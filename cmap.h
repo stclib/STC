@@ -59,10 +59,11 @@ static inline CMap(tag) cmap_##tag##_init(void) { \
 } \
  \
 static inline void cmap_##tag##_destroy(CMap(tag)* self) { \
-    if (self->_size == 0) return; \
-    cvector_size_t cap = cvector_capacity(self->_vec); \
-    CMapEntry(tag)* p = self->_vec.data, *end = p + cap; \
-    for (; p != end; ++p) if (p->_used) cmapentry_##tag##_destroy(p); \
+    if (self->_size) { \
+        cvector_size_t cap = _cvector_capacity(self->_vec); \
+        CMapEntry(tag)* p = self->_vec.data, *end = p + cap; \
+        for (; p != end; ++p) if (p->_used) cmapentry_##tag##_destroy(p); \
+    } \
     cvector__map##tag##_destroy(&self->_vec); \
 } \
  \
@@ -75,7 +76,7 @@ static inline void cmap_##tag##_clear(CMap(tag)* self) { \
  \
 static inline CMapEntry(tag)* cmap_##tag##_get(CMap(tag) cm, KeyRaw rawKey) { \
     if (cm._size == 0) return NULL; \
-    cvector_size_t cap = cvector_capacity(cm._vec); \
+    cvector_size_t cap = _cvector_capacity(cm._vec); \
     cvector_size_t idx = keyHasher(&rawKey, sizeof(Key)) % cap, first = idx; \
     FIBONACCI_DECL; \
     while (cm._vec.data[idx]._used && keyCompare(&cm._vec.data[idx].key, &rawKey, sizeof(Key)) != 0) \
@@ -88,8 +89,9 @@ static inline int cmap_##tag##_erase(CMap(tag)* self, KeyRaw rawKey) { \
     if (entryPtr) { \
         cmapentry_##tag##_destroy(entryPtr); \
         --self->_size; \
+        return 1; \
     } \
-    return entryPtr != NULL; \
+    return 0; \
 } \
  \
  static inline cvector_size_t cmap_##tag##_rehash(CMap(tag)* self); /* predeclared */ \
