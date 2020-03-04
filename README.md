@@ -47,7 +47,7 @@ declare_CMap(ii, int, int);
 CMap(ii) nums = cmap_initializer;
 cmap_ii_put(&nums, 8, 64);
 cmap_ii_put(&nums, 11, 121);
-printf("%s\n", cmap_ii_get(&nums, 8)->value);
+printf("%d\n", cmap_ii_get(&nums, 8)->value);
 cmap_ii_destroy(&nums);
 ```
 Simple CMap with CString keys -> int values
