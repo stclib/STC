@@ -71,8 +71,8 @@ CMap with CString keys, and CString values. Values are not handled internally.
 declare_CMap_STR(ss, CString, cstring_destroy); 
 
 CMap(ss) table = cmap_initializer;
-cmap_ss_put(&table, "Hello", 64);
-cmap_ss_put(&table, "Groovy", 121);
+cmap_ss_put(&table, "Hello", cstring_make("Goodbye"));
+cmap_ss_put(&table, "Groovy", cstring_make("Shaky"));
 printf("%s\n", cmap_ss_get(&table, "Groovy")->value.str);
 cmap_ss_destroy(&table); // frees key and value CStrings, and hash table (CVector).
 ```
