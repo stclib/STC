@@ -37,7 +37,7 @@ int read_words(CMap(si)* map)
 
     while (fgetstr(line, bufferLength, fp)) {
         ++i;
-        if (i < 20) printf("%zu: %s\n", i, line);
+        if (i < 10) printf("%zu: %s\n", i, line);
         cmap_si_put(map, line, i);
     }
 
@@ -47,12 +47,12 @@ int read_words(CMap(si)* map)
 
 int main()
 {
-    uint32_t i = 11, n = 671523123;
+    int i = 0;
 
-    CMap(si) words = cmap_init();
-    printf("read\n");
+    CMap(si) words = cmap_INIT;
+    printf("read words\n");
     read_words(&words);
-    //for (i=0; i<100; i++) { printf("%d: %d\n", i, graph[i]); graph[i] = 0; }
+
     CMapEntry(si)* num = NULL;
     num = cmap_si_get(words, "hello");
     if (num) printf("%s: %d\n", num->key.str, num->value);
@@ -60,60 +60,44 @@ int main()
     num = cmap_si_get(words, "funny");
     if (num) printf("%s: %d\n", num->key.str, num->value);
 
-    printf("%d, %d\n", cmap_size(words), cmap_capacity(words));
+    printf("words size: %d, capacity %d\n", cmap_size(words), cmap_capacity(words));
     cmap_si_clear(&words);
 
-/*
     CVector(cs) strv = cvector_INIT;
-    
     CString hello = cstring_make("Hello");
     cstring_assign(&hello, "Awesome");
-    
-    
 
     cvector_cs_push(&strv, cstring_make("E1"));
     cvector_cs_push(&strv, cstring_make("E2"));
     cvector_cs_push(&strv, cstring_make("E3"));
-    {CVectorIter(cs) it; cforeach (it, cvector_cs, strv) {
-        printf("  %s\n", it.item->str);
-    }}
+    CVectorIter(cs) it1; cforeach (it1, cvector_cs, strv) {
+        printf("  %s\n", it1.item->str);
+    }
     
-    {int i; for (i = 0; i < cvector_size(strv); ++i) {
+    for (i = 0; i < cvector_size(strv); ++i) {
         printf("  %s\n", strv.data[i].str);
-    }}
+    }
     cvector_cs_destroy(&strv);
 
-    CMap(ss) smap = cmap_init();
+    CMap(ss) smap = cmap_INIT;
     cmap_ss_put(&smap, "KEY1", cstring_make("VAL1"));
     cmap_ss_put(&smap, "KEY2", cstring_make("VAL2"));
     cmap_ss_put(&smap, "hello", cstring_makeCopy(hello));
     
     cstring_destroy(&hello);
     
-    {CMapIter(ss) it = cmap_ss_begin(smap), end = cmap_ss_end(smap);
-    for (; it.item != end.item; it = cmap_ss_next(it)) {
-        printf("  %s: %s\n", it.item->key.str, it.item->value.str);
-    }}
+    CMapIter(ss) it2 = cmap_ss_begin(smap), end2 = cmap_ss_end(smap);
+    for (; it2.item != end2.item; it2 = cmap_ss_next(it2)) {
+        printf("  %s: %s\n", it2.item->key.str, it2.item->value.str);
+    }
     cmap_ss_destroy(&smap);
-*/    
-    CMap(id) mymap = cmap_init();
-    //for (i = 0; i < 600000; ++i)
-    //    cmap_id_put(&mymap, ((uint64_t)i)*i, i * 1.0);
 
-
-    
-    //for (i=0; i<100; i++) { printf("%d: %d\n", i, graph[i]); graph[i] = 0; }
-    uint64_t tn = 75000;
-    cmap_id_put(&mymap, tn * tn, tn * 1.0);
-    printf("look %llu: %f\n", tn*tn, cmap_id_get(mymap, tn*tn) ? cmap_id_get(mymap, tn*tn)->value : -999.9);
+    CMap(id) mymap = cmap_INIT;
+    for (i = 0; i < 600000; ++i)
+        cmap_id_put(&mymap, i*i, i * 1.0);
         
-    //for (i = 0; i < cmap_size(mymap); ++i)
-    //    printf("look %d: %f\n", i*i, *cmap_id_get(mymap, i*i));
-    /*
-    {CMapIter(id) it; int k = 0; 
-    cforeach (it, cmap_id, mymap, k < 10, ++k) {
-        printf("  %d: %f\n", it.item->key, it.item->value);
-    }}
-    */
+    for (i = 1000; i < 1010; ++i)
+        printf("look %d: %f\n", i*i, *cmap_id_get(mymap, i*i));
+
     cmap_id_destroy(&mymap);
 }

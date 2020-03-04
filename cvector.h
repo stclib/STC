@@ -37,7 +37,8 @@ static inline cvector_size_t _cvector_safe_capacity(const void* data) {
 #define declare_CVector_2(tag, T)  declare_CVector_3(tag, T, cdef_destroy)
 #define declare_CVector_STR(tag)   declare_CVector_3(tag, CString, cstring_destroy)
 
-#define declare_CVector_3(tag, T, valueDestr) \
+
+#define declare_CVector_3(tag, T, valueDestroy) \
 typedef T cvector_##tag##_value_t; \
 typedef struct CVector(tag) { \
     T* data; \
@@ -58,7 +59,7 @@ static inline void cvector_##tag##_swap(CVector(tag)* v1, CVector(tag)* v2) { \
 static inline void cvector_##tag##_destroy(CVector(tag)* self) { \
     T* p = self->data; \
     cvector_size_t i = 0, n = cvector_size(*self); \
-    for (; i < n; ++p, ++i) valueDestr(p); \
+    for (; i < n; ++p, ++i) valueDestroy(p); \
     free(_cvector_alloced(self->data)); \
 } \
  \
@@ -111,10 +112,9 @@ static inline T cvector_##tag##_back(CVector(tag) cv) { \
 } \
  \
  \
-static inline T cvector_##tag##_pop(CVector(tag)* self) { \
-    T value = cvector_##tag##_back(*self); \
+static inline void cvector_##tag##_pop(CVector(tag)* self) { \
+    valueDestroy(&self->data[_cvector_size(*self) - 1]); \
     --_cvector_size(*self); \
-    return value; \
 } \
  \
  \
