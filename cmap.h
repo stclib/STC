@@ -7,21 +7,22 @@
 #define CMapEntry(tag) CMapEntry_##tag##_t
 #define CMapIter(tag)  CMapIter_##tag##_t
 
-#define cmap_INIT         {cvector_INIT, 0}
+#define cmap_initializer  {cvector_initializer, 0}
 #define cmap_size(cm)     ((cvector_size_t) (cm)._size)
 #define cmap_capacity(cm) cvector_capacity((cm)._vec)
 
 
 // CMapEntry:
-#define declare_CMapEntry_5(tag, Key, Value, keyDestroy, valueDestroy) \
-typedef struct CMapEntry(tag) { Key key; Value value; short untouched, _used; } CMapEntry(tag); \
-typedef struct CMapIter(tag) { CMapEntry(tag) *item, *_end; } CMapIter(tag); \
+#define declare_CMapEntry(tag, Key, Value, keyDestroy, valueDestroy) \
+struct CMapEntry(tag) { Key key; Value value; short untouched, _used; }; \
  \
-static inline void cmapentry_##tag##_destroy(CMapEntry(tag)* p) { \
+static inline void cmapentry_##tag##_destroy(struct CMapEntry(tag)* p) { \
     keyDestroy(&p->key); \
     valueDestroy(&p->value); \
     p->_used = 0; \
-}
+} \
+typedef struct CMapEntry(tag) CMapEntry(tag)
+
 
 // CMap:
 #define declare_CMap(...)  cdef_MACRO_OVERLOAD(declare_CMap, __VA_ARGS__)
@@ -45,7 +46,7 @@ static inline void cmapentry_##tag##_destroy(CMapEntry(tag)* p) { \
 
 // CMap full:
 #define declare_CMap_10(tag, Key, Value, valueDestroy, KeyRaw, keyGetRaw, keyCompare, keyHasher, keyInit, keyDestroy) \
-  declare_CMapEntry_5(tag, Key, Value, keyDestroy, valueDestroy); \
+  declare_CMapEntry(tag, Key, Value, keyDestroy, valueDestroy); \
   declare_CVector_3(_map##tag, CMapEntry(tag), cmapentry_##tag##_destroy); \
  \
 typedef struct CMap(tag) { \
@@ -53,8 +54,12 @@ typedef struct CMap(tag) { \
     cvector_size_t _size; \
 } CMap(tag); \
  \
+typedef struct CMapIter(tag) { \
+    CMapEntry(tag) *item, *_end; \
+} CMapIter(tag); \
+ \
 static inline CMap(tag) cmap_##tag##_init(void) { \
-    CMap(tag) map = cmap_INIT; \
+    CMap(tag) map = cmap_initializer; \
     return map; \
 } \
  \
@@ -68,7 +73,7 @@ static inline void cmap_##tag##_destroy(CMap(tag)* self) { \
 } \
  \
 static inline void cmap_##tag##_clear(CMap(tag)* self) { \
-    CMap(tag) cm = cmap_INIT; \
+    CMap(tag) cm = cmap_initializer; \
     cmap_##tag##_destroy(self); \
     *self = cm; \
 } \
@@ -112,7 +117,7 @@ static inline CMapEntry(tag)* cmap_##tag##_put(CMap(tag)* self, KeyRaw rawKey, V
 } \
  \
 static inline cvector_size_t cmap_##tag##_rehash(CMap(tag)* self) { \
-    CVector(_map##tag) vec = cvector_INIT; \
+    CVector(_map##tag) vec = cvector_initializer; \
     cvector_size_t newcap = 7 + cmap_capacity(*self) * 2; \
     cvector__map##tag##_swap(&self->_vec, &vec); \
     cvector__map##tag##_reserve(&self->_vec, newcap); \
@@ -135,7 +140,6 @@ static inline int cmap_##tag##_erase(CMap(tag)* self, KeyRaw rawKey) { \
     return 0; \
 } \
  \
- \
 static inline CMapIter(tag) cmap_##tag##_begin(CMap(tag) map) { \
     CMapIter(tag) null = {NULL, NULL}; \
     if (map._size == 0) return null; \
@@ -154,7 +158,9 @@ static inline CMapIter(tag) cmap_##tag##_end(CMap(tag) map) { \
     CMapEntry(tag)* end = (map._size == 0) ? NULL : map._vec.data + _cvector_capacity(map._vec); \
     CMapIter(tag) iter = {end, end}; \
     return iter; \
-}
+} \
+typedef Key cmap_##tag##_key_t; \
+typedef Value cmap_##tag##_value_t
 
 
 #define FIBONACCI_DECL  cvector_size_t fib1 = 1, fib2 = 2, fibx
