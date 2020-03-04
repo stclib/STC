@@ -52,8 +52,8 @@ static inline CVector(tag) cvector_##tag##_init(void) { \
     return cv; \
 } \
  \
-static inline void cvector_##tag##_swap(CVector(tag)* v1, CVector(tag)* v2) { \
-    T* data = v1->data; v1->data = v2->data; v2->data = data; \
+static inline void cvector_##tag##_swap(CVector(tag)* a, CVector(tag)* b) { \
+    T* data = a->data; a->data = b->data; b->data = data; \
 } \
  \
 static inline void cvector_##tag##_destroy(CVector(tag)* self) { \

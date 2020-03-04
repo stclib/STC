@@ -97,7 +97,12 @@ int main()
         cmap_id_put(&mymap, i*i, i);
         
     for (i = 1000; i < 1010; ++i)
-        printf("look %d: %f\n", i*i, cmap_id_get(mymap, i*i)->value);
+        printf("lookup %d: %f\n", i*i, cmap_id_get(mymap, i*i)->value);
+    
+    CMapEntry(id)* me = cmap_id_get(mymap, 10000);
+    printf("untouched: %d %f\n", me->untouched, me->value);
+    cmap_id_put(&mymap, 10000, 101.2);
+    printf("untouched: %d %f\n", me->untouched, me->value);
 
     cmap_id_destroy(&mymap);
 }
