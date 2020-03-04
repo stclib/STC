@@ -94,10 +94,10 @@ int main()
 
     CMap(id) mymap = cmap_INIT;
     for (i = 0; i < 600000; ++i)
-        cmap_id_put(&mymap, i*i, i * 1.0);
+        cmap_id_put(&mymap, i*i, i);
         
     for (i = 1000; i < 1010; ++i)
-        printf("look %d: %f\n", i*i, *cmap_id_get(mymap, i*i));
+        printf("look %d: %f\n", i*i, cmap_id_get(mymap, i*i)->value);
 
     cmap_id_destroy(&mymap);
 }
