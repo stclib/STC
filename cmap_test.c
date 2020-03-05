@@ -28,8 +28,8 @@
 
 
 declare_CVector(s, CString, cstring_destroy);
-declare_CMap_STR(ss, CString, cstring_destroy);
-declare_CMap_STR(si, int);
+declare_CMap_StringKey(ss, CString, cstring_destroy);
+declare_CMap_StringKey(si, int);
 declare_CMap(id, uint64_t, double);
 
 
