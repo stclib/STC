@@ -67,7 +67,7 @@ for (cmap_si_iter_t i = cmap_si_begin(nums); i.item != cmap_si_end(nums).item; i
 
 // or rather use the short form:
 cforeach (i, cmap_si, nums)
-  printf("%s: %d\n", i.item->key.str, i.item->value);
+  printf("%s: %d, changed: %s\n", i.item->key.str, i.item->value, i->changed ? "yes" : "no");
 
 cmap_si_destroy(&nums);
 ```
