@@ -19,12 +19,12 @@ declare_CVector(ix, int64_t); // ix is just an example tag name, use anything wi
 
 CVector_ix bignums = cvector_initializer; // use cvector_ix_init(); if initializing after declaration.
 cvector_ix_reserve(&bignums, 100);
-for (int i = 0; i<100; ++i)
+for (size_t i = 0; i<100; ++i)
   cvector_ix_push(&bignums, i * i * i);
 cvector_ix_pop(&bignums); // erase the last
 
 uint64_t value;
-for (int i = 0; i < cvector_size(bignums); ++i)
+for (size_t i = 0; i < cvector_size(bignums); ++i)
   value = bignums.data[i];
 cvector_ix_destroy(&bignums);
 ```
