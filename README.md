@@ -71,7 +71,7 @@ cforeach (i, cmap_si, nums)
 
 cmap_si_destroy(&nums);
 ```
-CMap with CString keys, and CString values. Values are not handled internally.
+CMap with CString keys, and CString values. Temporary values are created by "make", and moved to the container.
 ```
 #include "cmap.h"
 declare_CMap_STR(ss, CString, cstring_destroy); 
