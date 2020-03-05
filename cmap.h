@@ -57,12 +57,12 @@ typedef struct CMapEntry_##tag CMapEntry_##tag
 
 
 // CMap<CString, Value>:
-#define declare_CMap_STR(...)  cdef_MACRO_OVERLOAD(declare_CMap_STR, __VA_ARGS__)
+#define declare_CMap_StringKey(...)  cdef_MACRO_OVERLOAD(declare_CMap_StringKey, __VA_ARGS__)
 
-#define declare_CMap_STR_2(tag, Value) \
+#define declare_CMap_StringKey_2(tag, Value) \
     declare_CMap_STR_3(tag, Value, cdef_destroy)
 
-#define declare_CMap_STR_3(tag, Value, valueDestroy) \
+#define declare_CMap_StringKey_3(tag, Value, valueDestroy) \
     declare_CMap_10(tag, CString, Value, valueDestroy, const char*, cstring_getRaw, cstring_compare, cstring_hash, cstring_make, cstring_destroy)
 
 
