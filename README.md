@@ -28,7 +28,7 @@ for (int i = 0; i < cvector_size(bignums); ++i)
   value = bignums.data[i];
 cvector_ix_destroy(&bignums);
 ```
-CVector of CString
+CVector of CString:
 ```
 #include "cstring.h"
 #include "cvector.h"
@@ -40,7 +40,7 @@ cvector_cs_push(&names, cstring_make("Joe"));
 printf("%s\n", names.data[1].str); // Access the string char*
 cvector_cs_destroy(&names);
 ```
-Simple CMap, int -> int.
+Simple CMap, int -> int:
 ```
 #include "cmap.h"
 declare_CMap(ii, int, int);
@@ -62,10 +62,10 @@ cmap_si_put(&nums, "Hello", 64);
 cmap_si_put(&nums, "Groovy", 121);
 cmap_si_put(&nums, "Groovy", 200); // overwrite previous
 // iterate the map:
-for (cmap_si_iter_t i = cmap_si_begin(nums); i.item != cmap_si_end(nums); i = cmap_si_next(i))
+for (cmap_si_iter_t i = cmap_si_begin(nums); i.item != cmap_si_end(nums).item; i = cmap_si_next(i))
   printf("%s: %d\n", i.item->key.str, i.item->value);
 
-// or use the short form:
+// or rather use the short form:
 cforeach (i, cmap_si, nums)
   printf("%s: %d\n", i.item->key.str, i.item->value);
 
