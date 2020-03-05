@@ -1,3 +1,25 @@
+// MIT License
+//
+// Copyright (c) 2020 Tyge Løvset, NORCE, www.norceresearch.no
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
 #ifndef CVECTOR__H__
 #define CVECTOR__H__
 
@@ -25,44 +47,41 @@ static inline cvector_size_t _cvector_safe_capacity(const void* data) {
 }
 
 
-#define CVector(tag)           CVector_##tag##_t
-#define CVectorIter(tag)       CVectorIter_##tag##_t
-
 #define cvector_initializer    {NULL}
 #define cvector_size(cv)       _cvector_safe_size((cv).data)
 #define cvector_capacity(cv)   _cvector_safe_capacity((cv).data)
 #define cvector_empty(cv)      (_cvector_safe_size((cv).data) == 0)
 
-#define declare_CVector(...)       cdef_MACRO_OVERLOAD(declare_CVector, __VA_ARGS__)
+#define declare_CVector(...)           cdef_MACRO_OVERLOAD(declare_CVector, __VA_ARGS__)
 #define declare_CVector_2(tag, Value)  declare_CVector_3(tag, Value, cdef_destroy)
-#define declare_CVector_STR(tag)   declare_CVector_3(tag, CString, cstring_destroy)
+#define declare_CVector_STR(tag)       declare_CVector_3(tag, CString, cstring_destroy)
 
 
 #define declare_CVector_3(tag, Value, valueDestroy) \
-typedef struct CVector(tag) { \
+typedef struct CVector_##tag { \
     Value* data; \
-} CVector(tag); \
-typedef struct CVectorIter(tag) { \
+} CVector_##tag; \
+typedef struct cvector_##tag##_iter_t { \
     Value* item; \
-} CVectorIter(tag); \
+} cvector_##tag##_iter_t; \
  \
-static inline CVector(tag) cvector_##tag##_init(void) { \
-    CVector(tag) cv = cvector_initializer; \
+static inline CVector_##tag cvector_##tag##_init(void) { \
+    CVector_##tag cv = cvector_initializer; \
     return cv; \
 } \
  \
-static inline void cvector_##tag##_swap(CVector(tag)* a, CVector(tag)* b) { \
+static inline void cvector_##tag##_swap(CVector_##tag* a, CVector_##tag* b) { \
     Value* data = a->data; a->data = b->data; b->data = data; \
 } \
  \
-static inline void cvector_##tag##_destroy(CVector(tag)* self) { \
+static inline void cvector_##tag##_destroy(CVector_##tag* self) { \
     Value* p = self->data; \
     cvector_size_t i = 0, n = cvector_size(*self); \
     for (; i < n; ++p, ++i) valueDestroy(p); \
     free(_cvector_alloced(self->data)); \
 } \
  \
-static inline void cvector_##tag##_reserve(CVector(tag)* self, cvector_size_t cap) { \
+static inline void cvector_##tag##_reserve(CVector_##tag* self, cvector_size_t cap) { \
     if (cap > cvector_capacity(*self)) { \
         cvector_size_t len = cvector_size(*self); \
         cvector_size_t* rep = (cvector_size_t *) realloc(_cvector_alloced(self->data), 2 * sizeof(cvector_size_t) + cap * sizeof(Value)); \
@@ -72,25 +91,14 @@ static inline void cvector_##tag##_reserve(CVector(tag)* self, cvector_size_t ca
     } \
 } \
  \
- \
-static inline CVector(tag) cvector_##tag##_make(const Value* data, cvector_size_t len) { \
-    CVector(tag) cv = cvector_initializer; \
-    if (len) { \
-        cvector_##tag##_reserve(&cv, len); \
-        memcpy(cv.data, data, len * sizeof(Value)); \
-        _cvector_size(cv) = len; \
-    } \
-    return cv; \
-} \
- \
-static inline void cvector_##tag##_clear(CVector(tag)* self) { \
-    CVector(tag) cv = cvector_initializer; \
+static inline void cvector_##tag##_clear(CVector_##tag* self) { \
+    CVector_##tag cv = cvector_initializer; \
     cvector_##tag##_destroy(self); \
     *self = cv; \
 } \
  \
  \
-static inline void cvector_##tag##_push(CVector(tag)* self, Value value) { \
+static inline void cvector_##tag##_push(CVector_##tag* self, Value value) { \
     cvector_size_t newsize = cvector_size(*self) + 1; \
     if (newsize > cvector_capacity(*self)) \
         cvector_##tag##_reserve(self, 7 + newsize * 5 / 3); \
@@ -98,7 +106,7 @@ static inline void cvector_##tag##_push(CVector(tag)* self, Value value) { \
     _cvector_size(*self) = newsize; \
 } \
  \
-static inline void cvector_##tag##_insert(CVector(tag)* self, cvector_size_t pos, Value value) { \
+static inline void cvector_##tag##_insert(CVector_##tag* self, cvector_size_t pos, Value value) { \
     cvector_##tag##_push(self, value); \
     cvector_size_t len = cvector_size(*self); \
     memmove(&self->data[pos + 1], &self->data[pos], (len - pos - 1) * sizeof(Value)); \
@@ -106,30 +114,30 @@ static inline void cvector_##tag##_insert(CVector(tag)* self, cvector_size_t pos
 } \
  \
  \
-static inline Value cvector_##tag##_back(CVector(tag) cv) { \
+static inline Value cvector_##tag##_back(CVector_##tag cv) { \
     return cv.data[_cvector_size(cv) - 1]; \
 } \
  \
  \
-static inline void cvector_##tag##_pop(CVector(tag)* self) { \
+static inline void cvector_##tag##_pop(CVector_##tag* self) { \
     valueDestroy(&self->data[_cvector_size(*self) - 1]); \
     --_cvector_size(*self); \
 } \
  \
  \
-static inline CVectorIter(tag) cvector_##tag##_begin(CVector(tag) vec) { \
-    CVectorIter(tag) iter = {vec.data}; \
-    return iter; \
+static inline cvector_##tag##_iter_t cvector_##tag##_begin(CVector_##tag vec) { \
+    cvector_##tag##_iter_t it = {vec.data}; \
+    return it; \
 } \
  \
-static inline CVectorIter(tag) cvector_##tag##_next(CVectorIter(tag) iter) { \
-    ++iter.item; \
-    return iter; \
+static inline cvector_##tag##_iter_t cvector_##tag##_next(cvector_##tag##_iter_t it) { \
+    ++it.item; \
+    return it; \
 } \
  \
-static inline CVectorIter(tag) cvector_##tag##_end(CVector(tag) vec) { \
-    CVectorIter(tag) iter = {vec.data + cvector_size(vec)}; \
-    return iter; \
+static inline cvector_##tag##_iter_t cvector_##tag##_end(CVector_##tag vec) { \
+    cvector_##tag##_iter_t it = {vec.data + cvector_size(vec)}; \
+    return it; \
 } \
 typedef Value cvector_##tag##_value_t
 
