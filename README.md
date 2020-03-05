@@ -54,7 +54,7 @@ cmap_ii_destroy(&nums);
 Simple CMap with CString keys -> int values
 ```
 #include "cmap.h"
-declare_CMap_STR(si, int); // Just a shorthand macro for the general declare call.
+declare_CMap_StringKey(si, int); // Just a shorthand macro for the general declare call.
 // Keys strings are "magically" managed internally, although CMap is ignorant of CString.
 
 CMap_si nums = cmap_initializer;
@@ -74,7 +74,7 @@ cmap_si_destroy(&nums);
 CMap with CString keys -> CString values. Temporary values are created by "make", and moved to the container.
 ```
 #include "cmap.h"
-declare_CMap_STR(ss, CString, cstring_destroy); 
+declare_CMap_StringKey(ss, CString, cstring_destroy); 
 
 CMap_ss table = cmap_initializer;
 cmap_ss_put(&table, "Hello", cstring_make("Goodbye"));
