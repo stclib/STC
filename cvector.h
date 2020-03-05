@@ -31,19 +31,6 @@
 
 #include "cdef.h"
 
-#define _cvector_size(cv) ((size_t *)(cv).data)[-2]
-#define _cvector_capacity(cv) ((size_t *)(cv).data)[-1]
-
-static inline size_t* _cvector_alloced(void* data) {
-    return data ? ((size_t *) data) - 2 : NULL;
-}
-static inline size_t _cvector_safe_size(const void* data) {
-    return data ? ((const size_t *) data)[-2] : 0;
-}
-static inline size_t _cvector_safe_capacity(const void* data) {
-    return data ? ((const size_t *) data)[-1] : 0;
-}
-
 
 #define cvector_initializer    {NULL}
 #define cvector_size(cv)       _cvector_safe_size((cv).data)
@@ -138,5 +125,19 @@ static inline cvector_##tag##_iter_t cvector_##tag##_end(CVector_##tag vec) { \
     return it; \
 } \
 typedef Value cvector_##tag##_value_t
+
+
+#define _cvector_size(cv) ((size_t *)(cv).data)[-2]
+#define _cvector_capacity(cv) ((size_t *)(cv).data)[-1]
+
+static inline size_t* _cvector_alloced(void* data) {
+    return data ? ((size_t *) data) - 2 : NULL;
+}
+static inline size_t _cvector_safe_size(const void* data) {
+    return data ? ((const size_t *) data)[-2] : 0;
+}
+static inline size_t _cvector_safe_capacity(const void* data) {
+    return data ? ((const size_t *) data)[-1] : 0;
+}
 
 #endif
