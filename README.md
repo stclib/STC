@@ -17,16 +17,18 @@ Simple CVector of 64bit ints:
 #include "cvector.h"
 declare_CVector(ix, int64_t); // ix is just an example tag name, use anything without underscore.
 
-CVector_ix bignums = cvector_initializer; // use cvector_ix_init(); if initializing after declaration.
-cvector_ix_reserve(&bignums, 100);
-for (size_t i = 0; i<100; ++i)
-  cvector_ix_push(&bignums, i * i * i);
-cvector_ix_pop(&bignums); // erase the last
+int main() {
+  CVector_ix bignums = cvector_initializer; // use cvector_ix_init(); if initializing after declaration.
+  cvector_ix_reserve(&bignums, 100);
+  for (size_t i = 0; i<100; ++i)
+    cvector_ix_push(&bignums, i * i * i);
+  cvector_ix_pop(&bignums); // erase the last
 
-uint64_t value;
-for (size_t i = 0; i < cvector_size(bignums); ++i)
-  value = bignums.data[i];
-cvector_ix_destroy(&bignums);
+  uint64_t value;
+  for (size_t i = 0; i < cvector_size(bignums); ++i)
+    value = bignums.data[i];
+  cvector_ix_destroy(&bignums);
+}
 ```
 CVector of CString:
 ```
@@ -34,11 +36,13 @@ CVector of CString:
 #include "cvector.h"
 declare_CVector(cs, CString, cstring_destroy); // supply inline destructor of values
 
-CVector_cs names = cvector_initializer;
-cvector_cs_push(&names, cstring_make("Mary"));
-cvector_cs_push(&names, cstring_make("Joe"));
-printf("%s\n", names.data[1].str); // Access the string char*
-cvector_cs_destroy(&names);
+int main() {
+  CVector_cs names = cvector_initializer;
+  cvector_cs_push(&names, cstring_make("Mary"));
+  cvector_cs_push(&names, cstring_make("Joe"));
+  printf("%s\n", names.data[1].str); // Access the string char*
+  cvector_cs_destroy(&names);
+}
 ```
 Simple CMap, int -> int:
 ```
@@ -53,7 +57,7 @@ int main() {
   cmap_ii_destroy(&nums);
 }
 ```
-Simple CMap with CString keys -> int values
+Simple CMap with CString keys -> int values:
 ```
 #include "cstring.h"
 #include "cmap.h"
@@ -75,7 +79,7 @@ int main() {
   cmap_si_destroy(&nums);
 }
 ```
-CMap with CString keys -> CString values. Temporary values are created by "make", and moved to the container.
+CMap with CString keys -> CString values. Temp. CStrings are created by "make", and moved to the container.
 ```
 #include "cstring.h"
 #include "cmap.h"
