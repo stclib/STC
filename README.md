@@ -8,7 +8,7 @@ Headers only library with the most useful data structures: string, dynamic vecto
 
 The map is using open hashing with a novel probing strategy (fibonacci sequence), which is as efficient as quadratic probing, but has none of its limitations (max half full table, and prime number table length only requirements).
 
-The library has a very intuitive and straight forward API, and as mentioned is fully type safe. It uses "overloadable macros", to simplify usage.
+The library has an intuitive and straight forward API, and is fully type safe. It uses "overloadable macros", to simplify usage.
 
 Usage
 -----
