@@ -12,7 +12,7 @@ The library has a very intuitive and straight forward API, and as mentioned is f
 
 Usage
 -----
-Simple CVector:
+Simple CVector of 64bit ints:
 ```
 #include "cvector.h"
 declare_CVector(ix, int64_t); // ix is just an example tag name, use anything without underscore.
@@ -71,7 +71,7 @@ cforeach (i, cmap_si, nums)
 
 cmap_si_destroy(&nums);
 ```
-CMap with CString keys, and CString values. Temporary values are created by "make", and moved to the container.
+CMap with CString keys -> CString values. Temporary values are created by "make", and moved to the container.
 ```
 #include "cmap.h"
 declare_CMap_STR(ss, CString, cstring_destroy); 
