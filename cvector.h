@@ -31,19 +31,17 @@
 
 #include "cdef.h"
 
-typedef uint32_t cvector_size_t;
+#define _cvector_size(cv) ((size_t *)(cv).data)[-2]
+#define _cvector_capacity(cv) ((size_t *)(cv).data)[-1]
 
-#define _cvector_size(cv) ((cvector_size_t *)(cv).data)[-2]
-#define _cvector_capacity(cv) ((cvector_size_t *)(cv).data)[-1]
-
-static inline cvector_size_t* _cvector_alloced(void* data) {
-    return data ? ((cvector_size_t *) data) - 2 : NULL;
+static inline size_t* _cvector_alloced(void* data) {
+    return data ? ((size_t *) data) - 2 : NULL;
 }
-static inline cvector_size_t _cvector_safe_size(const void* data) {
-    return data ? ((const cvector_size_t *) data)[-2] : 0;
+static inline size_t _cvector_safe_size(const void* data) {
+    return data ? ((const size_t *) data)[-2] : 0;
 }
-static inline cvector_size_t _cvector_safe_capacity(const void* data) {
-    return data ? ((const cvector_size_t *) data)[-1] : 0;
+static inline size_t _cvector_safe_capacity(const void* data) {
+    return data ? ((const size_t *) data)[-1] : 0;
 }
 
 
@@ -76,15 +74,15 @@ static inline void cvector_##tag##_swap(CVector_##tag* a, CVector_##tag* b) { \
  \
 static inline void cvector_##tag##_destroy(CVector_##tag* self) { \
     Value* p = self->data; \
-    cvector_size_t i = 0, n = cvector_size(*self); \
+    size_t i = 0, n = cvector_size(*self); \
     for (; i < n; ++p, ++i) valueDestroy(p); \
     free(_cvector_alloced(self->data)); \
 } \
  \
-static inline void cvector_##tag##_reserve(CVector_##tag* self, cvector_size_t cap) { \
+static inline void cvector_##tag##_reserve(CVector_##tag* self, size_t cap) { \
     if (cap > cvector_capacity(*self)) { \
-        cvector_size_t len = cvector_size(*self); \
-        cvector_size_t* rep = (cvector_size_t *) realloc(_cvector_alloced(self->data), 2 * sizeof(cvector_size_t) + cap * sizeof(Value)); \
+        size_t len = cvector_size(*self); \
+        size_t* rep = (size_t *) realloc(_cvector_alloced(self->data), 2 * sizeof(size_t) + cap * sizeof(Value)); \
         self->data = (Value *) (rep + 2); \
         rep[0] = len; \
         rep[1] = cap; \
@@ -99,16 +97,16 @@ static inline void cvector_##tag##_clear(CVector_##tag* self) { \
  \
  \
 static inline void cvector_##tag##_push(CVector_##tag* self, Value value) { \
-    cvector_size_t newsize = cvector_size(*self) + 1; \
+    size_t newsize = cvector_size(*self) + 1; \
     if (newsize > cvector_capacity(*self)) \
         cvector_##tag##_reserve(self, 7 + newsize * 5 / 3); \
     self->data[cvector_size(*self)] = value; \
     _cvector_size(*self) = newsize; \
 } \
  \
-static inline void cvector_##tag##_insert(CVector_##tag* self, cvector_size_t pos, Value value) { \
+static inline void cvector_##tag##_insert(CVector_##tag* self, size_t pos, Value value) { \
     cvector_##tag##_push(self, value); \
-    cvector_size_t len = cvector_size(*self); \
+    size_t len = cvector_size(*self); \
     memmove(&self->data[pos + 1], &self->data[pos], (len - pos - 1) * sizeof(Value)); \
     self->data[pos] = value; \
 } \

@@ -26,7 +26,7 @@
 #include "cvector.h"
 
 #define cmap_initializer  {cvector_initializer, 0}
-#define cmap_size(cm)     ((cvector_size_t) (cm)._size)
+#define cmap_size(cm)     ((size_t) (cm)._size)
 #define cmap_capacity(cm) cvector_capacity((cm)._vec)
 
 
@@ -73,7 +73,7 @@ typedef struct CMapEntry_##tag CMapEntry_##tag
  \
 typedef struct CMap_##tag { \
     CVector_map_##tag _vec; \
-    cvector_size_t _size; \
+    size_t _size; \
 } CMap_##tag; \
  \
 typedef struct cmap_##tag##_iter_t { \
@@ -87,7 +87,7 @@ static inline CMap_##tag cmap_##tag##_init(void) { \
  \
 static inline void cmap_##tag##_destroy(CMap_##tag* self) { \
     if (self->_size) { \
-        cvector_size_t cap = _cvector_capacity(self->_vec); \
+        size_t cap = _cvector_capacity(self->_vec); \
         CMapEntry_##tag* p = self->_vec.data, *end = p + cap; \
         for (; p != end; ++p) if (p->_used) cmapentry_##tag##_destroy(p); \
     } \
@@ -102,12 +102,12 @@ static inline void cmap_##tag##_clear(CMap_##tag* self) { \
  \
 static inline void cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
     cvector_map_##tag##_swap(&a->_vec, &b->_vec); \
-    _cdef_swap(cvector_size_t, a->_size, b->_size); \
+    _cdef_swap(size_t, a->_size, b->_size); \
 } \
  \
-static inline cvector_size_t _cmap_##tag##_findIndex(CMap_##tag cm, KeyRaw rawKey) { \
-    cvector_size_t cap = cvector_capacity(cm._vec); \
-    cvector_size_t idx = keyHasher(&rawKey, sizeof(Key)) % cap, first = idx; \
+static inline size_t _cmap_##tag##_findIndex(CMap_##tag cm, KeyRaw rawKey) { \
+    size_t cap = cvector_capacity(cm._vec); \
+    size_t idx = keyHasher(&rawKey, sizeof(Key)) % cap, first = idx; \
     FIBONACCI_DECL; \
     while (cm._vec.data[idx]._used && keyCompare(&cm._vec.data[idx].key, &rawKey, sizeof(Key)) != 0) \
         idx = (first + FIBONACCI_NEXT) % cap; \
@@ -116,17 +116,17 @@ static inline cvector_size_t _cmap_##tag##_findIndex(CMap_##tag cm, KeyRaw rawKe
  \
 static inline CMapEntry_##tag* cmap_##tag##_get(CMap_##tag cm, KeyRaw rawKey) { \
     if (cm._size == 0) return NULL; \
-    cvector_size_t idx = _cmap_##tag##_findIndex(cm, rawKey); \
+    size_t idx = _cmap_##tag##_findIndex(cm, rawKey); \
     return cm._vec.data[idx]._used ? &cm._vec.data[idx] : NULL; \
 } \
  \
-static inline cvector_size_t cmap_##tag##_rehash(CMap_##tag* self); /* predeclared */ \
+static inline size_t cmap_##tag##_rehash(CMap_##tag* self); /* predeclared */ \
  \
 static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, KeyRaw rawKey, Value value) { \
-    cvector_size_t cap = cvector_capacity(self->_vec); \
+    size_t cap = cvector_capacity(self->_vec); \
     if (self->_size >= cap * 8 / 10) \
         cap = cmap_##tag##_rehash(self); \
-    cvector_size_t idx = _cmap_##tag##_findIndex(*self, rawKey); \
+    size_t idx = _cmap_##tag##_findIndex(*self, rawKey); \
     CMapEntry_##tag* e = &self->_vec.data[idx]; \
     e->value = value; \
     e->changed = e->_used; \
@@ -138,15 +138,15 @@ static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, KeyRaw rawKey,
     return e; \
 } \
  \
-static inline cvector_size_t cmap_##tag##_rehash(CMap_##tag* self) { \
+static inline size_t cmap_##tag##_rehash(CMap_##tag* self) { \
     CVector_map_##tag vec = cvector_initializer; \
-    cvector_size_t newcap = 7 + cmap_capacity(*self) * 2; \
+    size_t newcap = 7 + cmap_capacity(*self) * 2; \
     cvector_map_##tag##_swap(&self->_vec, &vec); \
     cvector_map_##tag##_reserve(&self->_vec, newcap); \
     self->_size = 0; \
     memset(self->_vec.data, 0, sizeof(CMapEntry_##tag) * newcap); \
     CMapEntry_##tag* p = vec.data; \
-    cvector_size_t i, oldcap = cvector_capacity(vec); \
+    size_t i, oldcap = cvector_capacity(vec); \
     for (i = 0; i < oldcap; ++i, ++p) \
         if (p->_used) cmap_##tag##_put(self, keyGetRaw(p->key), p->value); \
     return newcap; \
@@ -185,7 +185,7 @@ typedef Key cmap_##tag##_key_t; \
 typedef Value cmap_##tag##_value_t
 
 
-#define FIBONACCI_DECL  cvector_size_t fib1 = 1, fib2 = 2, fibx
+#define FIBONACCI_DECL  size_t fib1 = 1, fib2 = 2, fibx
 #define FIBONACCI_NEXT  (fibx = fib1 + fib2, fib1 = fib2, fib2 = fibx)
 
 #endif
