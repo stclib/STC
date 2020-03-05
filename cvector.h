@@ -54,7 +54,7 @@ static inline cvector_size_t _cvector_safe_capacity(const void* data) {
 
 #define declare_CVector(...)           cdef_MACRO_OVERLOAD(declare_CVector, __VA_ARGS__)
 #define declare_CVector_2(tag, Value)  declare_CVector_3(tag, Value, cdef_destroy)
-#define declare_CVector_STR(tag)       declare_CVector_3(tag, CString, cstring_destroy)
+#define declare_CStringVector(tag)     declare_CVector_3(tag, CString, cstring_destroy)
 
 
 #define declare_CVector_3(tag, Value, valueDestroy) \
