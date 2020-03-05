@@ -124,7 +124,7 @@ static inline size_t cmap_##tag##_rehash(CMap_##tag* self); /* predeclared */ \
  \
 static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, KeyRaw rawKey, Value value) { \
     size_t cap = cvector_capacity(self->_vec); \
-    if (self->_size >= cap * 8 / 10) \
+    if (self->_size >= cap * 4 / 5) \
         cap = cmap_##tag##_rehash(self); \
     size_t idx = _cmap_##tag##_findIndex(*self, rawKey); \
     CMapEntry_##tag* e = &self->_vec.data[idx]; \
@@ -140,7 +140,7 @@ static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, KeyRaw rawKey,
  \
 static inline size_t cmap_##tag##_rehash(CMap_##tag* self) { \
     CVector_map_##tag vec = cvector_initializer; \
-    size_t newcap = 7 + cmap_capacity(*self) * 2; \
+    size_t newcap = 7 + cmap_capacity(*self) * 5 / 3; \
     cvector_map_##tag##_swap(&self->_vec, &vec); \
     cvector_map_##tag##_reserve(&self->_vec, newcap); \
     self->_size = 0; \
@@ -185,7 +185,7 @@ typedef Key cmap_##tag##_key_t; \
 typedef Value cmap_##tag##_value_t
 
 
-#define FIBONACCI_DECL  size_t fib1 = 1, fib2 = 2, fibx
+#define FIBONACCI_DECL  size_t fib1 = 0, fib2 = 1, fibx
 #define FIBONACCI_NEXT  (fibx = fib1 + fib2, fib1 = fib2, fib2 = fibx)
 
 #endif
