@@ -42,10 +42,10 @@ struct CMapEntry_##tag { \
     uint8_t state, changed; \
 }; \
  \
-static inline void cmapentry_##tag##_destroy(struct CMapEntry_##tag* p) { \
-    keyDestroy(&p->key); \
-    valueDestroy(&p->value); \
-    p->state = CMapEntry_VACANT; \
+static inline void cmapentry_##tag##_destroy(struct CMapEntry_##tag* e) { \
+    keyDestroy(&e->key); \
+    valueDestroy(&e->value); \
+    e->state = CMapEntry_VACANT; \
 } \
 typedef struct CMapEntry_##tag CMapEntry_##tag
 
@@ -92,8 +92,8 @@ static inline CMap_##tag cmap_##tag##_init(void) { \
 static inline void cmap_##tag##_destroy(CMap_##tag* self) { \
     if (self->_size) { \
         size_t cap = _cvector_capacity(self->_vec); \
-        CMapEntry_##tag* p = self->_vec.data, *end = p + cap; \
-        for (; p != end; ++p) if (p->state == CMapEntry_INUSE) cmapentry_##tag##_destroy(p); \
+        CMapEntry_##tag* e = self->_vec.data, *end = e + cap; \
+        for (; e != end; ++e) if (e->state == CMapEntry_INUSE) cmapentry_##tag##_destroy(e); \
     } \
     cvector_map_##tag##_destroy(&self->_vec); \
 } \
@@ -147,24 +147,24 @@ static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, KeyRaw rawKey,
 } \
  \
 static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size) { \
-    size_t oldcap = cvector_capacity(self->_vec), newcap = (oldcap < 50 ? 7 : 1) + (size / 2) * 2; \
+    size_t oldcap = cvector_capacity(self->_vec), newcap = (oldcap ? 1 : 7) + (size / 2) * 2; \
     if (oldcap >= newcap) return oldcap; \
     CVector_map_##tag vec = cvector_initializer; \
     cvector_map_##tag##_swap(&self->_vec, &vec); \
     cvector_map_##tag##_reserve(&self->_vec, newcap); \
     self->_size = 0; \
     memset(self->_vec.data, 0, sizeof(CMapEntry_##tag) * newcap); \
-    CMapEntry_##tag* p = vec.data; \
-    for (size_t i = 0; i < oldcap; ++i, ++p) \
-        if (p->state == CMapEntry_INUSE) cmap_##tag##_put(self, keyGetRaw(p->key), p->value); \
+    CMapEntry_##tag* e = vec.data; \
+    for (size_t i = 0; i < oldcap; ++i, ++e) \
+        if (e->state == CMapEntry_INUSE) cmap_##tag##_put(self, keyGetRaw(e->key), e->value); \
     return newcap; \
 } \
  \
 static inline int cmap_##tag##_erase(CMap_##tag* self, KeyRaw rawKey) { \
-    CMapEntry_##tag* entryPtr = cmap_##tag##_get(*self, rawKey); \
-    if (entryPtr) { \
-        cmapentry_##tag##_destroy(entryPtr); \
-        entryPtr->state = CMapEntry_REMOVED; \
+    CMapEntry_##tag* e = cmap_##tag##_get(*self, rawKey); \
+    if (e) { \
+        cmapentry_##tag##_destroy(e); \
+        e->state = CMapEntry_REMOVED; \
         --self->_size; \
         return 1; \
     } \
@@ -174,14 +174,13 @@ static inline int cmap_##tag##_erase(CMap_##tag* self, KeyRaw rawKey) { \
 static inline cmap_##tag##_iter_t cmap_##tag##_begin(CMap_##tag map) { \
     cmap_##tag##_iter_t null = {NULL, NULL}; \
     if (map._size == 0) return null; \
-    CMapEntry_##tag* p = map._vec.data, *end = p + _cvector_capacity(map._vec); \
-    while (p != end && p->state != CMapEntry_INUSE) ++p; \
-    cmap_##tag##_iter_t it = {p, end}; return it; \
+    CMapEntry_##tag* e = map._vec.data, *end = e + _cvector_capacity(map._vec); \
+    while (e != end && e->state != CMapEntry_INUSE) ++e; \
+    cmap_##tag##_iter_t it = {e, end}; return it; \
 } \
  \
 static inline cmap_##tag##_iter_t cmap_##tag##_next(cmap_##tag##_iter_t it) { \
-    ++it.item; \
-    while (it.item != it._end && !(it.item->state & CMapEntry_INUSE)) ++it.item; \
+    do { ++it.item; } while (it.item != it._end && it.item->state != CMapEntry_INUSE); \
     return it; \
 } \
  \
