@@ -98,17 +98,25 @@ static inline void cvector_##tag##_insert(CVector_##tag* self, size_t pos, Value
     self->data[pos] = value; \
 } \
  \
+static inline void cvector_##tag##_erase(CVector_##tag* self, size_t pos, size_t size) { \
+    size_t len = cvector_size(*self); \
+    if (len) { \
+        Value* p = &self->data[pos], *start = p, *end = p + size; \
+        while (p != end) valueDestroy(p++); \
+        memmove(start, end, (len - pos - size) * sizeof(Value)); \
+        _cvector_size(*self) -= size; \
+    } \
+} \
+ \
  \
 static inline Value cvector_##tag##_back(CVector_##tag cv) { \
     return cv.data[_cvector_size(cv) - 1]; \
 } \
  \
- \
 static inline void cvector_##tag##_pop(CVector_##tag* self) { \
     valueDestroy(&self->data[_cvector_size(*self) - 1]); \
     --_cvector_size(*self); \
 } \
- \
  \
 static inline cvector_##tag##_iter_t cvector_##tag##_begin(CVector_##tag vec) { \
     cvector_##tag##_iter_t it = {vec.data}; \

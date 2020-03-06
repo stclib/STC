@@ -27,7 +27,7 @@
 #include "cstring.h"
 
 
-declare_CVector(s, CString, cstring_destroy);
+declare_CStringVector(s);
 declare_CMap_StringKey(ss, CString, cstring_destroy);
 declare_CMap_StringKey(si, int);
 declare_CMap(id, uint64_t, double);
