@@ -31,17 +31,21 @@
 
 
 // CMapEntry:
+enum { CMapEntry_VACANT = 0, 
+       CMapEntry_INUSE = 1,
+       CMapEntry_REMOVED = 2
+};
 #define declare_CMapEntry(tag, Key, Value, keyDestroy, valueDestroy) \
 struct CMapEntry_##tag { \
     Key key; \
     Value value; \
-    short _used, changed; \
+    uint8_t state, changed; \
 }; \
  \
 static inline void cmapentry_##tag##_destroy(struct CMapEntry_##tag* p) { \
     keyDestroy(&p->key); \
     valueDestroy(&p->value); \
-    p->_used = p->changed = 0; \
+    p->state = CMapEntry_VACANT; \
 } \
 typedef struct CMapEntry_##tag CMapEntry_##tag
 
@@ -89,7 +93,7 @@ static inline void cmap_##tag##_destroy(CMap_##tag* self) { \
     if (self->_size) { \
         size_t cap = _cvector_capacity(self->_vec); \
         CMapEntry_##tag* p = self->_vec.data, *end = p + cap; \
-        for (; p != end; ++p) if (p->_used) cmapentry_##tag##_destroy(p); \
+        for (; p != end; ++p) if (p->state == CMapEntry_INUSE) cmapentry_##tag##_destroy(p); \
     } \
     cvector_map_##tag##_destroy(&self->_vec); \
 } \
@@ -105,50 +109,54 @@ static inline void cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
     _cdef_swap(size_t, a->_size, b->_size); \
 } \
  \
-static inline size_t _cmap_##tag##_findIndex(CMap_##tag cm, KeyRaw rawKey) { \
+static inline size_t cmap_##tag##_bucket(CMap_##tag cm, KeyRaw rawKey) { \
     size_t cap = cvector_capacity(cm._vec); \
-    size_t idx = keyHasher(&rawKey, sizeof(Key)) % cap, first = idx; \
+    size_t idx = keyHasher(&rawKey, sizeof(Key)) % cap; \
+    size_t first = idx, found = cap, state = cm._vec.data[idx].state; \
     FIBONACCI_DECL; \
-    while (cm._vec.data[idx]._used && keyCompare(&cm._vec.data[idx].key, &rawKey, sizeof(Key)) != 0) \
-        idx = (first + FIBONACCI_NEXT) % cap; \
-    return idx; \
+    do { \
+        if ((state == CMapEntry_INUSE) && keyCompare(&cm._vec.data[idx].key, &rawKey, sizeof(Key)) == 0) return idx; \
+        if ((state == CMapEntry_REMOVED) && found == cap) found = idx; \
+        state = cm._vec.data[ idx = (first + FIBONACCI_NEXT) % cap ].state; \
+    } while (state != CMapEntry_VACANT); \
+    return found == cap ? idx : found; \
 } \
  \
 static inline CMapEntry_##tag* cmap_##tag##_get(CMap_##tag cm, KeyRaw rawKey) { \
     if (cm._size == 0) return NULL; \
-    size_t idx = _cmap_##tag##_findIndex(cm, rawKey); \
-    return cm._vec.data[idx]._used ? &cm._vec.data[idx] : NULL; \
+    size_t idx = cmap_##tag##_bucket(cm, rawKey); \
+    return cm._vec.data[idx].state == CMapEntry_INUSE ? &cm._vec.data[idx] : NULL; \
 } \
  \
-static inline size_t cmap_##tag##_rehash(CMap_##tag* self); /* predeclared */ \
+static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size); /* predeclared */ \
  \
 static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, KeyRaw rawKey, Value value) { \
     size_t cap = cvector_capacity(self->_vec); \
     if (self->_size >= cap * 4 / 5) \
-        cap = cmap_##tag##_rehash(self); \
-    size_t idx = _cmap_##tag##_findIndex(*self, rawKey); \
+        cap = cmap_##tag##_reserve(self, cap * 5 / 3); \
+    size_t idx = cmap_##tag##_bucket(*self, rawKey); \
     CMapEntry_##tag* e = &self->_vec.data[idx]; \
     e->value = value; \
-    e->changed = e->_used; \
-    if (!e->_used) { \
+    e->changed = (e->state == CMapEntry_INUSE); \
+    if (e->state != CMapEntry_INUSE) { \
         e->key = keyInit(rawKey); \
-        e->_used = 1; \
+        e->state = CMapEntry_INUSE; \
         ++self->_size; \
     } \
     return e; \
 } \
  \
-static inline size_t cmap_##tag##_rehash(CMap_##tag* self) { \
+static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size) { \
+    size_t oldcap = cvector_capacity(self->_vec), newcap = (oldcap < 50 ? 7 : 1) + (size / 2) * 2; \
+    if (oldcap >= newcap) return oldcap; \
     CVector_map_##tag vec = cvector_initializer; \
-    size_t newcap = 7 + cmap_capacity(*self) * 5 / 3; \
     cvector_map_##tag##_swap(&self->_vec, &vec); \
     cvector_map_##tag##_reserve(&self->_vec, newcap); \
     self->_size = 0; \
     memset(self->_vec.data, 0, sizeof(CMapEntry_##tag) * newcap); \
     CMapEntry_##tag* p = vec.data; \
-    size_t i, oldcap = cvector_capacity(vec); \
-    for (i = 0; i < oldcap; ++i, ++p) \
-        if (p->_used) cmap_##tag##_put(self, keyGetRaw(p->key), p->value); \
+    for (size_t i = 0; i < oldcap; ++i, ++p) \
+        if (p->state == CMapEntry_INUSE) cmap_##tag##_put(self, keyGetRaw(p->key), p->value); \
     return newcap; \
 } \
  \
@@ -156,6 +164,7 @@ static inline int cmap_##tag##_erase(CMap_##tag* self, KeyRaw rawKey) { \
     CMapEntry_##tag* entryPtr = cmap_##tag##_get(*self, rawKey); \
     if (entryPtr) { \
         cmapentry_##tag##_destroy(entryPtr); \
+        entryPtr->state = CMapEntry_REMOVED; \
         --self->_size; \
         return 1; \
     } \
@@ -166,13 +175,13 @@ static inline cmap_##tag##_iter_t cmap_##tag##_begin(CMap_##tag map) { \
     cmap_##tag##_iter_t null = {NULL, NULL}; \
     if (map._size == 0) return null; \
     CMapEntry_##tag* p = map._vec.data, *end = p + _cvector_capacity(map._vec); \
-    while (p != end && !p->_used) ++p; \
+    while (p != end && p->state != CMapEntry_INUSE) ++p; \
     cmap_##tag##_iter_t it = {p, end}; return it; \
 } \
  \
 static inline cmap_##tag##_iter_t cmap_##tag##_next(cmap_##tag##_iter_t it) { \
     ++it.item; \
-    while (it.item != it._end && !it.item->_used) ++it.item; \
+    while (it.item != it._end && !(it.item->state & CMapEntry_INUSE)) ++it.item; \
     return it; \
 } \
  \
