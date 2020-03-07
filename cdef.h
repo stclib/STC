@@ -46,8 +46,6 @@ static inline void  cdef_destroy(void* value) {}
 #define             cforeach(...) cdef_MACRO_OVERLOAD(cforeach, __VA_ARGS__)
 #define             cforeach_3(it, ctag, con) \
                         for (ctag##_iter_t it = ctag##_begin(con); it.item != ctag##_end(con).item; it = ctag##_next(it))
-#define             cforeach_5(it, ctag, con, cond, next) \
-                        for (ctag##_iter_t it = ctag##_begin(con); it.item != ctag##_end(con).item && (cond); it = ctag##_next(it), next)
 
 static inline uint32_t 
 cdef_murmurHash(const void *data, size_t len) // One-at-a-time 32bit

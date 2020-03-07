@@ -115,8 +115,10 @@ static inline size_t cmap_##tag##_bucket(CMap_##tag cm, KeyRaw rawKey) { \
     size_t first = idx, found = cap, state = cm._vec.data[idx].state; \
     FIBONACCI_DECL; \
     do { \
-        if ((state == CMapEntry_INUSE) && keyCompare(&cm._vec.data[idx].key, &rawKey, sizeof(Key)) == 0) return idx; \
-        if ((state == CMapEntry_REMOVED) && found == cap) found = idx; \
+        if (state == CMapEntry_INUSE && keyCompare(&cm._vec.data[idx].key, &rawKey, sizeof(Key)) == 0) \
+            return idx; \
+        if (state == CMapEntry_REMOVED && found == cap) \
+            found = idx; \
         state = cm._vec.data[ idx = (first + FIBONACCI_NEXT) % cap ].state; \
     } while (state != CMapEntry_VACANT); \
     return found == cap ? idx : found; \

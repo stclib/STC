@@ -22,6 +22,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include "cmap.h"
 #include "cstring.h"
@@ -52,7 +53,7 @@ int read_words(CMap_si* map)
     char line[bufferLength];
     size_t len = 0, i = 0;
     size_t read;
-
+    
     fp = fopen("words_dictionary.txt", "r");
     if (fp == NULL)
         return -1;
@@ -67,12 +68,43 @@ int read_words(CMap_si* map)
     return 0;
 }
 
+void stringSpeed(int limit) {
+    CString s = cstring_initializer;
+    char ch[2] = {0, 0};
+    size_t x = 0;
+    const char* p = 0;
+    for (int n = 0; n < limit; ++n) { ch[0] = 'A' + (rand() % 26); cstring_append(&s, ch); }
+    const char* search = "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    cstring_append(&s, search);
+    clock_t before = clock();
+    for (int n = 0; n < limit; ++n) {
+        p = cstring_find(s, 0, search + (n % 100));
+		if (p) x += (p - s.str);
+    }
+    clock_t diff = clock() - before;
+    printf("cstring length = %llu / %llu, sum %llu speed: %f\n", cstring_size(s), cstring_capacity(s), x, 1.0 * diff / CLOCKS_PER_SEC);
+}
+
 int main()
 {
     int i = 0;
 
-    CMap_si words = cmap_initializer;
+    stringSpeed(20000);
+    return 0;
     
+    CString cs = cstring_make("one three four");
+    printf("%s\n", cs.str);
+    cstring_insert(&cs, 3, " two");
+    printf("%s\n", cs.str);
+    cstring_erase(&cs, 7, strlen(" three"));
+    printf("%s\n", cs.str);
+    
+    printf("found: %s\n", cstring_findN(cs, 0, "fout", 3));
+    cstring_assign(&cs, "one two three four five six seven");
+    cstring_replace(&cs, 0, "four", "F-O-U-R");
+    printf("replace: %s\n", cs.str);
+    
+    CMap_si words = cmap_initializer;
     printf("read words\n");
     read_words(&words);
 
@@ -87,8 +119,8 @@ int main()
     cmap_si_clear(&words);
 
     CVector_s strv = cvector_initializer;
-    CString hello = cstring_make("Hello");
-    cstring_assign(&hello, "Awesome");
+    CString myday = cstring_make("my day");
+    cstring_assign(&myday, "great");
 
     cvector_s_push(&strv, cstring_make("E0"));
     cvector_s_push(&strv, cstring_make("E1"));
@@ -107,8 +139,8 @@ int main()
     CMap_ss smap = cmap_initializer;
     cmap_ss_put(&smap, "KEY1", cstring_make("VAL1"));
     cmap_ss_put(&smap, "KEY2", cstring_make("VAL2"));
-    cmap_ss_put(&smap, "hello", cstring_clone(hello));
-    cstring_destroy(&hello);
+    cmap_ss_put(&smap, "hello", cstring_makeCopy(myday));
+    cstring_destroy(&myday);
     
     cforeach (i, cmap_ss, smap)
         printf("  %s: %s\n", i.item->key.str, i.item->value.str);
