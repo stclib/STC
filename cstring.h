@@ -43,16 +43,24 @@ static size_t _cstring_null_rep[] = {0, 0, 0};
 #define cstring_size(cs)      ((size_t) _cstring_rep(cs)[0])
 #define cstring_capacity(cs)  ((size_t) _cstring_rep(cs)[1])
 #define cstring_npos          ((size_t) -1)
+#define cstring_makeTemp(str) _cstring_makeTemp(str, (size_t *) alloca(2 * sizeof(size_t) + strlen(str) + 1))
 
+
+static inline CString _cstring_makeTemp(const char* str, size_t *rep) {
+	CString cs = {(char *) (rep + 2)};
+	strcpy(cs.str, str);
+    rep[0] = strlen(str);
+    rep[1] = 0; // no cap -> no destroy. OK
+    return cs;
+}
 
 static inline void cstring_reserve(CString* self, size_t cap) {
     size_t len = cstring_size(*self), oldcap = cstring_capacity(*self);
     if (cap > oldcap) {
         size_t* rep = (size_t *) realloc(oldcap ? _cstring_rep(*self) : NULL, sizeof(size_t) * 2 + cap + 1);
-        rep[0] = len;
-        rep[1] = cap;
         self->str = (char* ) (rep + 2);
-        self->str[len] = '\0';
+        self->str[ rep[0] = len ] = '\0';
+        rep[1] = cap;
     }
 }
 

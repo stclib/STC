@@ -91,6 +91,9 @@ int main()
 
     stringSpeed(20000);
     
+    CString tmp = cstring_makeTemp("I will automatically be destroyed when going out of scope");
+    printf("tmp: %s\n", tmp.str);
+    
     CString cs = cstring_make("one-nine-three-seven-five");
     printf("%s.\n", cs.str);
     cstring_insert(&cs, 3, "-two");
