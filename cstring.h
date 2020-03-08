@@ -37,11 +37,12 @@ typedef struct CString {
 
 
 static size_t _cstring_null_rep[] = {0, 0, 0};
-#define               _cstring_rep(cs)      (((size_t *) (cs).str) - 2)
+#define       _cstring_rep(cs)      (((size_t *) (cs).str) - 2)
 
 #define cstring_initializer   {(char* ) (_cstring_null_rep + 2)}
 #define cstring_size(cs)      ((size_t) _cstring_rep(cs)[0])
 #define cstring_capacity(cs)  ((size_t) _cstring_rep(cs)[1])
+#define cstring_npos          ((size_t) -1)
 
 
 static inline void cstring_reserve(CString* self, size_t cap) {
@@ -127,39 +128,20 @@ static inline CString* cstring_appendS(CString* self, CString cs2) {
 }
 
 
-char* cstring_findN(CString cs, size_t pos, const char* needle, size_t n) {
-    char *h1 = cs.str + pos,
-         *h3 = cs.str + cstring_size(cs) - n + 1;
-    if (h1 >= h3)
-        return NULL;
-    int sum = 0;
-    const char *h2 = h1, *e1 = needle, *e2 = needle + n;
-    while (e1 != e2)
-        sum += *h2++ - *e1++;
-    while (h1 != h3) {
-        if (sum == 0 && memcmp(h1, needle, n) == 0)
-            return h1;
-        sum += *h2++ - *h1++;
-    }
-    return NULL;
-}
-
-
 static inline void _cstring_internalMove(CString* self, size_t pos1, size_t pos2) {
-    ptrdiff_t diff = pos2 - pos1;
-    if (!diff) return;
-    size_t len = cstring_size(*self), newlen = len + diff;
+    if (pos1 == pos2)
+        return;
+    size_t len = cstring_size(*self), newlen = len + pos2 - pos1;
     if (newlen > cstring_capacity(*self))
         cstring_reserve(self, newlen * 5 / 3);
-    memmove(&self->str[pos2], &self->str[pos1], len - diff);
+    memmove(&self->str[pos2], &self->str[pos1], len - pos1);
     self->str[_cstring_rep(*self)[0] = newlen] = '\0';
 }
 
-
 static inline void cstring_insertN(CString* self, size_t pos, const char* str, size_t n) {
-    char* buf = (char *) memcpy(alloca(n), str, n);
+    char* xstr = (char *) memcpy(alloca(n), str, n);
     _cstring_internalMove(self, pos, pos + n);
-    memcpy(&self->str[pos], buf, n);
+    memcpy(&self->str[pos], xstr, n);
 }
 
 static inline void cstring_insert(CString* self, size_t pos, const char* str) {
@@ -174,17 +156,18 @@ static inline void cstring_erase(CString* self, size_t pos, size_t n) {
     }
 }
 
-static inline bool cstring_replaceN(CString* self, size_t pos, const char* s1, size_t n1, const char* s2, size_t n2) {
-    const char* ptr = cstring_findN(*self, pos, s1, n1);
-    if (!ptr) return false;
-    size_t pos2 = ptr - self->str;
-    char* buf = (char *) memcpy(alloca(n2), s2, n2);
-    _cstring_internalMove(self, pos2, pos2 + n2 - n1);
-    memcpy(&self->str[pos2], buf, n2);
-    return true;
+static inline size_t cstring_findN(CString cs, size_t pos, const char* needle, size_t n);
+
+static inline size_t cstring_replaceN(CString* self, size_t pos, const char* s1, size_t n1, const char* s2, size_t n2) {
+    size_t pos2 = cstring_findN(*self, pos, s1, n1);
+    if (pos2 == cstring_npos) return cstring_npos;
+    char* xs2 = (char *) memcpy(alloca(n2), s2, n2);
+    _cstring_internalMove(self, pos2 + n1, pos2 + n2);
+    memcpy(&self->str[pos2], xs2, n2);
+    return pos2;
 }
 
-static inline bool cstring_replace(CString* self, size_t pos, const char* s1, const char* s2) {
+static inline size_t cstring_replace(CString* self, size_t pos, const char* s1, const char* s2) {
     return cstring_replaceN(self, pos, s1, strlen(s1), s2, strlen(s2));
 }
 
@@ -215,9 +198,31 @@ static inline bool cstring_equalsS(CString cs1, CString cs2) {
     return strcmp(cs1.str, cs2.str) == 0;
 }
 
-static inline char* cstring_find(CString cs, size_t pos, const char* needle) {
-    //return strstr(cs.str + pos, needle);
-    return cstring_findN(cs, pos, needle, strlen(needle));
+static inline char* cstring_strnstr(CString cs, size_t pos, const char* needle, size_t n) {
+    char *x = cs.str + pos, // haystack
+         *z = cs.str + cstring_size(cs) - n + 1;
+    if (x >= z)
+        return NULL;
+    ptrdiff_t sum = 0;
+    const char *y = x, *p = needle, *q = needle + n;
+    while (p != q)
+        sum += *y++ - *p++;
+    while (x != z) {
+        if (sum == 0 && memcmp(x, needle, n) == 0)
+            return x;
+        sum += *y++ - *x++;
+    }
+    return NULL;
+}
+
+static inline size_t cstring_findN(CString cs, size_t pos, const char* needle, size_t n) {
+    char* res = cstring_strnstr(cs, pos, needle, n);
+    return res ? res - cs.str : cstring_npos;
+}
+
+static inline size_t cstring_find(CString cs, size_t pos, const char* needle) {
+    char* res = strstr(cs.str + pos, needle);
+    return res ? res - cs.str : cstring_npos;
 }
 
 static inline char* cstring_splitFirst(const char* delimiters, CString cs) {

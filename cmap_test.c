@@ -72,14 +72,14 @@ void stringSpeed(int limit) {
     CString s = cstring_initializer;
     char ch[2] = {0, 0};
     size_t x = 0;
-    const char* p = 0;
+    size_t p = 0;
     for (int n = 0; n < limit; ++n) { ch[0] = 'A' + (rand() % 26); cstring_append(&s, ch); }
     const char* search = "ABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZABCDEFGHIJKLMNOPQRSTUVWXYZ";
     cstring_append(&s, search);
     clock_t before = clock();
     for (int n = 0; n < limit; ++n) {
         p = cstring_find(s, 0, search + (n % 100));
-		if (p) x += (p - s.str);
+		if (p != cstring_npos) x += p;
     }
     clock_t diff = clock() - before;
     printf("cstring length = %llu / %llu, sum %llu speed: %f\n", cstring_size(s), cstring_capacity(s), x, 1.0 * diff / CLOCKS_PER_SEC);
@@ -90,16 +90,17 @@ int main()
     int i = 0;
 
     stringSpeed(20000);
-    return 0;
     
-    CString cs = cstring_make("one three four");
-    printf("%s\n", cs.str);
-    cstring_insert(&cs, 3, " two");
-    printf("%s\n", cs.str);
-    cstring_erase(&cs, 7, strlen(" three"));
-    printf("%s\n", cs.str);
+    CString cs = cstring_make("one-nine-three-seven-five");
+    printf("%s.\n", cs.str);
+    cstring_insert(&cs, 3, "-two");
+    printf("%s.\n", cs.str);
+    cstring_erase(&cs, 7, 5); // -nine
+    printf("%s.\n", cs.str);
+    cstring_replace(&cs, 0, "seven", "four");
+    printf("%s.\n", cs.str);
     
-    printf("found: %s\n", cstring_findN(cs, 0, "fout", 3));
+    printf("found: %s\n", cs.str + cstring_find(cs, 0, "four"));
     cstring_assign(&cs, "one two three four five six seven");
     cstring_replace(&cs, 0, "four", "F-O-U-R");
     printf("replace: %s\n", cs.str);
