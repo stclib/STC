@@ -68,7 +68,7 @@ typedef struct CMapEntry_##tag CMapEntry_##tag
     declare_CMap_StringKey_3(tag, Value, cdef_destroy)
 
 #define declare_CMap_StringKey_3(tag, Value, valueDestroy) \
-    declare_CMap_10(tag, CString, Value, valueDestroy, const char*, cstring_make, cstring_getRaw, cstring_compare, cstring_hash, cstring_destroy)
+    declare_CMap_10(tag, CString, Value, valueDestroy, const char*, cstring_make, cstring_getRaw, cstring_compareRaw, cstring_hashRaw, cstring_destroy)
 
 
 // CMap full:

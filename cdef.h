@@ -37,28 +37,25 @@
 // #define foo_1(X)     foo_2(X, 100)
 // #define foo_2(X, Y)  X + Y
 
-#define             _cdef_max_alloca   (1000)
-#define             _cdef_swap(T, x, y) { T __t = x; x = y; y = __t; }
+#define                 _cdef_max_alloca   (1000)
+#define                 _cdef_swap(T, x, y) { T __t = x; x = y; y = __t; }
 
-#define             cdef_initRaw(x) (x)
-#define             cdef_getRaw(x) (x)
-static inline void  cdef_destroy(void* value) {}
+#define                 cdef_initRaw(x) (x)
+#define                 cdef_getRaw(x) (x)
+static inline void      cdef_destroy(void* value) {}
 
-#define             cforeach(it, ctag, con) \
-                        for (ctag##_iter_t it = ctag##_begin(con); it.item != ctag##_end(con).item; it = ctag##_next(it))
+#define                 cforeach(it, ctag, con) \
+                            for (ctag##_iter_t it = ctag##_begin(con); it.item != ctag##_end(con).item; it = ctag##_next(it))
 
-static inline uint32_t 
-cdef_murmurHash(const void *data, size_t len) // One-at-a-time 32bit
-{
+static inline uint32_t  cdef_murmurHash(const void *data, size_t len) { // One-at-a-time 32bit
     const unsigned char *key = (const unsigned char *) data;
-    uint32_t h = 3323198485ul;
+    uint32_t h = 0xC613FC15; // ‭0x749E3E6989DF617‬;  64bit
     while (len--) {
         h ^= *key++;
-        h *= 0x5bd1e995;
-        h ^= h >> 15;
+        h *= 0x5bd1e995;     // 0x5bd1e9955bd1e995; 64bit
+        h ^= h >> 15;        // 47;                 64bit
     }
     return h;
 }
-
 
 #endif
