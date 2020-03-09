@@ -25,10 +25,9 @@
 
 #include "cvector.h"
 
-#define cmap_initializer  {cvector_initializer, 0, 80, 167}
+#define cmap_initializer  {cvector_initializer, 0, 0.8f}
 #define cmap_size(cm)     ((size_t) (cm)._size)
 #define cmap_buckets(cm)  cvector_capacity((cm)._vec)
-#define cmap_maxLoadFactor(cm) ((cm).maxLoadPercentage / 100.0)
 
 
 // CMapEntry:
@@ -79,8 +78,7 @@ typedef struct CMapEntry_##tag CMapEntry_##tag
 typedef struct CMap_##tag { \
     CVector_map_##tag _vec; \
     size_t _size; \
-    uint16_t maxLoadPercentage; \
-    uint16_t expandPercentage; \
+    float maxLoadFactor; \
 } CMap_##tag; \
  \
 typedef struct cmap_##tag##_iter_t { \
@@ -114,15 +112,15 @@ static inline void cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
     _cdef_swap(size_t, a->_size, b->_size); \
 } \
  \
-static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, float loadFactor) { \
-    self->maxLoadPercentage = (uint16_t) (loadFactor * 100.99); \
-    if (cmap_size(*self) > cmap_buckets(*self) * loadFactor) \
-        cmap_##tag##_reserve(self, 7 + cmap_size(*self) / self->maxLoadPercentage); \
+static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, float fac) { \
+    self->maxLoadFactor = fac; \
+    if (cmap_size(*self) > cmap_buckets(*self) * fac) \
+        cmap_##tag##_reserve(self, 7 + (size_t) (cmap_size(*self) / fac)); \
 } \
  \
 static inline size_t cmap_##tag##_bucket(CMap_##tag cm, KeyRaw rawKey) { \
     size_t cap = cvector_capacity(cm._vec); \
-    size_t idx = keyHasher(&rawKey, sizeof(Key)) % cap; \
+    size_t idx = cmap_reduce(keyHasher(&rawKey, sizeof(Key)), cap); \
     size_t first = idx, found = cap, state = cm._vec.data[idx].state; \
     FIBONACCI_DECL; \
     do { \
@@ -143,8 +141,8 @@ static inline CMapEntry_##tag* cmap_##tag##_get(CMap_##tag cm, KeyRaw rawKey) { 
  \
 static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, KeyRaw rawKey, Value value) { \
     size_t cap = cvector_capacity(self->_vec); \
-    if (cmap_size(*self) >= cap * self->maxLoadPercentage / 100) \
-        cap = cmap_##tag##_reserve(self, cap * self->expandPercentage / 100); \
+    if (cmap_size(*self) >= cap * self->maxLoadFactor) \
+        cap = cmap_##tag##_reserve(self, (size_t) (cap * 1.8)); \
     size_t idx = cmap_##tag##_bucket(*self, rawKey); \
     CMapEntry_##tag* e = &self->_vec.data[idx]; \
     e->value = value; \
@@ -206,5 +204,9 @@ typedef Value cmap_##tag##_value_t
 
 #define FIBONACCI_DECL  size_t fib1 = 0, fib2 = 1, fibx
 #define FIBONACCI_NEXT  (fibx = fib1 + fib2, fib1 = fib2, fib2 = fibx)
+
+static inline uint32_t cmap_reduce(uint32_t x, uint32_t N) {
+    return ((uint64_t) x * (uint64_t) N) >> 32 ;
+}
 
 #endif
