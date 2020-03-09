@@ -37,14 +37,14 @@
 // #define foo_1(X)     foo_2(X, 100)
 // #define foo_2(X, Y)  X + Y
 
+#define             _cdef_max_alloca   (1000)
 #define             _cdef_swap(T, x, y) { T __t = x; x = y; y = __t; }
 
 #define             cdef_initRaw(x) (x)
 #define             cdef_getRaw(x) (x)
 static inline void  cdef_destroy(void* value) {}
 
-#define             cforeach(...) cdef_MACRO_OVERLOAD(cforeach, __VA_ARGS__)
-#define             cforeach_3(it, ctag, con) \
+#define             cforeach(it, ctag, con) \
                         for (ctag##_iter_t it = ctag##_begin(con); it.item != ctag##_end(con).item; it = ctag##_next(it))
 
 static inline uint32_t 

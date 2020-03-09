@@ -91,9 +91,6 @@ int main()
 
     stringSpeed(20000);
     
-    CString tmp = cstring_makeTemp("I will automatically be destroyed when going out of scope");
-    printf("tmp: %s\n", tmp.str);
-    
     CString cs = cstring_make("one-nine-three-seven-five");
     printf("%s.\n", cs.str);
     cstring_insert(&cs, 3, "-two");
@@ -119,7 +116,7 @@ int main()
     num = cmap_si_get(words, "funny");
     if (num) printf("%s: %d\n", num->key.str, num->value);
 
-    printf("words size: %zd, capacity %zd\n", cmap_size(words), cmap_capacity(words));
+    printf("words size: %llu, capacity %llu\n", cmap_size(words), cmap_buckets(words));
     cmap_si_clear(&words);
 
     CVector_s strv = cvector_initializer;

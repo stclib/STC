@@ -25,9 +25,10 @@
 
 #include "cvector.h"
 
-#define cmap_initializer  {cvector_initializer, 0}
+#define cmap_initializer  {cvector_initializer, 0, 80, 167}
 #define cmap_size(cm)     ((size_t) (cm)._size)
-#define cmap_capacity(cm) cvector_capacity((cm)._vec)
+#define cmap_buckets(cm)  cvector_capacity((cm)._vec)
+#define cmap_maxLoadFactor(cm) ((cm).maxLoadPercentage / 100.0)
 
 
 // CMapEntry:
@@ -57,7 +58,7 @@ typedef struct CMapEntry_##tag CMapEntry_##tag
     declare_CMap_4(tag, Key, Value, cdef_destroy)
 
 #define declare_CMap_4(tag, Key, Value, valueDestroy) \
-    declare_CMap_10(tag, Key, Value, valueDestroy, Key, cdef_getRaw, memcmp, cdef_murmurHash, cdef_initRaw, cdef_destroy)
+    declare_CMap_10(tag, Key, Value, valueDestroy, Key, cdef_initRaw, cdef_getRaw, memcmp, cdef_murmurHash, cdef_destroy)
 
 
 // CMap<CString, Value>:
@@ -67,17 +68,19 @@ typedef struct CMapEntry_##tag CMapEntry_##tag
     declare_CMap_StringKey_3(tag, Value, cdef_destroy)
 
 #define declare_CMap_StringKey_3(tag, Value, valueDestroy) \
-    declare_CMap_10(tag, CString, Value, valueDestroy, const char*, cstring_getRaw, cstring_compare, cstring_hash, cstring_make, cstring_destroy)
+    declare_CMap_10(tag, CString, Value, valueDestroy, const char*, cstring_make, cstring_getRaw, cstring_compare, cstring_hash, cstring_destroy)
 
 
 // CMap full:
-#define declare_CMap_10(tag, Key, Value, valueDestroy, KeyRaw, keyGetRaw, keyCompare, keyHasher, keyInit, keyDestroy) \
+#define declare_CMap_10(tag, Key, Value, valueDestroy, KeyRaw, keyInitRaw, keyGetRaw, keyCompare, keyHasher, keyDestroy) \
   declare_CMapEntry(tag, Key, Value, keyDestroy, valueDestroy); \
   declare_CVector_3(map_##tag, CMapEntry_##tag, cmapentry_##tag##_destroy); \
  \
 typedef struct CMap_##tag { \
     CVector_map_##tag _vec; \
     size_t _size; \
+    uint16_t maxLoadPercentage; \
+    uint16_t expandPercentage; \
 } CMap_##tag; \
  \
 typedef struct cmap_##tag##_iter_t { \
@@ -90,13 +93,15 @@ static inline CMap_##tag cmap_##tag##_init(void) { \
 } \
  \
 static inline void cmap_##tag##_destroy(CMap_##tag* self) { \
-    if (self->_size) { \
+    if (cmap_size(*self)) { \
         size_t cap = _cvector_capacity(self->_vec); \
         CMapEntry_##tag* e = self->_vec.data, *end = e + cap; \
         for (; e != end; ++e) if (e->state == CMapEntry_INUSE) cmapentry_##tag##_destroy(e); \
     } \
     cvector_map_##tag##_destroy(&self->_vec); \
 } \
+ \
+static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size); /* predeclared */ \
  \
 static inline void cmap_##tag##_clear(CMap_##tag* self) { \
     CMap_##tag cm = cmap_initializer; \
@@ -107,6 +112,12 @@ static inline void cmap_##tag##_clear(CMap_##tag* self) { \
 static inline void cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
     cvector_map_##tag##_swap(&a->_vec, &b->_vec); \
     _cdef_swap(size_t, a->_size, b->_size); \
+} \
+ \
+static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, float loadFactor) { \
+    self->maxLoadPercentage = (uint16_t) (loadFactor * 100.99); \
+    if (cmap_size(*self) > cmap_buckets(*self) * loadFactor) \
+        cmap_##tag##_reserve(self, 7 + cmap_size(*self) / self->maxLoadPercentage); \
 } \
  \
 static inline size_t cmap_##tag##_bucket(CMap_##tag cm, KeyRaw rawKey) { \
@@ -125,23 +136,21 @@ static inline size_t cmap_##tag##_bucket(CMap_##tag cm, KeyRaw rawKey) { \
 } \
  \
 static inline CMapEntry_##tag* cmap_##tag##_get(CMap_##tag cm, KeyRaw rawKey) { \
-    if (cm._size == 0) return NULL; \
+    if (cmap_size(cm) == 0) return NULL; \
     size_t idx = cmap_##tag##_bucket(cm, rawKey); \
     return cm._vec.data[idx].state == CMapEntry_INUSE ? &cm._vec.data[idx] : NULL; \
 } \
  \
-static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size); /* predeclared */ \
- \
 static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, KeyRaw rawKey, Value value) { \
     size_t cap = cvector_capacity(self->_vec); \
-    if (self->_size >= cap * 4 / 5) \
-        cap = cmap_##tag##_reserve(self, cap * 5 / 3); \
+    if (cmap_size(*self) >= cap * self->maxLoadPercentage / 100) \
+        cap = cmap_##tag##_reserve(self, cap * self->expandPercentage / 100); \
     size_t idx = cmap_##tag##_bucket(*self, rawKey); \
     CMapEntry_##tag* e = &self->_vec.data[idx]; \
     e->value = value; \
     e->changed = (e->state == CMapEntry_INUSE); \
     if (e->state != CMapEntry_INUSE) { \
-        e->key = keyInit(rawKey); \
+        e->key = keyInitRaw(rawKey); \
         e->state = CMapEntry_INUSE; \
         ++self->_size; \
     } \
@@ -162,20 +171,20 @@ static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size) { \
     return newcap; \
 } \
  \
-static inline int cmap_##tag##_erase(CMap_##tag* self, KeyRaw rawKey) { \
+static inline bool cmap_##tag##_erase(CMap_##tag* self, KeyRaw rawKey) { \
     CMapEntry_##tag* e = cmap_##tag##_get(*self, rawKey); \
     if (e) { \
         cmapentry_##tag##_destroy(e); \
         e->state = CMapEntry_REMOVED; \
         --self->_size; \
-        return 1; \
+        return true; \
     } \
-    return 0; \
+    return false; \
 } \
  \
 static inline cmap_##tag##_iter_t cmap_##tag##_begin(CMap_##tag map) { \
     cmap_##tag##_iter_t null = {NULL, NULL}; \
-    if (map._size == 0) return null; \
+    if (cmap_size(map) == 0) return null; \
     CMapEntry_##tag* e = map._vec.data, *end = e + _cvector_capacity(map._vec); \
     while (e != end && e->state != CMapEntry_INUSE) ++e; \
     cmap_##tag##_iter_t it = {e, end}; return it; \
@@ -187,7 +196,7 @@ static inline cmap_##tag##_iter_t cmap_##tag##_next(cmap_##tag##_iter_t it) { \
 } \
  \
 static inline cmap_##tag##_iter_t cmap_##tag##_end(CMap_##tag map) { \
-    CMapEntry_##tag* end = (map._size == 0) ? NULL : map._vec.data + _cvector_capacity(map._vec); \
+    CMapEntry_##tag* end = (cmap_size(map) == 0) ? NULL : map._vec.data + _cvector_capacity(map._vec); \
     cmap_##tag##_iter_t it = {end, end}; \
     return it; \
 } \
