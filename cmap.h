@@ -207,4 +207,11 @@ typedef Value cmap_##tag##_value_t
 #define FIBONACCI_DECL  size_t fib1 = 0, fib2 = 1, fibx
 #define FIBONACCI_NEXT  (fibx = fib1 + fib2, fib1 = fib2, fib2 = fibx)
 
+// https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
+// 
+static inline uint32_t fast_reduce(uint32_t x, uint32_t N) {
+    return ((uint64_t) x * (uint64_t) N) >> 32;
+}
+#define cmap_reduce(x, N) ((uint32_t)(((uint64_t) (x) * (uint64_t) (N)) >> 32))
+
 #endif
