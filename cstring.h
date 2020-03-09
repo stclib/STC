@@ -47,8 +47,8 @@ static size_t _cstring_null_rep[] = {0, 0, 0};
 
 
 static inline CString _cstring_makeTemp(const char* str, size_t *rep) {
-	CString cs = {(char *) (rep + 2)};
-	strcpy(cs.str, str);
+    CString cs = {(char *) (rep + 2)};
+    strcpy(cs.str, str);
     rep[0] = strlen(str);
     rep[1] = 0; // no cap -> no destroy. OK
     return cs;
