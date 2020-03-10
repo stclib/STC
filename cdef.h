@@ -37,8 +37,8 @@
 // #define foo_1(X)     foo_2(X, 100)
 // #define foo_2(X, Y)  X + Y
 
-#define                 _cdef_max_alloca   (1000)
-#define                 _cdef_swap(T, x, y) { T __t = x; x = y; y = __t; }
+#define                 cdef_max_alloca   (1000)
+#define                 cdef_swap(T, x, y) { T __t = x; x = y; y = __t; }
 
 #define                 cdef_initRaw(x) (x)
 #define                 cdef_getRaw(x) (x)

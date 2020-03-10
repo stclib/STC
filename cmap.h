@@ -109,7 +109,7 @@ static inline void cmap_##tag##_clear(CMap_##tag* self) { \
  \
 static inline void cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
     cvector_map_##tag##_swap(&a->_vec, &b->_vec); \
-    _cdef_swap(size_t, a->_size, b->_size); \
+    cdef_swap(size_t, a->_size, b->_size); \
 } \
  \
 static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, float fac) { \
@@ -126,10 +126,15 @@ static inline size_t cmap_##tag##_bucket(CMap_##tag cm, KeyRaw rawKey) { \
     do { \
         switch (state) { \
             case CMapEntry_VACANT: \
-                return erased_idx == cap ? idx : erased_idx; \
+                return erased_idx != cap ? erased_idx : idx; \
             case CMapEntry_INUSE: \
-                if (keyCompare(&cm._vec.data[idx].key, &rawKey, sizeof(Key)) == 0) return idx; \
-                break; \
+                if (keyCompare(&cm._vec.data[idx].key, &rawKey, sizeof(Key)) != 0) \
+                    break; \
+                if (erased_idx != cap) { \
+                    cdef_swap(CMapEntry_##tag, cm._vec.data[erased_idx], cm._vec.data[idx]); \
+                    return erased_idx; \
+                } \
+                return idx; \
             case CMapEntry_ERASED: \
                 if (erased_idx == cap) erased_idx = idx; \
                 break; \
