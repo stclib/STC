@@ -121,10 +121,10 @@ static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, float fac) { 
 static inline size_t cmap_##tag##_bucket(CMap_##tag cm, KeyRaw rawKey) { \
     size_t cap = cvector_capacity(cm._vec); \
     size_t idx = cmap_reduce(keyHasher(&rawKey, sizeof(Key)), cap); \
-    size_t first = idx, erased_idx = cap, state = cm._vec.data[idx].state; \
+    size_t first = idx, erased_idx = cap; \
     FIBONACCI_DECL; \
     do { \
-        switch (state) { \
+        switch (cm._vec.data[idx].state) { \
             case CMapEntry_VACANT: \
                 return erased_idx != cap ? erased_idx : idx; \
             case CMapEntry_INUSE: \
@@ -141,7 +141,6 @@ static inline size_t cmap_##tag##_bucket(CMap_##tag cm, KeyRaw rawKey) { \
         } \
         idx = first + FIBONACCI_NEXT; \
         if (idx >= cap) idx %= cap; \
-        state = cm._vec.data[ idx ].state; \
     } while (1); \
 } \
  \
