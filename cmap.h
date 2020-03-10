@@ -25,16 +25,15 @@
 
 #include "cvector.h"
 
-#define cmap_initializer  {cvector_initializer, 0, 80, 167}
+#define cmap_initializer  {cvector_initializer, 0, 0.8f}
 #define cmap_size(cm)     ((size_t) (cm)._size)
 #define cmap_buckets(cm)  cvector_capacity((cm)._vec)
-#define cmap_maxLoadFactor(cm) ((cm).maxLoadPercentage / 100.0)
 
 
 // CMapEntry:
 enum { CMapEntry_VACANT = 0, 
        CMapEntry_INUSE = 1,
-       CMapEntry_REMOVED = 2
+       CMapEntry_ERASED = 2
 };
 #define declare_CMapEntry(tag, Key, Value, keyDestroy, valueDestroy) \
 struct CMapEntry_##tag { \
@@ -79,8 +78,7 @@ typedef struct CMapEntry_##tag CMapEntry_##tag
 typedef struct CMap_##tag { \
     CVector_map_##tag _vec; \
     size_t _size; \
-    uint16_t maxLoadPercentage; \
-    uint16_t expandPercentage; \
+    float maxLoadFactor; \
 } CMap_##tag; \
  \
 typedef struct cmap_##tag##_iter_t { \
@@ -111,28 +109,38 @@ static inline void cmap_##tag##_clear(CMap_##tag* self) { \
  \
 static inline void cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
     cvector_map_##tag##_swap(&a->_vec, &b->_vec); \
-    _cdef_swap(size_t, a->_size, b->_size); \
+    cdef_swap(size_t, a->_size, b->_size); \
 } \
  \
-static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, float loadFactor) { \
-    self->maxLoadPercentage = (uint16_t) (loadFactor * 100.99); \
-    if (cmap_size(*self) > cmap_buckets(*self) * loadFactor) \
-        cmap_##tag##_reserve(self, 7 + cmap_size(*self) / self->maxLoadPercentage); \
+static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, float fac) { \
+    self->maxLoadFactor = fac; \
+    if (cmap_size(*self) > cmap_buckets(*self) * fac) \
+        cmap_##tag##_reserve(self, 7 + (size_t) (cmap_size(*self) / fac)); \
 } \
  \
 static inline size_t cmap_##tag##_bucket(CMap_##tag cm, KeyRaw rawKey) { \
     size_t cap = cvector_capacity(cm._vec); \
-    size_t idx = keyHasher(&rawKey, sizeof(Key)) % cap; \
-    size_t first = idx, found = cap, state = cm._vec.data[idx].state; \
+    size_t idx = cmap_reduce(keyHasher(&rawKey, sizeof(Key)), cap); \
+    size_t first = idx, erased_idx = cap, state = cm._vec.data[idx].state; \
     FIBONACCI_DECL; \
     do { \
-        if (state == CMapEntry_INUSE && keyCompare(&cm._vec.data[idx].key, &rawKey, sizeof(Key)) == 0) \
+        switch (state) { \
+            case CMapEntry_VACANT: \
+                return erased_idx != cap ? erased_idx : idx; \
+            case CMapEntry_INUSE: \
+                if (keyCompare(&cm._vec.data[idx].key, &rawKey, sizeof(Key)) != 0) \
+                    break; \
+                if (erased_idx != cap) { \
+                    cdef_swap(CMapEntry_##tag, cm._vec.data[erased_idx], cm._vec.data[idx]); \
+                    return erased_idx; \
+                } \
             return idx; \
-        if (state == CMapEntry_REMOVED && found == cap) \
-            found = idx; \
+            case CMapEntry_ERASED: \
+                if (erased_idx == cap) erased_idx = idx; \
+                break; \
+        } \
         state = cm._vec.data[ idx = (first + FIBONACCI_NEXT) % cap ].state; \
-    } while (state != CMapEntry_VACANT); \
-    return found == cap ? idx : found; \
+    } while (1); \
 } \
  \
 static inline CMapEntry_##tag* cmap_##tag##_get(CMap_##tag cm, KeyRaw rawKey) { \
@@ -143,8 +151,8 @@ static inline CMapEntry_##tag* cmap_##tag##_get(CMap_##tag cm, KeyRaw rawKey) { 
  \
 static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, KeyRaw rawKey, Value value) { \
     size_t cap = cvector_capacity(self->_vec); \
-    if (cmap_size(*self) >= cap * self->maxLoadPercentage / 100) \
-        cap = cmap_##tag##_reserve(self, cap * self->expandPercentage / 100); \
+    if (cmap_size(*self) >= cap * self->maxLoadFactor) \
+        cap = cmap_##tag##_reserve(self, (size_t) (cap * 1.8)); \
     size_t idx = cmap_##tag##_bucket(*self, rawKey); \
     CMapEntry_##tag* e = &self->_vec.data[idx]; \
     e->value = value; \
@@ -175,7 +183,7 @@ static inline bool cmap_##tag##_erase(CMap_##tag* self, KeyRaw rawKey) { \
     CMapEntry_##tag* e = cmap_##tag##_get(*self, rawKey); \
     if (e) { \
         cmapentry_##tag##_destroy(e); \
-        e->state = CMapEntry_REMOVED; \
+        e->state = CMapEntry_ERASED; \
         --self->_size; \
         return true; \
     } \
@@ -208,10 +216,8 @@ typedef Value cmap_##tag##_value_t
 #define FIBONACCI_NEXT  (fibx = fib1 + fib2, fib1 = fib2, fib2 = fibx)
 
 // https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
-// 
-static inline uint32_t fast_reduce(uint32_t x, uint32_t N) {
-    return ((uint64_t) x * (uint64_t) N) >> 32;
+static inline uint32_t cmap_reduce(uint32_t x, uint32_t N) {
+    return ((uint64_t) x * (uint64_t) N) >> 32 ;
 }
-#define cmap_reduce(x, N) ((uint32_t)(((uint64_t) (x) * (uint64_t) (N)) >> 32))
 
 #endif

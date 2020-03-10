@@ -138,10 +138,10 @@ static inline void _cstring_internalMove(CString* self, size_t pos1, size_t pos2
 }
 
 static inline void cstring_insertN(CString* self, size_t pos, const char* str, size_t n) {
-    char* xstr = (char *) memcpy(n > _cdef_max_alloca ? malloc(n) : alloca(n), str, n);
+    char* xstr = (char *) memcpy(n > cdef_max_alloca ? malloc(n) : alloca(n), str, n);
     _cstring_internalMove(self, pos, pos + n);
     memcpy(&self->str[pos], xstr, n);
-    if (n > _cdef_max_alloca) free(xstr); 
+    if (n > cdef_max_alloca) free(xstr); 
 }
 
 static inline void cstring_insert(CString* self, size_t pos, const char* str) {
@@ -161,10 +161,10 @@ static inline size_t cstring_findN(CString cs, size_t pos, const char* needle, s
 static inline size_t cstring_replaceN(CString* self, size_t pos, const char* s1, size_t n1, const char* s2, size_t n2) {
     size_t pos2 = cstring_findN(*self, pos, s1, n1);
     if (pos2 == cstring_npos) return cstring_npos;
-    char* xs2 = (char *) memcpy(n2 > _cdef_max_alloca ? malloc(n2) : alloca(n2), s2, n2);
+    char* xs2 = (char *) memcpy(n2 > cdef_max_alloca ? malloc(n2) : alloca(n2), s2, n2);
     _cstring_internalMove(self, pos2 + n1, pos2 + n2);
     memcpy(&self->str[pos2], xs2, n2);
-    if (n2 > _cdef_max_alloca) free(xs2);
+    if (n2 > cdef_max_alloca) free(xs2);
     return pos2;
 }
 
