@@ -115,7 +115,7 @@ static inline void cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
 static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, float fac) { \
     self->maxLoadFactor = fac; \
     if (cmap_size(*self) > cmap_buckets(*self) * fac) \
-        cmap_##tag##_reserve(self, 7 + (size_t) (cmap_size(*self) / fac)); \
+        cmap_##tag##_reserve(self, 1 + (size_t) (cmap_size(*self) / fac)); \
 } \
  \
 static inline size_t cmap_##tag##_bucket(CMap_##tag cm, KeyRaw rawKey) { \
@@ -139,7 +139,9 @@ static inline size_t cmap_##tag##_bucket(CMap_##tag cm, KeyRaw rawKey) { \
                 if (erased_idx == cap) erased_idx = idx; \
                 break; \
         } \
-        state = cm._vec.data[ idx = (first + FIBONACCI_NEXT) % cap ].state; \
+        idx = first + FIBONACCI_NEXT; \
+        if (idx >= cap) idx %= cap; \
+        state = cm._vec.data[ idx ].state; \
     } while (1); \
 } \
  \
@@ -218,5 +220,6 @@ typedef Value cmap_##tag##_value_t
 static inline uint32_t cmap_reduce(uint32_t x, uint32_t N) {
     return ((uint64_t) x * (uint64_t) N) >> 32 ;
 }
+
 
 #endif
