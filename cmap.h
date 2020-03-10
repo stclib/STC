@@ -33,7 +33,7 @@
 // CMapEntry:
 enum { CMapEntry_VACANT = 0, 
        CMapEntry_INUSE = 1,
-       CMapEntry_REMOVED = 2
+       CMapEntry_ERASED = 2
 };
 #define declare_CMapEntry(tag, Key, Value, keyDestroy, valueDestroy) \
 struct CMapEntry_##tag { \
@@ -121,16 +121,21 @@ static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, float fac) { 
 static inline size_t cmap_##tag##_bucket(CMap_##tag cm, KeyRaw rawKey) { \
     size_t cap = cvector_capacity(cm._vec); \
     size_t idx = cmap_reduce(keyHasher(&rawKey, sizeof(Key)), cap); \
-    size_t first = idx, found = cap, state = cm._vec.data[idx].state; \
+    size_t first = idx, erased_idx = cap, state = cm._vec.data[idx].state; \
     FIBONACCI_DECL; \
     do { \
-        if (state == CMapEntry_INUSE && keyCompare(&cm._vec.data[idx].key, &rawKey, sizeof(Key)) == 0) \
-            return idx; \
-        if (state == CMapEntry_REMOVED && found == cap) \
-            found = idx; \
+        switch (state) { \
+            case CMapEntry_VACANT: \
+                return erased_idx == cap ? idx : erased_idx; \
+            case CMapEntry_INUSE: \
+                if (keyCompare(&cm._vec.data[idx].key, &rawKey, sizeof(Key)) == 0) return idx; \
+                break; \
+            case CMapEntry_ERASED: \
+                if (erased_idx == cap) erased_idx = idx; \
+                break; \
+        } \
         state = cm._vec.data[ idx = (first + FIBONACCI_NEXT) % cap ].state; \
-    } while (state != CMapEntry_VACANT); \
-    return found == cap ? idx : found; \
+    } while (1); \
 } \
  \
 static inline CMapEntry_##tag* cmap_##tag##_get(CMap_##tag cm, KeyRaw rawKey) { \
@@ -173,7 +178,7 @@ static inline bool cmap_##tag##_erase(CMap_##tag* self, KeyRaw rawKey) { \
     CMapEntry_##tag* e = cmap_##tag##_get(*self, rawKey); \
     if (e) { \
         cmapentry_##tag##_destroy(e); \
-        e->state = CMapEntry_REMOVED; \
+        e->state = CMapEntry_ERASED; \
         --self->_size; \
         return true; \
     } \
