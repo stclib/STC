@@ -134,7 +134,7 @@ static inline size_t cmap_##tag##_bucket(CMap_##tag cm, KeyRaw rawKey) { \
                     cdef_swap(CMapEntry_##tag, cm._vec.data[erased_idx], cm._vec.data[idx]); \
                     return erased_idx; \
                 } \
-            return idx; \
+                return idx; \
             case CMapEntry_ERASED: \
                 if (erased_idx == cap) erased_idx = idx; \
                 break; \
