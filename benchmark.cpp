@@ -2,12 +2,12 @@
 #include <stdio.h>
 #include <time.h>
 #include "c_string.h"
-#include "c_hashmap_.h"
+#include "c_hashmap.h"
 #include <unordered_map>
 
 
 c_declare_Hashmap(ii, int, int);
-declare_c_StringVector(s);
+c_declare_Vector_string(s);
 
 int main()
 {

@@ -28,7 +28,7 @@
 #include "c_string.h"
 
 
-declare_c_StringVector(s);
+c_declare_Vector_string(s);
 c_declare_Hashmap_stringkey(ss, c_String, c_string_destroy);
 c_declare_Hashmap_stringkey(si, int);
 c_declare_Hashmap(id, uint64_t, double);
@@ -82,7 +82,7 @@ void stringSpeed(int limit) {
 		if (p != c_string_npos) x += p;
     }
     clock_t diff = clock() - before;
-    printf("cstring length = %llu / %llu, sum %llu speed: %f\n", c_string_size(s), c_string_capacity(s), x, 1.0 * diff / CLOCKS_PER_SEC);
+    printf("string length = %llu / %llu, sum %llu speed: %f\n", c_string_size(s), c_string_capacity(s), x, 1.0 * diff / CLOCKS_PER_SEC);
 }
 
 int main()
