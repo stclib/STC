@@ -4,7 +4,7 @@ Introduction
 ------------
 A modern, typesafe, very efficient, generic C99 container library: String, Vector and Hashmap
 
-Headers only library with the most used data structures: string, dynamic vector/stack, and map/assosiative array. The library has an intuitive and API, somewhat im. It uses overloadable macros to simplify usage.
+Headers only library with the most used data structures: string, dynamic vector/stack, and map/assosiative array. The library has an intuitive and API. It uses overloadable macros to simplify usage.
 
 Usage
 -----
