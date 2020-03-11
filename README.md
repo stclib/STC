@@ -61,7 +61,7 @@ Simple c_Hashmap, c_String -> int:
 ```
 #include "c_string.h"
 #include "c_hashmap.h"
-c_declare_Hashmap_stringkey(si, int); // Shorthand macro for the general declare_CMaphash expansion.
+c_declare_Hashmap_stringkey(si, int); // Shorthand macro for the general c_declare_Maphash expansion.
 // c_String keys are "magically" managed internally, although c_Hashmap is ignorant of c_String.
 
 int main() {
