@@ -26,8 +26,8 @@
 #include "c_vector.h"
 
 #define c_hashmap_initializer  {c_vector_initializer, 0, 0.8f}
-#define c_hashmap_size(cm)     ((size_t) (cm)._size)
-#define c_hashmap_buckets(cm)  c_vector_capacity((cm)._vec)
+#define c_hashmap_size(map)     ((size_t) (map)._size)
+#define c_hashmap_buckets(map)  c_vector_capacity((map)._vec)
 
 
 // c_HashmapEntry:
@@ -105,9 +105,9 @@ static inline void c_hashmap_##tag##_destroy(c_Hashmap_##tag* self) { \
 static inline size_t c_hashmap_##tag##_reserve(c_Hashmap_##tag* self, size_t size); /* predeclared */ \
  \
 static inline void c_hashmap_##tag##_clear(c_Hashmap_##tag* self) { \
-    c_Hashmap_##tag cm = c_hashmap_initializer; \
+    c_Hashmap_##tag map = c_hashmap_initializer; \
     c_hashmap_##tag##_destroy(self); \
-    *self = cm; \
+    *self = map; \
 } \
  \
 static inline void c_hashmap_##tag##_swap(c_Hashmap_##tag* a, c_Hashmap_##tag* b) { \
@@ -121,20 +121,20 @@ static inline void c_hashmap_##tag##_setMaxLoadFactor(c_Hashmap_##tag* self, flo
         c_hashmap_##tag##_reserve(self, 1 + (size_t) (c_hashmap_size(*self) / fac)); \
 } \
  \
-static inline size_t c_hashmap_##tag##_bucket(c_Hashmap_##tag cm, KeyRaw rawKey) { \
-    size_t cap = c_vector_capacity(cm._vec); \
+static inline size_t c_hashmap_##tag##_bucket(c_Hashmap_##tag map, KeyRaw rawKey) { \
+    size_t cap = c_vector_capacity(map._vec); \
     size_t idx = c_hashmap_reduce(keyHashRaw(&rawKey, sizeof(Key)), cap); \
     size_t first = idx, erased_idx = cap; \
     FIBONACCI_DECL; \
     do { \
-        switch (cm._vec.data[idx].state) { \
+        switch (map._vec.data[idx].state) { \
             case c_HashmapEntry_VACANT: \
                 return erased_idx != cap ? erased_idx : idx; \
             case c_HashmapEntry_INUSE: \
-                if (keyCompareRaw(&cm._vec.data[idx].key, &rawKey, sizeof(Key)) != 0) \
+                if (keyCompareRaw(&map._vec.data[idx].key, &rawKey, sizeof(Key)) != 0) \
                     break; \
                 if (erased_idx != cap) { \
-                    c_defs_swap(c_HashmapEntry_##tag, cm._vec.data[erased_idx], cm._vec.data[idx]); \
+                    c_defs_swap(c_HashmapEntry_##tag, map._vec.data[erased_idx], map._vec.data[idx]); \
                     return erased_idx; \
                 } \
                 return idx; \
@@ -147,16 +147,16 @@ static inline size_t c_hashmap_##tag##_bucket(c_Hashmap_##tag cm, KeyRaw rawKey)
     } while (1); \
 } \
  \
-static inline c_HashmapEntry_##tag* c_hashmap_##tag##_get(c_Hashmap_##tag cm, KeyRaw rawKey) { \
-    if (c_hashmap_size(cm) == 0) return NULL; \
-    size_t idx = c_hashmap_##tag##_bucket(cm, rawKey); \
-    return cm._vec.data[idx].state == c_HashmapEntry_INUSE ? &cm._vec.data[idx] : NULL; \
+static inline c_HashmapEntry_##tag* c_hashmap_##tag##_get(c_Hashmap_##tag map, KeyRaw rawKey) { \
+    if (c_hashmap_size(map) == 0) return NULL; \
+    size_t idx = c_hashmap_##tag##_bucket(map, rawKey); \
+    return map._vec.data[idx].state == c_HashmapEntry_INUSE ? &map._vec.data[idx] : NULL; \
 } \
  \
 static inline c_HashmapEntry_##tag* c_hashmap_##tag##_put(c_Hashmap_##tag* self, KeyRaw rawKey, Value value) { \
     size_t cap = c_vector_capacity(self->_vec); \
     if (c_hashmap_size(*self) >= cap * self->maxLoadFactor) \
-        cap = c_hashmap_##tag##_reserve(self, (size_t) (cap * 1.8)); \
+        cap = c_hashmap_##tag##_reserve(self, (size_t) 7 + (cap * 1.8)); \
     size_t idx = c_hashmap_##tag##_bucket(*self, rawKey); \
     c_HashmapEntry_##tag* e = &self->_vec.data[idx]; \
     e->value = value; \
@@ -170,7 +170,7 @@ static inline c_HashmapEntry_##tag* c_hashmap_##tag##_put(c_Hashmap_##tag* self,
 } \
  \
 static inline size_t c_hashmap_##tag##_reserve(c_Hashmap_##tag* self, size_t size) { \
-    size_t oldcap = c_vector_capacity(self->_vec), newcap = (oldcap ? 1 : 7) + (size / 2) * 2; \
+    size_t oldcap = c_vector_capacity(self->_vec), newcap = 1 + (size / 2) * 2; \
     if (oldcap >= newcap) return oldcap; \
     c_Vector_map_##tag vec = c_vector_initializer; \
     c_vector_map_##tag##_swap(&self->_vec, &vec); \
@@ -184,8 +184,9 @@ static inline size_t c_hashmap_##tag##_reserve(c_Hashmap_##tag* self, size_t siz
 } \
  \
 static inline bool c_hashmap_##tag##_erase(c_Hashmap_##tag* self, KeyRaw rawKey) { \
-    c_HashmapEntry_##tag* e = c_hashmap_##tag##_get(*self, rawKey); \
-    if (e) { \
+    size_t idx = c_hashmap_##tag##_bucket(*self, rawKey); \
+    c_HashmapEntry_##tag* e = &self->_vec.data[idx]; \
+    if (e->state == c_HashmapEntry_INUSE) { \
         c_hashmapentry_##tag##_destroy(e); \
         e->state = c_HashmapEntry_ERASED; \
         --self->_size; \
