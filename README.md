@@ -2,7 +2,7 @@
 
 Introduction
 ------------
-Typesafe, efficient, generic C99 containers: CString, CVector and CMap
+Typesafe, efficient, generic C99 containers: c_String, c_Vector and c_Hashmap
 
 Headers only library with the most useful data structures: string, dynamic vector/stack, and map/assosiative array.
 
@@ -12,86 +12,86 @@ The library has an intuitive and straight forward API, and is fully type safe. I
 
 Usage
 -----
-Simple CVector of 64bit ints:
+Simple c_Vector of 64bit ints:
 ```
-#include "cvector.h"
-declare_CVector(ix, int64_t); // ix is just an example tag name, use anything without underscore.
+#include "c_vector.h"
+c_declare_Vector(ix, int64_t); // ix is just an example tag name, use anything without underscore.
 
 int main() {
-  CVector_ix bignums = cvector_initializer; // use cvector_ix_init(); if initializing after declaration.
-  cvector_ix_reserve(&bignums, 100);
+  c_Vector_ix bignums = c_vector_initializer; // use c_vector_ix_init(); if initializing after declaration.
+  c_vector_ix_reserve(&bignums, 100);
   for (size_t i = 0; i<100; ++i)
-    cvector_ix_push(&bignums, i * i * i);
-  cvector_ix_pop(&bignums); // erase the last
+    c_vector_ix_push(&bignums, i * i * i);
+  c_vector_ix_pop(&bignums); // erase the last
 
   uint64_t value;
-  for (size_t i = 0; i < cvector_size(bignums); ++i)
+  for (size_t i = 0; i < c_vector_size(bignums); ++i)
     value = bignums.data[i];
-  cvector_ix_destroy(&bignums);
+  c_vector_ix_destroy(&bignums);
 }
 ```
 CVector of CString:
 ```
-#include "cstring.h"
-#include "cvector.h"
-declare_CVector(cs, CString, cstring_destroy); // supply inline destructor of values
+#include "c_string.h"
+#include "c_vector.h"
+c_declare_Vector(cs, c_String, c_string_destroy); // supply inline destructor of values
 
 int main() {
-  CVector_cs names = cvector_initializer;
-  cvector_cs_push(&names, cstring_make("Mary"));
-  cvector_cs_push(&names, cstring_make("Joe"));
+  c_Vector_cs names = c_vector_initializer;
+  c_vector_cs_push(&names, c_string_make("Mary"));
+  c_vector_cs_push(&names, c_string_make("Joe"));
   printf("%s\n", names.data[1].str); // Access the string char*
-  cvector_cs_destroy(&names);
+  c_vector_cs_destroy(&names);
 }
 ```
-Simple CMap, int -> int:
+Simple c_Hashmap, int -> int:
 ```
-#include "cmap.h"
-declare_CMap(ii, int, int);
+#include "c_hashmap.h"
+c_declare_Hashmap(ii, int, int);
 
 int main() {
-  CMap_ii nums = cmap_initializer;
-  cmap_ii_put(&nums, 8, 64);
-  cmap_ii_put(&nums, 11, 121);
-  printf("%d\n", cmap_ii_get(nums, 8)->value);
-  cmap_ii_destroy(&nums);
+  c_Hashmap_ii nums = c_hashmap_initializer;
+  c_hashmap_ii_put(&nums, 8, 64);
+  c_hashmap_ii_put(&nums, 11, 121);
+  printf("%d\n", c_hashmap_ii_get(nums, 8)->value);
+  c_hashmap_ii_destroy(&nums);
 }
 ```
-Simple CMap with CString keys -> int values:
+Simple c_Hashmap, c_String -> int:
 ```
-#include "cstring.h"
-#include "cmap.h"
-declare_CMap_StringKey(si, int); // Just a shorthand macro for the general declare call.
-// Keys strings are "magically" managed internally, although CMap is ignorant of CString.
+#include "c_string.h"
+#include "c_hashmap.h"
+c_declare_Hashmap_stringkey(si, int); // Shorthand macro for the general declare_CMaphash expansion.
+// c_String keys are "magically" managed internally, although c_Hashmap is ignorant of c_String.
 
 int main() {
-  CMap_si nums = cmap_initializer;
-  cmap_si_put(&nums, "Hello", 64);
-  cmap_si_put(&nums, "Groovy", 121);
-  cmap_si_put(&nums, "Groovy", 200); // overwrite previous
+  c_Hashmap_si nums = c_hashmap_initializer;
+  c_hashmap_si_put(&nums, "Hello", 64);
+  c_hashmap_si_put(&nums, "Groovy", 121);
+  c_hashmap_si_put(&nums, "Groovy", 200); // overwrite previous
   // iterate the map:
-  for (cmap_si_iter_t i = cmap_si_begin(nums); i.item != cmap_si_end(nums).item; i = cmap_si_next(i))
+  for (c_hashmap_si_iter_t i = c_hashmap_si_begin(nums); i.item != c_hashmap_si_end(nums).item; i = c_hashmap_si_next(i))
     printf("%s: %d\n", i.item->key.str, i.item->value);
   // or rather use the short form:
-  cforeach (i, cmap_si, nums)
+  c_foreach (i, c_hashmap_si, nums)
     printf("%s: %d, changed: %s\n", i.item->key.str, i.item->value, i.item->changed ? "yes" : "no");
 
-  cmap_si_destroy(&nums);
+  c_hashmap_si_destroy(&nums);
 }
 ```
-CMap with CString keys -> CString values. Temp. CStrings are created by "make", and moved to the container.
+c_Hashmap, with c_String -> c_String. Temporary c_String values are created by "make", and moved to the container.
 ```
-#include "cstring.h"
-#include "cmap.h"
-declare_CMap_StringKey(ss, CString, cstring_destroy); 
+#include "c_string.h"
+#include "c_hashmap.h"
+c_declare_Hashmap_stringkey(ss, c_String, c_string_destroy); 
 
 int main() {
-  CMap_ss table = cmap_initializer;
-  cmap_ss_put(&table, "Hello", cstring_make("Goodbye"));
-  cmap_ss_put(&table, "Groovy", cstring_make("Shaky"));
-  printf("Groovy: %s\n", cmap_ss_get(table, "Groovy")->value.str);
-  cmap_ss_erase(&table, "Hello");
-  printf("size %d\n", cmap_size(table));
-  cmap_ss_destroy(&table); // frees key and value CStrings, and hash table (CVector).
+  c_Hashmap_ss table = c_hashmap_initializer;
+  c_hashmap_ss_put(&table, "Make", c_string_make("my"));
+  c_hashmap_ss_put(&table, "Sunny", c_string_make("day"));
+  printf("Sunny: %s\n", c_hashmap_ss_get(table, "Sunny")->value.str);
+  c_hashmap_ss_erase(&table, "Make");
+  printf("size %d\n", c_hashmap_size(table));
+  c_hashmap_ss_destroy(&table); // frees key and value c_Strings, and hash table (c_Vector).
 }
 ```
