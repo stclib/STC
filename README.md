@@ -40,6 +40,7 @@ int main() {
   c_Vector_cs names = c_vector_initializer;
   c_vector_cs_push(&names, c_string_make("Mary"));
   c_vector_cs_push(&names, c_string_make("Joe"));
+  c_string_assign(&names.data[1], c_string_make("Jake")); // replace Joe
   printf("%s\n", names.data[1].str); // Access the string char*
   c_vector_cs_destroy(&names);
 }
@@ -61,7 +62,7 @@ Simple c_Hashmap, c_String -> int:
 ```
 #include "c_string.h"
 #include "c_hashmap.h"
-c_declare_Hashmap_stringkey(si, int); // Shorthand macro for the general c_declare_Maphash expansion.
+c_declare_Hashmap_stringkey(si, int); // Shorthand macro for the general c_declare_Hashmap expansion.
 // c_String keys are "magically" managed internally, although c_Hashmap is ignorant of c_String.
 
 int main() {
