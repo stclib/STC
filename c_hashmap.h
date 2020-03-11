@@ -35,7 +35,7 @@ enum { c_HashmapEntry_VACANT = 0,
        c_HashmapEntry_INUSE = 1,
        c_HashmapEntry_ERASED = 2
 };
-#define c_declare_HashmapEntry(tag, Key, Value, keyDestroy, valueDestroy) \
+#define c_declare_HashmapEntry(tag, Key, Value, valueDestroy, keyDestroy) \
 struct c_HashmapEntry_##tag { \
     Key key; \
     Value value; \
@@ -57,7 +57,10 @@ typedef struct c_HashmapEntry_##tag c_HashmapEntry_##tag
     c_declare_Hashmap_4(tag, Key, Value, c_defs_destroy)
 
 #define c_declare_Hashmap_4(tag, Key, Value, valueDestroy) \
-    c_declare_Hashmap_10(tag, Key, Value, valueDestroy, Key, memcmp, c_defs_murmurHash, c_defs_initRaw, c_defs_getRaw, c_defs_destroy)
+    c_declare_Hashmap_6(tag, Key, Value, valueDestroy, memcmp, c_defs_murmurHash)
+    
+#define c_declare_Hashmap_6(tag, Key, Value, valueDestroy, keyCompare, keyHash) \
+    c_declare_Hashmap_10(tag, Key, Value, valueDestroy, keyCompare, keyHash, c_defs_destroy, Key, c_defs_getRaw, c_defs_initRaw)
 
 
 // c_Hashmap<c_String, Value>:
@@ -67,12 +70,12 @@ typedef struct c_HashmapEntry_##tag c_HashmapEntry_##tag
     c_declare_Hashmap_stringkey_3(tag, Value, c_defs_destroy)
 
 #define c_declare_Hashmap_stringkey_3(tag, Value, valueDestroy) \
-    c_declare_Hashmap_10(tag, c_String, Value, valueDestroy, const char*, c_string_compareRaw, c_string_hashRaw, c_string_make, c_string_getRaw, c_string_destroy)
+    c_declare_Hashmap_10(tag, c_String, Value, valueDestroy, c_string_compareRaw, c_string_hashRaw, c_string_destroy, const char*, c_string_getRaw, c_string_make)
 
 
 // c_Hashmap full:
-#define c_declare_Hashmap_10(tag, Key, Value, valueDestroy, KeyRaw, keyCompareRaw, keyHashRaw, keyInitRaw, keyGetRaw, keyDestroy) \
-  c_declare_HashmapEntry(tag, Key, Value, keyDestroy, valueDestroy); \
+#define c_declare_Hashmap_10(tag, Key, Value, valueDestroy, keyCompareRaw, keyHashRaw, keyDestroy, KeyRaw, keyGetRaw, keyInitRaw) \
+  c_declare_HashmapEntry(tag, Key, Value, valueDestroy, keyDestroy); \
   c_declare_Vector_3(map_##tag, c_HashmapEntry_##tag, c_hashmapentry_##tag##_destroy); \
  \
 typedef struct c_Hashmap_##tag { \

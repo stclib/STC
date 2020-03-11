@@ -41,7 +41,7 @@ static size_t _c_string_null_rep[] = {0, 0, 0};
 #define c_string_initializer   {(char* ) (_c_string_null_rep + 2)}
 #define c_string_size(cs)      ((size_t) _c_string_rep(cs)[0])
 #define c_string_capacity(cs)  ((size_t) _c_string_rep(cs)[1])
-#define c_string_npos          ((size_t) -1)
+#define c_string_npos          c_defs_npos
 
 
 static inline void c_string_reserve(c_String* self, size_t cap) {

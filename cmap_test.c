@@ -79,7 +79,7 @@ void stringSpeed(int limit) {
     clock_t before = clock();
     for (int n = 0; n < limit; ++n) {
         p = c_string_find(s, 0, search + (n % 100));
-		if (p != c_string_npos) x += p;
+        if (p != c_string_npos) x += p;
     }
     clock_t diff = clock() - before;
     printf("string length = %llu / %llu, sum %llu speed: %f\n", c_string_size(s), c_string_capacity(s), x, 1.0 * diff / CLOCKS_PER_SEC);

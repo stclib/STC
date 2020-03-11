@@ -40,6 +40,7 @@
 // #define foo_1(X)     foo_2(X, 100)
 // #define foo_2(X, Y)  X + Y
 
+#define                 c_defs_npos         ((size_t) -1)
 #define                 c_defs_max_alloca   (1000)
 #define                 c_defs_swap(T, x, y) { T __t = x; x = y; y = __t; }
 

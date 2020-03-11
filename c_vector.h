@@ -33,15 +33,21 @@
 #define c_vector_capacity(cv)   _c_vector_safe_capacity((cv).data)
 #define c_vector_empty(cv)      (_c_vector_safe_size((cv).data) == 0)
 
-#define c_declare_Vector(...)           c_defs_MACRO_OVERLOAD(c_declare_Vector, __VA_ARGS__)
-#define c_declare_Vector_2(tag, Value)  c_declare_Vector_3(tag, Value, c_defs_destroy)
-#define c_declare_Vector_string(tag)    c_declare_Vector_3(tag, c_String, c_string_destroy)
-
-
+#define c_declare_Vector(...)   c_defs_MACRO_OVERLOAD(c_declare_Vector, __VA_ARGS__)
+#define c_declare_Vector_2(tag, Value) \
+                                c_declare_Vector_3(tag, Value, c_defs_destroy)
 #define c_declare_Vector_3(tag, Value, valueDestroy) \
+                                c_declare_Vector_5(tag, Value, valueDestroy, memcmp, Value)
+#define c_declare_Vector_4(tag, Value, valueDestroy, valueCompare) \
+                                c_declare_Vector_5(tag, Value, valueDestroy, valueCompare, Value)
+#define c_declare_Vector_string(tag) \
+                                c_declare_Vector_5(tag, c_String, c_string_destroy, c_string_compareRaw, const char*)
+
+#define c_declare_Vector_5(tag, Value, valueDestroy, valueCompareRaw, ValueRaw) \
 typedef struct c_Vector_##tag { \
     Value* data; \
 } c_Vector_##tag; \
+ \
 typedef struct c_vector_##tag##_iter_t { \
     Value* item; \
 } c_vector_##tag##_iter_t; \
@@ -102,6 +108,14 @@ static inline void c_vector_##tag##_erase(c_Vector_##tag* self, size_t pos, size
         memmove(start, end, (len - pos - size) * sizeof(Value)); \
         _c_vector_size(*self) -= size; \
     } \
+} \
+ \
+ \
+static inline size_t c_vector_##tag##_find(c_Vector_##tag cv, ValueRaw rawValue) { \
+    size_t n = c_vector_size(cv); \
+    for (size_t i = 0; i < n; ++i) \
+        if (valueCompareRaw(&cv.data[i], &rawValue, sizeof(Value)) == 0) return i; \
+    return c_defs_npos; \
 } \
  \
  \
