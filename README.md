@@ -1,17 +1,33 @@
-# C99Containers
+# c_Lib
 
 Introduction
 ------------
-Typesafe, efficient, generic C99 containers: c_String, c_Vector and c_Hashmap
+A modern, typesafe, very efficient, generic C99 container library: String, Vector and Hashmap
 
-Headers only library with the most useful data structures: string, dynamic vector/stack, and map/assosiative array.
-
-The map is using open hashing with a novel probing strategy (fibonacci sequence), which is as efficient as quadratic probing, but has none of its limitations (max half full table, and prime number table length only requirements).
-
-The library has an intuitive and straight forward API, and is fully type safe. It uses "overloadable macros", to simplify usage.
+Headers only library with the most used data structures: string, dynamic vector/stack, and map/assosiative array. The library has an intuitive and API, somewhat im. It uses overloadable macros to simplify usage.
 
 Usage
 -----
+c_String demo:
+```
+#include "c_string.h"
+
+int main() {
+    c_String cs = c_string_make("one-nine-three-seven-five");
+    printf("%s.\n", cs.str);
+    c_string_insert(&cs, 3, "-two");
+    printf("%s.\n", cs.str);
+    c_string_erase(&cs, 7, 5); // -nine
+    printf("%s.\n", cs.str);
+    c_string_replace(&cs, 0, "seven", "four");
+    printf("%s.\n", cs.str);
+    printf("find: %s\n", cs.str + c_string_find(cs, 0, "four"));
+    // reassign:
+    c_string_assign(&cs, "one two three four five six seven");
+    c_string_append(&cs, " eight");
+    printf("append: %s\n", cs.str);
+}
+```
 Simple c_Vector of 64bit ints:
 ```
 #include "c_vector.h"
