@@ -51,27 +51,27 @@ typedef struct CMapEntry_##tag CMapEntry_##tag
 
 
 // CMap:
-#define declare_CMap(...)  cdef_MACRO_OVERLOAD(declare_CMap, __VA_ARGS__)
+#define declare_CMap(...)  cdefs_MACRO_OVERLOAD(declare_CMap, __VA_ARGS__)
 
 #define declare_CMap_3(tag, Key, Value) \
-    declare_CMap_4(tag, Key, Value, cdef_destroy)
+    declare_CMap_4(tag, Key, Value, cdefs_destroy)
 
 #define declare_CMap_4(tag, Key, Value, valueDestroy) \
-    declare_CMap_10(tag, Key, Value, valueDestroy, Key, cdef_initRaw, cdef_getRaw, memcmp, cdef_murmurHash, cdef_destroy)
+    declare_CMap_10(tag, Key, Value, valueDestroy, Key, memcmp, cdefs_murmurHash, cdefs_initRaw, cdefs_getRaw, cdefs_destroy)
 
 
 // CMap<CString, Value>:
-#define declare_CMap_StringKey(...)  cdef_MACRO_OVERLOAD(declare_CMap_StringKey, __VA_ARGS__)
+#define declare_CMap_StringKey(...)  cdefs_MACRO_OVERLOAD(declare_CMap_StringKey, __VA_ARGS__)
 
 #define declare_CMap_StringKey_2(tag, Value) \
-    declare_CMap_StringKey_3(tag, Value, cdef_destroy)
+    declare_CMap_StringKey_3(tag, Value, cdefs_destroy)
 
 #define declare_CMap_StringKey_3(tag, Value, valueDestroy) \
-    declare_CMap_10(tag, CString, Value, valueDestroy, const char*, cstring_make, cstring_getRaw, cstring_compareRaw, cstring_hashRaw, cstring_destroy)
+    declare_CMap_10(tag, CString, Value, valueDestroy, const char*, cstring_compareRaw, cstring_hashRaw, cstring_make, cstring_getRaw, cstring_destroy)
 
 
 // CMap full:
-#define declare_CMap_10(tag, Key, Value, valueDestroy, KeyRaw, keyInitRaw, keyGetRaw, keyCompare, keyHasher, keyDestroy) \
+#define declare_CMap_10(tag, Key, Value, valueDestroy, KeyRaw, keyCompareRaw, keyHashRaw, keyInitRaw, keyGetRaw, keyDestroy) \
   declare_CMapEntry(tag, Key, Value, keyDestroy, valueDestroy); \
   declare_CVector_3(map_##tag, CMapEntry_##tag, cmapentry_##tag##_destroy); \
  \
@@ -109,7 +109,7 @@ static inline void cmap_##tag##_clear(CMap_##tag* self) { \
  \
 static inline void cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
     cvector_map_##tag##_swap(&a->_vec, &b->_vec); \
-    cdef_swap(size_t, a->_size, b->_size); \
+    cdefs_swap(size_t, a->_size, b->_size); \
 } \
  \
 static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, float fac) { \
@@ -120,7 +120,7 @@ static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, float fac) { 
  \
 static inline size_t cmap_##tag##_bucket(CMap_##tag cm, KeyRaw rawKey) { \
     size_t cap = cvector_capacity(cm._vec); \
-    size_t idx = cmap_reduce(keyHasher(&rawKey, sizeof(Key)), cap); \
+    size_t idx = cmap_reduce(keyHashRaw(&rawKey, sizeof(Key)), cap); \
     size_t first = idx, erased_idx = cap; \
     FIBONACCI_DECL; \
     do { \
@@ -128,10 +128,10 @@ static inline size_t cmap_##tag##_bucket(CMap_##tag cm, KeyRaw rawKey) { \
             case CMapEntry_VACANT: \
                 return erased_idx != cap ? erased_idx : idx; \
             case CMapEntry_INUSE: \
-                if (keyCompare(&cm._vec.data[idx].key, &rawKey, sizeof(Key)) != 0) \
+                if (keyCompareRaw(&cm._vec.data[idx].key, &rawKey, sizeof(Key)) != 0) \
                     break; \
                 if (erased_idx != cap) { \
-                    cdef_swap(CMapEntry_##tag, cm._vec.data[erased_idx], cm._vec.data[idx]); \
+                    cdefs_swap(CMapEntry_##tag, cm._vec.data[erased_idx], cm._vec.data[idx]); \
                     return erased_idx; \
                 } \
                 return idx; \

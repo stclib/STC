@@ -24,12 +24,8 @@
 #define CVECTOR__H__
 
 #include <malloc.h>
-#include <stdbool.h>
-#include <assert.h>
 #include <string.h>
-#include <stdint.h>
-
-#include "cdef.h"
+#include "cdefs.h"
 
 
 #define cvector_initializer    {NULL}
@@ -37,8 +33,8 @@
 #define cvector_capacity(cv)   _cvector_safe_capacity((cv).data)
 #define cvector_empty(cv)      (_cvector_safe_size((cv).data) == 0)
 
-#define declare_CVector(...)           cdef_MACRO_OVERLOAD(declare_CVector, __VA_ARGS__)
-#define declare_CVector_2(tag, Value)  declare_CVector_3(tag, Value, cdef_destroy)
+#define declare_CVector(...)           cdefs_MACRO_OVERLOAD(declare_CVector, __VA_ARGS__)
+#define declare_CVector_2(tag, Value)  declare_CVector_3(tag, Value, cdefs_destroy)
 #define declare_CStringVector(tag)     declare_CVector_3(tag, CString, cstring_destroy)
 
 
