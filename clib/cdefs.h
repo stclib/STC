@@ -62,4 +62,9 @@ static inline uint32_t  c_murmurHash(const void *data, size_t len) { // One-at-a
     return h;
 }
 
+// https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
+static inline uint32_t c_reduce(uint32_t x, uint32_t N) {
+    return ((uint64_t) x * (uint64_t) N) >> 32 ;
+}
+
 #endif

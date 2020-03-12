@@ -42,7 +42,7 @@ struct CMapEntry_##tag { \
     uint8_t state, changed; \
 }; \
  \
-static inline void chmapentry_##tag##_destroy(struct CMapEntry_##tag* e) { \
+static inline void cmapentry_##tag##_destroy(struct CMapEntry_##tag* e) { \
     keyDestroy(&e->key); \
     valueDestroy(&e->value); \
     e->state = CMapEntry_VACANT; \
@@ -78,7 +78,7 @@ typedef struct CMapEntry_##tag CMapEntry_##tag
 #define declare_CMap_10(tag, Key, Value, valueDestroy, keyCompareRaw, keyHashRaw, keyDestroy, \
                             KeyRaw, keyGetRaw, keyInitRaw) \
   declare_CMapEntry(tag, Key, Value, valueDestroy, keyDestroy); \
-  declare_CVector_3(map_##tag, CMapEntry_##tag, chmapentry_##tag##_destroy); \
+  declare_CVector_3(map_##tag, CMapEntry_##tag, cmapentry_##tag##_destroy); \
  \
 typedef struct CMap_##tag { \
     CVector_map_##tag _vec; \
@@ -99,7 +99,7 @@ static inline void cmap_##tag##_destroy(CMap_##tag* self) { \
     if (cmap_size(*self)) { \
         size_t cap = _cvector_capacity(self->_vec); \
         CMapEntry_##tag* e = self->_vec.data, *end = e + cap; \
-        for (; e != end; ++e) if (e->state == CMapEntry_INUSE) chmapentry_##tag##_destroy(e); \
+        for (; e != end; ++e) if (e->state == CMapEntry_INUSE) cmapentry_##tag##_destroy(e); \
     } \
     cvector_map_##tag##_destroy(&self->_vec); \
 } \
@@ -124,10 +124,8 @@ static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, float fac) { 
 } \
  \
 static inline size_t cmap_##tag##_bucket(CMap_##tag map, KeyRaw rawKey) { \
-    size_t cap = cvector_capacity(map._vec); \
-    size_t idx = cmap_reduce(keyHashRaw(&rawKey, sizeof(Key)), cap); \
-    size_t first = idx, erased_idx = cap; \
-    FIBONACCI_DECL; \
+    size_t cap = cvector_capacity(map._vec), erased_idx = cap; \
+    size_t idx = c_reduce(keyHashRaw(&rawKey, sizeof(Key)), cap); \
     do { \
         switch (map._vec.data[idx].state) { \
             case CMapEntry_VACANT: \
@@ -144,8 +142,7 @@ static inline size_t cmap_##tag##_bucket(CMap_##tag map, KeyRaw rawKey) { \
                 if (erased_idx == cap) erased_idx = idx; \
                 break; \
         } \
-        idx = first + FIBONACCI_NEXT; \
-        if (idx >= cap) idx %= cap; \
+        if (++idx >= cap) idx %= cap; \
     } while (1); \
 } \
  \
@@ -189,7 +186,7 @@ static inline bool cmap_##tag##_erase(CMap_##tag* self, KeyRaw rawKey) { \
     size_t idx = cmap_##tag##_bucket(*self, rawKey); \
     CMapEntry_##tag* e = &self->_vec.data[idx]; \
     if (e->state == CMapEntry_INUSE) { \
-        chmapentry_##tag##_destroy(e); \
+        cmapentry_##tag##_destroy(e); \
         e->state = CMapEntry_ERASED; \
         --self->_size; \
         return true; \
@@ -217,15 +214,6 @@ static inline cmap_##tag##_iter_t cmap_##tag##_end(CMap_##tag map) { \
 } \
 typedef Key cmap_##tag##_key_t; \
 typedef Value cmap_##tag##_value_t
-
-
-#define FIBONACCI_DECL  size_t fib1 = 0, fib2 = 1, fibx
-#define FIBONACCI_NEXT  (fibx = fib1 + fib2, fib1 = fib2, fib2 = fibx)
-
-// https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
-static inline uint32_t cmap_reduce(uint32_t x, uint32_t N) {
-    return ((uint64_t) x * (uint64_t) N) >> 32 ;
-}
 
 
 #endif
