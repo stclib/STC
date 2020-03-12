@@ -25,7 +25,7 @@
 
 #include <malloc.h>
 #include <string.h>
-#include "c_defs.h"
+#include "cdefs.h"
 
 
 #define cvector_initializer    {NULL}
