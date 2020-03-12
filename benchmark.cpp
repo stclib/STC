@@ -6,65 +6,65 @@
 #include <unordered_map>
 
 
-c_declare_Hashmap(ii, int, int);
-c_declare_Vector_string(s);
+declare_CMap(ii, int, int);
+declare_CVector_string(s);
 
 int main()
 {
-    c_Hashmap_ii map = c_hashmap_initializer;
+    CMap_ii map = cmap_initializer;
     int K = 300000;
     printf("BEGIN\n");
-    //c_hashmap_ii_reserve(&map, 50);
+    //cmap_ii_reserve(&map, 50);
     /*
-    c_hashmap_ii_setMaxLoadFactor(&map, 0.8);
+    cmap_ii_setMaxLoadFactor(&map, 0.8);
     for (size_t i = 0; i < K; ++i) {
-        c_hashmap_ii_put(&map, i*i, i);
+        cmap_ii_put(&map, i*i, i);
     }
     for (size_t i = 0; i < K/2; ++i) {
-        c_hashmap_ii_erase(&map, i*i);
+        cmap_ii_erase(&map, i*i);
     }
-    c_foreach (i, c_hashmap_ii, map) c_hashmap_ii_bucket(map, i.item->key);
+    c_foreach (i, cmap_ii, map) cmap_ii_bucket(map, i.item->key);
     for (size_t i = 0; i < K/2; ++i) {
-        c_hashmap_ii_put(&map, i, i*i);
+        cmap_ii_put(&map, i, i*i);
     }    
-    c_foreach (i, c_hashmap_ii, map) c_hashmap_ii_bucket(map, i.item->key);
+    c_foreach (i, cmap_ii, map) cmap_ii_bucket(map, i.item->key);
     */
     
     uint64_t checksum = 0;
     clock_t before, difference;
     size_t fib1, fib2, fibx;
     
-    const size_t N = 10000000;
+    const size_t N = 20000000;
 
     printf("Starting %llu\n", N);
-    //c_hashmap_ii_reserve(&map, N * 1.25);
+    //cmap_ii_reserve(&map, N * 1.25);
     before = clock();
     fib1 = 0, fib2 = 1; checksum = 0;
     for (size_t i = 0; i < N; ++i) {
-        checksum += ++c_hashmap_ii_put(&map, FIBONACCI_NEXT, i)->value;
+        checksum += ++cmap_ii_put(&map, FIBONACCI_NEXT, i)->value;
     }
     difference = clock() - before;
-    printf("c_Hashmap_ii added: size: %llu, time: %f, check: %llu\n", c_hashmap_size(map), 1.0 * difference / CLOCKS_PER_SEC, checksum);
+    printf("CMap_ii added: size: %llu, time: %f, check: %llu\n", cmap_size(map), 1.0 * difference / CLOCKS_PER_SEC, checksum);
     before = clock();
     fib1 = 0, fib2 = 1;
     for (size_t i = 0; i < N*2/3; ++i) {
-        c_hashmap_ii_erase(&map, FIBONACCI_NEXT);
+        cmap_ii_erase(&map, FIBONACCI_NEXT);
     }
     difference = clock() - before;
-    printf("c_Hashmap_ii removed: size: %llu, time: %f, check: %llu\n", c_hashmap_size(map), 1.0 * difference / CLOCKS_PER_SEC, checksum);
+    printf("CMap_ii removed: size: %llu, time: %f, check: %llu\n", cmap_size(map), 1.0 * difference / CLOCKS_PER_SEC, checksum);
 
     before = clock();
     fib1 = 0, fib2 = 1; checksum = 0;
     for (size_t i = 0; i < N; ++i) {
-        checksum += ++c_hashmap_ii_put(&map, i, i)->value;
+        checksum += ++cmap_ii_put(&map, i, i)->value;
     }
     difference = clock() - before;
-    printf("c_Hashmap_ii re-add: size: %llu, time: %f, check: %llu\n", c_hashmap_size(map), 1.0 * difference / CLOCKS_PER_SEC, checksum);
+    printf("CMap_ii re-add: size: %llu, time: %f, check: %llu\n", cmap_size(map), 1.0 * difference / CLOCKS_PER_SEC, checksum);
     
     size_t sum = 0;
-    c_foreach (i, c_hashmap_ii, map) sum += c_hashmap_ii_get(map, i.item->key)->value;
+    c_foreach (i, cmap_ii, map) sum += cmap_ii_get(map, i.item->key)->value;
     
-    c_hashmap_ii_destroy(&map);
+    cmap_ii_destroy(&map);
 
 
     std::unordered_map<int, int> map2;

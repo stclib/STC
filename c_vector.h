@@ -20,141 +20,141 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef C_VECTOR__H__
-#define C_VECTOR__H__
+#ifndef CVECTOR__H__
+#define CVECTOR__H__
 
 #include <malloc.h>
 #include <string.h>
 #include "c_defs.h"
 
 
-#define c_vector_initializer    {NULL}
-#define c_vector_size(cv)       _c_vector_safe_size((cv).data)
-#define c_vector_capacity(cv)   _c_vector_safe_capacity((cv).data)
-#define c_vector_empty(cv)      (_c_vector_safe_size((cv).data) == 0)
+#define cvector_initializer    {NULL}
+#define cvector_size(cv)       _cvector_safe_size((cv).data)
+#define cvector_capacity(cv)   _cvector_safe_capacity((cv).data)
+#define cvector_empty(cv)      (_cvector_safe_size((cv).data) == 0)
 
-#define c_declare_Vector(...)   c_defs_MACRO_OVERLOAD(c_declare_Vector, __VA_ARGS__)
-#define c_declare_Vector_2(tag, Value) \
-                                c_declare_Vector_3(tag, Value, c_defs_destroy)
-#define c_declare_Vector_3(tag, Value, valueDestroy) \
-                                c_declare_Vector_5(tag, Value, valueDestroy, memcmp, Value)
-#define c_declare_Vector_4(tag, Value, valueDestroy, valueCompare) \
-                                c_declare_Vector_5(tag, Value, valueDestroy, valueCompare, Value)
-#define c_declare_Vector_string(tag) \
-                                c_declare_Vector_5(tag, c_String, c_string_destroy, c_string_compareRaw, const char*)
+#define declare_CVector(...)   c_MACRO_OVERLOAD(declare_CVector, __VA_ARGS__)
+#define declare_CVector_2(tag, Value) \
+                                declare_CVector_3(tag, Value, c_defaultDestroy)
+#define declare_CVector_3(tag, Value, valueDestroy) \
+                                declare_CVector_5(tag, Value, valueDestroy, memcmp, Value)
+#define declare_CVector_4(tag, Value, valueDestroy, valueCompare) \
+                                declare_CVector_5(tag, Value, valueDestroy, valueCompare, Value)
+#define declare_CVector_string(tag) \
+                                declare_CVector_5(tag, CString, cstring_destroy, cstring_compareRaw, const char*)
 
-#define c_declare_Vector_5(tag, Value, valueDestroy, valueCompareRaw, ValueRaw) \
-typedef struct c_Vector_##tag { \
+#define declare_CVector_5(tag, Value, valueDestroy, valueCompareRaw, ValueRaw) \
+typedef struct CVector_##tag { \
     Value* data; \
-} c_Vector_##tag; \
+} CVector_##tag; \
  \
-typedef struct c_vector_##tag##_iter_t { \
+typedef struct cvector_##tag##_iter_t { \
     Value* item; \
-} c_vector_##tag##_iter_t; \
+} cvector_##tag##_iter_t; \
  \
-static inline c_Vector_##tag c_vector_##tag##_init(void) { \
-    c_Vector_##tag cv = c_vector_initializer; \
+static inline CVector_##tag cvector_##tag##_init(void) { \
+    CVector_##tag cv = cvector_initializer; \
     return cv; \
 } \
  \
-static inline void c_vector_##tag##_swap(c_Vector_##tag* a, c_Vector_##tag* b) { \
+static inline void cvector_##tag##_swap(CVector_##tag* a, CVector_##tag* b) { \
     Value* data = a->data; a->data = b->data; b->data = data; \
 } \
  \
-static inline void c_vector_##tag##_destroy(c_Vector_##tag* self) { \
+static inline void cvector_##tag##_destroy(CVector_##tag* self) { \
     Value* p = self->data; \
-    size_t i = 0, n = c_vector_size(*self); \
+    size_t i = 0, n = cvector_size(*self); \
     for (; i < n; ++p, ++i) valueDestroy(p); \
-    free(_c_vector_alloced(self->data)); \
+    free(_cvector_alloced(self->data)); \
 } \
  \
-static inline void c_vector_##tag##_reserve(c_Vector_##tag* self, size_t cap) { \
-    if (cap > c_vector_capacity(*self)) { \
-        size_t len = c_vector_size(*self); \
-        size_t* rep = (size_t *) realloc(_c_vector_alloced(self->data), 2 * sizeof(size_t) + cap * sizeof(Value)); \
+static inline void cvector_##tag##_reserve(CVector_##tag* self, size_t cap) { \
+    if (cap > cvector_capacity(*self)) { \
+        size_t len = cvector_size(*self); \
+        size_t* rep = (size_t *) realloc(_cvector_alloced(self->data), 2 * sizeof(size_t) + cap * sizeof(Value)); \
         self->data = (Value *) (rep + 2); \
         rep[0] = len; \
         rep[1] = cap; \
     } \
 } \
  \
-static inline void c_vector_##tag##_clear(c_Vector_##tag* self) { \
-    c_Vector_##tag cv = c_vector_initializer; \
-    c_vector_##tag##_destroy(self); \
+static inline void cvector_##tag##_clear(CVector_##tag* self) { \
+    CVector_##tag cv = cvector_initializer; \
+    cvector_##tag##_destroy(self); \
     *self = cv; \
 } \
  \
  \
-static inline void c_vector_##tag##_push(c_Vector_##tag* self, Value value) { \
-    size_t newsize = c_vector_size(*self) + 1; \
-    if (newsize > c_vector_capacity(*self)) \
-        c_vector_##tag##_reserve(self, 7 + newsize * 5 / 3); \
-    self->data[c_vector_size(*self)] = value; \
-    _c_vector_size(*self) = newsize; \
+static inline void cvector_##tag##_push(CVector_##tag* self, Value value) { \
+    size_t newsize = cvector_size(*self) + 1; \
+    if (newsize > cvector_capacity(*self)) \
+        cvector_##tag##_reserve(self, 7 + newsize * 5 / 3); \
+    self->data[cvector_size(*self)] = value; \
+    _cvector_size(*self) = newsize; \
 } \
  \
-static inline void c_vector_##tag##_insert(c_Vector_##tag* self, size_t pos, Value value) { \
-    c_vector_##tag##_push(self, value); \
-    size_t len = c_vector_size(*self); \
+static inline void cvector_##tag##_insert(CVector_##tag* self, size_t pos, Value value) { \
+    cvector_##tag##_push(self, value); \
+    size_t len = cvector_size(*self); \
     memmove(&self->data[pos + 1], &self->data[pos], (len - pos - 1) * sizeof(Value)); \
     self->data[pos] = value; \
 } \
  \
-static inline void c_vector_##tag##_erase(c_Vector_##tag* self, size_t pos, size_t size) { \
-    size_t len = c_vector_size(*self); \
+static inline void cvector_##tag##_erase(CVector_##tag* self, size_t pos, size_t size) { \
+    size_t len = cvector_size(*self); \
     if (len) { \
         Value* p = &self->data[pos], *start = p, *end = p + size; \
         while (p != end) valueDestroy(p++); \
         memmove(start, end, (len - pos - size) * sizeof(Value)); \
-        _c_vector_size(*self) -= size; \
+        _cvector_size(*self) -= size; \
     } \
 } \
  \
  \
-static inline size_t c_vector_##tag##_find(c_Vector_##tag cv, ValueRaw rawValue) { \
-    size_t n = c_vector_size(cv); \
+static inline size_t cvector_##tag##_find(CVector_##tag cv, ValueRaw rawValue) { \
+    size_t n = cvector_size(cv); \
     for (size_t i = 0; i < n; ++i) \
         if (valueCompareRaw(&cv.data[i], &rawValue, sizeof(Value)) == 0) return i; \
-    return c_defs_npos; \
+    return c_npos; \
 } \
  \
  \
-static inline Value c_vector_##tag##_back(c_Vector_##tag cv) { \
-    return cv.data[_c_vector_size(cv) - 1]; \
+static inline Value cvector_##tag##_back(CVector_##tag cv) { \
+    return cv.data[_cvector_size(cv) - 1]; \
 } \
  \
-static inline void c_vector_##tag##_pop(c_Vector_##tag* self) { \
-    valueDestroy(&self->data[_c_vector_size(*self) - 1]); \
-    --_c_vector_size(*self); \
+static inline void cvector_##tag##_pop(CVector_##tag* self) { \
+    valueDestroy(&self->data[_cvector_size(*self) - 1]); \
+    --_cvector_size(*self); \
 } \
  \
-static inline c_vector_##tag##_iter_t c_vector_##tag##_begin(c_Vector_##tag vec) { \
-    c_vector_##tag##_iter_t it = {vec.data}; \
+static inline cvector_##tag##_iter_t cvector_##tag##_begin(CVector_##tag vec) { \
+    cvector_##tag##_iter_t it = {vec.data}; \
     return it; \
 } \
  \
-static inline c_vector_##tag##_iter_t c_vector_##tag##_next(c_vector_##tag##_iter_t it) { \
+static inline cvector_##tag##_iter_t cvector_##tag##_next(cvector_##tag##_iter_t it) { \
     ++it.item; \
     return it; \
 } \
  \
-static inline c_vector_##tag##_iter_t c_vector_##tag##_end(c_Vector_##tag vec) { \
-    c_vector_##tag##_iter_t it = {vec.data + c_vector_size(vec)}; \
+static inline cvector_##tag##_iter_t cvector_##tag##_end(CVector_##tag vec) { \
+    cvector_##tag##_iter_t it = {vec.data + cvector_size(vec)}; \
     return it; \
 } \
-typedef Value c_vector_##tag##_value_t
+typedef Value cvector_##tag##_value_t
 
 
-#define _c_vector_size(cv) ((size_t *)(cv).data)[-2]
-#define _c_vector_capacity(cv) ((size_t *)(cv).data)[-1]
+#define _cvector_size(cv) ((size_t *)(cv).data)[-2]
+#define _cvector_capacity(cv) ((size_t *)(cv).data)[-1]
 
-static inline size_t* _c_vector_alloced(void* data) {
+static inline size_t* _cvector_alloced(void* data) {
     return data ? ((size_t *) data) - 2 : NULL;
 }
-static inline size_t _c_vector_safe_size(const void* data) {
+static inline size_t _cvector_safe_size(const void* data) {
     return data ? ((const size_t *) data)[-2] : 0;
 }
-static inline size_t _c_vector_safe_capacity(const void* data) {
+static inline size_t _cvector_safe_capacity(const void* data) {
     return data ? ((const size_t *) data)[-1] : 0;
 }
 
