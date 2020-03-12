@@ -28,7 +28,7 @@
 #include <string.h>
 #include <stdint.h>
 
-#include "c_defs.h"
+#include "cdefs.h"
 
 typedef struct CString {
     char* str;
