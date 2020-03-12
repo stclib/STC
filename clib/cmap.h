@@ -20,10 +20,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef CHASHMAP_H_
-#define CHASHMAP_H_
+#ifndef CMAP_H_
+#define CMAP_H_
 
-#include "c_vector.h"
+#include "cvector.h"
 
 #define cmap_initializer  {cvector_initializer, 0, 0.8f}
 #define cmap_size(map)     ((size_t) (map)._size)
