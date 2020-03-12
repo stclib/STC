@@ -1,4 +1,4 @@
-# c_Lib
+# c_lib
 
 Introduction
 ------------
