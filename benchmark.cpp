@@ -1,9 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
-#include "c_string.h"
-#include "c_hashmap.h"
 #include <unordered_map>
+#include <clib/cstring.h>
+#include <clib/cmap.h>
 
 
 declare_CMap(ii, int, int);

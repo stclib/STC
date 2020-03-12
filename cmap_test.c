@@ -24,9 +24,8 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "cmap.h"
-#include "cstring.h"
-
+#include <clib/cmap.h>
+#include <clib/cstring.h>
 
 declare_CVector_string(s);
 declare_CMap_stringkey(ss, CString, cstring_destroy);
