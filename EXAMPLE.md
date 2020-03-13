@@ -1,8 +1,10 @@
-To be able to use std::unordered_map (or one of the other unordered associative containers) with a user-defined key-type, you need to define two things:
+This example is based on https://stackoverflow.com/questions/17016175/c-unordered-map-using-a-custom-class-type-as-the-key/17017281#17017281, adapted to use CMap and CString instead of std::unordered_map and std::string.
 
-A hash function; this must be a class that overrides operator() and calculates the hash value given an object of the key-type. One particularly straight-forward way of doing this is to specialize the std::hash template for your key-type.
+To be able to use CMap (or one of the other unordered associative containers) with a user-defined key-type, you need to define two things:
 
-A comparison function for equality; this is required because the hash cannot rely on the fact that the hash function will always provide a unique hash value for every distinct key (i.e., it needs to be able to deal with collisions), so it needs a way to compare two given keys for an exact match. You can implement this either as a class that overrides operator(), or as a specialization of std::equal, or – easiest of all – by overloading operator==() for your key type (as you did already).
+1. A hash function; this must be a function that calculates the hash value given an object of the key-type.
+
+2. A comparison function for equality; this is required because the hash cannot rely on the fact that the hash function will always provide a unique hash value for every distinct key (i.e., it needs to be able to deal with collisions), so it needs a way to compare two given keys for an exact match.
 
 The difficulty with the hash function is that if your key type consists of several members, you will usually have the hash function calculate hash values for the individual members, and then somehow combine them into one hash value for the entire object. For good performance (i.e., few collisions) you should think carefully about how to combine the individual hash values to ensure you avoid getting the same output for different objects too often.
 
@@ -10,43 +12,33 @@ A fairly good starting point for a hash function is one that uses bit shifting a
 ```
 struct Key
 {
-  std::string first;
-  std::string second;
-  int         third;
-
-  bool operator==(const Key &other) const
-  { return (first == other.first
-            && second == other.second
-            && third == other.third);
-  }
+  CString first;
+  CString second;
+  int third;
 };
+
+int key_compare(const Key* x, const Key *y) {
+  int c = strcmp(x->first.str, y->first.str); if (c != 0) return c;
+  c = strcmp(x->second.str, y->second.str);  if (c != 0) return c;
+  return memcmp(&x.third, &y.third, sizeof(x.third));
+}
 ```
 Here is a simple hash function (adapted from the one used in the cppreference example for user-defined hash functions):
 ```
-namespace std {
-
-  template <>
-  struct hash<Key>
-  {
-    std::size_t operator()(const Key& k) const
-    {
-      using std::size_t;
-      using std::hash;
-      using std::string;
-
-      // Compute individual hash values for first,
-      // second and third and combine them using XOR
-      // and bit shifting:
-
-      return ((hash<string>()(k.first)
-               ^ (hash<string>()(k.second) << 1)) >> 1)
-               ^ (hash<int>()(k.third) << 1);
-    }
-  };
+size_t key_hash(const Key* k) {
+  // Compute individual hash values for first,
+  // second and third and combine them using XOR
+  // and bit shifting:
+  return c_murmurHash(k->first.str, cstring_size(k->first))
+      ^ (c_murmurHash(k->second.str, cstring_size(k->second)) << 1)) >> 1)
+      ^ (c_murmurHash(&k->third, sizeof(k->third)) << 1);
 }
 ```
-With this in place, you can instantiate a std::unordered_map for the key-type:
+With this in place, you can instantiate a CMap for the key-type:
 ```
+#include <clib/CMap.h>
+declare_CMap(mm, Key, CString, cstring_destroy, key_compare, keyHash
+
 int main()
 {
   std::unordered_map<Key,std::string> m6 = {
