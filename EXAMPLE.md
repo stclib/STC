@@ -63,7 +63,8 @@ int main()
   // ...
   c_foreach (it, cmap_mm, m6) {
       if (cstring_equals(it.item->key.first, "John"))
-          printf("%s %s %d -> %s\n", it.item->key.first.str, it.item->key.second.str, it.item->key.third, it.item->value.str);
+          printf("%s %s %d -> %s\n", it.item->key.first.str, it.item->key.second.str, it.item->key.third,
+                                     it.item->value.str);
   }
   
   cmap_mm_destroy(&m6);
