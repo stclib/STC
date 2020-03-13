@@ -71,5 +71,5 @@ int main()
 }
 ```
 It will automatically use key_hash() as defined above for the hash value calculations, and the key_compare() for equality checks.
-The cmap_mm_destroy() function will free all first, second CString's, and the CString value for each item in the map, in addition to the CMap hash table itself.
+The cmap_ex_destroy() function will free all first, second CString's, and the CString value for each item in the map, in addition to the CMap hash table itself.
 
