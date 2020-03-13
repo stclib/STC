@@ -8,7 +8,7 @@ To be able to use CMap (or one of the other unordered associative containers) wi
 
 The difficulty with the hash function is that if your key type consists of several members, you will usually have the hash function calculate hash values for the individual members, and then somehow combine them into one hash value for the entire object. For good performance (i.e., few collisions) you should think carefully about how to combine the individual hash values to ensure you avoid getting the same output for different objects too often.
 
-Assuming a key-type like this:
+Assuming a key-type like this, and want string as value, we define the functions key_make(), key_destroy() and key_compare():
 ```
 #include <clib/cstring.h>
 
@@ -49,7 +49,7 @@ size_t key_hash(const struct Key* k, size_t ignore) {
   return res;
 }
 ```
-With this in place, you can instantiate a CMap for the key-type:
+With this in place, you can instantiate a CMap with Key => CString:
 ```
 #include <clib/CMap.h>
 declare_CMap(mm, struct Key, CString, cstring_destroy, key_compare, key_hash, key_destroy);
@@ -70,5 +70,5 @@ int main()
   cmap_mm_destroy(&m6);
 }
 ```
-It will automatically use key_hash() as defined above for the hash value calculations, and the key_compare() for equality checks.
+It will automatically use key_hash() as defined above for the hash value calculations, and the key_compare() for equality checks. The cmap_mm_destroy() function will free both first, second CString's and value CString for each item in the map, in addition to the cmap hashtable itself.
 
