@@ -36,13 +36,13 @@ declare_CMap(id, uint64_t, double);
 // like fgets, but removes any newline
 char *fgetstr(char *string, int n, FILE *stream)
 {
-	char *res = fgets(string, n, stream);
-	if (!res) return res;
+    char *res = fgets(string, n, stream);
+    if (!res) return res;
     int last = strlen(string);
     if (last) {
         --last; if (string[last] == '\n') string[last] = '\0';
     }
-	return string;
+    return string;
 }
 
 int read_words(CMap_si* map)
