@@ -17,106 +17,48 @@ struct Key
   int third;
 };
 
+Key key_make(const char* first, const char* second, int third) {
+  Key k = {cstring_make(first), cstring_make(second), third}};
+  return k;
+}
+
+void key_destroy(Key* key) {
+  cstring_destroy(&key->first);
+  cstring_destroy(&key->second);
+}
+
 int key_compare(const Key* x, const Key *y) {
-  int c = strcmp(x->first.str, y->first.str); if (c != 0) return c;
-  c = strcmp(x->second.str, y->second.str);  if (c != 0) return c;
+  int c;
+  c = strcmp(x->first.str, y->first.str);   if (c != 0) return c;
+  c = strcmp(x->second.str, y->second.str); if (c != 0) return c;
   return memcmp(&x.third, &y.third, sizeof(x.third));
 }
 ```
-Here is a simple hash function (adapted from the one used in the cppreference example for user-defined hash functions):
+Here is a simple hash function that combines the three member's hashes:
 ```
 size_t key_hash(const Key* k) {
-  // Compute individual hash values for first,
-  // second and third and combine them using XOR
-  // and bit shifting:
-  return c_murmurHash(k->first.str, cstring_size(k->first))
-      ^ (c_murmurHash(k->second.str, cstring_size(k->second)) << 1)) >> 1)
-      ^ (c_murmurHash(&k->third, sizeof(k->third)) << 1);
+  // Compute individual hash values for first, second and third
+  // http://stackoverflow.com/a/1646913/126995
+
+  size_t res = 17;  
+  res = res * 31 + c_murmurHash(k->first.str, cstring_size(k->first));
+  res = res * 31 + c_murmurHash(k->second.str, cstring_size(k->second));
+  res = res * 31 + c_murmurHash(&k->third, sizeof(k->third));
 }
 ```
 With this in place, you can instantiate a CMap for the key-type:
 ```
 #include <clib/CMap.h>
-declare_CMap(mm, Key, CString, cstring_destroy, key_compare, keyHash
+declare_CMap(mm, Key, CString, cstring_destroy, key_compare, key_hash, key_destroy);
 
 int main()
 {
-  std::unordered_map<Key,std::string> m6 = {
-    { {"John", "Doe", 12}, "example"},
-    { {"Mary", "Sue", 21}, "another"}
-  };
+  CMap_mm m6 = cmap_initializer;
+  cmap_mm_put(&m6, key_make("John", "Doe", 12), cstring_make("example"));
+  cmap_mm_put(&m6, key_make("Mary", "Sue", 21), cstring_make("another"));
+  // ...
+  cmap_mm_destroy(&m6);
 }
 ```
-It will automatically use std::hash<Key> as defined above for the hash value calculations, and the operator== defined as member function of Key for equality checks.
+It will automatically use key_hash() as defined above for the hash value calculations, and the key_compare() for equality checks.
 
-If you don't want to specialize template inside the std namespace (although it's perfectly legal in this case), you can define the hash function as a separate class and add it to the template argument list for the map:
-```
-struct KeyHasher
-{
-  std::size_t operator()(const Key& k) const
-  {
-    using std::size_t;
-    using std::hash;
-    using std::string;
-
-    return ((hash<string>()(k.first)
-             ^ (hash<string>()(k.second) << 1)) >> 1)
-             ^ (hash<int>()(k.third) << 1);
-  }
-};
-
-int main()
-{
-  std::unordered_map<Key,std::string,KeyHasher> m6 = {
-    { {"John", "Doe", 12}, "example"},
-    { {"Mary", "Sue", 21}, "another"}
-  };
-}
-```
-How to define a better hash function? As said above, defining a good hash function is important to avoid collisions and get good performance. For a real good one you need to take into account the distribution of possible values of all fields and define a hash function that projects that distribution to a space of possible results as wide and evenly distributed as possible.
-
-This can be difficult; the XOR/bit-shifting method above is probably not a bad start. For a slightly better start, you may use the hash_value and hash_combine function template from the Boost library. The former acts in a similar way as std::hash for standard types (recently also including tuples and other useful standard types); the latter helps you combine individual hash values into one. Here is a rewrite of the hash function that uses the Boost helper functions:
-
-#include <boost/functional/hash.hpp>
-```
-struct KeyHasher
-{
-  std::size_t operator()(const Key& k) const
-  {
-      using boost::hash_value;
-      using boost::hash_combine;
-
-      // Start with a hash value of 0    .
-      std::size_t seed = 0;
-
-      // Modify 'seed' by XORing and bit-shifting in
-      // one member of 'Key' after the other:
-      hash_combine(seed,hash_value(k.first));
-      hash_combine(seed,hash_value(k.second));
-      hash_combine(seed,hash_value(k.third));
-
-      // Return the result.
-      return seed;
-  }
-};
-```
-And here’s a rewrite that doesn’t use boost, yet uses good method of combining the hashes:
-```
-namespace std
-{
-    template <>
-    struct hash<Key>
-    {
-        size_t operator()( const Key& k ) const
-        {
-            // Compute individual hash values for first, second and third
-            // http://stackoverflow.com/a/1646913/126995
-            size_t res = 17;
-            res = res * 31 + hash<string>()( k.first );
-            res = res * 31 + hash<string>()( k.second );
-            res = res * 31 + hash<int>()( k.third );
-            return res;
-        }
-    };
-}
-```
