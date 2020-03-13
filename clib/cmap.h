@@ -25,7 +25,7 @@
 
 #include "cvector.h"
 
-#define cmap_initializer  {cvector_initializer, 0, 0.8f}
+#define cmap_initializer   {cvector_initializer, 0, 0, 0.8f}
 #define cmap_size(map)     ((size_t) (map)._size)
 #define cmap_buckets(map)  cvector_capacity((map)._vec)
 
@@ -33,7 +33,7 @@
 // CMapEntry:
 enum { CMapEntry_VACANT = 0, 
        CMapEntry_INUSE = 1,
-       CMapEntry_ERASED = 2
+       CMapEntry_TOMBSTONE = 2
 };
 #define declare_CMapEntry(tag, Key, Value, valueDestroy, keyDestroy) \
 struct CMapEntry_##tag { \
@@ -82,7 +82,7 @@ typedef struct CMapEntry_##tag CMapEntry_##tag
  \
 typedef struct CMap_##tag { \
     CVector_map_##tag _vec; \
-    size_t _size; \
+    size_t _size, _occupied; \
     float maxLoadFactor; \
 } CMap_##tag; \
  \
@@ -117,38 +117,48 @@ static inline void cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
     c_swap(size_t, a->_size, b->_size); \
 } \
  \
-static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, float fac) { \
+static inline void cmap_##tag##_setmaxLoadFactor(CMap_##tag* self, float fac) { \
     self->maxLoadFactor = fac; \
     if (cmap_size(*self) > cmap_buckets(*self) * fac) \
         cmap_##tag##_reserve(self, 1 + (size_t) (cmap_size(*self) / fac)); \
 } \
  \
-static inline size_t cmap_##tag##_bucket(CMap_##tag map, KeyRaw rawKey) { \
-    size_t cap = cvector_capacity(map._vec), erased_idx = cap; \
-    size_t idx = c_reduce(keyHashRaw(&rawKey, sizeof(Key)), cap); \
+static inline size_t cmap_##tag##_bucket(CMap_##tag* self, KeyRaw rawKey) { \
+    size_t cap = cvector_capacity(self->_vec), erased_idx = cap; \
+    size_t idx = c_reduce(keyHashRaw(&rawKey, sizeof(Key)), cap)/*, first = idx, m = 0*/; \
     do { \
-        switch (map._vec.data[idx].state) { \
+        switch (self->_vec.data[idx].state) { \
             case CMapEntry_VACANT: \
                 return erased_idx != cap ? erased_idx : idx; \
             case CMapEntry_INUSE: \
-                if (keyCompareRaw(&map._vec.data[idx].key, &rawKey, sizeof(Key)) != 0) \
+                if (keyCompareRaw(&self->_vec.data[idx].key, &rawKey, sizeof(Key)) != 0) \
                     break; \
                 if (erased_idx != cap) { \
-                    c_swap(CMapEntry_##tag, map._vec.data[erased_idx], map._vec.data[idx]); \
+                    c_swap(CMapEntry_##tag, self->_vec.data[erased_idx], self->_vec.data[idx]); \
                     return erased_idx; \
                 } \
                 return idx; \
-            case CMapEntry_ERASED: \
+            case CMapEntry_TOMBSTONE: \
                 if (erased_idx == cap) erased_idx = idx; \
                 break; \
         } \
-        if (++idx >= cap) idx %= cap; \
+        /*++m; if ((idx = first + m*m) >= cap) idx %= cap;*/ \
+        if (++idx > cap) idx = 0; \
     } while (1); \
+} \
+ \
+static inline void cmap_##tag##_rehash(CMap_##tag* self) { \
+    CMapEntry_##tag *e, *end = self->_vec.data + cvector_capacity(self->_vec); \
+    for (e = self->_vec.data; e != end; ++e) \
+        if (e->state == CMapEntry_INUSE) cmap_##tag##_bucket(self, keyGetRaw(e->key)); \
+    for (e = self->_vec.data; e != end; ++e) \
+        if (e->state == CMapEntry_TOMBSTONE) e->state = CMapEntry_VACANT; \
+    self->_occupied = self->_size; \
 } \
  \
 static inline CMapEntry_##tag* cmap_##tag##_get(CMap_##tag map, KeyRaw rawKey) { \
     if (cmap_size(map) == 0) return NULL; \
-    size_t idx = cmap_##tag##_bucket(map, rawKey); \
+    size_t idx = cmap_##tag##_bucket(&map, rawKey); \
     return map._vec.data[idx].state == CMapEntry_INUSE ? &map._vec.data[idx] : NULL; \
 } \
  \
@@ -156,38 +166,47 @@ static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, KeyRaw rawKey,
     size_t cap = cvector_capacity(self->_vec); \
     if (cmap_size(*self) >= cap * self->maxLoadFactor) \
         cap = cmap_##tag##_reserve(self, (size_t) 7 + (cap * 1.8)); \
-    size_t idx = cmap_##tag##_bucket(*self, rawKey); \
+    else if (self->_occupied  >= 1.33 * cmap_size(*self)) \
+        cmap_##tag##_rehash(self); \
+    size_t idx = cmap_##tag##_bucket(self, rawKey); \
     CMapEntry_##tag* e = &self->_vec.data[idx]; \
     e->value = value; \
-    e->changed = (e->state == CMapEntry_INUSE); \
-    if (e->state != CMapEntry_INUSE) { \
-        e->key = keyInitRaw(rawKey); \
-        e->state = CMapEntry_INUSE; \
-        ++self->_size; \
+    switch (e->state) { \
+        case CMapEntry_INUSE: \
+            e->changed = true; \
+            return e; \
+        case CMapEntry_VACANT: \
+            ++self->_occupied; \
+        case CMapEntry_TOMBSTONE: \
+            ++self->_size; \
+            e->key = keyInitRaw(rawKey); \
+            e->state = CMapEntry_INUSE; \
+        default: return e; \
     } \
-    return e; \
 } \
  \
 static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size) { \
     size_t oldcap = cvector_capacity(self->_vec), newcap = 1 + (size / 2) * 2; \
     if (oldcap >= newcap) return oldcap; \
     CVector_map_##tag vec = cvector_initializer; \
+    cvector_map_##tag##_reserve(&vec, newcap); \
+    memset(vec.data, 0, sizeof(CMapEntry_##tag) * newcap); \
     cvector_map_##tag##_swap(&self->_vec, &vec); \
-    cvector_map_##tag##_reserve(&self->_vec, newcap); \
-    self->_size = 0; \
-    memset(self->_vec.data, 0, sizeof(CMapEntry_##tag) * newcap); \
-    CMapEntry_##tag* e = vec.data; \
+    CMapEntry_##tag* e = vec.data, *dst = self->_vec.data; \
     for (size_t i = 0; i < oldcap; ++i, ++e) \
-        if (e->state == CMapEntry_INUSE) cmap_##tag##_put(self, keyGetRaw(e->key), e->value); \
+        if (e->state == CMapEntry_INUSE) \
+            dst[ cmap_##tag##_bucket(self, keyGetRaw(e->key)) ] = *e; \
+    self->_occupied = self->_size; \
+    free(_cvector_alloced(vec.data)); /* not cvector_destroy here */ \
     return newcap; \
 } \
  \
 static inline bool cmap_##tag##_erase(CMap_##tag* self, KeyRaw rawKey) { \
-    size_t idx = cmap_##tag##_bucket(*self, rawKey); \
+    size_t idx = cmap_##tag##_bucket(self, rawKey); \
     CMapEntry_##tag* e = &self->_vec.data[idx]; \
     if (e->state == CMapEntry_INUSE) { \
         cmapentry_##tag##_destroy(e); \
-        e->state = CMapEntry_ERASED; \
+        e->state = CMapEntry_TOMBSTONE; \
         --self->_size; \
         return true; \
     } \
