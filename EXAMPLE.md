@@ -8,7 +8,7 @@ To be able to use CMap (or one of the other unordered associative containers) wi
 
 The difficulty with the hash function is that if your key type consists of several members, you will usually have the hash function calculate hash values for the individual members, and then somehow combine them into one hash value for the entire object. For good performance (i.e., few collisions) you should think carefully about how to combine the individual hash values to ensure you avoid getting the same output for different objects too often.
 
-A fairly good starting point for a hash function is one that uses bit shifting and bitwise XOR to combine the individual hash values. For example, assuming a key-type like this:
+A starting point for a hash function is one that combines the individual hash values in a good manner. For example, assuming a key-type like this:
 ```
 struct Key
 {
