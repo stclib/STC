@@ -10,6 +10,8 @@ The difficulty with the hash function is that if your key type consists of sever
 
 A starting point for a hash function is one that combines the individual hash values in a good manner. For example, assuming a key-type like this:
 ```
+#include <clib/cstring.h>
+
 struct Key
 {
   CString first;
@@ -17,26 +19,26 @@ struct Key
   int third;
 };
 
-Key key_make(const char* first, const char* second, int third) {
-  Key k = {cstring_make(first), cstring_make(second), third}};
+struct Key key_make(const char* first, const char* second, int third) {
+  struct Key k = {cstring_make(first), cstring_make(second), third};
   return k;
 }
 
-void key_destroy(Key* key) {
+void key_destroy(struct Key* key) {
   cstring_destroy(&key->first);
   cstring_destroy(&key->second);
 }
 
-int key_compare(const Key* x, const Key *y) {
+int key_compare(const struct Key* x, const struct Key *y, size_t ignore) {
   int c;
   c = strcmp(x->first.str, y->first.str);   if (c != 0) return c;
   c = strcmp(x->second.str, y->second.str); if (c != 0) return c;
-  return memcmp(&x.third, &y.third, sizeof(x.third));
+  return memcmp(&x->third, &y->third, sizeof(x->third));
 }
 ```
 Here is a simple hash function that combines the three member's hashes:
 ```
-size_t key_hash(const Key* k) {
+size_t key_hash(const struct Key* k, size_t ignore) {
   // Compute individual hash values for first, second and third
   // http://stackoverflow.com/a/1646913/126995
 
@@ -44,19 +46,26 @@ size_t key_hash(const Key* k) {
   res = res * 31 + c_murmurHash(k->first.str, cstring_size(k->first));
   res = res * 31 + c_murmurHash(k->second.str, cstring_size(k->second));
   res = res * 31 + c_murmurHash(&k->third, sizeof(k->third));
+  return res;
 }
 ```
 With this in place, you can instantiate a CMap for the key-type:
 ```
 #include <clib/CMap.h>
-declare_CMap(mm, Key, CString, cstring_destroy, key_compare, key_hash, key_destroy);
+declare_CMap(mm, struct Key, CString, cstring_destroy, key_compare, key_hash, key_destroy);
 
 int main()
 {
   CMap_mm m6 = cmap_initializer;
   cmap_mm_put(&m6, key_make("John", "Doe", 12), cstring_make("example"));
   cmap_mm_put(&m6, key_make("Mary", "Sue", 21), cstring_make("another"));
+  
   // ...
+  c_foreach (it, cmap_mm, m6) {
+      if (cstring_equals(it.item->key.first, "John"))
+          printf("%s %s %d -> %s\n", it.item->key.first.str, it.item->key.second.str, it.item->key.third, it.item->value.str);
+  }
+  
   cmap_mm_destroy(&m6);
 }
 ```
