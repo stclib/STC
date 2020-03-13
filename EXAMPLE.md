@@ -52,22 +52,22 @@ size_t key_hash(const struct Key* k, size_t ignore) {
 With this in place, you can instantiate a CMap with Key => CString:
 ```
 #include <clib/CMap.h>
-declare_CMap(mm, struct Key, CString, cstring_destroy, key_compare, key_hash, key_destroy);
+declare_CMap(ex, struct Key, CString, cstring_destroy, key_compare, key_hash, key_destroy);
 
 int main()
 {
-  CMap_mm m6 = cmap_initializer;
-  cmap_mm_put(&m6, key_make("John", "Doe", 12), cstring_make("example"));
-  cmap_mm_put(&m6, key_make("Mary", "Sue", 21), cstring_make("another"));
+  CMap_ex m6 = cmap_initializer;
+  cmap_ex_put(&m6, key_make("John", "Doe", 12), cstring_make("example"));
+  cmap_ex_put(&m6, key_make("Mary", "Sue", 21), cstring_make("another"));
   
   // ...
-  c_foreach (it, cmap_mm, m6) {
+  c_foreach (it, cmap_ex, m6) {
       if (cstring_equals(it.item->key.first, "John"))
           printf("%s %s %d -> %s\n", it.item->key.first.str, it.item->key.second.str, it.item->key.third,
                                      it.item->value.str);
   }
   
-  cmap_mm_destroy(&m6);
+  cmap_ex_destroy(&m6);
 }
 ```
 It will automatically use key_hash() as defined above for the hash value calculations, and the key_compare() for equality checks.
