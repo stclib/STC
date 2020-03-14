@@ -57,10 +57,10 @@ typedef struct CMapEntry_##tag CMapEntry_##tag
     declare_CMap_4(tag, Key, Value, c_defaultDestroy)
 
 #define declare_CMap_4(tag, Key, Value, valueDestroy) \
-    declare_CMap_6(tag, Key, Value, valueDestroy, memcmp, c_murmurHash)
+    declare_CMap_7(tag, Key, Value, valueDestroy, memcmp, c_murmurHash, c_defaultDestroy)
     
-#define declare_CMap_6(tag, Key, Value, valueDestroy, keyCompare, keyHash) \
-    declare_CMap_10(tag, Key, Value, valueDestroy, keyCompare, keyHash, c_defaultDestroy, Key, c_defaultGetRaw, c_defaultInitRaw)
+#define declare_CMap_7(tag, Key, Value, valueDestroy, keyCompare, keyHash, keyDestroy) \
+    declare_CMap_10(tag, Key, Value, valueDestroy, keyCompare, keyHash, keyDestroy, Key, c_defaultGetRaw, c_defaultInitRaw)
 
 
 // CMap<CString, Value>:
@@ -71,12 +71,12 @@ typedef struct CMapEntry_##tag CMapEntry_##tag
 
 #define declare_CMap_stringkey_3(tag, Value, valueDestroy) \
     declare_CMap_10(tag, CString, Value, valueDestroy, cstring_compareRaw, cstring_hashRaw, cstring_destroy, \
-                        const char*, cstring_getRaw, cstring_make)
+                         const char*, cstring_getRaw, cstring_make)
 
 
 // CMap full:
 #define declare_CMap_10(tag, Key, Value, valueDestroy, keyCompareRaw, keyHashRaw, keyDestroy, \
-                            KeyRaw, keyGetRaw, keyInitRaw) \
+                             KeyRaw, keyGetRaw, keyInitRaw) \
   declare_CMapEntry(tag, Key, Value, valueDestroy, keyDestroy); \
   declare_CVector_3(map_##tag, CMapEntry_##tag, cmapentry_##tag##_destroy); \
  \
@@ -143,7 +143,7 @@ static inline size_t cmap_##tag##_bucket(CMap_##tag* self, KeyRaw rawKey) { \
                 break; \
         } \
         /*++m; if ((idx = first + m*m) >= cap) idx %= cap;*/ \
-        if (++idx > cap) idx = 0; \
+        if (++idx == cap) idx = 0; \
     } while (1); \
 } \
  \
