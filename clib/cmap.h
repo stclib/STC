@@ -147,15 +147,6 @@ static inline size_t cmap_##tag##_bucket(CMap_##tag* self, KeyRaw rawKey) { \
     } while (1); \
 } \
  \
-static inline void cmap_##tag##_rehash(CMap_##tag* self) { \
-    CMapEntry_##tag *e, *end = self->_vec.data + cvector_capacity(self->_vec); \
-    for (e = self->_vec.data; e != end; ++e) \
-        if (e->state == CMapEntry_INUSE) cmap_##tag##_bucket(self, keyGetRaw(e->key)); \
-    for (e = self->_vec.data; e != end; ++e) \
-        if (e->state == CMapEntry_TOMBSTONE) e->state = CMapEntry_VACANT; \
-    self->_occupied = self->_size; \
-} \
- \
 static inline CMapEntry_##tag* cmap_##tag##_get(CMap_##tag map, KeyRaw rawKey) { \
     if (cmap_size(map) == 0) return NULL; \
     size_t idx = cmap_##tag##_bucket(&map, rawKey); \
@@ -166,8 +157,8 @@ static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, KeyRaw rawKey,
     size_t cap = cvector_capacity(self->_vec); \
     if (cmap_size(*self) >= cap * self->maxLoadFactor) \
         cap = cmap_##tag##_reserve(self, (size_t) 7 + (cap * 1.8)); \
-    else if (self->_occupied  >= 1.33 * cmap_size(*self)) \
-        cmap_##tag##_rehash(self); \
+    else if (self->_occupied  >= 1.3 * cmap_size(*self)) \
+        cap = cmap_##tag##_reserve(self, 1.4 * cmap_size(*self) / self->maxLoadFactor); \
     size_t idx = cmap_##tag##_bucket(self, rawKey); \
     CMapEntry_##tag* e = &self->_vec.data[idx]; \
     e->value = value; \
@@ -187,7 +178,7 @@ static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, KeyRaw rawKey,
  \
 static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size) { \
     size_t oldcap = cvector_capacity(self->_vec), newcap = 1 + (size / 2) * 2; \
-    if (oldcap >= newcap) return oldcap; \
+    if (cmap_size(*self) >= newcap * self->maxLoadFactor) return oldcap; \
     CVector_map_##tag vec = cvector_initializer; \
     cvector_map_##tag##_reserve(&vec, newcap); \
     memset(vec.data, 0, sizeof(CMapEntry_##tag) * newcap); \
@@ -202,6 +193,7 @@ static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size) { \
 } \
  \
 static inline bool cmap_##tag##_erase(CMap_##tag* self, KeyRaw rawKey) { \
+    if (!self->_size) return false; \
     size_t idx = cmap_##tag##_bucket(self, rawKey); \
     CMapEntry_##tag* e = &self->_vec.data[idx]; \
     if (e->state == CMapEntry_INUSE) { \
