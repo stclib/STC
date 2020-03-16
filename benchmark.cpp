@@ -9,7 +9,7 @@
 declare_CMap(ii, int64_t, int64_t);
 declare_CVector_string(s);
 
-#define RAND() rand() // * rand()
+#define RAND() rand() * rand()
 
 int main()
 {
@@ -17,7 +17,7 @@ int main()
     CMap_ii map = cmap_initializer;
     CMapEntry_ii* entry;
     uint64_t checksum, inserted, erased, get;
-    const size_t N = 50000000, seed = 123; // time(NULL);
+    const size_t N = 70000000, seed = 123; // time(NULL);
 
     printf("Starting %llu\n", N);
     cmap_ii_clear(&map);
