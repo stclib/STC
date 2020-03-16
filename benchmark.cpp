@@ -2,9 +2,8 @@
 #include <stdio.h>
 #include <time.h>
 #include <unordered_map>
-#include <clib/cstring.h>
-#include <clib/cmap.h>
-#include "khashl.hpp"
+#include <c_lib/cstring.h>
+#include <c_lib/cmap.h>
 
 declare_CMap(ii, int64_t, int64_t);
 declare_CVector_string(s);
