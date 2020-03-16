@@ -10,7 +10,7 @@ Usage
 -----
 CString demo:
 ```
-#include <clib/cstring.h>
+#include <c_lib/cstring.h>
 
 int main() {
     CString cs = cstring_make("one-nine-three-seven-five");
@@ -36,7 +36,7 @@ int main() {
 ```
 Simple CVector of 64bit ints:
 ```
-#include <clib/cvector.h>
+#include <c_lib/cvector.h>
 declare_CVector(ix, int64_t); // ix is just an example tag name, use anything without underscore.
 
 int main() {
@@ -54,8 +54,8 @@ int main() {
 ```
 CVector of CString:
 ```
-#include <clib/cstring.h>
-#include <clib/cvector.h>
+#include <c_lib/cstring.h>
+#include <c_lib/cvector.h>
 declare_CVector(cs, CString, cstring_destroy); // supply inline destructor of values
 
 int main() {
@@ -70,7 +70,7 @@ int main() {
 ```
 Simple CMap, int -> int:
 ```
-#include <clib/cmap.h>
+#include <c_lib/cmap.h>
 declare_CMap(ii, int, int);
 
 int main() {
@@ -84,8 +84,8 @@ int main() {
 ```
 Simple CMap, CString -> int:
 ```
-#include <clib/cstring.h>
-#include <clib/cmap.h>
+#include <c_lib/cstring.h>
+#include <c_lib/cmap.h>
 declare_CMap_stringkey(si, int); // Shorthand macro for the general declare_CMap expansion.
 // CString keys are "magically" managed internally, although CMap is ignorant of CString.
 
@@ -108,8 +108,8 @@ int main() {
 ```
 CMap, with CString -> CString. Temporary CString values are created by "make", and moved to the container.
 ```
-#include <clib/cstring.h>
-#include <clib/cmap.h>
+#include <c_lib/cstring.h>
+#include <c_lib/cmap.h>
 declare_CMap_stringkey(ss, CString, cstring_destroy); 
 
 int main() {
