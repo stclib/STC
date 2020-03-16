@@ -4,29 +4,32 @@
 #include <unordered_map>
 #include <clib/cstring.h>
 #include <clib/cmap.h>
+#include "khashl.hpp"
 
 declare_CMap(ii, int64_t, int64_t);
 declare_CVector_string(s);
+
+#define RAND() rand() // * rand()
 
 int main()
 {
     clock_t before, difference;
     CMap_ii map = cmap_initializer;
     CMapEntry_ii* entry;
-    uint64_t checksum = 0, erased, get;
-    const size_t N = 50000000;
+    uint64_t checksum, inserted, erased, get;
+    const size_t N = 50000000, seed = 123; // time(NULL);
 
     printf("Starting %llu\n", N);
-    //cmap_ii_reserve(&map, N * 1.25);
     cmap_ii_clear(&map);
-    srand(123);
+    srand(seed);
     before = clock();
-    checksum = 0; erased = 0; get = 0;
+    checksum = inserted = erased = get = 0;
     for (size_t i = 0; i < N; ++i) {
-        int64_t rnd = rand();
+        int64_t rnd = RAND();
         int op = rand() >> 13;
         switch (op) {
         case 1:
+            ++inserted;
             checksum += ++cmap_ii_put(&map, rnd, i-1)->value;
             break;
         case 2:
@@ -43,19 +46,21 @@ int main()
         }
     }
     difference = clock() - before;
-    printf("CMap_ii: size: %llu, time: %f, sum: %llu, erased: %llu, get %llu\n", cmap_size(map), 1.0 * difference / CLOCKS_PER_SEC, checksum, erased, get);
+    printf("CMap: sz: %llu, bk: %llu, time: %.02f, sum: %llu, ins: %llu del: %llu\n", cmap_size(map), cmap_buckets(map), (float) difference / CLOCKS_PER_SEC, checksum, inserted, erased);
+    cmap_ii_destroy(&map);
+   
 
-    std::unordered_map<int64_t, int64_t> map2, map3;
+    std::unordered_map<int64_t, int64_t> map2;
     std::unordered_map<int64_t, int64_t>::const_iterator iter;
-    //map2.reserve(N);
-    srand(123);
+    srand(seed);
     before = clock();
-    checksum = 0; erased = 0; get = 0;
+    checksum = inserted = erased = get = 0;
     for (size_t i = 0; i < N; ++i) {
-        int64_t rnd = rand();
+        int64_t rnd = RAND();
         int op = rand() >> 13;
         switch (op) {        
         case 1:
+            ++inserted;
             checksum += ++(map2[rnd] = i-1);
             break;
         case 2:
@@ -72,8 +77,6 @@ int main()
         }
     }
     difference = clock() - before;
-    printf("std::um: size: %llu, time: %f, sum: %llu, erased: %llu, get %llu\n", map2.size(), 1.0 * difference / CLOCKS_PER_SEC, checksum, erased, get);
-     
-    cmap_ii_destroy(&map);
+    printf("umap: sz: %llu, bk: %llu, time: %.02f, sum: %llu, ins: %llu del: %llu\n", map2.size(), map2.bucket_count(), (float) difference / CLOCKS_PER_SEC, checksum, inserted, erased);
     map2.clear();
 }
