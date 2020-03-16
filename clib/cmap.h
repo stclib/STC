@@ -41,7 +41,7 @@ struct CMapEntry_##tag { \
 static inline void cmapentry_##tag##_destroy(struct CMapEntry_##tag* e) { \
     keyDestroy(&e->key); \
     valueDestroy(&e->value); \
-    e->used = 0; \
+    e->used = false; \
 } \
 typedef struct CMapEntry_##tag CMapEntry_##tag
 
@@ -140,10 +140,10 @@ static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, KeyRaw rawKey,
     size_t idx = cmap_##tag##_bucket(self, rawKey); \
     CMapEntry_##tag* e = &self->_vec.data[idx]; \
     if (e->used) \
-        e->changed = 1; \
+        e->changed = true; \
     else { \
         e->key = keyInitRaw(rawKey); \
-        e->used = 1; \
+        e->used = true; \
         ++self->_size; \
     } \
     e->value = value; \
@@ -180,14 +180,13 @@ static inline bool cmap_##tag##_erase(CMap_##tag* self, KeyRaw rawKey) { \
             break; \
         KeyRaw r = keyGetRaw(slot[j].key); \
         k = c_reduce(keyHashRaw(&r, sizeof(KeyRaw)), cap); \
-        /* https://attractivechaos.wordpress.com/2019/12/28/deletion-from-hash-tables-without-tombstones/ \
-        if (j > i && (k <= i || k > j) || \
-            j < i && (k <= i && k > j))*/ \
+        /* https://attractivechaos.wordpress.com/2019/12/28/deletion-from-hash-tables-without-tombstones/ */ \
+        /* if (j > i && (k <= i || k > j) || j < i && (k <= i && k > j)) */ \
         if ((j < i) ^ (k <= i) ^ (k > j)) /* simplified */ \
             slot[i] = slot[j], i = j; \
     } while (true); \
     cmapentry_##tag##_destroy(&slot[i]); \
-    slot[i].used = 0; \
+    slot[i].used = false; \
     --self->_size; \
     return true; \
 } \
