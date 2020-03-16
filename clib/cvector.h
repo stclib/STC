@@ -69,8 +69,8 @@ static inline void cvector_##tag##_destroy(CVector_##tag* self) { \
 } \
  \
 static inline void cvector_##tag##_reserve(CVector_##tag* self, size_t cap) { \
-    if (cap > cvector_capacity(*self)) { \
-        size_t len = cvector_size(*self); \
+    size_t len = cvector_size(*self); \
+    if (cap >= len) { \
         size_t* rep = (size_t *) realloc(_cvector_alloced(self->data), 2 * sizeof(size_t) + cap * sizeof(Value)); \
         self->data = (Value *) (rep + 2); \
         rep[0] = len; \
