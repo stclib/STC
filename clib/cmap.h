@@ -53,7 +53,7 @@ typedef struct CMapEntry_##tag CMapEntry_##tag
     declare_CMap_4(tag, Key, Value, c_defaultDestroy)
 
 #define declare_CMap_4(tag, Key, Value, valueDestroy) \
-    declare_CMap_7(tag, Key, Value, valueDestroy, memcmp, c_murmurHash, c_defaultDestroy)
+    declare_CMap_7(tag, Key, Value, valueDestroy, memcmp, c_defaultHash, c_defaultDestroy)
     
 #define declare_CMap_7(tag, Key, Value, valueDestroy, keyCompare, keyHash, keyDestroy) \
     declare_CMap_10(tag, Key, Value, valueDestroy, keyCompare, keyHash, keyDestroy, Key, c_defaultGetRaw, c_defaultInitRaw)
@@ -177,15 +177,13 @@ static inline bool cmap_##tag##_erase(CMap_##tag* self, KeyRaw rawKey) { \
     CMapEntry_##tag* slot = self->_vec.data; \
     if (! slot[i].used) \
         return false; \
-    /* https://attractivechaos.wordpress.com/2019/12/28/deletion-from-hash-tables-without-tombstones/ */ \
-    do { \
-        if (++j == cap) j = 0; \
+    do { /* https://attractivechaos.wordpress.com/2019/12/28/deletion-from-hash-tables-without-tombstones/ */ \
+        if (++j == cap) j = 0; /* j %= cap; is slow */ \
         if (! slot[j].used) \
             break; \
         KeyRaw r = keyGetRaw(slot[j].key); \
         k = c_reduce(keyHashRaw(&r, sizeof(KeyRaw)), cap); \
-        /* Check if k is outside [i, j) range */ \
-        if ((j < i) ^ (k <= i) ^ (k > j)) \
+        if ((j < i) ^ (k <= i) ^ (k > j)) /* Check if k is outside [i, j) range */ \
             slot[i] = slot[j], i = j; \
     } while (true); \
     cmapentry_##tag##_destroy(&slot[i]); \

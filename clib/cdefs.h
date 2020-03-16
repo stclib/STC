@@ -50,14 +50,15 @@ static inline void      c_defaultDestroy(void* value) {}
 
 #define                 c_foreach(it, ctag, con) \
                             for (ctag##_iter_t it = ctag##_begin(con); it.item != ctag##_end(con).item; it = ctag##_next(it))
-
-static inline uint32_t  c_murmurHash(const void *data, size_t len) { // One-at-a-time 32bit
-    const unsigned char *key = (const unsigned char *) data;
-    uint32_t h = 0xC613FC15; // ‭0x749E3E6989DF617‬;  64bit
+                                
+// One-byte-at-a-time hash based on Murmur's mix
+static inline uint32_t  c_defaultHash(const void *data, size_t len) {
+    const uint8_t *key = (const uint8_t *) data;
+    uint32_t h = 0xc613fc15;
     while (len--) {
         h ^= *key++;
-        h *= 0x5bd1e995;     // 0x5bd1e9955bd1e995; 64bit
-        h ^= h >> 15;        // 47;                 64bit
+        h *= 0x5bd1e995;
+        h ^= h >> 15;
     }
     return h;
 }
