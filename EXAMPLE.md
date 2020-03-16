@@ -43,9 +43,9 @@ size_t person_hash(const struct Person* p, size_t ignore) {
   // http://stackoverflow.com/a/1646913/126995
 
   size_t res = 17;  
-  res = res * 31 + c_murmurHash(p->name.str, cstring_size(p->name));
-  res = res * 31 + c_murmurHash(p->surname.str, cstring_size(p->surname));
-  res = res * 31 + c_murmurHash(&p->age, sizeof(p->age));
+  res = res * 31 + c_defaultHash(p->name.str, cstring_size(p->name));
+  res = res * 31 + c_defaultHash(p->surname.str, cstring_size(p->surname));
+  res = res * 31 + c_defaultHash(&p->age, sizeof(p->age));
   return res;
 }
 ```
