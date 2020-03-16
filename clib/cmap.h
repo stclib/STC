@@ -25,7 +25,7 @@
 
 #include "cvector.h"
 
-#define cmap_initializer   {cvector_initializer, 0, 0.8f}
+#define cmap_initializer   {cvector_initializer, 0, 0.9f}
 #define cmap_size(map)     ((size_t) (map)._size)
 #define cmap_buckets(map)  cvector_capacity((map)._vec)
 
@@ -122,8 +122,9 @@ static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, float fac) { 
 static inline size_t cmap_##tag##_bucket(CMap_##tag* self, KeyRaw rawKey) { \
     size_t cap = cvector_capacity(self->_vec), erased_idx = cap; \
     size_t idx = c_reduce(keyHashRaw(&rawKey, sizeof(KeyRaw)), cap); \
-    while (self->_vec.data[idx].used && keyCompareRaw(&self->_vec.data[idx].key, &rawKey, sizeof(Key)) != 0) \
+    while (self->_vec.data[idx].used && keyCompareRaw(&self->_vec.data[idx].key, &rawKey, sizeof(Key)) != 0) {\
         if (++idx == cap) idx = 0; \
+    } \
     return idx; \
 } \
  \
@@ -135,8 +136,8 @@ static inline CMapEntry_##tag* cmap_##tag##_get(CMap_##tag map, KeyRaw rawKey) {
  \
 static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, KeyRaw rawKey, Value value) { \
     size_t cap = cvector_capacity(self->_vec); \
-    if (cmap_size(*self) >= cap * self->maxLoadFactor) \
-        cap = cmap_##tag##_reserve(self, (size_t) 7 + (cap * 1.7)); \
+    if (cmap_size(*self) + 1 >= cap * self->maxLoadFactor) \
+        cap = cmap_##tag##_reserve(self, (size_t) 7 + (1.6 * cap)); \
     size_t idx = cmap_##tag##_bucket(self, rawKey); \
     CMapEntry_##tag* e = &self->_vec.data[idx]; \
     if (e->used) \
@@ -169,20 +170,22 @@ static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size) { \
 static inline bool cmap_##tag##_erase(CMap_##tag* self, KeyRaw rawKey) { \
     if (cmap_size(*self) == 0) \
         return false; \
-    size_t i = cmap_##tag##_bucket(self, rawKey), k; \
+    size_t cap = cvector_capacity(self->_vec); \
+    if (cmap_size(*self) * 1.6 < cap * self->maxLoadFactor) \
+        cap = cmap_##tag##_reserve(self, 1.2 * cmap_size(*self) / self->maxLoadFactor); \
+    size_t i = cmap_##tag##_bucket(self, rawKey), j = i, k; \
     CMapEntry_##tag* slot = self->_vec.data; \
     if (! slot[i].used) \
         return false; \
-    size_t cap = cvector_capacity(self->_vec), j = i; \
+    /* https://attractivechaos.wordpress.com/2019/12/28/deletion-from-hash-tables-without-tombstones/ */ \
     do { \
         if (++j == cap) j = 0; \
         if (! slot[j].used) \
             break; \
         KeyRaw r = keyGetRaw(slot[j].key); \
         k = c_reduce(keyHashRaw(&r, sizeof(KeyRaw)), cap); \
-        /* https://attractivechaos.wordpress.com/2019/12/28/deletion-from-hash-tables-without-tombstones/ */ \
-        /* if (j > i && (k <= i || k > j) || j < i && (k <= i && k > j)) */ \
-        if ((j < i) ^ (k <= i) ^ (k > j)) /* simplified */ \
+        /* Check if k is outside [i, j) range */ \
+        if ((j < i) ^ (k <= i) ^ (k > j)) \
             slot[i] = slot[j], i = j; \
     } while (true); \
     cmapentry_##tag##_destroy(&slot[i]); \
