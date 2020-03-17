@@ -8,7 +8,7 @@
 declare_CMap(ii, int64_t, int64_t);
 declare_CVector_string(s);
 
-#define RAND() rand() * rand()
+#define RAND() rand() // * rand()
 
 int main()
 {
@@ -20,6 +20,7 @@ int main()
 
     printf("Starting %llu\n", N);
     cmap_ii_clear(&map);
+    cmap_ii_setMaxLoadFactor(&map, 0.77);
     srand(seed);
     before = clock();
     checksum = inserted = erased = get = 0;
@@ -29,7 +30,7 @@ int main()
         switch (op) {
         case 1:
             ++inserted;
-            checksum += ++cmap_ii_put(&map, rnd, i-1)->value;
+            checksum += ++cmap_ii_put(&map, rnd, i)->value;
             break;
         case 2:
             entry = cmap_ii_get(map, rnd);
@@ -47,7 +48,7 @@ int main()
     difference = clock() - before;
     printf("CMap: sz: %llu, bk: %llu, time: %.02f, sum: %llu, ins: %llu del: %llu\n", cmap_size(map), cmap_buckets(map), (float) difference / CLOCKS_PER_SEC, checksum, inserted, erased);
     cmap_ii_destroy(&map);
-   
+
 
     std::unordered_map<int64_t, int64_t> map2;
     std::unordered_map<int64_t, int64_t>::const_iterator iter;
@@ -60,7 +61,7 @@ int main()
         switch (op) {        
         case 1:
             ++inserted;
-            checksum += ++(map2[rnd] = i-1);
+            checksum += ++(map2[rnd] = i);
             break;
         case 2:
             iter = map2.find(rnd);
