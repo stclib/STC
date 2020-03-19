@@ -37,13 +37,13 @@
 #define declare_CVector_2(tag, Value) \
                                 declare_CVector_3(tag, Value, c_defaultDestroy)
 #define declare_CVector_3(tag, Value, valueDestroy) \
-                                declare_CVector_5(tag, Value, valueDestroy, memcmp, Value)
+                                declare_CVector_4(tag, Value, valueDestroy, c_defaultCompare)
 #define declare_CVector_4(tag, Value, valueDestroy, valueCompare) \
-                                declare_CVector_5(tag, Value, valueDestroy, valueCompare, Value)
+                                declare_CVector_6(tag, Value, valueDestroy, valueCompare, Value, c_defaultGetRaw)
 #define declare_CVector_string(tag) \
-                                declare_CVector_5(tag, CString, cstring_destroy, cstring_compareRaw, const char*)
+                                declare_CVector_6(tag, CString, cstring_destroy, strcmp, const char*, cstring_getRaw)
 
-#define declare_CVector_5(tag, Value, valueDestroy, valueCompareRaw, ValueRaw) \
+#define declare_CVector_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw) \
 typedef struct CVector_##tag { \
     Value* data; \
 } CVector_##tag; \
@@ -110,11 +110,23 @@ static inline void cvector_##tag##_erase(CVector_##tag* self, size_t pos, size_t
     } \
 } \
  \
+static inline int cvector_##tag##_sortCompare(const void* x, const void* y) { \
+    ValueRaw a = valueGetRaw(*(const Value *) x); \
+    ValueRaw b = valueGetRaw(*(const Value *) y); \
+    return valueCompare(a, b); \
+} \
+ \
+static inline void cvector_##tag##_sort(CVector_##tag* self) { \
+    size_t len = cvector_size(*self); \
+    if (len) qsort(self->data, len, sizeof(Value), cvector_##tag##_sortCompare); \
+} \
  \
 static inline size_t cvector_##tag##_find(CVector_##tag cv, ValueRaw rawValue) { \
     size_t n = cvector_size(cv); \
-    for (size_t i = 0; i < n; ++i) \
-        if (valueCompareRaw(&cv.data[i], &rawValue, sizeof(Value)) == 0) return i; \
+    for (size_t i = 0; i < n; ++i) { \
+        ValueRaw a = valueGetRaw(cv.data[i]); \
+        if (valueCompare(a, rawValue) == 0) return i; \
+    } \
     return c_npos; \
 } \
  \

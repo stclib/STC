@@ -238,7 +238,6 @@ static inline char* cstring_splitNext(const char* delimiters) {
 
 #define                cstring_getRaw(x) ((x).str)
 static inline uint32_t cstring_hashRaw(const char** str, size_t sz_ignored) { return c_defaultHash(*str, strlen(*str)); }
-static inline int      cstring_compareRaw(CString* self, const char** str, size_t sz_ignored) { return strcmp(self->str, *str); }
 
 
 #endif
