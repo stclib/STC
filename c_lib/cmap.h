@@ -33,11 +33,11 @@
 // CMapEntry:
 #define declare_CMapEntry(tag, Key, Value, valueDestroy, keyDestroy) \
 struct CMapEntry_##tag { \
-    uint16_t used; \
-    uint16_t changed; \
-    uint32_t hash; \
     Key key; \
     Value value; \
+    uint8_t changed; \
+    uint8_t used; \
+    uint16_t hash; \
 }; \
  \
 static inline void cmapentry_##tag##_destroy(struct CMapEntry_##tag* e) { \
@@ -125,14 +125,14 @@ static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, float fac) { 
 } \
  \
 static inline size_t cmap_##tag##_bucket(CMap_##tag* self, KeyRaw rawKey, uint32_t* h) { \
-    uint32_t hash = keyHashRaw(&rawKey, sizeof(KeyRaw)); \
+    uint32_t hash = keyHashRaw(&rawKey, sizeof(KeyRaw)), hx = hash & 0xffff; \
     size_t cap = cvector_capacity(self->_table); \
     size_t idx = c_reduce(hash, cap); \
     CMapEntry_##tag* slot = self->_table.data; \
-    while (slot[idx].used && (slot[idx].hash != hash || keyCompareRaw(keyGetRaw(slot[idx].key), rawKey) != 0)) { \
+    while (slot[idx].used && (slot[idx].hash != hx || keyCompareRaw(keyGetRaw(slot[idx].key), rawKey) != 0)) { \
         if (++idx == cap) idx = 0; \
     } \
-    *h = hash; \
+    *h = hx; \
     return idx; \
 } \
  \
