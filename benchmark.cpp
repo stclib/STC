@@ -8,7 +8,7 @@
 declare_CMap(ii, int64_t, int64_t);
 declare_CVector_string(s);
 
-#define RAND() rand() // * rand()
+#define RAND() rand() * rand()
 
 int main()
 {
@@ -79,4 +79,16 @@ int main()
     difference = clock() - before;
     printf("umap: sz: %llu, bk: %llu, time: %.02f, sum: %llu, ins: %llu del: %llu\n", map2.size(), map2.bucket_count(), (float) difference / CLOCKS_PER_SEC, checksum, inserted, erased);
     map2.clear();
+    
+    CVector_s names = cvector_initializer;
+    cvector_s_push(&names, cstring_make("Robert"));
+    cvector_s_push(&names, cstring_make("Johnny"));
+    cvector_s_push(&names, cstring_make("Anne"));
+    cvector_s_push(&names, cstring_make("Ruth"));
+    cvector_s_push(&names, cstring_make("Burt"));
+    
+    cvector_s_sort(&names);
+    c_foreach (i, cvector_s, names)
+        printf("%s\n", i.item->str);
+    cvector_s_destroy(&names);
 }
