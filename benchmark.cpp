@@ -7,6 +7,7 @@
 
 declare_CMap(ii, int64_t, int64_t);
 declare_CVector_string(s);
+declare_CMap(ix, short, short);
 
 #define RAND() rand() * rand()
 
@@ -79,6 +80,8 @@ int main()
     difference = clock() - before;
     printf("umap: sz: %llu, bk: %llu, time: %.02f, sum: %llu, ins: %llu del: %llu\n", map2.size(), map2.bucket_count(), (float) difference / CLOCKS_PER_SEC, checksum, inserted, erased);
     map2.clear();
+    
+    printf("ix entry size %llu\n", sizeof(CMapEntry_ix));
     
     CVector_s names = cvector_initializer;
     cvector_s_push(&names, cstring_make("Robert"));
