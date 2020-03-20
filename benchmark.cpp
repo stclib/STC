@@ -5,9 +5,9 @@
 #include <unordered_map>
 #include <c_lib/cstring.h>
 #include <c_lib/cmap.h>
-#include "bytell_hash_map.hpp"
-#include "robin_hood.hpp"
-
+#include "others/bytell_hash_map.h"
+#include "others/robin_hood.h"
+#include "others/khash.h"
 
 declare_CMap(ii, int64_t, int64_t);
 declare_CVector_string(s);
