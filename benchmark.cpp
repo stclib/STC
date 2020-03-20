@@ -5,13 +5,15 @@
 #include <unordered_map>
 #include <c_lib/cstring.h>
 #include <c_lib/cmap.h>
-#include "others/bytell_hash_map.hpp"
-#include "others/robin_hood.hpp"
+#include "others/bytell_hash_map.h"
+#include "others/robin_hood.h"
 #include "others/khash.h"
 
 declare_CMap(ii, int64_t, int64_t);
 declare_CVector_string(s);
 declare_CMap(ix, short, short);
+
+KHASH_MAP_INIT_INT64(ii, uint64_t)
 
 const size_t seed = 123; // time(NULL);
 const double maxLoadFactor = 0.77;
@@ -25,6 +27,16 @@ const double maxLoadFactor = 0.77;
 #define CMAP_SIZE(tag)              cmap_size(map)
 #define CMAP_BUCKETS(tag)           cmap_buckets(map)
 #define CMAP_CLEAR(tag)             cmap_##tag##_destroy(&map)
+
+
+#define KMAP_SETUP(tag, Key, Value) khash_t(ii)* map = kh_init(ii); \
+                                    khiter_t ki; int ret
+#define KMAP_PUT(tag, key, value)   kh_value(map, kh_put(ii, map, key, &ret)) = value
+#define KMAP_DEL(tag, key)          (ki = kh_get(ii, map, key)) != kh_end(map) ? kh_del(ii, map, ki), 1 : 0
+#define KMAP_FIND(tag, key)         (kh_get(ii, map, key) != kh_end(map))
+#define KMAP_SIZE(tag)              ((size_t) kh_size(map))
+#define KMAP_BUCKETS(tag)           ((size_t) kh_n_buckets(map))
+#define KMAP_CLEAR(tag)             kh_destroy(ii, map) 
 
 
 #define UMAP_SETUP(tag, Key, Value) std::unordered_map<Key, Value> map; map.max_load_factor(maxLoadFactor)
@@ -55,7 +67,7 @@ const double maxLoadFactor = 0.77;
 
 #define MAP_TEST1(M, tag) \
 { \
-    const size_t N = 30000000; \
+    const size_t N = 10000000; \
     M##_SETUP(tag, int64_t, int64_t); \
     uint64_t checksum = 0, inserted = 0, erased = 0; \
     srand(seed); \
@@ -102,11 +114,13 @@ int main()
 {
     MAP_TEST1(UMAP, ii)
     MAP_TEST1(CMAP, ii)
+    MAP_TEST1(KMAP, ii)
     MAP_TEST1(BMAP, ii)
     MAP_TEST1(RMAP, ii)
 
     MAP_TEST2(UMAP, ii)
     MAP_TEST2(CMAP, ii)
+    MAP_TEST2(KMAP, ii)
     MAP_TEST2(BMAP, ii)
     MAP_TEST2(RMAP, ii)
 
