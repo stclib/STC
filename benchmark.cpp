@@ -5,8 +5,8 @@
 #include <unordered_map>
 #include <c_lib/cstring.h>
 #include <c_lib/cmap.h>
-#include "others/bytell_hash_map.h"
-#include "others/robin_hood.h"
+#include "others/bytell_hash_map.hpp"
+#include "others/robin_hood.hpp"
 #include "others/khash.h"
 
 declare_CMap(ii, int64_t, int64_t);
