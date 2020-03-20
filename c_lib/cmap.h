@@ -25,7 +25,7 @@
 
 #include "cvector.h"
 
-#define cmap_initializer   {cvector_initializer, 0, 0.9f}
+#define cmap_initializer   {cvector_initializer, 0, 90, 0}
 #define cmap_size(map)     ((size_t) (map)._size)
 #define cmap_buckets(map)  cvector_capacity((map)._table)
 
@@ -83,7 +83,8 @@ enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
 typedef struct CMap_##tag { \
     CVector_map_##tag _table; \
     size_t _size; \
-    float maxLoadFactor; \
+    uint8_t maxLoadPercent; \
+    uint8_t shrinkLimitPercent; \
 } CMap_##tag; \
  \
 typedef struct cmap_##tag##_iter_t { \
@@ -117,10 +118,15 @@ static inline void cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
     c_swap(size_t, a->_size, b->_size); \
 } \
  \
-static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, float fac) { \
-    self->maxLoadFactor = fac; \
+static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, double fac) { \
+    self->maxLoadPercent = (uint8_t) (fac * 100); \
     if (cmap_size(*self) >= cmap_buckets(*self) * fac) \
-        cmap_##tag##_reserve(self, 1 + (size_t) (cmap_size(*self) / fac)); \
+        cmap_##tag##_reserve(self, (size_t) (cmap_size(*self) / fac)); \
+} \
+static inline void cmap_##tag##_setShrinkLimitFactor(CMap_##tag* self, double limit) { \
+    self->shrinkLimitPercent = (uint8_t) (limit * 100); \
+    if (cmap_size(*self) < cmap_buckets(*self) * limit) \
+        cmap_##tag##_reserve(self, (size_t) (cmap_size(*self) * 1.2 / limit)); \
 } \
  \
 static inline size_t cmap_##tag##_bucket(CMap_##tag* self, KeyRaw rawKey, uint32_t* hxPtr) { \
@@ -144,7 +150,7 @@ static inline CMapEntry_##tag* cmap_##tag##_get(CMap_##tag map, KeyRaw rawKey) {
  \
 static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, KeyRaw rawKey, Value value) { \
     size_t cap = cvector_capacity(self->_table); \
-    if (cmap_size(*self) + 1 >= cap * self->maxLoadFactor) \
+    if (cmap_size(*self) + 1 >= cap * self->maxLoadPercent * 0.01) \
         cap = cmap_##tag##_reserve(self, (size_t) 7 + (1.6 * cap)); \
     uint32_t hx; \
     size_t idx = cmap_##tag##_bucket(self, rawKey, &hx); \
@@ -160,7 +166,7 @@ static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, KeyRaw rawKey,
  \
 static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size) { \
     size_t oldcap = cvector_capacity(self->_table), newcap = 1 + (size / 2) * 2; \
-    if (cmap_size(*self) >= newcap * self->maxLoadFactor) return oldcap; \
+    if (cmap_size(*self) >= newcap * self->maxLoadPercent * 0.01) return oldcap; \
     CVector_map_##tag vec = cvector_initializer; \
     cvector_map_##tag##_reserve(&vec, newcap); \
     memset(vec.data, 0, sizeof(CMapEntry_##tag) * newcap); \
@@ -179,14 +185,14 @@ static inline bool cmap_##tag##_erase(CMap_##tag* self, KeyRaw rawKey) { \
     if (cmap_size(*self) == 0) \
         return false; \
     size_t cap = cvector_capacity(self->_table); \
-    if (cmap_size(*self) * 1.6 < cap * self->maxLoadFactor) \
-        cap = cmap_##tag##_reserve(self, 1.2 * cmap_size(*self) / self->maxLoadFactor); \
+    if (cmap_size(*self) < cap * self->shrinkLimitPercent * 0.01) \
+        cap = cmap_##tag##_reserve(self, cmap_size(*self) * 120 / self->maxLoadPercent); \
     uint32_t hx; \
     size_t i = cmap_##tag##_bucket(self, rawKey, &hx), j = i, k; \
     CMapEntry_##tag* slot = self->_table.data; \
     if (! slot[i].hashx) \
         return false; \
-    do { /* https://attractivechaos.wordpress.com/2019/12/28/deletion-from-hash-tables-without-tombstones/ */ \
+    do { /* deletion from hash table without tombstone */ \
         if (++j == cap) j = 0; /* j %= cap; is slow */ \
         if (! slot[j].hashx) \
             break; \
