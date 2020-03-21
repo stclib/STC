@@ -108,9 +108,8 @@ static inline void cmap_##tag##_destroy(CMap_##tag* self) { \
 static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size); /* predeclared */ \
  \
 static inline void cmap_##tag##_clear(CMap_##tag* self) { \
-    CMap_##tag map = cmap_initializer; \
-    cmap_##tag##_destroy(self); \
-    *self = map; \
+    memset(self->_table.data, 0, sizeof(CMapEntry_##tag) * _cvector_capacity(self->_table)); \
+    self->_size = 0; \
 } \
  \
 static inline void cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
