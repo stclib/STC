@@ -29,11 +29,13 @@ void person_destroy(struct Person* p) {
   cstring_destroy(&p->surname);
 }
 
-int person_compare(struct Person x, struct Person y) {
+#define person_compareVal(x, y) person_compare(&x, &y)
+
+int person_compare(struct Person* x, struct Person* y) {
   int c;
-  c = strcmp(x.name.str, y.name.str);   if (c != 0) return c;
-  c = strcmp(x.surname.str, y.surname.str); if (c != 0) return c;
-  return memcmp(&x.age, &y.age, sizeof(x.age));
+  c = strcmp(x->name.str, y->name.str);   if (c != 0) return c;
+  c = strcmp(x->surname.str, y->surname.str); if (c != 0) return c;
+  return memcmp(&x->age, &y->age, sizeof(x->age));
 }
 ```
 Here is a simple hash function that combines the three member's hashes:
@@ -52,7 +54,7 @@ size_t person_hash(const struct Person* p, size_t ignore) {
 With this in place, you can instantiate a CMap with Person => CString:
 ```
 #include <c_lib/CMap.h>
-declare_CMap(ex, struct Person, CString, cstring_destroy, person_hash, person_compare, person_destroy);
+declare_CMap(ex, struct Person, CString, cstring_destroy, person_hash, person_compareVal, person_destroy);
 
 int main()
 {
