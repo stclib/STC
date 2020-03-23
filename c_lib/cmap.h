@@ -56,10 +56,10 @@ enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
     declare_CMap_5(tag, Key, Value, c_defaultDestroy, c_defaultHash)
 
 #define declare_CMap_5(tag, Key, Value, valueDestroy, keyHash) \
-    declare_CMap_7(tag, Key, Value, valueDestroy, keyHash, c_defaultCompare, c_defaultDestroy)
+    declare_CMap_7(tag, Key, Value, valueDestroy, keyHash, c_defaultEquals, c_defaultDestroy)
     
-#define declare_CMap_7(tag, Key, Value, valueDestroy, keyHash, keyCompare, keyDestroy) \
-    declare_CMap_10(tag, Key, Value, valueDestroy, keyHash, keyCompare, keyDestroy, \
+#define declare_CMap_7(tag, Key, Value, valueDestroy, keyHash, keyEquals, keyDestroy) \
+    declare_CMap_10(tag, Key, Value, valueDestroy, keyHash, keyEquals, keyDestroy, \
                          Key, c_defaultGetRaw, c_defaultInitRaw)
 
 
@@ -75,7 +75,7 @@ enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
 
 
 // CMap full:
-#define declare_CMap_10(tag, Key, Value, valueDestroy, keyHashRaw, keyCompareRaw, keyDestroy, \
+#define declare_CMap_10(tag, Key, Value, valueDestroy, keyHashRaw, keyEquals, keyDestroy, \
                              KeyRaw, keyGetRaw, keyInitRaw) \
   declare_CMapEntry(tag, Key, Value, valueDestroy, keyDestroy); \
   declare_CVector_4(map_##tag, CMapEntry_##tag, cmapentry_##tag##_destroy, cmapentry_noCompare); \
@@ -128,12 +128,12 @@ static inline void cmap_##tag##_setShrinkLimitFactor(CMap_##tag* self, double li
         cmap_##tag##_reserve(self, (size_t) (cmap_size(*self) * 1.2 / limit)); \
 } \
  \
-static inline size_t cmap_##tag##_bucket(CMap_##tag* self, KeyRaw rawKey, uint32_t* hxPtr) { \
-    uint32_t hash = keyHashRaw(&rawKey, sizeof(KeyRaw)), hx = (hash & cmapentry_HASH) | cmapentry_USED; \
+static inline size_t cmap_##tag##_bucket(CMap_##tag* self, KeyRaw* rawKey, uint32_t* hxPtr) { \
+    uint32_t hash = keyHashRaw(rawKey, sizeof(KeyRaw)), hx = (hash & cmapentry_HASH) | cmapentry_USED; \
     size_t cap = cvector_capacity(self->_table); \
     size_t idx = c_reduce(hash, cap); \
     CMapEntry_##tag* slot = self->_table.data; \
-    while (slot[idx].hashx && (slot[idx].hashx != hx || keyCompareRaw(keyGetRaw(slot[idx].key), rawKey) != 0)) { \
+    while (slot[idx].hashx && (slot[idx].hashx != hx || !keyEquals(keyGetRaw(&slot[idx].key), rawKey))) { \
         if (++idx == cap) idx = 0; \
     } \
     *hxPtr = hx; \
@@ -143,7 +143,7 @@ static inline size_t cmap_##tag##_bucket(CMap_##tag* self, KeyRaw rawKey, uint32
 static inline CMapEntry_##tag* cmap_##tag##_get(CMap_##tag map, KeyRaw rawKey) { \
     if (cmap_size(map) == 0) return NULL; \
     uint32_t hx; \
-    size_t idx = cmap_##tag##_bucket(&map, rawKey, &hx); \
+    size_t idx = cmap_##tag##_bucket(&map, &rawKey, &hx); \
     return map._table.data[idx].hashx ? &map._table.data[idx] : NULL; \
 } \
  \
@@ -152,7 +152,7 @@ static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, KeyRaw rawKey,
     if (cmap_size(*self) + 1 >= cap * self->maxLoadPercent * 0.01) \
         cap = cmap_##tag##_reserve(self, (size_t) 7 + (1.6 * cap)); \
     uint32_t hx; \
-    size_t idx = cmap_##tag##_bucket(self, rawKey, &hx); \
+    size_t idx = cmap_##tag##_bucket(self, &rawKey, &hx); \
     CMapEntry_##tag* e = &self->_table.data[idx]; \
     if (! e->hashx) { \
         e->key = keyInitRaw(rawKey); \
@@ -175,7 +175,7 @@ static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size) { \
     uint32_t hx; \
     for (size_t i = 0; i < oldcap; ++i, ++e) \
         if (e->hashx) \
-            slot[ cmap_##tag##_bucket(self, keyGetRaw(e->key), &hx) ] = *e; \
+            slot[ cmap_##tag##_bucket(self, keyGetRaw(&e->key), &hx) ] = *e; \
     free(_cvector_alloced(vec.data)); /* not cvector_destroy() here */ \
     return newcap; \
 } \
@@ -187,7 +187,7 @@ static inline bool cmap_##tag##_erase(CMap_##tag* self, KeyRaw rawKey) { \
     if (cmap_size(*self) < cap * self->shrinkLimitPercent * 0.01) \
         cap = cmap_##tag##_reserve(self, cmap_size(*self) * 120 / self->maxLoadPercent); \
     uint32_t hx; \
-    size_t i = cmap_##tag##_bucket(self, rawKey, &hx), j = i, k; \
+    size_t i = cmap_##tag##_bucket(self, &rawKey, &hx), j = i, k; \
     CMapEntry_##tag* slot = self->_table.data; \
     if (! slot[i].hashx) \
         return false; \
@@ -195,8 +195,7 @@ static inline bool cmap_##tag##_erase(CMap_##tag* self, KeyRaw rawKey) { \
         if (++j == cap) j = 0; /* j %= cap; is slow */ \
         if (! slot[j].hashx) \
             break; \
-        KeyRaw r = keyGetRaw(slot[j].key); \
-        k = c_reduce(keyHashRaw(&r, sizeof(KeyRaw)), cap); \
+        k = c_reduce(keyHashRaw(keyGetRaw(&slot[j].key), sizeof(KeyRaw)), cap); \
         if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */ \
             slot[i] = slot[j], i = j; \
     } while (true); \
@@ -223,6 +222,7 @@ static inline cmap_##tag##_iter_t cmap_##tag##_end(CMap_##tag map) { \
     cmap_##tag##_iter_t it = {end, end}; \
     return it; \
 } \
+ \
 typedef Key cmap_##tag##_key_t; \
 typedef Value cmap_##tag##_value_t
 

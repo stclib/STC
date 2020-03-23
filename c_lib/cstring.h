@@ -233,10 +233,20 @@ static inline char* cstring_splitNext(const char* delimiters) {
     return strtok(NULL, delimiters);
 }
 
+#pragma warning(disable:4172)
+static inline CString cstring_tmp1k(const char* str) {
+    enum {N = 1000};
+    size_t len = strlen(str); if (len > N) len = N;
+    size_t buf[3 + N / sizeof(size_t)] = {strlen(str), 0, 0};
+    strncpy((char *) (buf + 2), str, N); 
+    CString tmp = {(char *) (buf + 2)};
+    return tmp;
+}
+#pragma warning(default:4172)
 
 // CVector / CMap API functions:
 
-#define                cstring_getRaw(x) ((x).str)
+#define                cstring_getRaw(x) ((x)->str)
 static inline uint32_t cstring_hashRaw(const char** str, size_t sz_ignored) { return c_defaultHash(*str, strlen(*str)); }
 
 

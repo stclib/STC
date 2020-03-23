@@ -111,21 +111,20 @@ static inline void cvector_##tag##_erase(CVector_##tag* self, size_t pos, size_t
 } \
  \
 static inline int cvector_##tag##_sortCompare(const void* x, const void* y) { \
-    ValueRaw a = valueGetRaw(*(const Value *) x); \
-    ValueRaw b = valueGetRaw(*(const Value *) y); \
-    return valueCompare(a, b); \
+    return valueCompare(valueGetRaw((const Value *) x), \
+                        valueGetRaw((const Value *) y)); \
 } \
  \
 static inline void cvector_##tag##_sort(CVector_##tag* self) { \
     size_t len = cvector_size(*self); \
     if (len) qsort(self->data, len, sizeof(Value), cvector_##tag##_sortCompare); \
 } \
- \
-static inline size_t cvector_##tag##_find(CVector_##tag cv, ValueRaw rawValue) { \
+\
+static inline size_t cvector_##tag##_find(CVector_##tag cv, Value value) { \
     size_t n = cvector_size(cv); \
     for (size_t i = 0; i < n; ++i) { \
-        ValueRaw a = valueGetRaw(cv.data[i]); \
-        if (valueCompare(a, rawValue) == 0) return i; \
+        if (valueCompare(valueGetRaw(&cv.data[i]), valueGetRaw(&value)) == 0) \
+            return i; \
     } \
     return c_npos; \
 } \
