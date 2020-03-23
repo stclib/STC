@@ -107,14 +107,17 @@ int main()
     MAP_TEST2(RMAP, ii)
 
     printf("ix entry size %llu\n", sizeof(CMapEntry_ix));
-    
+
     CVector_s names = cvector_initializer;
     cvector_s_push(&names, cstring_make("Robert"));
     cvector_s_push(&names, cstring_make("Johnny"));
     cvector_s_push(&names, cstring_make("Anne"));
     cvector_s_push(&names, cstring_make("Ruth"));
     cvector_s_push(&names, cstring_make("Burt"));
-    
+
+    size_t res = cvector_s_find(names, cstring_tmp1k("Ruth"));
+    printf("found %llu\n", res);
+       
     cvector_s_sort(&names);
     c_foreach (i, cvector_s, names)
         printf("%s\n", i.item->str);
