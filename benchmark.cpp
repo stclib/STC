@@ -22,7 +22,7 @@ const double maxLoadFactor = 0.77;
 #define CMAP_DEL(tag, key)          cmap_##tag##_erase(&map, key)
 #define CMAP_FIND(tag, key)         (cmap_##tag##_get(map, key) != NULL)
 #define CMAP_SIZE(tag)              cmap_size(map)
-#define CMAP_BUCKETS(tag)           cmap_buckets(map)
+#define CMAP_BUCKETS(tag)           cmap_bucketCount(map)
 #define CMAP_CLEAR(tag)             cmap_##tag##_destroy(&map)
 
 #define UMAP_SETUP(tag, Key, Value) std::unordered_map<Key, Value> map; map.max_load_factor(maxLoadFactor)
