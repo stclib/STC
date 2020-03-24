@@ -27,7 +27,7 @@
 
 #define cmap_initializer   {cvector_initializer, 0, 90, 0}
 #define cmap_size(map)     ((size_t) (map)._size)
-#define cmap_buckets(map)  cvector_capacity((map)._table)
+#define cmap_bucketCount(map)  cvector_capacity((map)._table)
 
 
 // CMapEntry:
@@ -119,17 +119,17 @@ static inline void cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
  \
 static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, double fac) { \
     self->maxLoadPercent = (uint8_t) (fac * 100); \
-    if (cmap_size(*self) >= cmap_buckets(*self) * fac) \
+    if (cmap_size(*self) >= cmap_bucketCount(*self) * fac) \
         cmap_##tag##_reserve(self, (size_t) (cmap_size(*self) / fac)); \
 } \
  \
 static inline void cmap_##tag##_setShrinkLimitFactor(CMap_##tag* self, double limit) { \
     self->shrinkLimitPercent = (uint8_t) (limit * 100); \
-    if (cmap_size(*self) < cmap_buckets(*self) * limit) \
+    if (cmap_size(*self) < cmap_bucketCount(*self) * limit) \
         cmap_##tag##_reserve(self, (size_t) (cmap_size(*self) * 1.2 / limit)); \
 } \
  \
-static inline size_t cmap_##tag##_bucket(CMap_##tag* self, const cmap_##tag##_rawkey_t* rawKey, uint32_t* hxPtr) { \
+static inline size_t cmap_##tag##_bucket(CMap_##tag* self, cmap_##tag##_rawkey_t* const rawKey, uint32_t* hxPtr) { \
     uint32_t hash = keyHashRaw(rawKey, sizeof(cmap_##tag##_rawkey_t)), hx = (hash & cmapentry_HASH) | cmapentry_USED; \
     size_t cap = cvector_capacity(self->_table); \
     size_t idx = c_reduce(hash, cap); \
