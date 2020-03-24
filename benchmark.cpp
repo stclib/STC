@@ -114,7 +114,7 @@ int main()
     cvector_s_push(&names, cstring_make("Ruth"));
     cvector_s_push(&names, cstring_make("Burt"));
 
-    size_t res = cvector_s_find(names, cstring_temp("Ruth"));
+    size_t res = cvector_s_find(names, "Ruth");
     printf("found %llu\n", res);
        
     cvector_s_sort(&names);
