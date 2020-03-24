@@ -56,10 +56,10 @@ enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
     declare_CMap_5(tag, Key, Value, c_defaultDestroy, c_defaultHash)
 
 #define declare_CMap_5(tag, Key, Value, valueDestroy, keyHash) \
-    declare_CMap_7(tag, Key, Value, valueDestroy, keyHash, c_defaultEquals, c_defaultDestroy)
+    declare_CMap_7(tag, Key, Value, valueDestroy, keyHash, c_defaultCompare, c_defaultDestroy)
     
-#define declare_CMap_7(tag, Key, Value, valueDestroy, keyHash, keyEquals, keyDestroy) \
-    declare_CMap_10(tag, Key, Value, valueDestroy, keyHash, keyEquals, keyDestroy, \
+#define declare_CMap_7(tag, Key, Value, valueDestroy, keyHash, keyCompare, keyDestroy) \
+    declare_CMap_10(tag, Key, Value, valueDestroy, keyHash, keyCompare, keyDestroy, \
                          Key, c_defaultGetRaw, c_defaultInitRaw)
 
 
@@ -70,15 +70,16 @@ enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
     declare_CMap_stringkey_3(tag, Value, c_defaultDestroy)
 
 #define declare_CMap_stringkey_3(tag, Value, valueDestroy) \
-    declare_CMap_10(tag, CString, Value, valueDestroy, cstring_hashRaw, strcmp, cstring_destroy, \
-                         const char*, cstring_getRaw, cstring_make)
+    declare_CMap_10(tag, CString, Value, valueDestroy, cstring_hashRaw, cstring_compareRaw, cstring_destroy, \
+                         const char* const, cstring_getRaw, cstring_make)
 
 
 // CMap full:
-#define declare_CMap_10(tag, Key, Value, valueDestroy, keyHashRaw, keyEquals, keyDestroy, \
-                             KeyRaw, keyGetRaw, keyInitRaw) \
+#define declare_CMap_10(tag, Key, Value, valueDestroy, keyHashRaw, keyCompareRaw, keyDestroy, \
+                             RawKey, keyGetRaw, keyInitRaw) \
   declare_CMapEntry(tag, Key, Value, valueDestroy, keyDestroy); \
   declare_CVector_4(map_##tag, CMapEntry_##tag, cmapentry_##tag##_destroy, cmapentry_noCompare); \
+  typedef RawKey cmap_##tag##_rawkey_t; \
  \
 typedef struct CMap_##tag { \
     CVector_map_##tag _table; \
@@ -128,26 +129,26 @@ static inline void cmap_##tag##_setShrinkLimitFactor(CMap_##tag* self, double li
         cmap_##tag##_reserve(self, (size_t) (cmap_size(*self) * 1.2 / limit)); \
 } \
  \
-static inline size_t cmap_##tag##_bucket(CMap_##tag* self, KeyRaw* rawKey, uint32_t* hxPtr) { \
-    uint32_t hash = keyHashRaw(rawKey, sizeof(KeyRaw)), hx = (hash & cmapentry_HASH) | cmapentry_USED; \
+static inline size_t cmap_##tag##_bucket(CMap_##tag* self, const cmap_##tag##_rawkey_t* rawKey, uint32_t* hxPtr) { \
+    uint32_t hash = keyHashRaw(rawKey, sizeof(cmap_##tag##_rawkey_t)), hx = (hash & cmapentry_HASH) | cmapentry_USED; \
     size_t cap = cvector_capacity(self->_table); \
     size_t idx = c_reduce(hash, cap); \
     CMapEntry_##tag* slot = self->_table.data; \
-    while (slot[idx].hashx && (slot[idx].hashx != hx || !keyEquals(keyGetRaw(&slot[idx].key), rawKey))) { \
+    while (slot[idx].hashx && (slot[idx].hashx != hx || keyCompareRaw(keyGetRaw(&slot[idx].key), rawKey) != 0)) { \
         if (++idx == cap) idx = 0; \
     } \
     *hxPtr = hx; \
     return idx; \
 } \
  \
-static inline CMapEntry_##tag* cmap_##tag##_get(CMap_##tag map, KeyRaw rawKey) { \
+static inline CMapEntry_##tag* cmap_##tag##_get(CMap_##tag map, cmap_##tag##_rawkey_t rawKey) { \
     if (cmap_size(map) == 0) return NULL; \
     uint32_t hx; \
     size_t idx = cmap_##tag##_bucket(&map, &rawKey, &hx); \
     return map._table.data[idx].hashx ? &map._table.data[idx] : NULL; \
 } \
  \
-static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, KeyRaw rawKey, Value value) { \
+static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, cmap_##tag##_rawkey_t rawKey, Value value) { \
     size_t cap = cvector_capacity(self->_table); \
     if (cmap_size(*self) + 1 >= cap * self->maxLoadPercent * 0.01) \
         cap = cmap_##tag##_reserve(self, (size_t) 7 + (1.6 * cap)); \
@@ -180,7 +181,7 @@ static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size) { \
     return newcap; \
 } \
  \
-static inline bool cmap_##tag##_erase(CMap_##tag* self, KeyRaw rawKey) { \
+static inline bool cmap_##tag##_erase(CMap_##tag* self, cmap_##tag##_rawkey_t rawKey) { \
     if (cmap_size(*self) == 0) \
         return false; \
     size_t cap = cvector_capacity(self->_table); \
@@ -195,7 +196,7 @@ static inline bool cmap_##tag##_erase(CMap_##tag* self, KeyRaw rawKey) { \
         if (++j == cap) j = 0; /* j %= cap; is slow */ \
         if (! slot[j].hashx) \
             break; \
-        k = c_reduce(keyHashRaw(keyGetRaw(&slot[j].key), sizeof(KeyRaw)), cap); \
+        k = c_reduce(keyHashRaw(keyGetRaw(&slot[j].key), sizeof(cmap_##tag##_rawkey_t)), cap); \
         if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */ \
             slot[i] = slot[j], i = j; \
     } while (true); \
@@ -222,7 +223,6 @@ static inline cmap_##tag##_iter_t cmap_##tag##_end(CMap_##tag map) { \
     cmap_##tag##_iter_t it = {end, end}; \
     return it; \
 } \
- \
 typedef Key cmap_##tag##_key_t; \
 typedef Value cmap_##tag##_value_t
 

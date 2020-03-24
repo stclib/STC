@@ -41,7 +41,7 @@
 #define declare_CVector_4(tag, Value, valueDestroy, valueCompare) \
                                 declare_CVector_6(tag, Value, valueDestroy, valueCompare, Value, c_defaultGetRaw)
 #define declare_CVector_string(tag) \
-                                declare_CVector_6(tag, CString, cstring_destroy, strcmp, const char*, cstring_getRaw)
+                                declare_CVector_6(tag, CString, cstring_destroy, cstring_compareRaw, const char*, cstring_getRaw)
 
 #define declare_CVector_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw) \
 typedef struct CVector_##tag { \
@@ -111,20 +111,18 @@ static inline void cvector_##tag##_erase(CVector_##tag* self, size_t pos, size_t
 } \
  \
 static inline int cvector_##tag##_sortCompare(const void* x, const void* y) { \
-    return valueCompare(valueGetRaw((const Value *) x), \
-                        valueGetRaw((const Value *) y)); \
+    return valueCompare(valueGetRaw((const Value *) x), valueGetRaw((const Value *) y)); \
 } \
  \
 static inline void cvector_##tag##_sort(CVector_##tag* self) { \
     size_t len = cvector_size(*self); \
     if (len) qsort(self->data, len, sizeof(Value), cvector_##tag##_sortCompare); \
 } \
-\
-static inline size_t cvector_##tag##_find(CVector_##tag cv, Value value) { \
+ \
+static inline size_t cvector_##tag##_find(CVector_##tag cv, ValueRaw rawValue) { \
     size_t n = cvector_size(cv); \
     for (size_t i = 0; i < n; ++i) { \
-        if (valueCompare(valueGetRaw(&cv.data[i]), valueGetRaw(&value)) == 0) \
-            return i; \
+        if (valueCompare(valueGetRaw(&cv.data[i]), &rawValue) == 0) return i; \
     } \
     return c_npos; \
 } \

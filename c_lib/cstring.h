@@ -241,8 +241,9 @@ static inline CString cstring_temp(const char* str) {
 
 // CVector / CMap API functions:
 
-#define                cstring_getRaw(x) ((x)->str)
-static inline uint32_t cstring_hashRaw(const char** str, size_t sz_ignored) { return c_defaultHash(*str, strlen(*str)); }
+#define                cstring_getRaw(x) (&(x)->str)
+#define                cstring_compareRaw(x, y) strcmp(*(x), *(y))
+static inline uint32_t cstring_hashRaw(const char* const* str, size_t ignored) { return c_defaultHash(*str, strlen(*str)); }
 
 
 #endif
