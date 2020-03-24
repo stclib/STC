@@ -103,7 +103,7 @@ static inline void cmap_##tag##_destroy(CMap_##tag* self) { \
         CMapEntry_##tag* e = self->_table.data, *end = e + cap; \
         for (; e != end; ++e) if (e->hashx) cmapentry_##tag##_destroy(e); \
     } \
-    cvector_map_##tag##_destroy(&self->_table); \
+    free(_cvector_alloced(self->_table.data)); \
 } \
  \
 static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size); /* predeclared */ \
@@ -114,8 +114,7 @@ static inline void cmap_##tag##_clear(CMap_##tag* self) { \
 } \
  \
 static inline void cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
-    cvector_map_##tag##_swap(&a->_table, &b->_table); \
-    c_swap(size_t, a->_size, b->_size); \
+    c_swap(CMap_##tag, *a, *b); \
 } \
  \
 static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, double fac) { \
@@ -123,6 +122,7 @@ static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, double fac) {
     if (cmap_size(*self) >= cmap_buckets(*self) * fac) \
         cmap_##tag##_reserve(self, (size_t) (cmap_size(*self) / fac)); \
 } \
+ \
 static inline void cmap_##tag##_setShrinkLimitFactor(CMap_##tag* self, double limit) { \
     self->shrinkLimitPercent = (uint8_t) (limit * 100); \
     if (cmap_size(*self) < cmap_buckets(*self) * limit) \
