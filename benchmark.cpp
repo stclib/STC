@@ -82,10 +82,9 @@ const double maxLoadFactor = 0.77;
     size_t erased = 0; \
     clock_t difference, before = clock(); \
     for (size_t i = 0; i < N; ++i) \
-        M##_PUT(tag, i*123, i); \
-    const size_t D=N*3/4; \
-    for (size_t i = 0; i < N; ++i) \
-        erased += M##_DEL(tag, i*123); \
+        M##_PUT(tag, i*17, i); \
+    for (size_t i = 0; i < N / 2; ++i) \
+        erased += M##_DEL(tag, i*17); \
     difference = clock() - before; \
     printf(#M "(" #tag "): sz: %llu, bucks: %llu, time: %.02f, erase %llu\n", M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, erased); \
     M##_CLEAR(tag); \
@@ -115,7 +114,7 @@ int main()
     cvector_s_push(&names, cstring_make("Ruth"));
     cvector_s_push(&names, cstring_make("Burt"));
 
-    size_t res = cvector_s_find(names, cstring_tmp1k("Ruth"));
+    size_t res = cvector_s_find(names, cstring_temp("Ruth"));
     printf("found %llu\n", res);
        
     cvector_s_sort(&names);
