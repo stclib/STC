@@ -138,7 +138,7 @@ static inline size_t cmap_##tag##_bucket(CMap_##tag* self, cmap_##tag##_rawkey_t
     size_t cap = cvector_capacity(self->_table); \
     size_t idx = c_reduce(hash, cap); \
     CMapEntry_##tag* slot = self->_table.data; \
-    while (slot[idx].hashx && (slot[idx].hashx != hx || !keyEqualsRaw(keyGetRaw(&slot[idx].key), rawKey))) { \
+    while (slot[idx].hashx && (slot[idx].hashx != hx || !keyEqualsRaw((RawKey* const) keyGetRaw(&slot[idx].key), rawKey))) { \
         if (++idx == cap) idx = 0; \
     } \
     *hxPtr = hx; \
@@ -175,7 +175,7 @@ static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, cmap_##tag##_r
 static inline CMapEntry_##tag* cmap_##tag##_insert(CMap_##tag* self, CMapEntry_##tag entry) { \
     cmap_##tag##_expand(self);  \
     uint32_t hx; \
-    size_t idx = cmap_##tag##_bucket(self, keyGetRaw(&entry.key), &hx); \
+    size_t idx = cmap_##tag##_bucket(self, (RawKey* const) keyGetRaw(&entry.key), &hx); \
     CMapEntry_##tag* e = &self->_table.data[idx]; \
     if (! e->hashx) { \
         e->key = entry.key; \
@@ -198,7 +198,7 @@ static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size) { \
     uint32_t hx; \
     for (size_t i = 0; i < oldcap; ++i, ++e) \
         if (e->hashx) \
-            slot[ cmap_##tag##_bucket(self, keyGetRaw(&e->key), &hx) ] = *e; \
+            slot[ cmap_##tag##_bucket(self, (RawKey* const) keyGetRaw(&e->key), &hx) ] = *e; \
     free(_cvector_alloced(vec.data)); /* not cvector_destroy() here */ \
     return newcap; \
 } \
@@ -218,7 +218,7 @@ static inline bool cmap_##tag##_erase(CMap_##tag* self, cmap_##tag##_rawkey_t ra
         if (++j == cap) j = 0; /* j %= cap; is slow */ \
         if (! slot[j].hashx) \
             break; \
-        k = c_reduce(keyHashRaw(keyGetRaw(&slot[j].key), sizeof(cmap_##tag##_rawkey_t)), cap); \
+        k = c_reduce(keyHashRaw((RawKey* const) keyGetRaw(&slot[j].key), sizeof(cmap_##tag##_rawkey_t)), cap); \
         if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */ \
             slot[i] = slot[j], i = j; \
     } while (true); \
