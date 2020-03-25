@@ -83,7 +83,7 @@ const double maxLoadFactor = 0.77;
     clock_t difference, before = clock(); \
     for (size_t i = 0; i < N; ++i) \
         M##_PUT(tag, i*17, i); \
-    for (size_t i = 0; i < N / 2; ++i) \
+    for (size_t i = 0; i < N; ++i) \
         erased += M##_DEL(tag, i*17); \
     difference = clock() - before; \
     printf(#M "(" #tag "): sz: %llu, bucks: %llu, time: %.02f, erase %llu\n", M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, erased); \
