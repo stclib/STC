@@ -47,6 +47,7 @@
 #define                 c_defaultInitRaw(x) (x)
 #define                 c_defaultGetRaw(x) (x)
 #define                 c_defaultCompare(x, y)  (*(x) == *(y) ? 0 : *(x) < *(y) ? -1 : 1)
+#define                 c_defaultEquals(x, y)  (*(x) == *(y))
 static inline void      c_defaultDestroy(void* value) {}
 
 #define                 c_foreach(it, ctag, con) \

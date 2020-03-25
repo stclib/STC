@@ -38,6 +38,10 @@ struct CMapEntry_##tag { \
     uint16_t hashx; \
 }; \
  \
+static inline struct CMapEntry_##tag cmapentry_##tag##_make(Key key, Value value) { \
+    struct CMapEntry_##tag e = {key, value, 0}; \
+    return e; \
+} \
 static inline void cmapentry_##tag##_destroy(struct CMapEntry_##tag* e) { \
     keyDestroy(&e->key); \
     valueDestroy(&e->value); \
@@ -56,10 +60,10 @@ enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
     declare_CMap_5(tag, Key, Value, c_defaultDestroy, c_defaultHash)
 
 #define declare_CMap_5(tag, Key, Value, valueDestroy, keyHash) \
-    declare_CMap_7(tag, Key, Value, valueDestroy, keyHash, c_defaultCompare, c_defaultDestroy)
+    declare_CMap_7(tag, Key, Value, valueDestroy, keyHash, c_defaultEquals, c_defaultDestroy)
     
-#define declare_CMap_7(tag, Key, Value, valueDestroy, keyHash, keyCompare, keyDestroy) \
-    declare_CMap_10(tag, Key, Value, valueDestroy, keyHash, keyCompare, keyDestroy, \
+#define declare_CMap_7(tag, Key, Value, valueDestroy, keyHash, keyEquals, keyDestroy) \
+    declare_CMap_10(tag, Key, Value, valueDestroy, keyHash, keyEquals, keyDestroy, \
                          Key, c_defaultGetRaw, c_defaultInitRaw)
 
 
@@ -70,12 +74,12 @@ enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
     declare_CMap_stringkey_3(tag, Value, c_defaultDestroy)
 
 #define declare_CMap_stringkey_3(tag, Value, valueDestroy) \
-    declare_CMap_10(tag, CString, Value, valueDestroy, cstring_hashRaw, cstring_compareRaw, cstring_destroy, \
+    declare_CMap_10(tag, CString, Value, valueDestroy, cstring_hashRaw, cstring_equalsRaw, cstring_destroy, \
                          const char* const, cstring_getRaw, cstring_make)
 
 
 // CMap full:
-#define declare_CMap_10(tag, Key, Value, valueDestroy, keyHashRaw, keyCompareRaw, keyDestroy, \
+#define declare_CMap_10(tag, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, keyDestroy, \
                              RawKey, keyGetRaw, keyInitRaw) \
   declare_CMapEntry(tag, Key, Value, valueDestroy, keyDestroy); \
   declare_CVector_4(map_##tag, CMapEntry_##tag, cmapentry_##tag##_destroy, cmapentry_noCompare); \
@@ -134,7 +138,7 @@ static inline size_t cmap_##tag##_bucket(CMap_##tag* self, cmap_##tag##_rawkey_t
     size_t cap = cvector_capacity(self->_table); \
     size_t idx = c_reduce(hash, cap); \
     CMapEntry_##tag* slot = self->_table.data; \
-    while (slot[idx].hashx && (slot[idx].hashx != hx || keyCompareRaw(keyGetRaw(&slot[idx].key), rawKey) != 0)) { \
+    while (slot[idx].hashx && (slot[idx].hashx != hx || !keyEqualsRaw(keyGetRaw(&slot[idx].key), rawKey))) { \
         if (++idx == cap) idx = 0; \
     } \
     *hxPtr = hx; \
@@ -148,10 +152,14 @@ static inline CMapEntry_##tag* cmap_##tag##_get(CMap_##tag map, cmap_##tag##_raw
     return map._table.data[idx].hashx ? &map._table.data[idx] : NULL; \
 } \
  \
-static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, cmap_##tag##_rawkey_t rawKey, Value value) { \
+static inline void cmap_##tag##_expand(CMap_##tag* self) { \
     size_t cap = cvector_capacity(self->_table); \
     if (cmap_size(*self) + 1 >= cap * self->maxLoadPercent * 0.01) \
-        cap = cmap_##tag##_reserve(self, (size_t) 7 + (1.6 * cap)); \
+        cmap_##tag##_reserve(self, (size_t) 7 + (1.6 * cap)); \
+} \
+ \
+static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, cmap_##tag##_rawkey_t rawKey, Value value) { \
+    cmap_##tag##_expand(self);  \
     uint32_t hx; \
     size_t idx = cmap_##tag##_bucket(self, &rawKey, &hx); \
     CMapEntry_##tag* e = &self->_table.data[idx]; \
@@ -161,6 +169,20 @@ static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, cmap_##tag##_r
         ++self->_size; \
     } \
     e->value = value; \
+    return e; \
+} \
+ \
+static inline CMapEntry_##tag* cmap_##tag##_insert(CMap_##tag* self, CMapEntry_##tag entry) { \
+    cmap_##tag##_expand(self);  \
+    uint32_t hx; \
+    size_t idx = cmap_##tag##_bucket(self, keyGetRaw(&entry.key), &hx); \
+    CMapEntry_##tag* e = &self->_table.data[idx]; \
+    if (! e->hashx) { \
+        e->key = entry.key; \
+        e->hashx = hx; \
+        ++self->_size; \
+    } \
+    e->value = entry.value; \
     return e; \
 } \
  \
