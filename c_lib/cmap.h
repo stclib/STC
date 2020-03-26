@@ -57,7 +57,10 @@ enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
 #define declare_CMap(...)  c_MACRO_OVERLOAD(declare_CMap, __VA_ARGS__)
 
 #define declare_CMap_3(tag, Key, Value) \
-    declare_CMap_5(tag, Key, Value, c_defaultDestroy, c_defaultHash)
+    declare_CMap_4(tag, Key, Value, c_defaultDestroy)
+
+#define declare_CMap_4(tag, Key, Value, valueDestroy) \
+    declare_CMap_5(tag, Key, Value, valueDestroy, c_defaultHash)
 
 #define declare_CMap_5(tag, Key, Value, valueDestroy, keyHash) \
     declare_CMap_7(tag, Key, Value, valueDestroy, keyHash, c_defaultEquals, c_defaultDestroy)
