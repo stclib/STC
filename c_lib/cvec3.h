@@ -27,8 +27,7 @@
 #include <stdbool.h>
 #include <math.h>
 
-#define cvec3_initializer {0, 0, 0}
-#define cvec3_data(v)     (&(v).x)
+#define cvec3_data(v)         (&(v).x)
 
 #define declare_CVec3(tag, T) \
     typedef struct CVec3##tag { T x, y, z; } CVec3##tag; \
@@ -61,23 +60,23 @@
         return _cvec3_DOT(v, v); \
     } \
     static inline CVec3##tag cvec3##tag##_plus(CVec3##tag u, CVec3##tag v) { \
-        CVec3##tag w = {u.x + v.x, u.y + v.y, u.z + v.z}; return w; \
+        u.x += v.x, u.y += v.y, u.z += v.z; return u; \
     } \
     static inline CVec3##tag cvec3##tag##_minus(CVec3##tag u, CVec3##tag v) { \
-        CVec3##tag w = {u.x - v.x, u.y - v.y, u.z - v.z}; return w; \
+        u.x -= v.x, u.y -= v.y, u.z -= v.z; return u; \
     } \
     static inline CVec3##tag cvec3##tag##_mult(CVec3##tag v, double s) { \
-        CVec3##tag w = {(T)(v.x*s), (T)(v.y*s), (T)(v.z*s)}; return w; \
-    } \
-    static inline CVec3##tag cvec3##tag##_neg(CVec3##tag v) { \
-        CVec3##tag w = {-v.x, -v.y, -v.z}; return w; \
-    } \
-    static inline CVec3##tag cvec3##tag##_unit(CVec3##tag v) { \
-        double s = 1.0 / cvec3##tag##_length(v); \
-        CVec3##tag w = {(T)(v.x*s), (T)(v.y*s), (T)(v.z*s)}; return w; \
+        v.x = (T)(s*v.x), v.y = (T)(s*v.y), v.z = (T)(s*v.z); return v; \
     } \
     static inline CVec3##tag cvec3##tag##_multInverse(CVec3##tag v, double s) { \
-        CVec3##tag w = {(T)(s/v.x), (T)(s/v.y), (T)(s/v.z)}; return w; \
+        v.x = (T)(s/v.x), v.y = (T)(s/v.y), v.z = (T)(s/v.z); return v; \
+    } \
+    static inline CVec3##tag cvec3##tag##_neg(CVec3##tag v) { \
+        v.x = -v.x, v.y = -v.y, v.z = -v.z; return v; \
+    } \
+    static inline CVec3##tag cvec3##tag##_unit(CVec3##tag v) { \
+        double s = 1.0 / sqrt(_cvec3_DOT(v, v)); \
+        v.x = (T)(v.x*s), v.y = (T)(v.y*s), v.z = (T)(v.z*s); return v; \
     } \
     static inline double cvec3##tag##_dot(CVec3##tag u, CVec3##tag v) { \
         return _cvec3_DOT(u, v); \
