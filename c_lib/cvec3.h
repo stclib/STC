@@ -133,10 +133,17 @@
 declare_CVec3(d, double);
 declare_CVec3(f, float);
 declare_CVec3(i, int32_t);
-declare_CVec3(ui, uint32_t);
-declare_CVec3(s, int16_t);
-declare_CVec3(us, uint16_t);
+//declare_CVec3(ui, uint32_t);
+//declare_CVec3(s, int16_t);
+//declare_CVec3(us, uint16_t);
 declare_CVec3(ub, uint8_t);
+
+static inline CVec3d cvec3f_to3d(CVec3f v) { \
+	Vec3d w = {v.x, v.y, v.z}; return w;
+}
+static inline CVec3f cvec3d_to3f(CVec3d v) { \
+	Vec3f w = {(float) v.x, (float) v.y, (float) v.z}; return w;
+}
 
 
 #endif
