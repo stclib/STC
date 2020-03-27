@@ -76,24 +76,24 @@
     } \
     static inline CVec3##tag cvec3##tag##_unit(CVec3##tag v) { \
         double s = 1.0 / sqrt(_cvec3_DOT(v, v)); \
-        v.x = (T)(v.x*s), v.y = (T)(v.y*s), v.z = (T)(v.z*s); return v; \
+        v.x = (T)(s*v.x), v.y = (T)(s*v.y), v.z = (T)(s*v.z); return v; \
     } \
     static inline double cvec3##tag##_dot(CVec3##tag u, CVec3##tag v) { \
         return _cvec3_DOT(u, v); \
     } \
     static inline CVec3##tag cvec3##tag##_cross(CVec3##tag u, CVec3##tag v) { \
-        CVec3##tag c = {_cvec3_CROSS(u, v)}; \
+        CVec3##tag c = {_cvec3_CROSS(T, u, v)}; \
         return c; \
     } \
     static inline double cvec3##tag##_triple(CVec3##tag u, CVec3##tag v, CVec3##tag w) { \
-        CVec3##tag c = {_cvec3_CROSS(u, v)}; \
+        CVec3##tag c = {_cvec3_CROSS(T, u, v)}; \
         return _cvec3_DOT(c, w); \
     } \
     /* Reflect u on plane with given normal vector n */ \
     static inline CVec3##tag cvec3##tag##_reflect(CVec3##tag u, CVec3##tag pn) { \
         double dot2 = 2.0 * _cvec3_DOT(u, pn); \
-        CVec3##tag w = {(T)(u.x - dot2*pn.x), (T)(u.y - dot2*pn.y), (T)(u.z - dot2*pn.z)}; \
-        return w; \
+        u.x = (T)(u.x - dot2*pn.x), u.y = (T)(u.y - dot2*pn.y), u.z = (T)(u.z - dot2*pn.z); \
+        return u; \
     } \
     /* Signed distance between point u and a plane (pp, pn), pn normalized. */ \
     static inline double cvec3##tag##_distanceToPlane(CVec3##tag u, CVec3##tag pp, CVec3##tag pn) { \
@@ -103,15 +103,15 @@
     /* Linear interpolation */ \
     static inline CVec3##tag cvec3##tag##_lerp(CVec3##tag u, CVec3##tag v, double t) { \
         double m = 1.0 - t; \
-        CVec3##tag w = {(T)(m*u.x + t*v.x), (T)(m*u.y + t*v.y), (T)(m*u.z + t*v.z)}; \
-        return w; \
+        u.x = (T)(m*u.x + t*v.x), u.y = (T)(m*u.y + t*v.y), u.z = (T)(m*u.z + t*v.z); \
+        return u; \
     } \
     static inline bool cvec3##tag##_rayPlaneIntersection(CVec3##tag* out, CVec3##tag u, CVec3##tag dir, \
                                                          CVec3##tag pp, CVec3##tag pn) { \
         double d = _cvec3_DOT(dir, pn); if (d == 0) return false; \
         double t = (_cvec3_DOT(pp, pn) - _cvec3_DOT(u, pn)) / d; \
         if (t < 0) return false; \
-        u.x += (T) (dir.x*t), u.y += (T) (dir.y*t), u.z += (T) (dir.z*t); \
+        u.x = (T)(u.x + dir.x*t), u.y = (T)(u.y + dir.y*t), u.z = (T)(u.z + dir.z*t); \
         *out = u; return true; \
     } \
     static inline bool cvec3##tag##_equals(CVec3##tag u, CVec3##tag v) { \
@@ -128,7 +128,7 @@
 
 #define _cvec3_DOT(u, v) ((double) u.x*v.x + u.y*v.y + u.z*v.z)
 #define _cvec3_SUB(u, v) u.x - v.x, u.y - v.y, u.z - v.z
-#define _cvec3_CROSS(u, v) u.y*v.z - v.y*u.z, u.z*v.x - v.z*u.x, u.x*v.y - u.y*v.x
+#define _cvec3_CROSS(T, u, v) (T) (u.y*v.z - v.y*u.z), (T) (u.z*v.x - v.z*u.x), (T) (u.x*v.y - u.y*v.x)
     
 declare_CVec3(d, double);
 declare_CVec3(f, float);
@@ -138,12 +138,14 @@ declare_CVec3(i, int32_t);
 //declare_CVec3(us, uint16_t);
 declare_CVec3(ub, uint8_t);
 
-static inline CVec3d cvec3f_to3d(CVec3f v) { \
-	Vec3d w = {v.x, v.y, v.z}; return w;
+static inline CVec3f cvec3d_to3f(CVec3d v) {
+	CVec3f w = {(float) v.x, (float) v.y, (float) v.z}; return w;
 }
-static inline CVec3f cvec3d_to3f(CVec3d v) { \
-	Vec3f w = {(float) v.x, (float) v.y, (float) v.z}; return w;
+static inline CVec3d cvec3f_to3d(CVec3f v) {
+	CVec3d w = {v.x, v.y, v.z}; return w;
 }
-
+static inline CVec3d cvec3i_to3d(CVec3i v) {
+	CVec3d w = {(double) v.x, (double) v.y, (double) v.z}; return w;
+}
 
 #endif
