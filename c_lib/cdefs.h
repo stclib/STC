@@ -36,10 +36,13 @@
 #define c_OVERLOAD_SELECT(NAME, NUM) c_CAT( NAME ## _, NUM)
 
 #define c_MACRO_OVERLOAD(NAME, ...) c_OVERLOAD_SELECT(NAME, c_VA_ARG_SIZE(__VA_ARGS__))(__VA_ARGS__)
-// #define foo(...)     c_MACRO_OVERLOAD(foo, __VA_ARGS__)
-// #define foo_1(X)     foo_2(X, 100)
-// #define foo_2(X, Y)  X + Y
 
+
+#define c_new(...)      c_MACRO_OVERLOAD(c_new, __VA_ARGS__)
+#define c_new_1(T)      ((T *) malloc(sizeof(T)))
+#define c_new_2(T, n)   ((T *) malloc(sizeof(T) * (n)))
+
+#define c_struct(S)     typedef struct S S; struct S
 #define                 c_npos         ((size_t) -1)
 #define                 c_max_alloca   (1000)
 #define                 c_swap(T, x, y) { T __t = x; x = y; y = __t; }
@@ -65,9 +68,5 @@ static inline uint32_t  c_defaultHash(const void *data, size_t len) {
     return h;
 }
 
-// https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
-static inline uint32_t c_reduce(uint32_t x, uint32_t N) {
-    return ((uint64_t) x * (uint64_t) N) >> 32 ;
-}
 
 #endif

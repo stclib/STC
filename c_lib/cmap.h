@@ -25,7 +25,7 @@
 
 #include "cvector.h"
 
-#define cmap_initializer   {cvector_initializer, 0, 90, 0}
+
 #define cmap_size(map)     ((size_t) (map)._size)
 #define cmap_bucketCount(map)  cvector_capacity((map)._table)
 
@@ -51,6 +51,11 @@ typedef struct CMapEntry_##tag CMapEntry_##tag
 
 enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
 #define cmapentry_noCompare(x, y) (0)
+
+// https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
+static inline uint32_t cmap_reduce(uint32_t x, uint32_t N) {
+    return ((uint64_t) x * (uint64_t) N) >> 32 ;
+}
 
 
 // CMap:
@@ -94,15 +99,11 @@ typedef struct CMap_##tag { \
     uint8_t maxLoadPercent; \
     uint8_t shrinkLimitPercent; \
 } CMap_##tag; \
+static const CMap_##tag cmap_##tag##_init = {{NULL}, 0, 90, 0}; \
  \
 typedef struct cmap_##tag##_iter_t { \
     CMapEntry_##tag *item, *_end; \
 } cmap_##tag##_iter_t; \
- \
-static inline CMap_##tag cmap_##tag##_init(void) { \
-    CMap_##tag map = cmap_initializer; \
-    return map; \
-} \
  \
 static inline void cmap_##tag##_destroy(CMap_##tag* self) { \
     if (cmap_size(*self)) { \
@@ -139,7 +140,7 @@ static inline void cmap_##tag##_setShrinkLimitFactor(CMap_##tag* self, double li
 static inline size_t cmap_##tag##_bucket(CMap_##tag* self, cmap_##tag##_rawkey_t* const rawKey, uint32_t* hxPtr) { \
     uint32_t hash = keyHashRaw(rawKey, sizeof(cmap_##tag##_rawkey_t)), hx = (hash & cmapentry_HASH) | cmapentry_USED; \
     size_t cap = cvector_capacity(self->_table); \
-    size_t idx = c_reduce(hash, cap); \
+    size_t idx = cmap_reduce(hash, cap); \
     CMapEntry_##tag* slot = self->_table.data; \
     while (slot[idx].hashx && (slot[idx].hashx != hx || !keyEqualsRaw((RawKey* const) keyGetRaw(&slot[idx].key), rawKey))) { \
         if (++idx == cap) idx = 0; \
@@ -192,7 +193,7 @@ static inline CMapEntry_##tag* cmap_##tag##_insert(CMap_##tag* self, CMapEntry_#
 static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size) { \
     size_t oldcap = cvector_capacity(self->_table), newcap = 1 + (size / 2) * 2; \
     if (cmap_size(*self) >= newcap * self->maxLoadPercent * 0.01) return oldcap; \
-    CVector_map_##tag vec = cvector_initializer; \
+    CVector_map_##tag vec = cvector_map_##tag##_init; \
     cvector_map_##tag##_reserve(&vec, newcap); \
     memset(vec.data, 0, sizeof(CMapEntry_##tag) * newcap); \
     cvector_map_##tag##_swap(&self->_table, &vec); \
@@ -221,7 +222,7 @@ static inline bool cmap_##tag##_erase(CMap_##tag* self, cmap_##tag##_rawkey_t ra
         if (++j == cap) j = 0; /* j %= cap; is slow */ \
         if (! slot[j].hashx) \
             break; \
-        k = c_reduce(keyHashRaw((RawKey* const) keyGetRaw(&slot[j].key), sizeof(cmap_##tag##_rawkey_t)), cap); \
+        k = cmap_reduce(keyHashRaw((RawKey* const) keyGetRaw(&slot[j].key), sizeof(cmap_##tag##_rawkey_t)), cap); \
         if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */ \
             slot[i] = slot[j], i = j; \
     } while (true); \

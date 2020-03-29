@@ -28,7 +28,6 @@
 #include "cdefs.h"
 
 
-#define cvector_initializer    {NULL}
 #define cvector_size(cv)       _cvector_safe_size((cv).data)
 #define cvector_capacity(cv)   _cvector_safe_capacity((cv).data)
 #define cvector_empty(cv)      (_cvector_safe_size((cv).data) == 0)
@@ -47,15 +46,11 @@
 typedef struct CVector_##tag { \
     Value* data; \
 } CVector_##tag; \
+static const CVector_##tag cvector_##tag##_init = {NULL}; \
  \
 typedef struct cvector_##tag##_iter_t { \
     Value* item; \
 } cvector_##tag##_iter_t; \
- \
-static inline CVector_##tag cvector_##tag##_init(void) { \
-    CVector_##tag cv = cvector_initializer; \
-    return cv; \
-} \
  \
 static inline void cvector_##tag##_swap(CVector_##tag* a, CVector_##tag* b) { \
     Value* data = a->data; a->data = b->data; b->data = data; \
@@ -79,7 +74,7 @@ static inline void cvector_##tag##_reserve(CVector_##tag* self, size_t cap) { \
 } \
  \
 static inline void cvector_##tag##_clear(CVector_##tag* self) { \
-    CVector_##tag cv = cvector_initializer; \
+    CVector_##tag cv = cvector_##tag##_init; \
     cvector_##tag##_destroy(self); \
     *self = cv; \
 } \

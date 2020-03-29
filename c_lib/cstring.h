@@ -38,11 +38,12 @@ typedef struct CString {
 static size_t _cstring_null_rep[] = {0, 0, 0};
 #define       _cstring_rep(cs)      (((size_t *) (cs).str) - 2)
 
-#define cstring_initializer   {(char* ) (_cstring_null_rep + 2)}
 #define cstring_size(cs)      ((size_t) _cstring_rep(cs)[0])
 #define cstring_capacity(cs)  ((size_t) _cstring_rep(cs)[1])
 #define cstring_npos          c_npos
 
+
+static const CString cstring_init = {(char* ) &_cstring_null_rep[2]};
 
 static inline void cstring_reserve(CString* self, size_t cap) {
     size_t len = cstring_size(*self), oldcap = cstring_capacity(*self);
@@ -60,13 +61,8 @@ static inline void cstring_destroy(CString* self) {
     }
 }
 
-static inline CString cstring_init(void) {
-    CString cs = cstring_initializer;
-    return cs;
-}
-
 static inline CString cstring_makeN(const char* str, size_t len) {
-    CString cs = cstring_initializer;
+    CString cs = cstring_init;
     if (len) {
         cstring_reserve(&cs, len);
         memcpy(cs.str, str, len);
@@ -84,7 +80,7 @@ static inline CString cstring_makeCopy(CString cs) {
 }
 
 static inline void cstring_clear(CString* self) {
-    CString cs = cstring_initializer;
+    CString cs = cstring_init;
     cstring_destroy(self);
     *self = cs;
 }
