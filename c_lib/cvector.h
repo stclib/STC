@@ -27,7 +27,7 @@
 #include <string.h>
 #include "cdefs.h"
 
-
+#define cvector_init           {NULL}
 #define cvector_size(cv)       _cvector_safe_size((cv).data)
 #define cvector_capacity(cv)   _cvector_safe_capacity((cv).data)
 #define cvector_empty(cv)      (_cvector_safe_size((cv).data) == 0)
@@ -46,7 +46,7 @@
 typedef struct CVector_##tag { \
     Value* data; \
 } CVector_##tag; \
-static const CVector_##tag cvector_##tag##_init = {NULL}; \
+static const CVector_##tag cvector_##tag##_init = cvector_init; \
  \
 typedef struct cvector_##tag##_iter_t { \
     Value* item; \

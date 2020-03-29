@@ -26,6 +26,7 @@
 #include "cvector.h"
 
 
+#define cmap_init          {cvector_init, 0, 90, 0}
 #define cmap_size(map)     ((size_t) (map)._size)
 #define cmap_bucketCount(map)  cvector_capacity((map)._table)
 
@@ -51,11 +52,6 @@ typedef struct CMapEntry_##tag CMapEntry_##tag
 
 enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
 #define cmapentry_noCompare(x, y) (0)
-
-// https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
-static inline uint32_t cmap_reduce(uint32_t x, uint32_t N) {
-    return ((uint64_t) x * (uint64_t) N) >> 32 ;
-}
 
 
 // CMap:
@@ -99,7 +95,7 @@ typedef struct CMap_##tag { \
     uint8_t maxLoadPercent; \
     uint8_t shrinkLimitPercent; \
 } CMap_##tag; \
-static const CMap_##tag cmap_##tag##_init = {{NULL}, 0, 90, 0}; \
+static const CMap_##tag cmap_##tag##_init = cmap_init; \
  \
 typedef struct cmap_##tag##_iter_t { \
     CMapEntry_##tag *item, *_end; \
@@ -251,5 +247,11 @@ static inline cmap_##tag##_iter_t cmap_##tag##_end(CMap_##tag map) { \
 } \
 typedef Key cmap_##tag##_key_t; \
 typedef Value cmap_##tag##_value_t
+
+
+// https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
+static inline uint32_t cmap_reduce(uint32_t x, uint32_t N) {
+    return ((uint64_t) x * (uint64_t) N) >> 32 ;
+}
 
 #endif
