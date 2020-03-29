@@ -40,7 +40,7 @@ Simple CVector of 64bit ints:
 declare_CVector(ix, int64_t); // ix is just an example tag name, use anything without underscore.
 
 int main() {
-    CVector_ix bignums = cvector_ix_init; // use cvector_ix_init(); if initializing after declaration.
+    CVector_ix bignums = cvector_init; // or use cvector_ix_init; if initializing after declaration.
     cvector_ix_reserve(&bignums, 100);
     for (size_t i = 0; i<100; ++i)
         cvector_ix_push(&bignums, i * i * i);
@@ -59,7 +59,7 @@ CVector of CString:
 declare_CVector(cs, CString, cstring_destroy); // supply inline destructor of values
 
 int main() {
-    CVector_cs names = cvector_cs_init;
+    CVector_cs names = cvector_init;
     cvector_cs_push(&names, cstring_make("Mary"));
     cvector_cs_push(&names, cstring_make("Joe"));
     cstring_assign(&names.data[1], cstring_make("Jake")); // replace Joe
@@ -74,7 +74,7 @@ Simple CMap, int -> int:
 declare_CMap(ii, int, int);
 
 int main() {
-    CMap_ii nums = cmap_ii_init;
+    CMap_ii nums = cmap_init;
     cmap_ii_put(&nums, 8, 64);
     cmap_ii_put(&nums, 11, 121);
 
@@ -90,7 +90,7 @@ declare_CMap_stringkey(si, int); // Shorthand macro for the general declare_CMap
 // CString keys are "magically" managed internally, although CMap is ignorant of CString.
 
 int main() {
-    CMap_si nums = cmap_si_init;
+    CMap_si nums = cmap_init;
     cmap_si_put(&nums, "Hello", 64);
     cmap_si_put(&nums, "Groovy", 121);
     cmap_si_put(&nums, "Groovy", 200); // overwrite previous
@@ -113,7 +113,7 @@ CMap, with CString -> CString. Temporary CString values are created by "make", a
 declare_CMap_stringkey(ss, CString, cstring_destroy); 
 
 int main() {
-    CMap_ss table = cmap_ss_init;
+    CMap_ss table = cmap_init;
     cmap_ss_put(&table, "Make", cstring_make("my"));
     cmap_ss_put(&table, "Sunny", cstring_make("day"));
     printf("Sunny: %s\n", cmap_ss_get(table, "Sunny")->value.str);
