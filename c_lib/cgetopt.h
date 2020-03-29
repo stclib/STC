@@ -59,9 +59,9 @@ static void c_getopt_permute(char *argv[], int j, int n) { /* move argv[j] over 
 // Parse command-line options and arguments
 //
 // This fuction has a similar interface to GNU's getopt_long(). Each call
-// parses one option and returns the option name.  s->arg points to the option
+// parses one option and returns the option name.  st->arg points to the option
 // argument if present. The function returns -1 when all command-line arguments
-// are parsed. In this case, s->ind is the index of the first non-option
+// are parsed. In this case, st->ind is the index of the first non-option
 // argument.
 //
 // @param st        status; shall be initialized to c_getopt_init on the first call
@@ -71,9 +71,9 @@ static void c_getopt_permute(char *argv[], int j, int n) { /* move argv[j] over 
 // @param optstr    option string
 // @param longopts  long options
 //
-// @return ASCII for a short option; c_longopt_t::val for a long option;
-//          -1 if argv[] is fully processed; '?' for an unknown option or
-//          an ambiguous long option; ':' if an option argument is missing
+// @return          ASCII val for a short option; longopt.val for a long option;
+//                  -1 if argv[] is fully processed; '?' for an unknown option or
+//                  an ambiguous long option; ':' if an option argument is missing
 //
 static int c_getopt(c_getopt_t *st, int argc, char *argv[], int permute, const char *optstr, const c_longopt_t *longopts) {
 	int opt = -1, i0, j;
