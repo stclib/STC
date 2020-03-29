@@ -56,10 +56,9 @@ declare_CMap(ex, struct Person, CString, cstring_destroy, person_hash, person_co
 
 int main()
 {
-  CMap_ex m6 = cmap_initializer;
+  CMap_ex m6 = cmap_ex_init;
   cmap_ex_put(&m6, person_make("John", "Doe", 12), cstring_make("example"));
   cmap_ex_put(&m6, person_make("Mary", "Sue", 21), cstring_make("another"));
-  
   // ...
   c_foreach (it, cmap_ex, m6) {
       if (cstring_equals(it.item->key.name, "John"))

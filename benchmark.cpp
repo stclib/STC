@@ -3,8 +3,8 @@
 #include <time.h>
 
 #include <unordered_map>
-#include <c_lib/cstring.h>
-#include <c_lib/cmap.h>
+#include "c_lib/cstring.h"
+#include "c_lib/cmap.h"
 #include "others/bytell_hash_map.hpp"
 #include "others/robin_hood.hpp"
 
@@ -16,7 +16,7 @@ const size_t seed = 123; // time(NULL);
 const double maxLoadFactor = 0.77;
 #define RAND() rand() * rand()
 
-#define CMAP_SETUP(tag, Key, Value) CMap_##tag map = cmap_initializer; \
+#define CMAP_SETUP(tag, Key, Value) CMap_##tag map = cmap_##tag##_init; \
                                     cmap_##tag##_setMaxLoadFactor(&map, maxLoadFactor)
 #define CMAP_PUT(tag, __key, __value)   cmap_##tag##_put(&map, __key, __value)->value
 #define CMAP_DEL(tag, key)          cmap_##tag##_erase(&map, key)
@@ -107,7 +107,7 @@ int main()
 
     printf("ix entry size %llu\n", sizeof(CMapEntry_ix));
 
-    CVector_s names = cvector_initializer;
+    CVector_s names = cvector_s_init;
     cvector_s_push(&names, cstring_make("Robert"));
     cvector_s_push(&names, cstring_make("Johnny"));
     cvector_s_push(&names, cstring_make("Anne"));
