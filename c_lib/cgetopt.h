@@ -154,21 +154,22 @@ static int copt_getopt(copt_t *opt, int argc, char *argv[],
             {"opt", copt_optional_argument, 'o'},
             {NULL}
         };
-        copt_t opt = copt_init;
-        int i = 0, c;
         const char* optstr = "a:b::c";
-        printf("optstr: %s\n", optstr);
+        printf("args -a arg -b [arg] -c --opt [arg] --foo --bar arg [arguments]\n");
+        int c;
+        copt_t opt = copt_init;
         while ((c = copt_getopt(&opt, argc, argv, optstr, longopts, true)) != -1) {
             if (c == '?') 
-                opt.opt != 0 ? printf("unknown option: %c\n", opt.opt)
-                             : printf("unknown option: %s\n", argv[opt.ind - 1]);
+                opt.longidx == -1 ? printf("unknown option: -%c\n", opt.opt)
+                                  : printf("unknown option: %s\n", argv[opt.ind - 1]);
             else if (c == ':')
-                printf("missing argument for %s\n", argv[opt.ind - 1]);
-            else
+                opt.longidx == -1 ? printf("missing argument for -%c\n", opt.opt)
+                                  : printf("missing argument for %s\n", argv[opt.ind - 1]);
+            else 
                 printf("option: %c %s\n", c, opt.arg ? opt.arg : "");
         }
         printf("\nNon-option arguments:");
-        for (i = opt.ind; i < argc; ++i)
+        for (int i = opt.ind; i < argc; ++i)
             printf(" %s", argv[i]);
         putchar('\n');
         return 0;
