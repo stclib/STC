@@ -26,9 +26,9 @@
 #include <string.h>
 
 enum {
-    c_optarg_none     = 0,
-    c_optarg_required = 1,
-    c_optarg_optional = 2
+    c_getopt_none     = 0,
+    c_getopt_required = 1,
+    c_getopt_optional = 2
 };
 typedef struct {
 	int ind;   /* equivalent to optind */
@@ -47,7 +47,7 @@ typedef struct {
 
 static const c_getopt_t c_getopt_init = {1, 0, 0, -1, 1, 0, 0};
 
-static void c_getopt_permute(char *argv[], int j, int n) { /* move argv[j] over n elements to the left */
+static void _c_getopt_permute(char *argv[], int j, int n) { /* move argv[j] over n elements to the left */
 	int k;
 	char *p = argv[j];
 	for (k = 0; k < n; ++k)
@@ -88,7 +88,7 @@ static int c_getopt(c_getopt_t *st, int argc, char *argv[], int permute, const c
 	}
 	if (argv[st->i][0] == '-' && argv[st->i][1] == '-') { /* "--" or a long option */
 		if (argv[st->i][2] == '\0') { /* a bare "--" */
-			c_getopt_permute(argv, st->i, st->n_args);
+			_c_getopt_permute(argv, st->i, st->n_args);
 			++st->i, st->ind = st->i - st->n_args;
 			return -1;
 		}
@@ -132,7 +132,7 @@ static int c_getopt(c_getopt_t *st, int argc, char *argv[], int permute, const c
 		++st->i, st->pos = 0;
 		if (st->n_args > 0) /* permute */
 			for (j = i0; j < st->i; ++j)
-				c_getopt_permute(argv, j, st->n_args);
+				_c_getopt_permute(argv, j, st->n_args);
 	}
 	st->ind = st->i - st->n_args;
 	return opt;
@@ -142,9 +142,9 @@ static int c_getopt(c_getopt_t *st, int argc, char *argv[], int permute, const c
     int main(int argc, char *argv[])
     {
       static c_longopt_t longopts[] = {
-        { "foo", c_optarg_none,     301 },
-        { "bar", c_optarg_required, 302 },
-        { "opt", c_optarg_optional, 303 },
+        { "foo", c_getopt_none,     301 },
+        { "bar", c_getopt_required, 302 },
+        { "opt", c_getopt_optional, 303 },
         { NULL, 0, 0 }
       };
       c_getopt_t opt = c_getopt_init;
