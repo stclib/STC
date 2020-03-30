@@ -155,7 +155,7 @@ static int copt_getopt(copt_t *opt, int argc, char *argv[],
             {NULL}
         };
         const char* optstr = "a:b::c";
-        printf("args -a arg -b [arg] -c --opt [arg] --foo --bar arg [arguments]\n");
+        printf("program -a arg -b [arg] -c --opt [arg] --foo --bar arg [arguments]\n");
         int c;
         copt_t opt = copt_init;
         while ((c = copt_getopt(&opt, argc, argv, optstr, longopts, true)) != -1) {
