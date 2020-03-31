@@ -113,7 +113,8 @@ static int copt_getopt(copt_t *opt, int argc, char *argv[],
                 if (o->has_arg != copt_no_argument) {
                     if (argv[opt->_i][j] == '=') 
                         opt->arg = &argv[opt->_i][j + 1];
-                    else if (argv[opt->_i][j] == '\0' && opt->_i < argc - 1 && (o->has_arg == copt_required_argument || argv[opt->_i + 1][0] != '-'))
+                    else if (argv[opt->_i][j] == '\0' && opt->_i < argc - 1 && (o->has_arg == copt_required_argument ||
+                                                                                argv[opt->_i + 1][0] != '-'))
                         opt->arg = argv[++opt->_i];
                     else if (o->has_arg == copt_required_argument)
                         optc = ':'; // missing option argument
