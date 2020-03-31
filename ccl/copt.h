@@ -22,10 +22,10 @@
 
 // Inspired by https://attractivechaos.wordpress.com/2018/08/31/a-survey-of-argument-parsing-libraries-in-c-c
 // Fixed major bugs with option arguments (both long and short), and shows a useful demo of the features.
-// Has a more consistent API, written in C99.
+// Has a more consistent API, added arg->err output field, written in C99.
 
-#ifndef CGETOPT__H__
-#define CGETOPT__H__
+#ifndef COPT__H__
+#define COPT__H__
 
 #include <string.h>
 #include <stdbool.h>
@@ -40,7 +40,7 @@ typedef struct {
     int opt;   // equivalent to optopt
     char *arg; // equivalent to optarg
     char *err; // points to the faulty option
-    int longidx; // index of a long option; or -1 if short
+    int longindex; // idx of long option; or -1 if short
     int _i, _pos, _nargs;
     char _err[4];
 } copt_t;
@@ -84,7 +84,7 @@ static int copt_getopt(copt_t *opt, int argc, char *argv[],
         while (opt->_i < argc && (argv[opt->_i][0] != '-' || argv[opt->_i][1] == '\0'))
             ++opt->_i, ++opt->_nargs;
     }
-    opt->arg = 0, opt->longidx = -1, i0 = opt->_i;
+    opt->arg = 0, opt->longindex = -1, i0 = opt->_i;
     if (opt->_i >= argc || argv[opt->_i][0] != '-' || argv[opt->_i][1] == '\0') {
         opt->ind = opt->_i - opt->_nargs;
         return -1;
@@ -109,7 +109,7 @@ static int copt_getopt(copt_t *opt, int argc, char *argv[],
             if (n_exact > 1 || (n_exact == 0 && n_partial > 1)) return '?';
             o = n_exact == 1? o_exact : n_partial == 1? o_partial : 0;
             if (o) {
-                opt->opt = optc = o->val, opt->longidx = o - longopts;
+                opt->opt = optc = o->val, opt->longindex = o - longopts;
                 if (o->has_arg != copt_no_argument) {
                     if (argv[opt->_i][j] == '=') 
                         opt->arg = &argv[opt->_i][j + 1];
