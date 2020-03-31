@@ -36,7 +36,7 @@
     static inline CVec4##tag cvec4##tag##_init(const T* a) { CVec4##tag v = {a[0], a[1], a[2], a[3]}; return v; } \
  \
     static inline CVec4##tag cvec4##tag##_set(CVec4##tag* self, T x, T y, T z, T w) { \
-         self->x = x, self->y = y, self->z = z, self->z = z; return *self; \
+         self->x = x, self->y = y, self->z = z, self->z = z, self->w = w; return *self; \
     } \
     static inline CVec4##tag cvec4##tag##_setv(CVec4##tag* self, const T* a) { \
          self->x = a[0], self->y = a[1], self->z = a[2], self->w = a[3]; return *self; \
