@@ -50,7 +50,7 @@
          self->x -= v.x, self->y -= v.y, self->z -= v.z; return *self; \
     } \
     static inline CVec3##tag cvec3##tag##_scale(CVec3##tag* self, double s) { \
-         self->x = (T)(self->x*s), self->y = (T)(self->x*s), self->z = (T)(self->x*s); \
+         self->x = (T)(self->x*s), self->y = (T)(self->y*s), self->z = (T)(self->z*s); \
          return *self; \
     } \
     static inline double cvec3##tag##_length(CVec3##tag v) { \
