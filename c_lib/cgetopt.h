@@ -39,8 +39,10 @@ typedef struct {
     int ind;   // equivalent to optind
     int opt;   // equivalent to optopt
     char *arg; // equivalent to optarg
+    char *err; // points to the faulty option
     int longidx; // index of a long option; or -1 if short
     int _i, _pos, _nargs;
+    char _err[4];
 } copt_t;
 
 struct copt_option {
@@ -49,7 +51,7 @@ struct copt_option {
     int val;
 };
 
-static const copt_t copt_init = {1, 0, 0, -1, 1, 0, 0};
+static const copt_t copt_init = {1, 0, NULL, NULL, -1, 1, 0, 0, {'-', 0, 0, 0}};
 
 static void _copt_permute(char *argv[], int j, int n) { // move argv[j] over n elements to the left
     int k;
@@ -103,6 +105,7 @@ static int copt_getopt(copt_t *opt, int argc, char *argv[],
                     if (longopts[k].name[j - 2] == 0) ++n_exact, o_exact = &longopts[k];
                     else ++n_partial, o_partial = &longopts[k];
                 }
+            opt->err = argv[opt->_i];
             if (n_exact > 1 || (n_exact == 0 && n_partial > 1)) return '?';
             o = n_exact == 1? o_exact : n_partial == 1? o_partial : 0;
             if (o) {
@@ -110,7 +113,7 @@ static int copt_getopt(copt_t *opt, int argc, char *argv[],
                 if (o->has_arg != copt_no_argument) {
                     if (argv[opt->_i][j] == '=') 
                         opt->arg = &argv[opt->_i][j + 1];
-                    else if (argv[opt->_i][j] == '\0' && opt->_i < argc - 1 && argv[opt->_i + 1][0] != '-') 
+                    else if (argv[opt->_i][j] == '\0' && opt->_i < argc - 1 && (o->has_arg == copt_required_argument || argv[opt->_i + 1][0] != '-'))
                         opt->arg = argv[++opt->_i];
                     else if (o->has_arg == copt_required_argument)
                         optc = ':'; // missing option argument
@@ -121,13 +124,14 @@ static int copt_getopt(copt_t *opt, int argc, char *argv[],
         const char *p;
         if (opt->_pos == 0) opt->_pos = 1;
         optc = opt->opt = argv[opt->_i][opt->_pos++];
+        opt->_err[1] = optc, opt->err = opt->_err;
         p = strchr((char *) shortopts, optc);
         if (p == 0) {
             optc = '?'; // unknown option
         } else if (p[1] == ':') {
             if (argv[opt->_i][opt->_pos] != '\0')
                 opt->arg = &argv[opt->_i][opt->_pos];
-            else if (opt->_i < argc - 1 && argv[opt->_i + 1][0] != '-') 
+            else if (opt->_i < argc - 1 && (p[2] != ':' || argv[opt->_i + 1][0] != '-')) 
                 opt->arg = argv[++opt->_i];
             else if (p[2] != ':')
                 optc = ':';
@@ -153,19 +157,16 @@ static int copt_getopt(copt_t *opt, int argc, char *argv[],
             {"opt", copt_optional_argument, 'o'},
             {NULL}
         };
-        const char* optstr = "ab:c::";
-        printf("program -a -b ARG -c [ARG] --foo --bar ARG --opt [ARG] [ARGUMENTS]\n");
+        const char* optstr = "xy:z::123";
+        printf("program -x -y ARG -z [ARG] -1 -2 -3 --foo --bar ARG --opt [ARG] [ARGUMENTS]\n");
         int c;
         copt_t opt = copt_init;
         while ((c = copt_getopt(&opt, argc, argv, optstr, longopts, true)) != -1) {
-            if (c == '?') 
-                opt.longidx == -1 ? printf("unknown option: -%c\n", opt.opt)
-                                  : printf("unknown option: %s\n", argv[opt.ind - 1]);
-            else if (c == ':')
-                opt.longidx == -1 ? printf("missing argument for -%c\n", opt.opt)
-                                  : printf("missing argument for %s\n", argv[opt.ind - 1]);
-            else 
-                printf("option: %c %s\n", c, opt.arg ? opt.arg : "");
+            switch (c) {
+                case '?': printf("error: unknown option: %s\n", opt.err); break;
+                case ':': printf("error: missing argument for %s\n", opt.err); break;
+                default:  printf("option: %c [%s]\n", c, opt.arg ? opt.arg : ""); break;
+            }
         }
         printf("\nNon-option arguments:");
         for (int i = opt.ind; i < argc; ++i)
