@@ -3,8 +3,8 @@
 #include <time.h>
 
 #include <unordered_map>
-#include "c_lib/cstring.h"
-#include "c_lib/cmap.h"
+#include "ccl/cstring.h"
+#include "ccl/cmap.h"
 #include "others/bytell_hash_map.hpp"
 #include "others/robin_hood.hpp"
 
