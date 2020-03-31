@@ -119,7 +119,7 @@ static inline CVec4f cvec4d_to4f(CVec4d v) {
 static inline CVec3d cvec4d_to3d(CVec4d v) {
 	CVec3d u = {v.x, v.y, v.z}; return u;
 }
-static inline CVec4f cvec4d_to3f(CVec4d v) {
+static inline CVec3f cvec4d_to3f(CVec4d v) {
 	CVec3f u = {(float) v.x, (float) v.y, (float) v.z}; return u;
 }
 
