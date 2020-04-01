@@ -22,7 +22,7 @@
 
 // Inspired by https://attractivechaos.wordpress.com/2018/08/31/a-survey-of-argument-parsing-libraries-in-c-c
 // Fixed major bugs with option arguments (both long and short), and shows a useful demo of the features.
-// Has a more consistent API, added arg->err output field, written in C99.
+// Has a more consistent API, added arg->bad output field, written in C99.
 
 #ifndef COPT__H__
 #define COPT__H__
@@ -39,10 +39,10 @@ typedef struct {
     int ind;   // equivalent to optind
     int opt;   // equivalent to optopt
     char *arg; // equivalent to optarg
-    char *err; // points to the faulty option
+    char *bad; // points to the faulty option
     int longindex; // idx of long option; or -1 if short
     int _i, _pos, _nargs;
-    char _err[4];
+    char _bad[4];
 } copt_t;
 
 struct copt_option {
@@ -70,17 +70,18 @@ static void _copt_permute(char *argv[], int j, int n) { // move argv[j] over n e
 // are parsed. In this case, opt->ind is the index of the first non-option
 // argument.
 //
-// @param opt       output; must be initialized to copt_init on first call
-// @param permute   true: move options ahead of non-option arguments
-// @return          ASCII val for a short option; longopt.val for a long option;
-//                  -1 if argv[] is fully processed; '?' for an unknown option or
-//                  an ambiguous long option; ':' if an option argument is missing
+// @param opt             output; must be initialized to copt_init on first call
+// @param posixly_correct if true, do not move options ahead of non-option arguments,
+//                        instead stop option processing on first nonoption argument.
+// @return                ASCII val for a short option; longopt.val for a long option;
+//                        -1 if argv[] is fully processed; '?' for an unknown option or
+//                        an ambiguous long option; ':' if an option argument is missing
 //
 static int copt_getopt(copt_t *opt, int argc, char *argv[],
                        const char *shortopts, const struct copt_option *longopts,
-                       bool permute) {
+                       bool posixly_correct) {
     int optc = -1, i0, j;
-    if (permute) {
+    if (!posixly_correct) {
         while (opt->_i < argc && (argv[opt->_i][0] != '-' || argv[opt->_i][1] == '\0'))
             ++opt->_i, ++opt->_nargs;
     }
@@ -105,7 +106,7 @@ static int copt_getopt(copt_t *opt, int argc, char *argv[],
                     if (longopts[k].name[j - 2] == 0) ++n_exact, o_exact = &longopts[k];
                     else ++n_partial, o_partial = &longopts[k];
                 }
-            opt->err = argv[opt->_i];
+            opt->bad = argv[opt->_i];
             if (n_exact > 1 || (n_exact == 0 && n_partial > 1)) return '?';
             o = n_exact == 1? o_exact : n_partial == 1? o_partial : 0;
             if (o) {
@@ -125,7 +126,7 @@ static int copt_getopt(copt_t *opt, int argc, char *argv[],
         const char *p;
         if (opt->_pos == 0) opt->_pos = 1;
         optc = opt->opt = argv[opt->_i][opt->_pos++];
-        opt->_err[1] = optc, opt->err = opt->_err;
+        opt->_bad[1] = optc, opt->bad = opt->_bad;
         p = strchr((char *) shortopts, optc);
         if (p == 0) {
             optc = '?'; // unknown option
@@ -164,8 +165,8 @@ static int copt_getopt(copt_t *opt, int argc, char *argv[],
         copt_t opt = copt_init;
         while ((c = copt_getopt(&opt, argc, argv, optstr, longopts, true)) != -1) {
             switch (c) {
-                case '?': printf("error: unknown option: %s\n", opt.err); break;
-                case ':': printf("error: missing argument for %s\n", opt.err); break;
+                case '?': printf("error: unknown option: %s\n", opt.bad); break;
+                case ':': printf("error: missing argument for %s\n", opt.bad); break;
                 default:  printf("option: %c [%s]\n", c, opt.arg ? opt.arg : ""); break;
             }
         }
