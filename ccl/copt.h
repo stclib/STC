@@ -163,7 +163,7 @@ static int copt_getopt(copt_t *opt, int argc, char *argv[],
         printf("program -x -y ARG -z [ARG] -1 -2 -3 --foo --bar ARG --opt [ARG] [ARGUMENTS]\n");
         int c;
         copt_t opt = copt_init;
-        while ((c = copt_getopt(&opt, argc, argv, optstr, longopts, true)) != -1) {
+        while ((c = copt_getopt(&opt, argc, argv, optstr, longopts, false)) != -1) {
             switch (c) {
                 case '?': printf("error: unknown option: %s\n", opt.bad); break;
                 case ':': printf("error: missing argument for %s\n", opt.bad); break;
