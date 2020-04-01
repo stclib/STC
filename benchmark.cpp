@@ -2,13 +2,15 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <unordered_map>
 #include "ccl/cstring.h"
 #include "ccl/cmap.h"
+#ifdef __cplusplus
+#include <unordered_map>
 #include "others/bytell_hash_map.hpp"
 #include "others/robin_hood.hpp"
+#endif
 
-declare_CMap(ii, int64_t, int64_t);
+declare_CMap(ii, int64_t, int64_t, c_defaultDestroy, c_lowbias32Hash);
 declare_CVector_string(s);
 declare_CMap(ix, short, short);
 
@@ -93,17 +95,20 @@ const double maxLoadFactor = 0.77;
 
 int main()
 {
-    MAP_TEST1(UMAP, ii)
     MAP_TEST1(CMAP, ii)
+#ifdef __cplusplus
+    MAP_TEST1(UMAP, ii)
     MAP_TEST1(BMAP, ii)
     MAP_TEST1(FMAP, ii)
     MAP_TEST1(RMAP, ii)
-
-    MAP_TEST2(UMAP, ii)
+#endif
     MAP_TEST2(CMAP, ii)
+#ifdef __cplusplus
+    MAP_TEST2(UMAP, ii)
     MAP_TEST2(BMAP, ii)
     MAP_TEST2(FMAP, ii)
     MAP_TEST2(RMAP, ii)
+#endif
 
     printf("ix entry size %llu\n", sizeof(CMapEntry_ix));
 
