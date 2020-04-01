@@ -51,7 +51,8 @@
 #define                 c_defaultGetRaw(x) (x)
 #define                 c_defaultCompare(x, y)  (*(x) == *(y) ? 0 : *(x) < *(y) ? -1 : 1)
 #define                 c_defaultEquals(x, y)  (memcmp(x, y, sizeof(*(y))) == 0)
-static inline void      c_defaultDestroy(void* value) {}
+#define                 c_defaultDestroy(p) (p)
+//static inline void      c_defaultDestroy(void* value) {}
 
 #define                 c_foreach(it, ctag, con) \
                             for (ctag##_iter_t it = ctag##_begin(con); it.item != ctag##_end(con).item; it = ctag##_next(it))
@@ -59,14 +60,26 @@ static inline void      c_defaultDestroy(void* value) {}
 // One-byte-at-a-time hash based on Murmur's mix
 static inline uint32_t  c_defaultHash(const void *data, size_t len) {
     const uint8_t *key = (const uint8_t *) data;
-    uint32_t h = 0xc613fc15;
+    uint32_t x = UINT32_C(0xc613fc15);
     while (len--) {
-        h ^= *key++;
-        h *= 0x5bd1e995;
-        h ^= h >> 15;
+        x ^= *key++;
+        x *= UINT32_C(0x5bd1e995);
+        x ^= x >> 15;
     }
-    return h;
+    return x;
 }
 
+// https://nullprogram.com/blog/2018/07/31/: assume len positive multiple of 4
+static inline uint32_t c_lowbias32Hash(const void *data, size_t len) {
+    const uint32_t *key = (const uint32_t *) data; uint32_t x = *key;
+    do {
+        x ^= *key++ >> 16;
+        x *= UINT32_C(0x7feb352d);
+        x ^= x >> 15;
+        x *= UINT32_C(0x846ca68b);
+        x ^= x >> 16;
+    } while (len -= 4);
+    return x;
+}
 
 #endif
