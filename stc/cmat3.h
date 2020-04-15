@@ -34,8 +34,7 @@
 #define cmat3d_zero         ((CMat3d) cmat3_zero_init)
 
 #define declare_CMat3(tag, T) \
-    typedef T (*CMat3##tag##Raw)[3]; \
-    typedef const T (*CMat3##tag##ConstRaw)[3]; \
+    typedef const T (*CMat3##tag##ConstRef)[3]; \
  \
     typedef union CMat3##tag { \
         CVec3##tag v[3]; \
@@ -43,7 +42,7 @@
     } CMat3##tag; \
  \
     static inline CMat3##tag \
-    cmat3##tag##_mult(CMat3##tag##ConstRaw m1, CMat3##tag##ConstRaw m2) { \
+    cmat3##tag##_mult(CMat3##tag##ConstRef m1, CMat3##tag##ConstRef m2) { \
         const T *a = m1[0], *b = m2[0]; \
         return (CMat3##tag) { \
             a[0] * b[0] + a[3] * b[1] + a[6] * b[2], \
@@ -67,21 +66,21 @@
         return self; \
     } \
     static inline CMat3##tag \
-    cmat3##tag##_scalarMult(CMat3##tag##ConstRaw m, T s) { \
+    cmat3##tag##_scalarMult(CMat3##tag##ConstRef m, T s) { \
         CMat3##tag dst; \
         T *c = dst.arr; const T *a = m[0]; \
         for (int i = 0; i < 9; ++i) *c++ = *a++ * s; \
         return dst; \
     } \
     static inline CMat3##tag \
-    cmat3##tag##_compMult(CMat3##tag##ConstRaw m1, CMat3##tag##ConstRaw m2) { \
+    cmat3##tag##_compMult(CMat3##tag##ConstRef m1, CMat3##tag##ConstRef m2) { \
         CMat3##tag dst; \
         T *c = dst.arr; const T *a = m1[0], *b = m2[0]; \
         for (int i = 0; i < 9; ++i) *c++ = *a++ * *b++; \
         return dst; \
     } \
     static inline CVec3##tag \
-    cmat3##tag##_vecMult(CMat3##tag##ConstRaw m, CVec3##tag v) { \
+    cmat3##tag##_vecMult(CMat3##tag##ConstRef m, CVec3##tag v) { \
         return (CVec3##tag) { \
             m[0][0] * v.x + m[1][0] * v.y + m[2][0] * v.z, \
             m[0][1] * v.x + m[1][1] * v.y + m[2][1] * v.z, \
@@ -90,7 +89,7 @@
     } \
  \
     static inline CMat3##tag \
-    cmat3##tag##_transpose(CMat3##tag##ConstRaw m) { \
+    cmat3##tag##_transpose(CMat3##tag##ConstRef m) { \
         return (CMat3##tag) { \
             m[0][0], m[1][0], m[2][0], \
             m[0][1], m[1][1], m[2][1], \
@@ -99,13 +98,13 @@
     } \
  \
     static inline T \
-    cmat3##tag##_trace(CMat3##tag##ConstRaw m) { \
+    cmat3##tag##_trace(CMat3##tag##ConstRef m) { \
         return m[0][0] + m[1][1] + m[2][2]; \
     } \
  \
  \
     static inline T \
-    cmat3##tag##_determinant(CMat3##tag##ConstRaw m) { \
+    cmat3##tag##_determinant(CMat3##tag##ConstRef m) { \
         const T *a = m[0]; \
         return a[0] * (a[4] * a[8] - a[7] * a[5]) \
              - a[3] * (a[1] * a[8] - a[2] * a[7]) \
@@ -113,7 +112,7 @@
     } \
  \
     static inline CMat3##tag \
-    cmat3##tag##_inverse(CMat3##tag##ConstRaw m) { \
+    cmat3##tag##_inverse(CMat3##tag##ConstRef m) { \
         const T *a = m[0]; \
         T k = 1.0f / cmat3##tag##_determinant(m); \
         return (CMat3##tag) { \

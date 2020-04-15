@@ -66,7 +66,7 @@
     } \
   \
     static inline CQuat##tag \
-    cquat##tag##_fromMat4(CMat4##tag##ConstRaw m) { \
+    cquat##tag##_fromMat4(CMat4##tag##ConstRef m) { \
         T trace = m[0][0] + m[1][1] + m[2][2], r, rinv; \
         CQuat##tag dst; \
         if (trace >= 0.0f) { \

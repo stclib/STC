@@ -37,8 +37,7 @@
 #define cmat4d_zero         ((CMat4d) cmat4_zero_init)
 
 #define declare_CMat4(tag, T) \
-    typedef T (*CMat4##tag##Raw)[4]; \
-    typedef const T (*CMat4##tag##ConstRaw)[4]; \
+    typedef const T (*CMat4##tag##ConstRef)[4]; \
  \
     typedef union CMat4##tag { \
         CVec4##tag v[4]; \
@@ -46,7 +45,7 @@
     } CMat4##tag; \
  \
     static inline CMat4##tag \
-    cmat4##tag##_mult(CMat4##tag##ConstRaw mat1, CMat4##tag##ConstRaw mat2) { \
+    cmat4##tag##_mult(CMat4##tag##ConstRef mat1, CMat4##tag##ConstRef mat2) { \
         const T *a = mat1[0], *b = mat2[0]; \
         return (CMat4##tag) { \
             a[ 0] * b[ 0] + a[ 4] * b[ 1] + a[ 8] * b[ 2] + a[12] * b[ 3], \
@@ -75,21 +74,21 @@
         return self; \
     } \
     static inline CMat4##tag \
-    cmat4##tag##_scalarMult(CMat4##tag##ConstRaw m, T s) { \
+    cmat4##tag##_scalarMult(CMat4##tag##ConstRef m, T s) { \
         CMat4##tag dst; \
         T *c = dst.arr; const T *a = m[0]; \
         for (int i = 0; i < 16; ++i) *c++ = *a++ * s; \
         return dst; \
     } \
     static inline CMat4##tag \
-    cmat4##tag##_compMult(CMat4##tag##ConstRaw m1, CMat4##tag##ConstRaw m2) { \
+    cmat4##tag##_compMult(CMat4##tag##ConstRef m1, CMat4##tag##ConstRef m2) { \
         CMat4##tag dst; \
         T *c = dst.arr; const T *a = m1[0], *b = m2[0]; \
         for (int i = 0; i < 16; ++i) *c++ = *a++ * *b++; \
         return dst; \
     } \
     static inline CVec4##tag \
-    cmat4##tag##_vecMult(CMat4##tag##ConstRaw m, CVec4##tag v) { \
+    cmat4##tag##_vecMult(CMat4##tag##ConstRef m, CVec4##tag v) { \
         return (CVec4##tag) { \
             m[0][0] * v.x + m[1][0] * v.y + m[2][0] * v.z + m[3][0] * v.w, \
             m[0][1] * v.x + m[1][1] * v.y + m[2][1] * v.z + m[3][1] * v.w, \
@@ -99,7 +98,7 @@
     } \
  \
     static inline CMat4##tag \
-    cmat4##tag##_transpose(CMat4##tag##ConstRaw m) { \
+    cmat4##tag##_transpose(CMat4##tag##ConstRef m) { \
         return (CMat4##tag) { \
             m[0][0], m[1][0], m[2][0], m[3][0], \
             m[0][1], m[1][1], m[2][1], m[3][1], \
@@ -109,7 +108,7 @@
     } \
  \
     static inline CMat3##tag \
-    cmat4##tag##_transpose3(CMat4##tag##ConstRaw m) { \
+    cmat4##tag##_transpose3(CMat4##tag##ConstRef m) { \
         return (CMat3##tag) { \
             m[0][0], m[1][0], m[2][0], \
             m[0][1], m[1][1], m[2][1], \
@@ -118,7 +117,7 @@
     } \
  \
     static inline CMat3##tag \
-    cmat4##tag##_to3(CMat4##tag##ConstRaw m) { \
+    cmat4##tag##_to3(CMat4##tag##ConstRef m) { \
         return (CMat3##tag) { \
             m[0][0], m[0][1], m[0][2], \
             m[1][0], m[1][1], m[1][2], \
@@ -127,12 +126,12 @@
     } \
  \
     static inline T \
-    cmat4##tag##_trace(CMat4##tag##ConstRaw m) { \
+    cmat4##tag##_trace(CMat4##tag##ConstRef m) { \
         return m[0][0] + m[1][1] + m[2][2] + m[3][3]; \
     } \
  \
     static inline T \
-    cmat4##tag##_determinant(CMat4##tag##ConstRaw mat) { \
+    cmat4##tag##_determinant(CMat4##tag##ConstRef mat) { \
         const T *p = mat[0]; \
         T a, b, c, d, e, f; \
         a = p[10] * p[15] - p[14] * p[11], \
@@ -149,7 +148,7 @@
  \
  \
     static inline CMat4##tag \
-    cmat4##tag##_inverse(CMat4##tag##ConstRaw mat) { \
+    cmat4##tag##_inverse(CMat4##tag##ConstRef mat) { \
         CMat4##tag dst; \
         const T *p = mat[0]; \
         T a, b, c, d, e, f, det; \
