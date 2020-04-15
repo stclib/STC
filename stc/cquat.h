@@ -51,16 +51,16 @@
  \
     static inline CQuat##tag \
     cquat##tag##_fromVectors(CVec3##tag u, CVec3##tag v) { \
-		T norm_u_norm_v = c_sqrt_##tag(cvec3##tag##_dot(u, u) * cvec3##tag##_dot(v, v)); \
-		T real_part = norm_u_norm_v + cvec3##tag##_dot(u, v); \
-		CVec3##tag t; \
-		if (real_part < 1.e-6f * norm_u_norm_v) { \
-			/* If u and v are exactly opposite, rotate 180 degrees */ \
-			/* around an arbitrary orthogonal axis. */ \
-			real_part = 0; \
-			t = fabs(u.x) > fabs(u.z) ? (CVec3##tag) {-u.y, u.x, 0} : (CVec3##tag) {0, -u.z, u.y}; \
-		} else \
-			t = cvec3##tag##_cross(u, v); /* Otherwise, build quaternion the standard way.*/ \
+        T d = c_sqrt_##tag(_cvec3_DOT(u, u) * _cvec3_DOT(v, v)); \
+        T real_part = d + _cvec3_DOT(u, v); \
+        CVec3##tag t; \
+        if (real_part < 1.e-6f * d) { \
+            /* If u and v are exactly opposite, rotate 180 degrees */ \
+            /* around an arbitrary orthogonal axis. */ \
+            real_part = 0; \
+            t = fabs(u.x) > fabs(u.z) ? (CVec3##tag) {-u.y, u.x, 0} : (CVec3##tag) {0, -u.z, u.y}; \
+        } else  /* Build quaternion the standard way.*/ \
+            t = _cvec3_CROSS(u, v); \
         CQuat##tag q = (CQuat##tag) {t.x, t.y, t.z, real_part}; \
         return cquat##tag##_unit(q); \
     } \
