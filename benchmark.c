@@ -10,9 +10,11 @@
 #include "others/robin_hood.hpp"
 #endif
 
+// Visual Studio: compile with -TP to force C++
+
 declare_CMap(ii, int64_t, int64_t, c_defaultDestroy, c_lowbias32Hash);
 declare_CVector_string(s);
-declare_CMap(ix, short, short);
+declare_CMap(ix, short, short); // test: bucket size = 6 bytes only!
 
 const size_t seed = 123; // time(NULL);
 const double maxLoadFactor = 0.77;
@@ -59,15 +61,16 @@ const double maxLoadFactor = 0.77;
 #define RMAP_BUCKETS(tag)           map.bucket_count()
 #define RMAP_CLEAR(tag)             map.clear()
 
+const size_t N1 = 7000000; \
+const size_t N2 = 10000000; \
 
 #define MAP_TEST1(M, tag) \
 { \
-    const size_t N = 7000000; \
     M##_SETUP(tag, int64_t, int64_t); \
     uint64_t checksum = 0, erased = 0; \
     srand(seed); \
     clock_t difference, before = clock(); \
-    for (size_t i = 0; i < N; ++i) { \
+    for (size_t i = 0; i < N1; ++i) { \
         checksum += ++M##_PUT(tag, RAND(), i); \
         erased += M##_DEL(tag, RAND()); \
     } \
@@ -78,14 +81,13 @@ const double maxLoadFactor = 0.77;
 
 #define MAP_TEST2(M, tag) \
 { \
-    const size_t N = 10000000; \
     M##_SETUP(tag, int64_t, int64_t); \
     srand(seed); \
     size_t erased = 0; \
     clock_t difference, before = clock(); \
-    for (size_t i = 0; i < N; ++i) \
+    for (size_t i = 0; i < N2; ++i) \
         M##_PUT(tag, i*17, i); \
-    for (size_t i = 0; i < N; ++i) \
+    for (size_t i = 0; i < N2; ++i) \
         erased += M##_DEL(tag, i*17); \
     difference = clock() - before; \
     printf(#M "(" #tag "): sz: %llu, bucks: %llu, time: %.02f, erase %llu\n", M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, erased); \
@@ -95,6 +97,7 @@ const double maxLoadFactor = 0.77;
 
 int main()
 {
+    printf("\nmap<uint64_t, uint64_t>: Insert + remove %llu random keys in range 0 - 2^30:\n", N1); \
     MAP_TEST1(CMAP, ii)
 #ifdef __cplusplus
     MAP_TEST1(UMAP, ii)
@@ -102,6 +105,8 @@ int main()
     MAP_TEST1(FMAP, ii)
     MAP_TEST1(RMAP, ii)
 #endif
+
+    printf("\nmap<uint64_t, uint64_t>: Insert %llu keys, THEN remove them in same order:\n", N2); \
     MAP_TEST2(CMAP, ii)
 #ifdef __cplusplus
     MAP_TEST2(UMAP, ii)
@@ -109,21 +114,4 @@ int main()
     MAP_TEST2(FMAP, ii)
     MAP_TEST2(RMAP, ii)
 #endif
-
-    printf("ix entry size %llu\n", sizeof(CMapEntry_ix));
-
-    CVector_s names = cvector_s_init;
-    cvector_s_push(&names, cstring_make("Robert"));
-    cvector_s_push(&names, cstring_make("Johnny"));
-    cvector_s_push(&names, cstring_make("Anne"));
-    cvector_s_push(&names, cstring_make("Ruth"));
-    cvector_s_push(&names, cstring_make("Burt"));
-
-    size_t res = cvector_s_find(names, "Ruth");
-    printf("found %llu\n", res);
-       
-    cvector_s_sort(&names);
-    c_foreach (i, cvector_s, names)
-        printf("%s\n", i.item->str);
-    cvector_s_destroy(&names);
 }
