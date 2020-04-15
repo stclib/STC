@@ -153,7 +153,7 @@ static int copt_getopt(copt_t *opt, int argc, char *argv[],
 /*  // demo:
     int main(int argc, char *argv[])
     {
-        static struct copt_option longopts[] = {
+        struct copt_option longopts[] = {
             {"foo", copt_no_argument,       'f'},
             {"bar", copt_required_argument, 'b'},
             {"opt", copt_optional_argument, 'o'},

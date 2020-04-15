@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <time.h>
 
-#include "ccl/cstring.h"
-#include "ccl/cmap.h"
+#include "stc/cstring.h"
+#include "stc/cmap.h"
 #ifdef __cplusplus
 #include <unordered_map>
 #include "others/bytell_hash_map.hpp"

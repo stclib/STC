@@ -43,7 +43,8 @@ static inline struct CMapEntry_##tag cmapentry_##tag##_make(Key key, Value value
     struct CMapEntry_##tag e = {key, value, 0}; \
     return e; \
 } \
-static inline void cmapentry_##tag##_destroy(struct CMapEntry_##tag* e) { \
+static inline void \
+cmapentry_##tag##_destroy(struct CMapEntry_##tag* e) { \
     keyDestroy(&e->key); \
     valueDestroy(&e->value); \
     e->hashx = 0; \
@@ -101,7 +102,8 @@ typedef struct cmap_##tag##_iter_t { \
     CMapEntry_##tag *item, *_end; \
 } cmap_##tag##_iter_t; \
  \
-static inline void cmap_##tag##_destroy(CMap_##tag* self) { \
+static inline void \
+cmap_##tag##_destroy(CMap_##tag* self) { \
     if (cmap_size(*self)) { \
         size_t cap = _cvector_capacity(self->_table); \
         CMapEntry_##tag* e = self->_table.data, *end = e + cap; \
@@ -110,30 +112,35 @@ static inline void cmap_##tag##_destroy(CMap_##tag* self) { \
     free(_cvector_alloced(self->_table.data)); \
 } \
  \
-static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size); /* predeclared */ \
+static inline size_t \
+cmap_##tag##_reserve(CMap_##tag* self, size_t size); /* predeclared */ \
  \
 static inline void cmap_##tag##_clear(CMap_##tag* self) { \
     memset(self->_table.data, 0, sizeof(CMapEntry_##tag) * _cvector_capacity(self->_table)); \
     self->_size = 0; \
 } \
  \
-static inline void cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
+static inline void \
+cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
     c_swap(CMap_##tag, *a, *b); \
 } \
  \
-static inline void cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, double fac) { \
+static inline void \
+cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, double fac) { \
     self->maxLoadPercent = (uint8_t) (fac * 100); \
     if (cmap_size(*self) >= cmap_bucketCount(*self) * fac) \
         cmap_##tag##_reserve(self, (size_t) (cmap_size(*self) / fac)); \
 } \
  \
-static inline void cmap_##tag##_setShrinkLimitFactor(CMap_##tag* self, double limit) { \
+static inline void \
+cmap_##tag##_setShrinkLimitFactor(CMap_##tag* self, double limit) { \
     self->shrinkLimitPercent = (uint8_t) (limit * 100); \
     if (cmap_size(*self) < cmap_bucketCount(*self) * limit) \
         cmap_##tag##_reserve(self, (size_t) (cmap_size(*self) * 1.2 / limit)); \
 } \
  \
-static inline size_t cmap_##tag##_bucket(CMap_##tag* self, cmap_##tag##_rawkey_t* const rawKey, uint32_t* hxPtr) { \
+static inline size_t \
+cmap_##tag##_bucket(CMap_##tag* self, cmap_##tag##_rawkey_t* const rawKey, uint32_t* hxPtr) { \
     uint32_t hash = keyHashRaw(rawKey, sizeof(cmap_##tag##_rawkey_t)), hx = (hash & cmapentry_HASH) | cmapentry_USED; \
     size_t cap = cvector_capacity(self->_table); \
     size_t idx = cmap_reduce(hash, cap); \
@@ -145,25 +152,30 @@ static inline size_t cmap_##tag##_bucket(CMap_##tag* self, cmap_##tag##_rawkey_t
     return idx; \
 } \
  \
-static inline CMapEntry_##tag* cmap_##tag##_get(CMap_##tag map, cmap_##tag##_rawkey_t rawKey) { \
+static inline CMapEntry_##tag* \
+cmap_##tag##_get(CMap_##tag map, cmap_##tag##_rawkey_t rawKey) { \
     if (cmap_size(map) == 0) return NULL; \
     uint32_t hx; \
     size_t idx = cmap_##tag##_bucket(&map, &rawKey, &hx); \
     return map._table.data[idx].hashx ? &map._table.data[idx] : NULL; \
 } \
  \
-static inline void cmap_##tag##_expand(CMap_##tag* self) { \
+static inline void \
+cmap_##tag##_expand(CMap_##tag* self) { \
     size_t cap = cvector_capacity(self->_table); \
     if (cmap_size(*self) + 1 >= cap * self->maxLoadPercent * 0.01) \
         cmap_##tag##_reserve(self, (size_t) 7 + (1.6 * cap)); \
 } \
  \
-static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, cmap_##tag##_rawkey_t rawKey, Value value) { \
+static inline CMapEntry_##tag* \
+cmap_##tag##_put(CMap_##tag* self, cmap_##tag##_rawkey_t rawKey, Value value) { \
     cmap_##tag##_expand(self);  \
     uint32_t hx; \
     size_t idx = cmap_##tag##_bucket(self, &rawKey, &hx); \
     CMapEntry_##tag* e = &self->_table.data[idx]; \
-    if (! e->hashx) { \
+    if (e->hashx) \
+        valueDestroy(&e->value); \
+    else { \
         e->key = keyInitRaw(rawKey); \
         e->hashx = hx; \
         ++self->_size; \
@@ -171,13 +183,16 @@ static inline CMapEntry_##tag* cmap_##tag##_put(CMap_##tag* self, cmap_##tag##_r
     e->value = value; \
     return e; \
 } \
- \
-static inline CMapEntry_##tag* cmap_##tag##_insert(CMap_##tag* self, CMapEntry_##tag entry) { \
+/* \
+static inline CMapEntry_##tag* \
+cmap_##tag##_insert(CMap_##tag* self, CMapEntry_##tag entry) { \
     cmap_##tag##_expand(self);  \
     uint32_t hx; \
     size_t idx = cmap_##tag##_bucket(self, (RawKey* const) keyGetRaw(&entry.key), &hx); \
     CMapEntry_##tag* e = &self->_table.data[idx]; \
-    if (! e->hashx) { \
+    if (e->hashx) \
+        valueDestroy(&e->value); \
+    else { \
         e->key = entry.key; \
         e->hashx = hx; \
         ++self->_size; \
@@ -185,8 +200,9 @@ static inline CMapEntry_##tag* cmap_##tag##_insert(CMap_##tag* self, CMapEntry_#
     e->value = entry.value; \
     return e; \
 } \
- \
-static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size) { \
+*/ \
+static inline size_t \
+cmap_##tag##_reserve(CMap_##tag* self, size_t size) { \
     size_t oldcap = cvector_capacity(self->_table), newcap = 1 + (size / 2) * 2; \
     if (cmap_size(*self) >= newcap * self->maxLoadPercent * 0.01) return oldcap; \
     CVector_map_##tag vec = cvector_map_##tag##_init; \
@@ -203,7 +219,8 @@ static inline size_t cmap_##tag##_reserve(CMap_##tag* self, size_t size) { \
     return newcap; \
 } \
  \
-static inline bool cmap_##tag##_erase(CMap_##tag* self, cmap_##tag##_rawkey_t rawKey) { \
+static inline bool \
+cmap_##tag##_erase(CMap_##tag* self, cmap_##tag##_rawkey_t rawKey) { \
     if (cmap_size(*self) == 0) \
         return false; \
     size_t cap = cvector_capacity(self->_table); \
@@ -227,7 +244,8 @@ static inline bool cmap_##tag##_erase(CMap_##tag* self, cmap_##tag##_rawkey_t ra
     return true; \
 } \
  \
-static inline cmap_##tag##_iter_t cmap_##tag##_begin(CMap_##tag map) { \
+static inline cmap_##tag##_iter_t \
+cmap_##tag##_begin(CMap_##tag map) { \
     cmap_##tag##_iter_t null = {NULL, NULL}; \
     if (cmap_size(map) == 0) return null; \
     CMapEntry_##tag* e = map._table.data, *end = e + _cvector_capacity(map._table); \
@@ -235,12 +253,14 @@ static inline cmap_##tag##_iter_t cmap_##tag##_begin(CMap_##tag map) { \
     cmap_##tag##_iter_t it = {e, end}; return it; \
 } \
  \
-static inline cmap_##tag##_iter_t cmap_##tag##_next(cmap_##tag##_iter_t it) { \
+static inline cmap_##tag##_iter_t \
+cmap_##tag##_next(cmap_##tag##_iter_t it) { \
     do { ++it.item; } while (it.item != it._end && !it.item->hashx); \
     return it; \
 } \
  \
-static inline cmap_##tag##_iter_t cmap_##tag##_end(CMap_##tag map) { \
+static inline cmap_##tag##_iter_t \
+cmap_##tag##_end(CMap_##tag map) { \
     CMapEntry_##tag* end = (cmap_size(map) == 0) ? NULL : map._table.data + _cvector_capacity(map._table); \
     cmap_##tag##_iter_t it = {end, end}; \
     return it; \

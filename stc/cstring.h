@@ -45,7 +45,8 @@ static size_t _cstring_null_rep[] = {0, 0, 0};
 
 static const CString cstring_init = {(char* ) &_cstring_null_rep[2]};
 
-static inline void cstring_reserve(CString* self, size_t cap) {
+static inline void
+cstring_reserve(CString* self, size_t cap) {
     size_t len = cstring_size(*self), oldcap = cstring_capacity(*self);
     if (cap > oldcap) {
         size_t* rep = (size_t *) realloc(oldcap ? _cstring_rep(*self) : NULL, sizeof(size_t) * 2 + cap + 1);
@@ -55,13 +56,30 @@ static inline void cstring_reserve(CString* self, size_t cap) {
     }
 }
 
-static inline void cstring_destroy(CString* self) {
+static inline void
+cstring_resize(CString* self, size_t len, char fill) {
+    size_t n = cstring_size(*self);
+	cstring_reserve(self, len);
+    if (len > n) memset(self->str + n, fill, len - n);
+	self->str[ _cstring_rep(*self)[0] = len ] = '\0';
+}
+
+static inline void
+cstring_destroy(CString* self) {
     if (cstring_capacity(*self)) {
         free(_cstring_rep(*self));
     }
 }
 
-static inline CString cstring_makeN(const char* str, size_t len) {
+static inline CString
+cstring_makeFill(size_t len, char fill) {
+    CString cs = cstring_init;
+    if (len) cstring_resize(&cs, len, fill);
+    return cs;
+}
+
+static inline CString
+cstring_makeN(const char* str, size_t len) {
     CString cs = cstring_init;
     if (len) {
         cstring_reserve(&cs, len);
@@ -71,21 +89,25 @@ static inline CString cstring_makeN(const char* str, size_t len) {
     return cs;
 }
 
-static inline CString cstring_make(const char* str) {
+static inline CString
+cstring_make(const char* str) {
     return cstring_makeN(str, strlen(str));
 }
 
-static inline CString cstring_makeCopy(CString cs) {
+static inline CString
+cstring_makeCopy(CString cs) {
     return cstring_makeN(cs.str, cstring_size(cs));
 }
 
-static inline void cstring_clear(CString* self) {
+static inline void
+cstring_clear(CString* self) {
     CString cs = cstring_init;
     cstring_destroy(self);
     *self = cs;
 }
 
-static inline CString* cstring_assignN(CString* self, const char* str, size_t len) {
+static inline CString*
+cstring_assignN(CString* self, const char* str, size_t len) {
     if (len) {
         cstring_reserve(self, len);
         memmove(self->str, str, len);
@@ -94,16 +116,19 @@ static inline CString* cstring_assignN(CString* self, const char* str, size_t le
     return self;
 }
 
-static inline CString* cstring_assign(CString* self, const char* str) {
+static inline CString*
+cstring_assign(CString* self, const char* str) {
     return cstring_assignN(self, str, strlen(str));
 }
 
-static inline CString* cstring_copy(CString* self, CString cs2) {
+static inline CString*
+cstring_copy(CString* self, CString cs2) {
     return cstring_assignN(self, cs2.str, cstring_size(cs2));
 }
 
 
-static inline CString* cstring_appendN(CString* self, const char* str, size_t len) {
+static inline CString*
+cstring_appendN(CString* self, const char* str, size_t len) {
     if (len) {
         size_t oldlen = cstring_size(*self), newlen = oldlen + len;
         if (newlen > cstring_capacity(*self))
@@ -114,10 +139,12 @@ static inline CString* cstring_appendN(CString* self, const char* str, size_t le
     return self;
 }
 
-static inline CString* cstring_append(CString* self, const char* str) {
+static inline CString*
+cstring_append(CString* self, const char* str) {
     return cstring_appendN(self, str, strlen(str));
 }
-static inline CString* cstring_appendS(CString* self, CString cs2) {
+static inline CString*
+cstring_appendS(CString* self, CString cs2) {
     return cstring_appendN(self, cs2.str, cstring_size(cs2));
 }
 
@@ -132,18 +159,21 @@ static inline void _cstring_internalMove(CString* self, size_t pos1, size_t pos2
     self->str[_cstring_rep(*self)[0] = newlen] = '\0';
 }
 
-static inline void cstring_insertN(CString* self, size_t pos, const char* str, size_t n) {
+static inline void
+cstring_insertN(CString* self, size_t pos, const char* str, size_t n) {
     char* xstr = (char *) memcpy(n > c_max_alloca ? malloc(n) : alloca(n), str, n);
     _cstring_internalMove(self, pos, pos + n);
     memcpy(&self->str[pos], xstr, n);
     if (n > c_max_alloca) free(xstr); 
 }
 
-static inline void cstring_insert(CString* self, size_t pos, const char* str) {
+static inline void
+cstring_insert(CString* self, size_t pos, const char* str) {
     cstring_insertN(self, pos, str, strlen(str));
 }
 
-static inline void cstring_erase(CString* self, size_t pos, size_t n) {
+static inline void
+cstring_erase(CString* self, size_t pos, size_t n) {
     size_t len = cstring_size(*self);
     if (len) {
         memmove(&self->str[pos], &self->str[pos + n], len - (pos + n));
@@ -153,7 +183,8 @@ static inline void cstring_erase(CString* self, size_t pos, size_t n) {
 
 static inline size_t cstring_findN(CString cs, size_t pos, const char* needle, size_t n);
 
-static inline size_t cstring_replaceN(CString* self, size_t pos, const char* s1, size_t n1, const char* s2, size_t n2) {
+static inline size_t
+cstring_replaceN(CString* self, size_t pos, const char* s1, size_t n1, const char* s2, size_t n2) {
     size_t pos2 = cstring_findN(*self, pos, s1, n1);
     if (pos2 == cstring_npos) return cstring_npos;
     char* xs2 = (char *) memcpy(n2 > c_max_alloca ? malloc(n2) : alloca(n2), s2, n2);
@@ -163,38 +194,46 @@ static inline size_t cstring_replaceN(CString* self, size_t pos, const char* s1,
     return pos2;
 }
 
-static inline size_t cstring_replace(CString* self, size_t pos, const char* s1, const char* s2) {
+static inline size_t
+cstring_replace(CString* self, size_t pos, const char* s1, const char* s2) {
     return cstring_replaceN(self, pos, s1, strlen(s1), s2, strlen(s2));
 }
 
 
-static inline char cstring_back(CString cs) {
+static inline char
+cstring_back(CString cs) {
     return cs.str[cstring_size(cs) - 1];
 }
 
-static inline CString* cstring_push(CString* self, char value) {
+static inline CString*
+cstring_push(CString* self, char value) {
     return cstring_appendN(self, &value, 1);
 }
 
 
-static inline void cstring_pop(CString* self) {
+static inline void
+cstring_pop(CString* self) {
     --_cstring_rep(*self)[0];
 }
 
 /* readonly */
 
-static inline bool cstring_empty(CString cs) {
+static inline bool
+cstring_empty(CString cs) {
     return cstring_size(cs) == 0;
 }
 
-static inline bool cstring_equals(CString cs1, const char* str) {
+static inline bool
+cstring_equals(CString cs1, const char* str) {
     return strcmp(cs1.str, str) == 0;
 }
-static inline bool cstring_equalsS(CString cs1, CString cs2) {
+static inline bool
+cstring_equalsS(CString cs1, CString cs2) {
     return strcmp(cs1.str, cs2.str) == 0;
 }
 
-static inline char* cstring_strnstr(CString cs, size_t pos, const char* needle, size_t n) {
+static inline char*
+cstring_strnstr(CString cs, size_t pos, const char* needle, size_t n) {
     char *x = cs.str + pos, // haystack
          *z = cs.str + cstring_size(cs) - n + 1;
     if (x >= z)
@@ -211,25 +250,30 @@ static inline char* cstring_strnstr(CString cs, size_t pos, const char* needle, 
     return NULL;
 }
 
-static inline size_t cstring_findN(CString cs, size_t pos, const char* needle, size_t n) {
+static inline size_t
+cstring_findN(CString cs, size_t pos, const char* needle, size_t n) {
     char* res = cstring_strnstr(cs, pos, needle, n);
     return res ? res - cs.str : cstring_npos;
 }
 
-static inline size_t cstring_find(CString cs, size_t pos, const char* needle) {
+static inline size_t
+cstring_find(CString cs, size_t pos, const char* needle) {
     char* res = strstr(cs.str + pos, needle);
     return res ? res - cs.str : cstring_npos;
 }
 
-static inline char* cstring_splitFirst(const char* delimiters, CString cs) {
+static inline char*
+cstring_splitFirst(const char* delimiters, CString cs) {
     return strtok(cs.str, delimiters);
 }
 
-static inline char* cstring_splitNext(const char* delimiters) {
+static inline char*
+cstring_splitNext(const char* delimiters) {
     return strtok(NULL, delimiters);
 }
 
-static inline CString cstring_temp(const char* str) {
+static inline CString
+cstring_temp(const char* str) {
     // May only be used for accessing .str
     CString temp = {(char *) str};
     return temp;

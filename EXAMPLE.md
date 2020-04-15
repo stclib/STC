@@ -10,7 +10,7 @@ The difficulty with the hash function is that if your key type consists of sever
 
 Assuming a key-type like this, and want string as value, we define the functions person_make(), person_destroy() and person_compare():
 ```
-#include <ccl/cstring.h>
+#include <stc/cstring.h>
 
 struct Person
 {
@@ -51,7 +51,7 @@ size_t person_hash(const struct Person* p, size_t ignore) {
 ```
 With this in place, you can instantiate a CMap with Person => CString:
 ```
-#include <ccl/CMap.h>
+#include <stc/CMap.h>
 declare_CMap(ex, struct Person, CString, cstring_destroy, person_hash, person_compare, person_destroy);
 
 int main()

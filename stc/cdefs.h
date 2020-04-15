@@ -37,7 +37,6 @@
 
 #define c_MACRO_OVERLOAD(NAME, ...) c_OVERLOAD_SELECT(NAME, c_VA_ARG_SIZE(__VA_ARGS__))(__VA_ARGS__)
 
-
 #define c_new(...)      c_MACRO_OVERLOAD(c_new, __VA_ARGS__)
 #define c_new_1(T)      ((T *) malloc(sizeof(T)))
 #define c_new_2(T, n)   ((T *) malloc(sizeof(T) * (n)))
@@ -49,14 +48,13 @@
 
 #define                 c_defaultInitRaw(x) (x)
 #define                 c_defaultGetRaw(x) (x)
-#define                 c_defaultCompare(x, y)  (*(x) == *(y) ? 0 : *(x) < *(y) ? -1 : 1)
+#define                 c_defaultCompare(x, y) (*(x) == *(y) ? 0 : *(x) < *(y) ? -1 : 1)
 #define                 c_defaultEquals(x, y)  (memcmp(x, y, sizeof(*(y))) == 0)
-#define                 c_defaultDestroy(p) (p)
-//static inline void      c_defaultDestroy(void* value) {}
+#define                 c_defaultDestroy(p)    ((void)0)
 
 #define                 c_foreach(it, ctag, con) \
                             for (ctag##_iter_t it = ctag##_begin(con); it.item != ctag##_end(con).item; it = ctag##_next(it))
-                                
+
 // One-byte-at-a-time hash based on Murmur's mix
 static inline uint32_t  c_defaultHash(const void *data, size_t len) {
     const uint8_t *key = (const uint8_t *) data;
