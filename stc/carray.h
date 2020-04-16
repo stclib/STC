@@ -51,7 +51,10 @@ int main()
 
 #define carray_xdim(a) ((a).xdim)
 #define carray_ydim(a) ({const uint32_t* d__ = &(a)._yxdim; d__[0] / d__[-1];})
-#define carray_zdim(a) ((a).zdim)
+#define carray_zdim(a) ((a)._zdim)
+#define carray1_size(a) ((a).xdim)
+#define carray2_size(a) ((a)._yxdim)
+#define carray3_size(a) ({const uint32_t* d__ = &(a)._zdim; d__[0] * d__[-1];})
 #define carray_destroy(a) free((a)._array)
 
 #define declare_CArray(tag, T) \
@@ -65,7 +68,7 @@ int main()
     }; \
     c_struct (CArray3##tag) { \
         T *data, *_array; \
-        uint32_t xdim, _yxdim, zdim; \
+        uint32_t xdim, _yxdim, _zdim; \
     }; \
  \
     static inline CArray1##tag \
