@@ -59,9 +59,16 @@ cstring_reserve(CString* self, size_t cap) {
 static inline void
 cstring_resize(CString* self, size_t len, char fill) {
     size_t n = cstring_size(*self);
-	cstring_reserve(self, len);
+    cstring_reserve(self, len);
     if (len > n) memset(self->str + n, fill, len - n);
-	self->str[ _cstring_rep(*self)[0] = len ] = '\0';
+    self->str[ _cstring_rep(*self)[0] = len ] = '\0';
+}
+
+static inline CString
+cstring_move(CString* self) {
+    CString mv = *self;
+    *self = cstring_init;
+    return mv;
 }
 
 static inline void

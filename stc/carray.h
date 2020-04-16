@@ -41,79 +41,78 @@ int main()
     printf("%f\n", carray2f_at(a2, 4).data[3]);
     
     printf("%f\n", carray3f_value(a3, 5, 4, 3));
-	printf("%f\n", carray3f_data(a3, 5, 4)[3]);
+    printf("%f\n", carray3f_data(a3, 5, 4)[3]);
     printf("%f\n", carray3f_at2(a3, 5, 4).data[3]);
     
-    carray_unref(a3);
-    carray_unref(a2);
+    carray_destroy(a3);
+    carray_destroy(a2); // not needed, but no harm.
 }
 */
 
 #define carray_xdim(a) ((a).xdim)
-#define carray_ydim(a) ((a)._yxdim / (a).xdim)
+#define carray_ydim(a) ({const uint32_t* d__ = &(a)._yxdim; d__[0] / d__[-1];})
 #define carray_zdim(a) ((a).zdim)
-#define carray_ref(a) (++(a)._refCount, a)
-#define carray_unref(a) (--(a)._refCount == 0 ? free((a).data) : (void)0)
+#define carray_destroy(a) free((a)._array)
 
 #define declare_CArray(tag, T) \
     c_struct (CArray1##tag) { \
-        T* data; \
-        int _refCount; \
-        size_t xdim; \
+        T *data, *_array; \
+        uint32_t xdim; \
     }; \
     c_struct (CArray2##tag) { \
-        T* data; \
-        int _refCount; \
-        size_t xdim, _yxdim; \
+        T *data, *_array; \
+        uint32_t xdim, _yxdim; \
     }; \
     c_struct (CArray3##tag) { \
-        T* data; \
-        int _refCount; \
-        size_t xdim, _yxdim, zdim; \
+        T *data, *_array; \
+        uint32_t xdim, _yxdim, zdim; \
     }; \
  \
     static inline CArray1##tag \
     carray1##tag##_make(size_t xdim) { \
-        CArray1##tag a = {c_new_2(T, xdim), 1, xdim}; return a; \
+        T* m = c_new_2(T, xdim); \
+        return (CArray1##tag) {m, m, xdim}; \
     } \
     static inline CArray2##tag \
     carray2##tag##_make(size_t ydim, size_t xdim) { \
-        CArray2##tag a = {c_new_2(T, ydim*xdim), 1, xdim, ydim*xdim}; return a; \
+        T* m = c_new_2(T, ydim*xdim); \
+        return (CArray2##tag) {m, m, xdim, ydim*xdim}; \
     } \
     static inline CArray3##tag \
     carray3##tag##_make(size_t zdim, size_t ydim, size_t xdim) { \
-        CArray3##tag a = {c_new_2(T, zdim*ydim*xdim), 1, xdim, ydim*xdim, zdim}; return a; \
+        T* m = c_new_2(T, zdim*ydim*xdim); \
+        return (CArray3##tag) {m, m, xdim, ydim*xdim, zdim}; \
     } \
  \
-	static inline CArray1##tag \
+    static inline CArray1##tag \
     carray2##tag##_at(CArray2##tag a, size_t y) { \
-        CArray1##tag out = {a.data + y*a.xdim, 1000, a.xdim}; return out; \
+        return (CArray1##tag) {a.data + y*a.xdim, NULL, a.xdim}; \
     } \
-	static inline T* \
+    static inline T* \
     carray2##tag##_data(CArray2##tag a, size_t y) { \
         return a.data + y*a.xdim; \
     } \
-	static inline T \
+    static inline T \
     carray2##tag##_value(CArray2##tag a, size_t y, size_t x) { \
         return a.data[ y*a.xdim + x ]; \
     } \
  \
-	static inline CArray2##tag \
+    static inline CArray2##tag \
     carray3##tag##_at(CArray3##tag a, size_t z) { \
-        CArray2##tag out = {a.data + z*a._yxdim, 1000, a.xdim, a._yxdim}; return out; \
+        return (CArray2##tag) {a.data + z*a._yxdim, NULL, a.xdim, a._yxdim}; \
     } \
-	static inline CArray1##tag \
+    static inline CArray1##tag \
     carray3##tag##_at2(CArray3##tag a, size_t z, size_t y) { \
-        CArray1##tag out = {a.data + z*a._yxdim + y*a.xdim, 1000, a.xdim}; return out; \
+        return (CArray1##tag) {a.data + z*a._yxdim + y*a.xdim, NULL, a.xdim}; \
     } \
-	static inline T* \
+    static inline T* \
     carray3##tag##_data(CArray3##tag a, size_t z, size_t y) { \
         return a.data + z*a._yxdim + y*a.xdim; \
     } \
-	static inline T \
+    static inline T \
     carray3##tag##_value(CArray3##tag a, size_t z, size_t y, size_t x) { \
         return a.data[ z*a._yxdim + y*a.xdim + x ]; \
     } \
     typedef T carray_##tag##_t
-
+    
 #endif
