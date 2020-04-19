@@ -43,8 +43,8 @@ int main() {
     CVector_ix bignums = cvector_init; // or use cvector_ix_init; if initializing after declaration.
     cvector_ix_reserve(&bignums, 100);
     for (size_t i = 0; i<100; ++i)
-        cvector_ix_push(&bignums, i * i * i);
-    cvector_ix_pop(&bignums); // erase the last
+        cvector_ix_pushBack(&bignums, i * i * i);
+    cvector_ix_popBack(&bignums); // erase the last
 
     uint64_t value;
     for (size_t i = 0; i < cvector_size(bignums); ++i)
@@ -60,8 +60,8 @@ declare_CVector(cs, CString, cstring_destroy); // supply inline destructor of va
 
 int main() {
     CVector_cs names = cvector_init;
-    cvector_cs_push(&names, cstring_make("Mary"));
-    cvector_cs_push(&names, cstring_make("Joe"));
+    cvector_cs_pushBack(&names, cstring_make("Mary"));
+    cvector_cs_pushBack(&names, cstring_make("Joe"));
     cstring_assign(&names.data[1], cstring_make("Jake")); // replace Joe
 
     printf("%s\n", names.data[1].str); // Access the string char*
