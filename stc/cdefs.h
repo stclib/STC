@@ -1,32 +1,32 @@
-// MIT License
-//
-// Copyright (c) 2020 Tyge Løvset, NORCE, www.norceresearch.no
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
+/* MIT License
+ *
+ * Copyright (c) 2020 Tyge Løvset, NORCE, www.norceresearch.no
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 #ifndef CDEFS__H__
 #define CDEFS__H__
 
 #include <stdint.h>
 #include <stdbool.h>
 
-// Macro overloading feature support: https://rextester.com/ONP80107
+/* Macro overloading feature support: https://rextester.com/ONP80107 */
 #define c_CAT( A, B ) A ## B
 #define c_EXPAND(...) __VA_ARGS__
 #define c_VA_ARG_SIZE(...) c_EXPAND(c_APPLY_ARG_N((__VA_ARGS__, c_RSEQ_N)))
@@ -48,6 +48,7 @@
 
 #define                 c_defaultInitRaw(x) (x)
 #define                 c_defaultGetRaw(x) (x)
+#define                 c_noCompare(x, y) 0
 #define                 c_defaultCompare(x, y) (*(x) == *(y) ? 0 : *(x) < *(y) ? -1 : 1)
 #define                 c_defaultEquals(x, y)  (memcmp(x, y, sizeof(*(y))) == 0)
 #define                 c_defaultDestroy(p)    ((void)0)
@@ -55,7 +56,7 @@
 #define                 c_foreach(it, ctag, con) \
                             for (ctag##_iter_t it = ctag##_begin(con); it.item != ctag##_end(con).item; it = ctag##_next(it))
 
-// One-byte-at-a-time hash based on Murmur's mix
+/* One-byte-at-a-time hash based on Murmur's mix */
 static inline uint32_t  c_defaultHash(const void *data, size_t len) {
     const uint8_t *key = (const uint8_t *) data;
     uint32_t x = UINT32_C(0xc613fc15);
@@ -67,7 +68,7 @@ static inline uint32_t  c_defaultHash(const void *data, size_t len) {
     return x;
 }
 
-// https://nullprogram.com/blog/2018/07/31/: assume len positive multiple of 4
+/* https://nullprogram.com/blog/2018/07/31/: assume len positive multiple of 4 */
 static inline uint32_t c_lowbias32Hash(const void *data, size_t len) {
     const uint32_t *key = (const uint32_t *) data; uint32_t x = *key;
     do {

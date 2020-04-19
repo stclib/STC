@@ -1,27 +1,27 @@
-// MIT License
-//
-// Copyright (c) 2020 Tyge Løvset, NORCE, www.norceresearch.no
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
-#ifndef CMAP_H_
-#define CMAP_H_
+/* MIT License
+ *
+ * Copyright (c) 2020 Tyge Løvset, NORCE, www.norceresearch.no
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+#ifndef CMAP__H__
+#define CMAP__H__
 
 #include "cvector.h"
 
@@ -31,7 +31,7 @@
 #define cmap_bucketCount(map)  cvector_capacity((map)._table)
 
 
-// CMapEntry:
+/* CMapEntry: */
 #define declare_CMapEntry(tag, Key, Value, valueDestroy, keyDestroy) \
 struct CMapEntry_##tag { \
     Key key; \
@@ -55,7 +55,7 @@ enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
 #define cmapentry_noCompare(x, y) (0)
 
 
-// CMap:
+/* CMap: */
 #define declare_CMap(...)  c_MACRO_OVERLOAD(declare_CMap, __VA_ARGS__)
 
 #define declare_CMap_3(tag, Key, Value) \
@@ -72,7 +72,7 @@ enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
                          Key, c_defaultGetRaw, c_defaultInitRaw)
 
 
-// CMap<CString, Value>:
+/* CMap<CString, Value>: */
 #define declare_CMap_stringkey(...)  c_MACRO_OVERLOAD(declare_CMap_stringkey, __VA_ARGS__)
 
 #define declare_CMap_stringkey_2(tag, Value) \
@@ -83,7 +83,7 @@ enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
                          const char* const, cstring_getRaw, cstring_make)
 
 
-// CMap full:
+/* CMap full: */
 #define declare_CMap_10(tag, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, keyDestroy, \
                              RawKey, keyGetRaw, keyInitRaw) \
   declare_CMapEntry(tag, Key, Value, valueDestroy, keyDestroy); \
@@ -269,7 +269,7 @@ typedef Key cmap_##tag##_key_t; \
 typedef Value cmap_##tag##_value_t
 
 
-// https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction/
+/* https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction */
 static inline uint32_t cmap_reduce(uint32_t x, uint32_t N) {
     return ((uint64_t) x * (uint64_t) N) >> 32 ;
 }

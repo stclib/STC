@@ -1,25 +1,25 @@
-// MIT License
-//
-// Copyright (c) 2020 Tyge Løvset, NORCE, www.norceresearch.no
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
+/* MIT License
+ *
+ * Copyright (c) 2020 Tyge Løvset, NORCE, www.norceresearch.no
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 #ifndef CSTRING__H__
 #define CSTRING__H__
 
@@ -239,9 +239,14 @@ cstring_equalsS(CString cs1, CString cs2) {
     return strcmp(cs1.str, cs2.str) == 0;
 }
 
+static inline int
+cstring_compare(const void* cs1, const void* cs2) {
+    return strcmp(((const CString*)cs1)->str, ((const CString*)cs2)->str);
+}
+
 static inline char*
 cstring_strnstr(CString cs, size_t pos, const char* needle, size_t n) {
-    char *x = cs.str + pos, // haystack
+    char *x = cs.str + pos, /* haystack */
          *z = cs.str + cstring_size(cs) - n + 1;
     if (x >= z)
         return NULL;
@@ -281,17 +286,16 @@ cstring_splitNext(const char* delimiters) {
 
 static inline CString
 cstring_temp(const char* str) {
-    // May only be used for accessing .str
+    /* May only be used for accessing .str */
     CString temp = {(char *) str};
     return temp;
 }
 
-// CVector / CMap API functions:
+/* CVector / CMap API functions: */
 
 #define                cstring_getRaw(x) (&(x)->str)
 #define                cstring_compareRaw(x, y) strcmp(*(x), *(y))
 #define                cstring_equalsRaw(x, y) (strcmp(*(x), *(y)) == 0)
 static inline uint32_t cstring_hashRaw(const char* const* str, size_t ignored) { return c_defaultHash(*str, strlen(*str)); }
-
 
 #endif

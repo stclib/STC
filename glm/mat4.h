@@ -20,34 +20,34 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#ifndef CMAT4__H__
-#define CMAT4__H__
+#ifndef GLM_MAT4__H__
+#define GLM_MAT4__H__
 
-#include "cmat3.h"
-#include "cvec4.h"
+#include "mat3.h"
+#include "vec4.h"
 
-#define cmat4_identity_init {1, 0, 0, 0,  0, 1, 0, 0, \
+#define glm_mat4_identity_init {1, 0, 0, 0,  0, 1, 0, 0, \
                              0, 0, 1, 0,  0, 0, 0, 1}
-#define cmat4_zero_init     {0, 0, 0, 0,  0, 0, 0, 0, \
+#define glm_mat4_zero_init     {0, 0, 0, 0,  0, 0, 0, 0, \
                              0, 0, 0, 0,  0, 0, 0, 0}
                               
-#define cmat4f_identity     ((CMat4f) cmat4_identity_init)
-#define cmat4d_identity     ((CMat4d) cmat4_identity_init)
-#define cmat4f_zero         ((CMat4f) cmat4_zero_init)
-#define cmat4d_zero         ((CMat4d) cmat4_zero_init)
+#define glm_mat4f_identity     ((glm_mat4f) glm_mat4_identity_init)
+#define glm_mat4d_identity     ((glm_mat4d) glm_mat4_identity_init)
+#define glm_mat4f_zero         ((glm_mat4f) glm_mat4_zero_init)
+#define glm_mat4d_zero         ((glm_mat4d) glm_mat4_zero_init)
 
-#define declare_CMat4(tag, T) \
-    typedef const T (*CMat4##tag##ConstRef)[4]; \
+#define declare_glm_mat4(tag, T) \
+    typedef const T (*glm_mat4##tag##m)[4]; \
  \
-    typedef union CMat4##tag { \
-        CVec4##tag v[4]; \
+    typedef union glm_mat4##tag { \
+        glm_vec4##tag v[4]; \
         T m[4][4], arr[4*4]; \
-    } CMat4##tag; \
+    } glm_mat4##tag; \
  \
-    static inline CMat4##tag \
-    cmat4##tag##_mult(CMat4##tag##ConstRef mat1, CMat4##tag##ConstRef mat2) { \
+    static inline glm_mat4##tag \
+    glm_mat4##tag##_mult(glm_mat4##tag##m mat1, glm_mat4##tag##m mat2) { \
         const T *a = mat1[0], *b = mat2[0]; \
-        return (CMat4##tag) { \
+        return (glm_mat4##tag) { \
             a[ 0] * b[ 0] + a[ 4] * b[ 1] + a[ 8] * b[ 2] + a[12] * b[ 3], \
             a[ 1] * b[ 0] + a[ 5] * b[ 1] + a[ 9] * b[ 2] + a[13] * b[ 3], \
             a[ 2] * b[ 0] + a[ 6] * b[ 1] + a[10] * b[ 2] + a[14] * b[ 3], \
@@ -67,29 +67,29 @@
         }; \
     } \
  \
-    static inline CMat4##tag* \
-    cmat4##tag##_scale(CMat4##tag* self, T s) { \
+    static inline glm_mat4##tag* \
+    glm_mat4##tag##_scale(glm_mat4##tag* self, T s) { \
         T* a = self->arr; \
         for (int i = 0; i < 16; ++i) *a++ *= s; \
         return self; \
     } \
-    static inline CMat4##tag \
-    cmat4##tag##_scalarMult(CMat4##tag##ConstRef m, T s) { \
-        CMat4##tag dst; \
+    static inline glm_mat4##tag \
+    glm_mat4##tag##_scalarMult(glm_mat4##tag##m m, T s) { \
+        glm_mat4##tag dst; \
         T *c = dst.arr; const T *a = m[0]; \
         for (int i = 0; i < 16; ++i) *c++ = *a++ * s; \
         return dst; \
     } \
-    static inline CMat4##tag \
-    cmat4##tag##_compMult(CMat4##tag##ConstRef m1, CMat4##tag##ConstRef m2) { \
-        CMat4##tag dst; \
+    static inline glm_mat4##tag \
+    glm_mat4##tag##_compMult(glm_mat4##tag##m m1, glm_mat4##tag##m m2) { \
+        glm_mat4##tag dst; \
         T *c = dst.arr; const T *a = m1[0], *b = m2[0]; \
         for (int i = 0; i < 16; ++i) *c++ = *a++ * *b++; \
         return dst; \
     } \
-    static inline CVec4##tag \
-    cmat4##tag##_vecMult(CMat4##tag##ConstRef m, CVec4##tag v) { \
-        return (CVec4##tag) { \
+    static inline glm_vec4##tag \
+    glm_mat4##tag##_vecMult(glm_mat4##tag##m m, glm_vec4##tag v) { \
+        return (glm_vec4##tag) { \
             m[0][0] * v.x + m[1][0] * v.y + m[2][0] * v.z + m[3][0] * v.w, \
             m[0][1] * v.x + m[1][1] * v.y + m[2][1] * v.z + m[3][1] * v.w, \
             m[0][2] * v.x + m[1][2] * v.y + m[2][2] * v.z + m[3][2] * v.w, \
@@ -97,9 +97,9 @@
         }; \
     } \
  \
-    static inline CMat4##tag \
-    cmat4##tag##_transpose(CMat4##tag##ConstRef m) { \
-        return (CMat4##tag) { \
+    static inline glm_mat4##tag \
+    glm_mat4##tag##_transpose(glm_mat4##tag##m m) { \
+        return (glm_mat4##tag) { \
             m[0][0], m[1][0], m[2][0], m[3][0], \
             m[0][1], m[1][1], m[2][1], m[3][1], \
             m[0][2], m[1][2], m[2][2], m[3][2], \
@@ -107,18 +107,18 @@
         }; \
     } \
  \
-    static inline CMat3##tag \
-    cmat4##tag##_transpose3(CMat4##tag##ConstRef m) { \
-        return (CMat3##tag) { \
+    static inline glm_mat3##tag \
+    glm_mat4##tag##_transpose3(glm_mat4##tag##m m) { \
+        return (glm_mat3##tag) { \
             m[0][0], m[1][0], m[2][0], \
             m[0][1], m[1][1], m[2][1], \
             m[0][2], m[1][2], m[2][2], \
         }; \
     } \
  \
-    static inline CMat3##tag \
-    cmat4##tag##_to3(CMat4##tag##ConstRef m) { \
-        return (CMat3##tag) { \
+    static inline glm_mat3##tag \
+    glm_mat4##tag##_to3(glm_mat4##tag##m m) { \
+        return (glm_mat3##tag) { \
             m[0][0], m[0][1], m[0][2], \
             m[1][0], m[1][1], m[1][2], \
             m[2][0], m[2][1], m[2][2], \
@@ -126,12 +126,12 @@
     } \
  \
     static inline T \
-    cmat4##tag##_trace(CMat4##tag##ConstRef m) { \
+    glm_mat4##tag##_trace(glm_mat4##tag##m m) { \
         return m[0][0] + m[1][1] + m[2][2] + m[3][3]; \
     } \
  \
     static inline T \
-    cmat4##tag##_determinant(CMat4##tag##ConstRef mat) { \
+    glm_mat4##tag##_determinant(glm_mat4##tag##m mat) { \
         const T *p = mat[0]; \
         T a, b, c, d, e, f; \
         a = p[10] * p[15] - p[14] * p[11], \
@@ -147,9 +147,9 @@
     } \
  \
  \
-    static inline CMat4##tag \
-    cmat4##tag##_inverse(CMat4##tag##ConstRef mat) { \
-        CMat4##tag dst; \
+    static inline glm_mat4##tag \
+    glm_mat4##tag##_inverse(glm_mat4##tag##m mat) { \
+        glm_mat4##tag dst; \
         const T *p = mat[0]; \
         T a, b, c, d, e, f, det; \
         a = p[10] * p[15] - p[14] * p[11], \
@@ -192,13 +192,13 @@
  \
         det = p[0] * dst.m[0][0] + p[1] * dst.m[1][0] \
             + p[2] * dst.m[2][0] + p[3] * dst.m[3][0]; \
-        return *cmat4##tag##_scale(&dst, 1.0f / det); \
+        return *glm_mat4##tag##_scale(&dst, 1.0f / det); \
     }  \
  \
-    typedef T cmat4##tag##_value_t
+    typedef T glm_mat4##tag##_value_t
 
-declare_CMat4(d, double);
-declare_CMat4(f, float);
+declare_glm_mat4(d, double);
+declare_glm_mat4(f, float);
 
 
 #endif

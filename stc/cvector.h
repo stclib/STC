@@ -1,25 +1,25 @@
-// MIT License
-//
-// Copyright (c) 2020 Tyge Løvset, NORCE, www.norceresearch.no
-//
-// Permission is hereby granted, free of charge, to any person obtaining a copy
-// of this software and associated documentation files (the "Software"), to deal
-// in the Software without restriction, including without limitation the rights
-// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-// copies of the Software, and to permit persons to whom the Software is
-// furnished to do so, subject to the following conditions:
-//
-// The above copyright notice and this permission notice shall be included in all
-// copies or substantial portions of the Software.
-//
-// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-// SOFTWARE.
-
+/* MIT License
+ *
+ * Copyright (c) 2020 Tyge Løvset, NORCE, www.norceresearch.no
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
 #ifndef CVECTOR__H__
 #define CVECTOR__H__
 
@@ -44,10 +44,14 @@ extern void qsort(void *base, size_t nitems, size_t size, int (*compar)(const vo
 #define declare_CVector_string(tag) \
                                 declare_CVector_6(tag, CString, cstring_destroy, cstring_compareRaw, const char*, cstring_getRaw)
 
+
+
 #define declare_CVector_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw) \
+ \
 typedef struct CVector_##tag { \
     Value* data; \
 } CVector_##tag; \
+ \
 static const CVector_##tag cvector_##tag##_init = cvector_init; \
  \
 static inline void \
@@ -83,7 +87,7 @@ cvector_##tag##_clear(CVector_##tag* self) { \
  \
  \
 static inline void \
-cvector_##tag##_push(CVector_##tag* self, Value value) { \
+cvector_##tag##_pushBack(CVector_##tag* self, Value value) { \
     size_t len = cvector_size(*self); \
     if (len == cvector_capacity(*self)) \
         cvector_##tag##_reserve(self, 7 + len * 5 / 3); \
@@ -139,7 +143,7 @@ cvector_##tag##_back(CVector_##tag cv) { \
 } \
  \
 static inline void \
-cvector_##tag##_pop(CVector_##tag* self) { \
+cvector_##tag##_popBack(CVector_##tag* self) { \
     valueDestroy(&self->data[_cvector_size(*self) - 1]); \
     --_cvector_size(*self); \
 } \
@@ -151,8 +155,7 @@ typedef struct cvector_##tag##_iter_t { \
  \
 static inline cvector_##tag##_iter_t \
 cvector_##tag##_begin(CVector_##tag vec) { \
-    cvector_##tag##_iter_t it = {vec.data}; \
-    return it; \
+    return (cvector_##tag##_iter_t) {vec.data}; \
 } \
  \
 static inline cvector_##tag##_iter_t \
@@ -163,8 +166,7 @@ cvector_##tag##_next(cvector_##tag##_iter_t it) { \
  \
 static inline cvector_##tag##_iter_t \
 cvector_##tag##_end(CVector_##tag vec) { \
-    cvector_##tag##_iter_t it = {vec.data + cvector_size(vec)}; \
-    return it; \
+    return (cvector_##tag##_iter_t) {vec.data + cvector_size(vec)}; \
 } \
 typedef Value cvector_##tag##_value_t
 
