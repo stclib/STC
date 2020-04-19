@@ -64,28 +64,27 @@
  \
     static inline void \
     clist_##tag##_pushFront(CList_##tag* self, Value value) { \
-        _clist_pushAfter(tag, self->last, value); \
+        _clist_insertAfter(tag, self->last, value); \
          if (!self->last) self->last = entry; \
     } \
     static inline void \
     clist_##tag##_pushBack(CList_##tag* self, Value value) { \
-        _clist_pushAfter(tag, self->last, value); \
+        _clist_insertAfter(tag, self->last, value); \
         self->last = entry; \
     } \
     static inline void \
-    clist_##tag##_pushAfter(CList_##tag* self, clist_##tag##_iter_t pos, Value value) { \
-        _clist_pushAfter(tag, pos.item, value); \
+    clist_##tag##_insertAfter(CList_##tag* self, clist_##tag##_iter_t pos, Value value) { \
+        _clist_insertAfter(tag, pos.item, value); \
         if (!self->last || pos.item == self->last) self->last = entry; \
+    } \
+    static inline void \
+    clist_##tag##_eraseAfter(CList_##tag* self, clist_##tag##_iter_t pos) { \
+        _clist_eraseAfter(tag, pos.item, valueDestroy); \
     } \
  \
     static inline void \
     clist_##tag##_popFront(CList_##tag* self) { \
-        CListNode_##tag* del = self->last->next, *next = del->next; \
-        --self->size; \
-        if (next == del) self->last = NULL; \
-        else self->last->next = next; \
-        valueDestroy(&del->value); \
-        free(del); \
+        _clist_eraseAfter(tag, self->last, valueDestroy); \
     } \
  \
     static inline void \
@@ -127,13 +126,21 @@
     typedef Value clist_##tag##_value_t
     
 
-#define _clist_pushAfter(tag, node, val) \
+#define _clist_insertAfter(tag, node, val) \
     CListNode_##tag *entry = c_new_1(CListNode_##tag), \
                     *next = self->last ? node->next : entry; \
     entry->value = val; \
     entry->next = next; \
     ++self->size; \
     if (node) node->next = entry
+
+#define _clist_eraseAfter(tag, node, valueDestroy) \
+    CListNode_##tag* del = node->next, *next = del->next; \
+    node->next = next; \
+    if (--self->size == 0) self->last = NULL; \
+    else if (self->last == del) self->last = node; \
+    valueDestroy(&del->value); \
+    free(del)
 
 
 declare_CListTypes(_i, int);
