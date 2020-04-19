@@ -8,10 +8,10 @@
         glm_mat4##tag dst = glm_mat4##tag##_identity; \
         dst.m[0][0] = 2.0f / (right - left); \
         dst.m[1][1] = 2.0f / (top - bottom); \
-        dst.m[2][2] = - 2.0f / (zFar - zNear); \
-        dst.m[3][0] = - (right + left) / (right - left); \
-        dst.m[3][1] = - (top + bottom) / (top - bottom); \
-        dst.m[3][2] = - (zFar + zNear) / (zFar - zNear); \
+        dst.m[2][2] = -2.0f / (zFar - zNear); \
+        dst.m[3][0] = -(right + left) / (right - left); \
+        dst.m[3][1] = -(top + bottom) / (top - bottom); \
+        dst.m[3][2] = -(zFar + zNear) / (zFar - zNear); \
         return dst; \
     } \
  \
@@ -22,9 +22,9 @@
         dst.m[1][1] = (2.0f * nearVal) / (top - bottom); \
         dst.m[2][0] = (right + left) / (right - left); \
         dst.m[2][1] = (top + bottom) / (top - bottom); \
-        dst.m[2][2] = - (farVal + nearVal) / (farVal - nearVal); \
-        dst.m[2][3] = - 1.0f; \
-        dst.m[3][2] = - (2.0f * farVal * nearVal) / (farVal - nearVal); \
+        dst.m[2][2] = -(farVal + nearVal) / (farVal - nearVal); \
+        dst.m[2][3] = -1.0f; \
+        dst.m[3][2] = -(2.0f * farVal * nearVal) / (farVal - nearVal); \
         return dst; \
     } \
      \
@@ -35,9 +35,9 @@
         glm_mat4##tag dst = glm_mat4##tag##_zero; \
         dst.m[0][0] = 1.0f / (aspect * tanHalfFovy); \
         dst.m[1][1] = 1.0f / (tanHalfFovy); \
-        dst.m[2][2] = - (zFar + zNear) / (zFar - zNear); \
-        dst.m[2][3] = - 1.0f; \
-        dst.m[3][2] = - (2.0f * zFar * zNear) / (zFar - zNear); \
+        dst.m[2][2] = -(zFar + zNear) / (zFar - zNear); \
+        dst.m[2][3] = -1.0f; \
+        dst.m[3][2] = -(2.0f * zFar * zNear) / (zFar - zNear); \
         return dst; \
     }     \
      \
@@ -50,9 +50,9 @@
         glm_mat4##tag dst = glm_mat4##tag##_zero; \
         dst.m[0][0] = w; \
         dst.m[1][1] = h; \
-        dst.m[2][2] = - (zFar + zNear) / (zFar - zNear); \
-        dst.m[2][3] = - 1.0f; \
-        dst.m[3][2] = - (2.0f * zFar * zNear) / (zFar - zNear); \
+        dst.m[2][2] = -(zFar + zNear) / (zFar - zNear); \
+        dst.m[2][3] = -1.0f; \
+        dst.m[3][2] = -(2.0f * zFar * zNear) / (zFar - zNear); \
         return dst; \
     }     \
      \
@@ -67,9 +67,9 @@
         glm_mat4##tag dst = glm_mat4##tag##_zero; \
         dst.m[0][0] = (2.0f * zNear) / (right - left); \
         dst.m[1][1] = (2.0f * zNear) / (top - bottom); \
-        dst.m[2][2] = - 1.0f; \
-        dst.m[2][3] = - 1.0f; \
-        dst.m[3][2] = - 2.0f * zNear; \
+        dst.m[2][2] = -1.0f; \
+        dst.m[2][3] = -1.0f; \
+        dst.m[3][2] = -2.0f * zNear; \
         return dst; \
     } \
  \
@@ -78,7 +78,7 @@
         glm_mat4##tag dst = *(const glm_mat4##tag *) m; \
         glm_vec4##tag##_add(&dst.v[3], glm_vec4##tag##_mult(dst.v[0], v.x) \
                                      + glm_vec4##tag##_mult(dst.v[1], v.y) \
-                                     + glm_vec4##tag##_mult(dst.v[2], v.z); \
+                                     + glm_vec4##tag##_mult(dst.v[2], v.z)); \
         return dst; \
     } \
  \
@@ -107,48 +107,49 @@
  \
         glm_mat4##tag dst; \
         const glm_vec4##tag* mv = (const glm_vec4##tag *) m; \
-         dst.m[0] = glm_vec4##tag##_mult(mv[0], rot.m[0][0]) \
+        dst.v[0] = glm_vec4##tag##_mult(mv[0], rot.m[0][0]) \
                  + glm_vec4##tag##_mult(mv[1], rot.m[0][1]) \
                  + glm_vec4##tag##_mult(mv[2], rot.m[0][2]); \
-        dst.m[1] = glm_vec4##tag##_mult(mv[0], rot.m[1][0]) \
+        dst.v[1] = glm_vec4##tag##_mult(mv[0], rot.m[1][0]) \
                  + glm_vec4##tag##_mult(mv[1], rot.m[1][1]) \
                  + glm_vec4##tag##_mult(mv[2], rot.m[1][2]); \
-        dst.m[2] = glm_vec4##tag##_mult(mv[0], rot.m[2][0]) \
+        dst.v[2] = glm_vec4##tag##_mult(mv[0], rot.m[2][0]) \
                  + glm_vec4##tag##_mult(mv[1], rot.m[2][1]) \
                  + glm_vec4##tag##_mult(mv[2], rot.m[2][2]); \
-        dst.m[3] = mv[3]; \
+        dst.v[3] = mv[3]; \
         return dst; \
     } \
  \
  \
     static inline glm_mat4##tag scale(glm_mat4##tag##m m, glm_vec3##tag v) \
     { \
-        glm_mat4##tag dst; \
-        dst.m[0] = m[0] * v[0]; \
-        dst.m[1] = m[1] * v[1]; \
-        dst.m[2] = m[2] * v[2]; \
-        dst.m[3] = m[3]; \
+        glm_mat4##tag dst = glm_mat4##tag##_zero; \
+        const glm_vec4##tag* mv = (const glm_vec4##tag *) m; \
+        dst.v[0] = glm_vec4##tag##_mult(mv[0], v.x); \
+        dst.v[1] = glm_vec4##tag##_mult(mv[1], v.y); \
+        dst.v[2] = glm_vec4##tag##_mult(mv[2], v.z); \
+        dst.v[3] = mv[3]; \
         return dst; \
     } \
  \
     static inline glm_mat4##tag lookAtRH(glm_vec3##tag eye, glm_vec3##tag center, glm_vec3##tag up) \
     { \
-        const glm_vec3##tag f(normalize(center - eye)); \
-        const glm_vec3##tag s(normalize(cross(f, up))); \
-        const glm_vec3##tag u(cross(s, f)); \
+        const glm_vec3##tag f = glm_vec3##tag##_normalize(glm_vec3##tag##_minus(center, eye)); \
+        const glm_vec3##tag s = glm_vec3##tag##_normalize(glm_vec3##tag##_cross(f, up)); \
+        const glm_vec3##tag u = glm_vec3##tag##_cross(s, f); \
  \
-        glm_mat4##tag dst(1); \
-        dst.m[0][0] = s.x; \
-        dst.m[1][0] = s.y; \
-        dst.m[2][0] = s.z; \
-        dst.m[0][1] = u.x; \
-        dst.m[1][1] = u.y; \
-        dst.m[2][1] = u.z; \
-        dst.m[0][2] =-f.x; \
-        dst.m[1][2] =-f.y; \
-        dst.m[2][2] =-f.z; \
-        dst.m[3][0] =-dot(s, eye); \
-        dst.m[3][1] =-dot(u, eye); \
-        dst.m[3][2] = dot(f, eye); \
+        glm_mat4##tag dst = glm_mat4##tag##_identity; \
+        dst.m[0][0] =  s.x; \
+        dst.m[1][0] =  s.y; \
+        dst.m[2][0] =  s.z; \
+        dst.m[0][1] =  u.x; \
+        dst.m[1][1] =  u.y; \
+        dst.m[2][1] =  u.z; \
+        dst.m[0][2] = -f.x; \
+        dst.m[1][2] = -f.y; \
+        dst.m[2][2] = -f.z; \
+        dst.m[3][0] = -glm_vec3##tag##_dot(s, eye); \
+        dst.m[3][1] = -glm_vec3##tag##_dot(u, eye); \
+        dst.m[3][2] =  glm_vec3##tag##_dot(f, eye); \
         return dst; \
     }
