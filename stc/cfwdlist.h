@@ -20,138 +20,137 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CLIST__H__
-#define CLIST__H__
+#ifndef CFWDLIST__H__
+#define CFWDLIST__H__
 
 #include "cdefs.h"
 
 /* Circular Singly-linked Lists */
 
-#define clist_init          {NULL, 0}
-#define clist_size(list)    ((size_t) (list).size)
+#define cfwdlist_init          {NULL}
 
-#define declare_CList(...)  c_MACRO_OVERLOAD(declare_CList, __VA_ARGS__)
+#define declare_CFwdList(...)  c_MACRO_OVERLOAD(declare_CFwdList, __VA_ARGS__)
 
-#define declare_CList_2(tag, Value) \
-                            declare_CList_3(tag, Value, c_defaultDestroy)
-#define declare_CList_3(tag, Value, valueDestroy) \
-                            declare_CList_4(tag, Value, valueDestroy, c_defaultCompare)
-#define declare_CList_4(tag, Value, valueDestroy, valueCompare) \
-                            declare_CList_6(tag, Value, valueDestroy, valueCompare, Value, c_defaultGetRaw)
-#define declare_CList_string(tag) \
-                            declare_CList_6(tag, CString, cstring_destroy, cstring_compareRaw, const char*, cstring_getRaw)                            
+#define declare_CFwdList_2(tag, Value) \
+                               declare_CFwdList_3(tag, Value, c_defaultDestroy)
+#define declare_CFwdList_3(tag, Value, valueDestroy) \
+                               declare_CFwdList_4(tag, Value, valueDestroy, c_defaultCompare)
+#define declare_CFwdList_4(tag, Value, valueDestroy, valueCompare) \
+                               declare_CFwdList_6(tag, Value, valueDestroy, valueCompare, Value, c_defaultGetRaw)
+#define declare_CFwdList_string(tag) \
+                               declare_CFwdList_6(tag, CString, cstring_destroy, cstring_compareRaw, const char*, cstring_getRaw)                            
 
 
-#define declare_CListTypes(tag, Value) \
-    c_struct (CListNode_##tag) { \
-        CListNode_##tag *next; \
+#define declare_CFwdListTypes(tag, Value) \
+    c_struct (CFwdListNode_##tag) { \
+        CFwdListNode_##tag *next; \
         Value value; \
     }; \
  \
-    c_struct (CList_##tag) { \
-        CListNode_##tag* last; \
-        size_t size; \
+    c_struct (CFwdList_##tag) { \
+        CFwdListNode_##tag* last; \
     }; \
  \
-    c_struct (clist_##tag##_iter_t) { \
-        CListNode_##tag *item, *head; \
+    c_struct (cfwdlist_##tag##_iter_t) { \
+        CFwdListNode_##tag *item, *head; \
     }
 
 
-#define declare_CList_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw) \
+#define declare_CFwdList_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw) \
  \
-    declare_CListTypes(tag, Value); \
+    declare_CFwdListTypes(tag, Value); \
  \
     static inline void \
-    clist_##tag##_pushFront(CList_##tag* self, Value value) { \
-        _clist_insertAfter(tag, self->last, value); \
+    cfwdlist_##tag##_pushFront(CFwdList_##tag* self, Value value) { \
+        _cfwdlist_insertAfter(tag, self->last, value); \
          if (!self->last) self->last = entry; \
     } \
     static inline void \
-    clist_##tag##_pushBack(CList_##tag* self, Value value) { \
-        _clist_insertAfter(tag, self->last, value); \
+    cfwdlist_##tag##_pushBack(CFwdList_##tag* self, Value value) { \
+        _cfwdlist_insertAfter(tag, self->last, value); \
         self->last = entry; \
     } \
     static inline void \
-    clist_##tag##_insertAfter(CList_##tag* self, clist_##tag##_iter_t pos, Value value) { \
-        _clist_insertAfter(tag, pos.item, value); \
+    cfwdlist_##tag##_insertAfter(CFwdList_##tag* self, cfwdlist_##tag##_iter_t pos, Value value) { \
+        _cfwdlist_insertAfter(tag, pos.item, value); \
         if (!self->last || pos.item == self->last) self->last = entry; \
     } \
     static inline void \
-    clist_##tag##_eraseAfter(CList_##tag* self, clist_##tag##_iter_t pos) { \
-        _clist_eraseAfter(tag, pos.item, valueDestroy); \
+    cfwdlist_##tag##_eraseAfter(CFwdList_##tag* self, cfwdlist_##tag##_iter_t pos) { \
+        _cfwdlist_eraseAfter(tag, pos.item, valueDestroy); \
     } \
  \
     static inline void \
-    clist_##tag##_popFront(CList_##tag* self) { \
-        _clist_eraseAfter(tag, self->last, valueDestroy); \
+    cfwdlist_##tag##_popFront(CFwdList_##tag* self) { \
+        _cfwdlist_eraseAfter(tag, self->last, valueDestroy); \
     } \
  \
     static inline void \
-    clist_##tag##_destroy(CList_##tag* self) { \
-        while (clist_size(*self)) \
-            clist_##tag##_popFront(self); \
+    cfwdlist_##tag##_destroy(CFwdList_##tag* self) { \
+        while (self->last) \
+            cfwdlist_##tag##_popFront(self); \
     } \
  \
-    static inline clist_##tag##_iter_t \
-    clist_##tag##_begin(CList_##tag lst) { \
-        CListNode_##tag *head = lst.last ? lst.last->next : NULL; \
-        return (clist_##tag##_iter_t) {head, head}; \
+    static inline cfwdlist_##tag##_iter_t \
+    cfwdlist_##tag##_begin(CFwdList_##tag lst) { \
+        CFwdListNode_##tag *head = lst.last ? lst.last->next : NULL; \
+        return (cfwdlist_##tag##_iter_t) {head, head}; \
     } \
  \
-    static inline clist_##tag##_iter_t \
-    clist_##tag##_next(clist_##tag##_iter_t it) { \
-        CListNode_##tag *next = it.item->next; \
+    static inline cfwdlist_##tag##_iter_t \
+    cfwdlist_##tag##_next(cfwdlist_##tag##_iter_t it) { \
+        CFwdListNode_##tag *next = it.item->next; \
         it.item = next != it.head ? next : NULL; \
         return it; \
     } \
  \
-    static inline clist_##tag##_iter_t \
-    clist_##tag##_end(CList_##tag lst) { \
-        return (clist_##tag##_iter_t) {NULL}; \
+    static inline cfwdlist_##tag##_iter_t \
+    cfwdlist_##tag##_end(CFwdList_##tag lst) { \
+        return (cfwdlist_##tag##_iter_t) {NULL}; \
     } \
  \
     static inline int \
-    clist_##tag##_sortCompare(const void* x, const void* y) { \
-        CListNode_##tag *a = (CListNode_##tag *)x, *b = (CListNode_##tag *)y; \
+    cfwdlist_##tag##_sortCmp(const void* x, const void* y) { \
+        CFwdListNode_##tag *a = (CFwdListNode_##tag *)x, *b = (CFwdListNode_##tag *)y; \
         return valueCompare(valueGetRaw(&a->value), valueGetRaw(&b->value)); \
     } \
      \
     static inline void \
-    clist_##tag##_sort(CList_##tag* self) { \
-        CListNode__i* last = clist_sort((CListNode__i *) self->last, clist_##tag##_sortCompare); \
-        self->last = (CListNode_##tag *) last; \
+    cfwdlist_##tag##_sort(CFwdList_##tag* self) { \
+        CFwdListNode__base* last = cfwdlist_sort_base((CFwdListNode__base *) self->last, cfwdlist_##tag##_sortCmp); \
+        self->last = (CFwdListNode_##tag *) last; \
     } \
  \
-    typedef Value clist_##tag##_value_t
+    typedef Value cfwdlist_##tag##_value_t
     
 
-#define _clist_insertAfter(tag, node, val) \
-    CListNode_##tag *entry = c_new_1(CListNode_##tag), \
-                    *next = self->last ? node->next : entry; \
+#define _cfwdlist_insertAfter(tag, node, val) \
+    CFwdListNode_##tag *entry = c_new_1(CFwdListNode_##tag), \
+                       *next = self->last ? node->next : entry; \
     entry->value = val; \
     entry->next = next; \
-    ++self->size; \
-    if (node) node->next = entry
+    if (node) node->next = entry \
+    /* +: set self->last based on node */
 
-#define _clist_eraseAfter(tag, node, valueDestroy) \
-    CListNode_##tag* del = node->next, *next = del->next; \
+
+#define _cfwdlist_eraseAfter(tag, node, valueDestroy) \
+    CFwdListNode_##tag* del = node->next, *next = del->next; \
     node->next = next; \
-    if (--self->size == 0) self->last = NULL; \
+    if (del == next) self->last = NULL; \
     else if (self->last == del) self->last = node; \
     valueDestroy(&del->value); \
     free(del)
 
 
-declare_CListTypes(_i, int);
+declare_CFwdListTypes(_base, int);
 
 /* 
  * Singly linked list Mergesort implementation by Simon Tatham. O(n*log(n)).
  * https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
  */
-static CListNode__i *
-clist_sort(CListNode__i *list, int (*cmp)(const void*, const void*)) {
-    CListNode__i *p, *q, *e, *tail, *oldhead;
+static CFwdListNode__base *
+cfwdlist_sort_base(CFwdListNode__base *list, int (*cmp)(const void*, const void*)) {
+    CFwdListNode__base *p, *q, *e, *tail, *oldhead;
     int insize = 1, nmerges, psize, qsize, i;
     if (!list) return NULL;
     
