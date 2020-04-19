@@ -36,7 +36,7 @@
     glm_quat##tag##_init(T x, T y, T z, T w) { return (glm_quat##tag) {x, y, z, w}; } \
  \
     static inline glm_quat##tag \
-    glm_quat##tag##_unit(glm_quat##tag q) { \
+    glm_quat##tag##_normalize(glm_quat##tag q) { \
         T dot = _glm_vec4_DOT(q, q); \
         if (dot <= 0.0f) return glm_quat##tag##_identity; \
         return glm_vec4##tag##_mult(q, 1.0f / glm_sqrt_##tag(dot)); \
@@ -45,7 +45,7 @@
     static inline glm_quat##tag \
     glm_quat##tag##_fromAxis(T angle, glm_vec3##tag axis) { \
         T a = angle * 0.5f, c = glm_cos_##tag(a), s = glm_sin_##tag(a); \
-        glm_vec3##tag u = glm_vec3##tag##_unit(axis); \
+        glm_vec3##tag u = glm_vec3##tag##_normalize(axis); \
         return (glm_quat##tag) {s * u.x, s * u.y, s * u.z, c}; \
     } \
  \
@@ -62,7 +62,7 @@
         } else  /* Build quaternion the standard way.*/ \
             t = _glm_vec3_CROSS(u, v); \
         glm_quat##tag q = (glm_quat##tag) {t.x, t.y, t.z, real_part}; \
-        return glm_quat##tag##_unit(q); \
+        return glm_quat##tag##_normalize(q); \
     } \
   \
     static inline glm_quat##tag \

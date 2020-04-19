@@ -101,7 +101,7 @@
         v.x = -v.x, v.y = -v.y, v.z = -v.z; return v; \
     } \
     static inline glm_vec3##tag \
-    glm_vec3##tag##_unit(glm_vec3##tag v) { \
+    glm_vec3##tag##_normalize(glm_vec3##tag v) { \
         T s = 1.0f / glm_sqrt_##tag(_glm_vec3_DOT(v, v)); \
         s; v.x *= s, v.y *= s, v.z *= s; \
         return v; \

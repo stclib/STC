@@ -94,7 +94,7 @@
         v.x = -v.x, v.y = -v.y, v.z = -v.z, v.w = -v.w; return v; \
     } \
     static inline glm_vec4##tag \
-    glm_vec4##tag##_unit(glm_vec4##tag v) { \
+    glm_vec4##tag##_normalize(glm_vec4##tag v) { \
         T s = glm_sqrt_##tag(_glm_vec4_DOT(v, v)); \
         if (s < 1e-8) return glm_vec4##tag##_zero; \
         s = 1.0f / s; v.x *= s, v.y *= s, v.z *= s, v.w *= s; \
