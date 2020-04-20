@@ -58,6 +58,7 @@
 #define cslist_init          {NULL}
 #define cslist_front(list)   (list).last->next->value
 #define cslist_back(list)    (list).last->value
+#define cslist_empty(list)   ((list).last == NULL)
 
 #define declare_CSList_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw) \
  \
@@ -116,6 +117,19 @@
     cslist_##tag##_next(cslist_##tag##_iter_t it) { \
         it.item = it.item == *it._last ? NULL : it.item->next; \
         return it; \
+    } \
+ \
+    static inline int \
+    cslist_##tag##_remove(CSList_##tag* self, ValueRaw val) { \
+        cslist_##tag##_iter_t prev = {self->last}; int n = 0; \
+        c_foreach (i, cslist_##tag, *self) { \
+            if (valueCompare(valueGetRaw(&i.item->value), &val) == 0) { \
+                cslist_##tag##_eraseAfter(self, prev), ++n; \
+                if (prev.item == i.item) break; \
+            } \
+            prev = i; \
+        } \
+        return n; \
     } \
  \
     typedef Value cslist_##tag##_value_t
