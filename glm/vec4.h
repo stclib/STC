@@ -113,25 +113,26 @@
     glm_vec4##tag##_xyz(glm_vec4##tag u) { \
         return (glm_vec3##tag) {u.x, u.y, u.z}; \
     }; \
+    static inline glm_vec3##tag \
     glm_vec4##tag##_xzy(glm_vec4##tag u) { \
         return (glm_vec3##tag) {u.x, u.z, u.y}; \
-    }; \
+    } \
     static inline glm_vec3##tag \
     glm_vec4##tag##_yxz(glm_vec4##tag u) { \
         return (glm_vec3##tag) {u.y, u.x, u.z}; \
-    }; \
+    } \
     static inline glm_vec3##tag \
     glm_vec4##tag##_yzx(glm_vec4##tag u) { \
         return (glm_vec3##tag) {u.y, u.z, u.x}; \
-    }; \
+    } \
     static inline glm_vec3##tag \
     glm_vec4##tag##_zxy(glm_vec4##tag u) { \
         return (glm_vec3##tag) {u.z, u.x, u.y}; \
-    }; \
+    } \
     static inline glm_vec3##tag \
     glm_vec4##tag##_zyx(glm_vec4##tag u) { \
         return (glm_vec3##tag) {u.z, u.y, u.x}; \
-    }; \
+    } \
  \
     static inline glm_vec4##tag \
     glm_vec4##tag##_swizzle(glm_vec4##tag u, const char* swz) { \

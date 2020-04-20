@@ -60,7 +60,7 @@
             real_part = 0; \
             t = fabs(u.x) > fabs(u.z) ? (glm_vec3##tag) {-u.y, u.x, 0} : (glm_vec3##tag) {0, -u.z, u.y}; \
         } else  /* Build quaternion the standard way.*/ \
-            t = _glm_vec3_CROSS(u, v); \
+            t = (glm_vec3##tag) {_glm_vec3_CROSS(u, v)}; \
         glm_quat##tag q = (glm_quat##tag) {t.x, t.y, t.z, real_part}; \
         return glm_quat##tag##_normalize(q); \
     } \
