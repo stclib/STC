@@ -52,7 +52,7 @@
     }; \
  \
     c_struct (cslist_##tag##_iter_t) { \
-        CSListNode_##tag *item, *head; \
+        CSListNode_##tag *item, **_last; \
     }
 
 
@@ -94,24 +94,6 @@
             cslist_##tag##_popFront(self); \
     } \
  \
-    static inline cslist_##tag##_iter_t \
-    cslist_##tag##_begin(CSList_##tag lst) { \
-        CSListNode_##tag *head = lst.last ? lst.last->next : NULL; \
-        return (cslist_##tag##_iter_t) {head, head}; \
-    } \
- \
-    static inline cslist_##tag##_iter_t \
-    cslist_##tag##_next(cslist_##tag##_iter_t it) { \
-        CSListNode_##tag *next = it.item->next; \
-        it.item = next != it.head ? next : NULL; \
-        return it; \
-    } \
- \
-    static inline cslist_##tag##_iter_t \
-    cslist_##tag##_end(CSList_##tag lst) { \
-        return (cslist_##tag##_iter_t) {NULL}; \
-    } \
- \
     static inline int \
     cslist_##tag##_sortCmp(const void* x, const void* y) { \
         CSListNode_##tag *a = (CSListNode_##tag *)x, *b = (CSListNode_##tag *)y; \
@@ -122,6 +104,19 @@
     cslist_##tag##_sort(CSList_##tag* self) { \
         CSListNode__base* last = cslist_sort_base((CSListNode__base *) self->last, cslist_##tag##_sortCmp); \
         self->last = (CSListNode_##tag *) last; \
+    } \
+ \
+    static inline cslist_##tag##_iter_t \
+    cslist_##tag##_begin(CSList_##tag* lst) { \
+        CSListNode_##tag *head = lst->last ? lst->last->next : NULL; \
+        return (cslist_##tag##_iter_t) {head, &lst->last}; \
+    } \
+ \
+    static inline cslist_##tag##_iter_t \
+    cslist_##tag##_next(cslist_##tag##_iter_t it) { \
+        if ((it.item = it.item->next) == (*it._last)->next) \
+            it.item = NULL; \
+        return it; \
     } \
  \
     typedef Value cslist_##tag##_value_t

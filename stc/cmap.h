@@ -245,26 +245,19 @@ cmap_##tag##_erase(CMap_##tag* self, cmap_##tag##_rawkey_t rawKey) { \
 } \
  \
 static inline cmap_##tag##_iter_t \
-cmap_##tag##_begin(CMap_##tag map) { \
-    cmap_##tag##_iter_t null = {NULL, NULL}; \
-    if (cmap_size(map) == 0) return null; \
-    CMapEntry_##tag* e = map._table.data, *end = e + _cvector_capacity(map._table); \
+cmap_##tag##_begin(CMap_##tag* map) { \
+    CMapEntry_##tag* e = map->_table.data, *end = e + _cvector_capacity(map->_table); \
     while (e != end && !e->hashx) ++e; \
-    cmap_##tag##_iter_t it = {e, end}; return it; \
+    return (cmap_##tag##_iter_t) {e == end ? NULL : e, end}; \
 } \
  \
 static inline cmap_##tag##_iter_t \
 cmap_##tag##_next(cmap_##tag##_iter_t it) { \
     do { ++it.item; } while (it.item != it._end && !it.item->hashx); \
+    if (it.item == it._end) it.item = NULL; \
     return it; \
 } \
  \
-static inline cmap_##tag##_iter_t \
-cmap_##tag##_end(CMap_##tag map) { \
-    CMapEntry_##tag* end = (cmap_size(map) == 0) ? NULL : map._table.data + _cvector_capacity(map._table); \
-    cmap_##tag##_iter_t it = {end, end}; \
-    return it; \
-} \
 typedef Key cmap_##tag##_key_t; \
 typedef Value cmap_##tag##_value_t
 

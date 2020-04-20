@@ -54,7 +54,7 @@
 #define                 c_defaultDestroy(p)    ((void)0)
 
 #define                 c_foreach(it, ctag, con) \
-                            for (ctag##_iter_t it = ctag##_begin(con); it.item != ctag##_end(con).item; it = ctag##_next(it))
+                            for (ctag##_iter_t it = ctag##_begin(&con); it.item; it = ctag##_next(it))
 
 /* One-byte-at-a-time hash based on Murmur's mix */
 static inline uint32_t  c_defaultHash(const void *data, size_t len) {

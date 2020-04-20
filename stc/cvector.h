@@ -150,24 +150,23 @@ cvector_##tag##_popBack(CVector_##tag* self) { \
  \
  \
 typedef struct cvector_##tag##_iter_t { \
-    Value* item; \
+    Value *item, *end; \
 } cvector_##tag##_iter_t; \
  \
 static inline cvector_##tag##_iter_t \
-cvector_##tag##_begin(CVector_##tag vec) { \
-    return (cvector_##tag##_iter_t) {vec.data}; \
-} \
- \
-static inline cvector_##tag##_iter_t \
-cvector_##tag##_next(cvector_##tag##_iter_t it) { \
-    ++it.item; \
+cvector_##tag##_begin(CVector_##tag* vec) { \
+    cvector_##tag##_iter_t it; \
+    it.item = vec->data, it.end = it.item + cvector_size(*vec); \
+    if (it.item == it.end) it.item = NULL; \
     return it; \
 } \
  \
 static inline cvector_##tag##_iter_t \
-cvector_##tag##_end(CVector_##tag vec) { \
-    return (cvector_##tag##_iter_t) {vec.data + cvector_size(vec)}; \
+cvector_##tag##_next(cvector_##tag##_iter_t it) { \
+    if (++it.item == it.end) it.item = NULL; \
+    return it; \
 } \
+ \
 typedef Value cvector_##tag##_value_t
 
 

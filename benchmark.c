@@ -114,4 +114,12 @@ int main()
     MAP_TEST2(FMAP, ii)
     MAP_TEST2(RMAP, ii)
 #endif
+
+    CMap_ix small = cmap_init;
+    cmap_ix_put(&small, 80, 800);
+    cmap_ix_put(&small, 10, 100);
+    cmap_ix_put(&small, 30, 300);
+    
+    c_foreach (i, cmap_ix, small)
+        printf("%d: %d\n", i.item->key, i.item->value);
 }
