@@ -27,9 +27,8 @@
 
 /* Circular Singly-linked Lists */
 
-#define cslist_init          {NULL}
 
-#define declare_CSList(...)  c_MACRO_OVERLOAD(declare_CSList, __VA_ARGS__)
+#define declare_CSList(...)    c_MACRO_OVERLOAD(declare_CSList, __VA_ARGS__)
 
 #define declare_CSList_2(tag, Value) \
                                declare_CSList_3(tag, Value, c_defaultDestroy)
@@ -56,6 +55,7 @@
     }
 
 
+#define cslist_init          {NULL}
 #define cslist_front(list)   (list).last->next->value
 #define cslist_back(list)    (list).last->value
 
@@ -102,7 +102,7 @@
      \
     static inline void \
     cslist_##tag##_sort(CSList_##tag* self) { \
-        CSListNode__base* last = cslist_sort_base((CSListNode__base *) self->last, cslist_##tag##_sortCmp); \
+        CSListNode__base* last = cslist_mergesort((CSListNode__base *) self->last, cslist_##tag##_sortCmp); \
         self->last = (CSListNode_##tag *) last; \
     } \
  \
@@ -147,7 +147,7 @@ declare_CSListTypes(_base, int);
  * https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
  */
 static CSListNode__base *
-cslist_sort_base(CSListNode__base *list, int (*cmp)(const void*, const void*)) {
+cslist_mergesort(CSListNode__base *list, int (*cmp)(const void*, const void*)) {
     CSListNode__base *p, *q, *e, *tail, *oldhead;
     int insize = 1, nmerges, psize, qsize, i;
     if (!list) return NULL;
