@@ -114,8 +114,7 @@
  \
     static inline cslist_##tag##_iter_t \
     cslist_##tag##_next(cslist_##tag##_iter_t it) { \
-        if ((it.item = it.item->next) == (*it._last)->next) \
-            it.item = NULL; \
+        it.item = it.item == *it._last ? NULL : it.item->next; \
         return it; \
     } \
  \
