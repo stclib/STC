@@ -79,6 +79,7 @@
         _cslist_insertAfter(tag, pos.item, value); \
         if (!self->last || pos.item == self->last) self->last = entry; \
     } \
+ \
     static inline void \
     cslist_##tag##_eraseAfter(CSList_##tag* self, cslist_##tag##_iter_t pos) { \
         _cslist_eraseAfter(tag, pos.item, valueDestroy); \
@@ -112,11 +113,36 @@
         CSListNode_##tag *head = lst->last ? lst->last->next : NULL; \
         return (cslist_##tag##_iter_t) {head, &lst->last}; \
     } \
+    static inline cslist_##tag##_iter_t \
+    cslist_##tag##_last(CSList_##tag* lst) { \
+        return (cslist_##tag##_iter_t) {lst->last, &lst->last}; \
+    } \
  \
     static inline cslist_##tag##_iter_t \
     cslist_##tag##_next(cslist_##tag##_iter_t it) { \
         it.item = it.item == *it._last ? NULL : it.item->next; \
         return it; \
+    } \
+ \
+    static inline void \
+    _cslist_##tag##_splice(CSList_##tag* self, cslist_##tag##_iter_t pos, CSList_##tag* other, bool bottom) { \
+        if (!pos.item) \
+            self->last = pos.item = other->last; \
+        else if (other->last) { \
+            CSListNode_##tag *next = pos.item->next; \
+            pos.item->next = other->last->next; \
+            other->last->next = next; \
+            if (bottom && pos.item == self->last) self->last = other->last; \
+        } \
+        other->last = NULL; \
+    } \
+    static inline void \
+    cslist_##tag##_spliceFront(CSList_##tag* self, CSList_##tag* other) { \
+        _cslist_##tag##_splice(self, cslist_##tag##_last(self), other, false); \
+    } \
+    static inline void \
+    cslist_##tag##_spliceAfter(CSList_##tag* self, cslist_##tag##_iter_t pos, CSList_##tag* other) { \
+        _cslist_##tag##_splice(self, pos, other, true); \
     } \
  \
     static inline int \
