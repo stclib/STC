@@ -47,7 +47,7 @@
 #define                 c_swap(T, x, y) { T __t = x; x = y; y = __t; }
 
 #define                 c_defaultInitRaw(x) (x)
-#define                 c_defaultGetRaw(x) (x)
+#define                 c_defaultGetRaw(ptr) (*(ptr))
 #define                 c_noCompare(x, y) 0
 #define                 c_defaultCompare(x, y) (*(x) == *(y) ? 0 : *(x) < *(y) ? -1 : 1)
 #define                 c_defaultEquals(x, y)  (memcmp(x, y, sizeof(*(y))) == 0)

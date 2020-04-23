@@ -47,7 +47,7 @@ extern void qsort(void *base, size_t nitems, size_t size, int (*compar)(const vo
 
 
 #define declare_CVector_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw) \
- \
+typedef ValueRaw cvector_##tag##_rawvalue_t; \
 typedef struct CVector_##tag { \
     Value* data; \
 } CVector_##tag; \
@@ -118,7 +118,9 @@ cvector_##tag##_erase(CVector_##tag* self, size_t pos, size_t size) { \
  \
 static inline int \
 cvector_##tag##_sortCompare(const void* x, const void* y) { \
-    return valueCompare(valueGetRaw((const Value *) x), valueGetRaw((const Value *) y)); \
+    cvector_##tag##_rawvalue_t rx = valueGetRaw((const Value *) x); \
+    cvector_##tag##_rawvalue_t ry = valueGetRaw((const Value *) y); \
+    return valueCompare(&rx, &ry); \
 } \
  \
 static inline void \
@@ -130,8 +132,9 @@ cvector_##tag##_sort(CVector_##tag* self) { \
 static inline size_t \
 cvector_##tag##_find(CVector_##tag cv, ValueRaw rawValue) { \
     size_t n = cvector_size(cv); \
+    cvector_##tag##_rawvalue_t r; \
     for (size_t i = 0; i < n; ++i) { \
-        if (valueCompare(valueGetRaw(&cv.data[i]), &rawValue) == 0) return i; \
+        if (valueCompare((r = valueGetRaw(&cv.data[i]), &r), &rawValue) == 0) return i; \
     } \
     return c_npos; \
 } \
