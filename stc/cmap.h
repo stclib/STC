@@ -253,7 +253,7 @@ static inline cmap_##tag##_iter_t \
 cmap_##tag##_begin(CMap_##tag* map) { \
     CMapEntry_##tag* e = map->_table.data, *end = e + _cvector_capacity(map->_table); \
     while (e != end && !e->hashx) ++e; \
-    return (cmap_##tag##_iter_t) {e == end ? NULL : e, end}; \
+    cmap_##tag##_iter_t it = {e == end ? NULL : e, end}; return it; \
 } \
  \
 static inline cmap_##tag##_iter_t \
