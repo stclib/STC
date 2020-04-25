@@ -44,7 +44,7 @@ Example:
         printf("program -x -y ARG -z [ARG] -1 -2 -3 --foo --bar ARG --opt [ARG] [ARGUMENTS]\n");
         int c;
         copt_t opt = copt_init;
-        while ((c = copt_getopt(&opt, argc, argv, optstr, longopts, false)) != -1) {
+        while ((c = copt_getopt(&opt, argc, argv, optstr, longopts)) != -1) {
             switch (c) {
                 case '?': printf("error: unknown option: %s\n", opt.faulty); break;
                 case ':': printf("error: missing argument for %s\n", opt.faulty); break;
@@ -93,23 +93,14 @@ static void _copt_permute(char *argv[], int j, int n) { /* move argv[j] over n e
     argv[j - k] = p;
 }
 
-/* This fuction has a very similar interface to GNU's getopt_long(). Each call
- * parses one option and returns the option name.  opt->arg points to the option
- * argument if present. The function returns -1 when all command-line arguments
- * are parsed. In this case, opt->ind is the index of the first non-option
- * argument.
- *
- * @param opt             output; must be initialized to copt_init on first call
- * @param posixly_correct if true, do not move options ahead of non-option arguments,
- *                        instead stop option processing on first nonoption argument.
+/* @param opt             output; must be initialized to copt_init on first call
  * @return                ASCII val for a short option; longopt.val for a long option;
  *                        -1 if argv[] is fully processed; '?' for an unknown option or
  *                        an ambiguous long option; ':' if an option argument is missing
  */
 static int copt_getopt(copt_t *opt, int argc, char *argv[],
-                       const char *shortopts, const struct copt_option *longopts,
-                       bool posixly_correct) {
-    int optc = -1, i0, j;
+                       const char *shortopts, const struct copt_option *longopts) {
+    int optc = -1, i0, j, posixly_correct = (shortopts[0] == '+');
     if (!posixly_correct) {
         while (opt->_i < argc && (argv[opt->_i][0] != '-' || argv[opt->_i][1] == '\0'))
             ++opt->_i, ++opt->_nargs;
