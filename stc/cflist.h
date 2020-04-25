@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CSLIST__H__
-#define CSLIST__H__
+#ifndef CFLIST__H__
+#define CFLIST__H__
 
 #include "cdefs.h"
 
