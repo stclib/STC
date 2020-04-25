@@ -64,13 +64,6 @@ cstring_resize(CString* self, size_t len, char fill) {
     self->str[ _cstring_rep(*self)[0] = len ] = '\0';
 }
 
-static inline CString
-cstring_move(CString* self) {
-    CString mv = *self;
-    *self = cstring_init;
-    return mv;
-}
-
 static inline void
 cstring_destroy(CString* self) {
     if (cstring_capacity(*self)) {
@@ -102,8 +95,15 @@ cstring_make(const char* str) {
 }
 
 static inline CString
-cstring_makeCopy(CString cs) {
+cstring_clone(CString cs) {
     return cstring_makeN(cs.str, cstring_size(cs));
+}
+
+static inline CString
+cstring_move(CString* self) {
+    CString mv = *self;
+    *self = cstring_init;
+    return mv;
 }
 
 static inline void
