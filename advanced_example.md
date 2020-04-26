@@ -1,5 +1,3 @@
-This example is based on https://stackoverflow.com/questions/17016175/c-unordered-map-using-a-custom-class-type-as-the-key/17017281#17017281, adapted to use CMap and CString instead of std::unordered_map and std::string.
-
 To be able to use CMap (or one of the other unordered associative containers) with a user-defined key-type, you need to define two things:
 
 1. A hash function; this must be a function that calculates the hash value given an object of the key-type.
@@ -10,6 +8,8 @@ The difficulty with the hash function is that if your key type consists of sever
 
 Assuming a key-type like this, and want string as value, we define the functions person_make(), person_destroy() and person_compare():
 ```
+#include <stdio.h>
+#include <stc/cmap.h>
 #include <stc/cstring.h>
 
 struct Person
@@ -28,13 +28,10 @@ void person_destroy(struct Person* p) {
   cstring_destroy(&p->name);
   cstring_destroy(&p->surname);
 }
-
-
 ```
-In order to use it as a CMap key, provide a "view" of your class, that owns no resources (e.g. CStrings):
+In order to use Person as a map key, provide a "view" of your class that owns no resources (e.g. CString):
 ```
-struct PersonView
-{
+struct PersonView {
   const char* name;
   const char* surname;
   int age;
@@ -47,12 +44,12 @@ struct Person person_fromView(struct PersonView pv) {
 }
 int personview_compare(const struct PersonView* x, const struct PersonView* y) {
   int c;
-  c = strcmp(x->name, y->name);   if (c != 0) return c;
+  c = strcmp(x->name, y->name);       if (c != 0) return c;
   c = strcmp(x->surname, y->surname); if (c != 0) return c;
   return memcmp(&x->age, &y->age, sizeof(x->age));
 }
 ```
-Here is a simple hash function that combines the three member's hashes:
+And a hash function that combines the three member's hashes:
 ```
 size_t personview_hash(const struct PersonView* pv, size_t ignore) {
   // Compute individual hash values for name, surname and age
@@ -65,33 +62,31 @@ size_t personview_hash(const struct PersonView* pv, size_t ignore) {
   return res;
 }
 ```
-With this in place, we can declare a CMap with Person => CString:
+With this in place, we can declare the map Person -> int:
 ```
-#include <stdio.h>
-#include "stc/CMap.h"
-declare_CMap(ex, struct Person, CString, cstring_destroy, 
+declare_CMap(ex, struct Person, int, c_noDestroy,
                  personview_hash, personview_compare, person_destroy,
                  struct PersonView, person_getView, person_fromView);
 
 ```
-Note we use struct PersonView to put keys in the map, but is stored as struct Person.
+Note we use struct PersonView to put keys in the map, but keys are stored as struct Person with proper dynamically allocated CStrings to store name and surname.
 ````
 int main()
 {
   CMap_ex m6 = cmap_init;
-  cmap_ex_put(&m6, (struct PersonView){"John", "Doe", 24}, cstring_make("dead"));
-  cmap_ex_put(&m6, (struct PersonView){"Jane", "Doe", 21}, cstring_make("another"));
-  cmap_ex_put(&m6, (struct PersonView){"John", "Travolta", 66}, cstring_make("actor"));
+  cmap_ex_put(&m6, (struct PersonView){"John", "Doe", 24}, 1001);
+  cmap_ex_put(&m6, (struct PersonView){"Jane", "Doe", 21}, 1002);
+  cmap_ex_put(&m6, (struct PersonView){"John", "Travolta", 66}, 1003);
 
   c_foreach (it, cmap_ex, m6) {
       if (cstring_equals(it.item->key.name, "John"))
-          printf("%s %s %d -> %s\n", it.item->key.name.str, it.item->key.surname.str, it.item->key.age,
-                                     it.item->value.str);
+          printf("%s %s %d -> %d\n", it.item->key.name.str, it.item->key.surname.str, it.item->key.age,
+                                     it.item->value);
   }
 
   cmap_ex_destroy(&m6);
 }
 ```
-CMap will automatically use personview_hash() as defined above for the hash value calculations, and the personview_compare() for equality checks.
+CMap uses personview_hash() for hash value calculations, and the personview_compare() for equality checks.
 The cmap_ex_destroy() function will free CStrings name, surname and the value for each item in the map, in addition to the CMap hash table itself.
 
