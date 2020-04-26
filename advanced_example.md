@@ -1,4 +1,4 @@
-To be able to use CMap (or one of the other unordered associative containers) with a user-defined key-type, you need to define two things:
+To be able to use CMap with a user-defined key-type, you need to define two things:
 
 1. A hash function; this must be a function that calculates the hash value given an object of the key-type.
 
@@ -12,8 +12,7 @@ Assuming a key-type like this, and want string as value, we define the functions
 #include <stc/cmap.h>
 #include <stc/cstring.h>
 
-struct Person
-{
+struct Person {
   CString name;
   CString surname;
   int age;
@@ -52,9 +51,7 @@ int personview_compare(const struct PersonView* x, const struct PersonView* y) {
 And a hash function that combines the three member's hashes:
 ```
 size_t personview_hash(const struct PersonView* pv, size_t ignore) {
-  // Compute individual hash values for name, surname and age
   // http://stackoverflow.com/a/1646913/126995
-
   size_t res = 17;  
   res = res * 31 + c_defaultHash(pv->name, strlen(pv->name));
   res = res * 31 + c_defaultHash(pv->surname, strlen(pv->surname));
@@ -70,7 +67,7 @@ declare_CMap(ex, struct Person, int, c_noDestroy,
 
 ```
 Note we use struct PersonView to put keys in the map, but keys are stored as struct Person with proper dynamically allocated CStrings to store name and surname.
-````
+```
 int main()
 {
   CMap_ex m6 = cmap_init;
@@ -87,6 +84,5 @@ int main()
   cmap_ex_destroy(&m6);
 }
 ```
-CMap uses personview_hash() for hash value calculations, and the personview_compare() for equality checks.
-The cmap_ex_destroy() function will free CStrings name, surname and the value for each item in the map, in addition to the CMap hash table itself.
+CMap uses personview_hash() for hash value calculations, and the personview_compare() for equality checks. The cmap_ex_destroy() function will free CStrings name, surname and the value for each item in the map, in addition to the CMap hash table itself.
 
