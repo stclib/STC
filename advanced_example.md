@@ -35,17 +35,20 @@ struct PersonView {
   const char* surname;
   int age;
 };
+
 struct PersonView person_getView(struct Person* p) {
   return (struct PersonView) {p->name.str, p->surname.str, p->age};
 }
+
 struct Person person_fromView(struct PersonView pv) {
   return (struct Person) {cstring_make(pv.name), cstring_make(pv.surname), pv.age};
 }
+
 int personview_compare(const struct PersonView* x, const struct PersonView* y) {
   int c;
   c = strcmp(x->name, y->name);       if (c != 0) return c;
   c = strcmp(x->surname, y->surname); if (c != 0) return c;
-  return memcmp(&x->age, &y->age, sizeof(x->age));
+  return x->age - y->age;
 }
 ```
 And a hash function that combines the three member's hashes:
