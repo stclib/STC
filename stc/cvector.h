@@ -27,8 +27,6 @@
 #include <string.h>
 #include "cdefs.h"
 
-extern void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*));
-
 #define cvector_init           {NULL}
 #define cvector_size(cv)       _cvector_safe_size((cv).data)
 #define cvector_capacity(cv)   _cvector_safe_capacity((cv).data)
@@ -45,21 +43,83 @@ extern void qsort(void *base, size_t nitems, size_t size, int (*compar)(const vo
                                 declare_CVector_6(tag, CString, cstring_destroy, cstring_compareRaw, const char*, cstring_getRaw)
 
 
-
 #define declare_CVector_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw) \
 typedef ValueRaw cvector_##tag##_rawvalue_t; \
 typedef struct CVector_##tag { \
     Value* data; \
 } CVector_##tag; \
  \
-static const CVector_##tag cvector_##tag##_init = cvector_init; \
- \
 static inline void \
 cvector_##tag##_swap(CVector_##tag* a, CVector_##tag* b) { \
-    Value* data = a->data; a->data = b->data; b->data = data; \
+    c_swap(Value*, a->data, b->data); \
 } \
  \
+STC_API void \
+cvector_##tag##_destroy(CVector_##tag* self); \
+ \
+STC_API void \
+cvector_##tag##_reserve(CVector_##tag* self, size_t cap); \
+ \
+STC_API void \
+cvector_##tag##_clear(CVector_##tag* self); \
+ \
+STC_API void \
+cvector_##tag##_pushBack(CVector_##tag* self, Value value); \
+ \
 static inline void \
+cvector_##tag##_popBack(CVector_##tag* self) { \
+    valueDestroy(&self->data[_cvector_size(*self) - 1]); \
+    --_cvector_size(*self); \
+} \
+ \
+static inline Value \
+cvector_##tag##_back(CVector_##tag cv) { \
+    return cv.data[_cvector_size(cv) - 1]; \
+} \
+ \
+STC_API void \
+cvector_##tag##_insert(CVector_##tag* self, size_t pos, Value value); \
+ \
+STC_API void \
+cvector_##tag##_erase(CVector_##tag* self, size_t pos, size_t size); \
+ \
+static inline int \
+cvector_##tag##_sortCompare(const void* x, const void* y) { \
+    ValueRaw rx = valueGetRaw((const Value *) x); \
+    ValueRaw ry = valueGetRaw((const Value *) y); \
+    return valueCompare(&rx, &ry); \
+} \
+ \
+STC_API void \
+cvector_##tag##_sort(CVector_##tag* self); \
+ \
+STC_API size_t \
+cvector_##tag##_find(CVector_##tag cv, ValueRaw rawValue); \
+ \
+ \
+typedef struct cvector_##tag##_iter_t { \
+    Value *item, *end; \
+} cvector_##tag##_iter_t; \
+ \
+STC_API cvector_##tag##_iter_t \
+cvector_##tag##_begin(CVector_##tag* vec); \
+ \
+static inline cvector_##tag##_iter_t \
+cvector_##tag##_next(cvector_##tag##_iter_t it) { \
+    if (++it.item == it.end) it.item = NULL; \
+    return it; \
+} \
+ \
+implement_CVector_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw) \
+ \
+typedef Value cvector_##tag##_value_t
+
+/* -------------------------- IMPLEMENTATION ------------------------- */
+
+#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
+#define implement_CVector_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw) \
+ \
+STC_API void \
 cvector_##tag##_destroy(CVector_##tag* self) { \
     Value* p = self->data; \
     size_t i = 0, n = cvector_size(*self); \
@@ -67,7 +127,7 @@ cvector_##tag##_destroy(CVector_##tag* self) { \
     free(_cvector_alloced(self->data)); \
 } \
  \
-static inline void \
+STC_API void \
 cvector_##tag##_reserve(CVector_##tag* self, size_t cap) { \
     size_t len = cvector_size(*self); \
     if (cap >= len) { \
@@ -78,15 +138,14 @@ cvector_##tag##_reserve(CVector_##tag* self, size_t cap) { \
     } \
 } \
  \
-static inline void \
+STC_API void \
 cvector_##tag##_clear(CVector_##tag* self) { \
-    CVector_##tag cv = cvector_##tag##_init; \
+    CVector_##tag cv = cvector_init; \
     cvector_##tag##_destroy(self); \
     *self = cv; \
 } \
  \
- \
-static inline void \
+STC_API void \
 cvector_##tag##_pushBack(CVector_##tag* self, Value value) { \
     size_t len = cvector_size(*self); \
     if (len == cvector_capacity(*self)) \
@@ -95,7 +154,7 @@ cvector_##tag##_pushBack(CVector_##tag* self, Value value) { \
     ++_cvector_size(*self); \
 } \
  \
-static inline void \
+STC_API void \
 cvector_##tag##_insert(CVector_##tag* self, size_t pos, Value value) { \
     size_t len = cvector_size(*self); \
     if (len == cvector_capacity(*self)) \
@@ -105,7 +164,7 @@ cvector_##tag##_insert(CVector_##tag* self, size_t pos, Value value) { \
     ++_cvector_size(*self); \
 } \
  \
-static inline void \
+STC_API void \
 cvector_##tag##_erase(CVector_##tag* self, size_t pos, size_t size) { \
     size_t len = cvector_size(*self); \
     if (len) { \
@@ -116,20 +175,7 @@ cvector_##tag##_erase(CVector_##tag* self, size_t pos, size_t size) { \
     } \
 } \
  \
-static inline int \
-cvector_##tag##_sortCompare(const void* x, const void* y) { \
-    cvector_##tag##_rawvalue_t rx = valueGetRaw((const Value *) x); \
-    cvector_##tag##_rawvalue_t ry = valueGetRaw((const Value *) y); \
-    return valueCompare(&rx, &ry); \
-} \
- \
-static inline void \
-cvector_##tag##_sort(CVector_##tag* self) { \
-    size_t len = cvector_size(*self); \
-    if (len) qsort(self->data, len, sizeof(Value), cvector_##tag##_sortCompare); \
-} \
- \
-static inline size_t \
+STC_API size_t \
 cvector_##tag##_find(CVector_##tag cv, ValueRaw rawValue) { \
     size_t n = cvector_size(cv); \
     cvector_##tag##_rawvalue_t r; \
@@ -139,38 +185,23 @@ cvector_##tag##_find(CVector_##tag cv, ValueRaw rawValue) { \
     return c_npos; \
 } \
  \
- \
-static inline Value \
-cvector_##tag##_back(CVector_##tag cv) { \
-    return cv.data[_cvector_size(cv) - 1]; \
+extern void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*)); \
+STC_API void \
+cvector_##tag##_sort(CVector_##tag* self) { \
+    size_t len = cvector_size(*self); \
+    if (len) qsort(self->data, len, sizeof(Value), cvector_##tag##_sortCompare); \
 } \
  \
-static inline void \
-cvector_##tag##_popBack(CVector_##tag* self) { \
-    valueDestroy(&self->data[_cvector_size(*self) - 1]); \
-    --_cvector_size(*self); \
-} \
- \
- \
-typedef struct cvector_##tag##_iter_t { \
-    Value *item, *end; \
-} cvector_##tag##_iter_t; \
- \
-static inline cvector_##tag##_iter_t \
+STC_API cvector_##tag##_iter_t \
 cvector_##tag##_begin(CVector_##tag* vec) { \
     cvector_##tag##_iter_t it; \
     it.item = vec->data, it.end = it.item + cvector_size(*vec); \
     if (it.item == it.end) it.item = NULL; \
     return it; \
-} \
- \
-static inline cvector_##tag##_iter_t \
-cvector_##tag##_next(cvector_##tag##_iter_t it) { \
-    if (++it.item == it.end) it.item = NULL; \
-    return it; \
-} \
- \
-typedef Value cvector_##tag##_value_t
+}
+#else
+#define implement_CVector_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw)
+#endif
 
 
 #define _cvector_size(cv) ((size_t *)(cv).data)[-2]
@@ -185,5 +216,6 @@ static inline size_t _cvector_safe_size(const void* data) {
 static inline size_t _cvector_safe_capacity(const void* data) {
     return data ? ((const size_t *) data)[-1] : 0;
 }
+
 
 #endif

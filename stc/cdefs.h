@@ -26,6 +26,12 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#if defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
+#define STC_API extern
+#else
+#define STC_API static inline
+#endif
+
 /* Macro overloading feature support: https://rextester.com/ONP80107 */
 #define c_CAT( A, B ) A ## B
 #define c_EXPAND(...) __VA_ARGS__

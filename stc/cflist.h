@@ -74,7 +74,6 @@
     }
  */
 
-
 #define declare_CFList(...)    c_MACRO_OVERLOAD(declare_CFList, __VA_ARGS__)
 
 #define declare_CFList_2(tag, Value) \
@@ -85,7 +84,6 @@
                                declare_CFList_6(tag, Value, valueDestroy, valueCompare, Value, c_defaultGetRaw)
 #define declare_CFList_string(tag) \
                                declare_CFList_6(tag, CString, cstring_destroy, cstring_compareRaw, const char*, cstring_getRaw)                            
-
 
 #define declare_CFListTypes(tag, Value) \
     c_struct (CFListNode_##tag) { \
@@ -101,61 +99,46 @@
         CFListNode_##tag *item, **_last; \
     }
 
-
 #define cflist_init          {NULL}
 #define cflist_front(list)   (list).last->next->value
 #define cflist_back(list)    (list).last->value
 #define cflist_empty(list)   ((list).last == NULL)
+
 
 #define declare_CFList_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw) \
  \
     declare_CFListTypes(tag, Value); \
     typedef ValueRaw cflist_##tag##_raw_t; \
  \
-    static inline void \
-    cflist_##tag##_pushFront(CFList_##tag* self, Value value) { \
-        _cflist_insertAfter(tag, self->last, value); \
-         if (!self->last) self->last = entry; \
-    } \
-    static inline void \
-    cflist_##tag##_pushBack(CFList_##tag* self, Value value) { \
-        _cflist_insertAfter(tag, self->last, value); \
-        self->last = entry; \
-    } \
-    static inline void \
-    cflist_##tag##_insertAfter(CFList_##tag* self, cflist_##tag##_iter_t pos, Value value) { \
-        _cflist_insertAfter(tag, pos.item, value); \
-        if (!self->last || pos.item == self->last) self->last = entry; \
-    } \
+    STC_API void \
+    cflist_##tag##_destroy(CFList_##tag* self); \
  \
-    static inline void \
-    cflist_##tag##_eraseAfter(CFList_##tag* self, cflist_##tag##_iter_t pos) { \
-        _cflist_eraseAfter(tag, pos.item, valueDestroy); \
-    } \
+    STC_API void \
+    cflist_##tag##_pushFront(CFList_##tag* self, Value value); \
  \
-    static inline void \
-    cflist_##tag##_popFront(CFList_##tag* self) { \
-        _cflist_eraseAfter(tag, self->last, valueDestroy); \
-    } \
+    STC_API void \
+    cflist_##tag##_popFront(CFList_##tag* self); \
  \
-    static inline void \
-    cflist_##tag##_destroy(CFList_##tag* self) { \
-        while (self->last) \
-            cflist_##tag##_popFront(self); \
-    } \
+    STC_API void \
+    cflist_##tag##_pushBack(CFList_##tag* self, Value value); \
  \
-    static inline int \
-    cflist_##tag##_sortCmp(const void* x, const void* y) { \
-        ValueRaw a = valueGetRaw(&((CFListNode_##tag *) x)->value); \
-        ValueRaw b = valueGetRaw(&((CFListNode_##tag *) y)->value); \
-        return valueCompare(&a, &b); \
-    } \
-     \
-    static inline void \
-    cflist_##tag##_sort(CFList_##tag* self) { \
-        CFListNode__base* last = cflist_mergesort((CFListNode__base *) self->last, cflist_##tag##_sortCmp); \
-        self->last = (CFListNode_##tag *) last; \
-    } \
+    STC_API void \
+    cflist_##tag##_insertAfter(CFList_##tag* self, cflist_##tag##_iter_t pos, Value value); \
+ \
+    STC_API void \
+    cflist_##tag##_eraseAfter(CFList_##tag* self, cflist_##tag##_iter_t pos); \
+ \
+    STC_API void \
+    cflist_##tag##_spliceFront(CFList_##tag* self, CFList_##tag* other); \
+ \
+    STC_API void \
+    cflist_##tag##_spliceAfter(CFList_##tag* self, cflist_##tag##_iter_t pos, CFList_##tag* other); \
+ \
+    STC_API int \
+    cflist_##tag##_remove(CFList_##tag* self, ValueRaw val); \
+ \
+    STC_API void \
+    cflist_##tag##_sort(CFList_##tag* self); \
  \
     static inline cflist_##tag##_iter_t \
     cflist_##tag##_begin(CFList_##tag* lst) { \
@@ -163,14 +146,56 @@
         return (cflist_##tag##_iter_t) {head, &lst->last}; \
     } \
     static inline cflist_##tag##_iter_t \
+    cflist_##tag##_next(cflist_##tag##_iter_t it) { \
+        it.item = it.item == *it._last ? NULL : it.item->next; \
+        return it; \
+    } \
+    static inline cflist_##tag##_iter_t \
     cflist_##tag##_last(CFList_##tag* lst) { \
         return (cflist_##tag##_iter_t) {lst->last, &lst->last}; \
     } \
  \
-    static inline cflist_##tag##_iter_t \
-    cflist_##tag##_next(cflist_##tag##_iter_t it) { \
-        it.item = it.item == *it._last ? NULL : it.item->next; \
-        return it; \
+    implement_CFList_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw) \
+ \
+    typedef Value cflist_##tag##_value_t
+
+    
+/* -------------------------- IMPLEMENTATION ------------------------- */
+
+#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
+#define implement_CFList_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw) \
+ \
+    STC_API void \
+    cflist_##tag##_destroy(CFList_##tag* self) { \
+        while (self->last) \
+            cflist_##tag##_popFront(self); \
+    } \
+ \
+    STC_API void \
+    cflist_##tag##_pushFront(CFList_##tag* self, Value value) { \
+        _cflist_insertAfter(tag, self->last, value); \
+        if (!self->last) self->last = entry; \
+    } \
+    STC_API void \
+    cflist_##tag##_popFront(CFList_##tag* self) { \
+        _cflist_eraseAfter(tag, self->last, valueDestroy); \
+    } \
+ \
+    STC_API void \
+    cflist_##tag##_pushBack(CFList_##tag* self, Value value) { \
+        _cflist_insertAfter(tag, self->last, value); \
+        self->last = entry; \
+    } \
+ \
+    STC_API void \
+    cflist_##tag##_insertAfter(CFList_##tag* self, cflist_##tag##_iter_t pos, Value value) { \
+        _cflist_insertAfter(tag, pos.item, value); \
+        if (!self->last || pos.item == self->last) self->last = entry; \
+    } \
+ \
+    STC_API void \
+    cflist_##tag##_eraseAfter(CFList_##tag* self, cflist_##tag##_iter_t pos) { \
+        _cflist_eraseAfter(tag, pos.item, valueDestroy); \
     } \
  \
     static inline void \
@@ -185,16 +210,16 @@
         } \
         other->last = NULL; \
     } \
-    static inline void \
+    STC_API void \
     cflist_##tag##_spliceFront(CFList_##tag* self, CFList_##tag* other) { \
         _cflist_##tag##_splice(self, cflist_##tag##_last(self), other, false); \
     } \
-    static inline void \
+    STC_API void \
     cflist_##tag##_spliceAfter(CFList_##tag* self, cflist_##tag##_iter_t pos, CFList_##tag* other) { \
         _cflist_##tag##_splice(self, pos, other, true); \
     } \
  \
-    static inline int \
+    STC_API int \
     cflist_##tag##_remove(CFList_##tag* self, ValueRaw val) { \
         cflist_##tag##_iter_t prev = {self->last}; int n = 0; \
         ValueRaw r; \
@@ -208,17 +233,25 @@
         return n; \
     } \
  \
-    typedef Value cflist_##tag##_value_t
-    
+    static inline int \
+    cflist_##tag##_sortCmp(const void* x, const void* y) { \
+        ValueRaw a = valueGetRaw(&((CFListNode_##tag *) x)->value); \
+        ValueRaw b = valueGetRaw(&((CFListNode_##tag *) y)->value); \
+        return valueCompare(&a, &b); \
+    } \
+    STC_API void \
+    cflist_##tag##_sort(CFList_##tag* self) { \
+        CFListNode__base* last = _cflist_mergesort((CFListNode__base *) self->last, cflist_##tag##_sortCmp); \
+        self->last = (CFListNode_##tag *) last; \
+    }
 
 #define _cflist_insertAfter(tag, node, val) \
     CFListNode_##tag *entry = c_new_1(CFListNode_##tag), \
                        *next = self->last ? node->next : entry; \
     entry->value = val; \
     entry->next = next; \
-    if (node) node->next = entry \
+    if (node) node->next = entry
     /* +: set self->last based on node */
-
 
 #define _cflist_eraseAfter(tag, node, valueDestroy) \
     CFListNode_##tag* del = node->next, *next = del->next; \
@@ -228,15 +261,13 @@
     valueDestroy(&del->value); \
     free(del)
 
-
 declare_CFListTypes(_base, int);
 
-/* 
- * Singly linked list Mergesort implementation by Simon Tatham. O(n*log(n)).
+/* Singly linked list Mergesort implementation by Simon Tatham. O(n*log(n)).
  * https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
  */
-static CFListNode__base *
-cflist_mergesort(CFListNode__base *list, int (*cmp)(const void*, const void*)) {
+static inline CFListNode__base *
+_cflist_mergesort(CFListNode__base *list, int (*cmp)(const void*, const void*)) {
     CFListNode__base *p, *q, *e, *tail, *oldhead;
     int insize = 1, nmerges, psize, qsize, i;
     if (!list) return NULL;
@@ -288,5 +319,9 @@ cflist_mergesort(CFListNode__base *list, int (*cmp)(const void*, const void*)) {
         insize *= 2;
     }
 }
+
+#else
+#define implement_CFList_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw)
+#endif
 
 #endif

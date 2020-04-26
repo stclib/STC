@@ -20,7 +20,7 @@ const size_t seed = 123; // time(NULL);
 const double maxLoadFactor = 0.77;
 #define RAND() rand() * rand()
 
-#define CMAP_SETUP(tag, Key, Value) CMap_##tag map = cmap_##tag##_init; \
+#define CMAP_SETUP(tag, Key, Value) CMap_##tag map = cmap_init; \
                                     cmap_##tag##_setMaxLoadFactor(&map, maxLoadFactor)
 #define CMAP_PUT(tag, __key, __value)   cmap_##tag##_put(&map, __key, __value)->value
 #define CMAP_DEL(tag, key)          cmap_##tag##_erase(&map, key)
