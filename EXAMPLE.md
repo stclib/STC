@@ -78,7 +78,7 @@ Note we use struct PersonView to put keys in the map, but is stored as struct Pe
 ````
 int main()
 {
-  CMap_ex m6 = cmap_ex_init;
+  CMap_ex m6 = cmap_init;
   cmap_ex_put(&m6, (struct PersonView){"John", "Doe", 24}, cstring_make("dead"));
   cmap_ex_put(&m6, (struct PersonView){"Jane", "Doe", 21}, cstring_make("another"));
   cmap_ex_put(&m6, (struct PersonView){"John", "Travolta", 66}, cstring_make("actor"));

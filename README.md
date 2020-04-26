@@ -40,7 +40,7 @@ Simple CVector of 64bit ints:
 declare_CVector(ix, int64_t); // ix is just an example tag name, use anything without underscore.
 
 int main() {
-    CVector_ix bignums = cvector_init; // or use cvector_ix_init; if initializing after declaration.
+    CVector_ix bignums = cvector_init; // = (CVector_ix) cvector_init; if initializing after declaration.
     cvector_ix_reserve(&bignums, 100);
     for (size_t i = 0; i<100; ++i)
         cvector_ix_pushBack(&bignums, i * i * i);
