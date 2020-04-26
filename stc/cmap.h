@@ -103,11 +103,6 @@ cmap_##tag##_destroy(CMap_##tag* self); \
 STC_API void \
 cmap_##tag##_clear(CMap_##tag* self); \
  \
-static inline void \
-cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
-    c_swap(CMap_##tag, *a, *b); \
-} \
- \
 STC_API void \
 cmap_##tag##_setMaxLoadFactor(CMap_##tag* self, double fac); \
  \
@@ -176,7 +171,7 @@ cmap_##tag##_setShrinkLimitFactor(CMap_##tag* self, double limit) { \
         cmap_##tag##_reserve(self, (size_t) (cmap_size(*self) * 1.2 / limit)); \
 } \
  \
-STC_API size_t \
+static inline size_t \
 cmap_##tag##_bucket(CMap_##tag* self, cmap_##tag##_rawkey_t* const rawKeyPtr, uint32_t* hxPtr) { \
     uint32_t hash = keyHashRaw(rawKeyPtr, sizeof(cmap_##tag##_rawkey_t)), hx = (hash & cmapentry_HASH) | cmapentry_USED; \
     size_t cap = cvector_capacity(self->_table); \
@@ -198,7 +193,7 @@ cmap_##tag##_get(CMap_##tag map, cmap_##tag##_rawkey_t rawKey) { \
     return map._table.data[idx].hashx ? &map._table.data[idx] : NULL; \
 } \
  \
-STC_API void \
+static inline void \
 cmap_##tag##_expand(CMap_##tag* self) { \
     size_t cap = cvector_capacity(self->_table); \
     if (cmap_size(*self) + 1 >= cap * self->maxLoadPercent * 0.01) \
@@ -238,6 +233,11 @@ cmap_##tag##_insert(CMap_##tag* self, CMapEntry_##tag entry) { \
     } \
     e->value = entry.value; \
     return e; \
+} \
+ \
+static inline void \
+cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
+    c_swap(CMap_##tag, *a, *b); \
 } \
  \
 STC_API size_t \

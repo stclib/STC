@@ -143,16 +143,15 @@
     static inline cflist_##tag##_iter_t \
     cflist_##tag##_begin(CFList_##tag* lst) { \
         CFListNode_##tag *head = lst->last ? lst->last->next : NULL; \
-        return (cflist_##tag##_iter_t) {head, &lst->last}; \
+        cflist_##tag##_iter_t it = {head, &lst->last}; return it; \
     } \
     static inline cflist_##tag##_iter_t \
     cflist_##tag##_next(cflist_##tag##_iter_t it) { \
-        it.item = it.item == *it._last ? NULL : it.item->next; \
-        return it; \
+        it.item = it.item == *it._last ? NULL : it.item->next; return it; \
     } \
     static inline cflist_##tag##_iter_t \
     cflist_##tag##_last(CFList_##tag* lst) { \
-        return (cflist_##tag##_iter_t) {lst->last, &lst->last}; \
+        cflist_##tag##_iter_t it = {lst->last, &lst->last}; return it; \
     } \
  \
     implement_CFList_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw) \

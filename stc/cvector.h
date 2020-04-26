@@ -49,11 +49,6 @@ typedef struct CVector_##tag { \
     Value* data; \
 } CVector_##tag; \
  \
-static inline void \
-cvector_##tag##_swap(CVector_##tag* a, CVector_##tag* b) { \
-    c_swap(Value*, a->data, b->data); \
-} \
- \
 STC_API void \
 cvector_##tag##_destroy(CVector_##tag* self); \
  \
@@ -83,18 +78,16 @@ cvector_##tag##_insert(CVector_##tag* self, size_t pos, Value value); \
 STC_API void \
 cvector_##tag##_erase(CVector_##tag* self, size_t pos, size_t size); \
  \
-static inline int \
-cvector_##tag##_sortCompare(const void* x, const void* y) { \
-    ValueRaw rx = valueGetRaw((const Value *) x); \
-    ValueRaw ry = valueGetRaw((const Value *) y); \
-    return valueCompare(&rx, &ry); \
-} \
- \
 STC_API void \
 cvector_##tag##_sort(CVector_##tag* self); \
  \
 STC_API size_t \
 cvector_##tag##_find(CVector_##tag cv, ValueRaw rawValue); \
+ \
+static inline void \
+cvector_##tag##_swap(CVector_##tag* a, CVector_##tag* b) { \
+    c_swap(Value*, a->data, b->data); \
+} \
  \
  \
 typedef struct cvector_##tag##_iter_t { \
@@ -185,6 +178,12 @@ cvector_##tag##_find(CVector_##tag cv, ValueRaw rawValue) { \
     return c_npos; \
 } \
  \
+STC_API int \
+cvector_##tag##_sortCompare(const void* x, const void* y) { \
+    ValueRaw rx = valueGetRaw((const Value *) x); \
+    ValueRaw ry = valueGetRaw((const Value *) y); \
+    return valueCompare(&rx, &ry); \
+} \
 extern void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*)); \
 STC_API void \
 cvector_##tag##_sort(CVector_##tag* self) { \
