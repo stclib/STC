@@ -10,6 +10,8 @@ The difficulty with the hash function is that if your key type consists of sever
 
 Assuming a key-type like this, and want string as value, we define the functions person_make(), person_destroy() and person_compare():
 ```
+#include <stdio.h>
+#include <stc/cmap.h>
 #include <stc/cstring.h>
 
 struct Person
@@ -28,8 +30,6 @@ void person_destroy(struct Person* p) {
   cstring_destroy(&p->name);
   cstring_destroy(&p->surname);
 }
-
-
 ```
 In order to use it as a CMap key, provide a "view" of your class, that owns no resources (e.g. CStrings):
 ```
@@ -47,7 +47,7 @@ struct Person person_fromView(struct PersonView pv) {
 }
 int personview_compare(const struct PersonView* x, const struct PersonView* y) {
   int c;
-  c = strcmp(x->name, y->name);   if (c != 0) return c;
+  c = strcmp(x->name, y->name);       if (c != 0) return c;
   c = strcmp(x->surname, y->surname); if (c != 0) return c;
   return memcmp(&x->age, &y->age, sizeof(x->age));
 }
@@ -65,11 +65,9 @@ size_t personview_hash(const struct PersonView* pv, size_t ignore) {
   return res;
 }
 ```
-With this in place, we can declare a CMap with Person => CString:
+With this in place, we can declare the map Person => int:
 ```
-#include <stdio.h>
-#include "stc/CMap.h"
-declare_CMap(ex, struct Person, CString, cstring_destroy, 
+declare_CMap(ex, struct Person, int, c_noDestroy,
                  personview_hash, personview_compare, person_destroy,
                  struct PersonView, person_getView, person_fromView);
 
@@ -79,14 +77,14 @@ Note we use struct PersonView to put keys in the map, but is stored as struct Pe
 int main()
 {
   CMap_ex m6 = cmap_init;
-  cmap_ex_put(&m6, (struct PersonView){"John", "Doe", 24}, cstring_make("dead"));
-  cmap_ex_put(&m6, (struct PersonView){"Jane", "Doe", 21}, cstring_make("another"));
-  cmap_ex_put(&m6, (struct PersonView){"John", "Travolta", 66}, cstring_make("actor"));
+  cmap_ex_put(&m6, (struct PersonView){"John", "Doe", 24}, 1001);
+  cmap_ex_put(&m6, (struct PersonView){"Jane", "Doe", 21}, 1002);
+  cmap_ex_put(&m6, (struct PersonView){"John", "Travolta", 66}, 1003);
 
   c_foreach (it, cmap_ex, m6) {
       if (cstring_equals(it.item->key.name, "John"))
-          printf("%s %s %d -> %s\n", it.item->key.name.str, it.item->key.surname.str, it.item->key.age,
-                                     it.item->value.str);
+          printf("%s %s %d -> %d\n", it.item->key.name.str, it.item->key.surname.str, it.item->key.age,
+                                     it.item->value);
   }
 
   cmap_ex_destroy(&m6);
