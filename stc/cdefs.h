@@ -52,12 +52,12 @@
 #define                 c_max_alloca   (1000)
 #define                 c_swap(T, x, y) { T __t = x; x = y; y = __t; }
 
-#define                 c_defaultInitRaw(x) (x)
-#define                 c_defaultGetRaw(ptr) (*(ptr))
-#define                 c_noCompare(x, y) 0
+#define                 c_defaultInitRaw(x)    (x)
+#define                 c_defaultGetRaw(ptr)   (*(ptr))
+#define                 c_noCompare(x, y)      (0)
 #define                 c_defaultCompare(x, y) (*(x) == *(y) ? 0 : *(x) < *(y) ? -1 : 1)
 #define                 c_defaultEquals(x, y)  (memcmp(x, y, sizeof(*(y))) == 0)
-#define                 c_defaultDestroy(p)    ((void)0)
+#define                 c_noDestroy(p)         ((void)0)
 
 #define                 c_foreach(it, prefix, container) \
                             for (prefix##_iter_t it = prefix##_begin(&container); it.item; it = prefix##_next(it))

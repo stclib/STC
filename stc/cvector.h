@@ -34,7 +34,7 @@
 
 #define declare_CVector(...)   c_MACRO_OVERLOAD(declare_CVector, __VA_ARGS__)
 #define declare_CVector_2(tag, Value) \
-                                declare_CVector_3(tag, Value, c_defaultDestroy)
+                                declare_CVector_3(tag, Value, c_noDestroy)
 #define declare_CVector_3(tag, Value, valueDestroy) \
                                 declare_CVector_4(tag, Value, valueDestroy, c_defaultCompare)
 #define declare_CVector_4(tag, Value, valueDestroy, valueCompare) \

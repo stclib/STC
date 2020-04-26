@@ -12,7 +12,7 @@
 
 // Visual Studio: compile with -TP to force C++
 
-declare_CMap(ii, int64_t, int64_t, c_defaultDestroy, c_lowbias32Hash);
+declare_CMap(ii, int64_t, int64_t, c_noDestroy, c_lowbias32Hash);
 declare_CVector_string(s);
 declare_CMap(ix, short, short); // test: bucket size = 6 bytes only!
 

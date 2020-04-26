@@ -36,13 +36,13 @@ enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
     c_MACRO_OVERLOAD(declare_CMap, __VA_ARGS__)
 
 #define declare_CMap_3(tag, Key, Value) \
-    declare_CMap_4(tag, Key, Value, c_defaultDestroy)
+    declare_CMap_4(tag, Key, Value, c_noDestroy)
 
 #define declare_CMap_4(tag, Key, Value, valueDestroy) \
     declare_CMap_5(tag, Key, Value, valueDestroy, c_defaultHash)
 
 #define declare_CMap_5(tag, Key, Value, valueDestroy, keyHash) \
-    declare_CMap_7(tag, Key, Value, valueDestroy, keyHash, c_defaultEquals, c_defaultDestroy)
+    declare_CMap_7(tag, Key, Value, valueDestroy, keyHash, c_defaultEquals, c_noDestroy)
     
 #define declare_CMap_7(tag, Key, Value, valueDestroy, keyHash, keyEquals, keyDestroy) \
     declare_CMap_10(tag, Key, Value, valueDestroy, keyHash, keyEquals, keyDestroy, \
@@ -54,7 +54,7 @@ enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
     c_MACRO_OVERLOAD(declare_CMap_stringkey, __VA_ARGS__)
 
 #define declare_CMap_stringkey_2(tag, Value) \
-    declare_CMap_stringkey_3(tag, Value, c_defaultDestroy)
+    declare_CMap_stringkey_3(tag, Value, c_noDestroy)
 
 #define declare_CMap_stringkey_3(tag, Value, valueDestroy) \
     declare_CMap_10(tag, CString, Value, valueDestroy, cstring_hashRaw, cstring_equalsRaw, cstring_destroy, \
@@ -145,7 +145,7 @@ typedef Value cmap_##tag##_value_t
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define implement_CMap_10(tag, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, keyDestroy, \
-                             RawKey, keyGetRaw, keyInitRaw) \
+                               RawKey, keyGetRaw, keyInitRaw) \
  \
 STC_API void \
 cmap_##tag##_destroy(CMap_##tag* self) { \

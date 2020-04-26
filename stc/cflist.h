@@ -77,7 +77,7 @@
 #define declare_CFList(...)    c_MACRO_OVERLOAD(declare_CFList, __VA_ARGS__)
 
 #define declare_CFList_2(tag, Value) \
-                               declare_CFList_3(tag, Value, c_defaultDestroy)
+                               declare_CFList_3(tag, Value, c_noDestroy)
 #define declare_CFList_3(tag, Value, valueDestroy) \
                                declare_CFList_4(tag, Value, valueDestroy, c_defaultCompare)
 #define declare_CFList_4(tag, Value, valueDestroy, valueCompare) \
