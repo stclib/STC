@@ -81,9 +81,9 @@
 #define declare_CFList_3(tag, Value, valueDestroy) \
                                declare_CFList_4(tag, Value, valueDestroy, c_defaultCompare)
 #define declare_CFList_4(tag, Value, valueDestroy, valueCompare) \
-                               declare_CFList_6(tag, Value, valueDestroy, valueCompare, Value, c_defaultGetRaw)
+                               declare_CFList_6(tag, Value, valueDestroy, Value, valueCompare, c_defaultGetRaw)
 #define declare_CFList_string(tag) \
-                               declare_CFList_6(tag, CString, cstring_destroy, cstring_compareRaw, const char*, cstring_getRaw)                            
+                               declare_CFList_6(tag, CString, cstring_destroy, const char*, cstring_compareRaw, cstring_getRaw)                            
 
 #define declare_CFListTypes(tag, Value) \
     c_struct (CFListNode_##tag) { \
@@ -105,7 +105,7 @@
 #define cflist_empty(list)   ((list).last == NULL)
 
 
-#define declare_CFList_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw) \
+#define declare_CFList_6(tag, Value, valueDestroy, ValueRaw, valueCompareRaw, valueGetRaw) \
  \
     declare_CFListTypes(tag, Value); \
     typedef ValueRaw cflist_##tag##_raw_t; \
@@ -154,7 +154,7 @@
         cflist_##tag##_iter_t it = {lst->last, &lst->last}; return it; \
     } \
  \
-    implement_CFList_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw) \
+    implement_CFList_6(tag, Value, valueDestroy, ValueRaw, valueCompareRaw, valueGetRaw) \
  \
     typedef Value cflist_##tag##_value_t
 
@@ -162,7 +162,7 @@
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define implement_CFList_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw) \
+#define implement_CFList_6(tag, Value, valueDestroy, ValueRaw, valueCompareRaw, valueGetRaw) \
  \
     STC_API void \
     cflist_##tag##_destroy(CFList_##tag* self) { \
@@ -223,7 +223,7 @@
         cflist_##tag##_iter_t prev = {self->last}; int n = 0; \
         ValueRaw r; \
         c_foreach (i, cflist_##tag, *self) { \
-            if (valueCompare((r = valueGetRaw(&i.item->value), &r), &val) == 0) { \
+            if (valueCompareRaw((r = valueGetRaw(&i.item->value), &r), &val) == 0) { \
                 cflist_##tag##_eraseAfter(self, prev), ++n; \
                 if (prev.item == i.item) break; \
             } \
@@ -236,7 +236,7 @@
     cflist_##tag##_sortCmp(const void* x, const void* y) { \
         ValueRaw a = valueGetRaw(&((CFListNode_##tag *) x)->value); \
         ValueRaw b = valueGetRaw(&((CFListNode_##tag *) y)->value); \
-        return valueCompare(&a, &b); \
+        return valueCompareRaw(&a, &b); \
     } \
     STC_API void \
     cflist_##tag##_sort(CFList_##tag* self) { \
@@ -320,7 +320,7 @@ _cflist_mergesort(CFListNode__base *list, int (*cmp)(const void*, const void*)) 
 }
 
 #else
-#define implement_CFList_6(tag, Value, valueDestroy, valueCompare, ValueRaw, valueGetRaw)
+#define implement_CFList_6(tag, Value, valueDestroy, ValueRaw, valueCompareRaw, valueGetRaw)
 #endif
 
 #endif

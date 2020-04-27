@@ -42,11 +42,11 @@ enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
     declare_CMap_5(tag, Key, Value, valueDestroy, c_defaultHash)
 
 #define declare_CMap_5(tag, Key, Value, valueDestroy, keyHash) \
-    declare_CMap_7(tag, Key, Value, valueDestroy, keyHash, c_defaultEquals, c_noDestroy)
+    declare_CMap_6(tag, Key, Value, valueDestroy, keyHash, c_defaultEquals)
     
-#define declare_CMap_7(tag, Key, Value, valueDestroy, keyHash, keyEquals, keyDestroy) \
-    declare_CMap_10(tag, Key, Value, valueDestroy, keyHash, keyEquals, keyDestroy, \
-                         Key, c_defaultGetRaw, c_defaultInitRaw)
+#define declare_CMap_6(tag, Key, Value, valueDestroy, keyHash, keyEquals) \
+    declare_CMap_10(tag, Key, Value, valueDestroy, c_noDestroy, Key, \
+                         keyHash, keyEquals, c_defaultGetRaw, c_defaultInitRaw)
 
 
 /* CMap<CString, Value>: */
@@ -57,13 +57,13 @@ enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
     declare_CMap_stringkey_3(tag, Value, c_noDestroy)
 
 #define declare_CMap_stringkey_3(tag, Value, valueDestroy) \
-    declare_CMap_10(tag, CString, Value, valueDestroy, cstring_hashRaw, cstring_equalsRaw, cstring_destroy, \
-                         const char*, cstring_getRaw, cstring_make)
+    declare_CMap_10(tag, CString, Value, valueDestroy, cstring_destroy, const char*, \
+                         cstring_hashRaw, cstring_equalsRaw, cstring_getRaw, cstring_make)
 
 
 /* CMap full: */
-#define declare_CMap_10(tag, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, keyDestroy, \
-                             RawKey, keyGetRaw, keyInitRaw) \
+#define declare_CMap_10(tag, Key, Value, valueDestroy, keyDestroy, RawKey, \
+                             keyHashRaw, keyEqualsRaw, keyGetRaw, keyInitRaw) \
 \
   struct CMapEntry_##tag { \
       Key key; \
@@ -130,8 +130,8 @@ cmap_##tag##_begin(CMap_##tag* map); \
 STC_API cmap_##tag##_iter_t \
 cmap_##tag##_next(cmap_##tag##_iter_t it); \
  \
-implement_CMap_10(tag, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, keyDestroy, \
-                       RawKey, keyGetRaw, keyInitRaw) \
+implement_CMap_10(tag, Key, Value, valueDestroy, keyDestroy, RawKey, \
+                       keyHashRaw, keyEqualsRaw, keyGetRaw, keyInitRaw) \
  \
 typedef Key cmap_##tag##_key_t; \
 typedef Value cmap_##tag##_value_t
@@ -139,8 +139,8 @@ typedef Value cmap_##tag##_value_t
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define implement_CMap_10(tag, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, keyDestroy, \
-                               RawKey, keyGetRaw, keyInitRaw) \
+#define implement_CMap_10(tag, Key, Value, valueDestroy, keyDestroy, RawKey, \
+                               keyHashRaw, keyEqualsRaw, keyGetRaw, keyInitRaw) \
  \
 STC_API void \
 cmap_##tag##_destroy(CMap_##tag* self) { \
@@ -299,15 +299,15 @@ cmap_##tag##_next(cmap_##tag##_iter_t it) { \
     if (it.item == it._end) it.item = NULL; \
     return it; \
 }
-#else
-#define implement_CMap_10(tag, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, keyDestroy, \
-                             RawKey, keyGetRaw, keyInitRaw)
-#endif
-
 
 /* https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction */
 static inline uint32_t cmap_reduce(uint32_t x, uint32_t N) {
     return ((uint64_t) x * (uint64_t) N) >> 32 ;
 }
+
+#else
+#define implement_CMap_10(tag, Key, Value, valueDestroy, keyDestroy, RawKey, \
+                               keyHashRaw, keyEqualsRaw, keyGetRaw, keyInitRaw)
+#endif
 
 #endif
