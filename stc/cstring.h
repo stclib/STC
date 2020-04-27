@@ -37,9 +37,10 @@ typedef struct CString {
 
 static size_t _cstring_null_rep[] = {0, 0, 0};
 #define       _cstring_rep(cs)      (((size_t *) (cs).str) - 2)
+#define       _cstring_size(cs)     ((size_t *) (cs).str)[-2]
 
-#define cstring_size(cs)      ((size_t) _cstring_rep(cs)[0])
-#define cstring_capacity(cs)  ((size_t) _cstring_rep(cs)[1])
+#define cstring_size(cs)      ((const size_t *) (cs).str)[-2]
+#define cstring_capacity(cs)  ((const size_t *) (cs).str)[-1]
 #define cstring_npos          c_npos
 
 
@@ -61,7 +62,7 @@ cstring_resize(CString* self, size_t len, char fill) {
     size_t n = cstring_size(*self);
     cstring_reserve(self, len);
     if (len > n) memset(self->str + n, fill, len - n);
-    self->str[ _cstring_rep(*self)[0] = len ] = '\0';
+    self->str[ _cstring_size(*self) = len ] = '\0';
 }
 
 static inline void
@@ -84,7 +85,7 @@ cstring_makeN(const char* str, size_t len) {
     if (len) {
         cstring_reserve(&cs, len);
         memcpy(cs.str, str, len);
-        cs.str[ _cstring_rep(cs)[0] = len ] = '\0';
+        cs.str[ _cstring_size(cs) = len ] = '\0';
     }
     return cs;
 }
@@ -118,7 +119,7 @@ cstring_assignN(CString* self, const char* str, size_t len) {
     if (len) {
         cstring_reserve(self, len);
         memmove(self->str, str, len);
-        self->str[_cstring_rep(*self)[0] = len] = '\0';
+        self->str[_cstring_size(*self) = len] = '\0';
     }
     return self;
 }
@@ -141,7 +142,7 @@ cstring_appendN(CString* self, const char* str, size_t len) {
         if (newlen > cstring_capacity(*self))
             cstring_reserve(self, newlen * 5 / 3);
         memmove(&self->str[oldlen], str, len);
-        self->str[_cstring_rep(*self)[0] = newlen] = '\0';
+        self->str[_cstring_size(*self) = newlen] = '\0';
     }
     return self;
 }
@@ -163,7 +164,7 @@ static inline void _cstring_internalMove(CString* self, size_t pos1, size_t pos2
     if (newlen > cstring_capacity(*self))
         cstring_reserve(self, newlen * 5 / 3);
     memmove(&self->str[pos2], &self->str[pos1], len - pos1);
-    self->str[_cstring_rep(*self)[0] = newlen] = '\0';
+    self->str[_cstring_size(*self) = newlen] = '\0';
 }
 
 static inline void
@@ -184,7 +185,7 @@ cstring_erase(CString* self, size_t pos, size_t n) {
     size_t len = cstring_size(*self);
     if (len) {
         memmove(&self->str[pos], &self->str[pos + n], len - (pos + n));
-        self->str[_cstring_rep(*self)[0] -= n] = '\0';
+        self->str[_cstring_size(*self) -= n] = '\0';
     }
 }
 
@@ -220,7 +221,7 @@ cstring_push(CString* self, char value) {
 
 static inline void
 cstring_pop(CString* self) {
-    --_cstring_rep(*self)[0];
+    --_cstring_size(*self);
 }
 
 /* readonly */
