@@ -49,12 +49,12 @@ int main()
 }
 */
 
-#define carray_xdim(a) ((a).xdim)
-#define carray_ydim(a) ({const uint32_t* d__ = &(a)._yxdim; d__[0] / d__[-1];})
-#define carray_zdim(a) ((a)._zdim)
+#define carray_xdim(a)  ((a).xdim)
+#define carray_ydim(a)  ((a)._yxdim / (a).xdim)
+#define carray_zdim(a)  ((a)._zdim)
 #define carray1_size(a) ((a).xdim)
 #define carray2_size(a) ((a)._yxdim)
-#define carray3_size(a) ({const uint32_t* d__ = &(a)._zdim; d__[0] * d__[-1];})
+#define carray3_size(a) ((a)._zdim * (a)._yxdim)
 #define carray_destroy(a) free((a)._array)
 
 #define declare_CArray(tag, T) \
