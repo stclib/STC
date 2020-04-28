@@ -28,6 +28,8 @@
 #define cmap_init          {cvector_init, 0, 90, 0}
 #define cmap_size(map)     ((size_t) (map)._size)
 #define cmap_bucketCount(map)  cvector_capacity((map)._table)
+/* https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction */
+#define cmap_reduce(x, N)  ((uint32_t) (((uint64_t) (x) * (N)) >> 32))
 
 enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
 
@@ -172,7 +174,7 @@ cmap_##tag##_setShrinkLimitFactor(CMap_##tag* self, double limit) { \
 } \
  \
 static inline size_t \
-cmap_##tag##_bucket(CMap_##tag* self, cmap_##tag##_rawkey_t* const rawKeyPtr, uint32_t* hxPtr) { \
+cmap_##tag##_bucket(CMap_##tag* self, const cmap_##tag##_rawkey_t* rawKeyPtr, uint32_t* hxPtr) { \
     uint32_t hash = keyHashRaw(rawKeyPtr, sizeof(cmap_##tag##_rawkey_t)), hx = (hash & cmapentry_HASH) | cmapentry_USED; \
     size_t cap = cvector_capacity(self->_table); \
     size_t idx = cmap_reduce(hash, cap); \
@@ -298,11 +300,6 @@ cmap_##tag##_next(cmap_##tag##_iter_t it) { \
     do { ++it.item; } while (it.item != it._end && !it.item->hashx); \
     if (it.item == it._end) it.item = NULL; \
     return it; \
-}
-
-/* https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction */
-static inline uint32_t cmap_reduce(uint32_t x, uint32_t N) {
-    return ((uint64_t) x * (uint64_t) N) >> 32 ;
 }
 
 #else

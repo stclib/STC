@@ -64,7 +64,7 @@
 
 /* One-byte-at-a-time hash based on Murmur's mix */
 static inline uint32_t  c_defaultHash(const void *data, size_t len) {
-    const uint8_t *key = (const uint8_t *) data;
+    const volatile uint8_t *key = (const uint8_t *) data;
     uint32_t x = UINT32_C(0xc613fc15);
     while (len--) {
         x ^= *key++;
@@ -76,7 +76,8 @@ static inline uint32_t  c_defaultHash(const void *data, size_t len) {
 
 /* https://nullprogram.com/blog/2018/07/31/: assume len positive multiple of 4 */
 static inline uint32_t c_lowbias32Hash(const void *data, size_t len) {
-    const uint32_t *key = (const uint32_t *) data; uint32_t x = *key;
+    const volatile uint32_t *key = (const uint32_t *) data;
+    uint32_t x = *key;
     do {
         x ^= *key++ >> 16;
         x *= UINT32_C(0x7feb352d);
