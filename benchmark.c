@@ -10,15 +10,15 @@
 #include "others/robin_hood.hpp"
 #endif
 
-// Visual Studio: compile with -TP to force C++
+// Visual Studio: compile with -TP to force C++:  cl -TP -EHsc -O2 benchmark.c
 
 declare_CMap(ii, int64_t, int64_t, c_noDestroy, c_lowbias32Hash);
 declare_CVector_string(s);
-declare_CMap(ix, short, short); // test: bucket size = 6 bytes only!
+declare_CMap(ix, short, short); // sizeof(CMapBucket_ix) = 6 bytes only!
 
 const size_t seed = 123; // time(NULL);
 const double maxLoadFactor = 0.77;
-#define RAND() rand() * rand()
+#define RAND(N) ((rand() << ((N) - 15)) ^ rand()) // N=16-30
 
 #define CMAP_SETUP(tag, Key, Value) CMap_##tag map = cmap_init; \
                                     cmap_##tag##_setMaxLoadFactor(&map, maxLoadFactor)
@@ -61,8 +61,9 @@ const double maxLoadFactor = 0.77;
 #define RMAP_BUCKETS(tag)           map.bucket_count()
 #define RMAP_CLEAR(tag)             map.clear()
 
-const size_t N1 = 7000000; \
-const size_t N2 = 10000000; \
+const size_t N1 = 7000000;
+const size_t N2 = 10000000;
+#define      RR   24
 
 #define MAP_TEST1(M, tag) \
 { \
@@ -71,8 +72,8 @@ const size_t N2 = 10000000; \
     srand(seed); \
     clock_t difference, before = clock(); \
     for (size_t i = 0; i < N1; ++i) { \
-        checksum += ++M##_PUT(tag, RAND(), i); \
-        erased += M##_DEL(tag, RAND()); \
+        checksum += ++M##_PUT(tag, RAND(RR), i); \
+        erased += M##_DEL(tag, RAND(RR)); \
     } \
     difference = clock() - before; \
     printf(#M "(" #tag "): sz: %llu, bucks: %llu, time: %.02f, sum: %llu, erase: %llu\n", M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, checksum, erased); \
@@ -97,7 +98,7 @@ const size_t N2 = 10000000; \
 
 int main()
 {
-    printf("\nmap<uint64_t, uint64_t>: Insert + remove %llu random keys in range 0 - 2^30:\n", N1); \
+    printf("\nmap<uint64_t, uint64_t>: Insert + remove %llu random keys in range 0 - 2^%d:\n", N1, RR); \
     MAP_TEST1(CMAP, ii)
 #ifdef __cplusplus
     MAP_TEST1(UMAP, ii)

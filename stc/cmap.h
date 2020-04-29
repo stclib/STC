@@ -175,12 +175,15 @@ cmap_##tag##_setShrinkLimitFactor(CMap_##tag* self, double limit) { \
  \
 static inline size_t \
 cmap_##tag##_bucket(CMap_##tag* self, const cmap_##tag##_rawkey_t* rawKeyPtr, uint32_t* hxPtr) { \
-    uint32_t hash = keyHashRaw(rawKeyPtr, sizeof(cmap_##tag##_rawkey_t)), hx = (hash & cmapentry_HASH) | cmapentry_USED; \
+    uint32_t hash = keyHashRaw(rawKeyPtr, sizeof(cmap_##tag##_rawkey_t)), sx, hx = (hash & cmapentry_HASH) | cmapentry_USED; \
     size_t cap = cvector_capacity(self->_table); \
     size_t idx = cmap_reduce(hash, cap); \
     CMapEntry_##tag* slot = self->_table.data; \
-    cmap_##tag##_rawkey_t r; \
-    while (slot[idx].hashx && (slot[idx].hashx != hx || !keyEqualsRaw((r = keyGetRaw(&slot[idx].key), &r), rawKeyPtr))) { \
+    while ((sx = slot[idx].hashx)) { \
+        if (sx == hx) { \
+            cmap_##tag##_rawkey_t r = keyGetRaw(&slot[idx].key); \
+            if (keyEqualsRaw(&r, rawKeyPtr)) break; \
+        } \
         if (++idx == cap) idx = 0; \
     } \
     *hxPtr = hx; \
@@ -275,7 +278,7 @@ cmap_##tag##_erase(CMap_##tag* self, cmap_##tag##_rawkey_t rawKey) { \
         return false; \
     cmap_##tag##_rawkey_t r; \
     do { /* deletion from hash table without tombstone */ \
-        if (++j == cap) j = 0; /* j %= cap; is slow */ \
+        if (++j == cap) j = 0; /* ++j %= cap; is slow */ \
         if (! slot[j].hashx) \
             break; \
         k = cmap_reduce(keyHashRaw((r = keyGetRaw(&slot[j].key), &r), \
