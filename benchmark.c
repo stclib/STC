@@ -13,8 +13,7 @@
 // Visual Studio: compile with -TP to force C++:  cl -TP -EHsc -O2 benchmark.c
 
 declare_CMap(ii, int64_t, int64_t, c_noDestroy, c_lowbias32Hash);
-declare_CVector_string(s);
-declare_CMap(ix, short, short); // sizeof(CMapBucket_ix) = 6 bytes only!
+declare_CMap(ix, short, short); // sizeof(CMapEntry_ix) = 6 bytes only!
 
 const size_t seed = 123; // time(NULL);
 const double maxLoadFactor = 0.77;
@@ -64,6 +63,7 @@ const double maxLoadFactor = 0.77;
 const size_t N1 = 7000000;
 const size_t N2 = 10000000;
 #define      RR   24
+int rr = RR;
 
 #define MAP_TEST1(M, tag) \
 { \
@@ -72,8 +72,8 @@ const size_t N2 = 10000000;
     srand(seed); \
     clock_t difference, before = clock(); \
     for (size_t i = 0; i < N1; ++i) { \
-        checksum += ++M##_PUT(tag, RAND(RR), i); \
-        erased += M##_DEL(tag, RAND(RR)); \
+        checksum += ++M##_PUT(tag, RAND(rr), i); \
+        erased += M##_DEL(tag, RAND(rr)); \
     } \
     difference = clock() - before; \
     printf(#M "(" #tag "): sz: %llu, bucks: %llu, time: %.02f, sum: %llu, erase: %llu\n", M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, checksum, erased); \
@@ -96,9 +96,10 @@ const size_t N2 = 10000000;
 }
 
 
-int main()
+int main(int argc, char* argv[])
 {
-    printf("\nmap<uint64_t, uint64_t>: Insert + remove %llu random keys in range 0 - 2^%d:\n", N1, RR); \
+    rr = argc == 2 ? atoi(argv[1]) : RR;
+    printf("\nmap<uint64_t, uint64_t>: Insert + remove %llu random keys in range 0 - 2^%d:\n", N1, rr);
     MAP_TEST1(CMAP, ii)
 #ifdef __cplusplus
     MAP_TEST1(UMAP, ii)
@@ -107,7 +108,7 @@ int main()
     MAP_TEST1(RMAP, ii)
 #endif
 
-    printf("\nmap<uint64_t, uint64_t>: Insert %llu keys, THEN remove them in same order:\n", N2); \
+    printf("\nmap<uint64_t, uint64_t>: Insert %llu keys, THEN remove them in same order:\n", N2);
     MAP_TEST2(CMAP, ii)
 #ifdef __cplusplus
     MAP_TEST2(UMAP, ii)
@@ -116,11 +117,4 @@ int main()
     MAP_TEST2(RMAP, ii)
 #endif
 
-    CMap_ix small = cmap_init;
-    cmap_ix_put(&small, 80, 800);
-    cmap_ix_put(&small, 10, 100);
-    cmap_ix_put(&small, 30, 300);
-    
-    c_foreach (i, cmap_ix, small)
-        printf("%d: %d\n", i.item->key, i.item->value);
 }

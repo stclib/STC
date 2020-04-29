@@ -81,9 +81,9 @@ static inline uint32_t c_lowbias32Hash(const void *data, size_t len) {
     do {
         x ^= *key++ >> 16;
         x *= UINT32_C(0x7feb352d);
-        x ^= x >> 15;
-        x *= UINT32_C(0x846ca68b);
-        x ^= x >> 16;
+        //x ^= x >> 15;
+        //x *= UINT32_C(0x846ca68b);
+        //x ^= x >> 16;
     } while (len -= 4);
     return x;
 }

@@ -184,7 +184,7 @@ cvector_##tag##_sortCompare(const void* x, const void* y) { \
     ValueRaw ry = valueGetRaw((const Value *) y); \
     return valueCompareRaw(&rx, &ry); \
 } \
-extern void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*)); \
+STC_EXTERN_IMPORT void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*)); \
 STC_API void \
 cvector_##tag##_sort(CVector_##tag* self) { \
     size_t len = cvector_size(*self); \
@@ -202,6 +202,11 @@ cvector_##tag##_begin(CVector_##tag* vec) { \
 #define implement_CVector_6(tag, Value, valueDestroy, ValueRaw, valueCompareRaw, valueGetRaw)
 #endif
 
+#if defined(_WIN32) && defined(_DLL)
+#define STC_EXTERN_IMPORT extern __declspec(dllimport)
+#else
+#define STC_EXTERN_IMPORT extern
+#endif
 
 #define _cvector_size(cv) ((size_t *)(cv).data)[-2]
 #define _cvector_capacity(cv) ((size_t *)(cv).data)[-1]
