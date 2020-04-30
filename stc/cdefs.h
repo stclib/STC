@@ -61,9 +61,10 @@
 
 #define                 c_defaultInitRaw(x)    (x)
 #define                 c_defaultGetRaw(ptr)   (*(ptr))
-#define                 c_noCompare(x, y)      (0)
 #define                 c_defaultCompare(x, y) (*(x) == *(y) ? 0 : *(x) < *(y) ? -1 : 1)
-#define                 c_defaultEquals(x, y)  (memcmp(x, y, sizeof(*(y))) == 0)
+#define                 c_noCompare(x, y)      (0)
+#define                 c_defaultEquals(x, y)  (*(x) == *(y))
+#define                 c_memEquals(x, y)      (memcmp(x, y, sizeof(*(y))) == 0)
 #define                 c_noDestroy(p)         ((void)0)
 
 #define                 c_foreach(it, prefix, container) \

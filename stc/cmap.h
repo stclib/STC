@@ -42,6 +42,7 @@ int main(void) {
 #ifndef CMAP__H__
 #define CMAP__H__
 
+#include <malloc.h>
 #include "cdefs.h"
 
 #define cmap_init          {NULL, NULL, 0, 0, 90, 0}
@@ -297,15 +298,15 @@ cmap_##tag##_erase(CMap_##tag* self, cmap_##tag##_rawkey_t rawKey) { \
     size_t i = cmap_##tag##_bucket(self, &rawKey, &hx), j = i, k; \
     CMapEntry_##tag* slot = self->_table; \
     uint8_t* hashx = self->_hashx; \
+    cmap_##tag##_rawkey_t r; \
     if (! hashx[i]) \
         return false; \
-    cmap_##tag##_rawkey_t r; \
     do { /* deletion from hash table without tombstone */ \
         if (++j == cap) j = 0; /* ++j %= cap; is slow */ \
         if (! hashx[j]) \
             break; \
-        k = cmap_reduce(keyHashRaw((r = keyGetRaw(&slot[j].key), &r), \
-                        sizeof(cmap_##tag##_rawkey_t)), cap); \
+        r = keyGetRaw(&slot[j].key); \
+        k = cmap_reduce(keyHashRaw(&r, sizeof(cmap_##tag##_rawkey_t)), cap); \
         if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */ \
             slot[i] = slot[j], hashx[i] = hashx[j], i = j; \
     } while (true); \
