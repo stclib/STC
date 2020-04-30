@@ -20,6 +20,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+/*  An example:
+#include <stdio.h>
+#include "stc/cmap.h"
+declare_CMap(ex, int, char);
+
+int main(void) {
+    CMap_ex h = cmap_init;
+    cmap_ex_put(&h, 5, 'a');
+    cmap_ex_put(&h, 8, 'b');
+    CMapEntry_ex* b = cmap_ex_get(h, 10); // = NULL
+    char val = cmap_ex_get(h, 5)->value;
+    cmap_ex_put(&h, 5, 'd');
+    cmap_ex_erase(&h, 8);
+    c_foreach (i, cmap_ex, h)
+        printf("%d: %c\n", i.item->key, i.item->value);
+    cmap_ex_destroy(&h);
+}
+*/
 #ifndef CMAP__H__
 #define CMAP__H__
 
