@@ -25,9 +25,9 @@
 
 #include "cvector.h"
 
-#define cmap_init          {cvector_init, 0, 90, 0}
+#define cmap_init          {cvector_init, 0, 0, 90, 0}
 #define cmap_size(map)     ((size_t) (map)._size)
-#define cmap_bucketCount(map)  cvector_capacity((map)._table)
+#define cmap_bucketCount(map)  ((size_t) (map)._cap)
 /* https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction */
 #define cmap_reduce(x, N)  ((uint32_t) (((uint64_t) (x) * (N)) >> 32))
 
@@ -90,7 +90,7 @@ enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
  \
 typedef struct CMap_##tag { \
     CVector_map_##tag _table; \
-    size_t _size; \
+    uint32_t _size, _cap; \
     uint8_t maxLoadPercent; \
     uint8_t shrinkLimitPercent; \
 } CMap_##tag; \
@@ -147,7 +147,7 @@ typedef Value cmap_##tag##_value_t
 STC_API void \
 cmap_##tag##_destroy(CMap_##tag* self) { \
     if (cmap_size(*self)) { \
-        size_t cap = _cvector_capacity(self->_table); \
+        size_t cap = cmap_bucketCount(*self); \
         CMapEntry_##tag* e = self->_table.data, *end = e + cap; \
         for (; e != end; ++e) if (e->hashx) cmapentry_##tag##_destroy(e); \
     } \
@@ -155,7 +155,7 @@ cmap_##tag##_destroy(CMap_##tag* self) { \
 } \
  \
 STC_API void cmap_##tag##_clear(CMap_##tag* self) { \
-    memset(self->_table.data, 0, sizeof(CMapEntry_##tag) * _cvector_capacity(self->_table)); \
+    memset(self->_table.data, 0, sizeof(CMapEntry_##tag) * cmap_bucketCount(*self)); \
     self->_size = 0; \
 } \
  \
@@ -176,7 +176,7 @@ cmap_##tag##_setShrinkLimitFactor(CMap_##tag* self, double limit) { \
 static inline size_t \
 cmap_##tag##_bucket(CMap_##tag* self, const cmap_##tag##_rawkey_t* rawKeyPtr, uint32_t* hxPtr) { \
     uint32_t hash = keyHashRaw(rawKeyPtr, sizeof(cmap_##tag##_rawkey_t)), sx, hx = (hash & cmapentry_HASH) | cmapentry_USED; \
-    size_t cap = cvector_capacity(self->_table); \
+    size_t cap = cmap_bucketCount(*self); \
     size_t idx = cmap_reduce(hash, cap); \
     CMapEntry_##tag* slot = self->_table.data; \
     while ((sx = slot[idx].hashx)) { \
@@ -198,16 +198,10 @@ cmap_##tag##_get(CMap_##tag map, cmap_##tag##_rawkey_t rawKey) { \
     return map._table.data[idx].hashx ? &map._table.data[idx] : NULL; \
 } \
  \
-static inline void \
-cmap_##tag##_expand(CMap_##tag* self) { \
-    size_t cap = cvector_capacity(self->_table); \
-    if (cmap_size(*self) + 1 >= cap * self->maxLoadPercent * 0.01) \
-        cmap_##tag##_reserve(self, (size_t) 7 + (1.6 * cap)); \
-} \
- \
 STC_API CMapEntry_##tag* \
 cmap_##tag##_put(CMap_##tag* self, cmap_##tag##_rawkey_t rawKey, Value value) { \
-    cmap_##tag##_expand(self);  \
+    if (cmap_size(*self) + 1 >= cmap_bucketCount(*self) * self->maxLoadPercent * 0.01) \
+        cmap_##tag##_reserve(self, (size_t) 7 + (1.6 * cmap_bucketCount(*self))); \
     uint32_t hx; \
     size_t idx = cmap_##tag##_bucket(self, &rawKey, &hx); \
     CMapEntry_##tag* e = &self->_table.data[idx]; \
@@ -224,7 +218,8 @@ cmap_##tag##_put(CMap_##tag* self, cmap_##tag##_rawkey_t rawKey, Value value) { 
  \
 STC_API CMapEntry_##tag* \
 cmap_##tag##_insert(CMap_##tag* self, CMapEntry_##tag entry) { \
-    cmap_##tag##_expand(self);  \
+    if (cmap_size(*self) + 1 >= cmap_bucketCount(*self) * self->maxLoadPercent * 0.01) \
+        cmap_##tag##_reserve(self, (size_t) 7 + (1.6 * cmap_bucketCount(*self))); \
     uint32_t hx; \
     cmap_##tag##_rawkey_t r = keyGetRaw(&entry.key); \
     size_t idx = cmap_##tag##_bucket(self, &r, &hx); \
@@ -247,10 +242,10 @@ cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
  \
 STC_API size_t \
 cmap_##tag##_reserve(CMap_##tag* self, size_t size) { \
-    size_t oldcap = cvector_capacity(self->_table), newcap = 1 + (size / 2) * 2; \
+    size_t oldcap = cmap_bucketCount(*self), newcap = 1 + (size / 2) * 2; \
     if (cmap_size(*self) >= newcap * self->maxLoadPercent * 0.01) return oldcap; \
     CVector_map_##tag vec = cvector_init; \
-    cvector_map_##tag##_reserve(&vec, newcap); \
+    cvector_map_##tag##_reserve(&vec, (self->_cap = newcap)); \
     memset(vec.data, 0, sizeof(CMapEntry_##tag) * newcap); \
     cvector_map_##tag##_swap(&self->_table, &vec); \
  \
@@ -268,7 +263,7 @@ STC_API bool \
 cmap_##tag##_erase(CMap_##tag* self, cmap_##tag##_rawkey_t rawKey) { \
     if (cmap_size(*self) == 0) \
         return false; \
-    size_t cap = cvector_capacity(self->_table); \
+    size_t cap = cmap_bucketCount(*self); \
     if (cmap_size(*self) < cap * self->shrinkLimitPercent * 0.01) \
         cap = cmap_##tag##_reserve(self, cmap_size(*self) * 120 / self->maxLoadPercent); \
     uint32_t hx; \
@@ -293,7 +288,7 @@ cmap_##tag##_erase(CMap_##tag* self, cmap_##tag##_rawkey_t rawKey) { \
  \
 STC_API cmap_##tag##_iter_t \
 cmap_##tag##_begin(CMap_##tag* map) { \
-    CMapEntry_##tag* e = map->_table.data, *end = e + _cvector_capacity(map->_table); \
+    CMapEntry_##tag* e = map->_table.data, *end = e + cmap_bucketCount(*map); \
     while (e != end && !e->hashx) ++e; \
     cmap_##tag##_iter_t it = {e == end ? NULL : e, end}; return it; \
 } \
