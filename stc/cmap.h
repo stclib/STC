@@ -23,15 +23,15 @@
 #ifndef CMAP__H__
 #define CMAP__H__
 
-#include "cvector.h"
+#include "cdefs.h"
 
-#define cmap_init          {cvector_init, 0, 0, 90, 0}
+#define cmap_init          {NULL, NULL, 0, 0, 90, 0}
 #define cmap_size(map)     ((size_t) (map)._size)
 #define cmap_bucketCount(map)  ((size_t) (map)._cap)
 /* https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction */
 #define cmap_reduce(x, N)  ((uint32_t) (((uint64_t) (x) * (N)) >> 32))
 
-enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
+enum   {cmapentry_HASH=0x7f, cmapentry_USED=0x80};
 
 /* CMap: */
 #define declare_CMap(...) \
@@ -70,26 +70,22 @@ enum   {cmapentry_HASH=0x7fff, cmapentry_USED=0x8000};
   struct CMapEntry_##tag { \
       Key key; \
       Value value; \
-      uint16_t hashx; \
   }; \
  \
   static inline struct CMapEntry_##tag cmapentry_##tag##_make(Key key, Value value) { \
-      struct CMapEntry_##tag e = {key, value, 0}; \
-      return e; \
+      struct CMapEntry_##tag e = {key, value}; return e; \
   } \
   static inline void \
   cmapentry_##tag##_destroy(struct CMapEntry_##tag* e) { \
       keyDestroy(&e->key); \
       valueDestroy(&e->value); \
-      e->hashx = 0; \
   } \
   typedef struct CMapEntry_##tag CMapEntry_##tag; \
-\
-  declare_CVector_4(map_##tag, CMapEntry_##tag, cmapentry_##tag##_destroy, c_noCompare); \
   typedef RawKey cmap_##tag##_rawkey_t; \
  \
 typedef struct CMap_##tag { \
-    CVector_map_##tag _table; \
+    CMapEntry_##tag* _table; \
+    uint8_t* _hashx; \
     uint32_t _size, _cap; \
     uint8_t maxLoadPercent; \
     uint8_t shrinkLimitPercent; \
@@ -97,6 +93,7 @@ typedef struct CMap_##tag { \
  \
 typedef struct cmap_##tag##_iter_t { \
     CMapEntry_##tag *item, *_end; \
+    uint8_t* _hx; \
 } cmap_##tag##_iter_t; \
  \
 STC_API void \
@@ -148,15 +145,17 @@ STC_API void \
 cmap_##tag##_destroy(CMap_##tag* self) { \
     if (cmap_size(*self)) { \
         size_t cap = cmap_bucketCount(*self); \
-        CMapEntry_##tag* e = self->_table.data, *end = e + cap; \
-        for (; e != end; ++e) if (e->hashx) cmapentry_##tag##_destroy(e); \
+        CMapEntry_##tag* e = self->_table, *end = e + cap; \
+        uint8_t *hashx = self->_hashx; \
+        for (; e != end; ++e) if (*hashx++) cmapentry_##tag##_destroy(e); \
     } \
-    free(_cvector_alloced(self->_table.data)); \
+    free(self->_hashx); \
+    free(self->_table); \
 } \
  \
 STC_API void cmap_##tag##_clear(CMap_##tag* self) { \
-    memset(self->_table.data, 0, sizeof(CMapEntry_##tag) * cmap_bucketCount(*self)); \
-    self->_size = 0; \
+    cmap_##tag##_destroy(self); \
+    self->_cap = self->_size = 0; \
 } \
  \
 STC_API void \
@@ -178,10 +177,10 @@ cmap_##tag##_bucket(CMap_##tag* self, const cmap_##tag##_rawkey_t* rawKeyPtr, ui
     uint32_t hash = keyHashRaw(rawKeyPtr, sizeof(cmap_##tag##_rawkey_t)), sx, hx = (hash & cmapentry_HASH) | cmapentry_USED; \
     size_t cap = cmap_bucketCount(*self); \
     size_t idx = cmap_reduce(hash, cap); \
-    CMapEntry_##tag* slot = self->_table.data; \
-    while ((sx = slot[idx].hashx)) { \
+    uint8_t* hashx = self->_hashx; \
+    while ((sx = hashx[idx])) { \
         if (sx == hx) { \
-            cmap_##tag##_rawkey_t r = keyGetRaw(&slot[idx].key); \
+            cmap_##tag##_rawkey_t r = keyGetRaw(&self->_table[idx].key); \
             if (keyEqualsRaw(&r, rawKeyPtr)) break; \
         } \
         if (++idx == cap) idx = 0; \
@@ -195,7 +194,7 @@ cmap_##tag##_get(CMap_##tag map, cmap_##tag##_rawkey_t rawKey) { \
     if (cmap_size(map) == 0) return NULL; \
     uint32_t hx; \
     size_t idx = cmap_##tag##_bucket(&map, &rawKey, &hx); \
-    return map._table.data[idx].hashx ? &map._table.data[idx] : NULL; \
+    return map._hashx[idx] ? &map._table[idx] : NULL; \
 } \
  \
 STC_API CMapEntry_##tag* \
@@ -204,12 +203,12 @@ cmap_##tag##_put(CMap_##tag* self, cmap_##tag##_rawkey_t rawKey, Value value) { 
         cmap_##tag##_reserve(self, (size_t) 7 + (1.6 * cmap_bucketCount(*self))); \
     uint32_t hx; \
     size_t idx = cmap_##tag##_bucket(self, &rawKey, &hx); \
-    CMapEntry_##tag* e = &self->_table.data[idx]; \
-    if (e->hashx) \
+    CMapEntry_##tag* e = &self->_table[idx]; \
+    if (self->_hashx[idx]) \
         valueDestroy(&e->value); \
     else { \
         e->key = keyInitRaw(rawKey); \
-        e->hashx = hx; \
+        self->_hashx[idx] = (uint8_t) hx; \
         ++self->_size; \
     } \
     e->value = value; \
@@ -223,12 +222,12 @@ cmap_##tag##_insert(CMap_##tag* self, CMapEntry_##tag entry) { \
     uint32_t hx; \
     cmap_##tag##_rawkey_t r = keyGetRaw(&entry.key); \
     size_t idx = cmap_##tag##_bucket(self, &r, &hx); \
-    CMapEntry_##tag* e = &self->_table.data[idx]; \
-    if (e->hashx) \
+    CMapEntry_##tag* e = &self->_table[idx]; \
+    if (self->_hashx[idx]) \
         valueDestroy(&e->value); \
     else { \
         e->key = entry.key; \
-        e->hashx = hx; \
+        self->_hashx[idx] = (uint8_t) hx; \
         ++self->_size; \
     } \
     e->value = entry.value; \
@@ -244,18 +243,26 @@ STC_API size_t \
 cmap_##tag##_reserve(CMap_##tag* self, size_t size) { \
     size_t oldcap = cmap_bucketCount(*self), newcap = 1 + (size / 2) * 2; \
     if (cmap_size(*self) >= newcap * self->maxLoadPercent * 0.01) return oldcap; \
-    CVector_map_##tag vec = cvector_init; \
-    cvector_map_##tag##_reserve(&vec, (self->_cap = newcap)); \
-    memset(vec.data, 0, sizeof(CMapEntry_##tag) * newcap); \
-    cvector_map_##tag##_swap(&self->_table, &vec); \
+    CMap_##tag tmp = { \
+        c_new_2(CMapEntry_##tag, newcap), \
+        (uint8_t *) calloc(newcap, sizeof(uint8_t)), \
+        self->_size, (uint32_t) newcap, \
+        self->maxLoadPercent, self->shrinkLimitPercent \
+    }; \
+    cmap_##tag##_swap(self, &tmp); \
  \
-    CMapEntry_##tag* e = vec.data, *slot = self->_table.data; \
+    CMapEntry_##tag* e = tmp._table, *slot = self->_table; \
+    uint8_t* hashx = self->_hashx; \
     uint32_t hx; \
-    cmap_##tag##_rawkey_t r; \
     for (size_t i = 0; i < oldcap; ++i, ++e) \
-        if (e->hashx) \
-            slot[ cmap_##tag##_bucket(self, (r = keyGetRaw(&e->key), &r), &hx) ] = *e; \
-    free(_cvector_alloced(vec.data)); /* not cvector_destroy() here */ \
+        if (tmp._hashx[i]) { \
+            cmap_##tag##_rawkey_t r = keyGetRaw(&e->key); \
+            size_t idx = cmap_##tag##_bucket(self, &r, &hx); \
+            slot[idx] = *e, \
+            hashx[idx] = (uint8_t) hx; \
+        } \
+    free(tmp._hashx); \
+    free(tmp._table); \
     return newcap; \
 } \
  \
@@ -268,34 +275,37 @@ cmap_##tag##_erase(CMap_##tag* self, cmap_##tag##_rawkey_t rawKey) { \
         cap = cmap_##tag##_reserve(self, cmap_size(*self) * 120 / self->maxLoadPercent); \
     uint32_t hx; \
     size_t i = cmap_##tag##_bucket(self, &rawKey, &hx), j = i, k; \
-    CMapEntry_##tag* slot = self->_table.data; \
-    if (! slot[i].hashx) \
+    CMapEntry_##tag* slot = self->_table; \
+    uint8_t* hashx = self->_hashx; \
+    if (! hashx[i]) \
         return false; \
     cmap_##tag##_rawkey_t r; \
     do { /* deletion from hash table without tombstone */ \
         if (++j == cap) j = 0; /* ++j %= cap; is slow */ \
-        if (! slot[j].hashx) \
+        if (! hashx[j]) \
             break; \
         k = cmap_reduce(keyHashRaw((r = keyGetRaw(&slot[j].key), &r), \
                         sizeof(cmap_##tag##_rawkey_t)), cap); \
         if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */ \
-            slot[i] = slot[j], i = j; \
+            slot[i] = slot[j], hashx[i] = hashx[j], i = j; \
     } while (true); \
-    cmapentry_##tag##_destroy(&slot[i]); /* sets used=false */ \
+    hashx[i] = 0; \
+    cmapentry_##tag##_destroy(&slot[i]); \
     --self->_size; \
     return true; \
 } \
  \
 STC_API cmap_##tag##_iter_t \
 cmap_##tag##_begin(CMap_##tag* map) { \
-    CMapEntry_##tag* e = map->_table.data, *end = e + cmap_bucketCount(*map); \
-    while (e != end && !e->hashx) ++e; \
-    cmap_##tag##_iter_t it = {e == end ? NULL : e, end}; return it; \
+    uint8_t* hx = map->_hashx; \
+    CMapEntry_##tag* e = map->_table, *end = e + cmap_bucketCount(*map); \
+    while (e != end && !*hx) ++e, ++hx; \
+    cmap_##tag##_iter_t it = {e == end ? NULL : e, end, hx}; return it; \
 } \
  \
 STC_API cmap_##tag##_iter_t \
 cmap_##tag##_next(cmap_##tag##_iter_t it) { \
-    do { ++it.item; } while (it.item != it._end && !it.item->hashx); \
+    do { ++it.item, ++it._hx; } while (it.item != it._end && !*it._hx); \
     if (it.item == it._end) it.item = NULL; \
     return it; \
 }
