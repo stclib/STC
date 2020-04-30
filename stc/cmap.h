@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-/*  An example:
+/*  // Example:
 #include <stdio.h>
 #include "stc/cmap.h"
 declare_CMap(ex, int, char);
@@ -193,7 +193,8 @@ cmap_##tag##_setShrinkLimitFactor(CMap_##tag* self, double limit) { \
  \
 static inline size_t \
 cmap_##tag##_bucket(CMap_##tag* self, const cmap_##tag##_rawkey_t* rawKeyPtr, uint32_t* hxPtr) { \
-    uint32_t hash = keyHashRaw(rawKeyPtr, sizeof(cmap_##tag##_rawkey_t)), sx, hx = (hash & cmapentry_HASH) | cmapentry_USED; \
+    uint32_t hash = keyHashRaw(rawKeyPtr, sizeof(cmap_##tag##_rawkey_t)); \
+    uint32_t sx, hx = (hash & cmapentry_HASH) | cmapentry_USED; \
     size_t cap = cmap_bucketCount(*self); \
     size_t idx = cmap_reduce(hash, cap); \
     uint8_t* hashx = self->_hashx; \
