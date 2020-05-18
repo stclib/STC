@@ -27,6 +27,8 @@
 #include <stdbool.h>
 #include <string.h>
 #include <stdint.h>
+#include <stdarg.h>
+#include <stdio.h>
 
 #include "cdefs.h"
 
@@ -84,7 +86,7 @@ cstring_makeN(const char* str, size_t len) {
     CString cs = cstring_init;
     if (len) {
         cstring_reserve(&cs, len);
-        memcpy(cs.str, str, len);
+        strncpy(cs.str, str, len);
         cs.str[ _cstring_size(cs) = len ] = '\0';
     }
     return cs;
@@ -96,7 +98,7 @@ cstring_make(const char* str) {
 }
 
 static inline CString
-cstring_clone(CString cs) {
+cstring_makeCopy(CString cs) {
     return cstring_makeN(cs.str, cstring_size(cs));
 }
 
@@ -128,9 +130,8 @@ static inline CString*
 cstring_assign(CString* self, const char* str) {
     return cstring_assignN(self, str, strlen(str));
 }
-
 static inline CString*
-cstring_copy(CString* self, CString cs2) {
+cstring_assignS(CString* self, CString cs2) {
     return cstring_assignN(self, cs2.str, cstring_size(cs2));
 }
 
@@ -156,6 +157,31 @@ cstring_appendS(CString* self, CString cs2) {
     return cstring_appendN(self, cs2.str, cstring_size(cs2));
 }
 
+static inline CString*
+cstring_printf(CString* self, const char* fmt, ...) {
+    size_t len = 0;
+    va_list args;
+    va_start(args, fmt);
+    len = vsnprintf(NULL, len, fmt, args);
+    cstring_reserve(self, len);
+    vsprintf(self->str, fmt, args);
+    _cstring_size(*self) = len;
+    va_end(args);
+    return self;
+}
+static inline CString
+cstring_makeFmt(const char* fmt, ...) {
+    CString tmp = cstring_init;
+    size_t len = 0;
+    va_list args;
+    va_start(args, fmt);
+    len = vsnprintf(NULL, len, fmt, args);
+    cstring_reserve(&tmp, len);
+    vsprintf(tmp.str, fmt, args);
+    _cstring_size(tmp) = len;
+    va_end(args);
+    return tmp;
+}
 
 static inline void _cstring_internalMove(CString* self, size_t pos1, size_t pos2) {
     if (pos1 == pos2)
