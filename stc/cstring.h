@@ -87,7 +87,7 @@ cstring_makeN(const char* str, size_t len) {
     if (len) {
         cstring_reserve(&cs, len);
         strncpy(cs.str, str, len);
-        cs.str[ _cstring_size(cs) = len ] = '\0';
+        cs.str[_cstring_size(cs) = len] = '\0';
     }
     return cs;
 }
@@ -101,6 +101,23 @@ static inline CString
 cstring_makeCopy(CString cs) {
     return cstring_makeN(cs.str, cstring_size(cs));
 }
+
+static inline CString
+cstring_makeFmt(const char* fmt, ...) {
+    CString tmp = cstring_init;
+    int len;
+    va_list args;
+    va_start(args, fmt);
+    len = vsnprintf(NULL, (size_t)0, fmt, args);
+    if (len > 0) {
+        cstring_reserve(&tmp, len);
+        _cstring_size(tmp) = len;
+        vsprintf(tmp.str, fmt, args);
+    }
+    va_end(args);
+    return tmp;
+}
+
 
 static inline CString
 cstring_move(CString* self) {
@@ -155,32 +172,6 @@ cstring_append(CString* self, const char* str) {
 static inline CString*
 cstring_appendS(CString* self, CString cs2) {
     return cstring_appendN(self, cs2.str, cstring_size(cs2));
-}
-
-static inline CString*
-cstring_printf(CString* self, const char* fmt, ...) {
-    size_t len = 0;
-    va_list args;
-    va_start(args, fmt);
-    len = vsnprintf(NULL, len, fmt, args);
-    cstring_reserve(self, len);
-    vsprintf(self->str, fmt, args);
-    _cstring_size(*self) = len;
-    va_end(args);
-    return self;
-}
-static inline CString
-cstring_makeFmt(const char* fmt, ...) {
-    CString tmp = cstring_init;
-    size_t len = 0;
-    va_list args;
-    va_start(args, fmt);
-    len = vsnprintf(NULL, len, fmt, args);
-    cstring_reserve(&tmp, len);
-    vsprintf(tmp.str, fmt, args);
-    _cstring_size(tmp) = len;
-    va_end(args);
-    return tmp;
 }
 
 static inline void _cstring_internalMove(CString* self, size_t pos1, size_t pos2) {
@@ -301,15 +292,6 @@ cstring_find(CString cs, size_t pos, const char* needle) {
     return res ? res - cs.str : cstring_npos;
 }
 
-static inline char*
-cstring_splitFirst(const char* delimiters, CString cs) {
-    return strtok(cs.str, delimiters);
-}
-
-static inline char*
-cstring_splitNext(const char* delimiters) {
-    return strtok(NULL, delimiters);
-}
 
 static inline CString
 cstring_temp(const char* str) {
