@@ -55,7 +55,6 @@
 #define c_new_2(T, n)   ((T *) malloc(sizeof(T) * (n)))
 
 #define c_struct(S)     typedef struct S S; struct S
-#define                 c_npos         ((size_t) -1)
 #define                 c_max_alloca   (1000)
 #define                 c_swap(T, x, y) { T __t = x; x = y; y = __t; }
 
