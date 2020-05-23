@@ -128,23 +128,15 @@ cstring_makeFmt(const char* fmt, ...) {
 }
 
 
-static inline CString
-cstring_move(CString* self) {
-    CString mv = *self;
-    *self = cstring_init;
-    return mv;
-}
-
 static inline void
 cstring_clear(CString* self) {
-    CString s = cstring_init;
     cstring_destroy(self);
-    *self = s;
+    *self = cstring_init;
 }
 
 static inline CString*
 cstring_assignN(CString* self, const char* str, size_t len) {
-    if (len) {
+    if (len || cstring_capacity(*self)) {
         cstring_reserve(self, len);
         memmove(self->str, str, len);
         self->str[_cstring_size(*self) = len] = '\0';
@@ -156,9 +148,32 @@ static inline CString*
 cstring_assign(CString* self, const char* str) {
     return cstring_assignN(self, str, strlen(str));
 }
+
 static inline CString*
-cstring_assignS(CString* self, CString s) {
+cstring_copy(CString* self, CString s) {
     return cstring_assignN(self, s.str, cstring_size(s));
+}
+
+static inline CString*
+cstring_take(CString* self, CString s) {
+    if (self->str != s.str && cstring_capacity(*self))
+        free(_cstring_rep(self));
+    self->str = s.str;
+    return self;
+}
+
+static inline CString
+cstring_release(CString* self) {
+    CString tmp = *self;
+    *self = cstring_init;
+    return tmp;
+}
+/* cstring_move(&s1, &s2) short for: cstring_take(&s1, cstring_release(&s2)) */
+static inline CString*
+cstring_move(CString* self, CString* s) {
+    cstring_take(self, *s);
+    *s = cstring_init;
+    return self;
 }
 
 

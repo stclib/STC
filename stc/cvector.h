@@ -173,9 +173,10 @@ cvector_##tag##_find(CVector_##tag cv, ValueRaw rawValue) { \
     size_t n = cvector_size(cv); \
     cvector_##tag##_rawvalue_t r; \
     for (size_t i = 0; i < n; ++i) { \
-        if (valueCompareRaw((r = valueGetRaw(&cv.data[i]), &r), &rawValue) == 0) return i; \
+        ValueRaw r = valueGetRaw(&cv.data[i]); \
+        if (valueCompareRaw(&r, &rawValue) == 0) return i; \
     } \
-    return c_npos; \
+    return (size_t) (-1); /*SIZE_MAX;*/ \
 } \
  \
 STC_API int \
