@@ -81,21 +81,21 @@ static inline mt19937_t mt19937_default(void) {
 
 /* generates a random number on [0,0xffffffff]-interval */
 static inline uint32_t mt19937_rand(mt19937_t *state) {
-    enum {N = mt19937_N, M = mt19937_M};
+    enum {N = mt19937_N, M = mt19937_M, N_1 = N-1, N_M = N-M};
 
     uint32_t y, *arr = state->arr;
     if (state->idx >= N) { /* generate N words at one time */
         int k;
-        for (k = 0; k < (N - M); ++k) {
+        for (k = 0; k < N_M; ++k) {
             y = (arr[k] & 0x80000000) | (arr[k + 1] & 0x7fffffff);
             arr[k] = arr[k + M] ^ (y >> 1) ^ ((y & 1) * 0x9908b0df);
         }
-        for (; k < N - 1; ++k) {
+        for (; k < N_1; ++k) {
             y = (arr[k] & 0x80000000) | (arr[k + 1] & 0x7fffffff);
-            arr[k] = arr[k - (N - M)] ^ (y >> 1) ^ ((y & 1) * 0x9908b0df);
+            arr[k] = arr[k - N_M] ^ (y >> 1) ^ ((y & 1) * 0x9908b0df);
         }
-        y = (arr[N - 1] & 0x80000000) | (arr[0] & 0x7fffffff);
-        arr[N - 1] = arr[M - 1] ^ (y >> 1) ^ ((y & 1) * 0x9908b0df);
+        y = (arr[N_1] & 0x80000000) | (arr[0] & 0x7fffffff);
+        arr[N_1] = arr[M - 1] ^ (y >> 1) ^ ((y & 1) * 0x9908b0df);
 
         state->idx = 0;
     }
