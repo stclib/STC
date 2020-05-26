@@ -1,11 +1,13 @@
-#ifndef MT19937__H__
-#define MT19937__H__
+#ifndef CRANDOM__H__
+#define CRANDOM__H__
 /*
-     Mersenne Twister random number generator.
+     Mersenne Twister random number generator MT19937, 32 bit.
      A C-program for MT19937, with initialization improved 2002/1/26.
      Coded by Takuji Nishimura and Makoto Matsumoto.
+     Optimized by Tyge Løvset.
 
-     Before using, initialize the state by using mt19937_seed(seed).
+     Before using, initialize the state by using mt19937_init(),
+     mt19937_seed() or mt19937_default().
 
      Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura,
      All rights reserved.                                                    
@@ -44,7 +46,7 @@
 
 #include <stdint.h>
 
-enum { /* Period parameters */
+enum { /* period parameters */
     mt19937_N = 624,
     mt19937_M = 397,
 };
@@ -62,7 +64,7 @@ static inline void mt19937_init(mt19937_t *state, uint32_t seed) {
         seed = state->arr[i] = 1812433253 * (seed ^ (seed >> 30)) + i; 
         /* See Knuth TAOCP Vol2. 3rd Ed. P.106 for multiplier. */
         /* In the previous versions, MSBs of the seed affect   */
-        /* only MSBs of the array arr[].                        */
+        /* only MSBs of the array arr[].                       */
         /* 2002/01/09 modified by Makoto Matsumoto             */
     }
 }
@@ -79,27 +81,27 @@ static inline mt19937_t mt19937_default(void) {
     return state;
 }
 
-/* generates a random number on [0,0xffffffff]-interval */
+/* generates a random number on [0, 0xffffffff]-interval */
 static inline uint32_t mt19937_rand(mt19937_t *state) {
-    enum {N = mt19937_N, M = mt19937_M, N_1 = N-1, N_M = N-M};
+    enum {N = mt19937_N, M = mt19937_M};
 
     uint32_t y, *arr = state->arr;
     if (state->idx >= N) { /* generate N words at one time */
-        int k;
-        for (k = 0; k < N_M; ++k) {
+        int k = 0;
+        for (; k < N-M; ++k) {
             y = (arr[k] & 0x80000000) | (arr[k + 1] & 0x7fffffff);
-            arr[k] = arr[k + M] ^ (y >> 1) ^ ((y & 1) * 0x9908b0df);
+            arr[k] = arr[k + M] ^ (y >> 1) ^ ((y & 1) ? 0x9908b0df : 0);
         }
-        for (; k < N_1; ++k) {
+        for (; k < N-1; ++k) {
             y = (arr[k] & 0x80000000) | (arr[k + 1] & 0x7fffffff);
-            arr[k] = arr[k - N_M] ^ (y >> 1) ^ ((y & 1) * 0x9908b0df);
+            arr[k] = arr[k - (N-M)] ^ (y >> 1) ^ ((y & 1) ? 0x9908b0df : 0);
         }
-        y = (arr[N_1] & 0x80000000) | (arr[0] & 0x7fffffff);
-        arr[N_1] = arr[M - 1] ^ (y >> 1) ^ ((y & 1) * 0x9908b0df);
+        y = (arr[N-1] & 0x80000000) | (arr[0] & 0x7fffffff);
+        arr[N-1] = arr[M-1] ^ (y >> 1) ^ ((y & 1) ? 0x9908b0df : 0);
 
         state->idx = 0;
     }
-    /* Tempering */
+    /* tempering */
     y = arr[state->idx++];
     y ^= (y >> 11);
     y ^= (y <<  7) & 0x9d2c5680;
