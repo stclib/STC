@@ -7,7 +7,7 @@
 
 void stringdemo1()
 {
-    printf("STRINGDEMO1\n");
+    printf("\nSTRINGDEMO1\n");
     CString cs = cstring_make("one-nine-three-seven-five");
     printf("%s.\n", cs.str);
 
@@ -37,16 +37,18 @@ declare_CVector(ix, int64_t); // ix is just an example tag name.
 
 void vectordemo1()
 {
-    printf("VECTORDEMO1\n");
+    printf("\nVECTORDEMO1\n");
     CVector_ix bignums = cvector_init; // = (CVector_ix) cvector_init; if initializing after declaration.
     cvector_ix_reserve(&bignums, 100);
-    for (size_t i = 0; i<100; ++i)
+    for (size_t i = 0; i<=100; ++i)
         cvector_ix_pushBack(&bignums, i * i * i);
+
+    printf("erase - %llu: %llu\n", 100, bignums.data[100]);
     cvector_ix_popBack(&bignums); // erase the last
 
-    uint64_t value;
-    for (size_t i = 0; i < cvector_size(bignums); ++i)
-        value = bignums.data[i];
+    for (size_t i = 0; i < cvector_size(bignums); ++i) {
+        if (i >= 90) printf("%llu: %llu\n", i, bignums.data[i]);
+    }
     cvector_ix_destroy(&bignums);
 }
 
@@ -56,7 +58,7 @@ declare_CVector(cs, CString, cstring_destroy, cstring_compare); // supply inline
 
 void vectordemo2()
 {
-    printf("VECTORDEMO2\n");
+    printf("\nVECTORDEMO2\n");
     CVector_cs names = cvector_init;
     cvector_cs_pushBack(&names, cstring_make("Mary"));
     cvector_cs_pushBack(&names, cstring_make("Joe"));
@@ -74,7 +76,7 @@ declare_CList(ix, int);
 
 void listdemo1()
 {
-    printf("LISTDEMO1\n");
+    printf("\nLISTDEMO1\n");
     CList_ix nums = clist_init;
     clist_ix_pushBack(&nums, 123);
     clist_ix_pushBack(&nums, 231);
@@ -96,12 +98,12 @@ declare_CMap(ii, int, int);
 
 void mapdemo1()
 {
-    printf("MAPDEMO1\n");
+    printf("\nMAPDEMO1\n");
     CMap_ii nums = cmap_init;
     cmap_ii_put(&nums, 8, 64);
     cmap_ii_put(&nums, 11, 121);
 
-    printf("%d\n", cmap_ii_get(&nums, 8)->value);
+    printf("get 8: %d\n", cmap_ii_get(&nums, 8)->value);
     cmap_ii_destroy(&nums);
 }
 
@@ -111,7 +113,7 @@ declare_CMap_stringkey(si, int); // Shorthand macro for the general declare_CMap
 
 void mapdemo2()
 {
-    printf("MAPDEMO2\n");
+    printf("\nMAPDEMO2\n");
     CMap_si nums = cmap_init;
     cmap_si_put(&nums, "Hello", 64);
     cmap_si_put(&nums, "Groovy", 121);
@@ -133,7 +135,7 @@ declare_CMap_stringkey(ss, CString, cstring_destroy);
 
 void mapdemo3()
 {
-    printf("MAPDEMO3\n");
+    printf("\nMAPDEMO3\n");
     CMap_ss table = cmap_init;
     cmap_ss_put(&table, "Map", cstring_make("test"));
     cmap_ss_put(&table, "Make", cstring_make("my"));
