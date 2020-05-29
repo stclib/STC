@@ -1,3 +1,4 @@
+#include <stdlib.h>
 #include "stc/cstring.h"
 #include "stc/cvector.h"
 #include "stc/clist.h"
