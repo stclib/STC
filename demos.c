@@ -100,7 +100,7 @@ void mapdemo1()
     cmap_ii_put(&nums, 8, 64);
     cmap_ii_put(&nums, 11, 121);
 
-    printf("%d\n", cmap_ii_get(nums, 8)->value);
+    printf("%d\n", cmap_ii_get(&nums, 8)->value);
     cmap_ii_destroy(&nums);
 }
 
@@ -137,10 +137,10 @@ void mapdemo3()
     cmap_ss_put(&table, "Map", cstring_make("test"));
     cmap_ss_put(&table, "Make", cstring_make("my"));
     cmap_ss_put(&table, "Sunny", cstring_make("day"));
-    printf("remove: Make: %s\n", cmap_ss_get(table, "Make")->value.str);
+    printf("remove: Make: %s\n", cmap_ss_get(&table, "Make")->value.str);
     cmap_ss_erase(&table, "Make");
 
-    printf("size %d\n", cmap_size(table));
+    printf("size %llu\n", cmap_size(table));
     c_foreach (i, cmap_ss, table)
         printf("key: %s\n", i.item->key.str);
     cmap_ss_destroy(&table); // frees key and value CStrings, and hash table (CVector).

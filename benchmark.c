@@ -1,9 +1,10 @@
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <stdio.h>
 #include <time.h>
 
 #include "stc/cstring.h"
 #include "stc/cmap.h"
+#include "stc/crandom.h"
 #include "others/khash.h"
 #ifdef __cplusplus
 #include <unordered_map>
@@ -14,13 +15,17 @@
 // Visual Studio: compile with -TP to force C++:  cl -TP -EHsc -O2 benchmark.c
 
 declare_CMap(ii, int64_t, int64_t, c_noDestroy, c_lowbias32Hash);
-declare_CMap(ix, short, short); // sizeof(CMapEntry_ix) = 6 bytes only!
 
 KHASH_MAP_INIT_INT64(ii, uint64_t)
 
 const size_t seed = 123; // time(NULL);
 const double maxLoadFactor = 0.77;
-#define RAND(N) ((rand() << ((N) - 15)) ^ rand()) // N=16-30
+#define SEED(s) sfc64_t rng = sfc64_seed(s)
+#define RAND(N) (sfc64_rand(&rng) & ((1 << N) - 1))
+
+//#define SEED(s) mt19937_t rng = mt19937_seed(s)
+//#define RAND(N) (mt19937_rand(&rng) & ((1 << N) - 1))
+
 
 #define CMAP_SETUP(tag, Key, Value) CMap_##tag map = cmap_init; \
                                     cmap_##tag##_setMaxLoadFactor(&map, maxLoadFactor)
@@ -81,21 +86,22 @@ int rr = RR;
 { \
     M##_SETUP(tag, int64_t, int64_t); \
     uint64_t checksum = 0, erased = 0; \
-    srand(seed); \
+    SEED(seed); \
     clock_t difference, before = clock(); \
     for (size_t i = 0; i < N1; ++i) { \
         checksum += ++ M##_PUT(tag, RAND(rr), i); \
         erased += M##_ERASE(tag, RAND(rr)); \
     } \
     difference = clock() - before; \
-    printf(#M "(" #tag "): sz: %llu, bucks: %llu, time: %.02f, sum: %llu, erase: %llu\n", M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, checksum, erased); \
+    printf(#M "(" #tag "): sz: %llu, bucks: %llu, time: %.02f, sum: %llu, erase: %llu\n", \
+           M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, checksum, erased); \
     M##_CLEAR(tag); \
 }
 
 #define MAP_TEST2(M, tag) \
 { \
     M##_SETUP(tag, int64_t, int64_t); \
-    srand(seed); \
+    SEED(seed); \
     size_t erased = 0; \
     clock_t difference, before = clock(); \
     for (size_t i = 0; i < N2; ++i) \
@@ -103,7 +109,8 @@ int rr = RR;
     for (size_t i = 0; i < N2; ++i) \
         erased += M##_ERASE(tag, i*17); \
     difference = clock() - before; \
-    printf(#M "(" #tag "): sz: %llu, bucks: %llu, time: %.02f, erase %llu\n", M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, erased); \
+    printf(#M "(" #tag "): sz: %llu, bucks: %llu, time: %.02f, erase %llu\n", \
+           M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, erased); \
     M##_CLEAR(tag); \
 }
 

@@ -43,8 +43,8 @@
                                 declare_CVector_6(tag, CString, cstring_destroy, const char*, cstring_compareRaw, cstring_getRaw)
 
 
-#define declare_CVector_6(tag, Value, valueDestroy, ValueRaw, valueCompareRaw, valueGetRaw) \
-typedef ValueRaw cvector_##tag##_rawvalue_t; \
+#define declare_CVector_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
+ \
 typedef struct CVector_##tag { \
     Value* data; \
 } CVector_##tag; \
@@ -82,7 +82,7 @@ STC_API void \
 cvector_##tag##_sort(CVector_##tag* self); \
  \
 STC_API size_t \
-cvector_##tag##_find(CVector_##tag cv, ValueRaw rawValue); \
+cvector_##tag##_find(CVector_##tag cv, RawValue rawValue); \
  \
 static inline void \
 cvector_##tag##_swap(CVector_##tag* a, CVector_##tag* b) { \
@@ -90,9 +90,9 @@ cvector_##tag##_swap(CVector_##tag* a, CVector_##tag* b) { \
 } \
  \
  \
-typedef struct cvector_##tag##_iter_t { \
+typedef struct { \
     Value *item, *end; \
-} cvector_##tag##_iter_t; \
+} CVectorIter_##tag, cvector_##tag##_iter_t; \
  \
 STC_API cvector_##tag##_iter_t \
 cvector_##tag##_begin(CVector_##tag* vec); \
@@ -103,14 +103,15 @@ cvector_##tag##_next(cvector_##tag##_iter_t it) { \
     return it; \
 } \
  \
-implement_CVector_6(tag, Value, valueDestroy, ValueRaw, valueCompareRaw, valueGetRaw) \
+implement_CVector_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
  \
-typedef Value cvector_##tag##_value_t
+typedef Value CVectorValue_##tag; \
+typedef RawValue CVectorRawValue_##tag
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define implement_CVector_6(tag, Value, valueDestroy, ValueRaw, valueCompareRaw, valueGetRaw) \
+#define implement_CVector_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
  \
 STC_API void \
 cvector_##tag##_destroy(CVector_##tag* self) { \
@@ -169,11 +170,10 @@ cvector_##tag##_erase(CVector_##tag* self, size_t pos, size_t size) { \
 } \
  \
 STC_API size_t \
-cvector_##tag##_find(CVector_##tag cv, ValueRaw rawValue) { \
+cvector_##tag##_find(CVector_##tag cv, RawValue rawValue) { \
     size_t n = cvector_size(cv); \
-    cvector_##tag##_rawvalue_t r; \
     for (size_t i = 0; i < n; ++i) { \
-        ValueRaw r = valueGetRaw(&cv.data[i]); \
+        RawValue r = valueGetRaw(&cv.data[i]); \
         if (valueCompareRaw(&r, &rawValue) == 0) return i; \
     } \
     return (size_t) (-1); /*SIZE_MAX;*/ \
@@ -181,8 +181,8 @@ cvector_##tag##_find(CVector_##tag cv, ValueRaw rawValue) { \
  \
 STC_API int \
 cvector_##tag##_sortCompare(const void* x, const void* y) { \
-    ValueRaw rx = valueGetRaw((const Value *) x); \
-    ValueRaw ry = valueGetRaw((const Value *) y); \
+    RawValue rx = valueGetRaw((const Value *) x); \
+    RawValue ry = valueGetRaw((const Value *) y); \
     return valueCompareRaw(&rx, &ry); \
 } \
 STC_EXTERN_IMPORT void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*)); \
@@ -200,7 +200,7 @@ cvector_##tag##_begin(CVector_##tag* vec) { \
     return it; \
 }
 #else
-#define implement_CVector_6(tag, Value, valueDestroy, ValueRaw, valueCompareRaw, valueGetRaw)
+#define implement_CVector_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw)
 #endif
 
 #if defined(_WIN32) && defined(_DLL)
