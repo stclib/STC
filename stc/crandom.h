@@ -108,6 +108,45 @@ STC_API uint64_t xoroshiro128ss_rand(xoroshiro128ss_t *state) {
     return result;
 }
 
+STC_API void xoroshiro128ss_jump(xoroshiro128ss_t *state, bool longJump) {
+    static const uint64_t JUMP2_64[] = {0xdf900294d8f554a5, 0x170865df4b3201fc},
+                          JUMP2_96[] = {0xd2a98b26625eee7b, 0xdddf9b1090aa7ac1};
+    const uint64_t *jump = longJump ? JUMP2_96 : JUMP2_64;
+    uint64_t s0 = 0, s1 = 0, *s = state->s;
+
+    for (int i = 0; i < 2; ++i) for (int b = 0; b < 64; ++b) {
+        if (jump[i] & (1ull << b)) s0 ^= s[0], s1 ^= s[1];
+        xoroshiro128ss_rand(state);
+    }
+    s[0] = s0;
+    s[1] = s1;
+}
+
+/*
+ * sfc32: http://pracrand.sourceforge.net
+ */
+
+typedef struct sfc32 {
+    uint32_t s[3], counter;
+} sfc32_t;
+
+STC_API uint32_t sfc32_rand(sfc32_t* state) {
+    enum {LROT = 21, RSHIFT = 9, LSHIFT = 3};
+    uint32_t *s = state->s;
+
+    uint32_t result = s[0] + s[1] + state->counter++;
+    s[0] = s[1] ^ (s[1] >> RSHIFT);
+    s[1] = s[2] + (s[2] << LSHIFT);
+    s[2] = ((s[2] << LROT) | (s[2] >> (32 - LROT))) + result;
+    return result;
+}
+
+STC_API sfc32_t sfc32_seed(const uint64_t seed) {
+    sfc32_t state = {{0, (uint32_t) seed, (uint32_t) (seed >> 32)}, 1};
+    for (int i = 0; i < 12; ++i) sfc32_rand(&state);
+    return state;
+}
+
 /*
  * sfc64: http://pracrand.sourceforge.net
  */
@@ -120,7 +159,7 @@ STC_API uint64_t sfc64_rand(sfc64_t* state) {
     enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
     uint64_t *s = state->s;
 
-    uint64_t result = s[0] + s[1] + ++state->counter;
+    uint64_t result = s[0] + s[1] + state->counter++;
     s[0] = s[1] ^ (s[1] >> RSHIFT);
     s[1] = s[2] + (s[2] << LSHIFT);
     s[2] = c_rotateLeft64(s[2], LROT) + result;
@@ -128,9 +167,23 @@ STC_API uint64_t sfc64_rand(sfc64_t* state) {
 }
 
 STC_API sfc64_t sfc64_seed(const uint64_t seed) {
-    sfc64_t state = {{seed, seed, seed}, 0};
+    sfc64_t state = {{seed, seed, seed}, 1};
     for (int i = 0; i < 12; ++i) sfc64_rand(&state);
     return state;
+}
+
+/*
+ * convert random int number to float in [0, 1) range.
+ */
+
+STC_API float rand_toFloat(uint32_t rnd) {
+    union {uint32_t i; float f;} v = {0x3F800000u | (rnd >> 9)};
+    return v.f - 1.0f;
+}
+ 
+STC_API double rand_toDouble(uint64_t rnd) {
+    union {uint64_t i; double f;} v = {0x3FF0000000000000ull | (rnd >> 12)};
+    return v.f - 1.0;
 }
 
 /*
