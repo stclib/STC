@@ -151,9 +151,9 @@ STC_API sfc64_t sfc64_seed(const uint64_t seed) {
 #endif
 
 typedef struct siphash_t {
-    int c, d;
+    uint64_t padding, v[4];
     size_t length;
-    uint64_t padding, v0, v1, v2, v3;
+    int c, d;
 } siphash_t;
 
 /* c=2, d=4 or c=1, d=3 */
@@ -162,13 +162,13 @@ STC_API void siphash_init_c_d(siphash_t* s, const uint64_t key[2], const int c, 
     s->d = d;
     s->length = 0;
     s->padding = 0;
-    s->v0 = key[0] ^ 0x736f6d6570736575;
-    s->v1 = key[1] ^ 0x646f72616e646f6d;
-    s->v2 = key[0] ^ 0x6c7967656e657261;
-    s->v3 = key[1] ^ 0x7465646279746573;
+    s->v[0] = key[0] ^ 0x736f6d6570736575;
+    s->v[1] = key[1] ^ 0x646f72616e646f6d;
+    s->v[2] = key[0] ^ 0x6c7967656e657261;
+    s->v[3] = key[1] ^ 0x7465646279746573;
 }
 
-// default init 2-4
+/* default init 2-4 */
 STC_API siphash_t siphash_init(const uint64_t key[2]) {
     siphash_t s;
     siphash_init_c_d(&s, key, 2, 4);
@@ -182,23 +182,24 @@ STC_API siphash_t siphash_init(const uint64_t key[2]) {
      d = c_rotateLeft64(d, j) ^ c, \
      a = c_rotateLeft64(a, 32))
 
-#define _siphash_compress(rounds, s) \
+#define _siphash_compress(rounds, v) \
     for (int r = 0; r < rounds; ++r) { \
-        _siphash_halfRound(13, 16, s->v0, s->v1, s->v2, s->v3); \
-        _siphash_halfRound(17, 21, s->v2, s->v1, s->v0, s->v3); \
+        _siphash_halfRound(13, 16, v[0], v[1], v[2], v[3]); \
+        _siphash_halfRound(17, 21, v[2], v[1], v[0], v[3]); \
     }
 
-#define _siphash_digest(rounds, s, m) { \
+#define _siphash_digest(rounds, v, m) { \
         uint64_t _m = m; \
-        s->v3 ^= _m; \
-        _siphash_compress(rounds, s); \
-        s->v0 ^= _m; \
+        v[3] ^= _m; \
+        _siphash_compress(rounds, v); \
+        v[0] ^= _m; \
     }
 
 STC_API void siphash_update(siphash_t* s, const void* bytes, size_t size) {
     union { const uint8_t* u8; const uint64_t* u64; } in;
     in.u8 = (const uint8_t*) bytes;
     size_t offset = s->length & 7;
+    uint64_t *v = s->v;
     s->length += size;
 
     if (offset) {
@@ -209,7 +210,7 @@ STC_API void siphash_update(siphash_t* s, const void* bytes, size_t size) {
         }
         if (end < 8) return;
 
-        _siphash_digest(s->c, s, s->padding);
+        _siphash_digest(s->c, v, s->padding);
         s->padding = 0;
     }
     size_t n_words = size >> 3;
@@ -217,7 +218,7 @@ STC_API void siphash_update(siphash_t* s, const void* bytes, size_t size) {
 
     while (n_words--) {
         memcpy(&m, in.u64++, 8);
-        _siphash_digest(s->c, s, c_le64ToHost(m));
+        _siphash_digest(s->c, v, c_le64ToHost(m));
     }
     switch (s->length & 7) {
         case 7: s->padding |= ((uint64_t) in.u8[6]) << 48;
@@ -231,17 +232,18 @@ STC_API void siphash_update(siphash_t* s, const void* bytes, size_t size) {
 }
 
 STC_API uint64_t siphash_finalize(siphash_t* s) {
-    _siphash_digest(s->c, s, s->padding | (s->length << 56));
-    s->v2 ^= 0xff;
-    _siphash_compress(s->d, s);
-    return s->v0 ^ s->v1 ^ s->v2 ^ s->v3;
+    uint64_t *v = s->v;
+    _siphash_digest(s->c, v, s->padding | (s->length << 56));
+    v[2] ^= 0xff;
+    _siphash_compress(s->d, v);
+    return v[0] ^ v[1] ^ v[2] ^ v[3];
 }
 /* c=2, d=4 or c=1, d=3 */
 STC_API uint64_t siphash_hash_c_d(const uint64_t key[2], const void* bytes, const uint64_t size, const int c, const int d) {
-    siphash_t state;
-    siphash_init_c_d(&state, key, c, d);
-    siphash_update(&state, bytes, size);
-    return siphash_finalize(&state);
+    siphash_t s;
+    siphash_init_c_d(&s, key, c, d);
+    siphash_update(&s, bytes, size);
+    return siphash_finalize(&s);
 }
 
 /* default hash 2-4 */
