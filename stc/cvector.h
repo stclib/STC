@@ -94,8 +94,12 @@ typedef struct { \
     Value *item, *end; \
 } CVectorIter_##tag, cvector_##tag##_iter_t; \
  \
-STC_API cvector_##tag##_iter_t \
-cvector_##tag##_begin(CVector_##tag* vec); \
+static inline cvector_##tag##_iter_t \
+cvector_##tag##_begin(CVector_##tag* vec) { \
+    const size_t n = cvector_size(*vec); \
+    cvector_##tag##_iter_t it = {n ? vec->data : NULL, vec->data + n}; \
+    return it; \
+} \
  \
 static inline cvector_##tag##_iter_t \
 cvector_##tag##_next(cvector_##tag##_iter_t it) { \
@@ -190,15 +194,8 @@ STC_API void \
 cvector_##tag##_sort(CVector_##tag* self) { \
     size_t len = cvector_size(*self); \
     if (len) qsort(self->data, len, sizeof(Value), cvector_##tag##_sortCompare); \
-} \
- \
-STC_API cvector_##tag##_iter_t \
-cvector_##tag##_begin(CVector_##tag* vec) { \
-    cvector_##tag##_iter_t it; \
-    it.item = vec->data, it.end = it.item + cvector_size(*vec); \
-    if (it.item == it.end) it.item = NULL; \
-    return it; \
 }
+
 #else
 #define implement_CVector_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw)
 #endif

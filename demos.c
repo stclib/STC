@@ -77,19 +77,25 @@ declare_CList(ix, int);
 void listdemo1()
 {
     printf("\nLISTDEMO1\n");
-    CList_ix nums = clist_init;
-    clist_ix_pushBack(&nums, 123);
-    clist_ix_pushBack(&nums, 231);
-    clist_ix_pushBack(&nums, 444);
-    clist_ix_pushBack(&nums, 321);
-    *clist_ix_find(&nums, 231) = 1000;
+    CList_ix nums = clist_init, nums2 = clist_init;
+    for (int i = 0; i < 10; ++i)
+        clist_ix_pushBack(&nums, i);
+    for (int i = 100; i < 110; ++i)
+        clist_ix_pushBack(&nums2, i);
     c_foreach (i, clist_ix, nums)
-        printf("value: %d\n", i.item->value);    
+        printf("value: %d\n", i.item->value);
+    /* merge/append nums2 to nums */
+    clist_ix_spliceAfter(&nums, clist_ix_last(&nums), &nums2);
+    c_foreach (i, clist_ix, nums)
+        printf("spliced: %d\n", i.item->value);
+
+    *clist_ix_find(&nums, 100) *= 10;
     clist_ix_sort(&nums);                     // Sort the array
-    clist_ix_remove(&nums, 123);
+    clist_ix_remove(&nums, 105);
+    clist_ix_popFront(&nums);
+    clist_ix_pushFront(&nums, -99);
     c_foreach (i, clist_ix, nums)
         printf("sorted: %d\n", i.item->value);
-
     clist_ix_destroy(&nums);
 }
 
