@@ -15,6 +15,8 @@ int main(void)
     printf("start\n");
 
     mt19937_t state = mt19937_default();
+    uint32_t k = mt19937_rand(&state);
+    printf("%u - %g\n", k, c_randToFloat(k));
 
     before = clock(); \
     v = 0;

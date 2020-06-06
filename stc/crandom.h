@@ -126,23 +126,20 @@ STC_API void xoroshiro128ss_jump(xoroshiro128ss_t *state, bool longJump) {
  * sfc32: http://pracrand.sourceforge.net
  */
 
-typedef struct sfc32 {
-    uint32_t s[3], counter;
-} sfc32_t;
+typedef struct sfc32 {uint32_t v[4];} sfc32_t;
 
 STC_API uint32_t sfc32_rand(sfc32_t* state) {
     enum {LROT = 21, RSHIFT = 9, LSHIFT = 3};
-    uint32_t *s = state->s;
-
-    uint32_t result = s[0] + s[1] + state->counter++;
-    s[0] = s[1] ^ (s[1] >> RSHIFT);
-    s[1] = s[2] + (s[2] << LSHIFT);
-    s[2] = ((s[2] << LROT) | (s[2] >> (32 - LROT))) + result;
-    return result;
+    uint32_t *v = state->v;
+    const uint32_t out = v[0] + v[1] + v[3]++;
+    v[0] = v[1] ^ (v[1] >> RSHIFT);
+    v[1] = v[2] + (v[2] << LSHIFT);
+    v[2] = ((v[2] << LROT) | (v[2] >> (32 - LROT))) + out;
+    return out;
 }
 
 STC_API sfc32_t sfc32_seed(const uint64_t seed) {
-    sfc32_t state = {{0, (uint32_t) seed, (uint32_t) (seed >> 32)}, 1};
+    sfc32_t state = {{0, (uint32_t) seed, (uint32_t) (seed >> 32), 1}};
     for (int i = 0; i < 12; ++i) sfc32_rand(&state);
     return state;
 }
@@ -151,23 +148,20 @@ STC_API sfc32_t sfc32_seed(const uint64_t seed) {
  * sfc64: http://pracrand.sourceforge.net
  */
 
-typedef struct sfc64 {
-    uint64_t s[3], counter;
-} sfc64_t;
+typedef struct sfc64 {uint64_t v[4];} sfc64_t;
 
 STC_API uint64_t sfc64_rand(sfc64_t* state) {
     enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
-    uint64_t *s = state->s;
-
-    uint64_t result = s[0] + s[1] + state->counter++;
-    s[0] = s[1] ^ (s[1] >> RSHIFT);
-    s[1] = s[2] + (s[2] << LSHIFT);
-    s[2] = c_rotateLeft64(s[2], LROT) + result;
-    return result;
+    uint64_t *v = state->v;
+    const uint64_t out = v[0] + v[1] + v[3]++;
+    v[0] = v[1] ^ (v[1] >> RSHIFT);
+    v[1] = v[2] + (v[2] << LSHIFT);
+    v[2] = ((v[2] << LROT) | (v[2] >> (64 - LROT))) + out;
+    return out;
 }
 
 STC_API sfc64_t sfc64_seed(const uint64_t seed) {
-    sfc64_t state = {{seed, seed, seed}, 1};
+    sfc64_t state = {{seed, seed, seed, 1}};
     for (int i = 0; i < 12; ++i) sfc64_rand(&state);
     return state;
 }
@@ -176,14 +170,14 @@ STC_API sfc64_t sfc64_seed(const uint64_t seed) {
  * convert random int number to float in [0, 1) range.
  */
 
-STC_API float rand_toFloat(uint32_t rnd) {
-    union {uint32_t i; float f;} v = {0x3F800000u | (rnd >> 9)};
-    return v.f - 1.0f;
+STC_API float c_randToFloat(uint32_t rnd) {
+    union {uint32_t i; float f;} u = {0x3F800000u | (rnd >> 9)};
+    return u.f - 1.0f;
 }
  
-STC_API double rand_toDouble(uint64_t rnd) {
-    union {uint64_t i; double f;} v = {0x3FF0000000000000ull | (rnd >> 12)};
-    return v.f - 1.0;
+STC_API double c_randToDouble(uint64_t rnd) {
+    union {uint64_t i; double f;} u = {0x3FF0000000000000ull | (rnd >> 12)};
+    return u.f - 1.0;
 }
 
 /*
@@ -204,7 +198,7 @@ STC_API double rand_toDouble(uint64_t rnd) {
 #endif
 
 typedef struct siphash_t {
-    uint64_t padding, v[4];
+    uint64_t v[4], padding;
     size_t length;
     int c, d;
 } siphash_t;
@@ -223,9 +217,9 @@ STC_API void siphash_init_c_d(siphash_t* s, const uint64_t key[2], const int c, 
 
 /* default init 2-4 */
 STC_API siphash_t siphash_init(const uint64_t key[2]) {
-    siphash_t s;
-    siphash_init_c_d(&s, key, 2, 4);
-    return s;
+    siphash_t state;
+    siphash_init_c_d(&state, key, 2, 4);
+    return state;
 }
 
 #define _siphash_halfRound(i, j, a, b, c, d) \
@@ -291,12 +285,13 @@ STC_API uint64_t siphash_finalize(siphash_t* s) {
     _siphash_compress(s->d, v);
     return v[0] ^ v[1] ^ v[2] ^ v[3];
 }
+
 /* c=2, d=4 or c=1, d=3 */
 STC_API uint64_t siphash_hash_c_d(const uint64_t key[2], const void* bytes, const uint64_t size, const int c, const int d) {
-    siphash_t s;
-    siphash_init_c_d(&s, key, c, d);
-    siphash_update(&s, bytes, size);
-    return siphash_finalize(&s);
+    siphash_t state;
+    siphash_init_c_d(&state, key, c, d);
+    siphash_update(&state, bytes, size);
+    return siphash_finalize(&state);
 }
 
 /* default hash 2-4 */
