@@ -1,8 +1,7 @@
-#include <stdlib.h>
-#include "stc/cstring.h"
 #include "stc/cvector.h"
 #include "stc/clist.h"
 #include "stc/cmap.h"
+#include "stc/cstring.h"
 
 
 void stringdemo1()

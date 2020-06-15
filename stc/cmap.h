@@ -42,7 +42,7 @@ int main(void) {
 #ifndef CMAP__H__
 #define CMAP__H__
 
-#include <malloc.h>
+#include <stdlib.h>
 #include "cdefs.h"
 
 #define cmap_init          {NULL, NULL, 0, 0, 90, 0}

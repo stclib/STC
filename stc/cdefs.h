@@ -24,6 +24,7 @@
 #define CDEFS__H__
 
 #include <stdint.h>
+#include <stddef.h>
 #include <stdbool.h>
 
 #if defined(_MSC_VER)

@@ -1,11 +1,11 @@
-//#include <stdlib.h>
+#include "stc/crandom.h"
+#include "stc/cstring.h"
+#include "stc/cmap.h"
+#include "others/khash.h"
+
 #include <stdio.h>
 #include <time.h>
 
-#include "stc/cstring.h"
-#include "stc/cmap.h"
-#include "stc/crandom.h"
-#include "others/khash.h"
 #ifdef __cplusplus
 #include <unordered_map>
 #include "others/bytell_hash_map.hpp"

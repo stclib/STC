@@ -23,7 +23,7 @@
 #ifndef CVECTOR__H__
 #define CVECTOR__H__
 
-#include <malloc.h>
+#include <stdlib.h>
 #include <string.h>
 #include "cdefs.h"
 
