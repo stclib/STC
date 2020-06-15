@@ -24,7 +24,7 @@ int main(void)
         v += mt19937_rand(&state);
     }
     difference = clock() - before;
-    printf("my-mt: %.02f, %llu\n", (float) difference / CLOCKS_PER_SEC, v);
+    printf("my-mt: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
 
 #ifdef __cplusplus
     std::mt19937 mt_rand;
@@ -34,7 +34,7 @@ int main(void)
         v += mt_rand();
     }
     difference = clock() - before;
-    printf("c++mt: %.02f, %llu\n", (float) difference / CLOCKS_PER_SEC, v);
+    printf("c++mt: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
 #endif
 
     xoroshiro128ss_t xo = xoroshiro128ss_seed(1234);
@@ -44,7 +44,7 @@ int main(void)
         v += xoroshiro128ss_rand(&xo) & 0xffffffff;
     }
     difference = clock() - before;
-    printf("xoros: %.02f, %llu\n", (float) difference / CLOCKS_PER_SEC, v);
+    printf("xoros: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
 
 
     sfc64_t sfc = sfc64_seed(1234);
@@ -54,7 +54,7 @@ int main(void)
         v += sfc64_rand(&sfc) & 0xffffffff;
     }
     difference = clock() - before;
-    printf("sfc64: %.02f, %llu\n", (float) difference / CLOCKS_PER_SEC, v);
+    printf("sfc64: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
 
 /*
     before = clock(); \
@@ -63,6 +63,6 @@ int main(void)
         v += rand();
     }
     difference = clock() - before;
-    printf("rand : %.02f, %llu\n", (float) difference / CLOCKS_PER_SEC, v);
+    printf("rand : %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
 */
 }

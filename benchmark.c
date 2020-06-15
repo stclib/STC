@@ -78,7 +78,7 @@ const double maxLoadFactor = 0.77;
 
 const size_t N1 = 7000000;
 const size_t N2 = 10000000;
-#define      RR   24
+#define      RR   20
 int rr = RR;
 
 
@@ -93,7 +93,7 @@ int rr = RR;
         erased += M##_ERASE(tag, RAND(rr)); \
     } \
     difference = clock() - before; \
-    printf(#M "(" #tag "): sz: %llu, bucks: %llu, time: %.02f, sum: %llu, erase: %llu\n", \
+    printf(#M "(" #tag "): sz: %zu, bucks: %zu, time: %.02f, sum: %zu, erase: %zu\n", \
            M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, checksum, erased); \
     M##_CLEAR(tag); \
 }
@@ -109,7 +109,7 @@ int rr = RR;
     for (size_t i = 0; i < N2; ++i) \
         erased += M##_ERASE(tag, i*17); \
     difference = clock() - before; \
-    printf(#M "(" #tag "): sz: %llu, bucks: %llu, time: %.02f, erase %llu\n", \
+    printf(#M "(" #tag "): sz: %zu, bucks: %zu, time: %.02f, erase %zu\n", \
            M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, erased); \
     M##_CLEAR(tag); \
 }
@@ -118,7 +118,7 @@ int rr = RR;
 int main(int argc, char* argv[])
 {
     rr = argc == 2 ? atoi(argv[1]) : RR;
-    printf("\nmap<uint64_t, uint64_t>: Insert + remove %llu random keys in range 0 - 2^%d:\n", N1, rr);
+    printf("\nmap<uint64_t, uint64_t>: Insert + remove %zu random keys in range 0 - 2^%d:\n", N1, rr);
     MAP_TEST1(CMAP, ii)
     MAP_TEST1(KMAP, ii)
 #ifdef __cplusplus
@@ -128,7 +128,7 @@ int main(int argc, char* argv[])
     MAP_TEST1(RMAP, ii)
 #endif
 
-    printf("\nmap<uint64_t, uint64_t>: Insert %llu keys, THEN remove them in same order:\n", N2);
+    printf("\nmap<uint64_t, uint64_t>: Insert %zu keys, THEN remove them in same order:\n", N2);
     MAP_TEST2(CMAP, ii)
     MAP_TEST2(KMAP, ii)
 #ifdef __cplusplus

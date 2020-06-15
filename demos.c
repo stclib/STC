@@ -43,11 +43,11 @@ void vectordemo1()
     for (size_t i = 0; i<=100; ++i)
         cvector_ix_pushBack(&bignums, i * i * i);
 
-    printf("erase - %llu: %llu\n", 100, bignums.data[100]);
+    printf("erase - %d: %zu\n", 100, bignums.data[100]);
     cvector_ix_popBack(&bignums); // erase the last
 
     for (size_t i = 0; i < cvector_size(bignums); ++i) {
-        if (i >= 90) printf("%llu: %llu\n", i, bignums.data[i]);
+        if (i >= 90) printf("%zu: %zu\n", i, bignums.data[i]);
     }
     cvector_ix_destroy(&bignums);
 }
@@ -149,7 +149,7 @@ void mapdemo3()
     printf("remove: Make: %s\n", cmap_ss_get(&table, "Make")->value.str);
     cmap_ss_erase(&table, "Make");
 
-    printf("size %llu\n", cmap_size(table));
+    printf("size %zu\n", cmap_size(table));
     c_foreach (i, cmap_ss, table)
         printf("key: %s\n", i.item->key.str);
     cmap_ss_destroy(&table); // frees key and value CStrings, and hash table (CVector).

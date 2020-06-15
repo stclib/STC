@@ -23,7 +23,9 @@
 #ifndef CSTRING__H__
 #define CSTRING__H__
 
+#include <stdlib.h> /* alloca */
 #include <malloc.h>
+#include <stddef.h>
 #include <stdbool.h>
 #include <string.h>
 #include <stdint.h>
