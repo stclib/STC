@@ -14,13 +14,19 @@
 
 // Visual Studio: compile with -TP to force C++:  cl -TP -EHsc -O2 benchmark.c
 
-declare_CMap(ii, int64_t, int64_t, c_noDestroy, c_lowbias32Hash);
+
+static inline uint32_t fibonacci_hash(const void* data, size_t len) {
+    const uint64_t key = *(const uint64_t *) data;
+    return (uint32_t) (key * 11400714819323198485llu);
+}
+declare_CMap(ii, int64_t, int64_t, c_noDestroy, fibonacci_hash); // c_lowbias32Hash);
 
 KHASH_MAP_INIT_INT64(ii, uint64_t)
 
-const size_t seed = 123; // time(NULL);
-const double maxLoadFactor = 0.77;
-#define SEED(s) sfc64_t rng = sfc64_seed(s)
+size_t seed = 1234;
+static const double maxLoadFactor = 0.77;
+sfc64_t rng;
+#define SEED(s) rng = sfc64_seed(seed)
 #define RAND(N) (sfc64_rand(&rng) & ((1 << N) - 1))
 
 //#define SEED(s) mt19937_t rng = mt19937_seed(s)
@@ -86,6 +92,7 @@ int rr = RR;
 { \
     M##_SETUP(tag, int64_t, int64_t); \
     uint64_t checksum = 0, erased = 0; \
+    seed = time(NULL); \
     SEED(seed); \
     clock_t difference, before = clock(); \
     for (size_t i = 0; i < N1; ++i) { \
@@ -101,13 +108,30 @@ int rr = RR;
 #define MAP_TEST2(M, tag) \
 { \
     M##_SETUP(tag, int64_t, int64_t); \
-    SEED(seed); \
     size_t erased = 0; \
     clock_t difference, before = clock(); \
     for (size_t i = 0; i < N2; ++i) \
-        M##_PUT(tag, i*17, i); \
+        M##_PUT(tag, i, i); \
     for (size_t i = 0; i < N2; ++i) \
-        erased += M##_ERASE(tag, i*17); \
+        erased += M##_ERASE(tag, i); \
+    difference = clock() - before; \
+    printf(#M "(" #tag "): sz: %zu, bucks: %zu, time: %.02f, erase %zu\n", \
+           M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, erased); \
+    M##_CLEAR(tag); \
+}
+
+#define MAP_TEST3(M, tag) \
+{ \
+    M##_SETUP(tag, int64_t, int64_t); \
+    size_t erased = 0; \
+    seed = time(NULL); \
+    clock_t difference, before = clock(); \
+    SEED(seed); \
+    for (size_t i = 0; i < N2; ++i) \
+        M##_PUT(tag, RAND(rr), i); \
+    SEED(seed); \
+    for (size_t i = 0; i < N2; ++i) \
+        erased += M##_ERASE(tag, RAND(rr)); \
     difference = clock() - before; \
     printf(#M "(" #tag "): sz: %zu, bucks: %zu, time: %.02f, erase %zu\n", \
            M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, erased); \
@@ -128,7 +152,7 @@ int main(int argc, char* argv[])
     MAP_TEST1(RMAP, ii)
 #endif
 
-    printf("\nmap<uint64_t, uint64_t>: Insert %zu keys, THEN remove them in same order:\n", N2);
+    printf("\nmap<uint64_t, uint64_t>: Insert %zu linear keys, THEN remove them in same order:\n", N2);
     MAP_TEST2(CMAP, ii)
     MAP_TEST2(KMAP, ii)
 #ifdef __cplusplus
@@ -136,5 +160,15 @@ int main(int argc, char* argv[])
     MAP_TEST2(BMAP, ii)
     MAP_TEST2(FMAP, ii)
     MAP_TEST2(RMAP, ii)
+#endif
+
+    printf("\nmap<uint64_t, uint64_t>: Insert %zu random keys, THEN remove them in same order:\n", N2);
+    MAP_TEST3(CMAP, ii)
+    MAP_TEST3(KMAP, ii)
+#ifdef __cplusplus
+    MAP_TEST3(UMAP, ii)
+    MAP_TEST3(BMAP, ii)
+    MAP_TEST3(FMAP, ii)
+    MAP_TEST3(RMAP, ii)
 #endif
 }

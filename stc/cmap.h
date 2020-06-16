@@ -275,8 +275,8 @@ cmap_##tag##_swap(CMap_##tag* a, CMap_##tag* b) { \
 } \
  \
 STC_API size_t \
-cmap_##tag##_reserve(CMap_##tag* self, size_t size) { \
-    size_t oldcap = cmap_bucketCount(*self), newcap = 1 + (size / 2) * 2; \
+cmap_##tag##_reserve(CMap_##tag* self, size_t newcap) { \
+    size_t oldcap = cmap_bucketCount(*self); newcap |= 1; \
     if (cmap_size(*self) >= newcap * self->maxLoadPercent * 0.01) return oldcap; \
     CMap_##tag tmp = { \
         c_new_2(CMapEntry_##tag, newcap), \

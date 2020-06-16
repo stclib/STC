@@ -24,6 +24,7 @@
 #define CSTRING__H__
 
 #include <stdlib.h> /* alloca, malloc */
+#include <malloc.h>
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h> /* vsnprintf */

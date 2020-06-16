@@ -83,15 +83,13 @@ static inline uint32_t  c_defaultHash(const void *data, size_t len) {
 }
 
 /* https://nullprogram.com/blog/2018/07/31/: assume len positive multiple of 4 */
+/* https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/ */
 static inline uint32_t c_lowbias32Hash(const void *data, size_t len) {
     const volatile uint32_t *key = (const uint32_t *) data;
     uint32_t x = *key;
     do {
         x ^= *key++ >> 16;
         x *= UINT32_C(0x7feb352d);
-        //x ^= x >> 15;
-        //x *= UINT32_C(0x846ca68b);
-        //x ^= x >> 16;
     } while (len -= 4);
     return x;
 }
