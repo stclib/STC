@@ -41,18 +41,16 @@
         CList_i list = clist_init;
         CList_s slist = clist_init;
         int n;
-
-        // Add one million random numbers...
-        for (int i=0; i<1000000; ++i)
+        for (int i=0; i<1000000; ++i) // one million
             clist_i_pushBack(&list, rand() * rand());
         n = 0; 
         c_foreach (i, clist_i, list)
-            if (++n % 10000 == 0) printf("%d: %lld\n", n, i.item->value);
+            if (++n % 10000 == 0) printf("%d: %zd\n", n, i.item->value);
         // Sort them...
         clist_i_sort(&list); // mergesort O(n*log n)
         n = 0;
         c_foreach (i, clist_i, list)
-            if (++n % 10000 == 0) printf("%d: %lld\n", n, i.item->value);
+            if (++n % 10000 == 0) printf("%d: %zd\n", n, i.item->value);
         clist_i_destroy(&list);
 
         // Test CList with CStrings 
@@ -60,13 +58,13 @@
         clist_s_pushBack(&slist, cstring_make("Item 2"));
         clist_s_pushBack(&slist, cstring_make("Item X"));
         clist_s_pushBack(&slist, cstring_make("Item 3"));
-        printf("\n");
+        puts("");
         c_foreach (i, clist_s, slist)
             printf("%s\n", i.item->value.str);
-        // Change the list...
+        // Modify
         clist_s_pushFront(&slist, cstring_make("Item 0"));
         clist_s_remove(&slist, "Item X");
-        printf("\n");
+        puts("");
         c_foreach (i, clist_s, slist)
             printf("%s\n", i.item->value.str);
         clist_s_destroy(&slist);
@@ -110,37 +108,26 @@
  \
     STC_API void \
     clist_##tag##_destroy(CList_##tag* self); \
- \
-    STC_API void \
-    clist_##tag##_pushFront(CList_##tag* self, Value value); \
- \
-    STC_API void \
-    clist_##tag##_popFront(CList_##tag* self); \
- \
     STC_API void \
     clist_##tag##_pushBack(CList_##tag* self, Value value); \
- \
+    STC_API void \
+    clist_##tag##_pushFront(CList_##tag* self, Value value); \
+    STC_API void \
+    clist_##tag##_popFront(CList_##tag* self); \
     STC_API void \
     clist_##tag##_insertAfter(CList_##tag* self, clist_##tag##_iter_t pos, Value value); \
- \
     STC_API void \
     clist_##tag##_eraseAfter(CList_##tag* self, clist_##tag##_iter_t pos); \
- \
     STC_API void \
     clist_##tag##_spliceFront(CList_##tag* self, CList_##tag* other); \
- \
     STC_API void \
     clist_##tag##_spliceAfter(CList_##tag* self, clist_##tag##_iter_t pos, CList_##tag* other); \
- \
     STC_API clist_##tag##_iter_t \
     clist_##tag##_findBefore(CList_##tag* self, RawValue val); \
- \
     STC_API Value* \
     clist_##tag##_find(CList_##tag* self, RawValue val); \
- \
     STC_API clist_##tag##_iter_t \
     clist_##tag##_remove(CList_##tag* self, RawValue val); \
- \
     STC_API void \
     clist_##tag##_sort(CList_##tag* self); \
  \
@@ -175,6 +162,11 @@
     } \
  \
     STC_API void \
+    clist_##tag##_pushBack(CList_##tag* self, Value value) { \
+        _clist_insertAfter(self, tag, self->last, value); \
+        self->last = entry; \
+    } \
+    STC_API void \
     clist_##tag##_pushFront(CList_##tag* self, Value value) { \
         _clist_insertAfter(self, tag, self->last, value); \
         if (!self->last) self->last = entry; \
@@ -185,17 +177,10 @@
     } \
  \
     STC_API void \
-    clist_##tag##_pushBack(CList_##tag* self, Value value) { \
-        _clist_insertAfter(self, tag, self->last, value); \
-        self->last = entry; \
-    } \
- \
-    STC_API void \
     clist_##tag##_insertAfter(CList_##tag* self, clist_##tag##_iter_t pos, Value value) { \
         _clist_insertAfter(self, tag, pos.item, value); \
         if (!self->last || pos.item == self->last) self->last = entry; \
     } \
- \
     STC_API void \
     clist_##tag##_eraseAfter(CList_##tag* self, clist_##tag##_iter_t pos) { \
         _clist_eraseAfter(self, tag, pos.item, valueDestroy); \

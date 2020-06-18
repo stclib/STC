@@ -51,44 +51,33 @@ typedef struct CVector_##tag { \
  \
 STC_API void \
 cvector_##tag##_destroy(CVector_##tag* self); \
- \
 STC_API void \
 cvector_##tag##_reserve(CVector_##tag* self, size_t cap); \
- \
 STC_API void \
 cvector_##tag##_clear(CVector_##tag* self); \
- \
 STC_API void \
 cvector_##tag##_pushBack(CVector_##tag* self, Value value); \
- \
 static inline void \
 cvector_##tag##_popBack(CVector_##tag* self) { \
     valueDestroy(&self->data[_cvector_size(*self) - 1]); \
     --_cvector_size(*self); \
 } \
- \
 static inline Value \
 cvector_##tag##_back(CVector_##tag cv) { \
     return cv.data[_cvector_size(cv) - 1]; \
 } \
- \
 STC_API void \
 cvector_##tag##_insert(CVector_##tag* self, size_t pos, Value value); \
- \
 STC_API void \
 cvector_##tag##_erase(CVector_##tag* self, size_t pos, size_t size); \
- \
 STC_API void \
 cvector_##tag##_sort(CVector_##tag* self); \
- \
 STC_API size_t \
 cvector_##tag##_find(CVector_##tag cv, RawValue rawValue); \
- \
 static inline void \
 cvector_##tag##_swap(CVector_##tag* a, CVector_##tag* b) { \
     c_swap(Value*, a->data, b->data); \
 } \
- \
  \
 typedef struct { \
     Value *item, *end; \
@@ -100,7 +89,6 @@ cvector_##tag##_begin(CVector_##tag* vec) { \
     cvector_##tag##_iter_t it = {n ? vec->data : NULL, vec->data + n}; \
     return it; \
 } \
- \
 static inline cvector_##tag##_iter_t \
 cvector_##tag##_next(cvector_##tag##_iter_t it) { \
     if (++it.item == it.end) it.item = NULL; \
@@ -108,7 +96,6 @@ cvector_##tag##_next(cvector_##tag##_iter_t it) { \
 } \
  \
 implement_CVector_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
- \
 typedef Value CVectorValue_##tag; \
 typedef RawValue CVectorRawValue_##tag
 
