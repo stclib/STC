@@ -1,14 +1,15 @@
-# stc
+STC - C99 Standard Container Library
+====================================
 
 Introduction
 ------------
-A modern, typesafe, very efficient, generic C99 container library: String, Vector and Hashmap
+A modern, generic, typesafe, and very efficient standard container library for C99.
 
-Headers only library with the most used data structures: string, dynamic vector/stack, and map/assosiative array. The library has an intuitive and API. It uses overloadable macros to simplify usage.
+This is a small headers only library with the most used data structures: **cstring**, **cvector**, **carray**, **clist** and **map**. 
 
 Usage
 -----
-CString demo:
+CString demo
 ```
 #include <stc/cstring.h>
 
@@ -34,7 +35,7 @@ int main() {
     cstring_destroy(&cs);
 }
 ```
-Simple CVector of 64bit ints:
+Simple CVector of 64bit int
 ```
 #include <stc/cvector.h>
 declare_CVector(ix, int64_t); // ix is just an example tag name, use anything without underscore.
@@ -52,7 +53,7 @@ int main() {
     cvector_ix_destroy(&bignums);
 }
 ```
-CVector of CString:
+CVector of CString
 ```
 #include <stc/cstring.h>
 #include <stc/cvector.h>
@@ -82,7 +83,7 @@ int main() {
     cmap_ii_destroy(&nums);
 }
 ```
-Simple CMap, CString -> int:
+Simple CMap, CString -> int
 ```
 #include <stc/cstring.h>
 #include <stc/cmap.h>
@@ -106,7 +107,7 @@ int main() {
     cmap_si_destroy(&nums);
 }
 ```
-CMap, with CString -> CString. Temporary CString values are created by "make", and moved to the container.
+CMap, with CString -> CString. Temporary CString values are created by "make", and moved to the container
 ```
 #include <stc/cstring.h>
 #include <stc/cmap.h>
