@@ -25,11 +25,12 @@ KHASH_MAP_INIT_INT64(ii, uint64_t)
 
 size_t seed = 1234;
 static const double maxLoadFactor = 0.77;
+
 sfc64_t rng;
 #define SEED(s) rng = sfc64_seed(seed)
 #define RAND(N) (sfc64_rand(&rng) & ((1 << N) - 1))
-
-//#define SEED(s) mt19937_t rng = mt19937_seed(s)
+//mt19937_t rng;
+//#define SEED(s) rng = mt19937_seed(s)
 //#define RAND(N) (mt19937_rand(&rng) & ((1 << N) - 1))
 
 
@@ -92,7 +93,6 @@ int rr = RR;
 { \
     M##_SETUP(tag, int64_t, int64_t); \
     uint64_t checksum = 0, erased = 0; \
-    seed = time(NULL); \
     SEED(seed); \
     clock_t difference, before = clock(); \
     for (size_t i = 0; i < N1; ++i) { \
@@ -124,7 +124,6 @@ int rr = RR;
 { \
     M##_SETUP(tag, int64_t, int64_t); \
     size_t erased = 0; \
-    seed = time(NULL); \
     clock_t difference, before = clock(); \
     SEED(seed); \
     for (size_t i = 0; i < N2; ++i) \
@@ -142,7 +141,9 @@ int rr = RR;
 int main(int argc, char* argv[])
 {
     rr = argc == 2 ? atoi(argv[1]) : RR;
-    printf("\nmap<uint64_t, uint64_t>: Insert + remove %zu random keys in range 0 - 2^%d:\n", N1, rr);
+    seed = time(NULL);
+    printf("\nRandom keys are in range [0, 2^%d):\n",  rr);
+    printf("\nmap<uint64_t, uint64_t>: %zu repeats of Insert random key + remove a different random key:\n", N1);
     MAP_TEST1(CMAP, ii)
     MAP_TEST1(KMAP, ii)
 #ifdef __cplusplus
@@ -152,7 +153,7 @@ int main(int argc, char* argv[])
     MAP_TEST1(RMAP, ii)
 #endif
 
-    printf("\nmap<uint64_t, uint64_t>: Insert %zu linear keys, THEN remove them in same order:\n", N2);
+    printf("\nmap<uint64_t, uint64_t>: Insert %zu index keys, then remove them in same order:\n", N2);
     MAP_TEST2(CMAP, ii)
     MAP_TEST2(KMAP, ii)
 #ifdef __cplusplus
@@ -162,7 +163,7 @@ int main(int argc, char* argv[])
     MAP_TEST2(RMAP, ii)
 #endif
 
-    printf("\nmap<uint64_t, uint64_t>: Insert %zu random keys, THEN remove them in same order:\n", N2);
+    printf("\nmap<uint64_t, uint64_t>: Insert %zu random keys, then remove them in same order:\n", N2);
     MAP_TEST3(CMAP, ii)
     MAP_TEST3(KMAP, ii)
 #ifdef __cplusplus

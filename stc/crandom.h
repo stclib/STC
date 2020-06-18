@@ -236,7 +236,7 @@ STC_API siphash_t siphash_init(const uint64_t key[2]) {
     }
 
 #define _siphash_digest(rounds, v, m) { \
-        uint64_t _m = m; \
+        const uint64_t _m = m; \
         v[3] ^= _m; \
         _siphash_compress(rounds, v); \
         v[0] ^= _m; \
@@ -250,7 +250,7 @@ STC_API void siphash_update(siphash_t* s, const void* bytes, size_t size) {
     s->length += size;
 
     if (offset) {
-        size_t end = offset + size;
+        const size_t end = offset + size;
         size -= 8 - offset;
         while (offset < end && offset < 8) {
             s->padding |= ((uint64_t) *in.u8++) << (offset++ << 3);
