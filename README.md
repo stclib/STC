@@ -12,6 +12,7 @@ All containers, except CString is generic (similar to templates in C++). Typical
 ```
 #include <stc/vector.h>
 declare_CVector(my, int);
+
 int main(void) {
     CVector_my vec = cvector_init;
     cvector_pushBack(&vec, 123);
@@ -26,6 +27,7 @@ This is a header only library, so files can simply be included in your program. 
 #define STC_IMPLEMENT
 #include <stc/vector.h>
 #include <stc/map.h>
+
 declare_CVector(my, int);
 declare_CMap(my, int, int);
 ...
