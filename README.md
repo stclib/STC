@@ -4,32 +4,31 @@ STC - C99 Standard Container Library
 Introduction
 ------------
 
-An elegant, modern, generic, typesafe, and very efficient standard container library for C99.
+An elegant, modern, generic, typesafe, and very efficient standard container library for C99. This is a small headers only library with the most used container components: **cstring**, **cvector**, **chash**, **carray**, and **clist**. 
 
-This is a small headers only library with the most used container components: **cstring**, **cvector**, **carray**, **clist** and **chash**. 
-
-All containers, except CString is generic (similar to templates in C++). Typical usage is:
+All containers, except CString are generic (similar to templates in C++). The typical usage is:
 ```
 #include <stc/vector.h>
-declare_CVector(my, int);
+declare_CVector(i, int);
 
 int main(void) {
-    CVector_my vec = cvector_init;
-    cvector_pushBack(&vec, 123);
-    cvector_destroy(&vec);
+    CVector_i vec = cvector_init;
+    cvector_i_pushBack(&vec, 42);
+    cvector_i_destroy(&vec);
 }
 ```
 Installation
 ------------
 
-This is a header only library, so files can simply be included in your program. The functions will be inlined by default. If the library is extensively used accross many files with same instantiated type, it can alternatively be compiled as a library in order to minimize executable size. In that case, specify -DSTC_HEADER on the compiler line, and create one file that contains all implementations of containers, e.g.
+Because it is headers only, files can simply be included in your program. The functions will be inlined by default. If the library is extensively used accross many files with same instantiated type, alternatively compile as a library to minimize executable size;  specify -DSTC_HEADER on the compiler line, and put all the instantiations of the containers you use in one C file, e.g.
 ```
-#define STC_IMPLEMENT
-#include <stc/vector.h>
-#include <stc/map.h>
+#define STC_IMPLEMENTATION
+#include <stc/cvector.h>
+#include <stc/chash.h>
 
-declare_CVector(my, int);
-declare_CMap(my, int, int);
+declare_CVector(i, int);
+declare_CHash(ii, map, int, int);
+declare_CHash(64, set, int64_t);
 ...
 ```
 
