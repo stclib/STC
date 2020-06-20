@@ -4,11 +4,16 @@ STC - C99 Standard Container Library
 Introduction
 ------------
 
-An elegant, modern, generic, customizable, typesafe, and very efficient standard container library for C99. This is a small headers only library with the most used container components: **cstring**, **cvector**, **chash** (map and set), **carray** (multi-dim. dynamic array), and **clist** (circular singly linked list, suited to be used as queue).
+An elegant, modern, generic, customizable, typesafe, consistent, user-friendly, and very efficient standard container library for C99. This is a small headers only library with the most used container components:
+- **CString** - Compact and powerful string class
+- **CVector** - Dynamic generic vector class.
+- **CHash** - Unorderd map and set.
+- **CArray** - Multi-dimensional dynamic array
+- **CList** - A circular singly linked list, suited to be used as queue (supports pushBack, pushFront, and popFront).
 
 The usage is quite similar to c++ standard containers, so it should be easy for those who are familiar with that.
 
-All containers mentioned above, except for CString are generic (similar to templates in C++). The typical usage is:
+All containers mentioned above, except for CString are generic (similar to templates in C++). A simple example:
 ```
 #include <stc/vector.h>
 declare_CVector(i, int);
