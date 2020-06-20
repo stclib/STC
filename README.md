@@ -4,12 +4,14 @@ STC - C99 Standard Container Library
 Introduction
 ------------
 
-An elegant, modern, generic, customizable, typesafe, consistent, user-friendly, and very efficient standard container library for C99. This is a small headers only library with the most used container components:
-- **CString** - Compact and powerful string class
-- **CVector** - Dynamic generic vector class.
-- **CHash** - Unorderd map and set.
-- **CArray** - Multi-dimensional dynamic array
-- **CList** - A circular singly linked list, suited to be used as queue (supports pushBack, pushFront, and popFront).
+An elegant, modern, generic, customizable, typesafe, consistent, user-friendly, and very efficient standard container library for C99. This is a small headers only library with the most used container components, and a few algorithms:
+- **cstring.h** - Compact and powerful string class
+- **cvector.h** - Dynamic generic vector class.
+- **chash.h** - Unordered **map** and **set**.
+- **carray.h** - Multi-dimensional dynamic array
+- **clist.h** - A circular singly linked list, suited to be used as queue (supports pushBack, pushFront, and popFront).
+- **coption.h** - Header-only implementation of getopt_long-like function, to parse command line arguments.
+- **crandom.h** - Header-only collection of efficent modern random number generators **xoroshiro128ss**, **sfc32/64** and **Mersenne Twister**. It also implements the crypto-strong **siphash** algorithm.
 
 The usage is quite similar to c++ standard containers, so it should be easy for those who are familiar with that.
 
@@ -38,11 +40,15 @@ declare_CHash(ii, map, int, int);
 declare_CHash(64, set, int64_t);
 ...
 ```
+Performance
+-----------
+
+These are all very efficient containers as they have templated "intrusive" elements. The 
 
 Usage by examples
 -----------------
 
-**CString** *demo*
+**CString** demo
 ```
 #include <stc/cstring.h>
 
