@@ -8,6 +8,29 @@ An elegant, modern, generic, typesafe, and very efficient standard container lib
 
 This is a small headers only library with the most used container components: **cstring**, **cvector**, **carray**, **clist** and **chash**. 
 
+All containers, except CString is generic (similar to templates in C++). Typical usage is:
+```
+#include <stc/vector.h>
+declare_CVector(my, int);
+int main(void) {
+    CVector_my vec = cvector_init;
+    cvector_pushBack(&vec, 123);
+    cvector_destroy(&vec);
+}
+```
+Installation
+------------
+
+This is a header only library, so files can simply be included in your program. The functions will be inlined by default. If the library is extensively used accross many files with same instantiated type, it can alternatively be compiled as a library in order to minimize executable size. In that case, specify -DSTC_HEADER on the compiler line, and create one file that contains all implementations of containers, e.g.
+```
+#define STC_IMPLEMENT
+#include <stc/vector.h>
+#include <stc/map.h>
+declare_CVector(my, int);
+declare_CMap(my, int, int);
+...
+```
+
 Usage by examples
 -----------------
 
