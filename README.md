@@ -3,12 +3,14 @@ STC - C99 Standard Container Library
 
 Introduction
 ------------
-A modern, generic, typesafe, and very efficient standard container library for C99.
 
-This is a small headers only library with the most used data structures: **cstring**, **cvector**, **carray**, **clist** and **map**. 
+An elegant, modern, generic, typesafe, and very efficient standard container library for C99.
 
-Usage
------
+This is a small headers only library with the most used container components: **cstring**, **cvector**, **carray**, **clist** and **chash**. 
+
+Usage by examples
+-----------------
+
 CString demo
 ```
 #include <stc/cstring.h>
@@ -69,58 +71,53 @@ int main() {
     cvector_cs_destroy(&names);
 }
 ```
-Simple CMap, int -> int:
+CHash map of int -> int
 ```
 #include <stc/cmap.h>
-declare_CMap(ii, int, int);
+declare_CHash(ii, map, int, int);
 
 int main() {
-    CMap_ii nums = cmap_init;
-    cmap_ii_put(&nums, 8, 64);
-    cmap_ii_put(&nums, 11, 121);
+    CHash_ii nums = cmap_init;
+    chash_ii_put(&nums, 8, 64);
+    chash_ii_put(&nums, 11, 121);
 
-    printf("%d\n", cmap_ii_get(nums, 8)->value);
-    cmap_ii_destroy(&nums);
+    printf("%d\n", chash_ii_get(nums, 8)->value);
+    chash_ii_destroy(&nums);
 }
 ```
-Simple CMap, CString -> int
+CHash set of CString
 ```
 #include <stc/cstring.h>
 #include <stc/cmap.h>
-declare_CMap_stringkey(si, int); // Shorthand macro for the general declare_CMap expansion.
-// CString keys are "magically" managed internally, although CMap is ignorant of CString.
+declare_CHash_string(s, set); // Shorthand macro for the general declare_CHash expansion.
+// CString keys are managed internally, although CHash is ignorant of CString.
 
 int main() {
-    CMap_si nums = cmap_init;
-    cmap_si_put(&nums, "Hello", 64);
-    cmap_si_put(&nums, "Groovy", 121);
-    cmap_si_put(&nums, "Groovy", 200); // overwrite previous
+    CHash_s words = cmap_init;
+    chash_s_put(&words, "Hello");
+    chash_s_put(&words, "Groovy");
+    chash_s_erase(&words, "Hello");
 
     // iterate the map:
-    for (cmap_si_iter_t i = cmap_si_begin(&nums); i.item; i = cmap_si_next(i))
-        printf("%s: %d\n", i.item->key.str, i.item->value);
-
-    // or rather use the shorter form:
-    c_foreach (i, cmap_si, nums)
-        printf("%s: %d\n", i.item->key.str, i.item->value);
-
-    cmap_si_destroy(&nums);
+    c_foreach (i, chash_s, words)
+        printf("%s\n", i.item->key.str);
+    chash_s_destroy(&words);
 }
 ```
-CMap, with CString -> CString. Temporary CString values are created by "make", and moved to the container
+CHash map of CString -> CString. Temporary CString values are created by "make", and moved to the container
 ```
 #include <stc/cstring.h>
 #include <stc/cmap.h>
-declare_CMap_stringkey(ss, CString, cstring_destroy); 
+declare_CHash_string(ss, map, CString, cstring_destroy); 
 
 int main() {
-    CMap_ss table = cmap_init;
-    cmap_ss_put(&table, "Make", cstring_make("my"));
-    cmap_ss_put(&table, "Sunny", cstring_make("day"));
-    printf("Sunny: %s\n", cmap_ss_get(table, "Sunny")->value.str);
-    cmap_ss_erase(&table, "Make");
+    CHash_ss table = cmap_init;
+    chash_ss_put(&table, "Make", cstring_make("my"));
+    chash_ss_put(&table, "Sunny", cstring_make("day"));
+    printf("Sunny: %s\n", chash_ss_get(table, "Sunny")->value.str);
+    chash_ss_erase(&table, "Make");
 
-    printf("size %d\n", cmap_size(table));
-    cmap_ss_destroy(&table); // frees key and value CStrings, and hash table (CVector).
+    printf("size %d\n", chash_size(table));
+    chash_ss_destroy(&table); // frees key and value CStrings, and hash table (CVector).
 }
 ```

@@ -65,7 +65,7 @@
 #define                 c_noCompare(x, y)      (0)
 #define                 c_defaultEquals(x, y)  (*(x) == *(y))
 #define                 c_memEquals(x, y)      (memcmp(x, y, sizeof(*(y))) == 0)
-#define                 c_noDestroy(p)         ((void)0)
+#define                 c_emptyDestroy(p)      ((void)0)
 
 #define                 c_foreach(it, prefix, container) \
                             for (prefix##_iter_t it = prefix##_begin(&container); it.item; it = prefix##_next(it))

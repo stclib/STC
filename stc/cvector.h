@@ -34,21 +34,23 @@
 
 #define declare_CVector(...)   c_MACRO_OVERLOAD(declare_CVector, __VA_ARGS__)
 #define declare_CVector_2(tag, Value) \
-                                declare_CVector_3(tag, Value, c_noDestroy)
+                                declare_CVector_3(tag, Value, c_emptyDestroy)
 #define declare_CVector_3(tag, Value, valueDestroy) \
                                 declare_CVector_4(tag, Value, valueDestroy, c_defaultCompare)
 #define declare_CVector_4(tag, Value, valueDestroy, valueCompare) \
-                                declare_CVector_6(tag, Value, valueDestroy, Value, valueCompare, c_defaultGetRaw)
+                                declare_CVector_6(tag, Value, valueDestroy, valueCompare, Value, c_defaultGetRaw)
 #define declare_CVector_string(tag) \
-                                declare_CVector_6(tag, CString, cstring_destroy, const char*, cstring_compareRaw, cstring_getRaw)
+                                declare_CVector_6(tag, CString, cstring_destroy, cstring_compareRaw, const char*, cstring_getRaw)
 
 
-#define declare_CVector_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
+#define declare_CVector_6(tag, Value, valueDestroy, valueCompareRaw, RawValue, valueGetRaw) \
  \
 typedef struct CVector_##tag { \
     Value* data; \
 } CVector_##tag; \
  \
+STC_API CVector_##tag \
+cvector_##tag##_make(size_t size, Value null); \
 STC_API void \
 cvector_##tag##_destroy(CVector_##tag* self); \
 STC_API void \
@@ -103,6 +105,15 @@ typedef RawValue CVectorRawValue_##tag
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define implement_CVector_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
+ \
+STC_API CVector_##tag \
+cvector_##tag##_make(size_t size, Value null) { \
+    CVector_##tag vec = cvector_init; \
+    cvector_##tag##_reserve(&vec, size); \
+    _cvector_size(vec) = size; \
+    for (size_t i=0; i<size; ++i) vec.data[i] = null; \
+    return vec; \
+} \
  \
 STC_API void \
 cvector_##tag##_destroy(CVector_##tag* self) { \
@@ -184,7 +195,7 @@ cvector_##tag##_sort(CVector_##tag* self) { \
 }
 
 #else
-#define implement_CVector_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw)
+#define implement_CVector_6(tag, Value, valueDestroy, valueCompareRaw, RawValue, valueGetRaw)
 #endif
 
 #if defined(_WIN32) && defined(_DLL)
