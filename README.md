@@ -5,12 +5,12 @@ Introduction
 ------------
 
 An elegant, modern, generic, customizable, typesafe, consistent, user-friendly, and very efficient standard container library for C99. This is a small headers only library with the most used container components, and a few algorithms:
-- **cstring.h** - Compact and powerful string class
-- **cvector.h** - Dynamic generic vector class.
+- **cstring.h** - Compact and powerful **string** class
+- **cvector.h** - Dynamic generic **vector** class.
 - **chash.h** - Unordered **map** and **set**.
-- **carray.h** - Multi-dimensional dynamic array
-- **clist.h** - A circular singly linked list, suited to be used as queue (supports pushBack, pushFront, and popFront).
-- **coption.h** - Header-only implementation of getopt_long-like function, to parse command line arguments.
+- **carray.h** - Multi-dimensional dynamic **array**
+- **clist.h** - A circular singly linked **list**, suited to be used as **queue** (supports pushBack, pushFront, and popFront).
+- **coption.h** - Header-only implementation of **getopt_long**-like function, to parse command line arguments.
 - **crandom.h** - Header-only collection of efficent modern random number generators **xoroshiro128ss**, **sfc32/64** and Mersenne Twister **mt19937**. It also implements the crypto-strong **siphash** algorithm.
 
 The usage of containers is similar to c++ standard containers, so it should be easy for those who are familiar with that.
