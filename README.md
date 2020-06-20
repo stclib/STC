@@ -4,9 +4,11 @@ STC - C99 Standard Container Library
 Introduction
 ------------
 
-An elegant, modern, generic, typesafe, and very efficient standard container library for C99. This is a small headers only library with the most used container components: **cstring**, **cvector**, **chash**, **carray**, and **clist**. 
+An elegant, modern, generic, customizable, typesafe, and very efficient standard container library for C99. This is a small headers only library with the most used container components: **cstring**, **cvector**, **chash**, **carray**, and **clist**.
 
-All containers, except CString are generic (similar to templates in C++). The typical usage is:
+The usage is quite similar to c++ standard containers, so it should be easy for those who are familiar with that.
+
+All containers mentioned above, except for CString are generic (similar to templates in C++). The typical usage is:
 ```
 #include <stc/vector.h>
 declare_CVector(i, int);
@@ -20,7 +22,7 @@ int main(void) {
 Installation
 ------------
 
-Because it is headers only, files can simply be included in your program. The functions will be inlined by default. If the library is extensively used accross many files with same instantiated type, alternatively compile as a library to minimize executable size;  specify -DSTC_HEADER on the compiler line, and put all the instantiations of the containers you use in one C file, e.g.
+Because it is headers only, files can simply be included in your program. The functions will be inlined by default. If containers are extensively used accross many files with the same instantiated type, it is recommended to build as a library to minimize executable size. In this case, specify -DSTC_HEADER to the compiler, and put all the instantiations of the containers used in one C file, e.g.
 ```
 #define STC_IMPLEMENTATION
 #include <stc/cvector.h>
@@ -83,7 +85,7 @@ CVector of CString
 ```
 #include <stc/cstring.h>
 #include <stc/cvector.h>
-declare_CVector(cs, CString, cstring_destroy); // supply inline destructor of values
+declare_CVector_string(cs);
 
 int main() {
     CVector_cs names = cvector_init;
