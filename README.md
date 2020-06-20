@@ -42,7 +42,7 @@ declare_CHash(64, set, int64_t);
 Usage by examples
 -----------------
 
-CString demo
+**CString** *demo*
 ```
 #include <stc/cstring.h>
 
@@ -68,7 +68,7 @@ int main() {
     cstring_destroy(&cs);
 }
 ```
-Simple CVector of 64bit int
+**CVector** of *int64_t*
 ```
 #include <stc/cvector.h>
 declare_CVector(ix, int64_t); // ix is just an example tag name, use anything without underscore.
@@ -86,7 +86,7 @@ int main() {
     cvector_ix_destroy(&bignums);
 }
 ```
-CVector of CString
+**CVector** of *CString*
 ```
 #include <stc/cstring.h>
 #include <stc/cvector.h>
@@ -102,7 +102,7 @@ int main() {
     cvector_cs_destroy(&names);
 }
 ```
-CHash map of int -> int
+**CHash map** of *int -> int*
 ```
 #include <stc/cmap.h>
 declare_CHash(ii, map, int, int);
@@ -116,7 +116,7 @@ int main() {
     chash_ii_destroy(&nums);
 }
 ```
-CHash set of CString
+**CHash set** of *CString*
 ```
 #include <stc/cstring.h>
 #include <stc/cmap.h>
@@ -135,7 +135,7 @@ int main() {
     chash_s_destroy(&words);
 }
 ```
-CHash map of CString -> CString. Temporary CString values are created by "make", and moved to the container
+**CHash map** of *CString -> CString*. Temporary CString values are created by "make", and moved to the container
 ```
 #include <stc/cstring.h>
 #include <stc/cmap.h>
