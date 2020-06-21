@@ -73,11 +73,11 @@ int main() {
 ```
 CHash map of int -> int
 ```
-#include <stc/cmap.h>
+#include <stc/chash.h>
 declare_CHash(ii, map, int, int);
 
 int main() {
-    CHash_ii nums = cmap_init;
+    CHash_ii nums = chash_init;
     chash_ii_put(&nums, 8, 64);
     chash_ii_put(&nums, 11, 121);
 
@@ -88,12 +88,12 @@ int main() {
 CHash set of CString
 ```
 #include <stc/cstring.h>
-#include <stc/cmap.h>
+#include <stc/chash.h>
 declare_CHash_string(s, set); // Shorthand macro for the general declare_CHash expansion.
 // CString keys are managed internally, although CHash is ignorant of CString.
 
 int main() {
-    CHash_s words = cmap_init;
+    CHash_s words = chash_init;
     chash_s_put(&words, "Hello");
     chash_s_put(&words, "Groovy");
     chash_s_erase(&words, "Hello");
@@ -107,11 +107,11 @@ int main() {
 CHash map of CString -> CString. Temporary CString values are created by "make", and moved to the container
 ```
 #include <stc/cstring.h>
-#include <stc/cmap.h>
+#include <stc/chash.h>
 declare_CHash_string(ss, map, CString, cstring_destroy); 
 
 int main() {
-    CHash_ss table = cmap_init;
+    CHash_ss table = chash_init;
     chash_ss_put(&table, "Make", cstring_make("my"));
     chash_ss_put(&table, "Sunny", cstring_make("day"));
     printf("Sunny: %s\n", chash_ss_get(table, "Sunny")->value.str);

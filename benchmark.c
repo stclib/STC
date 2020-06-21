@@ -1,6 +1,6 @@
 #include "stc/crandom.h"
 #include "stc/cstring.h"
-#include "stc/cmap.h"
+#include "stc/chash.h"
 #include "others/khash.h"
 
 #include <stdio.h>

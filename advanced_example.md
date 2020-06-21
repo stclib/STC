@@ -9,7 +9,8 @@ The difficulty with the hash function is that if your key type consists of sever
 Assuming a key-type like this, and want string as value, we define the functions person_make(), person_destroy() and person_compare():
 ```
 #include <stdio.h>
-#include <stc/cmap.h>
+
+#include <stc/chash.h>
 #include <stc/cstring.h>
 
 struct Person {
@@ -64,27 +65,26 @@ size_t personview_hash(const struct PersonView* pv, size_t ignore) {
 ```
 With this in place, we can declare the map Person -> int:
 ```
-declare_CMap(ex, struct Person, int, c_noDestroy, person_destroy,
-                 struct PersonView, personview_hash, personview_compare,
-                 person_getView, person_fromView);
+declare_CHash(ex, map, struct Person, int, c_emptyDestroy, personview_hash, personview_compare,
+                  struct PersonView, person_destroy, person_getView, person_fromView);
 ```
 Note we use struct PersonView to put keys in the map, but keys are stored as struct Person with proper dynamically allocated CStrings to store name and surname.
 ```
 int main()
 {
-  CMap_ex m6 = cmap_init;
-  cmap_ex_put(&m6, (struct PersonView){"John", "Doe", 24}, 1001);
-  cmap_ex_put(&m6, (struct PersonView){"Jane", "Doe", 21}, 1002);
-  cmap_ex_put(&m6, (struct PersonView){"John", "Travolta", 66}, 1003);
+  CMap_ex m6 = chash_init;
+  chash_ex_put(&m6, (struct PersonView){"John", "Doe", 24}, 1001);
+  chash_ex_put(&m6, (struct PersonView){"Jane", "Doe", 21}, 1002);
+  chash_ex_put(&m6, (struct PersonView){"John", "Travolta", 66}, 1003);
 
-  c_foreach (it, cmap_ex, m6) {
+  c_foreach (it, chash_ex, m6) {
       if (cstring_equals(it.item->key.name, "John"))
           printf("%s %s %d -> %d\n", it.item->key.name.str, it.item->key.surname.str, it.item->key.age,
                                      it.item->value);
   }
 
-  cmap_ex_destroy(&m6);
+  chash_ex_destroy(&m6);
 }
 ```
-CMap uses personview_hash() for hash value calculations, and the personview_compare() for equality checks. The cmap_ex_destroy() function will free CStrings name, surname and the value for each item in the map, in addition to the CMap hash table itself.
+CMap uses personview_hash() for hash value calculations, and the personview_compare() for equality checks. The chash_ex_destroy() function will free CStrings name, surname and the value for each item in the map, in addition to the CMap hash table itself.
 
