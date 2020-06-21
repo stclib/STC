@@ -94,8 +94,8 @@ The containers are memory efficent. E.g. the circular list is intrusive so only 
 - **CHash set**: Representation: 4 pointers size. The hash table stores a key per bucket, and one table of "used/hash-value", occupying only one byte per bucket.
 - **CHash map**: Same as CHash set, but each bucket in the array stores a (key, value) pair, not only the key.
 
-Usage by examples
------------------
+Examples
+--------
 
 **CString** demo
 ```
@@ -207,5 +207,51 @@ int main() {
 
     printf("size %d\n", chash_size(table));
     chash_ss_destroy(&table); // frees key and value CStrings, and hash table (CVector).
+}
+```
+**CList** of *int64_t*. Similar to c++ std::forward_list, but can do both pushFront() and pushBack().
+```
+    #include <stc/clist.h>
+    #include <stc/crandom.h>
+    declare_CList(i, int64_t);
+ 
+    int main() {
+        CList_i list = clist_init;
+        int n;
+        sfc64_t rng = sfc64_seed(1234);
+        for (int i=0; i<1000000; ++i) // one million random numbers
+            clist_i_pushBack(&list, sfc64_rand(&rng));
+        n = 0; 
+        c_foreach (i, clist_i, list)
+            if (++n % 10000 == 0) printf("%d: %zd\n", n, i.item->value);
+        // Sort them...
+        clist_i_sort(&list); // mergesort O(n*log n)
+        n = 0;
+        c_foreach (i, clist_i, list)
+            if (++n % 10000 == 0) printf("%d: %zd\n", n, i.item->value);
+        clist_i_destroy(&list);
+    }
+```
+**CArray** demo
+```
+#include <stc/carray.h>
+declare_CArray(f, float);
+
+int main()
+{
+    CArray3f a3 = carray3f_make(30, 20, 10);
+    carray3f_data(a3, 5, 4)[3] = 10.2f;  // a3[5][4][3]
+    CArray2f a2 = carray3f_at(a3, 5);    // sub-array reference (no data copy).
+
+    printf("%f\n", carray2f_value(a2, 4, 3));   // readonly lookup a2[4][3] (=10.2f)
+    printf("%f\n", carray2f_data(a2, 4)[3]);    // same, but this is writable.
+    printf("%f\n", carray2f_at(a2, 4).data[3]); // same, via sub-array access.
+    
+    printf("%f\n", carray3f_value(a3, 5, 4, 3)); // same data location, via a3 array.
+    printf("%f\n", carray3f_data(a3, 5, 4)[3]);
+    printf("%f\n", carray3f_at2(a3, 5, 4).data[3]);
+    
+    carray_destroy(a2); // does nothing, since it is a sub-array.
+    carray_destroy(a3); // also invalidates a2.
 }
 ```
