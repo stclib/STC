@@ -1,4 +1,12 @@
-To be able to use CMap with a user-defined key-type, you need to define two things:
+Examples
+========
+Contains various examples and benchmarks.
+
+
+advanced.c Example
+------------------
+
+This demonstrates how to customize **CHash map** with a user-defined key-type. You need to define two things:
 
 1. A hash function; this must be a function that calculates the hash value given an object of the key-type.
 
@@ -86,5 +94,5 @@ int main()
   chash_ex_destroy(&m6);
 }
 ```
-CMap uses personview_hash() for hash value calculations, and the personview_compare() for equality checks. The chash_ex_destroy() function will free CStrings name, surname and the value for each item in the map, in addition to the CMap hash table itself.
+CHash map uses personview_hash() for hash value calculations, and the personview_compare() for equality checks. The chash_ex_destroy() function will free CStrings name, surname and the value for each item in the map, in addition to the CMap hash table itself.
 
