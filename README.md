@@ -94,10 +94,10 @@ The containers are memory efficent. E.g. the circular list is intrusive so only 
 - **CHash set**: Representation: 4 pointers size. The hash table stores a key per bucket, and one table of "used/hash-value", occupying only one byte per bucket.
 - **CHash map**: Same as CHash set, but each bucket in the array stores a (key, value) pair, not only the key.
 
-Examples
---------
+Demos
+-----
 
-**CString** demo
+**CString**
 ```
 #include <stc/cstring.h>
 
@@ -232,7 +232,7 @@ int main() {
         clist_i_destroy(&list);
     }
 ```
-**CArray** demo
+**CArray**
 ```
 #include <stc/carray.h>
 declare_CArray(f, float);
