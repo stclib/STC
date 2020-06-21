@@ -29,7 +29,7 @@ int main(void) {
 Motivation
 ----------
 
-The goal of this project was to finally create a "standard container library" for the C language. I believe that many/most earlier attempts to create such a library has failed because they did not meet one or several of the following requirements:
+The goal of this project was to finally create a **Standard Container Library for the C language**. I believe that many/most earlier attempts at this has failed because they did not meet one, or several of the following requirements:
 - Easy to use, intuitive naming and consistency across the library.
 - Type safe. Minimized usage of casting and void* pointers.
 - Highly efficient. Both in speed and memory usage.
