@@ -1,7 +1,7 @@
-#include "stc/cvector.h"
-#include "stc/clist.h"
-#include "stc/chash.h"
-#include "stc/cstring.h"
+#include "../stc/cvector.h"
+#include "../stc/clist.h"
+#include "../stc/chash.h"
+#include "../stc/cstring.h"
 
 
 void stringdemo1()

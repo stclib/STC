@@ -9,8 +9,8 @@ The difficulty with the hash function is that if your key type consists of sever
 Assuming a key-type like this, and want string as value, we define the functions person_make(), person_destroy() and person_compare():
 ```*/
 #include <stdio.h>
-#include "stc/chash.h"
-#include "stc/cstring.h"
+#include "../stc/chash.h"
+#include "../stc/cstring.h"
 
 struct Person {
   CString name;
