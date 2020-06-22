@@ -8,7 +8,7 @@ An elegant, modern, generic, customizable, typesafe, consistent, user-friendly, 
 - **cstring.h** - Compact and powerful **string** class.
 - **cvector.h** - Dynamic generic **vector** class.
 - **chash.h** - Unordered **map** and **set**. Highly customizable and fast.
-- **carray.h** - Multi-dimensional dynamic **array**
+- **carray.h** - Multi-dimensional dynamic **array**, implemented as a single contiguous section of memory.
 - **clist.h** - A circular singly linked **list**, may be used as a **queue** (supports *pushBack, pushFront, and popFront*). Also contains various *splice* functions and (merge) *sorting*.
 - **coption.h** - Implementation of *getopt_long*-"like" function, *coption_get*, to parse command line arguments.
 - **crandom.h** - Collection of some efficent modern random number generators *xoroshiro128ss*, *sfc32/64* and Mersenne Twister *mt19937*. It also implements the crypto-strong *siphash* algorithm.
@@ -88,11 +88,12 @@ RMAP(ii): sz: 0, bucks: 1677721, time: 0.65, erase 1048490
 Memory efficiency
 -----------------
 
-The containers are memory efficent. E.g. the circular list is intrusive so only one allocation is needed for each node, however a custom allocator and various techniques could improve the linked lists memory usage.
+The containers are memory efficent, containers takes up as little memory as possible.
 - **CString**, **CVector**: Representaion: one pointer size. The size and capacity is stored as part of the heap allocation that also holds the vector elements.
-- **CList**: Representaion: one pointer size. Each node allocates block storing value and next pointer.
+- **CList**: Representation: one pointer size. Each node allocates block storing value and next pointer.
 - **CHash set**: Representation: 4 pointers size. The hash table stores a key per bucket, and one table of "used/hash-value", occupying only one byte per bucket.
 - **CHash map**: Same as CHash set, but each bucket in the array stores a (key, value) pair, not only the key.
+- **CArray**: Elements are stored as one memory block. Representation: Two pointers, plus variables to store dimensionality.
 
 Demos
 -----
