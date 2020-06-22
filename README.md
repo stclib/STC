@@ -166,7 +166,7 @@ int main() {
 ```
 **CString**
 ```
-#include <stc/cstring.h>
+#include "stc/cstring.h"
 
 int main() {
     CString s1 = cstring_make("one-nine-three-seven-five");
@@ -194,7 +194,7 @@ int main() {
 ```
 **CVector** of *int64_t*
 ```
-#include <stc/cvector.h>
+#include "stc/cvector.h"
 declare_CVector(ix, int64_t); // ix is just an example tag name, use anything without underscore.
 
 int main() {
@@ -212,8 +212,8 @@ int main() {
 ```
 **CVector** of *CString*
 ```
-#include <stc/cstring.h>
-#include <stc/cvector.h>
+#include "stc/cstring.h"
+#include "stc/cvector.h"
 declare_CVector_string(cs);
 
 int main() {
@@ -228,7 +228,8 @@ int main() {
 ```
 **CHash map** of *int -> int*
 ```
-#include <stc/chash.h>
+#include <stdio.h>
+#include "stc/chash.h"
 declare_CHash(ii, MAP, int, int);
 
 int main() {
@@ -242,8 +243,8 @@ int main() {
 ```
 **CHash set** of *CString*
 ```
-#include <stc/cstring.h>
-#include <stc/chash.h>
+#include "stc/cstring.h"
+#include "stc/chash.h"
 declare_CHash_string(s, SET); // See the discussion above regarding this declaration.
 
 int main() {
@@ -260,8 +261,8 @@ int main() {
 ```
 **CHash map** of *CString -> CString*. Temporary CString values are created by *cstring_make()*, and moved into the container
 ```
-#include <stc/cstring.h>
-#include <stc/chash.h>
+#include "stc/cstring.h"
+#include "stc/chash.h"
 declare_CHash_string(ss, MAP, CString, cstring_destroy); 
 
 int main() {
