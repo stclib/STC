@@ -29,17 +29,13 @@
     
     This implements a std::forward_list-like class in C, but because it is circular,
     it also support push* and splice* at both ends of the list. This makes it ideal
-    for being used as a queue, unlike std::forward_list's push_front/pop_front only.
-    Basic usage is similar to CVector:
+    for being used as a queue, unlike std::forward_list. Basic usage is similar to CVector:
    
     #include "stc/clist.h"
-    #omclude "stc/cstring.h"
     declare_CList(i, int64_t);
-    declare_CList_string(s);
  
     int main() {
         CList_i list = clist_init;
-        CList_s slist = clist_init;
         int n;
         for (int i=0; i<1000000; ++i) // one million
             clist_i_pushBack(&list, rand() * rand());
@@ -52,24 +48,8 @@
         c_foreach (i, clist_i, list)
             if (++n % 10000 == 0) printf("%d: %zd\n", n, i.item->value);
         clist_i_destroy(&list);
-
-        // Test CList with CStrings 
-        clist_s_pushBack(&slist, cstring_make("Item 1"));
-        clist_s_pushBack(&slist, cstring_make("Item 2"));
-        clist_s_pushBack(&slist, cstring_make("Item X"));
-        clist_s_pushBack(&slist, cstring_make("Item 3"));
-        puts("");
-        c_foreach (i, clist_s, slist)
-            printf("%s\n", i.item->value.str);
-        // Modify
-        clist_s_pushFront(&slist, cstring_make("Item 0"));
-        clist_s_remove(&slist, "Item X");
-        puts("");
-        c_foreach (i, clist_s, slist)
-            printf("%s\n", i.item->value.str);
-        clist_s_destroy(&slist);
     }
- */
+*/
 
 #define declare_CList(...)    c_MACRO_OVERLOAD(declare_CList, __VA_ARGS__)
 
