@@ -12,6 +12,7 @@ An elegant, modern, generic, customizable, typesafe, consistent, user-friendly, 
 - **clist.h** - A circular singly linked **list**, can be used as a **queue** (supports O(1) *pushBack, pushFront, and popFront*). Also contains various *splice* functions and (merge) *sorting*.
 - **coption.h** - Implementation of *getopt_long*-"like" function, *coption_get*, to parse command line arguments.
 - **crandom.h** - Collection of some efficent modern random number generators *xoroshiro128ss*, *sfc32/64* and Mersenne Twister *mt19937*. It also implements the crypto-strong *siphash* algorithm.
+- **cdefs.h** - A very small common include file with som central definitions.
 
 The usage of the containers is similar to the C++ standard containers, so it should be easier for those who are familiar with them.
 
@@ -95,6 +96,26 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 - **CHash map**: Same as CHash set, but each bucket in the array stores a (key, value) pair, not only the key.
 - **CArray**: Elements are stored as one memory block. Representation: Two pointers, plus variables to store dimensionality.
 
+CHash container notes
+---------------------
+
+The CHash class is the most complex of the containers (although, currently only ~370 lines of code). You can customize the destroy-, hash- and equals- function. In addition it supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is handy when e.g. having CString as key, as it enables us to use string literals as key in put() and get() functions, instead of a constructed CString. Without it you would need to write: 
+```
+chash_si_put(&map, cstring_make("mykey"), 12);
+```
+but even worse:
+```
+CString lookup = cstring_make("mykey");
+int x = chash_si_get(&map, lookup)->value;
+cstring_destroy(&lookup);
+```
+The predefined shorthand macro *declare_CHash_string()* defines a CHash container with a CString as key, but you may use it like:
+```
+chash_si_put(&map, "mykey", 12);
+int x = chash_si_get(&mykey")->value; // no allocation of string key happening here.
+```
+An alternative would be to use *char* * as key type, but you would the need to manage memory of the hash string keys yourself.
+
 Demos
 -----
 The first example has a complex nested container type, which demonstrates some of the capability of the library. Look at the simpler examples below to understand it better. The example adds an element into the data structure, and then accesses it. The type used in c++ template syntax:
@@ -109,30 +130,30 @@ void check_destroy(float* v) {printf("destroy %g\n", *v);}
 
 declare_CArray(f, float, check_destroy);
 declare_CList(t2, CArray2_f, carray2_f_destroy, c_noCompare);
-declare_CHash(lm, MAP, int, CList_t2, clist_t2_destroy);
-declare_CHash_string(m, MAP, CHash_lm, chash_lm_destroy);
+declare_CHash(il, MAP, int, CList_t2, clist_t2_destroy);
+declare_CHash_string(sm, MAP, CHash_lm, chash_lm_destroy);
 
 int main() {
     int dim1 = 4, dim2 = 6;
-    CHash_m theMap = chash_init;
+    CHash_sm theMap = chash_init;
     {
         // Construct.
         CArray2_f table = carray2_f_make(dim1, dim2, 0.f);
         CList_t2 tableList = clist_init;
-        CHash_lm listMap = chash_init;
+        CHash_il listMap = chash_init;
         
         // Put in some data.
         carray2_f_data(table, 2)[5] = 3.1415927; // table[2][5]
         clist_t2_pushBack(&tableList, table);
-        chash_lm_put(&listMap, 42, tableList);
-        chash_m_put(&theMap, "First", listMap);
+        chash_il_put(&listMap, 42, tableList);
+        chash_sm_put(&theMap, "First", listMap);
     }
 
     // Access the data entry
-    CArray2_f tab = clist_back(chash_lm_get(&chash_m_get(&theMap, "First")->value, 42)->value);
-    printf("value is: %f\n", carray2_f_value(tab, 3, 5));
+    CArray2_f table = clist_back(chash_il_get(&chash_sm_get(&theMap, "First")->value, 42)->value);
+    printf("value is: %f\n", carray2_f_value(table, 3, 5));
 
-    chash_m_destroy(&theMap); // destroy the whole shebang!
+    chash_sm_destroy(&theMap); // free up the whole shebang!
 }
 ```
 **CString**
