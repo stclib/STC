@@ -109,10 +109,10 @@ CString lookup = cstring_make("mykey");
 int x = chash_si_get(&map, lookup)->value;
 cstring_destroy(&lookup);
 ```
-The predefined shorthand macro *declare_CHash_string()* defines a CHash container with a CString as key, but you may use it like:
+The predefined shorthand macro *declare_CHash_string()* defines a CHash container with a CString as key, however you may use it like:
 ```
 chash_si_put(&map, "mykey", 12);
-int x = chash_si_get(&map, "mykey")->value; // no allocation of string key happening here.
+int x = chash_si_get(&map, "mykey")->value; // no allocation of string key happens here.
 ```
 An alternative would be to use *char* * as key type, but you would the need to manage memory of the hash string keys yourself.
 Note that this customization is also available for **CVector**, but only affects the *find()* function currently. See *declare_CVector_string()*.
@@ -300,7 +300,7 @@ declare_CArray(f, float);
 
 int main()
 {
-    CArray3_f a3 = carray3f_make(30, 20, 10, 0.f);
+    CArray3_f a3 = carray3_f_make(30, 20, 10, 0.f);
     carray3_f_data(a3, 5, 4)[3] = 10.2f;  // a3[5][4][3]
     CArray2_f a2 = carray3_f_at(a3, 5);   // sub-array reference (no data copy).
 
