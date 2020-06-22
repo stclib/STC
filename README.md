@@ -100,18 +100,39 @@ Demos
 The first example demonstrates an advanced complex type that shows some of the capability of the library. Look at the simpler to understand this better. This create one element into a large data structure (using C++ template syntax for describing the type):
 **CHash_map**< *CString*, *CHash_map*< *int*, *CList*< *CArray2*< *float* > > > >
 ```
-#include "<stc/cstring.h>
-#include "<stc/chash.h>
-#include "<stc/clist.h>
-#include "<stc/carray.h>
+#include "stc/cstring.h"
+#include "stc/chash.h"
+#include "stc/clist.h"
+#include "stc/carray.h"
 
-declare_CArray2(f, float);
-declare_CList(a2, CArray2_f, carray_f_destroy);
-declare_CHash(m2, map, CList_a2, clist_a2_destroy);
-declare_CHash(m, map, CHash_m2, chash_m2_destroy);
+void check_destroy(float* v) {printf("destroy %g\n", *v);}
+
+declare_CArray(f, float, check_destroy);
+declare_CList(t2, CArray2_f, carray2_f_destroy, c_noCompare);
+declare_CHash(lm, MAP, int, CList_t2, clist_t2_destroy);
+declare_CHash_string(m, MAP, CHash_lm, chash_lm_destroy);
 
 int main() {
-  
+    int dim1 = 4, dim2 = 6;
+    CHash_m theMap = chash_init;
+    {
+        // Construct.
+        CArray2_f table = carray2_f_make(dim1, dim2, 0.f);
+        CList_t2 tableList = clist_init;
+        CHash_lm listMap = chash_init;
+        
+        // Put in some data.
+        carray2_f_data(table, 2)[5] = 3.1415927; // table[2][5]
+        clist_t2_pushBack(&tableList, table);
+        chash_lm_put(&listMap, 42, tableList);
+        chash_m_put(&theMap, "First", listMap);
+    }
+
+    // Access the data entry
+    CArray2_f tab = clist_back(chash_lm_get(&chash_m_get(&theMap, "First")->value, 42)->value);
+    printf("value is: %f\n", carray2_f_value(tab, 3, 5));
+
+    chash_m_destroy(&theMap); // destroy the whole shebang!
 }
 ```
 **CString**
@@ -179,7 +200,7 @@ int main() {
 **CHash map** of *int -> int*
 ```
 #include <stc/chash.h>
-declare_CHash(ii, map, int, int);
+declare_CHash(ii, MAP, int, int);
 
 int main() {
     CHash_ii nums = chash_init;
@@ -194,7 +215,7 @@ int main() {
 ```
 #include <stc/cstring.h>
 #include <stc/chash.h>
-declare_CHash_string(s, set); // Shorthand macro for the general declare_CHash expansion.
+declare_CHash_string(s, SET); // Shorthand macro for the general declare_CHash expansion.
 // CString keys are managed internally, although CHash is ignorant of CString.
 
 int main() {
@@ -213,7 +234,7 @@ int main() {
 ```
 #include <stc/cstring.h>
 #include <stc/chash.h>
-declare_CHash_string(ss, map, CString, cstring_destroy); 
+declare_CHash_string(ss, MAP, CString, cstring_destroy); 
 
 int main() {
     CHash_ss table = chash_init;
@@ -249,26 +270,26 @@ int main() {
         clist_i_destroy(&list);
     }
 ```
-**CArray**
+**CArray**. Heap allocated 1D, 2D and 3D array in one memory block, with sub-arrays.
 ```
 #include <stc/carray.h>
 declare_CArray(f, float);
 
 int main()
 {
-    CArray3f a3 = carray3f_make(30, 20, 10);
-    carray3f_data(a3, 5, 4)[3] = 10.2f;  // a3[5][4][3]
-    CArray2f a2 = carray3f_at(a3, 5);    // sub-array reference (no data copy).
+    CArray3_f a3 = carray3f_make(30, 20, 10, 0.f);
+    carray3_f_data(a3, 5, 4)[3] = 10.2f;  // a3[5][4][3]
+    CArray2_f a2 = carray3_f_at(a3, 5);   // sub-array reference (no data copy).
 
-    printf("%f\n", carray2f_value(a2, 4, 3));   // readonly lookup a2[4][3] (=10.2f)
-    printf("%f\n", carray2f_data(a2, 4)[3]);    // same, but this is writable.
-    printf("%f\n", carray2f_at(a2, 4).data[3]); // same, via sub-array access.
+    printf("%f\n", carray2_f_value(a2, 4, 3));   // readonly lookup a2[4][3] (=10.2f)
+    printf("%f\n", carray2_f_data(a2, 4)[3]);    // same, but this is writable.
+    printf("%f\n", carray2_f_at(a2, 4).data[3]); // same, via sub-array access.
     
-    printf("%f\n", carray3f_value(a3, 5, 4, 3)); // same data location, via a3 array.
-    printf("%f\n", carray3f_data(a3, 5, 4)[3]);
-    printf("%f\n", carray3f_at2(a3, 5, 4).data[3]);
+    printf("%f\n", carray3_f_value(a3, 5, 4, 3)); // same data location, via a3 array.
+    printf("%f\n", carray3_f_data(a3, 5, 4)[3]);
+    printf("%f\n", carray3_f_at2(a3, 5, 4).data[3]);
     
-    carray_destroy(a2); // does nothing, since it is a sub-array.
-    carray_destroy(a3); // also invalidates a2.
+    carray_f_destroy(&a2); // does nothing, since it is a sub-array.
+    carray_f_destroy(&a3); // also invalidates a2.
 }
 ```

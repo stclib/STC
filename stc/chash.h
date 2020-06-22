@@ -95,10 +95,10 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
     declare_CHash_11(tag, type, CString, Value, valueDestroy, cstring_hashRaw, cstring_equalsRaw, \
                           const char*, cstring_destroy, cstring_getRaw, cstring_make)
 
-#define _chash1_set(x)
-#define _chash2_set(x, y) x
-#define _chash1_map(x) x
-#define _chash2_map(x, y) x, y
+#define _chash1_SET(x)
+#define _chash2_SET(x, y) x
+#define _chash1_MAP(x) x
+#define _chash2_MAP(x, y) x, y
 
 /* CHash full: */
 #define declare_CHash_11(tag, type, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, \

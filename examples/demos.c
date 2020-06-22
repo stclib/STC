@@ -1,5 +1,6 @@
 #include "../stc/cvector.h"
 #include "../stc/clist.h"
+#include "../stc/carray.h"
 #include "../stc/chash.h"
 #include "../stc/cstring.h"
 
@@ -98,7 +99,7 @@ void listdemo1()
     clist_ix_destroy(&nums);
 }
 
-declare_CHash(i, set, int);
+declare_CHash(i, SET, int);
 
 void setdemo1()
 {
@@ -113,7 +114,7 @@ void setdemo1()
 }
 
 
-declare_CHash(ii, map, int, int);
+declare_CHash(ii, MAP, int, int);
 
 void mapdemo1()
 {
@@ -127,7 +128,7 @@ void mapdemo1()
 }
 
 
-declare_CHash_string(si, map, int); // Shorthand macro for the general declare_CHash expansion.
+declare_CHash_string(si, MAP, int); // Shorthand macro for the general declare_CHash expansion.
 
 void mapdemo2()
 {
@@ -149,7 +150,7 @@ void mapdemo2()
 }
 
 
-declare_CHash_string(ss, map, CString, cstring_destroy); 
+declare_CHash_string(ss, MAP, CString, cstring_destroy); 
 
 void mapdemo3()
 {
@@ -169,6 +170,29 @@ void mapdemo3()
 
 
 
+declare_CArray(f, float);
+
+int arraydemo1()
+{
+    printf("\nARRAYDEMO1\n");
+    CArray3_f a3 = carray3_f_make(30, 20, 10, 0.f);
+    carray3_f_data(a3, 5, 4)[3] = 10.2f;         // a3[5][4][3]
+    CArray2_f a2 = carray3_f_at(a3, 5);          // sub-array reference (no data copy).
+
+    printf("%f\n", carray2_f_value(a2, 4, 3));   // readonly lookup a2[4][3] (=10.2f)
+    printf("%f\n", carray2_f_data(a2, 4)[3]);    // same, but this is writable.
+    printf("%f\n", carray2_f_at(a2, 4).data[3]); // same, via sub-array access.
+    
+    printf("%f\n", carray3_f_value(a3, 5, 4, 3)); // same data location, via a3 array.
+    printf("%f\n", carray3_f_data(a3, 5, 4)[3]);
+    printf("%f\n", carray3_f_at2(a3, 5, 4).data[3]);
+    
+    carray2_f_destroy(&a2); // does nothing, since it is a sub-array.
+    carray3_f_destroy(&a3); // also invalidates a2.
+}
+
+
+
 int main()
 {
     stringdemo1();
@@ -179,4 +203,5 @@ int main()
     mapdemo1();
     mapdemo2();
     mapdemo3();
+    arraydemo1();    
 }
