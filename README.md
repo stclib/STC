@@ -96,10 +96,10 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 - **CHash map**: Same as CHash set, but each bucket in the array stores a (key, value) pair, not only the key.
 - **CArray**: Elements are stored as one memory block. Representation: Two pointers, plus variables to store dimensionality.
 
-CHash container notes
----------------------
+CHash and CVector discussion
+----------------------------
 
-The CHash class is the most complex of the containers (although, currently only ~370 lines of code). You can customize the destroy-, hash- and equals- function. In addition it supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is handy when e.g. having CString as key, as it enables us to use string literals as key in put() and get() functions, instead of a constructed CString. Without it you would need to write: 
+**CHash** is the most complex of the containers (although, currently only ~370 lines of code). You can customize the destroy-, hash- and equals- function. In addition it supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is handy when e.g. having CString as key, as it enables us to use string literals as key in put() and get() functions, instead of a constructed CString. Without it you would need to write: 
 ```
 chash_si_put(&map, cstring_make("mykey"), 12);
 ```
@@ -115,10 +115,11 @@ chash_si_put(&map, "mykey", 12);
 int x = chash_si_get(&map, "mykey")->value; // no allocation of string key happening here.
 ```
 An alternative would be to use *char* * as key type, but you would the need to manage memory of the hash string keys yourself.
+Note that this customization is also available for **CVector**, but only affects the *find()* function currently. See *declare_CVector_string()*.
 
 Demos
 -----
-The first example has a complex nested container type, which demonstrates some of the capability of the library. Look at the simpler examples below to understand it better. The example adds an element into the data structure, and then accesses it. The type used in c++ template syntax:
+The first example has a complex nested container type, which demonstrates some of the capability of the library. Look at the simpler examples below to understand it better. The example adds an element into the data structure, and then accesses it. The type used, with c++ template syntax is:
 **CHashMap**< **CString**, **CHashMap**< *int*, **CList**< **CArray2**< *float* >>>>
 ```
 #include "stc/cstring.h"
@@ -236,8 +237,7 @@ int main() {
 ```
 #include <stc/cstring.h>
 #include <stc/chash.h>
-declare_CHash_string(s, SET); // Shorthand macro for the general declare_CHash expansion.
-                              // Keys are converted to CString from literals internally, although CHash is ignorant of CString.
+declare_CHash_string(s, SET); // See the discussion above regarding this declaration.
 
 int main() {
     CHash_s words = chash_init;
@@ -251,7 +251,7 @@ int main() {
     chash_s_destroy(&words);
 }
 ```
-**CHash map** of *CString -> CString*. Temporary CString's are created by *cstring_make()*, and moved into the container
+**CHash map** of *CString -> CString*. Temporary CString values are created by *cstring_make()*, and moved into the container
 ```
 #include <stc/cstring.h>
 #include <stc/chash.h>
