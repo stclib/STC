@@ -9,10 +9,10 @@ An elegant, typesafe, generic, customizable, user-friendly, consistent, and very
 - **cvector.h** - Dynamic generic **vector** class.
 - **chash.h** - Unordered **map** and **set** implemented as open hashing without tombstones. Highly customizable and fast.
 - **carray.h** - Multi-dimensional dynamic **array**, implemented as a single contiguous section of memory.
-- **clist.h** - A circular singly linked **list**, can be used as a **queue** (supports O(1) *pushBack, pushFront, and popFront*). Also contains various *splice* functions and (merge) *sorting*.
+- **clist.h** - A circular singly linked **list**, can be used as a **queue** - supports *pushBack, pushFront, and popFront* in *O*(1). Also contains various *splice* functions and (merge) *sort*.
 - **coption.h** - Implementation of *getopt_long*-"like" function, *coption_get*, to parse command line arguments.
 - **crandom.h** - Collection of some efficent modern random number generators *xoroshiro128ss*, *sfc32/64* and Mersenne Twister *mt19937*. It also implements the crypto-strong *siphash* algorithm.
-- **cdefs.h** - A very small common include file with som central definitions.
+- **cdefs.h** - A small common include file with central definitions.
 
 The usage of the containers is similar to the C++ standard containers, so it should be easier for those who are familiar with them.
 
