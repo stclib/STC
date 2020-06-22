@@ -99,7 +99,7 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 CHash and CVector discussion
 ----------------------------
 
-**CHash** is the most complex of the containers (although, currently only ~370 lines of code). It uses open hashing, but does not rely on power-of-two size table, nor prime number lengths, and it does not have tombstone buckets. Still, it is among the fastest hash-tables - see *Performance* below.
+**CHash** is the most complex of the containers (although, currently only ~370 lines of code). It uses open hashing, but does not rely on power-of-two size table, nor prime number lengths, and it does not have tombstone buckets. Still, it is among the fastest hash-tables, as shown above.
 
 You may customize the destroy-, hash- and equals- function. It also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is handy when e.g. having CString as key, as it enables the usage of string literals as key in *put() and *get() functions, instead of requering a constructed CString. Without it you would need to write: 
 ```
