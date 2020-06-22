@@ -97,7 +97,7 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 
 Demos
 -----
-The first example has a complex nested container type, which demonstrates some of the capability of the library. Look at the simpler examples below to understand it better. The example adds an element into the data structure, and then access it. The type is here described with c++ template syntax:
+The first example has a complex nested container type, which demonstrates some of the capability of the library. Look at the simpler examples below to understand it better. The example adds an element into the data structure, and then accesses it. The type used in c++ template syntax:
 **CHashMap**< **CString**, **CHashMap**< *int*, **CList**< **CArray2**< *float* >>>>
 ```
 #include "stc/cstring.h"
@@ -140,26 +140,26 @@ int main() {
 #include <stc/cstring.h>
 
 int main() {
-    CString s1 = cstring_makeFmt("%10.g", 123.0 / 13.0);
-    CString s2 = cstring_make("one-nine-three-seven-five");
-    printf("%s.\n", cs.str);
+    CString s1 = cstring_make("one-nine-three-seven-five");
+    printf("%s.\n", s1.str);
 
-    cstring_insert(&s2, 3, "-two");
-    printf("%s.\n", cs.str);
+    cstring_insert(&s1, 3, "-two");
+    printf("%s.\n", s1.str);
 
-    cstring_erase(&s2, 7, 5); // -nine
-    printf("%s.\n", cs.str);
+    cstring_erase(&s1, 7, 5); // -nine
+    printf("%s.\n", s1.str);
 
-    cstring_replace(&s2, 0, "seven", "four");
-    printf("%s.\n", s2.str);
-    printf("find: %s\n", s2.str + cstring_find(s2, 0, "four"));
+    cstring_replace(&s1, 0, "seven", "four");
+    printf("%s.\n", s1.str);
+    printf("find: %s\n", s1.str + cstring_find(s1, 0, "four"));
 
     // reassign:
-    cstring_assign(&s2, "one two three four five six seven");
-    cstring_append(&s2, " eight");
-    printf("append: %s\n", s2.str);
-
+    cstring_assign(&s1, "one two three four five six seven");
+    cstring_append(&s1, " eight");
+    printf("append: %s\n", s1.str);
     cstring_destroy(&s1);
+
+    CString s2 = cstring_makeFmt("Index %d: %f", 123, 4.56);
     cstring_destroy(&s2);
 }
 ```
