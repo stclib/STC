@@ -112,7 +112,7 @@ cstring_destroy(&lookup);
 The predefined shorthand macro *declare_CHash_string()* defines a CHash container with a CString as key, but you may use it like:
 ```
 chash_si_put(&map, "mykey", 12);
-int x = chash_si_get(&mykey")->value; // no allocation of string key happening here.
+int x = chash_si_get(&map, "mykey")->value; // no allocation of string key happening here.
 ```
 An alternative would be to use *char* * as key type, but you would the need to manage memory of the hash string keys yourself.
 
