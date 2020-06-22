@@ -30,15 +30,15 @@ int main(void) {
 Motivation
 ----------
 
-The goal of this project was to finally create a **Standard Container Library for the C language**. I suspect that most earlier attempts at this has failed because they did not meet one or several of the following requirements. A standard container library should
-- be easy to use, intuitive naming and consistency across the library.
-- be type safe. Minimal usage of casting and void* pointers.
+The aim of this project was to create a basis for an acceptable **Standard Container Library for the C99 language**. I suspect that most earlier attempts at this has failed because they did not meet one or several of the following requirements: I believe a standard container library should
+- be easy to use, have intuitive naming and consistency across the library.
+- be type safe. Have minimal usage of casting and void* pointers.
 - be highly efficient. Both in speed and memory usage.
 - be customizable without losing efficiency. E.g. inline replacable compare, hash, allocation functions per container type instantiation.
 - have a fairly small code base, and easy to install, deploy and maintain.
 - avoid bloat. It should not try to cover all thinkable functions, but limit itself to the most useful and commonly used.
 
-That said, this library is far from complete or free of possible bugs, but I believe it is a good foundation.
+That said, this library is far from complete or free of possible bugs, but I believe it is a good foundation. Currently it does not support custom allocators.
 
 Installation
 ------------
@@ -57,7 +57,7 @@ declare_CHash(64, set, int64_t);
 Performance
 -----------
 
-This library is very efficent. Containers have templated intrusive elements. One of the most performance critical containers is the **CHash map / CHash set**. Thankfully, is it among the fastest C / C++ map implementations: **examples/benchmark.c** compiled with g++ v9.2.0 -O3 on windows (the results are similar with VC++ and g++ on linux):
+This library is very efficent. Containers have templated intrusive elements. One of the most performance critical containers is the **CHash map / CHash set**. Thankfully, CHash is among the fastest C/C++ map implementations available: **examples/benchmark.c** compiled with g++ v9.2.0 -O3 on windows (the results are similar with VC++ and g++ on linux):
 
 **CMAP**=*CHash map*, KMAP=*khash*, UMAP=*std::unordered_map*, BMAP=*ska::bytell_hash_map*, FMAP=*ska::flat_hash_map*, RMAP=*robin_hood::unordered_map*
 ```
@@ -99,7 +99,9 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 CHash and CVector discussion
 ----------------------------
 
-**CHash** is the most complex of the containers (although, currently only ~370 lines of code). You can customize the destroy-, hash- and equals- function. In addition it supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is handy when e.g. having CString as key, as it enables us to use string literals as key in put() and get() functions, instead of a constructed CString. Without it you would need to write: 
+**CHash** is the most complex of the containers (although, currently only ~370 lines of code). It uses open hashing, but does not rely on power-of-two size table, nor prime number lengths, and it does not have tombstone buckets. Still, it is among the fastest hash-tables - see *Performance* below.
+
+You may customize the destroy-, hash- and equals- function. It also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is handy when e.g. having CString as key, as it enables the usage of string literals as key in *put() and *get() functions, instead of requering a constructed CString. Without it you would need to write: 
 ```
 chash_si_put(&map, cstring_make("mykey"), 12);
 ```
@@ -114,7 +116,7 @@ The predefined shorthand macro *declare_CHash_string()* defines a CHash containe
 chash_si_put(&map, "mykey", 12);
 int x = chash_si_get(&map, "mykey")->value; // no allocation of string key happens here.
 ```
-An alternative would be to use *char* * as key type, but you would the need to manage memory of the hash string keys yourself.
+An alternative would be to use *char* * as key type, but you would have to manage the memory of the hash char* keys yourself.
 Note that this customization is also available for **CVector**, but only affects the *find()* function currently. See *declare_CVector_string()*.
 
 Demos
@@ -122,7 +124,7 @@ Demos
 The first example has a complex nested container type, which demonstrates some of the capability of the library. Look at the simpler examples below to understand it better. The example adds an element into the data structure, and then accesses it. The type used, with c++ template syntax is:
 **CHashMap**< **CString**, **CHashMap**< *int*, **CList**< **CArray2**< *float* >>>>
 
-Note that *chash_sm_destroy(&theMap)* call below will also destroy all the nested containers, including memory allocated for CString keys in theMap object.
+Note that *chash_sm_destroy(&theMap)* below, will also destroy all the nested containers including the memory allocated for CString keys in theMap object.
 ```
 #include "stc/cstring.h"
 #include "stc/chash.h"
