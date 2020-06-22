@@ -6,7 +6,7 @@ Introduction
 
 An elegant, typesafe, generic, customizable, user-friendly, consistent, and very efficient standard container library for C99. This is a small headers only library with the most used container components, and a few algorithms:
 - **cstring.h** - Compact and powerful **string** class.
-- **cvector.h** - Dynamic generic **vector** class.
+- **cvector.h** - Dynamic generic **vector** class, works well as a **stack**.
 - **chash.h** - Unordered **map** and **set** implemented as open hashing without tombstones. Highly customizable and fast.
 - **carray.h** - Multi-dimensional dynamic **array**, implemented as a single contiguous section of memory.
 - **clist.h** - A circular singly linked **list**, can be used as a **queue** - supports *pushBack, pushFront, and popFront* in *O*(1). Also contains various *splice* functions and (merge) *sort*.
