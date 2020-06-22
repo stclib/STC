@@ -32,7 +32,7 @@ declare_CArray(f, float);
 
 int main()
 {
-    CArray3_f a3 = carray3f_make(30, 20, 10, 0.f);
+    CArray3_f a3 = carray3_f_make(30, 20, 10, 0.f);
     carray3_f_data(a3, 5, 4)[3] = 10.2f;  // a3[5][4][3]
     CArray2_f a2 = carray3_f_at(a3, 5);   // sub-array reference (no data copy).
 
