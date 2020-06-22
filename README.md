@@ -46,12 +46,12 @@ Installation
 Because it is headers only, files can simply be included in your program. The functions will be inlined by default. If containers are extensively used accross many tranlation units with common instantiated container types, it is recommended to build as a library, to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler argument, and put all the instantiations of the containers used in one C file, e.g.
 ```
 #define STC_IMPLEMENTATION
-#include <stc/cvector.h>
 #include <stc/chash.h>
+#include <stc/cvector.h>
 
+declare_CHash(ii, MAP, int, int);
+declare_CHash(ix, SET, int64_t);
 declare_CVector(i, int);
-declare_CHash(ii, map, int, int);
-declare_CHash(64, set, int64_t);
 ...
 ```
 Performance
