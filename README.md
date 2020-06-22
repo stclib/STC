@@ -30,7 +30,7 @@ int main(void) {
 Motivation
 ----------
 
-The aim of this project was to create a basis for an acceptable **Standard Container Library for the C99 language**. I suspect that most earlier attempts at this has failed because they did not meet one or several of the following requirements: I believe a standard container library should
+The aim of this project was to create a small **Standard Container Library for the C99 language**. I suspect that most earlier attempts at this has failed because they did not meet one or several of the following requirements: For me, a standard container library should
 - be easy to use, have intuitive naming and consistency across the library.
 - be type safe. Have minimal usage of casting and void* pointers.
 - be highly efficient. Both in speed and memory usage.
@@ -38,12 +38,12 @@ The aim of this project was to create a basis for an acceptable **Standard Conta
 - have a fairly small code base, and easy to install, deploy and maintain.
 - avoid bloat. It should not try to cover all thinkable functions, but limit itself to the most useful and commonly used.
 
-That said, this library is far from complete or free of possible bugs, but I believe it is a good foundation. Currently it does not support custom allocators.
+The library is not complete or free of possible bugs, but I believe that it already covers a large portion of the most needed containers.
 
 Installation
 ------------
 
-Because it is headers only, files can simply be included in your program. The functions will be inlined by default. If containers are extensively used accross many tranlation units with common instantiated container types, it is recommended to build as a library, to minimize executable size. In this case, specify **-DSTC_HEADER** as compiler argument, and put all the instantiations of the containers used in one C file, e.g.
+Because it is headers only, files can simply be included in your program. The functions will be inlined by default. If containers are extensively used accross many tranlation units with common instantiated container types, it is recommended to build as a library, to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler argument, and put all the instantiations of the containers used in one C file, e.g.
 ```
 #define STC_IMPLEMENTATION
 #include <stc/cvector.h>
