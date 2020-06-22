@@ -58,7 +58,7 @@ Performance
 
 This library is very efficent. Containers have templated intrusive elements. One of the most performance critical containers is the **CHash map / CHash set**. Thankfully, is it among the fastest C / C++ map implementations: **examples/benchmark.c** compiled with g++ v9.2.0 -O3 on windows (the results are similar with VC++ and g++ on linux):
 
-**CMAP=this**, KMAP=khash, UMAP=std::unordered_map, BMAP=ska::bytell_hash_map, FMAP=ska::flat_hash_map, RMAP=robin_hood::unordered_map
+**CMAP**=*CHash map*, KMAP=*khash*, UMAP=*std::unordered_map*, BMAP=*ska::bytell_hash_map*, FMAP=*ska::flat_hash_map*, RMAP=*robin_hood::unordered_map*
 ```
 Random keys are in range [0, 2^20):
 map<uint64_t, uint64_t>: 7000000 repeats of Insert random key + (try to) remove a different random key:
