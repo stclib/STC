@@ -119,6 +119,8 @@ int x = chash_si_get(&map, "mykey")->value; // no allocation of string key happe
 An alternative would be to use *char* * as key type, but you would have to manage the memory of the hash char* keys yourself.
 Note that this customization is also available for **CVector**, but only affects the *find()* function currently. See *declare_CVector_string()*.
 
+Also look at **examples/advanced.c**, it demonstrates how to use a custom struct as a hash map key, using the feature mentioned.
+
 Demos
 -----
 The first example has a complex nested container type, which demonstrates some of the capabilities of the library. Look at the simpler examples below to understand it better. The example adds an element into the data structure, and then accesses it. The type used, with c++ template syntax is:
