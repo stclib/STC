@@ -216,7 +216,7 @@ int main() {
 #include <stc/cstring.h>
 #include <stc/chash.h>
 declare_CHash_string(s, SET); // Shorthand macro for the general declare_CHash expansion.
-// CString keys are managed internally, although CHash is ignorant of CString.
+                              // Keys are converted to CString from literals internally, although CHash is ignorant of CString.
 
 int main() {
     CHash_s words = chash_init;
@@ -230,7 +230,7 @@ int main() {
     chash_s_destroy(&words);
 }
 ```
-**CHash map** of *CString -> CString*. Temporary CString values are created by "make", and moved to the container
+**CHash map** of *CString -> CString*. Temporary CString's are created by *cstring_make()*, and moved into the container
 ```
 #include <stc/cstring.h>
 #include <stc/chash.h>
@@ -247,7 +247,7 @@ int main() {
     chash_ss_destroy(&table); // frees key and value CStrings, and hash table (CVector).
 }
 ```
-**CList** of *int64_t*. Similar to c++ std::forward_list, but can do both pushFront() and pushBack().
+**CList** of *int64_t*. Similar to c++ *std::forward_list*, but can do both *pushFront()* and *pushBack()*.
 ```
     #include <stc/clist.h>
     #include <stc/crandom.h>
@@ -289,7 +289,7 @@ int main()
     printf("%f\n", carray3_f_data(a3, 5, 4)[3]);
     printf("%f\n", carray3_f_at2(a3, 5, 4).data[3]);
     
-    carray_f_destroy(&a2); // does nothing, since it is a sub-array.
-    carray_f_destroy(&a3); // also invalidates a2.
+    carray2_f_destroy(&a2); // does nothing, since it is a sub-array.
+    carray3_f_destroy(&a3); // also invalidates a2.
 }
 ```
