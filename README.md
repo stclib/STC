@@ -4,7 +4,7 @@ STC - C99 Standard Container Library
 Introduction
 ------------
 
-An elegant, modern, generic, customizable, typesafe, consistent, user-friendly, and very efficient standard container library for C99. This is a small headers only library with the most used container components, and a few algorithms:
+An elegant, typesafe, generic, customizable, user-friendly, consistent, and very efficient standard container library for C99. This is a small headers only library with the most used container components, and a few algorithms:
 - **cstring.h** - Compact and powerful **string** class.
 - **cvector.h** - Dynamic generic **vector** class.
 - **chash.h** - Unordered **map** and **set** implemented as open hashing without tombstones. Highly customizable and fast.
@@ -30,13 +30,13 @@ int main(void) {
 Motivation
 ----------
 
-The goal of this project was to finally create a **Standard Container Library for the C language**. I believe that many/most earlier attempts at this has failed because they did not meet one, or several of the following requirements:
-- Easy to use, intuitive naming and consistency across the library.
-- Type safe. Minimal usage of casting and void* pointers.
-- Highly efficient. Both in speed and memory usage.
-- Customizable without losing efficiency. E.g. inline replacable compare, hash, allocation functions per container type instantiation.
-- Small code base size and easy to install, deploy and maintain.
-- Avoids bloat. Should not try to cover all thinkable functions, but limit itself to the most useful and commonly used.
+The goal of this project was to finally create a **Standard Container Library for the C language**. I suspect that most earlier attempts at this has failed because they did not meet one or several of the following requirements. A standard container library should
+- be easy to use, intuitive naming and consistency across the library.
+- be type safe. Minimal usage of casting and void* pointers.
+- be highly efficient. Both in speed and memory usage.
+- be customizable without losing efficiency. E.g. inline replacable compare, hash, allocation functions per container type instantiation.
+- have a fairly small code base, and easy to install, deploy and maintain.
+- avoid bloat. It should not try to cover all thinkable functions, but limit itself to the most useful and commonly used.
 
 That said, this library is far from complete or free of possible bugs, but I believe it is a good foundation.
 
