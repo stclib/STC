@@ -27,13 +27,14 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-#if defined(_MSC_VER)
+#if 0 // defined(_MSC_VER)
 #  define STC_INLINE __forceinline
-#elif defined(__GNUC__)
+#elif 0 // defined(__GNUC__)
 #  define STC_INLINE inline __attribute((always_inline))
-#else
+#else // don't force
 #  define STC_INLINE inline
 #endif
+
 #if defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define STC_API extern
 #else

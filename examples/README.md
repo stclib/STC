@@ -73,8 +73,8 @@ size_t personview_hash(const struct PersonView* pv, size_t ignore) {
 ```
 With this in place, we can declare the map Person -> int:
 ```
-declare_CHash(ex, map, struct Person, int, c_emptyDestroy, personview_hash, personview_compare,
-                  struct PersonView, person_destroy, person_getView, person_fromView);
+declare_CHash(ex, MAP, struct Person, int, c_emptyDestroy, personview_hash, personview_compare,
+                  person_destroy, struct PersonView, person_getView, person_fromView);
 ```
 Note we use struct PersonView to put keys in the map, but keys are stored as struct Person with proper dynamically allocated CStrings to store name and surname.
 ```
@@ -94,5 +94,5 @@ int main()
   chash_ex_destroy(&m6);
 }
 ```
-CHash map uses personview_hash() for hash value calculations, and the personview_compare() for equality checks. The chash_ex_destroy() function will free CStrings name, surname and the value for each item in the map, in addition to the CMap hash table itself.
+CHash map uses personview_hash() for hash value calculations, and the personview_compare() for equality checks. The chash_ex_destroy() function will free CStrings name, surname and the value for each item in the map, in addition to the CHash map table itself.
 

@@ -79,7 +79,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
     
 #define declare_CHash_7(tag, type, Key, Value, valueDestroy, keyHash, keyEquals) \
     declare_CHash_11(tag, type, Key, Value, valueDestroy, keyHash, keyEquals, \
-                          Key, c_emptyDestroy, c_defaultGetRaw, c_defaultInitRaw)
+                          c_emptyDestroy, Key, c_defaultGetRaw, c_defaultInitRaw)
 
 /* CHash<CString, Value>: */
 #define declare_CHash_string(...) \
@@ -93,7 +93,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
 
 #define declare_CHash_string_4(tag, type, Value, valueDestroy) \
     declare_CHash_11(tag, type, CString, Value, valueDestroy, cstring_hashRaw, cstring_equalsRaw, \
-                          const char*, cstring_destroy, cstring_getRaw, cstring_make)
+                          cstring_destroy, const char*, cstring_getRaw, cstring_make)
 
 #define _chash1_SET(x)
 #define _chash2_SET(x, y) x
@@ -102,7 +102,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
 
 /* CHash full: */
 #define declare_CHash_11(tag, type, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, \
-                              RawKey, keyDestroy, keyGetRaw, keyInitRaw) \
+                              keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
 typedef struct CHashEntry_##tag { \
     Key key; \
     _chash1_##type(Value value;) \
@@ -168,7 +168,7 @@ STC_API chash_##tag##_iter_t \
 chash_##tag##_next(chash_##tag##_iter_t it); \
  \
 implement_CHash_11(tag, type, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, \
-                        RawKey, keyDestroy, keyGetRaw, keyInitRaw) \
+                        keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
 typedef Key CHashKey_##tag; \
 typedef Value CHashValue_##tag
 
@@ -176,7 +176,7 @@ typedef Value CHashValue_##tag
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define implement_CHash_11(tag, type, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, \
-                                RawKey, keyDestroy, keyGetRaw, keyInitRaw) \
+                                keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
  \
 STC_API void \
 chash_##tag##_destroy(CHash_##tag* self) { \
@@ -362,7 +362,7 @@ chash_##tag##_next(chash_##tag##_iter_t it) { \
 
 #else
 #define implement_CHash_11(tag, type, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, \
-                                RawKey, keyDestroy, keyGetRaw, keyInitRaw)
+                                keyDestroy, RawKey, keyGetRaw, keyInitRaw)
 #endif
 
 #endif

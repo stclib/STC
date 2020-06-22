@@ -8,8 +8,8 @@
 
 #ifdef __cplusplus
 #include <unordered_map>
-#include "../others/bytell_hash_map.hpp"
-#include "../others/robin_hood.hpp"
+#include "others/bytell_hash_map.hpp"
+#include "others/robin_hood.hpp"
 #endif
 
 // Visual Studio: compile with -TP to force C++:  cl -TP -EHsc -O2 benchmark.c

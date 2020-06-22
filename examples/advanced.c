@@ -65,7 +65,7 @@ size_t personview_hash(const struct PersonView* pv, size_t ignore) {
 With this in place, we can declare the map Person -> int:
 ```*/
 declare_CHash(ex, MAP, struct Person, int, c_emptyDestroy, personview_hash, personview_compare, 
-                  struct PersonView, person_destroy, person_getView, person_fromView);
+                  person_destroy, struct PersonView, person_getView, person_fromView);
 /*```
 Note we use struct PersonView to put keys in the map, but keys are stored as struct Person with proper dynamically allocated CStrings to store name and surname.
 ```*/
