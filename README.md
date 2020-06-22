@@ -123,7 +123,7 @@ Also look at **examples/advanced.c**, it demonstrates how to use a custom struct
 
 Demos
 -----
-The first example has a complex nested container type, which demonstrates some of the capabilities of the library. Look at the simpler examples below to understand it better. The example adds an element into the data structure, and then accesses it. The type used, with c++ template syntax is:
+The first example has a very complex nested container type, which demonstrates the power of this library. Look at the simpler examples below to understand it better. The example adds an element into the data structure, and then accesses it. The type used, with c++ template syntax is:
 **CHashMap**< **CString**, **CHashMap**< *int*, **CList**< **CArray2**< *float* >>>>
 
 Note: The *chash_sm_destroy(&theMap)* call below, will destroy all the nested containers including the memory allocated for CString keys in theMap object.
@@ -141,24 +141,25 @@ declare_CHash(il, MAP, int, CList_t2, clist_t2_destroy);
 declare_CHash_string(sm, MAP, CHash_lm, chash_lm_destroy);
 
 int main() {
-    int dim1 = 4, dim2 = 6;
+    int xdim = 4, ydim = 6;
+    int x = 2, y = 5, entry = 42;
     CHash_sm theMap = chash_init;
     {
         // Construct.
-        CArray2_f table = carray2_f_make(dim1, dim2, 0.f);
+        CArray2_f table = carray2_f_make(xdim, ydim, 0.f);
         CList_t2 tableList = clist_init;
         CHash_il listMap = chash_init;
         
         // Put in some data.
-        carray2_f_data(table, 2)[5] = 3.1415927; // table[2][5]
+        carray2_f_data(table, x)[y] = 3.1415927; // table[x][y]
         clist_t2_pushBack(&tableList, table);
-        chash_il_put(&listMap, 42, tableList);
+        chash_il_put(&listMap, entry, tableList);
         chash_sm_put(&theMap, "First", listMap);
     }
 
     // Access the data entry
-    CArray2_f table = clist_back(chash_il_get(&chash_sm_get(&theMap, "First")->value, 42)->value);
-    printf("value is: %f\n", carray2_f_value(table, 3, 5));
+    CArray2_f table = clist_back(chash_il_get(&chash_sm_get(&theMap, "First")->value, entry)->value);
+    printf("value is: %f\n", carray2_f_value(table, x, y));
 
     chash_sm_destroy(&theMap); // free up the whole shebang!
 }
