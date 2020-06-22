@@ -9,7 +9,7 @@ An elegant, modern, generic, customizable, typesafe, consistent, user-friendly, 
 - **cvector.h** - Dynamic generic **vector** class.
 - **chash.h** - Unordered **map** and **set**. Highly customizable and fast.
 - **carray.h** - Multi-dimensional dynamic **array**, implemented as a single contiguous section of memory.
-- **clist.h** - A circular singly linked **list**, may be used as a **queue** (supports *pushBack, pushFront, and popFront*). Also contains various *splice* functions and (merge) *sorting*.
+- **clist.h** - A circular singly linked **list**, can be used as a **queue** (supports O(1) *pushBack, pushFront, and popFront*). Also contains various *splice* functions and (merge) *sorting*.
 - **coption.h** - Implementation of *getopt_long*-"like" function, *coption_get*, to parse command line arguments.
 - **crandom.h** - Collection of some efficent modern random number generators *xoroshiro128ss*, *sfc32/64* and Mersenne Twister *mt19937*. It also implements the crypto-strong *siphash* algorithm.
 
@@ -31,11 +31,11 @@ Motivation
 
 The goal of this project was to finally create a **Standard Container Library for the C language**. I believe that many/most earlier attempts at this has failed because they did not meet one, or several of the following requirements:
 - Easy to use, intuitive naming and consistency across the library.
-- Type safe. Minimized usage of casting and void* pointers.
+- Type safe. Minimal usage of casting and void* pointers.
 - Highly efficient. Both in speed and memory usage.
-- Customizable without loosing efficiency. E.g. inline replacable compare, hash, allocation functions per container type instantiation.
-- Relative small code base size and easy to install, deploy and maintain.
-- Avoid bloat. Should not try to cover all thinkable functions, but limit itself to the most useful and commonly used.
+- Customizable without losing efficiency. E.g. inline replacable compare, hash, allocation functions per container type instantiation.
+- Small code base size and easy to install, deploy and maintain.
+- Avoids bloat. Should not try to cover all thinkable functions, but limit itself to the most useful and commonly used.
 
 That said, this library is far from complete or free of possible bugs, but I believe it is a good foundation.
 
@@ -88,7 +88,7 @@ RMAP(ii): sz: 0, bucks: 1677721, time: 0.65, erase 1048490
 Memory efficiency
 -----------------
 
-The containers are memory efficent, containers takes up as little memory as possible.
+All containers are memory efficent, they take up as little memory as practical possible.
 - **CString**, **CVector**: Representaion: one pointer size. The size and capacity is stored as part of the heap allocation that also holds the vector elements.
 - **CList**: Representation: one pointer size. Each node allocates block storing value and next pointer.
 - **CHash set**: Representation: 4 pointers size. The hash table stores a key per bucket, and one table of "used/hash-value", occupying only one byte per bucket.
@@ -97,7 +97,23 @@ The containers are memory efficent, containers takes up as little memory as poss
 
 Demos
 -----
+The first example demonstrates an advanced complex type that shows some of the capability of the library. Look at the simpler to understand this better. This create one element into a large data structure (using C++ template syntax for describing the type):
+**CHash_map**< *CString*, *CHash_map*< *int*, *CList*< *CArray2*< *float* > > > >
+```
+#include "<stc/cstring.h>
+#include "<stc/chash.h>
+#include "<stc/clist.h>
+#include "<stc/carray.h>
 
+declare_CArray2(f, float);
+declare_CList(a2, CArray2_f, carray_f_destroy);
+declare_CHash(m2, map, CList_a2, clist_a2_destroy);
+declare_CHash(m, map, CHash_m2, chash_m2_destroy);
+
+int main() {
+  
+}
+```
 **CString**
 ```
 #include <stc/cstring.h>
