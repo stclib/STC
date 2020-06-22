@@ -277,30 +277,35 @@ int main() {
 ```
 **CList** of *int64_t*. Similar to c++ *std::forward_list*, but can do both *pushFront()* and *pushBack()*.
 ```
-    #include <stc/clist.h>
-    #include <stc/crandom.h>
-    declare_CList(i, int64_t);
+#include <stdio.h>
+#include <time.h>
+#include "stc/clist.h"
+#include "stc/crandom.h"
+declare_CList(i, uint64_t);
  
-    int main() {
-        CList_i list = clist_init;
-        int n;
-        sfc64_t rng = sfc64_seed(1234);
-        for (int i=0; i<1000000; ++i) // one million random numbers
-            clist_i_pushBack(&list, sfc64_rand(&rng));
-        n = 0; 
-        c_foreach (i, clist_i, list)
-            if (++n % 10000 == 0) printf("%d: %zd\n", n, i.item->value);
-        // Sort them...
-        clist_i_sort(&list); // mergesort O(n*log n)
-        n = 0;
-        c_foreach (i, clist_i, list)
-            if (++n % 10000 == 0) printf("%d: %zd\n", n, i.item->value);
-        clist_i_destroy(&list);
-    }
+int main() {
+    CList_i list = clist_init;
+    int N = 2000000, n;
+    sfc64_t rng = sfc64_seed(time(NULL));
+    for (int i=0; i<N; ++i) // one million random numbers
+        clist_i_pushBack(&list, sfc64_rand(&rng));
+    n = 0; 
+    c_foreach (i, clist_i, list)
+        if (++n % (N/50) == 0) printf("%10d: %zu\n", n, i.item->value);
+    puts("sorting:");
+    // Sort them...
+    clist_i_sort(&list); // mergesort O(n*log n)
+    n = 0;
+    puts("done:");
+    c_foreach (i, clist_i, list)
+        if (++n % (N/50) == 0) printf("%10d: %zu\n", n, i.item->value);
+    clist_i_destroy(&list);
+}
 ```
 **CArray**. Heap allocated 1D, 2D and 3D array in one memory block, with sub-arrays.
 ```
-#include <stc/carray.h>
+#include <stdio.h>
+#include "stc/carray.h"
 declare_CArray(f, float);
 
 int main()
