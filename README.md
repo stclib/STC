@@ -88,7 +88,7 @@ RMAP(ii): sz: 0, bucks: 1677721, time: 0.65, erase 1048490
 Memory efficiency
 -----------------
 
-All containers are memory efficent, they take up as little memory as practical possible.
+The containers are memory efficent, i.e. they occupy as little memory as practical possible.
 - **CString**, **CVector**: Representaion: one pointer size. The size and capacity is stored as part of the heap allocation that also holds the vector elements.
 - **CList**: Representation: one pointer size. Each node allocates block storing value and next pointer.
 - **CHash set**: Representation: 4 pointers size. The hash table stores a key per bucket, and one table of "used/hash-value", occupying only one byte per bucket.
@@ -97,8 +97,8 @@ All containers are memory efficent, they take up as little memory as practical p
 
 Demos
 -----
-The first example demonstrates an advanced complex type that shows some of the capability of the library. Look at the simpler to understand this better. This create one element into a large data structure (using C++ template syntax for describing the type):
-**CHash_map**< *CString*, *CHash_map*< *int*, *CList*< *CArray2*< *float* > > > >
+The first example has a complex nested container type, which demonstrates some of the capability of the library. Look at the simpler examples below to understand it better. The example adds an element into the data structure, and then access it. The type is here described with c++ template syntax:
+**CHashMap**< **CString**, **CHashMap**< *int*, **CList**< **CArray2**< *float* >>>>
 ```
 #include "stc/cstring.h"
 #include "stc/chash.h"
