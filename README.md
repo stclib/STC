@@ -121,6 +121,8 @@ Demos
 -----
 The first example has a complex nested container type, which demonstrates some of the capability of the library. Look at the simpler examples below to understand it better. The example adds an element into the data structure, and then accesses it. The type used, with c++ template syntax is:
 **CHashMap**< **CString**, **CHashMap**< *int*, **CList**< **CArray2**< *float* >>>>
+
+Note that *chash_sm_destroy(&theMap)* call below will also destroy all the nested containers, including memory allocated for CString keys in theMap object.
 ```
 #include "stc/cstring.h"
 #include "stc/chash.h"
