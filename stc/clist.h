@@ -23,6 +23,7 @@
 #ifndef CLIST__H__
 #define CLIST__H__
 
+#include <stdlib.h>
 #include "cdefs.h"
 
 /*  Circular Singly-linked Lists.
@@ -221,7 +222,7 @@
     } \
     STC_API void \
     clist_##tag##_sort(CList_##tag* self) { \
-        CListNode__base* last = _clist_mergesort((CListNode__base *) self->last, clist_##tag##_sortCmp); \
+        CListNode__base* last = _clist_mergesort((CListNode__base *) self->last->next, clist_##tag##_sortCmp); \
         self->last = (CListNode_##tag *) last; \
     }
 

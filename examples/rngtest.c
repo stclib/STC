@@ -55,14 +55,4 @@ int main(void)
     }
     difference = clock() - before;
     printf("sfc64: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
-
-/*
-    before = clock(); \
-    v = 0;
-    for (size_t i=0; i<NN; i++) {
-        v += rand();
-    }
-    difference = clock() - before;
-    printf("rand : %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
-*/
 }

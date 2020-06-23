@@ -8,15 +8,8 @@
  * Mersenne Twister random number generator MT19937, 32 bit.
  */
 
-enum {
-    mt19937_N = 624,
-    mt19937_M = 397,
-};
-
-typedef struct mt19937 {
-    uint32_t idx;
-    uint32_t arr[mt19937_N];
-} mt19937_t;
+enum {mt19937_N = 624, mt19937_M = 397};
+typedef struct {uint32_t idx, arr[mt19937_N];} mt19937_t;
 
 /* initializes state with a seed */
 STC_API void mt19937_init(mt19937_t *state, uint32_t seed) {
@@ -39,7 +32,7 @@ STC_API mt19937_t mt19937_default(void) {
     return state;
 }
 
-/* generates a random number on [0, 0xffffffff]-interval */
+/* generates a random number in [0, 2^32)-interval */
 STC_API uint32_t mt19937_rand(mt19937_t *state) {
     enum {N = mt19937_N, M = mt19937_M};
 
@@ -71,7 +64,6 @@ STC_API uint32_t mt19937_rand(mt19937_t *state) {
 /* 
  * rotate bits left uint64
  */
-
 STC_INLINE uint64_t c_rotateLeft64(uint64_t x, int bits) {
     return (x << bits) | (x >> (64 - bits));
 }
@@ -79,7 +71,6 @@ STC_INLINE uint64_t c_rotateLeft64(uint64_t x, int bits) {
 /* 
  * xoroshiro128** with splitmix64 seed initialization
  */
-
 STC_API uint64_t splitmix64(uint64_t *state) {
     uint64_t z = (*state += 0x9e3779b97f4a7c15);
     z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9;
@@ -87,9 +78,7 @@ STC_API uint64_t splitmix64(uint64_t *state) {
     return z ^ (z >> 31);
 }
 
-typedef struct xoroshiro128ss {
-    uint64_t s[2];
-} xoroshiro128ss_t;
+typedef struct {uint64_t s[2];} xoroshiro128ss_t;
 
 STC_API xoroshiro128ss_t xoroshiro128ss_seed(uint64_t seed) {
     xoroshiro128ss_t state;
@@ -99,12 +88,11 @@ STC_API xoroshiro128ss_t xoroshiro128ss_seed(uint64_t seed) {
 }
 
 STC_API uint64_t xoroshiro128ss_rand(xoroshiro128ss_t *state) {
-    uint64_t *s = state->s, s1 = s[1];
-    const uint64_t s0 = s[0];
-    const uint64_t result = c_rotateLeft64(s0 * 5, 7) * 9;
-    s1 ^= s0;
-    s[0] = c_rotateLeft64(s0, 24) ^ s1 ^ (s1 << 16);
-    s[1] = c_rotateLeft64(s1, 37);
+    uint64_t *s = state->s;
+    const uint64_t xo = s[0] ^ s[1];
+    const uint64_t result = c_rotateLeft64(s[0] * 5, 7) * 9;
+    s[0] = c_rotateLeft64(s[0], 24) ^ xo ^ (xo << 16);
+    s[1] = c_rotateLeft64(xo, 37);
     return result;
 }
 
@@ -123,40 +111,62 @@ STC_API void xoroshiro128ss_jump(xoroshiro128ss_t *state, bool longJump) {
 }
 
 /*
+ * xoshiro256**:
+ */
+typedef struct {uint64_t s[4];} xoshiro256ss_t;
+
+STC_API uint64_t xoshiro256ss_rand(xoshiro256ss_t* state) {
+    uint64_t *s = state->s;
+    const uint64_t result = c_rotateLeft64(s[1] * 5, 7) * 9;
+    const uint64_t t = s[1] << 17;
+    s[2] ^= s[0];
+    s[3] ^= s[1];
+    s[1] ^= s[2];
+    s[0] ^= s[3];
+    s[2] ^= t;
+    s[3] = c_rotateLeft64(s[3], 45);
+    return result;
+}
+
+STC_API xoshiro256ss_t xoshiro256ss_seed(uint64_t seed) {
+    xoshiro256ss_t state;
+    for (int i=0; i<4; ++i) state.s[i] = splitmix64(&seed);
+    return state;
+}
+
+/*
  * sfc32: http://pracrand.sourceforge.net
  */
-
-typedef struct sfc32 {uint32_t v[4];} sfc32_t;
+typedef struct {uint32_t s[4];} sfc32_t;
 
 STC_API uint32_t sfc32_rand(sfc32_t* state) {
-    enum {LROT = 21, RSHIFT = 9, LSHIFT = 3};
-    uint32_t *v = state->v;
-    const uint32_t out = v[0] + v[1] + v[3]++;
-    v[0] = v[1] ^ (v[1] >> RSHIFT);
-    v[1] = v[2] + (v[2] << LSHIFT);
-    v[2] = ((v[2] << LROT) | (v[2] >> (32 - LROT))) + out;
+    enum {LR=21, RS=9, LS=3};
+    uint32_t *s = state->s;
+    const uint32_t out = s[0] + s[1] + s[3]++;
+    s[0] = s[1] ^ (s[1] >> RS);
+    s[1] = s[2] + (s[2] << LS);
+    s[2] = ((s[2] << LR) | (s[2] >> (32 - LR))) + out;
     return out;
 }
 
 STC_API sfc32_t sfc32_seed(const uint64_t seed) {
     sfc32_t state = {{0, (uint32_t) seed, (uint32_t) (seed >> 32), 1}};
-    for (int i = 0; i < 12; ++i) sfc32_rand(&state);
+    for (int i=0; i<12; ++i) sfc32_rand(&state);
     return state;
 }
 
 /*
  * sfc64: http://pracrand.sourceforge.net
  */
-
-typedef struct sfc64 {uint64_t v[4];} sfc64_t;
+typedef struct {uint64_t s[4];} sfc64_t;
 
 STC_API uint64_t sfc64_rand(sfc64_t* state) {
-    enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
-    uint64_t *v = state->v;
-    const uint64_t out = v[0] + v[1] + v[3]++;
-    v[0] = v[1] ^ (v[1] >> RSHIFT);
-    v[1] = v[2] + (v[2] << LSHIFT);
-    v[2] = ((v[2] << LROT) | (v[2] >> (64 - LROT))) + out;
+    enum {LR=24, RS=11, LS=3};
+    uint64_t *s = state->s;
+    const uint64_t out = s[0] + s[1] + s[3]++;
+    s[0] = s[1] ^ (s[1] >> RS);
+    s[1] = s[2] + (s[2] << LS);
+    s[2] = ((s[2] << LR) | (s[2] >> (64 - LR))) + out;
     return out;
 }
 
@@ -169,13 +179,12 @@ STC_API sfc64_t sfc64_seed(const uint64_t seed) {
 /*
  * convert random int number to float in [0, 1) range.
  */
-
-STC_API float c_randToFloat(uint32_t rnd) {
+STC_INLINE float c_randToFloat(uint32_t rnd) {
     union {uint32_t i; float f;} u = {0x3F800000u | (rnd >> 9)};
     return u.f - 1.0f;
 }
  
-STC_API double c_randToDouble(uint64_t rnd) {
+STC_INLINE double c_randToDouble(uint64_t rnd) {
     union {uint64_t i; double f;} u = {0x3FF0000000000000ull | (rnd >> 12)};
     return u.f - 1.0;
 }
@@ -183,7 +192,6 @@ STC_API double c_randToDouble(uint64_t rnd) {
 /*
  * siphash implementation.
  */
-
 #if defined(_WIN32) || (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
     STC_INLINE uint64_t c_le64ToHost(uint64_t x) { return x; }
 #elif defined(__APPLE__)

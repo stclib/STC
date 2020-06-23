@@ -28,17 +28,17 @@
 #include <stdbool.h>
 
 #if 0 // defined(_MSC_VER)
-#  define STC_INLINE __forceinline
+#  define STC_INLINE static __forceinline
 #elif 0 // defined(__GNUC__)
-#  define STC_INLINE inline __attribute((always_inline))
+#  define STC_INLINE static inline __attribute((always_inline))
 #else // don't force
-#  define STC_INLINE inline
+#  define STC_INLINE static inline
 #endif
 
 #if defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define STC_API extern
 #else
-#define STC_API static STC_INLINE
+#define STC_API STC_INLINE
 #endif
 
 /* Macro overloading feature support: https://rextester.com/ONP80107 */
