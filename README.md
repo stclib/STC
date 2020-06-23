@@ -9,7 +9,7 @@ An elegant, typesafe, generic, customizable, user-friendly, consistent, and very
 - **cvector.h** - Dynamic generic **vector** class, works well as a **stack**.
 - **chash.h** - Unordered **map** and **set** implemented as open hashing without tombstones. Highly customizable and fast.
 - **carray.h** - Multi-dimensional dynamic **array**, implemented as a single contiguous section of memory.
-- **clist.h** - A circular singly linked **list**, can be used as a **queue** - supports *pushBack, pushFront, and popFront* in *O*(1). Also contains various *splice* functions and (merge) *sort*.
+- **clist.h** - A circular singly **linked list**, can be used as a **queue** - supports *pushBack, pushFront, and popFront* in *O*(1). Also contains various *splice* functions and (merge) *sort*.
 - **coption.h** - Implementation of *getopt_long*-"like" function, *coption_get*, to parse command line arguments.
 - **crandom.h** - Collection of some efficent modern random number generators *xoroshiro128ss*, *sfc32/64* and Mersenne Twister *mt19937*. It also implements the crypto-strong *siphash* algorithm.
 - **cdefs.h** - A small common include file with central definitions.
@@ -101,17 +101,17 @@ CHash and CVector discussion
 
 **CHash** is the most complex of the containers (although, currently only ~370 lines of code). It uses open hashing, but does not rely on power-of-two size table, nor prime number lengths, and it does not have tombstone buckets. Still, it is among the fastest hash-tables, as shown above.
 
-You may customize the destroy-, hash- and equals- function. It also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is handy when e.g. having CString as key, as it enables the usage of string literals as key in *put() and *get() functions, instead of requering a constructed CString. Without it you would need to write: 
+You may customize the destroy-, hash- and equals- function. It also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is handy when e.g. having CString as key, as it enables the usage of string literals as key in *put() and *get() functions, instead of requering a constructed CString. Without it, you would have to write: 
 ```
 chash_si_put(&map, cstring_make("mykey"), 12);
 ```
-but even worse:
+but the main problem is lookup:
 ```
 CString lookup = cstring_make("mykey");
 int x = chash_si_get(&map, lookup)->value;
 cstring_destroy(&lookup);
 ```
-The predefined shorthand macro *declare_CHash_string()* defines a CHash container with a CString as key, however you may use it like:
+The predefined shorthand macro *declare_CHash_string()* defines a CHash container with a CString as key, however this you may use it like:
 ```
 chash_si_put(&map, "mykey", 12);            // constructs a CString key from the char* internally.
 int x = chash_si_get(&map, "mykey")->value; // no allocation of string key happens here, which is good.
