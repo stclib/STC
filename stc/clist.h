@@ -227,7 +227,7 @@
     }
 
 #define _clist_insertAfter(self, tag, node, val) \
-    CListNode_##tag *entry = c_new_1(CListNode_##tag), \
+    CListNode_##tag *entry = c_new (CListNode_##tag), \
                     *next = self->last ? node->next : entry; \
     entry->value = val; \
     entry->next = next; \

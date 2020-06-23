@@ -288,7 +288,7 @@ chash_##tag##_reserve(CHash_##tag* self, size_t newcap) { \
     size_t oldcap = chash_bucketCount(*self); newcap |= 1; \
     if (chash_size(*self) >= newcap * self->maxLoadPercent * 0.01) return oldcap; \
     CHash_##tag tmp = { \
-        c_new_2(CHashEntry_##tag, newcap), \
+        c_new_N(CHashEntry_##tag, newcap), \
         (uint8_t *) calloc(newcap, sizeof(uint8_t)), \
         self->_size, (uint32_t) newcap, \
         self->maxLoadPercent, self->shrinkLimitPercent \

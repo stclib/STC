@@ -51,25 +51,24 @@
 #define c_OVERLOAD_SELECT(NAME, NUM) c_CAT( NAME ## _, NUM)
 
 #define c_MACRO_OVERLOAD(NAME, ...) c_OVERLOAD_SELECT(NAME, c_VA_ARG_SIZE(__VA_ARGS__))(__VA_ARGS__)
+//#define test(...)     c_MACRO_OVERLOAD(test, __VA_ARGS__)  //#define test_1(x) a(x) //#define test_2(x,y) b(x,y)
 
-#define c_new(...)      c_MACRO_OVERLOAD(c_new, __VA_ARGS__)
-#define c_new_1(T)      ((T *) malloc(sizeof(T)))
-#define c_new_2(T, n)   ((T *) malloc(sizeof(T) * (n)))
+#define c_new(T)        ((T *) malloc(sizeof(T)))
+#define c_new_N(T, n)   ((T *) malloc(sizeof(T) * (n)))
 
-#define c_struct(S)     typedef struct S S; struct S
-#define                 c_max_alloca   (1000)
-#define                 c_swap(T, x, y) { T __t = x; x = y; y = __t; }
+#define c_max_alloca    (1000)
+#define c_swap(T, x, y) { T __t = x; x = y; y = __t; }
 
-#define                 c_defaultInitRaw(x)    (x)
-#define                 c_defaultGetRaw(ptr)   (*(ptr))
-#define                 c_defaultCompare(x, y) (*(x) == *(y) ? 0 : *(x) < *(y) ? -1 : 1)
-#define                 c_noCompare(x, y)      (0)
-#define                 c_defaultEquals(x, y)  (*(x) == *(y))
-#define                 c_memEquals(x, y)      (memcmp(x, y, sizeof(*(y))) == 0)
-#define                 c_emptyDestroy(p)      ((void)0)
+#define c_defaultInitRaw(x)    (x)
+#define c_defaultGetRaw(ptr)   (*(ptr))
+#define c_defaultCompare(x, y) (*(x) == *(y) ? 0 : *(x) < *(y) ? -1 : 1)
+#define c_noCompare(x, y)      (0)
+#define c_defaultEquals(x, y)  (*(x) == *(y))
+#define c_memEquals(x, y)      (memcmp(x, y, sizeof(*(y))) == 0)
+#define c_emptyDestroy(p)      ((void)0)
 
-#define                 c_foreach(it, prefix, container) \
-                            for (prefix##_iter_t it = prefix##_begin(&container); it.item; it = prefix##_next(it))
+#define c_foreach(it, prefix, container) \
+            for (prefix##_iter_t it = prefix##_begin(&container); it.item; it = prefix##_next(it))
 
 /* One-byte-at-a-time hash based on Murmur's mix */
 static inline uint32_t  c_defaultHash(const void *data, size_t len) {
