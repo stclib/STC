@@ -49,7 +49,7 @@ int main()
 }
 */
 
-#define carray_xdim(a)  ((a)._xdim & ~_carray_own)
+#define carray_xdim(a)  ((a)._xdim & _carray_sub)
 #define carray_ydim(a)  _carray_ydim(&(a)._yxdim)
 #define carray_zdim(a)  ((a)._zdim)
 #define carray1_size(a) carray_xdim(a)
@@ -57,10 +57,11 @@ int main()
 #define carray3_size(a) _carray3_size(&(a)._zdim)
 
 
-enum {_carray_own = 1ull << ((sizeof(size_t) << 3) - 1)};
+#define _carray_own (1ull << ((sizeof(size_t) << 3) - 1))
+#define _carray_sub (~_carray_own)
 
 static inline size_t _carray_ydim(const size_t* yxdim) {
-    return yxdim[0] / (yxdim[-1] & ~_carray_own);
+    return yxdim[0] / (yxdim[-1] & _carray_sub);
 }
 static inline size_t _carray3_size(const size_t* zdim) {
     return zdim[0] * zdim[-1];
@@ -91,18 +92,18 @@ static inline size_t _carray3_size(const size_t* zdim) {
  \
     static inline void \
     carray1_##tag##_destroy(CArray1_##tag* self) { \
-        const size_t n = carray1_size(*self); Value* a = self->data; \
-        if (self->_xdim & _carray_own) {for (size_t i=0; i<n; ++i) valueDestroy(&a[i]); free(a);} \
+        size_t n = carray1_size(*self); Value* a = self->data; \
+        if (self->_xdim & _carray_own) {while (n--) valueDestroy(&a[n]); free(a);} \
     } \
     static inline void \
     carray2_##tag##_destroy(CArray2_##tag* self) { \
-        const size_t n = carray2_size(*self); Value* a = self->data; \
-        if (self->_xdim & _carray_own) {for (size_t i=0; i<n; ++i) valueDestroy(&a[i]); free(a);} \
+        size_t n = carray2_size(*self); Value* a = self->data; \
+        if (self->_xdim & _carray_own) {while (n--) valueDestroy(&a[n]); free(a);} \
     } \
     static inline void \
     carray3_##tag##_destroy(CArray3_##tag* self) { \
-        const size_t n = carray3_size(*self); Value* a = self->data; \
-        if (self->_xdim & _carray_own) {for (size_t i=0; i<n; ++i) valueDestroy(&a[i]); free(a);} \
+        size_t n = carray3_size(*self); Value* a = self->data; \
+        if (self->_xdim & _carray_own) {while (n--) valueDestroy(&a[n]); free(a);} \
     } \
  \
     static inline CArray1_##tag \
@@ -114,7 +115,7 @@ static inline size_t _carray3_size(const size_t* zdim) {
     } \
     static inline CArray2_##tag \
     carray2_##tag##_make(size_t ydim, size_t xdim, Value val) { \
-        size_t n = ydim * xdim; \
+        const size_t n = ydim * xdim; \
         Value* m = c_new_N(Value, n); \
         for (size_t i=0; i<n; ++i) m[i] = val; \
         CArray2_##tag a = {m, xdim | _carray_own, ydim * xdim}; \
@@ -122,7 +123,7 @@ static inline size_t _carray3_size(const size_t* zdim) {
     } \
     static inline CArray3_##tag \
     carray3_##tag##_make(size_t zdim, size_t ydim, size_t xdim, Value val) { \
-        size_t n = zdim * ydim * xdim; \
+        const size_t n = zdim * ydim * xdim; \
         Value* m = c_new_N(Value, n); \
         for (size_t i=0; i<n; ++i) m[i] = val; \
         CArray3_##tag a = {m, xdim | _carray_own, ydim * xdim, zdim}; \
