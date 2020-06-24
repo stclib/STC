@@ -53,7 +53,7 @@ int main(void) {
 #include <stdlib.h>
 #include "cdefs.h"
 
-#define chash_init          {NULL, NULL, 0, 0, 90, 0}
+#define chash_init          {NULL, NULL, 0, 0, 0.85f, 0.15f}
 #define chash_size(map)     ((size_t) (map)._size)
 #define chash_bucketCount(map)  ((size_t) (map)._cap)
 /* https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction */
@@ -123,8 +123,8 @@ typedef struct CHash_##tag { \
     CHashEntry_##tag* _table; \
     uint8_t* _hashx; \
     uint32_t _size, _cap; \
-    uint8_t maxLoadPercent; \
-    uint8_t shrinkLimitPercent; \
+    float maxLoadFactor; \
+    float shrinkLimitFactor; \
 } CHash_##tag; \
  \
 typedef struct { \
@@ -145,9 +145,7 @@ chash_##tag##_destroy(CHash_##tag* self); \
 STC_API void \
 chash_##tag##_clear(CHash_##tag* self); \
 STC_API void \
-chash_##tag##_setMaxLoadFactor(CHash_##tag* self, double fac); \
-STC_API void \
-chash_##tag##_setShrinkLimitFactor(CHash_##tag* self, double limit); \
+chash_##tag##_setLoadFactors(CHash_##tag* self, float maxLoadFactor, float shrinkLimitFactor); \
 STC_API size_t \
 chash_##tag##_bucket(const CHash_##tag* self, const CHashRawKey_##tag* rawKeyPtr, uint32_t* hxPtr); \
 STC_API CHashEntry_##tag* \
@@ -205,17 +203,9 @@ STC_API void chash_##tag##_clear(CHash_##tag* self) { \
 } \
  \
 STC_API void \
-chash_##tag##_setMaxLoadFactor(CHash_##tag* self, double fac) { \
-    self->maxLoadPercent = (uint8_t) (fac * 100); \
-    if (chash_size(*self) >= chash_bucketCount(*self) * fac) \
-        chash_##tag##_reserve(self, (size_t) (chash_size(*self) / fac)); \
-} \
- \
-STC_API void \
-chash_##tag##_setShrinkLimitFactor(CHash_##tag* self, double limit) { \
-    self->shrinkLimitPercent = (uint8_t) (limit * 100); \
-    if (chash_size(*self) < chash_bucketCount(*self) * limit) \
-        chash_##tag##_reserve(self, (size_t) (chash_size(*self) * 1.2 / limit)); \
+chash_##tag##_setLoadFactors(CHash_##tag* self, float maxLoadFactor, float shrinkLimitFactor) { \
+    self->maxLoadFactor = maxLoadFactor; \
+    self->shrinkLimitFactor = shrinkLimitFactor; \
 } \
  \
 STC_API size_t \
@@ -245,7 +235,7 @@ chash_##tag##_get(const CHash_##tag* self, CHashRawKey_##tag rawKey) { \
 } \
  \
 static inline void _chash_##tag##_reserveExpand(CHash_##tag* self) { \
-    if (chash_size(*self) + 1 >= chash_bucketCount(*self) * self->maxLoadPercent * 0.01) \
+    if (chash_size(*self) + 1 >= chash_bucketCount(*self) * self->maxLoadFactor) \
         chash_##tag##_reserve(self, (size_t) 7 + (1.6 * chash_bucketCount(*self))); \
 } \
  \
@@ -295,12 +285,12 @@ chash_##tag##_swap(CHash_##tag* a, CHash_##tag* b) { \
 STC_API size_t \
 chash_##tag##_reserve(CHash_##tag* self, size_t newcap) { \
     size_t oldcap = chash_bucketCount(*self); newcap |= 1; \
-    if (chash_size(*self) >= newcap * self->maxLoadPercent * 0.01) return oldcap; \
+    if (chash_size(*self) >= newcap * self->maxLoadFactor) return oldcap; \
     CHash_##tag tmp = { \
         c_new_N(CHashEntry_##tag, newcap), \
         (uint8_t *) calloc(newcap, sizeof(uint8_t)), \
         self->_size, (uint32_t) newcap, \
-        self->maxLoadPercent, self->shrinkLimitPercent \
+        self->maxLoadFactor, self->shrinkLimitFactor \
     }; \
     chash_##tag##_swap(self, &tmp); \
  \
@@ -347,8 +337,8 @@ chash_##tag##_erase(CHash_##tag* self, CHashRawKey_##tag rawKey) { \
     if (chash_size(*self) == 0) \
         return false; \
     size_t cap = chash_bucketCount(*self); \
-    if (chash_size(*self) < cap * self->shrinkLimitPercent * 0.01) \
-        chash_##tag##_reserve(self, chash_size(*self) * 120 / self->maxLoadPercent); \
+    if (chash_size(*self) < cap * self->shrinkLimitFactor && cap * sizeof(CHashEntry_##tag) > 1024) \
+        chash_##tag##_reserve(self, (size_t) (chash_size(*self) * 1.2f / self->maxLoadFactor)); \
     uint32_t hx; \
     size_t i = chash_##tag##_bucket(self, &rawKey, &hx); \
     return chash_##tag##_eraseBucket(self, i); \

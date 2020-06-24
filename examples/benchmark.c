@@ -19,20 +19,20 @@ static inline uint32_t fibonacci_hash(const void* data, size_t len) {
     const uint64_t key = *(const uint64_t *) data;
     return (uint32_t) (key * 11400714819323198485llu);
 }
-declare_CHash(ii, MAP, int64_t, int64_t, c_emptyDestroy, fibonacci_hash); // c_lowbias32Hash);
+declare_CHash(ii, MAP, int64_t, int64_t, c_emptyDestroy, fibonacci_hash);
 
 KHASH_MAP_INIT_INT64(ii, uint64_t)
 
 size_t seed = 1234;
-static const double maxLoadFactor = 0.77;
+static const float maxLoadFactor = 0.77f;
 
 sfc64_random_t rng;
 #define SEED(s) rng = sfc64_seed(seed)
 #define RAND(N) (sfc64_random(&rng) & ((1 << N) - 1))
 
 
-#define CMAP_SETUP(tag, Key, Value) CHash_##tag map = chash_init; \
-                                    chash_##tag##_setMaxLoadFactor(&map, maxLoadFactor)
+#define CMAP_SETUP(tag, Key, Value) CHash_##tag map = chash_init \
+                                    /* ; chash_##tag##_setLoadFactors(&map, maxLoadFactor, 0.0)*/
 #define CMAP_PUT(tag, key, val)     chash_##tag##_put(&map, key, val)->value
 #define CMAP_ERASE(tag, key)        chash_##tag##_erase(&map, key)
 #define CMAP_FIND(tag, key)         (chash_##tag##_get(map, key) != NULL)
@@ -97,7 +97,7 @@ int rr = RR;
         erased += M##_ERASE(tag, RAND(rr)); \
     } \
     difference = clock() - before; \
-    printf(#M "(" #tag "): sz: %zu, bucks: %zu, time: %.02f, sum: %zu, erase: %zu\n", \
+    printf(#M "(" #tag "): sz: %zu, bucks: %8zu, time: %.02f, sum: %zu, erase: %zu\n", \
            M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, checksum, erased); \
     M##_CLEAR(tag); \
 }
@@ -112,7 +112,7 @@ int rr = RR;
     for (size_t i = 0; i < N2; ++i) \
         erased += M##_ERASE(tag, i); \
     difference = clock() - before; \
-    printf(#M "(" #tag "): sz: %zu, bucks: %zu, time: %.02f, erase %zu\n", \
+    printf(#M "(" #tag "): sz: %zu, bucks: %8zu, time: %.02f, erase %zu\n", \
            M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, erased); \
     M##_CLEAR(tag); \
 }
@@ -129,7 +129,7 @@ int rr = RR;
     for (size_t i = 0; i < N2; ++i) \
         erased += M##_ERASE(tag, RAND(rr)); \
     difference = clock() - before; \
-    printf(#M "(" #tag "): sz: %zu, bucks: %zu, time: %.02f, erase %zu\n", \
+    printf(#M "(" #tag "): sz: %zu, bucks: %8zu, time: %.02f, erase %zu\n", \
            M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, erased); \
     M##_CLEAR(tag); \
 }
