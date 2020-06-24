@@ -11,7 +11,7 @@ An elegant, typesafe, generic, customizable, user-friendly, consistent, and very
 - **carray.h** - Multi-dimensional dynamic **array**, implemented as a single contiguous section of memory.
 - **clist.h** - A circular singly **linked list**, can be used as a **queue** - supports *pushBack, pushFront, and popFront* in *O*(1). Also contains various *splice* functions and (merge) *sort*.
 - **coption.h** - Implementation of *getopt_long*-"like" function, *coption_get*, to parse command line arguments.
-- **crandom.h** - Collection of some efficent modern random number generators *xoroshiro128ss*, *sfc32/64* and Mersenne Twister *mt19937*. It also implements the crypto-strong *siphash* algorithm.
+- **crandom.h** - A few efficent modern random number generators *pgc32* and *sfc64*. It also implements the crypto-strong *siphash* algorithm.
 - **cdefs.h** - A small common include file with central definitions.
 
 The usage of the containers is similar to the C++ standard containers, so it should be easier for those who are familiar with them.
@@ -30,7 +30,7 @@ int main(void) {
 Motivation
 ----------
 
-The aim of this project was to create a small **Standard Container Library for the C99 language**. I suspect that most earlier attempts at this has failed because they did not meet one or several of the following requirements: For me, a standard container library should
+The aim of this project was to create a small **Standard Container Library for the C99 language**. I suspect that most other attempts at this has failed because it did not meet one or several of the following requirements: I believe a standard container library should ..
 - be easy to use, have intuitive naming and consistency across the library.
 - be type safe. Have minimal usage of casting and void* pointers.
 - be highly efficient. Both in speed and memory usage.
@@ -92,14 +92,14 @@ Memory efficiency
 The containers are memory efficent, i.e. they occupy as little memory as practical possible.
 - **CString**, **CVector**: Representaion: one pointer size. The size and capacity is stored as part of the heap allocation that also holds the vector elements.
 - **CList**: Representation: one pointer size. Each node allocates block storing value and next pointer.
-- **CHash set**: Representation: 4 pointers size. The hash table stores a key per bucket, and one table of "used/hash-value", occupying only one byte per bucket.
-- **CHash map**: Same as CHash set, but each bucket in the array stores a (key, value) pair, not only the key.
-- **CArray**: Elements are stored as one memory block. Representation: Two pointers, plus variables to store dimensionality.
+- **CHash set**: Representation: 4 pointers size. The CHash set uses one table of keys, and one table of "used/hash-value", which occupies one byte per bucket.
+- **CHash map**: Same as CHash set, but this uses a table of (key, value) pairs, not only keys.
+- **CArray**: CArray1, CArray2 and CArray3. Representation: One pointers, plus 1, 2, or 3 size_t variables to store dimensions. Elements are stored as one memory block.
 
 CHash and CVector discussion
 ----------------------------
 
-**CHash** is the most complex of the containers (although, currently only ~370 lines of code). It uses open hashing, but does not rely on power-of-two size table, nor prime number lengths, and it does not have tombstone buckets. Still, it is among the fastest hash-tables, as shown above.
+**CHash** is the most complex of the containers (although, currently only ~370 lines of code). It uses open hashing, but does not rely on power-of-two size table, nor prime number lengths, and it does not have tombstone buckets. Still, it is among the fastest hash-tables, as shown above. The default max load-factor is 0.85, and it shrinks (and rehashes) when load-factor goes below 0.15, by default (can be set per hash container).
 
 You may customize the destroy-, hash- and equals- function. It also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is handy when e.g. having CString as key, as it enables the usage of string literals as key in *put() and *get() functions, instead of requering a constructed CString. Without it, you would have to write: 
 ```
@@ -303,7 +303,7 @@ int main() {
     clist_i_destroy(&list);
 }
 ```
-**CArray**. Heap allocated 1D, 2D and 3D array in one memory block, with sub-arrays.
+**CArray**. 1D, 2D and 3D arrays, heap allocated in one memory block. CArray3 can make sub-array "views" CArray2 and CArray1 into CArray3, and CArray2 can further make CArray1 "views", as shown in the folling example.
 ```
 #include <stdio.h>
 #include "stc/carray.h"
