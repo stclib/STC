@@ -138,6 +138,8 @@ typedef struct { \
     uint32_t hashx; \
 } CHashBucket_##tag; \
  \
+STC_API CHash_##tag \
+chash_##tag##_make(size_t initialSize); \
 STC_API void \
 chash_##tag##_destroy(CHash_##tag* self); \
 STC_API void \
@@ -177,6 +179,13 @@ typedef Value CHashValue_##tag
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define implement_CHash_11(tag, type, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, \
                                 keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
+ \
+STC_API CHash_##tag \
+chash_##tag##_make(size_t initialSize) { \
+    CHash_##tag h = chash_init; \
+    chash_##tag##_reserve(&h, initialSize); \
+    return h; \
+} \
  \
 STC_API void \
 chash_##tag##_destroy(CHash_##tag* self) { \
