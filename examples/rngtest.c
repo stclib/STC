@@ -14,45 +14,26 @@ int main(void)
     uint64_t v;
     printf("start\n");
 
-    mt19937_t state = mt19937_default();
-    uint32_t k = mt19937_rand(&state);
-    printf("%u - %g\n", k, c_randToFloat(k));
-
+    pcg32_random_t pcg = pcg32_seed(time(NULL), 1);
     before = clock(); \
     v = 0;
     for (size_t i=0; i<NN; i++) {
-        v += mt19937_rand(&state);
+        v += pcg32_random(&pcg) & 0xffffffff;
     }
     difference = clock() - before;
-    printf("my-mt: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
+    printf("pcg32: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
 
-#ifdef __cplusplus
-    std::mt19937 mt_rand;
+    sfc64_random_t sfc = sfc64_seed(time(NULL));
     before = clock(); \
     v = 0;
     for (size_t i=0; i<NN; i++) {
-        v += mt_rand();
-    }
-    difference = clock() - before;
-    printf("c++mt: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
-#endif
-
-    xoroshiro128ss_t xo = xoroshiro128ss_seed(1234);
-    before = clock(); \
-    v = 0;
-    for (size_t i=0; i<NN; i++) {
-        v += xoroshiro128ss_rand(&xo) & 0xffffffff;
-    }
-    difference = clock() - before;
-    printf("xoros: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
-
-
-    sfc64_t sfc = sfc64_seed(1234);
-    before = clock(); \
-    v = 0;
-    for (size_t i=0; i<NN; i++) {
-        v += sfc64_rand(&sfc) & 0xffffffff;
+        v += sfc64_random(&sfc) & 0xffffffff;
     }
     difference = clock() - before;
     printf("sfc64: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
+
+    for (int i=0; i<8; ++i) printf("%f ", sfc64_fRandom(&sfc));
+    puts("");
+    for (int i=0; i<8; ++i) printf("%f ", pcg32_fRandom(&pcg));
+    puts("");
 }

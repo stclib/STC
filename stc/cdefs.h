@@ -27,12 +27,13 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-#if 0 // defined(_MSC_VER)
-#  define STC_INLINE static __forceinline
-#elif 0 // defined(__GNUC__)
-#  define STC_INLINE static inline __attribute((always_inline))
-#else // don't force
-#  define STC_INLINE static inline
+#define STC_INLINE static inline
+#if defined(_MSC_VER)
+#define STC_FORCE_INLINE static __forceinline
+#elif defined(__GNUC__)
+#define STC_FORCE_INLINE static inline __attribute((always_inline))
+#else
+#define STC_FORCE_INLINE static inline
 #endif
 
 #if defined(STC_HEADER) || defined(STC_IMPLEMENTATION)

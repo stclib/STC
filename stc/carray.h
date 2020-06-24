@@ -56,8 +56,8 @@ int main()
 #define carray2_size(a) ((a)._yxdim)
 #define carray3_size(a) _carray3_size(&(a)._zdim)
 
-#define _carray_own ((SIZE_MAX>>1)+1)
-#define _carray_sub (SIZE_MAX>>1)
+#define _carray_sub (SIZE_MAX >> 1)
+#define _carray_own (_carray_sub + 1)
 
 static inline size_t _carray_ydim(const size_t* yxdim) {
     return yxdim[0] / (yxdim[-1] & _carray_sub);
@@ -89,22 +89,6 @@ static inline size_t _carray3_size(const size_t* zdim) {
         size_t _xdim, _yxdim, _zdim; \
     } CArray3_##tag; \
  \
-    static inline void \
-    carray1_##tag##_destroy(CArray1_##tag* self) { \
-        size_t n = carray1_size(*self); Value* a = self->data; \
-        if (self->_xdim & _carray_own) {while (n--) valueDestroy(&a[n]); free(a);} \
-    } \
-    static inline void \
-    carray2_##tag##_destroy(CArray2_##tag* self) { \
-        size_t n = carray2_size(*self); Value* a = self->data; \
-        if (self->_xdim & _carray_own) {while (n--) valueDestroy(&a[n]); free(a);} \
-    } \
-    static inline void \
-    carray3_##tag##_destroy(CArray3_##tag* self) { \
-        size_t n = carray3_size(*self); Value* a = self->data; \
-        if (self->_xdim & _carray_own) {while (n--) valueDestroy(&a[n]); free(a);} \
-    } \
- \
     static inline CArray1_##tag \
     carray1_##tag##_make(size_t xdim, Value val) { \
         Value* m = c_new_N(Value, xdim); \
@@ -127,6 +111,28 @@ static inline size_t _carray3_size(const size_t* zdim) {
         for (size_t i=0; i<n; ++i) m[i] = val; \
         CArray3_##tag a = {m, xdim | _carray_own, ydim * xdim, zdim}; \
         return a; \
+    } \
+ \
+    static inline void \
+    carray1_##tag##_destroy(CArray1_##tag* self) { \
+        if (self->_xdim & _carray_own) { \
+            size_t n = carray1_size(*self); Value* a = self->data; \
+            while (n--) valueDestroy(&a[n]); free(a); \
+        } \
+    } \
+    static inline void \
+    carray2_##tag##_destroy(CArray2_##tag* self) { \
+        if (self->_xdim & _carray_own) { \
+            size_t n = carray2_size(*self); Value* a = self->data; \
+            while (n--) valueDestroy(&a[n]); free(a); \
+        } \
+    } \
+    static inline void \
+    carray3_##tag##_destroy(CArray3_##tag* self) { \
+        if (self->_xdim & _carray_own) { \
+            size_t n = carray3_size(*self); Value* a = self->data; \
+            while (n--) valueDestroy(&a[n]); free(a); \
+        } \
     } \
  \
     static inline CArray1_##tag \
