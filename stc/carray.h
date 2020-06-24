@@ -56,9 +56,8 @@ int main()
 #define carray2_size(a) ((a)._yxdim)
 #define carray3_size(a) _carray3_size(&(a)._zdim)
 
-
-#define _carray_own (1ull << ((sizeof(size_t) << 3) - 1))
-#define _carray_sub (~_carray_own)
+#define _carray_own ((SIZE_MAX>>1)+1)
+#define _carray_sub (SIZE_MAX>>1)
 
 static inline size_t _carray_ydim(const size_t* yxdim) {
     return yxdim[0] / (yxdim[-1] & _carray_sub);
