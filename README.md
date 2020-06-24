@@ -11,8 +11,8 @@ An elegant, typesafe, generic, customizable, user-friendly, consistent, and very
 - **carray.h** - Multi-dimensional dynamic **array**, implemented as a single contiguous section of memory.
 - **clist.h** - A circular singly **linked list**, can be used as a **queue** - supports *pushBack, pushFront, and popFront* in *O*(1). Also contains various *splice* functions and (merge) *sort*.
 - **coption.h** - Implementation of *getopt_long*-"like" function, *coption_get*, to parse command line arguments.
-- **crandom.h** - A few efficent modern random number generators *pgc32* and *sfc64*. It also implements the crypto-strong *siphash* algorithm.
-- **cdefs.h** - A small common include file with central definitions.
+- **crandom.h** - A few very efficent modern random number generators *pcg32* and *sfc64*. It also implements the crypto-strong *siphash* algorithm.
+- **cdefs.h** - A small common include file with some general definitions.
 
 The usage of the containers is similar to the C++ standard containers, so it should be easier for those who are familiar with them.
 
@@ -303,7 +303,7 @@ int main() {
     clist_i_destroy(&list);
 }
 ```
-**CArray**. 1D, 2D and 3D arrays, heap allocated in one memory block. CArray3 can make sub-array "views" CArray2 and CArray1 into CArray3, and CArray2 can further make CArray1 "views", as shown in the folling example.
+**CArray**. 1D, 2D and 3D arrays, heap allocated in one memory block. *CArray3* can have sub-array "views" of *CArray2* and *CArray1* etc., as shown in the following example.
 ```
 #include <stdio.h>
 #include "stc/carray.h"
