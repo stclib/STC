@@ -179,8 +179,8 @@ void arraydemo1()
     carray3_f_data(a3, 5, 4)[3] = 10.2f;         // a3[5][4][3]
     CArray2_f a2 = carray3_f_at(a3, 5);          // sub-array reference (no data copy).
 
-    printf("a3: %zu: (%zu, %zu, %zu) = %zu\n", sizeof(a3), carray_xdim(a3), carray_ydim(a3), carray_zdim(a3), carray3_size(a3));
-    printf("a2: %zu: (%zu, %zu) = %zu\n", sizeof(a2), carray_xdim(a2), carray_ydim(a2), carray2_size(a2));
+    printf("a3: %zu: (%zu, %zu, %zu) = %zu\n", sizeof(a3), carray3_xdim(a3), carray3_ydim(a3), carray3_zdim(a3), carray3_size(a3));
+    printf("a2: %zu: (%zu, %zu) = %zu\n", sizeof(a2), carray2_xdim(a2), carray2_ydim(a2), carray2_size(a2));
 
     printf("%f\n", carray2_f_value(a2, 4, 3));   // readonly lookup a2[4][3] (=10.2f)
     printf("%f\n", carray2_f_data(a2, 4)[3]);    // same, but this is writable.

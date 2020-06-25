@@ -118,6 +118,22 @@ static inline size_t _carray3_size(const size_t* zdim) {
         return a; \
     } \
  \
+    static inline CArray1_##tag \
+    carray1_##tag##_makeFrom(size_t xdim, Value* array, bool own) { \
+        CArray1_##tag a = {array, xdim | (own ? _carray_own : 0)}; \
+        return a; \
+    } \
+    static inline CArray2_##tag \
+    carray2_##tag##_makeFrom(size_t ydim, size_t xdim, Value* array, bool own) { \
+        CArray2_##tag a = {array, xdim | (own ? _carray_own : 0), ydim * xdim}; \
+        return a; \
+    } \
+    static inline CArray3_##tag \
+    carray3_##tag##_makeFrom(size_t zdim, size_t ydim, size_t xdim, Value* array, bool own) { \
+        CArray3_##tag a = {array, xdim | (own ? _carray_own : 0), ydim * xdim, zdim}; \
+        return a; \
+    } \
+ \
     static inline void \
     carray1_##tag##_destroy(CArray1_##tag* self) { \
         if (self->_xdim & _carray_own) { \
