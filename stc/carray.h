@@ -44,22 +44,27 @@ int main()
     printf("%f\n", carray3_f_data(a3, 5, 4)[3]);
     printf("%f\n", carray3_f_at2(a3, 5, 4).data[3]);
     
-    carray_f_destroy(&a2); // does nothing, since it is a sub-array.
-    carray_f_destroy(&a3); // also invalidates a2.
+    carray2_f_destroy(&a2); // does nothing, since it is a sub-array.
+    carray3_f_destroy(&a3); // also invalidates a2.
 }
 */
 
-#define carray_xdim(a)  ((a)._xdim & _carray_sub)
-#define carray_ydim(a)  _carray_ydim(&(a)._yxdim)
-#define carray_zdim(a)  ((a)._zdim)
-#define carray1_size(a) carray_xdim(a)
+#define carray1_xdim(a)  ((a)._xdim & _carray_sub)
+#define carray1_size(a) carray1_xdim(a)
+
+#define carray2_xdim(a)  carray1_xdim(a)
+#define carray2_ydim(a)  _carray2_ydim(&(a)._yxdim)
 #define carray2_size(a) ((a)._yxdim)
+
+#define carray3_xdim(a)  carray1_xdim(a)
+#define carray3_ydim(a)  carray2_ydim(a)
+#define carray3_zdim(a)  ((a)._zdim)
 #define carray3_size(a) _carray3_size(&(a)._zdim)
 
 #define _carray_sub (SIZE_MAX >> 1)
 #define _carray_own (_carray_sub + 1)
 
-static inline size_t _carray_ydim(const size_t* yxdim) {
+static inline size_t _carray2_ydim(const size_t* yxdim) {
     return yxdim[0] / (yxdim[-1] & _carray_sub);
 }
 static inline size_t _carray3_size(const size_t* zdim) {
@@ -137,35 +142,35 @@ static inline size_t _carray3_size(const size_t* zdim) {
  \
     static inline CArray1_##tag \
     carray2_##tag##_at(CArray2_##tag a, size_t y) { \
-        CArray1_##tag sub = {a.data + y*carray_xdim(a), carray_xdim(a)}; \
+        CArray1_##tag sub = {a.data + y*carray2_xdim(a), carray2_xdim(a)}; \
         return sub; \
     } \
     static inline Value* \
     carray2_##tag##_data(CArray2_##tag a, size_t y) { \
-        return a.data + y*carray_xdim(a); \
+        return a.data + y*carray2_xdim(a); \
     } \
     static inline Value \
     carray2_##tag##_value(CArray2_##tag a, size_t y, size_t x) { \
-        return a.data[ y*carray_xdim(a) + x ]; \
+        return a.data[ y*carray2_xdim(a) + x ]; \
     } \
  \
     static inline CArray2_##tag \
     carray3_##tag##_at(CArray3_##tag a, size_t z) { \
-        CArray2_##tag sub = {a.data + z*a._yxdim, carray_xdim(a), a._yxdim}; \
+        CArray2_##tag sub = {a.data + z*a._yxdim, carray3_xdim(a), a._yxdim}; \
         return sub; \
     } \
     static inline CArray1_##tag \
     carray3_##tag##_at2(CArray3_##tag a, size_t z, size_t y) { \
-        CArray1_##tag sub = {a.data + z*a._yxdim + y*carray_xdim(a), carray_xdim(a)}; \
+        CArray1_##tag sub = {a.data + z*a._yxdim + y*carray3_xdim(a), carray3_xdim(a)}; \
         return sub; \
     } \
     static inline Value* \
     carray3_##tag##_data(CArray3_##tag a, size_t z, size_t y) { \
-        return a.data + z*a._yxdim + y*carray_xdim(a); \
+        return a.data + z*a._yxdim + y*carray3_xdim(a); \
     } \
     static inline Value \
     carray3_##tag##_value(CArray3_##tag a, size_t z, size_t y, size_t x) { \
-        return a.data[ z*a._yxdim + y*carray_xdim(a) + x ]; \
+        return a.data[ z*a._yxdim + y*carray3_xdim(a) + x ]; \
     } \
     typedef Value CArrayValue_##tag
    
