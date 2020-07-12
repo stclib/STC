@@ -103,9 +103,11 @@ CHash and CVector discussion
 
 You may customize the destroy-, hash- and equals- function. It also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is handy when e.g. having CString as key, as it enables the usage of string literals as key in *put() and *get() functions, instead of requering a constructed CString. Without it, you would have to write: 
 ```
+declare_CHash(si, MAP, CString, int);
+...
 chash_si_put(&map, cstring_make("mykey"), 12);
 ```
-and the main incovenience is on lookup:
+but the main incovenience is with lookup:
 ```
 CString lookup = cstring_make("mykey");
 int x = chash_si_get(&map, lookup)->value;
@@ -116,8 +118,9 @@ To avoid this, use *declare_CHash_string()*:
 declare_CHash_string(si, MAP, int);
 ...
 CHash_si map = chash_init;
-chash_si_put(&map, "mykey", 12);            // constructs a CString key from the char* internally.
+chash_si_put(&map, "mykey", 12);            // constructs a CString key from the const char* internally.
 int x = chash_si_get(&map, "mykey")->value; // no allocation of string key happens here.
+chash_si_destroy(&map);
 ```
 An alternative would be to use *char* * as key type, but you would have to manage the memory of the hash char* keys yourself.
 Note that this customization is also available for **CVector**, but only affects the *find()* function currently. See *declare_CVector_string()*.
