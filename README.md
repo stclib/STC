@@ -105,16 +105,19 @@ You may customize the destroy-, hash- and equals- function. It also supports a f
 ```
 chash_si_put(&map, cstring_make("mykey"), 12);
 ```
-but the main problem is lookup:
+and the main incovenience is on lookup:
 ```
 CString lookup = cstring_make("mykey");
 int x = chash_si_get(&map, lookup)->value;
 cstring_destroy(&lookup);
 ```
-The predefined shorthand macro *declare_CHash_string()* defines a CHash container with a CString as key, however this you may use it like:
+To avoid this, use *declare_CHash_string()*:
 ```
+declare_CHash_string(si, MAP, int);
+...
+CHash_si map = chash_init;
 chash_si_put(&map, "mykey", 12);            // constructs a CString key from the char* internally.
-int x = chash_si_get(&map, "mykey")->value; // no allocation of string key happens here, which is good.
+int x = chash_si_get(&map, "mykey")->value; // no allocation of string key happens here.
 ```
 An alternative would be to use *char* * as key type, but you would have to manage the memory of the hash char* keys yourself.
 Note that this customization is also available for **CVector**, but only affects the *find()* function currently. See *declare_CVector_string()*.
