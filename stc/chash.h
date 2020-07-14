@@ -23,7 +23,7 @@
 
 /*  // Example:
 #include <stdio.h>
-#include <stc/cmap.h>
+#include <stc/chash.h>
 declare_CHash(sx, int);       // Set of int
 declare_CHash(mx, int, char); // Map of int -> char
 
