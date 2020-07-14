@@ -99,7 +99,7 @@ void listdemo1()
     clist_ix_destroy(&nums);
 }
 
-declare_CHash(i, SET, int);
+declare_CHash_set(i, int); // alias: declare_CHash(i, int);
 
 void setdemo1()
 {
@@ -114,7 +114,7 @@ void setdemo1()
 }
 
 
-declare_CHash(ii, MAP, int, int);
+declare_CHash(ii, int, int);
 
 void mapdemo1()
 {
@@ -128,7 +128,7 @@ void mapdemo1()
 }
 
 
-declare_CHash_string(si, MAP, int); // Shorthand macro for the general declare_CHash expansion.
+declare_CHash_string(si, int); // Shorthand macro for the general declare_CHash expansion.
 
 void mapdemo2()
 {
@@ -150,7 +150,7 @@ void mapdemo2()
 }
 
 
-declare_CHash_string(ss, MAP, CString, cstring_destroy); 
+declare_CHash_string(ss, CString, cstring_destroy); 
 
 void mapdemo3()
 {

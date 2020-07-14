@@ -49,8 +49,8 @@ Because it is headers only, files can simply be included in your program. The fu
 #include <stc/chash.h>
 #include <stc/cvector.h>
 
-declare_CHash(ii, MAP, int, int);
-declare_CHash(ix, SET, int64_t);
+declare_CHash(ii, int, int); // map
+declare_CHash(ix, int64_t);  // set
 declare_CVector(i, int);
 ...
 ```
@@ -137,8 +137,8 @@ void check_destroy(float* v) {printf("destroy %g\n", *v);}
 
 declare_CArray(f, float, check_destroy); // normally omit the last argument - float type need no destroy.
 declare_CList(t2, CArray2_f, carray2_f_destroy, c_noCompare);
-declare_CHash(il, MAP, int, CList_t2, clist_t2_destroy);
-declare_CHash_string(sm, MAP, CHash_il, chash_il_destroy);
+declare_CHash(il, int, CList_t2, clist_t2_destroy);
+declare_CHash_string(sm, CHash_il, chash_il_destroy);
 
 int main() {
     int xdim = 4, ydim = 6;
@@ -230,7 +230,7 @@ int main() {
 ```
 #include <stdio.h>
 #include "stc/chash.h"
-declare_CHash(ii, MAP, int, int);
+declare_CHash(ii, int, int);
 
 int main() {
     CHash_ii nums = chash_init;
@@ -245,7 +245,7 @@ int main() {
 ```
 #include "stc/cstring.h"
 #include "stc/chash.h"
-declare_CHash_string(s, SET); // See the discussion above regarding this declaration.
+declare_CHash_string(s); // CString set. See the discussion above.
 
 int main() {
     CHash_s words = chash_init;
@@ -263,7 +263,7 @@ int main() {
 ```
 #include "stc/cstring.h"
 #include "stc/chash.h"
-declare_CHash_string(ss, MAP, CString, cstring_destroy); 
+declare_CHash_string(ss, CString, cstring_destroy); 
 
 int main() {
     CHash_ss table = chash_init;

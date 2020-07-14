@@ -17,13 +17,13 @@ STC_INLINE uint32_t pcg32_random(pcg32_random_t* rng)
 }
 
 /* float random int number in range [0, 1). NB: 23 bit resolution. */
-STC_INLINE float pcg32_fRandom(pcg32_random_t* rng) {
+STC_INLINE float pcg32_floatRandom(pcg32_random_t* rng) {
     union {uint32_t i; float f;} u = {0x3F800000u | (pcg32_random(rng) >> 9)};
     return u.f - 1.0f;
 }
 
 /* Uniform random number in range [0, bound) */
-STC_INLINE uint32_t pcg32_bRandom(pcg32_random_t* rng, uint32_t bound) {
+STC_INLINE uint32_t pcg32_boundedRandom(pcg32_random_t* rng, uint32_t bound) {
     return (uint32_t) (((uint64_t) pcg32_random(rng) * bound) >> 32);
 }
 
