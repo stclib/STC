@@ -61,7 +61,6 @@ int main(void) {
 
 enum {chash_HASH = 0x7f, chash_USED = 0x80};
 
-/* CHash: */
 #define declare_CHash(...) \
     c_MACRO_OVERLOAD(declare_CHash, __VA_ARGS__)
 
@@ -69,27 +68,31 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
     declare_CHash_set_2(tag, Key)
 
 #define declare_CHash_3(tag, Key, Value) \
-    declare_CHash_4(tag, Key, Value, c_emptyDestroy)
+    declare_CHash_6(tag, Key, Value, c_emptyDestroy, c_defaultHash, c_defaultEquals)
 
 #define declare_CHash_4(tag, Key, Value, valueDestroy) \
-    declare_CHash_5(tag, Key, Value, valueDestroy, c_defaultHash)
+    declare_CHash_6(tag, Key, Value, valueDestroy, c_defaultHash, c_defaultEquals)
 
 #define declare_CHash_5(tag, Key, Value, valueDestroy, keyHash) \
     declare_CHash_6(tag, Key, Value, valueDestroy, keyHash, c_defaultEquals)
-    
+
 #define declare_CHash_6(tag, Key, Value, valueDestroy, keyHash, keyEquals) \
     declare_CHash_11(tag, MAP, Key, Value, valueDestroy, keyHash, keyEquals, \
                           c_emptyDestroy, Key, c_defaultGetRaw, c_defaultInitRaw)
 
-/* CHash_set<Key>: */
+/* CHash_set: */
 #define declare_CHash_set(...) \
     c_MACRO_OVERLOAD(declare_CHash_set, __VA_ARGS__)
+
 #define declare_CHash_set_2(tag, Key) \
-    declare_CHash_set_3(tag, Key, c_emptyDestroy)
+    declare_CHash_set_5(tag, Key, c_emptyDestroy, c_defaultHash, c_defaultEquals)
+
 #define declare_CHash_set_3(tag, Key, keyDestroy) \
-    declare_CHash_set_4(tag, Key, keyDestroy, c_defaultHash)
+    declare_CHash_set_5(tag, Key, keyDestroy, c_defaultHash, c_defaultEquals)
+
 #define declare_CHash_set_4(tag, Key, keyDestroy, keyHash) \
     declare_CHash_set_5(tag, Key, keyDestroy, keyHash, c_defaultEquals)
+
 #define declare_CHash_set_5(tag, Key, keyDestroy, keyHash, keyEquals) \
     declare_CHash_11(tag, SET, Key, void, void, keyHash, keyEquals, \
                           keyDestroy, Key, c_defaultGetRaw, c_defaultInitRaw)
@@ -97,12 +100,16 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
 /* CHash_string: */
 #define declare_CHash_string(...) \
     c_MACRO_OVERLOAD(declare_CHash_string, __VA_ARGS__)
+
 #define declare_CHash_string_1(tag) \
     declare_CHash_string_4(tag, SET, void, void)
+
 #define declare_CHash_string_2(tag, Value) \
     declare_CHash_string_4(tag, MAP, Value, c_emptyDestroy)
+
 #define declare_CHash_string_3(tag, Value, ValueDestroy) \
     declare_CHash_string_4(tag, MAP, Value, ValueDestroy)
+
 #define declare_CHash_string_4(tag, type, Value, valueDestroy) \
     declare_CHash_11(tag, type, CString, Value, valueDestroy, cstring_hashRaw, cstring_equalsRaw, \
                           cstring_destroy, const char*, cstring_getRaw, cstring_make)
