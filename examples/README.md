@@ -13,8 +13,7 @@ This demonstrates how to customize **CHash map** with a user-defined key-type. Y
 2. A comparison function for equality; 
 
 When your key type consists of several members, you will usually have the hash function calculate hash values for the individual members, and then somehow combine them into one hash value for the entire object.
-In order to use Viking as a map key, it is smart to define a plain-old-data "view" of the Viking struct first.
-
+If your key-type stores dynamic memory (e.g. CString as we will use), it is smart to define a plain-old-data "view" of the your key struct first:
 ```
 #include <stdio.h>
 #include <stc/chash.h>
@@ -38,7 +37,7 @@ int vikingvw_equals(const VikingVw* x, const VikingVw* y) {
 }
 
 ```
-An the the Viking data struct:
+And then the Viking data struct:
 ```
 typedef struct Viking {
     CString name;
@@ -59,12 +58,13 @@ Viking viking_fromVw(VikingVw vw) {
 }
 
 ```
-With this in place, we use the full declare_CHash() macro to define [Viking -> int] hash map type:
+With this in place, we use the full declare_CHash() macro to define {Viking -> int} hash map type:
 ```
 declare_CHash(vk, MAP, Viking, int, c_emptyDestroy, vikingvw_hash, vikingvw_equals, 
                   viking_destroy, VikingVw, viking_getVw, viking_fromVw);
 ```
-The demo program:
+CHash_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test. chash_vk_destroy() will free all memory allocated for Viking keys and the hash table values.
+Finally, the demo:
 ```
 int main()
 {
@@ -83,4 +83,3 @@ int main()
     chash_vk_destroy(&vikings);
 }
 ```
-CHash_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test. chash_vk_destroy() will free all memory allocated for Viking keys and the hash table values.
