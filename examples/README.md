@@ -8,91 +8,79 @@ advanced.c Example
 
 This demonstrates how to customize **CHash map** with a user-defined key-type. You need to define two things:
 
-1. A hash function; this must be a function that calculates the hash value given an object of the key-type.
+1. A hash function; calculates the hash value given an object of the key-type.
 
-2. A comparison function for equality; this is required because the hash cannot rely on the fact that the hash function will always provide a unique hash value for every distinct key (i.e., it needs to be able to deal with collisions), so it needs a way to compare two given keys for an exact match.
+2. A comparison function for equality; 
 
-The difficulty with the hash function is that if your key type consists of several members, you will usually have the hash function calculate hash values for the individual members, and then somehow combine them into one hash value for the entire object. For good performance (i.e., few collisions) you should think carefully about how to combine the individual hash values to ensure you avoid getting the same output for different objects too often.
+When your key type consists of several members, you will usually have the hash function calculate hash values for the individual members, and then somehow combine them into one hash value for the entire object.
+In order to use Viking as a map key, it is smart to define a plain-old-data "view" of the Viking struct first.
 
-Assuming a key-type like this, and want string as value, we define the functions person_make(), person_destroy() and person_compare():
 ```
 #include <stdio.h>
-
 #include <stc/chash.h>
 #include <stc/cstring.h>
 
-struct Person {
-  CString name;
-  CString surname;
-  int age;
-};
+// Viking view struct -----------------------
 
-struct Person person_make(const char* name, const char* surname, int age) {
-  struct Person person = {cstring_make(name), cstring_make(surname), age};
-  return person;
+typedef struct VikingVw {
+    const char* name;
+    const char* country;
+} VikingVw;
+
+uint32_t vikingvw_hash(const VikingVw* vw, size_t ignore) {
+    uint32_t hash = c_defaultHash(vw->name, strlen(vw->name))
+                  ^ c_defaultHash(vw->country, strlen(vw->country));
+    return hash;
 }
-
-void person_destroy(struct Person* p) {
-  cstring_destroy(&p->name);
-  cstring_destroy(&p->surname);
-}
-```
-In order to use Person as a map key, provide a "view" of your class that owns no resources (e.g. CString):
-```
-struct PersonView {
-  const char* name;
-  const char* surname;
-  int age;
-};
-
-struct PersonView person_getView(struct Person* p) {
-  return (struct PersonView) {p->name.str, p->surname.str, p->age};
+int vikingvw_equals(const VikingVw* x, const VikingVw* y) {
+    if (strcmp(x->name, y->name) != 0) return false;
+    return strcmp(x->country, y->country) == 0;
 }
 
-struct Person person_fromView(struct PersonView pv) {
-  return (struct Person) {cstring_make(pv.name), cstring_make(pv.surname), pv.age};
+```
+An the the Viking data struct:
+```
+typedef struct Viking {
+    CString name;
+    CString country;
+} Viking;
+
+
+void viking_destroy(Viking* vk) {
+    cstring_destroy(&vk->name);
+    cstring_destroy(&vk->country);
 }
 
-int personview_compare(const struct PersonView* x, const struct PersonView* y) {
-  int c;
-  c = strcmp(x->name, y->name);       if (c != 0) return c;
-  c = strcmp(x->surname, y->surname); if (c != 0) return c;
-  return x->age - y->age;
+VikingVw viking_getVw(Viking* vk) {
+    VikingVw vw = {vk->name.str, vk->country.str}; return vw;
 }
-```
-And a hash function that combines the three member's hashes:
-```
-size_t personview_hash(const struct PersonView* pv, size_t ignore) {
-  // http://stackoverflow.com/a/1646913/126995
-  size_t res = 17;  
-  res = res * 31 + c_defaultHash(pv->name, strlen(pv->name));
-  res = res * 31 + c_defaultHash(pv->surname, strlen(pv->surname));
-  res = res * 31 + c_defaultHash(&pv->age, sizeof(pv->age));
-  return res;
+Viking viking_fromVw(VikingVw vw) {
+    Viking vk = {cstring_make(vw.name), cstring_make(vw.country)}; return vk;
 }
+
 ```
-With this in place, we can declare the map Person -> int:
+With this in place, we use the full declare_CHash() macro to define [Viking -> int] hash map type:
 ```
-declare_CHash(ex, MAP, struct Person, int, c_emptyDestroy, personview_hash, personview_compare,
-                  person_destroy, struct PersonView, person_getView, person_fromView);
+declare_CHash(vk, MAP, Viking, int, c_emptyDestroy, vikingvw_hash, vikingvw_equals, 
+                  viking_destroy, VikingVw, viking_getVw, viking_fromVw);
 ```
-Note we use struct PersonView to put keys in the map, but keys are stored as struct Person with proper dynamically allocated CStrings to store name and surname.
+The demo program:
 ```
 int main()
 {
-  CMap_ex m6 = chash_init;
-  chash_ex_put(&m6, (struct PersonView){"John", "Doe", 24}, 1001);
-  chash_ex_put(&m6, (struct PersonView){"Jane", "Doe", 21}, 1002);
-  chash_ex_put(&m6, (struct PersonView){"John", "Travolta", 66}, 1003);
+    CHash_vk vikings = chash_init;
+    // emplace constructs the keys
+    chash_vk_put(&vikings, (VikingVw) {"Einar", "Norway"}, 20);
+    chash_vk_put(&vikings, (VikingVw) {"Olaf", "Denmark"}, 24);
+    chash_vk_put(&vikings, (VikingVw) {"Harald", "Iceland"}, 12);
 
-  c_foreach (it, chash_ex, m6) {
-      if (cstring_equals(it.item->key.name, "John"))
-          printf("%s %s %d -> %d\n", it.item->key.name.str, it.item->key.surname.str, it.item->key.age,
-                                     it.item->value);
-  }
+    CHashEntry_vk* e = chash_vk_get(&vikings, (VikingVw) {"Einar", "Norway"});
+    e->value += 5; // update 
 
-  chash_ex_destroy(&m6);
+    c_foreach (k, chash_vk, vikings) {
+        printf("%s of %s has %d hp\n", k.item->key.name.str, k.item->key.country.str, k.item->value);
+    }
+    chash_vk_destroy(&vikings);
 }
 ```
-CHash map uses personview_hash() for hash value calculations, and the personview_compare() for equality checks. The chash_ex_destroy() function will free CStrings name, surname and the value for each item in the map, in addition to the CHash map table itself.
-
+CHash_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test. chash_vk_destroy() will free all memory allocated for Viking keys and the hash table values.
