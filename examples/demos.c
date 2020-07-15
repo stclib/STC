@@ -159,12 +159,14 @@ void mapdemo3()
     chash_ss_put(&table, "Map", cstring_make("test"));
     chash_ss_put(&table, "Make", cstring_make("my"));
     chash_ss_put(&table, "Sunny", cstring_make("day"));
-    printf("remove: Make: %s\n", chash_ss_get(&table, "Make")->value.str);
+    CHashEntry_ss *e = chash_ss_get(&table, "Make");
+    printf("size %zu: remove: Make: %s\n", chash_size(table), e->value.str);
     chash_ss_erase(&table, "Make");
+    //chash_ss_eraseEntry(&table, e);
 
     printf("size %zu\n", chash_size(table));
     c_foreach (i, chash_ss, table)
-        printf("key: %s\n", i.item->key.str);
+        printf("entry: %s: %s\n", i.item->key.str, i.item->value.str);
     chash_ss_destroy(&table); // frees key and value CStrings, and hash table (CVector).
 }
 
