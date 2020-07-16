@@ -1,5 +1,5 @@
 #include "../stc/crandom.h"
-#include "../stc/cstring.h"
+#include "../stc/cstr.h"
 #include "../stc/chash.h"
 #include "others/khash.h"
 

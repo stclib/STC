@@ -12,7 +12,7 @@
  */
 #include <stdio.h>
 #include <stc/chash.h>
-#include <stc/cstring.h>
+#include <stc/cstr.h>
 
 // Viking view struct -----------------------
 

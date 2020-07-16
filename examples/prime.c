@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "stc/cvector.h"
+#include "stc/cvec.h"
 
 static inline void setBit(uint32_t* a, const size_t i) { a[i >> 5] |= 1u << (i & 31); }
 static inline void clearBit(uint32_t* a, const size_t i) { a[i >> 5] &= ~(1u << (i & 31)); }

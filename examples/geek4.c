@@ -34,8 +34,8 @@ Efficient Approach: For all the words of the first sentence, we can check if it 
 // C implementation of the approach 
 
 #include <stc/chash.h>
-#include <stc/cvector.h>
-#include <stc/cstring.h>
+#include <stc/cvec.h>
+#include <stc/cstr.h>
 
 declare_CVec_str(s);
 declare_CMap_str(sb, bool);

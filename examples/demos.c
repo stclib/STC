@@ -1,8 +1,8 @@
-#include "../stc/cvector.h"
+#include "../stc/cvec.h"
 #include "../stc/clist.h"
 #include "../stc/carray.h"
 #include "../stc/chash.h"
-#include "../stc/cstring.h"
+#include "../stc/cstr.h"
 
 
 void stringdemo1()

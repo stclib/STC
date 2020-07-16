@@ -1,4 +1,4 @@
-#include "../stc/cstring.h"
+#include "../stc/cstr.h"
 #include "../stc/chash.h"
 #include "../stc/clist.h"
 #include "../stc/carray.h"

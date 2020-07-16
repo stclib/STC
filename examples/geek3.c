@@ -1,7 +1,7 @@
 // xx3.c
 
 #include <stc/chash.h>
-#include <stc/cstring.h>
+#include <stc/cstr.h>
 
 declare_CMap_str(si, int);
 declare_CMap_str(ss, CStr, cstr_destroy);

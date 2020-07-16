@@ -1,7 +1,7 @@
 #ifndef __cplusplus
 
 #include <stc/chash.h>
-#include <stc/cstring.h>
+#include <stc/cstr.h>
 
 declare_CMap_str(ss, CStr, cstr_destroy);
 declare_CSet_str(ss);

@@ -18,8 +18,8 @@ Output: 0
 #ifndef __cplusplus
 
 #include <stc/chash.h>
-#include <stc/cvector.h>
-#include <stc/cstring.h>
+#include <stc/cvec.h>
+#include <stc/cstr.h>
 
 declare_CVec(i, int);
 declare_CMap_str(sv, CVec_i, cvec_i_destroy);
