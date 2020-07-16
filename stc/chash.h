@@ -237,7 +237,7 @@ chash_##tag##_bucket(const CHash_##tag* self, const CHashRawKey_##tag* rawKeyPtr
  \
 STC_API CHashEntry_##tag* \
 chash_##tag##_get(const CHash_##tag* self, CHashRawKey_##tag rawKey) { \
-    if (chash_bucketCount(*self) == 0) return NULL; \
+    if (chash_size(*self) == 0) return NULL; \
     uint32_t hx; \
     size_t idx = chash_##tag##_bucket(self, &rawKey, &hx); \
     return self->_hashx[idx] ? &self->table[idx] : NULL; \

@@ -162,19 +162,11 @@ cstring_take(CString* self, CString s) {
 }
 
 static inline CString
-cstring_release(CString* self) {
+cstring_move(CString* self) {
     CString tmp = *self;
     *self = cstring_init;
     return tmp;
 }
-/* cstring_move(&s1, &s2) short for: cstring_take(&s1, cstring_release(&s2)) */
-static inline CString*
-cstring_move(CString* self, CString* s) {
-    cstring_take(self, *s);
-    *s = cstring_init;
-    return self;
-}
-
 
 static inline CString*
 cstring_appendN(CString* self, const char* str, size_t len) {
@@ -187,10 +179,13 @@ cstring_appendN(CString* self, const char* str, size_t len) {
     }
     return self;
 }
-
 static inline CString*
 cstring_append(CString* self, const char* str) {
     return cstring_appendN(self, str, strlen(str));
+}
+static inline CString*
+cstring_appendC(CString* self, char ch) {
+    return cstring_appendN(self, &ch, 1);
 }
 static inline CString*
 cstring_appendS(CString* self, CString s) {
