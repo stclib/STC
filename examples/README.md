@@ -6,7 +6,7 @@ Contains various examples and benchmarks.
 advanced.c Example
 ------------------
 
-This demonstrates how to customize **CHash map** with a user-defined key-type. You need to define two things:
+This demonstrates how to customize hash **CMap** with a user-defined key-type. You need to define two things:
 
 1. A hash function; calculates the hash value given an object of the key-type.
 
@@ -58,28 +58,28 @@ Viking viking_fromVw(VikingVw vw) {
 }
 
 ```
-With this in place, we use the full declare_CHash() macro to define {Viking -> int} hash map type:
+With this in place, we use the full declare_CMap() macro to define {Viking -> int} hash map type:
 ```
-declare_CHash(vk, MAP, Viking, int, c_emptyDestroy, vikingvw_hash, vikingvw_equals, 
-                  viking_destroy, VikingVw, viking_getVw, viking_fromVw);
+declare_CMap(vk, Viking, int, c_emptyDestroy, vikingvw_hash, vikingvw_equals, 
+                 viking_destroy, VikingVw, viking_getVw, viking_fromVw);
 ```
-CHash_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test. chash_vk_destroy() will free all memory allocated for Viking keys and the hash table values.
+CMap_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test. cmap_vk_destroy() will free all memory allocated for Viking keys and the hash table values.
 Finally, the demo:
 ```
 int main()
 {
-    CHash_vk vikings = chash_init;
+    CMap_vk vikings = cmap_init;
     // emplace constructs the keys
-    chash_vk_put(&vikings, (VikingVw) {"Einar", "Norway"}, 20);
-    chash_vk_put(&vikings, (VikingVw) {"Olaf", "Denmark"}, 24);
-    chash_vk_put(&vikings, (VikingVw) {"Harald", "Iceland"}, 12);
+    cmap_vk_put(&vikings, (VikingVw) {"Einar", "Norway"}, 20);
+    cmap_vk_put(&vikings, (VikingVw) {"Olaf", "Denmark"}, 24);
+    cmap_vk_put(&vikings, (VikingVw) {"Harald", "Iceland"}, 12);
 
-    CHashEntry_vk* e = chash_vk_get(&vikings, (VikingVw) {"Einar", "Norway"});
+    CMapEntry_vk* e = cmap_vk_get(&vikings, (VikingVw) {"Einar", "Norway"});
     e->value += 5; // update 
 
-    c_foreach (k, chash_vk, vikings) {
+    c_foreach (k, cmap_vk, vikings) {
         printf("%s of %s has %d hp\n", k.item->key.name.str, k.item->key.country.str, k.item->value);
     }
-    chash_vk_destroy(&vikings);
+    cmap_vk_destroy(&vikings);
 }
 ```

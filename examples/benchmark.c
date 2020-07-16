@@ -19,7 +19,7 @@ static inline uint32_t fibonacci_hash(const void* data, size_t len) {
     const uint64_t key = *(const uint64_t *) data;
     return (uint32_t) (key * 11400714819323198485llu);
 }
-declare_CHash(ii, int64_t, int64_t, c_emptyDestroy, fibonacci_hash);
+declare_CMap(ii, int64_t, int64_t, c_emptyDestroy, fibonacci_hash);
 
 KHASH_MAP_INIT_INT64(ii, uint64_t)
 
@@ -31,14 +31,14 @@ sfc64_random_t rng;
 #define RAND(N) (sfc64_random(&rng) & ((1 << N) - 1))
 
 
-#define CMAP_SETUP(tag, Key, Value) CHash_##tag map = chash_init \
-                                    /* ; chash_##tag##_setLoadFactors(&map, maxLoadFactor, 0.0)*/
-#define CMAP_PUT(tag, key, val)     chash_##tag##_put(&map, key, val)->value
-#define CMAP_ERASE(tag, key)        chash_##tag##_erase(&map, key)
-#define CMAP_FIND(tag, key)         (chash_##tag##_get(map, key) != NULL)
-#define CMAP_SIZE(tag)              chash_size(map)
-#define CMAP_BUCKETS(tag)           chash_bucketCount(map)
-#define CMAP_CLEAR(tag)             chash_##tag##_destroy(&map)
+#define CMAP_SETUP(tag, Key, Value) CMap_##tag map = cmap_init \
+                                    /* ; cmap_##tag##_setLoadFactors(&map, maxLoadFactor, 0.0)*/
+#define CMAP_PUT(tag, key, val)     cmap_##tag##_put(&map, key, val)->value
+#define CMAP_ERASE(tag, key)        cmap_##tag##_erase(&map, key)
+#define CMAP_FIND(tag, key)         (cmap_##tag##_get(map, key) != NULL)
+#define CMAP_SIZE(tag)              cmap_size(map)
+#define CMAP_BUCKETS(tag)           cmap_bucketCount(map)
+#define CMAP_CLEAR(tag)             cmap_##tag##_destroy(&map)
 
 #define KMAP_SETUP(tag, Key, Value) khash_t(ii)* map = kh_init(ii); khiter_t ki; int ret
 #define KMAP_PUT(tag, key, val)     (*(ki = kh_put(ii, map, key, &ret), map->vals[ki] = val, &map->vals[ki]))

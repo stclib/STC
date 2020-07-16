@@ -99,75 +99,75 @@ void listdemo1()
     clist_ix_destroy(&nums);
 }
 
-declare_CHash_set(i, int); // alias: declare_CHash(i, int);
+declare_CSet(i, int);
 
 void setdemo1()
 {
     printf("\nSETDEMO1\n");
-    CHash_i nums = chash_init;
-    chash_i_put(&nums, 8);
-    chash_i_put(&nums, 11);
+    CSet_i nums = cset_init;
+    cset_i_put(&nums, 8);
+    cset_i_put(&nums, 11);
 
-    c_foreach (i, chash_i, nums)
+    c_foreach (i, cset_i, nums)
         printf("set: %d\n", i.item->key);
-    chash_i_destroy(&nums);
+    cset_i_destroy(&nums);
 }
 
 
-declare_CHash(ii, int, int);
+declare_CMap(ii, int, int);
 
 void mapdemo1()
 {
     printf("\nMAPDEMO1\n");
-    CHash_ii nums = chash_init;
-    chash_ii_put(&nums, 8, 64);
-    chash_ii_put(&nums, 11, 121);
+    CMap_ii nums = cmap_init;
+    cmap_ii_put(&nums, 8, 64);
+    cmap_ii_put(&nums, 11, 121);
 
-    printf("get 8: %d\n", chash_ii_get(&nums, 8)->value);
-    chash_ii_destroy(&nums);
+    printf("get 8: %d\n", cmap_ii_get(&nums, 8)->value);
+    cmap_ii_destroy(&nums);
 }
 
 
-declare_CHash_str(si, int); // Shorthand macro for the general declare_CHash expansion.
+declare_CMap_str(si, int); // Shorthand macro for the general declare_CMap expansion.
 
 void mapdemo2()
 {
     printf("\nMAPDEMO2\n");
-    CHash_si nums = chash_init;
-    chash_si_put(&nums, "Hello", 64);
-    chash_si_put(&nums, "Groovy", 121);
-    chash_si_put(&nums, "Groovy", 200); // overwrite previous
+    CMap_si nums = cmap_init;
+    cmap_si_put(&nums, "Hello", 64);
+    cmap_si_put(&nums, "Groovy", 121);
+    cmap_si_put(&nums, "Groovy", 200); // overwrite previous
 
     // iterate the map:
-    for (chash_si_iter_t i = chash_si_begin(&nums); i.item; i = chash_si_next(i))
+    for (cmap_si_iter_t i = cmap_si_begin(&nums); i.item; i = cmap_si_next(i))
         printf("long: %s: %d\n", i.item->key.str, i.item->value);
 
     // or rather use the short form:
-    c_foreach (i, chash_si, nums)
+    c_foreach (i, cmap_si, nums)
         printf("short: %s: %d\n", i.item->key.str, i.item->value);
 
-    chash_si_destroy(&nums);
+    cmap_si_destroy(&nums);
 }
 
 
-declare_CHash_str(ss, CStr, cstr_destroy); 
+declare_CMap_str(ss, CStr, cstr_destroy); 
 
 void mapdemo3()
 {
     printf("\nMAPDEMO3\n");
-    CHash_ss table = chash_init;
-    chash_ss_put(&table, "Map", cstr_make("test"));
-    chash_ss_put(&table, "Make", cstr_make("my"));
-    chash_ss_put(&table, "Sunny", cstr_make("day"));
-    CHashEntry_ss *e = chash_ss_get(&table, "Make");
-    printf("size %zu: remove: Make: %s\n", chash_size(table), e->value.str);
-    chash_ss_erase(&table, "Make");
-    //chash_ss_eraseEntry(&table, e);
+    CMap_ss table = cmap_init;
+    cmap_ss_put(&table, "Map", cstr_make("test"));
+    cmap_ss_put(&table, "Make", cstr_make("my"));
+    cmap_ss_put(&table, "Sunny", cstr_make("day"));
+    CMapEntry_ss *e = cmap_ss_get(&table, "Make");
+    printf("size %zu: remove: Make: %s\n", cmap_size(table), e->value.str);
+    cmap_ss_erase(&table, "Make");
+    //cmap_ss_eraseEntry(&table, e);
 
-    printf("size %zu\n", chash_size(table));
-    c_foreach (i, chash_ss, table)
+    printf("size %zu\n", cmap_size(table));
+    c_foreach (i, cmap_ss, table)
         printf("entry: %s: %s\n", i.item->key.str, i.item->value.str);
-    chash_ss_destroy(&table); // frees key and value CStrs, and hash table (CVec).
+    cmap_ss_destroy(&table); // frees key and value CStrs, and hash table (CVec).
 }
 
 

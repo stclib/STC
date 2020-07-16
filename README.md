@@ -49,17 +49,17 @@ Because it is headers only, files can simply be included in your program. The fu
 #include <stc/chash.h>
 #include <stc/cvector.h>
 
-declare_CHash(ii, int, int); // map
-declare_CHash(ix, int64_t);  // set
+declare_CMap(ii, int, int); // map
+declare_CMap(ix, int64_t);  // set
 declare_CVec(i, int);
 ...
 ```
 Performance
 -----------
 
-This library is very efficent. Containers have templated intrusive elements. One of the most performance critical containers is the **CHash map / CHash set**. Thankfully, CHash is among the fastest C/C++ map implementations available: **examples/benchmark.c** compiled with g++ v9.2.0 -O3 on windows (the results are similar with VC++ and g++ on linux):
+This library is very efficent. Containers have templated intrusive elements. One of the most performance critical containers is the **CMap map / CMap set**. Thankfully, CMap is among the fastest C/C++ map implementations available: **examples/benchmark.c** compiled with g++ v9.2.0 -O3 on windows (the results are similar with VC++ and g++ on linux):
 
-**CMAP**=*CHash map*, KMAP=*khash*, UMAP=*std::unordered_map*, BMAP=*ska::bytell_hash_map*, FMAP=*ska::flat_hash_map*, RMAP=*robin_hood::unordered_map*
+**CMAP**=*CMap map*, KMAP=*khash*, UMAP=*std::unordered_map*, BMAP=*ska::bytell_hash_map*, FMAP=*ska::flat_hash_map*, RMAP=*robin_hood::unordered_map*
 ```
 Random keys are in range [0, 2^20):
 map<uint64_t, uint64_t>: 7000000 repeats of Insert random key + (try to) remove a different random key:
@@ -92,35 +92,35 @@ Memory efficiency
 The containers are memory efficent, i.e. they occupy as little memory as practical possible.
 - **CStr**, **CVec**: Representaion: one pointer size. The size and capacity is stored as part of the heap allocation that also holds the vector elements.
 - **CList**: Representation: one pointer size. Each node allocates block storing value and next pointer.
-- **CHash set**: Representation: 4 pointers size. The CHash set uses one table of keys, and one table of "used/hash-value", which occupies one byte per bucket.
-- **CHash map**: Same as CHash set, but this uses a table of (key, value) pairs, not only keys.
+- **CSet**: Representation: 4 pointers size. CSet uses one table of keys, and one table of "used/hash-value", which occupies only one byte per bucket.
+- **CMap**: Same as CSet, but this uses a table of (key, value) pairs, not only keys.
 - **CArray**: CArray1, CArray2 and CArray3. Representation: One pointers, plus 1, 2, or 3 size_t variables to store dimensions. Elements are stored as one memory block.
 
-CHash and CVec discussion
+CMap, CSet and CVec discussion
 ----------------------------
 
-**CHash** is the most complex of the containers (although, currently only ~370 lines of code). It uses open hashing, but does not rely on power-of-two size table, nor prime number lengths, and it does not have tombstone buckets. Still, it is among the fastest hash-tables, as shown above. The default max load-factor is 0.85, and it shrinks (and rehashes) when load-factor goes below 0.15, by default (can be set per hash container).
+**CMap/CSet** are the most complex of the containers (although, currently only ~370 lines of code). It uses open hashing, but does not rely on power-of-two size table, nor prime number lengths, and it does not have tombstone buckets. It is still among the fastest hash-tables, as shown above. The default max load-factor is 0.85, and it shrinks (and rehashes) when load-factor goes below 0.15, by default (can be set per hash container).
 
 You may customize the destroy-, hash- and equals- function. It also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is handy when e.g. having CStr as key, as it enables the usage of string literals as key in *put() and *get() functions, instead of requering a constructed CStr. Without it, you would have to write: 
 ```
-declare_CHash(si, CStr, int);
+declare_CMap(si, CStr, int);
 ...
-chash_si_put(&map, cstr_make("mykey"), 12);
+cmap_si_put(&map, cstr_make("mykey"), 12);
 ```
 but the main incovenience is with lookup:
 ```
 CStr lookup = cstr_make("mykey");
-int x = chash_si_get(&map, lookup)->value;
+int x = cmap_si_get(&map, lookup)->value;
 cstr_destroy(&lookup);
 ```
-To avoid this, use *declare_CHash_str()*:
+To avoid this, use *declare_CMap_str()*:
 ```
-declare_CHash_str(si, int);
+declare_CMap_str(si, int);
 ...
-CHash_si map = chash_init;
-chash_si_put(&map, "mykey", 12);            // constructs a CStr key from the const char* internally.
-int x = chash_si_get(&map, "mykey")->value; // no allocation of string key happens here.
-chash_si_destroy(&map);
+CMap_si map = cmap_init;
+cmap_si_put(&map, "mykey", 12);            // constructs a CStr key from the const char* internally.
+int x = cmap_si_get(&map, "mykey")->value; // no allocation of string key happens here.
+cmap_si_destroy(&map);
 ```
 An alternative would be to use *char* * as key type, but you would have to manage the memory of the hash char* keys yourself.
 Note that this customization is also available for **CVec**, but only affects the *find()* function currently. See *declare_CVec_str()*.
@@ -130,9 +130,9 @@ Also look at **examples/advanced.c**, it demonstrates how to use a custom struct
 Example usages
 --------------
 The first example has a very complex nested container type, which demonstrates the power of this library. Look at the simpler examples below to understand it better. The example adds an element into the data structure, and then accesses it. The type used, with c++ template syntax is:
-**CHashMap**< **CStr**, **CHashMap**< *int*, **CList**< **CArray2**< *float* >>>>
+**CMapMap**< **CStr**, **CMapMap**< *int*, **CList**< **CArray2**< *float* >>>>
 
-Note: The *chash_sm_destroy(&theMap)* call below, will destroy all the nested containers including the memory allocated for CStr keys in theMap object.
+Note: The *cmap_sm_destroy(&theMap)* call below, will destroy all the nested containers including the memory allocated for CStr keys in theMap object.
 ```
 #include "stc/cstring.h"
 #include "stc/chash.h"
@@ -143,31 +143,31 @@ void check_destroy(float* v) {printf("destroy %g\n", *v);}
 
 declare_CArray(f, float, check_destroy); // normally omit the last argument - float type need no destroy.
 declare_CList(t2, CArray2_f, carray2_f_destroy, c_noCompare);
-declare_CHash(il, int, CList_t2, clist_t2_destroy);
-declare_CHash_str(sm, CHash_il, chash_il_destroy);
+declare_CMap(il, int, CList_t2, clist_t2_destroy);
+declare_CMap_str(sm, CMap_il, cmap_il_destroy);
 
 int main() {
     int xdim = 4, ydim = 6;
     int x = 2, y = 5, entry = 42;
-    CHash_sm theMap = chash_init;
+    CMap_sm theMap = cmap_init;
     {
         // Construct.
         CArray2_f table = carray2_f_make(xdim, ydim, 0.f);
         CList_t2 tableList = clist_init;
-        CHash_il listMap = chash_init;
+        CMap_il listMap = cmap_init;
         
         // Put in some data.
         carray2_f_data(table, x)[y] = 3.1415927; // table[x][y]
         clist_t2_pushBack(&tableList, table);
-        chash_il_put(&listMap, entry, tableList);
-        chash_sm_put(&theMap, "First", listMap);
+        cmap_il_put(&listMap, entry, tableList);
+        cmap_sm_put(&theMap, "First", listMap);
     }
 
     // Access the data entry
-    CArray2_f table = clist_back(chash_il_get(&chash_sm_get(&theMap, "First")->value, entry)->value);
+    CArray2_f table = clist_back(cmap_il_get(&cmap_sm_get(&theMap, "First")->value, entry)->value);
     printf("value is: %f\n", carray2_f_value(table, x, y));
 
-    chash_sm_destroy(&theMap); // free up the whole shebang!
+    cmap_sm_destroy(&theMap); // free up the whole shebang!
 }
 ```
 **CStr**
@@ -232,54 +232,54 @@ int main() {
     cvec_cs_destroy(&names);
 }
 ```
-**CHash map** of *int -> int*
+**CMap** of *int -> int*
 ```
 #include <stdio.h>
 #include "stc/chash.h"
-declare_CHash(ii, int, int);
+declare_CMap(ii, int, int);
 
 int main() {
-    CHash_ii nums = chash_init;
-    chash_ii_put(&nums, 8, 64);
-    chash_ii_put(&nums, 11, 121);
+    CMap_ii nums = cmap_init;
+    cmap_ii_put(&nums, 8, 64);
+    cmap_ii_put(&nums, 11, 121);
 
-    printf("%d\n", chash_ii_get(nums, 8)->value);
-    chash_ii_destroy(&nums);
+    printf("%d\n", cmap_ii_get(nums, 8)->value);
+    cmap_ii_destroy(&nums);
 }
 ```
-**CHash set** of *CStr*
+**CSet** of *CStr*
 ```
 #include "stc/cstring.h"
 #include "stc/chash.h"
-declare_CHash_str(s); // CStr set. See the discussion above.
+declare_CSet_str(s); // CStr set. See the discussion above.
 
 int main() {
-    CHash_s words = chash_init;
-    chash_s_put(&words, "Hello");
-    chash_s_put(&words, "Groovy");
-    chash_s_erase(&words, "Hello");
+    CSet_s words = cset_init;
+    cset_s_put(&words, "Hello");
+    cset_s_put(&words, "Groovy");
+    cset_s_erase(&words, "Hello");
 
     // iterate the map:
-    c_foreach (i, chash_s, words)
+    c_foreach (i, cset_s, words)
         printf("%s\n", i.item->key.str);
-    chash_s_destroy(&words);
+    cset_s_destroy(&words);
 }
 ```
-**CHash map** of *CStr -> CStr*. Temporary CStr values are created by *cstr_make()*, and moved into the container
+**CMap** of *CStr -> CStr*. Temporary CStr values are created by *cstr_make()*, and moved into the container
 ```
 #include "stc/cstring.h"
 #include "stc/chash.h"
-declare_CHash_str(ss, CStr, cstr_destroy); 
+declare_CMap_str(ss, CStr, cstr_destroy); 
 
 int main() {
-    CHash_ss table = chash_init;
-    chash_ss_put(&table, "Make", cstr_make("my"));
-    chash_ss_put(&table, "Sunny", cstr_make("day"));
-    printf("Sunny: %s\n", chash_ss_get(table, "Sunny")->value.str);
-    chash_ss_erase(&table, "Make");
+    CMap_ss table = cmap_init;
+    cmap_ss_put(&table, "Make", cstr_make("my"));
+    cmap_ss_put(&table, "Sunny", cstr_make("day"));
+    printf("Sunny: %s\n", cmap_ss_get(table, "Sunny")->value.str);
+    cmap_ss_erase(&table, "Make");
 
-    printf("size %d\n", chash_size(table));
-    chash_ss_destroy(&table); // frees key and value CStrs, and hash table (CVec).
+    printf("size %d\n", cmap_size(table));
+    cmap_ss_destroy(&table); // frees key and value CStrs, and hash table (CVec).
 }
 ```
 **CList** of *int64_t*. Similar to c++ *std::forward_list*, but can do both *pushFront()* and *pushBack()*.
