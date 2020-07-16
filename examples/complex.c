@@ -8,7 +8,7 @@ void check_destroy(float* v) {printf("destroy %g\n", *v);}
 declare_CArray(f, float, check_destroy); // normally omit the last argument - float type need no destroy.
 declare_CList(t2, CArray2_f, carray2_f_destroy, c_noCompare);
 declare_CHash(il, int, CList_t2, clist_t2_destroy);
-declare_CHash_string(sm, CHash_il, chash_il_destroy);
+declare_CHash_str(sm, CHash_il, chash_il_destroy);
 
 int main() {
     int xdim = 4, ydim = 6;

@@ -34,21 +34,21 @@ int vikingvw_equals(const VikingVw* x, const VikingVw* y) {
 // Viking data struct -----------------------
 
 typedef struct Viking {
-    CString name;
-    CString country;
+    CStr name;
+    CStr country;
 } Viking;
 
 
 void viking_destroy(Viking* vk) {
-    cstring_destroy(&vk->name);
-    cstring_destroy(&vk->country);
+    cstr_destroy(&vk->name);
+    cstr_destroy(&vk->country);
 }
 
 VikingVw viking_getVw(Viking* vk) {
     VikingVw vw = {vk->name.str, vk->country.str}; return vw;
 }
 Viking viking_fromVw(VikingVw vw) {
-    Viking vk = {cstring_make(vw.name), cstring_make(vw.country)}; return vk;
+    Viking vk = {cstr_make(vw.name), cstr_make(vw.country)}; return vk;
 }
 
 

@@ -99,7 +99,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
                           keyDestroy, Key, c_defaultGetRaw, c_defaultInitRaw)
 
 /* CHash_string: */
-#define declare_CHash_string(...) \
+#define declare_CHash_str(...) \
     c_MACRO_OVERLOAD(declare_CHash_string, __VA_ARGS__)
 
 #define declare_CHash_string_1(tag) \
@@ -112,8 +112,8 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
     declare_CHash_string_4(tag, MAP, Value, ValueDestroy)
 
 #define declare_CHash_string_4(tag, type, Value, valueDestroy) \
-    declare_CHash_11(tag, type, CString, Value, valueDestroy, cstring_hashRaw, cstring_equalsRaw, \
-                          cstring_destroy, const char*, cstring_getRaw, cstring_make)
+    declare_CHash_11(tag, type, CStr, Value, valueDestroy, cstr_hashRaw, cstr_equalsRaw, \
+                          cstr_destroy, const char*, cstr_getRaw, cstr_make)
 
 #define _chash1_SET(x)
 #define _chash2_SET(x, y) x

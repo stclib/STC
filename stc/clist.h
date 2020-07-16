@@ -30,7 +30,7 @@
     
     This implements a std::forward_list-like class in C, but because it is circular,
     it also support push* and splice* at both ends of the list. This makes it ideal
-    for being used as a queue, unlike std::forward_list. Basic usage is similar to CVector:
+    for being used as a queue, unlike std::forward_list. Basic usage is similar to CVec:
    
     #include "stc/clist.h"
     declare_CList(i, int64_t);
@@ -60,8 +60,8 @@
                                declare_CList_4(tag, Value, valueDestroy, c_defaultCompare)
 #define declare_CList_4(tag, Value, valueDestroy, valueCompare) \
                                declare_CList_6(tag, Value, valueDestroy, Value, valueCompare, c_defaultGetRaw)
-#define declare_CList_string(tag) \
-                               declare_CList_6(tag, CString, cstring_destroy, const char*, cstring_compareRaw, cstring_getRaw)                            
+#define declare_CList_str(tag) \
+                               declare_CList_6(tag, CStr, cstr_destroy, const char*, cstr_compareRaw, cstr_getRaw)                            
 
 #define declare_CListTypes(tag, Value) \
     typedef struct CListNode_##tag { \

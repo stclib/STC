@@ -13,7 +13,7 @@ This demonstrates how to customize **CHash map** with a user-defined key-type. Y
 2. A comparison function for equality; 
 
 When your key type consists of several members, you will usually have the hash function calculate hash values for the individual members, and then somehow combine them into one hash value for the entire object.
-If your key-type stores dynamic memory (e.g. CString as we will use), it is smart to define a plain-old-data "view" of the your key struct first:
+If your key-type stores dynamic memory (e.g. CStr as we will use), it is smart to define a plain-old-data "view" of the your key struct first:
 ```
 #include <stdio.h>
 #include <stc/chash.h>
@@ -40,21 +40,21 @@ int vikingvw_equals(const VikingVw* x, const VikingVw* y) {
 And then the Viking data struct:
 ```
 typedef struct Viking {
-    CString name;
-    CString country;
+    CStr name;
+    CStr country;
 } Viking;
 
 
 void viking_destroy(Viking* vk) {
-    cstring_destroy(&vk->name);
-    cstring_destroy(&vk->country);
+    cstr_destroy(&vk->name);
+    cstr_destroy(&vk->country);
 }
 
 VikingVw viking_getVw(Viking* vk) {
     VikingVw vw = {vk->name.str, vk->country.str}; return vw;
 }
 Viking viking_fromVw(VikingVw vw) {
-    Viking vk = {cstring_make(vw.name), cstring_make(vw.country)}; return vk;
+    Viking vk = {cstr_make(vw.name), cstr_make(vw.country)}; return vk;
 }
 
 ```

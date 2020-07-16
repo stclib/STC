@@ -8,68 +8,68 @@
 void stringdemo1()
 {
     printf("\nSTRINGDEMO1\n");
-    CString cs = cstring_make("one-nine-three-seven-five");
+    CStr cs = cstr_make("one-nine-three-seven-five");
     printf("%s.\n", cs.str);
 
-    cstring_insert(&cs, 3, "-two");
+    cstr_insert(&cs, 3, "-two");
     printf("%s.\n", cs.str);
 
-    cstring_erase(&cs, 7, 5); // -nine
+    cstr_erase(&cs, 7, 5); // -nine
     printf("%s.\n", cs.str);
 
-    cstring_replace(&cs, 0, "seven", "four");
+    cstr_replace(&cs, 0, "seven", "four");
     printf("%s.\n", cs.str);
-    cstring_take(&cs, cstring_makeFmt("%s *** %s", cs.str, cs.str));
+    cstr_take(&cs, cstr_makeFmt("%s *** %s", cs.str, cs.str));
     printf("%s.\n", cs.str);
 
-    printf("find: %s\n", cs.str + cstring_find(cs, 0, "four"));
+    printf("find: %s\n", cs.str + cstr_find(cs, 0, "four"));
 
     // reassign:
-    cstring_assign(&cs, "one two three four five six seven");
-    cstring_append(&cs, " eight");
+    cstr_assign(&cs, "one two three four five six seven");
+    cstr_append(&cs, " eight");
     printf("append: %s\n", cs.str);
 
-    cstring_destroy(&cs);
+    cstr_destroy(&cs);
 }
 
 
-declare_CVector(ix, int64_t); // ix is just an example tag name.
+declare_CVec(ix, int64_t); // ix is just an example tag name.
 
 void vectordemo1()
 {
     printf("\nVECTORDEMO1\n");
-    CVector_ix bignums = cvector_init; // = (CVector_ix) cvector_init; if initializing after declaration.
-    cvector_ix_reserve(&bignums, 100);
+    CVec_ix bignums = cvec_init; // = (CVec_ix) cvec_init; if initializing after declaration.
+    cvec_ix_reserve(&bignums, 100);
     for (size_t i = 0; i<=100; ++i)
-        cvector_ix_pushBack(&bignums, i * i * i);
+        cvec_ix_pushBack(&bignums, i * i * i);
 
     printf("erase - %d: %zu\n", 100, bignums.data[100]);
-    cvector_ix_popBack(&bignums); // erase the last
+    cvec_ix_popBack(&bignums); // erase the last
 
-    for (size_t i = 0; i < cvector_size(bignums); ++i) {
+    for (size_t i = 0; i < cvec_size(bignums); ++i) {
         if (i >= 90) printf("%zu: %zu\n", i, bignums.data[i]);
     }
-    cvector_ix_destroy(&bignums);
+    cvec_ix_destroy(&bignums);
 }
 
 
 
-declare_CVector(cs, CString, cstring_destroy, cstring_compare); // supply inline destructor of values
+declare_CVec(cs, CStr, cstr_destroy, cstr_compare); // supply inline destructor of values
 
 void vectordemo2()
 {
     printf("\nVECTORDEMO2\n");
-    CVector_cs names = cvector_init;
-    cvector_cs_pushBack(&names, cstring_make("Mary"));
-    cvector_cs_pushBack(&names, cstring_make("Joe"));
-    cvector_cs_pushBack(&names, cstring_make("Chris"));
-    cstring_assign(&names.data[1], "Jane");      // replace Joe
+    CVec_cs names = cvec_init;
+    cvec_cs_pushBack(&names, cstr_make("Mary"));
+    cvec_cs_pushBack(&names, cstr_make("Joe"));
+    cvec_cs_pushBack(&names, cstr_make("Chris"));
+    cstr_assign(&names.data[1], "Jane");      // replace Joe
     printf("names[1]: %s\n", names.data[1].str);
 
-    cvector_cs_sort(&names);                     // Sort the array
-    c_foreach (i, cvector_cs, names)
+    cvec_cs_sort(&names);                     // Sort the array
+    c_foreach (i, cvec_cs, names)
         printf("sorted: %s\n", i.item->str);
-    cvector_cs_destroy(&names);
+    cvec_cs_destroy(&names);
 }
 
 declare_CList(ix, int); 
@@ -128,7 +128,7 @@ void mapdemo1()
 }
 
 
-declare_CHash_string(si, int); // Shorthand macro for the general declare_CHash expansion.
+declare_CHash_str(si, int); // Shorthand macro for the general declare_CHash expansion.
 
 void mapdemo2()
 {
@@ -150,15 +150,15 @@ void mapdemo2()
 }
 
 
-declare_CHash_string(ss, CString, cstring_destroy); 
+declare_CHash_str(ss, CStr, cstr_destroy); 
 
 void mapdemo3()
 {
     printf("\nMAPDEMO3\n");
     CHash_ss table = chash_init;
-    chash_ss_put(&table, "Map", cstring_make("test"));
-    chash_ss_put(&table, "Make", cstring_make("my"));
-    chash_ss_put(&table, "Sunny", cstring_make("day"));
+    chash_ss_put(&table, "Map", cstr_make("test"));
+    chash_ss_put(&table, "Make", cstr_make("my"));
+    chash_ss_put(&table, "Sunny", cstr_make("day"));
     CHashEntry_ss *e = chash_ss_get(&table, "Make");
     printf("size %zu: remove: Make: %s\n", chash_size(table), e->value.str);
     chash_ss_erase(&table, "Make");
@@ -167,7 +167,7 @@ void mapdemo3()
     printf("size %zu\n", chash_size(table));
     c_foreach (i, chash_ss, table)
         printf("entry: %s: %s\n", i.item->key.str, i.item->value.str);
-    chash_ss_destroy(&table); // frees key and value CStrings, and hash table (CVector).
+    chash_ss_destroy(&table); // frees key and value CStrs, and hash table (CVec).
 }
 
 
