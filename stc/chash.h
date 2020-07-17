@@ -23,7 +23,7 @@
 
 /*  // Example:
 #include <stdio.h>
-#include <stc/chash.h>
+#include <stc/cmap.h>
 declare_CSet(sx, int);       // Set of int
 declare_CMap(mx, int, char); // Map of int -> char
 
@@ -101,16 +101,16 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
 
 #define declare_CSet_5(tag, Key, keyDestroy, keyHash, keyEquals) \
     declare_CSet_8(tag, Key, keyDestroy, keyHash, keyEquals, \
-	                    Key, c_defaultGetRaw, c_defaultInitRaw)
+                        Key, c_defaultGetRaw, c_defaultInitRaw)
 
 #define declare_CSet_8(tag, Key, keyDestroy, keyHashRaw, keyEqualsRaw, \
                             RawKey, keyGetRaw, keyInitRaw) \
-	declare_CHASH(tag, CSet, cset, Key, void, void, keyHashRaw, keyEqualsRaw, \
+    declare_CHASH(tag, CSet, cset, Key, void, void, keyHashRaw, keyEqualsRaw, \
                        keyDestroy, RawKey, keyGetRaw, keyInitRaw)
 
 /* CSet_str, CMap_str: */
-#define declare_CSet_str(tag) \
-    declare_CMAPSTR(tag, CSet, cset, void, void)
+#define declare_CSet_str() \
+    declare_CMAPSTR(str, CSet, cset, void, void)
 
 #define declare_CMap_str(...) \
     c_MACRO_OVERLOAD(declare_CMap_str, __VA_ARGS__)
@@ -123,7 +123,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
 
 #define declare_CMAPSTR(tag, CType, ctype, Value, valueDestroy) \
     declare_CHASH(tag, CType, ctype, CStr, Value, valueDestroy, cstr_hashRaw, \
-	                   cstr_equalsRaw, cstr_destroy, const char*, cstr_getRaw, cstr_make)
+                       cstr_equalsRaw, cstr_destroy, const char*, cstr_getRaw, cstr_make)
 
 #define OPT_1_cset(x)
 #define OPT_2_cset(x, y) x

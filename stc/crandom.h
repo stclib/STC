@@ -17,13 +17,13 @@ STC_INLINE uint32_t pcg32_random(pcg32_random_t* rng)
 }
 
 /* float random int number in range [0, 1). NB: 23 bit resolution. */
-STC_INLINE float pcg32_floatRandom(pcg32_random_t* rng) {
+STC_INLINE float pcg32_randomFloat(pcg32_random_t* rng) {
     union {uint32_t i; float f;} u = {0x3F800000u | (pcg32_random(rng) >> 9)};
     return u.f - 1.0f;
 }
 
 /* Uniform random number in range [0, bound) */
-STC_INLINE uint32_t pcg32_boundedRandom(pcg32_random_t* rng, uint32_t bound) {
+STC_INLINE uint32_t pcg32_randomBounded(pcg32_random_t* rng, uint32_t bound) {
     return (uint32_t) (((uint64_t) pcg32_random(rng) * bound) >> 32);
 }
 
@@ -59,7 +59,7 @@ STC_API uint64_t sfc64_random(sfc64_random_t* rng) {
 }
 
 /* double random int number in range [0, 1). */
-STC_INLINE double sfc64_fRandom(sfc64_random_t* rng) {
+STC_INLINE double sfc64_randomFloat(sfc64_random_t* rng) {
     union {uint64_t i; double f;} u = {0x3FF0000000000000ull | (sfc64_random(rng) >> 12)};
     return u.f - 1.0;
 }

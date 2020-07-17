@@ -32,8 +32,8 @@ int main(void)
     difference = clock() - before;
     printf("sfc64: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
 
-    for (int i=0; i<8; ++i) printf("%f ", sfc64_fRandom(&sfc));
+    for (int i=0; i<8; ++i) printf("%f ", sfc64_randomFloat(&sfc));
     puts("");
-    for (int i=0; i<8; ++i) printf("%f ", pcg32_fRandom(&pcg));
+    for (int i=0; i<8; ++i) printf("%f ", pcg32_randomFloat(&pcg));
     puts("");
 }

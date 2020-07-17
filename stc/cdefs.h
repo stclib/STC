@@ -43,16 +43,18 @@
 #endif
 
 /* Macro overloading feature support: https://rextester.com/ONP80107 */
-#define c_CAT( A, B ) A ## B
+#define c_CAT(A, B) A ## B
 #define c_EXPAND(...) __VA_ARGS__
-#define c_VA_ARG_SIZE(...) c_EXPAND(c_APPLY_ARG_N((__VA_ARGS__, c_RSEQ_N)))
-#define c_APPLY_ARG_N(ARGS) c_EXPAND(c_ARG_N ARGS)
-#define c_ARG_N(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, N,...) N
-#define c_RSEQ_N 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
-#define c_OVERLOAD_SELECT(NAME, NUM) c_CAT( NAME ## _, NUM)
+#define _c_RSEQ_N 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+#define _c_ARG_N(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, N,...) N
+#define _c_ZERO_ARGS_PREFIX__ZERO_ARGS_SUFFIX ,,,,,,,,,,,,,0 /* 13 commas */
+#define _c_ZERO_ARGS(...) c_EXPAND(_c_ZERO_ARGS_PREFIX_ ## __VA_ARGS__ ## _ZERO_ARGS_SUFFIX)
+#define _c_VA_ARG_SIZE(...) c_EXPAND(_c_APPLY_ARG_N((_c_ZERO_ARGS(__VA_ARGS__), _c_RSEQ_N)))
+#define _c_APPLY_ARG_N(ARGS) c_EXPAND(_c_ARG_N ARGS)
+#define _c_OVERLOAD_SELECT(NAME, NUM) c_CAT(NAME ## _, NUM)
 
-#define c_MACRO_OVERLOAD(NAME, ...) c_OVERLOAD_SELECT(NAME, c_VA_ARG_SIZE(__VA_ARGS__))(__VA_ARGS__)
-//#define test(...)     c_MACRO_OVERLOAD(test, __VA_ARGS__)  //#define test_1(x) a(x) //#define test_2(x,y) b(x,y)
+#define c_MACRO_OVERLOAD(NAME, ...) _c_OVERLOAD_SELECT(NAME, _c_VA_ARG_SIZE(__VA_ARGS__))(__VA_ARGS__)
+/*#define FOO(...) c_MACRO_OVERLOAD(FOO, __VA_ARGS__)   #define FOO_0() "0"   #define FOO_1(x) "1"   #define FOO_2(x,y) "2"*/
 
 #define c_new(T)        ((T *) malloc(sizeof(T)))
 #define c_new_N(T, n)   ((T *) malloc(sizeof(T) * (n)))
