@@ -110,18 +110,18 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
 
 /* CSet_str, CMap_str: */
 #define declare_CSet_str() \
-    declare_CMAPSTR(str, CSet, cset, void, void)
+    declare_CHASH_STR(str, CSet, cset, void, void)
 
 #define declare_CMap_str(...) \
     c_MACRO_OVERLOAD(declare_CMap_str, __VA_ARGS__)
 
 #define declare_CMap_str_2(tag, Value) \
-    declare_CMAPSTR(tag, CMap, cmap, Value, c_emptyDestroy)
+    declare_CHASH_STR(tag, CMap, cmap, Value, c_emptyDestroy)
 
 #define declare_CMap_str_3(tag, Value, ValueDestroy) \
-    declare_CMAPSTR(tag, CMap, cmap, Value, ValueDestroy)
+    declare_CHASH_STR(tag, CMap, cmap, Value, ValueDestroy)
 
-#define declare_CMAPSTR(tag, CType, ctype, Value, valueDestroy) \
+#define declare_CHASH_STR(tag, CType, ctype, Value, valueDestroy) \
     declare_CHASH(tag, CType, ctype, CStr, Value, valueDestroy, cstr_hashRaw, \
                        cstr_equalsRaw, cstr_destroy, const char*, cstr_getRaw, cstr_make)
 

@@ -59,12 +59,12 @@ STC_API void \
 cvec_##tag##_clear(CVec_##tag* self); \
 STC_API void \
 cvec_##tag##_pushBack(CVec_##tag* self, Value value); \
-static inline void \
+STC_INLINE void \
 cvec_##tag##_popBack(CVec_##tag* self) { \
     valueDestroy(&self->data[_cvec_size(*self) - 1]); \
     --_cvec_size(*self); \
 } \
-static inline Value \
+STC_INLINE Value \
 cvec_##tag##_back(CVec_##tag cv) { \
     return cv.data[_cvec_size(cv) - 1]; \
 } \
@@ -76,7 +76,7 @@ STC_API void \
 cvec_##tag##_sort(CVec_##tag* self); \
 STC_API size_t \
 cvec_##tag##_find(CVec_##tag cv, RawValue rawValue); \
-static inline void \
+STC_INLINE void \
 cvec_##tag##_swap(CVec_##tag* a, CVec_##tag* b) { \
     c_swap(Value*, a->data, b->data); \
 } \
@@ -85,13 +85,13 @@ typedef struct { \
     Value *item, *end; \
 } CVecIter_##tag, cvec_##tag##_iter_t; \
  \
-static inline cvec_##tag##_iter_t \
+STC_INLINE cvec_##tag##_iter_t \
 cvec_##tag##_begin(CVec_##tag* vec) { \
     const size_t n = cvec_size(*vec); \
     cvec_##tag##_iter_t it = {n ? vec->data : NULL, vec->data + n}; \
     return it; \
 } \
-static inline cvec_##tag##_iter_t \
+STC_INLINE cvec_##tag##_iter_t \
 cvec_##tag##_next(cvec_##tag##_iter_t it) { \
     if (++it.item == it.end) it.item = NULL; \
     return it; \
@@ -207,13 +207,13 @@ cvec_##tag##_sort(CVec_##tag* self) { \
 #define _cvec_size(cv) ((size_t *)(cv).data)[-2]
 #define _cvec_capacity(cv) ((size_t *)(cv).data)[-1]
 
-static inline size_t* _cvec_alloced(void* data) {
+STC_INLINE size_t* _cvec_alloced(void* data) {
     return data ? ((size_t *) data) - 2 : NULL;
 }
-static inline size_t _cvec_safe_size(const void* data) {
+STC_INLINE size_t _cvec_safe_size(const void* data) {
     return data ? ((const size_t *) data)[-2] : 0;
 }
-static inline size_t _cvec_safe_capacity(const void* data) {
+STC_INLINE size_t _cvec_safe_capacity(const void* data) {
     return data ? ((const size_t *) data)[-1] : 0;
 }
 
