@@ -39,8 +39,8 @@
                             declare_CVec_4(tag, Value, valueDestroy, c_defaultCompare)
 #define declare_CVec_4(tag, Value, valueDestroy, valueCompare) \
                             declare_CVec_6(tag, Value, valueDestroy, valueCompare, Value, c_defaultGetRaw)
-#define declare_CVec_str(tag) \
-                            declare_CVec_6(tag, CStr, cstr_destroy, cstr_compareRaw, const char*, cstr_getRaw)
+#define declare_CVec_str() \
+                            declare_CVec_6(str, CStr, cstr_destroy, cstr_compareRaw, const char*, cstr_getRaw)
 
 
 #define declare_CVec_6(tag, Value, valueDestroy, valueCompareRaw, RawValue, valueGetRaw) \

@@ -60,8 +60,8 @@
                                declare_CList_4(tag, Value, valueDestroy, c_defaultCompare)
 #define declare_CList_4(tag, Value, valueDestroy, valueCompare) \
                                declare_CList_6(tag, Value, valueDestroy, Value, valueCompare, c_defaultGetRaw)
-#define declare_CList_str(tag) \
-                               declare_CList_6(tag, CStr, cstr_destroy, const char*, cstr_compareRaw, cstr_getRaw)                            
+#define declare_CList_str() \
+                               declare_CList_6(str, CStr, cstr_destroy, const char*, cstr_compareRaw, cstr_getRaw)
 
 #define declare_CListTypes(tag, Value) \
     typedef struct CListNode_##tag { \

@@ -221,16 +221,16 @@ int main() {
 ```
 #include <stc/cstr.h>
 #include <stc/cvec.h>
-declare_CVec_str(cs);
+declare_CVec_str();
 
 int main() {
-    CVec_cs names = cvec_init;
-    cvec_cs_pushBack(&names, cstr_make("Mary"));
-    cvec_cs_pushBack(&names, cstr_make("Joe"));
+    CVec_str names = cvec_init;
+    cvec_str_pushBack(&names, cstr_make("Mary"));
+    cvec_str_pushBack(&names, cstr_make("Joe"));
     cstr_assign(&names.data[1], cstr_make("Jake")); // replace Joe
 
     printf("%s\n", names.data[1].str); // Access the string char*
-    cvec_cs_destroy(&names);
+    cvec_str_destroy(&names);
 }
 ```
 **CMap** of *int -> int*
@@ -252,18 +252,18 @@ int main() {
 ```
 #include <stc/cstr.h>
 #include <stc/cmap.h>
-declare_CSet_str(s); // CStr set. See the discussion above.
+declare_CSet_str(); // CStr set. See the discussion above.
 
 int main() {
-    CSet_s words = cset_init;
-    cset_s_put(&words, "Hello");
-    cset_s_put(&words, "Groovy");
-    cset_s_erase(&words, "Hello");
+    CSet_str words = cset_init;
+    cset_str_put(&words, "Hello");
+    cset_str_put(&words, "Groovy");
+    cset_str_erase(&words, "Hello");
 
     // iterate the map:
-    c_foreach (i, cset_s, words)
+    c_foreach (i, cset_str, words)
         printf("%s\n", i.item->key.str);
-    cset_s_destroy(&words);
+    cset_str_destroy(&words);
 }
 ```
 **CMap** of *CStr -> CStr*. Temporary CStr values are created by *cstr_make()*, and moved into the container
