@@ -46,8 +46,8 @@ int main(void) {
     cmap_mx_destroy(&m);
 }
 */
-#ifndef CHASH__H__
-#define CHASH__H__
+#ifndef CMAP__H__
+#define CMAP__H__
 
 #include <stdlib.h>
 #include "cdefs.h"

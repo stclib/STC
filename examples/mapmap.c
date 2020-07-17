@@ -1,6 +1,6 @@
 
 #include <stdio.h>
-#include <stc/chash.h>
+#include <stc/cmap.h>
 
 static void test_destr(int* x) {
     printf("destroy int: %d\n", *x);

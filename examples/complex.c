@@ -1,7 +1,7 @@
-#include "../stc/cstr.h"
-#include "../stc/chash.h"
-#include "../stc/clist.h"
-#include "../stc/carray.h"
+#include <stc/cstr.h>
+#include <stc/cmap.h>
+#include <stc/clist.h>
+#include <stc/carray.h>
 
 void check_destroy(float* v) {printf("destroy %g\n", *v);}
 

@@ -10,7 +10,7 @@ int a[] = { 1, 2, 2, 3, 2, 4, 10 };
 #ifndef __cplusplus
 // C program to implement the above approach 
 #include <stdio.h>
-#include <stc/chash.h>
+#include <stc/cmap.h>
 
 declare_CMap(ii, int, int);
   

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <time.h>
-#include "../stc/crandom.h"
+#include <stc/crandom.h>
 #ifdef __cplusplus
 #include <random>
 #endif

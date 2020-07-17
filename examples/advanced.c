@@ -11,7 +11,7 @@
  * of the Viking struct first.
  */
 #include <stdio.h>
-#include <stc/chash.h>
+#include <stc/cmap.h>
 #include <stc/cstr.h>
 
 // Viking view struct -----------------------

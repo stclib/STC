@@ -29,7 +29,7 @@ operation in almost O(1) time complexity.
 // positive missing number 
 
 #include <stdio.h>  
-#include <stc/chash.h>
+#include <stc/cmap.h>
 declare_CSet(i, int);
 
 // Function to find the smallest positive 

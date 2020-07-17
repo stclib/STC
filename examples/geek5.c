@@ -17,7 +17,7 @@ Output: 0
 
 #ifndef __cplusplus
 
-#include <stc/chash.h>
+#include <stc/cmap.h>
 #include <stc/cvec.h>
 #include <stc/cstr.h>
 

@@ -1,6 +1,6 @@
 // xx3.c
 
-#include <stc/chash.h>
+#include <stc/cmap.h>
 #include <stc/cstr.h>
 
 declare_CMap_str(si, int);

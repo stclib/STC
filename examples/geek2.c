@@ -1,6 +1,6 @@
 #ifndef __cplusplus
 
-#include <stc/chash.h>
+#include <stc/cmap.h>
 #include <stc/cstr.h>
 
 declare_CMap_str(ss, CStr, cstr_destroy);

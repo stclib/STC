@@ -33,7 +33,7 @@ Efficient Approach: For all the words of the first sentence, we can check if it 
 #ifndef __cplusplus
 // C implementation of the approach 
 
-#include <stc/chash.h>
+#include <stc/cmap.h>
 #include <stc/cvec.h>
 #include <stc/cstr.h>
 
