@@ -16,10 +16,10 @@ When your key type consists of several members, you will usually have the hash f
 If your key-type stores dynamic memory (e.g. CStr as we will use), it is smart to define a plain-old-data "view" of the your key struct first:
 ```
 #include <stdio.h>
-#include <stc/chash.h>
-#include <stc/cstring.h>
+#include <stc/cmap.h>
+#include <stc/cstr.h>
 
-// Viking view struct -----------------------
+// Viking view struct
 
 typedef struct VikingVw {
     const char* name;
@@ -37,7 +37,7 @@ int vikingvw_equals(const VikingVw* x, const VikingVw* y) {
 }
 
 ```
-And then the Viking data struct:
+And the Viking data struct:
 ```
 typedef struct Viking {
     CStr name;

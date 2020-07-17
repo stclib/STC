@@ -18,7 +18,7 @@ The usage of the containers is similar to the C++ standard containers, so it sho
 
 All containers mentioned above, except for CStr are generic (similar to templates in C++). A simple example:
 ```
-#include <stc/vector.h>
+#include <stc/cvec.h>
 declare_CVec(i, int);
 
 int main(void) {
@@ -46,8 +46,8 @@ Installation
 Because it is headers only, files can simply be included in your program. The functions will be inlined by default. If containers are extensively used accross many tranlation units with common instantiated container types, it is recommended to build as a library, to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler argument, and put all the instantiations of the containers used in one C file, e.g.
 ```
 #define STC_IMPLEMENTATION
-#include <stc/chash.h>
-#include <stc/cvector.h>
+#include <stc/cmap.h>
+#include <stc/cvec.h>
 
 declare_CMap(ii, int, int); // map
 declare_CMap(ix, int64_t);  // set
@@ -57,9 +57,9 @@ declare_CVec(i, int);
 Performance
 -----------
 
-This library is very efficent. Containers have templated intrusive elements. One of the most performance critical containers is the **CMap map / CMap set**. Thankfully, CMap is among the fastest C/C++ map implementations available: **examples/benchmark.c** compiled with g++ v9.2.0 -O3 on windows (the results are similar with VC++ and g++ on linux):
+This library is very efficent. Containers have templated intrusive elements. One of the most performance critical containers is the **CMap / CSet**. Luckily, CMap is among the fastest C/C++ map implementations available: **examples/benchmark.c** compiled with g++ v9.2.0 -O3 on windows (the results are similar with VC++ and g++ on linux):
 
-**CMAP**=*CMap map*, KMAP=*khash*, UMAP=*std::unordered_map*, BMAP=*ska::bytell_hash_map*, FMAP=*ska::flat_hash_map*, RMAP=*robin_hood::unordered_map*
+**CMAP**=*CMap*, KMAP=*khash*, UMAP=*std::unordered_map*, BMAP=*ska::bytell_hash_map*, FMAP=*ska::flat_hash_map*, RMAP=*robin_hood::unordered_map*
 ```
 Random keys are in range [0, 2^20):
 map<uint64_t, uint64_t>: 7000000 repeats of Insert random key + (try to) remove a different random key:
@@ -134,14 +134,14 @@ The first example has a very complex nested container type, which demonstrates t
 
 Note: The *cmap_sm_destroy(&theMap)* call below, will destroy all the nested containers including the memory allocated for CStr keys in theMap object.
 ```
-#include "stc/cstring.h"
-#include "stc/chash.h"
-#include "stc/clist.h"
-#include "stc/carray.h"
+#include <stc/cstr.h>
+#include <stc/cmap.h>
+#include <stc/clist.h>
+#include <stc/carray.h>
 
-void check_destroy(float* v) {printf("destroy %g\n", *v);}
+void verify_destroy(float* v) {printf("destroy %g\n", *v);}
 
-declare_CArray(f, float, check_destroy); // normally omit the last argument - float type need no destroy.
+declare_CArray(f, float, verify_destroy); // you should omit the last argument - float type need no destroy.
 declare_CList(t2, CArray2_f, carray2_f_destroy, c_noCompare);
 declare_CMap(il, int, CList_t2, clist_t2_destroy);
 declare_CMap_str(sm, CMap_il, cmap_il_destroy);
@@ -172,7 +172,7 @@ int main() {
 ```
 **CStr**
 ```
-#include "stc/cstring.h"
+#include <stc/cstr.h>
 
 int main() {
     CStr s1 = cstr_make("one-nine-three-seven-five");
@@ -200,7 +200,7 @@ int main() {
 ```
 **CVec** of *int64_t*
 ```
-#include "stc/cvector.h"
+#include <stc/cvec.h>
 declare_CVec(ix, int64_t); // ix is just an example tag name, use anything without underscore.
 
 int main() {
@@ -218,8 +218,8 @@ int main() {
 ```
 **CVec** of *CStr*
 ```
-#include "stc/cstring.h"
-#include "stc/cvector.h"
+#include <stc/cstr.h>
+#include <stc/cvec.h>
 declare_CVec_str(cs);
 
 int main() {
@@ -235,7 +235,7 @@ int main() {
 **CMap** of *int -> int*
 ```
 #include <stdio.h>
-#include "stc/chash.h"
+#include <stc/cmap.h>
 declare_CMap(ii, int, int);
 
 int main() {
@@ -249,8 +249,8 @@ int main() {
 ```
 **CSet** of *CStr*
 ```
-#include "stc/cstring.h"
-#include "stc/chash.h"
+#include <stc/cstr.h>
+#include <stc/cmap.h>
 declare_CSet_str(s); // CStr set. See the discussion above.
 
 int main() {
@@ -267,8 +267,8 @@ int main() {
 ```
 **CMap** of *CStr -> CStr*. Temporary CStr values are created by *cstr_make()*, and moved into the container
 ```
-#include "stc/cstring.h"
-#include "stc/chash.h"
+#include <stc/cstr.h>
+#include <stc/cmap.h>
 declare_CMap_str(ss, CStr, cstr_destroy); 
 
 int main() {
@@ -286,8 +286,8 @@ int main() {
 ```
 #include <stdio.h>
 #include <time.h>
-#include "stc/clist.h"
-#include "stc/crandom.h"
+#include <stc/clist.h>
+#include <stc/crandom.h>
 declare_CList(i, uint64_t);
  
 int main() {
@@ -312,7 +312,7 @@ int main() {
 **CArray**. 1D, 2D and 3D arrays, heap allocated in one memory block. *CArray3* can have sub-array "views" of *CArray2* and *CArray1* etc., as shown in the following example.
 ```
 #include <stdio.h>
-#include "stc/carray.h"
+#include <stc/carray.h>
 declare_CArray(f, float);
 
 int main()
