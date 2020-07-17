@@ -5,14 +5,15 @@ Introduction
 ------------
 
 An elegant, typesafe, generic, customizable, user-friendly, consistent, and very efficient standard container library for C99. This is a small headers only library with the most used container components, and a few algorithms:
-- **cstring.h** - Compact and powerful **string** class.
-- **cvector.h** - Dynamic generic **vector** class, works well as a **stack**.
-- **chash.h** - Unordered **map** and **set** implemented as open hashing without tombstones. Highly customizable and fast.
-- **carray.h** - Multi-dimensional dynamic **array**, implemented as a single contiguous section of memory.
-- **clist.h** - A circular singly **linked list**, can be used as a **queue** - supports *pushBack, pushFront, and popFront* in *O*(1). Also contains various *splice* functions and (merge) *sort*.
-- **coption.h** - Implementation of *getopt_long*-"like" function, *coption_get*, to parse command line arguments.
-- **crandom.h** - A few very efficent modern random number generators *pcg32* and *sfc64*. It also implements the crypto-strong *siphash* algorithm.
-- **cdefs.h** - A small common include file with some general definitions.
+- **stc/cstr.h** - Compact and powerful **string** class.
+- **stc/cvec.h** - Dynamic generic **vector** class, works well as a **stack**.
+- **stc/cmap.h** - A generic **unordered map** implemented as open hashing without tombstones. Highly customizable and fast.
+- **stc/cset.h** - A generic **unordered set** implemented in tandem with *unordered map*
+- **stc/carray.h** - Dynamic generic **multi-dimensional array**, implemented as a single contiguous section of memory.
+- **stc/clist.h** - A genric circular singly **linked list**, can be used as a **queue** - supports *pushBack, pushFront, and popFront* in *O*(1). Also contains various *splice* functions and (merge) *sort*.
+- **stc/coption.h** - Implementation of *getopt_long*-"like" function, *coption_get*, to parse command line arguments.
+- **stc/crandom.h** - A few very efficent modern random number generators *pcg32* and *sfc64*. It also implements the crypto-strong *siphash* algorithm.
+- **stc/cdefs.h** - A small common include file with some general definitions.
 
 The usage of the containers is similar to the C++ standard containers, so it should be easier for those who are familiar with them.
 
