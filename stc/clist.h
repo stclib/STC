@@ -215,14 +215,14 @@
     } \
  \
     static inline int \
-    clist_##tag##_sortCmp(const void* x, const void* y) { \
+    clist_##tag##_sortCompare(const void* x, const void* y) { \
         RawValue a = valueGetRaw(&((CListNode_##tag *) x)->value); \
         RawValue b = valueGetRaw(&((CListNode_##tag *) y)->value); \
         return valueCompareRaw(&a, &b); \
     } \
     STC_API void \
     clist_##tag##_sort(CList_##tag* self) { \
-        CListNode__base* last = _clist_mergesort((CListNode__base *) self->last->next, clist_##tag##_sortCmp); \
+        CListNode__base* last = _clist_mergesort((CListNode__base *) self->last->next, clist_##tag##_sortCompare); \
         self->last = (CListNode_##tag *) last; \
     }
 

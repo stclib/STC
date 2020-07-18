@@ -22,9 +22,11 @@ After inserting all the elements excluding the ones which are to be deleted, Pop
 #include <stdio.h>
 #include <stc/clist.h>
 #include <stc/cmap.h>
-#include <stc/cvec.h>
+#include <stc/cvecque.h>
 
 declare_CMap(ii, int, int);
+declare_CVec(i, int);
+declare_CVec_heap(i);
 
 // Find k minimum element from arr[0..m-1] after deleting 
 // elements from del[0..n-1] 
@@ -39,7 +41,7 @@ void findElementsAfterDel(int arr[], int m, int del[],
         cmap_ii_at(&mp, del[i], 0)->value++; 
     } 
   
-    priority_queue<int, vector<int>, greater<int> > heap; 
+    CVec_i heap = CVec_init; 
   
     for (int i = 0; i < m; ++i) { 
   
@@ -58,15 +60,17 @@ void findElementsAfterDel(int arr[], int m, int del[],
   
         // Else push it in the min heap 
         else
-            heap.push(arr[i]); 
+            cvecheap_i_push(&heap, arr[i]); 
+
+            CVecHeap_i Text
     } 
   
     // Print top k elements in the min heap 
     for (int i = 0; i < k; ++i) { 
-        cout << heap.top() << " "; 
+        printf("%d ", cvecque_i_top(&heap)); 
   
         // Pop the top element 
-        heap.pop(); 
+        cvecque_i_pop(&heap); 
     } 
 } 
   
