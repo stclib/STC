@@ -1,4 +1,6 @@
 /*
+https://www.geeksforgeeks.org/find-the-k-smallest-numbers-after-deleting-given-elements/
+
 Find the k smallest numbers after deleting given elements
 Given an array of integers, find the k smallest numbers after deleting given elements. In case of repeating elements delete only one instance in the given array for every instance of element present in the array containing the elements to be deleted.
 Assume that there are at least k elements left in the array after making n deletions.
@@ -22,11 +24,11 @@ After inserting all the elements excluding the ones which are to be deleted, Pop
 #include <stdio.h>
 #include <stc/clist.h>
 #include <stc/cmap.h>
-#include <stc/cvecque.h>
+#include <stc/cvecheap.h>
 
 declare_CMap(ii, int, int);
 declare_CVec(i, int);
-declare_CVec_heap(i);
+declare_CVec_heap(i, >);
 
 // Find k minimum element from arr[0..m-1] after deleting 
 // elements from del[0..n-1] 
@@ -41,7 +43,7 @@ void findElementsAfterDel(int arr[], int m, int del[],
         cmap_ii_at(&mp, del[i], 0)->value++; 
     } 
   
-    CVec_i heap = CVec_init; 
+    CVec_i heap = cvec_init; 
   
     for (int i = 0; i < m; ++i) { 
   
@@ -60,17 +62,15 @@ void findElementsAfterDel(int arr[], int m, int del[],
   
         // Else push it in the min heap 
         else
-            cvecheap_i_push(&heap, arr[i]); 
-
-            CVecHeap_i Text
+            cvec_i_heapPush(&heap, arr[i]); 
     } 
   
     // Print top k elements in the min heap 
     for (int i = 0; i < k; ++i) { 
-        printf("%d ", cvecque_i_top(&heap)); 
+        printf("%d ", cvec_i_heapTop(&heap)); 
   
         // Pop the top element 
-        cvecque_i_pop(&heap); 
+        cvec_i_heapPop(&heap); 
     } 
 } 
   
