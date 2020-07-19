@@ -21,48 +21,48 @@
  * SOFTWARE.
  */
 
-/*  Priority queue using CVec as heap.
+/*  Priority Queue using CVec as heap.
 
-    #include <stc/cvecheap.h>
+    #include <stc/cvecpq.h>
     #include <stc/crandom.h>
     declare_CVec(i, int);
-    declare_CVec_heap(i, >); // min-heap (increasing values)
+    declare_CVec_priorityQ(i, >); // min-heap (increasing values)
     int main() {
         pcg32_random_t pcg = pcg32_seed(1234, 0);
         CVec_i heap = cvec_init;
-        for (int i=0; i<100; ++i) cvec_i_pushHeap(&heap, pcg32_random(&pcg));
+        for (int i=0; i<100; ++i) cvec_i_pushPriorityQ(&heap, pcg32_random(&pcg));
         for (int i=0; i<5; ++i) {
-            printf("%d ", cvec_i_topHeap(&heap, pcg32_random(&pcg)));
-            cvec_i_popHeap(&heap, pcg32_random(&pcg));
+            printf("%d ", cvec_i_topPriorityQ(&heap, pcg32_random(&pcg)));
+            cvec_i_popPriorityQ(&heap, pcg32_random(&pcg));
         }
     }
- */
+*/
 
-#ifndef CVECHEAP__H__
-#define CVECHEAP__H__
+#ifndef CVECPQ__H__
+#define CVECPQ__H__
 
 #include "cvec.h"
 
-#define declare_CVec_heap(tag, cmpOpr) /* < or > */ \
+#define declare_CVec_priorityQ(tag, cmpOpr) /* < or > */ \
  \
 STC_API void \
-cvec_##tag##_buildHeap(CVec_##tag* self); \
+cvec_##tag##_buildPriorityQ(CVec_##tag* self); \
 STC_API void \
-cvec_##tag##_eraseHeapElement(CVec_##tag* self, size_t i); \
+cvec_##tag##_eraseFromPriorityQ(CVec_##tag* self, size_t i); \
 STC_INLINE CVecValue_##tag \
-cvec_##tag##_topHeap(CVec_##tag* self) {return self->data[0];} \
+cvec_##tag##_topPriorityQ(CVec_##tag* self) {return self->data[0];} \
 STC_INLINE void \
-cvec_##tag##_popHeap(CVec_##tag* self) {cvec_##tag##_eraseHeapElement(self, 0);} \
+cvec_##tag##_popPriorityQ(CVec_##tag* self) {cvec_##tag##_eraseFromPriorityQ(self, 0);} \
 STC_API void \
-cvec_##tag##_pushHeap(CVec_##tag* self, CVecValue_##tag value); \
+cvec_##tag##_pushPriorityQ(CVec_##tag* self, CVecValue_##tag value); \
  \
-implement_CVec_heap(tag, cmpOpr) \
-typedef CVec_##tag CVecHeap_##tag
+implement_CVec_priorityQ(tag, cmpOpr) \
+typedef CVec_##tag CVec_priorityQ_##tag
     
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define implement_CVec_heap(tag, cmpOpr) \
+#define implement_CVec_priorityQ(tag, cmpOpr) \
  \
 STC_INLINE void \
 _cvec_##tag##_siftDown(CVecValue_##tag* arr, size_t i, size_t n) { \
@@ -79,14 +79,14 @@ _cvec_##tag##_siftDown(CVecValue_##tag* arr, size_t i, size_t n) { \
 } \
  \
 STC_API void \
-cvec_##tag##_eraseHeapElement(CVec_##tag* self, size_t i) { \
+cvec_##tag##_eraseFromPriorityQ(CVec_##tag* self, size_t i) { \
     self->data[i] = cvec_##tag##_back(*self); \
     cvec_##tag##_popBack(self); \
     _cvec_##tag##_siftDown(self->data - 1, i + 1, cvec_size(*self)); \
 } \
  \
 STC_API void \
-cvec_##tag##_pushHeap(CVec_##tag* self, CVecValue_##tag value) { \
+cvec_##tag##_pushPriorityQ(CVec_##tag* self, CVecValue_##tag value) { \
     cvec_##tag##_pushBack(self, value); /* sift-up the value */ \
     size_t n = cvec_size(*self), c = n; \
     CVecValue_##tag *arr = self->data - 1; \
@@ -96,7 +96,7 @@ cvec_##tag##_pushHeap(CVec_##tag* self, CVecValue_##tag value) { \
 } \
  \
 STC_API void \
-cvec_##tag##_buildHeap(CVec_##tag* self) { \
+cvec_##tag##_buildPriorityQ(CVec_##tag* self) { \
     size_t n = cvec_size(*self);  \
     CVecValue_##tag *arr = self->data - 1; \
     for (size_t k = n >> 1; k != 0; --k) \
@@ -104,7 +104,7 @@ cvec_##tag##_buildHeap(CVec_##tag* self) { \
 }
 
 #else
-#define implement_CVec_heap(tag, cmpOpr)
+#define implement_CVec_priorityQ(tag, cmpOpr)
 #endif
 
 #endif
