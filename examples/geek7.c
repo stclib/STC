@@ -62,15 +62,15 @@ void findElementsAfterDel(int arr[], int m, int del[],
   
         // Else push it in the min heap 
         else
-            cvec_i_heapPush(&heap, arr[i]); 
+            cvec_i_pushHeap(&heap, arr[i]); 
     } 
   
     // Print top k elements in the min heap 
     for (int i = 0; i < k; ++i) { 
-        printf("%d ", cvec_i_heapTop(&heap)); 
+        printf("%d ", cvec_i_topHeap(&heap)); 
   
         // Pop the top element 
-        cvec_i_heapPop(&heap); 
+        cvec_i_popHeap(&heap); 
     } 
 } 
   
