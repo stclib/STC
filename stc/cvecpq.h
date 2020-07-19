@@ -96,7 +96,7 @@ cvec_##tag##_pushPriorityQ(CVec_##tag* self, CVecValue_##tag value) { \
     CVecValue_##tag *arr = self->data - 1; \
     for (; c > 1 && cvec_##tag##_sortCompare(&arr[c >> 1], &value) cmpOpr 0; c >>= 1) \
         arr[c] = arr[c >> 1]; \
-    arr[c] = value; \
+    if (c != n) arr[c] = value; \
 } \
  \
 STC_API void \
