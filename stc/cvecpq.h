@@ -30,11 +30,15 @@
     int main() {
         pcg32_random_t pcg = pcg32_seed(1234, 0);
         CVec_i heap = cvec_init;
-        for (int i=0; i<100; ++i) cvec_i_pushPriorityQ(&heap, pcg32_random(&pcg));
-        for (int i=0; i<5; ++i) {
-            printf("%d ", cvec_i_topPriorityQ(&heap, pcg32_random(&pcg)));
-            cvec_i_popPriorityQ(&heap, pcg32_random(&pcg));
+        // Push on one million random numbers
+        for (int i=0; i<1000000; ++i)
+            cvec_i_pushPriorityQ(&heap, pcg32_random(&pcg));
+        // Extract the 100 smallest.
+        for (int i=0; i<100; ++i) {
+            printf("%d ", cvec_i_topPriorityQ(&heap));
+            cvec_i_popPriorityQ(&heap);
         }
+        cvec_i_destroy(&heap);
     }
 */
 
