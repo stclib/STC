@@ -68,6 +68,11 @@ STC_INLINE void cbitvec_setAll(CBitVec *self, bool value) {
 	memset(self->_arr, value ? 0xff : 0x0, ((self->size + 31) >> 5) * 4);
 }
 
+STC_INLINE void cbitvec_setAll32(CBitVec *self, uint32_t pattern) {
+    size_t n = (self->size + 31) >> 5;
+    while (n--) self->_arr[n] = pattern;
+}
+
 STC_INLINE void cbitvec_flipAll(CBitVec *self) {
     size_t n = (self->size + 31) >> 5;
     while (n--) self->_arr[n] ^= 0xffffffff;
