@@ -32,23 +32,27 @@
     it also support push* and splice* at both ends of the list. This makes it ideal
     for being used as a queue, unlike std::forward_list. Basic usage is similar to CVec:
    
-    #include "stc/clist.h"
-    declare_CList(i, int64_t);
+    #include <stdio.h>
+    #include <stc/clist.h>
+    #include <stc/crandom.h>
+    declare_CList(ix, int64_t);
  
     int main() {
-        CList_i list = clist_init;
+        CList_ix list = clist_init;
+        pcg32_random_t pcg = pcg32_seed(123, 0);
         int n;
         for (int i=0; i<1000000; ++i) // one million
-            clist_i_pushBack(&list, rand() * rand());
+            clist_ix_pushBack(&list, pcg32_random(&pcg));
         n = 0; 
-        c_foreach (i, clist_i, list)
-            if (++n % 10000 == 0) printf("%d: %zd\n", n, i.item->value);
+        c_foreach (i, clist_ix, list)
+            if (++n % 10000 == 0) printf("%8d: %10zd\n", n, i.item->value);
         // Sort them...
-        clist_i_sort(&list); // mergesort O(n*log n)
+        clist_ix_sort(&list); // mergesort O(n*log n)
         n = 0;
-        c_foreach (i, clist_i, list)
-            if (++n % 10000 == 0) printf("%d: %zd\n", n, i.item->value);
-        clist_i_destroy(&list);
+        puts("sorted");
+        c_foreach (i, clist_ix, list)
+            if (++n % 10000 == 0) printf("%8d: %10zd\n", n, i.item->value);
+        clist_ix_destroy(&list);
     }
 */
 

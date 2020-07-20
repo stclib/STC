@@ -3,29 +3,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
-#include "stc/cvec.h"
-
-static inline void setBit(uint32_t* a, const size_t i) { a[i >> 5] |= 1u << (i & 31); }
-static inline void clearBit(uint32_t* a, const size_t i) { a[i >> 5] &= ~(1u << (i & 31)); }
-static inline bool testBit(uint32_t* a, const size_t i) { return (a[i >> 5] & (1u << (i & 31))) != 0; }
-
-declare_CVec(i, uint32_t);
+#include <stc/cbitvec.h>
 
 static inline void sieveOfEratosthenes(size_t n)
 {
-    CVec_i prime = cvec_i_make((n >> 5) + 1, 0xffffffff);
+    CBitVec prime = cbitvec_make(n + 1, true);
+    printf("computing primes up to %zu\n", n);
+    cbitvec_unset(&prime, 0);
+    cbitvec_unset(&prime, 1);
 
-    printf("n: %zu, ints: %zu\n", n, cvec_size(prime));
-    clearBit(prime.data, 0);
-    clearBit(prime.data, 1);
-
-    for (size_t i = 2; i <= n; ++i)
-    {
+    for (size_t i = 2; i <= n; ++i) {
         // If prime[i] is not changed, then it is a prime
-        if (testBit(prime.data, i) && i*i <= n)
-        {
+        if (cbitvec_value(&prime, i) && i*i <= n) {
             for (size_t j = i*i; j <= n; j += i) {
-                clearBit(prime.data, j);
+                cbitvec_unset(&prime, j);
             }
         }
     }
@@ -33,10 +24,10 @@ static inline void sieveOfEratosthenes(size_t n)
     // Print all prime numbers
     size_t count = 0;
     for (size_t i = 1; i <= n; ++i)
-       if (testBit(prime.data, i)) ++count; // printf("%zu\n", i);
+       if (cbitvec_value(&prime, i)) ++count; // printf("%zu\n", i);
 
-    printf("primes: %zu\n", count);
-    cvec_i_destroy(&prime);
+    printf("number of primes: %zu\n", count);
+    cbitvec_destroy(&prime);
 } 
 
 int main(void)
