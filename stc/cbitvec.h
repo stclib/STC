@@ -45,41 +45,42 @@ int main() {
 #include <stdlib.h>
 #include "cdefs.h"
 
-typedef struct { uint32_t* _arr; size_t size; } CBitVec;
+typedef struct { uint64_t* _arr; size_t size; } CBitVec;
 
-STC_INLINE void cbitvec_set(CBitVec *self, size_t i) {self->_arr[i >> 5] |= 1u << (i & 31);}
-STC_INLINE void cbitvec_unset(CBitVec *self, size_t i) {self->_arr[i >> 5] &= ~(1u << (i & 31));}
+STC_INLINE void cbitvec_set(CBitVec *self, size_t i) {self->_arr[i >> 6] |= 1ull << (i & 63);}
+STC_INLINE void cbitvec_unset(CBitVec *self, size_t i) {self->_arr[i >> 6] &= ~(1ull << (i & 63));}
 STC_INLINE void cbitvec_setValue(CBitVec *self, size_t i, bool value) {value ? cbitvec_set(self, i) : cbitvec_unset(self, i);}
-STC_INLINE void cbitvec_flip(CBitVec *self, size_t i) {self->_arr[i >> 5] ^= 1u << (i & 31);}
-STC_INLINE bool cbitvec_value(CBitVec *self, size_t i) {return (self->_arr[i >> 5] & (1u << (i & 31))) != 0;}
+STC_INLINE void cbitvec_flip(CBitVec *self, size_t i) {self->_arr[i >> 6] ^= 1ull << (i & 63);}
+STC_INLINE bool cbitvec_value(const CBitVec *self, size_t i) {return (self->_arr[i >> 6] & (1ull << (i & 63))) != 0;}
+STC_INLINE size_t cbitvec_size(CBitVec bv) {return bv.size;}
 
 STC_INLINE void cbitvec_resize(CBitVec* self, size_t size, bool value) {
-    size_t newsz = (size + 31) >> 5, oldsz = (self->size + 31) >> 5;
-    self->_arr = (uint32_t *) realloc(self->_arr, newsz * 4);
-    memset(self->_arr + oldsz, value ? 0xff : 0x0, (newsz - oldsz) * 4);
-    if (self->size & 31) {
-		size_t idx = (self->size - 1) >> 5; uint32_t bits = (1u << (self->size & 31)) - 1;
-		value ? (self->_arr[idx] |= ~bits) : (self->_arr[idx] &= bits);
-	}
+    size_t newsz = (size + 63) >> 6, oldsz = (self->size + 63) >> 6;
+    self->_arr = (uint64_t *) realloc(self->_arr, newsz * 8);
+    memset(self->_arr + oldsz, value ? 0xff : 0x0, (newsz - oldsz) * 8);
+    if (self->size & 63) {
+        size_t idx = (self->size - 1) >> 6; uint64_t bits = (1ull << (self->size & 63)) - 1;
+        value ? (self->_arr[idx] |= ~bits) : (self->_arr[idx] &= bits);
+    }
     self->size = size;
 }
 
 STC_INLINE void cbitvec_setAll(CBitVec *self, bool value) {
-	memset(self->_arr, value ? 0xff : 0x0, ((self->size + 31) >> 5) * 4);
+    memset(self->_arr, value ? 0xff : 0x0, ((self->size + 63) >> 6) * 8);
 }
 
-STC_INLINE void cbitvec_setAll32(CBitVec *self, uint32_t pattern) {
-    size_t n = (self->size + 31) >> 5;
+STC_INLINE void cbitvec_setAll64(CBitVec *self, uint64_t pattern) {
+    size_t n = (self->size + 63) >> 6;
     while (n--) self->_arr[n] = pattern;
 }
 
 STC_INLINE void cbitvec_flipAll(CBitVec *self) {
-    size_t n = (self->size + 31) >> 5;
-    while (n--) self->_arr[n] ^= 0xffffffff;
+    size_t n = (self->size + 63) >> 6;
+    while (n--) self->_arr[n] ^= ~0ull;
 }
 
 STC_INLINE CBitVec cbitvec_make(size_t size, bool value) {
-    CBitVec vec = {(uint32_t *) malloc(((size + 31) >> 5) * 4), size};
+    CBitVec vec = {(uint64_t *) malloc(((size + 63) >> 6) * 8), size};
     cbitvec_setAll(&vec, value);
     return vec;
 }
