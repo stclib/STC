@@ -4,18 +4,18 @@
 #include <stc/cstr.h>
 
 declare_CMap_str(ss, CStr, cstr_destroy);
-declare_CSet_str(ss);
+declare_CSet_str();
 
 int main() 
 { 
     // Lets use an explicit type signature (which would
     // be `CMap<String, String>` in this example).
     CMap_ss book_reviews = cmap_init; 
-    CSet_ss set = cset_init;
-    cset_ss_put(&set, "Hello");
-    cset_ss_put(&set, "You");
-    cset_ss_put(&set, "Tube");
-    c_foreach (i, cset_ss, set)
+    CSet_str set = cset_init;
+    cset_str_put(&set, "Hello");
+    cset_str_put(&set, "You");
+    cset_str_put(&set, "Tube");
+    c_foreach (i, cset_str, set)
         printf("%s ", i.item->key.str); puts("");
 
     // Review some books.

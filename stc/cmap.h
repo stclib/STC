@@ -69,21 +69,21 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
     c_MACRO_OVERLOAD(declare_CMap, __VA_ARGS__)
 
 #define declare_CMap_3(tag, Key, Value) \
-    declare_CMap_4(tag, Key, Value, c_emptyDestroy)
+    declare_CMap_4(tag, Key, Value, c_defaultDestroy)
 
 #define declare_CMap_4(tag, Key, Value, valueDestroy) \
-    declare_CMap_5(tag, Key, Value, valueDestroy, c_defaultHash)
+    declare_CMap_5(tag, Key, Value, valueDestroy, c_defaultEquals)
 
-#define declare_CMap_5(tag, Key, Value, valueDestroy, keyHash) \
-    declare_CMap_6(tag, Key, Value, valueDestroy, keyHash, c_defaultEquals)
+#define declare_CMap_5(tag, Key, Value, valueDestroy, keyEquals) \
+    declare_CMap_6(tag, Key, Value, valueDestroy, keyEquals, c_defaultHash)
 
-#define declare_CMap_6(tag, Key, Value, valueDestroy, keyHash, keyEquals) \
-    declare_CMap_10(tag, Key, Value, valueDestroy, keyHash, keyEquals, \
-                         c_emptyDestroy, Key, c_defaultGetRaw, c_defaultInitRaw)
+#define declare_CMap_6(tag, Key, Value, valueDestroy, keyEquals, keyHash) \
+    declare_CMap_10(tag, Key, Value, valueDestroy, keyEquals, keyHash, \
+                         c_defaultDestroy, Key, c_defaultGetRaw, c_defaultInitRaw)
 
-#define declare_CMap_10(tag, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, \
+#define declare_CMap_10(tag, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                              keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
-	declare_CHASH(tag, CMap, cmap, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, \
+	declare_CHASH(tag, CMap, cmap, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                        keyDestroy, RawKey, keyGetRaw, keyInitRaw)
 
 /* CSet: */
@@ -91,21 +91,21 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
     c_MACRO_OVERLOAD(declare_CSet, __VA_ARGS__)
 
 #define declare_CSet_2(tag, Key) \
-    declare_CSet_3(tag, Key, c_emptyDestroy)
+    declare_CSet_3(tag, Key, c_defaultEquals)
 
-#define declare_CSet_3(tag, Key, keyDestroy) \
-    declare_CSet_4(tag, Key, keyDestroy, c_defaultHash)
+#define declare_CSet_3(tag, Key, keyEquals) \
+    declare_CSet_4(tag, Key, keyEquals, c_defaultHash)
 
-#define declare_CSet_4(tag, Key, keyDestroy, keyHash) \
-    declare_CSet_5(tag, Key, keyDestroy, keyHash, c_defaultEquals)
+#define declare_CSet_4(tag, Key, keyEquals, keyHash) \
+    declare_CSet_5(tag, Key, keyEquals, keyHash, c_defaultDestroy)
 
-#define declare_CSet_5(tag, Key, keyDestroy, keyHash, keyEquals) \
-    declare_CSet_8(tag, Key, keyDestroy, keyHash, keyEquals, \
+#define declare_CSet_5(tag, Key, keyEquals, keyHash, keyDestroy) \
+    declare_CSet_8(tag, Key, keyEquals, keyHash, keyDestroy, \
                         Key, c_defaultGetRaw, c_defaultInitRaw)
 
-#define declare_CSet_8(tag, Key, keyDestroy, keyHashRaw, keyEqualsRaw, \
+#define declare_CSet_8(tag, Key, keyEqualsRaw, keyHashRaw, keyDestroy, \
                             RawKey, keyGetRaw, keyInitRaw) \
-    declare_CHASH(tag, CSet, cset, Key, void, void, keyHashRaw, keyEqualsRaw, \
+    declare_CHASH(tag, CSet, cset, Key, void, void, keyEqualsRaw, keyHashRaw, \
                        keyDestroy, RawKey, keyGetRaw, keyInitRaw)
 
 /* CSet_str, CMap_str: */
@@ -116,22 +116,22 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
     c_MACRO_OVERLOAD(declare_CMap_str, __VA_ARGS__)
 
 #define declare_CMap_str_2(tag, Value) \
-    declare_CHASH_STR(tag, CMap, cmap, Value, c_emptyDestroy)
+    declare_CHASH_STR(tag, CMap, cmap, Value, c_defaultDestroy)
 
 #define declare_CMap_str_3(tag, Value, ValueDestroy) \
     declare_CHASH_STR(tag, CMap, cmap, Value, ValueDestroy)
 
 #define declare_CHASH_STR(tag, CType, ctype, Value, valueDestroy) \
-    declare_CHASH(tag, CType, ctype, CStr, Value, valueDestroy, cstr_hashRaw, \
-                       cstr_equalsRaw, cstr_destroy, const char*, cstr_getRaw, cstr_make)
+    declare_CHASH(tag, CType, ctype, CStr, Value, valueDestroy, cstr_equalsRaw, cstr_hashRaw, \
+                       cstr_destroy, const char*, cstr_getRaw, cstr_make)
 
 #define OPT_1_cset(x)
 #define OPT_2_cset(x, y) x
 #define OPT_1_cmap(x) x
 #define OPT_2_cmap(x, y) x, y
 
-/* CHASH full: use 'void' for Value if <CType, ctype> is <CSet, cset> */
-#define declare_CHASH(tag, CType, ctype, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, \
+/* CHASH full: use 'void' for Value if ctype is cset */
+#define declare_CHASH(tag, CType, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                            keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
 typedef struct CType##Entry_##tag { \
     Key key; \
@@ -186,7 +186,7 @@ ctype##_##tag##_begin(CType##_##tag* map); \
 STC_API ctype##_##tag##_iter_t \
 ctype##_##tag##_next(ctype##_##tag##_iter_t it); \
  \
-implement_CHASH(tag, CType, ctype, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, \
+implement_CHASH(tag, CType, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                      keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
 typedef Key CType##Key_##tag; \
 typedef Value CType##Value_##tag
@@ -194,7 +194,7 @@ typedef Value CType##Value_##tag
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define implement_CHASH(tag, CType, ctype, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, \
+#define implement_CHASH(tag, CType, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                              keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
  \
 STC_API CType##_##tag \
@@ -369,7 +369,7 @@ ctype##_##tag##_next(ctype##_##tag##_iter_t it) { \
 }
 
 #else
-#define implement_CHASH(tag, CType, ctype, Key, Value, valueDestroy, keyHashRaw, keyEqualsRaw, \
+#define implement_CHASH(tag, CType, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                              keyDestroy, RawKey, keyGetRaw, keyInitRaw)
 #endif
 

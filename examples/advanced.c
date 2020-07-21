@@ -53,7 +53,7 @@ Viking viking_fromVw(VikingVw vw) {
 
 
 // Using the full declare_CMap() macro to define [Viking -> int] hash map type:
-declare_CMap(vk, Viking, int, c_emptyDestroy, vikingvw_hash, vikingvw_equals, 
+declare_CMap(vk, Viking, int, c_defaultDestroy, vikingvw_equals, vikingvw_hash, 
                  viking_destroy, VikingVw, viking_getVw, viking_fromVw);
 
 // CMap_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test.

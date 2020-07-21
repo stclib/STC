@@ -34,7 +34,7 @@
 
 #define declare_CVec(...)   c_MACRO_OVERLOAD(declare_CVec, __VA_ARGS__)
 #define declare_CVec_2(tag, Value) \
-                            declare_CVec_3(tag, Value, c_emptyDestroy)
+                            declare_CVec_3(tag, Value, c_defaultDestroy)
 #define declare_CVec_3(tag, Value, valueDestroy) \
                             declare_CVec_4(tag, Value, valueDestroy, c_defaultCompare)
 #define declare_CVec_4(tag, Value, valueDestroy, valueCompare) \
@@ -112,6 +112,14 @@ cvec_##tag##_make(size_t size, Value null) { \
     cvec_##tag##_reserve(&vec, size); \
     _cvec_size(vec) = size; \
     for (size_t i=0; i<size; ++i) vec.data[i] = null; \
+    return vec; \
+} \
+STC_API CVec_##tag \
+cvec_##tag##_from(Value array[], int size) { \
+    CVec_##tag vec = cvec_init; \
+    cvec_##tag##_reserve(&vec, size); \
+    _cvec_size(vec) = size; \
+    for (size_t i=0; i<size; ++i) vec.data[i] = array[i]; \
     return vec; \
 } \
  \

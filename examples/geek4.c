@@ -37,13 +37,13 @@ Efficient Approach: For all the words of the first sentence, we can check if it 
 #include <stc/cvec.h>
 #include <stc/cstr.h>
 
-declare_CVec_str(s);
+declare_CVec_str();
 declare_CMap_str(sb, bool);
 declare_CVec(sb, CMapEntry_sb, cmapentry_sb_destroy, c_noCompare);
   
 // Function to return the count of common words 
 // in all the sentences 
-int commonWords(CVec_s S) 
+int commonWords(CVec_str S) 
 { 
     int m, n, i, j; 
   
@@ -136,14 +136,14 @@ int commonWords(CVec_s S)
 // Driver code 
 int main() 
 { 
-    CVec_s S = cvec_init; 
-    cvec_s_pushBack(&S, cstr_make("there is a cow")); 
-    cvec_s_pushBack(&S, cstr_make("cow is our mother")); 
-    cvec_s_pushBack(&S, cstr_make("cow gives us milk and milk is sweet")); 
-    cvec_s_pushBack(&S, cstr_make("there is a boy who loves cow")); 
+    CVec_str S = cvec_init; 
+    cvec_str_pushBack(&S, cstr_make("there is a cow")); 
+    cvec_str_pushBack(&S, cstr_make("cow is our mother")); 
+    cvec_str_pushBack(&S, cstr_make("cow gives us milk and milk is sweet")); 
+    cvec_str_pushBack(&S, cstr_make("there is a boy who loves cow")); 
   
     printf("%d\n", commonWords(S)); 
-    cvec_s_destroy(&S);
+    cvec_str_destroy(&S);
     return 0; 
 }
 

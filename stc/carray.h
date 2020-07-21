@@ -75,7 +75,7 @@ static inline size_t _carray3_size(const size_t* zdim) {
 #define declare_CArray(...) c_MACRO_OVERLOAD(declare_CArray, __VA_ARGS__)
 
 #define declare_CArray_2(tag, Value) \
-    declare_CArray_3(tag, Value, c_emptyDestroy)
+    declare_CArray_3(tag, Value, c_defaultDestroy)
 
 
 #define declare_CArray_3(tag, Value, valueDestroy) \

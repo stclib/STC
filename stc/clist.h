@@ -59,7 +59,7 @@
 #define declare_CList(...)    c_MACRO_OVERLOAD(declare_CList, __VA_ARGS__)
 
 #define declare_CList_2(tag, Value) \
-                               declare_CList_3(tag, Value, c_emptyDestroy)
+                               declare_CList_3(tag, Value, c_defaultDestroy)
 #define declare_CList_3(tag, Value, valueDestroy) \
                                declare_CList_4(tag, Value, valueDestroy, c_defaultCompare)
 #define declare_CList_4(tag, Value, valueDestroy, valueCompare) \

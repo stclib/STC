@@ -19,7 +19,7 @@ static inline uint32_t fibonacci_hash(const void* data, size_t len) {
     const uint64_t key = *(const uint64_t *) data;
     return (uint32_t) (key * 11400714819323198485llu);
 }
-declare_CMap(ii, int64_t, int64_t, c_emptyDestroy, fibonacci_hash);
+declare_CMap(ii, int64_t, int64_t, c_defaultDestroy, c_defaultEquals, fibonacci_hash);
 
 KHASH_MAP_INIT_INT64(ii, uint64_t)
 
