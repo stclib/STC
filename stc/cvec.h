@@ -51,6 +51,8 @@ typedef struct CVec_##tag { \
  \
 STC_API CVec_##tag \
 cvec_##tag##_make(size_t size, Value null); \
+STC_API CVec_##tag \
+cvec_##tag##_from(const Value in[], size_t size); \
 STC_API void \
 cvec_##tag##_destroy(CVec_##tag* self); \
 STC_API void \
@@ -115,11 +117,11 @@ cvec_##tag##_make(size_t size, Value null) { \
     return vec; \
 } \
 STC_API CVec_##tag \
-cvec_##tag##_from(Value array[], int size) { \
+cvec_##tag##_from(const Value in[], size_t size) { \
     CVec_##tag vec = cvec_init; \
     cvec_##tag##_reserve(&vec, size); \
     _cvec_size(vec) = size; \
-    for (size_t i=0; i<size; ++i) vec.data[i] = array[i]; \
+    for (size_t i=0; i<size; ++i) vec.data[i] = in[i]; \
     return vec; \
 } \
  \

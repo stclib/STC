@@ -91,6 +91,8 @@
  \
     declare_CListTypes(tag, Value); \
  \
+    STC_API CList_##tag \
+    clist_##tag##_from(const Value in[], size_t size); \
     STC_API void \
     clist_##tag##_destroy(CList_##tag* self); \
     STC_API void \
@@ -139,6 +141,13 @@
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define implement_CList_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
+ \
+    STC_API CList_##tag \
+    clist_##tag##_from(const Value in[], size_t size) { \
+        CList_##tag lst = clist_init; \
+        for (size_t i=0; i<size; ++i) clist_##tag##_pushBack(&lst, in[i]); \
+        return lst; \
+    } \
  \
     STC_API void \
     clist_##tag##_destroy(CList_##tag* self) { \

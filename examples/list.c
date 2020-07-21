@@ -5,7 +5,10 @@
 declare_CList(ix, uint64_t);
 
 int main() {
-    CList_ix list = clist_init;
+    CList_ix list = clist_ix_from((uint64_t[]) {10, 20, 30, 40}, 4);
+    c_foreach (i, clist_ix, list) printf("%zu ", i.item->value);
+    puts("");
+
     pcg32_random_t pcg = pcg32_seed(time(NULL), 0);
     int n;
     for (int i=0; i<10000000; ++i) // ten million
