@@ -195,7 +195,7 @@ int main() {
     printf("append: %s\n", s1.str);
     cstr_destroy(&s1);
 
-    CStr s2 = cstr_makeFmt("Index %d: %f", 123, 4.56);
+    CStr s2 = cstr_from("Index %d: %f", 123, 4.56);
     cstr_destroy(&s2);
 }
 ```

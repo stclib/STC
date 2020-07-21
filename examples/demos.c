@@ -19,7 +19,7 @@ void stringdemo1()
 
     cstr_replace(&cs, 0, "seven", "four");
     printf("%s.\n", cs.str);
-    cstr_take(&cs, cstr_makeFmt("%s *** %s", cs.str, cs.str));
+    cstr_take(&cs, cstr_from("%s *** %s", cs.str, cs.str));
     printf("%s.\n", cs.str);
 
     printf("find: %s\n", cs.str + cstr_find(cs, 0, "four"));

@@ -111,7 +111,7 @@ cstr_makeCopy(CStr s) {
 }
 
 static inline CStr
-cstr_makeFmt(const char* fmt, ...) {
+cstr_from(const char* fmt, ...) {
     CStr tmp = cstr_init;
     int len;
     va_list args;
