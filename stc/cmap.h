@@ -72,10 +72,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
     declare_CMap_4(tag, Key, Value, c_defaultDestroy)
 
 #define declare_CMap_4(tag, Key, Value, valueDestroy) \
-    declare_CMap_5(tag, Key, Value, valueDestroy, c_defaultEquals)
-
-#define declare_CMap_5(tag, Key, Value, valueDestroy, keyEquals) \
-    declare_CMap_6(tag, Key, Value, valueDestroy, keyEquals, c_defaultHash)
+    declare_CMap_6(tag, Key, Value, valueDestroy, c_defaultEquals, c_defaultHash)
 
 #define declare_CMap_6(tag, Key, Value, valueDestroy, keyEquals, keyHash) \
     declare_CMap_10(tag, Key, Value, valueDestroy, keyEquals, keyHash, \
@@ -91,10 +88,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
     c_MACRO_OVERLOAD(declare_CSet, __VA_ARGS__)
 
 #define declare_CSet_2(tag, Key) \
-    declare_CSet_3(tag, Key, c_defaultEquals)
-
-#define declare_CSet_3(tag, Key, keyEquals) \
-    declare_CSet_4(tag, Key, keyEquals, c_defaultHash)
+    declare_CSet_4(tag, Key, c_defaultEquals, c_defaultHash)
 
 #define declare_CSet_4(tag, Key, keyEquals, keyHash) \
     declare_CSet_5(tag, Key, keyEquals, keyHash, c_defaultDestroy)
