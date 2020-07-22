@@ -9,11 +9,12 @@ declare_CMap_str(si, int);
 
 int main(void) {
     int year = 2020;
-    CMap_ms ms = cmap_ms_from((CMapInput_ms[]) {
+    CMapInput_ms ini[] = {
         100, cstr_make("Hello"),
         110, cstr_make("World"),
         120, cstr_from("Howdy, -%d-", year),
-    }, 3);
+    };
+    CMap_ms ms = cmap_ms_from(ini, 3);
 
     c_foreach (i, cmap_ms, ms)
         printf("%d: %s\n", i.item->key, i.item->value.str);

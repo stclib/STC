@@ -50,6 +50,7 @@ int main(void) {
 #define CMAP__H__
 
 #include <stdlib.h>
+#include <string.h>
 #include "cdefs.h"
 
 #define cmap_init                     {NULL, NULL, 0, 0, 0.85f, 0.15f}
@@ -137,7 +138,7 @@ ctype##entry_##tag##_destroy(CType##Entry_##tag* e) { \
     keyDestroy(&e->key); \
     OPT_1_##ctype(valueDestroy(&e->value);) \
 } \
-typedef struct { \
+typedef const struct { \
     RawKey key; \
     OPT_1_##ctype(Value value;) \
 } CType##Input_##tag; \
@@ -165,8 +166,10 @@ STC_API void \
 ctype##_##tag##_destroy(CType##_##tag* self); \
 STC_API void \
 ctype##_##tag##_clear(CType##_##tag* self); \
-STC_API void \
-ctype##_##tag##_setLoadFactors(CType##_##tag* self, float maxLoadFactor, float shrinkLimitFactor); \
+STC_INLINE void \
+ctype##_##tag##_setLoadFactors(CType##_##tag* self, float max, float shrink) { \
+    self->maxLoadFactor = max; self->shrinkLimitFactor = shrink; \
+} \
 STC_API CType##Entry_##tag* \
 ctype##_##tag##_find(const CType##_##tag* self, CType##RawKey_##tag rawKey); \
 STC_API CType##Entry_##tag* /* similar to c++ std::map.insert_or_assign(): */ \
@@ -210,27 +213,23 @@ ctype##_##tag##_from(const CType##Input_##tag in[], size_t size) { \
     return hh; \
 } \
  \
-STC_API void \
-ctype##_##tag##_destroy(CType##_##tag* self) { \
-    if (self->size) { \
-        size_t cap = self->buckets; \
-        CType##Entry_##tag* e = self->table, *end = e + cap; \
-        uint8_t *hashx = self->_hashx; \
-        for (; e != end; ++e) if (*hashx++) ctype##entry_##tag##_destroy(e); \
-    } \
+STC_INLINE void ctype##_##tag##_wipe_(CType##_##tag* self) { \
+    if (self->size == 0) return; \
+    CType##Entry_##tag* e = self->table, *end = e + self->buckets; \
+    uint8_t *hx = self->_hashx; \
+    for (; e != end; ++e) if (*hx++) ctype##entry_##tag##_destroy(e); \
+} \
+ \
+STC_API void ctype##_##tag##_destroy(CType##_##tag* self) { \
+    ctype##_##tag##_wipe_(self); \
     free(self->_hashx); \
     free(self->table); \
 } \
  \
 STC_API void ctype##_##tag##_clear(CType##_##tag* self) { \
-    ctype##_##tag##_destroy(self); \
-    self->buckets = self->size = 0; \
-} \
- \
-STC_API void \
-ctype##_##tag##_setLoadFactors(CType##_##tag* self, float maxLoadFactor, float shrinkLimitFactor) { \
-    self->maxLoadFactor = maxLoadFactor; \
-    self->shrinkLimitFactor = shrinkLimitFactor; \
+    ctype##_##tag##_wipe_(self); \
+    self->size = 0; \
+    memset(self->_hashx, 0, self->buckets); \
 } \
  \
 STC_API size_t \

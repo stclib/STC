@@ -38,7 +38,7 @@ sfc64_random_t rng;
 #define CMAP_FIND(tag, key)         (cmap_##tag##_find(map, key) != NULL)
 #define CMAP_SIZE(tag)              cmap_size(map)
 #define CMAP_BUCKETS(tag)           cmap_bucketCount(map)
-#define CMAP_CLEAR(tag)             cmap_##tag##_destroy(&map)
+#define CMAP_CLEAR(tag)             cmap_##tag##_clear(&map)
 
 #define KMAP_SETUP(tag, Key, Value) khash_t(ii)* map = kh_init(ii); khiter_t ki; int ret
 #define KMAP_PUT(tag, key, val)     (*(ki = kh_put(ii, map, key, &ret), map->vals[ki] = val, &map->vals[ki]))

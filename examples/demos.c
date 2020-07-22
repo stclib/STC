@@ -160,6 +160,8 @@ void mapdemo3()
     cmap_ss_put(&table, "Make", cstr_make("my"));
     cmap_ss_put(&table, "Sunny", cstr_make("day"));
     CMapEntry_ss *e = cmap_ss_find(&table, "Make");
+    c_foreach (i, cmap_ss, table)
+        printf("entry: %s: %s\n", i.item->key.str, i.item->value.str);
     printf("size %zu: remove: Make: %s\n", cmap_size(table), e->value.str);
     cmap_ss_erase(&table, "Make");
     //cmap_ss_eraseEntry(&table, e);
