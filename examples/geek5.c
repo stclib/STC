@@ -32,7 +32,7 @@ int NumOccurrences(const char* arr[], int n, const char* str, int L, int R)
     CMap_sv M = cmap_init; 
     for (int i = 0; i < n; i++) { 
         const char* temp = arr[i]; 
-        CMapEntry_sv* it = cmap_sv_get(&M, temp); 
+        CMapEntry_sv* it = cmap_sv_find(&M, temp); 
   
         // If current string doesn't 
         // have an entry in the map 
@@ -47,7 +47,7 @@ int NumOccurrences(const char* arr[], int n, const char* str, int L, int R)
         } 
     } 
   
-    CMapEntry_sv* it = cmap_sv_get(&M, str);
+    CMapEntry_sv* it = cmap_sv_find(&M, str);
 
     // If the given string is not 
     // present in the array 

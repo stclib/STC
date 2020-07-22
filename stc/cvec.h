@@ -66,10 +66,12 @@ cvec_##tag##_popBack(CVec_##tag* self) { \
     valueDestroy(&self->data[_cvec_size(*self) - 1]); \
     --_cvec_size(*self); \
 } \
-STC_INLINE Value \
-cvec_##tag##_back(CVec_##tag cv) { \
-    return cv.data[_cvec_size(cv) - 1]; \
-} \
+STC_INLINE Value* \
+cvec_##tag##_front(CVec_##tag* self) {return self->data;} \
+STC_INLINE Value* \
+cvec_##tag##_back(CVec_##tag* self) {return self->data + _cvec_size(*self) - 1;} \
+STC_INLINE Value* \
+cvec_##tag##_at(CVec_##tag* self, size_t i) {return self->data + i;} \
 STC_API void \
 cvec_##tag##_insert(CVec_##tag* self, size_t pos, Value value); \
 STC_API void \
@@ -77,7 +79,7 @@ cvec_##tag##_erase(CVec_##tag* self, size_t pos, size_t size); \
 STC_API void \
 cvec_##tag##_sort(CVec_##tag* self); \
 STC_API size_t \
-cvec_##tag##_find(CVec_##tag cv, RawValue rawValue); \
+cvec_##tag##_find(const CVec_##tag* self, RawValue rawValue); \
 STC_INLINE void \
 cvec_##tag##_swap(CVec_##tag* a, CVec_##tag* b) { \
     c_swap(Value*, a->data, b->data); \
@@ -182,13 +184,13 @@ cvec_##tag##_erase(CVec_##tag* self, size_t pos, size_t size) { \
 } \
  \
 STC_API size_t \
-cvec_##tag##_find(CVec_##tag cv, RawValue rawValue) { \
-    size_t n = cvec_size(cv); \
-    for (size_t i = 0; i < n; ++i) { \
-        RawValue r = valueGetRaw(&cv.data[i]); \
-        if (valueCompareRaw(&r, &rawValue) == 0) return i; \
+cvec_##tag##_find(const CVec_##tag* self, RawValue rawValue) { \
+    const Value *p = self->data, *end = p + cvec_size(*self); \
+    for (; p != end; ++p) { \
+        RawValue r = valueGetRaw(p); \
+        if (valueCompareRaw(&r, &rawValue) == 0) return p - self->data; \
     } \
-    return (size_t) (-1); /*SIZE_MAX;*/ \
+    return SIZE_MAX; /*(size_t) (-1)*/ \
 } \
  \
 STC_API int \

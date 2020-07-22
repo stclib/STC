@@ -64,10 +64,12 @@
 
 #define c_defaultInitRaw(x)    (x)
 #define c_defaultGetRaw(ptr)   (*(ptr))
-#define c_defaultCompare(x, y) (*(x) < *(y) ? -1 : *(y) < *(x))
 #define c_noCompare(x, y)      (0)
-#define c_defaultEquals(x, y)  (*(x) == *(y))
 #define c_memEquals(x, y)      (memcmp(x, y, sizeof(*(y))) == 0)
+#define c_defaultEquals(x, y)  (*(x) == *(y))
+#define c_defaultLess(x, y)    (*(x) < *(y))
+#define c_compare(less, x, y)  (less(x, y) ? -1 : less(y, x))
+#define c_defaultCompare(x, y) c_compare(c_defaultLess, x, y)
 #define c_defaultDestroy(p)    ((void)0)
 
 #define c_foreach(it, prefix, container) \

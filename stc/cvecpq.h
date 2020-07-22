@@ -84,9 +84,10 @@ _cvec_##tag##_siftDown(CVecValue_##tag* arr, size_t i, size_t n) { \
  \
 STC_API void \
 cvec_##tag##_eraseFromPriorityQ(CVec_##tag* self, size_t i) { \
-    self->data[i] = cvec_##tag##_back(*self); \
+    size_t n = cvec_size(*self) - 1; \
+    self->data[i] = self->data[n]; \
     cvec_##tag##_popBack(self); \
-    _cvec_##tag##_siftDown(self->data - 1, i + 1, cvec_size(*self)); \
+    _cvec_##tag##_siftDown(self->data - 1, i + 1, n); \
 } \
  \
 STC_API void \

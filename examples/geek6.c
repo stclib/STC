@@ -52,7 +52,7 @@ int missingNumber(int a[], int n)
     // Return the first value starting 
     // from 1 which does not exists in map 
     while (1) { 
-        if (cset_i_get(&mp, index) == NULL) {
+        if (cset_i_find(&mp, index) == NULL) {
             return index; 
         } 
   

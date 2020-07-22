@@ -39,7 +39,7 @@ int main()
     // Check for a specific one.
     // When collections store owned values (String), they can still be
     // queried using references (&str).
-    if (! cmap_ss_get(&book_reviews, "Les Misérables")) {
+    if (! cmap_ss_find(&book_reviews, "Les Misérables")) {
         printf("We've got %zu reviews, but Les Misérables ain't one.\n",
                book_reviews.size);
     }
@@ -50,13 +50,13 @@ int main()
     // Look up the values associated with some keys.
     const char* to_find[] = {"Pride and Prejudice", "Alice's Adventure in Wonderland", NULL};
     for (const char** book = to_find; *book; ++book) {
-        CMapEntry_ss* review = cmap_ss_get(&book_reviews, *book);
+        CMapEntry_ss* review = cmap_ss_find(&book_reviews, *book);
         if (review) printf("%s: %s\n", *book, review->value.str);
         else        printf("%s is unreviewed.\n", *book);
     }
 
     // Look up the value for a key (will panic if the key is not found).
-    printf("Review for Jane: %s\n", cmap_ss_get(&book_reviews, "Pride and Prejudice")->value.str);
+    printf("Review for Jane: %s\n", cmap_ss_find(&book_reviews, "Pride and Prejudice")->value.str);
 
     // Iterate over everything.
     c_foreach (i, cmap_ss, book_reviews) {

@@ -48,7 +48,7 @@ void findElementsAfterDel(int arr[], int m, int del[],
     for (int i = 0; i < m; ++i) { 
   
         // Search if the element is present 
-        CMapEntry_ii *e = cmap_ii_get(&mp, arr[i]);
+        CMapEntry_ii *e = cmap_ii_find(&mp, arr[i]);
         if (e != NULL) { 
   
             // Decrement its frequency 

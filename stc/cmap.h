@@ -38,8 +38,8 @@ int main(void) {
     cmap_mx_put(&m, 5, 'a');
     cmap_mx_put(&m, 8, 'b');
     cmap_mx_put(&m, 12, 'c');
-    CMapEntry_mx *e = cmap_mx_get(&m, 10); // = NULL
-    char val = cmap_mx_get(&m, 5)->value;
+    CMapEntry_mx *e = cmap_mx_find(&m, 10); // = NULL
+    char val = cmap_mx_find(&m, 5)->value;
     cmap_mx_put(&m, 5, 'd'); // update
     cmap_mx_erase(&m, 8);
     c_foreach (i, cmap_mx, m) printf("map %d: %c\n", i.item->key, i.item->value);
@@ -168,10 +168,10 @@ ctype##_##tag##_clear(CType##_##tag* self); \
 STC_API void \
 ctype##_##tag##_setLoadFactors(CType##_##tag* self, float maxLoadFactor, float shrinkLimitFactor); \
 STC_API CType##Entry_##tag* \
-ctype##_##tag##_get(const CType##_##tag* self, CType##RawKey_##tag rawKey); \
-STC_API CType##Entry_##tag* \
+ctype##_##tag##_find(const CType##_##tag* self, CType##RawKey_##tag rawKey); \
+STC_API CType##Entry_##tag* /* similar to c++ std::map.insert_or_assign(): */ \
 ctype##_##tag##_put(CType##_##tag* self, OPT_2_##ctype(CType##RawKey_##tag rawKey, Value value)); \
-OPT_1_##ctype(STC_API CType##Entry_##tag* \
+OPT_1_##ctype(STC_API CType##Entry_##tag* /* similar to c++ std::map.operator[](): */ \
 ctype##_##tag##_at(CType##_##tag* self, CType##RawKey_##tag rawKey, Value initValue);) \
 STC_INLINE void \
 ctype##_##tag##_swap(CType##_##tag* a, CType##_##tag* b) { c_swap(CType##_##tag, *a, *b); } \
@@ -252,7 +252,7 @@ ctype##_##tag##_bucket(const CType##_##tag* self, const CType##RawKey_##tag* raw
 } \
  \
 STC_API CType##Entry_##tag* \
-ctype##_##tag##_get(const CType##_##tag* self, CType##RawKey_##tag rawKey) { \
+ctype##_##tag##_find(const CType##_##tag* self, CType##RawKey_##tag rawKey) { \
     if (self->size == 0) return NULL; \
     uint32_t hx; \
     size_t idx = ctype##_##tag##_bucket(self, &rawKey, &hx); \

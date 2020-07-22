@@ -38,7 +38,7 @@ int findMaximumPairs(int a[], int n, int k)
             int first = it.item->key;
             int second = k - it.item->key; 
 
-            CMapEntry_ii *hf = cmap_ii_get(&hash, first),
+            CMapEntry_ii *hf = cmap_ii_find(&hash, first),
                          *hs = cmap_ii_at(&hash, second, 0);
             // Check for minimal occurrence 
             if (hf->value < hs->value) { 

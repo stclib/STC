@@ -43,8 +43,8 @@ int main ()
     cmap_ss_put(&u, "WHITE", cstr_make("#FFFFFF"));
  
     // Output values by key
-    printf("The HEX of color RED is:[%s]\n", cmap_ss_get(&u, "RED")->value.str);
-    printf("The HEX of color BLACK is:[%s]\n", cmap_ss_get(&u, "BLACK")->value.str);
+    printf("The HEX of color RED is:[%s]\n", cmap_ss_find(&u, "RED")->value.str);
+    printf("The HEX of color BLACK is:[%s]\n", cmap_ss_find(&u, "BLACK")->value.str);
     cmap_ss_destroy(&u);
     return 0;
 }

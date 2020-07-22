@@ -35,7 +35,7 @@ sfc64_random_t rng;
                                     /* ; cmap_##tag##_setLoadFactors(&map, maxLoadFactor, 0.0)*/
 #define CMAP_PUT(tag, key, val)     cmap_##tag##_put(&map, key, val)->value
 #define CMAP_ERASE(tag, key)        cmap_##tag##_erase(&map, key)
-#define CMAP_FIND(tag, key)         (cmap_##tag##_get(map, key) != NULL)
+#define CMAP_FIND(tag, key)         (cmap_##tag##_find(map, key) != NULL)
 #define CMAP_SIZE(tag)              cmap_size(map)
 #define CMAP_BUCKETS(tag)           cmap_bucketCount(map)
 #define CMAP_CLEAR(tag)             cmap_##tag##_destroy(&map)

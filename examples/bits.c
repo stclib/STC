@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "cbitvec.h"
+#include <stc/cbitvec.h>
 
 int main() {
     CBitVec vec = cbitvec_make(23, true);

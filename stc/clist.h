@@ -118,16 +118,21 @@
     STC_API void \
     clist_##tag##_sort(CList_##tag* self); \
  \
-    static inline clist_##tag##_iter_t \
+    STC_INLINE Value* \
+    clist_##tag##_front(CList_##tag* self) {return &self->last->next->value;} \
+    STC_INLINE Value* \
+    clist_##tag##_back(CList_##tag* self) {return &self->last->value;} \
+ \
+    STC_INLINE clist_##tag##_iter_t \
     clist_##tag##_begin(CList_##tag* self) { \
         CListNode_##tag *head = self->last ? self->last->next : NULL; \
         clist_##tag##_iter_t it = {head, &self->last}; return it; \
     } \
-    static inline clist_##tag##_iter_t \
+    STC_INLINE clist_##tag##_iter_t \
     clist_##tag##_next(clist_##tag##_iter_t it) { \
         it.item = it.item == *it._last ? NULL : it.item->next; return it; \
     } \
-    static inline clist_##tag##_iter_t \
+    STC_INLINE clist_##tag##_iter_t \
     clist_##tag##_last(CList_##tag* self) { \
         clist_##tag##_iter_t it = {self->last, &self->last}; return it; \
     } \
