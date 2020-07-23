@@ -1,56 +1,75 @@
 #include <stdio.h>
-#include <stc/cmap.h>
 #include <stc/cstr.h>
+#include <stc/cmap.h>
+#include <stc/cvec.h>
+#include <stc/clist.h>
 
-declare_CSet(sx, int);       // Set of int
-declare_CMap(mx, int, char); // Map of int -> char
-declare_CMap(ms, int, CStr, cstr_destroy); // Map of int -> CStr
-declare_CMap_str(si, int);
+declare_CMap(id, int, CStr, cstr_destroy); // Map of int -> CStr
+declare_CMap_str(cnt, int);
+
+typedef struct {int x, y;} ipair_t;
+declare_CVec(ip, ipair_t, c_defaultDestroy, c_memCompare);
+declare_CList(ip, ipair_t, c_defaultDestroy, c_memCompare);
+
 
 int main(void) {
     int year = 2020;
-    CMapInput_ms ini[] = {
-        100, cstr_make("Hello"),
-        110, cstr_make("World"),
-        120, cstr_from("Howdy, -%d-", year),
-    };
-    CMap_ms ms = cmap_ms_from(ini, 3);
+    CMap_id idnames = cmap_init;
+    c_push(&idnames, cmap_id, c_items(
+        {100, cstr_make("Hello")},
+        {110, cstr_make("World")},
+        {120, cstr_from("Howdy, -%d-", year)},
+    ));
 
-    c_foreach (i, cmap_ms, ms)
+    c_foreach (i, cmap_id, idnames)
         printf("%d: %s\n", i.item->key, i.item->value.str);
-    cmap_ms_destroy(&ms);
+    cmap_id_destroy(&idnames);
+    
     // ------------------
+    CMap_cnt countries = cmap_init;
 
-    CMap_si si = cmap_si_from((CMapInput_si[]) {
-        "Norway", 100,
-        "Denmark", 50,
-        "Iceland", 10
-    }, 3);
+    cmap_cnt_at(&countries, "Greenland", 0)->value += 20;
+    c_push(&countries, cmap_cnt, c_items(
+        {"Norway", 100},
+        {"Denmark", 50},
+        {"Iceland", 10},
+    ));
 
-    cmap_si_at(&si, "Sweden", 0)->value += 20;
-    cmap_si_at(&si, "Norway", 0)->value += 20;
-    cmap_si_at(&si, "Finland", 0)->value += 20;
+    cmap_cnt_at(&countries, "Sweden", 0)->value += 20;
+    cmap_cnt_at(&countries, "Norway", 0)->value += 20;
+    cmap_cnt_at(&countries, "Finland", 0)->value += 20;
 
-    c_foreach (i, cmap_si, si)
+    c_foreach (i, cmap_cnt, countries)
         printf("%s: %d\n", i.item->key.str, i.item->value);
-    cmap_si_destroy(&si);
+    cmap_cnt_destroy(&countries);
+    
     // ------------------
 
-    CSet_sx s = cset_init;
-    cset_sx_put(&s, 5);
-    cset_sx_put(&s, 8);
-    c_foreach (i, cset_sx, s) printf("set %d\n", i.item->key);
-    cset_sx_destroy(&s);
+    CVec_ip pairs1 = cvec_init; 
+    c_push(&pairs1, cvec_ip, c_items(
+        {1, 2},
+        {3, 4},
+        {5, 6},
+        {7, 8},
+    ));
+
+    c_foreach (i, cvec_ip, pairs1)
+        printf("(%d %d) ", i.item->x, i.item->y);
+    puts("");
+    cvec_ip_destroy(&pairs1);
+    
     // ------------------
 
-    CMap_mx m = cmap_mx_from((CMapInput_mx[]) {
-        {5, 'a'}, {8, 'b'}, {12, 'c'}
-    }, 3);
+    CList_ip pairs2 = clist_init;
+    c_push(&pairs2, clist_ip, c_items(
+        {1, 2},
+        {3, 4},
+        {5, 6},
+        {7, 8},
+    ));
 
-    CMapEntry_mx* e = cmap_mx_find(&m, 10); // = NULL
-    char val = cmap_mx_find(&m, 5)->value;
-    cmap_mx_put(&m, 5, 'd'); // update
-    cmap_mx_erase(&m, 8);
-    c_foreach (i, cmap_mx, m) printf("map %d: %c\n", i.item->key, i.item->value);
-    cmap_mx_destroy(&m);
+    c_foreach (i, clist_ip, pairs2)
+        printf("(%d %d) ", i.item->value.x, i.item->value.y);
+    puts("");
+    clist_ip_destroy(&pairs2);
 }

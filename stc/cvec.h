@@ -51,8 +51,8 @@ typedef struct CVec_##tag { \
  \
 STC_API CVec_##tag \
 cvec_##tag##_make(size_t size, Value null); \
-STC_API CVec_##tag \
-cvec_##tag##_from(const Value in[], size_t size); \
+STC_API void \
+cvec_##tag##_pushN(CVec_##tag *self, const Value in[], size_t size); \
 STC_API void \
 cvec_##tag##_destroy(CVec_##tag* self); \
 STC_API void \
@@ -102,7 +102,7 @@ cvec_##tag##_next(cvec_##tag##_iter_t it) { \
 } \
  \
 implement_CVec_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
-typedef Value CVecValue_##tag; \
+typedef Value CVecValue_##tag, cvec_##tag##_input_t; \
 typedef RawValue CVecRawValue_##tag
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
@@ -118,13 +118,11 @@ cvec_##tag##_make(size_t size, Value null) { \
     for (size_t i=0; i<size; ++i) vec.data[i] = null; \
     return vec; \
 } \
-STC_API CVec_##tag \
-cvec_##tag##_from(const Value in[], size_t size) { \
-    CVec_##tag vec = cvec_init; \
-    cvec_##tag##_reserve(&vec, size); \
-    _cvec_size(vec) = size; \
-    for (size_t i=0; i<size; ++i) vec.data[i] = in[i]; \
-    return vec; \
+STC_API void \
+cvec_##tag##_pushN(CVec_##tag *self, const Value in[], size_t size) { \
+    cvec_##tag##_reserve(self, cvec_size(*self) + size); \
+    _cvec_size(*self) += size; \
+    for (size_t i=0; i<size; ++i) self->data[i] = in[i]; \
 } \
  \
 STC_API void \

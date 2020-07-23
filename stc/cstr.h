@@ -113,10 +113,9 @@ cstr_makeCopy(CStr s) {
 static inline CStr
 cstr_from(const char* fmt, ...) {
     CStr tmp = cstr_init;
-    int len;
     va_list args;
     va_start(args, fmt);
-    len = vsnprintf(NULL, (size_t)0, fmt, args);
+    int len = vsnprintf(NULL, (size_t)0, fmt, args);
     if (len > 0) {
         tmp = cstr_makeReserved(len);
         vsprintf(tmp.str, fmt, args);

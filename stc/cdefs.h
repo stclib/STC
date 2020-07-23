@@ -66,6 +66,7 @@
 #define c_defaultGetRaw(ptr)   (*(ptr))
 #define c_noCompare(x, y)      (0)
 #define c_memEquals(x, y)      (memcmp(x, y, sizeof(*(y))) == 0)
+#define c_memCompare(x, y)     memcmp(x, y, sizeof(*(y)))
 #define c_defaultEquals(x, y)  (*(x) == *(y))
 #define c_defaultLess(x, y)    (*(x) < *(y))
 #define c_compare(less, x, y)  (less(x, y) ? -1 : less(y, x))
@@ -74,6 +75,11 @@
 
 #define c_foreach(it, prefix, container) \
             for (prefix##_iter_t it = prefix##_begin(&container); it.item; it = prefix##_next(it))
+#define c_items(...) {__VA_ARGS__}
+#define c_push(container, prefix, list) do { \
+    const prefix##_input_t __arr[] = list; \
+    prefix##_pushN(container, __arr, sizeof(__arr)/sizeof(prefix##_input_t)); \
+} while (0)
 
 /* One-byte-at-a-time hash based on Murmur's mix */
 static inline uint32_t  c_defaultHash(const void *data, size_t len) {

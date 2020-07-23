@@ -131,19 +131,19 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
 typedef struct { \
     Key key; \
     OPT_1_##ctype(Value value;) \
-} CType##Entry_##tag; \
+} CType##Entry_##tag, ctype##_##tag##_entry_t; \
  \
 STC_INLINE void \
 ctype##entry_##tag##_destroy(CType##Entry_##tag* e) { \
     keyDestroy(&e->key); \
     OPT_1_##ctype(valueDestroy(&e->value);) \
 } \
-typedef const struct { \
+typedef struct { \
     RawKey key; \
     OPT_1_##ctype(Value value;) \
-} CType##Input_##tag; \
+} CType##Input_##tag, ctype##_##tag##_input_t; \
  \
-typedef RawKey CType##RawKey_##tag; \
+typedef RawKey CType##RawKey_##tag, ctype##_##tag##_rawkey_t; \
  \
 typedef struct { \
     CType##Entry_##tag* table; \
@@ -160,8 +160,8 @@ typedef struct { \
  \
 STC_API CType##_##tag \
 ctype##_##tag##_make(size_t initialSize); \
-STC_API CType##_##tag \
-ctype##_##tag##_from(const CType##Input_##tag in[], size_t size); \
+STC_API void \
+ctype##_##tag##_pushN(CType##_##tag* self, const CType##Input_##tag in[], size_t size); \
 STC_API void \
 ctype##_##tag##_destroy(CType##_##tag* self); \
 STC_API void \
@@ -191,8 +191,8 @@ ctype##_##tag##_next(ctype##_##tag##_iter_t it); \
  \
 implement_CHASH(tag, CType, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                      keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
-typedef Key CType##Key_##tag; \
-typedef Value CType##Value_##tag
+typedef Key CType##Key_##tag, ctype##_##tag##_key_t; \
+typedef Value CType##Value_##tag, ctype##_##tag##_value_t
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
@@ -206,11 +206,9 @@ ctype##_##tag##_make(size_t initialSize) { \
     ctype##_##tag##_reserve(&h, initialSize); \
     return h; \
 } \
-STC_API CType##_##tag \
-ctype##_##tag##_from(const CType##Input_##tag in[], size_t size) { \
-    CType##_##tag hh = ctype##_init; \
-    for (size_t i=0; i<size; ++i) ctype##_##tag##_put(&hh, OPT_2_##ctype(in[i].key, in[i].value)); \
-    return hh; \
+STC_API void \
+ctype##_##tag##_pushN(CType##_##tag* self, const CType##Input_##tag in[], size_t size) { \
+    for (size_t i=0; i<size; ++i) ctype##_##tag##_put(self, OPT_2_##ctype(in[i].key, in[i].value)); \
 } \
  \
 STC_INLINE void ctype##_##tag##_wipe_(CType##_##tag* self) { \
