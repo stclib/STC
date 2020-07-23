@@ -63,17 +63,12 @@ declare_CMap(vk, Viking, int, c_defaultDestroy, vikingvw_equals, vikingvw_hash,
 
 int main()
 {
-/*
     CMap_vk vikings = cmap_init;
-    cmap_vk_put(&vikings, (VikingVw) {"Einar", "Norway"}, 20);
-    cmap_vk_put(&vikings, (VikingVw) {"Olaf", "Denmark"}, 24);
-    cmap_vk_put(&vikings, (VikingVw) {"Harald", "Iceland"}, 12);
-*/
-    CMap_vk vikings = cmap_vk_from(	(CMapInput_vk[]) {
+    c_push(&vikings, cmap_vk, c_items(
         {{"Einar", "Norway"}, 20},
         {{"Olaf", "Denmark"}, 24},
-        {{"Harald", "Iceland"}, 12}
-    }, 3);
+        {{"Harald", "Iceland"}, 12},
+    ));
 
     CMapEntry_vk* e = cmap_vk_find(&vikings, (VikingVw) {"Einar", "Norway"});
     e->value += 5; // update 

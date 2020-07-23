@@ -27,10 +27,12 @@
 #include "cdefs.h"
 #include <string.h>
 
-typedef struct {uint64_t state;  uint64_t inc;} pcg32_random_t;
+/* 
+ * PCG32 random number generator: https://www.pcg-random.org/index.html
+ */
+typedef struct {uint64_t state;  uint64_t inc;} crandom32_t;
 
-/* 32 bit random number generator */
-STC_INLINE uint32_t pcg32_random(pcg32_random_t* rng)
+STC_INLINE uint32_t crandom32(crandom32_t* rng)
 {
     uint64_t old = rng->state;
     rng->state = old * 6364136223846793005ull + rng->inc;
@@ -39,39 +41,41 @@ STC_INLINE uint32_t pcg32_random(pcg32_random_t* rng)
     return (xos >> rot) | (xos << ((-rot) & 31));
 }
 
-/* float random int number in range [0, 1). NB: 23 bit resolution. */
-STC_INLINE float pcg32_randomFloat(pcg32_random_t* rng) {
-    union {uint32_t i; float f;} u = {0x3F800000u | (pcg32_random(rng) >> 9)};
+/* float random int number in range [0, 1). Note: 23 bit resolution. */
+STC_INLINE float crandom32f(crandom32_t* rng) {
+    union {uint32_t i; float f;} u = {0x3F800000u | (crandom32(rng) >> 9)};
     return u.f - 1.0f;
 }
 
 /* Uniform random number in range [0, bound) */
-STC_INLINE uint32_t pcg32_randomBounded(pcg32_random_t* rng, uint32_t bound) {
-    return (uint32_t) (((uint64_t) pcg32_random(rng) * bound) >> 32);
+STC_INLINE uint32_t crandom32b(crandom32_t* rng, uint32_t bound) {
+    return (uint32_t) (((uint64_t) crandom32(rng) * bound) >> 32);
 }
 
-STC_INLINE pcg32_random_t pcg32_seed(uint64_t seed, uint64_t seq) {
-    pcg32_random_t rng = {0u, (seq << 1u) | 1u}; /* inc must be odd */
-    pcg32_random(&rng);
+STC_INLINE crandom32_t crandom32_init2(uint64_t seed, uint64_t seq) {
+    crandom32_t rng = {0u, (seq << 1u) | 1u}; /* inc must be odd */
+    crandom32(&rng);
     rng.state += seed;
-    pcg32_random(&rng);
+    crandom32(&rng);
     return rng;
 }
 
-/* 
- * Rotate bits left
- */
+STC_INLINE crandom32_t crandom32_init(uint64_t seed) {
+    return crandom32_init2(seed, seed);
+}
+
+
+/* Rotate bits left */
 STC_INLINE uint64_t c_rotateLeft64(uint64_t x, int bits) {
     return (x << bits) | (x >> (64 - bits));
 }
 
 /*
- * sfc64: http://pracrand.sourceforge.net
+ * SFC64 random number generator: http://pracrand.sourceforge.net
  */
-typedef struct {uint64_t state[4];} sfc64_random_t;
+typedef struct {uint64_t state[4];} crandom64_t;
 
-/* 64 bit random number generator */
-STC_API uint64_t sfc64_random(sfc64_random_t* rng) {
+STC_API uint64_t crandom64(crandom64_t* rng) {
     enum {LR=24, RS=11, LS=3};
     uint64_t *s = rng->state;
     const uint64_t result = s[0] + s[1] + s[3]++;
@@ -81,15 +85,15 @@ STC_API uint64_t sfc64_random(sfc64_random_t* rng) {
     return result;
 }
 
-/* double random int number in range [0, 1). */
-STC_INLINE double sfc64_randomFloat(sfc64_random_t* rng) {
-    union {uint64_t i; double f;} u = {0x3FF0000000000000ull | (sfc64_random(rng) >> 12)};
+/* float64 random int number in range [0, 1), 52 bit resolution */
+STC_INLINE double crandom64f(crandom64_t* rng) {
+    union {uint64_t i; double f;} u = {0x3FF0000000000000ull | (crandom64(rng) >> 12)};
     return u.f - 1.0;
 }
 
-STC_API sfc64_random_t sfc64_seed(const uint64_t seed) {
-    sfc64_random_t state = {{seed, seed, seed, 1}};
-    for (int i = 0; i < 12; ++i) sfc64_random(&state);
+STC_API crandom64_t crandom64_init(const uint64_t seed) {
+    crandom64_t state = {{seed, seed, seed, 1}};
+    for (int i = 0; i < 12; ++i) crandom64(&state);
     return state;
 }
 

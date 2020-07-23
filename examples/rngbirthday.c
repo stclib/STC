@@ -15,12 +15,12 @@ const static uint64_t mask = (1ull << 52) - 1;
 
 void repeats(void)
 {
-    sfc64_random_t rng = sfc64_seed(seed);
+    crandom64_t rng = crandom64_init(seed);
     CMap_ic m = cmap_init;
     cmap_ic_reserve(&m, N);
     clock_t now = clock();
     for (size_t i = 0; i < N; ++i) {
-        uint64_t k = sfc64_random(&rng) & mask;
+        uint64_t k = crandom64(&rng) & mask;
         int v = ++cmap_ic_at(&m, k, 0)->value;
         if (v > 1) printf("%zu: %x - %d\n", i, k, v);
     }
@@ -34,12 +34,12 @@ declare_CVec(x, uint64_t);
 
 void distribution(void)
 {
-    pcg32_random_t rng = pcg32_seed(seed, seed); // time(NULL), time(NULL));
+    crandom32_t rng = crandom32_init(seed); // time(NULL), time(NULL));
     const size_t N = 1ull << 28, M = 1ull << 9; // 1ull << 10;
     CMap_x map = cmap_x_make(M);
     clock_t now = clock();
     for (size_t i = 0; i < N; ++i) {
-        ++cmap_x_at(&map, pcg32_randomBounded(&rng, M), 0)->value;
+        ++cmap_x_at(&map, crandom32b(&rng, M), 0)->value;
     }
     float diff = (float) (clock() - now) / CLOCKS_PER_SEC;
 

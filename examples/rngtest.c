@@ -14,26 +14,26 @@ int main(void)
     uint64_t v;
     printf("start\n");
 
-    pcg32_random_t pcg = pcg32_seed(time(NULL), 1);
+    crandom32_t pcg = crandom32_init(time(NULL));
     before = clock(); \
     v = 0;
     for (size_t i=0; i<NN; i++) {
-        v += pcg32_random(&pcg) & 0xffffffff;
+        v += crandom32(&pcg);
     }
     difference = clock() - before;
     printf("pcg32: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
 
-    sfc64_random_t sfc = sfc64_seed(time(NULL));
+    crandom64_t sfc = crandom64_init(time(NULL));
     before = clock(); \
     v = 0;
     for (size_t i=0; i<NN; i++) {
-        v += sfc64_random(&sfc) & 0xffffffff;
+        v += crandom64(&sfc) & 0xffffffff;
     }
     difference = clock() - before;
     printf("sfc64: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
 
-    for (int i=0; i<8; ++i) printf("%f ", sfc64_randomFloat(&sfc));
+    for (int i=0; i<8; ++i) printf("%f ", crandom64f(&sfc));
     puts("");
-    for (int i=0; i<8; ++i) printf("%f ", pcg32_randomFloat(&pcg));
+    for (int i=0; i<8; ++i) printf("%f ", crandom32f(&pcg));
     puts("");
 }

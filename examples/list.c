@@ -9,10 +9,10 @@ int main() {
     c_foreach (i, clist_ix, list) printf("%zu ", i.item->value);
     puts("");
 
-    pcg32_random_t pcg = pcg32_seed(time(NULL), 0);
+    crandom32_t pcg = crandom32_init(time(NULL));
     int n;
     for (int i=0; i<10000000; ++i) // ten million
-        clist_ix_pushBack(&list, pcg32_random(&pcg));
+        clist_ix_pushBack(&list, crandom32(&pcg));
     n = 100; 
     c_foreach (i, clist_ix, list)
         if (n--) printf("%8d: %10zu\n", 100 - n, i.item->value); else break;
