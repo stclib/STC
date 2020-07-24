@@ -91,14 +91,16 @@
  \
     declare_CListTypes(tag, Value); \
  \
-    STC_API void \
-    clist_##tag##_pushN(CList_##tag *self, const Value in[], size_t size); \
+    STC_INLINE CList_##tag \
+    clist_##tag##_init(void) {return clist_init;} \
     STC_API void \
     clist_##tag##_destroy(CList_##tag* self); \
     STC_API void \
     clist_##tag##_pushBack(CList_##tag* self, Value value); \
     STC_API void \
     clist_##tag##_pushFront(CList_##tag* self, Value value); \
+    STC_API void \
+    clist_##tag##_pushN(CList_##tag *self, const Value in[], size_t size); \
     STC_API void \
     clist_##tag##_popFront(CList_##tag* self); \
     STC_API void \
@@ -148,11 +150,6 @@
 #define implement_CList_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
  \
     STC_API void \
-    clist_##tag##_pushN(CList_##tag *self, const Value in[], size_t size) { \
-        for (size_t i=0; i<size; ++i) clist_##tag##_pushBack(self, in[i]); \
-    } \
- \
-    STC_API void \
     clist_##tag##_destroy(CList_##tag* self) { \
         while (self->last) \
             clist_##tag##_popFront(self); \
@@ -167,6 +164,10 @@
     clist_##tag##_pushFront(CList_##tag* self, Value value) { \
         _clist_insertAfter(self, tag, self->last, value); \
         if (!self->last) self->last = entry; \
+    } \
+    STC_API void \
+    clist_##tag##_pushN(CList_##tag *self, const Value in[], size_t size) { \
+        for (size_t i=0; i<size; ++i) clist_##tag##_pushBack(self, in[i]); \
     } \
     STC_API void \
     clist_##tag##_popFront(CList_##tag* self) { \

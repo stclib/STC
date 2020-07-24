@@ -121,17 +121,17 @@ static inline size_t _carr3_size(const size_t* zdim) {
     } \
  \
     static inline CArr1_##tag \
-    carr1_##tag##_makeFrom(size_t xdim, Value* array, bool own) { \
+    carr1_##tag##_from(size_t xdim, Value* array, bool own) { \
         CArr1_##tag a = {array, xdim | (own ? _carr_OWN : 0)}; \
         return a; \
     } \
     static inline CArr2_##tag \
-    carr2_##tag##_makeFrom(size_t ydim, size_t xdim, Value* array, bool own) { \
+    carr2_##tag##_from(size_t ydim, size_t xdim, Value* array, bool own) { \
         CArr2_##tag a = {array, xdim | (own ? _carr_OWN : 0), ydim * xdim}; \
         return a; \
     } \
     static inline CArr3_##tag \
-    carr3_##tag##_makeFrom(size_t zdim, size_t ydim, size_t xdim, Value* array, bool own) { \
+    carr3_##tag##_from(size_t zdim, size_t ydim, size_t xdim, Value* array, bool own) { \
         CArr3_##tag a = {array, xdim | (own ? _carr_OWN : 0), ydim * xdim, zdim}; \
         return a; \
     } \

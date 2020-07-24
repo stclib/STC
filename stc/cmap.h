@@ -81,7 +81,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
 
 #define declare_CMap_10(tag, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                              keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
-	declare_CHASH(tag, CMap, cmap, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
+    declare_CHASH(tag, CMap, cmap, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                        keyDestroy, RawKey, keyGetRaw, keyInitRaw)
 
 /* CSet: */
@@ -158,6 +158,8 @@ typedef struct { \
     uint8_t* _hx; \
 } CType##Iter_##tag, ctype##_##tag##_iter_t; \
  \
+STC_INLINE CType##_##tag \
+ctype##_##tag##_init(void) {return cmap_init;} \
 STC_API CType##_##tag \
 ctype##_##tag##_make(size_t initialSize); \
 STC_API void \
@@ -199,7 +201,6 @@ typedef Value CType##Value_##tag, ctype##_##tag##_value_t
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define implement_CHASH(tag, CType, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                              keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
- \
 STC_API CType##_##tag \
 ctype##_##tag##_make(size_t initialSize) { \
     CType##_##tag h = ctype##_init; \

@@ -49,6 +49,8 @@ typedef struct CVec_##tag { \
     Value* data; \
 } CVec_##tag; \
  \
+STC_INLINE CVec_##tag \
+cvec_##tag##_init(void) {return cvec_init;} \
 STC_API CVec_##tag \
 cvec_##tag##_make(size_t size, Value null); \
 STC_API void \
