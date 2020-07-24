@@ -91,10 +91,11 @@
  \
     declare_CListTypes(tag, Value); \
  \
-    STC_INLINE CList_##tag \
-    clist_##tag##_init(void) {return clist_init;} \
+    STC_VARDECL CList_##tag clist_##tag##_init; \
     STC_API void \
     clist_##tag##_destroy(CList_##tag* self); \
+    STC_INLINE void \
+    clist_##tag##_clear(CList_##tag* self) {clist_##tag##_destroy(self);} \
     STC_API void \
     clist_##tag##_pushBack(CList_##tag* self, Value value); \
     STC_API void \
@@ -148,6 +149,8 @@
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define implement_CList_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
+ \
+    STC_VARDEF CList_##tag clist_##tag##_init = clist_init; \
  \
     STC_API void \
     clist_##tag##_destroy(CList_##tag* self) { \

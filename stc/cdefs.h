@@ -38,8 +38,12 @@
 
 #if defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define STC_API extern
+#define STC_VARDECL extern
+#define STC_VARDEF
 #else
 #define STC_API STC_INLINE
+#define STC_VARDECL static
+#define STC_VARDEF static
 #endif
 
 /* Macro overloading feature support: https://rextester.com/ONP80107 */

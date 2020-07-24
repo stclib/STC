@@ -158,8 +158,7 @@ typedef struct { \
     uint8_t* _hx; \
 } CType##Iter_##tag, ctype##_##tag##_iter_t; \
  \
-STC_INLINE CType##_##tag \
-ctype##_##tag##_init(void) {return cmap_init;} \
+STC_VARDECL CType##_##tag ctype##_##tag##_init; \
 STC_API CType##_##tag \
 ctype##_##tag##_make(size_t initialSize); \
 STC_API void \
@@ -201,6 +200,9 @@ typedef Value CType##Value_##tag, ctype##_##tag##_value_t
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define implement_CHASH(tag, CType, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                              keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
+ \
+STC_VARDEF CType##_##tag ctype##_##tag##_init = cmap_init; \
+ \
 STC_API CType##_##tag \
 ctype##_##tag##_make(size_t initialSize) { \
     CType##_##tag h = ctype##_init; \
