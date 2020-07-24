@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CSTRING__H__
-#define CSTRING__H__
+#ifndef CSTR__H__
+#define CSTR__H__
 
 #include <stdlib.h> /* alloca, malloc */
 #include <malloc.h>
@@ -35,7 +35,6 @@ typedef struct CStr {
     char* str;
 } CStr;
 
-
 static size_t _cstr_nullrep[] = {0, 0, 0};
 #define       _cstr_rep(self)   (((size_t *) (self)->str) - 2)
 #define       _cstr_size(s)     ((size_t *) (s).str)[-2]
@@ -46,9 +45,163 @@ static size_t _cstr_nullrep[] = {0, 0, 0};
 #define cstr_npos         ((size_t) (-1))
 
 
-static const CStr cstr_init = {(char* ) &_cstr_nullrep[2]};
+STC_VARDECL CStr cstr_init;
 
-static inline void
+STC_API CStr
+cstr_makeN(const char* str, size_t len);
+STC_API CStr
+cstr_from(const char* fmt, ...);
+STC_API void
+cstr_reserve(CStr* self, size_t cap);
+STC_API void
+cstr_resize(CStr* self, size_t len, char fill);
+STC_API CStr
+cstr_makeReserved(size_t cap);
+STC_API CStr*
+cstr_assignN(CStr* self, const char* str, size_t len);
+STC_API CStr*
+cstr_appendN(CStr* self, const char* str, size_t len);
+STC_API void
+cstr_insertN(CStr* self, size_t pos, const char* str, size_t n);
+STC_API size_t
+cstr_replaceN(CStr* self, size_t pos, const char* str1, size_t n1, const char* str2, size_t n2);
+STC_API void
+cstr_erase(CStr* self, size_t pos, size_t n);
+STC_API char*
+cstr_strnstr(CStr s, size_t pos, const char* needle, size_t n);
+
+STC_INLINE void
+cstr_destroy(CStr* self) {
+    if (cstr_capacity(*self)) {
+        free(_cstr_rep(self));
+    }
+}
+
+STC_INLINE CStr
+cstr_makeFilled(size_t len, char fill) {
+    CStr s = cstr_init;
+    if (len) cstr_resize(&s, len, fill);
+    return s;
+}
+
+STC_INLINE CStr
+cstr_make(const char* str) {
+    return cstr_makeN(str, strlen(str));
+}
+
+STC_INLINE CStr
+cstr_makeCopy(CStr s) {
+    return cstr_makeN(s.str, cstr_size(s));
+}
+
+STC_INLINE void
+cstr_clear(CStr* self) {
+    cstr_destroy(self);
+    *self = cstr_init;
+}
+
+STC_INLINE CStr*
+cstr_assign(CStr* self, const char* str) {
+    return cstr_assignN(self, str, strlen(str));
+}
+
+STC_INLINE CStr*
+cstr_copy(CStr* self, CStr s) {
+    return cstr_assignN(self, s.str, cstr_size(s));
+}
+
+STC_INLINE CStr*
+cstr_take(CStr* self, CStr s) {
+    if (self->str != s.str && cstr_capacity(*self))
+        free(_cstr_rep(self));
+    self->str = s.str;
+    return self;
+}
+
+STC_INLINE CStr
+cstr_move(CStr* self) {
+    CStr tmp = *self;
+    *self = cstr_init;
+    return tmp;
+}
+
+STC_INLINE CStr*
+cstr_append(CStr* self, const char* str) {
+    return cstr_appendN(self, str, strlen(str));
+}
+STC_INLINE CStr*
+cstr_appendS(CStr* self, CStr s) {
+    return cstr_appendN(self, s.str, cstr_size(s));
+}
+STC_INLINE CStr*
+cstr_pushBack(CStr* self, char value) {
+    return cstr_appendN(self, &value, 1);
+}
+STC_INLINE void
+cstr_popBack(CStr* self) {
+    --_cstr_size(*self);
+}
+STC_INLINE char
+cstr_back(CStr s) {
+    return s.str[cstr_size(s) - 1];
+}
+
+STC_INLINE void
+cstr_insert(CStr* self, size_t pos, const char* str) {
+    cstr_insertN(self, pos, str, strlen(str));
+}
+
+STC_INLINE size_t
+cstr_replace(CStr* self, size_t pos, const char* str1, const char* str2) {
+    return cstr_replaceN(self, pos, str1, strlen(str1), str2, strlen(str2));
+}
+
+/* readonly */
+
+STC_INLINE bool
+cstr_empty(CStr s) {
+    return cstr_size(s) == 0;
+}
+STC_INLINE bool
+cstr_equals(CStr s1, const char* str) {
+    return strcmp(s1.str, str) == 0;
+}
+STC_INLINE bool
+cstr_equalsS(CStr s1, CStr s2) {
+    return strcmp(s1.str, s2.str) == 0;
+}
+STC_INLINE int
+cstr_compare(const void* s1, const void* s2) {
+    return strcmp(((const CStr*)s1)->str, ((const CStr*)s2)->str);
+}
+STC_INLINE size_t
+cstr_findN(CStr s, size_t pos, const char* needle, size_t n) {
+    char* res = cstr_strnstr(s, pos, needle, n);
+    return res ? res - s.str : cstr_npos;
+}
+STC_INLINE size_t
+cstr_find(CStr s, size_t pos, const char* needle) {
+    char* res = strstr(s.str + pos, needle);
+    return res ? res - s.str : cstr_npos;
+}
+
+
+/* CVec / CMap API functions: */
+
+#define                cstr_getRaw(x) ((x)->str)
+#define                cstr_compareRaw(x, y) strcmp(*(x), *(y))
+#define                cstr_equalsRaw(x, y) (strcmp(*(x), *(y)) == 0)
+STC_INLINE uint32_t cstr_hashRaw(const char* const* sPtr, size_t ignored) {
+    return c_defaultHash(*sPtr, strlen(*sPtr));
+}
+
+/* -------------------------- IMPLEMENTATION ------------------------- */
+
+#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
+
+STC_VARDEF CStr cstr_init = {(char* ) &_cstr_nullrep[2]};
+
+STC_API void
 cstr_reserve(CStr* self, size_t cap) {
     size_t len = cstr_size(*self), oldcap = cstr_capacity(*self);
     if (cap > oldcap) {
@@ -59,7 +212,7 @@ cstr_reserve(CStr* self, size_t cap) {
     }
 }
 
-static inline void
+STC_API void
 cstr_resize(CStr* self, size_t len, char fill) {
     size_t n = cstr_size(*self);
     cstr_reserve(self, len);
@@ -67,21 +220,7 @@ cstr_resize(CStr* self, size_t len, char fill) {
     self->str[_cstr_size(*self) = len] = '\0';
 }
 
-static inline void
-cstr_destroy(CStr* self) {
-    if (cstr_capacity(*self)) {
-        free(_cstr_rep(self));
-    }
-}
-
-static inline CStr
-cstr_makeFilled(size_t len, char fill) {
-    CStr s = cstr_init;
-    if (len) cstr_resize(&s, len, fill);
-    return s;
-}
-
-static inline CStr
+STC_API CStr
 cstr_makeReserved(size_t cap) {
     if (cap == 0) return cstr_init;
     size_t *rep = (size_t *) malloc(_cstr_mem(cap));
@@ -90,7 +229,7 @@ cstr_makeReserved(size_t cap) {
     return s;
 }
 
-static inline CStr
+STC_API CStr
 cstr_makeN(const char* str, size_t len) {
     if (len == 0) return cstr_init;
     size_t *rep = (size_t *) malloc(_cstr_mem(len));
@@ -100,17 +239,7 @@ cstr_makeN(const char* str, size_t len) {
     return s;
 }
 
-static inline CStr
-cstr_make(const char* str) {
-    return cstr_makeN(str, strlen(str));
-}
-
-static inline CStr
-cstr_makeCopy(CStr s) {
-    return cstr_makeN(s.str, cstr_size(s));
-}
-
-static inline CStr
+STC_API CStr
 cstr_from(const char* fmt, ...) {
     CStr tmp = cstr_init;
     va_list args;
@@ -125,14 +254,7 @@ cstr_from(const char* fmt, ...) {
     return tmp;
 }
 
-
-static inline void
-cstr_clear(CStr* self) {
-    cstr_destroy(self);
-    *self = cstr_init;
-}
-
-static inline CStr*
+STC_API CStr*
 cstr_assignN(CStr* self, const char* str, size_t len) {
     if (len || cstr_capacity(*self)) {
         cstr_reserve(self, len);
@@ -142,32 +264,7 @@ cstr_assignN(CStr* self, const char* str, size_t len) {
     return self;
 }
 
-static inline CStr*
-cstr_assign(CStr* self, const char* str) {
-    return cstr_assignN(self, str, strlen(str));
-}
-
-static inline CStr*
-cstr_copy(CStr* self, CStr s) {
-    return cstr_assignN(self, s.str, cstr_size(s));
-}
-
-static inline CStr*
-cstr_take(CStr* self, CStr s) {
-    if (self->str != s.str && cstr_capacity(*self))
-        free(_cstr_rep(self));
-    self->str = s.str;
-    return self;
-}
-
-static inline CStr
-cstr_move(CStr* self) {
-    CStr tmp = *self;
-    *self = cstr_init;
-    return tmp;
-}
-
-static inline CStr*
+STC_API CStr*
 cstr_appendN(CStr* self, const char* str, size_t len) {
     if (len) {
         size_t oldlen = cstr_size(*self), newlen = oldlen + len;
@@ -178,20 +275,8 @@ cstr_appendN(CStr* self, const char* str, size_t len) {
     }
     return self;
 }
-static inline CStr*
-cstr_append(CStr* self, const char* str) {
-    return cstr_appendN(self, str, strlen(str));
-}
-static inline CStr*
-cstr_appendC(CStr* self, char ch) {
-    return cstr_appendN(self, &ch, 1);
-}
-static inline CStr*
-cstr_appendS(CStr* self, CStr s) {
-    return cstr_appendN(self, s.str, cstr_size(s));
-}
 
-static inline void _cstr_internalMove(CStr* self, size_t pos1, size_t pos2) {
+STC_INLINE void _cstr_internalMove(CStr* self, size_t pos1, size_t pos2) {
     if (pos1 == pos2)
         return;
     size_t len = cstr_size(*self), newlen = len + pos2 - pos1;
@@ -201,7 +286,7 @@ static inline void _cstr_internalMove(CStr* self, size_t pos1, size_t pos2) {
     self->str[_cstr_size(*self) = newlen] = '\0';
 }
 
-static inline void
+STC_API void
 cstr_insertN(CStr* self, size_t pos, const char* str, size_t n) {
     char* xstr = (char *) memcpy(n > c_max_alloca ? malloc(n) : alloca(n), str, n);
     _cstr_internalMove(self, pos, pos + n);
@@ -209,23 +294,7 @@ cstr_insertN(CStr* self, size_t pos, const char* str, size_t n) {
     if (n > c_max_alloca) free(xstr); 
 }
 
-static inline void
-cstr_insert(CStr* self, size_t pos, const char* str) {
-    cstr_insertN(self, pos, str, strlen(str));
-}
-
-static inline void
-cstr_erase(CStr* self, size_t pos, size_t n) {
-    size_t len = cstr_size(*self);
-    if (len) {
-        memmove(&self->str[pos], &self->str[pos + n], len - (pos + n));
-        self->str[_cstr_size(*self) -= n] = '\0';
-    }
-}
-
-static inline size_t cstr_findN(CStr s, size_t pos, const char* needle, size_t n);
-
-static inline size_t
+STC_API size_t
 cstr_replaceN(CStr* self, size_t pos, const char* str1, size_t n1, const char* str2, size_t n2) {
     size_t pos2 = cstr_findN(*self, pos, str1, n1);
     if (pos2 == cstr_npos) return cstr_npos;
@@ -236,50 +305,16 @@ cstr_replaceN(CStr* self, size_t pos, const char* str1, size_t n1, const char* s
     return pos2;
 }
 
-static inline size_t
-cstr_replace(CStr* self, size_t pos, const char* str1, const char* str2) {
-    return cstr_replaceN(self, pos, str1, strlen(str1), str2, strlen(str2));
+STC_API void
+cstr_erase(CStr* self, size_t pos, size_t n) {
+    size_t len = cstr_size(*self);
+    if (len) {
+        memmove(&self->str[pos], &self->str[pos + n], len - (pos + n));
+        self->str[_cstr_size(*self) -= n] = '\0';
+    }
 }
 
-
-static inline char
-cstr_back(CStr s) {
-    return s.str[cstr_size(s) - 1];
-}
-
-static inline CStr*
-cstr_push(CStr* self, char value) {
-    return cstr_appendN(self, &value, 1);
-}
-
-
-static inline void
-cstr_pop(CStr* self) {
-    --_cstr_size(*self);
-}
-
-/* readonly */
-
-static inline bool
-cstr_empty(CStr s) {
-    return cstr_size(s) == 0;
-}
-
-static inline bool
-cstr_equals(CStr s1, const char* str) {
-    return strcmp(s1.str, str) == 0;
-}
-static inline bool
-cstr_equalsS(CStr s1, CStr s2) {
-    return strcmp(s1.str, s2.str) == 0;
-}
-
-static inline int
-cstr_compare(const void* s1, const void* s2) {
-    return strcmp(((const CStr*)s1)->str, ((const CStr*)s2)->str);
-}
-
-static inline char*
+STC_API char*
 cstr_strnstr(CStr s, size_t pos, const char* needle, size_t n) {
     char *x = s.str + pos, /* haystack */
          *z = s.str + cstr_size(s) - n + 1;
@@ -297,26 +332,6 @@ cstr_strnstr(CStr s, size_t pos, const char* needle, size_t n) {
     return NULL;
 }
 
-static inline size_t
-cstr_findN(CStr s, size_t pos, const char* needle, size_t n) {
-    char* res = cstr_strnstr(s, pos, needle, n);
-    return res ? res - s.str : cstr_npos;
-}
-
-static inline size_t
-cstr_find(CStr s, size_t pos, const char* needle) {
-    char* res = strstr(s.str + pos, needle);
-    return res ? res - s.str : cstr_npos;
-}
-
-
-/* CVec / CMap API functions: */
-
-#define                cstr_getRaw(x) ((x)->str)
-#define                cstr_compareRaw(x, y) strcmp(*(x), *(y))
-#define                cstr_equalsRaw(x, y) (strcmp(*(x), *(y)) == 0)
-static inline uint32_t cstr_hashRaw(const char* const* sPtr, size_t ignored) {
-    return c_defaultHash(*sPtr, strlen(*sPtr));
-}
+#endif
 
 #endif

@@ -63,7 +63,7 @@ int commonWords(CVec_str S)
         CMapEntry_sb tmp = {cstr_init, false};
 
         while (i < cstr_size(S.data[0]) && S.data[0].str[i] != ' ') { 
-            cstr_appendC(&word, S.data[0].str[i]); 
+            cstr_pushBack(&word, S.data[0].str[i]); 
             i++; 
         } 
   
@@ -91,7 +91,7 @@ int commonWords(CVec_str S)
         while (i < cstr_size(S.data[j])) { 
             CStr word = cstr_init; 
             while (i < cstr_size(S.data[j]) && S.data[j].str[i] != ' ') { 
-                cstr_appendC(&word, S.data[j].str[i]); 
+                cstr_pushBack(&word, S.data[j].str[i]); 
                 i++; 
             } 
             i++; 
