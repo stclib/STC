@@ -173,6 +173,9 @@ ctype##_##tag##_setLoadFactors(CType##_##tag* self, float max, float shrink) { \
 } \
 STC_API CType##Entry_##tag* \
 ctype##_##tag##_find(const CType##_##tag* self, CType##RawKey_##tag rawKey); \
+STC_FORCE_INLINE CType##Entry_##tag* \
+ctype##_##tag##_get(const CType##_##tag* self, CType##RawKey_##tag rawKey) \
+    {return ctype##_##tag##_find(self, rawKey);} /* alias */ \
 STC_API CType##Entry_##tag* /* similar to c++ std::map.insert_or_assign(): */ \
 ctype##_##tag##_put(CType##_##tag* self, OPT_2_##ctype(CType##RawKey_##tag rawKey, Value value)); \
 OPT_1_##ctype(STC_API CType##Entry_##tag* /* similar to c++ std::map.operator[](): */ \

@@ -36,9 +36,9 @@ typedef struct CStr {
 } CStr;
 
 static size_t _cstr_nullrep[] = {0, 0, 0};
-#define       _cstr_rep(self)   (((size_t *) (self)->str) - 2)
-#define       _cstr_size(s)     ((size_t *) (s).str)[-2]
-#define       _cstr_mem(cap)    (sizeof(size_t) * (3 + (cap)/sizeof(size_t)))
+#define _cstr_rep(self)   (((size_t *) (self)->str) - 2)
+#define _cstr_size(s)     ((size_t *) (s).str)[-2]
+#define _cstr_mem(cap)    (sizeof(size_t) * (3 + (cap)/sizeof(size_t)))
 
 #define cstr_size(s)      ((const size_t *) (s).str)[-2]
 #define cstr_capacity(s)  ((const size_t *) (s).str)[-1]
@@ -185,12 +185,11 @@ cstr_find(CStr s, size_t pos, const char* needle) {
     return res ? res - s.str : cstr_npos;
 }
 
-
 /* CVec / CMap API functions: */
 
-#define                cstr_getRaw(x) ((x)->str)
-#define                cstr_compareRaw(x, y) strcmp(*(x), *(y))
-#define                cstr_equalsRaw(x, y) (strcmp(*(x), *(y)) == 0)
+#define             cstr_getRaw(x) ((x)->str)
+#define             cstr_compareRaw(x, y) strcmp(*(x), *(y))
+#define             cstr_equalsRaw(x, y) (strcmp(*(x), *(y)) == 0)
 STC_INLINE uint32_t cstr_hashRaw(const char* const* sPtr, size_t ignored) {
     return c_defaultHash(*sPtr, strlen(*sPtr));
 }
