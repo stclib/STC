@@ -31,6 +31,8 @@
 #define cvec_size(cv)       _cvec_safe_size((cv).data)
 #define cvec_capacity(cv)   _cvec_safe_capacity((cv).data)
 #define cvec_empty(cv)      (_cvec_safe_size((cv).data) == 0)
+#define cvec_front(cv)      (cv).data[0]
+#define cvec_back(cv)       (cv).data[_cvec_size(cv) - 1] /* may have side effect */
 
 #define declare_CVec(...)   c_MACRO_OVERLOAD(declare_CVec, __VA_ARGS__)
 #define declare_CVec_2(tag, Value) \

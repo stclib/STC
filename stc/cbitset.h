@@ -50,6 +50,8 @@ int main() {
 
 typedef struct { uint64_t* _arr; size_t size; } CBitset;
 
+#define cbitset_init {NULL, 0}
+
 STC_INLINE void cbitset_setAll(CBitset *self, bool value);
 
 STC_INLINE CBitset cbitset_make(size_t size, bool value) {
@@ -67,14 +69,16 @@ STC_INLINE void cbitset_destroy(CBitset* self) {
 }
 
 STC_INLINE void cbitset_resize(CBitset* self, size_t size, bool value) {
-    size_t newsz = (size + 63) >> 6, oldsz = (self->size + 63) >> 6;
-    self->_arr = (uint64_t *) realloc(self->_arr, newsz * 8);
-    memset(self->_arr + oldsz, value ? 0xff : 0x0, (newsz - oldsz) * 8);
-    if (self->size & 63) {
-        size_t idx = (self->size - 1) >> 6; uint64_t bits = (1ull << (self->size & 63)) - 1;
-        value ? (self->_arr[idx] |= ~bits) : (self->_arr[idx] &= bits);
-    }
+    size_t new_n = (size + 63) >> 6, osize = self->size, old_n = (osize + 63) >> 6;
+    self->_arr = (uint64_t *) realloc(self->_arr, new_n * 8);
     self->size = size;
+    if (new_n >= old_n) {
+        memset(self->_arr + old_n, value ? 0xff : 0x0, (new_n - old_n) * 8);
+        if (old_n > 0) {
+            uint64_t mask = (1ull << (osize & 63)) - 1;
+            value ? (self->_arr[old_n - 1] |= ~mask) : (self->_arr[old_n - 1] &= mask);
+        }
+    }
 }
 STC_INLINE size_t cbitset_size(CBitset set) {return set.size;}
 
