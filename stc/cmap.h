@@ -55,7 +55,7 @@ int main(void) {
 
 #define cmap_init                     {NULL, NULL, 0, 0, 0.85f, 0.15f}
 #define cmap_size(m)                  ((size_t) (m).size)
-#define cmap_bucketCount(m)           ((size_t) (m).buckets)
+#define cmap_bucketCount(m)           ((size_t) (m).bucketCount)
 #define cset_init                     cmap_init                    
 #define cset_size(s)                  cmap_size(s)                 
 #define cset_bucketCount(s)           cmap_bucketCount(s)          
@@ -148,7 +148,7 @@ typedef RawKey CType##RawKey_##tag, ctype##_##tag##_rawkey_t; \
 typedef struct { \
     CType##Entry_##tag* table; \
     uint8_t* _hashx; \
-    uint32_t size, buckets; \
+    uint32_t size, bucketCount; \
     float maxLoadFactor; \
     float shrinkLimitFactor; \
 } CType##_##tag; \
@@ -173,9 +173,9 @@ ctype##_##tag##_setLoadFactors(CType##_##tag* self, float max, float shrink) { \
 } \
 STC_API CType##Entry_##tag* \
 ctype##_##tag##_find(const CType##_##tag* self, CType##RawKey_##tag rawKey); \
-STC_FORCE_INLINE CType##Entry_##tag* \
+STC_FORCE_INLINE CType##Entry_##tag* /* alias */ \
 ctype##_##tag##_get(const CType##_##tag* self, CType##RawKey_##tag rawKey) \
-    {return ctype##_##tag##_find(self, rawKey);} /* alias */ \
+    {return ctype##_##tag##_find(self, rawKey);} \
 STC_API CType##Entry_##tag* /* similar to c++ std::map.insert_or_assign(): */ \
 ctype##_##tag##_put(CType##_##tag* self, OPT_2_##ctype(CType##RawKey_##tag rawKey, Value value)); \
 OPT_1_##ctype(STC_API CType##Entry_##tag* /* similar to c++ std::map.operator[](): */ \
@@ -219,7 +219,7 @@ ctype##_##tag##_pushN(CType##_##tag* self, const CType##Input_##tag in[], size_t
  \
 STC_INLINE void ctype##_##tag##_wipe_(CType##_##tag* self) { \
     if (self->size == 0) return; \
-    CType##Entry_##tag* e = self->table, *end = e + self->buckets; \
+    CType##Entry_##tag* e = self->table, *end = e + self->bucketCount; \
     uint8_t *hx = self->_hashx; \
     for (; e != end; ++e) if (*hx++) ctype##entry_##tag##_destroy(e); \
 } \
@@ -233,14 +233,14 @@ STC_API void ctype##_##tag##_destroy(CType##_##tag* self) { \
 STC_API void ctype##_##tag##_clear(CType##_##tag* self) { \
     ctype##_##tag##_wipe_(self); \
     self->size = 0; \
-    memset(self->_hashx, 0, self->buckets); \
+    memset(self->_hashx, 0, self->bucketCount); \
 } \
  \
 STC_API size_t \
 ctype##_##tag##_bucket(const CType##_##tag* self, const CType##RawKey_##tag* rawKeyPtr, uint32_t* hxPtr) { \
     uint32_t hash = keyHashRaw(rawKeyPtr, sizeof(CType##RawKey_##tag)); \
     uint32_t sx, hx = (hash & chash_HASH) | chash_USED; \
-    size_t cap = self->buckets; \
+    size_t cap = self->bucketCount; \
     size_t idx = chash_reduce(hash, cap); \
     uint8_t* hashx = self->_hashx; \
     while ((sx = hashx[idx])) { \
@@ -263,7 +263,7 @@ ctype##_##tag##_find(const CType##_##tag* self, CType##RawKey_##tag rawKey) { \
 } \
  \
 static inline void ctype##_##tag##_reserveExpand_(CType##_##tag* self) { \
-    if (self->size + 1 >= self->buckets * self->maxLoadFactor) \
+    if (self->size + 1 >= self->bucketCount * self->maxLoadFactor) \
         ctype##_##tag##_reserve(self, 7 + self->size * 3 / 2); \
 } \
  \
@@ -302,7 +302,7 @@ ctype##_##tag##_at(CType##_##tag* self, CType##RawKey_##tag rawKey, Value initVa
  \
 STC_API size_t \
 ctype##_##tag##_reserve(CType##_##tag* self, size_t newcap) { \
-    size_t oldcap = self->buckets; \
+    size_t oldcap = self->bucketCount; \
     if (self->size > newcap) return oldcap; \
     newcap /= self->maxLoadFactor; newcap |= 1; \
     CType##_##tag tmp = { \
@@ -330,7 +330,7 @@ ctype##_##tag##_reserve(CType##_##tag* self, size_t newcap) { \
  \
 STC_API bool \
 ctype##_##tag##_eraseEntry(CType##_##tag* self, CType##Entry_##tag* entry) { \
-    size_t i = chash_entryIndex(*self, entry), j = i, k, cap = self->buckets; \
+    size_t i = chash_entryIndex(*self, entry), j = i, k, cap = self->bucketCount; \
     CType##Entry_##tag* slot = self->table; \
     uint8_t* hashx = self->_hashx; \
     CType##RawKey_##tag r; \
@@ -355,7 +355,7 @@ STC_API bool \
 ctype##_##tag##_erase(CType##_##tag* self, CType##RawKey_##tag rawKey) { \
     if (self->size == 0) \
         return false; \
-    size_t cap = self->buckets; \
+    size_t cap = self->bucketCount; \
     if (self->size < cap * self->shrinkLimitFactor && cap * sizeof(CType##Entry_##tag) > 1024) \
         ctype##_##tag##_reserve(self, self->size * 6 / 5); \
     uint32_t hx; \
@@ -366,7 +366,7 @@ ctype##_##tag##_erase(CType##_##tag* self, CType##RawKey_##tag rawKey) { \
 STC_API ctype##_##tag##_iter_t \
 ctype##_##tag##_begin(CType##_##tag* map) { \
     uint8_t* hx = map->_hashx; \
-    CType##Entry_##tag* e = map->table, *end = e + map->buckets; \
+    CType##Entry_##tag* e = map->table, *end = e + map->bucketCount; \
     while (e != end && !*hx) ++e, ++hx; \
     ctype##_##tag##_iter_t it = {e == end ? NULL : e, end, hx}; return it; \
 } \

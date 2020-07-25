@@ -4,16 +4,18 @@ STC - C99 Standard Container Library
 Introduction
 ------------
 
-An elegant, typesafe, generic, customizable, user-friendly, consistent, and very efficient standard container library for C99. This is a small headers only library with the most used container components, and a few algorithms:
+An elegant, typesafe, generic, customizable, user-friendly, consistent, and very fast standard container library for C99. This is a small headers only library with the most used container components, and a few algorithms:
+- **stc/carray.h** - Dynamic generic **multi-dimensional array**, implemented as a single contiguous section of memory.
+- **stc/cbitset.h** - Bitset similar to c++ std::bitset or boost::dynamic_bitset.
+- **stc/clist.h** - A genric circular singly **linked list**, can be used as a **queue** - supports *pushBack, pushFront, and popFront* - **stc/cmap.h** - A generic **unordered map** implemented as open hashing without tombstones. Highly customizable and fast.
+- **stc/cset.h** - A generic **unordered set** implemented in tandem with *unordered map*
 - **stc/cstr.h** - Compact and powerful **string** class.
 - **stc/cvec.h** - Dynamic generic **vector** class, works well as a **stack**.
-- **stc/cmap.h** - A generic **unordered map** implemented as open hashing without tombstones. Highly customizable and fast.
-- **stc/cset.h** - A generic **unordered set** implemented in tandem with *unordered map*
-- **stc/carr.h** - Dynamic generic **multi-dimensional array**, implemented as a single contiguous section of memory.
-- **stc/clist.h** - A genric circular singly **linked list**, can be used as a **queue** - supports *pushBack, pushFront, and popFront* in *O*(1). Also contains various *splice* functions and (merge) *sort*.
+- **stc/cvecpq.h** - Priority queue adapter for **cvec.h**, implemented as a **heap**.
+in *O*(1). Also contains various *splice* functions and (merge) *sort*.
 - **stc/coption.h** - Implementation of *getopt_long*-"like" function, *coption_get*, to parse command line arguments.
 - **stc/crandom.h** - A few very efficent modern random number generators *pcg32* and *sfc64*. It also implements the crypto-strong *siphash* algorithm.
-- **stc/cdefs.h** - A small common include file with some general definitions.
+- **stc/cdefs.h** - A common include file with some general definitions.
 
 The usage of the containers is similar to the C++ standard containers, so it should be easier for those who are familiar with them.
 
@@ -95,7 +97,7 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 - **CList**: Representation: one pointer size. Each node allocates block storing value and next pointer.
 - **CSet**: Representation: 4 pointers size. CSet uses one table of keys, and one table of "used/hash-value", which occupies only one byte per bucket.
 - **CMap**: Same as CSet, but this uses a table of (key, value) pairs, not only keys.
-- **CArr**: CArr1, CArr2 and CArr3. Representation: One pointers, plus 1, 2, or 3 size_t variables to store dimensions. Elements are stored as one block of heap memory.
+- **CArray**: CArray1, CArray2 and CArray3. Representation: One pointers, plus 1, 2, or 3 size_t variables to store dimensions. Elements are stored as one block of heap memory.
 
 CMap, CSet and CVec discussion
 ----------------------------
@@ -131,19 +133,19 @@ Also look at **examples/advanced.c**, it demonstrates how to use a custom struct
 Example usages
 --------------
 The first example has a very complex nested container type, which demonstrates the power of this library. Look at the simpler examples below to understand it better. The example adds an element into the data structure, and then accesses it. The type used, with c++ template syntax is:
-**CMapMap**< **CStr**, **CMapMap**< *int*, **CList**< **CArr2**< *float* >>>>
+**CMapMap**< **CStr**, **CMapMap**< *int*, **CList**< **CArray2**< *float* >>>>
 
 Note: The *cmap_sm_destroy(&theMap)* call below, will destroy all the nested containers including the memory allocated for CStr keys in theMap object.
 ```
 #include <stc/cstr.h>
 #include <stc/cmap.h>
 #include <stc/clist.h>
-#include <stc/carr.h>
+#include <stc/carray.h>
 
 void verify_destroy(float* v) {printf("destroy %g\n", *v);}
 
-declare_CArr(f, float, verify_destroy); // you should omit the last argument - float type need no destroy.
-declare_CList(t2, CArr2_f, carr2_f_destroy, c_noCompare);
+declare_CArray(f, float, verify_destroy); // you should omit the last argument - float type need no destroy.
+declare_CList(t2, CArray2_f, carray2_f_destroy, c_noCompare);
 declare_CMap(il, int, CList_t2, clist_t2_destroy);
 declare_CMap_str(sm, CMap_il, cmap_il_destroy);
 
@@ -153,20 +155,20 @@ int main() {
     CMap_sm theMap = cmap_init;
     {
         // Construct.
-        CArr2_f table = carr2_f_make(xdim, ydim, 0.f);
+        CArray2_f table = carray2_f_make(xdim, ydim, 0.f);
         CList_t2 tableList = clist_init;
         CMap_il listMap = cmap_init;
         
         // Put in some data.
-        carr2_f_data(table, x)[y] = 3.1415927; // table[x][y]
+        carray2_f_data(table, x)[y] = 3.1415927; // table[x][y]
         clist_t2_pushBack(&tableList, table);
         cmap_il_put(&listMap, entry, tableList);
         cmap_sm_put(&theMap, "First", listMap);
     }
 
     // Access the data entry
-    CArr2_f table = clist_back(cmap_il_get(&cmap_sm_get(&theMap, "First")->value, entry)->value);
-    printf("value is: %f\n", carr2_f_value(table, x, y));
+    CArray2_f table = clist_back(cmap_il_get(&cmap_sm_get(&theMap, "First")->value, entry)->value);
+    printf("value is: %f\n", carray2_f_value(table, x, y));
 
     cmap_sm_destroy(&theMap); // free up the whole shebang!
 }
@@ -310,27 +312,27 @@ int main() {
     clist_i_destroy(&list);
 }
 ```
-**CArr**. 1D, 2D and 3D arrays, heap allocated in one memory block. *CArr3* can have sub-array "views" of *CArr2* and *CArr1* etc., as shown in the following example.
+**CArray**. 1D, 2D and 3D arrays, heap allocated in one memory block. *CArray3* can have sub-array "views" of *CArray2* and *CArray1* etc., as shown in the following example.
 ```
 #include <stdio.h>
-#include <stc/carr.h>
-declare_CArr(f, float);
+#include <stc/carray.h>
+declare_CArray(f, float);
 
 int main()
 {
-    CArr3_f a3 = carr3_f_make(30, 20, 10, 0.f);
-    carr3_f_data(a3, 5, 4)[3] = 10.2f; // a3[5][4][3]
-    CArr2_f a2 = carr3_f_at(a3, 5);    // sub-array reference (no data copy).
+    CArray3_f a3 = carray3_f_make(30, 20, 10, 0.f);
+    carray3_f_data(a3, 5, 4)[3] = 10.2f; // a3[5][4][3]
+    CArray2_f a2 = carray3_f_at(a3, 5);    // sub-array reference (no data copy).
 
-    printf("%f\n", carr2_f_value(a2, 4, 3));    // readonly lookup a2[4][3] (=10.2f)
-    printf("%f\n", carr2_f_data(a2, 4)[3]);     // same, but this is writable.
-    printf("%f\n", carr2_f_at(a2, 4).data[3]);  // same, via sub-array access.
+    printf("%f\n", carray2_f_value(a2, 4, 3));    // readonly lookup a2[4][3] (=10.2f)
+    printf("%f\n", carray2_f_data(a2, 4)[3]);     // same, but this is writable.
+    printf("%f\n", carray2_f_at(a2, 4).data[3]);  // same, via sub-array access.
     
-    printf("%f\n", carr3_f_value(a3, 5, 4, 3)); // same data location, via a3 array.
-    printf("%f\n", carr3_f_data(a3, 5, 4)[3]);
-    printf("%f\n", carr3_f_at2(a3, 5, 4).data[3]);
+    printf("%f\n", carray3_f_value(a3, 5, 4, 3)); // same data location, via a3 array.
+    printf("%f\n", carray3_f_data(a3, 5, 4)[3]);
+    printf("%f\n", carray3_f_at2(a3, 5, 4).data[3]);
     
-    carr2_f_destroy(&a2); // does nothing, since it is a sub-array.
-    carr3_f_destroy(&a3); // also invalidates a2.
+    carray2_f_destroy(&a2); // does nothing, since it is a sub-array.
+    carray3_f_destroy(&a3); // also invalidates a2.
 }
 ```
