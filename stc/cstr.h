@@ -35,17 +35,15 @@ typedef struct CStr {
     char* str;
 } CStr;
 
-static size_t _cstr_nullrep[] = {0, 0, 0};
 #define _cstr_rep(self)   (((size_t *) (self)->str) - 2)
 #define _cstr_size(s)     ((size_t *) (s).str)[-2]
 #define _cstr_mem(cap)    (sizeof(size_t) * (3 + (cap)/sizeof(size_t)))
+static size_t _cstr_nullrep[] = {0, 0, 0};
 
+static  CStr cstr_init =  {(char* ) &_cstr_nullrep[2]};
 #define cstr_size(s)      ((const size_t *) (s).str)[-2]
 #define cstr_capacity(s)  ((const size_t *) (s).str)[-1]
 #define cstr_npos         ((size_t) (-1))
-
-
-STC_VARDECL CStr cstr_init;
 
 STC_API CStr
 cstr_makeN(const char* str, size_t len);
@@ -197,8 +195,6 @@ STC_INLINE uint32_t cstr_hashRaw(const char* const* sPtr, size_t ignored) {
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-
-STC_VARDEF CStr cstr_init = {(char* ) &_cstr_nullrep[2]};
 
 STC_API void
 cstr_reserve(CStr* self, size_t cap) {

@@ -38,12 +38,8 @@
 
 #if defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define STC_API extern
-#define STC_VARDECL extern
-#define STC_VARDEF
 #else
 #define STC_API STC_INLINE
-#define STC_VARDECL static
-#define STC_VARDEF static
 #endif
 
 /* Macro overloading feature support: https://rextester.com/ONP80107 */
@@ -97,16 +93,19 @@ static inline uint32_t  c_defaultHash(const void *data, size_t len) {
     return x;
 }
 
-/* https://nullprogram.com/blog/2018/07/31/: assume len positive multiple of 4 */
+/* https://programmingpraxis.com/2018/06/19/fibonacci-hash */
 /* https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/ */
-static inline uint32_t c_lowbias32Hash(const void *data, size_t len) {
+static inline uint32_t c_fibonacciHash32(const void* data, size_t len) {
     const volatile uint32_t *key = (const uint32_t *) data;
-    uint32_t x = *key;
-    do {
-        x ^= *key++ >> 16;
-        x *= UINT32_C(0x7feb352d);
-    } while (len -= 4);
+    uint32_t x = *key++ * 2654435769u;
+    while (len -= 4) x ^= *key++ * 2654435769u;
     return x;
+}
+static inline uint32_t c_fibonacciHash64(const void* data, size_t len) {
+    const volatile uint64_t *key = (const uint64_t *) data;
+    uint64_t x = *key++ * 11400714819323198485ull;
+    while (len -= 8) x ^= *key++ * 11400714819323198485ull;
+    return (uint32_t) (x >> 13);
 }
 
 #endif

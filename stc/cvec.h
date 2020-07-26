@@ -51,7 +51,8 @@ typedef struct CVec_##tag { \
     Value* data; \
 } CVec_##tag; \
  \
-STC_VARDECL CVec_##tag cvec_##tag##_init; \
+STC_INLINE CVec_##tag \
+cvec_##tag##_init(void) {CVec_##tag x = cvec_init; return x;} \
 STC_API CVec_##tag \
 cvec_##tag##_make(size_t size, Value null); \
 STC_API void \
@@ -112,8 +113,6 @@ typedef RawValue CVecRawValue_##tag
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define implement_CVec_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
- \
-STC_VARDEF CVec_##tag cvec_##tag##_init = cvec_init; \
  \
 STC_API CVec_##tag \
 cvec_##tag##_make(size_t size, Value null) { \

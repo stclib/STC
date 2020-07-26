@@ -14,16 +14,11 @@
 
 // Visual Studio: compile with -TP to force C++:  cl -TP -EHsc -O2 benchmark.c
 
-
-static inline uint32_t fibonacci_hash(const void* data, size_t len) {
-    const uint64_t key = *(const uint64_t *) data;
-    return (uint32_t) (key * 11400714819323198485llu);
-}
-declare_CMap(ii, int64_t, int64_t, c_defaultDestroy, c_defaultEquals, fibonacci_hash);
+declare_CMap(ii, int64_t, int64_t, c_defaultDestroy, c_defaultEquals, c_fibonacciHash64);
 
 KHASH_MAP_INIT_INT64(ii, uint64_t)
 
-size_t seed = 1234;
+size_t seed;
 static const float maxLoadFactor = 0.77f;
 
 crandom64_t rng;
@@ -32,7 +27,7 @@ crandom64_t rng;
 
 
 #define CMAP_SETUP(tag, Key, Value) CMap_##tag map = cmap_init \
-                                    /* ; cmap_##tag##_setLoadFactors(&map, maxLoadFactor, 0.0)*/
+                                    ; cmap_##tag##_setLoadFactors(&map, maxLoadFactor, 0.0)
 #define CMAP_PUT(tag, key, val)     cmap_##tag##_put(&map, key, val)->value
 #define CMAP_ERASE(tag, key)        cmap_##tag##_erase(&map, key)
 #define CMAP_FIND(tag, key)         (cmap_##tag##_find(map, key) != NULL)
@@ -80,8 +75,9 @@ crandom64_t rng;
 #define RMAP_BUCKETS(tag)           map.bucket_count()
 #define RMAP_CLEAR(tag)             map.clear()
 
-const size_t N1 = 7000000;
-const size_t N2 = 10000000;
+const size_t N1 = 10000000 * 5;
+const size_t N2 = 10000000 * 5;
+const size_t N3 = 10000000 * 10;
 #define      RR   20
 int rr = RR;
 
@@ -97,7 +93,7 @@ int rr = RR;
         erased += M##_ERASE(tag, RAND(rr)); \
     } \
     difference = clock() - before; \
-    printf(#M "(" #tag "): sz: %zu, bucks: %8zu, time: %.02f, sum: %zu, erase: %zu\n", \
+    printf(#M ": size: %zu, buckets: %8zu, time: %.02f, sum: %zu, erased %zu\n", \
            M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, checksum, erased); \
     M##_CLEAR(tag); \
 }
@@ -112,7 +108,7 @@ int rr = RR;
     for (size_t i = 0; i < N2; ++i) \
         erased += M##_ERASE(tag, i); \
     difference = clock() - before; \
-    printf(#M "(" #tag "): sz: %zu, bucks: %8zu, time: %.02f, erase %zu\n", \
+    printf(#M ": size: %zu, buckets: %8zu, time: %.02f, erased %zu\n", \
            M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, erased); \
     M##_CLEAR(tag); \
 }
@@ -123,13 +119,13 @@ int rr = RR;
     size_t erased = 0; \
     clock_t difference, before = clock(); \
     SEED(seed); \
-    for (size_t i = 0; i < N2; ++i) \
+    for (size_t i = 0; i < N3; ++i) \
         M##_PUT(tag, RAND(rr), i); \
     SEED(seed); \
-    for (size_t i = 0; i < N2; ++i) \
+    for (size_t i = 0; i < N3; ++i) \
         erased += M##_ERASE(tag, RAND(rr)); \
     difference = clock() - before; \
-    printf(#M "(" #tag "): sz: %zu, bucks: %8zu, time: %.02f, erase %zu\n", \
+    printf(#M ": size: %zu, buckets: %8zu, time: %.02f, erased %zu\n", \
            M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, erased); \
     M##_CLEAR(tag); \
 }
@@ -139,8 +135,8 @@ int main(int argc, char* argv[])
 {
     rr = argc == 2 ? atoi(argv[1]) : RR;
     seed = time(NULL);
-    printf("\nRandom keys are in range [0, 2^%d):\n",  rr);
-    printf("\nmap<uint64_t, uint64_t>: %zu repeats of Insert random key + remove a different random key:\n", N1);
+    printf("\nRandom keys are in range [0, 2^%d), seed = %zu:\n",  rr, seed);
+    printf("\nUnordered maps: %zu repeats of Insert random key + try to remove a random key:\n", N1);
     MAP_TEST1(CMAP, ii)
     MAP_TEST1(KMAP, ii)
 #ifdef __cplusplus
@@ -150,7 +146,7 @@ int main(int argc, char* argv[])
     MAP_TEST1(RMAP, ii)
 #endif
 
-    printf("\nmap<uint64_t, uint64_t>: Insert %zu index keys, then remove them in same order:\n", N2);
+    printf("\nUnordered maps: Insert %zu index keys, then remove them in same order:\n", N2);
     MAP_TEST2(CMAP, ii)
     MAP_TEST2(KMAP, ii)
 #ifdef __cplusplus
@@ -160,7 +156,7 @@ int main(int argc, char* argv[])
     MAP_TEST2(RMAP, ii)
 #endif
 
-    printf("\nmap<uint64_t, uint64_t>: Insert %zu random keys, then remove them in same order:\n", N2);
+    printf("\nUnordered maps: Insert %zu random keys, then remove them in same order:\n", N3);
     MAP_TEST3(CMAP, ii)
     MAP_TEST3(KMAP, ii)
 #ifdef __cplusplus
