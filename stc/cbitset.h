@@ -48,6 +48,13 @@ int main() {
 #include <assert.h>
 #include "cdefs.h"
 
+#if defined(__GNUC__)
+#define cbitset_popcnt64(i) __builtin_popcountll(i)
+#else
+#include <nmmintrin.h>
+#define cbitset_popcnt64(i) _mm_popcnt_u64(i)
+#endif
+
 typedef struct { uint64_t* _arr; size_t size; } CBitset;
 
 #define cbitset_init {NULL, 0}
@@ -86,6 +93,14 @@ STC_INLINE void cbitset_flip(CBitset *self, size_t i) {
 }
 STC_INLINE bool cbitset_test(CBitset set, size_t i) {
     return (set._arr[i >> 6] & (1ull << (i & 63))) != 0;
+}
+STC_INLINE size_t cbitset_count(CBitset set) {
+    size_t count = 0, n = (set.size + 63) >> 6;
+    if (set.size > 0) {
+        --n; for (size_t i=0; i<n; ++i) count += cbitset_popcnt64(set._arr[i]);
+        count += cbitset_popcnt64(set._arr[n] & ((1ull << (set.size & 63)) - 1));
+    }
+    return count;
 }
 
 STC_INLINE void cbitset_setAll(CBitset *self, bool value) {

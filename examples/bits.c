@@ -3,6 +3,7 @@
 
 int main() {
     CBitset set = cbitset_make(23, true);
+    printf("count %zu, %zu\n", cbitset_count(set), set.size);
     cbitset_reset(&set, 9);
     cbitset_resize(&set, 43, false);
     printf("%4zu: ", set.size);
