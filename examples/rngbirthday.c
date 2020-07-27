@@ -7,7 +7,7 @@
 #include <stc/cvec.h>
 #include <stc/cstr.h>
 
-declare_CMap(ic, uint64_t, uint8_t);
+declare_cmap(ic, uint64_t, uint8_t);
 
 const static uint64_t seed = 1234;
 const static uint64_t N = 1ull << 27;
@@ -16,7 +16,7 @@ const static uint64_t mask = (1ull << 52) - 1;
 void repeats(void)
 {
     crandom64_t rng = crandom64_init(seed);
-    CMap_ic m = cmap_init;
+    cmap_ic m = cmap_init;
     cmap_ic_reserve(&m, N);
     clock_t now = clock();
     for (size_t i = 0; i < N; ++i) {
@@ -29,14 +29,14 @@ void repeats(void)
 }
 
 
-declare_CMap(x, uint32_t, uint64_t);
-declare_CVec(x, uint64_t);
+declare_cmap(x, uint32_t, uint64_t);
+declare_cvec(x, uint64_t);
 
 void distribution(void)
 {
     crandom32_t rng = crandom32_init(seed); // time(NULL), time(NULL));
     const size_t N = 1ull << 28, M = 1ull << 9; // 1ull << 10;
-    CMap_x map = cmap_x_make(M);
+    cmap_x map = cmap_x_make(M);
     clock_t now = clock();
     for (size_t i = 0; i < N; ++i) {
         ++cmap_x_insert(&map, crandom32b(&rng, M), 0)->value;

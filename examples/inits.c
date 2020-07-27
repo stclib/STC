@@ -4,17 +4,17 @@
 #include <stc/cvec.h>
 #include <stc/clist.h>
 
-declare_CMap(id, int, CStr, cstr_destroy); // Map of int -> CStr
-declare_CMap_str(cnt, int);
+declare_cmap(id, int, cstr_t, cstr_destroy); // Map of int -> cstr_t
+declare_cmap_str(cnt, int);
 
 typedef struct {int x, y;} ipair_t;
-declare_CVec(ip, ipair_t, c_defaultDestroy, c_memCompare);
-declare_CList(ip, ipair_t, c_defaultDestroy, c_memCompare);
+declare_cvec(ip, ipair_t, c_defaultDestroy, c_memCompare);
+declare_clist(ip, ipair_t, c_defaultDestroy, c_memCompare);
 
 
 int main(void) {
     int year = 2020;
-    CMap_id idnames = cmap_init;
+    cmap_id idnames = cmap_init;
     c_push(&idnames, cmap_id, c_items(
         {100, cstr_make("Hello")},
         {110, cstr_make("World")},
@@ -27,7 +27,7 @@ int main(void) {
 
     // ------------------
 
-    CMap_cnt countries = cmap_init;
+    cmap_cnt countries = cmap_init;
 
     cmap_cnt_insert(&countries, "Greenland", 0)->value += 20;
     c_push(&countries, cmap_cnt, c_items(
@@ -46,7 +46,7 @@ int main(void) {
 
     // ------------------
 
-    CVec_ip pairs1 = cvec_init; 
+    cvec_ip pairs1 = cvec_init; 
     c_push(&pairs1, cvec_ip, c_items(
         {1, 2},
         {3, 4},
@@ -61,7 +61,7 @@ int main(void) {
 
     // ------------------
 
-    CList_ip pairs2 = clist_init;
+    clist_ip pairs2 = clist_init;
     c_push(&pairs2, clist_ip, c_items(
         {1, 2},
         {3, 4},

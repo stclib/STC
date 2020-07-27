@@ -24,21 +24,21 @@
 /*  // Example:
 #include <stdio.h>
 #include <stc/cmap.h>
-declare_CSet(sx, int);       // Set of int
-declare_CMap(mx, int, char); // Map of int -> char
+declare_cset(sx, int);       // Set of int
+declare_cmap(mx, int, char); // Map of int -> char
 
 int main(void) {
-    CSet_sx s = cset_init;
+    cset_sx s = cset_init;
     cset_sx_put(&s, 5);
     cset_sx_put(&s, 8);
     c_foreach (i, cset_sx, s) printf("set %d\n", i.item->key);
     cset_sx_destroy(&s);
 
-    CMap_mx m = cmap_init;
+    cmap_mx m = cmap_init;
     cmap_mx_put(&m, 5, 'a');
     cmap_mx_put(&m, 8, 'b');
     cmap_mx_put(&m, 12, 'c');
-    CMapEntry_mx *e = cmap_mx_find(&m, 10); // = NULL
+    cmapentry_mx *e = cmap_mx_find(&m, 10); // = NULL
     char val = cmap_mx_find(&m, 5)->value;
     cmap_mx_put(&m, 5, 'd'); // update
     cmap_mx_erase(&m, 8);
@@ -66,58 +66,58 @@ int main(void) {
 
 enum {chash_HASH = 0x7f, chash_USED = 0x80};
 
-#define declare_CMap(...) \
-    c_MACRO_OVERLOAD(declare_CMap, __VA_ARGS__)
+#define declare_cmap(...) \
+    c_MACRO_OVERLOAD(declare_cmap, __VA_ARGS__)
 
-#define declare_CMap_3(tag, Key, Value) \
-    declare_CMap_4(tag, Key, Value, c_defaultDestroy)
+#define declare_cmap_3(tag, Key, Value) \
+    declare_cmap_4(tag, Key, Value, c_defaultDestroy)
 
-#define declare_CMap_4(tag, Key, Value, valueDestroy) \
-    declare_CMap_6(tag, Key, Value, valueDestroy, c_defaultEquals, c_defaultHash)
+#define declare_cmap_4(tag, Key, Value, valueDestroy) \
+    declare_cmap_6(tag, Key, Value, valueDestroy, c_defaultEquals, c_defaultHash)
 
-#define declare_CMap_6(tag, Key, Value, valueDestroy, keyEquals, keyHash) \
-    declare_CMap_10(tag, Key, Value, valueDestroy, keyEquals, keyHash, \
+#define declare_cmap_6(tag, Key, Value, valueDestroy, keyEquals, keyHash) \
+    declare_cmap_10(tag, Key, Value, valueDestroy, keyEquals, keyHash, \
                          c_defaultDestroy, Key, c_defaultGetRaw, c_defaultInitRaw)
 
-#define declare_CMap_10(tag, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
+#define declare_cmap_10(tag, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                              keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
-    declare_CHASH(tag, CMap, cmap, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
+    declare_CHASH(tag, cmap, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                        keyDestroy, RawKey, keyGetRaw, keyInitRaw)
 
-/* CSet: */
-#define declare_CSet(...) \
-    c_MACRO_OVERLOAD(declare_CSet, __VA_ARGS__)
+/* cset: */
+#define declare_cset(...) \
+    c_MACRO_OVERLOAD(declare_cset, __VA_ARGS__)
 
-#define declare_CSet_2(tag, Key) \
-    declare_CSet_4(tag, Key, c_defaultEquals, c_defaultHash)
+#define declare_cset_2(tag, Key) \
+    declare_cset_4(tag, Key, c_defaultEquals, c_defaultHash)
 
-#define declare_CSet_4(tag, Key, keyEquals, keyHash) \
-    declare_CSet_5(tag, Key, keyEquals, keyHash, c_defaultDestroy)
+#define declare_cset_4(tag, Key, keyEquals, keyHash) \
+    declare_cset_5(tag, Key, keyEquals, keyHash, c_defaultDestroy)
 
-#define declare_CSet_5(tag, Key, keyEquals, keyHash, keyDestroy) \
-    declare_CSet_8(tag, Key, keyEquals, keyHash, keyDestroy, \
+#define declare_cset_5(tag, Key, keyEquals, keyHash, keyDestroy) \
+    declare_cset_8(tag, Key, keyEquals, keyHash, keyDestroy, \
                         Key, c_defaultGetRaw, c_defaultInitRaw)
 
-#define declare_CSet_8(tag, Key, keyEqualsRaw, keyHashRaw, keyDestroy, \
+#define declare_cset_8(tag, Key, keyEqualsRaw, keyHashRaw, keyDestroy, \
                             RawKey, keyGetRaw, keyInitRaw) \
-    declare_CHASH(tag, CSet, cset, Key, void, void, keyEqualsRaw, keyHashRaw, \
+    declare_CHASH(tag, cset, Key, void, void, keyEqualsRaw, keyHashRaw, \
                        keyDestroy, RawKey, keyGetRaw, keyInitRaw)
 
-/* CSet_str, CMap_str: */
-#define declare_CSet_str() \
-    declare_CHASH_STR(str, CSet, cset, void, void)
+/* cset_str, cmap_str: */
+#define declare_cset_str() \
+    declare_CHASH_STR(str, cset, void, void)
 
-#define declare_CMap_str(...) \
-    c_MACRO_OVERLOAD(declare_CMap_str, __VA_ARGS__)
+#define declare_cmap_str(...) \
+    c_MACRO_OVERLOAD(declare_cmap_str, __VA_ARGS__)
 
-#define declare_CMap_str_2(tag, Value) \
-    declare_CHASH_STR(tag, CMap, cmap, Value, c_defaultDestroy)
+#define declare_cmap_str_2(tag, Value) \
+    declare_CHASH_STR(tag, cmap, Value, c_defaultDestroy)
 
-#define declare_CMap_str_3(tag, Value, ValueDestroy) \
-    declare_CHASH_STR(tag, CMap, cmap, Value, ValueDestroy)
+#define declare_cmap_str_3(tag, Value, ValueDestroy) \
+    declare_CHASH_STR(tag, cmap, Value, ValueDestroy)
 
-#define declare_CHASH_STR(tag, CType, ctype, Value, valueDestroy) \
-    declare_CHASH(tag, CType, ctype, CStr, Value, valueDestroy, cstr_equalsRaw, cstr_hashRaw, \
+#define declare_CHASH_STR(tag, ctype, Value, valueDestroy) \
+    declare_CHASH(tag, ctype, cstr_t, Value, valueDestroy, cstr_equalsRaw, cstr_hashRaw, \
                        cstr_destroy, const char*, cstr_getRaw, cstr_make)
 
 #define OPT_1_cset(x)
@@ -126,124 +126,124 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
 #define OPT_2_cmap(x, y) x, y
 
 /* CHASH full: use 'void' for Value if ctype is cset */
-#define declare_CHASH(tag, CType, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
+#define declare_CHASH(tag, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                            keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
 typedef struct { \
     Key key; \
     OPT_1_##ctype(Value value;) \
-} CType##Entry_##tag, ctype##_##tag##_entry_t; \
+} ctype##entry_##tag, ctype##_##tag##_entry_t; \
  \
 STC_INLINE void \
-ctype##entry_##tag##_destroy(CType##Entry_##tag* e) { \
+ctype##entry_##tag##_destroy(ctype##entry_##tag* e) { \
     keyDestroy(&e->key); \
     OPT_1_##ctype(valueDestroy(&e->value);) \
 } \
 typedef struct { \
     RawKey key; \
     OPT_1_##ctype(Value value;) \
-} CType##Input_##tag, ctype##_##tag##_input_t; \
+} ctype##_##tag##_input_t; \
  \
-typedef RawKey CType##RawKey_##tag, ctype##_##tag##_rawkey_t; \
+typedef RawKey ctype##_##tag##_rawkey_t; \
  \
 typedef struct { \
-    CType##Entry_##tag* table; \
+    ctype##entry_##tag* table; \
     uint8_t* _hashx; \
     uint32_t size, bucketCount; \
     float maxLoadFactor; \
     float shrinkLimitFactor; \
-} CType##_##tag; \
+} ctype##_##tag; \
  \
 typedef struct { \
-    CType##Entry_##tag *item, *_end; \
+    ctype##entry_##tag *item, *_end; \
     uint8_t* _hx; \
-} CType##Iter_##tag, ctype##_##tag##_iter_t; \
+} ctype##_##tag##_iter_t; \
  \
-STC_INLINE CType##_##tag \
-ctype##_##tag##_init(void) {CType##_##tag x = cmap_init; return x;} \
-STC_API CType##_##tag \
+STC_INLINE ctype##_##tag \
+ctype##_##tag##_init(void) {ctype##_##tag x = cmap_init; return x;} \
+STC_API ctype##_##tag \
 ctype##_##tag##_make(size_t initialSize); \
 STC_API void \
-ctype##_##tag##_pushN(CType##_##tag* self, const CType##Input_##tag in[], size_t size); \
+ctype##_##tag##_pushN(ctype##_##tag* self, const ctype##_##tag##_input_t in[], size_t size); \
 STC_API void \
-ctype##_##tag##_destroy(CType##_##tag* self); \
+ctype##_##tag##_destroy(ctype##_##tag* self); \
 STC_API void \
-ctype##_##tag##_clear(CType##_##tag* self); \
+ctype##_##tag##_clear(ctype##_##tag* self); \
 STC_INLINE void \
-ctype##_##tag##_setLoadFactors(CType##_##tag* self, float max, float shrink) { \
+ctype##_##tag##_setLoadFactors(ctype##_##tag* self, float max, float shrink) { \
     self->maxLoadFactor = max; self->shrinkLimitFactor = shrink; \
 } \
-STC_API CType##Entry_##tag* \
-ctype##_##tag##_find(const CType##_##tag* self, CType##RawKey_##tag rawKey); \
-STC_FORCE_INLINE CType##Entry_##tag* /* alias */ \
-ctype##_##tag##_get(const CType##_##tag* self, CType##RawKey_##tag rawKey) \
+STC_API ctype##entry_##tag* \
+ctype##_##tag##_find(const ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey); \
+STC_FORCE_INLINE ctype##entry_##tag* /* alias */ \
+ctype##_##tag##_get(const ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey) \
     {return ctype##_##tag##_find(self, rawKey);} \
-STC_API CType##Entry_##tag* /* similar to c++ std::map.insert_or_assign(): */ \
-ctype##_##tag##_put(CType##_##tag* self, OPT_2_##ctype(CType##RawKey_##tag rawKey, Value value)); \
-OPT_1_##ctype(STC_API CType##Entry_##tag* /* similar to c++ std::map.operator[](): */ \
-ctype##_##tag##_insert(CType##_##tag* self, CType##RawKey_##tag rawKey, Value initValue);) \
+STC_API ctype##entry_##tag* /* similar to c++ std::map.insert_or_assign(): */ \
+ctype##_##tag##_put(ctype##_##tag* self, OPT_2_##ctype(ctype##_##tag##_rawkey_t rawKey, Value value)); \
+OPT_1_##ctype(STC_API ctype##entry_##tag* /* similar to c++ std::map.operator[](): */ \
+ctype##_##tag##_insert(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey, Value initValue);) \
 STC_INLINE void \
-ctype##_##tag##_swap(CType##_##tag* a, CType##_##tag* b) { c_swap(CType##_##tag, *a, *b); } \
+ctype##_##tag##_swap(ctype##_##tag* a, ctype##_##tag* b) { c_swap(ctype##_##tag, *a, *b); } \
 STC_API size_t \
-ctype##_##tag##_reserve(CType##_##tag* self, size_t size); \
+ctype##_##tag##_reserve(ctype##_##tag* self, size_t size); \
 STC_API bool \
-ctype##_##tag##_eraseEntry(CType##_##tag* self, CType##Entry_##tag* entry); \
+ctype##_##tag##_eraseEntry(ctype##_##tag* self, ctype##entry_##tag* entry); \
 STC_API bool \
-ctype##_##tag##_erase(CType##_##tag* self, CType##RawKey_##tag rawKey); \
+ctype##_##tag##_erase(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey); \
 STC_API ctype##_##tag##_iter_t \
-ctype##_##tag##_begin(CType##_##tag* map); \
+ctype##_##tag##_begin(ctype##_##tag* map); \
 STC_API ctype##_##tag##_iter_t \
 ctype##_##tag##_next(ctype##_##tag##_iter_t it); \
  \
-implement_CHASH(tag, CType, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
+implement_CHASH(tag, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                      keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
-typedef Key CType##Key_##tag, ctype##_##tag##_key_t; \
-typedef Value CType##Value_##tag, ctype##_##tag##_value_t
+typedef Key ctype##_##tag##_key_t; \
+typedef Value ctype##_##tag##_value_t
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define implement_CHASH(tag, CType, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
+#define implement_CHASH(tag, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                              keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
- STC_API CType##_##tag \
+ STC_API ctype##_##tag \
 ctype##_##tag##_make(size_t initialSize) { \
-    CType##_##tag h = ctype##_init; \
+    ctype##_##tag h = ctype##_init; \
     ctype##_##tag##_reserve(&h, initialSize); \
     return h; \
 } \
 STC_API void \
-ctype##_##tag##_pushN(CType##_##tag* self, const CType##Input_##tag in[], size_t size) { \
+ctype##_##tag##_pushN(ctype##_##tag* self, const ctype##_##tag##_input_t in[], size_t size) { \
     for (size_t i=0; i<size; ++i) ctype##_##tag##_put(self, OPT_2_##ctype(in[i].key, in[i].value)); \
 } \
  \
-STC_INLINE void ctype##_##tag##_wipe_(CType##_##tag* self) { \
+STC_INLINE void ctype##_##tag##_wipe_(ctype##_##tag* self) { \
     if (self->size == 0) return; \
-    CType##Entry_##tag* e = self->table, *end = e + self->bucketCount; \
+    ctype##entry_##tag* e = self->table, *end = e + self->bucketCount; \
     uint8_t *hx = self->_hashx; \
     for (; e != end; ++e) if (*hx++) ctype##entry_##tag##_destroy(e); \
 } \
  \
-STC_API void ctype##_##tag##_destroy(CType##_##tag* self) { \
+STC_API void ctype##_##tag##_destroy(ctype##_##tag* self) { \
     ctype##_##tag##_wipe_(self); \
     free(self->_hashx); \
     free(self->table); \
 } \
  \
-STC_API void ctype##_##tag##_clear(CType##_##tag* self) { \
+STC_API void ctype##_##tag##_clear(ctype##_##tag* self) { \
     ctype##_##tag##_wipe_(self); \
     self->size = 0; \
     memset(self->_hashx, 0, self->bucketCount); \
 } \
  \
 STC_API size_t \
-ctype##_##tag##_bucket(const CType##_##tag* self, const CType##RawKey_##tag* rawKeyPtr, uint32_t* hxPtr) { \
-    uint32_t hash = keyHashRaw(rawKeyPtr, sizeof(CType##RawKey_##tag)); \
+ctype##_##tag##_bucket(const ctype##_##tag* self, const ctype##_##tag##_rawkey_t* rawKeyPtr, uint32_t* hxPtr) { \
+    uint32_t hash = keyHashRaw(rawKeyPtr, sizeof(ctype##_##tag##_rawkey_t)); \
     uint32_t sx, hx = (hash & chash_HASH) | chash_USED; \
     size_t cap = self->bucketCount; \
     size_t idx = chash_reduce(hash, cap); \
     uint8_t* hashx = self->_hashx; \
     while ((sx = hashx[idx])) { \
         if (sx == hx) { \
-            CType##RawKey_##tag r = keyGetRaw(&self->table[idx].key); \
+            ctype##_##tag##_rawkey_t r = keyGetRaw(&self->table[idx].key); \
             if (keyEqualsRaw(&r, rawKeyPtr)) break; \
         } \
         if (++idx == cap) idx = 0; \
@@ -252,25 +252,25 @@ ctype##_##tag##_bucket(const CType##_##tag* self, const CType##RawKey_##tag* raw
     return idx; \
 } \
  \
-STC_API CType##Entry_##tag* \
-ctype##_##tag##_find(const CType##_##tag* self, CType##RawKey_##tag rawKey) { \
+STC_API ctype##entry_##tag* \
+ctype##_##tag##_find(const ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey) { \
     if (self->size == 0) return NULL; \
     uint32_t hx; \
     size_t idx = ctype##_##tag##_bucket(self, &rawKey, &hx); \
     return self->_hashx[idx] ? &self->table[idx] : NULL; \
 } \
  \
-static inline void ctype##_##tag##_reserveExpand_(CType##_##tag* self) { \
+static inline void ctype##_##tag##_reserveExpand_(ctype##_##tag* self) { \
     if (self->size + 1 >= self->bucketCount * self->maxLoadFactor) \
         ctype##_##tag##_reserve(self, 7 + self->size * 3 / 2); \
 } \
  \
-STC_API CType##Entry_##tag* \
-ctype##_##tag##_put(CType##_##tag* self, OPT_2_##ctype(CType##RawKey_##tag rawKey, Value value)) { \
+STC_API ctype##entry_##tag* \
+ctype##_##tag##_put(ctype##_##tag* self, OPT_2_##ctype(ctype##_##tag##_rawkey_t rawKey, Value value)) { \
     ctype##_##tag##_reserveExpand_(self); \
     uint32_t hx; \
     size_t idx = ctype##_##tag##_bucket(self, &rawKey, &hx); \
-    CType##Entry_##tag* e = &self->table[idx]; \
+    ctype##entry_##tag* e = &self->table[idx]; \
     if (self->_hashx[idx]) \
         OPT_1_##ctype(valueDestroy(&e->value)) ; \
     else { \
@@ -283,12 +283,12 @@ ctype##_##tag##_put(CType##_##tag* self, OPT_2_##ctype(CType##RawKey_##tag rawKe
 } \
  \
 OPT_1_##ctype( \
-STC_API CType##Entry_##tag* \
-ctype##_##tag##_insert(CType##_##tag* self, CType##RawKey_##tag rawKey, Value initValue) { \
+STC_API ctype##entry_##tag* \
+ctype##_##tag##_insert(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey, Value initValue) { \
     ctype##_##tag##_reserveExpand_(self); \
     uint32_t hx; \
     size_t idx = ctype##_##tag##_bucket(self, &rawKey, &hx); \
-    CType##Entry_##tag* e = &self->table[idx]; \
+    ctype##entry_##tag* e = &self->table[idx]; \
     if (! self->_hashx[idx]) { \
         e->key = keyInitRaw(rawKey); \
         self->_hashx[idx] = (uint8_t) hx; \
@@ -299,24 +299,24 @@ ctype##_##tag##_insert(CType##_##tag* self, CType##RawKey_##tag rawKey, Value in
 }) \
  \
 STC_API size_t \
-ctype##_##tag##_reserve(CType##_##tag* self, size_t newcap) { \
+ctype##_##tag##_reserve(ctype##_##tag* self, size_t newcap) { \
     size_t oldcap = self->bucketCount; \
     if (self->size > newcap) return oldcap; \
     newcap /= self->maxLoadFactor; newcap |= 1; \
-    CType##_##tag tmp = { \
-        c_new_N(CType##Entry_##tag, newcap), \
+    ctype##_##tag tmp = { \
+        c_new_N(ctype##entry_##tag, newcap), \
         (uint8_t *) calloc(newcap, sizeof(uint8_t)), \
         self->size, (uint32_t) newcap, \
         self->maxLoadFactor, self->shrinkLimitFactor \
     }; \
     ctype##_##tag##_swap(self, &tmp); \
  \
-    CType##Entry_##tag* e = tmp.table, *slot = self->table; \
+    ctype##entry_##tag* e = tmp.table, *slot = self->table; \
     uint8_t* hashx = self->_hashx; \
     uint32_t hx; \
     for (size_t i = 0; i < oldcap; ++i, ++e) \
         if (tmp._hashx[i]) { \
-            CType##RawKey_##tag r = keyGetRaw(&e->key); \
+            ctype##_##tag##_rawkey_t r = keyGetRaw(&e->key); \
             size_t idx = ctype##_##tag##_bucket(self, &r, &hx); \
             slot[idx] = *e, \
             hashx[idx] = (uint8_t) hx; \
@@ -327,11 +327,11 @@ ctype##_##tag##_reserve(CType##_##tag* self, size_t newcap) { \
 } \
  \
 STC_API bool \
-ctype##_##tag##_eraseEntry(CType##_##tag* self, CType##Entry_##tag* entry) { \
+ctype##_##tag##_eraseEntry(ctype##_##tag* self, ctype##entry_##tag* entry) { \
     size_t i = chash_entryIndex(*self, entry), j = i, k, cap = self->bucketCount; \
-    CType##Entry_##tag* slot = self->table; \
+    ctype##entry_##tag* slot = self->table; \
     uint8_t* hashx = self->_hashx; \
-    CType##RawKey_##tag r; \
+    ctype##_##tag##_rawkey_t r; \
     if (! hashx[i]) \
         return false; \
     do { /* deletion from hash table without tombstone */ \
@@ -339,7 +339,7 @@ ctype##_##tag##_eraseEntry(CType##_##tag* self, CType##Entry_##tag* entry) { \
         if (! hashx[j]) \
             break; \
         r = keyGetRaw(&slot[j].key); \
-        k = chash_reduce(keyHashRaw(&r, sizeof(CType##RawKey_##tag)), cap); \
+        k = chash_reduce(keyHashRaw(&r, sizeof(ctype##_##tag##_rawkey_t)), cap); \
         if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */ \
             slot[i] = slot[j], hashx[i] = hashx[j], i = j; \
     } while (true); \
@@ -350,11 +350,11 @@ ctype##_##tag##_eraseEntry(CType##_##tag* self, CType##Entry_##tag* entry) { \
 } \
  \
 STC_API bool \
-ctype##_##tag##_erase(CType##_##tag* self, CType##RawKey_##tag rawKey) { \
+ctype##_##tag##_erase(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey) { \
     if (self->size == 0) \
         return false; \
     size_t cap = self->bucketCount; \
-    if (self->size < cap * self->shrinkLimitFactor && cap * sizeof(CType##Entry_##tag) > 1024) \
+    if (self->size < cap * self->shrinkLimitFactor && cap * sizeof(ctype##entry_##tag) > 1024) \
         ctype##_##tag##_reserve(self, self->size * 6 / 5); \
     uint32_t hx; \
     size_t i = ctype##_##tag##_bucket(self, &rawKey, &hx); \
@@ -362,9 +362,9 @@ ctype##_##tag##_erase(CType##_##tag* self, CType##RawKey_##tag rawKey) { \
 } \
  \
 STC_API ctype##_##tag##_iter_t \
-ctype##_##tag##_begin(CType##_##tag* map) { \
+ctype##_##tag##_begin(ctype##_##tag* map) { \
     uint8_t* hx = map->_hashx; \
-    CType##Entry_##tag* e = map->table, *end = e + map->bucketCount; \
+    ctype##entry_##tag* e = map->table, *end = e + map->bucketCount; \
     while (e != end && !*hx) ++e, ++hx; \
     ctype##_##tag##_iter_t it = {e == end ? NULL : e, end, hx}; return it; \
 } \
@@ -377,7 +377,7 @@ ctype##_##tag##_next(ctype##_##tag##_iter_t it) { \
 }
 
 #else
-#define implement_CHASH(tag, CType, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
+#define implement_CHASH(tag, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                              keyDestroy, RawKey, keyGetRaw, keyInitRaw)
 #endif
 

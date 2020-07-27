@@ -26,9 +26,9 @@ After inserting all the elements excluding the ones which are to be deleted, Pop
 #include <stc/cmap.h>
 #include <stc/cvecpq.h>
 
-declare_CMap(ii, int, int);
-declare_CVec(i, int);
-declare_CVec_priority_queue(i, >);
+declare_cmap(ii, int, int);
+declare_cvec(i, int);
+declare_cvec_priority_queue(i, >);
 
 // Find k minimum element from arr[0..m-1] after deleting 
 // elements from del[0..n-1] 
@@ -36,19 +36,19 @@ void findElementsAfterDel(int arr[], int m, int del[],
                           int n, int k) 
 { 
     // Hash Map of the numbers to be deleted 
-    CMap_ii mp = cmap_init; 
+    cmap_ii mp = cmap_init; 
     for (int i = 0; i < n; ++i) { 
   
         // Increment the count of del[i] 
         cmap_ii_insert(&mp, del[i], 0)->value++; 
     } 
   
-    CVec_i heap = cvec_init; 
+    cvec_i heap = cvec_init; 
   
     for (int i = 0; i < m; ++i) { 
   
         // Search if the element is present 
-        CMapEntry_ii *e = cmap_ii_find(&mp, arr[i]);
+        cmapentry_ii *e = cmap_ii_find(&mp, arr[i]);
         if (e != NULL) { 
   
             // Decrement its frequency 

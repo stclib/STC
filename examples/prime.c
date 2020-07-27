@@ -10,7 +10,7 @@
 
 static inline void sieveOfEratosthenes(size_t n)
 {
-    CBitset prime = cbitset_make(n + 1, true);
+    cbitset_t prime = cbitset_make(n + 1, true);
     printf("computing prime numbers up to %zu\n", n);
     cbitset_reset(&prime, 0);
     cbitset_reset(&prime, 1);
