@@ -2,7 +2,7 @@
 #include <stc/cbitset.h>
 
 int main() {
-    CBitset set = cbitset_make(23, true);
+    cbitset_t set = cbitset_make(23, true);
     printf("count %zu, %zu\n", cbitset_count(set), set.size);
     cbitset_reset(&set, 9);
     cbitset_resize(&set, 43, false);
@@ -21,7 +21,7 @@ int main() {
         printf("%d", cbitset_test(set, i));
     puts("");
 
-    CBitset s2 = cbitset_from(set);
+    cbitset_t s2 = cbitset_from(set);
     cbitset_flipAll(&s2);
     cbitset_set(&s2, 16);
     cbitset_set(&s2, 17);

@@ -2,10 +2,10 @@
 #include <time.h>
 #include <stc/clist.h>
 #include <stc/crandom.h>
-declare_CList(ix, uint64_t);
+declare_clist(ix, uint64_t);
 
 int main() {
-    CList_ix list = clist_init;
+    clist_ix list = clist_init;
     crandom32_t pcg = crandom32_init(time(NULL));
     int n;
     for (int i=0; i<10000000; ++i) // ten million

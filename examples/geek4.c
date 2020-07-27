@@ -37,19 +37,19 @@ Efficient Approach: For all the words of the first sentence, we can check if it 
 #include <stc/cvec.h>
 #include <stc/cstr.h>
 
-declare_CVec_str();
-declare_CMap_str(sb, bool);
-declare_CVec(sb, CMapEntry_sb, cmapentry_sb_destroy, c_noCompare);
+declare_cvec_str();
+declare_cmap_str(sb, bool);
+declare_cvec(sb, cmapentry_sb, cmapentry_sb_destroy, c_noCompare);
   
 // Function to return the count of common words 
 // in all the sentences 
-int commonWords(CVec_str S) 
+int commonWords(cvec_str S) 
 { 
     int m, n, i, j; 
   
  
     // To store all the words of first string 
-    CVec_sb ans = cvec_init; 
+    cvec_sb ans = cvec_init; 
   
     // m will store number of strings in given vector 
     m = cvec_size(S);
@@ -59,8 +59,8 @@ int commonWords(CVec_str S)
     // Extract all words of first string and store it in ans 
     while (i < cstr_size(S.data[0])) { 
         // To store separate words 
-        CStr word = cstr_init; 
-        CMapEntry_sb tmp = {cstr_init, false};
+        cstr_t word = cstr_init; 
+        cmapentry_sb tmp = {cstr_init, false};
 
         while (i < cstr_size(S.data[0]) && S.data[0].str[i] != ' ') { 
             cstr_pushBack(&word, S.data[0].str[i]); 
@@ -85,11 +85,11 @@ int commonWords(CVec_str S)
     for (j = 1; j < m; j++) { 
         // It will be used to check if a word is present 
         // in a particuler string 
-        CMap_sb has = cmap_init; 
+        cmap_sb has = cmap_init; 
         i = 0; 
   
         while (i < cstr_size(S.data[j])) { 
-            CStr word = cstr_init; 
+            cstr_t word = cstr_init; 
             while (i < cstr_size(S.data[j]) && S.data[j].str[i] != ' ') { 
                 cstr_pushBack(&word, S.data[j].str[i]); 
                 i++; 
@@ -136,7 +136,7 @@ int commonWords(CVec_str S)
 // Driver code 
 int main() 
 { 
-    CVec_str S = cvec_init; 
+    cvec_str S = cvec_init; 
     cvec_str_pushBack(&S, cstr_make("there is a cow")); 
     cvec_str_pushBack(&S, cstr_make("cow is our mother")); 
     cvec_str_pushBack(&S, cstr_make("cow gives us milk and milk is sweet")); 

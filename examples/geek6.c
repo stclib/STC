@@ -30,14 +30,14 @@ operation in almost O(1) time complexity.
 
 #include <stdio.h>  
 #include <stc/cmap.h>
-declare_CSet(i, int);
+declare_cset(i, int);
 
 // Function to find the smallest positive 
 // missing number 
 int missingNumber(int a[], int n) 
 { 
     // Declaring an unordered_map 
-    CSet_i mp = cset_init; 
+    cset_i mp = cset_init; 
   
     // if array value is positive 
     // store it in map 
