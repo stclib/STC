@@ -173,29 +173,28 @@ void mapdemo3()
 }
 
 
-
 declare_CArray(f, float);
 
 void arraydemo1()
 {
     printf("\nARRAYDEMO1\n");
-    CArray3_f a3 = carray3_f_make(30, 20, 10, 0.f);
-    carray3_f_data(a3, 5, 4)[3] = 10.2f;  // a3[5][4][3]
-    CArray2_f a2 = carray3_f_at(a3, 5);     // sub-array reference (no data copy).
+    CArray3f a3 = carray3f_make(30, 20, 10, 0.f);
+    carray3f_data(a3, 5, 4)[3] = 10.2f;  // a3[5][4][3]
+    CArray2f a2 = carray3f_at(a3, 5);     // sub-array reference (no data copy).
 
     printf("a3: %zu: (%zu, %zu, %zu) = %zu\n", sizeof(a3), carray3_xdim(a3), carray3_ydim(a3), carray3_zdim(a3), carray3_size(a3));
     printf("a2: %zu: (%zu, %zu) = %zu\n", sizeof(a2), carray2_xdim(a2), carray2_ydim(a2), carray2_size(a2));
 
-    printf("%f\n", carray2_f_value(a2, 4, 3));   // readonly lookup a2[4][3] (=10.2f)
-    printf("%f\n", carray2_f_data(a2, 4)[3]);    // same, but this is writable.
-    printf("%f\n", carray2_f_at(a2, 4).data[3]); // same, via sub-array access.
+    printf("%f\n", carray2f_value(a2, 4, 3));   // readonly lookup a2[4][3] (=10.2f)
+    printf("%f\n", carray2f_data(a2, 4)[3]);    // same, but this is writable.
+    printf("%f\n", carray2f_at(a2, 4).data[3]); // same, via sub-array access.
     
-    printf("%f\n", carray3_f_value(a3, 5, 4, 3)); // same data location, via a3 array.
-    printf("%f\n", carray3_f_data(a3, 5, 4)[3]);
-    printf("%f\n", carray3_f_at2(a3, 5, 4).data[3]);
+    printf("%f\n", carray3f_value(a3, 5, 4, 3)); // same data location, via a3 array.
+    printf("%f\n", carray3f_data(a3, 5, 4)[3]);
+    printf("%f\n", carray3f_at2(a3, 5, 4).data[3]);
 
-    carray2_f_destroy(&a2); // does nothing, since it is a sub-array.
-    carray3_f_destroy(&a3); // also invalidates a2.
+    carray2f_destroy(&a2); // does nothing, since it is a sub-array.
+    carray3f_destroy(&a3); // also invalidates a2.
 }
 
 

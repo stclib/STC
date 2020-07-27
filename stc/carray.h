@@ -34,20 +34,20 @@ declare_CArray(f, float);
 
 int main()
 {
-    CArray3_f a3 = carray3_f_make(30, 20, 10, 0.f);
-    carray3_f_data(a3, 5, 4)[3] = 10.2f;  // a3[5][4][3]
-    CArray2_f a2 = carray3_f_at(a3, 5);   // sub-array reference (no data copy).
+    CArray3_f a3 = carray3f_make(30, 20, 10, 0.f);
+    carray3f_data(a3, 5, 4)[3] = 10.2f;  // a3[5][4][3]
+    CArray2_f a2 = carray3f_at(a3, 5);   // sub-array reference (no data copy).
 
-    printf("%f\n", carray2_f_value(a2, 4, 3));   // readonly lookup a2[4][3] (=10.2f)
-    printf("%f\n", carray2_f_data(a2, 4)[3]);    // same, but this is writable.
-    printf("%f\n", carray2_f_at(a2, 4).data[3]); // same, via sub-array access.
+    printf("%f\n", carray2f_value(a2, 4, 3));   // readonly lookup a2[4][3] (=10.2f)
+    printf("%f\n", carray2f_data(a2, 4)[3]);    // same, but this is writable.
+    printf("%f\n", carray2f_at(a2, 4).data[3]); // same, via sub-array access.
     
-    printf("%f\n", carray3_f_value(a3, 5, 4, 3)); // same data location, via a3 array.
-    printf("%f\n", carray3_f_data(a3, 5, 4)[3]);
-    printf("%f\n", carray3_f_at2(a3, 5, 4).data[3]);
+    printf("%f\n", carray3f_value(a3, 5, 4, 3)); // same data location, via a3 array.
+    printf("%f\n", carray3f_data(a3, 5, 4)[3]);
+    printf("%f\n", carray3f_at2(a3, 5, 4).data[3]);
     
-    carray2_f_destroy(&a2); // does nothing, since it is a sub-array.
-    carray3_f_destroy(&a3); // also invalidates a2.
+    carray2f_destroy(&a2); // does nothing, since it is a sub-array.
+    carray3f_destroy(&a3); // also invalidates a2.
 }
 */
 
@@ -84,110 +84,110 @@ static inline size_t _carray3_size(const size_t* zdim) {
     typedef struct { \
         Value *data; \
         size_t _xdim; \
-    } CArray1_##tag; \
+    } CArray1##tag; \
  \
     typedef struct { \
         Value *data; \
         size_t _xdim, _yxdim; \
-    } CArray2_##tag; \
+    } CArray2##tag; \
  \
     typedef struct { \
         Value *data; \
         size_t _xdim, _yxdim, _zdim; \
-    } CArray3_##tag; \
+    } CArray3##tag; \
  \
-    static inline CArray1_##tag \
-    carray1_##tag##_make(size_t xdim, Value val) { \
+    static inline CArray1##tag \
+    carray1##tag##_make(size_t xdim, Value val) { \
         Value* m = c_new_N(Value, xdim); \
         for (size_t i=0; i<xdim; ++i) m[i] = val; \
-        CArray1_##tag a = {m, xdim | _carray_OWN}; \
+        CArray1##tag a = {m, xdim | _carray_OWN}; \
         return a; \
     } \
-    static inline CArray2_##tag \
-    carray2_##tag##_make(size_t ydim, size_t xdim, Value val) { \
+    static inline CArray2##tag \
+    carray2##tag##_make(size_t ydim, size_t xdim, Value val) { \
         const size_t n = ydim * xdim; \
         Value* m = c_new_N(Value, n); \
         for (size_t i=0; i<n; ++i) m[i] = val; \
-        CArray2_##tag a = {m, xdim | _carray_OWN, ydim * xdim}; \
+        CArray2##tag a = {m, xdim | _carray_OWN, ydim * xdim}; \
         return a; \
     } \
-    static inline CArray3_##tag \
-    carray3_##tag##_make(size_t zdim, size_t ydim, size_t xdim, Value val) { \
+    static inline CArray3##tag \
+    carray3##tag##_make(size_t zdim, size_t ydim, size_t xdim, Value val) { \
         const size_t n = zdim * ydim * xdim; \
         Value* m = c_new_N(Value, n); \
         for (size_t i=0; i<n; ++i) m[i] = val; \
-        CArray3_##tag a = {m, xdim | _carray_OWN, ydim * xdim, zdim}; \
+        CArray3##tag a = {m, xdim | _carray_OWN, ydim * xdim, zdim}; \
         return a; \
     } \
  \
-    static inline CArray1_##tag \
-    carray1_##tag##_from(size_t xdim, Value* array, bool own) { \
-        CArray1_##tag a = {array, xdim | (own ? _carray_OWN : 0)}; \
+    static inline CArray1##tag \
+    carray1##tag##_from(size_t xdim, Value* array, bool own) { \
+        CArray1##tag a = {array, xdim | (own ? _carray_OWN : 0)}; \
         return a; \
     } \
-    static inline CArray2_##tag \
-    carray2_##tag##_from(size_t ydim, size_t xdim, Value* array, bool own) { \
-        CArray2_##tag a = {array, xdim | (own ? _carray_OWN : 0), ydim * xdim}; \
+    static inline CArray2##tag \
+    carray2##tag##_from(size_t ydim, size_t xdim, Value* array, bool own) { \
+        CArray2##tag a = {array, xdim | (own ? _carray_OWN : 0), ydim * xdim}; \
         return a; \
     } \
-    static inline CArray3_##tag \
-    carray3_##tag##_from(size_t zdim, size_t ydim, size_t xdim, Value* array, bool own) { \
-        CArray3_##tag a = {array, xdim | (own ? _carray_OWN : 0), ydim * xdim, zdim}; \
+    static inline CArray3##tag \
+    carray3##tag##_from(size_t zdim, size_t ydim, size_t xdim, Value* array, bool own) { \
+        CArray3##tag a = {array, xdim | (own ? _carray_OWN : 0), ydim * xdim, zdim}; \
         return a; \
     } \
  \
     static inline void \
-    carray1_##tag##_destroy(CArray1_##tag* self) { \
+    carray1##tag##_destroy(CArray1##tag* self) { \
         if (self->_xdim & _carray_OWN) { \
             size_t n = carray1_size(*self); Value* a = self->data; \
             while (n--) valueDestroy(&a[n]); free(a); \
         } \
     } \
     static inline void \
-    carray2_##tag##_destroy(CArray2_##tag* self) { \
+    carray2##tag##_destroy(CArray2##tag* self) { \
         if (self->_xdim & _carray_OWN) { \
             size_t n = carray2_size(*self); Value* a = self->data; \
             while (n--) valueDestroy(&a[n]); free(a); \
         } \
     } \
     static inline void \
-    carray3_##tag##_destroy(CArray3_##tag* self) { \
+    carray3##tag##_destroy(CArray3##tag* self) { \
         if (self->_xdim & _carray_OWN) { \
             size_t n = carray3_size(*self); Value* a = self->data; \
             while (n--) valueDestroy(&a[n]); free(a); \
         } \
     } \
  \
-    static inline CArray1_##tag \
-    carray2_##tag##_at(CArray2_##tag a, size_t y) { \
-        CArray1_##tag sub = {a.data + y*carray2_xdim(a), carray2_xdim(a)}; \
+    static inline CArray1##tag \
+    carray2##tag##_at(CArray2##tag a, size_t y) { \
+        CArray1##tag sub = {a.data + y*carray2_xdim(a), carray2_xdim(a)}; \
         return sub; \
     } \
     static inline Value* \
-    carray2_##tag##_data(CArray2_##tag a, size_t y) { \
+    carray2##tag##_data(CArray2##tag a, size_t y) { \
         return a.data + y*carray2_xdim(a); \
     } \
     static inline Value \
-    carray2_##tag##_value(CArray2_##tag a, size_t y, size_t x) { \
+    carray2##tag##_value(CArray2##tag a, size_t y, size_t x) { \
         return a.data[ y*carray2_xdim(a) + x ]; \
     } \
  \
-    static inline CArray2_##tag \
-    carray3_##tag##_at(CArray3_##tag a, size_t z) { \
-        CArray2_##tag sub = {a.data + z*a._yxdim, carray3_xdim(a), a._yxdim}; \
+    static inline CArray2##tag \
+    carray3##tag##_at(CArray3##tag a, size_t z) { \
+        CArray2##tag sub = {a.data + z*a._yxdim, carray3_xdim(a), a._yxdim}; \
         return sub; \
     } \
-    static inline CArray1_##tag \
-    carray3_##tag##_at2(CArray3_##tag a, size_t z, size_t y) { \
-        CArray1_##tag sub = {a.data + z*a._yxdim + y*carray3_xdim(a), carray3_xdim(a)}; \
+    static inline CArray1##tag \
+    carray3##tag##_at2(CArray3##tag a, size_t z, size_t y) { \
+        CArray1##tag sub = {a.data + z*a._yxdim + y*carray3_xdim(a), carray3_xdim(a)}; \
         return sub; \
     } \
     static inline Value* \
-    carray3_##tag##_data(CArray3_##tag a, size_t z, size_t y) { \
+    carray3##tag##_data(CArray3##tag a, size_t z, size_t y) { \
         return a.data + z*a._yxdim + y*carray3_xdim(a); \
     } \
     static inline Value \
-    carray3_##tag##_value(CArray3_##tag a, size_t z, size_t y, size_t x) { \
+    carray3##tag##_value(CArray3##tag a, size_t z, size_t y, size_t x) { \
         return a.data[ z*a._yxdim + y*carray3_xdim(a) + x ]; \
     } \
     typedef Value CArrayValue_##tag
