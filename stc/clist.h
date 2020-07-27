@@ -39,10 +39,10 @@
  
     int main() {
         clist_ix list = clist_init;
-        pcg32_random_t pcg = pcg32_seed(123, 0);
+        crandom32_t pcg = crandom32_uniform_engine(12345);
         int n;
         for (int i=0; i<1000000; ++i) // one million
-            clist_ix_pushBack(&list, pcg32_random(&pcg));
+            clist_ix_pushBack(&list, crandom32_uniform_int(&pcg));
         n = 0; 
         c_foreach (i, clist_ix, list)
             if (++n % 10000 == 0) printf("%8d: %10zd\n", n, i.item->value);

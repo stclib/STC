@@ -55,10 +55,8 @@ int main(void) {
 
 #define cmap_init                     {NULL, NULL, 0, 0, 0.85f, 0.15f}
 #define cmap_size(m)                  ((size_t) (m).size)
-#define cmap_bucketCount(m)           ((size_t) (m).bucketCount)
 #define cset_init                     cmap_init                    
 #define cset_size(s)                  cmap_size(s)                 
-#define cset_bucketCount(s)           cmap_bucketCount(s)          
 
 /* https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction */
 #define chash_reduce(x, N)            ((uint32_t) (((uint64_t) (x) * (N)) >> 32))
@@ -160,6 +158,8 @@ typedef struct { \
  \
 STC_INLINE ctype##_##tag \
 ctype##_##tag##_init(void) {ctype##_##tag x = cmap_init; return x;} \
+STC_INLINE size_t \
+ctype##_##tag##_size(ctype##_##tag m) {return m.size;} \
 STC_API ctype##_##tag \
 ctype##_##tag##_make(size_t initialSize); \
 STC_API void \

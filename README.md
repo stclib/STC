@@ -296,9 +296,9 @@ declare_clist(i, uint64_t);
 int main() {
     clist_i list = clist_init;
     int N = 2000000, n;
-    crandom64_t rng = crandom64_seed(time(NULL));
+    crandom64_t rng = crandom64_uniform_engine(time(NULL));
     for (int i=0; i<N; ++i) // two million random numbers
-        clist_i_pushBack(&list, crandom64(&rng));
+        clist_i_pushBack(&list, crandom64_uinform_int(&rng));
     n = 0; 
     c_foreach (i, clist_i, list)
         if (++n % (N/50) == 0) printf("%10d: %zu\n", n, i.item->value);

@@ -22,8 +22,8 @@ size_t seed;
 static const float maxLoadFactor = 0.77f;
 
 crandom64_t rng;
-#define SEED(s) rng = crandom64_init(seed)
-#define RAND(N) (crandom64(&rng) & ((1 << N) - 1))
+#define SEED(s) rng = crandom64_uniform_engine(seed)
+#define RAND(N) (crandom64_uniform_int(&rng) & ((1 << N) - 1))
 
 
 #define CMAP_SETUP(tag, Key, Value) cmap_##tag map = cmap_init \
@@ -32,7 +32,7 @@ crandom64_t rng;
 #define CMAP_ERASE(tag, key)        cmap_##tag##_erase(&map, key)
 #define CMAP_FIND(tag, key)         (cmap_##tag##_find(map, key) != NULL)
 #define CMAP_SIZE(tag)              cmap_size(map)
-#define CMAP_BUCKETS(tag)           cmap_bucketCount(map)
+#define CMAP_BUCKETS(tag)           (map).bucketCount
 #define CMAP_CLEAR(tag)             cmap_##tag##_destroy(&map)
 
 #define KMAP_SETUP(tag, Key, Value) khash_t(ii)* map = kh_init(ii); khiter_t ki; int ret

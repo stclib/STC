@@ -28,11 +28,11 @@
     declare_cvec(i, int);
     declare_cvec_priority_queue(i, >); // min-heap (increasing values)
     int main() {
-        pcg32_random_t pcg = pcg32_seed(1234, 0);
+        crandom32_t pcg = crandom32_uniform_engine(1234);
         cvec_i heap = cvec_init;
         // Push one million random numbers onto the queue.
         for (int i=0; i<1000000; ++i)
-            cvecpq_i_push(&heap, pcg32_random(&pcg));
+            cvecpq_i_push(&heap, crandom32_uniform_int(&pcg));
         // Extract the 100 smallest.
         for (int i=0; i<100; ++i) {
             printf("%d ", cvecpq_i_top(&heap));
