@@ -28,9 +28,9 @@ static inline void sieveOfEratosthenes(size_t n)
     puts("done");
     // Count the primes
     size_t count = 0;
-    for (size_t i = 1; i <= n; ++i)
-       if (cbitset_test(prime, i)) ++count;
-    printf("number of primes: %zu\n", count);
+    //for (size_t i = 1; i <= n; ++i)
+    //   if (cbitset_test(prime, i)) ++count;
+    printf("number of primes: %zu\n", cbitset_count(prime));
     // print primes < 1000
     for (size_t i = 1; i <= 1000; ++i)
        if (cbitset_test(prime, i)) printf("%zu ", i);

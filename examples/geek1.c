@@ -21,7 +21,7 @@ int findMaximumPairs(int a[], int n, int k)
     // Hash-table 
     CMap_ii hash = cmap_init; 
     for (int i = 0; i < n; i++) {
-        cmap_ii_at(&hash, a[i] % k, 0)->value++;
+        cmap_ii_insert(&hash, a[i] % k, 0)->value++;
     }
   
     int count = 0; 
@@ -39,7 +39,7 @@ int findMaximumPairs(int a[], int n, int k)
             int second = k - it.item->key; 
 
             CMapEntry_ii *hf = cmap_ii_find(&hash, first),
-                         *hs = cmap_ii_at(&hash, second, 0);
+                         *hs = cmap_ii_insert(&hash, second, 0);
             // Check for minimal occurrence 
             if (hf->value < hs->value) { 
                 // Take the minimal 

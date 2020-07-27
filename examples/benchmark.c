@@ -33,7 +33,7 @@ crandom64_t rng;
 #define CMAP_FIND(tag, key)         (cmap_##tag##_find(map, key) != NULL)
 #define CMAP_SIZE(tag)              cmap_size(map)
 #define CMAP_BUCKETS(tag)           cmap_bucketCount(map)
-#define CMAP_CLEAR(tag)             cmap_##tag##_clear(&map)
+#define CMAP_CLEAR(tag)             cmap_##tag##_destroy(&map)
 
 #define KMAP_SETUP(tag, Key, Value) khash_t(ii)* map = kh_init(ii); khiter_t ki; int ret
 #define KMAP_PUT(tag, key, val)     (*(ki = kh_put(ii, map, key, &ret), map->vals[ki] = val, &map->vals[ki]))
@@ -41,7 +41,7 @@ crandom64_t rng;
 #define KMAP_FIND(tag, key)         (kh_get(ii, map, key) != kh_end(map))
 #define KMAP_SIZE(tag)              ((size_t) kh_size(map))
 #define KMAP_BUCKETS(tag)           ((size_t) kh_n_buckets(map))
-#define KMAP_CLEAR(tag)             kh_destroy(ii, map)                                 
+#define KMAP_CLEAR(tag)             kh_destroy(ii, map)
 
 #define UMAP_SETUP(tag, Key, Value) std::unordered_map<Key, Value> map; map.max_load_factor(maxLoadFactor)
 #define UMAP_PUT(tag, key, val)     (map[key] = val)

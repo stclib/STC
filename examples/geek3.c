@@ -15,10 +15,10 @@ int main ()
 
     // ...
     cmap_si_put(&mymap, "Mars", 3396);
-    cmap_si_at(&mymap, "Saturn", 0)->value += 272;
-    cmap_si_put(&mymap, "Jupiter", cmap_si_at(&mymap, "Saturn", 0)->value + 9638);
-    cmap_si_at(&mymap, "Sun", 0)->value += 1000;
-    cmap_si_at(&mymap, "Sun", 0)->value += 1000;
+    cmap_si_insert(&mymap, "Saturn", 0)->value += 272;
+    cmap_si_put(&mymap, "Jupiter", cmap_si_insert(&mymap, "Saturn", 0)->value + 9638);
+    cmap_si_insert(&mymap, "Sun", 0)->value += 1000;
+    cmap_si_insert(&mymap, "Sun", 0)->value += 1000;
 
     c_foreach (x, cmap_si, mymap) {
         printf("%s: %d\n", x.item->key.str, x.item->value);

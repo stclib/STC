@@ -180,7 +180,7 @@ ctype##_##tag##_get(const CType##_##tag* self, CType##RawKey_##tag rawKey) \
 STC_API CType##Entry_##tag* /* similar to c++ std::map.insert_or_assign(): */ \
 ctype##_##tag##_put(CType##_##tag* self, OPT_2_##ctype(CType##RawKey_##tag rawKey, Value value)); \
 OPT_1_##ctype(STC_API CType##Entry_##tag* /* similar to c++ std::map.operator[](): */ \
-ctype##_##tag##_at(CType##_##tag* self, CType##RawKey_##tag rawKey, Value initValue);) \
+ctype##_##tag##_insert(CType##_##tag* self, CType##RawKey_##tag rawKey, Value initValue);) \
 STC_INLINE void \
 ctype##_##tag##_swap(CType##_##tag* a, CType##_##tag* b) { c_swap(CType##_##tag, *a, *b); } \
 STC_API size_t \
@@ -284,7 +284,7 @@ ctype##_##tag##_put(CType##_##tag* self, OPT_2_##ctype(CType##RawKey_##tag rawKe
  \
 OPT_1_##ctype( \
 STC_API CType##Entry_##tag* \
-ctype##_##tag##_at(CType##_##tag* self, CType##RawKey_##tag rawKey, Value initValue) { \
+ctype##_##tag##_insert(CType##_##tag* self, CType##RawKey_##tag rawKey, Value initValue) { \
     ctype##_##tag##_reserveExpand_(self); \
     uint32_t hx; \
     size_t idx = ctype##_##tag##_bucket(self, &rawKey, &hx); \

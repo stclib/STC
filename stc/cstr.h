@@ -189,7 +189,10 @@ cstr_find(CStr s, size_t pos, const char* needle) {
 #define             cstr_compareRaw(x, y) strcmp(*(x), *(y))
 #define             cstr_equalsRaw(x, y) (strcmp(*(x), *(y)) == 0)
 STC_INLINE uint32_t cstr_hashRaw(const char* const* sPtr, size_t ignored) {
-    return c_defaultHash(*sPtr, strlen(*sPtr));
+    uint32_t hash = 5381, c; /* djb2 */
+    const char* tmp = *sPtr;
+    while (c = *tmp++) hash = ((hash << 5) + hash) ^ c;
+    return hash;    
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */

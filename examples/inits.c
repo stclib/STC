@@ -24,25 +24,26 @@ int main(void) {
     c_foreach (i, cmap_id, idnames)
         printf("%d: %s\n", i.item->key, i.item->value.str);
     cmap_id_destroy(&idnames);
-    
+
     // ------------------
+
     CMap_cnt countries = cmap_init;
 
-    cmap_cnt_at(&countries, "Greenland", 0)->value += 20;
+    cmap_cnt_insert(&countries, "Greenland", 0)->value += 20;
     c_push(&countries, cmap_cnt, c_items(
         {"Norway", 100},
         {"Denmark", 50},
         {"Iceland", 10},
     ));
 
-    cmap_cnt_at(&countries, "Sweden", 0)->value += 20;
-    cmap_cnt_at(&countries, "Norway", 0)->value += 20;
-    cmap_cnt_at(&countries, "Finland", 0)->value += 20;
+    cmap_cnt_insert(&countries, "Sweden", 0)->value += 20;
+    cmap_cnt_insert(&countries, "Norway", 0)->value += 20;
+    cmap_cnt_insert(&countries, "Finland", 0)->value += 20;
 
     c_foreach (i, cmap_cnt, countries)
         printf("%s: %d\n", i.item->key.str, i.item->value);
     cmap_cnt_destroy(&countries);
-    
+
     // ------------------
 
     CVec_ip pairs1 = cvec_init; 
@@ -57,7 +58,7 @@ int main(void) {
         printf("(%d %d) ", i.item->x, i.item->y);
     puts("");
     cvec_ip_destroy(&pairs1);
-    
+
     // ------------------
 
     CList_ip pairs2 = clist_init;

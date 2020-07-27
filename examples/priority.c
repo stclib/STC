@@ -7,7 +7,6 @@
 
 declare_CVec(i, uint32_t);
 declare_CVec_priority_queue(i, >); // min-heap (increasing values)
-declare_CMap(ii, int, int);
 
 int main() {
     crandom32_t pcg = crandom32_init(time(NULL));

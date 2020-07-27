@@ -40,7 +40,7 @@ void findElementsAfterDel(int arr[], int m, int del[],
     for (int i = 0; i < n; ++i) { 
   
         // Increment the count of del[i] 
-        cmap_ii_at(&mp, del[i], 0)->value++; 
+        cmap_ii_insert(&mp, del[i], 0)->value++; 
     } 
   
     CVec_i heap = cvec_init; 
