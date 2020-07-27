@@ -173,7 +173,7 @@ int main() {
     cmap_sm_destroy(&theMap); // free up the whole shebang!
 }
 ```
-**cstr_t**
+**cstr_t** string example.
 ```
 #include <stc/cstr.h>
 
@@ -201,13 +201,13 @@ int main() {
     cstr_destroy(&s2);
 }
 ```
-**cvec** of *int64_t*
+**cvec** of *int64_t*. 
 ```
 #include <stc/cvec.h>
 declare_cvec(ix, int64_t); // ix is just an example tag name, use anything without underscore.
 
 int main() {
-    cvec_ix bignums = cvec_init; // = (cvec_ix) cvec_init; if initializing after declaration.
+    cvec_ix bignums = cvec_init; // use cvec_ix_init() if initializing after declaration.
     cvec_ix_reserve(&bignums, 100);
     for (size_t i = 0; i<100; ++i)
         cvec_ix_pushBack(&bignums, i * i * i);
@@ -219,7 +219,7 @@ int main() {
     cvec_ix_destroy(&bignums);
 }
 ```
-**cvec** of *cstr_t*
+**cvec** of *cstr_t*.
 ```
 #include <stc/cstr.h>
 #include <stc/cvec.h>
@@ -235,7 +235,7 @@ int main() {
     cvec_str_destroy(&names);
 }
 ```
-**cmap** of *int -> int*
+**cmap** of *int -> int*.
 ```
 #include <stdio.h>
 #include <stc/cmap.h>
@@ -250,7 +250,7 @@ int main() {
     cmap_ii_destroy(&nums);
 }
 ```
-**cset** of *cstr_t*
+**cset** of *cstr_t*.
 ```
 #include <stc/cstr.h>
 #include <stc/cmap.h>
@@ -312,7 +312,7 @@ int main() {
     clist_i_destroy(&list);
 }
 ```
-**carray**. 1D, 2D and 3D arrays, heap allocated in one memory block. *carray3* can have sub-array "views" of *carray2* and *carray1* etc., as shown in the following example.
+**carray**. 1d, 2d and 3d arrays, allocated from heap in one memory block. *carray3* may have sub-array "views" of *carray2* and *carray1* etc., as shown in the following example:
 ```
 #include <stdio.h>
 #include <stc/carray.h>
@@ -320,19 +320,19 @@ declare_carray(f, float);
 
 int main()
 {
-    carray3_f a3 = carray3_f_make(30, 20, 10, 0.f);
-    carray3_f_data(a3, 5, 4)[3] = 10.2f; // a3[5][4][3]
-    carray2_f a2 = carray3_f_at(a3, 5);    // sub-array reference (no data copy).
+    carray3f a3 = carray3f_make(30, 20, 10, 0.f);
+    carray3f_data(a3, 5, 4)[3] = 10.2f; // a3[5][4][3]
+    carray2f a2 = carray3f_at(a3, 5);   // sub-array reference (no data copy).
 
-    printf("%f\n", carray2_f_value(a2, 4, 3));    // readonly lookup a2[4][3] (=10.2f)
-    printf("%f\n", carray2_f_data(a2, 4)[3]);     // same, but this is writable.
-    printf("%f\n", carray2_f_at(a2, 4).data[3]);  // same, via sub-array access.
+    printf("%f\n", carray2f_value(a2, 4, 3));    // readonly lookup a2[4][3] (=10.2f)
+    printf("%f\n", carray2f_data(a2, 4)[3]);     // same, but this is writable.
+    printf("%f\n", carray2f_at(a2, 4).data[3]);  // same, via sub-array access.
     
-    printf("%f\n", carray3_f_value(a3, 5, 4, 3)); // same data location, via a3 array.
-    printf("%f\n", carray3_f_data(a3, 5, 4)[3]);
-    printf("%f\n", carray3_f_at2(a3, 5, 4).data[3]);
+    printf("%f\n", carray3f_value(a3, 5, 4, 3)); // same data location, via a3 array.
+    printf("%f\n", carray3f_data(a3, 5, 4)[3]);
+    printf("%f\n", carray3f_at2(a3, 5, 4).data[3]);
     
-    carray2_f_destroy(&a2); // does nothing, since it is a sub-array.
-    carray3_f_destroy(&a3); // also invalidates a2.
+    carray2f_destroy(&a2); // does nothing, since it is a sub-array.
+    carray3f_destroy(&a3); // also invalidates a2.
 }
 ```
