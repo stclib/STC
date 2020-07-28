@@ -9,12 +9,12 @@ declare_CVec_priority_queue(f, >);
 int main()
 {
     uint32_t seed = time(NULL);
-    crandom32_t pcg = crandom32_init(seed);
+    CRand32 pcg = crand32_init(seed);
     int N = 30000000, M = 100;
     CVec_f vec = cvec_init;
     clock_t start = clock();
     for (int i=0; i<N; ++i)
-        cvec_f_pushBack(&vec, crandom32(&pcg));
+        cvec_f_pushBack(&vec, crand32_gen(&pcg));
     cvecpq_f_build(&vec);
     printf("Built priority queue: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
 
@@ -25,10 +25,10 @@ int main()
         cvecpq_f_pop(&vec);
     printf("\n\npopped PQ: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
 
-    pcg = crandom32_init(seed);
+    pcg = crand32_init(seed);
     start = clock();
     for (int i=0; i<N; ++i)
-        cvecpq_f_push(&vec, crandom32(&pcg));
+        cvecpq_f_push(&vec, crand32_gen(&pcg));
     printf("pushed PQ: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
     for (int i=0; i<M; ++i)
         printf("%.0f ", cvecpq_f_top(&vec)), cvecpq_f_pop(&vec);

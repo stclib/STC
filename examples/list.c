@@ -6,10 +6,10 @@ declare_CList(ix, uint64_t);
 
 int main() {
     CList_ix list = clist_init;
-    crandom32_t pcg = crandom32_init(time(NULL));
+    CRand32 pcg = crand32_init(time(NULL));
     int n;
     for (int i=0; i<10000000; ++i) // ten million
-        clist_ix_pushBack(&list, crandom32(&pcg));
+        clist_ix_pushBack(&list, crand32_gen(&pcg));
     n = 100; 
     c_foreach (i, clist_ix, list)
         if (n--) printf("%8d: %10zu\n", 100 - n, i.item->value); else break;

@@ -27,13 +27,56 @@
 #include "cdefs.h"
 #include <string.h>
 
-/* 
- * PCG32 random number generator: https://www.pcg-random.org/index.html
- */
-typedef struct {uint64_t state;  uint64_t inc;} crandom32_t;
+/* ------------- CRand32: PCG32 -------------- */
 
-STC_INLINE uint32_t crandom32(crandom32_t* rng)
-{
+typedef struct {uint64_t state, inc;} CRand32;
+
+STC_API CRand32 crand32_init2(uint64_t seed, uint64_t seq);
+
+STC_INLINE CRand32 crand32_init(uint64_t seed) {
+    return crand32_init2(seed, seed);
+}
+STC_API uint32_t crand32_gen(CRand32* rng);
+
+/* Uniform random number in range [0, bound) */
+STC_INLINE uint32_t crand32_genBounded(CRand32* rng, uint32_t bound) {
+    return (uint32_t) (((uint64_t) crand32_gen(rng) * bound) >> 32);
+}
+
+/* float random int number in range [0, 1). Note: 23 bit resolution. */
+STC_INLINE float crand32_genReal(CRand32* rng) {
+    union {uint32_t i; float f;} u = {0x3F800000u | (crand32_gen(rng) >> 9)};
+    return u.f - 1.0f;
+}
+
+/* ------------- CRand64: SFC64 -------------- */
+
+typedef struct {uint64_t state[4];} CRand64;
+
+STC_API CRand64 crand64_init(const uint64_t seed);
+
+STC_API uint64_t crand64_gen(CRand64* rng);
+
+/* float64 random int number in range [0, 1), 52 bit resolution */
+STC_INLINE double crand64_genReal(CRand64* rng) {
+    union {uint64_t i; double f;} u = {0x3FF0000000000000ull | (crand64_gen(rng) >> 12)};
+    return u.f - 1.0;
+}
+
+
+#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
+
+/* PCG32 random number generator: https://www.pcg-random.org/index.html */
+
+STC_API CRand32 crand32_init2(uint64_t seed, uint64_t seq) {
+    CRand32 rng = {0u, (seq << 1u) | 1u}; /* inc must be odd */
+    crand32_gen(&rng);
+    rng.state += seed;
+    crand32_gen(&rng);
+    return rng;
+}
+
+STC_API uint32_t crand32_gen(CRand32* rng) {
     uint64_t old = rng->state;
     rng->state = old * 6364136223846793005ull + rng->inc;
     uint32_t xos = ((old >> 18u) ^ old) >> 27u;
@@ -41,178 +84,25 @@ STC_INLINE uint32_t crandom32(crandom32_t* rng)
     return (xos >> rot) | (xos << ((-rot) & 31));
 }
 
-/* float random int number in range [0, 1). Note: 23 bit resolution. */
-STC_INLINE float crandom32f(crandom32_t* rng) {
-    union {uint32_t i; float f;} u = {0x3F800000u | (crandom32(rng) >> 9)};
-    return u.f - 1.0f;
+
+/* SFC64 random number generator: http://pracrand.sourceforge.net */
+
+STC_API CRand64 crand64_init(const uint64_t seed) {
+    CRand64 state = {{seed, seed, seed, 1}};
+    for (int i = 0; i < 12; ++i) crand64_gen(&state);
+    return state;
 }
 
-/* Uniform random number in range [0, bound) */
-STC_INLINE uint32_t crandom32b(crandom32_t* rng, uint32_t bound) {
-    return (uint32_t) (((uint64_t) crandom32(rng) * bound) >> 32);
-}
-
-STC_INLINE crandom32_t crandom32_init2(uint64_t seed, uint64_t seq) {
-    crandom32_t rng = {0u, (seq << 1u) | 1u}; /* inc must be odd */
-    crandom32(&rng);
-    rng.state += seed;
-    crandom32(&rng);
-    return rng;
-}
-
-STC_INLINE crandom32_t crandom32_init(uint64_t seed) {
-    return crandom32_init2(seed, seed);
-}
-
-
-/* Rotate bits left */
-STC_INLINE uint64_t c_rotateLeft64(uint64_t x, int bits) {
-    return (x << bits) | (x >> (64 - bits));
-}
-
-/*
- * SFC64 random number generator: http://pracrand.sourceforge.net
- */
-typedef struct {uint64_t state[4];} crandom64_t;
-
-STC_API uint64_t crandom64(crandom64_t* rng) {
+STC_API uint64_t crand64_gen(CRand64* rng) {
     enum {LR=24, RS=11, LS=3};
     uint64_t *s = rng->state;
     const uint64_t result = s[0] + s[1] + s[3]++;
     s[0] = s[1] ^ (s[1] >> RS);
     s[1] = s[2] + (s[2] << LS);
-    s[2] = c_rotateLeft64(s[2], LR) + result;
+    s[2] = (s[2] << LR) | (s[2] >> (64 - LR)) + result;
     return result;
 }
 
-/* float64 random int number in range [0, 1), 52 bit resolution */
-STC_INLINE double crandom64f(crandom64_t* rng) {
-    union {uint64_t i; double f;} u = {0x3FF0000000000000ull | (crandom64(rng) >> 12)};
-    return u.f - 1.0;
-}
-
-STC_API crandom64_t crandom64_init(const uint64_t seed) {
-    crandom64_t state = {{seed, seed, seed, 1}};
-    for (int i = 0; i < 12; ++i) crandom64(&state);
-    return state;
-}
-
-/*
- * SipHash implementation.
- */
-#if defined(_WIN32) || (defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
-    STC_INLINE uint64_t c_le64ToHost(uint64_t x) { return x; }
-#elif defined(__APPLE__)
-    #include <libkern/OSByteOrder.h>
-    STC_INLINE uint64_t c_le64ToHost(uint64_t x) { return OSSwapLittleToHostInt64(x); }
-#elif defined(__FreeBSD__) || defined(__NetBSD__) || defined(__OpenBSD__) || defined(__DragonFly__)
-    #include <sys/endian.h>
-    STC_INLINE uint64_t c_le64ToHost(uint64_t x) { return letoh64(x); }
-#elif defined(__linux__) || defined(__CYGWIN__) || defined(__GNUC__) || defined(__GNU_LIBRARY__)
-    #include <endian.h>
-    STC_INLINE uint64_t c_le64ToHost(uint64_t x) { return le64toh(x); }
 #endif
-
-typedef struct siphash_t {
-    uint64_t v[4], padding;
-    size_t length;
-    int c, d;
-} siphash_t;
-
-/* c=2, d=4 or c=1, d=3 */
-STC_INLINE void siphash_init_c_d(siphash_t* s, const uint64_t key[2], const int c, const int d) {
-    s->c = c;
-    s->d = d;
-    s->length = 0;
-    s->padding = 0;
-    s->v[0] = key[0] ^ 0x736f6d6570736575;
-    s->v[1] = key[1] ^ 0x646f72616e646f6d;
-    s->v[2] = key[0] ^ 0x6c7967656e657261;
-    s->v[3] = key[1] ^ 0x7465646279746573;
-}
-
-/* default init 2-4 */
-STC_API siphash_t siphash_init(const uint64_t key[2]) {
-    siphash_t state;
-    siphash_init_c_d(&state, key, 2, 4);
-    return state;
-}
-
-#define _siphash_halfRound(i, j, a, b, c, d) \
-    (a += b, \
-     c += d, \
-     b = c_rotateLeft64(b, i) ^ a, \
-     d = c_rotateLeft64(d, j) ^ c, \
-     a = c_rotateLeft64(a, 32))
-
-#define _siphash_compress(rounds, v) \
-    for (int r = 0; r < rounds; ++r) { \
-        _siphash_halfRound(13, 16, v[0], v[1], v[2], v[3]); \
-        _siphash_halfRound(17, 21, v[2], v[1], v[0], v[3]); \
-    }
-
-#define _siphash_digest(rounds, v, m) { \
-        const uint64_t _m = m; \
-        v[3] ^= _m; \
-        _siphash_compress(rounds, v); \
-        v[0] ^= _m; \
-    }
-
-STC_API void siphash_update(siphash_t* s, const void* bytes, size_t size) {
-    union { const uint8_t* u8; const uint64_t* u64; } in;
-    in.u8 = (const uint8_t*) bytes;
-    size_t offset = s->length & 7;
-    uint64_t *v = s->v;
-    s->length += size;
-
-    if (offset) {
-        const size_t end = offset + size;
-        size -= 8 - offset;
-        while (offset < end && offset < 8) {
-            s->padding |= ((uint64_t) *in.u8++) << (offset++ << 3);
-        }
-        if (end < 8) return;
-
-        _siphash_digest(s->c, v, s->padding);
-        s->padding = 0;
-    }
-    size_t n_words = size >> 3;
-    uint64_t m;
-
-    while (n_words--) {
-        memcpy(&m, in.u64++, 8);
-        _siphash_digest(s->c, v, c_le64ToHost(m));
-    }
-    switch (s->length & 7) {
-        case 7: s->padding |= ((uint64_t) in.u8[6]) << 48;
-        case 6: s->padding |= ((uint64_t) in.u8[5]) << 40;
-        case 5: s->padding |= ((uint64_t) in.u8[4]) << 32;
-        case 4: s->padding |= ((uint64_t) in.u8[3]) << 24;
-        case 3: s->padding |= ((uint64_t) in.u8[2]) << 16;
-        case 2: s->padding |= ((uint64_t) in.u8[1]) << 8;
-        case 1: s->padding |= ((uint64_t) in.u8[0]);
-    }
-}
-
-STC_API uint64_t siphash_finalize(siphash_t* s) {
-    uint64_t *v = s->v;
-    _siphash_digest(s->c, v, s->padding | (s->length << 56));
-    v[2] ^= 0xff;
-    _siphash_compress(s->d, v);
-    return v[0] ^ v[1] ^ v[2] ^ v[3];
-}
-
-/* c=2, d=4 or c=1, d=3 */
-STC_API uint64_t siphash_hash_c_d(const uint64_t key[2], const void* bytes, const uint64_t size, const int c, const int d) {
-    siphash_t state;
-    siphash_init_c_d(&state, key, c, d);
-    siphash_update(&state, bytes, size);
-    return siphash_finalize(&state);
-}
-
-/* default hash 2-4 */
-STC_INLINE uint64_t siphash_hash(const uint64_t key[2], const void* bytes, const uint64_t size) {
-    return siphash_hash_c_d(key, bytes, size, 2, 4);
-}
 
 #endif

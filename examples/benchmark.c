@@ -21,9 +21,9 @@ KHASH_MAP_INIT_INT64(ii, uint64_t)
 size_t seed;
 static const float maxLoadFactor = 0.77f;
 
-crandom64_t rng;
-#define SEED(s) rng = crandom64_init(seed)
-#define RAND(N) (crandom64(&rng) & ((1 << N) - 1))
+CRand64 rng;
+#define SEED(s) rng = crand64_init(seed)
+#define RAND(N) (crand64_gen(&rng) & ((1 << N) - 1))
 
 
 #define CMAP_SETUP(tag, Key, Value) CMap_##tag map = cmap_init \
