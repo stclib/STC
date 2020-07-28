@@ -21,24 +21,24 @@ Output: 0
 #include <stc/cvec.h>
 #include <stc/cstr.h>
 
-declare_cvec(i, int);
-declare_cmap_str(sv, cvec_i, cvec_i_destroy);
+declare_CVec(i, int);
+declare_CMap_str(sv, CVec_i, cvec_i_destroy);
 
   
 // Function to return the number of occurrences of 
 int NumOccurrences(const char* arr[], int n, const char* str, int L, int R) 
 { 
     // To store the indices of strings in the array 
-    cmap_sv M = cmap_init; 
+    CMap_sv M = cmap_init; 
     for (int i = 0; i < n; i++) { 
         const char* temp = arr[i]; 
-        cmapentry_sv* it = cmap_sv_find(&M, temp); 
+        CMapEntry_sv* it = cmap_sv_find(&M, temp); 
   
         // If current string doesn't 
         // have an entry in the map 
         // then create the entry 
         if (it == NULL) { 
-            cvec_i A = cvec_init; 
+            CVec_i A = cvec_init; 
             cvec_i_pushBack(&A, i + 1);
             cmap_sv_put(&M, temp, A); 
         } 
@@ -47,7 +47,7 @@ int NumOccurrences(const char* arr[], int n, const char* str, int L, int R)
         } 
     } 
   
-    cmapentry_sv* it = cmap_sv_find(&M, str);
+    CMapEntry_sv* it = cmap_sv_find(&M, str);
 
     // If the given string is not 
     // present in the array 
@@ -56,7 +56,7 @@ int NumOccurrences(const char* arr[], int n, const char* str, int L, int R)
   
     // If the given string is present 
     // in the array 
-    cvec_i A = it->value;
+    CVec_i A = it->value;
     int y = 0, x = 0; 
     for (; y < cvec_size(A); ++y) if (A.data[y] > R) break;
     for (; x < cvec_size(A); ++x) if (A.data[x] > L - 1) break;

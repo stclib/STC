@@ -5,22 +5,22 @@
 
 void check_destroy(float* v) {printf("destroy %g\n", *v);}
 
-declare_carray(f, float, check_destroy); // normally omit the last argument - float type need no destroy.
-declare_clist(t2, carray2f, carray2f_destroy, c_noCompare);
-declare_cmap(il, int, clist_t2, clist_t2_destroy);
-declare_cmap_str(sm, cmap_il, cmap_il_destroy);
+declare_CArray(f, float, check_destroy); // normally omit the last argument - float type need no destroy.
+declare_CList(t2, CArray2f, carray2f_destroy, c_noCompare);
+declare_CMap(il, int, CList_t2, clist_t2_destroy);
+declare_CMap_str(sm, CMap_il, cmap_il_destroy);
 
 int main() {
     int xdim = 4, ydim = 6;
     int x = 1, y = 5, tableKey = 42;
     const char* strKey = "first";
-    cmap_sm theMap = cmap_init;
+    CMap_sm theMap = cmap_init;
 
     { // Construct.
-        carray2f table = carray2f_make(ydim, xdim, 0.f);
+        CArray2f table = carray2f_make(ydim, xdim, 0.f);
         printf("table: (%zu, %zu)\n", carray2_ydim(table), carray2_xdim(table));
-        clist_t2 tableList = clist_init;
-        cmap_il listMap = cmap_init;
+        CList_t2 tableList = clist_init;
+        CMap_il listMap = cmap_init;
         
         // Put in some data.
         carray2f_data(table, y)[x] = 3.1415927; // table[y][x]
@@ -29,7 +29,7 @@ int main() {
         cmap_sm_put(&theMap, strKey, listMap);
     }
     { // Access the data entry
-        carray2f table = clist_back(cmap_il_find(&cmap_sm_find(&theMap, strKey)->value, tableKey)->value);
+        CArray2f table = clist_back(cmap_il_find(&cmap_sm_find(&theMap, strKey)->value, tableKey)->value);
         printf("value (%d, %d) is: %f\n", y, x, carray2f_value(table, y, x));
     }
 

@@ -3,15 +3,15 @@
 #include <stc/cmap.h>
 #include <stc/cstr.h>
 
-declare_cmap_str(ss, cstr_t, cstr_destroy);
-declare_cset_str();
+declare_CMap_str(ss, CStr, cstr_destroy);
+declare_CSet_str();
 
 int main() 
 { 
     // Lets use an explicit type signature (which would
-    // be `cmap<String, String>` in this example).
-    cmap_ss book_reviews = cmap_init; 
-    cset_str set = cset_init;
+    // be `CMap<String, String>` in this example).
+    CMap_ss book_reviews = cmap_init; 
+    CSet_str set = cset_init;
     cset_str_put(&set, "Hello");
     cset_str_put(&set, "You");
     cset_str_put(&set, "Tube");
@@ -50,7 +50,7 @@ int main()
     // Look up the values associated with some keys.
     const char* to_find[] = {"Pride and Prejudice", "Alice's Adventure in Wonderland", NULL};
     for (const char** book = to_find; *book; ++book) {
-        cmapentry_ss* review = cmap_ss_find(&book_reviews, *book);
+        CMapEntry_ss* review = cmap_ss_find(&book_reviews, *book);
         if (review) printf("%s: %s\n", *book, review->value.str);
         else        printf("%s is unreviewed.\n", *book);
     }

@@ -12,14 +12,14 @@ int a[] = { 1, 2, 2, 3, 2, 4, 10 };
 #include <stdio.h>
 #include <stc/cmap.h>
 
-declare_cmap(ii, int, int);
+declare_CMap(ii, int, int);
   
 // Function to maximize the number of pairs 
 int findMaximumPairs(int a[], int n, int k) 
 { 
   
     // Hash-table 
-    cmap_ii hash = cmap_init; 
+    CMap_ii hash = cmap_init; 
     for (int i = 0; i < n; i++) {
         cmap_ii_insert(&hash, a[i] % k, 0)->value++;
     }
@@ -38,7 +38,7 @@ int findMaximumPairs(int a[], int n, int k)
             int first = it.item->key;
             int second = k - it.item->key; 
 
-            cmapentry_ii *hf = cmap_ii_find(&hash, first),
+            CMapEntry_ii *hf = cmap_ii_find(&hash, first),
                          *hs = cmap_ii_insert(&hash, second, 0);
             // Check for minimal occurrence 
             if (hf->value < hs->value) { 

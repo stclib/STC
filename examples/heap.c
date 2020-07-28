@@ -3,15 +3,15 @@
 #include "stc/cvecpq.h"
 #include "stc/crandom.h"
 
-declare_cvec(f, float);
-declare_cvec_priority_queue(f, >);
+declare_CVec(f, float);
+declare_CVec_priority_queue(f, >);
 
 int main()
 {
     uint32_t seed = time(NULL);
     crandom32_t pcg = crandom32_init(seed);
     int N = 30000000, M = 100;
-    cvec_f vec = cvec_init;
+    CVec_f vec = cvec_init;
     clock_t start = clock();
     for (int i=0; i<N; ++i)
         cvec_f_pushBack(&vec, crandom32(&pcg));

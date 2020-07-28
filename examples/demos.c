@@ -8,7 +8,7 @@
 void stringdemo1()
 {
     printf("\nSTRINGDEMO1\n");
-    cstr_t cs = cstr_make("one-nine-three-seven-five");
+    CStr cs = cstr_make("one-nine-three-seven-five");
     printf("%s.\n", cs.str);
 
     cstr_insert(&cs, 3, "-two");
@@ -33,12 +33,12 @@ void stringdemo1()
 }
 
 
-declare_cvec(ix, int64_t); // ix is just an example tag name.
+declare_CVec(ix, int64_t); // ix is just an example tag name.
 
 void vectordemo1()
 {
     printf("\nVECTORDEMO1\n");
-    cvec_ix bignums = cvec_init; // = (cvec_ix) cvec_init; if initializing after declaration.
+    CVec_ix bignums = cvec_init; // = (CVec_ix) cvec_init; if initializing after declaration.
     cvec_ix_reserve(&bignums, 100);
     for (size_t i = 0; i<=100; ++i)
         cvec_ix_pushBack(&bignums, i * i * i);
@@ -54,12 +54,12 @@ void vectordemo1()
 
 
 
-declare_cvec(cs, cstr_t, cstr_destroy, cstr_compare); // supply inline destructor of values
+declare_CVec(cs, CStr, cstr_destroy, cstr_compare); // supply inline destructor of values
 
 void vectordemo2()
 {
     printf("\nVECTORDEMO2\n");
-    cvec_cs names = cvec_init;
+    CVec_cs names = cvec_init;
     cvec_cs_pushBack(&names, cstr_make("Mary"));
     cvec_cs_pushBack(&names, cstr_make("Joe"));
     cvec_cs_pushBack(&names, cstr_make("Chris"));
@@ -72,12 +72,12 @@ void vectordemo2()
     cvec_cs_destroy(&names);
 }
 
-declare_clist(ix, int); 
+declare_CList(ix, int); 
 
 void listdemo1()
 {
     printf("\nLISTDEMO1\n");
-    clist_ix nums = clist_init, nums2 = clist_init;
+    CList_ix nums = clist_init, nums2 = clist_init;
     for (int i = 0; i < 10; ++i)
         clist_ix_pushBack(&nums, i);
     for (int i = 100; i < 110; ++i)
@@ -99,12 +99,12 @@ void listdemo1()
     clist_ix_destroy(&nums);
 }
 
-declare_cset(i, int);
+declare_CSet(i, int);
 
 void setdemo1()
 {
     printf("\nSETDEMO1\n");
-    cset_i nums = cset_init;
+    CSet_i nums = cset_init;
     cset_i_put(&nums, 8);
     cset_i_put(&nums, 11);
 
@@ -114,12 +114,12 @@ void setdemo1()
 }
 
 
-declare_cmap(ii, int, int);
+declare_CMap(ii, int, int);
 
 void mapdemo1()
 {
     printf("\nMAPDEMO1\n");
-    cmap_ii nums = cmap_init;
+    CMap_ii nums = cmap_init;
     cmap_ii_put(&nums, 8, 64);
     cmap_ii_put(&nums, 11, 121);
 
@@ -128,12 +128,12 @@ void mapdemo1()
 }
 
 
-declare_cmap_str(si, int); // Shorthand macro for the general declare_cmap expansion.
+declare_CMap_str(si, int); // Shorthand macro for the general declare_CMap expansion.
 
 void mapdemo2()
 {
     printf("\nMAPDEMO2\n");
-    cmap_si nums = cmap_init;
+    CMap_si nums = cmap_init;
     cmap_si_put(&nums, "Hello", 64);
     cmap_si_put(&nums, "Groovy", 121);
     cmap_si_put(&nums, "Groovy", 200); // overwrite previous
@@ -150,16 +150,16 @@ void mapdemo2()
 }
 
 
-declare_cmap_str(ss, cstr_t, cstr_destroy); 
+declare_CMap_str(ss, CStr, cstr_destroy); 
 
 void mapdemo3()
 {
     printf("\nMAPDEMO3\n");
-    cmap_ss table = cmap_init;
+    CMap_ss table = cmap_init;
     cmap_ss_put(&table, "Map", cstr_make("test"));
     cmap_ss_put(&table, "Make", cstr_make("my"));
     cmap_ss_put(&table, "Sunny", cstr_make("day"));
-    cmapentry_ss *e = cmap_ss_find(&table, "Make");
+    CMapEntry_ss *e = cmap_ss_find(&table, "Make");
     c_foreach (i, cmap_ss, table)
         printf("entry: %s: %s\n", i.item->key.str, i.item->value.str);
     printf("size %zu: remove: Make: %s\n", cmap_size(table), e->value.str);
@@ -173,14 +173,14 @@ void mapdemo3()
 }
 
 
-declare_carray(f, float);
+declare_CArray(f, float);
 
 void arraydemo1()
 {
     printf("\nARRAYDEMO1\n");
-    carray3f a3 = carray3f_make(30, 20, 10, 0.f);
+    CArray3f a3 = carray3f_make(30, 20, 10, 0.f);
     carray3f_data(a3, 5, 4)[3] = 10.2f;  // a3[5][4][3]
-    carray2f a2 = carray3f_at(a3, 5);     // sub-array reference (no data copy).
+    CArray2f a2 = carray3f_at(a3, 5);     // sub-array reference (no data copy).
 
     printf("a3: %zu: (%zu, %zu, %zu) = %zu\n", sizeof(a3), carray3_xdim(a3), carray3_ydim(a3), carray3_zdim(a3), carray3_size(a3));
     printf("a2: %zu: (%zu, %zu) = %zu\n", sizeof(a2), carray2_xdim(a2), carray2_ydim(a2), carray2_size(a2));

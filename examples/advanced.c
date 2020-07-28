@@ -1,5 +1,5 @@
 /*
- * To be able to use cmap with a user-defined key-type, you need to define two things:
+ * To be able to use CMap with a user-defined key-type, you need to define two things:
  *   1. A hash function; this must be a function that calculates the hash value given
  *      an object of the key-type.
  *   2. A comparison function for equality.
@@ -34,8 +34,8 @@ int vikingvw_equals(const VikingVw* x, const VikingVw* y) {
 // Viking data struct -----------------------
 
 typedef struct Viking {
-    cstr_t name;
-    cstr_t country;
+    CStr name;
+    CStr country;
 } Viking;
 
 
@@ -52,25 +52,25 @@ Viking viking_fromVw(VikingVw vw) {
 }
 
 
-// Using the full declare_cmap() macro to define [Viking -> int] hash map type:
-declare_cmap(vk, Viking, int, c_defaultDestroy, vikingvw_equals, vikingvw_hash, 
+// Using the full declare_CMap() macro to define [Viking -> int] hash map type:
+declare_CMap(vk, Viking, int, c_defaultDestroy, vikingvw_equals, vikingvw_hash, 
                  viking_destroy, VikingVw, viking_getVw, viking_fromVw);
 
-// cmap_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test.
+// CMap_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test.
 // cmap_vk_destroy() will free all memory allocated for Viking keys and the hash table values.
 
 // Main ----------------------------
 
 int main()
 {
-    cmap_vk vikings = cmap_init;
+    CMap_vk vikings = cmap_init;
     c_push(&vikings, cmap_vk, c_items(
         {{"Einar", "Norway"}, 20},
         {{"Olaf", "Denmark"}, 24},
         {{"Harald", "Iceland"}, 12},
     ));
 
-    cmapentry_vk* e = cmap_vk_find(&vikings, (VikingVw) {"Einar", "Norway"});
+    CMapEntry_vk* e = cmap_vk_find(&vikings, (VikingVw) {"Einar", "Norway"});
     e->value += 5; // update 
 
     c_foreach (k, cmap_vk, vikings) {

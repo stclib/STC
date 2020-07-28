@@ -14,7 +14,7 @@
 
 // Visual Studio: compile with -TP to force C++:  cl -TP -EHsc -O2 benchmark.c
 
-declare_cmap(ii, int64_t, int64_t, c_defaultDestroy, c_defaultEquals, c_fibonacciHash64);
+declare_CMap(ii, int64_t, int64_t, c_defaultDestroy, c_defaultEquals, c_fibonacciHash64);
 
 KHASH_MAP_INIT_INT64(ii, uint64_t)
 
@@ -26,7 +26,7 @@ crandom64_t rng;
 #define RAND(N) (crandom64(&rng) & ((1 << N) - 1))
 
 
-#define CMAP_SETUP(tag, Key, Value) cmap_##tag map = cmap_init \
+#define CMAP_SETUP(tag, Key, Value) CMap_##tag map = cmap_init \
                                     ; cmap_##tag##_setLoadFactors(&map, maxLoadFactor, 0.0)
 #define CMAP_PUT(tag, key, val)     cmap_##tag##_put(&map, key, val)->value
 #define CMAP_ERASE(tag, key)        cmap_##tag##_erase(&map, key)
