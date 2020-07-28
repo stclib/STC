@@ -9,7 +9,7 @@ int main() {
     crandom32_t pcg = crandom32_uniform_engine(time(NULL));
     int n;
     for (int i=0; i<10000000; ++i) // ten million
-        clist_ix_pushBack(&list, crandom32_uniform_int(&pcg));
+        clist_ix_push_back(&list, crandom32_uniform_int(&pcg));
     n = 100; 
     c_foreach (i, clist_ix, list)
         if (n--) printf("%8d: %10zu\n", 100 - n, i.item->value); else break;

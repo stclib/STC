@@ -19,14 +19,14 @@ in *O*(1). Also contains various *splice* functions and (merge) *sort*.
 
 The usage of the containers is similar to the C++ standard containers, so it should be easier for those who are familiar with them.
 
-All containers mentioned above, except for cstr_t are generic (similar to templates in C++). A simple example:
+All containers mentioned above, except for cstr are generic (similar to templates in C++). A simple example:
 ```
 #include <stc/cvec.h>
 declare_cvec(i, int);
 
 int main(void) {
     cvec_i vec = cvec_init;
-    cvec_i_pushBack(&vec, 42);
+    cvec_i_push_back(&vec, 42);
     cvec_i_destroy(&vec);
 }
 ```
@@ -104,15 +104,15 @@ cmap, cset and cvec discussion
 
 **cmap/cset** are the most complex of the containers (although, currently only ~370 lines of code). It uses open hashing, but does not rely on power-of-two size table, nor prime number lengths, and it does not have tombstone buckets. It is still among the fastest hash-tables, as shown above. The default max load-factor is 0.85, and it shrinks (and rehashes) when load-factor goes below 0.15, by default (can be set per hash container).
 
-You may customize the destroy-, hash- and equals- function. It also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is handy when e.g. having cstr_t as key, as it enables the usage of string literals as key in *put() and *get() functions, instead of requering a constructed cstr_t. Without it, you would have to write: 
+You may customize the destroy-, hash- and equals- function. It also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is handy when e.g. having cstr as key, as it enables the usage of string literals as key in *put() and *get() functions, instead of requering a constructed cstr. Without it, you would have to write: 
 ```
-declare_cmap(si, cstr_t, int);
+declare_cmap(si, cstr, int);
 ...
 cmap_si_put(&map, cstr_make("mykey"), 12);
 ```
 but the main incovenience is with lookup:
 ```
-cstr_t lookup = cstr_make("mykey");
+cstr lookup = cstr_make("mykey");
 int x = cmap_si_get(&map, lookup)->value;
 cstr_destroy(&lookup);
 ```
@@ -121,7 +121,7 @@ To avoid this, use *declare_cmap_str()*:
 declare_cmap_str(si, int);
 ...
 cmap_si map = cmap_init;
-cmap_si_put(&map, "mykey", 12);            // constructs a cstr_t key from the const char* internally.
+cmap_si_put(&map, "mykey", 12);            // constructs a cstr key from the const char* internally.
 int x = cmap_si_get(&map, "mykey")->value; // no allocation of string key happens here.
 cmap_si_destroy(&map);
 ```
@@ -133,9 +133,9 @@ Also look at **examples/advanced.c**, it demonstrates how to use a custom struct
 Example usages
 --------------
 The first example has a very complex nested container type, which demonstrates the power of this library. Look at the simpler examples below to understand it better. The example adds an element into the data structure, and then accesses it. The type used, with c++ template syntax is:
-**cmapMap**< **cstr_t**, **cmapMap**< *int*, **clist**< **carray2**< *float* >>>>
+**cmapMap**< **cstr**, **cmapMap**< *int*, **clist**< **carray2**< *float* >>>>
 
-Note: The *cmap_sm_destroy(&theMap)* call below, will destroy all the nested containers including the memory allocated for cstr_t keys in theMap object.
+Note: The *cmap_sm_destroy(&theMap)* call below, will destroy all the nested containers including the memory allocated for cstr keys in theMap object.
 ```
 #include <stc/cstr.h>
 #include <stc/cmap.h>
@@ -145,7 +145,7 @@ Note: The *cmap_sm_destroy(&theMap)* call below, will destroy all the nested con
 void verify_destroy(float* v) {printf("destroy %g\n", *v);}
 
 declare_carray(f, float, verify_destroy); // you should omit the last argument - float type need no destroy.
-declare_clist(t2, carray2_f, carray2_f_destroy, c_noCompare);
+declare_clist(t2, carray2_f, carray2_f_destroy, c_no_compare);
 declare_cmap(il, int, clist_t2, clist_t2_destroy);
 declare_cmap_str(sm, cmap_il, cmap_il_destroy);
 
@@ -161,7 +161,7 @@ int main() {
         
         // Put in some data.
         carray2_f_data(table, x)[y] = 3.1415927; // table[x][y]
-        clist_t2_pushBack(&tableList, table);
+        clist_t2_push_back(&tableList, table);
         cmap_il_put(&listMap, entry, tableList);
         cmap_sm_put(&theMap, "First", listMap);
     }
@@ -173,12 +173,12 @@ int main() {
     cmap_sm_destroy(&theMap); // free up the whole shebang!
 }
 ```
-**cstr_t** string example.
+**cstr** string example.
 ```
 #include <stc/cstr.h>
 
 int main() {
-    cstr_t s1 = cstr_make("one-nine-three-seven-five");
+    cstr s1 = cstr_make("one-nine-three-seven-five");
     printf("%s.\n", s1.str);
 
     cstr_insert(&s1, 3, "-two");
@@ -197,7 +197,7 @@ int main() {
     printf("append: %s\n", s1.str);
     cstr_destroy(&s1);
 
-    cstr_t s2 = cstr_from("Index %d: %f", 123, 4.56);
+    cstr s2 = cstr_from("Index %d: %f", 123, 4.56);
     cstr_destroy(&s2);
 }
 ```
@@ -210,8 +210,8 @@ int main() {
     cvec_ix bignums = cvec_init; // use cvec_ix_init() if initializing after declaration.
     cvec_ix_reserve(&bignums, 100);
     for (size_t i = 0; i<100; ++i)
-        cvec_ix_pushBack(&bignums, i * i * i);
-    cvec_ix_popBack(&bignums); // erase the last
+        cvec_ix_push_back(&bignums, i * i * i);
+    cvec_ix_pop_back(&bignums); // erase the last
 
     uint64_t value;
     for (size_t i = 0; i < cvec_size(bignums); ++i)
@@ -219,7 +219,7 @@ int main() {
     cvec_ix_destroy(&bignums);
 }
 ```
-**cvec** of *cstr_t*.
+**cvec** of *cstr*.
 ```
 #include <stc/cstr.h>
 #include <stc/cvec.h>
@@ -227,8 +227,8 @@ declare_cvec_str();
 
 int main() {
     cvec_str names = cvec_init;
-    cvec_str_pushBack(&names, cstr_make("Mary"));
-    cvec_str_pushBack(&names, cstr_make("Joe"));
+    cvec_str_push_back(&names, cstr_make("Mary"));
+    cvec_str_push_back(&names, cstr_make("Joe"));
     cstr_assign(&names.data[1], cstr_make("Jake")); // replace Joe
 
     printf("%s\n", names.data[1].str); // Access the string char*
@@ -250,11 +250,11 @@ int main() {
     cmap_ii_destroy(&nums);
 }
 ```
-**cset** of *cstr_t*.
+**cset** of *cstr*.
 ```
 #include <stc/cstr.h>
 #include <stc/cmap.h>
-declare_cset_str(); // cstr_t set. See the discussion above.
+declare_cset_str(); // cstr set. See the discussion above.
 
 int main() {
     cset_str words = cset_init;
@@ -268,11 +268,11 @@ int main() {
     cset_str_destroy(&words);
 }
 ```
-**cmap** of *cstr_t -> cstr_t*. Temporary cstr_t values are created by *cstr_make()*, and moved into the container
+**cmap** of *cstr -> cstr*. Temporary cstr values are created by *cstr_make()*, and moved into the container
 ```
 #include <stc/cstr.h>
 #include <stc/cmap.h>
-declare_cmap_str(ss, cstr_t, cstr_destroy); 
+declare_cmap_str(ss, cstr, cstr_destroy); 
 
 int main() {
     cmap_ss table = cmap_init;
@@ -298,7 +298,7 @@ int main() {
     int N = 2000000, n;
     crandom64_t rng = crandom64_uniform_engine(time(NULL));
     for (int i=0; i<N; ++i) // two million random numbers
-        clist_i_pushBack(&list, crandom64_uinform_int(&rng));
+        clist_i_push_back(&list, crandom64_uinform_int(&rng));
     n = 0; 
     c_foreach (i, clist_i, list)
         if (++n % (N/50) == 0) printf("%10d: %zu\n", n, i.item->value);

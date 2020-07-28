@@ -77,7 +77,7 @@ static inline size_t _carray3_size(const size_t* zdim) {
 #define declare_carray(...) c_MACRO_OVERLOAD(declare_carray, __VA_ARGS__)
 
 #define declare_carray_2(tag, Value) \
-    declare_carray_3(tag, Value, c_defaultDestroy)
+    declare_carray_3(tag, Value, c_default_destroy)
 
 
 #define declare_carray_3(tag, Value, valueDestroy) \
@@ -98,7 +98,7 @@ static inline size_t _carray3_size(const size_t* zdim) {
  \
     static inline carray1##tag \
     carray1##tag##_make(size_t xdim, Value val) { \
-        Value* m = c_new_N(Value, xdim); \
+        Value* m = c_new_n(Value, xdim); \
         for (size_t i=0; i<xdim; ++i) m[i] = val; \
         carray1##tag a = {m, xdim | _carray_OWN}; \
         return a; \
@@ -106,7 +106,7 @@ static inline size_t _carray3_size(const size_t* zdim) {
     static inline carray2##tag \
     carray2##tag##_make(size_t ydim, size_t xdim, Value val) { \
         const size_t n = ydim * xdim; \
-        Value* m = c_new_N(Value, n); \
+        Value* m = c_new_n(Value, n); \
         for (size_t i=0; i<n; ++i) m[i] = val; \
         carray2##tag a = {m, xdim | _carray_OWN, ydim * xdim}; \
         return a; \
@@ -114,7 +114,7 @@ static inline size_t _carray3_size(const size_t* zdim) {
     static inline carray3##tag \
     carray3##tag##_make(size_t zdim, size_t ydim, size_t xdim, Value val) { \
         const size_t n = zdim * ydim * xdim; \
-        Value* m = c_new_N(Value, n); \
+        Value* m = c_new_n(Value, n); \
         for (size_t i=0; i<n; ++i) m[i] = val; \
         carray3##tag a = {m, xdim | _carray_OWN, ydim * xdim, zdim}; \
         return a; \

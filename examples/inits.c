@@ -4,12 +4,12 @@
 #include <stc/cvec.h>
 #include <stc/clist.h>
 
-declare_cmap(id, int, cstr_t, cstr_destroy); // Map of int -> cstr_t
+declare_cmap(id, int, cstr, cstr_destroy); // Map of int -> cstr
 declare_cmap_str(cnt, int);
 
 typedef struct {int x, y;} ipair_t;
-declare_cvec(ip, ipair_t, c_defaultDestroy, c_memCompare);
-declare_clist(ip, ipair_t, c_defaultDestroy, c_memCompare);
+declare_cvec(ip, ipair_t, c_default_destroy, c_mem_compare);
+declare_clist(ip, ipair_t, c_default_destroy, c_mem_compare);
 
 
 int main(void) {

@@ -4,7 +4,7 @@
 #include <stc/cstr.h>
 
 declare_cmap_str(si, int);
-declare_cmap_str(ss, cstr_t, cstr_destroy);
+declare_cmap_str(ss, cstr, cstr_destroy);
 
 int main ()
 {

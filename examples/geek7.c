@@ -57,7 +57,7 @@ void findElementsAfterDel(int arr[], int m, int del[],
             // If the frequency becomes 0, 
             // erase it from the map 
             if (e->value == 0) 
-                cmap_ii_eraseEntry(&mp, e);
+                cmap_ii_erase_entry(&mp, e);
         } 
   
         // Else push it in the min heap 

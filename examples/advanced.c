@@ -34,8 +34,8 @@ int vikingvw_equals(const VikingVw* x, const VikingVw* y) {
 // Viking data struct -----------------------
 
 typedef struct Viking {
-    cstr_t name;
-    cstr_t country;
+    cstr name;
+    cstr country;
 } Viking;
 
 
@@ -53,7 +53,7 @@ Viking viking_fromVw(VikingVw vw) {
 
 
 // Using the full declare_cmap() macro to define [Viking -> int] hash map type:
-declare_cmap(vk, Viking, int, c_defaultDestroy, vikingvw_equals, vikingvw_hash, 
+declare_cmap(vk, Viking, int, c_default_destroy, vikingvw_equals, vikingvw_hash, 
                  viking_destroy, VikingVw, viking_getVw, viking_fromVw);
 
 // cmap_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test.

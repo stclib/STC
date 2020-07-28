@@ -8,7 +8,7 @@
 void stringdemo1()
 {
     printf("\nSTRINGDEMO1\n");
-    cstr_t cs = cstr_make("one-nine-three-seven-five");
+    cstr cs = cstr_make("one-nine-three-seven-five");
     printf("%s.\n", cs.str);
 
     cstr_insert(&cs, 3, "-two");
@@ -41,10 +41,10 @@ void vectordemo1()
     cvec_ix bignums = cvec_init; // = (cvec_ix) cvec_init; if initializing after declaration.
     cvec_ix_reserve(&bignums, 100);
     for (size_t i = 0; i<=100; ++i)
-        cvec_ix_pushBack(&bignums, i * i * i);
+        cvec_ix_push_back(&bignums, i * i * i);
 
     printf("erase - %d: %zu\n", 100, bignums.data[100]);
-    cvec_ix_popBack(&bignums); // erase the last
+    cvec_ix_pop_back(&bignums); // erase the last
 
     for (size_t i = 0; i < cvec_size(bignums); ++i) {
         if (i >= 90) printf("%zu: %zu\n", i, bignums.data[i]);
@@ -54,15 +54,15 @@ void vectordemo1()
 
 
 
-declare_cvec(cs, cstr_t, cstr_destroy, cstr_compare); // supply inline destructor of values
+declare_cvec(cs, cstr, cstr_destroy, cstr_compare); // supply inline destructor of values
 
 void vectordemo2()
 {
     printf("\nVECTORDEMO2\n");
     cvec_cs names = cvec_init;
-    cvec_cs_pushBack(&names, cstr_make("Mary"));
-    cvec_cs_pushBack(&names, cstr_make("Joe"));
-    cvec_cs_pushBack(&names, cstr_make("Chris"));
+    cvec_cs_push_back(&names, cstr_make("Mary"));
+    cvec_cs_push_back(&names, cstr_make("Joe"));
+    cvec_cs_push_back(&names, cstr_make("Chris"));
     cstr_assign(&names.data[1], "Jane");      // replace Joe
     printf("names[1]: %s\n", names.data[1].str);
 
@@ -79,21 +79,21 @@ void listdemo1()
     printf("\nLISTDEMO1\n");
     clist_ix nums = clist_init, nums2 = clist_init;
     for (int i = 0; i < 10; ++i)
-        clist_ix_pushBack(&nums, i);
+        clist_ix_push_back(&nums, i);
     for (int i = 100; i < 110; ++i)
-        clist_ix_pushBack(&nums2, i);
+        clist_ix_push_back(&nums2, i);
     c_foreach (i, clist_ix, nums)
         printf("value: %d\n", i.item->value);
     /* merge/append nums2 to nums */
-    clist_ix_spliceAfter(&nums, clist_ix_last(&nums), &nums2);
+    clist_ix_splice_after(&nums, clist_ix_last(&nums), &nums2);
     c_foreach (i, clist_ix, nums)
         printf("spliced: %d\n", i.item->value);
 
     *clist_ix_find(&nums, 100) *= 10;
     clist_ix_sort(&nums);                     // Sort the array
     clist_ix_remove(&nums, 105);
-    clist_ix_popFront(&nums);
-    clist_ix_pushFront(&nums, -99);
+    clist_ix_pop_front(&nums);
+    clist_ix_push_front(&nums, -99);
     c_foreach (i, clist_ix, nums)
         printf("sorted: %d\n", i.item->value);
     clist_ix_destroy(&nums);
@@ -150,7 +150,7 @@ void mapdemo2()
 }
 
 
-declare_cmap_str(ss, cstr_t, cstr_destroy); 
+declare_cmap_str(ss, cstr, cstr_destroy); 
 
 void mapdemo3()
 {

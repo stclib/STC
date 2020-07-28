@@ -27,7 +27,7 @@ Similar to boost::dynamic_bitset / std::bitset
 #include "cbitset.h"
 
 int main() {
-    cbitset_t set = cbitset_make(23, true);
+    cbitset set = cbitset_make(23, true);
     cbitset_reset(&set, 9);
     cbitset_resize(&set, 43, false);
     printf("%4zu: ", set.size);for (int i=0; i<set.size; ++i) printf("%d", cbitset_value(&set, i));puts("");
@@ -55,97 +55,97 @@ int main() {
 #define cbitset_popcnt64(i) _mm_popcnt_u64(i)
 #endif
 
-typedef struct { uint64_t* _arr; size_t size; } cbitset_t;
+typedef struct { uint64_t* _arr; size_t size; } cbitset;
 
 #define cbitset_init {NULL, 0}
 
-STC_API void cbitset_resize(cbitset_t* self, size_t size, bool value);
-STC_API size_t cbitset_count(cbitset_t set);
+STC_API void cbitset_resize(cbitset* self, size_t size, bool value);
+STC_API size_t cbitset_count(cbitset set);
 
-STC_INLINE void cbitset_setAll(cbitset_t *self, bool value);
+STC_INLINE void cbitset_set_all(cbitset *self, bool value);
 
-STC_INLINE cbitset_t cbitset_make(size_t size, bool value) {
-    cbitset_t set = {(uint64_t *) malloc(((size + 63) >> 6) * 8), size};
-    cbitset_setAll(&set, value);
+STC_INLINE cbitset cbitset_make(size_t size, bool value) {
+    cbitset set = {(uint64_t *) malloc(((size + 63) >> 6) * 8), size};
+    cbitset_set_all(&set, value);
     return set;
 }
-STC_INLINE cbitset_t cbitset_from(cbitset_t other) {
+STC_INLINE cbitset cbitset_from(cbitset other) {
     size_t n = (other.size + 63) >> 6;
-    cbitset_t set = {(uint64_t *) memcpy(malloc(n * 8), other._arr, n * 8), other.size};
+    cbitset set = {(uint64_t *) memcpy(malloc(n * 8), other._arr, n * 8), other.size};
     return set;
 }
-STC_INLINE void cbitset_destroy(cbitset_t* self) {
+STC_INLINE void cbitset_destroy(cbitset* self) {
     free(self->_arr);
 }
 
-STC_INLINE size_t cbitset_size(cbitset_t set) {return set.size;}
+STC_INLINE size_t cbitset_size(cbitset set) {return set.size;}
 
-STC_INLINE void cbitset_set(cbitset_t *self, size_t i) {
+STC_INLINE void cbitset_set(cbitset *self, size_t i) {
     self->_arr[i >> 6] |= 1ull << (i & 63);
 }
-STC_INLINE void cbitset_reset(cbitset_t *self, size_t i) {
+STC_INLINE void cbitset_reset(cbitset *self, size_t i) {
     self->_arr[i >> 6] &= ~(1ull << (i & 63));
 }
-STC_INLINE void cbitset_setTo(cbitset_t *self, size_t i, bool value) {
+STC_INLINE void cbitset_set_to(cbitset *self, size_t i, bool value) {
     value ? cbitset_set(self, i) : cbitset_reset(self, i);
 }
-STC_INLINE void cbitset_flip(cbitset_t *self, size_t i) {
+STC_INLINE void cbitset_flip(cbitset *self, size_t i) {
     self->_arr[i >> 6] ^= 1ull << (i & 63);
 }
-STC_INLINE bool cbitset_test(cbitset_t set, size_t i) {
+STC_INLINE bool cbitset_test(cbitset set, size_t i) {
     return (set._arr[i >> 6] & (1ull << (i & 63))) != 0;
 }
 
-STC_INLINE void cbitset_setAll(cbitset_t *self, bool value) {
+STC_INLINE void cbitset_set_all(cbitset *self, bool value) {
     memset(self->_arr, value ? 0xff : 0x0, ((self->size + 63) >> 6) * 8);
 }
-STC_INLINE void cbitset_setAll64(cbitset_t *self, uint64_t pattern) {
+STC_INLINE void cbitset_set_all_64(cbitset *self, uint64_t pattern) {
     size_t n = (self->size + 63) >> 6;
     for (size_t i=0; i<n; ++i) self->_arr[i] = pattern;
 }
-STC_INLINE void cbitset_flipAll(cbitset_t *self) {
+STC_INLINE void cbitset_flip_all(cbitset *self) {
     size_t n = (self->size + 63) >> 6;
     for (size_t i=0; i<n; ++i) self->_arr[i] ^= ~0ull;
 }
 /* Intersection */
-STC_INLINE void cbitset_setAnd(cbitset_t *self, cbitset_t other) {
+STC_INLINE void cbitset_set_and(cbitset *self, cbitset other) {
     assert(self->size == other.size);
     size_t n = (self->size + 63) >> 6;
     for (size_t i=0; i<n; ++i) self->_arr[i] &= other._arr[i];
 }
 /* Union */
-STC_INLINE void cbitset_setOr(cbitset_t *self, cbitset_t other) {
+STC_INLINE void cbitset_set_or(cbitset *self, cbitset other) {
     assert(self->size == other.size);
     size_t n = (self->size + 63) >> 6;
     for (size_t i=0; i<n; ++i) self->_arr[i] |= other._arr[i];
 }
 /* Exclusive disjunction */
-STC_INLINE void cbitset_setXor(cbitset_t *self, cbitset_t other) {
+STC_INLINE void cbitset_set_xor(cbitset *self, cbitset other) {
     assert(self->size == other.size);
     size_t n = (self->size + 63) >> 6;
     for (size_t i=0; i<n; ++i) self->_arr[i] ^= other._arr[i];
 }
 
-STC_INLINE cbitset_t cbitset_and(cbitset_t s1, cbitset_t s2) {
-    cbitset_t set = cbitset_from(s1);
-    cbitset_setAnd(&set, s2); return set;
+STC_INLINE cbitset cbitset_and(cbitset s1, cbitset s2) {
+    cbitset set = cbitset_from(s1);
+    cbitset_set_and(&set, s2); return set;
 }
-STC_INLINE cbitset_t cbitset_or(cbitset_t s1, cbitset_t s2) {
-    cbitset_t set = cbitset_from(s1);
-    cbitset_setOr(&set, s2); return set;
+STC_INLINE cbitset cbitset_or(cbitset s1, cbitset s2) {
+    cbitset set = cbitset_from(s1);
+    cbitset_set_or(&set, s2); return set;
 }
-STC_INLINE cbitset_t cbitset_xor(cbitset_t s1, cbitset_t s2) {
-    cbitset_t set = cbitset_from(s1);
-    cbitset_setXor(&set, s2); return set;
+STC_INLINE cbitset cbitset_xor(cbitset s1, cbitset s2) {
+    cbitset set = cbitset_from(s1);
+    cbitset_set_xor(&set, s2); return set;
 }
-STC_INLINE cbitset_t cbitset_not(cbitset_t s1) {
-    cbitset_t set = cbitset_from(s1);
-    cbitset_flipAll(&set); return set;
+STC_INLINE cbitset cbitset_not(cbitset s1) {
+    cbitset set = cbitset_from(s1);
+    cbitset_flip_all(&set); return set;
 }
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-STC_API void cbitset_resize(cbitset_t* self, size_t size, bool value) {
+STC_API void cbitset_resize(cbitset* self, size_t size, bool value) {
     size_t new_n = (size + 63) >> 6, osize = self->size, old_n = (osize + 63) >> 6;
     self->_arr = (uint64_t *) realloc(self->_arr, new_n * 8);
     self->size = size;
@@ -158,7 +158,7 @@ STC_API void cbitset_resize(cbitset_t* self, size_t size, bool value) {
     }
 }
 
-STC_API size_t cbitset_count(cbitset_t set) {
+STC_API size_t cbitset_count(cbitset set) {
     size_t count = 0, n = (set.size + 63) >> 6;
     if (set.size > 0) {
         --n; for (size_t i=0; i<n; ++i) count += cbitset_popcnt64(set._arr[i]);

@@ -60,7 +60,7 @@ cvecpq_##tag##_pop(cvec_##tag* self) {cvecpq_##tag##_erase(self, 0);} \
 STC_API void \
 cvecpq_##tag##_push(cvec_##tag* self, cvec_##tag##_value_t value); \
 STC_API void \
-cvecpq_##tag##_pushN(cvec_##tag *self, const cvec_##tag##_value_t in[], size_t size); \
+cvecpq_##tag##_push_n(cvec_##tag *self, const cvec_##tag##_value_t in[], size_t size); \
  \
 implement_cvec_priority_queue(tag, cmpOpr) \
 typedef cvec_##tag##_value_t cvecpq_##tag##_input_t
@@ -74,9 +74,9 @@ STC_INLINE void \
 _cvecpq_##tag##_siftDown(cvec_##tag##_value_t* arr, size_t i, size_t n) { \
     size_t r = i, c = i << 1; \
     while (c <= n) { \
-        if (c < n && cvec_##tag##_sortCompare(&arr[c], &arr[c + 1]) cmpOpr 0) \
+        if (c < n && cvec_##tag##_sort_compare(&arr[c], &arr[c + 1]) cmpOpr 0) \
             ++c; \
-        if (cvec_##tag##_sortCompare(&arr[r], &arr[c]) cmpOpr 0) { \
+        if (cvec_##tag##_sort_compare(&arr[r], &arr[c]) cmpOpr 0) { \
             cvec_##tag##_value_t t = arr[r]; arr[r] = arr[c]; arr[r = c] = t; \
         } else \
             return; \
@@ -88,21 +88,21 @@ STC_API void \
 cvecpq_##tag##_erase(cvec_##tag* self, size_t i) { \
     size_t n = cvec_size(*self) - 1; \
     self->data[i] = self->data[n]; \
-    cvec_##tag##_popBack(self); \
+    cvec_##tag##_pop_back(self); \
     _cvecpq_##tag##_siftDown(self->data - 1, i + 1, n); \
 } \
  \
 STC_API void \
 cvecpq_##tag##_push(cvec_##tag* self, cvec_##tag##_value_t value) { \
-    cvec_##tag##_pushBack(self, value); /* sift-up the value */ \
+    cvec_##tag##_push_back(self, value); /* sift-up the value */ \
     size_t n = cvec_size(*self), c = n; \
     cvec_##tag##_value_t *arr = self->data - 1; \
-    for (; c > 1 && cvec_##tag##_sortCompare(&arr[c >> 1], &value) cmpOpr 0; c >>= 1) \
+    for (; c > 1 && cvec_##tag##_sort_compare(&arr[c >> 1], &value) cmpOpr 0; c >>= 1) \
         arr[c] = arr[c >> 1]; \
     if (c != n) arr[c] = value; \
 } \
 STC_API void \
-cvecpq_##tag##_pushN(cvec_##tag *self, const cvec_##tag##_value_t in[], size_t size) { \
+cvecpq_##tag##_push_n(cvec_##tag *self, const cvec_##tag##_value_t in[], size_t size) { \
     cvec_##tag##_reserve(self, cvec_size(*self) + size); \
     for (size_t i=0; i<size; ++i) cvecpq_##tag##_push(self, in[i]); \
 } \

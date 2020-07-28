@@ -14,7 +14,7 @@ int main()
     cvec_f vec = cvec_init;
     clock_t start = clock();
     for (int i=0; i<N; ++i)
-        cvec_f_pushBack(&vec, crandom32_uniform_int(&pcg));
+        cvec_f_push_back(&vec, crandom32_uniform_int(&pcg));
     cvecpq_f_build(&vec);
     printf("Built priority queue: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
 

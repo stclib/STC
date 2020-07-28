@@ -14,12 +14,12 @@
 
 // Visual Studio: compile with -TP to force C++:  cl -TP -EHsc -O2 benchmark.c
 
-declare_cmap(ii, int64_t, int64_t, c_defaultDestroy, c_defaultEquals, c_fibonacciHash64);
+declare_cmap(ii, int64_t, int64_t, c_default_destroy, c_default_equals, c_fibonacci_hash64);
 
 KHASH_MAP_INIT_INT64(ii, uint64_t)
 
 size_t seed;
-static const float maxLoadFactor = 0.77f;
+static const float max_load_factor = 0.77f;
 
 crandom64_t rng;
 #define SEED(s) rng = crandom64_uniform_engine(seed)
@@ -27,12 +27,12 @@ crandom64_t rng;
 
 
 #define CMAP_SETUP(tag, Key, Value) cmap_##tag map = cmap_init \
-                                    ; cmap_##tag##_setLoadFactors(&map, maxLoadFactor, 0.0)
+                                    ; cmap_##tag##_set_load_factors(&map, max_load_factor, 0.0)
 #define CMAP_PUT(tag, key, val)     cmap_##tag##_put(&map, key, val)->value
 #define CMAP_ERASE(tag, key)        cmap_##tag##_erase(&map, key)
 #define CMAP_FIND(tag, key)         (cmap_##tag##_find(map, key) != NULL)
 #define CMAP_SIZE(tag)              cmap_size(map)
-#define CMAP_BUCKETS(tag)           (map).bucketCount
+#define CMAP_BUCKETS(tag)           (map).bucket_count
 #define CMAP_CLEAR(tag)             cmap_##tag##_destroy(&map)
 
 #define KMAP_SETUP(tag, Key, Value) khash_t(ii)* map = kh_init(ii); khiter_t ki; int ret
@@ -43,7 +43,7 @@ crandom64_t rng;
 #define KMAP_BUCKETS(tag)           ((size_t) kh_n_buckets(map))
 #define KMAP_CLEAR(tag)             kh_destroy(ii, map)
 
-#define UMAP_SETUP(tag, Key, Value) std::unordered_map<Key, Value> map; map.max_load_factor(maxLoadFactor)
+#define UMAP_SETUP(tag, Key, Value) std::unordered_map<Key, Value> map; map.max_load_factor(max_load_factor)
 #define UMAP_PUT(tag, key, val)     (map[key] = val)
 #define UMAP_FIND(tag, key)         (map.find(key) != map.end())
 #define UMAP_ERASE(tag, key)        map.erase(key)
@@ -51,7 +51,7 @@ crandom64_t rng;
 #define UMAP_BUCKETS(tag)           map.bucket_count()
 #define UMAP_CLEAR(tag)             map.clear()
 
-#define BMAP_SETUP(tag, Key, Value) ska::bytell_hash_map<Key, Value> map; map.max_load_factor(maxLoadFactor)
+#define BMAP_SETUP(tag, Key, Value) ska::bytell_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
 #define BMAP_PUT(tag, key, val)     (map[key] = val)
 #define BMAP_FIND(tag, key)         (map.find(key) != map.end())
 #define BMAP_ERASE(tag, key)        map.erase(key)
@@ -59,7 +59,7 @@ crandom64_t rng;
 #define BMAP_BUCKETS(tag)           map.bucket_count()
 #define BMAP_CLEAR(tag)             map.clear()
 
-#define FMAP_SETUP(tag, Key, Value) ska::flat_hash_map<Key, Value> map; map.max_load_factor(maxLoadFactor)
+#define FMAP_SETUP(tag, Key, Value) ska::flat_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
 #define FMAP_PUT(tag, key, val)     (map[key] = val)
 #define FMAP_FIND(tag, key)         (map.find(key) != map.end())
 #define FMAP_ERASE(tag, key)        map.erase(key)

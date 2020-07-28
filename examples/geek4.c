@@ -39,7 +39,7 @@ Efficient Approach: For all the words of the first sentence, we can check if it 
 
 declare_cvec_str();
 declare_cmap_str(sb, bool);
-declare_cvec(sb, cmapentry_sb, cmapentry_sb_destroy, c_noCompare);
+declare_cvec(sb, cmapentry_sb, cmapentry_sb_destroy, c_no_compare);
   
 // Function to return the count of common words 
 // in all the sentences 
@@ -59,11 +59,11 @@ int commonWords(cvec_str S)
     // Extract all words of first string and store it in ans 
     while (i < cstr_size(S.data[0])) { 
         // To store separate words 
-        cstr_t word = cstr_init; 
+        cstr word = cstr_init; 
         cmapentry_sb tmp = {cstr_init, false};
 
         while (i < cstr_size(S.data[0]) && S.data[0].str[i] != ' ') { 
-            cstr_pushBack(&word, S.data[0].str[i]); 
+            cstr_push_back(&word, S.data[0].str[i]); 
             i++; 
         } 
   
@@ -75,7 +75,7 @@ int commonWords(cvec_str S)
         if (!cstr_empty(word)) { 
             tmp.key = cstr_move(&word);
             tmp.value = true;
-            cvec_sb_pushBack(&ans, tmp);
+            cvec_sb_push_back(&ans, tmp);
         }
     } 
 
@@ -89,9 +89,9 @@ int commonWords(cvec_str S)
         i = 0; 
   
         while (i < cstr_size(S.data[j])) { 
-            cstr_t word = cstr_init; 
+            cstr word = cstr_init; 
             while (i < cstr_size(S.data[j]) && S.data[j].str[i] != ' ') { 
-                cstr_pushBack(&word, S.data[j].str[i]); 
+                cstr_push_back(&word, S.data[j].str[i]); 
                 i++; 
             } 
             i++; 
@@ -137,10 +137,10 @@ int commonWords(cvec_str S)
 int main() 
 { 
     cvec_str S = cvec_init; 
-    cvec_str_pushBack(&S, cstr_make("there is a cow")); 
-    cvec_str_pushBack(&S, cstr_make("cow is our mother")); 
-    cvec_str_pushBack(&S, cstr_make("cow gives us milk and milk is sweet")); 
-    cvec_str_pushBack(&S, cstr_make("there is a boy who loves cow")); 
+    cvec_str_push_back(&S, cstr_make("there is a cow")); 
+    cvec_str_push_back(&S, cstr_make("cow is our mother")); 
+    cvec_str_push_back(&S, cstr_make("cow gives us milk and milk is sweet")); 
+    cvec_str_push_back(&S, cstr_make("there is a boy who loves cow")); 
   
     printf("%d\n", commonWords(S)); 
     cvec_str_destroy(&S);

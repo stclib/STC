@@ -39,11 +39,11 @@ int NumOccurrences(const char* arr[], int n, const char* str, int L, int R)
         // then create the entry 
         if (it == NULL) { 
             cvec_i A = cvec_init; 
-            cvec_i_pushBack(&A, i + 1);
+            cvec_i_push_back(&A, i + 1);
             cmap_sv_put(&M, temp, A); 
         } 
         else {
-            cvec_i_pushBack(&it->value, i + 1);
+            cvec_i_push_back(&it->value, i + 1);
         } 
     } 
   

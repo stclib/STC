@@ -36,13 +36,13 @@
 
 #define declare_cvec(...)   c_MACRO_OVERLOAD(declare_cvec, __VA_ARGS__)
 #define declare_cvec_2(tag, Value) \
-                            declare_cvec_3(tag, Value, c_defaultDestroy)
+                            declare_cvec_3(tag, Value, c_default_destroy)
 #define declare_cvec_3(tag, Value, valueDestroy) \
-                            declare_cvec_4(tag, Value, valueDestroy, c_defaultCompare)
+                            declare_cvec_4(tag, Value, valueDestroy, c_default_compare)
 #define declare_cvec_4(tag, Value, valueDestroy, valueCompare) \
                             declare_cvec_6(tag, Value, valueDestroy, valueCompare, Value, c_defaultGetRaw)
 #define declare_cvec_str() \
-                            declare_cvec_6(str, cstr_t, cstr_destroy, cstr_compareRaw, const char*, cstr_getRaw)
+                            declare_cvec_6(str, cstr, cstr_destroy, cstr_compareRaw, const char*, cstr_getRaw)
 
 
 #define declare_cvec_6(tag, Value, valueDestroy, valueCompareRaw, RawValue, valueGetRaw) \
@@ -56,7 +56,7 @@ cvec_##tag##_init(void) {cvec_##tag x = cvec_init; return x;} \
 STC_API cvec_##tag \
 cvec_##tag##_make(size_t size, Value null); \
 STC_API void \
-cvec_##tag##_pushN(cvec_##tag *self, const Value in[], size_t size); \
+cvec_##tag##_push_n(cvec_##tag *self, const Value in[], size_t size); \
 STC_API void \
 cvec_##tag##_destroy(cvec_##tag* self); \
 STC_API void \
@@ -64,9 +64,9 @@ cvec_##tag##_reserve(cvec_##tag* self, size_t cap); \
 STC_API void \
 cvec_##tag##_clear(cvec_##tag* self); \
 STC_API void \
-cvec_##tag##_pushBack(cvec_##tag* self, Value value); \
+cvec_##tag##_push_back(cvec_##tag* self, Value value); \
 STC_INLINE void \
-cvec_##tag##_popBack(cvec_##tag* self) { \
+cvec_##tag##_pop_back(cvec_##tag* self) { \
     valueDestroy(&self->data[_cvec_size(*self) - 1]); \
     --_cvec_size(*self); \
 } \
@@ -123,7 +123,7 @@ cvec_##tag##_make(size_t size, Value null) { \
     return vec; \
 } \
 STC_API void \
-cvec_##tag##_pushN(cvec_##tag *self, const Value in[], size_t size) { \
+cvec_##tag##_push_n(cvec_##tag *self, const Value in[], size_t size) { \
     cvec_##tag##_reserve(self, cvec_size(*self) + size); \
     _cvec_size(*self) += size; \
     for (size_t i=0; i<size; ++i) self->data[i] = in[i]; \
@@ -156,7 +156,7 @@ cvec_##tag##_clear(cvec_##tag* self) { \
 } \
  \
 STC_API void \
-cvec_##tag##_pushBack(cvec_##tag* self, Value value) { \
+cvec_##tag##_push_back(cvec_##tag* self, Value value) { \
     size_t len = cvec_size(*self); \
     if (len == cvec_capacity(*self)) \
         cvec_##tag##_reserve(self, 7 + len * 5 / 3); \
@@ -196,7 +196,7 @@ cvec_##tag##_find(const cvec_##tag* self, RawValue rawValue) { \
 } \
  \
 STC_API int \
-cvec_##tag##_sortCompare(const void* x, const void* y) { \
+cvec_##tag##_sort_compare(const void* x, const void* y) { \
     RawValue rx = valueGetRaw((const Value *) x); \
     RawValue ry = valueGetRaw((const Value *) y); \
     return valueCompareRaw(&rx, &ry); \
@@ -205,7 +205,7 @@ STC_EXTERN_IMPORT void qsort(void *base, size_t nitems, size_t size, int (*compa
 STC_API void \
 cvec_##tag##_sort(cvec_##tag* self) { \
     size_t len = cvec_size(*self); \
-    if (len) qsort(self->data, len, sizeof(Value), cvec_##tag##_sortCompare); \
+    if (len) qsort(self->data, len, sizeof(Value), cvec_##tag##_sort_compare); \
 }
 
 #else

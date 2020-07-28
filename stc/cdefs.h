@@ -57,28 +57,28 @@
 /*#define FOO(...) c_MACRO_OVERLOAD(FOO, __VA_ARGS__)   #define FOO_0() "0"   #define FOO_1(x) "1"   #define FOO_2(x,y) "2"*/
 
 #define c_new(T)        ((T *) malloc(sizeof(T)))
-#define c_new_N(T, n)   ((T *) malloc(sizeof(T) * (n)))
+#define c_new_n(T, n)   ((T *) malloc(sizeof(T) * (n)))
 
 #define c_max_alloca    (1000)
 #define c_swap(T, x, y) { T __t = x; x = y; y = __t; }
 
 #define c_defaultInitRaw(x)    (x)
 #define c_defaultGetRaw(ptr)   (*(ptr))
-#define c_noCompare(x, y)      (0)
-#define c_memCompare(x, y)     memcmp(x, y, sizeof(*(y)))
-#define c_memEquals(x, y)      (memCompare(x, y) == 0)
-#define c_defaultEquals(x, y)  (*(x) == *(y))
-#define c_defaultLess(x, y)    (*(x) < *(y))
+#define c_no_compare(x, y)      (0)
+#define c_mem_compare(x, y)     memcmp(x, y, sizeof(*(y)))
+#define c_mem_equals(x, y)      (memCompare(x, y) == 0)
+#define c_default_equals(x, y)  (*(x) == *(y))
+#define c_default_less(x, y)    (*(x) < *(y))
 #define c_compare(less, x, y)  (less(x, y) ? -1 : less(y, x))
-#define c_defaultCompare(x, y) c_compare(c_defaultLess, x, y)
-#define c_defaultDestroy(p)    ((void)0)
+#define c_default_compare(x, y) c_compare(c_default_less, x, y)
+#define c_default_destroy(p)    ((void)0)
 
 #define c_foreach(it, prefix, container) \
             for (prefix##_iter_t it = prefix##_begin(&container); it.item; it = prefix##_next(it))
 #define c_items(...) {__VA_ARGS__}
 #define c_push(container, prefix, items) do { \
     const prefix##_input_t __arr[] = items; \
-    prefix##_pushN(container, __arr, sizeof(__arr)/sizeof(prefix##_input_t)); \
+    prefix##_push_n(container, __arr, sizeof(__arr)/sizeof(prefix##_input_t)); \
 } while (0)
 
 /* One-byte-at-a-time hash based on Murmur's mix */
@@ -95,13 +95,13 @@ static inline uint32_t  c_defaultHash(const void *data, size_t len) {
 
 /* https://programmingpraxis.com/2018/06/19/fibonacci-hash */
 /* https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/ */
-static inline uint32_t c_fibonacciHash32(const void* data, size_t len) {
+static inline uint32_t c_fibonacci_hash32(const void* data, size_t len) {
     const volatile uint32_t *key = (const uint32_t *) data;
     uint32_t x = *key++ * 2654435769u;
     while (len -= 4) x ^= *key++ * 2654435769u;
     return x;
 }
-static inline uint32_t c_fibonacciHash64(const void* data, size_t len) {
+static inline uint32_t c_fibonacci_hash64(const void* data, size_t len) {
     const volatile uint64_t *key = (const uint64_t *) data;
     uint64_t x = *key++ * 11400714819323198485ull;
     while (len -= 8) x ^= *key++ * 11400714819323198485ull;
