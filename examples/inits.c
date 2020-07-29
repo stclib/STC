@@ -4,7 +4,7 @@
 #include <stc/cvec.h>
 #include <stc/clist.h>
 
-declare_cmap(id, int, cstr, cstr_destroy); // Map of int -> cstr
+declare_cmap(id, int, cstr_t, cstr_destroy); // Map of int -> cstr_t
 declare_cmap_str(cnt, int);
 
 typedef struct {int x, y;} ipair_t;

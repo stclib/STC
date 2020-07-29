@@ -3,7 +3,7 @@
 #include <stc/cmap.h>
 #include <stc/cstr.h>
 
-declare_cmap_str(ss, cstr, cstr_destroy);
+declare_cmap_str(ss, cstr_t, cstr_destroy);
 declare_cset_str();
 
 int main() 

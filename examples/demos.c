@@ -8,7 +8,7 @@
 void stringdemo1()
 {
     printf("\nSTRINGDEMO1\n");
-    cstr cs = cstr_make("one-nine-three-seven-five");
+    cstr_t cs = cstr_make("one-nine-three-seven-five");
     printf("%s.\n", cs.str);
 
     cstr_insert(&cs, 3, "-two");
@@ -54,7 +54,7 @@ void vectordemo1()
 
 
 
-declare_cvec(cs, cstr, cstr_destroy, cstr_compare); // supply inline destructor of values
+declare_cvec(cs, cstr_t, cstr_destroy, cstr_compare); // supply inline destructor of values
 
 void vectordemo2()
 {
@@ -150,7 +150,7 @@ void mapdemo2()
 }
 
 
-declare_cmap_str(ss, cstr, cstr_destroy); 
+declare_cmap_str(ss, cstr_t, cstr_destroy); 
 
 void mapdemo3()
 {

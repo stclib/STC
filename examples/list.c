@@ -1,15 +1,15 @@
 #include <stdio.h>
 #include <time.h>
 #include <stc/clist.h>
-#include <stc/crandom.h>
+#include <stc/crand.h>
 declare_clist(ix, uint64_t);
 
 int main() {
     clist_ix list = clist_init;
-    crandom32_t pcg = crandom32_uniform_engine(time(NULL));
+    crand_eng32_t pcg = crand_eng32(time(NULL));
     int n;
     for (int i=0; i<10000000; ++i) // ten million
-        clist_ix_push_back(&list, crandom32_uniform_int(&pcg));
+        clist_ix_push_back(&list, crand_gen_i32(&pcg));
     n = 100; 
     c_foreach (i, clist_ix, list)
         if (n--) printf("%8d: %10zu\n", 100 - n, i.item->value); else break;

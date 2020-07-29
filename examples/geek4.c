@@ -59,7 +59,7 @@ int commonWords(cvec_str S)
     // Extract all words of first string and store it in ans 
     while (i < cstr_size(S.data[0])) { 
         // To store separate words 
-        cstr word = cstr_init; 
+        cstr_t word = cstr_init; 
         cmapentry_sb tmp = {cstr_init, false};
 
         while (i < cstr_size(S.data[0]) && S.data[0].str[i] != ' ') { 
@@ -89,7 +89,7 @@ int commonWords(cvec_str S)
         i = 0; 
   
         while (i < cstr_size(S.data[j])) { 
-            cstr word = cstr_init; 
+            cstr_t word = cstr_init; 
             while (i < cstr_size(S.data[j]) && S.data[j].str[i] != ' ') { 
                 cstr_push_back(&word, S.data[j].str[i]); 
                 i++; 

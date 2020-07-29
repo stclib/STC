@@ -34,15 +34,15 @@
    
     #include <stdio.h>
     #include <stc/clist.h>
-    #include <stc/crandom.h>
+    #include <stc/crand.h>
     declare_clist(ix, int64_t);
  
     int main() {
         clist_ix list = clist_init;
-        crandom32_t pcg = crandom32_uniform_engine(12345);
+        crand_eng32_t pcg = crand_eng32(12345);
         int n;
         for (int i=0; i<1000000; ++i) // one million
-            clist_ix_push_back(&list, crandom32_uniform_int(&pcg));
+            clist_ix_push_back(&list, crand_gen_i32(&pcg));
         n = 0; 
         c_foreach (i, clist_ix, list)
             if (++n % 10000 == 0) printf("%8d: %10zd\n", n, i.item->value);
@@ -65,7 +65,7 @@
 #define declare_clist_4(tag, Value, valueDestroy, valueCompare) \
                                declare_clist_6(tag, Value, valueDestroy, Value, valueCompare, c_defaultGetRaw)
 #define declare_clist_str() \
-                               declare_clist_6(str, cstr, cstr_destroy, const char*, cstr_compareRaw, cstr_getRaw)
+                               declare_clist_6(str, cstr_t, cstr_destroy, const char*, cstr_compareRaw, cstr_getRaw)
 
 #define declare_clist_types(tag, Value) \
     typedef struct clistnode_##tag { \

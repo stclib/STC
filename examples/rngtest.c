@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <time.h>
-#include <stc/crandom.h>
+#include <stc/crand.h>
 #ifdef __cplusplus
 #include <random>
 #endif
@@ -14,26 +14,28 @@ int main(void)
     uint64_t v;
     printf("start\n");
 
-    crandom32_t pcg = crandom32_uniform_engine(time(NULL));
+    crand_eng32_t pcg = crand_eng32(time(NULL));
     before = clock(); \
     v = 0;
     for (size_t i=0; i<NN; i++) {
-        v += crandom32_uniform_int(&pcg);
+        v += crand_gen_i32(&pcg);
     }
     difference = clock() - before;
     printf("pcg32: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
 
-    crandom64_t sfc = crandom64_uniform_engine(time(NULL));
+    crand_eng64_t sfc = crand_eng64(time(NULL));
     before = clock(); \
     v = 0;
     for (size_t i=0; i<NN; i++) {
-        v += crandom64_uniform_int(&sfc) & 0xffffffff;
+        v += crand_gen_i64(&sfc) & 0xffffffff;
     }
     difference = clock() - before;
     printf("sfc64: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
 
-    for (int i=0; i<8; ++i) printf("%f ", crandom32_uniform_real(&pcg));
+    crand_f64_uniform_t fdist = crand_f64_uniform(10, 20);
+    for (int i=0; i<8; ++i) printf("%f ", crand_gen_f64_uniform(&sfc, fdist));
     puts("");
-    for (int i=0; i<8; ++i) printf("%f ", crandom64_uniform_real(&sfc));
+    crand_f32_uniform_t f32dist = crand_f32_uniform(10, 20);
+    for (int i=0; i<8; ++i) printf("%f ", crand_gen_f32_uniform(&pcg, f32dist));
     puts("");
 }

@@ -34,8 +34,8 @@ int vikingvw_equals(const VikingVw* x, const VikingVw* y) {
 // Viking data struct -----------------------
 
 typedef struct Viking {
-    cstr name;
-    cstr country;
+    cstr_t name;
+    cstr_t country;
 } Viking;
 
 

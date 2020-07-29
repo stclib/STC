@@ -115,7 +115,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
     declare_CHASH_STR(tag, cmap, Value, ValueDestroy)
 
 #define declare_CHASH_STR(tag, ctype, Value, valueDestroy) \
-    declare_CHASH(tag, ctype, cstr, Value, valueDestroy, cstr_equalsRaw, cstr_hashRaw, \
+    declare_CHASH(tag, ctype, cstr_t, Value, valueDestroy, cstr_equalsRaw, cstr_hashRaw, \
                        cstr_destroy, const char*, cstr_getRaw, cstr_make)
 
 #define OPT_1_cset(x)

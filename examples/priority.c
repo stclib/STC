@@ -3,18 +3,18 @@
 #include <time.h>
 #include <stc/cvecpq.h>
 #include <stc/cmap.h>
-#include <stc/crandom.h>
+#include <stc/crand.h>
 
 declare_cvec(i, uint32_t);
 declare_cvec_priority_queue(i, >); // min-heap (increasing values)
 
 int main() {
-    crandom32_t pcg = crandom32_uniform_engine(time(NULL));
+    crand_eng32_t pcg = crand_eng32(time(NULL));
     cvec_i heap = cvec_init;
 
     // Push ten million random numbers to queue
     for (int i=0; i<10000000; ++i)
-        cvecpq_i_push(&heap, crandom32_uniform_int(&pcg));
+        cvecpq_i_push(&heap, crand_gen_i32(&pcg));
 
     // Extract the hundred smallest.
     for (int i=0; i<100; ++i) {

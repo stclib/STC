@@ -24,15 +24,15 @@
 /*  Priority Queue using CVec as heap.
 
     #include <stc/cvecpq.h>
-    #include <stc/crandom.h>
+    #include <stc/crand.h>
     declare_cvec(i, int);
     declare_cvec_priority_queue(i, >); // min-heap (increasing values)
     int main() {
-        crandom32_t pcg = crandom32_uniform_engine(1234);
+        crand_eng32_t pcg = crand_eng32(1234);
         cvec_i heap = cvec_init;
         // Push one million random numbers onto the queue.
         for (int i=0; i<1000000; ++i)
-            cvecpq_i_push(&heap, crandom32_uniform_int(&pcg));
+            cvecpq_i_push(&heap, crand_gen_i32(&pcg));
         // Extract the 100 smallest.
         for (int i=0; i<100; ++i) {
             printf("%d ", cvecpq_i_top(&heap));
