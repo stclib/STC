@@ -37,7 +37,7 @@
 */
 
 typedef struct {uint64_t state, inc;} crand_eng32_t;
-typedef struct {int32_t min; uint32_t range;} crand_i32_uniform_t;
+typedef struct {int32_t min, range;} crand_i32_uniform_t;
 typedef struct {float min, range;} crand_f32_uniform_t;
 
 /* 32 bit random number generator engine */
