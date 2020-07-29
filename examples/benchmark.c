@@ -22,7 +22,7 @@ size_t seed;
 static const float max_load_factor = 0.77f;
 
 crand_eng64_t rng;
-#define SEED(s) rng = crand_eng64(seed)
+#define SEED(s) rng = crand_eng64_init(seed)
 #define RAND(N) (crand_gen_i64(&rng) & ((1 << N) - 1))
 
 

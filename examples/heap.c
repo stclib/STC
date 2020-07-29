@@ -9,7 +9,7 @@ declare_cvec_priority_queue(f, >);
 int main()
 {
     uint32_t seed = time(NULL);
-    crand_eng32_t pcg = crand_eng32(seed);
+    crand_eng32_t pcg = crand_eng32_init(seed);
     int N = 30000000, M = 100;
     cvec_f vec = cvec_init;
     clock_t start = clock();
@@ -25,7 +25,7 @@ int main()
         cvecpq_f_pop(&vec);
     printf("\n\npopped PQ: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
 
-    pcg = crand_eng32(seed);
+    pcg = crand_eng32_init(seed);
     start = clock();
     for (int i=0; i<N; ++i)
         cvecpq_f_push(&vec, crand_gen_i32(&pcg));

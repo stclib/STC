@@ -2,28 +2,29 @@
 #include <time.h>
 #include <stc/clist.h>
 #include <stc/crand.h>
-declare_clist(ix, uint64_t);
+declare_clist(fx, double);
 
 int main() {
-    clist_ix list = clist_init;
-    crand_eng32_t pcg = crand_eng32(time(NULL));
+    clist_fx list = clist_init;
+    crand_eng64_t eng = crand_eng64_init(time(NULL));
+    crand_uniform_f64_t dist = crand_uniform_f64_init(1.0, 100.0);
     int n;
-    for (int i=0; i<10000000; ++i) // ten million
-        clist_ix_push_back(&list, crand_gen_i32(&pcg));
+    for (int i = 0; i < 10000000; ++i) // ten million
+        clist_fx_push_back(&list, crand_uniform_f64(&eng, dist));
     n = 100; 
-    c_foreach (i, clist_ix, list)
-        if (n--) printf("%8d: %10zu\n", 100 - n, i.item->value); else break;
+    c_foreach (i, clist_fx, list)
+        if (n--) printf("%8d: %10f\n", 100 - n, i.item->value); else break;
     // Sort them...
-    clist_ix_sort(&list); // mergesort O(n*log n)
+    clist_fx_sort(&list); // mergesort O(n*log n)
     n = 100;
     puts("sorted");
-    c_foreach (i, clist_ix, list)
-        if (n--) printf("%8d: %10zu\n", 100 - n, i.item->value); else break;
+    c_foreach (i, clist_fx, list)
+        if (n--) printf("%8d: %10f\n", 100 - n, i.item->value); else break;
 
-    clist_ix_clear(&list);
-    c_push(&list, clist_ix, c_items(10, 20, 30, 40, 50));
-    c_foreach (i, clist_ix, list) printf("%zu ", i.item->value);
+    clist_fx_clear(&list);
+    c_push(&list, clist_fx, c_items(10, 20, 30, 40, 50));
+    c_foreach (i, clist_fx, list) printf("%f ", i.item->value);
     puts("");
 
-    clist_ix_destroy(&list);
+    clist_fx_destroy(&list);
 }

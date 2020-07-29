@@ -27,24 +27,23 @@
 #include "cdefs.h"
 #include <string.h>
 /*
-    crand_eng32_t eng = crand_eng32(seed);
-    crand_f32_uniform_t fdist = crand_f32_uniform(1.0f, 6.0f);
-    crand_i32_uniform_t idist = crand_i32_uniform(1, 6);
+    crand_eng32_t eng = crand_eng32_init(seed);
+    crand_uniform_f32_t fdist = crand_uniform_f32_init(1.0f, 6.0f);
+    crand_uniform_i32_t idist = crand_uniform_i32_init(1, 6);
     
     uint32_t i = crand_gen_i32(&eng);
-    int j = crand_gen_i32_uniform(&eng, idist);
-    float r = crand_gen_f32_uniform(&eng, fdist);
+    int j = crand_uniform_i32(&eng, idist);
+    float r = crand_uniform_f32(&eng, fdist);
 */
 
-typedef struct {uint64_t state, inc;} crand_eng32_t;
-typedef struct {int32_t min, range;} crand_i32_uniform_t;
-typedef struct {float min, range;} crand_f32_uniform_t;
+typedef struct {uint64_t state[2];} crand_eng32_t;
+typedef struct {int32_t min, range;} crand_uniform_i32_t;
+typedef struct {float min, range;} crand_uniform_f32_t;
 
 /* 32 bit random number generator engine */
-STC_API crand_eng32_t crand_eng32_with_id(uint64_t seed, uint64_t seq);
-
-STC_INLINE crand_eng32_t crand_eng32(uint64_t seed) {
-    return crand_eng32_with_id(seed, 0);
+STC_API crand_eng32_t crand_eng32_with_seq(uint64_t seed, uint64_t seq);
+STC_INLINE crand_eng32_t crand_eng32_init(uint64_t seed) {
+    return crand_eng32_with_seq(seed, 1);
 }
 
 /* int random number generator, range [0, 2^32) */
@@ -56,28 +55,30 @@ STC_INLINE float crand_gen_f32(crand_eng32_t* rng) {
 }
 
 /* int random number generator in range [low, high] */
-STC_INLINE crand_i32_uniform_t crand_i32_uniform(int32_t low, int32_t high) {
-    crand_i32_uniform_t dist = {low, high - low}; return dist;
+STC_INLINE crand_uniform_i32_t crand_uniform_i32_init(int32_t low, int32_t high) {
+    crand_uniform_i32_t dist = {low, high - low + 1}; return dist;
 }
-STC_INLINE uint32_t crand_gen_i32_uniform(crand_eng32_t* rng, crand_i32_uniform_t dist) {
+STC_INLINE int32_t crand_uniform_i32(crand_eng32_t* rng, crand_uniform_i32_t dist) {
     return dist.min + (int32_t) (((uint64_t) crand_gen_i32(rng) * dist.range) >> 32);
 }
 
 /* float random number in range [low, high). Note: 23 bit resolution. */
-STC_INLINE crand_f32_uniform_t crand_f32_uniform(float low, float high) {
-    crand_f32_uniform_t dist = {low, high - low}; return dist;
+STC_INLINE crand_uniform_f32_t crand_uniform_f32_init(float low, float high) {
+    crand_uniform_f32_t dist = {low, high - low}; return dist;
 }
-STC_INLINE float crand_gen_f32_uniform(crand_eng32_t* rng, crand_f32_uniform_t dist) {
+STC_INLINE float crand_uniform_f32(crand_eng32_t* rng, crand_uniform_f32_t dist) {
     return dist.min + crand_gen_f32(rng) * dist.range;
 }
 
 
 typedef struct {uint64_t state[4];} crand_eng64_t;
-typedef struct {double min, range;} crand_f64_uniform_t;
+typedef struct {double min, range;} crand_uniform_f64_t;
 
 /* 64 bit random number generator engine */
-STC_API crand_eng64_t crand_eng64(const uint64_t seed);
-
+STC_API crand_eng64_t crand_eng64_with_seq(uint64_t seed, uint64_t seq);
+STC_INLINE crand_eng64_t crand_eng64_init(uint64_t seed) {
+    return crand_eng64_with_seq(seed, 1);
+}
 /* int random number generator, range [0, 2^64) */
 STC_API uint64_t crand_gen_i64(crand_eng64_t* rng);
 
@@ -87,10 +88,10 @@ STC_INLINE double crand_gen_f64(crand_eng64_t* rng) {
 }
 
 /* double random number in range [low, high). 52 bit resolution. */
-STC_INLINE crand_f64_uniform_t crand_f64_uniform(float low, float high) {
-    crand_f64_uniform_t dist = {low, high - low}; return dist;
+STC_INLINE crand_uniform_f64_t crand_uniform_f64_init(float low, float high) {
+    crand_uniform_f64_t dist = {low, high - low}; return dist;
 }
-STC_INLINE double crand_gen_f64_uniform(crand_eng64_t* rng, crand_f64_uniform_t dist) {
+STC_INLINE double crand_uniform_f64(crand_eng64_t* rng, crand_uniform_f64_t dist) {
     return dist.min + crand_gen_f64(rng) * dist.range;
 }
 
@@ -99,40 +100,49 @@ STC_INLINE double crand_gen_f64_uniform(crand_eng64_t* rng, crand_f64_uniform_t 
 
 /* PCG32 random number generator: https://www.pcg-random.org/index.html */
 
-STC_API crand_eng32_t crand_eng32_with_id(uint64_t seed, uint64_t seq) {
+STC_API crand_eng32_t crand_eng32_with_seq(uint64_t seed, uint64_t seq) {
     crand_eng32_t rng = {0u, (seq << 1u) | 1u}; /* inc must be odd */
     crand_gen_i32(&rng);
-    rng.state += seed;
+    rng.state[0] += seed;
     crand_gen_i32(&rng);
     return rng;
 }
-
 STC_API uint32_t crand_gen_i32(crand_eng32_t* rng) {
-    uint64_t old = rng->state;
-    rng->state = old * 6364136223846793005ull + rng->inc;
-    uint32_t xos = ((old >> 18u) ^ old) >> 27u;
+    uint64_t old = rng->state[0];
+    rng->state[0] = old * 6364136223846793005ull + rng->state[1];
+    uint32_t xors = ((old >> 18u) ^ old) >> 27u;
     uint32_t rot = old >> 59u;
-    return (xos >> rot) | (xos << ((-rot) & 31));
+    return (xors >> rot) | (xors << ((-rot) & 31));
 }
 
 /* SFC64 random number generator: http://pracrand.sourceforge.net */
 
-STC_API crand_eng64_t crand_eng64(const uint64_t seed) {
-    crand_eng64_t state = {{seed, seed, seed, 1}};
-    for (int i = 0; i < 12; ++i) crand_gen_i64(&state);
-    return state;
+STC_API crand_eng64_t crand_eng64_with_seq(uint64_t seed, uint64_t seq) {
+    crand_eng64_t rng = {seed, seed, seed, (seq << 1u) | 1u}; /* increment must be odd */
+    for (int i = 0; i < 12; ++i) crand_gen_i64(&rng);
+    return rng;
 }
 
-STC_API uint64_t crand_gen_i64(crand_eng64_t* rng) {
-    enum {LR=24, RS=11, LS=3};
+#if USE_SFC64
+STC_API uint64_t crand_gen_i64(crand_eng64_t* rng) { /* original sfc64 */
+    enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
     uint64_t *s = rng->state;
     const uint64_t result = s[0] + s[1] + s[3]++;
-    s[0] = s[1] ^ (s[1] >> RS);
-    s[1] = s[2] + (s[2] << LS);
-    s[2] = (s[2] << LR) | (s[2] >> (64 - LR));
+    s[0] = s[1] ^ (s[1] >> RSHIFT);
+    s[1] = s[2] + (s[2] << LSHIFT);
+    s[2] = ((s[2] << LROT) | (s[2] >> (64 - LROT))) + result;
     return result;
 }
-
+#else
+STC_API uint64_t crand_gen_i64(crand_eng64_t* rng) { /* copyright: Tyge Løvset */
+    enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
+    uint64_t *s = rng->state;
+    const uint64_t b = s[1], result = s[0] ^ (s[2] += s[3]|1);
+    s[0] = (b + (b << LSHIFT)) ^ (b >> RSHIFT);
+    s[1] = ((b << LROT) | (b >> (64 - LROT))) + result;
+    return result;
+}
+#endif
 #endif
 
 #endif

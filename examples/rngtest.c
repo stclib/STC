@@ -14,7 +14,7 @@ int main(void)
     uint64_t v;
     printf("start\n");
 
-    crand_eng32_t pcg = crand_eng32(time(NULL));
+    crand_eng32_t pcg = crand_eng32_init(time(NULL));
     before = clock(); \
     v = 0;
     for (size_t i=0; i<NN; i++) {
@@ -23,7 +23,7 @@ int main(void)
     difference = clock() - before;
     printf("pcg32: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
 
-    crand_eng64_t sfc = crand_eng64(time(NULL));
+    crand_eng64_t sfc = crand_eng64_init(time(NULL));
     before = clock(); \
     v = 0;
     for (size_t i=0; i<NN; i++) {
@@ -32,10 +32,16 @@ int main(void)
     difference = clock() - before;
     printf("sfc64: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
 
-    crand_f64_uniform_t fdist = crand_f64_uniform(10, 20);
-    for (int i=0; i<8; ++i) printf("%f ", crand_gen_f64_uniform(&sfc, fdist));
+    crand_uniform_i32_t i32dist = crand_uniform_i32_init(10, 20);
+    for (int i=0; i<8; ++i) printf("%d ", crand_uniform_i32(&pcg, i32dist));
     puts("");
-    crand_f32_uniform_t f32dist = crand_f32_uniform(10, 20);
-    for (int i=0; i<8; ++i) printf("%f ", crand_gen_f32_uniform(&pcg, f32dist));
+
+    crand_uniform_f32_t f32dist = crand_uniform_f32_init(10, 20);
+    for (int i=0; i<8; ++i) printf("%f ", crand_uniform_f32(&pcg, f32dist));
+    puts("");
+
+    crand_uniform_f64_t fdist = crand_uniform_f64_init(10, 20);
+    for (int i=0; i<8; ++i) printf("%f ", crand_uniform_f64(&sfc, fdist));
+    //for (int i=0; i<8; ++i) printf("%zu ", crand_gen_i64(&sfc));
     puts("");
 }

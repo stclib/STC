@@ -15,7 +15,7 @@ const static uint64_t mask = (1ull << 52) - 1;
 
 void repeats(void)
 {
-    crand_eng64_t rng = crand_eng64(seed);
+    crand_eng64_t rng = crand_eng64_init(seed);
     cmap_ic m = cmap_init;
     cmap_ic_reserve(&m, N);
     clock_t now = clock();
@@ -34,13 +34,13 @@ declare_cvec(x, uint64_t);
 
 void distribution(void)
 {
-    crand_eng32_t rng = crand_eng32(seed); // time(NULL), time(NULL));
+    crand_eng32_t rng = crand_eng32_init(seed); // time(NULL), time(NULL));
     const size_t N = 1ull << 28, M = 1ull << 9; // 1ull << 10;
     cmap_x map = cmap_x_make(M);
     clock_t now = clock();
-    crand_i32_uniform_t dist = crand_i32_uniform(0, M);
+    crand_uniform_i32_t dist = crand_uniform_i32_init(0, M);
     for (size_t i = 0; i < N; ++i) {
-        ++cmap_x_insert(&map, crand_gen_i32_uniform(&rng, dist), 0)->value;
+        ++cmap_x_insert(&map, crand_uniform_i32(&rng, dist), 0)->value;
     }
     float diff = (float) (clock() - now) / CLOCKS_PER_SEC;
 

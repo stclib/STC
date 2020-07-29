@@ -39,7 +39,7 @@
  
     int main() {
         clist_ix list = clist_init;
-        crand_eng32_t pcg = crand_eng32(12345);
+        crand_eng32_t pcg = crand_eng32_init(12345);
         int n;
         for (int i=0; i<1000000; ++i) // one million
             clist_ix_push_back(&list, crand_gen_i32(&pcg));

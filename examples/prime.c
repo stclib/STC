@@ -1,12 +1,5 @@
-#include <stc/cbitset.h>
-
-#if defined(__GNUC__)
-#define cbitset_popcnt64(i) __builtin_popcountll(i)
-#else
-#define cbitset_popcnt64(i) _mm_popcnt_u64(i)
-#endif
-
 #include <stdio.h>
+#include <stc/cbitset.h>
 
 static inline void sieveOfEratosthenes(size_t n)
 {
@@ -14,8 +7,6 @@ static inline void sieveOfEratosthenes(size_t n)
     printf("computing prime numbers up to %zu\n", n);
     cbitset_reset(&prime, 0);
     cbitset_reset(&prime, 1);
-
-    uint64_t m = cbitset_popcnt64(123456);
 
     for (size_t i = 2; i <= n; ++i) {
         // If prime[i] is not changed, then it is a prime
