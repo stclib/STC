@@ -115,16 +115,26 @@ STC_API uint32_t crand_gen_i32(crand_eng32_t* rng) {
     return (xors >> rot) | (xors << ((-rot) & 31));
 }
 
-/* SFC64 random number generator: http://pracrand.sourceforge.net */
-
+/* New 64bit PRNG losely based on SFC64: Copyright 2020, Tyge Løvset */
+/* Faster: Updates only 192bit state. Parallel: Ensures unique sequence for each seq (2^63 seqs) */
+/* Minimal period is 2^64 per seq, average ~ 2^127 per seq */
 STC_API crand_eng64_t crand_eng64_with_seq(uint64_t seed, uint64_t seq) {
     crand_eng64_t rng = {seed, seed, seed, (seq << 1u) | 1u}; /* increment must be odd */
     for (int i = 0; i < 12; ++i) crand_gen_i64(&rng);
     return rng;
 }
 
-#if USE_SFC64
-STC_API uint64_t crand_gen_i64(crand_eng64_t* rng) { /* original sfc64 */
+STC_API uint64_t crand_gen_i64(crand_eng64_t* rng) {
+    enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
+    uint64_t *s = rng->state;
+    const uint64_t b = s[1], result = s[0] ^ (s[2] += s[3]|1);
+    s[0] = (b + (b << LSHIFT)) ^ (b >> RSHIFT);
+    s[1] = ((b << LROT) | (b >> (64 - LROT))) + result;
+    return result;
+}
+
+/* // Original SFC64 random number generator: http://pracrand.sourceforge.net
+STC_API uint64_t crand_gen_i64(crand_eng64_t* rng) {
     enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
     uint64_t *s = rng->state;
     const uint64_t result = s[0] + s[1] + s[3]++;
@@ -133,16 +143,7 @@ STC_API uint64_t crand_gen_i64(crand_eng64_t* rng) { /* original sfc64 */
     s[2] = ((s[2] << LROT) | (s[2] >> (64 - LROT))) + result;
     return result;
 }
-#else
-STC_API uint64_t crand_gen_i64(crand_eng64_t* rng) { /* copyright: Tyge Løvset */
-    enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
-    uint64_t *s = rng->state;
-    const uint64_t b = s[1], result = s[0] ^ (s[2] += s[3]|1);
-    s[0] = (b + (b << LSHIFT)) ^ (b >> RSHIFT);
-    s[1] = ((b << LROT) | (b >> (64 - LROT))) + result;
-    return result;
-}
-#endif
+*/
 #endif
 
 #endif

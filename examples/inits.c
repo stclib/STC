@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stc/cstr.h>
 #include <stc/cmap.h>
-#include <stc/cvec.h>
+#include <stc/cvec_pq.h>
 #include <stc/clist.h>
 
 declare_cmap(id, int, cstr_t, cstr_destroy); // Map of int -> cstr_t
@@ -11,8 +11,31 @@ typedef struct {int x, y;} ipair_t;
 declare_cvec(ip, ipair_t, c_default_destroy, c_mem_compare);
 declare_clist(ip, ipair_t, c_default_destroy, c_mem_compare);
 
+declare_cvec(f, float);
+declare_cvec_pqueue(f, >);
+
 
 int main(void) {
+    // regular vector:
+    cvec_f floats = cvec_init;
+    c_push(&floats, cvec_f, c_items(4.0f, 2.0f, 5.0f, 3.0f, 1.0f));
+    // Output:
+    c_foreach (i, cvec_f, floats) printf("%.1f ", *i.item);
+    puts("");
+
+    // reorganise as a priority queue, and add more numbers:
+    cvec_f_pqueue_build(&floats);
+    c_push(&floats, cvec_f_pqueue, c_items(40.0f, 20.0f, 50.0f, 30.0f, 10.0f));
+    // Output sorted:
+    while (cvec_size(floats) > 0) {
+        printf("%.1f ", cvec_f_pqueue_top(&floats));
+        cvec_f_pqueue_pop(&floats);
+    }
+    puts("\n");
+    cvec_f_destroy(&floats);
+
+    // ------------------
+
     int year = 2020;
     cmap_id idnames = cmap_init;
     c_push(&idnames, cmap_id, c_items(
@@ -23,6 +46,7 @@ int main(void) {
 
     c_foreach (i, cmap_id, idnames)
         printf("%d: %s\n", i.item->key, i.item->value.str);
+    puts("");
     cmap_id_destroy(&idnames);
 
     // ------------------
@@ -42,6 +66,7 @@ int main(void) {
 
     c_foreach (i, cmap_cnt, countries)
         printf("%s: %d\n", i.item->key.str, i.item->value);
+    puts("");
     cmap_cnt_destroy(&countries);
 
     // ------------------

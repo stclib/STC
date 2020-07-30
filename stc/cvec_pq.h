@@ -21,57 +21,60 @@
  * SOFTWARE.
  */
 
-/*  Priority Queue using CVec as heap.
+/*  Priority Queue using cvec as heap.
 
-    #include <stc/cvecpq.h>
     #include <stc/crand.h>
-    declare_cvec(i, int);
-    declare_cvec_priority_queue(i, >); // min-heap (increasing values)
+    #include <stc/cvec_pq.h>
+    declare_cvec(f, float);
+    declare_cvec_pqueue(f, >); // min-heap (increasing values)
+
     int main() {
-        crand_eng32_t pcg = crand_eng32_init(1234);
-        cvec_i heap = cvec_init;
-        // Push one million random numbers onto the queue.
-        for (int i=0; i<1000000; ++i)
-            cvecpq_i_push(&heap, crand_gen_i32(&pcg));
+        crand_eng32_t gen = crand_eng32_init(1234);
+        crand_uniform_f32_t dist = crand_uniform_f32_init(10.0f, 100.0f);
+
+        cvec_f queue = cvec_init;
+        // Push ten million random numbers onto the queue.
+        for (int i=0; i<10000000; ++i)
+            cvec_f_pqueue_push(&queue, crand_uniform_f32(&gen, dist));
         // Extract the 100 smallest.
         for (int i=0; i<100; ++i) {
-            printf("%d ", cvecpq_i_top(&heap));
-            cvecpq_i_pop(&heap);
+            printf("%f ", cvec_f_pqueue_top(&queue));
+            cvec_f_pqueue_pop(&queue);
         }
-        cvec_i_destroy(&heap);
+        cvec_f_destroy(&queue);
     }
 */
 
-#ifndef CVECPQ__H__
-#define CVECPQ__H__
+#ifndef CVEC_PQ__H__
+#define CVEC_PQ__H__
 
 #include "cvec.h"
 
-#define declare_cvec_priority_queue(tag, cmpOpr) /* < or > */ \
+#define declare_cvec_pqueue(tag, cmpOpr) /* < or > */ \
  \
 STC_API void \
-cvecpq_##tag##_build(cvec_##tag* self); \
+cvec_##tag##_pqueue_build(cvec_##tag* self); \
 STC_API void \
-cvecpq_##tag##_erase(cvec_##tag* self, size_t i); \
+cvec_##tag##_pqueue_erase(cvec_##tag* self, size_t i); \
 STC_INLINE cvec_##tag##_value_t \
-cvecpq_##tag##_top(cvec_##tag* self) {return self->data[0];} \
+cvec_##tag##_pqueue_top(cvec_##tag* self) {return self->data[0];} \
 STC_INLINE void \
-cvecpq_##tag##_pop(cvec_##tag* self) {cvecpq_##tag##_erase(self, 0);} \
+cvec_##tag##_pqueue_pop(cvec_##tag* self) {cvec_##tag##_pqueue_erase(self, 0);} \
 STC_API void \
-cvecpq_##tag##_push(cvec_##tag* self, cvec_##tag##_value_t value); \
+cvec_##tag##_pqueue_push(cvec_##tag* self, cvec_##tag##_value_t value); \
 STC_API void \
-cvecpq_##tag##_push_n(cvec_##tag *self, const cvec_##tag##_value_t in[], size_t size); \
+cvec_##tag##_pqueue_push_n(cvec_##tag *self, const cvec_##tag##_value_t in[], size_t size); \
  \
-implement_cvec_priority_queue(tag, cmpOpr) \
-typedef cvec_##tag##_value_t cvecpq_##tag##_input_t
+implement_cvec_pqueue(tag, cmpOpr) \
+typedef cvec_##tag##_value_t cvec_##tag##_pqueue_input_t
     
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define implement_cvec_priority_queue(tag, cmpOpr) \
+#define implement_cvec_pqueue(tag, cmpOpr) \
  \
 STC_INLINE void \
-_cvecpq_##tag##_siftDown(cvec_##tag##_value_t* arr, size_t i, size_t n) { \
+_cvec_##tag##_pqueue_sift_down(cvec_##tag##_value_t* arr, size_t i, size_t n) { \
     size_t r = i, c = i << 1; \
     while (c <= n) { \
         if (c < n && cvec_##tag##_sort_compare(&arr[c], &arr[c + 1]) cmpOpr 0) \
@@ -85,15 +88,23 @@ _cvecpq_##tag##_siftDown(cvec_##tag##_value_t* arr, size_t i, size_t n) { \
 } \
  \
 STC_API void \
-cvecpq_##tag##_erase(cvec_##tag* self, size_t i) { \
-    size_t n = cvec_size(*self) - 1; \
-    self->data[i] = self->data[n]; \
-    cvec_##tag##_pop_back(self); \
-    _cvecpq_##tag##_siftDown(self->data - 1, i + 1, n); \
+cvec_##tag##_pqueue_build(cvec_##tag* self) { \
+    size_t n = cvec_size(*self);  \
+    cvec_##tag##_value_t *arr = self->data - 1; \
+    for (size_t k = n >> 1; k != 0; --k) \
+        _cvec_##tag##_pqueue_sift_down(arr, k, n); \
 } \
  \
 STC_API void \
-cvecpq_##tag##_push(cvec_##tag* self, cvec_##tag##_value_t value) { \
+cvec_##tag##_pqueue_erase(cvec_##tag* self, size_t i) { \
+    size_t n = cvec_size(*self) - 1; \
+    self->data[i] = self->data[n]; \
+    cvec_##tag##_pop_back(self); \
+    _cvec_##tag##_pqueue_sift_down(self->data - 1, i + 1, n); \
+} \
+ \
+STC_API void \
+cvec_##tag##_pqueue_push(cvec_##tag* self, cvec_##tag##_value_t value) { \
     cvec_##tag##_push_back(self, value); /* sift-up the value */ \
     size_t n = cvec_size(*self), c = n; \
     cvec_##tag##_value_t *arr = self->data - 1; \
@@ -102,21 +113,13 @@ cvecpq_##tag##_push(cvec_##tag* self, cvec_##tag##_value_t value) { \
     if (c != n) arr[c] = value; \
 } \
 STC_API void \
-cvecpq_##tag##_push_n(cvec_##tag *self, const cvec_##tag##_value_t in[], size_t size) { \
+cvec_##tag##_pqueue_push_n(cvec_##tag *self, const cvec_##tag##_value_t in[], size_t size) { \
     cvec_##tag##_reserve(self, cvec_size(*self) + size); \
-    for (size_t i=0; i<size; ++i) cvecpq_##tag##_push(self, in[i]); \
-} \
- \
-STC_API void \
-cvecpq_##tag##_build(cvec_##tag* self) { \
-    size_t n = cvec_size(*self);  \
-    cvec_##tag##_value_t *arr = self->data - 1; \
-    for (size_t k = n >> 1; k != 0; --k) \
-        _cvecpq_##tag##_siftDown(arr, k, n); \
+    for (size_t i=0; i<size; ++i) cvec_##tag##_pqueue_push(self, in[i]); \
 }
 
 #else
-#define implement_cvec_priority_queue(tag, cmpOpr)
+#define implement_cvec_pqueue(tag, cmpOpr)
 #endif
 
 #endif
