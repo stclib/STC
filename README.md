@@ -7,17 +7,17 @@ Introduction
 An elegant, typesafe, generic, customizable, user-friendly, consistent, and very fast standard container library for C99. This is a small headers only library with the most used container components, and a few algorithms:
 - **stc/carray.h** - Dynamic generic **multi-dimensional array**, implemented as a single contiguous section of memory.
 - **stc/cbitset.h** - Bitset similar to c++ std::bitset or boost::dynamic_bitset.
-- **stc/clist.h** - A genric circular singly **linked list**, can be used as a **queue** - supports *pushBack, pushFront, and popFront* - **stc/cmap.h** - A generic **unordered map** implemented as open hashing without tombstones. Highly customizable and fast.
+- **stc/clist.h** - A genric circular **singly linked list**. Can be used as a **queue** as it supports *push_back(), push_front(), and pop_front()*. It also contains various *splice* functions and *merge sort*.
+- **stc/cmap.h** - A generic **unordered map** implemented as open hashing without tombstones. Highly customizable and fast.
 - **stc/cset.h** - A generic **unordered set** implemented in tandem with *unordered map*
 - **stc/cstr.h** - Compact and powerful **string** class.
 - **stc/cvec.h** - Dynamic generic **vector** class, works well as a **stack**.
-- **stc/cvec_pq.h** - Priority queue adapter for **cvec.h**, implemented as a **heap**.
-in *O*(1). Also contains various *splice* functions and (merge) *sort*.
-- **stc/coption.h** - Implementation of *getopt_long*-"like" function, *coption_get*, to parse command line arguments.
-- **stc/crand.h** - A few very efficent modern random number generators *pcg32* and *sfc64-variant*.
+- **stc/cvec_pq.h** - Priority queue adapter for **cvec.h**, as a **heap**.
+- **stc/copt.h** - Implementation of a **getopt_long()**-like function, *copt_get()*, to parse command line arguments.
+- **stc/crand.h** - A few very efficent modern random number generators *pcg32* and my own *64-bit PRNG*.
 - **stc/cdefs.h** - A common include file with some general definitions.
 
-The usage of the containers is similar to the C++ standard containers, so it should be easier for those who are familiar with them.
+The usage of the containers is vert similar to the C++ std:: containers, so it should be easy for those who are familiar with them.
 
 All containers mentioned above, except for cstr are generic (similar to templates in C++). A simple example:
 ```
@@ -52,8 +52,8 @@ Because it is headers only, files can simply be included in your program. The fu
 #include <stc/cmap.h>
 #include <stc/cvec.h>
 
-declare_cmap(ii, int, int); // map
-declare_cmap(ix, int64_t);  // set
+declare_cmap(ii, int, int);
+declare_cset(ix, int64_t);
 declare_cvec(i, int);
 ...
 ```
@@ -64,9 +64,9 @@ This library is very efficent. Containers have templated intrusive elements. One
 
 **CMAP**=*cmap*, KMAP=*khash*, UMAP=*std::unordered_map*, BMAP=*ska::bytell_hash_map*, FMAP=*ska::flat_hash_map*, RMAP=*robin_hood::unordered_map*
 ```
-Random keys are in range [0, 2^20), seed = 1596103163:
+Random keys are in range [0, 2^20):
 
-Unordered maps: 50000000 repeats of Insert random key + try to remove a random key:
+Unordered maps: 50000000 repeats of insert a random key + (attemt to) remove another random key:
 CMAP: time:  2.49 sec
 KMAP: time: 11.80 sec
 UMAP: time: 16.07 sec
@@ -74,7 +74,7 @@ BMAP: time:  3.54 sec
 FMAP: time:  2.79 sec
 RMAP: time:  5.96 sec
 
-Unordered maps: Insert 50000000 index keys, then remove them in same order:
+Unordered maps: Insert 50000000 sequenced keys, then remove all in same order:
 CMAP: time: 5.16 sec
 KMAP: time: 3.34 sec
 UMAP: time: 4.91 sec
@@ -82,7 +82,7 @@ BMAP: time: 5.37 sec
 FMAP: time: 4.51 sec
 RMAP: time: 5.14 sec
 
-Unordered maps: Insert 100000000 random keys, then remove them in same order:
+Unordered maps: Insert 100000000 random keys, then remove all in same order:
 CMAP: time:  2.62 sec
 KMAP: time:  6.27 sec
 UMAP: time: 15.30 sec
@@ -101,23 +101,23 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 - **carray**: carray1, carray2 and carray3. Representation: One pointers, plus 1, 2, or 3 size_t variables to store dimensions. Elements are stored as one block of heap memory.
 
 cmap, cset and cvec discussion
-----------------------------
+------------------------------
 
-**cmap/cset** are the most complex of the containers (although, currently only ~370 lines of code). It uses open hashing, but does not rely on power-of-two size table, nor prime number lengths, and it does not have tombstone buckets. It is still among the fastest hash-tables, as shown above. The default max load-factor is 0.85, and it shrinks (and rehashes) when load-factor goes below 0.15, by default (can be set per hash container).
+**cmap/cset** are the most complex of the containers (although, currently only ~380 lines of code). It uses open hashing, but does not rely on power-of-two size table, nor prime number lengths, and it does not have tombstone buckets. It is still among the fastest hash-tables, as shown above. The default max load-factor is 0.85, and it shrinks (and rehashes) when load-factor goes below 0.15, by default (can be set per hash container).
 
-You may customize the destroy-, hash- and equals- function. It also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is handy when e.g. having cstr as key, as it enables the usage of string literals as key in *put() and *get() functions, instead of requering a constructed cstr. Without it, you would have to write: 
+You can customize the destroy-, hash- and equals- function. **cmap/cset** also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is very useful when e.g. having cstr as key, as it enables the usage of string literals as key in *put() and find()* functions, instead of requering a constructed cstr. Without it, the code would become: 
 ```
 declare_cmap(si, cstr, int);
 ...
 cmap_si_put(&map, cstr_make("mykey"), 12);
 ```
-but the main incovenience is with lookup:
+This is a problem because cstr_t key may exist in the map, and it would need to destroy the current key and replace it with the new to avoid memory leak.  Lookup would also be problematic:
 ```
 cstr lookup = cstr_make("mykey");
 int x = cmap_si_find(&map, lookup)->value;
 cstr_destroy(&lookup);
 ```
-To avoid this, use *declare_cmap_str()*:
+To avoid all this, use *declare_cmap_str(tag, keytype)* or *declare_cset_str()*:
 ```
 declare_cmap_str(si, int);
 ...
@@ -126,54 +126,15 @@ cmap_si_put(&map, "mykey", 12);             // constructs a cstr key from the co
 int x = cmap_si_find(&map, "mykey")->value; // no allocation of string key happens here.
 cmap_si_destroy(&map);
 ```
-An alternative would be to use *char* * as key type, but you would have to manage the memory of the hash char* keys yourself.
+An alternative is to use *char* * as keytype, but then you must manage allcoated memory of the hash char* keys yourself.
 Note that this customization is also available for **cvec**, but only affects the *find()* function currently. See *declare_cvec_str()*.
 
-Also look at **examples/advanced.c**, it demonstrates how to use a custom struct as a hash map key, using the feature mentioned.
+You may want to look at **examples/advanced.c**, it demonstrates how to use a custom struct as a hash map key, using the optional parameters to declare_cmap().
 
 Example usages
 --------------
-The first example has a very complex nested container type, which demonstrates the power of this library. Look at the simpler examples below to understand it better. The example adds an element into the data structure, and then accesses it. The type used, with c++ template syntax is:
-**cmapMap**< **cstr**, **cmapMap**< *int*, **clist**< **carray2**< *float* >>>>
+The examples folder contains further examples.
 
-Note: The *cmap_sm_destroy(&theMap)* call below, will destroy all the nested containers including the memory allocated for cstr keys in theMap object.
-```
-#include <stc/cstr.h>
-#include <stc/cmap.h>
-#include <stc/clist.h>
-#include <stc/carray.h>
-
-void verify_destroy(float* v) {printf("destroy %g\n", *v);}
-
-declare_carray(f, float, verify_destroy); // you should omit the last argument - float type need no destroy.
-declare_clist(t2, carray2f, carray2f_destroy, c_no_compare);
-declare_cmap(il, int, clist_t2, clist_t2_destroy);
-declare_cmap_str(sm, cmap_il, cmap_il_destroy);
-
-int main() {
-    int xdim = 4, ydim = 6;
-    int x = 2, y = 5, entry = 42;
-    cmap_sm theMap = cmap_init;
-    {
-        // Construct.
-        carray2f table = carray2f_make(xdim, ydim, 0.f);
-        clist_t2 tableList = clist_init;
-        cmap_il listMap = cmap_init;
-        
-        // Put in some data.
-        carray2f_data(table, x)[y] = 3.1415927; // table[x][y]
-        clist_t2_push_back(&tableList, table);
-        cmap_il_put(&listMap, entry, tableList);
-        cmap_sm_put(&theMap, "First", listMap);
-    }
-
-    // Access the data entry
-    carray2f table = clist_back(cmap_il_get(&cmap_sm_get(&theMap, "First")->value, entry)->value);
-    printf("value is: %f\n", carray2f_value(table, x, y));
-
-    cmap_sm_destroy(&theMap); // free up the whole shebang!
-}
-```
 **cstr** string example.
 ```
 #include <stc/cstr.h>
@@ -244,8 +205,8 @@ declare_cmap(ii, int, int);
 
 int main() {
     cmap_ii nums = cmap_init;
-    cmap_ii_put(&nums, 8, 64);
-    cmap_ii_put(&nums, 11, 121);
+    cmap_ii_put(&nums, 8, 64); // put() works as c++ std::unordered_map<>::insert_or_replace()
+    cmap_ii_insert(&nums, 11, 121); // only insert value if key does not exists - like std::unordered_map::insert().
 
     printf("%d\n", cmap_ii_get(nums, 8)->value);
     cmap_ii_destroy(&nums);
@@ -279,11 +240,11 @@ int main() {
     cmap_ss table = cmap_init;
     cmap_ss_put(&table, "Make", cstr_make("my"));
     cmap_ss_put(&table, "Sunny", cstr_make("day"));
-    printf("Sunny: %s\n", cmap_ss_get(table, "Sunny")->value.str);
+    printf("Sunny: %s\n", cmap_ss_find(table, "Sunny")->value.str);
     cmap_ss_erase(&table, "Make");
 
     printf("size %d\n", cmap_size(table));
-    cmap_ss_destroy(&table); // frees key and value cstrs, and hash table (cvec).
+    cmap_ss_destroy(&table); // frees key and value cstrs, and hash table.
 }
 ```
 **clist** of *int64_t*. Similar to c++ *std::forward_list*, but can do both *pushFront()* and *pushBack()*.
@@ -312,6 +273,8 @@ int main() {
         if (++k <= 100) printf("%8d: %10f\n", k, i.item->value); else break;
 
     clist_fx_clear(&list);
+
+    // generic c_push() function, works on most containers:
     c_push(&list, clist_fx, c_items(10, 20, 30, 40, 50));
     c_foreach (i, clist_fx, list) printf("%f ", i.item->value);
     puts("");
