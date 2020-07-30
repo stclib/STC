@@ -63,8 +63,8 @@ STC_INLINE cbitset_t cbitset_make(size_t size, bool value) {
     return set;
 }
 STC_INLINE cbitset_t cbitset_make_copy(cbitset_t other) {
-    size_t n = (other.size + 63) >> 6;
-    cbitset_t set = {(uint64_t *) memcpy(malloc(n * 8), other._arr, n * 8), other.size};
+    size_t bytes = ((other.size + 63) >> 6) * 8;
+    cbitset_t set = {(uint64_t *) memcpy(malloc(bytes), other._arr, bytes), other.size};
     return set;
 }
 STC_INLINE void cbitset_destroy(cbitset_t* self) {
@@ -158,10 +158,8 @@ STC_API void cbitset_resize(cbitset_t* self, size_t size, bool value) {
 #else
 /* http://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation */
 static inline uint64_t c_popcount64(uint64_t x) {
-    uint64_t m1 = 0x5555555555555555ll;
-    uint64_t m2 = 0x3333333333333333ll;
-    uint64_t m4 = 0x0F0F0F0F0F0F0F0Fll;
-    uint64_t h01 = 0x0101010101010101ll;
+    const uint64_t m1 = 0x5555555555555555, m2 = 0x3333333333333333,
+                   m4 = 0x0f0f0f0f0f0f0f0f, h01 = 0x0101010101010101;
     x -= (x >> 1) & m1;
     x = (x & m2) + ((x >> 2) & m2);
     x = (x + (x >> 4)) & m4;
@@ -170,9 +168,9 @@ static inline uint64_t c_popcount64(uint64_t x) {
 #endif
 
 STC_API size_t cbitset_count(cbitset_t set) {
-    size_t count = 0, n = (set.size + 63) >> 6;
+    size_t count = 0, n = ((set.size + 63) >> 6) - 1;
     if (set.size > 0) {
-        --n; for (size_t i=0; i<n; ++i) count += c_popcount64(set._arr[i]);
+        for (size_t i=0; i<n; ++i) count += c_popcount64(set._arr[i]);
         count += c_popcount64(set._arr[n] & ((1ull << (set.size & 63)) - 1));
     }
     return count;

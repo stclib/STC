@@ -1,10 +1,7 @@
 #include <stdio.h>
 #include <stc/cbitset.h>
-#include <stc/cvec.h>
 
-declare_cvec(ux, uint64_t);
-
-static inline cvec_ux sieveOfEratosthenes(size_t n)
+static inline cbitset_t sieveOfEratosthenes(size_t n)
 {
     cbitset_t pbits = cbitset_make(n + 1, true);
     cbitset_reset(&pbits, 0);
@@ -18,27 +15,23 @@ static inline cvec_ux sieveOfEratosthenes(size_t n)
             }
         }
     }
-    puts("count:");
-    size_t np = cbitset_count(pbits);
-    puts("done");
-    cvec_ux primes = cvec_init;
-    cvec_ux_reserve(&primes, np);
-    for (uint32_t i = 2; i <= n; ++i)
-       if (cbitset_test(pbits, i)) cvec_ux_push_back(&primes, i);
-    
-    cbitset_destroy(&pbits);
-    return primes;
+    return pbits;
 } 
+
 
 int main(void)
 {
-    int n = 1000000000;
+    int n = 100000000;
     printf("computing prime numbers up to %u\n", n);
     
-    cvec_ux primes = sieveOfEratosthenes(n);
-    printf("number of primes: %zu\n", cvec_size(primes));
-    for (size_t i = 0; i < 100; ++i)
-       printf("%zu ", primes.data[i]);
+    cbitset_t primes = sieveOfEratosthenes(n);
+    puts("done");
+    
+    size_t np = cbitset_count(primes);
+    printf("number of primes: %zu\n", np);
 
-    cvec_ux_destroy(&primes);
+    for (uint32_t i = 2; i <= 1000; ++i)
+       if (cbitset_test(primes, i)) printf("%zu ", i);
+    puts("");
+    cbitset_destroy(&primes);
 }
