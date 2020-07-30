@@ -21,7 +21,7 @@ int main() {
         printf("%d", cbitset_test(set, i));
     puts("");
 
-    cbitset_t s2 = cbitset_from(set);
+    cbitset_t s2 = cbitset_make_copy(set);
     cbitset_flip_all(&s2);
     cbitset_set(&s2, 16);
     cbitset_set(&s2, 17);

@@ -62,7 +62,7 @@ STC_INLINE cbitset_t cbitset_make(size_t size, bool value) {
     cbitset_set_all(&set, value);
     return set;
 }
-STC_INLINE cbitset_t cbitset_from(cbitset_t other) {
+STC_INLINE cbitset_t cbitset_make_copy(cbitset_t other) {
     size_t n = (other.size + 63) >> 6;
     cbitset_t set = {(uint64_t *) memcpy(malloc(n * 8), other._arr, n * 8), other.size};
     return set;
@@ -120,19 +120,19 @@ STC_INLINE void cbitset_set_xor(cbitset_t *self, cbitset_t other) {
 }
 
 STC_INLINE cbitset_t cbitset_and(cbitset_t s1, cbitset_t s2) {
-    cbitset_t set = cbitset_from(s1);
+    cbitset_t set = cbitset_make_copy(s1);
     cbitset_set_and(&set, s2); return set;
 }
 STC_INLINE cbitset_t cbitset_or(cbitset_t s1, cbitset_t s2) {
-    cbitset_t set = cbitset_from(s1);
+    cbitset_t set = cbitset_make_copy(s1);
     cbitset_set_or(&set, s2); return set;
 }
 STC_INLINE cbitset_t cbitset_xor(cbitset_t s1, cbitset_t s2) {
-    cbitset_t set = cbitset_from(s1);
+    cbitset_t set = cbitset_make_copy(s1);
     cbitset_set_xor(&set, s2); return set;
 }
 STC_INLINE cbitset_t cbitset_not(cbitset_t s1) {
-    cbitset_t set = cbitset_from(s1);
+    cbitset_t set = cbitset_make_copy(s1);
     cbitset_flip_all(&set); return set;
 }
 
@@ -154,7 +154,6 @@ STC_API void cbitset_resize(cbitset_t* self, size_t size, bool value) {
 #if defined(__GNUC__)
     #define c_popcount64(x) __builtin_popcountll(x)
 #elif defined(_MSC_VER)
-    #include <nmmintrin.h>
     #define c_popcount64(x) _mm_popcnt_u64(x)
 #else
 /* http://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation */
