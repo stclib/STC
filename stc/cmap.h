@@ -261,8 +261,8 @@ ctype##_##tag##_find(const ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey)
 } \
  \
 static inline void ctype##_##tag##_reserve_expand(ctype##_##tag* self) { \
-    if (self->size >= self->bucket_count * self->max_load_factor) \
-        ctype##_##tag##_reserve(self, 4 + self->size * 3 / 2); \
+    if (self->size + 1 >= self->bucket_count * self->max_load_factor) \
+        ctype##_##tag##_reserve(self, 5 + self->size * 3 / 2); \
 } \
  \
 STC_API ctype##entry_##tag* \
