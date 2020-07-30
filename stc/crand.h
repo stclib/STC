@@ -43,7 +43,7 @@ typedef struct {float min, range;} crand_uniform_f32_t;
 /* 32 bit random number generator engine */
 STC_API crand_eng32_t crand_eng32_with_seq(uint64_t seed, uint64_t seq);
 STC_INLINE crand_eng32_t crand_eng32_init(uint64_t seed) {
-    return crand_eng32_with_seq(seed, 1);
+    return crand_eng32_with_seq(seed, seed);
 }
 
 /* int random number generator, range [0, 2^32) */
@@ -98,7 +98,7 @@ STC_INLINE double crand_uniform_f64(crand_eng64_t* rng, crand_uniform_f64_t dist
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-/* PCG32 random number generator: https://www.pcg-random.org/index.html */
+/* PCG32 random number generator: https://www.pcg-random.org/download.html */
 
 STC_API crand_eng32_t crand_eng32_with_seq(uint64_t seed, uint64_t seq) {
     crand_eng32_t rng = {0u, (seq << 1u) | 1u}; /* inc must be odd */
@@ -107,6 +107,7 @@ STC_API crand_eng32_t crand_eng32_with_seq(uint64_t seed, uint64_t seq) {
     crand_gen_i32(&rng);
     return rng;
 }
+
 STC_API uint32_t crand_gen_i32(crand_eng32_t* rng) {
     uint64_t old = rng->state[0];
     rng->state[0] = old * 6364136223846793005ull + rng->state[1];
@@ -133,7 +134,7 @@ STC_API uint64_t crand_gen_i64(crand_eng64_t* rng) {
     return result;
 }
 
-/* // Original SFC64 random number generator: http://pracrand.sourceforge.net
+/* // SFC64 random number generator: http://pracrand.sourceforge.net
 STC_API uint64_t crand_gen_i64(crand_eng64_t* rng) {
     enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
     uint64_t *s = rng->state;

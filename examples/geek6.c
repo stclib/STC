@@ -23,7 +23,7 @@ We can use the unordered_map in C++ to implement the hash which allow to perform
 operation in almost O(1) time complexity.
 */
 
-#ifndef __cplusplus
+#ifndef CXX
 
 // C program to find the smallest 
 // positive missing number 

@@ -16,17 +16,21 @@ declare_cvec_pqueue(f, >);
 
 
 int main(void) {
-    // regular vector:
+    
+    // CVEC FLOAT / PRIORITY QUEUE
+
     cvec_f floats = cvec_init;
     c_push(&floats, cvec_f, c_items(4.0f, 2.0f, 5.0f, 3.0f, 1.0f));
-    // Output:
+
     c_foreach (i, cvec_f, floats) printf("%.1f ", *i.item);
     puts("");
 
-    // reorganise as a priority queue, and add more numbers:
-    cvec_f_pqueue_build(&floats);
+    // CVEC PRIORITY QUEUE
+
+    cvec_f_pqueue_build(&floats); // reorganise vec
     c_push(&floats, cvec_f_pqueue, c_items(40.0f, 20.0f, 50.0f, 30.0f, 10.0f));
-    // Output sorted:
+
+    // sorted:
     while (cvec_size(floats) > 0) {
         printf("%.1f ", cvec_f_pqueue_top(&floats));
         cvec_f_pqueue_pop(&floats);
@@ -34,7 +38,7 @@ int main(void) {
     puts("\n");
     cvec_f_destroy(&floats);
 
-    // ------------------
+    // CMAP ID
 
     int year = 2020;
     cmap_id idnames = cmap_init;
@@ -49,7 +53,7 @@ int main(void) {
     puts("");
     cmap_id_destroy(&idnames);
 
-    // ------------------
+    // CMAP CNT
 
     cmap_cnt countries = cmap_init;
 
@@ -69,7 +73,7 @@ int main(void) {
     puts("");
     cmap_cnt_destroy(&countries);
 
-    // ------------------
+    // CVEC PAIR
 
     cvec_ip pairs1 = cvec_init; 
     c_push(&pairs1, cvec_ip, c_items(
@@ -84,7 +88,7 @@ int main(void) {
     puts("");
     cvec_ip_destroy(&pairs1);
 
-    // ------------------
+    // CLIST PAIR
 
     clist_ip pairs2 = clist_init;
     c_push(&pairs2, clist_ip, c_items(

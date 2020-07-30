@@ -48,13 +48,6 @@ int main() {
 #include <assert.h>
 #include "cdefs.h"
 
-#if defined(__GNUC__)
-#define cbitset_popcnt64(i) __builtin_popcountll(i)
-#else
-#include <nmmintrin.h>
-#define cbitset_popcnt64(i) _mm_popcnt_u64(i)
-#endif
-
 typedef struct { uint64_t* _arr; size_t size; } cbitset_t;
 
 #define cbitset_init {NULL, 0}
@@ -158,11 +151,30 @@ STC_API void cbitset_resize(cbitset_t* self, size_t size, bool value) {
     }
 }
 
+#if defined(__GNUC__)
+    #define c_popcount64(x) __builtin_popcountll(x)
+#elif defined(_MSC_VER)
+    #include <nmmintrin.h>
+    #define c_popcount64(x) _mm_popcnt_u64(x)
+#else
+/* http://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation */
+static inline uint64_t c_popcount64(uint64_t x) {
+    uint64_t m1 = 0x5555555555555555ll;
+    uint64_t m2 = 0x3333333333333333ll;
+    uint64_t m4 = 0x0F0F0F0F0F0F0F0Fll;
+    uint64_t h01 = 0x0101010101010101ll;
+    x -= (x >> 1) & m1;
+    x = (x & m2) + ((x >> 2) & m2);
+    x = (x + (x >> 4)) & m4;
+    return (x * h01) >> 56;
+}
+#endif
+
 STC_API size_t cbitset_count(cbitset_t set) {
     size_t count = 0, n = (set.size + 63) >> 6;
     if (set.size > 0) {
-        --n; for (size_t i=0; i<n; ++i) count += cbitset_popcnt64(set._arr[i]);
-        count += cbitset_popcnt64(set._arr[n] & ((1ull << (set.size & 63)) - 1));
+        --n; for (size_t i=0; i<n; ++i) count += c_popcount64(set._arr[i]);
+        count += c_popcount64(set._arr[n] & ((1ull << (set.size & 63)) - 1));
     }
     return count;
 }

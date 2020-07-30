@@ -1,4 +1,4 @@
-#ifndef __cplusplus
+#ifndef CXX
 
 #include <stc/cmap.h>
 #include <stc/cstr.h>
@@ -41,7 +41,7 @@ int main()
     // queried using references (&str).
     if (! cmap_ss_find(&book_reviews, "Les Misérables")) {
         printf("We've got %zu reviews, but Les Misérables ain't one.\n",
-               book_reviews.size);
+               cmap_size(book_reviews));
     }
 
     // oops, this review has a lot of spelling mistakes, let's delete it.

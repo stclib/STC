@@ -17,7 +17,7 @@ If present, erase it from the hash map. Else, insert it into a Min heap.
 After inserting all the elements excluding the ones which are to be deleted, Pop out k elements from the Min heap.
 */
 
-#ifndef __cplusplus
+#ifndef CXX
 
 // C implementation of the approach 
 

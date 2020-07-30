@@ -69,9 +69,10 @@ int main()
         {{"Olaf", "Denmark"}, 24},
         {{"Harald", "Iceland"}, 12},
     ));
-
-    cmapentry_vk* e = cmap_vk_find(&vikings, (VikingVw) {"Einar", "Norway"});
+    VikingVw look = {"Einar", "Norway"};
+    cmapentry_vk* e = cmap_vk_find(&vikings, look);
     e->value += 5; // update 
+    cmap_vk_insert(&vikings, look, 0)->value += 5; // again
 
     c_foreach (k, cmap_vk, vikings) {
         printf("%s of %s has %d hp\n", k.item->key.name.str, k.item->key.country.str, k.item->value);

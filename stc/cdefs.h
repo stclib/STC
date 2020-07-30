@@ -105,7 +105,7 @@ static inline uint32_t c_fibonacci_hash64(const void* data, size_t len) {
     const volatile uint64_t *key = (const uint64_t *) data;
     uint64_t x = *key++ * 11400714819323198485ull;
     while (len -= 8) x ^= *key++ * 11400714819323198485ull;
-    return (uint32_t) (x >> 13);
+    return (uint32_t) x; // (x >> 13);
 }
 
 #endif

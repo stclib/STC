@@ -11,10 +11,10 @@ An elegant, typesafe, generic, customizable, user-friendly, consistent, and very
 - **stc/cset.h** - A generic **unordered set** implemented in tandem with *unordered map*
 - **stc/cstr.h** - Compact and powerful **string** class.
 - **stc/cvec.h** - Dynamic generic **vector** class, works well as a **stack**.
-- **stc/cvecpq.h** - Priority queue adapter for **cvec.h**, implemented as a **heap**.
+- **stc/cvec_pq.h** - Priority queue adapter for **cvec.h**, implemented as a **heap**.
 in *O*(1). Also contains various *splice* functions and (merge) *sort*.
 - **stc/coption.h** - Implementation of *getopt_long*-"like" function, *coption_get*, to parse command line arguments.
-- **stc/crandom.h** - A few very efficent modern random number generators *pcg32* and *sfc64*. It also implements the crypto-strong *siphash* algorithm.
+- **stc/crand.h** - A few very efficent modern random number generators *pcg32* and *sfc64-variant*.
 - **stc/cdefs.h** - A common include file with some general definitions.
 
 The usage of the containers is similar to the C++ standard containers, so it should be easier for those who are familiar with them.
@@ -64,30 +64,31 @@ This library is very efficent. Containers have templated intrusive elements. One
 
 **CMAP**=*cmap*, KMAP=*khash*, UMAP=*std::unordered_map*, BMAP=*ska::bytell_hash_map*, FMAP=*ska::flat_hash_map*, RMAP=*robin_hood::unordered_map*
 ```
-Random keys are in range [0, 2^20):
-map<uint64_t, uint64_t>: 7000000 repeats of Insert random key + (try to) remove a different random key:
-CMAP(ii): sz: 523938, bucks: 1013337, time: 0.39, sum: 24500003500000, erase: 3237392 --> fastest
-KMAP(ii): sz: 523938, bucks: 2097152, time: 0.46, sum: 24500003500000, erase: 3237392
-UMAP(ii): sz: 523938, bucks: 1056323, time: 2.21, sum: 24500003500000, erase: 3237392
-BMAP(ii): sz: 523938, bucks: 1048576, time: 0.46, sum: 24500003500000, erase: 3237392
-FMAP(ii): sz: 523938, bucks: 1048576, time: 0.43, sum: 24500003500000, erase: 3237392
-RMAP(ii): sz: 523938, bucks: 838860, time: 0.82, sum: 24500003500000, erase: 3237392
+Random keys are in range [0, 2^20), seed = 1596103163:
 
-map<uint64_t, uint64_t>: Insert 10000000 sequensial keys, then remove them in same order:
-CMAP(ii): sz: 0, bucks: 17001171, time: 0.75, erase 10000000 --> second fastest
-KMAP(ii): sz: 0, bucks: 16777216, time: 0.48, erase 10000000
-UMAP(ii): sz: 0, bucks: 17961079, time: 1.04, erase 10000000
-BMAP(ii): sz: 0, bucks: 16777216, time: 1.04, erase 10000000
-FMAP(ii): sz: 0, bucks: 16777216, time: 0.94, erase 10000000
-RMAP(ii): sz: 0, bucks: 13421772, time: 0.84, erase 10000000
+Unordered maps: 50000000 repeats of Insert random key + try to remove a random key:
+CMAP: time:  2.49 sec
+KMAP: time: 11.80 sec
+UMAP: time: 16.07 sec
+BMAP: time:  3.54 sec
+FMAP: time:  2.79 sec
+RMAP: time:  5.96 sec
 
-map<uint64_t, uint64_t>: Insert 10000000 random keys, then remove them in same order:
-CMAP(ii): sz: 0, bucks: 1621347, time: 0.41, erase 1048490 --> fastest
-KMAP(ii): sz: 0, bucks: 2097152, time: 0.77, erase 1048490
-UMAP(ii): sz: 0, bucks: 2144977, time: 1.67, erase 1048490
-BMAP(ii): sz: 0, bucks: 2097152, time: 0.52, erase 1048490
-FMAP(ii): sz: 0, bucks: 2097152, time: 0.44, erase 1048490
-RMAP(ii): sz: 0, bucks: 1677721, time: 0.65, erase 1048490
+Unordered maps: Insert 50000000 index keys, then remove them in same order:
+CMAP: time: 5.16 sec
+KMAP: time: 3.34 sec
+UMAP: time: 4.91 sec
+BMAP: time: 5.37 sec
+FMAP: time: 4.51 sec
+RMAP: time: 5.14 sec
+
+Unordered maps: Insert 100000000 random keys, then remove them in same order:
+CMAP: time:  2.62 sec
+KMAP: time:  6.27 sec
+UMAP: time: 15.30 sec
+BMAP: time:  5.17 sec
+FMAP: time:  3.37 sec
+RMAP: time:  4.99 sec
 ```
 Memory efficiency
 -----------------
@@ -113,7 +114,7 @@ cmap_si_put(&map, cstr_make("mykey"), 12);
 but the main incovenience is with lookup:
 ```
 cstr lookup = cstr_make("mykey");
-int x = cmap_si_get(&map, lookup)->value;
+int x = cmap_si_find(&map, lookup)->value;
 cstr_destroy(&lookup);
 ```
 To avoid this, use *declare_cmap_str()*:
@@ -121,8 +122,8 @@ To avoid this, use *declare_cmap_str()*:
 declare_cmap_str(si, int);
 ...
 cmap_si map = cmap_init;
-cmap_si_put(&map, "mykey", 12);            // constructs a cstr key from the const char* internally.
-int x = cmap_si_get(&map, "mykey")->value; // no allocation of string key happens here.
+cmap_si_put(&map, "mykey", 12);             // constructs a cstr key from the const char* internally.
+int x = cmap_si_find(&map, "mykey")->value; // no allocation of string key happens here.
 cmap_si_destroy(&map);
 ```
 An alternative would be to use *char* * as key type, but you would have to manage the memory of the hash char* keys yourself.
@@ -145,7 +146,7 @@ Note: The *cmap_sm_destroy(&theMap)* call below, will destroy all the nested con
 void verify_destroy(float* v) {printf("destroy %g\n", *v);}
 
 declare_carray(f, float, verify_destroy); // you should omit the last argument - float type need no destroy.
-declare_clist(t2, carray2_f, carray2_f_destroy, c_no_compare);
+declare_clist(t2, carray2f, carray2f_destroy, c_no_compare);
 declare_cmap(il, int, clist_t2, clist_t2_destroy);
 declare_cmap_str(sm, cmap_il, cmap_il_destroy);
 
@@ -155,20 +156,20 @@ int main() {
     cmap_sm theMap = cmap_init;
     {
         // Construct.
-        carray2_f table = carray2_f_make(xdim, ydim, 0.f);
+        carray2f table = carray2f_make(xdim, ydim, 0.f);
         clist_t2 tableList = clist_init;
         cmap_il listMap = cmap_init;
         
         // Put in some data.
-        carray2_f_data(table, x)[y] = 3.1415927; // table[x][y]
+        carray2f_data(table, x)[y] = 3.1415927; // table[x][y]
         clist_t2_push_back(&tableList, table);
         cmap_il_put(&listMap, entry, tableList);
         cmap_sm_put(&theMap, "First", listMap);
     }
 
     // Access the data entry
-    carray2_f table = clist_back(cmap_il_get(&cmap_sm_get(&theMap, "First")->value, entry)->value);
-    printf("value is: %f\n", carray2_f_value(table, x, y));
+    carray2f table = clist_back(cmap_il_get(&cmap_sm_get(&theMap, "First")->value, entry)->value);
+    printf("value is: %f\n", carray2f_value(table, x, y));
 
     cmap_sm_destroy(&theMap); // free up the whole shebang!
 }
@@ -178,7 +179,7 @@ int main() {
 #include <stc/cstr.h>
 
 int main() {
-    cstr s1 = cstr_make("one-nine-three-seven-five");
+    cstr_t s1 = cstr_make("one-nine-three-seven-five");
     printf("%s.\n", s1.str);
 
     cstr_insert(&s1, 3, "-two");
@@ -290,26 +291,32 @@ int main() {
 #include <stdio.h>
 #include <time.h>
 #include <stc/clist.h>
-#include <stc/crandom.h>
-declare_clist(i, uint64_t);
- 
+#include <stc/crand.h>
+declare_clist(fx, double);
+
 int main() {
-    clist_i list = clist_init;
-    int N = 2000000, n;
-    crandom64_t rng = crandom64_uniform_engine(time(NULL));
-    for (int i=0; i<N; ++i) // two million random numbers
-        clist_i_push_back(&list, crandom64_uinform_int(&rng));
-    n = 0; 
-    c_foreach (i, clist_i, list)
-        if (++n % (N/50) == 0) printf("%10d: %zu\n", n, i.item->value);
-    puts("sorting:");
-    // Sort them...
-    clist_i_sort(&list); // mergesort O(n*log n)
-    n = 0;
-    puts("done:");
-    c_foreach (i, clist_i, list)
-        if (++n % (N/50) == 0) printf("%10d: %zu\n", n, i.item->value);
-    clist_i_destroy(&list);
+    clist_fx list = clist_init;
+    crand_eng64_t eng = crand_eng64_init(time(NULL));
+    crand_uniform_f64_t dist = crand_uniform_f64_init(100.0, 1000.0);
+    int k;
+    
+    for (int i = 0; i < 10000000; ++i)
+        clist_fx_push_back(&list, crand_uniform_f64(&eng, dist));
+    k = 0; c_foreach (i, clist_fx, list)
+        if (++k <= 100) printf("%8d: %10f\n", k, i.item->value); else break;
+
+    clist_fx_sort(&list); // mergesort O(n*log n)
+    puts("sorted");
+
+    k = 0; c_foreach (i, clist_fx, list)
+        if (++k <= 100) printf("%8d: %10f\n", k, i.item->value); else break;
+
+    clist_fx_clear(&list);
+    c_push(&list, clist_fx, c_items(10, 20, 30, 40, 50));
+    c_foreach (i, clist_fx, list) printf("%f ", i.item->value);
+    puts("");
+
+    clist_fx_destroy(&list);
 }
 ```
 **carray**. 1d, 2d and 3d arrays, allocated from heap in one memory block. *carray3* may have sub-array "views" of *carray2* and *carray1* etc., as shown in the following example:

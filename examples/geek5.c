@@ -15,7 +15,7 @@ Input: arr[] = {"abc", "def", "abc"}, L = 1, R = 3, str = "ghf"
 Output: 0
 */
 
-#ifndef __cplusplus
+#ifndef CXX
 
 #include <stc/cmap.h>
 #include <stc/cvec.h>

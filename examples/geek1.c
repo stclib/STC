@@ -7,7 +7,7 @@ int a[] = { 1, 2, 2, 3, 2, 4, 10 };
 //int a[] = { 1, 2, 2, 3, 2, 4, 10, 8, 9, 3, 2, 4 }; 
 
 
-#ifndef __cplusplus
+#ifndef CXX
 // C program to implement the above approach 
 #include <stdio.h>
 #include <stc/cmap.h>

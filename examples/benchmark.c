@@ -14,7 +14,12 @@
 
 // Visual Studio: compile with -TP to force C++:  cl -TP -EHsc -O2 benchmark.c
 
-declare_cmap(ii, int64_t, int64_t, c_default_destroy, c_default_equals, c_fibonacci_hash64);
+static inline uint32_t fibfast_hash(const void* data, size_t len) {
+    const uint64_t key = *(const uint64_t *) data;
+    return (uint32_t) (key * 11400714819323198485llu);
+}
+
+declare_cmap(ii, int64_t, int64_t, c_default_destroy, c_default_equals, fibfast_hash); // c_fibonacci_hash64);
 
 KHASH_MAP_INIT_INT64(ii, uint64_t)
 
@@ -39,8 +44,8 @@ crand_eng64_t rng;
 #define KMAP_PUT(tag, key, val)     (*(ki = kh_put(ii, map, key, &ret), map->vals[ki] = val, &map->vals[ki]))
 #define KMAP_ERASE(tag, key)        ((ki = kh_get(ii, map, key)) != kh_end(map) ? kh_del(ii, map, ki), 1 : 0)
 #define KMAP_FIND(tag, key)         (kh_get(ii, map, key) != kh_end(map))
-#define KMAP_SIZE(tag)              ((size_t) kh_size(map))
-#define KMAP_BUCKETS(tag)           ((size_t) kh_n_buckets(map))
+#define KMAP_SIZE(tag)              kh_size(map)
+#define KMAP_BUCKETS(tag)           kh_n_buckets(map)
 #define KMAP_CLEAR(tag)             kh_destroy(ii, map)
 
 #define UMAP_SETUP(tag, Key, Value) std::unordered_map<Key, Value> map; map.max_load_factor(max_load_factor)
@@ -93,8 +98,8 @@ int rr = RR;
         erased += M##_ERASE(tag, RAND(rr)); \
     } \
     difference = clock() - before; \
-    printf(#M ": size: %zu, buckets: %8zu, time: %.02f, sum: %zu, erased %zu\n", \
-           M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, checksum, erased); \
+    printf(#M ": size: %zu, buckets: %8zu, time: %5.02f, sum: %zu, erased %zu\n", \
+           (size_t) M##_SIZE(tag), (size_t) M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, checksum, erased); \
     M##_CLEAR(tag); \
 }
 
@@ -108,8 +113,8 @@ int rr = RR;
     for (size_t i = 0; i < N2; ++i) \
         erased += M##_ERASE(tag, i); \
     difference = clock() - before; \
-    printf(#M ": size: %zu, buckets: %8zu, time: %.02f, erased %zu\n", \
-           M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, erased); \
+    printf(#M ": size: %zu, buckets: %8zu, time: %5.02f, erased %zu\n", \
+           (size_t) M##_SIZE(tag), (size_t) M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, erased); \
     M##_CLEAR(tag); \
 }
 
@@ -125,8 +130,8 @@ int rr = RR;
     for (size_t i = 0; i < N3; ++i) \
         erased += M##_ERASE(tag, RAND(rr)); \
     difference = clock() - before; \
-    printf(#M ": size: %zu, buckets: %8zu, time: %.02f, erased %zu\n", \
-           M##_SIZE(tag), M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, erased); \
+    printf(#M ": size: %zu, buckets: %8zu, time: %5.02f, erased %zu\n", \
+           (size_t) M##_SIZE(tag), (size_t) M##_BUCKETS(tag), (float) difference / CLOCKS_PER_SEC, erased); \
     M##_CLEAR(tag); \
 }
 

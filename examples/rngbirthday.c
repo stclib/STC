@@ -22,7 +22,7 @@ void repeats(void)
     for (size_t i = 0; i < N; ++i) {
         uint64_t k = crand_gen_i64(&rng) & mask;
         int v = ++cmap_ic_insert(&m, k, 0)->value;
-        if (v > 1) printf("%zu: %x - %d\n", i, k, v);
+        if (v > 1) printf("%zu: %llx - %d\n", i, k, v);
     }
     float diff = (float) (clock() - now) / CLOCKS_PER_SEC;
     printf("%.02f", diff);
@@ -49,7 +49,7 @@ void distribution(void)
     sum /= map.size;
 
     c_foreach (i, cmap_x, map)
-        printf("%zu: %zu - %zu\n", i.item->key, i.item->value, sum);
+        printf("%u: %zu - %zu\n", i.item->key, i.item->value, sum);
 
     printf("%.02f\n", diff);
 }

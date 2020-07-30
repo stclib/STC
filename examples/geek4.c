@@ -30,7 +30,7 @@ Efficient Approach: For all the words of the first sentence, we can check if it 
                     of the first sentence in a map and check how many of these stored words are
                     present in all of the other sentences.
 */
-#ifndef __cplusplus
+#ifndef CXX
 // C implementation of the approach 
 
 #include <stc/cmap.h>
