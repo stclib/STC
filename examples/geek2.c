@@ -50,7 +50,7 @@ int main()
     // Look up the values associated with some keys.
     const char* to_find[] = {"Pride and Prejudice", "Alice's Adventure in Wonderland", NULL};
     for (const char** book = to_find; *book; ++book) {
-        cmapentry_ss* review = cmap_ss_find(&book_reviews, *book);
+        cmap_ss_entry_t *review = cmap_ss_find(&book_reviews, *book);
         if (review) printf("%s: %s\n", *book, review->value.str);
         else        printf("%s is unreviewed.\n", *book);
     }

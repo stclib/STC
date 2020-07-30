@@ -70,7 +70,7 @@ int main()
         {{"Harald", "Iceland"}, 12},
     ));
     VikingVw look = {"Einar", "Norway"};
-    cmapentry_vk* e = cmap_vk_find(&vikings, look);
+    cmap_vk_entry_t *e = cmap_vk_find(&vikings, look);
     e->value += 5; // update 
     cmap_vk_insert(&vikings, look, 0)->value += 5; // again
 

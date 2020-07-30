@@ -74,7 +74,7 @@ int main()
     cmap_vk_put(&vikings, (VikingVw) {"Olaf", "Denmark"}, 24);
     cmap_vk_put(&vikings, (VikingVw) {"Harald", "Iceland"}, 12);
 
-    cmapentry_vk* e = cmap_vk_get(&vikings, (VikingVw) {"Einar", "Norway"});
+    cmap_vk_entry_t* e = cmap_vk_get(&vikings, (VikingVw) {"Einar", "Norway"});
     e->value += 5; // update 
 
     c_foreach (k, cmap_vk, vikings) {

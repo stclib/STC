@@ -39,7 +39,7 @@ Efficient Approach: For all the words of the first sentence, we can check if it 
 
 declare_cvec_str();
 declare_cmap_str(sb, bool);
-declare_cvec(sb, cmapentry_sb, cmapentry_sb_destroy, c_no_compare);
+declare_cvec(sb, cmap_sb_entry_t, cmap_sb_entry_destroy, c_no_compare);
   
 // Function to return the count of common words 
 // in all the sentences 
@@ -60,7 +60,7 @@ int commonWords(cvec_str S)
     while (i < cstr_size(S.data[0])) { 
         // To store separate words 
         cstr_t word = cstr_init; 
-        cmapentry_sb tmp = {cstr_init, false};
+        cmap_sb_entry_t tmp = {cstr_init, false};
 
         while (i < cstr_size(S.data[0]) && S.data[0].str[i] != ' ') { 
             cstr_push_back(&word, S.data[0].str[i]); 

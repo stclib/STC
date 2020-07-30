@@ -38,7 +38,7 @@ int main(void) {
     cmap_mx_put(&m, 5, 'a');
     cmap_mx_put(&m, 8, 'b');
     cmap_mx_put(&m, 12, 'c');
-    cmapentry_mx *e = cmap_mx_find(&m, 10); // = NULL
+    cmap_mx_entry_t *e = cmap_mx_find(&m, 10); // = NULL
     char val = cmap_mx_find(&m, 5)->value;
     cmap_mx_put(&m, 5, 'd'); // update
     cmap_mx_erase(&m, 8);
@@ -129,10 +129,10 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
 typedef struct { \
     Key key; \
     OPT_1_##ctype(Value value;) \
-} ctype##entry_##tag, ctype##_##tag##_entry_t; \
+} ctype##_##tag##_entry_t; \
  \
 STC_INLINE void \
-ctype##entry_##tag##_destroy(ctype##entry_##tag* e) { \
+ctype##_##tag##_entry_destroy(ctype##_##tag##_entry_t* e) { \
     keyDestroy(&e->key); \
     OPT_1_##ctype(valueDestroy(&e->value);) \
 } \
@@ -144,7 +144,7 @@ typedef struct { \
 typedef RawKey ctype##_##tag##_rawkey_t; \
  \
 typedef struct { \
-    ctype##entry_##tag* table; \
+    ctype##_##tag##_entry_t* table; \
     uint8_t* _hashx; \
     uint32_t size, bucket_count; \
     float max_load_factor; \
@@ -152,7 +152,7 @@ typedef struct { \
 } ctype##_##tag; \
  \
 typedef struct { \
-    ctype##entry_##tag *item, *_end; \
+    ctype##_##tag##_entry_t *item, *_end; \
     uint8_t* _hx; \
 } ctype##_##tag##_iter_t; \
  \
@@ -172,21 +172,21 @@ STC_INLINE void \
 ctype##_##tag##_set_load_factors(ctype##_##tag* self, float max, float shrink) { \
     self->max_load_factor = max; self->shrink_limit_factor = shrink; \
 } \
-STC_API ctype##entry_##tag* \
+STC_API ctype##_##tag##_entry_t* \
 ctype##_##tag##_find(const ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey); \
-STC_FORCE_INLINE ctype##entry_##tag* /* alias */ \
+STC_FORCE_INLINE ctype##_##tag##_entry_t* /* alias */ \
 ctype##_##tag##_get(const ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey) \
     {return ctype##_##tag##_find(self, rawKey);} \
-STC_API ctype##entry_##tag* /* similar to c++ std::map.insert_or_assign(): */ \
+STC_API ctype##_##tag##_entry_t* /* similar to c++ std::map.insert_or_assign(): */ \
 ctype##_##tag##_put(ctype##_##tag* self, OPT_2_##ctype(ctype##_##tag##_rawkey_t rawKey, Value value)); \
-OPT_1_##ctype(STC_API ctype##entry_##tag* /* similar to c++ std::map.operator[](): */ \
+OPT_1_##ctype(STC_API ctype##_##tag##_entry_t* /* similar to c++ std::map.operator[](): */ \
 ctype##_##tag##_insert(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey, Value initValue);) \
 STC_INLINE void \
 ctype##_##tag##_swap(ctype##_##tag* a, ctype##_##tag* b) { c_swap(ctype##_##tag, *a, *b); } \
 STC_API size_t \
 ctype##_##tag##_reserve(ctype##_##tag* self, size_t size); \
 STC_API bool \
-ctype##_##tag##_erase_entry(ctype##_##tag* self, ctype##entry_##tag* entry); \
+ctype##_##tag##_erase_entry(ctype##_##tag* self, ctype##_##tag##_entry_t* entry); \
 STC_API bool \
 ctype##_##tag##_erase(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey); \
 STC_API ctype##_##tag##_iter_t \
@@ -217,9 +217,9 @@ ctype##_##tag##_push_n(ctype##_##tag* self, const ctype##_##tag##_input_t in[], 
  \
 STC_INLINE void ctype##_##tag##_wipe_(ctype##_##tag* self) { \
     if (self->size == 0) return; \
-    ctype##entry_##tag* e = self->table, *end = e + self->bucket_count; \
+    ctype##_##tag##_entry_t* e = self->table, *end = e + self->bucket_count; \
     uint8_t *hx = self->_hashx; \
-    for (; e != end; ++e) if (*hx++) ctype##entry_##tag##_destroy(e); \
+    for (; e != end; ++e) if (*hx++) ctype##_##tag##_entry_destroy(e); \
 } \
  \
 STC_API void ctype##_##tag##_destroy(ctype##_##tag* self) { \
@@ -252,7 +252,7 @@ ctype##_##tag##_bucket(const ctype##_##tag* self, const ctype##_##tag##_rawkey_t
     return idx; \
 } \
  \
-STC_API ctype##entry_##tag* \
+STC_API ctype##_##tag##_entry_t* \
 ctype##_##tag##_find(const ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey) { \
     if (self->size == 0) return NULL; \
     uint32_t hx; \
@@ -265,12 +265,12 @@ static inline void ctype##_##tag##_reserve_expand(ctype##_##tag* self) { \
         ctype##_##tag##_reserve(self, 5 + self->size * 3 / 2); \
 } \
  \
-STC_API ctype##entry_##tag* \
+STC_API ctype##_##tag##_entry_t* \
 ctype##_##tag##_put(ctype##_##tag* self, OPT_2_##ctype(ctype##_##tag##_rawkey_t rawKey, Value value)) { \
     ctype##_##tag##_reserve_expand(self); \
     uint32_t hx; \
     size_t idx = ctype##_##tag##_bucket(self, &rawKey, &hx); \
-    ctype##entry_##tag* e = &self->table[idx]; \
+    ctype##_##tag##_entry_t* e = &self->table[idx]; \
     if (self->_hashx[idx]) \
         OPT_1_##ctype(valueDestroy(&e->value)) ; \
     else { \
@@ -283,12 +283,12 @@ ctype##_##tag##_put(ctype##_##tag* self, OPT_2_##ctype(ctype##_##tag##_rawkey_t 
 } \
  \
 OPT_1_##ctype( \
-STC_API ctype##entry_##tag* \
+STC_API ctype##_##tag##_entry_t* \
 ctype##_##tag##_insert(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey, Value initValue) { \
     ctype##_##tag##_reserve_expand(self); \
     uint32_t hx; \
     size_t idx = ctype##_##tag##_bucket(self, &rawKey, &hx); \
-    ctype##entry_##tag* e = &self->table[idx]; \
+    ctype##_##tag##_entry_t* e = &self->table[idx]; \
     if (! self->_hashx[idx]) { \
         e->key = keyInitRaw(rawKey); \
         self->_hashx[idx] = (uint8_t) hx; \
@@ -304,14 +304,14 @@ ctype##_##tag##_reserve(ctype##_##tag* self, size_t newcap) { \
     if (self->size > newcap) return oldcap; \
     newcap /= self->max_load_factor; newcap |= 1; \
     ctype##_##tag tmp = { \
-        c_new_n(ctype##entry_##tag, newcap), \
+        c_new_n(ctype##_##tag##_entry_t, newcap), \
         (uint8_t *) calloc(newcap, sizeof(uint8_t)), \
         self->size, (uint32_t) newcap, \
         self->max_load_factor, self->shrink_limit_factor \
     }; \
     ctype##_##tag##_swap(self, &tmp); \
  \
-    ctype##entry_##tag* e = tmp.table, *slot = self->table; \
+    ctype##_##tag##_entry_t* e = tmp.table, *slot = self->table; \
     uint8_t* hashx = self->_hashx; \
     uint32_t hx; \
     for (size_t i = 0; i < oldcap; ++i, ++e) \
@@ -327,9 +327,9 @@ ctype##_##tag##_reserve(ctype##_##tag* self, size_t newcap) { \
 } \
  \
 STC_API bool \
-ctype##_##tag##_erase_entry(ctype##_##tag* self, ctype##entry_##tag* entry) { \
+ctype##_##tag##_erase_entry(ctype##_##tag* self, ctype##_##tag##_entry_t* entry) { \
     size_t i = chash_entry_index(*self, entry), j = i, k, cap = self->bucket_count; \
-    ctype##entry_##tag* slot = self->table; \
+    ctype##_##tag##_entry_t* slot = self->table; \
     uint8_t* hashx = self->_hashx; \
     ctype##_##tag##_rawkey_t r; \
     if (! hashx[i]) \
@@ -344,7 +344,7 @@ ctype##_##tag##_erase_entry(ctype##_##tag* self, ctype##entry_##tag* entry) { \
             slot[i] = slot[j], hashx[i] = hashx[j], i = j; \
     } while (true); \
     hashx[i] = 0; \
-    ctype##entry_##tag##_destroy(&slot[i]); \
+    ctype##_##tag##_entry_destroy(&slot[i]); \
     --self->size; \
     return true; \
 } \
@@ -354,7 +354,7 @@ ctype##_##tag##_erase(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey) { \
     if (self->size == 0) \
         return false; \
     size_t cap = self->bucket_count; \
-    if (self->size < cap * self->shrink_limit_factor && cap * sizeof(ctype##entry_##tag) > 1024) \
+    if (self->size < cap * self->shrink_limit_factor && cap * sizeof(ctype##_##tag##_entry_t) > 1024) \
         ctype##_##tag##_reserve(self, self->size * 6 / 5); \
     uint32_t hx; \
     size_t i = ctype##_##tag##_bucket(self, &rawKey, &hx); \
@@ -364,7 +364,7 @@ ctype##_##tag##_erase(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey) { \
 STC_API ctype##_##tag##_iter_t \
 ctype##_##tag##_begin(ctype##_##tag* map) { \
     uint8_t* hx = map->_hashx; \
-    ctype##entry_##tag* e = map->table, *end = e + map->bucket_count; \
+    ctype##_##tag##_entry_t* e = map->table, *end = e + map->bucket_count; \
     while (e != end && !*hx) ++e, ++hx; \
     ctype##_##tag##_iter_t it = {e == end ? NULL : e, end, hx}; return it; \
 } \
