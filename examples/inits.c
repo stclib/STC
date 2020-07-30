@@ -62,6 +62,11 @@ int main(void) {
         {"Norway", 100},
         {"Denmark", 50},
         {"Iceland", 10},
+        {"Belgium", 10},
+        {"Italy", 10},
+        {"Germany", 10},
+        {"Spain", 10},
+        {"France", 10},
     ));
 
     cmap_cnt_insert(&countries, "Sweden", 0)->value += 20;

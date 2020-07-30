@@ -260,14 +260,14 @@ ctype##_##tag##_find(const ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey)
     return self->_hashx[idx] ? &self->table[idx] : NULL; \
 } \
  \
-static inline void ctype##_##tag##_reserveExpand_(ctype##_##tag* self) { \
-    if (self->size + 1 >= self->bucket_count * self->max_load_factor) \
-        ctype##_##tag##_reserve(self, 7 + self->size * 3 / 2); \
+static inline void ctype##_##tag##_reserve_expand(ctype##_##tag* self) { \
+    if (self->size >= self->bucket_count * self->max_load_factor) \
+        ctype##_##tag##_reserve(self, 4 + self->size * 3 / 2); \
 } \
  \
 STC_API ctype##entry_##tag* \
 ctype##_##tag##_put(ctype##_##tag* self, OPT_2_##ctype(ctype##_##tag##_rawkey_t rawKey, Value value)) { \
-    ctype##_##tag##_reserveExpand_(self); \
+    ctype##_##tag##_reserve_expand(self); \
     uint32_t hx; \
     size_t idx = ctype##_##tag##_bucket(self, &rawKey, &hx); \
     ctype##entry_##tag* e = &self->table[idx]; \
@@ -285,7 +285,7 @@ ctype##_##tag##_put(ctype##_##tag* self, OPT_2_##ctype(ctype##_##tag##_rawkey_t 
 OPT_1_##ctype( \
 STC_API ctype##entry_##tag* \
 ctype##_##tag##_insert(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey, Value initValue) { \
-    ctype##_##tag##_reserveExpand_(self); \
+    ctype##_##tag##_reserve_expand(self); \
     uint32_t hx; \
     size_t idx = ctype##_##tag##_bucket(self, &rawKey, &hx); \
     ctype##entry_##tag* e = &self->table[idx]; \
