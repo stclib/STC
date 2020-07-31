@@ -109,7 +109,7 @@ cmap, cset and cvec discussion
 
 You can customize the destroy-, hash- and equals- function. **cmap/cset** also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is very useful when e.g. having cstr as key, as it enables the usage of string literals as key in *put() and find()* functions, instead of requering a constructed cstr. Without it, the code would become: 
 ```
-declare_cmap(si, cstr, int);
+declare_cmap(si, cstr_t, int); // don't do this.
 ...
 cmap_si_put(&map, cstr_make("mykey"), 12);
 ```
@@ -124,11 +124,11 @@ To avoid all this, use *declare_cmap_str(tag, keytype)* or *declare_cset_str()*:
 declare_cmap_str(si, int);
 ...
 cmap_si map = cmap_init;
-cmap_si_put(&map, "mykey", 12);             // constructs a cstr key from the const char* internally.
+cmap_si_put(&map, "mykey", 12);             // constructs a cstr_t key from the const char* internally.
 int x = cmap_si_find(&map, "mykey")->value; // no allocation of string key happens here.
 cmap_si_destroy(&map);
 ```
-An alternative is to use *char* * as keytype, but then you must manage allcoated memory of the hash char* keys yourself.
+An alternative is to use *char* * as key type, but then you must manage allcoated memory of the hash char* keys yourself.
 Note that this customization is also available for **cvec**, but only affects the *find()* function currently. See *declare_cvec_str()*.
 
 You may want to look at **examples/advanced.c**, it demonstrates how to use a custom struct as a hash map key, using the optional parameters to declare_cmap().
@@ -161,7 +161,7 @@ int main() {
     printf("append: %s\n", s1.str);
     cstr_destroy(&s1);
 
-    cstr s2 = cstr_from("Index %d: %f", 123, 4.56);
+    cstr_t s2 = cstr_from("Index %d: %f", 123, 4.56);
     cstr_destroy(&s2);
 }
 ```
@@ -183,7 +183,7 @@ int main() {
     cvec_ix_destroy(&bignums);
 }
 ```
-**cvec** of *cstr*.
+**cvec** of *cstr_t*.
 ```
 #include <stc/cstr.h>
 #include <stc/cvec.h>
@@ -210,7 +210,7 @@ int main() {
     cmap_ii_put(&nums, 8, 64); // put() works as c++ std::unordered_map<>::insert_or_replace()
     cmap_ii_insert(&nums, 11, 121); // only insert value if key does not exists - like std::unordered_map::insert().
 
-    printf("%d\n", cmap_ii_get(nums, 8)->value);
+    printf("%d\n", cmap_ii_find(nums, 8)->value);
     cmap_ii_destroy(&nums);
 }
 ```
