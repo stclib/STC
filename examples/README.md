@@ -35,13 +35,12 @@ int vikingvw_equals(const VikingVw* x, const VikingVw* y) {
     if (strcmp(x->name, y->name) != 0) return false;
     return strcmp(x->country, y->country) == 0;
 }
-
 ```
 And the Viking data struct:
 ```
 typedef struct Viking {
-    cstr name;
-    cstr country;
+    cstr_t name;
+    cstr_t country;
 } Viking;
 
 
@@ -56,26 +55,26 @@ VikingVw viking_getVw(Viking* vk) {
 Viking viking_fromVw(VikingVw vw) {
     Viking vk = {cstr_make(vw.name), cstr_make(vw.country)}; return vk;
 }
-
 ```
 With this in place, we use the full declare_cmap() macro to define {Viking -> int} hash map type:
 ```
 declare_cmap(vk, Viking, int, c_default_destroy, vikingvw_equals, vikingvw_hash, 
                  viking_destroy, VikingVw, viking_getVw, viking_fromVw);
 ```
-CMap_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test. cmap_vk_destroy() will free all memory allocated for Viking keys and the hash table values.
-Finally, the demo:
+cmap_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test. cmap_vk_destroy() will free all memory allocated for Viking keys and the hash table values.
+Finally, main which also demos the generic c_push() of multiple elements:
 ```
-int main()
-{
+int main() {
     cmap_vk vikings = cmap_init;
-    // emplace constructs the keys
-    cmap_vk_put(&vikings, (VikingVw) {"Einar", "Norway"}, 20);
-    cmap_vk_put(&vikings, (VikingVw) {"Olaf", "Denmark"}, 24);
-    cmap_vk_put(&vikings, (VikingVw) {"Harald", "Iceland"}, 12);
-
-    cmap_vk_entry_t* e = cmap_vk_get(&vikings, (VikingVw) {"Einar", "Norway"});
+    c_push(&vikings, cmap_vk, c_items(
+        {{"Einar", "Norway"}, 20},
+        {{"Olaf", "Denmark"}, 24},
+        {{"Harald", "Iceland"}, 12},
+    ));
+    VikingVw look = {"Einar", "Norway"};
+    cmap_vk_entry_t *e = cmap_vk_find(&vikings, look);
     e->value += 5; // update 
+    cmap_vk_insert(&vikings, look, 0)->value += 5; // again
 
     c_foreach (k, cmap_vk, vikings) {
         printf("%s of %s has %d hp\n", k.item->key.name.str, k.item->key.country.str, k.item->value);
