@@ -1,10 +1,10 @@
-STC - C99 Standard Container Library
+STC - C99 STandard Container library
 ====================================
 
 Introduction
 ------------
 
-An elegant, typesafe, generic, customizable, user-friendly, consistent, and very fast standard container library for C99. This is a small headers only library with the most used container components, and a few algorithms:
+An elegant, fully typesafe, generic, customizable, user-friendly, consistent, and very fast standard container library for C99. This is a small headers only library with the most used container components, and a few algorithms:
 - **stc/carray.h** - Dynamic generic **multi-dimensional array**, implemented as a single contiguous section of memory.
 - **stc/cbitset.h** - Bitset similar to c++ std::bitset or boost::dynamic_bitset.
 - **stc/clist.h** - A genric circular **singly linked list**. Can be used as a **queue** as it supports *push_back(), push_front(), and pop_front()*. It also contains various *splice* functions and *merge sort*.
@@ -14,12 +14,12 @@ An elegant, typesafe, generic, customizable, user-friendly, consistent, and very
 - **stc/cvec.h** - Dynamic generic **vector** class, works well as a **stack**.
 - **stc/cvec_pq.h** - Priority queue adapter for **cvec.h**, as a **heap**.
 - **stc/copt.h** - Implementation of a **getopt_long()**-like function, *copt_get()*, to parse command line arguments.
-- **stc/crand.h** - A few very efficent modern random number generators *pcg32* and my own *64-bit PRNG*.
+- **stc/crand.h** - A few very efficent modern random number generators *pcg32* and my own *64-bit PRNG* inspired by *sfc64*.
 - **stc/cdefs.h** - A common include file with some general definitions.
 
-The usage of the containers is vert similar to the C++ std:: containers, so it should be easy for those who are familiar with them.
+The usage of the containers is vert similar to the C++ standard containers, so it should be easy if you are familiar with them.
 
-All containers mentioned above, except for cstr are generic (similar to templates in C++). A simple example:
+All containers mentioned above, except cstr_t and cbitset_t are generic and typesafe (similar to templates in C++). No casting is used. A simple example:
 ```
 #include <stc/cvec.h>
 declare_cvec(i, int);
@@ -33,7 +33,7 @@ int main(void) {
 Motivation
 ----------
 
-The aim of this project was to create a small **Standard Container Library for the C99 language**. I suspect that most other attempts at this has failed because it did not meet one or several of the following requirements: I believe a standard container library should ..
+The aim of this project was to create a small **Standard Container Library for the C99 language**. It should
 - be easy to use, have intuitive naming and consistency across the library.
 - be type safe. Have minimal usage of casting and void* pointers.
 - be highly efficient. Both in speed and memory usage.
@@ -41,28 +41,30 @@ The aim of this project was to create a small **Standard Container Library for t
 - have a fairly small code base, and easy to install, deploy and maintain.
 - avoid bloat. It should not try to cover all thinkable functions, but limit itself to the most useful and commonly used.
 
-The library is not complete or free of possible bugs, but I believe that it already covers a large portion of the most needed containers.
-
 Installation
 ------------
 
-Because it is headers only, files can simply be included in your program. The functions will be inlined by default. If containers are extensively used accross many tranlation units with common instantiated container types, it is recommended to build as a library, to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler argument, and put all the instantiations of the containers used in one C file, e.g.
+Because it is headers only, files can simply be included in your program. The functions will be inlined by default. If containers are extensively used accross many tranlation units with common instantiated container types, it is recommended to build as a library, to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option, and put all the instantiations of the containers used in one C file, like this:
 ```
 #define STC_IMPLEMENTATION
+#include <stc/cstr.h>
 #include <stc/cmap.h>
 #include <stc/cvec.h>
+#include <stc/clist.h>
+#include "Vec3.h"
 
 declare_cmap(ii, int, int);
 declare_cset(ix, int64_t);
 declare_cvec(i, int);
+declare_clist(v3, Vec3);
 ...
 ```
 Performance
 -----------
 
-This library is very efficent. Containers have templated intrusive elements. One of the most performance critical containers is the **cmap / cset**. Luckily, cmap is among the fastest C/C++ map implementations available: **examples/benchmark.c** compiled with g++ v9.2.0 -O3 on windows (the results are similar with VC++ and g++ on linux):
+The library is very efficent. Containers have templated intrusive elements. One of the most performance critical containers is the **cmap / cset**. Luckily, cmap is among the fastest C/C++ map implementations available: **examples/benchmark.c** compiled with g++ v9.2.0 -O3 on windows (the results are similar with VC++ and g++ on linux):
 
-**CMAP**=*cmap*, KMAP=*khash*, UMAP=*std::unordered_map*, BMAP=*ska::bytell_hash_map*, FMAP=*ska::flat_hash_map*, RMAP=*robin_hood::unordered_map*
+**CMAP**=*cmap*, KMAP=*khash*, **UMAP**=*std::unordered_map*, BMAP=*ska::bytell_hash_map*, FMAP=*ska::flat_hash_map*, RMAP=*robin_hood::unordered_map*
 ```
 Random keys are in range [0, 2^20):
 
@@ -94,11 +96,11 @@ Memory efficiency
 -----------------
 
 The containers are memory efficent, i.e. they occupy as little memory as practical possible.
-- **cstr**, **cvec**: Representaion: one pointer size. The size and capacity is stored as part of the heap allocation that also holds the vector elements.
-- **clist**: Representation: one pointer size. Each node allocates block storing value and next pointer.
-- **cset**: Representation: 4 pointers size. cset uses one table of keys, and one table of "used/hash-value", which occupies only one byte per bucket.
-- **cmap**: Same as cset, but this uses a table of (key, value) pairs, not only keys.
-- **carray**: carray1, carray2 and carray3. Representation: One pointers, plus 1, 2, or 3 size_t variables to store dimensions. Elements are stored as one block of heap memory.
+- **cstr**, **cvec**: Type size: one pointer. The size and capacity is stored as part of the heap allocation that also holds the vector elements.
+- **clist**: Type size: one pointer. Each node allocates block storing value and next pointer.
+- **cmap**: Type size: 4 pointers. cmap uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The open hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
+- **cset**: Same as cmap, but this uses a table of keys only, not (key, value) pairs.
+- **carray**: carray1, carray2 and carray3. Type size: One pointer plus one, two, or three size_t variables to store dimensions. Arrays are allocated as one contiguous block of heap memory.
 
 cmap, cset and cvec discussion
 ------------------------------
@@ -247,7 +249,7 @@ int main() {
     cmap_ss_destroy(&table); // frees key and value cstrs, and hash table.
 }
 ```
-**clist** of *int64_t*. Similar to c++ *std::forward_list*, but can do both *pushFront()* and *pushBack()*.
+**clist** of *int64_t*. Similar to c++ *std::forward_list*, but can do both *push_front()* and *push_back()* as well as *pop_front()*.
 ```
 #include <stdio.h>
 #include <time.h>
