@@ -62,14 +62,14 @@
 #define c_max_alloca    (1000)
 #define c_swap(T, x, y) { T __t = x; x = y; y = __t; }
 
-#define c_defaultInitRaw(x)    (x)
-#define c_defaultGetRaw(ptr)   (*(ptr))
+#define c_default_from_raw(x)   (x)
+#define c_default_to_raw(ptr)   (*(ptr))
 #define c_no_compare(x, y)      (0)
 #define c_mem_compare(x, y)     memcmp(x, y, sizeof(*(y)))
-#define c_mem_equals(x, y)      (memCompare(x, y) == 0)
+#define c_mem_equals(x, y)      (c_mem_compare(x, y) == 0)
 #define c_default_equals(x, y)  (*(x) == *(y))
 #define c_default_less(x, y)    (*(x) < *(y))
-#define c_compare(less, x, y)  (less(x, y) ? -1 : less(y, x))
+#define c_compare(less, x, y)   (less(x, y) ? -1 : less(y, x))
 #define c_default_compare(x, y) c_compare(c_default_less, x, y)
 #define c_default_destroy(p)    ((void)0)
 
@@ -82,7 +82,7 @@
 } while (0)
 
 /* One-byte-at-a-time hash based on Murmur's mix */
-static inline uint32_t  c_defaultHash(const void *data, size_t len) {
+static inline uint32_t  c_default_hash(const void *data, size_t len) {
     const volatile uint8_t *key = (const uint8_t *) data;
     uint32_t x = UINT32_C(0xc613fc15);
     while (len--) {

@@ -22,17 +22,17 @@ typedef struct VikingVw {
     const char* country;
 } VikingVw;
 
+
 uint32_t vikingvw_hash(const VikingVw* vw, size_t ignore) {
-    uint32_t hash = c_defaultHash(vw->name, strlen(vw->name))
-                  ^ c_defaultHash(vw->country, strlen(vw->country));
+    uint32_t hash = c_default_hash(vw->name, strlen(vw->name))
+                  ^ c_default_hash(vw->country, strlen(vw->country));
     return hash;
 }
-int vikingvw_equals(const VikingVw* x, const VikingVw* y) {
-    if (strcmp(x->name, y->name) != 0) return false;
-    return strcmp(x->country, y->country) == 0;
+static inline int vikingvw_equals(const VikingVw* x, const VikingVw* y) {
+    return strcmp(x->name, y->name) == 0 && strcmp(x->country, y->country) == 0;
 }
 ```
-And the Viking data struct:
+And the Viking data struct with destroy and convertion functions between VikingVw <-> Viking structs.
 ```
 typedef struct Viking {
     cstr_t name;
@@ -45,17 +45,17 @@ void viking_destroy(Viking* vk) {
     cstr_destroy(&vk->country);
 }
 
-VikingVw viking_getVw(Viking* vk) {
+static inline VikingVw viking_toVw(Viking* vk) {
     VikingVw vw = {vk->name.str, vk->country.str}; return vw;
 }
-Viking viking_fromVw(VikingVw vw) {
+static inline Viking viking_fromVw(VikingVw vw) { // note: parameter is by value
     Viking vk = {cstr_make(vw.name), cstr_make(vw.country)}; return vk;
 }
 ```
 With this in place, we use the full declare_cmap() macro to define {Viking -> int} hash map type:
 ```
 declare_cmap(vk, Viking, int, c_default_destroy, vikingvw_equals, vikingvw_hash, 
-                 viking_destroy, VikingVw, viking_getVw, viking_fromVw);
+                 viking_destroy, VikingVw, viking_toVw, viking_fromVw);
 ```
 cmap_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test. cmap_vk_destroy() will free all memory allocated for Viking keys and the hash table values.
 Finally, main which also demos the generic c_push() of multiple elements:

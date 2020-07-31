@@ -40,7 +40,7 @@
 #define declare_cvec_3(tag, Value, valueDestroy) \
                             declare_cvec_4(tag, Value, valueDestroy, c_default_compare)
 #define declare_cvec_4(tag, Value, valueDestroy, valueCompare) \
-                            declare_cvec_6(tag, Value, valueDestroy, valueCompare, Value, c_defaultGetRaw)
+                            declare_cvec_6(tag, Value, valueDestroy, valueCompare, Value, c_default_to_raw)
 #define declare_cvec_str() \
                             declare_cvec_6(str, cstr_t, cstr_destroy, cstr_compareRaw, const char*, cstr_getRaw)
 

@@ -63,7 +63,7 @@
 #define declare_clist_3(tag, Value, valueDestroy) \
                                declare_clist_4(tag, Value, valueDestroy, c_default_compare)
 #define declare_clist_4(tag, Value, valueDestroy, valueCompare) \
-                               declare_clist_6(tag, Value, valueDestroy, Value, valueCompare, c_defaultGetRaw)
+                               declare_clist_6(tag, Value, valueDestroy, Value, valueCompare, c_default_to_raw)
 #define declare_clist_str() \
                                declare_clist_6(str, cstr_t, cstr_destroy, const char*, cstr_compareRaw, cstr_getRaw)
 
