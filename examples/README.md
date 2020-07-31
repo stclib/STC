@@ -1,19 +1,15 @@
 Examples
 ========
-Contains various examples and benchmarks.
+This folder contains various examples and benchmarks.
 
 
-advanced.c Example
+Custom key example
 ------------------
-
-This demonstrates how to customize hash **cmap** with a user-defined key-type. You need to define two things:
+This demonstrates how to customize **cmap** with a user-defined key-type. When your key type consists of several members, you will usually have the hash function calculate hash values for the individual members, and then somehow combine them into one hash value for the entire object. If your key-type stores dynamic memory (e.g. cstr_t, as we will use), it is recommended to define a "view/raw"-struct of the your data first. In addition, you must define two functions:
 
 1. A hash function; calculates the hash value given an object of the key-type.
 
 2. A comparison function for equality; 
-
-When your key type consists of several members, you will usually have the hash function calculate hash values for the individual members, and then somehow combine them into one hash value for the entire object.
-If your key-type stores dynamic memory (e.g. CStr as we will use), it is smart to define a plain-old-data "view" of the your key struct first:
 ```
 #include <stdio.h>
 #include <stc/cmap.h>
