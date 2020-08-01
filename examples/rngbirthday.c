@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <stc/crand.h>
+#include <stc/crandom.h>
 #include <stc/cmap.h>
 #include <stc/cvec.h>
 #include <stc/cstr.h>
@@ -15,12 +15,12 @@ const static uint64_t mask = (1ull << 52) - 1;
 
 void repeats(void)
 {
-    crand_eng64_t rng = crand_eng64_init(seed);
+    crandom_eng64_t rng = crandom_eng64_init(seed);
     cmap_ic m = cmap_init;
     cmap_ic_reserve(&m, N);
     clock_t now = clock();
     for (size_t i = 0; i < N; ++i) {
-        uint64_t k = crand_gen_i64(&rng) & mask;
+        uint64_t k = crandom_gen_i64(&rng) & mask;
         int v = ++cmap_ic_insert(&m, k, 0)->value;
         if (v > 1) printf("%zu: %llx - %d\n", i, k, v);
     }
@@ -34,13 +34,13 @@ declare_cvec(x, uint64_t);
 
 void distribution(void)
 {
-    crand_eng32_t rng = crand_eng32_init(seed); // time(NULL), time(NULL));
+    crandom_eng32_t rng = crandom_eng32_init(seed); // time(NULL), time(NULL));
     const size_t N = 1ull << 28, M = 1ull << 9; // 1ull << 10;
     cmap_x map = cmap_x_make(M);
     clock_t now = clock();
-    crand_uniform_i32_t dist = crand_uniform_i32_init(0, M);
+    crandom_uniform_i32_t dist = crandom_uniform_i32_init(0, M);
     for (size_t i = 0; i < N; ++i) {
-        ++cmap_x_insert(&map, crand_uniform_i32(&rng, dist), 0)->value;
+        ++cmap_x_insert(&map, crandom_uniform_i32(&rng, dist), 0)->value;
     }
     float diff = (float) (clock() - now) / CLOCKS_PER_SEC;
 

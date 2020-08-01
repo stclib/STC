@@ -24,7 +24,7 @@ After inserting all the elements excluding the ones which are to be deleted, Pop
 #include <stdio.h>
 #include <stc/clist.h>
 #include <stc/cmap.h>
-#include <stc/cvec_pq.h>
+#include <stc/cpqueue.h>
 
 declare_cmap(ii, int, int);
 declare_cvec(i, int);

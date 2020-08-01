@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stc/cstr.h>
 #include <stc/cmap.h>
-#include <stc/cvec_pq.h>
+#include <stc/cpqueue.h>
 #include <stc/clist.h>
 
 declare_cmap(id, int, cstr_t, cstr_destroy); // Map of int -> cstr_t

@@ -12,9 +12,9 @@ An elegant, fully typesafe, generic, customizable, user-friendly, consistent, an
 - **stc/cset.h** - A generic **unordered set** implemented in tandem with *unordered map*
 - **stc/cstr.h** - Compact and powerful **string** class.
 - **stc/cvec.h** - Dynamic generic **vector** class, works well as a **stack**.
-- **stc/cvec_pq.h** - Priority queue adapter for **cvec.h**, as a **heap**.
+- **stc/cpqueue.h** - Priority queue adapter for **cvec.h**, as a **heap**.
 - **stc/copt.h** - Implementation of a **getopt_long()**-like function, *copt_get()*, to parse command line arguments.
-- **stc/crand.h** - A few very efficent modern random number generators *pcg32* and my own *64-bit PRNG* inspired by *sfc64*.
+- **stc/crandom.h** - A few very efficent modern random number generators *pcg32* and my own *64-bit PRNG* inspired by *sfc64*.
 - **stc/cdefs.h** - A common include file with some general definitions.
 
 The usage of the containers is vert similar to the C++ standard containers, so it should be easy if you are familiar with them.
@@ -254,17 +254,17 @@ int main() {
 #include <stdio.h>
 #include <time.h>
 #include <stc/clist.h>
-#include <stc/crand.h>
+#include <stc/crandom.h>
 declare_clist(fx, double);
 
 int main() {
     clist_fx list = clist_init;
-    crand_eng64_t eng = crand_eng64_init(time(NULL));
-    crand_uniform_f64_t dist = crand_uniform_f64_init(100.0, 1000.0);
+    crandom_eng64_t eng = crandom_eng64_init(time(NULL));
+    crandom_uniform_f64_t dist = crandom_uniform_f64_init(100.0, 1000.0);
     int k;
     
     for (int i = 0; i < 10000000; ++i)
-        clist_fx_push_back(&list, crand_uniform_f64(&eng, dist));
+        clist_fx_push_back(&list, crandom_uniform_f64(&eng, dist));
     k = 0; c_foreach (i, clist_fx, list)
         if (++k <= 100) printf("%8d: %10f\n", k, i.item->value); else break;
 
