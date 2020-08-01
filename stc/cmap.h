@@ -178,10 +178,10 @@ ctype##_##tag##_set_load_factors(ctype##_##tag* self, float max, float shrink) {
 } \
 STC_API ctype##_##tag##_entry_t* \
 ctype##_##tag##_find(const ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey); \
-STC_API ctype##_##tag##_entry_t* /* like c++ std::map.insert_or_assign(), or operator[]: */ \
+STC_API ctype##_##tag##_entry_t* /* like c++ std::map.insert_or_assign(): */ \
 ctype##_##tag##_put(ctype##_##tag* self, OPT_2_##ctype(ctype##_##tag##_rawkey_t rawKey, Value value)); \
-OPT_1_##ctype(STC_API ctype##_##tag##_entry_t* /* like c++ std::map.insert(): */ \
-ctype##_##tag##_insert(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey, Value value);) \
+STC_API ctype##_##tag##_entry_t* /* like c++ std::map.insert(): */ \
+ctype##_##tag##_insert(ctype##_##tag* self, OPT_2_##ctype(ctype##_##tag##_rawkey_t rawKey, Value value)); \
 STC_INLINE void \
 ctype##_##tag##_swap(ctype##_##tag* a, ctype##_##tag* b) { c_swap(ctype##_##tag, *a, *b); } \
 STC_API size_t \
