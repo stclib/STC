@@ -116,25 +116,14 @@ STC_API uint32_t crandom_gen_i32(crandom_eng32_t* rng) {
     return (xors >> rot) | (xors << ((-rot) & 31));
 }
 
-/* New 64bit PRNG losely based on SFC64: Copyright 2020, Tyge Løvset */
-/* Faster: Updates only 192bit state. Parallel: Ensures unique sequence for each seq (2^63 seqs) */
-/* Minimal period is 2^64 per seq, average ~ 2^127 per seq */
 STC_API crandom_eng64_t crandom_eng64_with_seq(uint64_t seed, uint64_t seq) {
     crandom_eng64_t rng = {seed, seed, seed, (seq << 1u) | 1u}; /* increment must be odd */
     for (int i = 0; i < 12; ++i) crandom_gen_i64(&rng);
     return rng;
 }
 
-STC_API uint64_t crandom_gen_i64(crandom_eng64_t* rng) {
-    enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
-    uint64_t *s = rng->state;
-    const uint64_t b = s[1], result = s[0] ^ (s[2] += s[3]|1);
-    s[0] = (b + (b << LSHIFT)) ^ (b >> RSHIFT);
-    s[1] = ((b << LROT) | (b >> (64 - LROT))) + result;
-    return result;
-}
-
-/* // SFC64 random number generator: http://pracrand.sourceforge.net
+#ifdef STC_USE_SFC64
+/* SFC64 random number generator: http://pracrand.sourceforge.net */
 STC_API uint64_t crandom_gen_i64(crandom_eng64_t* rng) {
     enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
     uint64_t *s = rng->state;
@@ -144,7 +133,20 @@ STC_API uint64_t crandom_gen_i64(crandom_eng64_t* rng) {
     s[2] = ((s[2] << LROT) | (s[2] >> (64 - LROT))) + result;
     return result;
 }
-*/
+#else
+/* My own PRNG inspired by SFC64: Faster and has Weyl-sequence parameter. */
+/* Copyright Tyge Løvset, 2020 */
+/* Faster: updates only 192bit state. Parallel: Ensures unique sequence per seq (2^63) */
+/* Minimum period is 2^64 per seq, average ~ 2^127 per seq */
+STC_API uint64_t crandom_gen_i64(crandom_eng64_t* rng) {
+    enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
+    uint64_t *s = rng->state;
+    const uint64_t b = s[1], result = s[0] ^ (s[2] += s[3]|1);
+    s[0] = (b + (b << LSHIFT)) ^ (b >> RSHIFT);
+    s[1] = ((b << LROT) | (b >> (64 - LROT))) + result;
+    return result;
+}
 #endif
 
+#endif
 #endif
