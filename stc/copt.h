@@ -83,7 +83,7 @@ typedef struct {
     int val;
 } copt_long_t;
 
-static const copt_t copt_init = {1, 0, NULL, NULL, -1, 1, 0, 0, {'-', '?', '\0'}};
+static const copt_t copt_init = {1, 0, c_nullptr, c_nullptr, -1, 1, 0, 0, {'-', '?', '\0'}};
 
 static void _copt_permute(char *argv[], int j, int n) { /* move argv[j] over n elements to the left */
     int k;

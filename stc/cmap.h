@@ -38,7 +38,7 @@ int main(void) {
     cmap_mx_put(&m, 5, 'a');
     cmap_mx_put(&m, 8, 'b');
     cmap_mx_put(&m, 12, 'c');
-    cmap_mx_entry_t *e = cmap_mx_find(&m, 10); // = NULL
+    cmap_mx_entry_t *e = cmap_mx_find(&m, 10); // = c_nullptr
     char val = cmap_mx_find(&m, 5)->value;
     cmap_mx_put(&m, 5, 'd'); // update
     cmap_mx_erase(&m, 8);
@@ -53,7 +53,7 @@ int main(void) {
 #include <string.h>
 #include "cdefs.h"
 
-#define cmap_init                     {NULL, NULL, 0, 0, 0.85f, 0.15f}
+#define cmap_init                     {c_nullptr, c_nullptr, 0, 0, 0.85f, 0.15f}
 #define cmap_size(m)                  ((size_t) (m).size)
 #define cset_init                     cmap_init
 #define cset_size(s)                  cmap_size(s)
@@ -123,8 +123,8 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
                        cstr_destroy, const char*, cstr_to_raw, cstr_make)
 
 #define OPT_1_cset(x)
-#define OPT_2_cset(x, y) x
 #define OPT_1_cmap(x) x
+#define OPT_2_cset(x, y) x
 #define OPT_2_cmap(x, y) x, y
 
 /* CHASH full: use 'void' for Value if ctype is cset */
@@ -255,10 +255,10 @@ ctype##_##tag##_bucket(const ctype##_##tag* self, const ctype##_##tag##_rawkey_t
  \
 STC_API ctype##_##tag##_entry_t* \
 ctype##_##tag##_find(const ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey) { \
-    if (self->size == 0) return NULL; \
+    if (self->size == 0) return c_nullptr; \
     uint32_t hx; \
     size_t idx = ctype##_##tag##_bucket(self, &rawKey, &hx); \
-    return self->_hashx[idx] ? &self->table[idx] : NULL; \
+    return self->_hashx[idx] ? &self->table[idx] : c_nullptr; \
 } \
  \
 STC_INLINE void ctype##_##tag##_reserve_expand(ctype##_##tag* self) { \
@@ -310,7 +310,7 @@ ctype##_##tag##_reserve(ctype##_##tag* self, size_t newcap) { \
         self->max_load_factor, self->shrink_limit_factor \
     }; \
     /* Rehash: */ \
-    ctype##_##tag##_swap(self, &tmp); \
+    c_swap(ctype##_##tag, *self, tmp); \
     ctype##_##tag##_entry_t* e = tmp.table, *slot = self->table; \
     uint8_t* hashx = self->_hashx; \
     uint32_t hx; \
@@ -366,13 +366,13 @@ ctype##_##tag##_begin(ctype##_##tag* map) { \
     uint8_t* hx = map->_hashx; \
     ctype##_##tag##_entry_t* e = map->table, *end = e + map->bucket_count; \
     while (e != end && !*hx) ++e, ++hx; \
-    ctype##_##tag##_iter_t it = {e == end ? NULL : e, end, hx}; return it; \
+    ctype##_##tag##_iter_t it = {e == end ? c_nullptr : e, end, hx}; return it; \
 } \
  \
 STC_API ctype##_##tag##_iter_t \
 ctype##_##tag##_next(ctype##_##tag##_iter_t it) { \
     do { ++it.item, ++it._hx; } while (it.item != it._end && !*it._hx); \
-    if (it.item == it._end) it.item = NULL; \
+    if (it.item == it._end) it.item = c_nullptr; \
     return it; \
 }
 

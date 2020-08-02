@@ -61,6 +61,11 @@
 
 #define c_max_alloca    (1000)
 #define c_swap(T, x, y) { T __t = x; x = y; y = __t; }
+#ifdef __cplusplus
+#define c_nullptr       nullptr
+#else
+#define c_nullptr       NULL
+#endif
 
 #define c_default_from_raw(x)   (x)
 #define c_default_to_raw(ptr)   (*(ptr))

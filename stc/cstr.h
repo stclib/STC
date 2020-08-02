@@ -203,7 +203,7 @@ STC_API void
 cstr_reserve(cstr_t* self, size_t cap) {
     size_t len = cstr_size(*self), oldcap = cstr_capacity(*self);
     if (cap > oldcap) {
-        size_t* rep = (size_t *) realloc(oldcap ? _cstr_rep(self) : NULL, _cstr_mem(cap));
+        size_t* rep = (size_t *) realloc(oldcap ? _cstr_rep(self) : c_nullptr, _cstr_mem(cap));
         self->str = (char *) (rep + 2);
         self->str[rep[0] = len] = '\0';
         rep[1] = cap;
@@ -242,7 +242,7 @@ cstr_from(const char* fmt, ...) {
     cstr_t tmp = cstr_init;
     va_list args;
     va_start(args, fmt);
-    int len = vsnprintf(NULL, (size_t)0, fmt, args);
+    int len = vsnprintf(c_nullptr, (size_t)0, fmt, args);
     if (len > 0) {
         tmp = cstr_make_reserved(len);
         vsprintf(tmp.str, fmt, args);
@@ -317,7 +317,7 @@ cstr_strnstr(cstr_t s, size_t pos, const char* needle, size_t n) {
     char *x = s.str + pos, /* haystack */
          *z = s.str + cstr_size(s) - n + 1;
     if (x >= z)
-        return NULL;
+        return c_nullptr;
     ptrdiff_t sum = 0;
     const char *y = x, *p = needle, *q = needle + n;
     while (p != q)
@@ -327,7 +327,7 @@ cstr_strnstr(cstr_t s, size_t pos, const char* needle, size_t n) {
             return x;
         sum += *y++ - *x++;
     }
-    return NULL;
+    return c_nullptr;
 }
 
 #endif

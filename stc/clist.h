@@ -81,10 +81,10 @@
         clistnode_##tag *item, **_last; \
     } clist_##tag##_iter_t
 
-#define clist_init          {NULL}
+#define clist_init          {c_nullptr}
 #define clist_front(list)   (list).last->next->value
 #define clist_back(list)    (list).last->value
-#define clist_empty(list)   ((list).last == NULL)
+#define clist_empty(list)   ((list).last == c_nullptr)
 
 
 #define declare_clist_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
@@ -129,12 +129,12 @@
  \
     STC_INLINE clist_##tag##_iter_t \
     clist_##tag##_begin(clist_##tag* self) { \
-        clistnode_##tag *head = self->last ? self->last->next : NULL; \
+        clistnode_##tag *head = self->last ? self->last->next : c_nullptr; \
         clist_##tag##_iter_t it = {head, &self->last}; return it; \
     } \
     STC_INLINE clist_##tag##_iter_t \
     clist_##tag##_next(clist_##tag##_iter_t it) { \
-        it.item = it.item == *it._last ? NULL : it.item->next; return it; \
+        it.item = it.item == *it._last ? c_nullptr : it.item->next; return it; \
     } \
     STC_INLINE clist_##tag##_iter_t \
     clist_##tag##_last(clist_##tag* self) { \
@@ -196,7 +196,7 @@
             other->last->next = next; \
             if (bottom && pos.item == self->last) self->last = other->last; \
         } \
-        other->last = NULL; \
+        other->last = c_nullptr; \
     } \
     STC_API void \
     clist_##tag##_splice_front(clist_##tag* self, clist_##tag* other) { \
@@ -217,13 +217,13 @@
             } \
             prev = i; \
         } \
-        prev.item = NULL; return prev; \
+        prev.item = c_nullptr; return prev; \
     } \
  \
     STC_API Value* \
     clist_##tag##_find(clist_##tag* self, RawValue val) { \
         clist_##tag##_iter_t it = clist_##tag##_find_before(self, val); \
-        return it.item ? &it.item->next->value : NULL; \
+        return it.item ? &it.item->next->value : c_nullptr; \
     } \
  \
     STC_API clist_##tag##_iter_t \
@@ -256,7 +256,7 @@
 #define _clist_erase_after(self, tag, node, valueDestroy) \
     clistnode_##tag* del = node->next, *next = del->next; \
     node->next = next; \
-    if (del == next) self->last = NULL; \
+    if (del == next) self->last = c_nullptr; \
     else if (self->last == del) self->last = node; \
     valueDestroy(&del->value); \
     free(del)
@@ -270,12 +270,12 @@ static inline clistnode__base *
 _clist_mergesort(clistnode__base *list, int (*cmp)(const void*, const void*)) {
     clistnode__base *p, *q, *e, *tail, *oldhead;
     int insize = 1, nmerges, psize, qsize, i;
-    if (!list) return NULL;
+    if (!list) return c_nullptr;
     
     while (1) {
         p = list;
         oldhead = list;
-        list = tail = NULL;
+        list = tail = c_nullptr;
         nmerges = 0;
 
         while (p) {
@@ -284,7 +284,7 @@ _clist_mergesort(clistnode__base *list, int (*cmp)(const void*, const void*)) {
             psize = 0;
             for (i = 0; i < insize; ++i) {
                 ++psize;
-                q = (q->next == oldhead ? NULL : q->next);
+                q = (q->next == oldhead ? c_nullptr : q->next);
                 if (!q) break;
             }
             qsize = insize;
@@ -292,16 +292,16 @@ _clist_mergesort(clistnode__base *list, int (*cmp)(const void*, const void*)) {
             while (psize > 0 || (qsize > 0 && q)) {
                 if (psize == 0) {
                     e = q; q = q->next; --qsize;
-                    if (q == oldhead) q = NULL;
+                    if (q == oldhead) q = c_nullptr;
                 } else if (qsize == 0 || !q) {
                     e = p; p = p->next; --psize;
-                    if (p == oldhead) p = NULL;
+                    if (p == oldhead) p = c_nullptr;
                 } else if (cmp(p, q) <= 0) {
                     e = p; p = p->next; --psize;
-                    if (p == oldhead) p = NULL;
+                    if (p == oldhead) p = c_nullptr;
                 } else {
                     e = q; q = q->next; --qsize;
-                    if (q == oldhead) q = NULL;
+                    if (q == oldhead) q = c_nullptr;
                 }
                 if (tail)
                     tail->next = e;
