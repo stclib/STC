@@ -20,7 +20,7 @@ void repeats(void)
     cmap_ic_reserve(&m, N);
     clock_t now = clock();
     for (size_t i = 0; i < N; ++i) {
-        uint64_t k = crandom_gen_i64(&rng) & mask;
+        uint64_t k = crandom_i64(&rng) & mask;
         int v = ++cmap_ic_insert(&m, k, 0)->value;
         if (v > 1) printf("%zu: %llx - %d\n", i, k, v);
     }

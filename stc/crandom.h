@@ -31,7 +31,7 @@
     crandom_uniform_f32_t fdist = crandom_uniform_f32_init(1.0f, 6.0f);
     crandom_uniform_i32_t idist = crandom_uniform_i32_init(1, 6);
     
-    uint32_t i = crandom_gen_i32(&eng);
+    uint32_t i = crandom_i32(&eng);
     int j = crandom_uniform_i32(&eng, idist);
     float r = crandom_uniform_f32(&eng, fdist);
 */
@@ -47,10 +47,10 @@ STC_INLINE crandom_eng32_t crandom_eng32_init(uint64_t seed) {
 }
 
 /* int random number generator, range [0, 2^32) */
-STC_API uint32_t crandom_gen_i32(crandom_eng32_t* rng);
+STC_API uint32_t crandom_i32(crandom_eng32_t* rng);
 
-STC_INLINE float crandom_gen_f32(crandom_eng32_t* rng) {
-    union {uint32_t i; float f;} u = {0x3F800000u | (crandom_gen_i32(rng) >> 9)};
+STC_INLINE float crandom_f32(crandom_eng32_t* rng) {
+    union {uint32_t i; float f;} u = {0x3F800000u | (crandom_i32(rng) >> 9)};
     return u.f - 1.0f;
 }
 
@@ -59,7 +59,7 @@ STC_INLINE crandom_uniform_i32_t crandom_uniform_i32_init(int32_t low, int32_t h
     crandom_uniform_i32_t dist = {low, high - low + 1}; return dist;
 }
 STC_INLINE int32_t crandom_uniform_i32(crandom_eng32_t* rng, crandom_uniform_i32_t dist) {
-    return dist.min + (int32_t) (((uint64_t) crandom_gen_i32(rng) * dist.range) >> 32);
+    return dist.min + (int32_t) (((uint64_t) crandom_i32(rng) * dist.range) >> 32);
 }
 
 /* float random number in range [low, high). Note: 23 bit resolution. */
@@ -67,7 +67,7 @@ STC_INLINE crandom_uniform_f32_t crandom_uniform_f32_init(float low, float high)
     crandom_uniform_f32_t dist = {low, high - low}; return dist;
 }
 STC_INLINE float crandom_uniform_f32(crandom_eng32_t* rng, crandom_uniform_f32_t dist) {
-    return dist.min + crandom_gen_f32(rng) * dist.range;
+    return dist.min + crandom_f32(rng) * dist.range;
 }
 
 
@@ -80,10 +80,10 @@ STC_INLINE crandom_eng64_t crandom_eng64_init(uint64_t seed) {
     return crandom_eng64_with_seq(seed, 1);
 }
 /* int random number generator, range [0, 2^64) */
-STC_API uint64_t crandom_gen_i64(crandom_eng64_t* rng);
+STC_API uint64_t crandom_i64(crandom_eng64_t* rng);
 
-STC_INLINE double crandom_gen_f64(crandom_eng64_t* rng) {
-    union {uint64_t i; double f;} u = {0x3FF0000000000000ull | (crandom_gen_i64(rng) >> 12)};
+STC_INLINE double crandom_f64(crandom_eng64_t* rng) {
+    union {uint64_t i; double f;} u = {0x3FF0000000000000ull | (crandom_i64(rng) >> 12)};
     return u.f - 1.0;
 }
 
@@ -92,7 +92,7 @@ STC_INLINE crandom_uniform_f64_t crandom_uniform_f64_init(float low, float high)
     crandom_uniform_f64_t dist = {low, high - low}; return dist;
 }
 STC_INLINE double crandom_uniform_f64(crandom_eng64_t* rng, crandom_uniform_f64_t dist) {
-    return dist.min + crandom_gen_f64(rng) * dist.range;
+    return dist.min + crandom_f64(rng) * dist.range;
 }
 
 
@@ -102,13 +102,13 @@ STC_INLINE double crandom_uniform_f64(crandom_eng64_t* rng, crandom_uniform_f64_
 
 STC_API crandom_eng32_t crandom_eng32_with_seq(uint64_t seed, uint64_t seq) {
     crandom_eng32_t rng = {0u, (seq << 1u) | 1u}; /* inc must be odd */
-    crandom_gen_i32(&rng);
+    crandom_i32(&rng);
     rng.state[0] += seed;
-    crandom_gen_i32(&rng);
+    crandom_i32(&rng);
     return rng;
 }
 
-STC_API uint32_t crandom_gen_i32(crandom_eng32_t* rng) {
+STC_API uint32_t crandom_i32(crandom_eng32_t* rng) {
     uint64_t old = rng->state[0];
     rng->state[0] = old * 6364136223846793005ull + rng->state[1];
     uint32_t xors = ((old >> 18u) ^ old) >> 27u;
@@ -118,13 +118,13 @@ STC_API uint32_t crandom_gen_i32(crandom_eng32_t* rng) {
 
 STC_API crandom_eng64_t crandom_eng64_with_seq(uint64_t seed, uint64_t seq) {
     crandom_eng64_t rng = {seed, seed, seed, (seq << 1u) | 1u}; /* increment must be odd */
-    for (int i = 0; i < 12; ++i) crandom_gen_i64(&rng);
+    for (int i = 0; i < 12; ++i) crandom_i64(&rng);
     return rng;
 }
 
 #ifdef STC_USE_SFC64
 /* SFC64 random number generator: http://pracrand.sourceforge.net */
-STC_API uint64_t crandom_gen_i64(crandom_eng64_t* rng) {
+STC_API uint64_t crandom_i64(crandom_eng64_t* rng) {
     enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
     uint64_t *s = rng->state;
     const uint64_t result = s[0] + s[1] + s[3]++;
@@ -138,7 +138,7 @@ STC_API uint64_t crandom_gen_i64(crandom_eng64_t* rng) {
 /* Copyright Tyge Løvset, 2020 */
 /* Faster: updates only 192bit state. Parallel: Ensures unique sequence per seq (2^63) */
 /* Minimum period is 2^64 per seq, average ~ 2^127 per seq */
-STC_API uint64_t crandom_gen_i64(crandom_eng64_t* rng) {
+STC_API uint64_t crandom_i64(crandom_eng64_t* rng) {
     enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
     uint64_t *s = rng->state;
     const uint64_t b = s[1], result = s[0] ^ (s[2] += s[3]|1);

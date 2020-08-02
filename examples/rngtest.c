@@ -18,7 +18,7 @@ int main(void)
     before = clock(); \
     v = 0;
     for (size_t i=0; i<NN; i++) {
-        v += crandom_gen_i32(&pcg);
+        v += crandom_i32(&pcg);
     }
     difference = clock() - before;
     printf("pcg32: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
@@ -27,7 +27,7 @@ int main(void)
     before = clock(); \
     v = 0;
     for (size_t i=0; i<NN; i++) {
-        v += crandom_gen_i64(&sfc) & 0xffffffff;
+        v += crandom_i64(&sfc) & 0xffffffff;
     }
     difference = clock() - before;
     printf("sfc64: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
@@ -42,6 +42,6 @@ int main(void)
 
     crandom_uniform_f64_t fdist = crandom_uniform_f64_init(10, 20);
     for (int i=0; i<8; ++i) printf("%f ", crandom_uniform_f64(&sfc, fdist));
-    //for (int i=0; i<8; ++i) printf("%zu ", crandom_gen_i64(&sfc));
+    //for (int i=0; i<8; ++i) printf("%zu ", crandom_i64(&sfc));
     puts("");
 }

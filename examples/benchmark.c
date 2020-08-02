@@ -28,7 +28,7 @@ static const float max_load_factor = 0.77f;
 
 crandom_eng64_t rng;
 #define SEED(s) rng = crandom_eng64_init(seed)
-#define RAND(N) (crandom_gen_i64(&rng) & ((1 << N) - 1))
+#define RAND(N) (crandom_i64(&rng) & ((1 << N) - 1))
 
 
 #define CMAP_SETUP(tag, Key, Value) cmap_##tag map = cmap_init \

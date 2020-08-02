@@ -151,7 +151,12 @@ STC_API void cbitset_resize(cbitset_t* self, size_t size, bool value) {
     }
 }
 
-#if defined(__TINYC__) // and other popcount-unsupporting compilers
+#if defined(__GNUC__) || defined(__clang__)
+    #define c_popcount64(x) __builtin_popcountll(x)
+#elif defined(_MSC_VER)
+    #include <nmmintrin.h>
+    #define c_popcount64(x) _mm_popcnt_u64(x)
+#else
 /* http://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation */
 static inline uint64_t c_popcount64(uint64_t x) {
     const uint64_t m1 = 0x5555555555555555, m2 = 0x3333333333333333,
@@ -161,9 +166,6 @@ static inline uint64_t c_popcount64(uint64_t x) {
     x = (x + (x >> 4)) & m4;
     return (x * h01) >> 56;
 }
-#else
-    #include <nmmintrin.h>
-    #define c_popcount64(x) _mm_popcnt_u64(x)
 #endif
 
 STC_API size_t cbitset_count(cbitset_t set) {
