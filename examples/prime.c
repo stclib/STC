@@ -31,7 +31,7 @@ int main(void)
     printf("number of primes: %zu\n", np);
 
     for (uint32_t i = 2; i <= 1000; ++i)
-       if (cbitset_test(primes, i)) printf("%zu ", i);
+       if (cbitset_test(primes, i)) printf("%u ", i);
     puts("");
     cbitset_destroy(&primes);
 }
