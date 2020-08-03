@@ -68,17 +68,17 @@
                                declare_clist_6(str, cstr_t, cstr_destroy, const char*, cstr_compare_raw, cstr_to_raw)
 
 #define declare_clist_types(tag, Value) \
-    typedef struct clistnode_##tag { \
-        struct clistnode_##tag *next; \
+    typedef struct clist_##tag##_node { \
+        struct clist_##tag##_node *next; \
         Value value; \
-    } clistnode_##tag; \
+    } clist_##tag##_node_t; \
  \
     typedef struct clist_##tag { \
-        clistnode_##tag *last; \
+        clist_##tag##_node_t *last; \
     } clist_##tag; \
  \
     typedef struct { \
-        clistnode_##tag *item, **_last; \
+        clist_##tag##_node_t *item, **_last; \
     } clist_##tag##_iter_t
 
 #define clist_init          {c_nullptr}
@@ -129,7 +129,7 @@
  \
     STC_INLINE clist_##tag##_iter_t \
     clist_##tag##_begin(clist_##tag* self) { \
-        clistnode_##tag *head = self->last ? self->last->next : c_nullptr; \
+        clist_##tag##_node_t *head = self->last ? self->last->next : c_nullptr; \
         clist_##tag##_iter_t it = {head, &self->last}; return it; \
     } \
     STC_INLINE clist_##tag##_iter_t \
@@ -186,25 +186,15 @@
         _clist_erase_after(self, tag, pos.item, valueDestroy); \
     } \
  \
-    static inline void \
-    _clist_##tag##_splice(clist_##tag* self, clist_##tag##_iter_t pos, clist_##tag* other, bool bottom) { \
-        if (!pos.item) \
-            self->last = pos.item = other->last; \
-        else if (other->last) { \
-            clistnode_##tag *next = pos.item->next; \
-            pos.item->next = other->last->next; \
-            other->last->next = next; \
-            if (bottom && pos.item == self->last) self->last = other->last; \
-        } \
-        other->last = c_nullptr; \
-    } \
     STC_API void \
     clist_##tag##_splice_front(clist_##tag* self, clist_##tag* other) { \
-        _clist_##tag##_splice(self, clist_##tag##_last(self), other, false); \
+        clist_void *s = (clist_void *) self; \
+        clist_void_iter_t last = {s->last, &s->last}; \
+        _clist_splice(s, last, (clist_void *)other, false); \
     } \
     STC_API void \
     clist_##tag##_splice_after(clist_##tag* self, clist_##tag##_iter_t pos, clist_##tag* other) { \
-        _clist_##tag##_splice(self, pos, other, true); \
+        _clist_splice((clist_void *)self, *(clist_void_iter_t *) &pos, (clist_void *)other, true); \
     } \
  \
     STC_API clist_##tag##_iter_t \
@@ -212,12 +202,12 @@
         clist_##tag##_iter_t prev = {self->last, &self->last}; \
         c_foreach (i, clist_##tag, *self) { \
             RawValue r = valueGetRaw(&i.item->value); \
-            if (valueCompareRaw(&r, &val) == 0) { \
+            if (valueCompareRaw(&r, &val) == 0) \
                 return prev; \
-            } \
             prev = i; \
         } \
-        prev.item = c_nullptr; return prev; \
+        prev.item = c_nullptr; \
+        return prev; \
     } \
  \
     STC_API Value* \
@@ -235,40 +225,54 @@
  \
     static inline int \
     clist_##tag##_sort_compare(const void* x, const void* y) { \
-        RawValue a = valueGetRaw(&((clistnode_##tag *) x)->value); \
-        RawValue b = valueGetRaw(&((clistnode_##tag *) y)->value); \
+        RawValue a = valueGetRaw(&((clist_##tag##_node_t *) x)->value); \
+        RawValue b = valueGetRaw(&((clist_##tag##_node_t *) y)->value); \
         return valueCompareRaw(&a, &b); \
     } \
     STC_API void \
     clist_##tag##_sort(clist_##tag* self) { \
-        clistnode__base* last = _clist_mergesort((clistnode__base *) self->last->next, clist_##tag##_sort_compare); \
-        self->last = (clistnode_##tag *) last; \
+        clist_void_node_t* last = _clist_mergesort((clist_void_node_t *) self->last->next, clist_##tag##_sort_compare); \
+        self->last = (clist_##tag##_node_t *) last; \
     }
 
 #define _clist_insert_after(self, tag, node, val) \
-    clistnode_##tag *entry = c_new (clistnode_##tag), \
-                    *next = self->last ? node->next : entry; \
+    clist_##tag##_node_t *entry = c_new (clist_##tag##_node_t), \
+                         *next = self->last ? node->next : entry; \
     entry->value = val; \
     entry->next = next; \
     if (node) node->next = entry
     /* +: set self->last based on node */
 
 #define _clist_erase_after(self, tag, node, valueDestroy) \
-    clistnode_##tag* del = node->next, *next = del->next; \
+    clist_##tag##_node_t* del = node->next, *next = del->next; \
     node->next = next; \
     if (del == next) self->last = c_nullptr; \
     else if (self->last == del) self->last = node; \
     valueDestroy(&del->value); \
     free(del)
 
-declare_clist_types(_base, int);
+
+declare_clist_types(void, int);
+
+STC_API void \
+_clist_splice(clist_void* self, clist_void_iter_t pos, clist_void* other, bool bottom) {
+    if (!pos.item)
+        self->last = pos.item = other->last;
+    else if (other->last) {
+        clist_void_node_t *next = pos.item->next;
+        pos.item->next = other->last->next;
+        other->last->next = next;
+        if (bottom && pos.item == self->last) self->last = other->last;
+    }
+    other->last = c_nullptr;
+}
 
 /* Singly linked list Mergesort implementation by Simon Tatham. O(n*log n).
  * https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
  */
-static inline clistnode__base *
-_clist_mergesort(clistnode__base *list, int (*cmp)(const void*, const void*)) {
-    clistnode__base *p, *q, *e, *tail, *oldhead;
+STC_API clist_void_node_t *
+_clist_mergesort(clist_void_node_t *list, int (*cmp)(const void*, const void*)) {
+    clist_void_node_t *p, *q, *e, *tail, *oldhead;
     int insize = 1, nmerges, psize, qsize, i;
     if (!list) return c_nullptr;
     

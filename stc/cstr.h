@@ -191,7 +191,7 @@ cstr_find(cstr_t s, size_t pos, const char* needle) {
 STC_INLINE uint32_t cstr_hash_raw(const char* const* sPtr, size_t ignored) {
     uint32_t hash = 5381, c; /* djb2 */
     const char* tmp = *sPtr;
-    while (c = *tmp++) hash = ((hash << 5) + hash) ^ c;
+    while ((c = *tmp++)) hash = ((hash << 5) + hash) ^ c;
     return hash;    
 }
 
