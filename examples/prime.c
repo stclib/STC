@@ -3,7 +3,7 @@
 
 static inline cbitset_t sieveOfEratosthenes(size_t n)
 {
-    cbitset_t pbits = cbitset_make(n + 1, true);
+    cbitset_t pbits = cbitset_with_size(n + 1, true);
     cbitset_reset(&pbits, 0);
     cbitset_reset(&pbits, 1);
 

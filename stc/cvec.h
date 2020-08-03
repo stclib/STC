@@ -51,20 +51,45 @@ typedef struct cvec_##tag { \
     Value* data; \
 } cvec_##tag; \
  \
-STC_INLINE cvec_##tag \
-cvec_##tag##_init(void) {cvec_##tag x = cvec_init; return x;} \
-STC_API cvec_##tag \
-cvec_##tag##_make(size_t size, Value null); \
-STC_API void \
-cvec_##tag##_push_n(cvec_##tag *self, const Value in[], size_t size); \
 STC_API void \
 cvec_##tag##_destroy(cvec_##tag* self); \
 STC_API void \
 cvec_##tag##_reserve(cvec_##tag* self, size_t cap); \
 STC_API void \
-cvec_##tag##_clear(cvec_##tag* self); \
+cvec_##tag##_resize(cvec_##tag* self, size_t size, Value null_val); \
+STC_API void \
+cvec_##tag##_push_n(cvec_##tag *self, const Value in[], size_t size); \
 STC_API void \
 cvec_##tag##_push_back(cvec_##tag* self, Value value); \
+STC_API void \
+cvec_##tag##_insert(cvec_##tag* self, size_t pos, Value value); \
+STC_API void \
+cvec_##tag##_erase(cvec_##tag* self, size_t pos, size_t size); \
+STC_API void \
+cvec_##tag##_sort(cvec_##tag* self); \
+STC_API size_t \
+cvec_##tag##_find(const cvec_##tag* self, RawValue rawValue); \
+ \
+STC_INLINE cvec_##tag \
+cvec_##tag##_init(void) { \
+    cvec_##tag x = cvec_init; return x; \
+} \
+STC_INLINE cvec_##tag \
+cvec_##tag##_with_size(size_t size, Value null_val) { \
+    cvec_##tag x = cvec_init; \
+    cvec_##tag##_resize(&x, size, null_val); \
+    return x; \
+} \
+STC_INLINE cvec_##tag \
+cvec_##tag##_with_capacity(size_t size) { \
+    cvec_##tag x = cvec_init; \
+    cvec_##tag##_reserve(&x, size); \
+    return x; \
+} \
+STC_INLINE void \
+cvec_##tag##_clear(cvec_##tag* self) { \
+    if (self->data) _cvec_size(*self) = 0; \
+} \
 STC_INLINE void \
 cvec_##tag##_pop_back(cvec_##tag* self) { \
     valueDestroy(&self->data[_cvec_size(*self) - 1]); \
@@ -76,14 +101,6 @@ STC_INLINE Value* \
 cvec_##tag##_back(cvec_##tag* self) {return self->data + _cvec_size(*self) - 1;} \
 STC_INLINE Value* \
 cvec_##tag##_at(cvec_##tag* self, size_t i) {return self->data + i;} \
-STC_API void \
-cvec_##tag##_insert(cvec_##tag* self, size_t pos, Value value); \
-STC_API void \
-cvec_##tag##_erase(cvec_##tag* self, size_t pos, size_t size); \
-STC_API void \
-cvec_##tag##_sort(cvec_##tag* self); \
-STC_API size_t \
-cvec_##tag##_find(const cvec_##tag* self, RawValue rawValue); \
 STC_INLINE void \
 cvec_##tag##_swap(cvec_##tag* a, cvec_##tag* b) { \
     c_swap(Value*, a->data, b->data); \
@@ -114,14 +131,6 @@ typedef RawValue cvec_##tag##_rawvalue_t
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define implement_cvec_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
  \
-STC_API cvec_##tag \
-cvec_##tag##_make(size_t size, Value null) { \
-    cvec_##tag vec = cvec_init; \
-    cvec_##tag##_reserve(&vec, size); \
-    _cvec_size(vec) = size; \
-    for (size_t i=0; i<size; ++i) vec.data[i] = null; \
-    return vec; \
-} \
 STC_API void \
 cvec_##tag##_push_n(cvec_##tag *self, const Value in[], size_t size) { \
     cvec_##tag##_reserve(self, cvec_size(*self) + size); \
@@ -147,12 +156,11 @@ cvec_##tag##_reserve(cvec_##tag* self, size_t cap) { \
         rep[1] = cap; \
     } \
 } \
- \
 STC_API void \
-cvec_##tag##_clear(cvec_##tag* self) { \
-    cvec_##tag cv = cvec_init; \
-    cvec_##tag##_destroy(self); \
-    *self = cv; \
+cvec_##tag##_resize(cvec_##tag* self, size_t size, Value null_val) { \
+    cvec_##tag##_reserve(self, size); \
+    for (size_t i=cvec_size(*self); i<size; ++i) self->data[i] = null_val; \
+    if (self->data) _cvec_size(*self) = size; \
 } \
  \
 STC_API void \

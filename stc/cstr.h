@@ -53,8 +53,6 @@ STC_API void
 cstr_reserve(cstr_t* self, size_t cap);
 STC_API void
 cstr_resize(cstr_t* self, size_t len, char fill);
-STC_API cstr_t
-cstr_make_reserved(size_t cap);
 STC_API cstr_t*
 cstr_assign_n(cstr_t* self, const char* str, size_t len);
 STC_API cstr_t*
@@ -70,15 +68,21 @@ cstr_strnstr(cstr_t s, size_t pos, const char* needle, size_t n);
 
 STC_INLINE void
 cstr_destroy(cstr_t* self) {
-    if (cstr_capacity(*self)) {
+    if (cstr_capacity(*self))
         free(_cstr_rep(self));
-    }
 }
 
 STC_INLINE cstr_t
-cstr_make_filled(size_t len, char fill) {
+cstr_with_capacity(size_t cap) {
     cstr_t s = cstr_init;
-    if (len) cstr_resize(&s, len, fill);
+    cstr_reserve(&s, cap);
+    return s;
+}
+
+STC_INLINE cstr_t
+cstr_with_size(size_t len, char fill) {
+    cstr_t s = cstr_init;
+    cstr_resize(&s, len, fill);
     return s;
 }
 
@@ -88,7 +92,7 @@ cstr_make(const char* str) {
 }
 
 STC_INLINE cstr_t
-cstr_make_copy(cstr_t s) {
+cstr_clone(cstr_t s) {
     return cstr_make_n(s.str, cstr_size(s));
 }
 
@@ -219,15 +223,6 @@ cstr_resize(cstr_t* self, size_t len, char fill) {
 }
 
 STC_API cstr_t
-cstr_make_reserved(size_t cap) {
-    if (cap == 0) return cstr_init;
-    size_t *rep = (size_t *) malloc(_cstr_mem(cap));
-    cstr_t s = {(char *) (rep + 2)};
-    rep[0] = 0, rep[1] = cap, s.str[0] = '\0';
-    return s;
-}
-
-STC_API cstr_t
 cstr_make_n(const char* str, size_t len) {
     if (len == 0) return cstr_init;
     size_t *rep = (size_t *) malloc(_cstr_mem(len));
@@ -244,7 +239,7 @@ cstr_from(const char* fmt, ...) {
     va_start(args, fmt);
     int len = vsnprintf(c_nullptr, (size_t)0, fmt, args);
     if (len > 0) {
-        tmp = cstr_make_reserved(len);
+        tmp = cstr_with_capacity(len);
         vsprintf(tmp.str, fmt, args);
         _cstr_size(tmp) = len;
     }
