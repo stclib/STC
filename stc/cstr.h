@@ -55,8 +55,6 @@ cstr_assign_n(cstr_t* self, const char* str, size_t len);
 STC_API cstr_t*
 cstr_append_n(cstr_t* self, const char* str, size_t len);
 STC_API void
-cstr_insert_n(cstr_t* self, size_t pos, const char* str, size_t n);
-STC_API void
 cstr_replace_n(cstr_t* self, size_t pos, size_t len, const char* str, size_t n);
 STC_API void
 cstr_erase(cstr_t* self, size_t pos, size_t n);
@@ -149,12 +147,14 @@ STC_INLINE char
 cstr_back(cstr_t s) {
     return s.str[cstr_size(s) - 1];
 }
-
+STC_INLINE void
+cstr_insert_n(cstr_t* self, size_t pos, const char* str, size_t n) {
+    cstr_replace_n(self, pos, 0, str, n);
+}
 STC_INLINE void
 cstr_insert(cstr_t* self, size_t pos, const char* str) {
-    cstr_insert_n(self, pos, str, strlen(str));
+    cstr_replace_n(self, pos, 0, str, strlen(str));
 }
-
 STC_INLINE void
 cstr_replace(cstr_t* self, size_t pos, size_t len, const char* str) {
     cstr_replace_n(self, pos, len, str, strlen(str));
@@ -282,16 +282,8 @@ STC_INLINE void _cstr_internal_move(cstr_t* self, size_t pos1, size_t pos2) {
 }
 
 STC_API void
-cstr_insert_n(cstr_t* self, size_t pos, const char* str, size_t n) {
-    char* xstr = (char *) memcpy(n > c_max_alloca ? malloc(n) : alloca(n), str, n);
-    _cstr_internal_move(self, pos, pos + n);
-    memcpy(&self->str[pos], xstr, n);
-    if (n > c_max_alloca) free(xstr); 
-}
-
-STC_API void
 cstr_replace_n(cstr_t* self, size_t pos, size_t len, const char* str, size_t n) {
-    char* xstr = (char *) memcpy(len > c_max_alloca ? malloc(n) : alloca(n), str, n);
+    char* xstr = (char *) memcpy(n > c_max_alloca ? malloc(n) : alloca(n), str, n);
     _cstr_internal_move(self, pos + len, pos + n);
     memcpy(&self->str[pos], xstr, n);
     if (n > c_max_alloca) free(xstr);
