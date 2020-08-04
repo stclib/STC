@@ -4,8 +4,13 @@
 int main() {
     cbitset_t set = cbitset_with_size(23, true);
     printf("count %zu, %zu\n", cbitset_count(set), set.size);
+
     cbitset_reset(&set, 9);
     cbitset_resize(&set, 43, false);
+    cstr_t str = cbitset_to_str(set);
+    printf(" str: %s\n", str.str);
+    cstr_destroy(&str);
+
     printf("%4zu: ", set.size);
     for (int i=0; i<set.size; ++i)
         printf("%d", cbitset_test(set, i));

@@ -36,7 +36,7 @@ void distribution(void)
 {
     crandom_eng32_t rng = crandom_eng32_init(seed); // time(NULL), time(NULL));
     const size_t N = 1ull << 28, M = 1ull << 9; // 1ull << 10;
-    cmap_x map = cmap_x_make(M);
+    cmap_x map = cmap_x_with_capacity(M);
     clock_t now = clock();
     crandom_uniform_i32_t dist = crandom_uniform_i32_init(0, M);
     for (size_t i = 0; i < N; ++i) {

@@ -42,6 +42,5 @@ int main(void)
 
     crandom_uniform_f64_t fdist = crandom_uniform_f64_init(10, 20);
     for (int i=0; i<8; ++i) printf("%f ", crandom_uniform_f64(&sfc, fdist));
-    //for (int i=0; i<8; ++i) printf("%zu ", crandom_i64(&sfc));
     puts("");
 }

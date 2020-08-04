@@ -163,27 +163,29 @@ typedef struct { \
 STC_INLINE ctype##_##tag \
 ctype##_##tag##_init(void) {ctype##_##tag x = cmap_init; return x;} \
 STC_INLINE size_t \
-ctype##_##tag##_size(ctype##_##tag m) {return m.size;} \
+ctype##_##tag##_size(ctype##_##tag m) {return (size_t) m.size;} \
+STC_INLINE size_t \
+ctype##_##tag##_capacity(ctype##_##tag m) {return (size_t) (m.bucket_count * m.max_load_factor);} \
+STC_INLINE void \
+ctype##_##tag##_swap(ctype##_##tag* a, ctype##_##tag* b) {c_swap(ctype##_##tag, *a, *b);} \
+STC_INLINE void \
+ctype##_##tag##_set_load_factors(ctype##_##tag* self, float max, float shrink) { \
+    self->max_load_factor = max; self->shrink_limit_factor = shrink; \
+} \
 STC_API ctype##_##tag \
-ctype##_##tag##_make(size_t initialSize); \
+ctype##_##tag##_with_capacity(size_t cap); \
 STC_API void \
 ctype##_##tag##_push_n(ctype##_##tag* self, const ctype##_##tag##_input_t in[], size_t size); \
 STC_API void \
 ctype##_##tag##_destroy(ctype##_##tag* self); \
 STC_API void \
 ctype##_##tag##_clear(ctype##_##tag* self); \
-STC_INLINE void \
-ctype##_##tag##_set_load_factors(ctype##_##tag* self, float max, float shrink) { \
-    self->max_load_factor = max; self->shrink_limit_factor = shrink; \
-} \
 STC_API ctype##_##tag##_entry_t* \
 ctype##_##tag##_find(const ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey); \
 STC_API ctype##_##tag##_entry_t* /* like c++ std::map.insert_or_assign(): */ \
 ctype##_##tag##_put(ctype##_##tag* self, OPT_2_##ctype(ctype##_##tag##_rawkey_t rawKey, Value value)); \
 STC_API ctype##_##tag##_entry_t* /* like c++ std::map.insert(): */ \
 ctype##_##tag##_insert(ctype##_##tag* self, OPT_2_##ctype(ctype##_##tag##_rawkey_t rawKey, Value value)); \
-STC_INLINE void \
-ctype##_##tag##_swap(ctype##_##tag* a, ctype##_##tag* b) { c_swap(ctype##_##tag, *a, *b); } \
 STC_API size_t \
 ctype##_##tag##_reserve(ctype##_##tag* self, size_t size); \
 STC_API bool \
@@ -206,9 +208,9 @@ typedef Value ctype##_##tag##_value_t
 #define implement_CHASH(tag, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                              keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
  STC_API ctype##_##tag \
-ctype##_##tag##_make(size_t initialSize) { \
+ctype##_##tag##_with_capacity(size_t cap) { \
     ctype##_##tag h = ctype##_init; \
-    ctype##_##tag##_reserve(&h, initialSize); \
+    ctype##_##tag##_reserve(&h, cap); \
     return h; \
 } \
 STC_API void \

@@ -43,38 +43,18 @@ int main() {
 #ifndef CBITSET__H__
 #define CBITSET__H__
 
-#include <string.h>
-#include <stdlib.h>
 #include <assert.h>
-#include "cdefs.h"
+#include "cstr.h"
 
 typedef struct { uint64_t* _arr; size_t size; } cbitset_t;
 
 #define cbitset_init {NULL, 0}
 
-STC_API void cbitset_resize(cbitset_t* self, size_t size, bool value);
+STC_API void   cbitset_resize(cbitset_t* self, size_t size, bool value);
 STC_API size_t cbitset_count(cbitset_t set);
-STC_API bool cbitset_is_disjoint(cbitset_t s, cbitset_t other);
-STC_API bool cbitset_is_subset(cbitset_t s, cbitset_t other);
-STC_API bool cbitset_is_superset(cbitset_t s, cbitset_t other);
-
-STC_INLINE void cbitset_set_all(cbitset_t *self, bool value);
-
-STC_INLINE cbitset_t cbitset_with_size(size_t size, bool value) {
-    cbitset_t set = {(uint64_t *) malloc(((size + 63) >> 6) * 8), size};
-    cbitset_set_all(&set, value);
-    return set;
-}
-STC_INLINE cbitset_t cbitset_clone(cbitset_t other) {
-    size_t bytes = ((other.size + 63) >> 6) * 8;
-    cbitset_t set = {(uint64_t *) memcpy(malloc(bytes), other._arr, bytes), other.size};
-    return set;
-}
-STC_INLINE void cbitset_destroy(cbitset_t* self) {
-    free(self->_arr);
-}
-
-STC_INLINE size_t cbitset_size(cbitset_t set) {return set.size;}
+STC_API bool   cbitset_is_disjoint(cbitset_t set, cbitset_t other);
+STC_API bool   cbitset_is_subset(cbitset_t set, cbitset_t other);
+STC_API bool   cbitset_is_superset(cbitset_t set, cbitset_t other);
 
 STC_INLINE void cbitset_set(cbitset_t *self, size_t i) {
     self->_arr[i >> 6] |= 1ull << (i & 63);
@@ -103,6 +83,35 @@ STC_INLINE void cbitset_flip_all(cbitset_t *self) {
     size_t n = (self->size + 63) >> 6;
     for (size_t i=0; i<n; ++i) self->_arr[i] ^= ~0ull;
 }
+
+
+STC_INLINE cbitset_t cbitset_with_size(size_t size, bool value) {
+    cbitset_t set = {(uint64_t *) malloc(((size + 63) >> 6) * 8), size};
+    cbitset_set_all(&set, value);
+    return set;
+}
+STC_INLINE cbitset_t cbitset_from_str(const char* str) {
+    const char* p = str; while (*p) ++p;
+    cbitset_t set = cbitset_with_size(p - str, false);
+    for (size_t i=0; i<set.size; ++i) if (str[i] == '1') cbitset_set(&set, i);
+    return set;
+}
+STC_INLINE cstr_t cbitset_to_str(cbitset_t set) {
+    cstr_t out = cstr_with_size(set.size, '0');
+    for (size_t i=0; i<set.size; ++i) if (cbitset_test(set, i)) out.str[i] = '1';
+    return out;
+}
+STC_INLINE cbitset_t cbitset_clone(cbitset_t other) {
+    size_t bytes = ((other.size + 63) >> 6) * 8;
+    cbitset_t set = {(uint64_t *) memcpy(malloc(bytes), other._arr, bytes), other.size};
+    return set;
+}
+STC_INLINE void cbitset_destroy(cbitset_t* self) {
+    free(self->_arr);
+}
+
+STC_INLINE size_t cbitset_size(cbitset_t set) {return set.size;}
+
 /* Intersection */
 STC_INLINE void cbitset_intersect_with(cbitset_t *self, cbitset_t other) {
     assert(self->size == other.size);
