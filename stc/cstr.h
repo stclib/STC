@@ -35,9 +35,6 @@ typedef struct cstr_t {
     char* str;
 } cstr_t;
 
-#define _cstr_rep(self)   (((size_t *) (self)->str) - 2)
-#define _cstr_size(s)     ((size_t *) (s).str)[-2]
-#define _cstr_mem(cap)    (sizeof(size_t) * (3 + (cap)/sizeof(size_t)))
 static size_t _cstr_nullrep[] = {0, 0, 0};
 
 static  cstr_t cstr_init =  {(char* ) &_cstr_nullrep[2]};
@@ -65,6 +62,11 @@ STC_API void
 cstr_erase(cstr_t* self, size_t pos, size_t n);
 STC_API char*
 cstr_strnstr(cstr_t s, size_t pos, const char* needle, size_t n);
+
+#define _cstr_rep(self) (((size_t *) (self)->str) - 2)
+#define _cstr_size(s)   ((size_t *) (s).str)[-2]
+#define _cstr_mem(cap)  ((3 + (cap) / sizeof(size_t)) * sizeof(size_t))
+#define _cstr_cap(cap)  ((1 + (cap) / sizeof(size_t)) * sizeof(size_t) - 1)
 
 STC_INLINE void
 cstr_destroy(cstr_t* self) {
@@ -207,10 +209,10 @@ STC_API void
 cstr_reserve(cstr_t* self, size_t cap) {
     size_t len = cstr_size(*self), oldcap = cstr_capacity(*self);
     if (cap > oldcap) {
-        size_t* rep = (size_t *) realloc(oldcap ? _cstr_rep(self) : c_nullptr, _cstr_mem(cap));
+        size_t* rep = (size_t *) realloc(oldcap ? _cstr_rep(self) : NULL, _cstr_mem(cap));
         self->str = (char *) (rep + 2);
         self->str[rep[0] = len] = '\0';
-        rep[1] = cap;
+        rep[1] = _cstr_cap(cap);
     }
 }
 
@@ -219,16 +221,16 @@ cstr_resize(cstr_t* self, size_t len, char fill) {
     size_t n = cstr_size(*self);
     cstr_reserve(self, len);
     if (len > n) memset(self->str + n, fill, len - n);
-    self->str[_cstr_size(*self) = len] = '\0';
+    if (len | n) self->str[_cstr_size(*self) = len] = '\0';
 }
 
 STC_API cstr_t
 cstr_make_n(const char* str, size_t len) {
     if (len == 0) return cstr_init;
     size_t *rep = (size_t *) malloc(_cstr_mem(len));
-    cstr_t s = {(char *) (rep + 2)};
-    memcpy(s.str, str, len);
-    s.str[rep[0] = rep[1] = len] = '\0';
+    cstr_t s = {(char *) memcpy(rep + 2, str, len)};
+    s.str[rep[0] = len] = '\0'; 
+    rep[1] = _cstr_cap(len);
     return s;
 }
 
@@ -237,7 +239,7 @@ cstr_from(const char* fmt, ...) {
     cstr_t tmp = cstr_init;
     va_list args;
     va_start(args, fmt);
-    int len = vsnprintf(c_nullptr, (size_t)0, fmt, args);
+    int len = vsnprintf(NULL, (size_t)0, fmt, args);
     if (len > 0) {
         tmp = cstr_with_capacity(len);
         vsprintf(tmp.str, fmt, args);
@@ -262,7 +264,7 @@ cstr_append_n(cstr_t* self, const char* str, size_t len) {
     if (len) {
         size_t oldlen = cstr_size(*self), newlen = oldlen + len;
         if (newlen > cstr_capacity(*self))
-            cstr_reserve(self, newlen * 5 / 3);
+            cstr_reserve(self, 5 + newlen * 3 / 2);
         memmove(&self->str[oldlen], str, len);
         self->str[_cstr_size(*self) = newlen] = '\0';
     }
@@ -274,7 +276,7 @@ STC_INLINE void _cstr_internal_move(cstr_t* self, size_t pos1, size_t pos2) {
         return;
     size_t len = cstr_size(*self), newlen = len + pos2 - pos1;
     if (newlen > cstr_capacity(*self))
-        cstr_reserve(self, newlen * 5 / 3);
+        cstr_reserve(self, 5 + newlen * 3 / 2);
     memmove(&self->str[pos2], &self->str[pos1], len - pos1);
     self->str[_cstr_size(*self) = newlen] = '\0';
 }
@@ -312,7 +314,7 @@ cstr_strnstr(cstr_t s, size_t pos, const char* needle, size_t n) {
     char *x = s.str + pos, /* haystack */
          *z = s.str + cstr_size(s) - n + 1;
     if (x >= z)
-        return c_nullptr;
+        return NULL;
     ptrdiff_t sum = 0;
     const char *y = x, *p = needle, *q = needle + n;
     while (p != q)
@@ -322,7 +324,7 @@ cstr_strnstr(cstr_t s, size_t pos, const char* needle, size_t n) {
             return x;
         sum += *y++ - *x++;
     }
-    return c_nullptr;
+    return NULL;
 }
 
 #endif

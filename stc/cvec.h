@@ -27,7 +27,7 @@
 #include <string.h>
 #include "cdefs.h"
 
-#define cvec_init           {c_nullptr}
+#define cvec_init           {NULL}
 #define cvec_size(cv)       _cvec_safe_size((cv).data)
 #define cvec_capacity(cv)   _cvec_safe_capacity((cv).data)
 #define cvec_empty(cv)      (_cvec_safe_size((cv).data) == 0)
@@ -113,12 +113,12 @@ typedef struct { \
 STC_INLINE cvec_##tag##_iter_t \
 cvec_##tag##_begin(cvec_##tag* vec) { \
     const size_t n = cvec_size(*vec); \
-    cvec_##tag##_iter_t it = {n ? vec->data : c_nullptr, vec->data + n}; \
+    cvec_##tag##_iter_t it = {n ? vec->data : NULL, vec->data + n}; \
     return it; \
 } \
 STC_INLINE cvec_##tag##_iter_t \
 cvec_##tag##_next(cvec_##tag##_iter_t it) { \
-    if (++it.item == it.end) it.item = c_nullptr; \
+    if (++it.item == it.end) it.item = NULL; \
     return it; \
 } \
  \
@@ -230,7 +230,7 @@ cvec_##tag##_sort(cvec_##tag* self) { \
 #define _cvec_capacity(cv) ((size_t *)(cv).data)[-1]
 
 STC_INLINE size_t* _cvec_alloced(void* data) {
-    return data ? ((size_t *) data) - 2 : c_nullptr;
+    return data ? ((size_t *) data) - 2 : NULL;
 }
 STC_INLINE size_t _cvec_safe_size(const void* data) {
     return data ? ((const size_t *) data)[-2] : 0;

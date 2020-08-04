@@ -81,10 +81,10 @@
         clist_##tag##_node_t *item, **_last; \
     } clist_##tag##_iter_t
 
-#define clist_init          {c_nullptr}
+#define clist_init          {NULL}
 #define clist_front(list)   (list).last->next->value
 #define clist_back(list)    (list).last->value
-#define clist_empty(list)   ((list).last == c_nullptr)
+#define clist_empty(list)   ((list).last == NULL)
 
 
 #define declare_clist_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
@@ -129,12 +129,12 @@
  \
     STC_INLINE clist_##tag##_iter_t \
     clist_##tag##_begin(clist_##tag* self) { \
-        clist_##tag##_node_t *head = self->last ? self->last->next : c_nullptr; \
+        clist_##tag##_node_t *head = self->last ? self->last->next : NULL; \
         clist_##tag##_iter_t it = {head, &self->last}; return it; \
     } \
     STC_INLINE clist_##tag##_iter_t \
     clist_##tag##_next(clist_##tag##_iter_t it) { \
-        it.item = it.item == *it._last ? c_nullptr : it.item->next; return it; \
+        it.item = it.item == *it._last ? NULL : it.item->next; return it; \
     } \
     STC_INLINE clist_##tag##_iter_t \
     clist_##tag##_last(clist_##tag* self) { \
@@ -206,14 +206,14 @@
                 return prev; \
             prev = i; \
         } \
-        prev.item = c_nullptr; \
+        prev.item = NULL; \
         return prev; \
     } \
  \
     STC_API Value* \
     clist_##tag##_find(clist_##tag* self, RawValue val) { \
         clist_##tag##_iter_t it = clist_##tag##_find_before(self, val); \
-        return it.item ? &it.item->next->value : c_nullptr; \
+        return it.item ? &it.item->next->value : NULL; \
     } \
  \
     STC_API clist_##tag##_iter_t \
@@ -246,7 +246,7 @@
 #define _clist_erase_after(self, tag, node, valueDestroy) \
     clist_##tag##_node_t* del = node->next, *next = del->next; \
     node->next = next; \
-    if (del == next) self->last = c_nullptr; \
+    if (del == next) self->last = NULL; \
     else if (self->last == del) self->last = node; \
     valueDestroy(&del->value); \
     free(del)
@@ -264,7 +264,7 @@ _clist_splice(clist_void* self, clist_void_iter_t pos, clist_void* other, bool b
         other->last->next = next;
         if (bottom && pos.item == self->last) self->last = other->last;
     }
-    other->last = c_nullptr;
+    other->last = NULL;
 }
 
 /* Singly linked list Mergesort implementation by Simon Tatham. O(n*log n).
@@ -274,12 +274,12 @@ STC_API clist_void_node_t *
 _clist_mergesort(clist_void_node_t *list, int (*cmp)(const void*, const void*)) {
     clist_void_node_t *p, *q, *e, *tail, *oldhead;
     int insize = 1, nmerges, psize, qsize, i;
-    if (!list) return c_nullptr;
+    if (!list) return NULL;
     
     while (1) {
         p = list;
         oldhead = list;
-        list = tail = c_nullptr;
+        list = tail = NULL;
         nmerges = 0;
 
         while (p) {
@@ -288,7 +288,7 @@ _clist_mergesort(clist_void_node_t *list, int (*cmp)(const void*, const void*)) 
             psize = 0;
             for (i = 0; i < insize; ++i) {
                 ++psize;
-                q = (q->next == oldhead ? c_nullptr : q->next);
+                q = (q->next == oldhead ? NULL : q->next);
                 if (!q) break;
             }
             qsize = insize;
@@ -296,16 +296,16 @@ _clist_mergesort(clist_void_node_t *list, int (*cmp)(const void*, const void*)) 
             while (psize > 0 || (qsize > 0 && q)) {
                 if (psize == 0) {
                     e = q; q = q->next; --qsize;
-                    if (q == oldhead) q = c_nullptr;
+                    if (q == oldhead) q = NULL;
                 } else if (qsize == 0 || !q) {
                     e = p; p = p->next; --psize;
-                    if (p == oldhead) p = c_nullptr;
+                    if (p == oldhead) p = NULL;
                 } else if (cmp(p, q) <= 0) {
                     e = p; p = p->next; --psize;
-                    if (p == oldhead) p = c_nullptr;
+                    if (p == oldhead) p = NULL;
                 } else {
                     e = q; q = q->next; --qsize;
-                    if (q == oldhead) q = c_nullptr;
+                    if (q == oldhead) q = NULL;
                 }
                 if (tail)
                     tail->next = e;
