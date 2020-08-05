@@ -8,7 +8,7 @@ int main() {
     int k, n = 100000;
     clist_fx list = clist_init;
     crandom_eng64_t eng = crandom_eng64_init(time(NULL));
-    crandom_uniform_f64_t dist = crandom_uniform_f64_init(0.0f, n);
+    crandom_distrib_f64_t dist = crandom_uniform_f64_init(0.0f, n);
     
     for (int i = 0; i < 100000; ++i)
         clist_fx_push_back(&list, crandom_uniform_f64(&eng, dist));

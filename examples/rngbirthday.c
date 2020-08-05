@@ -38,7 +38,7 @@ void distribution(void)
     const size_t N = 1ull << 28, M = 1ull << 9; // 1ull << 10;
     cmap_x map = cmap_x_with_capacity(M);
     clock_t now = clock();
-    crandom_uniform_i32_t dist = crandom_uniform_i32_init(0, M);
+    crandom_distrib_i32_t dist = crandom_uniform_i32_init(0, M);
     for (size_t i = 0; i < N; ++i) {
         ++cmap_x_insert(&map, crandom_uniform_i32(&rng, dist), 0)->value;
     }

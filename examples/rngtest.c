@@ -32,15 +32,15 @@ int main(void)
     difference = clock() - before;
     printf("sfc64: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
 
-    crandom_uniform_i32_t i32dist = crandom_uniform_i32_init(10, 20);
+    crandom_distrib_i32_t i32dist = crandom_uniform_i32_init(10, 20);
     for (int i=0; i<8; ++i) printf("%d ", crandom_uniform_i32(&pcg, i32dist));
     puts("");
 
-    crandom_uniform_f32_t f32dist = crandom_uniform_f32_init(10, 20);
+    crandom_distrib_f32_t f32dist = crandom_uniform_f32_init(10, 20);
     for (int i=0; i<8; ++i) printf("%f ", crandom_uniform_f32(&pcg, f32dist));
     puts("");
 
-    crandom_uniform_f64_t fdist = crandom_uniform_f64_init(10, 20);
+    crandom_distrib_f64_t fdist = crandom_uniform_f64_init(10, 20);
     for (int i=0; i<8; ++i) printf("%f ", crandom_uniform_f64(&sfc, fdist));
     puts("");
 }

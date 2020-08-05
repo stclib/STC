@@ -10,7 +10,7 @@ declare_cvec_pqueue(i, >); // min-heap (increasing values)
 
 int main() {
     crandom_eng32_t pcg = crandom_eng32_init(time(NULL));
-    crandom_uniform_i32_t dist = crandom_uniform_i32_init(0, 100000000);
+    crandom_distrib_i32_t dist = crandom_uniform_i32_init(0, 100000000);
     cvec_i heap = cvec_init;
 
     // Push ten million random numbers to priority queue
