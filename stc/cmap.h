@@ -336,6 +336,7 @@ ctype##_##tag##_erase_entry(ctype##_##tag* self, ctype##_##tag##_entry_t* entry)
     ctype##_##tag##_rawkey_t r; \
     if (! hashx[i]) \
         return false; \
+    ctype##_##tag##_entry_destroy(&slot[i]); \
     do { /* deletion from hash table without tombstone */ \
         if (++j == cap) j = 0; /* ++j; j %= cap; is slow */ \
         if (! hashx[j]) \
@@ -346,7 +347,6 @@ ctype##_##tag##_erase_entry(ctype##_##tag* self, ctype##_##tag##_entry_t* entry)
             slot[i] = slot[j], hashx[i] = hashx[j], i = j; \
     } while (true); \
     hashx[i] = 0; \
-    ctype##_##tag##_entry_destroy(&slot[i]); \
     --self->size; \
     return true; \
 } \
