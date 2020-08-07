@@ -12,7 +12,12 @@ int main(void)
 {
     clock_t difference, before;
     uint64_t v;
-    printf("start\n");
+    
+    crandom_eng64_t sfc = crandom_eng64_init(time(NULL));
+    crandom_distrib_i64_t d10 = crandom_uniform_i64_init(10, 20);
+    
+    for (int i=0; i<30; ++i) printf("%02zd ", crandom_uniform_i64(&sfc, d10)); 
+    puts("");
 
     crandom_eng32_t pcg = crandom_eng32_init(time(NULL));
     before = clock(); \
@@ -23,7 +28,6 @@ int main(void)
     difference = clock() - before;
     printf("pcg32: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
 
-    crandom_eng64_t sfc = crandom_eng64_init(time(NULL));
     before = clock(); \
     v = 0;
     for (size_t i=0; i<NN; i++) {

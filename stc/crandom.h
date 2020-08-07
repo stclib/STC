@@ -73,6 +73,7 @@ STC_INLINE float crandom_uniform_f32(crandom_eng32_t* rng, crandom_distrib_f32_t
 
 
 typedef struct {uint64_t state[4];} crandom_eng64_t;
+typedef struct {int64_t offset, range;} crandom_distrib_i64_t;
 typedef struct {double offset, range;} crandom_distrib_f64_t;
 
 /* 64 bit random number generator engine */
@@ -87,6 +88,21 @@ STC_API uint64_t crandom_i64(crandom_eng64_t* rng);
 STC_INLINE double crandom_f64(crandom_eng64_t* rng) {
     union {uint64_t i; double f;} u = {0x3FF0000000000000ull | (crandom_i64(rng) >> 12)};
     return u.f - 1.0;
+}
+
+/* int random number generator in range [low, high] */
+STC_INLINE crandom_distrib_i64_t crandom_uniform_i64_init(int64_t low, int64_t high) {
+    crandom_distrib_i64_t dist = {low, high - low + 1}; return dist;
+}
+STC_INLINE int64_t crandom_uniform_i64(crandom_eng64_t* rng, crandom_distrib_i64_t dist) {
+#if defined(__SIZEOF_INT128__)
+    return dist.offset + (int64_t) (((__uint128_t) crandom_i64(rng) * dist.range) >> 64);
+#elif defined(_MSC_VER)
+    int64_t hi; _mul128(crandom_i64(rng) >> 1, dist.range << 1, &hi); return dist.offset + hi;
+#else
+    return dist.offset + (((uint32_t) crandom_i64(rng) * dist.range) >> 32); // range up to 2^32
+    //return dist.offset + crandom_i64(rng) % dist.range; // slow
+#endif
 }
 
 STC_INLINE crandom_distrib_f64_t crandom_uniform_f64_init(double low, double high) {
