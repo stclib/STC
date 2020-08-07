@@ -62,8 +62,10 @@ cstr_strnstr(cstr_t s, const char* needle, size_t pos, size_t n);
 
 #define _cstr_rep(self) (((size_t *) (self)->str) - 2)
 #define _cstr_size(s)   ((size_t *) (s).str)[-2]
-#define _cstr_mem(cap)  ((3 + (cap) / sizeof(size_t)) * sizeof(size_t))
-#define _cstr_cap(cap)  ((1 + (cap) / sizeof(size_t)) * sizeof(size_t) - 1)
+/* match common malloc_usable_size() sequence: 24, 40, 56, ... */
+#define _cstr_mem(size)  ((((size) + 24) >> 4) * 16 + 8)
+/* gives true string capacity: 7, 23, 39, ... */
+#define _cstr_cap(size)  ((((size) + 24) >> 4) * 16 - 9)
 
 STC_INLINE void
 cstr_destroy(cstr_t* self) {
@@ -107,7 +109,7 @@ cstr_assign(cstr_t* self, const char* str) {
 }
 
 STC_INLINE cstr_t*
-cstr_copy(cstr_t* self, cstr_t s) {
+cstr_assign_s(cstr_t* self, cstr_t s) {
     return cstr_assign_n(self, s.str, cstr_size(s));
 }
 
@@ -263,7 +265,7 @@ cstr_append_n(cstr_t* self, const char* str, size_t len) {
     if (len) {
         size_t oldlen = cstr_size(*self), newlen = oldlen + len;
         if (newlen > cstr_capacity(*self))
-            cstr_reserve(self, 5 + newlen * 3 / 2);
+            cstr_reserve(self, newlen * 3 / 2);
         memmove(&self->str[oldlen], str, len);
         self->str[_cstr_size(*self) = newlen] = '\0';
     }
@@ -275,7 +277,7 @@ STC_INLINE void _cstr_internal_move(cstr_t* self, size_t pos1, size_t pos2) {
         return;
     size_t len = cstr_size(*self), newlen = len + pos2 - pos1;
     if (newlen > cstr_capacity(*self))
-        cstr_reserve(self, 5 + newlen * 3 / 2);
+        cstr_reserve(self, newlen * 3 / 2);
     memmove(&self->str[pos2], &self->str[pos1], len - pos1);
     self->str[_cstr_size(*self) = newlen] = '\0';
 }
