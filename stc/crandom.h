@@ -100,8 +100,7 @@ STC_INLINE int64_t crandom_uniform_i64(crandom_eng64_t* rng, crandom_distrib_i64
 #elif defined(_MSC_VER)
     int64_t hi; _mul128(crandom_i64(rng) >> 1, dist.range << 1, &hi); return dist.offset + hi;
 #else
-    return dist.offset + (((uint32_t) crandom_i64(rng) * dist.range) >> 32); // range up to 2^32
-    //return dist.offset + crandom_i64(rng) % dist.range; // slow
+    return dist.offset + crandom_i64(rng) % dist.range; // slower
 #endif
 }
 
