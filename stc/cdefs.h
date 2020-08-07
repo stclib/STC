@@ -59,7 +59,7 @@
 #define c_new(T)        ((T *) malloc(sizeof(T)))
 #define c_new_n(T, n)   ((T *) malloc(sizeof(T) * (n)))
 
-#define c_max_alloca    (1000)
+#define c_max_alloca    (512)
 #define c_swap(T, x, y) { T __t = x; x = y; y = __t; }
 #ifdef __cplusplus
 #define c_nullptr       nullptr

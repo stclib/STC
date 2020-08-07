@@ -23,13 +23,12 @@
 #ifndef CSTR__H__
 #define CSTR__H__
 
-#include <stdlib.h> /* alloca, malloc */
-#include <malloc.h>
+#include <stdlib.h> /* malloc */
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h> /* vsnprintf */
-
 #include "cdefs.h"
+
 
 typedef struct cstr_t {
     char* str;
@@ -283,7 +282,8 @@ STC_INLINE void _cstr_internal_move(cstr_t* self, size_t pos1, size_t pos2) {
 
 STC_API void
 cstr_replace_n(cstr_t* self, size_t pos, size_t len, const char* str, size_t n) {
-    char* xstr = (char *) memcpy(n > c_max_alloca ? malloc(n) : alloca(n), str, n);
+    char buf[c_max_alloca];
+    char* xstr = (char *) memcpy(n > c_max_alloca ? malloc(n) : buf, str, n);
     _cstr_internal_move(self, pos + len, pos + n);
     memcpy(&self->str[pos], xstr, n);
     if (n > c_max_alloca) free(xstr);
