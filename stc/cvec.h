@@ -28,11 +28,11 @@
 #include "cdefs.h"
 
 #define cvec_init           {NULL}
-#define cvec_size(cv)       _cvec_safe_size((cv).data)
-#define cvec_capacity(cv)   _cvec_safe_capacity((cv).data)
-#define cvec_empty(cv)      (_cvec_safe_size((cv).data) == 0)
-#define cvec_front(cv)      (cv).data[0]
-#define cvec_back(cv)       (cv).data[_cvec_size(cv) - 1] /* may have side effect */
+#define cvec_size(v)       _cvec_safe_size((v).data)
+#define cvec_capacity(v)   _cvec_safe_capacity((v).data)
+#define cvec_empty(v)      (_cvec_safe_size((v).data) == 0)
+#define cvec_front(v)      (v).data[0]
+#define cvec_back(v)       (v).data[_cvec_size(v) - 1] /* may have side effect */
 
 #define declare_cvec(...)   c_MACRO_OVERLOAD(declare_cvec, __VA_ARGS__)
 #define declare_cvec_2(tag, Value) \
@@ -128,9 +128,7 @@ cvec_##tag##_begin(cvec_##tag* vec) { \
     return it; \
 } \
 STC_INLINE void \
-cvec_##tag##_next(cvec_##tag##_iter_t* it) { \
-    ++it->item; \
-} \
+cvec_##tag##_next(cvec_##tag##_iter_t* it) { ++it->item; } \
  \
 implement_cvec_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw) \
 typedef Value cvec_##tag##_value_t, cvec_##tag##_input_t; \

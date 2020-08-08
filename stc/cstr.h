@@ -33,13 +33,19 @@
 typedef struct cstr_t {
     char* str;
 } cstr_t;
+typedef struct {
+    char *item, *end;
+} cstr_iter_t;
 
 static size_t _cstr_nullrep[] = {0, 0, 0};
 
-static  cstr_t cstr_init =  {(char* ) &_cstr_nullrep[2]};
-#define cstr_size(s)      ((const size_t *) (s).str)[-2]
-#define cstr_capacity(s)  ((const size_t *) (s).str)[-1]
-#define cstr_npos         ((size_t) (-1))
+static  cstr_t cstr_init = {(char* ) &_cstr_nullrep[2]};
+#define cstr_size(s)       ((const size_t *) (s).str)[-2]
+#define cstr_capacity(s)   ((const size_t *) (s).str)[-1]
+#define cstr_empty(s)      (cstr_size(s) == 0)
+#define cstr_front(s)      (s).str[0]
+#define cstr_back(s)       (s).str[_cstr_size(s) - 1] /* may have side effect */
+#define cstr_npos          ((size_t) (-1))
 
 STC_API cstr_t
 cstr_make_n(const char* str, size_t len);
@@ -79,14 +85,12 @@ cstr_with_capacity(size_t cap) {
     cstr_reserve(&s, cap);
     return s;
 }
-
 STC_INLINE cstr_t
 cstr_with_size(size_t len, char fill) {
     cstr_t s = cstr_init;
     cstr_resize(&s, len, fill);
     return s;
 }
-
 STC_INLINE cstr_t
 cstr_make(const char* str) {
     return cstr_make_n(str, strlen(str));
@@ -99,15 +103,20 @@ cstr_clone(cstr_t s) {
 
 STC_INLINE void
 cstr_clear(cstr_t* self) {
-    cstr_destroy(self);
-    *self = cstr_init;
+    self->str[_cstr_size(*self) = 0] = '\0';
 }
+
+STC_INLINE cstr_iter_t
+cstr_begin(cstr_t* self) {
+    cstr_iter_t it = {self->str, self->str + cstr_size(*self)}; return it;
+}
+STC_INLINE void
+cstr_next(cstr_iter_t* it) { ++it->item; }
 
 STC_INLINE cstr_t*
 cstr_assign(cstr_t* self, const char* str) {
     return cstr_assign_n(self, str, strlen(str));
 }
-
 STC_INLINE cstr_t*
 cstr_assign_s(cstr_t* self, cstr_t s) {
     return cstr_assign_n(self, s.str, cstr_size(s));
@@ -120,7 +129,6 @@ cstr_take(cstr_t* self, cstr_t s) {
     self->str = s.str;
     return self;
 }
-
 STC_INLINE cstr_t
 cstr_move(cstr_t* self) {
     cstr_t tmp = *self;
@@ -144,10 +152,7 @@ STC_INLINE void
 cstr_pop_back(cstr_t* self) {
     --_cstr_size(*self);
 }
-STC_INLINE char
-cstr_back(cstr_t s) {
-    return s.str[cstr_size(s) - 1];
-}
+
 STC_INLINE void
 cstr_insert_n(cstr_t* self, size_t pos, const char* str, size_t n) {
     cstr_replace_n(self, pos, 0, str, n);
@@ -163,10 +168,6 @@ cstr_replace(cstr_t* self, size_t pos, size_t len, const char* str) {
 
 /* readonly */
 
-STC_INLINE bool
-cstr_empty(cstr_t s) {
-    return cstr_size(s) == 0;
-}
 STC_INLINE bool
 cstr_equals(cstr_t s1, const char* str) {
     return strcmp(s1.str, str) == 0;
