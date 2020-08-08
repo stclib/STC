@@ -194,8 +194,8 @@ STC_API bool \
 ctype##_##tag##_erase(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey); \
 STC_API ctype##_##tag##_iter_t \
 ctype##_##tag##_begin(ctype##_##tag* map); \
-STC_API ctype##_##tag##_iter_t \
-ctype##_##tag##_next(ctype##_##tag##_iter_t it); \
+STC_API void \
+ctype##_##tag##_next(ctype##_##tag##_iter_t* it); \
  \
 implement_CHASH(tag, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                      keyDestroy, RawKey, keyToRaw, keyFromRaw) \
@@ -371,11 +371,10 @@ ctype##_##tag##_begin(ctype##_##tag* map) { \
     ctype##_##tag##_iter_t it = {e == end ? NULL : e, end, hx}; return it; \
 } \
  \
-STC_API ctype##_##tag##_iter_t \
-ctype##_##tag##_next(ctype##_##tag##_iter_t it) { \
-    do { ++it.item, ++it._hx; } while (it.item != it._end && !*it._hx); \
-    if (it.item == it._end) it.item = NULL; \
-    return it; \
+STC_API void \
+ctype##_##tag##_next(ctype##_##tag##_iter_t* it) { \
+    while (++it->item != it->_end && *++it->_hx == 0) ; \
+    if (it->item == it->_end) it->item = NULL; \
 }
 
 #else

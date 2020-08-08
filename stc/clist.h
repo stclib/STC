@@ -132,9 +132,9 @@
         clist_##tag##_node_t *head = self->last ? self->last->next : NULL; \
         clist_##tag##_iter_t it = {head, &self->last}; return it; \
     } \
-    STC_INLINE clist_##tag##_iter_t \
-    clist_##tag##_next(clist_##tag##_iter_t it) { \
-        it.item = it.item == *it._last ? NULL : it.item->next; return it; \
+    STC_INLINE void \
+    clist_##tag##_next(clist_##tag##_iter_t* it) { \
+        it->item = it->item == *it->_last ? NULL : it->item->next; \
     } \
     STC_INLINE clist_##tag##_iter_t \
     clist_##tag##_last(clist_##tag* self) { \
