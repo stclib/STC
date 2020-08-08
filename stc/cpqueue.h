@@ -77,9 +77,9 @@ STC_INLINE void \
 _cvec_##tag##_pqueue_sift_down(cvec_##tag##_value_t* arr, size_t i, size_t n) { \
     size_t r = i, c = i << 1; \
     while (c <= n) { \
-        if (c < n && cvec_##tag##_sort_compare(&arr[c], &arr[c + 1]) cmpOpr 0) \
+        if (c < n && cvec_##tag##_value_compare(&arr[c], &arr[c + 1]) cmpOpr 0) \
             ++c; \
-        if (cvec_##tag##_sort_compare(&arr[r], &arr[c]) cmpOpr 0) { \
+        if (cvec_##tag##_value_compare(&arr[r], &arr[c]) cmpOpr 0) { \
             cvec_##tag##_value_t t = arr[r]; arr[r] = arr[c]; arr[r = c] = t; \
         } else \
             return; \
@@ -108,7 +108,7 @@ cvec_##tag##_pqueue_push(cvec_##tag* self, cvec_##tag##_value_t value) { \
     cvec_##tag##_push_back(self, value); /* sift-up the value */ \
     size_t n = cvec_size(*self), c = n; \
     cvec_##tag##_value_t *arr = self->data - 1; \
-    for (; c > 1 && cvec_##tag##_sort_compare(&arr[c >> 1], &value) cmpOpr 0; c >>= 1) \
+    for (; c > 1 && cvec_##tag##_value_compare(&arr[c >> 1], &value) cmpOpr 0; c >>= 1) \
         arr[c] = arr[c >> 1]; \
     if (c != n) arr[c] = value; \
 } \

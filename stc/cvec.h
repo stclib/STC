@@ -45,7 +45,7 @@
                             declare_cvec_6(str, cstr_t, cstr_destroy, cstr_compare_raw, const char*, cstr_to_raw)
 
 
-#define declare_cvec_6(tag, Value, valueDestroy, valueCompareRaw, RawValue, valueGetRaw) \
+#define declare_cvec_6(tag, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw) \
  \
 typedef struct cvec_##tag { \
     Value* data; \
@@ -67,6 +67,8 @@ STC_API void \
 cvec_##tag##_erase(cvec_##tag* self, size_t pos, size_t size); \
 STC_API void \
 cvec_##tag##_sort(cvec_##tag* self); \
+STC_API void \
+cvec_##tag##_sort_with(cvec_##tag* self, int(*cmp)(const Value*, const Value*)); \
 STC_API size_t \
 cvec_##tag##_find(const cvec_##tag* self, RawValue rawValue); \
  \
@@ -120,14 +122,14 @@ cvec_##tag##_next(cvec_##tag##_iter_t* it) { \
     ++it->item; \
 } \
  \
-implement_cvec_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
+implement_cvec_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw) \
 typedef Value cvec_##tag##_value_t, cvec_##tag##_input_t; \
 typedef RawValue cvec_##tag##_rawvalue_t
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define implement_cvec_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
+#define implement_cvec_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw) \
  \
 STC_API void \
 cvec_##tag##_push_n(cvec_##tag *self, const Value in[], size_t size) { \
@@ -195,27 +197,29 @@ STC_API size_t \
 cvec_##tag##_find(const cvec_##tag* self, RawValue rawValue) { \
     const Value *p = self->data, *end = p + cvec_size(*self); \
     for (; p != end; ++p) { \
-        RawValue r = valueGetRaw(p); \
+        RawValue r = valueToRaw(p); \
         if (valueCompareRaw(&r, &rawValue) == 0) return p - self->data; \
     } \
     return SIZE_MAX; /*(size_t) (-1)*/ \
 } \
  \
 STC_API int \
-cvec_##tag##_sort_compare(const void* x, const void* y) { \
-    RawValue rx = valueGetRaw((const Value *) x); \
-    RawValue ry = valueGetRaw((const Value *) y); \
+cvec_##tag##_value_compare(const Value* x, const Value* y) { \
+    RawValue rx = valueToRaw(x); \
+    RawValue ry = valueToRaw(y); \
     return valueCompareRaw(&rx, &ry); \
 } \
-STC_EXTERN_IMPORT void qsort(void *base, size_t nitems, size_t size, int (*compar)(const void *, const void*)); \
 STC_API void \
 cvec_##tag##_sort(cvec_##tag* self) { \
-    size_t len = cvec_size(*self); \
-    if (len) qsort(self->data, len, sizeof(Value), cvec_##tag##_sort_compare); \
+    qsort(self->data, cvec_size(*self), sizeof(Value), (_cvec_cmp) cvec_##tag##_value_compare); \
+} \
+STC_API void \
+cvec_##tag##_sort_with(cvec_##tag* self, int(*cmp)(const Value*, const Value*)) { \
+    qsort(self->data, cvec_size(*self), sizeof(Value), (_cvec_cmp) cmp); \
 }
 
 #else
-#define implement_cvec_6(tag, Value, valueDestroy, valueCompareRaw, RawValue, valueGetRaw)
+#define implement_cvec_6(tag, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw)
 #endif
 
 #if defined(_WIN32) && defined(_DLL)
@@ -223,6 +227,9 @@ cvec_##tag##_sort(cvec_##tag* self) { \
 #else
 #define STC_EXTERN_IMPORT extern
 #endif
+
+typedef int(*_cvec_cmp)(const void*, const void*);
+STC_EXTERN_IMPORT void qsort(void *base, size_t nitems, size_t size, _cvec_cmp cmp);
 
 #define _cvec_size(cv) ((size_t *)(cv).data)[-2]
 #define _cvec_capacity(cv) ((size_t *)(cv).data)[-1]
