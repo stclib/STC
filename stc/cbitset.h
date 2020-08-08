@@ -171,12 +171,10 @@ STC_API void cbitset_resize(cbitset_t* self, size_t size, bool value) {
 #else
 /* http://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation */
 static inline uint64_t c_popcount64(uint64_t x) {
-    const uint64_t m1 = 0x5555555555555555, m2 = 0x3333333333333333,
-                   m4 = 0x0f0f0f0f0f0f0f0f, h01 = 0x0101010101010101;
-    x -= (x >> 1) & m1;
-    x = (x & m2) + ((x >> 2) & m2);
-    x = (x + (x >> 4)) & m4;
-    return (x * h01) >> 56;
+    x -= (x >> 1) & 0x5555555555555555;
+    x = (x & 0x3333333333333333) + ((x >> 2) & 0x3333333333333333);
+    x = (x + (x >> 4)) & 0x0f0f0f0f0f0f0f0f;
+    return (x * 0x0101010101010101) >> 56;
 }
 #endif
 
@@ -189,28 +187,18 @@ STC_API size_t cbitset_count(cbitset_t s) {
     return count;
 }
 
-#define _cbitset_SETOP(op) \
+#define _cbitset_SETOP(OPR) \
     if (s.size == 0) return false; /* ? */ \
     size_t n = ((s.size + 63) >> 6) - 1; \
     for (size_t i=0; i<n; ++i) \
-        if ((s._arr[i] op other._arr[i]) != s._arr[i]) \
+        if ((s._arr[i] OPR other._arr[i]) != s._arr[i]) \
             return false; \
     uint64_t m = (1ull << (s.size & 63)) - 1, last = s._arr[n] & m; \
-    return (last op (other._arr[n] & m)) == last
+    return (last OPR (other._arr[n] & m)) == last
 
-STC_API bool cbitset_is_disjoint(cbitset_t s, cbitset_t other) {
-    _cbitset_SETOP(^);
-}
-
-STC_API bool cbitset_is_subset(cbitset_t s, cbitset_t other) {
-    _cbitset_SETOP(|);
-}
-
-STC_API bool cbitset_is_superset(cbitset_t s, cbitset_t other) {
-    _cbitset_SETOP(&);
-}
-
+STC_API bool cbitset_is_disjoint(cbitset_t s, cbitset_t other) { _cbitset_SETOP(^); }
+STC_API bool cbitset_is_subset(cbitset_t s, cbitset_t other) { _cbitset_SETOP(|); }
+STC_API bool cbitset_is_superset(cbitset_t s, cbitset_t other) { _cbitset_SETOP(&); }
 
 #endif
-
 #endif

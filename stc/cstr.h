@@ -176,8 +176,8 @@ cstr_equals_s(cstr_t s1, cstr_t s2) {
     return strcmp(s1.str, s2.str) == 0;
 }
 STC_INLINE int
-cstr_compare(const void* s1, const void* s2) {
-    return strcmp(((const cstr_t*)s1)->str, ((const cstr_t*)s2)->str);
+cstr_compare(const cstr_t *s1, const cstr_t *s2) {
+    return strcmp(s1->str, s2->str);
 }
 STC_INLINE size_t
 cstr_find_n(cstr_t s, const char* needle, size_t pos, size_t n) {

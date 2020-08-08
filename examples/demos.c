@@ -54,22 +54,23 @@ void vectordemo1()
 
 
 
-declare_cvec(cs, cstr_t, cstr_destroy, cstr_compare); // supply inline destructor of values
+//declare_cvec(cs, cstr_t, cstr_destroy, cstr_compare); // supply inline destructor of values
+declare_cvec_str(); // supply inline destructor of values
 
 void vectordemo2()
 {
     printf("\nVECTORDEMO2\n");
-    cvec_cs names = cvec_init;
-    cvec_cs_push_back(&names, cstr_make("Mary"));
-    cvec_cs_push_back(&names, cstr_make("Joe"));
-    cvec_cs_push_back(&names, cstr_make("Chris"));
+    cvec_str names = cvec_init;
+    cvec_str_push_back(&names, cstr_make("Mary"));
+    cvec_str_push_back(&names, cstr_make("Joe"));
+    cvec_str_push_back(&names, cstr_make("Chris"));
     cstr_assign(&names.data[1], "Jane");      // replace Joe
     printf("names[1]: %s\n", names.data[1].str);
 
-    cvec_cs_sort(&names);                     // Sort the array
-    c_foreach (i, cvec_cs, names)
+    cvec_str_sort(&names);                     // Sort the array
+    c_foreach (i, cvec_str, names)
         printf("sorted: %s\n", i.item->str);
-    cvec_cs_destroy(&names);
+    cvec_str_destroy(&names);
 }
 
 declare_clist(ix, int); 
