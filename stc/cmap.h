@@ -82,9 +82,9 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
                          c_default_destroy, Key, c_default_to_raw, c_default_from_raw)
 
 #define declare_cmap_10(tag, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
-                             keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
+                             keyDestroy, RawKey, keyToRaw, keyFromRaw) \
     declare_CHASH(tag, cmap, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
-                       keyDestroy, RawKey, keyGetRaw, keyInitRaw)
+                       keyDestroy, RawKey, keyToRaw, keyFromRaw)
 
 /* cset: */
 #define declare_cset(...) \
@@ -101,9 +101,9 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
                         Key, c_default_to_raw, c_default_from_raw)
 
 #define declare_cset_8(tag, Key, keyEqualsRaw, keyHashRaw, keyDestroy, \
-                            RawKey, keyGetRaw, keyInitRaw) \
+                            RawKey, keyToRaw, keyFromRaw) \
     declare_CHASH(tag, cset, Key, Key, void, keyEqualsRaw, keyHashRaw, \
-                       keyDestroy, RawKey, keyGetRaw, keyInitRaw)
+                       keyDestroy, RawKey, keyToRaw, keyFromRaw)
 
 /* cset_str, cmap_str: */
 #define declare_cset_str() \
@@ -129,7 +129,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
 
 /* CHASH full: use 'void' for Value if ctype is cset */
 #define declare_CHASH(tag, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
-                           keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
+                           keyDestroy, RawKey, keyToRaw, keyFromRaw) \
 typedef struct { \
     Key key; \
     OPT_1_##ctype(Value value;) \
@@ -161,7 +161,7 @@ typedef struct { \
 } ctype##_##tag##_iter_t; \
  \
 STC_INLINE ctype##_##tag \
-ctype##_##tag##_init(void) {ctype##_##tag x = cmap_init; return x;} \
+ctype##_##tag##_init(void) {ctype##_##tag m = cmap_init; return m;} \
 STC_INLINE size_t \
 ctype##_##tag##_size(ctype##_##tag m) {return (size_t) m.size;} \
 STC_INLINE size_t \
@@ -198,7 +198,7 @@ STC_API ctype##_##tag##_iter_t \
 ctype##_##tag##_next(ctype##_##tag##_iter_t it); \
  \
 implement_CHASH(tag, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
-                     keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
+                     keyDestroy, RawKey, keyToRaw, keyFromRaw) \
 typedef Key ctype##_##tag##_key_t; \
 typedef Value ctype##_##tag##_value_t
 
@@ -206,7 +206,7 @@ typedef Value ctype##_##tag##_value_t
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define implement_CHASH(tag, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
-                             keyDestroy, RawKey, keyGetRaw, keyInitRaw) \
+                             keyDestroy, RawKey, keyToRaw, keyFromRaw) \
  STC_API ctype##_##tag \
 ctype##_##tag##_with_capacity(size_t cap) { \
     ctype##_##tag h = ctype##_init; \
@@ -246,7 +246,7 @@ ctype##_##tag##_bucket(const ctype##_##tag* self, const ctype##_##tag##_rawkey_t
     uint8_t* hashx = self->_hashx; \
     while ((sx = hashx[idx])) { \
         if (sx == hx) { \
-            ctype##_##tag##_rawkey_t r = keyGetRaw(&self->table[idx].key); \
+            ctype##_##tag##_rawkey_t r = keyToRaw(&self->table[idx].key); \
             if (keyEqualsRaw(&r, rawKeyPtr)) break; \
         } \
         if (++idx == cap) idx = 0; \
@@ -276,7 +276,7 @@ ctype##_##tag##_insert_key(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey)
     size_t idx = ctype##_##tag##_bucket(self, &rawKey, &hx); \
     struct ctype##_##tag##_result res = {&self->table[idx], !self->_hashx[idx]}; \
     if (res.inserted) { \
-        res.entry->key = keyInitRaw(rawKey); \
+        res.entry->key = keyFromRaw(rawKey); \
         self->_hashx[idx] = (uint8_t) hx; \
         ++self->size; \
     } \
@@ -318,7 +318,7 @@ ctype##_##tag##_reserve(ctype##_##tag* self, size_t newcap) { \
     uint32_t hx; \
     for (size_t i = 0; i < oldcap; ++i, ++e) \
         if (tmp._hashx[i]) { \
-            ctype##_##tag##_rawkey_t r = keyGetRaw(&e->key); \
+            ctype##_##tag##_rawkey_t r = keyToRaw(&e->key); \
             size_t idx = ctype##_##tag##_bucket(self, &r, &hx); \
             slot[idx] = *e, \
             hashx[idx] = (uint8_t) hx; \
@@ -341,7 +341,7 @@ ctype##_##tag##_erase_entry(ctype##_##tag* self, ctype##_##tag##_entry_t* entry)
         if (++j == cap) j = 0; /* ++j; j %= cap; is slow */ \
         if (! hashx[j]) \
             break; \
-        r = keyGetRaw(&slot[j].key); \
+        r = keyToRaw(&slot[j].key); \
         k = chash_reduce(keyHashRaw(&r, sizeof(ctype##_##tag##_rawkey_t)), cap); \
         if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */ \
             slot[i] = slot[j], hashx[i] = hashx[j], i = j; \
@@ -380,7 +380,7 @@ ctype##_##tag##_next(ctype##_##tag##_iter_t it) { \
 
 #else
 #define implement_CHASH(tag, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
-                             keyDestroy, RawKey, keyGetRaw, keyInitRaw)
+                             keyDestroy, RawKey, keyToRaw, keyFromRaw)
 #endif
 
 #endif
