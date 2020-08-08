@@ -175,7 +175,7 @@ STC_API void \
 cvec_##tag##_push_back(cvec_##tag* self, Value value) { \
     size_t len = cvec_size(*self); \
     if (len == cvec_capacity(*self)) \
-        cvec_##tag##_reserve(self, 5 + len * 5 / 3); \
+        cvec_##tag##_reserve(self, 4 + len * 3 / 2); \
     self->data[cvec_size(*self)] = value; \
     ++_cvec_size(*self); \
 } \
@@ -184,7 +184,7 @@ STC_API void \
 cvec_##tag##_insert(cvec_##tag* self, size_t pos, Value value) { \
     size_t len = cvec_size(*self); \
     if (len == cvec_capacity(*self)) \
-        cvec_##tag##_reserve(self, 5 + len * 5 / 3); \
+        cvec_##tag##_reserve(self, 4 + len * 3 / 2); \
     memmove(&self->data[pos + 1], &self->data[pos], (len - pos) * sizeof(Value)); \
     self->data[pos] = value; \
     ++_cvec_size(*self); \
