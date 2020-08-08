@@ -78,7 +78,7 @@
     } clist_##tag; \
  \
     typedef struct { \
-        clist_##tag##_node_t *item, **_last; \
+        clist_##tag##_node_t *item, *end, **_last; \
     } clist_##tag##_iter_t
 
 #define clist_init          {NULL}
@@ -130,7 +130,7 @@
     STC_INLINE clist_##tag##_iter_t \
     clist_##tag##_begin(clist_##tag* self) { \
         clist_##tag##_node_t *head = self->last ? self->last->next : NULL; \
-        clist_##tag##_iter_t it = {head, &self->last}; return it; \
+        clist_##tag##_iter_t it = {head, NULL, &self->last}; return it; \
     } \
     STC_INLINE void \
     clist_##tag##_next(clist_##tag##_iter_t* it) { \
@@ -138,7 +138,7 @@
     } \
     STC_INLINE clist_##tag##_iter_t \
     clist_##tag##_last(clist_##tag* self) { \
-        clist_##tag##_iter_t it = {self->last, &self->last}; return it; \
+        clist_##tag##_iter_t it = {self->last, NULL, &self->last}; return it; \
     } \
  \
     implement_clist_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
@@ -189,7 +189,7 @@
     STC_API void \
     clist_##tag##_splice_front(clist_##tag* self, clist_##tag* other) { \
         clist_void *s = (clist_void *) self; \
-        clist_void_iter_t last = {s->last, &s->last}; \
+        clist_void_iter_t last = {s->last, NULL, &s->last}; \
         _clist_splice(s, last, (clist_void *)other, false); \
     } \
     STC_API void \
@@ -199,7 +199,7 @@
  \
     STC_API clist_##tag##_iter_t \
     clist_##tag##_find_before(clist_##tag* self, RawValue val) { \
-        clist_##tag##_iter_t prev = {self->last, &self->last}; \
+        clist_##tag##_iter_t prev = {self->last, NULL, &self->last}; \
         c_foreach (i, clist_##tag, *self) { \
             RawValue r = valueGetRaw(&i.item->value); \
             if (valueCompareRaw(&r, &val) == 0) \

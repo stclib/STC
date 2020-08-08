@@ -79,7 +79,7 @@
 #define c_default_destroy(p)    ((void)0)
 
 #define c_foreach(it, prefix, container) \
-            for (prefix##_iter_t it = prefix##_begin(&container); it.item; prefix##_next(&it))
+            for (prefix##_iter_t it = prefix##_begin(&container); it.item != it.end; prefix##_next(&it))
 #define c_items(...) {__VA_ARGS__}
 #define c_push(container, prefix, items) do { \
     const prefix##_input_t __arr[] = items; \

@@ -156,7 +156,7 @@ typedef struct { \
 } ctype##_##tag; \
  \
 typedef struct { \
-    ctype##_##tag##_entry_t *item, *_end; \
+    ctype##_##tag##_entry_t *item, *end; \
     uint8_t* _hx; \
 } ctype##_##tag##_iter_t; \
  \
@@ -365,16 +365,14 @@ ctype##_##tag##_erase(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey) { \
  \
 STC_API ctype##_##tag##_iter_t \
 ctype##_##tag##_begin(ctype##_##tag* map) { \
-    uint8_t* hx = map->_hashx; \
-    ctype##_##tag##_entry_t* e = map->table, *end = e + map->bucket_count; \
-    while (e != end && !*hx) ++e, ++hx; \
-    ctype##_##tag##_iter_t it = {e == end ? NULL : e, end, hx}; return it; \
+    ctype##_##tag##_iter_t it = {map->table, map->table + map->bucket_count, map->_hashx}; \
+    while (it.item != it.end && *it._hx == 0) ++it.item, ++it._hx; \
+    return it; \
 } \
  \
 STC_API void \
 ctype##_##tag##_next(ctype##_##tag##_iter_t* it) { \
-    while (++it->item != it->_end && *++it->_hx == 0) ; \
-    if (it->item == it->_end) it->item = NULL; \
+    while (++it->item != it->end && *++it->_hx == 0) ; \
 }
 
 #else

@@ -107,18 +107,17 @@ cvec_##tag##_swap(cvec_##tag* a, cvec_##tag* b) { \
 } \
  \
 typedef struct { \
-    Value *item, *_end; \
+    Value *item, *end; \
 } cvec_##tag##_iter_t; \
  \
 STC_INLINE cvec_##tag##_iter_t \
 cvec_##tag##_begin(cvec_##tag* vec) { \
-    const size_t n = cvec_size(*vec); \
-    cvec_##tag##_iter_t it = {n ? vec->data : NULL, vec->data + n}; \
+    cvec_##tag##_iter_t it = {vec->data, vec->data + cvec_size(*vec)}; \
     return it; \
 } \
 STC_INLINE void \
 cvec_##tag##_next(cvec_##tag##_iter_t* it) { \
-    if (++it->item == it->_end) it->item = NULL; \
+    ++it->item; \
 } \
  \
 implement_cvec_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \

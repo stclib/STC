@@ -139,7 +139,7 @@ void mapdemo2()
     cmap_si_put(&nums, "Groovy", 200); // overwrite previous
 
     // iterate the map:
-    for (cmap_si_iter_t i = cmap_si_begin(&nums); i.item; cmap_si_next(&i))
+    for (cmap_si_iter_t i = cmap_si_begin(&nums); i.item != i.end; cmap_si_next(&i))
         printf("long: %s: %d\n", i.item->key.str, i.item->value);
 
     // or rather use the short form:
