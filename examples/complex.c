@@ -20,17 +20,17 @@ int main() {
         carray2f table = carray2f_make(ydim, xdim, 0.f);
         printf("table: (%zu, %zu)\n", carray2_ydim(table), carray2_xdim(table));
         clist_t2 tableList = clist_init;
+        // Put in some data.
         cmap_il listMap = cmap_init;
         
-        // Put in some data.
-        carray2f_data(table, y)[x] = 3.1415927; // table[y][x]
+        *carray2f_at(&table, y, x) = 3.1415927; // table[y][x]
         clist_t2_push_back(&tableList, table);
         cmap_il_put(&listMap, tableKey, tableList);
         cmap_sm_put(&theMap, strKey, listMap);
     }
     { // Access the data entry
         carray2f table = clist_back(cmap_il_find(&cmap_sm_find(&theMap, strKey)->value, tableKey)->value);
-        printf("value (%d, %d) is: %f\n", y, x, carray2f_value(table, y, x));
+        printf("value (%d, %d) is: %f\n", y, x, *carray2f_at(&table, y, x));
     }
 
     cmap_sm_destroy(&theMap); // free up the whole shebang!
