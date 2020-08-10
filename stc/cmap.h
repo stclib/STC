@@ -389,7 +389,7 @@ STC_API uint32_t  c_default_hash(const void *data, size_t len) {
 /* https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/ */
 STC_API uint32_t c_default_hash32(const void* data, size_t len) {
     const volatile uint32_t *key = (const uint32_t *) data;
-    uint32_t x = *key++ * 2654435769u;
+    uint64_t x = *key++ * 2654435769u;
     while (len -= 4) x ^= *key++ * 2654435769u;
     return x;
 }
