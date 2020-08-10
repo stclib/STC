@@ -379,31 +379,19 @@ ctype##_##tag##_next(ctype##_##tag##_iter_t* it) { \
     while (++it->item != it->end && *++it->_hx == 0) ; \
 }
 
-
-/* One-byte-at-a-time hash based on Murmur's mix */
-STC_API uint32_t c_default_hash(const void *data, size_t len) {
-    const volatile uint8_t *key = (const uint8_t *) data;
-    uint32_t x = UINT32_C(0xc613fc15);
-    while (len--) {
-        x ^= *key++;
-        x *= UINT32_C(0x5bd1e995);
-        x ^= x >> 15;
-    }
+STC_API uint32_t  c_default_hash(const void *data, size_t len) {
+    const volatile uint16_t *key = (const uint16_t *) data;
+    uint64_t x = 0xc613fc15u;
+    while (len -= 2) x = ((*key++ + x) * 2654435769u) >> 13;
     return x;
 }
 /* https://programmingpraxis.com/2018/06/19/fibonacci-hash */
 /* https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/ */
-STC_API uint32_t c_fibonacci_hash32(const void* data, size_t len) {
+STC_API uint32_t c_default_hash32(const void* data, size_t len) {
     const volatile uint32_t *key = (const uint32_t *) data;
     uint32_t x = *key++ * 2654435769u;
     while (len -= 4) x ^= *key++ * 2654435769u;
     return x;
-}
-STC_API uint32_t c_fibonacci_hash64(const void* data, size_t len) {
-    const volatile uint64_t *key = (const uint64_t *) data;
-    uint64_t x = *key++ * 11400714819323198485ull;
-    while (len -= 8) x ^= *key++ * 11400714819323198485ull;
-    return (uint32_t) x; // (x >> 13);
 }
 
 #else

@@ -15,11 +15,10 @@
 // Visual Studio: compile with -TP to force C++:  cl -TP -EHsc -O2 benchmark.c
 
 static inline uint32_t fibfast_hash(const void* data, size_t len) {
-    const uint64_t key = *(const uint64_t *) data;
-    return (uint32_t) (key * 11400714819323198485llu);
+    return (*(const uint64_t *) data) * 11400714819323198485llu;
 }
 
-declare_cmap(ii, int64_t, int64_t, c_default_destroy, c_default_equals, fibfast_hash); // c_fibonacci_hash64);
+declare_cmap(ii, int64_t, int64_t, c_default_destroy, c_default_equals, fibfast_hash); // c_default_hash32);
 
 KHASH_MAP_INIT_INT64(ii, uint64_t)
 
@@ -143,7 +142,7 @@ int main(int argc, char* argv[])
     printf("\nRandom keys are in range [0, 2^%d), seed = %zu:\n",  rr, seed);
     printf("\nUnordered maps: %zu repeats of Insert random key + try to remove a random key:\n", N1);
     MAP_TEST1(CMAP, ii)
-    MAP_TEST1(KMAP, ii)
+    //MAP_TEST1(KMAP, ii)
 #ifdef __cplusplus
     MAP_TEST1(UMAP, ii)
     MAP_TEST1(BMAP, ii)
@@ -153,7 +152,7 @@ int main(int argc, char* argv[])
 
     printf("\nUnordered maps: Insert %zu index keys, then remove them in same order:\n", N2);
     MAP_TEST2(CMAP, ii)
-    MAP_TEST2(KMAP, ii)
+    //MAP_TEST2(KMAP, ii)
 #ifdef __cplusplus
     MAP_TEST2(UMAP, ii)
     MAP_TEST2(BMAP, ii)
@@ -163,7 +162,7 @@ int main(int argc, char* argv[])
 
     printf("\nUnordered maps: Insert %zu random keys, then remove them in same order:\n", N3);
     MAP_TEST3(CMAP, ii)
-    MAP_TEST3(KMAP, ii)
+    //MAP_TEST3(KMAP, ii)
 #ifdef __cplusplus
     MAP_TEST3(UMAP, ii)
     MAP_TEST3(BMAP, ii)
