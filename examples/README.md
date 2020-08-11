@@ -24,8 +24,7 @@ typedef struct VikingVw {
 
 
 uint32_t vikingvw_hash(const VikingVw* vw, size_t ignore) {
-    uint32_t hash = c_default_hash(vw->name, strlen(vw->name))
-                  ^ c_default_hash(vw->country, strlen(vw->country));
+    uint32_t hash = c_string_hash(vw->name) ^ c_string_hash(w->country);
     return hash;
 }
 static inline int vikingvw_equals(const VikingVw* x, const VikingVw* y) {

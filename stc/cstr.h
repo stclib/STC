@@ -196,11 +196,15 @@ cstr_find(cstr_t s, const char* needle, size_t pos) {
 #define             cstr_to_raw(x) ((x)->str)
 #define             cstr_compare_raw(x, y) strcmp(*(x), *(y))
 #define             cstr_equals_raw(x, y) (strcmp(*(x), *(y)) == 0)
-STC_INLINE uint32_t cstr_hash_raw(const char* const* sPtr, size_t ignored) {
+
+STC_INLINE uint32_t c_string_hash(const char* str) {
     uint32_t hash = 5381, c; /* djb2 */
-    const char* tmp = *sPtr;
-    while ((c = *tmp++)) hash = ((hash << 5) + hash) ^ c;
+    while ((c = *str++)) hash = ((hash << 5) + hash) ^ c;
     return hash;    
+}
+
+STC_INLINE uint32_t cstr_hash_raw(const char* const* chr_pp, size_t ignored) {
+    return c_string_hash(*chr_pp);
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
@@ -239,15 +243,17 @@ cstr_make_n(const char* str, size_t len) {
 STC_API cstr_t
 cstr_from(const char* fmt, ...) {
     cstr_t tmp = cstr_init;
-    va_list args;
+    va_list args, args2;
     va_start(args, fmt);
+    va_copy(args2, args);
     int len = vsnprintf(NULL, (size_t)0, fmt, args);
+    va_end(args);
     if (len > 0) {
         tmp = cstr_with_capacity(len);
-        vsprintf(tmp.str, fmt, args);
+        vsprintf(tmp.str, fmt, args2);
         _cstr_size(tmp) = len;
     }
-    va_end(args);
+    va_end(args2);
     return tmp;
 }
 

@@ -75,7 +75,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
     declare_cmap_4(tag, Key, Value, c_default_destroy)
 
 #define declare_cmap_4(tag, Key, Value, valueDestroy) \
-    declare_cmap_6(tag, Key, Value, valueDestroy, c_default_equals, c_default_hash)
+    declare_cmap_6(tag, Key, Value, valueDestroy, c_default_equals, c_default_hash16)
 
 #define declare_cmap_6(tag, Key, Value, valueDestroy, keyEquals, keyHash) \
     declare_cmap_10(tag, Key, Value, valueDestroy, keyEquals, keyHash, \
@@ -91,7 +91,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
     c_MACRO_OVERLOAD(declare_cset, __VA_ARGS__)
 
 #define declare_cset_2(tag, Key) \
-    declare_cset_4(tag, Key, c_default_equals, c_default_hash)
+    declare_cset_4(tag, Key, c_default_equals, c_default_hash16)
 
 #define declare_cset_4(tag, Key, keyEquals, keyHash) \
     declare_cset_5(tag, Key, keyEquals, keyHash, c_default_destroy)
@@ -197,9 +197,8 @@ ctype##_##tag##_begin(ctype##_##tag* map); \
 STC_API void \
 ctype##_##tag##_next(ctype##_##tag##_iter_t* it); \
  \
-STC_API uint32_t c_default_hash(const void *data, size_t len); \
-STC_API uint32_t c_fibonacci_hash32(const void* data, size_t len); \
-STC_API uint32_t c_fibonacci_hash64(const void* data, size_t len); \
+STC_API uint32_t c_default_hash16(const void *data, size_t len); \
+STC_API uint32_t c_default_hash32(const void* data, size_t len); \
  \
 implement_CHASH(tag, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                      keyDestroy, RawKey, keyToRaw, keyFromRaw) \
@@ -379,14 +378,14 @@ ctype##_##tag##_next(ctype##_##tag##_iter_t* it) { \
     while (++it->item != it->end && *++it->_hx == 0) ; \
 }
 
-STC_API uint32_t  c_default_hash(const void *data, size_t len) {
+/* https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/ */
+
+STC_API uint32_t c_default_hash16(const void *data, size_t len) {
     const volatile uint16_t *key = (const uint16_t *) data;
     uint64_t x = 0xc613fc15u;
     while (len -= 2) x = ((*key++ + x) * 2654435769u) >> 13;
     return x;
 }
-/* https://programmingpraxis.com/2018/06/19/fibonacci-hash */
-/* https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/ */
 STC_API uint32_t c_default_hash32(const void* data, size_t len) {
     const volatile uint32_t *key = (const uint32_t *) data;
     uint64_t x = *key++ * 2654435769u;
