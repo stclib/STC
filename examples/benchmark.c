@@ -34,7 +34,7 @@ crandom_eng64_t rng;
                                     ; cmap_##tag##_set_load_factors(&map, max_load_factor, 0.0)
 #define CMAP_PUT(tag, key, val)     cmap_##tag##_put(&map, key, val)->value
 #define CMAP_ERASE(tag, key)        cmap_##tag##_erase(&map, key)
-#define CMAP_FIND(tag, key)         (cmap_##tag##_find(map, key) != c_nullptr)
+#define CMAP_FIND(tag, key)         (cmap_##tag##_find(map, key) != NULL)
 #define CMAP_SIZE(tag)              cmap_size(map)
 #define CMAP_BUCKETS(tag)           (map).bucket_count
 #define CMAP_CLEAR(tag)             cmap_##tag##_destroy(&map)
@@ -76,7 +76,7 @@ crandom_eng64_t rng;
 #define RMAP_FIND(tag, key)         (map.find(key) != map.end())
 #define RMAP_ERASE(tag, key)        map.erase(key)
 #define RMAP_SIZE(tag)              map.size()
-#define RMAP_BUCKETS(tag)           map.bucket_count()
+#define RMAP_BUCKETS(tag)           map.mask()
 #define RMAP_CLEAR(tag)             map.clear()
 
 const size_t N1 = 10000000 * 5;
