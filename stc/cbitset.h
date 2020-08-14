@@ -62,7 +62,7 @@ STC_INLINE void cbitset_set(cbitset_t *self, size_t i) {
 STC_INLINE void cbitset_reset(cbitset_t *self, size_t i) {
     self->_arr[i >> 6] &= ~(1ull << (i & 63));
 }
-STC_INLINE void cbitset_set_to(cbitset_t *self, size_t i, bool value) {
+STC_INLINE void cbitset_set_value(cbitset_t *self, size_t i, bool value) {
     value ? cbitset_set(self, i) : cbitset_reset(self, i);
 }
 STC_INLINE void cbitset_flip(cbitset_t *self, size_t i) {
@@ -83,7 +83,6 @@ STC_INLINE void cbitset_flip_all(cbitset_t *self) {
     size_t n = (self->size + 63) >> 6;
     for (size_t i=0; i<n; ++i) self->_arr[i] ^= ~0ull;
 }
-
 
 STC_INLINE cbitset_t cbitset_with_size(size_t size, bool value) {
     cbitset_t set = {(uint64_t *) malloc(((size + 63) >> 6) * 8), size};
@@ -146,6 +145,19 @@ STC_INLINE cbitset_t cbitset_xor(cbitset_t s1, cbitset_t s2) {
 STC_INLINE cbitset_t cbitset_not(cbitset_t s1) {
     cbitset_t set = cbitset_clone(s1);
     cbitset_flip_all(&set); return set;
+}
+
+typedef struct { cbitset_t *_bs; size_t pos; int *item, *end, _val; } cbitset_iter_t;
+STC_INLINE cbitset_iter_t
+cbitset_begin(cbitset_t* self) {
+    if (!self->size) { cbitset_iter_t it = {self, 0, NULL, NULL, 0}; return it; }
+    cbitset_iter_t it = {self, 0, &it._val, NULL, self->_arr[0] & 1};
+    return it;
+}
+STC_INLINE void
+cbitset_next(cbitset_iter_t* it) { 
+    if (++it->pos == it->_bs->size) it->item = NULL;
+    else *it->item = cbitset_test(*it->_bs, it->pos);
 }
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)

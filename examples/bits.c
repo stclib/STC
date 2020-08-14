@@ -20,7 +20,11 @@ int main() {
     cbitset_resize(&set, 77, true);
     cbitset_resize(&set, 93, false);
     cbitset_resize(&set, 102, true);
-    cbitset_set_to(&set, 99, false);
+    cbitset_set_value(&set, 99, false);
+    printf("%4zu: ", set.size);
+    c_foreach (i, cbitset, set)
+        printf("%d", *i.item);
+    puts("");        
     printf("%4zu: ", set.size);
     for (int i=0; i<set.size; ++i)
         printf("%d", cbitset_test(set, i));
