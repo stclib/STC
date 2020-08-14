@@ -147,17 +147,26 @@ STC_INLINE cbitset_t cbitset_not(cbitset_t s1) {
     cbitset_flip_all(&set); return set;
 }
 
-typedef struct { cbitset_t *_bs; size_t pos; int *item, *end, _val; } cbitset_iter_t;
+struct cbitset_iter;
+typedef bool(*cbitset_cb)(struct cbitset_iter);
+typedef struct cbitset_iter {
+    cbitset_t *_bs;
+    cbitset_cb item, end;
+    size_t pos;
+} cbitset_iter_t;
+
+STC_INLINE bool cbitset_item(cbitset_iter_t it) { 
+    return cbitset_test(*it._bs, it.pos);
+}
 STC_INLINE cbitset_iter_t
 cbitset_begin(cbitset_t* self) {
-    if (!self->size) { cbitset_iter_t it = {self, 0, NULL, NULL, 0}; return it; }
-    cbitset_iter_t it = {self, 0, &it._val, NULL, self->_arr[0] & 1};
+    if (self->size == 0) { cbitset_iter_t it = {NULL}; return it; }
+    cbitset_iter_t it = {self, &cbitset_item, NULL, 0};
     return it;
 }
 STC_INLINE void
 cbitset_next(cbitset_iter_t* it) { 
     if (++it->pos == it->_bs->size) it->item = NULL;
-    else *it->item = cbitset_test(*it->_bs, it->pos);
 }
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
