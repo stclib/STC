@@ -37,7 +37,7 @@ int NumOccurrences(const char* arr[], int n, const char* str, int L, int R)
         // If current string doesn't 
         // have an entry in the map 
         // then create the entry 
-        if (it == c_nullptr) { 
+        if (it == NULL) { 
             cvec_i A = cvec_init; 
             cvec_i_push_back(&A, i + 1);
             cmap_sv_put(&M, temp, A); 
@@ -51,7 +51,7 @@ int NumOccurrences(const char* arr[], int n, const char* str, int L, int R)
 
     // If the given string is not 
     // present in the array 
-    if (it == c_nullptr)
+    if (it == NULL)
         return 0; 
   
     // If the given string is present 

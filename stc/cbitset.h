@@ -188,6 +188,7 @@ STC_API size_t cbitset_count(cbitset_t s) {
 }
 
 #define _cbitset_SETOP(OPR) \
+    assert(s.size == other.size); \
     if (s.size == 0) return false; /* ? */ \
     size_t n = ((s.size + 63) >> 6) - 1; \
     for (size_t i=0; i<n; ++i) \

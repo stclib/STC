@@ -60,11 +60,11 @@
 #define c_new_n(T, n)   ((T *) malloc(sizeof(T) * (n)))
 
 #define c_max_alloca    (512)
-#define c_swap(T, x, y) { T __t = x; x = y; y = __t; }
+#define c_swap(T, x, y) do { T __t = x; x = y; y = __t; } while (0)
 #ifdef __cplusplus
-#define c_nullptr       nullptr
+#define c_NULL          nullptr
 #else
-#define c_nullptr       NULL
+#define c_NULL          NULL
 #endif
 
 #define c_default_from_raw(x)   (x)

@@ -152,7 +152,9 @@ int main()
 
 
 // C++ implementation of the approach 
-#include <bits/stdc++.h> 
+#include <unordered_map> 
+#include <vector> 
+#include <iostream>
 using namespace std; 
   
 // Function to return the count of common words 
