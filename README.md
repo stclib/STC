@@ -68,29 +68,52 @@ The library is very efficent. Containers have templated intrusive elements. One 
 ```
 Random keys are in range [0, 2^20):
 
+CMAP: size: 524580, buckets:   936089, time:  2.58, sum: 1250000025000000, erased 24740032
+KMAP: size: 524580, buckets:  2097152, time: 12.17, sum: 1250000025000000, erased 24740032
+UMAP: size: 524580, buckets:  1056323, time: 16.49, sum: 1250000025000000, erased 24740032
+BMAP: size: 524580, buckets:  1048576, time:  3.55, sum: 1250000025000000, erased 24740032
+FMAP: size: 524580, buckets:  1048576, time:  2.83, sum: 1250000025000000, erased 24740032
+RMAP: size: 524580, buckets:  1048575, time:  2.70, sum: 1250000025000000, erased 24740032
+
+Unordered maps: Insert 50000000 index keys, then remove them in same order:
+CMAP: size: 0, buckets: 80970233, time:  5.28, erased 50000000
+KMAP: size: 0, buckets: 67108864, time:  3.44, erased 50000000
+UMAP: size: 0, buckets: 74066549, time:  5.04, erased 50000000
+BMAP: size: 0, buckets: 67108864, time:  5.62, erased 50000000
+FMAP: size: 0, buckets: 67108864, time:  4.69, erased 50000000
+RMAP: size: 0, buckets: 67108863, time:  4.91, erased 50000000
+
+Unordered maps: Insert 100000000 random keys, then remove them in same order:
+CMAP: size: 0, buckets:  1404139, time:  2.66, erased 1048576
+KMAP: size: 0, buckets:  2097152, time:  6.40, erased 1048576
+UMAP: size: 0, buckets:  2144977, time: 16.00, erased 1048576
+BMAP: size: 0, buckets:  2097152, time:  5.27, erased 1048576
+FMAP: size: 0, buckets:  2097152, time:  3.40, erased 1048576
+RMAP: size: 0, buckets:  2097151, time:  3.93, erased 1048576
+
 Unordered maps: 50000000 repeats of insert a random key + (attemt to) remove another random key:
-CMAP: time:  2.49 sec
+CMAP: time:  2.58 sec
 KMAP: time: 11.80 sec
 UMAP: time: 16.07 sec
 BMAP: time:  3.54 sec
 FMAP: time:  2.79 sec
-RMAP: time:  5.96 sec
+RMAP: time:  2.70 sec
 
 Unordered maps: Insert 50000000 sequenced keys, then remove all in same order:
-CMAP: time: 5.16 sec
+CMAP: time: 5.28 sec
 KMAP: time: 3.34 sec
 UMAP: time: 4.91 sec
 BMAP: time: 5.37 sec
 FMAP: time: 4.51 sec
-RMAP: time: 5.14 sec
+RMAP: time: 4.91 sec
 
 Unordered maps: Insert 100000000 random keys, then remove all in same order:
-CMAP: time:  2.62 sec
+CMAP: time:  2.66 sec
 KMAP: time:  6.27 sec
 UMAP: time: 15.30 sec
 BMAP: time:  5.17 sec
 FMAP: time:  3.37 sec
-RMAP: time:  4.99 sec
+RMAP: time:  3.93 sec
 ```
 Memory efficiency
 -----------------
@@ -151,10 +174,9 @@ int main() {
     cstr_erase(&s1, 7, 5); // -nine
     printf("%s.\n", s1.str);
 
-    cstr_replace(&s1, 0, "seven", "four");
+    cstr_replace(&cs, cstr_find(cs, "seven", 0), 5, "four");
     printf("%s.\n", s1.str);
-    printf("find: %s\n", s1.str + cstr_find(s1, 0, "four"));
-
+    
     // reassign:
     cstr_assign(&s1, "one two three four five six seven");
     cstr_append(&s1, " eight");
