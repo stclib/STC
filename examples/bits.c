@@ -22,13 +22,14 @@ int main() {
     cbitset_resize(&set, 102, true);
     cbitset_set_value(&set, 99, false);
     printf("%4zu: ", set.size);
+    for (int i=0; i<set.size; ++i)
+        printf("%d", cbitset_test(set, i));
+
+    puts("\nIterator:");
+    printf("%4zu: ", set.size);
     c_foreach (i, cbitset, set)
         printf("%d", i.item(i));
     puts("");        
-    printf("%4zu: ", set.size);
-    for (int i=0; i<set.size; ++i)
-        printf("%d", cbitset_test(set, i));
-    puts("");
 
     cbitset_t s2 = cbitset_clone(set);
     cbitset_flip_all(&s2);

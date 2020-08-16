@@ -8,8 +8,12 @@ declare_cmap(id, int, cstr_t, cstr_destroy); // Map of int -> cstr_t
 declare_cmap_str(cnt, int);
 
 typedef struct {int x, y;} ipair_t;
-declare_cvec(ip, ipair_t, c_default_destroy, c_mem_compare);
-declare_clist(ip, ipair_t, c_default_destroy, c_mem_compare);
+inline static int ipair_compare(const ipair_t* a, const ipair_t* b) {
+    int c = c_default_compare(&a->x, &b->x);
+    return c != 0 ? c : c_default_compare(&a->y, &b->y);
+}
+declare_cvec(ip, ipair_t, c_default_destroy, ipair_compare);
+declare_clist(ip, ipair_t, c_default_destroy, ipair_compare);
 
 declare_cvec(f, float);
 declare_cvec_pqueue(f, >);
@@ -82,12 +86,12 @@ int main(void) {
 
     cvec_ip pairs1 = cvec_init; 
     c_push(&pairs1, cvec_ip, c_items(
-        {1, 2},
-        {3, 4},
         {5, 6},
+        {3, 4},
+        {1, 2},
         {7, 8},
     ));
-
+    cvec_ip_sort(&pairs1);
     c_foreach (i, cvec_ip, pairs1)
         printf("(%d %d) ", i.item->x, i.item->y);
     puts("");
@@ -97,12 +101,12 @@ int main(void) {
 
     clist_ip pairs2 = clist_init;
     c_push(&pairs2, clist_ip, c_items(
-        {1, 2},
-        {3, 4},
         {5, 6},
+        {3, 4},
+        {1, 2},
         {7, 8},
     ));
-
+    clist_ip_sort(&pairs2);
     c_foreach (i, clist_ip, pairs2)
         printf("(%d %d) ", i.item->value.x, i.item->value.y);
     puts("");

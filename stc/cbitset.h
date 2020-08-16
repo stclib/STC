@@ -147,13 +147,13 @@ STC_INLINE cbitset_t cbitset_not(cbitset_t s1) {
     cbitset_flip_all(&set); return set;
 }
 
-struct cbitset_iter;
-typedef bool(*cbitset_cb)(struct cbitset_iter);
-typedef struct cbitset_iter {
+typedef struct cbitset_iter cbitset_iter_t;
+typedef bool(*cbitset_cb)(cbitset_iter_t);
+struct cbitset_iter {
     cbitset_t *_bs;
     cbitset_cb item, end;
     size_t pos;
-} cbitset_iter_t;
+};
 
 STC_INLINE bool cbitset_item(cbitset_iter_t it) { 
     return cbitset_test(*it._bs, it.pos);
