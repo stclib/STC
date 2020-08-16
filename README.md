@@ -138,6 +138,12 @@ cmap_si_destroy(&map);
 An alternative is to use *char* * as key type, but then you must manage allcoated memory of the hash char* keys yourself.
 Note that this customization is also available for **cvec**, but only affects the *find()* function currently. See *declare_cvec_str()*.
 
+Finally, cmap mimics c++17 unordered_map::try_emplace() and avoids cstr memory leak if key already exists in this example:
+`
+declare_cmap_str(ss, cstr_t, cstr_destroy); // cstr_t -> cstr_t
+...
+cmap_try_emplace(&map, ss, "already here", cstr_make("won't be called then")); // special: tag 'ss' is a parameter here.
+`
 You may want to look at **examples/advanced.c**, it demonstrates how to use a custom struct as a hash map key, using the optional parameters to declare_cmap().
 
 Example usages
