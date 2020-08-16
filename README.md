@@ -69,28 +69,28 @@ The library is very efficent. Containers have templated intrusive elements. One 
 Random keys are in range [0, 2^20):
 
 Unordered maps: 50000000 repeats of insert a random key + (attemt to) remove another random key:
-CMAP: time:  2.49 sec
+CMAP: time:  2.58 sec
 KMAP: time: 11.80 sec
 UMAP: time: 16.07 sec
 BMAP: time:  3.54 sec
 FMAP: time:  2.79 sec
-RMAP: time:  5.96 sec
+RMAP: time:  2.70 sec
 
 Unordered maps: Insert 50000000 sequenced keys, then remove all in same order:
-CMAP: time: 5.16 sec
+CMAP: time: 5.28 sec
 KMAP: time: 3.34 sec
 UMAP: time: 4.91 sec
 BMAP: time: 5.37 sec
 FMAP: time: 4.51 sec
-RMAP: time: 5.14 sec
+RMAP: time: 4.91 sec
 
 Unordered maps: Insert 100000000 random keys, then remove all in same order:
-CMAP: time:  2.62 sec
+CMAP: time:  2.66 sec
 KMAP: time:  6.27 sec
 UMAP: time: 15.30 sec
 BMAP: time:  5.17 sec
 FMAP: time:  3.37 sec
-RMAP: time:  4.99 sec
+RMAP: time:  3.93 sec
 ```
 Memory efficiency
 -----------------
@@ -151,10 +151,9 @@ int main() {
     cstr_erase(&s1, 7, 5); // -nine
     printf("%s.\n", s1.str);
 
-    cstr_replace(&s1, 0, "seven", "four");
+    cstr_replace(&cs, cstr_find(cs, "seven", 0), 5, "four");
     printf("%s.\n", s1.str);
-    printf("find: %s\n", s1.str + cstr_find(s1, 0, "four"));
-
+    
     // reassign:
     cstr_assign(&s1, "one two three four five six seven");
     cstr_append(&s1, " eight");
