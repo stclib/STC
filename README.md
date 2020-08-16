@@ -65,7 +65,13 @@ Performance
 The library is very efficent. Containers have templated intrusive elements. One of the most performance critical containers is the **cmap / cset**. Luckily, cmap is among the fastest C/C++ map implementations available, see **examples/benchmark.c**
 
 Compiled with g++ v9.2.0 -O3 on windows, Ryzen 7 2700X CPU. Similar results with VC and clang.
-**CMAP**=*cmap*, KMAP=*khash*, **UMAP**=*std::unordered_map*, BMAP=*ska::bytell_hash_map*, FMAP=*ska::flat_hash_map*, RMAP=*robin_hood::unordered_map*
+
+- **CMAP**=stc/*cmap*
+- KMAP=klib/*khash*
+- UMAP=*std::unordered_map*
+- BMAP=*ska::bytell_hash_map*
+- FMAP=*ska::flat_hash_map*
+- RMAP=*robin_hood::unordered_map*
 ```
 Random keys are in range [0, 2^20):
 
