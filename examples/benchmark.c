@@ -133,6 +133,11 @@ int rr = RR;
     M##_CLEAR(); \
 }
 
+#ifndef __cplusplus
+#define RUN_TEST(n) MAP_TEST##n(CMAP) MAP_TEST##n(KMAP)
+#else
+#define RUN_TEST(n) MAP_TEST##n(CMAP) MAP_TEST##n(KMAP) MAP_TEST##n(UMAP) MAP_TEST##n(BMAP) MAP_TEST##n(FMAP) MAP_TEST##n(RMAP)
+#endif
 
 int main(int argc, char* argv[])
 {
@@ -140,32 +145,11 @@ int main(int argc, char* argv[])
     seed = time(NULL);
     printf("\nRandom keys are in range [0, 2^%d), seed = %zu:\n",  rr, seed);
     printf("\nUnordered maps: %zu repeats of Insert random key + try to remove a random key:\n", N1);
-    MAP_TEST1(CMAP)
-    MAP_TEST1(KMAP)
-#ifdef __cplusplus
-    MAP_TEST1(UMAP)
-    MAP_TEST1(BMAP)
-    MAP_TEST1(FMAP)
-    MAP_TEST1(RMAP)
-#endif
+    RUN_TEST(1)
 
     printf("\nUnordered maps: Insert %zu index keys, then remove them in same order:\n", N2);
-    MAP_TEST2(CMAP)
-    MAP_TEST2(KMAP)
-#ifdef __cplusplus
-    MAP_TEST2(UMAP)
-    MAP_TEST2(BMAP)
-    MAP_TEST2(FMAP)
-    MAP_TEST2(RMAP)
-#endif
+    RUN_TEST(2)
 
     printf("\nUnordered maps: Insert %zu random keys, then remove them in same order:\n", N3);
-    MAP_TEST3(CMAP)
-    MAP_TEST3(KMAP)
-#ifdef __cplusplus
-    MAP_TEST3(UMAP)
-    MAP_TEST3(BMAP)
-    MAP_TEST3(FMAP)
-    MAP_TEST3(RMAP)
-#endif
+    RUN_TEST(3)
 }
