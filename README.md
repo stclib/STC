@@ -304,19 +304,18 @@ declare_carray(f, float);
 
 int main()
 {
-    carray3f a3 = carray3f_make(30, 20, 10, 0.f);
-    carray3f_data(a3, 5, 4)[3] = 10.2f; // a3[5][4][3]
-    carray2f a2 = carray3f_at(a3, 5);   // sub-array reference (no data copy).
+    carray3f a3 = carray3f_make(30, 20, 10, 0.0f);  // define a3[30][20][10], init with 0.0f.
+    *carray3f_at(a3, 5, 4, 3) = 3.14f;         // a3[5][4][3] = 3.14
 
-    printf("%f\n", carray2f_value(a2, 4, 3));    // readonly lookup a2[4][3] (=10.2f)
-    printf("%f\n", carray2f_data(a2, 4)[3]);     // same, but this is writable.
-    printf("%f\n", carray2f_at(a2, 4).data[3]);  // same, via sub-array access.
+    carray1f a1 = carray3f_at2(a3, 5, 4);      // sub-array a3[5][4] (no data copy).    
+    carray2f a2 = carray3f_at1(a3, 5);         // sub-array a3[5]
     
-    printf("%f\n", carray3f_value(a3, 5, 4, 3)); // same data location, via a3 array.
-    printf("%f\n", carray3f_data(a3, 5, 4)[3]);
-    printf("%f\n", carray3f_at2(a3, 5, 4).data[3]);
-    
-    carray2f_destroy(&a2); // does nothing, since it is a sub-array.
-    carray3f_destroy(&a3); // also invalidates a2.
+    printf("%f\n", *carray2f_at(a1, 3));       // a1[3] (3.14f)
+    printf("%f\n", *carray2f_at(a2, 4, 3));    // a2[4][3] (3.14f)
+    printf("%f\n", *carray3f_at(a3, 5, 4, 3)); // a3[5][4][3] (3.14f)
+    // ...
+    carray2f_destroy(&a1); // does nothing, since it is a sub-array.
+    carray2f_destroy(&a2); // likewise.
+    carray3f_destroy(&a3); // free array, and invalidates a1, a2.
 }
 ```
