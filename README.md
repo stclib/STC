@@ -109,10 +109,10 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 - **cset**: Same as cmap, but this uses a table of keys only, not (key, value) pairs.
 - **carray**: carray1, carray2 and carray3. Type size: One pointer plus one, two, or three size_t variables to store dimensions. Arrays are allocated as one contiguous block of heap memory.
 
-cmap, cset and cvec discussion
-------------------------------
+cmap discussion
+---------------
 
-**cmap/cset** are the most complex of the containers (although, currently only ~380 lines of code). It uses open hashing, but does not rely on power-of-two size table, nor prime number lengths, and it does not have tombstone buckets. It is still among the fastest hash-tables, as shown above. The default max load-factor is 0.85, and it shrinks (and rehashes) when load-factor goes below 0.15, by default (can be set per hash container).
+**cmap/cset** are the most complex of the containers (although, currently only ~400 lines of code). It uses open hashing, but does not rely on power-of-two size table, nor prime number lengths, and it does not have tombstone buckets. It is still among the fastest hash-tables, as shown above. The default max load-factor is 0.85, and it shrinks (and rehashes) when load-factor goes below 0.15, by default (can be set per hash container).
 
 You can customize the destroy-, hash- and equals- function. **cmap/cset** also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is very useful when e.g. having cstr as key, as it enables the usage of string literals as key in *put() and find()* functions, instead of requering a constructed cstr. Without it, the code would become: 
 ```
@@ -208,6 +208,8 @@ int main() {
     cstr_assign(&names.data[1], cstr_make("Jake")); // replace Joe
 
     printf("%s\n", names.data[1].str); // Access the string char*
+    c_foreach (i, cvec_str, names)
+        printf("item %s\n", i.item->str);
     cvec_str_destroy(&names);
 }
 ```
