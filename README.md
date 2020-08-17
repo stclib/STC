@@ -205,7 +205,7 @@ int main() {
     cvec_str names = cvec_init;
     cvec_str_push_back(&names, cstr_make("Mary"));
     cvec_str_push_back(&names, cstr_make("Joe"));
-    cstr_assign(&names.data[1], cstr_make("Jake")); // replace Joe
+    cstr_assign(&names.data[1], "Jake"); // replace "Joe".
 
     printf("%s\n", names.data[1].str); // Access the string char*
     c_foreach (i, cvec_str, names)
@@ -246,7 +246,7 @@ int main() {
     cset_str_destroy(&words);
 }
 ```
-**cmap** of *cstr -> cstr*. Temporary cstr values are created by *cstr_make()*, and moved into the container
+**cmap** of *cstr -> cstr*. cstr keys are created internally via *cstr_make()* from const char* key input.
 ```
 #include <stc/cstr.h>
 #include <stc/cmap.h>
