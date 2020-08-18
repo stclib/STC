@@ -164,7 +164,7 @@ int main() {
     cstr_erase(&s1, 7, 5); // -nine
     printf("%s.\n", s1.str);
 
-    cstr_replace(&cs, cstr_find(cs, "seven", 0), 5, "four");
+    cstr_replace(&cs, cstr_find(&cs, "seven"), 5, "four");
     printf("%s.\n", s1.str);
     
     // reassign:

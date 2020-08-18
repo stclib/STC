@@ -17,13 +17,13 @@ void stringdemo1()
     cstr_erase(&cs, 7, 5); // -nine
     printf("%s.\n", cs.str);
 
-    cstr_replace(&cs, cstr_find(cs, "seven", 0), 5, "four");
+    cstr_replace(&cs, cstr_find(&cs, "seven"), 5, "four");
     printf("%s.\n", cs.str);
 
     cstr_take(&cs, cstr_from("%s *** %s", cs.str, cs.str));
     printf("%s.\n", cs.str);
 
-    printf("find: %s\n", cs.str + cstr_find(cs, "four", 0));
+    printf("find \"four\": %s\n", cs.str + cstr_find(&cs, "four"));
 
     // reassign:
     cstr_assign(&cs, "one two three four five six seven");

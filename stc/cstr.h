@@ -64,7 +64,7 @@ cstr_replace_n(cstr_t* self, size_t pos, size_t len, const char* str, size_t n);
 STC_API void
 cstr_erase(cstr_t* self, size_t pos, size_t n);
 STC_API char*
-cstr_strnstr(cstr_t s, const char* needle, size_t pos, size_t n);
+c_strnstr(const char* s, const char* needle, size_t n);
 
 #define _cstr_rep(self) (((size_t *) (self)->str) - 2)
 #define _cstr_size(s)   ((size_t *) (s).str)[-2]
@@ -117,10 +117,6 @@ STC_INLINE cstr_t*
 cstr_assign(cstr_t* self, const char* str) {
     return cstr_assign_n(self, str, strlen(str));
 }
-STC_INLINE cstr_t*
-cstr_assign_s(cstr_t* self, cstr_t s) {
-    return cstr_assign_n(self, s.str, cstr_size(s));
-}
 
 STC_INLINE cstr_t*
 cstr_take(cstr_t* self, cstr_t s) {
@@ -141,16 +137,12 @@ cstr_append(cstr_t* self, const char* str) {
     return cstr_append_n(self, str, strlen(str));
 }
 STC_INLINE cstr_t*
-cstr_append_s(cstr_t* self, cstr_t s) {
-    return cstr_append_n(self, s.str, cstr_size(s));
-}
-STC_INLINE cstr_t*
 cstr_push_back(cstr_t* self, char value) {
     return cstr_append_n(self, &value, 1);
 }
 STC_INLINE void
 cstr_pop_back(cstr_t* self) {
-    --_cstr_size(*self);
+    self->str[ --_cstr_size(*self) ] = '\0';
 }
 
 STC_INLINE void
@@ -181,14 +173,14 @@ cstr_compare(const cstr_t *s1, const cstr_t *s2) {
     return strcmp(s1->str, s2->str);
 }
 STC_INLINE size_t
-cstr_find_n(cstr_t s, const char* needle, size_t pos, size_t n) {
-    char* res = cstr_strnstr(s, needle, pos, n);
-    return res ? res - s.str : cstr_npos;
+cstr_find_n(const cstr_t* s, const char* needle, size_t pos, size_t n) {
+    char* res = c_strnstr(s->str + pos, needle, n);
+    return res ? res - s->str : cstr_npos;
 }
 STC_INLINE size_t
-cstr_find(cstr_t s, const char* needle, size_t pos) {
-    char* res = strstr(s.str + pos, needle);
-    return res ? res - s.str : cstr_npos;
+cstr_find(const cstr_t* s, const char* needle) {
+    char* res = strstr(s->str, needle);
+    return res ? res - s->str : cstr_npos;
 }
 
 /* cvec/cmap API functions: */
@@ -308,18 +300,15 @@ cstr_erase(cstr_t* self, size_t pos, size_t n) {
 }
 
 STC_API char*
-cstr_strnstr(cstr_t s, const char* needle, size_t pos, size_t n) {
-    char *x = s.str + pos, /* haystack */
-         *z = s.str + cstr_size(s) - n + 1;
-    if (x >= z)
-        return NULL;
+c_strnstr(const char* x, const char* needle, size_t n) {
     ptrdiff_t sum = 0;
     const char *y = x, *p = needle, *q = needle + n;
-    while (p != q)
+    while (*y && *p && p != q) {
         sum += *y++ - *p++;
-    while (x != z) {
-        if (sum == 0 && memcmp(x, needle, n) == 0)
-            return x;
+    }
+    while (*y) {
+        if (sum == 0 && strncmp(x, needle, n) == 0)
+            return (char *) x;
         sum += *y++ - *x++;
     }
     return NULL;
