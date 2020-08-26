@@ -182,7 +182,7 @@
     } \
     STC_API void \
     clist_##tag##_push_n(clist_##tag *self, const clist_##tag##_input_t in[], size_t size) { \
-        for (size_t i=0; i<size; ++i) clist_##tag##_push_back(self, in[i]); \
+        for (size_t i=0; i<size; ++i) clist_##tag##_push_back(self, valueFromRaw(in[i])); \
     } \
     STC_API void \
     clist_##tag##_pop_front(clist_##tag* self) { \
