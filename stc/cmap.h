@@ -55,9 +55,11 @@ int main(void) {
 
 #define cmap_init                     {NULL, NULL, 0, 0, 0.85f, 0.15f}
 #define cmap_size(m)                  ((size_t) (m).size)
+#define cmap_bucket_count(m)          ((size_t) (m).bucket_count)
 #define cset_init                     cmap_init
 #define cset_size(s)                  cmap_size(s)
-#define cmap_try_emplace(self, tag, k, v) do { \
+#define cset_bucket_count(s)          cmap_bucket_count(s)
+#define cmap_try_emplace(tag, self, k, v) do { \
     struct cmap_##tag##_result __r = cmap_##tag##_insert_key(self, k); \
     if (__r.inserted) __r.entry->value = v; \
 } while (false)
@@ -299,7 +301,7 @@ ctype##_##tag##_put(ctype##_##tag* self, OPT_2_##ctype(ctype##_##tag##_rawkey_t 
 STC_API ctype##_##tag##_entry_t* \
 ctype##_##tag##_insert(ctype##_##tag* self, OPT_2_##ctype(ctype##_##tag##_rawkey_t rawKey, Value value)) { \
     struct ctype##_##tag##_result res = ctype##_##tag##_insert_key(self, rawKey); \
-    OPT_1_##ctype( if (res.inserted) res.entry->value = value; ) \
+    OPT_1_##ctype( if (res.inserted) res.entry->value = value; else valueDestroy(&value); ) \
     return res.entry; \
 } \
  \
@@ -310,12 +312,12 @@ ctype##_##tag##_reserve(ctype##_##tag* self, size_t newcap) { \
     newcap = (size_t) (newcap / self->max_load_factor) | 1; \
     ctype##_##tag tmp = { \
         c_new_n(ctype##_##tag##_entry_t, newcap), \
-        (uint8_t *) calloc(newcap, sizeof(uint8_t)), \
+        (uint8_t *) calloc(newcap + 1, sizeof(uint8_t)), \
         self->size, (uint32_t) newcap, \
         self->max_load_factor, self->shrink_limit_factor \
     }; \
     /* Rehash: */ \
-    c_swap(ctype##_##tag, *self, tmp); \
+    tmp._hashx[newcap] = 0xff; c_swap(ctype##_##tag, *self, tmp); \
     ctype##_##tag##_entry_t* e = tmp.table, *slot = self->table; \
     uint8_t* hashx = self->_hashx; \
     uint32_t hx; \
@@ -375,7 +377,7 @@ ctype##_##tag##_begin(ctype##_##tag* map) { \
  \
 STC_API void \
 ctype##_##tag##_next(ctype##_##tag##_iter_t* it) { \
-    while (++it->item != it->end && *++it->_hx == 0) ; \
+    while ((++it->item, *++it->_hx == 0)) ; \
 }
 
 /* https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/ */
@@ -383,14 +385,14 @@ ctype##_##tag##_next(ctype##_##tag##_iter_t* it) { \
 STC_API uint32_t c_default_hash16(const void *data, size_t len) {
     const volatile uint16_t *key = (const uint16_t *) data;
     uint64_t x = 0xc613fc15u;
-    while (len -= 2) x = ((*key++ + x) * 2654435769u) >> 13;
+    while (len -= 2) x = ((*key++ + x) * 2654435769ull) >> 13;
     return (uint32_t) x;
 }
 STC_API uint32_t c_default_hash32(const void* data, size_t len) {
     const volatile uint32_t *key = (const uint32_t *) data;
-    uint64_t x = *key++ * 2654435769u;
-    while (len -= 4) x ^= *key++ * 2654435769u;
-    return (uint32_t) x;
+    uint64_t x = *key++ * 2654435769ull;
+    while (len -= 4) x ^= *key++ * 2654435769ull;
+    return (uint32_t) (x >> 24);
 }
 
 #else

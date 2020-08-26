@@ -142,7 +142,7 @@ Finally, cmap mimics c++17 unordered_map::try_emplace() and avoids cstr memory l
 ```
 declare_cmap_str(ss, cstr_t, cstr_destroy); // cstr_t -> cstr_t
 ...
-cmap_try_emplace(&map, ss, "already here", cstr_make("won't be called then")); // special: tag 'ss' is a parameter here.
+cmap_try_emplace(ss, &map, "already here", cstr_make("won't be called then")); // note: tag 'ss' is a parameter here.
 ```
 You may want to look at **examples/advanced.c**, it demonstrates how to use a custom struct as a hash map key, using the optional parameters to declare_cmap().
 

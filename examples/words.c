@@ -9,7 +9,7 @@ declare_clist_str();
 declare_cmap_str(si, int);
 
 typedef const char* input_t;
- 
+
 int main1()
 {
     clist_str lwords = clist_init;
@@ -17,11 +17,7 @@ int main1()
         "this", "sentence", "is", "not", "a", "sentence",
         "this", "sentence", "is", "a", "hoax"
     ));
-    c_foreach (w, clist_str, lwords) {
-        printf("%s\n", w.item->value);
-    }
-    
-    
+
     cvec_str words = cvec_init;
     c_push(&words, cvec_str, c_items(
         "this", "sentence", "is", "not", "a", "sentence",
@@ -32,7 +28,7 @@ int main1()
     c_foreach (w, cvec_str, words) {
         ++cmap_si_insert(&word_map, w.item->str, 0)->value;
     }
- 
+
     c_foreach (pair, cmap_si, word_map) {
         printf("%d occurrences of word '%s'\n",
                pair.item->value,
@@ -56,12 +52,12 @@ int main2()
         "this", "sentence", "is", "not", "a", "sentence",
         "this", "sentence", "is", "a", "hoax" 
     };
- 
+
     std::unordered_map<std::string, size_t>  word_map;
     for (const auto &w : words) {
         ++word_map[w];
     }
- 
+
     for (const auto &pair : word_map) {
         std::cout << pair.second
                   << " occurrences of word '"

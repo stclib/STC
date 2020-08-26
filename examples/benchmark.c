@@ -11,6 +11,8 @@
 #include "others/bytell_hash_map.hpp"
 #include "others/robin_hood.hpp"
 #include "others/hopscotch_map.h"
+#include "others/sparsepp/spp.h"
+template<typename C> inline void destroy_me(C& c) { C().swap(c); }
 #endif
 
 // Visual Studio: compile with -TP to force C++:  cl -TP -EHsc -O2 benchmark.c
@@ -35,59 +37,90 @@ crandom_eng64_t rng;
 #define CMAP_SETUP(tt, Key, Value) cmap_##tt map = cmap_init \
                                     ; cmap_##tt##_set_load_factors(&map, max_load_factor, 0.0)
 #define CMAP_PUT(tt, key, val)     cmap_##tt##_put(&map, key, val)->value
+#define CMAP_INSERT(tt, key, val)  cmap_##tt##_insert(&map, key, val)
+#define CMAP_EMPLACE(tt, key, val) cmap_try_emplace(tt, &map, key, val)
 #define CMAP_ERASE(tt, key)        cmap_##tt##_erase(&map, key)
 #define CMAP_FIND(tt, key)         (cmap_##tt##_find(map, key) != NULL)
 #define CMAP_SIZE(tt)              cmap_size(map)
-#define CMAP_BUCKETS(tt)           (map).bucket_count
-#define CMAP_CLEAR(tt)             cmap_##tt##_destroy(&map)
+#define CMAP_BUCKETS(tt)           cmap_bucket_count(map)
+#define CMAP_CLEAR(tt)             cmap_##tt##_clear(&map)
+#define CMAP_DTOR(tt)              cmap_##tt##_destroy(&map)
 
 #define KMAP_SETUP(tt, Key, Value) khash_t(ii)* map = kh_init(ii); khiter_t ki; int ret
 #define KMAP_PUT(tt, key, val)     (*(ki = kh_put(ii, map, key, &ret), map->vals[ki] = val, &map->vals[ki]))
+#define KMAP_INSERT(tt, key, val)  (ki = kh_put(ii, map, key, &ret), ret ? (map->vals[ki] = val) : val)
 #define KMAP_ERASE(tt, key)        ((ki = kh_get(ii, map, key)) != kh_end(map) ? kh_del(ii, map, ki), 1 : 0)
 #define KMAP_FIND(tt, key)         (kh_get(ii, map, key) != kh_end(map))
 #define KMAP_SIZE(tt)              kh_size(map)
 #define KMAP_BUCKETS(tt)           kh_n_buckets(map)
-#define KMAP_CLEAR(tt)             kh_destroy(ii, map)
+#define KMAP_CLEAR(tt)             kh_clear(ii, map)
+#define KMAP_DTOR(tt)              kh_destroy(ii, map)
 
 #define UMAP_SETUP(tt, Key, Value) std::unordered_map<Key, Value> map; map.max_load_factor(max_load_factor)
 #define UMAP_PUT(tt, key, val)     (map[key] = val)
+#define UMAP_INSERT(tt, key, val)  map.insert(std::make_pair(key, val))
+#define UMAP_EMPLACE(tt, key, val) map.emplace(key, val)
 #define UMAP_FIND(tt, key)         (map.find(key) != map.end())
 #define UMAP_ERASE(tt, key)        map.erase(key)
 #define UMAP_SIZE(tt)              map.size()
 #define UMAP_BUCKETS(tt)           map.bucket_count()
 #define UMAP_CLEAR(tt)             map.clear()
+#define UMAP_DTOR(tt)              destroy_me(map)
 
 #define BMAP_SETUP(tt, Key, Value) ska::bytell_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
-#define BMAP_PUT(tt, key, val)     (map[key] = val)
-#define BMAP_FIND(tt, key)         (map.find(key) != map.end())
-#define BMAP_ERASE(tt, key)        map.erase(key)
-#define BMAP_SIZE(tt)              map.size()
-#define BMAP_BUCKETS(tt)           map.bucket_count()
-#define BMAP_CLEAR(tt)             map.clear()
+#define BMAP_PUT(tt, key, val)     UMAP_PUT(tt, key, val)
+#define BMAP_INSERT(tt, key, val)  UMAP_INSERT(tt, key, val)
+#define BMAP_EMPLACE(tt, key, val) UMAP_EMPLACE(tt, key, val)
+#define BMAP_FIND(tt, key)         UMAP_FIND(tt, key)
+#define BMAP_ERASE(tt, key)        UMAP_ERASE(tt, key)
+#define BMAP_SIZE(tt)              UMAP_SIZE(tt)
+#define BMAP_BUCKETS(tt)           UMAP_BUCKETS(tt)
+#define BMAP_CLEAR(tt)             UMAP_CLEAR(tt)
+#define BMAP_DTOR(tt)              UMAP_DTOR(tt)
 
 #define FMAP_SETUP(tt, Key, Value) ska::flat_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
-#define FMAP_PUT(tt, key, val)     (map[key] = val)
-#define FMAP_FIND(tt, key)         (map.find(key) != map.end())
-#define FMAP_ERASE(tt, key)        map.erase(key)
-#define FMAP_SIZE(tt)              map.size()
-#define FMAP_BUCKETS(tt)           map.bucket_count()
-#define FMAP_CLEAR(tt)             map.clear()
+#define FMAP_PUT(tt, key, val)     UMAP_PUT(tt, key, val)
+#define FMAP_INSERT(tt, key, val)  UMAP_INSERT(tt, key, val)
+#define FMAP_EMPLACE(tt, key, val) UMAP_EMPLACE(tt, key, val)
+#define FMAP_FIND(tt, key)         UMAP_FIND(tt, key)
+#define FMAP_ERASE(tt, key)        UMAP_ERASE(tt, key)
+#define FMAP_SIZE(tt)              UMAP_SIZE(tt)
+#define FMAP_BUCKETS(tt)           UMAP_BUCKETS(tt)
+#define FMAP_CLEAR(tt)             UMAP_CLEAR(tt)
+#define FMAP_DTOR(tt)              UMAP_DTOR(tt)
 
 #define HMAP_SETUP(tt, Key, Value) tsl::hopscotch_map<Key, Value> map; map.max_load_factor(max_load_factor)
-#define HMAP_PUT(tt, key, val)     (map[key] = val)
-#define HMAP_FIND(tt, key)         (map.find(key) != map.end())
-#define HMAP_ERASE(tt, key)        map.erase(key)
-#define HMAP_SIZE(tt)              map.size()
-#define HMAP_BUCKETS(tt)           map.bucket_count()
-#define HMAP_CLEAR(tt)             map.clear()
+#define HMAP_PUT(tt, key, val)     UMAP_PUT(tt, key, val)
+#define HMAP_INSERT(tt, key, val)  UMAP_INSERT(tt, key, val)
+#define HMAP_EMPLACE(tt, key, val) UMAP_EMPLACE(tt, key, val)
+#define HMAP_FIND(tt, key)         UMAP_FIND(tt, key)
+#define HMAP_ERASE(tt, key)        UMAP_ERASE(tt, key)
+#define HMAP_SIZE(tt)              UMAP_SIZE(tt)
+#define HMAP_BUCKETS(tt)           UMAP_BUCKETS(tt)
+#define HMAP_CLEAR(tt)             UMAP_CLEAR(tt)
+#define HMAP_DTOR(tt)              UMAP_DTOR(tt)
 
 #define RMAP_SETUP(tt, Key, Value) robin_hood::unordered_map<Key, Value> map
-#define RMAP_PUT(tt, key, val)     (map[key] = val)
-#define RMAP_FIND(tt, key)         (map.find(key) != map.end())
-#define RMAP_ERASE(tt, key)        map.erase(key)
-#define RMAP_SIZE(tt)              map.size()
+#define RMAP_PUT(tt, key, val)     UMAP_PUT(tt, key, val)
+#define RMAP_INSERT(tt, key, val)  UMAP_INSERT(tt, key, val)
+#define RMAP_EMPLACE(tt, key, val) UMAP_EMPLACE(tt, key, val)
+#define RMAP_FIND(tt, key)         UMAP_FIND(tt, key)
+#define RMAP_ERASE(tt, key)        UMAP_ERASE(tt, key)
+#define RMAP_SIZE(tt)              UMAP_SIZE(tt)
 #define RMAP_BUCKETS(tt)           map.mask()
-#define RMAP_CLEAR(tt)             map.clear()
+#define RMAP_CLEAR(tt)             UMAP_CLEAR(tt)
+#define RMAP_DTOR(tt)              UMAP_DTOR(tt)
+
+#define SMAP_SETUP(tt, Key, Value) spp::sparse_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
+#define SMAP_PUT(tt, key, val)     UMAP_PUT(tt, key, val)
+#define SMAP_INSERT(tt, key, val)  UMAP_INSERT(tt, key, val)
+#define SMAP_EMPLACE(tt, key, val) UMAP_EMPLACE(tt, key, val)
+#define SMAP_FIND(tt, key)         UMAP_FIND(tt, key)
+#define SMAP_ERASE(tt, key)        UMAP_ERASE(tt, key)
+#define SMAP_SIZE(tt)              UMAP_SIZE(tt)
+#define SMAP_BUCKETS(tt)           UMAP_BUCKETS(tt)
+#define SMAP_CLEAR(tt)             UMAP_CLEAR(tt)
+#define SMAP_DTOR(tt)              UMAP_DTOR(tt)
 
 const size_t N1 = 10000000 * 5;
 const size_t N2 = 10000000 * 5;
@@ -145,9 +178,9 @@ int rr = RR;
 }
 
 #ifndef __cplusplus
-#define RUN_TEST(n) MAP_TEST##n(CMAP, ii) // MAP_TEST##n(KMAP, ii)
+#define RUN_TEST(n) MAP_TEST##n(CMAP, ii) MAP_TEST##n(KMAP, ii)
 #else
-#define RUN_TEST(n) MAP_TEST##n(CMAP, ii) MAP_TEST##n(KMAP, ii) MAP_TEST##n(UMAP, ii) \
+#define RUN_TEST(n) MAP_TEST##n(CMAP, ii) MAP_TEST##n(KMAP, ii) MAP_TEST##n(UMAP, ii) MAP_TEST##n(SMAP, ii) \
                     MAP_TEST##n(BMAP, ii) MAP_TEST##n(FMAP, ii) MAP_TEST##n(RMAP, ii) MAP_TEST##n(HMAP, ii)
 #endif
 
