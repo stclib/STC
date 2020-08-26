@@ -360,9 +360,8 @@ STC_API bool \
 ctype##_##tag##_erase(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey) { \
     if (self->size == 0) \
         return false; \
-    size_t cap = self->bucket_count; \
-    if (self->size < cap * self->shrink_limit_factor && cap * sizeof(ctype##_##tag##_entry_t) > 1024) \
-        ctype##_##tag##_reserve(self, self->size * 6 / 5); \
+    if (self->size < self->bucket_count * self->shrink_limit_factor && self->bucket_count * sizeof(ctype##_##tag##_entry_t) > 1024) \
+        ctype##_##tag##_reserve(self, (size_t) (self->size * 1.2f / self->max_load_factor)); \
     uint32_t hx; \
     size_t i = ctype##_##tag##_bucket(self, &rawKey, &hx); \
     return ctype##_##tag##_erase_entry(self, self->table + i); \
@@ -371,7 +370,7 @@ ctype##_##tag##_erase(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey) { \
 STC_API ctype##_##tag##_iter_t \
 ctype##_##tag##_begin(ctype##_##tag* map) { \
     ctype##_##tag##_iter_t it = {map->table, map->table + map->bucket_count, map->_hashx}; \
-    while (it.item != it.end && *it._hx == 0) ++it.item, ++it._hx; \
+    if (it._hx) while (*it._hx == 0) ++it.item, ++it._hx; \
     return it; \
 } \
  \
