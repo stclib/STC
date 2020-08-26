@@ -234,6 +234,13 @@ cstr_make_n(const char* str, size_t len) {
 
 STC_API cstr_t
 cstr_from(const char* fmt, ...) {
+    #if defined(__clang__)
+    #  pragma clang diagnostic push
+    #  pragma clang diagnostic ignored "-Wdeprecated-declarations"
+    #elif defined(_MSC_VER)
+    #  pragma warning(push)
+    #  pragma warning(disable: 4996)
+    #endif
     cstr_t tmp = cstr_init;
     va_list args, args2;
     va_start(args, fmt);
@@ -247,6 +254,11 @@ cstr_from(const char* fmt, ...) {
     }
     va_end(args2);
     return tmp;
+    #if defined(__clang__)
+    #  pragma clang diagnostic pop
+    #elif defined(_MSC_VER)
+    #  pragma warning(push)
+    #endif
 }
 
 STC_API cstr_t*

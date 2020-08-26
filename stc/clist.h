@@ -63,9 +63,9 @@
 #define declare_clist_3(tag, Value, valueDestroy) \
                                declare_clist_4(tag, Value, valueDestroy, c_default_compare)
 #define declare_clist_4(tag, Value, valueDestroy, valueCompare) \
-                               declare_clist_6(tag, Value, valueDestroy, Value, valueCompare, c_default_to_raw)
+                               declare_clist_7(tag, Value, valueDestroy, Value, valueCompare, c_default_to_raw, c_default_from_raw)
 #define declare_clist_str() \
-                               declare_clist_6(str, cstr_t, cstr_destroy, const char*, cstr_compare_raw, cstr_to_raw)
+                               declare_clist_7(str, cstr_t, cstr_destroy, const char*, cstr_compare_raw, cstr_to_raw, cstr_make)
 
 #define declare_clist_types(tag, Value) \
     typedef struct clist_##tag##_node { \
@@ -87,9 +87,11 @@
 #define clist_empty(list)   ((list).last == NULL)
 
 
-#define declare_clist_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
+#define declare_clist_7(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
  \
     declare_clist_types(tag, Value); \
+    typedef RawValue clist_##tag##_rawvalue_t; \
+    typedef clist_##tag##_rawvalue_t clist_##tag##_input_t; \
  \
     STC_INLINE clist_##tag \
     clist_##tag##_init(void) {clist_##tag x = clist_init; return x;} \
@@ -99,14 +101,26 @@
     clist_##tag##_clear(clist_##tag* self) {clist_##tag##_destroy(self);} \
     STC_API void \
     clist_##tag##_push_back(clist_##tag* self, Value value); \
+    STC_INLINE void \
+    clist_##tag##_push_back_raw(clist_##tag* self, RawValue rawValue) { \
+        clist_##tag##_push_back(self, valueFromRaw(rawValue)); \
+    } \
     STC_API void \
     clist_##tag##_push_front(clist_##tag* self, Value value); \
+    STC_INLINE void \
+    clist_##tag##_push_front_raw(clist_##tag* self, RawValue rawValue) { \
+        clist_##tag##_push_front(self, valueFromRaw(rawValue)); \
+    } \
     STC_API void \
-    clist_##tag##_push_n(clist_##tag *self, const Value in[], size_t size); \
+    clist_##tag##_push_n(clist_##tag *self, const clist_##tag##_input_t in[], size_t size); \
     STC_API void \
     clist_##tag##_pop_front(clist_##tag* self); \
     STC_API void \
     clist_##tag##_insert_after(clist_##tag* self, clist_##tag##_iter_t pos, Value value); \
+    STC_INLINE void \
+    clist_##tag##_insert_after_raw(clist_##tag* self, clist_##tag##_iter_t pos, RawValue rawValue) { \
+        clist_##tag##_push_back(self, valueFromRaw(rawValue)); \
+    } \
     STC_API void \
     clist_##tag##_erase_after(clist_##tag* self, clist_##tag##_iter_t pos); \
     STC_API void \
@@ -141,15 +155,14 @@
         clist_##tag##_iter_t it = {self->last, NULL, &self->last}; return it; \
     } \
  \
-    implement_clist_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
-    typedef RawValue clist_##tag##_rawvalue_t; \
-    typedef Value clist_##tag##_value_t, clist_##tag##_input_t
+    implement_clist_7(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
+    typedef Value clist_##tag##_value_t
 
     
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define implement_clist_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw) \
+#define implement_clist_7(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
   \
     STC_API void \
     clist_##tag##_destroy(clist_##tag* self) { \
@@ -168,7 +181,7 @@
         if (!self->last) self->last = entry; \
     } \
     STC_API void \
-    clist_##tag##_push_n(clist_##tag *self, const Value in[], size_t size) { \
+    clist_##tag##_push_n(clist_##tag *self, const clist_##tag##_input_t in[], size_t size) { \
         for (size_t i=0; i<size; ++i) clist_##tag##_push_back(self, in[i]); \
     } \
     STC_API void \
@@ -201,7 +214,7 @@
     clist_##tag##_find_before(clist_##tag* self, RawValue val) { \
         clist_##tag##_iter_t prev = {self->last, NULL, &self->last}; \
         c_foreach (i, clist_##tag, *self) { \
-            RawValue r = valueGetRaw(&i.item->value); \
+            RawValue r = valueToRaw(&i.item->value); \
             if (valueCompareRaw(&r, &val) == 0) \
                 return prev; \
             prev = i; \
@@ -225,8 +238,8 @@
  \
     static inline int \
     clist_##tag##_sort_compare(const void* x, const void* y) { \
-        RawValue a = valueGetRaw(&((clist_##tag##_node_t *) x)->value); \
-        RawValue b = valueGetRaw(&((clist_##tag##_node_t *) y)->value); \
+        RawValue a = valueToRaw(&((clist_##tag##_node_t *) x)->value); \
+        RawValue b = valueToRaw(&((clist_##tag##_node_t *) y)->value); \
         return valueCompareRaw(&a, &b); \
     } \
     STC_API void \
@@ -325,7 +338,7 @@ _clist_mergesort(clist_void_node_t *list, int (*cmp)(const void*, const void*)) 
 }
 
 #else
-#define implement_clist_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueGetRaw)
+#define implement_clist_7(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw)
 #endif
 
 #endif

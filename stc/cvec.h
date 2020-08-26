@@ -40,16 +40,18 @@
 #define declare_cvec_3(tag, Value, valueDestroy) \
                             declare_cvec_4(tag, Value, valueDestroy, c_default_compare)
 #define declare_cvec_4(tag, Value, valueDestroy, valueCompare) \
-                            declare_cvec_6(tag, Value, valueDestroy, valueCompare, Value, c_default_to_raw)
+                            declare_cvec_7(tag, Value, valueDestroy, valueCompare, Value, c_default_to_raw, c_default_from_raw)
 #define declare_cvec_str() \
-                            declare_cvec_6(str, cstr_t, cstr_destroy, cstr_compare_raw, const char*, cstr_to_raw)
+                            declare_cvec_7(str, cstr_t, cstr_destroy, cstr_compare_raw, const char*, cstr_to_raw, cstr_make)
 
 
-#define declare_cvec_6(tag, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw) \
+#define declare_cvec_7(tag, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw) \
  \
 typedef struct cvec_##tag { \
     Value* data; \
 } cvec_##tag; \
+typedef RawValue cvec_##tag##_rawvalue_t; \
+typedef cvec_##tag##_rawvalue_t cvec_##tag##_input_t; \
  \
 STC_API void \
 cvec_##tag##_destroy(cvec_##tag* self); \
@@ -58,11 +60,19 @@ cvec_##tag##_reserve(cvec_##tag* self, size_t cap); \
 STC_API void \
 cvec_##tag##_resize(cvec_##tag* self, size_t size, Value null_val); \
 STC_API void \
-cvec_##tag##_push_n(cvec_##tag *self, const Value in[], size_t size); \
+cvec_##tag##_push_n(cvec_##tag *self, const cvec_##tag##_input_t in[], size_t size); \
 STC_API void \
 cvec_##tag##_push_back(cvec_##tag* self, Value value); \
+STC_INLINE void \
+cvec_##tag##_push_back_raw(cvec_##tag* self, cvec_##tag##_rawvalue_t rawValue) { \
+    cvec_##tag##_push_back(self, valueFromRaw(rawValue)); \
+} \
 STC_API void \
 cvec_##tag##_insert(cvec_##tag* self, size_t pos, Value value); \
+STC_INLINE void \
+cvec_##tag##_insert_raw(cvec_##tag* self, size_t pos, RawValue rawValue) { \
+    cvec_##tag##_insert(self, pos, valueFromRaw(rawValue)); \
+} \
 STC_API void \
 cvec_##tag##_erase(cvec_##tag* self, size_t pos, size_t size); \
 STC_API void \
@@ -130,20 +140,19 @@ cvec_##tag##_begin(cvec_##tag* vec) { \
 STC_INLINE void \
 cvec_##tag##_next(cvec_##tag##_iter_t* it) { ++it->item; } \
  \
-implement_cvec_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw) \
-typedef Value cvec_##tag##_value_t, cvec_##tag##_input_t; \
-typedef RawValue cvec_##tag##_rawvalue_t
+implement_cvec_7(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
+typedef Value cvec_##tag##_value_t
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define implement_cvec_6(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw) \
+#define implement_cvec_7(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
  \
 STC_API void \
-cvec_##tag##_push_n(cvec_##tag *self, const Value in[], size_t size) { \
+cvec_##tag##_push_n(cvec_##tag *self, const cvec_##tag##_input_t in[], size_t size) { \
     cvec_##tag##_reserve(self, cvec_size(*self) + size); \
     _cvec_size(*self) += size; \
-    for (size_t i=0; i<size; ++i) self->data[i] = in[i]; \
+    for (size_t i=0; i<size; ++i) self->data[i] = valueFromRaw(in[i]); \
 } \
  \
 STC_API void \
@@ -219,7 +228,7 @@ cvec_##tag##_value_compare(const Value* x, const Value* y) { \
 }
 
 #else
-#define implement_cvec_6(tag, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw)
+#define implement_cvec_7(tag, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw)
 #endif
 
 #if defined(_WIN32) && defined(_DLL)

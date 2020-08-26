@@ -179,7 +179,6 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
         return a->data + z*a->_yxdim + y*carray3_xdim(*a) + x; \
     } \
     typedef Value carray1##tag##_value_t; \
-    typedef Value carray2##tag##_value_t; \
-    typedef Value carray3##tag##_value_t
+    typedef carray1##tag##_value_t carray2##tag##_value_t, carray3##tag##_value_t
    
 #endif

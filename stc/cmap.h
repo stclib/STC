@@ -307,7 +307,7 @@ STC_API size_t \
 ctype##_##tag##_reserve(ctype##_##tag* self, size_t newcap) { \
     size_t oldcap = self->bucket_count; \
     if (self->size > newcap) return oldcap; \
-    newcap /= self->max_load_factor; newcap |= 1; \
+    newcap = (size_t) (newcap / self->max_load_factor) | 1; \
     ctype##_##tag tmp = { \
         c_new_n(ctype##_##tag##_entry_t, newcap), \
         (uint8_t *) calloc(newcap, sizeof(uint8_t)), \
@@ -384,13 +384,13 @@ STC_API uint32_t c_default_hash16(const void *data, size_t len) {
     const volatile uint16_t *key = (const uint16_t *) data;
     uint64_t x = 0xc613fc15u;
     while (len -= 2) x = ((*key++ + x) * 2654435769u) >> 13;
-    return x;
+    return (uint32_t) x;
 }
 STC_API uint32_t c_default_hash32(const void* data, size_t len) {
     const volatile uint32_t *key = (const uint32_t *) data;
     uint64_t x = *key++ * 2654435769u;
     while (len -= 4) x ^= *key++ * 2654435769u;
-    return x;
+    return (uint32_t) x;
 }
 
 #else
