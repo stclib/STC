@@ -100,26 +100,26 @@
     STC_INLINE void \
     clist_##tag##_clear(clist_##tag* self) {clist_##tag##_destroy(self);} \
     STC_API void \
-    clist_##tag##_push_back(clist_##tag* self, Value value); \
+    clist_##tag##_push_back_v(clist_##tag* self, Value value); \
     STC_INLINE void \
-    clist_##tag##_push_back_raw(clist_##tag* self, RawValue rawValue) { \
-        clist_##tag##_push_back(self, valueFromRaw(rawValue)); \
+    clist_##tag##_push_back(clist_##tag* self, RawValue rawValue) { \
+        clist_##tag##_push_back_v(self, valueFromRaw(rawValue)); \
     } \
     STC_API void \
-    clist_##tag##_push_front(clist_##tag* self, Value value); \
+    clist_##tag##_push_front_v(clist_##tag* self, Value value); \
     STC_INLINE void \
-    clist_##tag##_push_front_raw(clist_##tag* self, RawValue rawValue) { \
-        clist_##tag##_push_front(self, valueFromRaw(rawValue)); \
+    clist_##tag##_push_front(clist_##tag* self, RawValue rawValue) { \
+        clist_##tag##_push_front_v(self, valueFromRaw(rawValue)); \
     } \
     STC_API void \
     clist_##tag##_push_n(clist_##tag *self, const clist_##tag##_input_t in[], size_t size); \
     STC_API void \
     clist_##tag##_pop_front(clist_##tag* self); \
     STC_API void \
-    clist_##tag##_insert_after(clist_##tag* self, clist_##tag##_iter_t pos, Value value); \
+    clist_##tag##_insert_after_v(clist_##tag* self, clist_##tag##_iter_t pos, Value value); \
     STC_INLINE void \
-    clist_##tag##_insert_after_raw(clist_##tag* self, clist_##tag##_iter_t pos, RawValue rawValue) { \
-        clist_##tag##_push_back(self, valueFromRaw(rawValue)); \
+    clist_##tag##_insert_after(clist_##tag* self, clist_##tag##_iter_t pos, RawValue rawValue) { \
+        clist_##tag##_insert_after_v(self, valueFromRaw(rawValue)); \
     } \
     STC_API void \
     clist_##tag##_erase_after(clist_##tag* self, clist_##tag##_iter_t pos); \
@@ -171,18 +171,18 @@
     } \
  \
     STC_API void \
-    clist_##tag##_push_back(clist_##tag* self, Value value) { \
+    clist_##tag##_push_back_v(clist_##tag* self, Value value) { \
         _clist_insert_after(self, tag, self->last, value); \
         self->last = entry; \
     } \
     STC_API void \
-    clist_##tag##_push_front(clist_##tag* self, Value value) { \
+    clist_##tag##_push_front_v(clist_##tag* self, Value value) { \
         _clist_insert_after(self, tag, self->last, value); \
         if (!self->last) self->last = entry; \
     } \
     STC_API void \
     clist_##tag##_push_n(clist_##tag *self, const clist_##tag##_input_t in[], size_t size) { \
-        for (size_t i=0; i<size; ++i) clist_##tag##_push_back(self, valueFromRaw(in[i])); \
+        for (size_t i=0; i<size; ++i) clist_##tag##_push_back_v(self, valueFromRaw(in[i])); \
     } \
     STC_API void \
     clist_##tag##_pop_front(clist_##tag* self) { \
@@ -190,7 +190,7 @@
     } \
  \
     STC_API void \
-    clist_##tag##_insert_after(clist_##tag* self, clist_##tag##_iter_t pos, Value value) { \
+    clist_##tag##_insert_after_v(clist_##tag* self, clist_##tag##_iter_t pos, Value value) { \
         _clist_insert_after(self, tag, pos.item, value); \
         if (!self->last || pos.item == self->last) self->last = entry; \
     } \
