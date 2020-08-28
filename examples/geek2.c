@@ -1,16 +1,16 @@
-#ifndef CXX
+#ifndef RUST
 
 #include <stc/cmap.h>
 #include <stc/cstr.h>
 
-declare_cmap_str(ss, cstr_t, cstr_destroy);
+declare_cmap_str();
 declare_cset_str();
 
 int main() 
 { 
     // Lets use an explicit type signature (which would
     // be `cmap<String, String>` in this example).
-    cmap_ss book_reviews = cmap_init; 
+    cmap_str book_reviews = cmap_init; 
     cset_str set = cset_init;
     cset_str_put(&set, "Hello");
     cset_str_put(&set, "You");
@@ -19,50 +19,57 @@ int main()
         printf("%s ", i.item->key.str); puts("");
 
     // Review some books.
-    cmap_ss_put(&book_reviews,
+   c_push(&book_reviews, cmap_str, c_items(
+        {"Adventures of Huckleberry Finn", "My favorite book."},
+        {"Grimms' Fairy Tales", "Masterpiece."},
+        {"Pride and Prejudice", "Very enjoyable."},
+        {"The Adventures of Sherlock Holmes", "Eye lyked it alot."},
+    ));        
+/*
+    cmap_str_insert(&book_reviews,
         "Adventures of Huckleberry Finn",
-        cstr_make("My favorite book.")
+        "My favorite book."
     );
-    cmap_ss_put(&book_reviews,
+    cmap_str_insert(&book_reviews,
         "Grimms' Fairy Tales",
-        cstr_make("Masterpiece.")
+        "Masterpiece."
     );
-    cmap_ss_put(&book_reviews,
+    cmap_str_insert(&book_reviews,
         "Pride and Prejudice",
-        cstr_make("Very enjoyable.")
+        "Very enjoyable."
     );
-    cmap_ss_put(&book_reviews,
+    cmap_str_insert(&book_reviews,
         "The Adventures of Sherlock Holmes",
-        cstr_make("Eye lyked it alot.")
+        "Eye lyked it alot."
     );
-
+*/
     // Check for a specific one.
     // When collections store owned values (String), they can still be
     // queried using references (&str).
-    if (! cmap_ss_find(&book_reviews, "Les Misérables")) {
+    if (! cmap_str_find(&book_reviews, "Les Misérables")) {
         printf("We've got %zu reviews, but Les Misérables ain't one.\n",
                cmap_size(book_reviews));
     }
 
     // oops, this review has a lot of spelling mistakes, let's delete it.
-    cmap_ss_erase(&book_reviews, "The Adventures of Sherlock Holmes");
+    cmap_str_erase(&book_reviews, "The Adventures of Sherlock Holmes");
 
     // Look up the values associated with some keys.
     const char* to_find[] = {"Pride and Prejudice", "Alice's Adventure in Wonderland", NULL};
     for (const char** book = to_find; *book; ++book) {
-        cmap_ss_entry_t *review = cmap_ss_find(&book_reviews, *book);
+        cmap_str_entry_t *review = cmap_str_find(&book_reviews, *book);
         if (review) printf("%s: %s\n", *book, review->value.str);
         else        printf("%s is unreviewed.\n", *book);
     }
 
     // Look up the value for a key (will panic if the key is not found).
-    printf("Review for Jane: %s\n", cmap_ss_find(&book_reviews, "Pride and Prejudice")->value.str);
+    printf("Review for Jane: %s\n", cmap_str_find(&book_reviews, "Pride and Prejudice")->value.str);
 
     // Iterate over everything.
-    c_foreach (i, cmap_ss, book_reviews) {
+    c_foreach (i, cmap_str, book_reviews) {
         printf("- %s: \"%s\"\n", i.item->key.str, i.item->value.str);
     }
-    cmap_ss_destroy(&book_reviews);
+    cmap_str_destroy(&book_reviews);
 }
 
 #else // ======================================================

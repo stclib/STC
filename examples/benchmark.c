@@ -124,7 +124,7 @@ crandom_eng64_t rng;
 
 const size_t N1 = 10000000 * 5;
 const size_t N2 = 10000000 * 5;
-const size_t N3 = 10000000 * 10;
+const size_t N3 = 10000000 * 5;
 #define      RR   20
 int rr = RR;
 

@@ -6,9 +6,7 @@
 
 declare_cvec_str();
 declare_clist_str();
-declare_cmap_str(si, int);
-
-typedef const char* input_t;
+declare_cmap_strkey(si, int);
 
 int main1()
 {

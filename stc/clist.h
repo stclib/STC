@@ -119,7 +119,7 @@
     clist_##tag##_insert_after_v(clist_##tag* self, clist_##tag##_iter_t pos, Value value); \
     STC_INLINE void \
     clist_##tag##_insert_after(clist_##tag* self, clist_##tag##_iter_t pos, RawValue rawValue) { \
-        clist_##tag##_insert_after_v(self, valueFromRaw(rawValue)); \
+        clist_##tag##_insert_after_v(self, pos, valueFromRaw(rawValue)); \
     } \
     STC_API void \
     clist_##tag##_erase_after(clist_##tag* self, clist_##tag##_iter_t pos); \

@@ -22,7 +22,7 @@ Output: 0
 #include <stc/cstr.h>
 
 declare_cvec(i, int);
-declare_cmap_str(sv, cvec_i, cvec_i_destroy);
+declare_cmap_strkey(sv, cvec_i, cvec_i_destroy);
 
   
 // Function to return the number of occurrences of 

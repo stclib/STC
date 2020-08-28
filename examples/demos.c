@@ -62,9 +62,9 @@ void vectordemo2()
 {
     printf("\nVECTORDEMO2\n");
     cvec_str names = cvec_init;
-    cvec_str_push_back(&names, cstr_make("Mary"));
-    cvec_str_push_back(&names, cstr_make("Joe"));
-    cvec_str_push_back(&names, cstr_make("Chris"));
+    cvec_str_push_back(&names, "Mary");
+    cvec_str_push_back(&names, "Joe");
+    cvec_str_push_back(&names, "Chris");
     cstr_assign(&names.data[1], "Jane");      // replace Joe
     printf("names[1]: %s\n", names.data[1].str);
 
@@ -130,7 +130,7 @@ void mapdemo1()
 }
 
 
-declare_cmap_str(si, int); // Shorthand macro for the general declare_cmap expansion.
+declare_cmap_strkey(si, int); // Shorthand macro for the general declare_cmap expansion.
 
 void mapdemo2()
 {
@@ -152,7 +152,7 @@ void mapdemo2()
 }
 
 
-declare_cmap_str(ss, cstr_t, cstr_destroy); 
+declare_cmap_strkey(ss, cstr_t, cstr_destroy); 
 
 void mapdemo3()
 {

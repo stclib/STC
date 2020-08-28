@@ -8,8 +8,8 @@ static void my_str_destr(cstr_t* x) {
     cstr_destroy(x);
 }
 
-declare_cmap_str(ss, cstr_t, my_str_destr);
-declare_cmap_str(cfg, cmap_ss, cmap_ss_destroy);
+declare_cmap_strkey(ss, cstr_t, my_str_destr);
+declare_cmap_strkey(cfg, cmap_ss, cmap_ss_destroy);
 
 int main(void) {
     cmap_cfg config = cmap_init;

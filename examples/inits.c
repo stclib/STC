@@ -5,7 +5,7 @@
 #include <stc/clist.h>
 
 declare_cmap(id, int, cstr_t, cstr_destroy); // Map of int -> cstr_t
-declare_cmap_str(cnt, int);
+declare_cmap_strkey(cnt, int);
 
 typedef struct {int x, y;} ipair_t;
 inline static int ipair_compare(const ipair_t* a, const ipair_t* b) {

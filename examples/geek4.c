@@ -38,7 +38,7 @@ Efficient Approach: For all the words of the first sentence, we can check if it 
 #include <stc/cstr.h>
 
 declare_cvec_str();
-declare_cmap_str(sb, bool);
+declare_cmap_strkey(sb, bool);
 declare_cvec(sb, cmap_sb_entry_t, cmap_sb_entry_destroy, c_no_compare);
   
 // Function to return the count of common words 
@@ -137,10 +137,10 @@ int commonWords(cvec_str S)
 int main() 
 { 
     cvec_str S = cvec_init; 
-    cvec_str_push_back(&S, cstr_make("there is a cow")); 
-    cvec_str_push_back(&S, cstr_make("cow is our mother")); 
-    cvec_str_push_back(&S, cstr_make("cow gives us milk and milk is sweet")); 
-    cvec_str_push_back(&S, cstr_make("there is a boy who loves cow")); 
+    cvec_str_push_back(&S, "there is a cow"); 
+    cvec_str_push_back(&S, "cow is our mother"); 
+    cvec_str_push_back(&S, "cow gives us milk and milk is sweet"); 
+    cvec_str_push_back(&S, "there is a boy who loves cow"); 
   
     printf("%d\n", commonWords(S)); 
     cvec_str_destroy(&S);

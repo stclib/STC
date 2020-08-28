@@ -8,7 +8,7 @@ void check_destroy(float* v) {printf("destroy %g\n", *v);}
 declare_carray(f, float, check_destroy); // normally omit the last argument - float type need no destroy.
 declare_clist(t2, carray2f, carray2f_destroy, c_no_compare);
 declare_cmap(il, int, clist_t2, clist_t2_destroy);
-declare_cmap_str(sm, cmap_il, cmap_il_destroy);
+declare_cmap_strkey(sm, cmap_il, cmap_il_destroy);
 
 int main() {
     int xdim = 4, ydim = 6;

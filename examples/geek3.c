@@ -3,8 +3,8 @@
 #include <stc/cmap.h>
 #include <stc/cstr.h>
 
-declare_cmap_str(si, int);
-declare_cmap_str(ss, cstr_t, cstr_destroy);
+declare_cmap_strkey(si, int);
+declare_cmap_strkey(ss, cstr_t, cstr_destroy);
 
 int main ()
 {

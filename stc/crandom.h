@@ -95,11 +95,14 @@ STC_INLINE crandom_distrib_i64_t crandom_uniform_i64_init(int64_t low, int64_t h
     crandom_distrib_i64_t dist = {low, high - low + 1}; return dist;
 }
 
+#if defined(_MSC_VER) && defined(_WIN64)
+#include <intrin.h>
+#endif
+
 STC_INLINE int64_t crandom_uniform_i64(crandom_eng64_t* rng, crandom_distrib_i64_t dist) {
     #if defined(__SIZEOF_INT128__)
         return dist.offset + (int64_t) (((__uint128_t) crandom_i64(rng) * dist.range) >> 64);
     #elif defined(_MSC_VER) && defined(_WIN64)
-        uint64_t _umul128(uint64_t x, uint64_t y, uint64_t *hi);
         uint64_t hi; _umul128(crandom_i64(rng), dist.range, &hi); return dist.offset + hi;
     #else
         return dist.offset + crandom_i64(rng) % dist.range; // slower
