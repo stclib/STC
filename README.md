@@ -140,7 +140,7 @@ int x = cmap_si_find(&map, "mykey")->value; // no allocation of string key happe
 cmap_si_destroy(&map);
 ```
 An alternative is to use *char* * as key type, but then you must manage allcoated memory of the hash char* keys yourself.
-Note that this customization is also available for **cvec**, but only affects the *find()* function currently. See *declare_cvec_str()*.
+Note that this predefined customization is also available for **cvec** and **clist**. See *declare_cvec_str()*, *declare_clist_str()*.
 
 To customize your own cmap type to work like cmap_str, you may want to look at **examples/advanced.c**. It demonstrates how to use a custom struct as a hash map key, using the optional parameters to declare_cmap().
 
@@ -178,7 +178,7 @@ int main() {
 **cvec** of *int64_t*. 
 ```
 #include <stc/cvec.h>
-declare_cvec(ix, int64_t); // ix is just an example tag name, use anything without underscore.
+declare_cvec(ix, int64_t); // ix is just an example type tag name.
 
 int main() {
     cvec_ix bignums = cvec_init; // use cvec_ix_init() if initializing after declaration.
@@ -204,8 +204,8 @@ int main() {
     cvec_str_push_back(&names, "Mary");
     cvec_str_push_back(&names, "Joe");
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
-    // Note: use push_back_v() to add a new cstr_t object to be moved into the vector:
-    cvec_str_push_back_v(&names, cstr_from("%d elements so far", cvec_size(names)); 
+    // Note: use push_back_v() to add a new cstr_t object to be moved into the vector, e.g.:
+    cvec_str_push_back_v(&names, cstr_from("%d elements so far", cvec_size(names))); 
 
     printf("%s\n", names.data[1].str); // Access the string char*
     c_foreach (i, cvec_str, names)
