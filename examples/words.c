@@ -8,6 +8,7 @@ declare_cvec_str();
 declare_clist_str();
 declare_cmap_strkey(si, int);
 
+
 int main1()
 {
     clist_str lwords = clist_init;
@@ -15,6 +16,10 @@ int main1()
         "this", "sentence", "is", "not", "a", "sentence",
         "this", "sentence", "is", "a", "hoax"
     ));
+    clist_str_push_back_v(&lwords, cstr_from("%f", 123897.0 / 23.0));
+    c_foreach (w, clist_str, lwords)
+        printf("%s\n", w.item->value.str);
+    puts("");
 
     cvec_str words = cvec_init;
     c_push(&words, cvec_str, c_items(
@@ -23,9 +28,8 @@ int main1()
     ));
 
     cmap_si word_map = cmap_init;
-    c_foreach (w, cvec_str, words) {
+    c_foreach (w, cvec_str, words)
         ++cmap_si_insert(&word_map, w.item->str, 0)->value;
-    }
 
     c_foreach (pair, cmap_si, word_map) {
         printf("%d occurrences of word '%s'\n",
@@ -43,7 +47,7 @@ int main1()
 #include <iostream>
 #include <vector>
 #include <unordered_map>
- 
+
 int main2()
 {
     std::vector<std::string> words = { 
@@ -59,7 +63,7 @@ int main2()
     for (const auto &pair : word_map) {
         std::cout << pair.second
                   << " occurrences of word '"
-	              << pair.first << "'\n";
+                  << pair.first << "'\n";
     }
     return 0;
 }

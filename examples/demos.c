@@ -55,8 +55,7 @@ void vectordemo1()
 
 
 
-//declare_cvec(cs, cstr_t, cstr_destroy, cstr_compare); // supply inline destructor of values
-declare_cvec_str(); // supply inline destructor of values
+declare_cvec_str();
 
 void vectordemo2()
 {

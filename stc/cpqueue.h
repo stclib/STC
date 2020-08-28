@@ -61,9 +61,13 @@ cvec_##tag##_pqueue_top(cvec_##tag* self) {return self->data[0];} \
 STC_INLINE void \
 cvec_##tag##_pqueue_pop(cvec_##tag* self) {cvec_##tag##_pqueue_erase(self, 0);} \
 STC_API void \
-cvec_##tag##_pqueue_push(cvec_##tag* self, cvec_##tag##_value_t value); \
+cvec_##tag##_pqueue_push_v(cvec_##tag* self, cvec_##tag##_value_t value); \
+STC_INLINE void \
+cvec_##tag##_pqueue_push(cvec_##tag* self, cvec_##tag##_rawvalue_t rawValue) { \
+    cvec_##tag##_pqueue_push_v(self, cvec_##tag##_value_from_raw(rawValue)); \
+} \
 STC_API void \
-cvec_##tag##_pqueue_push_n(cvec_##tag *self, const cvec_##tag##_value_t in[], size_t size); \
+cvec_##tag##_pqueue_push_n(cvec_##tag *self, const cvec_##tag##_input_t in[], size_t size); \
  \
 implement_cvec_pqueue(tag, cmpOpr) \
 typedef cvec_##tag##_value_t cvec_##tag##_pqueue_input_t
@@ -104,7 +108,7 @@ cvec_##tag##_pqueue_erase(cvec_##tag* self, size_t i) { \
 } \
  \
 STC_API void \
-cvec_##tag##_pqueue_push(cvec_##tag* self, cvec_##tag##_value_t value) { \
+cvec_##tag##_pqueue_push_v(cvec_##tag* self, cvec_##tag##_value_t value) { \
     cvec_##tag##_push_back(self, value); /* sift-up the value */ \
     size_t n = cvec_size(*self), c = n; \
     cvec_##tag##_value_t *arr = self->data - 1; \
@@ -113,7 +117,7 @@ cvec_##tag##_pqueue_push(cvec_##tag* self, cvec_##tag##_value_t value) { \
     if (c != n) arr[c] = value; \
 } \
 STC_API void \
-cvec_##tag##_pqueue_push_n(cvec_##tag *self, const cvec_##tag##_value_t in[], size_t size) { \
+cvec_##tag##_pqueue_push_n(cvec_##tag *self, const cvec_##tag##_input_t in[], size_t size) { \
     cvec_##tag##_reserve(self, cvec_size(*self) + size); \
     for (size_t i=0; i<size; ++i) cvec_##tag##_pqueue_push(self, in[i]); \
 }

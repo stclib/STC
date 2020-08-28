@@ -53,12 +53,14 @@ typedef struct cvec_##tag { \
 typedef RawValue cvec_##tag##_rawvalue_t; \
 typedef cvec_##tag##_rawvalue_t cvec_##tag##_input_t; \
  \
+STC_INLINE Value \
+cvec_##tag##_value_from_raw(cvec_##tag##_rawvalue_t rawValue) {return valueFromRaw(rawValue);} \
 STC_API void \
 cvec_##tag##_destroy(cvec_##tag* self); \
 STC_API void \
 cvec_##tag##_reserve(cvec_##tag* self, size_t cap); \
 STC_API void \
-cvec_##tag##_resize(cvec_##tag* self, size_t size, Value null_val); \
+cvec_##tag##_resize(cvec_##tag* self, size_t size, Value fill_val); \
 STC_API void \
 cvec_##tag##_push_n(cvec_##tag *self, const cvec_##tag##_input_t in[], size_t size); \
 STC_API void \

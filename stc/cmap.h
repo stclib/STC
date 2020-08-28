@@ -204,13 +204,6 @@ struct ctype##_##tag##_result {ctype##_##tag##_entry_t *entry; bool inserted;}; 
 STC_API struct ctype##_##tag##_result \
 ctype##_##tag##_insert_key(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey); \
  \
-STC_INLINE ctype##_##tag##_entry_t* /* like c++ std::map.insert_or_assign(): */ \
-ctype##_##tag##_put(ctype##_##tag* self, CMAP_BOTH_##ctype(ctype##_##tag##_rawkey_t rawKey, RawValue rawValue)) { \
-    struct ctype##_##tag##_result res = ctype##_##tag##_insert_key(self, rawKey); \
-    CMAP_ONLY_##ctype( if (!res.inserted) valueDestroy(&res.entry->value); \
-                       res.entry->value = valueFromRaw(rawValue); ) \
-    return res.entry; \
-} \
 STC_INLINE ctype##_##tag##_entry_t* /* like c++ std::map.insert(): */ \
 ctype##_##tag##_insert(ctype##_##tag* self, CMAP_BOTH_##ctype(ctype##_##tag##_rawkey_t rawKey, RawValue rawValue)) { \
     struct ctype##_##tag##_result res = ctype##_##tag##_insert_key(self, rawKey); \
@@ -218,6 +211,13 @@ ctype##_##tag##_insert(ctype##_##tag* self, CMAP_BOTH_##ctype(ctype##_##tag##_ra
     return res.entry; \
 } \
  \
+STC_INLINE ctype##_##tag##_entry_t* /* like c++ std::map.insert_or_assign(): */ \
+ctype##_##tag##_put(ctype##_##tag* self, CMAP_BOTH_##ctype(ctype##_##tag##_rawkey_t rawKey, RawValue rawValue)) { \
+    struct ctype##_##tag##_result res = ctype##_##tag##_insert_key(self, rawKey); \
+    CMAP_ONLY_##ctype( if (!res.inserted) valueDestroy(&res.entry->value); \
+                       res.entry->value = valueFromRaw(rawValue); ) \
+    return res.entry; \
+} \
 CMAP_ONLY_##ctype( \
 STC_INLINE ctype##_##tag##_entry_t* /* cmap_put_v(key, move(value)) */ \
 ctype##_##tag##_put_v(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey, Value value) { \
