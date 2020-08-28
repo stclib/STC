@@ -112,13 +112,13 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 cmap discussion
 ---------------
 
-**cmap/cset** are the most complex of the containers (although, currently only ~400 lines of code). It uses open hashing, but does not rely on power-of-two size table, nor prime number lengths, and it does not have tombstone buckets. It is still among the fastest hash-tables, as shown above. The default max load-factor is 0.85, and it shrinks (and rehashes) when load-factor goes below 0.15, by default (can be set per hash container).
+**cmap/cset** are the most complex of the containers (although, currently less than 500 lines of code). It uses open hashing, but does not rely on power-of-two size table, nor prime number lengths, and it does not have tombstone buckets. It is still among the fastest hash-tables, as shown above. The default max load-factor is 0.85, and it shrinks (and rehashes) when load-factor goes below 0.15, by default (can be set per hash container).
 
 You can customize the destroy-, hash- and equals- function. **cmap/cset** also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is very useful when e.g. having cstr as key, as it enables the usage of string literals as key in *put() and find()* functions, instead of requering a constructed cstr. Without it, the code would become: 
 ```
 declare_cmap(si, cstr_t, int); // don't do this.
 ...
-cmap_si_put(&map, cstr_make("mykey"), 12);
+cmap_si_insert(&map, cstr_make("mykey"), 12);
 ```
 This is a problem because cstr_t key may exist in the map, and it would need to destroy the current key and replace it with the new to avoid memory leak.  Lookup would also be problematic:
 ```
@@ -126,9 +126,13 @@ cstr lookup = cstr_make("mykey");
 int x = cmap_si_find(&map, lookup)->value;
 cstr_destroy(&lookup);
 ```
-To avoid all this, use *declare_cmap_str(tag, keytype)* or *declare_cset_str()*:
+To avoid this, use 
+- *declare_cmap_strkey(tag, valuetype)*
+- *declare_cmap_strval(tag, keytype)*
+- *declare_cmap_str()* // cstr_t -> cstr_t
+- *declare_cset_str()* // cstr_t set
 ```
-declare_cmap_str(si, int);
+declare_cmap_strkey(si, int);
 ...
 cmap_si map = cmap_init;
 cmap_si_put(&map, "mykey", 12);             // constructs a cstr_t key from the const char* internally.
@@ -138,13 +142,7 @@ cmap_si_destroy(&map);
 An alternative is to use *char* * as key type, but then you must manage allcoated memory of the hash char* keys yourself.
 Note that this customization is also available for **cvec**, but only affects the *find()* function currently. See *declare_cvec_str()*.
 
-Finally, cmap mimics c++17 unordered_map::try_emplace() and avoids cstr memory leak if key already exists in this example:
-```
-declare_cmap_str(ss, cstr_t, cstr_destroy); // cstr_t -> cstr_t
-...
-cmap_try_emplace(ss, &map, "already here", cstr_make("won't be called then")); // note: tag 'ss' is a parameter here.
-```
-You may want to look at **examples/advanced.c**, it demonstrates how to use a custom struct as a hash map key, using the optional parameters to declare_cmap().
+To customize your own cmap type to work like cmap_str, you may want to look at **examples/advanced.c**. It demonstrates how to use a custom struct as a hash map key, using the optional parameters to declare_cmap().
 
 Example usages
 --------------
@@ -203,9 +201,11 @@ declare_cvec_str();
 
 int main() {
     cvec_str names = cvec_init;
-    cvec_str_push_back(&names, cstr_make("Mary"));
-    cvec_str_push_back(&names, cstr_make("Joe"));
+    cvec_str_push_back(&names, "Mary");
+    cvec_str_push_back(&names, "Joe");
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
+    // Note: use push_back_v() to add a new cstr_t object to be moved into the vector:
+    cvec_str_push_back_v(&names, cstr_from("%d elements so far", cvec_size(names)); 
 
     printf("%s\n", names.data[1].str); // Access the string char*
     c_foreach (i, cvec_str, names)
@@ -237,25 +237,26 @@ declare_cset_str(); // cstr set. See the discussion above.
 int main() {
     cset_str words = cset_init;
     cset_str_put(&words, "Hello");
-    cset_str_put(&words, "Groovy");
-    cset_str_erase(&words, "Hello");
+    cset_str_put(&words, "Cruel");
+    cset_str_put(&words, "World");    
+    cset_str_erase(&words, "Cruel");
 
-    // iterate the map:
+    // iterate the set:
     c_foreach (i, cset_str, words)
         printf("%s\n", i.item->key.str);
     cset_str_destroy(&words);
 }
 ```
-**cmap** of *cstr -> cstr*. cstr keys are created internally via *cstr_make()* from const char* key input.
+**cmap** of *cstr -> cstr*. Both cstr keys and values are created internally via *cstr_make()* from const char* inputs.
 ```
 #include <stc/cstr.h>
 #include <stc/cmap.h>
-declare_cmap_str(ss, cstr, cstr_destroy); 
+declare_cmap_str(); 
 
 int main() {
     cmap_ss table = cmap_init;
-    cmap_ss_put(&table, "Make", cstr_make("my"));
-    cmap_ss_put(&table, "Sunny", cstr_make("day"));
+    cmap_ss_put(&table, "Make", "my");
+    cmap_ss_put(&table, "Sunny", "day");
     printf("Sunny: %s\n", cmap_ss_find(table, "Sunny")->value.str);
     cmap_ss_erase(&table, "Make");
 
@@ -317,7 +318,7 @@ int main()
     printf("%f\n", *carray3f_at(a3, 5, 4, 3)); // a3[5][4][3] (3.14f)
     // ...
     carray2f_destroy(&a1); // does nothing, since it is a sub-array.
-    carray2f_destroy(&a2); // likewise.
+    carray2f_destroy(&a2); // same.
     carray3f_destroy(&a3); // free array, and invalidates a1, a2.
 }
 ```
