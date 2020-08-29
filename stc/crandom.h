@@ -59,7 +59,7 @@ STC_INLINE float crand_f32(crand_rng32_t* rng) {
 
 /* int random number generator in range [low, high] */
 STC_INLINE crand_uniform_i32_t crand_uniform_i32_init(crand_rng32_t rng, int32_t low, int32_t high) {
-    crand_uniform_i32_t dist = {rng, low, high - low + 1}; return dist;
+    crand_uniform_i32_t dist = {rng, low, (uint32_t) (high - low + 1)}; return dist;
 }
 STC_INLINE int32_t crand_uniform_i32(crand_uniform_i32_t* dist) {
     return dist->offset + (int32_t) (((uint64_t) crand_i32(&dist->rng) * dist->range) >> 32);
@@ -100,7 +100,7 @@ STC_INLINE double crand_f64(crand_rng64_t* rng) {
 
 /* int random number generator in range [low, high] */
 STC_INLINE crand_uniform_i64_t crand_uniform_i64_init(crand_rng64_t rng, int64_t low, int64_t high) {
-    crand_uniform_i64_t dist = {rng, low, high - low + 1}; return dist;
+    crand_uniform_i64_t dist = {rng, low, (uint64_t) (high - low + 1)}; return dist;
 }
 
 #if defined(_MSC_VER) && defined(_WIN64)
