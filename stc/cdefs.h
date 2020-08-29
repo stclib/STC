@@ -30,7 +30,7 @@
 #define STC_INLINE static inline
 #if defined(_MSC_VER)
 #define STC_FORCE_INLINE static __forceinline
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) || defined(__clang__)
 #define STC_FORCE_INLINE static inline __attribute((always_inline))
 #else
 #define STC_FORCE_INLINE static inline

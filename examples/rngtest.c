@@ -13,22 +13,22 @@ int main(void)
     clock_t difference, before;
     uint64_t v;
     
-    crandom_eng64_t sfc = crandom_eng64_init(time(NULL));
-    crandom_distrib_i32_t i32dist = crandom_uniform_i32_init(10, 20);
-    crandom_distrib_f32_t f32dist = crandom_uniform_f32_init(10, 20);
+    crand_rng64_t stc = crand_rng64_init(time(NULL));
+    crand_uniform_i64_t idist = crand_uniform_i64_init(stc, 10, 20);
+    crand_uniform_f64_t fdist = crand_uniform_f64_init(stc, 10, 20);
 
-    crandom_distrib_i64_t idist = crandom_uniform_i64_init(10, 20);
-    crandom_distrib_f64_t fdist = crandom_uniform_f64_init(10, 20);
-
-    for (int i=0; i<30; ++i) printf("%02zd ", crandom_uniform_i64(&sfc, idist)); 
+    for (int i=0; i<30; ++i) printf("%02zd ", crand_uniform_i64(&idist)); 
     puts("");
 
-    crandom_eng32_t pcg = crandom_eng32_init(time(NULL));
+    crand_rng32_t pcg = crand_rng32_init(time(NULL));
+    crand_uniform_i32_t i32dist = crand_uniform_i32_init(pcg, 10, 20);
+    crand_uniform_f32_t f32dist = crand_uniform_f32_init(pcg, 10, 20);
+
     before = clock(); \
     v = 0;
     for (size_t i=0; i<NN; i++) {
-        //v += crandom_i32(&pcg);
-        v += crandom_uniform_i32(&pcg, i32dist);
+        //v += crand_i32(&pcg);
+        v += crand_uniform_i32(&i32dist);
     }
     difference = clock() - before;
     printf("pcg32: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
@@ -36,20 +36,20 @@ int main(void)
     before = clock(); \
     v = 0;
     for (size_t i=0; i<NN; i++) {
-        //v += crandom_i64(&sfc) & 0xffffffff;
-        v += crandom_uniform_i64(&sfc, idist);
+        //v += crand_i64(&stc) & 0xffffffff;
+        v += crand_uniform_i64(&idist);
     }
     difference = clock() - before;
-    printf("sfc64: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
+    printf("stc64: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
 
     
-    for (int i=0; i<8; ++i) printf("%d ", crandom_uniform_i32(&pcg, i32dist));
+    for (int i=0; i<8; ++i) printf("%d ", crand_uniform_i32(&i32dist));
     puts("");
 
     
-    for (int i=0; i<8; ++i) printf("%f ", crandom_uniform_f32(&pcg, f32dist));
+    for (int i=0; i<8; ++i) printf("%f ", crand_uniform_f32(&f32dist));
     puts("");
     
-    for (int i=0; i<8; ++i) printf("%f ", crandom_uniform_f64(&sfc, fdist));
+    for (int i=0; i<8; ++i) printf("%f ", crand_uniform_f64(&fdist));
     puts("");
 }

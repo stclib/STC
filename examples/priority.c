@@ -9,19 +9,19 @@ declare_cvec(i, int64_t);
 declare_cvec_pqueue(i, >); // min-heap (increasing values)
 
 int main() {
-    crandom_eng32_t pcg = crandom_eng32_init(time(NULL));
-    crandom_distrib_i32_t dist = crandom_uniform_i32_init(0, 100000000);
+    crand_rng32_t pcg = crand_rng32_init(time(NULL));
+    crand_uniform_i32_t dist = crand_uniform_i32_init(pcg, 0, 100000000);
     cvec_i heap = cvec_init;
 
     // Push ten million random numbers to priority queue
     for (int i=0; i<10000000; ++i)
-        cvec_i_pqueue_push(&heap, crandom_uniform_i32(&pcg, dist));
+        cvec_i_pqueue_push(&heap, crand_uniform_i32(&dist));
 
     // push some negative numbers too.
     c_push(&heap, cvec_i_pqueue, c_items(-231, -32, -873, -4, -343));
 
     for (int i=0; i<10000000; ++i)
-        cvec_i_pqueue_push(&heap, crandom_uniform_i32(&pcg, dist));
+        cvec_i_pqueue_push(&heap, crand_uniform_i32(&dist));
 
 
     // Extract the hundred smallest.

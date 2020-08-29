@@ -233,10 +233,17 @@ STC_API bool \
 ctype##_##tag##_erase_entry(ctype##_##tag* self, ctype##_##tag##_entry_t* entry); \
 STC_API bool \
 ctype##_##tag##_erase(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey); \
-STC_API ctype##_##tag##_iter_t \
-ctype##_##tag##_begin(ctype##_##tag* map); \
-STC_API void \
-ctype##_##tag##_next(ctype##_##tag##_iter_t* it); \
+ \
+STC_FORCE_INLINE ctype##_##tag##_iter_t \
+ctype##_##tag##_begin(ctype##_##tag* map) { \
+    ctype##_##tag##_iter_t it = {map->table, map->table + map->bucket_count, map->_hashx}; \
+    if (it._hx) while (*it._hx == 0) ++it.item, ++it._hx; \
+    return it; \
+} \
+STC_FORCE_INLINE void \
+ctype##_##tag##_next(ctype##_##tag##_iter_t* it) { \
+    while ((++it->item, *++it->_hx == 0)) ; \
+} \
  \
 STC_API uint32_t c_default_hash16(const void *data, size_t len); \
 STC_API uint32_t c_default_hash32(const void* data, size_t len); \
@@ -386,18 +393,6 @@ ctype##_##tag##_erase(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey) { \
     uint32_t hx; \
     size_t i = ctype##_##tag##_bucket(self, &rawKey, &hx); \
     return ctype##_##tag##_erase_entry(self, self->table + i); \
-} \
- \
-STC_API ctype##_##tag##_iter_t \
-ctype##_##tag##_begin(ctype##_##tag* map) { \
-    ctype##_##tag##_iter_t it = {map->table, map->table + map->bucket_count, map->_hashx}; \
-    if (it._hx) while (*it._hx == 0) ++it.item, ++it._hx; \
-    return it; \
-} \
- \
-STC_API void \
-ctype##_##tag##_next(ctype##_##tag##_iter_t* it) { \
-    while ((++it->item, *++it->_hx == 0)) ; \
 }
 
 /* https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/ */
