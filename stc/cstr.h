@@ -185,9 +185,9 @@ cstr_find(const cstr_t* s, const char* needle) {
 
 /* cvec/cmap API functions: */
 
-#define             cstr_to_raw(x) ((x)->str)
-#define             cstr_compare_raw(x, y) strcmp(*(x), *(y))
-#define             cstr_equals_raw(x, y) (strcmp(*(x), *(y)) == 0)
+#define  cstr_to_raw(x)          ((x)->str)
+#define  cstr_compare_raw(x, y)  strcmp(*(x), *(y))
+#define  cstr_equals_raw(x, y)   (strcmp(*(x), *(y)) == 0)
 
 STC_INLINE uint32_t c_string_hash(const char* str) {
     uint32_t hash = 5381, c; /* djb2 */
@@ -195,8 +195,8 @@ STC_INLINE uint32_t c_string_hash(const char* str) {
     return hash;    
 }
 
-STC_INLINE uint32_t cstr_hash_raw(const char* const* chr_pp, size_t ignored) {
-    return c_string_hash(*chr_pp);
+STC_INLINE uint32_t cstr_hash_raw(const char* const* spp, size_t ignored) {
+    return c_string_hash(*spp);
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
@@ -257,7 +257,7 @@ cstr_from(const char* fmt, ...) {
     #if defined(__clang__)
     #  pragma clang diagnostic pop
     #elif defined(_MSC_VER)
-    #  pragma warning(push)
+    #  pragma warning(pop)
     #endif
 }
 

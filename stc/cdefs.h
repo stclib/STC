@@ -61,11 +61,6 @@
 
 #define c_max_alloca    (512)
 #define c_swap(T, x, y) do { T __t = x; x = y; y = __t; } while (0)
-#ifdef __cplusplus
-#define c_NULL          nullptr
-#else
-#define c_NULL          NULL
-#endif
 
 #define c_default_from_raw(x)   (x)
 #define c_default_to_raw(ptr)   (*(ptr))
@@ -79,9 +74,9 @@
 
 #define c_foreach(it, prefix, container) \
             for (prefix##_iter_t it = prefix##_begin(&container); it.item != it.end; prefix##_next(&it))
-#define c_items(...) {__VA_ARGS__}
+#define c_items(...) __VA_ARGS__
 #define c_push(container, prefix, items) do { \
-    const prefix##_input_t __arr[] = items; \
+    const prefix##_input_t __arr[] = { items }; \
     prefix##_push_n(container, __arr, sizeof(__arr)/sizeof(prefix##_input_t)); \
 } while (0)
 
