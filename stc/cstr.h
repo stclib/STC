@@ -46,6 +46,12 @@ static  cstr_t cstr_init = {(char* ) &_cstr_nullrep[2]};
 #define cstr_front(s)      (s).str[0]
 #define cstr_back(s)       (s).str[_cstr_size(s) - 1] /* may have side effect */
 #define cstr_npos          ((size_t) (-1))
+/* destroy multiple strings: */
+#define cstr_destr(...) do { \
+    cstr_t *__objs[] = {__VA_ARGS__}; \
+    for (size_t i=0; i<sizeof(__objs)/sizeof(__objs[0]); ++i) \
+        cstr_destroy(__objs[i]); \
+} while (0)
 
 STC_API cstr_t
 cstr_make_n(const char* str, size_t len);
@@ -276,11 +282,12 @@ cstr_append_n(cstr_t* self, const char* str, size_t len) {
     if (len) {
         size_t oldlen = cstr_size(*self), newlen = oldlen + len;
         if (newlen > cstr_capacity(*self)) {
+            /* handle self append */
             size_t off = (size_t) (str - self->str);
             cstr_reserve(self, newlen * 3 / 2);
             if (off <= oldlen) str = self->str + off;
         }
-        memmove(&self->str[oldlen], str, len);
+        memcpy(&self->str[oldlen], str, len);
         self->str[_cstr_size(*self) = newlen] = '\0';
     }
     return self;
