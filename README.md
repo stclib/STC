@@ -14,8 +14,8 @@ An elegant, fully typesafe, generic, customizable, user-friendly, consistent, an
 - **stc/cvec.h** - Dynamic generic **vector** class, works well as a **stack**.
 - **stc/cpqueue.h** - Priority queue adapter for **cvec.h**, as a **heap**.
 - **stc/copt.h** - Implementation of a **getopt_long()**-like function, *copt_get()*, to parse command line arguments.
-- **stc/crandom.h** - A few very efficent modern random number generators *pcg32* and my own *64-bit PRNG* inspired by *sfc64*.
-- **stc/cdefs.h** - A common include file with some general definitions.
+- **stc/crandom.h** - A few very efficent modern random number generators *pcg32* and my own *64-bit PRNG* inspired by *sfc64*. Both uniform and normal distributions.
+- **stc/cdefs.h** - A common include file with a few general definitions.
 
 The usage of the containers is vert similar to the C++ standard containers, so it should be easy if you are familiar with them.
 
@@ -169,10 +169,11 @@ int main() {
     cstr_assign(&s1, "one two three four five six seven");
     cstr_append(&s1, " eight");
     printf("append: %s\n", s1.str);
-    cstr_destroy(&s1);
 
-    cstr_t s2 = cstr_from("Index %d: %f", 123, 4.56);
-    cstr_destroy(&s2);
+    cstr_t full_path = cstr_from("%s/%s.%s", "directory", "filename", "ext");
+    printf("%s\n", full_path.str);
+    
+    cstr_mdestroy(&s1, &full_path);
 }
 ```
 **cvec** of *int64_t*. 
@@ -254,14 +255,17 @@ int main() {
 declare_cmap_str(); 
 
 int main() {
-    cmap_ss table = cmap_init;
-    cmap_ss_put(&table, "Make", "my");
-    cmap_ss_put(&table, "Sunny", "day");
-    printf("Sunny: %s\n", cmap_ss_find(table, "Sunny")->value.str);
-    cmap_ss_erase(&table, "Make");
+    cmap_str table = cmap_init;
+    cmap_str_put(&table, "Make", "my");
+    cmap_str_put(&table, "Rainy", "day");
+    cmap_str_put(&table, "Sunny", "afternoon");
+    printf("Sunny: %s\n", cmap_str_find(table, "Sunny")->value.str);
+    cmap_str_erase(&table, "Rainy");
 
-    printf("size %d\n", cmap_size(table));
-    cmap_ss_destroy(&table); // frees key and value cstrs, and hash table.
+    printf("size = %zu\n", cmap_size(table));
+    c_foreach (i, cmap_str, table)
+        printf("%s: %s\n", i.item->key.str, i.item->value.str);
+    cmap_str_destroy(&table); // frees key and value cstrs, and hash table.
 }
 ```
 **clist** of *int64_t*. Similar to c++ *std::forward_list*, but can do both *push_front()* and *push_back()* as well as *pop_front()*.
@@ -293,7 +297,9 @@ int main() {
 
     // generic c_push() function, works on most containers:
     c_push(&list, clist_fx, c_items(10, 20, 30, 40, 50));
-    c_foreach (i, clist_fx, list) printf("%f ", i.item->value);
+
+    c_foreach (i, clist_fx, list)
+        printf("%f ", i.item->value);
     puts("");
 
     clist_fx_destroy(&list);
