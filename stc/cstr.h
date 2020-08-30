@@ -275,8 +275,11 @@ STC_API cstr_t*
 cstr_append_n(cstr_t* self, const char* str, size_t len) {
     if (len) {
         size_t oldlen = cstr_size(*self), newlen = oldlen + len;
-        if (newlen > cstr_capacity(*self))
+        if (newlen > cstr_capacity(*self)) {
+            size_t off = (size_t) (str - self->str);
             cstr_reserve(self, newlen * 3 / 2);
+            if (off <= oldlen) str = self->str + off;
+        }
         memmove(&self->str[oldlen], str, len);
         self->str[_cstr_size(*self) = newlen] = '\0';
     }
