@@ -20,11 +20,19 @@ int main() {
 
     k = 0; c_foreach (i, clist_fx, list)
         if (++k <= 10) printf("%8d: %10f\n", k, i.item->value); else break;
-
-    clist_fx_clear(&list);
-    c_push(&list, clist_fx, c_items(10, 20, 30, 40, 50));
-    c_foreach (i, clist_fx, list) printf("%.1f ", i.item->value);
     puts("");
 
+    clist_fx_clear(&list);
+    c_push(&list, clist_fx, c_items(10, 20, 30, 40, 30, 50));
+    c_foreach (i, clist_fx, list) printf(" %g", i.item->value);
+    puts("");
+ 
+    int removed = clist_fx_remove(&list, 30);
+    clist_fx_insert_after(&list, clist_fx_last(&list), 1000);
+    //clist_fx_insert_after(&list, clist_fx_before_begin(&list), 5);
+    clist_fx_push_front(&list, 5);
+    c_foreach (i, clist_fx, list)
+        printf(" %g", i.item->value);
+    puts("");
     clist_fx_destroy(&list);
 }

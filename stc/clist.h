@@ -123,15 +123,15 @@
     } \
     STC_API clist_##tag##_iter_t \
     clist_##tag##_erase_after(clist_##tag* self, clist_##tag##_iter_t pos); \
-    STC_API void \
-    clist_##tag##_splice_front(clist_##tag* self, clist_##tag* other); \
-    STC_API void \
-    clist_##tag##_splice_after(clist_##tag* self, clist_##tag##_iter_t pos, clist_##tag* other); \
+    STC_INLINE void \
+    clist_##tag##_splice_after(clist_##tag* self, clist_##tag##_iter_t pos, clist_##tag* other) { \
+        _clist_splice_after((clist_void *) self, *(clist_void_iter_t *) &pos, (clist_void *) other); \
+    } \
     STC_API clist_##tag##_iter_t \
-    clist_##tag##_find_before(clist_##tag* self, RawValue val); \
+    clist_##tag##_find_before(clist_##tag* self, clist_##tag##_iter_t prev, RawValue val); \
     STC_API Value* \
     clist_##tag##_find(clist_##tag* self, RawValue val); \
-    STC_API clist_##tag##_iter_t \
+    STC_API size_t \
     clist_##tag##_remove(clist_##tag* self, RawValue val); \
     STC_API void \
     clist_##tag##_sort(clist_##tag* self); \
@@ -148,7 +148,12 @@
     } \
     STC_INLINE void \
     clist_##tag##_next(clist_##tag##_iter_t* it) { \
-        it->item = it->item == *it->_last ? NULL : it->item->next; \
+        if (it->item == *it->_last) it->end = it->item = it->item->next; \
+        else it->item = it->item->next; \
+    } \
+    STC_INLINE clist_##tag##_iter_t \
+    clist_##tag##_before_begin(clist_##tag* self) { \
+        clist_##tag##_iter_t it = {self->last, self->last, &self->last}; return it; \
     } \
     STC_INLINE clist_##tag##_iter_t \
     clist_##tag##_last(clist_##tag* self) { \
@@ -192,7 +197,7 @@
     STC_API clist_##tag##_iter_t \
     clist_##tag##_insert_after_v(clist_##tag* self, clist_##tag##_iter_t pos, Value value) { \
         _clist_insert_after(self, tag, pos.item, value); \
-        if (!self->last || pos.item == self->last) self->last = entry; \
+        if (pos.item != pos.end) self->last = entry; \
         pos.item = entry; return pos; \
     } \
     STC_API clist_##tag##_iter_t \
@@ -201,41 +206,32 @@
         clist_##tag##_next(&pos); return pos; \
     } \
  \
-    STC_API void \
-    clist_##tag##_splice_front(clist_##tag* self, clist_##tag* other) { \
-        clist_void *s = (clist_void *) self; \
-        clist_void_iter_t last = {s->last, NULL, &s->last}; \
-        _clist_splice(s, last, (clist_void *)other, false); \
-    } \
-    STC_API void \
-    clist_##tag##_splice_after(clist_##tag* self, clist_##tag##_iter_t pos, clist_##tag* other) { \
-        _clist_splice((clist_void *)self, *(clist_void_iter_t *) &pos, (clist_void *)other, true); \
-    } \
- \
     STC_API clist_##tag##_iter_t \
-    clist_##tag##_find_before(clist_##tag* self, RawValue val) { \
-        clist_##tag##_iter_t prev = {self->last, NULL, &self->last}; \
-        c_foreach (i, clist_##tag, *self) { \
+    clist_##tag##_find_before(clist_##tag* self, clist_##tag##_iter_t prev, RawValue val) { \
+        clist_##tag##_iter_t i = prev; \
+        if (i.item) i.item = i.item->next; \
+        for (; i.item != i.end; clist_##tag##_next(&i)) { \
             RawValue r = valueToRaw(&i.item->value); \
             if (valueCompareRaw(&r, &val) == 0) \
                 return prev; \
             prev = i; \
         } \
-        prev.item = NULL; \
+        prev.item = prev.end = NULL; \
         return prev; \
     } \
  \
     STC_API Value* \
     clist_##tag##_find(clist_##tag* self, RawValue val) { \
-        clist_##tag##_iter_t it = clist_##tag##_find_before(self, val); \
+        clist_##tag##_iter_t it = clist_##tag##_find_before(self, clist_##tag##_before_begin(self), val); \
         return it.item ? &it.item->next->value : NULL; \
     } \
  \
-    STC_API clist_##tag##_iter_t \
+    STC_API size_t \
     clist_##tag##_remove(clist_##tag* self, RawValue val) { \
-        clist_##tag##_iter_t it = clist_##tag##_find_before(self, val); \
-        if (it.item) clist_##tag##_erase_after(self, it); \
-        return it; \
+        clist_##tag##_iter_t it; size_t n = 0; \
+        while ((it = clist_##tag##_find_before(self, clist_##tag##_before_begin(self), val)).item) \
+            it = clist_##tag##_erase_after(self, it), ++n; \
+        return n; \
     } \
  \
     static inline int \
@@ -270,14 +266,14 @@
 declare_clist_types(void, int);
 
 STC_API void \
-_clist_splice(clist_void* self, clist_void_iter_t pos, clist_void* other, bool bottom) {
+_clist_splice_after(clist_void* self, clist_void_iter_t pos, clist_void* other) {
     if (!pos.item)
-        self->last = pos.item = other->last;
+        self->last = other->last;
     else if (other->last) {
         clist_void_node_t *next = pos.item->next;
         pos.item->next = other->last->next;
         other->last->next = next;
-        if (bottom && pos.item == self->last) self->last = other->last;
+        if (pos.item == pos.end) self->last = other->last;
     }
     other->last = NULL;
 }
