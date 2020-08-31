@@ -56,16 +56,17 @@
     }
 */
 
-#define declare_clist(...)    c_MACRO_OVERLOAD(declare_clist, __VA_ARGS__)
+#define declare_clist(...)   c_MACRO_OVERLOAD(declare_clist, __VA_ARGS__)
 
 #define declare_clist_2(tag, Value) \
-                               declare_clist_3(tag, Value, c_default_destroy)
+                             declare_clist_3(tag, Value, c_default_destroy)
 #define declare_clist_3(tag, Value, valueDestroy) \
-                               declare_clist_4(tag, Value, valueDestroy, c_default_compare)
+                             declare_clist_4(tag, Value, valueDestroy, c_default_compare)
 #define declare_clist_4(tag, Value, valueDestroy, valueCompare) \
-                               declare_clist_7(tag, Value, valueDestroy, Value, valueCompare, c_default_to_raw, c_default_from_raw)
-#define declare_clist_str() \
-                               declare_clist_7(str, cstr_t, cstr_destroy, const char*, cstr_compare_raw, cstr_to_raw, cstr_make)
+                             declare_clist_7(tag, Value, valueDestroy, Value, \
+                                             valueCompare, c_default_to_raw, c_default_from_raw)
+#define declare_clist_str()  declare_clist_7(str, cstr_t, cstr_destroy, const char*, \
+                                             cstr_compare_raw, cstr_to_raw, cstr_make)
 
 #define declare_clist_types(tag, Value) \
     typedef struct clist_##tag##_node { \

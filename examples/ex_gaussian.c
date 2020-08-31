@@ -1,0 +1,58 @@
+#include <stdio.h>
+#include <time.h>
+#include <math.h>
+#include <stc/crandom.h>
+#include <stc/cstr.h>
+#include <stc/cmap.h>
+#include <stc/cvec.h>
+
+// Declare int -> int hashmap. Uses typetag 'i' for ints.
+declare_cmap(i, int, size_t);
+
+// Declare int vector with map entries that can be sorted by map keys.
+static int compare(cmap_i_entry_t *a, cmap_i_entry_t *b) {
+    return c_default_compare(&a->key, &b->key);
+}
+// Vector: typetag 'e' for (map) entry
+declare_cvec(e, cmap_i_entry_t, c_default_destroy, compare);
+
+int main()
+{
+    enum {Rows = 40, N = 5000000};
+    const double StdDev = 6.0, Mag = 35.0, Mean = 12;
+
+    printf("Demo of gaussian / normal distribution of %d random samples\n", N);
+    
+    // Setup random engine with normal distribution.
+    uint64_t seed = time(NULL);    
+    crand_rng64_t rng = crand_rng64_init(seed);
+    crand_normal_f64_t dist = crand_normal_f64_init(rng, Mean, Rows / StdDev);
+    
+    // Create histogram map
+    cmap_i mhist = cmap_init;
+    for (size_t i = 0; i < N; ++i) {
+        int index = round( crand_normal_f64(&dist) );
+        ++ cmap_i_insert(&mhist, index, 0)->value;
+    }
+
+    // Transfer map to vec and sort it by map keys.
+    cvec_e vhist = cvec_init;
+    c_foreach (i, cmap_i, mhist)
+        cvec_e_push_back(&vhist, *i.item);
+    cvec_e_sort(&vhist);
+    
+    // Print the gaussian bar chart
+    cstr_t bar = cstr_init;
+    c_foreach (i, cvec_e, vhist) {
+        size_t n = (size_t) (i.item->value * Mag * Rows / N);
+        if (n > 0) {
+            // bar string: take ownership in new str after freeing current.
+            cstr_take(&bar, cstr_with_size(n, '*'));
+            printf("%4d %s\n", i.item->key, bar.str);
+        }
+    }
+    // Cleanup
+    cstr_destroy(&bar);
+    cmap_i_destroy(&mhist);
+    cvec_e_destroy(&vhist);
+}
