@@ -28,9 +28,9 @@ int main() {
     puts("");
  
     int removed = clist_fx_remove(&list, 30);
-    clist_fx_insert_after(&list, clist_fx_last(&list), 1000);
-    //clist_fx_insert_after(&list, clist_fx_before_begin(&list), 5);
-    clist_fx_push_front(&list, 5);
+    clist_fx_insert_after(&list, clist_fx_ahead(&list), 5);
+    clist_fx_insert_after(&list, clist_fx_last(&list), 500);
+    clist_fx_push_front(&list, 1964);
     c_foreach (i, clist_fx, list)
         printf(" %g", i.item->value);
     puts("");

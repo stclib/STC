@@ -146,18 +146,21 @@
         clist_##tag##_node_t *head = self->last ? self->last->next : NULL; \
         clist_##tag##_iter_t it = {head, NULL, &self->last}; return it; \
     } \
-    STC_INLINE void \
-    clist_##tag##_next(clist_##tag##_iter_t* it) { \
-        if (it->item == *it->_last) it->end = it->item = it->item->next; \
-        else it->item = it->item->next; \
-    } \
     STC_INLINE clist_##tag##_iter_t \
     clist_##tag##_before_begin(clist_##tag* self) { \
         clist_##tag##_iter_t it = {self->last, self->last, &self->last}; return it; \
     } \
     STC_INLINE clist_##tag##_iter_t \
+    clist_##tag##_ahead(clist_##tag* self) {return clist_##tag##_before_begin(self);} \
+ \
+    STC_INLINE clist_##tag##_iter_t \
     clist_##tag##_last(clist_##tag* self) { \
         clist_##tag##_iter_t it = {self->last, NULL, &self->last}; return it; \
+    } \
+    STC_INLINE void \
+    clist_##tag##_next(clist_##tag##_iter_t* it) { \
+        if (it->item == *it->_last) it->end = it->item = it->item->next; \
+        else it->item = it->item->next; \
     } \
  \
     implement_clist_7(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
@@ -197,7 +200,7 @@
     STC_API clist_##tag##_iter_t \
     clist_##tag##_insert_after_v(clist_##tag* self, clist_##tag##_iter_t pos, Value value) { \
         _clist_insert_after(self, tag, pos.item, value); \
-        if (pos.item != pos.end) self->last = entry; \
+        if (pos.item == self->last && pos.item != pos.end) self->last = entry; \
         pos.item = entry; return pos; \
     } \
     STC_API clist_##tag##_iter_t \
@@ -273,7 +276,7 @@ _clist_splice_after(clist_void* self, clist_void_iter_t pos, clist_void* other) 
         clist_void_node_t *next = pos.item->next;
         pos.item->next = other->last->next;
         other->last->next = next;
-        if (pos.item == pos.end) self->last = other->last;
+        if (pos.item == self->last && pos.item != pos.end) self->last = other->last;
     }
     other->last = NULL;
 }
