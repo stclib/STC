@@ -133,8 +133,8 @@
     } \
     STC_INLINE void \
     clist_##tag##_next(clist_##tag##_iter_t* it) { \
-        if (it->item == *it->_last) it->end = it->item = it->item->next; \
-        else it->item = it->item->next; \
+        it->end = it->item == *it->_last ? it->item->next : NULL; \
+        it->item = it->item->next; \
     } \
  \
     STC_API clist_##tag##_iter_t \
