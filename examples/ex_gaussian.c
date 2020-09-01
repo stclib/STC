@@ -18,15 +18,15 @@ declare_cvec(e, cmap_i_entry_t, c_default_destroy, compare);
 
 int main()
 {
-    enum {Rows = 40, N = 5000000};
-    const double StdDev = 6.0, Mag = 35.0, Mean = 12;
+    enum {N = 10000000};
+    const double Mean = 12.0, StdDev = 8.0, Mag = 12000.0 / StdDev;
 
     printf("Demo of gaussian / normal distribution of %d random samples\n", N);
     
     // Setup random engine with normal distribution.
     uint64_t seed = time(NULL);    
     crand_rng64_t rng = crand_rng64_init(seed);
-    crand_normal_f64_t dist = crand_normal_f64_init(rng, Mean, Rows / StdDev);
+    crand_normal_f64_t dist = crand_normal_f64_init(rng, Mean, StdDev);
     
     // Create histogram map
     cmap_i mhist = cmap_init;
@@ -44,7 +44,7 @@ int main()
     // Print the gaussian bar chart
     cstr_t bar = cstr_init;
     c_foreach (i, cvec_e, vhist) {
-        size_t n = (size_t) (i.item->value * Mag * Rows / N);
+        size_t n = (size_t) (i.item->value * Mag / N);
         if (n > 0) {
             // bar string: take ownership in new str after freeing current.
             cstr_take(&bar, cstr_with_size(n, '*'));

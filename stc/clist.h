@@ -30,7 +30,7 @@
     
     This implements a std::forward_list-like class in C, but because it is circular,
     it also support push* and splice* at both ends of the list. This makes it ideal
-    for being used as a queue, unlike std::forward_list. Basic usage is similar to CVec:
+    for being used as a queue, unlike std::forward_list. Basic usage is similar to cvec:
    
     #include <stdio.h>
     #include <stc/clist.h>
@@ -100,6 +100,9 @@
     clist_##tag##_destroy(clist_##tag* self); \
     STC_INLINE void \
     clist_##tag##_clear(clist_##tag* self) {clist_##tag##_destroy(self);} \
+ \
+    STC_API void \
+    clist_##tag##_push_n(clist_##tag *self, const clist_##tag##_input_t in[], size_t size); \
     STC_API void \
     clist_##tag##_push_back_v(clist_##tag* self, Value value); \
     STC_INLINE void \
@@ -113,9 +116,27 @@
         clist_##tag##_push_front_v(self, valueFromRaw(rawValue)); \
     } \
     STC_API void \
-    clist_##tag##_push_n(clist_##tag *self, const clist_##tag##_input_t in[], size_t size); \
-    STC_API void \
     clist_##tag##_pop_front(clist_##tag* self); \
+ \
+    STC_INLINE clist_##tag##_iter_t \
+    clist_##tag##_before_begin(clist_##tag* self) { \
+        clist_##tag##_iter_t it = {self->last, self->last, &self->last}; return it; \
+    } \
+    STC_INLINE clist_##tag##_iter_t \
+    clist_##tag##_begin(clist_##tag* self) { \
+        clist_##tag##_node_t *head = self->last ? self->last->next : NULL; \
+        clist_##tag##_iter_t it = {head, NULL, &self->last}; return it; \
+    } \
+    STC_INLINE clist_##tag##_iter_t \
+    clist_##tag##_last(clist_##tag* self) { \
+        clist_##tag##_iter_t it = {self->last, NULL, &self->last}; return it; \
+    } \
+    STC_INLINE void \
+    clist_##tag##_next(clist_##tag##_iter_t* it) { \
+        if (it->item == *it->_last) it->end = it->item = it->item->next; \
+        else it->item = it->item->next; \
+    } \
+ \
     STC_API clist_##tag##_iter_t \
     clist_##tag##_insert_after_v(clist_##tag* self, clist_##tag##_iter_t pos, Value value); \
     STC_INLINE clist_##tag##_iter_t \
@@ -124,10 +145,20 @@
     } \
     STC_API clist_##tag##_iter_t \
     clist_##tag##_erase_after(clist_##tag* self, clist_##tag##_iter_t pos); \
+ \
     STC_INLINE void \
     clist_##tag##_splice_after(clist_##tag* self, clist_##tag##_iter_t pos, clist_##tag* other) { \
         _clist_splice_after((clist_void *) self, *(clist_void_iter_t *) &pos, (clist_void *) other); \
     } \
+    STC_INLINE void \
+    clist_##tag##_splice_front(clist_##tag* self, clist_##tag* other) { \
+        clist_##tag##_splice_after(self, clist_##tag##_before_begin(self), other); \
+    } \
+    STC_INLINE void \
+    clist_##tag##_splice_back(clist_##tag* self, clist_##tag* other) { \
+        clist_##tag##_splice_after(self, clist_##tag##_last(self), other); \
+    } \
+  \
     STC_API clist_##tag##_iter_t \
     clist_##tag##_find_before(clist_##tag* self, clist_##tag##_iter_t prev, RawValue val); \
     STC_API Value* \
@@ -141,28 +172,6 @@
     clist_##tag##_front(clist_##tag* self) {return &self->last->next->value;} \
     STC_INLINE Value* \
     clist_##tag##_back(clist_##tag* self) {return &self->last->value;} \
- \
-    STC_INLINE clist_##tag##_iter_t \
-    clist_##tag##_begin(clist_##tag* self) { \
-        clist_##tag##_node_t *head = self->last ? self->last->next : NULL; \
-        clist_##tag##_iter_t it = {head, NULL, &self->last}; return it; \
-    } \
-    STC_INLINE clist_##tag##_iter_t \
-    clist_##tag##_before_begin(clist_##tag* self) { \
-        clist_##tag##_iter_t it = {self->last, self->last, &self->last}; return it; \
-    } \
-    STC_INLINE clist_##tag##_iter_t \
-    clist_##tag##_ahead(clist_##tag* self) {return clist_##tag##_before_begin(self);} \
- \
-    STC_INLINE clist_##tag##_iter_t \
-    clist_##tag##_last(clist_##tag* self) { \
-        clist_##tag##_iter_t it = {self->last, NULL, &self->last}; return it; \
-    } \
-    STC_INLINE void \
-    clist_##tag##_next(clist_##tag##_iter_t* it) { \
-        if (it->item == *it->_last) it->end = it->item = it->item->next; \
-        else it->item = it->item->next; \
-    } \
  \
     implement_clist_7(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
     typedef Value clist_##tag##_value_t
