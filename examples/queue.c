@@ -7,8 +7,8 @@ declare_cqueue(i, clist_i); // min-heap (increasing values)
 
 int main() {
     int n = 10000000;
-    crand_rng32_t gen = crand_rng32_init(1234);
-    crand_uniform_i32_t dist = crand_uniform_i32_init(gen, 0, n);
+    crand_uniform_i32_t dist;
+    dist = crand_uniform_i32_init(crand_rng32_init(1234), 0, n);
 
     cqueue_i queue = cqueue_i_init();
 

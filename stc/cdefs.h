@@ -72,23 +72,25 @@
 #define c_default_compare(x, y) c_compare(c_default_less, x, y)
 #define c_default_destroy(p)    ((void)0)
 
-#define c_foreach(it, prefix, container) \
-            for (prefix##_iter_t it = prefix##_begin(&container); it.item != it.end; prefix##_next(&it))
+#define c_foreach(it, ctype, container) \
+            for (ctype##_iter_t it = ctype##_begin(&container); it.item != it.end; ctype##_next(&it))
 
 #define c_items(...) __VA_ARGS__
-#define c_push(container_ptr, prefix, items) do { \
-    const prefix##_input_t __arr[] = { items }; \
-    prefix##_push_n(container_ptr, __arr, sizeof(__arr)/sizeof(__arr[0])); \
+#define c_push(container_ptr, ctype, items) do { \
+    const ctype##_input_t __arr[] = { items }; \
+    ctype##_push_n(container_ptr, __arr, sizeof(__arr)/sizeof(__arr[0])); \
 } while (0)
-#define c_init(prefix, container, items) \
-    prefix container = prefix##_init(); { \
-        const prefix##_input_t __arr[] = { items }; \
-        prefix##_push_n(&container, __arr, sizeof(__arr)/sizeof(__arr[0])); \
+
+#define c_init(ctype, container, items) \
+    ctype container = ctype##_init(); { \
+        const ctype##_input_t __arr[] = { items }; \
+        ctype##_push_n(&container, __arr, sizeof(__arr)/sizeof(__arr[0])); \
     }
-#define c_destroy(prefix, ...) do { \
-    struct prefix* __arr[] = {__VA_ARGS__}; \
+
+#define c_destroy(ctype, ...) do { \
+    struct ctype* __arr[] = {__VA_ARGS__}; \
     for (size_t i=0; i<sizeof(__arr)/sizeof(__arr[0]); ++i) \
-        prefix##_destroy(__arr[i]); \
+        ctype##_destroy(__arr[i]); \
 } while (0)
 
 
