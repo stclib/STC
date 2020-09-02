@@ -54,6 +54,7 @@ int main(void) {
 #include "cdefs.h"
 
 #define cmap_init                     {NULL, NULL, 0, 0, 0.85f, 0.15f}
+#define cmap_empty(m)                 ((m).size == 0)
 #define cmap_size(m)                  ((size_t) (m).size)
 #define cmap_bucket_count(m)          ((size_t) (m).bucket_count)
 #define cset_init                     cmap_init
@@ -179,6 +180,8 @@ typedef struct { \
  \
 STC_INLINE ctype##_##tag \
 ctype##_##tag##_init(void) {ctype##_##tag m = cmap_init; return m;} \
+STC_INLINE bool \
+ctype##_##tag##_empty(ctype##_##tag m) {return m.size == 0;} \
 STC_INLINE size_t \
 ctype##_##tag##_size(ctype##_##tag m) {return (size_t) m.size;} \
 STC_INLINE size_t \

@@ -19,7 +19,7 @@ declare_cvec(e, cmap_i_entry_t, c_default_destroy, compare);
 int main()
 {
     enum {N = 10000000};
-    const double Mean = 12.0, StdDev = 8.0, Mag = 12000.0 / StdDev;
+    const double Mean = -12.0, StdDev = 8.0, Mag = 12000.0 / StdDev;
 
     printf("Demo of gaussian / normal distribution of %d random samples\n", N);
     
@@ -32,7 +32,7 @@ int main()
     cmap_i mhist = cmap_init;
     for (size_t i = 0; i < N; ++i) {
         int index = round( crand_normal_f64(&dist) );
-        ++ cmap_i_insert(&mhist, index, 0)->value;
+        cmap_i_insert(&mhist, index, 0)->value += 1;
     }
 
     // Transfer map to vec and sort it by map keys.

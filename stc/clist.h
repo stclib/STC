@@ -83,9 +83,9 @@
     } clist_##tag##_iter_t
 
 #define clist_init          {NULL}
+#define clist_empty(list)   ((list).last == NULL)
 #define clist_front(list)   (list).last->next->value
 #define clist_back(list)    (list).last->value
-#define clist_empty(list)   ((list).last == NULL)
 
 
 #define declare_clist_7(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
@@ -96,6 +96,11 @@
  \
     STC_INLINE clist_##tag \
     clist_##tag##_init(void) {clist_##tag x = clist_init; return x;} \
+    STC_INLINE bool \
+    clist_##tag##_empty(clist_##tag* self) {return clist_empty(*self);} \
+    STC_INLINE Value \
+    clist_##tag##_value_from_raw(RawValue rawValue) {return valueFromRaw(rawValue);} \
+ \
     STC_API void \
     clist_##tag##_destroy(clist_##tag* self); \
     STC_INLINE void \

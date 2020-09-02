@@ -53,8 +53,16 @@ typedef struct cvec_##tag { \
 typedef RawValue cvec_##tag##_rawvalue_t; \
 typedef cvec_##tag##_rawvalue_t cvec_##tag##_input_t; \
  \
+STC_INLINE cvec_##tag \
+cvec_##tag##_init(void) {cvec_##tag v = cvec_init; return v;} \
+STC_INLINE bool \
+cvec_##tag##_empty(cvec_##tag v) {return cvec_empty(v);} \
+STC_INLINE size_t \
+cvec_##tag##_size(cvec_##tag v) {return cvec_size(v);} \
+STC_INLINE size_t \
+cvec_##tag##_capacity(cvec_##tag v) {return cvec_capacity(v);} \
 STC_INLINE Value \
-cvec_##tag##_value_from_raw(cvec_##tag##_rawvalue_t rawValue) {return valueFromRaw(rawValue);} \
+cvec_##tag##_value_from_raw(RawValue rawValue) {return valueFromRaw(rawValue);} \
 STC_API void \
 cvec_##tag##_destroy(cvec_##tag* self); \
 STC_API void \
@@ -66,7 +74,7 @@ cvec_##tag##_push_n(cvec_##tag *self, const cvec_##tag##_input_t in[], size_t si
 STC_API void \
 cvec_##tag##_push_back_v(cvec_##tag* self, Value value); \
 STC_INLINE void \
-cvec_##tag##_push_back(cvec_##tag* self, cvec_##tag##_rawvalue_t rawValue) { \
+cvec_##tag##_push_back(cvec_##tag* self, RawValue rawValue) { \
     cvec_##tag##_push_back_v(self, valueFromRaw(rawValue)); \
 } \
 STC_API void \
@@ -86,10 +94,6 @@ cvec_##tag##_find(const cvec_##tag* self, RawValue rawValue); \
 STC_API int \
 cvec_##tag##_value_compare(const Value* x, const Value* y); \
  \
-STC_INLINE cvec_##tag \
-cvec_##tag##_init(void) { \
-    cvec_##tag x = cvec_init; return x; \
-} \
 STC_INLINE cvec_##tag \
 cvec_##tag##_with_size(size_t size, Value null_val) { \
     cvec_##tag x = cvec_init; \

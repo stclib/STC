@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stc/cstr.h>
 #include <stc/cmap.h>
+#include <stc/cvec.h>
 #include <stc/cpqueue.h>
 #include <stc/clist.h>
 
@@ -16,37 +17,35 @@ declare_cvec(ip, ipair_t, c_default_destroy, ipair_compare);
 declare_clist(ip, ipair_t, c_default_destroy, ipair_compare);
 
 declare_cvec(f, float);
-declare_cvec_pqueue(f, >);
+declare_cpqueue(f, >, cvec);
 
 
 int main(void) {
     
     // CVEC FLOAT / PRIORITY QUEUE
 
-    cvec_f floats = cvec_init;
-    c_push(&floats, cvec_f, c_items(4.0f, 2.0f, 5.0f, 3.0f, 1.0f));
+    c_init(cvec_f, floats, c_items(4.0f, 2.0f, 5.0f, 3.0f, 1.0f));
 
     c_foreach (i, cvec_f, floats) printf("%.1f ", *i.item);
     puts("");
 
     // CVEC PRIORITY QUEUE
 
-    cvec_f_pqueue_build(&floats); // reorganise vec
-    c_push(&floats, cvec_f_pqueue, c_items(40.0f, 20.0f, 50.0f, 30.0f, 10.0f));
+    cpqueue_f_build(&floats); // reorganise vec
+    c_push(&floats, cpqueue_f, c_items(40.0f, 20.0f, 50.0f, 30.0f, 10.0f));
 
     // sorted:
     while (cvec_size(floats) > 0) {
-        printf("%.1f ", cvec_f_pqueue_top(&floats));
-        cvec_f_pqueue_pop(&floats);
+        printf("%.1f ", *cpqueue_f_top(&floats));
+        cpqueue_f_pop(&floats);
     }
     puts("\n");
-    cvec_f_destroy(&floats);
+    cpqueue_f_destroy(&floats);
 
     // CMAP ID
 
     int year = 2020;
-    cmap_id idnames = cmap_init;
-    c_push(&idnames, cmap_id, c_items(
+    c_init(cmap_id, idnames, c_items(
         {100, cstr_make("Hello")},
         {110, cstr_make("World")},
         {120, cstr_from("Howdy, -%d-", year)},
@@ -59,10 +58,7 @@ int main(void) {
 
     // CMAP CNT
 
-    cmap_cnt countries = cmap_init;
-
-    cmap_cnt_insert(&countries, "Greenland", 0)->value += 20;
-    c_push(&countries, cmap_cnt, c_items(
+    c_init(cmap_cnt, countries, c_items(
         {"Norway", 100},
         {"Denmark", 50},
         {"Iceland", 10},
@@ -72,7 +68,7 @@ int main(void) {
         {"Spain", 10},
         {"France", 10},
     ));
-
+    cmap_cnt_insert(&countries, "Greenland", 0)->value += 20;
     cmap_cnt_insert(&countries, "Sweden", 0)->value += 20;
     cmap_cnt_insert(&countries, "Norway", 0)->value += 20;
     cmap_cnt_insert(&countries, "Finland", 0)->value += 20;
@@ -84,14 +80,14 @@ int main(void) {
 
     // CVEC PAIR
 
-    cvec_ip pairs1 = cvec_init; 
-    c_push(&pairs1, cvec_ip, c_items(
+    c_init(cvec_ip, pairs1, c_items(
         {5, 6},
         {3, 4},
         {1, 2},
         {7, 8},
     ));
     cvec_ip_sort(&pairs1);
+
     c_foreach (i, cvec_ip, pairs1)
         printf("(%d %d) ", i.item->x, i.item->y);
     puts("");
@@ -99,14 +95,14 @@ int main(void) {
 
     // CLIST PAIR
 
-    clist_ip pairs2 = clist_init;
-    c_push(&pairs2, clist_ip, c_items(
+    c_init(clist_ip, pairs2, c_items(
         {5, 6},
         {3, 4},
         {1, 2},
         {7, 8},
     ));
     clist_ip_sort(&pairs2);
+    
     c_foreach (i, clist_ip, pairs2)
         printf("(%d %d) ", i.item->value.x, i.item->value.y);
     puts("");
