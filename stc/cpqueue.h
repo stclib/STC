@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-/*  Priority Queue using cvec as heap.
+/*  Priority Queue using heap, with adapter class (normally cvec).
 
     #include <stc/crandom.h>
     #include <stc/cpqueue.h>
@@ -38,7 +38,7 @@
             cpqueue_f_push(&queue, crandom_uniform_f32(&gen, dist));
         // Extract the 100 smallest.
         for (int i=0; i<100; ++i) {
-            printf("%f ", *cpqueue_f_top(&queue));
+            printf("%f ", cpqueue_f_top(queue));
             cpqueue_f_pop(&queue);
         }
         cpqueue_f_destroy(&queue);
@@ -59,17 +59,17 @@ typedef type##_##tag##_input_t cpqueue_##tag##_input_t; \
 STC_INLINE cpqueue_##tag \
 cpqueue_##tag##_init() {return type##_##tag##_init();} \
 STC_INLINE size_t \
-cpqueue_##tag##_size(cpqueue_##tag q) {return type##_##tag##_size(q);} \
+cpqueue_##tag##_size(cpqueue_##tag pq) {return type##_##tag##_size(pq);} \
 STC_INLINE bool \
-cpqueue_##tag##_empty(cpqueue_##tag q) {return type##_##tag##_empty(q);} \
+cpqueue_##tag##_empty(cpqueue_##tag pq) {return type##_##tag##_empty(pq);} \
 STC_INLINE void \
 cpqueue_##tag##_destroy(cpqueue_##tag* self) {type##_##tag##_destroy(self);} \
 STC_API void \
 cpqueue_##tag##_build(cpqueue_##tag* self); \
 STC_API void \
 cpqueue_##tag##_erase(cpqueue_##tag* self, size_t i); \
-STC_INLINE cpqueue_##tag##_value_t* \
-cpqueue_##tag##_top(cpqueue_##tag* self) {return &self->data[0];} \
+STC_INLINE cpqueue_##tag##_value_t \
+cpqueue_##tag##_top(cpqueue_##tag pq) {return pq.data[0];} \
 STC_INLINE void \
 cpqueue_##tag##_pop(cpqueue_##tag* self) {cpqueue_##tag##_erase(self, 0);} \
 STC_API void \

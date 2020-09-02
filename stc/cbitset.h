@@ -46,7 +46,7 @@ int main() {
 #include <assert.h>
 #include "cstr.h"
 
-typedef struct { uint64_t* _arr; size_t size; } cbitset_t;
+typedef struct cbitset { uint64_t* _arr; size_t size; } cbitset_t;
 
 #define cbitset_init {NULL, 0}
 

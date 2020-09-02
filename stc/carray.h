@@ -92,17 +92,17 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
 
 
 #define declare_carray_3(tag, Value, valueDestroy) \
-    typedef struct { \
+    typedef struct carray1##tag { \
         Value *data; \
         size_t _xdim; \
     } carray1##tag; \
  \
-    typedef struct { \
+    typedef struct carray2##tag { \
         Value *data; \
         size_t _xdim, _yxdim; \
     } carray2##tag; \
  \
-    typedef struct { \
+    typedef struct carray3##tag { \
         Value *data; \
         size_t _xdim, _yxdim, _zdim; \
     } carray3##tag; \

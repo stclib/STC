@@ -68,7 +68,7 @@ void findElementsAfterDel(int arr[], int m, int del[],
   
     // Print top k elements in the min heap 
     for (int i = 0; i < k; ++i) { 
-        printf("%d ", *cpqueue_i_top(&heap)); 
+        printf("%d ", cpqueue_i_top(heap)); 
   
         // Pop the top element 
         cpqueue_i_pop(&heap); 

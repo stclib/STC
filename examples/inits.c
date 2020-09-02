@@ -36,7 +36,7 @@ int main(void) {
 
     // sorted:
     while (cvec_size(floats) > 0) {
-        printf("%.1f ", *cpqueue_f_top(&floats));
+        printf("%.1f ", cpqueue_f_top(floats));
         cpqueue_f_pop(&floats);
     }
     puts("\n");

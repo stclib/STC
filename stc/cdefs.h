@@ -86,7 +86,7 @@
         prefix##_push_n(&container, __arr, sizeof(__arr)/sizeof(__arr[0])); \
     }
 #define c_destroy(prefix, ...) do { \
-    prefix* __arr[] = {__VA_ARGS__}; \
+    struct prefix* __arr[] = {__VA_ARGS__}; \
     for (size_t i=0; i<sizeof(__arr)/sizeof(__arr[0]); ++i) \
         prefix##_destroy(__arr[i]); \
 } while (0)

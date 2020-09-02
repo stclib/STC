@@ -29,5 +29,5 @@ int main ()
   cstr_replace(&s, 22, 1, "!!!");          // "this is a short phrase!!!"  (5)
   printf("(5) %s\n", s.str);  
   
-  cstr_mdestroy(&s, &m);
+  c_destroy(cstr, &s, &m);
 }

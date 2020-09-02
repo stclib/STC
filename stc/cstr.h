@@ -30,7 +30,7 @@
 #include "cdefs.h"
 
 
-typedef struct cstr_t {
+typedef struct cstr {
     char* str;
 } cstr_t;
 typedef struct {
@@ -46,12 +46,6 @@ static  cstr_t cstr_init = {(char* ) &_cstr_nullrep[2]};
 #define cstr_front(s)      (s).str[0]
 #define cstr_back(s)       (s).str[_cstr_size(s) - 1] /* may have side effect */
 #define cstr_npos          ((size_t) (-1))
-/* destroy multiple strings: */
-#define cstr_mdestroy(...) do { \
-    cstr_t *__objs[] = {__VA_ARGS__}; \
-    for (size_t i=0; i<sizeof(__objs)/sizeof(__objs[0]); ++i) \
-        cstr_destroy(__objs[i]); \
-} while (0)
 
 STC_API cstr_t
 cstr_make_n(const char* str, size_t len);

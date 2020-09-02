@@ -165,7 +165,7 @@ typedef struct { \
 typedef RawKey ctype##_##tag##_rawkey_t; \
 typedef RawValue ctype##_##tag##_rawvalue_t; \
  \
-typedef struct { \
+typedef struct ctype##_##tag { \
     ctype##_##tag##_entry_t* table; \
     uint8_t* _hashx; \
     uint32_t size, bucket_count; \

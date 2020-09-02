@@ -28,7 +28,7 @@ int main() {
 
     // Extract the hundred smallest.
     for (int i=0; i<100; ++i) {
-        printf("%zd ", *cpqueue_i_top(&heap));
+        printf("%zd ", cpqueue_i_top(heap));
         cpqueue_i_pop(&heap);
     }
     cpqueue_i_destroy(&heap);
