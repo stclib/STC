@@ -12,7 +12,7 @@ An elegant, fully typesafe, generic, customizable, user-friendly, consistent, an
 - **stc/cset.h** - A generic **unordered set** implemented in tandem with *unordered map*
 - **stc/cstr.h** - Compact and powerful **string** class.
 - **stc/cvec.h** - Dynamic generic **vector** class, works well as a **stack**.
-- **stc/cpqueue.h** - Priority queue adapter for **cvec.h**, as a **heap**.
+- **stc/cprique.h** - Priority queue adapter for **cvec.h**, as a **heap**.
 - **stc/copt.h** - Implementation of a **getopt_long()**-like function, *copt_get()*, to parse command line arguments.
 - **stc/crandom.h** - A few very efficent modern random number generators *pcg32* and my own *64-bit PRNG* inspired by *sfc64*. Both uniform and normal distributions.
 - **stc/cdefs.h** - A common include file with a few general definitions.

@@ -85,6 +85,10 @@
 #define clist_init          {NULL}
 #define clist_empty(list)   ((list).last == NULL)
 
+
+declare_clist_types(void, int);
+STC_API size_t _clist_size(const clist_void* self);
+
 #define declare_clist_7(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
  \
     declare_clist_types(tag, Value); \
@@ -94,7 +98,9 @@
     STC_INLINE clist_##tag \
     clist_##tag##_init(void) {clist_##tag x = clist_init; return x;} \
     STC_INLINE bool \
-    clist_##tag##_empty(clist_##tag l) {return clist_empty(l);} \
+    clist_##tag##_empty(clist_##tag ls) {return clist_empty(ls);} \
+    STC_INLINE size_t \
+    clist_##tag##_size(clist_##tag ls) {return _clist_size((const clist_void*) &ls);} \
     STC_INLINE Value \
     clist_##tag##_value_from_raw(RawValue rawValue) {return valueFromRaw(rawValue);} \
  \
@@ -278,9 +284,7 @@
     free(del)
 
 
-declare_clist_types(void, int);
-
-STC_API void \
+STC_API void
 _clist_splice_after(clist_void* self, clist_void_iter_t pos, clist_void* other) {
     if (!pos.item)
         self->last = other->last;
@@ -292,6 +296,16 @@ _clist_splice_after(clist_void* self, clist_void_iter_t pos, clist_void* other) 
     }
     other->last = NULL;
 }
+
+STC_API size_t
+_clist_size(const clist_void* self) {
+    const clist_void_node_t *i = self->last;
+    if (!i) return 0;
+    size_t n = 1;
+    while ((i = i->next) != self->last) ++n;
+    return n;
+}
+
 
 /* Singly linked list Mergesort implementation by Simon Tatham. O(n*log n).
  * https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html

@@ -2,7 +2,7 @@
 #include <stc/cstr.h>
 #include <stc/cmap.h>
 #include <stc/cvec.h>
-#include <stc/cpqueue.h>
+#include <stc/cprique.h>
 #include <stc/clist.h>
 
 declare_cmap(id, int, cstr_t, cstr_destroy); // Map of int -> cstr_t
@@ -17,7 +17,7 @@ declare_cvec(ip, ipair_t, c_default_destroy, ipair_compare);
 declare_clist(ip, ipair_t, c_default_destroy, ipair_compare);
 
 declare_cvec(f, float);
-declare_cpqueue(f, cvec_f, >);
+declare_cprique(f, cvec_f, >);
 
 
 int main(void) {
@@ -31,16 +31,16 @@ int main(void) {
 
     // CVEC PRIORITY QUEUE
 
-    cpqueue_f_build(&floats); // reorganise vec
-    c_push(&floats, cpqueue_f, c_items(40.0f, 20.0f, 50.0f, 30.0f, 10.0f));
+    cprique_f_build(&floats); // reorganise vec
+    c_push(&floats, cprique_f, c_items(40.0f, 20.0f, 50.0f, 30.0f, 10.0f));
 
     // sorted:
     while (cvec_size(floats) > 0) {
-        printf("%.1f ", *cpqueue_f_top(&floats));
-        cpqueue_f_pop(&floats);
+        printf("%.1f ", *cprique_f_top(&floats));
+        cprique_f_pop(&floats);
     }
     puts("\n");
-    cpqueue_f_destroy(&floats);
+    cprique_f_destroy(&floats);
 
     // CMAP ID
 
