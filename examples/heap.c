@@ -5,7 +5,7 @@
 #include <stc/cpqueue.h>
 
 declare_cvec(f, float);
-declare_cpqueue(f, >, cvec);
+declare_cpqueue(f, cvec_f, >);
 
 int main()
 {
@@ -24,7 +24,7 @@ int main()
     printf("Built priority queue: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
 
     for (int i=0; i<M; ++i)
-        printf("%.0f ", cpqueue_f_top(pq)), cpqueue_f_pop(&pq);
+        printf("%.0f ", *cpqueue_f_top(&pq)), cpqueue_f_pop(&pq);
     
     start = clock();
     for (int i=M; i<N; ++i)
@@ -38,7 +38,7 @@ int main()
     printf("pushed PQ: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
     
     for (int i=0; i<M; ++i)
-        printf("%.0f ", cpqueue_f_top(pq)), cpqueue_f_pop(&pq);
+        printf("%.0f ", *cpqueue_f_top(&pq)), cpqueue_f_pop(&pq);
     puts("");
 
     cpqueue_f_destroy(&pq);

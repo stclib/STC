@@ -39,10 +39,10 @@
  
     int main() {
         clist_ix list = clist_init;
-        crandom_eng32_t pcg = crandom_eng32_init(12345);
+        crand_rng32_t pcg = crand_rng32_init(12345);
         int n;
         for (int i=0; i<1000000; ++i) // one million
-            clist_ix_push_back(&list, crandom_i32(&pcg));
+            clist_ix_push_back(&list, crand_i32(&pcg));
         n = 0; 
         c_foreach (i, clist_ix, list)
             if (++n % 10000 == 0) printf("%8d: %10zd\n", n, i.item->value);
@@ -84,9 +84,6 @@
 
 #define clist_init          {NULL}
 #define clist_empty(list)   ((list).last == NULL)
-#define clist_front(list)   (list).last->next->value
-#define clist_back(list)    (list).last->value
-
 
 #define declare_clist_7(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
  \
@@ -97,7 +94,7 @@
     STC_INLINE clist_##tag \
     clist_##tag##_init(void) {clist_##tag x = clist_init; return x;} \
     STC_INLINE bool \
-    clist_##tag##_empty(clist_##tag* self) {return clist_empty(*self);} \
+    clist_##tag##_empty(clist_##tag l) {return clist_empty(l);} \
     STC_INLINE Value \
     clist_##tag##_value_from_raw(RawValue rawValue) {return valueFromRaw(rawValue);} \
  \

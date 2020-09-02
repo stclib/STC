@@ -278,12 +278,12 @@ declare_clist(fx, double);
 
 int main() {
     clist_fx list = clist_init;
-    crandom_eng64_t eng = crandom_eng64_init(time(NULL));
-    crandom_uniform_f64_t dist = crandom_uniform_f64_init(100.0, 1000.0);
+    crand_eng64_t eng = crand_eng64_init(time(NULL));
+    crand_uniform_f64_t dist = crand_uniform_f64_init(100.0, 1000.0);
     int k;
     
     for (int i = 0; i < 10000000; ++i)
-        clist_fx_push_back(&list, crandom_uniform_f64(&eng, dist));
+        clist_fx_push_back(&list, crand_uniform_f64(&eng, dist));
     k = 0; c_foreach (i, clist_fx, list)
         if (++k <= 100) printf("%8d: %10f\n", k, i.item->value); else break;
 

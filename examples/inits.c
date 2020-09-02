@@ -17,7 +17,7 @@ declare_cvec(ip, ipair_t, c_default_destroy, ipair_compare);
 declare_clist(ip, ipair_t, c_default_destroy, ipair_compare);
 
 declare_cvec(f, float);
-declare_cpqueue(f, >, cvec);
+declare_cpqueue(f, cvec_f, >);
 
 
 int main(void) {
@@ -36,7 +36,7 @@ int main(void) {
 
     // sorted:
     while (cvec_size(floats) > 0) {
-        printf("%.1f ", cpqueue_f_top(floats));
+        printf("%.1f ", *cpqueue_f_top(&floats));
         cpqueue_f_pop(&floats);
     }
     puts("\n");
