@@ -8,7 +8,7 @@ declare_cmap_strkey(ss, cstr_t, cstr_destroy);
 
 int main ()
 {
-    cmap_si mymap = cmap_init;
+    cmap_si mymap = cmap_ini;
     cmap_si_put(&mymap, "Mars", 3000);
     cmap_si_put(&mymap, "Saturn", 60000);
     cmap_si_put(&mymap, "Jupiter", 70000);
@@ -28,7 +28,7 @@ int main ()
     puts("------------------------");
 
     // Create an unordered_map of three strings (that map to strings)
-    cmap_ss u = cmap_init;
+    cmap_ss u = cmap_ini;
     cmap_ss_put(&u, "RED", cstr_make("#FF0000"));
     cmap_ss_put(&u, "GREEN", cstr_make("#00FF00"));
     cmap_ss_put(&u, "BLUE", cstr_make("#0000FF"));

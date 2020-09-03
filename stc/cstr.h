@@ -39,13 +39,13 @@ typedef char cstr_value_t, cstr_rawvalue_t, cstr_input_t;
 
 static size_t _cstr_nullrep[] = {0, 0, 0};
 
-static  cstr_t cstr_init = {(char* ) &_cstr_nullrep[2]};
+static  cstr_t cstr_ini =  {(char* ) &_cstr_nullrep[2]};
 #define cstr_size(s)       ((const size_t *) (s).str)[-2]
 #define cstr_capacity(s)   ((const size_t *) (s).str)[-1]
 #define cstr_empty(s)      (cstr_size(s) == 0)
-#define cstr_front(s)      (s).str[0]
-#define cstr_back(s)       (s).str[_cstr_size(s) - 1] /* may have side effect */
 #define cstr_npos          ((size_t) (-1))
+#define cstr_push_n        cstr_append_n
+#define cstr_push_back_v   cstr_push_back
 
 STC_API cstr_t
 cstr_make_n(const char* str, size_t len);
@@ -73,6 +73,9 @@ c_strnstr(const char* s, const char* needle, size_t n);
 /* gives true string capacity: 7, 23, 39, ... */
 #define _cstr_cap(size)  ((((size) + 24) >> 4) * 16 - 9)
 
+STC_INLINE cstr_t
+cstr_init() {return cstr_ini;}
+
 STC_INLINE void
 cstr_destroy(cstr_t* self) {
     if (cstr_capacity(*self))
@@ -81,13 +84,13 @@ cstr_destroy(cstr_t* self) {
 
 STC_INLINE cstr_t
 cstr_with_capacity(size_t cap) {
-    cstr_t s = cstr_init;
+    cstr_t s = cstr_ini;
     cstr_reserve(&s, cap);
     return s;
 }
 STC_INLINE cstr_t
 cstr_with_size(size_t len, char fill) {
-    cstr_t s = cstr_init;
+    cstr_t s = cstr_ini;
     cstr_resize(&s, len, fill);
     return s;
 }
@@ -105,6 +108,11 @@ STC_INLINE void
 cstr_clear(cstr_t* self) {
     self->str[_cstr_size(*self) = 0] = '\0';
 }
+
+STC_INLINE char*
+cstr_front(cstr_t* self) {return self->str;}
+STC_INLINE char*
+cstr_back(cstr_t* self) {return self->str + _cstr_size(*self) - 1;}
 
 STC_INLINE cstr_iter_t
 cstr_begin(cstr_t* self) {
@@ -128,7 +136,7 @@ cstr_take(cstr_t* self, cstr_t s) {
 STC_INLINE cstr_t
 cstr_move(cstr_t* self) {
     cstr_t tmp = *self;
-    *self = cstr_init;
+    *self = cstr_ini;
     return tmp;
 }
 
@@ -136,14 +144,11 @@ STC_INLINE cstr_t*
 cstr_append(cstr_t* self, const char* str) {
     return cstr_append_n(self, str, strlen(str));
 }
-/*STC_INLINE void
-cstr_push_n(cstr_t* self, const cstr_input_t[] in, size_t n) {
-    cstr_append_n(self, in, n);
-}*/
 STC_INLINE cstr_t*
 cstr_push_back(cstr_t* self, char value) {
     return cstr_append_n(self, &value, 1);
 }
+
 STC_INLINE void
 cstr_pop_back(cstr_t* self) {
     self->str[ --_cstr_size(*self) ] = '\0';
@@ -228,7 +233,7 @@ cstr_resize(cstr_t* self, size_t len, char fill) {
 
 STC_API cstr_t
 cstr_make_n(const char* str, size_t len) {
-    if (len == 0) return cstr_init;
+    if (len == 0) return cstr_ini;
     size_t *rep = (size_t *) malloc(_cstr_mem(len));
     cstr_t s = {(char *) memcpy(rep + 2, str, len)};
     s.str[rep[0] = len] = '\0'; 
@@ -245,7 +250,7 @@ cstr_from(const char* fmt, ...) {
     #  pragma warning(push)
     #  pragma warning(disable: 4996)
     #endif
-    cstr_t tmp = cstr_init;
+    cstr_t tmp = cstr_ini;
     va_list args, args2;
     va_start(args, fmt);
     va_copy(args2, args);

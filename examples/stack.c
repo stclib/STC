@@ -1,12 +1,15 @@
 
-#include <stc/cstack.h>
 #include <stdio.h>
+#include <stc/cstr.h>
+#include <stc/cstack.h>
 
 declare_cvec(i, int);
 declare_cstack(i, cvec_i);
+declare_cstack(c, cstr);
 
 int main() {
     cstack_i stack = cstack_i_init();
+    cstack_c chars = cstack_c_init();
 
     for (int i=0; i<100; ++i)
         cstack_i_push(&stack, i*i);

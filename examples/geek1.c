@@ -19,7 +19,7 @@ int findMaximumPairs(int a[], int n, int k)
 { 
   
     // Hash-table 
-    cmap_ii hash = cmap_init; 
+    cmap_ii hash = cmap_ini; 
     for (int i = 0; i < n; i++) {
         cmap_ii_insert(&hash, a[i] % k, 0)->value++;
     }

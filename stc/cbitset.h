@@ -48,7 +48,7 @@ int main() {
 
 typedef struct cbitset { uint64_t* _arr; size_t size; } cbitset_t;
 
-#define cbitset_init {NULL, 0}
+#define cbitset_ini {NULL, 0}
 
 STC_API void   cbitset_resize(cbitset_t* self, size_t size, bool value);
 STC_API size_t cbitset_count(cbitset_t set);

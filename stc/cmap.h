@@ -28,13 +28,13 @@ declare_cset(sx, int);       // Set of int
 declare_cmap(mx, int, char); // Map of int -> char
 
 int main(void) {
-    cset_sx s = cset_init;
+    cset_sx s = cset_ini;
     cset_sx_put(&s, 5);
     cset_sx_put(&s, 8);
     c_foreach (i, cset_sx, s) printf("set %d\n", i.item->key);
     cset_sx_destroy(&s);
 
-    cmap_mx m = cmap_init;
+    cmap_mx m = cmap_ini;
     cmap_mx_put(&m, 5, 'a');
     cmap_mx_put(&m, 8, 'b');
     cmap_mx_put(&m, 12, 'c');
@@ -53,11 +53,11 @@ int main(void) {
 #include <string.h>
 #include "cdefs.h"
 
-#define cmap_init                     {NULL, NULL, 0, 0, 0.85f, 0.15f}
+#define cmap_ini                      {NULL, NULL, 0, 0, 0.85f, 0.15f}
 #define cmap_empty(m)                 ((m).size == 0)
 #define cmap_size(m)                  ((size_t) (m).size)
 #define cmap_bucket_count(m)          ((size_t) (m).bucket_count)
-#define cset_init                     cmap_init
+#define cset_ini                      cmap_ini
 #define cset_size(s)                  cmap_size(s)
 #define cset_bucket_count(s)          cmap_bucket_count(s)
 #define cmap_try_emplace(tag, self, k, v) do { \
@@ -181,7 +181,7 @@ typedef struct { \
 } ctype##_##tag##_iter_t; \
  \
 STC_INLINE ctype##_##tag \
-ctype##_##tag##_init(void) {ctype##_##tag m = cmap_init; return m;} \
+ctype##_##tag##_init(void) {ctype##_##tag m = cmap_ini; return m;} \
 STC_INLINE bool \
 ctype##_##tag##_empty(ctype##_##tag m) {return m.size == 0;} \
 STC_INLINE size_t \
@@ -265,7 +265,7 @@ implement_CHASH(tag, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, 
                              keyDestroy, RawKey, keyToRaw, keyFromRaw, RawValue, valueFromRaw) \
 STC_API ctype##_##tag \
 ctype##_##tag##_with_capacity(size_t cap) { \
-    ctype##_##tag h = ctype##_init; \
+    ctype##_##tag h = ctype##_ini; \
     ctype##_##tag##_reserve(&h, cap); \
     return h; \
 } \

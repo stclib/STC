@@ -39,7 +39,7 @@ declare_cvec(ix, int64_t); // ix is just an example tag name.
 void vectordemo1()
 {
     printf("\nVECTORDEMO1\n");
-    cvec_ix bignums = cvec_init; // = (cvec_ix) cvec_init; if initializing after declaration.
+    cvec_ix bignums = cvec_ini; // = (cvec_ix) cvec_ini; if initializing after declaration.
     cvec_ix_reserve(&bignums, 100);
     for (size_t i = 0; i<=100; ++i)
         cvec_ix_push_back(&bignums, i * i * i);
@@ -60,7 +60,7 @@ declare_cvec_str();
 void vectordemo2()
 {
     printf("\nVECTORDEMO2\n");
-    cvec_str names = cvec_init;
+    cvec_str names = cvec_ini;
     cvec_str_push_back(&names, "Mary");
     cvec_str_push_back(&names, "Joe");
     cvec_str_push_back(&names, "Chris");
@@ -78,7 +78,7 @@ declare_clist(ix, int);
 void listdemo1()
 {
     printf("\nLISTDEMO1\n");
-    clist_ix nums = clist_init, nums2 = clist_init;
+    clist_ix nums = clist_ini, nums2 = clist_ini;
     for (int i = 0; i < 10; ++i)
         clist_ix_push_back(&nums, i);
     for (int i = 100; i < 110; ++i)
@@ -105,7 +105,7 @@ declare_cset(i, int);
 void setdemo1()
 {
     printf("\nSETDEMO1\n");
-    cset_i nums = cset_init;
+    cset_i nums = cset_ini;
     cset_i_put(&nums, 8);
     cset_i_put(&nums, 11);
 
@@ -120,7 +120,7 @@ declare_cmap(ii, int, int);
 void mapdemo1()
 {
     printf("\nMAPDEMO1\n");
-    cmap_ii nums = cmap_init;
+    cmap_ii nums = cmap_ini;
     cmap_ii_put(&nums, 8, 64);
     cmap_ii_put(&nums, 11, 121);
 
@@ -134,7 +134,7 @@ declare_cmap_strkey(si, int); // Shorthand macro for the general declare_cmap ex
 void mapdemo2()
 {
     printf("\nMAPDEMO2\n");
-    cmap_si nums = cmap_init;
+    cmap_si nums = cmap_ini;
     cmap_si_put(&nums, "Hello", 64);
     cmap_si_put(&nums, "Groovy", 121);
     cmap_si_put(&nums, "Groovy", 200); // overwrite previous
@@ -156,7 +156,7 @@ declare_cmap_strkey(ss, cstr_t, cstr_destroy);
 void mapdemo3()
 {
     printf("\nMAPDEMO3\n");
-    cmap_ss table = cmap_init;
+    cmap_ss table = cmap_ini;
     cmap_ss_put(&table, "Map", cstr_make("test"));
     cmap_ss_put(&table, "Make", cstr_make("my"));
     cmap_ss_put(&table, "Sunny", cstr_make("day"));

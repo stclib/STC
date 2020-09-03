@@ -10,8 +10,8 @@ int main()
 { 
     // Lets use an explicit type signature (which would
     // be `cmap<String, String>` in this example).
-    cmap_str book_reviews = cmap_init; 
-    cset_str set = cset_init;
+    cmap_str book_reviews = cmap_ini; 
+    cset_str set = cset_ini;
     cset_str_put(&set, "Hello");
     cset_str_put(&set, "You");
     cset_str_put(&set, "Tube");

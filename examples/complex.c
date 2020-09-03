@@ -14,14 +14,14 @@ int main() {
     int xdim = 4, ydim = 6;
     int x = 1, y = 5, tableKey = 42;
     const char* strKey = "first";
-    cmap_s myMap = cmap_init;
+    cmap_s myMap = cmap_ini;
 
     { // Construct.
         carray2f table = carray2f_make(ydim, xdim, 0.f);
         printf("table: (%zu, %zu)\n", carray2_ydim(table), carray2_xdim(table));
-        clist_y tableList = clist_init;
+        clist_y tableList = clist_ini;
         // Put in some data.
-        cmap_g listMap = cmap_init;
+        cmap_g listMap = cmap_ini;
         
         *carray2f_at(&table, y, x) = 3.1415927; // table[y][x]
         clist_y_push_back(&tableList, table);

@@ -25,11 +25,11 @@ After inserting all the elements excluding the ones which are to be deleted, Pop
 #include <stc/clist.h>
 #include <stc/cmap.h>
 #include <stc/cvec.h>
-#include <stc/cprique.h>
+#include <stc/cpqueue.h>
 
 declare_cmap(ii, int, int);
 declare_cvec(i, int);
-declare_cprique(i, cvec_i, >);
+declare_cpqueue(i, cvec_i, >);
 
 // Find k minimum element from arr[0..m-1] after deleting
 // elements from del[0..n-1]
@@ -37,14 +37,14 @@ void findElementsAfterDel(int arr[], int m, int del[],
                           int n, int k) 
 { 
     // Hash Map of the numbers to be deleted 
-    cmap_ii mp = cmap_init; 
+    cmap_ii mp = cmap_ini; 
     for (int i = 0; i < n; ++i) { 
   
         // Increment the count of del[i] 
         cmap_ii_insert(&mp, del[i], 0)->value++; 
     } 
   
-    cprique_i heap = cprique_i_init(); 
+    cpqueue_i heap = cpqueue_i_init(); 
   
     for (int i = 0; i < m; ++i) { 
   
@@ -63,17 +63,17 @@ void findElementsAfterDel(int arr[], int m, int del[],
   
         // Else push it in the min heap 
         else
-            cprique_i_push(&heap, arr[i]); 
+            cpqueue_i_push(&heap, arr[i]); 
     } 
   
     // Print top k elements in the min heap 
     for (int i = 0; i < k; ++i) { 
-        printf("%d ", *cprique_i_top(&heap)); 
+        printf("%d ", *cpqueue_i_top(&heap)); 
   
         // Pop the top element 
-        cprique_i_pop(&heap); 
+        cpqueue_i_pop(&heap); 
     }
-    cprique_i_destroy(&heap);
+    cpqueue_i_destroy(&heap);
 } 
   
 int main() 

@@ -38,7 +38,7 @@
     declare_clist(ix, int64_t);
  
     int main() {
-        clist_ix list = clist_init;
+        clist_ix list = clist_ini;
         crand_rng32_t pcg = crand_rng32_init(12345);
         int n;
         for (int i=0; i<1000000; ++i) // one million
@@ -82,7 +82,7 @@
         clist_##tag##_node_t *item, *end, **_last; \
     } clist_##tag##_iter_t
 
-#define clist_init          {NULL}
+#define clist_ini           {NULL}
 #define clist_empty(list)   ((list).last == NULL)
 
 
@@ -97,7 +97,7 @@ STC_API size_t _clist_size(const clist_void* self);
     typedef clist_##tag##_rawvalue_t clist_##tag##_input_t; \
  \
     STC_INLINE clist_##tag \
-    clist_##tag##_init(void) {clist_##tag x = clist_init; return x;} \
+    clist_##tag##_init(void) {clist_##tag x = clist_ini; return x;} \
     STC_INLINE bool \
     clist_##tag##_empty(clist_##tag ls) {return clist_empty(ls);} \
     STC_INLINE size_t \

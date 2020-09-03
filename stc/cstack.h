@@ -49,7 +49,7 @@
 
 #define declare_cstack(tag, ctype) \
  \
-typedef ctype cstack_##tag; \
+typedef struct ctype cstack_##tag; \
 typedef ctype##_value_t cstack_##tag##_value_t; \
 typedef ctype##_rawvalue_t cstack_##tag##_rawvalue_t; \
 typedef ctype##_input_t cstack_##tag##_input_t; \
@@ -73,11 +73,11 @@ STC_INLINE void \
 cstack_##tag##_push(cstack_##tag* self, cstack_##tag##_rawvalue_t rawValue) { \
     ctype##_push_back(self, rawValue); \
 } \
+ \
 STC_API void \
 cstack_##tag##_push_n(cstack_##tag *self, const cstack_##tag##_input_t in[], size_t size) { \
     ctype##_push_n(self, in, size); \
 } \
- \
 typedef ctype##_iter_t cstack_##tag##_iter_t; \
 STC_INLINE cstack_##tag##_iter_t \
 cstack_##tag##_begin(cstack_##tag* self) {return ctype##_begin(self);} \

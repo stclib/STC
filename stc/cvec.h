@@ -27,7 +27,7 @@
 #include <string.h>
 #include "cdefs.h"
 
-#define cvec_init           {NULL}
+#define cvec_ini           {NULL}
 #define cvec_size(v)       _cvec_safe_size((v).data)
 #define cvec_capacity(v)   _cvec_safe_capacity((v).data)
 #define cvec_empty(v)      (_cvec_safe_size((v).data) == 0)
@@ -55,7 +55,7 @@ typedef RawValue cvec_##tag##_rawvalue_t; \
 typedef cvec_##tag##_rawvalue_t cvec_##tag##_input_t; \
  \
 STC_INLINE cvec_##tag \
-cvec_##tag##_init(void) {cvec_##tag v = cvec_init; return v;} \
+cvec_##tag##_init(void) {cvec_##tag v = cvec_ini; return v;} \
 STC_INLINE bool \
 cvec_##tag##_empty(cvec_##tag v) {return cvec_empty(v);} \
 STC_INLINE size_t \
@@ -97,13 +97,13 @@ cvec_##tag##_value_compare(const Value* x, const Value* y); \
  \
 STC_INLINE cvec_##tag \
 cvec_##tag##_with_size(size_t size, Value null_val) { \
-    cvec_##tag x = cvec_init; \
+    cvec_##tag x = cvec_ini; \
     cvec_##tag##_resize(&x, size, null_val); \
     return x; \
 } \
 STC_INLINE cvec_##tag \
 cvec_##tag##_with_capacity(size_t size) { \
-    cvec_##tag x = cvec_init; \
+    cvec_##tag x = cvec_ini; \
     cvec_##tag##_reserve(&x, size); \
     return x; \
 } \

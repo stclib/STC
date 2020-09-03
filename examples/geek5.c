@@ -29,7 +29,7 @@ declare_cmap_strkey(sv, cvec_i, cvec_i_destroy);
 int NumOccurrences(const char* arr[], int n, const char* str, int L, int R) 
 { 
     // To store the indices of strings in the array 
-    cmap_sv M = cmap_init; 
+    cmap_sv M = cmap_ini; 
     for (int i = 0; i < n; i++) { 
         const char* temp = arr[i]; 
         cmap_sv_entry_t *it = cmap_sv_find(&M, temp); 
@@ -38,7 +38,7 @@ int NumOccurrences(const char* arr[], int n, const char* str, int L, int R)
         // have an entry in the map 
         // then create the entry 
         if (it == NULL) { 
-            cvec_i A = cvec_init; 
+            cvec_i A = cvec_ini; 
             cvec_i_push_back(&A, i + 1);
             cmap_sv_put(&M, temp, A); 
         } 

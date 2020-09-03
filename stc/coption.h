@@ -43,7 +43,7 @@ Example:
         const char* optstr = "xy:z::123";
         printf("program -x -y ARG -z [ARG] -1 -2 -3 --foo --bar ARG --opt [ARG] [ARGUMENTS]\n");
         int c;
-        coption_t opt = coption_init;
+        coption_t opt = coption_ini;
         while ((c = coption_get(&opt, argc, argv, optstr, longopts)) != -1) {
             switch (c) {
                 case '?': printf("error: unknown option: %s\n", opt.faulty); break;
@@ -83,7 +83,7 @@ typedef struct {
     int val;
 } coption_long_t;
 
-static const coption_t coption_init = {1, 0, NULL, NULL, -1, 1, 0, 0, {'-', '?', '\0'}};
+static const coption_t coption_ini = {1, 0, NULL, NULL, -1, 1, 0, 0, {'-', '?', '\0'}};
 
 static void _coption_permute(char *argv[], int j, int n) { /* move argv[j] over n elements to the left */
     int k;
@@ -93,7 +93,7 @@ static void _coption_permute(char *argv[], int j, int n) { /* move argv[j] over 
     argv[j - k] = p;
 }
 
-/* @param opt   output; must be initialized to coption_init on first call
+/* @param opt   output; must be initialized to coption_ini on first call
  * @return      ASCII val for a short option; longopt.val for a long option;
  *              -1 if argv[] is fully processed; '?' for an unknown option or
  *              an ambiguous long option; ':' if an option argument is missing

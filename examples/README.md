@@ -60,7 +60,7 @@ cmap_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() 
 Finally, main which also demos the generic c_push() of multiple elements:
 ```
 int main() {
-    cmap_vk vikings = cmap_init;
+    cmap_vk vikings = cmap_ini;
     c_push(&vikings, cmap_vk, c_items(
         { {"Einar", "Norway"}, 20 },
         { {"Olaf", "Denmark"}, 24 },

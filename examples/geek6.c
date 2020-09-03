@@ -37,7 +37,7 @@ declare_cset(i, int);
 int missingNumber(int a[], int n) 
 { 
     // Declaring an unordered_map 
-    cset_i mp = cset_init; 
+    cset_i mp = cset_ini; 
   
     // if array value is positive 
     // store it in map 

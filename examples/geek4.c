@@ -49,7 +49,7 @@ int commonWords(cvec_str S)
   
  
     // To store all the words of first string 
-    cvec_sb ans = cvec_init; 
+    cvec_sb ans = cvec_ini; 
   
     // m will store number of strings in given vector 
     m = cvec_size(S);
@@ -59,8 +59,8 @@ int commonWords(cvec_str S)
     // Extract all words of first string and store it in ans 
     while (i < cstr_size(S.data[0])) { 
         // To store separate words 
-        cstr_t word = cstr_init; 
-        cmap_sb_entry_t tmp = {cstr_init, false};
+        cstr_t word = cstr_ini; 
+        cmap_sb_entry_t tmp = {cstr_ini, false};
 
         while (i < cstr_size(S.data[0]) && S.data[0].str[i] != ' ') { 
             cstr_push_back(&word, S.data[0].str[i]); 
@@ -85,11 +85,11 @@ int commonWords(cvec_str S)
     for (j = 1; j < m; j++) { 
         // It will be used to check if a word is present 
         // in a particuler string 
-        cmap_sb has = cmap_init; 
+        cmap_sb has = cmap_ini; 
         i = 0; 
   
         while (i < cstr_size(S.data[j])) { 
-            cstr_t word = cstr_init; 
+            cstr_t word = cstr_ini; 
             while (i < cstr_size(S.data[j]) && S.data[j].str[i] != ' ') { 
                 cstr_push_back(&word, S.data[j].str[i]); 
                 i++; 
@@ -136,7 +136,7 @@ int commonWords(cvec_str S)
 // Driver code 
 int main() 
 { 
-    cvec_str S = cvec_init; 
+    cvec_str S = cvec_ini; 
     cvec_str_push_back(&S, "there is a cow"); 
     cvec_str_push_back(&S, "cow is our mother"); 
     cvec_str_push_back(&S, "cow gives us milk and milk is sweet"); 

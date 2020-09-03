@@ -14,7 +14,7 @@ An elegant, fully typesafe, generic, customizable, user-friendly, consistent, an
 - **stc/cvec.h** - Dynamic generic **vector** class, works well as a **stack**.
 - **stc/cstack.h** - **stack** adapter, currently works with *cvec*.
 - **stc/cqueue.h** - **queue** adapter, currently works with *clist*.
-- **stc/cprique.h** - **priority queue** adapter. Works with *cvec*.
+- **stc/cpqueue.h** - **priority queue** adapter. Works with *cvec*.
 - **stc/coption.h** - Implementation of a **getopt_long()**-like function, *coption_get()*, to parse command line arguments.
 - **stc/crandom.h** - A few very efficent modern random number generators *pcg32* and my own *64-bit PRNG* inspired by *sfc64*. Both uniform and normal distributions.
 - **stc/cdefs.h** - A common include file with a few general definitions.
@@ -27,7 +27,7 @@ All containers mentioned above, except cstr_t and cbitset_t are generic and type
 declare_cvec(i, int);
 
 int main(void) {
-    cvec_i vec = cvec_init;
+    cvec_i vec = cvec_ini;
     cvec_i_push_back(&vec, 42);
     cvec_i_destroy(&vec);
 }
@@ -136,7 +136,7 @@ To avoid this, use
 ```
 declare_cmap_strkey(si, int);
 ...
-cmap_si map = cmap_init;
+cmap_si map = cmap_ini;
 cmap_si_put(&map, "mykey", 12);             // constructs a cstr_t key from the const char* internally.
 int x = cmap_si_find(&map, "mykey")->value; // no allocation of string key happens here.
 cmap_si_destroy(&map);
@@ -184,7 +184,7 @@ int main() {
 declare_cvec(ix, int64_t); // ix is just an example type tag name.
 
 int main() {
-    cvec_ix bignums = cvec_init; // use cvec_ix_init() if initializing after declaration.
+    cvec_ix bignums = cvec_ini; // use cvec_ix_init() if initializing after declaration.
     cvec_ix_reserve(&bignums, 100);
     for (size_t i = 0; i<100; ++i)
         cvec_ix_push_back(&bignums, i * i * i);
@@ -203,7 +203,7 @@ int main() {
 declare_cvec_str();
 
 int main() {
-    cvec_str names = cvec_init;
+    cvec_str names = cvec_ini;
     cvec_str_push_back(&names, "Mary");
     cvec_str_push_back(&names, "Joe");
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
@@ -223,7 +223,7 @@ int main() {
 declare_cmap(ii, int, int);
 
 int main() {
-    cmap_ii nums = cmap_init;
+    cmap_ii nums = cmap_ini;
     cmap_ii_put(&nums, 8, 64); // put() works as c++ std::unordered_map<>::insert_or_replace()
     cmap_ii_insert(&nums, 11, 121); // only insert value if key does not exists - like std::unordered_map::insert().
 
@@ -238,7 +238,7 @@ int main() {
 declare_cset_str(); // cstr set. See the discussion above.
 
 int main() {
-    cset_str words = cset_init;
+    cset_str words = cset_ini;
     cset_str_put(&words, "Hello");
     cset_str_put(&words, "Cruel");
     cset_str_put(&words, "World");    
@@ -257,7 +257,7 @@ int main() {
 declare_cmap_str(); 
 
 int main() {
-    cmap_str table = cmap_init;
+    cmap_str table = cmap_ini;
     cmap_str_put(&table, "Make", "my");
     cmap_str_put(&table, "Rainy", "day");
     cmap_str_put(&table, "Sunny", "afternoon");
@@ -279,7 +279,7 @@ int main() {
 declare_clist(fx, double);
 
 int main() {
-    clist_fx list = clist_init;
+    clist_fx list = clist_ini;
     crand_eng64_t eng = crand_eng64_init(time(NULL));
     crand_uniform_f64_t dist = crand_uniform_f64_init(100.0, 1000.0);
     int k;

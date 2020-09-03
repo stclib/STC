@@ -34,7 +34,7 @@ crand_rng64_t rng;
 #define RAND(N) (crand_i64(&rng) & ((1 << N) - 1))
 
 
-#define CMAP_SETUP(tt, Key, Value) cmap_##tt map = cmap_init \
+#define CMAP_SETUP(tt, Key, Value) cmap_##tt map = cmap_ini \
                                     ; cmap_##tt##_set_load_factors(&map, max_load_factor, 0.0)
 #define CMAP_PUT(tt, key, val)     cmap_##tt##_put(&map, key, val)->value
 #define CMAP_INSERT(tt, key, val)  cmap_##tt##_insert(&map, key, val)

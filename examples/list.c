@@ -6,7 +6,7 @@ declare_clist(fx, double);
 
 int main() {
     int k, n = 100000;
-    clist_fx list = clist_init;
+    clist_fx list = clist_ini;
     crand_rng64_t eng = crand_rng64_init(time(NULL));
     crand_uniform_f64_t dist = crand_uniform_f64_init(eng, 0.0f, n);
     

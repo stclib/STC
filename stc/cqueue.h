@@ -60,7 +60,7 @@
 
 #define declare_cqueue(tag, ctype) \
  \
-typedef ctype cqueue_##tag; \
+typedef struct ctype cqueue_##tag; \
 typedef ctype##_value_t cqueue_##tag##_value_t; \
 typedef ctype##_rawvalue_t cqueue_##tag##_rawvalue_t; \
 typedef ctype##_input_t cqueue_##tag##_input_t; \
@@ -86,11 +86,11 @@ STC_INLINE void \
 cqueue_##tag##_push(cqueue_##tag* self, cqueue_##tag##_rawvalue_t rawValue) { \
     ctype##_push_back(self, rawValue); \
 } \
+ \
 STC_API void \
 cqueue_##tag##_push_n(cqueue_##tag *self, const cqueue_##tag##_input_t in[], size_t size) { \
     ctype##_push_n(self, in, size); \
 } \
- \
 typedef ctype##_iter_t cqueue_##tag##_iter_t; \
 STC_INLINE cqueue_##tag##_iter_t \
 cqueue_##tag##_begin(cqueue_##tag* self) {return ctype##_begin(self);} \

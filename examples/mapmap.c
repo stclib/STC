@@ -7,8 +7,8 @@ declare_cmap_str();
 declare_cmap_strkey(cfg, cmap_str, cmap_str_destroy);
 
 int main(void) {
-    cmap_cfg config = cmap_init;
-    cmap_str init = cmap_init;
+    cmap_cfg config = cmap_ini;
+    cmap_str init = cmap_ini;
     cmap_str_put(&cmap_cfg_insert(&config, "user", init)->value, "name", "Joe");
     cmap_str_put(&cmap_cfg_insert(&config, "user", init)->value, "groups", "proj1,proj3");
     cmap_str_put(&cmap_cfg_insert(&config, "group", init)->value, "proj1", "Energy");
