@@ -14,5 +14,7 @@ int main() {
     for (int i=0; i<90; ++i)
         cstack_i_pop(&stack);
     
+    c_foreach (i, cstack_i, stack)
+        printf("%d\n", *cstack_i_itval(i));
     printf("top: %d\n", *cstack_i_top(&stack));
 }

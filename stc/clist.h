@@ -146,7 +146,7 @@ STC_API size_t _clist_size(const clist_void* self);
         it->item = it->item->next; \
     } \
     STC_INLINE clist_##tag##_value_t* \
-    clist_##tag##_itval(clist_##tag##_iter_t* it) {return &it->item->value;} \
+    clist_##tag##_itval(clist_##tag##_iter_t it) {return &it.item->value;} \
  \
     STC_API clist_##tag##_iter_t \
     clist_##tag##_insert_after_v(clist_##tag* self, clist_##tag##_iter_t pos, Value value); \

@@ -147,7 +147,7 @@ cvec_##tag##_begin(cvec_##tag* vec) { \
 STC_INLINE void \
 cvec_##tag##_next(cvec_##tag##_iter_t* it) { ++it->item; } \
 STC_INLINE cvec_##tag##_value_t* \
-cvec_##tag##_itval(cvec_##tag##_iter_t* it) {return it->item;} \
+cvec_##tag##_itval(cvec_##tag##_iter_t it) {return it.item;} \
  \
 implement_cvec_7(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw)
 

@@ -250,7 +250,7 @@ ctype##_##tag##_next(ctype##_##tag##_iter_t* it) { \
     while ((++it->item, *++it->_hx == 0)) ; \
 } \
 CMAP_ONLY_##ctype( STC_INLINE ctype##_##tag##_value_t* \
-ctype##_##tag##_itval(ctype##_##tag##_iter_t* it) {return &it->item->value;} ) \
+ctype##_##tag##_itval(ctype##_##tag##_iter_t it) {return &it.item->value;} ) \
  \
 STC_API uint32_t c_default_hash16(const void *data, size_t len); \
 STC_API uint32_t c_default_hash32(const void* data, size_t len); \
