@@ -92,6 +92,7 @@ STC_API size_t _clist_size(const clist_void* self);
 #define declare_clist_7(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
  \
     declare_clist_types(tag, Value); \
+    typedef Value clist_##tag##_value_t; \
     typedef RawValue clist_##tag##_rawvalue_t; \
     typedef clist_##tag##_rawvalue_t clist_##tag##_input_t; \
  \
@@ -144,6 +145,8 @@ STC_API size_t _clist_size(const clist_void* self);
         it->end = it->item == *it->_last ? it->item->next : NULL; \
         it->item = it->item->next; \
     } \
+    STC_INLINE clist_##tag##_value_t* \
+    clist_##tag##_itval(clist_##tag##_iter_t* it) {return &it->item->value;} \
  \
     STC_API clist_##tag##_iter_t \
     clist_##tag##_insert_after_v(clist_##tag* self, clist_##tag##_iter_t pos, Value value); \
@@ -181,8 +184,7 @@ STC_API size_t _clist_size(const clist_void* self);
     STC_INLINE Value* \
     clist_##tag##_back(clist_##tag* self) {return &self->last->value;} \
  \
-    implement_clist_7(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
-    typedef Value clist_##tag##_value_t
+    implement_clist_7(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw)
 
     
 /* -------------------------- IMPLEMENTATION ------------------------- */
@@ -265,7 +267,9 @@ STC_API size_t _clist_size(const clist_void* self);
     clist_##tag##_sort(clist_##tag* self) { \
         clist_void_node_t* last = _clist_mergesort((clist_void_node_t *) self->last->next, clist_##tag##_sort_compare); \
         self->last = (clist_##tag##_node_t *) last; \
-    }
+    } \
+    typedef int clist_##tag##_dud
+
 
 #define _clist_insert_after(self, tag, node, val) \
     clist_##tag##_node_t *entry = c_new (clist_##tag##_node_t), \
@@ -305,7 +309,6 @@ _clist_size(const clist_void* self) {
     while ((i = i->next) != self->last) ++n;
     return n;
 }
-
 
 /* Singly linked list Mergesort implementation by Simon Tatham. O(n*log n).
  * https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html

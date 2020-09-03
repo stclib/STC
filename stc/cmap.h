@@ -162,6 +162,8 @@ typedef struct { \
     CMAP_ONLY_##ctype(RawValue value;) \
 } ctype##_##tag##_input_t; \
  \
+typedef Key ctype##_##tag##_key_t; \
+typedef Value ctype##_##tag##_value_t; \
 typedef RawKey ctype##_##tag##_rawkey_t; \
 typedef RawValue ctype##_##tag##_rawvalue_t; \
  \
@@ -237,31 +239,31 @@ ctype##_##tag##_erase_entry(ctype##_##tag* self, ctype##_##tag##_entry_t* entry)
 STC_API bool \
 ctype##_##tag##_erase(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey); \
  \
-STC_FORCE_INLINE ctype##_##tag##_iter_t \
-ctype##_##tag##_begin(ctype##_##tag* map) { \
-    ctype##_##tag##_iter_t it = {map->table, map->table + map->bucket_count, map->_hashx}; \
+STC_INLINE ctype##_##tag##_iter_t \
+ctype##_##tag##_begin(ctype##_##tag* self) { \
+    ctype##_##tag##_iter_t it = {self->table, self->table + self->bucket_count, self->_hashx}; \
     if (it._hx) while (*it._hx == 0) ++it.item, ++it._hx; \
     return it; \
 } \
-STC_FORCE_INLINE void \
+STC_INLINE void \
 ctype##_##tag##_next(ctype##_##tag##_iter_t* it) { \
     while ((++it->item, *++it->_hx == 0)) ; \
 } \
+CMAP_ONLY_##ctype( STC_INLINE ctype##_##tag##_value_t* \
+ctype##_##tag##_itval(ctype##_##tag##_iter_t* it) {return &it->item->value;} ) \
  \
 STC_API uint32_t c_default_hash16(const void *data, size_t len); \
 STC_API uint32_t c_default_hash32(const void* data, size_t len); \
  \
 implement_CHASH(tag, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
-                     keyDestroy, RawKey, keyToRaw, keyFromRaw, RawValue, valueFromRaw) \
-typedef Key ctype##_##tag##_key_t; \
-typedef Value ctype##_##tag##_value_t
+                     keyDestroy, RawKey, keyToRaw, keyFromRaw, RawValue, valueFromRaw)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define implement_CHASH(tag, ctype, Key, Value, valueDestroy, keyEqualsRaw, keyHashRaw, \
                              keyDestroy, RawKey, keyToRaw, keyFromRaw, RawValue, valueFromRaw) \
- STC_API ctype##_##tag \
+STC_API ctype##_##tag \
 ctype##_##tag##_with_capacity(size_t cap) { \
     ctype##_##tag h = ctype##_init; \
     ctype##_##tag##_reserve(&h, cap); \
@@ -396,7 +398,8 @@ ctype##_##tag##_erase(ctype##_##tag* self, ctype##_##tag##_rawkey_t rawKey) { \
     uint32_t hx; \
     size_t i = ctype##_##tag##_bucket(self, &rawKey, &hx); \
     return ctype##_##tag##_erase_entry(self, self->table + i); \
-}
+} \
+typedef int ctype##_##tag##_dud
 
 /* https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/ */
 

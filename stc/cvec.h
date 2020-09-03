@@ -50,6 +50,7 @@
 typedef struct cvec_##tag { \
     Value* data; \
 } cvec_##tag; \
+typedef Value cvec_##tag##_value_t; \
 typedef RawValue cvec_##tag##_rawvalue_t; \
 typedef cvec_##tag##_rawvalue_t cvec_##tag##_input_t; \
  \
@@ -145,9 +146,10 @@ cvec_##tag##_begin(cvec_##tag* vec) { \
 } \
 STC_INLINE void \
 cvec_##tag##_next(cvec_##tag##_iter_t* it) { ++it->item; } \
+STC_INLINE cvec_##tag##_value_t* \
+cvec_##tag##_itval(cvec_##tag##_iter_t* it) {return it->item;} \
  \
-implement_cvec_7(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
-typedef Value cvec_##tag##_value_t
+implement_cvec_7(tag, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
@@ -231,7 +233,8 @@ cvec_##tag##_value_compare(const Value* x, const Value* y) { \
     RawValue rx = valueToRaw(x); \
     RawValue ry = valueToRaw(y); \
     return valueCompareRaw(&rx, &ry); \
-}
+} \
+typedef int cvec_##taq##_dud
 
 #else
 #define implement_cvec_7(tag, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw)

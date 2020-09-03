@@ -29,13 +29,13 @@
 #include <stdio.h> /* vsnprintf */
 #include "cdefs.h"
 
-
 typedef struct cstr {
     char* str;
 } cstr_t;
 typedef struct {
     char *item, *end;
 } cstr_iter_t;
+typedef char cstr_value_t, cstr_rawvalue_t, cstr_input_t;
 
 static size_t _cstr_nullrep[] = {0, 0, 0};
 
@@ -110,8 +110,8 @@ STC_INLINE cstr_iter_t
 cstr_begin(cstr_t* self) {
     cstr_iter_t it = {self->str, self->str + cstr_size(*self)}; return it;
 }
-STC_INLINE void
-cstr_next(cstr_iter_t* it) { ++it->item; }
+STC_INLINE void cstr_next(cstr_iter_t* it) { ++it->item; }
+STC_INLINE char* cstr_itval(cstr_iter_t* it) {return it->item;}
 
 STC_INLINE cstr_t*
 cstr_assign(cstr_t* self, const char* str) {
@@ -136,6 +136,10 @@ STC_INLINE cstr_t*
 cstr_append(cstr_t* self, const char* str) {
     return cstr_append_n(self, str, strlen(str));
 }
+/*STC_INLINE void
+cstr_push_n(cstr_t* self, const cstr_input_t[] in, size_t n) {
+    cstr_append_n(self, in, n);
+}*/
 STC_INLINE cstr_t*
 cstr_push_back(cstr_t* self, char value) {
     return cstr_append_n(self, &value, 1);

@@ -90,6 +90,15 @@ STC_API void \
 cqueue_##tag##_push_n(cqueue_##tag *self, const cqueue_##tag##_input_t in[], size_t size) { \
     ctype##_push_n(self, in, size); \
 } \
+ \
+typedef ctype##_iter_t cqueue_##tag##_iter_t; \
+STC_INLINE cqueue_##tag##_iter_t \
+cqueue_##tag##_begin(cqueue_##tag* self) {return ctype##_begin(self);} \
+STC_INLINE void \
+cqueue_##tag##_next(cqueue_##tag##_iter_t* it) {ctype##_next(it);} \
+STC_INLINE cqueue_##tag##_value_t* \
+cqueue_##tag##_itval(cqueue_##tag##_iter_t* it) {return ctype##_itval(it);} \
+ \
 typedef int cqueue_##tag##_dud
 
 #endif

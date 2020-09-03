@@ -77,6 +77,15 @@ STC_API void \
 cstack_##tag##_push_n(cstack_##tag *self, const cstack_##tag##_input_t in[], size_t size) { \
     ctype##_push_n(self, in, size); \
 } \
+ \
+typedef ctype##_iter_t cstack_##tag##_iter_t; \
+STC_INLINE cstack_##tag##_iter_t \
+cstack_##tag##_begin(cstack_##tag* self) {return ctype##_begin(self);} \
+STC_INLINE void \
+cstack_##tag##_next(cstack_##tag##_iter_t* it) {ctype##_next(it);} \
+STC_INLINE cstack_##tag##_value_t* \
+cstack_##tag##_itval(cstack_##tag##_iter_t* it) {return ctype##_itval(it);} \
+ \
 typedef int cstack_##tag##_dud
 
 #endif

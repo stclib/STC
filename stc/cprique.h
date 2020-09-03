@@ -45,8 +45,8 @@
     }
 */
 
-#ifndef CPQUEUE__H__
-#define CPQUEUE__H__
+#ifndef CPRIQUE__H__
+#define CPRIQUE__H__
 
 #include "cvec.h"
 
