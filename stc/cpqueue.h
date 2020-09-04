@@ -50,52 +50,52 @@
 
 #include "cvec.h"
 
-#define declare_cpqueue(tag, ctype, cmpOpr) /* cmpOpr: < or > */ \
+#define declare_cpqueue(X, ctype, cmpOpr) /* cmpOpr: < or > */ \
  \
-typedef struct ctype cpqueue_##tag; \
-typedef ctype##_value_t cpqueue_##tag##_value_t; \
-typedef ctype##_rawvalue_t cpqueue_##tag##_rawvalue_t; \
-typedef ctype##_input_t cpqueue_##tag##_input_t; \
-STC_INLINE cpqueue_##tag \
-cpqueue_##tag##_init() {return ctype##_init();} \
+typedef struct ctype cpqueue_##X; \
+typedef ctype##_value_t cpqueue_##X##_value_t; \
+typedef ctype##_rawvalue_t cpqueue_##X##_rawvalue_t; \
+typedef ctype##_input_t cpqueue_##X##_input_t; \
+STC_INLINE cpqueue_##X \
+cpqueue_##X##_init() {return ctype##_init();} \
 STC_INLINE size_t \
-cpqueue_##tag##_size(cpqueue_##tag pq) {return ctype##_size(pq);} \
+cpqueue_##X##_size(cpqueue_##X pq) {return ctype##_size(pq);} \
 STC_INLINE bool \
-cpqueue_##tag##_empty(cpqueue_##tag pq) {return ctype##_empty(pq);} \
+cpqueue_##X##_empty(cpqueue_##X pq) {return ctype##_empty(pq);} \
 STC_INLINE void \
-cpqueue_##tag##_destroy(cpqueue_##tag* self) {ctype##_destroy(self);} \
+cpqueue_##X##_destroy(cpqueue_##X* self) {ctype##_destroy(self);} \
 STC_API void \
-cpqueue_##tag##_build(cpqueue_##tag* self); \
+cpqueue_##X##_build(cpqueue_##X* self); \
 STC_API void \
-cpqueue_##tag##_erase(cpqueue_##tag* self, size_t i); \
-STC_INLINE const cpqueue_##tag##_value_t* \
-cpqueue_##tag##_top(const cpqueue_##tag* self) {return &self->data[0];} \
+cpqueue_##X##_erase(cpqueue_##X* self, size_t i); \
+STC_INLINE const cpqueue_##X##_value_t* \
+cpqueue_##X##_top(const cpqueue_##X* self) {return &self->data[0];} \
 STC_INLINE void \
-cpqueue_##tag##_pop(cpqueue_##tag* self) {cpqueue_##tag##_erase(self, 0);} \
+cpqueue_##X##_pop(cpqueue_##X* self) {cpqueue_##X##_erase(self, 0);} \
 STC_API void \
-cpqueue_##tag##_push_v(cpqueue_##tag* self, cpqueue_##tag##_value_t value); \
+cpqueue_##X##_push_v(cpqueue_##X* self, cpqueue_##X##_value_t value); \
 STC_INLINE void \
-cpqueue_##tag##_push(cpqueue_##tag* self, cpqueue_##tag##_rawvalue_t rawValue) { \
-    cpqueue_##tag##_push_v(self, ctype##_value_from_raw(rawValue)); \
+cpqueue_##X##_push(cpqueue_##X* self, cpqueue_##X##_rawvalue_t rawValue) { \
+    cpqueue_##X##_push_v(self, ctype##_value_from_raw(rawValue)); \
 } \
 STC_API void \
-cpqueue_##tag##_push_n(cpqueue_##tag *self, const cpqueue_##tag##_input_t in[], size_t size); \
+cpqueue_##X##_push_n(cpqueue_##X *self, const cpqueue_##X##_input_t in[], size_t size); \
  \
-implement_cpqueue(tag, ctype, cmpOpr)
+implement_cpqueue(X, ctype, cmpOpr)
     
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define implement_cpqueue(tag, ctype, cmpOpr) \
+#define implement_cpqueue(X, ctype, cmpOpr) \
  \
 STC_INLINE void \
-_cpqueue_##tag##_sift_down(cpqueue_##tag##_value_t* arr, size_t i, size_t n) { \
+_cpqueue_##X##_sift_down(cpqueue_##X##_value_t* arr, size_t i, size_t n) { \
     size_t r = i, c = i << 1; \
     while (c <= n) { \
         if (c < n && ctype##_value_compare(&arr[c], &arr[c + 1]) cmpOpr 0) \
             ++c; \
         if (ctype##_value_compare(&arr[r], &arr[c]) cmpOpr 0) { \
-            cpqueue_##tag##_value_t t = arr[r]; arr[r] = arr[c]; arr[r = c] = t; \
+            cpqueue_##X##_value_t tmp = arr[r]; arr[r] = arr[c]; arr[r = c] = tmp; \
         } else \
             return; \
         c <<= 1; \
@@ -103,39 +103,39 @@ _cpqueue_##tag##_sift_down(cpqueue_##tag##_value_t* arr, size_t i, size_t n) { \
 } \
  \
 STC_API void \
-cpqueue_##tag##_build(cpqueue_##tag* self) { \
-    size_t n = cpqueue_##tag##_size(*self);  \
-    cpqueue_##tag##_value_t *arr = self->data - 1; \
+cpqueue_##X##_build(cpqueue_##X* self) { \
+    size_t n = cpqueue_##X##_size(*self);  \
+    cpqueue_##X##_value_t *arr = self->data - 1; \
     for (size_t k = n >> 1; k != 0; --k) \
-        _cpqueue_##tag##_sift_down(arr, k, n); \
+        _cpqueue_##X##_sift_down(arr, k, n); \
 } \
  \
 STC_API void \
-cpqueue_##tag##_erase(cpqueue_##tag* self, size_t i) { \
-    size_t n = cpqueue_##tag##_size(*self) - 1; \
+cpqueue_##X##_erase(cpqueue_##X* self, size_t i) { \
+    size_t n = cpqueue_##X##_size(*self) - 1; \
     self->data[i] = self->data[n]; \
     ctype##_pop_back(self); \
-    _cpqueue_##tag##_sift_down(self->data - 1, i + 1, n); \
+    _cpqueue_##X##_sift_down(self->data - 1, i + 1, n); \
 } \
  \
 STC_API void \
-cpqueue_##tag##_push_v(cpqueue_##tag* self, cpqueue_##tag##_value_t value) { \
+cpqueue_##X##_push_v(cpqueue_##X* self, cpqueue_##X##_value_t value) { \
     ctype##_push_back(self, value); /* sift-up the value */ \
-    size_t n = cpqueue_##tag##_size(*self), c = n; \
-    cpqueue_##tag##_value_t *arr = self->data - 1; \
+    size_t n = cpqueue_##X##_size(*self), c = n; \
+    cpqueue_##X##_value_t *arr = self->data - 1; \
     for (; c > 1 && ctype##_value_compare(&arr[c >> 1], &value) cmpOpr 0; c >>= 1) \
         arr[c] = arr[c >> 1]; \
     if (c != n) arr[c] = value; \
 } \
 STC_API void \
-cpqueue_##tag##_push_n(cpqueue_##tag *self, const cpqueue_##tag##_input_t in[], size_t size) { \
-    ctype##_reserve(self, cpqueue_##tag##_size(*self) + size); \
-    for (size_t i=0; i<size; ++i) cpqueue_##tag##_push(self, in[i]); \
+cpqueue_##X##_push_n(cpqueue_##X *self, const cpqueue_##X##_input_t in[], size_t size) { \
+    ctype##_reserve(self, cpqueue_##X##_size(*self) + size); \
+    for (size_t i=0; i<size; ++i) cpqueue_##X##_push(self, in[i]); \
 } \
-typedef int cpqueue_##tag##_dud
+typedef int cpqueue_##X##_dud
 
 #else
-#define implement_cpqueue(tag, ctype, cmpOpr)
+#define implement_cpqueue(X, ctype, cmpOpr)
 #endif
 
 #endif

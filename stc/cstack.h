@@ -47,45 +47,45 @@
 
 #include "cvec.h"
 
-#define declare_cstack(tag, ctype) \
+#define declare_cstack(X, ctype) \
  \
-typedef struct ctype cstack_##tag; \
-typedef ctype##_value_t cstack_##tag##_value_t; \
-typedef ctype##_rawvalue_t cstack_##tag##_rawvalue_t; \
-typedef ctype##_input_t cstack_##tag##_input_t; \
-STC_INLINE cstack_##tag \
-cstack_##tag##_init() {return ctype##_init();} \
+typedef struct ctype cstack_##X; \
+typedef ctype##_value_t cstack_##X##_value_t; \
+typedef ctype##_rawvalue_t cstack_##X##_rawvalue_t; \
+typedef ctype##_input_t cstack_##X##_input_t; \
+STC_INLINE cstack_##X \
+cstack_##X##_init() {return ctype##_init();} \
 STC_INLINE void \
-cstack_##tag##_destroy(cstack_##tag* self) {ctype##_destroy(self);} \
+cstack_##X##_destroy(cstack_##X* self) {ctype##_destroy(self);} \
 STC_INLINE size_t \
-cstack_##tag##_size(cstack_##tag pq) {return ctype##_size(pq);} \
+cstack_##X##_size(cstack_##X pq) {return ctype##_size(pq);} \
 STC_INLINE bool \
-cstack_##tag##_empty(cstack_##tag pq) {return ctype##_empty(pq);} \
-STC_INLINE cstack_##tag##_value_t* \
-cstack_##tag##_top(cstack_##tag* self) {return ctype##_back(self);} \
+cstack_##X##_empty(cstack_##X pq) {return ctype##_empty(pq);} \
+STC_INLINE cstack_##X##_value_t* \
+cstack_##X##_top(cstack_##X* self) {return ctype##_back(self);} \
 STC_INLINE void \
-cstack_##tag##_pop(cstack_##tag* self) {ctype##_pop_back(self);} \
+cstack_##X##_pop(cstack_##X* self) {ctype##_pop_back(self);} \
 STC_API void \
-cstack_##tag##_push_v(cstack_##tag* self, ctype##_value_t value) { \
+cstack_##X##_push_v(cstack_##X* self, ctype##_value_t value) { \
     ctype##_push_back_v(self, value); \
 } \
 STC_INLINE void \
-cstack_##tag##_push(cstack_##tag* self, cstack_##tag##_rawvalue_t rawValue) { \
+cstack_##X##_push(cstack_##X* self, cstack_##X##_rawvalue_t rawValue) { \
     ctype##_push_back(self, rawValue); \
 } \
  \
 STC_API void \
-cstack_##tag##_push_n(cstack_##tag *self, const cstack_##tag##_input_t in[], size_t size) { \
+cstack_##X##_push_n(cstack_##X *self, const cstack_##X##_input_t in[], size_t size) { \
     ctype##_push_n(self, in, size); \
 } \
-typedef ctype##_iter_t cstack_##tag##_iter_t; \
-STC_INLINE cstack_##tag##_iter_t \
-cstack_##tag##_begin(cstack_##tag* self) {return ctype##_begin(self);} \
+typedef ctype##_iter_t cstack_##X##_iter_t; \
+STC_INLINE cstack_##X##_iter_t \
+cstack_##X##_begin(cstack_##X* self) {return ctype##_begin(self);} \
 STC_INLINE void \
-cstack_##tag##_next(cstack_##tag##_iter_t* it) {ctype##_next(it);} \
-STC_INLINE cstack_##tag##_value_t* \
-cstack_##tag##_itval(cstack_##tag##_iter_t it) {return ctype##_itval(it);} \
+cstack_##X##_next(cstack_##X##_iter_t* it) {ctype##_next(it);} \
+STC_INLINE cstack_##X##_value_t* \
+cstack_##X##_itval(cstack_##X##_iter_t it) {return ctype##_itval(it);} \
  \
-typedef int cstack_##tag##_dud
+typedef int cstack_##X##_dud
 
 #endif
