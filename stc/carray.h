@@ -72,15 +72,23 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
  \
     STC_INLINE carray##D##X##_iter_t \
     carray##D##X##_begin(carray##D##X* a) { \
-        carray##D##X##_iter_t it = {a->data, a->data + carray##D##_size(*a)}; return it; \
+        carray##D##X##_iter_t it = {a->data}; return it; \
+    } \
+    STC_INLINE carray##D##X##_iter_t \
+    carray##D##X##_end(carray##D##X* a) { \
+        carray##D##X##_iter_t it = {a->data + carray##D##_size(*a)}; return it; \
+    } \
+    STC_INLINE carray##D##X##_iter_t \
+    carray##D##X##_range(carray##D##X##_iter_t start, carray##D##X##_iter_t finish) { \
+        start.end = finish.item; return start; \
     } \
     STC_INLINE void \
-    carray##D##X##_next(carray##D##X##_iter_t* it) { ++it->item; } \
+    carray##D##X##_next(carray##D##X##_iter_t* it) {++it->item;} \
  \
     STC_INLINE void \
     carray##D##X##_destroy(carray##D##X* self) { \
         if (self->_xdim & _carray_OWN) { \
-            c_foreach (i, carray##D##X, *self) \
+            c_foreach_3 (i, carray##D##X, *self) \
                 valueDestroy(i.item); \
             free(self->data); \
         } \

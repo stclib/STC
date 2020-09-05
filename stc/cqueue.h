@@ -94,6 +94,10 @@ cqueue_##X##_push_n(cqueue_##X *self, const cqueue_##X##_input_t in[], size_t si
 typedef ctype##_iter_t cqueue_##X##_iter_t; \
 STC_INLINE cqueue_##X##_iter_t \
 cqueue_##X##_begin(cqueue_##X* self) {return ctype##_begin(self);} \
+STC_INLINE cqueue_##X##_iter_t \
+cqueue_##X##_end(cqueue_##X* self) {return ctype##_end(self);} \
+STC_INLINE cqueue_##X##_iter_t \
+cqueue_##X##_range(cqueue_##X##_iter_t s, cqueue_##X##_iter_t f) {return ctype##_range(s, f);} \
 STC_INLINE void \
 cqueue_##X##_next(cqueue_##X##_iter_t* it) {ctype##_next(it);} \
 STC_INLINE cqueue_##X##_value_t* \

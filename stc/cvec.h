@@ -140,12 +140,19 @@ typedef struct { \
 } cvec_##X##_iter_t; \
  \
 STC_INLINE cvec_##X##_iter_t \
-cvec_##X##_begin(cvec_##X* vec) { \
-    cvec_##X##_iter_t it = {vec->data, vec->data + cvec_size(*vec)}; \
-    return it; \
+cvec_##X##_begin(cvec_##X* self) { \
+    cvec_##X##_iter_t it = {self->data}; return it; \
+} \
+STC_INLINE cvec_##X##_iter_t \
+cvec_##X##_end(cvec_##X* self) { \
+    cvec_##X##_iter_t it = {self->data + cvec_size(*self)}; return it; \
+} \
+STC_INLINE cvec_##X##_iter_t \
+cvec_##X##_range(cvec_##X##_iter_t start, cvec_##X##_iter_t finish) { \
+    start.end = finish.item; return start; \
 } \
 STC_INLINE void \
-cvec_##X##_next(cvec_##X##_iter_t* it) { ++it->item; } \
+cvec_##X##_next(cvec_##X##_iter_t* it) {++it->item;} \
 STC_INLINE cvec_##X##_value_t* \
 cvec_##X##_itval(cvec_##X##_iter_t it) {return it.item;} \
  \

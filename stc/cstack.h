@@ -81,6 +81,10 @@ cstack_##X##_push_n(cstack_##X *self, const cstack_##X##_input_t in[], size_t si
 typedef ctype##_iter_t cstack_##X##_iter_t; \
 STC_INLINE cstack_##X##_iter_t \
 cstack_##X##_begin(cstack_##X* self) {return ctype##_begin(self);} \
+STC_INLINE cstack_##X##_iter_t \
+cstack_##X##_end(cstack_##X* self) {return ctype##_end(self);} \
+STC_INLINE cstack_##X##_iter_t \
+cstack_##X##_range(cstack_##X##_iter_t s, cstack_##X##_iter_t f) {return ctype##_range(s, f);} \
 STC_INLINE void \
 cstack_##X##_next(cstack_##X##_iter_t* it) {ctype##_next(it);} \
 STC_INLINE cstack_##X##_value_t* \

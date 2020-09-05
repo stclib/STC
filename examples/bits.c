@@ -28,7 +28,7 @@ int main() {
     puts("\nIterator:");
     printf("%4zu: ", set.size);
     c_foreach (i, cbitset, set)
-        printf("%d", i.item(i));
+        printf("%d", cbitset_itval(i));
     puts("");        
 
     cbitset_t s2 = cbitset_clone(set);

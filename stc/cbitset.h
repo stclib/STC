@@ -43,7 +43,6 @@ int main() {
 #ifndef CBITSET__H__
 #define CBITSET__H__
 
-#include <assert.h>
 #include "cstr.h"
 
 typedef struct cbitset { uint64_t* _arr; size_t size; } cbitset_t;
@@ -147,26 +146,28 @@ STC_INLINE cbitset_t cbitset_not(cbitset_t s1) {
     cbitset_flip_all(&set); return set;
 }
 
-typedef struct cbitset_iter cbitset_iter_t;
-typedef bool(*cbitset_cb)(cbitset_iter_t);
-struct cbitset_iter {
+typedef struct {
     cbitset_t *_bs;
-    cbitset_cb item, end;
-    size_t pos;
-};
+    size_t item, end;
+} cbitset_iter_t;
 
-STC_INLINE bool cbitset_item(cbitset_iter_t it) { 
-    return cbitset_test(*it._bs, it.pos);
-}
 STC_INLINE cbitset_iter_t
 cbitset_begin(cbitset_t* self) {
-    if (self->size == 0) { cbitset_iter_t it = {NULL}; return it; }
-    cbitset_iter_t it = {self, &cbitset_item, NULL, 0};
-    return it;
+    cbitset_iter_t it = {self, 0}; return it;
+}
+STC_INLINE cbitset_iter_t
+cbitset_end(cbitset_t* self) {
+    cbitset_iter_t it = {self, self->size}; return it;
+}
+STC_INLINE cbitset_iter_t
+cbitset_range(cbitset_iter_t start, cbitset_iter_t finish) {
+    start.end = finish.item; return start;
 }
 STC_INLINE void
-cbitset_next(cbitset_iter_t* it) { 
-    if (++it->pos == it->_bs->size) it->item = NULL;
+cbitset_next(cbitset_iter_t* it) {++it->item;}
+
+STC_INLINE bool cbitset_itval(cbitset_iter_t it) { 
+    return cbitset_test(*it._bs, it.item);
 }
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)

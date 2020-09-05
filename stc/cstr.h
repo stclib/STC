@@ -115,9 +115,16 @@ STC_INLINE char*
 cstr_back(cstr_t* self) {return self->str + _cstr_size(*self) - 1;}
 
 STC_INLINE cstr_iter_t
-cstr_begin(cstr_t* self) {
-    cstr_iter_t it = {self->str, self->str + cstr_size(*self)}; return it;
+cstr_begin(cstr_t* self) {cstr_iter_t it = {self->str}; return it;}
+STC_INLINE cstr_iter_t
+cstr_end(cstr_t* self) {
+    cstr_iter_t it = {self->str + cstr_size(*self)}; return it;
 }
+STC_INLINE cstr_iter_t
+cstr_range(cstr_iter_t start, cstr_iter_t finish) {
+    start.end = finish.item; return start;
+}
+
 STC_INLINE void cstr_next(cstr_iter_t* it) { ++it->item; }
 STC_INLINE char* cstr_itval(cstr_iter_t it) {return it.item;}
 

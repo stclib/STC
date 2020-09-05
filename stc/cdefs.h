@@ -26,8 +26,8 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <assert.h>
 
-#define STC_INLINE static inline
 #if defined(_MSC_VER)
 #define STC_FORCE_INLINE static __forceinline
 #elif defined(__GNUC__) || defined(__clang__)
@@ -35,6 +35,7 @@
 #else
 #define STC_FORCE_INLINE static inline
 #endif
+#define STC_INLINE static inline
 
 #if defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define STC_API extern
@@ -72,8 +73,12 @@
 #define c_default_compare(x, y) c_compare(c_default_less, x, y)
 #define c_default_destroy(p)    ((void)0)
 
-#define c_foreach(it, ctype, container) \
-            for (ctype##_iter_t it = ctype##_begin(&container); it.item != it.end; ctype##_next(&it))
+#define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
+
+#define c_foreach_3(it, ctype, container) \
+    for (ctype##_iter_t it = ctype##_range(ctype##_begin(&container), ctype##_end(&container)); it.item != it.end; ctype##_next(&it))
+#define c_foreach_4(it, ctype, start, finish) \
+    for (ctype##_iter_t it = ctype##_range(start, finish); it.item != it.end; ctype##_next(&it))
 
 #define c_items(...) __VA_ARGS__
 #define c_push(container_ptr, ctype, items) do { \
@@ -92,6 +97,5 @@
     for (size_t i=0; i<sizeof(__arr)/sizeof(__arr[0]); ++i) \
         ctype##_destroy(__arr[i]); \
 } while (0)
-
 
 #endif

@@ -86,7 +86,7 @@ void listdemo1()
     c_foreach (i, clist_ix, nums)
         printf("value: %d\n", i.item->value);
     /* merge/append nums2 to nums */
-    clist_ix_splice_after(&nums, clist_ix_last(&nums), &nums2);
+    clist_ix_splice_front(&nums, &nums2);
     c_foreach (i, clist_ix, nums)
         printf("spliced: %d\n", i.item->value);
 
