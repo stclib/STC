@@ -73,16 +73,16 @@ cvec_##X##_resize(cvec_##X* self, size_t size, Value fill_val); \
 STC_API void \
 cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t in[], size_t size); \
 STC_API void \
-cvec_##X##_push_back_v(cvec_##X* self, Value value); \
+cvec_##X##_push_back(cvec_##X* self, Value value); \
 STC_INLINE void \
-cvec_##X##_push_back(cvec_##X* self, RawValue rawValue) { \
-    cvec_##X##_push_back_v(self, valueFromRaw(rawValue)); \
+cvec_##X##_emplace_back(cvec_##X* self, RawValue rawValue) { \
+    cvec_##X##_push_back(self, valueFromRaw(rawValue)); \
 } \
 STC_API void \
-cvec_##X##_insert_v(cvec_##X* self, size_t pos, Value value); \
+cvec_##X##_insert(cvec_##X* self, size_t pos, Value value); \
 STC_INLINE void \
-cvec_##X##_insert(cvec_##X* self, size_t pos, RawValue rawValue) { \
-    cvec_##X##_insert_v(self, pos, valueFromRaw(rawValue)); \
+cvec_##X##_emplace(cvec_##X* self, size_t pos, RawValue rawValue) { \
+    cvec_##X##_insert(self, pos, valueFromRaw(rawValue)); \
 } \
 STC_API void \
 cvec_##X##_erase(cvec_##X* self, size_t pos, size_t size); \
@@ -196,7 +196,7 @@ cvec_##X##_resize(cvec_##X* self, size_t size, Value null_val) { \
 } \
  \
 STC_API void \
-cvec_##X##_push_back_v(cvec_##X* self, Value value) { \
+cvec_##X##_push_back(cvec_##X* self, Value value) { \
     size_t len = cvec_size(*self); \
     if (len == cvec_capacity(*self)) \
         cvec_##X##_reserve(self, 4 + len * 3 / 2); \
@@ -205,7 +205,7 @@ cvec_##X##_push_back_v(cvec_##X* self, Value value) { \
 } \
  \
 STC_API void \
-cvec_##X##_insert_v(cvec_##X* self, size_t pos, Value value) { \
+cvec_##X##_insert(cvec_##X* self, size_t pos, Value value) { \
     size_t len = cvec_size(*self); \
     if (len == cvec_capacity(*self)) \
         cvec_##X##_reserve(self, 4 + len * 3 / 2); \

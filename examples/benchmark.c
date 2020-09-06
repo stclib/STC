@@ -37,8 +37,7 @@ crand_rng64_t rng;
 #define CMAP_SETUP(tt, Key, Value) cmap_##tt map = cmap_ini \
                                     ; cmap_##tt##_set_load_factors(&map, max_load_factor, 0.0)
 #define CMAP_PUT(tt, key, val)     cmap_##tt##_put(&map, key, val)->value
-#define CMAP_INSERT(tt, key, val)  cmap_##tt##_insert(&map, key, val)
-#define CMAP_EMPLACE(tt, key, val) cmap_try_emplace(tt, &map, key, val)
+#define CMAP_EMPLACE(tt, key, val) cmap_##tt##_emplace(&map, key, val)
 #define CMAP_ERASE(tt, key)        cmap_##tt##_erase(&map, key)
 #define CMAP_FIND(tt, key)         (cmap_##tt##_find(map, key) != NULL)
 #define CMAP_FOR(tt, i)            c_foreach (i, cmap_##tt, map)
@@ -50,7 +49,7 @@ crand_rng64_t rng;
 
 #define KMAP_SETUP(tt, Key, Value) khash_t(ii)* map = kh_init(ii); khiter_t ki; int ret
 #define KMAP_PUT(tt, key, val)     (*(ki = kh_put(ii, map, key, &ret), map->vals[ki] = val, &map->vals[ki]))
-#define KMAP_INSERT(tt, key, val)  (ki = kh_put(ii, map, key, &ret), ret ? (map->vals[ki] = val) : val)
+#define KMAP_EMPLACE(tt, key, val)  (ki = kh_put(ii, map, key, &ret), ret ? (map->vals[ki] = val) : val)
 #define KMAP_ERASE(tt, key)        ((ki = kh_get(ii, map, key)) != kh_end(map) ? kh_del(ii, map, ki), 1 : 0)
 #define KMAP_FIND(tt, key)         (kh_get(ii, map, key) != kh_end(map))
 #define KMAP_SIZE(tt)              kh_size(map)
@@ -60,7 +59,6 @@ crand_rng64_t rng;
 
 #define UMAP_SETUP(tt, Key, Value) std::unordered_map<Key, Value> map; map.max_load_factor(max_load_factor)
 #define UMAP_PUT(tt, key, val)     (map[key] = val)
-#define UMAP_INSERT(tt, key, val)  map.insert(std::make_pair(key, val))
 #define UMAP_EMPLACE(tt, key, val) map.emplace(key, val)
 #define UMAP_FIND(tt, key)         (map.find(key) != map.end())
 #define UMAP_ERASE(tt, key)        map.erase(key)
@@ -73,7 +71,6 @@ crand_rng64_t rng;
 
 #define BMAP_SETUP(tt, Key, Value) ska::bytell_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
 #define BMAP_PUT(tt, key, val)     UMAP_PUT(tt, key, val)
-#define BMAP_INSERT(tt, key, val)  UMAP_INSERT(tt, key, val)
 #define BMAP_EMPLACE(tt, key, val) UMAP_EMPLACE(tt, key, val)
 #define BMAP_FIND(tt, key)         UMAP_FIND(tt, key)
 #define BMAP_ERASE(tt, key)        UMAP_ERASE(tt, key)
@@ -86,7 +83,6 @@ crand_rng64_t rng;
 
 #define FMAP_SETUP(tt, Key, Value) ska::flat_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
 #define FMAP_PUT(tt, key, val)     UMAP_PUT(tt, key, val)
-#define FMAP_INSERT(tt, key, val)  UMAP_INSERT(tt, key, val)
 #define FMAP_EMPLACE(tt, key, val) UMAP_EMPLACE(tt, key, val)
 #define FMAP_FIND(tt, key)         UMAP_FIND(tt, key)
 #define FMAP_ERASE(tt, key)        UMAP_ERASE(tt, key)
@@ -99,7 +95,6 @@ crand_rng64_t rng;
 
 #define HMAP_SETUP(tt, Key, Value) tsl::hopscotch_map<Key, Value> map; map.max_load_factor(max_load_factor)
 #define HMAP_PUT(tt, key, val)     UMAP_PUT(tt, key, val)
-#define HMAP_INSERT(tt, key, val)  UMAP_INSERT(tt, key, val)
 #define HMAP_EMPLACE(tt, key, val) UMAP_EMPLACE(tt, key, val)
 #define HMAP_FIND(tt, key)         UMAP_FIND(tt, key)
 #define HMAP_ERASE(tt, key)        UMAP_ERASE(tt, key)
@@ -112,7 +107,6 @@ crand_rng64_t rng;
 
 #define RMAP_SETUP(tt, Key, Value) robin_hood::unordered_map<Key, Value> map
 #define RMAP_PUT(tt, key, val)     UMAP_PUT(tt, key, val)
-#define RMAP_INSERT(tt, key, val)  UMAP_INSERT(tt, key, val)
 #define RMAP_EMPLACE(tt, key, val) UMAP_EMPLACE(tt, key, val)
 #define RMAP_FIND(tt, key)         UMAP_FIND(tt, key)
 #define RMAP_ERASE(tt, key)        UMAP_ERASE(tt, key)
@@ -125,7 +119,6 @@ crand_rng64_t rng;
 
 #define SMAP_SETUP(tt, Key, Value) spp::sparse_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
 #define SMAP_PUT(tt, key, val)     UMAP_PUT(tt, key, val)
-#define SMAP_INSERT(tt, key, val)  UMAP_INSERT(tt, key, val)
 #define SMAP_EMPLACE(tt, key, val) UMAP_EMPLACE(tt, key, val)
 #define SMAP_FIND(tt, key)         UMAP_FIND(tt, key)
 #define SMAP_ERASE(tt, key)        UMAP_ERASE(tt, key)
@@ -225,14 +218,14 @@ int main(int argc, char* argv[])
     seed = time(NULL);
     printf("\nRandom keys are in range [0, 2^%d), seed = %zu:\n",  rr, seed);
     printf("\nUnordered maps: %d repeats of Insert random key + try to remove a random key:\n", N1);
-    RUN_TEST(1)
+    //RUN_TEST(1)
 
     printf("\nUnordered maps: Insert %d index keys, then remove them in same order:\n", N2);
-    RUN_TEST(2)
+    //RUN_TEST(2)
 
     printf("\nUnordered maps: Insert %d random keys, then remove them in same order:\n", N3);
-    RUN_TEST(3)
+    //RUN_TEST(3)
 
-    printf("\nUnordered maps: Iterate %d random keys, then remove them in same order:\n", N4);
+    printf("\nUnordered maps: Iterate %d random keys:\n", N4);
     RUN_TEST(4)
 }

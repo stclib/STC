@@ -61,9 +61,9 @@ void vectordemo2()
 {
     printf("\nVECTORDEMO2\n");
     cvec_str names = cvec_ini;
-    cvec_str_push_back(&names, "Mary");
-    cvec_str_push_back(&names, "Joe");
-    cvec_str_push_back(&names, "Chris");
+    cvec_str_emplace_back(&names, "Mary");
+    cvec_str_emplace_back(&names, "Joe");
+    cvec_str_emplace_back(&names, "Chris");
     cstr_assign(&names.data[1], "Jane");      // replace Joe
     printf("names[1]: %s\n", names.data[1].str);
 
@@ -151,26 +151,25 @@ void mapdemo2()
 }
 
 
-declare_cmap_strkey(ss, cstr_t, cstr_destroy); 
+declare_cmap_str(); 
 
 void mapdemo3()
 {
     printf("\nMAPDEMO3\n");
-    cmap_ss table = cmap_ini;
-    cmap_ss_put(&table, "Map", cstr_make("test"));
-    cmap_ss_put(&table, "Make", cstr_make("my"));
-    cmap_ss_put(&table, "Sunny", cstr_make("day"));
-    cmap_ss_entry_t *e = cmap_ss_find(&table, "Make");
-    c_foreach (i, cmap_ss, table)
+    cmap_str table = cmap_ini;
+    cmap_str_put(&table, "Map", "test");
+    cmap_str_put(&table, "Make", "my");
+    cmap_str_put(&table, "Sunny", "day");
+    cmap_str_entry_t *e = cmap_str_find(&table, "Make");
+    c_foreach (i, cmap_str, table)
         printf("entry: %s: %s\n", i.item->key.str, i.item->value.str);
     printf("size %zu: remove: Make: %s\n", cmap_size(table), e->value.str);
-    cmap_ss_erase(&table, "Make");
-    //cmap_ss_eraseEntry(&table, e);
+    cmap_str_erase(&table, "Make");
 
     printf("size %zu\n", cmap_size(table));
-    c_foreach (i, cmap_ss, table)
+    c_foreach (i, cmap_str, table)
         printf("entry: %s: %s\n", i.item->key.str, i.item->value.str);
-    cmap_ss_destroy(&table); // frees key and value CStrs, and hash table (CVec).
+    cmap_str_destroy(&table); // frees key and value CStrs, and hash table (CVec).
 }
 
 

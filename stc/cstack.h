@@ -66,14 +66,13 @@ cstack_##X##_top(cstack_##X* self) {return ctype##_back(self);} \
 STC_INLINE void \
 cstack_##X##_pop(cstack_##X* self) {ctype##_pop_back(self);} \
 STC_API void \
-cstack_##X##_push_v(cstack_##X* self, ctype##_value_t value) { \
-    ctype##_push_back_v(self, value); \
+cstack_##X##_push(cstack_##X* self, ctype##_value_t value) { \
+    ctype##_push_back(self, value); \
 } \
 STC_INLINE void \
-cstack_##X##_push(cstack_##X* self, cstack_##X##_rawvalue_t rawValue) { \
-    ctype##_push_back(self, rawValue); \
+cstack_##X##_emplace(cstack_##X* self, cstack_##X##_rawvalue_t rawValue) { \
+    ctype##_emplace_back(self, rawValue); \
 } \
- \
 STC_API void \
 cstack_##X##_push_n(cstack_##X *self, const cstack_##X##_input_t in[], size_t size) { \
     ctype##_push_n(self, in, size); \

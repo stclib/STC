@@ -106,13 +106,13 @@ int commonWords(cvec_str S)
         // make it false 
         for (int k = 0; k < cvec_size(ans); k++) { 
             if (ans.data[k].value != false 
-                && cmap_sb_insert(&has, ans.data[k].key.str, false)->value == false) { 
+                && cmap_sb_emplace(&has, ans.data[k].key.str, false).item->value == false) { 
                 ans.data[k].value = false; 
             } 
   
             // This line is used to consider only distinct words                 
             else if (ans.data[k].value != false
-                     && cmap_sb_insert(&has, ans.data[k].key.str, false)->value == true) { 
+                     && cmap_sb_emplace(&has, ans.data[k].key.str, false).item->value == true) { 
                 cmap_sb_put(&has, ans.data[k].key.str, false); 
             } 
         } 
@@ -137,10 +137,10 @@ int commonWords(cvec_str S)
 int main() 
 { 
     cvec_str S = cvec_ini; 
-    cvec_str_push_back(&S, "there is a cow"); 
-    cvec_str_push_back(&S, "cow is our mother"); 
-    cvec_str_push_back(&S, "cow gives us milk and milk is sweet"); 
-    cvec_str_push_back(&S, "there is a boy who loves cow"); 
+    cvec_str_emplace_back(&S, "there is a cow"); 
+    cvec_str_emplace_back(&S, "cow is our mother"); 
+    cvec_str_emplace_back(&S, "cow gives us milk and milk is sweet"); 
+    cvec_str_emplace_back(&S, "there is a boy who loves cow"); 
   
     printf("%d\n", commonWords(S)); 
     cvec_str_destroy(&S);

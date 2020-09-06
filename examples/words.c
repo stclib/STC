@@ -16,7 +16,7 @@ int main1()
         "this", "sentence", "is", "not", "a", "sentence",
         "this", "sentence", "is", "a", "hoax"
     ));
-    clist_str_push_back_v(&lwords, cstr_from("%f", 123897.0 / 23.0));
+    clist_str_push_back(&lwords, cstr_from("%f", 123897.0 / 23.0));
     c_foreach (w, clist_str, lwords)
         printf("%s\n", w.item->value.str);
     puts("");
@@ -29,7 +29,7 @@ int main1()
 
     cmap_si word_map = cmap_ini;
     c_foreach (w, cvec_str, words)
-        ++cmap_si_insert(&word_map, w.item->str, 0)->value;
+        ++cmap_si_emplace(&word_map, w.item->str, 0).item->value;
 
     c_foreach (pair, cmap_si, word_map) {
         printf("%d occurrences of word '%s'\n",

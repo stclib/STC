@@ -68,10 +68,10 @@ int main(void) {
         {"Spain", 10},
         {"France", 10},
     ));
-    cmap_cnt_insert(&countries, "Greenland", 0)->value += 20;
-    cmap_cnt_insert(&countries, "Sweden", 0)->value += 20;
-    cmap_cnt_insert(&countries, "Norway", 0)->value += 20;
-    cmap_cnt_insert(&countries, "Finland", 0)->value += 20;
+    cmap_cnt_emplace(&countries, "Greenland", 0).item->value += 20;
+    cmap_cnt_emplace(&countries, "Sweden", 0).item->value += 20;
+    cmap_cnt_emplace(&countries, "Norway", 0).item->value += 20;
+    cmap_cnt_emplace(&countries, "Finland", 0).item->value += 20;
 
     c_foreach (i, cmap_cnt, countries)
         printf("%s: %d\n", i.item->key.str, i.item->value);

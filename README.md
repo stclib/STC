@@ -224,8 +224,8 @@ declare_cmap(ii, int, int);
 
 int main() {
     cmap_ii nums = cmap_ini;
-    cmap_ii_put(&nums, 8, 64); // put() works as c++ std::unordered_map<>::insert_or_replace()
-    cmap_ii_insert(&nums, 11, 121); // only insert value if key does not exists - like std::unordered_map::insert().
+    cmap_ii_put(&nums, 8, 64); // simular to insert_or_replace(), 
+    cmap_ii_emplace(&nums, 11, 121);
 
     printf("%d\n", cmap_ii_find(nums, 8)->value);
     cmap_ii_destroy(&nums);
