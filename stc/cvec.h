@@ -30,9 +30,7 @@
 #define cvec_ini           {NULL}
 #define cvec_size(v)       _cvec_safe_size((v).data)
 #define cvec_capacity(v)   _cvec_safe_capacity((v).data)
-#define cvec_empty(v)      (_cvec_safe_size((v).data) == 0)
-#define cvec_front(v)      (v).data[0]
-#define cvec_back(v)       (v).data[_cvec_size(v) - 1] /* may have side effect */
+#define cvec_empty(v)      (cvec_size(v) == 0)
 
 #define declare_cvec(...)   c_MACRO_OVERLOAD(declare_cvec, __VA_ARGS__)
 #define declare_cvec_2(X, Value) \
@@ -64,6 +62,8 @@ STC_INLINE size_t \
 cvec_##X##_capacity(cvec_##X v) {return cvec_capacity(v);} \
 STC_INLINE Value \
 cvec_##X##_value_from_raw(RawValue rawValue) {return valueFromRaw(rawValue);} \
+STC_INLINE void \
+cvec_##X##_clear(cvec_##X* self); \
 STC_API void \
 cvec_##X##_destroy(cvec_##X* self); \
 STC_API void \
@@ -108,18 +108,13 @@ cvec_##X##_with_capacity(size_t size) { \
     return x; \
 } \
 STC_INLINE void \
-cvec_##X##_clear(cvec_##X* self) { \
-    if (self->data) _cvec_size(*self) = 0; \
-} \
-STC_INLINE void \
 cvec_##X##_pop_back(cvec_##X* self) { \
-    valueDestroy(&self->data[_cvec_size(*self) - 1]); \
-    --_cvec_size(*self); \
+    valueDestroy(&self->data[--_cvec_size(self)]); \
 } \
 STC_INLINE Value* \
 cvec_##X##_front(cvec_##X* self) {return self->data;} \
 STC_INLINE Value* \
-cvec_##X##_back(cvec_##X* self) {return self->data + _cvec_size(*self) - 1;} \
+cvec_##X##_back(cvec_##X* self) {return self->data + _cvec_size(self) - 1;} \
 STC_INLINE Value* \
 cvec_##X##_at(cvec_##X* self, size_t i) {return self->data + i;} \
 STC_INLINE void \
@@ -166,16 +161,21 @@ implement_cvec_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, 
 STC_API void \
 cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t in[], size_t size) { \
     cvec_##X##_reserve(self, cvec_size(*self) + size); \
-    _cvec_size(*self) += size; \
+    _cvec_size(self) += size; \
     for (size_t i=0; i<size; ++i) self->data[i] = valueFromRaw(in[i]); \
 } \
  \
 STC_API void \
+cvec_##X##_clear(cvec_##X* self) { \
+    Value* p = self->data; if (p) { \
+        for (Value* q = p + _cvec_size(self); p != q; ++p) valueDestroy(p); \
+        _cvec_size(self) = 0; \
+    } \
+} \
+STC_API void \
 cvec_##X##_destroy(cvec_##X* self) { \
-    Value* p = self->data; \
-    size_t i = 0, n = cvec_size(*self); \
-    for (; i < n; ++p, ++i) valueDestroy(p); \
-    free(_cvec_alloced(self->data)); \
+    cvec_##X##_clear(self); \
+    if (self->data) free(_cvec_alloced(self->data)); \
 } \
  \
 STC_API void \
@@ -192,7 +192,7 @@ STC_API void \
 cvec_##X##_resize(cvec_##X* self, size_t size, Value null_val) { \
     cvec_##X##_reserve(self, size); \
     for (size_t i=cvec_size(*self); i<size; ++i) self->data[i] = null_val; \
-    if (self->data) _cvec_size(*self) = size; \
+    if (self->data) _cvec_size(self) = size; \
 } \
  \
 STC_API void \
@@ -200,8 +200,7 @@ cvec_##X##_push_back(cvec_##X* self, Value value) { \
     size_t len = cvec_size(*self); \
     if (len == cvec_capacity(*self)) \
         cvec_##X##_reserve(self, 4 + len * 3 / 2); \
-    self->data[cvec_size(*self)] = value; \
-    ++_cvec_size(*self); \
+    self->data[_cvec_size(self)++] = value; \
 } \
  \
 STC_API void \
@@ -211,7 +210,7 @@ cvec_##X##_insert(cvec_##X* self, size_t pos, Value value) { \
         cvec_##X##_reserve(self, 4 + len * 3 / 2); \
     memmove(&self->data[pos + 1], &self->data[pos], (len - pos) * sizeof(Value)); \
     self->data[pos] = value; \
-    ++_cvec_size(*self); \
+    ++_cvec_size(self); \
 } \
  \
 STC_API void \
@@ -221,7 +220,7 @@ cvec_##X##_erase(cvec_##X* self, size_t pos, size_t size) { \
         Value* p = &self->data[pos], *start = p, *end = p + size; \
         while (p != end) valueDestroy(p++); \
         memmove(start, end, (len - pos - size) * sizeof(Value)); \
-        _cvec_size(*self) -= size; \
+        _cvec_size(self) -= size; \
     } \
 } \
  \
@@ -256,8 +255,7 @@ typedef int cvec_##taq##_dud
 typedef int(*_cvec_cmp)(const void*, const void*);
 STC_EXTERN_IMPORT void qsort(void *base, size_t nitems, size_t size, _cvec_cmp cmp);
 
-#define _cvec_size(cv) ((size_t *)(cv).data)[-2]
-#define _cvec_capacity(cv) ((size_t *)(cv).data)[-1]
+#define _cvec_size(self) ((size_t *) (self)->data)[-2]
 
 STC_INLINE size_t* _cvec_alloced(void* data) {
     return data ? ((size_t *) data) - 2 : NULL;
