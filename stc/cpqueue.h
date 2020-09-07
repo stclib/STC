@@ -73,10 +73,10 @@ cpqueue_##X##_top(const cpqueue_##X* self) {return &self->data[0];} \
 STC_INLINE void \
 cpqueue_##X##_pop(cpqueue_##X* self) {cpqueue_##X##_erase(self, 0);} \
 STC_API void \
-cpqueue_##X##_push_v(cpqueue_##X* self, cpqueue_##X##_value_t value); \
+cpqueue_##X##_push(cpqueue_##X* self, cpqueue_##X##_value_t value); \
 STC_INLINE void \
-cpqueue_##X##_push(cpqueue_##X* self, cpqueue_##X##_rawvalue_t rawValue) { \
-    cpqueue_##X##_push_v(self, ctype##_value_from_raw(rawValue)); \
+cpqueue_##X##_emplace(cpqueue_##X* self, cpqueue_##X##_rawvalue_t rawValue) { \
+    cpqueue_##X##_push(self, ctype##_value_from_raw(rawValue)); \
 } \
 STC_API void \
 cpqueue_##X##_push_n(cpqueue_##X *self, const cpqueue_##X##_input_t in[], size_t size); \
@@ -119,7 +119,7 @@ cpqueue_##X##_erase(cpqueue_##X* self, size_t i) { \
 } \
  \
 STC_API void \
-cpqueue_##X##_push_v(cpqueue_##X* self, cpqueue_##X##_value_t value) { \
+cpqueue_##X##_push(cpqueue_##X* self, cpqueue_##X##_value_t value) { \
     ctype##_push_back(self, value); /* sift-up the value */ \
     size_t n = cpqueue_##X##_size(*self), c = n; \
     cpqueue_##X##_value_t *arr = self->data - 1; \
