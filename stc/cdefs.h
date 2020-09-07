@@ -71,12 +71,12 @@
 #define c_default_less(x, y)    (*(x) < *(y))
 #define c_compare(less, x, y)   (less(x, y) ? -1 : less(y, x))
 #define c_default_compare(x, y) c_compare(c_default_less, x, y)
-#define c_default_destroy(p)    ((void) p)
+#define c_default_destroy(ptr)  ((void) (ptr))
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
 
-#define c_foreach_3(it, ctype, container) \
-    for (ctype##_iter_t it = ctype##_range(ctype##_begin(&container), ctype##_end(&container)); it.item != it.end; ctype##_next(&it))
+#define c_foreach_3(it, ctype, cnt) \
+    for (ctype##_iter_t it = ctype##_range(ctype##_begin(&cnt), ctype##_end(&cnt)); it.item != it.end; ctype##_next(&it))
 #define c_foreach_4(it, ctype, start, finish) \
     for (ctype##_iter_t it = ctype##_range(start, finish); it.item != it.end; ctype##_next(&it))
 
@@ -86,10 +86,10 @@
     ctype##_push_n(container_ptr, __arr, sizeof(__arr)/sizeof(__arr[0])); \
 } while (0)
 
-#define c_init(ctype, container, items) \
-    ctype container = ctype##_init(); { \
+#define c_init(ctype, cnt, items) \
+    ctype cnt = ctype##_init(); { \
         const ctype##_input_t __arr[] = { items }; \
-        ctype##_push_n(&container, __arr, sizeof(__arr)/sizeof(__arr[0])); \
+        ctype##_push_n(&cnt, __arr, sizeof(__arr)/sizeof(__arr[0])); \
     }
 
 #define c_destroy(ctype, ...) do { \
