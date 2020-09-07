@@ -218,17 +218,16 @@ ctype##_##X##_contains(const ctype##_##X* self, ctype##_##X##_rawkey_t rawKey); 
 STC_API ctype##_##X##_result_t \
 ctype##_##X##_insert_key_(ctype##_##X* self, ctype##_##X##_rawkey_t rawKey); \
  \
-CSET_ONLY_##ctype( STC_INLINE ctype##_##X##_result_t \
-ctype##_##X##_insert(ctype##_##X* self, ctype##_##X##_rawkey_t rawKey) { \
-    return ctype##_##X##_insert_key_(self, rawKey); \
-}) \
 STC_INLINE ctype##_##X##_result_t \
 ctype##_##X##_emplace(ctype##_##X* self, CMAP_ARGS_##ctype(ctype##_##X##_rawkey_t rawKey, RawValue rawValue)) { \
     ctype##_##X##_result_t res = ctype##_##X##_insert_key_(self, rawKey); \
     CMAP_ONLY_##ctype( if (res.inserted) res.item->value = valueFromRaw(rawValue); ) \
     return res; \
 } \
- \
+STC_INLINE ctype##_##X##_result_t \
+ctype##_##X##_insert(ctype##_##X* self, CMAP_ARGS_##ctype(ctype##_##X##_rawkey_t rawKey, RawValue rawValue)) { \
+    return ctype##_##X##_emplace(self, CMAP_ARGS_##ctype(rawKey, rawValue)); \
+} \
 CMAP_ONLY_##ctype( \
 STC_INLINE ctype##_##X##_result_t \
 ctype##_##X##_insert_or_assign(ctype##_##X* self, ctype##_##X##_rawkey_t rawKey, RawValue rawValue) { \

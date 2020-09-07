@@ -133,7 +133,7 @@ STC_API double crand_normal_f64(crand_normal_f64_t* dist);
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
 STC_API crand_rng32_t crand_rng32_with_seq(uint64_t seed, uint64_t seq) {
-    crand_rng32_t rng = {0u, (seq << 1u) | 1u}; /* inc must be odd */
+    crand_rng32_t rng = {{0u, (seq << 1u) | 1u}}; /* inc must be odd */
     crand_i32(&rng);
     rng.state[0] += seed;
     crand_i32(&rng);
@@ -155,7 +155,7 @@ STC_API uint32_t crand_i32(crand_rng32_t* rng) {
 /* Guarantees 2^63 unique threads with minimum 2^64 period length ~ 2^160 average period. */
 /* Tested with PractRand to 8 TB output: no issues */
 STC_API crand_rng64_t crand_rng64_with_seq(uint64_t seed, uint64_t seq) {
-    crand_rng64_t rng = {seed, seed, seed, (seq << 1u) | 1u}; /* increment must be odd */
+    crand_rng64_t rng = {{seed, seed, seed, (seq << 1u) | 1u}}; /* increment must be odd */
     for (int i = 0; i < 12; ++i) crand_i64(&rng);
     return rng;
 }

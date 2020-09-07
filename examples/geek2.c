@@ -16,7 +16,8 @@ int main()
     cset_str_put(&set, "You");
     cset_str_put(&set, "Tube");
     c_foreach (i, cset_str, set)
-        printf("%s ", i.item->key.str); puts("");
+        printf("%s ", i.item->key.str); 
+    puts("");
 
     // Review some books.
    c_push(&book_reviews, cmap_str, c_items(
