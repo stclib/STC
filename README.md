@@ -204,11 +204,11 @@ declare_cvec_str();
 
 int main() {
     cvec_str names = cvec_ini;
-    cvec_str_push_back(&names, "Mary");
-    cvec_str_push_back(&names, "Joe");
+    cvec_str_emplace_back(&names, "Mary");
+    cvec_str_emplace_back(&names, "Joe");
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
-    // Note: use push_back_v() to add a new cstr_t object to be moved into the vector, e.g.:
-    cvec_str_push_back_v(&names, cstr_from("%d elements so far", cvec_size(names))); 
+    // Use push_back() to add a new cstr_t object to be moved into the vector, e.g.:
+    cvec_str_push_back(&names, cstr_from("%d elements so far", cvec_size(names))); 
 
     printf("%s\n", names.data[1].str); // Access the string char*
     c_foreach (i, cvec_str, names)
@@ -224,8 +224,8 @@ declare_cmap(ii, int, int);
 
 int main() {
     cmap_ii nums = cmap_ini;
-    cmap_ii_put(&nums, 8, 64); // simular to insert_or_replace(), 
-    cmap_ii_emplace(&nums, 11, 121);
+    cmap_ii_put(&nums, 8, 64); // similar to insert_or_assign()
+    cmap_ii_insert(&nums, 11, 121); 
 
     printf("%d\n", cmap_ii_find(nums, 8)->value);
     cmap_ii_destroy(&nums);
@@ -239,9 +239,9 @@ declare_cset_str(); // cstr set. See the discussion above.
 
 int main() {
     cset_str words = cset_ini;
-    cset_str_put(&words, "Hello");
-    cset_str_put(&words, "Cruel");
-    cset_str_put(&words, "World");    
+    cset_str_insert(&words, "Hello");
+    cset_str_insert(&words, "Cruel");
+    cset_str_insert(&words, "World");    
     cset_str_erase(&words, "Cruel");
 
     // iterate the set:
@@ -286,14 +286,16 @@ int main() {
     
     for (int i = 0; i < 10000000; ++i)
         clist_fx_push_back(&list, crand_uniform_f64(&eng, dist));
-    k = 0; c_foreach (i, clist_fx, list)
-        if (++k <= 100) printf("%8d: %10f\n", k, i.item->value); else break;
+    k = 0;
+    c_foreach (i, clist_fx, list)
+        if (++k <= 10) printf("%8d: %10f\n", k, i.item->value); else break;
 
     clist_fx_sort(&list); // mergesort O(n*log n)
     puts("sorted");
 
-    k = 0; c_foreach (i, clist_fx, list)
-        if (++k <= 100) printf("%8d: %10f\n", k, i.item->value); else break;
+    k = 0;
+    c_foreach (i, clist_fx, list)
+        if (++k <= 10) printf("%8d: %10f\n", k, i.item->value); else break;
 
     clist_fx_clear(&list);
 
