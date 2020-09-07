@@ -71,7 +71,7 @@
 #define c_default_less(x, y)    (*(x) < *(y))
 #define c_compare(less, x, y)   (less(x, y) ? -1 : less(y, x))
 #define c_default_compare(x, y) c_compare(c_default_less, x, y)
-#define c_default_destroy(p)    ((void)0)
+#define c_default_destroy(p)    ((void) p)
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
 
