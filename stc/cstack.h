@@ -34,10 +34,10 @@
 
         for (int i=0; i<100; ++i)
             cstack_i_push(&stack, i*i);
-        
+
         for (int i=0; i<90; ++i)
             cstack_i_pop(&stack);
-        
+
         printf("top: %d\n", *cstack_i_top(&stack));
     }
 */
@@ -82,8 +82,6 @@ STC_INLINE cstack_##X##_iter_t \
 cstack_##X##_begin(cstack_##X* self) {return ctype##_begin(self);} \
 STC_INLINE cstack_##X##_iter_t \
 cstack_##X##_end(cstack_##X* self) {return ctype##_end(self);} \
-STC_INLINE cstack_##X##_iter_t \
-cstack_##X##_range(cstack_##X##_iter_t s, cstack_##X##_iter_t f) {return ctype##_range(s, f);} \
 STC_INLINE void \
 cstack_##X##_next(cstack_##X##_iter_t* it) {ctype##_next(it);} \
 STC_INLINE cstack_##X##_value_t* \

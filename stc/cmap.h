@@ -184,7 +184,7 @@ typedef struct ctype##_##X { \
 } ctype##_##X; \
  \
 typedef struct { \
-    ctype##_##X##_entry_t *item, *end; \
+    ctype##_##X##_entry_t *item; \
     uint8_t* _hx; \
 } ctype##_##X##_iter_t; \
  \
@@ -257,21 +257,17 @@ ctype##_##X##_erase(ctype##_##X* self, ctype##_##X##_rawkey_t rawKey); \
  \
 STC_INLINE ctype##_##X##_iter_t \
 ctype##_##X##_begin(ctype##_##X* self) { \
-    ctype##_##X##_iter_t it = {self->table, self->table + self->bucket_count, self->_hashx}; \
-    while (it.item != it.end && *it._hx == 0) ++it.item, ++it._hx; \
+    ctype##_##X##_iter_t it = {self->table, self->_hashx}; \
+    if (it._hx) while (*it._hx == 0) ++it.item, ++it._hx; \
     return it; \
 } \
 STC_INLINE ctype##_##X##_iter_t \
 ctype##_##X##_end(ctype##_##X* self) {\
-    ctype##_##X##_iter_t it = {self->table + self->bucket_count, NULL, NULL}; return it; \
-} \
-STC_INLINE ctype##_##X##_iter_t \
-ctype##_##X##_range(ctype##_##X##_iter_t start, ctype##_##X##_iter_t finish) {\
-    start.end = finish.item; return start; \
+    ctype##_##X##_iter_t it = {self->table + self->bucket_count}; return it; \
 } \
 STC_INLINE void \
 ctype##_##X##_next(ctype##_##X##_iter_t* it) { \
-    while (++it->item != it->end && *++it->_hx == 0) ; \
+    while ((++it->item, *++it->_hx == 0)) ; \
 } \
 CMAP_ONLY_##ctype( STC_INLINE ctype##_##X##_value_t* \
 ctype##_##X##_itval(ctype##_##X##_iter_t it) {return &it.item->value;} ) \

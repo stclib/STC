@@ -29,12 +29,8 @@
 #include <stdio.h> /* vsnprintf */
 #include "cdefs.h"
 
-typedef struct cstr {
-    char* str;
-} cstr_t;
-typedef struct {
-    char *item, *end;
-} cstr_iter_t;
+typedef struct cstr { char* str; } cstr_t;
+typedef struct { char *item; } cstr_iter_t;
 typedef char cstr_value_t, cstr_rawvalue_t, cstr_input_t;
 
 static size_t _cstr_nullrep[] = {0, 0, 0};
@@ -120,11 +116,6 @@ STC_INLINE cstr_iter_t
 cstr_end(cstr_t* self) {
     cstr_iter_t it = {self->str + cstr_size(*self)}; return it;
 }
-STC_INLINE cstr_iter_t
-cstr_range(cstr_iter_t start, cstr_iter_t finish) {
-    start.end = finish.item; return start;
-}
-
 STC_INLINE void cstr_next(cstr_iter_t* it) { ++it->item; }
 STC_INLINE char* cstr_itval(cstr_iter_t it) {return it.item;}
 
@@ -208,7 +199,7 @@ cstr_find(const cstr_t* s, const char* needle) {
 STC_INLINE uint32_t c_string_hash(const char* str) {
     uint32_t hash = 5381, c; /* djb2 */
     while ((c = *str++)) hash = ((hash << 5) + hash) ^ c;
-    return hash;    
+    return hash;
 }
 
 STC_INLINE uint32_t cstr_hash_raw(const char* const* spp, size_t ignored) {
@@ -243,7 +234,7 @@ cstr_make_n(const char* str, size_t len) {
     if (len == 0) return cstr_ini;
     size_t *rep = (size_t *) malloc(_cstr_mem(len));
     cstr_t s = {(char *) memcpy(rep + 2, str, len)};
-    s.str[rep[0] = len] = '\0'; 
+    s.str[rep[0] = len] = '\0';
     rep[1] = _cstr_cap(len);
     return s;
 }

@@ -130,9 +130,7 @@ cvec_##X##_sort_with(cvec_##X* self, int(*cmp)(const Value*, const Value*)) { \
     qsort(self->data, cvec_size(*self), sizeof(Value), (_cvec_cmp) cmp); \
 } \
  \
-typedef struct { \
-    Value *item, *end; \
-} cvec_##X##_iter_t; \
+typedef struct { Value *item; } cvec_##X##_iter_t; \
  \
 STC_INLINE cvec_##X##_iter_t \
 cvec_##X##_begin(cvec_##X* self) { \
@@ -141,10 +139,6 @@ cvec_##X##_begin(cvec_##X* self) { \
 STC_INLINE cvec_##X##_iter_t \
 cvec_##X##_end(cvec_##X* self) { \
     cvec_##X##_iter_t it = {self->data + cvec_size(*self)}; return it; \
-} \
-STC_INLINE cvec_##X##_iter_t \
-cvec_##X##_range(cvec_##X##_iter_t start, cvec_##X##_iter_t finish) { \
-    start.end = finish.item; return start; \
 } \
 STC_INLINE void \
 cvec_##X##_next(cvec_##X##_iter_t* it) {++it->item;} \

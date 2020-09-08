@@ -28,7 +28,7 @@
 
 /*
  Multi-dimensional generic array allocated as one block of heap-memory.
- // demo:    
+ // demo:
 #include <stc/carray.h>
 declare_carray(f, float);
 
@@ -68,7 +68,7 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
 }
 
 #define declare_carray_common(D, X, Value, valueDestroy) \
-    typedef struct { Value *item, *end; } carray##D##X##_iter_t; \
+    typedef struct { Value *item; } carray##D##X##_iter_t; \
  \
     STC_INLINE carray##D##X##_iter_t \
     carray##D##X##_begin(carray##D##X* a) { \
@@ -77,10 +77,6 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
     STC_INLINE carray##D##X##_iter_t \
     carray##D##X##_end(carray##D##X* a) { \
         carray##D##X##_iter_t it = {a->data + carray##D##_size(*a)}; return it; \
-    } \
-    STC_INLINE carray##D##X##_iter_t \
-    carray##D##X##_range(carray##D##X##_iter_t start, carray##D##X##_iter_t finish) { \
-        start.end = finish.item; return start; \
     } \
     STC_INLINE void \
     carray##D##X##_next(carray##D##X##_iter_t* it) {++it->item;} \
@@ -188,5 +184,5 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
     } \
     typedef Value carray1##X##_value_t; \
     typedef carray1##X##_value_t carray2##X##_value_t, carray3##X##_value_t
-   
+
 #endif

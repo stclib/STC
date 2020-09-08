@@ -76,14 +76,14 @@
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
 
 #define c_foreach_3(it, ctype, cnt) \
-    for (ctype##_iter_t it = ctype##_range(ctype##_begin(&cnt), ctype##_end(&cnt)); it.item != it.end; ctype##_next(&it))
+    for (ctype##_iter_t it = ctype##_begin(&cnt), it##_end_ = ctype##_end(&cnt); it.item != it##_end_.item; ctype##_next(&it))
 #define c_foreach_4(it, ctype, start, finish) \
-    for (ctype##_iter_t it = ctype##_range(start, finish); it.item != it.end; ctype##_next(&it))
+    for (ctype##_iter_t it = start, it##_end_ = finish; it.item != it##_end_.item; ctype##_next(&it))
 
 #define c_items(...) __VA_ARGS__
-#define c_push(container_ptr, ctype, items) do { \
+#define c_push(cnt_ptr, ctype, items) do { \
     const ctype##_input_t __arr[] = { items }; \
-    ctype##_push_n(container_ptr, __arr, sizeof(__arr)/sizeof(__arr[0])); \
+    ctype##_push_n(cnt_ptr, __arr, sizeof(__arr)/sizeof(__arr[0])); \
 } while (0)
 
 #define c_init(ctype, cnt, items) \

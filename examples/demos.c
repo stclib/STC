@@ -73,7 +73,7 @@ void vectordemo2()
     cvec_str_destroy(&names);
 }
 
-declare_clist(ix, int); 
+declare_clist(ix, int);
 
 void listdemo1()
 {
@@ -140,7 +140,7 @@ void mapdemo2()
     cmap_si_put(&nums, "Groovy", 200); // overwrite previous
 
     // iterate the map:
-    for (cmap_si_iter_t i = cmap_si_begin(&nums); i.item != i.end; cmap_si_next(&i))
+    for (cmap_si_iter_t i = cmap_si_begin(&nums), ie = cmap_si_end(&nums); i.item != ie.item; cmap_si_next(&i))
         printf("long: %s: %d\n", i.item->key.str, i.item->value);
 
     // or rather use the short form:
@@ -151,7 +151,7 @@ void mapdemo2()
 }
 
 
-declare_cmap_str(); 
+declare_cmap_str();
 
 void mapdemo3()
 {
@@ -210,5 +210,5 @@ int main()
     mapdemo1();
     mapdemo2();
     mapdemo3();
-    arraydemo1();    
+    arraydemo1();
 }

@@ -148,7 +148,7 @@ STC_INLINE cbitset_t cbitset_not(cbitset_t s1) {
 
 typedef struct {
     cbitset_t *_bs;
-    size_t item, end;
+    size_t item;
 } cbitset_iter_t;
 
 STC_INLINE cbitset_iter_t
@@ -159,14 +159,10 @@ STC_INLINE cbitset_iter_t
 cbitset_end(cbitset_t* self) {
     cbitset_iter_t it = {self, self->size}; return it;
 }
-STC_INLINE cbitset_iter_t
-cbitset_range(cbitset_iter_t start, cbitset_iter_t finish) {
-    start.end = finish.item; return start;
-}
 STC_INLINE void
 cbitset_next(cbitset_iter_t* it) {++it->item;}
 
-STC_INLINE bool cbitset_itval(cbitset_iter_t it) { 
+STC_INLINE bool cbitset_itval(cbitset_iter_t it) {
     return cbitset_test(*it._bs, it.item);
 }
 

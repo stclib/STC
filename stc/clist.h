@@ -27,23 +27,23 @@
 #include "cdefs.h"
 
 /*  Circular Singly-linked Lists.
-    
+
     This implements a std::forward_list-like class in C, but because it is circular,
     it also support push* and splice* at both ends of the list. This makes it ideal
     for being used as a queue, unlike std::forward_list. Basic usage is similar to cvec:
-   
+
     #include <stdio.h>
     #include <stc/clist.h>
     #include <stc/crandom.h>
     declare_clist(ix, int64_t);
- 
+
     int main() {
         clist_ix list = clist_ini;
         crand_rng32_t pcg = crand_rng32_init(12345);
         int n;
         for (int i=0; i<1000000; ++i) // one million
             clist_ix_push_back(&list, crand_i32(&pcg));
-        n = 0; 
+        n = 0;
         c_foreach (i, clist_ix, list)
             if (++n % 10000 == 0) printf("%8d: %10zd\n", n, i.item->value);
         // Sort them...
@@ -140,10 +140,6 @@ STC_API size_t _clist_size(const clist_void* self);
     clist_##X##_end(clist_##X* self) { \
         clist_##X##_iter_t it = {NULL, NULL, &self->last}; return it; \
     } \
-    STC_INLINE clist_##X##_iter_t \
-    clist_##X##_range(clist_##X##_iter_t start, clist_##X##_iter_t finish) { \
-        start.end = finish.item; return start; \
-    } \
     STC_INLINE void \
     clist_##X##_next(clist_##X##_iter_t* it) { \
         it->item = (it->item == *it->_last) ? NULL : it->item->next; \
@@ -190,7 +186,7 @@ STC_API size_t _clist_size(const clist_void* self);
  \
     implement_clist_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw)
 
-    
+
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
@@ -323,7 +319,7 @@ _clist_mergesort(clist_void_node_t *list, int (*cmp)(const void*, const void*)) 
     clist_void_node_t *p, *q, *e, *tail, *oldhead;
     int insize = 1, nmerges, psize, qsize, i;
     if (!list) return NULL;
-    
+
     while (1) {
         p = list;
         oldhead = list;
