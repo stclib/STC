@@ -31,7 +31,7 @@
 
 typedef struct cstr { char* str; } cstr_t;
 typedef struct { char *item; } cstr_iter_t;
-typedef char cstr_value_t, cstr_rawvalue_t, cstr_input_t;
+typedef char cstr_value_t;
 
 static size_t _cstr_nullrep[] = {0, 0, 0};
 
@@ -40,8 +40,6 @@ static  cstr_t cstr_ini =  {(char* ) &_cstr_nullrep[2]};
 #define cstr_capacity(s)   ((const size_t *) (s).str)[-1]
 #define cstr_empty(s)      (cstr_size(s) == 0)
 #define cstr_npos          ((size_t) (-1))
-#define cstr_push_n        cstr_append_n
-#define cstr_push_back_v   cstr_push_back
 
 STC_API cstr_t
 cstr_make_n(const char* str, size_t len);
