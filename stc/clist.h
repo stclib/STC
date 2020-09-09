@@ -70,16 +70,17 @@
 
 #define declare_clist_types(X, Value) \
     typedef struct clist_##X##_node { \
-        struct clist_##X##_node *next; \
+        struct clist_##X##_node* next; \
         Value value; \
     } clist_##X##_node_t; \
  \
     typedef struct clist_##X { \
-        clist_##X##_node_t *last; \
+        clist_##X##_node_t* last; \
     } clist_##X; \
  \
     typedef struct { \
-        clist_##X##_node_t **_last, *item; \
+        clist_##X##_node_t* const* _last; \
+        clist_##X##_node_t* item; \
         int state; \
     } clist_##X##_iter_t
 
@@ -129,16 +130,16 @@ STC_API size_t _clist_size(const clist_void* self);
     clist_##X##_pop_front(clist_##X* self); \
  \
     STC_INLINE clist_##X##_iter_t \
-    clist_##X##_before_begin(clist_##X* self) { \
+    clist_##X##_before_begin(const clist_##X* self) { \
         clist_##X##_iter_t it = {&self->last, self->last, -1}; return it; \
     } \
     STC_INLINE clist_##X##_iter_t \
-    clist_##X##_begin(clist_##X* self) { \
+    clist_##X##_begin(const clist_##X* self) { \
         clist_##X##_node_t* head = self->last ? self->last->next : NULL; \
         clist_##X##_iter_t it = {&self->last, head}; return it; \
     } \
     STC_INLINE clist_##X##_iter_t \
-    clist_##X##_end(clist_##X* self) { \
+    clist_##X##_end(const clist_##X* self) { \
         clist_##X##_iter_t it = {NULL}; return it; \
     } \
     STC_INLINE void \
@@ -172,9 +173,9 @@ STC_API size_t _clist_size(const clist_void* self);
     } \
   \
     STC_API clist_##X##_iter_t \
-    clist_##X##_find_before(clist_##X* self, clist_##X##_iter_t prev, RawValue val); \
+    clist_##X##_find_before(const clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t last, RawValue val); \
     STC_API clist_##X##_iter_t \
-    clist_##X##_find(clist_##X* self, RawValue val); \
+    clist_##X##_find(const clist_##X* self, RawValue val); \
     STC_API size_t \
     clist_##X##_remove(clist_##X* self, RawValue val); \
     STC_API void \
@@ -231,30 +232,29 @@ STC_API size_t _clist_size(const clist_void* self);
     } \
  \
     STC_API clist_##X##_iter_t \
-    clist_##X##_find_before(clist_##X* self, clist_##X##_iter_t prev, RawValue val) { \
-        clist_##X##_iter_t i = prev; \
-        for (clist_##X##_next(&i); i.item; clist_##X##_next(&i)) { \
+    clist_##X##_find_before(const clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t last, RawValue val) { \
+        clist_##X##_iter_t i = first; \
+        for (clist_##X##_next(&i); i.item != last.item; clist_##X##_next(&i)) { \
             RawValue r = valueToRaw(&i.item->value); \
-            if (valueCompareRaw(&r, &val) == 0) \
-                return prev; \
-            prev = i; \
+            if (valueCompareRaw(&r, &val) == 0) return first; \
+            first = i; \
         } \
-        prev.item = NULL; \
-        return prev; \
+        return clist_##X##_end(self); \
     } \
  \
     STC_API clist_##X##_iter_t \
-    clist_##X##_find(clist_##X* self, RawValue val) { \
-        clist_##X##_iter_t it = clist_##X##_find_before(self, clist_##X##_before_begin(self), val); \
+    clist_##X##_find(const clist_##X* self, RawValue val) { \
+        clist_##X##_iter_t it = clist_##X##_find_before(self, clist_##X##_before_begin(self), clist_##X##_end(self), val); \
         if (it.item) it.item = it.item->next; \
         return it; \
     } \
  \
     STC_API size_t \
     clist_##X##_remove(clist_##X* self, RawValue val) { \
-        clist_##X##_iter_t it; size_t n = 0; \
-        while ((it = clist_##X##_find_before(self, clist_##X##_before_begin(self), val)).item) \
-            it = clist_##X##_erase_after(self, it), ++n; \
+        size_t n = 0; \
+        clist_##X##_iter_t it = clist_##X##_before_begin(self), end = clist_##X##_end(self); \
+        while ((it = clist_##X##_find_before(self, it, end, val)).item != end.item) \
+            clist_##X##_erase_after(self, it), ++n; \
         return n; \
     } \
  \

@@ -31,7 +31,13 @@ int main() {
     clist_fx_insert_after(&list, clist_fx_before_begin(&list), 5); // same as push_front()
     clist_fx_push_back(&list, 500);
     clist_fx_push_front(&list, 1964);
+    clist_fx_iter_t it = clist_fx_before_begin(&list);
+    printf("Full: ");
     c_foreach (i, clist_fx, list)
+        printf(" %g", i.item->value);
+    for (int i=0; i<4; ++i) clist_fx_next(&it);
+    printf("\nSubs: ");
+    c_foreach (i, clist_fx, it, clist_fx_end(&list))
         printf(" %g", i.item->value);
     puts("");
     clist_fx_destroy(&list);

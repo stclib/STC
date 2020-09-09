@@ -235,17 +235,17 @@ ctype##_##X##_insert_or_assign(ctype##_##X* self, ctype##_##X##_rawkey_t rawKey,
     if (!res.inserted) valueDestroy(&res.item->value); \
     res.item->value = valueFromRaw(rawValue); return res; \
 } \
-STC_INLINE ctype##_##X##_entry_t* \
+STC_INLINE ctype##_##X##_result_t \
 ctype##_##X##_putv(ctype##_##X* self, ctype##_##X##_rawkey_t rawKey, Value value) { \
     ctype##_##X##_result_t res = ctype##_##X##_insert_key_(self, rawKey); \
     if (!res.inserted) valueDestroy(&res.item->value); \
-    res.item->value = value; return res.item; \
+    res.item->value = value; return res; \
 }) \
  \
-STC_INLINE ctype##_##X##_entry_t* \
+STC_INLINE ctype##_##X##_result_t \
 ctype##_##X##_put(ctype##_##X* self, CMAP_ARGS_##ctype(ctype##_##X##_rawkey_t rawKey, RawValue rawValue)) { \
-    CMAP_ONLY_##ctype( return ctype##_##X##_insert_or_assign(self, rawKey, rawValue).item; ) \
-    CSET_ONLY_##ctype( return ctype##_##X##_insert_key_(self, rawKey).item; ) \
+    CMAP_ONLY_##ctype( return ctype##_##X##_insert_or_assign(self, rawKey, rawValue); ) \
+    CSET_ONLY_##ctype( return ctype##_##X##_insert_key_(self, rawKey); ) \
 } \
  \
 STC_API size_t \

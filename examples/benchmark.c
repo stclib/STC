@@ -36,7 +36,7 @@ crand_rng64_t rng;
 
 #define CMAP_SETUP(tt, Key, Value) cmap_##tt map = cmap_ini \
                                     ; cmap_##tt##_set_load_factors(&map, max_load_factor, 0.0)
-#define CMAP_PUT(tt, key, val)     cmap_##tt##_put(&map, key, val)->value
+#define CMAP_PUT(tt, key, val)     cmap_##tt##_put(&map, key, val).item->value
 #define CMAP_EMPLACE(tt, key, val) cmap_##tt##_emplace(&map, key, val)
 #define CMAP_ERASE(tt, key)        cmap_##tt##_erase(&map, key)
 #define CMAP_FIND(tt, key)         (cmap_##tt##_find(map, key) != NULL)
@@ -130,7 +130,7 @@ crand_rng64_t rng;
 #define SMAP_DTOR(tt)              UMAP_DTOR(tt)
 
 enum {
-    FAC = 5,
+    FAC = 3,
     N1 = 10000000 * FAC,
     N2 = 10000000 * FAC,
     N3 = 10000000 * FAC,
@@ -218,13 +218,13 @@ int main(int argc, char* argv[])
     seed = time(NULL);
     printf("\nRandom keys are in range [0, 2^%d), seed = %zu:\n",  rr, seed);
     printf("\nUnordered maps: %d repeats of Insert random key + try to remove a random key:\n", N1);
-    //RUN_TEST(1)
+    RUN_TEST(1)
 
     printf("\nUnordered maps: Insert %d index keys, then remove them in same order:\n", N2);
-    //RUN_TEST(2)
+    RUN_TEST(2)
 
     printf("\nUnordered maps: Insert %d random keys, then remove them in same order:\n", N3);
-    //RUN_TEST(3)
+    RUN_TEST(3)
 
     printf("\nUnordered maps: Iterate %d random keys:\n", N4);
     RUN_TEST(4)

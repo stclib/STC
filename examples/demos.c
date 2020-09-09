@@ -90,7 +90,7 @@ void listdemo1()
     c_foreach (i, clist_ix, nums)
         printf("spliced: %d\n", i.item->value);
 
-    *clist_ix_find(&nums, 100) *= 10;
+    clist_ix_find(&nums, 100).item->value *= 10;
     clist_ix_sort(&nums);                     // Sort the array
     clist_ix_remove(&nums, 105);
     clist_ix_pop_front(&nums);

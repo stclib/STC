@@ -53,7 +53,7 @@
 #define _c_OVERLOAD_SELECT(NAME, NUM) _c_CAT( NAME ## _, NUM)
 
 #define c_MACRO_OVERLOAD(NAME, ...) _c_OVERLOAD_SELECT(NAME, _c_VA_ARG_SIZE(__VA_ARGS__))(__VA_ARGS__)
-/*#define FOO(...) c_MACRO_OVERLOAD(FOO, __VA_ARGS__)   #define FOO_0() "0"   #define FOO_1(x) "1"   #define FOO_2(x,y) "2"*/
+/*#define FOO(...) c_MACRO_OVERLOAD(FOO, __VA_ARGS__)   #define FOO_1(x) "1"   #define FOO_2(x,y) "2"*/
 
 #define c_new(T)        ((T *) malloc(sizeof(T)))
 #define c_new_n(T, n)   ((T *) malloc(sizeof(T) * (n)))

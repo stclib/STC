@@ -51,6 +51,7 @@ typedef struct cvec_##X { \
 typedef Value cvec_##X##_value_t; \
 typedef RawValue cvec_##X##_rawvalue_t; \
 typedef cvec_##X##_rawvalue_t cvec_##X##_input_t; \
+typedef struct { Value *item; } cvec_##X##_iter_t; \
  \
 STC_INLINE cvec_##X \
 cvec_##X##_init(void) {cvec_##X v = cvec_ini; return v;} \
@@ -90,8 +91,10 @@ STC_API void \
 cvec_##X##_sort(cvec_##X* self); \
 STC_API void \
 cvec_##X##_sort_with(cvec_##X* self, int(*cmp)(const Value*, const Value*)); \
-STC_API size_t \
+STC_API cvec_##X##_iter_t \
 cvec_##X##_find(const cvec_##X* self, RawValue rawValue); \
+STC_API cvec_##X##_iter_t \
+cvec_##X##_find_in_range(const cvec_##X* self, cvec_##X##_iter_t first, cvec_##X##_iter_t last, RawValue rawValue); \
 STC_API int \
 cvec_##X##_value_compare(const Value* x, const Value* y); \
  \
@@ -130,14 +133,12 @@ cvec_##X##_sort_with(cvec_##X* self, int(*cmp)(const Value*, const Value*)) { \
     qsort(self->data, cvec_size(*self), sizeof(Value), (_cvec_cmp) cmp); \
 } \
  \
-typedef struct { Value *item; } cvec_##X##_iter_t; \
- \
 STC_INLINE cvec_##X##_iter_t \
-cvec_##X##_begin(cvec_##X* self) { \
+cvec_##X##_begin(const cvec_##X* self) { \
     cvec_##X##_iter_t it = {self->data}; return it; \
 } \
 STC_INLINE cvec_##X##_iter_t \
-cvec_##X##_end(cvec_##X* self) { \
+cvec_##X##_end(const cvec_##X* self) { \
     cvec_##X##_iter_t it = {self->data + cvec_size(*self)}; return it; \
 } \
 STC_INLINE void \
@@ -218,14 +219,17 @@ cvec_##X##_erase(cvec_##X* self, size_t pos, size_t size) { \
     } \
 } \
  \
-STC_API size_t \
-cvec_##X##_find(const cvec_##X* self, RawValue rawValue) { \
-    const Value *p = self->data, *end = p + cvec_size(*self); \
-    for (; p != end; ++p) { \
-        RawValue r = valueToRaw(p); \
-        if (valueCompareRaw(&r, &rawValue) == 0) return p - self->data; \
+STC_API cvec_##X##_iter_t \
+cvec_##X##_find_in_range(const cvec_##X* self, cvec_##X##_iter_t first, cvec_##X##_iter_t last, RawValue rawValue) { \
+    for (; first.item != last.item; cvec_##X##_next(&first)) { \
+        RawValue r = valueToRaw(first.item); \
+        if (valueCompareRaw(&r, &rawValue) == 0) return first; \
     } \
-    return SIZE_MAX; /*(size_t) (-1)*/ \
+    return cvec_##X##_end(self); \
+} \
+STC_API cvec_##X##_iter_t \
+cvec_##X##_find(const cvec_##X* self, RawValue rawValue) { \
+    return cvec_##X##_find_in_range(self, cvec_##X##_begin(self), cvec_##X##_end(self), rawValue); \
 } \
  \
 STC_API int \
