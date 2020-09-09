@@ -245,7 +245,7 @@ STC_API size_t _clist_size(const clist_void* self);
     STC_API clist_##X##_iter_t \
     clist_##X##_find(const clist_##X* self, RawValue val) { \
         clist_##X##_iter_t it = clist_##X##_find_before(self, clist_##X##_before_begin(self), clist_##X##_end(self), val); \
-        if (it.item) it.item = it.item->next; \
+        if (it.item != clist_##X##_end(self).item) clist_##X##_next(&it); \
         return it; \
     } \
  \
@@ -253,7 +253,7 @@ STC_API size_t _clist_size(const clist_void* self);
     clist_##X##_remove(clist_##X* self, RawValue val) { \
         size_t n = 0; \
         clist_##X##_iter_t it = clist_##X##_before_begin(self), end = clist_##X##_end(self); \
-        while ((it = clist_##X##_find_before(self, it, end, val)).item != end.item) \
+        while ((it = clist_##X##_find_before(self, it, clist_##X##_end(self), val)).item != clist_##X##_end(self).item) \
             clist_##X##_erase_after(self, it), ++n; \
         return n; \
     } \
