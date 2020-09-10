@@ -84,14 +84,9 @@
     ctype##_push_n(cnt_ptr, __arr, sizeof(__arr)/sizeof(__arr[0])); \
 } while (0)
 
-#define c_init(ctype, cnt, items) \
-    ctype cnt = ctype##_init(); { \
-        const ctype##_input_t __arr[] = { items }; \
-        ctype##_push_n(&cnt, __arr, sizeof(__arr)/sizeof(__arr[0])); \
-    }
-
-#define c_make(arr, init, n) do { \
-    for (size_t __i = 0; __i < n; ++__i) (arr)[__i] = init; \
+#define c_init(type, arr, init, n) do { \
+    type __init = init, *__i = arr, *__last = __i + n; \
+    while (__i != __last) = *__i++ = __init; \
 } while (0)
 
 #define c_destroy(ctype, ...) do { \

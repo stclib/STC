@@ -21,10 +21,11 @@ declare_cpqueue(f, cvec_f, >);
 
 
 int main(void) {
-    
+
     // CVEC FLOAT / PRIORITY QUEUE
 
-    c_init(cvec_f, floats, c_items(4.0f, 2.0f, 5.0f, 3.0f, 1.0f));
+    cvec_f floats = cvec_ini;
+    c_push(&floats, cvec_f, c_items(4.0f, 2.0f, 5.0f, 3.0f, 1.0f));
 
     c_foreach (i, cvec_f, floats) printf("%.1f ", *i.item);
     puts("");
@@ -45,7 +46,8 @@ int main(void) {
     // CMAP ID
 
     int year = 2020;
-    c_init(cmap_id, idnames, c_items(
+    cmap_id idnames = cmap_ini;
+    c_push(&idnames, cmap_id, c_items(
         {100, cstr_make("Hello")},
         {110, cstr_make("World")},
         {120, cstr_from("Howdy, -%d-", year)},
@@ -58,7 +60,8 @@ int main(void) {
 
     // CMAP CNT
 
-    c_init(cmap_cnt, countries, c_items(
+    cmap_cnt countries = cmap_ini;
+    c_push(&countries, cmap_cnt, c_items(
         {"Norway", 100},
         {"Denmark", 50},
         {"Iceland", 10},
@@ -80,7 +83,8 @@ int main(void) {
 
     // CVEC PAIR
 
-    c_init(cvec_ip, pairs1, c_items(
+    cvec_ip pairs1 = cvec_ini;
+    c_push(&pairs1, cvec_ip, c_items(
         {5, 6},
         {3, 4},
         {1, 2},
@@ -95,14 +99,15 @@ int main(void) {
 
     // CLIST PAIR
 
-    c_init(clist_ip, pairs2, c_items(
+    clist_ip pairs2 = clist_ini;
+    c_push(&pairs2, clist_ip, c_items(
         {5, 6},
         {3, 4},
         {1, 2},
         {7, 8},
     ));
     clist_ip_sort(&pairs2);
-    
+
     c_foreach (i, clist_ip, pairs2)
         printf("(%d %d) ", i.item->value.x, i.item->value.y);
     puts("");

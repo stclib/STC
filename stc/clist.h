@@ -86,7 +86,13 @@
 
 #define clist_ini           {NULL}
 #define clist_empty(list)   ((list).last == NULL)
-
+#define clist_emplace_after(X, self, pos, items) do { \
+    clist_##X* __self = self; \
+    clist_##X##_iter_t __pos = pos; \
+    const clist_##X##_input_t __arr[] = {items}; \
+    for (size_t __i=0; __i<sizeof(__arr)/sizeof(__arr[0]); ++__i) \
+        __pos = clist_##X##_emplace_after(__self, __pos, __arr[__i]); \
+} while (0)
 
 declare_clist_types(void, int);
 STC_API size_t _clist_size(const clist_void* self);
@@ -150,17 +156,22 @@ STC_API size_t _clist_size(const clist_void* self);
     clist_##X##_itval(clist_##X##_iter_t it) {return &it.item->value;} \
 \
     STC_API clist_##X##_iter_t \
-    clist_##X##_insert_after(clist_##X* self, clist_##X##_iter_t it, Value value); \
+    clist_##X##_insert_after(clist_##X* self, clist_##X##_iter_t pos, Value value); \
     STC_INLINE clist_##X##_iter_t \
-    clist_##X##_emplace_after(clist_##X* self, clist_##X##_iter_t it, RawValue rawValue) { \
-        return clist_##X##_insert_after(self, it, valueFromRaw(rawValue)); \
+    clist_##X##_emplace_after(clist_##X* self, clist_##X##_iter_t pos, RawValue rawValue) { \
+        return clist_##X##_insert_after(self, pos, valueFromRaw(rawValue)); \
     } \
     STC_API clist_##X##_iter_t \
-    clist_##X##_erase_after(clist_##X* self, clist_##X##_iter_t it); \
+    clist_##X##_erase_after(clist_##X* self, clist_##X##_iter_t pos); \
+    STC_INLINE clist_##X##_iter_t \
+    clist_##X##_erase_range_after(clist_##X* self, clist_##X##_iter_t pos, clist_##X##_iter_t last) { \
+        while (pos.item != last.item) pos = clist_##X##_erase_after(self, pos); \
+        return pos; \
+    } \
 \
     STC_INLINE void \
-    clist_##X##_splice_after(clist_##X* self, clist_##X##_iter_t it, clist_##X* other) { \
-        _clist_splice_after((clist_void *) self, *(clist_void_iter_t *) &it, (clist_void *) other); \
+    clist_##X##_splice_after(clist_##X* self, clist_##X##_iter_t pos, clist_##X* other) { \
+        _clist_splice_after((clist_void *) self, *(clist_void_iter_t *) &pos, (clist_void *) other); \
     } \
     STC_INLINE void \
     clist_##X##_splice_front(clist_##X* self, clist_##X* other) { \
@@ -220,15 +231,15 @@ STC_API size_t _clist_size(const clist_void* self);
     } \
 \
     STC_API clist_##X##_iter_t \
-    clist_##X##_insert_after(clist_##X* self, clist_##X##_iter_t it, Value value) { \
-        _clist_insert_after(self, X, it.item, value); \
-        if (it.item == self->last && it.state == 0) self->last = entry; \
-        it.item = entry; return it; \
+    clist_##X##_insert_after(clist_##X* self, clist_##X##_iter_t pos, Value value) { \
+        _clist_insert_after(self, X, pos.item, value); \
+        if (pos.item == self->last && pos.state == 0) self->last = entry; \
+        pos.item = entry; return pos; \
     } \
     STC_API clist_##X##_iter_t \
-    clist_##X##_erase_after(clist_##X* self, clist_##X##_iter_t it) { \
-        _clist_erase_after(self, X, it.item, valueDestroy); \
-        clist_##X##_next(&it); return it; \
+    clist_##X##_erase_after(clist_##X* self, clist_##X##_iter_t pos) { \
+        _clist_erase_after(self, X, pos.item, valueDestroy); \
+        clist_##X##_next(&pos); return pos; \
     } \
 \
     STC_API clist_##X##_iter_t \
@@ -290,14 +301,14 @@ STC_API size_t _clist_size(const clist_void* self);
 
 
 STC_API void
-_clist_splice_after(clist_void* self, clist_void_iter_t it, clist_void* other) {
-    if (!it.item)
+_clist_splice_after(clist_void* self, clist_void_iter_t pos, clist_void* other) {
+    if (!pos.item)
         self->last = other->last;
     else if (other->last) {
-        clist_void_node_t *next = it.item->next;
-        it.item->next = other->last->next;
+        clist_void_node_t *next = pos.item->next;
+        pos.item->next = other->last->next;
         other->last->next = next;
-        if (it.item == self->last && it.state == 0) self->last = other->last;
+        if (pos.item == self->last && pos.state == 0) self->last = other->last;
     }
     other->last = NULL;
 }

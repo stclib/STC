@@ -84,8 +84,8 @@
     cvec_##X##_insert_range(cvec_##X* self, cvec_##X##_iter_t pos, cvec_##X##_iter_t first, cvec_##X##_iter_t last); \
     \
     STC_INLINE cvec_##X##_iter_t \
-    cvec_##X##_insert_irange(cvec_##X* self, size_t ipos, Value* pfirst, Value* plast) { \
-        cvec_##X##_iter_t pos = {self->data + ipos}, first = {pfirst}, last = {plast}; \
+    cvec_##X##_insert_items(cvec_##X* self, size_t idx, Value* pfirst, Value* plast) { \
+        cvec_##X##_iter_t pos = {self->data + idx}, first = {pfirst}, last = {plast}; \
         return cvec_##X##_insert_range(self, pos, first, last); \
     } \
     STC_INLINE cvec_##X##_iter_t \
@@ -94,8 +94,8 @@
         return cvec_##X##_insert_range(self, pos, first, last); \
     } \
     STC_INLINE cvec_##X##_iter_t \
-    cvec_##X##_insert_ipos(cvec_##X* self, size_t ipos, Value value) { \
-        cvec_##X##_iter_t pos = {self->data + ipos}, first = {&value}, last = {&value + 1}; \
+    cvec_##X##_insert_at(cvec_##X* self, size_t idx, Value value) { \
+        cvec_##X##_iter_t pos = {self->data + idx}, first = {&value}, last = {&value + 1}; \
         return cvec_##X##_insert_range(self, pos, first, last); \
     } \
     STC_INLINE cvec_##X##_iter_t \
@@ -103,8 +103,8 @@
         cvec_##X##_insert(self, pos, valueFromRaw(rawValue)); \
     } \
     STC_INLINE cvec_##X##_iter_t \
-    cvec_##X##_emplace_ipos(cvec_##X* self, size_t ipos, RawValue rawValue) { \
-        cvec_##X##_insert_ipos(self, ipos, valueFromRaw(rawValue)); \
+    cvec_##X##_emplace_at(cvec_##X* self, size_t idx, RawValue rawValue) { \
+        cvec_##X##_insert_at(self, idx, valueFromRaw(rawValue)); \
     } \
 \
     STC_API cvec_##X##_iter_t \
@@ -116,12 +116,12 @@
         return cvec_##X##_erase_range(self, pos, next); \
     } \
     STC_INLINE cvec_##X##_iter_t \
-    cvec_##X##_erase_ipos(cvec_##X* self, size_t ipos) { \
-        cvec_##X##_iter_t first = {self->data + ipos}, last = {first.item + 1}; \
+    cvec_##X##_erase_at(cvec_##X* self, size_t idx) { \
+        cvec_##X##_iter_t first = {self->data + idx}, last = {first.item + 1}; \
         return cvec_##X##_erase_range(self, first, last); \
     } \
     STC_INLINE cvec_##X##_iter_t \
-    cvec_##X##_erase_irange(cvec_##X* self, size_t ifirst, size_t ilast) { \
+    cvec_##X##_erase_items(cvec_##X* self, size_t ifirst, size_t ilast) { \
         cvec_##X##_iter_t first = {self->data + ifirst}, last = {self->data + ilast}; \
         return cvec_##X##_erase_range(self, first, last); \
     } \
@@ -240,12 +240,12 @@
     STC_API cvec_##X##_iter_t \
     cvec_##X##_insert_range(cvec_##X* self, cvec_##X##_iter_t pos, cvec_##X##_iter_t first, cvec_##X##_iter_t last) { \
         enum {max_buf = c_max_alloca / sizeof(Value) + 1}; Value buf[max_buf]; \
-        size_t len = last.item - first.item, ipos = pos.item - self->data, size = cvec_size(*self); \
-        Value* xbuf = (Value *) memcpy(len > max_buf ? c_new_n(Value, len) : buf, first.item, len); \
+        size_t len = last.item - first.item, idx = pos.item - self->data, size = cvec_size(*self); \
+        Value* xbuf = (Value *) memcpy(len > max_buf ? c_new_n(Value, len) : buf, first.item, len * sizeof(Value)); \
         if (size + len > cvec_capacity(*self)) \
             cvec_##X##_reserve(self, 4 + (size + len) * 3 / 2); \
-        pos.item = self->data + ipos; \
-        memmove(pos.item + len, pos.item, (size - ipos) * sizeof(Value)); \
+        pos.item = self->data + idx; \
+        memmove(pos.item + len, pos.item, (size - idx) * sizeof(Value)); \
         memcpy(pos.item, xbuf, len * sizeof(Value)); \
         _cvec_size(self) += len; \
         if (len > max_buf) free(xbuf); \
