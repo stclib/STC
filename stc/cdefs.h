@@ -90,6 +90,10 @@
         ctype##_push_n(&cnt, __arr, sizeof(__arr)/sizeof(__arr[0])); \
     }
 
+#define c_make(arr, init, n) do { \
+    for (size_t __i = 0; __i < n; ++__i) (arr)[__i] = init; \
+} while (0)
+
 #define c_destroy(ctype, ...) do { \
     struct ctype* __arr[] = {__VA_ARGS__}; \
     for (size_t i=0; i<sizeof(__arr)/sizeof(__arr[0]); ++i) \
