@@ -73,11 +73,11 @@
         struct clist_##X##_node* next; \
         Value value; \
     } clist_##X##_node_t; \
- \
+\
     typedef struct clist_##X { \
         clist_##X##_node_t* last; \
     } clist_##X; \
- \
+\
     typedef struct { \
         clist_##X##_node_t* const* _last; \
         clist_##X##_node_t* item; \
@@ -92,12 +92,12 @@ declare_clist_types(void, int);
 STC_API size_t _clist_size(const clist_void* self);
 
 #define declare_clist_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
- \
+\
     declare_clist_types(X, Value); \
     typedef Value clist_##X##_value_t; \
     typedef RawValue clist_##X##_rawvalue_t; \
     typedef clist_##X##_rawvalue_t clist_##X##_input_t; \
- \
+\
     STC_INLINE clist_##X \
     clist_##X##_init(void) {clist_##X x = clist_ini; return x;} \
     STC_INLINE bool \
@@ -106,12 +106,12 @@ STC_API size_t _clist_size(const clist_void* self);
     clist_##X##_size(clist_##X ls) {return _clist_size((const clist_void*) &ls);} \
     STC_INLINE Value \
     clist_##X##_value_from_raw(RawValue rawValue) {return valueFromRaw(rawValue);} \
- \
+\
     STC_API void \
     clist_##X##_destroy(clist_##X* self); \
     STC_INLINE void \
     clist_##X##_clear(clist_##X* self) {clist_##X##_destroy(self);} \
- \
+\
     STC_API void \
     clist_##X##_push_n(clist_##X *self, const clist_##X##_input_t in[], size_t size); \
     STC_API void \
@@ -128,7 +128,7 @@ STC_API size_t _clist_size(const clist_void* self);
     } \
     STC_API void \
     clist_##X##_pop_front(clist_##X* self); \
- \
+\
     STC_INLINE clist_##X##_iter_t \
     clist_##X##_before_begin(const clist_##X* self) { \
         clist_##X##_iter_t it = {&self->last, self->last, -1}; return it; \
@@ -148,7 +148,7 @@ STC_API size_t _clist_size(const clist_void* self);
     } \
     STC_INLINE clist_##X##_value_t* \
     clist_##X##_itval(clist_##X##_iter_t it) {return &it.item->value;} \
- \
+\
     STC_API clist_##X##_iter_t \
     clist_##X##_insert_after(clist_##X* self, clist_##X##_iter_t it, Value value); \
     STC_INLINE clist_##X##_iter_t \
@@ -157,7 +157,7 @@ STC_API size_t _clist_size(const clist_void* self);
     } \
     STC_API clist_##X##_iter_t \
     clist_##X##_erase_after(clist_##X* self, clist_##X##_iter_t it); \
- \
+\
     STC_INLINE void \
     clist_##X##_splice_after(clist_##X* self, clist_##X##_iter_t it, clist_##X* other) { \
         _clist_splice_after((clist_void *) self, *(clist_void_iter_t *) &it, (clist_void *) other); \
@@ -171,7 +171,7 @@ STC_API size_t _clist_size(const clist_void* self);
         clist_##X##_iter_t last = {&self->last, self->last, 0}; \
         clist_##X##_splice_after(self, last, other); \
     } \
-  \
+\
     STC_API clist_##X##_iter_t \
     clist_##X##_find_before(const clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t last, RawValue val); \
     STC_API clist_##X##_iter_t \
@@ -180,12 +180,12 @@ STC_API size_t _clist_size(const clist_void* self);
     clist_##X##_remove(clist_##X* self, RawValue val); \
     STC_API void \
     clist_##X##_sort(clist_##X* self); \
- \
+\
     STC_INLINE Value* \
     clist_##X##_front(clist_##X* self) {return &self->last->next->value;} \
     STC_INLINE Value* \
     clist_##X##_back(clist_##X* self) {return &self->last->value;} \
- \
+\
     implement_clist_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw)
 
 
@@ -193,13 +193,13 @@ STC_API size_t _clist_size(const clist_void* self);
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define implement_clist_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
-  \
+\
     STC_API void \
     clist_##X##_destroy(clist_##X* self) { \
         while (self->last) \
             clist_##X##_pop_front(self); \
     } \
- \
+\
     STC_API void \
     clist_##X##_push_back(clist_##X* self, Value value) { \
         _clist_insert_after(self, X, self->last, value); \
@@ -218,7 +218,7 @@ STC_API size_t _clist_size(const clist_void* self);
     clist_##X##_pop_front(clist_##X* self) { \
         _clist_erase_after(self, X, self->last, valueDestroy); \
     } \
- \
+\
     STC_API clist_##X##_iter_t \
     clist_##X##_insert_after(clist_##X* self, clist_##X##_iter_t it, Value value) { \
         _clist_insert_after(self, X, it.item, value); \
@@ -230,7 +230,7 @@ STC_API size_t _clist_size(const clist_void* self);
         _clist_erase_after(self, X, it.item, valueDestroy); \
         clist_##X##_next(&it); return it; \
     } \
- \
+\
     STC_API clist_##X##_iter_t \
     clist_##X##_find_before(const clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t last, RawValue val) { \
         clist_##X##_iter_t i = first; \
@@ -241,14 +241,14 @@ STC_API size_t _clist_size(const clist_void* self);
         } \
         return clist_##X##_end(self); \
     } \
- \
+\
     STC_API clist_##X##_iter_t \
     clist_##X##_find(const clist_##X* self, RawValue val) { \
         clist_##X##_iter_t it = clist_##X##_find_before(self, clist_##X##_before_begin(self), clist_##X##_end(self), val); \
         if (it.item != clist_##X##_end(self).item) clist_##X##_next(&it); \
         return it; \
     } \
- \
+\
     STC_API size_t \
     clist_##X##_remove(clist_##X* self, RawValue val) { \
         size_t n = 0; \
@@ -257,7 +257,7 @@ STC_API size_t _clist_size(const clist_void* self);
             clist_##X##_erase_after(self, it), ++n; \
         return n; \
     } \
- \
+\
     static inline int \
     clist_##X##_sort_compare(const void* x, const void* y) { \
         RawValue a = valueToRaw(&((clist_##X##_node_t *) x)->value); \

@@ -69,28 +69,27 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
 
 
 #define declare_carray_common(D, X, Value, valueDestroy) \
+    typedef struct { Value *item; } carray##D##X##_iter_t; \
 \
-typedef struct { Value *item; } carray##D##X##_iter_t; \
-\
-STC_INLINE carray##D##X##_iter_t \
-carray##D##X##_begin(carray##D##X* a) { \
-    carray##D##X##_iter_t it = {a->data}; return it; \
-} \
-STC_INLINE carray##D##X##_iter_t \
-carray##D##X##_end(carray##D##X* a) { \
-    carray##D##X##_iter_t it = {a->data + carray##D##_size(*a)}; return it; \
-} \
-STC_INLINE void \
-carray##D##X##_next(carray##D##X##_iter_t* it) {++it->item;} \
-\
-STC_INLINE void \
-carray##D##X##_destroy(carray##D##X* self) { \
-    if (self->_xdim & _carray_OWN) { \
-        c_foreach_3 (i, carray##D##X, *self) \
-            valueDestroy(i.item); \
-        free(self->data); \
+    STC_INLINE carray##D##X##_iter_t \
+    carray##D##X##_begin(carray##D##X* a) { \
+        carray##D##X##_iter_t it = {a->data}; return it; \
     } \
-}
+    STC_INLINE carray##D##X##_iter_t \
+    carray##D##X##_end(carray##D##X* a) { \
+        carray##D##X##_iter_t it = {a->data + carray##D##_size(*a)}; return it; \
+    } \
+    STC_INLINE void \
+    carray##D##X##_next(carray##D##X##_iter_t* it) {++it->item;} \
+\
+    STC_INLINE void \
+    carray##D##X##_destroy(carray##D##X* self) { \
+        if (self->_xdim & _carray_OWN) { \
+            c_foreach_3 (i, carray##D##X, *self) \
+                valueDestroy(i.item); \
+            free(self->data); \
+        } \
+    }
 
 #define declare_carray(...) c_MACRO_OVERLOAD(declare_carray, __VA_ARGS__)
 #define declare_carray_2(X, Value) \
@@ -99,95 +98,95 @@ carray##D##X##_destroy(carray##D##X* self) { \
 
 #define declare_carray_3(X, Value, valueDestroy) \
 \
-typedef Value carray1##X##_value_t; \
-typedef carray1##X##_value_t carray2##X##_value_t, carray3##X##_value_t; \
+    typedef Value carray1##X##_value_t; \
+    typedef carray1##X##_value_t carray2##X##_value_t, carray3##X##_value_t; \
 \
-typedef struct carray1##X { \
-    Value *data; \
-    size_t _xdim; \
-} carray1##X; \
+    typedef struct carray1##X { \
+        Value *data; \
+        size_t _xdim; \
+    } carray1##X; \
 \
-typedef struct carray2##X { \
-    Value *data; \
-    size_t _xdim, _yxdim; \
-} carray2##X; \
+    typedef struct carray2##X { \
+        Value *data; \
+        size_t _xdim, _yxdim; \
+    } carray2##X; \
 \
-typedef struct carray3##X { \
-    Value *data; \
-    size_t _xdim, _yxdim, _zdim; \
-} carray3##X; \
+    typedef struct carray3##X { \
+        Value *data; \
+        size_t _xdim, _yxdim, _zdim; \
+    } carray3##X; \
 \
-declare_carray_common(1, X, Value, valueDestroy) \
-declare_carray_common(2, X, Value, valueDestroy) \
-declare_carray_common(3, X, Value, valueDestroy) \
+    declare_carray_common(1, X, Value, valueDestroy) \
+    declare_carray_common(2, X, Value, valueDestroy) \
+    declare_carray_common(3, X, Value, valueDestroy) \
 \
-STC_INLINE carray1##X \
-carray1##X##_make(size_t xdim, Value val) { \
-    Value* m = c_new_n(Value, xdim); \
-    for (size_t i=0; i<xdim; ++i) m[i] = val; \
-    carray1##X a = {m, xdim | _carray_OWN}; \
-    return a; \
-} \
-STC_INLINE carray2##X \
-carray2##X##_make(size_t ydim, size_t xdim, Value val) { \
-    const size_t n = ydim * xdim; \
-    Value* m = c_new_n(Value, n); \
-    for (size_t i=0; i<n; ++i) m[i] = val; \
-    carray2##X a = {m, xdim | _carray_OWN, ydim * xdim}; \
-    return a; \
-} \
-STC_INLINE carray3##X \
-carray3##X##_make(size_t zdim, size_t ydim, size_t xdim, Value val) { \
-    const size_t n = zdim * ydim * xdim; \
-    Value* m = c_new_n(Value, n); \
-    for (size_t i=0; i<n; ++i) m[i] = val; \
-    carray3##X a = {m, xdim | _carray_OWN, ydim * xdim, zdim}; \
-    return a; \
-} \
+    STC_INLINE carray1##X \
+    carray1##X##_make(size_t xdim, Value val) { \
+        Value* m = c_new_n(Value, xdim); \
+        for (size_t i=0; i<xdim; ++i) m[i] = val; \
+        carray1##X a = {m, xdim | _carray_OWN}; \
+        return a; \
+    } \
+    STC_INLINE carray2##X \
+    carray2##X##_make(size_t ydim, size_t xdim, Value val) { \
+        const size_t n = ydim * xdim; \
+        Value* m = c_new_n(Value, n); \
+        for (size_t i=0; i<n; ++i) m[i] = val; \
+        carray2##X a = {m, xdim | _carray_OWN, ydim * xdim}; \
+        return a; \
+    } \
+    STC_INLINE carray3##X \
+    carray3##X##_make(size_t zdim, size_t ydim, size_t xdim, Value val) { \
+        const size_t n = zdim * ydim * xdim; \
+        Value* m = c_new_n(Value, n); \
+        for (size_t i=0; i<n; ++i) m[i] = val; \
+        carray3##X a = {m, xdim | _carray_OWN, ydim * xdim, zdim}; \
+        return a; \
+    } \
 \
-STC_INLINE carray1##X \
-carray1##X##_from(size_t xdim, Value* array, bool own) { \
-    carray1##X a = {array, xdim | (own ? _carray_OWN : 0)}; \
-    return a; \
-} \
-STC_INLINE carray2##X \
-carray2##X##_from(size_t ydim, size_t xdim, Value* array, bool own) { \
-    carray2##X a = {array, xdim | (own ? _carray_OWN : 0), ydim * xdim}; \
-    return a; \
-} \
-STC_INLINE carray3##X \
-carray3##X##_from(size_t zdim, size_t ydim, size_t xdim, Value* array, bool own) { \
-    carray3##X a = {array, xdim | (own ? _carray_OWN : 0), ydim * xdim, zdim}; \
-    return a; \
-} \
+    STC_INLINE carray1##X \
+    carray1##X##_from(size_t xdim, Value* array, bool own) { \
+        carray1##X a = {array, xdim | (own ? _carray_OWN : 0)}; \
+        return a; \
+    } \
+    STC_INLINE carray2##X \
+    carray2##X##_from(size_t ydim, size_t xdim, Value* array, bool own) { \
+        carray2##X a = {array, xdim | (own ? _carray_OWN : 0), ydim * xdim}; \
+        return a; \
+    } \
+    STC_INLINE carray3##X \
+    carray3##X##_from(size_t zdim, size_t ydim, size_t xdim, Value* array, bool own) { \
+        carray3##X a = {array, xdim | (own ? _carray_OWN : 0), ydim * xdim, zdim}; \
+        return a; \
+    } \
 \
-STC_INLINE Value* \
-carray1##X##_at(carray1##X *a, size_t x) { return a->data + x; } \
+    STC_INLINE Value* \
+    carray1##X##_at(carray1##X *a, size_t x) { return a->data + x; } \
+    \
+    STC_INLINE carray1##X \
+    carray2##X##_at1(carray2##X *a, size_t y) { \
+        carray1##X sub = {a->data + y*carray2_xdim(*a), carray2_xdim(*a)}; \
+        return sub; \
+    } \
+    STC_INLINE Value* \
+    carray2##X##_at(carray2##X *a, size_t y, size_t x) { \
+        return a->data + y*carray2_xdim(*a) + x; \
+    } \
 \
-STC_INLINE carray1##X \
-carray2##X##_at1(carray2##X *a, size_t y) { \
-    carray1##X sub = {a->data + y*carray2_xdim(*a), carray2_xdim(*a)}; \
-    return sub; \
-} \
-STC_INLINE Value* \
-carray2##X##_at(carray2##X *a, size_t y, size_t x) { \
-    return a->data + y*carray2_xdim(*a) + x; \
-} \
-\
-STC_INLINE carray2##X \
-carray3##X##_at1(carray3##X *a, size_t z) { \
-    carray2##X sub = {a->data + z*a->_yxdim, carray3_xdim(*a), a->_yxdim}; \
-    return sub; \
-} \
-STC_INLINE carray1##X \
-carray3##X##_at2(carray3##X *a, size_t z, size_t y) { \
-    carray1##X sub = {a->data + z*a->_yxdim + y*carray3_xdim(*a), carray3_xdim(*a)}; \
-    return sub; \
-} \
-STC_INLINE Value* \
-carray3##X##_at(carray3##X *a, size_t z, size_t y, size_t x) { \
-    return a->data + z*a->_yxdim + y*carray3_xdim(*a) + x; \
-} \
-typedef int carray1##X##_dud
+    STC_INLINE carray2##X \
+    carray3##X##_at1(carray3##X *a, size_t z) { \
+        carray2##X sub = {a->data + z*a->_yxdim, carray3_xdim(*a), a->_yxdim}; \
+        return sub; \
+    } \
+    STC_INLINE carray1##X \
+    carray3##X##_at2(carray3##X *a, size_t z, size_t y) { \
+        carray1##X sub = {a->data + z*a->_yxdim + y*carray3_xdim(*a), carray3_xdim(*a)}; \
+        return sub; \
+    } \
+    STC_INLINE Value* \
+    carray3##X##_at(carray3##X *a, size_t z, size_t y, size_t x) { \
+        return a->data + z*a->_yxdim + y*carray3_xdim(*a) + x; \
+    } \
+    typedef int carray1##X##_dud
 
 #endif

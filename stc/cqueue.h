@@ -59,47 +59,47 @@
 #include "clist.h"
 
 #define declare_cqueue(X, ctype) \
- \
-typedef struct ctype cqueue_##X; \
-typedef ctype##_value_t cqueue_##X##_value_t; \
-typedef ctype##_rawvalue_t cqueue_##X##_rawvalue_t; \
-typedef ctype##_input_t cqueue_##X##_input_t; \
-STC_INLINE cqueue_##X \
-cqueue_##X##_init() {return ctype##_init();} \
-STC_INLINE void \
-cqueue_##X##_destroy(cqueue_##X* self) {ctype##_destroy(self);} \
-STC_INLINE size_t \
-cqueue_##X##_size(cqueue_##X pq) {return ctype##_size(pq);} \
-STC_INLINE bool \
-cqueue_##X##_empty(cqueue_##X pq) {return ctype##_empty(pq);} \
-STC_INLINE cqueue_##X##_value_t* \
-cqueue_##X##_front(cqueue_##X* self) {return ctype##_front(self);} \
-STC_INLINE cqueue_##X##_value_t* \
-cqueue_##X##_back(cqueue_##X* self) {return ctype##_back(self);} \
-STC_INLINE void \
-cqueue_##X##_pop(cqueue_##X* self) {ctype##_pop_front(self);} \
-STC_API void \
-cqueue_##X##_push(cqueue_##X* self, ctype##_value_t value) { \
-    ctype##_push_back(self, value); \
-} \
-STC_INLINE void \
-cqueue_##X##_emplace(cqueue_##X* self, cqueue_##X##_rawvalue_t rawValue) { \
-    ctype##_emplace_back(self, rawValue); \
-} \
-STC_API void \
-cqueue_##X##_push_n(cqueue_##X *self, const cqueue_##X##_input_t in[], size_t size) { \
-    ctype##_push_n(self, in, size); \
-} \
-typedef ctype##_iter_t cqueue_##X##_iter_t; \
-STC_INLINE cqueue_##X##_iter_t \
-cqueue_##X##_begin(cqueue_##X* self) {return ctype##_begin(self);} \
-STC_INLINE cqueue_##X##_iter_t \
-cqueue_##X##_end(cqueue_##X* self) {return ctype##_end(self);} \
-STC_INLINE void \
-cqueue_##X##_next(cqueue_##X##_iter_t* it) {ctype##_next(it);} \
-STC_INLINE cqueue_##X##_value_t* \
-cqueue_##X##_itval(cqueue_##X##_iter_t it) {return ctype##_itval(it);} \
- \
-typedef int cqueue_##X##_dud
+\
+    typedef struct ctype cqueue_##X; \
+    typedef ctype##_value_t cqueue_##X##_value_t; \
+    typedef ctype##_rawvalue_t cqueue_##X##_rawvalue_t; \
+    typedef ctype##_input_t cqueue_##X##_input_t; \
+    STC_INLINE cqueue_##X \
+    cqueue_##X##_init() {return ctype##_init();} \
+    STC_INLINE void \
+    cqueue_##X##_destroy(cqueue_##X* self) {ctype##_destroy(self);} \
+    STC_INLINE size_t \
+    cqueue_##X##_size(cqueue_##X pq) {return ctype##_size(pq);} \
+    STC_INLINE bool \
+    cqueue_##X##_empty(cqueue_##X pq) {return ctype##_empty(pq);} \
+    STC_INLINE cqueue_##X##_value_t* \
+    cqueue_##X##_front(cqueue_##X* self) {return ctype##_front(self);} \
+    STC_INLINE cqueue_##X##_value_t* \
+    cqueue_##X##_back(cqueue_##X* self) {return ctype##_back(self);} \
+    STC_INLINE void \
+    cqueue_##X##_pop(cqueue_##X* self) {ctype##_pop_front(self);} \
+    STC_API void \
+    cqueue_##X##_push(cqueue_##X* self, ctype##_value_t value) { \
+        ctype##_push_back(self, value); \
+    } \
+    STC_INLINE void \
+    cqueue_##X##_emplace(cqueue_##X* self, cqueue_##X##_rawvalue_t rawValue) { \
+        ctype##_emplace_back(self, rawValue); \
+    } \
+    STC_API void \
+    cqueue_##X##_push_n(cqueue_##X *self, const cqueue_##X##_input_t in[], size_t size) { \
+        ctype##_push_n(self, in, size); \
+    } \
+    typedef ctype##_iter_t cqueue_##X##_iter_t; \
+    STC_INLINE cqueue_##X##_iter_t \
+    cqueue_##X##_begin(cqueue_##X* self) {return ctype##_begin(self);} \
+    STC_INLINE cqueue_##X##_iter_t \
+    cqueue_##X##_end(cqueue_##X* self) {return ctype##_end(self);} \
+    STC_INLINE void \
+    cqueue_##X##_next(cqueue_##X##_iter_t* it) {ctype##_next(it);} \
+    STC_INLINE cqueue_##X##_value_t* \
+    cqueue_##X##_itval(cqueue_##X##_iter_t it) {return ctype##_itval(it);} \
+\
+    typedef int cqueue_##X##_dud
 
 #endif
