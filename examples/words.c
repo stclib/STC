@@ -29,7 +29,7 @@ int main1()
 
     cmap_si word_map = cmap_ini;
     c_foreach (w, cvec_str, words)
-        cmap_si_insert(&word_map, w.item->str, 0).item->value += 1;
+        cmap_si_emplace(&word_map, w.item->str, 0).item->value += 1;
 
     c_foreach (pair, cmap_si, word_map) {
         printf("%d occurrences of word '%s'\n",

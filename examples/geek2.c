@@ -27,19 +27,19 @@ int main()
         {"The Adventures of Sherlock Holmes", "Eye lyked it alot."},
     ));        
 /*
-    cmap_str_insert(&book_reviews,
+    cmap_str_emplace(&book_reviews,
         "Adventures of Huckleberry Finn",
         "My favorite book."
     );
-    cmap_str_insert(&book_reviews,
+    cmap_str_emplace(&book_reviews,
         "Grimms' Fairy Tales",
         "Masterpiece."
     );
-    cmap_str_insert(&book_reviews,
+    cmap_str_emplace(&book_reviews,
         "Pride and Prejudice",
         "Very enjoyable."
     );
-    cmap_str_insert(&book_reviews,
+    cmap_str_emplace(&book_reviews,
         "The Adventures of Sherlock Holmes",
         "Eye lyked it alot."
     );
