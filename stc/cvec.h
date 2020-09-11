@@ -71,6 +71,20 @@
     cvec_##X##_reserve(cvec_##X* self, size_t cap); \
     STC_API void \
     cvec_##X##_resize(cvec_##X* self, size_t size, Value fill_val); \
+\
+    STC_INLINE cvec_##X \
+    cvec_##X##_with_size(size_t size, Value null_val) { \
+        cvec_##X x = cvec_ini; \
+        cvec_##X##_resize(&x, size, null_val); \
+        return x; \
+    } \
+    STC_INLINE cvec_##X \
+    cvec_##X##_with_capacity(size_t size) { \
+        cvec_##X x = cvec_ini; \
+        cvec_##X##_reserve(&x, size); \
+        return x; \
+    } \
+\
     STC_API void \
     cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t in[], size_t size); \
     STC_API void \
@@ -78,6 +92,10 @@
     STC_INLINE void \
     cvec_##X##_emplace_back(cvec_##X* self, RawValue rawValue) { \
         cvec_##X##_push_back(self, valueFromRaw(rawValue)); \
+    } \
+    STC_INLINE void \
+    cvec_##X##_pop_back(cvec_##X* self) { \
+        valueDestroy(&self->data[--_cvec_size(self)]); \
     } \
 \
     STC_API cvec_##X##_iter_t \
@@ -126,33 +144,11 @@
         return cvec_##X##_erase_range(self, first, last); \
     } \
 \
-    STC_API void \
-    cvec_##X##_sort(cvec_##X* self); \
-    STC_API void \
-    cvec_##X##_sort_with(cvec_##X* self, int(*cmp)(const Value*, const Value*)); \
     STC_API cvec_##X##_iter_t \
     cvec_##X##_find(const cvec_##X* self, RawValue rawValue); \
     STC_API cvec_##X##_iter_t \
     cvec_##X##_find_in_range(const cvec_##X* self, cvec_##X##_iter_t first, cvec_##X##_iter_t last, RawValue rawValue); \
-    STC_API int \
-    cvec_##X##_value_compare(const Value* x, const Value* y); \
 \
-    STC_INLINE cvec_##X \
-    cvec_##X##_with_size(size_t size, Value null_val) { \
-        cvec_##X x = cvec_ini; \
-        cvec_##X##_resize(&x, size, null_val); \
-        return x; \
-    } \
-    STC_INLINE cvec_##X \
-    cvec_##X##_with_capacity(size_t size) { \
-        cvec_##X x = cvec_ini; \
-        cvec_##X##_reserve(&x, size); \
-        return x; \
-    } \
-    STC_INLINE void \
-    cvec_##X##_pop_back(cvec_##X* self) { \
-        valueDestroy(&self->data[--_cvec_size(self)]); \
-    } \
     STC_INLINE Value* \
     cvec_##X##_front(cvec_##X* self) {return self->data;} \
     STC_INLINE Value* \
@@ -163,13 +159,16 @@
     cvec_##X##_swap(cvec_##X* a, cvec_##X* b) { \
         c_swap(Value*, a->data, b->data); \
     } \
+\
+    STC_API int \
+    cvec_##X##_value_compare(const Value* x, const Value* y); \
     STC_INLINE void \
-    cvec_##X##_sort(cvec_##X* self) { \
-        qsort(self->data, cvec_size(*self), sizeof(Value), (_cvec_cmp) cvec_##X##_value_compare); \
+    cvec_##X##_sort_with(cvec_##X* self, size_t ifirst, size_t ilast, int(*cmp)(const Value*, const Value*)) { \
+        qsort(self->data + ifirst, ilast - ifirst, sizeof(Value), (_cvec_cmp) cmp); \
     } \
     STC_INLINE void \
-    cvec_##X##_sort_with(cvec_##X* self, int(*cmp)(const Value*, const Value*)) { \
-        qsort(self->data, cvec_size(*self), sizeof(Value), (_cvec_cmp) cmp); \
+    cvec_##X##_sort(cvec_##X* self) { \
+        cvec_##X##_sort_with(self, 0, cvec_size(*self), cvec_##X##_value_compare); \
     } \
 \
     STC_INLINE cvec_##X##_iter_t \
@@ -184,6 +183,8 @@
     cvec_##X##_next(cvec_##X##_iter_t* it) {++it->item;} \
     STC_INLINE cvec_##X##_value_t* \
     cvec_##X##_itval(cvec_##X##_iter_t it) {return it.item;} \
+    STC_INLINE size_t \
+    cvec_##X##_idx(cvec_##X v, cvec_##X##_iter_t it) {return it.item - v.data;} \
 \
     implement_cvec_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw)
 
