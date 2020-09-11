@@ -27,17 +27,17 @@ Similar to boost::dynamic_bitset / std::bitset
 #include "cbitset.h"
 
 int main() {
-    cbitset_t set = cbitset_with_size(23, true);
-    cbitset_reset(&set, 9);
-    cbitset_resize(&set, 43, false);
-    printf("%4zu: ", set.size);for (int i=0; i<set.size; ++i) printf("%d", cbitset_value(&set, i));puts("");
-    cbitset_set(&set, 28);
-    cbitset_resize(&set, 77, true);
-    cbitset_resize(&set, 93, false);
-    cbitset_resize(&set, 102, true);
-    cbitset_setTo(&set, 99, false);
-    printf("%4zu: ", set.size);for (int i=0; i<set.size; ++i) printf("%d", cbitset_value(&set, i));puts("");
-    cbitset_destroy(&set);
+    cbitset_t bset = cbitset_with_size(23, true);
+    cbitset_reset(&bset, 9);
+    cbitset_resize(&bset, 43, false);
+    printf("%4zu: ", bset.size); for (int i=0; i<bset.size; ++i) printf("%d", cbitset_test(&bset, i)); puts("");
+    cbitset_set(&bset, 28);
+    cbitset_resize(&bset, 77, true);
+    cbitset_resize(&bset, 93, false);
+    cbitset_resize(&bset, 102, true);
+    cbitset_set_value(&bset, 99, false);
+    printf("%4zu: ", bset.size); for (int i=0; i<bset.size; ++i) printf("%d", cbitset_test(&bset, i)); puts("");
+    cbitset_destroy(&bset);
 }
 */
 #ifndef CBITSET__H__

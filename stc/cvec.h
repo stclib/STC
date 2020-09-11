@@ -118,11 +118,11 @@
     } \
     STC_INLINE cvec_##X##_iter_t \
     cvec_##X##_emplace(cvec_##X* self, cvec_##X##_iter_t pos, RawValue rawValue) { \
-        cvec_##X##_insert(self, pos, valueFromRaw(rawValue)); \
+        return cvec_##X##_insert(self, pos, valueFromRaw(rawValue)); \
     } \
     STC_INLINE cvec_##X##_iter_t \
     cvec_##X##_emplace_at_idx(cvec_##X* self, size_t idx, RawValue rawValue) { \
-        cvec_##X##_insert_at_idx(self, idx, valueFromRaw(rawValue)); \
+        return cvec_##X##_insert_at_idx(self, idx, valueFromRaw(rawValue)); \
     } \
 \
     STC_API cvec_##X##_iter_t \
