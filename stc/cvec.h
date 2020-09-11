@@ -71,6 +71,8 @@
     cvec_##X##_reserve(cvec_##X* self, size_t cap); \
     STC_API void \
     cvec_##X##_resize(cvec_##X* self, size_t size, Value fill_val); \
+    STC_INLINE void \
+    cvec_##X##_swap(cvec_##X* a, cvec_##X* b) {c_swap(Value*, a->data, b->data);} \
 \
     STC_INLINE cvec_##X \
     cvec_##X##_with_size(size_t size, Value null_val) { \
@@ -154,10 +156,9 @@
     STC_INLINE Value* \
     cvec_##X##_back(cvec_##X* self) {return self->data + _cvec_size(self) - 1;} \
     STC_INLINE Value* \
-    cvec_##X##_at(cvec_##X* self, size_t i) {return self->data + i;} \
-    STC_INLINE void \
-    cvec_##X##_swap(cvec_##X* a, cvec_##X* b) { \
-        c_swap(Value*, a->data, b->data); \
+    cvec_##X##_at(cvec_##X* self, size_t i) { \
+        c_assert(i < cvec_size(*self), "cvec_at()"); \
+        return self->data + i; \
     } \
 \
     STC_API int \

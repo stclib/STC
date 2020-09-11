@@ -218,6 +218,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 \
     STC_API ctype##_##X##_result_t \
     ctype##_##X##_insert_key_(ctype##_##X* self, ctype##_##X##_rawkey_t rawKey); \
+    STC_API ctype##_bucket_t \
+    ctype##_##X##_bucket(const ctype##_##X* self, const ctype##_##X##_rawkey_t* rawKeyPtr); \
 \
     STC_INLINE ctype##_##X##_result_t \
     ctype##_##X##_emplace(ctype##_##X* self, CMAP_ARGS_##ctype(ctype##_##X##_rawkey_t rawKey, RawValue rawValue)) { \
@@ -235,6 +237,12 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         ctype##_##X##_result_t res = ctype##_##X##_insert_key_(self, rawKey); \
         if (!res.inserted) valueDestroy(&res.item->value); \
         res.item->value = valueFromRaw(rawValue); return res; \
+    } \
+    STC_API ctype##_##X##_value_t* \
+    ctype##_##X##_at(const ctype##_##X* self, ctype##_##X##_rawkey_t rawKey) { \
+        ctype##_bucket_t b = ctype##_##X##_bucket(self, &rawKey); \
+        c_assert(self->_hashx[b.idx], "cmap_at()"); \
+        return &self->table[b.idx].value; \
     } \
     STC_INLINE ctype##_##X##_result_t \
     ctype##_##X##_putv(ctype##_##X* self, ctype##_##X##_rawkey_t rawKey, Value value) { \
