@@ -47,8 +47,8 @@ int main(int argc, char **argv)
   printf("Phone book:\n");
   print_phone_book(phone_book);
 
-  cmap_try_emplace(str, &phone_book, "Zak Byers", cstr_make("(551) 396-1880"));
-  cmap_try_emplace(str, &phone_book, "Zak Byers", cstr_make("(551) 396-1990"));
+  c_try_emplace(&phone_book, cmap_str, "Zak Byers", cstr_make("(551) 396-1880"));
+  c_try_emplace(&phone_book, cmap_str, "Zak Byers", cstr_make("(551) 396-1990"));
 
   printf("\nPhone book after adding Zak Byers:\n");
   print_phone_book(phone_book);

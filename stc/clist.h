@@ -86,12 +86,13 @@
 
 #define clist_ini           {NULL}
 #define clist_empty(list)   ((list).last == NULL)
-#define clist_emplace_after(X, self, pos, items) do { \
-    clist_##X* __self = self; \
-    clist_##X##_iter_t __pos = pos; \
-    const clist_##X##_input_t __arr[] = {items}; \
+
+#define c_emplace_after(self, ctype, pos, items) do { \
+    ctype* __self = self; \
+    ctype##_iter_t __pos = pos; \
+    const ctype##_input_t __arr[] = {items}; \
     for (size_t __i=0; __i<sizeof(__arr)/sizeof(__arr[0]); ++__i) \
-        __pos = clist_##X##_emplace_after(__self, __pos, __arr[__i]); \
+        __pos = ctype##_emplace_after(__self, __pos, __arr[__i]); \
 } while (0)
 
 declare_clist_types(void, int);

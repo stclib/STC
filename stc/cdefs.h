@@ -79,14 +79,14 @@
     for (ctype##_iter_t it = start, it##_end_ = finish; it.item != it##_end_.item; ctype##_next(&it))
 
 #define c_items(...) __VA_ARGS__
-#define c_push(cnt_ptr, ctype, items) do { \
-    const ctype##_input_t __arr[] = { items }; \
-    ctype##_push_n(cnt_ptr, __arr, sizeof(__arr)/sizeof(__arr[0])); \
+#define c_push(self, ctype, items) do { \
+    const ctype##_input_t __arr[] = {items}; \
+    ctype##_push_n(self, __arr, sizeof(__arr)/sizeof(__arr[0])); \
 } while (0)
 
-#define c_init(type, arr, init, n) do { \
-    type __init = init, *__i = arr, *__last = __i + n; \
-    while (__i != __last) = *__i++ = __init; \
+#define c_apply(array, type, value, n) do { \
+    type __val = value, *__i = array, *__last = __i + (n); \
+    while (__i != __last) = *__i++ = __val; \
 } while (0)
 
 #define c_destroy(ctype, ...) do { \

@@ -60,9 +60,10 @@ int main(void) {
 #define cset_ini                      cmap_ini
 #define cset_size(s)                  cmap_size(s)
 #define cset_bucket_count(s)          cmap_bucket_count(s)
-#define cmap_try_emplace(X, self, k, v) do { \
-    cmap_##X##_result_t __r = cmap_##X##_insert_key_(self, k); \
-    if (__r.inserted) __r.item->value = v; \
+
+#define c_try_emplace(self, ctype, key, val) do { \
+    ctype##_result_t __r = ctype##_insert_key_(self, key); \
+    if (__r.inserted) __r.item->value = val; \
 } while (false)
 
 /* https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction */
