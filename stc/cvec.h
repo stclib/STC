@@ -113,6 +113,10 @@
         cvec_##X##_iter_t first = {&value}, finish = {&value + 1}; \
         return cvec_##X##_insert_range(self, pos, first, finish); \
     } \
+    STC_INLINE cvec_##X##_iter_t /*alias*/ \
+    cvec_##X##_insert_at(cvec_##X* self, cvec_##X##_iter_t pos, Value value) { \
+        return cvec_##X##_insert(self, pos, value); \
+    } \
     STC_INLINE cvec_##X##_iter_t \
     cvec_##X##_insert_at_idx(cvec_##X* self, size_t idx, Value value) { \
         cvec_##X##_iter_t pos = {self->data + idx}, first = {&value}, finish = {&value + 1}; \
@@ -134,6 +138,10 @@
     cvec_##X##_erase(cvec_##X* self, cvec_##X##_iter_t pos) { \
         cvec_##X##_iter_t next = {pos.item + 1}; \
         return cvec_##X##_erase_range(self, pos, next); \
+    } \
+    STC_INLINE cvec_##X##_iter_t /*alias*/ \
+    cvec_##X##_erase_at(cvec_##X* self, cvec_##X##_iter_t pos) { \
+        return cvec_##X##_erase(self, pos); \
     } \
     STC_INLINE cvec_##X##_iter_t \
     cvec_##X##_erase_at_idx(cvec_##X* self, size_t idx) { \

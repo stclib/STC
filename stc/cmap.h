@@ -206,6 +206,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     STC_API ctype##_##X \
     ctype##_##X##_with_capacity(size_t cap); \
     STC_API void \
+    ctype##_##X##_reserve(ctype##_##X* self, size_t size); \
+    STC_API void \
     ctype##_##X##_push_n(ctype##_##X* self, const ctype##_##X##_input_t in[], size_t size); \
     STC_API void \
     ctype##_##X##_destroy(ctype##_##X* self); \
@@ -257,13 +259,6 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         CSET_ONLY_##ctype( return ctype##_##X##_insert_key_(self, rawKey); ) \
     } \
 \
-    STC_API size_t \
-    ctype##_##X##_reserve(ctype##_##X* self, size_t size); \
-    STC_API bool \
-    ctype##_##X##_erase_entry(ctype##_##X* self, ctype##_##X##_entry_t* item); \
-    STC_API bool \
-    ctype##_##X##_erase(ctype##_##X* self, ctype##_##X##_rawkey_t rawKey); \
-\
     STC_INLINE ctype##_##X##_iter_t \
     ctype##_##X##_begin(ctype##_##X* self) { \
         ctype##_##X##_iter_t it = {self->table, self->_hashx}; \
@@ -280,6 +275,20 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     } \
     CMAP_ONLY_##ctype( STC_INLINE ctype##_##X##_value_t* \
     ctype##_##X##_itval(ctype##_##X##_iter_t it) {return &it.item->value;} ) \
+\
+    STC_API void \
+    ctype##_##X##_erase_entry(ctype##_##X* self, ctype##_##X##_entry_t* item); \
+    STC_INLINE size_t \
+    ctype##_##X##_erase(ctype##_##X* self, ctype##_##X##_rawkey_t rawKey) { \
+        if (self->size == 0) return 0; \
+        ctype##_bucket_t b = ctype##_##X##_bucket(self, &rawKey); \
+        return self->_hashx[b.idx] ? ctype##_##X##_erase_entry(self, self->table + b.idx), 1 : 0; \
+    } \
+    STC_INLINE ctype##_##X##_iter_t \
+    ctype##_##X##_erase_at(ctype##_##X* self, ctype##_##X##_iter_t pos) { \
+        ctype##_##X##_erase_entry(self, pos.item); \
+        ctype##_##X##_next(&pos); return pos; \
+    } \
 \
     STC_API uint32_t c_default_hash16(const void *data, size_t len); \
     STC_API uint32_t c_default_hash32(const void* data, size_t len); \
@@ -367,10 +376,10 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         return res; \
     } \
 \
-    STC_API size_t \
+    STC_API void \
     ctype##_##X##_reserve(ctype##_##X* self, size_t newcap) { \
         size_t oldcap = self->bucket_count; \
-        if (self->size > newcap) return oldcap; \
+        if (self->size > newcap) return; \
         newcap = (size_t) (newcap / self->max_load_factor) | 1; \
         ctype##_##X tmp = { \
             c_new_n(ctype##_##X##_entry_t, newcap), \
@@ -391,17 +400,15 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
             } \
         free(tmp._hashx); \
         free(tmp.table); \
-        return newcap; \
     } \
 \
-    STC_API bool \
+    STC_API void \
     ctype##_##X##_erase_entry(ctype##_##X* self, ctype##_##X##_entry_t* item) { \
         size_t i = chash_entry_index(*self, item), j = i, k, cap = self->bucket_count; \
         ctype##_##X##_entry_t* slot = self->table; \
         uint8_t* hashx = self->_hashx; \
         ctype##_##X##_rawkey_t r; \
-        if (! hashx[i]) \
-            return false; \
+        /*c_assert(hashx[i], "erase_entry");*/ \
         ctype##_##X##_entry_destroy(&slot[i]); \
         do { /* deletion from hash table without tombstone */ \
             if (++j == cap) j = 0; /* ++j; j %= cap; is slow */ \
@@ -414,18 +421,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         } while (true); \
         hashx[i] = 0; \
         --self->size; \
-        return true; \
     } \
 \
-    STC_API bool \
-    ctype##_##X##_erase(ctype##_##X* self, ctype##_##X##_rawkey_t rawKey) { \
-        if (self->size == 0) \
-            return false; \
-        if (self->size < self->bucket_count * self->shrink_limit_factor && self->bucket_count * sizeof(ctype##_##X##_entry_t) > 1024) \
-            ctype##_##X##_reserve(self, self->size * 6 / 5); \
-        ctype##_bucket_t b = ctype##_##X##_bucket(self, &rawKey); \
-        return ctype##_##X##_erase_entry(self, self->table + b.idx); \
-    } \
     typedef int ctype##_##X##_dud
 
 /* https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/ */
