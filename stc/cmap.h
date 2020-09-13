@@ -237,10 +237,6 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     }) \
 \
     CMAP_ONLY_##ctype( \
-    STC_INLINE void \
-    ctype##_##X##_emplace_n(ctype##_##X* self, const cmap_##X##_input_t pairs[], size_t n) { \
-        for (size_t i=0; i<n; ++i) ctype##_##X##_emplace(self, pairs[i].key, pairs[i].value); \
-    } \
     STC_INLINE ctype##_##X##_result_t \
     ctype##_##X##_insert_or_assign(ctype##_##X* self, RawKey rawKey, RawValue rawValue) { \
         ctype##_##X##_result_t res = ctype##_##X##_insert_key_(self, rawKey); \
