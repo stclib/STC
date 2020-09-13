@@ -69,7 +69,7 @@ int main() {
     VikingVw look = {"Einar", "Norway"};
     cmap_vk_entry_t *e = cmap_vk_find(&vikings, look);
     e->value += 5; // update 
-    cmap_vk_insert(&vikings, look, 0)->value += 5; // again
+    cmap_vk_emplace(&vikings, look, 0)->value += 5; // again
 
     c_foreach (k, cmap_vk, vikings) {
         printf("%s of %s has %d hp\n", k.item->key.name.str, k.item->key.country.str, k.item->value);

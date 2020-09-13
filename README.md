@@ -120,7 +120,7 @@ You can customize the destroy-, hash- and equals- function. **cmap/cset** also s
 ```
 declare_cmap(si, cstr_t, int); // don't do this.
 ...
-cmap_si_insert(&map, cstr_make("mykey"), 12);
+cmap_si_put(&map, cstr_make("mykey"), 12);
 ```
 This is a problem because cstr_t key may exist in the map, and it would need to destroy the current key and replace it with the new to avoid memory leak.  Lookup would also be problematic:
 ```
@@ -225,7 +225,7 @@ declare_cmap(ii, int, int);
 int main() {
     cmap_ii nums = cmap_ini;
     cmap_ii_put(&nums, 8, 64); // similar to insert_or_assign()
-    cmap_ii_insert(&nums, 11, 121); 
+    cmap_ii_emplace(&nums, 11, 121); 
 
     printf("%d\n", cmap_ii_find(nums, 8)->value);
     cmap_ii_destroy(&nums);
