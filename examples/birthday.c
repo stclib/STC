@@ -38,9 +38,9 @@ void distribution(void)
     const size_t N = 1ull << 28, M = 1ull << 9; // 1ull << 10;
     cmap_x map = cmap_x_with_capacity(M);
     clock_t now = clock();
-    crand_uniform_i32_t dist = crand_uniform_i32_init(rng, 0, M);
+    crand_uniform_i32_t dist = crand_uniform_i32_init(0, M);
     for (size_t i = 0; i < N; ++i) {
-        ++cmap_x_emplace(&map, crand_uniform_i32(&dist), 0).item->value;
+        ++cmap_x_emplace(&map, crand_uniform_i32(&rng, &dist), 0).item->value;
     }
     float diff = (float) (clock() - now) / CLOCKS_PER_SEC;
 

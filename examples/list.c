@@ -8,10 +8,10 @@ int main() {
     int k, n = 100000;
     clist_fx list = clist_ini;
     crand_rng64_t eng = crand_rng64_init(time(NULL));
-    crand_uniform_f64_t dist = crand_uniform_f64_init(eng, 0.0f, n);
+    crand_uniform_f64_t dist = crand_uniform_f64_init(0.0f, n);
     
     for (int i = 0; i < 100000; ++i)
-        clist_fx_push_back(&list, crand_uniform_f64(&dist));
+        clist_fx_push_back(&list, crand_uniform_f64(&eng, &dist));
     k = 0; c_foreach (i, clist_fx, list)
         if (++k <= 10) printf("%8d: %10f\n", k, i.item->value); else break;
 
