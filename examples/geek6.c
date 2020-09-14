@@ -43,7 +43,7 @@ int missingNumber(int a[], int n)
     // store it in map 
     for (int i = 0; i < n; i++) { 
         if (a[i] > 0) 
-            cset_i_put(&mp, a[i]);
+            cset_i_insert(&mp, a[i]);
     } 
   
     // index value set to 1 

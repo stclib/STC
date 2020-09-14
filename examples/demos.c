@@ -106,11 +106,11 @@ void setdemo1()
 {
     printf("\nSETDEMO1\n");
     cset_i nums = cset_ini;
-    cset_i_put(&nums, 8);
-    cset_i_put(&nums, 11);
+    cset_i_insert(&nums, 8);
+    cset_i_insert(&nums, 11);
 
     c_foreach (i, cset_i, nums)
-        printf("set: %d\n", i.item->key);
+        printf("set: %d\n", i.item->value);
     cset_i_destroy(&nums);
 }
 
@@ -140,11 +140,11 @@ void mapdemo2()
 
     // iterate the map:
     for (cmap_si_iter_t i = cmap_si_begin(&nums); i.item != cmap_si_end(&nums).item; cmap_si_next(&i))
-        printf("long: %s: %d\n", i.item->key.str, i.item->value);
+        printf("long: %s: %d\n", i.item->first.str, i.item->second);
 
     // or rather use the short form:
     c_foreach (i, cmap_si, nums)
-        printf("short: %s: %d\n", i.item->key.str, i.item->value);
+        printf("short: %s: %d\n", i.item->first.str, i.item->second);
 
     cmap_si_destroy(&nums);
 }
@@ -159,15 +159,15 @@ void mapdemo3()
     cmap_str_put(&table, "Map", "test");
     cmap_str_put(&table, "Make", "my");
     cmap_str_put(&table, "Sunny", "day");
-    cmap_str_entry_t *e = cmap_str_find(&table, "Make");
+    cmap_str_value_t *e = cmap_str_find(&table, "Make");
     c_foreach (i, cmap_str, table)
-        printf("entry: %s: %s\n", i.item->key.str, i.item->value.str);
-    printf("size %zu: remove: Make: %s\n", cmap_size(table), e->value.str);
+        printf("entry: %s: %s\n", i.item->first.str, i.item->second.str);
+    printf("size %zu: remove: Make: %s\n", cmap_size(table), e->second.str);
     cmap_str_erase(&table, "Make");
 
     printf("size %zu\n", cmap_size(table));
     c_foreach (i, cmap_str, table)
-        printf("entry: %s: %s\n", i.item->key.str, i.item->value.str);
+        printf("entry: %s: %s\n", i.item->first.str, i.item->second.str);
     cmap_str_destroy(&table); // frees key and value CStrs, and hash table (CVec).
 }
 

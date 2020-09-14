@@ -43,6 +43,12 @@
 #define STC_API STC_INLINE
 #endif
 
+#if defined(_MSC_VER) || defined(__GNUC__) || defined(__clang__) || defined(__TINYC__)
+#define c_UNION(...) union {__VA_ARGS__;}
+#else
+#define c_UNION(x, ...) x
+#endif
+
 /* Macro overloading feature support: https://rextester.com/ONP80107 */
 #define _c_CAT( A, B ) A ## B
 #define _c_EXPAND(...) __VA_ARGS__

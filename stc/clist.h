@@ -69,9 +69,11 @@
                                              cstr_compare_raw, cstr_to_raw, cstr_make)
 
 #define declare_clist_types(X, Value) \
+    typedef Value clist_##X##_value_t; \
+\
     typedef struct clist_##X##_node { \
         struct clist_##X##_node* next; \
-        Value value; \
+        clist_##X##_value_t value; \
     } clist_##X##_node_t; \
 \
     typedef struct clist_##X { \
@@ -81,7 +83,7 @@
     typedef struct { \
         clist_##X##_node_t* const* _last; \
         clist_##X##_node_t* item; \
-        int state; \
+        int _state; \
     } clist_##X##_iter_t
 
 #define clist_ini           {NULL}
@@ -101,7 +103,6 @@ STC_API size_t _clist_size(const clist_void* self);
 #define declare_clist_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
 \
     declare_clist_types(X, Value); \
-    typedef Value clist_##X##_value_t; \
     typedef RawValue clist_##X##_rawvalue_t; \
     typedef clist_##X##_rawvalue_t clist_##X##_input_t; \
 \
@@ -155,7 +156,7 @@ STC_API size_t _clist_size(const clist_void* self);
     } \
     STC_INLINE void \
     clist_##X##_next(clist_##X##_iter_t* it) { \
-        it->item = ((it->state += it->item == *it->_last) == 1) ? NULL : it->item->next; \
+        it->item = ((it->_state += it->item == *it->_last) == 1) ? NULL : it->item->next; \
     } \
     STC_INLINE clist_##X##_value_t* \
     clist_##X##_itval(clist_##X##_iter_t it) {return &it.item->value;} \
@@ -237,7 +238,7 @@ STC_API size_t _clist_size(const clist_void* self);
     STC_API clist_##X##_iter_t \
     clist_##X##_insert_after(clist_##X* self, clist_##X##_iter_t pos, Value value) { \
         _clist_insert_after(self, X, pos.item, value); \
-        if (pos.item == self->last && pos.state == 0) self->last = entry; \
+        if (pos.item == self->last && pos._state == 0) self->last = entry; \
         pos.item = entry; return pos; \
     } \
     STC_API clist_##X##_iter_t \
@@ -312,7 +313,7 @@ _clist_splice_after(clist_void* self, clist_void_iter_t pos, clist_void* other) 
         clist_void_node_t *next = pos.item->next;
         pos.item->next = other->last->next;
         other->last->next = next;
-        if (pos.item == self->last && pos.state == 0) self->last = other->last;
+        if (pos.item == self->last && pos._state == 0) self->last = other->last;
     }
     other->last = NULL;
 }

@@ -12,9 +12,9 @@ int main()
     // be `cmap<String, String>` in this example).
     cmap_str book_reviews = cmap_ini; 
     cset_str set = cset_ini;
-    cset_str_put(&set, "Hello");
-    cset_str_put(&set, "You");
-    cset_str_put(&set, "Tube");
+    cset_str_insert(&set, "Hello");
+    cset_str_insert(&set, "You");
+    cset_str_insert(&set, "Tube");
     c_foreach (i, cset_str, set)
         printf("%s ", i.item->key.str); 
     puts("");
