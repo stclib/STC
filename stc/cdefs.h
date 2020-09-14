@@ -63,7 +63,6 @@
 
 #define c_new(T)        ((T *) malloc(sizeof(T)))
 #define c_new_n(T, n)   ((T *) malloc(sizeof(T) * (n)))
-#define c_assert(cond, msg) assert((msg, cond))
 #define c_static_assert(cond, msg) typedef char static_assert_##msg[(cond) ? 1 : -1]
 
 #define c_max_alloca    (512)

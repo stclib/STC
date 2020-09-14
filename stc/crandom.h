@@ -132,6 +132,11 @@ STC_API double crand_normal_f64(crand_rng64_t* rng, crand_normal_f64_t* dist);
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
+#if defined(_MSC_VER)
+  #pragma warning(push)
+  #pragma warning(disable: 4146)
+#endif
+
 /* PRNG PCG32 https://www.pcg-random.org/download.html */
 STC_API crand_rng32_t crand_rng32_with_seq(uint64_t seed, uint64_t seq) {
     crand_rng32_t rng = {{0u, (seq << 1u) | 1u}}; /* inc must be odd */
@@ -196,6 +201,10 @@ STC_API double crand_normal_f64(crand_rng64_t* rng, crand_normal_f64_t* dist) {
     dist->next = u2 * m, dist->has_next = true;
     return (u1 * m) * dist->stddev + dist->mean;
 }
+
+#if defined(_MSC_VER)
+  #pragma warning(pop)
+#endif
 
 #endif
 #endif

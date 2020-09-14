@@ -165,7 +165,7 @@
     cvec_##X##_back(cvec_##X* self) {return self->data + _cvec_size(self) - 1;} \
     STC_INLINE Value* \
     cvec_##X##_at(cvec_##X* self, size_t i) { \
-        c_assert(i < cvec_size(*self), "cvec_at()"); \
+        assert(i < cvec_size(*self)); \
         return self->data + i; \
     } \
 \

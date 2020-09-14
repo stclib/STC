@@ -18,7 +18,7 @@ int main()
     pcg = crand_rng32_init(seed);
     clock_t start = clock();
     for (int i=0; i<N; ++i)
-        cvec_f_push_back(&pq, crand_i32(&pcg));
+        cvec_f_push_back(&pq, (float) crand_i32(&pcg));
     
     cpqueue_f_build(&pq);
     printf("Built priority queue: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
@@ -34,7 +34,7 @@ int main()
     pcg = crand_rng32_init(seed);
     start = clock();
     for (int i=0; i<N; ++i)
-        cpqueue_f_push(&pq, crand_i32(&pcg));
+        cpqueue_f_push(&pq, (float) crand_i32(&pcg));
     printf("pushed PQ: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
     
     for (int i=0; i<M; ++i)

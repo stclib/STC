@@ -31,7 +31,7 @@ int main()
     // Create histogram map
     cmap_i mhist = cmap_ini;
     for (size_t i = 0; i < N; ++i) {
-        int index = round( crand_normal_f64(&rng, &dist) );
+        int index = (int) round( crand_normal_f64(&rng, &dist) );
         cmap_i_emplace(&mhist, index, 0).item->value += 1;
     }
 

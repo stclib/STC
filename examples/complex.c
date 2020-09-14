@@ -23,7 +23,7 @@ int main() {
         // Put in some data.
         cmap_g listMap = cmap_ini;
         
-        *carray2f_at(&table, y, x) = 3.1415927; // table[y][x]
+        *carray2f_at(&table, y, x) = 3.1415927f; // table[y][x]
         clist_y_push_back(&tableList, table);
         cmap_g_put(&listMap, tableKey, tableList);
         cmap_s_put(&myMap, strKey, listMap);

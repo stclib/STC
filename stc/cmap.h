@@ -248,7 +248,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     STC_API ctype##_##X##_mapped_t* \
     ctype##_##X##_at(const ctype##_##X* self, RawKey rawKey) { \
         ctype##_bucket_t b = ctype##_##X##_bucket(self, &rawKey); \
-        c_assert(self->_hashx[b.idx], "cmap_at()"); \
+        assert(self->_hashx[b.idx]); \
         return &self->table[b.idx].value; \
     } \
     STC_INLINE ctype##_##X##_result_t \

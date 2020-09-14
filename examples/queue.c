@@ -26,7 +26,6 @@ int main() {
         else
             --n, cqueue_i_pop(&queue);
     }
-    printf("%d\n", n);
-    printf("%zu\n", n, cqueue_i_size(queue));
+    printf("%d, %zu\n", n, cqueue_i_size(queue));
     cqueue_i_destroy(&queue);
 }
