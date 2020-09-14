@@ -32,7 +32,7 @@ int main()
     cmap_i mhist = cmap_ini;
     for (size_t i = 0; i < N; ++i) {
         int index = (int) round( crand_normal_f64(&rng, &dist) );
-        cmap_i_emplace(&mhist, index, 0).item->value += 1;
+        cmap_i_emplace(&mhist, index, 0).first->value += 1;
     }
 
     // Transfer map to vec and sort it by map keys.

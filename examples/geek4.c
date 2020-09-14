@@ -106,13 +106,13 @@ int commonWords(cvec_str S)
         // make it false 
         for (int k = 0; k < cvec_size(ans); k++) { 
             if (ans.data[k].value != false 
-                && cmap_sb_emplace(&has, ans.data[k].key.str, false).item->value == false) { 
+                && cmap_sb_emplace(&has, ans.data[k].key.str, false).first->value == false) { 
                 ans.data[k].value = false; 
             } 
   
             // This line is used to consider only distinct words                 
             else if (ans.data[k].value != false
-                     && cmap_sb_emplace(&has, ans.data[k].key.str, false).item->value == true) { 
+                     && cmap_sb_emplace(&has, ans.data[k].key.str, false).first->value == true) { 
                 cmap_sb_put(&has, ans.data[k].key.str, false); 
             } 
         } 

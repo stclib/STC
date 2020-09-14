@@ -36,7 +36,7 @@ crand_rng64_t rng;
 
 #define CMAP_SETUP(tt, Key, Value) cmap_##tt map = cmap_ini \
                                     ; cmap_##tt##_set_load_factors(&map, max_load_factor, 0.0)
-#define CMAP_PUT(tt, key, val)     cmap_##tt##_put(&map, key, val).item->value
+#define CMAP_PUT(tt, key, val)     cmap_##tt##_put(&map, key, val).first->value
 #define CMAP_EMPLACE(tt, key, val) cmap_##tt##_emplace(&map, key, val)
 #define CMAP_ERASE(tt, key)        cmap_##tt##_erase(&map, key)
 #define CMAP_FIND(tt, key)         (cmap_##tt##_find(map, key) != NULL)

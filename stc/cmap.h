@@ -63,7 +63,7 @@ int main(void) {
 
 #define c_try_emplace(self, ctype, key, val) do { \
     ctype##_result_t __r = ctype##_insert_key_(self, key); \
-    if (__r.inserted) __r.item->value = val; \
+    if (__r.second) __r.first->value = val; \
 } while (0)
 #define c_insert(self, ctype, ...) do { \
     const ctype##_input_t __arr[] = __VA_ARGS__; \
@@ -178,8 +178,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     ctype##_##X##_input_t; \
 \
     typedef struct { \
-        c_UNION(ctype##_##X##_value_t *item, *first); \
-        c_UNION(bool inserted, second); \
+        ctype##_##X##_value_t *first; \
+        bool second; /* inserted */ \
     } ctype##_##X##_result_t; \
 \
     typedef struct ctype##_##X { \
@@ -232,7 +232,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     STC_INLINE ctype##_##X##_result_t \
     ctype##_##X##_emplace(ctype##_##X* self, CMAP_ARGS_##ctype(RawKey rawKey, RawVal rawVal)) { \
         ctype##_##X##_result_t res = ctype##_##X##_insert_key_(self, rawKey); \
-        CMAP_ONLY_##ctype( if (res.inserted) res.item->value = valueFromRaw(rawVal); ) \
+        CMAP_ONLY_##ctype( if (res.second) res.first->value = valueFromRaw(rawVal); ) \
         return res; \
     } \
     STC_INLINE ctype##_##X##_result_t \
@@ -245,8 +245,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     STC_INLINE ctype##_##X##_result_t \
     ctype##_##X##_insert_or_assign(ctype##_##X* self, RawKey rawKey, RawVal rawVal) { \
         ctype##_##X##_result_t res = ctype##_##X##_insert_key_(self, rawKey); \
-        if (!res.inserted) valueDestroy(&res.item->value); \
-        res.item->value = valueFromRaw(rawVal); return res; \
+        if (!res.second) valueDestroy(&res.first->value); \
+        res.first->value = valueFromRaw(rawVal); return res; \
     } \
     STC_API ctype##_##X##_mapped_t* \
     ctype##_##X##_at(const ctype##_##X* self, RawKey rawKey) { \
@@ -261,8 +261,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     STC_INLINE ctype##_##X##_result_t \
     ctype##_##X##_putv(ctype##_##X* self, RawKey rawKey, Mapped mapped) { \
         ctype##_##X##_result_t res = ctype##_##X##_insert_key_(self, rawKey); \
-        if (!res.inserted) valueDestroy(&res.item->value); \
-        res.item->value = mapped; return res; \
+        if (!res.second) valueDestroy(&res.first->value); \
+        res.first->value = mapped; return res; \
     }) \
 \
     STC_INLINE ctype##_##X##_iter_t \
@@ -375,8 +375,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         ctype##_##X##_reserve_expand(self); \
         ctype##_bucket_t b = ctype##_##X##_bucket(self, &rawKey); \
         ctype##_##X##_result_t res = {&self->table[b.idx], !self->_hashx[b.idx]}; \
-        if (res.inserted) { \
-            res.item->key = keyFromRaw(rawKey); \
+        if (res.second) { \
+            res.first->key = keyFromRaw(rawKey); \
             self->_hashx[b.idx] = (uint8_t) b.hx; \
             ++self->size; \
         } \
