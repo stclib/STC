@@ -61,11 +61,11 @@ Finally, main which also demos the generic c_push() of multiple elements:
 ```
 int main() {
     cmap_vk vikings = cmap_ini;
-    c_push(&vikings, cmap_vk, c_items(
+    c_push(&vikings, cmap_vk, {
         { {"Einar", "Norway"}, 20 },
         { {"Olaf", "Denmark"}, 24 },
         { {"Harald", "Iceland"}, 12 },
-    ));
+    });
     VikingVw look = {"Einar", "Norway"};
     cmap_vk_entry_t *e = cmap_vk_find(&vikings, look);
     e->value += 5; // update 

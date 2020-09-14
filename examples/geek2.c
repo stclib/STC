@@ -20,12 +20,12 @@ int main()
     puts("");
 
     // Review some books.
-   c_push(&book_reviews, cmap_str, c_items(
+   c_push(&book_reviews, cmap_str, {
         {"Adventures of Huckleberry Finn", "My favorite book."},
         {"Grimms' Fairy Tales", "Masterpiece."},
         {"Pride and Prejudice", "Very enjoyable."},
         {"The Adventures of Sherlock Holmes", "Eye lyked it alot."},
-    ));        
+   });
 /*
     cmap_str_emplace(&book_reviews,
         "Adventures of Huckleberry Finn",

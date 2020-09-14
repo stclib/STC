@@ -12,20 +12,20 @@ declare_cmap_strkey(si, int);
 int main1()
 {
     clist_str lwords = clist_ini;
-    c_push(&lwords, clist_str, c_items(
+    c_push(&lwords, clist_str, {
         "this", "sentence", "is", "not", "a", "sentence",
         "this", "sentence", "is", "a", "hoax"
-    ));
+    });
     clist_str_push_back(&lwords, cstr_from("%f", 123897.0 / 23.0));
     c_foreach (w, clist_str, lwords)
         printf("%s\n", w.item->value.str);
     puts("");
 
     cvec_str words = cvec_ini;
-    c_push(&words, cvec_str, c_items(
+    c_push(&words, cvec_str, {
         "this", "sentence", "is", "not", "a", "sentence",
         "this", "sentence", "is", "a", "hoax"
-    ));
+    });
 
     cmap_si word_map = cmap_ini;
     c_foreach (w, cvec_str, words)

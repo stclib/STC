@@ -62,11 +62,11 @@ declare_cmap(vk, Viking, int, c_default_destroy, vikingvw_equals, vikingvw_hash,
 int main()
 {
     cmap_vk vikings = cmap_ini;
-    c_push(&vikings, cmap_vk, c_items(
+    c_push(&vikings, cmap_vk, {
         {{"Einar", "Norway"}, 20},
         {{"Olaf", "Denmark"}, 24},
         {{"Harald", "Iceland"}, 12},
-    ));
+    });
 
     VikingVw einar = {"Einar", "Norway"};
     cmap_vk_entry_t *e = cmap_vk_find(&vikings, einar);

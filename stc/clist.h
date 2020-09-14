@@ -89,10 +89,10 @@
 #define clist_ini           {NULL}
 #define clist_empty(list)   ((list).last == NULL)
 
-#define c_emplace_after(self, ctype, pos, items) do { \
+#define c_emplace_after(self, ctype, pos, ...) do { \
     ctype* __self = self; \
     ctype##_iter_t __pos = pos; \
-    const ctype##_input_t __arr[] = {items}; \
+    const ctype##_input_t __arr[] = __VA_ARGS__; \
     for (size_t __i=0; __i<sizeof(__arr)/sizeof(__arr[0]); ++__i) \
         __pos = ctype##_emplace_after(__self, __pos, __arr[__i]); \
 } while (0)

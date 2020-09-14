@@ -25,7 +25,7 @@ int main(void) {
     // CVEC FLOAT / PRIORITY QUEUE
 
     cvec_f floats = cvec_ini;
-    c_push(&floats, cvec_f, c_items(4.0f, 2.0f, 5.0f, 3.0f, 1.0f));
+    c_push(&floats, cvec_f, {4.0f, 2.0f, 5.0f, 3.0f, 1.0f});
 
     c_foreach (i, cvec_f, floats) printf("%.1f ", *i.item);
     puts("");
@@ -33,7 +33,7 @@ int main(void) {
     // CVEC PRIORITY QUEUE
 
     cpqueue_f_build(&floats); // reorganise vec
-    c_push(&floats, cpqueue_f, c_items(40.0f, 20.0f, 50.0f, 30.0f, 10.0f));
+    c_push(&floats, cpqueue_f, {40.0f, 20.0f, 50.0f, 30.0f, 10.0f});
 
     // sorted:
     while (cvec_size(floats) > 0) {
@@ -47,11 +47,11 @@ int main(void) {
 
     int year = 2020;
     cmap_id idnames = cmap_ini;
-    c_push(&idnames, cmap_id, c_items(
+    c_push(&idnames, cmap_id, {
         {100, cstr_make("Hello")},
         {110, cstr_make("World")},
         {120, cstr_from("Howdy, -%d-", year)},
-    ));
+    });
 
     c_foreach (i, cmap_id, idnames)
         printf("%d: %s\n", i.item->key, i.item->value.str);
@@ -61,7 +61,7 @@ int main(void) {
     // CMAP CNT
 
     cmap_cnt countries = cmap_ini;
-    c_push(&countries, cmap_cnt, c_items(
+    c_push(&countries, cmap_cnt, {
         {"Norway", 100},
         {"Denmark", 50},
         {"Iceland", 10},
@@ -70,7 +70,7 @@ int main(void) {
         {"Germany", 10},
         {"Spain", 10},
         {"France", 10},
-    ));
+    });
     cmap_cnt_emplace(&countries, "Greenland", 0).item->value += 20;
     cmap_cnt_emplace(&countries, "Sweden", 0).item->value += 20;
     cmap_cnt_emplace(&countries, "Norway", 0).item->value += 20;
@@ -84,12 +84,12 @@ int main(void) {
     // CVEC PAIR
 
     cvec_ip pairs1 = cvec_ini;
-    c_push(&pairs1, cvec_ip, c_items(
+    c_push(&pairs1, cvec_ip, {
         {5, 6},
         {3, 4},
         {1, 2},
         {7, 8},
-    ));
+    });
     cvec_ip_sort(&pairs1);
 
     c_foreach (i, cvec_ip, pairs1)
@@ -100,12 +100,12 @@ int main(void) {
     // CLIST PAIR
 
     clist_ip pairs2 = clist_ini;
-    c_push(&pairs2, clist_ip, c_items(
+    c_push(&pairs2, clist_ip, {
         {5, 6},
         {3, 4},
         {1, 2},
         {7, 8},
-    ));
+    });
     clist_ip_sort(&pairs2);
 
     c_foreach (i, clist_ip, pairs2)

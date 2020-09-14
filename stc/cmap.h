@@ -65,6 +65,10 @@ int main(void) {
     ctype##_result_t __r = ctype##_insert_key_(self, key); \
     if (__r.inserted) __r.item->value = val; \
 } while (0)
+#define c_insert(self, ctype, ...) do { \
+    const ctype##_input_t __arr[] = __VA_ARGS__; \
+    for (size_t i=0;i<sizeof(__arr)/sizeof(__arr[0]); ++i) ctype##_insert(self, __arr[i]); \
+} while (0)
 
 /* https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction */
 #define chash_reduce(x, N)            ((uint32_t) (((uint64_t) (x) * (N)) >> 32))
@@ -231,12 +235,11 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         CMAP_ONLY_##ctype( if (res.inserted) res.item->value = valueFromRaw(rawVal); ) \
         return res; \
     } \
-\
-    CSET_ONLY_##ctype( \
     STC_INLINE ctype##_##X##_result_t \
-    ctype##_##X##_insert(ctype##_##X* self, RawKey rawKey) { \
-        return ctype##_##X##_insert_key_(self, rawKey); \
-    }) \
+    ctype##_##X##_insert(ctype##_##X* self, ctype##_##X##_input_t in) { \
+        return CSET_ONLY_##ctype(ctype##_##X##_insert_key_(self, in)) \
+               CMAP_ONLY_##ctype(ctype##_##X##_emplace(self, in.first, in.second)); \
+    } \
 \
     CMAP_ONLY_##ctype( \
     STC_INLINE ctype##_##X##_result_t \

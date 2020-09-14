@@ -20,7 +20,7 @@ int main() {
         cpqueue_i_push(&heap, crand_uniform_i64(&pcg, &dist));
 
     // push some negative numbers too.
-    c_push(&heap, cpqueue_i, c_items(-231, -32, -873, -4, -343));
+    c_push(&heap, cpqueue_i, {-231, -32, -873, -4, -343});
 
     for (int i=0; i<N; ++i)
         cpqueue_i_push(&heap, crand_uniform_i64(&pcg, &dist));
