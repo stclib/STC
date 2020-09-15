@@ -4,9 +4,9 @@
 #include <stc/clist.h>
 #include <stc/cvec.h>
 
-declare_cvec_str();
-declare_clist_str();
-declare_cmap_strkey(si, int);
+cdef_cvec_str();
+cdef_clist_str();
+cdef_cmap_strkey(si, int);
 
 
 int main1()
@@ -18,7 +18,7 @@ int main1()
     });
     clist_str_push_back(&lwords, cstr_from("%f", 123897.0 / 23.0));
     c_foreach (w, clist_str, lwords)
-        printf("%s\n", w.item->value.str);
+        printf("%s\n", w.get->value.str);
     puts("");
 
     cvec_str words = cvec_ini;
@@ -29,12 +29,12 @@ int main1()
 
     cmap_si word_map = cmap_ini;
     c_foreach (w, cvec_str, words)
-        cmap_si_emplace(&word_map, w.item->str, 0).first->value += 1;
+        cmap_si_emplace(&word_map, w.get->str, 0).first->value += 1;
 
     c_foreach (pair, cmap_si, word_map) {
         printf("%d occurrences of word '%s'\n",
-               pair.item->value,
-               pair.item->key.str);
+               pair.get->value,
+               pair.get->key.str);
     }
 
     cmap_si_destroy(&word_map);

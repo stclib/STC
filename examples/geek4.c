@@ -37,9 +37,9 @@ Efficient Approach: For all the words of the first sentence, we can check if it 
 #include <stc/cvec.h>
 #include <stc/cstr.h>
 
-declare_cvec_str();
-declare_cmap_strkey(sb, bool);
-declare_cvec(sb, cmap_sb_entry_t, cmap_sb_entry_destroy, c_no_compare);
+cdef_cvec_str();
+cdef_cmap_strkey(sb, bool);
+cdef_cvec(sb, cmap_sb_entry_t, cmap_sb_entry_destroy, c_no_compare);
   
 // Function to return the count of common words 
 // in all the sentences 

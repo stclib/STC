@@ -7,14 +7,14 @@
 #include <stc/cvec.h>
 
 // Declare int -> int hashmap. Uses typetag 'i' for ints.
-declare_cmap(i, int, size_t);
+cdef_cmap(i, int, size_t);
 
 // Declare int vector with map entries that can be sorted by map keys.
 static int compare(cmap_i_entry_t *a, cmap_i_entry_t *b) {
     return c_default_compare(&a->key, &b->key);
 }
 // Vector: typetag 'e' for (map) entry
-declare_cvec(e, cmap_i_entry_t, c_default_destroy, compare);
+cdef_cvec(e, cmap_i_entry_t, c_default_destroy, compare);
 
 int main()
 {
@@ -38,17 +38,17 @@ int main()
     // Transfer map to vec and sort it by map keys.
     cvec_e vhist = cvec_ini;
     c_foreach (i, cmap_i, mhist)
-        cvec_e_push_back(&vhist, *i.item);
+        cvec_e_push_back(&vhist, *i.get);
     cvec_e_sort(&vhist);
     
     // Print the gaussian bar chart
     cstr_t bar = cstr_ini;
     c_foreach (i, cvec_e, vhist) {
-        size_t n = (size_t) (i.item->value * Mag / N);
+        size_t n = (size_t) (i.get->value * Mag / N);
         if (n > 0) {
             // bar string: take ownership in new str after freeing current.
             cstr_take(&bar, cstr_with_size(n, '*'));
-            printf("%4d %s\n", i.item->key, bar.str);
+            printf("%4d %s\n", i.get->key, bar.str);
         }
     }
     // Cleanup

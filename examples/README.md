@@ -48,12 +48,12 @@ static inline VikingVw viking_toVw(Viking* vk) {
     VikingVw vw = {vk->name.str, vk->country.str}; return vw;
 }
 static inline Viking viking_fromVw(VikingVw vw) { // note: parameter is by value
-    Viking vk = {cstr_make(vw.name), cstr_make(vw.country)}; return vk;
+    Viking vk = {cstr(vw.name), cstr(vw.country)}; return vk;
 }
 ```
-With this in place, we use the full declare_cmap() macro to define {Viking -> int} hash map type:
+With this in place, we use the full cdef_cmap() macro to define {Viking -> int} hash map type:
 ```
-declare_cmap(vk, Viking, int, c_default_destroy, vikingvw_equals, vikingvw_hash, 
+cdef_cmap(vk, Viking, int, c_default_destroy, vikingvw_equals, vikingvw_hash, 
                  viking_destroy, VikingVw, viking_toVw, viking_fromVw);
 ```
 cmap_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test. cmap_vk_destroy() will free all memory allocated for Viking keys and the hash table values.
@@ -72,7 +72,7 @@ int main() {
     cmap_vk_emplace(&vikings, look, 0)->value += 5; // again
 
     c_foreach (k, cmap_vk, vikings) {
-        printf("%s of %s has %d hp\n", k.item->key.name.str, k.item->key.country.str, k.item->value);
+        printf("%s of %s has %d hp\n", k.get->key.name.str, k.get->key.country.str, k.get->value);
     }
     cmap_vk_destroy(&vikings);
 }

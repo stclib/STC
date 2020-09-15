@@ -3,8 +3,8 @@
 #include <stc/cmap.h>
 #include <stc/cstr.h>
 
-declare_cmap_str();
-declare_cset_str();
+cdef_cmap_str();
+cdef_cset_str();
 
 int main() 
 { 
@@ -16,7 +16,7 @@ int main()
     cset_str_insert(&set, "You");
     cset_str_insert(&set, "Tube");
     c_foreach (i, cset_str, set)
-        printf("%s ", i.item->key.str); 
+        printf("%s ", i.get->key.str); 
     puts("");
 
     // Review some books.
@@ -68,7 +68,7 @@ int main()
 
     // Iterate over everything.
     c_foreach (i, cmap_str, book_reviews) {
-        printf("- %s: \"%s\"\n", i.item->key.str, i.item->value.str);
+        printf("- %s: \"%s\"\n", i.get->key.str, i.get->value.str);
     }
     cmap_str_destroy(&book_reviews);
 }

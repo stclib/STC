@@ -7,7 +7,7 @@
 #include <stc/cvec.h>
 #include <stc/cstr.h>
 
-declare_cmap(ic, uint64_t, uint8_t);
+cdef_cmap(ic, uint64_t, uint8_t);
 
 const static uint64_t seed = 1234;
 const static uint64_t N = 1ull << 27;
@@ -29,8 +29,8 @@ void repeats(void)
 }
 
 
-declare_cmap(x, uint32_t, uint64_t);
-declare_cvec(x, uint64_t);
+cdef_cmap(x, uint32_t, uint64_t);
+cdef_cvec(x, uint64_t);
 
 void distribution(void)
 {
@@ -45,11 +45,11 @@ void distribution(void)
     float diff = (float) (clock() - now) / CLOCKS_PER_SEC;
 
     uint64_t sum = 0;
-    c_foreach (i, cmap_x, map) sum += i.item->value;
+    c_foreach (i, cmap_x, map) sum += i.get->value;
     sum /= map.size;
 
     c_foreach (i, cmap_x, map)
-        printf("%u: %zu - %zu\n", i.item->key, i.item->value, sum);
+        printf("%u: %zu - %zu\n", i.get->key, i.get->value, sum);
 
     printf("%.02f\n", diff);
 }

@@ -5,19 +5,19 @@
 #include <stc/cpqueue.h>
 #include <stc/clist.h>
 
-declare_cmap(id, int, cstr_t, cstr_destroy); // Map of int -> cstr_t
-declare_cmap_strkey(cnt, int);
+cdef_cmap(id, int, cstr_t, cstr_destroy); // Map of int -> cstr_t
+cdef_cmap_strkey(cnt, int);
 
 typedef struct {int x, y;} ipair_t;
 inline static int ipair_compare(const ipair_t* a, const ipair_t* b) {
     int c = c_default_compare(&a->x, &b->x);
     return c != 0 ? c : c_default_compare(&a->y, &b->y);
 }
-declare_cvec(ip, ipair_t, c_default_destroy, ipair_compare);
-declare_clist(ip, ipair_t, c_default_destroy, ipair_compare);
+cdef_cvec(ip, ipair_t, c_default_destroy, ipair_compare);
+cdef_clist(ip, ipair_t, c_default_destroy, ipair_compare);
 
-declare_cvec(f, float);
-declare_cpqueue(f, cvec_f, >);
+cdef_cvec(f, float);
+cdef_cpqueue(f, cvec_f, >);
 
 
 int main(void) {
@@ -27,7 +27,7 @@ int main(void) {
     cvec_f floats = cvec_ini;
     c_push(&floats, cvec_f, {4.0f, 2.0f, 5.0f, 3.0f, 1.0f});
 
-    c_foreach (i, cvec_f, floats) printf("%.1f ", *i.item);
+    c_foreach (i, cvec_f, floats) printf("%.1f ", *i.get);
     puts("");
 
     // CVEC PRIORITY QUEUE
@@ -48,13 +48,13 @@ int main(void) {
     int year = 2020;
     cmap_id idnames = cmap_ini;
     c_push(&idnames, cmap_id, {
-        {100, cstr_make("Hello")},
-        {110, cstr_make("World")},
+        {100, cstr("Hello")},
+        {110, cstr("World")},
         {120, cstr_from("Howdy, -%d-", year)},
     });
 
     c_foreach (i, cmap_id, idnames)
-        printf("%d: %s\n", i.item->key, i.item->value.str);
+        printf("%d: %s\n", i.get->key, i.get->value.str);
     puts("");
     cmap_id_destroy(&idnames);
 
@@ -77,7 +77,7 @@ int main(void) {
     cmap_cnt_emplace(&countries, "Finland", 0).first->value += 20;
 
     c_foreach (i, cmap_cnt, countries)
-        printf("%s: %d\n", i.item->key.str, i.item->value);
+        printf("%s: %d\n", i.get->key.str, i.get->value);
     puts("");
     cmap_cnt_destroy(&countries);
 
@@ -93,7 +93,7 @@ int main(void) {
     cvec_ip_sort(&pairs1);
 
     c_foreach (i, cvec_ip, pairs1)
-        printf("(%d %d) ", i.item->x, i.item->y);
+        printf("(%d %d) ", i.get->x, i.get->y);
     puts("");
     cvec_ip_destroy(&pairs1);
 
@@ -109,7 +109,7 @@ int main(void) {
     clist_ip_sort(&pairs2);
 
     c_foreach (i, clist_ip, pairs2)
-        printf("(%d %d) ", i.item->value.x, i.item->value.y);
+        printf("(%d %d) ", i.get->value.x, i.get->value.y);
     puts("");
     clist_ip_destroy(&pairs2);
 }

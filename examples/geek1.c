@@ -12,7 +12,7 @@ int a[] = { 1, 2, 2, 3, 2, 4, 10 };
 #include <stdio.h>
 #include <stc/cmap.h>
 
-declare_cmap(ii, int, int);
+cdef_cmap(ii, int, int);
   
 // Function to maximize the number of pairs 
 int findMaximumPairs(int a[], int n, int k) 
@@ -30,13 +30,13 @@ int findMaximumPairs(int a[], int n, int k)
     c_foreach (it, cmap_ii, hash) { 
   
         // If the number is 0 
-        if (it.item->key == 0) { 
+        if (it.get->key == 0) { 
             // We take half since same number 
-            count += it.item->value / 2; 
-            cmap_ii_put(&hash, it.item->key, it.item->key & 1);
+            count += it.get->value / 2; 
+            cmap_ii_put(&hash, it.get->key, it.get->key & 1);
         } else { 
-            int one = it.item->key;
-            int two = k - it.item->key; 
+            int one = it.get->key;
+            int two = k - it.get->key; 
 
             cmap_ii_entry_t *hf = cmap_ii_find(&hash, one),
                             *hs = cmap_ii_emplace(&hash, two, 0).first;
@@ -62,10 +62,10 @@ int findMaximumPairs(int a[], int n, int k)
                 if (one == two) { 
   
                     // If same then number of pairs will be half 
-                    count += it.item->value / 2; 
+                    count += it.get->value / 2; 
   
                     // Check for remaining 
-                    hf->value = (it.item->key & 1); 
+                    hf->value = (it.get->key & 1); 
                 } 
                 else { 
                     // Store the number of pairs 

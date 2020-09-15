@@ -30,7 +30,7 @@ operation in almost O(1) time complexity.
 
 #include <stdio.h>  
 #include <stc/cmap.h>
-declare_cset(i, int);
+cdef_cset(i, int);
 
 // Function to find the smallest positive 
 // missing number 

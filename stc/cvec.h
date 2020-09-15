@@ -32,18 +32,18 @@
 #define cvec_capacity(v)   _cvec_safe_capacity((v).data)
 #define cvec_empty(v)      (cvec_size(v) == 0)
 
-#define declare_cvec(...)   c_MACRO_OVERLOAD(declare_cvec, __VA_ARGS__)
-#define declare_cvec_2(X, Value) \
-                            declare_cvec_3(X, Value, c_default_destroy)
-#define declare_cvec_3(X, Value, valueDestroy) \
-                            declare_cvec_4(X, Value, valueDestroy, c_default_compare)
-#define declare_cvec_4(X, Value, valueDestroy, valueCompare) \
-                            declare_cvec_7(X, Value, valueDestroy, valueCompare, Value, c_default_to_raw, c_default_from_raw)
-#define declare_cvec_str() \
-                            declare_cvec_7(str, cstr_t, cstr_destroy, cstr_compare_raw, const char*, cstr_to_raw, cstr_make)
+#define cdef_cvec(...)   c_MACRO_OVERLOAD(cdef_cvec, __VA_ARGS__)
+#define cdef_cvec_2(X, Value) \
+                            cdef_cvec_3(X, Value, c_default_destroy)
+#define cdef_cvec_3(X, Value, valueDestroy) \
+                            cdef_cvec_4(X, Value, valueDestroy, c_default_compare)
+#define cdef_cvec_4(X, Value, valueDestroy, valueCompare) \
+                            cdef_cvec_7(X, Value, valueDestroy, valueCompare, Value, c_default_to_raw, c_default_from_raw)
+#define cdef_cvec_str() \
+                            cdef_cvec_7(str, cstr_t, cstr_destroy, cstr_compare_raw, const char*, cstr_to_raw, cstr)
 
 
-#define declare_cvec_7(X, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw) \
+#define cdef_cvec_7(X, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw) \
 \
     typedef struct cvec_##X { \
         Value* data; \
@@ -51,7 +51,7 @@
     typedef Value cvec_##X##_value_t; \
     typedef RawValue cvec_##X##_rawvalue_t; \
     typedef cvec_##X##_rawvalue_t cvec_##X##_input_t; \
-    typedef struct { Value *item; } cvec_##X##_iter_t; \
+    typedef struct { Value *get; } cvec_##X##_iter_t; \
 \
     STC_INLINE cvec_##X \
     cvec_##X##_init(void) {cvec_##X v = cvec_ini; return v;} \
@@ -132,12 +132,12 @@
 \
     STC_INLINE cvec_##X##_iter_t \
     cvec_##X##_erase_at(cvec_##X* self, cvec_##X##_iter_t pos) { \
-        cvec_##X##_iter_t next = {pos.item + 1}; \
+        cvec_##X##_iter_t next = {pos.get + 1}; \
         return cvec_##X##_erase_range(self, pos, next); \
     } \
     STC_INLINE cvec_##X##_iter_t \
     cvec_##X##_erase_at_idx(cvec_##X* self, size_t idx) { \
-        cvec_##X##_iter_t first = {self->data + idx}, finish = {first.item + 1}; \
+        cvec_##X##_iter_t first = {self->data + idx}, finish = {first.get + 1}; \
         return cvec_##X##_erase_range(self, first, finish); \
     } \
     STC_INLINE cvec_##X##_iter_t \
@@ -181,11 +181,11 @@
         cvec_##X##_iter_t it = {self->data + cvec_size(*self)}; return it; \
     } \
     STC_INLINE void \
-    cvec_##X##_next(cvec_##X##_iter_t* it) {++it->item;} \
+    cvec_##X##_next(cvec_##X##_iter_t* it) {++it->get;} \
     STC_INLINE cvec_##X##_value_t* \
-    cvec_##X##_itval(cvec_##X##_iter_t it) {return it.item;} \
+    cvec_##X##_itval(cvec_##X##_iter_t it) {return it.get;} \
     STC_INLINE size_t \
-    cvec_##X##_idx(cvec_##X v, cvec_##X##_iter_t it) {return it.item - v.data;} \
+    cvec_##X##_idx(cvec_##X v, cvec_##X##_iter_t it) {return it.get - v.data;} \
 \
     implement_cvec_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw)
 
@@ -242,13 +242,13 @@
     STC_API cvec_##X##_iter_t \
     cvec_##X##_insert_range(cvec_##X* self, cvec_##X##_iter_t pos, cvec_##X##_iter_t first, cvec_##X##_iter_t finish) { \
         enum {max_buf = c_max_alloca / sizeof(Value) + 1}; Value buf[max_buf]; \
-        size_t len = finish.item - first.item, idx = pos.item - self->data, size = cvec_size(*self); \
-        Value* xbuf = (Value *) memcpy(len > max_buf ? c_new_n(Value, len) : buf, first.item, len * sizeof(Value)); \
+        size_t len = finish.get - first.get, idx = pos.get - self->data, size = cvec_size(*self); \
+        Value* xbuf = (Value *) memcpy(len > max_buf ? c_new_n(Value, len) : buf, first.get, len * sizeof(Value)); \
         if (size + len > cvec_capacity(*self)) \
             cvec_##X##_reserve(self, 4 + (size + len) * 3 / 2); \
-        pos.item = self->data + idx; \
-        memmove(pos.item + len, pos.item, (size - idx) * sizeof(Value)); \
-        memcpy(pos.item, xbuf, len * sizeof(Value)); \
+        pos.get = self->data + idx; \
+        memmove(pos.get + len, pos.get, (size - idx) * sizeof(Value)); \
+        memcpy(pos.get, xbuf, len * sizeof(Value)); \
         _cvec_size(self) += len; \
         if (len > max_buf) free(xbuf); \
         return pos; \
@@ -256,11 +256,11 @@
 \
     STC_API cvec_##X##_iter_t \
     cvec_##X##_erase_range(cvec_##X* self, cvec_##X##_iter_t first, cvec_##X##_iter_t finish) { \
-        intptr_t len = finish.item - first.item; \
+        intptr_t len = finish.get - first.get; \
         if (len > 0) { \
-            Value* p = first.item, *end = p + _cvec_size(self); \
-            while (p != finish.item) valueDestroy(p++); \
-            memmove(first.item, finish.item, (end - finish.item) * sizeof(Value)); \
+            Value* p = first.get, *end = p + _cvec_size(self); \
+            while (p != finish.get) valueDestroy(p++); \
+            memmove(first.get, finish.get, (end - finish.get) * sizeof(Value)); \
             _cvec_size(self) -= len; \
         } \
         return first; \
@@ -268,8 +268,8 @@
 \
     STC_API cvec_##X##_iter_t \
     cvec_##X##_find_in_range(const cvec_##X* self, cvec_##X##_iter_t first, cvec_##X##_iter_t finish, RawValue rawValue) { \
-        for (; first.item != finish.item; cvec_##X##_next(&first)) { \
-            RawValue r = valueToRaw(first.item); \
+        for (; first.get != finish.get; cvec_##X##_next(&first)) { \
+            RawValue r = valueToRaw(first.get); \
             if (valueCompareRaw(&r, &rawValue) == 0) return first; \
         } \
         return cvec_##X##_end(self); \

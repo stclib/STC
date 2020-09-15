@@ -30,7 +30,7 @@
 #include "cdefs.h"
 
 typedef struct cstr { char* str; } cstr_t;
-typedef struct { char *item; } cstr_iter_t;
+typedef struct { char *get; } cstr_iter_t;
 typedef char cstr_value_t;
 
 static size_t _cstr_nullrep[] = {0, 0, 0};
@@ -42,7 +42,7 @@ static  cstr_t cstr_ini =  {(char* ) &_cstr_nullrep[2]};
 #define cstr_npos          ((size_t) (-1))
 
 STC_API cstr_t
-cstr_make_n(const char* str, size_t len);
+cstr_n(const char* str, size_t len);
 STC_API cstr_t
 cstr_from(const char* fmt, ...);
 STC_API void
@@ -89,13 +89,13 @@ cstr_with_size(size_t len, char fill) {
     return s;
 }
 STC_INLINE cstr_t
-cstr_make(const char* str) {
-    return cstr_make_n(str, strlen(str));
+cstr(const char* str) {
+    return cstr_n(str, strlen(str));
 }
 
 STC_INLINE cstr_t
 cstr_clone(cstr_t s) {
-    return cstr_make_n(s.str, cstr_size(s));
+    return cstr_n(s.str, cstr_size(s));
 }
 
 STC_INLINE void
@@ -114,8 +114,8 @@ STC_INLINE cstr_iter_t
 cstr_end(cstr_t* self) {
     cstr_iter_t it = {self->str + cstr_size(*self)}; return it;
 }
-STC_INLINE void cstr_next(cstr_iter_t* it) { ++it->item; }
-STC_INLINE char* cstr_itval(cstr_iter_t it) {return it.item;}
+STC_INLINE void cstr_next(cstr_iter_t* it) { ++it->get; }
+STC_INLINE char* cstr_itval(cstr_iter_t it) {return it.get;}
 
 STC_INLINE cstr_t*
 cstr_assign(cstr_t* self, const char* str) {
@@ -228,7 +228,7 @@ cstr_resize(cstr_t* self, size_t len, char fill) {
 }
 
 STC_API cstr_t
-cstr_make_n(const char* str, size_t len) {
+cstr_n(const char* str, size_t len) {
     if (len == 0) return cstr_ini;
     size_t *rep = (size_t *) malloc(_cstr_mem(len));
     cstr_t s = {(char *) memcpy(rep + 2, str, len)};

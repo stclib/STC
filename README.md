@@ -24,7 +24,7 @@ The usage of the containers is vert similar to the C++ standard containers, so i
 All containers mentioned above, except cstr_t and cbitset_t are generic and typesafe (similar to templates in C++). No casting is used. A simple example:
 ```
 #include <stc/cvec.h>
-declare_cvec(i, int);
+cdef_cvec(i, int);
 
 int main(void) {
     cvec_i vec = cvec_ini;
@@ -55,10 +55,10 @@ Because it is headers only, files can simply be included in your program. The fu
 #include <stc/clist.h>
 #include "Vec3.h"
 
-declare_cmap(ii, int, int);
-declare_cset(ix, int64_t);
-declare_cvec(i, int);
-declare_clist(v3, Vec3);
+cdef_cmap(ii, int, int);
+cdef_cset(ix, int64_t);
+cdef_cvec(i, int);
+cdef_clist(v3, Vec3);
 ...
 ```
 Performance
@@ -118,23 +118,23 @@ cmap discussion
 
 You can customize the destroy-, hash- and equals- function. **cmap/cset** also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is very useful when e.g. having cstr as key, as it enables the usage of string literals as key in *put() and find()* functions, instead of requering a constructed cstr. Without it, the code would become: 
 ```
-declare_cmap(si, cstr_t, int); // don't do this.
+cdef_cmap(si, cstr_t, int); // don't do this.
 ...
-cmap_si_put(&map, cstr_make("mykey"), 12);
+cmap_si_put(&map, cstr("mykey"), 12);
 ```
 This is a problem because cstr_t key may exist in the map, and it would need to destroy the current key and replace it with the new to avoid memory leak.  Lookup would also be problematic:
 ```
-cstr lookup = cstr_make("mykey");
+cstr lookup = cstr("mykey");
 int x = cmap_si_find(&map, lookup)->value;
 cstr_destroy(&lookup);
 ```
 To avoid this, use 
-- *declare_cmap_strkey(tag, valuetype)*
-- *declare_cmap_strval(tag, keytype)*
-- *declare_cmap_str()* // cstr_t -> cstr_t
-- *declare_cset_str()* // cstr_t set
+- *cdef_cmap_strkey(tag, valuetype)*
+- *cdef_cmap_strval(tag, keytype)*
+- *cdef_cmap_str()* // cstr_t -> cstr_t
+- *cdef_cset_str()* // cstr_t set
 ```
-declare_cmap_strkey(si, int);
+cdef_cmap_strkey(si, int);
 ...
 cmap_si map = cmap_ini;
 cmap_si_put(&map, "mykey", 12);             // constructs a cstr_t key from the const char* internally.
@@ -142,9 +142,9 @@ int x = cmap_si_find(&map, "mykey")->value; // no allocation of string key happe
 cmap_si_destroy(&map);
 ```
 An alternative is to use *char* * as key type, but then you must manage allcoated memory of the hash char* keys yourself.
-Note that this predefined customization is also available for **cvec** and **clist**. See *declare_cvec_str()*, *declare_clist_str()*.
+Note that this predefined customization is also available for **cvec** and **clist**. See *cdef_cvec_str()*, *cdef_clist_str()*.
 
-To customize your own cmap type to work like cmap_str, you may want to look at **examples/advanced.c**. It demonstrates how to use a custom struct as a hash map key, using the optional parameters to declare_cmap().
+To customize your own cmap type to work like cmap_str, you may want to look at **examples/advanced.c**. It demonstrates how to use a custom struct as a hash map key, using the optional parameters to cdef_cmap().
 
 Example usages
 --------------
@@ -155,7 +155,7 @@ The examples folder contains further examples.
 #include <stc/cstr.h>
 
 int main() {
-    cstr_t s1 = cstr_make("one-nine-three-seven-five");
+    cstr_t s1 = cstr("one-nine-three-seven-five");
     printf("%s.\n", s1.str);
 
     cstr_insert(&s1, 3, "-two");
@@ -181,7 +181,7 @@ int main() {
 **cvec** of *int64_t*. 
 ```
 #include <stc/cvec.h>
-declare_cvec(ix, int64_t); // ix is just an example type tag name.
+cdef_cvec(ix, int64_t); // ix is just an example type tag name.
 
 int main() {
     cvec_ix bignums = cvec_ini; // use cvec_ix_init() if initializing after declaration.
@@ -200,7 +200,7 @@ int main() {
 ```
 #include <stc/cstr.h>
 #include <stc/cvec.h>
-declare_cvec_str();
+cdef_cvec_str();
 
 int main() {
     cvec_str names = cvec_ini;
@@ -212,7 +212,7 @@ int main() {
 
     printf("%s\n", names.data[1].str); // Access the string char*
     c_foreach (i, cvec_str, names)
-        printf("item %s\n", i.item->str);
+        printf("get %s\n", i.get->str);
     cvec_str_destroy(&names);
 }
 ```
@@ -220,7 +220,7 @@ int main() {
 ```
 #include <stdio.h>
 #include <stc/cmap.h>
-declare_cmap(ii, int, int);
+cdef_cmap(ii, int, int);
 
 int main() {
     cmap_ii nums = cmap_ini;
@@ -235,7 +235,7 @@ int main() {
 ```
 #include <stc/cstr.h>
 #include <stc/cmap.h>
-declare_cset_str(); // cstr set. See the discussion above.
+cdef_cset_str(); // cstr set. See the discussion above.
 
 int main() {
     cset_str words = cset_ini;
@@ -246,15 +246,15 @@ int main() {
 
     // iterate the set:
     c_foreach (i, cset_str, words)
-        printf("%s\n", i.item->key.str);
+        printf("%s\n", i.get->key.str);
     cset_str_destroy(&words);
 }
 ```
-**cmap** of *cstr -> cstr*. Both cstr keys and values are created internally via *cstr_make()* from const char* inputs.
+**cmap** of *cstr -> cstr*. Both cstr keys and values are created internally via *cstr()* from const char* inputs.
 ```
 #include <stc/cstr.h>
 #include <stc/cmap.h>
-declare_cmap_str(); 
+cdef_cmap_str(); 
 
 int main() {
     cmap_str table = cmap_ini;
@@ -266,7 +266,7 @@ int main() {
 
     printf("size = %zu\n", cmap_size(table));
     c_foreach (i, cmap_str, table)
-        printf("%s: %s\n", i.item->key.str, i.item->value.str);
+        printf("%s: %s\n", i.get->key.str, i.get->value.str);
     cmap_str_destroy(&table); // frees key and value cstrs, and hash table.
 }
 ```
@@ -276,7 +276,7 @@ int main() {
 #include <time.h>
 #include <stc/clist.h>
 #include <stc/crandom.h>
-declare_clist(fx, double);
+cdef_clist(fx, double);
 
 int main() {
     clist_fx list = clist_ini;
@@ -288,14 +288,14 @@ int main() {
         clist_fx_push_back(&list, crand_uniform_f64(&eng, dist));
     k = 0;
     c_foreach (i, clist_fx, list)
-        if (++k <= 10) printf("%8d: %10f\n", k, i.item->value); else break;
+        if (++k <= 10) printf("%8d: %10f\n", k, i.get->value); else break;
 
     clist_fx_sort(&list); // mergesort O(n*log n)
     puts("sorted");
 
     k = 0;
     c_foreach (i, clist_fx, list)
-        if (++k <= 10) printf("%8d: %10f\n", k, i.item->value); else break;
+        if (++k <= 10) printf("%8d: %10f\n", k, i.get->value); else break;
 
     clist_fx_clear(&list);
 
@@ -303,7 +303,7 @@ int main() {
     c_push(&list, clist_fx, {10, 20, 30, 40, 50});
 
     c_foreach (i, clist_fx, list)
-        printf("%f ", i.item->value);
+        printf("%f ", i.get->value);
     puts("");
 
     clist_fx_destroy(&list);
@@ -313,7 +313,7 @@ int main() {
 ```
 #include <stdio.h>
 #include <stc/carray.h>
-declare_carray(f, float);
+cdef_carray(f, float);
 
 int main()
 {

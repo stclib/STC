@@ -25,12 +25,12 @@
 #include <stc/cmap.h>
 #include <stc/cstr.h>
 
-declare_cmap_str();
+cdef_cmap_str();
 
 void print_phone_book(cmap_str phone_book)
 {
   c_foreach (i, cmap_str, phone_book)
-    printf("%s\t- %s\n", i.item->key.str, i.item->value.str);
+    printf("%s\t- %s\n", i.get->key.str, i.get->value.str);
 }
 
 int main(int argc, char **argv)
@@ -47,8 +47,8 @@ int main(int argc, char **argv)
   printf("Phone book:\n");
   print_phone_book(phone_book);
 
-  c_try_emplace(&phone_book, cmap_str, "Zak Byers", cstr_make("(551) 396-1880"));
-  c_try_emplace(&phone_book, cmap_str, "Zak Byers", cstr_make("(551) 396-1990"));
+  c_try_emplace(&phone_book, cmap_str, "Zak Byers", cstr("(551) 396-1880"));
+  c_try_emplace(&phone_book, cmap_str, "Zak Byers", cstr("(551) 396-1990"));
 
   printf("\nPhone book after adding Zak Byers:\n");
   print_phone_book(phone_book);

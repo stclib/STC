@@ -22,7 +22,7 @@ static inline uint32_t fibonacci_hash(const void* data, size_t len) {
 }
 
 // cmap and khash template expansion
-declare_cmap(ii, int64_t, int64_t, c_default_destroy, c_default_equals, fibonacci_hash);
+cdef_cmap(ii, int64_t, int64_t, c_default_destroy, c_default_equals, fibonacci_hash);
 KHASH_MAP_INIT_INT64(ii, int64_t)
 
 
@@ -41,7 +41,7 @@ crand_rng64_t rng;
 #define CMAP_ERASE(tt, key)        cmap_##tt##_erase(&map, key)
 #define CMAP_FIND(tt, key)         (cmap_##tt##_find(map, key) != NULL)
 #define CMAP_FOR(tt, i)            c_foreach (i, cmap_##tt, map)
-#define CMAP_ITEM(tt, i)           i.item->value
+#define CMAP_ITEM(tt, i)           i.get->value
 #define CMAP_SIZE(tt)              cmap_size(map)
 #define CMAP_BUCKETS(tt)           cmap_bucket_count(map)
 #define CMAP_CLEAR(tt)             cmap_##tt##_clear(&map)

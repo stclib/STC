@@ -8,7 +8,7 @@
 void stringdemo1()
 {
     printf("\nSTRINGDEMO1\n");
-    cstr_t cs = cstr_make("one-nine-three-seven-five");
+    cstr_t cs = cstr("one-nine-three-seven-five");
     printf("%s.\n", cs.str);
 
     cstr_insert(&cs, 3, "-two");
@@ -34,7 +34,7 @@ void stringdemo1()
 }
 
 
-declare_cvec(ix, int64_t); // ix is just an example tag name.
+cdef_cvec(ix, int64_t); // ix is just an example tag name.
 
 void vectordemo1()
 {
@@ -55,7 +55,7 @@ void vectordemo1()
 
 
 
-declare_cvec_str();
+cdef_cvec_str();
 
 void vectordemo2()
 {
@@ -69,11 +69,11 @@ void vectordemo2()
 
     cvec_str_sort(&names);                     // Sort the array
     c_foreach (i, cvec_str, names)
-        printf("sorted: %s\n", i.item->str);
+        printf("sorted: %s\n", i.get->str);
     cvec_str_destroy(&names);
 }
 
-declare_clist(ix, int);
+cdef_clist(ix, int);
 
 void listdemo1()
 {
@@ -84,23 +84,23 @@ void listdemo1()
     for (int i = 100; i < 110; ++i)
         clist_ix_push_back(&nums2, i);
     c_foreach (i, clist_ix, nums)
-        printf("value: %d\n", i.item->value);
+        printf("value: %d\n", i.get->value);
     /* merge/append nums2 to nums */
     clist_ix_splice_front(&nums, &nums2);
     c_foreach (i, clist_ix, nums)
-        printf("spliced: %d\n", i.item->value);
+        printf("spliced: %d\n", i.get->value);
 
-    clist_ix_find(&nums, 100).item->value *= 10;
+    clist_ix_find(&nums, 100).get->value *= 10;
     clist_ix_sort(&nums);                     // Sort the array
     clist_ix_remove(&nums, 105);
     clist_ix_pop_front(&nums);
     clist_ix_push_front(&nums, -99);
     c_foreach (i, clist_ix, nums)
-        printf("sorted: %d\n", i.item->value);
+        printf("sorted: %d\n", i.get->value);
     clist_ix_destroy(&nums);
 }
 
-declare_cset(i, int);
+cdef_cset(i, int);
 
 void setdemo1()
 {
@@ -110,12 +110,12 @@ void setdemo1()
     cset_i_insert(&nums, 11);
 
     c_foreach (i, cset_i, nums)
-        printf("set: %d\n", i.item->value);
+        printf("set: %d\n", i.get->value);
     cset_i_destroy(&nums);
 }
 
 
-declare_cmap(ii, int, int);
+cdef_cmap(ii, int, int);
 
 void mapdemo1()
 {
@@ -128,7 +128,7 @@ void mapdemo1()
 }
 
 
-declare_cmap_strkey(si, int); // Shorthand macro for the general declare_cmap expansion.
+cdef_cmap_strkey(si, int); // Shorthand macro for the general cdef_cmap expansion.
 
 void mapdemo2()
 {
@@ -139,18 +139,18 @@ void mapdemo2()
     cmap_si_put(&nums, "Groovy", 200); // overwrite previous
 
     // iterate the map:
-    for (cmap_si_iter_t i = cmap_si_begin(&nums); i.item != cmap_si_end(&nums).item; cmap_si_next(&i))
-        printf("long: %s: %d\n", i.item->first.str, i.item->second);
+    for (cmap_si_iter_t i = cmap_si_begin(&nums); i.get != cmap_si_end(&nums).get; cmap_si_next(&i))
+        printf("long: %s: %d\n", i.get->first.str, i.get->second);
 
     // or rather use the short form:
     c_foreach (i, cmap_si, nums)
-        printf("short: %s: %d\n", i.item->first.str, i.item->second);
+        printf("short: %s: %d\n", i.get->first.str, i.get->second);
 
     cmap_si_destroy(&nums);
 }
 
 
-declare_cmap_str();
+cdef_cmap_str();
 
 void mapdemo3()
 {
@@ -161,18 +161,18 @@ void mapdemo3()
     cmap_str_put(&table, "Sunny", "day");
     cmap_str_value_t *e = cmap_str_find(&table, "Make");
     c_foreach (i, cmap_str, table)
-        printf("entry: %s: %s\n", i.item->first.str, i.item->second.str);
+        printf("entry: %s: %s\n", i.get->first.str, i.get->second.str);
     printf("size %zu: remove: Make: %s\n", cmap_size(table), e->second.str);
     cmap_str_erase(&table, "Make");
 
     printf("size %zu\n", cmap_size(table));
     c_foreach (i, cmap_str, table)
-        printf("entry: %s: %s\n", i.item->first.str, i.item->second.str);
+        printf("entry: %s: %s\n", i.get->first.str, i.get->second.str);
     cmap_str_destroy(&table); // frees key and value CStrs, and hash table (CVec).
 }
 
 
-declare_carray(f, float);
+cdef_carray(f, float);
 
 void arraydemo1()
 {
@@ -190,7 +190,7 @@ void arraydemo1()
     printf("%f\n", *carray3f_at(&a3, 5, 4, 3)); // lookup a3[5][4][3] (=10.2f)
 
     c_foreach (i, carray3f, a3)
-        *i.item = 1.0f;
+        *i.get = 1.0f;
     printf("%f\n", *carray3f_at(&a3, 29, 19, 9));
 
     carray2f_destroy(&a2); // does nothing, since it is a sub-array.
