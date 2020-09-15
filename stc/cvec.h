@@ -32,18 +32,18 @@
 #define cvec_capacity(v)   _cvec_safe_capacity((v).data)
 #define cvec_empty(v)      (cvec_size(v) == 0)
 
-#define cdef_cvec(...)   c_MACRO_OVERLOAD(cdef_cvec, __VA_ARGS__)
-#define cdef_cvec_2(X, Value) \
-                            cdef_cvec_3(X, Value, c_default_destroy)
-#define cdef_cvec_3(X, Value, valueDestroy) \
-                            cdef_cvec_4(X, Value, valueDestroy, c_default_compare)
-#define cdef_cvec_4(X, Value, valueDestroy, valueCompare) \
-                            cdef_cvec_7(X, Value, valueDestroy, valueCompare, Value, c_default_to_raw, c_default_from_raw)
-#define cdef_cvec_str() \
-                            cdef_cvec_7(str, cstr_t, cstr_destroy, cstr_compare_raw, const char*, cstr_to_raw, cstr)
+#define c_cvec(...) c_MACRO_OVERLOAD(c_cvec, __VA_ARGS__)
+#define c_cvec_2(X, Value) \
+                    c_cvec_3(X, Value, c_default_destroy)
+#define c_cvec_3(X, Value, valueDestroy) \
+                    c_cvec_4(X, Value, valueDestroy, c_default_compare)
+#define c_cvec_4(X, Value, valueDestroy, valueCompare) \
+                    c_cvec_7(X, Value, valueDestroy, valueCompare, Value, c_default_to_raw, c_default_from_raw)
+#define c_cvec_str() \
+                    c_cvec_7(str, cstr_t, cstr_destroy, cstr_compare_raw, const char*, cstr_to_raw, cstr)
 
 
-#define cdef_cvec_7(X, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw) \
+#define c_cvec_7(X, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw) \
 \
     typedef struct cvec_##X { \
         Value* data; \

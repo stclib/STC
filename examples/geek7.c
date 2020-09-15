@@ -27,9 +27,9 @@ After inserting all the elements excluding the ones which are to be deleted, Pop
 #include <stc/cvec.h>
 #include <stc/cpqueue.h>
 
-cdef_cmap(ii, int, int);
-cdef_cvec(i, int);
-cdef_cpqueue(i, cvec_i, >);
+c_cmap(ii, int, int);
+c_cvec(i, int);
+c_cpqueue(i, cvec_i, >);
 
 // Find k minimum element from arr[0..m-1] after deleting
 // elements from del[0..n-1]

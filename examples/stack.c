@@ -3,10 +3,10 @@
 #include <stc/cstr.h>
 #include <stc/cstack.h>
 
-cdef_cvec(i, int);
-cdef_cvec(c, char);
-cdef_cstack(i, cvec_i);
-cdef_cstack(c, cvec_c);
+c_cvec(i, int);
+c_cvec(c, char);
+c_cstack(i, cvec_i);
+c_cstack(c, cvec_c);
 
 int main() {
     cstack_i stack = cstack_i_init();

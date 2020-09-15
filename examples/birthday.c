@@ -7,7 +7,7 @@
 #include <stc/cvec.h>
 #include <stc/cstr.h>
 
-cdef_cmap(ic, uint64_t, uint8_t);
+c_cmap(ic, uint64_t, uint8_t);
 
 const static uint64_t seed = 1234;
 const static uint64_t N = 1ull << 27;
@@ -29,8 +29,8 @@ void repeats(void)
 }
 
 
-cdef_cmap(x, uint32_t, uint64_t);
-cdef_cvec(x, uint64_t);
+c_cmap(x, uint32_t, uint64_t);
+c_cvec(x, uint64_t);
 
 void distribution(void)
 {

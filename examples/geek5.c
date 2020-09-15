@@ -21,8 +21,8 @@ Output: 0
 #include <stc/cvec.h>
 #include <stc/cstr.h>
 
-cdef_cvec(i, int);
-cdef_cmap_strkey(sv, cvec_i, cvec_i_destroy);
+c_cvec(i, int);
+c_cmap_strkey(sv, cvec_i, cvec_i_destroy);
 
   
 // Function to return the number of occurrences of 

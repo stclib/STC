@@ -23,8 +23,8 @@
 /*
 #include <stdio.h>
 #include <stc/cmap.h>
-cdef_cset(sx, int);       // Set of int
-cdef_cmap(mx, int, char); // Map of int -> char
+c_cset(sx, int);       // Set of int
+c_cmap(mx, int, char); // Map of int -> char
 
 int main(void) {
     cset_sx s = cset_ini;
@@ -77,73 +77,73 @@ int main(void) {
 enum {chash_HASH = 0x7f, chash_USED = 0x80};
 typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 
-#define cdef_cmap(...) \
-    c_MACRO_OVERLOAD(cdef_cmap, __VA_ARGS__)
+#define c_cmap(...) \
+    c_MACRO_OVERLOAD(c_cmap, __VA_ARGS__)
 
-#define cdef_cmap_3(X, Key, Mapped) \
-    cdef_cmap_4(X, Key, Mapped, c_default_destroy)
+#define c_cmap_3(X, Key, Mapped) \
+    c_cmap_4(X, Key, Mapped, c_default_destroy)
 
-#define cdef_cmap_4(X, Key, Mapped, valueDestroy) \
-    cdef_cmap_6(X, Key, Mapped, valueDestroy, c_default_equals, c_default_hash16)
+#define c_cmap_4(X, Key, Mapped, valueDestroy) \
+    c_cmap_6(X, Key, Mapped, valueDestroy, c_default_equals, c_default_hash16)
 
-#define cdef_cmap_6(X, Key, Mapped, valueDestroy, keyEquals, keyHash) \
-    cdef_cmap_10(X, Key, Mapped, valueDestroy, keyEquals, keyHash, \
-                       c_default_destroy, Key, c_default_to_raw, c_default_from_raw)
+#define c_cmap_6(X, Key, Mapped, valueDestroy, keyEquals, keyHash) \
+    c_cmap_10(X, Key, Mapped, valueDestroy, keyEquals, keyHash, \
+                 c_default_destroy, Key, c_default_to_raw, c_default_from_raw)
 
-#define cdef_cmap_10(X, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
-                             keyDestroy, RawKey, keyToRaw, keyFromRaw) \
+#define c_cmap_10(X, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
+                     keyDestroy, RawKey, keyToRaw, keyFromRaw) \
     _declare_CHASH(X, cmap, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
                       keyDestroy, RawKey, keyToRaw, keyFromRaw, Mapped, c_default_from_raw)
 
 /* cset: */
-#define cdef_cset(...) \
-    c_MACRO_OVERLOAD(cdef_cset, __VA_ARGS__)
+#define c_cset(...) \
+    c_MACRO_OVERLOAD(c_cset, __VA_ARGS__)
 
-#define cdef_cset_2(X, Key) \
-    cdef_cset_4(X, Key, c_default_equals, c_default_hash16)
+#define c_cset_2(X, Key) \
+    c_cset_4(X, Key, c_default_equals, c_default_hash16)
 
-#define cdef_cset_4(X, Key, keyEquals, keyHash) \
-    cdef_cset_5(X, Key, keyEquals, keyHash, c_default_destroy)
+#define c_cset_4(X, Key, keyEquals, keyHash) \
+    c_cset_5(X, Key, keyEquals, keyHash, c_default_destroy)
 
-#define cdef_cset_5(X, Key, keyEquals, keyHash, keyDestroy) \
-    cdef_cset_8(X, Key, keyEquals, keyHash, keyDestroy, \
-                      Key, c_default_to_raw, c_default_from_raw)
+#define c_cset_5(X, Key, keyEquals, keyHash, keyDestroy) \
+    c_cset_8(X, Key, keyEquals, keyHash, keyDestroy, \
+                Key, c_default_to_raw, c_default_from_raw)
 
-#define cdef_cset_8(X, Key, keyEqualsRaw, keyHashRaw, keyDestroy, \
-                          RawKey, keyToRaw, keyFromRaw) \
+#define c_cset_8(X, Key, keyEqualsRaw, keyHashRaw, keyDestroy, \
+                    RawKey, keyToRaw, keyFromRaw) \
     _declare_CHASH(X, cset, Key, Key, void, keyEqualsRaw, keyHashRaw, \
-                     keyDestroy, RawKey, keyToRaw, keyFromRaw, void, c_default_from_raw)
+                      keyDestroy, RawKey, keyToRaw, keyFromRaw, void, c_default_from_raw)
 
 /* cset_str, cmap_str, cmap_strkey, cmap_strval: */
-#define cdef_cset_str() \
+#define c_cset_str() \
     _declare_CHASH_strkey(str, cset, cstr_t, void)
 
-#define cdef_cmap_str() \
+#define c_cmap_str() \
     _declare_CHASH(str, cmap, cstr_t, cstr_t, cstr_destroy, cstr_equals_raw, cstr_hash_raw, \
-                       cstr_destroy, const char*, cstr_to_raw, cstr, const char*, cstr)
+                        cstr_destroy, const char*, cstr_to_raw, cstr, const char*, cstr)
 
-#define cdef_cmap_strkey(...) \
-    c_MACRO_OVERLOAD(cdef_cmap_strkey, __VA_ARGS__)
+#define c_cmap_strkey(...) \
+    c_MACRO_OVERLOAD(c_cmap_strkey, __VA_ARGS__)
 
-#define cdef_cmap_strkey_2(X, Mapped) \
+#define c_cmap_strkey_2(X, Mapped) \
     _declare_CHASH_strkey(X, cmap, Mapped, c_default_destroy)
 
-#define cdef_cmap_strkey_3(X, Mapped, ValueDestroy) \
+#define c_cmap_strkey_3(X, Mapped, ValueDestroy) \
     _declare_CHASH_strkey(X, cmap, Mapped, ValueDestroy)
 
-#define cdef_cmap_strval(...) \
-    c_MACRO_OVERLOAD(cdef_cmap_strval, __VA_ARGS__)
+#define c_cmap_strval(...) \
+    c_MACRO_OVERLOAD(c_cmap_strval, __VA_ARGS__)
 
-#define cdef_cmap_strval_2(X, Key) \
-    cdef_cmap_strval_4(X, Key, c_default_equals, c_default_hash16)
+#define c_cmap_strval_2(X, Key) \
+    c_cmap_strval_4(X, Key, c_default_equals, c_default_hash16)
 
-#define cdef_cmap_strval_4(X, Key, keyEquals, keyHash) \
+#define c_cmap_strval_4(X, Key, keyEquals, keyHash) \
     _declare_CHASH(X, cmap, Key, cstr_t, cstr_destroy, keyEquals, keyHash, \
-                       c_default_destroy, Key, c_default_to_raw, c_default_from_raw, const char*, cstr)
+                      c_default_destroy, Key, c_default_to_raw, c_default_from_raw, const char*, cstr)
 
 #define _declare_CHASH_strkey(X, ctype, Mapped, valueDestroy) \
     _declare_CHASH(X, ctype, cstr_t, Mapped, valueDestroy, cstr_equals_raw, cstr_hash_raw, \
-                       cstr_destroy, const char*, cstr_to_raw, cstr, Mapped, c_default_from_raw)
+                      cstr_destroy, const char*, cstr_to_raw, cstr, Mapped, c_default_from_raw)
 
 #define CSET_ONLY_cset(...) __VA_ARGS__
 #define CSET_ONLY_cmap(...)

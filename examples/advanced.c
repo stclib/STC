@@ -50,8 +50,8 @@ Viking viking_fromVw(VikingVw vw) {
     Viking vk = {cstr(vw.name), cstr(vw.country)}; return vk;
 }
 
-// Using the full cdef_cmap() macro to define [Viking -> int] hash map type:
-cdef_cmap(vk, Viking, int, c_default_destroy, vikingvw_equals, vikingvw_hash, 
+// Using the full c_cmap() macro to define [Viking -> int] hash map type:
+c_cmap(vk, Viking, int, c_default_destroy, vikingvw_equals, vikingvw_hash, 
                  viking_destroy, VikingVw, viking_toVw, viking_fromVw);
 
 // cmap_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test.

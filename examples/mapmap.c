@@ -3,8 +3,8 @@
 #include <stc/cmap.h>
 #include <stc/cstr.h>
 
-cdef_cmap_str();
-cdef_cmap_strkey(cfg, cmap_str, cmap_str_destroy);
+c_cmap_str();
+c_cmap_strkey(cfg, cmap_str, cmap_str_destroy);
 
 int main(void) {
     cmap_cfg config = cmap_ini;

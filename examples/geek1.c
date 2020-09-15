@@ -12,7 +12,7 @@ int a[] = { 1, 2, 2, 3, 2, 4, 10 };
 #include <stdio.h>
 #include <stc/cmap.h>
 
-cdef_cmap(ii, int, int);
+c_cmap(ii, int, int);
   
 // Function to maximize the number of pairs 
 int findMaximumPairs(int a[], int n, int k) 

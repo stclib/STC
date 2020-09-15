@@ -3,8 +3,8 @@
 #include <stc/cmap.h>
 #include <stc/cstr.h>
 
-cdef_cmap_str();
-cdef_cset_str();
+c_cmap_str();
+c_cset_str();
 
 int main() 
 { 

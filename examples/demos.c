@@ -34,7 +34,7 @@ void stringdemo1()
 }
 
 
-cdef_cvec(ix, int64_t); // ix is just an example tag name.
+c_cvec(ix, int64_t); // ix is just an example tag name.
 
 void vectordemo1()
 {
@@ -55,7 +55,7 @@ void vectordemo1()
 
 
 
-cdef_cvec_str();
+c_cvec_str();
 
 void vectordemo2()
 {
@@ -73,7 +73,7 @@ void vectordemo2()
     cvec_str_destroy(&names);
 }
 
-cdef_clist(ix, int);
+c_clist(ix, int);
 
 void listdemo1()
 {
@@ -100,7 +100,7 @@ void listdemo1()
     clist_ix_destroy(&nums);
 }
 
-cdef_cset(i, int);
+c_cset(i, int);
 
 void setdemo1()
 {
@@ -115,7 +115,7 @@ void setdemo1()
 }
 
 
-cdef_cmap(ii, int, int);
+c_cmap(ii, int, int);
 
 void mapdemo1()
 {
@@ -128,7 +128,7 @@ void mapdemo1()
 }
 
 
-cdef_cmap_strkey(si, int); // Shorthand macro for the general cdef_cmap expansion.
+c_cmap_strkey(si, int); // Shorthand macro for the general c_cmap expansion.
 
 void mapdemo2()
 {
@@ -150,7 +150,7 @@ void mapdemo2()
 }
 
 
-cdef_cmap_str();
+c_cmap_str();
 
 void mapdemo3()
 {
@@ -172,7 +172,7 @@ void mapdemo3()
 }
 
 
-cdef_carray(f, float);
+c_carray(f, float);
 
 void arraydemo1()
 {
