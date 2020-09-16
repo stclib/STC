@@ -97,7 +97,7 @@
     while (__i != __last) = *__i++ = __val; \
 } while (0)
 
-#define c_destroy(ctype, ...) do { \
+#define c_dtor(ctype, ...) do { \
     struct ctype* __arr[] = {__VA_ARGS__}; \
     for (size_t i=0; i<sizeof(__arr)/sizeof(__arr[0]); ++i) \
         ctype##_destroy(__arr[i]); \

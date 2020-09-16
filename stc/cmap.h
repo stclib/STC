@@ -87,12 +87,17 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 
 #define typedef_cmap_6(X, Key, Mapped, valueDestroy, keyEquals, keyHash) \
     typedef_cmap_10(X, Key, Mapped, valueDestroy, keyEquals, keyHash, \
-                 c_default_destroy, Key, c_default_to_raw, c_default_from_raw)
+                    c_default_destroy, Key, c_default_to_raw, c_default_from_raw)
 
 #define typedef_cmap_10(X, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
-                     keyDestroy, RawKey, keyToRaw, keyFromRaw) \
+                        keyDestroy, RawKey, keyToRaw, keyFromRaw) \
     _c_typedef_CHASH(X, cmap, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
                         keyDestroy, RawKey, keyToRaw, keyFromRaw, Mapped, c_default_from_raw)
+
+#define typedef_cmap_12(X, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
+                        keyDestroy, RawKey, keyToRaw, keyFromRaw, RawVal, valueFromRaw) \
+    _c_typedef_CHASH(X, cmap, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
+                        keyDestroy, RawKey, keyToRaw, keyFromRaw, RawVal, valueFromRaw)
 
 /* cset: */
 #define typedef_cset(...) \
@@ -137,8 +142,13 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     typedef_cmap_strval_4(X, Key, c_default_equals, c_default_hash16)
 
 #define typedef_cmap_strval_4(X, Key, keyEquals, keyHash) \
+    typedef_cmap_strval_8(X, Key, keyEquals, keyHash, \
+                             c_default_destroy, Key, c_default_to_raw, c_default_from_raw)
+
+#define typedef_cmap_strval_8(X, Key, keyEquals, keyHash, keyDestroy, RawKey, keyToRaw, keyFromRaw) \
     _c_typedef_CHASH(X, cmap, Key, cstr_t, cstr_destroy, keyEquals, keyHash, \
-                        c_default_destroy, Key, c_default_to_raw, c_default_from_raw, const char*, cstr)
+                        keyDestroy, RawKey, keyToRaw, keyFromRaw, const char*, cstr)
+
 
 #define _c_declare_CHASH_strkey(X, ctype, Mapped, valueDestroy) \
     _c_typedef_CHASH(X, ctype, cstr_t, Mapped, valueDestroy, cstr_equals_raw, cstr_hash_raw, \
