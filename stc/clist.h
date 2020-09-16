@@ -55,7 +55,6 @@
         clist_ix_destroy(&list);
     }
 */
-
 #define typedef_clist(...)   c_MACRO_OVERLOAD(typedef_clist, __VA_ARGS__)
 
 #define typedef_clist_2(X, Value) \
@@ -82,7 +81,7 @@
 \
     typedef struct { \
         clist_##X##_node_t* const* _last; \
-        clist_##X##_node_t* get; \
+        clist_##X##_value_t* get; \
         int _state; \
     } clist_##X##_iter_t
 
@@ -97,8 +96,10 @@
         __pos = ctype##_emplace_after(__self, __pos, __arr[__i]); \
 } while (0)
 
+
 typedef_clist_types(void, int);
 STC_API size_t _clist_size(const clist_void* self);
+#define _clist_node(X, vp) c_container_of(vp, clist_##X##_node_t, value)
 
 #define typedef_clist_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
 \
@@ -139,16 +140,18 @@ STC_API size_t _clist_size(const clist_void* self);
 \
     STC_INLINE clist_##X##_iter_t \
     clist_##X##_before_begin(const clist_##X* self) { \
-        clist_##X##_iter_t it = {&self->last, self->last, -1}; return it; \
+        clist_##X##_value_t *before = self->last ? &self->last->value : NULL; \
+        clist_##X##_iter_t it = {&self->last, before, -1}; return it; \
     } \
     STC_INLINE clist_##X##_iter_t \
     clist_##X##_begin(const clist_##X* self) { \
-        clist_##X##_node_t* head = self->last ? self->last->next : NULL; \
+        clist_##X##_value_t* head = self->last ? &self->last->next->value : NULL; \
         clist_##X##_iter_t it = {&self->last, head, 0}; return it; \
     } \
     STC_INLINE clist_##X##_iter_t \
     clist_##X##_last(const clist_##X* self) { \
-        clist_##X##_iter_t it = {&self->last, self->last, 0}; return it; \
+        clist_##X##_value_t *last = self->last ? &self->last->value : NULL; \
+        clist_##X##_iter_t it = {&self->last, last, 0}; return it; \
     } \
     STC_INLINE clist_##X##_iter_t \
     clist_##X##_end(const clist_##X* self) { \
@@ -156,11 +159,12 @@ STC_API size_t _clist_size(const clist_void* self);
     } \
     STC_INLINE void \
     clist_##X##_next(clist_##X##_iter_t* it) { \
-        it->get = ((it->_state += it->get == *it->_last) == 1) ? NULL : it->get->next; \
+        clist_##X##_node_t* node = _clist_node(X, it->get); \
+        it->get = ((it->_state += node == *it->_last) == 1) ? NULL : &node->next->value; \
     } \
     STC_INLINE clist_##X##_value_t* \
-    clist_##X##_itval(clist_##X##_iter_t it) {return &it.get->value;} \
-\
+    clist_##X##_itval(clist_##X##_iter_t it) {return it.get;} \
+    \
     STC_API clist_##X##_iter_t \
     clist_##X##_insert_after(clist_##X* self, clist_##X##_iter_t pos, Value value); \
     STC_INLINE clist_##X##_iter_t \
@@ -175,10 +179,8 @@ STC_API size_t _clist_size(const clist_void* self);
         return pos; \
     } \
 \
-    STC_INLINE void \
-    clist_##X##_splice_after(clist_##X* self, clist_##X##_iter_t pos, clist_##X* other) { \
-        _clist_splice_after((clist_void *) self, *(clist_void_iter_t *) &pos, (clist_void *) other); \
-    } \
+    STC_API void \
+    clist_##X##_splice_after(clist_##X* self, clist_##X##_iter_t pos, clist_##X* other); \
     STC_INLINE void \
     clist_##X##_splice_front(clist_##X* self, clist_##X* other) { \
         clist_##X##_splice_after(self, clist_##X##_before_begin(self), other); \
@@ -237,13 +239,14 @@ STC_API size_t _clist_size(const clist_void* self);
 \
     STC_API clist_##X##_iter_t \
     clist_##X##_insert_after(clist_##X* self, clist_##X##_iter_t pos, Value value) { \
-        _c_clist_insert_after(self, X, pos.get, value); \
-        if (pos.get == self->last && pos._state == 0) self->last = entry; \
-        pos.get = entry; return pos; \
+        clist_##X##_node_t* node = pos.get ? _clist_node(X, pos.get) : NULL; \
+        _c_clist_insert_after(self, X, node, value); \
+        if (node == self->last && pos._state == 0) self->last = entry; \
+        pos.get = &entry->value; return pos; \
     } \
     STC_API clist_##X##_iter_t \
     clist_##X##_erase_after(clist_##X* self, clist_##X##_iter_t pos) { \
-        _c_clist_erase_after(self, X, pos.get, valueDestroy); \
+        _c_clist_erase_after(self, X, _clist_node(X, pos.get), valueDestroy); \
         clist_##X##_next(&pos); return pos; \
     } \
 \
@@ -251,7 +254,7 @@ STC_API size_t _clist_size(const clist_void* self);
     clist_##X##_find_before(const clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t finish, RawValue val) { \
         clist_##X##_iter_t i = first; \
         for (clist_##X##_next(&i); i.get != finish.get; clist_##X##_next(&i)) { \
-            RawValue r = valueToRaw(&i.get->value); \
+            RawValue r = valueToRaw(i.get); \
             if (valueCompareRaw(&r, &val) == 0) return first; \
             first = i; \
         } \
@@ -274,6 +277,19 @@ STC_API size_t _clist_size(const clist_void* self);
         return n; \
     } \
 \
+    STC_API void \
+    clist_##X##_splice_after(clist_##X* self, clist_##X##_iter_t pos, clist_##X* other) { \
+        if (!pos.get) \
+            self->last = other->last; \
+        else if (other->last) { \
+            clist_##X##_node_t *node = _clist_node(X, pos.get), *next = node->next; \
+            node->next = other->last->next; \
+            other->last->next = next; \
+            if (node == self->last && pos._state == 0) self->last = other->last; \
+        } \
+        other->last = NULL; \
+    } \
+\
     static inline int \
     clist_##X##_sort_compare(const void* x, const void* y) { \
         RawValue a = valueToRaw(&((clist_##X##_node_t *) x)->value); \
@@ -290,7 +306,7 @@ STC_API size_t _clist_size(const clist_void* self);
 
 #define _c_clist_insert_after(self, X, node, val) \
     clist_##X##_node_t *entry = c_new (clist_##X##_node_t), \
-                         *next = self->last ? node->next : entry; \
+                       *next = self->last ? node->next : entry; \
     entry->value = val; \
     entry->next = next; \
     if (node) node->next = entry
@@ -303,20 +319,6 @@ STC_API size_t _clist_size(const clist_void* self);
     else if (self->last == del) self->last = node; \
     valueDestroy(&del->value); \
     free(del)
-
-
-STC_API void
-_clist_splice_after(clist_void* self, clist_void_iter_t pos, clist_void* other) {
-    if (!pos.get)
-        self->last = other->last;
-    else if (other->last) {
-        clist_void_node_t *next = pos.get->next;
-        pos.get->next = other->last->next;
-        other->last->next = next;
-        if (pos.get == self->last && pos._state == 0) self->last = other->last;
-    }
-    other->last = NULL;
-}
 
 STC_API size_t
 _clist_size(const clist_void* self) {

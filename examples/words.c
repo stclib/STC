@@ -18,7 +18,7 @@ int main1()
     });
     clist_str_push_back(&lwords, cstr_from("%f", 123897.0 / 23.0));
     c_foreach (w, clist_str, lwords)
-        printf("%s\n", w.get->value.str);
+        printf("%s\n", w.get->str);
     puts("");
 
     cvec_str words = cvec_ini;

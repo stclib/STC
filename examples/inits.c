@@ -109,7 +109,7 @@ int main(void) {
     clist_ip_sort(&pairs2);
 
     c_foreach (i, clist_ip, pairs2)
-        printf("(%d %d) ", i.get->value.x, i.get->value.y);
+        printf("(%d %d) ", i.get->x, i.get->y);
     puts("");
     clist_ip_destroy(&pairs2);
 }

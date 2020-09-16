@@ -84,19 +84,19 @@ void listdemo1()
     for (int i = 100; i < 110; ++i)
         clist_ix_push_back(&nums2, i);
     c_foreach (i, clist_ix, nums)
-        printf("value: %d\n", i.get->value);
+        printf("value: %d\n", *i.get);
     /* merge/append nums2 to nums */
     clist_ix_splice_front(&nums, &nums2);
     c_foreach (i, clist_ix, nums)
-        printf("spliced: %d\n", i.get->value);
+        printf("spliced: %d\n", *i.get);
 
-    clist_ix_find(&nums, 100).get->value *= 10;
+    *clist_ix_find(&nums, 100).get *= 10;
     clist_ix_sort(&nums);                     // Sort the array
     clist_ix_remove(&nums, 105);
     clist_ix_pop_front(&nums);
     clist_ix_push_front(&nums, -99);
     c_foreach (i, clist_ix, nums)
-        printf("sorted: %d\n", i.get->value);
+        printf("sorted: %d\n", *i.get);
     clist_ix_destroy(&nums);
 }
 
@@ -110,7 +110,7 @@ void setdemo1()
     cset_i_insert(&nums, 11);
 
     c_foreach (i, cset_i, nums)
-        printf("set: %d\n", i.get->value);
+        printf("set: %d\n", *i.get);
     cset_i_destroy(&nums);
 }
 

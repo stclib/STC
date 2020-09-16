@@ -64,6 +64,8 @@
 #define c_new(T)        ((T *) malloc(sizeof(T)))
 #define c_new_n(T, n)   ((T *) malloc(sizeof(T) * (n)))
 #define c_static_assert(cond, msg) typedef char static_assert_##msg[(cond) ? 1 : -1]
+#define c_container_of(ptr, type, member) \
+                        ((type *)((char *)(ptr) - offsetof(type, member)))
 
 #define c_max_alloca    (512)
 #define c_swap(T, x, y) do { T __t = x; x = y; y = __t; } while (0)
