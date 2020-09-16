@@ -4,9 +4,9 @@
 #include <stc/clist.h>
 #include <stc/cvec.h>
 
-c_cvec_str();
-c_clist_str();
-c_cmap_strkey(si, int);
+typedef_cvec_str();
+typedef_clist_str();
+typedef_cmap_strkey(si, int);
 
 
 int main1()

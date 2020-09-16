@@ -26,8 +26,8 @@
     #include <stc/cstack.h>
     #include <stdio.h>
 
-    c_cvec(i, int);
-    c_cstack(i, cvec_i);
+    typedef_cvec(i, int);
+    typedef_cstack(i, cvec_i);
 
     int main() {
         cstack_i stack = cstack_i_init();
@@ -47,7 +47,7 @@
 
 #include "cvec.h"
 
-#define c_cstack(X, ctype) \
+#define typedef_cstack(X, ctype) \
 \
     typedef struct ctype cstack_##X; \
     typedef ctype##_value_t cstack_##X##_value_t; \

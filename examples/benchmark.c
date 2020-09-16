@@ -22,7 +22,7 @@ static inline uint32_t fibonacci_hash(const void* data, size_t len) {
 }
 
 // cmap and khash template expansion
-c_cmap(ii, int64_t, int64_t, c_default_destroy, c_default_equals, fibonacci_hash);
+typedef_cmap(ii, int64_t, int64_t, c_default_destroy, c_default_equals, fibonacci_hash);
 KHASH_MAP_INIT_INT64(ii, int64_t)
 
 
@@ -34,100 +34,100 @@ crand_rng64_t rng;
 #define RAND(N) (crand_i64(&rng) & ((1 << N) - 1))
 
 
-#define CMAP_SETUP(tt, Key, Value) cmap_##tt map = cmap_ini \
-                                    ; cmap_##tt##_set_load_factors(&map, max_load_factor, 0.0)
-#define CMAP_PUT(tt, key, val)     cmap_##tt##_put(&map, key, val).first->second
-#define CMAP_EMPLACE(tt, key, val) cmap_##tt##_emplace(&map, key, val)
-#define CMAP_ERASE(tt, key)        cmap_##tt##_erase(&map, key)
-#define CMAP_FIND(tt, key)         (cmap_##tt##_find(map, key) != NULL)
-#define CMAP_FOR(tt, i)            c_foreach (i, cmap_##tt, map)
-#define CMAP_ITEM(tt, i)           i.get->second
-#define CMAP_SIZE(tt)              cmap_size(map)
-#define CMAP_BUCKETS(tt)           cmap_bucket_count(map)
-#define CMAP_CLEAR(tt)             cmap_##tt##_clear(&map)
-#define CMAP_DTOR(tt)              cmap_##tt##_destroy(&map)
+#define CMAP_SETUP(X, Key, Value) cmap_##X map = cmap_ini \
+                                  ; cmap_##X##_set_load_factors(&map, max_load_factor, 0.0)
+#define CMAP_PUT(X, key, val)     cmap_##X##_put(&map, key, val).first->second
+#define CMAP_EMPLACE(X, key, val) cmap_##X##_emplace(&map, key, val)
+#define CMAP_ERASE(X, key)        cmap_##X##_erase(&map, key)
+#define CMAP_FIND(X, key)         (cmap_##X##_find(map, key) != NULL)
+#define CMAP_FOR(X, i)            c_foreach (i, cmap_##X, map)
+#define CMAP_ITEM(X, i)           i.get->second
+#define CMAP_SIZE(X)              cmap_size(map)
+#define CMAP_BUCKETS(X)           cmap_##X##_bucket_count(map)
+#define CMAP_CLEAR(X)             cmap_##X##_clear(&map)
+#define CMAP_DTOR(X)              cmap_##X##_destroy(&map)
 
-#define KMAP_SETUP(tt, Key, Value) khash_t(ii)* map = kh_init(ii); khiter_t ki; int ret
-#define KMAP_PUT(tt, key, val)     (*(ki = kh_put(ii, map, key, &ret), map->vals[ki] = val, &map->vals[ki]))
-#define KMAP_EMPLACE(tt, key, val)  (ki = kh_put(ii, map, key, &ret), ret ? (map->vals[ki] = val) : val)
-#define KMAP_ERASE(tt, key)        ((ki = kh_get(ii, map, key)) != kh_end(map) ? kh_del(ii, map, ki), 1 : 0)
-#define KMAP_FIND(tt, key)         (kh_get(ii, map, key) != kh_end(map))
-#define KMAP_SIZE(tt)              kh_size(map)
-#define KMAP_BUCKETS(tt)           kh_n_buckets(map)
-#define KMAP_CLEAR(tt)             kh_clear(ii, map)
-#define KMAP_DTOR(tt)              kh_destroy(ii, map)
+#define KMAP_SETUP(X, Key, Value) khash_t(ii)* map = kh_init(ii); khiter_t ki; int ret
+#define KMAP_PUT(X, key, val)     (*(ki = kh_put(ii, map, key, &ret), map->vals[ki] = val, &map->vals[ki]))
+#define KMAP_EMPLACE(X, key, val)  (ki = kh_put(ii, map, key, &ret), ret ? (map->vals[ki] = val) : val)
+#define KMAP_ERASE(X, key)        ((ki = kh_get(ii, map, key)) != kh_end(map) ? kh_del(ii, map, ki), 1 : 0)
+#define KMAP_FIND(X, key)         (kh_get(ii, map, key) != kh_end(map))
+#define KMAP_SIZE(X)              kh_size(map)
+#define KMAP_BUCKETS(X)           kh_n_buckets(map)
+#define KMAP_CLEAR(X)             kh_clear(ii, map)
+#define KMAP_DTOR(X)              kh_destroy(ii, map)
 
-#define UMAP_SETUP(tt, Key, Value) std::unordered_map<Key, Value> map; map.max_load_factor(max_load_factor)
-#define UMAP_PUT(tt, key, val)     (map[key] = val)
-#define UMAP_EMPLACE(tt, key, val) map.emplace(key, val)
-#define UMAP_FIND(tt, key)         (map.find(key) != map.end())
-#define UMAP_ERASE(tt, key)        map.erase(key)
-#define UMAP_FOR(tt, i)            for (auto i: map)
-#define UMAP_ITEM(tt, i)           i.second
-#define UMAP_SIZE(tt)              map.size()
-#define UMAP_BUCKETS(tt)           map.bucket_count()
-#define UMAP_CLEAR(tt)             map.clear()
-#define UMAP_DTOR(tt)              destroy_me(map)
+#define UMAP_SETUP(X, Key, Value) std::unordered_map<Key, Value> map; map.max_load_factor(max_load_factor)
+#define UMAP_PUT(X, key, val)     (map[key] = val)
+#define UMAP_EMPLACE(X, key, val) map.emplace(key, val)
+#define UMAP_FIND(X, key)         (map.find(key) != map.end())
+#define UMAP_ERASE(X, key)        map.erase(key)
+#define UMAP_FOR(X, i)            for (auto i: map)
+#define UMAP_ITEM(X, i)           i.second
+#define UMAP_SIZE(X)              map.size()
+#define UMAP_BUCKETS(X)           map.bucket_count()
+#define UMAP_CLEAR(X)             map.clear()
+#define UMAP_DTOR(X)              destroy_me(map)
 
-#define BMAP_SETUP(tt, Key, Value) ska::bytell_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
-#define BMAP_PUT(tt, key, val)     UMAP_PUT(tt, key, val)
-#define BMAP_EMPLACE(tt, key, val) UMAP_EMPLACE(tt, key, val)
-#define BMAP_FIND(tt, key)         UMAP_FIND(tt, key)
-#define BMAP_ERASE(tt, key)        UMAP_ERASE(tt, key)
-#define BMAP_FOR(tt, i)            UMAP_FOR(tt, i)
-#define BMAP_ITEM(tt, i)           UMAP_ITEM(tt, i)
-#define BMAP_SIZE(tt)              UMAP_SIZE(tt)
-#define BMAP_BUCKETS(tt)           UMAP_BUCKETS(tt)
-#define BMAP_CLEAR(tt)             UMAP_CLEAR(tt)
-#define BMAP_DTOR(tt)              UMAP_DTOR(tt)
+#define BMAP_SETUP(X, Key, Value) ska::bytell_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
+#define BMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
+#define BMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
+#define BMAP_FIND(X, key)         UMAP_FIND(X, key)
+#define BMAP_ERASE(X, key)        UMAP_ERASE(X, key)
+#define BMAP_FOR(X, i)            UMAP_FOR(X, i)
+#define BMAP_ITEM(X, i)           UMAP_ITEM(X, i)
+#define BMAP_SIZE(X)              UMAP_SIZE(X)
+#define BMAP_BUCKETS(X)           UMAP_BUCKETS(X)
+#define BMAP_CLEAR(X)             UMAP_CLEAR(X)
+#define BMAP_DTOR(X)              UMAP_DTOR(X)
 
-#define FMAP_SETUP(tt, Key, Value) ska::flat_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
-#define FMAP_PUT(tt, key, val)     UMAP_PUT(tt, key, val)
-#define FMAP_EMPLACE(tt, key, val) UMAP_EMPLACE(tt, key, val)
-#define FMAP_FIND(tt, key)         UMAP_FIND(tt, key)
-#define FMAP_ERASE(tt, key)        UMAP_ERASE(tt, key)
-#define FMAP_FOR(tt, i)            UMAP_FOR(tt, i)
-#define FMAP_ITEM(tt, i)           UMAP_ITEM(tt, i)
-#define FMAP_SIZE(tt)              UMAP_SIZE(tt)
-#define FMAP_BUCKETS(tt)           UMAP_BUCKETS(tt)
-#define FMAP_CLEAR(tt)             UMAP_CLEAR(tt)
-#define FMAP_DTOR(tt)              UMAP_DTOR(tt)
+#define FMAP_SETUP(X, Key, Value) ska::flat_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
+#define FMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
+#define FMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
+#define FMAP_FIND(X, key)         UMAP_FIND(X, key)
+#define FMAP_ERASE(X, key)        UMAP_ERASE(X, key)
+#define FMAP_FOR(X, i)            UMAP_FOR(X, i)
+#define FMAP_ITEM(X, i)           UMAP_ITEM(X, i)
+#define FMAP_SIZE(X)              UMAP_SIZE(X)
+#define FMAP_BUCKETS(X)           UMAP_BUCKETS(X)
+#define FMAP_CLEAR(X)             UMAP_CLEAR(X)
+#define FMAP_DTOR(X)              UMAP_DTOR(X)
 
-#define HMAP_SETUP(tt, Key, Value) tsl::hopscotch_map<Key, Value> map; map.max_load_factor(max_load_factor)
-#define HMAP_PUT(tt, key, val)     UMAP_PUT(tt, key, val)
-#define HMAP_EMPLACE(tt, key, val) UMAP_EMPLACE(tt, key, val)
-#define HMAP_FIND(tt, key)         UMAP_FIND(tt, key)
-#define HMAP_ERASE(tt, key)        UMAP_ERASE(tt, key)
-#define HMAP_FOR(tt, i)            UMAP_FOR(tt, i)
-#define HMAP_ITEM(tt, i)           UMAP_ITEM(tt, i)
-#define HMAP_SIZE(tt)              UMAP_SIZE(tt)
-#define HMAP_BUCKETS(tt)           UMAP_BUCKETS(tt)
-#define HMAP_CLEAR(tt)             UMAP_CLEAR(tt)
-#define HMAP_DTOR(tt)              UMAP_DTOR(tt)
+#define HMAP_SETUP(X, Key, Value) tsl::hopscotch_map<Key, Value> map; map.max_load_factor(max_load_factor)
+#define HMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
+#define HMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
+#define HMAP_FIND(X, key)         UMAP_FIND(X, key)
+#define HMAP_ERASE(X, key)        UMAP_ERASE(X, key)
+#define HMAP_FOR(X, i)            UMAP_FOR(X, i)
+#define HMAP_ITEM(X, i)           UMAP_ITEM(X, i)
+#define HMAP_SIZE(X)              UMAP_SIZE(X)
+#define HMAP_BUCKETS(X)           UMAP_BUCKETS(X)
+#define HMAP_CLEAR(X)             UMAP_CLEAR(X)
+#define HMAP_DTOR(X)              UMAP_DTOR(X)
 
-#define RMAP_SETUP(tt, Key, Value) robin_hood::unordered_map<Key, Value> map
-#define RMAP_PUT(tt, key, val)     UMAP_PUT(tt, key, val)
-#define RMAP_EMPLACE(tt, key, val) UMAP_EMPLACE(tt, key, val)
-#define RMAP_FIND(tt, key)         UMAP_FIND(tt, key)
-#define RMAP_ERASE(tt, key)        UMAP_ERASE(tt, key)
-#define RMAP_FOR(tt, i)            UMAP_FOR(tt, i)
-#define RMAP_ITEM(tt, i)           UMAP_ITEM(tt, i)
-#define RMAP_SIZE(tt)              UMAP_SIZE(tt)
-#define RMAP_BUCKETS(tt)           map.mask()
-#define RMAP_CLEAR(tt)             UMAP_CLEAR(tt)
-#define RMAP_DTOR(tt)              UMAP_DTOR(tt)
+#define RMAP_SETUP(X, Key, Value) robin_hood::unordered_map<Key, Value> map
+#define RMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
+#define RMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
+#define RMAP_FIND(X, key)         UMAP_FIND(X, key)
+#define RMAP_ERASE(X, key)        UMAP_ERASE(X, key)
+#define RMAP_FOR(X, i)            UMAP_FOR(X, i)
+#define RMAP_ITEM(X, i)           UMAP_ITEM(X, i)
+#define RMAP_SIZE(X)              UMAP_SIZE(X)
+#define RMAP_BUCKETS(X)           map.mask()
+#define RMAP_CLEAR(X)             UMAP_CLEAR(X)
+#define RMAP_DTOR(X)              UMAP_DTOR(X)
 
-#define SMAP_SETUP(tt, Key, Value) spp::sparse_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
-#define SMAP_PUT(tt, key, val)     UMAP_PUT(tt, key, val)
-#define SMAP_EMPLACE(tt, key, val) UMAP_EMPLACE(tt, key, val)
-#define SMAP_FIND(tt, key)         UMAP_FIND(tt, key)
-#define SMAP_ERASE(tt, key)        UMAP_ERASE(tt, key)
-#define SMAP_FOR(tt, i)            UMAP_FOR(tt, i)
-#define SMAP_ITEM(tt, i)           UMAP_ITEM(tt, i)
-#define SMAP_SIZE(tt)              UMAP_SIZE(tt)
-#define SMAP_BUCKETS(tt)           UMAP_BUCKETS(tt)
-#define SMAP_CLEAR(tt)             UMAP_CLEAR(tt)
-#define SMAP_DTOR(tt)              UMAP_DTOR(tt)
+#define SMAP_SETUP(X, Key, Value) spp::sparse_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
+#define SMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
+#define SMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
+#define SMAP_FIND(X, key)         UMAP_FIND(X, key)
+#define SMAP_ERASE(X, key)        UMAP_ERASE(X, key)
+#define SMAP_FOR(X, i)            UMAP_FOR(X, i)
+#define SMAP_ITEM(X, i)           UMAP_ITEM(X, i)
+#define SMAP_SIZE(X)              UMAP_SIZE(X)
+#define SMAP_BUCKETS(X)           UMAP_BUCKETS(X)
+#define SMAP_CLEAR(X)             UMAP_CLEAR(X)
+#define SMAP_DTOR(X)              UMAP_DTOR(X)
 
 enum {
     FAC = 3,
@@ -140,68 +140,68 @@ enum {
 int rr = RR;
 
 
-#define MAP_TEST1(M, tt) \
+#define MAP_TEST1(M, X) \
 { \
-    M##_SETUP(tt, int64_t, int64_t); \
+    M##_SETUP(X, int64_t, int64_t); \
     uint64_t checksum = 0, erased = 0; \
     SEED(seed); \
     clock_t difference, before = clock(); \
     for (size_t i = 0; i < N1; ++i) { \
-        checksum += ++ M##_PUT(tt, RAND(rr), i); \
-        erased += M##_ERASE(tt, RAND(rr)); \
+        checksum += ++ M##_PUT(X, RAND(rr), i); \
+        erased += M##_ERASE(X, RAND(rr)); \
     } \
     difference = clock() - before; \
     printf(#M ": size: %zu, buckets: %8zu, time: %5.02f, sum: %zu, erased %zu\n", \
-           (size_t) M##_SIZE(tt), (size_t) M##_BUCKETS(tt), (float) difference / CLOCKS_PER_SEC, checksum, erased); \
-    M##_CLEAR(tt); \
+           (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), (float) difference / CLOCKS_PER_SEC, checksum, erased); \
+    M##_CLEAR(X); \
 }
 
-#define MAP_TEST2(M, tt) \
+#define MAP_TEST2(M, X) \
 { \
-    M##_SETUP(tt, int64_t, int64_t); \
+    M##_SETUP(X, int64_t, int64_t); \
     size_t erased = 0; \
     clock_t difference, before = clock(); \
     for (size_t i = 0; i < N2; ++i) \
-        M##_PUT(tt, i, i); \
+        M##_PUT(X, i, i); \
     for (size_t i = 0; i < N2; ++i) \
-        erased += M##_ERASE(tt, i); \
+        erased += M##_ERASE(X, i); \
     difference = clock() - before; \
     printf(#M ": size: %zu, buckets: %8zu, time: %5.02f, erased %zu\n", \
-           (size_t) M##_SIZE(tt), (size_t) M##_BUCKETS(tt), (float) difference / CLOCKS_PER_SEC, erased); \
-    M##_CLEAR(tt); \
+           (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), (float) difference / CLOCKS_PER_SEC, erased); \
+    M##_CLEAR(X); \
 }
 
-#define MAP_TEST3(M, tt) \
+#define MAP_TEST3(M, X) \
 { \
-    M##_SETUP(tt, int64_t, int64_t); \
+    M##_SETUP(X, int64_t, int64_t); \
     size_t erased = 0; \
     clock_t difference, before = clock(); \
     SEED(seed); \
     for (size_t i = 0; i < N3; ++i) \
-        M##_PUT(tt, RAND(rr), i); \
+        M##_PUT(X, RAND(rr), i); \
     SEED(seed); \
     for (size_t i = 0; i < N3; ++i) \
-        erased += M##_ERASE(tt, RAND(rr)); \
+        erased += M##_ERASE(X, RAND(rr)); \
     difference = clock() - before; \
     printf(#M ": size: %zu, buckets: %8zu, time: %5.02f, erased %zu\n", \
-           (size_t) M##_SIZE(tt), (size_t) M##_BUCKETS(tt), (float) difference / CLOCKS_PER_SEC, erased); \
-    M##_CLEAR(tt); \
+           (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), (float) difference / CLOCKS_PER_SEC, erased); \
+    M##_CLEAR(X); \
 }
 
-#define MAP_TEST4(M, tt) \
+#define MAP_TEST4(M, X) \
 { \
-    M##_SETUP(tt, int64_t, int64_t); \
+    M##_SETUP(X, int64_t, int64_t); \
     size_t sum = 0; \
     SEED(seed); \
     for (size_t i = 0; i < N4; ++i) \
-        M##_PUT(tt, RAND(rr), i); \
+        M##_PUT(X, RAND(rr), i); \
     clock_t difference, before = clock(); \
-    for (int k=0; k<5; k++) M##_FOR (tt, i) \
-        sum += M##_ITEM(tt, i); \
+    for (int k=0; k<5; k++) M##_FOR (X, i) \
+        sum += M##_ITEM(X, i); \
     difference = clock() - before; \
     printf(#M ": size: %zu, buckets: %8zu, time: %5.02f, sum %zu\n", \
-           (size_t) M##_SIZE(tt), (size_t) M##_BUCKETS(tt), (float) difference / CLOCKS_PER_SEC, sum); \
-    M##_CLEAR(tt); \
+           (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), (float) difference / CLOCKS_PER_SEC, sum); \
+    M##_CLEAR(X); \
 }
 
 

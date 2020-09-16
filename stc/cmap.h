@@ -23,8 +23,8 @@
 /*
 #include <stdio.h>
 #include <stc/cmap.h>
-c_cset(sx, int);       // Set of int
-c_cmap(mx, int, char); // Map of int -> char
+typedef_cset(sx, int);       // Set of int
+typedef_cmap(mx, int, char); // Map of int -> char
 
 int main(void) {
     cset_sx s = cset_ini;
@@ -56,10 +56,9 @@ int main(void) {
 #define cmap_ini                      {NULL, NULL, 0, 0, 0.85f, 0.15f}
 #define cmap_empty(m)                 ((m).size == 0)
 #define cmap_size(m)                  ((size_t) (m).size)
-#define cmap_bucket_count(m)          ((size_t) (m).bucket_count)
 #define cset_ini                      cmap_ini
+#define cset_empty(s)                 cmap_empty(s)
 #define cset_size(s)                  cmap_size(s)
-#define cset_bucket_count(s)          cmap_bucket_count(s)
 
 #define c_try_emplace(self, ctype, key, val) do { \
     ctype##_result_t __r = ctype##_insert_key_(self, key); \
@@ -77,72 +76,72 @@ int main(void) {
 enum {chash_HASH = 0x7f, chash_USED = 0x80};
 typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 
-#define c_cmap(...) \
-    c_MACRO_OVERLOAD(c_cmap, __VA_ARGS__)
+#define typedef_cmap(...) \
+    c_MACRO_OVERLOAD(typedef_cmap, __VA_ARGS__)
 
-#define c_cmap_3(X, Key, Mapped) \
-    c_cmap_4(X, Key, Mapped, c_default_destroy)
+#define typedef_cmap_3(X, Key, Mapped) \
+    typedef_cmap_4(X, Key, Mapped, c_default_destroy)
 
-#define c_cmap_4(X, Key, Mapped, valueDestroy) \
-    c_cmap_6(X, Key, Mapped, valueDestroy, c_default_equals, c_default_hash16)
+#define typedef_cmap_4(X, Key, Mapped, valueDestroy) \
+    typedef_cmap_6(X, Key, Mapped, valueDestroy, c_default_equals, c_default_hash16)
 
-#define c_cmap_6(X, Key, Mapped, valueDestroy, keyEquals, keyHash) \
-    c_cmap_10(X, Key, Mapped, valueDestroy, keyEquals, keyHash, \
+#define typedef_cmap_6(X, Key, Mapped, valueDestroy, keyEquals, keyHash) \
+    typedef_cmap_10(X, Key, Mapped, valueDestroy, keyEquals, keyHash, \
                  c_default_destroy, Key, c_default_to_raw, c_default_from_raw)
 
-#define c_cmap_10(X, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
+#define typedef_cmap_10(X, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
                      keyDestroy, RawKey, keyToRaw, keyFromRaw) \
-    _c_declare_CHASH(X, cmap, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
+    _c_typedef_CHASH(X, cmap, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
                         keyDestroy, RawKey, keyToRaw, keyFromRaw, Mapped, c_default_from_raw)
 
 /* cset: */
-#define c_cset(...) \
-    c_MACRO_OVERLOAD(c_cset, __VA_ARGS__)
+#define typedef_cset(...) \
+    c_MACRO_OVERLOAD(typedef_cset, __VA_ARGS__)
 
-#define c_cset_2(X, Key) \
-    c_cset_4(X, Key, c_default_equals, c_default_hash16)
+#define typedef_cset_2(X, Key) \
+    typedef_cset_4(X, Key, c_default_equals, c_default_hash16)
 
-#define c_cset_4(X, Key, keyEquals, keyHash) \
-    c_cset_5(X, Key, keyEquals, keyHash, c_default_destroy)
+#define typedef_cset_4(X, Key, keyEquals, keyHash) \
+    typedef_cset_5(X, Key, keyEquals, keyHash, c_default_destroy)
 
-#define c_cset_5(X, Key, keyEquals, keyHash, keyDestroy) \
-    c_cset_8(X, Key, keyEquals, keyHash, keyDestroy, \
+#define typedef_cset_5(X, Key, keyEquals, keyHash, keyDestroy) \
+    typedef_cset_8(X, Key, keyEquals, keyHash, keyDestroy, \
                 Key, c_default_to_raw, c_default_from_raw)
 
-#define c_cset_8(X, Key, keyEqualsRaw, keyHashRaw, keyDestroy, \
+#define typedef_cset_8(X, Key, keyEqualsRaw, keyHashRaw, keyDestroy, \
                     RawKey, keyToRaw, keyFromRaw) \
-    _c_declare_CHASH(X, cset, Key, Key, void, keyEqualsRaw, keyHashRaw, \
+    _c_typedef_CHASH(X, cset, Key, Key, void, keyEqualsRaw, keyHashRaw, \
                         keyDestroy, RawKey, keyToRaw, keyFromRaw, void, c_default_from_raw)
 
 /* cset_str, cmap_str, cmap_strkey, cmap_strval: */
-#define c_cset_str() \
+#define typedef_cset_str() \
     _c_declare_CHASH_strkey(str, cset, cstr_t, void)
 
-#define c_cmap_str() \
-    _c_declare_CHASH(str, cmap, cstr_t, cstr_t, cstr_destroy, cstr_equals_raw, cstr_hash_raw, \
+#define typedef_cmap_str() \
+    _c_typedef_CHASH(str, cmap, cstr_t, cstr_t, cstr_destroy, cstr_equals_raw, cstr_hash_raw, \
                           cstr_destroy, const char*, cstr_to_raw, cstr, const char*, cstr)
 
-#define c_cmap_strkey(...) \
-    c_MACRO_OVERLOAD(c_cmap_strkey, __VA_ARGS__)
+#define typedef_cmap_strkey(...) \
+    c_MACRO_OVERLOAD(typedef_cmap_strkey, __VA_ARGS__)
 
-#define c_cmap_strkey_2(X, Mapped) \
+#define typedef_cmap_strkey_2(X, Mapped) \
     _c_declare_CHASH_strkey(X, cmap, Mapped, c_default_destroy)
 
-#define c_cmap_strkey_3(X, Mapped, ValueDestroy) \
+#define typedef_cmap_strkey_3(X, Mapped, ValueDestroy) \
     _c_declare_CHASH_strkey(X, cmap, Mapped, ValueDestroy)
 
-#define c_cmap_strval(...) \
-    c_MACRO_OVERLOAD(c_cmap_strval, __VA_ARGS__)
+#define typedef_cmap_strval(...) \
+    c_MACRO_OVERLOAD(typedef_cmap_strval, __VA_ARGS__)
 
-#define c_cmap_strval_2(X, Key) \
-    c_cmap_strval_4(X, Key, c_default_equals, c_default_hash16)
+#define typedef_cmap_strval_2(X, Key) \
+    typedef_cmap_strval_4(X, Key, c_default_equals, c_default_hash16)
 
-#define c_cmap_strval_4(X, Key, keyEquals, keyHash) \
-    _c_declare_CHASH(X, cmap, Key, cstr_t, cstr_destroy, keyEquals, keyHash, \
+#define typedef_cmap_strval_4(X, Key, keyEquals, keyHash) \
+    _c_typedef_CHASH(X, cmap, Key, cstr_t, cstr_destroy, keyEquals, keyHash, \
                         c_default_destroy, Key, c_default_to_raw, c_default_from_raw, const char*, cstr)
 
 #define _c_declare_CHASH_strkey(X, ctype, Mapped, valueDestroy) \
-    _c_declare_CHASH(X, ctype, cstr_t, Mapped, valueDestroy, cstr_equals_raw, cstr_hash_raw, \
+    _c_typedef_CHASH(X, ctype, cstr_t, Mapped, valueDestroy, cstr_equals_raw, cstr_hash_raw, \
                         cstr_destroy, const char*, cstr_to_raw, cstr, Mapped, c_default_from_raw)
 
 #define CSET_ONLY_cset(...) __VA_ARGS__
@@ -153,7 +152,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 #define KEY_NAME_cmap       first
 
 /* CHASH full: use 'void' for Mapped if ctype is cset */
-#define _c_declare_CHASH(X, ctype, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
+#define _c_typedef_CHASH(X, ctype, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
                             keyDestroy, RawKey, keyToRaw, keyFromRaw, RawVal, valueFromRaw) \
     typedef Key ctype##_##X##_key_t; \
     typedef Mapped ctype##_##X##_mapped_t; \
@@ -200,6 +199,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     ctype##_##X##_empty(ctype##_##X m) {return m.size == 0;} \
     STC_INLINE size_t \
     ctype##_##X##_size(ctype##_##X m) {return (size_t) m.size;} \
+    STC_INLINE size_t \
+    ctype##_##X##_bucket_count(ctype##_##X m) {return (size_t) m.bucket_count;} \
     STC_INLINE size_t \
     ctype##_##X##_capacity(ctype##_##X m) {return (size_t) (m.bucket_count * m.max_load_factor);} \
     STC_INLINE void \

@@ -2,7 +2,7 @@
 #include <time.h>
 #include <stc/clist.h>
 #include <stc/crandom.h>
-c_clist(fx, double);
+typedef_clist(fx, double);
 
 int main() {
     int k, n = 100000;

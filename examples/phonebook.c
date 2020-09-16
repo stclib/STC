@@ -25,7 +25,7 @@
 #include <stc/cmap.h>
 #include <stc/cstr.h>
 
-c_cmap_str();
+typedef_cmap_str();
 
 void print_phone_book(cmap_str phone_book)
 {

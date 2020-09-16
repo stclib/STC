@@ -24,7 +24,7 @@ The usage of the containers is vert similar to the C++ standard containers, so i
 All containers mentioned above, except cstr_t and cbitset_t are generic and typesafe (similar to templates in C++). No casting is used. A simple example:
 ```
 #include <stc/cvec.h>
-c_cvec(i, int);
+typedef_cvec(i, int);
 
 int main(void) {
     cvec_i vec = cvec_ini;
@@ -55,10 +55,10 @@ Because it is headers only, files can simply be included in your program. The fu
 #include <stc/clist.h>
 #include "Vec3.h"
 
-c_cmap(ii, int, int);
-c_cset(ix, int64_t);
-c_cvec(i, int);
-c_clist(v3, Vec3);
+typedef_cmap(ii, int, int);
+typedef_cset(ix, int64_t);
+typedef_cvec(i, int);
+typedef_clist(v3, Vec3);
 ...
 ```
 Performance
@@ -118,7 +118,7 @@ cmap discussion
 
 You can customize the destroy-, hash- and equals- function. **cmap/cset** also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is very useful when e.g. having cstr as key, as it enables the usage of string literals as key in *put() and find()* functions, instead of requering a constructed cstr. Without it, the code would become: 
 ```
-c_cmap(si, cstr_t, int); // don't do this.
+typedef_cmap(si, cstr_t, int); // don't do this.
 ...
 cmap_si_put(&map, cstr("mykey"), 12);
 ```
@@ -129,12 +129,12 @@ int x = cmap_si_find(&map, lookup)->value;
 cstr_destroy(&lookup);
 ```
 To avoid this, use 
-- *c_cmap_strkey(tag, valuetype)*
-- *c_cmap_strval(tag, keytype)*
-- *c_cmap_str()* // cstr_t -> cstr_t
-- *c_cset_str()* // cstr_t set
+- *typedef_cmap_strkey(tag, valuetype)*
+- *typedef_cmap_strval(tag, keytype)*
+- *typedef_cmap_str()* // cstr_t -> cstr_t
+- *typedef_cset_str()* // cstr_t set
 ```
-c_cmap_strkey(si, int);
+typedef_cmap_strkey(si, int);
 ...
 cmap_si map = cmap_ini;
 cmap_si_put(&map, "mykey", 12);             // constructs a cstr_t key from the const char* internally.
@@ -142,9 +142,9 @@ int x = cmap_si_find(&map, "mykey")->value; // no allocation of string key happe
 cmap_si_destroy(&map);
 ```
 An alternative is to use *char* * as key type, but then you must manage allcoated memory of the hash char* keys yourself.
-Note that this predefined customization is also available for **cvec** and **clist**. See *c_cvec_str()*, *c_clist_str()*.
+Note that this predefined customization is also available for **cvec** and **clist**. See *typedef_cvec_str()*, *typedef_clist_str()*.
 
-To customize your own cmap type to work like cmap_str, you may want to look at **examples/advanced.c**. It demonstrates how to use a custom struct as a hash map key, using the optional parameters to c_cmap().
+To customize your own cmap type to work like cmap_str, you may want to look at **examples/advanced.c**. It demonstrates how to use a custom struct as a hash map key, using the optional parameters to typedef_cmap().
 
 Example usages
 --------------
@@ -181,7 +181,7 @@ int main() {
 **cvec** of *int64_t*. 
 ```
 #include <stc/cvec.h>
-c_cvec(ix, int64_t); // ix is just an example type tag name.
+typedef_cvec(ix, int64_t); // ix is just an example type tag name.
 
 int main() {
     cvec_ix bignums = cvec_ini; // use cvec_ix_init() if initializing after declaration.
@@ -200,7 +200,7 @@ int main() {
 ```
 #include <stc/cstr.h>
 #include <stc/cvec.h>
-c_cvec_str();
+typedef_cvec_str();
 
 int main() {
     cvec_str names = cvec_ini;
@@ -220,7 +220,7 @@ int main() {
 ```
 #include <stdio.h>
 #include <stc/cmap.h>
-c_cmap(ii, int, int);
+typedef_cmap(ii, int, int);
 
 int main() {
     cmap_ii nums = cmap_ini;
@@ -235,7 +235,7 @@ int main() {
 ```
 #include <stc/cstr.h>
 #include <stc/cmap.h>
-c_cset_str(); // cstr set. See the discussion above.
+typedef_cset_str(); // cstr set. See the discussion above.
 
 int main() {
     cset_str words = cset_ini;
@@ -254,7 +254,7 @@ int main() {
 ```
 #include <stc/cstr.h>
 #include <stc/cmap.h>
-c_cmap_str(); 
+typedef_cmap_str(); 
 
 int main() {
     cmap_str table = cmap_ini;
@@ -276,7 +276,7 @@ int main() {
 #include <time.h>
 #include <stc/clist.h>
 #include <stc/crandom.h>
-c_clist(fx, double);
+typedef_clist(fx, double);
 
 int main() {
     clist_fx list = clist_ini;
@@ -313,7 +313,7 @@ int main() {
 ```
 #include <stdio.h>
 #include <stc/carray.h>
-c_carray(f, float);
+typedef_carray(f, float);
 
 int main()
 {

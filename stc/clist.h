@@ -35,7 +35,7 @@
     #include <stdio.h>
     #include <stc/clist.h>
     #include <stc/crandom.h>
-    c_clist(ix, int64_t);
+    typedef_clist(ix, int64_t);
 
     int main() {
         clist_ix list = clist_ini;
@@ -56,19 +56,19 @@
     }
 */
 
-#define c_clist(...)   c_MACRO_OVERLOAD(c_clist, __VA_ARGS__)
+#define typedef_clist(...)   c_MACRO_OVERLOAD(typedef_clist, __VA_ARGS__)
 
-#define c_clist_2(X, Value) \
-                             c_clist_3(X, Value, c_default_destroy)
-#define c_clist_3(X, Value, valueDestroy) \
-                             c_clist_4(X, Value, valueDestroy, c_default_compare)
-#define c_clist_4(X, Value, valueDestroy, valueCompare) \
-                             c_clist_7(X, Value, valueDestroy, Value, \
+#define typedef_clist_2(X, Value) \
+                             typedef_clist_3(X, Value, c_default_destroy)
+#define typedef_clist_3(X, Value, valueDestroy) \
+                             typedef_clist_4(X, Value, valueDestroy, c_default_compare)
+#define typedef_clist_4(X, Value, valueDestroy, valueCompare) \
+                             typedef_clist_7(X, Value, valueDestroy, Value, \
                                           valueCompare, c_default_to_raw, c_default_from_raw)
-#define c_clist_str()  c_clist_7(str, cstr_t, cstr_destroy, const char*, \
+#define typedef_clist_str()  typedef_clist_7(str, cstr_t, cstr_destroy, const char*, \
                                       cstr_compare_raw, cstr_to_raw, cstr)
 
-#define c_clist_types(X, Value) \
+#define typedef_clist_types(X, Value) \
     typedef Value clist_##X##_value_t; \
 \
     typedef struct clist_##X##_node { \
@@ -97,12 +97,12 @@
         __pos = ctype##_emplace_after(__self, __pos, __arr[__i]); \
 } while (0)
 
-c_clist_types(void, int);
+typedef_clist_types(void, int);
 STC_API size_t _clist_size(const clist_void* self);
 
-#define c_clist_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
+#define typedef_clist_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
 \
-    c_clist_types(X, Value); \
+    typedef_clist_types(X, Value); \
     typedef RawValue clist_##X##_rawvalue_t; \
     typedef clist_##X##_rawvalue_t clist_##X##_input_t; \
 \

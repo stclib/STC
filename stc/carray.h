@@ -30,7 +30,7 @@
  Multi-dimensional generic array allocated as one block of heap-memory.
  // demo:
 #include <stc/carray.h>
-c_carray(f, float);
+typedef_carray(f, float);
 
 int main()
 {
@@ -68,7 +68,7 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
 }
 
 
-#define c_carray_common(D, X, Value, valueDestroy) \
+#define typedef_carray_common(D, X, Value, valueDestroy) \
     typedef struct { Value *get; } carray##D##X##_iter_t; \
 \
     STC_INLINE carray##D##X##_iter_t \
@@ -91,12 +91,12 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
         } \
     }
 
-#define c_carray(...) c_MACRO_OVERLOAD(c_carray, __VA_ARGS__)
-#define c_carray_2(X, Value) \
-    c_carray_3(X, Value, c_default_destroy)
+#define typedef_carray(...) c_MACRO_OVERLOAD(typedef_carray, __VA_ARGS__)
+#define typedef_carray_2(X, Value) \
+    typedef_carray_3(X, Value, c_default_destroy)
 
 
-#define c_carray_3(X, Value, valueDestroy) \
+#define typedef_carray_3(X, Value, valueDestroy) \
 \
     typedef Value carray1##X##_value_t; \
     typedef carray1##X##_value_t carray2##X##_value_t, carray3##X##_value_t; \
@@ -116,9 +116,9 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
         size_t _xdim, _yxdim, _zdim; \
     } carray3##X; \
 \
-    c_carray_common(1, X, Value, valueDestroy) \
-    c_carray_common(2, X, Value, valueDestroy) \
-    c_carray_common(3, X, Value, valueDestroy) \
+    typedef_carray_common(1, X, Value, valueDestroy) \
+    typedef_carray_common(2, X, Value, valueDestroy) \
+    typedef_carray_common(3, X, Value, valueDestroy) \
 \
     STC_INLINE carray1##X \
     carray1##X##_make(size_t xdim, Value val) { \
