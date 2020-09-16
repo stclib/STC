@@ -5,20 +5,30 @@
 typedef_clist(fx, double);
 
 int main() {
-    int k, n = 100000;
+    int k;
+    const int n = 2000000;
+
     clist_fx list = clist_ini;
-    crand_rng64_t eng = crand_rng64_init(time(NULL));
-    crand_uniform_f64_t dist = crand_uniform_f64_init(0.0f, n);
+    crand_rng64_t eng = crand_rng64_init(1234);
+    crand_uniform_f64_t dist = crand_uniform_f64_init(100.0f, n);
+    int m = 0;
+    for (int i = 0; i < n; ++i)
+        clist_fx_push_back(&list, crand_uniform_f64(&eng, &dist)), ++m;
+    double sum = 0.0;
+    printf("sumarize %d:\n", m);
+    c_foreach (i, clist_fx, list)
+        sum += *i.get;
+    printf("sum %f\n\n", sum);
 
-    for (int i = 0; i < 100000; ++i)
-        clist_fx_push_back(&list, crand_uniform_f64(&eng, &dist));
-    k = 0; c_foreach (i, clist_fx, list)
+    k = 0;
+    c_foreach (i, clist_fx, list)
         if (++k <= 10) printf("%8d: %10f\n", k, *i.get); else break;
-
+    puts("sort");
     clist_fx_sort(&list); // mergesort O(n*log n)
     puts("sorted");
 
-    k = 0; c_foreach (i, clist_fx, list)
+    k = 0;
+    c_foreach (i, clist_fx, list)
         if (++k <= 10) printf("%8d: %10f\n", k, *i.get); else break;
     puts("");
 

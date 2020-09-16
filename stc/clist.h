@@ -246,8 +246,9 @@ STC_API size_t _clist_size(const clist_void* self);
     } \
     STC_API clist_##X##_iter_t \
     clist_##X##_erase_after(clist_##X* self, clist_##X##_iter_t pos) { \
-        _c_clist_erase_after(self, X, _clist_node(X, pos.get), valueDestroy); \
-        clist_##X##_next(&pos); return pos; \
+        clist_##X##_node_t* node = _clist_node(X, pos.get); \
+        _c_clist_erase_after(self, X, node, valueDestroy); \
+        clist_##X##_next(&pos); return pos;\
     } \
 \
     STC_API clist_##X##_iter_t \
