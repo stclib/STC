@@ -299,8 +299,8 @@ int main() {
 
     clist_fx_clear(&list);
 
-    // generic c_push() function, works on most containers:
-    c_push(&list, clist_fx, {10, 20, 30, 40, 50});
+    // generic c_push_items() function, works on most containers:
+    c_push_items(&list, clist_fx, {10, 20, 30, 40, 50});
 
     c_foreach (i, clist_fx, list)
         printf("%f ", i.get->value);

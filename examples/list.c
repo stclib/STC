@@ -23,7 +23,7 @@ int main() {
     puts("");
 
     clist_fx_clear(&list);
-    c_push(&list, clist_fx, {10, 20, 30, 40, 30, 50});
+    c_push_items(&list, clist_fx, {10, 20, 30, 40, 30, 50});
     c_foreach (i, clist_fx, list) printf(" %g", i.get->value);
     puts("");
  

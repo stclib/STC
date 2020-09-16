@@ -57,11 +57,11 @@ c_cmap(vk, Viking, int, c_default_destroy, vikingvw_equals, vikingvw_hash,
                  viking_destroy, VikingVw, viking_toVw, viking_fromVw);
 ```
 cmap_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test. cmap_vk_destroy() will free all memory allocated for Viking keys and the hash table values.
-Finally, main which also demos the generic c_push() of multiple elements:
+Finally, main which also demos the generic c_push_items() of multiple elements:
 ```
 int main() {
     cmap_vk vikings = cmap_ini;
-    c_push(&vikings, cmap_vk, {
+    c_push_items(&vikings, cmap_vk, {
         { {"Einar", "Norway"}, 20 },
         { {"Olaf", "Denmark"}, 24 },
         { {"Harald", "Iceland"}, 12 },

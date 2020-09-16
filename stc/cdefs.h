@@ -85,7 +85,7 @@
 #define c_foreach_4(it, ctype, start, finish) \
     for (ctype##_iter_t it = start, it##_end_ = finish; it.get != it##_end_.get; ctype##_next(&it))
 
-#define c_push(self, ctype, ...) do { \
+#define c_push_items(self, ctype, ...) do { \
     const ctype##_input_t __arr[] = __VA_ARGS__; \
     ctype##_push_n(self, __arr, sizeof(__arr)/sizeof(__arr[0])); \
 } while (0)

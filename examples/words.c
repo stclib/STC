@@ -12,7 +12,7 @@ c_cmap_strkey(si, int);
 int main1()
 {
     clist_str lwords = clist_ini;
-    c_push(&lwords, clist_str, {
+    c_push_items(&lwords, clist_str, {
         "this", "sentence", "is", "not", "a", "sentence",
         "this", "sentence", "is", "a", "hoax"
     });
@@ -22,7 +22,7 @@ int main1()
     puts("");
 
     cvec_str words = cvec_ini;
-    c_push(&words, cvec_str, {
+    c_push_items(&words, cvec_str, {
         "this", "sentence", "is", "not", "a", "sentence",
         "this", "sentence", "is", "a", "hoax"
     });
