@@ -29,12 +29,12 @@ int main1()
 
     cmap_si word_map = cmap_ini;
     c_foreach (w, cvec_str, words)
-        cmap_si_emplace(&word_map, w.get->str, 0).first->value += 1;
+        cmap_si_emplace(&word_map, w.get->str, 0).first->second += 1;
 
     c_foreach (pair, cmap_si, word_map) {
         printf("%d occurrences of word '%s'\n",
-               pair.get->value,
-               pair.get->key.str);
+               pair.get->second,
+               pair.get->first.str);
     }
 
     cmap_si_destroy(&word_map);
@@ -50,9 +50,9 @@ int main1()
 
 int main2()
 {
-    std::vector<std::string> words = { 
+    std::vector<std::string> words = {
         "this", "sentence", "is", "not", "a", "sentence",
-        "this", "sentence", "is", "a", "hoax" 
+        "this", "sentence", "is", "a", "hoax"
     };
 
     std::unordered_map<std::string, size_t>  word_map;
@@ -77,4 +77,4 @@ int main() {
 int main() {
     main1();
 }
-#endif    
+#endif

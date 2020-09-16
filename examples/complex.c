@@ -22,14 +22,14 @@ int main() {
         clist_y tableList = clist_ini;
         // Put in some data.
         cmap_g listMap = cmap_ini;
-        
+
         *carray2f_at(&table, y, x) = 3.1415927f; // table[y][x]
         clist_y_push_back(&tableList, table);
         cmap_g_put(&listMap, tableKey, tableList);
         cmap_s_put(&myMap, strKey, listMap);
     }
     { // Access the data entry
-        carray2f table = *clist_y_back(&cmap_g_find(&cmap_s_find(&myMap, strKey)->value, tableKey)->value);
+        carray2f table = *clist_y_back(&cmap_g_find(&cmap_s_find(&myMap, strKey)->second, tableKey)->second);
         printf("value (%d, %d) is: %f\n", y, x, *carray2f_at(&table, y, x));
     }
 

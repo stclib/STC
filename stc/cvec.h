@@ -187,12 +187,12 @@
     STC_INLINE size_t \
     cvec_##X##_idx(cvec_##X v, cvec_##X##_iter_t it) {return it.get - v.data;} \
 \
-    implement_cvec_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw)
+    _c_implement_cvec_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define implement_cvec_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
+#define _c_implement_cvec_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
 \
     STC_API void \
     cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t in[], size_t size) { \
@@ -288,7 +288,7 @@
     typedef int cvec_##taq##_dud
 
 #else
-#define implement_cvec_7(X, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw)
+#define _c_implement_cvec_7(X, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw)
 #endif
 
 #if defined(_WIN32) && defined(_DLL)

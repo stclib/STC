@@ -54,7 +54,7 @@ int main(void) {
     });
 
     c_foreach (i, cmap_id, idnames)
-        printf("%d: %s\n", i.get->key, i.get->value.str);
+        printf("%d: %s\n", i.get->first, i.get->second.str);
     puts("");
     cmap_id_destroy(&idnames);
 
@@ -71,13 +71,13 @@ int main(void) {
         {"Spain", 10},
         {"France", 10},
     });
-    cmap_cnt_emplace(&countries, "Greenland", 0).first->value += 20;
-    cmap_cnt_emplace(&countries, "Sweden", 0).first->value += 20;
-    cmap_cnt_emplace(&countries, "Norway", 0).first->value += 20;
-    cmap_cnt_emplace(&countries, "Finland", 0).first->value += 20;
+    cmap_cnt_emplace(&countries, "Greenland", 0).first->second += 20;
+    cmap_cnt_emplace(&countries, "Sweden", 0).first->second += 20;
+    cmap_cnt_emplace(&countries, "Norway", 0).first->second += 20;
+    cmap_cnt_emplace(&countries, "Finland", 0).first->second += 20;
 
     c_foreach (i, cmap_cnt, countries)
-        printf("%s: %d\n", i.get->key.str, i.get->value);
+        printf("%s: %d\n", i.get->first.str, i.get->second);
     puts("");
     cmap_cnt_destroy(&countries);
 

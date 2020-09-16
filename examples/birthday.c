@@ -21,7 +21,7 @@ void repeats(void)
     clock_t now = clock();
     for (size_t i = 0; i < N; ++i) {
         uint64_t k = crand_i64(&rng) & mask;
-        int v = ++cmap_ic_emplace(&m, k, 0).first->value;
+        int v = ++cmap_ic_emplace(&m, k, 0).first->second;
         if (v > 1) printf("%zu: %llx - %d\n", i, k, v);
     }
     float diff = (float) (clock() - now) / CLOCKS_PER_SEC;
@@ -40,16 +40,16 @@ void distribution(void)
     clock_t now = clock();
     crand_uniform_i32_t dist = crand_uniform_i32_init(0, M);
     for (size_t i = 0; i < N; ++i) {
-        ++cmap_x_emplace(&map, crand_uniform_i32(&rng, &dist), 0).first->value;
+        ++cmap_x_emplace(&map, crand_uniform_i32(&rng, &dist), 0).first->second;
     }
     float diff = (float) (clock() - now) / CLOCKS_PER_SEC;
 
     uint64_t sum = 0;
-    c_foreach (i, cmap_x, map) sum += i.get->value;
+    c_foreach (i, cmap_x, map) sum += i.get->second;
     sum /= map.size;
 
     c_foreach (i, cmap_x, map)
-        printf("%u: %zu - %zu\n", i.get->key, i.get->value, sum);
+        printf("%u: %zu - %zu\n", i.get->first, i.get->second, sum);
 
     printf("%.02f\n", diff);
 }

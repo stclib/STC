@@ -168,7 +168,7 @@ void mapdemo3()
     printf("size %zu\n", cmap_size(table));
     c_foreach (i, cmap_str, table)
         printf("entry: %s: %s\n", i.get->first.str, i.get->second.str);
-    cmap_str_destroy(&table); // frees key and value CStrs, and hash table (CVec).
+    cmap_str_destroy(&table); // frees key and value cstrs, and hash table.
 }
 
 

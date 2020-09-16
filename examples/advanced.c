@@ -5,7 +5,7 @@
  *   2. A comparison function for equality.
 
  * When your key type consists of several members, you will usually have the hash function
- * calculate hash values for the individual members, and then somehow combine them into one 
+ * calculate hash values for the individual members, and then somehow combine them into one
  * hash value for the entire object.
  * In order to use Viking as a map key, it is smart to define a plain-old-data "view"
  * of the Viking struct, to simplfy insert and lookup in the map.
@@ -51,7 +51,7 @@ Viking viking_fromVw(VikingVw vw) {
 }
 
 // Using the full c_cmap() macro to define [Viking -> int] hash map type:
-c_cmap(vk, Viking, int, c_default_destroy, vikingvw_equals, vikingvw_hash, 
+c_cmap(vk, Viking, int, c_default_destroy, vikingvw_equals, vikingvw_hash,
                  viking_destroy, VikingVw, viking_toVw, viking_fromVw);
 
 // cmap_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test.
@@ -70,11 +70,11 @@ int main()
 
     VikingVw einar = {"Einar", "Norway"};
     cmap_vk_entry_t *e = cmap_vk_find(&vikings, einar);
-    e->value += 5; // update 
-    cmap_vk_emplace(&vikings, einar, 0).first->value += 5; // again
+    e->second += 5; // update
+    cmap_vk_emplace(&vikings, einar, 0).first->second += 5; // again
 
     c_foreach (k, cmap_vk, vikings) {
-        printf("%s of %s has %d hp\n", k.get->key.name.str, k.get->key.country.str, k.get->value);
+        printf("%s of %s has %d hp\n", k.get->first.name.str, k.get->first.country.str, k.get->second);
     }
     cmap_vk_destroy(&vikings);
 }

@@ -31,7 +31,7 @@ int main(void) {
     cset_sx_insert(&s, 5);
     cset_sx_insert(&s, 8);
     c_foreach (i, cset_sx, s)
-        printf("set %d\n", i.get->value);
+        printf("set %d\n", i.get->second);
     cset_sx_destroy(&s);
 
     cmap_mx m = cmap_ini;
@@ -63,7 +63,7 @@ int main(void) {
 
 #define c_try_emplace(self, ctype, key, val) do { \
     ctype##_result_t __r = ctype##_insert_key_(self, key); \
-    if (__r.second) __r.first->value = val; \
+    if (__r.second) __r.first->second = val; \
 } while (0)
 #define c_insert(self, ctype, ...) do { \
     const ctype##_input_t __arr[] = __VA_ARGS__; \
@@ -92,8 +92,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 
 #define c_cmap_10(X, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
                      keyDestroy, RawKey, keyToRaw, keyFromRaw) \
-    _declare_CHASH(X, cmap, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
-                      keyDestroy, RawKey, keyToRaw, keyFromRaw, Mapped, c_default_from_raw)
+    _c_declare_CHASH(X, cmap, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
+                        keyDestroy, RawKey, keyToRaw, keyFromRaw, Mapped, c_default_from_raw)
 
 /* cset: */
 #define c_cset(...) \
@@ -111,25 +111,25 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 
 #define c_cset_8(X, Key, keyEqualsRaw, keyHashRaw, keyDestroy, \
                     RawKey, keyToRaw, keyFromRaw) \
-    _declare_CHASH(X, cset, Key, Key, void, keyEqualsRaw, keyHashRaw, \
-                      keyDestroy, RawKey, keyToRaw, keyFromRaw, void, c_default_from_raw)
+    _c_declare_CHASH(X, cset, Key, Key, void, keyEqualsRaw, keyHashRaw, \
+                        keyDestroy, RawKey, keyToRaw, keyFromRaw, void, c_default_from_raw)
 
 /* cset_str, cmap_str, cmap_strkey, cmap_strval: */
 #define c_cset_str() \
-    _declare_CHASH_strkey(str, cset, cstr_t, void)
+    _c_declare_CHASH_strkey(str, cset, cstr_t, void)
 
 #define c_cmap_str() \
-    _declare_CHASH(str, cmap, cstr_t, cstr_t, cstr_destroy, cstr_equals_raw, cstr_hash_raw, \
-                        cstr_destroy, const char*, cstr_to_raw, cstr, const char*, cstr)
+    _c_declare_CHASH(str, cmap, cstr_t, cstr_t, cstr_destroy, cstr_equals_raw, cstr_hash_raw, \
+                          cstr_destroy, const char*, cstr_to_raw, cstr, const char*, cstr)
 
 #define c_cmap_strkey(...) \
     c_MACRO_OVERLOAD(c_cmap_strkey, __VA_ARGS__)
 
 #define c_cmap_strkey_2(X, Mapped) \
-    _declare_CHASH_strkey(X, cmap, Mapped, c_default_destroy)
+    _c_declare_CHASH_strkey(X, cmap, Mapped, c_default_destroy)
 
 #define c_cmap_strkey_3(X, Mapped, ValueDestroy) \
-    _declare_CHASH_strkey(X, cmap, Mapped, ValueDestroy)
+    _c_declare_CHASH_strkey(X, cmap, Mapped, ValueDestroy)
 
 #define c_cmap_strval(...) \
     c_MACRO_OVERLOAD(c_cmap_strval, __VA_ARGS__)
@@ -138,38 +138,37 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     c_cmap_strval_4(X, Key, c_default_equals, c_default_hash16)
 
 #define c_cmap_strval_4(X, Key, keyEquals, keyHash) \
-    _declare_CHASH(X, cmap, Key, cstr_t, cstr_destroy, keyEquals, keyHash, \
-                      c_default_destroy, Key, c_default_to_raw, c_default_from_raw, const char*, cstr)
+    _c_declare_CHASH(X, cmap, Key, cstr_t, cstr_destroy, keyEquals, keyHash, \
+                        c_default_destroy, Key, c_default_to_raw, c_default_from_raw, const char*, cstr)
 
-#define _declare_CHASH_strkey(X, ctype, Mapped, valueDestroy) \
-    _declare_CHASH(X, ctype, cstr_t, Mapped, valueDestroy, cstr_equals_raw, cstr_hash_raw, \
-                      cstr_destroy, const char*, cstr_to_raw, cstr, Mapped, c_default_from_raw)
+#define _c_declare_CHASH_strkey(X, ctype, Mapped, valueDestroy) \
+    _c_declare_CHASH(X, ctype, cstr_t, Mapped, valueDestroy, cstr_equals_raw, cstr_hash_raw, \
+                        cstr_destroy, const char*, cstr_to_raw, cstr, Mapped, c_default_from_raw)
 
 #define CSET_ONLY_cset(...) __VA_ARGS__
 #define CSET_ONLY_cmap(...)
 #define CMAP_ONLY_cset(...)
 #define CMAP_ONLY_cmap(...) __VA_ARGS__
-#define CMAP_ARGS_cset(x, y) x
-#define CMAP_ARGS_cmap(x, y) x, y
+#define KEY_NAME_cset       value
+#define KEY_NAME_cmap       first
 
 /* CHASH full: use 'void' for Mapped if ctype is cset */
-#define _declare_CHASH(X, ctype, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
-                         keyDestroy, RawKey, keyToRaw, keyFromRaw, RawVal, valueFromRaw) \
+#define _c_declare_CHASH(X, ctype, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
+                            keyDestroy, RawKey, keyToRaw, keyFromRaw, RawVal, valueFromRaw) \
     typedef Key ctype##_##X##_key_t; \
     typedef Mapped ctype##_##X##_mapped_t; \
     typedef RawKey ctype##_##X##_rawkey_t; \
     typedef RawVal ctype##_##X##_rawval_t; \
 \
     typedef struct { \
-        CSET_ONLY_##ctype(c_UNION(ctype##_##X##_key_t key, value);) \
-        CMAP_ONLY_##ctype(c_UNION(ctype##_##X##_key_t key, first); \
-                          c_UNION(ctype##_##X##_mapped_t value, second);) \
+        ctype##_##X##_key_t KEY_NAME_##ctype; \
+        CMAP_ONLY_##ctype(ctype##_##X##_mapped_t second;) \
     } ctype##_##X##_value_t, ctype##_##X##_entry_t; \
 \
     STC_INLINE void \
     ctype##_##X##_entry_destroy(ctype##_##X##_value_t* e) { \
-        keyDestroy(&e->key); \
-        CMAP_ONLY_##ctype(valueDestroy(&e->value);) \
+        keyDestroy(&e->KEY_NAME_##ctype); \
+        CMAP_ONLY_##ctype(valueDestroy(&e->second);) \
     } \
     typedef \
     CMAP_ONLY_##ctype( struct {ctype##_##X##_rawkey_t first; \
@@ -230,9 +229,9 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     ctype##_##X##_bucket(const ctype##_##X* self, const ctype##_##X##_rawkey_t* rawKeyPtr); \
 \
     STC_INLINE ctype##_##X##_result_t \
-    ctype##_##X##_emplace(ctype##_##X* self, CMAP_ARGS_##ctype(RawKey rawKey, RawVal rawVal)) { \
+    ctype##_##X##_emplace(ctype##_##X* self, RawKey rawKey CMAP_ONLY_##ctype(, RawVal rawVal)) { \
         ctype##_##X##_result_t res = ctype##_##X##_insert_key_(self, rawKey); \
-        CMAP_ONLY_##ctype( if (res.second) res.first->value = valueFromRaw(rawVal); ) \
+        CMAP_ONLY_##ctype( if (res.second) res.first->second = valueFromRaw(rawVal); ) \
         return res; \
     } \
     STC_INLINE ctype##_##X##_result_t \
@@ -245,14 +244,14 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     STC_INLINE ctype##_##X##_result_t \
     ctype##_##X##_insert_or_assign(ctype##_##X* self, RawKey rawKey, RawVal rawVal) { \
         ctype##_##X##_result_t res = ctype##_##X##_insert_key_(self, rawKey); \
-        if (!res.second) valueDestroy(&res.first->value); \
-        res.first->value = valueFromRaw(rawVal); return res; \
+        if (!res.second) valueDestroy(&res.first->second); \
+        res.first->second = valueFromRaw(rawVal); return res; \
     } \
     STC_API ctype##_##X##_mapped_t* \
     ctype##_##X##_at(const ctype##_##X* self, RawKey rawKey) { \
         ctype##_bucket_t b = ctype##_##X##_bucket(self, &rawKey); \
         assert(self->_hashx[b.idx]); \
-        return &self->table[b.idx].value; \
+        return &self->table[b.idx].second; \
     } \
     STC_INLINE ctype##_##X##_result_t \
     ctype##_##X##_put(ctype##_##X* self, RawKey rawKey, RawVal rawVal) { \
@@ -261,8 +260,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     STC_INLINE ctype##_##X##_result_t \
     ctype##_##X##_putv(ctype##_##X* self, RawKey rawKey, Mapped mapped) { \
         ctype##_##X##_result_t res = ctype##_##X##_insert_key_(self, rawKey); \
-        if (!res.second) valueDestroy(&res.first->value); \
-        res.first->value = mapped; return res; \
+        if (!res.second) valueDestroy(&res.first->second); \
+        res.first->second = mapped; return res; \
     }) \
 \
     STC_INLINE ctype##_##X##_iter_t \
@@ -280,7 +279,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         while ((++it->get, *++it->_hx == 0)) ; \
     } \
     CMAP_ONLY_##ctype( STC_INLINE ctype##_##X##_mapped_t* \
-    ctype##_##X##_itval(ctype##_##X##_iter_t it) {return &it.get->value;} ) \
+    ctype##_##X##_itval(ctype##_##X##_iter_t it) {return &it.get->second;} ) \
 \
     STC_API void \
     ctype##_##X##_erase_entry(ctype##_##X* self, ctype##_##X##_value_t* get); \
@@ -299,14 +298,14 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     STC_API uint32_t c_default_hash16(const void *data, size_t len); \
     STC_API uint32_t c_default_hash32(const void* data, size_t len); \
 \
-    _implement_CHASH(X, ctype, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
-                         keyDestroy, RawKey, keyToRaw, keyFromRaw, RawVal, valueFromRaw)
+    _c_implement_CHASH(X, ctype, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
+                          keyDestroy, RawKey, keyToRaw, keyFromRaw, RawVal, valueFromRaw)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define _implement_CHASH(X, ctype, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
-                             keyDestroy, RawKey, keyToRaw, keyFromRaw, RawVal, valueFromRaw) \
+#define _c_implement_CHASH(X, ctype, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
+                              keyDestroy, RawKey, keyToRaw, keyFromRaw, RawVal, valueFromRaw) \
     STC_API ctype##_##X \
     ctype##_##X##_with_capacity(size_t cap) { \
         ctype##_##X h = ctype##_ini; \
@@ -346,7 +345,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         uint8_t* hashx = self->_hashx; \
         while ((sx = hashx[b.idx])) { \
             if (sx == b.hx) { \
-                ctype##_##X##_rawkey_t r = keyToRaw(&self->table[b.idx].key); \
+                ctype##_##X##_rawkey_t r = keyToRaw(&self->table[b.idx].KEY_NAME_##ctype); \
                 if (keyEqualsRaw(&r, rawKeyPtr)) break; \
             } \
             if (++b.idx == cap) b.idx = 0; \
@@ -376,7 +375,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         ctype##_bucket_t b = ctype##_##X##_bucket(self, &rawKey); \
         ctype##_##X##_result_t res = {&self->table[b.idx], !self->_hashx[b.idx]}; \
         if (res.second) { \
-            res.first->key = keyFromRaw(rawKey); \
+            res.first->KEY_NAME_##ctype = keyFromRaw(rawKey); \
             self->_hashx[b.idx] = (uint8_t) b.hx; \
             ++self->size; \
         } \
@@ -400,7 +399,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         uint8_t* hashx = self->_hashx; \
         for (size_t i = 0; i < oldcap; ++i, ++e) \
             if (tmp._hashx[i]) { \
-                RawKey r = keyToRaw(&e->key); \
+                RawKey r = keyToRaw(&e->KEY_NAME_##ctype); \
                 ctype##_bucket_t b = ctype##_##X##_bucket(self, &r); \
                 slot[b.idx] = *e, \
                 hashx[b.idx] = (uint8_t) b.hx; \
@@ -419,7 +418,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
             if (++j == cap) j = 0; /* ++j; j %= cap; is slow */ \
             if (! hashx[j]) \
                 break; \
-            RawKey r = keyToRaw(&slot[j].key); \
+            RawKey r = keyToRaw(&slot[j].KEY_NAME_##ctype); \
             k = chash_reduce(keyHashRaw(&r, sizeof(RawKey)), cap); \
             if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */ \
                 slot[i] = slot[j], hashx[i] = hashx[j], i = j; \
@@ -446,8 +445,8 @@ STC_API uint32_t c_default_hash32(const void* data, size_t len) {
 }
 
 #else
-#define _implement_CHASH(X, ctype, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
-                             keyDestroy, RawKey, keyToRaw, keyFromRaw)
+#define _c_implement_CHASH(X, ctype, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
+                              keyDestroy, RawKey, keyToRaw, keyFromRaw)
 #endif
 
 #endif
