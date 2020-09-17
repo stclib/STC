@@ -18,11 +18,11 @@ template<typename C> inline void destroy_me(C& c) { C().swap(c); }
 // Visual Studio: compile with -TP to force C++:  cl -TP -EHsc -O2 benchmark.c
 
 static inline uint32_t fibonacci_hash(const void* data, size_t len) {
-    return ((*(const uint64_t *) data) * 11400714819323198485llu) >> 24;
+    return (uint32_t) (((*(const uint64_t *) data) * 11400714819323198485llu) >> 24);
 }
 
 // cmap and khash template expansion
-typedef_cmap(ii, int64_t, int64_t, c_default_destroy, c_default_equals, fibonacci_hash);
+typedef_cmap(ii, int64_t, int64_t, c_default_destroy, c_default_equals, fibonacci_hash); // c_default_hash16);
 KHASH_MAP_INIT_INT64(ii, int64_t)
 
 

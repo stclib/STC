@@ -443,15 +443,15 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 
 STC_API uint32_t c_default_hash16(const void *data, size_t len) {
     const volatile uint16_t *key = (const uint16_t *) data;
-    uint64_t x = 0xc613fc15u;
-    while (len -= 2) x = ((*key++ + x) * 2654435769ull) >> 13;
+    uint64_t x = *key++ * 0xc613fc15u;
+    while (len -= 2) x = (*key++ + x) * 2654435769ull;
     return (uint32_t) x;
 }
 STC_API uint32_t c_default_hash32(const void* data, size_t len) {
     const volatile uint32_t *key = (const uint32_t *) data;
     uint64_t x = *key++ * 2654435769ull;
-    while (len -= 4) x ^= *key++ * 2654435769ull;
-    return (uint32_t) (x >> 24);
+    while (len -= 4) x = (*key++ + x) * 2654435769ull;
+    return (uint32_t) x;
 }
 
 #else
