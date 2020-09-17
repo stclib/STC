@@ -2,8 +2,8 @@
 #include <stc/cqueue.h>
 #include <stdio.h>
 
-typedef_clist(i, int);
-typedef_cqueue(i, clist_i); // min-heap (increasing values)
+using_clist(i, int);
+using_cqueue(i, clist_i); // min-heap (increasing values)
 
 int main() {
     int n = 10000000;

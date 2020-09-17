@@ -7,14 +7,14 @@
 #include <stc/cvec.h>
 
 // Declare int -> int hashmap. Uses typetag 'i' for ints.
-typedef_cmap(i, int, size_t);
+using_cmap(i, int, size_t);
 
 // Declare int vector with map entries that can be sorted by map keys.
 static int compare(cmap_i_entry_t *a, cmap_i_entry_t *b) {
     return c_default_compare(&a->first, &b->first);
 }
 // Vector: typetag 'e' for (map) entry
-typedef_cvec(e, cmap_i_entry_t, c_default_destroy, compare);
+using_cvec(e, cmap_i_entry_t, c_default_destroy, compare);
 
 int main()
 {

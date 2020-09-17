@@ -25,8 +25,8 @@
 
     #include <stc/crandom.h>
     #include <stc/cpqueue.h>
-    typedef_cvec(f, float);
-    typedef_cpqueue(f, cvec_f, >); // min-heap (increasing values)
+    using_cvec(f, float);
+    using_cpqueue(f, cvec_f, >); // min-heap (increasing values)
 
     int main() {
         crand_rng32_t gen = crand_rng32_init(1234);
@@ -50,7 +50,7 @@
 
 #include "cvec.h"
 
-#define typedef_cpqueue(X, ctype, cmpOpr) /* cmpOpr: < or > */ \
+#define using_cpqueue(X, ctype, cmpOpr) /* cmpOpr: < or > */ \
 \
     typedef struct ctype cpqueue_##X; \
     typedef ctype##_value_t cpqueue_##X##_value_t; \

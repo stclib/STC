@@ -5,19 +5,19 @@
 #include <stc/cpqueue.h>
 #include <stc/clist.h>
 
-typedef_cmap(id, int, cstr_t, cstr_destroy); // Map of int -> cstr_t
-typedef_cmap_strkey(cnt, int);
+using_cmap(id, int, cstr_t, cstr_destroy); // Map of int -> cstr_t
+using_cmap_strkey(cnt, int);
 
 typedef struct {int x, y;} ipair_t;
 inline static int ipair_compare(const ipair_t* a, const ipair_t* b) {
     int c = c_default_compare(&a->x, &b->x);
     return c != 0 ? c : c_default_compare(&a->y, &b->y);
 }
-typedef_cvec(ip, ipair_t, c_default_destroy, ipair_compare);
-typedef_clist(ip, ipair_t, c_default_destroy, ipair_compare);
+using_cvec(ip, ipair_t, c_default_destroy, ipair_compare);
+using_clist(ip, ipair_t, c_default_destroy, ipair_compare);
 
-typedef_cvec(f, float);
-typedef_cpqueue(f, cvec_f, >);
+using_cvec(f, float);
+using_cpqueue(f, cvec_f, >);
 
 
 int main(void) {

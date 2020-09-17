@@ -5,10 +5,10 @@
 
 void check_destroy(float* v) {printf("destroy %g\n", *v);}
 
-typedef_carray(f, float, check_destroy); // normally omit the last argument - float type need no destroy.
-typedef_clist(y, carray2f, carray2f_destroy, c_no_compare);
-typedef_cmap(g, int, clist_y, clist_y_destroy);
-typedef_cmap_strkey(s, cmap_g, cmap_g_destroy);
+using_carray(f, float, check_destroy); // normally omit the last argument - float type need no destroy.
+using_clist(y, carray2f, carray2f_destroy, c_no_compare);
+using_cmap(g, int, clist_y, clist_y_destroy);
+using_cmap_strkey(s, cmap_g, cmap_g_destroy);
 
 int main() {
     int xdim = 4, ydim = 6;

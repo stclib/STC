@@ -23,8 +23,8 @@
 /*
 #include <stdio.h>
 #include <stc/cmap.h>
-typedef_cset(sx, int);       // Set of int
-typedef_cmap(mx, int, char); // Map of int -> char
+using_cset(sx, int);       // Set of int
+using_cmap(mx, int, char); // Map of int -> char
 
 int main(void) {
     cset_sx s = cset_ini;
@@ -76,76 +76,76 @@ int main(void) {
 enum {chash_HASH = 0x7f, chash_USED = 0x80};
 typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 
-#define typedef_cmap(...) \
-    c_MACRO_OVERLOAD(typedef_cmap, __VA_ARGS__)
+#define using_cmap(...) \
+    c_MACRO_OVERLOAD(using_cmap, __VA_ARGS__)
 
-#define typedef_cmap_3(X, Key, Mapped) \
-    typedef_cmap_4(X, Key, Mapped, c_default_destroy)
+#define using_cmap_3(X, Key, Mapped) \
+    using_cmap_4(X, Key, Mapped, c_default_destroy)
 
-#define typedef_cmap_4(X, Key, Mapped, valueDestroy) \
-    typedef_cmap_6(X, Key, Mapped, valueDestroy, c_default_equals, c_default_hash16)
+#define using_cmap_4(X, Key, Mapped, valueDestroy) \
+    using_cmap_6(X, Key, Mapped, valueDestroy, c_default_equals, c_default_hash16)
 
-#define typedef_cmap_6(X, Key, Mapped, valueDestroy, keyEquals, keyHash) \
-    typedef_cmap_10(X, Key, Mapped, valueDestroy, keyEquals, keyHash, \
+#define using_cmap_6(X, Key, Mapped, valueDestroy, keyEquals, keyHash) \
+    using_cmap_10(X, Key, Mapped, valueDestroy, keyEquals, keyHash, \
                     c_default_destroy, Key, c_default_to_raw, c_default_from_raw)
 
-#define typedef_cmap_10(X, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
+#define using_cmap_10(X, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
                         keyDestroy, RawKey, keyToRaw, keyFromRaw) \
     _c_typedef_CHASH(X, cmap, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
                         keyDestroy, RawKey, keyToRaw, keyFromRaw, Mapped, c_default_from_raw)
 
-#define typedef_cmap_12(X, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
+#define using_cmap_12(X, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
                         keyDestroy, RawKey, keyToRaw, keyFromRaw, RawVal, valueFromRaw) \
     _c_typedef_CHASH(X, cmap, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
                         keyDestroy, RawKey, keyToRaw, keyFromRaw, RawVal, valueFromRaw)
 
 /* cset: */
-#define typedef_cset(...) \
-    c_MACRO_OVERLOAD(typedef_cset, __VA_ARGS__)
+#define using_cset(...) \
+    c_MACRO_OVERLOAD(using_cset, __VA_ARGS__)
 
-#define typedef_cset_2(X, Key) \
-    typedef_cset_4(X, Key, c_default_equals, c_default_hash16)
+#define using_cset_2(X, Key) \
+    using_cset_4(X, Key, c_default_equals, c_default_hash16)
 
-#define typedef_cset_4(X, Key, keyEquals, keyHash) \
-    typedef_cset_5(X, Key, keyEquals, keyHash, c_default_destroy)
+#define using_cset_4(X, Key, keyEquals, keyHash) \
+    using_cset_5(X, Key, keyEquals, keyHash, c_default_destroy)
 
-#define typedef_cset_5(X, Key, keyEquals, keyHash, keyDestroy) \
-    typedef_cset_8(X, Key, keyEquals, keyHash, keyDestroy, \
+#define using_cset_5(X, Key, keyEquals, keyHash, keyDestroy) \
+    using_cset_8(X, Key, keyEquals, keyHash, keyDestroy, \
                 Key, c_default_to_raw, c_default_from_raw)
 
-#define typedef_cset_8(X, Key, keyEqualsRaw, keyHashRaw, keyDestroy, \
+#define using_cset_8(X, Key, keyEqualsRaw, keyHashRaw, keyDestroy, \
                     RawKey, keyToRaw, keyFromRaw) \
     _c_typedef_CHASH(X, cset, Key, Key, void, keyEqualsRaw, keyHashRaw, \
                         keyDestroy, RawKey, keyToRaw, keyFromRaw, void, c_default_from_raw)
 
 /* cset_str, cmap_str, cmap_strkey, cmap_strval: */
-#define typedef_cset_str() \
+#define using_cset_str() \
     _c_declare_CHASH_strkey(str, cset, cstr_t, void)
 
-#define typedef_cmap_str() \
+#define using_cmap_str() \
     _c_typedef_CHASH(str, cmap, cstr_t, cstr_t, cstr_destroy, cstr_equals_raw, cstr_hash_raw, \
                           cstr_destroy, const char*, cstr_to_raw, cstr, const char*, cstr)
 
-#define typedef_cmap_strkey(...) \
-    c_MACRO_OVERLOAD(typedef_cmap_strkey, __VA_ARGS__)
+#define using_cmap_strkey(...) \
+    c_MACRO_OVERLOAD(using_cmap_strkey, __VA_ARGS__)
 
-#define typedef_cmap_strkey_2(X, Mapped) \
+#define using_cmap_strkey_2(X, Mapped) \
     _c_declare_CHASH_strkey(X, cmap, Mapped, c_default_destroy)
 
-#define typedef_cmap_strkey_3(X, Mapped, ValueDestroy) \
+#define using_cmap_strkey_3(X, Mapped, ValueDestroy) \
     _c_declare_CHASH_strkey(X, cmap, Mapped, ValueDestroy)
 
-#define typedef_cmap_strval(...) \
-    c_MACRO_OVERLOAD(typedef_cmap_strval, __VA_ARGS__)
+#define using_cmap_strval(...) \
+    c_MACRO_OVERLOAD(using_cmap_strval, __VA_ARGS__)
 
-#define typedef_cmap_strval_2(X, Key) \
-    typedef_cmap_strval_4(X, Key, c_default_equals, c_default_hash16)
+#define using_cmap_strval_2(X, Key) \
+    using_cmap_strval_4(X, Key, c_default_equals, c_default_hash16)
 
-#define typedef_cmap_strval_4(X, Key, keyEquals, keyHash) \
-    typedef_cmap_strval_8(X, Key, keyEquals, keyHash, \
+#define using_cmap_strval_4(X, Key, keyEquals, keyHash) \
+    using_cmap_strval_8(X, Key, keyEquals, keyHash, \
                              c_default_destroy, Key, c_default_to_raw, c_default_from_raw)
 
-#define typedef_cmap_strval_8(X, Key, keyEquals, keyHash, keyDestroy, RawKey, keyToRaw, keyFromRaw) \
+#define using_cmap_strval_8(X, Key, keyEquals, keyHash, keyDestroy, RawKey, keyToRaw, keyFromRaw) \
     _c_typedef_CHASH(X, cmap, Key, cstr_t, cstr_destroy, keyEquals, keyHash, \
                         keyDestroy, RawKey, keyToRaw, keyFromRaw, const char*, cstr)
 

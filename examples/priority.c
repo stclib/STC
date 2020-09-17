@@ -6,8 +6,8 @@
 #include <stc/cmap.h>
 #include <stc/crandom.h>
 
-typedef_cvec(i, int64_t);
-typedef_cpqueue(i, cvec_i, >); // min-heap (increasing values)
+using_cvec(i, int64_t);
+using_cpqueue(i, cvec_i, >); // min-heap (increasing values)
 
 int main() {
     size_t N = 10000000;

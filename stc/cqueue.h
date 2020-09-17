@@ -25,8 +25,8 @@
 
     #include <stc/crandom.h>
     #include <stc/cqueue.h>
-    typedef_clist(i, int);
-    typedef_cqueue(i, clist_i); // min-heap (increasing values)
+    using_clist(i, int);
+    using_cqueue(i, clist_i); // min-heap (increasing values)
 
     int main() {
         int n = 10000000;
@@ -58,7 +58,7 @@
 
 #include "clist.h"
 
-#define typedef_cqueue(X, ctype) \
+#define using_cqueue(X, ctype) \
 \
     typedef struct ctype cqueue_##X; \
     typedef ctype##_value_t cqueue_##X##_value_t; \

@@ -4,8 +4,8 @@
 #include <stc/cvec.h>
 #include <stc/cpqueue.h>
 
-typedef_cvec(f, float);
-typedef_cpqueue(f, cvec_f, >);
+using_cvec(f, float);
+using_cpqueue(f, cvec_f, >);
 
 int main()
 {
