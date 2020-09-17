@@ -115,11 +115,8 @@ cmap discussion
 ---------------
 
 **cmap / cset** support managing memory of the elements, i.e., you may customize the destroy-, hash- and equals- function, in addition to convertion to from some literal input types. E.g. it enables the usage of string literals as key in functions, instead of requering a constructed cstr as input.
-```
-using_cmap_strkey(si, int); // cstr_t => int map. Uses a special instatiatiation for cstr that allows you to input string literals as key.
-...
-cmap_si_emplace(&map, "mykey", 12); // construct and assign cstr("mykey") inside function, only if not already exist.
-```
+
+
 As string are common both as key and value, these are predefined:
 - *using_cmap_strkey(tag, valuetype)* // *cstr_t* => *valuetype*
 - *using_cmap_strval(tag, keytype)* // *keytype* => *cstr_t*
@@ -164,7 +161,7 @@ int main() {
     cstr_t full_path = cstr_from("%s/%s.%s", "directory", "filename", "ext");
     printf("%s\n", full_path.str);
     
-    cstr_mdestroy(&s1, &full_path);
+    cstr_dtor(cstr, &s1, &full_path); // multi-destroy..
 }
 ```
 **cvec** of *int64_t*. 
@@ -199,12 +196,12 @@ int main() {
     cvec_str_emplace_back(&names, "Joe");
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
     
-    // Use puch_back() for arguments of type cstr_t: is moved to the map.
+    // Use push_back() for items of type cstr_t: is moved to the map.
     cvec_str_push_back(&names, cstr_from("%d elements so far", cvec_size(names))); 
 
     printf("%s\n", names.data[1].str); // Access the string char*
     c_foreach (i, cvec_str, names)
-        printf("get %s\n", i.get->str);
+        printf("name: %s\n", i.get->str);
     cvec_str_destroy(&names);
 }
 ```
