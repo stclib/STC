@@ -1,5 +1,5 @@
-STC - C99 STandard Container library
-====================================
+STC - C99 Standard Containers library
+=====================================
 
 Introduction
 ------------
@@ -64,7 +64,7 @@ using_clist(v3, Vec3);
 Performance
 -----------
 
-The library is very efficent. Containers have templated intrusive elements. One of the most performance critical containers is the **cmap / cset**. Luckily, cmap is among the fastest C/C++ map implementations available, see **examples/benchmark.c**
+The library is highly efficent. All containers have templated intrusive elements. One of the most performance critical containers is the **cmap / cset**. Luckily, cmap is among the fastest C/C++ hash map implementations available, see **examples/benchmark.c**
 
 Compiled with g++ v9.2.0 -O3 on windows, Ryzen 7 2700X CPU. Similar results with VC and clang.
 
@@ -114,36 +114,25 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 cmap discussion
 ---------------
 
-**cmap/cset** are the most complex of the containers (although, currently less than 500 lines of code). It uses open hashing, but does not rely on power-of-two size table, nor prime number lengths, and it does not have tombstone buckets. It is still among the fastest hash-tables, as shown above. The default max load-factor is 0.85, and it shrinks (and rehashes) when load-factor goes below 0.15, by default (can be set per hash container).
-
-You can customize the destroy-, hash- and equals- function. **cmap/cset** also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is very useful when e.g. having cstr as key, as it enables the usage of string literals as key in *put() and find()* functions, instead of requering a constructed cstr. Without it, the code would become: 
+**cmap / cset** support managing memory of the elements, i.e., you may customize the destroy-, hash- and equals- function, in addition to convertion to from some literal input types. E.g. it enables the usage of string literals as key in functions, instead of requering a constructed cstr as input.
 ```
-using_cmap(si, cstr_t, int); // don't do this.
+using_cmap_strkey(si, int); // cstr_t => int map. Uses a special instatiatiation for cstr that allows you to input string literals as key.
 ...
-cmap_si_put(&map, cstr("mykey"), 12);
+cmap_si_emplace(&map, "mykey", 12); // construct and assign cstr("mykey") inside function, only if not already exist.
 ```
-This is a problem because cstr_t key may exist in the map, and it would need to destroy the current key and replace it with the new to avoid memory leak.  Lookup would also be problematic:
+As string are common both as key and value, these are predefined:
+- *using_cmap_strkey(tag, valuetype)* // *cstr_t* => *valuetype*
+- *using_cmap_strval(tag, keytype)* // *keytype* => *cstr_t*
+- *using_cmap_str()* // cstr_t => *cstr_t*, tag is *str*.
+- *using_cset_str()* // cstr_t **cset**
 ```
-cstr lookup = cstr("mykey");
-int x = cmap_si_find(&map, lookup)->value;
-cstr_destroy(&lookup);
-```
-To avoid this, use 
-- *using_cmap_strkey(tag, valuetype)*
-- *using_cmap_strval(tag, keytype)*
-- *using_cmap_str()* // cstr_t -> cstr_t
-- *using_cset_str()* // cstr_t set
-```
-using_cmap_strkey(si, int);
+using_cmap_strkey(si, int);  // cstr_t => int map. Uses a special instatiatiation for cstr that allows you to input string literals as key.
 ...
 cmap_si map = cmap_ini;
-cmap_si_put(&map, "mykey", 12);             // constructs a cstr_t key from the const char* internally.
-int x = cmap_si_find(&map, "mykey")->value; // no allocation of string key happens here.
+cmap_si_emplace(&map, "mykey", 12); // construct and assign a cstr_t inside the function, but only if not already exist.
+int x = cmap_si_find(&map, "mykey")->second; // Also accepts const char* string input
 cmap_si_destroy(&map);
 ```
-An alternative is to use *char* * as key type, but then you must manage allcoated memory of the hash char* keys yourself.
-Note that this predefined customization is also available for **cvec** and **clist**. See *using_cvec_str()*, *using_clist_str()*.
-
 To customize your own cmap type to work like cmap_str, you may want to look at **examples/advanced.c**. It demonstrates how to use a custom struct as a hash map key, using the optional parameters to using_cmap().
 
 Example usages
@@ -181,6 +170,7 @@ int main() {
 **cvec** of *int64_t*. 
 ```
 #include <stc/cvec.h>
+
 using_cvec(ix, int64_t); // ix is just an example type tag name.
 
 int main() {
@@ -200,6 +190,7 @@ int main() {
 ```
 #include <stc/cstr.h>
 #include <stc/cvec.h>
+
 using_cvec_str();
 
 int main() {
@@ -207,7 +198,8 @@ int main() {
     cvec_str_emplace_back(&names, "Mary");
     cvec_str_emplace_back(&names, "Joe");
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
-    // Use push_back() to add a new cstr_t object to be moved into the vector, e.g.:
+    
+    // Use puch_back() for arguments of type cstr_t: is moved to the map.
     cvec_str_push_back(&names, cstr_from("%d elements so far", cvec_size(names))); 
 
     printf("%s\n", names.data[1].str); // Access the string char*
@@ -220,6 +212,7 @@ int main() {
 ```
 #include <stdio.h>
 #include <stc/cmap.h>
+
 using_cmap(ii, int, int);
 
 int main() {
@@ -231,42 +224,45 @@ int main() {
     cmap_ii_destroy(&nums);
 }
 ```
-**cset** of *cstr*.
+**cset** of *cstr_t* type.
 ```
 #include <stc/cstr.h>
 #include <stc/cmap.h>
-using_cset_str(); // cstr set. See the discussion above.
+
+using_cset_str(); 
 
 int main() {
     cset_str words = cset_ini;
     cset_str_insert(&words, "Hello");
-    cset_str_insert(&words, "Cruel");
+    cset_str_insert(&words, "Sad");
     cset_str_insert(&words, "World");    
-    cset_str_erase(&words, "Cruel");
+
+    cset_str_erase(&words, "Sad");
 
     // iterate the set:
     c_foreach (i, cset_str, words)
-        printf("%s\n", i.get->key.str);
+        printf("%s\n", i.get->str);
     cset_str_destroy(&words);
 }
 ```
-**cmap** of *cstr -> cstr*. Both cstr keys and values are created internally via *cstr()* from const char* inputs.
+**cmap** of *cstr_t -> cstr_t*. Both cstr keys and values are created internally via *cstr()* from const char* inputs.
 ```
 #include <stc/cstr.h>
 #include <stc/cmap.h>
-using_cmap_str(); 
+
+using_cmap_str(); // cstr_t => cstr_t
 
 int main() {
     cmap_str table = cmap_ini;
     cmap_str_put(&table, "Make", "my");
     cmap_str_put(&table, "Rainy", "day");
-    cmap_str_put(&table, "Sunny", "afternoon");
-    printf("Sunny: %s\n", cmap_str_find(table, "Sunny")->value.str);
+    cmap_str_insert_or_assign(&table, "Sunny", "afternoon"); // same as put()
+    printf("Sunny: %s\n", cmap_str_find(table, "Sunny")->second.str);
     cmap_str_erase(&table, "Rainy");
 
     printf("size = %zu\n", cmap_size(table));
     c_foreach (i, cmap_str, table)
-        printf("%s: %s\n", i.get->key.str, i.get->value.str);
+        printf("%s: %s\n", i.get->first.str, i.get->second.str);
     cmap_str_destroy(&table); // frees key and value cstrs, and hash table.
 }
 ```
@@ -276,34 +272,38 @@ int main() {
 #include <time.h>
 #include <stc/clist.h>
 #include <stc/crandom.h>
+
 using_clist(fx, double);
 
 int main() {
-    clist_fx list = clist_ini;
+    // Random engine, with uniform distribution from 100 to 1000:
     crand_eng64_t eng = crand_eng64_init(time(NULL));
     crand_uniform_f64_t dist = crand_uniform_f64_init(100.0, 1000.0);
-    int k;
     
+    int k;
+    // Fill singly linked list with random real numbers
+    clist_fx list = clist_ini;
     for (int i = 0; i < 10000000; ++i)
-        clist_fx_push_back(&list, crand_uniform_f64(&eng, dist));
+        clist_fx_push_back(&list, crand_uniform_f64(&eng, &dist));
+    
     k = 0;
     c_foreach (i, clist_fx, list)
-        if (++k <= 10) printf("%8d: %10f\n", k, i.get->value); else break;
+        if (++k <= 10) printf("%8d: %10f\n", k, *i.get); else break;
 
     clist_fx_sort(&list); // mergesort O(n*log n)
     puts("sorted");
 
     k = 0;
     c_foreach (i, clist_fx, list)
-        if (++k <= 10) printf("%8d: %10f\n", k, i.get->value); else break;
+        if (++k <= 10) printf("%8d: %10f\n", k, *i.get); else break;
 
     clist_fx_clear(&list);
 
-    // generic c_push_items() function, works on most containers:
+    // generic push a list of items, works on most containers:
     c_push_items(&list, clist_fx, {10, 20, 30, 40, 50});
 
     c_foreach (i, clist_fx, list)
-        printf("%f ", i.get->value);
+        printf("%f ", *i.get);
     puts("");
 
     clist_fx_destroy(&list);
@@ -313,6 +313,7 @@ int main() {
 ```
 #include <stdio.h>
 #include <stc/carray.h>
+
 using_carray(f, float);
 
 int main()
