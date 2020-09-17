@@ -274,7 +274,7 @@ using_clist(fx, double);
 
 int main() {
     // Random engine, with uniform distribution from 100 to 1000:
-    crand_eng64_t eng = crand_eng64_init(time(NULL));
+    crand_rng64_t eng = crand_rng64_init(time(NULL));
     crand_uniform_f64_t dist = crand_uniform_f64_init(100.0, 1000.0);
     
     int k;
