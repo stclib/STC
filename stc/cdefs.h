@@ -90,7 +90,7 @@
 #define c_forrange_3(i, type, stop) for (type i=0, i##_end_=stop; i < i##_end_; ++i)
 #define c_forrange_4(i, type, start, stop) for (type i=start, i##_end_=stop; i < i##_end_; ++i)
 #define c_forrange_5(i, type, start, stop, step) \
-    for (type i=start, i##_inc_=step, i##_end_=stop - (i##_inc_ > 0); (i <= i##_end_) == (0 < i##_inc_); i += i##_inc_)
+    for (type i=start, i##_inc_=step, i##_end_=(stop) - (i##_inc_ > 0); (i <= i##_end_) == (0 < i##_inc_); i += i##_inc_)
 
 #define c_push_items(self, ctype, ...) do { \
     const ctype##_input_t __arr[] = __VA_ARGS__; \
