@@ -86,10 +86,10 @@
 #define c_foreach_4(it, ctype, start, finish) \
     for (ctype##_iter_t it = start, it##_end_ = finish; it.get != it##_end_.get; ctype##_next(&it))
 
-#define c_for_range(...) c_MACRO_OVERLOAD(c_for_range, __VA_ARGS__)
-#define c_for_range_3(type, i, stop) for (type i=0, i##_end_=stop; i < i##_end_; ++i)
-#define c_for_range_4(type, i, start, stop) for (type i=start, i##_end_=stop; i < i##_end_; ++i)
-#define c_for_range_5(type, i, start, stop, step) \
+#define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
+#define c_forrange_3(i, type, stop) for (type i=0, i##_end_=stop; i < i##_end_; ++i)
+#define c_forrange_4(i, type, start, stop) for (type i=start, i##_end_=stop; i < i##_end_; ++i)
+#define c_forrange_5(i, type, start, stop, step) \
     for (type i=start, i##_inc_=step, i##_end_=stop - (i##_inc_ > 0); (i <= i##_end_) == (0 < i##_inc_); i += i##_inc_)
 
 #define c_push_items(self, ctype, ...) do { \

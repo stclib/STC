@@ -33,5 +33,5 @@ int main() {
         printf("value (%d, %d) is: %f\n", y, x, *carray2f_at(&table, y, x));
     }
 
-    c_del_(cmap_s, &myMap); // free up everything!
+    cmap_s_del(&myMap); // free up everything!
 }
