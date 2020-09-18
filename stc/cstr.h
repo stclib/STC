@@ -35,11 +35,11 @@ typedef char cstr_value_t;
 
 static size_t _cstr_nullrep[] = {0, 0, 0};
 
-static  cstr_t cstr_ini =  {(char* ) &_cstr_nullrep[2]};
+static  cstr_t cstr_INIT = {(char* ) &_cstr_nullrep[2]};
 #define cstr_size(s)       ((const size_t *) (s).str)[-2]
 #define cstr_capacity(s)   ((const size_t *) (s).str)[-1]
 #define cstr_empty(s)      (cstr_size(s) == 0)
-#define cstr_npos          ((size_t) (-1))
+#define cstr_NPOS          ((size_t) (-1))
 
 STC_API cstr_t
 cstr_n(const char* str, size_t len);
@@ -68,23 +68,23 @@ c_strnstr(const char* s, const char* needle, size_t n);
 #define _cstr_cap(size)  ((((size) + 24) >> 4) * 16 - 9)
 
 STC_INLINE cstr_t
-cstr_init() {return cstr_ini;}
+cstr_init() {return cstr_INIT;}
 
 STC_INLINE void
-cstr_destroy(cstr_t* self) {
+cstr_del(cstr_t* self) {
     if (cstr_capacity(*self))
         free(_cstr_rep(self));
 }
 
 STC_INLINE cstr_t
 cstr_with_capacity(size_t cap) {
-    cstr_t s = cstr_ini;
+    cstr_t s = cstr_INIT;
     cstr_reserve(&s, cap);
     return s;
 }
 STC_INLINE cstr_t
 cstr_with_size(size_t len, char fill) {
-    cstr_t s = cstr_ini;
+    cstr_t s = cstr_INIT;
     cstr_resize(&s, len, fill);
     return s;
 }
@@ -132,7 +132,7 @@ cstr_take(cstr_t* self, cstr_t s) {
 STC_INLINE cstr_t
 cstr_move(cstr_t* self) {
     cstr_t tmp = *self;
-    *self = cstr_ini;
+    *self = cstr_INIT;
     return tmp;
 }
 
@@ -180,12 +180,12 @@ cstr_compare(const cstr_t *s1, const cstr_t *s2) {
 STC_INLINE size_t
 cstr_find_n(const cstr_t* s, const char* needle, size_t pos, size_t n) {
     char* res = c_strnstr(s->str + pos, needle, n);
-    return res ? res - s->str : cstr_npos;
+    return res ? res - s->str : cstr_NPOS;
 }
 STC_INLINE size_t
 cstr_find(const cstr_t* s, const char* needle) {
     char* res = strstr(s->str, needle);
-    return res ? res - s->str : cstr_npos;
+    return res ? res - s->str : cstr_NPOS;
 }
 
 /* cvec/cmap API functions: */
@@ -229,7 +229,7 @@ cstr_resize(cstr_t* self, size_t len, char fill) {
 
 STC_API cstr_t
 cstr_n(const char* str, size_t len) {
-    if (len == 0) return cstr_ini;
+    if (len == 0) return cstr_INIT;
     size_t *rep = (size_t *) malloc(_cstr_mem(len));
     cstr_t s = {(char *) memcpy(rep + 2, str, len)};
     s.str[rep[0] = len] = '\0';
@@ -246,7 +246,7 @@ cstr_from(const char* fmt, ...) {
     #  pragma warning(push)
     #  pragma warning(disable: 4996)
     #endif
-    cstr_t tmp = cstr_ini;
+    cstr_t tmp = cstr_INIT;
     va_list args, args2;
     va_start(args, fmt);
     va_copy(args2, args);

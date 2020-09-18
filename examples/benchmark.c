@@ -22,7 +22,7 @@ static inline uint32_t fibonacci_hash(const void* data, size_t len) {
 }
 
 // cmap and khash template expansion
-using_cmap(ii, int64_t, int64_t, c_default_destroy, c_default_equals, fibonacci_hash); // c_default_hash16);
+using_cmap(ii, int64_t, int64_t, c_default_del, c_default_equals, fibonacci_hash); // c_default_hash16);
 KHASH_MAP_INIT_INT64(ii, int64_t)
 
 
@@ -34,7 +34,7 @@ crand_rng64_t rng;
 #define RAND(N) (crand_i64(&rng) & ((1 << N) - 1))
 
 
-#define CMAP_SETUP(X, Key, Value) cmap_##X map = cmap_ini \
+#define CMAP_SETUP(X, Key, Value) cmap_##X map = cmap_INIT \
                                   ; cmap_##X##_set_load_factors(&map, max_load_factor, 0.0)
 #define CMAP_PUT(X, key, val)     cmap_##X##_put(&map, key, val).first->second
 #define CMAP_EMPLACE(X, key, val) cmap_##X##_emplace(&map, key, val)
@@ -45,7 +45,7 @@ crand_rng64_t rng;
 #define CMAP_SIZE(X)              cmap_size(map)
 #define CMAP_BUCKETS(X)           cmap_##X##_bucket_count(map)
 #define CMAP_CLEAR(X)             cmap_##X##_clear(&map)
-#define CMAP_DTOR(X)              cmap_##X##_destroy(&map)
+#define CMAP_DTOR(X)              cmap_##X##_del(&map)
 
 #define KMAP_SETUP(X, Key, Value) khash_t(ii)* map = kh_init(ii); khiter_t ki; int ret
 #define KMAP_PUT(X, key, val)     (*(ki = kh_put(ii, map, key, &ret), map->vals[ki] = val, &map->vals[ki]))

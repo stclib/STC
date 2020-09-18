@@ -33,5 +33,5 @@ int main(void)
     for (uint32_t i = 2; i <= 1000; ++i)
        if (cbitset_test(primes, i)) printf("%u ", i);
     puts("");
-    cbitset_destroy(&primes);
+    cbitset_del(&primes);
 }

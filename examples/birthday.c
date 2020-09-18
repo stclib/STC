@@ -16,7 +16,7 @@ const static uint64_t mask = (1ull << 52) - 1;
 void repeats(void)
 {
     crand_rng64_t rng = crand_rng64_init(seed);
-    cmap_ic m = cmap_ini;
+    cmap_ic m = cmap_INIT;
     cmap_ic_reserve(&m, N);
     clock_t now = clock();
     for (size_t i = 0; i < N; ++i) {

@@ -9,7 +9,7 @@ int main() {
     cbitset_resize(&set, 43, false);
     cstr_t str = cbitset_to_str(set);
     printf(" str: %s\n", str.str);
-    cstr_destroy(&str);
+    cstr_del(&str);
 
     printf("%4zu: ", set.size);
     for (int i=0; i<set.size; ++i)
@@ -53,6 +53,6 @@ int main() {
         printf("%d", cbitset_test(set, i));
     puts("");
     
-    cbitset_destroy(&s2);
-    cbitset_destroy(&set);
+    cbitset_del(&s2);
+    cbitset_del(&set);
 }

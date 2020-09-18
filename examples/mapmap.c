@@ -4,11 +4,11 @@
 #include <stc/cstr.h>
 
 using_cmap_str();
-using_cmap_strkey(cfg, cmap_str, cmap_str_destroy);
+using_cmap_strkey(cfg, cmap_str, cmap_str_del);
 
 int main(void) {
-    cmap_cfg config = cmap_ini;
-    cmap_str init = cmap_ini;
+    cmap_cfg config = cmap_INIT;
+    cmap_str init = cmap_INIT;
     cmap_str_put(&cmap_cfg_emplace(&config, "user", init).first->second, "name", "Joe");
     cmap_str_put(&cmap_cfg_emplace(&config, "user", init).first->second, "groups", "proj1,proj3");
     cmap_str_put(&cmap_cfg_emplace(&config, "group", init).first->second, "proj1", "Energy");
@@ -22,5 +22,5 @@ int main(void) {
         c_foreach (j, cmap_str, i.get->second)
             printf("%s: %s - %s (%u)\n", i.get->first.str, j.get->first.str, j.get->second.str, i.get->second.bucket_count);
 
-    cmap_cfg_destroy(&config);
+    cmap_cfg_del(&config);
 }

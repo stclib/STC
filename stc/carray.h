@@ -40,8 +40,8 @@ int main()
     printf("%f\n", *carray2f_at(a2, 4, 3));    // lookup a2[4][3] (=10.2f)
     printf("%f\n", *carray3f_at(a3, 5, 4, 3)); // same data location, via a3 array.
 
-    carray2f_destroy(&a2); // does nothing, since it is a sub-array.
-    carray3f_destroy(&a3); // also invalidates a2.
+    carray2f_del(&a2); // does nothing, since it is a sub-array.
+    carray3f_del(&a3); // also invalidates a2.
 }
 */
 
@@ -83,7 +83,7 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
     carray##D##X##_next(carray##D##X##_iter_t* it) {++it->get;} \
 \
     STC_INLINE void \
-    carray##D##X##_destroy(carray##D##X* self) { \
+    carray##D##X##_del(carray##D##X* self) { \
         if (self->_xdim & _carray_OWN) { \
             c_foreach_3 (i, carray##D##X, *self) \
                 valueDestroy(i.get); \
@@ -93,7 +93,7 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
 
 #define using_carray(...) c_MACRO_OVERLOAD(using_carray, __VA_ARGS__)
 #define using_carray_2(X, Value) \
-    using_carray_3(X, Value, c_default_destroy)
+    using_carray_3(X, Value, c_default_del)
 
 
 #define using_carray_3(X, Value, valueDestroy) \

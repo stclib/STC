@@ -3,25 +3,25 @@
 #include <stc/clist.h>
 #include <stc/carray.h>
 
-void check_destroy(float* v) {printf("destroy %g\n", *v);}
+void check_del(float* v) {printf("destroy %g\n", *v);}
 
-using_carray(f, float, check_destroy); // normally omit the last argument - float type need no destroy.
-using_clist(y, carray2f, carray2f_destroy, c_no_compare);
-using_cmap(g, int, clist_y, clist_y_destroy);
-using_cmap_strkey(s, cmap_g, cmap_g_destroy);
+using_carray(f, float, check_del); // normally omit the last argument - float type need no destroy.
+using_clist(y, carray2f, carray2f_del, c_no_compare);
+using_cmap(g, int, clist_y, clist_y_del);
+using_cmap_strkey(s, cmap_g, cmap_g_del);
 
 int main() {
     int xdim = 4, ydim = 6;
     int x = 1, y = 5, tableKey = 42;
     const char* strKey = "first";
-    cmap_s myMap = cmap_ini;
+    cmap_s myMap = cmap_INIT;
 
     { // Construct.
         carray2f table = carray2f_make(ydim, xdim, 0.f);
         printf("table: (%zu, %zu)\n", carray2_ydim(table), carray2_xdim(table));
-        clist_y tableList = clist_ini;
+        clist_y tableList = clist_INIT;
         // Put in some data.
-        cmap_g listMap = cmap_ini;
+        cmap_g listMap = cmap_INIT;
 
         *carray2f_at(&table, y, x) = 3.1415927f; // table[y][x]
         clist_y_push_back(&tableList, table);
@@ -33,5 +33,5 @@ int main() {
         printf("value (%d, %d) is: %f\n", y, x, *carray2f_at(&table, y, x));
     }
 
-    c_dtor(cmap_s, &myMap); // free up everything!
+    c_del_(cmap_s, &myMap); // free up everything!
 }

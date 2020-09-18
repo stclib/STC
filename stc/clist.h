@@ -38,7 +38,7 @@
     using_clist(ix, int64_t);
 
     int main() {
-        clist_ix list = clist_ini;
+        clist_ix list = clist_INIT;
         crand_rng32_t pcg = crand_rng32_init(12345);
         int n;
         for (int i=0; i<1000000; ++i) // one million
@@ -52,19 +52,19 @@
         puts("sorted");
         c_foreach (i, clist_ix, list)
             if (++n % 10000 == 0) printf("%8d: %10zd\n", n, i.get->value);
-        clist_ix_destroy(&list);
+        clist_ix_del(&list);
     }
 */
 #define using_clist(...)   c_MACRO_OVERLOAD(using_clist, __VA_ARGS__)
 
 #define using_clist_2(X, Value) \
-                             using_clist_3(X, Value, c_default_destroy)
+                             using_clist_3(X, Value, c_default_del)
 #define using_clist_3(X, Value, valueDestroy) \
                              using_clist_4(X, Value, valueDestroy, c_default_compare)
 #define using_clist_4(X, Value, valueDestroy, valueCompare) \
                              using_clist_7(X, Value, valueDestroy, Value, \
                                           valueCompare, c_default_to_raw, c_default_from_raw)
-#define using_clist_str()  using_clist_7(str, cstr_t, cstr_destroy, const char*, \
+#define using_clist_str()  using_clist_7(str, cstr_t, cstr_del, const char*, \
                                       cstr_compare_raw, cstr_to_raw, cstr)
 
 #define using_clist_types(X, Value) \
@@ -85,7 +85,7 @@
         int _state; \
     } clist_##X##_iter_t
 
-#define clist_ini           {NULL}
+#define clist_INIT          {NULL}
 #define clist_empty(list)   ((list).last == NULL)
 
 #define c_emplace_after(self, ctype, pos, ...) do { \
@@ -108,7 +108,7 @@ STC_API size_t _clist_size(const clist_void* self);
     typedef clist_##X##_rawvalue_t clist_##X##_input_t; \
 \
     STC_INLINE clist_##X \
-    clist_##X##_init(void) {clist_##X x = clist_ini; return x;} \
+    clist_##X##_init(void) {clist_##X x = clist_INIT; return x;} \
     STC_INLINE bool \
     clist_##X##_empty(clist_##X ls) {return clist_empty(ls);} \
     STC_INLINE size_t \
@@ -117,9 +117,9 @@ STC_API size_t _clist_size(const clist_void* self);
     clist_##X##_value_from_raw(RawValue rawValue) {return valueFromRaw(rawValue);} \
 \
     STC_API void \
-    clist_##X##_destroy(clist_##X* self); \
+    clist_##X##_del(clist_##X* self); \
     STC_INLINE void \
-    clist_##X##_clear(clist_##X* self) {clist_##X##_destroy(self);} \
+    clist_##X##_clear(clist_##X* self) {clist_##X##_del(self);} \
 \
     STC_API void \
     clist_##X##_push_n(clist_##X *self, const clist_##X##_input_t in[], size_t size); \
@@ -214,7 +214,7 @@ STC_API size_t _clist_size(const clist_void* self);
 #define _c_implement_clist_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
 \
     STC_API void \
-    clist_##X##_destroy(clist_##X* self) { \
+    clist_##X##_del(clist_##X* self) { \
         while (self->last) _clist_##X##_erase_after(self, self->last); \
     } \
 \

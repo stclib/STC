@@ -22,9 +22,9 @@ typedef struct Viking {
 } Viking;
 
 
-void viking_destroy(Viking* vk) {
-    cstr_destroy(&vk->name);
-    cstr_destroy(&vk->country);
+void viking_del(Viking* vk) {
+    cstr_del(&vk->name);
+    cstr_del(&vk->country);
 }
 
 // Viking view struct -----------------------
@@ -51,17 +51,17 @@ Viking viking_fromVw(VikingVw vw) {
 }
 
 // Using the full using_cmap() macro to define [Viking -> int] hash map type:
-using_cmap(vk, Viking, int, c_default_destroy, vikingvw_equals, vikingvw_hash,
-                 viking_destroy, VikingVw, viking_toVw, viking_fromVw);
+using_cmap(vk, Viking, int, c_default_del, vikingvw_equals, vikingvw_hash,
+                 viking_del, VikingVw, viking_toVw, viking_fromVw);
 
 // cmap_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test.
-// cmap_vk_destroy() will free all memory allocated for Viking keys and the hash table values.
+// cmap_vk_del() will free all memory allocated for Viking keys and the hash table values.
 
 // Main ----------------------------
 
 int main()
 {
-    cmap_vk vikings = cmap_ini;
+    cmap_vk vikings = cmap_INIT;
     c_push_items(&vikings, cmap_vk, {
         {{"Einar", "Norway"}, 20},
         {{"Olaf", "Denmark"}, 24},
@@ -76,6 +76,6 @@ int main()
     c_foreach (k, cmap_vk, vikings) {
         printf("%s of %s has %d hp\n", k.get->first.name.str, k.get->first.country.str, k.get->second);
     }
-    cmap_vk_destroy(&vikings);
+    cmap_vk_del(&vikings);
 }
 

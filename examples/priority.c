@@ -31,5 +31,5 @@ int main() {
         printf("%zd ", *cpqueue_i_top(&heap));
         cpqueue_i_pop(&heap);
     }
-    cpqueue_i_destroy(&heap);
+    cpqueue_i_del(&heap);
 }

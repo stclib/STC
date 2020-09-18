@@ -27,20 +27,20 @@
 #include <string.h>
 #include "cdefs.h"
 
-#define cvec_ini           {NULL}
+#define cvec_INIT           {NULL}
 #define cvec_size(v)       _cvec_safe_size((v).data)
 #define cvec_capacity(v)   _cvec_safe_capacity((v).data)
 #define cvec_empty(v)      (cvec_size(v) == 0)
 
 #define using_cvec(...) c_MACRO_OVERLOAD(using_cvec, __VA_ARGS__)
 #define using_cvec_2(X, Value) \
-                    using_cvec_3(X, Value, c_default_destroy)
+                    using_cvec_3(X, Value, c_default_del)
 #define using_cvec_3(X, Value, valueDestroy) \
                     using_cvec_4(X, Value, valueDestroy, c_default_compare)
 #define using_cvec_4(X, Value, valueDestroy, valueCompare) \
                     using_cvec_7(X, Value, valueDestroy, valueCompare, Value, c_default_to_raw, c_default_from_raw)
 #define using_cvec_str() \
-                    using_cvec_7(str, cstr_t, cstr_destroy, cstr_compare_raw, const char*, cstr_to_raw, cstr)
+                    using_cvec_7(str, cstr_t, cstr_del, cstr_compare_raw, const char*, cstr_to_raw, cstr)
 
 
 #define using_cvec_7(X, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw) \
@@ -55,7 +55,7 @@
     } cvec_##X; \
 \
     STC_INLINE cvec_##X \
-    cvec_##X##_init(void) {cvec_##X v = cvec_ini; return v;} \
+    cvec_##X##_init(void) {cvec_##X v = cvec_INIT; return v;} \
     STC_INLINE bool \
     cvec_##X##_empty(cvec_##X v) {return cvec_empty(v);} \
     STC_INLINE size_t \
@@ -67,7 +67,7 @@
     STC_INLINE void \
     cvec_##X##_clear(cvec_##X* self); \
     STC_API void \
-    cvec_##X##_destroy(cvec_##X* self); \
+    cvec_##X##_del(cvec_##X* self); \
     STC_API void \
     cvec_##X##_reserve(cvec_##X* self, size_t cap); \
     STC_API void \
@@ -77,13 +77,13 @@
 \
     STC_INLINE cvec_##X \
     cvec_##X##_with_size(size_t size, Value null_val) { \
-        cvec_##X x = cvec_ini; \
+        cvec_##X x = cvec_INIT; \
         cvec_##X##_resize(&x, size, null_val); \
         return x; \
     } \
     STC_INLINE cvec_##X \
     cvec_##X##_with_capacity(size_t size) { \
-        cvec_##X x = cvec_ini; \
+        cvec_##X x = cvec_INIT; \
         cvec_##X##_reserve(&x, size); \
         return x; \
     } \
@@ -208,7 +208,7 @@
         } \
     } \
     STC_API void \
-    cvec_##X##_destroy(cvec_##X* self) { \
+    cvec_##X##_del(cvec_##X* self) { \
         cvec_##X##_clear(self); \
         if (self->data) free(_cvec_alloced(self->data)); \
     } \

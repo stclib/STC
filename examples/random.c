@@ -58,10 +58,10 @@ int main()
         if (n >= 0 && n < R) ++hist[n];
     }
     
-    cstr_t bar = cstr_ini;
+    cstr_t bar = cstr_INIT;
     for (int i=0; i < R; ++i) {
         cstr_take(&bar, cstr_with_size(hist[i] * 25ull * R / N2, '*'));
         printf("%2d %s\n", i, bar.str);
     }
-    cstr_destroy(&bar);
+    cstr_del(&bar);
 }

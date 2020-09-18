@@ -49,7 +49,7 @@
                 --n, cqueue_i_pop(&queue);
         }
         printf("%d\n", n);
-        cqueue_i_destroy(&queue);
+        cqueue_i_del(&queue);
     }
 */
 
@@ -67,7 +67,7 @@
     STC_INLINE cqueue_##X \
     cqueue_##X##_init() {return ctype##_init();} \
     STC_INLINE void \
-    cqueue_##X##_destroy(cqueue_##X* self) {ctype##_destroy(self);} \
+    cqueue_##X##_del(cqueue_##X* self) {ctype##_del(self);} \
     STC_INLINE size_t \
     cqueue_##X##_size(cqueue_##X pq) {return ctype##_size(pq);} \
     STC_INLINE bool \

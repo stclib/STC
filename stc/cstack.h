@@ -56,7 +56,7 @@
     STC_INLINE cstack_##X \
     cstack_##X##_init() {return ctype##_init();} \
     STC_INLINE void \
-    cstack_##X##_destroy(cstack_##X* self) {ctype##_destroy(self);} \
+    cstack_##X##_del(cstack_##X* self) {ctype##_del(self);} \
     STC_INLINE size_t \
     cstack_##X##_size(cstack_##X pq) {return ctype##_size(pq);} \
     STC_INLINE bool \

@@ -14,7 +14,7 @@ static int compare(cmap_i_entry_t *a, cmap_i_entry_t *b) {
     return c_default_compare(&a->first, &b->first);
 }
 // Vector: typetag 'e' for (map) entry
-using_cvec(e, cmap_i_entry_t, c_default_destroy, compare);
+using_cvec(e, cmap_i_entry_t, c_default_del, compare);
 
 int main()
 {
@@ -29,20 +29,20 @@ int main()
     crand_normal_f64_t dist = crand_normal_f64_init(Mean, StdDev);
 
     // Create histogram map
-    cmap_i mhist = cmap_ini;
+    cmap_i mhist = cmap_INIT;
     for (size_t i = 0; i < N; ++i) {
         int index = (int) round( crand_normal_f64(&rng, &dist) );
         cmap_i_emplace(&mhist, index, 0).first->second += 1;
     }
 
     // Transfer map to vec and sort it by map keys.
-    cvec_e vhist = cvec_ini;
+    cvec_e vhist = cvec_INIT;
     c_foreach (i, cmap_i, mhist)
         cvec_e_push_back(&vhist, *i.get);
     cvec_e_sort(&vhist);
 
     // Print the gaussian bar chart
-    cstr_t bar = cstr_ini;
+    cstr_t bar = cstr_INIT;
     c_foreach (i, cvec_e, vhist) {
         size_t n = (size_t) (i.get->second * Mag / N);
         if (n > 0) {
@@ -52,7 +52,7 @@ int main()
         }
     }
     // Cleanup
-    cstr_destroy(&bar);
-    cmap_i_destroy(&mhist);
-    cvec_e_destroy(&vhist);
+    cstr_del(&bar);
+    cmap_i_del(&mhist);
+    cvec_e_del(&vhist);
 }

@@ -27,9 +27,9 @@ All containers mentioned above, except cstr_t and cbitset_t are generic and type
 using_cvec(i, int);
 
 int main(void) {
-    cvec_i vec = cvec_ini;
+    cvec_i vec = cvec_INIT;
     cvec_i_push_back(&vec, 42);
-    cvec_i_destroy(&vec);
+    cvec_i_del(&vec);
 }
 ```
 Motivation
@@ -126,7 +126,7 @@ This is a problem because cstr_t key may exist in the map, and it would need to 
 ```
 cstr lookup = cstr("mykey");
 int x = cmap_si_find(&map, lookup)->value;
-cstr_destroy(&lookup);
+cstr_del(&lookup);
 ```
 To avoid this, use 
 - *using_cmap_strkey(tag, valuetype)*
@@ -136,10 +136,10 @@ To avoid this, use
 ```
 using_cmap_strkey(si, int);
 ...
-cmap_si map = cmap_ini;
+cmap_si map = cmap_INIT;
 cmap_si_put(&map, "mykey", 12);             // constructs a cstr_t key from the const char* internally.
 int x = cmap_si_find(&map, "mykey")->value; // no allocation of string key happens here.
-cmap_si_destroy(&map);
+cmap_si_del(&map);
 ```
 An alternative is to use *char* * as key type, but then you must manage allcoated memory of the hash char* keys yourself.
 Note that this predefined customization is also available for **cvec** and **clist**. See *using_cvec_str()*, *using_clist_str()*.
@@ -184,7 +184,7 @@ int main() {
 using_cvec(ix, int64_t); // ix is just an example type tag name.
 
 int main() {
-    cvec_ix bignums = cvec_ini; // use cvec_ix_init() if initializing after declaration.
+    cvec_ix bignums = cvec_INIT; // use cvec_ix_init() if initializing after declaration.
     cvec_ix_reserve(&bignums, 100);
     for (size_t i = 0; i<100; ++i)
         cvec_ix_push_back(&bignums, i * i * i);
@@ -193,7 +193,7 @@ int main() {
     uint64_t value;
     for (size_t i = 0; i < cvec_size(bignums); ++i)
         value = bignums.data[i];
-    cvec_ix_destroy(&bignums);
+    cvec_ix_del(&bignums);
 }
 ```
 **cvec** of *cstr_t*.
@@ -203,7 +203,7 @@ int main() {
 using_cvec_str();
 
 int main() {
-    cvec_str names = cvec_ini;
+    cvec_str names = cvec_INIT;
     cvec_str_emplace_back(&names, "Mary");
     cvec_str_emplace_back(&names, "Joe");
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
@@ -213,7 +213,7 @@ int main() {
     printf("%s\n", names.data[1].str); // Access the string char*
     c_foreach (i, cvec_str, names)
         printf("get %s\n", i.get->str);
-    cvec_str_destroy(&names);
+    cvec_str_del(&names);
 }
 ```
 **cmap** of *int -> int*.
@@ -223,12 +223,12 @@ int main() {
 using_cmap(ii, int, int);
 
 int main() {
-    cmap_ii nums = cmap_ini;
+    cmap_ii nums = cmap_INIT;
     cmap_ii_put(&nums, 8, 64); // similar to insert_or_assign()
     cmap_ii_emplace(&nums, 11, 121); 
 
     printf("%d\n", cmap_ii_find(nums, 8)->value);
-    cmap_ii_destroy(&nums);
+    cmap_ii_del(&nums);
 }
 ```
 **cset** of *cstr*.
@@ -238,7 +238,7 @@ int main() {
 using_cset_str(); // cstr set. See the discussion above.
 
 int main() {
-    cset_str words = cset_ini;
+    cset_str words = cset_INIT;
     cset_str_insert(&words, "Hello");
     cset_str_insert(&words, "Cruel");
     cset_str_insert(&words, "World");    
@@ -247,7 +247,7 @@ int main() {
     // iterate the set:
     c_foreach (i, cset_str, words)
         printf("%s\n", i.get->key.str);
-    cset_str_destroy(&words);
+    cset_str_del(&words);
 }
 ```
 **cmap** of *cstr -> cstr*. Both cstr keys and values are created internally via *cstr()* from const char* inputs.
@@ -257,7 +257,7 @@ int main() {
 using_cmap_str(); 
 
 int main() {
-    cmap_str table = cmap_ini;
+    cmap_str table = cmap_INIT;
     cmap_str_put(&table, "Make", "my");
     cmap_str_put(&table, "Rainy", "day");
     cmap_str_put(&table, "Sunny", "afternoon");
@@ -267,7 +267,7 @@ int main() {
     printf("size = %zu\n", cmap_size(table));
     c_foreach (i, cmap_str, table)
         printf("%s: %s\n", i.get->key.str, i.get->value.str);
-    cmap_str_destroy(&table); // frees key and value cstrs, and hash table.
+    cmap_str_del(&table); // frees key and value cstrs, and hash table.
 }
 ```
 **clist** of *int64_t*. Similar to c++ *std::forward_list*, but can do both *push_front()* and *push_back()* as well as *pop_front()*.
@@ -279,7 +279,7 @@ int main() {
 using_clist(fx, double);
 
 int main() {
-    clist_fx list = clist_ini;
+    clist_fx list = clist_INIT;
     crand_eng64_t eng = crand_eng64_init(time(NULL));
     crand_uniform_f64_t dist = crand_uniform_f64_init(100.0, 1000.0);
     int k;
@@ -306,7 +306,7 @@ int main() {
         printf("%f ", i.get->value);
     puts("");
 
-    clist_fx_destroy(&list);
+    clist_fx_del(&list);
 }
 ```
 **carray**. 1d, 2d and 3d arrays, allocated from heap in one memory block. *carray3* may have sub-array "views" of *carray2* and *carray1* etc., as shown in the following example:
@@ -327,8 +327,8 @@ int main()
     printf("%f\n", *carray2f_at(a2, 4, 3));    // a2[4][3] (3.14f)
     printf("%f\n", *carray3f_at(a3, 5, 4, 3)); // a3[5][4][3] (3.14f)
     // ...
-    carray2f_destroy(&a1); // does nothing, since it is a sub-array.
-    carray2f_destroy(&a2); // same.
-    carray3f_destroy(&a3); // free array, and invalidates a1, a2.
+    carray2f_del(&a1); // does nothing, since it is a sub-array.
+    carray2f_del(&a2); // same.
+    carray3f_del(&a3); // free array, and invalidates a1, a2.
 }
 ```

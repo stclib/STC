@@ -78,29 +78,29 @@
 #define c_default_less(x, y)    (*(x) < *(y))
 #define c_less_compare(less, x, y) (less(x, y) ? -1 : less(y, x))
 #define c_default_compare(x, y) c_less_compare(c_default_less, x, y)
-#define c_default_destroy(ptr)  ((void) (ptr))
+#define c_default_del(ptr)  ((void) (ptr))
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
-
 #define c_foreach_3(it, ctype, cnt) \
     for (ctype##_iter_t it = ctype##_begin(&cnt), it##_end_ = ctype##_end(&cnt); it.get != it##_end_.get; ctype##_next(&it))
 #define c_foreach_4(it, ctype, start, finish) \
     for (ctype##_iter_t it = start, it##_end_ = finish; it.get != it##_end_.get; ctype##_next(&it))
+
+#define c_for_range(...) c_MACRO_OVERLOAD(c_for_range, __VA_ARGS__)
+#define c_for_range_3(type, i, stop) for (type i=0, i##_end_=stop; i < i##_end_; ++i)
+#define c_for_range_4(type, i, start, stop) for (type i=start, i##_end_=stop; i < i##_end_; ++i)
+#define c_for_range_5(type, i, start, stop, step) \
+    for (type i=start, i##_inc_=step, i##_end_=stop - (i##_inc_ > 0); (i <= i##_end_) == (0 < i##_inc_); i += i##_inc_)
 
 #define c_push_items(self, ctype, ...) do { \
     const ctype##_input_t __arr[] = __VA_ARGS__; \
     ctype##_push_n(self, __arr, sizeof(__arr)/sizeof(__arr[0])); \
 } while (0)
 
-#define c_apply(array, type, value, n) do { \
-    type __val = value, *__i = array, *__last = __i + (n); \
-    while (__i != __last) = *__i++ = __val; \
-} while (0)
-
-#define c_dtor(ctype, ...) do { \
+#define c_del_(ctype, ...) do { \
     struct ctype* __arr[] = {__VA_ARGS__}; \
     for (size_t i=0; i<sizeof(__arr)/sizeof(__arr[0]); ++i) \
-        ctype##_destroy(__arr[i]); \
+        ctype##_del(__arr[i]); \
 } while (0)
 
 #endif

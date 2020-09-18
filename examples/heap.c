@@ -41,5 +41,5 @@ int main()
         printf("%.0f ", *cpqueue_f_top(&pq)), cpqueue_f_pop(&pq);
     puts("");
 
-    cpqueue_f_destroy(&pq);
+    cpqueue_f_del(&pq);
 }

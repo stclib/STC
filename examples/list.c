@@ -8,7 +8,7 @@ int main() {
     int k;
     const int n = 2000000;
 
-    clist_fx list = clist_ini;
+    clist_fx list = clist_INIT;
     crand_rng64_t eng = crand_rng64_init(1234);
     crand_uniform_f64_t dist = crand_uniform_f64_init(100.0f, n);
     int m = 0;
@@ -50,5 +50,5 @@ int main() {
     c_foreach (i, clist_fx, it, clist_fx_end(&list))
         printf(" %g", *i.get);
     puts("");
-    clist_fx_destroy(&list);
+    clist_fx_del(&list);
 }

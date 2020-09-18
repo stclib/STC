@@ -30,7 +30,7 @@ void stringdemo1()
     cstr_append(&cs, " eight");
     printf("append: %s\n", cs.str);
 
-    cstr_destroy(&cs);
+    cstr_del(&cs);
 }
 
 
@@ -39,7 +39,7 @@ using_cvec(ix, int64_t); // ix is just an example tag name.
 void vectordemo1()
 {
     printf("\nVECTORDEMO1\n");
-    cvec_ix bignums = cvec_ini; // = (cvec_ix) cvec_ini; if initializing after declaration.
+    cvec_ix bignums = cvec_INIT; // = (cvec_ix) cvec_INIT; if initializing after declaration.
     cvec_ix_reserve(&bignums, 100);
     for (size_t i = 0; i<=100; ++i)
         cvec_ix_push_back(&bignums, i * i * i);
@@ -50,7 +50,7 @@ void vectordemo1()
     for (size_t i = 0; i < cvec_size(bignums); ++i) {
         if (i >= 90) printf("%zu: %zu\n", i, bignums.data[i]);
     }
-    cvec_ix_destroy(&bignums);
+    cvec_ix_del(&bignums);
 }
 
 
@@ -60,7 +60,7 @@ using_cvec_str();
 void vectordemo2()
 {
     printf("\nVECTORDEMO2\n");
-    cvec_str names = cvec_ini;
+    cvec_str names = cvec_INIT;
     cvec_str_emplace_back(&names, "Mary");
     cvec_str_emplace_back(&names, "Joe");
     cvec_str_emplace_back(&names, "Chris");
@@ -70,7 +70,7 @@ void vectordemo2()
     cvec_str_sort(&names);                     // Sort the array
     c_foreach (i, cvec_str, names)
         printf("sorted: %s\n", i.get->str);
-    cvec_str_destroy(&names);
+    cvec_str_del(&names);
 }
 
 using_clist(ix, int);
@@ -78,7 +78,7 @@ using_clist(ix, int);
 void listdemo1()
 {
     printf("\nLISTDEMO1\n");
-    clist_ix nums = clist_ini, nums2 = clist_ini;
+    clist_ix nums = clist_INIT, nums2 = clist_INIT;
     for (int i = 0; i < 10; ++i)
         clist_ix_push_back(&nums, i);
     for (int i = 100; i < 110; ++i)
@@ -97,7 +97,7 @@ void listdemo1()
     clist_ix_push_front(&nums, -99);
     c_foreach (i, clist_ix, nums)
         printf("sorted: %d\n", *i.get);
-    clist_ix_destroy(&nums);
+    clist_ix_del(&nums);
 }
 
 using_cset(i, int);
@@ -105,13 +105,13 @@ using_cset(i, int);
 void setdemo1()
 {
     printf("\nSETDEMO1\n");
-    cset_i nums = cset_ini;
+    cset_i nums = cset_INIT;
     cset_i_insert(&nums, 8);
     cset_i_insert(&nums, 11);
 
     c_foreach (i, cset_i, nums)
         printf("set: %d\n", *i.get);
-    cset_i_destroy(&nums);
+    cset_i_del(&nums);
 }
 
 
@@ -120,11 +120,11 @@ using_cmap(ii, int, int);
 void mapdemo1()
 {
     printf("\nMAPDEMO1\n");
-    cmap_ii nums = cmap_ini;
+    cmap_ii nums = cmap_INIT;
     cmap_ii_put(&nums, 8, 64);
     cmap_ii_put(&nums, 11, 121);
     printf("get 8: %d\n", *cmap_ii_at(&nums, 8));
-    cmap_ii_destroy(&nums);
+    cmap_ii_del(&nums);
 }
 
 
@@ -133,7 +133,7 @@ using_cmap_strkey(si, int); // Shorthand macro for the general using_cmap expans
 void mapdemo2()
 {
     printf("\nMAPDEMO2\n");
-    cmap_si nums = cmap_ini;
+    cmap_si nums = cmap_INIT;
     cmap_si_put(&nums, "Hello", 64);
     cmap_si_put(&nums, "Groovy", 121);
     cmap_si_put(&nums, "Groovy", 200); // overwrite previous
@@ -146,7 +146,7 @@ void mapdemo2()
     c_foreach (i, cmap_si, nums)
         printf("short: %s: %d\n", i.get->first.str, i.get->second);
 
-    cmap_si_destroy(&nums);
+    cmap_si_del(&nums);
 }
 
 
@@ -155,7 +155,7 @@ using_cmap_str();
 void mapdemo3()
 {
     printf("\nMAPDEMO3\n");
-    cmap_str table = cmap_ini;
+    cmap_str table = cmap_INIT;
     cmap_str_put(&table, "Map", "test");
     cmap_str_put(&table, "Make", "my");
     cmap_str_put(&table, "Sunny", "day");
@@ -168,7 +168,7 @@ void mapdemo3()
     printf("size %zu\n", cmap_size(table));
     c_foreach (i, cmap_str, table)
         printf("entry: %s: %s\n", i.get->first.str, i.get->second.str);
-    cmap_str_destroy(&table); // frees key and value cstrs, and hash table.
+    cmap_str_del(&table); // frees key and value cstrs, and hash table.
 }
 
 
@@ -193,8 +193,8 @@ void arraydemo1()
         *i.get = 1.0f;
     printf("%f\n", *carray3f_at(&a3, 29, 19, 9));
 
-    carray2f_destroy(&a2); // does nothing, since it is a sub-array.
-    carray3f_destroy(&a3); // also invalidates a2.
+    carray2f_del(&a2); // does nothing, since it is a sub-array.
+    carray3f_del(&a3); // also invalidates a2.
 }
 
 

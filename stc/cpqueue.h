@@ -41,7 +41,7 @@
             printf("%f ", *cpqueue_f_top(queue));
             cpqueue_f_pop(&queue);
         }
-        cpqueue_f_destroy(&queue);
+        cpqueue_f_del(&queue);
     }
 */
 
@@ -63,7 +63,7 @@
     STC_INLINE bool \
     cpqueue_##X##_empty(cpqueue_##X pq) {return ctype##_empty(pq);} \
     STC_INLINE void \
-    cpqueue_##X##_destroy(cpqueue_##X* self) {ctype##_destroy(self);} \
+    cpqueue_##X##_del(cpqueue_##X* self) {ctype##_del(self);} \
     STC_API void \
     cpqueue_##X##_build(cpqueue_##X* self); \
     STC_API void \

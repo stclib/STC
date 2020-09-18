@@ -37,7 +37,7 @@ int main() {
     cbitset_resize(&bset, 102, true);
     cbitset_set_value(&bset, 99, false);
     printf("%4zu: ", bset.size); for (int i=0; i<bset.size; ++i) printf("%d", cbitset_test(&bset, i)); puts("");
-    cbitset_destroy(&bset);
+    cbitset_del(&bset);
 }
 */
 #ifndef CBITSET__H__
@@ -47,7 +47,7 @@ int main() {
 
 typedef struct cbitset { uint64_t* _arr; size_t size; } cbitset_t;
 
-#define cbitset_ini {NULL, 0}
+#define cbitset_INIT {NULL, 0}
 
 STC_API void   cbitset_resize(cbitset_t* self, size_t size, bool value);
 STC_API size_t cbitset_count(cbitset_t set);
@@ -104,7 +104,7 @@ STC_INLINE cbitset_t cbitset_clone(cbitset_t other) {
     cbitset_t set = {(uint64_t *) memcpy(malloc(bytes), other._arr, bytes), other.size};
     return set;
 }
-STC_INLINE void cbitset_destroy(cbitset_t* self) {
+STC_INLINE void cbitset_del(cbitset_t* self) {
     free(self->_arr);
 }
 

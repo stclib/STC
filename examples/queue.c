@@ -16,7 +16,7 @@ int main() {
     // Push ten million random numbers onto the queue.
     for (int i=0; i<n; ++i)
         cqueue_i_push(&queue, crand_uniform_i32(&rng, &dist));
-    
+
     // Push or pop on the queue ten million times
     printf("%d\n", n);
     for (int i=n; i>0; --i) {
@@ -27,5 +27,5 @@ int main() {
             --n, cqueue_i_pop(&queue);
     }
     printf("%d, %zu\n", n, cqueue_i_size(queue));
-    cqueue_i_destroy(&queue);
+    cqueue_i_del(&queue);
 }
