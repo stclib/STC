@@ -12,10 +12,10 @@ int main() {
     cstack_i stack = cstack_i_init();
     cstack_c chars = cstack_c_init();
 
-    for (int i=0; i<100; ++i)
+    c_forrange (i, int, 100) 
         cstack_i_push(&stack, i*i);
     
-    for (int i=0; i<90; ++i)
+    c_forrange (i, int, 90)  
         cstack_i_pop(&stack);
     
     c_foreach (i, cstack_i, stack)

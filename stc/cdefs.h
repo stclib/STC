@@ -78,7 +78,7 @@
 #define c_default_less(x, y)    (*(x) < *(y))
 #define c_less_compare(less, x, y) (less(x, y) ? -1 : less(y, x))
 #define c_default_compare(x, y) c_less_compare(c_default_less, x, y)
-#define c_default_del(ptr)  ((void) (ptr))
+#define c_default_del(ptr)      ((void) (ptr))
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
 #define c_foreach_3(it, ctype, cnt) \
@@ -90,7 +90,7 @@
 #define c_forrange_3(i, type, stop) for (type i=0, i##_end_=stop; i < i##_end_; ++i)
 #define c_forrange_4(i, type, start, stop) for (type i=start, i##_end_=stop; i < i##_end_; ++i)
 #define c_forrange_5(i, type, start, stop, step) \
-    for (type i=start, i##_inc_=step, i##_end_=(stop) - (i##_inc_ > 0); (i <= i##_end_) == (0 < i##_inc_); i += i##_inc_)
+    for (type i=start, i##_inc_=step, i##_end_=(stop) - (0 < i##_inc_); (i <= i##_end_) == (0 < i##_inc_); i += i##_inc_)
 
 #define c_push_items(self, ctype, ...) do { \
     const ctype##_input_t __arr[] = __VA_ARGS__; \

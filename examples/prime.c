@@ -7,10 +7,10 @@ static inline cbitset_t sieveOfEratosthenes(size_t n)
     cbitset_reset(&pbits, 0);
     cbitset_reset(&pbits, 1);
 
-    for (size_t i = 2; i <= n; ++i) {
+    c_forrange (i, size_t, 2, n+1) {
         // If pbits[i] is not changed, then it is a prime
         if (cbitset_test(pbits, i) && i*i <= n) {
-            for (size_t j = i*i; j <= n; j += i) {
+            c_forrange (j, size_t, i*i, n+1, i) {
                 cbitset_reset(&pbits, j);
             }
         }
@@ -30,8 +30,10 @@ int main(void)
     size_t np = cbitset_count(primes);
     printf("number of primes: %zu\n", np);
 
-    for (uint32_t i = 2; i <= 1000; ++i)
-       if (cbitset_test(primes, i)) printf("%u ", i);
+    printf("2 ");
+    c_forrange (i, int, 3, 1001, 2) {
+       if (cbitset_test(primes, i)) printf("%d ", i);
+    }
     puts("");
     cbitset_del(&primes);
 }
