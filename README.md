@@ -22,7 +22,7 @@ An elegant, fully typesafe, generic, customizable, user-friendly, consistent, an
 The usage of the containers is vert similar to the C++ standard containers, so it should be easy if you are familiar with them.
 
 All containers mentioned above, except cstr_t and cbitset_t are generic and typesafe (similar to templates in C++). No casting is used. A simple example:
-```
+```C
 #include <stc/cvec.h>
 using_cvec(i, int);
 
@@ -47,7 +47,7 @@ Installation
 ------------
 
 Because it is headers only, files can simply be included in your program. The functions will be inlined by default. If containers are extensively used accross many tranlation units with common instantiated container types, it is recommended to build as a library, to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option, and put all the instantiations of the containers used in one C file, like this:
-```
+```C
 #define STC_IMPLEMENTATION
 #include <stc/cstr.h>
 #include <stc/cmap.h>
@@ -117,13 +117,13 @@ cmap discussion
 **cmap/cset** are the most complex of the containers (although, currently less than 500 lines of code). It uses open hashing, but does not rely on power-of-two size table, nor prime number lengths, and it does not have tombstone buckets. It is still among the fastest hash-tables, as shown above. The default max load-factor is 0.85, and it shrinks (and rehashes) when load-factor goes below 0.15, by default (can be set per hash container).
 
 You can customize the destroy-, hash- and equals- function. **cmap/cset** also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is very useful when e.g. having cstr as key, as it enables the usage of string literals as key in *put() and find()* functions, instead of requering a constructed cstr. Without it, the code would become: 
-```
+```C
 using_cmap(si, cstr_t, int); // don't do this.
 ...
 cmap_si_put(&map, cstr("mykey"), 12);
 ```
 This is a problem because cstr_t key may exist in the map, and it would need to destroy the current key and replace it with the new to avoid memory leak.  Lookup would also be problematic:
-```
+```C
 cstr lookup = cstr("mykey");
 int x = cmap_si_find(&map, lookup)->value;
 cstr_del(&lookup);
@@ -133,7 +133,7 @@ To avoid this, use
 - *using_cmap_strval(tag, keytype)*
 - *using_cmap_str()* // cstr_t -> cstr_t
 - *using_cset_str()* // cstr_t set
-```
+```C
 using_cmap_strkey(si, int);
 ...
 cmap_si map = cmap_INIT;
@@ -151,7 +151,7 @@ Example usages
 The examples folder contains further examples.
 
 **cstr** string example.
-```
+```C
 #include <stc/cstr.h>
 
 int main() {
@@ -179,7 +179,7 @@ int main() {
 }
 ```
 **cvec** of *int64_t*. 
-```
+```C
 #include <stc/cvec.h>
 using_cvec(ix, int64_t); // ix is just an example type tag name.
 
@@ -197,7 +197,7 @@ int main() {
 }
 ```
 **cvec** of *cstr_t*.
-```
+```C
 #include <stc/cstr.h>
 #include <stc/cvec.h>
 using_cvec_str();
@@ -217,7 +217,7 @@ int main() {
 }
 ```
 **cmap** of *int -> int*.
-```
+```C
 #include <stdio.h>
 #include <stc/cmap.h>
 using_cmap(ii, int, int);
@@ -232,7 +232,7 @@ int main() {
 }
 ```
 **cset** of *cstr*.
-```
+```C
 #include <stc/cstr.h>
 #include <stc/cmap.h>
 using_cset_str(); // cstr set. See the discussion above.
@@ -251,7 +251,7 @@ int main() {
 }
 ```
 **cmap** of *cstr -> cstr*. Both cstr keys and values are created internally via *cstr()* from const char* inputs.
-```
+```C
 #include <stc/cstr.h>
 #include <stc/cmap.h>
 using_cmap_str(); 
@@ -271,7 +271,7 @@ int main() {
 }
 ```
 **clist** of *int64_t*. Similar to c++ *std::forward_list*, but can do both *push_front()* and *push_back()* as well as *pop_front()*.
-```
+```C
 #include <stdio.h>
 #include <time.h>
 #include <stc/clist.h>
@@ -310,7 +310,7 @@ int main() {
 }
 ```
 **carray**. 1d, 2d and 3d arrays, allocated from heap in one memory block. *carray3* may have sub-array "views" of *carray2* and *carray1* etc., as shown in the following example:
-```
+```C
 #include <stdio.h>
 #include <stc/carray.h>
 using_carray(f, float);
