@@ -26,7 +26,7 @@ void viking_del(Viking* vk) {
     cstr_del(&vk->country);
 }
 ```
-And the Viking raw struct with convertion functions between Viking and VikingRaw structs:
+And the Viking raw struct with hash, equals, and convertion functions between Viking and VikingRaw structs:
 ```C
 // Viking raw struct
 
@@ -51,18 +51,18 @@ static inline Viking viking_fromRaw(VikingRaw vw) { // note: parameter is by val
 }
 ```
 With this in place, we use the full using_cmap() macro to define {Viking -> int} hash map type:
-```
+```C
 using_cmap(vk, Viking, int, c_default_del, vikingraw_equals, vikingraw_hash, 
-                 viking_del, VikingRaw, viking_toRaw, viking_fromRaw);
+               viking_del, VikingRaw, viking_toRaw, viking_fromRaw);
 ```
 cmap_vk uses vikingraw_hash() for hash value calculations, and vikingraw_equals() for equality test. cmap_vk_del() will free all memory allocated for Viking keys and the hash table values. Finally, main which also demos the generic c_push_items() of multiple elements:
 ```C
 int main() {
     cmap_vk vikings = cmap_INIT;
     c_push_items(&vikings, cmap_vk, {
-        { {"Einar", "Norway"}, 20 },
-        { {"Olaf", "Denmark"}, 24 },
-        { {"Harald", "Iceland"}, 12 },
+        {{"Einar", "Norway"}, 20},
+        {{"Olaf", "Denmark"}, 24},
+        {{"Harald", "Iceland"}, 12},
     });
     
     VikingRaw look = {"Einar", "Norway"};
