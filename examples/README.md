@@ -5,11 +5,12 @@ This folder contains various examples and benchmarks.
 
 Custom key example
 ------------------
-This demonstrates how to customize **cmap** with a user-defined key-type. When your key type consists of several members, you will usually have the hash function calculate hash values for the individual members, and then somehow combine them into one hash value for the entire object. If your key-type stores dynamic memory (e.g. cstr_t, as we will use), it is recommended to define a "raw"-struct of the your data first. In addition, you must define two functions:
+This demonstrates how to customize **cmap** with a user-defined key-type. When your key type consists of several members, you will usually have the hash function calculate hash values for the individual members, and then somehow combine them into one hash value for the entire object. If your key-type stores dynamic memory (e.g. cstr_t, as we will use), it is highly recommended to define a "raw"-struct representaion for your dynamic data struct. In addition, you must define two functions:
 
 1. A hash function; calculates the hash value given an object of the key-type.
-
 2. A comparison function for equality; 
+
+First, the Viking struct with destructor function:
 ```C
 #include <stdio.h>
 #include <stc/cmap.h>
@@ -25,7 +26,7 @@ void viking_del(Viking* vk) {
     cstr_del(&vk->country);
 }
 ```
-And the Viking data struct with destroy and convertion functions between VikingVw <-> Viking structs.
+And the Viking raw struct with convertion functions between Viking and VikingRaw structs:
 ```C
 // Viking raw struct
 
@@ -63,10 +64,12 @@ int main() {
         { {"Olaf", "Denmark"}, 24 },
         { {"Harald", "Iceland"}, 12 },
     });
+    
     VikingRaw look = {"Einar", "Norway"};
+    
     cmap_vk_entry_t *e = cmap_vk_find(&vikings, look);
-    e->second += 5; // update 
-    cmap_vk_emplace(&vikings, look, 0)->second += 5; // again
+    e->second += 5; // add 
+    cmap_vk_emplace(&vikings, look, 0)->second += 5; // update again
 
     c_foreach (k, cmap_vk, vikings) {
         printf("%s of %s has %d hp\n", k.get->first.name.str, k.get->first.country.str, k.get->second);
