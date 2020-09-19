@@ -1,4 +1,4 @@
-STC - C99 STandard Container library
+STC - C99 Standard Container library
 ====================================
 
 Introduction
