@@ -16,18 +16,18 @@ int main() {
     cpqueue_i heap = cpqueue_i_init();
 
     // Push ten million random numbers to priority queue
-    for (int i=0; i<N; ++i)
+    c_forrange (i, int, N)
         cpqueue_i_push(&heap, crand_uniform_i64(&pcg, &dist));
 
     // push some negative numbers too.
     c_push_items(&heap, cpqueue_i, {-231, -32, -873, -4, -343});
 
-    for (int i=0; i<N; ++i)
+    c_forrange (i, int, N)
         cpqueue_i_push(&heap, crand_uniform_i64(&pcg, &dist));
 
 
     // Extract the hundred smallest.
-    for (int i=0; i<100; ++i) {
+    c_forrange (i, int, 100) {
         printf("%zd ", *cpqueue_i_top(&heap));
         cpqueue_i_pop(&heap);
     }

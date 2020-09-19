@@ -12,7 +12,7 @@ int main() {
     crand_rng64_t eng = crand_rng64_init(1234);
     crand_uniform_f64_t dist = crand_uniform_f64_init(100.0f, n);
     int m = 0;
-    for (int i = 0; i < n; ++i)
+    c_forrange (i, int, n)
         clist_fx_push_back(&list, crand_uniform_f64(&eng, &dist)), ++m;
     double sum = 0.0;
     printf("sumarize %d:\n", m);

@@ -14,12 +14,12 @@ int main() {
     cqueue_i queue = cqueue_i_init();
 
     // Push ten million random numbers onto the queue.
-    for (int i=0; i<n; ++i)
+    c_forrange (i, int, 0, n)
         cqueue_i_push(&queue, crand_uniform_i32(&rng, &dist));
 
     // Push or pop on the queue ten million times
     printf("%d\n", n);
-    for (int i=n; i>0; --i) {
+    c_forrange (i, int, n, 0, -1) {
         int r = crand_uniform_i32(&rng, &dist);
         if (r & 1)
             ++n, cqueue_i_push(&queue, r);

@@ -12,13 +12,16 @@ int main() {
     cstack_i stack = cstack_i_init();
     cstack_c chars = cstack_c_init();
 
-    c_forrange (i, int, 100) 
+    c_forrange (i, int, 101) 
         cstack_i_push(&stack, i*i);
-    
+
+    printf("%d\n", *cstack_i_top(&stack));
+
     c_forrange (i, int, 90)  
         cstack_i_pop(&stack);
     
     c_foreach (i, cstack_i, stack)
-        printf("%d\n", *cstack_i_itval(i));
+        printf(" %d", *i.get);
+    puts("");
     printf("top: %d\n", *cstack_i_top(&stack));
 }

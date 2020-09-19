@@ -17,27 +17,27 @@ int main()
     
     pcg = crand_rng32_init(seed);
     clock_t start = clock();
-    for (int i=0; i<N; ++i)
+    c_forrange (i, int, N)
         cvec_f_push_back(&pq, (float) crand_i32(&pcg));
     
     cpqueue_f_build(&pq);
     printf("Built priority queue: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
 
-    for (int i=0; i<M; ++i)
+    c_forrange (i, int, M)
         printf("%.0f ", *cpqueue_f_top(&pq)), cpqueue_f_pop(&pq);
     
     start = clock();
-    for (int i=M; i<N; ++i)
+    c_forrange (i, int, M, N)
         cpqueue_f_pop(&pq);
     printf("\n\npopped PQ: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
 
     pcg = crand_rng32_init(seed);
     start = clock();
-    for (int i=0; i<N; ++i)
+    c_forrange (i, int, N)
         cpqueue_f_push(&pq, (float) crand_i32(&pcg));
     printf("pushed PQ: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
     
-    for (int i=0; i<M; ++i)
+    c_forrange (i, int, M)
         printf("%.0f ", *cpqueue_f_top(&pq)), cpqueue_f_pop(&pq);
     puts("");
 
