@@ -18,7 +18,7 @@ int main()
     printf("32 uniform: %u\n", dist0.range);
     double fsum = 0;
     before = clock();
-    c_forrange (i, size_t, N) {
+    c_forrange (N) {
         fsum += (double) crand_uniform_i32(&pcg, &dist0) / dist0.range;
     }
     difference = clock() - before;
@@ -29,7 +29,7 @@ int main()
     puts("32 unbiased");
     fsum = 0;
     before = clock();
-    c_forrange (i, size_t, N) {
+    c_forrange (N) {
         fsum += (double) crand_unbiased_i32(&pcg, &dist0) / dist0.range;
     }
     difference = clock() - before;
@@ -40,7 +40,7 @@ int main()
     crand_uniform_i64_t dist1 = crand_uniform_i64_init(0, N);
     sum = 0;
     before = clock();    
-    c_forrange (i, size_t, N)  {
+    c_forrange (N)  {
         sum += crand_uniform_i64(&stc, &dist1);
     }
     difference = clock() - before;
@@ -52,7 +52,7 @@ int main()
     size_t N2 = 10000000;
     int hist[R] = {0};
     sum = 0;
-    c_forrange (i, size_t, N2)  {
+    c_forrange (N2)  {
         int n = (int) (crand_normal_f64(&stc, &dist2) + 0.5);
         sum += n;
         if (n >= 0 && n < R) ++hist[n];

@@ -24,6 +24,7 @@ The usage of the containers is vert similar to the C++ standard containers, so i
 All containers mentioned above, except cstr_t and cbitset_t are generic and typesafe (similar to templates in C++). No casting is used. A simple example:
 ```C
 #include <stc/cvec.h>
+
 using_cvec(i, int);
 
 int main(void) {
@@ -114,37 +115,17 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 cmap discussion
 ---------------
 
-**cmap/cset** are the most complex of the containers (although, currently less than 500 lines of code). It uses open hashing, but does not rely on power-of-two size table, nor prime number lengths, and it does not have tombstone buckets. It is still among the fastest hash-tables, as shown above. The default max load-factor is 0.85, and it shrinks (and rehashes) when load-factor goes below 0.15, by default (can be set per hash container).
+**cmap/cset** uses open hashing and is among the fastest hash-tables for C and C++. The default max load-factor is 0.85.
 
-You can customize the destroy-, hash- and equals- function. **cmap/cset** also supports a few other arguments in the declare-statement that allows to define a convertion from a raw/literal type to the key-type specified. This is very useful when e.g. having cstr as key, as it enables the usage of string literals as key in *put() and find()* functions, instead of requering a constructed cstr. Without it, the code would become: 
-```C
-using_cmap(si, cstr_t, int); // don't do this.
-...
-cmap_si_put(&map, cstr("mykey"), 12);
-```
-This is a problem because cstr_t key may exist in the map, and it would need to destroy the current key and replace it with the new to avoid memory leak.  Lookup would also be problematic:
-```C
-cstr lookup = cstr("mykey");
-int x = cmap_si_find(&map, lookup)->value;
-cstr_del(&lookup);
-```
-To avoid this, use 
+You can customize the destroy-, hash-, equals- functions, but also define a convertion from a raw/literal type to the key-type specified. This is very useful when e.g. having cstr as key, and therefore a few using-macros are pre-defined
+for cmaps with cstr_t keys and/or values:
+
 - *using_cmap_strkey(tag, valuetype)*
 - *using_cmap_strval(tag, keytype)*
 - *using_cmap_str()* // cstr_t -> cstr_t
 - *using_cset_str()* // cstr_t set
-```C
-using_cmap_strkey(si, int);
-...
-cmap_si map = cmap_INIT;
-cmap_si_put(&map, "mykey", 12);             // constructs a cstr_t key from the const char* internally.
-int x = cmap_si_find(&map, "mykey")->value; // no allocation of string key happens here.
-cmap_si_del(&map);
-```
-An alternative is to use *char* * as key type, but then you must manage allcoated memory of the hash char* keys yourself.
-Note that this predefined customization is also available for **cvec** and **clist**. See *using_cvec_str()*, *using_clist_str()*.
 
-To customize your own cmap type to work like cmap_str, you may want to look at **examples/advanced.c**. It demonstrates how to use a custom struct as a hash map key, using the optional parameters to using_cmap().
+To customize your own cmap type to work like these, you may want to look at **examples/advanced.c**. It demonstrates how to use a custom struct as a hash map key, by using the optional parameters to using_cmap().
 
 Example usages
 --------------
@@ -181,17 +162,18 @@ int main() {
 **cvec** of *int64_t*. 
 ```C
 #include <stc/cvec.h>
+
 using_cvec(ix, int64_t); // ix is just an example type tag name.
 
 int main() {
     cvec_ix bignums = cvec_INIT; // use cvec_ix_init() if initializing after declaration.
     cvec_ix_reserve(&bignums, 100);
-    for (size_t i = 0; i<100; ++i)
+    c_forrange (i, 100)
         cvec_ix_push_back(&bignums, i * i * i);
     cvec_ix_pop_back(&bignums); // erase the last
 
     uint64_t value;
-    for (size_t i = 0; i < cvec_size(bignums); ++i)
+    c_forrange (i, cvec_size(bignums))
         value = bignums.data[i];
     cvec_ix_del(&bignums);
 }
@@ -200,6 +182,7 @@ int main() {
 ```C
 #include <stc/cstr.h>
 #include <stc/cvec.h>
+
 using_cvec_str();
 
 int main() {
@@ -220,6 +203,7 @@ int main() {
 ```C
 #include <stdio.h>
 #include <stc/cmap.h>
+
 using_cmap(ii, int, int);
 
 int main() {
@@ -235,6 +219,7 @@ int main() {
 ```C
 #include <stc/cstr.h>
 #include <stc/cmap.h>
+
 using_cset_str(); // cstr set. See the discussion above.
 
 int main() {
@@ -254,6 +239,7 @@ int main() {
 ```C
 #include <stc/cstr.h>
 #include <stc/cmap.h>
+
 using_cmap_str(); 
 
 int main() {
@@ -276,6 +262,7 @@ int main() {
 #include <time.h>
 #include <stc/clist.h>
 #include <stc/crandom.h>
+
 using_clist(fx, double);
 
 int main() {
@@ -284,7 +271,7 @@ int main() {
     crand_uniform_f64_t dist = crand_uniform_f64_init(100.0, 1000.0);
     int k;
     
-    for (int i = 0; i < 10000000; ++i)
+    c_forrange (10000000)
         clist_fx_push_back(&list, crand_uniform_f64(&eng, dist));
     k = 0;
     c_foreach (i, clist_fx, list)
@@ -313,6 +300,7 @@ int main() {
 ```C
 #include <stdio.h>
 #include <stc/carray.h>
+
 using_carray(f, float);
 
 int main()

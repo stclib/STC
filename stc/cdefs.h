@@ -87,6 +87,8 @@
     for (ctype##_iter_t it = start, it##_end_ = finish; it.get != it##_end_.get; ctype##_next(&it))
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
+#define c_forrange_1(stop) for (size_t _c_i=0, _c_end_=stop; _c_i < _c_end_; ++_c_i)
+#define c_forrange_2(i, stop) for (size_t i=0, i##_end_=stop; i < i##_end_; ++i)
 #define c_forrange_3(i, type, stop) for (type i=0, i##_end_=stop; i < i##_end_; ++i)
 #define c_forrange_4(i, type, start, stop) for (type i=start, i##_end_=stop; i < i##_end_; ++i)
 #define c_forrange_5(i, type, start, stop, step) \
