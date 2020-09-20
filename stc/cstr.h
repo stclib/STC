@@ -304,11 +304,11 @@ STC_INLINE void _cstr_internal_move(cstr_t* self, size_t pos1, size_t pos2) {
 
 STC_API void
 cstr_replace_n(cstr_t* self, size_t pos, size_t len, const char* str, size_t n) {
-    char buf[c_max_alloca];
-    char* xstr = (char *) memcpy(n > c_max_alloca ? malloc(n) : buf, str, n);
+    char buf[_c_max_buffer];
+    char* xstr = (char *) memcpy(n > _c_max_buffer ? malloc(n) : buf, str, n);
     _cstr_internal_move(self, pos + len, pos + n);
     memcpy(&self->str[pos], xstr, n);
-    if (n > c_max_alloca) free(xstr);
+    if (n > _c_max_buffer) free(xstr);
 }
 
 STC_API void

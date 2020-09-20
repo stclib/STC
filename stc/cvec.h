@@ -240,7 +240,7 @@
 \
     STC_API cvec_##X##_iter_t \
     cvec_##X##_insert_range_p(cvec_##X* self, cvec_##X##_value_t* pos, cvec_##X##_value_t* first, cvec_##X##_value_t* finish) { \
-        enum {max_buf = c_max_alloca / sizeof(Value) + 1}; \
+        enum {max_buf = _c_max_buffer / sizeof(Value) + 1}; \
         Value buf[max_buf]; \
         size_t len = finish - first, idx = pos - self->data, size = cvec_size(*self); \
         cvec_##X##_value_t* xbuf = (len > max_buf ? c_new_n(cvec_##X##_value_t, len) : &buf[0]); \
