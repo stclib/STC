@@ -337,8 +337,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 \
     STC_API void ctype##_##X##_del(ctype##_##X* self) { \
         ctype##_##X##_wipe_(self); \
-        free(self->_hashx); \
-        free(self->table); \
+        c_free(self->_hashx); \
+        c_free(self->table); \
     } \
 \
     STC_API void ctype##_##X##_clear(ctype##_##X* self) { \
@@ -398,8 +398,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         if (self->size > newcap) return; \
         newcap = (size_t) (newcap / self->max_load_factor) | 1; \
         ctype##_##X tmp = { \
-            c_new_n(ctype##_##X##_value_t, newcap), \
-            (uint8_t *) calloc(newcap + 1, sizeof(uint8_t)), \
+            c_new_2 (ctype##_##X##_value_t, newcap), \
+            (uint8_t *) c_calloc(newcap + 1, sizeof(uint8_t)), \
             self->size, (uint32_t) newcap, \
             self->max_load_factor, self->shrink_limit_factor \
         }; \
@@ -414,8 +414,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
                 slot[b.idx] = *e, \
                 hashx[b.idx] = (uint8_t) b.hx; \
             } \
-        free(tmp._hashx); \
-        free(tmp.table); \
+        c_free(tmp._hashx); \
+        c_free(tmp.table); \
     } \
 \
     STC_API void \

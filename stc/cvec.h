@@ -210,14 +210,14 @@
     STC_API void \
     cvec_##X##_del(cvec_##X* self) { \
         cvec_##X##_clear(self); \
-        if (self->data) free(_cvec_alloced(self->data)); \
+        if (self->data) c_free(_cvec_alloced(self->data)); \
     } \
 \
     STC_API void \
     cvec_##X##_reserve(cvec_##X* self, size_t cap) { \
         size_t len = cvec_size(*self); \
         if (cap >= len) { \
-            size_t* rep = (size_t *) realloc(_cvec_alloced(self->data), 2 * sizeof(size_t) + cap * sizeof(Value)); \
+            size_t* rep = (size_t *) c_realloc(_cvec_alloced(self->data), 2 * sizeof(size_t) + cap * sizeof(Value)); \
             self->data = (Value *) (rep + 2); \
             rep[0] = len; \
             rep[1] = cap; \
@@ -243,7 +243,7 @@
         enum {max_buf = _c_max_buffer / sizeof(Value) + 1}; \
         Value buf[max_buf]; \
         size_t len = finish - first, idx = pos - self->data, size = cvec_size(*self); \
-        cvec_##X##_value_t* xbuf = (len > max_buf ? c_new_n(cvec_##X##_value_t, len) : &buf[0]); \
+        cvec_##X##_value_t* xbuf = (len > max_buf ? c_new_2(cvec_##X##_value_t, len) : &buf[0]); \
         for (size_t i=0; i<len; ++i, ++first) \
             xbuf[i] = valueFromRaw(valueToRaw(first)); \
         if (size + len > cvec_capacity(*self)) \
@@ -252,7 +252,7 @@
         memmove(pos + len, pos, (size - idx) * sizeof(Value)); \
         memcpy(pos, xbuf, len * sizeof(Value)); \
         _cvec_size(self) += len; \
-        if (len > max_buf) free(xbuf); \
+        if (len > max_buf) c_free(xbuf); \
         cvec_##X##_iter_t it = {pos}; return it; \
     } \
 \

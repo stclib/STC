@@ -57,8 +57,16 @@ enum   {_c_max_buffer = 512};
 #define c_static_assert(cond, msg) typedef char static_assert_##msg[(cond) ? 1 : -1]
 #define c_container_of(ptr, type, member) \
                                 ((type *)((char *)(ptr) - offsetof(type, member)))
-#define c_new(T)                ((T *) malloc(sizeof(T)))
-#define c_new_n(T, n)           ((T *) malloc(sizeof(T) * (n)))
+
+#define c_new(...)              c_MACRO_OVERLOAD(c_new, __VA_ARGS__)
+#define c_new_1(T)              ((T *) c_malloc(sizeof(T)))
+#define c_new_2(T, n)           ((T *) c_malloc(sizeof(T) * (n)))
+#ifndef c_malloc
+#define c_malloc(sz)            malloc(sz)
+#define c_calloc(n, sz)         calloc(n, sz)
+#define c_realloc(p, sz)        realloc(p, sz)
+#define c_free(p)               free(p)
+#endif
 #define c_swap(T, x, y)         do { T __t = x; x = y; y = __t; } while (0)
 #define c_no_compare(x, y)      (0)
 #define c_mem_equals(x, y)      (memcmp(x, y, sizeof(*(y))) == 0)

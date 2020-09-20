@@ -73,7 +73,7 @@ cstr_init() {return cstr_INIT;}
 STC_INLINE void
 cstr_del(cstr_t* self) {
     if (cstr_capacity(*self))
-        free(_cstr_rep(self));
+        c_free(_cstr_rep(self));
 }
 
 STC_INLINE cstr_t
@@ -125,7 +125,7 @@ cstr_assign(cstr_t* self, const char* str) {
 STC_INLINE cstr_t*
 cstr_take(cstr_t* self, cstr_t s) {
     if (self->str != s.str && cstr_capacity(*self))
-        free(_cstr_rep(self));
+        c_free(_cstr_rep(self));
     self->str = s.str;
     return self;
 }
@@ -212,7 +212,7 @@ STC_API void
 cstr_reserve(cstr_t* self, size_t cap) {
     size_t len = cstr_size(*self), oldcap = cstr_capacity(*self);
     if (cap > oldcap) {
-        size_t* rep = (size_t *) realloc(oldcap ? _cstr_rep(self) : NULL, _cstr_mem(cap));
+        size_t* rep = (size_t *) c_realloc(oldcap ? _cstr_rep(self) : NULL, _cstr_mem(cap));
         self->str = (char *) (rep + 2);
         self->str[rep[0] = len] = '\0';
         rep[1] = _cstr_cap(cap);
@@ -230,7 +230,7 @@ cstr_resize(cstr_t* self, size_t len, char fill) {
 STC_API cstr_t
 cstr_n(const char* str, size_t len) {
     if (len == 0) return cstr_INIT;
-    size_t *rep = (size_t *) malloc(_cstr_mem(len));
+    size_t *rep = (size_t *) c_malloc(_cstr_mem(len));
     cstr_t s = {(char *) memcpy(rep + 2, str, len)};
     s.str[rep[0] = len] = '\0';
     rep[1] = _cstr_cap(len);
@@ -305,10 +305,10 @@ STC_INLINE void _cstr_internal_move(cstr_t* self, size_t pos1, size_t pos2) {
 STC_API void
 cstr_replace_n(cstr_t* self, size_t pos, size_t len, const char* str, size_t n) {
     char buf[_c_max_buffer];
-    char* xstr = (char *) memcpy(n > _c_max_buffer ? malloc(n) : buf, str, n);
+    char* xstr = (char *) memcpy(n > _c_max_buffer ? c_malloc(n) : buf, str, n);
     _cstr_internal_move(self, pos + len, pos + n);
     memcpy(&self->str[pos], xstr, n);
-    if (n > _c_max_buffer) free(xstr);
+    if (n > _c_max_buffer) c_free(xstr);
 }
 
 STC_API void

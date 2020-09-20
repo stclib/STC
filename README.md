@@ -173,7 +173,7 @@ int main() {
     cvec_ix_pop_back(&bignums); // erase the last
 
     uint64_t value;
-    c_forrange (i, cvec_size(bignums))
+    c_forrange (i, cvec_ix_size(bignums))
         value = bignums.data[i];
     cvec_ix_del(&bignums);
 }
@@ -191,7 +191,7 @@ int main() {
     cvec_str_emplace_back(&names, "Joe");
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
     // Use push_back() to add a new cstr_t object to be moved into the vector, e.g.:
-    cvec_str_push_back(&names, cstr_from("%d elements so far", cvec_size(names))); 
+    cvec_str_push_back(&names, cstr_from("%d elements so far", cvec_str_size(names))); 
 
     printf("%s\n", names.data[1].str); // Access the string char*
     c_foreach (i, cvec_str, names)

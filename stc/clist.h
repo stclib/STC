@@ -276,7 +276,7 @@ STC_API size_t _clist_size(const clist_void* self);
         node->next = next; \
         if (del == next) self->last = node = NULL; \
         else if (self->last == del) self->last = node, node = NULL; \
-        valueDestroy(&del->value); free(del); \
+        valueDestroy(&del->value); c_free(del); \
         return node; \
     } \
 \
@@ -323,7 +323,7 @@ STC_API size_t _clist_size(const clist_void* self);
 
 
 #define _c_clist_insert_after(self, X, node, val) \
-    clist_##X##_node_t *entry = c_new (clist_##X##_node_t), \
+    clist_##X##_node_t *entry = c_new_1 (clist_##X##_node_t), \
                        *next = self->last ? node->next : entry; \
     entry->value = val; \
     entry->next = next; \

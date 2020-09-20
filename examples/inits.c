@@ -10,18 +10,17 @@ using_cmap_strkey(cnt, int);
 
 typedef struct {int x, y;} ipair_t;
 inline static int ipair_compare(const ipair_t* a, const ipair_t* b) {
-    int c = c_default_compare(&a->x, &b->x);
-    return c != 0 ? c : c_default_compare(&a->y, &b->y);
+    int cx = c_default_compare(&a->x, &b->x);
+    return cx == 0 ? c_default_compare(&a->y, &b->y) : cx;
 }
+
 using_cvec(ip, ipair_t, c_default_del, ipair_compare);
 using_clist(ip, ipair_t, c_default_del, ipair_compare);
-
 using_cvec(f, float);
 using_cpqueue(f, cvec_f, >);
 
-
-int main(void) {
-
+int main(void)
+{
     // CVEC FLOAT / PRIORITY QUEUE
 
     cvec_f floats = cvec_INIT;
@@ -32,11 +31,11 @@ int main(void) {
 
     // CVEC PRIORITY QUEUE
 
-    cpqueue_f_build(&floats); // reorganise vec
+    cpqueue_f_build(&floats); // make heap
     c_push_items(&floats, cpqueue_f, {40.0f, 20.0f, 50.0f, 30.0f, 10.0f});
 
     // sorted:
-    while (cvec_size(floats) > 0) {
+    while (! cpqueue_f_empty(floats)) {
         printf("%.1f ", *cpqueue_f_top(&floats));
         cpqueue_f_pop(&floats);
     }

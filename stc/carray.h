@@ -87,7 +87,7 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
         if (self->_xdim & _carray_OWN) { \
             c_foreach_3 (i, carray##D##X, *self) \
                 valueDestroy(i.get); \
-            free(self->data); \
+            c_free(self->data); \
         } \
     }
 
@@ -122,7 +122,7 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
 \
     STC_INLINE carray1##X \
     carray1##X##_make(size_t xdim, Value val) { \
-        Value* m = c_new_n(Value, xdim); \
+        Value* m = c_new_2(Value, xdim); \
         for (size_t i=0; i<xdim; ++i) m[i] = val; \
         carray1##X a = {m, xdim | _carray_OWN}; \
         return a; \
@@ -130,7 +130,7 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
     STC_INLINE carray2##X \
     carray2##X##_make(size_t ydim, size_t xdim, Value val) { \
         const size_t n = ydim * xdim; \
-        Value* m = c_new_n(Value, n); \
+        Value* m = c_new_2(Value, n); \
         for (size_t i=0; i<n; ++i) m[i] = val; \
         carray2##X a = {m, xdim | _carray_OWN, ydim * xdim}; \
         return a; \
@@ -138,7 +138,7 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
     STC_INLINE carray3##X \
     carray3##X##_make(size_t zdim, size_t ydim, size_t xdim, Value val) { \
         const size_t n = zdim * ydim * xdim; \
-        Value* m = c_new_n(Value, n); \
+        Value* m = c_new_2(Value, n); \
         for (size_t i=0; i<n; ++i) m[i] = val; \
         carray3##X a = {m, xdim | _carray_OWN, ydim * xdim, zdim}; \
         return a; \
