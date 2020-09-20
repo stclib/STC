@@ -156,7 +156,7 @@ int main() {
     cstr_t full_path = cstr_from("%s/%s.%s", "directory", "filename", "ext");
     printf("%s\n", full_path.str);
     
-    cstr_mdestroy(&s1, &full_path);
+    c_del(cstr, &s1, &full_path);
 }
 ```
 **cvec** of *int64_t*. 
@@ -195,7 +195,7 @@ int main() {
 
     printf("%s\n", names.data[1].str); // Access the string char*
     c_foreach (i, cvec_str, names)
-        printf("get %s\n", i.get->str);
+        printf("item: %s\n", i.get->str);
     cvec_str_del(&names);
 }
 ```
@@ -211,7 +211,7 @@ int main() {
     cmap_ii_put(&nums, 8, 64); // similar to insert_or_assign()
     cmap_ii_emplace(&nums, 11, 121); 
 
-    printf("%d\n", cmap_ii_find(nums, 8)->value);
+    printf("%d\n", cmap_ii_find(nums, 8)->second);
     cmap_ii_del(&nums);
 }
 ```
@@ -225,13 +225,14 @@ using_cset_str(); // cstr set. See the discussion above.
 int main() {
     cset_str words = cset_INIT;
     cset_str_insert(&words, "Hello");
-    cset_str_insert(&words, "Cruel");
-    cset_str_insert(&words, "World");    
-    cset_str_erase(&words, "Cruel");
+    cset_str_insert(&words, "Sad");
+    cset_str_insert(&words, "World");
+    
+    cset_str_erase(&words, "Sad");
 
-    // iterate the set:
+    // iterate the set of cstr_t values:
     c_foreach (i, cset_str, words)
-        printf("%s\n", i.get->key.str);
+        printf("%s\n", i.get->str);
     cset_str_del(&words);
 }
 ```
@@ -247,13 +248,14 @@ int main() {
     cmap_str_put(&table, "Make", "my");
     cmap_str_put(&table, "Rainy", "day");
     cmap_str_put(&table, "Sunny", "afternoon");
-    printf("Sunny: %s\n", cmap_str_find(table, "Sunny")->value.str);
+    printf("Sunny: %s\n", cmap_str_find(table, "Sunny")->second.str);
     cmap_str_erase(&table, "Rainy");
 
     printf("size = %zu\n", cmap_size(table));
     c_foreach (i, cmap_str, table)
-        printf("%s: %s\n", i.get->key.str, i.get->value.str);
-    cmap_str_del(&table); // frees key and value cstrs, and hash table.
+        printf("%s: %s\n", i.get->first.str, i.get->second.str);
+    
+    cmap_str_del(&table); // frees first and second cstrs, and hash table array.
 }
 ```
 **clist** of *int64_t*. Similar to c++ *std::forward_list*, but can do both *push_front()* and *push_back()* as well as *pop_front()*.
@@ -267,22 +269,22 @@ using_clist(fx, double);
 
 int main() {
     clist_fx list = clist_INIT;
-    crand_eng64_t eng = crand_eng64_init(time(NULL));
+    crand_rng64_t eng = crand_rng64_init(time(NULL));
     crand_uniform_f64_t dist = crand_uniform_f64_init(100.0, 1000.0);
     int k;
     
     c_forrange (10000000)
-        clist_fx_push_back(&list, crand_uniform_f64(&eng, dist));
+        clist_fx_push_back(&list, crand_uniform_f64(&eng, &dist));
     k = 0;
     c_foreach (i, clist_fx, list)
-        if (++k <= 10) printf("%8d: %10f\n", k, i.get->value); else break;
+        if (++k <= 10) printf("%8d: %10f\n", k, *i.get); else break;
 
     clist_fx_sort(&list); // mergesort O(n*log n)
     puts("sorted");
 
     k = 0;
     c_foreach (i, clist_fx, list)
-        if (++k <= 10) printf("%8d: %10f\n", k, i.get->value); else break;
+        if (++k <= 10) printf("%8d: %10f\n", k, *i.get); else break;
 
     clist_fx_clear(&list);
 
@@ -290,7 +292,7 @@ int main() {
     c_push_items(&list, clist_fx, {10, 20, 30, 40, 50});
 
     c_foreach (i, clist_fx, list)
-        printf("%f ", i.get->value);
+        printf("%f ", *i.get);
     puts("");
 
     clist_fx_del(&list);
@@ -311,11 +313,11 @@ int main()
     carray1f a1 = carray3f_at2(a3, 5, 4);      // sub-array a3[5][4] (no data copy).    
     carray2f a2 = carray3f_at1(a3, 5);         // sub-array a3[5]
     
-    printf("%f\n", *carray2f_at(a1, 3));       // a1[3] (3.14f)
+    printf("%f\n", *carray1f_at(a1, 3));       // a1[3] (3.14f)
     printf("%f\n", *carray2f_at(a2, 4, 3));    // a2[4][3] (3.14f)
     printf("%f\n", *carray3f_at(a3, 5, 4, 3)); // a3[5][4][3] (3.14f)
     // ...
-    carray2f_del(&a1); // does nothing, since it is a sub-array.
+    carray1f_del(&a1); // does nothing, since it is a sub-array.
     carray2f_del(&a2); // same.
     carray3f_del(&a3); // free array, and invalidates a1, a2.
 }
