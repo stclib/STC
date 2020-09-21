@@ -156,6 +156,7 @@ int main() {
         cvec_ix_push_back(&bignums, i * i * i);
 
     cvec_ix_pop_back(&bignums); // erase the last
+
     c_forrange (i, cvec_ix_size(bignums))
         bignums.data[i] /= i; // make them smaller
 
@@ -181,7 +182,8 @@ int main() {
     cstr_t tmp = cstr_from("%d elements so far", cvec_str_size(names));
     cvec_str_push_back(&names, tmp); // tmp is moved to names, do not del() it.
 
-    printf("%s\n", names.data[1].str); // Access the string char*
+    printf("%s\n", names.data[1].str); // Access the second element
+
     c_foreach (i, cvec_str, names)
         printf("item: %s\n", i.get->str);
     cvec_str_del(&names);
@@ -278,22 +280,21 @@ int main() {
     c_push_items(&list, clist_fx, {
         10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0
     });
+    // interleave push_front / push_back:
+    c_forrange (i, 1, 10) {
+        if (i & 1) clist_fx_push_front(&list, (float) i);
+        else       clist_fx_push_back(&list, (float) i);
+    }
     
-    c_forrange (i, int, 5, 95, 10)
-        clist_fx_push_back(&list, (float) i);
-    clist_fx_push_front(&list, 100.0);
-    
-    printf("current: ");
+    printf("initial: ");
     c_foreach (i, clist_fx, list)
         printf(" %g", *i.get);
-    puts("");
     
     clist_fx_sort(&list); // mergesort O(n*log n)
 
-    printf("sorted: ");
+    printf("\nsorted: ");
     c_foreach (i, clist_fx, list)
         printf(" %g", *i.get);
-    puts("");
 
     clist_fx_del(&list);
 }
@@ -339,11 +340,13 @@ using_cqueue(i, clist_i);
 int main() {
     cqueue_i queue = cqueue_i_init();
 
-    // push_front() / push_back() interleaved.
-    c_forrange (i, 20) {
-        if (i & 1) cqueue_i_push_front(&queue, i);
-        else       cqueue_i_push_back(&queue, i);
-    }
+    // push() and pop() a few.
+    c_forrange (i, 20)
+        cqueue_i_push(&queue, i);
+
+    c_forrange (5)
+        cqueue_i_pop(&queue);
+
     c_foreach (i, cqueue_i, queue) {
         printf(" %d\n", *i.get);
 
