@@ -78,39 +78,55 @@ Compiled with clang.exe -O3 -x c++, v10.0 on windows, Ryzen 7 2700X CPU. Similar
 - RMAP = *robin_hood::unordered_map*
 - HMAP = *tsl::hopscotch_map*
 ```
-Random keys are in range [0, 2^24), seed = 1600713678:
+Random keys are in range [0, 2^24), seed = 1600720716:
 
 Unordered maps: 30000000 repeats of Insert random key + try to remove a random key:
-CMAP: time:  4.44, sum: 450000015000000, erased 10921039
-UMAP: time: 11.40, sum: 450000015000000, erased 10921039
-SMAP: time: 14.27, sum: 450000015000000, erased 10921039
-BMAP: time:  5.36, sum: 450000015000000, erased 10921039
-FMAP: time:  4.40, sum: 450000015000000, erased 10921039
-HMAP: time:  4.48, sum: 450000015000000, erased 10921039
+CMAP: time:  4.35, sum: 450000015000000, size: 8153497, erased 10922466
+KMAP: time:  3.37, sum: 450000015000000, size: 8153497, erased 10922466
+UMAP: time: 11.19, sum: 450000015000000, size: 8153497, erased 10922466
+SMAP: time: 14.21, sum: 450000015000000, size: 8153497, erased 10922466
+BMAP: time:  5.00, sum: 450000015000000, size: 8153497, erased 10922466
+FMAP: time:  4.68, sum: 450000015000000, size: 8153497, erased 10922466
+RMAP: time:  3.16, sum: 450000015000000, size: 8153497, erased 10922466
+HMAP: time:  4.49, sum: 450000015000000, size: 8153497, erased 10922466
 
 Unordered maps: Insert 30000000 index keys, then remove them in same order:
-CMAP: time:  3.29, erased 30000000
-UMAP: time: 15.44, erased 30000000
-SMAP: time: 22.21, erased 30000000
-BMAP: time:  7.49, erased 30000000
-FMAP: time:  5.71, erased 30000000
-HMAP: time:  5.94, erased 30000000
+CMAP: time:  3.27, erased 30000000
+KMAP: time:  2.86, erased 30000000
+UMAP: time: 15.80, erased 30000000
+SMAP: time: 22.60, erased 30000000
+BMAP: time:  7.93, erased 30000000
+FMAP: time:  5.91, erased 30000000
+RMAP: time:  3.22, erased 30000000
+HMAP: time:  5.91, erased 30000000
 
 Unordered maps: Insert 30000000 random keys, then remove them in same order:
-CMAP: time:  3.19, erased 13970961
-UMAP: time: 10.07, erased 13970961
-SMAP: time: 13.41, erased 13970961
-BMAP: time:  5.44, erased 13970961
-FMAP: time:  4.45, erased 13970961
-HMAP: time:  4.48, erased 13970961
+CMAP: time:  3.16, erased 13971002
+KMAP: time:  4.05, erased 13971002
+UMAP: time: 10.77, erased 13971002
+SMAP: time: 13.77, erased 13971002
+BMAP: time:  5.27, erased 13971002
+FMAP: time:  4.41, erased 13971002
+RMAP: time:  3.21, erased 13971002
+HMAP: time:  4.50, erased 13971002
 
 Unordered maps: Iterate 30000000 random keys:
-CMAP: time:  0.23, sum 1344646322743375
-UMAP: time:  3.35, sum 1344646322743375
-SMAP: time:  0.33, sum 1344646322743375
-BMAP: time:  0.61, sum 1344646322743375
-FMAP: time:  0.57, sum 1344646322743375
-HMAP: time:  0.51, sum 1344646322743375
+CMAP: time:  0.23, size: 13971002, sum 1344701724191145
+UMAP: time:  3.32, size: 13971002, sum 1344701724191145
+SMAP: time:  0.33, size: 13971002, sum 1344701724191145
+BMAP: time:  0.60, size: 13971002, sum 1344701724191145
+FMAP: time:  0.56, size: 13971002, sum 1344701724191145
+HMAP: time:  0.51, size: 13971002, sum 1344701724191145
+```
+From these tests *robin_hood* and *khash* wins by a tiny margin, but with random numbers in 0 - 2^20 range, khash was not as great:
+```
+Unordered maps: 30000000 repeats of Insert random key + try to remove a random key:
+CMAP: time:  1.93, sum: 450000015000000, size: 524809, erased 14738434
+KMAP: time:  7.28, sum: 450000015000000, size: 524809, erased 14738434
+
+Unordered maps: Insert 30000000 random keys, then remove them in same order:
+CMAP: time:  1.16, erased 1048576
+KMAP: time:  2.62, erased 1048576
 ```
 Memory efficiency
 -----------------
