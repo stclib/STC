@@ -141,6 +141,52 @@ Example usages
 --------------
 The examples folder contains further examples.
 
+**cvec** of *int64_t*. 
+```C
+#include <stc/cvec.h>
+#include <stdio.h>
+
+using_cvec(ix, int64_t); // ix is just an example type tag name.
+
+int main() {
+    cvec_ix bignums = cvec_INIT; // use cvec_ix_init() if initializing after declaration.
+    cvec_ix_reserve(&bignums, 50);
+    
+    c_forrange (i, 50)
+        cvec_ix_push_back(&bignums, i * i * i);
+
+    cvec_ix_pop_back(&bignums); // erase the last
+    c_forrange (i, cvec_ix_size(bignums))
+        bignums.data[i] /= i; // make them smaller
+
+    c_foreach (i, cvec_ix, bignums)
+        printf(" %d", *i.get);
+    cvec_ix_del(&bignums);
+}
+```
+**cvec** of *cstr_t*.
+```C
+#include <stc/cstr.h>
+#include <stc/cvec.h>
+
+using_cvec_str();
+
+int main() {
+    cvec_str names = cvec_INIT;
+    cvec_str_emplace_back(&names, "Mary");
+    cvec_str_emplace_back(&names, "Joe");
+    cstr_assign(&names.data[1], "Jake"); // replace "Joe".
+
+    // Use push_back() rather than emplace_back() when adding a cstr_t type:
+    cstr_t tmp = cstr_from("%d elements so far", cvec_str_size(names));
+    cvec_str_push_back(&names, tmp); // tmp is moved to names, do not del() it.
+
+    printf("%s\n", names.data[1].str); // Access the string char*
+    c_foreach (i, cvec_str, names)
+        printf("item: %s\n", i.get->str);
+    cvec_str_del(&names);
+}
+```
 **cstr** string example.
 ```C
 #include <stc/cstr.h>
@@ -167,48 +213,6 @@ int main() {
     printf("%s\n", full_path.str);
     
     c_del(cstr, &s1, &full_path);
-}
-```
-**cvec** of *int64_t*. 
-```C
-#include <stc/cvec.h>
-
-using_cvec(ix, int64_t); // ix is just an example type tag name.
-
-int main() {
-    cvec_ix bignums = cvec_INIT; // use cvec_ix_init() if initializing after declaration.
-    cvec_ix_reserve(&bignums, 100);
-    c_forrange (i, 100)
-        cvec_ix_push_back(&bignums, i * i * i);
-    cvec_ix_pop_back(&bignums); // erase the last
-
-    uint64_t value;
-    c_forrange (i, cvec_ix_size(bignums))
-        value = bignums.data[i];
-    cvec_ix_del(&bignums);
-}
-```
-**cvec** of *cstr_t*.
-```C
-#include <stc/cstr.h>
-#include <stc/cvec.h>
-
-using_cvec_str();
-
-int main() {
-    cvec_str names = cvec_INIT;
-    cvec_str_emplace_back(&names, "Mary");
-    cvec_str_emplace_back(&names, "Joe");
-    cstr_assign(&names.data[1], "Jake"); // replace "Joe".
-
-    // Use push_back() rather than emplace_back() when adding a cstr_t type:
-    cstr_t tmp = cstr_from("%d elements so far", cvec_str_size(names));
-    cvec_str_push_back(&names, tmp); // tmp is moved to names, do not del() it.
-
-    printf("%s\n", names.data[1].str); // Access the string char*
-    c_foreach (i, cvec_str, names)
-        printf("item: %s\n", i.get->str);
-    cvec_str_del(&names);
 }
 ```
 **cmap** of *int => int*, and **cmap** of *cstr_t* => *cstr_t*
@@ -322,6 +326,28 @@ int main()
         cpqueue_i_pop(&heap);
     }
     cpqueue_i_del(&heap);
+}
+```
+**cqueue** adapter container. Uses singly linked list as representation.
+```C
+#include <stc/cqueue.h>
+#include <stdio.h>
+
+using_clist(i, int);
+using_cqueue(i, clist_i);
+
+int main() {
+    cqueue_i queue = cqueue_i_init();
+
+    // push_front() / push_back() interleaved.
+    c_forrange (i, 20) {
+        if (i & 1) cqueue_i_push_front(&queue, i);
+        else       cqueue_i_push_back(&queue, i);
+    }
+    c_foreach (i, cqueue_i, queue) {
+        printf(" %d\n", *i.get);
+
+    cqueue_i_del(&queue);
 }
 ```
 **carray**. 1d, 2d and 3d arrays, allocated from heap in one memory block. *carray3* may have sub-array "views" of *carray2* and *carray1* etc., as shown in the following example:
