@@ -151,19 +151,21 @@ using_cvec(ix, int64_t); // ix is just an example type tag name.
 int main() {
     cvec_ix bignums = cvec_INIT; // use cvec_ix_init() if initializing after declaration.
     cvec_ix_reserve(&bignums, 50);
-    
-    c_forrange (i, 50)
+
+    c_forrange (i, int, 1, 50)
         cvec_ix_push_back(&bignums, i * i * i);
 
     cvec_ix_pop_back(&bignums); // erase the last
 
-    c_forrange (i, cvec_ix_size(bignums))
+    c_forrange (i, int, 1, cvec_ix_size(bignums))
         bignums.data[i] /= i; // make them smaller
 
     c_foreach (i, cvec_ix, bignums)
         printf(" %d", *i.get);
     cvec_ix_del(&bignums);
 }
+// Output:
+ 1 8 13 21 31 43 57 73 91 111 133 157 183 211 241 273 307 343 381 421 463 507 553 601 651 703 757 813 871 931 993 1057 1123 1191 1261 1333 1407 1483 1561 1641 1723 1807 1893 1981 2071 2163 2257 2353
 ```
 **cvec** of *cstr_t*.
 ```C
@@ -188,6 +190,11 @@ int main() {
         printf("item: %s\n", i.get->str);
     cvec_str_del(&names);
 }
+// Output:
+Jake
+item: Mary
+item: Jake
+item: 2 elements so far
 ```
 **cstr** string example.
 ```C
@@ -203,7 +210,7 @@ int main() {
     cstr_erase(&s1, 7, 5); // -nine
     printf("%s.\n", s1.str);
 
-    cstr_replace(&cs, cstr_find(&cs, "seven"), 5, "four");
+    cstr_replace(&s1, cstr_find(&s1, "seven"), 5, "four");
     printf("%s.\n", s1.str);
     
     // reassign:
@@ -216,24 +223,32 @@ int main() {
     
     c_del(cstr, &s1, &full_path);
 }
+// Output:
+one-nine-three-seven-five.
+one-two-nine-three-seven-five.
+one-two-three-seven-five.
+one-two-three-four-five.
+append: one two three four five six seven eight
+directory/filename.ext
 ```
 **cmap** of *int => int*, and **cmap** of *cstr_t* => *cstr_t*
 ```C
 #include <stdio.h>
 #include <stc/cmap.h>
+#include <stc/cstr.h>
 
 using_cmap(ii, int, int);
-using_cmap_str(); 
+using_cmap_str();
 
 int main() {
     // -- map of ints --
     cmap_ii nums = cmap_INIT;
     cmap_ii_put(&nums, 8, 64); // similar to insert_or_assign()
-    cmap_ii_emplace(&nums, 11, 121); 
+    cmap_ii_emplace(&nums, 11, 121);
 
-    printf("%d\n", cmap_ii_find(nums, 8)->second);
+    printf("%d\n", cmap_ii_find(&nums, 8)->second);
     cmap_ii_del(&nums);
-    
+
     // -- map of str --
     cmap_str strings = cmap_INIT;
     cmap_str_emplace(&strings, "Make", "my");
@@ -241,11 +256,19 @@ int main() {
     cmap_str_emplace(&strings, "Sunny", "afternoon");
     c_push_items(&strings, cmap_str, {{"Eleven", "XI"}, {"Six", "VI"}});
 
-    printf("size = %zu\n", cmap_str_size(table));
+    printf("size = %zu\n", cmap_str_size(strings));
     c_foreach (i, cmap_str, strings)
         printf("%s: %s\n", i.get->first.str, i.get->second.str);
-    cmap_str_del(&strings); // frees all strings and map.    
+    cmap_str_del(&strings); // frees all strings and map.
 }
+// Output:
+64
+size = 5
+Rainy: day
+Sunny: afternoon
+Six: VI
+Make: my
+Eleven: XI
 ```
 **cset** of *cstr*.
 ```C
@@ -264,9 +287,11 @@ int main() {
 
     // iterate the set of cstr_t values:
     c_foreach (i, cset_str, words)
-        printf("%s\n", i.get->str);
+        printf("%s ", i.get->str);
     cset_str_del(&words);
 }
+// Output:
+Hello World
 ```
 **clist** of *int64_t*. Similar to c++ *std::forward_list*, but can do both *push_front()* and *push_back()* as well as *pop_front()*.
 ```C
@@ -281,7 +306,7 @@ int main() {
         10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0
     });
     // interleave push_front / push_back:
-    c_forrange (i, 1, 10) {
+    c_forrange (i, int, 1, 10) {
         if (i & 1) clist_fx_push_front(&list, (float) i);
         else       clist_fx_push_back(&list, (float) i);
     }
@@ -298,11 +323,13 @@ int main() {
 
     clist_fx_del(&list);
 }
+// Output:
+initial:  9 7 5 3 1 10 20 30 40 50 60 70 80 90 2 4 6 8
+sorted:  1 2 3 4 5 6 7 8 9 10 20 30 40 50 60 70 80 90
 ```
 **cpqueue** priority queue demo:
 ```C
 #include <stdio.h>
-#include <time.h>
 #include <stc/cpqueue.h>
 #include <stc/crandom.h>
 
@@ -312,9 +339,9 @@ using_cpqueue(i, cvec_i, >); // adaptor type, '>' = min-heap
 int main()
 {
     size_t N = 10000000;
-    crand_rng64_t rng = crand_rng64_init(time(NULL));
+    crand_rng64_t rng = crand_rng64_init(1234);
     crand_uniform_i64_t dist = crand_uniform_i64_init(0, N * 10);
-    
+
     cpqueue_i heap = cpqueue_i_init();
     // Push ten million random numbers to priority queue, plus some negative ones.
     c_forrange (N)
@@ -328,6 +355,8 @@ int main()
     }
     cpqueue_i_del(&heap);
 }
+// Output:
+ -873 -343 -231 -32 -4 3 5 6 18 23 31 54 68 87 99 105 107 125 128 147 150 155 167 178 181 188 213 216 272 284 287 302 306 311 313 326 329 331 344 348 363 367 374 385 396 399 401 407 412 477
 ```
 **cqueue** adapter container. Uses singly linked list as representation.
 ```C
@@ -347,11 +376,13 @@ int main() {
     c_forrange (5)
         cqueue_i_pop(&queue);
 
-    c_foreach (i, cqueue_i, queue) {
-        printf(" %d\n", *i.get);
+    c_foreach (i, cqueue_i, queue)
+        printf(" %d", *i.get);
 
     cqueue_i_del(&queue);
 }
+// Output:
+ 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19
 ```
 **carray**. 1d, 2d and 3d arrays, allocated from heap in one memory block. *carray3* may have sub-array "views" of *carray2* and *carray1* etc., as shown in the following example:
 ```C
@@ -363,19 +394,23 @@ using_carray(f, float);
 int main()
 {
     carray3f a3 = carray3f_make(30, 20, 10, 0.0f);  // define a3[30][20][10], init with 0.0f.
-    *carray3f_at(a3, 5, 4, 3) = 3.14f;         // a3[5][4][3] = 3.14
+    *carray3f_at(&a3, 5, 4, 3) = 3.14f;         // a3[5][4][3] = 3.14
 
-    carray1f a1 = carray3f_at2(a3, 5, 4);      // sub-array a3[5][4] (no data copy).    
-    carray2f a2 = carray3f_at1(a3, 5);         // sub-array a3[5]
-    
-    printf("%f\n", *carray1f_at(a1, 3));       // a1[3] (3.14f)
-    printf("%f\n", *carray2f_at(a2, 4, 3));    // a2[4][3] (3.14f)
-    printf("%f\n", *carray3f_at(a3, 5, 4, 3)); // a3[5][4][3] (3.14f)
+    carray1f a1 = carray3f_at2(&a3, 5, 4);      // sub-array a3[5][4] (no data copy).
+    carray2f a2 = carray3f_at1(&a3, 5);         // sub-array a3[5]
+
+    printf("%f\n", *carray1f_at(&a1, 3));       // a1[3] (3.14f)
+    printf("%f\n", *carray2f_at(&a2, 4, 3));    // a2[4][3] (3.14f)
+    printf("%f\n", *carray3f_at(&a3, 5, 4, 3)); // a3[5][4][3] (3.14f)
     // ...
     carray1f_del(&a1); // does nothing, since it is a sub-array.
     carray2f_del(&a2); // same.
     carray3f_del(&a3); // free array, and invalidates a1, a2.
 }
+// Output:
+3.140000
+3.140000
+3.140000
 ```
 Finally, a demo of **cmap**, **cvec**, **cstr** and **random**: Normal distribution with a random mean and standard deviation, which may produce this:
 ```
