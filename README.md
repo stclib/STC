@@ -67,40 +67,50 @@ Performance
 
 The library is very efficent. Containers have templated intrusive elements. One of the most performance critical containers is the **cmap / cset**. Luckily, cmap is among the fastest C/C++ map implementations available, see **examples/benchmark.c**
 
-Compiled with g++ v9.2.0 -O3 on windows, Ryzen 7 2700X CPU. Similar results with VC and clang.
+Compiled with clang.exe -O3 -x c++, v10.0 on windows, Ryzen 7 2700X CPU. Similar results with VC and g++.
 
-- **CMAP**=stc/*cmap*
-- KMAP=klib/*khash*
-- UMAP=*std::unordered_map*
-- BMAP=*ska::bytell_hash_map*
-- FMAP=*ska::flat_hash_map*
-- RMAP=*robin_hood::unordered_map*
+- **CMAP** = stc/*cmap*
+- KMAP = klib/*khash*
+- UMAP = *std::unordered_map*
+- SMAP = *spp::sparse_hash_map*
+- BMAP = *ska::bytell_hash_map*
+- FMAP = *ska::flat_hash_map*
+- RMAP = *robin_hood::unordered_map*
+- HMAP = *tsl::hopscotch_map*
 ```
-Random keys are in range [0, 2^20):
+Random keys are in range [0, 2^24), seed = 1600713678:
 
-Unordered maps: 50000000 repeats of insert a random key + (attemt to) remove another random key:
-CMAP: time:  2.58 sec
-KMAP: time: 11.80 sec
-UMAP: time: 16.07 sec
-BMAP: time:  3.54 sec
-FMAP: time:  2.79 sec
-RMAP: time:  2.70 sec
+Unordered maps: 30000000 repeats of Insert random key + try to remove a random key:
+CMAP: time:  4.44, sum: 450000015000000, erased 10921039
+UMAP: time: 11.40, sum: 450000015000000, erased 10921039
+SMAP: time: 14.27, sum: 450000015000000, erased 10921039
+BMAP: time:  5.36, sum: 450000015000000, erased 10921039
+FMAP: time:  4.40, sum: 450000015000000, erased 10921039
+HMAP: time:  4.48, sum: 450000015000000, erased 10921039
 
-Unordered maps: Insert 50000000 sequenced keys, then remove all in same order:
-CMAP: time: 5.28 sec
-KMAP: time: 3.34 sec
-UMAP: time: 4.91 sec
-BMAP: time: 5.37 sec
-FMAP: time: 4.51 sec
-RMAP: time: 4.91 sec
+Unordered maps: Insert 30000000 index keys, then remove them in same order:
+CMAP: time:  3.29, erased 30000000
+UMAP: time: 15.44, erased 30000000
+SMAP: time: 22.21, erased 30000000
+BMAP: time:  7.49, erased 30000000
+FMAP: time:  5.71, erased 30000000
+HMAP: time:  5.94, erased 30000000
 
-Unordered maps: Insert 100000000 random keys, then remove all in same order:
-CMAP: time:  2.66 sec
-KMAP: time:  6.27 sec
-UMAP: time: 15.30 sec
-BMAP: time:  5.17 sec
-FMAP: time:  3.37 sec
-RMAP: time:  3.93 sec
+Unordered maps: Insert 30000000 random keys, then remove them in same order:
+CMAP: time:  3.19, erased 13970961
+UMAP: time: 10.07, erased 13970961
+SMAP: time: 13.41, erased 13970961
+BMAP: time:  5.44, erased 13970961
+FMAP: time:  4.45, erased 13970961
+HMAP: time:  4.48, erased 13970961
+
+Unordered maps: Iterate 30000000 random keys:
+CMAP: time:  0.23, sum 1344646322743375
+UMAP: time:  3.35, sum 1344646322743375
+SMAP: time:  0.33, sum 1344646322743375
+BMAP: time:  0.61, sum 1344646322743375
+FMAP: time:  0.57, sum 1344646322743375
+HMAP: time:  0.51, sum 1344646322743375
 ```
 Memory efficiency
 -----------------
@@ -190,8 +200,10 @@ int main() {
     cvec_str_emplace_back(&names, "Mary");
     cvec_str_emplace_back(&names, "Joe");
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
-    // Use push_back() to add a new cstr_t object to be moved into the vector, e.g.:
-    cvec_str_push_back(&names, cstr_from("%d elements so far", cvec_str_size(names))); 
+
+    // Use push_back() rather than emplace_back() when adding a cstr_t type:
+    cstr_t tmp = cstr_from("%d elements so far", cvec_str_size(names));
+    cvec_str_push_back(&names, tmp); // tmp is moved to names, do not del() it.
 
     printf("%s\n", names.data[1].str); // Access the string char*
     c_foreach (i, cvec_str, names)
@@ -199,20 +211,34 @@ int main() {
     cvec_str_del(&names);
 }
 ```
-**cmap** of *int -> int*.
+**cmap** of *int => int*, and **cmap** of *cstr_t* => *cstr_t*
 ```C
 #include <stdio.h>
 #include <stc/cmap.h>
 
 using_cmap(ii, int, int);
+using_cmap_str(); 
 
 int main() {
+    // -- map of ints --
     cmap_ii nums = cmap_INIT;
     cmap_ii_put(&nums, 8, 64); // similar to insert_or_assign()
     cmap_ii_emplace(&nums, 11, 121); 
 
     printf("%d\n", cmap_ii_find(nums, 8)->second);
     cmap_ii_del(&nums);
+    
+    // -- map of str --
+    cmap_str strings = cmap_INIT;
+    cmap_str_emplace(&strings, "Make", "my");
+    cmap_str_emplace(&strings, "Rainy", "day");
+    cmap_str_emplace(&strings, "Sunny", "afternoon");
+    c_push_items(&strings, cmap_str, {{"Eleven", "XI"}, {"Six", "VI"}});
+
+    printf("size = %zu\n", cmap_str_size(table));
+    c_foreach (i, cmap_str, strings)
+        printf("%s: %s\n", i.get->first.str, i.get->second.str);
+    cmap_str_del(&strings); // frees all strings and map.    
 }
 ```
 **cset** of *cstr*.
@@ -236,66 +262,66 @@ int main() {
     cset_str_del(&words);
 }
 ```
-**cmap** of *cstr -> cstr*. Both cstr keys and values are created internally via *cstr()* from const char* inputs.
-```C
-#include <stc/cstr.h>
-#include <stc/cmap.h>
-
-using_cmap_str(); 
-
-int main() {
-    cmap_str table = cmap_INIT;
-    cmap_str_put(&table, "Make", "my");
-    cmap_str_put(&table, "Rainy", "day");
-    cmap_str_put(&table, "Sunny", "afternoon");
-    printf("Sunny: %s\n", cmap_str_find(table, "Sunny")->second.str);
-    cmap_str_erase(&table, "Rainy");
-
-    printf("size = %zu\n", cmap_size(table));
-    c_foreach (i, cmap_str, table)
-        printf("%s: %s\n", i.get->first.str, i.get->second.str);
-    
-    cmap_str_del(&table); // frees first and second cstrs, and hash table array.
-}
-```
 **clist** of *int64_t*. Similar to c++ *std::forward_list*, but can do both *push_front()* and *push_back()* as well as *pop_front()*.
 ```C
 #include <stdio.h>
-#include <time.h>
 #include <stc/clist.h>
-#include <stc/crandom.h>
 
 using_clist(fx, double);
 
 int main() {
     clist_fx list = clist_INIT;
-    crand_rng64_t eng = crand_rng64_init(time(NULL));
-    crand_uniform_f64_t dist = crand_uniform_f64_init(100.0, 1000.0);
-    int k;
+    c_push_items(&list, clist_fx, {
+        10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0
+    });
     
-    c_forrange (10000000)
-        clist_fx_push_back(&list, crand_uniform_f64(&eng, &dist));
-    k = 0;
+    c_forrange (i, int, 5, 95, 10)
+        clist_fx_push_back(&list, (float) i);
+    clist_fx_push_front(&list, 100.0);
+    
+    printf("current: ");
     c_foreach (i, clist_fx, list)
-        if (++k <= 10) printf("%8d: %10f\n", k, *i.get); else break;
-
+        printf(" %g", *i.get);
+    puts("");
+    
     clist_fx_sort(&list); // mergesort O(n*log n)
-    puts("sorted");
 
-    k = 0;
+    printf("sorted: ");
     c_foreach (i, clist_fx, list)
-        if (++k <= 10) printf("%8d: %10f\n", k, *i.get); else break;
-
-    clist_fx_clear(&list);
-
-    // generic c_push_items() function, works on most containers:
-    c_push_items(&list, clist_fx, {10, 20, 30, 40, 50});
-
-    c_foreach (i, clist_fx, list)
-        printf("%f ", *i.get);
+        printf(" %g", *i.get);
     puts("");
 
     clist_fx_del(&list);
+}
+```
+**cpqueue** priority queue demo:
+```C
+#include <stdio.h>
+#include <time.h>
+#include <stc/cpqueue.h>
+#include <stc/crandom.h>
+
+using_cvec(i, int64_t);
+using_cpqueue(i, cvec_i, >); // adaptor type, '>' = min-heap
+
+int main()
+{
+    size_t N = 10000000;
+    crand_rng64_t rng = crand_rng64_init(time(NULL));
+    crand_uniform_i64_t dist = crand_uniform_i64_init(0, N * 10);
+    
+    cpqueue_i heap = cpqueue_i_init();
+    // Push ten million random numbers to priority queue, plus some negative ones.
+    c_forrange (N)
+        cpqueue_i_push(&heap, crand_uniform_i64(&rng, &dist));
+    c_push_items(&heap, cpqueue_i, {-231, -32, -873, -4, -343});
+
+    // Extract and disply the fifty smallest.
+    c_forrange (50) {
+        printf("%zd ", *cpqueue_i_top(&heap));
+        cpqueue_i_pop(&heap);
+    }
+    cpqueue_i_del(&heap);
 }
 ```
 **carray**. 1d, 2d and 3d arrays, allocated from heap in one memory block. *carray3* may have sub-array "views" of *carray2* and *carray1* etc., as shown in the following example:
@@ -320,5 +346,114 @@ int main()
     carray1f_del(&a1); // does nothing, since it is a sub-array.
     carray2f_del(&a2); // same.
     carray3f_del(&a3); // free array, and invalidates a1, a2.
+}
+```
+Finally, a demo of **cmap**, **cvec**, **cstr** and **random**: Normal distribution with a random mean and standard deviation, which may produce this:
+```
+  55 *
+  56 **
+  57 ****
+  58 ******
+  59 *********
+  60 **************
+  61 ********************
+  62 ***************************
+  63 ************************************
+  64 ********************************************
+  65 *****************************************************
+  66 *************************************************************
+  67 ********************************************************************
+  68 ************************************************************************
+  69 *************************************************************************
+  70 ************************************************************************
+  71 *******************************************************************
+  72 *************************************************************
+  73 *****************************************************
+  74 ********************************************
+  75 ***********************************
+  76 ***************************
+  77 ********************
+  78 **************
+  79 **********
+  80 ******
+  81 ****
+  82 **
+  83 *
+Normal distribution with mean=69, stddev=5. '*' = 10811 samples out of 10000000.
+```
+Code:
+```C
+#include <stdio.h>
+#include <time.h>
+#include <math.h>
+#include <stc/cmap.h>
+#include <stc/cvec.h>
+#include <stc/cstr.h>
+#include <stc/crandom.h>
+
+using_cmap(ii, int, int);
+
+static int compare(cmap_ii_value_t *a, cmap_ii_value_t *b)
+{
+    return c_default_compare(&a->first, &b->first);
+}
+using_cvec(mi, cmap_ii_value_t, c_default_del, compare);
+
+cvec_mi make_normal_dist(crand_rng64_t* rng, crand_normal_f64_t* dist, int n);
+void display_hist(cvec_mi hist, int mean, int stddev, int n, int scale);
+
+
+int main(int argc, char* argv[])
+{
+    // Seed with a real random value, if available
+    crand_rng64_t rng = crand_rng64_init(time(NULL));
+
+    // Choose random mean and standard deviation
+    crand_uniform_i64_t mean_dist = crand_uniform_i64_init(-99, 99),
+                        sdev_dist = crand_uniform_i64_init(5, 12);
+
+    int mean = (int) crand_uniform_i64(&rng, &mean_dist);
+    int stddev = (int) crand_uniform_i64(&rng, &sdev_dist);
+
+    // Setup a normal distribution:
+    crand_normal_f64_t norm_dist = crand_normal_f64_init(mean, stddev);
+
+    int samples = 10000000, scale = 74;
+    cvec_mi hist = make_normal_dist(&rng, &norm_dist, samples);
+    display_hist(hist, mean, stddev, samples, scale);
+
+    cvec_mi_del(&hist);
+}
+
+cvec_mi make_normal_dist(crand_rng64_t* rng, crand_normal_f64_t* dist, int n)
+{
+    cmap_ii mhist = cmap_INIT;
+    c_forrange (i, int, n) {
+        cmap_ii_emplace(&mhist, (int) round(crand_normal_f64(rng, dist)), 0).first->second += 1;
+    }
+
+    // Transfer map to vec, sort and return it.
+    cvec_mi hist = cvec_INIT;
+    c_foreach (i, cmap_ii, mhist) {
+        cvec_mi_push_back(&hist, *i.get);
+    }
+    cvec_mi_sort(&hist);
+    cmap_ii_del(&mhist);
+    return hist;
+}
+
+void display_hist(cvec_mi hist, int mean, int stddev, int n, int scale)
+{
+    cstr_t bar = cstr_INIT;
+    c_foreach (i, cvec_mi, hist) {
+        int k = (int) (i.get->second * stddev * scale * 25ull / 10 / n);
+        if (k > 0) {
+            cstr_take(&bar, cstr_with_size(k, '*'));
+            printf("%4d %s\n", i.get->first, bar.str);
+        }
+    }
+    printf("Normal distribution with mean=%d, stddev=%d. '*' = %.0f samples out of %d.\n",
+           mean, stddev, n / (2.5 * stddev * scale), n);
+    cstr_del(&bar);
 }
 ```
