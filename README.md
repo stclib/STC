@@ -272,7 +272,7 @@ int main() {
     cmap_str_emplace(&strings, "Make", "my");
     cmap_str_emplace(&strings, "Rainy", "day");
     cmap_str_emplace(&strings, "Sunny", "afternoon");
-    c_push_items(&strings, cmap_str, {{"Eleven", "XI"}, {"Six", "VI"}});
+    c_push_items(&strings, cmap_str, { {"Eleven", "XI"}, {"Six", "VI"} });
 
     printf("size = %zu\n", cmap_str_size(strings));
     c_foreach (i, cmap_str, strings)
