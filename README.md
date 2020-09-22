@@ -49,7 +49,7 @@ Installation
 
 Because it is headers only, files can simply be included in your program. The functions will be inlined by default. You may add the project folder to CPATH environment variable, to let gcc, clang, and tinyc locate the headers.
 
-If containers are extensively used accross many tranlation units with common instantiated container types, it is recommended to build as a library, to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option, and put all the instantiations of the containers used in one C file, like this:
+If containers are extensively used accross many translation units with common instantiated container types, it is recommended to build as a library, to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option, and put all the instantiations of the containers used in one C file, like this:
 ```C
 #define STC_IMPLEMENTATION
 #include <stc/cstr.h>
@@ -482,7 +482,7 @@ static int compare(cmap_ii_value_t *a, cmap_ii_value_t *b)
 using_cvec(mi, cmap_ii_value_t, c_default_del, compare);
 
 cvec_mi make_normal_dist(crand_rng64_t* rng, crand_normal_f64_t* dist, int n);
-void display_hist(cvec_mi hist, int mean, int stddev, int n, int scale);
+void display_hist(cvec_mi hist, int scale, int mean, int stddev);
 
 
 int main(int argc, char* argv[])
@@ -502,7 +502,7 @@ int main(int argc, char* argv[])
 
     int samples = 10000000, scale = 74;
     cvec_mi hist = make_normal_dist(&rng, &norm_dist, samples);
-    display_hist(hist, mean, stddev, samples, scale);
+    display_hist(hist, scale, mean, stddev);
 
     cvec_mi_del(&hist);
 }
@@ -510,11 +510,11 @@ int main(int argc, char* argv[])
 cvec_mi make_normal_dist(crand_rng64_t* rng, crand_normal_f64_t* dist, int n)
 {
     cmap_ii mhist = cmap_INIT;
-    c_forrange (i, int, n) {
+    c_forrange (n) {
         cmap_ii_emplace(&mhist, (int) round(crand_normal_f64(rng, dist)), 0).first->second += 1;
     }
 
-    // Transfer map to vec, sort and return it.
+    // Transfer cmap entries to a cvec, sort and return it.
     cvec_mi hist = cvec_INIT;
     c_foreach (i, cmap_ii, mhist) {
         cvec_mi_push_back(&hist, *i.get);
@@ -524,9 +524,12 @@ cvec_mi make_normal_dist(crand_rng64_t* rng, crand_normal_f64_t* dist, int n)
     return hist;
 }
 
-void display_hist(cvec_mi hist, int mean, int stddev, int n, int scale)
+void display_hist(cvec_mi hist, int scale, int mean, int stddev)
 {
     cstr_t bar = cstr_INIT;
+    int n = 0; // samples
+    c_foreach (i, cvec_mi, hist)
+        n += i.get->second;
     c_foreach (i, cvec_mi, hist) {
         int k = (int) (i.get->second * stddev * scale * 25ull / 10 / n);
         if (k > 0) {
