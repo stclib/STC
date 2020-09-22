@@ -47,7 +47,9 @@ The aim of this project was to create a small **Standard Container Library for t
 Installation
 ------------
 
-Because it is headers only, files can simply be included in your program. The functions will be inlined by default. If containers are extensively used accross many tranlation units with common instantiated container types, it is recommended to build as a library, to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option, and put all the instantiations of the containers used in one C file, like this:
+Because it is headers only, files can simply be included in your program. The functions will be inlined by default. You may add the project folder to CPATH environment variable, to let gcc, clang, and tinyc locate the headers.
+
+If containers are extensively used accross many tranlation units with common instantiated container types, it is recommended to build as a library, to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option, and put all the instantiations of the containers used in one C file, like this:
 ```C
 #define STC_IMPLEMENTATION
 #include <stc/cstr.h>
@@ -157,7 +159,7 @@ Example usages
 --------------
 The examples folder contains further examples.
 
-**cvec** of *int64_t*. 
+**cvec** of *int64_t*.
 ```C
 #include <stc/cvec.h>
 #include <stdio.h>
@@ -228,7 +230,7 @@ int main() {
 
     cstr_replace(&s1, cstr_find(&s1, "seven"), 5, "four");
     printf("%s.\n", s1.str);
-    
+
     // reassign:
     cstr_assign(&s1, "one two three four five six seven");
     cstr_append(&s1, " eight");
@@ -236,7 +238,7 @@ int main() {
 
     cstr_t full_path = cstr_from("%s/%s.%s", "directory", "filename", "ext");
     printf("%s\n", full_path.str);
-    
+
     c_del(cstr, &s1, &full_path);
 }
 // Output:
@@ -298,7 +300,7 @@ int main() {
     cset_str_insert(&words, "Hello");
     cset_str_insert(&words, "Sad");
     cset_str_insert(&words, "World");
-    
+
     cset_str_erase(&words, "Sad");
 
     // iterate the set of cstr_t values:
@@ -326,11 +328,11 @@ int main() {
         if (i & 1) clist_fx_push_front(&list, (float) i);
         else       clist_fx_push_back(&list, (float) i);
     }
-    
+
     printf("initial: ");
     c_foreach (i, clist_fx, list)
         printf(" %g", *i.get);
-    
+
     clist_fx_sort(&list); // mergesort O(n*log n)
 
     printf("\nsorted: ");

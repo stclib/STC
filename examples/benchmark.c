@@ -208,7 +208,9 @@ int rr = RR;
 #ifndef __cplusplus
 #define RUN_TEST(n) MAP_TEST##n(CMAP, ii) /*MAP_TEST##n(KMAP, ii)*/
 #else
-#define RUN_TEST(n) MAP_TEST##n(CMAP, ii) /*MAP_TEST##n(KMAP, ii)*/ MAP_TEST##n(UMAP, ii) MAP_TEST##n(SMAP, ii) \
+#define RUN_TEST(n) MAP_TEST##n(CMAP, ii) MAP_TEST##n(KMAP, ii) MAP_TEST##n(UMAP, ii) MAP_TEST##n(SMAP, ii) \
+                    MAP_TEST##n(BMAP, ii) MAP_TEST##n(FMAP, ii) MAP_TEST##n(RMAP, ii) MAP_TEST##n(HMAP, ii)
+#define RUNX_TEST(n) MAP_TEST##n(CMAP, ii) /*MAP_TEST##n(KMAP, ii)*/ MAP_TEST##n(UMAP, ii) MAP_TEST##n(SMAP, ii) \
                     MAP_TEST##n(BMAP, ii) MAP_TEST##n(FMAP, ii) /*MAP_TEST##n(RMAP, ii)*/ MAP_TEST##n(HMAP, ii)
 #endif
 
@@ -227,5 +229,5 @@ int main(int argc, char* argv[])
     RUN_TEST(3)
 
     printf("\nUnordered maps: Iterate %d random keys:\n", N4);
-    RUN_TEST(4)
+    RUNX_TEST(4)
 }
