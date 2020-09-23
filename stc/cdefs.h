@@ -77,6 +77,7 @@ enum   {_c_max_buffer = 512};
 #define c_default_from_raw(x)   (x)
 #define c_default_to_raw(ptr)   (*(ptr))
 #define c_default_del(ptr)      ((void) (ptr))
+#define c_pointer_del(pptr)     free(*(pptr))
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
 #define c_foreach_3(it, ctype, cnt) \
@@ -98,7 +99,7 @@ enum   {_c_max_buffer = 512};
 } while (0)
 
 #define c_del(ctype, ...) do { \
-    struct ctype* __arr[] = {__VA_ARGS__}; \
+    ctype##_t* __arr[] = {__VA_ARGS__}; \
     for (size_t i=0; i<sizeof(__arr)/sizeof(__arr[0]); ++i) \
         ctype##_del(__arr[i]); \
 } while (0)

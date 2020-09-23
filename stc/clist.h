@@ -75,9 +75,9 @@
         clist_##X##_value_t value; \
     } clist_##X##_node_t; \
 \
-    typedef struct clist_##X { \
+    typedef struct { \
         clist_##X##_node_t* last; \
-    } clist_##X; \
+    } clist_##X, clist_##X##_t; \
 \
     typedef struct { \
         clist_##X##_node_t* const* _last; \

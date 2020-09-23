@@ -189,13 +189,13 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         bool second; /* inserted */ \
     } ctype##_##X##_result_t; \
 \
-    typedef struct ctype##_##X { \
+    typedef struct { \
         ctype##_##X##_value_t* table; \
         uint8_t* _hashx; \
         uint32_t size, bucket_count; \
         float max_load_factor; \
         float shrink_limit_factor; \
-    } ctype##_##X; \
+    } ctype##_##X, ctype##_##X##_t; \
 \
     typedef struct { \
         ctype##_##X##_value_t *get; \

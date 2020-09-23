@@ -49,7 +49,7 @@
 
 #define using_cstack(X, ctype) \
 \
-    typedef struct ctype cstack_##X; \
+    typedef ctype##_t cstack_##X, cstack_##X##_t; \
     typedef ctype##_value_t cstack_##X##_value_t; \
     typedef ctype##_rawvalue_t cstack_##X##_rawvalue_t; \
     typedef ctype##_input_t cstack_##X##_input_t; \

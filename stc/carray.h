@@ -101,20 +101,20 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
     typedef Value carray1##X##_value_t; \
     typedef carray1##X##_value_t carray2##X##_value_t, carray3##X##_value_t; \
 \
-    typedef struct carray1##X { \
+    typedef struct { \
         Value *data; \
         size_t _xdim; \
-    } carray1##X; \
+    } carray1##X, carray1##X##_t; \
 \
-    typedef struct carray2##X { \
+    typedef struct { \
         Value *data; \
         size_t _xdim, _yxdim; \
-    } carray2##X; \
+    } carray2##X, carray2##X##_t; \
 \
-    typedef struct carray3##X { \
+    typedef struct { \
         Value *data; \
         size_t _xdim, _yxdim, _zdim; \
-    } carray3##X; \
+    } carray3##X, carray3##X##_t; \
 \
     using_carray_common(1, X, Value, valueDestroy) \
     using_carray_common(2, X, Value, valueDestroy) \

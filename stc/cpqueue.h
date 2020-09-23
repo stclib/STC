@@ -52,7 +52,7 @@
 
 #define using_cpqueue(X, ctype, cmpOpr) /* cmpOpr: < or > */ \
 \
-    typedef struct ctype cpqueue_##X; \
+    typedef ctype##_t cpqueue_##X, cpqueue_##X##_t; \
     typedef ctype##_value_t cpqueue_##X##_value_t; \
     typedef ctype##_rawvalue_t cpqueue_##X##_rawvalue_t; \
     typedef ctype##_input_t cpqueue_##X##_input_t; \

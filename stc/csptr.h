@@ -1,0 +1,113 @@
+/* MIT License
+ *
+ * Copyright (c) 2020 Tyge Løvset, NORCE, www.norceresearch.no
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+#ifndef CSPTR__H__
+#define CSPTR__H__
+
+#include "cdefs.h"
+
+/* csptr: std::shared_ptr -like type: */
+/*
+#include <stc/csptr.h>
+#include <stc/cstr.h>
+
+typedef struct { cstr_t name, last; } Person;
+
+void Person_del(Person* p) {
+    printf("del: %s\n", p->name.str);
+    c_del(cstr, &p->name, &p->last);
+}
+
+using_csptr(pe, Person, Person_del);
+
+int main() {
+    csptr_pe p = csptr_pe_make(c_new(Person));
+    p.get->name = cstr("Joe");
+    p.get->last = cstr("Jordan");
+
+    csptr_pe q = csptr_pe_ref(p); // share the pointer
+    printf("%s %s: %d\n", q.get->name.str, q.get->last.str, *q.use_count);
+
+    c_del(csptr_pe, &p, &q);
+}
+*/
+typedef int atomic_count_t;
+#if defined(__i386__) || defined(__x86_64__)
+    static inline atomic_count_t atomic_exchange_and_add(atomic_count_t* pw, int dv) {
+        int r;
+        __asm__ __volatile__ (
+            "lock\n\t"
+            "xadd %1, %0":
+            "=m"( *pw ), "=r"( r ): // int r = *pw; // outputs (%0, %1)
+            "m"( *pw ), "1"( dv ):  // *pw += dv;   // inputs (%2, %3 == %1)
+            "memory", "cc"          // clobbers
+        );
+        return r;
+    }
+    static inline void atomic_increment(atomic_count_t* pw) {
+        __asm__ (
+            "lock\n\t"
+            "incl %0":
+            "=m"( *pw ): // ++*pw // output (%0)
+            "m"( *pw ):  // input (%1)
+            "cc"         // clobbers
+        );
+    }
+    static inline atomic_count_t atomic_decrement(atomic_count_t* pw) {
+        return atomic_exchange_and_add(pw, -1) - 1; // (pw, 1) + 1;
+    }
+#else
+    static inline void atomic_increment(atomic_count_t* pw) {++*pw;}
+    static inline atomic_count_t atomic_decrement(atomic_count_t* pw) {return --*pw;}
+#endif
+
+
+#define using_csptr(X, Value, valueDestroy) \
+    typedef Value csptr_##X##_value_t; \
+    typedef struct { csptr_##X##_value_t* get; atomic_count_t* use_count; } csptr_##X, csptr_##X##_t; \
+\
+    STC_INLINE csptr_##X \
+    csptr_##X##_make(csptr_##X##_value_t* p) { \
+        csptr_##X ptr = {p}; \
+        if (p) *(ptr.use_count = c_new(atomic_count_t)) = 1; \
+        return ptr; \
+    } \
+\
+    STC_INLINE csptr_##X \
+    csptr_##X##_ref(csptr_##X ptr) {if (ptr.get) atomic_increment(ptr.use_count); return ptr;} \
+\
+    STC_INLINE void \
+    csptr_##X##_del(csptr_##X* self) { \
+        if (self->use_count && atomic_decrement(self->use_count) == 0) { \
+             c_free(self->use_count); valueDestroy(self->get); c_free(self->get); \
+        } \
+    } \
+\
+    STC_INLINE void \
+    csptr_##X##_reset(csptr_##X* self, csptr_##X##_value_t* p) { \
+        csptr_##X##_del(self); \
+        *self = csptr_##X##_make(p); \
+    } \
+\
+    typedef int csptr_##X##_dud
+
+#endif

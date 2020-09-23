@@ -50,9 +50,9 @@
     typedef cvec_##X##_rawvalue_t cvec_##X##_input_t; \
     typedef struct { cvec_##X##_value_t *get; } cvec_##X##_iter_t; \
 \
-    typedef struct cvec_##X { \
+    typedef struct { \
         cvec_##X##_value_t* data; \
-    } cvec_##X; \
+    } cvec_##X, cvec_##X##_t; \
 \
     STC_INLINE cvec_##X \
     cvec_##X##_init(void) {cvec_##X v = cvec_INIT; return v;} \

@@ -60,7 +60,7 @@
 
 #define using_cqueue(X, ctype) \
 \
-    typedef struct ctype cqueue_##X; \
+    typedef ctype##_t cqueue_##X, cqueue_##X##_t; \
     typedef ctype##_value_t cqueue_##X##_value_t; \
     typedef ctype##_rawvalue_t cqueue_##X##_rawvalue_t; \
     typedef ctype##_input_t cqueue_##X##_input_t; \

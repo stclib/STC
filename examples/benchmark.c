@@ -151,8 +151,8 @@ int rr = RR;
         erased += M##_ERASE(X, RAND(rr)); \
     } \
     difference = clock() - before; \
-    printf(#M ": size: %zu, buckets: %8zu, time: %5.02f, sum: %zu, erased %zu\n", \
-           (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), (float) difference / CLOCKS_PER_SEC, checksum, erased); \
+    printf(#M ": time: %5.02f, sum: %zu, erased %zu, size: %zu, buckets: %8zu\n", \
+           (float) difference / CLOCKS_PER_SEC, checksum, erased, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
     M##_CLEAR(X); \
 }
 
@@ -166,8 +166,8 @@ int rr = RR;
     for (size_t i = 0; i < N2; ++i) \
         erased += M##_ERASE(X, i); \
     difference = clock() - before; \
-    printf(#M ": size: %zu, buckets: %8zu, time: %5.02f, erased %zu\n", \
-           (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), (float) difference / CLOCKS_PER_SEC, erased); \
+    printf(#M ": time: %5.02f, erased %zu, size: %zu, buckets: %8zu\n", \
+           (float) difference / CLOCKS_PER_SEC, erased, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
     M##_CLEAR(X); \
 }
 
@@ -183,8 +183,8 @@ int rr = RR;
     for (size_t i = 0; i < N3; ++i) \
         erased += M##_ERASE(X, RAND(rr)); \
     difference = clock() - before; \
-    printf(#M ": size: %zu, buckets: %8zu, time: %5.02f, erased %zu\n", \
-           (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), (float) difference / CLOCKS_PER_SEC, erased); \
+    printf(#M ": time: %5.02f, erased %zu, size: %zu, buckets: %8zu\n", \
+           (float) difference / CLOCKS_PER_SEC, erased, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
     M##_CLEAR(X); \
 }
 
@@ -199,20 +199,21 @@ int rr = RR;
     for (int k=0; k<5; k++) M##_FOR (X, i) \
         sum += M##_ITEM(X, i); \
     difference = clock() - before; \
-    printf(#M ": size: %zu, buckets: %8zu, time: %5.02f, sum %zu\n", \
-           (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), (float) difference / CLOCKS_PER_SEC, sum); \
+    printf(#M ": time: %5.02f, sum %zu, size: %zu, buckets: %8zu\n", \
+           (float) difference / CLOCKS_PER_SEC, sum, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
     M##_CLEAR(X); \
 }
 
-
-#ifndef __cplusplus
-#define RUN_TEST(n) MAP_TEST##n(CMAP, ii) /*MAP_TEST##n(KMAP, ii)*/
-#else
+#ifdef __cplusplus
 #define RUN_TEST(n) MAP_TEST##n(CMAP, ii) MAP_TEST##n(KMAP, ii) MAP_TEST##n(UMAP, ii) MAP_TEST##n(SMAP, ii) \
                     MAP_TEST##n(BMAP, ii) MAP_TEST##n(FMAP, ii) MAP_TEST##n(RMAP, ii) MAP_TEST##n(HMAP, ii)
 #define RUNX_TEST(n) MAP_TEST##n(CMAP, ii) /*MAP_TEST##n(KMAP, ii)*/ MAP_TEST##n(UMAP, ii) MAP_TEST##n(SMAP, ii) \
                     MAP_TEST##n(BMAP, ii) MAP_TEST##n(FMAP, ii) /*MAP_TEST##n(RMAP, ii)*/ MAP_TEST##n(HMAP, ii)
+#else
+#define RUN_TEST(n) MAP_TEST##n(CMAP, ii) MAP_TEST##n(KMAP, ii)
+#define RUNX_TEST(n) MAP_TEST##n(CMAP, ii)
 #endif
+
 
 int main(int argc, char* argv[])
 {
