@@ -69,7 +69,7 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
 
 
 #define using_carray_common(D, X, Value, valueDestroy) \
-    typedef struct { Value *get; } carray##D##X##_iter_t; \
+    typedef struct { Value *val; } carray##D##X##_iter_t; \
 \
     STC_INLINE carray##D##X##_iter_t \
     carray##D##X##_begin(carray##D##X* a) { \
@@ -80,13 +80,13 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
         carray##D##X##_iter_t it = {a->data + carray##D##_size(*a)}; return it; \
     } \
     STC_INLINE void \
-    carray##D##X##_next(carray##D##X##_iter_t* it) {++it->get;} \
+    carray##D##X##_next(carray##D##X##_iter_t* it) {++it->val;} \
 \
     STC_INLINE void \
     carray##D##X##_del(carray##D##X* self) { \
         if (self->_xdim & _carray_OWN) { \
             c_foreach_3 (i, carray##D##X, *self) \
-                valueDestroy(i.get); \
+                valueDestroy(i.val); \
             c_free(self->data); \
         } \
     }

@@ -19,8 +19,8 @@ int main(void) {
     cmap_str_put(&cmap_cfg_emplace(&config, "group", init).first->second, "proj2", "Wind"); // Update
 
     c_foreach (i, cmap_cfg, config)
-        c_foreach (j, cmap_str, i.get->second)
-            printf("%s: %s - %s (%u)\n", i.get->first.str, j.get->first.str, j.get->second.str, i.get->second.bucket_count);
+        c_foreach (j, cmap_str, i.val->second)
+            printf("%s: %s - %s (%u)\n", i.val->first.str, j.val->first.str, j.val->second.str, i.val->second.bucket_count);
 
     cmap_cfg_del(&config);
 }

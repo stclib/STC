@@ -148,7 +148,7 @@ STC_INLINE cbitset_t cbitset_not(cbitset_t s1) {
 
 typedef struct {
     cbitset_t *_bs;
-    size_t get;
+    size_t val;
 } cbitset_iter_t;
 
 STC_INLINE cbitset_iter_t
@@ -160,10 +160,10 @@ cbitset_end(cbitset_t* self) {
     cbitset_iter_t it = {self, self->size}; return it;
 }
 STC_INLINE void
-cbitset_next(cbitset_iter_t* it) {++it->get;}
+cbitset_next(cbitset_iter_t* it) {++it->val;}
 
 STC_INLINE bool cbitset_itval(cbitset_iter_t it) {
-    return cbitset_test(*it._bs, it.get);
+    return cbitset_test(*it._bs, it.val);
 }
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)

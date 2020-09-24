@@ -18,7 +18,7 @@ int main1()
     });
     clist_str_push_back(&lwords, cstr_from("%f", 123897.0 / 23.0));
     c_foreach (w, clist_str, lwords)
-        printf("%s\n", w.get->str);
+        printf("%s\n", w.val->str);
     puts("");
 
     cvec_str words = cvec_INIT;
@@ -29,12 +29,10 @@ int main1()
 
     cmap_si word_map = cmap_INIT;
     c_foreach (w, cvec_str, words)
-        cmap_si_emplace(&word_map, w.get->str, 0).first->second += 1;
+        cmap_si_emplace(&word_map, w.val->str, 0).first->second += 1;
 
-    c_foreach (pair, cmap_si, word_map) {
-        printf("%d occurrences of word '%s'\n",
-               pair.get->second,
-               pair.get->first.str);
+    c_foreach (i, cmap_si, word_map) {
+        printf("%d occurrences of word '%s'\n", i.val->second, i.val->first.str);
     }
 
     cmap_si_del(&word_map);

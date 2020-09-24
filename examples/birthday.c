@@ -46,11 +46,11 @@ void distribution(void)
     float diff = (float) (clock() - now) / CLOCKS_PER_SEC;
 
     uint64_t sum = 0;
-    c_foreach (i, cmap_x, map) sum += i.get->second;
+    c_foreach (i, cmap_x, map) sum += i.val->second;
     sum /= map.size;
 
     c_foreach (i, cmap_x, map)
-        printf("%u: %zu - %zu\n", i.get->first, i.get->second, sum);
+        printf("%u: %zu - %zu\n", i.val->first, i.val->second, sum);
 
     printf("%.02f\n", diff);
 }

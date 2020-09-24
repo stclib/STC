@@ -30,7 +30,7 @@ using_cmap_str();
 void print_phone_book(cmap_str phone_book)
 {
   c_foreach (i, cmap_str, phone_book)
-    printf("%s\t- %s\n", i.get->first.str, i.get->second.str);
+    printf("%s\t- %s\n", i.val->first.str, i.val->second.str);
 }
 
 int main(int argc, char **argv)

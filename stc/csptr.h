@@ -115,6 +115,9 @@ typedef long atomic_count_t;
         *self = csptr_##X##_make(p); \
     } \
 \
+    STC_INLINE csptr_##X##_value_t* \
+    csptr_##X##_get(csptr_##X x) {return x.get;} \
+\
     typedef int csptr_##X##_dud
 
 #endif

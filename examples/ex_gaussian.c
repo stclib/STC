@@ -38,17 +38,17 @@ int main()
     // Transfer map to vec and sort it by map keys.
     cvec_e vhist = cvec_INIT;
     c_foreach (i, cmap_i, mhist)
-        cvec_e_push_back(&vhist, *i.get);
+        cvec_e_push_back(&vhist, *i.val);
     cvec_e_sort(&vhist);
 
     // Print the gaussian bar chart
     cstr_t bar = cstr_INIT;
     c_foreach (i, cvec_e, vhist) {
-        size_t n = (size_t) (i.get->second * Mag / N);
+        size_t n = (size_t) (i.val->second * Mag / N);
         if (n > 0) {
             // bar string: take ownership in new str after freeing current.
             cstr_take(&bar, cstr_with_size(n, '*'));
-            printf("%4d %s\n", i.get->first, bar.str);
+            printf("%4d %s\n", i.val->first, bar.str);
         }
     }
     // Cleanup

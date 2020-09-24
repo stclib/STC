@@ -179,7 +179,7 @@ int main() {
         bignums.data[i] /= i; // make them smaller
 
     c_foreach (i, cvec_ix, bignums)
-        printf(" %d", *i.get);
+        printf(" %d", *i.val);
     cvec_ix_del(&bignums);
 }
 // Output:
@@ -205,7 +205,7 @@ int main() {
     printf("%s\n", names.data[1].str); // Access the second element
 
     c_foreach (i, cvec_str, names)
-        printf("item: %s\n", i.get->str);
+        printf("item: %s\n", i.val->str);
     cvec_str_del(&names);
 }
 // Output:
@@ -276,7 +276,7 @@ int main() {
 
     printf("size = %zu\n", cmap_str_size(strings));
     c_foreach (i, cmap_str, strings)
-        printf("%s: %s\n", i.get->first.str, i.get->second.str);
+        printf("%s: %s\n", i.val->first.str, i.val->second.str);
     cmap_str_del(&strings); // frees all strings and map.
 }
 // Output:
@@ -305,7 +305,7 @@ int main() {
 
     // iterate the set of cstr_t values:
     c_foreach (i, cset_str, words)
-        printf("%s ", i.get->str);
+        printf("%s ", i.val->str);
     cset_str_del(&words);
 }
 // Output:
@@ -331,13 +331,13 @@ int main() {
 
     printf("initial: ");
     c_foreach (i, clist_fx, list)
-        printf(" %g", *i.get);
+        printf(" %g", *i.val);
 
     clist_fx_sort(&list); // mergesort O(n*log n)
 
     printf("\nsorted: ");
     c_foreach (i, clist_fx, list)
-        printf(" %g", *i.get);
+        printf(" %g", *i.val);
 
     clist_fx_del(&list);
 }
@@ -395,7 +395,7 @@ int main() {
         cqueue_i_pop(&queue);
 
     c_foreach (i, cqueue_i, queue)
-        printf(" %d", *i.get);
+        printf(" %d", *i.val);
 
     cqueue_i_del(&queue);
 }
@@ -517,7 +517,7 @@ cvec_mi make_normal_dist(crand_rng64_t* rng, crand_normal_f64_t* dist, int n)
     // Transfer cmap entries to a cvec, sort and return it.
     cvec_mi hist = cvec_INIT;
     c_foreach (i, cmap_ii, mhist) {
-        cvec_mi_push_back(&hist, *i.get);
+        cvec_mi_push_back(&hist, *i.val);
     }
     cvec_mi_sort(&hist);
     cmap_ii_del(&mhist);
@@ -529,12 +529,12 @@ void display_hist(cvec_mi hist, int scale, int mean, int stddev)
     cstr_t bar = cstr_INIT;
     int n = 0; // samples
     c_foreach (i, cvec_mi, hist)
-        n += i.get->second;
+        n += i.val->second;
     c_foreach (i, cvec_mi, hist) {
-        int k = (int) (i.get->second * stddev * scale * 25ull / 10 / n);
+        int k = (int) (i.val->second * stddev * scale * 25ull / 10 / n);
         if (k > 0) {
             cstr_take(&bar, cstr_with_size(k, '*'));
-            printf("%4d %s\n", i.get->first, bar.str);
+            printf("%4d %s\n", i.val->first, bar.str);
         }
     }
     printf("Normal distribution with mean=%d, stddev=%d. '*' = %.0f samples out of %d.\n",

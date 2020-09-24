@@ -30,7 +30,7 @@
 #include "cdefs.h"
 
 typedef struct cstr { char* str; } cstr_t;
-typedef struct { char *get; } cstr_iter_t;
+typedef struct { char *val; } cstr_iter_t;
 typedef char cstr_value_t;
 
 static size_t _cstr_nullrep[] = {0, 0, 0};
@@ -114,8 +114,8 @@ STC_INLINE cstr_iter_t
 cstr_end(cstr_t* self) {
     cstr_iter_t it = {self->str + cstr_size(*self)}; return it;
 }
-STC_INLINE void cstr_next(cstr_iter_t* it) { ++it->get; }
-STC_INLINE char* cstr_itval(cstr_iter_t it) {return it.get;}
+STC_INLINE void cstr_next(cstr_iter_t* it) { ++it->val; }
+STC_INLINE char* cstr_itval(cstr_iter_t it) {return it.val;}
 
 STC_INLINE cstr_t*
 cstr_assign(cstr_t* self, const char* str) {

@@ -31,7 +31,7 @@ int main(void) {
     cset_sx_insert(&s, 5);
     cset_sx_insert(&s, 8);
     c_foreach (i, cset_sx, s)
-        printf("set %d\n", i.get->second);
+        printf("set %d\n", i.val->second);
     cset_sx_del(&s);
 
     cmap_mx m = cmap_INIT;
@@ -43,7 +43,7 @@ int main(void) {
     cmap_mx_put(&m, 5, 'd'); // update
     cmap_mx_erase(&m, 8);
     c_foreach (i, cmap_mx, m)
-        printf("map %d: %c\n", i.get->first, i.get->second);
+        printf("map %d: %c\n", i.val->first, i.val->second);
     cmap_mx_del(&m);
 }*/
 #ifndef CMAP__H__
@@ -198,7 +198,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     } ctype##_##X, ctype##_##X##_t; \
 \
     typedef struct { \
-        ctype##_##X##_value_t *get; \
+        ctype##_##X##_value_t *val; \
         uint8_t* _hx; \
     } ctype##_##X##_iter_t; \
 \
@@ -277,7 +277,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     STC_INLINE ctype##_##X##_iter_t \
     ctype##_##X##_begin(ctype##_##X* self) { \
         ctype##_##X##_iter_t it = {self->table, self->_hashx}; \
-        if (it._hx) while (*it._hx == 0) ++it.get, ++it._hx; \
+        if (it._hx) while (*it._hx == 0) ++it.val, ++it._hx; \
         return it; \
     } \
     STC_INLINE ctype##_##X##_iter_t \
@@ -286,13 +286,13 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     } \
     STC_INLINE void \
     ctype##_##X##_next(ctype##_##X##_iter_t* it) { \
-        while ((++it->get, *++it->_hx == 0)) ; \
+        while ((++it->val, *++it->_hx == 0)) ; \
     } \
     CMAP_ONLY_##ctype( STC_INLINE ctype##_##X##_mapped_t* \
-    ctype##_##X##_itval(ctype##_##X##_iter_t it) {return &it.get->second;} ) \
+    ctype##_##X##_itval(ctype##_##X##_iter_t it) {return &it.val->second;} ) \
 \
     STC_API void \
-    ctype##_##X##_erase_entry(ctype##_##X* self, ctype##_##X##_value_t* get); \
+    ctype##_##X##_erase_entry(ctype##_##X* self, ctype##_##X##_value_t* val); \
     STC_INLINE size_t \
     ctype##_##X##_erase(ctype##_##X* self, RawKey rawKey) { \
         if (self->size == 0) return 0; \
@@ -301,7 +301,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     } \
     STC_INLINE ctype##_##X##_iter_t \
     ctype##_##X##_erase_at(ctype##_##X* self, ctype##_##X##_iter_t pos) { \
-        ctype##_##X##_erase_entry(self, pos.get); \
+        ctype##_##X##_erase_entry(self, pos.val); \
         ctype##_##X##_next(&pos); return pos; \
     } \
 \
@@ -419,8 +419,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     } \
 \
     STC_API void \
-    ctype##_##X##_erase_entry(ctype##_##X* self, ctype##_##X##_value_t* get) { \
-        size_t i = chash_entry_index(*self, get), j = i, k, cap = self->bucket_count; \
+    ctype##_##X##_erase_entry(ctype##_##X* self, ctype##_##X##_value_t* val) { \
+        size_t i = chash_entry_index(*self, val), j = i, k, cap = self->bucket_count; \
         ctype##_##X##_value_t* slot = self->table; \
         uint8_t* hashx = self->_hashx; \
         ctype##_##X##_entry_del(&slot[i]); \

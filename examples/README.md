@@ -72,7 +72,7 @@ int main() {
     cmap_vk_emplace(&vikings, look, 0)->second += 5; // update again
 
     c_foreach (k, cmap_vk, vikings) {
-        printf("%s of %s has %d hp\n", k.get->first.name.str, k.get->first.country.str, k.get->second);
+        printf("%s of %s has %d hp\n", k.val->first.name.str, k.val->first.country.str, k.val->second);
     }
     cmap_vk_del(&vikings);
 }
