@@ -52,7 +52,7 @@
 \
     typedef struct { \
         cvec_##X##_value_t* data; \
-    } cvec_##X, cvec_##X##_t; \
+    } cvec_##X; \
 \
     STC_INLINE cvec_##X \
     cvec_##X##_init(void) {cvec_##X v = cvec_INIT; return v;} \
@@ -287,7 +287,7 @@
         RawValue ry = valueToRaw(y); \
         return valueCompareRaw(&rx, &ry); \
     } \
-    typedef int cvec_##taq##_dud
+    typedef cvec_##X cvec_##X##_t
 
 #else
 #define _c_implement_cvec_7(X, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw)

@@ -52,7 +52,7 @@
 
 #define using_cpqueue(X, ctype, cmpOpr) /* cmpOpr: < or > */ \
 \
-    typedef ctype##_t cpqueue_##X, cpqueue_##X##_t; \
+    typedef ctype##_t cpqueue_##X; \
     typedef ctype##_value_t cpqueue_##X##_value_t; \
     typedef ctype##_rawvalue_t cpqueue_##X##_rawvalue_t; \
     typedef ctype##_input_t cpqueue_##X##_input_t; \
@@ -133,7 +133,7 @@
         for (size_t i=0; i<size; ++i) cpqueue_##X##_push(self, in[i]); \
     } \
 \
-    typedef int cpqueue_##X##_dud
+    typedef cpqueue_##X cpqueue_##X##_t
 
 #else
 #define implement_cpqueue(X, ctype, cmpOpr)

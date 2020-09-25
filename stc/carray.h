@@ -104,7 +104,7 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
     typedef struct { \
         Value *data; \
         size_t _xdim; \
-    } carray1##X, carray1##X##_t; \
+    } carray1##X; \
 \
     typedef struct { \
         Value *data; \
@@ -187,6 +187,6 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
     carray3##X##_at(carray3##X *a, size_t z, size_t y, size_t x) { \
         return a->data + z*a->_yxdim + y*carray3_xdim(*a) + x; \
     } \
-    typedef int carray1##X##_dud
+    typedef carray1##X carray1##X##_t
 
 #endif

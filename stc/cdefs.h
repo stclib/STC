@@ -77,7 +77,6 @@ enum   {_c_max_buffer = 512};
 #define c_default_from_raw(x)   (x)
 #define c_default_to_raw(ptr)   (*(ptr))
 #define c_default_del(ptr)      ((void) (ptr))
-#define c_pointer_del(pptr)     free(*(pptr))
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
 #define c_foreach_3(it, ctype, cnt) \

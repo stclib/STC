@@ -82,18 +82,21 @@ typedef long atomic_count_t;
     }
 #endif
 
+#define using_csptr(...) c_MACRO_OVERLOAD(using_csptr, __VA_ARGS__)
 
-#define using_csptr(X, Value, valueDestroy) \
+#define using_csptr_2(X, Value) \
+    using_csptr_3(X, Value, c_default_del)
+
+#define using_csptr_3(X, Value, valueDestroy) \
     typedef Value csptr_##X##_value_t; \
     typedef struct { csptr_##X##_value_t* get; atomic_count_t* use_count; } csptr_##X, csptr_##X##_t; \
 \
     STC_INLINE csptr_##X \
     csptr_##X##_make(csptr_##X##_value_t* p) { \
         csptr_##X ptr = {p}; \
-        if (p) *(ptr.use_count = c_new(atomic_count_t)) = 1; \
+        if (p) *(ptr.use_count = c_new_1(atomic_count_t)) = 1; \
         return ptr; \
     } \
-\
     STC_INLINE csptr_##X \
     csptr_##X##_share(csptr_##X ptr) { \
         if (ptr.get) atomic_increment(ptr.use_count); \
@@ -108,7 +111,6 @@ typedef long atomic_count_t;
             c_free(self->get); \
         } \
     } \
-\
     STC_INLINE void \
     csptr_##X##_reset(csptr_##X* self, csptr_##X##_value_t* p) { \
         csptr_##X##_del(self); \
@@ -118,6 +120,27 @@ typedef long atomic_count_t;
     STC_INLINE csptr_##X##_value_t* \
     csptr_##X##_get(csptr_##X x) {return x.get;} \
 \
-    typedef int csptr_##X##_dud
+    typedef csptr_##X csptr_##X##_t
+
+
+#define using_csptr_4(X, Value, valueDestroy, valueCompare) \
+    using_csptr_3(X, Value, valueDestroy); \
+    STC_INLINE int \
+    csptr_##X##_compare(csptr_##X* x, csptr_##X* y) { \
+        return valueCompare(x->get, y->get); \
+    } \
+    typedef int csptr_##X##_dud4
+
+#define using_csptr_5(X, Value, valueDestroy, valueCompare, hash) \
+    using_csptr_4(X, Value, valueDestroy, valueCompare); \
+    STC_INLINE int \
+    csptr_##X##_equals(csptr_##X* x, csptr_##X* y) { \
+        return valueCompare(x->get, y->get) == 0; \
+    } \
+    STC_INLINE uint32_t \
+    csptr_##X##_hash(csptr_##X* self, size_t len) { \
+        return hash(&self->get, len); \
+    } \
+    typedef int csptr_##X##_dud5
 
 #endif

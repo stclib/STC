@@ -60,7 +60,7 @@
 
 #define using_cqueue(X, ctype) \
 \
-    typedef ctype##_t cqueue_##X, cqueue_##X##_t; \
+    typedef ctype##_t cqueue_##X; \
     typedef ctype##_value_t cqueue_##X##_value_t; \
     typedef ctype##_rawvalue_t cqueue_##X##_rawvalue_t; \
     typedef ctype##_input_t cqueue_##X##_input_t; \
@@ -100,6 +100,6 @@
     STC_INLINE cqueue_##X##_value_t* \
     cqueue_##X##_itval(cqueue_##X##_iter_t it) {return ctype##_itval(it);} \
 \
-    typedef int cqueue_##X##_dud
+    typedef cqueue_##X cqueue_##X##_t
 
 #endif

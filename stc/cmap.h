@@ -195,7 +195,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         uint32_t size, bucket_count; \
         float max_load_factor; \
         float shrink_limit_factor; \
-    } ctype##_##X, ctype##_##X##_t; \
+    } ctype##_##X; \
 \
     typedef struct { \
         ctype##_##X##_value_t *val; \
@@ -437,7 +437,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         --self->size; \
     } \
 \
-    typedef int ctype##_##X##_dud
+    typedef ctype##_##X ctype##_##X##_t
 
 /* https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/ */
 

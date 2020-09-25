@@ -62,10 +62,10 @@
 #define using_clist_3(X, Value, valueDestroy) \
                              using_clist_4(X, Value, valueDestroy, c_default_compare)
 #define using_clist_4(X, Value, valueDestroy, valueCompare) \
-                             using_clist_7(X, Value, valueDestroy, Value, \
-                                          valueCompare, c_default_to_raw, c_default_from_raw)
-#define using_clist_str()  using_clist_7(str, cstr_t, cstr_del, const char*, \
-                                      cstr_compare_raw, cstr_to_raw, cstr)
+                             using_clist_7(X, Value, valueDestroy, valueCompare, \
+                                              Value, c_default_to_raw, c_default_from_raw)
+#define using_clist_str()  using_clist_7(str, cstr_t, cstr_del, cstr_compare_raw, \
+                                              const char*, cstr_to_raw, cstr)
 
 #define using_clist_types(X, Value) \
     typedef Value clist_##X##_value_t; \
@@ -77,7 +77,7 @@
 \
     typedef struct { \
         clist_##X##_node_t* last; \
-    } clist_##X, clist_##X##_t; \
+    } clist_##X; \
 \
     typedef struct { \
         clist_##X##_node_t* const* _last; \
@@ -101,7 +101,7 @@ using_clist_types(void, int);
 STC_API size_t _clist_size(const clist_void* self);
 #define _clist_node(X, vp) c_container_of(vp, clist_##X##_node_t, value)
 
-#define using_clist_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
+#define using_clist_7(X, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw) \
 \
     using_clist_types(X, Value); \
     typedef RawValue clist_##X##_rawvalue_t; \
@@ -205,13 +205,13 @@ STC_API size_t _clist_size(const clist_void* self);
     STC_INLINE Value* \
     clist_##X##_back(clist_##X* self) {return &self->last->value;} \
 \
-    _c_implement_clist_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw)
+    _c_implement_clist_7(X, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw)
 
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define _c_implement_clist_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
+#define _c_implement_clist_7(X, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw) \
 \
     STC_API void \
     clist_##X##_del(clist_##X* self) { \
@@ -319,7 +319,7 @@ STC_API size_t _clist_size(const clist_void* self);
         clist_void_node_t* last = _clist_mergesort((clist_void_node_t *) self->last->next, clist_##X##_sort_compare); \
         self->last = (clist_##X##_node_t *) last; \
     } \
-    typedef int clist_##X##_dud
+    typedef clist_##X clist_##X##_t
 
 
 #define _c_clist_insert_after(self, X, node, val) \
@@ -397,7 +397,7 @@ _clist_mergesort(clist_void_node_t *list, int (*cmp)(const void*, const void*)) 
 }
 
 #else
-#define _c_implement_clist_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw)
+#define _c_implement_clist_7(X, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw)
 #endif
 
 #endif

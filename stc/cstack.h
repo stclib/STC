@@ -49,7 +49,7 @@
 
 #define using_cstack(X, ctype) \
 \
-    typedef ctype##_t cstack_##X, cstack_##X##_t; \
+    typedef ctype##_t cstack_##X; \
     typedef ctype##_value_t cstack_##X##_value_t; \
     typedef ctype##_rawvalue_t cstack_##X##_rawvalue_t; \
     typedef ctype##_input_t cstack_##X##_input_t; \
@@ -87,6 +87,6 @@
     STC_INLINE cstack_##X##_value_t* \
     cstack_##X##_itval(cstack_##X##_iter_t it) {return ctype##_itval(it);} \
 \
-    typedef int cstack_##X##_dud
+    typedef cstack_##X cstack_##X##_t
 
 #endif
