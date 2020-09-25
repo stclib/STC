@@ -117,9 +117,6 @@ typedef long atomic_count_t;
         *self = csptr_##X##_make(p); \
     } \
 \
-    STC_INLINE csptr_##X##_value_t* \
-    csptr_##X##_get(csptr_##X x) {return x.get;} \
-\
     typedef csptr_##X csptr_##X##_t
 
 
@@ -130,17 +127,5 @@ typedef long atomic_count_t;
         return valueCompare(x->get, y->get); \
     } \
     typedef int csptr_##X##_dud4
-
-#define using_csptr_5(X, Value, valueDestroy, valueCompare, hash) \
-    using_csptr_4(X, Value, valueDestroy, valueCompare); \
-    STC_INLINE int \
-    csptr_##X##_equals(csptr_##X* x, csptr_##X* y) { \
-        return valueCompare(x->get, y->get) == 0; \
-    } \
-    STC_INLINE uint32_t \
-    csptr_##X##_hash(csptr_##X* self, size_t len) { \
-        return hash(&self->get, len); \
-    } \
-    typedef int csptr_##X##_dud5
 
 #endif

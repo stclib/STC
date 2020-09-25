@@ -87,17 +87,5 @@ int main() {
     } \
     typedef int cptr_##X##_dud4
 
-#define using_cptr_5(X, Value, valueDestroy, valueCompare, hash) \
-    using_cptr_4(X, Value, valueDestroy, valueCompare); \
-    STC_INLINE int \
-    cptr_##X##_equals(cptr_##X* x, cptr_##X* y) { \
-        return valueCompare(*x, *y) == 0; \
-    } \
-    STC_INLINE uint32_t \
-    cptr_##X##_hash(cptr_##X* self, size_t len) { \
-        return hash(*self, len); \
-    } \
-    typedef int cptr_##X##_dud5    
-
 #endif
  
