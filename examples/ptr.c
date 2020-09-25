@@ -17,18 +17,34 @@ int Person_compare(const Person* p, const Person* q) {
     return cmp == 0 ? strcmp(p->last.str, q->last.str) : cmp;
 }
 
+using_cvec(pe, Person, Person_del, Person_compare);
 using_cptr(pe, Person, Person_del, Person_compare);
-using_cvec(pe, Person*, cptr_pe_del, cptr_pe_compare);
+using_cvec(pp, Person*, cptr_pe_del, cptr_pe_compare);
 
 int main() {
+    puts("Vec of Person *:");
+    cvec_pp pvec = cvec_pp_init();
+    cvec_pp_push_back(&pvec, Person_make(c_new(Person), "Joe", "Jordan"));
+    cvec_pp_push_back(&pvec, Person_make(c_new(Person), "Annie", "Aniston"));
+    cvec_pp_push_back(&pvec, Person_make(c_new(Person), "Jane", "Jacobs"));
+
+    cvec_pp_sort(&pvec);
+    c_foreach (i, cvec_pp, pvec)
+        printf("%s %s\n", (*i.val)->name.str, (*i.val)->last.str);
+
+    puts("\nVec of Person:");
     cvec_pe vec = cvec_pe_init();
-    cvec_pe_push_back(&vec, Person_make(c_new(Person), "Joe", "Jordan"));
-    cvec_pe_push_back(&vec, Person_make(c_new(Person), "Annie", "Aniston"));
-    cvec_pe_push_back(&vec, Person_make(c_new(Person), "Jane", "Jacobs"));
+    Person tmp;
+    cvec_pe_push_back(&vec, *Person_make(&tmp, "Joe", "Jordan"));
+    cvec_pe_push_back(&vec, *Person_make(&tmp, "Annie", "Aniston"));
+    cvec_pe_push_back(&vec, *Person_make(&tmp, "Jane", "Jacobs"));
 
     cvec_pe_sort(&vec);
     c_foreach (i, cvec_pe, vec)
-        printf("%s %s\n", (*i.val)->name.str, (*i.val)->last.str);
+        printf("%s %s\n", i.val->name.str, i.val->last.str);
 
+    puts("\nDestroy pvec:");
+    cvec_pp_del(&pvec);
+    puts("\nDestroy vec:");
     cvec_pe_del(&vec);
 }
