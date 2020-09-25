@@ -89,7 +89,7 @@ typedef long atomic_count_t;
 
 #define using_csptr_3(X, Value, valueDestroy) \
     typedef Value csptr_##X##_value_t; \
-    typedef struct { csptr_##X##_value_t* get; atomic_count_t* use_count; } csptr_##X, csptr_##X##_t; \
+    typedef struct { csptr_##X##_value_t* get; atomic_count_t* use_count; } csptr_##X; \
 \
     STC_INLINE csptr_##X \
     csptr_##X##_make(csptr_##X##_value_t* p) { \
@@ -99,7 +99,7 @@ typedef long atomic_count_t;
     } \
     STC_INLINE csptr_##X \
     csptr_##X##_share(csptr_##X ptr) { \
-        if (ptr.get) atomic_increment(ptr.use_count); \
+        if (ptr.use_count) atomic_increment(ptr.use_count); \
         return ptr; \
     } \
 \

@@ -6,7 +6,7 @@
 
 typedef struct { cstr_t name, last; } Person;
 
-Person* Person_make(Person* p, const char* name, const char* last) {
+Person* Person_from(Person* p, const char* name, const char* last) {
     p->name = cstr(name), p->last = cstr(last);
     return p;
 }
@@ -31,7 +31,7 @@ int main() {
     c_forrange (i, 10) {
         csptr_pe p = csptr_pe_make(c_new(Person));
         p.get->name = cstr_from("Name %d", (i * 7) % 10);
-        p.get->last = cstr_from("Last %d", (i * 9) % 10);
+        p.get->last = cstr_from("Last %d", (i * 7) % 10);
         clist_pe_push_back(&queue, p);
         cvec_pe_push_back(&vec, csptr_pe_share(p)); // Don't forget to share!
     }
@@ -52,6 +52,13 @@ int main() {
     puts("Sorted vec:");
     c_foreach (i, cvec_pe, vec)
         printf(" %s\n", i.val->get->name.str);
+
+    Person lost; Person_from(&lost, "Name 5", "Last 5");
+    csptr_pe ptmp = {&lost, NULL}; // share pointer without counter - OK.
+    clist_pe_iter_t lit = clist_pe_find(&queue, ptmp);
+    Person_del(&lost);
+
+    if (lit.val) printf("Found: %s\n", lit.val->get->name.str);
 
     puts("Destroy queue:");
     clist_pe_del(&queue);
