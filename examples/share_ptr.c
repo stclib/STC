@@ -1,4 +1,4 @@
-#include <stc/csptr.h>
+#include <stc/cptr.h>
 #include <stc/clist.h>
 #include <stc/cvec.h>
 #include <stc/cstr.h>
