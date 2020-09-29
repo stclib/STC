@@ -29,18 +29,18 @@
 #include <assert.h>
 
 #if defined(_MSC_VER)
-  #define STC_FORCE_INLINE static __forceinline
+#  define STC_FORCE_INLINE static __forceinline
 #elif defined(__GNUC__) || defined(__clang__)
-  #define STC_FORCE_INLINE static inline __attribute((always_inline))
+#  define STC_FORCE_INLINE static inline __attribute((always_inline))
 #else
-  #define STC_FORCE_INLINE static inline
+#  define STC_FORCE_INLINE static inline
 #endif
 #define STC_INLINE static inline
 
 #if defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-  #define STC_API extern
+#  define STC_API extern
 #else
-  #define STC_API STC_INLINE
+#  define STC_API STC_INLINE
 #endif
 
 enum   {_c_max_buffer = 512};
@@ -91,6 +91,8 @@ enum   {_c_max_buffer = 512};
 #define c_forrange_4(i, type, start, stop) for (type i=start, i##_end_=stop; i < i##_end_; ++i)
 #define c_forrange_5(i, type, start, stop, step) \
     for (type i=start, i##_inc_=step, i##_end_=(stop) - (0 < i##_inc_); (i <= i##_end_) == (0 < i##_inc_); i += i##_inc_)
+
+#define c_withfile(f, open) for (FILE *f = open; f; fclose(f), f = NULL)
 
 #define c_push_items(self, ctype, ...) do { \
     const ctype##_input_t __arr[] = __VA_ARGS__; \
