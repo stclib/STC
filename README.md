@@ -120,7 +120,7 @@ BMAP: time:  0.60, size: 13971002, sum 1344701724191145
 FMAP: time:  0.56, size: 13971002, sum 1344701724191145
 HMAP: time:  0.51, size: 13971002, sum 1344701724191145
 ```
-From these tests *robin_hood* and *khash* wins by a tiny margin, but with random numbers in 0 - 2^20 range, khash was not as great:
+From these tests *cmap*, *robin_hood* and *khash* are almost equally fast. std::unordered_map is horrible. With random numbers in 0 - 2^20 range, khash performs worse, though:
 ```
 Unordered maps: 30000000 repeats of Insert random key + try to remove a random key:
 CMAP: time:  1.93, sum: 450000015000000, size: 524809, erased 14738434
