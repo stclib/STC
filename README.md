@@ -15,6 +15,7 @@ An elegant, fully typesafe, generic, customizable, user-friendly, consistent, an
 - **stc/cstack.h** - **stack** adapter, currently works with *cvec*.
 - **stc/cqueue.h** - **queue** adapter, currently works with *clist*.
 - **stc/cpqueue.h** - **priority queue** adapter. Works with *cvec*.
+- **stc/cptr.h** - Support for pointers in containers, and a reference counted shared pointer **csptr**.
 - **stc/coption.h** - Implementation of a **getopt_long()**-like function, *coption_get()*, to parse command line arguments.
 - **stc/crandom.h** - A few very efficent modern random number generators *pcg32* and my own *64-bit PRNG* inspired by *sfc64*. Both uniform and normal distributions.
 - **stc/cdefs.h** - A common include file with a few general definitions.
