@@ -149,6 +149,8 @@ typedef long atomic_count_t;
     }
 #endif
 
+#define csptr_pointer_compare(x, y) ((x)->get - (y)->get)
+
 #define using_csptr(...) c_MACRO_OVERLOAD(using_csptr, __VA_ARGS__)
 
 #define using_csptr_2(X, Value) \

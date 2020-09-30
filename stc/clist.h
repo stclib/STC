@@ -237,7 +237,7 @@ STC_API size_t _clist_size(const clist_void* self);
     clist_##X##_insert_after(clist_##X* self, clist_##X##_iter_t pos, Value value) { \
         clist_##X##_node_t* node = pos.val ? _clist_node(X, pos.val) : NULL; \
         _c_clist_insert_after(self, X, node, value); \
-        if (node == self->last && pos._state == 0) self->last = entry; \
+        if (!node || node == self->last && pos._state == 0) self->last = entry; \
         pos.val = &entry->value, pos._state = 0; return pos; \
     } \
     STC_API clist_##X##_iter_t \
