@@ -28,7 +28,7 @@ All containers mentioned above, except cstr_t and cbitset_t are generic and type
 using_cvec(i, int);
 
 int main(void) {
-    cvec_i vec = cvec_INIT;
+    cvec_i vec = cvec_i_init();
     cvec_i_push_back(&vec, 42);
     cvec_i_del(&vec);
 }
@@ -167,7 +167,7 @@ The examples folder contains further examples.
 using_cvec(ix, int64_t); // ix is just an example type tag name.
 
 int main() {
-    cvec_ix bignums = cvec_INIT; // use cvec_ix_init() if initializing after declaration.
+    cvec_ix bignums = cvec_ix_init(); // use cvec_ix_init() if initializing after declaration.
     cvec_ix_reserve(&bignums, 50);
 
     c_forrange (i, int, 1, 50)
@@ -193,7 +193,7 @@ int main() {
 using_cvec_str();
 
 int main() {
-    cvec_str names = cvec_INIT;
+    cvec_str names = cvec_str_init();
     cvec_str_emplace_back(&names, "Mary");
     cvec_str_emplace_back(&names, "Joe");
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
@@ -260,7 +260,7 @@ using_cmap_str();
 
 int main() {
     // -- map of ints --
-    cmap_ii nums = cmap_INIT;
+    cmap_ii nums = cmap_ii_init();
     cmap_ii_put(&nums, 8, 64); // similar to insert_or_assign()
     cmap_ii_emplace(&nums, 11, 121);
 
@@ -268,7 +268,7 @@ int main() {
     cmap_ii_del(&nums);
 
     // -- map of str --
-    cmap_str strings = cmap_INIT;
+    cmap_str strings = cmap_str_init();
     cmap_str_emplace(&strings, "Make", "my");
     cmap_str_emplace(&strings, "Rainy", "day");
     cmap_str_emplace(&strings, "Sunny", "afternoon");
@@ -296,7 +296,7 @@ Eleven: XI
 using_cset_str(); // cstr set. See the discussion above.
 
 int main() {
-    cset_str words = cset_INIT;
+    cset_str words = cset_str_init();
     cset_str_insert(&words, "Hello");
     cset_str_insert(&words, "Sad");
     cset_str_insert(&words, "World");
@@ -319,7 +319,7 @@ Hello World
 using_clist(fx, double);
 
 int main() {
-    clist_fx list = clist_INIT;
+    clist_fx list = clist_fx_init();
     c_push_items(&list, clist_fx, {
         10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0
     });
@@ -509,13 +509,13 @@ int main(int argc, char* argv[])
 
 cvec_mi make_normal_dist(crand_rng64_t* rng, crand_normal_f64_t* dist, int n)
 {
-    cmap_ii mhist = cmap_INIT;
+    cmap_ii mhist = cmap_ii_init();
     c_forrange (n) {
         cmap_ii_emplace(&mhist, (int) round(crand_normal_f64(rng, dist)), 0).first->second += 1;
     }
 
     // Transfer cmap entries to a cvec, sort and return it.
-    cvec_mi hist = cvec_INIT;
+    cvec_mi hist = cvec_mi_init();
     c_foreach (i, cmap_ii, mhist) {
         cvec_mi_push_back(&hist, *i.val);
     }
@@ -526,7 +526,7 @@ cvec_mi make_normal_dist(crand_rng64_t* rng, crand_normal_f64_t* dist, int n)
 
 void display_hist(cvec_mi hist, int scale, int mean, int stddev)
 {
-    cstr_t bar = cstr_INIT;
+    cstr_t bar = cstr_init();
     int n = 0; // samples
     c_foreach (i, cvec_mi, hist)
         n += i.val->second;
