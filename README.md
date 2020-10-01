@@ -37,16 +37,22 @@ int main(void) {
     cvec_i_del(&vec);
 }
 ```
-It is easy to have more complex container element types:
+Using containers with complex element types is simple:
 ```C
 #include <stc/cstr.h>
 #include <stc/cvec.h>
 
-typedef struct { cstr_t name; int id; } User;
-void User_del(User* u) {cstr_del(&u->name);}
-int  User_cmp(User* u, User* v) {int c = strcmp(u->name.str, v->name.str); return c != 0 ? c : u->id - v->id;}
+typedef struct { 
+    cstr_t name; // dynamic string
+    int id;
+} User;
 
-using_cvec(u, User, User_del, User_cmp);
+void User_del(User* u)
+    { cstr_del(&u->name); }
+int User_compare(User* u, User* v) 
+    { int c = strcmp(u->name.str, v->name.str); return c != 0 ? c : u->id - v->id; }
+
+using_cvec(u, User, User_del, User_compare);
 
 int main(void) {
     cvec_u vec = cvec_u_init();
