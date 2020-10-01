@@ -20,7 +20,7 @@ int main()
     c_forrange (i, int, N)
         cvec_f_push_back(&pq, (float) crand_i32(&pcg));
     
-    cpqueue_f_build(&pq);
+    cpqueue_f_make_heap(&pq);
     printf("Built priority queue: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
 
     c_forrange (i, int, M)

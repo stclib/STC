@@ -31,7 +31,7 @@ int main(void)
 
     // CVEC PRIORITY QUEUE
 
-    cpqueue_f_build(&floats); // make heap
+    cpqueue_f_make_heap(&floats);
     c_push_items(&floats, cpqueue_f, {40.0f, 20.0f, 50.0f, 30.0f, 10.0f});
 
     // sorted:

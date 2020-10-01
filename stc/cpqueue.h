@@ -65,7 +65,7 @@
     STC_INLINE void \
     cpqueue_##X##_del(cpqueue_##X* self) {ctype##_del(self);} \
     STC_API void \
-    cpqueue_##X##_build(cpqueue_##X* self); \
+    cpqueue_##X##_make_heap(cpqueue_##X* self); \
     STC_API void \
     cpqueue_##X##_erase(cpqueue_##X* self, size_t i); \
     STC_INLINE const cpqueue_##X##_value_t* \
@@ -103,7 +103,7 @@
     } \
 \
     STC_API void \
-    cpqueue_##X##_build(cpqueue_##X* self) { \
+    cpqueue_##X##_make_heap(cpqueue_##X* self) { \
         size_t n = cpqueue_##X##_size(*self);  \
         cpqueue_##X##_value_t *arr = self->data - 1; \
         for (size_t k = n >> 1; k != 0; --k) \
