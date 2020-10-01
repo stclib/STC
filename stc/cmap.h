@@ -64,10 +64,6 @@ int main(void) {
     ctype##_result_t __r = ctype##_insert_key_(self, key); \
     if (__r.second) __r.first->second = val; \
 } while (0)
-#define c_insert_items(self, ctype, ...) do { \
-    const ctype##_input_t __arr[] = __VA_ARGS__; \
-    for (size_t i=0;i<sizeof(__arr)/sizeof(__arr[0]); ++i) ctype##_insert(self, __arr[i]); \
-} while (0)
 
 /* https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction */
 #define chash_reduce(x, N)            ((uint32_t) (((uint64_t) (x) * (N)) >> 32))
