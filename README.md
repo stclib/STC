@@ -22,7 +22,7 @@ An elegant, fully typesafe, generic, customizable, user-friendly, consistent, an
 
 The usage of the containers is vert similar to the C++ standard containers, so it should be easy if you are familiar with them.
 
-All containers mentioned above, except cstr_t and cbitset_t are generic and typesafe (similar to templates in C++). No casting is used. A simple example:
+All containers mentioned above, except cstr_t and cbitset_t, are generic and therefore typesafe (similar to templates in C++). No casting is used. A simple example:
 ```C
 #include <stc/cvec.h>
 
@@ -30,8 +30,31 @@ using_cvec(i, int);
 
 int main(void) {
     cvec_i vec = cvec_i_init();
-    cvec_i_push_back(&vec, 42);
+    cvec_i_push_back(&vec, 1);
+    cvec_i_push_back(&vec, 2);
+    c_foreach (i, cvec_u, vec) 
+        printf(" %d", *i.val);
     cvec_i_del(&vec);
+}
+```
+It is easy to have more complex container element types:
+```C
+#include <stc/cstr.h>
+#include <stc/cvec.h>
+
+typedef struct { cstr_t name; int id; } User;
+void User_del(User* u) {cstr_del(&u->name);}
+int  User_cmp(User* u, User* v) {int c = strcmp(u->name.str, v->name.str); return c != 0 ? c : u->id - v->id;}
+
+using_cvec(u, User, User_del, User_cmp);
+
+int main(void) {
+    cvec_u vec = cvec_u_init();
+    cvec_u_push_back(&vec, (User) {cstr("admin"), 0}); // cstr() allocates string memory
+    cvec_u_push_back(&vec, (User) {cstr("usera"), 1});
+    c_foreach (i, cvec_u, vec) 
+        printf("%s: %d\n", i.val->name.str, i.val->id);
+    cvec_u_del(&vec); // free everything
 }
 ```
 Motivation
