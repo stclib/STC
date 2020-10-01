@@ -96,13 +96,13 @@ enum   {_c_max_buffer = 512};
 
 #define c_push_items(self, ctype, ...) do { \
     const ctype##_input_t __arr[] = __VA_ARGS__; \
-    ctype##_push_n(self, __arr, sizeof(__arr)/sizeof(__arr[0])); \
+    ctype##_push_n(self, __arr, sizeof __arr/sizeof *__arr); \
 } while (0)
 
 #define c_del(ctype, ...) do { \
     ctype##_t* __arr[] = {__VA_ARGS__}; \
-    for (size_t i=0; i<sizeof(__arr)/sizeof(__arr[0]); ++i) \
-        ctype##_del(__arr[i]); \
+    for (size_t __i=0; __i<sizeof __arr/sizeof *__arr; ++__i) \
+        ctype##_del(__arr[__i]); \
 } while (0)
 
 #endif

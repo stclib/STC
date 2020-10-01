@@ -92,7 +92,7 @@
     ctype* __self = self; \
     ctype##_iter_t __pos = pos; \
     const ctype##_input_t __arr[] = __VA_ARGS__; \
-    for (size_t __i=0; __i<sizeof(__arr)/sizeof(__arr[0]); ++__i) \
+    for (size_t __i=0; __i<sizeof __arr/sizeof *__arr; ++__i) \
         __pos = ctype##_emplace_after(__self, __pos, __arr[__i]); \
 } while (0)
 
