@@ -72,11 +72,13 @@ enum   {_c_max_buffer = 512};
 #define c_mem_equals(x, y)      (memcmp(x, y, sizeof(*(y))) == 0)
 #define c_default_equals(x, y)  (*(x) == *(y))
 #define c_default_less(x, y)    (*(x) < *(y))
-#define c_less_compare(less, x, y) (less(x, y) ? -1 : less(y, x))
-#define c_default_compare(x, y) (*(x) - *(y))
+#define c_less_compare(less, x, y) (less(y, x) - less(x, y))
+#define c_default_compare(x, y) c_less_compare(c_default_less, x, y)
 #define c_default_from_raw(x)   (x)
 #define c_default_to_raw(ptr)   (*(ptr))
 #define c_default_del(ptr)      ((void) (ptr))
+
+/* Generic algorithms */
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
 #define c_foreach_3(it, ctype, cnt) \
