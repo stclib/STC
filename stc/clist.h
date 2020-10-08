@@ -24,7 +24,7 @@
 #define CLIST__H__
 
 #include <stdlib.h>
-#include "cdefs.h"
+#include "ccommon.h"
 
 /*  Circular Singly-linked Lists.
 

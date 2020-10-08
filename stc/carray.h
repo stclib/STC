@@ -24,7 +24,7 @@
 #define CARRAY__H__
 
 #include <stdlib.h>
-#include "cdefs.h"
+#include "ccommon.h"
 
 /*
  Multi-dimensional generic array allocated as one block of heap-memory.

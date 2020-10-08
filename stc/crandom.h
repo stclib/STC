@@ -24,7 +24,7 @@
 #ifndef CRANDOM__H__
 #define CRANDOM__H__
 
-#include "cdefs.h"
+#include "ccommon.h"
 #include <string.h>
 #include <math.h>
 /*

@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CDEFS__H__
-#define CDEFS__H__
+#ifndef CCOMMON__H__
+#define CCOMMON__H__
 
 #include <stdint.h>
 #include <stddef.h>

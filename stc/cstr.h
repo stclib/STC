@@ -27,7 +27,7 @@
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h> /* vsnprintf */
-#include "cdefs.h"
+#include "ccommon.h"
 
 typedef struct cstr { char* str; } cstr_t;
 typedef struct { char *val; } cstr_iter_t;

@@ -23,7 +23,7 @@
 #ifndef CPTR__H__
 #define CPTR__H__
 
-#include "cdefs.h"
+#include "ccommon.h"
 
 /* cptr: std::unique_ptr -like type: */
 /*

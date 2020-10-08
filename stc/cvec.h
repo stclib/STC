@@ -25,7 +25,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "cdefs.h"
+#include "ccommon.h"
 
 #define cvec_INIT           {NULL}
 #define cvec_size(v)       _cvec_safe_size((v).data)

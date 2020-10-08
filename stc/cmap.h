@@ -51,7 +51,7 @@ int main(void) {
 
 #include <stdlib.h>
 #include <string.h>
-#include "cdefs.h"
+#include "ccommon.h"
 
 #define cmap_INIT                     {NULL, NULL, 0, 0, 0.85f, 0.15f}
 #define cmap_empty(m)                 ((m).size == 0)
