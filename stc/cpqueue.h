@@ -92,8 +92,7 @@
     _cpqueue_##X##_sift_down(cpqueue_##X##_value_t* arr, size_t i, size_t n) { \
         size_t r = i, c = i << 1; \
         while (c <= n) { \
-            if (c < n && ctype##_value_compare(&arr[c], &arr[c + 1]) cmpOpr 0) \
-                ++c; \
+            c += (c < n && ctype##_value_compare(&arr[c], &arr[c + 1]) cmpOpr 0); \
             if (ctype##_value_compare(&arr[r], &arr[c]) cmpOpr 0) { \
                 cpqueue_##X##_value_t tmp = arr[r]; arr[r] = arr[c]; arr[r = c] = tmp; \
             } else \
@@ -104,7 +103,7 @@
 \
     STC_API void \
     cpqueue_##X##_make_heap(cpqueue_##X* self) { \
-        size_t n = cpqueue_##X##_size(*self);  \
+        size_t n = cpqueue_##X##_size(*self); \
         cpqueue_##X##_value_t *arr = self->data - 1; \
         for (size_t k = n >> 1; k != 0; --k) \
             _cpqueue_##X##_sift_down(arr, k, n); \
