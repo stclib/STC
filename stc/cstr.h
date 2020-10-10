@@ -45,7 +45,7 @@ STC_API cstr_t
 cstr_n(const char* str, size_t len);
 STC_API cstr_t
 cstr_from(const char* fmt, ...);
-STC_API void
+STC_API size_t
 cstr_reserve(cstr_t* self, size_t cap);
 STC_API void
 cstr_resize(cstr_t* self, size_t len, char fill);
@@ -57,6 +57,8 @@ STC_API void
 cstr_replace_n(cstr_t* self, size_t pos, size_t len, const char* str, size_t n);
 STC_API void
 cstr_erase(cstr_t* self, size_t pos, size_t n);
+STC_API bool
+cstr_getdelim(cstr_t *self, int delim, FILE *stream);
 STC_API char*
 c_strnstr(const char* s, const char* needle, size_t n);
 
@@ -163,6 +165,11 @@ cstr_replace(cstr_t* self, size_t pos, size_t len, const char* str) {
     cstr_replace_n(self, pos, len, str, strlen(str));
 }
 
+STC_INLINE bool
+cstr_getline(cstr_t *self, FILE *stream) {
+    return cstr_getdelim(self, '\n', stream);
+}
+
 /* readonly */
 
 STC_INLINE bool
@@ -208,15 +215,16 @@ STC_INLINE uint32_t cstr_hash_raw(const char* const* spp, size_t ignored) {
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-STC_API void
+STC_API size_t
 cstr_reserve(cstr_t* self, size_t cap) {
     size_t len = cstr_size(*self), oldcap = cstr_capacity(*self);
     if (cap > oldcap) {
         size_t* rep = (size_t *) c_realloc(oldcap ? _cstr_rep(self) : NULL, _cstr_mem(cap));
         self->str = (char *) (rep + 2);
         self->str[rep[0] = len] = '\0';
-        rep[1] = _cstr_cap(cap);
+        return rep[1] = _cstr_cap(cap);
     }
+    return oldcap;
 }
 
 STC_API void
@@ -317,6 +325,25 @@ cstr_erase(cstr_t* self, size_t pos, size_t n) {
     if (len) {
         memmove(&self->str[pos], &self->str[pos + n], len - (pos + n));
         self->str[_cstr_size(*self) -= n] = '\0';
+    }
+}
+
+STC_API bool
+cstr_getdelim(cstr_t *self, int delim, FILE *stream) {
+    size_t pos = 0, cap = cstr_capacity(*self);
+    for (;;) {
+        int c = fgetc(stream);
+        if (c == EOF) return false;
+        if (cap - pos < 2) cap = cstr_reserve(self, cap * 3 / 2 + 34);
+        char *cur = self->str + pos;
+        do {
+            *cur++ = (char) c;
+            if (c == delim || (c = fgetc(stream)) == EOF) {
+                *cur = '\0';
+                _cstr_size(*self) = pos + 1;
+                return errno == 0;
+            }
+        } while (++pos != cap - 1);
     }
 }
 
