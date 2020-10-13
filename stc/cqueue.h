@@ -78,7 +78,7 @@
     cqueue_##X##_back(cqueue_##X* self) {return ctype##_back(self);} \
     STC_INLINE void \
     cqueue_##X##_pop(cqueue_##X* self) {ctype##_pop_front(self);} \
-    STC_API void \
+    STC_INLINE void \
     cqueue_##X##_push(cqueue_##X* self, ctype##_value_t value) { \
         ctype##_push_back(self, value); \
     } \
@@ -86,7 +86,7 @@
     cqueue_##X##_emplace(cqueue_##X* self, cqueue_##X##_rawvalue_t rawValue) { \
         ctype##_emplace_back(self, rawValue); \
     } \
-    STC_API void \
+    STC_INLINE void \
     cqueue_##X##_push_n(cqueue_##X *self, const cqueue_##X##_input_t in[], size_t size) { \
         ctype##_push_n(self, in, size); \
     } \

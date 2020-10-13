@@ -30,13 +30,15 @@ int main() {
     cbitset_t bset = cbitset_with_size(23, true);
     cbitset_reset(&bset, 9);
     cbitset_resize(&bset, 43, false);
-    printf("%4zu: ", bset.size); for (int i=0; i<bset.size; ++i) printf("%d", cbitset_test(&bset, i)); puts("");
+    printf("%4zu: ", bset.size); c_forrange (i, bset.size) printf("%d", cbitset_test(&bset, i));
+    puts("");
     cbitset_set(&bset, 28);
     cbitset_resize(&bset, 77, true);
     cbitset_resize(&bset, 93, false);
     cbitset_resize(&bset, 102, true);
     cbitset_set_value(&bset, 99, false);
-    printf("%4zu: ", bset.size); for (int i=0; i<bset.size; ++i) printf("%d", cbitset_test(&bset, i)); puts("");
+    printf("%4zu: ", bset.size); c_forrange (i, bset.size) printf("%d", cbitset_test(&bset, i));
+    puts("");
     cbitset_del(&bset);
 }
 */
@@ -182,25 +184,24 @@ STC_API void cbitset_resize(cbitset_t* self, size_t size, bool value) {
 }
 
 #if defined(__GNUC__) || defined(__clang__)
-    #define c_popcount64(x) __builtin_popcountll(x)
+    STC_INLINE uint64_t cpopcount64(uint64_t x) {return __builtin_popcountll(x);}
 #elif defined(_MSC_VER) && defined(_WIN64)
     #include <intrin.h>
-    #define c_popcount64(x) __popcnt64(x)
+    STC_INLINE uint64_t cpopcount64(uint64_t x) {return __popcnt64(x);}
 #else
-/* http://en.wikipedia.org/wiki/Hamming_weight#Efficient_implementation */
-static inline uint64_t c_popcount64(uint64_t x) {
-    x -= (x >> 1) & 0x5555555555555555;
-    x = (x & 0x3333333333333333) + ((x >> 2) & 0x3333333333333333);
-    x = (x + (x >> 4)) & 0x0f0f0f0f0f0f0f0f;
-    return (x * 0x0101010101010101) >> 56;
-}
+    STC_INLINE uint64_t cpopcount64(uint64_t x) { /* http://en.wikipedia.org/wiki/Hamming_weight */
+        x -= (x >> 1) & 0x5555555555555555;
+        x = (x & 0x3333333333333333) + ((x >> 2) & 0x3333333333333333);
+        x = (x + (x >> 4)) & 0x0f0f0f0f0f0f0f0f;
+        return (x * 0x0101010101010101) >> 56;
+    }
 #endif
 
 STC_API size_t cbitset_count(cbitset_t s) {
     size_t count = 0, n = ((s.size + 63) >> 6) - 1;
     if (s.size > 0) {
-        for (size_t i=0; i<n; ++i) count += c_popcount64(s._arr[i]);
-        count += c_popcount64(s._arr[n] & ((1ull << (s.size & 63)) - 1));
+        for (size_t i=0; i<n; ++i) count += cpopcount64(s._arr[i]);
+        count += cpopcount64(s._arr[n] & ((1ull << (s.size & 63)) - 1));
     }
     return count;
 }
