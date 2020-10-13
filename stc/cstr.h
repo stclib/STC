@@ -339,8 +339,8 @@ cstr_getdelim(cstr_t *self, int delim, FILE *stream) {
         do {
             *cur++ = (char) c;
             if (c == delim || (c = fgetc(stream)) == EOF) {
-                *cur = '\0';
-                _cstr_size(*self) = pos + 1;
+                pos += c != delim;
+                self->str[_cstr_size(*self) = pos] = '\0';
                 return errno == 0;
             }
         } while (++pos != cap - 1);
