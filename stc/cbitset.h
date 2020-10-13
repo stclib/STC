@@ -51,12 +51,21 @@ typedef struct cbitset { uint64_t* _arr; size_t size; } cbitset_t;
 
 #define cbitset_INIT {NULL, 0}
 
-STC_API void   cbitset_resize(cbitset_t* self, size_t size, bool value);
-STC_API size_t cbitset_count(cbitset_t set);
-STC_API bool   cbitset_is_disjoint(cbitset_t set, cbitset_t other);
-STC_API bool   cbitset_is_subset(cbitset_t set, cbitset_t other);
-STC_API bool   cbitset_is_superset(cbitset_t set, cbitset_t other);
+STC_API cbitset_t cbitset_with_size(size_t size, bool value);
+STC_API cbitset_t cbitset_from_str(const char* str);
+STC_API cstr_t    cbitset_to_str(cbitset_t set);
+STC_API cbitset_t cbitset_clone(cbitset_t other);
+STC_API void      cbitset_resize(cbitset_t* self, size_t size, bool value);
+STC_API size_t    cbitset_count(cbitset_t set);
+STC_API bool      cbitset_is_disjoint(cbitset_t set, cbitset_t other);
+STC_API bool      cbitset_is_subset(cbitset_t set, cbitset_t other);
+STC_API bool      cbitset_is_superset(cbitset_t set, cbitset_t other);
 
+STC_INLINE size_t cbitset_size(cbitset_t set) {return set.size;}
+
+STC_INLINE cbitset_t cbitset_init() {
+    cbitset_t bs = cbitset_INIT; return bs;
+}
 STC_INLINE void cbitset_set(cbitset_t *self, size_t i) {
     self->_arr[i >> 6] |= 1ull << (i & 63);
 }
@@ -72,7 +81,6 @@ STC_INLINE void cbitset_flip(cbitset_t *self, size_t i) {
 STC_INLINE bool cbitset_test(cbitset_t set, size_t i) {
     return (set._arr[i >> 6] & (1ull << (i & 63))) != 0;
 }
-
 STC_INLINE void cbitset_set_all(cbitset_t *self, bool value) {
     memset(self->_arr, value ? 0xff : 0x0, ((self->size + 63) >> 6) * 8);
 }
@@ -84,33 +92,9 @@ STC_INLINE void cbitset_flip_all(cbitset_t *self) {
     size_t n = (self->size + 63) >> 6;
     for (size_t i=0; i<n; ++i) self->_arr[i] ^= ~0ull;
 }
-
-STC_INLINE cbitset_t cbitset_with_size(size_t size, bool value) {
-    cbitset_t set = {(uint64_t *) c_malloc(((size + 63) >> 6) * 8), size};
-    cbitset_set_all(&set, value);
-    return set;
-}
-STC_INLINE cbitset_t cbitset_from_str(const char* str) {
-    const char* p = str; while (*p) ++p;
-    cbitset_t set = cbitset_with_size(p - str, false);
-    for (size_t i=0; i<set.size; ++i) if (str[i] == '1') cbitset_set(&set, i);
-    return set;
-}
-STC_INLINE cstr_t cbitset_to_str(cbitset_t set) {
-    cstr_t out = cstr_with_size(set.size, '0');
-    for (size_t i=0; i<set.size; ++i) if (cbitset_test(set, i)) out.str[i] = '1';
-    return out;
-}
-STC_INLINE cbitset_t cbitset_clone(cbitset_t other) {
-    size_t bytes = ((other.size + 63) >> 6) * 8;
-    cbitset_t set = {(uint64_t *) memcpy(c_malloc(bytes), other._arr, bytes), other.size};
-    return set;
-}
 STC_INLINE void cbitset_del(cbitset_t* self) {
     c_free(self->_arr);
 }
-
-STC_INLINE size_t cbitset_size(cbitset_t set) {return set.size;}
 
 /* Intersection */
 STC_INLINE void cbitset_intersect_with(cbitset_t *self, cbitset_t other) {
@@ -168,6 +152,20 @@ STC_INLINE bool cbitset_itval(cbitset_iter_t it) {
     return cbitset_test(*it._bs, it.val);
 }
 
+#if defined(__GNUC__) || defined(__clang__)
+    STC_INLINE uint64_t cpopcount64(uint64_t x) {return __builtin_popcountll(x);}
+#elif defined(_MSC_VER) && defined(_WIN64)
+    #include <intrin.h>
+    STC_INLINE uint64_t cpopcount64(uint64_t x) {return __popcnt64(x);}
+#else
+    STC_INLINE uint64_t cpopcount64(uint64_t x) { /* http://en.wikipedia.org/wiki/Hamming_weight */
+        x -= (x >> 1) & 0x5555555555555555;
+        x = (x & 0x3333333333333333) + ((x >> 2) & 0x3333333333333333);
+        x = (x + (x >> 4)) & 0x0f0f0f0f0f0f0f0f;
+        return (x * 0x0101010101010101) >> 56;
+    }
+#endif
+
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
 STC_API void cbitset_resize(cbitset_t* self, size_t size, bool value) {
@@ -183,20 +181,27 @@ STC_API void cbitset_resize(cbitset_t* self, size_t size, bool value) {
     }
 }
 
-#if defined(__GNUC__) || defined(__clang__)
-    STC_INLINE uint64_t cpopcount64(uint64_t x) {return __builtin_popcountll(x);}
-#elif defined(_MSC_VER) && defined(_WIN64)
-    #include <intrin.h>
-    STC_INLINE uint64_t cpopcount64(uint64_t x) {return __popcnt64(x);}
-#else
-    STC_INLINE uint64_t cpopcount64(uint64_t x) { /* http://en.wikipedia.org/wiki/Hamming_weight */
-        x -= (x >> 1) & 0x5555555555555555;
-        x = (x & 0x3333333333333333) + ((x >> 2) & 0x3333333333333333);
-        x = (x + (x >> 4)) & 0x0f0f0f0f0f0f0f0f;
-        return (x * 0x0101010101010101) >> 56;
-    }
-#endif
-
+STC_API cbitset_t cbitset_with_size(size_t size, bool value) {
+    cbitset_t set = {(uint64_t *) c_malloc(((size + 63) >> 6) * 8), size};
+    cbitset_set_all(&set, value);
+    return set;
+}
+STC_API cbitset_t cbitset_from_str(const char* str) {
+    const char* p = str; while (*p) ++p;
+    cbitset_t set = cbitset_with_size(p - str, false);
+    for (size_t i=0; i<set.size; ++i) if (str[i] == '1') cbitset_set(&set, i);
+    return set;
+}
+STC_API cstr_t cbitset_to_str(cbitset_t set) {
+    cstr_t out = cstr_with_size(set.size, '0');
+    for (size_t i=0; i<set.size; ++i) if (cbitset_test(set, i)) out.str[i] = '1';
+    return out;
+}
+STC_API cbitset_t cbitset_clone(cbitset_t other) {
+    size_t bytes = ((other.size + 63) >> 6) * 8;
+    cbitset_t set = {(uint64_t *) memcpy(c_malloc(bytes), other._arr, bytes), other.size};
+    return set;
+}
 STC_API size_t cbitset_count(cbitset_t s) {
     size_t count = 0, n = ((s.size + 63) >> 6) - 1;
     if (s.size > 0) {
