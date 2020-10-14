@@ -47,9 +47,9 @@ int main(void)
     int year = 2020;
     cmap_id idnames = cmap_INIT;
     c_push_items(&idnames, cmap_id, {
-        {100, cstr("Hello")},
-        {110, cstr("World")},
-        {120, cstr_from("Howdy, -%d-", year)},
+        {100, cstr_from("Hello")},
+        {110, cstr_from("World")},
+        {120, cstr_from_fmt("Howdy, -%d-", year)},
     });
 
     c_foreach (i, cmap_id, idnames)

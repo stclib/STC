@@ -34,7 +34,7 @@
 typedef struct { cstr_t name, last; } Person;
 
 Person* Person_make(Person* p, const char* name, const char* last) {
-    p->name = cstr(name), p->last = cstr(last);
+    p->name = cstr_from(name), p->last = cstr_from(last);
     return p;
 }
 void Person_del(Person* p) {
@@ -100,7 +100,7 @@ int main() {
 typedef struct { cstr_t name, last; } Person;
 
 Person* Person_make(Person* p, const char* name, const char* last) {
-    p->name = cstr(name), p->last = cstr(last);
+    p->name = cstr_from(name), p->last = cstr_from(last);
     return p;
 }
 void Person_del(Person* p) {

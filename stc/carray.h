@@ -119,14 +119,14 @@ _carray3_size(const size_t* zdim) {return zdim[0] * zdim[-1] * zdim[-2];}
     using_carray_common(3, X, Value, valueDestroy) \
 \
     STC_INLINE carray1##X \
-    carray1##X##_make(size_t xdim, Value val) { \
+    carray1##X##_init(size_t xdim, Value val) { \
         Value* m = c_new_2(Value, xdim); \
         for (size_t i=0; i<xdim; ++i) m[i] = val; \
         carray1##X a = {m, xdim | _carray_OWN}; \
         return a; \
     } \
     STC_INLINE carray2##X \
-    carray2##X##_make(size_t ydim, size_t xdim, Value val) { \
+    carray2##X##_init(size_t ydim, size_t xdim, Value val) { \
         const size_t n = ydim * xdim; \
         Value* m = c_new_2(Value, n); \
         for (size_t i=0; i<n; ++i) m[i] = val; \
@@ -134,7 +134,7 @@ _carray3_size(const size_t* zdim) {return zdim[0] * zdim[-1] * zdim[-2];}
         return a; \
     } \
     STC_INLINE carray3##X \
-    carray3##X##_make(size_t zdim, size_t ydim, size_t xdim, Value val) { \
+    carray3##X##_init(size_t zdim, size_t ydim, size_t xdim, Value val) { \
         const size_t n = zdim * ydim * xdim; \
         Value* m = c_new_2(Value, n); \
         for (size_t i=0; i<n; ++i) m[i] = val; \
@@ -143,17 +143,17 @@ _carray3_size(const size_t* zdim) {return zdim[0] * zdim[-1] * zdim[-2];}
     } \
 \
     STC_INLINE carray1##X \
-    carray1##X##_from(size_t xdim, Value* array, bool own) { \
+    carray1##X##_from(Value* array, bool own, size_t xdim) { \
         carray1##X a = {array, xdim | (own ? _carray_OWN : 0)}; \
         return a; \
     } \
     STC_INLINE carray2##X \
-    carray2##X##_from(size_t ydim, size_t xdim, Value* array, bool own) { \
+    carray2##X##_from(Value* array, bool own, size_t ydim, size_t xdim) { \
         carray2##X a = {array, xdim | (own ? _carray_OWN : 0), ydim}; \
         return a; \
     } \
     STC_INLINE carray3##X \
-    carray3##X##_from(size_t zdim, size_t ydim, size_t xdim, Value* array, bool own) { \
+    carray3##X##_from(Value* array, bool own, size_t zdim, size_t ydim, size_t xdim) { \
         carray3##X a = {array, xdim | (own ? _carray_OWN : 0), ydim, zdim}; \
         return a; \
     } \

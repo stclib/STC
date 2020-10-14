@@ -8,7 +8,7 @@
 void stringdemo1()
 {
     printf("\nSTRINGDEMO1\n");
-    cstr_t cs = cstr("one-nine-three-seven-five");
+    cstr_t cs = cstr_from("one-nine-three-seven-five");
     printf("%s.\n", cs.str);
 
     cstr_insert(&cs, 3, "-two");
@@ -20,7 +20,7 @@ void stringdemo1()
     cstr_replace(&cs, cstr_find(&cs, "seven"), 5, "four");
     printf("%s.\n", cs.str);
 
-    cstr_take(&cs, cstr_from("%s *** %s", cs.str, cs.str));
+    cstr_take(&cs, cstr_from_fmt("%s *** %s", cs.str, cs.str));
     printf("%s.\n", cs.str);
 
     printf("find \"four\": %s\n", cs.str + cstr_find(&cs, "four"));
@@ -177,7 +177,7 @@ using_carray(f, float);
 void arraydemo1()
 {
     printf("\nARRAYDEMO1\n");
-    carray3f a3 = carray3f_make(30, 20, 10, 0.0f);
+    carray3f a3 = carray3f_init(30, 20, 10, 0.0f);
     *carray3f_at(&a3, 5, 4, 3) = 10.2f;    // a3[5][4][3]
     carray2f a2 = carray3f_at1(&a3, 5);    // sub-array reference: a2 = a3[5]
     carray1f a1 = carray3f_at2(&a3, 5, 4); // sub-array reference: a1 = a3[5][4]

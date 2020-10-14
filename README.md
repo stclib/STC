@@ -56,8 +56,8 @@ using_cvec(u, User, User_del, User_compare);
 
 int main(void) {
     cvec_u vec = cvec_u_init();
-    cvec_u_push_back(&vec, (User) {cstr("admin"), 0}); // cstr() allocates string memory
-    cvec_u_push_back(&vec, (User) {cstr("usera"), 1});
+    cvec_u_push_back(&vec, (User) {cstr_from("admin"), 0}); // cstr_from() allocates string memory
+    cvec_u_push_back(&vec, (User) {cstr_from("usera"), 1});
     c_foreach (i, cvec_u, vec) 
         printf("%s: %d\n", i.val->name.str, i.val->id);
     cvec_u_del(&vec); // free everything
@@ -229,7 +229,7 @@ int main() {
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
 
     // Use push_back() rather than emplace_back() when adding a cstr_t type:
-    cstr_t tmp = cstr_from("%d elements so far", cvec_str_size(names));
+    cstr_t tmp = cstr_from_fmt("%d elements so far", cvec_str_size(names));
     cvec_str_push_back(&names, tmp); // tmp is moved to names, do not del() it.
 
     printf("%s\n", names.data[1].str); // Access the second element
@@ -249,7 +249,7 @@ item: 2 elements so far
 #include <stc/cstr.h>
 
 int main() {
-    cstr_t s1 = cstr("one-nine-three-seven-five");
+    cstr_t s1 = cstr_from("one-nine-three-seven-five");
     printf("%s.\n", s1.str);
 
     cstr_insert(&s1, 3, "-two");
@@ -266,7 +266,7 @@ int main() {
     cstr_append(&s1, " eight");
     printf("append: %s\n", s1.str);
 
-    cstr_t full_path = cstr_from("%s/%s.%s", "directory", "filename", "ext");
+    cstr_t full_path = cstr_from_fmt("%s/%s.%s", "directory", "filename", "ext");
     printf("%s\n", full_path.str);
 
     c_del(cstr, &s1, &full_path);

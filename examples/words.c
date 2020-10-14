@@ -16,7 +16,7 @@ int main1()
         "this", "sentence", "is", "not", "a", "sentence",
         "this", "sentence", "is", "a", "hoax"
     });
-    clist_str_push_back(&lwords, cstr_from("%f", 123897.0 / 23.0));
+    clist_str_push_back(&lwords, cstr_from_fmt("%f", 123897.0 / 23.0));
     c_foreach (w, clist_str, lwords)
         printf("%s\n", w.val->str);
     puts("");

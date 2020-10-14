@@ -17,7 +17,7 @@ int main() {
     cmap_s myMap = cmap_INIT;
 
     { // Construct.
-        carray2f table = carray2f_make(ydim, xdim, 0.f);
+        carray2f table = carray2f_init(ydim, xdim, 0.f);
         printf("table: (%zu, %zu)\n", carray2_ydim(table), carray2_xdim(table));
         clist_y tableList = clist_INIT;
         // Put in some data.

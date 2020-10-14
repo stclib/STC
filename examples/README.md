@@ -47,7 +47,7 @@ static inline VikingRaw viking_toRaw(Viking* vk) {
     VikingRaw vw = {vk->name.str, vk->country.str}; return vw;
 }
 static inline Viking viking_fromRaw(VikingRaw vw) { // note: parameter is by value
-    Viking vk = {cstr(vw.name), cstr(vw.country)}; return vk;
+    Viking vk = {cstr_from(vw.name), cstr_from(vw.country)}; return vk;
 }
 ```
 With this in place, we use the full using_cmap() macro to define {Viking -> int} hash map type:

@@ -126,7 +126,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 
 #define using_cmap_str() \
     _c_typedef_CHASH(str, cmap, cstr_t, cstr_t, cstr_del, cstr_equals_raw, cstr_hash_raw, \
-                          cstr_del, const char*, cstr_to_raw, cstr, const char*, cstr)
+                          cstr_del, const char*, cstr_to_raw, cstr_from, const char*, cstr_from)
 
 #define using_cmap_strkey(...) \
     c_MACRO_OVERLOAD(using_cmap_strkey, __VA_ARGS__)
@@ -149,12 +149,12 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 
 #define using_cmap_strval_8(X, Key, keyEquals, keyHash, keyDestroy, RawKey, keyToRaw, keyFromRaw) \
     _c_typedef_CHASH(X, cmap, Key, cstr_t, cstr_del, keyEquals, keyHash, \
-                        keyDestroy, RawKey, keyToRaw, keyFromRaw, const char*, cstr)
+                        keyDestroy, RawKey, keyToRaw, keyFromRaw, const char*, cstr_from)
 
 
 #define _c_declare_CHASH_strkey(X, ctype, Mapped, valueDestroy) \
     _c_typedef_CHASH(X, ctype, cstr_t, Mapped, valueDestroy, cstr_equals_raw, cstr_hash_raw, \
-                        cstr_del, const char*, cstr_to_raw, cstr, Mapped, c_default_from_raw)
+                        cstr_del, const char*, cstr_to_raw, cstr_from, Mapped, c_default_from_raw)
 
 #define CSET_ONLY_cset(...) __VA_ARGS__
 #define CSET_ONLY_cmap(...)

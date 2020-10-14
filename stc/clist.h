@@ -65,7 +65,7 @@
                              using_clist_7(X, Value, valueDestroy, valueCompare, \
                                               Value, c_default_to_raw, c_default_from_raw)
 #define using_clist_str()  using_clist_7(str, cstr_t, cstr_del, cstr_compare_raw, \
-                                              const char*, cstr_to_raw, cstr)
+                                              const char*, cstr_to_raw, cstr_from)
 
 #define using_clist_types(X, Value) \
     typedef Value clist_##X##_value_t; \

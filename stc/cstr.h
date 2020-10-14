@@ -44,7 +44,7 @@ static  cstr_t cstr_INIT = {(char* ) &_cstr_nullrep[2]};
 STC_API cstr_t
 cstr_n(const char* str, size_t len);
 STC_API cstr_t
-cstr_from(const char* fmt, ...);
+cstr_from_fmt(const char* fmt, ...);
 STC_API size_t
 cstr_reserve(cstr_t* self, size_t cap);
 STC_API void
@@ -91,7 +91,7 @@ cstr_with_size(size_t len, char fill) {
     return s;
 }
 STC_INLINE cstr_t
-cstr(const char* str) {
+cstr_from(const char* str) {
     return cstr_n(str, strlen(str));
 }
 
@@ -246,7 +246,7 @@ cstr_n(const char* str, size_t len) {
 }
 
 STC_API cstr_t
-cstr_from(const char* fmt, ...) {
+cstr_from_fmt(const char* fmt, ...) {
     #if defined(__clang__)
     #  pragma clang diagnostic push
     #  pragma clang diagnostic ignored "-Wdeprecated-declarations"

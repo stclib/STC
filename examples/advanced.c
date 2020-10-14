@@ -47,7 +47,7 @@ VikingVw viking_toVw(Viking* vk) {
     VikingVw vw = {vk->name.str, vk->country.str}; return vw;
 }
 Viking viking_fromVw(VikingVw vw) {
-    Viking vk = {cstr(vw.name), cstr(vw.country)}; return vk;
+    Viking vk = {cstr_from(vw.name), cstr_from(vw.country)}; return vk;
 }
 
 // Using the full using_cmap() macro to define [Viking -> int] hash map type:

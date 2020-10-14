@@ -11,7 +11,7 @@ Person* Person_from(Person* p, cstr_t name, cstr_t last) {
     return p;
 }
 Person* Person_make(Person* p, const char* name, const char* last) {
-    p->name = cstr(name), p->last = cstr(last);
+    p->name = cstr_from(name), p->last = cstr_from(last);
     return p;
 }
 void Person_del(Person* p) {
@@ -30,8 +30,8 @@ int main() {
     // c_try_emplace: The last argument is completely ignored if key already exist in map, so no memory leak happens!
     c_forrange (i, 20) { // When i>9, all key will exist, so value arg is not executed.
         c_try_emplace(&map, cmap_pe, (i * 7) % 10,
-                            csptr_pe_from(Person_from(c_new(Person), cstr_from("Name %d", (i * 7) % 10),
-                                                                     cstr_from("Last %d", (i * 9) % 10))));
+                            csptr_pe_from(Person_from(c_new(Person), cstr_from_fmt("Name %d", (i * 7) % 10),
+                                                                     cstr_from_fmt("Last %d", (i * 9) % 10))));
     }
     c_try_emplace(&map, cmap_pe, 11, csptr_pe_from(Person_make(c_new(Person), "Hello", "World!")));
 

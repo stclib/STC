@@ -7,7 +7,7 @@
 typedef struct { cstr_t name, last; } Person;
 
 Person* Person_make(Person* p, const char* name, const char* last) {
-    p->name = cstr(name), p->last = cstr(last);
+    p->name = cstr_from(name), p->last = cstr_from(last);
     return p;
 }
 void Person_del(Person* p) {
@@ -27,15 +27,15 @@ int main() {
     clist_pe queue = clist_pe_init();
     cvec_pe vec = cvec_pe_init();
 
-    csptr_pe joe = csptr_pe_make((Person) {cstr("Joe"), cstr("Jordan")});
+    csptr_pe joe = csptr_pe_make((Person) {cstr_from("Joe"), cstr_from("Jordan")});
     clist_pe_push_back(&queue, csptr_pe_share(joe));
     cvec_pe_push_back(&vec, csptr_pe_share(joe));
 
     puts("Push 10:");
     c_forrange (i, 10) {
         csptr_pe p = csptr_pe_from(c_new(Person));
-        p.get->name = cstr_from("Name %d", (i * 7) % 10);
-        p.get->last = cstr_from("Last %d", (i * 7) % 10);
+        p.get->name = cstr_from_fmt("Name %d", (i * 7) % 10);
+        p.get->last = cstr_from_fmt("Last %d", (i * 7) % 10);
         clist_pe_push_back(&queue, p);
         cvec_pe_push_back(&vec, csptr_pe_share(p)); // Don't forget to share!
     }

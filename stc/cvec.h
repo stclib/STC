@@ -40,7 +40,7 @@
 #define using_cvec_4(X, Value, valueDestroy, valueCompare) \
                     using_cvec_7(X, Value, valueDestroy, valueCompare, Value, c_default_to_raw, c_default_from_raw)
 #define using_cvec_str() \
-                    using_cvec_7(str, cstr_t, cstr_del, cstr_compare_raw, const char*, cstr_to_raw, cstr)
+                    using_cvec_7(str, cstr_t, cstr_del, cstr_compare_raw, const char*, cstr_to_raw, cstr_from)
 
 
 #define using_cvec_7(X, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw) \
