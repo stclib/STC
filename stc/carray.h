@@ -45,27 +45,25 @@ int main()
 }
 */
 
-#define carray1_xdim(a)  ((a)._xdim & _carray_SUB)
+#define carray1_xdim(a) ((a)._xdim & _carray_SUB)
 #define carray1_size(a) carray1_xdim(a)
 
-#define carray2_xdim(a)  carray1_xdim(a)
-#define carray2_ydim(a)  _carray2_ydim(&(a)._yxdim)
-#define carray2_size(a) ((a)._yxdim)
+#define carray2_xdim(a) carray1_xdim(a)
+#define carray2_ydim(a) (a)._ydim
+#define carray2_size(a) _carray2_size(&(a)._ydim)
 
-#define carray3_xdim(a)  carray1_xdim(a)
-#define carray3_ydim(a)  carray2_ydim(a)
-#define carray3_zdim(a)  ((a)._zdim)
+#define carray3_xdim(a) carray1_xdim(a)
+#define carray3_ydim(a) carray2_ydim(a)
+#define carray3_zdim(a) (a)._zdim
 #define carray3_size(a) _carray3_size(&(a)._zdim)
 
 #define _carray_SUB (SIZE_MAX >> 1)
 #define _carray_OWN (_carray_SUB + 1)
 
-STC_INLINE size_t _carray2_ydim(const size_t* yxdim) {
-    return yxdim[0] / (yxdim[-1] & _carray_SUB);
-}
-STC_INLINE size_t _carray3_size(const size_t* zdim) {
-    return zdim[0] * zdim[-1];
-}
+STC_INLINE size_t
+_carray2_size(const size_t* ydim) {return ydim[0] * ydim[-1];}
+STC_INLINE size_t
+_carray3_size(const size_t* zdim) {return zdim[0] * zdim[-1] * zdim[-2];}
 
 
 #define using_carray_common(D, X, Value, valueDestroy) \
@@ -108,12 +106,12 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
 \
     typedef struct { \
         Value *data; \
-        size_t _xdim, _yxdim; \
+        size_t _xdim, _ydim; \
     } carray2##X, carray2##X##_t; \
 \
     typedef struct { \
         Value *data; \
-        size_t _xdim, _yxdim, _zdim; \
+        size_t _xdim, _ydim, _zdim; \
     } carray3##X, carray3##X##_t; \
 \
     using_carray_common(1, X, Value, valueDestroy) \
@@ -132,7 +130,7 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
         const size_t n = ydim * xdim; \
         Value* m = c_new_2(Value, n); \
         for (size_t i=0; i<n; ++i) m[i] = val; \
-        carray2##X a = {m, xdim | _carray_OWN, ydim * xdim}; \
+        carray2##X a = {m, xdim | _carray_OWN, ydim}; \
         return a; \
     } \
     STC_INLINE carray3##X \
@@ -140,7 +138,7 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
         const size_t n = zdim * ydim * xdim; \
         Value* m = c_new_2(Value, n); \
         for (size_t i=0; i<n; ++i) m[i] = val; \
-        carray3##X a = {m, xdim | _carray_OWN, ydim * xdim, zdim}; \
+        carray3##X a = {m, xdim | _carray_OWN, ydim, zdim}; \
         return a; \
     } \
 \
@@ -151,12 +149,12 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
     } \
     STC_INLINE carray2##X \
     carray2##X##_from(size_t ydim, size_t xdim, Value* array, bool own) { \
-        carray2##X a = {array, xdim | (own ? _carray_OWN : 0), ydim * xdim}; \
+        carray2##X a = {array, xdim | (own ? _carray_OWN : 0), ydim}; \
         return a; \
     } \
     STC_INLINE carray3##X \
     carray3##X##_from(size_t zdim, size_t ydim, size_t xdim, Value* array, bool own) { \
-        carray3##X a = {array, xdim | (own ? _carray_OWN : 0), ydim * xdim, zdim}; \
+        carray3##X a = {array, xdim | (own ? _carray_OWN : 0), ydim, zdim}; \
         return a; \
     } \
 \
@@ -175,17 +173,17 @@ STC_INLINE size_t _carray3_size(const size_t* zdim) {
 \
     STC_INLINE carray2##X \
     carray3##X##_at1(carray3##X *a, size_t z) { \
-        carray2##X sub = {a->data + z*a->_yxdim, carray3_xdim(*a), a->_yxdim}; \
+        carray2##X sub = {a->data + z*a->_ydim*carray2_xdim(*a), carray3_xdim(*a), a->_ydim}; \
         return sub; \
     } \
     STC_INLINE carray1##X \
     carray3##X##_at2(carray3##X *a, size_t z, size_t y) { \
-        carray1##X sub = {a->data + z*a->_yxdim + y*carray3_xdim(*a), carray3_xdim(*a)}; \
+        carray1##X sub = {a->data + (z*a->_ydim + y)*carray3_xdim(*a), carray3_xdim(*a)}; \
         return sub; \
     } \
     STC_INLINE Value* \
     carray3##X##_at(carray3##X *a, size_t z, size_t y, size_t x) { \
-        return a->data + z*a->_yxdim + y*carray3_xdim(*a) + x; \
+        return a->data + (z*a->_ydim + y)*carray3_xdim(*a) + x; \
     } \
     typedef carray1##X carray1##X##_t
 
