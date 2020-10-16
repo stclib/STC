@@ -120,14 +120,14 @@ int main() {
 */
 typedef long atomic_count_t;
 #if defined(__GNUC__) || defined(__clang__)
-    static inline void atomic_increment(atomic_count_t* pw) {__atomic_add_fetch(pw, 1, __ATOMIC_SEQ_CST);}
-    static inline atomic_count_t atomic_decrement(atomic_count_t* pw) {return __atomic_sub_fetch(pw, 1, __ATOMIC_SEQ_CST);}
+    STC_INLINE void atomic_increment(atomic_count_t* pw) {__atomic_add_fetch(pw, 1, __ATOMIC_SEQ_CST);}
+    STC_INLINE atomic_count_t atomic_decrement(atomic_count_t* pw) {return __atomic_sub_fetch(pw, 1, __ATOMIC_SEQ_CST);}
 #elif defined(_MSC_VER)
     #include <intrin.h>
-    static inline void atomic_increment(atomic_count_t* pw) {_InterlockedIncrement(pw);}
-    static inline atomic_count_t atomic_decrement(atomic_count_t* pw) {return _InterlockedDecrement(pw);}
+    STC_INLINE void atomic_increment(atomic_count_t* pw) {_InterlockedIncrement(pw);}
+    STC_INLINE atomic_count_t atomic_decrement(atomic_count_t* pw) {return _InterlockedDecrement(pw);}
 #elif defined(__i386__) || defined(__x86_64__)
-    static inline void atomic_increment(atomic_count_t* pw) {
+    STC_INLINE void atomic_increment(atomic_count_t* pw) {
         __asm__ (
             "lock\n\t"
             "incl %0":
@@ -136,7 +136,7 @@ typedef long atomic_count_t;
             "cc"         // clobbers
         );
     }
-    static inline atomic_count_t atomic_decrement(atomic_count_t* pw) {
+    STC_INLINE atomic_count_t atomic_decrement(atomic_count_t* pw) {
         int r;
         __asm__ __volatile__ (
             "lock\n\t"

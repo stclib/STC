@@ -259,7 +259,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         if (!res.second) valueDestroy(&res.first->second); \
         res.first->second = valueFromRaw(rawVal); return res; \
     } \
-    STC_API ctype##_##X##_mapped_t* \
+    STC_INLINE ctype##_##X##_mapped_t* \
     ctype##_##X##_at(const ctype##_##X* self, RawKey rawKey) { \
         ctype##_bucket_t b = ctype##_##X##_bucket(self, &rawKey); \
         assert(self->_hashx[b.idx]); \
@@ -311,20 +311,21 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     STC_API uint32_t c_default_hash32(const void* data, size_t len); \
 \
     _c_implement_CHASH(X, ctype, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
-                          keyDestroy, RawKey, keyToRaw, keyFromRaw, RawVal, valueFromRaw)
+                          keyDestroy, RawKey, keyToRaw, keyFromRaw, RawVal, valueFromRaw) \
+    typedef ctype##_##X ctype##_##X##_t
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define _c_implement_CHASH(X, ctype, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
                               keyDestroy, RawKey, keyToRaw, keyFromRaw, RawVal, valueFromRaw) \
-    STC_API ctype##_##X \
+    STC_IMP ctype##_##X \
     ctype##_##X##_with_capacity(size_t cap) { \
         ctype##_##X h = ctype##_INIT; \
         ctype##_##X##_reserve(&h, cap); \
         return h; \
     } \
-    STC_API void \
+    STC_IMP void \
     ctype##_##X##_push_n(ctype##_##X* self, const ctype##_##X##_input_t in[], size_t n) { \
         for (size_t i=0; i<n; ++i) CMAP_ONLY_##ctype(ctype##_##X##_put(self, in[i].first, in[i].second)) \
                                    CSET_ONLY_##ctype(ctype##_##X##_insert(self, in[i])) ; \
@@ -337,19 +338,19 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         for (; e != end; ++e) if (*hx++) ctype##_##X##_entry_del(e); \
     } \
 \
-    STC_API void ctype##_##X##_del(ctype##_##X* self) { \
+    STC_IMP void ctype##_##X##_del(ctype##_##X* self) { \
         ctype##_##X##_wipe_(self); \
         c_free(self->_hashx); \
         c_free(self->table); \
     } \
 \
-    STC_API void ctype##_##X##_clear(ctype##_##X* self) { \
+    STC_IMP void ctype##_##X##_clear(ctype##_##X* self) { \
         ctype##_##X##_wipe_(self); \
         self->size = 0; \
         memset(self->_hashx, 0, self->bucket_count); \
     } \
 \
-    STC_API ctype##_bucket_t \
+    STC_IMP ctype##_bucket_t \
     ctype##_##X##_bucket(const ctype##_##X* self, const ctype##_##X##_rawkey_t* rawKeyPtr) { \
         uint32_t sx, hash = keyHashRaw(rawKeyPtr, sizeof(ctype##_##X##_rawkey_t)); \
         size_t cap = self->bucket_count; \
@@ -365,7 +366,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         return b; \
     } \
 \
-    STC_API ctype##_##X##_value_t* \
+    STC_IMP ctype##_##X##_value_t* \
     ctype##_##X##_find(const ctype##_##X* self, RawKey rawKey) { \
         if (self->size == 0) return NULL; \
         ctype##_bucket_t b = ctype##_##X##_bucket(self, &rawKey); \
@@ -376,12 +377,12 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         if (self->size + 1 >= self->bucket_count * self->max_load_factor) \
             ctype##_##X##_reserve(self, 5 + self->size * 3 / 2); \
     } \
-    STC_API bool \
+    STC_IMP bool \
     ctype##_##X##_contains(const ctype##_##X* self, RawKey rawKey) { \
         return self->size && self->_hashx[ctype##_##X##_bucket(self, &rawKey).idx]; \
     } \
 \
-    STC_API ctype##_##X##_result_t \
+    STC_IMP ctype##_##X##_result_t \
     ctype##_##X##_insert_key_(ctype##_##X* self, RawKey rawKey) { \
         ctype##_##X##_reserve_expand(self); \
         ctype##_bucket_t b = ctype##_##X##_bucket(self, &rawKey); \
@@ -394,7 +395,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         return res; \
     } \
 \
-    STC_API void \
+    STC_IMP void \
     ctype##_##X##_reserve(ctype##_##X* self, size_t newcap) { \
         size_t oldcap = self->bucket_count; \
         if (self->size > newcap) return; \
@@ -420,7 +421,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         c_free(tmp.table); \
     } \
 \
-    STC_API void \
+    STC_IMP void \
     ctype##_##X##_erase_entry(ctype##_##X* self, ctype##_##X##_value_t* val) { \
         size_t i = chash_entry_index(*self, val), j = i, k, cap = self->bucket_count; \
         ctype##_##X##_value_t* slot = self->table; \
@@ -437,19 +438,17 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         } while (true); \
         hashx[i] = 0; \
         --self->size; \
-    } \
-\
-    typedef ctype##_##X ctype##_##X##_t
+    }
 
 /* https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/ */
 
-STC_API uint32_t c_default_hash16(const void *data, size_t len) {
+STC_IMP uint32_t c_default_hash16(const void *data, size_t len) {
     const volatile uint16_t *key = (const uint16_t *) data;
     uint64_t x = *key++ * 0xc613fc15u;
     while (len -= 2) x = (*key++ + x) * 2654435769ull;
     return (uint32_t) x;
 }
-STC_API uint32_t c_default_hash32(const void* data, size_t len) {
+STC_IMP uint32_t c_default_hash32(const void* data, size_t len) {
     const volatile uint32_t *key = (const uint32_t *) data;
     uint64_t x = *key++ * 2654435769ull;
     while (len -= 4) x = (*key++ + x) * 2654435769ull;
@@ -458,7 +457,7 @@ STC_API uint32_t c_default_hash32(const void* data, size_t len) {
 
 #else
 #define _c_implement_CHASH(X, ctype, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
-                              keyDestroy, RawKey, keyToRaw, keyFromRaw)
+                              keyDestroy, RawKey, keyToRaw, keyFromRaw, RawVal, valueFromRaw)
 #endif
 
 #endif

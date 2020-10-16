@@ -33,9 +33,9 @@ typedef struct cstr { char* str; } cstr_t;
 typedef struct { char *val; } cstr_iter_t;
 typedef char cstr_value_t;
 
-static size_t _cstr_nullrep[] = {0, 0, 0};
+STC_APIV size_t _cstr_nullrep[];
+STC_APIV cstr_t cstr_INIT;
 
-static  cstr_t cstr_INIT = {(char* ) &_cstr_nullrep[2]};
 #define cstr_size(s)       ((const size_t *) (s).str)[-2]
 #define cstr_capacity(s)   ((const size_t *) (s).str)[-1]
 #define cstr_empty(s)      (cstr_size(s) == 0)
@@ -215,7 +215,10 @@ STC_INLINE uint32_t cstr_hash_raw(const char* const* spp, size_t ignored) {
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-STC_API size_t
+STC_IMPV size_t _cstr_nullrep[] = {0, 0, 0};
+STC_IMPV cstr_t cstr_INIT = {(char* ) &_cstr_nullrep[2]};
+
+STC_IMP size_t
 cstr_reserve(cstr_t* self, size_t cap) {
     size_t len = cstr_size(*self), oldcap = cstr_capacity(*self);
     if (cap > oldcap) {
@@ -227,7 +230,7 @@ cstr_reserve(cstr_t* self, size_t cap) {
     return oldcap;
 }
 
-STC_API void
+STC_IMP void
 cstr_resize(cstr_t* self, size_t len, char fill) {
     size_t n = cstr_size(*self);
     cstr_reserve(self, len);
@@ -235,7 +238,7 @@ cstr_resize(cstr_t* self, size_t len, char fill) {
     if (len | n) self->str[_cstr_size(*self) = len] = '\0';
 }
 
-STC_API cstr_t
+STC_IMP cstr_t
 cstr_n(const char* str, size_t len) {
     if (len == 0) return cstr_INIT;
     size_t *rep = (size_t *) c_malloc(_cstr_mem(len));
@@ -245,7 +248,7 @@ cstr_n(const char* str, size_t len) {
     return s;
 }
 
-STC_API cstr_t
+STC_IMP cstr_t
 cstr_from_fmt(const char* fmt, ...) {
     #if defined(__clang__)
     #  pragma clang diagnostic push
@@ -274,7 +277,7 @@ cstr_from_fmt(const char* fmt, ...) {
     #endif
 }
 
-STC_API cstr_t*
+STC_IMP cstr_t*
 cstr_assign_n(cstr_t* self, const char* str, size_t len) {
     if (len || cstr_capacity(*self)) {
         cstr_reserve(self, len);
@@ -284,7 +287,7 @@ cstr_assign_n(cstr_t* self, const char* str, size_t len) {
     return self;
 }
 
-STC_API cstr_t*
+STC_IMP cstr_t*
 cstr_append_n(cstr_t* self, const char* str, size_t len) {
     if (len) {
         size_t oldlen = cstr_size(*self), newlen = oldlen + len;
@@ -310,16 +313,16 @@ STC_INLINE void _cstr_internal_move(cstr_t* self, size_t pos1, size_t pos2) {
     self->str[_cstr_size(*self) = newlen] = '\0';
 }
 
-STC_API void
+STC_IMP void
 cstr_replace_n(cstr_t* self, size_t pos, size_t len, const char* str, size_t n) {
-    char buf[_c_max_buffer];
-    char* xstr = (char *) memcpy(n > _c_max_buffer ? c_malloc(n) : buf, str, n);
-    _cstr_internal_move(self, pos + len, pos + n);
-    memcpy(&self->str[pos], xstr, n);
-    if (n > _c_max_buffer) c_free(xstr);
+    c_withbuffer (char, xstr, n) {
+        memcpy(xstr, str, n);
+        _cstr_internal_move(self, pos + len, pos + n);
+        memcpy(&self->str[pos], xstr, n);
+    }
 }
 
-STC_API void
+STC_IMP void
 cstr_erase(cstr_t* self, size_t pos, size_t n) {
     size_t len = cstr_size(*self);
     if (len) {
@@ -328,7 +331,7 @@ cstr_erase(cstr_t* self, size_t pos, size_t n) {
     }
 }
 
-STC_API bool
+STC_IMP bool
 cstr_getdelim(cstr_t *self, int delim, FILE *stream) {
     size_t pos = 0, cap = cstr_capacity(*self);
     for (;;) {
@@ -347,7 +350,7 @@ cstr_getdelim(cstr_t *self, int delim, FILE *stream) {
     }
 }
 
-STC_API char*
+STC_IMP char*
 c_strnstr(const char* x, const char* needle, size_t n) {
     ptrdiff_t sum = 0;
     const char *y = x, *p = needle, *q = needle + n;

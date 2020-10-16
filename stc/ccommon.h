@@ -39,11 +39,16 @@
 
 #if defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #  define STC_API extern
+#  define STC_IMP
+#  define STC_APIV extern
+#  define STC_IMPV
 #else
-#  define STC_API STC_INLINE
+#  define STC_API static inline
+#  define STC_IMP static inline
+#  define STC_APIV static
+#  define STC_IMPV static
 #endif
 
-enum   {_c_max_buffer = 512};
 /* Macro overloading feature support: https://rextester.com/ONP80107 */
 #define _c_CAT( A, B ) A ## B
 #define _c_EXPAND(...) __VA_ARGS__
@@ -94,7 +99,13 @@ enum   {_c_max_buffer = 512};
 #define c_forrange_5(i, type, start, stop, step) \
     for (type i=start, i##_inc_=step, i##_end_=(stop) - (0 < i##_inc_); (i <= i##_end_) == (0 < i##_inc_); i += i##_inc_)
 
+#define c_break_with continue
 #define c_withfile(f, open) for (FILE *f = open; f; fclose(f), f = NULL)
+#define c_withbuffer(type, b, n) c_withbuffer_x(type, b, n, 512)
+#define c_withbuffer_x(type, b, n, BYTES) \
+    for (type __b[((BYTES) - 1) / sizeof(type) + 1], \
+               *b = (n) * sizeof *b > (BYTES) ? c_new_2(type, n) : __b; \
+         b; b != __b ? c_free(b) : (void)0, b = NULL)
 
 #define c_push_items(self, ctype, ...) do { \
     const ctype##_input_t __arr[] = __VA_ARGS__; \

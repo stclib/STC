@@ -138,14 +138,14 @@ STC_API double crand_normal_f64(crand_rng64_t* rng, crand_normal_f64_t* dist);
 #endif
 
 /* PRNG PCG32 https://www.pcg-random.org/download.html */
-STC_API crand_rng32_t crand_rng32_with_seq(uint64_t seed, uint64_t seq) {
+STC_IMP crand_rng32_t crand_rng32_with_seq(uint64_t seed, uint64_t seq) {
     crand_rng32_t rng = {{0u, (seq << 1u) | 1u}}; /* inc must be odd */
     crand_i32(&rng);
     rng.state[0] += seed;
     crand_i32(&rng);
     return rng;
 }
-STC_API uint32_t crand_i32(crand_rng32_t* rng) {
+STC_IMP uint32_t crand_i32(crand_rng32_t* rng) {
     uint64_t old = rng->state[0];
     rng->state[0] = old * 6364136223846793005ull + rng->state[1];
     uint32_t xors = (uint32_t) (((old >> 18u) ^ old) >> 27u);
@@ -158,12 +158,12 @@ STC_API uint32_t crand_i32(crand_rng32_t* rng) {
 /* Even faster than sfc64: updates only 192bit state. Better for parallel processing: */
 /* Guarantees 2^63 unique threads with minimum 2^64 period length ~ 2^160 average period. */
 /* Tested with PractRand to 8 TB output: no issues */
-STC_API crand_rng64_t crand_rng64_with_seq(uint64_t seed, uint64_t seq) {
+STC_IMP crand_rng64_t crand_rng64_with_seq(uint64_t seed, uint64_t seq) {
     crand_rng64_t rng = {{seed, seed, seed, (seq << 1u) | 1u}}; /* increment must be odd */
     for (int i = 0; i < 12; ++i) crand_i64(&rng);
     return rng;
 }
-STC_API uint64_t crand_i64(crand_rng64_t* rng) {
+STC_IMP uint64_t crand_i64(crand_rng64_t* rng) {
     enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
     uint64_t *s = rng->state;
     const uint64_t b = s[1], result = s[0] ^ (s[2] += s[3]|1);
@@ -173,7 +173,7 @@ STC_API uint64_t crand_i64(crand_rng64_t* rng) {
 }
 
 /* Unbiased uniform https://github.com/lemire/fastrange */
-STC_API uint32_t crand_unbiased_i32(crand_rng32_t* rng, crand_uniform_i32_t* dist) {
+STC_IMP uint32_t crand_unbiased_i32(crand_rng32_t* rng, crand_uniform_i32_t* dist) {
     uint32_t r = dist->range;
     uint64_t m = (uint64_t) crand_i32(rng) * r;
     uint32_t l = (uint32_t) m;
@@ -186,7 +186,7 @@ STC_API uint32_t crand_unbiased_i32(crand_rng32_t* rng, crand_uniform_i32_t* dis
 }
 
 /* Marsaglia polar method for gaussian distribution. */
-STC_API double crand_normal_f64(crand_rng64_t* rng, crand_normal_f64_t* dist) {
+STC_IMP double crand_normal_f64(crand_rng64_t* rng, crand_normal_f64_t* dist) {
     double u1, u2, s, m;
     if (dist->has_next) {
         dist->has_next = false;
