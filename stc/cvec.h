@@ -194,27 +194,27 @@
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define _c_implement_cvec_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
 \
-    STC_IMP void \
+    STC_DEF void \
     cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t in[], size_t size) { \
         cvec_##X##_reserve(self, cvec_size(*self) + size); \
         _cvec_size(self) += size; \
         for (size_t i=0; i<size; ++i) self->data[i] = valueFromRaw(in[i]); \
     } \
 \
-    STC_IMP void \
+    STC_DEF void \
     cvec_##X##_clear(cvec_##X* self) { \
         cvec_##X##_value_t* p = self->data; if (p) { \
             for (cvec_##X##_value_t* q = p + _cvec_size(self); p != q; ++p) valueDestroy(p); \
             _cvec_size(self) = 0; \
         } \
     } \
-    STC_IMP void \
+    STC_DEF void \
     cvec_##X##_del(cvec_##X* self) { \
         cvec_##X##_clear(self); \
         if (self->data) c_free(_cvec_alloced(self->data)); \
     } \
 \
-    STC_IMP void \
+    STC_DEF void \
     cvec_##X##_reserve(cvec_##X* self, size_t cap) { \
         size_t len = cvec_size(*self); \
         if (cap >= len) { \
@@ -224,14 +224,14 @@
             rep[1] = cap; \
         } \
     } \
-    STC_IMP void \
+    STC_DEF void \
     cvec_##X##_resize(cvec_##X* self, size_t size, Value null_val) { \
         cvec_##X##_reserve(self, size); \
         for (size_t i=cvec_size(*self); i<size; ++i) self->data[i] = null_val; \
         if (self->data) _cvec_size(self) = size; \
     } \
 \
-    STC_IMP void \
+    STC_DEF void \
     cvec_##X##_push_back(cvec_##X* self, Value value) { \
         size_t len = cvec_size(*self); \
         if (len == cvec_capacity(*self)) \
@@ -239,7 +239,7 @@
         self->data[_cvec_size(self)++] = value; \
     } \
 \
-    STC_IMP cvec_##X##_iter_t \
+    STC_DEF cvec_##X##_iter_t \
     cvec_##X##_insert_range_p(cvec_##X* self, cvec_##X##_value_t* pos, cvec_##X##_value_t* first, cvec_##X##_value_t* finish) { \
         size_t len = finish - first, idx = pos - self->data, size = cvec_size(*self); \
         c_withbuffer (cvec_##X##_value_t, buf, len) { \
@@ -255,7 +255,7 @@
         cvec_##X##_iter_t it = {pos}; return it; \
     } \
 \
-    STC_IMP cvec_##X##_iter_t \
+    STC_DEF cvec_##X##_iter_t \
     cvec_##X##_erase_range_p(cvec_##X* self, cvec_##X##_value_t* first, cvec_##X##_value_t* finish) { \
         intptr_t len = finish - first; \
         if (len > 0) { \
@@ -267,7 +267,7 @@
         cvec_##X##_iter_t it = {first}; return it; \
     } \
 \
-    STC_IMP cvec_##X##_iter_t \
+    STC_DEF cvec_##X##_iter_t \
     cvec_##X##_find_in_range(const cvec_##X* self, cvec_##X##_iter_t first, cvec_##X##_iter_t finish, RawValue rawValue) { \
         for (; first.val != finish.val; cvec_##X##_next(&first)) { \
             RawValue r = valueToRaw(first.val); \
@@ -275,12 +275,12 @@
         } \
         return cvec_##X##_end(self); \
     } \
-    STC_IMP cvec_##X##_iter_t \
+    STC_DEF cvec_##X##_iter_t \
     cvec_##X##_find(const cvec_##X* self, RawValue rawValue) { \
         return cvec_##X##_find_in_range(self, cvec_##X##_begin(self), cvec_##X##_end(self), rawValue); \
     } \
 \
-    STC_IMP int \
+    STC_DEF int \
     cvec_##X##_value_compare(const cvec_##X##_value_t* x, const cvec_##X##_value_t* y) { \
         RawValue rx = valueToRaw(x); \
         RawValue ry = valueToRaw(y); \

@@ -57,7 +57,7 @@
     typedef ctype##_rawvalue_t cpqueue_##X##_rawvalue_t; \
     typedef ctype##_input_t cpqueue_##X##_input_t; \
     STC_INLINE cpqueue_##X \
-    cpqueue_##X##_init() {return ctype##_init();} \
+    cpqueue_##X##_init(void) {return ctype##_init();} \
     STC_INLINE size_t \
     cpqueue_##X##_size(cpqueue_##X pq) {return ctype##_size(pq);} \
     STC_INLINE bool \

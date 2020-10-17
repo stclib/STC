@@ -54,7 +54,7 @@
     typedef ctype##_rawvalue_t cstack_##X##_rawvalue_t; \
     typedef ctype##_input_t cstack_##X##_input_t; \
     STC_INLINE cstack_##X \
-    cstack_##X##_init() {return ctype##_init();} \
+    cstack_##X##_init(void) {return ctype##_init();} \
     STC_INLINE void \
     cstack_##X##_del(cstack_##X* self) {ctype##_del(self);} \
     STC_INLINE size_t \

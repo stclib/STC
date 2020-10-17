@@ -168,7 +168,7 @@ STC_INLINE bool cbitset_itval(cbitset_iter_t it) {
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-STC_IMP void cbitset_resize(cbitset_t* self, size_t size, bool value) {
+STC_DEF void cbitset_resize(cbitset_t* self, size_t size, bool value) {
     size_t new_n = (size + 63) >> 6, osize = self->size, old_n = (osize + 63) >> 6;
     self->_arr = (uint64_t *) c_realloc(self->_arr, new_n * 8);
     self->size = size;
@@ -181,28 +181,28 @@ STC_IMP void cbitset_resize(cbitset_t* self, size_t size, bool value) {
     }
 }
 
-STC_IMP cbitset_t cbitset_with_size(size_t size, bool value) {
+STC_DEF cbitset_t cbitset_with_size(size_t size, bool value) {
     cbitset_t set = {(uint64_t *) c_malloc(((size + 63) >> 6) * 8), size};
     cbitset_set_all(&set, value);
     return set;
 }
-STC_IMP cbitset_t cbitset_from_str(const char* str) {
+STC_DEF cbitset_t cbitset_from_str(const char* str) {
     const char* p = str; while (*p) ++p;
     cbitset_t set = cbitset_with_size(p - str, false);
     for (size_t i=0; i<set.size; ++i) if (str[i] == '1') cbitset_set(&set, i);
     return set;
 }
-STC_IMP cstr_t cbitset_to_str(cbitset_t set) {
+STC_DEF cstr_t cbitset_to_str(cbitset_t set) {
     cstr_t out = cstr_with_size(set.size, '0');
     for (size_t i=0; i<set.size; ++i) if (cbitset_test(set, i)) out.str[i] = '1';
     return out;
 }
-STC_IMP cbitset_t cbitset_clone(cbitset_t other) {
+STC_DEF cbitset_t cbitset_clone(cbitset_t other) {
     size_t bytes = ((other.size + 63) >> 6) * 8;
     cbitset_t set = {(uint64_t *) memcpy(c_malloc(bytes), other._arr, bytes), other.size};
     return set;
 }
-STC_IMP size_t cbitset_count(cbitset_t s) {
+STC_DEF size_t cbitset_count(cbitset_t s) {
     size_t count = 0, n = ((s.size + 63) >> 6) - 1;
     if (s.size > 0) {
         for (size_t i=0; i<n; ++i) count += cpopcount64(s._arr[i]);
@@ -221,9 +221,9 @@ STC_IMP size_t cbitset_count(cbitset_t s) {
     uint64_t m = (1ull << (s.size & 63)) - 1, last = s._arr[n] & m; \
     return (last OPR (other._arr[n] & m)) == last
 
-STC_IMP bool cbitset_is_disjoint(cbitset_t s, cbitset_t other) { _cbitset_SETOP(^); }
-STC_IMP bool cbitset_is_subset(cbitset_t s, cbitset_t other) { _cbitset_SETOP(|); }
-STC_IMP bool cbitset_is_superset(cbitset_t s, cbitset_t other) { _cbitset_SETOP(&); }
+STC_DEF bool cbitset_is_disjoint(cbitset_t s, cbitset_t other) { _cbitset_SETOP(^); }
+STC_DEF bool cbitset_is_subset(cbitset_t s, cbitset_t other) { _cbitset_SETOP(|); }
+STC_DEF bool cbitset_is_superset(cbitset_t s, cbitset_t other) { _cbitset_SETOP(&); }
 
 #endif
 #endif

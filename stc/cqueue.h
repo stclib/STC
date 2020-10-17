@@ -65,7 +65,7 @@
     typedef ctype##_rawvalue_t cqueue_##X##_rawvalue_t; \
     typedef ctype##_input_t cqueue_##X##_input_t; \
     STC_INLINE cqueue_##X \
-    cqueue_##X##_init() {return ctype##_init();} \
+    cqueue_##X##_init(void) {return ctype##_init();} \
     STC_INLINE void \
     cqueue_##X##_del(cqueue_##X* self) {ctype##_del(self);} \
     STC_INLINE size_t \

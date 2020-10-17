@@ -441,7 +441,7 @@ using_carray(f, float);
 
 int main()
 {
-    carray3f a3 = carray3f_make(30, 20, 10, 0.0f);  // define a3[30][20][10], init with 0.0f.
+    carray3f a3 = carray3f_init(30, 20, 10, 0.0f);  // define a3[30][20][10], init with 0.0f.
     *carray3f_at(&a3, 5, 4, 3) = 3.14f;         // a3[5][4][3] = 3.14
 
     carray1f a1 = carray3f_at2(&a3, 5, 4);      // sub-array a3[5][4] (no data copy).
