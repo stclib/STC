@@ -115,11 +115,10 @@ _cfmt_printf(int s, const char* fmt, ...) {
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
 #include <stdarg.h>
-#include <string.h>
 
 STC_DEF char *
 _cfmt_conv(const char *fmt, ...) {
-    char *fmt2 = strcpy((char *) malloc(strlen(fmt) * 2), fmt), *p = fmt2, *f, ch;
+    char *fmt2 = strcpy((char *) malloc(strlen(fmt)*2 + 1), fmt), *p = fmt2, *f, ch;
     va_list args;
     va_start(args, fmt);
     do {
