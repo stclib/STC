@@ -23,11 +23,11 @@
 #ifndef CSTR__H__
 #define CSTR__H__
 
+#include "ccommon.h"
 #include <stdlib.h> /* malloc */
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h> /* vsnprintf */
-#include "ccommon.h"
 
 typedef struct cstr { char* str; } cstr_t;
 typedef struct { char *val; } cstr_iter_t;
@@ -44,6 +44,8 @@ STC_API cstr_t
 cstr_from_n(const char* str, size_t len);
 STC_API cstr_t
 cstr_from_fmt(const char* fmt, ...);
+STC_API void
+cstr_fmt(cstr_t* self, const char* fmt, ...);
 STC_API size_t
 cstr_reserve(cstr_t* self, size_t cap);
 STC_API void
@@ -242,40 +244,54 @@ STC_DEF cstr_t
 cstr_from_n(const char* str, size_t len) {
     if (len == 0) return cstr_init();
     size_t *rep = (size_t *) c_malloc(_cstr_mem(len));
-    cstr_t s = {(char *) memcpy(rep + 2, str, len)};
+    cstr_t s = {strncpy((char *)(rep + 2), str, len)};
     s.str[rep[0] = len] = '\0';
     rep[1] = _cstr_cap(len);
     return s;
 }
 
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_MSC_VER)
+#  pragma warning(push)
+#  pragma warning(disable: 4996)
+#endif
+
 STC_DEF cstr_t
 cstr_from_fmt(const char* fmt, ...) {
-    #if defined(__clang__)
-    #  pragma clang diagnostic push
-    #  pragma clang diagnostic ignored "-Wdeprecated-declarations"
-    #elif defined(_MSC_VER)
-    #  pragma warning(push)
-    #  pragma warning(disable: 4996)
-    #endif
-    cstr_t tmp = cstr_init();
+    cstr_t ret = cstr_init();
     va_list args, args2;
     va_start(args, fmt);
     va_copy(args2, args);
     int len = vsnprintf(NULL, (size_t)0, fmt, args);
     va_end(args);
-    if (len > 0) {
-        tmp = cstr_with_capacity(len);
-        vsprintf(tmp.str, fmt, args2);
-        _cstr_size(tmp) = len;
-    }
+    cstr_reserve(&ret, len);
+    vsprintf(ret.str, fmt, args2);
     va_end(args2);
-    return tmp;
-    #if defined(__clang__)
-    #  pragma clang diagnostic pop
-    #elif defined(_MSC_VER)
-    #  pragma warning(pop)
-    #endif
+    _cstr_size(ret) = len;
+    return ret;
 }
+
+STC_DEF void
+cstr_fmt(cstr_t* self, const char* fmt, ...) {
+    va_list args, args2;
+    va_start(args, fmt);
+    va_copy(args2, args);
+    int len = vsnprintf(NULL, (size_t)0, fmt, args);
+    va_end(args);
+    cstr_reserve(self, len);
+    vsprintf(self->str, fmt, args2);
+    va_end(args2);
+    _cstr_size(*self) = len;
+}
+
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined(_MSC_VER)
+#  pragma warning(pop)
+#endif
+
 
 STC_DEF cstr_t*
 cstr_assign_n(cstr_t* self, const char* str, size_t len) {

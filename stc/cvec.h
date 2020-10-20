@@ -23,9 +23,9 @@
 #ifndef CVEC__H__
 #define CVEC__H__
 
+#include "ccommon.h"
 #include <stdlib.h>
 #include <string.h>
-#include "ccommon.h"
 
 #define cvec_INIT           {NULL}
 #define cvec_size(v)       _cvec_safe_size((v).data)
@@ -102,7 +102,7 @@
     } \
 \
     STC_API cvec_##X##_iter_t \
-    cvec_##X##_insert_range_p(cvec_##X* self, cvec_##X##_value_t* pos, cvec_##X##_value_t* pfirst, cvec_##X##_value_t* pfinish); \
+    cvec_##X##_insert_range_p(cvec_##X* self, cvec_##X##_value_t* pos, const cvec_##X##_value_t* pfirst, const cvec_##X##_value_t* pfinish); \
 \
     STC_INLINE cvec_##X##_iter_t \
     cvec_##X##_insert_range(cvec_##X* self, cvec_##X##_iter_t pos, cvec_##X##_iter_t first, cvec_##X##_iter_t finish) { \
@@ -187,7 +187,7 @@
     cvec_##X##_idx(cvec_##X v, cvec_##X##_iter_t it) {return it.val - v.data;} \
 \
     _c_implement_cvec_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
-    typedef cvec_##X cvec_##X##_t    
+    typedef cvec_##X cvec_##X##_t
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
@@ -240,7 +240,7 @@
     } \
 \
     STC_DEF cvec_##X##_iter_t \
-    cvec_##X##_insert_range_p(cvec_##X* self, cvec_##X##_value_t* pos, cvec_##X##_value_t* first, cvec_##X##_value_t* finish) { \
+    cvec_##X##_insert_range_p(cvec_##X* self, cvec_##X##_value_t* pos, const cvec_##X##_value_t* first, const cvec_##X##_value_t* finish) { \
         size_t len = finish - first, idx = pos - self->data, size = cvec_size(*self); \
         c_withbuffer (cvec_##X##_value_t, buf, len) { \
             for (size_t i=0; i<len; ++i, ++first) \

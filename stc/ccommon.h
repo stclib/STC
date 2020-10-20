@@ -23,6 +23,8 @@
 #ifndef CCOMMON__H__
 #define CCOMMON__H__
 
+#define __USE_MINGW_ANSI_STDIO 1
+
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
@@ -52,8 +54,8 @@
 /* Macro overloading feature support: https://rextester.com/ONP80107 */
 #define _c_CAT( A, B ) A ## B
 #define _c_EXPAND(...) __VA_ARGS__
-#define _c_ARG_N(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, N,...) N
-#define _c_RSEQ_N 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+#define _c_ARG_N(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, N,...) N
+#define _c_RSEQ_N 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 #define _c_APPLY_ARG_N(ARGS) _c_EXPAND(_c_ARG_N ARGS)
 #define _c_VA_ARG_SIZE(...) _c_EXPAND(_c_APPLY_ARG_N((__VA_ARGS__, _c_RSEQ_N)))
 #define _c_OVERLOAD_SELECT(NAME, NUM) _c_CAT( NAME ## _, NUM)
@@ -101,7 +103,7 @@
 
 #define c_break_with continue
 #define c_withfile(f, open) for (FILE *f = open; f; fclose(f), f = NULL)
-#define c_withbuffer(type, b, n) c_withbuffer_x(type, b, n, 512)
+#define c_withbuffer(type, b, n) c_withbuffer_x(type, b, n, 256)
 #define c_withbuffer_x(type, b, n, BYTES) \
     for (type __b[((BYTES) - 1) / sizeof(type) + 1], \
                *b = (n) * sizeof *b > (BYTES) ? c_new_2(type, n) : __b; \

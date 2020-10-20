@@ -23,8 +23,8 @@
 #ifndef CLIST__H__
 #define CLIST__H__
 
-#include <stdlib.h>
 #include "ccommon.h"
+#include <stdlib.h>
 
 /*  Circular Singly-linked Lists.
 

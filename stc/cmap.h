@@ -49,9 +49,9 @@ int main(void) {
 #ifndef CMAP__H__
 #define CMAP__H__
 
+#include "ccommon.h"
 #include <stdlib.h>
 #include <string.h>
-#include "ccommon.h"
 
 #define cmap_INIT                     {NULL, NULL, 0, 0, 0.85f, 0.15f}
 #define cmap_empty(m)                 ((m).size == 0)

@@ -143,18 +143,18 @@ _carray3_size(const size_t* zdim) {return zdim[0] * zdim[-1] * zdim[-2];}
     } \
 \
     STC_INLINE carray1##X \
-    carray1##X##_from(Value* array, bool own, size_t xdim) { \
-        carray1##X a = {array, xdim | (own ? _carray_OWN : 0)}; \
+    carray1##X##_from(Value* array, size_t xdim) { \
+        carray1##X a = {array, xdim}; \
         return a; \
     } \
     STC_INLINE carray2##X \
-    carray2##X##_from(Value* array, bool own, size_t ydim, size_t xdim) { \
-        carray2##X a = {array, xdim | (own ? _carray_OWN : 0), ydim}; \
+    carray2##X##_from(Value* array, size_t ydim, size_t xdim) { \
+        carray2##X a = {array, xdim, ydim}; \
         return a; \
     } \
     STC_INLINE carray3##X \
-    carray3##X##_from(Value* array, bool own, size_t zdim, size_t ydim, size_t xdim) { \
-        carray3##X a = {array, xdim | (own ? _carray_OWN : 0), ydim, zdim}; \
+    carray3##X##_from(Value* array, size_t zdim, size_t ydim, size_t xdim) { \
+        carray3##X a = {array, xdim, ydim, zdim}; \
         return a; \
     } \
 \
