@@ -41,9 +41,9 @@ _cfmt_conv(const char *fmt, ...);
     cstr_t *: cstr_fmt)
 
 #if defined(_MSC_VER) && !defined(__clang__)
-#   define _cfmt_uschar() char: "hhd", unsigned char: "hhu"
+#   define _cfmt_uschar() char: "c", unsigned char: "hhu"
 #else
-#   define _cfmt_uschar() char: "hhd", signed char: "hhd", unsigned char: "hhu"
+#   define _cfmt_uschar() char: "c", signed char: "hhd", unsigned char: "hhu"
 #endif
 
 #define _cfmt(x) _Generic ((x), \
