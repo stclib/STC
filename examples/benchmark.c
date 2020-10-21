@@ -1,5 +1,5 @@
 #include <stc/crandom.h>
-#include <stc/cstr.h>
+#include <stc/cfmt.h>
 #include <stc/cmap.h>
 #include "others/khash.h"
 
@@ -151,7 +151,7 @@ int rr = RR;
         erased += M##_ERASE(X, RAND(rr)); \
     } \
     difference = clock() - before; \
-    printf(#M ": time: %5.02f, sum: %zu, erased %zu, size: %zu, buckets: %8zu\n", \
+    c_print(0, #M ": time: {:5.02f}, sum: {}, erased {}, size: {}, buckets: {:8}\n", \
            (float) difference / CLOCKS_PER_SEC, checksum, erased, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
     M##_CLEAR(X); \
 }
@@ -166,7 +166,7 @@ int rr = RR;
     for (size_t i = 0; i < N2; ++i) \
         erased += M##_ERASE(X, i); \
     difference = clock() - before; \
-    printf(#M ": time: %5.02f, erased %zu, size: %zu, buckets: %8zu\n", \
+    c_print(0, #M ": time: {:5.02f}, erased {}, size: {}, buckets: {:8}\n", \
            (float) difference / CLOCKS_PER_SEC, erased, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
     M##_CLEAR(X); \
 }
@@ -183,7 +183,7 @@ int rr = RR;
     for (size_t i = 0; i < N3; ++i) \
         erased += M##_ERASE(X, RAND(rr)); \
     difference = clock() - before; \
-    printf(#M ": time: %5.02f, erased %zu, size: %zu, buckets: %8zu\n", \
+    c_print(0, #M ": time: {:5.02f}, erased {}, size: {}, buckets: {:8}\n", \
            (float) difference / CLOCKS_PER_SEC, erased, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
     M##_CLEAR(X); \
 }
@@ -199,7 +199,7 @@ int rr = RR;
     for (int k=0; k<5; k++) M##_FOR (X, i) \
         sum += M##_ITEM(X, i); \
     difference = clock() - before; \
-    printf(#M ": time: %5.02f, sum %zu, size: %zu, buckets: %8zu\n", \
+    c_print(0, #M ": time: {:5.02f}, sum {}, size: {}, buckets: {:8}\n", \
            (float) difference / CLOCKS_PER_SEC, sum, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
     M##_CLEAR(X); \
 }
@@ -219,16 +219,16 @@ int main(int argc, char* argv[])
 {
     rr = argc == 2 ? atoi(argv[1]) : RR;
     seed = time(NULL);
-    printf("\nRandom keys are in range [0, 2^%d), seed = %zu:\n",  rr, seed);
-    printf("\nUnordered maps: %d repeats of Insert random key + try to remove a random key:\n", N1);
+    c_print(0, "\nRandom keys are in range [0, 2^%d), seed = %zu:\n",  rr, seed);
+    c_print(0, "\nUnordered maps: %d repeats of Insert random key + try to remove a random key:\n", N1);
     RUN_TEST(1)
 
-    printf("\nUnordered maps: Insert %d index keys, then remove them in same order:\n", N2);
+    c_print(0, "\nUnordered maps: Insert %d index keys, then remove them in same order:\n", N2);
     RUN_TEST(2)
 
-    printf("\nUnordered maps: Insert %d random keys, then remove them in same order:\n", N3);
+    c_print(0, "\nUnordered maps: Insert %d random keys, then remove them in same order:\n", N3);
     RUN_TEST(3)
 
-    printf("\nUnordered maps: Iterate %d random keys:\n", N4);
+    c_print(0, "\nUnordered maps: Iterate %d random keys:\n", N4);
     RUNX_TEST(4)
 }
