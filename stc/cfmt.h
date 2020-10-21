@@ -147,6 +147,10 @@ _cfmt_conv(const char *fmt, ...) {
     va_start(args, fmt);
     do {
         switch ((ch = *fmt)) {
+        case '%':
+            if (fmt[1] == '%') *p++ = *fmt++;
+            else va_arg(args, char *);
+            break;
         case '}':
             if (fmt[1] == '}') ++fmt;
             break;
