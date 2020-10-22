@@ -153,6 +153,7 @@ _cfmt_printf(int s, const char* fmt, ...) {
 STC_DEF char *
 _cfmt_conv(int nargs, const char *fmt, ...) {
     char *fmt2 = (char *) malloc(strlen(fmt)*2 + 1), *p = fmt2, *f, ch;
+    const char *fmt0 = fmt;
     int n = 0;
     va_list args;
     va_start(args, fmt);
@@ -162,7 +163,7 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
             *p++ = *fmt++;
             if (*fmt == '%') break;
             if (++n > nargs) {
-                fprintf(stderr, "error: c_printf(): missing argument\n");
+                fprintf(stderr, "ERROR: c_printf() missing argument(%d): %s\n", n, fmt0);
                 break;
             }
             f = va_arg(args, char *);
@@ -181,7 +182,7 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
             if (fmt[1] == '{') { ++fmt; break; }
             if (fmt[1] == ':' || fmt[1] == '}') {
                 if (++n > nargs) {
-                    fprintf(stderr, "error: c_printf(): missing argument\n");
+                    fprintf(stderr, "ERROR: c_printf() missing argument(%d): %s\n", n, fmt0);
                     break;
                 }
                 *p++ = '%';
@@ -200,7 +201,7 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
     } while (ch);
     va_end(args);
     if (n < nargs)
-        fprintf(stderr, "warning: c_printf(): superfluous argument(s)\n");
+        fprintf(stderr, "WARNING: c_printf() %d superfluous argument(s): %s\n", nargs - n, fmt0);
     return fmt2;
 }
 
