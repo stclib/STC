@@ -162,7 +162,7 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
             *p++ = *fmt++;
             if (*fmt == '%') break;
             if (++n > nargs) {
-                if (n-1 == nargs) fprintf(stderr, "error: c_printf(): missing argument(s)\n");
+                fprintf(stderr, "error: c_printf(): missing argument\n");
                 break;
             }
             f = va_arg(args, char *);
@@ -181,7 +181,7 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
             if (fmt[1] == '{') { ++fmt; break; }
             if (fmt[1] == ':' || fmt[1] == '}') {
                 if (++n > nargs) {
-                    if (n-1 == nargs) fprintf(stdout, "error: c_printf(): missing argument(s)\n");
+                    fprintf(stderr, "error: c_printf(): missing argument\n");
                     break;
                 }
                 *p++ = '%';
