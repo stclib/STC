@@ -201,7 +201,6 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
     va_end(args);
     if (n < nargs)
         fprintf(stderr, "warning: c_printf(): superfluous argument(s)\n");
-    printf("fmt(%d, %d): %s", n, nargs, fmt2);
     return fmt2;
 }
 
