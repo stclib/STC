@@ -173,8 +173,7 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
                 ++fmt; 
                 while (*f) *p++ = *f++;
             }
-            ch = *fmt;
-            break;
+            continue;
         case '}':
             if (fmt[1] == '}') ++fmt;
             break;
@@ -192,8 +191,7 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
                 if (!strchr("csdioxXufFeEaAgGnp", fmt[-1]))
                     while (*f) *p++ = *f++;
                 fmt += (*fmt == '}');
-                ch = *fmt;
-                break;
+                continue;
             }
             break;
         }
