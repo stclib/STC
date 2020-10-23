@@ -47,6 +47,7 @@ _cfmt_conv(int nargs, const char *fmt, ...);
 #endif
 
 #define _cfmt(x) _Generic ((x), \
+    _Bool: "d:bool", \
     _cfmt_uschar(), \
     short: "hd", \
     unsigned short: "hu", \
@@ -145,14 +146,14 @@ _cfmt_conv(int nargs, const char *fmt, ...);
 STC_DEF void
 _cfmt_printf(int s, const char* fmt, ...) {
     va_list args;
-	va_start(args, fmt);
+    va_start(args, fmt);
     vfprintf(s ? stderr : stdout, fmt, args);
     va_end(args);
 }
 
 STC_DEF char *
 _cfmt_conv(int nargs, const char *fmt, ...) {
-    char *fmt2 = (char *) malloc(strlen(fmt)*2 + 1), *p = fmt2, *f, ch;
+    char *fmt1 = (char *) malloc(strlen(fmt)*2 + 1), *p = fmt1, *f, ch;
     const char *fmt0 = fmt;
     int n = 0;
     va_list args;
@@ -160,47 +161,36 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
     do {
         switch ((ch = *fmt)) {
         case '%':
-            *p++ = *fmt++;
-            if (*fmt == '%') break;
-            if (++n > nargs) {
-                fprintf(stderr, "ERROR: c_printf() missing argument(%d): %s\n", n, fmt0);
-                break;
-            }
-            f = va_arg(args, char *);
-            while (*fmt && !strchr("csdioxXufFeEaAgGnpt", *fmt))
-                *p++ = *fmt++;
-            if (*fmt == 't') {
-                ++fmt; 
-                while (*f) *p++ = *f++;
-            }
-            continue;
+            if (fmt[1] == '%') *p++ = *fmt++;
+            else fprintf(stderr, "ERROR: c_printf() illegal unescaped %%: %s\n", fmt0);
+            break;
         case '}':
             if (fmt[1] == '}') ++fmt;
             break;
         case '{':
             if (fmt[1] == '{') { ++fmt; break; }
-            if (fmt[1] == ':' || fmt[1] == '}') {
-                if (++n > nargs) {
-                    fprintf(stderr, "ERROR: c_printf() missing argument(%d): %s\n", n, fmt0);
-                    break;
-                }
-                *p++ = '%';
-                fmt += 1 + (fmt[1] == ':');
-                while (*fmt != '}' && *fmt) *p++ = *fmt++;
-                f = va_arg(args, char *);
-                if (!strchr("csdioxXufFeEaAgGnp", fmt[-1]))
-                    while (*f) *p++ = *f++;
-                fmt += (*fmt == '}');
-                continue;
+            if (fmt[1] != ':' && fmt[1] != '}') break;
+            if (++n > nargs) {
+                fprintf(stderr, "ERROR: c_printf() missing argument(%d): %s\n", n, fmt0);
+                break;
             }
-            break;
+            *p++ = '%';
+            fmt += 1 + (fmt[1] == ':');
+            f = va_arg(args, char *);
+            while (*fmt != '}' && *fmt)
+                if ((*p++ = *fmt++) == '*' && ++n <= nargs)
+                    f = va_arg(args, char *);
+            if (!strchr("csdioxXufFeEaAgGnp", fmt[-1]))
+                while (*f) *p++ = *f++;
+            fmt += (*fmt == '}');
+            continue;
         }
         *p++ = *fmt++;
     } while (ch);
     va_end(args);
     if (n < nargs)
         fprintf(stderr, "WARNING: c_printf() %d superfluous argument(s): %s\n", nargs - n, fmt0);
-    return fmt2;
+    return fmt1;
 }
 
 #endif
