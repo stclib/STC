@@ -28,10 +28,8 @@
 // https://gist.github.com/alexameen/6550d892338626964a870e408d1e8912
 // https://gist.github.com/alexameen/4440e4bcad557a464dcc9ff884763049
 
-STC_API void
-_cfmt_printf(int s, const char* fmt, ...);
-STC_API char *
-_cfmt_conv(int nargs, const char *fmt, ...);
+STC_API void _cfmt_printf(int s, const char* fmt, ...);
+STC_API char* _cfmt_conv(int nargs, const char *fmt, ...);
 enum {_cfmt_bn=4, _cfmt_sn=64};
 STC_INLINE const char* _cfmt_strftime(char* n, char buf[][_cfmt_sn], size_t maxsize, const char *fmt, const struct tm *timeptr) {
     if (*n >= _cfmt_bn) return fmt;
@@ -171,8 +169,7 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
     do {
         switch ((ch = *fmt)) {
         case '%':
-            if (fmt[1] == '%') *p++ = *fmt++;
-            else fprintf(stderr, "ERROR: c_printf() illegal unescaped %%: %s\n", fmt0);
+            *p++ = '%';
             break;
         case '}':
             if (fmt[1] == '}') ++fmt;
