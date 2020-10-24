@@ -34,13 +34,14 @@ int main() {
     time_t rawtime = time(NULL);
     struct tm* tm = localtime(&rawtime);
     unsigned char r = 123, g = 214, b = 90, w = 110;
-    c_printf(0, "Date: {} {}\n", c_timef("%Y-%m-%d %X %Z", tm), test);
-    c_printf(0, "Color: ({} {} {}), {}\n", r, g, b, flag);
-    c_printf(0, "{:10}, {:10}, {:.2f}\n", 42, 43, 3.141592267);
-    c_printf(stdout, "{:10} {:10} {:10}\n", z, z, w);
-    c_printf(stderr, "100%: {} {:.*} {}\n", string.str, 4, pi, x);
-    c_printf(&string, "Precision: {} {:.16} {}", string.str, pi, x);
-    c_printf(0, "{}\nvector: ({}, {}, {})\n", string.str, 3.2, 3.3, 4.2/3.2);
+    c_print(0, "Date: {} {}\n", c_ftime("%Y-%m-%d %X %Z", tm), test);
+    c_print(0, "Color: ({} {} {}), {}\n", r, g, b, flag);
+    c_print(0, "{:10}, {:10}, {:.2f}\n", 42, 43, 3.141592267);
+    c_print(stdout, "{:10} {:10} {:10}\n", z, z, w);
+    c_print(stderr, "100%: {} {:.*} {}\n", string.str, 4, pi, x);
+    c_print(&string, "Precision: {} {:.16} {}", string.str, pi, x);
+    c_print(0, "{}\nvector: ({}, {}, {})\n", string.str, 3.2, 3.3, 4.2/3.2);
+    cstr_del(&string);
 }
 */
 #ifndef CFMT__H__
@@ -89,7 +90,7 @@ STC_INLINE const char* _cfmt_strftime(char* n, char buf[][_cfmt_sn], size_t maxs
     void *: "p", \
     const char *: "s", \
     const void *: "p")
-#else
+#else /* c++ */
     inline auto _cfmt_fn(FILE*) {return fprintf;}
     inline auto _cfmt_fn(char*) {return sprintf;}
     inline auto _cfmt_fn(int s) {return _cfmt_printf;}
@@ -112,60 +113,60 @@ STC_INLINE const char* _cfmt_strftime(char* n, char buf[][_cfmt_sn], size_t maxs
     inline auto _cfmt(const void *x) {return "p";}
 #endif
 
-/* Only for argument to c_printf. Max 4 uses per c_printf() statement. Buffer = 64 chars. */
-#define c_timef(fmt, timeptr) _cfmt_strftime(&_tn, _tm, sizeof _tm[0], fmt, timeptr)
+/* Only for argument to c_print. Max 4 uses per c_print() statement. Buffer = 64 chars. */
+#define c_ftime(fmt, timeptr) _cfmt_strftime(&_tn, _tm, sizeof _tm[0], fmt, timeptr)
 
 /* Primary function. */
-#define c_printf(...) c_MACRO_OVERLOAD(c_printf, __VA_ARGS__)
-#define c_printf_2(to, fmt) \
+#define c_print(...) c_MACRO_OVERLOAD(c_print, __VA_ARGS__)
+#define c_print_2(to, fmt) \
     do { char *_fm = _cfmt_conv(0, fmt); \
         _cfmt_fn(to)(to, _fm); free(_fm); } while (0)
-#define c_printf_3(to, fmt, c) \
+#define c_print_3(to, fmt, c) \
     do { char _tm[1][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(1, fmt, _cfmt(c)); \
         _cfmt_fn(to)(to, _fm, c); free(_fm); } while (0)
-#define c_printf_4(to, fmt, c, d) \
+#define c_print_4(to, fmt, c, d) \
     do { char _tm[2][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(2, fmt, _cfmt(c), _cfmt(d)); \
         _cfmt_fn(to)(to, _fm, c, d); free(_fm); } while (0)
-#define c_printf_5(to, fmt, c, d, e) \
+#define c_print_5(to, fmt, c, d, e) \
     do { char _tm[3][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(3, fmt, _cfmt(c), _cfmt(d), _cfmt(e)); \
         _cfmt_fn(to)(to, _fm, c, d, e); free(_fm); } while (0)
-#define c_printf_6(to, fmt, c, d, e, f) \
+#define c_print_6(to, fmt, c, d, e, f) \
     do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(4, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f); free(_fm); } while (0)
-#define c_printf_7(to, fmt, c, d, e, f, g) \
+#define c_print_7(to, fmt, c, d, e, f, g) \
     do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(5, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g); free(_fm); } while (0)
-#define c_printf_8(to, fmt, c, d, e, f, g, h) \
+#define c_print_8(to, fmt, c, d, e, f, g, h) \
     do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(6, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h); free(_fm); } while (0)
-#define c_printf_9(to, fmt, c, d, e, f, g, h, i) \
+#define c_print_9(to, fmt, c, d, e, f, g, h, i) \
     do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(7, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i); free(_fm); } while (0)
-#define c_printf_10(to, fmt, c, d, e, f, g, h, i, j) \
+#define c_print_10(to, fmt, c, d, e, f, g, h, i, j) \
     do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(8, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i, j); free(_fm); } while (0)
-#define c_printf_11(to, fmt, c, d, e, f, g, h, i, j, k) \
+#define c_print_11(to, fmt, c, d, e, f, g, h, i, j, k) \
     do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(9, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i, j, k); free(_fm); } while (0)
-#define c_printf_12(to, fmt, c, d, e, f, g, h, i, j, k, m) \
+#define c_print_12(to, fmt, c, d, e, f, g, h, i, j, k, m) \
     do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(10, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i, j, k, m); free(_fm); } while (0)
-#define c_printf_13(to, fmt, c, d, e, f, g, h, i, j, k, m, n) \
+#define c_print_13(to, fmt, c, d, e, f, g, h, i, j, k, m, n) \
     do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(11, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m), _cfmt(n)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i, j, k, m, n); free(_fm); } while (0)
-#define c_printf_14(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o) \
+#define c_print_14(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o) \
     do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(12, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m), _cfmt(n), _cfmt(o)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i, j, k, m, n, o); free(_fm); } while (0)
-#define c_printf_15(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o, p) \
+#define c_print_15(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o, p) \
     do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(13, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m), _cfmt(n), _cfmt(o), _cfmt(p)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i, j, k, m, n, o, p); free(_fm); } while (0)
-#define c_printf_16(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o, p, q) \
+#define c_print_16(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o, p, q) \
     do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(14, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m), _cfmt(n), _cfmt(o), _cfmt(p), _cfmt(p)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i, j, k, m, n, o, p, q); free(_fm); } while (0)
-#define c_printf_17(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o, p, q, r) \
+#define c_print_17(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o, p, q, r) \
     do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(15, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m), _cfmt(n), _cfmt(o), _cfmt(p), _cfmt(p), _cfmt(r)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i, j, k, m, n, o, p, q, r); free(_fm); } while (0)
-#define c_printf_18(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o, p, q, r, s) \
+#define c_print_18(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o, p, q, r, s) \
     do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(16, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m), _cfmt(n), _cfmt(o), _cfmt(p), _cfmt(p), _cfmt(r), _cfmt(s)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i, j, k, m, n, o, p, q, r, s); free(_fm); } while (0)
 
@@ -200,7 +201,7 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
             if (fmt[1] == '{') { ++fmt; break; }
             if (fmt[1] != ':' && fmt[1] != '}') break;
             if (++n > nargs) {
-                fprintf(stderr, "ERROR: c_printf() missing argument(%d): %s\n", n, fmt0);
+                fprintf(stderr, "ERROR: c_print() missing argument(%d): %s\n", n, fmt0);
                 break;
             }
             *p++ = '%';
@@ -218,7 +219,7 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
     } while (ch);
     va_end(args);
     if (n < nargs)
-        fprintf(stderr, "WARNING: c_printf() %d superfluous argument(s): %s\n", nargs - n, fmt0);
+        fprintf(stderr, "WARNING: c_print() %d superfluous argument(s): %s\n", nargs - n, fmt0);
     return fmt1;
 }
 

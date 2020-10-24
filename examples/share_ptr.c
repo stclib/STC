@@ -11,7 +11,7 @@ Person* Person_make(Person* p, const char* name, const char* last) {
     return p;
 }
 void Person_del(Person* p) {
-    c_printf(0, "del: {}\n", p->name.str);
+    c_print(0, "del: {}\n", p->name.str);
     c_del(cstr, &p->name, &p->last);
 }
 int Person_compare(const Person* p, const Person* q) {
@@ -40,7 +40,7 @@ int main() {
         cvec_pe_push_back(&vec, csptr_pe_share(p)); // Don't forget to share!
     }
     c_foreach (i, clist_pe, queue)
-        c_printf(0, " {}\n", i.val->get->name.str);
+        c_print(0, " {}\n", i.val->get->name.str);
 
     puts("Sort and pop 3:");
     clist_pe_sort(&queue);
@@ -52,18 +52,18 @@ int main() {
 
     puts("Sorted queue:");
     c_foreach (i, clist_pe, queue)
-        c_printf(0, " {}\n", i.val->get->name.str);
+        c_print(0, " {}\n", i.val->get->name.str);
     puts("Sorted vec:");
     c_foreach (i, cvec_pe, vec)
-        c_printf(0, " {}\n", i.val->get->name.str);
+        c_print(0, " {}\n", i.val->get->name.str);
 
     Person lost; Person_make(&lost, "Name 5", "Last 5");
     csptr_pe ptmp = {&lost, NULL}; // share pointer without counter - OK.
     clist_pe_iter_t lit = clist_pe_find(&queue, ptmp);
     Person_del(&lost);
-    if (lit.val) c_printf(0, "Found: {}\n", lit.val->get->name.str);
+    if (lit.val) c_print(0, "Found: {}\n", lit.val->get->name.str);
 
-    c_printf(0, "use {}\n", *joe.use_count);
+    c_print(0, "use {}\n", *joe.use_count);
     csptr_pe_del(&joe);
 
     puts("Destroy queue:");
