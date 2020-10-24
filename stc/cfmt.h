@@ -20,13 +20,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+/*
+// https://gist.github.com/alexameen/4440e4bcad557a464dcc9ff884763049
+#include <time.h>
+#include <stc/cfmt.h>
+
+int main() {
+    const double pi = 3.141592653589793;
+    const size_t x = 1234567890;
+    cstr_t string = cstr_from("Hello world");
+    const char z = 'z', *test = "TEST";
+    bool flag = true;
+    time_t rawtime = time(NULL);
+    struct tm* tm = localtime(&rawtime);
+    unsigned char r = 123, g = 214, b = 90, w = 110;
+    c_printf(0, "Date: {} {}\n", c_timef("%Y-%m-%d %X %Z", tm), test);
+    c_printf(0, "Color: ({} {} {}), {}\n", r, g, b, flag);
+    c_printf(0, "{:10}, {:10}, {:.2f}\n", 42, 43, 3.141592267);
+    c_printf(stdout, "{:10} {:10} {:10}\n", z, z, w);
+    c_printf(stderr, "100%: {} {:.*} {}\n", string.str, 4, pi, x);
+    c_printf(&string, "Precision: {} {:.16} {}", string.str, pi, x);
+    c_printf(0, "{}\nvector: ({}, {}, {})\n", string.str, 3.2, 3.3, 4.2/3.2);
+}
+*/
 #ifndef CFMT__H__
 #define CFMT__H__
 
 #include <stc/cstr.h>
-
-// https://gist.github.com/alexameen/6550d892338626964a870e408d1e8912
-// https://gist.github.com/alexameen/4440e4bcad557a464dcc9ff884763049
 
 STC_API void _cfmt_printf(int s, const char* fmt, ...);
 STC_API char* _cfmt_conv(int nargs, const char *fmt, ...);
@@ -92,8 +112,10 @@ STC_INLINE const char* _cfmt_strftime(char* n, char buf[][_cfmt_sn], size_t maxs
     inline auto _cfmt(const void *x) {return "p";}
 #endif
 
+/* Only for argument to c_printf. Max 4 uses per c_printf() statement. Buffer = 64 chars. */
 #define c_timef(fmt, timeptr) _cfmt_strftime(&_tn, _tm, sizeof _tm[0], fmt, timeptr)
 
+/* Primary function. */
 #define c_printf(...) c_MACRO_OVERLOAD(c_printf, __VA_ARGS__)
 #define c_printf_2(to, fmt) \
     do { char *_fm = _cfmt_conv(0, fmt); \
