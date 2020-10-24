@@ -33,7 +33,7 @@ STC_API char* _cfmt_conv(int nargs, const char *fmt, ...);
 enum {_cfmt_bn=4, _cfmt_sn=64};
 STC_INLINE const char* _cfmt_strftime(char* n, char buf[][_cfmt_sn], size_t maxsize, const char *fmt, const struct tm *timeptr) {
     if (*n >= _cfmt_bn) return fmt;
-    int k = (*n)++;
+    int k = (*n)++; buf[k][0] = '\0';
     strftime(buf[k], maxsize, fmt, timeptr);
     return buf[k];
 }
