@@ -34,13 +34,13 @@ int main() {
     time_t rawtime = time(NULL);
     struct tm* tm = localtime(&rawtime);
     unsigned char r = 123, g = 214, b = 90, w = 110;
-    c_print(0, "Date: {} {}\n", c_ftime("%Y-%m-%d %X %Z", tm), test);
-    c_print(0, "Color: ({} {} {}), {}\n", r, g, b, flag);
-    c_print(0, "{:10}, {:10}, {:.2f}\n", 42, 43, 3.141592267);
+    c_print(1, "Date: {} {}\n", c_ftime("%Y-%m-%d %X %Z", tm), test);
+    c_print(1, "Color: ({} {} {}), {}\n", r, g, b, flag);
+    c_print(1, "{:10}, {:10}, {:.2f}\n", 42, 43, 3.141592267);
     c_print(stdout, "{:10} {:10} {:10}\n", z, z, w);
     c_print(stderr, "100%: {} {:.*} {}\n", string.str, 4, pi, x);
     c_print(&string, "Precision: {} {:.16} {}", string.str, pi, x);
-    c_print(0, "{}\nvector: ({}, {}, {})\n", string.str, 3.2, 3.3, 4.2/3.2);
+    c_print(1, "{}\nvector: ({}, {}, {})\n", string.str, 3.2, 3.3, 4.2/3.2);
     cstr_del(&string);
 }
 */
@@ -178,7 +178,7 @@ STC_DEF void
 _cfmt_printf(int s, const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    vfprintf(s ? stderr : stdout, fmt, args);
+    vfprintf(s == 1 ? stdout : stderr, fmt, args);
     va_end(args);
 }
 

@@ -151,7 +151,7 @@ int rr = RR;
         erased += M##_ERASE(X, RAND(rr)); \
     } \
     difference = clock() - before; \
-    c_print(0, #M ": time: {:5.02f}, sum: {}, erased {}, size: {}, buckets: {:8}\n", \
+    c_print(1, #M ": time: {:5.02f}, sum: {}, erased {}, size: {}, buckets: {:8}\n", \
            (float) difference / CLOCKS_PER_SEC, checksum, erased, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
     M##_CLEAR(X); \
 }
@@ -166,7 +166,7 @@ int rr = RR;
     for (size_t i = 0; i < N2; ++i) \
         erased += M##_ERASE(X, i); \
     difference = clock() - before; \
-    c_print(0, #M ": time: {:5.02f}, erased {}, size: {}, buckets: {:8}\n", \
+    c_print(1, #M ": time: {:5.02f}, erased {}, size: {}, buckets: {:8}\n", \
            (float) difference / CLOCKS_PER_SEC, erased, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
     M##_CLEAR(X); \
 }
@@ -183,7 +183,7 @@ int rr = RR;
     for (size_t i = 0; i < N3; ++i) \
         erased += M##_ERASE(X, RAND(rr)); \
     difference = clock() - before; \
-    c_print(0, #M ": time: {:5.02f}, erased {}, size: {}, buckets: {:8}\n", \
+    c_print(1, #M ": time: {:5.02f}, erased {}, size: {}, buckets: {:8}\n", \
            (float) difference / CLOCKS_PER_SEC, erased, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
     M##_CLEAR(X); \
 }
@@ -199,7 +199,7 @@ int rr = RR;
     for (int k=0; k<5; k++) M##_FOR (X, i) \
         sum += M##_ITEM(X, i); \
     difference = clock() - before; \
-    c_print(0, #M ": time: {:5.02f}, sum {}, size: {}, buckets: {:8}\n", \
+    c_print(1, #M ": time: {:5.02f}, sum {}, size: {}, buckets: {:8}\n", \
            (float) difference / CLOCKS_PER_SEC, sum, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
     M##_CLEAR(X); \
 }
@@ -219,16 +219,16 @@ int main(int argc, char* argv[])
 {
     rr = argc == 2 ? atoi(argv[1]) : RR;
     seed = time(NULL);
-    c_print(0, "\nRandom keys are in range [0, 2^{}), seed = {}:\n",  rr, seed);
-    c_print(0, "\nUnordered maps: {} repeats of Insert random key + try to remove a random key:\n", N1);
+    c_print(1, "\nRandom keys are in range [0, 2^{}), seed = {}:\n",  rr, seed);
+    c_print(1, "\nUnordered maps: {} repeats of Insert random key + try to remove a random key:\n", N1);
     RUN_TEST(1)
 
-    c_print(0, "\nUnordered maps: Insert {} index keys, then remove them in same order:\n", N2);
+    c_print(1, "\nUnordered maps: Insert {} index keys, then remove them in same order:\n", N2);
     RUN_TEST(2)
 
-    c_print(0, "\nUnordered maps: Insert {} random keys, then remove them in same order:\n", N3);
+    c_print(1, "\nUnordered maps: Insert {} random keys, then remove them in same order:\n", N3);
     RUN_TEST(3)
 
-    c_print(0, "\nUnordered maps: Iterate {} random keys:\n", N4);
+    c_print(1, "\nUnordered maps: Iterate {} random keys:\n", N4);
     RUNX_TEST(4)
 }

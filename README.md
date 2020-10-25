@@ -35,7 +35,7 @@ int main(void) {
     cvec_i_push_back(&vec, 2);
 
     c_foreach (i, cvec_i, vec)
-        c_print(0, " {}", *i.val);
+        c_print(1, " {}", *i.val);
     cvec_i_del(&vec);
 }
 ```
@@ -61,7 +61,7 @@ int main(void) {
     cvec_u_push_back(&vec, (User) {cstr_from("admin"), 0}); // cstr_from() allocates string memory
     cvec_u_push_back(&vec, (User) {cstr_from("usera"), 1});
     c_foreach (i, cvec_u, vec)
-        c_print(0, "{}: {}\n", i.val->name.str, i.val->id);
+        c_print(1, "{}: {}\n", i.val->name.str, i.val->id);
     cvec_u_del(&vec); // free everything
 }
 ```
@@ -211,7 +211,7 @@ int main() {
         bignums.data[i] /= i; // make them smaller
 
     c_foreach (i, cvec_ix, bignums)
-        c_print(0, " {}", *i.val);
+        c_print(1, " {}", *i.val);
     cvec_ix_del(&bignums);
 }
 // Output:
@@ -234,10 +234,10 @@ int main() {
     cstr_t tmp = cstr_from_fmt("%d elements so far", cvec_str_size(names));
     cvec_str_push_back(&names, tmp); // tmp is moved to names, do not del() it.
 
-    c_print(0, "{}\n", names.data[1].str); // Access the second element
+    c_print(1, "{}\n", names.data[1].str); // Access the second element
 
     c_foreach (i, cvec_str, names)
-        c_print(0, "item: {}\n", i.val->str);
+        c_print(1, "item: {}\n", i.val->str);
     cvec_str_del(&names);
 }
 // Output:
@@ -252,13 +252,13 @@ item: 2 elements so far
 
 int main() {
     cstr_t s1 = cstr_from("one-nine-three-seven-five");
-    c_print(0, "{}.\n", s1.str);
+    c_print(1, "{}.\n", s1.str);
 
     cstr_insert(&s1, 3, "-two");
-    c_print(0, "{}.\n", s1.str);
+    c_print(1, "{}.\n", s1.str);
 
     cstr_erase(&s1, 7, 5); // -nine
-    c_print(0, "{}.\n", s1.str);
+    c_print(1, "{}.\n", s1.str);
 
     cstr_replace(&s1, cstr_find(&s1, "seven"), 5, "four");
     c_print(stderr, "{}.\n", s1.str);
@@ -270,7 +270,7 @@ int main() {
 
     cstr_t full_path cstr_init;
     c_print(&full_path, "{}/{}.{}", "directory", "filename", "ext");
-    c_print(1, "{}\n", full_path.str); // 1 = stderr
+    c_print(2, "{}\n", full_path.str); // 2 = stderr
 
     c_del(cstr, &s1, &full_path);
 }
@@ -297,7 +297,7 @@ int main() {
     cmap_ii_put(&nums, 8, 64); // similar to insert_or_assign()
     cmap_ii_emplace(&nums, 11, 121);
 
-    c_print(0, "{}\n", cmap_ii_find(&nums, 8)->second);
+    c_print(1, "{}\n", cmap_ii_find(&nums, 8)->second);
     cmap_ii_del(&nums);
 
     // -- map of str --
@@ -307,9 +307,9 @@ int main() {
     cmap_str_emplace(&strings, "Sunny", "afternoon");
     c_push_items(&strings, cmap_str, { {"Eleven", "XI"}, {"Six", "VI"} });
 
-    c_print(0, "size = {}\n", cmap_str_size(strings));
+    c_print(1, "size = {}\n", cmap_str_size(strings));
     c_foreach (i, cmap_str, strings)
-        c_print(0, "{}: {}\n", i.val->first.str, i.val->second.str);
+        c_print(1, "{}: {}\n", i.val->first.str, i.val->second.str);
     cmap_str_del(&strings); // frees all strings and map.
 }
 // Output:
@@ -338,7 +338,7 @@ int main() {
 
     // iterate the set of cstr_t values:
     c_foreach (i, cset_str, words)
-        c_print(0, "{} ", i.val->str);
+        c_print(1, "{} ", i.val->str);
     cset_str_del(&words);
 }
 // Output:
@@ -365,13 +365,13 @@ int main() {
 
     printf("initial: ");
     c_foreach (i, clist_fx, list)
-        c_print(0, " {:.16}", *i.val);
+        c_print(1, " {:.16}", *i.val);
 
     clist_fx_sort(&list); // mergesort O(n*log n)
 
     printf("\nsorted: ");
     c_foreach (i, clist_fx, list)
-        c_print(0, " {:10f}", *i.val);
+        c_print(1, " {:10f}", *i.val);
 
     clist_fx_del(&list);
 }
@@ -403,7 +403,7 @@ int main()
 
     // Extract and disply the fifty smallest.
     c_forrange (50) {
-        c_print(0, "{} ", *cpqueue_i_top(&heap));
+        c_print(1, "{} ", *cpqueue_i_top(&heap));
         cpqueue_i_pop(&heap);
     }
     cpqueue_i_del(&heap);
@@ -431,7 +431,7 @@ int main() {
         cqueue_i_pop(&queue);
 
     c_foreach (i, cqueue_i, queue)
-        c_print(0, " {}", *i.val);
+        c_print(1, " {}", *i.val);
 
     cqueue_i_del(&queue);
 }
@@ -571,10 +571,10 @@ void display_hist(cvec_mi hist, int scale, int mean, int stddev)
         int k = (int) (i.val->second * stddev * scale * 25ull / 10 / n);
         if (k > 0) {
             cstr_take(&bar, cstr_with_size(k, '*'));
-            c_print(0, "{:4} {}\n", i.val->first, bar.str);
+            c_print(1, "{:4} {}\n", i.val->first, bar.str);
         }
     }
-    c_print(0, "Normal distribution with mean={}, stddev={}. '*' = {:.0f} samples out of {}.\n",
+    c_print(1, "Normal distribution with mean={}, stddev={}. '*' = {:.0f} samples out of {}.\n",
            mean, stddev, n / (2.5 * stddev * scale), n);
     cstr_del(&bar);
 }
