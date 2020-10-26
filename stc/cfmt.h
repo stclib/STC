@@ -208,10 +208,11 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
             arg = va_arg(args, char *);
             *p++ = '%'; p0 = p; align = 0;
             while (1) switch (*fmt) {
-                case '}': case '\0': goto done;
-                case '<': *p++ = '-', ++fmt, align = 1; break;
-                case '>': ++fmt, align = 1; break;
+                case '\0': goto done;
+                case '}': ++fmt; goto done;
                 case '-': ++fmt; break;
+                case '>': ++fmt, align = 1; break;
+                case '<': *p++ = '-', ++fmt, align = 1; break;
                 case '*': if (++n <= nargs) arg = va_arg(args, char *); /* nobreak */
                 default: *p++ = *fmt++;
             }
@@ -222,7 +223,6 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
                 memmove(p0+1, p0, p-p0), *p0 = '+', *p++ = 'd';
             else if (!align && strchr("cs", p[-1]))
                 memmove(p0+1, p0, p-p0), *p0 = '-', ++p;
-            fmt += (*fmt == '}');
             continue;
         }
         *p++ = *fmt++;
