@@ -207,13 +207,15 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
             fmt += 1 + (fmt[1] == ':');
             arg = va_arg(args, char *);
             *p++ = '%'; p0 = p; align = 0;
-            while (*fmt != '}' && *fmt) switch (*fmt) {
+            while (1) switch (*fmt) {
+                case '}': case '\0': goto done;
                 case '<': *p++ = '-', ++fmt, align = 1; break;
                 case '>': ++fmt, align = 1; break;
                 case '-': ++fmt; break;
                 case '*': if (++n <= nargs) arg = va_arg(args, char *); /* nobreak */
                 default: *p++ = *fmt++;
             }
+            done:
             if (!strchr("csdioxXufFeEaAgGnp", fmt[-1]))
                 while (*arg) *p++ = *arg++;
             if (p[-1] == 'B')
