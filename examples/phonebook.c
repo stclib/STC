@@ -23,14 +23,14 @@
 
 #include <stdio.h>
 #include <stc/cmap.h>
-#include <stc/cstr.h>
+#include <stc/cfmt.h>
 
 using_cmap_str();
 
 void print_phone_book(cmap_str phone_book)
 {
   c_foreach (i, cmap_str, phone_book)
-    printf("%s\t- %s\n", i.val->first.str, i.val->second.str);
+    c_print(1, "{}\t- {}\n", i.val->first.str, i.val->second.str);
 }
 
 int main(int argc, char **argv)

@@ -1,5 +1,5 @@
 
-#include <stdio.h>
+#include <stc/cfmt.h>
 #include <stc/cstr.h>
 #include <stc/cstack.h>
 
@@ -12,16 +12,16 @@ int main() {
     cstack_i stack = cstack_i_init();
     cstack_c chars = cstack_c_init();
 
-    c_forrange (i, int, 101) 
+    c_forrange (i, int, 101)
         cstack_i_push(&stack, i*i);
 
-    printf("%d\n", *cstack_i_top(&stack));
+    c_print(1, "{}\n", *cstack_i_top(&stack));
 
-    c_forrange (i, int, 90)  
+    c_forrange (i, int, 90)
         cstack_i_pop(&stack);
-    
+
     c_foreach (i, cstack_i, stack)
-        printf(" %d", *i.val);
+        c_print(1, " {}", *i.val);
     puts("");
-    printf("top: %d\n", *cstack_i_top(&stack));
+    c_print(1, "top: {}\n", *cstack_i_top(&stack));
 }

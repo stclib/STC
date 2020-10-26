@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <time.h>
 #include <stc/crandom.h>
-#include <stc/cstr.h>
+#include <stc/cfmt.h>
 
 int main()
 {
     enum {R = 30};
     const size_t N = 1000000000;
-    clock_t difference, before;    
+    clock_t difference, before;
     uint64_t sum = 0;
 
     uint64_t seed = time(NULL);
@@ -15,36 +15,36 @@ int main()
     uint32_t range = crand_i32(&pcg) & ((1u << 28) - 1);
     crand_uniform_i32_t dist0 = crand_uniform_i32_init(0, range);
 
-    printf("32 uniform: %u\n", dist0.range);
-    double fsum = 0;
+    c_print(1, "32 uniform: {}\n", dist0.range);
+    sum = 0;
     before = clock();
     c_forrange (N) {
-        fsum += (double) crand_uniform_i32(&pcg, &dist0) / dist0.range;
+        sum += crand_uniform_i32(&pcg, &dist0);
     }
     difference = clock() - before;
-    printf("%zu %f: %f secs\n", N, fsum / N, (float) difference / CLOCKS_PER_SEC);
+    c_print(1, "{} {}: {} secs\n", N, (double) sum / N  / dist0.range, (float) difference / CLOCKS_PER_SEC);
 
     pcg = crand_rng32_init(seed);
     dist0 = crand_uniform_i32_init(0, range);
     puts("32 unbiased");
-    fsum = 0;
+    sum = 0;
     before = clock();
     c_forrange (N) {
-        fsum += (double) crand_unbiased_i32(&pcg, &dist0) / dist0.range;
+        sum += crand_unbiased_i32(&pcg, &dist0);
     }
     difference = clock() - before;
-    printf("%zu %f: %f secs\n", N, fsum / N, (float) difference / CLOCKS_PER_SEC);
+    c_print(1, "{} {}: {} secs\n", N, (double) sum / N / dist0.range, (float) difference / CLOCKS_PER_SEC);
 
     puts("64 uniform");
     crand_rng64_t stc = crand_rng64_init(seed);
-    crand_uniform_i64_t dist1 = crand_uniform_i64_init(0, N);
+    crand_uniform_i64_t dist1 = crand_uniform_i64_init(0, dist0.range);
     sum = 0;
-    before = clock();    
+    before = clock();
     c_forrange (N)  {
         sum += crand_uniform_i64(&stc, &dist1);
     }
     difference = clock() - before;
-    printf("%zu %f: %f secs\n", N, (double) sum / N, (float) difference / CLOCKS_PER_SEC);
+    c_print(1, "{} {}: {} secs\n", N, (double) sum / N / dist1.range, (float) difference / CLOCKS_PER_SEC);
 
 
     puts("normal distribution");
@@ -57,11 +57,11 @@ int main()
         sum += n;
         if (n >= 0 && n < R) ++hist[n];
     }
-    
+
     cstr_t bar = cstr_init();
     c_forrange (i, int, R)  {
         cstr_take(&bar, cstr_with_size(hist[i] * 25ull * R / N2, '*'));
-        printf("%2d %s\n", i, bar.str);
+        c_print(1, "{:3} {}\n", i, bar.str);
     }
     cstr_del(&bar);
 }

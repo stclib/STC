@@ -38,7 +38,7 @@ int main() {
     c_print(1, "Color: ({} {} {}), {}\n", r, g, b, flag);
     c_print(1, "{:10}, {:10}, {:.2f}\n", 42, 43, 3.141592267);
     c_print(stdout, "{:10} {:10} {:10}\n", z, z, w);
-    c_print(stderr, "100%: {} {:.*} {}\n", string.str, 4, pi, x);
+    c_print(stderr, "100%: {:>} {:.*} {}\n", string.str, 4, pi, x);
     c_print(&string, "Precision: {} {:.16} {}", string.str, pi, x);
     c_print(1, "{}\nvector: ({}, {}, {})\n", string.str, 3.2, 3.3, 4.2/3.2);
     cstr_del(&string);
@@ -73,7 +73,7 @@ STC_INLINE const char* _cfmt_strftime(char* n, char buf[][_cfmt_sn], size_t maxs
 #endif
 
 #define _cfmt(x) _Generic (x, \
-    _Bool: "B", \
+    _Bool: "hhu", \
     _cfmt_uschar(), \
     short: "hd", \
     unsigned short: "hu", \
@@ -95,7 +95,7 @@ STC_INLINE const char* _cfmt_strftime(char* n, char buf[][_cfmt_sn], size_t maxs
     inline auto _cfmt_fn(char*) {return sprintf;}
     inline auto _cfmt_fn(int s) {return _cfmt_printf;}
     inline auto _cfmt_fn(cstr_t*) {return cstr_fmt;}
-    inline auto _cfmt(bool x) {return "B";}
+    inline auto _cfmt(bool x) {return "hhu";}
     inline auto _cfmt(char x) {return "c";}
     inline auto _cfmt(unsigned char x) {return "hhu";}
     inline auto _cfmt(short x) {return "hd";}
@@ -218,8 +218,6 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
             done:
             if (!strchr("csdioxXufFeEaAgGnp", fmt[-1]))
                 while (*arg) *p++ = *arg++;
-            if (p[-1] == 'B')
-                memmove(p0+1, p0, p-p0), *p0 = '+', *p++ = 'd';
             else if (!align && strchr("cs", p[-1]))
                 memmove(p0+1, p0, p-p0), *p0 = '-', ++p;
             fmt += *fmt == '}';

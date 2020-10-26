@@ -1,7 +1,7 @@
 
 #include <stdio.h>
 #include <stc/cmap.h>
-#include <stc/cstr.h>
+#include <stc/cfmt.h>
 
 using_cmap_str();
 using_cmap_strkey(cfg, cmap_str, cmap_str_del);
@@ -20,7 +20,7 @@ int main(void) {
 
     c_foreach (i, cmap_cfg, config)
         c_foreach (j, cmap_str, i.val->second)
-            printf("%s: %s - %s (%u)\n", i.val->first.str, j.val->first.str, j.val->second.str, i.val->second.bucket_count);
+            c_print(1, "{}: {} - {} ({})\n", i.val->first.str, j.val->first.str, j.val->second.str, i.val->second.bucket_count);
 
     cmap_cfg_del(&config);
 }

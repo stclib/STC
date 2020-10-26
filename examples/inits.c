@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stc/cstr.h>
+#include <stc/cfmt.h>
 #include <stc/cmap.h>
 #include <stc/cvec.h>
 #include <stc/cpqueue.h>
@@ -26,7 +26,7 @@ int main(void)
     cvec_f floats = cvec_INIT;
     c_push_items(&floats, cvec_f, {4.0f, 2.0f, 5.0f, 3.0f, 1.0f});
 
-    c_foreach (i, cvec_f, floats) printf("%.1f ", *i.val);
+    c_foreach (i, cvec_f, floats) c_print(1, "{:.1f} ", *i.val);
     puts("");
 
     // CVEC PRIORITY QUEUE
@@ -36,7 +36,7 @@ int main(void)
 
     // sorted:
     while (! cpqueue_f_empty(floats)) {
-        printf("%.1f ", *cpqueue_f_top(&floats));
+        c_print(1, "{:.1f} ", *cpqueue_f_top(&floats));
         cpqueue_f_pop(&floats);
     }
     puts("\n");
@@ -53,7 +53,7 @@ int main(void)
     });
 
     c_foreach (i, cmap_id, idnames)
-        printf("%d: %s\n", i.val->first, i.val->second.str);
+        c_print(1, "{}: {}\n", i.val->first, i.val->second.str);
     puts("");
     cmap_id_del(&idnames);
 
@@ -76,7 +76,7 @@ int main(void)
     cmap_cnt_emplace(&countries, "Finland", 0).first->second += 20;
 
     c_foreach (i, cmap_cnt, countries)
-        printf("%s: %d\n", i.val->first.str, i.val->second);
+        c_print(1, "{}: {}\n", i.val->first.str, i.val->second);
     puts("");
     cmap_cnt_del(&countries);
 
@@ -92,7 +92,7 @@ int main(void)
     cvec_ip_sort(&pairs1);
 
     c_foreach (i, cvec_ip, pairs1)
-        printf("(%d %d) ", i.val->x, i.val->y);
+        c_print(1, "({} {}) ", i.val->x, i.val->y);
     puts("");
     cvec_ip_del(&pairs1);
 
@@ -108,7 +108,7 @@ int main(void)
     clist_ip_sort(&pairs2);
 
     c_foreach (i, clist_ip, pairs2)
-        printf("(%d %d) ", i.val->x, i.val->y);
+        c_print(1, "({} {}) ", i.val->x, i.val->y);
     puts("");
     clist_ip_del(&pairs2);
 }

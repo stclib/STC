@@ -10,9 +10,8 @@
  * In order to use Viking as a map key, it is smart to define a plain-old-data "view"
  * of the Viking struct, to simplfy insert and lookup in the map.
  */
-#include <stdio.h>
 #include <stc/cmap.h>
-#include <stc/cstr.h>
+#include <stc/cfmt.h>
 
 // Viking data struct -----------------------
 
@@ -74,7 +73,7 @@ int main()
     cmap_vk_emplace(&vikings, einar, 0).first->second += 5; // again
 
     c_foreach (k, cmap_vk, vikings) {
-        printf("%s of %s has %d hp\n", k.val->first.name.str, k.val->first.country.str, k.val->second);
+        c_print(1, "{} of {} has {} HP\n", k.val->first.name.str, k.val->first.country.str, k.val->second);
     }
     cmap_vk_del(&vikings);
 }

@@ -1,5 +1,5 @@
 
-#include <stc/cstr.h>
+#include <stc/cfmt.h>
 #include <stc/cmap.h>
 #include <stc/clist.h>
 #include <stc/cvec.h>
@@ -18,7 +18,7 @@ int main1()
     });
     clist_str_push_back(&lwords, cstr_from_fmt("%f", 123897.0 / 23.0));
     c_foreach (w, clist_str, lwords)
-        printf("%s\n", w.val->str);
+        c_print(1, "{}\n", w.val->str);
     puts("");
 
     cvec_str words = cvec_INIT;
@@ -32,7 +32,7 @@ int main1()
         cmap_si_emplace(&word_map, w.val->str, 0).first->second += 1;
 
     c_foreach (i, cmap_si, word_map) {
-        printf("%d occurrences of word '%s'\n", i.val->second, i.val->first.str);
+        c_print(1, "{} occurrences of word '{}'\n", i.val->second, i.val->first.str);
     }
 
     cmap_si_del(&word_map);

@@ -1,4 +1,4 @@
-#include <stdio.h>
+#include <stc/cfmt.h>
 #include <stc/cbitset.h>
 
 static inline cbitset_t sieveOfEratosthenes(size_t n)
@@ -16,23 +16,23 @@ static inline cbitset_t sieveOfEratosthenes(size_t n)
         }
     }
     return pbits;
-} 
+}
 
 
 int main(void)
 {
     int n = 100000000;
-    printf("computing prime numbers up to %u\n", n);
-    
+    c_print(1, "computing prime numbers up to {}\n", n);
+
     cbitset_t primes = sieveOfEratosthenes(n);
     puts("done");
-    
+
     size_t np = cbitset_count(primes);
-    printf("number of primes: %zu\n", np);
+    c_print(1, "number of primes: {}\n", np);
 
     printf("2 ");
     c_forrange (i, int, 3, 1001, 2) {
-       if (cbitset_test(primes, i)) printf("%d ", i);
+       if (cbitset_test(primes, i)) c_print(1, "{} ", i);
     }
     puts("");
     cbitset_del(&primes);

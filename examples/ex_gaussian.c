@@ -2,7 +2,7 @@
 #include <time.h>
 #include <math.h>
 #include <stc/crandom.h>
-#include <stc/cstr.h>
+#include <stc/cfmt.h>
 #include <stc/cmap.h>
 #include <stc/cvec.h>
 
@@ -21,7 +21,7 @@ int main()
     enum {N = 10000000};
     const double Mean = -12.0, StdDev = 8.0, Mag = 12000.0 / StdDev;
 
-    printf("Demo of gaussian / normal distribution of %d random samples\n", N);
+    c_print(1, "Demo of gaussian / normal distribution of {} random samples\n", N);
 
     // Setup random engine with normal distribution.
     uint64_t seed = time(NULL);
@@ -48,7 +48,7 @@ int main()
         if (n > 0) {
             // bar string: take ownership in new str after freeing current.
             cstr_take(&bar, cstr_with_size(n, '*'));
-            printf("%4d %s\n", i.val->first, bar.str);
+            c_print(1, "{:4} {}\n", i.val->first, bar.str);
         }
     }
     // Cleanup
