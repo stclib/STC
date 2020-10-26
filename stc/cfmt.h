@@ -83,8 +83,8 @@ STC_INLINE const char* _cfmt_strftime(char* n, char buf[][_cfmt_sn], size_t maxs
     unsigned long: "lu", \
     long long: "lld", \
     unsigned long long: "llu", \
-    float: "4", \
-    double: "8", \
+    float: "g", \
+    double: "g", \
     long double: "Lg", \
     char *: "s", \
     void *: "p", \
@@ -106,8 +106,8 @@ STC_INLINE const char* _cfmt_strftime(char* n, char buf[][_cfmt_sn], size_t maxs
     inline auto _cfmt(unsigned long x) {return "lu";}
     inline auto _cfmt(long long x) {return "lld";}
     inline auto _cfmt(unsigned long long x) {return "llu";}
-    inline auto _cfmt(float x) {return "4";}
-    inline auto _cfmt(double x) {return "8";}
+    inline auto _cfmt(float x) {return "g";}
+    inline auto _cfmt(double x) {return "g";}
     inline auto _cfmt(long double x) {return "Lg";}
     inline auto _cfmt(const char *x) {return "s";}
     inline auto _cfmt(const void *x) {return "p";}
@@ -186,7 +186,7 @@ STC_DEF char *
 _cfmt_conv(int nargs, const char *fmt, ...) {
     char *fmt1 = (char *) malloc(strlen(fmt)*25/10 + 1), *p = fmt1, *p0, *arg, ch;
     const char *fmt0 = fmt;
-    int n = 0, align, deci;
+    int n = 0, align;
     va_list args;
     va_start(args, fmt);
     do {
@@ -206,23 +206,19 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
             }
             fmt += 1 + (fmt[1] == ':');
             arg = va_arg(args, char *);
-            *p++ = '%'; p0 = p;
-            align = deci = 0;
+            *p++ = '%'; p0 = p; align = 0;
             while (*fmt != '}' && *fmt) switch (*fmt) {
                 case '<': *p++ = '-', ++fmt, align = 1; break;
                 case '>': ++fmt, align = 1; break;
                 case '-': ++fmt; break;
                 case '*': if (++n <= nargs) arg = va_arg(args, char *); /* nobreak */
-                default: if ((*p++ = *fmt++) == '.') deci = 1;
+                default: *p++ = *fmt++;
             }
             if (!strchr("csdioxXufFeEaAgGnp", fmt[-1]))
                 while (*arg) *p++ = *arg++;
             if (p[-1] == 'B')
                 memmove(p0+1, p0, p-p0), *p0 = '+', *p++ = 'd';
-            else if (*arg == 0 && strchr("48", p[-1])) {
-                if (deci) p[-1] = 'g';
-                else strcpy(p - 1, p[-1] == '4' ? ".07g" : ".15g"), p += 3;
-            } else if (!align && strchr("cs", p[-1]))
+            else if (!align && strchr("cs", p[-1]))
                 memmove(p0+1, p0, p-p0), *p0 = '-', ++p;
             fmt += (*fmt == '}');
             continue;
