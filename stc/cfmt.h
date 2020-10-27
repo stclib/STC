@@ -51,7 +51,7 @@ int main() {
 
 STC_API void _cfmt_printf(int s, const char* fmt, ...);
 STC_API char* _cfmt_conv(int nargs, const char *fmt, ...);
-enum {_cfmt_bn=4, _cfmt_sn=64};
+enum {_cfmt_bn=4, _cfmt_sn=80};
 STC_INLINE const char* _cfmt_strftime(char* n, char buf[][_cfmt_sn], size_t maxsize, const char *fmt, const struct tm *timeptr) {
     if (*n >= _cfmt_bn) return fmt;
     int k = (*n)++; buf[k][0] = '\0';
@@ -200,10 +200,7 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
         case '{':
             if (fmt[1] == '{') { ++fmt; break; }
             if (fmt[1] != ':' && fmt[1] != '}') break;
-            if (++n > nargs) {
-                fprintf(stderr, "ERROR: c_print() missing argument(%d): %s\n", n, fmt0);
-                break;
-            }
+            if (++n > nargs) break;
             fmt += 1 + (fmt[1] == ':');
             arg = va_arg(args, char *);
             *p++ = '%'; p0 = p; align = 0;
@@ -226,8 +223,10 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
         *p++ = *fmt++;
     } while (ch);
     va_end(args);
-    if (n < nargs)
-        fprintf(stderr, "WARNING: c_print() %d superfluous argument(s): %s\n", nargs - n, fmt0);
+    if (n != nargs) {
+        fprintf(stderr, "error: c_print(to, fmt, ...) expected %d arg(s) after fmt, got %d:\n\tfmt: %s\n", n, nargs, fmt0);
+        fmt1[0] = '\0';
+    }
     return fmt1;
 }
 
