@@ -37,7 +37,7 @@ int main() {
     c_print(1, "Date: {} {}\n", c_ftime("%Y-%m-%d %X %Z", tm), test);
     c_print(1, "Color: ({} {} {}), {}\n", r, g, b, flag);
     c_print(1, "{:10}, {:10}, {:.2f}\n", 42, 43, 3.141592267);
-    c_print(stdout, "{:10} {:10} {:10}\n", z, z, w);
+    c_print(stdout, "{:>10} {:>10} {:>10}\n", z, z, w);
     c_print(stderr, "100%: {:>} {:.*} {}\n", string.str, 4, pi, x);
     c_print(&string, "Precision: {} {:.16} {}", string.str, pi, x);
     c_print(1, "{}\nvector: ({}, {}, {})\n", string.str, 3.2, 3.3, 4.2/3.2);
@@ -215,7 +215,7 @@ _cfmt_conv(int nargs, const char *fmt, ...) {
             done:
             if (!strchr("csdioxXufFeEaAgGnp", fmt[-1]))
                 while (*arg) *p++ = *arg++;
-            else if (!align && strchr("cs", p[-1]))
+            if (!align && strchr("cs", p[-1]))
                 memmove(p0+1, p0, p-p0), *p0 = '-', ++p;
             fmt += *fmt == '}';
             continue;
