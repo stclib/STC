@@ -8,8 +8,7 @@ An elegant, fully typesafe, generic, customizable, user-friendly, consistent, an
 - **stc/carray.h** - Dynamic generic **multi-dimensional array**, implemented as a single contiguous section of memory.
 - **stc/cbitset.h** - Bitset similar to c++ std::bitset or boost::dynamic_bitset.
 - **stc/clist.h** - A genric circular **singly linked list**. Can be used as a **queue** as it supports *push_back(), push_front(), and pop_front()*. It also contains various *splice* functions and *merge sort*.
-- **stc/cmap.h** - A generic **unordered map** implemented as open hashing without tombstones. Highly customizable and fast.
-- **stc/cset.h** - A generic **unordered set** implemented in tandem with *unordered map*
+- **stc/cmap.h** - A generic **unordered map / set** implemented as open hashing without tombstones. Highly customizable and fast.
 - **stc/cstr.h** - Compact and powerful **string** class.
 - **stc/cvec.h** - Dynamic generic **vector** class, works well as a **stack**.
 - **stc/cstack.h** - **stack** adapter, currently works with *cvec*.
@@ -21,7 +20,7 @@ An elegant, fully typesafe, generic, customizable, user-friendly, consistent, an
 - **stc/cfmt.h** - Implementation of **c_print()** with c++20 *std::format*-like formatting, including automatic detection of argument types.
 - **stc/ccommon.h** - A common include file with a few general definitions.
 
-The usage of the containers is vert similar to the C++ standard containers, so it should be easy if you are familiar with them.
+The usage of the containers is quite similar to the C++ standard containers, so it should be easy if you are familiar with them.
 
 All containers mentioned above, except cstr_t and cbitset_t, are generic and therefore typesafe (similar to templates in C++). No casting is used. A simple example:
 ```C
