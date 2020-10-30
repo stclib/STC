@@ -18,6 +18,7 @@ An elegant, fully typesafe, generic, customizable, user-friendly, consistent, an
 - **stc/cptr.h** - Support for pointers in containers, and a reference counted shared pointer **csptr**.
 - **stc/coption.h** - Implementation of a **getopt_long()**-like function, *coption_get()*, to parse command line arguments.
 - **stc/crandom.h** - A few very efficent modern random number generators *pcg32* and my own *64-bit PRNG* inspired by *sfc64*. Both uniform and normal distributions.
+- **stc/cfmt.h** - Implementation of **c_print()** with c++20 *std::format*-like formatting, including automatic detection of argument types.
 - **stc/ccommon.h** - A common include file with a few general definitions.
 
 The usage of the containers is vert similar to the C++ standard containers, so it should be easy if you are familiar with them.
