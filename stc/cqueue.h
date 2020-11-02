@@ -20,6 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#ifndef CQUEUE__H__
+#define CQUEUE__H__
 
 /*  Priority Queue using heap, with adapter class (normally cvec).
 
@@ -52,10 +54,6 @@
         cqueue_i_del(&queue);
     }
 */
-
-#ifndef CQUEUE__H__
-#define CQUEUE__H__
-
 #include "clist.h"
 
 #define using_cqueue(X, ctype) \

@@ -33,10 +33,10 @@ typedef struct cstr { char* str; } cstr_t;
 typedef struct { char *val; } cstr_iter_t;
 typedef char cstr_value_t;
 
-#define cstr_size(s)       ((const size_t *) (s).str)[-2]
-#define cstr_capacity(s)   ((const size_t *) (s).str)[-1]
-#define cstr_empty(s)      (cstr_size(s) == 0)
-#define cstr_NPOS          ((size_t) (-1))
+#define cstr_size(s)     ((const size_t *) (s).str)[-2]
+#define cstr_capacity(s) ((const size_t *) (s).str)[-1]
+#define cstr_empty(s)    (cstr_size(s) == 0)
+#define cstr_NPOS        ((size_t) (-1))
 
 STC_API cstr_t
 cstr_init(void);

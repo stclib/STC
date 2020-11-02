@@ -44,7 +44,6 @@
         cpqueue_f_del(&queue);
     }
 */
-
 #ifndef CPQUEUE__H__
 #define CPQUEUE__H__
 

@@ -23,10 +23,7 @@
 #ifndef CPTR__H__
 #define CPTR__H__
 
-#include "ccommon.h"
-
-/* cptr: std::unique_ptr -like type: */
-/*
+/* cptr: pointers in containers, csptr: std::unique_ptr -like type:
 #include <stc/cptr.h>
 #include <stc/cstr.h>
 #include <stc/cvec.h>
@@ -59,6 +56,7 @@ int main() {
     cvec_pe_del(&vec);
 }
 */
+#include "ccommon.h"
 
 #define using_cptr(...) c_MACRO_OVERLOAD(using_cptr, __VA_ARGS__)
 

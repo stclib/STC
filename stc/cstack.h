@@ -20,6 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#ifndef CSTACK__H__
+#define CSTACK__H__
 
 /*  Stack adapter (normally uses cvec).
 
@@ -41,10 +43,6 @@
         printf("top: %d\n", *cstack_i_top(&stack));
     }
 */
-
-#ifndef CSTACK__H__
-#define CSTACK__H__
-
 #include "cvec.h"
 
 #define using_cstack(X, ctype) \

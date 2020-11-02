@@ -23,9 +23,6 @@
 #ifndef CLIST__H__
 #define CLIST__H__
 
-#include "ccommon.h"
-#include <stdlib.h>
-
 /*  Circular Singly-linked Lists.
 
     This implements a std::forward_list-like class in C, but because it is circular,
@@ -38,7 +35,7 @@
     using_clist(ix, int64_t);
 
     int main() {
-        clist_ix list = clist_INIT;
+        clist_ix list = clist__init;
         crand_rng32_t pcg = crand_rng32_init(12345);
         int n;
         for (int i=0; i<1000000; ++i) // one million
@@ -55,6 +52,9 @@
         clist_ix_del(&list);
     }
 */
+#include "ccommon.h"
+#include <stdlib.h>
+
 #define using_clist(...)   c_MACRO_OVERLOAD(using_clist, __VA_ARGS__)
 
 #define using_clist_2(X, Value) \
@@ -85,7 +85,7 @@
         int _state; \
     } clist_##X##_iter_t
 
-#define clist_INIT          {NULL}
+#define clist__init         {NULL}
 #define clist_empty(list)   ((list).last == NULL)
 
 #define c_emplace_after(self, ctype, pos, ...) do { \
@@ -108,7 +108,7 @@ STC_API size_t _clist_size(const clist_void* self);
     typedef clist_##X##_rawvalue_t clist_##X##_input_t; \
 \
     STC_INLINE clist_##X \
-    clist_##X##_init(void) {clist_##X x = clist_INIT; return x;} \
+    clist_##X##_init(void) {clist_##X x = clist__init; return x;} \
     STC_INLINE bool \
     clist_##X##_empty(clist_##X ls) {return clist_empty(ls);} \
     STC_INLINE size_t \

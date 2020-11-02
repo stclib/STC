@@ -20,13 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
 #ifndef CRANDOM__H__
 #define CRANDOM__H__
 
-#include "ccommon.h"
-#include <string.h>
-#include <math.h>
 /*
     crand_rng32_t rng = crand_rng32_init(seed);
     crand_uniform_f32_t fdist = crand_uniform_f32_init(rng, 1.0f, 6.0f);
@@ -36,6 +32,9 @@
     int j = crand_uniform_i32(&idist);
     float r = crand_uniform_f32(&fdist);
 */
+#include "ccommon.h"
+#include <string.h>
+#include <math.h>
 
 /* 32-BIT RANDOM NUMBER GENERATOR */
 

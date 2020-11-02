@@ -20,6 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#ifndef CMAP__H__
+#define CMAP__H__
+
 /*
 #include <stdio.h>
 #include <stc/cmap.h>
@@ -27,14 +30,14 @@ using_cset(sx, int);       // Set of int
 using_cmap(mx, int, char); // Map of int -> char
 
 int main(void) {
-    cset_sx s = cset_INIT;
+    cset_sx s = cset__init;
     cset_sx_insert(&s, 5);
     cset_sx_insert(&s, 8);
     c_foreach (i, cset_sx, s)
         printf("set %d\n", i.val->second);
     cset_sx_del(&s);
 
-    cmap_mx m = cmap_INIT;
+    cmap_mx m = cmap__init;
     cmap_mx_put(&m, 5, 'a');
     cmap_mx_put(&m, 8, 'b');
     cmap_mx_put(&m, 12, 'c');
@@ -45,18 +48,16 @@ int main(void) {
     c_foreach (i, cmap_mx, m)
         printf("map %d: %c\n", i.val->first, i.val->second);
     cmap_mx_del(&m);
-}*/
-#ifndef CMAP__H__
-#define CMAP__H__
-
+}
+*/
 #include "ccommon.h"
 #include <stdlib.h>
 #include <string.h>
 
-#define cmap_INIT                     {NULL, NULL, 0, 0, 0.85f, 0.15f}
+#define cmap__init                    {NULL, NULL, 0, 0, 0.85f, 0.15f}
 #define cmap_empty(m)                 ((m).size == 0)
 #define cmap_size(m)                  ((size_t) (m).size)
-#define cset_INIT                     cmap_INIT
+#define cset__init                    cmap__init
 #define cset_empty(s)                 cmap_empty(s)
 #define cset_size(s)                  cmap_size(s)
 
@@ -205,7 +206,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     } ctype##_##X##_iter_t; \
 \
     STC_INLINE ctype##_##X \
-    ctype##_##X##_init(void) {ctype##_##X m = cmap_INIT; return m;} \
+    ctype##_##X##_init(void) {ctype##_##X m = cmap__init; return m;} \
     STC_INLINE bool \
     ctype##_##X##_empty(ctype##_##X m) {return m.size == 0;} \
     STC_INLINE size_t \
@@ -321,7 +322,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
                               keyDestroy, RawKey, keyToRaw, keyFromRaw, RawVal, valueFromRaw) \
     STC_DEF ctype##_##X \
     ctype##_##X##_with_capacity(size_t cap) { \
-        ctype##_##X h = ctype##_INIT; \
+        ctype##_##X h = ctype##__init; \
         ctype##_##X##_reserve(&h, cap); \
         return h; \
     } \

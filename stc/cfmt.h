@@ -20,6 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#ifndef CFMT__H__
+#define CFMT__H__
+
 /*
 // https://gist.github.com/alexameen/4440e4bcad557a464dcc9ff884763049
 #include <time.h>
@@ -44,9 +47,6 @@ int main() {
     cstr_del(&string);
 }
 */
-#ifndef CFMT__H__
-#define CFMT__H__
-
 #include <stc/cstr.h>
 
 STC_API void _cfmt_printf(int s, const char* fmt, ...);
@@ -66,15 +66,15 @@ STC_INLINE const char* _cfmt_strftime(char* n, char buf[][_cfmt_sn], size_t maxs
     int: _cfmt_printf, \
     cstr_t *: cstr_fmt)
 
-#if defined(_MSC_VER) && !defined(__clang__)
-#   define _cfmt_uschar() char: "c", unsigned char: "hhu"
-#else
-#   define _cfmt_uschar() char: "c", signed char: "c", unsigned char: "hhu"
+#if !defined(_MSC_VER) || defined(__clang__)
+#define _cfmt_uchar() signed char: "c",
 #endif
 
 #define _cfmt(x) _Generic (x, \
     _Bool: "hhu", \
-    _cfmt_uschar(), \
+    char: "c", \
+    unsigned char: "hhu", \
+    _cfmt_uchar() \
     short: "hd", \
     unsigned short: "hu", \
     int: "d", \

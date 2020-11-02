@@ -23,42 +23,44 @@
 #ifndef COPTIONS__H__
 #define COPTIONS__H__
 
-/*  Inspired by https://attractivechaos.wordpress.com/2018/08/31/a-survey-of-argument-parsing-libraries-in-c-c
-    Fixed major bugs with option arguments (both long and short).
-    Added arg->faulty output field, and has a more consistent API.
+/*
+// Inspired by https://attractivechaos.wordpress.com/2018/08/31/a-survey-of-argument-parsing-libraries-in-c-c
+// Fixed major bugs with option arguments (both long and short).
+// Added arg->faulty output field, and has a more consistent API.
+// 
+// coption_get() is similar to GNU's getopt_long(). Each call parses one option and
+// returns the option name. opt->arg points to  the option argument if present.
+// The function returns -1 when all command-line arguments are parsed. In this case,
+// opt->ind is the index of the first non-option argument.
+#include <stdio.h>
+#include <stc/coption.h>
 
-    coption_get() is similar to GNU's getopt_long(). Each call parses one option and
-    returns the option name. opt->arg points to  the option argument if present.
-    The function returns -1 when all command-line arguments are parsed. In this case,
-    opt->ind is the index of the first non-option argument.
-Example:
-    int main(int argc, char *argv[])
-    {
-        coption_long_t longopts[] = {
-            {"foo", coption_no_argument,       'f'},
-            {"bar", coption_required_argument, 'b'},
-            {"opt", coption_optional_argument, 'o'},
-            {NULL}
-        };
-        const char* optstr = "xy:z::123";
-        printf("program -x -y ARG -z [ARG] -1 -2 -3 --foo --bar ARG --opt [ARG] [ARGUMENTS]\n");
-        int c;
-        coption_t opt = coption_INIT;
-        while ((c = coption_get(&opt, argc, argv, optstr, longopts)) != -1) {
-            switch (c) {
-                case '?': printf("error: unknown option: %s\n", opt.faulty); break;
-                case ':': printf("error: missing argument for %s\n", opt.faulty); break;
-                default:  printf("option: %c [%s]\n", c, opt.arg ? opt.arg : ""); break;
-            }
+int main(int argc, char *argv[])
+{
+    coption_long_t longopts[] = {
+        {"foo", coption_no_argument,       'f'},
+        {"bar", coption_required_argument, 'b'},
+        {"opt", coption_optional_argument, 'o'},
+        {NULL}
+    };
+    const char* optstr = "xy:z::123";
+    printf("program -x -y ARG -z [ARG] -1 -2 -3 --foo --bar ARG --opt [ARG] [ARGUMENTS]\n");
+    int c;
+    coption_t opt = coption_init();
+    while ((c = coption_get(&opt, argc, argv, optstr, longopts)) != -1) {
+        switch (c) {
+            case '?': printf("error: unknown option: %s\n", opt.faulty); break;
+            case ':': printf("error: missing argument for %s\n", opt.faulty); break;
+            default:  printf("option: %c [%s]\n", c, opt.arg ? opt.arg : ""); break;
         }
-        printf("\nNon-option arguments:");
-        for (int i = opt.ind; i < argc; ++i)
-            printf(" %s", argv[i]);
-        putchar('\n');
-        return 0;
     }
+    printf("\nNon-option arguments:");
+    for (int i = opt.ind; i < argc; ++i)
+        printf(" %s", argv[i]);
+    putchar('\n');
+    return 0;
+}
 */
-
 #include <string.h>
 #include <stdbool.h>
 
@@ -83,7 +85,10 @@ typedef struct {
     int val;
 } coption_long_t;
 
-static const coption_t coption_INIT = {1, 0, NULL, NULL, -1, 1, 0, 0, {'-', '?', '\0'}};
+static inline coption_t coption_init() {
+    static const coption_t init = {1, 0, NULL, NULL, -1, 1, 0, 0, {'-', '?', '\0'}};
+    return init;
+}
 
 static void _coption_permute(char *argv[], int j, int n) { /* move argv[j] over n elements to the left */
     int k;
@@ -93,7 +98,7 @@ static void _coption_permute(char *argv[], int j, int n) { /* move argv[j] over 
     argv[j - k] = p;
 }
 
-/* @param opt   output; must be initialized to coption_INIT on first call
+/* @param opt   output; must be initialized to coption_init() on first call
  * @return      ASCII val for a short option; longopt.val for a long option;
  *              -1 if argv[] is fully processed; '?' for an unknown option or
  *              an ambiguous long option; ':' if an option argument is missing

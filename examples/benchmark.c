@@ -1,10 +1,9 @@
+#include <stdio.h>
+#include <time.h>
 #include <stc/crandom.h>
 #include <stc/cfmt.h>
 #include <stc/cmap.h>
 #include "others/khash.h"
-
-#include <stdio.h>
-#include <time.h>
 
 #ifdef __cplusplus
 #include <unordered_map>
@@ -34,7 +33,7 @@ crand_rng64_t rng;
 #define RAND(N) (crand_i64(&rng) & ((1 << N) - 1))
 
 
-#define CMAP_SETUP(X, Key, Value) cmap_##X map = cmap_INIT \
+#define CMAP_SETUP(X, Key, Value) cmap_##X map = cmap__init \
                                   ; cmap_##X##_set_load_factors(&map, max_load_factor, 0.0)
 #define CMAP_PUT(X, key, val)     cmap_##X##_put(&map, key, val).first->second
 #define CMAP_EMPLACE(X, key, val) cmap_##X##_emplace(&map, key, val)

@@ -20,6 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#ifndef CBITSET__H__
+#define CBITSET__H__
+
 /*
 Similar to boost::dynamic_bitset / std::bitset
 
@@ -42,14 +45,9 @@ int main() {
     cbitset_del(&bset);
 }
 */
-#ifndef CBITSET__H__
-#define CBITSET__H__
-
 #include "cstr.h"
 
 typedef struct cbitset { uint64_t* _arr; size_t size; } cbitset_t;
-
-#define cbitset_INIT {NULL, 0}
 
 STC_API cbitset_t cbitset_with_size(size_t size, bool value);
 STC_API cbitset_t cbitset_from_str(const char* str);
@@ -64,7 +62,7 @@ STC_API bool      cbitset_is_superset(cbitset_t set, cbitset_t other);
 STC_INLINE size_t cbitset_size(cbitset_t set) {return set.size;}
 
 STC_INLINE cbitset_t cbitset_init() {
-    cbitset_t bs = cbitset_INIT; return bs;
+    cbitset_t bs = {NULL, 0}; return bs;
 }
 STC_INLINE void cbitset_set(cbitset_t *self, size_t i) {
     self->_arr[i >> 6] |= 1ull << (i & 63);
