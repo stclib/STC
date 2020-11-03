@@ -8,9 +8,8 @@ int main() {
 
     cbitset_reset(&set, 9);
     cbitset_resize(&set, 43, false);
-    cstr_t str = cbitset_to_str(set);
-    c_print(1, " str: {}\n", str.str);
-    cstr_del(&str);
+    c_withbuffer (str, char, set.size + 1)
+        c_print(1, " str: {}\n", cbitset_to_str(set, str, 0, -1));
 
     c_print(1, "{:4}: ", set.size);
     c_forrange (i, int, set.size)

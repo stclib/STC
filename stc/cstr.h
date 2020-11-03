@@ -331,7 +331,7 @@ STC_INLINE void _cstr_internal_move(cstr_t* self, size_t pos1, size_t pos2) {
 
 STC_DEF void
 cstr_replace_n(cstr_t* self, size_t pos, size_t len, const char* str, size_t n) {
-    c_withbuffer (char, xstr, n) {
+    c_withbuffer (xstr, char, n) {
         memcpy(xstr, str, n);
         _cstr_internal_move(self, pos + len, pos + n);
         memcpy(&self->str[pos], xstr, n);

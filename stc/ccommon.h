@@ -103,8 +103,8 @@
 
 #define c_break_with continue
 #define c_withfile(f, open) for (FILE *f = open; f; fclose(f), f = NULL)
-#define c_withbuffer(type, b, n) c_withbuffer_x(type, b, n, 256)
-#define c_withbuffer_x(type, b, n, BYTES) \
+#define c_withbuffer(b, type, n) c_withbuffer_x(b, type, n, 256)
+#define c_withbuffer_x(b, type, n, BYTES) \
     for (type __b[((BYTES) - 1) / sizeof(type) + 1], \
                *b = (n) * sizeof *b > (BYTES) ? c_new_2(type, n) : __b; \
          b; b != __b ? c_free(b) : (void)0, b = NULL)

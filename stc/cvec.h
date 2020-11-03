@@ -242,7 +242,7 @@
     STC_DEF cvec_##X##_iter_t \
     cvec_##X##_insert_range_p(cvec_##X* self, cvec_##X##_value_t* pos, const cvec_##X##_value_t* first, const cvec_##X##_value_t* finish) { \
         size_t len = finish - first, idx = pos - self->data, size = cvec_size(*self); \
-        c_withbuffer (cvec_##X##_value_t, buf, len) { \
+        c_withbuffer (buf, cvec_##X##_value_t, len) { \
             for (size_t i=0; i<len; ++i, ++first) \
                 buf[i] = valueFromRaw(valueToRaw(first)); \
             if (size + len > cvec_capacity(*self)) \

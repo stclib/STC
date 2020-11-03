@@ -51,7 +51,7 @@ typedef struct cbitset { uint64_t* _arr; size_t size; } cbitset_t;
 
 STC_API cbitset_t cbitset_with_size(size_t size, bool value);
 STC_API cbitset_t cbitset_from_str(const char* str);
-STC_API cstr_t    cbitset_to_str(cbitset_t set);
+STC_API char*     cbitset_to_str(cbitset_t set, char* str, size_t start, intptr_t stop);
 STC_API cbitset_t cbitset_clone(cbitset_t other);
 STC_API void      cbitset_resize(cbitset_t* self, size_t size, bool value);
 STC_API size_t    cbitset_count(cbitset_t set);
@@ -190,10 +190,10 @@ STC_DEF cbitset_t cbitset_from_str(const char* str) {
     for (size_t i=0; i<set.size; ++i) if (str[i] == '1') cbitset_set(&set, i);
     return set;
 }
-STC_DEF cstr_t cbitset_to_str(cbitset_t set) {
-    cstr_t out = cstr_with_size(set.size, '0');
-    for (size_t i=0; i<set.size; ++i) if (cbitset_test(set, i)) out.str[i] = '1';
-    return out;
+STC_DEF char* cbitset_to_str(cbitset_t set, char* out, size_t start, intptr_t stop) {
+    size_t end = stop < 0 ? set.size : stop;
+    for (size_t i=start; i<end; ++i) out[i] = (cbitset_test(set, i)) ? '1' : '0';
+    out[end] = '\0'; return out;
 }
 STC_DEF cbitset_t cbitset_clone(cbitset_t other) {
     size_t bytes = ((other.size + 63) >> 6) * 8;
