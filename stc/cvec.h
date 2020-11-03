@@ -27,7 +27,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define cvec__init         {NULL}
+#define cvec_inits         {NULL}
 #define cvec_size(v)       _cvec_safe_size((v).data)
 #define cvec_capacity(v)   _cvec_safe_capacity((v).data)
 #define cvec_empty(v)      (cvec_size(v) == 0)
@@ -55,7 +55,7 @@
     } cvec_##X; \
 \
     STC_INLINE cvec_##X \
-    cvec_##X##_init(void) {cvec_##X v = cvec__init; return v;} \
+    cvec_##X##_init(void) {cvec_##X v = cvec_inits; return v;} \
     STC_INLINE bool \
     cvec_##X##_empty(cvec_##X v) {return cvec_empty(v);} \
     STC_INLINE size_t \
@@ -77,13 +77,13 @@
 \
     STC_INLINE cvec_##X \
     cvec_##X##_with_size(size_t size, Value null_val) { \
-        cvec_##X x = cvec__init; \
+        cvec_##X x = cvec_inits; \
         cvec_##X##_resize(&x, size, null_val); \
         return x; \
     } \
     STC_INLINE cvec_##X \
     cvec_##X##_with_capacity(size_t size) { \
-        cvec_##X x = cvec__init; \
+        cvec_##X x = cvec_inits; \
         cvec_##X##_reserve(&x, size); \
         return x; \
     } \

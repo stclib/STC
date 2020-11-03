@@ -39,7 +39,7 @@ using_cvec(ix, int64_t); // ix is just an example tag name.
 void vectordemo1()
 {
     c_print(1, "\nVECTORDEMO1\n");
-    cvec_ix bignums = cvec__init; // = (cvec_ix) cvec__init; if initializing after declaration.
+    cvec_ix bignums = cvec_inits; // = (cvec_ix) cvec_inits; if initializing after declaration.
     cvec_ix_reserve(&bignums, 100);
     c_forrange (i, 101)
         cvec_ix_push_back(&bignums, i * i * i);
@@ -60,7 +60,7 @@ using_cvec_str();
 void vectordemo2()
 {
     c_print(1, "\nVECTORDEMO2\n");
-    cvec_str names = cvec__init;
+    cvec_str names = cvec_inits;
     cvec_str_emplace_back(&names, "Mary");
     cvec_str_emplace_back(&names, "Joe");
     cvec_str_emplace_back(&names, "Chris");
@@ -78,7 +78,7 @@ using_clist(ix, int);
 void listdemo1()
 {
     c_print(1, "\nLISTDEMO1\n");
-    clist_ix nums = clist__init, nums2 = clist__init;
+    clist_ix nums = clist_inits, nums2 = clist_inits;
     c_forrange (i, 10)
         clist_ix_push_back(&nums, i);
     c_forrange (i, int, 100, 110)
@@ -105,7 +105,7 @@ using_cset(i, int);
 void setdemo1()
 {
     c_print(1, "\nSETDEMO1\n");
-    cset_i nums = cset__init;
+    cset_i nums = cset_inits;
     cset_i_insert(&nums, 8);
     cset_i_insert(&nums, 11);
 
@@ -120,7 +120,7 @@ using_cmap(ii, int, int);
 void mapdemo1()
 {
     c_print(1, "\nMAPDEMO1\n");
-    cmap_ii nums = cmap__init;
+    cmap_ii nums = cmap_inits;
     cmap_ii_put(&nums, 8, 64);
     cmap_ii_put(&nums, 11, 121);
     c_print(1, "val 8: {}\n", *cmap_ii_at(&nums, 8));
@@ -133,7 +133,7 @@ using_cmap_strkey(si, int); // Shorthand macro for the general using_cmap expans
 void mapdemo2()
 {
     c_print(1, "\nMAPDEMO2\n");
-    cmap_si nums = cmap__init;
+    cmap_si nums = cmap_inits;
     cmap_si_put(&nums, "Hello", 64);
     cmap_si_put(&nums, "Groovy", 121);
     cmap_si_put(&nums, "Groovy", 200); // overwrite previous
@@ -155,7 +155,7 @@ using_cmap_str();
 void mapdemo3()
 {
     c_print(1, "\nMAPDEMO3\n");
-    cmap_str table = cmap__init;
+    cmap_str table = cmap_inits;
     cmap_str_put(&table, "Map", "test");
     cmap_str_put(&table, "Make", "my");
     cmap_str_put(&table, "Sunny", "day");

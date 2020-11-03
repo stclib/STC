@@ -23,7 +23,7 @@ int main(void)
 {
     // CVEC FLOAT / PRIORITY QUEUE
 
-    cvec_f floats = cvec__init;
+    cvec_f floats = cvec_inits;
     c_push_items(&floats, cvec_f, {4.0f, 2.0f, 5.0f, 3.0f, 1.0f});
 
     c_foreach (i, cvec_f, floats) c_print(1, "{:.1f} ", *i.val);
@@ -45,7 +45,7 @@ int main(void)
     // CMAP ID
 
     int year = 2020;
-    cmap_id idnames = cmap__init;
+    cmap_id idnames = cmap_inits;
     c_push_items(&idnames, cmap_id, {
         {100, cstr_from("Hello")},
         {110, cstr_from("World")},
@@ -59,7 +59,7 @@ int main(void)
 
     // CMAP CNT
 
-    cmap_cnt countries = cmap__init;
+    cmap_cnt countries = cmap_inits;
     c_push_items(&countries, cmap_cnt, {
         {"Norway", 100},
         {"Denmark", 50},
@@ -82,7 +82,7 @@ int main(void)
 
     // CVEC PAIR
 
-    cvec_ip pairs1 = cvec__init;
+    cvec_ip pairs1 = cvec_inits;
     c_push_items(&pairs1, cvec_ip, {
         {5, 6}, {3, 4}, {1, 2}, {7, 8},
     });
@@ -95,7 +95,7 @@ int main(void)
 
     // CLIST PAIR
 
-    clist_ip pairs2 = clist__init;
+    clist_ip pairs2 = clist_inits;
     c_push_items(&pairs2, clist_ip, {
         {5, 6}, {3, 4}, {1, 2}, {7, 8},
     });

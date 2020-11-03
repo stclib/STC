@@ -9,7 +9,7 @@ int main() {
     int k;
     const int n = 2000000;
 
-    clist_fx list = clist__init;
+    clist_fx list = clist_inits;
     crand_rng64_t eng = crand_rng64_init(1234);
     crand_uniform_f64_t dist = crand_uniform_f64_init(100.0f, n);
     int m = 0;

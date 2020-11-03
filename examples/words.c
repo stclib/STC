@@ -11,7 +11,7 @@ using_cmap_strkey(si, int);
 
 int main1()
 {
-    clist_str lwords = clist__init;
+    clist_str lwords = clist_inits;
     c_push_items(&lwords, clist_str, {
         "this", "sentence", "is", "not", "a", "sentence",
         "this", "sentence", "is", "a", "hoax"
@@ -21,13 +21,13 @@ int main1()
         c_print(1, "{}\n", w.val->str);
     puts("");
 
-    cvec_str words = cvec__init;
+    cvec_str words = cvec_inits;
     c_push_items(&words, cvec_str, {
         "this", "sentence", "is", "not", "a", "sentence",
         "this", "sentence", "is", "a", "hoax"
     });
 
-    cmap_si word_map = cmap__init;
+    cmap_si word_map = cmap_inits;
     c_foreach (w, cvec_str, words)
         cmap_si_emplace(&word_map, w.val->str, 0).first->second += 1;
 
