@@ -76,7 +76,7 @@
 #endif
 #define c_swap(T, x, y)         do { T __t = x; x = y; y = __t; } while (0)
 #define c_no_compare(x, y)      (0)
-#define c_mem_equals(x, y)      (memcmp(x, y, sizeof(*(y))) == 0)
+#define c_mem_equals(x, y)      (memcmp(x, y, sizeof *(x)) == 0)
 #define c_default_equals(x, y)  (*(x) == *(y))
 #define c_default_less(x, y)    (*(x) < *(y))
 #define c_less_compare(less, x, y) (less(y, x) - less(x, y))

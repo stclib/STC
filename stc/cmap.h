@@ -445,8 +445,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 
 STC_DEF uint32_t c_default_hash16(const void *data, size_t len) {
     const volatile uint16_t *key = (const uint16_t *) data;
-    uint64_t x = *key++ * 0xc613fc15u;
-    while (len -= 2) x = (*key++ + x) * 2654435769ull;
+    uint64_t x = *key++ * 11400714819323198485llu;
+    while (len -= 2) x = (*key++ + x) * 11400714819323198485llu;
     return (uint32_t) x;
 }
 STC_DEF uint32_t c_default_hash32(const void* data, size_t len) {
