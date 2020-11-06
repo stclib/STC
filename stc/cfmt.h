@@ -25,7 +25,6 @@
 
 /*
 // https://gist.github.com/alexameen/4440e4bcad557a464dcc9ff884763049
-#include <time.h>
 #include <stc/cfmt.h>
 
 int main() {
@@ -47,17 +46,13 @@ int main() {
     cstr_del(&string);
 }
 */
+#include <time.h>
 #include <stc/cstr.h>
 
+STC_API char* _cfmt_parse(int nargs, const char *fmt, ...);
 STC_API void _cfmt_printf(int s, const char* fmt, ...);
-STC_API char* _cfmt_conv(int nargs, const char *fmt, ...);
 enum {_cfmt_bn=4, _cfmt_sn=80};
-STC_INLINE const char* _cfmt_strftime(char* n, char buf[][_cfmt_sn], size_t maxsize, const char *fmt, const struct tm *timeptr) {
-    if (*n >= _cfmt_bn) return fmt;
-    int k = (*n)++; buf[k][0] = '\0';
-    strftime(buf[k], maxsize, fmt, timeptr);
-    return buf[k];
-}
+STC_API const char* _cfmt_strftime(char* n, char buf[][_cfmt_sn], size_t maxsize, const char *fmt, const struct tm *timeptr);
 
 #ifndef __cplusplus
 #define _cfmt_fn(x) _Generic ((x), \
@@ -119,60 +114,61 @@ STC_INLINE const char* _cfmt_strftime(char* n, char buf[][_cfmt_sn], size_t maxs
 /* Primary function. */
 #define c_print(...) c_MACRO_OVERLOAD(c_print, __VA_ARGS__)
 #define c_print_2(to, fmt) \
-    do { char *_fm = _cfmt_conv(0, fmt); \
+    do { char *_fm = _cfmt_parse(0, fmt); \
         _cfmt_fn(to)(to, _fm); free(_fm); } while (0)
 #define c_print_3(to, fmt, c) \
-    do { char _tm[1][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(1, fmt, _cfmt(c)); \
+    do { char _tm[1][_cfmt_sn], _tn=0, *_fm = _cfmt_parse(1, fmt, _cfmt(c)); \
         _cfmt_fn(to)(to, _fm, c); free(_fm); } while (0)
 #define c_print_4(to, fmt, c, d) \
-    do { char _tm[2][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(2, fmt, _cfmt(c), _cfmt(d)); \
+    do { char _tm[2][_cfmt_sn], _tn=0, *_fm = _cfmt_parse(2, fmt, _cfmt(c), _cfmt(d)); \
         _cfmt_fn(to)(to, _fm, c, d); free(_fm); } while (0)
 #define c_print_5(to, fmt, c, d, e) \
-    do { char _tm[3][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(3, fmt, _cfmt(c), _cfmt(d), _cfmt(e)); \
+    do { char _tm[3][_cfmt_sn], _tn=0, *_fm = _cfmt_parse(3, fmt, _cfmt(c), _cfmt(d), _cfmt(e)); \
         _cfmt_fn(to)(to, _fm, c, d, e); free(_fm); } while (0)
 #define c_print_6(to, fmt, c, d, e, f) \
-    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(4, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f)); \
+    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_parse(4, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f); free(_fm); } while (0)
 #define c_print_7(to, fmt, c, d, e, f, g) \
-    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(5, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g)); \
+    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_parse(5, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g); free(_fm); } while (0)
 #define c_print_8(to, fmt, c, d, e, f, g, h) \
-    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(6, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h)); \
+    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_parse(6, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h); free(_fm); } while (0)
 #define c_print_9(to, fmt, c, d, e, f, g, h, i) \
-    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(7, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i)); \
+    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_parse(7, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i); free(_fm); } while (0)
 #define c_print_10(to, fmt, c, d, e, f, g, h, i, j) \
-    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(8, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j)); \
+    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_parse(8, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i, j); free(_fm); } while (0)
 #define c_print_11(to, fmt, c, d, e, f, g, h, i, j, k) \
-    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(9, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k)); \
+    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_parse(9, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i, j, k); free(_fm); } while (0)
 #define c_print_12(to, fmt, c, d, e, f, g, h, i, j, k, m) \
-    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(10, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m)); \
+    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_parse(10, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i, j, k, m); free(_fm); } while (0)
 #define c_print_13(to, fmt, c, d, e, f, g, h, i, j, k, m, n) \
-    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(11, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m), _cfmt(n)); \
+    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_parse(11, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m), _cfmt(n)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i, j, k, m, n); free(_fm); } while (0)
 #define c_print_14(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o) \
-    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(12, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m), _cfmt(n), _cfmt(o)); \
+    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_parse(12, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m), _cfmt(n), _cfmt(o)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i, j, k, m, n, o); free(_fm); } while (0)
 #define c_print_15(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o, p) \
-    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(13, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m), _cfmt(n), _cfmt(o), _cfmt(p)); \
+    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_parse(13, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m), _cfmt(n), _cfmt(o), _cfmt(p)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i, j, k, m, n, o, p); free(_fm); } while (0)
 #define c_print_16(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o, p, q) \
-    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(14, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m), _cfmt(n), _cfmt(o), _cfmt(p), _cfmt(p)); \
+    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_parse(14, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m), _cfmt(n), _cfmt(o), _cfmt(p), _cfmt(p)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i, j, k, m, n, o, p, q); free(_fm); } while (0)
 #define c_print_17(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o, p, q, r) \
-    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(15, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m), _cfmt(n), _cfmt(o), _cfmt(p), _cfmt(p), _cfmt(r)); \
+    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_parse(15, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m), _cfmt(n), _cfmt(o), _cfmt(p), _cfmt(p), _cfmt(r)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i, j, k, m, n, o, p, q, r); free(_fm); } while (0)
 #define c_print_18(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o, p, q, r, s) \
-    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_conv(16, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m), _cfmt(n), _cfmt(o), _cfmt(p), _cfmt(p), _cfmt(r), _cfmt(s)); \
+    do { char _tm[_cfmt_bn][_cfmt_sn], _tn=0, *_fm = _cfmt_parse(16, fmt, _cfmt(c), _cfmt(d), _cfmt(e), _cfmt(f), _cfmt(g), _cfmt(h), _cfmt(i), _cfmt(j), _cfmt(k), _cfmt(m), _cfmt(n), _cfmt(o), _cfmt(p), _cfmt(p), _cfmt(r), _cfmt(s)); \
         _cfmt_fn(to)(to, _fm, c, d, e, f, g, h, i, j, k, m, n, o, p, q, r, s); free(_fm); } while (0)
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
 #include <stdarg.h>
+#include <time.h>
 
 STC_DEF void
 _cfmt_printf(int s, const char* fmt, ...) {
@@ -182,8 +178,15 @@ _cfmt_printf(int s, const char* fmt, ...) {
     va_end(args);
 }
 
+STC_DEF const char* _cfmt_strftime(char* n, char buf[][_cfmt_sn], size_t maxsize, const char *fmt, const struct tm *timeptr) {
+    if (*n >= _cfmt_bn) return fmt;
+    int k = (*n)++; buf[k][0] = '\0';
+    strftime(buf[k], maxsize, fmt, timeptr);
+    return buf[k];
+}
+
 STC_DEF char *
-_cfmt_conv(int nargs, const char *fmt, ...) {
+_cfmt_parse(int nargs, const char *fmt, ...) {
     char *fmt1 = (char *) malloc(strlen(fmt)*25/10 + 1), *p = fmt1, *p0, *arg, ch;
     const char *fmt0 = fmt;
     int n = 0, align;

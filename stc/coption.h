@@ -72,15 +72,15 @@ enum {
 typedef struct {
     int ind;   /* equivalent to optind */
     int opt;   /* equivalent to optopt */
-    char *arg; /* equivalent to optarg */
-    char *faulty; /* points to the faulty option */
+    const char *arg; /* equivalent to optarg */
+    const char *faulty; /* points to the faulty option */
     int longindex; /* idx of long option; or -1 if short */
     int _i, _pos, _nargs;
     char _faulty[4];
 } coption_t;
 
 typedef struct {
-    char *name;
+    const char *name;
     int has_arg;
     int val;
 } coption_long_t;
