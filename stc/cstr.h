@@ -226,7 +226,7 @@ cstr_reserve(cstr_t* self, size_t cap) {
     if (cap > oldcap) {
         size_t* rep = (size_t *) c_realloc(oldcap ? _cstr_rep(self) : NULL, _cstr_mem(cap));
         self->str = (char *) &rep[2];
-        if (oldcap == 0) self->str[rep[0] = len] = '\0';
+        if (oldcap == 0) self->str[rep[0] = 0] = '\0';
         return rep[1] = _cstr_cap(cap);
     }
     return oldcap;
@@ -244,7 +244,7 @@ STC_DEF cstr_t
 cstr_from_n(const char* str, size_t len) {
     if (len == 0) return cstr_init();
     size_t *rep = (size_t *) c_malloc(_cstr_mem(len));
-    cstr_t s = {strncpy((char *)(rep + 2), str, len)};
+    cstr_t s = {strncpy((char *) &rep[2], str, len)};
     s.str[rep[0] = len] = '\0';
     rep[1] = _cstr_cap(len);
     return s;
@@ -352,13 +352,11 @@ cstr_getdelim(cstr_t *self, int delim, FILE *fp) {
     size_t pos = 0, cap = cstr_capacity(*self);
     for (;;) {
         int c = fgetc(fp);
-        if (errno != 0)
-            return false;
         if (pos == cap)
             cap = cstr_reserve(self, cap * 3 / 2 + 34);
         if (c == delim || c == EOF) {
             self->str[_cstr_size(*self) = pos] = '\0';
-            return true;
+            return c != EOF;
         }
         self->str[pos++] = (char) c;
     }
