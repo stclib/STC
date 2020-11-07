@@ -350,15 +350,18 @@ cstr_erase(cstr_t* self, size_t pos, size_t n) {
 STC_DEF bool
 cstr_getdelim(cstr_t *self, int delim, FILE *fp) {
     size_t pos = 0, cap = cstr_capacity(*self);
+    int c = fgetc(fp);
+    if (c == EOF)
+        return false;
     for (;;) {
-        int c = fgetc(fp);
         if (pos == cap)
             cap = cstr_reserve(self, cap * 3 / 2 + 34);
         if (c == delim || c == EOF) {
             self->str[_cstr_size(*self) = pos] = '\0';
-            return c != EOF;
+            return true;
         }
         self->str[pos++] = (char) c;
+        c = fgetc(fp);
     }
 }
 
