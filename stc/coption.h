@@ -85,8 +85,8 @@ typedef struct {
     int val;
 } coption_long_t;
 
-static inline coption_t coption_init() {
-    static const coption_t init = {1, 0, NULL, NULL, -1, 1, 0, 0, {'-', '?', '\0'}};
+static inline coption_t coption_init(void) {
+    const coption_t init = {1, 0, NULL, NULL, -1, 1, 0, 0, {'-', '?', '\0'}};
     return init;
 }
 

@@ -225,8 +225,8 @@ cstr_reserve(cstr_t* self, size_t cap) {
     size_t len = cstr_size(*self), oldcap = cstr_capacity(*self);
     if (cap > oldcap) {
         size_t* rep = (size_t *) c_realloc(oldcap ? _cstr_rep(self) : NULL, _cstr_mem(cap));
-        self->str = (char *) (rep + 2);
-        self->str[rep[0] = len] = '\0';
+        self->str = (char *) &rep[2];
+        if (oldcap == 0) self->str[rep[0] = len] = '\0';
         return rep[1] = _cstr_cap(cap);
     }
     return oldcap;
@@ -348,21 +348,19 @@ cstr_erase(cstr_t* self, size_t pos, size_t n) {
 }
 
 STC_DEF bool
-cstr_getdelim(cstr_t *self, int delim, FILE *stream) {
+cstr_getdelim(cstr_t *self, int delim, FILE *fp) {
     size_t pos = 0, cap = cstr_capacity(*self);
     for (;;) {
-        int c = fgetc(stream);
-        if (c == EOF) return false;
-        if (cap - pos < 2) cap = cstr_reserve(self, cap * 3 / 2 + 34);
-        char *cur = self->str + pos;
-        do {
-            *cur++ = (char) c;
-            if (c == delim || (c = fgetc(stream)) == EOF) {
-                pos += c != delim;
-                self->str[_cstr_size(*self) = pos] = '\0';
-                return errno == 0;
-            }
-        } while (++pos != cap - 1);
+        int c = fgetc(fp);
+        if (errno != 0)
+            return false;
+        if (pos == cap)
+            cap = cstr_reserve(self, cap * 3 / 2 + 34);
+        if (c == delim || c == EOF) {
+            self->str[_cstr_size(*self) = pos] = '\0';
+            return true;
+        }
+        self->str[pos++] = (char) c;
     }
 }
 
