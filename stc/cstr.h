@@ -194,15 +194,18 @@ cstr_find(cstr_t s, const char* needle) {
 }
 
 STC_INLINE bool
-cstr_contains(const cstr_t s, const char* needle) {
+cstr_contains(cstr_t s, const char* needle) {
     return strstr(s.str, needle) != NULL;
 }
 STC_INLINE bool
-cstr_begins_with(const cstr_t s, const char* needle) {
-    return strncmp(s.str, needle, strlen(needle)) == 0;
+cstr_begins_with(cstr_t s, const char* needle) {
+    for (;;) {
+        if (!(*needle && *s.str)) return *needle == 0;
+        if (*needle++ != *s.str++) return false;
+    }
 }
 STC_INLINE bool
-cstr_ends_with(const cstr_t s, const char* needle) {
+cstr_ends_with(cstr_t s, const char* needle) {
     size_t n = strlen(needle), sz = cstr_size(s);
     return n <= sz ? strcmp(s.str + sz - n, needle) == 0 : false;
 }
