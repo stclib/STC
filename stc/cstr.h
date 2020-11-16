@@ -183,14 +183,28 @@ cstr_compare(const cstr_t *s1, const cstr_t *s2) {
     return strcmp(s1->str, s2->str);
 }
 STC_INLINE size_t
-cstr_find_n(const cstr_t* s, const char* needle, size_t pos, size_t n) {
-    char* res = c_strnstr(s->str + pos, needle, n);
-    return res ? res - s->str : cstr_NPOS;
+cstr_find_n(cstr_t s, const char* needle, size_t pos, size_t n) {
+    char* res = c_strnstr(s.str + pos, needle, n);
+    return res ? res - s.str : cstr_NPOS;
 }
 STC_INLINE size_t
-cstr_find(const cstr_t* s, const char* needle) {
-    char* res = strstr(s->str, needle);
-    return res ? res - s->str : cstr_NPOS;
+cstr_find(cstr_t s, const char* needle) {
+    char* res = strstr(s.str, needle);
+    return res ? res - s.str : cstr_NPOS;
+}
+
+STC_INLINE bool
+cstr_contains(const cstr_t s, const char* needle) {
+    return strstr(s.str, needle) != NULL;
+}
+STC_INLINE bool
+cstr_begins_with(const cstr_t s, const char* needle) {
+    return strncmp(s.str, needle, strlen(needle)) == 0;
+}
+STC_INLINE bool
+cstr_ends_with(const cstr_t s, const char* needle) {
+    size_t n = strlen(needle), sz = cstr_size(s);
+    return n <= sz ? strcmp(s.str + sz - n, needle) == 0 : false;
 }
 
 /* cvec/cmap API functions: */
