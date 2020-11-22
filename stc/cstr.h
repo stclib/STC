@@ -36,7 +36,7 @@ typedef char cstr_value_t;
 #define cstr_size(s)     ((const size_t *) (s).str)[-2]
 #define cstr_capacity(s) ((const size_t *) (s).str)[-1]
 #define cstr_empty(s)    (cstr_size(s) == 0)
-#define cstr_NPOS        ((size_t) (-1))
+#define cstr_npos        ((size_t) (-1))
 
 STC_API cstr_t
 cstr_init(void);
@@ -61,7 +61,7 @@ cstr_erase(cstr_t* self, size_t pos, size_t n);
 STC_API bool
 cstr_getdelim(cstr_t *self, int delim, FILE *stream);
 STC_API char*
-c_strnstr(const char* s, const char* needle, size_t n);
+c_strnfind(const char* s, const char* needle, size_t nlen);
 
 #define _cstr_rep(self) (((size_t *) (self)->str) - 2)
 #define _cstr_size(s)   ((size_t *) (s).str)[-2]
@@ -182,15 +182,17 @@ STC_INLINE int
 cstr_compare(const cstr_t *s1, const cstr_t *s2) {
     return strcmp(s1->str, s2->str);
 }
-STC_INLINE size_t
-cstr_find_n(cstr_t s, const char* needle, size_t pos, size_t n) {
-    char* res = c_strnstr(s.str + pos, needle, n);
-    return res ? res - s.str : cstr_NPOS;
-}
+
 STC_INLINE size_t
 cstr_find(cstr_t s, const char* needle) {
     char* res = strstr(s.str, needle);
-    return res ? res - s.str : cstr_NPOS;
+    return res ? res - s.str : cstr_npos;
+}
+STC_INLINE size_t
+cstr_find_n(cstr_t s, const char* needle, size_t pos, size_t nlen) {
+    if (pos > cstr_size(s)) return NULL;
+    char* res = c_strnfind(s.str + pos, needle, nlen);
+    return res ? res - s.str : cstr_npos;
 }
 
 STC_INLINE bool
@@ -379,18 +381,21 @@ cstr_getdelim(cstr_t *self, int delim, FILE *fp) {
 }
 
 STC_DEF char*
-c_strnstr(const char* x, const char* needle, size_t n) {
+c_strnfind(const char* s, const char* needle, size_t nlen) {
     ptrdiff_t sum = 0;
-    const char *y = x, *p = needle, *q = needle + n;
-    while (*y && *p && p != q) {
-        sum += *y++ - *p++;
+    const char *t = s, *p = needle, *q = p + nlen;
+    while (p != q) {
+        if (!(*t && *p))
+            return NULL;
+        sum += *t++ - *p++;
     }
-    while (*y) {
-        if (sum == 0 && strncmp(x, needle, n) == 0)
-            return (char *) x;
-        sum += *y++ - *x++;
+    for (;;) {
+        if (sum == 0 && memcmp(s, needle, nlen) == 0)
+            return (char *) s;
+        if (!*t)
+            return NULL;
+        sum += *t++ - *s++;
     }
-    return NULL;
 }
 
 #endif
