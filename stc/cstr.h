@@ -173,9 +173,20 @@ cstr_getline(cstr_t *self, FILE *stream) {
 STC_INLINE size_t
 cstr_length(cstr_t s) { return cstr_size(s); }
 
+STC_INLINE int
+c_strcasecmp(const char* s1, const char* s2) {
+    while (*s1 && tolower(*s1) == tolower(*s2))
+        ++s1, ++s2;
+    return tolower(*s1) - tolower(*s2);
+}
+
 STC_INLINE bool
 cstr_equals(cstr_t s1, const char* str) {
     return strcmp(s1.str, str) == 0;
+}
+STC_INLINE bool
+cstr_equals_caseins(cstr_t s1, const char* str) {
+    return c_strcasecmp(s1.str, str) == 0;
 }
 STC_INLINE bool
 cstr_equals_s(cstr_t s1, cstr_t s2) {
@@ -184,6 +195,10 @@ cstr_equals_s(cstr_t s1, cstr_t s2) {
 STC_INLINE int
 cstr_compare(const cstr_t *s1, const cstr_t *s2) {
     return strcmp(s1->str, s2->str);
+}
+STC_INLINE int
+cstr_casecmp(const cstr_t *s1, const cstr_t *s2) {
+    return c_strcasecmp(s1->str, s2->str);
 }
 
 STC_INLINE size_t
