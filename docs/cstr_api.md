@@ -44,6 +44,7 @@ void cstr_del( cstr_t *self );
 
 ## Interface
 
+### Get properties
 ```c
 size_t       cstr_size( cstr_t s );
 size_t       cstr_length( cstr_t s );
@@ -51,12 +52,14 @@ size_t       cstr_capacity( cstr_t s );
 bool         cstr_empty( cstr_t s );
 ```
 
+### Reserve, reserve, and clear string.
 ```c
 size_t       cstr_reserve( cstr_t* self, size_t cap );
 void         cstr_resize( cstr_t* self, size_t len, char fill );
 void         cstr_clear( cstr_t* self );
 ```
 
+### Assignment and transfer of ownership.
 ```c
 cstr_t*      cstr_assign( cstr_t* self, const char* str );
 cstr_t*      cstr_assign_n( cstr_t* self, const char* str, size_t len );
@@ -65,32 +68,41 @@ cstr_t       cstr_clone( cstr_t s );
 cstr_t       cstr_move( cstr_t* self );
 ```
 
+### Append characters.
 ```c
 cstr_t*      cstr_append( cstr_t* self, const char* str );
 cstr_t*      cstr_append_n( cstr_t* self, const char* str, size_t len );
 cstr_t*      cstr_push_back( cstr_t* self, char value );
 ```
 
+### Insert characters
 ```c
 void         cstr_insert( cstr_t* self, size_t pos, const char* str );
 void         cstr_insert_n( cstr_t* self, size_t pos, const char* str, size_t n );
 ```
 
+### Erase characters
 ```c
 void         cstr_erase( cstr_t* self, size_t pos, size_t n );
 void         cstr_pop_back( cstr_t* self );
 ```
 
+### Replace substring
 ```c
 void         cstr_replace( cstr_t* self, size_t pos, size_t len, const char* str );
 void         cstr_replace_n( cstr_t* self, size_t pos, size_t len, const char* str, size_t n );
 ```
 
+### Search in string
 ```c
 size_t       cstr_find( cstr_t s, const char* needle );
 size_t       cstr_find_n( cstr_t s, const char* needle, size_t pos, size_t nlen );
+bool         cstr_contains( cstr_t s, const char* needle );
+bool         cstr_begins_with( cstr_t s, const char* needle );
+bool         cstr_ends_with( cstr_t s, const char* needle );
 ```
 
+### Comparisons and equality
 ```c
 bool         cstr_equals( cstr_t s1, const char* str );
 bool         cstr_equals_caseins( cstr_t s1, const char* str );
@@ -99,31 +111,28 @@ int          cstr_compare( const cstr_t *s1, const cstr_t *s2 );
 int          cstr_casecmp( const cstr_t *s1, const cstr_t *s2 );
 ```
 
+### Reference to front and back of string
 ```c
 char*        cstr_front( cstr_t* self );
 char*        cstr_back( cstr_t* self );
 ```
 
+### Iterator functions
 ```c
 cstr_iter_t  cstr_begin( cstr_t* self );
 cstr_iter_t  cstr_end( cstr_t* self );
-void         cstr_next(cstr_iter_t* it) { ++it->val; }
-char*        cstr_itval(cstr_iter_t it) {return it.val;}
+void         cstr_next( cstr_iter_t* it );
+char*        cstr_itval( cstr_iter_t it );
 ```
 
 ```c
-bool         cstr_contains( cstr_t s, const char* needle );
-bool         cstr_begins_with( cstr_t s, const char* needle );
-bool         cstr_ends_with( cstr_t s, const char* needle );
-```
-
-```c
-bool         cstr_getline(cstr_t *self, FILE *stream)
+bool         cstr_getline( cstr_t *self, FILE *stream );
 bool         cstr_getdelim( cstr_t *self, int delim, FILE *stream );
 ```
 
-## Non-members
+## Other string functions
 
+### Non-members
 ```c
 char*        c_strnfind( const char* s, const char* needle, size_t nlen );
 int          c_strcasecmp( const char* s1, const char* s2 );
@@ -131,7 +140,6 @@ uint32_t     c_string_hash( const char* str );
 ```
 
 ## Helper functions
-
 ```c
 const char*  cstr_to_raw( const cstr_t* x );
 int          cstr_compare_raw( const char** x, const char** y );
