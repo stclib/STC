@@ -170,6 +170,9 @@ cstr_getline(cstr_t *self, FILE *stream) {
 
 /* readonly */
 
+STC_INLINE size_t
+cstr_length(cstr_t s) { return cstr_size(s); }
+
 STC_INLINE bool
 cstr_equals(cstr_t s1, const char* str) {
     return strcmp(s1.str, str) == 0;
@@ -190,7 +193,7 @@ cstr_find(cstr_t s, const char* needle) {
 }
 STC_INLINE size_t
 cstr_find_n(cstr_t s, const char* needle, size_t pos, size_t nlen) {
-    if (pos > cstr_size(s)) return NULL;
+    if (pos > cstr_size(s)) return cstr_npos;
     char* res = c_strnfind(s.str + pos, needle, nlen);
     return res ? res - s.str : cstr_npos;
 }
