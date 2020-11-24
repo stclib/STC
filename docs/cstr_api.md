@@ -1,6 +1,6 @@
 # Introduction
 
-This describes the API of the **cstr_t** API
+This describes the API of **cstr_t**.
 
 ## Types
 
@@ -87,18 +87,24 @@ void         cstr_replace_n( cstr_t* self, size_t pos, size_t len, const char* s
 ```
 
 ```c
-bool         cstr_equals( cstr_t s1, const char* str );
-bool         cstr_equals_caseins( cstr_t s1, const char* str );
-bool         cstr_equals_s( cstr_t s1, cstr_t s2 );
-int          cstr_compare( const cstr_t *s1, const cstr_t *s2 );
-int          cstr_casecmp( const cstr_t *s1, const cstr_t *s2 );
 size_t       cstr_find( cstr_t s, const char* needle );
 size_t       cstr_find_n( cstr_t s, const char* needle, size_t pos, size_t nlen );
 ```
 
 ```c
+bool         cstr_equals( cstr_t s1, const char* str );
+bool         cstr_equals_caseins( cstr_t s1, const char* str );
+bool         cstr_equals_s( cstr_t s1, cstr_t s2 );
+int          cstr_compare( const cstr_t *s1, const cstr_t *s2 );
+int          cstr_casecmp( const cstr_t *s1, const cstr_t *s2 );
+```
+
+```c
 char*        cstr_front( cstr_t* self );
 char*        cstr_back( cstr_t* self );
+```
+
+```c
 cstr_iter_t  cstr_begin( cstr_t* self );
 cstr_iter_t  cstr_end( cstr_t* self );
 void         cstr_next(cstr_iter_t* it) { ++it->val; }
