@@ -28,18 +28,17 @@ All cstr definitions and prototypes may be included in your C source file by inc
 
 The interfaces to create a cstr_t object:
 ```c
-cstr_t cstr_init( void );
-cstr_t cstr_with_capacity( size_t cap );
-cstr_t cstr_with_size( size_t len, char fill );
-cstr_t cstr_from( const char* str );
-cstr_t cstr_from_n( const char* str, size_t len );
-cstr_t cstr_from_fmt( const char* fmt, ... );
+cstr_t        cstr_init( void );
+cstr_t        cstr_with_capacity( size_t cap );
+cstr_t        cstr_with_size( size_t len, char fill );
+cstr_t        cstr_from( const char* str );
+cstr_t        cstr_from_n( const char* str, size_t len );
+cstr_t        cstr_from_fmt( const char* fmt, ... );
 ```
 
 ## Destruction
-
 ```c
-void cstr_del( cstr_t *self );
+void          cstr_del( cstr_t *self );
 ```
 
 ## Interface
@@ -111,7 +110,7 @@ int          cstr_compare( const cstr_t *s1, const cstr_t *s2 );
 int          cstr_casecmp( const cstr_t *s1, const cstr_t *s2 );
 ```
 
-### Reference to front and back of string
+### Get references to front and back of string
 ```c
 char*        cstr_front( cstr_t* self );
 char*        cstr_back( cstr_t* self );
@@ -139,7 +138,7 @@ int          c_strcasecmp( const char* s1, const char* s2 );
 uint32_t     c_string_hash( const char* str );
 ```
 
-## Helper functions
+### Helper functions
 ```c
 const char*  cstr_to_raw( const cstr_t* x );
 int          cstr_compare_raw( const char** x, const char** y );
