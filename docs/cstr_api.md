@@ -34,9 +34,9 @@ cstr_t        cstr_with_size( size_t len, char fill );     (3)
 cstr_t        cstr_from( const char* str );                (4)
 cstr_t        cstr_from_n( const char* str, size_t len );  (5)
 cstr_t        cstr_from_fmt( const char* fmt, ... );       (6)
-cstr_t       cstr_clone( cstr_t s );                       (7)
+cstr_t        cstr_clone( cstr_t s );                      (7)
 ```
-(1) creates an empty string, and (2) with capacity `cap`. (3) creates a cstr_t of length `len`, containing `fill` characters. (4) constructs a cstr_t from a const char* string, and (5) limits the length by `len` or strlen(str). (6) constructs a string from a formatted string `fmt` and arguments, as defined by printf(). (7) constructs a new string by cloning cstr_t `s`.
+(1) Create an empty cstr_t, (2) with capacity `cap`. (3) Create a cstr_t containing the `fill` character `len` times. (4) Construct a cstr_t from a const char* str, and (5) limit the length by `len` or `strlen(str)`. (6) Construct a string from a formatted const char* `fmt` and arguments, as defined by `printf()`. (7) Construct a new string by cloning another cstr_t `s`.
 
 ## Destruction
 ```c
@@ -53,7 +53,7 @@ size_t       cstr_capacity( cstr_t s );
 bool         cstr_empty( cstr_t s );
 ```
 
-### Reserve, resize and clear string
+### Reserve capcacity, resize, and clear
 ```c
 size_t       cstr_reserve( cstr_t* self, size_t cap );
 void         cstr_resize( cstr_t* self, size_t len, char fill );
@@ -67,7 +67,7 @@ cstr_t*      cstr_assign_n( cstr_t* self, const char* str, size_t len );   (2)
 cstr_t*      cstr_take( cstr_t* self, cstr_t s );                          (3)
 cstr_t       cstr_move( cstr_t* self );                                    (4)
 ```
-(1) assigns `str` to `*self`, (2) assigns substring `str` limited by `len` or `strlen(str)`. (3) takes the constructed or moved string `s`, i.e., no allocation takes place. (4) explicitely moves `*self` to the caller of the method; `*self` becomes an empty string after move.
+(1) Assign `str` to `*self`, (2) assign substring `str` limited by `len` or `strlen(str)`. (3) Take the constructed or moved string `s`, i.e., no allocation takes place. (4) Explicitly move `*self` to the caller of the method; `*self` becomes an empty string after move.
 
 ### Append characters
 ```c
@@ -75,7 +75,7 @@ cstr_t*      cstr_append( cstr_t* self, const char* str );                (1)
 cstr_t*      cstr_append_n( cstr_t* self, const char* str, size_t len );  (2)
 cstr_t*      cstr_push_back( cstr_t* self, char ch );                     (3)
 ```
-Appends `str` (1), substring `str` limited by `len` (2), or character `ch` to `*self` (3).
+(1) Append `str` to `*self`. (2) Append substring `str` limited by `len`. (3), Append character `ch`.
 
 ### Insert characters
 ```c
@@ -95,13 +95,13 @@ void         cstr_replace( cstr_t* self, size_t pos, size_t len, const char* str
 void         cstr_replace_n( cstr_t* self, size_t pos, size_t len, const char* str, size_t n );
 ```
 
-### Search in string
+### Search for substring
 ```c
-size_t       cstr_find( cstr_t s, const char* needle );
-size_t       cstr_find_n( cstr_t s, const char* needle, size_t pos, size_t nlen );
-bool         cstr_contains( cstr_t s, const char* needle );
-bool         cstr_begins_with( cstr_t s, const char* needle );
-bool         cstr_ends_with( cstr_t s, const char* needle );
+size_t       cstr_find( cstr_t s, const char* substr );
+size_t       cstr_find_n( cstr_t s, const char* substr, size_t pos, size_t nlen );
+bool         cstr_contains( cstr_t s, const char* substr );
+bool         cstr_begins_with( cstr_t s, const char* substr );
+bool         cstr_ends_with( cstr_t s, const char* substr );
 ```
 
 ### Comparisons and equality
@@ -113,7 +113,7 @@ int          cstr_compare( const cstr_t *s1, const cstr_t *s2 );
 int          cstr_casecmp( const cstr_t *s1, const cstr_t *s2 );
 ```
 
-### Get references to front and back of string
+### Get references to front and back of a cstr_t
 ```c
 char*        cstr_front( cstr_t* self );
 char*        cstr_back( cstr_t* self );
