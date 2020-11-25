@@ -23,8 +23,9 @@ All cstr definitions and prototypes may be included in your C source file by inc
 ```c
 #include "stc/cstr.h"
 ```
+## Methods
 
-## Construction
+### Construction
 
 The interfaces to create a cstr_t object:
 ```c
@@ -36,16 +37,15 @@ cstr_t        cstr_from_n( const char* str, size_t len );  (5)
 cstr_t        cstr_from_fmt( const char* fmt, ... );       (6)
 cstr_t        cstr_clone( cstr_t s );                      (7)
 ```
-(1) Create an empty cstr_t, (2) with capacity `cap`. (3) Create a cstr_t containing the `fill` character `len` times. (4) Construct a cstr_t from a const char* str, and (5) limit the length by `len` or `strlen(str)`. (6) Construct a string from a formatted const char* `fmt` and arguments, as defined by `printf()`. (7) Construct a new string by cloning another cstr_t `s`.
+(1) Create an empty cstr_t, (2) with capacity `cap`. (3) Create a cstr_t by repeating the `fill` character `len` times. (4) Construct a cstr_t from a const char* str, and (5) limit the length by `len` and `strlen(str)`. (6) Construct a string from a formatted const char* `fmt` and arguments, using `printf()` formatting. (7) Construct a new string by cloning another cstr_t `s`.
 
-## Destruction
+### Destruction
 ```c
 void          cstr_del( cstr_t *self );
 ```
+Free the allocated memory used by string.
 
-## cstr_t Interface
-
-### Get attributes
+### Get string properties
 ```c
 size_t       cstr_size( cstr_t s );
 size_t       cstr_length( cstr_t s );
@@ -67,7 +67,7 @@ cstr_t*      cstr_assign_n( cstr_t* self, const char* str, size_t len );   (2)
 cstr_t*      cstr_take( cstr_t* self, cstr_t s );                          (3)
 cstr_t       cstr_move( cstr_t* self );                                    (4)
 ```
-(1) Assign `str` to `*self`, (2) assign substring `str` limited by `len` or `strlen(str)`. (3) Take the constructed or moved string `s`, i.e., no allocation takes place. (4) Explicitly move `*self` to the caller of the method; `*self` becomes an empty string after move.
+(1) Assign `str` to `*self`, (2) assign substring `str` limited by `len` and `strlen(str)`. (3) Take the constructed or moved string `s`, i.e., no allocation takes place. (4) Explicitly move `*self` to the caller of the method; `*self` becomes an empty string after move.
 
 ### Append characters
 ```c
@@ -79,10 +79,10 @@ cstr_t*      cstr_push_back( cstr_t* self, char ch );                     (3)
 
 ### Insert characters
 ```c
-void         cstr_insert( cstr_t* self, size_t pos, const char* str );
-void         cstr_insert_n( cstr_t* self, size_t pos, const char* str, size_t n );
+void         cstr_insert( cstr_t* self, size_t pos, const char* str );              (1)
+void         cstr_insert_n( cstr_t* self, size_t pos, const char* str, size_t n );  (2)
 ```
-
+Insert a string at the specified position (1), or insert string limited with 
 ### Erase characters
 ```c
 void         cstr_erase( cstr_t* self, size_t pos, size_t n );
@@ -119,20 +119,21 @@ char*        cstr_front( cstr_t* self );
 char*        cstr_back( cstr_t* self );
 ```
 
-### Iterator functions
+### Iterator methods
 ```c
-cstr_iter_t  cstr_begin( cstr_t* self );
-cstr_iter_t  cstr_end( cstr_t* self );
-void         cstr_next( cstr_iter_t* it );
-char*        cstr_itval( cstr_iter_t it );
+cstr_iter_t  cstr_begin( cstr_t* self );     (1)
+cstr_iter_t  cstr_end( cstr_t* self );       (2)
+void         cstr_next( cstr_iter_t* it );   (3)
+char*        cstr_itval( cstr_iter_t it );   (4)
 ```
+To iterate though a string, one can use the generic `c_foreach` macro. E.g. `c_foreach (i, cstr, mystr) printf("%c", *i.val);`. This is equivalent to `for (size_t i=0; i<cstr_size(mystr); ++i) printf("%c", mystr.str[i])`.
 
 ```c
 bool         cstr_getline( cstr_t *self, FILE *stream );
 bool         cstr_getdelim( cstr_t *self, int delim, FILE *stream );
 ```
 
-## Other string functions
+## Other string methods
 
 ### Non-members
 ```c
@@ -141,7 +142,7 @@ int          c_strcasecmp( const char* s1, const char* s2 );
 uint32_t     c_string_hash( const char* str );
 ```
 
-### Helper functions
+### Helper methods
 ```c
 const char*  cstr_to_raw( const cstr_t* x );
 int          cstr_compare_raw( const char** x, const char** y );
