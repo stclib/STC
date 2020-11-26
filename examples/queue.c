@@ -1,6 +1,6 @@
 #include <stc/crandom.h>
 #include <stc/cqueue.h>
-#include <stc/cfmt.h>
+#include <stdio.h>
 
 using_clist(i, int);
 using_cqueue(i, clist_i); // min-heap (increasing values)
@@ -18,7 +18,7 @@ int main() {
         cqueue_i_push(&queue, crand_uniform_i32(&rng, &dist));
 
     // Push or pop on the queue ten million times
-    c_print(1, "{}\n", n);
+    printf("%d\n", n);
     c_forrange (n) { // range uses initial n only.
         int r = crand_uniform_i32(&rng, &dist);
         if (r & 1)
@@ -26,6 +26,6 @@ int main() {
         else
             --n, cqueue_i_pop(&queue);
     }
-    c_print(1, "{}, {}\n", n, cqueue_i_size(queue));
+    printf("%d, %zu\n", n, cqueue_i_size(queue));
     cqueue_i_del(&queue);
 }

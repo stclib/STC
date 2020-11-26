@@ -1,9 +1,9 @@
-#include <stc/cfmt.h>
+#include <stc/cstr.h>
 #include <stc/cmap.h>
 #include <stc/clist.h>
 #include <stc/carray.h>
 
-void check_del(float* v) {c_print(1, "destroy {}\n", *v);}
+void check_del(float* v) {printf("destroy %g\n", *v);}
 
 using_carray(f, float, check_del); // normally omit the last argument - float type need no destroy.
 using_clist(y, carray2f, carray2f_del, c_no_compare);
@@ -18,7 +18,7 @@ int main() {
 
     { // Construct.
         carray2f table = carray2f_init(ydim, xdim, 0.f);
-        c_print(1, "table: ({}, {})\n", carray2_ydim(table), carray2_xdim(table));
+        printf("table: (%zu, %zu)\n", carray2_ydim(table), carray2_xdim(table));
         clist_y tableList = clist_inits;
         // Put in some data.
         cmap_g listMap = cmap_inits;
@@ -30,7 +30,7 @@ int main() {
     }
     { // Access the data entry
         carray2f table = *clist_y_back(&cmap_g_find(&cmap_s_find(&myMap, strKey)->second, tableKey)->second);
-        c_print(1, "value ({}, {}) is: {}\n", y, x, *carray2f_at(&table, y, x));
+        printf("value (%d, %d) is: %f\n", y, x, *carray2f_at(&table, y, x));
     }
 
     cmap_s_del(&myMap); // free up everything!

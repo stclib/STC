@@ -1,12 +1,12 @@
 #include <stc/cptr.h>
 #include <stc/cmap.h>
-#include <stc/cfmt.h>
+#include <stc/cstr.h>
 #include <stdio.h>
 
 typedef struct { cstr_t name, last; } Person;
 
 Person* Person_from(Person* p, cstr_t name, cstr_t last) {
-    c_print(1, "make {}\n", name.str);
+    printf("make %s\n", name.str);
     p->name = name, p->last = last;
     return p;
 }
@@ -15,7 +15,7 @@ Person* Person_make(Person* p, const char* name, const char* last) {
     return p;
 }
 void Person_del(Person* p) {
-    c_print(1, "del: {}\n", p->name.str);
+    printf("del: %s\n", p->name.str);
     c_del(cstr, &p->name, &p->last);
 }
 
@@ -36,7 +36,7 @@ int main() {
     c_try_emplace(&map, cmap_pe, 11, csptr_pe_from(Person_make(c_new(Person), "Hello", "World!")));
 
     c_foreach (i, cmap_pe, map)
-        c_print(1, " {}: {}\n", i.val->first, i.val->second.get->name.str);
+        printf(" %d: %s\n", i.val->first, i.val->second.get->name.str);
 
     puts("Destroy map:");
     cmap_pe_del(&map);

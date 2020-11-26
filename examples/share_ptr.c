@@ -1,7 +1,7 @@
 #include <stc/cptr.h>
 #include <stc/clist.h>
 #include <stc/cvec.h>
-#include <stc/cfmt.h>
+#include <stc/cstr.h>
 #include <stdio.h>
 
 typedef struct { cstr_t name, last; } Person;
@@ -11,7 +11,7 @@ Person* Person_make(Person* p, const char* name, const char* last) {
     return p;
 }
 void Person_del(Person* p) {
-    c_print(1, "del: {}\n", p->name.str);
+    printf("del: %s\n", p->name.str);
     c_del(cstr, &p->name, &p->last);
 }
 int Person_compare(const Person* p, const Person* q) {
@@ -27,7 +27,8 @@ int main() {
     clist_pe queue = clist_pe_init();
     cvec_pe vec = cvec_pe_init();
 
-    csptr_pe joe = csptr_pe_make((Person) {cstr_from("Joe"), cstr_from("Jordan")});
+    Person tmp = {cstr_from("Joe"), cstr_from("Jordan")};
+    csptr_pe joe = csptr_pe_make(tmp);
     clist_pe_push_back(&queue, csptr_pe_share(joe));
     cvec_pe_push_back(&vec, csptr_pe_share(joe));
 
@@ -40,7 +41,7 @@ int main() {
         cvec_pe_push_back(&vec, csptr_pe_share(p)); // Don't forget to share!
     }
     c_foreach (i, clist_pe, queue)
-        c_print(1, " {}\n", i.val->get->name.str);
+        printf(" %s\n", i.val->get->name.str);
 
     puts("Sort and pop 3:");
     clist_pe_sort(&queue);
@@ -52,18 +53,18 @@ int main() {
 
     puts("Sorted queue:");
     c_foreach (i, clist_pe, queue)
-        c_print(1, " {}\n", i.val->get->name.str);
+        printf(" %s\n", i.val->get->name.str);
     puts("Sorted vec:");
     c_foreach (i, cvec_pe, vec)
-        c_print(1, " {}\n", i.val->get->name.str);
+        printf(" %s\n", i.val->get->name.str);
 
     Person lost; Person_make(&lost, "Name 5", "Last 5");
     csptr_pe ptmp = {&lost, NULL}; // share pointer without counter - OK.
     clist_pe_iter_t lit = clist_pe_find(&queue, ptmp);
     Person_del(&lost);
-    if (lit.val) c_print(1, "Found: {}\n", lit.val->get->name.str);
+    if (lit.val) printf("Found: %s\n", lit.val->get->name.str);
 
-    c_print(1, "use {}\n", *joe.use_count);
+    printf("use %ld\n", *joe.use_count);
     csptr_pe_del(&joe);
 
     puts("Destroy queue:");

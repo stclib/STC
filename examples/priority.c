@@ -1,6 +1,7 @@
+
+#include <stdio.h>
 #include <time.h>
 #include <stc/cvec.h>
-#include <stc/cfmt.h>
 #include <stc/cpqueue.h>
 #include <stc/cmap.h>
 #include <stc/crandom.h>
@@ -27,7 +28,7 @@ int main() {
 
     // Extract the hundred smallest.
     c_forrange (100) {
-        c_print(1, "{} ", *cpqueue_i_top(&heap));
+        printf("%zd ", *cpqueue_i_top(&heap));
         cpqueue_i_pop(&heap);
     }
     cpqueue_i_del(&heap);

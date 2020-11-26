@@ -11,7 +11,7 @@
  * of the Viking struct, to simplfy insert and lookup in the map.
  */
 #include <stc/cmap.h>
-#include <stc/cfmt.h>
+#include <stc/cstr.h>
 
 // Viking data struct -----------------------
 
@@ -73,7 +73,7 @@ int main()
     cmap_vk_emplace(&vikings, einar, 0).first->second += 5; // again
 
     c_foreach (k, cmap_vk, vikings) {
-        c_print(1, "{} of {} has {} HP\n", k.val->first.name.str, k.val->first.country.str, k.val->second);
+        printf("%s of %s has %d HP\n", k.val->first.name.str, k.val->first.country.str, k.val->second);
     }
     cmap_vk_del(&vikings);
 }

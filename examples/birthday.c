@@ -5,7 +5,6 @@
 #include <stc/crandom.h>
 #include <stc/cmap.h>
 #include <stc/cvec.h>
-#include <stc/cfmt.h>
 
 using_cmap(ic, uint64_t, uint8_t);
 
@@ -22,10 +21,10 @@ void repeats(void)
     c_forrange (i, N) {
         uint64_t k = crand_i64(&rng) & mask;
         int v = ++cmap_ic_emplace(&m, k, 0).first->second;
-        if (v > 1) c_print(1, "{}: {:x} - {}\n", i, k, v);
+        if (v > 1) printf("%zu: %llx - %d\n", i, k, v);
     }
     float diff = (float) (clock() - now) / CLOCKS_PER_SEC;
-    c_print(1, "{}", diff);
+    printf("%.02f", diff);
 }
 
 
@@ -50,9 +49,9 @@ void distribution(void)
     sum /= map.size;
 
     c_foreach (i, cmap_x, map)
-        c_print(1, "{}: {} - {}\n", i.val->first, i.val->second, sum);
+        printf("%u: %zu - %zu\n", i.val->first, i.val->second, sum);
 
-    c_print(1, "{:.02}\n", diff);
+    printf("%.02f\n", diff);
 }
 
 int main()

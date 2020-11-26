@@ -17,7 +17,6 @@ An elegant, fully typesafe, generic, customizable, user-friendly, consistent, an
 - **stc/cptr.h** - Support for pointers in containers, and a reference counted shared pointer **csptr**.
 - **stc/coption.h** - Implementation of a **getopt_long()**-like function, *coption_get()*, to parse command line arguments.
 - **stc/crandom.h** - A few very efficent modern random number generators *pcg32* and my own *64-bit PRNG* inspired by *sfc64*. Both uniform and normal distributions.
-- **stc/cfmt.h** - Implementation of **c_print()** with c++20 *std::format*-like formatting, including automatic detection of argument types.
 - **stc/ccommon.h** - A common include file with a few general definitions.
 
 The usage of the containers is quite similar to the C++ standard containers, so it should be easy if you are familiar with them.
@@ -25,7 +24,6 @@ The usage of the containers is quite similar to the C++ standard containers, so 
 All containers mentioned above, except cstr_t and cbitset_t, are generic and therefore typesafe (similar to templates in C++). No casting is used. A simple example:
 ```C
 #include <stc/cvec.h>
-#include <stc/cfmt.h>
 
 using_cvec(i, int);
 
@@ -33,9 +31,8 @@ int main(void) {
     cvec_i vec = cvec_i_init();
     cvec_i_push_back(&vec, 1);
     cvec_i_push_back(&vec, 2);
-
     c_foreach (i, cvec_i, vec)
-        c_print(1, " {}", *i.val);
+        printf(" %d", *i.val);
     cvec_i_del(&vec);
 }
 ```
@@ -61,7 +58,7 @@ int main(void) {
     cvec_u_push_back(&vec, (User) {cstr_from("admin"), 0}); // cstr_from() allocates string memory
     cvec_u_push_back(&vec, (User) {cstr_from("usera"), 1});
     c_foreach (i, cvec_u, vec)
-        c_print(1, "{}: {}\n", i.val->name.str, i.val->id);
+        printf("%s: %d\n", i.val->name.str, i.val->id);
     cvec_u_del(&vec); // free everything
 }
 ```
@@ -194,7 +191,7 @@ The examples folder contains further examples.
 **cvec** of *int64_t*.
 ```C
 #include <stc/cvec.h>
-#include <stc/cfmt.h>
+#include <stdio.h>
 
 using_cvec(ix, int64_t); // ix is just an example type tag name.
 
@@ -211,7 +208,7 @@ int main() {
         bignums.data[i] /= i; // make them smaller
 
     c_foreach (i, cvec_ix, bignums)
-        c_print(1, " {}", *i.val);
+        printf(" %d", *i.val);
     cvec_ix_del(&bignums);
 }
 // Output:
@@ -219,7 +216,7 @@ int main() {
 ```
 **cvec** of *cstr_t*.
 ```C
-#include <stc/cfmt.h>
+#include <stc/cstr.h>
 #include <stc/cvec.h>
 
 using_cvec_str();
@@ -234,10 +231,10 @@ int main() {
     cstr_t tmp = cstr_from_fmt("%d elements so far", cvec_str_size(names));
     cvec_str_push_back(&names, tmp); // tmp is moved to names, do not del() it.
 
-    c_print(1, "{}\n", names.data[1].str); // Access the second element
+    printf("%s\n", names.data[1].str); // Access the second element
 
     c_foreach (i, cvec_str, names)
-        c_print(1, "item: {}\n", i.val->str);
+        printf("item: %s\n", i.val->str);
     cvec_str_del(&names);
 }
 // Output:
@@ -248,29 +245,28 @@ item: 2 elements so far
 ```
 **cstr** string example.
 ```C
-#include <stc/cfmt.h>
+#include <stc/cstr.h>
 
 int main() {
     cstr_t s1 = cstr_from("one-nine-three-seven-five");
-    c_print(1, "{}.\n", s1.str);
+    printf("%s.\n", s1.str);
 
     cstr_insert(&s1, 3, "-two");
-    c_print(1, "{}.\n", s1.str);
+    printf("%s.\n", s1.str);
 
     cstr_erase(&s1, 7, 5); // -nine
-    c_print(1, "{}.\n", s1.str);
+    printf("%s.\n", s1.str);
 
     cstr_replace(&s1, cstr_find(&s1, "seven"), 5, "four");
-    c_print(stderr, "{}.\n", s1.str);
+    printf("%s.\n", s1.str);
 
     // reassign:
     cstr_assign(&s1, "one two three four five six seven");
     cstr_append(&s1, " eight");
     printf("append: %s\n", s1.str);
 
-    cstr_t full_path cstr_init;
-    c_print(&full_path, "{}/{}.{}", "directory", "filename", "ext");
-    c_print(2, "{}\n", full_path.str); // 2 = stderr
+    cstr_t full_path = cstr_from_fmt("%s/%s.%s", "directory", "filename", "ext");
+    printf("%s\n", full_path.str);
 
     c_del(cstr, &s1, &full_path);
 }
@@ -286,7 +282,7 @@ directory/filename.ext
 ```C
 #include <stdio.h>
 #include <stc/cmap.h>
-#include <stc/cfmt.h>
+#include <stc/cstr.h>
 
 using_cmap(ii, int, int);
 using_cmap_str();
@@ -297,7 +293,7 @@ int main() {
     cmap_ii_put(&nums, 8, 64); // similar to insert_or_assign()
     cmap_ii_emplace(&nums, 11, 121);
 
-    c_print(1, "{}\n", cmap_ii_find(&nums, 8)->second);
+    printf("%d\n", cmap_ii_find(&nums, 8)->second);
     cmap_ii_del(&nums);
 
     // -- map of str --
@@ -307,9 +303,9 @@ int main() {
     cmap_str_emplace(&strings, "Sunny", "afternoon");
     c_push_items(&strings, cmap_str, { {"Eleven", "XI"}, {"Six", "VI"} });
 
-    c_print(1, "size = {}\n", cmap_str_size(strings));
+    printf("size = %zu\n", cmap_str_size(strings));
     c_foreach (i, cmap_str, strings)
-        c_print(1, "{}: {}\n", i.val->first.str, i.val->second.str);
+        printf("%s: %s\n", i.val->first.str, i.val->second.str);
     cmap_str_del(&strings); // frees all strings and map.
 }
 // Output:
@@ -323,7 +319,7 @@ Eleven: XI
 ```
 **cset** of *cstr*.
 ```C
-#include <stc/cfmt.h>
+#include <stc/cstr.h>
 #include <stc/cmap.h>
 
 using_cset_str(); // cstr set. See the discussion above.
@@ -338,7 +334,7 @@ int main() {
 
     // iterate the set of cstr_t values:
     c_foreach (i, cset_str, words)
-        c_print(1, "{} ", i.val->str);
+        printf("%s ", i.val->str);
     cset_str_del(&words);
 }
 // Output:
@@ -347,7 +343,6 @@ Hello World
 **clist** of *int64_t*. Similar to c++ *std::forward_list*, but can do both *push_front()* and *push_back()* as well as *pop_front()*.
 ```C
 #include <stdio.h>
-#include <stc/cfmt.h>
 #include <stc/clist.h>
 
 using_clist(fx, double);
@@ -365,13 +360,13 @@ int main() {
 
     printf("initial: ");
     c_foreach (i, clist_fx, list)
-        c_print(1, " {:.16}", *i.val);
+        printf(" %g", *i.val);
 
     clist_fx_sort(&list); // mergesort O(n*log n)
 
     printf("\nsorted: ");
     c_foreach (i, clist_fx, list)
-        c_print(1, " {:10f}", *i.val);
+        printf(" %g", *i.val);
 
     clist_fx_del(&list);
 }
@@ -382,7 +377,6 @@ sorted:  1 2 3 4 5 6 7 8 9 10 20 30 40 50 60 70 80 90
 **cpqueue** priority queue demo:
 ```C
 #include <stdio.h>
-#include <stc/cfmt.h>
 #include <stc/cpqueue.h>
 #include <stc/crandom.h>
 
@@ -403,7 +397,7 @@ int main()
 
     // Extract and disply the fifty smallest.
     c_forrange (50) {
-        c_print(1, "{} ", *cpqueue_i_top(&heap));
+        printf("%zd ", *cpqueue_i_top(&heap));
         cpqueue_i_pop(&heap);
     }
     cpqueue_i_del(&heap);
@@ -414,7 +408,6 @@ int main()
 **cqueue** adapter container. Uses singly linked list as representation.
 ```C
 #include <stc/cqueue.h>
-#include <stc/cfmt.h>
 #include <stdio.h>
 
 using_clist(i, int);
@@ -431,7 +424,7 @@ int main() {
         cqueue_i_pop(&queue);
 
     c_foreach (i, cqueue_i, queue)
-        c_print(1, " {}", *i.val);
+        printf(" %d", *i.val);
 
     cqueue_i_del(&queue);
 }
@@ -442,7 +435,6 @@ int main() {
 ```C
 #include <stdio.h>
 #include <stc/carray.h>
-#include <stc/cfmt.h>
 
 using_carray(f, float);
 
@@ -454,9 +446,9 @@ int main()
     carray1f a1 = carray3f_at2(&a3, 5, 4);      // sub-array a3[5][4] (no data copy).
     carray2f a2 = carray3f_at1(&a3, 5);         // sub-array a3[5]
 
-    c_print(stdout, "{}\n", *carray1f_at(&a1, 3));       // a1[3] (3.14f)
-    c_print(stdout, "{}\n", *carray2f_at(&a2, 4, 3));    // a2[4][3] (3.14f)
-    c_print(stdout, "{}\n", *carray3f_at(&a3, 5, 4, 3)); // a3[5][4][3] (3.14f)
+    printf("%f\n", *carray1f_at(&a1, 3));       // a1[3] (3.14f)
+    printf("%f\n", *carray2f_at(&a2, 4, 3));    // a2[4][3] (3.14f)
+    printf("%f\n", *carray3f_at(&a3, 5, 4, 3)); // a3[5][4][3] (3.14f)
     // ...
     carray1f_del(&a1); // does nothing, since it is a sub-array.
     carray2f_del(&a2); // same.
@@ -507,7 +499,7 @@ Code:
 #include <math.h>
 #include <stc/cmap.h>
 #include <stc/cvec.h>
-#include <stc/cfmt.h>
+#include <stc/cstr.h>
 #include <stc/crandom.h>
 
 using_cmap(ii, int, int);
@@ -571,10 +563,10 @@ void display_hist(cvec_mi hist, int scale, int mean, int stddev)
         int k = (int) (i.val->second * stddev * scale * 25ull / 10 / n);
         if (k > 0) {
             cstr_take(&bar, cstr_with_size(k, '*'));
-            c_print(1, "{:4} {}\n", i.val->first, bar.str);
+            printf("%4d %s\n", i.val->first, bar.str);
         }
     }
-    c_print(1, "Normal distribution with mean={}, stddev={}. '*' = {:.0f} samples out of {}.\n",
+    printf("Normal distribution with mean=%d, stddev=%d. '*' = %.0f samples out of %d.\n",
            mean, stddev, n / (2.5 * stddev * scale), n);
     cstr_del(&bar);
 }
