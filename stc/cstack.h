@@ -23,7 +23,7 @@
 #ifndef CSTACK__H__
 #define CSTACK__H__
 
-/*  Stack adapter (normally uses cvec).
+/*  Stack adapter, default uses cvec.
 
     #include <stc/cstack.h>
     #include <stdio.h>

@@ -5,19 +5,19 @@ Introduction
 ------------
 
 An elegant, fully typesafe, generic, customizable, user-friendly, consistent, and very fast standard container library for C99. This is a small headers only library with the most used container components, and a few algorithms:
-- **stc/carray.h** - Dynamic generic **multi-dimensional array**, implemented as a single contiguous section of memory.
-- **stc/cbitset.h** - Bitset similar to c++ std::bitset or boost::dynamic_bitset.
-- **stc/clist.h** - A genric circular **singly linked list**. Can be used as a **queue** as it supports *push_back(), push_front(), and pop_front()*. It also contains various *splice* functions and *merge sort*.
-- **stc/cmap.h** - A generic **unordered map / set** implemented as open hashing without tombstones. Highly customizable and fast.
-- **stc/cstr.h** - Compact and powerful **string** class.
-- **stc/cvec.h** - Dynamic generic **vector** class, works well as a **stack**.
-- **stc/cstack.h** - **stack** adapter, currently works with *cvec*.
-- **stc/cqueue.h** - **queue** adapter, currently works with *clist*.
-- **stc/cpqueue.h** - **priority queue** adapter. Works with *cvec*.
-- **stc/cptr.h** - Support for pointers in containers, and a reference counted shared pointer **csptr**.
-- **stc/coption.h** - Implementation of a **getopt_long()**-like function, *coption_get()*, to parse command line arguments.
-- **stc/crandom.h** - A few very efficent modern random number generators *pcg32* and my own *64-bit PRNG* inspired by *sfc64*. Both uniform and normal distributions.
-- **stc/ccommon.h** - A common include file with a few general definitions.
+- **carray** - Dynamic generic **Multi-Dimensional Array**, implemented as a single contiguous section of memory.
+- **cbitset** - **Bitset** similar to c++ *std::bitset* or *boost::dynamic_bitset*.
+- **clist** - A genric circular **Singly Linked List**. Can be used as a *queue* as it supports *push_back(), push_front(), and pop_front()*. It also contains various *splice* functions and *merge sort*.
+- **cmap** - A generic **Unordered Map / Set** implemented as open hashing without tombstones. Highly customizable and fast.
+- **[cstr](docs/cstr_api.md)** - Powerful and compact **String** type.
+- **cvec** - Dynamic generic **Vector** class.
+- **cstack** - **Stack** adapter, currently works with *cvec*.
+- **cqueue** - **Queue** adapter, currently works with *clist*.
+- **cpqueue** - **Priority Queue** adapter. Works with *cvec*.
+- **cptr** - Support for **pointers** in containers, and a reference counted shared pointer *csptr*.
+- **coption** - Implementation of a **getopt_long()**-like function, *coption_get()*, to parse command line arguments.
+- **crandom** - A few very efficent modern **random number generators** *pcg32* and my own *64-bit PRNG* inspired by *sfc64*. Both uniform and normal distributions.
+- **ccommon** - A common include file with a few general definitions.
 
 The usage of the containers is quite similar to the C++ standard containers, so it should be easy if you are familiar with them.
 

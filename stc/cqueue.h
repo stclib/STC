@@ -23,12 +23,12 @@
 #ifndef CQUEUE__H__
 #define CQUEUE__H__
 
-/*  Priority Queue using heap, with adapter class (normally cvec).
+/*  Queue adapter, default uses clist.
 
     #include <stc/crandom.h>
     #include <stc/cqueue.h>
     using_clist(i, int);
-    using_cqueue(i, clist_i); // min-heap (increasing values)
+    using_cqueue(i, clist_i);
 
     int main() {
         int n = 10000000;

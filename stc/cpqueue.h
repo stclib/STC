@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-/*  Priority Queue using heap, with adapter class (normally cvec).
+/*  Priority-Queue adapter (implemented as heap), default uses cvec.
 
     #include <stc/crandom.h>
     #include <stc/cpqueue.h>
