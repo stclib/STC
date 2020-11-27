@@ -223,12 +223,12 @@ cstr_ibegins_with(cstr_t s, const char* needle) {
 STC_INLINE bool
 cstr_ends_with(cstr_t s, const char* needle) {
     size_t n = strlen(needle), sz = cstr_size(s);
-    return n <= sz ? strcmp(s.str + sz - n, needle) == 0 : false;
+    return n <= sz ? memcmp(s.str + sz - n, needle, n) == 0 : false;
 }
 STC_INLINE bool
 cstr_iends_with(cstr_t s, const char* needle) {
     size_t n = strlen(needle), sz = cstr_size(s);
-    return n <= sz ? c_strncasecmp(s.str + sz - n, needle, cstr_npos) == 0 : false;
+    return n <= sz ? c_strncasecmp(s.str + sz - n, needle, n) == 0 : false;
 }
 
 /* cvec/cmap API functions: */
