@@ -5,19 +5,19 @@ Introduction
 ------------
 
 An elegant, fully typesafe, generic, customizable, user-friendly, consistent, and very fast standard container library for C99. This is a small headers only library with the most used container components, and a few algorithms:
-- **carray** - Dynamic generic **Multi-Dimensional Array**, implemented as a single contiguous section of memory.
-- **cbitset** - **Bitset** similar to c++ *std::bitset* or *boost::dynamic_bitset*.
-- **clist** - A genric circular **Singly Linked List**. Can be used as a *queue* as it supports *push_back(), push_front(), and pop_front()*. It also contains various *splice* functions and *merge sort*.
-- **cmap** - A generic **Unordered Map / Set** implemented as open hashing without tombstones. Highly customizable and fast.
-- **[cstr](docs/cstr_api.md)** - Powerful and compact **String** type.
-- **cvec** - Dynamic generic **Vector** class.
-- **cstack** - **Stack** adapter, currently works with *cvec*.
-- **cqueue** - **Queue** adapter, currently works with *clist*.
-- **cpqueue** - **Priority Queue** adapter. Works with *cvec*.
-- **cptr** - Support for **pointers** in containers, and a reference counted shared pointer *csptr*.
-- **coption** - Implementation of a **getopt_long()**-like function, *coption_get()*, to parse command line arguments.
-- **crandom** - A few very efficent modern **random number generators** *pcg32* and my own *64-bit PRNG* inspired by *sfc64*. Both uniform and normal distributions.
-- **ccommon** - A common include file with a few general definitions.
+- [**carray** - Dynamic generic **Multi-Dimensional Array**](docs/cbitset_api.md), implemented as a single contiguous block of memory.
+- [**cbitset** - **Bitset** - a *std::bitset*- or *boost::dynamic_bitset*-like type](docs/cbitset_api.md)
+- [**clist** - A genric circular **Singly Linked List**](docs/clist_api.md). Can be used as a *queue* as it supports *push_back(), push_front(), and pop_front()*. Supports various *splice* functions and *merge sort*.
+- [**cmap** - Generic fast **Unordered Map/Set**](docs/cstr_api.md) Implemented as open hashing without tombstones. Highly customizable and fast.
+- [**cstr** - Powerful and compact **String** type](docs/cstr_api.md)
+- [**cvec** - Dynamic generic **Vector** class](docs/cvec_api.md)
+- [**cstack** - **Stack** adapter type](docs/cstack_api.md)
+- [**cqueue** - **Queue** adapter type](docs/cqueue_api.md)
+- [**cpqueue** - **Priority Queue** adapter type](docs/cpqueue_api.md)
+- [**cptr** - Support for pointers and shared pointers in containers](docs/cptr_api.md)
+- [**coption** - Implements *coption_get()*, a **getopt_long**-like function](docs/coption_api.md), for command line argument parsing.
+- [**crandom** - A few very efficent modern **random number generators**](docs/crandom_api.md) *pcg32* and my own *64-bit PRNG* inspired by *sfc64*, with uniform and normal distributions.
+- [**ccommon** - A common include file with a few general definitions](docs/ccommon_api.md)
 
 The usage of the containers is quite similar to the C++ standard containers, so it should be easy if you are familiar with them.
 
