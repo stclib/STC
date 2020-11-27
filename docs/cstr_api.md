@@ -82,7 +82,8 @@ cstr_t*      cstr_push_back( cstr_t* self, char ch );                     (3)
 void         cstr_insert( cstr_t* self, size_t pos, const char* str );              (1)
 void         cstr_insert_n( cstr_t* self, size_t pos, const char* str, size_t n );  (2)
 ```
-Insert a string at the specified position (1), or insert string limited with 
+Insert a string at the specified position (1), or insert string limited with n / strlen(str).
+
 ### Erase characters
 ```c
 void         cstr_erase( cstr_t* self, size_t pos, size_t n );
@@ -99,18 +100,21 @@ void         cstr_replace_n( cstr_t* self, size_t pos, size_t len, const char* s
 ```c
 size_t       cstr_find( cstr_t s, const char* substr );
 size_t       cstr_find_n( cstr_t s, const char* substr, size_t pos, size_t nlen );
+size_t       cstr_ifind_n( cstr_t s, const char* substr, size_t pos, size_t nlen );
 bool         cstr_contains( cstr_t s, const char* substr );
+bool         cstr_icontains( cstr_t s, const char* substr );
 bool         cstr_begins_with( cstr_t s, const char* substr );
+bool         cstr_ibegins_with( cstr_t s, const char* substr );
 bool         cstr_ends_with( cstr_t s, const char* substr );
+bool         cstr_iends_with( cstr_t s, const char* substr );
 ```
 
 ### Comparisons and equality
 ```c
 bool         cstr_equals( cstr_t s1, const char* str );
-bool         cstr_equals_caseins( cstr_t s1, const char* str );
+bool         cstr_iequals( cstr_t s1, const char* str );
 bool         cstr_equals_s( cstr_t s1, cstr_t s2 );
 int          cstr_compare( const cstr_t *s1, const cstr_t *s2 );
-int          cstr_casecmp( const cstr_t *s1, const cstr_t *s2 );
 ```
 
 ### Get references to front and back of a cstr_t
@@ -137,8 +141,9 @@ bool         cstr_getdelim( cstr_t *self, int delim, FILE *stream );
 
 ### Non-members
 ```c
-char*        c_strnfind( const char* s, const char* needle, size_t nlen );
-int          c_strcasecmp( const char* s1, const char* s2 );
+int          c_strncasecmp( const char* s1, const char* s2, size_t n );
+char*        c_strnfind( const char* s, const char* needle, size_t nmax );
+char*        c_istrnfind( const char* s, const char* needle, size_t nmax );
 uint32_t     c_string_hash( const char* str );
 ```
 

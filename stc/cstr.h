@@ -61,8 +61,19 @@ STC_API void
 cstr_erase(cstr_t* self, size_t pos, size_t n);
 STC_API bool
 cstr_getdelim(cstr_t *self, int delim, FILE *stream);
+STC_API size_t
+cstr_find(cstr_t s, const char* needle);
+STC_API size_t
+cstr_find_n(cstr_t s, const char* needle, size_t pos, size_t nlen);
+STC_API size_t
+cstr_ifind_n(cstr_t s, const char* needle, size_t pos, size_t nlen);
+
+STC_API int
+c_strncasecmp(const char* s1, const char* s2, size_t n);
 STC_API char*
-c_strnfind(const char* s, const char* needle, size_t nlen);
+c_strnfind(const char* s, const char* needle, size_t nmax);
+STC_DEF char*
+c_istrnfind(const char* s, const char* needle, size_t nmax);
 
 #define _cstr_rep(self) (((size_t *) (self)->str) - 2)
 #define _cstr_size(s)   ((size_t *) (s).str)[-2]
@@ -174,20 +185,13 @@ cstr_getline(cstr_t *self, FILE *stream) {
 STC_INLINE size_t
 cstr_length(cstr_t s) { return cstr_size(s); }
 
-STC_INLINE int
-c_strcasecmp(const char* s1, const char* s2) {
-    while (*s1 && tolower(*s1) == tolower(*s2))
-        ++s1, ++s2;
-    return tolower(*s1) - tolower(*s2);
-}
-
 STC_INLINE bool
 cstr_equals(cstr_t s1, const char* str) {
     return strcmp(s1.str, str) == 0;
 }
 STC_INLINE bool
-cstr_equals_caseins(cstr_t s1, const char* str) {
-    return c_strcasecmp(s1.str, str) == 0;
+cstr_iequals(cstr_t s1, const char* str) {
+    return c_strncasecmp(s1.str, str, cstr_npos) == 0;
 }
 STC_INLINE bool
 cstr_equals_s(cstr_t s1, cstr_t s2) {
@@ -197,38 +201,34 @@ STC_INLINE int
 cstr_compare(const cstr_t *s1, const cstr_t *s2) {
     return strcmp(s1->str, s2->str);
 }
-STC_INLINE int
-cstr_casecmp(const cstr_t *s1, const cstr_t *s2) {
-    return c_strcasecmp(s1->str, s2->str);
-}
-
-STC_INLINE size_t
-cstr_find(cstr_t s, const char* needle) {
-    char* res = strstr(s.str, needle);
-    return res ? res - s.str : cstr_npos;
-}
-STC_INLINE size_t
-cstr_find_n(cstr_t s, const char* needle, size_t pos, size_t nlen) {
-    if (pos > cstr_size(s)) return cstr_npos;
-    char* res = c_strnfind(s.str + pos, needle, nlen);
-    return res ? res - s.str : cstr_npos;
-}
 
 STC_INLINE bool
 cstr_contains(cstr_t s, const char* needle) {
     return strstr(s.str, needle) != NULL;
 }
 STC_INLINE bool
-cstr_begins_with(cstr_t s, const char* needle) {
-    for (;;) {
-        if (!(*needle && *s.str)) return *needle == 0;
-        if (*needle++ != *s.str++) return false;
-    }
+cstr_icontains(cstr_t s, const char* needle) {
+    return c_istrnfind(s.str, needle, cstr_npos) != NULL;
 }
+
+STC_INLINE bool
+cstr_begins_with(cstr_t s, const char* needle) {
+    return strncmp(s.str, needle, strlen(needle)) == 0;
+}
+STC_INLINE bool
+cstr_ibegins_with(cstr_t s, const char* needle) {
+    return c_strncasecmp(s.str, needle, strlen(needle)) == 0;
+}
+
 STC_INLINE bool
 cstr_ends_with(cstr_t s, const char* needle) {
     size_t n = strlen(needle), sz = cstr_size(s);
     return n <= sz ? strcmp(s.str + sz - n, needle) == 0 : false;
+}
+STC_INLINE bool
+cstr_iends_with(cstr_t s, const char* needle) {
+    size_t n = strlen(needle), sz = cstr_size(s);
+    return n <= sz ? c_strncasecmp(s.str + sz - n, needle, cstr_npos) == 0 : false;
 }
 
 /* cvec/cmap API functions: */
@@ -399,21 +399,62 @@ cstr_getdelim(cstr_t *self, int delim, FILE *fp) {
     }
 }
 
+STC_DEF size_t
+cstr_find(cstr_t s, const char* needle) {
+    char* res = strstr(s.str, needle);
+    return res ? res - s.str : cstr_npos;
+}
+STC_DEF size_t
+cstr_find_n(cstr_t s, const char* needle, size_t pos, size_t nlen) {
+    if (pos > cstr_size(s)) return cstr_npos;
+    char* res = c_strnfind(s.str + pos, needle, nlen);
+    return res ? res - s.str : cstr_npos;
+}
+STC_DEF size_t
+cstr_ifind_n(cstr_t s, const char* needle, size_t pos, size_t nlen) {
+    if (pos > cstr_size(s)) return cstr_npos;
+    char* res = c_istrnfind(s.str + pos, needle, nlen);
+    return res ? res - s.str : cstr_npos;
+}
+
+STC_DEF int
+c_strncasecmp(const char* s1, const char* s2, size_t n) {
+    while (n && *s1 && tolower(*s1) == tolower(*s2))
+        ++s1, ++s2, --n;
+    return n ? tolower(*s1) - tolower(*s2) : 0;
+}
+
 STC_DEF char*
-c_strnfind(const char* s, const char* needle, size_t nlen) {
+c_strnfind(const char* s, const char* needle, size_t nmax) {
     ptrdiff_t sum = 0;
-    const char *t = s, *p = needle, *q = p + nlen;
-    while (p != q) {
-        if (!(*t && *p))
-            return NULL;
+    const char *t = s, *p = needle;
+    while (*p && nmax--) {
+        if (!*t) return NULL;
         sum += *t++ - *p++;
     }
+    nmax = t - s;
     for (;;) {
-        if (sum == 0 && memcmp(s, needle, nlen) == 0)
+        if (sum == 0 && memcmp(s, needle, nmax) == 0)
             return (char *) s;
-        if (!*t)
-            return NULL;
+        if (!*t) return NULL;
         sum += *t++ - *s++;
+    }
+}
+
+STC_DEF char*
+c_istrnfind(const char* s, const char* needle, size_t nmax) {
+    ptrdiff_t sum = 0;
+    const char *t = s, *p = needle;
+    while (*p && nmax--) {
+        if (!*t) return NULL;
+        sum += tolower(*t++) - tolower(*p++);
+    }
+    nmax = t - s;
+    for (;;) {
+        if (sum == 0 && c_strncasecmp(s, needle, nmax) == 0)
+            return (char *) s;
+        if (!*t) return NULL;
+        sum += tolower(*t++) - tolower(*s++);
     }
 }
 
