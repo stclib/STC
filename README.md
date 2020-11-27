@@ -9,7 +9,7 @@ An elegant, fully typesafe, generic, customizable, user-friendly, consistent, an
 - [**cbitset** - A ***bitset*** - *std::bitset*- or *boost::dynamic_bitset*-like](docs/cbitset_api.md)
 - [**clist** - Generic circular ***singly linked List*** type](docs/clist_api.md). Can be used as a *queue* as it supports *push_back(), push_front(), and pop_front()*. Supports various *splice* functions and *merge sort*.
 - [**cmap** - Generic fast ***unordered map/set*** types](docs/cstr_api.md) Implemented as open hashing without tombstones. Highly customizable and fast.
-- [**cstr** - Powerful and compact **string** type](docs/cstr_api.md)
+- [**cstr** - Powerful and compact ***string*** type](docs/cstr_api.md)
 - [**cvec** - Dynamic generic ***vector*** type](docs/cvec_api.md)
 - [**cstack** - A ***stack*** adapter type](docs/cstack_api.md)
 - [**cqueue** - A ***queue*** adapter type](docs/cqueue_api.md)
@@ -17,7 +17,7 @@ An elegant, fully typesafe, generic, customizable, user-friendly, consistent, an
 - [**cptr** - Support for pointers and shared pointers in containers](docs/cptr_api.md)
 - [**coption** - Implements *coption_get()*, a ***getopt_long***-like function](docs/coption_api.md), for command line argument parsing.
 - [**crandom** - A few very efficent modern ***random number generators***](docs/crandom_api.md) *pcg32* and my own *64-bit PRNG* inspired by *sfc64*, with uniform and normal distributions.
-- [**ccommon** - A common include file with a few general definitions](docs/ccommon_api.md)
+- [**ccommon** - Collection of general definitions](docs/ccommon_api.md)
 
 The usage of the containers is quite similar to the C++ standard containers, so it should be easy if you are familiar with them.
 
