@@ -52,6 +52,10 @@ be replaced by `my` in all of the following documentation.
 |                      | `}`                                   |                                    |
 | `cmap_T_input_t`     | `cmap_T_value_t`                      | cmap input type                    |
 | `cmap_T_rawvalue_t`  | `RawMapped`                           | cmap raw value type                |
+| `cmap_T_result_t`    | `struct {`                            | Result of insert/put/emplace       |
+|                      | `  cmap_T_value_t* first;`            |                                    |
+|                      | `  bool second;` /* inserted */       |                                    |
+|                      | `}`                                   |                                    |
 | `cmap_T_iter_t`      | `struct {`                            | cmap iterator                      |
 |                      | `  cmap_T_value_t* val;`              |                                    |
 |                      | `  ...;`                              |                                    |
@@ -78,7 +82,7 @@ All cmap definitions and prototypes may be included in your C source file by inc
 
 ### Construction
 
-The interfaces to create a cmap_T object:
+The interface for cmap_T:
 ```c
 cmap_T              cmap_T_init(void);
 cmap_T              cmap_T_with_capacity(size_t cap);
@@ -97,7 +101,7 @@ size_t              cmap_T_capacity(cmap_T m);
 
 void                cmap_T_push_n(cmap_T* self, const cmap_T_input_t in[], size_t size);
 
-cmap_T_result_t     cmap_T_emplace(cmap_T* self, RawKey rawKey RawMapped rawVal);
+cmap_T_result_t     cmap_T_emplace(cmap_T* self, RawKey rawKey, RawMapped rawVal);
 cmap_T_result_t     cmap_T_insert(cmap_T* self, cmap_T_input_t in);
 cmap_T_result_t     cmap_T_insert_or_assign(cmap_T* self, RawKey rawKey, RawMapped rawVal);
 cmap_T_result_t     cmap_T_put(cmap_T* self, RawKey rawKey, RawMapped rawVal);

@@ -8,7 +8,8 @@ An elegant, fully typesafe, generic, customizable, user-friendly, consistent, an
 - [***carray*** - Dynamic generic **multi-dimensional array**](docs/cbitset_api.md), implemented as a single contiguous block of memory.
 - [***cbitset*** - A **bitset** - *std::bitset*- or *boost::dynamic_bitset*-like](docs/cbitset_api.md)
 - [***clist*** - Generic circular **singly linked List** type](docs/clist_api.md). Can be used as a *queue* as it supports *push_back(), push_front(), and pop_front()*. Supports various *splice* functions and *merge sort*.
-- [***cmap*** - Generic fast **unordered map/set** types](docs/cstr_api.md) Implemented as open hashing without tombstones. Highly customizable and fast.
+- [***cmap*** - Generic fast **unordered map** type](docs/cmap_api.md) Implemented as open hashing without tombstones. Highly customizable and fast.
+- [***cset*** - Generic fast **unordered set** type](docs/cset_api.md) Same as cmap, but contains and uses keys only.
 - [***cstr*** - Powerful and compact **string** type](docs/cstr_api.md)
 - [***cvec*** - Dynamic generic **vector** type](docs/cvec_api.md)
 - [***cstack*** - A **stack** adapter type](docs/cstack_api.md)

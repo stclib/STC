@@ -27,7 +27,7 @@ All cstr definitions and prototypes may be included in your C source file by inc
 
 ### Construction
 
-The interfaces to create a cstr_t object:
+The interface for cstr_t:
 ```c
 cstr_t        cstr_init(void);                           (1)
 cstr_t        cstr_with_capacity(size_t cap);            (2)
