@@ -2,7 +2,7 @@
 
 UNDER CONSTRUCTION!
 
-This describes the API of circular singly linked list type **cmap**.
+This describes the API of the unordered map type **cmap**.
 
 ## Declaration
 

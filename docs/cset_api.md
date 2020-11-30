@@ -2,7 +2,7 @@
 
 UNDER CONSTRUCTION!
 
-This describes the API of circular singly linked list type **cset**.
+This describes the API of the unordered set type **cset**.
 
 ## Declaration
 
