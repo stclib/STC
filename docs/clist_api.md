@@ -16,10 +16,11 @@ This describes the API of circular singly linked list type **clist**.
                               valueFromRaw=c_default_from_raw)
 ```
 The macro `using_clist()` can be instantiated with 2, 3, 4, or 7 arguments in the global scope.
-Defaults are given above for args not specified. Note that `z` can be any name, it's a tag and
-will affect the names of all clist types and methods, e.g. for `using_clist(my, int);` `$` should
-be replaced by `my` in all of the following documentation. `using_clist_str()` is a predefined
-macro for `using_clist(str, cstr_t, ...)`.
+Default values are given above for args not specified. `$` is a type tag name and
+will affect the names of all clist types and methods. E.g. declaring `using_clist(my, int);`, `$` should
+be replaced by `my` in all of the following documentation.
+
+`using_clist_str()` is a predefined macro for `using_clist(str, cstr_t, ...)`.
 
 ## Types
 

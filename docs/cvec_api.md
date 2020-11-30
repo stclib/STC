@@ -16,10 +16,11 @@ This describes the API of vector type **cvec**.
                              valueFromRaw=c_default_from_raw)
 ```
 The macro `using_cvec()` can be instantiated with 2, 3, 4, or 7 arguments in the global scope.
-Defaults are given above for args not specified. Note that `z` can be any name, it's a tag and
-will affect the names of all cvec types and methods, e.g. for `using_cvec(my, int);` `$` should
-be replaced by `my` in all of the following documentation. `using_cvec_str()` is a predefined
-macro for `using_cvec(str, cstr_t, ...)`.
+Defaults values are given above for args not specified. `$` is a type tag name and
+will affect the names of all cvec types and methods. E.g. declaring `using_cvec(my, int);`, `$` should
+be replaced by `my` in all of the following documentation.
+
+`using_cvec_str()` is a predefined macro for `using_cvec(str, cstr_t, ...)`.
 
 ## Types
 
@@ -36,9 +37,10 @@ macro for `using_cvec(str, cstr_t, ...)`.
 | Name                       | Value            |
 |:---------------------------|:-----------------|
 |  `cvec_inits`              | `{NULL}`         |
-|  `cvec_size(v)             |                  |
-|  `cvec_capacity(v)`        |                  |
-|  `cvec_empty(v)`           |                  |
+|  `cvec_empty(vec)`         |                  |
+|  `cvec_size(vec)`          |                  |
+|  `cvec_capacity(vec)`      |                  |
+
 
 ## Header file
 
