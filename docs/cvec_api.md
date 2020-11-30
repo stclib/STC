@@ -77,24 +77,24 @@ void                cvec_z_push_back(cvec_z* self, Value value);
 void                cvec_z_emplace_back(cvec_z* self, RawValue val);
 void                cvec_z_pop_back(cvec_z* self);
 
-cvec_z_iter_t       cvec_z_insert_range(cvec_z* self, cvec_z_iter_t pos,
-                                        cvec_z_iter_t first, cvec_z_iter_t finish);
-cvec_z_iter_t       cvec_z_insert_range_p(cvec_z* self, cvec_z_value_t* pos,
-                                          const cvec_z_value_t* pfirst, const cvec_z_value_t* pfinish);
 cvec_z_iter_t       cvec_z_insert_at(cvec_z* self, cvec_z_iter_t pos, Value value);
 cvec_z_iter_t       cvec_z_insert_at_idx(cvec_z* self, size_t idx, Value value);
 cvec_z_iter_t       cvec_z_emplace_at(cvec_z* self, cvec_z_iter_t pos, RawValue val);
 cvec_z_iter_t       cvec_z_emplace_at_idx(cvec_z* self, size_t idx, RawValue val);
+cvec_z_iter_t       cvec_z_insert_range(cvec_z* self, cvec_z_iter_t pos,
+                                        cvec_z_iter_t first, cvec_z_iter_t finish);
+cvec_z_iter_t       cvec_z_insert_range_p(cvec_z* self, cvec_z_value_t* pos,
+                                          const cvec_z_value_t* pfirst, const cvec_z_value_t* pfinish);
 
-cvec_z_iter_t       cvec_z_erase_range(cvec_z* self, cvec_z_iter_t first, cvec_z_iter_t finish);
-cvec_z_iter_t       cvec_z_erase_range_p(cvec_z* self, cvec_z_value_t* first, cvec_z_value_t* finish);
 cvec_z_iter_t       cvec_z_erase_at(cvec_z* self, cvec_z_iter_t pos);
 cvec_z_iter_t       cvec_z_erase_at_idx(cvec_z* self, size_t idx);
+cvec_z_iter_t       cvec_z_erase_range(cvec_z* self, cvec_z_iter_t first, cvec_z_iter_t finish);
+cvec_z_iter_t       cvec_z_erase_range_p(cvec_z* self, cvec_z_value_t* first, cvec_z_value_t* finish);
 cvec_z_iter_t       cvec_z_erase_range_idx(cvec_z* self, size_t ifirst, size_t ifinish);
 
 cvec_z_iter_t       cvec_z_find(const cvec_z* self, RawValue val);
 cvec_z_iter_t       cvec_z_find_in_range(const cvec_z* self,
-                                   cvec_z_iter_t first, cvec_z_iter_t finish, RawValue val);
+                                         cvec_z_iter_t first, cvec_z_iter_t finish, RawValue val);
 
 void                cvec_z_sort(cvec_z* self);
 void                cvec_z_sort_with(cvec_z* self, size_t ifirst, size_t ifinish,
