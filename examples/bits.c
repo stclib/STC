@@ -28,13 +28,13 @@ int main() {
     printf("%4zu: ", set.size);
     c_foreach (i, cbitset, set)
         printf("%d", cbitset_itval(i));
-    puts("");        
+    puts("");
 
     cbitset_t s2 = cbitset_clone(set);
     cbitset_flip_all(&s2);
     cbitset_set(&s2, 16);
     cbitset_set(&s2, 17);
-    cbitset_set(&s2, 18);    
+    cbitset_set(&s2, 18);
     printf(" new: ");
     c_forrange (i, int, s2.size)
         printf("%d", cbitset_test(s2, i));

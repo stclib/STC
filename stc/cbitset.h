@@ -45,7 +45,9 @@ int main() {
     cbitset_del(&bset);
 }
 */
-#include "cstr.h"
+#include <stdlib.h>
+#include <string.h>
+#include "ccommon.h"
 
 typedef struct cbitset { uint64_t* _arr; size_t size; } cbitset_t;
 
@@ -64,6 +66,23 @@ STC_INLINE size_t cbitset_size(cbitset_t set) {return set.size;}
 STC_INLINE cbitset_t cbitset_init() {
     cbitset_t bs = {NULL, 0}; return bs;
 }
+STC_INLINE void cbitset_del(cbitset_t* self) {
+    c_free(self->_arr);
+}
+
+STC_DEF cbitset_t* cbitset_take(cbitset_t* self, cbitset_t other) {
+    if (self->_arr != other._arr) cbitset_del(self), *self = other;
+    return self;
+}
+STC_DEF cbitset_t* cbitset_assign(cbitset_t* self, cbitset_t other) {
+    if (self->_arr != other._arr) cbitset_del(self), *self = cbitset_clone(other);
+    return self;
+}
+STC_INLINE cbitset_t cbitset_move(cbitset_t* self) {
+    cbitset_t tmp = *self; self->_arr = NULL, self->size = 0;
+    return tmp;
+}
+
 STC_INLINE void cbitset_set(cbitset_t *self, size_t i) {
     self->_arr[i >> 6] |= 1ull << (i & 63);
 }
@@ -89,9 +108,6 @@ STC_INLINE void cbitset_set_all_64(cbitset_t *self, uint64_t pattern) {
 STC_INLINE void cbitset_flip_all(cbitset_t *self) {
     size_t n = (self->size + 63) >> 6;
     for (size_t i=0; i<n; ++i) self->_arr[i] ^= ~0ull;
-}
-STC_INLINE void cbitset_del(cbitset_t* self) {
-    c_free(self->_arr);
 }
 
 /* Intersection */
@@ -192,7 +208,7 @@ STC_DEF cbitset_t cbitset_from_str(const char* str) {
 }
 STC_DEF char* cbitset_to_str(cbitset_t set, char* out, size_t start, intptr_t stop) {
     size_t end = stop < 0 ? set.size : stop;
-    for (size_t i=start; i<end; ++i) out[i] = (cbitset_test(set, i)) ? '1' : '0';
+    for (size_t i=start; i<end; ++i) out[i] = cbitset_test(set, i) ? '1' : '0';
     out[end] = '\0'; return out;
 }
 STC_DEF cbitset_t cbitset_clone(cbitset_t other) {
