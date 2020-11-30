@@ -4,17 +4,20 @@ This describes the API of string type **cstr_t**.
 
 ## Types
 
-| cstr              | Type definition                        | Used to represent...                 |
+| Type name         | Type definition                        | Used to represent...                 |
 |:------------------|:---------------------------------------|:-------------------------------------|
 | `cstr_t`          | `struct { const char *str; }`          | The string type                      |
 | `cstr_value_t`    | `char`                                 | The string element type              |
-| `cstr_iter_t`     | `struct { char *val; }`                | String iterator                      |
+| `cstr_iter_t`     | `struct { cstr_value_t *val; }`        | cstr_t iterator                      |
 
-## Constants
+## Constants and macros
 
-| cstr constant name         | Numerical values |
+| Name                       | Value / Returns  |
 |:---------------------------|:-----------------|
 |  `cstr_npos`               | `-1ULL`          |
+|  `cstr_size(str)           |                  |
+|  `cstr_capacity(str)       |                  |
+|  `cstr_empty(str)          |                  |
 
 ## Header file
 
