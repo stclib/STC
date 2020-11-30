@@ -104,7 +104,7 @@ cmap_T_result_t     cmap_T_put(cmap_T* self, RawKey rawKey, RawMapped rawVal);
 cmap_T_result_t     cmap_T_putv(cmap_T* self, RawKey rawKey, Mapped mapped);
 cmap_T_mapped_t*    cmap_T_at(const cmap_T* self, RawKey rawKey);
 
-size_t              cmap_T_erase(cmap_T* self, RawKey rawKey)
+size_t              cmap_T_erase(cmap_T* self, RawKey rawKey);
 void                cmap_T_erase_entry(cmap_T* self, cmap_T_value_t* val);
 cmap_T_iter_t       cmap_T_erase_at(cmap_T* self, cmap_T_iter_t pos);
 
@@ -112,7 +112,7 @@ cmap_T_value_t*     cmap_T_find(const cmap_T* self, RawKey rawKey);
 bool                cmap_T_contains(const cmap_T* self, RawKey rawKey);
 
 cmap_T_iter_t       cmap_T_begin(cmap_T* self);
-cmap_T_iter_t       cmap_T_end(cmap_T* self)
+cmap_T_iter_t       cmap_T_end(cmap_T* self);
 void                cmap_T_next(cmap_T_iter_t* it);
 cmap_T_mapped_t*    cmap_T_itval(cmap_T_iter_t it);
 
