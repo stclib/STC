@@ -4,7 +4,7 @@ UNDER CONSTRUCTION!
 
 This describes the API of vector type **cvec**.
 
-## Instantiation
+## Declaration
 
 ```c
 #define using_cvec_str()
@@ -15,10 +15,11 @@ This describes the API of vector type **cvec**.
                              valueToRaw=c_default_to_raw,
                              valueFromRaw=c_default_from_raw)
 ```
-The macro `using_cvec()` can be instantiated with 2, 3, 4, or 7 arguments. Defaults are given above for args not specified.
-Note that `z` can be any name, it's a tag and will affect the names of all cvec types and methods,
-e.g. for `using_cvec(my, int);` `_z` should be replaced by `_my` in all the following documentation.
-`using_cvec_str()` is a predefined macro for `using_cvec(str, cstr_t, ...)`.
+The macro `using_cvec()` can be instantiated with 2, 3, 4, or 7 arguments in the global scope.
+Defaults are given above for args not specified. Note that `z` can be any name, it's a tag and
+will affect the names of all cvec types and methods, e.g. for `using_cvec(my, int);` `_z` should
+be replaced by `_my` in all of the following documentation. `using_cvec_str()` is a predefined
+macro for `using_cvec(str, cstr_t, ...)`.
 
 ## Types
 
@@ -53,7 +54,7 @@ All cvec definitions and prototypes may be included in your C source file by inc
 The interface for cvec:
 ```c
 cvec_z              cvec_z_init(void);
-cvec_z              cvec_z_with_size(size_t size, Value null_val);
+cvec_z              cvec_z_with_size(size_t size, Value fill_val);
 cvec_z              cvec_z_with_capacity(size_t size);
 
 void                cvec_z_clear(cvec_z* self);

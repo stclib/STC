@@ -4,7 +4,7 @@ UNDER CONSTRUCTION!
 
 This describes the API of circular singly linked list type **clist**.
 
-## Instantiation
+## Declaration
 
 ```c
 #define using_clist_str()
@@ -15,10 +15,11 @@ This describes the API of circular singly linked list type **clist**.
                               valueToRaw=c_default_to_raw,
                               valueFromRaw=c_default_from_raw)
 ```
-The macro `using_clist()` can be instantiated with 2, 3, 4, or 7 arguments. Defaults are given above for args not specified.
-Note that `z` can be any name, it's a tag and will affect the names of all clist types and methods,
-e.g. for `using_clist(my, int);` `_z` should be replaced by `_my` in all the following documentation.
-`using_clist_str()` is a predefined macro for `using_clist(str, cstr_t, ...)`.
+The macro `using_clist()` can be instantiated with 2, 3, 4, or 7 arguments in the global scope.
+Defaults are given above for args not specified. Note that `z` can be any name, it's a tag and
+will affect the names of all clist types and methods, e.g. for `using_clist(my, int);` `_z` should
+be replaced by `_my` in all of the following documentation. `using_clist_str()` is a predefined
+macro for `using_clist(str, cstr_t, ...)`.
 
 ## Types
 

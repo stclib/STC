@@ -15,9 +15,6 @@ This describes the API of string type **cstr_t**.
 | Name                       | Value            |
 |:---------------------------|:-----------------|
 |  `cstr_npos`               | `-1ull`          |
-|  `cstr_size(str)           |                  |
-|  `cstr_capacity(str)       |                  |
-|  `cstr_empty(str)          |                  |
 
 ## Header file
 
