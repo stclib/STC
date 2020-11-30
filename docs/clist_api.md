@@ -10,15 +10,15 @@ This describes the API of circular singly linked list type **clist**.
 #define using_clist_str()
 
 #define using_clist(z, Value, valueDestroy=c_default_del,
-                               valueCompareRaw=c_default_compare,
-                               RawValue=Value,
-                               valueToRaw=c_default_to_raw,
-                               valueFromRaw=c_default_from_raw)
+                              valueCompareRaw=c_default_compare,
+                              RawValue=Value,
+                              valueToRaw=c_default_to_raw,
+                              valueFromRaw=c_default_from_raw)
 ```
 The macro `using_clist()` can be instantiated with 2, 3, 4, or 7 arguments. Defaults are given above for args not specified.
 Note that `z` can be any name, it's a tag and will affect the names of all clist types and methods,
 e.g. for `using_clist(my, int);` `_z` should be replaced by `_my` in all the following documentation.
-`using_clist_str()` is a predefined macro for `clist_using(str, cstr_t, ...)`.
+`using_clist_str()` is a predefined macro for `using_clist(str, cstr_t, ...)`.
 
 ## Types
 
@@ -33,9 +33,8 @@ e.g. for `using_clist(my, int);` `_z` should be replaced by `_my` in all the fol
 | `clist_z_input_t`     | `clist_z_value_t`                      | clist input type                    |
 | `clist_z_rawvalue_t`  | `RawValue`                             | clist raw value type                |
 | `clist_z_iter_t`      | `struct {`                             | clist iterator                      |
-|                       | `  clist_z_node_t* const* _...;`       |                                     |
+|                       | `  ...;`                               |                                     |
 |                       | `  clist_z_value_t* val;`              |                                     |
-|                       | `  int _...;`                          |                                     |
 |                       | `}`                                    |                                     |
 
 
@@ -68,6 +67,9 @@ bool                clist_z_empty(clist_z list);
 size_t              clist_z_size(clist_z list);
 Value               clist_z_value_from_raw(RawValue val);
 
+clist_z_value_t*    clist_z_front(clist_z* self);
+clist_z_value_t*    clist_z_back(clist_z* self);
+
 void                clist_z_push_n(clist_z *self, const clist_z_input_t in[], size_t size);
 void                clist_z_push_back(clist_z* self, Value value);
 void                clist_z_emplace_back(clist_z* self, RawValue val);
@@ -87,14 +89,12 @@ void                clist_z_splice_back(clist_z* self, clist_z* other);
 void                clist_z_splice_after(clist_z* self, clist_z_iter_t pos, clist_z* other);
 
 clist_z_iter_t      clist_z_find(const clist_z* self, RawValue val);
-clist_z_iter_t      clist_z_find_before(const clist_z* self, clist_z_iter_t first, clist_z_iter_t finish, RawValue val);
+clist_z_iter_t      clist_z_find_before(const clist_z* self,
+                                        clist_z_iter_t first, clist_z_iter_t finish, RawValue val);
 
 size_t              clist_z_remove(clist_z* self, RawValue val);
 
 void                clist_z_sort(clist_z* self);
-
-Value*              clist_z_front(clist_z* self);
-Value*              clist_z_back(clist_z* self);
 
 clist_z_iter_t      clist_z_before_begin(const clist_z* self);
 clist_z_iter_t      clist_z_begin(const clist_z* self);
