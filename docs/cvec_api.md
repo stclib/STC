@@ -9,15 +9,15 @@ This describes the API of vector type **cvec**.
 ```c
 #define using_cvec_str()
 
-#define using_cvec($, Value, valueDestroy=c_default_del,
+#define using_cvec(T, Value, valueDestroy=c_default_del,
                              valueCompareRaw=c_default_compare,
                              RawValue=Value,
                              valueToRaw=c_default_to_raw,
                              valueFromRaw=c_default_from_raw)
 ```
 The macro `using_cvec()` can be instantiated with 2, 3, 4, or 7 arguments in the global scope.
-Defaults values are given above for args not specified. `$` is a type tag name and
-will affect the names of all cvec types and methods. E.g. declaring `using_cvec(my, int);`, `$` should
+Defaults values are given above for args not specified. `T` is a type tag name and
+will affect the names of all cvec types and methods. E.g. declaring `using_cvec(my, int);`, `T` should
 be replaced by `my` in all of the following documentation.
 
 `using_cvec_str()` is a predefined macro for `using_cvec(str, cstr_t, ...)`.
@@ -26,11 +26,11 @@ be replaced by `my` in all of the following documentation.
 
 | Type name            | Type definition                        | Used to represent...                |
 |:---------------------|:---------------------------------------|:------------------------------------|
-| `cvec_$`             | `struct { cvec_$_value_t* data; }`     | The cvec type                       |
-| `cvec_$_value_t`     | `Value`                                | The cvec element type               |
-| `cvec_$_input_t`     | `cvec_$_value_t`                       | cvec input type                     |
-| `cvec_$_rawvalue_t`  | `RawValue`                             | cvec raw value type                 |
-| `cvec_$_iter_t`      | `struct { cvec_$_value_t* val; }`      | cvec iterator                       |
+| `cvec_T`             | `struct { cvec_T_value_t* data; }`     | The cvec type                       |
+| `cvec_T_value_t`     | `Value`                                | The cvec element type               |
+| `cvec_T_input_t`     | `cvec_T_value_t`                       | cvec input type                     |
+| `cvec_T_rawvalue_t`  | `RawValue`                             | cvec raw value type                 |
+| `cvec_T_iter_t`      | `struct { cvec_T_value_t* val; }`      | cvec iterator                       |
 
 ## Constants and macros
 
@@ -55,57 +55,57 @@ All cvec definitions and prototypes may be included in your C source file by inc
 
 The interface for cvec:
 ```c
-cvec_$              cvec_$_init(void);
-cvec_$              cvec_$_with_size(size_t size, Value fill_val);
-cvec_$              cvec_$_with_capacity(size_t size);
+cvec_T              cvec_T_init(void);
+cvec_T              cvec_T_with_size(size_t size, Value fill_val);
+cvec_T              cvec_T_with_capacity(size_t size);
 
-void                cvec_$_clear(cvec_$* self);
-void                cvec_$_reserve(cvec_$* self, size_t cap);
-void                cvec_$_resize(cvec_$* self, size_t size, Value fill_val);
-void                cvec_$_swap(cvec_$* a, cvec_$* b);
+void                cvec_T_clear(cvec_T* self);
+void                cvec_T_reserve(cvec_T* self, size_t cap);
+void                cvec_T_resize(cvec_T* self, size_t size, Value fill_val);
+void                cvec_T_swap(cvec_T* a, cvec_T* b);
 
-void                cvec_$_del(cvec_$* self);
+void                cvec_T_del(cvec_T* self);
 
-bool                cvec_$_empty(cvec_$ vec);
-size_t              cvec_$_size(cvec_$ vec);
-size_t              cvec_$_capacity(cvec_$ vec);
-Value               cvec_$_value_from_raw(RawValue val);
+bool                cvec_T_empty(cvec_T vec);
+size_t              cvec_T_size(cvec_T vec);
+size_t              cvec_T_capacity(cvec_T vec);
+Value               cvec_T_value_from_raw(RawValue val);
 
-cvec_$_value_t*     cvec_$_at(cvec_$* self, size_t i);
-cvec_$_value_t*     cvec_$_front(cvec_$* self);
-cvec_$_value_t*     cvec_$_back(cvec_$* self);
+cvec_T_value_t*     cvec_T_at(cvec_T* self, size_t i);
+cvec_T_value_t*     cvec_T_front(cvec_T* self);
+cvec_T_value_t*     cvec_T_back(cvec_T* self);
 
-void                cvec_$_push_n(cvec_$ *self, const cvec_$_input_t in[], size_t size);
-void                cvec_$_push_back(cvec_$* self, Value value);
-void                cvec_$_emplace_back(cvec_$* self, RawValue val);
-void                cvec_$_pop_back(cvec_$* self);
+void                cvec_T_push_n(cvec_T *self, const cvec_T_input_t in[], size_t size);
+void                cvec_T_push_back(cvec_T* self, Value value);
+void                cvec_T_emplace_back(cvec_T* self, RawValue val);
+void                cvec_T_pop_back(cvec_T* self);
 
-cvec_$_iter_t       cvec_$_insert_at(cvec_$* self, cvec_$_iter_t pos, Value value);
-cvec_$_iter_t       cvec_$_insert_at_idx(cvec_$* self, size_t idx, Value value);
-cvec_$_iter_t       cvec_$_emplace_at(cvec_$* self, cvec_$_iter_t pos, RawValue val);
-cvec_$_iter_t       cvec_$_emplace_at_idx(cvec_$* self, size_t idx, RawValue val);
-cvec_$_iter_t       cvec_$_insert_range(cvec_$* self, cvec_$_iter_t pos,
-                                        cvec_$_iter_t first, cvec_$_iter_t finish);
-cvec_$_iter_t       cvec_$_insert_range_p(cvec_$* self, cvec_$_value_t* pos,
-                                          const cvec_$_value_t* pfirst, const cvec_$_value_t* pfinish);
+cvec_T_iter_t       cvec_T_insert_at(cvec_T* self, cvec_T_iter_t pos, Value value);
+cvec_T_iter_t       cvec_T_insert_at_idx(cvec_T* self, size_t idx, Value value);
+cvec_T_iter_t       cvec_T_emplace_at(cvec_T* self, cvec_T_iter_t pos, RawValue val);
+cvec_T_iter_t       cvec_T_emplace_at_idx(cvec_T* self, size_t idx, RawValue val);
+cvec_T_iter_t       cvec_T_insert_range(cvec_T* self, cvec_T_iter_t pos,
+                                        cvec_T_iter_t first, cvec_T_iter_t finish);
+cvec_T_iter_t       cvec_T_insert_range_p(cvec_T* self, cvec_T_value_t* pos,
+                                          const cvec_T_value_t* pfirst, const cvec_T_value_t* pfinish);
 
-cvec_$_iter_t       cvec_$_erase_at(cvec_$* self, cvec_$_iter_t pos);
-cvec_$_iter_t       cvec_$_erase_at_idx(cvec_$* self, size_t idx);
-cvec_$_iter_t       cvec_$_erase_range(cvec_$* self, cvec_$_iter_t first, cvec_$_iter_t finish);
-cvec_$_iter_t       cvec_$_erase_range_p(cvec_$* self, cvec_$_value_t* first, cvec_$_value_t* finish);
-cvec_$_iter_t       cvec_$_erase_range_idx(cvec_$* self, size_t ifirst, size_t ifinish);
+cvec_T_iter_t       cvec_T_erase_at(cvec_T* self, cvec_T_iter_t pos);
+cvec_T_iter_t       cvec_T_erase_at_idx(cvec_T* self, size_t idx);
+cvec_T_iter_t       cvec_T_erase_range(cvec_T* self, cvec_T_iter_t first, cvec_T_iter_t finish);
+cvec_T_iter_t       cvec_T_erase_range_p(cvec_T* self, cvec_T_value_t* first, cvec_T_value_t* finish);
+cvec_T_iter_t       cvec_T_erase_range_idx(cvec_T* self, size_t ifirst, size_t ifinish);
 
-cvec_$_iter_t       cvec_$_find(const cvec_$* self, RawValue val);
-cvec_$_iter_t       cvec_$_find_in_range(const cvec_$* self,
-                                         cvec_$_iter_t first, cvec_$_iter_t finish, RawValue val);
+cvec_T_iter_t       cvec_T_find(const cvec_T* self, RawValue val);
+cvec_T_iter_t       cvec_T_find_in_range(const cvec_T* self,
+                                         cvec_T_iter_t first, cvec_T_iter_t finish, RawValue val);
 
-void                cvec_$_sort(cvec_$* self);
-void                cvec_$_sort_with(cvec_$* self, size_t ifirst, size_t ifinish,
-                                     int(*cmp)(const cvec_$_value_t*, const cvec_$_value_t*));
+void                cvec_T_sort(cvec_T* self);
+void                cvec_T_sort_with(cvec_T* self, size_t ifirst, size_t ifinish,
+                                     int(*cmp)(const cvec_T_value_t*, const cvec_T_value_t*));
 
-cvec_$_iter_t       cvec_$_begin(const cvec_$* self);
-cvec_$_iter_t       cvec_$_last(const cvec_$* self);
-cvec_$_iter_t       cvec_$_end(const cvec_$* self);
-void                cvec_$_next(cvec_$_iter_t* it);
-cvec_$_value_t*     cvec_$_itval(cvec_$_iter_t it);
+cvec_T_iter_t       cvec_T_begin(const cvec_T* self);
+cvec_T_iter_t       cvec_T_last(const cvec_T* self);
+cvec_T_iter_t       cvec_T_end(const cvec_T* self);
+void                cvec_T_next(cvec_T_iter_t* it);
+cvec_T_value_t*     cvec_T_itval(cvec_T_iter_t it);
 ```

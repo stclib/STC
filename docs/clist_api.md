@@ -9,15 +9,15 @@ This describes the API of circular singly linked list type **clist**.
 ```c
 #define using_clist_str()
 
-#define using_clist($, Value, valueDestroy=c_default_del,
+#define using_clist(T, Value, valueDestroy=c_default_del,
                               valueCompareRaw=c_default_compare,
                               RawValue=Value,
                               valueToRaw=c_default_to_raw,
                               valueFromRaw=c_default_from_raw)
 ```
 The macro `using_clist()` can be instantiated with 2, 3, 4, or 7 arguments in the global scope.
-Default values are given above for args not specified. `$` is a type tag name and
-will affect the names of all clist types and methods. E.g. declaring `using_clist(my, int);`, `$` should
+Default values are given above for args not specified. `T` is a type tag name and
+will affect the names of all clist types and methods. E.g. declaring `using_clist(my, int);`, `T` should
 be replaced by `my` in all of the following documentation.
 
 `using_clist_str()` is a predefined macro for `using_clist(str, cstr_t, ...)`.
@@ -26,17 +26,17 @@ be replaced by `my` in all of the following documentation.
 
 | Type name             | Type definition                        | Used to represent...                |
 |:----------------------|:---------------------------------------|:------------------------------------|
-| `clist_$`             | `struct { clist_$_node_t* last; }`     | The clist type                      |
-| `clist_$_node_t`      | `struct {`                             | clist node                          |
-|                       | `  struct clist_$_node* next;`         |                                     |
-|                       | `  clist_$_value_t value;`             |                                     |
+| `clist_T`             | `struct { clist_T_node_t* last; }`     | The clist type                      |
+| `clist_T_node_t`      | `struct {`                             | clist node                          |
+|                       | `  struct clist_T_node* next;`         |                                     |
+|                       | `  clist_T_value_t value;`             |                                     |
 |                       | `}`                                    |                                     |
-| `clist_$_value_t`     | `Value`                                | The clist element type              |
-| `clist_$_input_t`     | `clist_$_value_t`                      | clist input type                    |
-| `clist_$_rawvalue_t`  | `RawValue`                             | clist raw value type                |
-| `clist_$_iter_t`      | `struct {`                             | clist iterator                      |
+| `clist_T_value_t`     | `Value`                                | The clist element type              |
+| `clist_T_input_t`     | `clist_T_value_t`                      | clist input type                    |
+| `clist_T_rawvalue_t`  | `RawValue`                             | clist raw value type                |
+| `clist_T_iter_t`      | `struct {`                             | clist iterator                      |
 |                       | `  ...;`                               |                                     |
-|                       | `  clist_$_value_t* val;`              |                                     |
+|                       | `  clist_T_value_t* val;`              |                                     |
 |                       | `}`                                    |                                     |
 
 
@@ -58,50 +58,50 @@ All clist definitions and prototypes may be included in your C source file by in
 
 ### Construction
 
-The interfaces to create a clist_$ object:
+The interfaces to create a clist_T object:
 ```c
-clist_$             clist_$_init(void);
+clist_T             clist_T_init(void);
 
-void                clist_$_clear(clist_$* self);
-void                clist_$_del(clist_$* self);
+void                clist_T_clear(clist_T* self);
+void                clist_T_del(clist_T* self);
 
-bool                clist_$_empty(clist_$ list);
-size_t              clist_$_size(clist_$ list);
-Value               clist_$_value_from_raw(RawValue val);
+bool                clist_T_empty(clist_T list);
+size_t              clist_T_size(clist_T list);
+Value               clist_T_value_from_raw(RawValue val);
 
-clist_$_value_t*    clist_$_front(clist_$* self);
-clist_$_value_t*    clist_$_back(clist_$* self);
+clist_T_value_t*    clist_T_front(clist_T* self);
+clist_T_value_t*    clist_T_back(clist_T* self);
 
-void                clist_$_push_n(clist_$ *self, const clist_$_input_t in[], size_t size);
-void                clist_$_push_back(clist_$* self, Value value);
-void                clist_$_emplace_back(clist_$* self, RawValue val);
+void                clist_T_push_n(clist_T *self, const clist_T_input_t in[], size_t size);
+void                clist_T_push_back(clist_T* self, Value value);
+void                clist_T_emplace_back(clist_T* self, RawValue val);
 
-void                clist_$_push_front(clist_$* self, Value value);
-void                clist_$_emplace_front(clist_$* self, RawValue val);
-void                clist_$_pop_front(clist_$* self);
+void                clist_T_push_front(clist_T* self, Value value);
+void                clist_T_emplace_front(clist_T* self, RawValue val);
+void                clist_T_pop_front(clist_T* self);
 
-clist_$_iter_t      clist_$_insert_after(clist_$* self, clist_$_iter_t pos, Value val);
-clist_$_iter_t      clist_$_emplace_after(clist_$* self, clist_$_iter_t pos, RawValue val);
+clist_T_iter_t      clist_T_insert_after(clist_T* self, clist_T_iter_t pos, Value val);
+clist_T_iter_t      clist_T_emplace_after(clist_T* self, clist_T_iter_t pos, RawValue val);
 
-clist_$_iter_t      clist_$_erase_after(clist_$* self, clist_$_iter_t pos);
-clist_$_iter_t      clist_$_erase_range_after(clist_$* self, clist_$_iter_t pos, clist_$_iter_t finish);
+clist_T_iter_t      clist_T_erase_after(clist_T* self, clist_T_iter_t pos);
+clist_T_iter_t      clist_T_erase_range_after(clist_T* self, clist_T_iter_t pos, clist_T_iter_t finish);
 
-void                clist_$_splice_front(clist_$* self, clist_$* other);
-void                clist_$_splice_back(clist_$* self, clist_$* other);
-void                clist_$_splice_after(clist_$* self, clist_$_iter_t pos, clist_$* other);
+void                clist_T_splice_front(clist_T* self, clist_T* other);
+void                clist_T_splice_back(clist_T* self, clist_T* other);
+void                clist_T_splice_after(clist_T* self, clist_T_iter_t pos, clist_T* other);
 
-clist_$_iter_t      clist_$_find(const clist_$* self, RawValue val);
-clist_$_iter_t      clist_$_find_before(const clist_$* self,
-                                        clist_$_iter_t first, clist_$_iter_t finish, RawValue val);
+clist_T_iter_t      clist_T_find(const clist_T* self, RawValue val);
+clist_T_iter_t      clist_T_find_before(const clist_T* self,
+                                        clist_T_iter_t first, clist_T_iter_t finish, RawValue val);
 
-size_t              clist_$_remove(clist_$* self, RawValue val);
+size_t              clist_T_remove(clist_T* self, RawValue val);
 
-void                clist_$_sort(clist_$* self);
+void                clist_T_sort(clist_T* self);
 
-clist_$_iter_t      clist_$_before_begin(const clist_$* self);
-clist_$_iter_t      clist_$_begin(const clist_$* self);
-clist_$_iter_t      clist_$_last(const clist_$* self);
-clist_$_iter_t      clist_$_end(const clist_$* self);
-void                clist_$_next(clist_$_iter_t* it);
-clist_$_value_t*    clist_$_itval(clist_$_iter_t it);
+clist_T_iter_t      clist_T_before_begin(const clist_T* self);
+clist_T_iter_t      clist_T_begin(const clist_T* self);
+clist_T_iter_t      clist_T_last(const clist_T* self);
+clist_T_iter_t      clist_T_end(const clist_T* self);
+void                clist_T_next(clist_T_iter_t* it);
+clist_T_value_t*    clist_T_itval(clist_T_iter_t it);
 ```
