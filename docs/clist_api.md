@@ -105,3 +105,39 @@ clist_T_iter_t      clist_T_end(const clist_T* self);
 void                clist_T_next(clist_T_iter_t* it);
 clist_T_value_t*    clist_T_itval(clist_T_iter_t it);
 ```
+
+Example:
+```c
+#include <stdio.h>
+#include "stc/clist.h"
+
+using_clist(fx, double);
+
+int main() {
+    clist_fx list = clist_fx_init();
+    c_push_items(&list, clist_fx, {
+        10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0
+    });
+    // interleave push_front / push_back:
+    c_forrange (i, int, 1, 10) {
+        if (i & 1) clist_fx_push_front(&list, (float) i);
+        else       clist_fx_push_back(&list, (float) i);
+    }
+
+    printf("initial: ");
+    c_foreach (i, clist_fx, list)
+        printf(" %g", *i.val);
+
+    clist_fx_sort(&list); // mergesort O(n*log n)
+
+    printf("\nsorted: ");
+    c_foreach (i, clist_fx, list)
+        printf(" %g", *i.val);
+
+    clist_fx_del(&list);
+}
+
+Output:
+initial:  9 7 5 3 1 10 20 30 40 50 60 70 80 90 2 4 6 8
+sorted:  1 2 3 4 5 6 7 8 9 10 20 30 40 50 60 70 80 90
+```

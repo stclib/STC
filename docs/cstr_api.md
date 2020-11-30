@@ -152,3 +152,39 @@ int          cstr_compare_raw(const char** x, const char** y);
 bool         cstr_equals_raw(const char** x, const char** y);
 uint32_t     cstr_hash_raw(const char* const* spp, size_t ignored);
 ```
+
+Example:
+```c
+#include "stc/cstr.h"
+
+int main() {
+    cstr_t s1 = cstr_from("one-nine-three-seven-five");
+    printf("%s.\n", s1.str);
+
+    cstr_insert(&s1, 3, "-two");
+    printf("%s.\n", s1.str);
+
+    cstr_erase(&s1, 7, 5); // -nine
+    printf("%s.\n", s1.str);
+
+    cstr_replace(&s1, cstr_find(&s1, "seven"), 5, "four");
+    printf("%s.\n", s1.str);
+
+    // reassign:
+    cstr_assign(&s1, "one two three four five six seven");
+    cstr_append(&s1, " eight");
+    printf("append: %s\n", s1.str);
+
+    cstr_t full_path = cstr_from_fmt("%s/%s.%s", "directory", "filename", "ext");
+    printf("%s\n", full_path.str);
+
+    c_del(cstr, &s1, &full_path);
+}
+// Output:
+one-nine-three-seven-five.
+one-two-nine-three-seven-five.
+one-two-three-seven-five.
+one-two-three-four-five.
+append: one two three four five six seven eight
+directory/filename.ext
+```

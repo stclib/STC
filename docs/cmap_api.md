@@ -63,13 +63,14 @@ be replaced by `my` in all of the following documentation.
 
 ## Constants and macros
 
-| Name                       | Value            |
-|:---------------------------|:-----------------|
-|  `cmap_inits`              | `{...}`          |
-|  `cmap_empty(map)`         | `true` if empty  |
-|  `cmap_size(map)`          |                  |
-|  `cmap_capacity(map)`      |                  |
-
+| Name                                            | Purpose                |
+|:------------------------------------------------|:-----------------------|
+|  `cmap_inits`                                   | Initializer const      |
+|  `cmap_empty(map)`                              | Test for empty map     |
+|  `cmap_size(map)`                               | Get map size           |
+|  `cmap_capacity(map)`                           | Get map capacity       |
+|  `c_try_emplace(self, ctype, key, val)          | Emplace if key exist   |
+|  `c_insert_items(self, ctype, array)`           | Insert literals list   |
 
 ## Header file
 
@@ -124,4 +125,44 @@ cmap_bucket_t       cmap_T_bucket(const cmap_T* self, const cmap_T_rawkey_t* raw
 
 uint32_t            c_default_hash16(const void *data, size_t len);
 uint32_t            c_default_hash32(const void* data, size_t len);
+```
+
+Example:
+```c
+#include <stdio.h>
+#include <stc/cmap.h>
+#include <stc/cstr.h>
+
+using_cmap(ii, int, int);
+using_cmap_str();
+
+int main() {
+    // -- map of ints --
+    cmap_ii nums = cmap_ii_init();
+    cmap_ii_put(&nums, 8, 64); // similar to insert_or_assign()
+    cmap_ii_emplace(&nums, 11, 121);
+
+    printf("%d\n", cmap_ii_find(&nums, 8)->second);
+    cmap_ii_del(&nums);
+
+    // -- map of cstr_t --
+    cmap_str strings = cmap_str_init();
+    cmap_str_emplace(&strings, "Make", "my");
+    cmap_str_emplace(&strings, "Rainy", "day");
+    cmap_str_emplace(&strings, "Sunny", "afternoon");
+    c_push_items(&strings, cmap_str, { {"Eleven", "XI"}, {"Six", "VI"} });
+
+    printf("size = %zu\n", cmap_str_size(strings));
+    c_foreach (i, cmap_str, strings)
+        printf("%s: %s\n", i.val->first.str, i.val->second.str);
+    cmap_str_del(&strings); // frees all strings and map.
+}
+// Output:
+64
+size = 5
+Rainy: day
+Sunny: afternoon
+Six: VI
+Make: my
+Eleven: XI
 ```

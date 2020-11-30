@@ -47,20 +47,21 @@ be replaced by `my` in all of the following documentation.
 
 ## Constants and macros
 
-| Name                       | Value            |
-|:---------------------------|:-----------------|
-|  `cset_inits`              | `{...}`          |
-|  `cset_empty(map)`         | `true` if empty  |
-|  `cset_size(map)`          |                  |
-|  `cset_capacity(map)`      |                  |
-
+| Name                                            | Purpose                  |
+|:------------------------------------------------|:-------------------------|
+|  `cset_inits`                                   | Initializer const        |
+|  `cset_empty(set)`                              | Test for empty set       |
+|  `cset_size(set)`                               | Get set size             |
+|  `cset_capacity(set)`                           | Get set capacity         |
+|  `c_try_emplace(self, ctype, key, val)`         | Emplace if key exist     |
+|  `c_insert_items(self, ctype, array)`           | Insert literals list     |
 
 ## Header file
 
 All cset definitions and prototypes may be included in your C source file by including a single header file.
 
 ```c
-#include "stc/cset.h"
+#include "stc/cset.h" or "stc/cmap.h"
 ```
 ## Methods
 
@@ -104,4 +105,27 @@ cset_bucket_t       cset_T_bucket(const cset_T* self, const cset_T_rawkey_t* raw
 
 uint32_t            c_default_hash16(const void *data, size_t len);
 uint32_t            c_default_hash32(const void* data, size_t len);
+```
+
+Example:
+```c
+#include <stc/cstr.h>
+#include <stc/cmap.h>
+
+using_cset_str();
+
+int main() {
+    cset_str words = cset_str_init();
+    cset_str_emplace(&words, "Hello");
+    cset_str_emplace(&words, "Crazy");
+    cset_str_emplace(&words, "World");
+    cset_str_erase(&words, "Crazy");
+
+    // iterate the set of cstr_t values:
+    c_foreach (i, cset_str, words)
+        printf("%s ", i.val->str);
+    cset_str_del(&words);
+}
+// Output:
+Hello World
 ```
