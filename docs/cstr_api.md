@@ -1,4 +1,4 @@
-# Introduction
+# String type cstr_t
 
 This describes the API of string type **cstr_t**.
 
@@ -14,6 +14,7 @@ This describes the API of string type **cstr_t**.
 
 | Name                       | Value            |
 |:---------------------------|:-----------------|
+|  `cstr_inits`              | `{...}`          |
 |  `cstr_npos`               | `-1ull`          |
 
 ## Header file

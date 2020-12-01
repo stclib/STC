@@ -1,6 +1,4 @@
-# Introduction
-
-UNDER CONSTRUCTION!
+# Random number generators
 
 This describes the API of module **crandom**.
 

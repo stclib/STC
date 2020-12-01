@@ -1,6 +1,4 @@
-# Introduction
-
-UNDER CONSTRUCTION!
+# Container type clist
 
 This describes the API of circular singly linked list type **clist**.
 

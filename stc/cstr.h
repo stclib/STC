@@ -40,8 +40,6 @@ typedef char cstr_value_t;
 #define cstr_npos        ((size_t) (-1))
 
 STC_API cstr_t
-cstr_init(void);
-STC_API cstr_t
 cstr_from_n(const char* str, size_t len);
 STC_API cstr_t
 cstr_from_fmt(const char* fmt, ...);
@@ -81,6 +79,12 @@ c_istrnfind(const char* s, const char* needle, size_t nmax);
 #define _cstr_mem(size)  ((((size) + 24) >> 4) * 16 + 8)
 /* gives true string capacity: 7, 23, 39, ... */
 #define _cstr_cap(size)  ((((size) + 24) >> 4) * 16 - 9)
+static size_t _cstr_nullrep[3] = {0, 0, 0};
+
+static const cstr_t cstr_inits = {(char* ) &_cstr_nullrep[2]};
+
+STC_INLINE cstr_t
+cstr_init() { return cstr_inits; }
 
 STC_INLINE void
 cstr_del(cstr_t* self) {
@@ -90,13 +94,13 @@ cstr_del(cstr_t* self) {
 
 STC_INLINE cstr_t
 cstr_with_capacity(size_t cap) {
-    cstr_t s = cstr_init();
+    cstr_t s = cstr_inits;
     cstr_reserve(&s, cap);
     return s;
 }
 STC_INLINE cstr_t
 cstr_with_size(size_t len, char fill) {
-    cstr_t s = cstr_init();
+    cstr_t s = cstr_inits;
     cstr_resize(&s, len, fill);
     return s;
 }
@@ -144,7 +148,7 @@ cstr_take(cstr_t* self, cstr_t s) {
 STC_INLINE cstr_t
 cstr_move(cstr_t* self) {
     cstr_t tmp = *self;
-    *self = cstr_init();
+    *self = cstr_inits;
     return tmp;
 }
 
@@ -251,13 +255,6 @@ STC_INLINE uint32_t cstr_hash_raw(const char* const* spp, size_t ignored) {
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-STC_DEF cstr_t
-cstr_init() {
-    static size_t nullrep[3] = {0, 0, 0};
-    static cstr_t init = {(char* ) &nullrep[2]};
-    return init;
-}
-
 STC_DEF size_t
 cstr_reserve(cstr_t* self, size_t cap) {
     size_t len = cstr_size(*self), oldcap = cstr_capacity(*self);
@@ -280,7 +277,7 @@ cstr_resize(cstr_t* self, size_t len, char fill) {
 
 STC_DEF cstr_t
 cstr_from_n(const char* str, size_t len) {
-    if (len == 0) return cstr_init();
+    if (len == 0) return cstr_inits;
     size_t *rep = (size_t *) c_malloc(_cstr_mem(len));
     cstr_t s = {strncpy((char *) &rep[2], str, len)};
     s.str[rep[0] = len] = '\0';
@@ -315,7 +312,7 @@ cstr_fmt(cstr_t* self, const char* fmt, ...) {
 
 STC_DEF cstr_t
 cstr_from_fmt(const char* fmt, ...) {
-    cstr_t ret = cstr_init();
+    cstr_t ret = cstr_inits;
     va_list args; va_start(args, fmt);
     cstr_vfmt(&ret, fmt, args);
     va_end(args);

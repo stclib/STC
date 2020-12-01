@@ -66,12 +66,6 @@ int main(void) {
     if (__r.second) __r.first->second = val; \
 } while (0)
 
-#define c_insert_items(self, ctype, ...) do { \
-    const ctype##_input_t __arr[] = __VA_ARGS__; \
-    for (size_t __i=0;__i<sizeof __arr/sizeof *__arr; ++__i) \
-        ctype##_insert(self, __arr[__i]); \
-} while (0)
-
 /* https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction */
 #define chash_reduce(x, N)            ((uint32_t) (((uint64_t) (x) * (N)) >> 32))
 #define chash_entry_index(h, entryPtr) ((entryPtr) - (h).table)

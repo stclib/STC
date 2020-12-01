@@ -1,6 +1,4 @@
-# Introduction
-
-UNDER CONSTRUCTION!
+# Container type cmap
 
 This describes the API of the unordered map type **cmap**.
 
@@ -44,19 +42,20 @@ be replaced by `my` in all of the following documentation.
 |                      | `  uint8_t* _hashx;`                  |                                    |
 |                      | `  ...;`                              |                                    |
 |                      | `}`                                   |                                    |
-| `cmap_X_key_t`       | `Key`                                 | The cmap key type                  |
-| `cmap_X_mapped_t`    | `Mapped`                              | cmap mapped type                   |
-| `cmap_X_value_t`     | `struct {`                            | The cmap value type                |
+| `cmap_X_rawkey_t`    | `RawKey`                              | The raw key type                   |
+| `cmap_X_rawval_t`    | `RawMapped`                           | The raw mapped type                |
+| `cmap_X_key_t`       | `Key`                                 | The key type                       |
+| `cmap_X_mapped_t`    | `Mapped`                              | The mapped type                    |
+| `cmap_X_value_t`     | `struct {`                            | The value type                     |
 |                      | `  cmap_X_key_t first;`               |                                    |
 |                      | `  cmap_X_mapped_t second;`           |                                    |
 |                      | `}`                                   |                                    |
-| `cmap_X_input_t`     | `cmap_X_value_t`                      | cmap input type                    |
-| `cmap_X_rawvalue_t`  | `RawMapped`                           | cmap raw value type                |
+| `cmap_X_input_t`     | `struct { ... }`                      | RawKey + RawVal type               |
 | `cmap_X_result_t`    | `struct {`                            | Result of insert/put/emplace       |
 |                      | `  cmap_X_value_t* first;`            |                                    |
 |                      | `  bool second; /* inserted */`       |                                    |
 |                      | `}`                                   |                                    |
-| `cmap_X_iter_t`      | `struct {`                            | cmap iterator                      |
+| `cmap_X_iter_t`      | `struct {`                            | Iterator type                      |
 |                      | `  cmap_X_value_t* val;`              |                                    |
 |                      | `  ...;`                              |                                    |
 |                      | `}`                                   |                                    |
@@ -69,8 +68,7 @@ be replaced by `my` in all of the following documentation.
 |  `cmap_empty(map)`                              | Test for empty map     |
 |  `cmap_size(map)`                               | Get map size           |
 |  `cmap_capacity(map)`                           | Get map capacity       |
-|  `c_try_emplace(self, ctype, key, val)          | Emplace if key exist   |
-|  `c_insert_items(self, ctype, array)`           | Insert literals list   |
+|  `c_try_emplace(self, ctype, key, val)`         | Emplace if key exist   |
 
 ## Header file
 
@@ -102,19 +100,19 @@ size_t              cmap_X_capacity(cmap_X m);
 
 void                cmap_X_push_n(cmap_X* self, const cmap_X_input_t in[], size_t size);
 
-cmap_X_result_t     cmap_X_emplace(cmap_X* self, RawKey rawKey, RawMapped rawVal);
+cmap_X_result_t     cmap_X_emplace(cmap_X* self, RawKey rkey, RawMapped rmapped);
 cmap_X_result_t     cmap_X_insert(cmap_X* self, cmap_X_input_t in);
-cmap_X_result_t     cmap_X_insert_or_assign(cmap_X* self, RawKey rawKey, RawMapped rawVal);
-cmap_X_result_t     cmap_X_put(cmap_X* self, RawKey rawKey, RawMapped rawVal);
-cmap_X_result_t     cmap_X_putv(cmap_X* self, RawKey rawKey, Mapped mapped);
-cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, RawKey rawKey);
+cmap_X_result_t     cmap_X_insert_or_assign(cmap_X* self, RawKey rkey, RawMapped rmapped);
+cmap_X_result_t     cmap_X_put(cmap_X* self, RawKey rkey, RawMapped rmapped);
+cmap_X_result_t     cmap_X_putv(cmap_X* self, RawKey rkey, Mapped mapped);
+cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, RawKey rkey);
 
-size_t              cmap_X_erase(cmap_X* self, RawKey rawKey);
+size_t              cmap_X_erase(cmap_X* self, RawKey rkey);
 void                cmap_X_erase_entry(cmap_X* self, cmap_X_value_t* val);
 cmap_X_iter_t       cmap_X_erase_at(cmap_X* self, cmap_X_iter_t pos);
 
-cmap_X_value_t*     cmap_X_find(const cmap_X* self, RawKey rawKey);
-bool                cmap_X_contains(const cmap_X* self, RawKey rawKey);
+cmap_X_value_t*     cmap_X_find(const cmap_X* self, RawKey rkey);
+bool                cmap_X_contains(const cmap_X* self, RawKey rkey);
 
 cmap_X_iter_t       cmap_X_begin(cmap_X* self);
 cmap_X_iter_t       cmap_X_end(cmap_X* self);

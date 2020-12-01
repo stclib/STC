@@ -1,6 +1,4 @@
-# Introduction
-
-UNDER CONSTRUCTION!
+# Container type cbitset
 
 This describes the API of string type **cbitset**.
 

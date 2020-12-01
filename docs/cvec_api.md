@@ -1,6 +1,4 @@
-# Introduction
-
-UNDER CONSTRUCTION!
+# Container type cvec
 
 This describes the API of vector type **cvec**.
 
@@ -27,10 +25,10 @@ be replaced by `my` in all of the following documentation.
 | Type name            | Type definition                        | Used to represent...                |
 |:---------------------|:---------------------------------------|:------------------------------------|
 | `cvec_X`             | `struct { cvec_X_value_t* data; }`     | The cvec type                       |
-| `cvec_X_value_t`     | `Value`                                | The cvec element type               |
-| `cvec_X_input_t`     | `cvec_X_value_t`                       | cvec input type                     |
-| `cvec_X_rawvalue_t`  | `RawValue`                             | cvec raw value type                 |
-| `cvec_X_iter_t`      | `struct { cvec_X_value_t* val; }`      | cvec iterator                       |
+| `cvec_X_value_t`     | `Value`                                | The cvec value type                 |
+| `cvec_X_input_t`     | `cvec_X_value_t`                       | The input type                      |
+| `cvec_X_rawvalue_t`  | `RawValue`                             | The raw value type                  |
+| `cvec_X_iter_t`      | `struct { cvec_X_value_t* val; }`      | The iterator                        |
 
 ## Constants and macros
 

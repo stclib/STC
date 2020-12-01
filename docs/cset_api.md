@@ -1,6 +1,4 @@
-# Introduction
-
-UNDER CONSTRUCTION!
+# Container type cset
 
 This describes the API of the unordered set type **cset**.
 
@@ -32,15 +30,15 @@ be replaced by `my` in all of the following documentation.
 |                      | `  uint8_t* _hashx;`                  |                                    |
 |                      | `  ...;`                              |                                    |
 |                      | `}`                                   |                                    |
-| `cset_X_key_t`       | `Key`                                 | The cset key type                  |
-| `cset_X_mapped_t`    | `Mapped`                              | cset mapped type                   |
-| `cset_X_value_t`     | `Key`                                 | The cset value type                |
+| `cset_X_rawkey_t`    | `RawKey`                              | The raw key type                   |
+| `cset_X_key_t`       | `Key`                                 | The key type                       |
+| `cset_X_value_t`     | `Key`                                 | The value type                     |
 | `cset_X_result_t`    | `struct {`                            | Result of insert/emplace           |
 |                      | `  cset_X_value_t* first;`            |                                    |
 |                      | `  bool second; /* inserted */`       |                                    |
 |                      | `}`                                   |                                    |
-| `cset_X_input_t`     | `cset_X_value_t`                      | cset input type                    |
-| `cset_X_iter_t`      | `struct {`                            | cset iterator                      |
+| `cset_X_input_t`     | `cset_X_rawkey_t`                     | The input type (rawkey)            |
+| `cset_X_iter_t`      | `struct {`                            | Iterator type                      |
 |                      | `  cset_X_value_t* val;`              |                                    |
 |                      | `  ...;`                              |                                    |
 |                      | `}`                                   |                                    |
@@ -54,14 +52,13 @@ be replaced by `my` in all of the following documentation.
 |  `cset_size(set)`                               | Get set size             |
 |  `cset_capacity(set)`                           | Get set capacity         |
 |  `c_try_emplace(self, ctype, key, val)`         | Emplace if key exist     |
-|  `c_insert_items(self, ctype, array)`           | Insert literals list     |
 
 ## Header file
 
 All cset definitions and prototypes may be included in your C source file by including a single header file.
 
 ```c
-#include "stc/cset.h" or "stc/cmap.h"
+#include "stc/cset.h"
 ```
 ## Methods
 
@@ -86,22 +83,22 @@ size_t              cset_X_capacity(cset_X m);
 
 void                cset_X_push_n(cset_X* self, const cset_X_input_t in[], size_t size);
 
-cset_X_result_t     cset_X_emplace(cset_X* self, cset_X_rawkey_t rawKey);
-cset_X_result_t     cset_X_insert(cset_X* self, cset_X_rawkey_t rawKey);
+cset_X_result_t     cset_X_emplace(cset_X* self, RawKey rkey);
+cset_X_result_t     cset_X_insert(cset_X* self, RawKey rkey);
 
-size_t              cset_X_erase(cset_X* self, cset_X_rawkey_t rawKey);
+size_t              cset_X_erase(cset_X* self, RawKey rkey);
 void                cset_X_erase_entry(cset_X* self, cset_X_key_t* key);
 cset_X_iter_t       cset_X_erase_at(cset_X* self, cset_X_iter_t pos);
 
-cset_X_value_t*     cset_X_find(const cset_X* self, cset_X_rawkey_t rawKey);
-bool                cset_X_contains(const cset_X* self, cset_X_rawkey_t rawKey);
+cset_X_value_t*     cset_X_find(const cset_X* self, RawKey rkey);
+bool                cset_X_contains(const cset_X* self, RawKey rkey);
 
 cset_X_iter_t       cset_X_begin(cset_X* self);
 cset_X_iter_t       cset_X_end(cset_X* self);
 void                cset_X_next(cset_X_iter_t* it);
 cset_X_mapped_t*    cset_X_itval(cset_X_iter_t it);
 
-cset_bucket_t       cset_X_bucket(const cset_X* self, const cset_X_rawkey_t* rawKeyPtr);
+cset_bucket_t       cset_X_bucket(const cset_X* self, const cset_X_rawkey_t* rkeyPtr);
 
 uint32_t            c_default_hash16(const void *data, size_t len);
 uint32_t            c_default_hash32(const void* data, size_t len);
