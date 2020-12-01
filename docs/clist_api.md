@@ -71,15 +71,15 @@ clist_X_value_t*    clist_X_front(clist_X* self);
 clist_X_value_t*    clist_X_back(clist_X* self);
 
 void                clist_X_push_n(clist_X *self, const clist_X_input_t in[], size_t size);
-void                clist_X_push_back(clist_X* self, Value value);
 void                clist_X_emplace_back(clist_X* self, RawValue val);
+void                clist_X_push_back(clist_X* self, Value value);
 
-void                clist_X_push_front(clist_X* self, Value value);
 void                clist_X_emplace_front(clist_X* self, RawValue val);
+void                clist_X_push_front(clist_X* self, Value value);
 void                clist_X_pop_front(clist_X* self);
 
-clist_X_iter_t      clist_X_insert_after(clist_X* self, clist_X_iter_t pos, Value val);
 clist_X_iter_t      clist_X_emplace_after(clist_X* self, clist_X_iter_t pos, RawValue val);
+clist_X_iter_t      clist_X_insert_after(clist_X* self, clist_X_iter_t pos, Value val);
 
 clist_X_iter_t      clist_X_erase_after(clist_X* self, clist_X_iter_t pos);
 clist_X_iter_t      clist_X_erase_range_after(clist_X* self, clist_X_iter_t pos, clist_X_iter_t finish);
