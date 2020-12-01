@@ -7,7 +7,7 @@ This describes the API of the unordered map type **cmap**.
 ```c
 #define using_cmap_str()
 
-#define using_cmap_strkey(Mapped, mappedDestroy=c_default_del)
+#define using_cmap_strkey(X, Mapped, mappedDestroy=c_default_del)
 
 #define using_cmap_strval(X, Key, keyEquals=c_default_equals,
                                   keyHash=c_default_hash16,
@@ -31,7 +31,8 @@ Default values are given above for args not specified. `X` is a type tag name an
 will affect the names of all cmap types and methods. E.g. declaring `using_cmap(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.
 
-`using_cmap_str()` is a predefined macro for `using_cmap(str, cstr_t, ...)`.
+`using_cmap_str()` is a specific definition of `using_cmap(str, cstr_t, ...)`. `using_cmap_strkey(X, ...)` and `using_cmap_strval(X, ...)`
+are special macros for `using_cmap()` with `cstr_t` as key and mapped value correspondingly.
 
 ## Types
 
