@@ -104,7 +104,7 @@ void                clist_X_next(clist_X_iter_t* it);
 clist_X_value_t*    clist_X_itval(clist_X_iter_t it);
 ```
 
-Example:
+## Example
 ```c
 #include <stdio.h>
 #include "stc/clist.h"
@@ -134,8 +134,9 @@ int main() {
 
     clist_fx_del(&list);
 }
-
+```
 Output:
+```
 initial:  9 7 5 3 1 10 20 30 40 50 60 70 80 90 2 4 6 8
 sorted:  1 2 3 4 5 6 7 8 9 10 20 30 40 50 60 70 80 90
 ```

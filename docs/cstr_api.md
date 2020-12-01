@@ -138,7 +138,7 @@ These methods may be used by other container types.
 (4)     uint32_t     c_string_hash(const char* str);
 ```
 
-Example:
+## Example
 ```c
 #include "stc/cstr.h"
 
@@ -165,7 +165,9 @@ int main() {
 
     c_del(cstr, &s1, &full_path);
 }
-// Output:
+```
+Output:
+```
 one-nine-three-seven-five.
 one-two-nine-three-seven-five.
 one-two-three-seven-five.

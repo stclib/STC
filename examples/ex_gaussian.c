@@ -19,7 +19,7 @@ using_cvec(e, cmap_i_entry_t, c_default_del, compare);
 int main()
 {
     enum {N = 10000000};
-    const double Mean = -12.0, StdDev = 8.0, Mag = 12000.0 / StdDev;
+    const double Mean = -12.0, StdDev = 6.0, Mag = 8000.0 / StdDev;
 
     printf("Demo of gaussian / normal distribution of %d random samples\n", N);
 

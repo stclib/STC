@@ -126,16 +126,19 @@ int main ()
   c_foreach (x, cset_str, second) cset_str_emplace(&fifth, x.val->str);
   c_foreach (x, cset_str, third) cset_str_emplace(&fifth, x.val->str);
   c_foreach (x, cset_str, fourth) cset_str_emplace(&fifth, x.val->str);
+  c_del(cset_str, &first, &second, &third, &fourth);
 
-  printf("fifth contains:\n-------------\n");
+  printf("fifth contains:\n\n");
   c_foreach (x, cset_str, fifth) printf("%s\n", x.val->str);
+  cset_str_del(&fifth);
 
-  c_del(cset_str, &first, &second, &third, &fourth, &fifth);
   return 0;
 }
 ```
 Output:
 ```
+fifth contains:
+
 red
 green
 flour
