@@ -55,7 +55,7 @@ These returns properties of a string. `cstr_front()` and `cstr_back()` returns r
 
 ### String resource management and ownership
 ```c
-(1)     size_t       cstr_reserve(cstr_t* self, size_t cap);
+(1)     size_t       cstr_reserve(cstr_t* self, size_t capacity);
 (2)     void         cstr_resize(cstr_t* self, size_t len, char fill);
 (3)     void         cstr_clear(cstr_t* self);
 (4)     cstr_t*      cstr_assign(cstr_t* self, const char* str);
@@ -85,26 +85,21 @@ These returns properties of a string. `cstr_front()` and `cstr_back()` returns r
 (9) replacement str limited by n characters.
 
 
-### Search for substring, case sensitive + insensitive
+### String comparisons and search, case sensitive and insensitive
 ```c
-(1)     size_t       cstr_find(cstr_t s, const char* substr);
-(2)     size_t       cstr_find_n(cstr_t s, const char* substr, size_t pos, size_t nlen);
-(3)     bool         cstr_contains(cstr_t s, const char* substr);
-(4)     bool         cstr_begins_with(cstr_t s, const char* substr);
-(5)     bool         cstr_ends_with(cstr_t s, const char* substr);
-(5)     size_t       cstr_ifind_n(cstr_t s, const char* substr, size_t pos, size_t nlen);
-(6)     bool         cstr_icontains(cstr_t s, const char* substr);
-(7)     bool         cstr_ibegins_with(cstr_t s, const char* substr);
-(8)     bool         cstr_iends_with(cstr_t s, const char* substr);
-```
-These are mostly self-explainatory. Methods prefixed by i does case-insensitive search.
-
-### Comparisons and equality
-```c
-(1)     bool         cstr_equals(cstr_t s, const char* str);
-(2)     bool         cstr_equals_s(cstr_t s, cstr_t s2);
-(3)     int          cstr_compare(const cstr_t *s1, const cstr_t *s2);
+(1)     int          cstr_compare(const cstr_t *s1, const cstr_t *s2);
+(2)     bool         cstr_equals(cstr_t s, const char* str);
+(3)     bool         cstr_equals_s(cstr_t s, cstr_t s2);
 (4)     bool         cstr_iequals(cstr_t s, const char* str);
+(5)     size_t       cstr_find(cstr_t s, const char* substr);
+(6)     size_t       cstr_find_n(cstr_t s, const char* substr, size_t pos, size_t nlen);
+(7)     size_t       cstr_ifind_n(cstr_t s, const char* substr, size_t pos, size_t nlen);
+(8)     bool         cstr_contains(cstr_t s, const char* substr);
+(9)     bool         cstr_icontains(cstr_t s, const char* substr);
+(10)    bool         cstr_begins_with(cstr_t s, const char* substr);
+(11)    bool         cstr_ibegins_with(cstr_t s, const char* substr);
+(12)    bool         cstr_ends_with(cstr_t s, const char* substr);
+(13)    bool         cstr_iends_with(cstr_t s, const char* substr);
 ```
 These are mostly self-explainatory. Methods prefixed by i does case-insensitive search.
 
@@ -124,7 +119,7 @@ This is equivalent to `for (size_t i=0; i<cstr_size(mystr); ++i) printf("%c", my
 (1)     bool         cstr_getline(cstr_t *self, FILE *stream);
 (2)     bool         cstr_getdelim(cstr_t *self, int delim, FILE *stream);
 ```
-Reads a line of text from stream and stores it in `*self`. Line is separated by delim, which is '\n' in (1).
+(1,2) Reads a line of text from stream and stores it in `*self`. Line is separated by delim, which is '\n' in (1).
 
 ### Helper methods
 ```c
