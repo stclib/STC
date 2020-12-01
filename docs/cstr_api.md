@@ -34,12 +34,13 @@ All cstr definitions and prototypes may be included in your C source file by inc
 (4)     cstr_t       cstr_from(const char* str);
 (5)     cstr_t       cstr_from_n(const char* str, size_t len);
 (6)     cstr_t       cstr_from_fmt(const char* fmt, ...);
+(7)     cstr_t       cstr_clone(cstr_t s);
 (8)     void         cstr_del(cstr_t *self);
 ```
 (1) Create an empty cstr_t, (2) with capacity `cap`. (3) Create a cstr_t by repeating the `fill` character `len` times.
-(4) Construct a cstr_t from a const char* str, and (5) limit the length by `len` and `strlen(str)`.
-(6) Construct a string from a formatted const char* `fmt` and arguments, using `printf()` formatting.
-(7) Construct a new string by cloning another cstr_t `s`. (8) Free the allocated memory used by string.
+(4) Construct a cstr_t from `str`, and (5) limit the length by `len` and `strlen(str)`.
+(6) Construct a string from a formatting string `fmt` with arguments, using `printf()` formatting.
+(7) Construct a new string by cloning another string. (8) Free the allocated memory used by string.
 
 ### Get string properties
 ```c
@@ -50,6 +51,7 @@ All cstr definitions and prototypes may be included in your C source file by inc
 (5)     char*        cstr_front(cstr_t* self);
 (6)     char*        cstr_back(cstr_t* self);
 ```
+These returns properties of a string. `cstr_front()` and `cstr_back()` returns reference, ie. pointer to the character.
 
 ### String resource management and ownership
 ```c
@@ -60,14 +62,12 @@ All cstr definitions and prototypes may be included in your C source file by inc
 (5)     cstr_t*      cstr_assign_n(cstr_t* self, const char* str, size_t len);
 (6)     cstr_t*      cstr_take(cstr_t* self, cstr_t s);
 (7)     cstr_t       cstr_move(cstr_t* self);
-(8)     cstr_t       cstr_clone(cstr_t s);
-
 ```
 (4) Assign `str` to `*self`, (5) assign substring `str` limited by `len` and `strlen(str)`.
 (6) Take the constructed or moved string `s`, i.e., no allocation takes place.
 (7) Explicitly move `*self` to the caller of the method; `*self` becomes an empty string after move.
 
-### Append and insert characters
+### Append, insert replace, and erase strings or substrings
 ```c
 (1)     cstr_t*      cstr_append(cstr_t* self, const char* str);
 (2)     cstr_t*      cstr_append_n(cstr_t* self, const char* str, size_t len);
@@ -80,7 +80,10 @@ All cstr definitions and prototypes may be included in your C source file by inc
 (9)     void         cstr_replace_n(cstr_t* self, size_t pos, size_t len, const char* str, size_t n);
 ```
 (1) Append `str` to `*self`. (2) Append substring `str` limited by `len`. (3), Append character `ch`.
-(4) Insert a string at the specified position (5), or insert string limited with n / strlen(str).
+(4) Erase last character. (5) Insert string at a positions, (6) string limited by n characters.
+(7) Erase n characters at position pos. (8) Replace len characters at position pos with str,
+(9) replacement str limited by n characters.
+
 
 ### Search for substring, case sensitive + insensitive
 ```c
@@ -94,6 +97,7 @@ All cstr definitions and prototypes may be included in your C source file by inc
 (7)     bool         cstr_ibegins_with(cstr_t s, const char* substr);
 (8)     bool         cstr_iends_with(cstr_t s, const char* substr);
 ```
+These are mostly self-explainatory. Methods prefixed by i does case-insensitive search.
 
 ### Comparisons and equality
 ```c
@@ -102,6 +106,7 @@ All cstr definitions and prototypes may be included in your C source file by inc
 (3)     int          cstr_compare(const cstr_t *s1, const cstr_t *s2);
 (4)     bool         cstr_iequals(cstr_t s, const char* str);
 ```
+These are mostly self-explainatory. Methods prefixed by i does case-insensitive search.
 
 ### Iterator methods
 ```c
@@ -119,6 +124,7 @@ This is equivalent to `for (size_t i=0; i<cstr_size(mystr); ++i) printf("%c", my
 (1)     bool         cstr_getline(cstr_t *self, FILE *stream);
 (2)     bool         cstr_getdelim(cstr_t *self, int delim, FILE *stream);
 ```
+Reads a line of text from stream and stores it in `*self`. Line is separated by delim, which is '\n' in (1).
 
 ### Helper methods
 ```c
@@ -127,6 +133,7 @@ This is equivalent to `for (size_t i=0; i<cstr_size(mystr); ++i) printf("%c", my
 (3)     bool         cstr_equals_raw(const char** x, const char** y);
 (4)     uint32_t     cstr_hash_raw(const char* const* spp, size_t ignored);
 ```
+These methods may be used by other container types.
 
 ### Non-members
 ```c
