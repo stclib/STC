@@ -416,9 +416,9 @@ cstr_ifind_n(cstr_t s, const char* needle, size_t pos, size_t nlen) {
 
 STC_DEF int
 c_strncasecmp(const char* s1, const char* s2, size_t n) {
-    while (n && *s1 && tolower(*s1) == tolower(*s2))
-        ++s1, ++s2, --n;
-    return n ? tolower(*s1) - tolower(*s2) : 0;
+    int ret = 0;
+    while (n-- && (ret = tolower(*s1++) - tolower(*s2)) == 0 && *s2++) ;
+    return ret;
 }
 
 STC_DEF char*
