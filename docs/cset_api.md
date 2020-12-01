@@ -104,25 +104,45 @@ uint32_t            c_default_hash16(const void *data, size_t len);
 uint32_t            c_default_hash32(const void* data, size_t len);
 ```
 
-Example:
+## Example
 ```c
+#include <stdio.h>
 #include <stc/cstr.h>
-#include <stc/cmap.h>
+#include <stc/cset.h>
 
 using_cset_str();
 
-int main() {
-    cset_str words = cset_str_init();
-    cset_str_emplace(&words, "Hello");
-    cset_str_emplace(&words, "Crazy");
-    cset_str_emplace(&words, "World");
-    cset_str_erase(&words, "Crazy");
+int main ()
+{
+  cset_str first = cset_inits;                                                             // empty
+  cset_str second = cset_inits; c_push_items(&second, cset_str, {"red","green","blue"});   // init list
+  cset_str third = cset_inits; c_push_items(&third, cset_str, {"orange","pink","yellow"}); // init list
+  cset_str fourth = cset_inits;
+  cset_str_emplace(&fourth, "potatoes");
+  cset_str_emplace(&fourth, "milk");
+  cset_str_emplace(&fourth, "flour");
 
-    // iterate the set of cstr_t values:
-    c_foreach (i, cset_str, words)
-        printf("%s ", i.val->str);
-    cset_str_del(&words);
+  cset_str fifth = cset_inits;
+  c_foreach (x, cset_str, second) cset_str_emplace(&fifth, x.val->str);
+  c_foreach (x, cset_str, third) cset_str_emplace(&fifth, x.val->str);
+  c_foreach (x, cset_str, fourth) cset_str_emplace(&fifth, x.val->str);
+
+  printf("fifth contains:\n-------------\n");
+  c_foreach (x, cset_str, fifth) printf("%s\n", x.val->str);
+
+  c_del(cset_str, &first, &second, &third, &fourth, &fifth);
+  return 0;
 }
-// Output:
-Hello World
+```
+Output:
+```
+red
+green
+flour
+orange
+blue
+pink
+yellow
+milk
+potatoes
 ```

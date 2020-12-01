@@ -285,8 +285,11 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     ctype##_##X##_next(ctype##_##X##_iter_t* it) { \
         while ((++it->val, *++it->_hx == 0)) ; \
     } \
+\
     CMAP_ONLY_##ctype( STC_INLINE ctype##_##X##_mapped_t* \
     ctype##_##X##_itval(ctype##_##X##_iter_t it) {return &it.val->second;} ) \
+    CSET_ONLY_##ctype( STC_INLINE ctype##_##X##_value_t* \
+    ctype##_##X##_itval(ctype##_##X##_iter_t it) {return it.val;} ) \
 \
     STC_API void \
     ctype##_##X##_erase_entry(ctype##_##X* self, ctype##_##X##_value_t* val); \

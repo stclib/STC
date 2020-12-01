@@ -126,42 +126,45 @@ uint32_t            c_default_hash16(const void *data, size_t len);
 uint32_t            c_default_hash32(const void* data, size_t len);
 ```
 
-Example:
+## Example
 ```c
 #include <stdio.h>
-#include <stc/cmap.h>
 #include <stc/cstr.h>
+#include <stc/cmap.h>
 
-using_cmap(ii, int, int);
 using_cmap_str();
 
-int main() {
-    // -- map of ints --
-    cmap_ii nums = cmap_ii_init();
-    cmap_ii_put(&nums, 8, 64); // similar to insert_or_assign()
-    cmap_ii_emplace(&nums, 11, 121);
+int main()
+{
+    // Create an unordered_map of three strings (that map to strings)
+    cmap_str u = cmap_inits;
+    c_push_items(&u, cmap_str, {
+        {"RED","#FF0000"},
+        {"GREEN","#00FF00"},
+        {"BLUE","#0000FF"}
+    });
 
-    printf("%d\n", cmap_ii_find(&nums, 8)->second);
-    cmap_ii_del(&nums);
+    // Iterate and print keys and values of unordered map
+    c_foreach (n, cmap_str, u) {
+        printf("Key:[%s] Value:[%s]\n", n.val->first.str, n.val->second.str);
+    }
 
-    // -- map of cstr_t --
-    cmap_str strings = cmap_str_init();
-    cmap_str_emplace(&strings, "Make", "my");
-    cmap_str_emplace(&strings, "Rainy", "day");
-    cmap_str_emplace(&strings, "Sunny", "afternoon");
-    c_push_items(&strings, cmap_str, { {"Eleven", "XI"}, {"Six", "VI"} });
+    // Add two new entries to the unordered map
+    cmap_str_put(&u, "BLACK", "#000000");
+    cmap_str_put(&u, "WHITE", "#FFFFFF");
 
-    printf("size = %zu\n", cmap_str_size(strings));
-    c_foreach (i, cmap_str, strings)
-        printf("%s: %s\n", i.val->first.str, i.val->second.str);
-    cmap_str_del(&strings); // frees all strings and map.
+    // Output values by key
+    printf("The HEX of color RED is:[%s]\n", cmap_str_at(&u, "RED")->str);
+    printf("The HEX of color BLACK is:[%s]\n", cmap_str_at(&u, "BLACK")->str);
+
+    return 0;
 }
-// Output:
-64
-size = 5
-Rainy: day
-Sunny: afternoon
-Six: VI
-Make: my
-Eleven: XI
+```
+Output:
+```
+Key:[RED] Value:[#FF0000]
+Key:[GREEN] Value:[#00FF00]
+Key:[BLUE] Value:[#0000FF]
+The HEX of color RED is:[#FF0000]
+The HEX of color BLACK is:[#000000]
 ```

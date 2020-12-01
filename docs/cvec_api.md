@@ -107,3 +107,35 @@ cvec_X_iter_t       cvec_X_end(const cvec_X* self);
 void                cvec_X_next(cvec_X_iter_t* it);
 cvec_X_value_t*     cvec_X_itval(cvec_X_iter_t it);
 ```
+
+## Example
+```c
+#include <stdio.h>
+#include <stc/cvec.h>
+using_cvec(i, int);
+
+int main()
+{
+    // Create a vector containing integers
+    cvec_i v = cvec_inits;
+    c_push_items(&v, cvec_i, {7, 5, 16, 8});
+
+    // Add two more integers to vector
+    cvec_i_push_back(&v, 25);
+    cvec_i_push_back(&v, 13);
+
+    // Iterate and print values of vector
+    c_foreach (n, cvec_i, v) {
+        printf("%d\n", *n.val);
+    }
+}
+```
+Output:
+```
+7
+5
+16
+8
+25
+13
+```
