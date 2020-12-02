@@ -93,7 +93,7 @@ bool                cset_X_contains(const cset_X* self, RawKey rkey);
 cset_X_iter_t       cset_X_begin(cset_X* self);
 cset_X_iter_t       cset_X_end(cset_X* self);
 void                cset_X_next(cset_X_iter_t* it);
-cset_X_mapped_t*    cset_X_itval(cset_X_iter_t it);
+cset_X_value_t*     cset_X_itval(cset_X_iter_t it);
 
 cset_bucket_t       cset_X_bucket(const cset_X* self, const cset_X_rawkey_t* rkeyPtr);
 

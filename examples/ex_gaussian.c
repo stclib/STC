@@ -46,8 +46,7 @@ int main()
     c_foreach (i, cvec_e, vhist) {
         size_t n = (size_t) (i.val->second * StdDev * Scale * 2.5 / N);
         if (n > 0) {
-            // bar string: take ownership in new str after freeing current.
-            cstr_take(&bar, cstr_with_size(n, '*'));
+            cstr_resize(&bar, n, '*');
             printf("%4d %s\n", i.val->first, bar.str);
         }
     }

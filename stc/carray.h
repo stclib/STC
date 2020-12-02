@@ -29,17 +29,17 @@
 /*
  Multi-dimensional generic array allocated as one block of heap-memory.
  // demo:
-#include <stdio.h.h>
-#include <stc/carray.h>
+#include <stdio.h>
+#include "stc/carray.h"
 using_carray(f, float);
 
 int main()
 {
-    carray3f a3 = carray3f_init(30, 20, 10, 0.f);
-    *carray3f_at(a3, 5, 4, 3) = 10.2f;         // a3[5][4][3]
-    carray2f a2 = carray3f_at1(a3, 5);         // sub-array reference: a2 = a3[5]
-    printf("%g\n", *carray2f_at(a2, 4, 3));    // lookup a2[4][3] (=10.2f)
-    printf("%g\n", *carray3f_at(a3, 5, 4, 3)); // same data location, via a3 array.
+    carray3f a3 = carray3f_init(30, 20, 10, 0.0f);
+    *carray3f_at(&a3, 5, 4, 3) = 10.2f;         // a3[5][4][3]
+    carray2f a2 = carray3f_at1(&a3, 5);         // sub-array reference: a2 = a3[5]
+    printf("%g\n", *carray2f_at(&a2, 4, 3));    // lookup a2[4][3] (=10.2f)
+    printf("%g\n", *carray3f_at(&a3, 5, 4, 3)); // same data location, via a3 array.
 
     carray2f_del(&a2); // does nothing, since it is a sub-array.
     carray3f_del(&a3); // destroy a3, invalidates a2.
