@@ -1,6 +1,7 @@
 # Container type cset
 
 This describes the API of the unordered set type **cset**.
+Same base implementation as cmap, but contains and uses keys only.
 
 ## Declaration
 

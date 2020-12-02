@@ -1,6 +1,8 @@
 # Container type carray
 
 This describes the API of the unordered set type **carray**.
+1d, 2d and 3d arrays, allocated from heap in one single contiguous block of memory.
+*carray3* may have sub-array "views" of *carray2* and *carray1* etc.
 
 ## Declaration
 
@@ -83,18 +85,24 @@ using_carray(f, float);
 
 int main()
 {
-    carray3f a3 = carray3f_init(30, 20, 10, 0.f);
-    *carray3f_at(&a3, 5, 4, 3) = 10.2f;         // a3[5][4][3]
-    carray2f a2 = carray3f_at1(&a3, 5);         // sub-array reference: a2 = a3[5]
-    printf("%g\n", *carray2f_at(&a2, 4, 3));    // lookup a2[4][3] (=10.2f)
-    printf("%g\n", *carray3f_at(&a3, 5, 4, 3)); // same data location, via a3 array.
+    carray3f a3 = carray3f_init(30, 20, 10, 0.0f);  // define a3[30][20][10], init with 0.0f.
+    *carray3f_at(&a3, 5, 4, 3) = 3.14f;             // a3[5][4][3] = 3.14
 
-    carray2f_del(&a2); // does nothing, since it is a sub-array.
-    carray3f_del(&a3); // destroy a3, invalidates a2.
+    carray1f a1 = carray3f_at2(&a3, 5, 4);          // sub-array a3[5][4] (no data copy).
+    carray2f a2 = carray3f_at1(&a3, 5);             // sub-array a3[5]
+
+    printf("%f\n", *carray1f_at(&a1, 3));           // a1[3] (3.14f)
+    printf("%f\n", *carray2f_at(&a2, 4, 3));        // a2[4][3] (3.14f)
+    printf("%f\n", *carray3f_at(&a3, 5, 4, 3));     // a3[5][4][3] (3.14f)
+    // ...
+    carray1f_del(&a1); // does nothing, since it is a sub-array.
+    carray2f_del(&a2); // same.
+    carray3f_del(&a3); // free array, and invalidates a1, a2.
 }
 ```
 Output:
 ```
-10.2
-10.2
+3.140000
+3.140000
+3.140000
 ```

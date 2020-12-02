@@ -105,7 +105,7 @@ void                cvec_X_next(cvec_X_iter_t* it);
 cvec_X_value_t*     cvec_X_itval(cvec_X_iter_t it);
 ```
 
-## Example
+## Examples
 ```c
 #include <stdio.h>
 #include "stc/cvec.h"
@@ -141,4 +141,35 @@ Output:
 ```
 initial:  7 5 16 8 25 13
 sorted:  5 7 8 13 16 25
+```
+### Example 2
+```c
+#include "stc/cstr.h"
+#include "stc/cvec.h"
+
+using_cvec_str();
+
+int main() {
+    cvec_str names = cvec_str_init();
+    cvec_str_emplace_back(&names, "Mary");
+    cvec_str_emplace_back(&names, "Joe");
+    cstr_assign(&names.data[1], "Jake"); // replace "Joe".
+
+    // Use push_back() rather than emplace_back() when adding a cstr_t type:
+    cstr_t tmp = cstr_from_fmt("%d elements so far", cvec_str_size(names));
+    cvec_str_push_back(&names, tmp); // tmp is moved to names, do not del() it.
+
+    printf("%s\n", names.data[1].str); // Access the second element
+
+    c_foreach (i, cvec_str, names)
+        printf("item: %s\n", i.val->str);
+    cvec_str_del(&names);
+}
+```
+Output:
+```
+Jake
+item: Mary
+item: Jake
+item: 2 elements so far
 ```

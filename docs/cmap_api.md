@@ -1,6 +1,7 @@
 # Container type cmap
 
-This describes the API of the unordered map type **cmap**.
+This describes the API of the unordered map type **cmap**. Elements are pairs of keys and mapped values.
+Implemented as open hashing without tombstones. Highly customizable and fast.
 
 ## Declaration
 

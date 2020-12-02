@@ -1,6 +1,7 @@
 # Random number generators
 
-This describes the API of module **crandom**.
+This describes the API of module **crandom**. Contains *pcg32* and a extremely fast *64-bit PRNG* inspired by *sfc64*.
+The RNG's can generate uniform and normal distributions.
 
 ## Types
 
