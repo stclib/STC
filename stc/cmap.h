@@ -265,7 +265,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         return ctype##_##X##_insert_or_assign(self, rawKey, rawVal); \
     } \
     STC_INLINE ctype##_##X##_result_t \
-    ctype##_##X##_putv(ctype##_##X* self, RawKey rawKey, Mapped mapped) { \
+    ctype##_##X##_put_mapped(ctype##_##X* self, RawKey rawKey, Mapped mapped) { \
         ctype##_##X##_result_t res = ctype##_##X##_insert_key_(self, rawKey); \
         if (!res.second) valueDestroy(&res.first->second); \
         res.first->second = mapped; return res; \

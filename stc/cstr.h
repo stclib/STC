@@ -247,8 +247,8 @@ STC_INLINE uint32_t c_string_hash(const char* str) {
     return hash;
 }
 
-STC_INLINE uint32_t cstr_hash_raw(const char* const* spp, size_t ignored) {
-    return c_string_hash(*spp);
+STC_INLINE uint32_t cstr_hash_raw(const char* const* strref, size_t ignored) {
+    return c_string_hash(*strref);
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */

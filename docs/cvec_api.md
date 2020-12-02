@@ -5,20 +5,22 @@ This describes the API of vector type **cvec**.
 ## Declaration
 
 ```c
-#define using_cvec_str()
-
 #define using_cvec(X, Value, valueDestroy=c_default_del,
                              valueCompareRaw=c_default_compare,
                              RawValue=Value,
                              valueToRaw=c_default_to_raw,
                              valueFromRaw=c_default_from_raw)
+#define using_cvec_str()
 ```
 The macro `using_cvec()` can be instantiated with 2, 3, 4, or 7 arguments in the global scope.
 Defaults values are given above for args not specified. `X` is a type tag name and
 will affect the names of all cvec types and methods. E.g. declaring `using_cvec(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.
 
-`using_cvec_str()` is a predefined macro for `using_cvec(str, cstr_t, ...)`.
+`using_cvec_str()` is a shorthand, expands to:
+```
+using_cvec(str, cstr_t, cstr_del, cstr_compare_raw, const char*, cstr_to_raw, cstr_from)
+```
 
 ## Types
 
@@ -155,8 +157,9 @@ int main() {
     cvec_str_emplace_back(&names, "Joe");
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
 
-    // Use push_back() rather than emplace_back() when adding a cstr_t type:
     cstr_t tmp = cstr_from_fmt("%d elements so far", cvec_str_size(names));
+
+    // Emplace_back() will not compile when adding a new cstr_t type. Use push_back():
     cvec_str_push_back(&names, tmp); // tmp is moved to names, do not del() it.
 
     printf("%s\n", names.data[1].str); // Access the second element
