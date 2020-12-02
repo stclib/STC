@@ -27,17 +27,17 @@ be replaced by `my` in all of the following documentation. The `#` character sho
 
 | Name                 | Purpose                  |
 |:---------------------|:-------------------------|
-| `carray1_size(arr)   |                          |
-| `carray1_xdim(arr)   |                          |
+| `carray1_size(arr)`  |  carray1 size and dim    |
+| `carray1_xdim(arr)`  |                          |
 |                      |                          |
-| `carray2_size(arr)   |                          |
-| `carray2_xdim(arr)   |                          |
-| `carray2_ydim(arr)   |                          |
+| `carray2_size(arr)`  |  carray2 size and dims   |
+| `carray2_xdim(arr)`  |                          |
+| `carray2_ydim(arr)`  |                          |
 |                      |                          |
-| `carray3_size(arr)   |                          |
-| `carray3_xdim(arr)   |                          |
-| `carray3_ydim(arr)   |                          |
-| `carray3_zdim(arr)   |                          |
+| `carray3_size(arr)`  |  carray3 size and dims   |
+| `carray3_xdim(arr)`  |                          |
+| `carray3_ydim(arr)`  |                          |
+| `carray3_zdim(arr)`  |                          |
 
 ## Header file
 
