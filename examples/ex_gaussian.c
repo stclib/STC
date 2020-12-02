@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
-#include <stc/crandom.h>
-#include <stc/cstr.h>
-#include <stc/cmap.h>
-#include <stc/cvec.h>
+#include "stc/crandom.h"
+#include "stc/cstr.h"
+#include "stc/cmap.h"
+#include "stc/cvec.h"
 
 // Declare int -> int hashmap. Uses typetag 'i' for ints.
 using_cmap(i, int, size_t);
@@ -19,7 +19,7 @@ using_cvec(e, cmap_i_entry_t, c_default_del, compare);
 int main()
 {
     enum {N = 10000000};
-    const double Mean = -12.0, StdDev = 6.0, Mag = 8000.0 / StdDev;
+    const double Mean = -12.0, StdDev = 6.0, Scale = 74;
 
     printf("Demo of gaussian / normal distribution of %d random samples\n", N);
 
@@ -44,7 +44,7 @@ int main()
     // Print the gaussian bar chart
     cstr_t bar = cstr_init();
     c_foreach (i, cvec_e, vhist) {
-        size_t n = (size_t) (i.val->second * Mag / N);
+        size_t n = (size_t) (i.val->second * StdDev * Scale * 2.5 / N);
         if (n > 0) {
             // bar string: take ownership in new str after freeing current.
             cstr_take(&bar, cstr_with_size(n, '*'));

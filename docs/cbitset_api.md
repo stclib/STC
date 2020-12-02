@@ -18,9 +18,6 @@ All cstr definitions and prototypes may be included in your C source file by inc
 ```
 ## Methods
 
-### Construction
-
-The interfaces to create a cbitset object:
 ```c
 cbitset_t        cbitset_init(void);
 cbitset_t        cbitset_with_size(size_t size, bool value);
@@ -68,7 +65,7 @@ bool             cbitset_itval(cbitset_iter_t it);
 ## Example
 ```c
 #include <stdio.h>
-#include <stc/cbitset.h>
+#include "stc/cbitset.h"
 
 static inline cbitset_t sieveOfEratosthenes(size_t n)
 {

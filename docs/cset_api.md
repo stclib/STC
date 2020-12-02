@@ -62,9 +62,6 @@ All cset definitions and prototypes may be included in your C source file by inc
 ```
 ## Methods
 
-### Construction
-
-The interface for cset_X:
 ```c
 cset_X              cset_X_init(void);
 cset_X              cset_X_with_capacity(size_t cap);
@@ -107,9 +104,8 @@ uint32_t            c_default_hash32(const void* data, size_t len);
 ## Example
 ```c
 #include <stdio.h>
-#include <stc/cstr.h>
-#include <stc/cset.h>
-
+#include "stc/cstr.h"
+#include "stc/cset.h"
 using_cset_str();
 
 int main ()

@@ -80,9 +80,6 @@ All cmap definitions and prototypes may be included in your C source file by inc
 ```
 ## Methods
 
-### Construction
-
-The interface for cmap_X:
 ```c
 cmap_X              cmap_X_init(void);
 cmap_X              cmap_X_with_capacity(size_t cap);
@@ -129,8 +126,8 @@ uint32_t            c_default_hash32(const void* data, size_t len);
 ## Example
 ```c
 #include <stdio.h>
-#include <stc/cstr.h>
-#include <stc/cmap.h>
+#include "stc/cstr.h"
+#include "stc/cmap.h"
 
 using_cmap_str();
 

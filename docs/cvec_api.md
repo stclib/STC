@@ -49,9 +49,6 @@ All cvec definitions and prototypes may be included in your C source file by inc
 ```
 ## Methods
 
-### Construction
-
-The interface for cvec:
 ```c
 cvec_X              cvec_X_init(void);
 cvec_X              cvec_X_with_size(size_t size, Value fill_val);
@@ -111,31 +108,37 @@ cvec_X_value_t*     cvec_X_itval(cvec_X_iter_t it);
 ## Example
 ```c
 #include <stdio.h>
-#include <stc/cvec.h>
+#include "stc/cvec.h"
 using_cvec(i, int);
 
 int main()
 {
     // Create a vector containing integers
-    cvec_i v = cvec_inits;
-    c_push_items(&v, cvec_i, {7, 5, 16, 8});
+    cvec_i vec = cvec_inits;
+    c_push_items(&vec, cvec_i, {7, 5, 16, 8});
 
     // Add two more integers to vector
-    cvec_i_push_back(&v, 25);
-    cvec_i_push_back(&v, 13);
+    cvec_i_push_back(&vec, 25);
+    cvec_i_push_back(&vec, 13);
 
-    // Iterate and print values of vector
-    c_foreach (n, cvec_i, v) {
-        printf("%d\n", *n.val);
+    printf("initial: ");
+    c_foreach (n, cvec_i, vec) {
+        printf(" %d", *n.val);
     }
+
+    // Sort the vector
+    cvec_i_sort(&vec);
+
+    printf("\nsorted: ");
+    c_foreach (n, cvec_i, vec) {
+        printf(" %d", *n.val);
+    }
+
+    cvec_i_del(&vec);
 }
 ```
 Output:
 ```
-7
-5
-16
-8
-25
-13
+initial:  7 5 16 8 25 13
+sorted:  5 7 8 13 16 25
 ```

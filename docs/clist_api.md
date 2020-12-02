@@ -54,9 +54,6 @@ All clist definitions and prototypes may be included in your C source file by in
 ```
 ## Methods
 
-### Construction
-
-The interfaces to create a clist_X object:
 ```c
 clist_X             clist_X_init(void);
 
@@ -108,31 +105,31 @@ clist_X_value_t*    clist_X_itval(clist_X_iter_t it);
 ```c
 #include <stdio.h>
 #include "stc/clist.h"
-
-using_clist(fx, double);
+using_clist(d, double);
 
 int main() {
-    clist_fx list = clist_fx_init();
-    c_push_items(&list, clist_fx, {
+    clist_d list = clist_inits;
+    c_push_items(&list, clist_d, {
         10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0
     });
-    // interleave push_front / push_back:
+
+    // Interleave push_front / push_back:
     c_forrange (i, int, 1, 10) {
-        if (i & 1) clist_fx_push_front(&list, (float) i);
-        else       clist_fx_push_back(&list, (float) i);
+        if (i & 1) clist_d_push_front(&list, (float) i);
+        else       clist_d_push_back(&list, (float) i);
     }
 
     printf("initial: ");
-    c_foreach (i, clist_fx, list)
+    c_foreach (i, clist_d, list)
         printf(" %g", *i.val);
 
-    clist_fx_sort(&list); // mergesort O(n*log n)
+    clist_d_sort(&list); // mergesort O(n*log n)
 
     printf("\nsorted: ");
-    c_foreach (i, clist_fx, list)
+    c_foreach (i, clist_d, list)
         printf(" %g", *i.val);
 
-    clist_fx_del(&list);
+    clist_d_del(&list);
 }
 ```
 Output:
