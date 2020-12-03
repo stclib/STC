@@ -1,7 +1,7 @@
-# Container type clist: Circular Singly Linked List
+# Container clist: Singly Linked List
 
 This is similar to c++ *std::forward_list*, but can do both *push_front()* and *push_back()* as well as *pop_front()*.
-Also supports various *splice* functions and *merge sort*.
+Implemented as a circular singly linked list. Also supports various *splice* functions and *merge sort*.
 
 ## Declaration
 

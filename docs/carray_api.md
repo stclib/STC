@@ -1,4 +1,4 @@
-# Container type carray: Dynamic 1/2/3 Dimensional Array
+# Container carray: Dynamic 1/2/3 Dimensional Array
 
 This is 1D, 2D and 3D arrays, which are allocated from heap in one single contiguous block of memory.
 *carray3* may have sub-array "views" of *carray2* and *carray1* etc.
@@ -27,11 +27,9 @@ be replaced by `my` in all of the following documentation. The `#` character sho
 |:---------------------|:-------------------------|
 | `carray1_size(arr)`  |  carray1 size and dim    |
 | `carray1_xdim(arr)`  |                          |
-|                      |                          |
 | `carray2_size(arr)`  |  carray2 size and dims   |
 | `carray2_xdim(arr)`  |                          |
 | `carray2_ydim(arr)`  |                          |
-|                      |                          |
 | `carray3_size(arr)`  |  carray3 size and dims   |
 | `carray3_xdim(arr)`  |                          |
 | `carray3_ydim(arr)`  |                          |

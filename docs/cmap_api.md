@@ -1,4 +1,4 @@
-# Container type cmap: Unordered Map
+# Container cmap: Unordered Map
 
 Elements are pairs of keys and mapped values. Implemented as open hashing without tombstones. Highly customizable and fast.
 

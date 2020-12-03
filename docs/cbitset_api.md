@@ -1,4 +1,4 @@
-# Container type cbitset_t: Indexed Set of Boolean Values (Bits)
+# Container cbitset_t: Indexed Bitset
 
 This describes the API of type **cbitset**.
 

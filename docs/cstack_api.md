@@ -1,4 +1,4 @@
-# Container type cstack: Stack
+# Container cstack: Stack
 
 This describes the API of the queue type **cstack**.
 
@@ -7,7 +7,7 @@ This describes the API of the queue type **cstack**.
 ```c
 #define using_cstack(X, CType)
 ```
-The macro `using_cstack()` shall be instantiated in the global scope.
+The macro `using_cstack()` must be instantiated in the global scope.
 **cstack** uses normally a **cvec** type as underlying implementation, given as CType.
 Default values are given above for args not specified. `X` is a type tag name and
 will affect the names of all cstack types and methods. E.g. declaring `using_cstack(my, cvec_my);`,

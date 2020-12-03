@@ -1,4 +1,4 @@
-# Container type cstr_t: String
+# Container cstr_t: String
 
 This describes the API of string type **cstr_t**.
 
@@ -13,7 +13,7 @@ This describes the API of string type **cstr_t**.
 ## Constants and macros
 
 | Name              | Value            |
-|:---------------- -|:-----------------|
+|:------------------|:-----------------|
 |  `cstr_inits`     | `{...}`          |
 |  `cstr_npos`      | `-1ull`          |
 
