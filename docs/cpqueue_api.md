@@ -21,7 +21,6 @@ Declaring `using_cpqueue(my, cvec_my, >);`, `X` should be replaced by `my` in th
 | `cpqueue_X_value_t`    |                                        | The cpqueue element type             |
 | `cpqueue_X_input_t`    |                                        | cpqueue input type                   |
 | `cpqueue_X_rawvalue_t` |                                        | cpqueue raw value type               |
-| `cpqueue_X_iter_t`     |                                        | cpqueue iterator                     |
 
 ## Header file
 
@@ -48,11 +47,6 @@ void                    cpqueue_X_emplace(cpqueue_X* self, cpqueue_X_rawvalue_t 
 void                    cpqueue_X_push(cpqueue_X* self, cpqueue_X_value_t value);
 void                    cpqueue_X_pop(cpqueue_X* self);
 void                    cpqueue_X_erase_at(cpqueue_X* self, size_t i);
-
-cpqueue_X_iter_t        cpqueue_X_begin(cpqueue_X* self);
-cpqueue_X_iter_t        cpqueue_X_end(cpqueue_X* self);
-void                    cpqueue_X_next(cpqueue_X_iter_t* it);
-cpqueue_X_value_t*      cpqueue_X_itval(cpqueue_X_iter_t it);
 ```
 
 ## Example
