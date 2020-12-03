@@ -8,10 +8,10 @@ This describes the API of the queue type **cpqueue**. Implemented as a heap.
 #define using_cpqueue(X, CType, MaxOrMinHeap)
 ```
 The macro `using_cpqueue()` must be instantiated in the global scope.
-**cpqueue** uses normally a **cvec** type as undelying implementation, specified as CType.
+**cpqueue** uses normally a **cvec** type as underlying implementation, specified as CType.
 The MaxOrMinHeap argument should be specified as a < or >, representing a max-heap or a min-heap.
 `X` is a type tag name and will affect the names of all cpqueue types and methods.
-Declaring `using_cpqueue(my, cvec_my);`, `X` should be replaced by `my` in the following documentation.
+Declaring `using_cpqueue(my, cvec_my, >);`, `X` should be replaced by `my` in the following documentation.
 
 ## Types
 
@@ -40,7 +40,8 @@ void                    cpqueue_X_del(cpqueue_X* self);
 
 size_t                  cpqueue_X_size(cpqueue_X pq);
 bool                    cpqueue_X_empty(cpqueue_X pq);
-cpqueue_X_value_t*      cpqueue_X_top(cpqueue_X* self);
+const
+cpqueue_X_value_t*      cpqueue_X_top(const cpqueue_X* self);
 
 void                    cpqueue_X_push_n(cpqueue_X *self, const cpqueue_X_input_t in[], size_t size);
 void                    cpqueue_X_emplace(cpqueue_X* self, cpqueue_X_rawvalue_t raw);
