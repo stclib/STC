@@ -1,7 +1,6 @@
-# Container type cmap
+# Container type cmap: Unordered Map
 
-This describes the API of the unordered map type **cmap**. Elements are pairs of keys and mapped values.
-Implemented as open hashing without tombstones. Highly customizable and fast.
+Elements are pairs of keys and mapped values. Implemented as open hashing without tombstones. Highly customizable and fast.
 
 ## Declaration
 
@@ -159,11 +158,11 @@ The HEX of color BLACK is:[#000000]
 ```
 
 ### Example 2
-For illustration, this example uses a cmap with cstr_t as mapped value, instead of `using_strval(id, int)` macro.
+For illustration, this example uses a cmap with cstr_t as mapped value, instead of `using_cmap_strval(id, int)` macro.
 We must therefore pass new constructed cstr_t objects to the map when inserting, instead of `const char*` strings.
 ```c
-#include <stc/cstr.h>
-#include <stc/cmap.h>
+#include "stc/cstr.h"
+#include "stc/cmap.h"
 
 using_cmap(id, int, cstr_t, cstr_del);
 

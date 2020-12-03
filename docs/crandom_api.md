@@ -1,11 +1,11 @@
-# Random number generators
+# Module crand: Pseudo Random Number Generators
 
-This describes the API of module **crandom**. Contains *pcg32* and a extremely fast *64-bit PRNG* inspired by *sfc64*.
-The RNG's can generate uniform and normal distributions.
+This describes the API of module **crand**. Contains *pcg32* and an extremely fast *64-bit PRNG* inspired by *sfc64*.
+The PRNG's can generate uniform and normal distributions.
 
 ## Types
 
-| crandom               | Type definition                             | Used to represent...                 |
+| Name                  | Type definition                             | Used to represent...                 |
 |:----------------------|:--------------------------------------------|:-------------------------------------|
 | `crand_rng32_t`       | `struct {uint64_t state[2];}`               | The crandom type                     |
 | `crand_uniform_i32_t` | `struct {int32_t offset; uint32_t range;}`  | The crandom element type             |

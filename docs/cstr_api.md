@@ -1,4 +1,4 @@
-# String type cstr_t
+# Container type cstr_t: String
 
 This describes the API of string type **cstr_t**.
 

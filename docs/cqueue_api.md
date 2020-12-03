@@ -1,4 +1,4 @@
-# Container type cqueue
+# Container type cqueue: Queue
 
 This describes the API of the queue type **cqueue**.
 
@@ -7,8 +7,8 @@ This describes the API of the queue type **cqueue**.
 ```c
 #define using_cqueue(X, CType)
 ```
-The macro `using_cqueue()` can be instantiated with 2 arguments in the global scope.
-**cqueue** uses normally a **clist** type as undelying implementation.
+The macro `using_cqueue()` shall be instantiated in the global scope.
+**cqueue** uses normally a **clist** type as underlying implementation, given as CType.
 Default values are given above for args not specified. `X` is a type tag name and
 will affect the names of all cqueue types and methods. E.g. declaring `using_cqueue(my, clist_my);`,
 `X` should be replaced by `my` in all of the following documentation.

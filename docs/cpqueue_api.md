@@ -1,17 +1,17 @@
-# Container type cpqueue
+# Container type cpqueue: Priority Queue
 
-This describes the API of the queue type **cpqueue**.
+This describes the API of the queue type **cpqueue**. Implemented as a heap.
 
 ## Declaration
 
 ```c
-#define using_cpqueue(X, CType)
+#define using_cpqueue(X, CType, MaxOrMinHeap)
 ```
-The macro `using_cpqueue()` can be instantiated with 2 arguments in the global scope.
-**cpqueue** uses normally a **cvec** type as undelying implementation.
-Default values are given above for args not specified. `X` is a type tag name and
-will affect the names of all cpqueue types and methods. E.g. declaring `using_cpqueue(my, cvec_my);`,
-`X` should be replaced by `my` in all of the following documentation.
+The macro `using_cpqueue()` shall be instantiated in the global scope.
+**cpqueue** uses normally a **cvec** type as undelying implementation, specified as CType.
+The MaxOrMinHeap argument should be specified as a < or >, representing a max-heap or a min-heap.
+`X` is a type tag name and will affect the names of all cpqueue types and methods.
+Declaring `using_cpqueue(my, cvec_my);`, `X` should be replaced by `my` in the following documentation.
 
 ## Types
 

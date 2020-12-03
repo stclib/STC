@@ -1,7 +1,6 @@
-# Container type carray
+# Container type carray: Dynamic 1/2/3 Dimensional Array
 
-This describes the API of the unordered set type **carray**.
-1d, 2d and 3d arrays, allocated from heap in one single contiguous block of memory.
+This is 1D, 2D and 3D arrays, which are allocated from heap in one single contiguous block of memory.
 *carray3* may have sub-array "views" of *carray2* and *carray1* etc.
 
 ## Declaration

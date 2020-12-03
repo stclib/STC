@@ -1,4 +1,4 @@
-# Container type cvec
+# Container type cvec: Vector
 
 This describes the API of vector type **cvec**.
 
