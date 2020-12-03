@@ -66,11 +66,11 @@
     STC_API void \
     cpqueue_##X##_make_heap(cpqueue_##X* self); \
     STC_API void \
-    cpqueue_##X##_erase(cpqueue_##X* self, size_t i); \
+    cpqueue_##X##_erase_at(cpqueue_##X* self, size_t i); \
     STC_INLINE const cpqueue_##X##_value_t* \
     cpqueue_##X##_top(const cpqueue_##X* self) {return &self->data[0];} \
     STC_INLINE void \
-    cpqueue_##X##_pop(cpqueue_##X* self) {cpqueue_##X##_erase(self, 0);} \
+    cpqueue_##X##_pop(cpqueue_##X* self) {cpqueue_##X##_erase_at(self, 0);} \
     STC_API void \
     cpqueue_##X##_push(cpqueue_##X* self, cpqueue_##X##_value_t value); \
     STC_INLINE void \
@@ -109,7 +109,7 @@
     } \
 \
     STC_API void \
-    cpqueue_##X##_erase(cpqueue_##X* self, size_t i) { \
+    cpqueue_##X##_erase_at(cpqueue_##X* self, size_t i) { \
         size_t n = cpqueue_##X##_size(*self) - 1; \
         self->data[i] = self->data[n]; \
         ctype##_pop_back(self); \
