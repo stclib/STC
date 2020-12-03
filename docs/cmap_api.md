@@ -30,8 +30,8 @@ Default values are given above for args not specified. `X` is a type tag name an
 will affect the names of all cmap types and methods. E.g. declaring `using_cmap(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.
 
-`using_cmap_strkey(X, ...)` and `using_cmap_strval(X, ...)` are special macros defined with
-`using_cmap()`. The `using_cmap_str()` macro expands to:
+`using_cmap_strkey()` and `using_cmap_strval()` are special macros defined by
+`using_cmap()`. The macro `using_cmap_str()` is a shorthand for
 ```c
 using_cmap(str, cstr_t, cstr_t, cstr_del, cstr_equals_raw, cstr_hash_raw,
            cstr_del, const char*, cstr_to_raw, cstr_from, const char*, cstr_from)
@@ -39,17 +39,17 @@ using_cmap(str, cstr_t, cstr_t, cstr_del, cstr_equals_raw, cstr_hash_raw,
 
 ## Types
 
-| Type name            | Type definition                       | Used to represent...               |
-|:---------------------|:--------------------------------------|:-----------------------------------|
-| `cmap_X`             | `struct { ... }`                      | The cmap type                      |
-| `cmap_X_rawkey_t`    | `RawKey`                              | The raw key type                   |
-| `cmap_X_rawval_t`    | `RawMapped`                           | The raw mapped type                |
-| `cmap_X_key_t`       | `Key`                                 | The key type                       |
-| `cmap_X_mapped_t`    | `Mapped`                              | The mapped type                    |
-| `cmap_X_value_t`     | `struct { ... }`                      | The value type                     |
-| `cmap_X_input_t`     | `struct { ... }`                      | RawKey + RawVal type               |
-| `cmap_X_result_t`    | `struct { ... }`                      | Result of insert/put/emplace       |
-| `cmap_X_iter_t`      | `struct { ... }`                      | Iterator type                      |
+| Type name            | Type definition        | Used to represent...          |
+|:---------------------|:-----------------------|:------------------------------|
+| `cmap_X`             | `struct { ... }`       | The cmap type                 |
+| `cmap_X_rawkey_t`    | `RawKey`               | The raw key type              |
+| `cmap_X_rawval_t`    | `RawMapped`            | The raw mapped type           |
+| `cmap_X_key_t`       | `Key`                  | The key type                  |
+| `cmap_X_mapped_t`    | `Mapped`               | The mapped type               |
+| `cmap_X_value_t`     | `struct { ... }`       | The value type                |
+| `cmap_X_input_t`     | `struct { ... }`       | RawKey + RawVal type          |
+| `cmap_X_result_t`    | `struct { ... }`       | Result of insert/put/emplace  |
+| `cmap_X_iter_t`      | `struct { ... }`       | Iterator type                 |
 
 ## Constants and macros
 
@@ -86,10 +86,10 @@ size_t              cmap_X_size(cmap_X m);
 size_t              cmap_X_bucket_count(cmap_X m);
 size_t              cmap_X_capacity(cmap_X m);
 
-void                cmap_X_push_n(cmap_X* self, const cmap_X_input_t in[], size_t size);
+void                cmap_X_push_n(cmap_X* self, const cmap_X_input_t arr[], size_t size);
 
 cmap_X_result_t     cmap_X_emplace(cmap_X* self, RawKey rkey, RawMapped rmapped);
-cmap_X_result_t     cmap_X_insert(cmap_X* self, cmap_X_input_t in);
+cmap_X_result_t     cmap_X_insert(cmap_X* self, cmap_X_input_t rval);
 cmap_X_result_t     cmap_X_insert_or_assign(cmap_X* self, RawKey rkey, RawMapped rmapped);
 cmap_X_result_t     cmap_X_put(cmap_X* self, RawKey rkey, RawMapped rmapped);
 cmap_X_result_t     cmap_X_put_mapped(cmap_X* self, RawKey rkey, Mapped mapped);
@@ -107,8 +107,7 @@ cmap_X_iter_t       cmap_X_end(cmap_X* self);
 void                cmap_X_next(cmap_X_iter_t* it);
 cmap_X_mapped_t*    cmap_X_itval(cmap_X_iter_t it);
 
-cmap_bucket_t       cmap_X_bucket(const cmap_X* self, const cmap_X_rawkey_t* rawKeyPtr);
-
+cmap_bucket_t       cmap_X_bucket(const cmap_X* self, const cmap_X_rawkey_t* rkeyPtr);
 uint32_t            c_default_hash16(const void *data, size_t len);
 uint32_t            c_default_hash32(const void* data, size_t len);
 ```

@@ -9,7 +9,7 @@ This describes the API of the queue type **cpqueue**. Implemented as a heap.
 ```
 The macro `using_cpqueue()` must be instantiated in the global scope.
 **cpqueue** uses normally a **cvec** type as underlying implementation, specified as `ctype`.
-The `heap_variant` argument should be given as `<` or `>`, specifying a *max-heap* or a *min-heap*.
+The `heap_variant` must be given as `<` or `>`, specifying *max-heap* or *min-heap* for the priority queue.
 Note that the function `{ctype}_value_compare(x, y)` defined by the underlying vector type is used to
 compare values (priorities). `X` is a type tag name and will affect the names of all cpqueue types and methods.
 Declaring `using_cpqueue(my, cvec_my, >);`, `X` should be replaced by `my` in the following documentation.
@@ -43,11 +43,11 @@ bool                    cpqueue_X_empty(cpqueue_X pq);
 const
 cpqueue_X_value_t*      cpqueue_X_top(const cpqueue_X* self);
 
-void                    cpqueue_X_push_n(cpqueue_X *self, const cpqueue_X_input_t in[], size_t size);
+void                    cpqueue_X_push_n(cpqueue_X *self, const cpqueue_X_input_t arr[], size_t size);
 void                    cpqueue_X_emplace(cpqueue_X* self, cpqueue_X_rawvalue_t raw);
 void                    cpqueue_X_push(cpqueue_X* self, cpqueue_X_value_t value);
 void                    cpqueue_X_pop(cpqueue_X* self);
-void                    cpqueue_X_erase_at(cpqueue_X* self, size_t i);
+void                    cpqueue_X_erase_at(cpqueue_X* self, size_t idx);
 ```
 
 ## Example

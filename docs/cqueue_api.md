@@ -7,9 +7,8 @@ This describes the API of the queue type **cqueue**.
 ```c
 #define using_cqueue(X, ctype)
 ```
-The macro `using_cqueue()` must be instantiated in the global scope.
-**cqueue** uses normally a **clist** type as underlying implementation, given as `ctype`.
-Default values are given above for args not specified. `X` is a type tag name and
+The macro `using_cqueue()` must be instantiated in the global scope. **cqueue** uses normally
+a **clist** type as underlying implementation, given as `ctype`. `X` is a type tag name and
 will affect the names of all cqueue types and methods. E.g. declaring `using_cqueue(my, clist_my);`,
 `X` should be replaced by `my` in all of the following documentation.
 
@@ -28,7 +27,7 @@ will affect the names of all cqueue types and methods. E.g. declaring `using_cqu
 All cqueue definitions and prototypes may be included in your C source file by including a single header file.
 
 ```c
-#include "stc/cqueue.h"
+#include "stc/cqueue.h" /* includes default underlying implementation header clist.h */
 ```
 
 ## Methods

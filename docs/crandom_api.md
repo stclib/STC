@@ -1,7 +1,7 @@
 # Module crand: Pseudo Random Number Generators
 
-This describes the API of module **crand**. Contains *pcg32* and an extremely fast *64-bit PRNG* inspired by *sfc64*.
-The PRNG's can generate uniform and normal distributions.
+This describes the API of module **crand**. It contains *pcg32* created by Melissa O'Neill, and an
+*64-bit PRNG* created by Tyge Løvset. The PRNG can generate uniform and normal distributions.
 
 ## Types
 
@@ -52,10 +52,18 @@ All cstr definitions and prototypes may be included in your C source file by inc
 (9)     crand_normal_f64_t      crand_normal_f64_init(double mean, double stddev);
 (10)    double                  crand_normal_f64(crand_rng64_t* rng, crand_normal_f64_t* dist);
 ```
-(1-2) RNG engine initializers. (3) Integer generator, range \[0, 2^64): PRNG copyright Tyge Løvset, NORCE Research, 2020.
+(1-2) RNG engine initializers. (3) Integer generator, range \[0, 2^64),
 (4) Double random number in range \[low, high), 52 bit resolution. (5-8) Initializers and generators of uniform random numbers.
 Integer generator has range \[low, high]. (9-10) Initializer and generator for normal distributed random numbers.
 (9-10) Initializer and generator for normal-distributed random numbers.
+
+The method `crand_i64(crand_rng64_t* rng)` is an extremely fast PRNG suited for parallel usage, featuring
+a Weyl-sequence as part of the state. It is faster than *sfc64*, *wyhash64*, *pcg*, and the *xoroshiro*
+families of RPNGs. It does not require fast multiplication or 128-bit integer operations as it uses only
+shift, xor and addition. The state is 256-bits, but updates only 192 bit per generated number, as the
+last 64 bit holds the Weyl increment. Therefore, it can create 2^63 unique threads with minimum period
+length of 2^64 (expected period length 2^128) per thread. There is no *jump function*, but incrementing
+the Weyl increment by 2, achieves the same goal. Tested with *PractRand* up to 8TB output without issues.
 
 ## Example
 ```c

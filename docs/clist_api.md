@@ -16,29 +16,29 @@ Implemented as a circular singly linked list. Also supports various *splice* fun
 The macro `using_clist()` can be instantiated with 2, 3, 4, or 7 arguments in the global scope.
 Default values are given above for args not specified. `X` is a type tag name and
 will affect the names of all clist types and methods. E.g. declaring `using_clist(my, int);`, `X` should
-be replaced by `my` in all of the following documentation. `using_clist_str()` is a shorthand for:
+be replaced by `my` in all of the following documentation. `using_clist_str()` is a shorthand for
 ```c
 using_clist(str, cstr_t, cstr_del, cstr_compare_raw, const char*, cstr_to_raw, cstr_from)
 ```
 
 ## Types
 
-| Type name             | Type definition                        | Used to represent...                |
-|:----------------------|:---------------------------------------|:------------------------------------|
-| `clist_X`             | `struct { clist_X_node_t* last; }`     | The clist type                      |
-| `clist_X_node_t`      | `struct { ... }`                       | clist node                          |
-| `clist_X_value_t`     | `Value`                                | The clist element type              |
-| `clist_X_input_t`     | `clist_X_value_t`                      | clist input type                    |
-| `clist_X_rawvalue_t`  | `RawValue`                             | clist raw value type                |
-| `clist_X_iter_t`      | `struct { ... }`                       | clist iterator                      |
+| Type name             | Type definition                     | Used to represent...      |
+|:----------------------|:------------------------------------|:--------------------------|
+| `clist_X`             | `struct { clist_X_node_t* last; }`  | The clist type            |
+| `clist_X_node_t`      | `struct { ... }`                    | clist node                |
+| `clist_X_value_t`     | `Value`                             | The clist element type    |
+| `clist_X_input_t`     | `clist_X_value_t`                   | clist input type          |
+| `clist_X_rawvalue_t`  | `RawValue`                          | clist raw value type      |
+| `clist_X_iter_t`      | `struct { ... }`                    | clist iterator            |
 
 
 ## Constants and macros
 
-| Name                       | Value            |
-|:---------------------------|:-----------------|
-|  `clist_inits`             | `{NULL}`         |
-|  `clist_empty(list)`       | `true` if empty  |
+| Name                       | Purpose              |
+|:---------------------------|:---------------------|
+|  `clist_inits`             | Initializer constant |
+|  `clist_empty(list)`       | `true` if list empty |
 
 ## Header file
 

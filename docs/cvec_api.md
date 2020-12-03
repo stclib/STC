@@ -30,16 +30,16 @@ using_cvec(str, cstr_t, cstr_del, cstr_compare_raw, const char*, cstr_to_raw, cs
 | `cvec_X_value_t`     | `Value`                             | The cvec value type    |
 | `cvec_X_input_t`     | `cvec_X_value_t`                    | The input type         |
 | `cvec_X_rawvalue_t`  | `RawValue`                          | The raw value type     |
-| `cvec_X_iter_t`      | `struct { cvec_X_value_t* val; }`   | The iterator           |
+| `cvec_X_iter_t`      | `struct { cvec_X_value_t* val; }`   | The iterator type      |
 
 ## Constants and macros
 
-| Name                       | Value            |
-|:---------------------------|:-----------------|
-|  `cvec_inits`              | `{NULL}`         |
-|  `cvec_empty(vec)`         |                  |
-|  `cvec_size(vec)`          |                  |
-|  `cvec_capacity(vec)`      |                  |
+| Name                       | Purpose              |
+|:---------------------------|:---------------------|
+|  `cvec_inits`              | Initializer constant |
+|  `cvec_empty(vec)`         | true if vec is empty |
+|  `cvec_size(vec)`          | return vec length    |
+|  `cvec_capacity(vec)`      | return vec capacity  |
 
 
 ## Header file
@@ -53,12 +53,12 @@ All cvec definitions and prototypes may be included in your C source file by inc
 
 ```c
 cvec_X              cvec_X_init(void);
-cvec_X              cvec_X_with_size(size_t size, Value fill_val);
+cvec_X              cvec_X_with_size(size_t size, Value fill);
 cvec_X              cvec_X_with_capacity(size_t size);
 
 void                cvec_X_clear(cvec_X* self);
 void                cvec_X_reserve(cvec_X* self, size_t cap);
-void                cvec_X_resize(cvec_X* self, size_t size, Value fill_val);
+void                cvec_X_resize(cvec_X* self, size_t size, Value fill);
 void                cvec_X_swap(cvec_X* a, cvec_X* b);
 
 void                cvec_X_del(cvec_X* self);
@@ -68,11 +68,11 @@ size_t              cvec_X_size(cvec_X vec);
 size_t              cvec_X_capacity(cvec_X vec);
 Value               cvec_X_value_from_raw(RawValue val);
 
-cvec_X_value_t*     cvec_X_at(cvec_X* self, size_t i);
+cvec_X_value_t*     cvec_X_at(cvec_X* self, size_t idx);
 cvec_X_value_t*     cvec_X_front(cvec_X* self);
 cvec_X_value_t*     cvec_X_back(cvec_X* self);
 
-void                cvec_X_push_n(cvec_X *self, const cvec_X_input_t in[], size_t size);
+void                cvec_X_push_n(cvec_X *self, const cvec_X_input_t arr[], size_t size);
 void                cvec_X_emplace_back(cvec_X* self, RawValue val);
 void                cvec_X_push_back(cvec_X* self, Value value);
 void                cvec_X_pop_back(cvec_X* self);
