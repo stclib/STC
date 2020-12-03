@@ -77,20 +77,20 @@ void                cvec_X_emplace_back(cvec_X* self, RawValue val);
 void                cvec_X_push_back(cvec_X* self, Value value);
 void                cvec_X_pop_back(cvec_X* self);
 
-cvec_X_iter_t       cvec_X_emplace_at(cvec_X* self, cvec_X_iter_t pos, RawValue val);
-cvec_X_iter_t       cvec_X_emplace_at_idx(cvec_X* self, size_t idx, RawValue val);
-cvec_X_iter_t       cvec_X_insert_at(cvec_X* self, cvec_X_iter_t pos, Value value);
-cvec_X_iter_t       cvec_X_insert_at_idx(cvec_X* self, size_t idx, Value value);
+cvec_X_iter_t       cvec_X_emplace(cvec_X* self, cvec_X_iter_t pos, RawValue val);
+cvec_X_iter_t       cvec_X_emplace_at(cvec_X* self, size_t idx, RawValue val);
+cvec_X_iter_t       cvec_X_insert(cvec_X* self, cvec_X_iter_t pos, Value value);
+cvec_X_iter_t       cvec_X_insert_at(cvec_X* self, size_t idx, Value value);
 cvec_X_iter_t       cvec_X_insert_range(cvec_X* self, cvec_X_iter_t pos,
                                         cvec_X_iter_t first, cvec_X_iter_t finish);
-cvec_X_iter_t       cvec_X_insert_range_ptr(cvec_X* self, cvec_X_value_t* pos,
-                                            const cvec_X_value_t* pfirst, const cvec_X_value_t* pfinish);
+cvec_X_iter_t       cvec_X_insert_range_p(cvec_X* self, cvec_X_value_t* pos,
+                                          const cvec_X_value_t* pfirst, const cvec_X_value_t* pfinish);
 
-cvec_X_iter_t       cvec_X_erase_at(cvec_X* self, cvec_X_iter_t pos);
-cvec_X_iter_t       cvec_X_erase_at_idx(cvec_X* self, size_t idx);
+cvec_X_iter_t       cvec_X_erase(cvec_X* self, cvec_X_iter_t pos);
+cvec_X_iter_t       cvec_X_erase_at(cvec_X* self, size_t idx);
 cvec_X_iter_t       cvec_X_erase_range(cvec_X* self, cvec_X_iter_t first, cvec_X_iter_t finish);
-cvec_X_iter_t       cvec_X_erase_range_ptr(cvec_X* self, cvec_X_value_t* first, cvec_X_value_t* finish);
-cvec_X_iter_t       cvec_X_erase_range_idx(cvec_X* self, size_t ifirst, size_t ifinish);
+cvec_X_iter_t       cvec_X_erase_range_p(cvec_X* self, cvec_X_value_t* pfirst, cvec_X_value_t* pfinish);
+cvec_X_iter_t       cvec_X_erase_range_i(cvec_X* self, size_t ifirst, size_t ifinish);
 
 cvec_X_iter_t       cvec_X_find(const cvec_X* self, RawValue val);
 cvec_X_iter_t       cvec_X_find_in_range(const cvec_X* self,
