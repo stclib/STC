@@ -5,22 +5,23 @@ This describes the API of the queue type **cpqueue**. Implemented as a heap.
 ## Declaration
 
 ```c
-#define using_cpqueue(X, CType, MaxOrMinHeap)
+#define using_cpqueue(X, ctype, heap_variant)
 ```
 The macro `using_cpqueue()` must be instantiated in the global scope.
-**cpqueue** uses normally a **cvec** type as underlying implementation, specified as CType.
-The MaxOrMinHeap argument should be specified as a < or >, representing a max-heap or a min-heap.
-`X` is a type tag name and will affect the names of all cpqueue types and methods.
+**cpqueue** uses normally a **cvec** type as underlying implementation, specified as `ctype`.
+The `heap_variant` argument should be given as `<` or `>`, specifying a *max-heap* or a *min-heap*.
+Note that the function `{ctype}_value_compare(x, y)` defined by the underlying vector type is used to
+compare values (priorities). `X` is a type tag name and will affect the names of all cpqueue types and methods.
 Declaring `using_cpqueue(my, cvec_my, >);`, `X` should be replaced by `my` in the following documentation.
 
 ## Types
 
-| Type name              | Type definition                        | Used to represent...                |
-|:-----------------------|:---------------------------------------|:------------------------------------|
-| `cpqueue_X`            | Depends on underlying container type   | The cpqueue type                     |
-| `cpqueue_X_value_t`    |                                        | The cpqueue element type             |
-| `cpqueue_X_input_t`    |                                        | cpqueue input type                   |
-| `cpqueue_X_rawvalue_t` |                                        | cpqueue raw value type               |
+| Type name              | Type definition                         | Used to represent...      |
+|:-----------------------|:----------------------------------------|:--------------------------|
+| `cpqueue_X`            | `struct {cpqueue_X_value_t* data; ...}` | The cpqueue type          |
+| `cpqueue_X_value_t`    | Depends on underlying container type    | The cpqueue element type  |
+| `cpqueue_X_input_t`    |                   "                     | cpqueue input type        |
+| `cpqueue_X_rawvalue_t` |                   "                     | cpqueue raw value type    |
 
 ## Header file
 

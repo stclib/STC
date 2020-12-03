@@ -24,15 +24,15 @@ be replaced by `my` in all of the following documentation.
 
 ## Types
 
-| Type name            | Type definition                       | Used to represent...               |
-|:---------------------|:--------------------------------------|:-----------------------------------|
-| `cset_X`             | `struct { ... }`                      | The cset type                      |
-| `cset_X_rawkey_t`    | `RawKey`                              | The raw key type                   |
-| `cset_X_key_t`       | `Key`                                 | The key type                       |
-| `cset_X_value_t`     | `Key`                                 | The value type                     |
-| `cset_X_result_t`    | `struct { ... }`                      | Result of insert/emplace           |
-| `cset_X_input_t`     | `cset_X_rawkey_t`                     | The input type (rawkey)            |
-| `cset_X_iter_t`      | `struct { ... }`                      | Iterator type                      |
+| Type name            | Type definition          | Used to represent...     |
+|:---------------------|:-------------------------|:-------------------------|
+| `cset_X`             | `struct { ... }`         | The cset type            |
+| `cset_X_rawkey_t`    | `RawKey`                 | The raw key type         |
+| `cset_X_key_t`       | `Key`                    | The key type             |
+| `cset_X_value_t`     | `Key`                    | The value type           |
+| `cset_X_result_t`    | `struct { ... }`         | Result of insert/emplace |
+| `cset_X_input_t`     | `cset_X_rawkey_t`        | The input type (rawkey)  |
+| `cset_X_iter_t`      | `struct { ... }`         | Iterator type            |
 
 ## Constants and macros
 

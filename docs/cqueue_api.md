@@ -5,23 +5,23 @@ This describes the API of the queue type **cqueue**.
 ## Declaration
 
 ```c
-#define using_cqueue(X, CType)
+#define using_cqueue(X, ctype)
 ```
 The macro `using_cqueue()` must be instantiated in the global scope.
-**cqueue** uses normally a **clist** type as underlying implementation, given as CType.
+**cqueue** uses normally a **clist** type as underlying implementation, given as `ctype`.
 Default values are given above for args not specified. `X` is a type tag name and
 will affect the names of all cqueue types and methods. E.g. declaring `using_cqueue(my, clist_my);`,
 `X` should be replaced by `my` in all of the following documentation.
 
 ## Types
 
-| Type name             | Type definition                        | Used to represent...                |
-|:----------------------|:---------------------------------------|:------------------------------------|
-| `cqueue_X`            | Depends on underlying container type   | The cqueue type                     |
-| `cqueue_X_value_t`    |                                        | The cqueue element type             |
-| `cqueue_X_input_t`    |                                        | cqueue input type                   |
-| `cqueue_X_rawvalue_t` |                                        | cqueue raw value type               |
-| `cqueue_X_iter_t`     |                                        | cqueue iterator                     |
+| Type name             | Type definition                        | Used to represent...     |
+|:----------------------|:---------------------------------------|:-------------------------|
+| `cqueue_X`            | Depends on underlying container type   | The cqueue type          |
+| `cqueue_X_value_t`    |                   "                    | The cqueue element type  |
+| `cqueue_X_input_t`    |                   "                    | cqueue input type        |
+| `cqueue_X_rawvalue_t` |                   "                    | cqueue raw value type    |
+| `cqueue_X_iter_t`     |                   "                    | cqueue iterator          |
 
 ## Header file
 

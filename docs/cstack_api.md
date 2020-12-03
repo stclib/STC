@@ -5,23 +5,23 @@ This describes the API of the queue type **cstack**.
 ## Declaration
 
 ```c
-#define using_cstack(X, CType)
+#define using_cstack(X, ctype)
 ```
 The macro `using_cstack()` must be instantiated in the global scope.
-**cstack** uses normally a **cvec** type as underlying implementation, given as CType.
+**cstack** uses normally a **cvec** type as underlying implementation, given as `ctype`.
 Default values are given above for args not specified. `X` is a type tag name and
 will affect the names of all cstack types and methods. E.g. declaring `using_cstack(my, cvec_my);`,
 `X` should be replaced by `my` in all of the following documentation.
 
 ## Types
 
-| Type name             | Type definition                        | Used to represent...                |
-|:----------------------|:---------------------------------------|:------------------------------------|
-| `cstack_X`            | Depends on underlying container type   | The cstack type                     |
-| `cstack_X_value_t`    |                                        | The cstack element type             |
-| `cstack_X_input_t`    |                                        | cstack input type                   |
-| `cstack_X_rawvalue_t` |                                        | cstack raw value type               |
-| `cstack_X_iter_t`     |                                        | cstack iterator                     |
+| Type name             | Type definition                        | Used to represent...        |
+|:----------------------|:---------------------------------------|:----------------------------|
+| `cstack_X`            | Depends on underlying container type   | The cstack type             |
+| `cstack_X_value_t`    |                   "                    | The cstack element type     |
+| `cstack_X_input_t`    |                   "                    | cstack input type           |
+| `cstack_X_rawvalue_t` |                   "                    | cstack raw value type       |
+| `cstack_X_iter_t`     |                   "                    | cstack iterator             |
 
 ## Header file
 
