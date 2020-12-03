@@ -184,7 +184,7 @@
     STC_INLINE cvec_##X##_value_t* \
     cvec_##X##_itval(cvec_##X##_iter_t it) {return it.val;} \
     STC_INLINE size_t \
-    cvec_##X##_idx(cvec_##X v, cvec_##X##_iter_t it) {return it.val - v.data;} \
+    cvec_##X##_index(cvec_##X v, cvec_##X##_iter_t it) {return it.val - v.data;} \
 \
     _c_implement_cvec_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
     typedef cvec_##X cvec_##X##_t

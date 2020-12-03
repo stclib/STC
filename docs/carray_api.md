@@ -18,10 +18,7 @@ be replaced by `my` in all of the following documentation. The `#` character sho
 
 | Type name            | Type definition               | Used to represent...      |
 |:---------------------|:------------------------------|:--------------------------|
-| `carray#X`           | `struct {`                    | The carray type           |
-|                      | `  carray#X_value_t* data;`   |                           |
-|                      | `  ...;`                      |                           |
-|                      | `}`                           |                           |
+| `carray#X`           | `struct { ... }`              | The carray type           |
 | `carray#X_value_t`   | `Value`                       | The value type            |
 | `carray#X_iter_t`    | `struct { Value *val; }`      | Iterator type             |
 

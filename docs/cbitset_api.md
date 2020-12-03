@@ -4,10 +4,10 @@ This describes the API of string type **cbitset**.
 
 ## Types
 
-| cbitset               | Type definition                           | Used to represent...                 |
-|:----------------------|:------------------------------------------|:-------------------------------------|
-| `cbitset_t`           | `struct { uint64_t* _arr; size_t size; }` | The cbitset type                     |
-| `cbitset_iter_t`      | `struct { cbitset_t *_bs; size_t val; }`  | The cbitset iterator type            |
+| cbitset               | Type definition           | Used to represent...                 |
+|:----------------------|:--------------------------|:-------------------------------------|
+| `cbitset_t`           | `struct { ... }`          | The cbitset type                     |
+| `cbitset_iter_t`      | `struct { ... }`          | The cbitset iterator type            |
 
 ## Header file
 

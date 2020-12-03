@@ -17,7 +17,7 @@ will affect the names of all cstack types and methods. E.g. declaring `using_cst
 
 | Type name             | Type definition                        | Used to represent...                |
 |:----------------------|:---------------------------------------|:------------------------------------|
-| `cstack_X`            | Depending on underlying container type | The cstack type                     |
+| `cstack_X`            | Depends on underlying container type   | The cstack type                     |
 | `cstack_X_value_t`    |                                        | The cstack element type             |
 | `cstack_X_input_t`    |                                        | cstack input type                   |
 | `cstack_X_rawvalue_t` |                                        | cstack raw value type               |

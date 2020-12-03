@@ -5,15 +5,15 @@ The RNG's can generate uniform and normal distributions.
 
 ## Types
 
-| crandom               | Type definition                                      | Used to represent...                 |
-|:----------------------|:-----------------------------------------------------|:-------------------------------------|
-| `crand_rng32_t`       | `struct {uint64_t state[2];}`                        | The crandom type                     |
-| `crand_uniform_i32_t` | `struct {int32_t offset; uint32_t range;}`           | The crandom element type             |
-| `crand_uniform_f32_t` | `struct {float offset, range;}`                      | crandom iterator                     |
-| `crand_rng64_t`       | `struct {uint64_t state[4];}`                        |                                      |
-| `crand_uniform_i64_t` | `struct {int64_t offset; uint64_t range;}`           |                                      |
-| `crand_uniform_f64_t` | `struct {double offset, range;}`                     |                                      |
-| `crand_normal_f64_t`  | `struct {double mean, stddev, next; bool has_next;}` |                                      |
+| crandom               | Type definition                             | Used to represent...                 |
+|:----------------------|:--------------------------------------------|:-------------------------------------|
+| `crand_rng32_t`       | `struct {uint64_t state[2];}`               | The crandom type                     |
+| `crand_uniform_i32_t` | `struct {int32_t offset; uint32_t range;}`  | The crandom element type             |
+| `crand_uniform_f32_t` | `struct {float offset, range;}`             | crandom iterator                     |
+| `crand_rng64_t`       | `struct {uint64_t state[4];}`               |                                      |
+| `crand_uniform_i64_t` | `struct {int64_t offset; uint64_t range;}`  |                                      |
+| `crand_uniform_f64_t` | `struct {double offset, range;}`            |                                      |
+| `crand_normal_f64_t`  | `struct {double mean, stddev, ...;}`        |                                      |
 
 ## Header file
 

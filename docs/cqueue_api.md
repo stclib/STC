@@ -17,7 +17,7 @@ will affect the names of all cqueue types and methods. E.g. declaring `using_cqu
 
 | Type name             | Type definition                        | Used to represent...                |
 |:----------------------|:---------------------------------------|:------------------------------------|
-| `cqueue_X`            | Depending on underlying container type | The cqueue type                     |
+| `cqueue_X`            | Depends on underlying container type   | The cqueue type                     |
 | `cqueue_X_value_t`    |                                        | The cqueue element type             |
 | `cqueue_X_input_t`    |                                        | cqueue input type                   |
 | `cqueue_X_rawvalue_t` |                                        | cqueue raw value type               |

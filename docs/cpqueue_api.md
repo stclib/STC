@@ -17,7 +17,7 @@ will affect the names of all cpqueue types and methods. E.g. declaring `using_cp
 
 | Type name              | Type definition                        | Used to represent...                |
 |:-----------------------|:---------------------------------------|:------------------------------------|
-| `cpqueue_X`            | Depending on underlying container type | The cpqueue type                     |
+| `cpqueue_X`            | Depends on underlying container type   | The cpqueue type                     |
 | `cpqueue_X_value_t`    |                                        | The cpqueue element type             |
 | `cpqueue_X_input_t`    |                                        | cpqueue input type                   |
 | `cpqueue_X_rawvalue_t` |                                        | cpqueue raw value type               |

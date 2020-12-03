@@ -24,13 +24,13 @@ using_cvec(str, cstr_t, cstr_del, cstr_compare_raw, const char*, cstr_to_raw, cs
 
 ## Types
 
-| Type name            | Type definition                        | Used to represent...                |
-|:---------------------|:---------------------------------------|:------------------------------------|
-| `cvec_X`             | `struct { cvec_X_value_t* data; }`     | The cvec type                       |
-| `cvec_X_value_t`     | `Value`                                | The cvec value type                 |
-| `cvec_X_input_t`     | `cvec_X_value_t`                       | The input type                      |
-| `cvec_X_rawvalue_t`  | `RawValue`                             | The raw value type                  |
-| `cvec_X_iter_t`      | `struct { cvec_X_value_t* val; }`      | The iterator                        |
+| Type name            | Type definition                     | Used to represent...   |
+|:---------------------|:------------------------------------|:-----------------------|
+| `cvec_X`             | `struct { cvec_X_value_t* data; }`  | The cvec type          |
+| `cvec_X_value_t`     | `Value`                             | The cvec value type    |
+| `cvec_X_input_t`     | `cvec_X_value_t`                    | The input type         |
+| `cvec_X_rawvalue_t`  | `RawValue`                          | The raw value type     |
+| `cvec_X_iter_t`      | `struct { cvec_X_value_t* val; }`   | The iterator           |
 
 ## Constants and macros
 
@@ -101,10 +101,10 @@ void                cvec_X_sort_with(cvec_X* self, size_t ifirst, size_t ifinish
                                      int(*cmp)(const cvec_X_value_t*, const cvec_X_value_t*));
 
 cvec_X_iter_t       cvec_X_begin(const cvec_X* self);
-cvec_X_iter_t       cvec_X_last(const cvec_X* self);
 cvec_X_iter_t       cvec_X_end(const cvec_X* self);
 void                cvec_X_next(cvec_X_iter_t* it);
 cvec_X_value_t*     cvec_X_itval(cvec_X_iter_t it);
+size_t              cvec_X_index(const cvec_X vec, cvec_X_iter_t it);
 ```
 
 ## Examples
@@ -159,7 +159,7 @@ int main() {
 
     cstr_t tmp = cstr_from_fmt("%d elements so far", cvec_str_size(names));
 
-    // Emplace_back() will not compile when adding a new cstr_t type. Use push_back():
+    // emplace_back() will not compile if adding a new cstr_t type. Use push_back():
     cvec_str_push_back(&names, tmp); // tmp is moved to names, do not del() it.
 
     printf("%s\n", names.data[1].str); // Access the second element

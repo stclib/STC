@@ -27,17 +27,11 @@ using_clist(str, cstr_t, cstr_del, cstr_compare_raw, const char*, cstr_to_raw, c
 | Type name             | Type definition                        | Used to represent...                |
 |:----------------------|:---------------------------------------|:------------------------------------|
 | `clist_X`             | `struct { clist_X_node_t* last; }`     | The clist type                      |
-| `clist_X_node_t`      | `struct {`                             | clist node                          |
-|                       | `  struct clist_X_node* next;`         |                                     |
-|                       | `  clist_X_value_t value;`             |                                     |
-|                       | `}`                                    |                                     |
+| `clist_X_node_t`      | `struct { ... }`                       | clist node                          |
 | `clist_X_value_t`     | `Value`                                | The clist element type              |
 | `clist_X_input_t`     | `clist_X_value_t`                      | clist input type                    |
 | `clist_X_rawvalue_t`  | `RawValue`                             | clist raw value type                |
-| `clist_X_iter_t`      | `struct {`                             | clist iterator                      |
-|                       | `  clist_X_value_t* val;`              |                                     |
-|                       | `  ...;`                               |                                     |
-|                       | `}`                                    |                                     |
+| `clist_X_iter_t`      | `struct { ... }`                       | clist iterator                      |
 
 
 ## Constants and macros
@@ -96,8 +90,8 @@ size_t              clist_X_remove(clist_X* self, RawValue val);
 void                clist_X_sort(clist_X* self);
 
 clist_X_iter_t      clist_X_before_begin(const clist_X* self);
-clist_X_iter_t      clist_X_begin(const clist_X* self);
 clist_X_iter_t      clist_X_last(const clist_X* self);
+clist_X_iter_t      clist_X_begin(const clist_X* self);
 clist_X_iter_t      clist_X_end(const clist_X* self);
 void                clist_X_next(clist_X_iter_t* it);
 clist_X_value_t*    clist_X_itval(clist_X_iter_t it);

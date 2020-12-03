@@ -12,10 +12,10 @@ This describes the API of string type **cstr_t**.
 
 ## Constants and macros
 
-| Name                       | Value            |
-|:---------------------------|:-----------------|
-|  `cstr_inits`              | `{...}`          |
-|  `cstr_npos`               | `-1ull`          |
+| Name              | Value            |
+|:---------------- -|:-----------------|
+|  `cstr_inits`     | `{...}`          |
+|  `cstr_npos`      | `-1ull`          |
 
 ## Header file
 

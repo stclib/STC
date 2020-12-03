@@ -42,38 +42,25 @@ using_cmap(str, cstr_t, cstr_t, cstr_del, cstr_equals_raw, cstr_hash_raw,
 
 | Type name            | Type definition                       | Used to represent...               |
 |:---------------------|:--------------------------------------|:-----------------------------------|
-| `cmap_X`             | `struct {`                            | The cmap type                      |
-|                      | `  cmap_X_value_t* table;`            |                                    |
-|                      | `  uint8_t* _hashx;`                  |                                    |
-|                      | `  ...;`                              |                                    |
-|                      | `}`                                   |                                    |
+| `cmap_X`             | `struct { ... }`                      | The cmap type                      |
 | `cmap_X_rawkey_t`    | `RawKey`                              | The raw key type                   |
 | `cmap_X_rawval_t`    | `RawMapped`                           | The raw mapped type                |
 | `cmap_X_key_t`       | `Key`                                 | The key type                       |
 | `cmap_X_mapped_t`    | `Mapped`                              | The mapped type                    |
-| `cmap_X_value_t`     | `struct {`                            | The value type                     |
-|                      | `  cmap_X_key_t first;`               |                                    |
-|                      | `  cmap_X_mapped_t second;`           |                                    |
-|                      | `}`                                   |                                    |
+| `cmap_X_value_t`     | `struct { ... }`                      | The value type                     |
 | `cmap_X_input_t`     | `struct { ... }`                      | RawKey + RawVal type               |
-| `cmap_X_result_t`    | `struct {`                            | Result of insert/put/emplace       |
-|                      | `  cmap_X_value_t* first;`            |                                    |
-|                      | `  bool second; /* inserted */`       |                                    |
-|                      | `}`                                   |                                    |
-| `cmap_X_iter_t`      | `struct {`                            | Iterator type                      |
-|                      | `  cmap_X_value_t* val;`              |                                    |
-|                      | `  ...;`                              |                                    |
-|                      | `}`                                   |                                    |
+| `cmap_X_result_t`    | `struct { ... }`                      | Result of insert/put/emplace       |
+| `cmap_X_iter_t`      | `struct { ... }`                      | Iterator type                      |
 
 ## Constants and macros
 
-| Name                                            | Purpose                |
-|:------------------------------------------------|:-----------------------|
-|  `cmap_inits`                                   | Initializer const      |
-|  `cmap_empty(map)`                              | Test for empty map     |
-|  `cmap_size(map)`                               | Get map size           |
-|  `cmap_capacity(map)`                           | Get map capacity       |
-|  `c_try_emplace(self, ctype, key, val)`         | Emplace if key exist   |
+| Name                                     | Purpose                |
+|:-----------------------------------------|:-----------------------|
+|  `cmap_inits`                            | Initializer const      |
+|  `cmap_empty(map)`                       | Test for empty map     |
+|  `cmap_size(map)`                        | Get map size           |
+|  `cmap_capacity(map)`                    | Get map capacity       |
+|  `c_try_emplace(self, ctype, key, val)`  | Emplace if key exist   |
 
 ## Header file
 
