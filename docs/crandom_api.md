@@ -24,7 +24,6 @@ All cstr definitions and prototypes may be included in your C source file by inc
 
 ## Methods
 
-### Interface for 32-bits random number generators
 ```c
 (1)     crand_rng32_t           crand_rng32_init(uint64_t seed);
 (2)     crand_rng32_t           crand_rng32_with_seq(uint64_t seed, uint64_t seq);
@@ -36,10 +35,8 @@ All cstr definitions and prototypes may be included in your C source file by inc
 (8)     crand_uniform_f32_t     crand_uniform_f32_init(float low, float high); /*  */
 (9)     float                   crand_uniform_f32(crand_rng32_t* rng, crand_uniform_f32_t* dist);
 ```
-(1-2) RNG engine initializers. (3) Integer random number generator with range \[0, 2^32). (5) Integer generator with range \[low, high].
+(1-2) PRNG 32-bit engine initializers. (3) Integer random number generator with range \[0, 2^32). (5) Integer generator with range \[low, high].
 (7) Unbiased version, see https://github.com/lemire/fastrange. (8) 32-bit float random number in range \[low, high), 23 bits resolution numbers.
-
-### Interface for 64-bits random number generators
 ```c
 (1)     crand_rng64_t           crand_rng64_with_seq(uint64_t seed, uint64_t seq);
 (2)     crand_rng64_t           crand_rng64_init(uint64_t seed);
@@ -52,18 +49,16 @@ All cstr definitions and prototypes may be included in your C source file by inc
 (9)     crand_normal_f64_t      crand_normal_f64_init(double mean, double stddev);
 (10)    double                  crand_normal_f64(crand_rng64_t* rng, crand_normal_f64_t* dist);
 ```
-(1-2) RNG engine initializers. (3) Integer generator, range \[0, 2^64),
-(4) Double random number in range \[low, high), 52 bit resolution. (5-8) Initializers and generators of uniform random numbers.
-Integer generator has range \[low, high]. (9-10) Initializer and generator for normal distributed random numbers.
-(9-10) Initializer and generator for normal-distributed random numbers.
+(1-2) PRNG 64-bit engine initializers. (3) Integer generator, range \[0, 2^64),
+(4) 64-bit float random numbers, 52 bit resolution. (5-8) Initializers and generators of uniform random numbers. (5) has range \[low, high].
+(7) has range \[low, high). (9-10) Initializer and generator for normal-distributed random numbers.
 
 The method `crand_i64(crand_rng64_t* rng)` is an extremely fast PRNG suited for parallel usage, featuring
 a Weyl-sequence as part of the state. It is faster than *sfc64*, *wyhash64*, *pcg*, and the *xoroshiro*
-families of RPNGs. It does not require fast multiplication or 128-bit integer operations as it uses only
-shift, xor and addition. The state is 256-bits, but updates only 192 bit per generated number, as the
-last 64 bit holds the Weyl increment. Therefore, it can create 2^63 unique threads with minimum period
-length of 2^64 (expected period length 2^128) per thread. There is no *jump function*, but incrementing
-the Weyl increment by 2, achieves the same goal. Tested with *PractRand* up to 8TB output without issues.
+families of RPNGs. It does not require fast multiplication or 128-bit integer operations. The state is
+256-bits, but updates only 192 bit per generated number. It can create 2^63 unique threads with minimum period
+length of 2^64 per thread (expected period lengths 2^127). There is no *jump function*, but incrementing
+the Weyl-increment by 2, achieves the same goal. Passes *PractRand*, tested up to 8TB output.
 
 ## Example
 ```c
