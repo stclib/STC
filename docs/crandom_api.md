@@ -36,8 +36,8 @@ All cstr definitions and prototypes may be included in your C source file by inc
  9)     float                   crand_uniform_f32(crand_rng32_t* rng, crand_uniform_f32_t* dist);
 ```
 `1-2)` PRNG 32-bit engine initializers. `3)` Integer RNG with range \[0, 2^32). `4)` Float RNG with range \[0, 1). 
-`5-6)` Uniform integer RNG with range \[`low`, `high`]. `7)` Unbiased version, see https://github.com/lemire/fastrange.
-`8-9)` Uniform float RNG with range \[`low`, `high`).
+`5-6)` Uniform integer RNG with range \[*low*, *high*]. `7)` Unbiased version, see https://github.com/lemire/fastrange.
+`8-9)` Uniform float RNG with range \[*low*, *high*).
 ```c
  1)     crand_rng64_t           crand_rng64_with_seq(uint64_t seed, uint64_t seq);
  2)     crand_rng64_t           crand_rng64_init(uint64_t seed);
@@ -51,8 +51,8 @@ All cstr definitions and prototypes may be included in your C source file by inc
 10)     double                  crand_normal_f64(crand_rng64_t* rng, crand_normal_f64_t* dist);
 ```
 `1-2)` PRNG 64-bit engine initializers. `3)` Integer generator, range \[0, 2^64). `4)` Double RNG with range \[0, 1).
-`5-6)` Uniform integer RNG with range \[`low`, `high`]. `7-8)` Uniform double RNG with range \[`low`, `high`).
-`9-10)` Normal-distributed double RNG with range [`mean`-`stddev`, `mean`+`stddev`].
+`5-6)` Uniform integer RNG with range \[*low*, *high*]. `7-8)` Uniform double RNG with range \[*low*, *high*).
+`9-10)` Normal-distributed double RNG with range [*mean*-*stddev*, *mean*+*stddev*].
 
 The method `crand_i64(crand_rng64_t* rng)` is an extremely fast PRNG suited for parallel usage, featuring
 a Weyl-sequence as part of the state. It is faster than *sfc64*, *wyhash64*, *pcg*, and the *xoroshiro*

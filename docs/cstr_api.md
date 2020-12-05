@@ -36,9 +36,9 @@ All cstr definitions and prototypes may be included in your C source file by inc
  7)     cstr_t       cstr_clone(cstr_t s);
  8)     void         cstr_del(cstr_t *self);
 ```
-`1)` Create an empty string, `2)` with capacity. `3)` Create a string by repeating `fill` character `len` times.
-`4)` Construct a string from `str`, and `5)` limit the length by `len` and `strlen(str)`.
-`6)` Construct a string from the format specified by `fmt` and arguments, using `printf()` formatting.
+`1)` Create an empty string, `2)` with capacity. `3)` Create a string by repeating *fill* character *len* times.
+`4)` Construct a string from *str*, and `5)` limit the length by *len* and *strlen(str)*.
+`6)` Construct a string from the format specified by *fmt* and arguments, using *printf()* formatting.
 `7)` Construct a new string by cloning another string. `8)` Free the allocated memory used by string.
 ```c
         size_t       cstr_size(cstr_t s);
@@ -58,8 +58,8 @@ These returns properties of a string. `5-6)` returns reference, ie. pointer to t
  6)     cstr_t*      cstr_take(cstr_t* self, cstr_t s);
  7)     cstr_t       cstr_move(cstr_t* self);
 ```
-`1-3)` Reserve, resize, clear string. `4)` Assign `str` to string, `5)` assign substring `str` limited by
-`len` and `strlen(str)`. `6)` Take the constructed or moved string `s`, i.e., no allocation takes place.
+`1-3)` Reserve, resize, clear string. `4)` Assign *str* to string. `5)` assign substring *str* limited by
+*len* and *strlen(str)*. `6)` Take the constructed or moved string *s*, i.e., no allocation takes place.
 `7)` Explicitly move string to the caller of the method; string becomes empty after move.
 ```c
  1)     cstr_t*      cstr_append(cstr_t* self, const char* str);
@@ -72,10 +72,10 @@ These returns properties of a string. `5-6)` returns reference, ie. pointer to t
  8)     void         cstr_replace(cstr_t* self, size_t pos, size_t len, const char* str);
  9)     void         cstr_replace_n(cstr_t* self, size_t pos, size_t len, const char* str, size_t n);
 ```
-`1)` Append `str` to string. `2)` Append substring `str` limited by `len`. `3)`, Append character `ch`.
-`4)` Erase last character. `5)` Insert string at a positions, `6)` string limited by n characters.
-`7)` Erase n characters at position pos. `8)` Replace len characters at position pos with str,
-`9)` replacement str limited by n characters.
+`1)` Append *str* to string. `2)` Append substring *str* limited by *len*. `3)` Append character *ch*.
+`4)` Erase last character. `5)` Insert string at a position *pos*. `6)` string limited by n characters.
+`7)` Erase *n* characters at position *pos*. `8)` Replace *len* characters at position *pos* with *str*.
+`9)` Replace with *str* limited by *n* characters.
 ```c
         int          cstr_compare(const cstr_t *s1, const cstr_t *s2);
         bool         cstr_equals(cstr_t s, const char* str);
@@ -91,19 +91,19 @@ These returns properties of a string. `5-6)` returns reference, ie. pointer to t
         bool         cstr_ends_with(cstr_t s, const char* substr);
         bool         cstr_iends_with(cstr_t s, const char* substr);
 ```
-Compare and search methods. Methods prefixed by `i` does case-insensitive compare/search.
+Compare and search methods. Methods prefixed by *i* does case-insensitive compare/search.
 ```c
         cstr_iter_t  cstr_begin(cstr_t* self);
         cstr_iter_t  cstr_end(cstr_t* self);
         void         cstr_next(cstr_iter_t* it);
         char*        cstr_itval(cstr_iter_t it);
 ```
-Iterator methods, typically used via the general `c_foreach` macro.
+Iterator methods, typically used via the general *c_foreach* macro.
 ```c
  1)     bool         cstr_getline(cstr_t *self, FILE *stream);
  2)     bool         cstr_getdelim(cstr_t *self, int delim, FILE *stream);
 ```
-`1-2)` Read a line of text from stream and store it in string. Line is separated by delim, which is '\n' in `1)`.
+`1-2)` Read a line of text from *stream* and store it in string. Line is separated by *delim*, which is *'\n'* in `1)`.
 ```c
         const char*  cstr_to_raw(const cstr_t* x);
         int          cstr_compare_raw(const char** x, const char** y);
