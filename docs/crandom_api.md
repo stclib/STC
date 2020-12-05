@@ -52,7 +52,7 @@ All cstr definitions and prototypes may be included in your C source file by inc
 ```
 `1-2)` PRNG 64-bit engine initializers. `3)` Integer generator, range \[0, 2^64). `4)` Double RNG with range \[0, 1).
 `5-6)` Uniform integer RNG with range \[*low*, *high*]. `7-8)` Uniform double RNG with range \[*low*, *high*).
-`9-10)` Normal-distributed double RNG with range [*mean*-*stddev*, *mean*+*stddev*].
+`9-10)` Normal-distributed double RNG were 99.7% of the values are within the range [*mean*-*stddev\*3*, *mean*+*stddev\*3*].
 
 The method `crand_i64(crand_rng64_t* rng)` is an extremely fast PRNG suited for parallel usage, featuring
 a Weyl-sequence as part of the state. It is faster than *sfc64*, *wyhash64*, *pcg*, and the *xoroshiro*
