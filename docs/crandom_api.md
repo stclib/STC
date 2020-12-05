@@ -25,33 +25,34 @@ All cstr definitions and prototypes may be included in your C source file by inc
 ## Methods
 
 ```c
-(1)     crand_rng32_t           crand_rng32_init(uint64_t seed);
-(2)     crand_rng32_t           crand_rng32_with_seq(uint64_t seed, uint64_t seq);
-(3)     uint32_t                crand_i32(crand_rng32_t* rng);
-(4)     float                   crand_f32(crand_rng32_t* rng);
-(5)     crand_uniform_i32_t     crand_uniform_i32_init(int32_t low, int32_t high);
-(6)     int32_t                 crand_uniform_i32(crand_rng32_t* rng, crand_uniform_i32_t* dist);
-(7)     uint32_t                crand_unbiased_i32(crand_rng32_t* rng, crand_uniform_i32_t* dist);
-(8)     crand_uniform_f32_t     crand_uniform_f32_init(float low, float high); /*  */
-(9)     float                   crand_uniform_f32(crand_rng32_t* rng, crand_uniform_f32_t* dist);
+ 1)     crand_rng32_t           crand_rng32_init(uint64_t seed);
+ 2)     crand_rng32_t           crand_rng32_with_seq(uint64_t seed, uint64_t seq);
+ 3)     uint32_t                crand_i32(crand_rng32_t* rng);
+ 4)     float                   crand_f32(crand_rng32_t* rng);
+ 5)     crand_uniform_i32_t     crand_uniform_i32_init(int32_t low, int32_t high);
+ 6)     int32_t                 crand_uniform_i32(crand_rng32_t* rng, crand_uniform_i32_t* dist);
+ 7)     uint32_t                crand_unbiased_i32(crand_rng32_t* rng, crand_uniform_i32_t* dist);
+ 8)     crand_uniform_f32_t     crand_uniform_f32_init(float low, float high); /*  */
+ 9)     float                   crand_uniform_f32(crand_rng32_t* rng, crand_uniform_f32_t* dist);
 ```
-(1-2) PRNG 32-bit engine initializers. (3) Integer random number generator with range \[0, 2^32). (5) Integer generator with range \[low, high].
-(7) Unbiased version, see https://github.com/lemire/fastrange. (8) 32-bit float random number in range \[low, high), 23 bits resolution numbers.
+`1-2)` PRNG 32-bit engine initializers. `3)` Integer RNG with range \[0, 2^32). `4)` Float RNG with range \[0, 1). 
+`5-6)` Uniform integer RNG with range \[`low`, `high`]. `7)` Unbiased version, see https://github.com/lemire/fastrange.
+`8-9)` Uniform float RNG with range \[`low`, `high`).
 ```c
-(1)     crand_rng64_t           crand_rng64_with_seq(uint64_t seed, uint64_t seq);
-(2)     crand_rng64_t           crand_rng64_init(uint64_t seed);
-(3)     uint64_t                crand_i64(crand_rng64_t* rng);
-(4)     double                  crand_f64(crand_rng64_t* rng);
-(5)     crand_uniform_i64_t     crand_uniform_i64_init(int64_t low, int64_t high);
-(6)     int64_t                 crand_uniform_i64(crand_rng64_t* rng, crand_uniform_i64_t* dist);
-(7)     crand_uniform_f64_t     crand_uniform_f64_init(double low, double high);
-(8)     double                  crand_uniform_f64(crand_rng64_t* rng, crand_uniform_f64_t* dist);
-(9)     crand_normal_f64_t      crand_normal_f64_init(double mean, double stddev);
-(10)    double                  crand_normal_f64(crand_rng64_t* rng, crand_normal_f64_t* dist);
+ 1)     crand_rng64_t           crand_rng64_with_seq(uint64_t seed, uint64_t seq);
+ 2)     crand_rng64_t           crand_rng64_init(uint64_t seed);
+ 3)     uint64_t                crand_i64(crand_rng64_t* rng);
+ 4)     double                  crand_f64(crand_rng64_t* rng);
+ 5)     crand_uniform_i64_t     crand_uniform_i64_init(int64_t low, int64_t high);
+ 6)     int64_t                 crand_uniform_i64(crand_rng64_t* rng, crand_uniform_i64_t* dist);
+ 7)     crand_uniform_f64_t     crand_uniform_f64_init(double low, double high);
+ 8)     double                  crand_uniform_f64(crand_rng64_t* rng, crand_uniform_f64_t* dist);
+ 9)     crand_normal_f64_t      crand_normal_f64_init(double mean, double stddev);
+10)     double                  crand_normal_f64(crand_rng64_t* rng, crand_normal_f64_t* dist);
 ```
-(1-2) PRNG 64-bit engine initializers. (3) Integer generator, range \[0, 2^64),
-(4) 64-bit float random numbers, 52 bit resolution. (5-8) Initializers and generators of uniform random numbers. (5) has range \[low, high].
-(7) has range \[low, high). (9-10) Initializer and generator for normal-distributed random numbers.
+`1-2)` PRNG 64-bit engine initializers. `3)` Integer generator, range \[0, 2^64). `4)` Double RNG with range \[0, 1).
+`5-6)` Uniform integer RNG with range \[`low`, `high`]. `7-8)` Uniform double RNG with range \[`low`, `high`).
+`9-10)` Normal-distributed double RNG with range [`mean`-`stddev`, `mean`+`stddev`].
 
 The method `crand_i64(crand_rng64_t* rng)` is an extremely fast PRNG suited for parallel usage, featuring
 a Weyl-sequence as part of the state. It is faster than *sfc64*, *wyhash64*, *pcg*, and the *xoroshiro*

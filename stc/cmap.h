@@ -80,7 +80,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     using_cmap_4(X, Key, Mapped, c_default_del)
 
 #define using_cmap_4(X, Key, Mapped, valueDestroy) \
-    using_cmap_6(X, Key, Mapped, valueDestroy, c_default_equals, c_default_hash16)
+    using_cmap_6(X, Key, Mapped, valueDestroy, c_default_equals, c_default_hash)
 
 #define using_cmap_6(X, Key, Mapped, valueDestroy, keyEquals, keyHash) \
     using_cmap_10(X, Key, Mapped, valueDestroy, keyEquals, keyHash, \
@@ -101,7 +101,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     c_MACRO_OVERLOAD(using_cset, __VA_ARGS__)
 
 #define using_cset_2(X, Key) \
-    using_cset_4(X, Key, c_default_equals, c_default_hash16)
+    using_cset_4(X, Key, c_default_equals, c_default_hash)
 
 #define using_cset_4(X, Key, keyEquals, keyHash) \
     using_cset_5(X, Key, keyEquals, keyHash, c_default_del)
@@ -136,7 +136,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     c_MACRO_OVERLOAD(using_cmap_strval, __VA_ARGS__)
 
 #define using_cmap_strval_2(X, Key) \
-    using_cmap_strval_4(X, Key, c_default_equals, c_default_hash16)
+    using_cmap_strval_4(X, Key, c_default_equals, c_default_hash)
 
 #define using_cmap_strval_4(X, Key, keyEquals, keyHash) \
     using_cmap_strval_8(X, Key, keyEquals, keyHash, \
@@ -305,7 +305,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         ctype##_##X##_next(&pos); return pos; \
     } \
 \
-    STC_API uint32_t c_default_hash16(const void *data, size_t len); \
+    STC_API uint32_t c_default_hash(const void *data, size_t len); \
     STC_API uint32_t c_default_hash32(const void* data, size_t len); \
 \
     _c_implement_CHASH(X, ctype, Key, Mapped, valueDestroy, keyEqualsRaw, keyHashRaw, \
@@ -440,7 +440,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 
 /* https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/ */
 
-STC_DEF uint32_t c_default_hash16(const void *data, size_t len) {
+STC_DEF uint32_t c_default_hash(const void *data, size_t len) {
     const volatile uint16_t *key = (const uint16_t *) data;
     uint64_t x = *key++ * 11400714819323198485llu;
     while (len -= 2) x = (*key++ + x) * 11400714819323198485llu;

@@ -27,55 +27,55 @@ All cstr definitions and prototypes may be included in your C source file by inc
 ## Methods
 
 ```c
-(1)     cstr_t       cstr_init(void);
-(2)     cstr_t       cstr_with_capacity(size_t cap);
-(3)     cstr_t       cstr_with_size(size_t len, char fill);
-(4)     cstr_t       cstr_from(const char* str);
-(5)     cstr_t       cstr_from_n(const char* str, size_t len);
-(6)     cstr_t       cstr_from_fmt(const char* fmt, ...);
-(7)     cstr_t       cstr_clone(cstr_t s);
-(8)     void         cstr_del(cstr_t *self);
+ 1)     cstr_t       cstr_init(void);
+ 2)     cstr_t       cstr_with_capacity(size_t cap);
+ 3)     cstr_t       cstr_with_size(size_t len, char fill);
+ 4)     cstr_t       cstr_from(const char* str);
+ 5)     cstr_t       cstr_from_n(const char* str, size_t len);
+ 6)     cstr_t       cstr_from_fmt(const char* fmt, ...);
+ 7)     cstr_t       cstr_clone(cstr_t s);
+ 8)     void         cstr_del(cstr_t *self);
 ```
-(1) Create an empty string, (2) with capacity. (3) Create a string by repeating `fill` character `len` times.
-(4) Construct a string from `str`, and (5) limit the length by `len` and `strlen(str)`.
-(6) Construct a string from the format specified by `fmt` and arguments, using `printf()` formatting.
-(7) Construct a new string by cloning another string. (8) Free the allocated memory used by string.
+`1)` Create an empty string, `2)` with capacity. `3)` Create a string by repeating `fill` character `len` times.
+`4)` Construct a string from `str`, and `5)` limit the length by `len` and `strlen(str)`.
+`6)` Construct a string from the format specified by `fmt` and arguments, using `printf()` formatting.
+`7)` Construct a new string by cloning another string. `8)` Free the allocated memory used by string.
 ```c
         size_t       cstr_size(cstr_t s);
         size_t       cstr_length(cstr_t s);
         size_t       cstr_capacity(cstr_t s);
         bool         cstr_empty(cstr_t s);
-(5)     char*        cstr_front(cstr_t* self);
-(6)     char*        cstr_back(cstr_t* self);
+ 5)     char*        cstr_front(cstr_t* self);
+ 6)     char*        cstr_back(cstr_t* self);
 ```
-These returns properties of a string. (5-6) returns reference, ie. pointer to the char.
+These returns properties of a string. `5-6)` returns reference, ie. pointer to the char.
 ```c
-(1)     size_t       cstr_reserve(cstr_t* self, size_t capacity);
-(2)     void         cstr_resize(cstr_t* self, size_t len, char fill);
-(3)     void         cstr_clear(cstr_t* self);
-(4)     cstr_t*      cstr_assign(cstr_t* self, const char* str);
-(5)     cstr_t*      cstr_assign_n(cstr_t* self, const char* str, size_t len);
-(6)     cstr_t*      cstr_take(cstr_t* self, cstr_t s);
-(7)     cstr_t       cstr_move(cstr_t* self);
+ 1)     size_t       cstr_reserve(cstr_t* self, size_t capacity);
+ 2)     void         cstr_resize(cstr_t* self, size_t len, char fill);
+ 3)     void         cstr_clear(cstr_t* self);
+ 4)     cstr_t*      cstr_assign(cstr_t* self, const char* str);
+ 5)     cstr_t*      cstr_assign_n(cstr_t* self, const char* str, size_t len);
+ 6)     cstr_t*      cstr_take(cstr_t* self, cstr_t s);
+ 7)     cstr_t       cstr_move(cstr_t* self);
 ```
-(1-3) Reserve, resize, clear string. (4) Assign `str` to string, (5) assign substring `str` limited by
-`len` and `strlen(str)`. (6) Take the constructed or moved string `s`, i.e., no allocation takes place.
-(7) Explicitly move string to the caller of the method; string becomes empty after move.
+`1-3)` Reserve, resize, clear string. `4)` Assign `str` to string, `5)` assign substring `str` limited by
+`len` and `strlen(str)`. `6)` Take the constructed or moved string `s`, i.e., no allocation takes place.
+`7)` Explicitly move string to the caller of the method; string becomes empty after move.
 ```c
-(1)     cstr_t*      cstr_append(cstr_t* self, const char* str);
-(2)     cstr_t*      cstr_append_n(cstr_t* self, const char* str, size_t len);
-(3)     cstr_t*      cstr_push_back(cstr_t* self, char ch);
-(4)     void         cstr_pop_back(cstr_t* self);
-(5)     void         cstr_insert(cstr_t* self, size_t pos, const char* str);
-(6)     void         cstr_insert_n(cstr_t* self, size_t pos, const char* str, size_t n);
-(7)     void         cstr_erase(cstr_t* self, size_t pos, size_t n);
-(8)     void         cstr_replace(cstr_t* self, size_t pos, size_t len, const char* str);
-(9)     void         cstr_replace_n(cstr_t* self, size_t pos, size_t len, const char* str, size_t n);
+ 1)     cstr_t*      cstr_append(cstr_t* self, const char* str);
+ 2)     cstr_t*      cstr_append_n(cstr_t* self, const char* str, size_t len);
+ 3)     cstr_t*      cstr_push_back(cstr_t* self, char ch);
+ 4)     void         cstr_pop_back(cstr_t* self);
+ 5)     void         cstr_insert(cstr_t* self, size_t pos, const char* str);
+ 6)     void         cstr_insert_n(cstr_t* self, size_t pos, const char* str, size_t n);
+ 7)     void         cstr_erase(cstr_t* self, size_t pos, size_t n);
+ 8)     void         cstr_replace(cstr_t* self, size_t pos, size_t len, const char* str);
+ 9)     void         cstr_replace_n(cstr_t* self, size_t pos, size_t len, const char* str, size_t n);
 ```
-(1) Append `str` to stirng. (2) Append substring `str` limited by `len`. (3), Append character `ch`.
-(4) Erase last character. (5) Insert string at a positions, (6) string limited by n characters.
-(7) Erase n characters at position pos. (8) Replace len characters at position pos with str,
-(9) replacement str limited by n characters.
+`1)` Append `str` to string. `2)` Append substring `str` limited by `len`. `3)`, Append character `ch`.
+`4)` Erase last character. `5)` Insert string at a positions, `6)` string limited by n characters.
+`7)` Erase n characters at position pos. `8)` Replace len characters at position pos with str,
+`9)` replacement str limited by n characters.
 ```c
         int          cstr_compare(const cstr_t *s1, const cstr_t *s2);
         bool         cstr_equals(cstr_t s, const char* str);
@@ -91,19 +91,19 @@ These returns properties of a string. (5-6) returns reference, ie. pointer to th
         bool         cstr_ends_with(cstr_t s, const char* substr);
         bool         cstr_iends_with(cstr_t s, const char* substr);
 ```
-Methods prefixed by i does case-insensitive search.
+Compare and search methods. Methods prefixed by `i` does case-insensitive compare/search.
 ```c
         cstr_iter_t  cstr_begin(cstr_t* self);
         cstr_iter_t  cstr_end(cstr_t* self);
         void         cstr_next(cstr_iter_t* it);
         char*        cstr_itval(cstr_iter_t it);
 ```
-Iterator methods, typically used via the general macro `c_foreach`.
+Iterator methods, typically used via the general `c_foreach` macro.
 ```c
-(1)     bool         cstr_getline(cstr_t *self, FILE *stream);
-(2)     bool         cstr_getdelim(cstr_t *self, int delim, FILE *stream);
+ 1)     bool         cstr_getline(cstr_t *self, FILE *stream);
+ 2)     bool         cstr_getdelim(cstr_t *self, int delim, FILE *stream);
 ```
-Reads a line of text from stream and stores it in string. Line is separated by delim, which is '\n' in (1).
+`1-2)` Read a line of text from stream and store it in string. Line is separated by delim, which is '\n' in `1)`.
 ```c
         const char*  cstr_to_raw(const cstr_t* x);
         int          cstr_compare_raw(const char** x, const char** y);

@@ -9,7 +9,7 @@ Same base implementation as cmap, but contains and uses keys only.
 #define using_cset_str()
 
 #define using_cset(X, Key, keyEqualsRaw=c_default_equals,
-                           keyHashRaw=c_default_hash16,
+                           keyHashRaw=c_default_hash,
                            keyDestroy=c_default_del,
                            RawKey=Key,
                            keyToRaw=c_default_to_raw,
@@ -88,7 +88,7 @@ cset_X_value_t*     cset_X_itval(cset_X_iter_t it);
 
 cset_bucket_t       cset_X_bucket(const cset_X* self, const cset_X_rawkey_t* rkeyPtr);
 
-uint32_t            c_default_hash16(const void *data, size_t len);
+uint32_t            c_default_hash(const void *data, size_t len);
 uint32_t            c_default_hash32(const void* data, size_t len);
 ```
 

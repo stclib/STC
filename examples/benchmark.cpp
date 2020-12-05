@@ -21,7 +21,7 @@ static inline uint32_t fibonacci_hash(const void* data, size_t len) {
 }
 
 // cmap and khash template expansion
-using_cmap(ii, int64_t, int64_t, c_default_del, c_default_equals, fibonacci_hash); // c_default_hash16);
+using_cmap(ii, int64_t, int64_t, c_default_del, c_default_equals, fibonacci_hash); // c_default_hash);
 KHASH_MAP_INIT_INT64(ii, int64_t)
 
 

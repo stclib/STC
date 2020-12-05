@@ -7,7 +7,7 @@ Elements are pairs of keys and mapped values. Implemented as open hashing withou
 ```c
 #define using_cmap(X, Key, Mapped, mappedDestroy=c_default_del,
                                    keyEqualsRaw=c_default_equals,
-                                   keyHashRaw=c_default_hash16,
+                                   keyHashRaw=c_default_hash,
                                    keyDestroy=c_default_del,
                                    RawKey=Key,
                                    keyToRaw=c_default_to_raw,
@@ -18,7 +18,7 @@ Elements are pairs of keys and mapped values. Implemented as open hashing withou
 #define using_cmap_strkey(X, Mapped, mappedDestroy=c_default_del)
 
 #define using_cmap_strval(X, Key, keyEquals=c_default_equals,
-                                  keyHash=c_default_hash16,
+                                  keyHash=c_default_hash,
                                   keyDestroy=c_default_del,
                                   RawKey=Key,
                                   keyToRaw=c_default_to_raw,
@@ -29,6 +29,8 @@ The macro `using_cmap()` can be instantiated with 3, 4, 6, 10, or 12 arguments i
 Default values are given above for args not specified. `X` is a type tag name and
 will affect the names of all cmap types and methods. E.g. declaring `using_cmap(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.
+
+`c_default_hash` requires Key to be 16-bit aligned, and size to be a multiple of 16. There is also a `c_default_hash32` which is slightly faster.
 
 `using_cmap_strkey()` and `using_cmap_strval()` are special macros defined by
 `using_cmap()`. The macro `using_cmap_str()` is a shorthand for
@@ -108,7 +110,7 @@ void                cmap_X_next(cmap_X_iter_t* it);
 cmap_X_mapped_t*    cmap_X_itval(cmap_X_iter_t it);
 
 cmap_bucket_t       cmap_X_bucket(const cmap_X* self, const cmap_X_rawkey_t* rkeyPtr);
-uint32_t            c_default_hash16(const void *data, size_t len);
+uint32_t            c_default_hash(const void *data, size_t len);
 uint32_t            c_default_hash32(const void* data, size_t len);
 ```
 
