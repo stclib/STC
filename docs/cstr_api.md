@@ -68,7 +68,7 @@ These returns properties of a string. `5-6)` returns reference, ie. pointer to t
  4)     void         cstr_pop_back(cstr_t* self);
  5)     void         cstr_insert(cstr_t* self, size_t pos, const char* str);
  6)     void         cstr_insert_n(cstr_t* self, size_t pos, const char* str, size_t n);
- 7)     void         cstr_erase(cstr_t* self, size_t pos, size_t n);
+ 7)     void         cstr_erase_n(cstr_t* self, size_t pos, size_t n);
  8)     void         cstr_replace(cstr_t* self, size_t pos, size_t len, const char* str);
  9)     void         cstr_replace_n(cstr_t* self, size_t pos, size_t len, const char* str, size_t n);
 ```

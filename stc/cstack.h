@@ -53,12 +53,14 @@
     typedef ctype##_input_t cstack_##X##_input_t; \
     STC_INLINE cstack_##X \
     cstack_##X##_init(void) {return ctype##_init();} \
+    STC_INLINE cstack_##X \
+    cstack_##X##_clone(cstack_##X st) {return ctype##_clone(st);} \
     STC_INLINE void \
     cstack_##X##_del(cstack_##X* self) {ctype##_del(self);} \
     STC_INLINE size_t \
-    cstack_##X##_size(cstack_##X pq) {return ctype##_size(pq);} \
+    cstack_##X##_size(cstack_##X st) {return ctype##_size(st);} \
     STC_INLINE bool \
-    cstack_##X##_empty(cstack_##X pq) {return ctype##_empty(pq);} \
+    cstack_##X##_empty(cstack_##X st) {return ctype##_empty(st);} \
     STC_INLINE cstack_##X##_value_t* \
     cstack_##X##_top(cstack_##X* self) {return ctype##_back(self);} \
     STC_INLINE void \

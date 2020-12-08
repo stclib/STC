@@ -64,12 +64,14 @@
     typedef ctype##_input_t cqueue_##X##_input_t; \
     STC_INLINE cqueue_##X \
     cqueue_##X##_init(void) {return ctype##_init();} \
+    STC_INLINE cqueue_##X \
+    cqueue_##X##_clone(cqueue_##X q) {return ctype##_clone(q);} \
     STC_INLINE void \
     cqueue_##X##_del(cqueue_##X* self) {ctype##_del(self);} \
     STC_INLINE size_t \
-    cqueue_##X##_size(cqueue_##X pq) {return ctype##_size(pq);} \
+    cqueue_##X##_size(cqueue_##X q) {return ctype##_size(q);} \
     STC_INLINE bool \
-    cqueue_##X##_empty(cqueue_##X pq) {return ctype##_empty(pq);} \
+    cqueue_##X##_empty(cqueue_##X q) {return ctype##_empty(q);} \
     STC_INLINE cqueue_##X##_value_t* \
     cqueue_##X##_front(cqueue_##X* self) {return ctype##_front(self);} \
     STC_INLINE cqueue_##X##_value_t* \

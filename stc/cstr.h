@@ -56,7 +56,7 @@ cstr_append_n(cstr_t* self, const char* str, size_t len);
 STC_API void
 cstr_replace_n(cstr_t* self, size_t pos, size_t len, const char* str, size_t n);
 STC_API void
-cstr_erase_at(cstr_t* self, size_t pos, size_t n);
+cstr_erase_n(cstr_t* self, size_t pos, size_t n);
 STC_API bool
 cstr_getdelim(cstr_t *self, int delim, FILE *stream);
 STC_API size_t
@@ -370,7 +370,7 @@ cstr_replace_n(cstr_t* self, size_t pos, size_t len, const char* str, size_t n) 
 }
 
 STC_DEF void
-cstr_erase_at(cstr_t* self, size_t pos, size_t n) {
+cstr_erase_n(cstr_t* self, size_t pos, size_t n) {
     size_t len = cstr_size(*self);
     if (len) {
         memmove(&self->str[pos], &self->str[pos + n], len - (pos + n));

@@ -139,7 +139,7 @@
         return cvec_##X##_erase_range_p(self, pos.val, pos.val + 1); \
     } \
     STC_INLINE cvec_##X##_iter_t \
-    cvec_##X##_erase_at(cvec_##X* self, size_t idx, size_t n) { \
+    cvec_##X##_erase_n(cvec_##X* self, size_t idx, size_t n) { \
         return cvec_##X##_erase_range_p(self, self->data + idx, self->data + idx + n); \
     } \
 \
