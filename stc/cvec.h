@@ -241,10 +241,7 @@
     cvec_##X##_clone(cvec_##X vec) { \
         size_t len = cvec_size(vec); \
         cvec_##X out = cvec_##X##_with_capacity(len); \
-        _cvec_size(&out) = len; \
-        const cvec_##X##_value_t* p = vec.data; \
-        for (size_t i=0; i<len; ++i) \
-            out.data[i] = valueFromRaw(valueToRaw(p++)); \
+        cvec_##X##_insert_range_p(&out, out.data, vec.data, vec.data + len); \
         return out; \
     } \
 \
