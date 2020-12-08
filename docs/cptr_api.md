@@ -84,10 +84,9 @@ using_cmap(ps, int, csptr_ps, csptr_ps_del);
 
 int main() {
     cmap_ps map = cmap_inits;
-    c_forrange (i, 20)
-        c_try_emplace(&map, cmap_ps, (i * 7) % 10,
-                            csptr_ps_from(Person_from(c_new(Person), cstr_from_fmt("Name %d", (i * 7) % 10),
-                                                                     cstr_from_fmt("Last %d", (i * 9) % 10))));
+    cmap_ps_emplace(&map, 1990, csptr_ps_from(Person_from(c_new(Person), cstr_from("Joe"), cstr_from("Average"));
+    cmap_ps_emplace(&map, 1985, csptr_ps_from(Person_from(c_new(Person), cstr_from("John"), cstr_from("Smith"));
+    
     c_foreach (i, cmap_ps, map)
         printf(" %d: %s\n", i.val->first, i.val->second.get->name.str);
     cmap_ps_del(&map);
