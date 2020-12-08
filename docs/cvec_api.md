@@ -55,6 +55,7 @@ All cvec definitions and prototypes may be included in your C source file by inc
 cvec_X              cvec_X_init(void);
 cvec_X              cvec_X_with_size(size_t size, Value fill);
 cvec_X              cvec_X_with_capacity(size_t size);
+cvec_X              cvec_X_clone(cvec_X vec);
 
 void                cvec_X_clear(cvec_X* self);
 void                cvec_X_reserve(cvec_X* self, size_t cap);

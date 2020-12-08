@@ -51,6 +51,7 @@ All clist definitions and prototypes may be included in your C source file by in
 
 ```c
 clist_X             clist_X_init(void);
+clist_X             clist_X_clone(clist_X list);
 
 void                clist_X_clear(clist_X* self);
 void                clist_X_del(clist_X* self);
