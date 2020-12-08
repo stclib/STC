@@ -34,14 +34,15 @@ All cqueue definitions and prototypes may be included in your C source file by i
 
 ```c
 cqueue_X                cqueue_X_init(void);
+cqueue_X                cqueue_X_clone(cqueue_X q);
 void                    cqueue_X_del(cqueue_X* self);
 
-size_t                  cqueue_X_size(cqueue_X pq);
-bool                    cqueue_X_empty(cqueue_X pq);
+size_t                  cqueue_X_size(cqueue_X q);
+bool                    cqueue_X_empty(cqueue_X q);
 cqueue_X_value_t*       cqueue_X_front(cqueue_X* self);
 cqueue_X_value_t*       cqueue_X_back(cqueue_X* self);
 
-void                    cqueue_X_push_n(cqueue_X *self, const cqueue_X_input_t in[], size_t size);
+void                    cqueue_X_push_n(cqueue_X *self, const cqueue_X_input_t arr[], size_t size);
 void                    cqueue_X_emplace(cqueue_X* self, cqueue_X_rawvalue_t raw);
 void                    cqueue_X_push(cqueue_X* self, cqueue_X_value_t value);
 void                    cqueue_X_pop(cqueue_X* self);

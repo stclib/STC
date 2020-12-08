@@ -35,6 +35,7 @@ All cpqueue definitions and prototypes may be included in your C source file by 
 
 ```c
 cpqueue_X               cpqueue_X_init(void);
+cpqueue_X               cpqueue_X_clone(cpqueue_X pq);
 void                    cpqueue_X_make_heap(cpqueue_X* self);
 void                    cpqueue_X_del(cpqueue_X* self);
 

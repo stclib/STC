@@ -34,13 +34,14 @@ All cstack definitions and prototypes may be included in your C source file by i
 
 ```c
 cstack_X                cstack_X_init(void);
+cstack_X                cstack_X_clone(cstack_X st);
 void                    cstack_X_del(cstack_X* self);
 
-size_t                  cstack_X_size(cstack_X pq);
-bool                    cstack_X_empty(cstack_X pq);
+size_t                  cstack_X_size(cstack_X st);
+bool                    cstack_X_empty(cstack_X st);
 cstack_X_value_t*       cstack_X_top(cstack_X* self);
 
-void                    cstack_X_push_n(cstack_X *self, const cstack_X_input_t in[], size_t size);
+void                    cstack_X_push_n(cstack_X *self, const cstack_X_input_t arr[], size_t size);
 void                    cstack_X_emplace(cstack_X* self, cstack_X_rawvalue_t raw);
 void                    cstack_X_push(cstack_X* self, cstack_X_value_t value);
 void                    cstack_X_pop(cstack_X* self);

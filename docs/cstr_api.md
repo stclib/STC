@@ -64,7 +64,7 @@ These returns properties of a string. `5-6)` returns reference, ie. pointer to t
 ```c
  1)     cstr_t*      cstr_append(cstr_t* self, const char* str);
  2)     cstr_t*      cstr_append_n(cstr_t* self, const char* str, size_t len);
- 3)     cstr_t*      cstr_push_back(cstr_t* self, char ch);
+ 3)     void         cstr_push_back(cstr_t* self, char ch);
  4)     void         cstr_pop_back(cstr_t* self);
  5)     void         cstr_insert(cstr_t* self, size_t pos, const char* str);
  6)     void         cstr_insert_n(cstr_t* self, size_t pos, const char* str, size_t n);

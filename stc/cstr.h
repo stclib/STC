@@ -156,9 +156,9 @@ STC_INLINE cstr_t*
 cstr_append(cstr_t* self, const char* str) {
     return cstr_append_n(self, str, strlen(str));
 }
-STC_INLINE cstr_t*
+STC_INLINE void
 cstr_push_back(cstr_t* self, char value) {
-    return cstr_append_n(self, &value, 1);
+    cstr_append_n(self, &value, 1);
 }
 
 STC_INLINE void
