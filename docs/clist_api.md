@@ -58,7 +58,6 @@ void                clist_X_del(clist_X* self);
 
 bool                clist_X_empty(clist_X list);
 size_t              clist_X_size(clist_X list);
-Value               clist_X_value_from_raw(RawValue val);
 
 clist_X_value_t*    clist_X_front(clist_X* self);
 clist_X_value_t*    clist_X_back(clist_X* self);
@@ -95,6 +94,8 @@ clist_X_iter_t      clist_X_begin(const clist_X* self);
 clist_X_iter_t      clist_X_end(const clist_X* self);
 void                clist_X_next(clist_X_iter_t* it);
 clist_X_value_t*    clist_X_itval(clist_X_iter_t it);
+
+Value               clist_X_value_from_raw(RawValue val);
 ```
 
 ## Example

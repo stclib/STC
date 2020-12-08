@@ -67,7 +67,6 @@ void                cvec_X_del(cvec_X* self);
 bool                cvec_X_empty(cvec_X vec);
 size_t              cvec_X_size(cvec_X vec);
 size_t              cvec_X_capacity(cvec_X vec);
-Value               cvec_X_value_from_raw(RawValue val);
 
 cvec_X_value_t*     cvec_X_at(cvec_X* self, size_t idx);
 cvec_X_value_t*     cvec_X_front(cvec_X* self);
@@ -105,6 +104,8 @@ cvec_X_iter_t       cvec_X_end(const cvec_X* self);
 void                cvec_X_next(cvec_X_iter_t* it);
 cvec_X_value_t*     cvec_X_itval(cvec_X_iter_t it);
 size_t              cvec_X_index(const cvec_X vec, cvec_X_iter_t it);
+
+Value               cvec_X_value_from_raw(RawValue val);
 ```
 
 ## Examples
