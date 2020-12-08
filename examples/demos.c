@@ -14,7 +14,7 @@ void stringdemo1()
     cstr_insert(&cs, 3, "-two");
     printf("%s.\n", cs.str);
 
-    cstr_erase(&cs, 7, 5); // -nine
+    cstr_erase_at(&cs, 7, 5); // -nine
     printf("%s.\n", cs.str);
 
     cstr_replace(&cs, cstr_find(cs, "seven"), 5, "four");
@@ -41,14 +41,17 @@ void vectordemo1()
     printf("\nVECTORDEMO1\n");
     cvec_ix bignums = cvec_inits; // = (cvec_ix) cvec_inits; if initializing after declaration.
     cvec_ix_reserve(&bignums, 100);
-    for (size_t i = 0; i<=100; ++i)
-        cvec_ix_push_back(&bignums, i * i * i);
+    for (size_t i = 10; i <= 100; i += 10)
+        cvec_ix_push_back(&bignums, i * i);
 
-    printf("erase - %d: %zu\n", 100, bignums.data[100]);
-    cvec_ix_pop_back(&bignums); // erase the last
+    printf("erase - %d: %zu\n", 3, bignums.data[3]);
+    cvec_ix_erase_at(&bignums, 3, 1); // erase index 3
+
+    cvec_ix_pop_back(&bignums);      // erase the last
+    cvec_ix_erase_at(&bignums, 0, 1); // erase the first
 
     for (size_t i = 0; i < cvec_size(bignums); ++i) {
-        if (i >= 90) printf("%zu: %zu\n", i, bignums.data[i]);
+        printf("%zu: %zu\n", i, bignums.data[i]);
     }
     cvec_ix_del(&bignums);
 }

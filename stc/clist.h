@@ -118,6 +118,8 @@ STC_API size_t _clist_size(const clist_void* self);
 \
     STC_API void \
     clist_##X##_del(clist_##X* self); \
+    STC_API clist_##X \
+    clist_##X##_clone(clist_##X list); \
     STC_INLINE void \
     clist_##X##_clear(clist_##X* self) {clist_##X##_del(self);} \
 \
@@ -213,6 +215,13 @@ STC_API size_t _clist_size(const clist_void* self);
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define _c_implement_clist_7(X, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw) \
 \
+    STC_DEF clist_##X \
+    clist_##X##_clone(clist_##X list) { \
+        clist_##X out = clist_inits; \
+        c_foreach_3 (i, clist_##X, list) \
+            clist_##X##_emplace_back(&out, valueToRaw(i.val)); \
+        return out; \
+    } \
     STC_DEF void \
     clist_##X##_del(clist_##X* self) { \
         while (self->last) _clist_##X##_erase_after(self, self->last); \

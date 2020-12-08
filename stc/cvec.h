@@ -88,6 +88,8 @@
         return x; \
     } \
 \
+    STC_API cvec_##X \
+    cvec_##X##_clone(cvec_##X vec); \
     STC_API void \
     cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t in[], size_t size); \
     STC_API void \
@@ -137,12 +139,8 @@
         return cvec_##X##_erase_range_p(self, pos.val, pos.val + 1); \
     } \
     STC_INLINE cvec_##X##_iter_t \
-    cvec_##X##_erase_at(cvec_##X* self, size_t idx) { \
-        return cvec_##X##_erase_range_p(self, self->data + idx, self->data + idx + 1); \
-    } \
-    STC_INLINE cvec_##X##_iter_t \
-    cvec_##X##_erase_range_i(cvec_##X* self, size_t ifirst, size_t ifinish) { \
-        return cvec_##X##_erase_range_p(self, self->data + ifirst, self->data + ifinish); \
+    cvec_##X##_erase_at(cvec_##X* self, size_t idx, size_t n) { \
+        return cvec_##X##_erase_range_p(self, self->data + idx, self->data + idx + n); \
     } \
 \
     STC_API cvec_##X##_iter_t \
@@ -239,20 +237,29 @@
         self->data[_cvec_size(self)++] = value; \
     } \
 \
+    STC_DEF cvec_##X \
+    cvec_##X##_clone(cvec_##X vec) { \
+        size_t len = cvec_size(vec); \
+        cvec_##X out = cvec_##X##_with_capacity(len); \
+        _cvec_size(&out) = len; \
+        const cvec_##X##_value_t* p = vec.data; \
+        for (size_t i=0; i<len; ++i) \
+            out.data[i] = valueFromRaw(valueToRaw(p++)); \
+        return out; \
+    } \
+\
     STC_DEF cvec_##X##_iter_t \
     cvec_##X##_insert_range_p(cvec_##X* self, cvec_##X##_value_t* pos, const cvec_##X##_value_t* first, const cvec_##X##_value_t* finish) { \
         size_t len = finish - first, idx = pos - self->data, size = cvec_size(*self); \
-        c_withbuffer (buf, cvec_##X##_value_t, len) { \
-            for (size_t i=0; i<len; ++i, ++first) \
-                buf[i] = valueFromRaw(valueToRaw(first)); \
-            if (size + len > cvec_capacity(*self)) \
-                cvec_##X##_reserve(self, 4 + (size + len) * 3 / 2); \
-            pos = self->data + idx; \
-            memmove(pos + len, pos, (size - idx) * sizeof(Value)); \
-            memcpy(pos, buf, len * sizeof(Value)); \
-            _cvec_size(self) += len; \
-        } \
-        cvec_##X##_iter_t it = {pos}; return it; \
+        if (size + len > cvec_capacity(*self)) \
+            cvec_##X##_reserve(self, 4 + (size + len) * 3 / 2); \
+        _cvec_size(self) += len; \
+        pos = self->data + idx; \
+        cvec_##X##_iter_t it = {pos}; \
+        memmove(pos + len, pos, (size - idx) * sizeof(Value)); \
+        while (first != finish) \
+            *pos++ = valueFromRaw(valueToRaw(first++)); \
+        return it; \
     } \
 \
     STC_DEF cvec_##X##_iter_t \
