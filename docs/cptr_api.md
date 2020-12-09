@@ -2,7 +2,7 @@
 
 This describes the API of the type **cuptr** and the shared pointer type **csptr**. The **cuptr** is meant to be used like a c++ std::unique_ptr, while **csptr** is similar to c++ std::shared_ptr.
 
-The **cuptr** type is meant to be used as elements of containers, because the pointed to elements will automatically be deleted when the container is deleted. On its own, it offers little over regular pointers. **csptr** however, is useful when you want to track and delete the last usage of a pointer. **csptr** uses atomic usage counting, via the *csptr_X_share(sp)* and *csptr_X_del(&sp)* methods.
+The **cuptr** type can be used as elements of containers, so the pointed-to elements are automatically deleted when the container is deleted. On its own, it offers little over regular pointers. **csptr** however is useful for tracking and deleting the last usage of a pointer. **csptr** has thread-safe atomic use count, via the *csptr_X_share(sp)* and *csptr_X_del(&sp)* methods.
 
 ## Declaration
 
@@ -63,7 +63,7 @@ int                 csptr_pointer_compare(csptr_X_value_t* x, csptr_X_value_t* y
 ```
 
 ## Example
-This shows three maps with struct Person as the mapped type in different ways, map1 with Person value, map2 with bare pointer to Person, and map3 with a shared pointer to Person.
+This shows 3 maps with struct Person as the mapped type in different ways, map1 with Person value, map2 with cuptr to Person, and map3 with a csptr to Person. A 4th option would be to have raw pointers to Person as mapped values, which would not be deleted on map destruction. Should be used if the mapped values are owned by a different container.
 ```c
 #include <stc/cptr.h>
 #include <stc/cmap.h>
