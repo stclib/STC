@@ -1,8 +1,8 @@
-# Module cuptr: Smart Pointers
+# Module cptr: Smart Pointers
 
-This describes the API of the type **cuptr** and the shared pointer type **csptr**. The **cuptr** is meant to be used like a c++ std::unique_ptr, while **csptr** is similar to c++ std::shared_ptr.
+This describes the API of the type **cuptr** and the shared pointer type **csptr**. Type **cuptr** is meant to be used like a c++ std::unique_ptr, while **csptr** is similar to c++ std::shared_ptr.
 
-The **cuptr** type can be used as elements of containers, so the pointed-to elements are automatically deleted when the container is deleted. On its own, it offers little over regular pointers. **csptr** however is useful for tracking and deleting the last usage of a pointer. **csptr** has thread-safe atomic use count, via the *csptr_X_share(sp)* and *csptr_X_del(&sp)* methods.
+**cuptr** and **cuptr** objects can be used as items of containers. The pointed-to elements are automatically deleted when the container is deleted. **csptr** elements are only deleted if there are no other references to the element. **csptr** has thread-safe atomic use count, enabled by the *csptr_X_share(sp)* and *csptr_X_del(&sp)* methods.
 
 ## Declaration
 
@@ -50,7 +50,6 @@ void                cuptr_X_reset(cuptr_X* self, cuptr_X_value_t* ptr);
 
 int                 cuptr_X_compare(cuptr_X* x, cuptr_X* y);
 ```
-
 ```c
 csptr_X             csptr_X_from(csptr_X_value_t* ptr);
 csptr_X             csptr_X_make(csptr_X_value_t val);
@@ -63,75 +62,106 @@ int                 csptr_pointer_compare(csptr_X_value_t* x, csptr_X_value_t* y
 ```
 
 ## Example
-This shows 3 maps with struct Person as the mapped type in different ways, map1 with Person value, map2 with cuptr to Person, and map3 with a csptr to Person. A 4th option would be to have raw pointers to Person as mapped values, which would not be deleted on map destruction. Should be used if the mapped values are owned by a different container.
+This shows 3 cvecs with struct Person as value type in different ways. vec: Person, uvec: cuptr <Person>, and svec: csptr <Person>.
 ```c
 #include <stc/cptr.h>
-#include <stc/cmap.h>
 #include <stc/cstr.h>
-#include <stdio.h>
+#include <stc/cvec.h>
 
 typedef struct { cstr_t name, last; } Person;
 
-Person* Person_from(Person* p, cstr_t name, cstr_t last) {
-    p->name = name, p->last = last;
+Person* Person_make(Person* p, const char* name, const char* last) {
+    p->name = cstr_from(name), p->last = cstr_from(last);
     return p;
 }
 void Person_del(Person* p) {
-    printf("del: %s %s\n", p->name.str, p->last.str);
+    printf("del: %s\n", p->name.str);
     c_del(cstr, &p->name, &p->last);
 }
+int Person_compare(const Person* p, const Person* q) {
+    int cmp = strcmp(p->name.str, q->name.str);
+    return cmp == 0 ? strcmp(p->last.str, q->last.str) : cmp;
+}
 
-using_cmap(pv, int, Person, Person_del);           // mapped: Person
+using_cvec(pe, Person, Person_del, Person_compare);
 
-using_cuptr(pp, Person, Person_del, c_no_compare);
-using_cmap(pp, int, cuptr_pp, cuptr_pp_del);       // mapped: Person*
+using_cuptr(pu, Person, Person_del, Person_compare);
+using_cvec(pu, Person*, cuptr_pu_del, cuptr_pu_compare);
 
-using_csptr(ps, Person, Person_del, c_no_compare);
-using_cmap(ps, int, csptr_ps, csptr_ps_del);       // mapped: csptr<Person>
+using_csptr(ps, Person, Person_del, Person_compare);
+using_cvec(ps, csptr_ps, csptr_ps_del, csptr_ps_compare);
 
+
+const char* names[] = {
+    "Joe", "Jordan",
+    "Annie", "Aniston",
+    "Jane", "Jacobs"
+};
 
 int main() {
-    cmap_pv map1 = cmap_inits;  // mapped: Person
-    cmap_pv_put(&map1, 1990, (Person){cstr_from("Joe 1"), cstr_from("Average")});
-    cmap_pv_put(&map1, 1985, (Person){cstr_from("John 1"), cstr_from("Smith")});
-    c_foreach (i, cmap_pv, map1)
-        printf("   %d: %s\n", i.val->first, i.val->second.name.str);
-    cmap_pv_del(&map1);
+    Person tmp;
+    cvec_pe vec = cvec_inits;
+    for (int i=0;i<6; i+=2) cvec_pe_push_back(&vec, *Person_make(&tmp, names[i], names[i+1]));
+    puts("cvec of Person:");
+    cvec_pe_sort(&vec);
+    c_foreach (i, cvec_pe, vec)
+        printf("  %s %s\n", i.val->name.str, i.val->last.str);
 
-    cmap_pp map2 = cmap_inits;  // mapped: Person*
-    cmap_pp_put(&map2, 1990, Person_from(c_new(Person), cstr_from("Joe 2"), cstr_from("Average")));
-    cmap_pp_put(&map2, 1985, Person_from(c_new(Person), cstr_from("John 2"), cstr_from("Smith")));
-    c_foreach (i, cmap_pp, map2)
-        printf("   %d: %s\n", i.val->first, i.val->second->name.str);
-    cmap_pp_del(&map2); 
-    
-    cmap_ps map3 = cmap_inits;  // mapped: csptr<Person>
-    cmap_ps_put(&map3, 1990, csptr_ps_from(Person_from(c_new(Person), cstr_from("Joe 3"), cstr_from("Average"))));
-    cmap_ps_put(&map3, 1985, csptr_ps_from(Person_from(c_new(Person), cstr_from("John 3"), cstr_from("Smith"))));
+    cvec_pu uvec = cvec_inits;
+    for (int i=0;i<6; i+=2) cvec_pu_push_back(&uvec, Person_make(c_new(Person), names[i], names[i+1]));
+    puts("cvec of cuptr<Person>:");
+    cvec_pu_sort(&uvec);
+    c_foreach (i, cvec_pu, uvec)
+        printf("  %s %s\n", (*i.val)->name.str, (*i.val)->last.str);
 
-    csptr_ps x = csptr_ps_share(*cmap_ps_at(&map3, 1990)); // share an item in the map
+    cvec_ps svec = cvec_inits;
+    for (int i=0;i<6; i+=2) cvec_ps_push_back(&svec, csptr_ps_from(Person_make(c_new(Person), names[i], names[i+1])));
+    puts("cvec of csptr<Person>:");
+    cvec_ps_sort(&svec);
+    c_foreach (i, cvec_ps, svec)
+        printf("  %s %s\n", (*i.val).get->name.str, (*i.val).get->last.str);
     
-    c_foreach (i, cmap_ps, map3)
-        printf("   %d: %s\n", i.val->first, i.val->second.get->name.str);
-    cmap_ps_del(&map3); 
-    
-    printf("x: 1990: %s\n", x.get->name.str);
+    csptr_ps x = csptr_ps_share(svec.data[1]);
+
+    puts("\nDestroy svec:");
+    cvec_ps_del(&svec);
+    puts("\nDestroy pvec:");
+    cvec_pu_del(&uvec);
+    puts("\nDestroy vec:");
+    cvec_pe_del(&vec);
+    puts("\nDestroy x:");
     csptr_ps_del(&x);
 }
 ```
 Output:
 ```
-   1990: Joe 1
-   1985: John 1
-del: Joe 1 Average
-del: John 1 Smith
-   1990: Joe 2
-   1985: John 2
-del: Joe 2 Average
-del: John 2 Smith
-   1990: Joe 3
-   1985: John 3
-del: John 3 Smith
-x: 1990: Joe 3
-del: Joe 3 Average
+cvec of Person:
+  Annie Aniston
+  Jane Jacobs
+  Joe Jordan
+cvec of cuptr<Person>:
+  Annie Aniston
+  Jane Jacobs
+  Joe Jordan
+cvec of csptr<Person>:
+  Annie Aniston
+  Jane Jacobs
+  Joe Jordan
+
+Destroy svec:
+del: Annie
+del: Joe
+
+Destroy pvec:
+del: Annie
+del: Jane
+del: Joe
+
+Destroy vec:
+del: Annie
+del: Jane
+del: Joe
+
+Destroy x:
+del: Jane
 ```
