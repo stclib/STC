@@ -19,18 +19,17 @@ affect the names of all cuptr types and methods. E.g. declaring `using_cuptr(my,
 
  Types
 
-| Type name           | Type definition                        | Used to represent...     |
-|:--------------------|:---------------------------------------|:-------------------------|
-| `cuptr_X`           | Depends on underlying container type   | The cuptr type           |
-| `cuptr_X_value_t`   | "                                      | The cuptr element type   |
-| `cuptr_X_iter_t`    | "                                      | cuptr iterator           |
+| Type name           | Type definition        | Used to represent...     |
+|:--------------------|:-----------------------|:-------------------------|
+| `cuptr_X`           | `cuptr_X_value_t *`    | The cuptr type           |
+| `cuptr_X_value_t`   | `Value`                | The cuptr element type   |
 
 
-| Type name           | Type definition                        | Used to represent...     |
-|:--------------------|:---------------------------------------|:-------------------------|
-| `csptr_X`           | Depends on underlying container type   | The csptr type           |
-| `csptr_X_value_t`   | "                                      | The csptr element type   |
-| `csptr_X_iter_t`    | "                                      | csptr iterator           |
+| Type name           | Type definition                                               | Used to represent...     |
+|:--------------------|:--------------------------------------------------------------|:-------------------------|
+| `csptr_X`           | `struct { csptr_X_value_t* get; atomic_count_t* use_count; }` | The csptr type           |
+| `csptr_X_value_t`   | `Value`                                                       | The csptr element type   |
+| `atomic_count_t`    | `long`                                                        | The reference counter    |
 
 
 ## Header file
@@ -122,10 +121,6 @@ int main() {
 ```
 Output:
 ```
-cvec of Person:
-  Annie Aniston
-  Jane Jacobs
-  Joe Jordan
 cvec of cuptr<Person>:
   Annie Aniston
   Jane Jacobs
@@ -140,11 +135,6 @@ del: Annie
 del: Joe
 
 Destroy pvec:
-del: Annie
-del: Jane
-del: Joe
-
-Destroy vec:
 del: Annie
 del: Jane
 del: Joe
