@@ -18,33 +18,51 @@ int Person_compare(const Person* p, const Person* q) {
 }
 
 using_cvec(pe, Person, Person_del, Person_compare);
-using_cuptr(pe, Person, Person_del, Person_compare);
-using_cvec(pp, Person*, cuptr_pe_del, cuptr_pe_compare);
+
+using_cuptr(pu, Person, Person_del, Person_compare);
+using_cvec(pu, Person*, cuptr_pu_del, cuptr_pu_compare);
+
+using_csptr(ps, Person, Person_del, Person_compare);
+using_cvec(ps, csptr_ps, csptr_ps_del, csptr_ps_compare);
+
+
+const char* names[] = {
+    "Joe", "Jordan",
+    "Annie", "Aniston",
+    "Jane", "Jacobs"
+};
 
 int main() {
-    puts("Vec of Person *:");
-    cvec_pp pvec = cvec_pp_init();
-    cvec_pp_push_back(&pvec, Person_make(c_new(Person), "Joe", "Jordan"));
-    cvec_pp_push_back(&pvec, Person_make(c_new(Person), "Annie", "Aniston"));
-    cvec_pp_push_back(&pvec, Person_make(c_new(Person), "Jane", "Jacobs"));
-
-    cvec_pp_sort(&pvec);
-    c_foreach (i, cvec_pp, pvec)
-        printf("%s %s\n", (*i.val)->name.str, (*i.val)->last.str);
-
-    puts("\nVec of Person:");
-    cvec_pe vec = cvec_pe_init();
     Person tmp;
-    cvec_pe_push_back(&vec, *Person_make(&tmp, "Joe", "Jordan"));
-    cvec_pe_push_back(&vec, *Person_make(&tmp, "Annie", "Aniston"));
-    cvec_pe_push_back(&vec, *Person_make(&tmp, "Jane", "Jacobs"));
-
+    cvec_pe vec = cvec_inits;
+    for (int i=0;i<6; i+=2) cvec_pe_push_back(&vec, *Person_make(&tmp, names[i], names[i+1]));
+    puts("cvec of Person:");
     cvec_pe_sort(&vec);
     c_foreach (i, cvec_pe, vec)
-        printf("%s %s\n", i.val->name.str, i.val->last.str);
+        printf("  %s %s\n", i.val->name.str, i.val->last.str);
 
+    cvec_pu uvec = cvec_inits;
+    for (int i=0;i<6; i+=2) cvec_pu_push_back(&uvec, Person_make(c_new(Person), names[i], names[i+1]));
+    puts("cvec of cuptr<Person>:");
+    cvec_pu_sort(&uvec);
+    c_foreach (i, cvec_pu, uvec)
+        printf("  %s %s\n", (*i.val)->name.str, (*i.val)->last.str);
+
+    cvec_ps svec = cvec_inits;
+    for (int i=0;i<6; i+=2) cvec_ps_push_back(&svec, csptr_ps_from(Person_make(c_new(Person), names[i], names[i+1])));
+    puts("cvec of csptr<Person>:");
+    cvec_ps_sort(&svec);
+    c_foreach (i, cvec_ps, svec)
+        printf("  %s %s\n", (*i.val).get->name.str, (*i.val).get->last.str);
+    
+    csptr_ps x = csptr_ps_share(svec.data[1]);
+
+    puts("\nDestroy svec:");
+    cvec_ps_del(&svec);
     puts("\nDestroy pvec:");
-    cvec_pp_del(&pvec);
+    cvec_pu_del(&uvec);
     puts("\nDestroy vec:");
     cvec_pe_del(&vec);
+    puts("\nDestroy x:");
+    csptr_ps_del(&x);
 }
