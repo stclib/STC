@@ -1,27 +1,29 @@
-# Container cptr: Shared Ptr
+# Module cuptr: Smart Pointers
 
-This describes the API of the type **cptr** and the shared pointer type **csptr**. The **cptr** is a helper for pointers in containers, while **csptr** is similar to c++ std::shared_ptr.
+This describes the API of the type **cuptr** and the shared pointer type **csptr**. The **cuptr** is meant to be used like a c++ std::unique_ptr, while **csptr** is similar to c++ std::shared_ptr.
+
+The **cuptr** type is meant to be used as elements of containers, because the pointed to elements will automatically be deleted when the container is deleted. On its own, it offers little over regular pointers. **csptr** however, is useful when you want to track and delete the last usage of a pointer. **csptr** uses atomic usage counting, via the *csptr_X_share(sp)* and *csptr_X_del(&sp)* methods.
 
 ## Declaration
 
 ```c
-#define using_cptr(X, Value, valueDestroy=c_default_del,
-                             valueCompare=c_default_compare)
+#define using_cuptr(X, Value, valueDestroy=c_default_del,
+                              valueCompare=c_default_compare)
 
 #define using_csptr(X, Value, valueDestroy=c_default_del,
                               valueCompare=c_default_compare)
 ```
-The macro `using_cptr()` must be instantiated in the global scope. `X` is a type tag name and will
-affect the names of all cptr types and methods. E.g. declaring `using_cptr(my, cvec_my);`,
+The macro `using_cuptr()` must be instantiated in the global scope. `X` is a type tag name and will
+affect the names of all cuptr types and methods. E.g. declaring `using_cuptr(my, cvec_my);`,
 `X` should be replaced by `my` in all of the following documentation.
 
  Types
 
 | Type name           | Type definition                        | Used to represent...     |
 |:--------------------|:---------------------------------------|:-------------------------|
-| `cptr_X`            | Depends on underlying container type   | The cptr type            |
-| `cptr_X_value_t`    | "                                      | The cptr element type    |
-| `cptr_X_iter_t`     | "                                      | cptr iterator            |
+| `cuptr_X`           | Depends on underlying container type   | The cuptr type            |
+| `cuptr_X_value_t`   | "                                      | The cuptr element type    |
+| `cuptr_X_iter_t`    | "                                      | cuptr iterator            |
 
 
 | Type name           | Type definition                        | Used to represent...     |
@@ -42,11 +44,11 @@ All cptr definitions and prototypes may be included in your C source file by inc
 ## Methods
 
 ```c
-cptr_X              cptr_X_init(void);
-void                cptr_X_del(cptr_X* self);
-void                cptr_X_reset(cptr_X* self, cptr_X_value_t* ptr);
+cuptr_X             cuptr_X_init(void);
+void                cuptr_X_del(cuptr_X* self);
+void                cuptr_X_reset(cuptr_X* self, cuptr_X_value_t* ptr);
 
-int                 cptr_X_compare(cptr_X* x, cptr_X* y);
+int                 cuptr_X_compare(cuptr_X* x, cuptr_X* y);
 ```
 
 ```c
@@ -57,7 +59,7 @@ void                csptr_X_del(csptr_X* self);
 void                csptr_X_reset(csptr_X* self, csptr_X_value_t* p);
 
 int                 csptr_X_compare(csptr_X* x, csptr_X* y);
-int                 csptr_pointer_compare(cptr_X_value_t* x, cptr_X_value_t* y);
+int                 csptr_pointer_compare(csptr_X_value_t* x, csptr_X_value_t* y);
 ```
 
 ## Example
@@ -81,8 +83,8 @@ void Person_del(Person* p) {
 
 using_cmap(pv, int, Person, Person_del);           // mapped: Person
 
-using_cptr(pp, Person, Person_del, c_no_compare);
-using_cmap(pp, int, cptr_pp, cptr_pp_del);         // mapped: Person*
+using_cuptr(pp, Person, Person_del, c_no_compare);
+using_cmap(pp, int, cuptr_pp, cuptr_pp_del);       // mapped: Person*
 
 using_csptr(ps, Person, Person_del, c_no_compare);
 using_cmap(ps, int, csptr_ps, csptr_ps_del);       // mapped: csptr<Person>

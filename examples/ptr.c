@@ -18,8 +18,8 @@ int Person_compare(const Person* p, const Person* q) {
 }
 
 using_cvec(pe, Person, Person_del, Person_compare);
-using_cptr(pe, Person, Person_del, Person_compare);
-using_cvec(pp, Person*, cptr_pe_del, cptr_pe_compare);
+using_cuptr(pe, Person, Person_del, Person_compare);
+using_cvec(pp, Person*, cuptr_pe_del, cuptr_pe_compare);
 
 int main() {
     puts("Vec of Person *:");
