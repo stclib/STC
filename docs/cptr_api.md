@@ -1,6 +1,6 @@
 # Container cptr: Shared Ptr
 
-This describes the API of the type **cptr** and the shared pointer type **csptr**. The type **csptr** is a wrapper struct for 
+This describes the API of the type **cptr** and the shared pointer type **csptr**. The **cptr** is a helper for pointers in containers, while **csptr** is similar to c++ std::shared_ptr.
 
 ## Declaration
 
@@ -61,6 +61,7 @@ int                 csptr_pointer_compare(cptr_X_value_t* x, cptr_X_value_t* y);
 ```
 
 ## Example
+This shows three maps with struct Person as the mapped type in different ways, map1 with Person value, map2 with bare pointer to Person, and map3 with a shared pointer to Person.
 ```c
 #include <stc/cptr.h>
 #include <stc/cmap.h>
@@ -107,6 +108,7 @@ int main() {
     cmap_ps_put(&map3, 1985, csptr_ps_from(Person_from(c_new(Person), cstr_from("John 3"), cstr_from("Smith"))));
 
     csptr_ps x = csptr_ps_share(*cmap_ps_at(&map3, 1990)); // share an item in the map
+    
     c_foreach (i, cmap_ps, map3)
         printf("   %d: %s\n", i.val->first, i.val->second.get->name.str);
     cmap_ps_del(&map3); 
