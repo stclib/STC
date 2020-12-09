@@ -21,9 +21,9 @@ affect the names of all cuptr types and methods. E.g. declaring `using_cuptr(my,
 
 | Type name           | Type definition                        | Used to represent...     |
 |:--------------------|:---------------------------------------|:-------------------------|
-| `cuptr_X`           | Depends on underlying container type   | The cuptr type            |
-| `cuptr_X_value_t`   | "                                      | The cuptr element type    |
-| `cuptr_X_iter_t`    | "                                      | cuptr iterator            |
+| `cuptr_X`           | Depends on underlying container type   | The cuptr type           |
+| `cuptr_X_value_t`   | "                                      | The cuptr element type   |
+| `cuptr_X_iter_t`    | "                                      | cuptr iterator           |
 
 
 | Type name           | Type definition                        | Used to represent...     |
@@ -45,24 +45,22 @@ All cptr definitions and prototypes may be included in your C source file by inc
 
 ```c
 cuptr_X             cuptr_X_init(void);
-void                cuptr_X_del(cuptr_X* self);
 void                cuptr_X_reset(cuptr_X* self, cuptr_X_value_t* ptr);
-
+void                cuptr_X_del(cuptr_X* self);
 int                 cuptr_X_compare(cuptr_X* x, cuptr_X* y);
 ```
 ```c
 csptr_X             csptr_X_from(csptr_X_value_t* ptr);
 csptr_X             csptr_X_make(csptr_X_value_t val);
 csptr_X             csptr_X_share(csptr_X ptr);
-void                csptr_X_del(csptr_X* self);
 void                csptr_X_reset(csptr_X* self, csptr_X_value_t* p);
-
+void                csptr_X_del(csptr_X* self);
 int                 csptr_X_compare(csptr_X* x, csptr_X* y);
-int                 csptr_pointer_compare(csptr_X_value_t* x, csptr_X_value_t* y);
 ```
 
 ## Example
-This shows 3 cvecs with struct Person as value type in different ways. vec: Person, uvec: cuptr <Person>, and svec: csptr <Person>.
+
+This shows 2 cvecs with two different pointer to Person. uvec: cuptr<Person>, and svec: csptr<Person>.
 ```c
 #include <stc/cptr.h>
 #include <stc/cstr.h>
@@ -83,14 +81,13 @@ int Person_compare(const Person* p, const Person* q) {
     return cmp == 0 ? strcmp(p->last.str, q->last.str) : cmp;
 }
 
-using_cvec(pe, Person, Person_del, Person_compare);
+using_cvec(pe, Person, Person_del, Person_compare); // unused
 
 using_cuptr(pu, Person, Person_del, Person_compare);
 using_cvec(pu, Person*, cuptr_pu_del, cuptr_pu_compare);
 
 using_csptr(ps, Person, Person_del, Person_compare);
 using_cvec(ps, csptr_ps, csptr_ps_del, csptr_ps_compare);
-
 
 const char* names[] = {
     "Joe", "Jordan",
@@ -99,14 +96,6 @@ const char* names[] = {
 };
 
 int main() {
-    Person tmp;
-    cvec_pe vec = cvec_inits;
-    for (int i=0;i<6; i+=2) cvec_pe_push_back(&vec, *Person_make(&tmp, names[i], names[i+1]));
-    puts("cvec of Person:");
-    cvec_pe_sort(&vec);
-    c_foreach (i, cvec_pe, vec)
-        printf("  %s %s\n", i.val->name.str, i.val->last.str);
-
     cvec_pu uvec = cvec_inits;
     for (int i=0;i<6; i+=2) cvec_pu_push_back(&uvec, Person_make(c_new(Person), names[i], names[i+1]));
     puts("cvec of cuptr<Person>:");
@@ -127,8 +116,6 @@ int main() {
     cvec_ps_del(&svec);
     puts("\nDestroy pvec:");
     cvec_pu_del(&uvec);
-    puts("\nDestroy vec:");
-    cvec_pe_del(&vec);
     puts("\nDestroy x:");
     csptr_ps_del(&x);
 }
