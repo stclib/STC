@@ -41,17 +41,17 @@ using_cmap(str, cstr_t, cstr_t, cstr_del, cstr_equals_raw, cstr_hash_raw,
 
 ## Types
 
-| Type name            | Type definition        | Used to represent...          |
-|:---------------------|:-----------------------|:------------------------------|
-| `cmap_X`             | `struct { ... }`       | The cmap type                 |
-| `cmap_X_rawkey_t`    | `RawKey`               | The raw key type              |
-| `cmap_X_rawval_t`    | `RawMapped`            | The raw mapped type           |
-| `cmap_X_key_t`       | `Key`                  | The key type                  |
-| `cmap_X_mapped_t`    | `Mapped`               | The mapped type               |
-| `cmap_X_value_t`     | `struct { ... }`       | The value type                |
-| `cmap_X_input_t`     | `struct { ... }`       | RawKey + RawVal type          |
-| `cmap_X_result_t`    | `struct { ... }`       | Result of insert/put/emplace  |
-| `cmap_X_iter_t`      | `struct { ... }`       | Iterator type                 |
+| Type name            | Type definition                                 | Used to represent...          |
+|:---------------------|:------------------------------------------------|:------------------------------|
+| `cmap_X`             | `struct { ... }`                                | The cmap type                 |
+| `cmap_X_rawkey_t`    | `RawKey`                                        | The raw key type              |
+| `cmap_X_rawval_t`    | `RawMapped`                                     | The raw mapped type           |
+| `cmap_X_key_t`       | `Key`                                           | The key type                  |
+| `cmap_X_mapped_t`    | `Mapped`                                        | The mapped type               |
+| `cmap_X_value_t`     | `struct { Key first; Mapped second; }`          | The value type                |
+| `cmap_X_input_t`     | `struct { RawKey first; RawMapped second; }`    | RawKey + RawVal type          |
+| `cmap_X_result_t`    | `struct { cmap_X_value_t first; bool second; }` | Result of insert/put/emplace  |
+| `cmap_X_iter_t`      | `struct { cmap_X_value_t *val; ... }`           | Iterator type                 |
 
 ## Constants and macros
 

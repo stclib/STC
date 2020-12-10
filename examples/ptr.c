@@ -19,8 +19,8 @@ int Person_compare(const Person* p, const Person* q) {
 
 using_cvec(pe, Person, Person_del, Person_compare);
 
-using_cuptr(pu, Person, Person_del, Person_compare);
-using_cvec(pu, Person*, cuptr_pu_del, cuptr_pu_compare);
+using_cptr(pu, Person, Person_del, Person_compare);
+using_cvec(pu, Person*, cptr_pu_del, cptr_pu_compare);
 
 using_csptr(ps, Person, Person_del, Person_compare);
 using_cvec(ps, csptr_ps, csptr_ps_del, csptr_ps_compare);
@@ -43,7 +43,7 @@ int main() {
 
     cvec_pu uvec = cvec_inits;
     for (int i=0;i<6; i+=2) cvec_pu_push_back(&uvec, Person_make(c_new(Person), names[i], names[i+1]));
-    puts("cvec of cuptr<Person>:");
+    puts("cvec of cptr<Person>:");
     cvec_pu_sort(&uvec);
     c_foreach (i, cvec_pu, uvec)
         printf("  %s %s\n", (*i.val)->name.str, (*i.val)->last.str);

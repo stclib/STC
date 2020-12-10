@@ -23,7 +23,7 @@
 #ifndef CPTR__H__
 #define CPTR__H__
 
-/* cuptr: std::unique_ptr -like type */
+/* cptr: std::unique_ptr -like type */
 /*
 #include <stc/cptr.h>
 #include <stc/cstr.h>
@@ -44,8 +44,8 @@ int Person_compare(const Person* p, const Person* q) {
     return cmp == 0 ? strcmp(p->last.str, q->last.str) : cmp;
 }
 
-using_cuptr(pe, Person, Person_del, Person_compare);
-using_cvec(pe, Person*, cuptr_pe_del, cuptr_pe_compare);
+using_cptr(pe, Person, Person_del, Person_compare);
+using_cvec(pe, Person*, cptr_pe_del, cptr_pe_compare);
 
 int main() {
     cvec_pe vec = cvec_pe_init();
@@ -59,35 +59,35 @@ int main() {
 */
 #include "ccommon.h"
 
-#define using_cuptr(...) c_MACRO_OVERLOAD(using_cuptr, __VA_ARGS__)
+#define using_cptr(...) c_MACRO_OVERLOAD(using_cptr, __VA_ARGS__)
 
-#define using_cuptr_2(X, Value) \
-    using_cuptr_3(X, Value, c_default_del)
+#define using_cptr_2(X, Value) \
+    using_cptr_3(X, Value, c_default_del)
 
-#define using_cuptr_3(X, Value, valueDestroy) \
-    using_cuptr_4(X, Value, valueDestroy, c_default_compare)
+#define using_cptr_3(X, Value, valueDestroy) \
+    using_cptr_4(X, Value, valueDestroy, c_default_compare)
 
-#define using_cuptr_4(X, Value, valueDestroy, valueCompare) \
-    typedef Value cuptr_##X##_value_t; \
-    typedef cuptr_##X##_value_t *cuptr_##X; \
+#define using_cptr_4(X, Value, valueDestroy, valueCompare) \
+    typedef Value cptr_##X##_value_t; \
+    typedef cptr_##X##_value_t *cptr_##X; \
 \
     STC_INLINE void \
-    cuptr_##X##_del(cuptr_##X* self) { \
+    cptr_##X##_del(cptr_##X* self) { \
         valueDestroy(*self); \
         c_free(*self); \
     } \
 \
     STC_INLINE void \
-    cuptr_##X##_reset(cuptr_##X* self, cuptr_##X##_value_t* p) { \
-        cuptr_##X##_del(self); \
+    cptr_##X##_reset(cptr_##X* self, cptr_##X##_value_t* p) { \
+        cptr_##X##_del(self); \
         *self = p; \
     } \
 \
     STC_INLINE int \
-    cuptr_##X##_compare(cuptr_##X* x, cuptr_##X* y) { \
+    cptr_##X##_compare(cptr_##X* x, cptr_##X* y) { \
         return valueCompare(*x, *y); \
     } \
-    typedef cuptr_##X cuptr_##X##_t
+    typedef cptr_##X cptr_##X##_t
 
 
 

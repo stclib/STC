@@ -1,28 +1,28 @@
 # Module cptr: Smart Pointers
 
-This describes the API of the type **cuptr** and the shared pointer type **csptr**. Type **cuptr** is meant to be used like a c++ std::unique_ptr, while **csptr** is similar to c++ std::shared_ptr.
+This describes the API of the pointer type **cptr** and the shared pointer type **csptr**. Type **cptr** is meant to be used like a c++ *std::unique_ptr*, while **csptr** is similar to c++ *std::shared_ptr*.
 
-**cuptr** and **cuptr** objects can be used as items of containers. The pointed-to elements are automatically deleted when the container is deleted. **csptr** elements are only deleted if there are no other references to the element. **csptr** has thread-safe atomic use count, enabled by the *csptr_X_share(sp)* and *csptr_X_del(&sp)* methods.
+**cptr** and **cptr** objects can be used as items of containers. The pointed-to elements are automatically deleted when the container is deleted. **csptr** elements are only deleted if there are no other references to the element. **csptr** has thread-safe atomic use count, enabled by the *csptr_X_share(sp)* and *csptr_X_del(&sp)* methods.
 
 ## Declaration
 
 ```c
-#define using_cuptr(X, Value, valueDestroy=c_default_del,
-                              valueCompare=c_default_compare)
+#define using_cptr(X, Value, valueDestroy=c_default_del,
+                             valueCompare=c_default_compare)
 
 #define using_csptr(X, Value, valueDestroy=c_default_del,
                               valueCompare=c_default_compare)
 ```
-The macro `using_cuptr()` must be instantiated in the global scope. `X` is a type tag name and will
-affect the names of all cuptr types and methods. E.g. declaring `using_cuptr(my, cvec_my);`,
+The macro `using_cptr()` must be instantiated in the global scope. `X` is a type tag name and will
+affect the names of all cptr types and methods. E.g. declaring `using_cptr(my, cvec_my);`,
 `X` should be replaced by `my` in all of the following documentation.
 
  Types
 
-| Type name           | Type definition        | Used to represent...     |
-|:--------------------|:-----------------------|:-------------------------|
-| `cuptr_X`           | `cuptr_X_value_t *`    | The cuptr type           |
-| `cuptr_X_value_t`   | `Value`                | The cuptr element type   |
+| Type name          | Type definition       | Used to represent...    |
+|:-------------------|:----------------------|:------------------------|
+| `cptr_X`           | `cptr_X_value_t *`    | The cptr type           |
+| `cptr_X_value_t`   | `Value`               | The cptr element type   |
 
 
 | Type name           | Type definition                                               | Used to represent...     |
@@ -43,10 +43,10 @@ All cptr definitions and prototypes may be included in your C source file by inc
 ## Methods
 
 ```c
-cuptr_X             cuptr_X_init(void);
-void                cuptr_X_reset(cuptr_X* self, cuptr_X_value_t* ptr);
-void                cuptr_X_del(cuptr_X* self);
-int                 cuptr_X_compare(cuptr_X* x, cuptr_X* y);
+cptr_X              cptr_X_init(void);
+void                cptr_X_reset(cptr_X* self, cptr_X_value_t* ptr);
+void                cptr_X_del(cptr_X* self);
+int                 cptr_X_compare(cptr_X* x, cptr_X* y);
 ```
 ```c
 csptr_X             csptr_X_from(csptr_X_value_t* ptr);
@@ -59,7 +59,7 @@ int                 csptr_X_compare(csptr_X* x, csptr_X* y);
 
 ## Example
 
-This shows 2 cvecs with two different pointer to Person. uvec: cuptr<Person>, and svec: csptr<Person>.
+This shows 2 cvecs with two different pointer to Person. uvec: cptr<Person>, and svec: csptr<Person>.
 ```c
 #include <stc/cptr.h>
 #include <stc/cstr.h>
@@ -82,8 +82,8 @@ int Person_compare(const Person* p, const Person* q) {
 
 using_cvec(pe, Person, Person_del, Person_compare); // unused
 
-using_cuptr(pu, Person, Person_del, Person_compare);
-using_cvec(pu, Person*, cuptr_pu_del, cuptr_pu_compare);
+using_cptr(pu, Person, Person_del, Person_compare);
+using_cvec(pu, Person*, cptr_pu_del, cptr_pu_compare);
 
 using_csptr(ps, Person, Person_del, Person_compare);
 using_cvec(ps, csptr_ps, csptr_ps_del, csptr_ps_compare);
@@ -97,7 +97,7 @@ const char* names[] = {
 int main() {
     cvec_pu uvec = cvec_inits;
     for (int i=0;i<6; i+=2) cvec_pu_push_back(&uvec, Person_make(c_new(Person), names[i], names[i+1]));
-    puts("cvec of cuptr<Person>:");
+    puts("cvec of cptr<Person>:");
     cvec_pu_sort(&uvec);
     c_foreach (i, cvec_pu, uvec)
         printf("  %s %s\n", (*i.val)->name.str, (*i.val)->last.str);
@@ -121,7 +121,7 @@ int main() {
 ```
 Output:
 ```
-cvec of cuptr<Person>:
+cvec of cptr<Person>:
   Annie Aniston
   Jane Jacobs
   Joe Jordan

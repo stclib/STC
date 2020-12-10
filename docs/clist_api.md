@@ -26,12 +26,10 @@ using_clist(str, cstr_t, cstr_del, cstr_compare_raw, const char*, cstr_to_raw, c
 | Type name             | Type definition                     | Used to represent...      |
 |:----------------------|:------------------------------------|:--------------------------|
 | `clist_X`             | `struct { clist_X_node_t* last; }`  | The clist type            |
-| `clist_X_node_t`      | `struct { ... }`                    | clist node                |
 | `clist_X_value_t`     | `Value`                             | The clist element type    |
 | `clist_X_input_t`     | `clist_X_value_t`                   | clist input type          |
 | `clist_X_rawvalue_t`  | `RawValue`                          | clist raw value type      |
-| `clist_X_iter_t`      | `struct { ... }`                    | clist iterator            |
-
+| `clist_X_iter_t`      | `struct { clist_value_t *val; ... }`| clist iterator            |
 
 ## Constants and macros
 
