@@ -2,7 +2,7 @@
 
 This describes the API of the pointer type **cptr** and the shared pointer type **csptr**. Type **cptr** is meant to be used like a c++ *std::unique_ptr*, while **csptr** is similar to c++ *std::shared_ptr*.
 
-**cptr** and **cptr** objects can be used as items of containers. The pointed-to elements are automatically deleted when the container is deleted. **csptr** elements are only deleted if there are no other references to the element. **csptr** has thread-safe atomic use count, enabled by the *csptr_X_share(sp)* and *csptr_X_del(&sp)* methods.
+**cptr** and **csptr** objects can be used as items of containers. The pointed-to elements are automatically destructed+deleted when the container is destructed. **csptr** elements are only deleted if there are no other shared references to the element. **csptr** has thread-safe atomic use count, enabled by the *csptr_X_share(sp)* and *csptr_X_del(&sp)* methods.
 
 ## Declaration
 
@@ -42,6 +42,7 @@ All cptr definitions and prototypes may be included in your C source file by inc
 
 ## Methods
 
+The *\*_del()* and *\*_compare()* methods are defined based on the methods passed to the *using_\*ptr()* macro. For *csptr* use *csptr_X_share(p)* when sharing ownership of the pointed-to object to others. See example, where x has shared ownership with the shared pointer element in cvec container. Refer to c++ std::shared_ptr for more information.
 ```c
 cptr_X              cptr_X_init(void);
 void                cptr_X_reset(cptr_X* self, cptr_X_value_t* ptr);
@@ -59,7 +60,7 @@ int                 csptr_X_compare(csptr_X* x, csptr_X* y);
 
 ## Example
 
-This shows 2 cvecs with two different pointer to Person. uvec: cptr<Person>, and svec: csptr<Person>.
+This shows 2 cvecs with two different pointer to Person. pvec: cptr<Person>, and svec: csptr<Person>.
 ```c
 #include <stc/cptr.h>
 #include <stc/cstr.h>
@@ -82,8 +83,8 @@ int Person_compare(const Person* p, const Person* q) {
 
 using_cvec(pe, Person, Person_del, Person_compare); // unused
 
-using_cptr(pu, Person, Person_del, Person_compare);
-using_cvec(pu, Person*, cptr_pu_del, cptr_pu_compare);
+using_cptr(pp, Person, Person_del, Person_compare);
+using_cvec(pp, Person*, cptr_pp_del, cptr_pp_compare);
 
 using_csptr(ps, Person, Person_del, Person_compare);
 using_cvec(ps, csptr_ps, csptr_ps_del, csptr_ps_compare);
@@ -95,11 +96,11 @@ const char* names[] = {
 };
 
 int main() {
-    cvec_pu uvec = cvec_inits;
-    for (int i=0;i<6; i+=2) cvec_pu_push_back(&uvec, Person_make(c_new(Person), names[i], names[i+1]));
+    cvec_pp pvec = cvec_inits;
+    for (int i=0;i<6; i+=2) cvec_pp_push_back(&pvec, Person_make(c_new(Person), names[i], names[i+1]));
     puts("cvec of cptr<Person>:");
-    cvec_pu_sort(&uvec);
-    c_foreach (i, cvec_pu, uvec)
+    cvec_pp_sort(&pvec);
+    c_foreach (i, cvec_pp, pvec)
         printf("  %s %s\n", (*i.val)->name.str, (*i.val)->last.str);
 
     cvec_ps svec = cvec_inits;
@@ -107,14 +108,14 @@ int main() {
     puts("cvec of csptr<Person>:");
     cvec_ps_sort(&svec);
     c_foreach (i, cvec_ps, svec)
-        printf("  %s %s\n", (*i.val).get->name.str, (*i.val).get->last.str);
+        printf("  %s %s\n", i.val->get->name.str, i.val->get->last.str);
     
     csptr_ps x = csptr_ps_share(svec.data[1]);
 
     puts("\nDestroy svec:");
-    cvec_ps_del(&svec);
+    cvec_ps_del(&svec); // destroys all elements but x!
     puts("\nDestroy pvec:");
-    cvec_pu_del(&uvec);
+    cvec_pp_del(&pvec);
     puts("\nDestroy x:");
     csptr_ps_del(&x);
 }
