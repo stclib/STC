@@ -51,20 +51,21 @@ int main() {
 
 typedef struct cbitset { uint64_t* _arr; size_t size; } cbitset_t;
 
-STC_API cbitset_t cbitset_with_size(size_t size, bool value);
-STC_API cbitset_t cbitset_from_str(const char* str);
-STC_API char*     cbitset_to_str(cbitset_t set, char* str, size_t start, intptr_t stop);
-STC_API cbitset_t cbitset_clone(cbitset_t other);
-STC_API void      cbitset_resize(cbitset_t* self, size_t size, bool value);
-STC_API size_t    cbitset_count(cbitset_t set);
-STC_API bool      cbitset_is_disjoint(cbitset_t set, cbitset_t other);
-STC_API bool      cbitset_is_subset(cbitset_t set, cbitset_t other);
-STC_API bool      cbitset_is_superset(cbitset_t set, cbitset_t other);
+STC_API cbitset_t    cbitset_with_size(size_t size, bool value);
+STC_API cbitset_t    cbitset_from_str(const char* str);
+STC_API char*        cbitset_to_str(cbitset_t set, char* str, size_t start, intptr_t stop);
+STC_API cbitset_t    cbitset_clone(cbitset_t other);
+STC_API void         cbitset_resize(cbitset_t* self, size_t size, bool value);
+STC_API size_t       cbitset_count(cbitset_t set);
+STC_API bool         cbitset_is_disjoint(cbitset_t set, cbitset_t other);
+STC_API bool         cbitset_is_subset(cbitset_t set, cbitset_t other);
+STC_API bool         cbitset_is_superset(cbitset_t set, cbitset_t other);
 
-STC_INLINE size_t cbitset_size(cbitset_t set) {return set.size;}
+STC_INLINE size_t    cbitset_size(cbitset_t set) {return set.size;}
+#define              cbitset_inits {NULL, 0}
 
 STC_INLINE cbitset_t cbitset_init() {
-    cbitset_t bs = {NULL, 0}; return bs;
+    cbitset_t bs = cbitset_inits; return bs;
 }
 STC_INLINE void cbitset_del(cbitset_t* self) {
     c_free(self->_arr);

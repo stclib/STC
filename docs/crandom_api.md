@@ -1,19 +1,16 @@
-# Module crand: Pseudo Random Number Generators
+# Module crandom: Pseudo Random Number Generators
 
 This describes the API of module **crand**. It contains *pcg32* created by Melissa O'Neill, and an
 *64-bit PRNG* created by Tyge Løvset. The PRNG can generate uniform and normal distributions.
 
 ## Types
 
-| Name                  | Type definition                             | Used to represent...                 |
-|:----------------------|:--------------------------------------------|:-------------------------------------|
-| `crand_rng32_t`       | `struct {uint64_t state[2];}`               | The crandom type                     |
-| `crand_uniform_i32_t` | `struct {int32_t offset; uint32_t range;}`  | The crandom element type             |
-| `crand_uniform_f32_t` | `struct {float offset, range;}`             | crandom iterator                     |
-| `crand_rng64_t`       | `struct {uint64_t state[4];}`               |                                      |
-| `crand_uniform_i64_t` | `struct {int64_t offset; uint64_t range;}`  |                                      |
-| `crand_uniform_f64_t` | `struct {double offset, range;}`            |                                      |
-| `crand_normal_f64_t`  | `struct {double mean, stddev, ...;}`        |                                      |
+| Name                | Type definition                             | Used to represent...         |
+|:--------------------|:--------------------------------------------|:-----------------------------|
+| `cstc64_t`          | `struct {uint64_t state[4];}`               | The PRNG engine type         |
+| `cstc64_uniform_t`  | `struct {int64_t offset; uint64_t range;}`  | Integer uniform distribution |
+| `cstc64_uniformf_t` | `struct {double offset, range;}`            | Real number uniform distr.   |
+| `cstc64_normalf_t`  | `struct {double mean, stddev;}`             | Normal distribution type     |
 
 ## Header file
 
@@ -25,41 +22,28 @@ All cstr definitions and prototypes may be included in your C source file by inc
 ## Methods
 
 ```c
- 1)     crand_rng32_t           crand_rng32_init(uint64_t seed);
- 2)     crand_rng32_t           crand_rng32_with_seq(uint64_t seed, uint64_t seq);
- 3)     uint32_t                crand_i32(crand_rng32_t* rng);
- 4)     float                   crand_f32(crand_rng32_t* rng);
- 5)     crand_uniform_i32_t     crand_uniform_i32_init(int32_t low, int32_t high);
- 6)     int32_t                 crand_uniform_i32(crand_rng32_t* rng, crand_uniform_i32_t* dist);
- 7)     uint32_t                crand_unbiased_i32(crand_rng32_t* rng, crand_uniform_i32_t* dist);
- 8)     crand_uniform_f32_t     crand_uniform_f32_init(float low, float high); /*  */
- 9)     float                   crand_uniform_f32(crand_rng32_t* rng, crand_uniform_f32_t* dist);
+ 1)     cstc64_t            cstc64_with_seq(uint64_t seed, uint64_t seq);
+ 2)     cstc64_t            cstc64_init(uint64_t seed);
+ 3)     uint64_t            cstc64_rand(cstc64_t* rng);
+ 4)     double              cstc64_randf(cstc64_t* rng);
+ 5)     cstc64_uniform_t    cstc64_uniform_init(int64_t low, int64_t high);
+ 6)     int64_t             cstc64_uniform(cstc64_t* rng, cstc64_uniform_t* dist);
+ 7)     cstc64_uniformf_t   cstc64_uniformf_init(double low, double high);
+ 8)     double              cstc64_uniformf(cstc64_t* rng, cstc64_uniformf_t* dist);
+ 9)     cstc64_normalf_t    cstc64_normalf_init(double mean, double stddev);
+10)     double              cstc64_normalf(cstc64_t* rng, cstc64_normalf_t* dist);
 ```
-`1-2)` PRNG 32-bit engine initializers. `3)` Integer RNG with range \[0, 2^32). `4)` Float RNG with range \[0, 1). 
-`5-6)` Uniform integer RNG with range \[*low*, *high*]. `7)` Unbiased version, see https://github.com/lemire/fastrange.
-`8-9)` Uniform float RNG with range \[*low*, *high*).
-```c
- 1)     crand_rng64_t           crand_rng64_with_seq(uint64_t seed, uint64_t seq);
- 2)     crand_rng64_t           crand_rng64_init(uint64_t seed);
- 3)     uint64_t                crand_i64(crand_rng64_t* rng);
- 4)     double                  crand_f64(crand_rng64_t* rng);
- 5)     crand_uniform_i64_t     crand_uniform_i64_init(int64_t low, int64_t high);
- 6)     int64_t                 crand_uniform_i64(crand_rng64_t* rng, crand_uniform_i64_t* dist);
- 7)     crand_uniform_f64_t     crand_uniform_f64_init(double low, double high);
- 8)     double                  crand_uniform_f64(crand_rng64_t* rng, crand_uniform_f64_t* dist);
- 9)     crand_normal_f64_t      crand_normal_f64_init(double mean, double stddev);
-10)     double                  crand_normal_f64(crand_rng64_t* rng, crand_normal_f64_t* dist);
-```
-`1-2)` PRNG 64-bit engine initializers. `3)` Integer generator, range \[0, 2^64). `4)` Double RNG with range \[0, 1).
-`5-6)` Uniform integer RNG with range \[*low*, *high*]. `7-8)` Uniform double RNG with range \[*low*, *high*).
-`9-10)` Normal-distributed double RNG were around 68% of the values are within the range [*mean* - *stddev, *mean* + *stddev*].
+`1-2)` PRNG 64-bit engine initializers. `3)` Integer generator, range \[0, 2^64).
+`4)` Double RNG with range \[0, 1). `5-6)` Uniform integer RNG with range \[*low*, *high*].
+`7-8)` Uniform double RNG with range \[*low*, *high*). `9-10)` Normal-distributed double
+RNG, around 68% of the values are within the range [*mean* - *stddev, *mean* + *stddev*].
 
-The method `crand_i64(crand_rng64_t* rng)` is an extremely fast PRNG suited for parallel usage, featuring
-a Weyl-sequence as part of the state. It is faster than *sfc64*, *wyhash64*, *pcg*, and the *xoroshiro*
-families of RPNGs. It does not require fast multiplication or 128-bit integer operations. The state is
-256-bits, but updates only 192 bit per generated number. It can create 2^63 unique threads with minimum period
-length of 2^64 per thread (expected period lengths 2^127). There is no *jump function*, but incrementing
-the Weyl-increment by 2, achieves the same goal. Passes *PractRand*, tested up to 8TB output.
+The method `cstc64_rand(cstc64_t* rng)` is an extremely fast PRNG by Tyge Løvset, suited for parallel usage.
+It features a Weyl-sequence as part of the state. It is faster than *sfc64*, *wyhash64*, *pcg64*, and almost 
+50% faster than *xoshiro256\*\** on GCC. It does not require fast multiplication or 128-bit integer operations.
+It has a 256 bit state, but updates only 192 bit per generated number. There is no *jump function*, but incrementing
+the Weyl-increment by 2, initializes a new unique 2^64 *minimum* length period. Passes *PractRand*, tested up to
+8TB output, Vigna's Hamming weight test, and simple correlation tests, i.e. interleaved streams with one-bit diff state.
 
 ## Example
 ```c
@@ -91,13 +75,13 @@ int main()
 
     // Setup random engine with normal distribution.
     uint64_t seed = time(NULL);
-    crand_rng64_t rng = crand_rng64_init(seed);
-    crand_normal_f64_t dist = crand_normal_f64_init(Mean, StdDev);
+    cstc64_t rng = cstc64_init(seed);
+    cstc64_normalf_t dist = cstc64_normalf_init(Mean, StdDev);
 
     // Create histogram map
     cmap_i mhist = cmap_i_init();
     for (size_t i = 0; i < N; ++i) {
-        int index = (int) round( crand_normal_f64(&rng, &dist) );
+        int index = (int) round( cstc64_normalf(&rng, &dist) );
         cmap_i_emplace(&mhist, index, 0).first->second += 1;
     }
 

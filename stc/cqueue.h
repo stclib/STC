@@ -32,19 +32,19 @@
 
     int main() {
         int n = 10000000;
-        crand_rng32_t gen = crand_rng32_init(1234);
-        crand_uniform_i32_t dist = crand_uniform_i32_init(gen, 0, n);
+        cstc64_t gen = cstc64_init(1234);
+        cstc64_uniform_t dist = cstc64_uniform_init(gen, 0, n);
 
         cqueue_i queue = cqueue_i_init();
 
         // Push ten million random numbers onto the queue.
         for (int i=0; i<n; ++i)
-            cqueue_i_push(&queue, crand_uniform_i32(&dist));
+            cqueue_i_push(&queue, cstc64_uniform(&dist));
 
         // Push or pop on the queue ten million times
         printf("%d\n", n);
         for (int i=n; i>0; --i) {
-            int r = crand_uniform_i32(&dist);
+            int r = cstc64_uniform(&dist);
             if (r & 1)
                 ++n, cqueue_i_push(&queue, r);
             else

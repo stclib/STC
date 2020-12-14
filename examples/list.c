@@ -9,11 +9,11 @@ int main() {
     const int n = 2000000;
 
     clist_fx list = clist_inits;
-    crand_rng64_t eng = crand_rng64_init(1234);
-    crand_uniform_f64_t dist = crand_uniform_f64_init(100.0f, n);
+    cstc64_t eng = cstc64_init(1234);
+    cstc64_uniformf_t dist = cstc64_uniformf_init(100.0f, n);
     int m = 0;
     c_forrange (i, int, n)
-        clist_fx_push_back(&list, crand_uniform_f64(&eng, &dist)), ++m;
+        clist_fx_push_back(&list, cstc64_uniformf(&eng, &dist)), ++m;
     double sum = 0.0;
     printf("sumarize %d:\n", m);
     c_foreach (i, clist_fx, list)

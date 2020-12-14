@@ -6,49 +6,35 @@
 #endif
 
 
-#define NN 3000000000
+#define NN 1000000000
 
 int main(void)
 {
-    clock_t difference, before;
+    clock_t diff, before;
     uint64_t v;
     
-    crand_rng64_t stc = crand_rng64_init(time(NULL));
-    crand_uniform_i64_t idist = crand_uniform_i64_init(10, 20);
-    crand_uniform_f64_t fdist = crand_uniform_f64_init(10, 20);
+    cstc64_t stc = cstc64_init(time(NULL));
+    cstc64_uniform_t idist = cstc64_uniform_init(10, 20);
+    cstc64_uniformf_t fdist = cstc64_uniformf_init(10, 20);
 
-    c_forrange (30) printf("%02zd ", crand_uniform_i64(&stc, &idist)); 
-    puts("");
-
-    crand_rng32_t pcg = crand_rng32_init(time(NULL));
-    crand_uniform_i32_t i32dist = crand_uniform_i32_init(10, 20);
-    crand_uniform_f32_t f32dist = crand_uniform_f32_init(10, 20);
-
-    before = clock(); \
+    before = clock();
     v = 0;
     c_forrange (NN) {
-        //v += crand_i32(&pcg);
-        v += crand_uniform_i32(&pcg, &i32dist);
+        v += cstc64_rand(&stc);
     }
-    difference = clock() - before;
-    printf("pcg32: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
+    diff = clock() - before;
+    printf("stc64_rand: %.02f, %zu\n", (float) diff / CLOCKS_PER_SEC, v);
 
-    before = clock(); \
+    before = clock();
     v = 0;
     c_forrange (NN) {
-        //v += crand_i64(&stc) & 0xffffffff;
-        v += crand_uniform_i64(&stc, &idist);
+        v += cstc64_uniform(&stc, &idist);
     }
-    difference = clock() - before;
-    printf("stc64: %.02f, %zu\n", (float) difference / CLOCKS_PER_SEC, v);
+    diff = clock() - before;
+    printf("stc64_uniform: %.02f, %zu\n\n", (float) diff / CLOCKS_PER_SEC, v);
 
-    c_forrange (8) printf("%d ", crand_uniform_i32(&pcg, &i32dist));
+    c_forrange (30) printf("%02zd ", cstc64_uniform(&stc, &idist)); 
     puts("");
-
-    
-    c_forrange (8) printf("%f ", crand_uniform_f32(&pcg, &f32dist));
-    puts("");
-    
-    c_forrange (8) printf("%f ", crand_uniform_f64(&stc, &fdist));
+    c_forrange (8) printf("%f ", cstc64_uniformf(&stc, &fdist));
     puts("");
 }

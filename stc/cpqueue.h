@@ -29,13 +29,13 @@
     using_cpqueue(f, cvec_f, >); // min-heap (increasing values)
 
     int main() {
-        crand_rng32_t gen = crand_rng32_init(1234);
-        crand_uniform_f32_t dist = crand_uniform_f32_init(10.0f, 100.0f);
+        cstc64_t gen = cstc64_init(1234);
+        cstc64_uniformf_t dist = cstc64_uniformf_init(10.0f, 100.0f);
 
         cpqueue_f queue = cpqueue_f_init();
         // Push ten million random numbers onto the queue.
         for (int i=0; i<10000000; ++i)
-            cpqueue_f_push(&queue, crand_uniform_f32(&gen, dist));
+            cpqueue_f_push(&queue, cstc64_uniformf(&gen, dist));
         // Extract the 100 smallest.
         for (int i=0; i<100; ++i) {
             printf("%f ", *cpqueue_f_top(queue));
