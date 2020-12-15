@@ -81,11 +81,6 @@ STC_API double cstc64_normalf(cstc64_t* rng, cstc64_normalf_t* dist);
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-#if defined(_MSC_VER)
-  #pragma warning(push)
-  //#pragma warning(disable: 4146)
-#endif
-
 /* PRNG stc64: Tyge Løvset, NORCE Research, 2020.
  * Extremely fast PRNG suited for parallel usage with Weyl-sequence parameter.
  * Faster than sfc64, wyhash64, and almost 50% faster than xoshiro256** on gcc.
@@ -143,9 +138,6 @@ STC_DEF double cstc64_normalf(cstc64_t* rng, cstc64_normalf_t* dist) {
     return (u1 * m) * dist->stddev + dist->mean;
 }
 
-#if defined(_MSC_VER)
-  #pragma warning(pop)
-#endif
 
 #endif
 #endif
