@@ -5,12 +5,12 @@ This describes the API of module **crand**. It contains *pcg32* created by Melis
 
 ## Types
 
-| Name               | Type definition                            | Used to represent...         |
-|:-------------------|:-------------------------------------------|:-----------------------------|
-| `crand_t`          | `struct {uint64_t state[4];}`              | The PRNG engine type         |
-| `crand_uniform_t`  | `struct {int64_t offset; uint64_t range;}` | Integer uniform distribution |
-| `crand_uniformf_t` | `struct {double offset, range;}`           | Real number uniform distr.   |
-| `crand_normalf_t`  | `struct {double mean, stddev;}`            | Normal distribution type     |
+| Name               | Type definition                           | Used to represent...         |
+|:-------------------|:------------------------------------------|:-----------------------------|
+| `crand_t`          | `struct {uint64_t state[4];}`             | The PRNG engine type         |
+| `crand_uniform_t`  | `struct {int64_t lower; uint64_t range;}` | Integer uniform distribution |
+| `crand_uniformf_t` | `struct {double lower, range;}`           | Real number uniform distr.   |
+| `crand_normalf_t`  | `struct {double mean, stddev;}`           | Normal distribution type     |
 
 ## Header file
 

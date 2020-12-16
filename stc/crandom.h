@@ -43,10 +43,10 @@ int main() {
 #include <string.h>
 #include <math.h>
 
-typedef struct {uint64_t state[4];}                         crand_t;
-typedef struct {int64_t offset; uint64_t range, threshold;} crand_uniform_t;
-typedef struct {double offset, range;}                      crand_uniformf_t;
-typedef struct {double mean, stddev, next; bool has_next;}  crand_normalf_t;
+typedef struct {uint64_t state[4];}                        crand_t;
+typedef struct {int64_t lower; uint64_t range, threshold;} crand_uniform_t;
+typedef struct {double lower, range;}                      crand_uniformf_t;
+typedef struct {double mean, stddev, next; bool has_next;} crand_normalf_t;
 
 
 /* int random number generator, range [0, 2^64). PRNG copyright Tyge Løvset, NORCE Research, 2020 */
@@ -69,7 +69,7 @@ STC_INLINE crand_uniformf_t crand_uniformf_init(double low, double high) {
     crand_uniformf_t dist = {low, high - low}; return dist;
 }
 STC_INLINE double crand_uniformf(crand_t* rng, crand_uniformf_t* dist) {
-    return dist->offset + crand_nextf(rng) * dist->range;
+    return crand_nextf(rng)*dist->range + dist->lower;
 }
 
 /* double normal distributed RNG. */
@@ -108,8 +108,7 @@ STC_DEF uint64_t crand_next(crand_t* rng) {
     return result;
 }
 
-/* unbiased integer random number generator in range [low, high] */
-
+/* Very fast unbiased uniform int RNG with bounds [low, high] */
 STC_DEF crand_uniform_t crand_uniform_init(int64_t low, int64_t high) {
     crand_uniform_t dist = {low, (uint64_t) (high - low + 1)};
     dist.threshold = (uint64_t)(-dist.range) % dist.range;
@@ -117,23 +116,27 @@ STC_DEF crand_uniform_t crand_uniform_init(int64_t low, int64_t high) {
 }
 
 #if defined(__SIZEOF_INT128__)
-    #define cmul128(a, b, m) *(__uint128_t *)m = (__uint128_t)a * b
+    #define cmul128(a, b, lo, hi) \
+        do { __uint128_t _z = (__uint128_t)(a) * (b); \
+             *(lo) = (uint64_t)_z, *(hi) = _z >> 64; } while(0)
 #elif defined(_MSC_VER) && defined(_WIN64)
     #include <intrin.h>
-    #define cmul128(a, b, m) m[0] = _umul128(a, b, &m[1])
+    #define cmul128(a, b, lo, hi) (*(lo) = _umul128(a, b, hi), (void)0)
 #elif defined(__x86_64__)
-    #define cmul128(a, b, m) \
-        asm("mulq %[rhs]" : "=a" (m[0]), "=d" (m[1]) \
+    #define cmul128(a, b, lo, hi) \
+        asm("mulq %[rhs]" : "=a" (*(lo)), "=d" (*(hi)) \
                           : [lhs] "0" (a), [rhs] "rm" (b))
 #endif
 
-STC_DEF int64_t crand_uniform(crand_t* rng, crand_uniform_t* dist) {
-    uint64_t m[2]; 
-    do { cmul128(crand_next(rng), dist->range, m); } while (m[0] < dist->threshold);
-    return dist->offset + m[1];
+STC_DEF int64_t crand_uniform(crand_t* rng, crand_uniform_t* d) {
+    uint64_t lo, hi; 
+    do {
+        cmul128(crand_next(rng), d->range, &lo, &hi);
+    } while (lo < d->threshold);
+    return d->lower + hi;
 }
 
-/* Marsaglia polar method for gaussian distribution. */
+/* Marsaglia polar method for gaussian/normal distribution. */
 STC_DEF double crand_normalf(crand_t* rng, crand_normalf_t* dist) {
     double u1, u2, s, m;
     if (dist->has_next) {
