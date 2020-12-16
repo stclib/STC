@@ -9,13 +9,13 @@ Weyl-sequence as part of the state. It is faster than *sfc64*, *wyhash64*, *pcg6
 128-bit integer operations. It has a 256 bit state, but updates only 192 bit per generated
 number.
 
-There is no *jump function*, but by incrementing the Weyl-increment by 2, it starts
-a new unique 2^64 *minimum* length period. Note that for each Weyl-increment, the period
+There is no *jump function*, but by incrementing the Weyl-increment by 2, it starts a new 
+unique 2^64 *minimum* length period. Note that for each Weyl-increment (state[3]), the period
 length is about 2^126 with a high probability. For a single thread, a minimum period of 2^127
-is generated when the Weyl-increment is incremented by 2 every 2^64 output number.
+is generated when the Weyl-increment is incremented by 2 every 2^64 output.
 
 **crand** passes *PractRand*, tested up to 8TB output, Vigna's Hamming weight test, and simple
-correlation tests, i.e. N interleaved streams with only one-bit differences in initial state.
+correlation tests, i.e. *n* interleaved streams with only one-bit differences in initial state.
 
 ## Types
 
