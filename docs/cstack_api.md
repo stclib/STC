@@ -1,4 +1,4 @@
-# Container cstack: Stack
+# Container [cstack](../stc/cstack.h): Stack
 
 This describes the API of the queue type **cstack**.
 

@@ -1,4 +1,4 @@
-# Container cvec: Vector
+# Container [cvec](../stc/cvec.h): Vector
 
 This describes the API of vector type **cvec**.
 

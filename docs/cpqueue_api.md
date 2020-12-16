@@ -1,4 +1,4 @@
-# Container cpqueue: Priority Queue
+# Container [cpqueue](../stc/cpqueue.h): Priority Queue
 
 This describes the API of the queue type **cpqueue**. Implemented as a heap.
 

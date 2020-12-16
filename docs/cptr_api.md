@@ -1,4 +1,4 @@
-# Module cptr: Smart Pointers
+# Module [cptr](../stc/cptr.h): Smart Pointers
 
 This describes the API of the pointer type **cptr** and the shared pointer type **csptr**. Type **cptr** is meant to be used like a c++ *std::unique_ptr*, while **csptr** is similar to c++ *std::shared_ptr*.
 

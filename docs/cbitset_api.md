@@ -1,4 +1,4 @@
-# Container cbitset_t: Indexed Bitset
+# Container [cbitset](../stc/cbitset.h): Indexed Bitset
 
 This describes the API of type **cbitset**.
 

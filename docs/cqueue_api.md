@@ -1,4 +1,4 @@
-# Container cqueue: Queue
+# Container [cqueue](../stc/cqueue.h): Queue
 
 This describes the API of the queue type **cqueue**.
 

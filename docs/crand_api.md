@@ -1,4 +1,4 @@
-# Module crand: Pseudo Random Number Generators
+# Module [crand](../stc/crand.h): Pseudo Random Number Generators
 
 This describes the API of module **crand**. It contains a *64-bit PRNG*, and can generate
 bounded uniform and normal distributed random numbers.

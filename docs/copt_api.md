@@ -1,4 +1,4 @@
-# Introduction
+# Module [copt](../stc/copt.h): Command line argument parsing
 
 This describes the API of string type *copt_get()* function for command line argument parsing.
 

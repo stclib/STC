@@ -1,4 +1,4 @@
-# Container cstr_t: String
+# Container [cstr](../stc/cstr.h): String
 
 This describes the API of string type **cstr_t**.
 
