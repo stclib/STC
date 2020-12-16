@@ -1,11 +1,11 @@
 # Module crandom: Pseudo Random Number Generators
 
-This describes the API of module **crand**. It contains a *64-bit PRNG* by Tyge Løvset,
-and can generate both uniform and normal distributed random numbers.
+This describes the API of module **crand**. It contains a *64-bit PRNG*, and can generate
+bounded uniform and normal distributed random numbers.
 
 **crand** is an extremely fast PRNG by Tyge Løvset, suited for parallel usage. It features a 
 Weyl-sequence as part of the state. It is faster than *sfc64*, *wyhash64*, *pcg64*, and almost
-50% faster than *xoshiro256\*\** compiled with GCC. It does not require fast multiplication or
+50% faster than *xoshiro256\*\** on common platforms. It does not require fast multiplication or
 128-bit integer operations. It has a 256 bit state, but updates only 192 bit per generated
 number.
 
