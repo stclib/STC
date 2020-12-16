@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <stc/crandom.h>
+#include <stc/crand.h>
 #include <stc/cmap.h>
 #include <stc/cvec.h>
 

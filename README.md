@@ -17,7 +17,7 @@ An elegant, fully typesafe, generic, customizable, user-friendly, consistent, an
 - [***cpqueue*** - A **priority queue** adapter type](docs/cpqueue_api.md)
 - [***cptr*** - Support for pointers and shared pointers in containers](docs/cptr_api.md)
 - [***copt*** - Implements *copt_get()*, a **getopt_long**-like function](docs/copt_api.md)
-- [***crandom*** - A few very efficent modern **random number generators**](docs/crandom_api.md)
+- [***crand*** - A few very efficent modern **random number generators**](docs/crand_api.md)
 - [***ccommon*** - Collection of general definitions](docs/ccommon_api.md)
 
 The usage of the containers is quite similar to the C++ standard containers, so it should be easy if you are familiar with them.

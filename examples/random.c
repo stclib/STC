@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
-#include <stc/crandom.h>
+#include <stc/crand.h>
 #include <stc/cstr.h>
 
 int main()

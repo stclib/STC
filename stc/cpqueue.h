@@ -23,7 +23,7 @@
 
 /*  Priority-Queue adapter (implemented as heap), default uses cvec.
 
-    #include <stc/crandom.h>
+    #include <stc/crand.h>
     #include <stc/cpqueue.h>
     using_cvec(f, float);
     using_cpqueue(f, cvec_f, >); // min-heap (increasing values)

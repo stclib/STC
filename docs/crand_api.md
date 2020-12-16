@@ -1,4 +1,4 @@
-# Module crandom: Pseudo Random Number Generators
+# Module crand: Pseudo Random Number Generators
 
 This describes the API of module **crand**. It contains a *64-bit PRNG*, and can generate
 bounded uniform and normal distributed random numbers.
@@ -30,7 +30,7 @@ correlation tests, i.e. N interleaved streams with only one-bit differences in i
 
 All cstr definitions and prototypes may be included in your C source file by including a single header file.
 ```c
-#include "stc/crandom.h"
+#include "stc/crand.h"
 ```
 
 ## Methods
@@ -57,7 +57,7 @@ RNG, around 68% of the values fall within the range [*mean* - *stddev*, *mean* +
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
-#include "stc/crandom.h"
+#include "stc/crand.h"
 #include "stc/cstr.h"
 #include "stc/cmap.h"
 #include "stc/cvec.h"

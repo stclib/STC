@@ -55,7 +55,7 @@ void                    cpqueue_X_erase_at(cpqueue_X* self, size_t idx);
 ```c
 #include <stdio.h>
 #include "stc/cpqueue.h"
-#include "stc/crandom.h"
+#include "stc/crand.h"
 
 using_cvec(i, int64_t);
 using_cpqueue(i, cvec_i, >); // adaptor type, '>' = min-heap

@@ -25,7 +25,7 @@
 
 /*
 // crand: Pseudo-random number generator
-#include "stc/crandom.h"
+#include "stc/crand.h"
 int main() {
     uint64_t seed = 123456789;
     crand_t rng = crand_init(seed);
