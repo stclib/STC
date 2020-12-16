@@ -9,17 +9,17 @@ This is 1D, 2D and 3D arrays, which are allocated from heap in one single contig
 #define using_carray(X, Value, valueDestroy=c_default_del)
 ```
 The macro `using_carray()` can be instantiated with 2 or 3 arguments in the global scope.
-Default values are given above for args not specified. `X` is a type tag name and
+Default values are given above for args not specified. `X` and `N` are type tags and
 will affect the names of all cset types and methods. E.g. declaring `using_carray(my, int);`, `X` should
-be replaced by `my` in all of the following documentation. The `#` character should be replaced by `1`, `2` or `3`.
+be replaced by `my` in all of the following documentation. The `N` character should be replaced by `1`, `2` or `3`.
 
 ## Types
 
 | Type name            | Type definition               | Used to represent...      |
 |:---------------------|:------------------------------|:--------------------------|
-| `carray#X`           | `struct { ... }`              | The carray type           |
-| `carray#X_value_t`   | `Value`                       | The value type            |
-| `carray#X_iter_t`    | `struct { Value *val; }`      | Iterator type             |
+| `carrayNX`           | `struct { ... }`              | The carray type           |
+| `carrayNX_value_t`   | `Value`                       | The value type            |
+| `carrayNX_iter_t`    | `struct { Value *val; }`      | Iterator type             |
 
 ## Constants and macros
 
@@ -44,7 +44,6 @@ All cset definitions and prototypes may be included in your C source file by inc
 ```
 ## Methods
 
-### Constructors
 ```c
 carray1X            carray1X_init(size_t xdim, Value val);
 carray2X            carray2X_init(size_t ydim, size_t xdim, Value val);
@@ -52,8 +51,9 @@ carray3X            carray3X_init(size_t zdim, size_t ydim, size_t xdim, Value v
 carray1X            carray1X_from(Value* array, size_t xdim);
 carray2X            carray2X_from(Value* array, size_t ydim, size_t xdim);
 carray3X            carray3X_from(Value* array, size_t zdim, size_t ydim, size_t xdim);
+void                carrayNX_del(carrayNX* self);
 ```
-### Data access
+Constructors and destructor.
 ```c
 Value*              carray1X_at(carray1X *self, size_t x);
 Value*              carray2X_at(carray2X *self, size_t y, size_t x);
@@ -62,13 +62,14 @@ carray1X            carray2X_at1(carray2X *self, size_t y);
 carray1X            carray3X_at2(carray3X *self, size_t z, size_t y);
 carray2X            carray3X_at1(carray3X *self, size_t z);
 ```
-### Iterators
+Array accessor methods.
 ```c
-carray#X_iter_t     carray#X_begin(carray#X* self);
-carray#X_iter_t     carray#X_end(carray#X* self);
-void                carray#X_next(carray#X_iter_t* it);
-carray#X_value_t*   carray#X_itval(carray#X_iter_t it);
+carrayNX_iter_t     carrayNX_begin(carrayNX* self);
+carrayNX_iter_t     carrayNX_end(carrayNX* self);
+void                carrayNX_next(carrayNX_iter_t* it);
+carrayNX_value_t*   carrayNX_itval(carrayNX_iter_t it);
 ```
+Iterator methods.
 
 ## Example
 ```c
