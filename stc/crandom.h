@@ -24,64 +24,64 @@
 #define CRANDOM__H__
 
 /*
-// cstc64: Pseudo-random number generator
+// crand: Pseudo-random number generator
 #include "stc/crandom.h"
 int main() {
     uint64_t seed = 123456789;
-    cstc64_t rng = cstc64_init(seed);
-    cstc64_uniform_t dist1 = cstc64_uniform_init(1, 6);
-    cstc64_uniformf_t dist2 = cstc64_uniformf_init(1.0, 10.0);
-    cstc64_normalf_t dist3 = cstc64_normalf_init(1.0, 10.0);
+    crand_t rng = crand_init(seed);
+    crand_uniform_t dist1 = crand_uniform_init(1, 6);
+    crand_uniformf_t dist2 = crand_uniformf_init(1.0, 10.0);
+    crand_normalf_t dist3 = crand_normalf_init(1.0, 10.0);
     
-    uint64_t i = cstc64_rand(&rng);
-    int64_t iu = cstc64_uniform(&rng, &dist1);
-    double xu = cstc64_uniformf(&rng, &dist2);
-    double xn = cstc64_normalf(&rng, &dist3);
+    uint64_t i = crand_next(&rng);
+    int64_t iu = crand_uniform(&rng, &dist1);
+    double xu = crand_uniformf(&rng, &dist2);
+    double xn = crand_normalf(&rng, &dist3);
 }
 */
 #include "ccommon.h"
 #include <string.h>
 #include <math.h>
 
-typedef struct {uint64_t state[4];}                         cstc64_t;
-typedef struct {int64_t offset; uint64_t range, threshold;} cstc64_uniform_t;
-typedef struct {double offset, range;}                      cstc64_uniformf_t;
-typedef struct {double mean, stddev, next; bool has_next;}  cstc64_normalf_t;
+typedef struct {uint64_t state[4];}                         crand_t;
+typedef struct {int64_t offset; uint64_t range, threshold;} crand_uniform_t;
+typedef struct {double offset, range;}                      crand_uniformf_t;
+typedef struct {double mean, stddev, next; bool has_next;}  crand_normalf_t;
 
 
 /* int random number generator, range [0, 2^64). PRNG copyright Tyge Løvset, NORCE Research, 2020 */
-STC_API cstc64_t cstc64_init(uint64_t seed);
-STC_API cstc64_t cstc64_with_seq(uint64_t seed, uint64_t seq);
-STC_API uint64_t cstc64_rand(cstc64_t* rng);
+STC_API crand_t crand_init(uint64_t seed);
+STC_API crand_t crand_with_seq(uint64_t seed, uint64_t seq);
+STC_API uint64_t crand_next(crand_t* rng);
 
 /* double random number in range [low, high). */
-STC_INLINE double cstc64_randf(cstc64_t* rng) {
-    union {uint64_t i; double f;} u = {0x3FF0000000000000ull | (cstc64_rand(rng) >> 12)};
+STC_INLINE double crand_nextf(crand_t* rng) {
+    union {uint64_t i; double f;} u = {0x3FF0000000000000ull | (crand_next(rng) >> 12)};
     return u.f - 1.0;
 }
 
 /* integer uniform distributed RNG, range [low, high]. */
-STC_API cstc64_uniform_t cstc64_uniform_init(int64_t low, int64_t high);
-STC_API int64_t          cstc64_uniform(cstc64_t* rng, cstc64_uniform_t* dist);
+STC_API crand_uniform_t crand_uniform_init(int64_t low, int64_t high);
+STC_API int64_t         crand_uniform(crand_t* rng, crand_uniform_t* dist);
 
 /* double uniform distributed RNG, range [low, high). */
-STC_INLINE cstc64_uniformf_t cstc64_uniformf_init(double low, double high) {
-    cstc64_uniformf_t dist = {low, high - low}; return dist;
+STC_INLINE crand_uniformf_t crand_uniformf_init(double low, double high) {
+    crand_uniformf_t dist = {low, high - low}; return dist;
 }
-STC_INLINE double cstc64_uniformf(cstc64_t* rng, cstc64_uniformf_t* dist) {
-    return dist->offset + cstc64_randf(rng) * dist->range;
+STC_INLINE double crand_uniformf(crand_t* rng, crand_uniformf_t* dist) {
+    return dist->offset + crand_nextf(rng) * dist->range;
 }
 
 /* double normal distributed RNG. */
-STC_INLINE cstc64_normalf_t cstc64_normalf_init(double mean, double stddev) {
-    cstc64_normalf_t dist = {mean, stddev, 0.0, false}; return dist;
+STC_INLINE crand_normalf_t crand_normalf_init(double mean, double stddev) {
+    crand_normalf_t dist = {mean, stddev, 0.0, false}; return dist;
 }
-STC_API double cstc64_normalf(cstc64_t* rng, cstc64_normalf_t* dist);
+STC_API double crand_normalf(crand_t* rng, crand_normalf_t* dist);
 
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-/* PRNG stc64: Tyge Løvset, NORCE Research, 2020.
+/* PRNG crand: by Tyge Løvset, NORCE Research, 2020.
  * Extremely fast PRNG suited for parallel usage with Weyl-sequence parameter.
  * Faster than sfc64, wyhash64, and almost 50% faster than xoshiro256** on gcc.
  * 256bit state, updates only 192bit per rng.
@@ -91,53 +91,64 @@ STC_API double cstc64_normalf(cstc64_t* rng, cstc64_normalf_t* dist);
  * and simple correlation tests, i.e. interleaved streams with one-bit diff state.
  */
 
-STC_DEF cstc64_t cstc64_init(uint64_t seed) {
-    return cstc64_with_seq(seed, 0x3504f333d3aa0b34);
+STC_DEF crand_t crand_init(uint64_t seed) {
+    return crand_with_seq(seed, 0x3504f333d3aa0b34);
 }
-STC_DEF cstc64_t cstc64_with_seq(uint64_t seed, uint64_t seq) {
-    cstc64_t rng = {{seed, seed, seed, (seq << 1u) | 1u}};
-    for (int i = 0; i < 8; ++i) cstc64_rand(&rng);
+STC_DEF crand_t crand_with_seq(uint64_t seed, uint64_t seq) {
+    crand_t rng = {{seed, seed, seed, (seq << 1u) | 1u}};
+    for (int i = 0; i < 8; ++i) crand_next(&rng);
     return rng;
 }
-STC_DEF uint64_t cstc64_rand(cstc64_t* rng) {
+STC_DEF uint64_t crand_next(crand_t* rng) {
     enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
     uint64_t *s = rng->state;
-    const uint64_t result = s[0] ^ (s[2] += s[3]|1);
-    s[0] = (s[1] + (s[1] << LSHIFT)) ^ (s[1] >> RSHIFT);
-    s[1] = ((s[1] << LROT) | (s[1] >> (64 - LROT))) + result;
+    const uint64_t b = s[1], result = s[0] ^ (s[2] += s[3]|1);
+    s[0] = (b + (b << LSHIFT)) ^ (b >> RSHIFT);
+    s[1] = ((b << LROT) | (b >> (64 - LROT))) + result;
     return result;
 }
 
 /* unbiased integer random number generator in range [low, high] */
-STC_DEF cstc64_uniform_t cstc64_uniform_init(int64_t low, int64_t high) {
-    cstc64_uniform_t dist = {low, (uint64_t) (high - low + 1)};
+
+STC_DEF crand_uniform_t crand_uniform_init(int64_t low, int64_t high) {
+    crand_uniform_t dist = {low, (uint64_t) (high - low + 1)};
     dist.threshold = (uint64_t)(-dist.range) % dist.range;
     return dist;
 }
-STC_DEF int64_t cstc64_uniform(cstc64_t* rng, cstc64_uniform_t* dist) {
-    for (;;) {
-        uint64_t r = cstc64_rand(rng);
-        if (r >= dist->threshold) return dist->offset + (r % dist->range);
-    }
+
+#if defined(__SIZEOF_INT128__)
+    #define cmul128(a, b, m) *(__uint128_t *)m = (__uint128_t)a * b
+#elif defined(_MSC_VER) && defined(_WIN64)
+    #include <intrin.h>
+    #define cmul128(a, b, m) m[0] = _umul128(a, b, &m[1])
+#elif defined(__x86_64__)
+    #define cmul128(a, b, m) \
+        asm("mulq %[rhs]" : "=a" (m[0]), "=d" (m[1]) \
+                          : [lhs] "0" (a), [rhs] "rm" (b))
+#endif
+
+STC_DEF int64_t crand_uniform(crand_t* rng, crand_uniform_t* dist) {
+    uint64_t m[2]; 
+    do { cmul128(crand_next(rng), dist->range, m); } while (m[0] < dist->threshold);
+    return dist->offset + m[1];
 }
 
 /* Marsaglia polar method for gaussian distribution. */
-STC_DEF double cstc64_normalf(cstc64_t* rng, cstc64_normalf_t* dist) {
+STC_DEF double crand_normalf(crand_t* rng, crand_normalf_t* dist) {
     double u1, u2, s, m;
     if (dist->has_next) {
         dist->has_next = false;
         return dist->next * dist->stddev + dist->mean;
     }
     do {
-        u1 = 2.0 * cstc64_randf(rng) - 1.0;
-        u2 = 2.0 * cstc64_randf(rng) - 1.0;
+        u1 = 2.0 * crand_nextf(rng) - 1.0;
+        u2 = 2.0 * crand_nextf(rng) - 1.0;
         s = u1*u1 + u2*u2;
     } while (s >= 1.0 || s == 0.0);
     m = sqrt(-2.0 * log(s) / s);
     dist->next = u2 * m, dist->has_next = true;
     return (u1 * m) * dist->stddev + dist->mean;
 }
-
 
 #endif
 #endif

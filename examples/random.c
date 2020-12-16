@@ -7,18 +7,18 @@
 int main()
 {
     enum {R = 30};
-    const size_t N = 500000000;
-    uint64_t seed = time(NULL);
-    cstc64_t stc = cstc64_init(seed);
+    const size_t N = 1000000000;
+    uint64_t seed = 1234; // time(NULL);
+    crand_t rng = crand_init(seed);
 
     uint64_t sum = 0;
 
-    cstc64_normalf_t dist2 = cstc64_normalf_init(R / 2.0, R / 6.0);
+    crand_normalf_t dist2 = crand_normalf_init(R / 2.0, R / 6.0);
     size_t N2 = 10000000;
     int hist[R] = {0};
     sum = 0;
     c_forrange (N2)  {
-        int n = round((cstc64_normalf(&stc, &dist2) + 0.5));
+        int n = round((crand_normalf(&rng, &dist2) + 0.5));
         sum += n;
         if (n >= 0 && n < R) ++hist[n];
     }
@@ -33,16 +33,16 @@ int main()
     sum = 0;
     before = clock();    
     c_forrange (N)  {
-        sum += cstc64_rand(&stc);
+        sum += crand_next(&rng);
     }
     diff = clock() - before;
     printf("random : %f secs, %zu %f\n", (float) diff / CLOCKS_PER_SEC, N, (double) sum / N);
 
-    cstc64_uniform_t dist1 = cstc64_uniform_init(0, 1000);
+    crand_uniform_t dist1 = crand_uniform_init(0, 1000);
     sum = 0;
     before = clock();    
     c_forrange (N)  {
-        sum += cstc64_uniform(&stc, &dist1);
+        sum += crand_uniform(&rng, &dist1);
     }
     diff = clock() - before;
     printf("uniform: %f secs, %zu %f\n", (float) diff / CLOCKS_PER_SEC, N, (double) sum / N);

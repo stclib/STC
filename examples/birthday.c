@@ -14,12 +14,12 @@ const static uint64_t mask = (1ull << 52) - 1;
 
 void repeats(void)
 {
-    cstc64_t rng = cstc64_init(seed);
+    crand_t rng = crand_init(seed);
     cmap_ic m = cmap_ic_init();
     cmap_ic_reserve(&m, N);
     clock_t now = clock();
     c_forrange (i, N) {
-        uint64_t k = cstc64_rand(&rng) & mask;
+        uint64_t k = crand_next(&rng) & mask;
         int v = ++cmap_ic_emplace(&m, k, 0).first->second;
         if (v > 1) printf("%zu: %llx - %d\n", i, k, v);
     }
@@ -33,14 +33,14 @@ using_cvec(x, uint64_t);
 
 void distribution(void)
 {
-    cstc64_t rng = cstc64_init(seed); // time(NULL), time(NULL));
+    crand_t rng = crand_init(seed); // time(NULL), time(NULL));
     const size_t N = 1ull << 28, M = 1ull << 9; // 1ull << 10;
     cmap_x map = cmap_x_with_capacity(M);
     clock_t now = clock();
-    cstc64_uniform_t dist = cstc64_uniform_init(0, M);
+    crand_uniform_t dist = crand_uniform_init(0, M);
 
     c_forrange (N) {
-        ++cmap_x_emplace(&map, cstc64_uniform(&rng, &dist), 0).first->second;
+        ++cmap_x_emplace(&map, crand_uniform(&rng, &dist), 0).first->second;
     }
     float diff = (float) (clock() - now) / CLOCKS_PER_SEC;
 

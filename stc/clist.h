@@ -36,10 +36,10 @@
 
     int main() {
         clist_ix list = clist_inits;
-        cstc64_t rng = cstc64_init(12345);
+        crand_t rng = crand_init(12345);
         int n;
         for (int i=0; i<1000000; ++i) // one million
-            clist_ix_push_back(&list, cstc64_rand(&rng) >> 32);
+            clist_ix_push_back(&list, crand_next(&rng) >> 32);
         n = 0;
         c_foreach (i, clist_ix, list)
             if (++n % 10000 == 0) printf("%8d: %10zd\n", n, i.val->value);
