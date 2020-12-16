@@ -1,7 +1,21 @@
 # Module crandom: Pseudo Random Number Generators
 
-This describes the API of module **crand**. It contains *pcg32* created by Melissa O'Neill, and an
-*64-bit PRNG* created by Tyge Løvset. The PRNG can generate uniform and normal distributions.
+This describes the API of module **crand**. It contains a *64-bit PRNG* by Tyge Løvset,
+and can generate both uniform and normal distributed random numbers.
+
+**crand** is an extremely fast PRNG by Tyge Løvset, suited for parallel usage. It features a 
+Weyl-sequence as part of the state. It is faster than *sfc64*, *wyhash64*, *pcg64*, and almost
+50% faster than *xoshiro256\*\** compiled with GCC. It does not require fast multiplication or
+128-bit integer operations. It has a 256 bit state, but updates only 192 bit per generated
+number.
+
+There is no *jump function*, but by incrementing the Weyl-increment by 2, it starts
+a new unique 2^64 *minimum* length period. Note that for each Weyl-increment, the period
+length is about 2^126 with a high probability. For a single thread, a minimum period of 2^127
+is generated when the Weyl-increment is incremented by 2 every 2^64 output number.
+
+**crand** passes *PractRand*, tested up to 8TB output, Vigna's Hamming weight test, and simple
+correlation tests, i.e. N interleaved streams with only one-bit differences in initial state.
 
 ## Types
 
@@ -36,19 +50,7 @@ All cstr definitions and prototypes may be included in your C source file by inc
 `1-2)` PRNG 64-bit engine initializers. `3)` Integer generator, range \[0, 2^64).
 `4)` Double RNG with range \[0, 1). `5-6)` Uniform integer RNG with range \[*low*, *high*].
 `7-8)` Uniform double RNG with range \[*low*, *high*). `9-10)` Normal-distributed double
-RNG, around 68% of the values fall within the range [*mean* - *stddev, *mean* + *stddev*].
-
-**crand** is an extremely fast PRNG by Tyge Løvset, suited for parallel usage. It features a 
-Weyl-sequence as part of the state. It is faster than *sfc64*, *wyhash64*, *pcg64*, and almost
-50% faster than *xoshiro256\*\** compiled with GCC. It does not require fast multiplication or
-128-bit integer operations. It has a 256 bit state, but updates only 192 bit per generated
-number. There is no *jump function*, but by incrementing the Weyl-increment by 2, it initializes
-a new unique 2^64 *minimum* length period. Note that for each Weyl-increment, the expected period
-length is about 2^126. For a single thread, a minimum period of 2^127 is generated if the
-Weyl-increment is incremented by 2 every 2^64 number output.
-
-*crand* passes *PractRand*, tested up to 8TB output, Vigna's Hamming weight test, and simple
-correlation tests, i.e. interleaved streams with one-bit diff state.
+RNG, around 68% of the values fall within the range [*mean* - *stddev*, *mean* + *stddev*].
 
 ## Example
 ```c
