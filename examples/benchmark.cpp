@@ -40,7 +40,7 @@ crand_t rng;
 #define CMAP_ERASE(X, key)        cmap_##X##_erase(&map, key)
 #define CMAP_FIND(X, key)         (cmap_##X##_find(map, key) != NULL)
 #define CMAP_FOR(X, i)            c_foreach (i, cmap_##X, map)
-#define CMAP_ITEM(X, i)           i.val->second
+#define CMAP_ITEM(X, i)           i.ref->second
 #define CMAP_SIZE(X)              cmap_size(map)
 #define CMAP_BUCKETS(X)           cmap_##X##_bucket_count(map)
 #define CMAP_CLEAR(X)             cmap_##X##_clear(&map)
