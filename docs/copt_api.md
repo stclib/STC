@@ -22,7 +22,7 @@ typedef struct {
 typedef struct {
     const char *name;
     int has_arg;
-    int ref;
+    int val;
 } copt_long_t;
 
 const copt_t copt_inits;
