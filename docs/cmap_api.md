@@ -51,7 +51,7 @@ using_cmap(str, cstr_t, cstr_t, cstr_del, cstr_equals_raw, cstr_hash_raw,
 | `cmap_X_value_t`     | `struct { Key first; Mapped second; }`          | The value type                |
 | `cmap_X_input_t`     | `struct { RawKey first; RawMapped second; }`    | RawKey + RawVal type          |
 | `cmap_X_result_t`    | `struct { cmap_X_value_t first; bool second; }` | Result of insert/put/emplace  |
-| `cmap_X_iter_t`      | `struct { cmap_X_value_t *val; ... }`           | Iterator type                 |
+| `cmap_X_iter_t`      | `struct { cmap_X_value_t *ref; ... }`           | Iterator type                 |
 
 ## Constants and macros
 
@@ -61,7 +61,7 @@ using_cmap(str, cstr_t, cstr_t, cstr_del, cstr_equals_raw, cstr_hash_raw,
 |  `cmap_empty(map)`                       | Test for empty map     |
 |  `cmap_size(map)`                        | Get map size           |
 |  `cmap_capacity(map)`                    | Get map capacity       |
-|  `c_try_emplace(self, ctype, key, val)`  | Emplace if key exist   |
+|  `c_try_emplace(self, ctype, key, ref)`  | Emplace if key exist   |
 
 ## Header file
 
@@ -98,7 +98,7 @@ cmap_X_result_t     cmap_X_put_mapped(cmap_X* self, RawKey rkey, Mapped mapped);
 cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, RawKey rkey);
 
 size_t              cmap_X_erase(cmap_X* self, RawKey rkey);
-void                cmap_X_erase_entry(cmap_X* self, cmap_X_value_t* val);
+void                cmap_X_erase_entry(cmap_X* self, cmap_X_value_t* ref);
 cmap_X_iter_t       cmap_X_erase_at(cmap_X* self, cmap_X_iter_t pos);
 
 cmap_X_value_t*     cmap_X_find(const cmap_X* self, RawKey rkey);
@@ -134,7 +134,7 @@ int main()
 
     // Iterate and print keys and values of unordered map
     c_foreach (n, cmap_str, u) {
-        printf("Key:[%s] Value:[%s]\n", n.val->first.str, n.val->second.str);
+        printf("Key:[%s] Value:[%s]\n", n.ref->first.str, n.ref->second.str);
     }
 
     // Add two new entries to the unordered map
@@ -179,7 +179,7 @@ int main()
     cmap_id_put(&idnames, 80, cstr_from("White"));
 
     c_foreach (i, cmap_id, idnames)
-        printf("%d: %s\n", i.val->first, i.val->second.str);
+        printf("%d: %s\n", i.ref->first, i.ref->second.str);
     puts("");
 
     cmap_id_del(&idnames);

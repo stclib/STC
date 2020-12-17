@@ -68,7 +68,7 @@ _carray3_size(const size_t* zdim) {return zdim[0] * zdim[-1] * zdim[-2];}
 
 
 #define using_carray_common(D, X, Value, valueDestroy) \
-    typedef struct { Value *val; } carray##D##X##_iter_t; \
+    typedef struct { Value *ref; } carray##D##X##_iter_t; \
 \
     STC_INLINE carray##D##X##_iter_t \
     carray##D##X##_begin(carray##D##X* a) { \
@@ -79,13 +79,13 @@ _carray3_size(const size_t* zdim) {return zdim[0] * zdim[-1] * zdim[-2];}
         carray##D##X##_iter_t it = {a->data + carray##D##_size(*a)}; return it; \
     } \
     STC_INLINE void \
-    carray##D##X##_next(carray##D##X##_iter_t* it) {++it->val;} \
+    carray##D##X##_next(carray##D##X##_iter_t* it) {++it->ref;} \
 \
     STC_INLINE void \
     carray##D##X##_del(carray##D##X* self) { \
         if (self->_xdim & _carray_OWN) { \
             c_foreach_3 (i, carray##D##X, *self) \
-                valueDestroy(i.val); \
+                valueDestroy(i.ref); \
             c_free(self->data); \
         } \
     }

@@ -51,7 +51,7 @@ int                 cptr_X_compare(cptr_X* x, cptr_X* y);
 ```
 ```c
 csptr_X             csptr_X_from(csptr_X_value_t* ptr);
-csptr_X             csptr_X_make(csptr_X_value_t val);
+csptr_X             csptr_X_make(csptr_X_value_t ref);
 csptr_X             csptr_X_share(csptr_X ptr);
 void                csptr_X_reset(csptr_X* self, csptr_X_value_t* p);
 void                csptr_X_del(csptr_X* self);
@@ -101,14 +101,14 @@ int main() {
     puts("cvec of cptr<Person>:");
     cvec_pp_sort(&pvec);
     c_foreach (i, cvec_pp, pvec)
-        printf("  %s %s\n", (*i.val)->name.str, (*i.val)->last.str);
+        printf("  %s %s\n", (*i.ref)->name.str, (*i.ref)->last.str);
 
     cvec_ps svec = cvec_inits;
     for (int i=0;i<6; i+=2) cvec_ps_push_back(&svec, csptr_ps_from(Person_make(c_new(Person), names[i], names[i+1])));
     puts("cvec of csptr<Person>:");
     cvec_ps_sort(&svec);
     c_foreach (i, cvec_ps, svec)
-        printf("  %s %s\n", i.val->get->name.str, i.val->get->last.str);
+        printf("  %s %s\n", i.ref->get->name.str, i.ref->get->last.str);
     
     csptr_ps x = csptr_ps_share(svec.data[1]);
 

@@ -72,7 +72,7 @@ void vectordemo2()
 
     cvec_str_sort(&names);                     // Sort the array
     c_foreach (i, cvec_str, names)
-        printf("sorted: %s\n", i.val->str);
+        printf("sorted: %s\n", i.ref->str);
     cvec_str_del(&names);
 }
 
@@ -87,19 +87,19 @@ void listdemo1()
     for (int i = 100; i < 110; ++i)
         clist_ix_push_back(&nums2, i);
     c_foreach (i, clist_ix, nums)
-        printf("value: %d\n", *i.val);
+        printf("value: %d\n", *i.ref);
     /* merge/append nums2 to nums */
     clist_ix_splice_front(&nums, &nums2);
     c_foreach (i, clist_ix, nums)
-        printf("spliced: %d\n", *i.val);
+        printf("spliced: %d\n", *i.ref);
 
-    *clist_ix_find(&nums, 100).val *= 10;
+    *clist_ix_find(&nums, 100).ref *= 10;
     clist_ix_sort(&nums);                     // Sort the array
     clist_ix_remove(&nums, 105);
     clist_ix_pop_front(&nums);
     clist_ix_push_front(&nums, -99);
     c_foreach (i, clist_ix, nums)
-        printf("sorted: %d\n", *i.val);
+        printf("sorted: %d\n", *i.ref);
     clist_ix_del(&nums);
 }
 
@@ -113,7 +113,7 @@ void setdemo1()
     cset_i_insert(&nums, 11);
 
     c_foreach (i, cset_i, nums)
-        printf("set: %d\n", *i.val);
+        printf("set: %d\n", *i.ref);
     cset_i_del(&nums);
 }
 
@@ -142,12 +142,12 @@ void mapdemo2()
     cmap_si_put(&nums, "Groovy", 200); // overwrite previous
 
     // iterate the map:
-    for (cmap_si_iter_t i = cmap_si_begin(&nums); i.val != cmap_si_end(&nums).val; cmap_si_next(&i))
-        printf("long: %s: %d\n", i.val->first.str, i.val->second);
+    for (cmap_si_iter_t i = cmap_si_begin(&nums); i.ref != cmap_si_end(&nums).ref; cmap_si_next(&i))
+        printf("long: %s: %d\n", i.ref->first.str, i.ref->second);
 
     // or rather use the short form:
     c_foreach (i, cmap_si, nums)
-        printf("short: %s: %d\n", i.val->first.str, i.val->second);
+        printf("short: %s: %d\n", i.ref->first.str, i.ref->second);
 
     cmap_si_del(&nums);
 }
@@ -164,13 +164,13 @@ void mapdemo3()
     cmap_str_put(&table, "Sunny", "day");
     cmap_str_value_t *e = cmap_str_find(&table, "Make");
     c_foreach (i, cmap_str, table)
-        printf("entry: %s: %s\n", i.val->first.str, i.val->second.str);
+        printf("entry: %s: %s\n", i.ref->first.str, i.ref->second.str);
     printf("size %zu: remove: Make: %s\n", cmap_size(table), e->second.str);
     cmap_str_erase(&table, "Make");
 
     printf("size %zu\n", cmap_size(table));
     c_foreach (i, cmap_str, table)
-        printf("entry: %s: %s\n", i.val->first.str, i.val->second.str);
+        printf("entry: %s: %s\n", i.ref->first.str, i.ref->second.str);
     cmap_str_del(&table); // frees key and value cstrs, and hash table.
 }
 
@@ -193,7 +193,7 @@ void arraydemo1()
     printf("%f\n", *carray3f_at(&a3, 5, 4, 3)); // lookup a3[5][4][3] (=10.2f)
 
     c_foreach (i, carray3f, a3)
-        *i.val = 1.0f;
+        *i.ref = 1.0f;
     printf("%f\n", *carray3f_at(&a3, 29, 19, 9));
 
     carray2f_del(&a2); // does nothing, since it is a sub-array.

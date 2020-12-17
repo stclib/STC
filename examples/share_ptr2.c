@@ -25,6 +25,6 @@ int main() {
                                                                      cstr_from_fmt("Last %d", (i * 9) % 10))));
     }
     c_foreach (i, cmap_ps, map)
-        printf(" %d: %s\n", i.val->first, i.val->second.get->name.str);
+        printf(" %d: %s\n", i.ref->first, i.ref->second.get->name.str);
     cmap_ps_del(&map);
 }

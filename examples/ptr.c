@@ -39,21 +39,21 @@ int main() {
     puts("cvec of Person:");
     cvec_pe_sort(&vec);
     c_foreach (i, cvec_pe, vec)
-        printf("  %s %s\n", i.val->name.str, i.val->last.str);
+        printf("  %s %s\n", i.ref->name.str, i.ref->last.str);
 
     cvec_pu uvec = cvec_inits;
     for (int i=0;i<6; i+=2) cvec_pu_push_back(&uvec, Person_make(c_new(Person), names[i], names[i+1]));
     puts("cvec of cptr<Person>:");
     cvec_pu_sort(&uvec);
     c_foreach (i, cvec_pu, uvec)
-        printf("  %s %s\n", (*i.val)->name.str, (*i.val)->last.str);
+        printf("  %s %s\n", (*i.ref)->name.str, (*i.ref)->last.str);
 
     cvec_ps svec = cvec_inits;
     for (int i=0;i<6; i+=2) cvec_ps_push_back(&svec, csptr_ps_from(Person_make(c_new(Person), names[i], names[i+1])));
     puts("cvec of csptr<Person>:");
     cvec_ps_sort(&svec);
     c_foreach (i, cvec_ps, svec)
-        printf("  %s %s\n", (*i.val).get->name.str, (*i.val).get->last.str);
+        printf("  %s %s\n", (*i.ref).get->name.str, (*i.ref).get->last.str);
     
     csptr_ps x = csptr_ps_share(svec.data[1]);
 

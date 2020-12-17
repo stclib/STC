@@ -53,7 +53,7 @@ int main() {
     cvec_pe_push_back(&vec, Person_make(c_new(Person), "Jane", "Jacobs"));
 
     c_foreach (i, cvec_pe, vec)
-        printf("%s %s\n", (*i.val)->name.str, (*i.val)->last.str);
+        printf("%s %s\n", (*i.ref)->name.str, (*i.ref)->last.str);
     cvec_pe_del(&vec);
 }
 */

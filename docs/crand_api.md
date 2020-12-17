@@ -95,16 +95,16 @@ int main()
     // Transfer map to vec and sort it by map entry keys.
     cvec_e vhist = cvec_e_init();
     c_foreach (i, cmap_i, mhist)
-        cvec_e_push_back(&vhist, *i.val);
+        cvec_e_push_back(&vhist, *i.ref);
     cvec_e_sort(&vhist);
 
     // Print the gaussian bar chart
     cstr_t bar = cstr_init();
     c_foreach (i, cvec_e, vhist) {
-        size_t n = (size_t) (i.val->second * StdDev * Scale * 2.5 / N);
+        size_t n = (size_t) (i.ref->second * StdDev * Scale * 2.5 / N);
         if (n > 0) {
             cstr_resize(&bar, n, '*');
-            printf("%4d %s\n", i.val->first, bar.str);
+            printf("%4d %s\n", i.ref->first, bar.str);
         }
     }
 

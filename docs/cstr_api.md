@@ -8,7 +8,7 @@ This describes the API of string type **cstr_t**.
 |:------------------|:---------------------------------|:---------------------------|
 | `cstr_t`          | `struct { const char *str; }`    | The string type            |
 | `cstr_value_t`    | `char`                           | The string element type    |
-| `cstr_iter_t`     | `struct { cstr_value_t *val; }`  | cstr_t iterator            |
+| `cstr_iter_t`     | `struct { cstr_value_t *ref; }`  | cstr_t iterator            |
 
 ## Constants and macros
 

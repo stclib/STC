@@ -41,7 +41,7 @@ int main() {
         cvec_pe_push_back(&vec, csptr_pe_share(p)); // Don't forget to share!
     }
     c_foreach (i, clist_pe, queue)
-        printf(" %s\n", i.val->get->name.str);
+        printf(" %s\n", i.ref->get->name.str);
 
     puts("Sort and pop 3:");
     clist_pe_sort(&queue);
@@ -53,16 +53,16 @@ int main() {
 
     puts("Sorted queue:");
     c_foreach (i, clist_pe, queue)
-        printf(" %s\n", i.val->get->name.str);
+        printf(" %s\n", i.ref->get->name.str);
     puts("Sorted vec:");
     c_foreach (i, cvec_pe, vec)
-        printf(" %s\n", i.val->get->name.str);
+        printf(" %s\n", i.ref->get->name.str);
 
     Person lost; Person_make(&lost, "Name 5", "Last 5");
     csptr_pe ptmp = {&lost, NULL}; // share pointer without counter - OK.
     clist_pe_iter_t lit = clist_pe_find(&queue, ptmp);
     Person_del(&lost);
-    if (lit.val) printf("Found: %s\n", lit.val->get->name.str);
+    if (lit.ref) printf("Found: %s\n", lit.ref->get->name.str);
 
     printf("use %ld\n", *joe.use_count);
     csptr_pe_del(&joe);

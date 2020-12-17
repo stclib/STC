@@ -21,7 +21,7 @@ int main() {
         cstack_i_pop(&stack);
     
     c_foreach (i, cstack_i, stack)
-        printf(" %d", *i.val);
+        printf(" %d", *i.ref);
     puts("");
     printf("top: %d\n", *cstack_i_top(&stack));
 }

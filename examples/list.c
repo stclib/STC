@@ -17,24 +17,24 @@ int main() {
     double sum = 0.0;
     printf("sumarize %d:\n", m);
     c_foreach (i, clist_fx, list)
-        sum += *i.val;
+        sum += *i.ref;
     printf("sum %f\n\n", sum);
 
     k = 0;
     c_foreach (i, clist_fx, list)
-        if (++k <= 10) printf("%8d: %10f\n", k, *i.val); else break;
+        if (++k <= 10) printf("%8d: %10f\n", k, *i.ref); else break;
     puts("sort");
     clist_fx_sort(&list); // mergesort O(n*log n)
     puts("sorted");
 
     k = 0;
     c_foreach (i, clist_fx, list)
-        if (++k <= 10) printf("%8d: %10f\n", k, *i.val); else break;
+        if (++k <= 10) printf("%8d: %10f\n", k, *i.ref); else break;
     puts("");
 
     clist_fx_clear(&list);
     c_push_items(&list, clist_fx, {10, 20, 30, 40, 30, 50});
-    c_foreach (i, clist_fx, list) printf(" %g", *i.val);
+    c_foreach (i, clist_fx, list) printf(" %g", *i.ref);
     puts("");
 
     int removed = clist_fx_remove(&list, 30);
@@ -44,11 +44,11 @@ int main() {
     clist_fx_iter_t it = clist_fx_before_begin(&list);
     printf("Full: ");
     c_foreach (i, clist_fx, list)
-        printf(" %g", *i.val);
+        printf(" %g", *i.ref);
     for (int i=0; i<4; ++i) clist_fx_next(&it);
     printf("\nSubs: ");
     c_foreach (i, clist_fx, it, clist_fx_end(&list))
-        printf(" %g", *i.val);
+        printf(" %g", *i.ref);
     puts("");
     clist_fx_del(&list);
 }

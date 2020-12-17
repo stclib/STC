@@ -33,7 +33,7 @@ int main(void) {
     cvec_i_push_back(&vec, 1);
     cvec_i_push_back(&vec, 2);
     c_foreach (i, cvec_i, vec)
-        printf(" %d", *i.val);
+        printf(" %d", *i.ref);
     cvec_i_del(&vec);
 }
 ```
@@ -59,7 +59,7 @@ int main(void) {
     cvec_u_push_back(&vec, (User) {cstr_from("admin"), 0}); // cstr_from() allocates string memory
     cvec_u_push_back(&vec, (User) {cstr_from("usera"), 1});
     c_foreach (i, cvec_u, vec)
-        printf("%s: %d\n", i.val->name.str, i.val->id);
+        printf("%s: %d\n", i.ref->name.str, i.ref->id);
     cvec_u_del(&vec); // free everything
 }
 ```

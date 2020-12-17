@@ -31,7 +31,7 @@
 #include <ctype.h>
 
 typedef struct cstr { char* str; } cstr_t;
-typedef struct { char *val; } cstr_iter_t;
+typedef struct { char *ref; } cstr_iter_t;
 typedef char cstr_value_t;
 
 #define cstr_size(s)     ((const size_t *) (s).str)[-2]
@@ -130,8 +130,8 @@ STC_INLINE cstr_iter_t
 cstr_end(cstr_t* self) {
     cstr_iter_t it = {self->str + cstr_size(*self)}; return it;
 }
-STC_INLINE void cstr_next(cstr_iter_t* it) { ++it->val; }
-STC_INLINE char* cstr_itval(cstr_iter_t it) {return it.val;}
+STC_INLINE void cstr_next(cstr_iter_t* it) { ++it->ref; }
+STC_INLINE char* cstr_itval(cstr_iter_t it) {return it.ref;}
 
 STC_INLINE cstr_t*
 cstr_assign(cstr_t* self, const char* str) {

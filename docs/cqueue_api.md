@@ -72,7 +72,7 @@ int main() {
         cqueue_i_pop(&queue);
 
     c_foreach (i, cqueue_i, queue)
-        printf(" %d", *i.val);
+        printf(" %d", *i.ref);
 
     cqueue_i_del(&queue);
 }

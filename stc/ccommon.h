@@ -89,9 +89,9 @@
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
 #define c_foreach_3(it, ctype, cnt) \
-    for (ctype##_iter_t it = ctype##_begin(&cnt), it##_end_ = ctype##_end(&cnt); it.val != it##_end_.val; ctype##_next(&it))
+    for (ctype##_iter_t it = ctype##_begin(&cnt), it##_end_ = ctype##_end(&cnt); it.ref != it##_end_.ref; ctype##_next(&it))
 #define c_foreach_4(it, ctype, start, finish) \
-    for (ctype##_iter_t it = start, it##_end_ = finish; it.val != it##_end_.val; ctype##_next(&it))
+    for (ctype##_iter_t it = start, it##_end_ = finish; it.ref != it##_end_.ref; ctype##_next(&it))
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
 #define c_forrange_1(stop) for (size_t _c_i=0, _c_end_=stop; _c_i < _c_end_; ++_c_i)

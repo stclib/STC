@@ -48,7 +48,7 @@
     typedef Value cvec_##X##_value_t; \
     typedef RawValue cvec_##X##_rawvalue_t; \
     typedef cvec_##X##_rawvalue_t cvec_##X##_input_t; \
-    typedef struct { cvec_##X##_value_t *val; } cvec_##X##_iter_t; \
+    typedef struct { cvec_##X##_value_t *ref; } cvec_##X##_iter_t; \
 \
     typedef struct { \
         cvec_##X##_value_t* data; \
@@ -108,11 +108,11 @@
 \
     STC_INLINE cvec_##X##_iter_t \
     cvec_##X##_insert_range(cvec_##X* self, cvec_##X##_iter_t pos, cvec_##X##_iter_t first, cvec_##X##_iter_t finish) { \
-        return cvec_##X##_insert_range_p(self, pos.val, first.val, finish.val); \
+        return cvec_##X##_insert_range_p(self, pos.ref, first.ref, finish.ref); \
     } \
     STC_INLINE cvec_##X##_iter_t \
     cvec_##X##_insert(cvec_##X* self, cvec_##X##_iter_t pos, Value value) { \
-        return cvec_##X##_insert_range_p(self, pos.val, &value, &value + 1); \
+        return cvec_##X##_insert_range_p(self, pos.ref, &value, &value + 1); \
     } \
     STC_INLINE cvec_##X##_iter_t \
     cvec_##X##_insert_at(cvec_##X* self, size_t idx, Value value) { \
@@ -132,11 +132,11 @@
 \
     STC_INLINE cvec_##X##_iter_t \
     cvec_##X##_erase_range(cvec_##X* self, cvec_##X##_iter_t first, cvec_##X##_iter_t finish) { \
-        return cvec_##X##_erase_range_p(self, first.val, finish.val); \
+        return cvec_##X##_erase_range_p(self, first.ref, finish.ref); \
     } \
     STC_INLINE cvec_##X##_iter_t \
     cvec_##X##_erase(cvec_##X* self, cvec_##X##_iter_t pos) { \
-        return cvec_##X##_erase_range_p(self, pos.val, pos.val + 1); \
+        return cvec_##X##_erase_range_p(self, pos.ref, pos.ref + 1); \
     } \
     STC_INLINE cvec_##X##_iter_t \
     cvec_##X##_erase_n(cvec_##X* self, size_t idx, size_t n) { \
@@ -178,11 +178,11 @@
         cvec_##X##_iter_t it = {self->data + cvec_size(*self)}; return it; \
     } \
     STC_INLINE void \
-    cvec_##X##_next(cvec_##X##_iter_t* it) {++it->val;} \
+    cvec_##X##_next(cvec_##X##_iter_t* it) {++it->ref;} \
     STC_INLINE cvec_##X##_value_t* \
-    cvec_##X##_itval(cvec_##X##_iter_t it) {return it.val;} \
+    cvec_##X##_itval(cvec_##X##_iter_t it) {return it.ref;} \
     STC_INLINE size_t \
-    cvec_##X##_index(cvec_##X v, cvec_##X##_iter_t it) {return it.val - v.data;} \
+    cvec_##X##_index(cvec_##X v, cvec_##X##_iter_t it) {return it.ref - v.data;} \
 \
     _c_implement_cvec_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
     typedef cvec_##X cvec_##X##_t
@@ -273,8 +273,8 @@
 \
     STC_DEF cvec_##X##_iter_t \
     cvec_##X##_find_in_range(const cvec_##X* self, cvec_##X##_iter_t first, cvec_##X##_iter_t finish, RawValue rawValue) { \
-        for (; first.val != finish.val; cvec_##X##_next(&first)) { \
-            RawValue r = valueToRaw(first.val); \
+        for (; first.ref != finish.ref; cvec_##X##_next(&first)) { \
+            RawValue r = valueToRaw(first.ref); \
             if (valueCompareRaw(&r, &rawValue) == 0) return first; \
         } \
         return cvec_##X##_end(self); \

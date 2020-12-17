@@ -73,7 +73,7 @@ int main()
     cmap_vk_emplace(&vikings, einar, 0).first->second += 5; // again
 
     c_foreach (k, cmap_vk, vikings) {
-        printf("%s of %s has %d HP\n", k.val->first.name.str, k.val->first.country.str, k.val->second);
+        printf("%s of %s has %d HP\n", k.ref->first.name.str, k.ref->first.country.str, k.ref->second);
     }
     cmap_vk_del(&vikings);
 }

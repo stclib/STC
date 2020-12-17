@@ -19,7 +19,7 @@ be replaced by `my` in all of the following documentation. The `#` character sho
 |:---------------------|:------------------------------|:--------------------------|
 | `carray#X`           | `struct { ... }`              | The carray type           |
 | `carray#X_value_t`   | `Value`                       | The value type            |
-| `carray#X_iter_t`    | `struct { Value *val; }`      | Iterator type             |
+| `carray#X_iter_t`    | `struct { Value *ref; }`      | Iterator type             |
 
 ## Constants and macros
 
@@ -46,9 +46,9 @@ All cset definitions and prototypes may be included in your C source file by inc
 
 ### Constructors
 ```c
-carray1X            carray1X_init(size_t xdim, Value val);
-carray2X            carray2X_init(size_t ydim, size_t xdim, Value val);
-carray3X            carray3X_init(size_t zdim, size_t ydim, size_t xdim, Value val);
+carray1X            carray1X_init(size_t xdim, Value ref);
+carray2X            carray2X_init(size_t ydim, size_t xdim, Value ref);
+carray3X            carray3X_init(size_t zdim, size_t ydim, size_t xdim, Value ref);
 carray1X            carray1X_from(Value* array, size_t xdim);
 carray2X            carray2X_from(Value* array, size_t ydim, size_t xdim);
 carray3X            carray3X_from(Value* array, size_t zdim, size_t ydim, size_t xdim);

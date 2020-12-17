@@ -32,7 +32,7 @@ be replaced by `my` in all of the following documentation.
 | `cset_X_value_t`     | `Key`                                 | The value type           |
 | `cset_X_result_t`    | `struct { Key first; bool second; }`  | Result of insert/emplace |
 | `cset_X_input_t`     | `cset_X_rawkey_t`                     | The input type (rawkey)  |
-| `cset_X_iter_t`      | `struct { cset_X_value_t *val; ... }` | Iterator type            |
+| `cset_X_iter_t`      | `struct { cset_X_value_t *ref; ... }` | Iterator type            |
 
 ## Constants and macros
 
@@ -42,7 +42,7 @@ be replaced by `my` in all of the following documentation.
 |  `cset_empty(set)`                              | Test for empty set       |
 |  `cset_size(set)`                               | Get set size             |
 |  `cset_capacity(set)`                           | Get set capacity         |
-|  `c_try_emplace(self, ctype, key, val)`         | Emplace if key exist     |
+|  `c_try_emplace(self, ctype, key, ref)`         | Emplace if key exist     |
 
 ## Header file
 
@@ -110,13 +110,13 @@ int main ()
   cset_str_emplace(&fourth, "flour");
 
   cset_str fifth = cset_inits;
-  c_foreach (x, cset_str, second) cset_str_emplace(&fifth, x.val->str);
-  c_foreach (x, cset_str, third) cset_str_emplace(&fifth, x.val->str);
-  c_foreach (x, cset_str, fourth) cset_str_emplace(&fifth, x.val->str);
+  c_foreach (x, cset_str, second) cset_str_emplace(&fifth, x.ref->str);
+  c_foreach (x, cset_str, third) cset_str_emplace(&fifth, x.ref->str);
+  c_foreach (x, cset_str, fourth) cset_str_emplace(&fifth, x.ref->str);
   c_del(cset_str, &first, &second, &third, &fourth);
 
   printf("fifth contains:\n\n");
-  c_foreach (x, cset_str, fifth) printf("%s\n", x.val->str);
+  c_foreach (x, cset_str, fifth) printf("%s\n", x.ref->str);
   cset_str_del(&fifth);
 
   return 0;
