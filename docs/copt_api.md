@@ -24,11 +24,13 @@ typedef struct {
     int has_arg;
     int ref;
 } copt_long_t;
+
+const copt_t copt_inits;
 ```
 
 ## Methods
 
-```
+```c
 copt_t              copt_init(void);
 int                 copt_get(copt_t *opt, int argc, char *argv[],
                              const char *shortopts, const copt_long_t *longopts);
@@ -36,7 +38,7 @@ int                 copt_get(copt_t *opt, int argc, char *argv[],
 
 ## Example
 
-```
+```c
 #include <stdio.h>
 #include "stc/copt.h"
 
