@@ -2,7 +2,7 @@
 #include <stc/cstr.h>
 #include <stc/cmap.h>
 #include <stc/cvec.h>
-#include <stc/cpqueue.h>
+#include <stc/cpque.h>
 #include <stc/clist.h>
 
 using_cmap(id, int, cstr_t, cstr_del); // Map of int -> cstr_t
@@ -17,7 +17,7 @@ inline static int ipair_compare(const ipair_t* a, const ipair_t* b) {
 using_cvec(ip, ipair_t, c_default_del, ipair_compare);
 using_clist(ip, ipair_t, c_default_del, ipair_compare);
 using_cvec(f, float);
-using_cpqueue(f, cvec_f, >);
+using_cpque(f, cvec_f, >);
 
 int main(void)
 {
@@ -31,16 +31,16 @@ int main(void)
 
     // CVEC PRIORITY QUEUE
 
-    cpqueue_f_make_heap(&floats);
-    c_push_items(&floats, cpqueue_f, {40.0f, 20.0f, 50.0f, 30.0f, 10.0f});
+    cpque_f_make_heap(&floats);
+    c_push_items(&floats, cpque_f, {40.0f, 20.0f, 50.0f, 30.0f, 10.0f});
 
     // sorted:
-    while (! cpqueue_f_empty(floats)) {
-        printf("%.1f ", *cpqueue_f_top(&floats));
-        cpqueue_f_pop(&floats);
+    while (! cpque_f_empty(floats)) {
+        printf("%.1f ", *cpque_f_top(&floats));
+        cpque_f_pop(&floats);
     }
     puts("\n");
-    cpqueue_f_del(&floats);
+    cpque_f_del(&floats);
 
     // CMAP ID
 

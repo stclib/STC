@@ -24,24 +24,24 @@
 /*  Priority-Queue adapter (implemented as heap), default uses cvec.
 
     #include <stc/crand.h>
-    #include <stc/cpqueue.h>
+    #include <stc/cpque.h>
     using_cvec(f, float);
-    using_cpqueue(f, cvec_f, >); // min-heap (increasing values)
+    using_cpque(f, cvec_f, >); // min-heap (increasing values)
 
     int main() {
         crand_t rng = crand_init(1234);
         crand_uniformf_t dist = crand_uniformf_init(10.0f, 100.0f);
 
-        cpqueue_f queue = cpqueue_f_init();
+        cpque_f queue = cpque_f_init();
         // Push ten million random numbers onto the queue.
         for (int i=0; i<10000000; ++i)
-            cpqueue_f_push(&queue, crand_uniformf(&rng, dist));
+            cpque_f_push(&queue, crand_uniformf(&rng, dist));
         // Extract the 100 smallest.
         for (int i=0; i<100; ++i) {
-            printf("%f ", *cpqueue_f_top(queue));
-            cpqueue_f_pop(&queue);
+            printf("%f ", *cpque_f_top(queue));
+            cpque_f_pop(&queue);
         }
-        cpqueue_f_del(&queue);
+        cpque_f_del(&queue);
     }
 */
 #ifndef CPQUEUE__H__
@@ -49,53 +49,53 @@
 
 #include "cvec.h"
 
-#define using_cpqueue(X, ctype, cmpOpr) /* cmpOpr: < or > */ \
+#define using_cpque(X, ctype, cmpOpr) /* cmpOpr: < or > */ \
 \
-    typedef ctype##_t cpqueue_##X; \
-    typedef ctype##_value_t cpqueue_##X##_value_t; \
-    typedef ctype##_rawvalue_t cpqueue_##X##_rawvalue_t; \
-    typedef ctype##_input_t cpqueue_##X##_input_t; \
-    STC_INLINE cpqueue_##X \
-    cpqueue_##X##_init(void) {return ctype##_init();} \
-    STC_INLINE cpqueue_##X \
-    cpqueue_##X##_clone(cpqueue_##X pq) {return ctype##_clone(pq);} \
+    typedef ctype##_t cpque_##X; \
+    typedef ctype##_value_t cpque_##X##_value_t; \
+    typedef ctype##_rawvalue_t cpque_##X##_rawvalue_t; \
+    typedef ctype##_input_t cpque_##X##_input_t; \
+    STC_INLINE cpque_##X \
+    cpque_##X##_init(void) {return ctype##_init();} \
+    STC_INLINE cpque_##X \
+    cpque_##X##_clone(cpque_##X pq) {return ctype##_clone(pq);} \
     STC_INLINE size_t \
-    cpqueue_##X##_size(cpqueue_##X pq) {return ctype##_size(pq);} \
+    cpque_##X##_size(cpque_##X pq) {return ctype##_size(pq);} \
     STC_INLINE bool \
-    cpqueue_##X##_empty(cpqueue_##X pq) {return ctype##_empty(pq);} \
+    cpque_##X##_empty(cpque_##X pq) {return ctype##_empty(pq);} \
     STC_INLINE void \
-    cpqueue_##X##_del(cpqueue_##X* self) {ctype##_del(self);} \
+    cpque_##X##_del(cpque_##X* self) {ctype##_del(self);} \
     STC_API void \
-    cpqueue_##X##_make_heap(cpqueue_##X* self); \
+    cpque_##X##_make_heap(cpque_##X* self); \
     STC_API void \
-    cpqueue_##X##_erase_at(cpqueue_##X* self, size_t i); \
-    STC_INLINE const cpqueue_##X##_value_t* \
-    cpqueue_##X##_top(const cpqueue_##X* self) {return &self->data[0];} \
+    cpque_##X##_erase_at(cpque_##X* self, size_t i); \
+    STC_INLINE const cpque_##X##_value_t* \
+    cpque_##X##_top(const cpque_##X* self) {return &self->data[0];} \
     STC_INLINE void \
-    cpqueue_##X##_pop(cpqueue_##X* self) {cpqueue_##X##_erase_at(self, 0);} \
+    cpque_##X##_pop(cpque_##X* self) {cpque_##X##_erase_at(self, 0);} \
     STC_API void \
-    cpqueue_##X##_push(cpqueue_##X* self, cpqueue_##X##_value_t value); \
+    cpque_##X##_push(cpque_##X* self, cpque_##X##_value_t value); \
     STC_INLINE void \
-    cpqueue_##X##_emplace(cpqueue_##X* self, cpqueue_##X##_rawvalue_t rawValue) { \
-        cpqueue_##X##_push(self, ctype##_value_from_raw(rawValue)); \
+    cpque_##X##_emplace(cpque_##X* self, cpque_##X##_rawvalue_t rawValue) { \
+        cpque_##X##_push(self, ctype##_value_from_raw(rawValue)); \
     } \
     STC_API void \
-    cpqueue_##X##_push_n(cpqueue_##X *self, const cpqueue_##X##_input_t in[], size_t size); \
+    cpque_##X##_push_n(cpque_##X *self, const cpque_##X##_input_t in[], size_t size); \
 \
-    implement_cpqueue(X, ctype, cmpOpr)
+    implement_cpque(X, ctype, cmpOpr)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define implement_cpqueue(X, ctype, cmpOpr) \
+#define implement_cpque(X, ctype, cmpOpr) \
 \
     STC_INLINE void \
-    _cpqueue_##X##_sift_down(cpqueue_##X##_value_t* arr, size_t i, size_t n) { \
+    _cpque_##X##_sift_down(cpque_##X##_value_t* arr, size_t i, size_t n) { \
         size_t r = i, c = i << 1; \
         while (c <= n) { \
             c += (c < n && ctype##_value_compare(&arr[c], &arr[c + 1]) cmpOpr 0); \
             if (ctype##_value_compare(&arr[r], &arr[c]) cmpOpr 0) { \
-                cpqueue_##X##_value_t tmp = arr[r]; arr[r] = arr[c]; arr[r = c] = tmp; \
+                cpque_##X##_value_t tmp = arr[r]; arr[r] = arr[c]; arr[r = c] = tmp; \
             } else \
                 return; \
             c <<= 1; \
@@ -103,40 +103,40 @@
     } \
 \
     STC_API void \
-    cpqueue_##X##_make_heap(cpqueue_##X* self) { \
-        size_t n = cpqueue_##X##_size(*self); \
-        cpqueue_##X##_value_t *arr = self->data - 1; \
+    cpque_##X##_make_heap(cpque_##X* self) { \
+        size_t n = cpque_##X##_size(*self); \
+        cpque_##X##_value_t *arr = self->data - 1; \
         for (size_t k = n >> 1; k != 0; --k) \
-            _cpqueue_##X##_sift_down(arr, k, n); \
+            _cpque_##X##_sift_down(arr, k, n); \
     } \
 \
     STC_API void \
-    cpqueue_##X##_erase_at(cpqueue_##X* self, size_t i) { \
-        size_t n = cpqueue_##X##_size(*self) - 1; \
+    cpque_##X##_erase_at(cpque_##X* self, size_t i) { \
+        size_t n = cpque_##X##_size(*self) - 1; \
         self->data[i] = self->data[n]; \
         ctype##_pop_back(self); \
-        _cpqueue_##X##_sift_down(self->data - 1, i + 1, n); \
+        _cpque_##X##_sift_down(self->data - 1, i + 1, n); \
     } \
 \
     STC_API void \
-    cpqueue_##X##_push(cpqueue_##X* self, cpqueue_##X##_value_t value) { \
+    cpque_##X##_push(cpque_##X* self, cpque_##X##_value_t value) { \
         ctype##_push_back(self, value); /* sift-up the value */ \
-        size_t n = cpqueue_##X##_size(*self), c = n; \
-        cpqueue_##X##_value_t *arr = self->data - 1; \
+        size_t n = cpque_##X##_size(*self), c = n; \
+        cpque_##X##_value_t *arr = self->data - 1; \
         for (; c > 1 && ctype##_value_compare(&arr[c >> 1], &value) cmpOpr 0; c >>= 1) \
             arr[c] = arr[c >> 1]; \
         if (c != n) arr[c] = value; \
     } \
     STC_API void \
-    cpqueue_##X##_push_n(cpqueue_##X *self, const cpqueue_##X##_input_t in[], size_t size) { \
-        ctype##_reserve(self, cpqueue_##X##_size(*self) + size); \
-        for (size_t i=0; i<size; ++i) cpqueue_##X##_push(self, in[i]); \
+    cpque_##X##_push_n(cpque_##X *self, const cpque_##X##_input_t in[], size_t size) { \
+        ctype##_reserve(self, cpque_##X##_size(*self) + size); \
+        for (size_t i=0; i<size; ++i) cpque_##X##_push(self, in[i]); \
     } \
 \
-    typedef cpqueue_##X cpqueue_##X##_t
+    typedef cpque_##X cpque_##X##_t
 
 #else
-#define implement_cpqueue(X, ctype, cmpOpr)
+#define implement_cpque(X, ctype, cmpOpr)
 #endif
 
 #endif

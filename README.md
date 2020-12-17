@@ -14,7 +14,7 @@ An elegant, fully typesafe, generic, customizable, user-friendly, consistent, an
 - [***cvec*** - Generic dynamic **vector** type](docs/cvec_api.md)
 - [***cstack*** - A **stack** adapter type](docs/cstack_api.md)
 - [***cqueue*** - A **queue** adapter type](docs/cqueue_api.md)
-- [***cpqueue*** - A **priority queue** adapter type](docs/cpqueue_api.md)
+- [***cpque*** - A **priority queue** adapter type](docs/cpque_api.md)
 - [***cptr*** - Support for pointers and shared pointers in containers](docs/cptr_api.md)
 - [***copt*** - Implements *copt_get()*, a **getopt_long**-like function](docs/copt_api.md)
 - [***crand*** - A few very efficent modern **random number generators**](docs/crand_api.md)
