@@ -210,9 +210,9 @@
     STC_DEF void \
     cdeq_##X##_push_n(cdeq_##X *self, const cdeq_##X##_input_t arr[], size_t n) { \
         _cdeq_##X##_expand(self, n, false); \
-        _cdeq_size(self) += n; \
         cdeq_##X##_value_t* p = self->data + cdeq_size(*self); \
         for (size_t i=0; i < n; ++i) *p++ = valueFromRaw(arr[i]); \
+        _cdeq_size(self) += n; \
     } \
 \
     STC_DEF void \

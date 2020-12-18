@@ -200,9 +200,9 @@
     STC_DEF void \
     cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t arr[], size_t n) { \
         cvec_##X##_reserve(self, cvec_size(*self) + n); \
-        _cvec_size(self) += n; \
         cvec_##X##_value_t* p = self->data + cvec_size(*self); \
         for (size_t i=0; i < n; ++i) *p++ = valueFromRaw(arr[i]); \
+        _cvec_size(self) += n; \
     } \
 \
     STC_DEF void \
