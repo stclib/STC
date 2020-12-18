@@ -58,6 +58,7 @@ cvec_X              cvec_X_with_capacity(size_t size);
 cvec_X              cvec_X_clone(cvec_X vec);
 
 void                cvec_X_clear(cvec_X* self);
+void                cvec_X_shrink_to_fit(cvec_X* self);
 void                cvec_X_reserve(cvec_X* self, size_t cap);
 void                cvec_X_resize(cvec_X* self, size_t size, Value fill);
 void                cvec_X_swap(cvec_X* a, cvec_X* b);
@@ -73,12 +74,12 @@ cvec_X_value_t*     cvec_X_front(cvec_X* self);
 cvec_X_value_t*     cvec_X_back(cvec_X* self);
 
 void                cvec_X_push_n(cvec_X *self, const cvec_X_input_t arr[], size_t size);
-void                cvec_X_emplace_back(cvec_X* self, RawValue ref);
+void                cvec_X_emplace_back(cvec_X* self, RawValue raw);
 void                cvec_X_push_back(cvec_X* self, Value value);
 void                cvec_X_pop_back(cvec_X* self);
 
-cvec_X_iter_t       cvec_X_emplace(cvec_X* self, cvec_X_iter_t pos, RawValue ref);
-cvec_X_iter_t       cvec_X_emplace_at(cvec_X* self, size_t idx, RawValue ref);
+cvec_X_iter_t       cvec_X_emplace(cvec_X* self, cvec_X_iter_t pos, RawValue raw);
+cvec_X_iter_t       cvec_X_emplace_at(cvec_X* self, size_t idx, RawValue raw);
 cvec_X_iter_t       cvec_X_insert(cvec_X* self, cvec_X_iter_t pos, Value value);
 cvec_X_iter_t       cvec_X_insert_at(cvec_X* self, size_t idx, Value value);
 cvec_X_iter_t       cvec_X_insert_range(cvec_X* self, cvec_X_iter_t pos,
@@ -91,9 +92,9 @@ cvec_X_iter_t       cvec_X_erase_n(cvec_X* self, size_t idx, size_t n);
 cvec_X_iter_t       cvec_X_erase_range(cvec_X* self, cvec_X_iter_t first, cvec_X_iter_t finish);
 cvec_X_iter_t       cvec_X_erase_range_p(cvec_X* self, cvec_X_value_t* pfirst, cvec_X_value_t* pfinish);
 
-cvec_X_iter_t       cvec_X_find(const cvec_X* self, RawValue ref);
+cvec_X_iter_t       cvec_X_find(const cvec_X* self, RawValue raw);
 cvec_X_iter_t       cvec_X_find_in_range(const cvec_X* self,
-                                         cvec_X_iter_t first, cvec_X_iter_t finish, RawValue ref);
+                                         cvec_X_iter_t first, cvec_X_iter_t finish, RawValue raw);
 
 void                cvec_X_sort(cvec_X* self);
 void                cvec_X_sort_with(cvec_X* self, size_t ifirst, size_t ifinish,
@@ -105,7 +106,7 @@ void                cvec_X_next(cvec_X_iter_t* it);
 cvec_X_value_t*     cvec_X_itval(cvec_X_iter_t it);
 size_t              cvec_X_index(const cvec_X vec, cvec_X_iter_t it);
 
-Value               cvec_X_value_from_raw(RawValue ref);
+Value               cvec_X_value_from_raw(RawValue raw);
 ```
 
 ## Examples

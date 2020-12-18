@@ -87,9 +87,14 @@
         cvec_##X##_reserve(&x, size); \
         return x; \
     } \
-\
     STC_API cvec_##X \
     cvec_##X##_clone(cvec_##X vec); \
+\
+    STC_INLINE void \
+    cvec_##X##_shrink_to_fit(cvec_##X *self) { \
+        cvec_##X x = cvec_##X##_clone(*self); \
+        cvec_##X##_del(self); *self = x; \
+    } \
     STC_API void \
     cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t arr[], size_t size); \
     STC_API void \
@@ -193,8 +198,11 @@
 #define _c_implement_cvec_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
 \
     STC_DEF void \
-    cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t arr[], size_t size) { \
-        cvec_##X##_insert_range_p(self, self->data + cvec_size(*self), arr, arr + size); \
+    cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t arr[], size_t n) { \
+        cvec_##X##_reserve(self, cvec_size(*self) + n); \
+        _cvec_size(self) += n; \
+        cvec_##X##_value_t* p = self->data + cvec_size(*self); \
+        for (size_t i=0; i < n; ++i) *p++ = valueFromRaw(arr[i]); \
     } \
 \
     STC_DEF void \
@@ -212,8 +220,8 @@
 \
     STC_DEF void \
     cvec_##X##_reserve(cvec_##X* self, size_t cap) { \
-        size_t len = cvec_size(*self); \
-        if (cap >= len) { \
+        if (cap > cvec_capacity(*self)) { \
+            size_t len = cvec_size(*self); \
             size_t* rep = (size_t *) c_realloc(_cvec_alloced(self->data), 2 * sizeof(size_t) + cap * sizeof(Value)); \
             self->data = (Value *) (rep + 2); \
             rep[0] = len; \

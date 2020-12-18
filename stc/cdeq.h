@@ -68,7 +68,7 @@
     STC_API void \
     cdeq_##X##_resize(cdeq_##X* self, size_t size, Value fill_val); \
     STC_API void \
-    cdeq_##X##_expand(cdeq_##X* self, size_t n, bool front); \
+    _cdeq_##X##_expand(cdeq_##X* self, size_t n, bool front); \
     STC_INLINE void \
     cdeq_##X##_swap(cdeq_##X* a, cdeq_##X* b) {c_swap(cdeq_##X, *a, *b);} \
 \
@@ -81,14 +81,20 @@
     STC_INLINE cdeq_##X \
     cdeq_##X##_with_capacity(size_t size) { \
         cdeq_##X x = cdeq_inits; \
-        cdeq_##X##_expand(&x, size, false); \
+        _cdeq_##X##_expand(&x, size, false); \
         return x; \
     } \
-\
     STC_API cdeq_##X \
     cdeq_##X##_clone(cdeq_##X vec); \
+\
+    STC_INLINE void \
+    cdeq_##X##_shrink_to_fit(cdeq_##X *self) { \
+        cdeq_##X x = cdeq_##X##_clone(*self); \
+        cdeq_##X##_del(self); *self = x; \
+    } \
+\
     STC_API void \
-    cdeq_##X##_push_n(cdeq_##X *self, const cdeq_##X##_input_t arr[], size_t size); \
+    cdeq_##X##_push_n(cdeq_##X *self, const cdeq_##X##_input_t arr[], size_t n); \
     STC_API void \
     cdeq_##X##_push_back(cdeq_##X* self, Value value); \
     STC_INLINE void \
@@ -98,6 +104,18 @@
     STC_INLINE void \
     cdeq_##X##_pop_back(cdeq_##X* self) { \
         valueDestroy(&self->data[--_cdeq_size(self)]); \
+    } \
+\
+    STC_INLINE void \
+    cdeq_##X##_push_front(cdeq_##X* self, Value value); \
+    STC_INLINE void \
+    cdeq_##X##_emplace_front(cdeq_##X* self, RawValue rawValue) { \
+        cdeq_##X##_push_front(self, valueFromRaw(rawValue)); \
+    } \
+    STC_INLINE void \
+    cdeq_##X##_pop_front(cdeq_##X* self) { \
+        valueDestroy(self->data++); \
+        --_cdeq_size(self); \
     } \
 \
     STC_API cdeq_##X##_iter_t \
@@ -190,8 +208,11 @@
 #define _c_implement_cdeq_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
 \
     STC_DEF void \
-    cdeq_##X##_push_n(cdeq_##X *self, const cdeq_##X##_input_t arr[], size_t size) { \
-        cdeq_##X##_insert_range_p(self, self->data + cdeq_size(*self), arr, arr + size); \
+    cdeq_##X##_push_n(cdeq_##X *self, const cdeq_##X##_input_t arr[], size_t n) { \
+        _cdeq_##X##_expand(self, n, false); \
+        _cdeq_size(self) += n; \
+        cdeq_##X##_value_t* p = self->data + cdeq_size(*self); \
+        for (size_t i=0; i < n; ++i) *p++ = valueFromRaw(arr[i]); \
     } \
 \
     STC_DEF void \
@@ -209,7 +230,7 @@
     } \
 \
     STC_DEF void \
-    cdeq_##X##_expand(cdeq_##X* self, size_t n, bool front) { \
+    _cdeq_##X##_expand(cdeq_##X* self, size_t n, bool front) { \
         size_t len = cdeq_size(*self), cap = _cdeq_capacity(self); \
         size_t nfront = self->data - self->base, nback = cap - (nfront + len); \
         if (front && nfront >= n || !front && nback >= n) \
@@ -222,16 +243,16 @@
             rep[0] = len; \
             rep[1] = cap; \
         } \
-        size_t k = cap - (len + n); \
-        size_t pos = front ? c_maxf(k*0.7, (float) k - nback) + n \
-                           : c_minf(k*0.3, nfront); \
+        size_t unused = cap - (len + n); \
+        size_t pos = front ? c_maxf(unused*0.7, (float) unused - nback) + n \
+                           : c_minf(unused*0.3, nfront); \
         memmove(self->base + pos, self->data, len*sizeof(Value)); \
         self->data = self->base + pos; \
     } \
 \
     STC_DEF void \
     cdeq_##X##_resize(cdeq_##X* self, size_t size, Value null_val) { \
-        cdeq_##X##_expand(self, size, false); \
+        _cdeq_##X##_expand(self, size, false); \
         for (size_t i=cdeq_size(*self); i<size; ++i) self->data[i] = null_val; \
         if (self->data) _cdeq_size(self) = size; \
     } \
@@ -239,14 +260,14 @@
     STC_DEF void \
     cdeq_##X##_push_front(cdeq_##X* self, Value value) { \
         if (self->data == self->base) \
-            cdeq_##X##_expand(self, 1, true); \
+            _cdeq_##X##_expand(self, 1, true); \
         _cdeq_size(self)++, --self->data; \
         *self->data = value; \
     } \
     STC_DEF void \
     cdeq_##X##_push_back(cdeq_##X* self, Value value) { \
         if ((self->data - self->base) + cdeq_size(*self) == _cdeq_capacity(self)) \
-            cdeq_##X##_expand(self, 1, false); \
+            _cdeq_##X##_expand(self, 1, false); \
         self->data[_cdeq_size(self)++] = value; \
     } \
 \
@@ -260,12 +281,17 @@
 \
     STC_DEF cdeq_##X##_iter_t \
     cdeq_##X##_insert_range_p(cdeq_##X* self, cdeq_##X##_value_t* pos, const cdeq_##X##_value_t* first, const cdeq_##X##_value_t* finish) { \
-        size_t len = finish - first, idx = pos - self->data, size = cdeq_size(*self); \
-        cdeq_##X##_expand(self, len, false); \
-        pos = self->data + idx; \
+        size_t n = finish - first, idx = pos - self->data, size = cdeq_size(*self); \
+        bool is_front = (pos == self->data); \
+        _cdeq_##X##_expand(self, n, is_front); \
+        if (is_front) \
+            pos = (self->data -= n); \
+        else { \
+            pos = self->data + idx; \
+            memmove(pos + n, pos, (size - idx)*sizeof(Value)); \
+        } \
         cdeq_##X##_iter_t it = {pos}; \
-        memmove(pos + len, pos, (size - idx) * sizeof(Value)); \
-        _cdeq_size(self) += len; \
+        _cdeq_size(self) += n; \
         while (first != finish) \
             *pos++ = valueFromRaw(valueToRaw(first++)); \
         return it; \
