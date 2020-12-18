@@ -91,7 +91,7 @@
     STC_API cvec_##X \
     cvec_##X##_clone(cvec_##X vec); \
     STC_API void \
-    cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t in[], size_t size); \
+    cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t arr[], size_t size); \
     STC_API void \
     cvec_##X##_push_back(cvec_##X* self, Value value); \
     STC_INLINE void \
@@ -193,10 +193,8 @@
 #define _c_implement_cvec_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
 \
     STC_DEF void \
-    cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t in[], size_t size) { \
-        cvec_##X##_reserve(self, cvec_size(*self) + size); \
-        _cvec_size(self) += size; \
-        for (size_t i=0; i<size; ++i) self->data[i] = valueFromRaw(in[i]); \
+    cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t arr[], size_t size) { \
+        cvec_##X##_insert_range_p(self, self->data + cvec_size(*self), arr, arr + size); \
     } \
 \
     STC_DEF void \

@@ -16,12 +16,12 @@ Declaring `using_cpque(my, cvec_my, >);`, `X` should be replaced by `my` in the 
 
 ## Types
 
-| Type name              | Type definition                         | Used to represent...      |
-|:-----------------------|:----------------------------------------|:--------------------------|
+| Type name            | Type definition                       | Used to represent...    |
+|:---------------------|:--------------------------------------|:------------------------|
 | `cpque_X`            | `struct {cpque_X_value_t* data; ...}` | The cpque type          |
-| `cpque_X_value_t`    | Depends on underlying container type    | The cpque element type  |
-| `cpque_X_input_t`    |                   "                     | cpque input type        |
-| `cpque_X_rawvalue_t` |                   "                     | cpque raw value type    |
+| `cpque_X_value_t`    | Depends on underlying container type  | The cpque element type  |
+| `cpque_X_input_t`    |                   "                   | cpque input type        |
+| `cpque_X_rawvalue_t` |                   "                   | cpque raw value type    |
 
 ## Header file
 
@@ -34,15 +34,15 @@ All cpque definitions and prototypes may be included in your C source file by in
 ## Methods
 
 ```c
-cpque_X               cpque_X_init(void);
-cpque_X               cpque_X_clone(cpque_X pq);
+cpque_X                 cpque_X_init(void);
+cpque_X                 cpque_X_clone(cpque_X pq);
 void                    cpque_X_make_heap(cpque_X* self);
 void                    cpque_X_del(cpque_X* self);
 
 size_t                  cpque_X_size(cpque_X pq);
 bool                    cpque_X_empty(cpque_X pq);
 const
-cpque_X_value_t*      cpque_X_top(const cpque_X* self);
+cpque_X_value_t*        cpque_X_top(const cpque_X* self);
 
 void                    cpque_X_push_n(cpque_X *self, const cpque_X_input_t arr[], size_t size);
 void                    cpque_X_emplace(cpque_X* self, cpque_X_rawvalue_t raw);
