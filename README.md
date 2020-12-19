@@ -12,6 +12,7 @@ An elegant, fully typesafe, generic, customizable, user-friendly, consistent, an
 - [***cmap*** - Generic fast **unordered map** type](docs/cmap_api.md)
 - [***cset*** - Generic fast **unordered set** type](docs/cset_api.md)
 - [***cvec*** - Generic dynamic **vector** type](docs/cvec_api.md)
+- [***cdeq*** - Generic dynamic **dequeue** type](docs/cdeq_api.md)
 - [***cstack*** - A **stack** adapter type](docs/cstack_api.md)
 - [***cqueue*** - A **queue** adapter type](docs/cqueue_api.md)
 - [***cpque*** - A **priority queue** adapter type](docs/cpque_api.md)
