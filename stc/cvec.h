@@ -28,9 +28,9 @@
 #include <string.h>
 
 #define cvec_inits         {NULL}
-#define cvec_size(v)       _cvec_safe_size((v).data)
-#define cvec_capacity(v)   _cvec_safe_capacity((v).data)
-#define cvec_empty(v)      (cvec_size(v) == 0)
+#define cvec_size(vec)     _cvec_safe_size((vec).data)
+#define cvec_capacity(vec) _cvec_safe_capacity((vec).data)
+#define cvec_empty(vec)    (cvec_size(vec) == 0)
 
 #define using_cvec(...) c_MACRO_OVERLOAD(using_cvec, __VA_ARGS__)
 #define using_cvec_2(X, Value) \
@@ -42,26 +42,26 @@
 #define using_cvec_str() \
                     using_cvec_7(str, cstr_t, cstr_del, cstr_compare_raw, const char*, cstr_to_raw, cstr_from)
 
-
-#define using_cvec_7(X, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw) \
-\
+#define typedefs_cvec(X, Value, RawValue) \
     typedef Value cvec_##X##_value_t; \
     typedef RawValue cvec_##X##_rawvalue_t; \
     typedef cvec_##X##_rawvalue_t cvec_##X##_input_t; \
     typedef struct { cvec_##X##_value_t *ref; } cvec_##X##_iter_t; \
-\
     typedef struct { \
         cvec_##X##_value_t* data; \
-    } cvec_##X; \
+    } cvec_##X
+
+#define using_cvec_7(X, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw) \
+    typedefs_cvec(X, Value, RawValue); \
 \
     STC_INLINE cvec_##X \
-    cvec_##X##_init(void) {cvec_##X v = cvec_inits; return v;} \
+    cvec_##X##_init(void) {cvec_##X vec = cvec_inits; return vec;} \
     STC_INLINE bool \
-    cvec_##X##_empty(cvec_##X v) {return cvec_empty(v);} \
+    cvec_##X##_empty(cvec_##X vec) {return cvec_empty(vec);} \
     STC_INLINE size_t \
-    cvec_##X##_size(cvec_##X v) {return cvec_size(v);} \
+    cvec_##X##_size(cvec_##X vec) {return cvec_size(vec);} \
     STC_INLINE size_t \
-    cvec_##X##_capacity(cvec_##X v) {return cvec_capacity(v);} \
+    cvec_##X##_capacity(cvec_##X vec) {return cvec_capacity(vec);} \
     STC_INLINE Value \
     cvec_##X##_value_from_raw(RawValue rawValue) {return valueFromRaw(rawValue);} \
     STC_INLINE void \
@@ -187,7 +187,7 @@
     STC_INLINE cvec_##X##_value_t* \
     cvec_##X##_itval(cvec_##X##_iter_t it) {return it.ref;} \
     STC_INLINE size_t \
-    cvec_##X##_index(cvec_##X v, cvec_##X##_iter_t it) {return it.ref - v.data;} \
+    cvec_##X##_index(cvec_##X vec, cvec_##X##_iter_t it) {return it.ref - vec.data;} \
 \
     _c_implement_cvec_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
     typedef cvec_##X cvec_##X##_t

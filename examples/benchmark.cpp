@@ -129,7 +129,7 @@ crand_t rng;
 #define SMAP_DTOR(X)              UMAP_DTOR(X)
 
 enum {
-    FAC = 3,
+    FAC = 2,
     N1 = 10000000 * FAC,
     N2 = 10000000 * FAC,
     N3 = 10000000 * FAC,
