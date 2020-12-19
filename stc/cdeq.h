@@ -69,7 +69,7 @@
     STC_API void \
     cdeq_##X##_resize(cdeq_##X* self, size_t size, Value fill_val); \
     STC_API void \
-    _cdeq_##X##_expand(cdeq_##X* self, size_t n, bool front); \
+    _cdeq_##X##_expand(cdeq_##X* self, size_t n, bool at_front); \
     STC_INLINE void \
     cdeq_##X##_swap(cdeq_##X* a, cdeq_##X* b) {c_swap(cdeq_##X, *a, *b);} \
 \
@@ -231,10 +231,10 @@
     } \
 \
     STC_DEF void \
-    _cdeq_##X##_expand(cdeq_##X* self, size_t n, bool front) { \
+    _cdeq_##X##_expand(cdeq_##X* self, size_t n, bool at_front) { \
         size_t len = cdeq_size(*self), cap = cdeq_capacity(*self); \
         size_t nfront = self->data - self->base, nback = cap - (nfront + len); \
-        if (front && nfront >= n || !front && nback >= n) \
+        if (at_front && nfront >= n || !at_front && nback >= n) \
             return; \
         if (len + n > cap) { \
             cap = (len + n + 6)*3/2; \
@@ -245,8 +245,8 @@
             rep[1] = cap; \
         } \
         size_t unused = cap - (len + n); \
-        size_t pos = front ? c_maxf(unused*0.7, (float) unused - nback) + n \
-                           : c_minf(unused*0.3, nfront); \
+        size_t pos = at_front ? c_maxf(unused*0.7, (float) unused - nback) + n \
+                              : c_minf(unused*0.3, nfront); \
         memmove(self->base + pos, self->data, len*sizeof(Value)); \
         self->data = self->base + pos; \
     } \
@@ -281,11 +281,12 @@
     } \
 \
     STC_DEF cdeq_##X##_iter_t \
-    cdeq_##X##_insert_range_p(cdeq_##X* self, cdeq_##X##_value_t* pos, const cdeq_##X##_value_t* first, const cdeq_##X##_value_t* finish) { \
+    cdeq_##X##_insert_range_p(cdeq_##X* self, cdeq_##X##_value_t* pos, \
+                              const cdeq_##X##_value_t* first, const cdeq_##X##_value_t* finish) { \
         size_t n = finish - first, idx = pos - self->data, size = cdeq_size(*self); \
-        bool is_front = (pos == self->data); \
-        _cdeq_##X##_expand(self, n, is_front); \
-        if (is_front) \
+        bool at_front = (pos == self->data); \
+        _cdeq_##X##_expand(self, n, at_front); \
+        if (at_front) \
             pos = (self->data -= n); \
         else { \
             pos = self->data + idx; \
@@ -304,7 +305,8 @@
         if (len > 0) { \
             cdeq_##X##_value_t* p = first, *end = self->data + _cdeq_size(self); \
             while (p != finish) valueDestroy(p++); \
-            memmove(first, finish, (end - finish) * sizeof(Value)); \
+            if (first == self->data) self->data += len; \
+            else memmove(first, finish, (end - finish) * sizeof(Value)); \
             _cdeq_size(self) -= len; \
         } \
         cdeq_##X##_iter_t it = {first}; return it; \

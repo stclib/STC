@@ -1,27 +1,27 @@
-STC - C99 Standard Container library
-====================================
+STC - Standard Template library for C
+=====================================
 
 Introduction
 ------------
 
-An elegant, fully typesafe, generic, customizable, user-friendly, consistent, and very fast standard container library for C99. This is a small headers only library with the most used container components, and a few algorithms:
-- [***carray*** - Generic dynamic **multi-dimensional array**](docs/carray_api.md)
+An modern, fully typesafe, generic, customizable, user-friendly, consistent, and very fast standard container library for C99. This is a small headers only library with the most used container components, and a few algorithms:
 - [***cstr*** - Powerful and compact **string** type](docs/cstr_api.md)
-- [***cbitset*** - A *std::bitset*/*boost::dynamic_bitset*-like **bitset** type](docs/cbitset_api.md)
-- [***clist*** - Generic circular **singly linked list** type](docs/clist_api.md)
-- [***cmap*** - Generic fast **unordered map** type](docs/cmap_api.md)
-- [***cset*** - Generic fast **unordered set** type](docs/cset_api.md)
-- [***cvec*** - Generic dynamic **vector** type](docs/cvec_api.md)
-- [***cdeq*** - Generic dynamic **dequeue** type](docs/cdeq_api.md)
-- [***cstack*** - A **stack** adapter type](docs/cstack_api.md)
-- [***cqueue*** - A **queue** adapter type](docs/cqueue_api.md)
-- [***cpque*** - A **priority queue** adapter type](docs/cpque_api.md)
-- [***cptr*** - Support for pointers and shared pointers in containers](docs/cptr_api.md)
-- [***copt*** - Implements *copt_get()*, a **getopt_long**-like function](docs/copt_api.md)
-- [***crand*** - A few very efficent modern **random number generators**](docs/crand_api.md)
-- [***ccommon*** - Collection of general definitions](docs/ccommon_api.md)
+- [***crand*** - An extremely efficent modern **random number generator**](docs/crand_api.md)
+- [***clist*** - Templated **std::forward_list** alike type](docs/clist_api.md)
+- [***cmap*** - Templated **std::unordered_map** alike type](docs/cmap_api.md)
+- [***cset*** - Templated **std::unordered_set** alike type](docs/cset_api.md)
+- [***cvec*** - Templated **std::vector** alike type](docs/cvec_api.md)
+- [***cdeq*** - Templated **std::dequeue** alike type](docs/cdeq_api.md)
+- [***cstack*** - Templated **std::stack** alike adapter type](docs/cstack_api.md)
+- [***cqueue*** - Templated **std::queue** alike adapter type](docs/cqueue_api.md)
+- [***cpque*** - Templated **std::priority_queue** alike adapter type](docs/cpque_api.md)
+- [***carray*** - Templated **multi-dimensional array** type](docs/carray_api.md)
+- [***cptr*** - Container pointers and **std::shared_ptr** alike support](docs/cptr_api.md)
+- [***cbitset*** - A **std::bitset** / **boost::dynamic_bitset* alike type](docs/cbitset_api.md)
+- [***copt*** - Implements *copt_get()*, a **getopt_long** alike function](docs/copt_api.md)
+- [***ccommon*** - General definitions](docs/ccommon_api.md)
 
-The usage of the containers is quite similar to the C++ standard containers, so it should be easy if you are familiar with them.
+The usage of the containers is similar to the C++ standard containers, so it should be easy if you are familiar with them.
 
 All containers mentioned above, except cstr_t and cbitset_t, are generic and therefore typesafe (similar to templates in C++). No casting is used. A simple example:
 ```C
@@ -67,7 +67,7 @@ int main(void) {
 Motivation
 ----------
 
-The aim of this project was to create a small **Standard Container Library for the C99 language**. It should
+The aim of this project was to create a small **Standard Template library for the C language**. It should
 - be easy to use, have intuitive naming and consistency across the library.
 - be type safe. Have minimal usage of casting and void* pointers.
 - be highly efficient. Both in speed and memory usage.
@@ -174,7 +174,7 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 cmap discussion
 ---------------
 
-**cmap/cset** uses open hashing and is among the fastest hash-tables for C and C++. The default max load-factor is 0.85.
+**cmap / cset** uses open hashing and is among the fastest hash-tables for C and C++. The default max load-factor is 0.85.
 
 You can customize the destroy-, hash-, equals- functions, but also define a convertion from a raw/literal type to the key-type specified. This is very useful when e.g. having cstr as key, and therefore a few using-macros are pre-defined
 for cmaps with cstr_t keys and/or values:
