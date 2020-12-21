@@ -32,7 +32,7 @@ int main() {
     crand_uniform_t dist1 = crand_uniform_init(1, 6);
     crand_uniformf_t dist2 = crand_uniformf_init(1.0, 10.0);
     crand_normalf_t dist3 = crand_normalf_init(1.0, 10.0);
-    
+
     uint64_t i = crand_next(&rng);
     int64_t iu = crand_uniform(&rng, &dist1);
     double xu = crand_uniformf(&rng, &dist2);
@@ -72,6 +72,25 @@ STC_INLINE double crand_uniformf(crand_t* rng, crand_uniformf_t* dist) {
     return crand_nextf(rng)*dist->range + dist->lower;
 }
 
+#if defined(__SIZEOF_INT128__)
+    #define cmul128(a, b, lo, hi) \
+        do { __uint128_t _z = (__uint128_t)(a) * (b); \
+             *(lo) = (uint64_t)_z, *(hi) = _z >> 64; } while(0)
+#elif defined(_MSC_VER) && defined(_WIN64)
+    #include <intrin.h>
+    #define cmul128(a, b, lo, hi) (*(lo) = _umul128(a, b, hi), (void)0)
+#elif defined(__x86_64__)
+    #define cmul128(a, b, lo, hi) \
+        asm("mulq %[rhs]" : "=a" (*(lo)), "=d" (*(hi)) \
+                          : [lhs] "0" (a), [rhs] "rm" (b))
+#endif
+
+STC_INLINE int64_t crand_uniform_fast(crand_t* rng, crand_uniform_t* d) {
+    uint64_t lo, hi;
+    cmul128(crand_next(rng), d->range, &lo, &hi);
+    return d->lower + hi;
+}
+
 /* double normal distributed RNG. */
 STC_INLINE crand_normalf_t crand_normalf_init(double mean, double stddev) {
     crand_normalf_t dist = {mean, stddev, 0.0, false}; return dist;
@@ -87,7 +106,7 @@ STC_API double crand_normalf(crand_t* rng, crand_normalf_t* dist);
  * 256bit state, updates only 192bit per rng.
  * 2^63 unique threads with a minimum 2^64 period lengths each.
  * 2^127 minimum period length for single thread (double loop).
- * Passes PractRand tested up to 8TB output, Vigna's Hamming weight test, 
+ * Passes PractRand tested up to 8TB output, Vigna's Hamming weight test,
  * and simple correlation tests, i.e. interleaved streams with one-bit diff state.
  */
 
@@ -115,21 +134,8 @@ STC_DEF crand_uniform_t crand_uniform_init(int64_t low, int64_t high) {
     return dist;
 }
 
-#if defined(__SIZEOF_INT128__)
-    #define cmul128(a, b, lo, hi) \
-        do { __uint128_t _z = (__uint128_t)(a) * (b); \
-             *(lo) = (uint64_t)_z, *(hi) = _z >> 64; } while(0)
-#elif defined(_MSC_VER) && defined(_WIN64)
-    #include <intrin.h>
-    #define cmul128(a, b, lo, hi) (*(lo) = _umul128(a, b, hi), (void)0)
-#elif defined(__x86_64__)
-    #define cmul128(a, b, lo, hi) \
-        asm("mulq %[rhs]" : "=a" (*(lo)), "=d" (*(hi)) \
-                          : [lhs] "0" (a), [rhs] "rm" (b))
-#endif
-
 STC_DEF int64_t crand_uniform(crand_t* rng, crand_uniform_t* d) {
-    uint64_t lo, hi; 
+    uint64_t lo, hi;
     do {
         cmul128(crand_next(rng), d->range, &lo, &hi);
     } while (lo < d->threshold);

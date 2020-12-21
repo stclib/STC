@@ -1,12 +1,18 @@
 #include <stc/crand.h>
 #include <stc/cqueue.h>
+#include <stc/cdeq.h>
 #include <stdio.h>
 
+#if 1
 using_clist(i, int);
-using_cqueue(i, clist_i); // min-heap (increasing values)
+using_cqueue(i, clist_i);
+#else
+using_cdeq(i, int);
+using_cqueue(i, cdeq_i);
+#endif
 
 int main() {
-    int n = 10000000;
+    int n = 100000000;
     crand_uniform_t dist;
     crand_t rng = crand_init(1234);
     dist = crand_uniform_init(0, n);
@@ -15,7 +21,7 @@ int main() {
 
     // Push ten million random numbers onto the queue.
     c_forrange (n)
-        cqueue_i_push(&queue, crand_uniform(&rng, &dist));
+        cqueue_i_push(&queue, crand_uniform_fast(&rng, &dist));
 
     // Push or pop on the queue ten million times
     printf("%d\n", n);

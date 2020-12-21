@@ -239,14 +239,14 @@
         if (len + n > cap) { \
             cap = (len + n + 6)*3/2; \
             size_t* rep = (size_t *) c_realloc(_cdeq_alloced(self->base), 2*sizeof(size_t) + cap*sizeof(Value)); \
+            rep[0] = len, rep[1] = cap; \
             self->base = (cdeq_##X##_value_t *) (rep + 2); \
             self->data = self->base + nfront; \
-            rep[0] = len; \
-            rep[1] = cap; \
+            return _deq_##X##_expand(self, n, at_front); \
         } \
         size_t unused = cap - (len + n); \
-        size_t pos = at_front ? c_maxf(unused*0.7, (float) unused - nback) + n \
-                              : c_minf(unused*0.3, nfront); \
+        size_t pos = at_front ? c_maxf(unused*0.9, (float) unused - nback) + n \
+                              : c_minf(unused*0.1, nfront); \
         memmove(self->base + pos, self->data, len*sizeof(Value)); \
         self->data = self->base + pos; \
     } \
@@ -284,11 +284,12 @@
     cdeq_##X##_insert_range_p(cdeq_##X* self, cdeq_##X##_value_t* pos, \
                               const cdeq_##X##_value_t* first, const cdeq_##X##_value_t* finish) { \
         size_t n = finish - first, idx = pos - self->data, size = cdeq_size(*self); \
-        bool at_front = (pos == self->data); \
+        bool at_front = (idx < size/2); \
         _cdeq_##X##_expand(self, n, at_front); \
-        if (at_front) \
-            pos = (self->data -= n); \
-        else { \
+        if (at_front) { \
+            memmove(self->data - n, self->data, idx*sizeof(Value)); \
+            pos = (self->data -= n) + idx; \
+        } else { \
             pos = self->data + idx; \
             memmove(pos + n, pos, (size - idx)*sizeof(Value)); \
         } \
