@@ -242,7 +242,7 @@
             rep[0] = len, rep[1] = cap; \
             self->base = (cdeq_##X##_value_t *) (rep + 2); \
             self->data = self->base + nfront; \
-            return _deq_##X##_expand(self, n, at_front); \
+            return _cdeq_##X##_expand(self, n, at_front); \
         } \
         size_t unused = cap - (len + n); \
         size_t pos = at_front ? c_maxf(unused*0.9, (float) unused - nback) + n \

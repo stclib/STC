@@ -52,7 +52,15 @@ typedef struct {double mean, stddev, next; bool has_next;} crand_normalf_t;
 /* int random number generator, range [0, 2^64). PRNG copyright Tyge Løvset, NORCE Research, 2020 */
 STC_API crand_t crand_init(uint64_t seed);
 STC_API crand_t crand_with_seq(uint64_t seed, uint64_t seq);
-STC_API uint64_t crand_next(crand_t* rng);
+
+STC_INLINE uint64_t crand_next(crand_t* rng) {
+    enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
+    uint64_t *s = rng->state;
+    const uint64_t b = s[1], result = s[0] ^ (s[2] += s[3]|1);
+    s[0] = (b + (b << LSHIFT)) ^ (b >> RSHIFT);
+    s[1] = ((b << LROT) | (b >> (64 - LROT))) + result;
+    return result;
+}
 
 /* double random number in range [low, high). */
 STC_INLINE double crand_nextf(crand_t* rng) {
@@ -62,7 +70,6 @@ STC_INLINE double crand_nextf(crand_t* rng) {
 
 /* integer uniform distributed RNG, range [low, high]. */
 STC_API crand_uniform_t crand_uniform_init(int64_t low, int64_t high);
-STC_API int64_t         crand_uniform(crand_t* rng, crand_uniform_t* dist);
 
 /* double uniform distributed RNG, range [low, high). */
 STC_INLINE crand_uniformf_t crand_uniformf_init(double low, double high) {
@@ -85,9 +92,9 @@ STC_INLINE double crand_uniformf(crand_t* rng, crand_uniformf_t* dist) {
                           : [lhs] "0" (a), [rhs] "rm" (b))
 #endif
 
-STC_INLINE int64_t crand_uniform_fast(crand_t* rng, crand_uniform_t* d) {
+STC_INLINE int64_t crand_uniform(crand_t* rng, crand_uniform_t* d) {
     uint64_t lo, hi;
-    cmul128(crand_next(rng), d->range, &lo, &hi);
+    do { cmul128(crand_next(rng), d->range, &lo, &hi); } while (lo < d->threshold);
     return d->lower + hi;
 }
 
@@ -118,28 +125,12 @@ STC_DEF crand_t crand_with_seq(uint64_t seed, uint64_t seq) {
     for (int i = 0; i < 8; ++i) crand_next(&rng);
     return rng;
 }
-STC_DEF uint64_t crand_next(crand_t* rng) {
-    enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
-    uint64_t *s = rng->state;
-    const uint64_t b = s[1], result = s[0] ^ (s[2] += s[3]|1);
-    s[0] = (b + (b << LSHIFT)) ^ (b >> RSHIFT);
-    s[1] = ((b << LROT) | (b >> (64 - LROT))) + result;
-    return result;
-}
 
 /* Very fast unbiased uniform int RNG with bounds [low, high] */
 STC_DEF crand_uniform_t crand_uniform_init(int64_t low, int64_t high) {
     crand_uniform_t dist = {low, (uint64_t) (high - low + 1)};
     dist.threshold = (uint64_t)(-dist.range) % dist.range;
     return dist;
-}
-
-STC_DEF int64_t crand_uniform(crand_t* rng, crand_uniform_t* d) {
-    uint64_t lo, hi;
-    do {
-        cmul128(crand_next(rng), d->range, &lo, &hi);
-    } while (lo < d->threshold);
-    return d->lower + hi;
 }
 
 /* Marsaglia polar method for gaussian/normal distribution. */

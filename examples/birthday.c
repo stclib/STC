@@ -1,61 +1,57 @@
-
+#include <math.h>
 #include <stdio.h>
 #include <time.h>
 
 #include <stc/crand.h>
 #include <stc/cmap.h>
-#include <stc/cvec.h>
 
 using_cmap(ic, uint64_t, uint8_t);
+static uint64_t seed = 12345;
 
-const static uint64_t seed = 1234;
-const static uint64_t N = 1ull << 27;
-const static uint64_t mask = (1ull << 52) - 1;
-
-void repeats(void)
+static void test_repeats(void)
 {
+    enum {BITS = 46, BITS_TEST = BITS/2 + 2};
+    const static uint64_t N = 1ull << BITS_TEST;
+    const static uint64_t mask = (1ull << BITS) - 1;
+
+    printf("birthday paradox: value range: 2^%d, testing repeats of 2^%d values\n", BITS, BITS_TEST);
     crand_t rng = crand_init(seed);
     cmap_ic m = cmap_ic_init();
     cmap_ic_reserve(&m, N);
-    clock_t now = clock();
     c_forrange (i, N) {
         uint64_t k = crand_next(&rng) & mask;
         int v = ++cmap_ic_emplace(&m, k, 0).first->second;
-        if (v > 1) printf("%zu: %llx - %d\n", i, k, v);
+        if (v > 1) printf("repeated value %llx (%d) at 2^%d\n", k, v, (int) log2(i));
     }
-    float diff = (float) (clock() - now) / CLOCKS_PER_SEC;
-    printf("%.02f", diff);
 }
 
 
 using_cmap(x, uint32_t, uint64_t);
-using_cvec(x, uint64_t);
 
-void distribution(void)
+void test_distribution(void)
 {
-    crand_t rng = crand_init(seed); // time(NULL), time(NULL));
-    const size_t N = 1ull << 28, M = 1ull << 9; // 1ull << 10;
-    cmap_x map = cmap_x_with_capacity(M);
-    clock_t now = clock();
-    crand_uniform_t dist = crand_uniform_init(0, M);
+    enum {BITS = 26};
+    printf("distribution test: 2^%d values\n", BITS);
+    crand_t rng = crand_init(seed);
+    const size_t N = 1ull << BITS ;
+    cmap_x map = cmap_x_init();
 
     c_forrange (N) {
-        ++cmap_x_emplace(&map, crand_uniform(&rng, &dist), 0).first->second;
+        uint64_t k = crand_next(&rng);
+        ++cmap_x_emplace(&map, k & 0xf, 0).first->second;
     }
-    float diff = (float) (clock() - now) / CLOCKS_PER_SEC;
 
     uint64_t sum = 0;
     c_foreach (i, cmap_x, map) sum += i.ref->second;
     sum /= map.size;
 
     c_foreach (i, cmap_x, map)
-        printf("%u: %zu - %zu\n", i.ref->first, i.ref->second, sum);
-
-    printf("%.02f\n", diff);
+        printf("%4u: %zu - %zu: %11.8f\n", i.ref->first, i.ref->second, sum, (1 - (double) i.ref->second / sum));
 }
 
 int main()
 {
-    repeats();
-    //distribution();
+    seed = time(NULL);
+    test_distribution();
+    test_repeats();
 }

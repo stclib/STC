@@ -11,7 +11,7 @@ int main()
 {
     uint32_t seed = time(NULL);
     crand_t rng;
-    int N = 3000000, M = 100;
+    int N = 10000000, M = 10;
 
     cpque_f pq = cpque_f_init();
 
