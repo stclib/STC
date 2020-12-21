@@ -3,7 +3,7 @@
 #include <stc/cdeq.h>
 #include <stdio.h>
 
-#if 1
+#if 0
 using_clist(i, int);
 using_cqueue(i, clist_i);
 #else
@@ -21,7 +21,7 @@ int main() {
 
     // Push ten million random numbers onto the queue.
     c_forrange (n)
-        cqueue_i_push(&queue, crand_uniform_fast(&rng, &dist));
+        cqueue_i_push(&queue, crand_uniform(&rng, &dist));
 
     // Push or pop on the queue ten million times
     printf("%d\n", n);
