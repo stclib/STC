@@ -37,10 +37,6 @@ using_cvec(str, cstr_t, cstr_del, cstr_compare_raw, const char*, cstr_to_raw, cs
 | Name                       | Purpose              |
 |:---------------------------|:---------------------|
 |  `cvec_inits`              | Initializer constant |
-|  `cvec_empty(vec)`         | true if vec is empty |
-|  `cvec_size(vec)`          | return vec length    |
-|  `cvec_capacity(vec)`      | return vec capacity  |
-
 
 ## Header file
 

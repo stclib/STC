@@ -55,11 +55,7 @@ int main(void) {
 #include <string.h>
 
 #define cmap_inits                    {NULL, NULL, 0, 0, 0.85f, 0.15f}
-#define cmap_empty(m)                 ((m).size == 0)
-#define cmap_size(m)                  ((size_t) (m).size)
 #define cset_inits                    cmap_inits
-#define cset_empty(s)                 cmap_empty(s)
-#define cset_size(s)                  cmap_size(s)
 
 #define c_try_emplace(self, ctype, key, val) do { \
     ctype##_result_t __r = ctype##_insert_key_(self, key); \

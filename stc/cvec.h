@@ -28,9 +28,6 @@
 #include <string.h>
 
 #define cvec_inits         {NULL}
-#define cvec_size(vec)     _cvec_safe_size((vec).data)
-#define cvec_capacity(vec) _cvec_safe_capacity((vec).data)
-#define cvec_empty(vec)    (cvec_size(vec) == 0)
 
 #define using_cvec(...) c_MACRO_OVERLOAD(using_cvec, __VA_ARGS__)
 #define using_cvec_2(X, Value) \
@@ -56,12 +53,14 @@
 \
     STC_INLINE cvec_##X \
     cvec_##X##_init(void) {cvec_##X vec = cvec_inits; return vec;} \
+    STC_INLINE size_t \
+    cvec_##X##_size(cvec_##X vec) \
+        {return vec.data ? ((const size_t *) vec.data)[-2] : 0;} \
+    STC_INLINE size_t \
+    cvec_##X##_capacity(cvec_##X vec) \
+        {return vec.data ? ((const size_t *) vec.data)[-1] : 0;} \
     STC_INLINE bool \
-    cvec_##X##_empty(cvec_##X vec) {return cvec_empty(vec);} \
-    STC_INLINE size_t \
-    cvec_##X##_size(cvec_##X vec) {return cvec_size(vec);} \
-    STC_INLINE size_t \
-    cvec_##X##_capacity(cvec_##X vec) {return cvec_capacity(vec);} \
+    cvec_##X##_empty(cvec_##X vec) {return !cvec_##X##_size(vec);} \
     STC_INLINE Value \
     cvec_##X##_value_from_raw(RawValue rawValue) {return valueFromRaw(rawValue);} \
     STC_INLINE void \
@@ -159,7 +158,7 @@
     cvec_##X##_back(cvec_##X* self) {return self->data + _cvec_size(self) - 1;} \
     STC_INLINE cvec_##X##_value_t* \
     cvec_##X##_at(cvec_##X* self, size_t i) { \
-        assert(i < cvec_size(*self)); \
+        assert(i < cvec_##X##_size(*self)); \
         return self->data + i; \
     } \
 \
@@ -171,7 +170,7 @@
     } \
     STC_INLINE void \
     cvec_##X##_sort(cvec_##X* self) { \
-        cvec_##X##_sort_with(self, 0, cvec_size(*self), cvec_##X##_value_compare); \
+        cvec_##X##_sort_with(self, 0, cvec_##X##_size(*self), cvec_##X##_value_compare); \
     } \
 \
     STC_INLINE cvec_##X##_iter_t \
@@ -180,7 +179,7 @@
     } \
     STC_INLINE cvec_##X##_iter_t \
     cvec_##X##_end(const cvec_##X* self) { \
-        cvec_##X##_iter_t it = {self->data + cvec_size(*self)}; return it; \
+        cvec_##X##_iter_t it = {self->data + cvec_##X##_size(*self)}; return it; \
     } \
     STC_INLINE void \
     cvec_##X##_next(cvec_##X##_iter_t* it) {++it->ref;} \
@@ -199,8 +198,8 @@
 \
     STC_DEF void \
     cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t arr[], size_t n) { \
-        cvec_##X##_reserve(self, cvec_size(*self) + n); \
-        cvec_##X##_value_t* p = self->data + cvec_size(*self); \
+        cvec_##X##_reserve(self, cvec_##X##_size(*self) + n); \
+        cvec_##X##_value_t* p = self->data + _cvec_size(self); \
         for (size_t i=0; i < n; ++i) *p++ = valueFromRaw(arr[i]); \
         _cvec_size(self) += n; \
     } \
@@ -220,9 +219,10 @@
 \
     STC_DEF void \
     cvec_##X##_reserve(cvec_##X* self, size_t cap) { \
-        if (cap > cvec_capacity(*self)) { \
-            size_t len = cvec_size(*self); \
-            size_t* rep = (size_t *) c_realloc(_cvec_alloced(self->data), 2 * sizeof(size_t) + cap * sizeof(Value)); \
+        size_t* rep; \
+        if (cap > cvec_##X##_capacity(*self)) { \
+            size_t len = cvec_##X##_size(*self); \
+            rep = (size_t *) c_realloc(_cvec_alloced(self->data), 2 * sizeof(size_t) + cap * sizeof(Value)); \
             self->data = (Value *) (rep + 2); \
             rep[0] = len; \
             rep[1] = cap; \
@@ -231,21 +231,21 @@
     STC_DEF void \
     cvec_##X##_resize(cvec_##X* self, size_t size, Value null_val) { \
         cvec_##X##_reserve(self, size); \
-        for (size_t i=cvec_size(*self); i<size; ++i) self->data[i] = null_val; \
+        for (size_t i=cvec_##X##_size(*self); i<size; ++i) self->data[i] = null_val; \
         if (self->data) _cvec_size(self) = size; \
     } \
 \
     STC_DEF void \
     cvec_##X##_push_back(cvec_##X* self, Value value) { \
-        size_t len = cvec_size(*self); \
-        if (len == cvec_capacity(*self)) \
+        size_t len = cvec_##X##_size(*self); \
+        if (len == cvec_##X##_capacity(*self)) \
             cvec_##X##_reserve(self, 4 + len * 3 / 2); \
         self->data[_cvec_size(self)++] = value; \
     } \
 \
     STC_DEF cvec_##X \
     cvec_##X##_clone(cvec_##X vec) { \
-        size_t len = cvec_size(vec); \
+        size_t len = cvec_##X##_size(vec); \
         cvec_##X out = cvec_##X##_with_capacity(len); \
         cvec_##X##_insert_range_p(&out, out.data, vec.data, vec.data + len); \
         return out; \
@@ -253,8 +253,8 @@
 \
     STC_DEF cvec_##X##_iter_t \
     cvec_##X##_insert_range_p(cvec_##X* self, cvec_##X##_value_t* pos, const cvec_##X##_value_t* first, const cvec_##X##_value_t* finish) { \
-        size_t len = finish - first, idx = pos - self->data, size = cvec_size(*self); \
-        if (size + len > cvec_capacity(*self)) \
+        size_t len = finish - first, idx = pos - self->data, size = cvec_##X##_size(*self); \
+        if (size + len > cvec_##X##_capacity(*self)) \
             cvec_##X##_reserve(self, 4 + (size + len) * 3 / 2); \
         _cvec_size(self) += len; \
         pos = self->data + idx; \
@@ -311,15 +311,6 @@ typedef int(*_cvec_cmp)(const void*, const void*);
 STC_EXTERN_IMPORT void qsort(void *base, size_t nitems, size_t size, _cvec_cmp cmp);
 
 #define _cvec_size(self) ((size_t *) (self)->data)[-2]
-
-STC_INLINE size_t* _cvec_alloced(void* data) {
-    return data ? ((size_t *) data) - 2 : NULL;
-}
-STC_INLINE size_t _cvec_safe_size(const void* data) {
-    return data ? ((const size_t *) data)[-2] : 0;
-}
-STC_INLINE size_t _cvec_safe_capacity(const void* data) {
-    return data ? ((const size_t *) data)[-1] : 0;
-}
+#define _cvec_alloced(data) ((data) ? ((size_t *) (data)) - 2 : NULL)
 
 #endif

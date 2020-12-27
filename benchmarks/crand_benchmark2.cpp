@@ -30,7 +30,7 @@ void test1(void)
     diff = clock() - before;
     printf("std::uniform:\t\t%.02f, %zu\n\n", (float) diff / CLOCKS_PER_SEC, sum);
 
-    c_forrange (30) printf("%02zd ", idist(rng));
+    c_forrange (30) printf("%02d ", idist(rng));
     puts("");
     c_forrange (8) printf("%f ", fdist(rng));
     puts("\n");

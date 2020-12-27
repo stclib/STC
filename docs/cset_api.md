@@ -39,10 +39,6 @@ be replaced by `my` in all of the following documentation.
 | Name                                            | Purpose                  |
 |:------------------------------------------------|:-------------------------|
 |  `cset_inits`                                   | Initializer const        |
-|  `cset_empty(set)`                              | Test for empty set       |
-|  `cset_size(set)`                               | Get set size             |
-|  `cset_capacity(set)`                           | Get set capacity         |
-|  `c_try_emplace(self, ctype, key, ref)`         | Emplace if key exist     |
 
 ## Header file
 

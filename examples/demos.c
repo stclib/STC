@@ -50,7 +50,7 @@ void vectordemo1()
     cvec_ix_pop_back(&bignums);      // erase the last
     cvec_ix_erase_n(&bignums, 0, 1); // erase the first
 
-    for (size_t i = 0; i < cvec_size(bignums); ++i) {
+    for (size_t i = 0; i < cvec_ix_size(bignums); ++i) {
         printf("%zu: %zu\n", i, bignums.data[i]);
     }
     cvec_ix_del(&bignums);
@@ -165,10 +165,10 @@ void mapdemo3()
     cmap_str_value_t *e = cmap_str_find(&table, "Make");
     c_foreach (i, cmap_str, table)
         printf("entry: %s: %s\n", i.ref->first.str, i.ref->second.str);
-    printf("size %zu: remove: Make: %s\n", cmap_size(table), e->second.str);
+    printf("size %zu: remove: Make: %s\n", cmap_str_size(table), e->second.str);
     cmap_str_erase(&table, "Make");
 
-    printf("size %zu\n", cmap_size(table));
+    printf("size %zu\n", cmap_str_size(table));
     c_foreach (i, cmap_str, table)
         printf("entry: %s: %s\n", i.ref->first.str, i.ref->second.str);
     cmap_str_del(&table); // frees key and value cstrs, and hash table.

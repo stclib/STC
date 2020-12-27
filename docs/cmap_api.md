@@ -58,9 +58,6 @@ using_cmap(str, cstr_t, cstr_t, cstr_del, cstr_equals_raw, cstr_hash_raw,
 | Name                                     | Purpose                |
 |:-----------------------------------------|:-----------------------|
 |  `cmap_inits`                            | Initializer const      |
-|  `cmap_empty(map)`                       | Test for empty map     |
-|  `cmap_size(map)`                        | Get map size           |
-|  `cmap_capacity(map)`                    | Get map capacity       |
 |  `c_try_emplace(self, ctype, key, ref)`  | Emplace if key exist   |
 
 ## Header file

@@ -86,7 +86,6 @@
     } clist_##X##_iter_t
 
 #define clist_inits         {NULL}
-#define clist_empty(list)   ((list).last == NULL)
 
 #define c_emplace_after(self, ctype, pos, ...) do { \
     ctype* __self = self; \
@@ -110,7 +109,7 @@ STC_API size_t _clist_size(const clist_void* self);
     STC_INLINE clist_##X \
     clist_##X##_init(void) {clist_##X x = clist_inits; return x;} \
     STC_INLINE bool \
-    clist_##X##_empty(clist_##X ls) {return clist_empty(ls);} \
+    clist_##X##_empty(clist_##X ls) {return ls.last == NULL;} \
     STC_INLINE size_t \
     clist_##X##_size(clist_##X ls) {return _clist_size((const clist_void*) &ls);} \
     STC_INLINE Value \

@@ -359,7 +359,7 @@ STC_INLINE size_t _cdeq_safe_capacity(const void* base) {
     return base ? ((const size_t *) base)[-1] : 0;
 }
 
-static inline c_minf(double x, double y) { return x < y ? x : y; }
-static inline c_maxf(double x, double y) { return x > y ? x : y; }
+static inline double c_minf(double x, double y) { return x < y ? x : y; }
+static inline double c_maxf(double x, double y) { return x > y ? x : y; }
 
 #endif
