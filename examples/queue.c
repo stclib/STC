@@ -13,20 +13,20 @@ using_cqueue(i, cdeq_i);
 
 int main() {
     int n = 100000000;
-    crand_uniform_t dist;
-    crand_t rng = crand_init(1234);
-    dist = crand_uniform_init(0, n);
+    stc64_uniform_t dist;
+    stc64_t rng = stc64_init(1234);
+    dist = stc64_uniform_init(0, n);
 
     cqueue_i queue = cqueue_i_init();
 
     // Push ten million random numbers onto the queue.
     c_forrange (n)
-        cqueue_i_push(&queue, crand_uniform(&rng, &dist));
+        cqueue_i_push(&queue, stc64_uniform(&rng, &dist));
 
     // Push or pop on the queue ten million times
     printf("%d\n", n);
     c_forrange (n) { // range uses initial n only.
-        int r = crand_uniform(&rng, &dist);
+        int r = stc64_uniform(&rng, &dist);
         if (r & 1)
             ++n, cqueue_i_push(&queue, r);
         else

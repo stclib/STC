@@ -10,15 +10,15 @@ using_cpque(f, cvec_f, >);
 int main()
 {
     uint32_t seed = time(NULL);
-    crand_t rng;
+    stc64_t rng;
     int N = 10000000, M = 10;
 
     cpque_f pq = cpque_f_init();
 
-    rng = crand_init(seed);
+    rng = stc64_init(seed);
     clock_t start = clock();
     c_forrange (i, int, N)
-        cvec_f_push_back(&pq, (float) crand_nextf(&rng)*100000);
+        cvec_f_push_back(&pq, (float) stc64_randf(&rng)*100000);
 
     cpque_f_make_heap(&pq);
     printf("Built priority queue: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
@@ -35,7 +35,7 @@ int main()
 
     start = clock();
     c_forrange (i, int, N)
-        cpque_f_push(&pq, (float) crand_nextf(&rng)*100000);
+        cpque_f_push(&pq, (float) stc64_randf(&rng)*100000);
     printf("pushed PQ: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
 
     c_forrange (i, int, M) {

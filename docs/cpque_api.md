@@ -63,13 +63,13 @@ using_cpque(i, cvec_i, >); // adaptor type, '>' = min-heap
 int main()
 {
     size_t N = 10000000;
-    crand_t rng = crand_init(1234);
-    crand_uniform_t dist = crand_uniform_init(0, N * 10);
+    stc64_t rng = stc64_init(1234);
+    stc64_uniform_t dist = stc64_uniform_init(0, N * 10);
 
     cpque_i heap = cpque_i_init();
     // Push ten million random numbers to priority queue, plus some negative ones.
     c_forrange (N)
-        cpque_i_push(&heap, crand_uniform(&rng, &dist));
+        cpque_i_push(&heap, stc64_uniform(&rng, &dist));
     c_push_items(&heap, cpque_i, {-231, -32, -873, -4, -343});
 
     // Extract and display the fifty smallest.

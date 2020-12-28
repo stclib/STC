@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <time.h>
-#include <stc/crand.h>
 #include <random>
+#include "stc/crand.h"
+#include "others/pcg_random.hpp"
+
+enum {N = 1000000000};
 
 void test1(void)
 {
-    enum {N = 1000000000};
     clock_t diff, before;
     uint64_t sum;
 
@@ -20,7 +22,7 @@ void test1(void)
         sum += rng();
     }
     diff = clock() - before;
-    printf("std::random:\t\t%.02f, %zu\n", (float) diff / CLOCKS_PER_SEC, sum);
+    printf("std::random:\t\t%.02f, %zu, sz:%zu\n", (float) diff / CLOCKS_PER_SEC, sum, sizeof rng);
 
     before = clock();
     sum = 0;
@@ -36,35 +38,72 @@ void test1(void)
     puts("\n");
 }
 
-void test2(void)
+void test2()
 {
-    enum {N = 1000000000};
     clock_t diff, before;
     uint64_t sum;
 
-    crand_t rng = crand_init(time(NULL));
-    crand_uniform_t idist = crand_uniform_init(1, 10);
-    crand_uniformf_t fdist = crand_uniformf_init(1, 10);
+    // Seed with a real random value, if available
+    pcg_extras::seed_seq_from<std::random_device> seed_source;
+
+    // Make a random number engine
+    pcg64 rng(seed_source);
+
+    // Choose a random mean between 1 and 10
+    std::uniform_int_distribution<int> idist(1, 10);
+    std::uniform_real_distribution<double> fdist(1, 10);
+
+   before = clock();
+    sum = 0;
+    c_forrange (N) {
+        sum += rng();
+    }
+    diff = clock() - before;
+    printf("pcg64::random:\t\t%.02f, %zu, sz:%zu\n", (float) diff / CLOCKS_PER_SEC, sum, sizeof rng);
 
     before = clock();
     sum = 0;
     c_forrange (N) {
-        sum += crand_next(&rng);
+        sum += idist(rng);
     }
     diff = clock() - before;
-    printf("crand_next:\t\t%.02f, %zu\n", (float) diff / CLOCKS_PER_SEC, sum);
+    printf("pcg64::uniform:\t\t%.02f, %zu\n\n", (float) diff / CLOCKS_PER_SEC, sum);
 
-    before = clock();
-    sum = 0;
-    c_forrange (N) {
-        sum += crand_uniform(&rng, &idist);
-    }
-    diff = clock() - before;
-    printf("crand_uniform:\t\t%.02f, %zu\n\n", (float) diff / CLOCKS_PER_SEC, sum);
-
-    c_forrange (30) printf("%02zd ", crand_uniform(&rng, &idist));
+    c_forrange (30) printf("%02d ", idist(rng));
     puts("");
-    c_forrange (8) printf("%f ", crand_uniformf(&rng, &fdist));
+    c_forrange (8) printf("%f ", fdist(rng));
+    puts("\n");
+}
+
+
+void test3(void)
+{
+    clock_t diff, before;
+    uint64_t sum;
+
+    stc64_t rng = stc64_init(time(NULL));
+    stc64_uniform_t idist = stc64_uniform_init(1, 10);
+    stc64_uniformf_t fdist = stc64_uniformf_init(1, 10);
+
+    before = clock();
+    sum = 0;
+    c_forrange (N) {
+        sum += stc64_rand(&rng);
+    }
+    diff = clock() - before;
+    printf("stc64_random:\t\t%.02f, %zu sz:%zu\n", (float) diff / CLOCKS_PER_SEC, sum, sizeof rng);
+
+    before = clock();
+    sum = 0;
+    c_forrange (N) {
+        sum += stc64_uniform(&rng, &idist);
+    }
+    diff = clock() - before;
+    printf("stc64_uniform:\t\t%.02f, %zu\n\n", (float) diff / CLOCKS_PER_SEC, sum);
+
+    c_forrange (30) printf("%02zd ", stc64_uniform(&rng, &idist));
+    puts("");
+    c_forrange (8) printf("%f ", stc64_uniformf(&rng, &fdist));
     puts("\n");
 }
 
@@ -72,4 +111,5 @@ int main()
 {
     test1();
     test2();
+    test3();
 }

@@ -4,15 +4,15 @@
 #include <stc/cdeq.h>
 #include <stc/crand.h>
 
-enum {N = 200000000, M = 10000, P = 5000, R = 100};
+enum {N = 200000000, M = 10000, P = 5000, R = 50};
 using_cdeq(i, int);
 
 void test1() {
     clock_t t1 = clock(), t2, t3;
-    crand_t rng = crand_init(0);
+    stc64_t rng = stc64_init(0);
     std::deque<int> deq;
     for (size_t i = 1; i < N; i++) {
-        deq.push_front(crand_next(&rng));
+        deq.push_front(stc64_rand(&rng));
         if (i % M == 0)
             for (int j = 0; j < P; j++)
                 deq.pop_back();
@@ -30,10 +30,10 @@ void test1() {
 
 void test2() {
     clock_t t1 = clock(), t2, t3;
-    crand_t rng = crand_init(0);
+    stc64_t rng = stc64_init(0);
     cdeq_i deq = cdeq_inits;
     for (size_t i = 1; i < N; i++) {
-        cdeq_i_push_front(&deq, crand_next(&rng));
+        cdeq_i_push_front(&deq, stc64_rand(&rng));
         if (i % M == 0)
             for (int j = 0; j < P; j++)
                 cdeq_i_pop_back(&deq);

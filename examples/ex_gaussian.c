@@ -25,13 +25,13 @@ int main()
 
     // Setup random engine with normal distribution.
     uint64_t seed = time(NULL);
-    crand_t rng = crand_init(seed);
-    crand_normalf_t dist = crand_normalf_init(Mean, StdDev);
+    stc64_t rng = stc64_init(seed);
+    stc64_normalf_t dist = stc64_normalf_init(Mean, StdDev);
 
     // Create histogram map
     cmap_i mhist = cmap_i_init();
     for (size_t i = 0; i < N; ++i) {
-        int index = (int) round( crand_normalf(&rng, &dist) );
+        int index = (int) round( stc64_normalf(&rng, &dist) );
         cmap_i_emplace(&mhist, index, 0).first->second += 1;
     }
 

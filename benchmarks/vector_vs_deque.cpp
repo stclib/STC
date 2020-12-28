@@ -20,7 +20,7 @@ void add(cvec_si* tm, const char* s, int n) { Si si = {s, n}; cvec_si_push_back(
 void test_vector(const int num_iterations)
 {
     std::vector<int> v;
-    crand_t rng = crand_init(0);
+    stc64_t rng = stc64_init(0);
     v.reserve(num_iterations + 2); //Ensure there is enough space reserved.
 
     // == PUSH_BACK
@@ -29,7 +29,7 @@ void test_vector(const int num_iterations)
 
         for (int i=0; i<(num_iterations>>1); ++i)
         {
-            v.push_back(crand_next(&rng));
+            v.push_back(stc64_rand(&rng));
         }
 
         clock_t t2 = std::clock();
@@ -44,7 +44,7 @@ void test_vector(const int num_iterations)
         for (int i=0; i<(num_iterations>>1); ++i)
         {
             // Rather add some more elements to back.
-            v.push_back(crand_next(&rng));
+            v.push_back(stc64_rand(&rng));
         }
 
         clock_t t2 = std::clock();
@@ -96,7 +96,7 @@ void test_vector(const int num_iterations)
 void test_deque(const int num_iterations)
 {
     std::deque<int> d;
-    crand_t rng = crand_init(0);
+    stc64_t rng = stc64_init(0);
 
     // == PUSH_BACK
     {
@@ -104,7 +104,7 @@ void test_deque(const int num_iterations)
 
         for (int i=0; i<(num_iterations>>1); ++i)
         {
-            d.push_back(crand_next(&rng));
+            d.push_back(stc64_rand(&rng));
         }
 
         clock_t t2 = std::clock();
@@ -118,7 +118,7 @@ void test_deque(const int num_iterations)
 
         for (int i=0; i<(num_iterations>>1); ++i)
         {
-            d.push_front(crand_next(&rng));
+            d.push_front(stc64_rand(&rng));
         }
 
         clock_t t2 = std::clock();
@@ -177,7 +177,7 @@ using_cvec(i, int);
 void test_cvec(const int num_iterations)
 {
     cvec_i v = cvec_inits;
-    crand_t rng = crand_init(0);
+    stc64_t rng = stc64_init(0);
     //v.reserve(num_iterations + 2); //Ensure there is enough space reserved.
 
     // == PUSH_BACK
@@ -186,7 +186,7 @@ void test_cvec(const int num_iterations)
 
         for (int i=0; i<(num_iterations>>1); ++i)
         {
-            cvec_i_push_back(&v, crand_next(&rng));
+            cvec_i_push_back(&v, stc64_rand(&rng));
         }
 
         clock_t t2 = std::clock();
@@ -201,7 +201,7 @@ void test_cvec(const int num_iterations)
         for (int i=0; i<(num_iterations>>1); ++i)
         {
             // Rather add some more elements to back.
-            cvec_i_push_back(&v, crand_next(&rng));
+            cvec_i_push_back(&v, stc64_rand(&rng));
         }
 
         clock_t t2 = std::clock();
@@ -257,7 +257,7 @@ using_cdeq(i, int);
 void test_cdeq(const int num_iterations)
 {
     cdeq_i d = cdeq_i_with_capacity(num_iterations + 2);
-    crand_t rng = crand_init(0);
+    stc64_t rng = stc64_init(0);
 
     // == PUSH_BACK
     {
@@ -265,7 +265,7 @@ void test_cdeq(const int num_iterations)
 
         for (int i=0; i<(num_iterations>>1); ++i)
         {
-            cdeq_i_push_back(&d, crand_next(&rng));
+            cdeq_i_push_back(&d, stc64_rand(&rng));
         }
 
         clock_t t2 = std::clock();
@@ -279,7 +279,7 @@ void test_cdeq(const int num_iterations)
 
         for (int i=0; i<(num_iterations>>1); ++i)
         {
-            cdeq_i_push_front(&d, crand_next(&rng));
+            cdeq_i_push_front(&d, stc64_rand(&rng));
         }
 
         clock_t t2 = std::clock();

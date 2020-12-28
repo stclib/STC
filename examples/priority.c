@@ -11,19 +11,19 @@ using_cpque(i, cvec_i, >); // min-heap (increasing values)
 
 int main() {
     size_t N = 10000000;
-    crand_t rng = crand_init(time(NULL));
-    crand_uniform_t dist = crand_uniform_init(0, N * 10);
+    stc64_t rng = stc64_init(time(NULL));
+    stc64_uniform_t dist = stc64_uniform_init(0, N * 10);
     cpque_i heap = cpque_i_init();
 
     // Push ten million random numbers to priority queue
     c_forrange (N)
-        cpque_i_push(&heap, crand_uniform(&rng, &dist));
+        cpque_i_push(&heap, stc64_uniform(&rng, &dist));
 
     // push some negative numbers too.
     c_push_items(&heap, cpque_i, {-231, -32, -873, -4, -343});
 
     c_forrange (N)
-        cpque_i_push(&heap, crand_uniform(&rng, &dist));
+        cpque_i_push(&heap, stc64_uniform(&rng, &dist));
 
 
     // Extract the hundred smallest.
