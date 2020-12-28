@@ -6,7 +6,7 @@ Introduction
 
 An modern, fully typesafe, generic, customizable, user-friendly, consistent, and very fast standard container library for C99. This is a small headers only library with the most used container components, and a few algorithms:
 - [***cstr*** - Powerful and compact **string** type](docs/cstr_api.md)
-- [***crand*** - An extremely efficent modern **random number generator**](docs/stc64_api.md)
+- [***crand*** - An extremely efficent modern **random number generator**](docs/crand_api.md)
 - [***clist*** - Templated **std::forward_list** alike type](docs/clist_api.md)
 - [***cmap*** - Templated **std::unordered_map** alike type](docs/cmap_api.md)
 - [***cset*** - Templated **std::unordered_set** alike type](docs/cset_api.md)
