@@ -236,8 +236,8 @@
         size_t nfront = self->data - self->base, nback = cap - (nfront + len); \
         if (at_front && nfront >= n || !at_front && nback >= n) \
             return; \
-        if (len + n > cap) { \
-            cap = (len + n + 6)*3/2; \
+        if ((len + n)*1.1 > cap) { \
+            cap = (len + n + 6)*1.5; \
             size_t* rep = (size_t *) c_realloc(_cdeq_alloced(self->base), 2*sizeof(size_t) + cap*sizeof(Value)); \
             rep[0] = len, rep[1] = cap; \
             self->base = (cdeq_##X##_value_t *) (rep + 2); \
