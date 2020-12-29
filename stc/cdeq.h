@@ -237,7 +237,7 @@
         if (at_front && nfront >= n || !at_front && nback >= n) \
             return; \
         if ((len + n)*1.1 > cap) { \
-            cap = (len + n + 6)*1.5; \
+            cap = (len + n + 6)*2; \
             size_t* rep = (size_t *) c_realloc(_cdeq_alloced(self->base), 2*sizeof(size_t) + cap*sizeof(Value)); \
             rep[0] = len, rep[1] = cap; \
             self->base = (cdeq_##X##_value_t *) (rep + 2); \
@@ -245,8 +245,8 @@
             return _cdeq_##X##_expand(self, n, at_front); \
         } \
         size_t unused = cap - (len + n); \
-        size_t pos = at_front ? c_maxf(unused*0.9, (float) unused - nback) + n \
-                              : c_minf(unused*0.1, nfront); \
+        size_t pos = at_front ? c_maxf(unused*0.6, (float) unused - nback) + n \
+                              : c_minf(unused*0.4, nfront); \
         memmove(self->base + pos, self->data, len*sizeof(Value)); \
         self->data = self->base + pos; \
     } \
