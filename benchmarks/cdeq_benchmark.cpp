@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <deque>
+#include <vector>
 #include <stc/cdeq.h>
 #include <stc/crand.h>
 
@@ -27,15 +28,24 @@ void test1() {
             sum += deq[i];
         t3 = clock();
         printf("std access      : %5.2f sec, sum=%zu\n", (float)(t3 - t2) / CLOCKS_PER_SEC, sum);
-     }
-     std::deque<int> deq;
-     for (size_t i = 1; i < N/10; i++) {
-        if (i & 1) deq.push_front(stc64_rand(&rng));
-        else deq.push_back(stc64_rand(&rng));
-    }
-    t2 = clock();
-    printf("std pushf/pushb : %5.2f sec\n", (float)(t2 - t3) / CLOCKS_PER_SEC);
+     }{
+        std::deque<int> deq;
+        for (size_t i = 1; i < N/10; i++) {
+            if (i & 1) deq.push_front(stc64_rand(&rng));
+            else deq.push_back(stc64_rand(&rng));
+        }
+        t2 = clock();
+        printf("std pushf/pushb : %5.2f sec\n", (float)(t2 - t3) / CLOCKS_PER_SEC);
+    }{
+        std::deque<int> deq;
+        for (size_t i = 1; i < N/2; i++) {
+            deq.push_back(stc64_rand(&rng));
+        }
+        t3 = clock();
+        printf("std pushb       : %5.2f sec\n", (float)(t3 - t2) / CLOCKS_PER_SEC);
+    }    
 }
+
 
 void test2() {
     clock_t t1 = clock(), t2, t3;
@@ -57,15 +67,24 @@ void test2() {
         t3 = clock();
         printf("stc access      : %5.2f sec, sum=%zu\n", (float)(t3 - t2) / CLOCKS_PER_SEC, sum);
         cdeq_i_del(&deq);
+    }{
+        cdeq_i deq = cdeq_inits;
+        for (size_t i = 1; i < N/10; i++) {
+            if (i & 1) cdeq_i_push_front(&deq, stc64_rand(&rng));
+            else cdeq_i_push_back(&deq, stc64_rand(&rng));
+        }
+        t2 = clock();
+        printf("stc pushf/pushb : %5.2f sec\n", (float)(t2 - t3) / CLOCKS_PER_SEC);
+        cdeq_i_del(&deq);
+    }{
+        cdeq_i deq = cdeq_inits;
+        for (size_t i = 1; i < N/2; i++) {
+            cdeq_i_push_back(&deq, stc64_rand(&rng));
+        }
+        t3 = clock();
+        printf("stc pushb       : %5.2f sec\n", (float)(t3 - t2) / CLOCKS_PER_SEC);
+        cdeq_i_del(&deq);
     }
-    cdeq_i deq = cdeq_inits;
-    for (size_t i = 1; i < N/10; i++) {
-        if (i & 1) cdeq_i_push_front(&deq, stc64_rand(&rng));
-        else cdeq_i_push_back(&deq, stc64_rand(&rng));
-    }
-    t2 = clock();
-    printf("stc pushf/pushb : %5.2f sec\n", (float)(t2 - t3) / CLOCKS_PER_SEC);
-    cdeq_i_del(&deq);
 }
 
 int main()
