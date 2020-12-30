@@ -6,8 +6,8 @@ Implemented as a circular singly linked list. Also supports various *splice* fun
 ## Declaration
 
 ```c
-#define using_clist(X, Value, valueDestroy=c_default_del,
-                              valueCompareRaw=c_default_compare,
+#define using_clist(X, Value, valueCompareRaw=c_default_compare,
+                              valueDestroy=c_default_del,
                               RawValue=Value,
                               valueToRaw=c_default_to_raw,
                               valueFromRaw=c_default_from_raw)

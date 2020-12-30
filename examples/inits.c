@@ -14,8 +14,8 @@ inline static int ipair_compare(const ipair_t* a, const ipair_t* b) {
     return cx == 0 ? c_default_compare(&a->y, &b->y) : cx;
 }
 
-using_cvec(ip, ipair_t, c_default_del, ipair_compare);
-using_clist(ip, ipair_t, c_default_del, ipair_compare);
+using_cvec(ip, ipair_t, ipair_compare);
+using_clist(ip, ipair_t, ipair_compare);
 using_cvec(f, float);
 using_cpque(f, cvec_f, >);
 

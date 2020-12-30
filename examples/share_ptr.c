@@ -19,9 +19,9 @@ int Person_compare(const Person* p, const Person* q) {
     return cmp == 0 ? strcmp(p->last.str, q->last.str) : cmp;
 }
 
-using_csptr(pe, Person, Person_del, Person_compare);
-using_clist(pe, csptr_pe, csptr_pe_del, csptr_pe_compare);
-using_cvec(pe, csptr_pe, csptr_pe_del, csptr_pe_compare);
+using_csptr(pe, Person, Person_compare, Person_del);
+using_clist(pe, csptr_pe, csptr_pe_compare, csptr_pe_del);
+using_cvec(pe, csptr_pe, csptr_pe_compare, csptr_pe_del);
 
 int main() {
     clist_pe queue = clist_pe_init();

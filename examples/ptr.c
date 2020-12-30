@@ -17,13 +17,13 @@ int Person_compare(const Person* p, const Person* q) {
     return cmp == 0 ? strcmp(p->last.str, q->last.str) : cmp;
 }
 
-using_cvec(pe, Person, Person_del, Person_compare);
+using_cvec(pe, Person, Person_compare, Person_del);
 
-using_cptr(pu, Person, Person_del, Person_compare);
-using_cvec(pu, Person*, cptr_pu_del, cptr_pu_compare);
+using_cptr(pu, Person, Person_compare, Person_del);
+using_cvec(pu, Person*, cptr_pu_compare, cptr_pu_del);
 
-using_csptr(ps, Person, Person_del, Person_compare);
-using_cvec(ps, csptr_ps, csptr_ps_del, csptr_ps_compare);
+using_csptr(ps, Person, Person_compare, Person_del);
+using_cvec(ps, csptr_ps, csptr_ps_compare, csptr_ps_del);
 
 
 const char* names[] = {

@@ -7,11 +7,11 @@ This describes the API of the pointer type **cptr** and the shared pointer type 
 ## Declaration
 
 ```c
-#define using_cptr(X, Value, valueDestroy=c_default_del,
-                             valueCompare=c_default_compare)
+#define using_cptr(X, Value, valueCompare=c_default_compare,
+                             valueDestroy=c_default_del)
 
-#define using_csptr(X, Value, valueDestroy=c_default_del,
-                              valueCompare=c_default_compare)
+#define using_csptr(X, Value, valueCompare=c_default_compare,
+                              valueDestroy=c_default_del)
 ```
 The macro `using_cptr()` must be instantiated in the global scope. `X` is a type tag name and will
 affect the names of all cptr types and methods. E.g. declaring `using_cptr(my, cvec_my);`,

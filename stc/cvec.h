@@ -31,13 +31,13 @@
 
 #define using_cvec(...) c_MACRO_OVERLOAD(using_cvec, __VA_ARGS__)
 #define using_cvec_2(X, Value) \
-                    using_cvec_3(X, Value, c_default_del)
-#define using_cvec_3(X, Value, valueDestroy) \
-                    using_cvec_4(X, Value, valueDestroy, c_default_compare)
-#define using_cvec_4(X, Value, valueDestroy, valueCompare) \
-                    using_cvec_7(X, Value, valueDestroy, valueCompare, Value, c_default_to_raw, c_default_from_raw)
+                    using_cvec_3(X, Value, c_default_compare)
+#define using_cvec_3(X, Value, valueCompare) \
+                    using_cvec_4(X, Value, valueCompare, c_default_del)
+#define using_cvec_4(X, Value, valueCompare, valueDestroy) \
+                    using_cvec_7(X, Value, valueCompare, valueDestroy, Value, c_default_to_raw, c_default_from_raw)
 #define using_cvec_str() \
-                    using_cvec_7(str, cstr_t, cstr_del, cstr_compare_raw, const char*, cstr_to_raw, cstr_from)
+                    using_cvec_7(str, cstr_t, cstr_compare_raw, cstr_del, const char*, cstr_to_raw, cstr_from)
 
 #define typedefs_cvec(X, Value, RawValue) \
     typedef Value cvec_##X##_value_t; \
@@ -48,7 +48,7 @@
         cvec_##X##_value_t* data; \
     } cvec_##X
 
-#define using_cvec_7(X, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw) \
+#define using_cvec_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueToRaw, valueFromRaw) \
     typedefs_cvec(X, Value, RawValue); \
 \
     STC_INLINE cvec_##X \
@@ -188,13 +188,13 @@
     STC_INLINE size_t \
     cvec_##X##_index(cvec_##X vec, cvec_##X##_iter_t it) {return it.ref - vec.data;} \
 \
-    _c_implement_cvec_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
+    _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueToRaw, valueFromRaw) \
     typedef cvec_##X cvec_##X##_t
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define _c_implement_cvec_7(X, Value, valueDestroy, RawValue, valueCompareRaw, valueToRaw, valueFromRaw) \
+#define _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueToRaw, valueFromRaw) \
 \
     STC_DEF void \
     cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t arr[], size_t n) { \
@@ -298,7 +298,7 @@
     }
 
 #else
-#define _c_implement_cvec_7(X, Value, valueDestroy, valueCompareRaw, RawValue, valueToRaw, valueFromRaw)
+#define _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueToRaw, valueFromRaw)
 #endif
 
 #if defined(_WIN32) && defined(_DLL)

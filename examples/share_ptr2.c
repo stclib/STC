@@ -13,7 +13,7 @@ void Person_del(Person* p) {
     c_del(cstr, &p->name, &p->last);
 }
 
-using_csptr(ps, Person, Person_del, c_no_compare);
+using_csptr(ps, Person, c_no_compare, Person_del);
 using_cmap(ps, int, csptr_ps, csptr_ps_del);
 
 

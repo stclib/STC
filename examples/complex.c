@@ -6,7 +6,7 @@
 void check_del(float* v) {printf("destroy %g\n", *v);}
 
 using_carray(f, float, check_del); // normally omit the last argument - float type need no destroy.
-using_clist(y, carray2f, carray2f_del, c_no_compare);
+using_clist(y, carray2f, c_no_compare, carray2f_del);
 using_cmap(g, int, clist_y, clist_y_del);
 using_cmap_strkey(s, cmap_g, cmap_g_del);
 
