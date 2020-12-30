@@ -231,7 +231,9 @@
     STC_DEF void \
     cvec_##X##_resize(cvec_##X* self, size_t size, Value null_val) { \
         cvec_##X##_reserve(self, size); \
-        for (size_t i=cvec_##X##_size(*self); i<size; ++i) self->data[i] = null_val; \
+        size_t i, n = cvec_##X##_size(*self); \
+        for (i=size; i<n; ++i) valueDestroy(self->data + i); \
+        for (i=n; i<size; ++i) self->data[i] = null_val; \
         if (self->data) _cvec_size(self) = size; \
     } \
 \
@@ -239,7 +241,7 @@
     cvec_##X##_push_back(cvec_##X* self, Value value) { \
         size_t len = cvec_##X##_size(*self); \
         if (len == cvec_##X##_capacity(*self)) \
-            cvec_##X##_reserve(self, 4 + len * 3 / 2); \
+            cvec_##X##_reserve(self, 4 + len*3/2); \
         self->data[_cvec_size(self)++] = value; \
     } \
 \
@@ -255,7 +257,7 @@
     cvec_##X##_insert_range_p(cvec_##X* self, cvec_##X##_value_t* pos, const cvec_##X##_value_t* first, const cvec_##X##_value_t* finish) { \
         size_t len = finish - first, idx = pos - self->data, size = cvec_##X##_size(*self); \
         if (size + len > cvec_##X##_capacity(*self)) \
-            cvec_##X##_reserve(self, 4 + (size + len) * 3 / 2); \
+            cvec_##X##_reserve(self, 4 + (size + len)*3/2); \
         _cvec_size(self) += len; \
         pos = self->data + idx; \
         cvec_##X##_iter_t it = {pos}; \

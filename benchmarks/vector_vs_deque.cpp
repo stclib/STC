@@ -11,7 +11,7 @@
 #include <stc/crand.h>
 
 typedef struct {const char* first; int second;} Si;
-using_cvec(si, Si, c_default_del, c_no_compare);
+using_cvec(si, Si, c_no_compare);
 cvec_si tm = cvec_inits;
 
 void add(cvec_si* tm, const char* s, int n) { Si si = {s, n}; cvec_si_push_back(tm, si); }
@@ -48,7 +48,7 @@ void test_vector(const int num_iterations)
         }
 
         clock_t t2 = std::clock();
-        add(&tm, "vector::push_front", t2 - t1);
+        add(&tm, "vector::push_back", t2 - t1);
         printf("#");
     }
 

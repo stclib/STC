@@ -28,9 +28,6 @@
 #include <string.h>
 
 #define cdeq_inits          {NULL, NULL}
-#define cdeq_size(deq)      _cdeq_safe_size((deq).base)
-#define cdeq_capacity(deq)  _cdeq_safe_capacity((deq).base)
-#define cdeq_empty(deq)     (cdeq_size(deq) == 0)
 
 #define using_cdeq(...) c_MACRO_OVERLOAD(using_cdeq, __VA_ARGS__)
 #define using_cdeq_2(X, Value) \
@@ -57,9 +54,11 @@
     STC_INLINE cdeq_##X \
     cdeq_##X##_init(void) {cdeq_##X deq = cdeq_inits; return deq;} \
     STC_INLINE bool \
-    cdeq_##X##_empty(cdeq_##X deq) {return cdeq_empty(deq);} \
+    cdeq_##X##_empty(cdeq_##X deq) {return !deq.base || _cdeq_size(&deq) == 0;} \
     STC_INLINE size_t \
-    cdeq_##X##_size(cdeq_##X deq) {return cdeq_size(deq);} \
+    cdeq_##X##_size(cdeq_##X deq) {return deq.base ? _cdeq_size(&deq) : 0;} \
+    STC_INLINE size_t \
+    cdeq_##X##_capacity(cdeq_##X deq) {return deq.base ? _cdeq_capacity(&deq) : 0;} \
     STC_INLINE Value \
     cdeq_##X##_value_from_raw(RawValue rawValue) {return valueFromRaw(rawValue);} \
     STC_INLINE void \
@@ -170,7 +169,7 @@
     cdeq_##X##_back(cdeq_##X* self) {return self->data + _cdeq_size(self) - 1;} \
     STC_INLINE cdeq_##X##_value_t* \
     cdeq_##X##_at(cdeq_##X* self, size_t i) { \
-        assert(i < cdeq_size(*self)); \
+        assert(i < _cdeq_size(self)); \
         return self->data + i; \
     } \
 \
@@ -182,7 +181,7 @@
     } \
     STC_INLINE void \
     cdeq_##X##_sort(cdeq_##X* self) { \
-        cdeq_##X##_sort_with(self, 0, cdeq_size(*self), cdeq_##X##_value_compare); \
+        cdeq_##X##_sort_with(self, 0, cdeq_##X##_size(*self), cdeq_##X##_value_compare); \
     } \
 \
     STC_INLINE cdeq_##X##_iter_t \
@@ -191,7 +190,7 @@
     } \
     STC_INLINE cdeq_##X##_iter_t \
     cdeq_##X##_end(const cdeq_##X* self) { \
-        cdeq_##X##_iter_t it = {self->data + cdeq_size(*self)}; return it; \
+        cdeq_##X##_iter_t it = {self->data ? self->data + _cdeq_size(self) : NULL}; return it; \
     } \
     STC_INLINE void \
     cdeq_##X##_next(cdeq_##X##_iter_t* it) {++it->ref;} \
@@ -211,7 +210,7 @@
     STC_DEF void \
     cdeq_##X##_push_n(cdeq_##X *self, const cdeq_##X##_input_t arr[], size_t n) { \
         _cdeq_##X##_expand(self, n, false); \
-        cdeq_##X##_value_t* p = self->data + cdeq_size(*self); \
+        cdeq_##X##_value_t* p = self->data + cdeq_##X##_size(*self); \
         for (size_t i=0; i < n; ++i) *p++ = valueFromRaw(arr[i]); \
         _cdeq_size(self) += n; \
     } \
@@ -227,18 +226,18 @@
     STC_DEF void \
     cdeq_##X##_del(cdeq_##X* self) { \
         cdeq_##X##_clear(self); \
-        if (self->base) c_free(_cdeq_alloced(self->base)); \
+        if (self->base) c_free(_cdeq_alloced(self)); \
     } \
 \
     STC_DEF void \
     _cdeq_##X##_expand(cdeq_##X* self, size_t n, bool at_front) { \
-        size_t len = cdeq_size(*self), cap = cdeq_capacity(*self); \
+        size_t len = cdeq_##X##_size(*self), cap = cdeq_##X##_capacity(*self); \
         size_t nfront = self->data - self->base, nback = cap - (nfront + len); \
         if (at_front && nfront >= n || !at_front && nback >= n) \
             return; \
         if ((len + n)*1.3 > cap) { \
             cap = (len + n + 6)*1.8; \
-            size_t* rep = (size_t *) c_realloc(_cdeq_alloced(self->base), 2*sizeof(size_t) + cap*sizeof(Value)); \
+            size_t* rep = (size_t *) c_realloc(_cdeq_alloced(self), 2*sizeof(size_t) + cap*sizeof(Value)); \
             rep[0] = len, rep[1] = cap; \
             self->base = (cdeq_##X##_value_t *) (rep + 2); \
             self->data = self->base + nfront; \
@@ -253,7 +252,9 @@
     STC_DEF void \
     cdeq_##X##_resize(cdeq_##X* self, size_t size, Value null_val) { \
         _cdeq_##X##_expand(self, size, false); \
-        for (size_t i=cdeq_size(*self); i<size; ++i) self->data[i] = null_val; \
+        size_t i, n = cdeq_##X##_size(*self); \
+        for (i=size; i<n; ++i) valueDestroy(self->data + i); \
+        for (i=n; i<size; ++i) self->data[i] = null_val; \
         if (self->data) _cdeq_size(self) = size; \
     } \
 \
@@ -266,14 +267,14 @@
     } \
     STC_DEF void \
     cdeq_##X##_push_back(cdeq_##X* self, Value value) { \
-        if (cdeq_size(*self) + _cdeq_nfront(self) == cdeq_capacity(*self)) \
+        if (!self->data || _cdeq_nfront(self) + _cdeq_size(self) == _cdeq_capacity(self)) \
             _cdeq_##X##_expand(self, 1, false); \
         self->data[_cdeq_size(self)++] = value; \
     } \
 \
     STC_DEF cdeq_##X \
     cdeq_##X##_clone(cdeq_##X vec) { \
-        size_t len = cdeq_size(vec); \
+        size_t len = cdeq_##X##_size(vec); \
         cdeq_##X out = cdeq_##X##_with_capacity(len); \
         cdeq_##X##_insert_range_p(&out, out.data, vec.data, vec.data + len); \
         return out; \
@@ -282,7 +283,7 @@
     STC_DEF cdeq_##X##_iter_t \
     cdeq_##X##_insert_range_p(cdeq_##X* self, cdeq_##X##_value_t* pos, \
                               const cdeq_##X##_value_t* first, const cdeq_##X##_value_t* finish) { \
-        size_t n = finish - first, idx = pos - self->data, size = cdeq_size(*self); \
+        size_t n = finish - first, idx = pos - self->data, size = cdeq_##X##_size(*self); \
         bool at_front = (idx < size/2); \
         _cdeq_##X##_expand(self, n, at_front); \
         if (at_front) { \
@@ -293,7 +294,7 @@
             memmove(pos + n, pos, (size - idx)*sizeof(Value)); \
         } \
         cdeq_##X##_iter_t it = {pos}; \
-        _cdeq_size(self) += n; \
+        if (n) _cdeq_size(self) += n; \
         while (first != finish) \
             *pos++ = valueFromRaw(valueToRaw(first++)); \
         return it; \
@@ -346,17 +347,9 @@ typedef int(*_cdeq_cmp)(const void*, const void*);
 STC_EXTERN_IMPORT void qsort(void *start, size_t nitems, size_t size, _cdeq_cmp cmp);
 
 #define _cdeq_size(self)      ((size_t *) (self)->base)[-2]
+#define _cdeq_capacity(self)  ((size_t *) (self)->base)[-1]
 #define _cdeq_nfront(self)    ((self)->data - (self)->base)
-
-STC_INLINE size_t* _cdeq_alloced(void* base) {
-    return base ? ((size_t *) base) - 2 : NULL;
-}
-STC_INLINE size_t _cdeq_safe_size(const void* base) {
-    return base ? ((const size_t *) base)[-2] : 0;
-}
-STC_INLINE size_t _cdeq_safe_capacity(const void* base) {
-    return base ? ((const size_t *) base)[-1] : 0;
-}
+#define _cdeq_alloced(self)   ((self)->base ? ((size_t *) (self)->base) - 2 : NULL)
 
 static inline double c_minf(double x, double y) { return x < y ? x : y; }
 static inline double c_maxf(double x, double y) { return x > y ? x : y; }
