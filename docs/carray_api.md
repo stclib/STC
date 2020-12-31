@@ -38,7 +38,7 @@ be replaced by `my` in all of the following documentation. The `N` character sho
 
 ## Header file
 
-All cset definitions and prototypes may be included in your C source file by including a single header file.
+All carray definitions and prototypes may be included in your C source file by including a single header file.
 
 ```c
 #include "stc/carray.h"
@@ -52,25 +52,21 @@ carray3X            carray3X_init(size_t zdim, size_t ydim, size_t xdim, Value v
 carray1X            carray1X_from(Value* array, size_t xdim);
 carray2X            carray2X_from(Value* array, size_t ydim, size_t xdim);
 carray3X            carray3X_from(Value* array, size_t zdim, size_t ydim, size_t xdim);
+
 void                carrayNX_del(carrayNX* self);
-```
-Constructors and destructor.
-```c
+
 Value*              carray1X_at(carray1X *self, size_t x);
 Value*              carray2X_at(carray2X *self, size_t y, size_t x);
-Value*              carray3X_at(carray3X *self, size_t z, size_t y, size_t x);
 carray1X            carray2X_at1(carray2X *self, size_t y);
+Value*              carray3X_at(carray3X *self, size_t z, size_t y, size_t x);
 carray1X            carray3X_at2(carray3X *self, size_t z, size_t y);
 carray2X            carray3X_at1(carray3X *self, size_t z);
-```
-Array accessor methods.
-```c
+
 carrayNX_iter_t     carrayNX_begin(carrayNX* self);
 carrayNX_iter_t     carrayNX_end(carrayNX* self);
 void                carrayNX_next(carrayNX_iter_t* it);
 carrayNX_value_t*   carrayNX_itval(carrayNX_iter_t it);
 ```
-Iterator methods.
 
 ## Example
 ```c
