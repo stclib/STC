@@ -82,3 +82,32 @@ Output:
 ```
 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19
 ```
+### Example 2
+```c
+#include <stdio.h>
+#include "stc/cqueue.h"
+#include "stc/cdeq.h"
+
+using_cdeq(i, int);
+using_cqueue(i, cdeq_i);
+
+int main() {
+    cqueue_i queue = cqueue_i_init();
+
+    // push() and pop() a few.
+    c_forrange (i, 20)
+        cqueue_i_push(&queue, i);
+
+    c_forrange (5)
+        cqueue_i_pop(&queue);
+
+    c_foreach (i, cqueue_i, queue)
+        printf(" %d", *i.ref);
+
+    cqueue_i_del(&queue);
+}
+```
+Output:
+```
+5 6 7 8 9 10 11 12 13 14 15 16 17 18 19
+```
