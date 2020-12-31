@@ -37,10 +37,6 @@ using_cdeq(str, cstr_t, cstr_del, cstr_compare_raw, const char*, cstr_to_raw, cs
 | Name                       | Purpose              |
 |:---------------------------|:---------------------|
 |  `cdeq_inits`              | Initializer constant |
-|  `cdeq_empty(vec)`         | true if vec is empty |
-|  `cdeq_size(vec)`          | return vec length    |
-|  `cdeq_capacity(vec)`      | return vec capacity  |
-
 
 ## Header file
 

@@ -1,5 +1,5 @@
-STC - Standard Template library for C
-=====================================
+STC - Standard Template Containers for C99
+==========================================
 
 Introduction
 ------------

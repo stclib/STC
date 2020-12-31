@@ -84,7 +84,7 @@ using namespace std;
 
 int main(void)
 {
-  enum {N = 1000000000};
+  enum {N = 800000000};
   uint64_t* recipient = new uint64_t[N];
   static stc64_t rng;
   init_state(rng.state, 12345123);
@@ -115,7 +115,7 @@ int main(void)
     for (size_t i = 0; i < N; i++)
       recipient[i] = stc64_rand(&rng);
     end = clock();
-    cout << "stc-crand:\t"
+    cout << "stc64:\t\t"
          << (float(end - beg) / CLOCKS_PER_SEC)
          << " s: " << recipient[312] << endl;
 
@@ -160,7 +160,7 @@ int main(void)
     for (size_t i = 0; i < N; i++)
       s += stc64_rand(&rng);
     end = clock();
-    cout << "stc-crand:\t"
+    cout << "stc64:\t\t"
          << ((float) end - beg) / CLOCKS_PER_SEC
          << " s: " << s << endl;
 

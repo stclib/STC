@@ -49,29 +49,28 @@ typedef struct {double lower, range;}                      stc64_uniformf_t;
 typedef struct {double mean, stddev, next; bool has_next;} stc64_normalf_t;
 
 
-/* int random number generator, range [0, 2^64). PRNG copyright Tyge Løvset, NORCE Research, 2020 */
+/* Stc64: random number generator, range [0, 2^64). PRNG copyright Tyge Løvset, NORCE Research, 2020 */
 STC_API stc64_t stc64_init(uint64_t seed);
 STC_API stc64_t stc64_with_seq(uint64_t seed, uint64_t seq);
 
 STC_INLINE uint64_t stc64_rand(stc64_t* rng) {
-    enum {LROT = 24, RSHIFT = 11, LSHIFT = 3};
     uint64_t *s = rng->state;
     const uint64_t b = s[1], result = s[0] ^ (s[2] += s[3]|1);
-    s[0] = (b + (b << LSHIFT)) ^ (b >> RSHIFT);
-    s[1] = ((b << LROT) | (b >> (64 - LROT))) + result;
+    s[0] = (b + (b << 3)) ^ (b >> 11);
+    s[1] = ((b << 24) | (b >> (64 - 24))) + result;
     return result;
 }
 
-/* double random number in range [low, high). */
+/* Float64 random number in range [low, high). */
 STC_INLINE double stc64_randf(stc64_t* rng) {
     union {uint64_t i; double f;} u = {0x3FF0000000000000ull | (stc64_rand(rng) >> 12)};
     return u.f - 1.0;
 }
 
-/* integer uniform distributed RNG, range [low, high]. */
+/* Int64 uniform distributed RNG, range [low, high]. */
 STC_API stc64_uniform_t stc64_uniform_init(int64_t low, int64_t high);
 
-/* double uniform distributed RNG, range [low, high). */
+/* Float64 uniform distributed RNG, range [low, high). */
 STC_INLINE stc64_uniformf_t stc64_uniformf_init(double low, double high) {
     stc64_uniformf_t dist = {low, high - low}; return dist;
 }
@@ -92,13 +91,14 @@ STC_INLINE double stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist) {
                           : [lhs] "0" (a), [rhs] "rm" (b))
 #endif
 
+/* Unbiased bounded uniform distribution. */
 STC_INLINE int64_t stc64_uniform(stc64_t* rng, stc64_uniform_t* d) {
     uint64_t lo, hi;
     do { cmul128(stc64_rand(rng), d->range, &lo, &hi); } while (lo < d->threshold);
     return d->lower + hi;
 }
 
-/* double normal distributed RNG. */
+/* Normal distributed RNG, Float64. */
 STC_INLINE stc64_normalf_t stc64_normalf_init(double mean, double stddev) {
     stc64_normalf_t dist = {mean, stddev, 0.0, false}; return dist;
 }
@@ -109,7 +109,7 @@ STC_API double stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
 
 /* PRNG crand: by Tyge Løvset, NORCE Research, 2020.
  * Extremely fast PRNG suited for parallel usage with Weyl-sequence parameter.
- * Faster than sfc64, wyhash64, and almost 50% faster than xoshiro256** on gcc.
+ * Faster than sfc64, wyhash64, and xoshiro256** on most platforms.
  * 256bit state, updates only 192bit per rng.
  * 2^63 unique threads with a minimum 2^64 period lengths each.
  * 2^127 minimum period length for single thread (double loop).
