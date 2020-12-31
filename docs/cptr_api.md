@@ -74,22 +74,25 @@ Person* Person_make(Person* p, const char* name, const char* last) {
     p->name = cstr_from(name), p->last = cstr_from(last);
     return p;
 }
-void Person_del(Person* p) {
-    printf("del: %s\n", p->name.str);
-    c_del(cstr, &p->name, &p->last);
-}
 int Person_compare(const Person* p, const Person* q) {
     int cmp = strcmp(p->name.str, q->name.str);
     return cmp == 0 ? strcmp(p->last.str, q->last.str) : cmp;
 }
+void Person_del(Person* p) {
+    printf("del: %s\n", p->name.str);
+    c_del(cstr, &p->name, &p->last);
+}
 
-using_cvec(pe, Person, Person_del, Person_compare); // unused
+// 1. cvec of Person structs (unused)
+using_cvec(pe, Person, Person_compare, Person_del);
 
-using_cptr(pp, Person, Person_del, Person_compare);
-using_cvec(pp, Person*, cptr_pp_del, cptr_pp_compare);
+// 2. cvec of raw/owned pointers to Person
+using_cptr(pp, Person, Person_compare, Person_del);
+using_cvec(pp, Person*, cptr_pp_compare, cptr_pp_del);
 
-using_csptr(ps, Person, Person_del, Person_compare);
-using_cvec(ps, csptr_ps, csptr_ps_del, csptr_ps_compare);
+// 3. cvec of shared_ptr to Person
+using_csptr(ps, Person, Person_compare, Person_del);
+using_cvec(ps, csptr_ps, csptr_ps_compare, csptr_ps_del);
 
 const char* names[] = {
     "Joe", "Jordan",
@@ -99,14 +102,16 @@ const char* names[] = {
 
 int main() {
     cvec_pp pvec = cvec_inits;
-    for (int i=0;i<6; i+=2) cvec_pp_push_back(&pvec, Person_make(c_new(Person), names[i], names[i+1]));
+    for (int i=0;i<6; i+=2)
+        cvec_pp_push_back(&pvec, Person_make(c_new(Person), names[i], names[i+1]));
     puts("cvec of cptr<Person>:");
     cvec_pp_sort(&pvec);
     c_foreach (i, cvec_pp, pvec)
         printf("  %s %s\n", (*i.ref)->name.str, (*i.ref)->last.str);
 
     cvec_ps svec = cvec_inits;
-    for (int i=0;i<6; i+=2) cvec_ps_push_back(&svec, csptr_ps_from(Person_make(c_new(Person), names[i], names[i+1])));
+    for (int i=0;i<6; i+=2)
+        cvec_ps_push_back(&svec, csptr_ps_from(Person_make(c_new(Person), names[i], names[i+1])));
     puts("cvec of csptr<Person>:");
     cvec_ps_sort(&svec);
     c_foreach (i, cvec_ps, svec)
