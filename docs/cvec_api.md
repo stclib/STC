@@ -17,9 +17,9 @@ Defaults values are given above for args not specified. `X` is a type tag name a
 will affect the names of all cvec types and methods. E.g. declaring `using_cvec(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.
 
-`using_cvec_str()` is a shorthand, expands to:
+`using_cvec_str()` is a shorthand for:
 ```
-using_cvec(str, cstr_t, cstr_del, cstr_compare_raw, const char*, cstr_to_raw, cstr_from)
+using_cvec(str, cstr_t, cstr_compare_raw, cstr_del, const char*, cstr_to_raw, cstr_from)
 ```
 
 ## Types

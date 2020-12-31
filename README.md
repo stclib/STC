@@ -1,30 +1,30 @@
-STC - Standard Template Containers for C99
-==========================================
+STC - Standard Template Containers for C
+========================================
 
 Introduction
 ------------
 
 An modern, fully typesafe, generic, customizable, user-friendly, consistent, and very fast standard container library for C99. This is a small headers only library with the most used container components, and a few algorithms:
-- [***cstr*** - Powerful and compact **string** type](docs/cstr_api.md)
-- [***crand*** - An extremely efficent modern **random number generator**](docs/crand_api.md)
-- [***clist*** - Templated **std::forward_list** alike type](docs/clist_api.md)
-- [***cmap*** - Templated **std::unordered_map** alike type](docs/cmap_api.md)
-- [***cset*** - Templated **std::unordered_set** alike type](docs/cset_api.md)
+- [***cstr*** - A **std::string** alike type](docs/cstr_api.md)
 - [***cvec*** - Templated **std::vector** alike type](docs/cvec_api.md)
 - [***cdeq*** - Templated **std::dequeue** alike type](docs/cdeq_api.md)
+- [***cmap*** - Templated **std::unordered_map** alike type](docs/cmap_api.md)
+- [***cset*** - Templated **std::unordered_set** alike type](docs/cset_api.md)
 - [***cstack*** - Templated **std::stack** alike adapter type](docs/cstack_api.md)
 - [***cqueue*** - Templated **std::queue** alike adapter type](docs/cqueue_api.md)
 - [***cpque*** - Templated **std::priority_queue** alike adapter type](docs/cpque_api.md)
+- [***clist*** - Templated **std::forward_list** alike type](docs/clist_api.md)
+- [***cbitset*** - A **std::bitset** / **boost::dynamic_bitset* alike type](docs/cbitset_api.md)
 - [***carray*** - Templated **multi-dimensional array** type](docs/carray_api.md)
 - [***cptr*** - Container pointers and **std::shared_ptr** alike support](docs/cptr_api.md)
-- [***cbitset*** - A **std::bitset** / **boost::dynamic_bitset* alike type](docs/cbitset_api.md)
-- [***copt*** - Implements *copt_get()*, a **getopt_long** alike function](docs/copt_api.md)
+- [***crand*** - A very efficent modern **pseudo-random number generator**](docs/crand_api.md)
+- [***copt*** - Implements ***copt_get()***, similar to posix **getopt_long()**](docs/copt_api.md)
 - [***ccommon*** - General definitions](docs/ccommon_api.md)
 
 The usage of the containers is similar to the C++ standard containers, so it should be easy if you are familiar with them.
 
 All containers mentioned above, except cstr_t and cbitset_t, are generic and therefore typesafe (similar to templates in C++). No casting is used. A simple example:
-```C
+```c
 #include <stc/cvec.h>
 
 using_cvec(i, int);
@@ -38,8 +38,8 @@ int main(void) {
     cvec_i_del(&vec);
 }
 ```
-Using containers with complex element types is simple:
-```C
+Containers with struct element types:
+```c
 #include <stc/cstr.h>
 #include <stc/cvec.h>
 
@@ -48,26 +48,27 @@ typedef struct {
     int id;
 } User;
 
-void User_del(User* u)
-    { cstr_del(&u->name); }
-int User_compare(User* u, User* v)
-    { int c = strcmp(u->name.str, v->name.str); return c != 0 ? c : u->id - v->id; }
+int User_compare(User* a, User* b)
+    { int c = strcmp(a->name.str, b->name.str); return c != 0 ? c : a->id - b->id; }
+void User_del(User* user)
+    { cstr_del(&user->name); }
 
-using_cvec(u, User, User_del, User_compare);
+using_cvec(u, User, User_compare, User_del);
 
 int main(void) {
     cvec_u vec = cvec_u_init();
-    cvec_u_push_back(&vec, (User) {cstr_from("admin"), 0}); // cstr_from() allocates string memory
-    cvec_u_push_back(&vec, (User) {cstr_from("usera"), 1});
+    cvec_u_push_back(&vec, (User) {cstr_from("admin"), 0});
+    cvec_u_push_back(&vec, (User) {cstr_from("joe"), 1});
+
     c_foreach (i, cvec_u, vec)
         printf("%s: %d\n", i.ref->name.str, i.ref->id);
-    cvec_u_del(&vec); // free everything
+    cvec_u_del(&vec); // cleanup
 }
 ```
 Motivation
 ----------
 
-The aim of this project was to create a small **Standard Template library for the C language**. It should
+The aim is to make a small **Standard Template Containers library for C**. It should
 - be easy to use, have intuitive naming and consistency across the library.
 - be type safe. Have minimal usage of casting and void* pointers.
 - be highly efficient. Both in speed and memory usage.
@@ -81,7 +82,7 @@ Installation
 Because it is headers only, files can simply be included in your program. The functions will be inlined by default. You may add the project folder to CPATH environment variable, to let gcc, clang, and tinyc locate the headers.
 
 If containers are extensively used accross many translation units with common instantiated container types, it is recommended to build as a library, to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option, and put all the instantiations of the containers used in one C file, like this:
-```C
+```c
 #define STC_IMPLEMENTATION
 #include <stc/cstr.h>
 #include <stc/cmap.h>
