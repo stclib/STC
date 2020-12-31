@@ -1,10 +1,12 @@
+![Standard Template Containers](docs/containers-small.jpg)
+
 STC - Standard Template Containers for C
 ========================================
 
 Introduction
 ------------
 
-An modern, fully typesafe, generic, customizable, user-friendly, consistent, and very fast standard container library for C99.
+An modern, fully typesafe, generic, customizable, user-friendly, consistent, and very fast container library for C99.
 This is a small headers only library with the most used container components, and a few algorithms:
 - [***cstr*** - A **std::string** alike type](docs/cstr_api.md)
 - [***cvec*** - Templated **std::vector** alike type](docs/cvec_api.md)
@@ -22,7 +24,7 @@ This is a small headers only library with the most used container components, an
 - [***copt*** - Implements ***copt_get()***, similar to posix **getopt_long()**](docs/copt_api.md)
 - [***ccommon*** - General definitions](docs/ccommon_api.md)
 
-The usage of the containers is similar to the C++ standard containers, so it should be easy if you are familiar with them.
+The usage of the containers is similar to the C++ standard containers in STL, so it should be easy if you are familiar with them.
 
 All containers mentioned above, except cstr_t and cbitset_t, are generic and therefore typesafe (similar to templates in C++).
 No casting is used. A simple example:
@@ -50,10 +52,13 @@ typedef struct {
     int id;
 } User;
 
-int User_compare(User* a, User* b)
-    { int c = strcmp(a->name.str, b->name.str); return c != 0 ? c : a->id - b->id; }
-void User_del(User* user)
-    { cstr_del(&user->name); }
+int User_compare(const User* a, const User* b) {
+    int c = strcmp(a->name.str, b->name.str);
+    return c != 0 ? c : a->id - b->id;
+}
+void User_del(User* user) {
+    cstr_del(&user->name);
+}
 
 using_cvec(u, User, User_compare, User_del);
 
