@@ -137,8 +137,8 @@ int main()
     }
 
     // Add two new entries to the unordered map
-    cmap_str_put(&u, "BLACK", "#000000");
-    cmap_str_put(&u, "WHITE", "#FFFFFF");
+    cmap_str_emplace(&u, "BLACK", "#000000");
+    cmap_str_emplace(&u, "WHITE", "#FFFFFF");
 
     // Output values by key
     printf("The HEX of color RED is:[%s]\n", cmap_str_at(&u, "RED")->str);
@@ -175,7 +175,9 @@ int main()
         {110, cstr_from("Blue")},
         {120, cstr_from_fmt("#%08x", col)},
     });
-    cmap_id_put(&idnames, 80, cstr_from("White"));
+    
+    /* put replaces existing mapped value (unlike emplace and insert): */
+    cmap_id_put(&idnames, 110, cstr_from("White"));
 
     c_foreach (i, cmap_id, idnames)
         printf("%d: %s\n", i.ref->first, i.ref->second.str);
@@ -186,8 +188,7 @@ int main()
 ```
 Output:
 ```c
-80: White
 100: Red
-110: Blue
+110: White
 120: #cc7744ff
 ```
