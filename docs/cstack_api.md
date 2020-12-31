@@ -1,3 +1,4 @@
+![Stack](docs/stack.jpg)
 # Container [cstack](../stc/cstack.h): Stack
 
 This describes the API of the stack type **cstack**.
