@@ -158,26 +158,28 @@ The HEX of color BLACK is:[#000000]
 ```
 
 ### Example 2
-For illustration, this example uses a cmap with cstr_t as mapped value, instead of `using_cmap_strval(id, int)` macro.
-We must therefore pass new constructed cstr_t objects to the map when inserting, instead of `const char*` strings.
+This example uses a cmap with cstr_t as mapped value, by the `using_cmap_strval(id, int)` macro.
 ```c
 #include "stc/cstr.h"
 #include "stc/cmap.h"
 
-using_cmap(id, int, cstr_t, cstr_del);
+/* cmap<int, cstr>: */
+using_cmap_strval(id, int);
 
 int main()
 {
     uint32_t col = 0xcc7744ff;
     cmap_id idnames = cmap_inits;
     c_push_items(&idnames, cmap_id, {
-        {100, cstr_from("Red")},
-        {110, cstr_from("Blue")},
-        {120, cstr_from_fmt("#%08x", col)},
+        {100, "Red"},
+        {110, "Blue"},
     });
-    
-    /* put replaces existing mapped value (unlike emplace and insert): */
-    cmap_id_put(&idnames, 110, cstr_from("White"));
+    /* put replaces existing mapped value: */
+    cmap_id_put(&idnames, 110, "White");
+    /* put a constructed mapped value into map: */
+    cmap_id_put_mapped(&idnames, 120, cstr_from_fmt("#%08x", col));
+    /* emplace inserts only when key does not exist: */
+    cmap_id_emplace(&idnames, 100, "Green");
 
     c_foreach (i, cmap_id, idnames)
         printf("%d: %s\n", i.ref->first, i.ref->second.str);
