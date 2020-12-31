@@ -15,7 +15,7 @@ This is a small headers only library with the most used container components, an
 - [***cqueue*** - Templated **std::queue** alike adapter type](docs/cqueue_api.md)
 - [***cpque*** - Templated **std::priority_queue** alike adapter type](docs/cpque_api.md)
 - [***clist*** - Templated **std::forward_list** alike type](docs/clist_api.md)
-- [***cbitset*** - A **std::bitset** / **boost::dynamic_bitset* alike type](docs/cbitset_api.md)
+- [***cbitset*** - A **std::bitset** / **boost::dynamic_bitset** alike type](docs/cbitset_api.md)
 - [***carray*** - Templated **multi-dimensional array** type](docs/carray_api.md)
 - [***cptr*** - Container pointers and **std::shared_ptr** alike support](docs/cptr_api.md)
 - [***crand*** - A very efficent modern **pseudo-random number generator**](docs/crand_api.md)
