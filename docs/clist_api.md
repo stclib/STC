@@ -1,4 +1,4 @@
-![List](docs/list.jpg)
+![List](list.jpg)
 # Container [clist](../stc/clist.h): Singly Linked List
 
 This is similar to c++ [std::forward_list](https://en.cppreference.com/w/cpp/container/forward_list), but supports both

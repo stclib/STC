@@ -1,4 +1,4 @@
-![Deque](docs/deque.jpg)
+![Deque](deque.jpg)
 # Container [cdeq](../stc/cdeq.h): Double Ended Queue (Deque)
 
 This describes the API of deque type **cdeq**.

@@ -1,4 +1,4 @@
-![Vector](docs/vector.jpg)
+![Vector](vector.jpg)
 # Container [cvec](../stc/cvec.h): Vector
 
 This describes the API of vector type **cvec**.
