@@ -1,6 +1,7 @@
-# Container [cdeq](../stc/cdeq.h): Deque (Double Ended Queue)
+# Container [cdeq](../stc/cdeq.h): Double Ended Queue (Deque)
 
-This describes the API of vector type **cdeq**.
+This describes the API of deque type **cdeq**.
+See [std::deque](https://en.cppreference.com/w/cpp/container/deque) for corresponding c++ documentation.
 
 ## Declaration
 

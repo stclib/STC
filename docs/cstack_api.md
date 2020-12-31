@@ -1,6 +1,7 @@
 # Container [cstack](../stc/cstack.h): Stack
 
-This describes the API of the queue type **cstack**.
+This describes the API of the stack type **cstack**.
+See [std::stack](https://en.cppreference.com/w/cpp/container/stack) for a similar c++ class.
 
 ## Declaration
 

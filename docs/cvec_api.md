@@ -1,6 +1,7 @@
 # Container [cvec](../stc/cvec.h): Vector
 
 This describes the API of vector type **cvec**.
+See [std::vector](https://en.cppreference.com/w/cpp/container/vector) for a similar c++ class.
 
 ## Declaration
 

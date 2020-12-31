@@ -1,7 +1,7 @@
 # Container [cset](../stc/cmap.h): Unordered Set
 
-This describes the API of the unordered set type **cset**.
-Same base implementation as cmap, but contains and uses keys only.
+This describes the API of the unordered set type **cset**. Same base implementation as cmap, but contains and uses keys only.
+See [std::unordered_set](https://en.cppreference.com/w/cpp/container/unordered_set) for a similar c++ class.
 
 ## Declaration
 

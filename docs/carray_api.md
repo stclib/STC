@@ -2,6 +2,7 @@
 
 This is 1D, 2D and 3D arrays, which are allocated from heap in one single contiguous block of memory.
 *carray3* may have sub-array "views" of *carray2* and *carray1* etc.
+See [boost::multi_array](https://www.boost.org/doc/libs/release/libs/multi_array) for similar c++ classes.
 
 ## Declaration
 

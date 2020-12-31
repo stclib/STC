@@ -1,6 +1,7 @@
 # Module [copt](../stc/copt.h): Command line argument parsing
 
 This describes the API of string type *copt_get()* function for command line argument parsing.
+See [getopt_long](https://www.freebsd.org/cgi/man.cgi?getopt_long(3)) for a similar freebsd function.
 
 ## Types
 
@@ -16,7 +17,7 @@ typedef struct {
     const char *arg;     /* equivalent to optarg */
     const char *faulty;  /* points to the faulty option, if any */
     int longindex;       /* index of long option; or -1 if short */
-    ... 
+    ...
 } copt_t;
 
 typedef struct {
@@ -45,7 +46,7 @@ int                 copt_get(copt_t *opt, int argc, char *argv[],
 int main(int argc, char *argv[]) {
     static copt_long_t long_options[] = {
       {"verbose", copt_no_argument,       'V'},
-      {"help",   copt_no_argument,        'H'},
+      {"help",    copt_no_argument,       'H'},
       {"add",     copt_no_argument,       'a'},
       {"append",  copt_no_argument,       'b'},
       {"delete",  copt_required_argument, 'd'},

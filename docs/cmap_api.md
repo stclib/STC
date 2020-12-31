@@ -1,6 +1,7 @@
 # Container [cmap](../stc/cmap.h): Unordered Map
 
 Elements are pairs of keys and mapped values. Implemented as open hashing without tombstones. Highly customizable and fast.
+See [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_map) for a similar c++ class.
 
 ## Declaration
 

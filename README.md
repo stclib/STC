@@ -4,10 +4,11 @@ STC - Standard Template Containers for C
 Introduction
 ------------
 
-An modern, fully typesafe, generic, customizable, user-friendly, consistent, and very fast standard container library for C99. This is a small headers only library with the most used container components, and a few algorithms:
+An modern, fully typesafe, generic, customizable, user-friendly, consistent, and very fast standard container library for C99.
+This is a small headers only library with the most used container components, and a few algorithms:
 - [***cstr*** - A **std::string** alike type](docs/cstr_api.md)
 - [***cvec*** - Templated **std::vector** alike type](docs/cvec_api.md)
-- [***cdeq*** - Templated **std::dequeue** alike type](docs/cdeq_api.md)
+- [***cdeq*** - Templated **std::deque** alike type](docs/cdeq_api.md)
 - [***cmap*** - Templated **std::unordered_map** alike type](docs/cmap_api.md)
 - [***cset*** - Templated **std::unordered_set** alike type](docs/cset_api.md)
 - [***cstack*** - Templated **std::stack** alike adapter type](docs/cstack_api.md)
@@ -23,7 +24,8 @@ An modern, fully typesafe, generic, customizable, user-friendly, consistent, and
 
 The usage of the containers is similar to the C++ standard containers, so it should be easy if you are familiar with them.
 
-All containers mentioned above, except cstr_t and cbitset_t, are generic and therefore typesafe (similar to templates in C++). No casting is used. A simple example:
+All containers mentioned above, except cstr_t and cbitset_t, are generic and therefore typesafe (similar to templates in C++).
+No casting is used. A simple example:
 ```c
 #include <stc/cvec.h>
 
@@ -38,7 +40,7 @@ int main(void) {
     cvec_i_del(&vec);
 }
 ```
-Containers with struct element types:
+Container with elements of structs:
 ```c
 #include <stc/cstr.h>
 #include <stc/cvec.h>

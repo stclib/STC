@@ -1,7 +1,8 @@
 # Module [crand](../stc/crand.h): Pseudo Random Number Generators
 
 This describes the API of module **crand**. It contains **stc64**, a *64-bit PRNG*, and can generate
-bounded uniform and normal distributed random numbers.
+bounded uniform and normal distributed random numbers. See [random](https://en.cppreference.com/w/cpp/header/random)
+for similar c++ functionality.
 
 **stc64** is an extremely fast PRNG by Tyge Løvset, suited for parallel usage. It features a
 Weyl-sequence as part of the state. It is faster than *sfc64*, *wyhash64*, *pcg64*, and *xoshiro256\*\**

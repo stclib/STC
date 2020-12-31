@@ -1,6 +1,8 @@
 # Module [cptr](../stc/cptr.h): Smart Pointers
 
-This describes the API of the pointer type **cptr** and the shared pointer type **csptr**. Type **cptr** is meant to be used like a c++ *std::unique_ptr*, while **csptr** is similar to c++ *std::shared_ptr*.
+This describes the API of the pointer type **cptr** and the shared pointer type **csptr**. Type **cptr** can be used similar to a c++
+[std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr), while **csptr** is similar to a c++
+[std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr).
 
 **cptr** and **csptr** objects can be used as items of containers. The pointed-to elements are automatically destructed+deleted when the container is destructed. **csptr** elements are only deleted if there are no other shared references to the element. **csptr** has thread-safe atomic use count, enabled by the *csptr_X_share(sp)* and *csptr_X_del(&sp)* methods.
 
@@ -109,7 +111,7 @@ int main() {
     cvec_ps_sort(&svec);
     c_foreach (i, cvec_ps, svec)
         printf("  %s %s\n", i.ref->get->name.str, i.ref->get->last.str);
-    
+
     csptr_ps x = csptr_ps_share(svec.data[1]);
 
     puts("\nDestroy svec:");

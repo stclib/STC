@@ -1,6 +1,7 @@
 # Container [cstr](../stc/cstr.h): String
 
 This describes the API of string type **cstr_t**.
+See [std::basic_string](https://en.cppreference.com/w/cpp/string/basic_string) for a similar c++ class.
 
 ## Types
 
