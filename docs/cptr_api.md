@@ -43,7 +43,7 @@ All cptr definitions and prototypes may be included in your C source file by inc
 
 ## Methods
 
-The *\*_del()* and *\*_compare()* methods are defined based on the methods passed to the *using_\*ptr()* macro. For *csptr* use *csptr_X_share(p)* when sharing ownership of the pointed-to object to others. See example, where x has shared ownership with the shared pointer element in cvec container. Refer to c++ std::shared_ptr for more information.
+The *\*_del()* and *\*_compare()* methods are defined based on the methods passed to the *using_\*ptr()* macro. For *csptr* use *csptr_X_share(p)* when sharing ownership of the pointed-to object to others. See example below.
 ```c
 cptr_X              cptr_X_init(void);
 void                cptr_X_reset(cptr_X* self, cptr_X_value_t* ptr);
@@ -61,7 +61,7 @@ int                 csptr_X_compare(csptr_X* x, csptr_X* y);
 
 ## Example
 
-This example shows three different ways to store struct Person in vectors: 1) cvec<Person>,  2) cvec<Person*>, and 3) cvec<csptr<Person>>.
+This example shows three different ways to store struct Person in vectors: 1) `cvec<Person>`, 2) `cvec<Person *>`, and 3) `cvec<csptr<Person>>`.
 ```c
 #include <stc/cptr.h>
 #include <stc/cstr.h>
@@ -74,15 +74,15 @@ Person* Person_make(Person* p, const char* name, const char* last) {
     return p;
 }
 int Person_compare(const Person* p, const Person* q) {
-    int cmp = strcmp(p->name.str, q->name.str);
-    return cmp == 0 ? strcmp(p->last.str, q->last.str) : cmp;
+    int c = strcmp(p->name.str, q->name.str);
+    return c == 0 ? strcmp(p->last.str, q->last.str) : c;
 }
 void Person_del(Person* p) {
     printf("del: %s\n", p->name.str);
     c_del(cstr, &p->name, &p->last);
 }
 
-// 1. cvec of Person structs
+// 1. cvec of Person struct
 using_cvec(pe, Person, Person_compare, Person_del);
 
 // 2. cvec of raw/owned pointers to Person
