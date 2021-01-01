@@ -50,7 +50,7 @@ void             cbitset_set_value(cbitset_t *self, size_t i, bool value);
 void             cbitset_flip(cbitset_t *self, size_t i);
 bool             cbitset_test(cbitset_t set, size_t i);
 void             cbitset_set_all(cbitset_t *self, bool value);
-void             cbitset_set_all_64(cbitset_t *self, uint64_t pattern);
+void             cbitset_set_all64(cbitset_t *self, uint64_t pattern);
 void             cbitset_flip_all(cbitset_t *self);
 
 void             cbitset_intersect_with(cbitset_t *self, cbitset_t other);

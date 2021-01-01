@@ -102,7 +102,7 @@ STC_INLINE bool cbitset_test(cbitset_t set, size_t i) {
 STC_INLINE void cbitset_set_all(cbitset_t *self, bool value) {
     memset(self->_arr, value ? 0xff : 0x0, ((self->size + 63) >> 6) * 8);
 }
-STC_INLINE void cbitset_set_all_64(cbitset_t *self, uint64_t pattern) {
+STC_INLINE void cbitset_set_all64(cbitset_t *self, uint64_t pattern) {
     size_t n = (self->size + 63) >> 6;
     for (size_t i=0; i<n; ++i) self->_arr[i] = pattern;
 }
