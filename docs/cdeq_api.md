@@ -1,7 +1,7 @@
 ![Deque](deque.jpg)
 # Container [cdeq](../stc/cdeq.h): Double Ended Queue (Deque)
 
-This describes the API of deque type **cdeq**.
+A **cdeq** is an indexed sequence container that allows fast insertion and deletion at both its beginning and its end.
 See [std::deque](https://en.cppreference.com/w/cpp/container/deque) for corresponding c++ documentation.
 
 ## Declaration

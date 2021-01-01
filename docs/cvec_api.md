@@ -1,7 +1,7 @@
 ![Vector](vector.jpg)
 # Container [cvec](../stc/cvec.h): Vector
 
-This describes the API of vector type **cvec**.
+A **cvec** is a sequence container that encapsulates dynamic size arrays.
 See [std::vector](https://en.cppreference.com/w/cpp/container/vector) for a similar c++ class.
 
 ## Declaration
