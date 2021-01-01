@@ -1,8 +1,7 @@
 ![Set](set.jpg)
 # Container [cset](../stc/cmap.h): Unordered Set
 
-This describes the API of the unordered set type **cset**. Same base implementation as cmap, but contains and uses keys only.
-See [std::unordered_set](https://en.cppreference.com/w/cpp/container/unordered_set) for a similar c++ class.
+A **cset** is an associative container that contains a set of unique objects of type Key. Search, insertion, and removal have average constant-time complexity. See [std::unordered_set](https://en.cppreference.com/w/cpp/container/unordered_set) for a similar c++ class.
 
 ## Declaration
 
