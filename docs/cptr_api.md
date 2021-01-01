@@ -74,8 +74,8 @@ Person* Person_make(Person* p, const char* name, const char* last) {
     return p;
 }
 int Person_compare(const Person* p, const Person* q) {
-    int c = strcmp(p->name.str, q->name.str);
-    return c == 0 ? strcmp(p->last.str, q->last.str) : c;
+    int cmp = strcmp(p->name.str, q->name.str);
+    return cmp == 0 ? strcmp(p->last.str, q->last.str) : cmp;
 }
 void Person_del(Person* p) {
     printf("del: %s\n", p->name.str);
@@ -86,12 +86,12 @@ void Person_del(Person* p) {
 using_cvec(pe, Person, Person_compare, Person_del);
 
 // 2. cvec of raw/owned pointers to Person
-using_cptr(pp, Person, Person_compare, Person_del);
-using_cvec(pp, Person*, cptr_pp_compare, cptr_pp_del);
+using_cptr(pe, Person, Person_compare, Person_del);
+using_cvec(pp, Person*, cptr_pe_compare, cptr_pe_del);
 
-// 3. cvec of shared-pointer to Person
-using_csptr(ps, Person, Person_compare, Person_del);
-using_cvec(ps, csptr_ps, csptr_ps_compare, csptr_ps_del);
+// 3. cvec of shared-ptr to Person
+using_csptr(pe, Person, Person_compare, Person_del);
+using_cvec(ps, csptr_pe, csptr_pe_compare, csptr_pe_del);
 
 const char* names[] = {
     "Joe", "Jordan",
@@ -108,7 +108,7 @@ int main() {
         Person tmp;
         cvec_pe_push_back(&vec1, *Person_make(&tmp, names[i], names[i+1]));
         cvec_pp_push_back(&vec2, Person_make(c_new(Person), names[i], names[i+1]));
-        cvec_ps_push_back(&vec3, csptr_ps_from(Person_make(c_new(Person), names[i], names[i+1])));
+        cvec_ps_push_back(&vec3, csptr_pe_from(Person_make(c_new(Person), names[i], names[i+1])));
     }
     puts("1. sorted cvec of Person :");
     cvec_pe_sort(&vec1);
@@ -125,8 +125,8 @@ int main() {
     c_foreach (i, cvec_ps, vec3)
         printf("  %s %s\n", i.ref->get->name.str, i.ref->get->last.str);
   
-    // share ownership of vec3.data[1] with elem:
-    csptr_ps elem = csptr_ps_share(vec3.data[1]);
+    // share vec3[1] with elem variable.
+    csptr_pe elem = csptr_pe_share(vec3.data[1]);
 
     puts("\nDestroy vec3:");
     cvec_ps_del(&vec3); // destroys all elements, but elem!
@@ -136,7 +136,7 @@ int main() {
     cvec_pe_del(&vec1);
 
     puts("\nDestroy elem:");
-    csptr_ps_del(&elem);
+    csptr_pe_del(&elem);
 }
 ```
 Output:
