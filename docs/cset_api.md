@@ -1,3 +1,4 @@
+![Set](set.jpg)
 # Container [cset](../stc/cmap.h): Unordered Set
 
 This describes the API of the unordered set type **cset**. Same base implementation as cmap, but contains and uses keys only.

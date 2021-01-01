@@ -2,7 +2,7 @@
 # Container [clist](../stc/clist.h): Forward List
 
 This is similar to c++ [std::forward_list](https://en.cppreference.com/w/cpp/container/forward_list), but supports both
-*push_front()* and *push_back()* as well as *pop_front()* in **O**(*1*) time. Implemented as a circular singly linked list.
+*push_front()* and *push_back()* as well as *pop_front()* in **O**(1) time. Implemented as a circular singly linked list.
 Also supports various *splice* functions and *merge-sort*. Note that like std::forward_list, the representation size of **clist**
 is only one pointer, and length of the list is not stored. The method *clist_X_size()* is therefore computed in **O**(*n*) time.
 
