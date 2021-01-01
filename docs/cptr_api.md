@@ -1,10 +1,9 @@
 # Module [cptr](../stc/cptr.h): Smart Pointers
 
-This describes the API of the pointer type **cptr** and the shared pointer type **csptr**. Type **cptr** can be used similar to a c++
-[std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr), while **csptr** is similar to a c++
+This module simplifies management of pointers in containers. The **csptr** type is similar to a c++
 [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr).
 
-**cptr** and **csptr** objects can be used as items of containers. The pointed-to elements are automatically destructed+deleted when the container is destructed. **csptr** elements are only deleted if there are no other shared references to the element. **csptr** has thread-safe atomic use count, enabled by the *csptr_X_share(sp)* and *csptr_X_del(&sp)* methods.
+Raw pointers and shared pointers (**csptr**) may be used as items of containers. The pointed-to elements are automatically destructed and deleted when the container is destructed. **csptr** elements are only deleted if there are no other shared references to the element. **csptr** uses thread-safe atomic use-count, through the *csptr_X_share(sp)* and *csptr_X_del(&sp)* methods.
 
 ## Declaration
 
@@ -62,7 +61,7 @@ int                 csptr_X_compare(csptr_X* x, csptr_X* y);
 
 ## Example
 
-This shows 2 cvecs with two different pointer to Person. pvec: cptr<Person>, and svec: csptr<Person>.
+This example shows three different ways to store struct Person in vectors: 1) cvec<Person>,  2) cvec<Person*>, and 3) cvec<csptr<Person>>.
 ```c
 #include <stc/cptr.h>
 #include <stc/cstr.h>
@@ -83,14 +82,14 @@ void Person_del(Person* p) {
     c_del(cstr, &p->name, &p->last);
 }
 
-// 1. cvec of Person structs (unused)
+// 1. cvec of Person structs
 using_cvec(pe, Person, Person_compare, Person_del);
 
 // 2. cvec of raw/owned pointers to Person
 using_cptr(pp, Person, Person_compare, Person_del);
 using_cvec(pp, Person*, cptr_pp_compare, cptr_pp_del);
 
-// 3. cvec of shared_ptr to Person
+// 3. cvec of shared-pointer to Person
 using_csptr(ps, Person, Person_compare, Person_del);
 using_cvec(ps, csptr_ps, csptr_ps_compare, csptr_ps_del);
 
@@ -101,52 +100,76 @@ const char* names[] = {
 };
 
 int main() {
-    cvec_pp pvec = cvec_inits;
-    for (int i=0;i<6; i+=2)
-        cvec_pp_push_back(&pvec, Person_make(c_new(Person), names[i], names[i+1]));
-    puts("cvec of cptr<Person>:");
-    cvec_pp_sort(&pvec);
-    c_foreach (i, cvec_pp, pvec)
+    cvec_pe vec1 = cvec_inits;
+    cvec_pp vec2 = cvec_inits;
+    cvec_ps vec3 = cvec_inits;
+
+    for (int i = 0; i < 6; i += 2) {
+        Person tmp;
+        cvec_pe_push_back(&vec1, *Person_make(&tmp, names[i], names[i+1]));
+        cvec_pp_push_back(&vec2, Person_make(c_new(Person), names[i], names[i+1]));
+        cvec_ps_push_back(&vec3, csptr_ps_from(Person_make(c_new(Person), names[i], names[i+1])));
+    }
+    puts("1. sorted cvec of Person :");
+    cvec_pe_sort(&vec1);
+    c_foreach (i, cvec_pe, vec1)
+        printf("  %s %s\n", i.ref->name.str, i.ref->last.str);
+
+    puts("\n2. sorted cvec of pointer to Person :");
+    cvec_pp_sort(&vec2);
+    c_foreach (i, cvec_pp, vec2)
         printf("  %s %s\n", (*i.ref)->name.str, (*i.ref)->last.str);
-
-    cvec_ps svec = cvec_inits;
-    for (int i=0;i<6; i+=2)
-        cvec_ps_push_back(&svec, csptr_ps_from(Person_make(c_new(Person), names[i], names[i+1])));
-    puts("cvec of csptr<Person>:");
-    cvec_ps_sort(&svec);
-    c_foreach (i, cvec_ps, svec)
+        
+    puts("\n3. sorted cvec of shared-pointer to Person :");
+    cvec_ps_sort(&vec3);
+    c_foreach (i, cvec_ps, vec3)
         printf("  %s %s\n", i.ref->get->name.str, i.ref->get->last.str);
+  
+    // share ownership of vec3.data[1] with elem:
+    csptr_ps elem = csptr_ps_share(vec3.data[1]);
 
-    csptr_ps x = csptr_ps_share(svec.data[1]);
+    puts("\nDestroy vec3:");
+    cvec_ps_del(&vec3); // destroys all elements, but elem!
+    puts("\nDestroy vec2:");
+    cvec_pp_del(&vec2);
+    puts("\nDestroy vec1:");
+    cvec_pe_del(&vec1);
 
-    puts("\nDestroy svec:");
-    cvec_ps_del(&svec); // destroys all elements but x!
-    puts("\nDestroy pvec:");
-    cvec_pp_del(&pvec);
-    puts("\nDestroy x:");
-    csptr_ps_del(&x);
+    puts("\nDestroy elem:");
+    csptr_ps_del(&elem);
 }
 ```
 Output:
 ```
-cvec of cptr<Person>:
-  Annie Aniston
-  Jane Jacobs
-  Joe Jordan
-cvec of csptr<Person>:
+1. sorted cvec of Person :
   Annie Aniston
   Jane Jacobs
   Joe Jordan
 
-Destroy svec:
+2. sorted cvec of pointer to Person :       
+  Annie Aniston
+  Jane Jacobs
+  Joe Jordan
+
+3. sorted cvec of shared-pointer to Person :
+  Annie Aniston
+  Jane Jacobs
+  Joe Jordan
+
+Destroy vec3:
 del: Annie
 del: Joe
 
-Destroy pvec:
+Destroy vec2:
 del: Annie
 del: Jane
 del: Joe
 
-Destroy x:
+Destroy vec1:
+del: Annie
+del: Jane
+del: Joe
+
+Destroy elem:
 del: Jane
 ```
