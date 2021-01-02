@@ -35,7 +35,7 @@
 #define using_cvec_3(X, Value, valueCompare) \
                     using_cvec_4(X, Value, valueCompare, c_default_del)
 #define using_cvec_4(X, Value, valueCompare, valueDestroy) \
-                    using_cvec_7(X, Value, valueCompare, valueDestroy, c_default_from_raw, c_default_to_raw, Value)
+                    using_cvec_5(X, Value, valueCompare, valueDestroy, c_default_from_raw)
 #define using_cvec_5(X, Value, valueCompare, valueDestroy, valueClone) \
                     using_cvec_7(X, Value, valueCompare, valueDestroy, valueClone, c_default_to_raw, Value)
 #define using_cvec_str() \

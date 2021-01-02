@@ -61,7 +61,7 @@
 #define using_clist_3(X, Value, valueCompare) \
                     using_clist_4(X, Value, valueCompare, c_default_del)
 #define using_clist_4(X, Value, valueCompare, valueDestroy) \
-                    using_clist_7(X, Value, valueCompare, valueDestroy, c_default_from_raw, c_default_to_raw, Value)
+                    using_clist_5(X, Value, valueCompare, valueDestroy, c_default_from_raw)
 #define using_clist_5(X, Value, valueCompare, valueDestroy, valueClone) \
                     using_clist_7(X, Value, valueCompare, valueDestroy, valueClone, c_default_to_raw, Value)
 #define using_clist_str() \
