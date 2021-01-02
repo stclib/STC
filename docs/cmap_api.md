@@ -13,8 +13,8 @@ See [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_m
                                    keyHashRaw=c_default_hash,
                                    keyDestroy=c_default_del,
                                    RawKey=Key,
-                                   keyToRaw=c_default_to_raw,
                                    keyFromRaw=c_default_from_raw,
+                                   keyToRaw=c_default_to_raw,
                                    RawMapped=Mapped,
                                    mappedFromRaw=c_default_from_raw)
 
@@ -24,8 +24,8 @@ See [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_m
                                   keyHash=c_default_hash,
                                   keyDestroy=c_default_del,
                                   RawKey=Key,
-                                  keyToRaw=c_default_to_raw,
-                                  keyFromRaw=c_default_from_raw)
+                                  keyFromRaw=c_default_from_raw,
+                                  keyToRaw=c_default_to_raw)
 #define using_cmap_str()
 ```
 The macro `using_cmap()` can be instantiated with 3, 4, 6, 10, or 12 arguments in the global scope.
@@ -39,7 +39,7 @@ be replaced by `my` in all of the following documentation.
 `using_cmap()`. The macro `using_cmap_str()` is a shorthand for
 ```c
 using_cmap(str, cstr_t, cstr_t, cstr_del, cstr_equals_raw, cstr_hash_raw,
-           cstr_del, const char*, cstr_to_raw, cstr_from, const char*, cstr_from)
+           cstr_del, const char*, cstr_from, cstr_to_raw, const char*, cstr_from)
 ```
 
 ## Types

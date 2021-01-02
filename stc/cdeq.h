@@ -35,9 +35,9 @@
 #define using_cdeq_3(X, Value, valueCompare) \
                     using_cdeq_4(X, Value, valueCompare, c_default_del)
 #define using_cdeq_4(X, Value, valueCompare, valueDestroy) \
-                    using_cdeq_7(X, Value, valueCompare, valueDestroy, Value, c_default_to_raw, c_default_from_raw)
+                    using_cdeq_7(X, Value, valueCompare, valueDestroy, Value, c_default_from_raw, c_default_to_raw)
 #define using_cdeq_str() \
-                    using_cdeq_7(str, cstr_t, cstr_compare_raw, cstr_del, const char*, cstr_to_raw, cstr_from)
+                    using_cdeq_7(str, cstr_t, cstr_compare_raw, cstr_del, const char*, cstr_from, cstr_to_raw)
 
 #define typedefs_cdeq(X, Value, RawValue) \
     typedef Value cdeq_##X##_value_t; \
@@ -48,7 +48,7 @@
         cdeq_##X##_value_t *base, *data; \
     } cdeq_##X
 
-#define using_cdeq_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueToRaw, valueFromRaw) \
+#define using_cdeq_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueFromRaw, valueToRaw) \
     typedefs_cdeq(X, Value, RawValue); \
 \
     STC_INLINE cdeq_##X \
@@ -199,13 +199,13 @@
     STC_INLINE size_t \
     cdeq_##X##_index(cdeq_##X deq, cdeq_##X##_iter_t it) {return it.ref - deq.data;} \
 \
-    _c_implement_cdeq_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueToRaw, valueFromRaw) \
+    _c_implement_cdeq_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueFromRaw, valueToRaw) \
     typedef cdeq_##X cdeq_##X##_t
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define _c_implement_cdeq_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueToRaw, valueFromRaw) \
+#define _c_implement_cdeq_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueFromRaw, valueToRaw) \
 \
     STC_DEF void \
     cdeq_##X##_push_n(cdeq_##X *self, const cdeq_##X##_input_t arr[], size_t n) { \
@@ -334,7 +334,7 @@
     }
 
 #else
-#define _c_implement_cdeq_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueToRaw, valueFromRaw)
+#define _c_implement_cdeq_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueFromRaw, valueToRaw)
 #endif
 
 #if defined(_WIN32) && defined(_DLL)

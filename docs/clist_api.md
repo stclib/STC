@@ -12,8 +12,8 @@ is only one pointer, and length of the list is not stored. The method *clist_X_s
 #define using_clist(X, Value, valueCompareRaw=c_default_compare,
                               valueDestroy=c_default_del,
                               RawValue=Value,
-                              valueToRaw=c_default_to_raw,
-                              valueFromRaw=c_default_from_raw)
+                              valueFromRaw=c_default_from_raw,
+                              valueToRaw=c_default_to_raw)
 #define using_clist_str()
 ```
 The macro `using_clist()` can be instantiated with 2, 3, 4, or 7 arguments in the global scope.
@@ -21,7 +21,7 @@ Default values are given above for args not specified. `X` is a type tag name an
 will affect the names of all clist types and methods. E.g. declaring `using_clist(my, int);`, `X` should
 be replaced by `my` in all of the following documentation. `using_clist_str()` is a shorthand for
 ```c
-using_clist(str, cstr_t, cstr_compare_raw, cstr_del, const char*, cstr_to_raw, cstr_from)
+using_clist(str, cstr_t, cstr_compare_raw, cstr_del, const char*, cstr_from, cstr_to_raw)
 ```
 
 ## Types

@@ -10,8 +10,8 @@ See [std::vector](https://en.cppreference.com/w/cpp/container/vector) for a simi
 #define using_cvec(X, Value, valueCompareRaw=c_default_compare,
                              valueDestroy=c_default_del,
                              RawValue=Value,
-                             valueToRaw=c_default_to_raw,
-                             valueFromRaw=c_default_from_raw)
+                             valueFromRaw=c_default_from_raw,
+                             valueToRaw=c_default_to_raw)
 #define using_cvec_str()
 ```
 The macro `using_cvec()` can be instantiated with 2, 3, 4, or 7 arguments in the global scope.
@@ -21,7 +21,7 @@ be replaced by `my` in all of the following documentation.
 
 `using_cvec_str()` is a shorthand for:
 ```
-using_cvec(str, cstr_t, cstr_compare_raw, cstr_del, const char*, cstr_to_raw, cstr_from)
+using_cvec(str, cstr_t, cstr_compare_raw, cstr_del, const char*, cstr_from, cstr_to_raw)
 ```
 
 ## Types

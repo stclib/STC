@@ -35,9 +35,9 @@
 #define using_cvec_3(X, Value, valueCompare) \
                     using_cvec_4(X, Value, valueCompare, c_default_del)
 #define using_cvec_4(X, Value, valueCompare, valueDestroy) \
-                    using_cvec_7(X, Value, valueCompare, valueDestroy, Value, c_default_to_raw, c_default_from_raw)
+                    using_cvec_7(X, Value, valueCompare, valueDestroy, Value, c_default_from_raw, c_default_to_raw)
 #define using_cvec_str() \
-                    using_cvec_7(str, cstr_t, cstr_compare_raw, cstr_del, const char*, cstr_to_raw, cstr_from)
+                    using_cvec_7(str, cstr_t, cstr_compare_raw, cstr_del, const char*, cstr_from, cstr_to_raw)
 
 #define typedefs_cvec(X, Value, RawValue) \
     typedef Value cvec_##X##_value_t; \
@@ -48,7 +48,7 @@
         cvec_##X##_value_t* data; \
     } cvec_##X
 
-#define using_cvec_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueToRaw, valueFromRaw) \
+#define using_cvec_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueFromRaw, valueToRaw) \
     typedefs_cvec(X, Value, RawValue); \
 \
     STC_INLINE cvec_##X \
@@ -188,13 +188,13 @@
     STC_INLINE size_t \
     cvec_##X##_index(cvec_##X vec, cvec_##X##_iter_t it) {return it.ref - vec.data;} \
 \
-    _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueToRaw, valueFromRaw) \
+    _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueFromRaw, valueToRaw) \
     typedef cvec_##X cvec_##X##_t
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueToRaw, valueFromRaw) \
+#define _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueFromRaw, valueToRaw) \
 \
     STC_DEF void \
     cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t arr[], size_t n) { \
@@ -256,11 +256,12 @@
     STC_DEF cvec_##X##_iter_t \
     cvec_##X##_insert_range_p(cvec_##X* self, cvec_##X##_value_t* pos, const cvec_##X##_value_t* first, const cvec_##X##_value_t* finish) { \
         size_t len = finish - first, idx = pos - self->data, size = cvec_##X##_size(*self); \
-        if (size + len > cvec_##X##_capacity(*self)) \
-            cvec_##X##_reserve(self, 4 + (size + len)*3/2); \
-        _cvec_size(self) += len; \
-        pos = self->data + idx; \
         cvec_##X##_iter_t it = {pos}; \
+        if (len == 0) return it; \
+        if (size + len > cvec_##X##_capacity(*self)) \
+            cvec_##X##_reserve(self, 4 + (size + len)*3/2), \
+            it.ref = pos = self->data + idx; \
+        _cvec_size(self) += len; \
         memmove(pos + len, pos, (size - idx) * sizeof(Value)); \
         while (first != finish) \
             *pos++ = valueFromRaw(valueToRaw(first++)); \
@@ -300,7 +301,7 @@
     }
 
 #else
-#define _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueToRaw, valueFromRaw)
+#define _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueFromRaw, valueToRaw)
 #endif
 
 #if defined(_WIN32) && defined(_DLL)
