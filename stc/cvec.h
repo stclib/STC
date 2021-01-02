@@ -35,9 +35,11 @@
 #define using_cvec_3(X, Value, valueCompare) \
                     using_cvec_4(X, Value, valueCompare, c_default_del)
 #define using_cvec_4(X, Value, valueCompare, valueDestroy) \
-                    using_cvec_7(X, Value, valueCompare, valueDestroy, Value, c_default_from_raw, c_default_to_raw)
+                    using_cvec_7(X, Value, valueCompare, valueDestroy, c_default_from_raw, c_default_to_raw, Value)
+#define using_cvec_5(X, Value, valueCompare, valueDestroy, valueClone) \
+                    using_cvec_7(X, Value, valueCompare, valueDestroy, valueClone, c_default_to_raw, Value)
 #define using_cvec_str() \
-                    using_cvec_7(str, cstr_t, cstr_compare_raw, cstr_del, const char*, cstr_from, cstr_to_raw)
+                    using_cvec_7(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_to_raw, const char*)
 
 #define typedefs_cvec(X, Value, RawValue) \
     typedef Value cvec_##X##_value_t; \
@@ -48,7 +50,7 @@
         cvec_##X##_value_t* data; \
     } cvec_##X
 
-#define using_cvec_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueFromRaw, valueToRaw) \
+#define using_cvec_7(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue) \
     typedefs_cvec(X, Value, RawValue); \
 \
     STC_INLINE cvec_##X \
@@ -188,13 +190,13 @@
     STC_INLINE size_t \
     cvec_##X##_index(cvec_##X vec, cvec_##X##_iter_t it) {return it.ref - vec.data;} \
 \
-    _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueFromRaw, valueToRaw) \
+    _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue) \
     typedef cvec_##X cvec_##X##_t
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueFromRaw, valueToRaw) \
+#define _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue) \
 \
     STC_DEF void \
     cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t arr[], size_t n) { \
@@ -301,7 +303,7 @@
     }
 
 #else
-#define _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, RawValue, valueFromRaw, valueToRaw)
+#define _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue)
 #endif
 
 #if defined(_WIN32) && defined(_DLL)

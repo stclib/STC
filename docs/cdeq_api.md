@@ -9,12 +9,12 @@ See [std::deque](https://en.cppreference.com/w/cpp/container/deque) for correspo
 ```c
 #define using_cdeq(X, Value, valueCompareRaw=c_default_compare,
                              valueDestroy=c_default_del,
-                             RawValue=Value,
                              valueFromRaw=c_default_from_raw,
-                             valueToRaw=c_default_to_raw)
+                             valueToRaw=c_default_to_raw,
+                             RawValue=Value)
 #define using_cdeq_str()
 ```
-The macro `using_cdeq()` can be instantiated with 2, 3, 4, or 7 arguments in the global scope.
+The macro `using_cdeq()` can be instantiated with 2, 3, 4, 5, or 7 arguments in the global scope.
 Defaults values are given above for args not specified. `X` is a type tag name and
 will affect the names of all cdeq types and methods. E.g. declaring `using_cdeq(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.

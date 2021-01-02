@@ -9,12 +9,12 @@ See [std::vector](https://en.cppreference.com/w/cpp/container/vector) for a simi
 ```c
 #define using_cvec(X, Value, valueCompareRaw=c_default_compare,
                              valueDestroy=c_default_del,
-                             RawValue=Value,
                              valueFromRaw=c_default_from_raw,
-                             valueToRaw=c_default_to_raw)
+                             valueToRaw=c_default_to_raw,
+                             RawValue=Value)
 #define using_cvec_str()
 ```
-The macro `using_cvec()` can be instantiated with 2, 3, 4, or 7 arguments in the global scope.
+The macro `using_cvec()` can be instantiated with 2, 3, 4, 5, or 7 arguments in the global scope.
 Defaults values are given above for args not specified. `X` is a type tag name and
 will affect the names of all cvec types and methods. E.g. declaring `using_cvec(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.

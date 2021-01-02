@@ -84,13 +84,13 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 
 #define using_cmap_10(X, Key, Mapped, mappedDel, keyEqualsRaw, keyHashRaw, \
                         keyDel, RawKey, keyFromRaw, keyToRaw) \
-    _c_typedef_CHASH(X, cmap, Key, Mapped, mappedDel, keyEqualsRaw, keyHashRaw, \
-                        keyDel, RawKey, keyFromRaw, keyToRaw, Mapped, c_default_from_raw)
+    _using_CHASH(X, cmap, Key, Mapped, mappedDel, keyEqualsRaw, keyHashRaw, \
+                    keyDel, RawKey, keyFromRaw, keyToRaw, Mapped, c_default_from_raw)
 
 #define using_cmap_12(X, Key, Mapped, mappedDel, keyEqualsRaw, keyHashRaw, \
                         keyDel, RawKey, keyFromRaw, keyToRaw, RawMapped, mappedFromRaw) \
-    _c_typedef_CHASH(X, cmap, Key, Mapped, mappedDel, keyEqualsRaw, keyHashRaw, \
-                        keyDel, RawKey, keyFromRaw, keyToRaw, RawMapped, mappedFromRaw)
+    _using_CHASH(X, cmap, Key, Mapped, mappedDel, keyEqualsRaw, keyHashRaw, \
+                    keyDel, RawKey, keyFromRaw, keyToRaw, RawMapped, mappedFromRaw)
 
 /* cset: */
 #define using_cset(...) \
@@ -108,25 +108,25 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 
 #define using_cset_8(X, Key, keyEqualsRaw, keyHashRaw, keyDel, \
                     RawKey, keyFromRaw, keyToRaw) \
-    _c_typedef_CHASH(X, cset, Key, Key, void, keyEqualsRaw, keyHashRaw, \
-                        keyDel, RawKey, keyFromRaw, keyToRaw, void, c_default_from_raw)
+    _using_CHASH(X, cset, Key, Key, void, keyEqualsRaw, keyHashRaw, \
+                    keyDel, RawKey, keyFromRaw, keyToRaw, void, c_default_from_raw)
 
 /* cset_str, cmap_str, cmap_strkey, cmap_strval: */
 #define using_cset_str() \
-    _c_declare_CHASH_strkey(str, cset, cstr_t, void)
+    _using_CHASH_strkey(str, cset, cstr_t, void)
 
 #define using_cmap_str() \
-    _c_typedef_CHASH(str, cmap, cstr_t, cstr_t, cstr_del, cstr_equals_raw, cstr_hash_raw, \
-                          cstr_del, const char*, cstr_from, cstr_to_raw, const char*, cstr_from)
+    _using_CHASH(str, cmap, cstr_t, cstr_t, cstr_del, cstr_equals_raw, cstr_hash_raw, \
+                      cstr_del, const char*, cstr_from, cstr_to_raw, const char*, cstr_from)
 
 #define using_cmap_strkey(...) \
     c_MACRO_OVERLOAD(using_cmap_strkey, __VA_ARGS__)
 
 #define using_cmap_strkey_2(X, Mapped) \
-    _c_declare_CHASH_strkey(X, cmap, Mapped, c_default_del)
+    _using_CHASH_strkey(X, cmap, Mapped, c_default_del)
 
 #define using_cmap_strkey_3(X, Mapped, ValueDestroy) \
-    _c_declare_CHASH_strkey(X, cmap, Mapped, ValueDestroy)
+    _using_CHASH_strkey(X, cmap, Mapped, ValueDestroy)
 
 #define using_cmap_strval(...) \
     c_MACRO_OVERLOAD(using_cmap_strval, __VA_ARGS__)
@@ -139,13 +139,13 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
                            c_default_del, Key, c_default_from_raw, c_default_to_raw)
 
 #define using_cmap_strval_8(X, Key, keyEquals, keyHash, keyDel, RawKey, keyFromRaw, keyToRaw) \
-    _c_typedef_CHASH(X, cmap, Key, cstr_t, cstr_del, keyEquals, keyHash, \
-                        keyDel, RawKey, keyFromRaw, keyToRaw, const char*, cstr_from)
+    _using_CHASH(X, cmap, Key, cstr_t, cstr_del, keyEquals, keyHash, \
+                    keyDel, RawKey, keyFromRaw, keyToRaw, const char*, cstr_from)
 
 
-#define _c_declare_CHASH_strkey(X, ctype, Mapped, mappedDel) \
-    _c_typedef_CHASH(X, ctype, cstr_t, Mapped, mappedDel, cstr_equals_raw, cstr_hash_raw, \
-                        cstr_del, const char*, cstr_from, cstr_to_raw, Mapped, c_default_from_raw)
+#define _using_CHASH_strkey(X, ctype, Mapped, mappedDel) \
+    _using_CHASH(X, ctype, cstr_t, Mapped, mappedDel, cstr_equals_raw, cstr_hash_raw, \
+                    cstr_del, const char*, cstr_from, cstr_to_raw, Mapped, c_default_from_raw)
 
 #define CSET_ONLY_cset(...) __VA_ARGS__
 #define CSET_ONLY_cmap(...)
@@ -155,8 +155,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 #define KEY_REF_cmap(e)     (e)->first
 
 /* CHASH full: use 'void' for Mapped if ctype is cset */
-#define _c_typedef_CHASH(X, ctype, Key, Mapped, mappedDel, keyEqualsRaw, keyHashRaw, \
-                            keyDel, RawKey, keyFromRaw, keyToRaw, RawMapped, mappedFromRaw) \
+#define _using_CHASH(X, ctype, Key, Mapped, mappedDel, keyEqualsRaw, keyHashRaw, \
+                        keyDel, RawKey, keyFromRaw, keyToRaw, RawMapped, mappedFromRaw) \
     typedef Key ctype##_##X##_key_t; \
     typedef Mapped ctype##_##X##_mapped_t; \
     typedef RawKey ctype##_##X##_rawkey_t; \
