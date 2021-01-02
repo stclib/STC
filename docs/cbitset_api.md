@@ -1,4 +1,4 @@
-![Bitset](bitset.jpg)
+![Bitset](pics/bitset.jpg)
 # Container [cbitset](../stc/cbitset.h): Bitset
 
 This describes the API of type **cbitset**. See [std::bitset](https://en.cppreference.com/w/cpp/utility/bitset) or

@@ -1,4 +1,4 @@
-![Vector](vector.jpg)
+![Vector](pics/vector.jpg)
 # Container [cvec](../stc/cvec.h): Vector
 
 A **cvec** is a sequence container that encapsulates dynamic size arrays.

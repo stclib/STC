@@ -1,4 +1,4 @@
-![String](string.jpg)
+![String](pics/string.jpg)
 # Container [cstr](../stc/cstr.h): String
 
 This describes the API of string type **cstr_t**.

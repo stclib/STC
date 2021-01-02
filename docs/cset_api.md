@@ -1,4 +1,4 @@
-![Set](set.jpg)
+![Set](pics/set.jpg)
 # Container [cset](../stc/cmap.h): Unordered Set
 
 A **cset** is an associative container that contains a set of unique objects of type Key. Search, insertion, and removal have average constant-time complexity. See [std::unordered_set](https://en.cppreference.com/w/cpp/container/unordered_set) for a similar c++ class.

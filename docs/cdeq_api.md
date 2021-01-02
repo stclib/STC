@@ -1,4 +1,4 @@
-![Deque](deque.jpg)
+![Deque](pics/deque.jpg)
 # Container [cdeq](../stc/cdeq.h): Double Ended Queue (Deque)
 
 A **cdeq** is an indexed sequence container that allows fast insertion and deletion at both its beginning and its end.

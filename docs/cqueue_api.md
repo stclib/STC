@@ -1,4 +1,4 @@
-![Queue](queue.jpg)
+![Queue](pics/queue.jpg)
 # Container [cqueue](../stc/cqueue.h): Queue
 
 This describes the API of the queue type **cqueue**.

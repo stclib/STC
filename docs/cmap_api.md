@@ -1,4 +1,4 @@
-![Map](map.jpg)
+![Map](pics/map.jpg)
 # Container [cmap](../stc/cmap.h): Unordered Map
 
 A **cmap** is an associative container that contains key-value pairs with unique keys. Search, insertion, and removal of elements have average constant-time complexity.

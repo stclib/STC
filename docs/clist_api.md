@@ -1,4 +1,4 @@
-![List](list.jpg)
+![List](pics/list.jpg)
 # Container [clist](../stc/clist.h): Forward List
 
 This is similar to c++ [std::forward_list](https://en.cppreference.com/w/cpp/container/forward_list), but supports both
