@@ -3,16 +3,18 @@
 This module simplifies management of pointers in containers. The **csptr** type is similar to a c++
 [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr).
 
-Raw pointers and shared pointers (**csptr**) may be used as items of containers. The pointed-to elements are automatically destructed and deleted when the container is destructed. **csptr** elements are only deleted if there are no other shared references to the element. **csptr** uses thread-safe atomic use-count, through the *csptr_X_share(sp)* and *csptr_X_del(&sp)* methods.
+Raw pointers and shared pointers (**csptr**) may be used as items of containers. The pointed-to elements are automatically destructed and deleted when the container is destructed. **csptr** elements are only deleted if there are no other shared references to the element. **csptr** uses thread-safe atomic use-count, through the *csptr_X_clone(sp)* and *csptr_X_del(&sp)* methods.
 
 ## Declaration
 
 ```c
 #define using_cptr(X, Value, valueCompare=c_default_compare,
-                             valueDestroy=c_default_del)
+                             valueDestroy=c_default_del,
+                             valueClone=c_default_clone)
 
 #define using_csptr(X, Value, valueCompare=c_default_compare,
-                              valueDestroy=c_default_del)
+                              valueDestroy=c_default_del,
+                              valueClone=c_default_clone)
 ```
 The macro `using_cptr()` must be instantiated in the global scope. `X` is a type tag name and will
 affect the names of all cptr types and methods. E.g. declaring `using_cptr(my, cvec_my);`,
@@ -43,7 +45,7 @@ All cptr definitions and prototypes may be included in your C source file by inc
 
 ## Methods
 
-The *\*_del()* and *\*_compare()* methods are defined based on the methods passed to the *using_\*ptr()* macro. For *csptr* use *csptr_X_share(p)* when sharing ownership of the pointed-to object to others. See example below.
+The *\*_del()* and *\*_compare()* methods are defined based on the methods passed to the *using_\*ptr()* macro. For *csptr* use *csptr_X_clone(p)* when sharing ownership of the pointed-to object to others. See example below.
 ```c
 cptr_X              cptr_X_init(void);
 void                cptr_X_reset(cptr_X* self, cptr_X_value_t* ptr);
@@ -53,7 +55,7 @@ int                 cptr_X_compare(cptr_X* x, cptr_X* y);
 ```c
 csptr_X             csptr_X_from(csptr_X_value_t* ptr);
 csptr_X             csptr_X_make(csptr_X_value_t ref);
-csptr_X             csptr_X_share(csptr_X ptr);
+csptr_X             csptr_X_clone(csptr_X ptr);
 void                csptr_X_reset(csptr_X* self, csptr_X_value_t* p);
 void                csptr_X_del(csptr_X* self);
 int                 csptr_X_compare(csptr_X* x, csptr_X* y);
@@ -126,7 +128,7 @@ int main() {
         printf("  %s %s\n", i.ref->get->name.str, i.ref->get->last.str);
   
     // share ownership of vec3.data[1] with elem:
-    csptr_ps elem = csptr_ps_share(vec3.data[1]);
+    csptr_ps elem = csptr_ps_clone(vec3.data[1]);
 
     puts("\nDestroy vec3:");
     cvec_ps_del(&vec3); // destroys all elements, but elem!

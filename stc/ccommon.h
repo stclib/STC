@@ -82,6 +82,7 @@
 #define c_less_compare(less, x, y) (less(y, x) - less(x, y))
 #define c_default_compare(x, y) c_less_compare(c_default_less, x, y)
 #define c_default_from_raw(x)   (x)
+#define c_default_clone(x)      (x)
 #define c_default_to_raw(ptr)   (*(ptr))
 #define c_default_del(ptr)      ((void) (ptr))
 

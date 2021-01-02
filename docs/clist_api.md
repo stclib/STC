@@ -11,7 +11,7 @@ is only one pointer, and length of the list is not stored. The method *clist_X_s
 ```c
 #define using_clist(X, Value, valueCompareRaw=c_default_compare,
                               valueDestroy=c_default_del,
-                              valueFromRaw=c_default_from_raw,
+                              valueFromRaw=c_default_clone,
                               valueToRaw=c_default_to_raw,
                               RawValue=Value)
 #define using_clist_str()

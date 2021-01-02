@@ -185,8 +185,8 @@ void arraydemo1()
     carray2f a2 = carray3f_at1(&a3, 5);    // sub-array reference: a2 = a3[5]
     carray1f a1 = carray3f_at2(&a3, 5, 4); // sub-array reference: a1 = a3[5][4]
 
-    printf("a3: %zu: (%zu, %zu, %zu) = %zu\n", sizeof(a3), carray3_xdim(a3), carray3_ydim(a3), carray3_zdim(a3), carray3_size(a3));
-    printf("a2: %zu: (%zu, %zu) = %zu\n", sizeof(a2), carray2_xdim(a2), carray2_ydim(a2), carray2_size(a2));
+    printf("a3: %zu: (%zu, %zu, %zu) = %zu\n", sizeof(a3), carray3f_xdim(a3), carray3f_ydim(a3), carray3f_zdim(a3), carray3f_size(a3));
+    printf("a2: %zu: (%zu, %zu) = %zu\n", sizeof(a2), carray2f_xdim(a2), carray2f_ydim(a2), carray2f_size(a2));
 
     printf("%f\n", a1.data[3]);                 // lookup a1[3] (=10.2f)
     printf("%f\n", *carray2f_at(&a2, 4, 3));    // lookup a2[4][3] (=10.2f)

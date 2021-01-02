@@ -9,7 +9,7 @@ See [std::vector](https://en.cppreference.com/w/cpp/container/vector) for a simi
 ```c
 #define using_cvec(X, Value, valueCompareRaw=c_default_compare,
                              valueDestroy=c_default_del,
-                             valueFromRaw=c_default_from_raw,
+                             valueFromRaw=c_default_clone,
                              valueToRaw=c_default_to_raw,
                              RawValue=Value)
 #define using_cvec_str()

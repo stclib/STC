@@ -65,9 +65,12 @@ int main() {
     using_cptr_3(X, Value, c_default_compare)
 
 #define using_cptr_3(X, Value, valueCompare) \
-    using_cptr_4(X, Value, valueCompare, c_default_del)
+    using_cptr_5(X, Value, valueCompare, c_default_del, c_default_clone)
 
 #define using_cptr_4(X, Value, valueCompare, valueDestroy) \
+    using_cptr_5(X, Value, valueCompare, valueDestroy, Value##_clone)
+
+#define using_cptr_5(X, Value, valueCompare, valueDestroy, valueClone) \
     typedef Value cptr_##X##_value_t; \
     typedef cptr_##X##_value_t *cptr_##X; \
 \
@@ -75,6 +78,12 @@ int main() {
     cptr_##X##_del(cptr_##X* self) { \
         valueDestroy(*self); \
         c_free(*self); \
+    } \
+    STC_INLINE cptr_##X \
+    cptr_##X##_clone(cptr_##X ptr) { \
+        cptr_##X clone = c_new_1(Value); \
+        *clone = valueClone(*ptr); \
+        return clone; \
     } \
 \
     STC_INLINE void \
@@ -111,7 +120,7 @@ using_csptr(pe, Person, Person_del);
 
 int main() {
     csptr_pe p = csptr_pe_make(Person_make(c_new(Person), "Joe", "Jordan"));
-    csptr_pe q = csptr_pe_share(p); // share the pointer
+    csptr_pe q = csptr_pe_clone(p); // share the pointer
 
     printf("%s %s: %d\n", q.get->name.str, q.get->last.str, *q.use_count);
     c_del(csptr_pe, &p, &q);
@@ -174,7 +183,7 @@ typedef long atomic_count_t;
         *ptr.get = val, *ptr.use_count = 1; return ptr; \
     } \
     STC_INLINE csptr_##X \
-    csptr_##X##_share(csptr_##X ptr) { \
+    csptr_##X##_clone(csptr_##X ptr) { \
         if (ptr.use_count) atomic_increment(ptr.use_count); \
         return ptr; \
     } \

@@ -29,8 +29,8 @@ int main() {
 
     Person tmp = {cstr_from("Joe"), cstr_from("Jordan")};
     csptr_pe joe = csptr_pe_make(tmp);
-    clist_pe_push_back(&queue, csptr_pe_share(joe));
-    cvec_pe_push_back(&vec, csptr_pe_share(joe));
+    clist_pe_push_back(&queue, csptr_pe_clone(joe));
+    cvec_pe_push_back(&vec, csptr_pe_clone(joe));
 
     puts("Push 10:");
     c_forrange (i, 10) {
@@ -38,7 +38,7 @@ int main() {
         p.get->name = cstr_from_fmt("Name %d", (i * 7) % 10);
         p.get->last = cstr_from_fmt("Last %d", (i * 7) % 10);
         clist_pe_push_back(&queue, p);
-        cvec_pe_push_back(&vec, csptr_pe_share(p)); // Don't forget to share!
+        cvec_pe_push_back(&vec, csptr_pe_clone(p)); // Don't forget to share!
     }
     c_foreach (i, clist_pe, queue)
         printf(" %s\n", i.ref->get->name.str);

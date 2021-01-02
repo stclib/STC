@@ -30,7 +30,7 @@
 #include <stdio.h> /* vsnprintf */
 #include <ctype.h>
 
-typedef struct cstr { char* str; } cstr_t;
+typedef struct cstr { char* str; } cstr_t, cstr;
 typedef struct { char *ref; } cstr_iter_t;
 typedef char cstr_value_t;
 

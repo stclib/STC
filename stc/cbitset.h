@@ -49,7 +49,7 @@ int main() {
 #include <string.h>
 #include "ccommon.h"
 
-typedef struct cbitset { uint64_t* _arr; size_t size; } cbitset_t;
+typedef struct cbitset { uint64_t* _arr; size_t size; } cbitset_t, cbitset;
 
 STC_API cbitset_t    cbitset_with_size(size_t size, bool value);
 STC_API cbitset_t    cbitset_from_str(const char* str);

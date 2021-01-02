@@ -46,56 +46,14 @@ int main()
 }
 */
 
-#define carray1_xdim(a) ((a)._xdim & _carray_SUB)
-#define carray1_size(a) carray1_xdim(a)
-
-#define carray2_xdim(a) carray1_xdim(a)
-#define carray2_ydim(a) (a)._ydim
-#define carray2_size(a) _carray2_size(&(a)._ydim)
-
-#define carray3_xdim(a) carray1_xdim(a)
-#define carray3_ydim(a) carray2_ydim(a)
-#define carray3_zdim(a) (a)._zdim
-#define carray3_size(a) _carray3_size(&(a)._zdim)
-
-#define _carray_SUB (SIZE_MAX >> 1)
-#define _carray_OWN (_carray_SUB + 1)
-
-STC_INLINE size_t
-_carray2_size(const size_t* ydim) {return ydim[0] * ydim[-1];}
-STC_INLINE size_t
-_carray3_size(const size_t* zdim) {return zdim[0] * zdim[-1] * zdim[-2];}
-
-
-#define using_carray_common(D, X, Value, valueDestroy) \
-    typedef struct { Value *ref; } carray##D##X##_iter_t; \
-\
-    STC_INLINE carray##D##X##_iter_t \
-    carray##D##X##_begin(carray##D##X* a) { \
-        carray##D##X##_iter_t it = {a->data}; return it; \
-    } \
-    STC_INLINE carray##D##X##_iter_t \
-    carray##D##X##_end(carray##D##X* a) { \
-        carray##D##X##_iter_t it = {a->data + carray##D##_size(*a)}; return it; \
-    } \
-    STC_INLINE void \
-    carray##D##X##_next(carray##D##X##_iter_t* it) {++it->ref;} \
-\
-    STC_INLINE void \
-    carray##D##X##_del(carray##D##X* self) { \
-        if (self->_xdim & _carray_OWN) { \
-            c_foreach_3 (i, carray##D##X, *self) \
-                valueDestroy(i.ref); \
-            c_free(self->data); \
-        } \
-    }
-
 #define using_carray(...) c_MACRO_OVERLOAD(using_carray, __VA_ARGS__)
 #define using_carray_2(X, Value) \
-    using_carray_3(X, Value, c_default_del)
-
+    using_carray_4(X, Value, c_default_del, c_default_clone)
 
 #define using_carray_3(X, Value, valueDestroy) \
+    using_carray_4(X, Value, valueDestroy, Value##_clone)
+
+#define using_carray_4(X, Value, valueDestroy, valueClone) \
 \
     typedef Value carray1##X##_value_t; \
     typedef carray1##X##_value_t carray2##X##_value_t, carray3##X##_value_t; \
@@ -115,9 +73,22 @@ _carray3_size(const size_t* zdim) {return zdim[0] * zdim[-1] * zdim[-2];}
         size_t _xdim, _ydim, _zdim; \
     } carray3##X, carray3##X##_t; \
 \
-    using_carray_common(1, X, Value, valueDestroy) \
-    using_carray_common(2, X, Value, valueDestroy) \
-    using_carray_common(3, X, Value, valueDestroy) \
+    STC_INLINE size_t \
+    carray1##X##_size(carray1##X a) {return _carray_xdim(a);} \
+    STC_INLINE size_t \
+    carray2##X##_size(carray2##X a) {return _carray_xdim(a)*_carray_ydim(a);} \
+    STC_INLINE size_t \
+    carray3##X##_size(carray3##X a) {return _carray_xdim(a)*_carray_ydim(a)*_carray_zdim(a);} \
+    STC_INLINE size_t \
+    carray2##X##_ydim(carray2##X a) {return _carray_ydim(a);} \
+    STC_INLINE size_t \
+    carray3##X##_ydim(carray3##X a) {return _carray_ydim(a);} \
+    STC_INLINE size_t \
+    carray3##X##_zdim(carray3##X a) {return _carray_zdim(a);} \
+\
+    _using_carray_common(1, X, Value, valueDestroy, valueClone) \
+    _using_carray_common(2, X, Value, valueDestroy, valueClone) \
+    _using_carray_common(3, X, Value, valueDestroy, valueClone) \
 \
     STC_INLINE carray1##X \
     carray1##X##_init(size_t xdim, Value val) { \
@@ -164,28 +135,68 @@ _carray3_size(const size_t* zdim) {return zdim[0] * zdim[-1] * zdim[-2];}
     \
     STC_INLINE carray1##X \
     carray2##X##_at1(carray2##X *a, size_t y) { \
-        carray1##X sub = {a->data + y*carray2_xdim(*a), carray2_xdim(*a)}; \
+        carray1##X sub = {a->data + y*_carray_xdim(*a), _carray_xdim(*a)}; \
         return sub; \
     } \
     STC_INLINE Value* \
     carray2##X##_at(carray2##X *a, size_t y, size_t x) { \
-        return a->data + y*carray2_xdim(*a) + x; \
+        return a->data + y*_carray_xdim(*a) + x; \
     } \
 \
     STC_INLINE carray2##X \
     carray3##X##_at1(carray3##X *a, size_t z) { \
-        carray2##X sub = {a->data + z*a->_ydim*carray2_xdim(*a), carray3_xdim(*a), a->_ydim}; \
+        carray2##X sub = {a->data + z*_carray_ydim(*a)*_carray_xdim(*a), _carray_xdim(*a), _carray_ydim(*a)}; \
         return sub; \
     } \
     STC_INLINE carray1##X \
     carray3##X##_at2(carray3##X *a, size_t z, size_t y) { \
-        carray1##X sub = {a->data + (z*a->_ydim + y)*carray3_xdim(*a), carray3_xdim(*a)}; \
+        carray1##X sub = {a->data + (z*_carray_ydim(*a) + y)*_carray_xdim(*a), _carray_xdim(*a)}; \
         return sub; \
     } \
     STC_INLINE Value* \
     carray3##X##_at(carray3##X *a, size_t z, size_t y, size_t x) { \
-        return a->data + (z*a->_ydim + y)*carray3_xdim(*a) + x; \
+        return a->data + (z*_carray_ydim(*a) + y)*_carray_xdim(*a) + x; \
     } \
     typedef carray1##X carray1##X##_t
+
+
+#define _carray_SUB (SIZE_MAX >> 1)
+#define _carray_OWN (_carray_SUB + 1)
+#define _carray_xdim(a) ((a)._xdim & _carray_SUB)
+#define _carray_ydim(a) (a)._ydim
+#define _carray_zdim(a) (a)._zdim
+
+#define _using_carray_common(D, X, Value, valueDestroy, valueClone) \
+    typedef struct { Value *ref; } carray##D##X##_iter_t; \
+\
+    STC_INLINE carray##D##X##_iter_t \
+    carray##D##X##_begin(carray##D##X* a) { \
+        carray##D##X##_iter_t it = {a->data}; return it; \
+    } \
+    STC_INLINE carray##D##X##_iter_t \
+    carray##D##X##_end(carray##D##X* a) { \
+        carray##D##X##_iter_t it = {a->data + carray##D##X##_size(*a)}; return it; \
+    } \
+    STC_INLINE void \
+    carray##D##X##_next(carray##D##X##_iter_t* it) {++it->ref;} \
+\
+    STC_INLINE void \
+    carray##D##X##_del(carray##D##X* self) { \
+        if (self->_xdim & _carray_OWN) { \
+            c_foreach_3 (i, carray##D##X, *self) \
+                valueDestroy(i.ref); \
+            c_free(self->data); \
+        } \
+    } \
+    STC_INLINE carray##D##X \
+    carray##D##X##_clone(carray##D##X arr) { \
+        carray##D##X c = arr; size_t k = 0; \
+        c.data = c_new_2(Value, carray##D##X##_size(arr)); \
+        c_foreach_3 (i, carray##D##X, arr) \
+            c.data[k++] = valueClone(*i.ref); \
+        return c; \
+    } \
+    STC_INLINE size_t \
+    carray##D##X##_xdim(carray##D##X a) {return _carray_xdim(a);} \
 
 #endif

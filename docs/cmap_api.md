@@ -9,23 +9,27 @@ See [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_m
 
 ```c
 #define using_cmap(X, Key, Mapped, mappedDestroy=c_default_del,
+                                   mappedClone=c_default_clone,
                                    keyEqualsRaw=c_default_equals,
                                    keyHashRaw=c_default_hash,
                                    keyDestroy=c_default_del,
-                                   RawKey=Key,
-                                   keyFromRaw=c_default_from_raw,
+                                   keyFromRaw=c_default_clone,
                                    keyToRaw=c_default_to_raw,
-                                   RawMapped=Mapped,
-                                   mappedFromRaw=c_default_from_raw)
+                                   RawKey=Key)
+// or:
+#define using_cmap(X, Key, Mapped, mappedDestroy,
+                                   mappedFromRaw, keyFromRaw, RawMapped,
+                                   keyEqualsRaw, keyHashRaw, keyDestroy,
+                                   keyFromRaw, keyToRaw, RawKey)
 
 #define using_cmap_strkey(X, Mapped, mappedDestroy=c_default_del)
 
 #define using_cmap_strval(X, Key, keyEquals=c_default_equals,
                                   keyHash=c_default_hash,
                                   keyDestroy=c_default_del,
-                                  RawKey=Key,
-                                  keyFromRaw=c_default_from_raw,
-                                  keyToRaw=c_default_to_raw)
+                                  keyFromRaw=c_default_clone,
+                                  keyToRaw=c_default_to_raw,
+                                  RawKey=Key)
 #define using_cmap_str()
 ```
 The macro `using_cmap()` can be instantiated with 3, 4, 6, 10, or 12 arguments in the global scope.
