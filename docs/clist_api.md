@@ -21,7 +21,7 @@ Default values are given above for args not specified. `X` is a type tag name an
 will affect the names of all clist types and methods. E.g. declaring `using_clist(my, int);`, `X` should
 be replaced by `my` in all of the following documentation. `using_clist_str()` is a shorthand for
 ```c
-using_clist(str, cstr_t, cstr_compare_raw, cstr_del, const char*, cstr_from, cstr_to_raw)
+using_clist(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_to_raw, const char*)
 ```
 
 ## Types
@@ -62,16 +62,16 @@ size_t              clist_X_size(clist_X list); // note: O(n)
 clist_X_value_t*    clist_X_front(clist_X* self);
 clist_X_value_t*    clist_X_back(clist_X* self);
 
-void                clist_X_push_n(clist_X *self, const clist_X_input_t in[], size_t size);
+void                clist_X_push_n(clist_X *self, const clist_X_input_t arr[], size_t size);
 void                clist_X_emplace_back(clist_X* self, RawValue ref);
 void                clist_X_push_back(clist_X* self, Value value);
 
-void                clist_X_emplace_front(clist_X* self, RawValue ref);
+void                clist_X_emplace_front(clist_X* self, RawValue raw);
 void                clist_X_push_front(clist_X* self, Value value);
 void                clist_X_pop_front(clist_X* self);
 
-clist_X_iter_t      clist_X_emplace_after(clist_X* self, clist_X_iter_t pos, RawValue ref);
-clist_X_iter_t      clist_X_insert_after(clist_X* self, clist_X_iter_t pos, Value ref);
+clist_X_iter_t      clist_X_emplace_after(clist_X* self, clist_X_iter_t pos, RawValue raw);
+clist_X_iter_t      clist_X_insert_after(clist_X* self, clist_X_iter_t pos, Value raw);
 
 clist_X_iter_t      clist_X_erase_after(clist_X* self, clist_X_iter_t pos);
 clist_X_iter_t      clist_X_erase_range_after(clist_X* self, clist_X_iter_t pos, clist_X_iter_t finish);
@@ -80,11 +80,11 @@ void                clist_X_splice_front(clist_X* self, clist_X* other);
 void                clist_X_splice_back(clist_X* self, clist_X* other);
 void                clist_X_splice_after(clist_X* self, clist_X_iter_t pos, clist_X* other);
 
-clist_X_iter_t      clist_X_find(const clist_X* self, RawValue ref);
+clist_X_iter_t      clist_X_find(const clist_X* self, RawValue raw);
 clist_X_iter_t      clist_X_find_before(const clist_X* self,
                                         clist_X_iter_t first, clist_X_iter_t finish, RawValue ref);
 
-size_t              clist_X_remove(clist_X* self, RawValue ref);
+size_t              clist_X_remove(clist_X* self, RawValue raw);
 
 void                clist_X_sort(clist_X* self);
 
@@ -95,7 +95,7 @@ clist_X_iter_t      clist_X_end(const clist_X* self);
 void                clist_X_next(clist_X_iter_t* it);
 clist_X_value_t*    clist_X_itval(clist_X_iter_t it);
 
-Value               clist_X_value_from_raw(RawValue ref);
+Value               clist_X_value_from_raw(RawValue raw);
 ```
 
 ## Example
