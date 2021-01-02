@@ -50,8 +50,8 @@ Viking viking_fromVw(VikingVw vw) {
 }
 
 // Using the full using_cmap() macro to define [Viking -> int] hash map type:
-using_cmap(vk, Viking, int, c_default_del, vikingvw_equals, vikingvw_hash,
-               viking_del, VikingVw, viking_fromVw, viking_toVw);
+using_cmap(vk, Viking, int, c_default_del, vikingvw_equals, vikingvw_hash, viking_del,
+               viking_fromVw, viking_toVw, VikingVw);
 
 // cmap_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test.
 // cmap_vk_del() will free all memory allocated for Viking keys and the hash table values.
