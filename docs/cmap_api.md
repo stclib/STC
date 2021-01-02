@@ -84,6 +84,7 @@ cmap_X              cmap_X_init(void);
 cmap_X              cmap_X_with_capacity(size_t cap);
 void                cmap_X_set_load_factors(cmap_X* self, float max, float shrink);
 
+cmap_X              cmap_X_clone(cmap_x map);
 void                cmap_X_clear(cmap_X* self);
 void                cmap_X_reserve(cmap_X* self, size_t size);
 void                cmap_X_swap(cmap_X* a, cmap_X* b);

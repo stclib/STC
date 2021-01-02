@@ -24,6 +24,8 @@ All cstr definitions and prototypes may be included in your C source file by inc
 cbitset_t        cbitset_init(void);
 cbitset_t        cbitset_with_size(size_t size, bool value);
 cbitset_t        cbitset_from_str(const char* str);
+
+cbitset_t        cbitset_clone(cbitset_t other);
 void             cbitset_resize(cbitset_t* self, size_t size, bool value);
 
 cbitset_t        cbitset_intersect(cbitset_t s1, cbitset_t s2);
@@ -33,9 +35,8 @@ cbitset_t        cbitset_not(cbitset_t s1);
 
 void             cbitset_del(cbitset_t* self);
 
-cbitset_t*       cbitset_take(cbitset_t* self, cbitset_t other);
 cbitset_t*       cbitset_assign(cbitset_t* self, cbitset_t other);
-cbitset_t        cbitset_clone(cbitset_t other);
+cbitset_t*       cbitset_take(cbitset_t* self, cbitset_t other);
 cbitset_t        cbitset_move(cbitset_t* self);
 
 size_t           cbitset_size(cbitset_t set);

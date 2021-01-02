@@ -54,6 +54,7 @@ cset_X              cset_X_init(void);
 cset_X              cset_X_with_capacity(size_t cap);
 void                cset_X_set_load_factors(cset_X* self, float max, float shrink);
 
+cset_X              cset_X_clone(cset_x set);
 void                cset_X_clear(cset_X* self);
 void                cset_X_reserve(cset_X* self, size_t size);
 void                cset_X_swap(cset_X* a, cset_X* b);
