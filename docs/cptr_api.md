@@ -19,6 +19,7 @@ Raw pointers and shared pointers (**csptr**) may be used as items of containers.
 The macro `using_cptr()` must be instantiated in the global scope. `X` is a type tag name and will
 affect the names of all cptr types and methods. E.g. declaring `using_cptr(my, cvec_my);`,
 `X` should be replaced by `my` in all of the following documentation.
+Note that if valueDestroy is specified and not *valueClone*, it expects *Value_clone* to be defined
 
  Types
 
@@ -48,15 +49,16 @@ All cptr definitions and prototypes may be included in your C source file by inc
 The *\*_del()* and *\*_compare()* methods are defined based on the methods passed to the *using_\*ptr()* macro. For *csptr* use *csptr_X_clone(p)* when sharing ownership of the pointed-to object to others. See example below.
 ```c
 cptr_X              cptr_X_init(void);
+cptr_X              cptr_X_clone(cptr_X ptr);
 void                cptr_X_reset(cptr_X* self, cptr_X_value_t* ptr);
 void                cptr_X_del(cptr_X* self);
 int                 cptr_X_compare(cptr_X* x, cptr_X* y);
 ```
 ```c
 csptr_X             csptr_X_from(csptr_X_value_t* ptr);
-csptr_X             csptr_X_make(csptr_X_value_t ref);
-csptr_X             csptr_X_clone(csptr_X ptr);
-void                csptr_X_reset(csptr_X* self, csptr_X_value_t* p);
+csptr_X             csptr_X_make(csptr_X_value_t val);
+csptr_X             csptr_X_clone(csptr_X sptr);
+void                csptr_X_reset(csptr_X* self, csptr_X_value_t* ptr);
 void                csptr_X_del(csptr_X* self);
 int                 csptr_X_compare(csptr_X* x, csptr_X* y);
 ```
@@ -83,13 +85,18 @@ void Person_del(Person* p) {
     printf("del: %s\n", p->name.str);
     c_del(cstr, &p->name, &p->last);
 }
+Person Person_clone(Person p) {
+    p.name = cstr_clone(p.name);
+    p.last = cstr_clone(p.last);
+    return p;
+}
 
 // 1. cvec of Person struct
 using_cvec(pe, Person, Person_compare, Person_del);
 
 // 2. cvec of raw/owned pointers to Person
 using_cptr(pe, Person, Person_compare, Person_del);
-using_cvec(pp, Person*, cptr_pe_compare, cptr_pe_del);
+using_cvec(pp, Person*, cptr_pe_compare, cptr_pe_del, cptr_pe_clone);
 
 // 3. cvec of shared-ptr to Person
 using_csptr(pe, Person, Person_compare, Person_del);
@@ -127,7 +134,7 @@ int main() {
     c_foreach (i, cvec_ps, vec3)
         printf("  %s %s\n", i.ref->get->name.str, i.ref->get->last.str);
   
-    // share ownership of vec3[1] with elem:
+    // share vec3[1] with elem variable.
     csptr_pe elem = csptr_pe_clone(vec3.data[1]);
 
     puts("\nDestroy vec3:");
