@@ -21,7 +21,7 @@ be replaced by `my` in all of the following documentation.
 
 `using_cdeq_str()` is a shorthand for:
 ```
-using_cdeq(str, cstr_t, cstr_compare_raw, cstr_del, const char*, cstr_from, cstr_to_raw)
+using_cdeq(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_to_raw, const char*)
 ```
 
 ## Types
@@ -53,7 +53,7 @@ All cdeq definitions and prototypes may be included in your C source file by inc
 cdeq_X              cdeq_X_init(void);
 cdeq_X              cdeq_X_with_size(size_t size, Value fill);
 cdeq_X              cdeq_X_with_capacity(size_t size);
-cdeq_X              cdeq_X_clone(cdeq_X vec);
+cdeq_X              cdeq_X_clone(cdeq_X deq);
 
 void                cdeq_X_clear(cdeq_X* self);
 void                cdeq_X_shrink_to_fit(cdeq_X* self);
@@ -63,9 +63,9 @@ void                cdeq_X_swap(cdeq_X* a, cdeq_X* b);
 
 void                cdeq_X_del(cdeq_X* self);
 
-bool                cdeq_X_empty(cdeq_X vec);
-size_t              cdeq_X_size(cdeq_X vec);
-size_t              cdeq_X_capacity(cdeq_X vec);
+bool                cdeq_X_empty(cdeq_X deq);
+size_t              cdeq_X_size(cdeq_X deq);
+size_t              cdeq_X_capacity(cdeq_X deq);
 
 cdeq_X_value_t*     cdeq_X_at(cdeq_X* self, size_t idx);
 cdeq_X_value_t*     cdeq_X_front(cdeq_X* self);
@@ -105,7 +105,7 @@ cdeq_X_iter_t       cdeq_X_begin(const cdeq_X* self);
 cdeq_X_iter_t       cdeq_X_end(const cdeq_X* self);
 void                cdeq_X_next(cdeq_X_iter_t* it);
 cdeq_X_value_t*     cdeq_X_itval(cdeq_X_iter_t it);
-size_t              cdeq_X_index(const cdeq_X vec, cdeq_X_iter_t it);
+size_t              cdeq_X_index(const cdeq_X deq, cdeq_X_iter_t it);
 
 Value               cdeq_X_value_from_raw(RawValue raw);
 ```
@@ -118,26 +118,26 @@ Value               cdeq_X_value_from_raw(RawValue raw);
 using_cdeq(i, int);
 
 int main() {
-    cdeq_i x = cdeq_i_init();
-    cdeq_i_push_front(&x, 10);
-    c_foreach (i, cdeq_i, x)
+    cdeq_i q = cdeq_i_init();
+    cdeq_i_push_front(&q, 10);
+    c_foreach (i, cdeq_i, q)
         printf(" %d", *i.ref);
     puts("");
 
-    c_push_items(&x, cdeq_i, {1, 4, 5, 22, 33, 2});
-    c_foreach (i, cdeq_i, x)
+    c_push_items(&q, cdeq_i, {1, 4, 5, 22, 33, 2});
+    c_foreach (i, cdeq_i, q)
         printf(" %d", *i.ref);
     puts("");
 
-    cdeq_i_push_front(&x, 9);
-    cdeq_i_push_front(&x, 20);
-    cdeq_i_push_back(&x, 11);
-    cdeq_i_push_front(&x, 8);
+    cdeq_i_push_front(&q, 9);
+    cdeq_i_push_front(&q, 20);
+    cdeq_i_push_back(&q, 11);
+    cdeq_i_push_front(&q, 8);
 
-    c_foreach (i, cdeq_i, x)
+    c_foreach (i, cdeq_i, q)
         printf(" %d", *i.ref);
     puts("");
-    cdeq_i_del(&x);
+    cdeq_i_del(&q);
 }
 ```
 Output:
