@@ -71,10 +71,12 @@ int main(void) {
     cvec_u vec = cvec_u_init();
     cvec_u_push_back(&vec, (User) {cstr_from("admin"), 0});
     cvec_u_push_back(&vec, (User) {cstr_from("joe"), 1});
-
-    c_foreach (i, cvec_u, vec)
+    
+    cvec_u vec2 = cvec_u_clone(vec);
+    c_foreach (i, cvec_u, vec2)
         printf("%s: %d\n", i.ref->name.str, i.ref->id);
-    cvec_u_del(&vec); // cleanup
+
+    c_del(cvec_u, &vec, &vec2); // cleanup
 }
 ```
 Motivation
