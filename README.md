@@ -37,8 +37,10 @@ int main(void) {
     cvec_i vec = cvec_i_init();
     cvec_i_push_back(&vec, 1);
     cvec_i_push_back(&vec, 2);
+    
     c_foreach (i, cvec_i, vec)
         printf(" %d", *i.ref);
+        
     cvec_i_del(&vec);
 }
 ```
