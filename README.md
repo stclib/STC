@@ -56,11 +56,16 @@ int User_compare(const User* a, const User* b) {
     int c = strcmp(a->name.str, b->name.str);
     return c != 0 ? c : a->id - b->id;
 }
-void User_del(User* user) {
-    cstr_del(&user->name);
+void User_del(User* self) {
+    cstr_del(&self->name);
+}
+User User_clone(User user) {
+    user.name = cstr_clone(user.name);
+    return user;
 }
 
-using_cvec(u, User, User_compare, User_del);
+// declare a memory managed, clonable vector of users:
+using_cvec(u, User, User_compare, User_del, User_clone);
 
 int main(void) {
     cvec_u vec = cvec_u_init();
