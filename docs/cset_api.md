@@ -6,16 +6,15 @@ A **cset** is an associative container that contains a set of unique objects of 
 ## Declaration
 
 ```c
-#define using_cset_str()
-
 #define using_cset(X, Key, keyEqualsRaw=c_default_equals,
                            keyHashRaw=c_default_hash,
                            keyDestroy=c_default_del,
                            keyFromRaw=c_default_clone,
                            keyToRaw=c_default_to_raw,                           
                            RawKey=Key)
+#define using_cset_str()                           
 ```
-The macro `using_cset()` can be instantiated with 2, 4, 5, or 8 arguments in the global scope.
+The macro `using_cset()` can be instantiated with 2, 4, 6, or 8 arguments in the global scope.
 Default values are given above for args not specified. `X` is a type tag name and
 will affect the names of all cset types and methods. E.g. declaring `using_cset(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.

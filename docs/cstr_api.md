@@ -1,14 +1,14 @@
 # STC Container [cstr](../stc/cstr.h): String
 ![String](pics/string.jpg)
 
-This describes the API of string type **cstr_t**.
+This describes the API of string type **cstr**.
 See [std::basic_string](https://en.cppreference.com/w/cpp/string/basic_string) for a similar c++ class.
 
 ## Types
 
 | Type name         | Type definition                  | Used to represent...       |
 |:------------------|:---------------------------------|:---------------------------|
-| `cstr_t`          | `struct { const char *str; }`    | The string type            |
+| `cstr, cstr_t`    | `struct { const char *str; }`    | The string type            |
 | `cstr_value_t`    | `char`                           | The string element type    |
 | `cstr_iter_t`     | `struct { cstr_value_t *ref; }`  | cstr_t iterator            |
 

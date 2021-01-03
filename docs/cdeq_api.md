@@ -1,4 +1,4 @@
-# STC Container [cdeq](../stc/cdeq.h): Double Ended Queue (Deque)
+# STC Container [cdeq](../stc/cdeq.h): Double Ended Queue
 ![Deque](pics/deque.jpg)
 
 A **cdeq** is an indexed sequence container that allows fast insertion and deletion at both its beginning and its end.
@@ -14,7 +14,7 @@ See [std::deque](https://en.cppreference.com/w/cpp/container/deque) for a simila
                              RawValue=Value)
 #define using_cdeq_str()
 ```
-The macro `using_cdeq()` can be instantiated with 2, 3, 4, 5, or 7 arguments in the global scope.
+The macro `using_cdeq()` can be instantiated with 2, 3, 5, or 7 arguments in the global scope.
 Defaults values are given above for args not specified. `X` is a type tag name and
 will affect the names of all cdeq types and methods. E.g. declaring `using_cdeq(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.

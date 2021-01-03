@@ -1,7 +1,7 @@
 # STC Module [copt](../stc/copt.h): Command line argument parsing
 
-This describes the API of string type *copt_get()* function for command line argument parsing.
-See [getopt_long](https://www.freebsd.org/cgi/man.cgi?getopt_long(3)) for a similar freebsd function.
+This describes the API of the *copt_get()* function for command line argument parsing.
+See [getopt_long](https://www.freebsd.org/cgi/man.cgi?getopt_long(3)) for a similar posix function.
 
 ## Types
 

@@ -11,7 +11,7 @@ See [boost::multi_array](https://www.boost.org/doc/libs/release/libs/multi_array
 #define using_carray(X, Value, valueDestroy=c_default_del, 
                                valueClone=c_default_clone)
 ```
-The macro `using_carray()` can be instantiated with 2 or 3 arguments in the global scope.
+The macro `using_carray()` can be instantiated with 2 or 4 arguments in the global scope.
 Default values are given above for args not specified. `X` and `N` are type tags and
 will affect the names of all cset types and methods. E.g. declaring `using_carray(my, int);`, `X` should
 be replaced by `my` in all of the following documentation. The `N` character should be replaced by `1`, `2` or `3`.

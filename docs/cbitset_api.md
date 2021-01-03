@@ -1,7 +1,7 @@
 # STC Container [cbitset](../stc/cbitset.h): Bitset
 ![Bitset](pics/bitset.jpg)
 
-This describes the API of type **cbitset**. See [std::bitset](https://en.cppreference.com/w/cpp/utility/bitset) or
+A **cbitset** represents a resizable sequence of N bits. Bitsets can be manipulated by standard logic operators and converted to and from strings and integers. See [std::bitset](https://en.cppreference.com/w/cpp/utility/bitset) or
 [boost::dynamic_bitset](https://www.boost.org/doc/libs/release/libs/dynamic_bitset/dynamic_bitset.html) for similar c++ classes.
 
 ## Types
