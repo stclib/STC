@@ -14,12 +14,12 @@ Raw pointers and shared pointers (**csptr**) may be used as items of containers.
 
 #define using_csptr(X, Value, valueCompare=c_default_compare,
                               valueDestroy=c_default_del,
-                              valueClone=c_default_clone)
+                              valueClone=ignored)
 ```
 The macro `using_cptr()` must be instantiated in the global scope. `X` is a type tag name and will
 affect the names of all cptr types and methods. E.g. declaring `using_cptr(my, cvec_my);`,
 `X` should be replaced by `my` in all of the following documentation.
-Note that if valueDestroy is specified and not *valueClone*, it expects *Value_clone* to be defined
+Note: for shared-ptr csptr, "cloning" is done by pointer sharing (ref counting), so valueClone is not required and ignored.
 
  Types
 
