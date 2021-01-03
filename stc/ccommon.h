@@ -120,6 +120,9 @@
     ctype##_push_n(self, __arr, sizeof __arr/sizeof *__arr); \
 } while (0)
 
+#define c_defcnt(ctype, cnt, ...) \
+    ctype cnt = ctype##_init(); c_push_items(&cnt, ctype, __VA_ARGS__)
+
 #define c_del(ctype, ...) do { \
     ctype##_t* __arr[] = {__VA_ARGS__}; \
     for (size_t __i=0; __i<sizeof __arr/sizeof *__arr; ++__i) \
