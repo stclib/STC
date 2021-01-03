@@ -92,15 +92,15 @@ Person Person_clone(Person p) {
 }
 
 // 1. cvec of Person struct
-using_cvec(pe, Person, Person_compare, Person_del);
+using_cvec(pe, Person, Person_compare, Person_del, Person_clone);
 
 // 2. cvec of raw/owned pointers to Person
-using_cptr(pe, Person, Person_compare, Person_del);
+using_cptr(pe, Person, Person_compare, Person_del, Person_clone);
 using_cvec(pp, Person*, cptr_pe_compare, cptr_pe_del, cptr_pe_clone);
 
-// 3. cvec of shared-ptr to Person
-using_csptr(pe, Person, Person_compare, Person_del);
-using_cvec(ps, csptr_pe, csptr_pe_compare, csptr_pe_del);
+// 3. cvec of shared-ptr to Person.
+using_csptr(pe, Person, Person_compare, Person_del); // clone is done internally by "sharing"
+using_cvec(ps, csptr_pe, csptr_pe_compare, csptr_pe_del, Person_clone);
 
 const char* names[] = {
     "Joe", "Jordan",
@@ -128,12 +128,12 @@ int main() {
     cvec_pp_sort(&vec2);
     c_foreach (i, cvec_pp, vec2)
         printf("  %s %s\n", (*i.ref)->name.str, (*i.ref)->last.str);
-        
+
     puts("\n3. sorted cvec of shared-pointer to Person :");
     cvec_ps_sort(&vec3);
     c_foreach (i, cvec_ps, vec3)
         printf("  %s %s\n", i.ref->get->name.str, i.ref->get->last.str);
-  
+
     // share vec3[1] with elem variable.
     csptr_pe elem = csptr_pe_clone(vec3.data[1]);
 
