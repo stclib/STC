@@ -19,7 +19,8 @@ Raw pointers and shared pointers (**csptr**) may be used as items of containers.
 The macro `using_cptr()` must be instantiated in the global scope. `X` is a type tag name and will
 affect the names of all cptr types and methods. E.g. declaring `using_cptr(my, cvec_my);`,
 `X` should be replaced by `my` in all of the following documentation.
-Note: for shared-ptr csptr, "cloning" is done by pointer sharing (ref counting), so valueClone is not required and ignored.
+
+Note: for shared-ptr **csptr**, "cloning" is done by pointer sharing (ref counting), so *valueClone* is not required and ignored.
 
  Types
 
