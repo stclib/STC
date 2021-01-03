@@ -1,4 +1,4 @@
-# Module [cptr](../stc/cptr.h): Smart Pointers
+# STC Module [cptr](../stc/cptr.h): Smart Pointers
 
 This module simplifies management of pointers in containers. The **csptr** type is similar to a c++
 [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr).

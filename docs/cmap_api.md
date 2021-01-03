@@ -1,5 +1,5 @@
+# STC Container [cmap](../stc/cmap.h): Unordered Map
 ![Map](pics/map.jpg)
-# Container [cmap](../stc/cmap.h): Unordered Map
 
 A **cmap** is an associative container that contains key-value pairs with unique keys. Search, insertion, and removal of elements have average constant-time complexity.
 Elements are pairs of keys and mapped values. Implemented as open hashing with linear probing and without storing tombstones. Very fast, see performance comparisons.

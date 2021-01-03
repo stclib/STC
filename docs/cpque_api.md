@@ -1,4 +1,4 @@
-# Container [cpque](../stc/cpque.h): Priority Queue
+# STC Container [cpque](../stc/cpque.h): Priority Queue
 
 This describes the API of the priority queue type **cpque**. Implemented as a heap.
 See [std::priority_queue](https://en.cppreference.com/w/cpp/container/priority_queue) for a similar c++ class.

@@ -1,4 +1,4 @@
-# Module [ccommon](../stc/ccommon.h): Common methods and definitions
+# STC Module [ccommon](../stc/ccommon.h): Common methods and definitions
 
 This describes the features the ccommon.h header file.
 

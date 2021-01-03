@@ -1,5 +1,5 @@
+# STC Container [cqueue](../stc/cqueue.h): Queue
 ![Queue](pics/queue.jpg)
-# Container [cqueue](../stc/cqueue.h): Queue
 
 This describes the API of the queue type **cqueue**.
 See [std::queue](https://en.cppreference.com/w/cpp/container/queue) for a similar c++ class.

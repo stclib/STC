@@ -1,5 +1,5 @@
+# STC Container [cvec](../stc/cvec.h): Vector
 ![Vector](pics/vector.jpg)
-# Container [cvec](../stc/cvec.h): Vector
 
 A **cvec** is a sequence container that encapsulates dynamic size arrays.
 See [std::vector](https://en.cppreference.com/w/cpp/container/vector) for a similar c++ class.
