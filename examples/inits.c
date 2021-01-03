@@ -5,7 +5,7 @@
 #include <stc/cpque.h>
 #include <stc/clist.h>
 
-using_cmap(id, int, cstr, cstr_del); // Map of int -> cstr
+using_cmap(id, int, cstr, cstr_del, cstr_clone); // Map of int -> cstr
 using_cmap_strkey(cnt, int);
 
 typedef struct {int x, y;} ipair_t;

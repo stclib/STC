@@ -74,16 +74,21 @@
 #define c_realloc(p, sz)        realloc(p, sz)
 #define c_free(p)               free(p)
 #endif
+
 #define c_swap(T, x, y)         do { T __t = x; x = y; y = __t; } while (0)
-#define c_no_compare(x, y)      (0)
-#define c_mem_equals(x, y)      (memcmp(x, y, sizeof *(x)) == 0)
-#define c_default_equals(x, y)  (*(x) == *(y))
+
+#define c_default_compare(x, y) c_less_compare(c_default_less, x, y)
 #define c_default_less(x, y)    (*(x) < *(y))
 #define c_less_compare(less, x, y) (less(y, x) - less(x, y))
-#define c_default_compare(x, y) c_less_compare(c_default_less, x, y)
-#define c_default_from_raw(x)   (x)
+#define c_no_compare(x, y)      (0)
+
+#define c_default_equals(x, y)  (*(x) == *(y))
+#define c_mem_equals(x, y)      (memcmp(x, y, sizeof *(x)) == 0)
+
 #define c_default_clone(x)      (x)
+#define c_no_clone(x)           (assert(!"c_no_clone"), x)
 #define c_default_to_raw(ptr)   (*(ptr))
+
 #define c_default_del(ptr)      ((void) (ptr))
 
 /* Generic algorithms */

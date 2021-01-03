@@ -75,9 +75,6 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 #define using_cmap_3(X, Key, Mapped) \
     using_cmap_5(X, Key, Mapped, c_default_del, c_default_clone)
 
-#define using_cmap_4(X, Key, Mapped, mappedDel) \
-    using_cmap_5(X, Key, Mapped, mappedDel, Mapped##_clone)
-
 #define using_cmap_5(X, Key, Mapped, mappedDel, mappedClone) \
     using_cmap_7(X, Key, Mapped, mappedDel, mappedClone, c_default_equals, c_default_hash)
 
@@ -108,9 +105,6 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 #define using_cset_4(X, Key, keyEquals, keyHash) \
     using_cset_6(X, Key, keyEquals, keyHash, c_default_del, c_default_clone)
 
-#define using_cset_5(X, Key, keyEquals, keyHash, keyDel) \
-    using_cset_6(X, Key, keyEquals, keyHash, keyDel, Key##_clone)
-
 #define using_cset_6(X, Key, keyEquals, keyHash, keyDel, keyClone) \
     using_cset_8(X, Key, keyEquals, keyHash, keyDel, keyClone, c_default_to_raw, Key)
 
@@ -129,8 +123,6 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     c_MACRO_OVERLOAD(using_cmap_strkey, __VA_ARGS__)
 #define using_cmap_strkey_2(X, Mapped) \
     _using_CHASH_strkey(X, cmap, Mapped, c_default_del, c_default_clone)
-#define using_cmap_strkey_3(X, Mapped, mappedDel) \
-    _using_CHASH_strkey(X, cmap, Mapped, mappedDel, Mapped##_clone)
 #define using_cmap_strkey_4(X, Mapped, mappedDel, mappedClone) \
     _using_CHASH_strkey(X, cmap, Mapped, mappedDel, mappedClone)
 
@@ -142,9 +134,6 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 
 #define using_cmap_strval_4(X, Key, keyEquals, keyHash) \
     using_cmap_strval_6(X, Key, keyEquals, keyHash, c_default_del, c_default_clone)
-
-#define using_cmap_strval_5(X, Key, keyEquals, keyHash, keyDel) \
-    using_cmap_strval_6(X, Key, keyEquals, keyHash, keyDel, Key##_clone)
 
 #define using_cmap_strval_6(X, Key, keyEquals, keyHash, keyDel, keyClone) \
     using_cmap_strval_8(X, Key, keyEquals, keyHash, keyDel, keyClone, c_default_to_raw, Key)

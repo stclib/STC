@@ -67,9 +67,6 @@ int main() {
 #define using_cptr_3(X, Value, valueCompare) \
     using_cptr_5(X, Value, valueCompare, c_default_del, c_default_clone)
 
-#define using_cptr_4(X, Value, valueCompare, valueDestroy) \
-    using_cptr_5(X, Value, valueCompare, valueDestroy, Value##_clone)
-
 #define using_cptr_5(X, Value, valueCompare, valueDestroy, valueClone) \
     typedef Value cptr_##X##_value_t; \
     typedef cptr_##X##_value_t *cptr_##X; \
@@ -157,8 +154,6 @@ typedef long atomic_count_t;
     }
 #endif
 
-#define csptr_pointer_compare(x, y) ((x)->get - (y)->get)
-
 #define using_csptr(...) c_MACRO_OVERLOAD(using_csptr, __VA_ARGS__)
 
 #define using_csptr_2(X, Value) \
@@ -166,6 +161,9 @@ typedef long atomic_count_t;
 
 #define using_csptr_3(X, Value, valueCompare) \
     using_csptr_4(X, Value, valueCompare, c_default_del)
+
+#define using_csptr_5(X, Value, valueCompare, valueDestroy, dummyValueClone) \
+    using_csptr_4(X, Value, valueCompare, valueDestroy)
 
 #define using_csptr_4(X, Value, valueCompare, valueDestroy) \
     typedef Value csptr_##X##_value_t; \

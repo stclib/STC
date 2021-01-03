@@ -4,7 +4,7 @@
 #include <stc/cstr.h>
 
 using_cmap_str();
-using_cmap_strkey(cfg, cmap_str, cmap_str_del);
+using_cmap_strkey(cfg, cmap_str, cmap_str_del, cmap_str_clone);
 
 int main(void) {
     cmap_cfg config = cmap_inits;

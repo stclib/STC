@@ -23,15 +23,15 @@ Person Person_clone(Person p) {
 }
 
 // 1. cvec of Person struct
-using_cvec(pe, Person, Person_compare, Person_del);
+using_cvec(pe, Person, Person_compare, Person_del, Person_clone);
 
 // 2. cvec of raw/owned pointers to Person
-using_cptr(pe, Person, Person_compare, Person_del);
+using_cptr(pe, Person, Person_compare, Person_del, Person_clone);
 using_cvec(pp, Person*, cptr_pe_compare, cptr_pe_del, cptr_pe_clone);
 
 // 3. cvec of shared-ptr to Person
 using_csptr(pe, Person, Person_compare, Person_del);
-using_cvec(ps, csptr_pe, csptr_pe_compare, csptr_pe_del);
+using_cvec(ps, csptr_pe, csptr_pe_compare, csptr_pe_del, csptr_pe_clone);
 
 const char* names[] = {
     "Joe", "Jordan",
