@@ -65,10 +65,10 @@ using_cmap(str, cstr_t, cstr_t, cstr_del,
 
 ## Constants and macros
 
-| Name                                     | Purpose                |
-|:-----------------------------------------|:-----------------------|
-|  `cmap_inits`                            | Initializer const      |
-|  `c_try_emplace(self, ctype, key, ref)`  | Emplace if key exist   |
+| Name                                        | Purpose                |
+|:--------------------------------------------|:-----------------------|
+|  `cmap_inits`                               | Initializer const      |
+|  `c_try_emplace(self, ctype, rkey, mapped)` | Emplace if key exist   |
 
 ## Header file
 
@@ -106,7 +106,7 @@ cmap_X_result_t     cmap_X_put_mapped(cmap_X* self, RawKey rkey, Mapped mapped);
 cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, RawKey rkey);
 
 size_t              cmap_X_erase(cmap_X* self, RawKey rkey);
-void                cmap_X_erase_entry(cmap_X* self, cmap_X_value_t* ref);
+void                cmap_X_erase_entry(cmap_X* self, cmap_X_value_t* entry);
 cmap_X_iter_t       cmap_X_erase_at(cmap_X* self, cmap_X_iter_t pos);
 
 cmap_X_value_t*     cmap_X_find(const cmap_X* self, RawKey rkey);
@@ -331,7 +331,7 @@ int main()
     
     VikingRaw lookup = {"Einar", "Norway"};
 
-    cmap_vk_entry_t *e = cmap_vk_find(&vikings, lookup);
+    cmap_vk_value_t *e = cmap_vk_find(&vikings, lookup);
     e->second += 3; // add 3 hp points to Einar
     cmap_vk_emplace(&vikings, lookup, 0).first->second += 5; // add 5 more to Einar
 
