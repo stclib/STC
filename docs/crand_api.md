@@ -70,11 +70,11 @@ RNG, around 68% of the values fall within the range [*mean* - *stddev*, *mean* +
 using_cmap(i, int, size_t);
 
 // Comparison of map keys.
-static int compare(cmap_i_entry_t *a, cmap_i_entry_t *b) {
+static int compare(cmap_i_value_t *a, cmap_i_value_t *b) {
     return c_default_compare(&a->first, &b->first);
 }
 // Declare vector of map entries, with comparison function.
-using_cvec(e, cmap_i_entry_t, compare);
+using_cvec(e, cmap_i_value_t, compare);
 
 
 int main()
