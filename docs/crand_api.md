@@ -71,7 +71,7 @@ static int compare(cmap_i_entry_t *a, cmap_i_entry_t *b) {
     return c_default_compare(&a->first, &b->first);
 }
 // Declare vector of map entries, with comparison function.
-using_cvec(e, cmap_i_entry_t, c_default_del, compare);
+using_cvec(e, cmap_i_entry_t, compare);
 
 
 int main()
