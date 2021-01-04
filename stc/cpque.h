@@ -59,6 +59,8 @@
     cpque_##X##_init(void) {return ctype##_init();} \
     STC_INLINE cpque_##X \
     cpque_##X##_clone(cpque_##X pq) {return ctype##_clone(pq);} \
+    STC_INLINE cpque_##X##_value_t \
+    cpque_##X##_value_clone(cpque_##X##_value_t val) {return ctype##_value_clone(val);} \
     STC_INLINE size_t \
     cpque_##X##_size(cpque_##X pq) {return ctype##_size(pq);} \
     STC_INLINE bool \
@@ -76,8 +78,8 @@
     STC_API void \
     cpque_##X##_push(cpque_##X* self, cpque_##X##_value_t value); \
     STC_INLINE void \
-    cpque_##X##_emplace(cpque_##X* self, cpque_##X##_rawvalue_t rawValue) { \
-        cpque_##X##_push(self, ctype##_value_from_raw(rawValue)); \
+    cpque_##X##_emplace(cpque_##X* self, cpque_##X##_rawvalue_t raw) { \
+        cpque_##X##_push(self, ctype##_value_from_raw(raw)); \
     } \
     STC_API void \
     cpque_##X##_push_n(cpque_##X *self, const cpque_##X##_input_t in[], size_t size); \

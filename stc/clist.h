@@ -111,7 +111,9 @@ STC_API size_t _clist_size(const clist_void* self);
     STC_INLINE size_t \
     clist_##X##_size(clist_##X ls) {return _clist_size((const clist_void*) &ls);} \
     STC_INLINE Value \
-    clist_##X##_value_from_raw(RawValue rawValue) {return valueFromRaw(rawValue);} \
+    clist_##X##_value_from_raw(RawValue raw) {return valueFromRaw(raw);} \
+    STC_INLINE clist_##X##_value_t \
+    clist_##X##_value_clone(clist_##X##_value_t val) {return valueFromRaw(valueToRaw(&val));} \
 \
     STC_API void \
     clist_##X##_del(clist_##X* self); \
@@ -125,14 +127,14 @@ STC_API size_t _clist_size(const clist_void* self);
     STC_API void \
     clist_##X##_push_back(clist_##X* self, Value value); \
     STC_INLINE void \
-    clist_##X##_emplace_back(clist_##X* self, RawValue rawValue) { \
-        clist_##X##_push_back(self, valueFromRaw(rawValue)); \
+    clist_##X##_emplace_back(clist_##X* self, RawValue raw) { \
+        clist_##X##_push_back(self, valueFromRaw(raw)); \
     } \
     STC_API void \
     clist_##X##_push_front(clist_##X* self, Value value); \
     STC_INLINE void \
-    clist_##X##_emplace_front(clist_##X* self, RawValue rawValue) { \
-        clist_##X##_push_front(self, valueFromRaw(rawValue)); \
+    clist_##X##_emplace_front(clist_##X* self, RawValue raw) { \
+        clist_##X##_push_front(self, valueFromRaw(raw)); \
     } \
 \
     STC_API clist_##X##_node_t* \
@@ -171,8 +173,8 @@ STC_API size_t _clist_size(const clist_void* self);
     STC_API clist_##X##_iter_t \
     clist_##X##_insert_after(clist_##X* self, clist_##X##_iter_t pos, Value value); \
     STC_INLINE clist_##X##_iter_t \
-    clist_##X##_emplace_after(clist_##X* self, clist_##X##_iter_t pos, RawValue rawValue) { \
-        return clist_##X##_insert_after(self, pos, valueFromRaw(rawValue)); \
+    clist_##X##_emplace_after(clist_##X* self, clist_##X##_iter_t pos, RawValue raw) { \
+        return clist_##X##_insert_after(self, pos, valueFromRaw(raw)); \
     } \
     STC_API clist_##X##_iter_t \
     clist_##X##_erase_after(clist_##X* self, clist_##X##_iter_t pos); \

@@ -62,7 +62,9 @@
     STC_INLINE bool \
     cvec_##X##_empty(cvec_##X vec) {return !cvec_##X##_size(vec);} \
     STC_INLINE Value \
-    cvec_##X##_value_from_raw(RawValue rawValue) {return valueFromRaw(rawValue);} \
+    cvec_##X##_value_from_raw(RawValue raw) {return valueFromRaw(raw);} \
+    STC_INLINE cvec_##X##_value_t \
+    cvec_##X##_value_clone(cvec_##X##_value_t val) {return valueFromRaw(valueToRaw(&val));} \
     STC_INLINE void \
     cvec_##X##_clear(cvec_##X* self); \
     STC_API void \
@@ -99,8 +101,8 @@
     STC_API void \
     cvec_##X##_push_back(cvec_##X* self, Value value); \
     STC_INLINE void \
-    cvec_##X##_emplace_back(cvec_##X* self, RawValue rawValue) { \
-        cvec_##X##_push_back(self, valueFromRaw(rawValue)); \
+    cvec_##X##_emplace_back(cvec_##X* self, RawValue raw) { \
+        cvec_##X##_push_back(self, valueFromRaw(raw)); \
     } \
     STC_INLINE void \
     cvec_##X##_pop_back(cvec_##X* self) { \
@@ -123,12 +125,12 @@
         return cvec_##X##_insert_range_p(self, self->data + idx, &value, &value + 1); \
     } \
     STC_INLINE cvec_##X##_iter_t \
-    cvec_##X##_emplace(cvec_##X* self, cvec_##X##_iter_t pos, RawValue rawValue) { \
-        return cvec_##X##_insert(self, pos, valueFromRaw(rawValue)); \
+    cvec_##X##_emplace(cvec_##X* self, cvec_##X##_iter_t pos, RawValue raw) { \
+        return cvec_##X##_insert(self, pos, valueFromRaw(raw)); \
     } \
     STC_INLINE cvec_##X##_iter_t \
-    cvec_##X##_emplace_at(cvec_##X* self, size_t idx, RawValue rawValue) { \
-        return cvec_##X##_insert_at(self, idx, valueFromRaw(rawValue)); \
+    cvec_##X##_emplace_at(cvec_##X* self, size_t idx, RawValue raw) { \
+        return cvec_##X##_insert_at(self, idx, valueFromRaw(raw)); \
     } \
 \
     STC_API cvec_##X##_iter_t \
@@ -148,9 +150,9 @@
     } \
 \
     STC_API cvec_##X##_iter_t \
-    cvec_##X##_find(const cvec_##X* self, RawValue rawValue); \
+    cvec_##X##_find(const cvec_##X* self, RawValue raw); \
     STC_API cvec_##X##_iter_t \
-    cvec_##X##_find_in_range(const cvec_##X* self, cvec_##X##_iter_t first, cvec_##X##_iter_t finish, RawValue rawValue); \
+    cvec_##X##_find_in_range(const cvec_##X* self, cvec_##X##_iter_t first, cvec_##X##_iter_t finish, RawValue raw); \
 \
     STC_INLINE cvec_##X##_value_t* \
     cvec_##X##_front(cvec_##X* self) {return self->data;} \
@@ -281,16 +283,16 @@
     } \
 \
     STC_DEF cvec_##X##_iter_t \
-    cvec_##X##_find_in_range(const cvec_##X* self, cvec_##X##_iter_t first, cvec_##X##_iter_t finish, RawValue rawValue) { \
+    cvec_##X##_find_in_range(const cvec_##X* self, cvec_##X##_iter_t first, cvec_##X##_iter_t finish, RawValue raw) { \
         for (; first.ref != finish.ref; cvec_##X##_next(&first)) { \
             RawValue r = valueToRaw(first.ref); \
-            if (valueCompareRaw(&r, &rawValue) == 0) return first; \
+            if (valueCompareRaw(&r, &raw) == 0) return first; \
         } \
         return cvec_##X##_end(self); \
     } \
     STC_DEF cvec_##X##_iter_t \
-    cvec_##X##_find(const cvec_##X* self, RawValue rawValue) { \
-        return cvec_##X##_find_in_range(self, cvec_##X##_begin(self), cvec_##X##_end(self), rawValue); \
+    cvec_##X##_find(const cvec_##X* self, RawValue raw) { \
+        return cvec_##X##_find_in_range(self, cvec_##X##_begin(self), cvec_##X##_end(self), raw); \
     } \
 \
     STC_DEF int \

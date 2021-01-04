@@ -60,7 +60,9 @@
     STC_INLINE size_t \
     cdeq_##X##_capacity(cdeq_##X deq) {return deq.base ? _cdeq_capacity(&deq) : 0;} \
     STC_INLINE Value \
-    cdeq_##X##_value_from_raw(RawValue rawValue) {return valueFromRaw(rawValue);} \
+    cdeq_##X##_value_from_raw(RawValue raw) {return valueFromRaw(raw);} \
+    STC_INLINE cdeq_##X##_value_t \
+    cdeq_##X##_value_clone(cdeq_##X##_value_t val) {return valueFromRaw(valueToRaw(&val));} \
     STC_INLINE void \
     cdeq_##X##_clear(cdeq_##X* self); \
     STC_API void \
@@ -98,8 +100,8 @@
     STC_API void \
     cdeq_##X##_push_back(cdeq_##X* self, Value value); \
     STC_INLINE void \
-    cdeq_##X##_emplace_back(cdeq_##X* self, RawValue rawValue) { \
-        cdeq_##X##_push_back(self, valueFromRaw(rawValue)); \
+    cdeq_##X##_emplace_back(cdeq_##X* self, RawValue raw) { \
+        cdeq_##X##_push_back(self, valueFromRaw(raw)); \
     } \
     STC_INLINE void \
     cdeq_##X##_pop_back(cdeq_##X* self) { \
@@ -109,8 +111,8 @@
     STC_INLINE void \
     cdeq_##X##_push_front(cdeq_##X* self, Value value); \
     STC_INLINE void \
-    cdeq_##X##_emplace_front(cdeq_##X* self, RawValue rawValue) { \
-        cdeq_##X##_push_front(self, valueFromRaw(rawValue)); \
+    cdeq_##X##_emplace_front(cdeq_##X* self, RawValue raw) { \
+        cdeq_##X##_push_front(self, valueFromRaw(raw)); \
     } \
     STC_INLINE void \
     cdeq_##X##_pop_front(cdeq_##X* self) { \
@@ -134,12 +136,12 @@
         return cdeq_##X##_insert_range_p(self, self->data + idx, &value, &value + 1); \
     } \
     STC_INLINE cdeq_##X##_iter_t \
-    cdeq_##X##_emplace(cdeq_##X* self, cdeq_##X##_iter_t pos, RawValue rawValue) { \
-        return cdeq_##X##_insert(self, pos, valueFromRaw(rawValue)); \
+    cdeq_##X##_emplace(cdeq_##X* self, cdeq_##X##_iter_t pos, RawValue raw) { \
+        return cdeq_##X##_insert(self, pos, valueFromRaw(raw)); \
     } \
     STC_INLINE cdeq_##X##_iter_t \
-    cdeq_##X##_emplace_at(cdeq_##X* self, size_t idx, RawValue rawValue) { \
-        return cdeq_##X##_insert_at(self, idx, valueFromRaw(rawValue)); \
+    cdeq_##X##_emplace_at(cdeq_##X* self, size_t idx, RawValue raw) { \
+        return cdeq_##X##_insert_at(self, idx, valueFromRaw(raw)); \
     } \
 \
     STC_API cdeq_##X##_iter_t \
@@ -159,9 +161,9 @@
     } \
 \
     STC_API cdeq_##X##_iter_t \
-    cdeq_##X##_find(const cdeq_##X* self, RawValue rawValue); \
+    cdeq_##X##_find(const cdeq_##X* self, RawValue raw); \
     STC_API cdeq_##X##_iter_t \
-    cdeq_##X##_find_in_range(const cdeq_##X* self, cdeq_##X##_iter_t first, cdeq_##X##_iter_t finish, RawValue rawValue); \
+    cdeq_##X##_find_in_range(const cdeq_##X* self, cdeq_##X##_iter_t first, cdeq_##X##_iter_t finish, RawValue raw); \
 \
     STC_INLINE cdeq_##X##_value_t* \
     cdeq_##X##_front(cdeq_##X* self) {return self->data;} \
@@ -314,16 +316,16 @@
     } \
 \
     STC_DEF cdeq_##X##_iter_t \
-    cdeq_##X##_find_in_range(const cdeq_##X* self, cdeq_##X##_iter_t first, cdeq_##X##_iter_t finish, RawValue rawValue) { \
+    cdeq_##X##_find_in_range(const cdeq_##X* self, cdeq_##X##_iter_t first, cdeq_##X##_iter_t finish, RawValue raw) { \
         for (; first.ref != finish.ref; cdeq_##X##_next(&first)) { \
             RawValue r = valueToRaw(first.ref); \
-            if (valueCompareRaw(&r, &rawValue) == 0) return first; \
+            if (valueCompareRaw(&r, &raw) == 0) return first; \
         } \
         return cdeq_##X##_end(self); \
     } \
     STC_DEF cdeq_##X##_iter_t \
-    cdeq_##X##_find(const cdeq_##X* self, RawValue rawValue) { \
-        return cdeq_##X##_find_in_range(self, cdeq_##X##_begin(self), cdeq_##X##_end(self), rawValue); \
+    cdeq_##X##_find(const cdeq_##X* self, RawValue raw) { \
+        return cdeq_##X##_find_in_range(self, cdeq_##X##_begin(self), cdeq_##X##_end(self), raw); \
     } \
 \
     STC_DEF int \

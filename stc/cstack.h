@@ -55,6 +55,8 @@
     cstack_##X##_init(void) {return ctype##_init();} \
     STC_INLINE cstack_##X \
     cstack_##X##_clone(cstack_##X st) {return ctype##_clone(st);} \
+    STC_INLINE cstack_##X##_value_t \
+    cstack_##X##_value_clone(cstack_##X##_value_t val) {return ctype##_value_clone(val);} \
     STC_INLINE void \
     cstack_##X##_del(cstack_##X* self) {ctype##_del(self);} \
     STC_INLINE size_t \
@@ -70,8 +72,8 @@
         ctype##_push_back(self, value); \
     } \
     STC_INLINE void \
-    cstack_##X##_emplace(cstack_##X* self, cstack_##X##_rawvalue_t rawValue) { \
-        ctype##_emplace_back(self, rawValue); \
+    cstack_##X##_emplace(cstack_##X* self, cstack_##X##_rawvalue_t raw) { \
+        ctype##_emplace_back(self, raw); \
     } \
     STC_INLINE void \
     cstack_##X##_push_n(cstack_##X *self, const cstack_##X##_input_t in[], size_t size) { \

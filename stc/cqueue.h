@@ -66,6 +66,8 @@
     cqueue_##X##_init(void) {return ctype##_init();} \
     STC_INLINE cqueue_##X \
     cqueue_##X##_clone(cqueue_##X q) {return ctype##_clone(q);} \
+    STC_INLINE cqueue_##X##_value_t \
+    cqueue_##X##_value_clone(cqueue_##X##_value_t val) {return ctype##_value_clone(val);} \
     STC_INLINE void \
     cqueue_##X##_del(cqueue_##X* self) {ctype##_del(self);} \
     STC_INLINE size_t \
@@ -83,8 +85,8 @@
         ctype##_push_back(self, value); \
     } \
     STC_INLINE void \
-    cqueue_##X##_emplace(cqueue_##X* self, cqueue_##X##_rawvalue_t rawValue) { \
-        ctype##_emplace_back(self, rawValue); \
+    cqueue_##X##_emplace(cqueue_##X* self, cqueue_##X##_rawvalue_t raw) { \
+        ctype##_emplace_back(self, raw); \
     } \
     STC_INLINE void \
     cqueue_##X##_push_n(cqueue_##X *self, const cqueue_##X##_input_t in[], size_t size) { \

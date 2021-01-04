@@ -199,6 +199,12 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     ctype##_##X##_empty(ctype##_##X m) {return m.size == 0;} \
     STC_INLINE size_t \
     ctype##_##X##_size(ctype##_##X m) {return (size_t) m.size;} \
+    STC_INLINE ctype##_##X##_value_t \
+    ctype##_##X##_value_clone(ctype##_##X##_value_t val) { \
+        KEY_REF_##ctype(&val) = keyFromRaw(keyToRaw(&KEY_REF_##ctype(&val))); \
+        CMAP_ONLY_##ctype( val.second = mappedFromRaw(mappedToRaw(&val.second)); ) \
+        return val; \
+    } \
     STC_INLINE size_t \
     ctype##_##X##_bucket_count(ctype##_##X m) {return (size_t) m.bucket_count;} \
     STC_INLINE size_t \
@@ -397,10 +403,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
             m.size, m.bucket_count, m.max_load_factor, m.shrink_limit_factor \
         }; \
         ctype##_##X##_value_t *e = m.table, *end = e + m.bucket_count, *dst = clone.table; \
-        for (uint8_t *hx = m._hashx; e != end; ++hx, ++e, ++dst) if (*hx) { \
-            KEY_REF_##ctype(dst) = keyFromRaw(keyToRaw(&KEY_REF_##ctype(e))); \
-            CMAP_ONLY_##ctype( dst->second = mappedFromRaw(mappedToRaw(&e->second)); ) \
-        } \
+        for (uint8_t *hx = m._hashx; e != end; ++hx, ++e, ++dst) \
+            if (*hx) *dst = ctype##_##X##_value_clone(*e); \
         return clone; \
     } \
 \
