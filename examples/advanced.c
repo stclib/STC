@@ -65,11 +65,12 @@ int main() {
         { {"Olaf", "Denmark"}, 24},
         { {"Harald", "Iceland"}, 12},
     });
+    cmap_vk_put(&vikings, (VikingRaw){"Bjorn", "Sweden"}, 10);
 
     VikingRaw lookup = {"Einar", "Norway"};
 
     cmap_vk_entry_t *e = cmap_vk_find(&vikings, lookup);
-    e->second += 3; // add 3 hp points
+    e->second += 3; // add 3 hp points to Einar
     cmap_vk_emplace(&vikings, lookup, 0).first->second += 5; // add 5 more to Einar
 
     c_foreach (k, cmap_vk, vikings) {
