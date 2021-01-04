@@ -1,22 +1,10 @@
-/*
- * To be able to use cmap with a user-defined key-type, you need to define two things:
- *   1. A hash function; this must be a function that calculates the hash value given
- *      an object of the key-type.
- *   2. A comparison function for equality.
-
- * When your key type consists of several members, you will usually have the hash function
- * calculate hash values for the individual members, and then somehow combine them into one
- * hash value for the entire object.
- * In order to use Viking as a map key, it is smart to define a plain-old-data "view"
- * of the Viking struct, to simplfy insert and lookup in the map.
- */
 #include <stdio.h>
 #include <stc/cmap.h>
 #include <stc/cstr.h>
 
 typedef struct Viking {
-    cstr_t name;
-    cstr_t country;
+    cstr name;
+    cstr country;
 } Viking;
 
 void viking_del(Viking* vk) {
@@ -54,11 +42,8 @@ using_cmap(vk, Viking, int, c_default_del, c_default_clone,
                             vikingraw_equals, vikingraw_hash,
                             viking_del, viking_fromRaw, viking_toRaw, VikingRaw);
 
-// cmap_vk uses vikingraw_hash() for hash value calculations, and vikingraw_equals() for equality test.
-// cmap_vk_del() will free all memory allocated for Viking keys and the hash table values. Finally, main
-// which also demos the generic c_push_items() of multiple elements:
-
-int main() {
+int main()
+{
     cmap_vk vikings = cmap_vk_init();
     c_push_items(&vikings, cmap_vk, {
         { {"Einar", "Norway"}, 20},
