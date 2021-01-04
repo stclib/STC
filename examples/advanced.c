@@ -10,72 +10,70 @@
  * In order to use Viking as a map key, it is smart to define a plain-old-data "view"
  * of the Viking struct, to simplfy insert and lookup in the map.
  */
+#include <stdio.h>
 #include <stc/cmap.h>
 #include <stc/cstr.h>
-
-// Viking data struct -----------------------
 
 typedef struct Viking {
     cstr_t name;
     cstr_t country;
 } Viking;
 
-
 void viking_del(Viking* vk) {
     cstr_del(&vk->name);
     cstr_del(&vk->country);
 }
 
-// Viking view struct -----------------------
 
-typedef struct VikingVw {
+// Define Viking raw struct with hash, equals, and convertion functions between Viking and VikingRaw structs:
+
+typedef struct VikingRaw {
     const char* name;
     const char* country;
-} VikingVw;
+} VikingRaw;
 
-uint32_t vikingvw_hash(const VikingVw* vw, size_t ignore) {
-    uint32_t hash = c_string_hash(vw->name) ^ c_string_hash(vw->country);
+uint32_t vikingraw_hash(const VikingRaw* raw, size_t ignore) {
+    uint32_t hash = c_string_hash(raw->name) ^ (c_string_hash(raw->country) << 3);
     return hash;
 }
-int vikingvw_equals(const VikingVw* x, const VikingVw* y) {
-    if (strcmp(x->name, y->name) != 0) return false;
-    return strcmp(x->country, y->country) == 0;
+static inline int vikingraw_equals(const VikingRaw* rx, const VikingRaw* ry) {
+    return strcmp(rx->name, ry->name) == 0 && strcmp(rx->country, ry->country) == 0;
 }
 
-VikingVw viking_toVw(Viking* vk) {
-    VikingVw vw = {vk->name.str, vk->country.str}; return vw;
-}
-Viking viking_fromVw(VikingVw vw) {
-    Viking vk = {cstr_from(vw.name), cstr_from(vw.country)}; return vk;
+static inline Viking viking_fromRaw(VikingRaw raw) { // note: parameter is by value
+    Viking vk = {cstr_from(raw.name), cstr_from(raw.country)}; return vk;
 }
 
-// Using the full using_cmap() macro to define [Viking -> int] hash map type:
+static inline VikingRaw viking_toRaw(Viking* vk) {
+    VikingRaw raw = {vk->name.str, vk->country.str}; return raw;
+}
+
+// With this in place, we use the full using_cmap() macro to define {Viking -> int} hash map type:
+
 using_cmap(vk, Viking, int, c_default_del, c_default_clone,
-               vikingvw_equals, vikingvw_hash, 
-               viking_del, viking_fromVw, viking_toVw, VikingVw);
+                            vikingraw_equals, vikingraw_hash,
+                            viking_del, viking_fromRaw, viking_toRaw, VikingRaw);
 
-// cmap_vk uses vikingvw_hash() for hash value calculations, and vikingvw_equals() for equality test.
-// cmap_vk_del() will free all memory allocated for Viking keys and the hash table values.
+// cmap_vk uses vikingraw_hash() for hash value calculations, and vikingraw_equals() for equality test.
+// cmap_vk_del() will free all memory allocated for Viking keys and the hash table values. Finally, main
+// which also demos the generic c_push_items() of multiple elements:
 
-// Main ----------------------------
-
-int main()
-{
+int main() {
     cmap_vk vikings = cmap_vk_init();
     c_push_items(&vikings, cmap_vk, {
-        {{"Einar", "Norway"}, 20},
-        {{"Olaf", "Denmark"}, 24},
-        {{"Harald", "Iceland"}, 12},
+        { {"Einar", "Norway"}, 20},
+        { {"Olaf", "Denmark"}, 24},
+        { {"Harald", "Iceland"}, 12},
     });
 
-    VikingVw einar = {"Einar", "Norway"};
-    cmap_vk_entry_t *e = cmap_vk_find(&vikings, einar);
-    e->second += 5; // update
-    cmap_vk_emplace(&vikings, einar, 0).first->second += 5; // again
+    VikingRaw lookup = {"Einar", "Norway"};
+
+    cmap_vk_entry_t *e = cmap_vk_find(&vikings, lookup);
+    e->second += 3; // add 3 hp points
+    cmap_vk_emplace(&vikings, lookup, 0).first->second += 5; // add 5 more to Einar
 
     c_foreach (k, cmap_vk, vikings) {
-        printf("%s of %s has %d HP\n", k.ref->first.name.str, k.ref->first.country.str, k.ref->second);
+        printf("%s of %s has %d hp\n", k.ref->first.name.str, k.ref->first.country.str, k.ref->second);
     }
     cmap_vk_del(&vikings);
 }
-
