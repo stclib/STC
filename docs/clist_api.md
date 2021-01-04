@@ -94,7 +94,7 @@ clist_X_iter_t      clist_X_end(const clist_X* self);
 void                clist_X_next(clist_X_iter_t* it);
 clist_X_value_t*    clist_X_itval(clist_X_iter_t it);
 
-Value               clist_X_value_from_raw(RawValue raw);
+clist_X_value_t     clist_X_value_clone(clist_X_value_t val);
 ```
 
 ## Example

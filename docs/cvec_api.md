@@ -103,7 +103,7 @@ void                cvec_X_next(cvec_X_iter_t* it);
 cvec_X_value_t*     cvec_X_itval(cvec_X_iter_t it);
 size_t              cvec_X_index(const cvec_X vec, cvec_X_iter_t it);
 
-Value               cvec_X_value_from_raw(RawValue raw);
+cvec_X_value_t      cvec_X_value_clone(cvec_X_value_t val);
 ```
 
 ## Examples

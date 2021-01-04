@@ -70,7 +70,7 @@ cdeq_X_value_t*     cdeq_X_at(cdeq_X* self, size_t idx);
 cdeq_X_value_t*     cdeq_X_front(cdeq_X* self);
 cdeq_X_value_t*     cdeq_X_back(cdeq_X* self);
 
-void                cdeq_X_push_n(cdeq_X *self, const cdeq_X_input_t arr[], size_t size);
+void                cdeq_X_push_n(cdeq_X *self, const cdeq_X_rawvalue_t arr[], size_t size);
 void                cdeq_X_push_front(cdeq_X* self, Value value);
 void                cdeq_X_push_back(cdeq_X* self, Value value);
 void                cdeq_X_emplace_front(cdeq_X* self, RawValue raw);
@@ -106,7 +106,7 @@ void                cdeq_X_next(cdeq_X_iter_t* it);
 cdeq_X_value_t*     cdeq_X_itval(cdeq_X_iter_t it);
 size_t              cdeq_X_index(const cdeq_X deq, cdeq_X_iter_t it);
 
-Value               cdeq_X_value_from_raw(RawValue raw);
+cdeq_X_value_t      cdeq_X_value_clone(cdeq_X_value_t val);
 ```
 
 ## Examples

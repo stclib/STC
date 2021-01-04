@@ -205,6 +205,11 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         CMAP_ONLY_##ctype( val.second = mappedFromRaw(mappedToRaw(&val.second)); ) \
         return val; \
     } \
+    STC_INLINE void \
+    ctype##_##X##_value_del(ctype##_##X##_value_t* val) { \
+        keyDel(&KEY_REF_##ctype(val)); \
+        CMAP_ONLY_##ctype( mappedDel(&val->second); ) \
+    } \
     STC_INLINE size_t \
     ctype##_##X##_bucket_count(ctype##_##X m) {return (size_t) m.bucket_count;} \
     STC_INLINE size_t \

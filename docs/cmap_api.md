@@ -99,7 +99,7 @@ size_t              cmap_X_capacity(cmap_X m);
 void                cmap_X_push_n(cmap_X* self, const cmap_X_rawvalue_t arr[], size_t size);
 
 cmap_X_result_t     cmap_X_emplace(cmap_X* self, RawKey rkey, RawMapped rmapped);
-cmap_X_result_t     cmap_X_insert(cmap_X* self, cmap_X_input_t rval);
+cmap_X_result_t     cmap_X_insert(cmap_X* self, cmap_X_rawvalue_t rval);
 cmap_X_result_t     cmap_X_insert_or_assign(cmap_X* self, RawKey rkey, RawMapped rmapped);
 cmap_X_result_t     cmap_X_put(cmap_X* self, RawKey rkey, RawMapped rmapped);
 cmap_X_result_t     cmap_X_put_mapped(cmap_X* self, RawKey rkey, Mapped mapped);
@@ -117,7 +117,8 @@ cmap_X_iter_t       cmap_X_end(cmap_X* self);
 void                cmap_X_next(cmap_X_iter_t* it);
 cmap_X_mapped_t*    cmap_X_itval(cmap_X_iter_t it);
 
-cmap_bucket_t       cmap_X_bucket(const cmap_X* self, const cmap_X_rawkey_t* rkeyPtr);
+cmap_X_value_t      cmap_X_value_clone(cmap_X_value_t val);
+void                cmap_X_value_del(cmap_X_value_t* val);
 uint32_t            c_default_hash(const void *data, size_t len);
 uint32_t            c_default_hash32(const void* data, size_t len);
 ```

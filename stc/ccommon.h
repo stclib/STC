@@ -123,8 +123,8 @@
 #define c_defcon(ctype, c, ...) \
     ctype c = ctype##_init(); c_push_items(&c, ctype, __VA_ARGS__)
 
-#define c_convert(ctype1, c1, ctype2, c2, put) do { \
-    ctype2* __c2 = &(c2); \
+#define c_convert(ctype1, c1, ctype2, put, c2ref) do { \
+    ctype2* __c2 = c2ref; \
     c_foreach_3 (__i, ctype1, c1) \
         ctype2##_##put(__c2, ctype2##_value_clone(*__i.ref)); \
 } while (0)

@@ -82,8 +82,8 @@ cset_X_iter_t       cset_X_end(cset_X* self);
 void                cset_X_next(cset_X_iter_t* it);
 cset_X_value_t*     cset_X_itval(cset_X_iter_t it);
 
-cset_bucket_t       cset_X_bucket(const cset_X* self, const cset_X_rawkey_t* rkeyPtr);
-
+cset_X_value_t      cset_X_value_clone(cset_X_value_t val);
+void                cset_X_value_del(cset_X_value_t* val);
 uint32_t            c_default_hash(const void *data, size_t len);
 uint32_t            c_default_hash32(const void* data, size_t len);
 ```
