@@ -192,7 +192,6 @@ int main()
 
     c_foreach (i, cmap_id, idnames)
         printf("%d: %s\n", i.ref->first, i.ref->second.str);
-    puts("");
 
     cmap_id_del(&idnames);
 }
@@ -228,7 +227,6 @@ int main()
 
     c_foreach (i, cmap_v3, vecs)
         printf("{%4d, %4d, %4d}: %d\n", i.ref->first.x,  i.ref->first.y,  i.ref->first.z,  i.ref->second);
-    puts("");
 
     cmap_v3_del(&vecs);
 }
@@ -262,7 +260,6 @@ int main()
 
     c_foreach (i, cmap_iv, vecs)
         printf("%d: {%4d, %4d, %4d}\n", i.ref->first, i.ref->second.x,  i.ref->second.y,  i.ref->second.z);
-    puts("");
 
     cmap_iv_del(&vecs);
 }
