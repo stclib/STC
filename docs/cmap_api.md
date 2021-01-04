@@ -205,14 +205,14 @@ Output:
 ```
 
 ### Example 3
-Demonstrate cmap with plain-old-data struct key type Vec3f: cmap<Vec3f, int>:
+Demonstrate cmap with plain-old-data struct key type Vec3i: cmap<Vec3i, int>:
 ```c
 #include "stc/cmap.h"
 #include <stdio.h>
 
-typedef struct { float x, y, z; } Vec3f;
+typedef struct { int x, y, z; } Vec3i;
 
-using_cmap(v3, Vec3f, int, c_default_del,
+using_cmap(v3, Vec3i, int, c_default_del,
                            c_default_clone,
                            c_mem_equals,
                            c_default_hash32);
@@ -221,13 +221,13 @@ int main()
 {
     cmap_v3 vecs = cmap_v3_init();
 
-    cmap_v3_put(&vecs, (Vec3f){1.0f, 0.0f, 0.0f}, 1);
-    cmap_v3_put(&vecs, (Vec3f){0.0f, 1.0f, 0.0f}, 2);
-    cmap_v3_put(&vecs, (Vec3f){0.0f, 0.0f, 1.0f}, 3);
-    cmap_v3_put(&vecs, (Vec3f){1.0f, 1.0f, 1.0f}, 4);
+    cmap_v3_put(&vecs, (Vec3i){100,   0,   0}, 1);
+    cmap_v3_put(&vecs, (Vec3i){  0, 100,   0}, 2);
+    cmap_v3_put(&vecs, (Vec3i){  0,   0, 100}, 3);
+    cmap_v3_put(&vecs, (Vec3i){100, 100, 100}, 4);
 
     c_foreach (i, cmap_v3, vecs)
-        printf("{%f %f %f}: %d\n", i.ref->first.x,  i.ref->first.y,  i.ref->first.z,  i.ref->second);
+        printf("{%4d, %4d, %4d}: %d\n", i.ref->first.x,  i.ref->first.y,  i.ref->first.z,  i.ref->second);
     puts("");
 
     cmap_v3_del(&vecs);
@@ -235,10 +235,10 @@ int main()
 ```
 Output:
 ```c
-{1.000000 1.000000 1.000000}: 4
-{1.000000 0.000000 0.000000}: 1
-{0.000000 1.000000 0.000000}: 2
-{0.000000 0.000000 1.000000}: 3
+{ 100,    0,    0}: 1
+{   0,    0,  100}: 3
+{ 100,  100,  100}: 4
+{   0,  100,    0}: 2
 ```
 
 ### Example 4
@@ -247,21 +247,21 @@ Inverse: demonstrate cmap with mapped POD type Vec3f: cmap<int, Vec3f>:
 #include "stc/cmap.h"
 #include <stdio.h>
 
-typedef struct { float x, y, z; } Vec3f;
+typedef struct { int x, y, z; } Vec3i;
 
-using_cmap(iv, int, Vec3f);
+using_cmap(iv, int, Vec3i);
 
 int main()
 {
     cmap_iv vecs = cmap_iv_init();
 
-    cmap_iv_put(&vecs, 1, (Vec3f){1.0f, 0.0f, 0.0f});
-    cmap_iv_put(&vecs, 2, (Vec3f){0.0f, 1.0f, 0.0f});
-    cmap_iv_put(&vecs, 3, (Vec3f){0.0f, 0.0f, 1.0f});
-    cmap_iv_put(&vecs, 4, (Vec3f){1.0f, 1.0f, 1.0f});
+    cmap_iv_put(&vecs, 1, (Vec3i){100,   0,   0});
+    cmap_iv_put(&vecs, 2, (Vec3i){  0, 100,   0});
+    cmap_iv_put(&vecs, 3, (Vec3i){  0,   0, 100});
+    cmap_iv_put(&vecs, 4, (Vec3i){100, 100, 100});
 
     c_foreach (i, cmap_iv, vecs)
-        printf("%d: {%f %f %f}\n", i.ref->first, i.ref->second.x,  i.ref->second.y,  i.ref->second.z);
+        printf("%d: {%4d, %4d, %4d}\n", i.ref->first, i.ref->second.x,  i.ref->second.y,  i.ref->second.z);
     puts("");
 
     cmap_iv_del(&vecs);
@@ -269,8 +269,8 @@ int main()
 ```
 Output:
 ```c
-4: {1.000000 1.000000 1.000000}
-3: {0.000000 0.000000 1.000000}
-2: {0.000000 1.000000 0.000000}
-1: {1.000000 0.000000 0.000000}
-``````
+4: { 100,  100,  100}
+3: {   0,    0,  100}
+2: {   0,  100,    0}
+1: { 100,    0,    0}
+```
