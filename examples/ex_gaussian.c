@@ -10,11 +10,11 @@
 using_cmap(i, int, size_t);
 
 // Declare int vector with map entries that can be sorted by map keys.
-static int compare(cmap_i_entry_t *a, cmap_i_entry_t *b) {
+static int compare(cmap_i_value_t *a, cmap_i_value_t *b) {
     return c_default_compare(&a->first, &b->first);
 }
 // Vector: typetag 'e' for (map) entry
-using_cvec(e, cmap_i_entry_t, compare);
+using_cvec(e, cmap_i_value_t, compare);
 
 int main()
 {

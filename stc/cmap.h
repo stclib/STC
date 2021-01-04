@@ -163,7 +163,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     typedef CSET_ONLY_##ctype( ctype##_##X##_key_t ) \
             CMAP_ONLY_##ctype( struct {ctype##_##X##_key_t first; \
                                       ctype##_##X##_mapped_t second;} ) \
-    ctype##_##X##_value_t, ctype##_##X##_entry_t; \
+    ctype##_##X##_value_t; \
 \
     STC_INLINE void \
     ctype##_##X##_entry_del(ctype##_##X##_value_t* e) { \
