@@ -242,7 +242,7 @@ Output:
 ```
 
 ### Example 4
-Inverse: demonstrate cmap with mapped POD type Vec3f: cmap<int, Vec3f>:
+Inverse: demonstrate cmap with mapped POD type Vec3i: cmap<int, Vec3i>:
 ```c
 #include "stc/cmap.h"
 #include <stdio.h>
