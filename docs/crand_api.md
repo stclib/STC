@@ -18,6 +18,9 @@ is generated when the Weyl-increment is incremented by 2 every 2^64 output.
 **stc64** passes *PractRand*, tested up to 8TB output, Vigna's Hamming weight test, and simple
 correlation tests, i.e. *n* interleaved streams with only one-bit differences in initial state.
 
+See the PRNG shootout by Vigna: http://prng.di.unimi.it and the debate between the authors of
+xoshiro and pcg (Vigna/O'Neill) PRNGs: https://www.pcg-random.org/posts/on-vignas-pcg-critique.html
+
 ## Types
 
 | Name               | Type definition                           | Used to represent...         |
