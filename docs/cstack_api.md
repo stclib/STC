@@ -20,7 +20,6 @@ affect the names of all cstack types and methods. E.g. declaring `using_cstack(m
 |:----------------------|:---------------------------------------|:----------------------------|
 | `cstack_X`            | Depends on underlying container type   | The cstack type             |
 | `cstack_X_value_t`    |                   "                    | The cstack element type     |
-| `cstack_X_input_t`    |                   "                    | cstack input type           |
 | `cstack_X_rawvalue_t` |                   "                    | cstack raw value type       |
 | `cstack_X_iter_t`     |                   "                    | cstack iterator             |
 
@@ -43,7 +42,7 @@ size_t                  cstack_X_size(cstack_X st);
 bool                    cstack_X_empty(cstack_X st);
 cstack_X_value_t*       cstack_X_top(cstack_X* self);
 
-void                    cstack_X_push_n(cstack_X *self, const cstack_X_input_t arr[], size_t size);
+void                    cstack_X_push_n(cstack_X *self, const cstack_X_rawvalue_t arr[], size_t size);
 void                    cstack_X_emplace(cstack_X* self, cstack_X_rawvalue_t raw);
 void                    cstack_X_push(cstack_X* self, cstack_X_value_t value);
 void                    cstack_X_pop(cstack_X* self);

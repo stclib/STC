@@ -88,7 +88,7 @@
 #define c_emplace_after(self, ctype, pos, ...) do { \
     ctype* __self = self; \
     ctype##_iter_t __pos = pos; \
-    const ctype##_input_t __arr[] = __VA_ARGS__; \
+    const ctype##_rawvalue_t __arr[] = __VA_ARGS__; \
     for (size_t __i=0; __i<sizeof __arr/sizeof *__arr; ++__i) \
         __pos = ctype##_emplace_after(__self, __pos, __arr[__i]); \
 } while (0)
@@ -102,7 +102,6 @@ STC_API size_t _clist_size(const clist_void* self);
 \
     using_clist_types(X, Value); \
     typedef RawValue clist_##X##_rawvalue_t; \
-    typedef clist_##X##_rawvalue_t clist_##X##_input_t; \
 \
     STC_INLINE clist_##X \
     clist_##X##_init(void) {clist_##X x = clist_inits; return x;} \
@@ -123,7 +122,7 @@ STC_API size_t _clist_size(const clist_void* self);
     clist_##X##_clear(clist_##X* self) {clist_##X##_del(self);} \
 \
     STC_API void \
-    clist_##X##_push_n(clist_##X *self, const clist_##X##_input_t in[], size_t size); \
+    clist_##X##_push_n(clist_##X *self, const clist_##X##_rawvalue_t arr[], size_t size); \
     STC_API void \
     clist_##X##_push_back(clist_##X* self, Value value); \
     STC_INLINE void \
@@ -237,8 +236,8 @@ STC_API size_t _clist_size(const clist_void* self);
         if (!self->last) self->last = entry; \
     } \
     STC_DEF void \
-    clist_##X##_push_n(clist_##X *self, const clist_##X##_input_t in[], size_t size) { \
-        for (size_t i=0; i<size; ++i) clist_##X##_push_back(self, valueFromRaw(in[i])); \
+    clist_##X##_push_n(clist_##X *self, const clist_##X##_rawvalue_t arr[], size_t size) { \
+        for (size_t i=0; i<size; ++i) clist_##X##_push_back(self, valueFromRaw(arr[i])); \
     } \
 \
     STC_DEF clist_##X##_iter_t \

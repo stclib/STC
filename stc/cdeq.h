@@ -42,7 +42,6 @@
 #define typedefs_cdeq(X, Value, RawValue) \
     typedef Value cdeq_##X##_value_t; \
     typedef RawValue cdeq_##X##_rawvalue_t; \
-    typedef cdeq_##X##_rawvalue_t cdeq_##X##_input_t; \
     typedef struct { cdeq_##X##_value_t *ref; } cdeq_##X##_iter_t; \
     typedef struct { \
         cdeq_##X##_value_t *base, *data; \
@@ -96,7 +95,7 @@
     } \
 \
     STC_API void \
-    cdeq_##X##_push_n(cdeq_##X *self, const cdeq_##X##_input_t arr[], size_t n); \
+    cdeq_##X##_push_n(cdeq_##X *self, const cdeq_##X##_rawvalue_t arr[], size_t n); \
     STC_API void \
     cdeq_##X##_push_back(cdeq_##X* self, Value value); \
     STC_INLINE void \
@@ -210,7 +209,7 @@
 #define _c_implement_cdeq_7(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue) \
 \
     STC_DEF void \
-    cdeq_##X##_push_n(cdeq_##X *self, const cdeq_##X##_input_t arr[], size_t n) { \
+    cdeq_##X##_push_n(cdeq_##X *self, const cdeq_##X##_rawvalue_t arr[], size_t n) { \
         _cdeq_##X##_expand(self, n, false); \
         cdeq_##X##_value_t* p = self->data + cdeq_##X##_size(*self); \
         for (size_t i=0; i < n; ++i) *p++ = valueFromRaw(arr[i]); \

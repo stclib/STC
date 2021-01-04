@@ -50,11 +50,10 @@
 #include "cvec.h"
 
 #define using_cpque(X, ctype, cmpOpr) /* cmpOpr: < or > */ \
-\
     typedef ctype##_t cpque_##X; \
     typedef ctype##_value_t cpque_##X##_value_t; \
     typedef ctype##_rawvalue_t cpque_##X##_rawvalue_t; \
-    typedef ctype##_input_t cpque_##X##_input_t; \
+\
     STC_INLINE cpque_##X \
     cpque_##X##_init(void) {return ctype##_init();} \
     STC_INLINE cpque_##X \
@@ -82,7 +81,7 @@
         cpque_##X##_push(self, ctype##_value_from_raw(raw)); \
     } \
     STC_API void \
-    cpque_##X##_push_n(cpque_##X *self, const cpque_##X##_input_t in[], size_t size); \
+    cpque_##X##_push_n(cpque_##X *self, const cpque_##X##_rawvalue_t arr[], size_t size); \
 \
     implement_cpque(X, ctype, cmpOpr)
 
@@ -130,9 +129,9 @@
         if (c != n) arr[c] = value; \
     } \
     STC_API void \
-    cpque_##X##_push_n(cpque_##X *self, const cpque_##X##_input_t in[], size_t size) { \
+    cpque_##X##_push_n(cpque_##X *self, const cpque_##X##_rawvalue_t arr[], size_t size) { \
         ctype##_reserve(self, cpque_##X##_size(*self) + size); \
-        for (size_t i=0; i<size; ++i) cpque_##X##_push(self, in[i]); \
+        for (size_t i=0; i<size; ++i) cpque_##X##_push(self, arr[i]); \
     } \
 \
     typedef cpque_##X cpque_##X##_t

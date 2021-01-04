@@ -116,7 +116,7 @@
          b; b != __b ? c_free(b) : (void)0, b = NULL)
 
 #define c_push_items(self, ctype, ...) do { \
-    const ctype##_input_t __arr[] = __VA_ARGS__; \
+    const ctype##_rawvalue_t __arr[] = __VA_ARGS__; \
     ctype##_push_n(self, __arr, sizeof __arr/sizeof *__arr); \
 } while (0)
 

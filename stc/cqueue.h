@@ -57,11 +57,10 @@
 #include "clist.h"
 
 #define using_cqueue(X, ctype) \
-\
     typedef ctype##_t cqueue_##X; \
     typedef ctype##_value_t cqueue_##X##_value_t; \
     typedef ctype##_rawvalue_t cqueue_##X##_rawvalue_t; \
-    typedef ctype##_input_t cqueue_##X##_input_t; \
+\
     STC_INLINE cqueue_##X \
     cqueue_##X##_init(void) {return ctype##_init();} \
     STC_INLINE cqueue_##X \
@@ -89,8 +88,8 @@
         ctype##_emplace_back(self, raw); \
     } \
     STC_INLINE void \
-    cqueue_##X##_push_n(cqueue_##X *self, const cqueue_##X##_input_t in[], size_t size) { \
-        ctype##_push_n(self, in, size); \
+    cqueue_##X##_push_n(cqueue_##X *self, const cqueue_##X##_rawvalue_t arr[], size_t size) { \
+        ctype##_push_n(self, arr, size); \
     } \
     typedef ctype##_iter_t cqueue_##X##_iter_t; \
     STC_INLINE cqueue_##X##_iter_t \

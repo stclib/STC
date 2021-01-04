@@ -30,7 +30,6 @@ using_cvec(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_to_raw, cons
 |:---------------------|:------------------------------------|:-----------------------|
 | `cvec_X`             | `struct { cvec_X_value_t* data; }`  | The cvec type          |
 | `cvec_X_value_t`     | `Value`                             | The cvec value type    |
-| `cvec_X_input_t`     | `cvec_X_value_t`                    | The input type         |
 | `cvec_X_rawvalue_t`  | `RawValue`                          | The raw value type     |
 | `cvec_X_iter_t`      | `struct { cvec_X_value_t* ref; }`   | The iterator type      |
 
@@ -71,7 +70,7 @@ cvec_X_value_t*     cvec_X_at(cvec_X* self, size_t idx);
 cvec_X_value_t*     cvec_X_front(cvec_X* self);
 cvec_X_value_t*     cvec_X_back(cvec_X* self);
 
-void                cvec_X_push_n(cvec_X *self, const cvec_X_input_t arr[], size_t size);
+void                cvec_X_push_n(cvec_X *self, const cvec_X_rawvalue_t arr[], size_t size);
 void                cvec_X_emplace_back(cvec_X* self, RawValue raw);
 void                cvec_X_push_back(cvec_X* self, Value value);
 void                cvec_X_pop_back(cvec_X* self);

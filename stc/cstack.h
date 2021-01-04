@@ -46,11 +46,10 @@
 #include "cvec.h"
 
 #define using_cstack(X, ctype) \
-\
     typedef ctype##_t cstack_##X; \
     typedef ctype##_value_t cstack_##X##_value_t; \
     typedef ctype##_rawvalue_t cstack_##X##_rawvalue_t; \
-    typedef ctype##_input_t cstack_##X##_input_t; \
+\
     STC_INLINE cstack_##X \
     cstack_##X##_init(void) {return ctype##_init();} \
     STC_INLINE cstack_##X \
@@ -76,8 +75,8 @@
         ctype##_emplace_back(self, raw); \
     } \
     STC_INLINE void \
-    cstack_##X##_push_n(cstack_##X *self, const cstack_##X##_input_t in[], size_t size) { \
-        ctype##_push_n(self, in, size); \
+    cstack_##X##_push_n(cstack_##X *self, const cstack_##X##_rawvalue_t arr[], size_t size) { \
+        ctype##_push_n(self, arr, size); \
     } \
     typedef ctype##_iter_t cstack_##X##_iter_t; \
     STC_INLINE cstack_##X##_iter_t \

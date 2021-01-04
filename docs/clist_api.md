@@ -30,7 +30,6 @@ using_clist(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_to_raw, con
 |:----------------------|:------------------------------------|:--------------------------|
 | `clist_X`             | `struct { clist_X_node_t* last; }`  | The clist type            |
 | `clist_X_value_t`     | `Value`                             | The clist element type    |
-| `clist_X_input_t`     | `clist_X_value_t`                   | clist input type          |
 | `clist_X_rawvalue_t`  | `RawValue`                          | clist raw value type      |
 | `clist_X_iter_t`      | `struct { clist_value_t *ref; ... }`| clist iterator            |
 
@@ -62,7 +61,7 @@ size_t              clist_X_size(clist_X list); // note: O(n)
 clist_X_value_t*    clist_X_front(clist_X* self);
 clist_X_value_t*    clist_X_back(clist_X* self);
 
-void                clist_X_push_n(clist_X *self, const clist_X_input_t arr[], size_t size);
+void                clist_X_push_n(clist_X *self, const clist_X_rawvalue_t arr[], size_t size);
 void                clist_X_emplace_back(clist_X* self, RawValue ref);
 void                clist_X_push_back(clist_X* self, Value value);
 

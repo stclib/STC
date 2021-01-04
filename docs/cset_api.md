@@ -27,10 +27,10 @@ be replaced by `my` in all of the following documentation.
 |:---------------------|:--------------------------------------|:-------------------------|
 | `cset_X`             | `struct { ... }`                      | The cset type            |
 | `cset_X_rawkey_t`    | `RawKey`                              | The raw key type         |
+| `cset_X_rawvalue_t`  | `cset_X_rawkey_t`                     | The raw key type         |
 | `cset_X_key_t`       | `Key`                                 | The key type             |
-| `cset_X_value_t`     | `Key`                                 | The value type           |
+| `cset_X_value_t`     | `cset_X_key_t`                        | The value type           |
 | `cset_X_result_t`    | `struct { Key first; bool second; }`  | Result of insert/emplace |
-| `cset_X_input_t`     | `cset_X_rawkey_t`                     | The input type (rawkey)  |
 | `cset_X_iter_t`      | `struct { cset_X_value_t *ref; ... }` | Iterator type            |
 
 ## Constants and macros
@@ -65,7 +65,7 @@ size_t              cset_X_size(cset_X m);
 size_t              cset_X_bucket_count(cset_X m);
 size_t              cset_X_capacity(cset_X m);
 
-void                cset_X_push_n(cset_X* self, const cset_X_input_t in[], size_t size);
+void                cset_X_push_n(cset_X* self, const RawKey arr[], size_t size);
 
 cset_X_result_t     cset_X_emplace(cset_X* self, RawKey rkey);
 cset_X_result_t     cset_X_insert(cset_X* self, RawKey rkey);

@@ -30,7 +30,6 @@ using_cdeq(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_to_raw, cons
 |:---------------------|:------------------------------------|:-----------------------|
 | `cdeq_X`             | `struct { cdeq_X_value_t* data; }`  | The cdeq type          |
 | `cdeq_X_value_t`     | `Value`                             | The cdeq value type    |
-| `cdeq_X_input_t`     | `cdeq_X_value_t`                    | The input type         |
 | `cdeq_X_rawvalue_t`  | `RawValue`                          | The raw value type     |
 | `cdeq_X_iter_t`      | `struct { cdeq_X_value_t* ref; }`   | The iterator type      |
 

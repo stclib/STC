@@ -42,7 +42,6 @@
 #define typedefs_cvec(X, Value, RawValue) \
     typedef Value cvec_##X##_value_t; \
     typedef RawValue cvec_##X##_rawvalue_t; \
-    typedef cvec_##X##_rawvalue_t cvec_##X##_input_t; \
     typedef struct { cvec_##X##_value_t *ref; } cvec_##X##_iter_t; \
     typedef struct { \
         cvec_##X##_value_t* data; \
@@ -97,7 +96,7 @@
         cvec_##X##_del(self); *self = x; \
     } \
     STC_API void \
-    cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t arr[], size_t size); \
+    cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_rawvalue_t arr[], size_t size); \
     STC_API void \
     cvec_##X##_push_back(cvec_##X* self, Value value); \
     STC_INLINE void \
@@ -199,7 +198,7 @@
 #define _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue) \
 \
     STC_DEF void \
-    cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_input_t arr[], size_t n) { \
+    cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_rawvalue_t arr[], size_t n) { \
         cvec_##X##_reserve(self, cvec_##X##_size(*self) + n); \
         cvec_##X##_value_t* p = self->data + _cvec_size(self); \
         for (size_t i=0; i < n; ++i) *p++ = valueFromRaw(arr[i]); \

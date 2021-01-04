@@ -158,7 +158,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     typedef Key ctype##_##X##_key_t; \
     typedef Mapped ctype##_##X##_mapped_t; \
     typedef RawKey ctype##_##X##_rawkey_t; \
-    typedef RawMapped ctype##_##X##_rawval_t; \
+    typedef RawMapped ctype##_##X##_rawmapped_t; \
 \
     typedef CSET_ONLY_##ctype( ctype##_##X##_key_t ) \
             CMAP_ONLY_##ctype( struct {ctype##_##X##_key_t first; \
@@ -172,8 +172,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     } \
     typedef CSET_ONLY_##ctype( ctype##_##X##_rawkey_t ) \
             CMAP_ONLY_##ctype( struct {ctype##_##X##_rawkey_t first; \
-                                       ctype##_##X##_rawval_t second;} ) \
-    ctype##_##X##_input_t; \
+                                       ctype##_##X##_rawmapped_t second;} ) \
+    ctype##_##X##_rawvalue_t; \
 \
     typedef struct { \
         ctype##_##X##_value_t *first; \
@@ -222,7 +222,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     STC_API void \
     ctype##_##X##_reserve(ctype##_##X* self, size_t size); \
     STC_API void \
-    ctype##_##X##_push_n(ctype##_##X* self, const ctype##_##X##_input_t arr[], size_t size); \
+    ctype##_##X##_push_n(ctype##_##X* self, const ctype##_##X##_rawvalue_t arr[], size_t size); \
     STC_API void \
     ctype##_##X##_del(ctype##_##X* self); \
     STC_API void \
@@ -244,9 +244,9 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         return res; \
     } \
     STC_INLINE ctype##_##X##_result_t \
-    ctype##_##X##_insert(ctype##_##X* self, ctype##_##X##_input_t in) { \
-        return CSET_ONLY_##ctype(ctype##_##X##_insert_key_(self, in)) \
-               CMAP_ONLY_##ctype(ctype##_##X##_emplace(self, in.first, in.second)); \
+    ctype##_##X##_insert(ctype##_##X* self, ctype##_##X##_rawvalue_t arr) { \
+        return CSET_ONLY_##ctype(ctype##_##X##_insert_key_(self, arr)) \
+               CMAP_ONLY_##ctype(ctype##_##X##_emplace(self, arr.first, arr.second)); \
     } \
 \
     CMAP_ONLY_##ctype( \
@@ -326,7 +326,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         return h; \
     } \
     STC_DEF void \
-    ctype##_##X##_push_n(ctype##_##X* self, const ctype##_##X##_input_t arr[], size_t n) { \
+    ctype##_##X##_push_n(ctype##_##X* self, const ctype##_##X##_rawvalue_t arr[], size_t n) { \
         for (size_t i=0; i<n; ++i) CMAP_ONLY_##ctype(ctype##_##X##_put(self, arr[i].first, arr[i].second)) \
                                    CSET_ONLY_##ctype(ctype##_##X##_insert(self, arr[i])) ; \
     } \

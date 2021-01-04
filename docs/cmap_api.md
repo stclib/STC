@@ -55,11 +55,11 @@ using_cmap(str, cstr_t, cstr_t, cstr_del,
 |:---------------------|:------------------------------------------------|:------------------------------|
 | `cmap_X`             | `struct { ... }`                                | The cmap type                 |
 | `cmap_X_rawkey_t`    | `RawKey`                                        | The raw key type              |
-| `cmap_X_rawval_t`    | `RawMapped`                                     | The raw mapped type           |
+| `cmap_X_rawmapped_t  | `RawMapped`                                     | The raw mapped type           |
 | `cmap_X_key_t`       | `Key`                                           | The key type                  |
 | `cmap_X_mapped_t`    | `Mapped`                                        | The mapped type               |
 | `cmap_X_value_t`     | `struct { Key first; Mapped second; }`          | The value type                |
-| `cmap_X_input_t`     | `struct { RawKey first; RawMapped second; }`    | RawKey + RawVal type          |
+| `cmap_X_rawvalue_t`  | `struct { RawKey first; RawMapped second; }`    | RawKey + RawVal type          |
 | `cmap_X_result_t`    | `struct { cmap_X_value_t first; bool second; }` | Result of insert/put/emplace  |
 | `cmap_X_iter_t`      | `struct { cmap_X_value_t *ref; ... }`           | Iterator type                 |
 
@@ -96,7 +96,7 @@ size_t              cmap_X_size(cmap_X m);
 size_t              cmap_X_bucket_count(cmap_X m);
 size_t              cmap_X_capacity(cmap_X m);
 
-void                cmap_X_push_n(cmap_X* self, const cmap_X_input_t arr[], size_t size);
+void                cmap_X_push_n(cmap_X* self, const cmap_X_rawvalue_t arr[], size_t size);
 
 cmap_X_result_t     cmap_X_emplace(cmap_X* self, RawKey rkey, RawMapped rmapped);
 cmap_X_result_t     cmap_X_insert(cmap_X* self, cmap_X_input_t rval);

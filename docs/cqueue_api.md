@@ -20,7 +20,6 @@ will affect the names of all cqueue types and methods. E.g. declaring `using_cqu
 |:----------------------|:---------------------------------------|:-------------------------|
 | `cqueue_X`            | Depends on underlying container type   | The cqueue type          |
 | `cqueue_X_value_t`    |                   "                    | The cqueue element type  |
-| `cqueue_X_input_t`    |                   "                    | cqueue input type        |
 | `cqueue_X_rawvalue_t` |                   "                    | cqueue raw value type    |
 | `cqueue_X_iter_t`     |                   "                    | cqueue iterator          |
 
@@ -44,7 +43,7 @@ bool                    cqueue_X_empty(cqueue_X q);
 cqueue_X_value_t*       cqueue_X_front(cqueue_X* self);
 cqueue_X_value_t*       cqueue_X_back(cqueue_X* self);
 
-void                    cqueue_X_push_n(cqueue_X *self, const cqueue_X_input_t arr[], size_t size);
+void                    cqueue_X_push_n(cqueue_X *self, const cqueue_X_rawvalue_t arr[], size_t size);
 void                    cqueue_X_emplace(cqueue_X* self, cqueue_X_rawvalue_t raw);
 void                    cqueue_X_push(cqueue_X* self, cqueue_X_value_t value);
 void                    cqueue_X_pop(cqueue_X* self);

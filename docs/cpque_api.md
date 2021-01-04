@@ -21,7 +21,6 @@ Declaring `using_cpque(my, cvec_my, >);`, `X` should be replaced by `my` in the 
 |:---------------------|:--------------------------------------|:------------------------|
 | `cpque_X`            | `struct {cpque_X_value_t* data; ...}` | The cpque type          |
 | `cpque_X_value_t`    | Depends on underlying container type  | The cpque element type  |
-| `cpque_X_input_t`    |                   "                   | cpque input type        |
 | `cpque_X_rawvalue_t` |                   "                   | cpque raw value type    |
 
 ## Header file
