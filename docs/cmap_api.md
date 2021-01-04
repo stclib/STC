@@ -204,17 +204,17 @@ Output:
 ```
 
 ### Example 3
-Demonstrate cmap with plain-old-data struct key type Vec3i: cmap<Vec3i, int>:
+Demonstrate cmap with plain-old-data key type Vec3i and int as mapped type: cmap<Vec3i, int>. 
 ```c
 #include "stc/cmap.h"
 #include <stdio.h>
 
 typedef struct { int x, y, z; } Vec3i;
 
-using_cmap(v3, Vec3i, int, c_default_del,
-                           c_default_clone,
-                           c_mem_equals,
-                           c_default_hash32);
+using_cmap(v3, Vec3i, int, c_default_del,     // mapped: empty int destroy func
+                           c_default_clone,   // mapped: clone int by "memcpy"
+                           c_mem_equals,      // key: compare Vec3i bit-by-bit 
+                           c_default_hash32); // key: hash Vec3i in 32-bits word-by-word.
 
 int main()
 {
@@ -280,8 +280,8 @@ Demonstrate a complex key type.
 #include <stc/cstr.h>
 
 typedef struct Viking {
-    cstr_t name;
-    cstr_t country;
+    cstr name;
+    cstr country;
 } Viking;
 
 void viking_del(Viking* vk) {
@@ -319,19 +319,20 @@ using_cmap(vk, Viking, int, c_default_del, c_default_clone,
                             vikingraw_equals, vikingraw_hash,
                             viking_del, viking_fromRaw, viking_toRaw, VikingRaw);
 
-
-int main() {
+int main()
+{
     cmap_vk vikings = cmap_vk_init();
     c_push_items(&vikings, cmap_vk, {
         { {"Einar", "Norway"}, 20},
         { {"Olaf", "Denmark"}, 24},
         { {"Harald", "Iceland"}, 12},
     });
-
+    cmap_vk_put(&vikings, (VikingRaw){"Bjorn", "Sweden"}, 10);
+    
     VikingRaw lookup = {"Einar", "Norway"};
 
     cmap_vk_entry_t *e = cmap_vk_find(&vikings, lookup);
-    e->second += 3; // add 3 hp points
+    e->second += 3; // add 3 hp points to Einar
     cmap_vk_emplace(&vikings, lookup, 0).first->second += 5; // add 5 more to Einar
 
     c_foreach (k, cmap_vk, vikings) {
@@ -343,6 +344,7 @@ int main() {
 Output:
 ```
 Olaf of Denmark has 24 hp
+Bjorn of Sweden has 10 hp
 Einar of Norway has 28 hp
 Harald of Iceland has 12 hp
 ```
