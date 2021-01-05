@@ -11,17 +11,17 @@ using_cmap_strkey(si, int);
 
 int main1()
 {
-    c_defcon (clist_str, lwords, {
+    c_init (clist_str, lwords, {
         "this", "sentence", "is", "not", "a", "sentence",
         "this", "sentence", "is", "a", "hoax"
     });
-    
+
     clist_str_push_back(&lwords, cstr_from_fmt("%f", 123897.0 / 23.0));
     c_foreach (w, clist_str, lwords)
         printf("%s\n", w.ref->str);
     puts("");
 
-    c_defcon (cvec_str, words, {
+    c_init (cvec_str, words, {
         "this", "sentence", "is", "not", "a", "sentence",
         "this", "sentence", "is", "a", "hoax"
     });
