@@ -166,6 +166,10 @@ STC_API size_t _clist_size(const clist_void* self);
         clist_##X##_node_t* node = _clist_node(X, it->ref); \
         it->ref = ((it->_state += node == *it->_last) == 1) ? NULL : &node->next->value; \
     } \
+    STC_INLINE clist_##X##_iter_t \
+    clist_##X##_fwd(clist_##X##_iter_t it, size_t n) { \
+        c_forrange_1 (n) clist_##X##_next(&it); return it; \
+    } \
     STC_INLINE clist_##X##_value_t* \
     clist_##X##_itval(clist_##X##_iter_t it) {return it.ref;} \
     \

@@ -227,17 +227,17 @@ int main()
     cmap_v3_put(&vecs, (Vec3i){100, 100, 100}, 4);
 
     c_foreach (i, cmap_v3, vecs)
-        printf("{%4d, %4d, %4d}: %d\n", i.ref->first.x,  i.ref->first.y,  i.ref->first.z,  i.ref->second);
+        printf("{ %3d, %3d, %3d }: %d\n", i.ref->first.x,  i.ref->first.y,  i.ref->first.z,  i.ref->second);
 
     cmap_v3_del(&vecs);
 }
 ```
 Output:
 ```c
-{ 100,    0,    0}: 1
-{   0,    0,  100}: 3
-{ 100,  100,  100}: 4
-{   0,  100,    0}: 2
+{ 100,   0,   0 }: 1
+{   0,   0, 100 }: 3
+{ 100, 100, 100 }: 4
+{   0, 100,   0 }: 2
 ```
 
 ### Example 4
@@ -260,17 +260,17 @@ int main()
     cmap_iv_put(&vecs, 4, (Vec3i){100, 100, 100});
 
     c_foreach (i, cmap_iv, vecs)
-        printf("%d: {%4d, %4d, %4d}\n", i.ref->first, i.ref->second.x,  i.ref->second.y,  i.ref->second.z);
+        printf("%d: { %3d, %3d, %3d }\n", i.ref->first, i.ref->second.x,  i.ref->second.y,  i.ref->second.z);
 
     cmap_iv_del(&vecs);
 }
 ```
 Output:
 ```c
-4: { 100,  100,  100}
-3: {   0,    0,  100}
-2: {   0,  100,    0}
-1: { 100,    0,    0}
+4: { 100, 100, 100 }
+3: {   0,   0, 100 }
+2: {   0, 100,   0 }
+1: { 100,   0,   0 }
 ```
 
 ### Example 5
