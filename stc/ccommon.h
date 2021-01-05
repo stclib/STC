@@ -120,7 +120,7 @@
     ctype##_push_n(self, __arr, sizeof __arr/sizeof *__arr); \
 } while (0)
 
-#define c_defcon(ctype, c, ...) \
+#define c_init(ctype, c, ...) \
     ctype c = ctype##_init(); c_push_items(&c, ctype, __VA_ARGS__)
 
 #define c_convert(ctype1, c1, ctype2, put, c2ref) do { \

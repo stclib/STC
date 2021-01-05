@@ -79,6 +79,8 @@ clist_X_iter_t      clist_X_splice_after(clist_X* self, clist_X_iter_t pos, clis
 clist_X_iter_t      clist_X_splice_front(clist_X* self, clist_X* other);
 clist_X_iter_t      clist_X_splice_back(clist_X* self, clist_X* other);
 
+clist_X             clist_X_split_after(clist_X* self, clist_X_iter_t pos1, clist_X_iter_t pos2);
+
 clist_X_iter_t      clist_X_find(const clist_X* self, RawValue raw);
 clist_X_iter_t      clist_X_find_before(const clist_X* self,
                                         clist_X_iter_t first, clist_X_iter_t finish, RawValue ref);

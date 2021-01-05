@@ -304,7 +304,7 @@ STC_API size_t _clist_size(const clist_void* self);
 \
     STC_DEF clist_##X##_iter_t \
     clist_##X##_splice_after(clist_##X* self, clist_##X##_iter_t pos, clist_##X* other) { \
-        clist_##X##_iter_t ret = clist_##X##_last(other); \
+        clist_##X##_iter_t it = clist_##X##_last(other); \
         if (!pos.ref) \
             self->last = other->last; \
         else if (other->last) { \
@@ -314,7 +314,16 @@ STC_API size_t _clist_size(const clist_void* self);
             if (node == self->last && pos._state == 0) self->last = other->last; \
         } \
         other->last = NULL; \
-        ret._last = &self->last; return ret; \
+        it._last = &self->last; return it; \
+    } \
+\
+    STC_DEF clist_##X \
+    clist_##X##_split_after(clist_##X* self, clist_##X##_iter_t pos1, clist_##X##_iter_t pos2) { \
+        clist_##X##_node_t *node1 = _clist_node(X, pos1.ref), *next1 = node1->next, \
+                           *node2 = _clist_node(X, pos2.ref); \
+        node1->next = node2->next, node2->next = next1; \
+        if (self->last == node2) self->last = node1; \
+        clist_##X list = {node2}; return list; \
     } \
 \
     STC_INLINE int \
