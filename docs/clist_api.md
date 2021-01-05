@@ -98,7 +98,7 @@ clist_X_value_t*    clist_X_itval(clist_X_iter_t it);
 
 clist_X_value_t     clist_X_value_clone(clist_X_value_t val);
 ```
-The *clist_X_split_after(self, it1, it2)* can be combined with *clist_X_splice_after(self, pos, other)* to mimic c++ *std::forward_list::splice_after(pos, other, it1, it2)*. Note however, that it2 is included in elements to be spliced, unlike with *std::forward_list()*. E.g, splice in 2, 3 after 10 in L2:
+The `clist_X_split_after(self, it1, it2)` can be combined with `clist_X_splice_after(self, pos, other)` to mimic c++ `std::forward_list::splice_after(pos, other, it1, it2)`. Note however, that `it2` is included in elements to be spliced, unlike with `std::forward_list()`. E.g, splice in 2, 3 after 10 in L2:
 ```c
 c_init (clist_i, L1, {1, 2, 3, 4, 5});
 c_init (clist_i, L2, {10, 20, 30, 40, 50});
