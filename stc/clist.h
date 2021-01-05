@@ -180,15 +180,15 @@ STC_API size_t _clist_size(const clist_void* self);
     STC_API clist_##X##_iter_t \
     clist_##X##_erase_range_after(clist_##X* self, clist_##X##_iter_t pos, clist_##X##_iter_t finish); \
 \
-    STC_API void \
+    STC_API clist_##X##_iter_t \
     clist_##X##_splice_after(clist_##X* self, clist_##X##_iter_t pos, clist_##X* other); \
-    STC_INLINE void \
+    STC_INLINE clist_##X##_iter_t \
     clist_##X##_splice_front(clist_##X* self, clist_##X* other) { \
-        clist_##X##_splice_after(self, clist_##X##_before_begin(self), other); \
+        return clist_##X##_splice_after(self, clist_##X##_before_begin(self), other); \
     } \
-    STC_INLINE void \
+    STC_INLINE clist_##X##_iter_t \
     clist_##X##_splice_back(clist_##X* self, clist_##X* other) { \
-        clist_##X##_splice_after(self, clist_##X##_last(self), other); \
+        return clist_##X##_splice_after(self, clist_##X##_last(self), other); \
     } \
 \
     STC_API clist_##X##_iter_t \
@@ -302,8 +302,9 @@ STC_API size_t _clist_size(const clist_void* self);
         return n; \
     } \
 \
-    STC_DEF void \
+    STC_DEF clist_##X##_iter_t \
     clist_##X##_splice_after(clist_##X* self, clist_##X##_iter_t pos, clist_##X* other) { \
+        clist_##X##_iter_t ret = clist_##X##_last(other); \
         if (!pos.ref) \
             self->last = other->last; \
         else if (other->last) { \
@@ -313,6 +314,7 @@ STC_API size_t _clist_size(const clist_void* self);
             if (node == self->last && pos._state == 0) self->last = other->last; \
         } \
         other->last = NULL; \
+        ret._last = &self->last; return ret; \
     } \
 \
     STC_INLINE int \
@@ -355,15 +357,13 @@ _clist_mergesort(clist_void_node_t *list, int (*cmp)(const void*, const void*)) 
     if (!list) return NULL;
 
     while (1) {
-        p = list;
-        oldhead = list;
+        p = oldhead = list;
         list = tail = NULL;
         nmerges = 0;
 
         while (p) {
             ++nmerges;
-            q = p;
-            psize = 0;
+            q = p, psize = 0;
             for (i = 0; i < insize; ++i) {
                 ++psize;
                 q = (q->next == oldhead ? NULL : q->next);
@@ -373,22 +373,19 @@ _clist_mergesort(clist_void_node_t *list, int (*cmp)(const void*, const void*)) 
 
             while (psize > 0 || (qsize > 0 && q)) {
                 if (psize == 0) {
-                    e = q; q = q->next; --qsize;
+                    e = q, q = q->next, --qsize;
                     if (q == oldhead) q = NULL;
                 } else if (qsize == 0 || !q) {
-                    e = p; p = p->next; --psize;
+                    e = p, p = p->next, --psize;
                     if (p == oldhead) p = NULL;
                 } else if (cmp(p, q) <= 0) {
-                    e = p; p = p->next; --psize;
+                    e = p, p = p->next, --psize;
                     if (p == oldhead) p = NULL;
                 } else {
-                    e = q; q = q->next; --qsize;
+                    e = q, q = q->next, --qsize;
                     if (q == oldhead) q = NULL;
                 }
-                if (tail)
-                    tail->next = e;
-                else
-                    list = e;
+                if (tail) tail->next = e; else list = e;
                 tail = e;
             }
             p = q;
