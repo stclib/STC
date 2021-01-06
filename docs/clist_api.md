@@ -79,7 +79,7 @@ clist_X_iter_t      clist_X_splice_after(clist_X* self, clist_X_iter_t pos, clis
 clist_X_iter_t      clist_X_splice_front(clist_X* self, clist_X* other);
 clist_X_iter_t      clist_X_splice_back(clist_X* self, clist_X* other);
 
-clist_X             clist_X_split_after(clist_X* self, clist_X_iter_t pos1, clist_X_iter_t pos2);
+clist_X             clist_X_splice_out(clist_X* self, clist_X_iter_t pos1, clist_X_iter_t pos2);
 
 clist_X_iter_t      clist_X_find(const clist_X* self, RawValue raw);
 clist_X_iter_t      clist_X_find_before(const clist_X* self,
@@ -99,13 +99,13 @@ clist_X_iter_t      clist_X_fwd(clist_X_iter it, size_t n);
 
 clist_X_value_t     clist_X_value_clone(clist_X_value_t val);
 ```
-The `clist_X_split_after(self, it1, it2)` can be combined with `clist_X_splice_after(self, pos, other)` to mimic c++ `std::forward_list::splice_after(pos, other, it1, it2)`. Note however, that `it2` is included in elements to be spliced, unlike with `std::forward_list()`. E.g, splice in 2, 3 after 10 in L2:
+The `clist_X_splice_out(self, it1, it2)` can be combined with `clist_X_splice_after(self, pos, other)` to mimic c++ `std::forward_list::splice_after(pos, other, it1, it2)`. Note however, that `it2` is included in elements to be spliced, unlike with `std::forward_list()`. E.g, splice in 2, 3 after 10 in L2:
 ```c
 c_init (clist_i, L1, {1, 2, 3, 4, 5});
 c_init (clist_i, L2, {10, 20, 30, 40, 50});
 
 clist_i_iter_t it = clist_i_fwd(clist_i_begin(&L1), 2);
-clist_i tmp = clist_i_split_after(&L1, clist_i_begin(&L1), it);
+clist_i tmp = clist_i_splice_out(&L1, clist_i_begin(&L1), it);
 clist_i_splice_after(&L2, clist_i_begin(&L2), &tmp);
 
 // C++:
