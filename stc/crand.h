@@ -46,7 +46,7 @@ int main() {
 typedef struct {uint64_t state[4];}                        stc64_t;
 typedef struct {int64_t lower; uint64_t range, threshold;} stc64_uniform_t;
 typedef struct {double lower, range;}                      stc64_uniformf_t;
-typedef struct {double mean, stddev, next; bool has_next;} stc64_normalf_t;
+typedef struct {double mean, stddev, next; unsigned has_next;} stc64_normalf_t;
 
 
 /* Stc64: random number generator, range [0, 2^64). PRNG copyright Tyge Løvset, NORCE Research, 2020 */
@@ -60,6 +60,11 @@ STC_INLINE uint64_t stc64_rand(stc64_t* rng) {
     s[1] = ((b << 24) | (b >> (64 - 24))) + result;
     return result;
 }
+
+/* Global random() */
+static stc64_t stc64_global = {{0x26aa069ea2fb1a4d, 0x70c72c95cd592d04, 0x504f333d3aa0b359, 0x6a09e667a754166b}};
+STC_INLINE void stc64_srandom(uint64_t seed) { stc64_global = stc64_init(seed); }
+STC_INLINE uint64_t stc64_random(void) { return stc64_rand(&stc64_global); }
 
 /* Float64 random number in range [low, high). */
 STC_INLINE double stc64_randf(stc64_t* rng) {
@@ -100,7 +105,7 @@ STC_INLINE int64_t stc64_uniform(stc64_t* rng, stc64_uniform_t* d) {
 
 /* Normal distributed RNG, Float64. */
 STC_INLINE stc64_normalf_t stc64_normalf_init(double mean, double stddev) {
-    stc64_normalf_t dist = {mean, stddev, 0.0, false}; return dist;
+    stc64_normalf_t dist = {mean, stddev, 0.0, 0}; return dist;
 }
 STC_API double stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
 
@@ -118,7 +123,7 @@ STC_API double stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
  */
 
 STC_DEF stc64_t stc64_init(uint64_t seed) {
-    return stc64_with_seq(seed, 0x3504f333d3aa0b34);
+    return stc64_with_seq(seed, seed + 0x3504f333d3aa0b34);
 }
 STC_DEF stc64_t stc64_with_seq(uint64_t seed, uint64_t seq) {
     stc64_t rng = {{seed, seed, seed, (seq << 1u) | 1u}};
@@ -136,17 +141,15 @@ STC_DEF stc64_uniform_t stc64_uniform_init(int64_t low, int64_t high) {
 /* Marsaglia polar method for gaussian/normal distribution. */
 STC_DEF double stc64_normalf(stc64_t* rng, stc64_normalf_t* dist) {
     double u1, u2, s, m;
-    if (dist->has_next) {
-        dist->has_next = false;
+    if (dist->has_next++ & 1)
         return dist->next * dist->stddev + dist->mean;
-    }
     do {
         u1 = 2.0 * stc64_randf(rng) - 1.0;
         u2 = 2.0 * stc64_randf(rng) - 1.0;
         s = u1*u1 + u2*u2;
     } while (s >= 1.0 || s == 0.0);
     m = sqrt(-2.0 * log(s) / s);
-    dist->next = u2 * m, dist->has_next = true;
+    dist->next = u2 * m;
     return (u1 * m) * dist->stddev + dist->mean;
 }
 

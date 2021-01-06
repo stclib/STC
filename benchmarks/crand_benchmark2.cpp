@@ -4,6 +4,28 @@
 #include "stc/crand.h"
 #include "others/pcg_random.hpp"
 
+static struct stc32_state { stc64_t rng; uint64_t spare; unsigned n; } stc32_global =
+    {{0x7a5fed, 0x8e3f52, 0x9bc713, 0x6a09e667a7541669}, 0, 0};
+
+STC_INLINE void stc32_srandom(uint64_t seed) { stc32_global.rng = stc64_init(seed); }
+STC_INLINE uint32_t stc32_random(void) {
+    return (uint32_t) (++stc32_global.n & 1 ? (stc32_global.spare = stc64_rand(&stc32_global.rng))
+                                            : (stc32_global.spare >> 32));
+}
+
+static unsigned long myrand_next = 1;
+
+/* RAND_MAX assumed to be 32767 */
+int myrand(void) {
+    myrand_next = myrand_next * 214013 + 2531011;
+    return (myrand_next >> 16) & 0x7fff;
+}
+
+void mysrand(unsigned seed) {
+    myrand_next = seed;
+}
+
+
 enum {N = 1000000000};
 
 void test1(void)
@@ -88,7 +110,8 @@ void test3(void)
     before = clock();
     sum = 0;
     c_forrange (N) {
-        sum += stc64_rand(&rng);
+        //sum += stc64_rand(&rng);
+        sum += rand();
     }
     diff = clock() - before;
     printf("stc64_random:\t\t%.02f, %zu sz:%zu\n", (float) diff / CLOCKS_PER_SEC, sum, sizeof rng);

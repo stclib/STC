@@ -40,14 +40,20 @@ All cstr definitions and prototypes may be included in your C source file by inc
 ## Methods
 
 ```c
+        void                stc64_srandom(uint64_t seed);
+        uint64_t            stc64_random(void);
+
  1)     stc64_t             stc64_init(uint64_t seed);
  2)     stc64_t             stc64_with_seq(uint64_t seed, uint64_t seq);
+
  3)     uint64_t            stc64_rand(stc64_t* rng);
  4)     double              stc64_randf(stc64_t* rng);
+
  5)     stc64_uniform_t     stc64_uniform_init(int64_t low, int64_t high);
  6)     int64_t             stc64_uniform(stc64_t* rng, stc64_uniform_t* dist);
  7)     stc64_uniformf_t    stc64_uniformf_init(double low, double high);
  8)     double              stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist);
+
  9)     stc64_normalf_t     stc64_normalf_init(double mean, double stddev);
 10)     double              stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
 ```
