@@ -134,8 +134,7 @@ using_cmap_str();
 int main()
 {
     // Create an unordered_map of three strings (that map to strings)
-    cmap_str u = cmap_inits;
-    c_push_items(&u, cmap_str, {
+    c_init (cmap_str, u, {
         {"RED", "#FF0000"},
         {"GREEN", "#00FF00"},
         {"BLUE", "#0000FF"}

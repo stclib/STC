@@ -91,31 +91,36 @@ uint32_t            c_default_hash32(const void* data, size_t len);
 ## Example
 ```c
 #include <stdio.h>
-#include "stc/cstr.h"
-#include "stc/cset.h"
+#include <stc/cstr.h>
+#include <stc/cset.h>
+
 using_cset_str();
 
 int main ()
 {
-  cset_str first = cset_inits;                                                             // empty
-  cset_str second = cset_inits; c_push_items(&second, cset_str, {"red","green","blue"});   // init list
-  cset_str third = cset_inits; c_push_items(&third, cset_str, {"orange","pink","yellow"}); // init list
-  cset_str fourth = cset_inits;
-  cset_str_emplace(&fourth, "potatoes");
-  cset_str_emplace(&fourth, "milk");
-  cset_str_emplace(&fourth, "flour");
+    cset_str first = cset_inits; // empty
+    c_init (cset_str, second, {"red", "green", "blue"});
+    c_init (cset_str, third, {"orange", "pink", "yellow"});
 
-  cset_str fifth = cset_inits;
-  c_foreach (x, cset_str, second) cset_str_emplace(&fifth, x.ref->str);
-  c_foreach (x, cset_str, third) cset_str_emplace(&fifth, x.ref->str);
-  c_foreach (x, cset_str, fourth) cset_str_emplace(&fifth, x.ref->str);
-  c_del(cset_str, &first, &second, &third, &fourth);
+    cset_str fourth = cset_inits;
+    cset_str_emplace(&fourth, "potatoes");
+    cset_str_emplace(&fourth, "milk");
+    cset_str_emplace(&fourth, "flour");
 
-  printf("fifth contains:\n\n");
-  c_foreach (x, cset_str, fifth) printf("%s\n", x.ref->str);
-  cset_str_del(&fifth);
+    cset_str fifth = cset_str_clone(second);
+    c_foreach (i, cset_str, third)
+        cset_str_insert(&fifth, cset_str_value_clone(*i.ref));
+    c_foreach (i, cset_str, fourth)
+        cset_str_emplace(&fifth, i.ref->str);
 
-  return 0;
+    c_del(cset_str, &first, &second, &third, &fourth);
+
+    printf("fifth contains:\n\n");
+    c_foreach (i, cset_str, fifth) 
+        printf("%s\n", i.ref->str);
+
+    cset_str_del(&fifth);
+    return 0;
 }
 ```
 Output:

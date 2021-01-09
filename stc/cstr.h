@@ -201,10 +201,6 @@ STC_INLINE bool
 cstr_equals_s(cstr_t s1, cstr_t s2) {
     return strcmp(s1.str, s2.str) == 0;
 }
-STC_INLINE int
-cstr_compare(const cstr_t *s1, const cstr_t *s2) {
-    return strcmp(s1->str, s2->str);
-}
 
 STC_INLINE bool
 cstr_contains(cstr_t s, const char* needle) {
@@ -237,19 +233,22 @@ cstr_iends_with(cstr_t s, const char* needle) {
 
 /* cvec/cmap API functions: */
 
-#define  cstr_to_raw(x)          ((x)->str)
-#define  cstr_compare_raw(x, y)  strcmp(*(x), *(y))
-#define  cstr_equals_raw(x, y)   (strcmp(*(x), *(y)) == 0)
-
 STC_INLINE uint32_t c_string_hash(const char* str) {
     uint32_t hash = 5381, c; /* djb2 */
     while ((c = *str++)) hash = ((hash << 5) + hash) ^ c;
     return hash;
 }
 
-STC_INLINE uint32_t cstr_hash_raw(const char* const* strref, size_t ignored) {
-    return c_string_hash(*strref);
+STC_INLINE uint32_t cstr_hash_raw(const char* const* ptrref, size_t ignored) {
+    return c_string_hash(*ptrref);
 }
+
+#define  cstr_to_raw(x)          ((x)->str)
+#define  cstr_compare_raw(x, y)  strcmp(*(x), *(y))
+#define  cstr_equals_raw(x, y)   (strcmp(*(x), *(y)) == 0)
+#define  cstr_compare_ref(x, y)  strcmp((x)->str, (y)->str)
+#define  cstr_equals_ref(x, y)   (strcmp((x)->str, (y)->str) == 0)
+#define  cstr_hash_ref(x, none)  c_string_hash((x)->str)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 

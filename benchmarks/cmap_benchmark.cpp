@@ -21,7 +21,7 @@ static inline uint32_t fibonacci_hash(const void* data, size_t len) {
 }
 
 // cmap and khash template expansion
-using_cmap(ii, int64_t, int64_t, c_default_del, c_default_equals, fibonacci_hash); // c_default_hash);
+using_cmap(ii, int64_t, int64_t, c_default_del, c_default_clone, c_default_equals, fibonacci_hash); // c_default_hash);
 KHASH_MAP_INIT_INT64(ii, int64_t)
 
 
@@ -36,7 +36,7 @@ stc64_t rng;
 #define CMAP_SETUP(X, Key, Value) cmap_##X map = cmap_inits \
                                   ; cmap_##X##_set_load_factors(&map, max_load_factor, 0.0)
 #define CMAP_PUT(X, key, val)     cmap_##X##_put(&map, key, val).first->second
-#define CMAP_EMPLACE(X, key, val) cmap_##X##_emplace(&map, key, val)
+#define CMAP_EMPLACE(X, key, val) cmap_##X##_emplace(&map, key, val).first->second
 #define CMAP_ERASE(X, key)        cmap_##X##_erase(&map, key)
 #define CMAP_FIND(X, key)         (cmap_##X##_find(map, key) != NULL)
 #define CMAP_FOR(X, i)            c_foreach (i, cmap_##X, map)
@@ -48,7 +48,7 @@ stc64_t rng;
 
 #define KMAP_SETUP(X, Key, Value) khash_t(ii)* map = kh_init(ii); khiter_t ki; int ret
 #define KMAP_PUT(X, key, val)     (*(ki = kh_put(ii, map, key, &ret), map->vals[ki] = val, &map->vals[ki]))
-#define KMAP_EMPLACE(X, key, val)  (ki = kh_put(ii, map, key, &ret), ret ? (map->vals[ki] = val) : val)
+#define KMAP_EMPLACE(X, key, val) (ki = kh_put(ii, map, key, &ret), ret ? (map->vals[ki] = val, 0) : 0, map->vals[ki])
 #define KMAP_ERASE(X, key)        ((ki = kh_get(ii, map, key)) != kh_end(map) ? kh_del(ii, map, ki), 1 : 0)
 #define KMAP_FIND(X, key)         (kh_get(ii, map, key) != kh_end(map))
 #define KMAP_SIZE(X)              kh_size(map)
@@ -58,7 +58,7 @@ stc64_t rng;
 
 #define UMAP_SETUP(X, Key, Value) std::unordered_map<Key, Value> map; map.max_load_factor(max_load_factor)
 #define UMAP_PUT(X, key, val)     (map[key] = val)
-#define UMAP_EMPLACE(X, key, val) map.emplace(key, val)
+#define UMAP_EMPLACE(X, key, val) (*map.emplace(key, val).first).second
 #define UMAP_FIND(X, key)         (map.find(key) != map.end())
 #define UMAP_ERASE(X, key)        map.erase(key)
 #define UMAP_FOR(X, i)            for (auto i: map)
@@ -146,7 +146,7 @@ int rr = RR;
     SEED(seed); \
     clock_t difference, before = clock(); \
     for (size_t i = 0; i < N1; ++i) { \
-        checksum += ++ M##_PUT(X, RAND(rr), i); \
+        checksum += ++ M##_EMPLACE(X, RAND(rr), i); \
         erased += M##_ERASE(X, RAND(rr)); \
     } \
     difference = clock() - before; \
@@ -203,11 +203,26 @@ int rr = RR;
     M##_CLEAR(X); \
 }
 
+#define MAP_TEST5(M, X) \
+{ \
+    M##_SETUP(X, int64_t, int64_t); \
+    uint64_t checksum = 0; \
+    SEED(seed); \
+    clock_t difference, before = clock(); \
+    for (size_t i = 0; i < N1; ++i) { \
+        checksum += ++ M##_EMPLACE(X, RAND(rr), i); \
+    } \
+    difference = clock() - before; \
+    printf(#M ": time: %5.02f, sum: %zu, size: %zu, buckets: %8zu\n", \
+           (float) difference / CLOCKS_PER_SEC, checksum, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
+    M##_CLEAR(X); \
+}
+
 #ifdef __cplusplus
-#define RUN_TEST(n) MAP_TEST##n(CMAP, ii) MAP_TEST##n(KMAP, ii) MAP_TEST##n(UMAP, ii) MAP_TEST##n(SMAP, ii) \
-                    MAP_TEST##n(BMAP, ii) MAP_TEST##n(FMAP, ii) MAP_TEST##n(RMAP, ii) MAP_TEST##n(HMAP, ii)
+#define RUN_TEST(n) MAP_TEST##n(CMAP, ii) MAP_TEST##n(KMAP, ii) MAP_TEST##n(UMAP, ii) /*MAP_TEST##n(SMAP, ii)*/ \
+                    MAP_TEST##n(BMAP, ii) MAP_TEST##n(FMAP, ii) MAP_TEST##n(RMAP, ii) /*MAP_TEST##n(HMAP, ii)*/
 #define RUNX_TEST(n) MAP_TEST##n(CMAP, ii) /*MAP_TEST##n(KMAP, ii)*/ MAP_TEST##n(UMAP, ii) MAP_TEST##n(SMAP, ii) \
-                    MAP_TEST##n(BMAP, ii) MAP_TEST##n(FMAP, ii) /*MAP_TEST##n(RMAP, ii)*/ MAP_TEST##n(HMAP, ii)
+                    MAP_TEST##n(BMAP, ii) MAP_TEST##n(FMAP, ii) /*MAP_TEST##n(RMAP, ii)*/ /*MAP_TEST##n(HMAP, ii)*/
 #else
 #define RUN_TEST(n) MAP_TEST##n(CMAP, ii) MAP_TEST##n(KMAP, ii)
 #define RUNX_TEST(n) MAP_TEST##n(CMAP, ii)
@@ -218,6 +233,10 @@ int main(int argc, char* argv[])
 {
     rr = argc == 2 ? atoi(argv[1]) : RR;
     seed = time(NULL);
+
+    printf("\nUnordered maps: Insert %d random keys:\n", N3);
+    RUN_TEST(5)
+
     printf("\nRandom keys are in range [0, 2^%d), seed = %zu:\n",  rr, seed);
     printf("\nUnordered maps: %d repeats of Insert random key + try to remove a random key:\n", N1);
     RUN_TEST(1)
