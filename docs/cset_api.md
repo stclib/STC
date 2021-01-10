@@ -51,7 +51,7 @@ All cset definitions and prototypes may be included in your C source file by inc
 ```c
 cset_X              cset_X_init(void);
 cset_X              cset_X_with_capacity(size_t cap);
-void                cset_X_set_load_factors(cset_X* self, float max, float shrink);
+void                cset_X_set_load_factors(cset_X* self, float min_load, float max_load);
 
 cset_X              cset_X_clone(cset_x set);
 void                cset_X_clear(cset_X* self);
@@ -109,7 +109,7 @@ int main ()
 
     cset_str fifth = cset_str_clone(second);
     c_foreach (i, cset_str, third)
-        cset_str_insert(&fifth, cset_str_value_clone(*i.ref));
+        cset_str_emplace(&fifth, i.ref->ref);
     c_foreach (i, cset_str, fourth)
         cset_str_emplace(&fifth, i.ref->str);
 

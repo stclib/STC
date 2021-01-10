@@ -54,7 +54,7 @@ int main(void) {
 #include <stdlib.h>
 #include <string.h>
 
-#define cmap_inits                    {NULL, NULL, 0, 0, 0.85f, 0.15f}
+#define cmap_inits                    {NULL, NULL, 0, 0, 0.15f, 0.85f}
 #define cset_inits                    cmap_inits
 
 #define c_try_emplace(self, ctype, key, val) do { \
@@ -184,8 +184,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         ctype##_##X##_value_t* table; \
         uint8_t* _hashx; \
         uint32_t size, bucket_count; \
+        float min_load_factor; \
         float max_load_factor; \
-        float shrink_limit_factor; \
     } ctype##_##X; \
 \
     typedef struct { \
@@ -217,8 +217,9 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     STC_INLINE void \
     ctype##_##X##_swap(ctype##_##X* a, ctype##_##X* b) {c_swap(ctype##_##X, *a, *b);} \
     STC_INLINE void \
-    ctype##_##X##_set_load_factors(ctype##_##X* self, float max, float shrink) { \
-        self->max_load_factor = max; self->shrink_limit_factor = shrink; \
+    ctype##_##X##_set_load_factors(ctype##_##X* self, float min_load, float max_load) { \
+        self->min_load_factor = min_load; \
+        self->max_load_factor = max_load; \
     } \
     STC_API ctype##_##X \
     ctype##_##X##_with_capacity(size_t cap); \
@@ -403,7 +404,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         ctype##_##X clone = { \
             c_new_2(ctype##_##X##_value_t, m.bucket_count), \
             (uint8_t *) memcpy(c_malloc(m.bucket_count + 1), m._hashx, m.bucket_count + 1), \
-            m.size, m.bucket_count, m.max_load_factor, m.shrink_limit_factor \
+            m.size, m.bucket_count, m.min_load_factor, m.max_load_factor \
         }; \
         ctype##_##X##_value_t *e = m.table, *end = e + m.bucket_count, *dst = clone.table; \
         for (uint8_t *hx = m._hashx; e != end; ++hx, ++e, ++dst) \
@@ -413,14 +414,14 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 \
     STC_DEF void \
     ctype##_##X##_reserve(ctype##_##X* self, size_t newcap) { \
+        if (newcap < self->size) return; \
         size_t oldcap = self->bucket_count; \
-        if (self->size > newcap) return; \
         newcap = (size_t) (newcap / self->max_load_factor) | 1; \
         ctype##_##X tmp = { \
             c_new_2 (ctype##_##X##_value_t, newcap), \
             (uint8_t *) c_calloc(newcap + 1, sizeof(uint8_t)), \
             self->size, (uint32_t) newcap, \
-            self->max_load_factor, self->shrink_limit_factor \
+            self->min_load_factor, self->max_load_factor \
         }; \
         /* Rehash: */ \
         tmp._hashx[newcap] = 0xff; c_swap(ctype##_##X, *self, tmp); \
@@ -452,8 +453,9 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
             if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */ \
                 slot[i] = slot[j], hashx[i] = hashx[j], i = j; \
         } while (true); \
-        hashx[i] = 0; \
-        --self->size; \
+        hashx[i] = 0, k = --self->size; \
+        if ((float) k / cap < self->min_load_factor && k > 512) \
+            ctype##_##X##_reserve(self, k*1.2); \
     }
 
 /* https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/ */

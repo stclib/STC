@@ -498,7 +498,7 @@ public:
                     else
                     {
                         // no baseline to compare to
-                        out << "     ??? |";
+                        out << "       ? |";
                     }
 
                     auto ops_per_sec = ps.first.first * (1000000000.0 / double(bm.total_time_ns));
@@ -937,7 +937,8 @@ public:
         {
             auto i = benchmarks.begin() + long(rnd() % benchmarks.size());
             auto& b = *i;
-
+            std::cerr << "run: " << b->_name << ": " << b->_istate->iterations()
+                                             << " (" << b->_istate->user_data() << ")\n";
             b->_proc(*b->_istate);
 
             ++b->_istate;

@@ -82,7 +82,7 @@ All cmap definitions and prototypes may be included in your C source file by inc
 ```c
 cmap_X              cmap_X_init(void);
 cmap_X              cmap_X_with_capacity(size_t cap);
-void                cmap_X_set_load_factors(cmap_X* self, float max, float shrink);
+void                cmap_X_set_load_factors(cmap_X* self, float min_load, float max_load);
 
 cmap_X              cmap_X_clone(cmap_x map);
 void                cmap_X_clear(cmap_X* self);
