@@ -444,7 +444,7 @@ public:
             }
             line(out, width);
             out <<
-                "  Name (* = baseline)        |       Dim | User data |  Total ms |     ns/op | Baseline|  Ops/second\n";
+                "  Name (* = baseline)        |Iterations | User data |  Total ms |     ns/op |Baseline |  Ops/second\n";
             line(out, width);
 
             auto problem_space_view = get_problem_space_view(suite);
@@ -467,7 +467,7 @@ public:
                     out << " |"
                         << setw(10) << ps.first.first << " |"
                         << setw(10) << bm.user_data << " |"
-                        << setw(10) << fixed << setprecision(3) << double(bm.total_time_ns) / 1000000.0 << " |";
+                        << setw(10) << fixed << setprecision(2) << double(bm.total_time_ns) / 1000000.0 << " |";
                     auto ns_op = (bm.total_time_ns / ps.first.first);
                     if (ns_op > 99999999)
                     {
@@ -561,16 +561,18 @@ public:
 
                 out << " |" << setw(10) << ns_per_op << " |";
 
-                if (&bm == baseline)
+                if (bm.is_baseline)
                 {
                     out << "        - |";
+                    baseline_total_time = total_time;
+                    baseline_total_iterations = total_iterations;
+                    baseline_ns_per_op = ns_per_op;
                 }
                 else
                 {
                     out << setw(9) << fixed << setprecision(3)
                         << double(ns_per_op) / double(baseline_ns_per_op) << " |";
                 }
-
                 auto ops_per_sec = total_iterations * (1000000000.0 / double(total_time));
                 out << setw(12) << fixed << setprecision(1) << ops_per_sec << "\n";
             }
@@ -579,60 +581,59 @@ public:
         }
     }
 
-    void to_csv(std::ostream& out, bool header = true, bool dec = '.') const
+    void to_csv(std::ostream& out) const
     {
         using namespace std;
-
-        if (header)
-        {
-            out << "Suite, Benchmark, Baseline, Dimension, User data, Samples, Total ns, Result, ns/op, Baseline ratio\n";
-        }
+        const char* sep = ",";
 
         for (auto& suite : suites)
         {
-            const benchmark* baseline = nullptr;
-            for (auto& bm : suite.benchmarks)
-            {
-                if (bm.is_baseline)
-                {
-                    baseline = &bm;
-                    break;
-                }
-            }
-            I_PICOBENCH_ASSERT(baseline);
+            out << "Suite, Baseline, Benchmark, Iterations, User data, Total ms, ns/op, Ratio, Ops/second\n";
 
-            for (auto& bm : suite.benchmarks)
+            auto problem_space_view = get_problem_space_view(suite);
+            for (auto& ps : problem_space_view)
             {
-                for (auto& d : bm.data)
+                const problem_space_benchmark* baseline = nullptr;
+                for (auto& bm : ps.second)
+                {
+                    if (bm.is_baseline)
+                    {
+                        baseline = &bm;
+                        break;
+                    }
+                }
+
+                for (auto& bm : ps.second)
                 {
                     out << '"' << (suite.name ? suite.name : "") << '"';
-                    out << ",\"" << bm.name << "\", ";
-                    out << (&bm == baseline ? "true" : "false");
-                    out << ", "
-                        << d.dimension << ", "
-                        << d.user_data << ", "
-                        << d.samples << ", "
-                        << d.total_time_ns << ", "
-                        << d.result << ", "
-                        << (d.total_time_ns / d.dimension) << ", ";
+                    out << sep << (bm.is_baseline ? "true" : "false");
+                    out << sep << '"' << bm.name << '"';
+                    out << sep << ps.first.first
+                        << sep << bm.user_data
+                        << sep << fixed << setprecision(3) << bm.total_time_ns / 1000000.0;
 
-                    if (baseline)
+                    auto ns_op = (bm.total_time_ns / ps.first.first);
+                    out << sep << ns_op << sep;
+                    if (baseline == &bm)
                     {
-                        for (auto& bd : baseline->data)
-                        {
-                            if (bd.dimension == d.dimension && bd.user_data == d.user_data)
-                            {
-                                out << fixed << setprecision(3) << (double(d.total_time_ns) / double(bd.total_time_ns));
-                            }
-                        }
+                        out << 1.0;
+                    }
+                    else if (baseline)
+                    {
+                        out << fixed << setprecision(3) << bm.total_time_ns / double(baseline->total_time_ns);
                     }
                     else
-                        out << -999;
-                    out << '\n';
+                    {
+                        out << -1.0; // no baseline to compare to
+                    }
+
+                    auto ops_per_sec = ps.first.first * (1000000000.0 / bm.total_time_ns);
+                    out << sep << fixed << setprecision(1) << ops_per_sec << "\n";
                 }
             }
         }
     }
+
 
     struct problem_space_benchmark
     {
@@ -720,7 +721,8 @@ enum class report_output_format
 {
     text,
     concise_text,
-    csv
+    csv,
+    all,
 };
 
 #if !defined(PICOBENCH_DEFAULT_ITERATIONS)
@@ -805,28 +807,47 @@ public:
             auto report = generate_report();
             std::ostream* out = _stdout;
             std::ofstream fout;
-            if (preferred_output_filename())
+            report_output_format fmt[] = {report_output_format::text,
+                                          report_output_format::concise_text,
+                                          report_output_format::csv};
+            const char *ext[] = {".txt", ".lst", ".csv"}, *fn = preferred_output_filename();
+            bool all = preferred_output_format() == report_output_format::all;
+            for (int i = 0; i < 3; ++i)
             {
-                fout.open(preferred_output_filename());
-                if (!fout.is_open())
+                if (all || preferred_output_format() == fmt[i])
                 {
-                    std::cerr << "Error: Could not open output file `" << preferred_output_filename() << "`\n";
-                    return 1;
-                }
-                out = &fout;
-            }
+                    if (fn)
+                    {
+                        std::string name(fn);
 
-            switch (preferred_output_format())
-            {
-            case picobench::report_output_format::text:
-                report.to_text(*out);
-                break;
-            case picobench::report_output_format::concise_text:
-                report.to_text_concise(*out);
-                break;
-            case picobench::report_output_format::csv:
-                report.to_csv(*out);
-                break;
+                        if (all || name.find(".") == std::string::npos)
+                        {
+                             name += ext[i];
+                        }
+                        fout.close();
+                        fout.open(name.c_str());
+                        if (!fout.is_open())
+                        {
+                            std::cerr << "Error: Could not open output file `" << fn << "`\n";
+                            return 1;
+                        }
+                        out = &fout;
+                    }
+
+                    switch (fmt[i])
+                    {
+                    case report_output_format::text:
+                        report.to_text(*out);
+                        break;
+                    case report_output_format::concise_text:
+                        report.to_text_concise(*out);
+                        break;
+                    case report_output_format::csv:
+                        report.to_csv(*out);
+                        break;
+                    default: break;
+                    }
+                }
             }
         }
         return error();
@@ -1103,8 +1124,8 @@ public:
             _opts.emplace_back("-samples=", "<n>",
                 "Sets default number of samples for benchmarks",
                 &runner::cmd_samples);
-            _opts.emplace_back("-out-fmt=", "<txt|con|csv>",
-                "Outputs text or concise or csv",
+            _opts.emplace_back("-out-fmt=", "<txt|lst|csv|all>",
+                "Outputs text, concise, csv or all",
                 &runner::cmd_out_fmt);
             _opts.emplace_back("-output=", "<filename>",
                 "Sets output filename or `stdout`",
@@ -1310,13 +1331,17 @@ private:
         {
             _output_format = report_output_format::text;
         }
-        else if (strcmp(line, "con") == 0)
+        else if (strcmp(line, "lst") == 0)
         {
             _output_format = report_output_format::concise_text;
         }
         else if (strcmp(line, "csv") == 0)
         {
             _output_format = report_output_format::csv;
+        }
+        else if (strcmp(line, "all") == 0)
+        {
+            _output_format = report_output_format::all;
         }
         else
         {

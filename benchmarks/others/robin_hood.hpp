@@ -6,7 +6,6 @@
 //                                      _/_____/
 //
 // Fast & memory efficient hashtable based on robin hood hashing for C++11/14/17/20
-// version 3.8.1
 // https://github.com/martinus/robin-hood-hashing
 //
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
@@ -35,9 +34,9 @@
 #define ROBIN_HOOD_H_INCLUDED
 
 // see https://semver.org/
-#define ROBIN_HOOD_VERSION_MAJOR 3 // for incompatible API changes
-#define ROBIN_HOOD_VERSION_MINOR 8 // for adding functionality in a backwards-compatible manner
-#define ROBIN_HOOD_VERSION_PATCH 1 // for backwards-compatible bug fixes
+#define ROBIN_HOOD_VERSION_MAJOR 3  // for incompatible API changes
+#define ROBIN_HOOD_VERSION_MINOR 10 // for adding functionality in a backwards-compatible manner
+#define ROBIN_HOOD_VERSION_PATCH 0  // for backwards-compatible bug fixes
 
 #include <algorithm>
 #include <cstdlib>
@@ -55,7 +54,8 @@
 // #define ROBIN_HOOD_LOG_ENABLED
 #ifdef ROBIN_HOOD_LOG_ENABLED
 #    include <iostream>
-#    define ROBIN_HOOD_LOG(x) std::cout << __FUNCTION__ << "@" << __LINE__ << ": " << x << std::endl
+#    define ROBIN_HOOD_LOG(...) \
+        std::cout << __FUNCTION__ << "@" << __LINE__ << ": " << __VA_ARGS__ << std::endl;
 #else
 #    define ROBIN_HOOD_LOG(x)
 #endif
@@ -63,8 +63,8 @@
 // #define ROBIN_HOOD_TRACE_ENABLED
 #ifdef ROBIN_HOOD_TRACE_ENABLED
 #    include <iostream>
-#    define ROBIN_HOOD_TRACE(x) \
-        std::cout << __FUNCTION__ << "@" << __LINE__ << ": " << x << std::endl
+#    define ROBIN_HOOD_TRACE(...) \
+        std::cout << __FUNCTION__ << "@" << __LINE__ << ": " << __VA_ARGS__ << std::endl;
 #else
 #    define ROBIN_HOOD_TRACE(x)
 #endif
@@ -132,42 +132,32 @@ static Counts& counts() {
 #endif
 
 // count leading/trailing bits
-#if ((defined __i386 || defined __x86_64__) && defined __BMI__) || defined _M_IX86 || defined _M_X64
+#if !defined(ROBIN_HOOD_DISABLE_INTRINSICS)
 #    ifdef _MSC_VER
+#        if ROBIN_HOOD(BITNESS) == 32
+#            define ROBIN_HOOD_PRIVATE_DEFINITION_BITSCANFORWARD() _BitScanForward
+#        else
+#            define ROBIN_HOOD_PRIVATE_DEFINITION_BITSCANFORWARD() _BitScanForward64
+#        endif
 #        include <intrin.h>
+#        pragma intrinsic(ROBIN_HOOD(BITSCANFORWARD))
+#        define ROBIN_HOOD_COUNT_TRAILING_ZEROES(x)                                       \
+            [](size_t mask) noexcept -> int {                                             \
+                unsigned long index;                                                      \
+                return ROBIN_HOOD(BITSCANFORWARD)(&index, mask) ? static_cast<int>(index) \
+                                                                : ROBIN_HOOD(BITNESS);    \
+            }(x)
 #    else
-#        include <x86intrin.h>
+#        if ROBIN_HOOD(BITNESS) == 32
+#            define ROBIN_HOOD_PRIVATE_DEFINITION_CTZ() __builtin_ctzl
+#            define ROBIN_HOOD_PRIVATE_DEFINITION_CLZ() __builtin_clzl
+#        else
+#            define ROBIN_HOOD_PRIVATE_DEFINITION_CTZ() __builtin_ctzll
+#            define ROBIN_HOOD_PRIVATE_DEFINITION_CLZ() __builtin_clzll
+#        endif
+#        define ROBIN_HOOD_COUNT_LEADING_ZEROES(x) ((x) ? ROBIN_HOOD(CLZ)(x) : ROBIN_HOOD(BITNESS))
+#        define ROBIN_HOOD_COUNT_TRAILING_ZEROES(x) ((x) ? ROBIN_HOOD(CTZ)(x) : ROBIN_HOOD(BITNESS))
 #    endif
-#    if ROBIN_HOOD(BITNESS) == 32
-#        define ROBIN_HOOD_PRIVATE_DEFINITION_CTZ() _tzcnt_u32
-#    else
-#        define ROBIN_HOOD_PRIVATE_DEFINITION_CTZ() _tzcnt_u64
-#    endif
-#    define ROBIN_HOOD_COUNT_TRAILING_ZEROES(x) ROBIN_HOOD(CTZ)(x)
-#elif defined _MSC_VER
-#    if ROBIN_HOOD(BITNESS) == 32
-#        define ROBIN_HOOD_PRIVATE_DEFINITION_BITSCANFORWARD() _BitScanForward
-#    else
-#        define ROBIN_HOOD_PRIVATE_DEFINITION_BITSCANFORWARD() _BitScanForward64
-#    endif
-#    include <intrin.h>
-#    pragma intrinsic(ROBIN_HOOD(BITSCANFORWARD))
-#    define ROBIN_HOOD_COUNT_TRAILING_ZEROES(x)                                       \
-        [](size_t mask) noexcept -> int {                                             \
-            unsigned long index;                                                      \
-            return ROBIN_HOOD(BITSCANFORWARD)(&index, mask) ? static_cast<int>(index) \
-                                                            : ROBIN_HOOD(BITNESS);    \
-        }(x)
-#else
-#    if ROBIN_HOOD(BITNESS) == 32
-#        define ROBIN_HOOD_PRIVATE_DEFINITION_CTZ() __builtin_ctzl
-#        define ROBIN_HOOD_PRIVATE_DEFINITION_CLZ() __builtin_clzl
-#    else
-#        define ROBIN_HOOD_PRIVATE_DEFINITION_CTZ() __builtin_ctzll
-#        define ROBIN_HOOD_PRIVATE_DEFINITION_CLZ() __builtin_clzll
-#    endif
-#    define ROBIN_HOOD_COUNT_LEADING_ZEROES(x) ((x) ? ROBIN_HOOD(CLZ)(x) : ROBIN_HOOD(BITNESS))
-#    define ROBIN_HOOD_COUNT_TRAILING_ZEROES(x) ((x) ? ROBIN_HOOD(CTZ)(x) : ROBIN_HOOD(BITNESS))
 #endif
 
 // fallthrough
@@ -301,6 +291,13 @@ using index_sequence_for = make_index_sequence<sizeof...(T)>;
 
 namespace detail {
 
+// make sure we static_cast to the correct type for hash_int
+#if ROBIN_HOOD(BITNESS) == 64
+using SizeT = uint64_t;
+#else
+using SizeT = uint32_t;
+#endif
+
 template <typename T>
 T rotr(T x, unsigned k) {
     return (x >> k) | (x << (8U * sizeof(T) - k));
@@ -322,14 +319,14 @@ inline T reinterpret_cast_no_cast_align_warning(void const* ptr) noexcept {
 // make sure this is not inlined as it is slow and dramatically enlarges code, thus making other
 // inlinings more difficult. Throws are also generally the slow path.
 template <typename E, typename... Args>
-ROBIN_HOOD(NOINLINE)
+[[noreturn]] ROBIN_HOOD(NOINLINE)
 #if ROBIN_HOOD(HAS_EXCEPTIONS)
-void doThrow(Args&&... args) {
+    void doThrow(Args&&... args) {
     // NOLINTNEXTLINE(cppcoreguidelines-pro-bounds-array-to-pointer-decay)
     throw E(std::forward<Args>(args)...);
 }
 #else
-void doThrow(Args&&... ROBIN_HOOD_UNUSED(args) /*unused*/) {
+    void doThrow(Args&&... ROBIN_HOOD_UNUSED(args) /*unused*/) {
     abort();
 }
 #endif
@@ -395,7 +392,8 @@ public:
     void reset() noexcept {
         while (mListForFree) {
             T* tmp = *mListForFree;
-            free(mListForFree);
+            ROBIN_HOOD_LOG("std::free")
+            std::free(mListForFree);
             mListForFree = reinterpret_cast_no_cast_align_warning<T**>(tmp);
         }
         mHead = nullptr;
@@ -430,8 +428,10 @@ public:
         // calculate number of available elements in ptr
         if (numBytes < ALIGNMENT + ALIGNED_SIZE) {
             // not enough data for at least one element. Free and return.
-            free(ptr);
+            ROBIN_HOOD_LOG("std::free")
+            std::free(ptr);
         } else {
+            ROBIN_HOOD_LOG("add to buffer")
             add(ptr, numBytes);
         }
     }
@@ -495,9 +495,10 @@ private:
         size_t const numElementsToAlloc = calcNumElementsToAlloc();
 
         // alloc new memory: [prev |T, T, ... T]
-        // std::cout << (sizeof(T*) + ALIGNED_SIZE * numElementsToAlloc) << " bytes" << std::endl;
         size_t const bytes = ALIGNMENT + ALIGNED_SIZE * numElementsToAlloc;
-        add(assertNotNull<std::bad_alloc>(malloc(bytes)), bytes);
+        ROBIN_HOOD_LOG("std::malloc " << bytes << " = " << ALIGNMENT << " + " << ALIGNED_SIZE
+                                      << " * " << numElementsToAlloc)
+        add(assertNotNull<std::bad_alloc>(std::malloc(bytes)), bytes);
         return mHead;
     }
 
@@ -533,7 +534,8 @@ struct NodeAllocator<T, MinSize, MaxSize, true> {
 
     // we are not using the data, so just free it.
     void addOrFree(void* ptr, size_t ROBIN_HOOD_UNUSED(numBytes) /*unused*/) noexcept {
-        free(ptr);
+        ROBIN_HOOD_LOG("std::free")
+        std::free(ptr);
     }
 };
 
@@ -677,7 +679,7 @@ inline constexpr bool operator>=(pair<A, B> const& x, pair<A, B> const& y) {
     return !(x < y);
 }
 
-inline size_t hash_bytes(void const* ptr, size_t const len) noexcept {
+inline size_t hash_bytes(void const* ptr, size_t len) noexcept {
     static constexpr uint64_t m = UINT64_C(0xc6a4a7935bd1e995);
     static constexpr uint64_t seed = UINT64_C(0xe17a1465);
     static constexpr unsigned int r = 47;
@@ -737,8 +739,8 @@ inline size_t hash_int(uint64_t x) noexcept {
     //
     // Instead of shifts, we use rotations so we don't lose any bits.
     //
-    // Added a final multiplcation with a constant for more mixing. It is most important that the
-    // lower bits are well mixed.
+    // Added a final multiplcation with a constant for more mixing. It is most important that
+    // the lower bits are well mixed.
     auto h1 = x * UINT64_C(0xA24BAED4963EE407);
     auto h2 = detail::rotr(x, 32U) * UINT64_C(0x9FB21C651E98DF25);
     auto h = detail::rotr(h1 + h2, 32U);
@@ -746,14 +748,14 @@ inline size_t hash_int(uint64_t x) noexcept {
 }
 
 // A thin wrapper around std::hash, performing an additional simple mixing step of the result.
-template <typename T>
+template <typename T, typename Enable = void>
 struct hash : public std::hash<T> {
     size_t operator()(T const& obj) const
         noexcept(noexcept(std::declval<std::hash<T>>().operator()(std::declval<T const&>()))) {
         // call base hash
         auto result = std::hash<T>::operator()(obj);
         // return mixed of that, to be save against identity has
-        return hash_int(static_cast<uint64_t>(result));
+        return hash_int(static_cast<detail::SizeT>(result));
     }
 };
 
@@ -776,21 +778,29 @@ struct hash<std::basic_string_view<CharT>> {
 template <class T>
 struct hash<T*> {
     size_t operator()(T* ptr) const noexcept {
-        return hash_int(reinterpret_cast<size_t>(ptr));
+        return hash_int(reinterpret_cast<detail::SizeT>(ptr));
     }
 };
 
 template <class T>
 struct hash<std::unique_ptr<T>> {
     size_t operator()(std::unique_ptr<T> const& ptr) const noexcept {
-        return hash_int(reinterpret_cast<size_t>(ptr.get()));
+        return hash_int(reinterpret_cast<detail::SizeT>(ptr.get()));
     }
 };
 
 template <class T>
 struct hash<std::shared_ptr<T>> {
     size_t operator()(std::shared_ptr<T> const& ptr) const noexcept {
-        return hash_int(reinterpret_cast<size_t>(ptr.get()));
+        return hash_int(reinterpret_cast<detail::SizeT>(ptr.get()));
+    }
+};
+
+template <typename Enum>
+struct hash<Enum, typename std::enable_if<std::is_enum<Enum>::value>::type> {
+    size_t operator()(Enum e) const noexcept {
+        using Underlying = typename std::underlying_type<Enum>::type;
+        return hash<Underlying>{}(static_cast<Underlying>(e));
     }
 };
 
@@ -923,7 +933,8 @@ private:
     static constexpr size_t InitialNumElements = sizeof(uint64_t);
     static constexpr uint32_t InitialInfoNumBits = 5;
     static constexpr uint8_t InitialInfoInc = 1U << InitialInfoNumBits;
-    static constexpr uint8_t InitialInfoHashShift = sizeof(size_t) * 8 - InitialInfoNumBits;
+    static constexpr size_t InfoMask = InitialInfoInc - 1U;
+    static constexpr uint8_t InitialInfoHashShift = 0;
     using DataPool = detail::NodeAllocator<value_type, 4, 16384, IsFlat>;
 
     // type needs to be wider than uint8_t.
@@ -1287,13 +1298,29 @@ private:
                 mInfo += sizeof(size_t);
                 mKeyVals += sizeof(size_t);
             }
-#if ROBIN_HOOD(LITTLE_ENDIAN)
-            auto inc = ROBIN_HOOD_COUNT_TRAILING_ZEROES(n) / 8;
+#if defined(ROBIN_HOOD_DISABLE_INTRINSICS)
+            // we know for certain that within the next 8 bytes we'll find a non-zero one.
+            if (ROBIN_HOOD_UNLIKELY(0U == detail::unaligned_load<uint32_t>(mInfo))) {
+                mInfo += 4;
+                mKeyVals += 4;
+            }
+            if (ROBIN_HOOD_UNLIKELY(0U == detail::unaligned_load<uint16_t>(mInfo))) {
+                mInfo += 2;
+                mKeyVals += 2;
+            }
+            if (ROBIN_HOOD_UNLIKELY(0U == *mInfo)) {
+                mInfo += 1;
+                mKeyVals += 1;
+            }
 #else
+#    if ROBIN_HOOD(LITTLE_ENDIAN)
+            auto inc = ROBIN_HOOD_COUNT_TRAILING_ZEROES(n) / 8;
+#    else
             auto inc = ROBIN_HOOD_COUNT_LEADING_ZEROES(n) / 8;
-#endif
+#    endif
             mInfo += inc;
             mKeyVals += inc;
+#endif
         }
 
         friend class Table<IsFlat, MaxLoadFactor100, key_type, mapped_type, hasher, key_equal>;
@@ -1315,10 +1342,11 @@ private:
             typename std::conditional<std::is_same<::robin_hood::hash<key_type>, hasher>::value,
                                       ::robin_hood::detail::identity_hash<size_t>,
                                       ::robin_hood::hash<size_t>>::type;
-        *idx = Mix{}(WHash::operator()(key));
 
-        *info = mInfoInc + static_cast<InfoType>(*idx >> mInfoHashShift);
-        *idx &= mMask;
+        // the lower InitialInfoNumBits are reserved for info.
+        auto h = Mix{}(WHash::operator()(key));
+        *info = mInfoInc + static_cast<InfoType>((h & InfoMask) >> mInfoHashShift);
+        *idx = (h >> InitialInfoNumBits) & mMask;
     }
 
     // forwards the index by one, wrapping around at the end
@@ -1457,13 +1485,19 @@ public:
     using iterator = Iter<false>;
     using const_iterator = Iter<true>;
 
+    Table() noexcept(noexcept(Hash()) && noexcept(KeyEqual()))
+        : WHash()
+        , WKeyEqual() {
+        ROBIN_HOOD_TRACE(this)
+    }
+
     // Creates an empty hash map. Nothing is allocated yet, this happens at the first insert.
     // This tremendously speeds up ctor & dtor of a map that never receives an element. The
     // penalty is payed at the first insert, and not before. Lookup of this empty map works
     // because everybody points to DummyInfoByte::b. parameter bucket_count is dictated by the
     // standard, but we can ignore it.
     explicit Table(
-        size_t ROBIN_HOOD_UNUSED(bucket_count) /*unused*/ = 0, const Hash& h = Hash{},
+        size_t ROBIN_HOOD_UNUSED(bucket_count) /*unused*/, const Hash& h = Hash{},
         const KeyEqual& equal = KeyEqual{}) noexcept(noexcept(Hash(h)) && noexcept(KeyEqual(equal)))
         : WHash(h)
         , WKeyEqual(equal) {
@@ -1543,8 +1577,12 @@ public:
             // elements and insert them, but copying is probably faster.
 
             auto const numElementsWithBuffer = calcNumElementsWithBuffer(o.mMask + 1);
-            mKeyVals = static_cast<Node*>(detail::assertNotNull<std::bad_alloc>(
-                malloc(calcNumBytesTotal(numElementsWithBuffer))));
+            auto const numBytesTotal = calcNumBytesTotal(numElementsWithBuffer);
+
+            ROBIN_HOOD_LOG("std::malloc " << numBytesTotal << " = calcNumBytesTotal("
+                                          << numElementsWithBuffer << ")")
+            mKeyVals = static_cast<Node*>(
+                detail::assertNotNull<std::bad_alloc>(std::malloc(numBytesTotal)));
             // no need for calloc because clonData does memcpy
             mInfo = reinterpret_cast<uint8_t*>(mKeyVals + numElementsWithBuffer);
             mNumElements = o.mNumElements;
@@ -1592,12 +1630,16 @@ public:
             // no luck: we don't have the same array size allocated, so we need to realloc.
             if (0 != mMask) {
                 // only deallocate if we actually have data!
-                free(mKeyVals);
+                ROBIN_HOOD_LOG("std::free")
+                std::free(mKeyVals);
             }
 
             auto const numElementsWithBuffer = calcNumElementsWithBuffer(o.mMask + 1);
-            mKeyVals = static_cast<Node*>(detail::assertNotNull<std::bad_alloc>(
-                malloc(calcNumBytesTotal(numElementsWithBuffer))));
+            auto const numBytesTotal = calcNumBytesTotal(numElementsWithBuffer);
+            ROBIN_HOOD_LOG("std::malloc " << numBytesTotal << " = calcNumBytesTotal("
+                                          << numElementsWithBuffer << ")")
+            mKeyVals = static_cast<Node*>(
+                detail::assertNotNull<std::bad_alloc>(std::malloc(numBytesTotal)));
 
             // no need for calloc here because cloneData performs a memcpy.
             mInfo = reinterpret_cast<uint8_t*>(mKeyVals + numElementsWithBuffer);
@@ -1939,23 +1981,36 @@ public:
     // reserves space for the specified number of elements. Makes sure the old data fits.
     // exactly the same as reserve(c).
     void rehash(size_t c) {
-        reserve(c);
+        // forces a reserve
+        reserve(c, true);
     }
 
     // reserves space for the specified number of elements. Makes sure the old data fits.
-    // Exactly the same as resize(c). Use resize(0) to shrink to fit.
+    // Exactly the same as rehash(c). Use rehash(0) to shrink to fit.
     void reserve(size_t c) {
+        // reserve, but don't force rehash
+        reserve(c, false);
+    }
+
+    // If possible reallocates the map to a smaller one. This frees the underlying table.
+    // Does not do anything if load_factor is too large for decreasing the table's size.
+    void compact() {
         ROBIN_HOOD_TRACE(this)
-        auto const minElementsAllowed = (std::max)(c, mNumElements);
         auto newSize = InitialNumElements;
-        while (calcMaxNumElementsAllowed(newSize) < minElementsAllowed && newSize != 0) {
+        while (calcMaxNumElementsAllowed(newSize) < mNumElements && newSize != 0) {
             newSize *= 2;
         }
         if (ROBIN_HOOD_UNLIKELY(newSize == 0)) {
             throwOverflowError();
         }
 
-        rehashPowerOfTwo(newSize);
+        ROBIN_HOOD_LOG("newSize > mMask + 1: " << newSize << " > " << mMask << " + 1")
+
+        // only actually do anything when the new size is bigger than the old one. This prevents to
+        // continuously allocate for each reserve() call.
+        if (newSize < mMask + 1) {
+            rehashPowerOfTwo(newSize, true);
+        }
     }
 
     size_type size() const noexcept { // NOLINT(modernize-use-nodiscard)
@@ -1988,6 +2043,17 @@ public:
         ROBIN_HOOD_TRACE(this)
         return mMask;
     }
+
+#ifndef IGNORE_STANDARD_METHODS
+    ROBIN_HOOD(NODISCARD) size_t bucket_count() const noexcept {
+        ROBIN_HOOD_TRACE(this)
+        return mMask;
+    }
+    void max_load_factor(float) {
+        ROBIN_HOOD_TRACE(this)
+        // warning, not used
+    }
+#endif
 
     ROBIN_HOOD(NODISCARD) size_t calcMaxNumElementsAllowed(size_t maxElements) const noexcept {
         if (ROBIN_HOOD_LIKELY(maxElements <= (std::numeric_limits<size_t>::max)() / 100)) {
@@ -2046,9 +2112,29 @@ private:
         return find(e) != end();
     }
 
+    void reserve(size_t c, bool forceRehash) {
+        ROBIN_HOOD_TRACE(this)
+        auto const minElementsAllowed = (std::max)(c, mNumElements);
+        auto newSize = InitialNumElements;
+        while (calcMaxNumElementsAllowed(newSize) < minElementsAllowed && newSize != 0) {
+            newSize *= 2;
+        }
+        if (ROBIN_HOOD_UNLIKELY(newSize == 0)) {
+            throwOverflowError();
+        }
+
+        ROBIN_HOOD_LOG("newSize > mMask + 1: " << newSize << " > " << mMask << " + 1")
+
+        // only actually do anything when the new size is bigger than the old one. This prevents to
+        // continuously allocate for each reserve() call.
+        if (forceRehash || newSize > mMask + 1) {
+            rehashPowerOfTwo(newSize, false);
+        }
+    }
+
     // reserves space for at least the specified number of elements.
     // only works if numBuckets if power of two
-    void rehashPowerOfTwo(size_t numBuckets) {
+    void rehashPowerOfTwo(size_t numBuckets, bool forceFree) {
         ROBIN_HOOD_TRACE(this)
 
         Node* const oldKeyVals = mKeyVals;
@@ -2067,8 +2153,17 @@ private:
                 }
             }
 
-            // don't destroy old data: put it into the pool instead
-            DataPool::addOrFree(oldKeyVals, calcNumBytesTotal(oldMaxElementsWithBuffer));
+            // this check is not necessary as it's guarded by the previous if, but it helps silence
+            // g++'s overeager "attempt to free a non-heap object 'map'
+            // [-Werror=free-nonheap-object]" warning.
+            if (oldKeyVals != reinterpret_cast_no_cast_align_warning<Node*>(&mMask)) {
+                // don't destroy old data: put it into the pool instead
+                if (forceFree) {
+                    std::free(oldKeyVals);
+                } else {
+                    DataPool::addOrFree(oldKeyVals, calcNumBytesTotal(oldMaxElementsWithBuffer));
+                }
+            }
         }
     }
 
@@ -2111,8 +2206,11 @@ private:
         auto const numElementsWithBuffer = calcNumElementsWithBuffer(max_elements);
 
         // calloc also zeroes everything
-        mKeyVals = reinterpret_cast<Node*>(detail::assertNotNull<std::bad_alloc>(
-            calloc(1, calcNumBytesTotal(numElementsWithBuffer))));
+        auto const numBytesTotal = calcNumBytesTotal(numElementsWithBuffer);
+        ROBIN_HOOD_LOG("std::calloc " << numBytesTotal << " = calcNumBytesTotal("
+                                      << numElementsWithBuffer << ")")
+        mKeyVals = reinterpret_cast<Node*>(
+            detail::assertNotNull<std::bad_alloc>(std::calloc(1, numBytesTotal)));
         mInfo = reinterpret_cast<uint8_t*>(mKeyVals + numElementsWithBuffer);
 
         // set sentinel
@@ -2282,7 +2380,7 @@ private:
             throwOverflowError();
         }
 
-        rehashPowerOfTwo((mMask + 1) * 2);
+        rehashPowerOfTwo((mMask + 1) * 2, false);
     }
 
     void destroy() {
@@ -2296,10 +2394,11 @@ private:
 
         // This protection against not deleting mMask shouldn't be needed as it's sufficiently
         // protected with the 0==mMask check, but I have this anyways because g++ 7 otherwise
-        // reports a compile error: attempt to free a non-heap object ‘fm’
+        // reports a compile error: attempt to free a non-heap object 'fm'
         // [-Werror=free-nonheap-object]
         if (mKeyVals != reinterpret_cast_no_cast_align_warning<Node*>(&mMask)) {
-            free(mKeyVals);
+            ROBIN_HOOD_LOG("std::free")
+            std::free(mKeyVals);
         }
     }
 
