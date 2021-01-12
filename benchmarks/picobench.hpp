@@ -150,13 +150,14 @@ using high_res_clock = std::chrono::high_resolution_clock;
 #endif
 
 using result_t = int64_t;
-using udata_t = int64_t;
+using udata_t = uint64_t;
 
 class state
 {
 public:
-    explicit state(size_t num_iterations, udata_t user_data = 0)
+    explicit state(size_t num_iterations, udata_t user_data = 0, udata_t iter_data = 0)
         : _user_data(user_data)
+        , _iter_data(iter_data)
         , _iterations(num_iterations)
     {
         I_PICOBENCH_ASSERT(_iterations > 0);
@@ -168,11 +169,12 @@ public:
     void add_custom_duration(uint64_t duration_ns) { _duration_ns += duration_ns; }
 
     udata_t user_data() const { return _user_data; }
+    udata_t iter_data() const { return _iter_data; }
 
     // optionally set result of benchmark
     // this can be used as a value sync to prevent optimizations
     // or a way to check whether benchmarks produce the same results
-    void set_result(uintptr_t data) { _result = data; }
+    void set_result(udata_t data) { _result = data; }
     result_t result() const { return _result; }
 
     PICOBENCH_INLINE
@@ -251,6 +253,7 @@ private:
     high_res_clock::time_point _start;
     uint64_t _duration_ns = 0;
     udata_t _user_data;
+    udata_t _iter_data;
     size_t _iterations;
     result_t _result = 0;
 };
@@ -290,7 +293,8 @@ public:
     benchmark& samples(int n) { _samples = n; return *this; }
     benchmark& label(const char* label) { _name = label; return *this; }
     benchmark& baseline(bool b = true) { _baseline = b; return *this; }
-    benchmark& user_data(std::vector<udata_t> data) { _user_data = std::move(data); return *this; }
+    benchmark& user_data(udata_t data) { _user_data = data; return *this; }
+    benchmark& iter_data(std::vector<udata_t> data) { _iter_data = std::move(data); return *this; }
 
 protected:
     friend class runner;
@@ -301,7 +305,8 @@ protected:
     const benchmark_proc _proc;
     bool _baseline = false;
 
-    std::vector<udata_t> _user_data;
+    udata_t _user_data;
+    std::vector<udata_t> _iter_data;
     std::vector<size_t> _state_iterations;
     int _samples = 0;
 };
@@ -379,6 +384,7 @@ public:
     {
         size_t dimension; // number of iterations for the problem space
         udata_t user_data; // additional user data.
+        udata_t iter_data; // additional user data.
         int samples; // number of samples taken
         uint64_t total_time_ns; // fastest sample!!!
         result_t result; // result of fastest sample
@@ -466,7 +472,7 @@ public:
 
                     out << " |"
                         << setw(10) << ps.first.first << " |"
-                        << setw(10) << bm.user_data << " |"
+                        << setw(10) << bm.iter_data << " |"
                         << setw(10) << fixed << setprecision(2) << double(bm.total_time_ns) / 1000000.0 << " |";
                     auto ns_op = (bm.total_time_ns / ps.first.first);
                     if (ns_op > 99999999)
@@ -571,9 +577,9 @@ public:
                 else
                 {
                     out << setw(9) << fixed << setprecision(3)
-                        << double(ns_per_op) / double(baseline_ns_per_op) << " |";
+                        << double(ns_per_op) / baseline_ns_per_op << " |";
                 }
-                auto ops_per_sec = total_iterations * (1000000000.0 / double(total_time));
+                auto ops_per_sec = total_iterations * (1000000000.0 / total_time);
                 out << setw(12) << fixed << setprecision(1) << ops_per_sec << "\n";
             }
 
@@ -609,7 +615,7 @@ public:
                     out << sep << (bm.is_baseline ? "true" : "false");
                     out << sep << '"' << bm.name << '"';
                     out << sep << ps.first.first
-                        << sep << bm.user_data
+                        << sep << bm.iter_data
                         << sep << fixed << setprecision(3) << bm.total_time_ns / 1000000.0;
 
                     auto ns_op = (bm.total_time_ns / ps.first.first);
@@ -620,7 +626,7 @@ public:
                     }
                     else if (baseline)
                     {
-                        out << fixed << setprecision(3) << bm.total_time_ns / double(baseline->total_time_ns);
+                        out << fixed << setprecision(3) << double(bm.total_time_ns) / baseline->total_time_ns;
                     }
                     else
                     {
@@ -640,6 +646,7 @@ public:
         const char* name;
         bool is_baseline;
         udata_t user_data;
+        udata_t iter_data;
         uint64_t total_time_ns; // fastest sample!!!
         result_t result; // result of fastest sample
     };
@@ -653,8 +660,8 @@ public:
         {
             for (auto& d : bm.data)
             {
-                auto& pvbs = res[{d.dimension, d.user_data}];
-                pvbs.push_back({ bm.name, bm.is_baseline, d.user_data, d.total_time_ns, d.result });
+                auto& pvbs = res[{d.dimension, d.iter_data}];
+                pvbs.push_back({ bm.name, bm.is_baseline, d.user_data, d.iter_data, d.total_time_ns, d.result });
             }
         }
         return res;
@@ -807,10 +814,10 @@ public:
             auto report = generate_report();
             std::ostream* out = _stdout;
             std::ofstream fout;
-            report_output_format fmt[] = {report_output_format::text,
-                                          report_output_format::concise_text,
-                                          report_output_format::csv};
-            const char *ext[] = {".txt", ".lst", ".csv"}, *fn = preferred_output_filename();
+            report_output_format fmt[] = {report_output_format::csv,
+                                          report_output_format::text,
+                                          report_output_format::concise_text};
+            const char *ext[] = {".csv", ".txt", ".lst"}, *fn = preferred_output_filename();
             bool all = preferred_output_format() == report_output_format::all;
             for (int i = 0; i < 3; ++i)
             {
@@ -907,8 +914,8 @@ public:
             if (b->_state_iterations.empty())
                 b->_state_iterations = _default_state_iterations;
 
-            udata_t udata = b->_user_data.empty() ? udata_t() : b->_user_data.back();
-            b->_user_data.resize(b->_state_iterations.size(), udata);
+            udata_t idata = b->_iter_data.empty() ? udata_t() : b->_iter_data.back();
+            b->_iter_data.resize(b->_state_iterations.size(), idata);
 
             if (b->_samples == 0)
                 b->_samples = _default_samples;
@@ -922,7 +929,7 @@ public:
                 {
                     auto index = rnd() % (b->_states.size() + 1);
                     auto pos = b->_states.begin() + long(index);
-                    b->_states.emplace(pos, b->_state_iterations[iter], b->_user_data[iter]);
+                    b->_states.emplace(pos, b->_state_iterations[iter], b->_user_data, b->_iter_data[iter]);
                 }
             }
 
@@ -959,7 +966,7 @@ public:
             auto i = benchmarks.begin() + long(rnd() % benchmarks.size());
             auto& b = *i;
             std::cerr << "run: " << b->_name << ": " << b->_istate->iterations()
-                                             << " (" << b->_istate->user_data() << ")\n";
+                                             << " (" << b->_istate->iter_data() << ")\n";
             b->_proc(*b->_istate);
 
             ++b->_istate;
@@ -994,16 +1001,16 @@ public:
                 rpt_benchmark->is_baseline = b->_baseline;
 
                 rpt_benchmark->data.reserve(b->_state_iterations.size());
-                for (int i = 0; i < b->_state_iterations.size(); ++i)
+                for (size_t i = 0; i < b->_state_iterations.size(); ++i)
                 {
-                    rpt_benchmark->data.push_back({ b->_state_iterations[i], b->_user_data[i], 0, 0ll });
+                    rpt_benchmark->data.push_back({ b->_state_iterations[i], b->_user_data, b->_iter_data[i], 0, 0ll });
                 }
 
                 for (auto& state : b->_states)
                 {
                     for (auto& d : rpt_benchmark->data)
                     {
-                        if (state.iterations() == d.dimension && state.user_data() == d.user_data)
+                        if (state.iterations() == d.dimension && state.iter_data() == d.iter_data)
                         {
                             if (d.total_time_ns == 0 || d.total_time_ns > state.duration_ns())
                             {
@@ -1097,7 +1104,7 @@ public:
         return _default_samples;
     }
 
-    void add_cmd_opt(const char* cmd, const char* arg_desc, const char* cmd_desc, bool(*handler)(uintptr_t, const char*), udata_t user_data = udata_t())
+    void add_cmd_opt(const char* cmd, const char* arg_desc, const char* cmd_desc, bool(*handler)(udata_t, const char*), udata_t user_data = udata_t())
     {
         cmd_line_option opt;
         opt.cmd = picostring(cmd);
@@ -1124,9 +1131,12 @@ public:
             _opts.emplace_back("-samples=", "<n>",
                 "Sets default number of samples for benchmarks",
                 &runner::cmd_samples);
-            _opts.emplace_back("-out-fmt=", "<txt|lst|csv|all>",
+            _opts.emplace_back("-out-fmt=", "<txt|con|csv>",
                 "Outputs text, concise, csv or all",
                 &runner::cmd_out_fmt);
+            _opts.emplace_back("-all", "",
+                "Outputs all formats: text, con, csv",
+                &runner::cmd_out_all);
             _opts.emplace_back("-output=", "<filename>",
                 "Sets output filename or `stdout`",
                 &runner::cmd_output);
@@ -1225,7 +1235,7 @@ private:
     bool _compare_results_across_samples = false;
     bool _compare_results_across_benchmarks = false;
 
-    report_output_format _output_format = report_output_format::text;
+    report_output_format _output_format = report_output_format::all;
     const char* _output_file = nullptr; // nullptr means stdout
 
     std::ostream* _stdout = &std::cout;
@@ -1243,7 +1253,7 @@ private:
     // command line parsing
     picostring _cmd_prefix;
     typedef bool (runner::*cmd_handler)(const char*); // internal handler
-    typedef bool(*ext_handler)(uintptr_t user_data, const char* cmd_line); // external (user) handler
+    typedef bool(*ext_handler)(udata_t user_data, const char* cmd_line); // external (user) handler
     struct cmd_line_option
     {
         cmd_line_option() = default;
@@ -1259,7 +1269,7 @@ private:
         picostring arg_desc;
         const char* desc;
         cmd_handler handler; // may be nullptr for external handlers
-        uintptr_t user_data; // passed as an argument to user handlers
+        udata_t user_data; // passed as an argument to user handlers
         ext_handler user_handler;
     };
     bool _has_opts = false; // have opts been added to list
@@ -1325,6 +1335,12 @@ private:
         return true;
     }
 
+    bool cmd_out_all(const char* line)
+    {
+        _output_format = report_output_format::all;
+        return true;
+    }
+
     bool cmd_out_fmt(const char* line)
     {
         if (strcmp(line, "txt") == 0)
@@ -1338,10 +1354,6 @@ private:
         else if (strcmp(line, "csv") == 0)
         {
             _output_format = report_output_format::csv;
-        }
-        else if (strcmp(line, "all") == 0)
-        {
-            _output_format = report_output_format::all;
         }
         else
         {

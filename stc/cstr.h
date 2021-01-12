@@ -235,12 +235,14 @@ cstr_iends_with(cstr_t s, const char* needle) {
 
 STC_INLINE uint32_t c_string_hash(const char* str) {
     uint32_t hash = 5381, c; /* djb2 */
-    while ((c = *str++)) hash = ((hash << 5) + hash) ^ c;
+    const uint8_t* p = (const uint8_t*) str;
+    while ((c = *p++)) hash = ((hash << 5) + hash) ^ c;
     return hash;
 }
 
-STC_INLINE uint32_t cstr_hash_raw(const char* const* ptrref, size_t ignored) {
-    return c_string_hash(*ptrref);
+STC_INLINE
+uint32_t cstr_hash_raw(const char* const* p, size_t none) {
+    return c_string_hash(*p);
 }
 
 #define  cstr_to_raw(x)          ((x)->str)

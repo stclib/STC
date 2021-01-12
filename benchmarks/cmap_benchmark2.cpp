@@ -1,7 +1,7 @@
 #include <stc/crand.h>
 #include <stc/cstr.h>
 #include <stc/cmap.h>
-
+#include <cmath>
 #include <string>
 #include <unordered_map>
 #include "others/bytell_hash_map.hpp"
@@ -139,7 +139,7 @@ PICOBENCH(ins_and_erase_cmap_i).P;
 template <class MapInt>
 static void ins_and_access_i(picobench::state& s)
 {
-    uint64_t mask = (1ull << s.user_data()) - 1;
+    uint64_t mask = (1ull << s.iter_data()) - 1;
     size_t result = 0;
     MapInt map;
     map.max_load_factor(MaxLoadFactor100 / 100.0);
@@ -153,7 +153,7 @@ static void ins_and_access_i(picobench::state& s)
 
 static void ins_and_access_cmap_i(picobench::state& s)
 {
-    uint64_t mask = (1ull << s.user_data()) - 1;
+    uint64_t mask = (1ull << s.iter_data()) - 1;
     size_t result = 0;
     cmap_i map = cmap_inits;
     cmap_i_set_load_factors(&map, 0.0, MaxLoadFactor100 / 100.0);
@@ -166,7 +166,7 @@ static void ins_and_access_cmap_i(picobench::state& s)
     cmap_i_del(&map);
 }
 
-#define P samples(S1).iterations({N1, N1, N1, N1}).user_data({18, 23, 25, 31})
+#define P samples(S1).iterations({N1, N1, N1, N1}).iter_data({18, 23, 25, 31})
 PICOBENCH(ins_and_access_i<umap_i>).P.baseline();
 PICOBENCH(ins_and_access_i<bmap_i>).P;
 PICOBENCH(ins_and_access_i<fmap_i>).P;
@@ -186,7 +186,7 @@ static void randomize(char* str, size_t len) {
 template <class MapStr>
 static void ins_and_access_s(picobench::state& s)
 {
-    std::string str(s.user_data(), 'x');
+    std::string str(s.iter_data(), 'x');
     size_t result = 0;
     MapStr map;
     map.max_load_factor(MaxLoadFactor100 / 100.0);
@@ -208,7 +208,7 @@ static void ins_and_access_s(picobench::state& s)
 
 static void ins_and_access_cmap_s(picobench::state& s)
 {
-    cstr str = cstr_with_size(s.user_data(), 'x');
+    cstr str = cstr_with_size(s.iter_data(), 'x');
     size_t result = 0;
     cmap_s map = cmap_inits;
     cmap_s_set_load_factors(&map, 0.0, MaxLoadFactor100 / 100.0);
@@ -230,7 +230,7 @@ static void ins_and_access_cmap_s(picobench::state& s)
     cmap_s_del(&map);
 }
 
-#define P samples(S1).iterations({N1/5, N1/5, N1/5, N1/10, N1/40}).user_data({13, 7, 8, 100, 1000})
+#define P samples(S1).iterations({N1/5, N1/5, N1/5, N1/10, N1/40}).iter_data({13, 7, 8, 100, 1000})
 PICOBENCH(ins_and_access_s<umap_s>).P.baseline();
 PICOBENCH(ins_and_access_s<bmap_s>).P;
 PICOBENCH(ins_and_access_s<fmap_s>).P;
@@ -238,4 +238,76 @@ PICOBENCH(ins_and_access_s<hmap_s>).P;
 PICOBENCH(ins_and_access_s<smap_s>).P;
 PICOBENCH(ins_and_access_s<rmap_s>).P;
 PICOBENCH(ins_and_access_cmap_s).P;
+#undef P
+
+
+template <class MapX>
+static void iterate_x(picobench::state& s)
+{
+    MapX map;
+    map.max_load_factor(MaxLoadFactor100 / 100.0);
+    uint64_t K = (1ull << s.iter_data()) - 1;
+
+    picobench::scope scope(s);
+    stc64_srandom(seed);
+    size_t result = 0;
+
+    // measure insert then iterate whole map
+    c_forrange (n, s.iterations()) {
+        map[stc64_random()] = n;
+        if (!(n & K)) for (auto const& keyVal : map)
+            result += keyVal.second;
+    }
+
+    // reset rng back to inital state
+    stc64_srandom(seed);
+
+    // measure erase then iterate whole map
+    c_forrange (n, s.iterations()) {
+        map.erase(stc64_random());
+        if (!(n & K)) for (auto const& keyVal : map)
+            result += keyVal.second;
+    }
+    s.set_result(result);
+}
+
+static void iterate_cmap_x(picobench::state& s)
+{
+    cmap_x map = cmap_inits;
+    cmap_x_set_load_factors(&map, 0.3, MaxLoadFactor100 / 100.0);
+    uint64_t K = (1ull << s.iter_data()) - 1;
+
+    picobench::scope scope(s);
+    stc64_srandom(seed);
+    size_t result = 0;
+
+    // measure insert then iterate whole map
+    c_forrange (n, s.iterations()) {
+        cmap_x_put(&map, stc64_random(), n);
+        if (!(n & K)) c_foreach (i, cmap_x, map)
+            result += i.ref->second;
+    }
+
+    // reset rng back to inital state
+    stc64_srandom(seed);
+
+    // measure erase then iterate whole map
+    c_forrange (n, s.iterations()) {
+        cmap_x_erase(&map, stc64_random());
+        if (!(n & K)) c_foreach (i, cmap_x, map)
+            result += i.ref->second;
+    }
+    s.set_result(result);
+    cmap_x_del(&map);
+}
+
+
+#define P samples(S1).iterations({N1/20}).iter_data({12})
+PICOBENCH(iterate_x<umap_x>).P.baseline();
+PICOBENCH(iterate_x<bmap_x>).P;
+PICOBENCH(iterate_x<fmap_x>).P;
+PICOBENCH(iterate_x<hmap_x>).P;
+PICOBENCH(iterate_x<smap_x>).P;
+PICOBENCH(iterate_x<rmap_x>).P;
+PICOBENCH(iterate_cmap_x).P;
 #undef P
