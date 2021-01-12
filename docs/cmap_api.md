@@ -178,8 +178,7 @@ using_cmap_strval(id, int);
 int main()
 {
     uint32_t col = 0xcc7744ff;
-    cmap_id idnames = cmap_inits;
-    c_push_items(&idnames, cmap_id, {
+    c_init (cmap_id, idnames, {
         {100, "Red"},
         {110, "Blue"},
     });
@@ -246,13 +245,11 @@ Inverse: demonstrate cmap with mapped POD type Vec3i: cmap<int, Vec3i>:
 #include <stdio.h>
 
 typedef struct { int x, y, z; } Vec3i;
-
 using_cmap(iv, int, Vec3i);
 
 int main()
 {
     cmap_iv vecs = cmap_iv_init();
-
     cmap_iv_put(&vecs, 1, (Vec3i){100,   0,   0});
     cmap_iv_put(&vecs, 2, (Vec3i){  0, 100,   0});
     cmap_iv_put(&vecs, 3, (Vec3i){  0,   0, 100});
@@ -289,7 +286,6 @@ void viking_del(Viking* vk) {
     cstr_del(&vk->country);
 }
 
-
 // Define Viking raw struct with hash, equals, and convertion functions between Viking and VikingRaw structs:
 
 typedef struct VikingRaw {
@@ -322,9 +318,9 @@ using_cmap(vk, Viking, int, c_default_del, c_default_clone,
 int main()
 {
     c_init (cmap_vk vikings {
-        {\{"Einar", "Norway"}, 20},
-        {\{"Olaf", "Denmark"}, 24},
-        {\{"Harald", "Iceland"}, 12},
+        { {"Einar", "Norway"}, 20 },
+        { {"Olaf", "Denmark"}, 24 },
+        { {"Harald", "Iceland"}, 12 },
     });
     cmap_vk_put(&vikings, (VikingRaw){"Bjorn", "Sweden"}, 10);
     
