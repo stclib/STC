@@ -321,11 +321,10 @@ using_cmap(vk, Viking, int, c_default_del, c_default_clone,
 
 int main()
 {
-    cmap_vk vikings = cmap_vk_init();
-    c_push_items(&vikings, cmap_vk, {
-        { {"Einar", "Norway"}, 20},
-        { {"Olaf", "Denmark"}, 24},
-        { {"Harald", "Iceland"}, 12},
+    c_init (cmap_vk vikings {
+        {\{"Einar", "Norway"}, 20},
+        {\{"Olaf", "Denmark"}, 24},
+        {\{"Harald", "Iceland"}, 12},
     });
     cmap_vk_put(&vikings, (VikingRaw){"Bjorn", "Sweden"}, 10);
     
