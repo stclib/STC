@@ -317,7 +317,7 @@ using_cmap(vk, Viking, int, c_default_del, c_default_clone,
 
 int main()
 {
-    c_init (cmap_vk, vikings {
+    c_init (cmap_vk, vikings, {
         { {"Einar", "Norway"}, 20 },
         { {"Olaf", "Denmark"}, 24 },
         { {"Harald", "Iceland"}, 12 },
