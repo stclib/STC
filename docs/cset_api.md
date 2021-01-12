@@ -109,7 +109,7 @@ int main ()
 
     cset_str fifth = cset_str_clone(second);
     c_foreach (i, cset_str, third)
-        cset_str_emplace(&fifth, i.ref->ref);
+        cset_str_emplace(&fifth, i.ref->str);
     c_foreach (i, cset_str, fourth)
         cset_str_emplace(&fifth, i.ref->str);
 
