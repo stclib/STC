@@ -28,7 +28,7 @@ will affect the names of all cqueue types and methods. E.g. declaring `using_cqu
 All cqueue definitions and prototypes may be included in your C source file by including a single header file.
 
 ```c
-#include "stc/cqueue.h" /* includes default underlying implementation header clist.h */
+#include "stc/cqueue.h" /* includes default underlying implementation header cdeq.h */
 ```
 
 ## Methods
@@ -61,8 +61,8 @@ cqueue_X_value_t        cqueue_X_value_clone(cqueue_X_value_t val);
 #include <stdio.h>
 #include "stc/cqueue.h"
 
-using_clist(i, int);
-using_cqueue(i, clist_i);
+using_cdeq(i, int);
+using_cqueue(i, cdeq_i);
 
 int main() {
     cqueue_i queue = cqueue_i_init();
@@ -88,10 +88,10 @@ Output:
 ```c
 #include <stdio.h>
 #include "stc/cqueue.h"
-#include "stc/cdeq.h"
+#include "stc/clist.h"
 
 using_cdeq(i, int);
-using_cqueue(i, cdeq_i);
+using_cqueue(i, clist_i);
 
 int main() {
     cqueue_i queue = cqueue_i_init();

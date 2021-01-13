@@ -1,14 +1,14 @@
 #include <stc/crand.h>
 #include <stc/cqueue.h>
-#include <stc/cdeq.h>
 #include <stdio.h>
 
-#if 0
-using_clist(i, int);
-using_cqueue(i, clist_i);
-#else
+#if 1
 using_cdeq(i, int);
 using_cqueue(i, cdeq_i);
+#else
+#include <stc/clist.h>
+using_clist(i, int);
+using_cqueue(i, clist_i);
 #endif
 
 int main() {

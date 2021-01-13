@@ -27,8 +27,8 @@
 
     #include <stc/crand.h>
     #include <stc/cqueue.h>
-    using_clist(i, int);
-    using_cqueue(i, clist_i);
+    using_cdeq(i, int);
+    using_cqueue(i, cdeq_i);
 
     int main() {
         int n = 10000000;
@@ -54,7 +54,7 @@
         cqueue_i_del(&queue);
     }
 */
-#include "clist.h"
+#include "cdeq.h"
 
 #define using_cqueue(X, ctype) \
     typedef ctype##_t cqueue_##X; \
