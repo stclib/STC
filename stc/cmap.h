@@ -23,6 +23,7 @@
 #ifndef CMAP__H__
 #define CMAP__H__
 
+// Unordered set/map - implemented as open hashing with linear probing and no tombstones.
 /*
 #include <stdio.h>
 #include <stc/cmap.h>
@@ -54,11 +55,11 @@ int main(void) {
 #include <stdlib.h>
 #include <string.h>
 
-#define cmap_inits                    {NULL, NULL, 0, 0, 0.15f, 0.85f}
-#define cset_inits                    cmap_inits
+#define cmap_inits    {NULL, NULL, 0, 0, 0.15f, 0.85f}
+#define cset_inits    cmap_inits
 
-#define c_try_emplace(self, ctype, key, val) do { \
-    ctype##_result_t __r = ctype##_insert_key_(self, key); \
+#define c_try_emplace(self, C, key, val) do { \
+    C##_result_t __r = C##_insert_key_(self, key); \
     if (__r.second) __r.first->second = val; \
 } while (0)
 
@@ -89,11 +90,6 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
                          keyFromRaw, keyToRaw, RawKey) \
     _using_CHASH(X, cmap, Key, Mapped, mappedDel, keyEqualsRaw, keyHashRaw, keyDel, \
                     keyFromRaw, keyToRaw, RawKey, mappedClone, c_default_to_raw, Mapped)
-
-#define using_cmap_13(X, Key, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
-                         keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
-    _using_CHASH(X, cmap, Key, Mapped, mappedDel, keyEqualsRaw, keyHashRaw, keyDel, \
-                    keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped)
 
 /* cset: */
 #define using_cset(...) \
@@ -142,227 +138,227 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     _using_CHASH(X, cmap, Key, cstr_t, cstr_del, keyEquals, keyHash, keyDel, \
                     keyFromRaw, keyToRaw, RawKey, cstr_from, cstr_to_raw, const char*)
 
-#define _using_CHASH_strkey(X, ctype, Mapped, mappedDel, mappedClone) \
-    _using_CHASH(X, ctype, cstr_t, Mapped, mappedDel, cstr_equals_raw, cstr_hash_raw, cstr_del, \
+#define _using_CHASH_strkey(X, C, Mapped, mappedDel, mappedClone) \
+    _using_CHASH(X, C, cstr_t, Mapped, mappedDel, cstr_equals_raw, cstr_hash_raw, cstr_del, \
                     cstr_from, cstr_to_raw, const char*, mappedClone, c_default_to_raw, Mapped)
 
-#define CSET_ONLY_cset(...) __VA_ARGS__
-#define CSET_ONLY_cmap(...)
-#define CMAP_ONLY_cset(...)
-#define CMAP_ONLY_cmap(...) __VA_ARGS__
-#define KEY_REF_cset(e)     (*(e))
-#define KEY_REF_cmap(e)     (e)->first
+#define SET_ONLY_cset(...) __VA_ARGS__
+#define SET_ONLY_cmap(...)
+#define MAP_ONLY_cset(...)
+#define MAP_ONLY_cmap(...) __VA_ARGS__
+#define KEY_REF_cset(vp)   (vp)
+#define KEY_REF_cmap(vp)   (&(vp)->first)
 
-#define _using_CHASH(X, ctype, Key, Mapped, mappedDel, keyEqualsRaw, keyHashRaw, keyDel, \
+#define _using_CHASH(X, C, Key, Mapped, mappedDel, keyEqualsRaw, keyHashRaw, keyDel, \
                         keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
-    typedef Key ctype##_##X##_key_t; \
-    typedef Mapped ctype##_##X##_mapped_t; \
-    typedef RawKey ctype##_##X##_rawkey_t; \
-    typedef RawMapped ctype##_##X##_rawmapped_t; \
+    typedef Key C##_##X##_key_t; \
+    typedef Mapped C##_##X##_mapped_t; \
+    typedef RawKey C##_##X##_rawkey_t; \
+    typedef RawMapped C##_##X##_rawmapped_t; \
 \
-    typedef CSET_ONLY_##ctype( ctype##_##X##_key_t ) \
-            CMAP_ONLY_##ctype( struct {ctype##_##X##_key_t first; \
-                                      ctype##_##X##_mapped_t second;} ) \
-    ctype##_##X##_value_t; \
+    typedef SET_ONLY_##C( C##_##X##_key_t ) \
+            MAP_ONLY_##C( struct {C##_##X##_key_t first; \
+                                      C##_##X##_mapped_t second;} ) \
+    C##_##X##_value_t; \
 \
     STC_INLINE void \
-    ctype##_##X##_entry_del(ctype##_##X##_value_t* e) { \
-        keyDel(&KEY_REF_##ctype(e)); \
-        CMAP_ONLY_##ctype(mappedDel(&e->second);) \
+    C##_##X##_entry_del(C##_##X##_value_t* e) { \
+        keyDel(KEY_REF_##C(e)); \
+        MAP_ONLY_##C(mappedDel(&e->second);) \
     } \
-    typedef CSET_ONLY_##ctype( ctype##_##X##_rawkey_t ) \
-            CMAP_ONLY_##ctype( struct {ctype##_##X##_rawkey_t first; \
-                                       ctype##_##X##_rawmapped_t second;} ) \
-    ctype##_##X##_rawvalue_t; \
+    typedef SET_ONLY_##C( C##_##X##_rawkey_t ) \
+            MAP_ONLY_##C( struct {C##_##X##_rawkey_t first; \
+                                      C##_##X##_rawmapped_t second;} ) \
+    C##_##X##_rawvalue_t; \
 \
     typedef struct { \
-        ctype##_##X##_value_t *first; \
+        C##_##X##_value_t *first; \
         bool second; /* inserted */ \
-    } ctype##_##X##_result_t; \
+    } C##_##X##_result_t; \
 \
     typedef struct { \
-        ctype##_##X##_value_t* table; \
+        C##_##X##_value_t* table; \
         uint8_t* _hashx; \
         uint32_t size, bucket_count; \
         float min_load_factor; \
         float max_load_factor; \
-    } ctype##_##X; \
+    } C##_##X; \
 \
     typedef struct { \
-        ctype##_##X##_value_t *ref; \
+        C##_##X##_value_t *ref; \
         uint8_t* _hx; \
-    } ctype##_##X##_iter_t; \
+    } C##_##X##_iter_t; \
 \
-    STC_INLINE ctype##_##X \
-    ctype##_##X##_init(void) {ctype##_##X m = cmap_inits; return m;} \
+    STC_INLINE C##_##X \
+    C##_##X##_init(void) {C##_##X m = cmap_inits; return m;} \
     STC_INLINE bool \
-    ctype##_##X##_empty(ctype##_##X m) {return m.size == 0;} \
+    C##_##X##_empty(C##_##X m) {return m.size == 0;} \
     STC_INLINE size_t \
-    ctype##_##X##_size(ctype##_##X m) {return (size_t) m.size;} \
-    STC_INLINE ctype##_##X##_value_t \
-    ctype##_##X##_value_clone(ctype##_##X##_value_t val) { \
-        KEY_REF_##ctype(&val) = keyFromRaw(keyToRaw(&KEY_REF_##ctype(&val))); \
-        CMAP_ONLY_##ctype( val.second = mappedFromRaw(mappedToRaw(&val.second)); ) \
+    C##_##X##_size(C##_##X m) {return (size_t) m.size;} \
+    STC_INLINE C##_##X##_value_t \
+    C##_##X##_value_clone(C##_##X##_value_t val) { \
+        *KEY_REF_##C(&val) = keyFromRaw(keyToRaw(KEY_REF_##C(&val))); \
+        MAP_ONLY_##C( val.second = mappedFromRaw(mappedToRaw(&val.second)); ) \
         return val; \
     } \
     STC_INLINE void \
-    ctype##_##X##_value_del(ctype##_##X##_value_t* val) { \
-        keyDel(&KEY_REF_##ctype(val)); \
-        CMAP_ONLY_##ctype( mappedDel(&val->second); ) \
+    C##_##X##_value_del(C##_##X##_value_t* val) { \
+        keyDel(KEY_REF_##C(val)); \
+        MAP_ONLY_##C( mappedDel(&val->second); ) \
     } \
     STC_INLINE size_t \
-    ctype##_##X##_bucket_count(ctype##_##X m) {return (size_t) m.bucket_count;} \
+    C##_##X##_bucket_count(C##_##X m) {return (size_t) m.bucket_count;} \
     STC_INLINE size_t \
-    ctype##_##X##_capacity(ctype##_##X m) {return (size_t) (m.bucket_count * m.max_load_factor);} \
+    C##_##X##_capacity(C##_##X m) {return (size_t) (m.bucket_count * m.max_load_factor);} \
     STC_INLINE void \
-    ctype##_##X##_swap(ctype##_##X* a, ctype##_##X* b) {c_swap(ctype##_##X, *a, *b);} \
+    C##_##X##_swap(C##_##X* a, C##_##X* b) {c_swap(C##_##X, *a, *b);} \
     STC_INLINE void \
-    ctype##_##X##_set_load_factors(ctype##_##X* self, float min_load, float max_load) { \
+    C##_##X##_set_load_factors(C##_##X* self, float min_load, float max_load) { \
         self->min_load_factor = min_load; \
         self->max_load_factor = max_load; \
     } \
-    STC_API ctype##_##X \
-    ctype##_##X##_with_capacity(size_t cap); \
-    STC_API ctype##_##X \
-    ctype##_##X##_clone(ctype##_##X m); \
+    STC_API C##_##X \
+    C##_##X##_with_capacity(size_t cap); \
+    STC_API C##_##X \
+    C##_##X##_clone(C##_##X m); \
     STC_API void \
-    ctype##_##X##_reserve(ctype##_##X* self, size_t size); \
+    C##_##X##_reserve(C##_##X* self, size_t size); \
     STC_API void \
-    ctype##_##X##_push_n(ctype##_##X* self, const ctype##_##X##_rawvalue_t arr[], size_t size); \
+    C##_##X##_push_n(C##_##X* self, const C##_##X##_rawvalue_t arr[], size_t size); \
     STC_API void \
-    ctype##_##X##_del(ctype##_##X* self); \
+    C##_##X##_del(C##_##X* self); \
     STC_API void \
-    ctype##_##X##_clear(ctype##_##X* self); \
-    STC_API ctype##_##X##_value_t* \
-    ctype##_##X##_find(const ctype##_##X* self, RawKey rkey); \
+    C##_##X##_clear(C##_##X* self); \
+    STC_API C##_##X##_value_t* \
+    C##_##X##_find(const C##_##X* self, RawKey rkey); \
     STC_API bool \
-    ctype##_##X##_contains(const ctype##_##X* self, RawKey rkey); \
+    C##_##X##_contains(const C##_##X* self, RawKey rkey); \
 \
-    STC_API ctype##_##X##_result_t \
-    ctype##_##X##_insert_key_(ctype##_##X* self, RawKey rkey); \
-    STC_API ctype##_bucket_t \
-    ctype##_##X##_bucket(const ctype##_##X* self, const ctype##_##X##_rawkey_t* rkeyptr); \
+    STC_API C##_##X##_result_t \
+    C##_##X##_insert_key_(C##_##X* self, RawKey rkey); \
+    STC_API C##_bucket_t \
+    C##_##X##_bucket(const C##_##X* self, const C##_##X##_rawkey_t* rkeyptr); \
 \
-    STC_INLINE ctype##_##X##_result_t \
-    ctype##_##X##_emplace(ctype##_##X* self, RawKey rkey CMAP_ONLY_##ctype(, RawMapped rmapped)) { \
-        ctype##_##X##_result_t res = ctype##_##X##_insert_key_(self, rkey); \
-        CMAP_ONLY_##ctype( if (res.second) res.first->second = mappedFromRaw(rmapped); ) \
+    STC_INLINE C##_##X##_result_t \
+    C##_##X##_emplace(C##_##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
+        C##_##X##_result_t res = C##_##X##_insert_key_(self, rkey); \
+        MAP_ONLY_##C( if (res.second) res.first->second = mappedFromRaw(rmapped); ) \
         return res; \
     } \
-    STC_INLINE ctype##_##X##_result_t \
-    ctype##_##X##_insert(ctype##_##X* self, ctype##_##X##_rawvalue_t raw) { \
-        return CSET_ONLY_##ctype(ctype##_##X##_insert_key_(self, raw)) \
-               CMAP_ONLY_##ctype(ctype##_##X##_emplace(self, raw.first, raw.second)); \
+    STC_INLINE C##_##X##_result_t \
+    C##_##X##_insert(C##_##X* self, C##_##X##_rawvalue_t raw) { \
+        return SET_ONLY_##C(C##_##X##_insert_key_(self, raw)) \
+               MAP_ONLY_##C(C##_##X##_emplace(self, raw.first, raw.second)); \
     } \
 \
-    CMAP_ONLY_##ctype( \
-    STC_INLINE ctype##_##X##_result_t \
-    ctype##_##X##_put(ctype##_##X* self, RawKey rkey, RawMapped rmapped) { \
-        ctype##_##X##_result_t res = ctype##_##X##_insert_key_(self, rkey); \
+    MAP_ONLY_##C( \
+    STC_INLINE C##_##X##_result_t \
+    C##_##X##_put(C##_##X* self, RawKey rkey, RawMapped rmapped) { \
+        C##_##X##_result_t res = C##_##X##_insert_key_(self, rkey); \
         if (!res.second) mappedDel(&res.first->second); \
         res.first->second = mappedFromRaw(rmapped); return res; \
     } \
-    STC_INLINE ctype##_##X##_result_t \
-    ctype##_##X##_insert_or_assign(ctype##_##X* self, RawKey rkey, RawMapped rmapped) { \
-        return ctype##_##X##_put(self, rkey, rmapped); \
+    STC_INLINE C##_##X##_result_t \
+    C##_##X##_insert_or_assign(C##_##X* self, RawKey rkey, RawMapped rmapped) { \
+        return C##_##X##_put(self, rkey, rmapped); \
     } \
-    STC_INLINE ctype##_##X##_result_t \
-    ctype##_##X##_put_mapped(ctype##_##X* self, RawKey rkey, Mapped mapped) { \
-        ctype##_##X##_result_t res = ctype##_##X##_insert_key_(self, rkey); \
+    STC_INLINE C##_##X##_result_t \
+    C##_##X##_put_mapped(C##_##X* self, RawKey rkey, Mapped mapped) { \
+        C##_##X##_result_t res = C##_##X##_insert_key_(self, rkey); \
         if (!res.second) mappedDel(&res.first->second); \
         res.first->second = mapped; return res; \
     } \
-    STC_INLINE ctype##_##X##_mapped_t* \
-    ctype##_##X##_at(const ctype##_##X* self, RawKey rkey) { \
-        ctype##_bucket_t b = ctype##_##X##_bucket(self, &rkey); \
+    STC_INLINE C##_##X##_mapped_t* \
+    C##_##X##_at(const C##_##X* self, RawKey rkey) { \
+        C##_bucket_t b = C##_##X##_bucket(self, &rkey); \
         assert(self->_hashx[b.idx]); \
         return &self->table[b.idx].second; \
     }) \
 \
-    STC_INLINE ctype##_##X##_iter_t \
-    ctype##_##X##_begin(ctype##_##X* self) { \
-        ctype##_##X##_iter_t it = {self->table, self->_hashx}; \
+    STC_INLINE C##_##X##_iter_t \
+    C##_##X##_begin(C##_##X* self) { \
+        C##_##X##_iter_t it = {self->table, self->_hashx}; \
         if (it._hx) while (*it._hx == 0) ++it.ref, ++it._hx; \
         return it; \
     } \
-    STC_INLINE ctype##_##X##_iter_t \
-    ctype##_##X##_end(ctype##_##X* self) {\
-        ctype##_##X##_iter_t it = {self->table + self->bucket_count}; return it; \
+    STC_INLINE C##_##X##_iter_t \
+    C##_##X##_end(C##_##X* self) {\
+        C##_##X##_iter_t it = {self->table + self->bucket_count}; return it; \
     } \
     STC_INLINE void \
-    ctype##_##X##_next(ctype##_##X##_iter_t* it) { \
+    C##_##X##_next(C##_##X##_iter_t* it) { \
         while ((++it->ref, *++it->_hx == 0)) ; \
     } \
-    STC_INLINE ctype##_##X##_mapped_t* \
-    ctype##_##X##_itval(ctype##_##X##_iter_t it) {return CMAP_ONLY_##ctype(&it.ref->second) \
-                                                         CSET_ONLY_##ctype(it.ref);} \
+    STC_INLINE C##_##X##_mapped_t* \
+    C##_##X##_itval(C##_##X##_iter_t it) {return MAP_ONLY_##C(&it.ref->second) \
+                                                         SET_ONLY_##C(it.ref);} \
 \
     STC_API void \
-    ctype##_##X##_erase_entry(ctype##_##X* self, ctype##_##X##_value_t* val); \
+    C##_##X##_erase_entry(C##_##X* self, C##_##X##_value_t* val); \
     STC_INLINE size_t \
-    ctype##_##X##_erase(ctype##_##X* self, RawKey rkey) { \
+    C##_##X##_erase(C##_##X* self, RawKey rkey) { \
         if (self->size == 0) return 0; \
-        ctype##_bucket_t b = ctype##_##X##_bucket(self, &rkey); \
-        return self->_hashx[b.idx] ? ctype##_##X##_erase_entry(self, self->table + b.idx), 1 : 0; \
+        C##_bucket_t b = C##_##X##_bucket(self, &rkey); \
+        return self->_hashx[b.idx] ? C##_##X##_erase_entry(self, self->table + b.idx), 1 : 0; \
     } \
-    STC_INLINE ctype##_##X##_iter_t \
-    ctype##_##X##_erase_at(ctype##_##X* self, ctype##_##X##_iter_t pos) { \
-        ctype##_##X##_erase_entry(self, pos.ref); \
-        ctype##_##X##_next(&pos); return pos; \
+    STC_INLINE C##_##X##_iter_t \
+    C##_##X##_erase_at(C##_##X* self, C##_##X##_iter_t pos) { \
+        C##_##X##_erase_entry(self, pos.ref); \
+        C##_##X##_next(&pos); return pos; \
     } \
 \
     STC_API uint32_t c_default_hash(const void *data, size_t len); \
     STC_API uint32_t c_default_hash32(const void* data, size_t len); \
 \
-    _c_implement_CHASH(X, ctype, Key, Mapped, mappedDel, keyEqualsRaw, keyHashRaw, keyDel, \
-                          keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
-    typedef ctype##_##X ctype##_##X##_t
+    _implement_CHASH(X, C, Key, Mapped, mappedDel, keyEqualsRaw, keyHashRaw, keyDel, \
+                        keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
+    typedef C##_##X C##_##X##_t
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define _c_implement_CHASH(X, ctype, Key, Mapped, mappedDel, keyEqualsRaw, keyHashRaw, keyDel, \
-                              keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
-    STC_DEF ctype##_##X \
-    ctype##_##X##_with_capacity(size_t cap) { \
-        ctype##_##X h = ctype##_inits; \
-        ctype##_##X##_reserve(&h, cap); \
+#define _implement_CHASH(X, C, Key, Mapped, mappedDel, keyEqualsRaw, keyHashRaw, keyDel, \
+                            keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
+    STC_DEF C##_##X \
+    C##_##X##_with_capacity(size_t cap) { \
+        C##_##X h = C##_inits; \
+        C##_##X##_reserve(&h, cap); \
         return h; \
     } \
     STC_DEF void \
-    ctype##_##X##_push_n(ctype##_##X* self, const ctype##_##X##_rawvalue_t arr[], size_t n) { \
-        for (size_t i=0; i<n; ++i) CMAP_ONLY_##ctype(ctype##_##X##_put(self, arr[i].first, arr[i].second)) \
-                                   CSET_ONLY_##ctype(ctype##_##X##_insert(self, arr[i])) ; \
+    C##_##X##_push_n(C##_##X* self, const C##_##X##_rawvalue_t arr[], size_t n) { \
+        for (size_t i=0; i<n; ++i) MAP_ONLY_##C(C##_##X##_put(self, arr[i].first, arr[i].second)) \
+                                   SET_ONLY_##C(C##_##X##_insert(self, arr[i])) ; \
     } \
 \
-    STC_INLINE void ctype##_##X##_wipe_(ctype##_##X* self) { \
+    STC_INLINE void C##_##X##_wipe_(C##_##X* self) { \
         if (self->size == 0) return; \
-        ctype##_##X##_value_t* e = self->table, *end = e + self->bucket_count; \
+        C##_##X##_value_t* e = self->table, *end = e + self->bucket_count; \
         uint8_t *hx = self->_hashx; \
-        for (; e != end; ++e) if (*hx++) ctype##_##X##_entry_del(e); \
+        for (; e != end; ++e) if (*hx++) C##_##X##_entry_del(e); \
     } \
 \
-    STC_DEF void ctype##_##X##_del(ctype##_##X* self) { \
-        ctype##_##X##_wipe_(self); \
+    STC_DEF void C##_##X##_del(C##_##X* self) { \
+        C##_##X##_wipe_(self); \
         c_free(self->_hashx); \
         c_free(self->table); \
     } \
 \
-    STC_DEF void ctype##_##X##_clear(ctype##_##X* self) { \
-        ctype##_##X##_wipe_(self); \
+    STC_DEF void C##_##X##_clear(C##_##X* self) { \
+        C##_##X##_wipe_(self); \
         self->size = 0; \
         memset(self->_hashx, 0, self->bucket_count); \
     } \
 \
-    STC_DEF ctype##_bucket_t \
-    ctype##_##X##_bucket(const ctype##_##X* self, const ctype##_##X##_rawkey_t* rkeyptr) { \
-        uint32_t sx, hash = keyHashRaw(rkeyptr, sizeof(ctype##_##X##_rawkey_t)); \
+    STC_DEF C##_bucket_t \
+    C##_##X##_bucket(const C##_##X* self, const C##_##X##_rawkey_t* rkeyptr) { \
+        uint32_t sx, hash = keyHashRaw(rkeyptr, sizeof(C##_##X##_rawkey_t)); \
         size_t cap = self->bucket_count; \
-        ctype##_bucket_t b = {chash_reduce(hash, cap), (hash & chash_HASH) | chash_USED}; \
+        C##_bucket_t b = {chash_reduce(hash, cap), (hash & chash_HASH) | chash_USED}; \
         uint8_t* hashx = self->_hashx; \
         while ((sx = hashx[b.idx])) { \
             if (sx == b.hx) { \
-                ctype##_##X##_rawkey_t r = keyToRaw(&KEY_REF_##ctype(self->table + b.idx)); \
+                C##_##X##_rawkey_t r = keyToRaw(KEY_REF_##C(self->table + b.idx)); \
                 if (keyEqualsRaw(&r, rkeyptr)) break; \
             } \
             if (++b.idx == cap) b.idx = 0; \
@@ -370,67 +366,67 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         return b; \
     } \
 \
-    STC_DEF ctype##_##X##_value_t* \
-    ctype##_##X##_find(const ctype##_##X* self, RawKey rkey) { \
+    STC_DEF C##_##X##_value_t* \
+    C##_##X##_find(const C##_##X* self, RawKey rkey) { \
         if (self->size == 0) return NULL; \
-        ctype##_bucket_t b = ctype##_##X##_bucket(self, &rkey); \
+        C##_bucket_t b = C##_##X##_bucket(self, &rkey); \
         return self->_hashx[b.idx] ? &self->table[b.idx] : NULL; \
     } \
 \
     STC_DEF bool \
-    ctype##_##X##_contains(const ctype##_##X* self, RawKey rkey) { \
-        return self->size && self->_hashx[ctype##_##X##_bucket(self, &rkey).idx]; \
+    C##_##X##_contains(const C##_##X* self, RawKey rkey) { \
+        return self->size && self->_hashx[C##_##X##_bucket(self, &rkey).idx]; \
     } \
 \
-    STC_INLINE void ctype##_##X##_reserve_expand_(ctype##_##X* self) { \
+    STC_INLINE void C##_##X##_reserve_expand_(C##_##X* self) { \
         if (self->size + 1 >= self->bucket_count * self->max_load_factor) \
-            ctype##_##X##_reserve(self, 5 + self->size * 3 / 2); \
+            C##_##X##_reserve(self, 5 + self->size * 3 / 2); \
     } \
-    STC_DEF ctype##_##X##_result_t \
-    ctype##_##X##_insert_key_(ctype##_##X* self, RawKey rkey) { \
-        ctype##_##X##_reserve_expand_(self); \
-        ctype##_bucket_t b = ctype##_##X##_bucket(self, &rkey); \
-        ctype##_##X##_result_t res = {&self->table[b.idx], !self->_hashx[b.idx]}; \
+    STC_DEF C##_##X##_result_t \
+    C##_##X##_insert_key_(C##_##X* self, RawKey rkey) { \
+        C##_##X##_reserve_expand_(self); \
+        C##_bucket_t b = C##_##X##_bucket(self, &rkey); \
+        C##_##X##_result_t res = {&self->table[b.idx], !self->_hashx[b.idx]}; \
         if (res.second) { \
-            KEY_REF_##ctype(res.first) = keyFromRaw(rkey); \
+            *KEY_REF_##C(res.first) = keyFromRaw(rkey); \
             self->_hashx[b.idx] = (uint8_t) b.hx; \
             ++self->size; \
         } \
         return res; \
     } \
 \
-    STC_DEF ctype##_##X \
-    ctype##_##X##_clone(ctype##_##X m) { \
-        ctype##_##X clone = { \
-            c_new_2(ctype##_##X##_value_t, m.bucket_count), \
+    STC_DEF C##_##X \
+    C##_##X##_clone(C##_##X m) { \
+        C##_##X clone = { \
+            c_new_2(C##_##X##_value_t, m.bucket_count), \
             (uint8_t *) memcpy(c_malloc(m.bucket_count + 1), m._hashx, m.bucket_count + 1), \
             m.size, m.bucket_count, m.min_load_factor, m.max_load_factor \
         }; \
-        ctype##_##X##_value_t *e = m.table, *end = e + m.bucket_count, *dst = clone.table; \
+        C##_##X##_value_t *e = m.table, *end = e + m.bucket_count, *dst = clone.table; \
         for (uint8_t *hx = m._hashx; e != end; ++hx, ++e, ++dst) \
-            if (*hx) *dst = ctype##_##X##_value_clone(*e); \
+            if (*hx) *dst = C##_##X##_value_clone(*e); \
         return clone; \
     } \
 \
     STC_DEF void \
-    ctype##_##X##_reserve(ctype##_##X* self, size_t newcap) { \
+    C##_##X##_reserve(C##_##X* self, size_t newcap) { \
         if (newcap < self->size) return; \
         size_t oldcap = self->bucket_count; \
         newcap = (size_t) (newcap / self->max_load_factor) | 1; \
-        ctype##_##X tmp = { \
-            c_new_2 (ctype##_##X##_value_t, newcap), \
+        C##_##X tmp = { \
+            c_new_2 (C##_##X##_value_t, newcap), \
             (uint8_t *) c_calloc(newcap + 1, sizeof(uint8_t)), \
             self->size, (uint32_t) newcap, \
             self->min_load_factor, self->max_load_factor \
         }; \
         /* Rehash: */ \
-        tmp._hashx[newcap] = 0xff; c_swap(ctype##_##X, *self, tmp); \
-        ctype##_##X##_value_t* e = tmp.table, *slot = self->table; \
+        tmp._hashx[newcap] = 0xff; c_swap(C##_##X, *self, tmp); \
+        C##_##X##_value_t* e = tmp.table, *slot = self->table; \
         uint8_t* hashx = self->_hashx; \
         for (size_t i = 0; i < oldcap; ++i, ++e) \
             if (tmp._hashx[i]) { \
-                RawKey r = keyToRaw(&KEY_REF_##ctype(e)); \
-                ctype##_bucket_t b = ctype##_##X##_bucket(self, &r); \
+                RawKey r = keyToRaw(KEY_REF_##C(e)); \
+                C##_bucket_t b = C##_##X##_bucket(self, &r); \
                 slot[b.idx] = *e, \
                 hashx[b.idx] = (uint8_t) b.hx; \
             } \
@@ -439,23 +435,23 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     } \
 \
     STC_DEF void \
-    ctype##_##X##_erase_entry(ctype##_##X* self, ctype##_##X##_value_t* val) { \
+    C##_##X##_erase_entry(C##_##X* self, C##_##X##_value_t* val) { \
         size_t i = chash_entry_index(*self, val), j = i, k, cap = self->bucket_count; \
-        ctype##_##X##_value_t* slot = self->table; \
+        C##_##X##_value_t* slot = self->table; \
         uint8_t* hashx = self->_hashx; \
-        ctype##_##X##_entry_del(&slot[i]); \
+        C##_##X##_entry_del(&slot[i]); \
         do { /* deletion from hash table without tombstone */ \
             if (++j == cap) j = 0; /* ++j; j %= cap; is slow */ \
             if (! hashx[j]) \
                 break; \
-            RawKey r = keyToRaw(&KEY_REF_##ctype(slot + j)); \
+            RawKey r = keyToRaw(KEY_REF_##C(slot + j)); \
             k = chash_reduce(keyHashRaw(&r, sizeof(RawKey)), cap); \
             if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */ \
                 slot[i] = slot[j], hashx[i] = hashx[j], i = j; \
         } while (true); \
         hashx[i] = 0, k = --self->size; \
         if ((float) k / cap < self->min_load_factor && k > 512) \
-            ctype##_##X##_reserve(self, k*1.2); \
+            C##_##X##_reserve(self, k*1.2); \
     }
 
 /* https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/ */
@@ -474,8 +470,8 @@ STC_DEF uint32_t c_default_hash32(const void* data, size_t len) {
 }
 
 #else
-#define _c_implement_CHASH(X, ctype, Key, Mapped, mappedDel, keyEqualsRaw, keyHashRaw, keyDel, \
-                              keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped)
+#define _implement_CHASH(X, C, Key, Mapped, mappedDel, keyEqualsRaw, keyHashRaw, keyDel, \
+                            keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped)
 #endif
 
 #endif
