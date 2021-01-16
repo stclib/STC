@@ -124,7 +124,7 @@ int main(void) {
 #define KEY_REF_csset(vp)   (vp)
 #define KEY_REF_csmap(vp)   (&(vp)->first)
 
-#define _using_CBST_types(X, C, Key, Mapped, RawKey, RawMapped) \
+#define _using_CBST_types(X, C, Key, Mapped) \
     typedef Key C##_##X##_key_t; \
     typedef Mapped C##_##X##_mapped_t; \
 \
@@ -140,15 +140,20 @@ int main(void) {
     } C##_##X##_node_t; \
 \
     typedef struct { \
-        C##_##X##_node_t* root; \
-        size_t size; \
-    } C##_##X; \
-\
-    typedef struct { \
         C##_##X##_value_t *ref; \
         int top; \
         C##_##X##_node_t *tn, *stk[34]; \
-    } C##_##X##_iter_t; \
+    } C##_##X##_iter_t
+
+
+#define _using_CBST(X, C, Key, Mapped, mappedDel, keyCompareRaw, keyDel, \
+                        keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
+    _using_CBST_types(X, C, Key, Mapped); \
+\
+    typedef struct { \
+        C##_##X##_node_t* root; \
+        size_t size; \
+    } C##_##X; \
 \
     typedef RawKey C##_##X##_rawkey_t; \
     typedef RawMapped C##_##X##_rawmapped_t; \
@@ -160,12 +165,7 @@ int main(void) {
     typedef struct { \
         C##_##X##_value_t *first; \
         bool second; \
-    } C##_##X##_result_t
-
-
-#define _using_CBST(X, C, Key, Mapped, mappedDel, keyCompareRaw, keyDel, \
-                        keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
-    _using_CBST_types(X, C, Key, Mapped, RawKey, RawMapped); \
+    } C##_##X##_result_t; \
 \
     STC_INLINE C##_##X \
     C##_##X##_init(void) {C##_##X m = {(C##_##X##_node_t *) &cbst_nil, 0}; return m;} \
@@ -254,7 +254,7 @@ int main(void) {
     STC_INLINE C##_##X##_mapped_t* \
     C##_##X##_at(const C##_##X* self, RawKey rkey) { \
         C##_##X##_iter_t it; \
-        return C##_##X##_find_r_(self->root, &rkey, &it)->second; \
+        return &C##_##X##_find_r_(self->root, &rkey, &it)->second; \
     }) \
 \
     STC_INLINE C##_##X##_value_t* \
@@ -414,7 +414,7 @@ int main(void) {
         return clone; \
     }
 
-_using_CBST_types(_, csmap, int, int, int, int);
+_using_CBST_types(_, csmap, int, int);
 static csmap___node_t cbst_nil = {&cbst_nil, &cbst_nil, 0};
 
 STC_DEF csmap___node_t *
