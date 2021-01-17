@@ -22,7 +22,8 @@ This is a small headers only library with the most used container components, an
 - [***cstack*** - Templated **std::stack** alike adapter type](docs/cstack_api.md)
 - [***cstr*** - A **std::string** alike type](docs/cstr_api.md)
 - [***cvec*** - Templated **std::vector** alike type](docs/cvec_api.md)
-- Other files:
+
+Other files:
 - [***ccommon*** - General definitions](docs/ccommon_api.md)
 - [***copt*** - Implements ***copt_get()***, similar to posix **getopt_long()**](docs/copt_api.md)
 - [***crand*** - A very efficent modern **pseudo-random number generator**](docs/crand_api.md)
