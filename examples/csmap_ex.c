@@ -32,7 +32,10 @@ int main(int argc, char **argv)
     puts("");
 
     csmap_i_iter_t it;
-    printf("min/max: %d -- %d: %d\n\n", csmap_i_front(&map)->first, csmap_i_back(&map)->first, csmap_i_find(&map, 500000, &it) != NULL);
+    printf("min/max: %d -- %d: %d: %zu\n\n", csmap_i_front(&map)->first,
+                                             csmap_i_back(&map)->first, 
+                                             csmap_i_find(&map, 500000, &it) != NULL,
+                                             csmap_i_size(map));
 
     c_foreach (i, csmap_i, it, csmap_i_end(&map))
         printf("-- %d: %d\n", i.ref->first, i.ref->second);

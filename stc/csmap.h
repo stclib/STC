@@ -350,7 +350,7 @@ STC_API void cbst_next(csmap___iter_t *it, size_t offset);
     C##_##X##_insert_key(C##_##X* self, RawKey rkey) { \
         C##_##X##_result_t res = {NULL, false}; \
         self->root = C##_##X##_insert_key_r_(self->root, &rkey, &res); \
-        if (res.second) ++self->size; \
+        self->size += res.second; \
         return res; \
     } \
 \
@@ -439,7 +439,7 @@ cbst_split(csmap___node_t *tn) {
 STC_DEF void
 cbst_next(csmap___iter_t *it, size_t offset) {
     csmap___node_t *tn = it->_tn;
-    if (tn->level || it->_top) {
+    if (it->_top || tn->level) {
         while (tn->level) {
             it->_st[it->_top++] = tn;
             tn = tn->link[0];
