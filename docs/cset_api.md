@@ -44,7 +44,7 @@ be replaced by `my` in all of the following documentation.
 All cset definitions and prototypes may be included in your C source file by including a single header file.
 
 ```c
-#include "stc/cset.h"
+#include "stc/cmap.h"
 ```
 ## Methods
 
@@ -92,7 +92,7 @@ uint32_t            c_default_hash32(const void* data, size_t len);
 ```c
 #include <stdio.h>
 #include <stc/cstr.h>
-#include <stc/cset.h>
+#include <stc/cmap.h>
 
 using_cset_str();
 
