@@ -129,9 +129,9 @@ int main()
 ```
 Output:
 ```
-Key:[RED] Value:[#FF0000]
-Key:[GREEN] Value:[#00FF00]
 Key:[BLUE] Value:[#0000FF]
+Key:[GREEN] Value:[#00FF00]
+Key:[RED] Value:[#FF0000]
 The HEX of color RED is:[#FF0000]
 The HEX of color BLACK is:[#000000]
 ```
@@ -207,10 +207,10 @@ int main()
 ```
 Output:
 ```c
-{ 100,   0,   0 }: 1
 {   0,   0, 100 }: 3
-{ 100, 100, 100 }: 4
 {   0, 100,   0 }: 2
+{ 100,   0,   0 }: 1
+{ 100, 100, 100 }: 4
 ```
 
 ### Example 4
@@ -238,8 +238,8 @@ int main()
 ```
 Output:
 ```c
-4: { 100, 100, 100 }
-3: {   0,   0, 100 }
-2: {   0, 100,   0 }
 1: { 100,   0,   0 }
+2: {   0, 100,   0 }
+3: {   0,   0, 100 }
+4: { 100, 100, 100 }
 ```

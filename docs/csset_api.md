@@ -111,13 +111,13 @@ Output:
 ```
 fifth contains:
 
-red
-green
-flour
-orange
 blue
-pink
-yellow
+flour
+green
 milk
+orange
+pink
 potatoes
+red
+yellow
 ```
