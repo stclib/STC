@@ -29,26 +29,24 @@ int main(int argc, char **argv)
     for (unsigned int i = 0; i < n - 20; ++i) {
         csmap_i_erase(&map, stc64_random() & mask);
     }
-    
-    csmap_i_emplace(&map, 500000, 5);
+        
+    size_t val = 500000;
+    csmap_i_emplace(&map, val, 5);
 
+    int k = 0;
     c_foreach (i, csmap_i, map)
-        printf("-- %d: %d\n", i.ref->first, i.ref->second);
-    puts("");
+        printf("%2d %d: %d\n", ++k, i.ref->first, i.ref->second);
 
-    csmap_i_find(&map, 500000, &it);
-
+    csmap_i_find(&map, val, &it);
+    printf("\nmin/max: %d -- %d: found: %d. size: %zu\n", csmap_i_front(&map)->first,
+                                                        csmap_i_back(&map)->first, 
+                                                        it.ref->first,
+                                                        csmap_i_size(map));
     c_foreach (i, csmap_i, it, csmap_i_end(&map))
-        printf("-- %d: %d\n", i.ref->first, i.ref->second);
-    printf("\n%d: %d\n", 500000, *csmap_i_at(&map, 500000));
-
-    printf("min/max: %d -- %d: %d: %zu\n\n", csmap_i_front(&map)->first,
-                                             csmap_i_back(&map)->first, 
-                                             csmap_i_find(&map, 500000, &it) != NULL,
-                                             csmap_i_size(map));
+        printf("-- %d: %zu\n", i.ref->first, i.ref->second);
 
     csmap_i_del(&map);
-    puts("done\n");
+    puts("");
 
     c_init (csset_str, names, {
         "Hello", "Try this", "Awesome", "Works well", "Greetings"
@@ -57,5 +55,4 @@ int main(int argc, char **argv)
         printf("name: %s\n", i.ref->str);
     
     csset_str_del(&names);
-    return 0;
 }
