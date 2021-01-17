@@ -8,23 +8,24 @@ Introduction
 
 An modern, fully typesafe, generic, customizable, user-friendly, consistent, and very fast container library for C99.
 This is a small headers only library with the most used container components, and a few algorithms:
-- [***cstr*** - A **std::string** alike type](docs/cstr_api.md)
-- [***cvec*** - Templated **std::vector** alike type](docs/cvec_api.md)
+- [***carray*** - Templated **multi-dimensional array** type](docs/carray_api.md)
+- [***cbitset*** - A **std::bitset** / **boost::dynamic_bitset** alike type](docs/cbitset_api.md)
 - [***cdeq*** - Templated **std::deque** alike type](docs/cdeq_api.md)
+- [***clist*** - Templated **std::forward_list** alike type](docs/clist_api.md)
 - [***cmap*** - Templated **std::unordered_map** alike type](docs/cmap_api.md)
+- [***cpque*** - Templated **std::priority_queue** alike adapter type](docs/cpque_api.md)
+- [***cptr*** - Container pointers and **std::shared_ptr** alike support](docs/cptr_api.md)
+- [***cqueue*** - Templated **std::queue** alike adapter type](docs/cqueue_api.md)
 - [***cset*** - Templated **std::unordered_set** alike type](docs/cset_api.md)
 - [***csmap*** - Templated **std::map** sorted map alike type](docs/csmap_api.md)
 - [***csset*** - Templated **std::set** sorted set alike type](docs/csset_api.md)
 - [***cstack*** - Templated **std::stack** alike adapter type](docs/cstack_api.md)
-- [***cqueue*** - Templated **std::queue** alike adapter type](docs/cqueue_api.md)
-- [***cpque*** - Templated **std::priority_queue** alike adapter type](docs/cpque_api.md)
-- [***clist*** - Templated **std::forward_list** alike type](docs/clist_api.md)
-- [***cbitset*** - A **std::bitset** / **boost::dynamic_bitset** alike type](docs/cbitset_api.md)
-- [***carray*** - Templated **multi-dimensional array** type](docs/carray_api.md)
-- [***cptr*** - Container pointers and **std::shared_ptr** alike support](docs/cptr_api.md)
-- [***crand*** - A very efficent modern **pseudo-random number generator**](docs/crand_api.md)
-- [***copt*** - Implements ***copt_get()***, similar to posix **getopt_long()**](docs/copt_api.md)
+- [***cstr*** - A **std::string** alike type](docs/cstr_api.md)
+- [***cvec*** - Templated **std::vector** alike type](docs/cvec_api.md)
+
 - [***ccommon*** - General definitions](docs/ccommon_api.md)
+- [***copt*** - Implements ***copt_get()***, similar to posix **getopt_long()**](docs/copt_api.md)
+- [***crand*** - A very efficent modern **pseudo-random number generator**](docs/crand_api.md)
 
 The usage of the containers is similar to the C++ standard containers in STL, so it should be easy if you are familiar with them.
 
