@@ -189,11 +189,10 @@ int main(void) {
         keyDel(KEY_REF_##C(val)); \
         MAP_ONLY_##C( mappedDel(&val->second); ) \
     } \
-    STC_INLINE C##_##X##_value_t \
-    C##_##X##_value_clone(C##_##X##_value_t val) { \
-        *KEY_REF_##C(&val) = keyFromRaw(keyToRaw(KEY_REF_##C(&val))); \
-        MAP_ONLY_##C( val.second = mappedFromRaw(mappedToRaw(&val.second)); ) \
-        return val; \
+    STC_INLINE void \
+    C##_##X##_value_copy(const C##_##X##_value_t* src, C##_##X##_value_t* dst) { \
+        *KEY_REF_##C(dst) = keyFromRaw(keyToRaw(KEY_REF_##C(src))); \
+        MAP_ONLY_##C( dst->second = mappedFromRaw(mappedToRaw(&src->second)); ) \
     } \
 \
     STC_API C##_##X##_node_t* C##_##X##_clone_r_(C##_##X##_node_t *tn); \
@@ -268,12 +267,12 @@ int main(void) {
 \
     STC_INLINE void \
     C##_##X##_next(C##_##X##_iter_t* it) { \
-        cbst_next((csmap___iter_t*) it); \
+        cbst_next((csmap___iter_t*) it, offsetof(C##_##X##_node_t, value)); \
     } \
     STC_INLINE C##_##X##_iter_t \
     C##_##X##_begin(C##_##X* self) { \
         C##_##X##_iter_t it = {NULL, 0, self->root}; \
-        cbst_next((csmap___iter_t*) &it); \
+        cbst_next((csmap___iter_t*) &it, offsetof(C##_##X##_node_t, value)); \
         return it; \
     } \
     STC_INLINE C##_##X##_iter_t \
@@ -307,7 +306,7 @@ static csmap___node_t cbst_nil = {&cbst_nil, &cbst_nil, 0};
 
 STC_API csmap___node_t* cbst_skew(csmap___node_t *tn);
 STC_API csmap___node_t* cbst_split(csmap___node_t *tn);
-STC_API void cbst_next(csmap___iter_t *it);
+STC_API void cbst_next(csmap___iter_t *it, size_t offset);
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
@@ -410,7 +409,7 @@ STC_API void cbst_next(csmap___iter_t *it);
         cn->link[0] = C##_##X##_clone_r_(tn->link[0]); \
         cn->link[1] = C##_##X##_clone_r_(tn->link[1]); \
         cn->level = tn->level; \
-        cn->value = C##_##X##_value_clone(tn->value); \
+        C##_##X##_value_copy(&tn->value, &cn->value); \
         return cn; \
     }
 
@@ -438,19 +437,18 @@ cbst_split(csmap___node_t *tn) {
 }
 
 STC_DEF void
-cbst_next(csmap___iter_t *it) {
+cbst_next(csmap___iter_t *it, size_t offset) {
     csmap___node_t *tn = it->_tn;
-    if (tn->level == 0 && it->_top == 0)
-        it->ref = NULL;
-    else {
+    if (tn->level || it->_top) {
         while (tn->level) {
             it->_st[it->_top++] = tn;
             tn = tn->link[0];
         }
         tn = it->_st[--it->_top];
-        it->ref = &tn->value;
         it->_tn = tn->link[1];
-    }
+        it->ref = (csmap___value_t *) ((uint8_t *)tn + offset);
+    } else
+        it->ref = NULL;
 }
 
 #else

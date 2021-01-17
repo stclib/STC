@@ -3,7 +3,7 @@
 #include <stc/crand.h>
 #include <stdio.h>
 
-using_csmap(i, int, int);
+using_csmap(i, int, size_t);
 using_csset_str();
 
 #include <time.h>
