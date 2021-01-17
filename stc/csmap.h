@@ -135,14 +135,14 @@ int main(void) {
 \
     typedef struct C##_##X##_node { \
         struct C##_##X##_node *link[2]; \
-        intptr_t level; \
+        uint8_t level; \
         C##_##X##_value_t value; \
     } C##_##X##_node_t; \
 \
     typedef struct { \
         C##_##X##_value_t *ref; \
-        int top; \
-        C##_##X##_node_t *tn, *stk[34]; \
+        int _top; \
+        C##_##X##_node_t *_tn, *_st[34]; \
     } C##_##X##_iter_t
 
 
@@ -391,13 +391,13 @@ STC_API void cbst_next(csmap___iter_t *it);
     STC_DEF C##_##X##_value_t* \
     C##_##X##_find(const C##_##X* self, C##_##X##_rawkey_t rkey, C##_##X##_iter_t* it) { \
         C##_##X##_node_t *tn = self->root; \
-        it->top = 0; \
+        it->_top = 0; \
         while (tn->level) { \
             C##_##X##_rawkey_t rx = keyToRaw(KEY_REF_##C(&tn->value)); \
             switch (keyCompareRaw(&rx, &rkey)) { \
                 case -1: tn = tn->link[1]; break; \
-                case 1: it->stk[it->top++] = tn; tn = tn->link[0]; break; \
-                case 0: it->ref = &tn->value; it->tn = tn->link[1]; return it->ref; \
+                case 1: it->_st[it->_top++] = tn; tn = tn->link[0]; break; \
+                case 0: it->ref = &tn->value; it->_tn = tn->link[1]; return it->ref; \
             } \
         } \
         return (it->ref = NULL); \
@@ -439,17 +439,17 @@ cbst_split(csmap___node_t *tn) {
 
 STC_DEF void
 cbst_next(csmap___iter_t *it) {
-    csmap___node_t *tn = it->tn;
-    if (tn->level == 0 && it->top == 0)
+    csmap___node_t *tn = it->_tn;
+    if (tn->level == 0 && it->_top == 0)
         it->ref = NULL;
     else {
         while (tn->level) {
-            it->stk[it->top++] = tn;
+            it->_st[it->_top++] = tn;
             tn = tn->link[0];
         }
-        tn = it->stk[--it->top];
+        tn = it->_st[--it->_top];
         it->ref = &tn->value;
-        it->tn = tn->link[1];
+        it->_tn = tn->link[1];
     }
 }
 
