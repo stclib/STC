@@ -11,9 +11,9 @@ using_csset_str();
 int main(int argc, char **argv)
 {
     csmap_i map = csmap_i_init();
-    time_t seed = 123 ; // time(NULL);
+    time_t seed = time(NULL);
 
-    size_t n = 5000000;
+    size_t n = 500000;
     uint64_t mask = (1ull << 20) - 1;
     csmap_i_iter_t it;
 
@@ -26,7 +26,7 @@ int main(int argc, char **argv)
         }
     }
     stc64_srandom(seed);
-    for (unsigned int i = 0; i < n - 50; ++i) {
+    for (unsigned int i = 0; i < n - 20; ++i) {
         csmap_i_erase(&map, stc64_random() & mask);
     }
     
