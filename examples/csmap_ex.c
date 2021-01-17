@@ -7,6 +7,7 @@
 //using_csmap(s, cstr, cstr, cstr_del, cstr_clone, cstr_compare_ref, cstr_del, cstr_clone);
 
 using_csmap(i, int, int);
+using_csset_str();
 
 #include <time.h>
 
@@ -38,8 +39,17 @@ int main(int argc, char **argv)
 
     c_foreach (i, csmap_i, it, csmap_i_end(&map))
         printf("-- %d: %d\n", i.ref->first, i.ref->second);
+    printf("\n%d: %d\n", 500000, *csmap_i_at(&map, 500000));
 
     csmap_i_del(&map);
-    puts("done");
+    puts("done\n");
+
+
+    c_init (csset_str, names, {
+        "Hello", "Try this", "Awesome", "Works well", "Greetings"
+    });
+    c_foreach (i, csset_str, names)
+        printf("name: %s\n", i.ref->str);
+
     return 0;
 }

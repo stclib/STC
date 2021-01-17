@@ -181,6 +181,8 @@ int main(void) {
     C##_##X##_del(C##_##X* self) {C##_##X##_del_r_(self->root);} \
     STC_INLINE void \
     C##_##X##_clear(C##_##X* self) {C##_##X##_del(self); self->size = 0;} \
+    STC_INLINE void \
+    C##_##X##_swap(C##_##X* a, C##_##X* b) {c_swap(C##_##X, *a, *b);} \
 \
     STC_INLINE void \
     C##_##X##_value_del(C##_##X##_value_t* val) { \
@@ -193,30 +195,24 @@ int main(void) {
         MAP_ONLY_##C( val.second = mappedFromRaw(mappedToRaw(&val.second)); ) \
         return val; \
     } \
-    STC_INLINE int \
-    C##_##X##_node_compare_rkey(const C##_##X##_node_t* tn, const C##_##X##_rawkey_t* ry) { \
-        C##_##X##_rawkey_t rx = keyToRaw(KEY_REF_##C(&tn->value)); \
-        return keyCompareRaw(&rx, ry); \
+\
+    STC_API C##_##X##_node_t* C##_##X##_clone_r_(C##_##X##_node_t *tn); \
+    STC_INLINE C##_##X \
+    C##_##X##_clone(C##_##X bst) { \
+        C##_##X clone = {C##_##X##_clone_r_(bst.root), bst.size}; \
+        return clone; \
     } \
 \
-    STC_INLINE void \
-    C##_##X##_swap(C##_##X* a, C##_##X* b) {c_swap(C##_##X, *a, *b);} \
-    STC_API C##_##X \
-    C##_##X##_clone(C##_##X m); \
     STC_API void \
     C##_##X##_push_n(C##_##X* self, const C##_##X##_rawvalue_t arr[], size_t size); \
 \
     STC_API C##_##X##_value_t* \
-    C##_##X##_find_r_(C##_##X##_node_t *tn, const C##_##X##_rawkey_t* rkey, C##_##X##_iter_t* it); \
+    C##_##X##_find(const C##_##X* self, RawKey rkey, C##_##X##_iter_t* it); \
 \
-    STC_INLINE C##_##X##_value_t* \
-    C##_##X##_find(const C##_##X* self, RawKey rkey, C##_##X##_iter_t* it) { \
-        return C##_##X##_find_r_(self->root, &rkey, it); \
-    } \
     STC_INLINE bool \
     C##_##X##_contains(const C##_##X* self, RawKey rkey) { \
         C##_##X##_iter_t it; \
-        return C##_##X##_find_r_(self->root, &rkey, &it) != NULL; \
+        return C##_##X##_find(self, rkey, &it) != NULL; \
     } \
 \
     STC_API C##_##X##_result_t \
@@ -254,7 +250,7 @@ int main(void) {
     STC_INLINE C##_##X##_mapped_t* \
     C##_##X##_at(const C##_##X* self, RawKey rkey) { \
         C##_##X##_iter_t it; \
-        return &C##_##X##_find_r_(self->root, &rkey, &it)->second; \
+        return &C##_##X##_find(self, rkey, &it)->second; \
     }) \
 \
     STC_INLINE C##_##X##_value_t* \
@@ -305,6 +301,13 @@ int main(void) {
     _implement_CBST(X, C, Key, Mapped, mappedDel, keyCompareRaw, keyDel, \
                        keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
     typedef C##_##X C##_##X##_t
+
+_using_CBST_types(_, csmap, int, int);
+static csmap___node_t cbst_nil = {&cbst_nil, &cbst_nil, 0};
+
+STC_API csmap___node_t* cbst_skew(csmap___node_t *tn);
+STC_API csmap___node_t* cbst_split(csmap___node_t *tn);
+STC_API void cbst_next(csmap___iter_t *it);
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
@@ -386,18 +389,21 @@ int main(void) {
     } \
 \
     STC_DEF C##_##X##_value_t* \
-    C##_##X##_find_r_(C##_##X##_node_t *tn, const C##_##X##_rawkey_t* rkey, C##_##X##_iter_t* it) { \
+    C##_##X##_find(const C##_##X* self, C##_##X##_rawkey_t rkey, C##_##X##_iter_t* it) { \
+        C##_##X##_node_t *tn = self->root; \
         it->top = 0; \
-        while (tn->level) \
-            switch (C##_##X##_node_compare_rkey(tn, rkey)) { \
+        while (tn->level) { \
+            C##_##X##_rawkey_t rx = keyToRaw(KEY_REF_##C(&tn->value)); \
+            switch (keyCompareRaw(&rx, &rkey)) { \
                 case -1: tn = tn->link[1]; break; \
                 case 1: it->stk[it->top++] = tn; tn = tn->link[0]; break; \
                 case 0: it->ref = &tn->value; it->tn = tn->link[1]; return it->ref; \
             } \
+        } \
         return (it->ref = NULL); \
     } \
 \
-    STC_DEF C##_##X##_node_t * \
+    STC_DEF C##_##X##_node_t* \
     C##_##X##_clone_r_(C##_##X##_node_t *tn) { \
         if (! tn->level) return tn; \
         C##_##X##_node_t *cn = c_new_1(C##_##X##_node_t); \
@@ -406,16 +412,7 @@ int main(void) {
         cn->level = tn->level; \
         cn->value = C##_##X##_value_clone(tn->value); \
         return cn; \
-    } \
-\
-    STC_DEF C##_##X \
-    C##_##X##_clone(C##_##X bst) { \
-        C##_##X clone = {C##_##X##_clone_r_(bst.root), bst.size}; \
-        return clone; \
     }
-
-_using_CBST_types(_, csmap, int, int);
-static csmap___node_t cbst_nil = {&cbst_nil, &cbst_nil, 0};
 
 STC_DEF csmap___node_t *
 cbst_skew(csmap___node_t *tn) {

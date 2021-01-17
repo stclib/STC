@@ -107,7 +107,7 @@
         valueDestroy(&self->data[--_cdeq_size(self)]); \
     } \
 \
-    STC_INLINE void \
+    STC_API void \
     cdeq_##X##_push_front(cdeq_##X* self, Value value); \
     STC_INLINE void \
     cdeq_##X##_emplace_front(cdeq_##X* self, RawValue raw) { \
