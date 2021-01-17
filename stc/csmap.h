@@ -265,15 +265,13 @@ int main(void) {
         return &tn->value; \
     } \
 \
-    STC_INLINE void \
-    C##_##X##_next(C##_##X##_iter_t* it) { \
-        cbst_next((csmap___iter_t*) it, offsetof(C##_##X##_node_t, value)); \
-    } \
+    STC_API void \
+    C##_##X##_next(C##_##X##_iter_t* it); \
+\
     STC_INLINE C##_##X##_iter_t \
     C##_##X##_begin(C##_##X* self) { \
         C##_##X##_iter_t it = {NULL, 0, self->root}; \
-        cbst_next((csmap___iter_t*) &it, offsetof(C##_##X##_node_t, value)); \
-        return it; \
+        C##_##X##_next(&it); return it; \
     } \
     STC_INLINE C##_##X##_iter_t \
     C##_##X##_end(C##_##X* self) {\
@@ -304,10 +302,6 @@ int main(void) {
 _using_CBST_types(_, csmap, int, int);
 static csmap___node_t cbst_nil = {&cbst_nil, &cbst_nil, 0};
 
-STC_API csmap___node_t* cbst_skew(csmap___node_t *tn);
-STC_API csmap___node_t* cbst_split(csmap___node_t *tn);
-STC_API void cbst_next(csmap___iter_t *it, size_t offset);
-
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
@@ -328,6 +322,44 @@ STC_API void cbst_next(csmap___iter_t *it, size_t offset);
         } \
     } \
 \
+    static C##_##X##_node_t * \
+    C##_##X##_skew_(C##_##X##_node_t *tn) { \
+        if (tn->link[0]->level == tn->level && tn->level) { \
+            C##_##X##_node_t *tmp = tn->link[0]; \
+            tn->link[0] = tmp->link[1]; \
+            tmp->link[1] = tn; \
+            tn = tmp; \
+        } \
+        return tn; \
+    } \
+\
+    static C##_##X##_node_t * \
+    C##_##X##_split_(C##_##X##_node_t *tn) { \
+        if (tn->link[1]->link[1]->level == tn->level && tn->level) { \
+            C##_##X##_node_t *tmp = tn->link[1]; \
+            tn->link[1] = tmp->link[0]; \
+            tmp->link[0] = tn; \
+            tn = tmp; \
+            ++tn->level; \
+        } \
+        return tn; \
+    } \
+\
+    STC_DEF void \
+    C##_##X##_next(C##_##X##_iter_t *it) { \
+        C##_##X##_node_t *tn = it->_tn; \
+        if (it->_top || tn->level) { \
+            while (tn->level) { \
+                it->_st[it->_top++] = tn; \
+                tn = tn->link[0]; \
+            } \
+            tn = it->_st[--it->_top]; \
+            it->_tn = tn->link[1]; \
+            it->ref = &tn->value; \
+        } else \
+            it->ref = NULL; \
+    } \
+\
     STC_DEF C##_##X##_node_t* \
     C##_##X##_insert_key_r_(C##_##X##_node_t* tn, const C##_##X##_rawkey_t* rkey, C##_##X##_result_t* res) { \
         if (tn->level == 0) { \
@@ -341,8 +373,8 @@ STC_API void cbst_next(csmap___iter_t *it, size_t offset);
         int c = keyCompareRaw(&r, rkey); \
         if (c == 0) { res->first = &tn->value; return tn; } \
         tn->link[c == -1] = C##_##X##_insert_key_r_(tn->link[c == -1], rkey, res); \
-        tn = (C##_##X##_node_t*) cbst_skew((csmap___node_t*) tn); \
-        tn = (C##_##X##_node_t*) cbst_split((csmap___node_t*) tn); \
+        tn = C##_##X##_skew_(tn); \
+        tn = C##_##X##_split_(tn); \
         return tn; \
     } \
 \
@@ -381,8 +413,8 @@ STC_API void cbst_next(csmap___iter_t *it, size_t offset);
         if (tn->link[0]->level < tn->level - 1 || tn->link[1]->level < tn->level - 1) { \
             if (tn->link[1]->level > --tn->level) \
                 tn->link[1]->level = tn->level; \
-            tn = (C##_##X##_node_t*) cbst_skew((csmap___node_t*) tn); \
-            tn = (C##_##X##_node_t*) cbst_split((csmap___node_t*) tn); \
+            tn = C##_##X##_skew_(tn); \
+            tn = C##_##X##_split_(tn); \
         } \
         return tn; \
     } \
@@ -412,44 +444,6 @@ STC_API void cbst_next(csmap___iter_t *it, size_t offset);
         C##_##X##_value_copy(&tn->value, &cn->value); \
         return cn; \
     }
-
-STC_DEF csmap___node_t *
-cbst_skew(csmap___node_t *tn) {
-    if (tn->link[0]->level == tn->level && tn->level) {
-        csmap___node_t *tmp = tn->link[0];
-        tn->link[0] = tmp->link[1];
-        tmp->link[1] = tn;
-        tn = tmp;
-    }
-    return tn;
-}
-
-STC_DEF csmap___node_t *
-cbst_split(csmap___node_t *tn) {
-    if (tn->link[1]->link[1]->level == tn->level && tn->level) {
-        csmap___node_t *tmp = tn->link[1];
-        tn->link[1] = tmp->link[0];
-        tmp->link[0] = tn;
-        tn = tmp;
-        ++tn->level;
-    }
-    return tn;
-}
-
-STC_DEF void
-cbst_next(csmap___iter_t *it, size_t offset) {
-    csmap___node_t *tn = it->_tn;
-    if (it->_top || tn->level) {
-        while (tn->level) {
-            it->_st[it->_top++] = tn;
-            tn = tn->link[0];
-        }
-        tn = it->_st[--it->_top];
-        it->_tn = tn->link[1];
-        it->ref = (csmap___value_t *) ((uint8_t *)tn + offset);
-    } else
-        it->ref = NULL;
-}
 
 #else
 #define _implement_CBST(X, C, Key, Mapped, mappedDel, keyCompareRaw, keyDel, \
