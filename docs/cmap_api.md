@@ -16,11 +16,6 @@ See [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_m
                                    keyFromRaw=c_default_clone,
                                    keyToRaw=c_default_to_raw,
                                    RawKey=Key)
-// or:
-#define using_cmap(X, Key, Mapped, mappedDestroy,
-                                   mappedFromRaw, mappedToRaw, RawMapped,
-                                   keyEqualsRaw, keyHashRaw, keyDestroy,
-                                   keyFromRaw, keyToRaw, RawKey)
 
 #define using_cmap_strkey(X, Mapped, mappedDestroy=c_default_del,
                                      mappedClone=c_default_clone)
@@ -43,10 +38,7 @@ be replaced by `my` in all of the following documentation.
 `using_cmap_strkey()` and `using_cmap_strval()` are special macros defined by
 `using_cmap()`. The macro `using_cmap_str()` is a shorthand for
 ```c
-using_cmap(str, cstr_t, cstr_t, cstr_del,
-                cstr_from, cstr_to_raw, const char*,
-                cstr_equals_raw, cstr_hash_raw, cstr_del,
-                cstr_from, cstr_to_raw, const char*)
+using_cmap(str, cstr_t, cstr_t, cstr_del, ...) // uses char* as "raw" types
 ```
 
 ## Types
