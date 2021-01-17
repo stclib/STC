@@ -3,9 +3,6 @@
 #include <stc/crand.h>
 #include <stdio.h>
 
-//using_csset(i, int);
-//using_csmap(s, cstr, cstr, cstr_del, cstr_clone, cstr_compare_ref, cstr_del, cstr_clone);
-
 using_csmap(i, int, int);
 using_csset_str();
 
@@ -50,6 +47,7 @@ int main(int argc, char **argv)
     });
     c_foreach (i, csset_str, names)
         printf("name: %s\n", i.ref->str);
-
+    
+    csset_str_del(&names);
     return 0;
 }
