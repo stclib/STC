@@ -6,8 +6,8 @@ STC - Standard Template Containers for C
 Introduction
 ------------
 
-An modern, fully typesafe, generic, customizable, user-friendly, consistent, and very fast container library for C99.
-This is a small headers only library with the most used container components, and a few algorithms:
+An modern, templated, user-friendly, fast, fully typesafe, and customizable container library for C99, with a uniform API.
+This is a compact headers-only library with the all of the standard data containers, and a few algorithms:
 - [***carray*** - Templated **multi-dimensional array** type](docs/carray_api.md)
 - [***cbitset*** - A **std::bitset** / **boost::dynamic_bitset** alike type](docs/cbitset_api.md)
 - [***cdeq*** - Templated **std::deque** alike type](docs/cdeq_api.md)
@@ -23,7 +23,7 @@ This is a small headers only library with the most used container components, an
 - [***cstr*** - A **std::string** alike type](docs/cstr_api.md)
 - [***cvec*** - Templated **std::vector** alike type](docs/cvec_api.md)
 
-Other:
+Others:
 - [***ccommon*** - General definitions](docs/ccommon_api.md)
 - [***copt*** - Implements ***copt_get()***, similar to posix **getopt_long()**](docs/copt_api.md)
 - [***crand*** - A very efficent modern **pseudo-random number generator**](docs/crand_api.md)
