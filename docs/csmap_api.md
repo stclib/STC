@@ -181,8 +181,8 @@ Demonstrate csmap with plain-old-data key type Vec3i and int as mapped type: csm
 typedef struct { int x, y, z; } Vec3i;
 
 static int Vec3i_compare(const Vec3i* a, const Vec3i* b) {
-    if (a->x != b->x) return c_default_compare(&a->x, &b->x);
-    if (a->y != b->y) return c_default_compare(&a->y, &b->y);
+    if (a->x != b->x) return 1 - ((a->x < b->x)<<1);
+    if (a->y != b->y) return 1 - ((a->y < b->y)<<1);
     return c_default_compare(&a->z, &b->z);
 }
 
