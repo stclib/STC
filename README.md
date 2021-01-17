@@ -13,6 +13,8 @@ This is a small headers only library with the most used container components, an
 - [***cdeq*** - Templated **std::deque** alike type](docs/cdeq_api.md)
 - [***cmap*** - Templated **std::unordered_map** alike type](docs/cmap_api.md)
 - [***cset*** - Templated **std::unordered_set** alike type](docs/cset_api.md)
+- [***csmap*** - Templated **std::map** sorted map alike type](docs/csmap_api.md)
+- [***csset*** - Templated **std::set** sorted set alike type](docs/csset_api.md)
 - [***cstack*** - Templated **std::stack** alike adapter type](docs/cstack_api.md)
 - [***cqueue*** - Templated **std::queue** alike adapter type](docs/cqueue_api.md)
 - [***cpque*** - Templated **std::priority_queue** alike adapter type](docs/cpque_api.md)
