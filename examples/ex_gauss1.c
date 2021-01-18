@@ -13,7 +13,6 @@ using_cmap(i, int, size_t);
 static int compare(cmap_i_value_t *a, cmap_i_value_t *b) {
     return c_default_compare(&a->first, &b->first);
 }
-// Vector: typetag 'e' for (map) entry
 using_cvec(e, cmap_i_value_t, compare);
 
 int main()
@@ -30,9 +29,9 @@ int main()
 
     // Create histogram map
     cmap_i mhist = cmap_i_init();
-    for (size_t i = 0; i < N; ++i) {
+    c_forrange (N) {
         int index = (int) round( stc64_normalf(&rng, &dist) );
-        cmap_i_emplace(&mhist, index, 0).first->second += 1;
+        ++ cmap_i_emplace(&mhist, index, 0).first->second;
     }
 
     // Transfer map to vec and sort it by map keys.

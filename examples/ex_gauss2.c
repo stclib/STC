@@ -22,7 +22,7 @@ int main()
 
     // Create histogram map
     csmap_i mhist = csmap_i_init();
-    for (size_t i = 0; i < N; ++i) {
+    c_forrange (N) {
         int index = (int) round( stc64_normalf(&rng, &dist) );
         ++ csmap_i_emplace(&mhist, index, 0).first->second;
     }
