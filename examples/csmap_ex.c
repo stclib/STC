@@ -21,7 +21,7 @@ int main(int argc, char **argv)
     c_forrange (i, n) {
         uint64_t val = stc64_random() & mask;
         csmap_i_emplace(&map, val, i);
-        if (!csmap_i_find(&map, val, &it)) {
+        if (!csmap_i_contains(&map, val)) {
             printf("Not found: %zu, %zu: ", i, val);
         }
     }
@@ -37,7 +37,7 @@ int main(int argc, char **argv)
     c_foreach (i, csmap_i, map)
         printf("%2d %d: %zu\n", ++k, i.ref->first, i.ref->second);
 
-    csmap_i_find(&map, val, &it);
+    csmap_i_find_it(&map, val, &it);
     printf("\nmin/max: %d -- %d: found: %d. size: %zu\n", csmap_i_front(&map)->first,
                                                           csmap_i_back(&map)->first, 
                                                           it.ref->first,

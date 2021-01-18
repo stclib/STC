@@ -130,7 +130,6 @@
     } \
     STC_API void \
     cpque_##X##_push_n(cpque_##X *self, const cpque_##X##_rawvalue_t arr[], size_t size) { \
-        ctype##_reserve(self, cpque_##X##_size(*self) + size); \
         for (size_t i=0; i<size; ++i) cpque_##X##_push(self, arr[i]); \
     } \
 \

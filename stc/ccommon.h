@@ -76,6 +76,7 @@
 #endif
 
 #define c_swap(T, x, y)         do { T __t = x; x = y; y = __t; } while (0)
+#define c_arraylen(a)           (sizeof (a)/sizeof (a)[0])
 
 #define c_default_compare(x, y) c_less_compare(c_default_less, x, y)
 #define c_default_less(x, y)    (*(x) < *(y))
@@ -107,37 +108,38 @@
 #define c_forrange_5(i, type, start, stop, step) \
     for (type i=start, i##_inc_=step, i##_end_=(stop) - (0 < i##_inc_); (i <= i##_end_) == (0 < i##_inc_); i += i##_inc_)
 
-#define c_break_with continue
 #define c_withfile(f, open) for (FILE *f = open; f; fclose(f), f = NULL)
 #define c_withbuffer(b, type, n) c_withbuffer_x(b, type, n, 256)
 #define c_withbuffer_x(b, type, n, BYTES) \
     for (type __b[((BYTES) - 1) / sizeof(type) + 1], \
                *b = (n) * sizeof *b > (BYTES) ? c_new_2(type, n) : __b; \
          b; b != __b ? c_free(b) : (void)0, b = NULL)
+#define c_breakwith continue
+
+#define c_init(ctype, c, ...) \
+    ctype c = ctype##_init(); c_push_items(&c, ctype, __VA_ARGS__)
 
 #define c_push_items(self, ctype, ...) do { \
     const ctype##_rawvalue_t __arr[] = __VA_ARGS__; \
     ctype##_push_n(self, __arr, sizeof __arr/sizeof *__arr); \
 } while (0)
 
-#define c_init(ctype, c, ...) \
-    ctype c = ctype##_init(); c_push_items(&c, ctype, __VA_ARGS__)
-
-#define c_convert(ctype1, c1, ctype2, put, c2ref) do { \
-    ctype2* __c2 = c2ref; \
+#define c_convert(ctype1, c1, ctype2, c2ptr, push) do { \
+    ctype2* __c2 = c2ptr; \
     c_foreach_3 (__i, ctype1, c1) \
-        ctype2##_##put(__c2, ctype2##_value_clone(*__i.ref)); \
+        ctype2##_##push(__c2, ctype2##_value_clone(*__i.ref)); \
+} while (0)
+
+/* For cmap_X and csmap_X only: */
+#define c_try_emplace(self, ctype, rkey, mapped) do { \
+    ctype##_result_t __r = ctype##_insert_key(self, rkey); \
+    if (__r.second) __r.first->second = mapped; \
 } while (0)
 
 #define c_del(ctype, ...) do { \
     ctype##_t* __arr[] = {__VA_ARGS__}; \
     for (size_t __i=0; __i<sizeof __arr/sizeof *__arr; ++__i) \
         ctype##_del(__arr[__i]); \
-} while (0)
-/* For cmap_X and csmap_X only: */
-#define c_try_emplace(self, ctype, rkey, mapped) do { \
-    ctype##_result_t __r = ctype##_insert_key(self, rkey); \
-    if (__r.second) __r.first->second = mapped; \
 } while (0)
 
 #endif

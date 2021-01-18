@@ -203,12 +203,16 @@ int main(void) {
     } \
 \
     STC_API C##_##X##_value_t* \
-    C##_##X##_find(const C##_##X* self, RawKey rkey, C##_##X##_iter_t* it); \
+    C##_##X##_find_it(const C##_##X* self, RawKey rkey, C##_##X##_iter_t* out); \
 \
+    STC_INLINE C##_##X##_value_t* \
+    C##_##X##_find(const C##_##X* self, RawKey rkey) { \
+        C##_##X##_iter_t it; \
+        return C##_##X##_find_it(self, rkey, &it); \
+    } \
     STC_INLINE bool \
     C##_##X##_contains(const C##_##X* self, RawKey rkey) { \
-        C##_##X##_iter_t it; \
-        return C##_##X##_find(self, rkey, &it) != NULL; \
+        return C##_##X##_find(self, rkey) != NULL; \
     } \
 \
     STC_API C##_##X##_result_t \
@@ -250,7 +254,7 @@ int main(void) {
     STC_INLINE C##_##X##_mapped_t* \
     C##_##X##_at(const C##_##X* self, RawKey rkey) { \
         C##_##X##_iter_t it; \
-        return &C##_##X##_find(self, rkey, &it)->second; \
+        return &C##_##X##_find_it(self, rkey, &it)->second; \
     }) \
 \
     STC_INLINE C##_##X##_value_t* \
@@ -310,18 +314,18 @@ static csmap___node_t cbst_nil = {&cbst_nil, &cbst_nil, 0};
                            keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
 \
     STC_DEF C##_##X##_value_t* \
-    C##_##X##_find(const C##_##X* self, C##_##X##_rawkey_t rkey, C##_##X##_iter_t* it) { \
+    C##_##X##_find_it(const C##_##X* self, C##_##X##_rawkey_t rkey, C##_##X##_iter_t* out) { \
         C##_##X##_node_t *tn = self->root; \
-        it->_top = 0; \
+        out->_top = 0; \
         while (tn->level) { \
             C##_##X##_rawkey_t rx = keyToRaw(KEY_REF_##C(&tn->value)); \
             switch (keyCompareRaw(&rx, &rkey)) { \
                 case -1: tn = tn->link[1]; break; \
-                case 1: it->_st[it->_top++] = tn; tn = tn->link[0]; break; \
-                case 0: it->ref = &tn->value; it->_tn = tn->link[1]; return it->ref; \
+                case 1: out->_st[out->_top++] = tn; tn = tn->link[0]; break; \
+                case 0: out->ref = &tn->value; out->_tn = tn->link[1]; return out->ref; \
             } \
         } \
-        return (it->ref = NULL); \
+        return (out->ref = NULL); \
     } \
 \
     STC_DEF void \

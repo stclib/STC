@@ -60,7 +60,8 @@ csset_X_result_t    csset_X_insert(csset_X* self, RawKey rkey);
 size_t              csset_X_erase(csset_X* self, RawKey rkey);
 csset_X_iter_t      csset_X_erase_at(csset_X* self, csset_X_iter_t pos);
 
-csset_X_value_t*    csset_X_find(const csset_X* self, RawKey rkey, csset_X_iter_t* it);
+csset_X_value_t*    csset_X_find(const csset_X* self, RawKey rkey);
+csset_X_value_t*    csset_X_find_it(const csset_X* self, RawKey rkey, csset_X_iter_t* out);
 bool                csset_X_contains(const csset_X* self, RawKey rkey);
 
 csset_X_iter_t      csset_X_begin(csset_X* self);

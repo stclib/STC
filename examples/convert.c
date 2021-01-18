@@ -27,18 +27,18 @@ int main()
         printf("  %s: %s\n", i.ref->first.str, i.ref->second.str);
 
     cvec_ss vec = cvec_ss_init();
-    c_convert(cmap_str, map, cvec_ss, push_back, &vec);
+    c_convert(cmap_str, map, cvec_ss, &vec, push_back);
 
     puts("\nvec_ss:");
     c_foreach (i, cvec_ss, vec)
-        printf("  %s: %s\n", i.ref->first.str, i.ref->second.str);    
+        printf("  %s: %s\n", i.ref->first.str, i.ref->second.str);
 
     clist_ss list = clist_ss_init();
-    c_convert(cmap_str, map, clist_ss, push_back, &list);
+    c_convert(cmap_str, map, clist_ss, &list, push_back);
 
     puts("\nclist_ss:");
     c_foreach (i, clist_ss, list)
-        printf("  %s: %s\n", i.ref->first.str, i.ref->second.str);    
+        printf("  %s: %s\n", i.ref->first.str, i.ref->second.str);
 
     c_del(cmap_str, &map, &clone);
     cvec_ss_del(&vec);
