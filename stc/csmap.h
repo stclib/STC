@@ -189,10 +189,11 @@ int main(void) {
         keyDel(KEY_REF_##C(val)); \
         MAP_ONLY_##C( mappedDel(&val->second); ) \
     } \
-    STC_INLINE void \
-    C##_##X##_value_copy(const C##_##X##_value_t* src, C##_##X##_value_t* dst) { \
-        *KEY_REF_##C(dst) = keyFromRaw(keyToRaw(KEY_REF_##C(src))); \
-        MAP_ONLY_##C( dst->second = mappedFromRaw(mappedToRaw(&src->second)); ) \
+    STC_INLINE C##_##X##_value_t \
+    C##_##X##_value_clone(C##_##X##_value_t val) { \
+        *KEY_REF_##C(&val) = keyFromRaw(keyToRaw(KEY_REF_##C(&val))); \
+        MAP_ONLY_##C( val.second = mappedFromRaw(mappedToRaw(&val.second)); ) \
+        return val; \
     } \
 \
     STC_API C##_##X##_node_t* C##_##X##_clone_r_(C##_##X##_node_t *tn); \
@@ -432,7 +433,7 @@ static csmap___node_t cbst_nil = {&cbst_nil, &cbst_nil, 0};
         cn->link[0] = C##_##X##_clone_r_(tn->link[0]); \
         cn->link[1] = C##_##X##_clone_r_(tn->link[1]); \
         cn->level = tn->level; \
-        C##_##X##_value_copy(&tn->value, &cn->value); \
+        cn->value = C##_##X##_value_clone(tn->value); \
         return cn; \
     } \
 \

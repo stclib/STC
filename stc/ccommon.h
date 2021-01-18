@@ -124,12 +124,6 @@
     ctype##_push_n(self, __arr, sizeof __arr/sizeof *__arr); \
 } while (0)
 
-#define c_convert(ctype1, c1, ctype2, c2ptr, push) do { \
-    ctype2* __c2 = c2ptr; \
-    c_foreach_3 (__i, ctype1, c1) \
-        ctype2##_##push(__c2, ctype2##_value_clone(*__i.ref)); \
-} while (0)
-
 /* For cmap_X and csmap_X only: */
 #define c_try_emplace(self, ctype, rkey, mapped) do { \
     ctype##_result_t __r = ctype##_insert_key(self, rkey); \

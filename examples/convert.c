@@ -1,13 +1,14 @@
 
 #include "stc/cmap.h"
+#include "stc/csmap.h"
 #include "stc/cvec.h"
 #include "stc/clist.h"
 #include "stc/cstr.h"
 #include <stdio.h>
 
 using_cmap_str();
-using_cvec(ss, cmap_str_value_t, c_no_compare, cmap_str_value_del, cmap_str_value_clone);
-using_clist(ss, cmap_str_value_t, c_no_compare, cmap_str_value_del, cmap_str_value_clone);
+using_cvec_str();
+using_clist_str();
 
 int main()
 {
@@ -16,31 +17,31 @@ int main()
     cmap_str_emplace(&map, "blue", "#0000ff");
     cmap_str_emplace(&map, "yellow", "#ffff00");
 
-    puts("cmap_str:");
+    puts("MAP:");
     c_foreach (i, cmap_str, map)
         printf("  %s: %s\n", i.ref->first.str, i.ref->second.str);
 
-    cmap_str clone = cmap_str_clone(map);
-
-    puts("\ncmap_str clone:");
-    c_foreach (i, cmap_str, clone)
+    puts("\nCLONE MAP:");
+    cmap_str mclone = cmap_str_clone(map);
+    c_foreach (i, cmap_str, mclone)
         printf("  %s: %s\n", i.ref->first.str, i.ref->second.str);
 
-    cvec_ss vec = cvec_ss_init();
-    c_convert(cmap_str, map, cvec_ss, &vec, push_back);
 
-    puts("\nvec_ss:");
-    c_foreach (i, cvec_ss, vec)
-        printf("  %s: %s\n", i.ref->first.str, i.ref->second.str);
+    puts("\nMAP TO VECS:");
+    cvec_str vec1 = cvec_str_init(), vec2 = cvec_str_init();
+    c_foreach (i, cmap_str, mclone) {
+        cvec_str_emplace_back(&vec1, i.ref->first.str);
+        cvec_str_emplace_back(&vec2, i.ref->second.str);
+    }
+    c_forrange (i, cvec_str_size(vec1))
+        printf("  %s: %s\n", vec1.data[i].str, vec2.data[i].str);
 
-    clist_ss list = clist_ss_init();
-    c_convert(cmap_str, map, clist_ss, &list, push_back);
+    puts("\nVEC TO LIST:");
+    clist_str list = clist_str_init();
+    c_foreach (i, cvec_str, vec1) clist_str_emplace_back(&list, i.ref->str);
+    c_foreach (i, clist_str, list) printf("  %s\n", i.ref->str);
 
-    puts("\nclist_ss:");
-    c_foreach (i, clist_ss, list)
-        printf("  %s: %s\n", i.ref->first.str, i.ref->second.str);
-
-    c_del(cmap_str, &map, &clone);
-    cvec_ss_del(&vec);
-    clist_ss_del(&list);
+    c_del(cmap_str, &map, &mclone);
+    c_del(cvec_str, &vec1, &vec2);
+    clist_str_del(&list);
 }
