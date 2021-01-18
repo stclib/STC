@@ -202,9 +202,6 @@ int main(void) {
         return clone; \
     } \
 \
-    STC_API void \
-    C##_##X##_push_n(C##_##X* self, const C##_##X##_rawvalue_t arr[], size_t size); \
-\
     STC_API C##_##X##_value_t* \
     C##_##X##_find(const C##_##X* self, RawKey rkey, C##_##X##_iter_t* it); \
 \
@@ -227,6 +224,10 @@ int main(void) {
     C##_##X##_insert(C##_##X* self, C##_##X##_rawvalue_t raw) { \
         return SET_ONLY_##C( C##_##X##_insert_key(self, raw) ) \
                MAP_ONLY_##C( C##_##X##_emplace(self, raw.first, raw.second) ); \
+    } \
+    STC_INLINE void \
+    C##_##X##_push_n(C##_##X* self, const C##_##X##_rawvalue_t arr[], size_t n) { \
+        for (size_t i=0; i<n; ++i) C##_##X##_insert(self, arr[i]); \
     } \
 \
     MAP_ONLY_##C( \
@@ -307,19 +308,35 @@ static csmap___node_t cbst_nil = {&cbst_nil, &cbst_nil, 0};
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define _implement_CBST(X, C, Key, Mapped, mappedDel, keyCompareRaw, keyDel, \
                            keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
-    STC_DEF void \
-    C##_##X##_push_n(C##_##X* self, const C##_##X##_rawvalue_t arr[], size_t n) { \
-        for (size_t i=0; i<n; ++i) MAP_ONLY_##C( C##_##X##_put(self, arr[i].first, arr[i].second) ) \
-                                   SET_ONLY_##C( C##_##X##_insert(self, arr[i]) ) ; \
-    } \
-    STC_DEF void \
-    C##_##X##_del_r_(C##_##X##_node_t* tn) { \
-        if (tn->level != 0) { \
-            C##_##X##_del_r_(tn->link[0]); \
-            C##_##X##_del_r_(tn->link[1]); \
-            C##_##X##_value_del(&tn->value); \
-            c_free(tn); \
+\
+    STC_DEF C##_##X##_value_t* \
+    C##_##X##_find(const C##_##X* self, C##_##X##_rawkey_t rkey, C##_##X##_iter_t* it) { \
+        C##_##X##_node_t *tn = self->root; \
+        it->_top = 0; \
+        while (tn->level) { \
+            C##_##X##_rawkey_t rx = keyToRaw(KEY_REF_##C(&tn->value)); \
+            switch (keyCompareRaw(&rx, &rkey)) { \
+                case -1: tn = tn->link[1]; break; \
+                case 1: it->_st[it->_top++] = tn; tn = tn->link[0]; break; \
+                case 0: it->ref = &tn->value; it->_tn = tn->link[1]; return it->ref; \
+            } \
         } \
+        return (it->ref = NULL); \
+    } \
+\
+    STC_DEF void \
+    C##_##X##_next(C##_##X##_iter_t *it) { \
+        C##_##X##_node_t *tn = it->_tn; \
+        if (it->_top || tn->level) { \
+            while (tn->level) { \
+                it->_st[it->_top++] = tn; \
+                tn = tn->link[0]; \
+            } \
+            tn = it->_st[--it->_top]; \
+            it->_tn = tn->link[1]; \
+            it->ref = &tn->value; \
+        } else \
+            it->ref = NULL; \
     } \
 \
     static C##_##X##_node_t * \
@@ -343,21 +360,6 @@ static csmap___node_t cbst_nil = {&cbst_nil, &cbst_nil, 0};
             ++tn->level; \
         } \
         return tn; \
-    } \
-\
-    STC_DEF void \
-    C##_##X##_next(C##_##X##_iter_t *it) { \
-        C##_##X##_node_t *tn = it->_tn; \
-        if (it->_top || tn->level) { \
-            while (tn->level) { \
-                it->_st[it->_top++] = tn; \
-                tn = tn->link[0]; \
-            } \
-            tn = it->_st[--it->_top]; \
-            it->_tn = tn->link[1]; \
-            it->ref = &tn->value; \
-        } else \
-            it->ref = NULL; \
     } \
 \
     STC_DEF C##_##X##_node_t* \
@@ -419,21 +421,6 @@ static csmap___node_t cbst_nil = {&cbst_nil, &cbst_nil, 0};
         return tn; \
     } \
 \
-    STC_DEF C##_##X##_value_t* \
-    C##_##X##_find(const C##_##X* self, C##_##X##_rawkey_t rkey, C##_##X##_iter_t* it) { \
-        C##_##X##_node_t *tn = self->root; \
-        it->_top = 0; \
-        while (tn->level) { \
-            C##_##X##_rawkey_t rx = keyToRaw(KEY_REF_##C(&tn->value)); \
-            switch (keyCompareRaw(&rx, &rkey)) { \
-                case -1: tn = tn->link[1]; break; \
-                case 1: it->_st[it->_top++] = tn; tn = tn->link[0]; break; \
-                case 0: it->ref = &tn->value; it->_tn = tn->link[1]; return it->ref; \
-            } \
-        } \
-        return (it->ref = NULL); \
-    } \
-\
     STC_DEF C##_##X##_node_t* \
     C##_##X##_clone_r_(C##_##X##_node_t *tn) { \
         if (! tn->level) return tn; \
@@ -443,6 +430,16 @@ static csmap___node_t cbst_nil = {&cbst_nil, &cbst_nil, 0};
         cn->level = tn->level; \
         C##_##X##_value_copy(&tn->value, &cn->value); \
         return cn; \
+    } \
+\
+    STC_DEF void \
+    C##_##X##_del_r_(C##_##X##_node_t* tn) { \
+        if (tn->level != 0) { \
+            C##_##X##_del_r_(tn->link[0]); \
+            C##_##X##_del_r_(tn->link[1]); \
+            C##_##X##_value_del(&tn->value); \
+            c_free(tn); \
+        } \
     }
 
 #else

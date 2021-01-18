@@ -219,8 +219,6 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     STC_API void \
     C##_##X##_reserve(C##_##X* self, size_t size); \
     STC_API void \
-    C##_##X##_push_n(C##_##X* self, const C##_##X##_rawvalue_t arr[], size_t size); \
-    STC_API void \
     C##_##X##_del(C##_##X* self); \
     STC_API void \
     C##_##X##_clear(C##_##X* self); \
@@ -244,6 +242,10 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     C##_##X##_insert(C##_##X* self, C##_##X##_rawvalue_t raw) { \
         return SET_ONLY_##C(C##_##X##_insert_key(self, raw)) \
                MAP_ONLY_##C(C##_##X##_emplace(self, raw.first, raw.second)); \
+    } \
+    STC_INLINE void \
+    C##_##X##_push_n(C##_##X* self, const C##_##X##_rawvalue_t arr[], size_t n) { \
+        for (size_t i=0; i<n; ++i) C##_##X##_insert(self, arr[i]); \
     } \
 \
     MAP_ONLY_##C( \
@@ -319,11 +321,6 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         C##_##X h = C##_inits; \
         C##_##X##_reserve(&h, cap); \
         return h; \
-    } \
-    STC_DEF void \
-    C##_##X##_push_n(C##_##X* self, const C##_##X##_rawvalue_t arr[], size_t n) { \
-        for (size_t i=0; i<n; ++i) MAP_ONLY_##C(C##_##X##_put(self, arr[i].first, arr[i].second)) \
-                                   SET_ONLY_##C(C##_##X##_insert(self, arr[i])) ; \
     } \
 \
     STC_INLINE void C##_##X##_wipe_(C##_##X* self) { \
