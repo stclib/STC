@@ -134,5 +134,10 @@
     for (size_t __i=0; __i<sizeof __arr/sizeof *__arr; ++__i) \
         ctype##_del(__arr[__i]); \
 } while (0)
+/* For cmap_X and csmap_X only: */
+#define c_try_emplace(self, ctype, rkey, mapped) do { \
+    ctype##_result_t __r = ctype##_insert_key(self, rkey); \
+    if (__r.second) __r.first->second = mapped; \
+} while (0)
 
 #endif

@@ -58,11 +58,6 @@ int main(void) {
 #define cmap_inits    {NULL, NULL, 0, 0, 0.15f, 0.85f}
 #define cset_inits    cmap_inits
 
-#define c_try_emplace(self, C, key, val) do { \
-    C##_result_t __r = C##_insert_key_(self, key); \
-    if (__r.second) __r.first->second = val; \
-} while (0)
-
 /* https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction */
 #define chash_reduce(x, N)            ((uint32_t) (((uint64_t) (x) * (N)) >> 32))
 #define chash_entry_index(h, entryPtr) ((entryPtr) - (h).table)
@@ -235,26 +230,26 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     C##_##X##_contains(const C##_##X* self, RawKey rkey); \
 \
     STC_API C##_##X##_result_t \
-    C##_##X##_insert_key_(C##_##X* self, RawKey rkey); \
+    C##_##X##_insert_key(C##_##X* self, RawKey rkey); \
     STC_API C##_bucket_t \
     C##_##X##_bucket(const C##_##X* self, const C##_##X##_rawkey_t* rkeyptr); \
 \
     STC_INLINE C##_##X##_result_t \
     C##_##X##_emplace(C##_##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
-        C##_##X##_result_t res = C##_##X##_insert_key_(self, rkey); \
+        C##_##X##_result_t res = C##_##X##_insert_key(self, rkey); \
         MAP_ONLY_##C( if (res.second) res.first->second = mappedFromRaw(rmapped); ) \
         return res; \
     } \
     STC_INLINE C##_##X##_result_t \
     C##_##X##_insert(C##_##X* self, C##_##X##_rawvalue_t raw) { \
-        return SET_ONLY_##C(C##_##X##_insert_key_(self, raw)) \
+        return SET_ONLY_##C(C##_##X##_insert_key(self, raw)) \
                MAP_ONLY_##C(C##_##X##_emplace(self, raw.first, raw.second)); \
     } \
 \
     MAP_ONLY_##C( \
     STC_INLINE C##_##X##_result_t \
     C##_##X##_put(C##_##X* self, RawKey rkey, RawMapped rmapped) { \
-        C##_##X##_result_t res = C##_##X##_insert_key_(self, rkey); \
+        C##_##X##_result_t res = C##_##X##_insert_key(self, rkey); \
         if (!res.second) mappedDel(&res.first->second); \
         res.first->second = mappedFromRaw(rmapped); return res; \
     } \
@@ -264,7 +259,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     } \
     STC_INLINE C##_##X##_result_t \
     C##_##X##_put_mapped(C##_##X* self, RawKey rkey, Mapped mapped) { \
-        C##_##X##_result_t res = C##_##X##_insert_key_(self, rkey); \
+        C##_##X##_result_t res = C##_##X##_insert_key(self, rkey); \
         if (!res.second) mappedDel(&res.first->second); \
         res.first->second = mapped; return res; \
     } \
@@ -383,7 +378,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
             C##_##X##_reserve(self, 5 + self->size * 3 / 2); \
     } \
     STC_DEF C##_##X##_result_t \
-    C##_##X##_insert_key_(C##_##X* self, RawKey rkey) { \
+    C##_##X##_insert_key(C##_##X* self, RawKey rkey) { \
         C##_##X##_reserve_expand_(self); \
         C##_bucket_t b = C##_##X##_bucket(self, &rkey); \
         C##_##X##_result_t res = {&self->table[b.idx], !self->_hashx[b.idx]}; \
