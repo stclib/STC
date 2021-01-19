@@ -47,21 +47,21 @@ int main(void) {
     c_MACRO_OVERLOAD(using_csmap, __VA_ARGS__)
 
 #define using_csmap_3(X, Key, Mapped) \
-    using_csmap_5(X, Key, Mapped, c_default_del, c_default_clone)
+    using_csmap_4(X, Key, Mapped, c_default_compare)
 
-#define using_csmap_5(X, Key, Mapped, mappedDel, mappedClone) \
-    using_csmap_6(X, Key, Mapped, mappedDel, mappedClone, c_default_compare)
+#define using_csmap_4(X, Key, Mapped, keyCompare) \
+    using_csmap_6(X, Key, Mapped, keyCompare, c_default_del, c_default_clone)
 
-#define using_csmap_6(X, Key, Mapped, mappedDel, mappedClone, keyCompare) \
-    using_csmap_8(X, Key, Mapped, mappedDel, mappedClone, keyCompare, c_default_del, c_default_clone)
+#define using_csmap_6(X, Key, Mapped, keyCompare, mappedDel, mappedClone) \
+    using_csmap_8(X, Key, Mapped, keyCompare, mappedDel, mappedClone, c_default_del, c_default_clone)
 
-#define using_csmap_8(X, Key, Mapped, mappedDel, mappedClone, keyCompare, keyDel, keyClone) \
-    using_csmap_10(X, Key, Mapped, mappedDel, mappedClone, keyCompare, keyDel, \
-                      keyClone, c_default_to_raw, Key)
+#define using_csmap_8(X, Key, Mapped, keyCompare, mappedDel, mappedClone, keyDel, keyClone) \
+    using_csmap_10(X, Key, Mapped, keyCompare, mappedDel, mappedClone, \
+                      keyDel, keyClone, c_default_to_raw, Key)
 
-#define using_csmap_10(X, Key, Mapped, mappedDel, mappedClone, keyCompareRaw, keyDel, \
-                          keyFromRaw, keyToRaw, RawKey) \
-    _using_CBST(X, csmap, Key, Mapped, mappedDel, keyCompareRaw, keyDel, \
+#define using_csmap_10(X, Key, Mapped, keyCompareRaw, mappedDel, mappedClone, \
+                          keyDel, keyFromRaw, keyToRaw, RawKey) \
+    _using_CBST(X, csmap, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \
                    keyFromRaw, keyToRaw, RawKey, mappedClone, c_default_to_raw, Mapped)
 
 /* csset: */
@@ -78,14 +78,14 @@ int main(void) {
     using_csset_7(X, Key, keyCompare, keyDel, keyClone, c_default_to_raw, Key)
 
 #define using_csset_7(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
-    _using_CBST(X, csset, Key, Key, _UNUSED_, keyCompareRaw, keyDel, \
+    _using_CBST(X, csset, Key, Key, keyCompareRaw, _UNUSED_, keyDel, \
                    keyFromRaw, keyToRaw, RawKey, _UNUSED_, _UNUSED_, void)
 
 /* csset_str, csmap_str, csmap_strkey, csmap_strval: */
 #define using_csset_str() \
     _using_CBST_strkey(str, csset, cstr_t, _UNUSED_, _UNUSED_)
 #define using_csmap_str() \
-    _using_CBST(str, csmap, cstr_t, cstr_t, cstr_del, cstr_compare_raw, cstr_del, \
+    _using_CBST(str, csmap, cstr_t, cstr_t, cstr_compare_raw, cstr_del, cstr_del, \
                      cstr_from, cstr_to_raw, const char*, cstr_from, cstr_to_raw, const char*)
 
 #define using_csmap_strkey(...) \
@@ -98,7 +98,7 @@ int main(void) {
     _using_CBST_strkey(X, csmap, Mapped, mappedDel, mappedClone)
 
 #define _using_CBST_strkey(X, C, Mapped, mappedDel, mappedClone) \
-    _using_CBST(X, C, cstr_t, Mapped, mappedDel, cstr_compare_raw, cstr_del, \
+    _using_CBST(X, C, cstr_t, Mapped, cstr_compare_raw, mappedDel, cstr_del, \
                    cstr_from, cstr_to_raw, const char*, mappedClone, c_default_to_raw, Mapped)
 
 #define using_csmap_strval(...) \
@@ -114,7 +114,7 @@ int main(void) {
     using_csmap_strval_7(X, Key, keyCompare, keyDel, keyClone, c_default_to_raw, Key)
 
 #define using_csmap_strval_7(X, Key, keyCompare, keyDel, keyFromRaw, keyToRaw, RawKey) \
-    _using_CBST(X, csmap, Key, cstr_t, cstr_del, keyCompare, keyDel, \
+    _using_CBST(X, csmap, Key, cstr_t, keyCompare, cstr_del, keyDel, \
                    keyFromRaw, keyToRaw, RawKey, cstr_from, cstr_to_raw, const char*)
 
 #define SET_ONLY_csset(...) __VA_ARGS__
@@ -146,7 +146,7 @@ int main(void) {
     } C##_##X##_iter_t
 
 
-#define _using_CBST(X, C, Key, Mapped, mappedDel, keyCompareRaw, keyDel, \
+#define _using_CBST(X, C, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \
                         keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
     _using_CBST_types(X, C, Key, Mapped); \
 \
@@ -301,7 +301,7 @@ int main(void) {
         return C##_##X##_erase(self, keyToRaw(KEY_REF_##C(pos.ref))); \
     } \
 \
-    _implement_CBST(X, C, Key, Mapped, mappedDel, keyCompareRaw, keyDel, \
+    _implement_CBST(X, C, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \
                        keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
     typedef C##_##X C##_##X##_t
 
@@ -311,7 +311,7 @@ static csmap___node_t cbst_nil = {&cbst_nil, &cbst_nil, 0};
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define _implement_CBST(X, C, Key, Mapped, mappedDel, keyCompareRaw, keyDel, \
+#define _implement_CBST(X, C, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \
                            keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
 \
     STC_DEF C##_##X##_value_t* \
@@ -448,7 +448,7 @@ static csmap___node_t cbst_nil = {&cbst_nil, &cbst_nil, 0};
     }
 
 #else
-#define _implement_CBST(X, C, Key, Mapped, mappedDel, keyCompareRaw, keyDel, \
+#define _implement_CBST(X, C, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \
                            keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped)
 #endif
 

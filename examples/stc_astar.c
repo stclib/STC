@@ -67,8 +67,8 @@ typedef struct {
 
 using_cdeq(mp, MazePoint, mpoint_compare_priority);
 using_cpque(mp, cdeq_mp, <);
-using_csmap(ms, MazePoint, MazePoint, c_default_del, c_default_clone, mpoint_key_compare); // step
-using_csmap(mc, MazePoint, int, c_default_del, c_default_clone, mpoint_key_compare); // cost
+using_csmap(ms, MazePoint, MazePoint, mpoint_key_compare); // step
+using_csmap(mc, MazePoint, int, mpoint_key_compare); // cost
 
 
 cdeq_mp

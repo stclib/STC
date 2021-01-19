@@ -7,9 +7,9 @@ See [std::map](https://en.cppreference.com/w/cpp/container/map) for a similar c+
 ## Declaration
 
 ```c
-#define using_csmap(X, Key, Mapped, mappedDestroy=c_default_del,
+#define using_csmap(X, Key, Mapped, keyCompareRaw=c_default_compare,
+                                    mappedDestroy=c_default_del,
                                     mappedClone=c_default_clone,
-                                    keyCompareRaw=c_default_compare,
                                     keyDestroy=c_default_del,
                                     keyFromRaw=c_default_clone,
                                     keyToRaw=c_default_to_raw,
