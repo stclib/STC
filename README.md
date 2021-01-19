@@ -9,7 +9,7 @@ Introduction
 An modern, templated, user-friendly, fast, fully typesafe, and customizable container library for C99, with a uniform API.
 This is a compact headers-only library with the all of the standard data containers, and a few algorithms:
 - [***carray*** - Templated **multi-dimensional array** type](docs/carray_api.md)
-- [***cbitset*** - A **std::bitset** / **boost::dynamic_bitset** alike type](docs/cbitset_api.md)
+- [***cbits*** - A **std::bitset** / **boost::dynamic_bitset** alike type](docs/cbits_api.md)
 - [***cdeq*** - Templated **std::deque** alike type](docs/cdeq_api.md)
 - [***clist*** - Templated **std::forward_list** alike type](docs/clist_api.md)
 - [***cmap*** - Templated **std::unordered_map** alike type](docs/cmap_api.md)
@@ -30,7 +30,7 @@ Others:
 
 The usage of the containers is similar to the C++ standard containers in STL, so it should be easy if you are familiar with them.
 
-All containers mentioned above, except cstr_t and cbitset_t, are generic and therefore typesafe (similar to templates in C++).
+All containers mentioned above, except cstr_t and cbits_t, are generic and therefore typesafe (similar to templates in C++).
 No casting is used. A simple example:
 ```c
 #include <stc/cvec.h>

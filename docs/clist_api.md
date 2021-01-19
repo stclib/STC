@@ -1,10 +1,11 @@
 # STC Container [clist](../stc/clist.h): Forward List
 ![List](pics/list.jpg)
 
-This is similar to c++ [std::forward_list](https://en.cppreference.com/w/cpp/container/forward_list), but supports both
-*push_front()* and *push_back()* as well as *pop_front()* in **O**(1) time. Implemented as a circular singly linked list.
-Also supports various *splice* functions and *merge-sort*. Note that like std::forward_list, the representation size of **clist**
-is only one pointer, and length of the list is not stored. The method *clist_X_size()* is therefore computed in **O**(*n*) time.
+The **clist** container supports fast insertion and removal of elements from anywhere in the container. It is similar to the c++ [std::forward_list](https://en.cppreference.com/w/cpp/container/forward_list), but **clist** also supports *push_back()* (**O**(1) time). It is implemented as a circular singly-linked list. Fast random access is not supported.
+
+Adding, removing and moving the elements within the list, or across several lists, does not invalidate the iterators currently referring to other elements in the list. However, an iterator or reference referring to an element is invalidated when the corresponding element is removed (via *erase_after*) from the list.
+
+**clist** also supports various *splice* functions and *merge-sort*. **clist** itself occupies only one pointer in memory, like *std::forward_list*, the length of **clist** is not stored. The method *clist_X_size()* is available, however computed in **O**(*n*) time.
 
 ## Declaration
 

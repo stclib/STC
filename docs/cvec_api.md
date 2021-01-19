@@ -4,6 +4,10 @@
 A **cvec** is a sequence container that encapsulates dynamic size arrays.
 See [std::vector](https://en.cppreference.com/w/cpp/container/vector) for a similar c++ class.
 
+The storage of the vector is handled automatically, being expanded and contracted as needed. Vectors usually occupy more space than static arrays, because more memory is allocated to handle future growth. This way a vector does not need to reallocate each time an element is inserted, but only when the additional memory is exhausted. The total amount of allocated memory can be queried using *cvec_X_capacity()* function. Extra memory can be returned to the system via a call to *cvec_X_shrink_to_fit()*.
+
+Reallocations are usually costly operations in terms of performance. The *cvec_X_reserve()* function can be used to eliminate reallocations if the number of elements is known beforehand.
+
 ## Declaration
 
 ```c

@@ -38,7 +38,7 @@ be replaced by `my` in all of the following documentation.
 All csset definitions and prototypes may be included in your C source file by including a single header file.
 
 ```c
-#include "stc/csmap.h"
+#include "stc/csmap.h" // both csmap and csset
 ```
 ## Methods
 

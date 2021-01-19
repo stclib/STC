@@ -44,7 +44,7 @@ be replaced by `my` in all of the following documentation.
 All cset definitions and prototypes may be included in your C source file by including a single header file.
 
 ```c
-#include "stc/cmap.h"
+#include "stc/cmap.h"  // both cmap and cset
 ```
 ## Methods
 

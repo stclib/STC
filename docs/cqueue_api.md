@@ -10,7 +10,7 @@ See [std::queue](https://en.cppreference.com/w/cpp/container/queue) for a simila
 #define using_cqueue(X, ctype)
 ```
 The macro `using_cqueue()` must be instantiated in the global scope. **cqueue** uses normally
-a **clist** type as underlying implementation, given as `ctype`. `X` is a type tag name and
+a **cdeq_X** or **clist_X** type as underlying implementation, given as `ctype`. `X` is a type tag name and
 will affect the names of all cqueue types and methods. E.g. declaring `using_cqueue(my, clist_my);`,
 `X` should be replaced by `my` in all of the following documentation.
 

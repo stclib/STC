@@ -1,7 +1,7 @@
 # STC Container [cdeq](../stc/cdeq.h): Double Ended Queue
 ![Deque](pics/deque.jpg)
 
-A **cdeq** is an indexed sequence container that allows fast insertion and deletion at both its beginning and its end.
+A **cdeq** is an indexed sequence container that allows fast insertion and deletion at both its beginning and its end. Note that this container is implemented similar to a vector, but has the same performance profile for both *push_back()* and *push_front()* as *cvec_X_push_back()*. Iterators may be invalidated after push-operations.
 See [std::deque](https://en.cppreference.com/w/cpp/container/deque) for a similar c++ class.
 
 ## Declaration

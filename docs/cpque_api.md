@@ -1,7 +1,10 @@
 # STC Container [cpque](../stc/cpque.h): Priority Queue
 
-This describes the API of the priority queue type **cpque**. It is implemented as a heap.
+A priority queue is a container adaptor that provides constant time lookup of the largest (by default) element, at the expense of logarithmic insertion and extraction.
+
 See [std::priority_queue](https://en.cppreference.com/w/cpp/container/priority_queue) for a similar c++ class.
+
+Working with a priority_queue is similar to managing a heap in some random access container, with the benefit of not being able to accidentally invalidate the heap.
 
 ## Declaration
 
@@ -9,8 +12,9 @@ See [std::priority_queue](https://en.cppreference.com/w/cpp/container/priority_q
 #define using_cpque(X, ctype, heap_variant)
 ```
 The macro `using_cpque()` must be instantiated in the global scope.
-**cpque** uses normally a **cvec** type as underlying implementation, specified as `ctype`.
-The `heap_variant` must be given as `<` or `>`, specifying *max-heap* or *min-heap* for the priority queue.
+**cpque** uses normally **cvec_X** or **cdeq_X** as underlying implementation, specified as `ctype`.
+The `heap_variant` must be given as `<` or `>`, specifying *max-heap* or *min-heap* for the priority queue to change the ordering, e.g. `>` would cause the smallest element to appear as the *cpque_X_top()*.
+
 Note that the function `{ctype}_value_compare(x, y)` defined by the underlying vector type is used to
 compare values (priorities). `X` is a type tag name and will affect the names of all cpque types and methods.
 Declaring `using_cpque(my, cvec_my, >);`, `X` should be replaced by `my` in the following documentation.

@@ -1,57 +1,57 @@
 #include <stdio.h>
-#include <stc/cbitset.h>
+#include <stc/cbits.h>
 
 int main() {
-    cbitset_t set = cbitset_with_size(23, true);
-    printf("count %zu, %zu\n", cbitset_count(set), set.size);
+    cbits_t set = cbits_with_size(23, true);
+    printf("count %zu, %zu\n", cbits_count(set), set.size);
 
-    cbitset_reset(&set, 9);
-    cbitset_resize(&set, 43, false);
+    cbits_reset(&set, 9);
+    cbits_resize(&set, 43, false);
     c_withbuffer (str, char, set.size + 1)
-        printf(" str: %s\n", cbitset_to_str(set, str, 0, -1));
+        printf(" str: %s\n", cbits_to_str(set, str, 0, -1));
 
     printf("%4zu: ", set.size);
     c_forrange (i, int, set.size)
-        printf("%d", cbitset_test(set, i));
+        printf("%d", cbits_test(set, i));
     puts("");
 
-    cbitset_set(&set, 28);
-    cbitset_resize(&set, 77, true);
-    cbitset_resize(&set, 93, false);
-    cbitset_resize(&set, 102, true);
-    cbitset_set_value(&set, 99, false);
+    cbits_set(&set, 28);
+    cbits_resize(&set, 77, true);
+    cbits_resize(&set, 93, false);
+    cbits_resize(&set, 102, true);
+    cbits_set_value(&set, 99, false);
     printf("%4zu: ", set.size);
     c_forrange (i, int, set.size)
-        printf("%d", cbitset_test(set, i));
+        printf("%d", cbits_test(set, i));
 
     puts("\nIterator:");
     printf("%4zu: ", set.size);
-    c_foreach (i, cbitset, set)
-        printf("%d", cbitset_itval(i));
+    c_foreach (i, cbits, set)
+        printf("%d", cbits_itval(i));
     puts("");
 
-    cbitset_t s2 = cbitset_clone(set);
-    cbitset_flip_all(&s2);
-    cbitset_set(&s2, 16);
-    cbitset_set(&s2, 17);
-    cbitset_set(&s2, 18);
+    cbits_t s2 = cbits_clone(set);
+    cbits_flip_all(&s2);
+    cbits_set(&s2, 16);
+    cbits_set(&s2, 17);
+    cbits_set(&s2, 18);
     printf(" new: ");
     c_forrange (i, int, s2.size)
-        printf("%d", cbitset_test(s2, i));
+        printf("%d", cbits_test(s2, i));
     puts("");
 
     printf(" xor: ");
-    cbitset_xor_with(&set, s2);
+    cbits_xor_with(&set, s2);
     c_forrange (i, int, set.size)
-        printf("%d", cbitset_test(set, i));
+        printf("%d", cbits_test(set, i));
     puts("");
 
-    cbitset_set_all(&set, false);
+    cbits_set_all(&set, false);
     printf("%4zu: ", set.size);
     c_forrange (i, int, set.size)
-        printf("%d", cbitset_test(set, i));
+        printf("%d", cbits_test(set, i));
     puts("");
 
-    cbitset_del(&s2);
-    cbitset_del(&set);
+    cbits_del(&s2);
+    cbits_del(&set);
 }
