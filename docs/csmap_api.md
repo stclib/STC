@@ -25,7 +25,7 @@ See [std::map](https://en.cppreference.com/w/cpp/container/map) for a similar c+
                                    RawKey=Key)
 #define using_csmap_str()
 ```
-The macro `using_csmap()` can be instantiated with 3, 5, 6, 8, or 10 arguments in the global scope.
+The macro `using_csmap()` can be instantiated with 3, 4, 6, 8, or 10 arguments in the global scope.
 Default values are given above for args not specified. `X` is a type tag name and
 will affect the names of all csmap types and methods. E.g. declaring `using_csmap(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.

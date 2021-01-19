@@ -41,8 +41,8 @@ DEFMAP(map_i, <int, int>);
 DEFMAP(map_x, <uint64_t, uint64_t>);
 DEFMAP(map_s, <std::string, std::string>);
 
-using_cmap(i, int, int, c_default_del, c_default_clone, c_default_equals, hash32);
-using_cmap(x, uint64_t, uint64_t, c_default_del, c_default_clone, c_default_equals, hash64);
+using_cmap(i, int, int, c_default_equals, hash32);
+using_cmap(x, uint64_t, uint64_t, c_default_equals, hash64);
 using_cmap_strkey(s, cstr, cstr_del, cstr_clone);
 
 template <class MapInt>

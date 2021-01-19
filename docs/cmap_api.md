@@ -8,10 +8,10 @@ See [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_m
 ## Declaration
 
 ```c
-#define using_cmap(X, Key, Mapped, mappedDestroy=c_default_del,
-                                   mappedClone=c_default_clone,
-                                   keyEqualsRaw=c_default_equals,
+#define using_cmap(X, Key, Mapped, keyEqualsRaw=c_default_equals,
                                    keyHashRaw=c_default_hash,
+                                   mappedDestroy=c_default_del,
+                                   mappedClone=c_default_clone,
                                    keyDestroy=c_default_del,
                                    keyFromRaw=c_default_clone,
                                    keyToRaw=c_default_to_raw,
@@ -202,9 +202,7 @@ Demonstrate cmap with plain-old-data key type Vec3i and int as mapped type: cmap
 
 typedef struct { int x, y, z; } Vec3i;
 
-using_cmap(v3, Vec3i, int, c_default_del,     // mapped: empty int destroy func
-                           c_default_clone,   // mapped: clone int by "memcpy"
-                           c_mem_equals,      // key: compare Vec3i bit-by-bit 
+using_cmap(v3, Vec3i, int, c_mem_equals,      // key: compare Vec3i bit-by-bit 
                            c_default_hash32); // key: hash Vec3i in 32-bits word-by-word.
 
 int main()
@@ -303,8 +301,8 @@ static inline VikingRaw viking_toRaw(Viking* vk) {
 
 // With this in place, we use the full using_cmap() macro to define {Viking -> int} hash map type:
 
-using_cmap(vk, Viking, int, c_default_del, c_default_clone,
-                            vikingraw_equals, vikingraw_hash,
+using_cmap(vk, Viking, int, vikingraw_equals, vikingraw_hash,
+                            c_default_del, c_default_clone, // mapped: int => use default.
                             viking_del, viking_fromRaw, viking_toRaw, VikingRaw);
 
 int main()
