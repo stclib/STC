@@ -14,27 +14,27 @@
 typedef struct {
     int x, y;
     int priorty, width;
-} MapPoint;
+} MazePoint;
 
-MapPoint
+MazePoint
 mpoint_init(int x, int y, int width)
 {
-    return (MapPoint) { x, y, 0, width };
+    return (MazePoint) { x, y, 0, width };
 }
 
 int
-mpoint_compare_priority(const MapPoint* a, const MapPoint* b)
+mpoint_compare_priority(const MazePoint* a, const MazePoint* b)
 {
     return a->priorty < b->priorty;
 }
 
 int
-mpoint_equal(MapPoint* a, MapPoint* b)
+mpoint_equal(MazePoint* a, MazePoint* b)
 {
     return a->x == b->x && a->y == b->y;
 }
 
-MapPoint
+MazePoint
 mpoint_from(cstr maze, const char* c, int width)
 {
     int index = cstr_find(maze, c);
@@ -42,65 +42,54 @@ mpoint_from(cstr maze, const char* c, int width)
 }
 
 int
-mpoint_index(const MapPoint* p)
+mpoint_index(const MazePoint* p)
 {
     return p->x + p->width * p->y;
 }
 
 int
-mpoint_key_compare(const MapPoint* a, const MapPoint* b)
+mpoint_key_compare(const MazePoint* a, const MazePoint* b)
 {
     int i = mpoint_index(a);
     int j = mpoint_index(b);
-    return (j < i) - (i < j);
+    return (i > j) - (i < j);
 }
 
 typedef struct {
-    MapPoint point;
+    MazePoint point;
     int value;
-} PointCost;
+} MazeCost;
 
 typedef struct {
-    MapPoint a;
-    MapPoint b;
-} MapStep;
+    MazePoint a;
+    MazePoint b;
+} MazeStep;
 
-int
-mstep_key_compare(const MapStep* a, const MapStep* b)
-{
-    return mpoint_key_compare(&a->a, &b->a);
-}
-
-int
-pcost_key_compare(const PointCost* a, const PointCost* b)
-{
-    return mpoint_key_compare(&a->point, &b->point);
-}
-
-using_cdeq(pt, MapPoint, mpoint_compare_priority);
-using_cpque(pt, cdeq_pt, <);
-using_csset(ms, MapStep, mstep_key_compare);
-using_csset(pc, PointCost, pcost_key_compare);
+using_cdeq(mp, MazePoint, mpoint_compare_priority);
+using_cpque(mp, cdeq_mp, <);
+using_csmap(ms, MazePoint, MazePoint, c_default_del, c_default_clone, mpoint_key_compare); // step
+using_csmap(mc, MazePoint, int, c_default_del, c_default_clone, mpoint_key_compare); // cost
 
 
-cdeq_pt
+cdeq_mp
 astar(cstr maze, int width)
 {
-    MapPoint start = mpoint_from(maze, "@", width);
-    MapPoint goal = mpoint_from(maze, "!", width);
-    cpque_pt frontier = cpque_pt_init();
-    cpque_pt_push(&frontier, start);
-    csset_ms came_from = csset_ms_init();
-    csset_pc cost_so_far = csset_pc_init();
-    csset_pc_insert(&cost_so_far, (PointCost) {start, 0});
+    MazePoint start = mpoint_from(maze, "@", width);
+    MazePoint goal = mpoint_from(maze, "!", width);
+    cpque_mp frontier = cpque_mp_init();
+    csmap_ms came_from = csmap_ms_init();
+    csmap_mc cost_so_far = csmap_mc_init();
 
-    while (!cpque_pt_empty(frontier))
+    cpque_mp_push(&frontier, start);
+    csmap_mc_emplace(&cost_so_far, start, 0);
+
+    while (!cpque_mp_empty(frontier))
     {
-        MapPoint current = *cpque_pt_top(&frontier);
-        cpque_pt_pop(&frontier);
+        MazePoint current = *cpque_mp_top(&frontier);
+        cpque_mp_pop(&frontier);
         if (mpoint_equal(&current, &goal))
             break;
-        MapPoint deltas[] = {
+        MazePoint deltas[] = {
             { -1, +1, 0, width }, { 0, +1, 0, width }, { 1, +1, 0, width },
             { -1,  0, 0, width }, /* ~ ~ ~ ~ ~ ~ ~ */  { 1,  0, 0, width },
             { -1, -1, 0, width }, { 0, -1, 0, width }, { 1, -1, 0, width },
@@ -108,34 +97,34 @@ astar(cstr maze, int width)
 
         for (size_t i = 0; i < c_arraylen(deltas); i++)
         {
-            MapPoint delta = deltas[i];
-            MapPoint next = mpoint_init(current.x + delta.x, current.y + delta.y, width);
-            int new_cost = csset_pc_find(&cost_so_far, (PointCost) {.point = current})->value;
+            MazePoint delta = deltas[i];
+            MazePoint next = mpoint_init(current.x + delta.x, current.y + delta.y, width);
+            int new_cost = *csmap_mc_at(&cost_so_far, current);
             if (maze.str[mpoint_index(&next)] != '#')
             {
-                csset_pc_value_t* cost = csset_pc_find(&cost_so_far, (PointCost) {.point = next});
-                if (!cost || new_cost < cost->value)
+                csmap_mc_value_t* cost = csmap_mc_find(&cost_so_far, next);
+                if (!cost || new_cost < cost->second)
                 {
-                    csset_pc_insert(&cost_so_far, (PointCost) {next, new_cost});
+                    csmap_mc_emplace(&cost_so_far, next, new_cost);
                     next.priorty = new_cost + abs(goal.x - next.x) + abs(goal.y - next.y);
-                    cpque_pt_push(&frontier, next);
-                    csset_ms_insert(&came_from, (MapStep) { next, current });
+                    cpque_mp_push(&frontier, next);
+                    csmap_ms_emplace(&came_from, next, current);
                 }
             }
         }
     }
-    MapPoint current = goal;
-    cdeq_pt path = cdeq_pt_init();
+    MazePoint current = goal;
+    cdeq_mp path = cdeq_mp_init();
 
     while(!mpoint_equal(&current, &start))
     {
-        cdeq_pt_push_front(&path, current);
-        current = csset_ms_find(&came_from, (MapStep) {.a = current})->b;
+        cdeq_mp_push_front(&path, current);
+        current = *csmap_ms_at(&came_from, current);
     }
-    cdeq_pt_push_front(&path, start);
-    cpque_pt_del(&frontier);
-    csset_ms_del(&came_from);
-    csset_pc_del(&cost_so_far);
+    cdeq_mp_push_front(&path, start);
+    cpque_mp_del(&frontier);
+    csmap_ms_del(&came_from);
+    csmap_mc_del(&cost_so_far);
     return path;
 }
 
@@ -167,14 +156,14 @@ main(void)
         "#   #                   #           #               #               #   #\n"
         "#########################################################################\n");
     int width = cstr_find(maze, "\n") + 1;
-    cdeq_pt path = astar(maze, width);
+    cdeq_mp path = astar(maze, width);
 
-    printf("length: %zu\n", cdeq_pt_size(path));
+    printf("length: %zu\n", cdeq_mp_size(path));
 
-    c_foreach (it, cdeq_pt, path)
-        maze.str[mpoint_index(it.ref)] = 'c';
+    c_foreach (it, cdeq_mp, path)
+        maze.str[mpoint_index(it.ref)] = 't';
 
     printf("%s", maze.str);
     cstr_del(&maze);
-    cdeq_pt_del(&path);
+    cdeq_mp_del(&path);
 }
