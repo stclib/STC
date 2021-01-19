@@ -182,14 +182,13 @@ Demonstrate csmap with plain-old-data key type Vec3i and int as mapped type: csm
 typedef struct { int x, y, z; } Vec3i;
 
 static int Vec3i_compare(const Vec3i* a, const Vec3i* b) {
+    // optimal way to return -1, 0, 1:
     if (a->x != b->x) return 1 - ((a->x < b->x)<<1);
     if (a->y != b->y) return 1 - ((a->y < b->y)<<1);
-    return c_default_compare(&a->z, &b->z);
+    return (a->z > b->z) - (a->z < b->z);
 }
 
-using_csmap(v3, Vec3i, int, c_default_del,     // mapped: empty int destroy func
-                            c_default_clone,   // mapped: clone int by "memcpy"
-                            Vec3i_compare);    // key: compare Vec3i 
+using_csmap(v3, Vec3i, int, Vec3i_compare);
 
 int main()
 {
