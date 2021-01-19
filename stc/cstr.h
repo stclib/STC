@@ -178,6 +178,8 @@ STC_INLINE void
 cstr_replace(cstr_t* self, size_t pos, size_t len, const char* str) {
     cstr_replace_n(self, pos, len, str, strlen(str));
 }
+STC_INLINE void
+cstr_erase(cstr_t* self, size_t pos) {cstr_erase_n(self, pos, 1);}
 
 STC_INLINE bool
 cstr_getline(cstr_t *self, FILE *stream) {

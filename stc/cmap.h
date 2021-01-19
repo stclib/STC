@@ -240,8 +240,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     } \
     STC_INLINE C##_##X##_result_t \
     C##_##X##_insert(C##_##X* self, C##_##X##_rawvalue_t raw) { \
-        return SET_ONLY_##C(C##_##X##_insert_key(self, raw)) \
-               MAP_ONLY_##C(C##_##X##_emplace(self, raw.first, raw.second)); \
+        return SET_ONLY_##C( C##_##X##_insert_key(self, raw) ) \
+               MAP_ONLY_##C( C##_##X##_emplace(self, raw.first, raw.second) ); \
     } \
     STC_INLINE void \
     C##_##X##_push_n(C##_##X* self, const C##_##X##_rawvalue_t arr[], size_t n) { \
@@ -287,8 +287,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         while ((++it->ref, *++it->_hx == 0)) ; \
     } \
     STC_INLINE C##_##X##_mapped_t* \
-    C##_##X##_itval(C##_##X##_iter_t it) {return MAP_ONLY_##C(&it.ref->second) \
-                                                         SET_ONLY_##C(it.ref);} \
+    C##_##X##_itval(C##_##X##_iter_t it) {return SET_ONLY_##C( it.ref ) \
+                                                 MAP_ONLY_##C( &it.ref->second );} \
 \
     STC_API void \
     C##_##X##_erase_entry(C##_##X* self, C##_##X##_value_t* val); \

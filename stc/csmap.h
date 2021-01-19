@@ -284,8 +284,8 @@ int main(void) {
         C##_##X##_iter_t it = {NULL}; return it; \
     } \
     STC_INLINE C##_##X##_mapped_t* \
-    C##_##X##_itval(C##_##X##_iter_t it) {return MAP_ONLY_##C( &it.ref->second ) \
-                                                 SET_ONLY_##C( it.ref );} \
+    C##_##X##_itval(C##_##X##_iter_t it) {return SET_ONLY_##C( it.ref ) \
+                                                 MAP_ONLY_##C( &it.ref->second );} \
 \
     STC_API C##_##X##_node_t* \
     C##_##X##_erase_r_(C##_##X##_node_t *tn, const C##_##X##_rawkey_t* rkey, int *erased); \
