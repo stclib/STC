@@ -25,7 +25,8 @@ mpoint_init(int x, int y, int width)
 int
 mpoint_compare_priority(const MazePoint* a, const MazePoint* b)
 {
-    return a->priorty < b->priorty;
+    // NB! returning 0 gives 14 steps shorter path!? hmm..
+    return (a->priorty > b->priorty) - (a->priorty < b->priorty);
 }
 
 int
@@ -66,7 +67,7 @@ typedef struct {
 } MazeStep;
 
 using_cdeq(mp, MazePoint, mpoint_compare_priority);
-using_cpque(mp, cdeq_mp, <);
+using_cpque(mp, cdeq_mp, >);
 using_csmap(ms, MazePoint, MazePoint, mpoint_key_compare); // step
 using_csmap(mc, MazePoint, int, mpoint_key_compare); // cost
 
@@ -161,7 +162,7 @@ main(void)
     printf("length: %zu\n", cdeq_mp_size(path));
 
     c_foreach (it, cdeq_mp, path)
-        maze.str[mpoint_index(it.ref)] = 't';
+        maze.str[mpoint_index(it.ref)] = 'o';
 
     printf("%s", maze.str);
     cstr_del(&maze);
