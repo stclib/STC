@@ -1,18 +1,18 @@
 # STC Container [cqueue](../stc/cqueue.h): Queue
 ![Queue](pics/queue.jpg)
 
-This describes the API of the queue type **cqueue**.
-See [std::queue](https://en.cppreference.com/w/cpp/container/queue) for a similar c++ class.
+The **cqueue** is container adapter that gives the programmer the functionality of a queue - specifically, a FIFO (first-in, first-out) data structure. The class template acts as a wrapper to the underlying container - only a specific set of functions is provided. The queue pushes the elements on the back of the underlying container and pops them from the front.
+
+See the c++ class [std::queue](https://en.cppreference.com/w/cpp/container/queue) for a functional reference.
 
 ## Declaration
-
 ```c
 #define using_cqueue(X, ctype)
 ```
 The macro `using_cqueue()` must be instantiated in the global scope. **cqueue** uses normally
-a **cdeq_X** or **clist_X** type as underlying implementation, given as `ctype`. `X` is a type tag name and
-will affect the names of all cqueue types and methods. E.g. declaring `using_cqueue(my, clist_my);`,
-`X` should be replaced by `my` in all of the following documentation.
+a **cdeq_X** or **clist_X** type as underlying implementation, given as `ctype`. See example below for usage.
+`X` is a type tag name and will affect the names of all cqueue types and methods. E.g. declaring 
+`using_cqueue(my, clist_my)`, `X` should be replaced by `my` in all of the following documentation.
 
 ## Header file
 
