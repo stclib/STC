@@ -2,8 +2,12 @@
 #include <stc/cbits.h>
 
 int main() {
-    cbits_t set = cbits_with_size(23, true);
+    cbits set = cbits_with_size(23, true);
     printf("count %zu, %zu\n", cbits_count(set), set.size);
+    cbits s1 = cbits_from_str("1110100110111");
+    char buf[256];
+    cbits_to_str(s1, buf, 0, -1);
+    printf("buf: %s: %zu\n", buf, cbits_count(s1));
 
     cbits_reset(&set, 9);
     cbits_resize(&set, 43, false);

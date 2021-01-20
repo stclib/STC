@@ -1,21 +1,21 @@
 #include <stdio.h>
 #include <stc/cbits.h>
 
-static inline cbits_t sieveOfEratosthenes(size_t n)
+static inline cbits sieveOfEratosthenes(size_t n)
 {
-    cbits_t pbits = cbits_with_size(n + 1, true);
-    cbits_reset(&pbits, 0);
-    cbits_reset(&pbits, 1);
+    cbits primes = cbits_with_size(n + 1, true);
+    cbits_reset(&primes, 0);
+    cbits_reset(&primes, 1);
 
     c_forrange (i, size_t, 2, n+1) {
-        // If pbits[i] is not changed, then it is a prime
-        if (cbits_test(pbits, i) && i*i <= n) {
+        // If primes[i] is not changed, then it is a prime
+        if (cbits_test(primes, i) && i*i <= n) {
             c_forrange (j, size_t, i*i, n+1, i) {
-                cbits_reset(&pbits, j);
+                cbits_reset(&primes, j);
             }
         }
     }
-    return pbits;
+    return primes;
 } 
 
 
@@ -24,7 +24,7 @@ int main(void)
     int n = 100000000;
     printf("computing prime numbers up to %u\n", n);
     
-    cbits_t primes = sieveOfEratosthenes(n);
+    cbits primes = sieveOfEratosthenes(n);
     puts("done");
     
     size_t np = cbits_count(primes);

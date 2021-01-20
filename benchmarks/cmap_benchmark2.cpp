@@ -13,7 +13,7 @@
 #include "picobench.hpp"
 
 PICOBENCH_SUITE("Map");
-enum {N1 = 5000000, S1 = 1, MaxLoadFactor100 = 80};
+enum {N1 = 10000000, S1 = 1, MaxLoadFactor100 = 80};
 uint64_t seed = time(NULL);
 
 static inline uint32_t hash32(const void* data, size_t len) {
@@ -139,7 +139,7 @@ PICOBENCH(ins_and_erase_cmap_i).P;
 template <class MapInt>
 static void ins_and_access_i(picobench::state& s)
 {
-    uint64_t mask = (1ull << s.iter_data()) - 1;
+    uint64_t mask = (1ull << s.arg()) - 1;
     size_t result = 0;
     MapInt map;
     map.max_load_factor(MaxLoadFactor100 / 100.0);
@@ -153,7 +153,7 @@ static void ins_and_access_i(picobench::state& s)
 
 static void ins_and_access_cmap_i(picobench::state& s)
 {
-    uint64_t mask = (1ull << s.iter_data()) - 1;
+    uint64_t mask = (1ull << s.arg()) - 1;
     size_t result = 0;
     cmap_i map = cmap_inits;
     cmap_i_set_load_factors(&map, 0.0, MaxLoadFactor100 / 100.0);
@@ -166,7 +166,7 @@ static void ins_and_access_cmap_i(picobench::state& s)
     cmap_i_del(&map);
 }
 
-#define P samples(S1).iterations({N1, N1, N1, N1}).iter_data({18, 23, 25, 31})
+#define P samples(S1).iterations({N1, N1, N1, N1}).args({18, 23, 25, 31})
 PICOBENCH(ins_and_access_i<umap_i>).P.baseline();
 PICOBENCH(ins_and_access_i<bmap_i>).P;
 PICOBENCH(ins_and_access_i<fmap_i>).P;
@@ -186,7 +186,7 @@ static void randomize(char* str, size_t len) {
 template <class MapStr>
 static void ins_and_access_s(picobench::state& s)
 {
-    std::string str(s.iter_data(), 'x');
+    std::string str(s.arg(), 'x');
     size_t result = 0;
     MapStr map;
     map.max_load_factor(MaxLoadFactor100 / 100.0);
@@ -208,7 +208,7 @@ static void ins_and_access_s(picobench::state& s)
 
 static void ins_and_access_cmap_s(picobench::state& s)
 {
-    cstr str = cstr_with_size(s.iter_data(), 'x');
+    cstr str = cstr_with_size(s.arg(), 'x');
     size_t result = 0;
     cmap_s map = cmap_inits;
     cmap_s_set_load_factors(&map, 0.0, MaxLoadFactor100 / 100.0);
@@ -230,7 +230,7 @@ static void ins_and_access_cmap_s(picobench::state& s)
     cmap_s_del(&map);
 }
 
-#define P samples(S1).iterations({N1/5, N1/5, N1/5, N1/10, N1/40}).iter_data({13, 7, 8, 100, 1000})
+#define P samples(S1).iterations({N1/5, N1/5, N1/5, N1/10, N1/40}).args({13, 7, 8, 100, 1000})
 PICOBENCH(ins_and_access_s<umap_s>).P.baseline();
 PICOBENCH(ins_and_access_s<bmap_s>).P;
 PICOBENCH(ins_and_access_s<fmap_s>).P;
@@ -246,7 +246,7 @@ static void iterate_x(picobench::state& s)
 {
     MapX map;
     map.max_load_factor(MaxLoadFactor100 / 100.0);
-    uint64_t K = (1ull << s.iter_data()) - 1;
+    uint64_t K = (1ull << s.arg()) - 1;
 
     picobench::scope scope(s);
     stc64_srandom(seed);
@@ -275,7 +275,7 @@ static void iterate_cmap_x(picobench::state& s)
 {
     cmap_x map = cmap_inits;
     cmap_x_set_load_factors(&map, 0.3, MaxLoadFactor100 / 100.0);
-    uint64_t K = (1ull << s.iter_data()) - 1;
+    uint64_t K = (1ull << s.arg()) - 1;
 
     picobench::scope scope(s);
     stc64_srandom(seed);
@@ -302,7 +302,7 @@ static void iterate_cmap_x(picobench::state& s)
 }
 
 
-#define P samples(S1).iterations({N1/20}).iter_data({12})
+#define P samples(S1).iterations({N1/20}).args({12})
 PICOBENCH(iterate_x<umap_x>).P.baseline();
 PICOBENCH(iterate_x<bmap_x>).P;
 PICOBENCH(iterate_x<fmap_x>).P;
