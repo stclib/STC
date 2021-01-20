@@ -16,14 +16,6 @@ Default values are given above for args not specified. `X` and `N` are type tags
 will affect the names of all cset types and methods. E.g. declaring `using_carray(my, int);`, `X` should
 be replaced by `my` in all of the following documentation. The `N` character should be replaced by `1`, `2` or `3`.
 
-## Types
-
-| Type name            | Type definition               | Used to represent...      |
-|:---------------------|:------------------------------|:--------------------------|
-| `carrayNX`           | `struct { ... }`              | The carray type           |
-| `carrayNX_value_t`   | `Value`                       | The value type            |
-| `carrayNX_iter_t`    | `struct { Value *ref; }`      | Iterator type             |
-
 ## Header file
 
 All carray definitions and prototypes may be included in your C source file by including a single header file.
@@ -63,6 +55,13 @@ carrayNX_iter_t     carrayNX_end(carrayNX* self);
 void                carrayNX_next(carrayNX_iter_t* it);
 carrayNX_value_t*   carrayNX_itval(carrayNX_iter_t it);
 ```
+## Types
+
+| Type name            | Type definition               | Used to represent...      |
+|:---------------------|:------------------------------|:--------------------------|
+| `carrayNX`           | `struct { ... }`              | The carray type           |
+| `carrayNX_value_t`   | `Value`                       | The value type            |
+| `carrayNX_iter_t`    | `struct { Value *ref; }`      | Iterator type             |
 
 ## Example
 ```c

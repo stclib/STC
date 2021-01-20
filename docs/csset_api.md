@@ -20,19 +20,6 @@ be replaced by `my` in all of the following documentation.
 
 `using_csset_str()` is a predefined macro for `using_csset(str, cstr_t, ...)`.
 
-## Types
-
-| Type name            | Type definition                        | Used to represent...     |
-|:---------------------|:---------------------------------------|:-------------------------|
-| `csset_X`            | `struct { ... }`                       | The csset type           |
-| `csset_X_rawkey_t`   | `RawKey`                               | The raw key type         |
-| `csset_X_rawvalue_t` | `csset_X_rawkey_t`                     | The raw key type         |
-| `csset_X_key_t`      | `Key`                                  | The key type             |
-| `csset_X_value_t`    | `csset_X_key_t`                        | The value type           |
-| `csset_X_result_t`   | `struct { Key first; bool second; }`   | Result of insert/emplace |
-| `csset_X_iter_t`     | `struct { csset_X_value_t *ref; ... }` | Iterator type            |
-
-
 ## Header file
 
 All csset definitions and prototypes may be included in your C source file by including a single header file.
@@ -72,6 +59,18 @@ csset_X_value_t*    csset_X_itval(csset_X_iter_t it);
 csset_X_value_t     csset_X_value_clone(csset_X_value_t val);
 void                csset_X_value_del(csset_X_value_t* val);
 ```
+
+## Types
+
+| Type name            | Type definition                        | Used to represent...     |
+|:---------------------|:---------------------------------------|:-------------------------|
+| `csset_X`            | `struct { ... }`                       | The csset type           |
+| `csset_X_rawkey_t`   | `RawKey`                               | The raw key type         |
+| `csset_X_rawvalue_t` | `csset_X_rawkey_t`                     | The raw key type         |
+| `csset_X_key_t`      | `Key`                                  | The key type             |
+| `csset_X_value_t`    | `csset_X_key_t`                        | The value type           |
+| `csset_X_result_t`   | `struct { Key first; bool second; }`   | Result of insert/emplace |
+| `csset_X_iter_t`     | `struct { csset_X_value_t *ref; ... }` | Iterator type            |
 
 ## Example
 ```c

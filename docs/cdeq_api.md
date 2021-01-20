@@ -24,21 +24,6 @@ be replaced by `my` in all of the following documentation.
 using_cdeq(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_to_raw, const char*)
 ```
 
-## Types
-
-| Type name            | Type definition                     | Used to represent...   |
-|:---------------------|:------------------------------------|:-----------------------|
-| `cdeq_X`             | `struct { cdeq_X_value_t* data; }`  | The cdeq type          |
-| `cdeq_X_value_t`     | `Value`                             | The cdeq value type    |
-| `cdeq_X_rawvalue_t`  | `RawValue`                          | The raw value type     |
-| `cdeq_X_iter_t`      | `struct { cdeq_X_value_t* ref; }`   | The iterator type      |
-
-## Constants and macros
-
-| Name                       | Purpose              |
-|:---------------------------|:---------------------|
-|  `cdeq_inits`              | Initializer constant |
-
 ## Header file
 
 All cdeq definitions and prototypes may be included in your C source file by including a single header file.
@@ -108,6 +93,15 @@ size_t              cdeq_X_index(const cdeq_X deq, cdeq_X_iter_t it);
 
 cdeq_X_value_t      cdeq_X_value_clone(cdeq_X_value_t val);
 ```
+
+## Types
+
+| Type name            | Type definition                     | Used to represent...   |
+|:---------------------|:------------------------------------|:-----------------------|
+| `cdeq_X`             | `struct { cdeq_X_value_t* data; }`  | The cdeq type          |
+| `cdeq_X_value_t`     | `Value`                             | The cdeq value type    |
+| `cdeq_X_rawvalue_t`  | `RawValue`                          | The raw value type     |
+| `cdeq_X_iter_t`      | `struct { cdeq_X_value_t* ref; }`   | The iterator type      |
 
 ## Examples
 ```c

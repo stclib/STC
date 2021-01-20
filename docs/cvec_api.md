@@ -28,21 +28,6 @@ be replaced by `my` in all of the following documentation.
 using_cvec(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_to_raw, const char*)
 ```
 
-## Types
-
-| Type name            | Type definition                     | Used to represent...   |
-|:---------------------|:------------------------------------|:-----------------------|
-| `cvec_X`             | `struct { cvec_X_value_t* data; }`  | The cvec type          |
-| `cvec_X_value_t`     | `Value`                             | The cvec value type    |
-| `cvec_X_rawvalue_t`  | `RawValue`                          | The raw value type     |
-| `cvec_X_iter_t`      | `struct { cvec_X_value_t* ref; }`   | The iterator type      |
-
-## Constants and macros
-
-| Name                       | Purpose              |
-|:---------------------------|:---------------------|
-|  `cvec_inits`              | Initializer constant |
-
 ## Header file
 
 All cvec definitions and prototypes may be included in your C source file by including a single header file.
@@ -109,6 +94,15 @@ size_t              cvec_X_index(const cvec_X vec, cvec_X_iter_t it);
 
 cvec_X_value_t      cvec_X_value_clone(cvec_X_value_t val);
 ```
+
+## Types
+
+| Type name            | Type definition                     | Used to represent...   |
+|:---------------------|:------------------------------------|:-----------------------|
+| `cvec_X`             | `struct { cvec_X_value_t* data; }`  | The cvec type          |
+| `cvec_X_value_t`     | `Value`                             | The cvec value type    |
+| `cvec_X_rawvalue_t`  | `RawValue`                          | The raw value type     |
+| `cvec_X_iter_t`      | `struct { cvec_X_value_t* ref; }`   | The iterator type      |
 
 ## Examples
 ```c

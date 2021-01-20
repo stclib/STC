@@ -33,34 +33,11 @@ Default values are given above for args not specified. `X` is a type tag name an
 will affect the names of all cmap types and methods. E.g. declaring `using_cmap(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.
 
-`c_default_hash` requires Key to be 16-bit aligned, and size to be a multiple of 16. There is also a `c_default_hash32` which is slightly faster.
-
 `using_cmap_strkey()` and `using_cmap_strval()` are special macros defined by
 `using_cmap()`. The macro `using_cmap_str()` is a shorthand for
 ```c
 using_cmap(str, cstr_t, cstr_t, cstr_del, ...) // uses char* as "raw" types
 ```
-
-## Types
-
-| Type name            | Type definition                                 | Used to represent...          |
-|:---------------------|:------------------------------------------------|:------------------------------|
-| `cmap_X`             | `struct { ... }`                                | The cmap type                 |
-| `cmap_X_rawkey_t`    | `RawKey`                                        | The raw key type              |
-| `cmap_X_rawmapped_t` | `RawMapped`                                     | The raw mapped type           |
-| `cmap_X_key_t`       | `Key`                                           | The key type                  |
-| `cmap_X_mapped_t`    | `Mapped`                                        | The mapped type               |
-| `cmap_X_value_t`     | `struct { Key first; Mapped second; }`          | The value type                |
-| `cmap_X_rawvalue_t`  | `struct { RawKey first; RawMapped second; }`    | RawKey + RawMapped type       |
-| `cmap_X_result_t`    | `struct { cmap_X_value_t first; bool second; }` | Result of insert/put/emplace  |
-| `cmap_X_iter_t`      | `struct { cmap_X_value_t *ref; ... }`           | Iterator type                 |
-
-## Constants and macros
-
-| Name                                        | Purpose                |
-|:--------------------------------------------|:-----------------------|
-|  `cmap_inits`                               | Initializer const      |
-|  `c_try_emplace(self, ctype, rkey, mapped)` | Emplace if key exist   |
 
 ## Header file
 
@@ -114,6 +91,28 @@ void                cmap_X_value_del(cmap_X_value_t* val);
 uint32_t            c_default_hash(const void *data, size_t len);
 uint32_t            c_default_hash32(const void* data, size_t len);
 ```
+
+## Types
+
+| Type name            | Type definition                                 | Used to represent...          |
+|:---------------------|:------------------------------------------------|:------------------------------|
+| `cmap_X`             | `struct { ... }`                                | The cmap type                 |
+| `cmap_X_rawkey_t`    | `RawKey`                                        | The raw key type              |
+| `cmap_X_rawmapped_t` | `RawMapped`                                     | The raw mapped type           |
+| `cmap_X_key_t`       | `Key`                                           | The key type                  |
+| `cmap_X_mapped_t`    | `Mapped`                                        | The mapped type               |
+| `cmap_X_value_t`     | `struct { Key first; Mapped second; }`          | The value type                |
+| `cmap_X_rawvalue_t`  | `struct { RawKey first; RawMapped second; }`    | RawKey + RawMapped type       |
+| `cmap_X_result_t`    | `struct { cmap_X_value_t first; bool second; }` | Result of insert/put/emplace  |
+| `cmap_X_iter_t`      | `struct { cmap_X_value_t *ref; ... }`           | Iterator type                 |
+
+`c_default_hash` requires Key to be 16-bit aligned, and size to be a multiple of 16. There is also a `c_default_hash32` which is slightly faster.
+
+## Constants and macros
+
+| Name                                        | Purpose                |
+|:--------------------------------------------|:-----------------------|
+|  `c_try_emplace(self, ctype, rkey, mapped)` | Emplace if key exist   |
 
 ## Examples
 ```c

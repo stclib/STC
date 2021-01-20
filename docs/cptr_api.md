@@ -22,21 +22,6 @@ affect the names of all cptr types and methods. E.g. declaring `using_cptr(my, c
 
 Note: for shared-ptr **csptr**, "cloning" is done by pointer sharing (ref counting), so *valueClone* is not required and ignored.
 
- Types
-
-| Type name          | Type definition       | Used to represent...    |
-|:-------------------|:----------------------|:------------------------|
-| `cptr_X`           | `cptr_X_value_t *`    | The cptr type           |
-| `cptr_X_value_t`   | `Value`               | The cptr element type   |
-
-
-| Type name           | Type definition                                               | Used to represent...     |
-|:--------------------|:--------------------------------------------------------------|:-------------------------|
-| `csptr_X`           | `struct { csptr_X_value_t* get; atomic_count_t* use_count; }` | The csptr type           |
-| `csptr_X_value_t`   | `Value`                                                       | The csptr element type   |
-| `atomic_count_t`    | `long`                                                        | The reference counter    |
-
-
 ## Header file
 
 All cptr definitions and prototypes may be included in your C source file by including a single header file.
@@ -63,6 +48,20 @@ void                csptr_X_reset(csptr_X* self, csptr_X_value_t* ptr);
 void                csptr_X_del(csptr_X* self);
 int                 csptr_X_compare(csptr_X* x, csptr_X* y);
 ```
+
+## Types
+
+| Type name          | Type definition       | Used to represent...    |
+|:-------------------|:----------------------|:------------------------|
+| `cptr_X`           | `cptr_X_value_t *`    | The cptr type           |
+| `cptr_X_value_t`   | `Value`               | The cptr element type   |
+
+
+| Type name           | Type definition                                               | Used to represent...     |
+|:--------------------|:--------------------------------------------------------------|:-------------------------|
+| `csptr_X`           | `struct { csptr_X_value_t* get; atomic_count_t* use_count; }` | The csptr type           |
+| `csptr_X_value_t`   | `Value`                                                       | The csptr element type   |
+| `atomic_count_t`    | `long`                                                        | The reference counter    |
 
 ## Example
 

@@ -14,15 +14,6 @@ a **cdeq_X** or **clist_X** type as underlying implementation, given as `ctype`.
 will affect the names of all cqueue types and methods. E.g. declaring `using_cqueue(my, clist_my);`,
 `X` should be replaced by `my` in all of the following documentation.
 
-## Types
-
-| Type name             | Type definition                        | Used to represent...     |
-|:----------------------|:---------------------------------------|:-------------------------|
-| `cqueue_X`            | Depends on underlying container type   | The cqueue type          |
-| `cqueue_X_value_t`    |                   "                    | The cqueue element type  |
-| `cqueue_X_rawvalue_t` |                   "                    | cqueue raw value type    |
-| `cqueue_X_iter_t`     |                   "                    | cqueue iterator          |
-
 ## Header file
 
 All cqueue definitions and prototypes may be included in your C source file by including a single header file.
@@ -55,6 +46,15 @@ cqueue_X_value_t*       cqueue_X_itval(cqueue_X_iter_t it);
 
 cqueue_X_value_t        cqueue_X_value_clone(cqueue_X_value_t val);
 ```
+
+## Types
+
+| Type name             | Type definition                        | Used to represent...     |
+|:----------------------|:---------------------------------------|:-------------------------|
+| `cqueue_X`            | Depends on underlying container type   | The cqueue type          |
+| `cqueue_X_value_t`    |                   "                    | The cqueue element type  |
+| `cqueue_X_rawvalue_t` |                   "                    | cqueue raw value type    |
+| `cqueue_X_iter_t`     |                   "                    | cqueue iterator          |
 
 ## Examples
 ```c

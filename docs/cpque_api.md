@@ -19,14 +19,6 @@ Note that the function `{ctype}_value_compare(x, y)` defined by the underlying v
 compare values (priorities). `X` is a type tag name and will affect the names of all cpque types and methods.
 Declaring `using_cpque(my, cvec_my, >);`, `X` should be replaced by `my` in the following documentation.
 
-## Types
-
-| Type name            | Type definition                       | Used to represent...    |
-|:---------------------|:--------------------------------------|:------------------------|
-| `cpque_X`            | `struct {cpque_X_value_t* data; ...}` | The cpque type          |
-| `cpque_X_value_t`    | Depends on underlying container type  | The cpque element type  |
-| `cpque_X_rawvalue_t` |                   "                   | cpque raw value type    |
-
 ## Header file
 
 All cpque definitions and prototypes may be included in your C source file by including a single header file.
@@ -56,6 +48,14 @@ void                    cpque_X_erase_at(cpque_X* self, size_t idx);
 
 cpque_X_value_t         cpque_X_value_clone(cpque_X_value_t val);
 ```
+
+## Types
+
+| Type name            | Type definition                       | Used to represent...    |
+|:---------------------|:--------------------------------------|:------------------------|
+| `cpque_X`            | `struct {cpque_X_value_t* data; ...}` | The cpque type          |
+| `cpque_X_value_t`    | Depends on underlying container type  | The cpque element type  |
+| `cpque_X_rawvalue_t` |                   "                   | cpque raw value type    |
 
 ## Example
 ```c

@@ -25,21 +25,6 @@ be replaced by `my` in all of the following documentation. `using_clist_str()` i
 using_clist(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_to_raw, const char*)
 ```
 
-## Types
-
-| Type name             | Type definition                     | Used to represent...      |
-|:----------------------|:------------------------------------|:--------------------------|
-| `clist_X`             | `struct { clist_X_node_t* last; }`  | The clist type            |
-| `clist_X_value_t`     | `Value`                             | The clist element type    |
-| `clist_X_rawvalue_t`  | `RawValue`                          | clist raw value type      |
-| `clist_X_iter_t`      | `struct { clist_value_t *ref; ... }`| clist iterator            |
-
-## Constants and macros
-
-| Name                       | Purpose              |
-|:---------------------------|:---------------------|
-|  `clist_inits`             | Initializer constant |
-
 ## Header file
 
 All clist definitions and prototypes may be included in your C source file by including a single header file.
@@ -104,6 +89,16 @@ clist_X_iter_t      clist_X_fwd(clist_X_iter it, size_t n);
 
 clist_X_value_t     clist_X_value_clone(clist_X_value_t val);
 ```
+
+## Types
+
+| Type name             | Type definition                     | Used to represent...      |
+|:----------------------|:------------------------------------|:--------------------------|
+| `clist_X`             | `struct { clist_X_node_t* last; }`  | The clist type            |
+| `clist_X_value_t`     | `Value`                             | The clist element type    |
+| `clist_X_rawvalue_t`  | `RawValue`                          | clist raw value type      |
+| `clist_X_iter_t`      | `struct { clist_value_t *ref; ... }`| clist iterator            |
+
 The `clist_X_splice_out(self, it1, it2)` can be combined with `clist_X_splice_after(self, it, other)` to mimic c++ `std::forward_list::splice_after(it, other, it1, it2)`. Note however that *it2* is included in elements to be spliced, unlike with *std::forward_list()*. Example: splice in `[2, 3]` from *L1* after `10` in *L2*:
 ```c
 c_init (clist_i, L1, {1, 2, 3, 4, 5});

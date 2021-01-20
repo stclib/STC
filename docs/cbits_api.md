@@ -5,13 +5,6 @@ A **cbits** represents a set of bits. It provides accesses to the value of indiv
 
 The **cbits** container is similar to the c++ class [std::bitset](https://en.cppreference.com/w/cpp/utility/bitset) and [boost::dynamic_bitset](https://www.boost.org/doc/libs/release/libs/dynamic_bitset/dynamic_bitset.html).
 
-## Types
-
-| cbits               | Type definition           | Used to represent...         |
-|:--------------------|:--------------------------|:-----------------------------|
-| `cbits`             | `struct { ... }`          | The cbits type               |
-| `cbits_iter_t`      | `struct { ... }`          | The cbits iterator type      |
-
 ## Header file
 
 All cstr definitions and prototypes may be included in your C source file by including a single header file.
@@ -67,6 +60,13 @@ cbits_iter_t     cbits_end(cbits_t* self);
 void             cbits_next(cbits_iter_t* it);
 bool             cbits_itval(cbits_iter_t it);
 ```
+
+## Types
+
+| cbits               | Type definition           | Used to represent...         |
+|:--------------------|:--------------------------|:-----------------------------|
+| `cbits`             | `struct { ... }`          | The cbits type               |
+| `cbits_iter_t`      | `struct { ... }`          | The cbits iterator type      |
 
 ## Example
 ```c

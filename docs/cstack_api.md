@@ -14,15 +14,6 @@ a **cvec_X** or **cdeq_X** type as underlying implementation, given as `ctype`. 
 affect the names of all cstack types and methods. E.g. declaring `using_cstack(my, cvec_my);`,
 `X` should be replaced by `my` in all of the following documentation.
 
-## Types
-
-| Type name             | Type definition                        | Used to represent...        |
-|:----------------------|:---------------------------------------|:----------------------------|
-| `cstack_X`            | Depends on underlying container type   | The cstack type             |
-| `cstack_X_value_t`    |                   "                    | The cstack element type     |
-| `cstack_X_rawvalue_t` |                   "                    | cstack raw value type       |
-| `cstack_X_iter_t`     |                   "                    | cstack iterator             |
-
 ## Header file
 
 All cstack definitions and prototypes may be included in your C source file by including a single header file.
@@ -54,6 +45,15 @@ cstack_X_value_t*       cstack_X_itval(cstack_X_iter_t it);
 
 cstack_X_value_t        cstack_X_value_clone(cstack_X_value_t val);
 ```
+
+## Types
+
+| Type name             | Type definition                        | Used to represent...        |
+|:----------------------|:---------------------------------------|:----------------------------|
+| `cstack_X`            | Depends on underlying container type   | The cstack type             |
+| `cstack_X_value_t`    |                   "                    | The cstack element type     |
+| `cstack_X_rawvalue_t` |                   "                    | cstack raw value type       |
+| `cstack_X_iter_t`     |                   "                    | cstack iterator             |
 
 ## Example
 ```c

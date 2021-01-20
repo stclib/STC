@@ -21,24 +21,6 @@ be replaced by `my` in all of the following documentation.
 
 `using_cset_str()` is a predefined macro for `using_cset(str, cstr_t, ...)`.
 
-## Types
-
-| Type name            | Type definition                       | Used to represent...     |
-|:---------------------|:--------------------------------------|:-------------------------|
-| `cset_X`             | `struct { ... }`                      | The cset type            |
-| `cset_X_rawkey_t`    | `RawKey`                              | The raw key type         |
-| `cset_X_rawvalue_t`  | `cset_X_rawkey_t`                     | The raw key type         |
-| `cset_X_key_t`       | `Key`                                 | The key type             |
-| `cset_X_value_t`     | `cset_X_key_t`                        | The value type           |
-| `cset_X_result_t`    | `struct { Key first; bool second; }`  | Result of insert/emplace |
-| `cset_X_iter_t`      | `struct { cset_X_value_t *ref; ... }` | Iterator type            |
-
-## Constants and macros
-
-| Name                                            | Purpose                  |
-|:------------------------------------------------|:-------------------------|
-|  `cset_inits`                                   | Initializer const        |
-
 ## Header file
 
 All cset definitions and prototypes may be included in your C source file by including a single header file.
@@ -87,6 +69,18 @@ void                cset_X_value_del(cset_X_value_t* val);
 uint32_t            c_default_hash(const void *data, size_t len);
 uint32_t            c_default_hash32(const void* data, size_t len);
 ```
+
+## Types
+
+| Type name            | Type definition                       | Used to represent...     |
+|:---------------------|:--------------------------------------|:-------------------------|
+| `cset_X`             | `struct { ... }`                      | The cset type            |
+| `cset_X_rawkey_t`    | `RawKey`                              | The raw key type         |
+| `cset_X_rawvalue_t`  | `cset_X_rawkey_t`                     | The raw key type         |
+| `cset_X_key_t`       | `Key`                                 | The key type             |
+| `cset_X_value_t`     | `cset_X_key_t`                        | The value type           |
+| `cset_X_result_t`    | `struct { Key first; bool second; }`  | Result of insert/emplace |
+| `cset_X_iter_t`      | `struct { cset_X_value_t *ref; ... }` | Iterator type            |
 
 ## Example
 ```c

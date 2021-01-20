@@ -4,21 +4,6 @@
 This describes the API of string type **cstr**.
 See [std::basic_string](https://en.cppreference.com/w/cpp/string/basic_string) for a similar c++ class.
 
-## Types
-
-| Type name         | Type definition                  | Used to represent...     |
-|:------------------|:---------------------------------|:-------------------------|
-| `cstr, cstr_t`    | `struct { const char *str; }`    | The string type          |
-| `cstr_value_t`    | `char`                           | The string element type  |
-| `cstr_iter_t`     | `struct { cstr_value_t *ref; }`  | cstr iterator            |
-
-## Constants and macros
-
-| Name              | Value            |
-|:------------------|:-----------------|
-|  `cstr_inits`     | `{...}`          |
-|  `cstr_npos`      | `-1ull`          |
-
 ## Header file
 
 All cstr definitions and prototypes may be included in your C source file by including a single header file.
@@ -117,6 +102,21 @@ Iterator methods, typically used via the general *c_foreach* macro.
         uint32_t     c_string_hash(const char* str);
 ```
 Helper methods, used by other container types.
+
+## Types
+
+| Type name         | Type definition                  | Used to represent...     |
+|:------------------|:---------------------------------|:-------------------------|
+| `cstr, cstr_t`    | `struct { const char *str; }`    | The string type          |
+| `cstr_value_t`    | `char`                           | The string element type  |
+| `cstr_iter_t`     | `struct { cstr_value_t *ref; }`  | cstr iterator            |
+
+## Constants and macros
+
+| Name              | Value            |
+|:------------------|:-----------------|
+|  `cstr_inits`     | `{...}`          |
+|  `cstr_npos`      | `-1ull`          |
 
 ## Example
 ```c
