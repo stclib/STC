@@ -49,7 +49,7 @@ int main(void) {
     cvec_i_del(&vec);
 }
 ```
-Here is five more...
+And five more containers...
 ```c
 #include <stc/cmap.h>
 #include <stc/csmap.h>
@@ -59,10 +59,10 @@ Here is five more...
 #include <stdio.h>
 
 // declare your container types
-using_cset(i, int);       // unordered hash set
+using_cset(i, int);       // unordered (hash) set
 using_clist(i, int);      // singly linked list
 using_cdeq(i, int);       // deque
-using_cqueue(i, cdeq_i);  // deque, using deque as adapter
+using_cqueue(i, cdeq_i);  // queue, using deque as adapter
 using_csmap(i, int, int); // sorted map
 
 int main(void) {
@@ -75,7 +75,7 @@ int main(void) {
 
     // add one more element
     cset_i_insert(&set, 40);
-    clist_i_push_front(&list, 5);
+    clist_i_push_back(&list, 40);
     cdeq_i_push_front(&deq, 5);
     cqueue_i_push(&que, 40);
     csmap_i_emplace(&map, 40, 4);
@@ -98,7 +98,7 @@ int main(void) {
 Outputs
 ```
  10 20 30 40
- 5 10 20 30
+ 10 20 30 40
  5 10 20 30
  10 20 30 40
  (10: 1) (20: 2) (30: 3) (40: 4)
