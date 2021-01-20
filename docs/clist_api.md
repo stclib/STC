@@ -101,7 +101,7 @@ clist_X_value_t     clist_X_value_clone(clist_X_value_t val);
 | `clist_X_rawvalue_t`  | `RawValue`                          | clist raw value type      |
 | `clist_X_iter_t`      | `struct { clist_value_t *ref; ... }`| clist iterator            |
 
-The `clist_X_splice_out(self, it1, it2)` can be combined with `clist_X_splice_after(self, it, other)` to mimic c++ `std::forward_list::splice_after(it, other, it1, it2)`. Note however that *it2* is included in elements to be spliced, unlike with *std::forward_list()*. Example: splice in `[2, 3]` from *L1* after `10` in *L2*:
+The `clist_X_splice_out(self, it1, it2)` can be combined with `clist_X_splice_after(self, it, other)` to mimic c++ `std::forward_list::splice_after(it, other, it1, it2)`. Note however that *it2* is included in elements to be spliced, unlike with *std::forward_list()*. E.g. splice in `[2, 3]` from *L1* after `10` in *L2*:
 ```c
 c_init (clist_i, L1, {1, 2, 3, 4, 5});
 c_init (clist_i, L2, {10, 20, 30, 40, 50});
@@ -119,18 +119,18 @@ clist_i_splice_after(&L2, clist_i_begin(&L2), &tmp);
 ```
 
 ## Example
+
+Interleave *push_front()* / *push_back()* then *sort()*:
 ```c
 #include <stdio.h>
 #include "stc/clist.h"
 using_clist(d, double);
 
 int main() {
-    clist_d list = clist_inits;
-    c_push_items(&list, clist_d, {
+    c_init (clist_d, list, {
         10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0
     });
 
-    // Interleave push_front / push_back:
     c_forrange (i, int, 1, 10) {
         if (i & 1) clist_d_push_front(&list, (float) i);
         else       clist_d_push_back(&list, (float) i);
@@ -155,6 +155,7 @@ initial:  9 7 5 3 1 10 20 30 40 50 60 70 80 90 2 4 6 8
 sorted:  1 2 3 4 5 6 7 8 9 10 20 30 40 50 60 70 80 90
 ```
 ### Example 2
+Show *erase_after()*, *erase_range_after()*:
 ```c
 // erasing from clist
 #include <stc/clist.h>
