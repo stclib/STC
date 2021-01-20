@@ -33,14 +33,20 @@ int main() {
     cbits_t bset = cbits_with_size(23, true);
     cbits_reset(&bset, 9);
     cbits_resize(&bset, 43, false);
-    printf("%4zu: ", bset.size); c_forrange (i, bset.size) printf("%d", cbits_test(&bset, i));
+
+    printf("%4zu: ", bset.size);
+    c_forrange (i, bset.size)
+        printf("%d", cbits_at(&bset, i));
     puts("");
     cbits_set(&bset, 28);
     cbits_resize(&bset, 77, true);
     cbits_resize(&bset, 93, false);
     cbits_resize(&bset, 102, true);
     cbits_set_value(&bset, 99, false);
-    printf("%4zu: ", bset.size); c_forrange (i, bset.size) printf("%d", cbits_test(&bset, i));
+
+    printf("%4zu: ", bset.size);
+    c_forrange (i, bset.size)
+        printf("%d", cbits_at(&bset, i));
     puts("");
     cbits_del(&bset);
 }
@@ -51,10 +57,10 @@ int main() {
 
 typedef struct cbits { uint64_t* _arr; size_t size; } cbits_t, cbits;
 
-STC_API cbits_t    cbits_with_size(size_t size, bool value);
-STC_API cbits_t    cbits_from_str(const char* str);
+STC_API cbits_t      cbits_with_size(size_t size, bool value);
+STC_API cbits_t      cbits_from_str(const char* str);
 STC_API char*        cbits_to_str(cbits_t set, char* str, size_t start, intptr_t stop);
-STC_API cbits_t    cbits_clone(cbits_t other);
+STC_API cbits_t      cbits_clone(cbits_t other);
 STC_API void         cbits_resize(cbits_t* self, size_t size, bool value);
 STC_API size_t       cbits_count(cbits_t set);
 STC_API bool         cbits_is_disjoint(cbits_t set, cbits_t other);
@@ -84,6 +90,13 @@ STC_INLINE cbits_t cbits_move(cbits_t* self) {
     return tmp;
 }
 
+STC_INLINE bool cbits_test(cbits_t set, size_t i) {
+    return (set._arr[i >> 6] & (1ull << (i & 63))) != 0;
+}
+STC_INLINE bool cbits_at(cbits_t set, size_t i) {
+    return (set._arr[i >> 6] & (1ull << (i & 63))) != 0;
+}
+
 STC_INLINE void cbits_set(cbits_t *self, size_t i) {
     self->_arr[i >> 6] |= 1ull << (i & 63);
 }
@@ -95,9 +108,6 @@ STC_INLINE void cbits_set_value(cbits_t *self, size_t i, bool value) {
 }
 STC_INLINE void cbits_flip(cbits_t *self, size_t i) {
     self->_arr[i >> 6] ^= 1ull << (i & 63);
-}
-STC_INLINE bool cbits_test(cbits_t set, size_t i) {
-    return (set._arr[i >> 6] & (1ull << (i & 63))) != 0;
 }
 STC_INLINE void cbits_set_all(cbits_t *self, bool value) {
     memset(self->_arr, value ? 0xff : 0x0, ((self->size + 63) >> 6) * 8);

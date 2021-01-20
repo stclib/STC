@@ -47,11 +47,13 @@ bool             cbits_is_subset(cbits_t set, cbits_t other);
 bool             cbits_is_superset(cbits_t set, cbits_t other);
 char*            cbits_to_str(cbits_t set, char* str, size_t start, intptr_t stop);
 
+bool             cbits_test(cbits_t set, size_t i);
+bool             cbits_at(cbits_t set, size_t i);   // same as cbits_test()
+
 void             cbits_set(cbits_t *self, size_t i);
 void             cbits_reset(cbits_t *self, size_t i);
 void             cbits_set_value(cbits_t *self, size_t i, bool value);
 void             cbits_flip(cbits_t *self, size_t i);
-bool             cbits_test(cbits_t set, size_t i);
 void             cbits_set_all(cbits_t *self, bool value);
 void             cbits_set_all64(cbits_t *self, uint64_t pattern);
 void             cbits_flip_all(cbits_t *self);

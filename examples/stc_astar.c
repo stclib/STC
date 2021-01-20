@@ -25,7 +25,7 @@ mpoint_init(int x, int y, int width)
 int
 mpoint_compare_priority(const MazePoint* a, const MazePoint* b)
 {
-    // NB! returning 0 gives 14 steps shorter path!? hmm..
+    //return 0; // NB! gives 14 steps shorter path!? hmm..
     return (a->priorty > b->priorty) - (a->priorty < b->priorty);
 }
 
@@ -96,7 +96,7 @@ astar(cstr maze, int width)
             { -1, -1, 0, width }, { 0, -1, 0, width }, { 1, -1, 0, width },
         };
 
-        for (size_t i = 0; i < c_arraylen(deltas); i++)
+        c_forrange (i, c_arraylen(deltas))
         {
             MazePoint delta = deltas[i];
             MazePoint next = mpoint_init(current.x + delta.x, current.y + delta.y, width);
@@ -106,10 +106,10 @@ astar(cstr maze, int width)
                 csmap_mc_value_t* cost = csmap_mc_find(&cost_so_far, next);
                 if (!cost || new_cost < cost->second)
                 {
-                    csmap_mc_emplace(&cost_so_far, next, new_cost);
+                    csmap_mc_put(&cost_so_far, next, new_cost); // update (put)
                     next.priorty = new_cost + abs(goal.x - next.x) + abs(goal.y - next.y);
                     cpque_mp_push(&frontier, next);
-                    csmap_ms_emplace(&came_from, next, current);
+                    csmap_ms_put(&came_from, next, current);
                 }
             }
         }
