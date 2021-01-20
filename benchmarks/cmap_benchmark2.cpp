@@ -12,8 +12,7 @@
 #define PICOBENCH_IMPLEMENT_WITH_MAIN
 #include "picobench.hpp"
 
-PICOBENCH_SUITE("Map");
-enum {N1 = 10000000, S1 = 1, MaxLoadFactor100 = 80};
+enum {N1 = 4000000, S1 = 1, MaxLoadFactor100 = 80};
 uint64_t seed = time(NULL);
 
 static inline uint32_t hash32(const void* data, size_t len) {
@@ -45,6 +44,8 @@ using_cmap(i, int, int, c_default_equals, hash32);
 using_cmap(x, uint64_t, uint64_t, c_default_equals, hash64);
 using_cmap_strkey(s, cstr, cstr_del, cstr_clone);
 
+PICOBENCH_SUITE("Map1");
+
 template <class MapInt>
 static void ctor_and_ins_one_i(picobench::state& s)
 {
@@ -74,7 +75,7 @@ static void ctor_and_ins_one_cmap_i(picobench::state& s)
 }
 
 #define P samples(S1).iterations({N1})
-PICOBENCH(ctor_and_ins_one_i<umap_i>).P.baseline();
+PICOBENCH(ctor_and_ins_one_i<umap_i>).P;
 PICOBENCH(ctor_and_ins_one_i<bmap_i>).P;
 PICOBENCH(ctor_and_ins_one_i<fmap_i>).P;
 PICOBENCH(ctor_and_ins_one_i<hmap_i>).P;
@@ -83,6 +84,7 @@ PICOBENCH(ctor_and_ins_one_i<rmap_i>).P;
 PICOBENCH(ctor_and_ins_one_cmap_i).P;
 #undef P
 
+PICOBENCH_SUITE("Map2");
 
 template <class MapInt>
 static void ins_and_erase_i(picobench::state& s)
@@ -126,7 +128,7 @@ static void ins_and_erase_cmap_i(picobench::state& s)
 }
 
 #define P samples(S1).iterations({N1/4})
-PICOBENCH(ins_and_erase_i<umap_i>).P.baseline();
+PICOBENCH(ins_and_erase_i<umap_i>).P;
 PICOBENCH(ins_and_erase_i<bmap_i>).P;
 PICOBENCH(ins_and_erase_i<fmap_i>).P;
 PICOBENCH(ins_and_erase_i<hmap_i>).P;
@@ -135,6 +137,7 @@ PICOBENCH(ins_and_erase_i<rmap_i>).P;
 PICOBENCH(ins_and_erase_cmap_i).P;
 #undef P
 
+PICOBENCH_SUITE("Map3");
 
 template <class MapInt>
 static void ins_and_access_i(picobench::state& s)
@@ -167,7 +170,7 @@ static void ins_and_access_cmap_i(picobench::state& s)
 }
 
 #define P samples(S1).iterations({N1, N1, N1, N1}).args({18, 23, 25, 31})
-PICOBENCH(ins_and_access_i<umap_i>).P.baseline();
+PICOBENCH(ins_and_access_i<umap_i>).P;
 PICOBENCH(ins_and_access_i<bmap_i>).P;
 PICOBENCH(ins_and_access_i<fmap_i>).P;
 PICOBENCH(ins_and_access_i<hmap_i>).P;
@@ -176,6 +179,7 @@ PICOBENCH(ins_and_access_i<rmap_i>).P;
 PICOBENCH(ins_and_access_cmap_i).P;
 #undef P
 
+PICOBENCH_SUITE("Map4");
 
 static void randomize(char* str, size_t len) {
     union {uint64_t i; char c[8];} r = {.i = stc64_random()};
@@ -231,7 +235,7 @@ static void ins_and_access_cmap_s(picobench::state& s)
 }
 
 #define P samples(S1).iterations({N1/5, N1/5, N1/5, N1/10, N1/40}).args({13, 7, 8, 100, 1000})
-PICOBENCH(ins_and_access_s<umap_s>).P.baseline();
+PICOBENCH(ins_and_access_s<umap_s>).P;
 PICOBENCH(ins_and_access_s<bmap_s>).P;
 PICOBENCH(ins_and_access_s<fmap_s>).P;
 PICOBENCH(ins_and_access_s<hmap_s>).P;
@@ -240,6 +244,7 @@ PICOBENCH(ins_and_access_s<rmap_s>).P;
 PICOBENCH(ins_and_access_cmap_s).P;
 #undef P
 
+PICOBENCH_SUITE("Map5");
 
 template <class MapX>
 static void iterate_x(picobench::state& s)
@@ -303,7 +308,7 @@ static void iterate_cmap_x(picobench::state& s)
 
 
 #define P samples(S1).iterations({N1/20}).args({12})
-PICOBENCH(iterate_x<umap_x>).P.baseline();
+PICOBENCH(iterate_x<umap_x>).P;
 PICOBENCH(iterate_x<bmap_x>).P;
 PICOBENCH(iterate_x<fmap_x>).P;
 PICOBENCH(iterate_x<hmap_x>).P;
