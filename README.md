@@ -30,7 +30,7 @@ Others:
 
 The usage of the containers is similar to the C++ standard containers in STL, so it should be easy if you are familiar with them.
 
-All containers mentioned above, except cstr_t and cbits_t, are generic and therefore typesafe (similar to templates in C++).
+All containers mentioned above are generic, except for **cstr** and **cbits**, and are therefore typesafe like templates in C++.
 No casting is used. A simple example:
 ```c
 #include <stc/cvec.h>
@@ -49,7 +49,7 @@ int main(void) {
     cvec_i_del(&vec);
 }
 ```
-And five more containers...
+And with five containers...
 ```c
 #include <stc/cmap.h>
 #include <stc/csmap.h>
