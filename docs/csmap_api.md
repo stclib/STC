@@ -71,17 +71,17 @@ size_t              csmap_X_size(csmap_X m);
 
 void                csmap_X_push_n(csmap_X* self, const csmap_X_rawvalue_t arr[], size_t size);
 
-csmap_X_result_t    csmap_X_emplace(csmap_X* self, RawKey rkey, RawMapped rmapped);
-csmap_X_result_t    csmap_X_insert(csmap_X* self, csmap_X_rawvalue_t rval);
+csmap_X_result_t    csmap_X_emplace(csmap_X* self, RawKey rkey, RawMapped rmapped); // no change if rkey in map
+csmap_X_result_t    csmap_X_insert(csmap_X* self, csmap_X_rawvalue_t rval);         // same
 csmap_X_result_t    csmap_X_insert_or_assign(csmap_X* self, RawKey rkey, RawMapped rmapped);
-csmap_X_result_t    csmap_X_put(csmap_X* self, RawKey rkey, RawMapped rmapped);
-csmap_X_result_t    csmap_X_put_mapped(csmap_X* self, RawKey rkey, Mapped mapped);
-csmap_X_mapped_t*   csmap_X_at(const csmap_X* self, RawKey rkey);
+csmap_X_result_t    csmap_X_put(csmap_X* self, RawKey rkey, RawMapped rmapped);     // same as insert_or_assign()
+csmap_X_result_t    csmap_X_put_mapped(csmap_X* self, RawKey rkey, Mapped mapped);  // same
+csmap_X_mapped_t*   csmap_X_at(const csmap_X* self, RawKey rkey);                   // rkey must be in map.
 
 size_t              csmap_X_erase(csmap_X* self, RawKey rkey);
 csmap_X_iter_t      csmap_X_erase_at(csmap_X* self, csmap_X_iter_t pos);
 
-csmap_X_value_t*    csmap_X_find(const csmap_X* self, RawKey rkey);
+csmap_X_value_t*    csmap_X_find(const csmap_X* self, RawKey rkey);                 // NULL if not found
 csmap_X_value_t*    csmap_X_find_it(const csmap_X* self, RawKey rkey, csmap_X_iter_t* out);
 bool                csmap_X_contains(const csmap_X* self, RawKey rkey);
 
