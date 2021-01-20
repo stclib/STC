@@ -39,8 +39,9 @@ using_cvec(i, int);
 
 int main(void) {
     cvec_i vec = cvec_i_init();
-    cvec_i_push_back(&vec, 1);
-    cvec_i_push_back(&vec, 2);
+    cvec_i_push_back(&vec, 10);
+    cvec_i_push_back(&vec, 20);
+    cvec_i_push_back(&vec, 30);
     
     c_foreach (i, cvec_i, vec)
         printf(" %d", *i.ref);
@@ -48,47 +49,65 @@ int main(void) {
     cvec_i_del(&vec);
 }
 ```
-Container with elements of structs:
+Here is five more...
 ```c
-#include <stc/cstr.h>
-#include <stc/cvec.h>
+#include <stc/cmap.h>
+#include <stc/csmap.h>
+#include <stc/clist.h>
+#include <stc/clist.h>
+#include <stc/cqueue.h>
+#include <stdio.h>
 
-typedef struct {
-    cstr name; // dynamic string
-    int id;
-} User;
-
-int User_compare(const User* a, const User* b) {
-    int c = strcmp(a->name.str, b->name.str);
-    return c != 0 ? c : a->id - b->id;
-}
-void User_del(User* self) {
-    cstr_del(&self->name);
-}
-User User_clone(User user) {
-    user.name = cstr_clone(user.name);
-    return user;
-}
-
-// declare a memory managed, clonable vector of users:
-using_cvec(u, User, User_compare, User_del, User_clone);
+// declare your container types
+using_cset(i, int);       // unordered hash set
+using_clist(i, int);      // singly linked list
+using_cdeq(i, int);       // deque
+using_cqueue(i, cdeq_i);  // deque, using deque as adapter
+using_csmap(i, int, int); // sorted map
 
 int main(void) {
-    cvec_u vec = cvec_u_init();
-    cvec_u_push_back(&vec, (User) {cstr_from("admin"), 0});
-    cvec_u_push_back(&vec, (User) {cstr_from("joe"), 1});
-    
-    cvec_u vec2 = cvec_u_clone(vec);
-    c_foreach (i, cvec_u, vec2)
-        printf("%s: %d\n", i.ref->name.str, i.ref->id);
+    // define and initialize
+    c_init (cset_i, set, {10, 20, 30});
+    c_init (clist_i, list, {10, 20, 30});
+    c_init (cdeq_i, deq, {10, 20, 30});
+    c_init (cqueue_i, que, {10, 20, 30});
+    c_init (csmap_i, map, {{20, 2}, {10, 1}, {30, 3}});
 
-    c_del(cvec_u, &vec, &vec2); // cleanup
+    // add one more element
+    cset_i_insert(&set, 40);
+    clist_i_push_front(&list, 5);
+    cdeq_i_push_front(&deq, 5);
+    cqueue_i_push(&que, 40);
+    csmap_i_emplace(&map, 40, 4);
+
+    // print them
+    c_foreach (i, cset_i, set) printf(" %d", *i.ref); puts("");
+    c_foreach (i, clist_i, list) printf(" %d", *i.ref); puts("");
+    c_foreach (i, cdeq_i, deq) printf(" %d", *i.ref); puts("");
+    c_foreach (i, cqueue_i, que) printf(" %d", *i.ref); puts("");
+    c_foreach (i, csmap_i, map) printf(" (%d: %d)", i.ref->first, i.ref->second);
+
+    // cleanup
+    cset_i_del(&set);
+    clist_i_del(&list);
+    cdeq_i_del(&deq);
+    cqueue_i_del(&que);
+    csmap_i_del(&map);
 }
 ```
+Outputs
+```
+ 10 20 30 40
+ 5 10 20 30
+ 5 10 20 30
+ 10 20 30 40
+ (10: 1) (20: 2) (30: 3) (40: 4)
+```
+
 Motivation
 ----------
 
-The aim is to make a small **Standard Template Containers library for C**. It should
+The aim was to make a small **Standard Template Containers library for C**. It should
 - be easy to use, have intuitive naming and consistency across the library.
 - be type safe. Have minimal usage of casting and void* pointers.
 - be highly efficient. Both in speed and memory usage.

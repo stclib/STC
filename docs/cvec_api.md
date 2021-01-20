@@ -173,3 +173,42 @@ item: Mary
 item: Jake
 item: 2 elements so far
 ```
+### Example 3
+
+Container with elements of structs:
+```c
+#include <stc/cstr.h>
+#include <stc/cvec.h>
+
+typedef struct {
+    cstr name; // dynamic string
+    int id;
+} User;
+
+int User_compare(const User* a, const User* b) {
+    int c = strcmp(a->name.str, b->name.str);
+    return c != 0 ? c : a->id - b->id;
+}
+void User_del(User* self) {
+    cstr_del(&self->name);
+}
+User User_clone(User user) {
+    user.name = cstr_clone(user.name);
+    return user;
+}
+
+// declare a memory managed, clonable vector of users:
+using_cvec(u, User, User_compare, User_del, User_clone);
+
+int main(void) {
+    cvec_u vec = cvec_u_init();
+    cvec_u_push_back(&vec, (User) {cstr_from("admin"), 0});
+    cvec_u_push_back(&vec, (User) {cstr_from("joe"), 1});
+    
+    cvec_u vec2 = cvec_u_clone(vec);
+    c_foreach (i, cvec_u, vec2)
+        printf("%s: %d\n", i.ref->name.str, i.ref->id);
+
+    c_del(cvec_u, &vec, &vec2); // cleanup
+}
+```
