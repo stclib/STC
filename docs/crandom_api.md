@@ -1,11 +1,11 @@
-# STC Module [crandom](../stc/crandom.h): Pseudo Random Number Generators
+# STC Module [crandom](../stc/crandom.h): Pseudo Random Number Generator
 ![Random](pics/random.jpg)
 
-This describes the API of module **crandom**. It contains **stc64**, a *64-bit PRNG*, and can generate
+This describes the API of module **crandom**. It contains **stc64**, a *64-bit PRNG*. It can also generate
 bounded uniform and normal distributed random numbers. See [random](https://en.cppreference.com/w/cpp/header/random)
 for similar c++ functionality.
 
-**stc64** is an extremely fast PRNG by Tyge Løvset, suited for parallel usage. It features a
+**stc64** is an extremely fast, novel PRNG by Tyge Løvset, suited for parallel usage. It features a
 Weyl-sequence as part of the state. It is faster than *sfc64*, *wyhash64*, *pcg64*, and *xoshiro256\*\**
 on common platforms. It does not require fast multiplication or 128-bit integer operations. It has a
 256 bit state, but updates only 192 bit per generated number.
@@ -18,7 +18,7 @@ is generated when the Weyl-increment is incremented by 2 every 2^64 output.
 **stc64** passes *PractRand*, tested up to 8TB output, Vigna's Hamming weight test, and simple
 correlation tests, i.e. *n* interleaved streams with only one-bit differences in initial state.
 
-See the PRNG shootout by Vigna: http://prng.di.unimi.it and the debate between the authors of
+For more, see the PRNG shootout by Vigna: http://prng.di.unimi.it and the debate between the authors of
 xoshiro and pcg (Vigna/O'Neill) PRNGs: https://www.pcg-random.org/posts/on-vignas-pcg-critique.html
 
 ## Types
@@ -66,22 +66,13 @@ RNG, around 68% of the values fall within the range [*mean* - *stddev*, *mean* +
 ```c
 #include <stdio.h>
 #include <time.h>
-#include <math.h>
-#include "stc/crandom.h"
-#include "stc/cstr.h"
-#include "stc/cmap.h"
-#include "stc/cvec.h"
 
-// Declare unordered map: int -> int with typetag 'i'.
-using_cmap(i, int, size_t);
+#include <stc/crandom.h>
+#include <stc/csmap.h>
+#include <stc/cstr.h>
 
-// Comparison of map keys.
-static int compare(cmap_i_value_t *a, cmap_i_value_t *b) {
-    return c_default_compare(&a->first, &b->first);
-}
-// Declare vector of map entries, with comparison function.
-using_cvec(e, cmap_i_value_t, compare);
-
+// Declare int -> int sorted map. Uses typetag 'i' for ints.
+using_csmap(i, int, size_t);
 
 int main()
 {
@@ -96,32 +87,24 @@ int main()
     stc64_normalf_t dist = stc64_normalf_init(Mean, StdDev);
 
     // Create histogram map
-    cmap_i mhist = cmap_i_init();
-    for (size_t i = 0; i < N; ++i) {
+    csmap_i mhist = csmap_i_init();
+    c_forrange (N) {
         int index = (int) round( stc64_normalf(&rng, &dist) );
-        cmap_i_emplace(&mhist, index, 0).first->second += 1;
+        ++ csmap_i_emplace(&mhist, index, 0).first->second;
     }
-
-    // Transfer map to vec and sort it by map entry keys.
-    cvec_e vhist = cvec_e_init();
-    c_foreach (i, cmap_i, mhist)
-        cvec_e_push_back(&vhist, *i.ref);
-    cvec_e_sort(&vhist);
 
     // Print the gaussian bar chart
     cstr_t bar = cstr_init();
-    c_foreach (i, cvec_e, vhist) {
+    c_foreach (i, csmap_i, mhist) {
         size_t n = (size_t) (i.ref->second * StdDev * Scale * 2.5 / N);
         if (n > 0) {
             cstr_resize(&bar, n, '*');
             printf("%4d %s\n", i.ref->first, bar.str);
         }
     }
-
     // Cleanup
     cstr_del(&bar);
-    cmap_i_del(&mhist);
-    cvec_e_del(&vhist);
+    csmap_i_del(&mhist);
 }
 ```
 Output:
