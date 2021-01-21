@@ -7,7 +7,7 @@ Introduction
 ------------
 
 An modern, templated, user-friendly, fast, fully typesafe, and customizable container library for C99, with a uniform API.
-This is a compact headers-only library with the all of the standard data containers, and a few algorithms:
+This is a compact headers-only library with the all of the "standard" data containers, except for the multi-map/set variants:
 - [***carray*** - Templated **multi-dimensional array** type](docs/carray_api.md)
 - [***cbits*** - A **std::bitset** / **boost::dynamic_bitset** alike type](docs/cbits_api.md)
 - [***cdeq*** - Templated **std::deque** alike type](docs/cdeq_api.md)
@@ -28,9 +28,9 @@ Others:
 - [***copt*** - Implements ***copt_get()***, similar to posix **getopt_long()**](docs/copt_api.md)
 - [***crand*** - A very efficent modern **pseudo-random number generator**](docs/crand_api.md)
 
-The usage of the containers is similar to the C++ standard containers in STL, so it should be easy if you are familiar with them. 
+The usage of the containers is similar to the c++ standard containers in STL, so it should be easy if you are familiar with them. 
 All containers mentioned above are generic, except for **cstr** and **cbits**. No casting is used, and containers are therefore
-typesafe like templates in C++. Here is a simple usage example:
+typesafe like templates in c++. Here is a simple usage example:
 ```c
 #include <stc/cvec.h>
 
@@ -120,7 +120,7 @@ The aim was to make a small **Standard Template Containers library for C**. It s
 - be type safe. Have minimal usage of casting and void* pointers.
 - be highly efficient. Both in speed and memory usage.
 - be customizable without losing efficiency. E.g. inline replacable compare, hash, allocation functions per container type instantiation.
-- have a fairly small code base, and easy to install, deploy and maintain.
+- have a small code base, and easy to install, deploy and maintain.
 - avoid bloat. It should not try to cover all thinkable functions, but limit itself to the most useful and commonly used.
 
 Installation
