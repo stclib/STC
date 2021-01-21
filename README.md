@@ -1,13 +1,15 @@
 ![Standard Template Containers](docs/pics/containers.jpg)
 
-STC - the Standard Template Containers
-======================================
+STC - Standard Template Containers - C99 header-only library
+============================================================
 
 Introduction
 ------------
 
-An modern, templated, user-friendly, fast, fully typesafe, and customizable container library for C99, with a uniform API.
-This is a compact headers-only library with the all of the "standard" data containers, except for the multi-map/set variants:
+An modern, templated, user-friendly, fast, fully typesafe, and customizable container library for C99,
+with a uniform API that uses the naming conventions from the c++ standard template library (STL) where possible.
+
+This is a compact, headers-only library with the all the major "standard" data containers, except for the multi-map/set variants:
 - [***carray*** - Templated **multi-dimensional array** type](docs/carray_api.md)
 - [***cbits*** - A **std::bitset** / **boost::dynamic_bitset** alike type](docs/cbits_api.md)
 - [***cdeq*** - Templated **std::deque** alike type](docs/cdeq_api.md)
@@ -24,7 +26,7 @@ This is a compact headers-only library with the all of the "standard" data conta
 - [***cvec*** - Templated **std::vector** alike type](docs/cvec_api.md)
 
 Others:
-- [***ccommon*** - General definitions](docs/ccommon_api.md)
+- [***ccommon*** - General definitions, and handy safe-to-use macros](docs/ccommon_api.md)
 - [***coption*** - Implements ***coption_get()***, similar to posix **getopt_long()**](docs/coption_api.md)
 - [***crandom*** - A novel, extremely fast **pseudo-random number generator**](docs/crandom_api.md) named **stc64**.
 
