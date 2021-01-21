@@ -25,7 +25,7 @@
 
 /*  Queue adapter, default uses clist.
 
-    #include <stc/crand.h>
+    #include <stc/crandom.h>
     #include <stc/cqueue.h>
     using_cdeq(i, int);
     using_cqueue(i, cdeq_i);

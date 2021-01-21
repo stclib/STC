@@ -1,4 +1,4 @@
-#include <stc/crand.h>
+#include <stc/crandom.h>
 #include <stc/cqueue.h>
 #include <stdio.h>
 

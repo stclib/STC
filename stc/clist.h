@@ -31,7 +31,7 @@
 
     #include <stdio.h>
     #include <stc/clist.h>
-    #include <stc/crand.h>
+    #include <stc/crandom.h>
     using_clist(ix, int64_t);
 
     int main() {

@@ -1,7 +1,7 @@
 #include <cstdint>
 #include <iostream>
 #include <ctime>
-#include <stc/crand.h>
+#include <stc/crandom.h>
 
 static inline uint64_t rotl64(const uint64_t x, const int k)
   { return (x << k) | (x >> (64 - k)); }

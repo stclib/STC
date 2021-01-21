@@ -24,8 +24,8 @@
 #define CRANDOM__H__
 
 /*
-// crand: Pseudo-random number generator
-#include "stc/crand.h"
+// crandom: Pseudo-random number generator
+#include "stc/crandom.h"
 int main() {
     uint64_t seed = 123456789;
     stc64_t rng = stc64_init(seed);
@@ -112,7 +112,7 @@ STC_API double stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-/* PRNG crand: by Tyge Løvset, NORCE Research, 2020.
+/* PRNG crandom: by Tyge Løvset, NORCE Research, 2020.
  * Extremely fast PRNG suited for parallel usage with Weyl-sequence parameter.
  * Faster than sfc64, wyhash64, and xoshiro256** on most platforms.
  * 256bit state, updates only 192bit per rng.

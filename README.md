@@ -26,7 +26,7 @@ This is a compact headers-only library with the all of the "standard" data conta
 Others:
 - [***ccommon*** - General definitions](docs/ccommon_api.md)
 - [***copt*** - Implements ***copt_get()***, similar to posix **getopt_long()**](docs/copt_api.md)
-- [***crand*** - A very efficent modern **pseudo-random number generator**](docs/crand_api.md)
+- [***crandom*** - A very efficent modern **pseudo-random number generator**](docs/crandom_api.md)
 
 The usage of the containers is similar to the c++ standard containers in STL, so it should be easy if you are familiar with them. 
 All containers mentioned above are generic, except for **cstr** and **cbits**. No casting is used, and containers are therefore

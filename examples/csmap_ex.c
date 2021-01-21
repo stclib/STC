@@ -1,6 +1,6 @@
 #include <stc/csmap.h>
 #include <stc/cstr.h>
-#include <stc/crand.h>
+#include <stc/crandom.h>
 #include <stdio.h>
 
 using_csmap(i, int, size_t);

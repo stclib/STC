@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <time.h>
-#include <stc/crand.h>
+#include <stc/crandom.h>
 #include <stc/cvec.h>
 #include <stc/cpque.h>
 

@@ -60,7 +60,7 @@ cpque_X_value_t         cpque_X_value_clone(cpque_X_value_t val);
 ```c
 #include <stdio.h>
 #include "stc/cpque.h"
-#include "stc/crand.h"
+#include "stc/crandom.h"
 
 using_cvec(i, int64_t);
 using_cpque(i, cvec_i, >); // adaptor type, '>' = min-heap

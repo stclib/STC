@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stc/clist.h>
-#include <stc/crand.h>
+#include <stc/crandom.h>
 using_clist(fx, double);
 
 int main() {

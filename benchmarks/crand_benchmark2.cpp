@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <random>
-#include "stc/crand.h"
+#include "stc/crandom.h"
 #include "others/pcg_random.hpp"
 
 static struct stc32_state { stc64_t rng; uint64_t spare; unsigned n; } stc32_global =

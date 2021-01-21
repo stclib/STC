@@ -1,7 +1,7 @@
-# STC Module [crand](../stc/crand.h): Pseudo Random Number Generators
+# STC Module [crandom](../stc/crandom.h): Pseudo Random Number Generators
 ![Random](pics/random.jpg)
 
-This describes the API of module **crand**. It contains **stc64**, a *64-bit PRNG*, and can generate
+This describes the API of module **crandom**. It contains **stc64**, a *64-bit PRNG*, and can generate
 bounded uniform and normal distributed random numbers. See [random](https://en.cppreference.com/w/cpp/header/random)
 for similar c++ functionality.
 
@@ -34,7 +34,7 @@ xoshiro and pcg (Vigna/O'Neill) PRNGs: https://www.pcg-random.org/posts/on-vigna
 
 All cstr definitions and prototypes may be included in your C source file by including a single header file.
 ```c
-#include "stc/crand.h"
+#include "stc/crandom.h"
 ```
 
 ## Methods
@@ -67,7 +67,7 @@ RNG, around 68% of the values fall within the range [*mean* - *stddev*, *mean* +
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
-#include "stc/crand.h"
+#include "stc/crandom.h"
 #include "stc/cstr.h"
 #include "stc/cmap.h"
 #include "stc/cvec.h"

@@ -4,7 +4,7 @@
 #include <stc/cvec.h>
 #include <stc/cpque.h>
 #include <stc/cmap.h>
-#include <stc/crand.h>
+#include <stc/crandom.h>
 
 using_cvec(i, int64_t);
 using_cpque(i, cvec_i, >); // min-heap (increasing values)

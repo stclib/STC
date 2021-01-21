@@ -3,7 +3,7 @@
 #include <deque>
 #include <vector>
 #include <stc/cdeq.h>
-#include <stc/crand.h>
+#include <stc/crandom.h>
 
 enum {N = 1000000000, M = 12345, P = 5000, R = 2000};
 using_cdeq(i, int);

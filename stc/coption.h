@@ -20,24 +20,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef COPT__H__
-#define COPT__H__
+#ifndef COPTION__H__
+#define COPTION__H__
 
 /*
 // Inspired by https://attractivechaos.wordpress.com/2018/08/31/a-survey-of-argument-parsing-libraries-in-c-c
 // Fixed major bugs with option arguments (both long and short).
 // Added arg->faulty output field, and has a more consistent API.
 // 
-// copt_get() is similar to GNU's getopt_long(). Each call parses one option and
+// coption_get() is similar to GNU's getopt_long(). Each call parses one option and
 // returns the option name. opt->arg points to  the option argument if present.
 // The function returns -1 when all command-line arguments are parsed. In this case,
 // opt->ind is the index of the first non-option argument.
 #include <stdio.h>
-#include <stc/copt.h>
+#include <stc/coption.h>
 
 int main(int argc, char *argv[])
 {
-    copt_long_t longopts[] = {
+    coption_long longopts[] = {
         {"foo", copt_no_argument,       'f'},
         {"bar", copt_required_argument, 'b'},
         {"opt", copt_optional_argument, 'o'},
@@ -46,8 +46,8 @@ int main(int argc, char *argv[])
     const char* optstr = "xy:z::123";
     printf("program -x -y ARG -z [ARG] -1 -2 -3 --foo --bar ARG --opt [ARG] [ARGUMENTS]\n");
     int c;
-    copt_t opt = copt_init();
-    while ((c = copt_get(&opt, argc, argv, optstr, longopts)) != -1) {
+    coption opt = coption_init();
+    while ((c = coption_get(&opt, argc, argv, optstr, longopts)) != -1) {
         switch (c) {
             case '?': printf("error: unknown option: %s\n", opt.faulty); break;
             case ':': printf("error: missing argument for %s\n", opt.faulty); break;
@@ -77,16 +77,16 @@ typedef struct {
     int longindex; /* idx of long option; or -1 if short */
     int _i, _pos, _nargs;
     char _faulty[4];
-} copt_t;
+} coption;
 
 typedef struct {
     const char *name;
     int has_arg;
     int val;
-} copt_long_t;
+} coption_long;
 
-static const copt_t copt_inits = {1, 0, NULL, NULL, -1, 1, 0, 0, {'-', '?', '\0'}};
-static inline copt_t copt_init(void) { return copt_inits; }
+static const coption coption_inits = {1, 0, NULL, NULL, -1, 1, 0, 0, {'-', '?', '\0'}};
+static inline coption coption_init(void) { return coption_inits; }
 
 static void _copt_permute(char *argv[], int j, int n) { /* move argv[j] over n elements to the left */
     int k;
@@ -96,13 +96,13 @@ static void _copt_permute(char *argv[], int j, int n) { /* move argv[j] over n e
     argv[j - k] = p;
 }
 
-/* @param opt   output; must be initialized to copt_init() on first call
+/* @param opt   output; must be initialized to coption_init() on first call
  * @return      ASCII val for a short option; longopt.val for a long option;
  *              -1 if argv[] is fully processed; '?' for an unknown option or
  *              an ambiguous long option; ':' if an option argument is missing
  */
-static int copt_get(copt_t *opt, int argc, char *argv[],
-                    const char *shortopts, const copt_long_t *longopts) {
+static int coption_get(coption *opt, int argc, char *argv[],
+                       const char *shortopts, const coption_long *longopts) {
     int optc = -1, i0, j, posixly_correct = (shortopts[0] == '+');
     if (!posixly_correct) {
         while (opt->_i < argc && (argv[opt->_i][0] != '-' || argv[opt->_i][1] == '\0'))
@@ -122,7 +122,7 @@ static int copt_get(copt_t *opt, int argc, char *argv[],
         opt->opt = 0, optc = '?', opt->_pos = -1;
         if (longopts) { /* parse long options */
             int k, n_exact = 0, n_partial = 0;
-            const copt_long_t *o = 0, *o_exact = 0, *o_partial = 0;
+            const coption_long *o = 0, *o_exact = 0, *o_partial = 0;
             for (j = 2; argv[opt->_i][j] != '\0' && argv[opt->_i][j] != '='; ++j) {} /* find the end of the option name */
             for (k = 0; longopts[k].name != 0; ++k)
                 if (strncmp(&argv[opt->_i][2], longopts[k].name, j - 2) == 0) {

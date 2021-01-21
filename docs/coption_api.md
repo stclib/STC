@@ -1,6 +1,6 @@
-# STC Module [copt](../stc/copt.h): Command line argument parsing
+# STC Module [copt](../stc/coption.h): Command line argument parsing
 
-This describes the API of the *copt_get()* function for command line argument parsing.
+This describes the API of the *coption_get()* function for command line argument parsing.
 See [getopt_long](https://www.freebsd.org/cgi/man.cgi?getopt_long(3)) for a similar posix function.
 
 ## Types
@@ -12,39 +12,39 @@ enum {
     copt_optional_argument = 2
 };
 typedef struct {
-    int ind;             /* equivalent to optind */
-    int opt;             /* equivalent to optopt */
-    const char *arg;     /* equivalent to optarg */
+    int ind;             /* equivalent to posix optind */
+    int opt;             /* equivalent to posix optopt */
+    const char *arg;     /* equivalent to posix optarg */
     const char *faulty;  /* points to the faulty option, if any */
     int longindex;       /* index of long option; or -1 if short */
     ...
-} copt_t;
+} coption;
 
 typedef struct {
     const char *name;
     int has_arg;
     int val;
-} copt_long_t;
+} coption_long;
 
-const copt_t copt_inits;
+const coption coption_inits;
 ```
 
 ## Methods
 
 ```c
-copt_t              copt_init(void);
-int                 copt_get(copt_t *opt, int argc, char *argv[],
-                             const char *shortopts, const copt_long_t *longopts);
+coption             coption_init(void);
+int                 coption_get(coption *opt, int argc, char *argv[],
+                                const char *shortopts, const coption_long *longopts);
 ```
 
 ## Example
 
 ```c
 #include <stdio.h>
-#include "stc/copt.h"
+#include "stc/coption.h"
 
 int main(int argc, char *argv[]) {
-    static copt_long_t long_options[] = {
+    static coption_long long_options[] = {
       {"verbose", copt_no_argument,       'V'},
       {"help",    copt_no_argument,       'H'},
       {"add",     copt_no_argument,       'a'},
@@ -54,9 +54,9 @@ int main(int argc, char *argv[]) {
       {"file",    copt_required_argument, 'f'},
       {NULL}
     };
-    copt_t opt = copt_inits;
+    coption opt = coption_init();
     int c;
-    while ((c = copt_get(&opt, argc, argv, ":if:lr", long_options)) != -1) {
+    while ((c = coption_get(&opt, argc, argv, ":if:lr", long_options)) != -1) {
         switch (c) {
             case 'V': case 'H':
             case 'a': case 'b':

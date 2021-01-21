@@ -8,7 +8,7 @@
 #include <stc/cvec.h>
 #include <stc/cdeq.h>
 #include <stc/cstr.h>
-#include <stc/crand.h>
+#include <stc/crandom.h>
 
 typedef struct {const char* first; int second;} Si;
 using_cvec(si, Si, c_no_compare);
