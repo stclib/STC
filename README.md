@@ -6,8 +6,8 @@ STC - Standard Template Containers
 Introduction
 ------------
 
-An modern, templated, user-friendly, fast, fully typesafe, and customizable container library for C99,
-with a uniform API that uses the naming conventions from the c++ standard template library (STL) where possible.
+A modern, templated, user-friendly, fast, fully typesafe, and customizable container library for C99,
+with a uniform API, which resembles the c++ standard template library (STL).
 
 This is a compact, header-only library with the all the major "standard" data containers, except for the multi-map/set variants:
 - [***carray*** - Templated **multi-dimensional array** type](docs/carray_api.md)
@@ -31,8 +31,8 @@ Others:
 - [***crandom*** - A novel, extremely fast *PRNG* named **stc64**](docs/crandom_api.md)
 
 The usage of the containers is similar to the c++ standard containers in STL, so it should be easy if you are familiar with them. 
-All containers mentioned above are generic, except for **cstr** and **cbits**. No casting is used, and containers are therefore
-typesafe like templates in c++. Here is a simple usage example:
+All containers are generic/templated, except for **cstr** and **cbits**. No casting is used, so containers are typesafe like
+templates in c++. A basic usage example:
 ```c
 #include <stc/cvec.h>
 
@@ -114,23 +114,22 @@ Outputs
  {10: 1} {20: 2} {30: 3} {40: 4}
 ```
 
-Motivation
+Highlights
 ----------
-
-The aim was to make a small **Standard Template Containers library for C**. It should
-- be easy to use, have intuitive naming and consistency across the library.
-- be type safe. Have minimal usage of casting and void* pointers.
-- be highly efficient. Both in speed and memory usage.
-- be customizable without losing efficiency. E.g. inline replacable compare, hash, allocation functions per container type instantiation.
-- have a small code base, and easy to install, deploy and maintain.
-- avoid bloat. It should not try to cover all thinkable functions, but limit itself to the most useful and commonly used.
+- **User Friendly** - Easy to use, as can be seen from the examples above. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments for customization of value- *comparison*, *destruction*, *cloning*, *convertion types*, and more. Methods have in most cases similar named corresponding methods in STL.
+- **High Performance** - The containers are written with efficiency, low memory usage, and small code size in mind. Most containers perform similarly to the c++ STL containers, however **cmap** and **cset** are around 5 ***-five-*** times faster than the STL equivalents, *std::unordered_map* and *std::unordered_set*. See below. Also **cdeq** are in some cases significantly faster than *std::deque*, however implementations vary between different c++ compilers.
+- **Type Safe** - No more casting that obscure bugs in your code. The compiler will let you know when you're passing wrong container or element types to your methods, and no more error prone casting of elements back from your containers.
+- **Uniform API** - Methods to *construct*, *initialize*, *iterate* and *destruct* are intuitive and consistent across the various containers in the library. Makes it easier to learn how to use the library.
+- **Small Footprint** - Generated code is surprisingly small, partly due to the small library code base. The example above with six different containers resulted in an executable of ***18 kb in size*** without dependencies, using the TinyC compiler! It compiles and links instantaniously. Compare this with a corresponding c++ program using STL.
+- **Dual Mode Compilation** - Can be used a simple header-only library with static methods (default), or as a traditional library by defining STC_HEADER in your project. See below for instructions.
+- **Simple Installation** - It is headers only by default.
 
 Installation
 ------------
 
-Because it is headers only, files can simply be included in your program. The functions will be inlined by default. You may add the project folder to CPATH environment variable, to let gcc, clang, and tinyc locate the headers.
+Because it is headers only, files can simply be included in your program. The methods will be static by default (some inlined). You may add the project folder to CPATH environment variable, to let gcc, clang, or tinyc locate the headers.
 
-If containers are extensively used accross many translation units with common instantiated container types, it is recommended to build as a "library", to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option, and put all the instantiations of containers used in one single C file, like this:
+If containers are extensively used accross several translation units with common instantiated container types, it is recommended to build as a "library", to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option, and put all the instantiations of containers used in one single C-file, e.g.:
 ```c
 #define STC_IMPLEMENTATION
 #include <stc/cstr.h>
@@ -142,15 +141,15 @@ If containers are extensively used accross many translation units with common in
 using_cmap(ii, int, int);
 using_cset(ix, int64_t);
 using_cvec(i, int);
-using_clist(p, struct Point);
+using_clist(pt, struct Point);
 ...
 ```
 Performance
 -----------
 
-The library is very efficent. Containers have templated intrusive elements. One of the most performance critical containers is the **cmap / cset**. Luckily, cmap is among the very fastest unordered map implementations available, also considering highly optimized C++ implementations. See *benchmarks* folder.
+All containers have templated intrusive elements. The unordered map and set are among the most performance critical containers. **cmap** and **cset** are among the very fastest unordered map implementations available, also considering highly optimized c++ implementations. Below are some benchmarks for this.
 
-Compiled with clang.exe -O3 -x c++, v10.0 on windows, Ryzen 7 2700X CPU. Similar results with VC and g++.
+Compiled with clang -O3 -x c++, v10.0 on windows, Ryzen 7 2700X CPU. Similar results with VC and g++.
 
 - **CMAP** = stc/*cmap*
 - KMAP = klib/*khash*
@@ -221,17 +220,17 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 - **cset**: Same as cmap, but this uses a table of keys only, not (key, value) pairs.
 - **carray**: carray1, carray2 and carray3. Type size: One pointer plus one, two, or three size_t variables to store dimensions. Arrays are allocated as one contiguous block of heap memory.
 
-cmap discussion
----------------
+More on **cmap**
+----------------
 
-**cmap / cset** uses open hashing and is among the fastest hash-tables for C and C++. The default max load-factor is 0.85.
+**cmap** uses open hashing, and default max load-factor is 0.85.
 
 You can customize the destroy-, hash-, equals- functions, but also define a convertion from a raw/literal type to the key-type specified. This is very useful when e.g. having cstr as key, and therefore a few using-macros are pre-defined
-for cmaps with cstr_t keys and/or values:
+for **cmap** with **cstr** keys and/or values:
 
 - *using_cmap_strkey(tag, valuetype)*
 - *using_cmap_strval(tag, keytype)*
-- *using_cmap_str()* // cstr_t -> cstr_t
-- *using_cset_str()* // cstr_t set
+- *using_cmap_str()* // cstr -> cstr
+- *using_cset_str()* // cstr set
 
-To customize your own cmap type to work like these, you may want to look at **examples/advanced.c**. It demonstrates how to use a custom struct as a hash map key, by using the optional parameters to using_cmap().
+To customize your own cmap type to work like these, you may want to look at examples. One shows how to use a custom struct as a hash map key, by using the optional parameters of *using_cmap()*.
