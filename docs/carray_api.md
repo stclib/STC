@@ -1,4 +1,4 @@
-# STC [carray](../stc/carray.h): Dynamic 1/2/3 Dimensional Array
+# STC [carray](../stc/carray.h): Dynamic Multi-dimensional Array of Contiguous Data
 ![Array](pics/array.jpg)
 
 The **carray** containers provides templates for multidimensional arrays of contiguous data It supports 1-, 2- and
