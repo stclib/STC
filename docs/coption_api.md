@@ -1,6 +1,7 @@
-# STC Module [copt](../stc/coption.h): Command line argument parsing
+# STC [coption](../stc/coption.h): Command line argument parsing
 
 This describes the API of the *coption_get()* function for command line argument parsing.
+
 See [getopt_long](https://www.freebsd.org/cgi/man.cgi?getopt_long(3)) for a similar posix function.
 
 ## Types

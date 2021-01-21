@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <time.h>
-#include <math.h>
-#include "stc/crandom.h"
-#include "stc/cstr.h"
-#include "stc/csmap.h"
+
+#include <stc/crandom.h>
+#include <stc/csmap.h>
+#include <stc/cstr.h>
 
 // Declare int -> int sorted map. Uses typetag 'i' for ints.
 using_csmap(i, int, size_t);

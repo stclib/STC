@@ -8,7 +8,7 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ## Declaration
 
 ```c
-#define using_cpque(X, ctype, direction)
+using_cpque(X, ctype, direction)
 ```
 The macro `using_cpque()` must be instantiated in the global scope.
 **cpque** uses normally **cvec_X** or **cdeq_X** as underlying implementation, specified as `ctype`.

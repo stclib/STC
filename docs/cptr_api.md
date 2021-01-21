@@ -1,20 +1,21 @@
-# STC Module [cptr](../stc/cptr.h): Smart Pointers
+# STC [cptr](../stc/cptr.h): Smart Pointers
 
-This module simplifies management of pointers in containers. The **csptr** type is similar to a c++
-[std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr).
+**cptr** (managed raw pointer) and **csptr** (shared pointer) enables memory managed pointers in containers.
 
-Raw pointers and shared pointers (**csptr**) may be used as items of containers. The pointed-to elements are automatically destructed and deleted when the container is destructed. **csptr** elements are only deleted if there are no other shared references to the element. **csptr** uses thread-safe atomic use-count, through the *csptr_X_clone(sp)* and *csptr_X_del(&sp)* methods.
+The pointed-to elements are automatically destructed and deleted when the container is destructed. **csptr** elements are only deleted if there are no other shared references to the element. **csptr** uses thread-safe atomic use-count, through the *csptr_X_clone()* and *csptr_X_del()* methods.
+
+ See the c++ classes [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr) for a functional reference.
 
 ## Declaration
 
 ```c
-#define using_cptr(X, Value, valueCompare=c_default_compare,
-                             valueDestroy=c_default_del,
-                             valueClone=c_default_clone)
+using_cptr(X, Value, valueCompare=c_default_compare,
+                     valueDestroy=c_default_del,
+                     valueClone=c_default_clone)
 
-#define using_csptr(X, Value, valueCompare=c_default_compare,
-                              valueDestroy=c_default_del,
-                              valueClone=ignored)
+using_csptr(X, Value, valueCompare=c_default_compare,
+                      valueDestroy=c_default_del,
+                      valueClone=ignored)
 ```
 The macro `using_cptr()` must be instantiated in the global scope. `X` is a type tag name and will
 affect the names of all cptr types and methods. E.g. declaring `using_cptr(my, cvec_my);`,

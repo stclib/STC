@@ -50,7 +50,7 @@ int main(void) {
 ```
 And with multiple containers...
 ```c
-#include <stc/cmap.h>
+#include <stc/cset.h>
 #include <stc/cvec.h>
 #include <stc/cdeq.h>
 #include <stc/clist.h>
@@ -61,8 +61,8 @@ And with multiple containers...
 struct Point { float x, y; };
 
 // declare your container types
-using_cset(i, int);                         // unordered (hash) set
-using_cvec(p, struct Point, c_no_compare);  // vector again, but struct as elements
+using_cset(i, int);                         // unordered set
+using_cvec(p, struct Point, c_no_compare);  // vector, struct as elements
 using_cdeq(i, int);                         // deque
 using_clist(i, int);                        // singly linked list
 using_cqueue(i, cdeq_i);                    // queue, using deque as adapter

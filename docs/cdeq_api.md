@@ -1,18 +1,19 @@
-# STC Container [cdeq](../stc/cdeq.h): Double Ended Queue
+# STC [cdeq](../stc/cdeq.h): Double Ended Queue
 ![Deque](pics/deque.jpg)
 
 A **cdeq** is an indexed sequence container that allows fast insertion and deletion at both its beginning and its end. Note that this container is implemented similar to a vector, but has the same performance profile for both *push_back()* and *push_front()* as *cvec_X_push_back()*. Iterators may be invalidated after push-operations.
-See [std::deque](https://en.cppreference.com/w/cpp/container/deque) for a similar c++ class.
+
+See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque) for a functional description.
 
 ## Declaration
 
 ```c
-#define using_cdeq(X, Value, valueCompareRaw=c_default_compare,
-                             valueDestroy=c_default_del,
-                             valueFromRaw=c_default_clone,
-                             valueToRaw=c_default_to_raw,
-                             RawValue=Value)
-#define using_cdeq_str()
+using_cdeq(X, Value, valueCompareRaw=c_default_compare,
+                     valueDestroy=c_default_del,
+                     valueFromRaw=c_default_clone,
+                     valueToRaw=c_default_to_raw,
+                     RawValue=Value)
+using_cdeq_str()
 ```
 The macro `using_cdeq()` can be instantiated with 2, 3, 5, or 7 arguments in the global scope.
 Defaults values are given above for args not specified. `X` is a type tag name and

@@ -1,21 +1,28 @@
-# STC Container [clist](../stc/clist.h): Forward List
+# STC [clist](../stc/clist.h): Forward List
 ![List](pics/list.jpg)
 
-The **clist** container supports fast insertion and removal of elements from anywhere in the container. It is similar to the c++ [std::forward_list](https://en.cppreference.com/w/cpp/container/forward_list), but **clist** also supports *push_back()* (**O**(1) time). It is implemented as a circular singly-linked list. Fast random access is not supported.
+The **clist** container supports fast insertion and removal of elements from anywhere in the container.
+Fast random access is not supported. Adding, removing and moving the elements within the list, or across
+several lists, does not invalidate the iterators currently referring to other elements in the list. However,
+an iterator or reference referring to an element is invalidated when the corresponding element is removed
+(via *erase_after*) from the list.
 
-Adding, removing and moving the elements within the list, or across several lists, does not invalidate the iterators currently referring to other elements in the list. However, an iterator or reference referring to an element is invalidated when the corresponding element is removed (via *erase_after*) from the list.
+Unlike the similar c++ class *std::forward_list*, **clist** also supports *push_back()* (**O**(1) time).
+It is implemented as a circular singly-linked list. A **clist** object occupies only one pointer in memory,
+and like *std::forward_list* the length of the list is not stored. The method *clist_X_size()* is available,
+however computed in **O**(*n*) time.
 
-**clist** also supports various *splice* functions and *merge-sort*. **clist** itself occupies only one pointer in memory, like *std::forward_list*, the length of **clist** is not stored. The method *clist_X_size()* is available, however computed in **O**(*n*) time.
+See the c++ class [std::forward_list](https://en.cppreference.com/w/cpp/container/forward_list) for a functional description.
 
 ## Declaration
 
 ```c
-#define using_clist(X, Value, valueCompareRaw=c_default_compare,
-                              valueDestroy=c_default_del,
-                              valueFromRaw=c_default_clone,
-                              valueToRaw=c_default_to_raw,
-                              RawValue=Value)
-#define using_clist_str()
+using_clist(X, Value, valueCompareRaw=c_default_compare,
+                      valueDestroy=c_default_del,
+                      valueFromRaw=c_default_clone,
+                      valueToRaw=c_default_to_raw,
+                      RawValue=Value)
+using_clist_str()
 ```
 The macro `using_clist()` can be instantiated with 2, 3, 5, or 7 arguments in the global scope.
 Default values are given above for args not specified. `X` is a type tag name and

@@ -1,29 +1,30 @@
-# STC Container [csmap](../stc/csmap.h): Sorted Map
+# STC [csmap](../stc/csmap.h): Sorted Map
 ![Map](pics/smap.jpg)
 
 A **csmap** is a sorted associative container that contains key-value pairs with unique keys. Keys are sorted by using the comparison function *keyCompare*. Search, removal, and insertion operations have logarithmic complexity. **csmap** is implemented as an AA-tree.
-See [std::map](https://en.cppreference.com/w/cpp/container/map) for a similar c++ class.
+
+See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) for a functional description.
 
 ## Declaration
 
 ```c
-#define using_csmap(X, Key, Mapped, keyCompareRaw=c_default_compare,
-                                    mappedDestroy=c_default_del,
-                                    mappedClone=c_default_clone,
-                                    keyDestroy=c_default_del,
-                                    keyFromRaw=c_default_clone,
-                                    keyToRaw=c_default_to_raw,
-                                    RawKey=Key)
+using_csmap(X, Key, Mapped, keyCompareRaw=c_default_compare,
+                            mappedDestroy=c_default_del,
+                            mappedClone=c_default_clone,
+                            keyDestroy=c_default_del,
+                            keyFromRaw=c_default_clone,
+                            keyToRaw=c_default_to_raw,
+                            RawKey=Key)
 
-#define using_csmap_strkey(X, Mapped, mappedDestroy=c_default_del,
-                                      mappedClone=c_default_clone)
+using_csmap_strkey(X, Mapped, mappedDestroy=c_default_del,
+                              mappedClone=c_default_clone)
 
-#define using_csmap_strval(X, Key, keyCompare=c_default_compare,
-                                   keyDestroy=c_default_del,
-                                   keyFromRaw=c_default_clone,
-                                   keyToRaw=c_default_to_raw,
-                                   RawKey=Key)
-#define using_csmap_str()
+using_csmap_strval(X, Key, keyCompare=c_default_compare,
+                           keyDestroy=c_default_del,
+                           keyFromRaw=c_default_clone,
+                           keyToRaw=c_default_to_raw,
+                           RawKey=Key)
+using_csmap_str()
 ```
 The macro `using_csmap()` can be instantiated with 3, 4, 6, 8, or 10 arguments in the global scope.
 Default values are given above for args not specified. `X` is a type tag name and

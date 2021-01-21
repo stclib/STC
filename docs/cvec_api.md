@@ -1,22 +1,23 @@
-# STC Container [cvec](../stc/cvec.h): Vector
+# STC [cvec](../stc/cvec.h): Vector
 ![Vector](pics/vector.jpg)
 
 A **cvec** is a sequence container that encapsulates dynamic size arrays.
-See [std::vector](https://en.cppreference.com/w/cpp/container/vector) for a similar c++ class.
 
 The storage of the vector is handled automatically, being expanded and contracted as needed. Vectors usually occupy more space than static arrays, because more memory is allocated to handle future growth. This way a vector does not need to reallocate each time an element is inserted, but only when the additional memory is exhausted. The total amount of allocated memory can be queried using *cvec_X_capacity()* function. Extra memory can be returned to the system via a call to *cvec_X_shrink_to_fit()*.
 
 Reallocations are usually costly operations in terms of performance. The *cvec_X_reserve()* function can be used to eliminate reallocations if the number of elements is known beforehand.
 
+See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vector) for a functional description.
+
 ## Declaration
 
 ```c
-#define using_cvec(X, Value, valueCompareRaw=c_default_compare,
-                             valueDestroy=c_default_del,
-                             valueFromRaw=c_default_clone,
-                             valueToRaw=c_default_to_raw,
-                             RawValue=Value)
-#define using_cvec_str()
+using_cvec(X, Value, valueCompareRaw=c_default_compare,
+                     valueDestroy=c_default_del,
+                     valueFromRaw=c_default_clone,
+                     valueToRaw=c_default_to_raw,
+                     RawValue=Value)
+using_cvec_str()
 ```
 The macro `using_cvec()` can be instantiated with 2, 3, 5, or 7 arguments in the global scope.
 Defaults values are given above for args not specified. `X` is a type tag name and

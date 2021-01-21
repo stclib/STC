@@ -1,17 +1,19 @@
-# STC Container [csset](../stc/csmap.h): Sorted Set
+# STC [csset](../stc/csmap.h): Sorted Set
 ![Set](pics/sset.jpg)
 
-A **csset** is an associative container that contains a sorted set of unique objects of type *Key*. Sorting is done using the key comparison function *keyCompare*. Search, removal, and insertion operations have logarithmic complexity. **csset** is implemented as a AA-tree. See [std::set](https://en.cppreference.com/w/cpp/container/set) for a similar c++ class.
+A **csset** is an associative container that contains a sorted set of unique objects of type *Key*. Sorting is done using the key comparison function *keyCompare*. Search, removal, and insertion operations have logarithmic complexity. **csset** is implemented as a AA-tree.
+
+See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) for a functional description.
 
 ## Declaration
 
 ```c
-#define using_csset(X, Key, keyCompare=c_default_compare,
-                            keyDestroy=c_default_del,
-                            keyFromRaw=c_default_clone,
-                            keyToRaw=c_default_to_raw,                           
-                            RawKey=Key)
-#define using_csset_str()                           
+using_csset(X, Key, keyCompare=c_default_compare,
+                    keyDestroy=c_default_del,
+                    keyFromRaw=c_default_clone,
+                    keyToRaw=c_default_to_raw,                           
+                    RawKey=Key)
+using_csset_str()                           
 ```
 The macro `using_csset()` can be instantiated with 2, 3, 5, or 7 arguments in the global scope.
 Default values are given above for args not specified. `X` is a type tag name and
@@ -25,7 +27,7 @@ be replaced by `my` in all of the following documentation.
 All csset definitions and prototypes may be included in your C source file by including a single header file.
 
 ```c
-#include "stc/csmap.h" // both csmap and csset
+#include "stc/csset.h"
 ```
 ## Methods
 

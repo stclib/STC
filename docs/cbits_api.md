@@ -1,9 +1,11 @@
-# STC Container [cbits](../stc/cbits.h): Bitset
+# STC [cbits](../stc/cbits.h): Bitset
 ![Bitset](pics/bitset.jpg)
 
-A **cbits** represents a set of bits. It provides accesses to the value of individual bits via *cbits_test()* and provides the bitwise operators that one can apply to builtin integers. The number of bits in the set is specified at runtime via a parameter to the constructor *cbits_with_size()* or by *cbits_resize()*. A **cbits* bitset can be manipulated by standard logic operators and converted to and from strings.
+A **cbits** represents a set of bits. It provides accesses to the value of individual bits via *cbits_test()* and provides the bitwise operators that one can apply to builtin integers. The number of bits in the set is specified at runtime via a parameter to the constructor *cbits_with_size()* or by *cbits_resize()*. A **cbits** bitset can be manipulated by standard logic operators and converted to and from strings.
 
-The **cbits** container is similar to the c++ class [std::bitset](https://en.cppreference.com/w/cpp/utility/bitset) and [boost::dynamic_bitset](https://www.boost.org/doc/libs/release/libs/dynamic_bitset/dynamic_bitset.html).
+See the c++ class [std::bitset](https://en.cppreference.com/w/cpp/utility/bitset) or
+[boost::dynamic_bitset](https://www.boost.org/doc/libs/release/libs/dynamic_bitset/dynamic_bitset.html)
+for a functional description.
 
 ## Header file
 

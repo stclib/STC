@@ -1,11 +1,12 @@
-# STC Module [crandom](../stc/crandom.h): Pseudo Random Number Generators
+# STC [crandom](../stc/crandom.h): Pseudo Random Number Generator
 ![Random](pics/random.jpg)
 
-This describes the API of module **crandom**. It contains **stc64**, a *64-bit PRNG*, and can generate
-bounded uniform and normal distributed random numbers. See [random](https://en.cppreference.com/w/cpp/header/random)
-for similar c++ functionality.
+This describes the API of module **crandom**. It features a *64-bit PRNG* named **stc64**,
+and can generate bounded uniform and normal distributed random numbers.
 
-**stc64** is an extremely fast PRNG by Tyge Løvset, suited for parallel usage. It features a
+See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ functionality.
+
+**stc64** is a novel, extremely fast PRNG by Tyge Løvset, suited for parallel usage. It features a
 Weyl-sequence as part of the state. It is faster than *sfc64*, *wyhash64*, *pcg64*, and *xoshiro256\*\**
 on common platforms. It does not require fast multiplication or 128-bit integer operations. It has a
 256 bit state, but updates only 192 bit per generated number.

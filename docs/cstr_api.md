@@ -1,7 +1,8 @@
-# STC Container [cstr](../stc/cstr.h): String
+# STC [cstr](../stc/cstr.h): String
 ![String](pics/string.jpg)
 
-This describes the API of string type **cstr**.
+A **cstr* is an object that represent sequences of characters. It supports an interface similar to that of a standard container of bytes, but adding features specifically designed to operate with strings of single-byte characters.
+
 See [std::basic_string](https://en.cppreference.com/w/cpp/string/basic_string) for a similar c++ class.
 
 ## Header file

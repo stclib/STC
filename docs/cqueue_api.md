@@ -7,7 +7,7 @@ See the c++ class [std::queue](https://en.cppreference.com/w/cpp/container/queue
 
 ## Declaration
 ```c
-#define using_cqueue(X, ctype)
+using_cqueue(X, ctype)
 ```
 The macro `using_cqueue()` must be instantiated in the global scope. **cqueue** uses normally
 a **cdeq_X** or **clist_X** type as underlying implementation, given as `ctype`. See example below for usage.

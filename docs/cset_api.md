@@ -1,18 +1,19 @@
-# STC Container [cset](../stc/cmap.h): Unordered Set
+# STC [cset](../stc/cmap.h): Unordered Set
 ![Set](pics/set.jpg)
 
-A **cset** is an associative container that contains a set of unique objects of type Key. Search, insertion, and removal have average constant-time complexity. See [std::unordered_set](https://en.cppreference.com/w/cpp/container/unordered_set) for a similar c++ class.
+A **cset** is an associative container that contains a set of unique objects of type Key. Search, insertion, and removal have average constant-time complexity. See the c++ class 
+[std::unordered_set](https://en.cppreference.com/w/cpp/container/unordered_set) for a functional description.
 
 ## Declaration
 
 ```c
-#define using_cset(X, Key, keyEqualsRaw=c_default_equals,
-                           keyHashRaw=c_default_hash,
-                           keyDestroy=c_default_del,
-                           keyFromRaw=c_default_clone,
-                           keyToRaw=c_default_to_raw,                           
-                           RawKey=Key)
-#define using_cset_str()                           
+using_cset(X, Key, keyEqualsRaw=c_default_equals,
+                   keyHashRaw=c_default_hash,
+                   keyDestroy=c_default_del,
+                   keyFromRaw=c_default_clone,
+                   keyToRaw=c_default_to_raw,                           
+                   RawKey=Key)
+using_cset_str()                           
 ```
 The macro `using_cset()` can be instantiated with 2, 4, 6, or 8 arguments in the global scope.
 Default values are given above for args not specified. `X` is a type tag name and
@@ -26,7 +27,7 @@ be replaced by `my` in all of the following documentation.
 All cset definitions and prototypes may be included in your C source file by including a single header file.
 
 ```c
-#include "stc/cmap.h"  // both cmap and cset
+#include "stc/cset.h"
 ```
 ## Methods
 

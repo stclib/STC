@@ -1,13 +1,14 @@
-# STC Container [cstack](../stc/cstack.h): Stack
+# STC [cstack](../stc/cstack.h): Stack
 ![Stack](pics/stack.jpg)
 
-This describes the API of the stack type **cstack**.
+The **cstack** is a container adapter that gives the programmer the functionality of a stack - specifically, a LIFO (last-in, first-out) data structure. The class template acts as a wrapper to the underlying container - only a specific set of functions is provided. The stack pushes and pops the element from the back of the underlying container, known as the top of the stack.
+
 See [std::stack](https://en.cppreference.com/w/cpp/container/stack) for a similar c++ class.
 
 ## Declaration
 
 ```c
-#define using_cstack(X, ctype)
+using_cstack(X, ctype)
 ```
 The macro `using_cstack()` must be instantiated in the global scope. **cstack** uses normally
 a **cvec_X** or **cdeq_X** type as underlying implementation, given as `ctype`. `X` is a type tag name and will

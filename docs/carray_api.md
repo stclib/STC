@@ -1,15 +1,16 @@
-# STC Container [carray](../stc/carray.h): Dynamic 1/2/3 Dimensional Array
+# STC [carray](../stc/carray.h): Dynamic 1/2/3 Dimensional Array
 ![Array](pics/array.jpg)
 
 This is 1D, 2D and 3D arrays, which are allocated from heap in one single contiguous block of memory.
 *carray3* may have sub-array "views" of *carray2* and *carray1* etc.
-See [boost::multi_array](https://www.boost.org/doc/libs/release/libs/multi_array) for similar c++ classes.
+
+See the c++ class [boost::multi_array](https://www.boost.org/doc/libs/release/libs/multi_array) for similar functionality.
 
 ## Declaration
 
 ```c
-#define using_carray(X, Value, valueDestroy=c_default_del, 
-                               valueClone=c_default_clone)
+using_carray(X, Value, valueDestroy=c_default_del, 
+                       valueClone=c_default_clone)
 ```
 The macro `using_carray()` can be instantiated with 2 or 4 arguments in the global scope.
 Default values are given above for args not specified. `X` and `N` are type tags and

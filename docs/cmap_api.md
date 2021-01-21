@@ -1,33 +1,33 @@
-# STC Container [cmap](../stc/cmap.h): Unordered Map
+# STC [cmap](../stc/cmap.h): Unordered Map
 ![Map](pics/map.jpg)
 
-A **cmap** is an associative container that contains key-value pairs with unique keys. Search, insertion, and removal of elements have average constant-time complexity.
-Elements are pairs of keys and mapped values. Implemented as open hashing with linear probing and without storing tombstones. Very fast, see performance comparisons.
+A **cmap** is an associative container that contains key-value pairs with unique keys. Search, insertion,
+and removal of elements have average constant-time complexity. Internally, the elements are not sorted in any particular order, but organized into buckets. Which bucket an element is placed into depends entirely on the hash of its key. This allows fast access to individual elements, since once the hash is computed, it refers to the exact bucket the element is placed into. It is implemented as open hashing with linear probing, and without leaving tombstones on erase.
 
-Please refer to the documentation of the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_map) for a functional description.
+See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_map) for a functional description.
 
 ## Declaration
 
 ```c
-#define using_cmap(X, Key, Mapped, keyEqualsRaw=c_default_equals,
-                                   keyHashRaw=c_default_hash,
-                                   mappedDestroy=c_default_del,
-                                   mappedClone=c_default_clone,
-                                   keyDestroy=c_default_del,
-                                   keyFromRaw=c_default_clone,
-                                   keyToRaw=c_default_to_raw,
-                                   RawKey=Key)
+using_cmap(X, Key, Mapped, keyEqualsRaw=c_default_equals,
+                           keyHashRaw=c_default_hash,
+                           mappedDestroy=c_default_del,
+                           mappedClone=c_default_clone,
+                           keyDestroy=c_default_del,
+                           keyFromRaw=c_default_clone,
+                           keyToRaw=c_default_to_raw,
+                           RawKey=Key)
 
-#define using_cmap_strkey(X, Mapped, mappedDestroy=c_default_del,
-                                     mappedClone=c_default_clone)
+using_cmap_strkey(X, Mapped, mappedDestroy=c_default_del,
+                             mappedClone=c_default_clone)
 
-#define using_cmap_strval(X, Key, keyEquals=c_default_equals,
-                                  keyHash=c_default_hash,
-                                  keyDestroy=c_default_del,
-                                  keyFromRaw=c_default_clone,
-                                  keyToRaw=c_default_to_raw,
-                                  RawKey=Key)
-#define using_cmap_str()
+using_cmap_strval(X, Key, keyEquals=c_default_equals,
+                          keyHash=c_default_hash,
+                          keyDestroy=c_default_del,
+                          keyFromRaw=c_default_clone,
+                          keyToRaw=c_default_to_raw,
+                          RawKey=Key)
+using_cmap_str()
 ```
 The macro `using_cmap()` can be instantiated with 3, 5, 7, 9, or 11 arguments in the global scope.
 Default values are given above for args not specified. `X` is a type tag name and
