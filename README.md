@@ -26,9 +26,9 @@ This is a compact, header-only library with the all the major "standard" data co
 - [***cvec*** - Templated **std::vector** alike type](docs/cvec_api.md)
 
 Others:
-- [***ccommon*** - General definitions, and handy safe-to-use macros](docs/ccommon_api.md)
+- [***ccommon*** - General definitions and handy, safe-to-use macros](docs/ccommon_api.md)
 - [***coption*** - Implements ***coption_get()***, similar to posix **getopt_long()**](docs/coption_api.md)
-- [***crandom*** - A novel, extremely fast **pseudo-random number generator**](docs/crandom_api.md) named **stc64**.
+- [***crandom*** - A novel, extremely fast *PRNG* named **stc64**](docs/crandom_api.md)
 
 The usage of the containers is similar to the c++ standard containers in STL, so it should be easy if you are familiar with them. 
 All containers mentioned above are generic, except for **cstr** and **cbits**. No casting is used, and containers are therefore
