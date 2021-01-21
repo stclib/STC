@@ -1,8 +1,8 @@
 # STC [carray](../stc/carray.h): Dynamic 1/2/3 Dimensional Array
 ![Array](pics/array.jpg)
 
-This is 1D, 2D and 3D arrays, which are allocated from heap in one single contiguous block of memory.
-*carray3* may have sub-array "views" of *carray2* and *carray1* etc.
+The **carray** containers provides templates for multidimensional arrays of contiguous data It supports 1-, 2- and
+3-dimensional arrays, which are allocated from the heap as a single contiguous block of memory.
 
 See the c++ class [boost::multi_array](https://www.boost.org/doc/libs/release/libs/multi_array) for similar functionality.
 
@@ -19,7 +19,7 @@ be replaced by `my` in all of the following documentation. The `N` character sho
 
 ## Header file
 
-All carray definitions and prototypes may be included in your C source file by including a single header file.
+All **carray** definitions and prototypes may be included in your C source file by including a single header file.
 
 ```c
 #include "stc/carray.h"
