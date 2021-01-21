@@ -49,47 +49,49 @@ int main(void) {
     cvec_i_del(&vec);
 }
 ```
-And with five containers...
+And with multiple containers...
 ```c
 #include <stc/cmap.h>
-#include <stc/csmap.h>
 #include <stc/clist.h>
-#include <stc/clist.h>
+#include <stc/cdeq.h>
 #include <stc/cqueue.h>
+#include <stc/csmap.h>
 #include <stdio.h>
 
+struct Point { float x, y; };
+
 // declare your container types
-using_cset(i, int);       // unordered (hash) set
-using_clist(i, int);      // singly linked list
-using_cdeq(i, int);       // deque
-using_cqueue(i, cdeq_i);  // queue, using deque as adapter
-using_csmap(i, int, int); // sorted map
+using_cset(i, int);                         // unordered (hash) set
+using_clist(p, struct Point, c_no_compare); // singly linked list
+using_cdeq(i, int);                         // deque
+using_cqueue(i, cdeq_i);                    // queue, using deque as adapter
+using_csmap(i, int, int);                   // sorted map
 
 int main(void) {
     // define and initialize
     c_init (cset_i, set, {10, 20, 30});
-    c_init (clist_i, list, {10, 20, 30});
+    c_init (clist_p, list, {{10, 1}, {20, 2}, {30, 3}});
     c_init (cdeq_i, deq, {10, 20, 30});
     c_init (cqueue_i, que, {10, 20, 30});
     c_init (csmap_i, map, {{20, 2}, {10, 1}, {30, 3}});
 
     // add one more element
     cset_i_insert(&set, 40);
-    clist_i_push_back(&list, 40);
+    clist_p_push_back(&list, (struct Point) {40, 4});
     cdeq_i_push_front(&deq, 5);
     cqueue_i_push(&que, 40);
     csmap_i_emplace(&map, 40, 4);
 
     // print them
     c_foreach (i, cset_i, set) printf(" %d", *i.ref); puts("");
-    c_foreach (i, clist_i, list) printf(" %d", *i.ref); puts("");
+    c_foreach (i, clist_p, list) printf(" (%f, %f)", i.ref->x, i.ref->y); puts("");
     c_foreach (i, cdeq_i, deq) printf(" %d", *i.ref); puts("");
     c_foreach (i, cqueue_i, que) printf(" %d", *i.ref); puts("");
-    c_foreach (i, csmap_i, map) printf(" (%d: %d)", i.ref->first, i.ref->second);
+    c_foreach (i, csmap_i, map) printf(" {%d: %d}", i.ref->first, i.ref->second);
 
     // cleanup
     cset_i_del(&set);
-    clist_i_del(&list);
+    clist_p_del(&list);
     cdeq_i_del(&deq);
     cqueue_i_del(&que);
     csmap_i_del(&map);
@@ -98,10 +100,10 @@ int main(void) {
 Outputs
 ```
  10 20 30 40
- 10 20 30 40
+ (10.000000, 1.000000) (20.000000, 2.000000) (30.000000, 3.000000) (40.000000, 4.000000)
  5 10 20 30
  10 20 30 40
- (10: 1) (20: 2) (30: 3) (40: 4)
+ {10: 1} {20: 2} {30: 3} {40: 4}
 ```
 
 Motivation
