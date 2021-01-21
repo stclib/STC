@@ -28,10 +28,9 @@ Others:
 - [***copt*** - Implements ***copt_get()***, similar to posix **getopt_long()**](docs/copt_api.md)
 - [***crand*** - A very efficent modern **pseudo-random number generator**](docs/crand_api.md)
 
-The usage of the containers is similar to the C++ standard containers in STL, so it should be easy if you are familiar with them.
-
-All containers mentioned above are generic, except for **cstr** and **cbits**, and are therefore typesafe like templates in C++.
-No casting is used. A simple example:
+The usage of the containers is similar to the C++ standard containers in STL, so it should be easy if you are familiar with them. 
+All containers mentioned above are generic, except for **cstr** and **cbits**. No casting is used, and containers are therefore
+typesafe like templates in C++. Here is a simple usage example:
 ```c
 #include <stc/cvec.h>
 
@@ -52,8 +51,9 @@ int main(void) {
 And with multiple containers...
 ```c
 #include <stc/cmap.h>
-#include <stc/clist.h>
+#include <stc/cvec.h>
 #include <stc/cdeq.h>
+#include <stc/clist.h>
 #include <stc/cqueue.h>
 #include <stc/csmap.h>
 #include <stdio.h>
@@ -62,37 +62,42 @@ struct Point { float x, y; };
 
 // declare your container types
 using_cset(i, int);                         // unordered (hash) set
-using_clist(p, struct Point, c_no_compare); // singly linked list
+using_cvec(p, struct Point, c_no_compare);  // vector again, but struct as elements
 using_cdeq(i, int);                         // deque
+using_clist(i, int);                        // singly linked list
 using_cqueue(i, cdeq_i);                    // queue, using deque as adapter
 using_csmap(i, int, int);                   // sorted map
 
 int main(void) {
     // define and initialize
     c_init (cset_i, set, {10, 20, 30});
-    c_init (clist_p, list, {{10, 1}, {20, 2}, {30, 3}});
+    c_init (cvec_p, vec, {{10, 1}, {20, 2}, {30, 3}});
     c_init (cdeq_i, deq, {10, 20, 30});
+    c_init (clist_i, lst, {10, 20, 30});
     c_init (cqueue_i, que, {10, 20, 30});
     c_init (csmap_i, map, {{20, 2}, {10, 1}, {30, 3}});
 
     // add one more element
     cset_i_insert(&set, 40);
-    clist_p_push_back(&list, (struct Point) {40, 4});
+    cvec_p_push_back(&vec, (struct Point) {40, 4});
     cdeq_i_push_front(&deq, 5);
+    clist_i_push_front(&lst, 5);
     cqueue_i_push(&que, 40);
     csmap_i_emplace(&map, 40, 4);
 
     // print them
     c_foreach (i, cset_i, set) printf(" %d", *i.ref); puts("");
-    c_foreach (i, clist_p, list) printf(" (%f, %f)", i.ref->x, i.ref->y); puts("");
+    c_foreach (i, cvec_p, vec) printf(" (%f, %f)", i.ref->x, i.ref->y); puts("");
     c_foreach (i, cdeq_i, deq) printf(" %d", *i.ref); puts("");
+    c_foreach (i, clist_i, lst) printf(" %d", *i.ref); puts("");
     c_foreach (i, cqueue_i, que) printf(" %d", *i.ref); puts("");
     c_foreach (i, csmap_i, map) printf(" {%d: %d}", i.ref->first, i.ref->second);
 
     // cleanup
     cset_i_del(&set);
-    clist_p_del(&list);
+    cvec_p_del(&vec);
     cdeq_i_del(&deq);
+    clist_i_del(&lst);
     cqueue_i_del(&que);
     csmap_i_del(&map);
 }
@@ -101,6 +106,7 @@ Outputs
 ```
  10 20 30 40
  (10.000000, 1.000000) (20.000000, 2.000000) (30.000000, 3.000000) (40.000000, 4.000000)
+ 5 10 20 30
  5 10 20 30
  10 20 30 40
  {10: 1} {20: 2} {30: 3} {40: 4}
@@ -122,25 +128,25 @@ Installation
 
 Because it is headers only, files can simply be included in your program. The functions will be inlined by default. You may add the project folder to CPATH environment variable, to let gcc, clang, and tinyc locate the headers.
 
-If containers are extensively used accross many translation units with common instantiated container types, it is recommended to build as a library, to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option, and put all the instantiations of the containers used in one C file, like this:
+If containers are extensively used accross many translation units with common instantiated container types, it is recommended to build as a "library", to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option, and put all the instantiations of containers used in one single C file, like this:
 ```c
 #define STC_IMPLEMENTATION
 #include <stc/cstr.h>
 #include <stc/cmap.h>
 #include <stc/cvec.h>
 #include <stc/clist.h>
-#include "Vec3.h"
+#include "Point.h"
 
 using_cmap(ii, int, int);
 using_cset(ix, int64_t);
 using_cvec(i, int);
-using_clist(v3, Vec3);
+using_clist(p, struct Point);
 ...
 ```
 Performance
 -----------
 
-The library is very efficent. Containers have templated intrusive elements. One of the most performance critical containers is the **cmap / cset**. Luckily, cmap is among the fastest C/C++ map implementations available, see **benchmarks/cmap_benchmark.c**
+The library is very efficent. Containers have templated intrusive elements. One of the most performance critical containers is the **cmap / cset**. Luckily, cmap is among the very fastest unordered map implementations available, also considering highly optimized C++ implementations. See *benchmarks* folder.
 
 Compiled with clang.exe -O3 -x c++, v10.0 on windows, Ryzen 7 2700X CPU. Similar results with VC and g++.
 
