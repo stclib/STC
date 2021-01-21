@@ -117,17 +117,17 @@ Outputs
 Highlights
 ----------
 - **User Friendly** - Easy to use, as can be seen from the examples above. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments for customization of value- *comparison*, *destruction*, *cloning*, *convertion types*, and more. Methods have in most cases similar named corresponding methods in STL.
-- **High Performance** - The containers are written with efficiency, low memory usage, and small code size in mind. Most containers perform similarly to the c++ STL containers, however **cmap** and **cset** are around 5 ***-five-*** times faster than the STL equivalents, *std::unordered_map* and *std::unordered_set*. See below. Also **cdeq** are in some cases significantly faster than *std::deque*, however implementations vary between different c++ compilers.
+- **High Performance** - The containers are written with efficiency, low memory usage, and small code size in mind. Most containers perform similarly to the c++ STL containers, however **cmap** and **cset** are roughly 5 *-five-* times faster than the STL equivalents, *std::unordered_map* and *std::unordered_set*. See below. Also **cdeq** are in some cases significantly faster than *std::deque*, however implementations vary between different c++ compilers.
 - **Type Safe** - No more error prone casting of container types and elements back and forth from your containers. Less obscure bugs in your code. The compiler will let you know when retrieving or passing wrong container or element types to the methods.
-- **Uniform API** - Methods to *construct*, *initialize*, *iterate* and *destruct* are intuitive and consistent across the various containers in the library. Makes it easier to learn how to use the library.
-- **Small Footprint** - Generated code is surprisingly small, partly due to the small library code base. The example above with six different containers resulted in an executable of ***18 kb in size*** without dependencies, using the TinyC compiler! It compiles and links instantaniously. Compare this with a corresponding c++ program using STL.
+- **Uniform API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** are intuitive and uniform across the various containers. Makes it easier to learn how to use the library.
+- **Small Footprint** - Generated executables are small, partly due to the small library code base. The example above with six different containers resulted in an executable of ***18 kb in size***, compiled with the TinyC compiler! Compiles and links instantaniously. Compare this with a corresponding c++ program using STL.
 - **Dual Mode Compilation** - Can be used a simple header-only library with static methods (default), or as a traditional library by defining STC_HEADER in your project. See below for instructions.
-- **Simple Installation** - It is headers only by default.
+- **Simple Installation** - It is headers-only by default.
 
 Installation
 ------------
 
-Because it is headers only, files can simply be included in your program. The methods will be static by default (some inlined). You may add the project folder to CPATH environment variable, to let gcc, clang, or tinyc locate the headers.
+Because it is headers-only, files can simply be included in your program. The methods will be static by default (some inlined). You may add the project folder to CPATH environment variable, to let gcc, clang, or tinyc locate the headers.
 
 If containers are extensively used accross several translation units with common instantiated container types, it is recommended to build as a "library", to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option, and put all the instantiations of containers used in one single C-file, e.g.:
 ```c
@@ -200,15 +200,7 @@ BMAP: time:  0.60, size: 13971002, sum 1344701724191145
 FMAP: time:  0.56, size: 13971002, sum 1344701724191145
 HMAP: time:  0.51, size: 13971002, sum 1344701724191145
 ```
-From these tests *cmap*, *robin_hood* and *khash* are almost equally fast. std::unordered_map is bad. With random numbers in 0 - 2^20 range, khash performs slightly worse:
-```
-Unordered maps: 30000000 repeats of Insert random key + try to remove a random key:
-CMAP: time:  1.93, sum: 450000015000000, size: 524809, erased 14738434
-KMAP: time:  7.28, sum: 450000015000000, size: 524809, erased 14738434
-
-Unordered maps: Insert 30000000 random keys, then remove them in same order:
-CMAP: time:  1.16, erased 1048576
-KMAP: time:  2.62, erased 1048576
+From these tests *cmap*, *robin_hood* and *khash* are almost equally fast. std::unordered_map is very slow in comparison.
 ```
 Memory efficiency
 -----------------
@@ -216,6 +208,7 @@ Memory efficiency
 The containers are memory efficent, i.e. they occupy as little memory as practical possible.
 - **cstr**, **cvec**: Type size: one pointer. The size and capacity is stored as part of the heap allocation that also holds the vector elements.
 - **clist**: Type size: one pointer. Each node allocates block storing value and next pointer.
+- **cdeq**:  Type size: two pointers. Otherwise equal to cvec.
 - **cmap**: Type size: 4 pointers. cmap uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The open hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
 - **cset**: Same as cmap, but this uses a table of keys only, not (key, value) pairs.
 - **carray**: carray1, carray2 and carray3. Type size: One pointer plus one, two, or three size_t variables to store dimensions. Arrays are allocated as one contiguous block of heap memory.
