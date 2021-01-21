@@ -1,7 +1,7 @@
 ![Standard Template Containers](docs/pics/containers.jpg)
 
-STC - Standard Template Containers - C99 header-only library
-============================================================
+STC - Standard Template Containers
+==================================
 
 Introduction
 ------------
@@ -9,7 +9,7 @@ Introduction
 An modern, templated, user-friendly, fast, fully typesafe, and customizable container library for C99,
 with a uniform API that uses the naming conventions from the c++ standard template library (STL) where possible.
 
-This is a compact, headers-only library with the all the major "standard" data containers, except for the multi-map/set variants:
+This is a compact, header-only library with the all the major "standard" data containers, except for the multi-map/set variants:
 - [***carray*** - Templated **multi-dimensional array** type](docs/carray_api.md)
 - [***cbits*** - A **std::bitset** / **boost::dynamic_bitset** alike type](docs/cbits_api.md)
 - [***cdeq*** - Templated **std::deque** alike type](docs/cdeq_api.md)
