@@ -116,12 +116,12 @@ Outputs
 
 Highlights
 ----------
-- **User Friendly** - Easy to use, as can be seen from the examples above. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments for customization of value- *comparison*, *destruction*, *cloning*, *convertion types*, and more. Methods have in most cases similar named corresponding methods in STL.
-- **High Performance** - The containers are written with efficiency, low memory usage, and small code size in mind. Most containers perform similarly to the c++ STL containers, however **cmap** and **cset** are roughly 5 *-five-* times faster than the STL equivalents, *std::unordered_map* and *std::unordered_set*. See below. Also **cdeq** are in some cases significantly faster than *std::deque*, however implementations vary between different c++ compilers.
+- **User Friendly** - Easy to use, as can be seen from the examples above. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments for customization of value- *comparison*, *destruction*, *cloning*, *convertion types*, and more. Most methods have similar named corresponding methods in STL.
+- **High Performance** - The containers are written with efficiency, low memory usage, and small code size in mind. Most containers perform similarly to the c++ STL containers, however **cmap** and **cset** are roughly *5* times faster than the STL equivalents, *std::unordered_map* and *std::unordered_set*. See *Performance*. Also **cdeq** are in some cases significantly faster than *std::deque*, however implementations vary between different c++ compilers.
 - **Type Safe** - No more error prone casting of container types and elements back and forth from your containers. Less obscure bugs in your code. The compiler will let you know when retrieving or passing wrong container or element types to the methods.
-- **Uniform API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** are intuitive and uniform across the various containers. Makes it easier to learn how to use the library.
-- **Small Footprint** - Generated executables are small, partly due to the small library code base. The example above with six different containers resulted in an executable of ***18 kb in size***, compiled with the TinyC compiler! Compiles and links instantaniously. Compare this with a corresponding c++ program using STL.
-- **Dual Mode Compilation** - Can be used a simple header-only library with static methods (default), or as a traditional library by defining STC_HEADER in your project. See below for instructions.
+- **Uniform API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** are intuitive and uniform across the various containers.
+- **Small Footprint** - Generated executables are small, partly due to the small library code base. The example above with six different containers, compiles to an executable of *18 kb in size*, compiled with TinyC.
+- **Dual Mode Compilation** - Can be used a simple header-only library with static methods (default), or as a traditional library by defining symbol STC_HEADER in your project. See below for instructions.
 - **Simple Installation** - It is headers-only by default.
 
 Installation
@@ -129,7 +129,7 @@ Installation
 
 Because it is headers-only, files can simply be included in your program. The methods will be static by default (some inlined). You may add the project folder to CPATH environment variable, to let gcc, clang, or tinyc locate the headers.
 
-If containers are extensively used accross several translation units with common instantiated container types, it is recommended to build as a "library", to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option, and put all the instantiations of containers used in one single C-file, e.g.:
+If containers are extensively used accross several translation units with common instantiated container types, it is recommended to build as a "library", to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option, and place all the instantiations of containers used in a single C source file, e.g.:
 ```c
 #define STC_IMPLEMENTATION
 #include <stc/cstr.h>
@@ -201,7 +201,7 @@ FMAP: time:  0.56, size: 13971002, sum 1344701724191145
 HMAP: time:  0.51, size: 13971002, sum 1344701724191145
 ```
 From these tests *cmap*, *robin_hood* and *khash* are almost equally fast. std::unordered_map is very slow in comparison.
-```
+
 Memory efficiency
 -----------------
 
