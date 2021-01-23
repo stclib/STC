@@ -39,7 +39,7 @@ using_cvec(ix, int64_t); // ix is just an example tag name.
 void vectordemo1()
 {
     printf("\nVECTORDEMO1\n");
-    cvec_ix bignums = cvec_inits; // = (cvec_ix) cvec_inits; if initializing after declaration.
+    cvec_ix bignums = cvec_ix_init();
     cvec_ix_reserve(&bignums, 100);
     for (size_t i = 10; i <= 100; i += 10)
         cvec_ix_push_back(&bignums, i * i);
@@ -63,7 +63,7 @@ using_cvec_str();
 void vectordemo2()
 {
     printf("\nVECTORDEMO2\n");
-    cvec_str names = cvec_inits;
+    cvec_str names = cvec_str_init();
     cvec_str_emplace_back(&names, "Mary");
     cvec_str_emplace_back(&names, "Joe");
     cvec_str_emplace_back(&names, "Chris");
@@ -81,7 +81,7 @@ using_clist(ix, int);
 void listdemo1()
 {
     printf("\nLISTDEMO1\n");
-    clist_ix nums = clist_inits, nums2 = clist_inits;
+    clist_ix nums = clist_ix_init(), nums2 = clist_ix_init();
     for (int i = 0; i < 10; ++i)
         clist_ix_push_back(&nums, i);
     for (int i = 100; i < 110; ++i)

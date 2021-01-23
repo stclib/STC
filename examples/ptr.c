@@ -40,9 +40,9 @@ const char* names[] = {
 };
 
 int main() {
-    cvec_pe vec1 = cvec_inits;
-    cvec_pp vec2 = cvec_inits;
-    cvec_ps vec3 = cvec_inits;
+    cvec_pe vec1 = cvec_pe_init();
+    cvec_pp vec2 = cvec_pp_init();
+    cvec_ps vec3 = cvec_ps_init();
 
     for (int i = 0; i < 6; i += 2) {
         Person tmp;

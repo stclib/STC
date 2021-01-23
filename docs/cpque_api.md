@@ -1,4 +1,4 @@
-# STC Container [cpque](../stc/cpque.h): Priority Queue
+# STC [cpque](../stc/cpque.h): Priority Queue
 
 A priority queue is a container adaptor that provides constant time lookup of the largest (by default) element, at the expense of logarithmic insertion and extraction.
 A user-provided argument `<`or `>` must be supplied to set the ordering, e.g. using `>` would cause the smallest element to appear as the top().

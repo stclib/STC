@@ -51,7 +51,7 @@ void test2() {
     clock_t t1 = clock(), t2, t3;
     stc64_t rng = stc64_init(0);
     {
-        cdeq_i deq = cdeq_inits;
+        cdeq_i deq = cdeq_i_init();
         for (size_t i = 1; i < N; i++) {
             cdeq_i_push_front(&deq, stc64_rand(&rng));
             if (i % M == 0)
@@ -68,7 +68,7 @@ void test2() {
         printf("stc access      : %5.2f sec, sum=%zu\n", (float)(t3 - t2) / CLOCKS_PER_SEC, sum);
         cdeq_i_del(&deq);
     }{
-        cdeq_i deq = cdeq_inits;
+        cdeq_i deq = cdeq_i_init();
         for (size_t i = 1; i < N/10; i++) {
             if (i & 1) cdeq_i_push_front(&deq, stc64_rand(&rng));
             else cdeq_i_push_back(&deq, stc64_rand(&rng));
@@ -77,7 +77,7 @@ void test2() {
         printf("stc pushf/pushb : %5.2f sec\n", (float)(t2 - t3) / CLOCKS_PER_SEC);
         cdeq_i_del(&deq);
     }{
-        cdeq_i deq = cdeq_inits;
+        cdeq_i deq = cdeq_i_init();
         for (size_t i = 1; i < N/2; i++) {
             cdeq_i_push_back(&deq, stc64_rand(&rng));
         }

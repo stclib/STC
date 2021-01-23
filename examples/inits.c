@@ -23,7 +23,7 @@ int main(void)
 {
     // CVEC FLOAT / PRIORITY QUEUE
 
-    cvec_f floats = cvec_inits;
+    cvec_f floats = cvec_f_init();
     c_push_items(&floats, cvec_f, {4.0f, 2.0f, 5.0f, 3.0f, 1.0f});
 
     c_foreach (i, cvec_f, floats) printf("%.1f ", *i.ref);
@@ -82,7 +82,7 @@ int main(void)
 
     // CVEC PAIR
 
-    cvec_ip pairs1 = cvec_inits;
+    cvec_ip pairs1 = cvec_ip_init();
     c_push_items(&pairs1, cvec_ip, {
         {5, 6},
         {3, 4},
@@ -98,7 +98,7 @@ int main(void)
 
     // CLIST PAIR
 
-    clist_ip pairs2 = clist_inits;
+    clist_ip pairs2 = clist_ip_init();
     c_push_items(&pairs2, clist_ip, {
         {5, 6},
         {3, 4},

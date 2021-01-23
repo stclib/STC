@@ -35,7 +35,7 @@
     using_clist(ix, int64_t);
 
     int main() {
-        clist_ix list = clist_inits;
+        clist_ix list = clist_ix_init();
         stc64_t rng = stc64_init(12345);
         int n;
         for (int i=0; i<1000000; ++i) // one million
@@ -83,8 +83,6 @@
         int _state; \
     } clist_##X##_iter_t
 
-#define clist_inits         {NULL}
-
 #define c_emplace_after(self, ctype, pos, ...) do { \
     ctype* __self = self; \
     ctype##_iter_t __pos = pos; \
@@ -104,7 +102,7 @@ STC_API size_t _clist_size(const clist_void* self);
     typedef RawValue clist_##X##_rawvalue_t; \
 \
     STC_INLINE clist_##X \
-    clist_##X##_init(void) {clist_##X x = clist_inits; return x;} \
+    clist_##X##_init(void) {clist_##X x = {NULL}; return x;} \
     STC_INLINE bool \
     clist_##X##_empty(clist_##X ls) {return ls.last == NULL;} \
     STC_INLINE size_t \
@@ -219,7 +217,7 @@ STC_API size_t _clist_size(const clist_void* self);
 \
     STC_DEF clist_##X \
     clist_##X##_clone(clist_##X list) { \
-        clist_##X out = clist_inits; \
+        clist_##X out = clist_##X##_init(); \
         c_foreach_3 (i, clist_##X, list) \
             clist_##X##_emplace_back(&out, valueToRaw(i.ref)); \
         return out; \

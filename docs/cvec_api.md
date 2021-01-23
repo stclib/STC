@@ -114,7 +114,7 @@ using_cvec(i, int);
 int main()
 {
     // Create a vector containing integers
-    cvec_i vec = cvec_inits;
+    cvec_i vec = cvec_i_init();
     c_push_items(&vec, cvec_i, {7, 5, 16, 8});
 
     // Add two more integers to vector

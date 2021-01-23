@@ -22,7 +22,7 @@ int main() {
     carray2f arr_a = carray2f_init(ydim, xdim, 0.f);
     printf("arr_a: (%zu, %zu)\n", carray2f_ydim(arr_a), carray2f_xdim(arr_a));
 
-    clist_a tableList = clist_inits;
+    clist_a tableList = clist_a_init();
     // Put in some data.
     *carray2f_at(&arr_a, y, x) = 3.1415927f; // aa[y][x]
     clist_a_push_back(&tableList, arr_a);

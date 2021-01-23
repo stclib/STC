@@ -8,7 +8,7 @@ int main() {
     int k;
     const int n = 2000000;
 
-    clist_fx list = clist_inits;
+    clist_fx list = clist_fx_init();
     stc64_t rng = stc64_init(1234);
     stc64_uniformf_t dist = stc64_uniformf_init(100.0f, n);
     int m = 0;

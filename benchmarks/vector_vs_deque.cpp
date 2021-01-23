@@ -12,7 +12,7 @@
 
 typedef struct {const char* first; int second;} Si;
 using_cvec(si, Si, c_no_compare);
-cvec_si tm = cvec_inits;
+cvec_si tm = cvec_si_init();
 
 void add(cvec_si* tm, const char* s, int n) { Si si = {s, n}; cvec_si_push_back(tm, si); }
 
@@ -176,7 +176,7 @@ using_cvec(i, int);
 
 void test_cvec(const int num_iterations)
 {
-    cvec_i v = cvec_inits;
+    cvec_i v = cvec_i_init();
     stc64_t rng = stc64_init(0);
     //v.reserve(num_iterations + 2); //Ensure there is enough space reserved.
 

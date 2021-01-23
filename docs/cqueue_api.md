@@ -1,4 +1,4 @@
-# STC Container [cqueue](../stc/cqueue.h): Queue
+# STC [cqueue](../stc/cqueue.h): Queue
 ![Queue](pics/queue.jpg)
 
 The **cqueue** is container adapter that gives the programmer the functionality of a queue - specifically, a FIFO (first-in, first-out) data structure. The class template acts as a wrapper to the underlying container - only a specific set of functions is provided. The queue pushes the elements on the back of the underlying container and pops them from the front.
