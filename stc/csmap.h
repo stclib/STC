@@ -180,7 +180,7 @@ int main(void) {
     STC_INLINE void \
     C##_##X##_del(C##_##X* self) {C##_##X##_del_r_(self->root);} \
     STC_INLINE void \
-    C##_##X##_clear(C##_##X* self) {C##_##X##_del(self); self->size = 0;} \
+    C##_##X##_clear(C##_##X* self) {C##_##X##_del(self); *self = C##_##X##_init();} \
     STC_INLINE void \
     C##_##X##_swap(C##_##X* a, C##_##X* b) {c_swap(C##_##X, *a, *b);} \
 \

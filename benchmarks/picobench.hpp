@@ -1240,7 +1240,7 @@ private:
     bool _compare_results_across_samples = true;
     bool _compare_results_across_benchmarks = true;
 
-    report_output_format _output_format = report_output_format::all;
+    report_output_format _output_format = report_output_format::concise_text;
     const char* _output_file = nullptr; // nullptr means stdout
 
     std::ostream* _stdout = &std::cout;

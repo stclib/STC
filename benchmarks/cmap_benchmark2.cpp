@@ -123,8 +123,8 @@ static void ins_and_erase_cmap_i(picobench::state& s)
     stc64_srandom(seed);
     c_forrange (s.iterations())
         cmap_i_erase(&map, stc64_random());
-    cmap_i_del(&map);
     s.set_result(cmap_i_size(map));
+    cmap_i_del(&map);
 }
 
 #define P samples(S1).iterations({N1/4})
