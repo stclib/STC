@@ -31,14 +31,14 @@ using_cset(sx, int);       // Set of int
 using_cmap(mx, int, char); // Map of int -> char
 
 int main(void) {
-    cset_sx s = cset_inits;
+    cset_sx s = cset_sx_init();
     cset_sx_insert(&s, 5);
     cset_sx_insert(&s, 8);
     c_foreach (i, cset_sx, s)
         printf("set %d\n", i.ref->second);
     cset_sx_del(&s);
 
-    cmap_mx m = cmap_inits;
+    cmap_mx m = cmap_mx_init();
     cmap_mx_put(&m, 5, 'a');
     cmap_mx_put(&m, 8, 'b');
     cmap_mx_put(&m, 12, 'c');
@@ -55,8 +55,7 @@ int main(void) {
 #include <stdlib.h>
 #include <string.h>
 
-#define cmap_inits    {NULL, NULL, 0, 0, 0.15f, 0.85f}
-#define cset_inits    cmap_inits
+#define _cmap_inits   {NULL, NULL, 0, 0, 0.15f, 0.85f}
 
 /* https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction */
 #define chash_reduce(x, N)            ((uint32_t) (((uint64_t) (x) * (N)) >> 32))
@@ -185,7 +184,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     } C##_##X##_iter_t; \
 \
     STC_INLINE C##_##X \
-    C##_##X##_init(void) {C##_##X m = cmap_inits; return m;} \
+    C##_##X##_init(void) {C##_##X m = _cmap_inits; return m;} \
     STC_INLINE bool \
     C##_##X##_empty(C##_##X m) {return m.size == 0;} \
     STC_INLINE size_t \
@@ -318,7 +317,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
                             keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
     STC_DEF C##_##X \
     C##_##X##_with_capacity(size_t cap) { \
-        C##_##X h = C##_inits; \
+        C##_##X h = _cmap_inits; \
         C##_##X##_reserve(&h, cap); \
         return h; \
     } \

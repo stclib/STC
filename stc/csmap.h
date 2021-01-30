@@ -167,8 +167,8 @@ int main(void) {
         bool second; \
     } C##_##X##_result_t; \
 \
-    STC_INLINE C##_##X \
-    C##_##X##_init(void) {C##_##X m = {(C##_##X##_node_t *) &cbst_nil, 0}; return m;} \
+    STC_API C##_##X \
+    C##_##X##_init(void); \
     STC_INLINE bool \
     C##_##X##_empty(C##_##X m) {return m.size == 0;} \
     STC_INLINE size_t \
@@ -305,14 +305,16 @@ int main(void) {
                        keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
     typedef C##_##X C##_##X##_t
 
-_using_CBST_types(_, csmap, int, int);
-static csmap___node_t cbst_nil = {&cbst_nil, &cbst_nil, 0};
-
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #define _implement_CBST(X, C, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \
                            keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
+    STC_DEF C##_##X \
+    C##_##X##_init(void) { \
+        C##_##X m = {(C##_##X##_node_t *) &cbst_nil, 0}; \
+        return m; \
+    } \
 \
     STC_DEF C##_##X##_value_t* \
     C##_##X##_find_it(const C##_##X* self, C##_##X##_rawkey_t rkey, C##_##X##_iter_t* out) { \
@@ -446,6 +448,10 @@ static csmap___node_t cbst_nil = {&cbst_nil, &cbst_nil, 0};
             c_free(tn); \
         } \
     }
+
+
+_using_CBST_types(_, csmap, int, int);
+static csmap___node_t cbst_nil = {&cbst_nil, &cbst_nil, 0};
 
 #else
 #define _implement_CBST(X, C, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \

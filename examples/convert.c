@@ -12,7 +12,7 @@ using_clist_str();
 
 int main()
 {
-    cmap_str map = cmap_inits;
+    cmap_str map = cmap_str_init();
     cmap_str_emplace(&map, "green", "#00ff00");
     cmap_str_emplace(&map, "blue", "#0000ff");
     cmap_str_emplace(&map, "yellow", "#ffff00");

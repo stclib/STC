@@ -216,18 +216,17 @@
     STC_DEF void \
     cvec_##X##_del(cvec_##X* self) { \
         cvec_##X##_clear(self); \
-        if (_cvec_alloced(self) != _cvec_inits) \
-            c_free(_cvec_alloced(self)); \
+        if (_cvec_rep(self) != _cvec_inits) \
+            c_free(_cvec_rep(self)); \
     } \
 \
     STC_DEF void \
     cvec_##X##_reserve(cvec_##X* self, size_t cap) { \
-        size_t* rep; \
-        if (cap > cvec_##X##_capacity(*self)) { \
-            size_t len = _cvec_size(self); \
-            rep = (size_t *) c_realloc(_cvec_alloced(self) != _cvec_inits ? _cvec_alloced(self) : NULL, \
-                                       2*sizeof(size_t) + cap*sizeof(Value)); \
-            self->data = (Value *) (rep + 2); \
+        size_t len = _cvec_size(self); \
+        if (cap > _cvec_cap(self)) { \
+            size_t* rep = (size_t *) c_realloc(_cvec_rep(self) != _cvec_inits ? _cvec_rep(self) : NULL, \
+                                               2*sizeof(size_t) + cap*sizeof(Value)); \
+            self->data = (cvec_##X##_value_t*) (rep + 2); \
             rep[0] = len; \
             rep[1] = cap; \
         } \
@@ -305,7 +304,7 @@
     }
 
 static size_t _cvec_inits[2] = {0, 0};
-#define _cvec_alloced(self) (((size_t *) (self)->data) - 2)
+#define _cvec_rep(self) (((size_t *) (self)->data) - 2)
 
 #else
 #define _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue)

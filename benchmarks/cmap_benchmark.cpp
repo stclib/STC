@@ -33,7 +33,7 @@ stc64_t rng;
 #define RAND(N) (stc64_rand(&rng) & ((1 << N) - 1))
 
 
-#define CMAP_SETUP(X, Key, Value) cmap_##X map = cmap_inits \
+#define CMAP_SETUP(X, Key, Value) cmap_##X map = cmap_##X##_init() \
                                   ; cmap_##X##_set_load_factors(&map, 0.0, max_load_factor)
 #define CMAP_PUT(X, key, val)     cmap_##X##_put(&map, key, val).first->second
 #define CMAP_EMPLACE(X, key, val) cmap_##X##_emplace(&map, key, val).first->second

@@ -14,9 +14,9 @@ int main() {
     int xdim = 4, ydim = 6;
     int x = 1, y = 5, tableKey = 42;
     const char* strKey = "first";
-    cmap_l listMap = cmap_inits;
+    cmap_l listMap = cmap_l_init();
 
-    cmap_s myMap = cmap_inits;
+    cmap_s myMap = cmap_s_init();
 
     // Construct.
     carray2f arr_a = carray2f_init(ydim, xdim, 0.f);

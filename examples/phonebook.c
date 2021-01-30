@@ -36,8 +36,7 @@ void print_phone_book(cmap_str phone_book)
 int main(int argc, char **argv)
 {
   bool erased;
-  cmap_str phone_book = cmap_inits;
-  c_push_items(&phone_book, cmap_str, {
+  c_init (cmap_str, phone_book, {
     {"Lilia Friedman", "(892) 670-4739"},
     {"Tariq Beltran", "(489) 600-7575"},
     {"Laiba Juarez", "(303) 885-5692"},

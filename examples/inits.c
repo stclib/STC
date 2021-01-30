@@ -45,7 +45,7 @@ int main(void)
     // CMAP ID
 
     int year = 2020;
-    cmap_id idnames = cmap_inits;
+    cmap_id idnames = cmap_id_init();
     c_push_items(&idnames, cmap_id, {
         {100, cstr_from("Hello")},
         {110, cstr_from("World")},
@@ -59,7 +59,7 @@ int main(void)
 
     // CMAP CNT
 
-    cmap_cnt countries = cmap_inits;
+    cmap_cnt countries = cmap_cnt_init();
     c_push_items(&countries, cmap_cnt, {
         {"Norway", 100},
         {"Denmark", 50},

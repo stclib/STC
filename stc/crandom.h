@@ -84,14 +84,14 @@ STC_INLINE double stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist) {
 }
 
 #if defined(__SIZEOF_INT128__)
-    #define cmul128(a, b, lo, hi) \
+    #define cumul128(a, b, lo, hi) \
         do { __uint128_t _z = (__uint128_t)(a) * (b); \
              *(lo) = (uint64_t)_z, *(hi) = _z >> 64; } while(0)
 #elif defined(_MSC_VER) && defined(_WIN64)
     #include <intrin.h>
-    #define cmul128(a, b, lo, hi) (*(lo) = _umul128(a, b, hi), (void)0)
+    #define cumul128(a, b, lo, hi) (*(lo) = _umul128(a, b, hi), (void)0)
 #elif defined(__x86_64__)
-    #define cmul128(a, b, lo, hi) \
+    #define cumul128(a, b, lo, hi) \
         asm("mulq %[rhs]" : "=a" (*(lo)), "=d" (*(hi)) \
                           : [lhs] "0" (a), [rhs] "rm" (b))
 #endif
@@ -99,7 +99,11 @@ STC_INLINE double stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist) {
 /* Unbiased bounded uniform distribution. */
 STC_INLINE int64_t stc64_uniform(stc64_t* rng, stc64_uniform_t* d) {
     uint64_t lo, hi;
-    do { cmul128(stc64_rand(rng), d->range, &lo, &hi); } while (lo < d->threshold);
+#ifdef cumul128
+    do { cumul128(stc64_rand(rng), d->range, &lo, &hi); } while (lo < d->threshold);
+#else
+    hi = stc64_rand(rng) % d->range;
+#endif
     return d->lower + hi;
 }
 

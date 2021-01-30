@@ -108,7 +108,7 @@ using_cset(i, int);
 void setdemo1()
 {
     printf("\nSETDEMO1\n");
-    cset_i nums = cset_inits;
+    cset_i nums = cset_i_init();
     cset_i_insert(&nums, 8);
     cset_i_insert(&nums, 11);
 
@@ -123,7 +123,7 @@ using_cmap(ii, int, int);
 void mapdemo1()
 {
     printf("\nMAPDEMO1\n");
-    cmap_ii nums = cmap_inits;
+    cmap_ii nums = cmap_ii_init();
     cmap_ii_put(&nums, 8, 64);
     cmap_ii_put(&nums, 11, 121);
     printf("val 8: %d\n", *cmap_ii_at(&nums, 8));
@@ -136,7 +136,7 @@ using_cmap_strkey(si, int); // Shorthand macro for the general using_cmap expans
 void mapdemo2()
 {
     printf("\nMAPDEMO2\n");
-    cmap_si nums = cmap_inits;
+    cmap_si nums = cmap_si_init();
     cmap_si_put(&nums, "Hello", 64);
     cmap_si_put(&nums, "Groovy", 121);
     cmap_si_put(&nums, "Groovy", 200); // overwrite previous
@@ -158,7 +158,7 @@ using_cmap_str();
 void mapdemo3()
 {
     printf("\nMAPDEMO3\n");
-    cmap_str table = cmap_inits;
+    cmap_str table = cmap_str_init();
     cmap_str_put(&table, "Map", "test");
     cmap_str_put(&table, "Make", "my");
     cmap_str_put(&table, "Sunny", "day");

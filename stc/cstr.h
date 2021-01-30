@@ -260,7 +260,7 @@ uint32_t cstr_hash_raw(const char* const* p, size_t none) {
 
 STC_DEF size_t
 cstr_reserve(cstr_t* self, size_t cap) {
-    size_t len = cstr_size(*self), oldcap = cstr_capacity(*self);
+    size_t oldcap = cstr_capacity(*self);
     if (cap > oldcap) {
         size_t* rep = (size_t *) c_realloc(oldcap ? _cstr_rep(self) : NULL, _cstr_mem(cap));
         self->str = (char *) &rep[2];

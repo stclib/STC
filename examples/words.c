@@ -26,7 +26,7 @@ int main1()
         "this", "sentence", "is", "a", "hoax"
     });
 
-    cmap_si word_map = cmap_inits;
+    cmap_si word_map = cmap_si_init();
     c_foreach (w, cvec_str, words)
         cmap_si_emplace(&word_map, w.ref->str, 0).first->second += 1;
 
