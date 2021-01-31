@@ -25,6 +25,6 @@
 
 // Unordered set - implemented as open hashing with linear probing and no tombstones.
 
-#incluide "cmap.h"
+#include "cmap.h"
 
 #endif
