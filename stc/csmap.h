@@ -344,7 +344,7 @@ int main(void) {
     C##_##X##_node_del_(C##_##X##_node_t *d, C##_##X##_size_t tn) { \
         size_t *rep = ((size_t *) d) - 4; \
         keyDel(KEY_REF_##C(&d[tn].value)); \
-        d[tn].link[1] = (C##_##X##_size_t) rep[_smap_DISP]; d[tn].level = 0; \
+        d[tn].link[1] = (C##_##X##_size_t) rep[_smap_DISP]; \
         rep[_smap_DISP] = tn; \
     } \
 \
@@ -353,7 +353,7 @@ int main(void) {
         C##_##X##_size_t tn = _smap_root(self); \
         C##_##X##_node_t *d = out->_d = self->data; \
         out->_top = 0; \
-        if (tn) while (d[tn].level) { \
+        while (tn) { \
             C##_##X##_rawkey_t rx = keyToRaw(KEY_REF_##C(&d[tn].value)); \
             switch (keyCompareRaw(&rx, &rkey)) { \
                 case -1: tn = d[tn].link[1]; break; \
