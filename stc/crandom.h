@@ -84,14 +84,14 @@ STC_INLINE double stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist) {
 }
 
 #if defined(__SIZEOF_INT128__)
-    #define cumul128(a, b, lo, hi) \
+    #define cmul128(a, b, lo, hi) \
         do { __uint128_t _z = (__uint128_t)(a) * (b); \
              *(lo) = (uint64_t)_z, *(hi) = _z >> 64; } while(0)
 #elif defined(_MSC_VER) && defined(_WIN64)
     #include <intrin.h>
-    #define cumul128(a, b, lo, hi) (*(lo) = _umul128(a, b, hi), (void)0)
+    #define cmul128(a, b, lo, hi) (*(lo) = _umul128(a, b, hi), (void)0)
 #elif defined(__x86_64__)
-    #define cumul128(a, b, lo, hi) \
+    #define cmul128(a, b, lo, hi) \
         asm("mulq %[rhs]" : "=a" (*(lo)), "=d" (*(hi)) \
                           : [lhs] "0" (a), [rhs] "rm" (b))
 #endif
@@ -99,8 +99,8 @@ STC_INLINE double stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist) {
 /* Unbiased bounded uniform distribution. */
 STC_INLINE int64_t stc64_uniform(stc64_t* rng, stc64_uniform_t* d) {
     uint64_t lo, hi;
-#ifdef cumul128
-    do { cumul128(stc64_rand(rng), d->range, &lo, &hi); } while (lo < d->threshold);
+#ifdef cmul128
+    do { cmul128(stc64_rand(rng), d->range, &lo, &hi); } while (lo < d->threshold);
 #else
     hi = stc64_rand(rng) % d->range;
 #endif
@@ -118,10 +118,11 @@ STC_API double stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
 
 /* PRNG crandom: by Tyge Løvset, NORCE Research, 2020.
  * Extremely fast PRNG suited for parallel usage with Weyl-sequence parameter.
- * Faster than sfc64, wyhash64, and xoshiro256** on most platforms.
- * 256bit state, updates only 192bit per rng.
- * 2^63 unique threads with a minimum 2^64 period lengths each.
- * 2^127 minimum period length for single thread (double loop).
+ * 256bit state, updates 192bit per rng.
+  * Faster than pcg, sfc64, xoshiro256** on most platforms.
+ * wyrand64 is slightly faster, but has only 64-bit state,
+ * unfit when longer periods or multiple threads are required.
+ * stc64 supports 2^63 unique threads with a minimum 2^64 period lengths each.
  * Passes PractRand tested up to 8TB output, Vigna's Hamming weight test,
  * and simple correlation tests, i.e. interleaved streams with one-bit diff state.
  */
@@ -131,7 +132,7 @@ STC_DEF stc64_t stc64_init(uint64_t seed) {
 }
 STC_DEF stc64_t stc64_with_seq(uint64_t seed, uint64_t seq) {
     stc64_t rng = {{seed, seed, seed, (seq << 1u) | 1u}};
-    for (int i = 0; i < 8; ++i) stc64_rand(&rng);
+    for (int i = 0; i < 12; ++i) stc64_rand(&rng);
     return rng;
 }
 

@@ -123,14 +123,10 @@ int main(void) {
 #define MAP_ONLY_csmap(...) __VA_ARGS__
 #define KEY_REF_csset(vp)   (vp)
 #define KEY_REF_csmap(vp)   (&(vp)->first)
-#ifndef CSMAP_SIZE_T
-#define CSMAP_SIZE_T uint32_t
-#endif
 
 #define _using_CBST_types(X, C, Key, Mapped) \
     typedef Key C##_##X##_key_t; \
     typedef Mapped C##_##X##_mapped_t; \
-    typedef CSMAP_SIZE_T C##_##X##_size_t; \
 \
     typedef SET_ONLY_##C( C##_##X##_key_t ) \
             MAP_ONLY_##C( struct {C##_##X##_key_t first; \
@@ -138,24 +134,25 @@ int main(void) {
     C##_##X##_value_t; \
 \
     typedef struct C##_##X##_node { \
-        C##_##X##_size_t link[2]; \
-        int8_t level; \
+        struct C##_##X##_node *link[2]; \
+        uint8_t level; \
         C##_##X##_value_t value; \
     } C##_##X##_node_t; \
 \
     typedef struct { \
         C##_##X##_value_t *ref; \
-        C##_##X##_node_t *_d; \
         int _top; \
-        C##_##X##_size_t _tn, _st[64]; \
+        C##_##X##_node_t *_tn, *_st[50]; \
     } C##_##X##_iter_t
 
+
 #define _using_CBST(X, C, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \
-                       keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
+                        keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
     _using_CBST_types(X, C, Key, Mapped); \
 \
     typedef struct { \
-        C##_##X##_node_t* data; \
+        C##_##X##_node_t* root; \
+        size_t size; \
     } C##_##X; \
 \
     typedef RawKey C##_##X##_rawkey_t; \
@@ -170,23 +167,18 @@ int main(void) {
         bool second; \
     } C##_##X##_result_t; \
 \
-    STC_API C##_##X C##_##X##_init(void); \
-    STC_API C##_##X C##_##X##_clone(C##_##X bst); \
+    STC_API C##_##X \
+    C##_##X##_init(void); \
+    STC_INLINE bool \
+    C##_##X##_empty(C##_##X m) {return m.size == 0;} \
+    STC_INLINE size_t \
+    C##_##X##_size(C##_##X m) {return m.size;} \
 \
     STC_API void \
-    C##_##X##_reserve(C##_##X* self, size_t cap); \
-    STC_INLINE C##_##X \
-    C##_##X##_with_capacity(size_t size) { \
-        C##_##X x = C##_##X##_init(); \
-        C##_##X##_reserve(&x, size); \
-        return x; \
-    } \
-    STC_INLINE bool \
-    C##_##X##_empty(C##_##X m) {return _smap_size(&m) == 0;} \
-    STC_INLINE size_t \
-    C##_##X##_size(C##_##X m) {return _smap_size(&m);} \
-    STC_API void \
-    C##_##X##_del(C##_##X* self); \
+    C##_##X##_del_r_(C##_##X##_node_t* tn); \
+\
+    STC_INLINE void \
+    C##_##X##_del(C##_##X* self) {C##_##X##_del_r_(self->root);} \
     STC_INLINE void \
     C##_##X##_clear(C##_##X* self) {C##_##X##_del(self); *self = C##_##X##_init();} \
     STC_INLINE void \
@@ -202,6 +194,13 @@ int main(void) {
         *KEY_REF_##C(&val) = keyFromRaw(keyToRaw(KEY_REF_##C(&val))); \
         MAP_ONLY_##C( val.second = mappedFromRaw(mappedToRaw(&val.second)); ) \
         return val; \
+    } \
+\
+    STC_API C##_##X##_node_t* C##_##X##_clone_r_(C##_##X##_node_t *tn); \
+    STC_INLINE C##_##X \
+    C##_##X##_clone(C##_##X bst) { \
+        C##_##X clone = {C##_##X##_clone_r_(bst.root), bst.size}; \
+        return clone; \
     } \
 \
     STC_API C##_##X##_value_t* \
@@ -259,15 +258,26 @@ int main(void) {
         return &C##_##X##_find_it(self, rkey, &it)->second; \
     }) \
 \
-    STC_API C##_##X##_value_t* C##_##X##_front(C##_##X* self); \
-    STC_API C##_##X##_value_t* C##_##X##_back(C##_##X* self); \
-    STC_API void C##_##X##_next(C##_##X##_iter_t* it); \
+    STC_INLINE C##_##X##_value_t* \
+    C##_##X##_front(C##_##X* self) { \
+        C##_##X##_node_t *tn = self->root; \
+        while (tn->link[0]->level) tn = tn->link[0]; \
+        return &tn->value; \
+    } \
+    STC_INLINE C##_##X##_value_t* \
+    C##_##X##_back(C##_##X* self) { \
+        C##_##X##_node_t *tn = self->root; \
+        while (tn->link[1]->level) tn = tn->link[1]; \
+        return &tn->value; \
+    } \
+\
+    STC_API void \
+    C##_##X##_next(C##_##X##_iter_t* it); \
 \
     STC_INLINE C##_##X##_iter_t \
     C##_##X##_begin(C##_##X* self) { \
-        C##_##X##_iter_t it = {NULL, self->data, 0, (C##_##X##_size_t) _smap_root(self)}; \
-        if (it._tn) C##_##X##_next(&it); \
-        return it; \
+        C##_##X##_iter_t it = {NULL, 0, self->root}; \
+        C##_##X##_next(&it); return it; \
     } \
     STC_INLINE C##_##X##_iter_t \
     C##_##X##_end(C##_##X* self) {\
@@ -276,10 +286,17 @@ int main(void) {
     STC_INLINE C##_##X##_mapped_t* \
     C##_##X##_itval(C##_##X##_iter_t it) {return SET_ONLY_##C( it.ref ) \
                                                  MAP_ONLY_##C( &it.ref->second );} \
-    STC_API int \
-    C##_##X##_erase(C##_##X* self, RawKey rkey); \
 \
-    STC_INLINE int \
+    STC_API C##_##X##_node_t* \
+    C##_##X##_erase_r_(C##_##X##_node_t *tn, const C##_##X##_rawkey_t* rkey, int *erased); \
+\
+    STC_INLINE size_t \
+    C##_##X##_erase(C##_##X* self, RawKey rkey) { \
+        int erased = 0; \
+        self->root = C##_##X##_erase_r_(self->root, &rkey, &erased); \
+        self->size -= erased; return erased; \
+    } \
+    STC_INLINE size_t \
     C##_##X##_erase_at(C##_##X* self, C##_##X##_iter_t pos) { \
         return C##_##X##_erase(self, keyToRaw(KEY_REF_##C(pos.ref))); \
     } \
@@ -295,70 +312,20 @@ int main(void) {
                            keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
     STC_DEF C##_##X \
     C##_##X##_init(void) { \
-        C##_##X m = {(C##_##X##_node_t *) (_smap_inits + 4)}; \
+        C##_##X m = {(C##_##X##_node_t *) &cbst_nil, 0}; \
         return m; \
     } \
 \
     STC_DEF C##_##X##_value_t* \
-    C##_##X##_front(C##_##X* self) { \
-        C##_##X##_node_t *d = self->data; \
-        C##_##X##_size_t tn = (C##_##X##_size_t) _smap_root(self); \
-        while (d[tn].link[0]) tn = d[tn].link[0]; \
-        return &d[tn].value; \
-    } \
-    STC_DEF C##_##X##_value_t* \
-    C##_##X##_back(C##_##X* self) { \
-        C##_##X##_node_t *d = self->data; \
-        C##_##X##_size_t tn = (C##_##X##_size_t) _smap_root(self); \
-        while (d[tn].link[1]) tn = d[tn].link[1]; \
-        return &d[tn].value; \
-    } \
-\
-    STC_DEF void \
-    C##_##X##_reserve(C##_##X* self, size_t cap) { \
-        C##_##X##_size_t oldcap = _smap_cap(self); \
-        if (cap > oldcap) { \
-            size_t* rep = (size_t *) c_realloc(oldcap ? _smap_rep(self) : NULL, \
-                                               4*sizeof(size_t) + (cap + 1)*sizeof(C##_##X##_node_t)); \
-            if (oldcap == 0) \
-                memset(rep, 0, sizeof(size_t)*4 + sizeof(C##_##X##_node_t)); \
-            rep[_smap_CAP] = cap; \
-            self->data = (C##_##X##_node_t *) (rep + 4); \
-        } \
-    } \
-\
-    STC_DEF C##_##X##_size_t \
-    C##_##X##_node_new_(C##_##X* self) { \
-        size_t tn, *rep = _smap_rep(self); \
-        if (rep[_smap_DISP]) { \
-            tn = rep[_smap_DISP]; \
-            rep[_smap_DISP] = self->data[tn].link[1]; \
-        } else if ((tn = rep[_smap_SIZE] + 1) > rep[_smap_CAP]) \
-            C##_##X##_reserve(self, 4 + tn*3/2); \
-        C##_##X##_node_t* dn = &self->data[tn]; \
-        dn->link[0] = dn->link[1] = 0; dn->level = 1; \
-        return (C##_##X##_size_t) tn; \
-    } \
-\
-    STC_DEF void \
-    C##_##X##_node_del_(C##_##X##_node_t *d, C##_##X##_size_t tn) { \
-        size_t *rep = ((size_t *) d) - 4; \
-        keyDel(KEY_REF_##C(&d[tn].value)); \
-        d[tn].link[1] = (C##_##X##_size_t) rep[_smap_DISP]; d[tn].level = 0; \
-        rep[_smap_DISP] = tn; \
-    } \
-\
-    STC_DEF C##_##X##_value_t* \
     C##_##X##_find_it(const C##_##X* self, C##_##X##_rawkey_t rkey, C##_##X##_iter_t* out) { \
-        C##_##X##_size_t tn = _smap_root(self); \
-        C##_##X##_node_t *d = out->_d = self->data; \
+        C##_##X##_node_t *tn = self->root; \
         out->_top = 0; \
-        if (tn) while (d[tn].level) { \
-            C##_##X##_rawkey_t rx = keyToRaw(KEY_REF_##C(&d[tn].value)); \
+        while (tn->level) { \
+            C##_##X##_rawkey_t rx = keyToRaw(KEY_REF_##C(&tn->value)); \
             switch (keyCompareRaw(&rx, &rkey)) { \
-                case -1: tn = d[tn].link[1]; break; \
-                case 1: out->_st[out->_top++] = tn; tn = d[tn].link[0]; break; \
-                case 0: out->_tn = d[tn].link[1]; return (out->ref = &d[tn].value); \
+                case -1: tn = tn->link[1]; break; \
+                case 1: out->_st[out->_top++] = tn; tn = tn->link[0]; break; \
+                case 0: out->_tn = tn->link[1]; return (out->ref = &tn->value); \
             } \
         } \
         return (out->ref = NULL); \
@@ -366,64 +333,102 @@ int main(void) {
 \
     STC_DEF void \
     C##_##X##_next(C##_##X##_iter_t *it) { \
-        C##_##X##_size_t tn = it->_tn; \
-        if (it->_top || it->_d[tn].level) { \
-            while (it->_d[tn].level) { \
+        C##_##X##_node_t *tn = it->_tn; \
+        if (it->_top || tn->level) { \
+            while (tn->level) { \
                 it->_st[it->_top++] = tn; \
-                tn = it->_d[tn].link[0]; \
+                tn = tn->link[0]; \
             } \
             tn = it->_st[--it->_top]; \
-            it->_tn = it->_d[tn].link[1]; \
-            it->ref = &it->_d[tn].value; \
+            it->_tn = tn->link[1]; \
+            it->ref = &tn->value; \
         } else \
             it->ref = NULL; \
     } \
 \
-    static C##_##X##_size_t \
-    C##_##X##_skew_(C##_##X##_node_t *d, C##_##X##_size_t tn) { \
-        if (d[d[tn].link[0]].level == d[tn].level) { \
-            C##_##X##_size_t tmp = d[tn].link[0]; \
-            d[tn].link[0] = d[tmp].link[1]; \
-            d[tmp].link[1] = tn; \
+    static C##_##X##_node_t * \
+    C##_##X##_skew_(C##_##X##_node_t *tn) { \
+        if (tn->link[0]->level == tn->level && tn->level) { \
+            C##_##X##_node_t *tmp = tn->link[0]; \
+            tn->link[0] = tmp->link[1]; \
+            tmp->link[1] = tn; \
             tn = tmp; \
         } \
         return tn; \
     } \
 \
-    static C##_##X##_size_t \
-    C##_##X##_split_(C##_##X##_node_t *d, C##_##X##_size_t tn) { \
-        if (d[d[d[tn].link[1]].link[1]].level == d[tn].level) { \
-            C##_##X##_size_t tmp = d[tn].link[1]; \
-            d[tn].link[1] = d[tmp].link[0]; \
-            d[tmp].link[0] = tn; \
+    static C##_##X##_node_t * \
+    C##_##X##_split_(C##_##X##_node_t *tn) { \
+        if (tn->link[1]->link[1]->level == tn->level && tn->level) { \
+            C##_##X##_node_t *tmp = tn->link[1]; \
+            tn->link[1] = tmp->link[0]; \
+            tmp->link[0] = tn; \
             tn = tmp; \
-            ++d[tn].level; \
+            ++tn->level; \
         } \
         return tn; \
     } \
 \
-    static inline C##_##X##_size_t \
-    C##_##X##_insert_key_i_(C##_##X* self, C##_##X##_size_t tn, const C##_##X##_rawkey_t* rkey, C##_##X##_result_t* res) { \
-        C##_##X##_size_t up[64], it = tn; \
-        C##_##X##_node_t* d = self->data; \
+/*\
+    static C##_##X##_node_t*  ** recursive version ** \
+    C##_##X##_insert_key_r_(C##_##X##_node_t* tn, const C##_##X##_rawkey_t* rkey, C##_##X##_result_t* res) { \
+        if (tn->level == 0) { \
+            tn = c_new_1(C##_##X##_node_t); \
+            res->first = &tn->value, res->second = true; \
+            tn->link[0] = tn->link[1] = (C##_##X##_node_t*) &cbst_nil, tn->level = 1; \
+            *KEY_REF_##C(&tn->value) = keyFromRaw(*rkey); \
+            return tn; \
+        } \
+        C##_##X##_rawkey_t r = keyToRaw(KEY_REF_##C(&tn->value)); \
+        int c = keyCompareRaw(&r, rkey); \
+        if (c == 0) { res->first = &tn->value; return tn; } \
+        tn->link[c == -1] = C##_##X##_insert_key_r_(tn->link[c == -1], rkey, res); \
+        tn = C##_##X##_skew_(tn); \
+        tn = C##_##X##_split_(tn); \
+        return tn; \
+    } \
+\
+    static C##_##X##_size_t ** recursive version, array based ** \
+    C##_##X##_insert_key_r_(C##_##X* self, C##_##X##_size_t tn, const C##_##X##_rawkey_t* rkey, C##_##X##_result_t* res) { \
+        if (tn == 0) { \
+            tn = C##_##X##_node_new_(self); \
+            *KEY_REF_##C(&self->data[tn].value) = keyFromRaw(*rkey); \
+            res->first = &self->data[tn].value, res->second = true; \
+            return tn; \
+        } \
+        C##_##X##_rawkey_t r = keyToRaw(KEY_REF_##C(&self->data[tn].value)); \
+        int c = keyCompareRaw(&r, rkey), dir; \
+        if (c == 0) { res->first = &self->data[tn].value; return tn; } \
+        dir = (c == -1); \
+        C##_##X##_size_t node = C##_##X##_insert_key_r_(self, self->data[tn].link[dir], rkey, res); \
+        C##_##X##_node_t *d = self->data; \
+        d[tn].link[dir] = node; \
+        tn = C##_##X##_skew_(d, tn); \
+        tn = C##_##X##_split_(d, tn); \
+        return tn; \
+    } \
+*/\
+    static inline C##_##X##_node_t* \
+    C##_##X##_insert_key_i_(C##_##X##_node_t* tn, const C##_##X##_rawkey_t* rkey, C##_##X##_result_t* res) { \
+        C##_##X##_node_t *up[64], *it = tn; \
         int c, top = 0, dir = 0; \
-        while (it) { \
+        while (it->level) { \
             up[top++] = it; \
-            C##_##X##_rawkey_t r = keyToRaw(KEY_REF_##C(&d[it].value)); \
-            if ((c = keyCompareRaw(&r, rkey)) == 0) {res->first = &d[it].value; return tn;} \
-            dir = (c == -1); \
-            it = d[it].link[dir]; \
+            C##_##X##_rawkey_t r = keyToRaw(KEY_REF_##C(&it->value)); \
+            if ((c = keyCompareRaw(&r, rkey)) == 0) {res->first = &it->value; return tn;} \
+            it = it->link[(dir = (c == -1))]; \
         } \
-        it = C##_##X##_node_new_(self); d = self->data; \
-        *KEY_REF_##C(&d[it].value) = keyFromRaw(*rkey); \
-        res->first = &d[it].value, res->second = true; \
-        if (top == 0) return it; \
-        d[up[top - 1]].link[dir] = it; \
+        tn = c_new_1(C##_##X##_node_t); \
+        *KEY_REF_##C(&tn->value) = keyFromRaw(*rkey); \
+        res->first = &tn->value, res->second = true; \
+        tn->link[0] = tn->link[1] = (C##_##X##_node_t*) &cbst_nil, tn->level = 1; \
+        if (top == 0) return tn; \
+        up[top - 1]->link[dir] = tn; \
         while (top--) { \
-            if (top) dir = (d[up[top - 1]].link[1] == up[top]); \
-            up[top] = C##_##X##_skew_(d, up[top]); \
-            up[top] = C##_##X##_split_(d, up[top]); \
-            if (top) d[up[top - 1]].link[dir] = up[top]; \
+            if (top) dir = (up[top - 1]->link[1] == up[top]); \
+            up[top] = C##_##X##_skew_(up[top]); \
+            up[top] = C##_##X##_split_(up[top]); \
+            if (top) up[top - 1]->link[dir] = up[top]; \
         } \
         return up[0]; \
     } \
@@ -431,101 +436,72 @@ int main(void) {
     STC_DEF C##_##X##_result_t \
     C##_##X##_insert_key(C##_##X* self, RawKey rkey) { \
         C##_##X##_result_t res = {NULL, false}; \
-        C##_##X##_size_t tn = C##_##X##_insert_key_i_(self, (C##_##X##_size_t) _smap_root(self), &rkey, &res); \
-        _smap_root(self) = tn; \
-        _smap_size(self) += res.second; \
+        self->root = C##_##X##_insert_key_i_(self->root, &rkey, &res); \
+        self->size += res.second; \
         return res; \
     } \
 \
-    static C##_##X##_size_t \
-    C##_##X##_erase_r_(C##_##X##_node_t *d, C##_##X##_size_t tn, const C##_##X##_rawkey_t* rkey, int *erased) { \
-        if (tn == 0) return 0; \
-        C##_##X##_rawkey_t r = keyToRaw(KEY_REF_##C(&d[tn].value)); \
+    STC_DEF C##_##X##_node_t* \
+    C##_##X##_erase_r_(C##_##X##_node_t *tn, const C##_##X##_rawkey_t* rkey, int *erased) { \
+        if (tn->level == 0) \
+            return tn; \
+        C##_##X##_rawkey_t r = keyToRaw(KEY_REF_##C(&tn->value)); \
         int c = keyCompareRaw(&r, rkey); \
         if (c != 0) \
-            d[tn].link[c == -1] = C##_##X##_erase_r_(d, d[tn].link[c == -1], rkey, erased); \
+            tn->link[c == -1] = C##_##X##_erase_r_(tn->link[c == -1], rkey, erased); \
         else { \
-            if (d[d[tn].link[0]].level && d[d[tn].link[1]].level) { \
-                C##_##X##_size_t h = d[tn].link[0]; \
-                while (d[d[h].link[1]].level) \
-                    h = d[h].link[1]; \
-                d[tn].value = d[h].value; \
-                r = keyToRaw(KEY_REF_##C(&d[tn].value)); \
-                d[tn].link[0] = C##_##X##_erase_r_(d, d[tn].link[0], &r, erased); \
+            if (tn->link[0]->level && tn->link[1]->level) { \
+                C##_##X##_node_t *h = tn->link[0]; \
+                while (h->link[1]->level) \
+                    h = h->link[1]; \
+                tn->value = h->value; \
+                r = keyToRaw(KEY_REF_##C(&tn->value)); \
+                tn->link[0] = C##_##X##_erase_r_(tn->link[0], &r, erased); \
             } else { \
-                C##_##X##_size_t tmp = tn; \
-                tn = d[tn].link[ d[d[tn].link[0]].level == 0 ]; \
-                C##_##X##_value_del(&d[tmp].value); \
-                C##_##X##_node_del_(d, tmp); \
+                C##_##X##_node_t *tmp = tn; \
+                tn = tn->link[tn->link[0]->level == 0]; \
+                C##_##X##_value_del(&tmp->value); \
+                free(tmp); \
                 *erased = 1; \
             } \
         } \
-        C##_##X##_size_t t1 = d[tn].link[1]; \
-        if (d[d[tn].link[0]].level < d[tn].level - 1 || d[t1].level < d[tn].level - 1) { \
-            if (d[t1].level > --d[tn].level) \
-                d[t1].level = d[tn].level; \
-            tn = C##_##X##_skew_(d, tn); \
-            tn = C##_##X##_split_(d, tn); \
+        if (tn->link[0]->level < tn->level - 1 || tn->link[1]->level < tn->level - 1) { \
+            if (tn->link[1]->level > --tn->level) \
+                tn->link[1]->level = tn->level; \
+            tn = C##_##X##_skew_(tn); \
+            tn = C##_##X##_split_(tn); \
         } \
         return tn; \
     } \
 \
-    STC_DEF int \
-    C##_##X##_erase(C##_##X* self, RawKey rkey) { \
-        int erased = 0; \
-        C##_##X##_size_t root = C##_##X##_erase_r_(self->data, (C##_##X##_size_t) _smap_root(self), &rkey, &erased); \
-        if (erased) {_smap_root(self) = root; --_smap_size(self);} \
-        return erased; \
-    } \
-\
-    static C##_##X##_size_t \
-    C##_##X##_clone_r_(C##_##X* self, const C##_##X##_node_t* src, C##_##X##_size_t tn) { \
-        if (tn == 0) return 0; \
-        C##_##X##_size_t cn = C##_##X##_node_new_(self); \
-        C##_##X##_node_t* d = self->data; \
-        d[cn].link[0] = C##_##X##_clone_r_(self, src, src[tn].link[0]); \
-        d[cn].link[1] = C##_##X##_clone_r_(self, src, src[tn].link[1]); \
-        d[cn].level = src[tn].level; \
-        d[cn].value = C##_##X##_value_clone(src[tn].value); \
+    STC_DEF C##_##X##_node_t* \
+    C##_##X##_clone_r_(C##_##X##_node_t *tn) { \
+        if (! tn->level) return tn; \
+        C##_##X##_node_t *cn = c_new_1(C##_##X##_node_t); \
+        cn->link[0] = C##_##X##_clone_r_(tn->link[0]); \
+        cn->link[1] = C##_##X##_clone_r_(tn->link[1]); \
+        cn->level = tn->level; \
+        cn->value = C##_##X##_value_clone(tn->value); \
         return cn; \
     } \
-    STC_DEF C##_##X \
-    C##_##X##_clone(C##_##X bst) { \
-        C##_##X clone = C##_##X##_with_capacity(_smap_size(&bst)); \
-        C##_##X##_size_t root = C##_##X##_clone_r_(&clone, bst.data, (C##_##X##_size_t) _smap_root(&bst)); \
-        _smap_root(&clone) = root; \
-        return clone; \
-    } \
 \
-    static void \
-    C##_##X##_del_r_(C##_##X##_node_t* d, C##_##X##_size_t tn) { \
-        if (tn) { \
-            C##_##X##_del_r_(d, d[tn].link[0]); \
-            C##_##X##_del_r_(d, d[tn].link[1]); \
-            C##_##X##_value_del(&d[tn].value); \
-        } \
-    } \
     STC_DEF void \
-    C##_##X##_del(C##_##X* self) { \
-        if (_smap_root(self)) { \
-            C##_##X##_del_r_(self->data, (C##_##X##_size_t) _smap_root(self)); \
-            c_free(_smap_rep(self)); \
+    C##_##X##_del_r_(C##_##X##_node_t* tn) { \
+        if (tn->level != 0) { \
+            C##_##X##_del_r_(tn->link[0]); \
+            C##_##X##_del_r_(tn->link[1]); \
+            C##_##X##_value_del(&tn->value); \
+            c_free(tn); \
         } \
     }
 
+
 _using_CBST_types(_, csmap, int, int);
-static size_t _smap_inits[4] = {0, 0, 0, 0};
+static csmap___node_t cbst_nil = {&cbst_nil, &cbst_nil, 0};
 
 #else
 #define _implement_CBST(X, C, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \
                            keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped)
 #endif
-
-enum {_smap_ROOT=0, _smap_DISP=1, _smap_SIZE=2, _smap_CAP=3};
-#define _smap_rep(self) (((size_t *)(self)->data) - 4)
-#define _smap_root(self) _smap_rep(self)[_smap_ROOT]
-#define _smap_disp(self) _smap_rep(self)[_smap_DISP]
-#define _smap_size(self) _smap_rep(self)[_smap_SIZE]
-#define _smap_cap(self) _smap_rep(self)[_smap_CAP]
 
 #endif

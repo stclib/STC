@@ -16,10 +16,11 @@ enum {N1 = 4000000, S1 = 1, MaxLoadFactor100 = 80};
 uint64_t seed = time(NULL);
 
 static inline uint32_t hash32(const void* data, size_t len) {
-    return (uint32_t) ((*(const uint32_t *) data) * 2654435769u);
+    return *(const uint32_t *)data * 2654435769u;
 }
 static inline uint32_t hash64(const void* data, size_t len) {
-    return (uint32_t) (((*(const uint64_t *) data) * 11400714819323198485ull) >> 24);
+    uint64_t x = *(const uint64_t *)data * 11400714819323198485ull;
+    return x ^ (x >> 24);
 }
 template <class K, class V> using umap = std::unordered_map<K, V>;
 template <class K, class V> using bmap = ska::bytell_hash_map<K, V>;
@@ -127,14 +128,34 @@ static void ins_and_erase_cmap_i(picobench::state& s)
     cmap_i_del(&map);
 }
 
+static void ins_and_erase_cmap_x(picobench::state& s)
+{
+    cmap_x map = cmap_x_init();
+    cmap_x_set_load_factors(&map, 0.0, MaxLoadFactor100 / 100.0);
+    stc64_srandom(seed);
+
+    picobench::scope scope(s);
+    c_forrange (s.iterations())
+        cmap_x_emplace(&map, stc64_random(), 0);
+    cmap_x_clear(&map);
+    stc64_srandom(seed);
+    c_forrange (s.iterations())
+        cmap_x_emplace(&map, stc64_random(), 0);
+    stc64_srandom(seed);
+    c_forrange (s.iterations())
+        cmap_x_erase(&map, stc64_random());
+    s.set_result(cmap_x_size(map));
+    cmap_x_del(&map);
+}
+
 #define P samples(S1).iterations({N1/4})
-PICOBENCH(ins_and_erase_i<umap_i>).P;
-PICOBENCH(ins_and_erase_i<bmap_i>).P;
-PICOBENCH(ins_and_erase_i<fmap_i>).P;
-PICOBENCH(ins_and_erase_i<hmap_i>).P;
-PICOBENCH(ins_and_erase_i<smap_i>).P;
-PICOBENCH(ins_and_erase_i<rmap_i>).P;
-PICOBENCH(ins_and_erase_cmap_i).P;
+PICOBENCH(ins_and_erase_i<umap_x>).P;
+PICOBENCH(ins_and_erase_i<bmap_x>).P;
+PICOBENCH(ins_and_erase_i<fmap_x>).P;
+PICOBENCH(ins_and_erase_i<hmap_x>).P;
+PICOBENCH(ins_and_erase_i<smap_x>).P;
+PICOBENCH(ins_and_erase_i<rmap_x>).P;
+PICOBENCH(ins_and_erase_cmap_x).P;
 #undef P
 
 PICOBENCH_SUITE("Map3");
