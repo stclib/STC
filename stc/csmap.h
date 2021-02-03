@@ -367,8 +367,8 @@ int main(void) {
     STC_DEF void \
     C##_##X##_next(C##_##X##_iter_t *it) { \
         C##_##X##_size_t tn = it->_tn; \
-        if (it->_top || it->_d[tn].level) { \
-            while (it->_d[tn].level) { \
+        if (it->_top || tn) { \
+            while (tn) { \
                 it->_st[it->_top++] = tn; \
                 tn = it->_d[tn].link[0]; \
             } \
@@ -381,7 +381,7 @@ int main(void) {
 \
     static C##_##X##_size_t \
     C##_##X##_skew_(C##_##X##_node_t *d, C##_##X##_size_t tn) { \
-        if (d[d[tn].link[0]].level == d[tn].level) { \
+        if (tn && d[d[tn].link[0]].level == d[tn].level) { \
             C##_##X##_size_t tmp = d[tn].link[0]; \
             d[tn].link[0] = d[tmp].link[1]; \
             d[tmp].link[1] = tn; \
@@ -389,10 +389,9 @@ int main(void) {
         } \
         return tn; \
     } \
-\
     static C##_##X##_size_t \
     C##_##X##_split_(C##_##X##_node_t *d, C##_##X##_size_t tn) { \
-        if (d[d[d[tn].link[1]].link[1]].level == d[tn].level) { \
+        if (tn && d[d[d[tn].link[1]].link[1]].level == d[tn].level) { \
             C##_##X##_size_t tmp = d[tn].link[1]; \
             d[tn].link[1] = d[tmp].link[0]; \
             d[tmp].link[0] = tn; \
@@ -409,8 +408,8 @@ int main(void) {
         int c, top = 0, dir = 0; \
         while (it) { \
             up[top++] = it; \
-            C##_##X##_rawkey_t r = keyToRaw(KEY_REF_##C(&d[it].value)); \
-            if ((c = keyCompareRaw(&r, rkey)) == 0) {res->first = &d[it].value; return tn;} \
+            C##_##X##_rawkey_t raw = keyToRaw(KEY_REF_##C(&d[it].value)); \
+            if ((c = keyCompareRaw(&raw, rkey)) == 0) {res->first = &d[it].value; return tn;} \
             dir = (c == -1); \
             it = d[it].link[dir]; \
         } \
@@ -440,32 +439,36 @@ int main(void) {
     static C##_##X##_size_t \
     C##_##X##_erase_r_(C##_##X##_node_t *d, C##_##X##_size_t tn, const C##_##X##_rawkey_t* rkey, int *erased) { \
         if (tn == 0) return 0; \
-        C##_##X##_rawkey_t r = keyToRaw(KEY_REF_##C(&d[tn].value)); \
-        int c = keyCompareRaw(&r, rkey); \
+        C##_##X##_rawkey_t raw = keyToRaw(KEY_REF_##C(&d[tn].value)); \
+        C##_##X##_size_t tx; int c = keyCompareRaw(&raw, rkey); \
         if (c != 0) \
             d[tn].link[c == -1] = C##_##X##_erase_r_(d, d[tn].link[c == -1], rkey, erased); \
         else { \
-            if (d[d[tn].link[0]].level && d[d[tn].link[1]].level) { \
-                C##_##X##_size_t h = d[tn].link[0]; \
-                while (d[d[h].link[1]].level) \
-                    h = d[h].link[1]; \
-                d[tn].value = d[h].value; \
-                r = keyToRaw(KEY_REF_##C(&d[tn].value)); \
-                d[tn].link[0] = C##_##X##_erase_r_(d, d[tn].link[0], &r, erased); \
+            if (d[tn].link[0] && d[tn].link[1]) { \
+                tx = d[tn].link[0]; \
+                while (d[tx].link[1]) \
+                    tx = d[tx].link[1]; \
+                C##_##X##_value_del(&d[tn].value); \
+                d[tn].value = d[tx].value; /* move */ \
+                raw = keyToRaw(KEY_REF_##C(&d[tn].value)); \
+                d[tn].link[0] = C##_##X##_erase_r_(d, d[tn].link[0], &raw, erased); \
             } else { \
-                C##_##X##_size_t tmp = tn; \
-                tn = d[tn].link[ d[d[tn].link[0]].level == 0 ]; \
-                C##_##X##_value_del(&d[tmp].value); \
-                C##_##X##_node_del_(d, tmp); \
+                tx = tn; \
+                tn = d[tn].link[ d[tn].link[0] == 0 ]; \
+                C##_##X##_node_del_(d, tx); \
                 *erased = 1; \
             } \
         } \
-        C##_##X##_size_t t1 = d[tn].link[1]; \
-        if (d[d[tn].link[0]].level < d[tn].level - 1 || d[t1].level < d[tn].level - 1) { \
-            if (d[t1].level > --d[tn].level) \
-                d[t1].level = d[tn].level; \
-            tn = C##_##X##_skew_(d, tn); \
-            tn = C##_##X##_split_(d, tn); \
+        tx = d[tn].link[1]; \
+        if (d[d[tn].link[0]].level < d[tn].level - 1 || d[tx].level < d[tn].level - 1) { \
+            if (d[tx].level > --d[tn].level) \
+                d[tx].level = d[tn].level; \
+            if ((tn = C##_##X##_skew_(d, tn))) { \
+                tx = d[tn].link[1] = C##_##X##_skew_(d, d[tn].link[1]); \
+                     d[tx].link[1] = C##_##X##_skew_(d, d[tx].link[1]); \
+                                tn = C##_##X##_split_(d, tn); \
+                     d[tn].link[1] = C##_##X##_split_(d, d[tn].link[1]); \
+            } \
         } \
         return tn; \
     } \

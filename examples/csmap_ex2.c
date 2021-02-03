@@ -7,26 +7,43 @@
 #endif
 
 using_csmap(i, int, int);
-enum {N=10000000};
+enum {N=2000};
 int main()
 {
     clock_t t1, t2, t3, t4, t5;
     {
         t1 = clock();
         csmap_i map = csmap_i_init();
-        stc64_srandom(1);
-        c_forrange (i, N)
-            csmap_i_emplace(&map, stc64_random() & 0xffffff, i);
-        c_forrange (i, N/2)
-            csmap_i_erase(&map, stc64_random() & 0xffffff);
+        stc64_srandom(123);
+        c_forrange (i, 12) {
+            int x = stc64_random() & 0xff;
+            csmap_i_emplace(&map, x, i);
+            printf(" %d", x);
+        }
+        puts("");
+        c_foreach (i, csmap_i, map) printf(" %d", i.ref->first);
+        puts("\n");
+        //c_foreach (i, csmap_i, map)
+            //printf("%d: %d\n", i.ref->first, i.ref->second);
+        printf("size %zu\n", csmap_i_size(map));
+
+        stc64_srandom(123);
+        c_forrange (i, 6) {
+            int x = stc64_random() & 0xff;
+            printf("Try erase: %d\n", x);
+            csmap_i_erase(&map, x);
+            c_foreach (i, csmap_i, map) printf(" %d", i.ref->first);
+            puts("");
+        }
         t2 = clock();
         size_t n = 0, sum = 0;
         c_foreach (i, csmap_i, map)
             sum += i.ref->first;
         t3 = clock();
-        c_foreach (i, csmap_i, map)
-            if (n++ < 20) printf("%d: %d\n", i.ref->first, i.ref->second); else break;
+        //c_foreach (i, csmap_i, map)
+            //if (n++ < 20) printf("%d: %d\n", i.ref->first, i.ref->second); else break;
         printf("size %zu: %zu\n", csmap_i_size(map), sum);
+
         t4 = clock();
         csmap_i_del(&map);
     }

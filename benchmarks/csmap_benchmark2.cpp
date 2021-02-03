@@ -9,7 +9,7 @@
 #define PICOBENCH_IMPLEMENT_WITH_MAIN
 #include "picobench.hpp"
 
-enum {N1 = 3000000, S1 = 1};
+enum {N1 = 2000000, S1 = 1};
 uint64_t seed = time(NULL); // 18237129837891;
 
 using omap_i = std::map<int, int>;
