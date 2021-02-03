@@ -7,7 +7,7 @@ Introduction
 ------------
 
 A modern, templated, user-friendly, fast, fully typesafe, and customizable container library for C99,
-with a uniform API, which resembles the c++ standard template library (STL).
+with a cross-containers uniform API, similar to c++ STL.
 
 This is a compact, header-only library with the all the major "standard" data containers, except for the multi-map/set variants:
 - [***carray*** - Templated **multi-dimensional array** type](docs/carray_api.md)
@@ -89,11 +89,11 @@ int main(void) {
 
     // print them
     c_foreach (i, cset_i, set) printf(" %d", *i.ref); puts("");
-    c_foreach (i, cvec_p, vec) printf(" (%f, %f)", i.ref->x, i.ref->y); puts("");
+    c_foreach (i, cvec_p, vec) printf(" (%g, %g)", i.ref->x, i.ref->y); puts("");
     c_foreach (i, cdeq_i, deq) printf(" %d", *i.ref); puts("");
     c_foreach (i, clist_i, lst) printf(" %d", *i.ref); puts("");
     c_foreach (i, cqueue_i, que) printf(" %d", *i.ref); puts("");
-    c_foreach (i, csmap_i, map) printf(" {%d: %d}", i.ref->first, i.ref->second);
+    c_foreach (i, csmap_i, map) printf(" [%d: %d]", i.ref->first, i.ref->second);
 
     // cleanup
     cset_i_del(&set);
@@ -107,22 +107,21 @@ int main(void) {
 Outputs
 ```
  10 20 30 40
- (10.000000, 1.000000) (20.000000, 2.000000) (30.000000, 3.000000) (40.000000, 4.000000)
+ (10, 1) (20, 2) (30, 3) (40, 4)
  5 10 20 30
  5 10 20 30
  10 20 30 40
- {10: 1} {20: 2} {30: 3} {40: 4}
+ [10: 1] [20: 2] [30: 3] [40: 4]
 ```
 
 Highlights
 ----------
-- **User Friendly** - Easy to use, as can be seen from the examples above. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments for customization of value- *comparison*, *destruction*, *cloning*, *convertion types*, and more. Most methods have similar named corresponding methods in STL.
-- **High Performance** - The containers are written with efficiency, low memory usage, and small code size in mind. Most containers perform similarly to the c++ STL containers, however **cmap** and **cset** are roughly ***5 times faster than the STL equivalents***, *std::unordered_map* and *std::unordered_set*. **csmap** and **csset** are in general faster than *std::unordered_map/set* See *Performance*. Also **cdeq** are in some cases significantly faster than *std::deque*, however implementations vary between different c++ compilers.
-- **Type Safe** - No more error prone casting of container types and elements back and forth from your containers. Less obscure bugs in your code. The compiler will let you know when retrieving or passing wrong container or element types to the methods.
-- **Uniform API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** are intuitive and uniform across the various containers.
-- **Small Footprint** - Generated executables are small, partly due to the small library code base. The example above with six different containers, compiles to an executable of *18 kb in size*, compiled with TinyC.
+- **Friendly** - Incredible easy to use and deploy. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments for customization of value- *comparison*, *destruction*, *cloning*, *convertion types*, and more. Most methods have similar named corresponding methods in STL.
+- **Extreme Performance** - The associative containers **cmap** and **cset** are roughly ***5 times faster than the STL equivalents***, *std::unordered_map* and *std::unordered_set*! **csmap** and **csset** are more than 20% faster in general  than *std::unordered_map/set* See *Performance*. Also **cdeq** are in some cases significantly faster than *std::deque*, however implementations vary between different c++ compilers.
+- **Type Safety** - No error prone casting of container types and elements back and forth from your containers. Less obscure bugs in your code. The compiler will let you know when retrieving or passing wrong container or element types to the methods.
+- **Uniform API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** are intuitive and uniform across the various containers, as can be seen from the example above.
+- **Small Footprint** - Both source code and generated executables are small. The executable from the above example with six different containers is *18 kb in size*, when compiled with TinyC.
 - **Dual Mode Compilation** - Can be used a simple header-only library with static methods (default), or as a traditional library by defining symbol STC_HEADER in your project. See below for instructions.
-- **Simple Installation** - It is headers-only by default.
 
 Installation
 ------------
