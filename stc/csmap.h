@@ -444,19 +444,18 @@ int main(void) {
         if (c != 0) \
             d[tn].link[c == -1] = C##_##X##_erase_r_(d, d[tn].link[c == -1], rkey, erased); \
         else { \
+            if (!*erased) {C##_##X##_value_del(&d[tn].value); *erased = 1;} \
             if (d[tn].link[0] && d[tn].link[1]) { \
                 tx = d[tn].link[0]; \
                 while (d[tx].link[1]) \
                     tx = d[tx].link[1]; \
-                C##_##X##_value_del(&d[tn].value); \
                 d[tn].value = d[tx].value; /* move */ \
                 raw = keyToRaw(KEY_REF_##C(&d[tn].value)); \
                 d[tn].link[0] = C##_##X##_erase_r_(d, d[tn].link[0], &raw, erased); \
-            } else { \
+            } else { /* unlink node */ \
                 tx = tn; \
                 tn = d[tn].link[ d[tn].link[0] == 0 ]; \
                 C##_##X##_node_del_(d, tx); \
-                *erased = 1; \
             } \
         } \
         tx = d[tn].link[1]; \
