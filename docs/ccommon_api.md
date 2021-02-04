@@ -26,13 +26,13 @@ c_foreach (i, cvec_x, vec) sum += *i.ref;
 #### c_forrange
 Declare an iterator and specify a range to iterate with a for loop. Like python's ***range()*** function:
 
-| Type name                                     | Python equivalent                   |
-|:----------------------------------------------|:------------------------------------|
-| `c_forrange (stop)`                           | `for _ in range(stop):`             |
-| `c_forrange (i, stop)   // Itertype=size_t`   | `for i in range(stop):`             |
-| `c_forrange (i, IterType, stop)`              | `for i in range(stop):`             |
-| `c_forrange (i, IterType, start, stop)`       | `for i in range(start, stop):`      |
-| `c_forrange (i, IterType, start, stop, step)` | `for i in range(start, stop, step)` |
+| Usage                                         | Python equivalent                    |
+|:----------------------------------------------|:-------------------------------------|
+| `c_forrange (stop)`                           | `for _ in range(stop):`              |
+| `c_forrange (i, stop) // IterType=size_t`     | `for i in range(stop):`              |
+| `c_forrange (i, IterType, stop)`              | `for i in range(stop):`              |
+| `c_forrange (i, IterType, start, stop)`       | `for i in range(start, stop):`       |
+| `c_forrange (i, IterType, start, stop, step)` | `for i in range(start, stop, step):` |
 
 ```c
 c_forrange (5) printf("x");
