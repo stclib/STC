@@ -39,7 +39,7 @@ int main(void) {
     csset_sx_del(&s);
 }
 */
-#include "ccommon.h"
+#include <stc/ccommon.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -348,7 +348,7 @@ int main(void) {
 \
     static C##_##X##_node_t * \
     C##_##X##_skew_(C##_##X##_node_t *tn) { \
-        if (tn->link[0]->level == tn->level && tn->level) { \
+        if (tn && tn->link[0]->level == tn->level && tn->level) { \
             C##_##X##_node_t *tmp = tn->link[0]; \
             tn->link[0] = tmp->link[1]; \
             tmp->link[1] = tn; \
@@ -445,31 +445,33 @@ int main(void) {
     C##_##X##_erase_r_(C##_##X##_node_t *tn, const C##_##X##_rawkey_t* rkey, int *erased) { \
         if (tn->level == 0) \
             return tn; \
-        C##_##X##_rawkey_t r = keyToRaw(KEY_REF_##C(&tn->value)); \
-        int c = keyCompareRaw(&r, rkey); \
+        C##_##X##_rawkey_t raw = keyToRaw(KEY_REF_##C(&tn->value)); \
+        C##_##X##_node_t *tx; int c = keyCompareRaw(&raw, rkey); \
         if (c != 0) \
             tn->link[c == -1] = C##_##X##_erase_r_(tn->link[c == -1], rkey, erased); \
         else { \
+            if (!*erased) {C##_##X##_value_del(&tn->value); *erased = 1;} \
             if (tn->link[0]->level && tn->link[1]->level) { \
-                C##_##X##_node_t *h = tn->link[0]; \
-                while (h->link[1]->level) \
-                    h = h->link[1]; \
-                tn->value = h->value; \
-                r = keyToRaw(KEY_REF_##C(&tn->value)); \
-                tn->link[0] = C##_##X##_erase_r_(tn->link[0], &r, erased); \
+                tx = tn->link[0]; \
+                while (tx->link[1]->level) \
+                    tx = tx->link[1]; \
+                tn->value = tx->value; \
+                raw = keyToRaw(KEY_REF_##C(&tn->value)); \
+                tn->link[0] = C##_##X##_erase_r_(tn->link[0], &raw, erased); \
             } else { \
-                C##_##X##_node_t *tmp = tn; \
+                tx = tn; \
                 tn = tn->link[tn->link[0]->level == 0]; \
-                C##_##X##_value_del(&tmp->value); \
-                free(tmp); \
-                *erased = 1; \
+                c_free(tx); \
             } \
         } \
         if (tn->link[0]->level < tn->level - 1 || tn->link[1]->level < tn->level - 1) { \
             if (tn->link[1]->level > --tn->level) \
                 tn->link[1]->level = tn->level; \
-            tn = C##_##X##_skew_(tn); \
-            tn = C##_##X##_split_(tn); \
+                          tn = C##_##X##_skew_(tn); \
+            tx = tn->link[0] = C##_##X##_skew_(tn->link[0]); \
+                 tx->link[0] = C##_##X##_skew_(tx->link[0]); \
+                          tn = C##_##X##_split_(tn); \
+                 tn->link[0] = C##_##X##_split_(tn->link[0]); \
         } \
         return tn; \
     } \
