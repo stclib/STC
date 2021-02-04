@@ -194,7 +194,9 @@ STC_API size_t _clist_size(const clist_void* self);
     } \
 \
     STC_API clist_##X##_iter_t \
-    clist_##X##_find_before(const clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t finish, RawValue val); \
+    clist_##X##_find_before_in_range(const clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t finish, RawValue val); \
+    STC_API clist_##X##_iter_t \
+    clist_##X##_find_before(const clist_##X* self, RawValue val); \
     STC_API clist_##X##_iter_t \
     clist_##X##_find(const clist_##X* self, RawValue val); \
     STC_API size_t \
@@ -263,7 +265,7 @@ STC_API size_t _clist_size(const clist_void* self);
     } \
 \
     STC_DEF clist_##X##_iter_t \
-    clist_##X##_find_before(const clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t finish, RawValue val) { \
+    clist_##X##_find_before_in_range(const clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t finish, RawValue val) { \
         clist_##X##_iter_t i = first; \
         for (clist_##X##_next(&i); i.ref != finish.ref; clist_##X##_next(&i)) { \
             RawValue r = valueToRaw(i.ref); \
@@ -272,13 +274,18 @@ STC_API size_t _clist_size(const clist_void* self);
         } \
         return clist_##X##_end(self); \
     } \
-\
+    STC_DEF clist_##X##_iter_t \
+    clist_##X##_find_before(const clist_##X* self, RawValue val) { \
+        clist_##X##_iter_t it = clist_##X##_find_before_in_range(self, clist_##X##_before_begin(self), clist_##X##_end(self), val); \
+        return it; \
+    } \
     STC_DEF clist_##X##_iter_t \
     clist_##X##_find(const clist_##X* self, RawValue val) { \
-        clist_##X##_iter_t it = clist_##X##_find_before(self, clist_##X##_before_begin(self), clist_##X##_end(self), val); \
+        clist_##X##_iter_t it = clist_##X##_find_before_in_range(self, clist_##X##_before_begin(self), clist_##X##_end(self), val); \
         if (it.ref != clist_##X##_end(self).ref) clist_##X##_next(&it); \
         return it; \
     } \
+\
     STC_DEF clist_##X##_node_t* \
     _clist_##X##_erase_after(clist_##X* self, clist_##X##_node_t* node) { \
         clist_##X##_node_t* del = node->next, *next = del->next; \

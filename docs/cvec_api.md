@@ -65,17 +65,17 @@ void                cvec_X_emplace_back(cvec_X* self, RawValue raw);
 void                cvec_X_push_back(cvec_X* self, Value value);
 void                cvec_X_pop_back(cvec_X* self);
 
-cvec_X_iter_t       cvec_X_emplace(cvec_X* self, cvec_X_iter_t pos, RawValue raw);
-cvec_X_iter_t       cvec_X_emplace_at(cvec_X* self, size_t idx, RawValue raw);
-cvec_X_iter_t       cvec_X_insert(cvec_X* self, cvec_X_iter_t pos, Value value);
-cvec_X_iter_t       cvec_X_insert_at(cvec_X* self, size_t idx, Value value);
+cvec_X_iter_t       cvec_X_emplace(cvec_X* self, size_t idx, RawValue raw);
+cvec_X_iter_t       cvec_X_emplace_at(cvec_X* self, cvec_X_iter_t pos, RawValue raw);
+cvec_X_iter_t       cvec_X_insert(cvec_X* self, size_t idx, Value value);
+cvec_X_iter_t       cvec_X_insert_at(cvec_X* self, cvec_X_iter_t pos, Value value);
 cvec_X_iter_t       cvec_X_insert_range(cvec_X* self, cvec_X_iter_t pos,
                                         cvec_X_iter_t first, cvec_X_iter_t finish);
 cvec_X_iter_t       cvec_X_insert_range_p(cvec_X* self, cvec_X_value_t* pos,
                                           const cvec_X_value_t* pfirst, const cvec_X_value_t* pfinish);
 
-cvec_X_iter_t       cvec_X_erase(cvec_X* self, cvec_X_iter_t pos);
-cvec_X_iter_t       cvec_X_erase_n(cvec_X* self, size_t idx, size_t n);
+cvec_X_iter_t       cvec_X_erase(cvec_X* self, size_t idx, size_t n);
+cvec_X_iter_t       cvec_X_erase_at(cvec_X* self, cvec_X_iter_t pos);
 cvec_X_iter_t       cvec_X_erase_range(cvec_X* self, cvec_X_iter_t first, cvec_X_iter_t finish);
 cvec_X_iter_t       cvec_X_erase_range_p(cvec_X* self, cvec_X_value_t* pfirst, cvec_X_value_t* pfinish);
 

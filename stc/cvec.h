@@ -112,20 +112,20 @@
         return cvec_##X##_insert_range_p(self, pos.ref, first.ref, finish.ref); \
     } \
     STC_INLINE cvec_##X##_iter_t \
-    cvec_##X##_insert(cvec_##X* self, cvec_##X##_iter_t pos, Value value) { \
+    cvec_##X##_insert_at(cvec_##X* self, cvec_##X##_iter_t pos, Value value) { \
         return cvec_##X##_insert_range_p(self, pos.ref, &value, &value + 1); \
     } \
     STC_INLINE cvec_##X##_iter_t \
-    cvec_##X##_insert_at(cvec_##X* self, size_t idx, Value value) { \
+    cvec_##X##_insert(cvec_##X* self, size_t idx, Value value) { \
         return cvec_##X##_insert_range_p(self, self->data + idx, &value, &value + 1); \
     } \
     STC_INLINE cvec_##X##_iter_t \
-    cvec_##X##_emplace(cvec_##X* self, cvec_##X##_iter_t pos, RawValue raw) { \
-        return cvec_##X##_insert(self, pos, valueFromRaw(raw)); \
+    cvec_##X##_emplace_at(cvec_##X* self, cvec_##X##_iter_t pos, RawValue raw) { \
+        return cvec_##X##_insert_at(self, pos, valueFromRaw(raw)); \
     } \
     STC_INLINE cvec_##X##_iter_t \
-    cvec_##X##_emplace_at(cvec_##X* self, size_t idx, RawValue raw) { \
-        return cvec_##X##_insert_at(self, idx, valueFromRaw(raw)); \
+    cvec_##X##_emplace(cvec_##X* self, size_t idx, RawValue raw) { \
+        return cvec_##X##_insert(self, idx, valueFromRaw(raw)); \
     } \
 \
     STC_API cvec_##X##_iter_t \
@@ -136,11 +136,11 @@
         return cvec_##X##_erase_range_p(self, first.ref, finish.ref); \
     } \
     STC_INLINE cvec_##X##_iter_t \
-    cvec_##X##_erase(cvec_##X* self, cvec_##X##_iter_t pos) { \
+    cvec_##X##_erase_at(cvec_##X* self, cvec_##X##_iter_t pos) { \
         return cvec_##X##_erase_range_p(self, pos.ref, pos.ref + 1); \
     } \
     STC_INLINE cvec_##X##_iter_t \
-    cvec_##X##_erase_n(cvec_##X* self, size_t idx, size_t n) { \
+    cvec_##X##_erase(cvec_##X* self, size_t idx, size_t n) { \
         return cvec_##X##_erase_range_p(self, self->data + idx, self->data + idx + n); \
     } \
 \

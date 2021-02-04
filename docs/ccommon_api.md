@@ -57,7 +57,6 @@ c_forrange (i, int, 30, 0, -5) printf(" %d", i);
 using_csset(x, int);
 ...
 c_init (csset_x, set, {23, 3, 7, 5, 12});
-double sum = 0;
 c_foreach (i, csset_x, set) printf(" %d", *i.ref);
 // 3 5 7 12 23
 csset_x_iter_t it = csset_x_find(&set, 7);

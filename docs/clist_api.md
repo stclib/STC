@@ -78,8 +78,9 @@ clist_X_iter_t      clist_X_splice_back(clist_X* self, clist_X* other);
 clist_X             clist_X_splice_out(clist_X* self, clist_X_iter_t it1, clist_X_iter_t it2);
 
 clist_X_iter_t      clist_X_find(const clist_X* self, RawValue raw);
-clist_X_iter_t      clist_X_find_before(const clist_X* self,
-                                        clist_X_iter_t it1, clist_X_iter_t it2, RawValue raw);
+clist_X_iter_t      clist_X_find_before(const clist_X* self, RawValue raw);
+clist_X_iter_t      clist_X_find_before_in_range(const clist_X* self,
+                                                 clist_X_iter_t it1, clist_X_iter_t it2, RawValue raw);
 
                     // std: removes all elements equal to raw
 size_t              clist_X_remove(clist_X* self, RawValue raw);

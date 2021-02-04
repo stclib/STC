@@ -104,7 +104,7 @@ uint32_t            c_default_hash32(const void* data, size_t len);
 | `cmap_X_mapped_t`    | `Mapped`                                        | The mapped type               |
 | `cmap_X_value_t`     | `struct { Key first; Mapped second; }`          | The value type                |
 | `cmap_X_rawvalue_t`  | `struct { RawKey first; RawMapped second; }`    | RawKey + RawMapped type       |
-| `cmap_X_result_t`    | `struct { cmap_X_value_t first; bool second; }` | Result of insert/put/emplace  |
+| `cmap_X_result_t`    | `struct { cmap_X_value_t *first; bool second; }`| Result of insert/put/emplace  |
 | `cmap_X_iter_t`      | `struct { cmap_X_value_t *ref; ... }`           | Iterator type                 |
 
 `c_default_hash` requires Key to be 16-bit aligned, and size to be a multiple of 16. There is also a `c_default_hash32` which is slightly faster.
