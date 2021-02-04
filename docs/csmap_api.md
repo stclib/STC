@@ -188,21 +188,21 @@ static int Vec3i_compare(const Vec3i* a, const Vec3i* b) {
     return (a->z > b->z) - (a->z < b->z);
 }
 
-using_csmap(v3, Vec3i, int, Vec3i_compare);
+using_csmap(vi, Vec3i, int, Vec3i_compare);
 
 int main()
 {
-    csmap_v3 vecs = csmap_v3_init();
+    csmap_vi vecs = csmap_vi_init();
 
-    csmap_v3_put(&vecs, (Vec3i){100,   0,   0}, 1);
-    csmap_v3_put(&vecs, (Vec3i){  0, 100,   0}, 2);
-    csmap_v3_put(&vecs, (Vec3i){  0,   0, 100}, 3);
-    csmap_v3_put(&vecs, (Vec3i){100, 100, 100}, 4);
+    csmap_vi_put(&vecs, (Vec3i){100,   0,   0}, 1);
+    csmap_vi_put(&vecs, (Vec3i){  0, 100,   0}, 2);
+    csmap_vi_put(&vecs, (Vec3i){  0,   0, 100}, 3);
+    csmap_vi_put(&vecs, (Vec3i){100, 100, 100}, 4);
 
-    c_foreach (i, csmap_v3, vecs)
-        printf("{ %3d, %3d, %3d }: %d\n", i.ref->first.x,  i.ref->first.y,  i.ref->first.z,  i.ref->second);
+    c_foreach (i, csmap_vi, vecs)
+        printf("{ %3d, %3d, %3d }: %d\n", i.ref->first.x, i.ref->first.y, i.ref->first.z, i.ref->second);
 
-    csmap_v3_del(&vecs);
+    csmap_vi_del(&vecs);
 }
 ```
 Output:
@@ -231,7 +231,7 @@ int main()
     csmap_iv_put(&vecs, 4, (Vec3i){100, 100, 100});
 
     c_foreach (i, csmap_iv, vecs)
-        printf("%d: { %3d, %3d, %3d }\n", i.ref->first, i.ref->second.x,  i.ref->second.y,  i.ref->second.z);
+        printf("%d: { %3d, %3d, %3d }\n", i.ref->first, i.ref->second.x, i.ref->second.y, i.ref->second.z);
 
     csmap_iv_del(&vecs);
 }

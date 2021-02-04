@@ -57,7 +57,7 @@ size_t              cset_X_erase(cset_X* self, RawKey rkey);
 void                cset_X_erase_entry(cset_X* self, cset_X_key_t* key);
 cset_X_iter_t       cset_X_erase_at(cset_X* self, cset_X_iter_t pos);
 
-cset_X_value_t*     cset_X_find(const cset_X* self, RawKey rkey);
+cset_X_iter_t       cset_X_find(const cset_X* self, RawKey rkey);
 bool                cset_X_contains(const cset_X* self, RawKey rkey);
 
 cset_X_iter_t       cset_X_begin(cset_X* self);
