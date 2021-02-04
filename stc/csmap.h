@@ -391,7 +391,7 @@ int main(void) {
     } \
     static C##_##X##_size_t \
     C##_##X##_split_(C##_##X##_node_t *d, C##_##X##_size_t tn) { \
-        if (tn && d[d[d[tn].link[1]].link[1]].level == d[tn].level) { \
+        if (d[d[d[tn].link[1]].link[1]].level == d[tn].level) { \
             C##_##X##_size_t tmp = d[tn].link[1]; \
             d[tn].link[1] = d[tmp].link[0]; \
             d[tmp].link[0] = tn; \
@@ -462,12 +462,11 @@ int main(void) {
         if (d[d[tn].link[0]].level < d[tn].level - 1 || d[tx].level < d[tn].level - 1) { \
             if (d[tx].level > --d[tn].level) \
                 d[tx].level = d[tn].level; \
-            if ((tn = C##_##X##_skew_(d, tn))) { \
+                                tn = C##_##X##_skew_(d, tn); \
                 tx = d[tn].link[1] = C##_##X##_skew_(d, d[tn].link[1]); \
                      d[tx].link[1] = C##_##X##_skew_(d, d[tx].link[1]); \
                                 tn = C##_##X##_split_(d, tn); \
                      d[tn].link[1] = C##_##X##_split_(d, d[tn].link[1]); \
-            } \
         } \
         return tn; \
     } \
