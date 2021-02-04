@@ -464,11 +464,11 @@ int main(void) {
         if (d[d[tn].link[0]].level < d[tn].level - 1 || d[tx].level < d[tn].level - 1) { \
             if (d[tx].level > --d[tn].level) \
                 d[tx].level = d[tn].level; \
-                                tn = C##_##X##_skew_(d, tn); \
-                tx = d[tn].link[1] = C##_##X##_skew_(d, d[tn].link[1]); \
-                     d[tx].link[1] = C##_##X##_skew_(d, d[tx].link[1]); \
-                                tn = C##_##X##_split_(d, tn); \
-                     d[tn].link[1] = C##_##X##_split_(d, d[tn].link[1]); \
+                            tn = C##_##X##_skew_(d, tn); \
+            tx = d[tn].link[1] = C##_##X##_skew_(d, d[tn].link[1]); \
+                 d[tx].link[1] = C##_##X##_skew_(d, d[tx].link[1]); \
+                            tn = C##_##X##_split_(d, tn); \
+                 d[tn].link[1] = C##_##X##_split_(d, d[tn].link[1]); \
         } \
         return tn; \
     } \

@@ -244,13 +244,13 @@ static void ins_and_access_cmap_s(picobench::state& s)
         randomize(str.str, cstr_size(str));
         cmap_s_put(&map, str.str, cstr_clone(str));
         randomize(str.str, cstr_size(str));
-        cmap_s_value_t* val = cmap_s_find(&map, str.str);
-        if (val) {
+        cmap_s_iter_t it = cmap_s_find(&map, str.str);
+        if (it.ref) {
             ++result;
-            cmap_s_erase_entry(&map, val);
+            cmap_s_erase_at(&map, it);
         }
     }
-    s.set_result(result);
+    s.set_result(result + cmap_s_size(map));
     cstr_del(&str);
     cmap_s_del(&map);
 }
