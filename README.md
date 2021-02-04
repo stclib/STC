@@ -62,9 +62,14 @@ And with multiple containers...
 
 struct Point { float x, y; };
 
-// declare your container types
+int Point_compare(const struct Point* a, const struct Point* b) {
+    if (a->x != b->x) return 1 - 2*(a->x < b->x);
+    return (a->y > b->y) - (a->y < b->y);
+}
+
+// declare container types
 using_cset(i, int);                         // unordered set
-using_cvec(p, struct Point, c_no_compare);  // vector, struct as elements
+using_cvec(p, struct Point, Point_compare); // vector, struct as elements
 using_cdeq(i, int);                         // deque
 using_clist(i, int);                        // singly linked list
 using_cqueue(i, cdeq_i);                    // queue, using deque as adapter
@@ -79,7 +84,7 @@ int main(void) {
     c_init (cqueue_i, que, {10, 20, 30});
     c_init (csmap_i, map, { {20, 2}, {10, 1}, {30, 3} });
 
-    // add one more element
+    // add one more element to each container
     cset_i_insert(&set, 40);
     cvec_p_push_back(&vec, (struct Point) {40, 4});
     cdeq_i_push_front(&deq, 5);
@@ -87,13 +92,28 @@ int main(void) {
     cqueue_i_push(&que, 40);
     csmap_i_emplace(&map, 40, 4);
 
-    // print them
-    c_foreach (i, cset_i, set) printf(" %d", *i.ref); puts("");
-    c_foreach (i, cvec_p, vec) printf(" (%g, %g)", i.ref->x, i.ref->y); puts("");
-    c_foreach (i, cdeq_i, deq) printf(" %d", *i.ref); puts("");
-    c_foreach (i, clist_i, lst) printf(" %d", *i.ref); puts("");
-    c_foreach (i, cqueue_i, que) printf(" %d", *i.ref); puts("");
-    c_foreach (i, csmap_i, map) printf(" [%d: %d]", i.ref->first, i.ref->second);
+    // find an element in each container
+    cset_i_iter_t i1 = cset_i_find(&set, 20);
+    cvec_p_iter_t i2 = cvec_p_find(&vec, (struct Point) {20, 2});
+    cdeq_i_iter_t i3 = cdeq_i_find(&deq, 20);
+    clist_i_iter_t i4 = clist_i_find_before(&lst, 20);
+    csmap_i_iter_t i5 = csmap_i_find(&map, 20);
+    printf("\nFound: %d, (%g, %g), %d, %d, [%d: %d]\n", *i1.ref, i2.ref->x, i2.ref->y, *i3.ref,
+                                                        *clist_i_fwd(i4, 1).ref, i5.ref->first, i5.ref->second);
+    // erase the elements found
+    cset_i_erase_at(&set, i1);
+    cvec_p_erase_at(&vec, i2);
+    cdeq_i_erase_at(&deq, i3);
+    clist_i_erase_after(&lst, i4);
+    csmap_i_erase_at(&map, i5);
+
+    printf("After erasing elements found:");
+    printf("\n set:"); c_foreach (i, cset_i, set) printf(" %d", *i.ref);
+    printf("\n vec:"); c_foreach (i, cvec_p, vec) printf(" (%g, %g)", i.ref->x, i.ref->y);
+    printf("\n deq:"); c_foreach (i, cdeq_i, deq) printf(" %d", *i.ref);
+    printf("\n lst:"); c_foreach (i, clist_i, lst) printf(" %d", *i.ref);
+    printf("\n que:"); c_foreach (i, cqueue_i, que) printf(" %d", *i.ref);
+    printf("\n map:"); c_foreach (i, csmap_i, map) printf(" [%d: %d]", i.ref->first, i.ref->second);
 
     // cleanup
     cset_i_del(&set);
@@ -104,24 +124,26 @@ int main(void) {
     csmap_i_del(&map);
 }
 ```
-Outputs
+Output
 ```
- 10 20 30 40
- (10, 1) (20, 2) (30, 3) (40, 4)
- 5 10 20 30
- 5 10 20 30
- 10 20 30 40
- [10: 1] [20: 2] [30: 3] [40: 4]
+Found: 20, (20, 2), 20, 20, [20: 2]
+After erasing elements found:
+ set: 10 30 40
+ vec: (10, 1) (30, 3) (40, 4)
+ deq: 5 10 30
+ lst: 5 10 30
+ que: 10 20 30 40
+ map: [10: 1] [30: 3] [40: 4]
 ```
 
 Highlights
 ----------
-- **Friendly** - Incredible easy to use and deploy. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments for customization of value- *comparison*, *destruction*, *cloning*, *convertion types*, and more. Most methods have similar named corresponding methods in STL.
-- **Extreme Performance** - The associative containers **cmap** and **cset** are roughly ***5 times faster than the STL equivalents***, *std::unordered_map* and *std::unordered_set*! **csmap** and **csset** are more than 20% faster in general  than *std::unordered_map/set* See *Performance*. Also **cdeq** are in some cases significantly faster than *std::deque*, however implementations vary between different c++ compilers.
-- **Type Safety** - No error prone casting of container types and elements back and forth from your containers. Less obscure bugs in your code. The compiler will let you know when retrieving or passing wrong container or element types to the methods.
+- **User friendly** - Incredible easy to use and deploy. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments for customization of value- *comparison*, *destruction*, *cloning*, *convertion types*, and more. Most methods have similar named corresponding methods in STL.
+- **Extreme performance** - The associative containers **cmap** and **cset** are more than ***4 times faster than c++ STL equivalents***, *std::unordered_map* and *std::unordered_set*! **csmap** and **csset** are more than 20% faster than *std::unordered_map/set* Also **cdeq** is significantly faster than *std::deque* in most cases, however implementations vary between different c++ compilers. See *Performance*.
+- **Full type safety** - No error prone casting of container types and elements back and forth from your containers. Less obscure bugs in your code. The compiler will let you know when retrieving or passing wrong container or element types to the methods.
 - **Uniform API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** are intuitive and uniform across the various containers, as can be seen from the example above.
-- **Small Footprint** - Both source code and generated executables are small. The executable from the above example with six different containers is *18 kb in size*, when compiled with TinyC.
-- **Dual Mode Compilation** - Can be used a simple header-only library with static methods (default), or as a traditional library by defining symbol STC_HEADER in your project. See below for instructions.
+- **Small footprint** - Both source code and generated executables are small. The executable from the above example with six different containers is *18 kb in size*, when compiled with TinyC.
+- **Dual mode compilation** - Can be used a simple header-only library with static methods (default), or as a traditional library by defining symbol STC_HEADER in your project. See below for instructions.
 
 Installation
 ------------
@@ -208,14 +230,14 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 - **cstr**, **cvec**: Type size: one pointer. The size and capacity is stored as part of the heap allocation that also holds the vector elements.
 - **clist**: Type size: one pointer. Each node allocates block storing value and next pointer.
 - **cdeq**:  Type size: two pointers. Otherwise equal to cvec.
-- **cmap**: Type size: 4 pointers. cmap uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The open hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
+- **cmap**: Type size: 4 pointers. cmap uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
 - **cset**: Same as cmap, but this uses a table of keys only, not (key, value) pairs.
 - **carray**: carray1, carray2 and carray3. Type size: One pointer plus one, two, or three size_t variables to store dimensions. Arrays are allocated as one contiguous block of heap memory.
 
 More on **cmap**
 ----------------
 
-**cmap** uses open hashing, and default max load-factor is 0.85.
+**cmap** uses closed hashing, and default max load-factor is 0.85.
 
 You can customize the destroy-, hash-, equals- functions, but also define a convertion from a raw/literal type to the key-type specified. This is very useful when e.g. having cstr as key, and therefore a few using-macros are pre-defined
 for **cmap** with **cstr** keys and/or values:

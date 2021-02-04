@@ -2,7 +2,7 @@
 ![Map](pics/map.jpg)
 
 A **cmap** is an associative container that contains key-value pairs with unique keys. Search, insertion,
-and removal of elements have average constant-time complexity. Internally, the elements are not sorted in any particular order, but organized into buckets. Which bucket an element is placed into depends entirely on the hash of its key. This allows fast access to individual elements, since once the hash is computed, it refers to the exact bucket the element is placed into. It is implemented as open hashing with linear probing, and without leaving tombstones on erase.
+and removal of elements have average constant-time complexity. Internally, the elements are not sorted in any particular order, but organized into buckets. Which bucket an element is placed into depends entirely on the hash of its key. This allows fast access to individual elements, since once the hash is computed, it refers to the exact bucket the element is placed into. It is implemented as closed hashing (aka open addressing) with linear probing, and without leaving tombstones on erase.
 
 See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_map) for a functional description.
 

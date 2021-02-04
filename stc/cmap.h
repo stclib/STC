@@ -23,7 +23,7 @@
 #ifndef CMAP__H__
 #define CMAP__H__
 
-// Unordered set/map - implemented as open hashing with linear probing and no tombstones.
+// Unordered set/map - implemented as closed hashing with linear probing and no tombstones.
 /*
 #include <stdio.h>
 #include <stc/cmap.h>
@@ -433,8 +433,8 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         C##_##X##_value_t* slot = self->table; \
         uint8_t* hashx = self->_hashx; \
         C##_##X##_entry_del(&slot[i]); \
-        do { /* deletion from hash table without tombstone */ \
-            if (++j == cap) j = 0; /* ++j; j %= cap; is slow */ \
+        do { /* delete without leaving tombstone */ \
+            if (++j == cap) j = 0; \
             if (! hashx[j]) \
                 break; \
             RawKey r = keyToRaw(KEY_REF_##C(slot + j)); \

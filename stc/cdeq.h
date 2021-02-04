@@ -149,11 +149,11 @@
         return cdeq_##X##_erase_range_p(self, first.ref, finish.ref); \
     } \
     STC_INLINE cdeq_##X##_iter_t \
-    cdeq_##X##_erase(cdeq_##X* self, cdeq_##X##_iter_t pos) { \
+    cdeq_##X##_erase_at(cdeq_##X* self, cdeq_##X##_iter_t pos) { \
         return cdeq_##X##_erase_range_p(self, pos.ref, pos.ref + 1); \
     } \
     STC_INLINE cdeq_##X##_iter_t \
-    cdeq_##X##_erase_at(cdeq_##X* self, size_t idx, size_t n) { \
+    cdeq_##X##_erase(cdeq_##X* self, size_t idx, size_t n) { \
         return cdeq_##X##_erase_range_p(self, self->data + idx, self->data + idx + n); \
     } \
 \

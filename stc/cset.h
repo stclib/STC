@@ -23,7 +23,7 @@
 #ifndef CSET__H__
 #define CSET__H__
 
-// Unordered set - implemented as open hashing with linear probing and no tombstones.
+// Unordered set - implemented as closed hashing with linear probing and no tombstones.
 
 #include "cmap.h"
 

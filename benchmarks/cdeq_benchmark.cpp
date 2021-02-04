@@ -5,6 +5,9 @@
 #include <stc/cdeq.h>
 #include <stc/crandom.h>
 
+static float secs(time_t t1, time_t t2) { return (float)(t2 - t1) / CLOCKS_PER_SEC; }
+
+
 enum {N = 1000000000, M = 12345, P = 5000, R = 2000};
 using_cdeq(i, int);
 
