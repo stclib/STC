@@ -16,17 +16,17 @@ static inline cbits sieveOfEratosthenes(size_t n)
         }
     }
     return primes;
-} 
+}
 
 
 int main(void)
 {
     int n = 100000000;
     printf("computing prime numbers up to %u\n", n);
-    
+
     cbits primes = sieveOfEratosthenes(n);
     puts("done");
-    
+
     size_t np = cbits_count(primes);
     printf("number of primes: %zu\n", np);
 

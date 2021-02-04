@@ -24,12 +24,16 @@ c_foreach (i, cvec_x, vec) sum += *i.ref;
 ```
 
 #### c_forrange
-Declare an iterator and specify a range to iterate with a for loop. 
-- c_forrange (end)
-- c_forrange (it, end)
-- c_forrange (it, IterType, end)
-- c_forrange (it, IterType, begin, end)
-- c_forrange (it, IterType, begin, end, step)
+Declare an iterator and specify a range to iterate with a for loop. Like python's ***range()*** function:
+- c_forrange (stop)                              #  for _ in range(stop):
+- c_forrange (i, stop)  // IterType=size_t       #  for i in range(stop):
+- c_forrange (i, IterType, stop)                 #  for i in range(stop):
+- c_forrange (i, IterType, start, stop)          #  for i in range(start, stop):
+- c_forrange (i, IterType, start, stop, step)    #  for i in range(start, stop, step):
+```
+c_forrange (i, int, -3, 3) printf(" %d", i);
+// -3 -2 -1 0 1 2
+```
 
 #### c_withbuffer
 
