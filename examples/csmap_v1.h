@@ -142,7 +142,7 @@ int main(void) {
     typedef struct { \
         C##_##X##_value_t *ref; \
         int _top; \
-        C##_##X##_node_t *_tn, *_st[50]; \
+        C##_##X##_node_t *_tn, *_st[48]; \
     } C##_##X##_iter_t
 
 
@@ -206,14 +206,16 @@ int main(void) {
     STC_API C##_##X##_value_t* \
     C##_##X##_find_it(const C##_##X* self, RawKey rkey, C##_##X##_iter_t* out); \
 \
-    STC_INLINE C##_##X##_value_t* \
+    STC_INLINE C##_##X##_iter_t \
     C##_##X##_find(const C##_##X* self, RawKey rkey) { \
         C##_##X##_iter_t it; \
-        return C##_##X##_find_it(self, rkey, &it); \
+        C##_##X##_find_it(self, rkey, &it); \
+        return it; \
     } \
     STC_INLINE bool \
     C##_##X##_contains(const C##_##X* self, RawKey rkey) { \
-        return C##_##X##_find(self, rkey) != NULL; \
+        C##_##X##_iter_t it; \
+        return C##_##X##_find_it(self, rkey, &it) != NULL; \
     } \
 \
     STC_API C##_##X##_result_t \

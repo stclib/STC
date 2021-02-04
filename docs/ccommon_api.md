@@ -5,26 +5,27 @@ This describes the features the ccommon.h header file.
 ## Macros
 The following macros a completely safe to use, with no side-effects.
 
+
 #### c_new, c_del
-- Type* c_new (VType)
-- Type* c_new (VType, size_t N)
-- c_del (CType, CType* x1, ..., CType* xN)
 
-#### c_malloc, c_calloc, c_realloc, c_free
-Macros that can be overloaded by user to use a different allocator for the entire library
-
-#### c_foreach
-- c_foreach (it, CType, container)
+| Usage                          | Meaning                                 |
+|:-------------------------------|:----------------------------------------|
+| `c_new (type)`                 | `(type *) c_malloc(sizeof(type))`       |
+| `c_new (type, N)`              | `(type *) c_malloc((N) * sizeof(type))` |
+| `c_del (ctype, c1, ..., cN)`   | `ctype_del(c1); ... ctype_del(cN)`      |
 ```c
-using_cvec(x, double);
-...
-cvec_x vec = cvec_x_init();
-double sum = 0;
-c_foreach (i, cvec_x, vec) sum += *i.ref;
+int* array = c_new (int, 100);
+c_free(array);
+
+cstr a = cstr_from("Hello"), b = cstr_from("World");
+c_del(cstr, &a, &b);
 ```
 
+#### c_malloc, c_calloc, c_realloc, c_free
+Memory allocator for the entire library. Macros can be overloaded by the user.
+
 #### c_forrange
-Declare an iterator and specify a range to iterate with a for loop. Like python's ***range()*** function:
+Declare an iterator and specify a range to iterate with a for loop. Like python's ***for i in range()*** function:
 
 | Usage                                         | Python equivalent                    |
 |:----------------------------------------------|:-------------------------------------|
@@ -37,12 +38,31 @@ Declare an iterator and specify a range to iterate with a for loop. Like python'
 ```c
 c_forrange (5) printf("x");
 // xxxxx
-c_forrange (i, 5) printf(" %zu");
+c_forrange (i, 5) printf(" %zu", i);
 // 0 1 2 3 4
 c_forrange (i, int, -3, 3) printf(" %d", i);
 // -3 -2 -1 0 1 2
 c_forrange (i, int, 30, 0, -5) printf(" %d", i);
 // 30 25 20 15 10 5
+```
+
+#### c_foreach
+
+| Usage                                         | Description                     |
+|:----------------------------------------------|:--------------------------------|
+| `c_foreach (it, ctype, container)`            | `Iteratate all elements `       |
+| `c_foreach (it, ctype, it1, it2)`             | `Iterate the range [it1, it2)`  |
+
+```c
+using_csset(x, int);
+...
+c_init (csset_x, set, {23, 3, 7, 5, 12});
+double sum = 0;
+c_foreach (i, csset_x, set) printf(" %d", *i.ref);
+// 3 5 7 12 23
+csset_x_iter_t it = csset_x_find(&set, 7);
+c_foreach (i, csset_x, it, csset_x_end(&set)) printf(" %d", *i.ref);
+// 7 12 23
 ```
 
 #### c_withbuffer

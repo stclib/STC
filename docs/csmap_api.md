@@ -68,8 +68,8 @@ csmap_X_mapped_t*   csmap_X_at(const csmap_X* self, RawKey rkey);               
 size_t              csmap_X_erase(csmap_X* self, RawKey rkey);
 csmap_X_iter_t      csmap_X_erase_at(csmap_X* self, csmap_X_iter_t pos);
 
-csmap_X_value_t*    csmap_X_find(const csmap_X* self, RawKey rkey);                           // NULL if not found
-csmap_X_value_t*    csmap_X_find_it(const csmap_X* self, RawKey rkey, csmap_X_iter_t* out);
+csmap_X_iter_t      csmap_X_find(const csmap_X* self, RawKey rkey);
+csmap_X_value_t*    csmap_X_find_it(const csmap_X* self, RawKey rkey, csmap_X_iter_t* out);  // return NULL if not found
 bool                csmap_X_contains(const csmap_X* self, RawKey rkey);
 
 csmap_X_iter_t      csmap_X_begin(csmap_X* self);

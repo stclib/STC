@@ -30,7 +30,7 @@ int main() {
     cmap_s_put(&myMap, strKey, listMap);
 
     // Access the data entry
-    carray2f arr_b = *clist_a_back(&cmap_l_find(&cmap_s_find(&myMap, strKey)->second, tableKey)->second);
+    carray2f arr_b = *clist_a_back(&cmap_l_find(&cmap_s_find(&myMap, strKey).ref->second, tableKey).ref->second);
     printf("value (%d, %d) is: %f\n", y, x, *carray2f_at(&arr_b, y, x));
 
     cmap_s_del(&myMap); // free up everything!

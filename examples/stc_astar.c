@@ -103,7 +103,7 @@ astar(cstr maze, int width)
             int new_cost = *csmap_mc_at(&cost_so_far, current);
             if (maze.str[mpoint_index(&next)] != '#')
             {
-                csmap_mc_value_t* cost = csmap_mc_find(&cost_so_far, next);
+                csmap_mc_value_t* cost = csmap_mc_find(&cost_so_far, next).ref;
                 if (!cost || new_cost < cost->second)
                 {
                     csmap_mc_put(&cost_so_far, next, new_cost); // update (put)

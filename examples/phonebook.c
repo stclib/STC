@@ -52,7 +52,7 @@ int main(int argc, char **argv)
   printf("\nPhone book after adding Zak Byers:\n");
   print_phone_book(phone_book);
 
-  if (cmap_str_find(&phone_book, "Tariq Beltran") != NULL)
+  if (cmap_str_find(&phone_book, "Tariq Beltran").ref != NULL)
     printf("\nTariq Beltran is in phone book\n");
 
   erased = cmap_str_erase(&phone_book, "Tariq Beltran");

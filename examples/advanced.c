@@ -54,7 +54,7 @@ int main()
 
     VikingRaw lookup = {"Einar", "Norway"};
 
-    cmap_vk_value_t *e = cmap_vk_find(&vikings, lookup);
+    cmap_vk_value_t *e = cmap_vk_find(&vikings, lookup).ref;
     e->second += 3; // add 3 hp points to Einar
     cmap_vk_emplace(&vikings, lookup, 0).first->second += 5; // add 5 more to Einar
 

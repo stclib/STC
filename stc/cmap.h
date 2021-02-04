@@ -42,8 +42,8 @@ int main(void) {
     cmap_mx_put(&m, 5, 'a');
     cmap_mx_put(&m, 8, 'b');
     cmap_mx_put(&m, 12, 'c');
-    cmap_mx_value_t *e = cmap_mx_find(&m, 10); // = NULL
-    char val = cmap_mx_find(&m, 5)->second;
+    cmap_mx_iter_t it = cmap_mx_find(&m, 10); // none
+    char val = cmap_mx_find(&m, 5).ref->second;
     cmap_mx_put(&m, 5, 'd'); // update
     cmap_mx_erase(&m, 8);
     c_foreach (i, cmap_mx, m)
@@ -221,7 +221,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     C##_##X##_del(C##_##X* self); \
     STC_API void \
     C##_##X##_clear(C##_##X* self); \
-    STC_API C##_##X##_value_t* \
+    STC_API C##_##X##_iter_t \
     C##_##X##_find(const C##_##X* self, RawKey rkey); \
     STC_API bool \
     C##_##X##_contains(const C##_##X* self, RawKey rkey); \
@@ -357,11 +357,13 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         return b; \
     } \
 \
-    STC_DEF C##_##X##_value_t* \
+    STC_DEF C##_##X##_iter_t \
     C##_##X##_find(const C##_##X* self, RawKey rkey) { \
-        if (self->size == 0) return NULL; \
+        C##_##X##_iter_t it = {NULL}; \
+        if (self->size == 0) return it; \
         C##_bucket_t b = C##_##X##_bucket(self, &rkey); \
-        return self->_hashx[b.idx] ? &self->table[b.idx] : NULL; \
+        if (*(it._hx = self->_hashx+b.idx)) it.ref = self->table+b.idx; \
+        return it; \
     } \
 \
     STC_DEF bool \
