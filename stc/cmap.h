@@ -56,12 +56,6 @@ int main(void) {
 #include <string.h>
 
 #define _cmap_inits   {NULL, NULL, 0, 0, 0.15f, 0.85f}
-
-/* https://lemire.me/blog/2016/06/27/a-fast-alternative-to-the-modulo-reduction */
-#define chash_reduce(x, N)            ((uint32_t) (((uint64_t) (x) * (N)) >> 32))
-#define chash_entry_index(h, entryPtr) ((entryPtr) - (h).table)
-
-enum {chash_HASH = 0x7f, chash_USED = 0x80};
 typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 
 #define using_cmap(...) \
@@ -313,6 +307,11 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
+
+#define chash_reduce(x, N) ((uint32_t) (((uint64_t) (x) * (N)) >> 32))
+#define chash_entry_index(h, entryPtr) ((entryPtr) - (h).table)
+enum {chash_HASH = 0x7f, chash_USED = 0x80};
+
 #define _implement_CHASH(X, C, Key, Mapped, keyEqualsRaw, keyHashRaw, mappedDel, keyDel, \
                             keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
     STC_DEF C##_##X \
@@ -446,8 +445,6 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         if ((float) k / cap < self->min_load_factor && k > 512) \
             C##_##X##_reserve(self, k*1.2); \
     }
-
-/* https://probablydance.com/2018/06/16/fibonacci-hashing-the-optimization-that-the-world-forgot-or-a-better-alternative-to-integer-modulo/ */
 
 STC_DEF uint32_t c_default_hash(const void *data, size_t len) {
     const volatile uint16_t *key = (const uint16_t *) data;

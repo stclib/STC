@@ -228,7 +228,7 @@ static void ins_and_access_s(picobench::state& s)
             map.erase(it);
         }
     }
-    s.set_result(result);
+    s.set_result(result + map.size());
 }
 
 static void ins_and_access_cmap_s(picobench::state& s)

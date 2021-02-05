@@ -61,9 +61,9 @@
 #define _c_OVERLOAD_SELECT(NAME, NUM) _c_CAT( NAME ## _, NUM)
 
 #define c_MACRO_OVERLOAD(NAME, ...) _c_OVERLOAD_SELECT(NAME, _c_VA_ARG_SIZE(__VA_ARGS__))(__VA_ARGS__)
-#define c_static_assert(cond, msg) typedef char static_assert_##msg[(cond) ? 1 : -1]
+#define c_static_assert(cond) typedef char _static_assert_[(cond) ? 1 : -1]
 #define c_container_of(ptr, type, member) \
-                                ((type *)((char *)(ptr) - offsetof(type, member)))
+        ((type *)((char *)(ptr) - offsetof(type, member)))
 
 #define c_new(...)              c_MACRO_OVERLOAD(c_new, __VA_ARGS__)
 #define c_new_1(T)              ((T *) c_malloc(sizeof(T)))

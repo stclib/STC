@@ -45,17 +45,20 @@
         cdeq_##X##_value_t *base, *data; \
     } cdeq_##X
 
+struct cdeq_rep { size_t size, cap; void* base[]; };
+#define _cdeq_rep(self) c_container_of((self)->base, struct cdeq_rep, base)
+
 #define using_cdeq_7(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue) \
     typedefs_cdeq(X, Value, RawValue); \
 \
     STC_API cdeq_##X \
     cdeq_##X##_init(void); \
     STC_INLINE bool \
-    cdeq_##X##_empty(cdeq_##X deq) {return !_cdeq_size(&deq);} \
+    cdeq_##X##_empty(cdeq_##X deq) {return !_cdeq_rep(&deq)->size;} \
     STC_INLINE size_t \
-    cdeq_##X##_size(cdeq_##X deq) {return _cdeq_size(&deq);} \
+    cdeq_##X##_size(cdeq_##X deq) {return _cdeq_rep(&deq)->size;} \
     STC_INLINE size_t \
-    cdeq_##X##_capacity(cdeq_##X deq) {return _cdeq_cap(&deq);} \
+    cdeq_##X##_capacity(cdeq_##X deq) {return _cdeq_rep(&deq)->cap;} \
     STC_INLINE Value \
     cdeq_##X##_value_from_raw(RawValue raw) {return valueFromRaw(raw);} \
     STC_INLINE cdeq_##X##_value_t \
@@ -102,7 +105,7 @@
     } \
     STC_INLINE void \
     cdeq_##X##_pop_back(cdeq_##X* self) { \
-        valueDestroy(&self->data[--_cdeq_size(self)]); \
+        valueDestroy(&self->data[--_cdeq_rep(self)->size]); \
     } \
 \
     STC_API void \
@@ -114,7 +117,7 @@
     STC_INLINE void \
     cdeq_##X##_pop_front(cdeq_##X* self) { \
         valueDestroy(self->data++); \
-        --_cdeq_size(self); \
+        --_cdeq_rep(self)->size; \
     } \
 \
     STC_API cdeq_##X##_iter_t \
@@ -165,10 +168,10 @@
     STC_INLINE cdeq_##X##_value_t* \
     cdeq_##X##_front(cdeq_##X* self) {return self->data;} \
     STC_INLINE cdeq_##X##_value_t* \
-    cdeq_##X##_back(cdeq_##X* self) {return self->data + _cdeq_size(self) - 1;} \
+    cdeq_##X##_back(cdeq_##X* self) {return self->data + _cdeq_rep(self)->size - 1;} \
     STC_INLINE cdeq_##X##_value_t* \
     cdeq_##X##_at(cdeq_##X* self, size_t i) { \
-        assert(i < _cdeq_size(self)); \
+        assert(i < _cdeq_rep(self)->size); \
         return self->data + i; \
     } \
 \
@@ -180,7 +183,7 @@
     } \
     STC_INLINE void \
     cdeq_##X##_sort(cdeq_##X* self) { \
-        cdeq_##X##_sort_with(self, 0, _cdeq_size(self), cdeq_##X##_value_compare); \
+        cdeq_##X##_sort_with(self, 0, _cdeq_rep(self)->size, cdeq_##X##_value_compare); \
     } \
 \
     STC_INLINE cdeq_##X##_iter_t \
@@ -189,7 +192,7 @@
     } \
     STC_INLINE cdeq_##X##_iter_t \
     cdeq_##X##_end(const cdeq_##X* self) { \
-        cdeq_##X##_iter_t it = {self->data + _cdeq_size(self)}; return it; \
+        cdeq_##X##_iter_t it = {self->data + _cdeq_rep(self)->size}; return it; \
     } \
     STC_INLINE void \
     cdeq_##X##_next(cdeq_##X##_iter_t* it) {++it->ref;} \
@@ -204,66 +207,73 @@
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
+
+static struct cdeq_rep _cdeq_inits = {0, 0};
+#define              _cdeq_nfront(self) ((self)->data - (self)->base)
+static inline double _minf(double x, double y) {return x < y ? x : y;}
+static inline double _maxf(double x, double y) {return x > y ? x : y;}
+
 #define _c_implement_cdeq_7(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue) \
 \
     STC_DEF cdeq_##X \
     cdeq_##X##_init(void) { \
-        cdeq_##X##_value_t *t = (cdeq_##X##_value_t *) (_cdeq_inits + 2); \
-        cdeq_##X deq = {t, t}; return deq; \
+        cdeq_##X##_value_t *b = (cdeq_##X##_value_t *) _cdeq_inits.base; \
+        cdeq_##X deq = {b, b}; return deq; \
     } \
 \
     STC_DEF void \
     cdeq_##X##_push_n(cdeq_##X *self, const cdeq_##X##_rawvalue_t arr[], size_t n) { \
         _cdeq_##X##_expand(self, n, false); \
-        cdeq_##X##_value_t* p = self->data + _cdeq_size(self); \
+        cdeq_##X##_value_t* p = self->data + _cdeq_rep(self)->size; \
         for (size_t i=0; i < n; ++i) *p++ = valueFromRaw(arr[i]); \
-        _cdeq_size(self) += n; \
+        _cdeq_rep(self)->size += n; \
     } \
 \
     STC_DEF void \
     cdeq_##X##_clear(cdeq_##X* self) { \
         cdeq_##X##_value_t* p = self->data; if (p) { \
-            for (cdeq_##X##_value_t* q = p + _cdeq_size(self); p != q; ++p) \
+            for (cdeq_##X##_value_t* q = p + _cdeq_rep(self)->size; p != q; ++p) \
                 valueDestroy(p); \
-            _cdeq_size(self) = 0; \
+            _cdeq_rep(self)->size = 0; \
         } \
     } \
     STC_DEF void \
     cdeq_##X##_del(cdeq_##X* self) { \
         cdeq_##X##_clear(self); \
-        if (_cdeq_alloced(self) != _cdeq_inits) \
-            c_free(_cdeq_alloced(self)); \
+        if (_cdeq_rep(self)->cap) \
+            c_free(_cdeq_rep(self)); \
     } \
 \
     STC_DEF void \
     _cdeq_##X##_expand(cdeq_##X* self, size_t n, bool at_front) { \
-        size_t len = _cdeq_size(self), cap = _cdeq_cap(self); \
+        struct cdeq_rep* rep = _cdeq_rep(self); \
+        size_t len = rep->size, cap = rep->cap; \
         size_t nfront = self->data - self->base, nback = cap - (nfront + len); \
         if (at_front && nfront >= n || !at_front && nback >= n) \
             return; \
         if ((len + n)*1.3 > cap) { \
             cap = (len + n + 6)*1.8; \
-            size_t* rep = (size_t *) c_realloc(_cdeq_alloced(self) != _cdeq_inits ? _cdeq_alloced(self) : NULL, \
-                                               2*sizeof(size_t) + cap*sizeof(Value)); \
-            rep[0] = len, rep[1] = cap; \
-            self->base = (cdeq_##X##_value_t *) (rep + 2); \
+            rep = (struct cdeq_rep*) c_realloc(rep->cap ? rep : NULL, \
+                                               sizeof(struct cdeq_rep) + cap*sizeof(Value)); \
+            rep->size = len, rep->cap = cap; \
+            self->base = (cdeq_##X##_value_t *) rep->base; \
             self->data = self->base + nfront; \
             _cdeq_##X##_expand(self, n, at_front); \
             return; \
         } \
         size_t unused = cap - (len + n); \
-        size_t pos = at_front ? c_maxf(unused*0.5, (float) unused - nback) + n \
-                              : c_minf(unused*0.5, nfront); \
+        size_t pos = at_front ? _maxf(unused*0.5, (float) unused - nback) + n \
+                              : _minf(unused*0.5, nfront); \
         self->data = (cdeq_##X##_value_t *) memmove(self->base + pos, self->data, len*sizeof(Value)); \
     } \
 \
     STC_DEF void \
     cdeq_##X##_resize(cdeq_##X* self, size_t size, Value null_val) { \
         _cdeq_##X##_expand(self, size, false); \
-        size_t i, n = _cdeq_size(self); \
+        size_t i, n = _cdeq_rep(self)->size; \
         for (i=size; i<n; ++i) valueDestroy(self->data + i); \
         for (i=n; i<size; ++i) self->data[i] = null_val; \
-        if (self->data) _cdeq_size(self) = size; \
+        if (self->data) _cdeq_rep(self)->size = size; \
     } \
 \
     STC_DEF void \
@@ -271,18 +281,18 @@
         if (self->data == self->base) \
             _cdeq_##X##_expand(self, 1, true); \
         *--self->data = value; \
-        ++_cdeq_size(self); \
+        ++_cdeq_rep(self)->size; \
     } \
     STC_DEF void \
     cdeq_##X##_push_back(cdeq_##X* self, Value value) { \
-        if (_cdeq_nfront(self) + _cdeq_size(self) == _cdeq_cap(self)) \
+        if (_cdeq_nfront(self) + _cdeq_rep(self)->size == _cdeq_rep(self)->cap) \
             _cdeq_##X##_expand(self, 1, false); \
-        self->data[_cdeq_size(self)++] = value; \
+        self->data[_cdeq_rep(self)->size++] = value; \
     } \
 \
     STC_DEF cdeq_##X \
     cdeq_##X##_clone(cdeq_##X vec) { \
-        size_t len = _cdeq_size(&vec); \
+        size_t len = _cdeq_rep(&vec)->size; \
         cdeq_##X out = cdeq_##X##_with_capacity(len); \
         cdeq_##X##_insert_range_p(&out, out.data, vec.data, vec.data + len); \
         return out; \
@@ -291,7 +301,7 @@
     STC_DEF cdeq_##X##_iter_t \
     cdeq_##X##_insert_range_p(cdeq_##X* self, cdeq_##X##_value_t* pos, \
                               const cdeq_##X##_value_t* first, const cdeq_##X##_value_t* finish) { \
-        size_t n = finish - first, idx = pos - self->data, size = _cdeq_size(self); \
+        size_t n = finish - first, idx = pos - self->data, size = _cdeq_rep(self)->size; \
         bool at_front = (idx < size/2); \
         _cdeq_##X##_expand(self, n, at_front); \
         if (at_front) { \
@@ -302,7 +312,7 @@
             memmove(pos + n, pos, (size - idx)*sizeof(Value)); \
         } \
         cdeq_##X##_iter_t it = {pos}; \
-        if (n) _cdeq_size(self) += n; \
+        if (n) _cdeq_rep(self)->size += n; \
         while (first != finish) \
             *pos++ = valueFromRaw(valueToRaw(first++)); \
         return it; \
@@ -312,11 +322,11 @@
     cdeq_##X##_erase_range_p(cdeq_##X* self, cdeq_##X##_value_t* first, cdeq_##X##_value_t* finish) { \
         intptr_t len = finish - first; \
         if (len > 0) { \
-            cdeq_##X##_value_t* p = first, *end = self->data + _cdeq_size(self); \
+            cdeq_##X##_value_t* p = first, *end = self->data + _cdeq_rep(self)->size; \
             while (p != finish) valueDestroy(p++); \
             if (first == self->data) self->data += len; \
             else memmove(first, finish, (end - finish) * sizeof(Value)); \
-            _cdeq_size(self) -= len; \
+            _cdeq_rep(self)->size -= len; \
         } \
         cdeq_##X##_iter_t it = {first}; return it; \
     } \
@@ -341,9 +351,6 @@
         return valueCompareRaw(&rx, &ry); \
     }
 
-static size_t _cdeq_inits[2] = {0, 0};
-#define _cdeq_alloced(self) (((size_t *) (self)->base) - 2)
-
 #else
 #define _c_implement_cdeq_7(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue)
 #endif
@@ -356,12 +363,5 @@ static size_t _cdeq_inits[2] = {0, 0};
 
 typedef int(*_cdeq_cmp)(const void*, const void*);
 STC_EXTERN_IMPORT void qsort(void *start, size_t nitems, size_t size, _cdeq_cmp cmp);
-
-#define _cdeq_size(self)      ((size_t *) (self)->base)[-2]
-#define _cdeq_cap(self)       ((size_t *) (self)->base)[-1]
-#define _cdeq_nfront(self)    ((self)->data - (self)->base)
-
-static inline double c_minf(double x, double y) { return x < y ? x : y; }
-static inline double c_maxf(double x, double y) { return x > y ? x : y; }
 
 #endif

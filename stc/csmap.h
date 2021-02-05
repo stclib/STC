@@ -150,6 +150,9 @@ int main(void) {
         C##_##X##_size_t _tn, _st[48]; \
     } C##_##X##_iter_t
 
+struct csmap_rep { size_t root, disp, size, cap; void* data[]; };
+#define _csmap_rep(self) c_container_of((self)->data, struct csmap_rep, data)
+
 #define _using_AATREE(X, C, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \
                          keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
     _using_AATREE_types(X, C, Key, Mapped); \
@@ -182,9 +185,9 @@ int main(void) {
         return x; \
     } \
     STC_INLINE bool \
-    C##_##X##_empty(C##_##X m) {return _smap_size(&m) == 0;} \
+    C##_##X##_empty(C##_##X m) {return _csmap_rep(&m)->size == 0;} \
     STC_INLINE size_t \
-    C##_##X##_size(C##_##X m) {return _smap_size(&m);} \
+    C##_##X##_size(C##_##X m) {return _csmap_rep(&m)->size;} \
     STC_API void \
     C##_##X##_del(C##_##X* self); \
     STC_INLINE void \
@@ -267,7 +270,7 @@ int main(void) {
 \
     STC_INLINE C##_##X##_iter_t \
     C##_##X##_begin(C##_##X* self) { \
-        C##_##X##_iter_t it = {NULL, self->data, 0, (C##_##X##_size_t) _smap_root(self)}; \
+        C##_##X##_iter_t it = {NULL, self->data, 0, (C##_##X##_size_t) _csmap_rep(self)->root}; \
         if (it._tn) C##_##X##_next(&it); \
         return it; \
     } \
@@ -293,49 +296,52 @@ int main(void) {
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
+static struct csmap_rep _smap_inits = {0, 0, 0, 0};
+
 #define _implement_AATREE(X, C, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \
                              keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
     STC_DEF C##_##X \
     C##_##X##_init(void) { \
-        C##_##X m = {(C##_##X##_node_t *) (_smap_inits + 4)}; \
+        C##_##X m = {(C##_##X##_node_t *) _smap_inits.data}; \
         return m; \
     } \
 \
     STC_DEF C##_##X##_value_t* \
     C##_##X##_front(C##_##X* self) { \
         C##_##X##_node_t *d = self->data; \
-        C##_##X##_size_t tn = (C##_##X##_size_t) _smap_root(self); \
+        C##_##X##_size_t tn = (C##_##X##_size_t) _csmap_rep(self)->root; \
         while (d[tn].link[0]) tn = d[tn].link[0]; \
         return &d[tn].value; \
     } \
     STC_DEF C##_##X##_value_t* \
     C##_##X##_back(C##_##X* self) { \
         C##_##X##_node_t *d = self->data; \
-        C##_##X##_size_t tn = (C##_##X##_size_t) _smap_root(self); \
+        C##_##X##_size_t tn = (C##_##X##_size_t) _csmap_rep(self)->root; \
         while (d[tn].link[1]) tn = d[tn].link[1]; \
         return &d[tn].value; \
     } \
 \
     STC_DEF void \
     C##_##X##_reserve(C##_##X* self, size_t cap) { \
-        C##_##X##_size_t oldcap = _smap_cap(self); \
+        struct csmap_rep* rep = _csmap_rep(self); \
+        C##_##X##_size_t oldcap = rep->cap; \
         if (cap > oldcap) { \
-            size_t* rep = (size_t *) c_realloc(oldcap ? _smap_rep(self) : NULL, \
-                                               4*sizeof(size_t) + (cap + 1)*sizeof(C##_##X##_node_t)); \
+            rep = (struct csmap_rep*) c_realloc(oldcap ? rep : NULL, \
+                                                sizeof(struct csmap_rep) + (cap + 1)*sizeof(C##_##X##_node_t)); \
             if (oldcap == 0) \
-                memset(rep, 0, sizeof(size_t)*4 + sizeof(C##_##X##_node_t)); \
-            rep[_smap_CAP] = cap; \
-            self->data = (C##_##X##_node_t *) (rep + 4); \
+                memset(rep, 0, sizeof(struct csmap_rep) + sizeof(C##_##X##_node_t)); \
+            rep->cap = cap; \
+            self->data = (C##_##X##_node_t *) rep->data; \
         } \
     } \
 \
     STC_DEF C##_##X##_size_t \
     C##_##X##_node_new_(C##_##X* self) { \
-        size_t tn, *rep = _smap_rep(self); \
-        if (rep[_smap_DISP]) { \
-            tn = rep[_smap_DISP]; \
-            rep[_smap_DISP] = self->data[tn].link[1]; \
-        } else if ((tn = rep[_smap_SIZE] + 1) > rep[_smap_CAP]) \
+        size_t tn; struct csmap_rep *rep = _csmap_rep(self); \
+        if (rep->disp) { \
+            tn = rep->disp; \
+            rep->disp = self->data[tn].link[1]; \
+        } else if ((tn = rep->size + 1) > rep->cap) \
             C##_##X##_reserve(self, 4 + tn*3/2); \
         C##_##X##_node_t* dn = &self->data[tn]; \
         dn->link[0] = dn->link[1] = 0; dn->level = 1; \
@@ -344,15 +350,15 @@ int main(void) {
 \
     STC_DEF void \
     C##_##X##_node_del_(C##_##X##_node_t *d, C##_##X##_size_t tn) { \
-        size_t *rep = ((size_t *) d) - 4; \
+        struct csmap_rep *rep = c_container_of(d, struct csmap_rep, data); \
         keyDel(KEY_REF_##C(&d[tn].value)); \
-        d[tn].link[1] = (C##_##X##_size_t) rep[_smap_DISP]; \
-        rep[_smap_DISP] = tn; \
+        d[tn].link[1] = (C##_##X##_size_t) rep->disp; \
+        rep->disp = tn; \
     } \
 \
     STC_DEF C##_##X##_value_t* \
     C##_##X##_find_it(const C##_##X* self, C##_##X##_rawkey_t rkey, C##_##X##_iter_t* out) { \
-        C##_##X##_size_t tn = _smap_root(self); \
+        C##_##X##_size_t tn = _csmap_rep(self)->root; \
         C##_##X##_node_t *d = out->_d = self->data; \
         out->_top = 0; \
         while (tn) { \
@@ -432,9 +438,9 @@ int main(void) {
     STC_DEF C##_##X##_result_t \
     C##_##X##_insert_key(C##_##X* self, RawKey rkey) { \
         C##_##X##_result_t res = {NULL, false}; \
-        C##_##X##_size_t tn = C##_##X##_insert_key_i_(self, (C##_##X##_size_t) _smap_root(self), &rkey, &res); \
-        _smap_root(self) = tn; \
-        _smap_size(self) += res.second; \
+        C##_##X##_size_t tn = C##_##X##_insert_key_i_(self, (C##_##X##_size_t) _csmap_rep(self)->root, &rkey, &res); \
+        _csmap_rep(self)->root = tn; \
+        _csmap_rep(self)->size += res.second; \
         return res; \
     } \
 \
@@ -476,8 +482,8 @@ int main(void) {
     STC_DEF int \
     C##_##X##_erase(C##_##X* self, RawKey rkey) { \
         int erased = 0; \
-        C##_##X##_size_t root = C##_##X##_erase_r_(self->data, (C##_##X##_size_t) _smap_root(self), &rkey, &erased); \
-        if (erased) {_smap_root(self) = root; --_smap_size(self);} \
+        C##_##X##_size_t root = C##_##X##_erase_r_(self->data, (C##_##X##_size_t) _csmap_rep(self)->root, &rkey, &erased); \
+        if (erased) {_csmap_rep(self)->root = root; --_csmap_rep(self)->size;} \
         return erased; \
     } \
 \
@@ -494,9 +500,9 @@ int main(void) {
     } \
     STC_DEF C##_##X \
     C##_##X##_clone(C##_##X bst) { \
-        C##_##X clone = C##_##X##_with_capacity(_smap_size(&bst)); \
-        C##_##X##_size_t root = C##_##X##_clone_r_(&clone, bst.data, (C##_##X##_size_t) _smap_root(&bst)); \
-        _smap_root(&clone) = root; \
+        C##_##X clone = C##_##X##_with_capacity(_csmap_rep(&bst)->size); \
+        C##_##X##_size_t root = C##_##X##_clone_r_(&clone, bst.data, (C##_##X##_size_t) _csmap_rep(&bst)->root); \
+        _csmap_rep(&clone)->root = root; \
         return clone; \
     } \
 \
@@ -510,25 +516,15 @@ int main(void) {
     } \
     STC_DEF void \
     C##_##X##_del(C##_##X* self) { \
-        if (_smap_root(self)) { \
-            C##_##X##_del_r_(self->data, (C##_##X##_size_t) _smap_root(self)); \
-            c_free(_smap_rep(self)); \
+        if (_csmap_rep(self)->root) { \
+            C##_##X##_del_r_(self->data, (C##_##X##_size_t) _csmap_rep(self)->root); \
+            c_free(_csmap_rep(self)); \
         } \
     }
-
-_using_AATREE_types(_, csmap, int, int);
-static size_t _smap_inits[4] = {0, 0, 0, 0};
 
 #else
 #define _implement_AATREE(X, C, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \
                              keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped)
 #endif
-
-enum {_smap_ROOT=0, _smap_DISP=1, _smap_SIZE=2, _smap_CAP=3};
-#define _smap_rep(self) (((size_t *)(self)->data) - 4)
-#define _smap_root(self) _smap_rep(self)[_smap_ROOT]
-#define _smap_disp(self) _smap_rep(self)[_smap_DISP]
-#define _smap_size(self) _smap_rep(self)[_smap_SIZE]
-#define _smap_cap(self) _smap_rep(self)[_smap_CAP]
 
 #endif

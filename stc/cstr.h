@@ -35,43 +35,26 @@ typedef struct { char *ref; } cstr_iter_t;
 typedef char cstr_value_t;
 #define cstr_npos ((size_t) (-1))
 
+STC_API cstr_t  cstr_from_n(const char* str, size_t len);
+STC_API cstr_t  cstr_from_fmt(const char* fmt, ...);
+STC_API void    cstr_fmt(cstr_t* self, const char* fmt, ...);
+STC_API size_t  cstr_reserve(cstr_t* self, size_t cap);
+STC_API void    cstr_resize(cstr_t* self, size_t len, char fill);
+STC_API cstr_t* cstr_assign_n(cstr_t* self, const char* str, size_t len);
+STC_API cstr_t* cstr_append_n(cstr_t* self, const char* str, size_t len);
+STC_API void    cstr_replace_n(cstr_t* self, size_t pos, size_t len, const char* str, size_t n);
+STC_API void    cstr_erase_n(cstr_t* self, size_t pos, size_t n);
+STC_API bool    cstr_getdelim(cstr_t *self, int delim, FILE *stream);
+STC_API size_t  cstr_find(cstr_t s, const char* needle);
+STC_API size_t  cstr_find_n(cstr_t s, const char* needle, size_t pos, size_t nlen);
+STC_API size_t  cstr_ifind_n(cstr_t s, const char* needle, size_t pos, size_t nlen);
+
+STC_API int     c_strncasecmp(const char* s1, const char* s2, size_t n);
+STC_API char*   c_strnfind(const char* s, const char* needle, size_t nmax);
+STC_DEF char*   c_istrnfind(const char* s, const char* needle, size_t nmax);
+
 struct cstr_rep { size_t size, cap; char str[sizeof(size_t)]; };
 #define _cstr_rep(self) c_container_of((self)->str, struct cstr_rep, str)
-
-STC_API cstr_t
-cstr_from_n(const char* str, size_t len);
-STC_API cstr_t
-cstr_from_fmt(const char* fmt, ...);
-STC_API void
-cstr_fmt(cstr_t* self, const char* fmt, ...);
-STC_API size_t
-cstr_reserve(cstr_t* self, size_t cap);
-STC_API void
-cstr_resize(cstr_t* self, size_t len, char fill);
-STC_API cstr_t*
-cstr_assign_n(cstr_t* self, const char* str, size_t len);
-STC_API cstr_t*
-cstr_append_n(cstr_t* self, const char* str, size_t len);
-STC_API void
-cstr_replace_n(cstr_t* self, size_t pos, size_t len, const char* str, size_t n);
-STC_API void
-cstr_erase_n(cstr_t* self, size_t pos, size_t n);
-STC_API bool
-cstr_getdelim(cstr_t *self, int delim, FILE *stream);
-STC_API size_t
-cstr_find(cstr_t s, const char* needle);
-STC_API size_t
-cstr_find_n(cstr_t s, const char* needle, size_t pos, size_t nlen);
-STC_API size_t
-cstr_ifind_n(cstr_t s, const char* needle, size_t pos, size_t nlen);
-
-STC_API int
-c_strncasecmp(const char* s1, const char* s2, size_t n);
-STC_API char*
-c_strnfind(const char* s, const char* needle, size_t nmax);
-STC_DEF char*
-c_istrnfind(const char* s, const char* needle, size_t nmax);
-
 /* optimal memory: based on malloc_usable_size() sequence: 24, 40, 56, ... */
 #define _cstr_opt_mem(cap)  ((((offsetof(struct cstr_rep, str) + (cap) + 8)>>4)<<4) + 8)
 /* optimal string capacity: 7, 23, 39, ... */
@@ -106,12 +89,10 @@ STC_INLINE cstr_t
 cstr_from(const char* str) {
     return cstr_from_n(str, strlen(str));
 }
-
 STC_INLINE cstr_t
 cstr_clone(cstr_t s) {
     return cstr_from_n(s.str, _cstr_rep(&s)->size);
 }
-
 STC_INLINE void
 cstr_clear(cstr_t* self) {
     self->str[_cstr_rep(self)->size = 0] = '\0';
@@ -158,7 +139,6 @@ STC_INLINE void
 cstr_push_back(cstr_t* self, char value) {
     cstr_append_n(self, &value, 1);
 }
-
 STC_INLINE void
 cstr_pop_back(cstr_t* self) {
     self->str[ --_cstr_rep(self)->size ] = '\0';
@@ -186,10 +166,14 @@ cstr_getline(cstr_t *self, FILE *stream) {
 
 /* readonly */
 
-STC_INLINE size_t cstr_size(cstr_t s) {return _cstr_rep(&s)->size;}
-STC_INLINE size_t cstr_capacity(cstr_t s) {return _cstr_rep(&s)->cap;}
-STC_INLINE size_t cstr_empty(cstr_t s) {return _cstr_rep(&s)->size == 0;}
-STC_INLINE size_t cstr_length(cstr_t s) { return _cstr_rep(&s)->size; }
+STC_INLINE size_t 
+cstr_size(cstr_t s) {return _cstr_rep(&s)->size;}
+STC_INLINE size_t
+cstr_capacity(cstr_t s) {return _cstr_rep(&s)->cap;}
+STC_INLINE size_t
+cstr_empty(cstr_t s) {return _cstr_rep(&s)->size == 0;}
+STC_INLINE size_t
+cstr_length(cstr_t s) { return _cstr_rep(&s)->size; }
 
 STC_INLINE bool
 cstr_equals(cstr_t s1, const char* str) {
@@ -258,7 +242,7 @@ uint32_t cstr_hash_raw(const char* const* p, size_t none) {
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-STC_LIBRARY_ONLY( struct cstr_rep _cstr_nullrep = {0, 0, {0}};
+STC_LIBRARY_ONLY( static struct cstr_rep _cstr_nullrep = {0, 0, {0}};
                   const cstr_t cstr_inits = {_cstr_nullrep.str}; )
 
 STC_DEF size_t
