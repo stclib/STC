@@ -1,4 +1,4 @@
-
+#include <math.h>
 #include <stc/cstr.h>
 #include <stc/cmap.h>
 #include <stc/clist.h>
@@ -16,7 +16,7 @@ int main1()
         "this", "sentence", "is", "a", "hoax"
     });
 
-    clist_str_push_back(&lwords, cstr_from_fmt("%f", 123897.0 / 23.0));
+    clist_str_push_back(&lwords, cstr_from_fmt("%.15f", sqrt(2)));
     c_foreach (w, clist_str, lwords)
         printf("%s\n", w.ref->str);
     puts("");

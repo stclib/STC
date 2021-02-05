@@ -42,13 +42,13 @@
 #if defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 #  define STC_API extern
 #  define STC_DEF
-#  define STC_API_V extern
-#  define STC_DEF_V
+#  define STC_LIBRARY_ONLY(...) __VA_ARGS__
+#  define STC_STATIC_ONLY(...) 
 #else
 #  define STC_API static inline
 #  define STC_DEF static inline
-#  define STC_API_V static
-#  define STC_DEF_V static
+#  define STC_LIBRARY_ONLY(...)
+#  define STC_STATIC_ONLY(...) __VA_ARGS__
 #endif
 
 /* Macro overloading feature support: https://rextester.com/ONP80107 */
