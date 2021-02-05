@@ -348,10 +348,9 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
         return (C##_##X##_size_t) tn; \
     } \
 \
-    STC_DEF void \
-    C##_##X##_node_del_(C##_##X##_node_t *d, C##_##X##_size_t tn) { \
+    STC_INLINE void \
+    C##_##X##_node_unlink_(C##_##X##_node_t *d, C##_##X##_size_t tn) { \
         struct csmap_rep *rep = c_container_of(d, struct csmap_rep, data); \
-        keyDel(KEY_REF_##C(&d[tn].value)); \
         d[tn].link[1] = (C##_##X##_size_t) rep->disp; \
         rep->disp = tn; \
     } \
@@ -463,7 +462,7 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
             } else { /* unlink node */ \
                 tx = tn; \
                 tn = d[tn].link[ d[tn].link[0] == 0 ]; \
-                C##_##X##_node_del_(d, tx); \
+                C##_##X##_node_unlink_(d, tx); \
             } \
         } \
         tx = d[tn].link[1]; \

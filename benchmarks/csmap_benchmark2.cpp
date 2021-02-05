@@ -62,11 +62,10 @@ static void insert_i(picobench::state& s)
     size_t result = 0;
     MapInt map;
     stc64_srandom(seed);
-    s.start_timer();
+    picobench::scope scope(s);
     c_forrange (n, s.iterations())
         map.emplace(stc64_random() & 0xfffffff, n);
     s.set_result(map.size());
-    s.stop_timer();
 }
 
 static void insert_csmap_i(picobench::state& s)
@@ -74,17 +73,16 @@ static void insert_csmap_i(picobench::state& s)
     size_t result = 0;
     csmap_i map = csmap_i_init();
     stc64_srandom(seed);
-    s.start_timer();
+    picobench::scope scope(s);
     c_forrange (n, s.iterations())
         csmap_i_emplace(&map, stc64_random() & 0xfffffff, n);
     s.set_result(csmap_i_size(map));
-    s.stop_timer();
     csmap_i_del(&map);
 }
 
 #define P samples(S1).iterations({N1})
-//PICOBENCH(insert_i<omap_i>).P;
-//PICOBENCH(insert_csmap_i).P;
+PICOBENCH(insert_i<omap_i>).P;
+PICOBENCH(insert_csmap_i).P;
 #undef P
 
 
@@ -238,8 +236,8 @@ static void ins_and_access_csmap_s(picobench::state& s)
 }
 
 #define P samples(S1).iterations({N1/5, N1/5, N1/5, N1/10, N1/40}).args({13, 7, 8, 100, 1000})
-//PICOBENCH(ins_and_access_s<omap_s>).P;
-//PICOBENCH(ins_and_access_csmap_s).P;
+PICOBENCH(ins_and_access_s<omap_s>).P;
+PICOBENCH(ins_and_access_csmap_s).P;
 #undef P
 
 PICOBENCH_SUITE("Map5");
