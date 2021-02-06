@@ -61,7 +61,7 @@
 #define _c_OVERLOAD_SELECT(NAME, NUM) _c_CAT( NAME ## _, NUM)
 
 #define c_MACRO_OVERLOAD(NAME, ...) _c_OVERLOAD_SELECT(NAME, _c_VA_ARG_SIZE(__VA_ARGS__))(__VA_ARGS__)
-#define c_static_assert(cond) typedef char _static_assert_[(cond) ? 1 : -1]
+#define c_static_assert(cond, ...) typedef char _static_assert_[(cond) ? 1 : -1]
 #define c_container_of(ptr, type, member) \
         ((type *)((char *)(ptr) - offsetof(type, member)))
 
@@ -122,12 +122,6 @@
 #define c_push_items(self, ctype, ...) do { \
     const ctype##_rawvalue_t __arr[] = __VA_ARGS__; \
     ctype##_push_n(self, __arr, sizeof __arr/sizeof *__arr); \
-} while (0)
-
-/* For cmap_X and csmap_X only: */
-#define c_try_emplace(self, ctype, rkey, mapped) do { \
-    ctype##_result_t __r = ctype##_insert_key(self, rkey); \
-    if (__r.second) __r.first->second = mapped; \
 } while (0)
 
 #define c_del(ctype, ...) do { \

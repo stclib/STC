@@ -188,6 +188,8 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* data[]; };
     C##_##X##_empty(C##_##X tree) {return _csmap_rep(&tree)->size == 0;} \
     STC_INLINE size_t \
     C##_##X##_size(C##_##X tree) {return _csmap_rep(&tree)->size;} \
+    STC_INLINE size_t \
+    C##_##X##_capacity(C##_##X tree) {return _csmap_rep(&tree)->cap;} \
     STC_API void \
     C##_##X##_del(C##_##X* self); \
     STC_INLINE void \

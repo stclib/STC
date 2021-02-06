@@ -26,6 +26,7 @@
 #include <stc/cstr.h>
 
 using_cmap_str();
+using_cset_str();
 
 void print_phone_book(cmap_str phone_book)
 {
@@ -35,6 +36,11 @@ void print_phone_book(cmap_str phone_book)
 
 int main(int argc, char **argv)
 {
+  c_static_assert(3 == 3, "hello");
+
+  c_init (cset_str, names, {"Hello", "Cool", "True"});
+  c_foreach (i, cset_str, names) printf("set: %s\n", i.ref->str);
+
   bool erased;
   c_init (cmap_str, phone_book, {
     {"Lilia Friedman", "(892) 670-4739"},
@@ -46,8 +52,8 @@ int main(int argc, char **argv)
   printf("Phone book:\n");
   print_phone_book(phone_book);
 
-  c_try_emplace(&phone_book, cmap_str, "Zak Byers", cstr_from("(551) 396-1880"));
-  c_try_emplace(&phone_book, cmap_str, "Zak Byers", cstr_from("(551) 396-1990"));
+  cmap_str_emplace(&phone_book, "Zak Byers", "(551) 396-1880");
+  cmap_str_emplace(&phone_book, "Zak Byers", "(551) 396-1990");
 
   printf("\nPhone book after adding Zak Byers:\n");
   print_phone_book(phone_book);
@@ -61,7 +67,7 @@ int main(int argc, char **argv)
   printf("\nPhone book after erasing Tariq and Elliott:\n");
   print_phone_book(phone_book);
 
-  cmap_str_insert_or_assign(&phone_book, "Zak Byers", "(555) 396-188");
+  cmap_str_put(&phone_book, "Zak Byers", "(555) 396-188");
 
   printf("\nPhone book after update phone of Zak Byers:\n");
   print_phone_book(phone_book);
