@@ -150,7 +150,7 @@ int main(void) {
         C##_##X##_size_t _tn, _st[48]; \
     } C##_##X##_iter_t
 
-struct csmap_rep { size_t root, disp, size, cap; void* data[]; };
+struct csmap_rep { size_t root, disp, head, size, cap; void* data[]; };
 #define _csmap_rep(self) c_container_of((self)->data, struct csmap_rep, data)
 
 #define _using_AATREE(X, C, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \
@@ -174,7 +174,7 @@ struct csmap_rep { size_t root, disp, size, cap; void* data[]; };
     } C##_##X##_result_t; \
 \
     STC_API C##_##X C##_##X##_init(void); \
-    STC_API C##_##X C##_##X##_clone(C##_##X bst); \
+    STC_API C##_##X C##_##X##_clone(C##_##X tree); \
 \
     STC_API void \
     C##_##X##_reserve(C##_##X* self, size_t cap); \
@@ -185,9 +185,9 @@ struct csmap_rep { size_t root, disp, size, cap; void* data[]; };
         return x; \
     } \
     STC_INLINE bool \
-    C##_##X##_empty(C##_##X m) {return _csmap_rep(&m)->size == 0;} \
+    C##_##X##_empty(C##_##X tree) {return _csmap_rep(&tree)->size == 0;} \
     STC_INLINE size_t \
-    C##_##X##_size(C##_##X m) {return _csmap_rep(&m)->size;} \
+    C##_##X##_size(C##_##X tree) {return _csmap_rep(&tree)->size;} \
     STC_API void \
     C##_##X##_del(C##_##X* self); \
     STC_INLINE void \
@@ -302,8 +302,8 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
                              keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
     STC_DEF C##_##X \
     C##_##X##_init(void) { \
-        C##_##X m = {(C##_##X##_node_t *) _smap_inits.data}; \
-        return m; \
+        C##_##X tree = {(C##_##X##_node_t *) _smap_inits.data}; \
+        return tree; \
     } \
 \
     STC_DEF C##_##X##_value_t* \
@@ -336,15 +336,17 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
     } \
 \
     STC_DEF C##_##X##_size_t \
-    C##_##X##_node_new_(C##_##X* self) { \
+    C##_##X##_node_new_(C##_##X* self, int level) { \
         size_t tn; struct csmap_rep *rep = _csmap_rep(self); \
         if (rep->disp) { \
             tn = rep->disp; \
             rep->disp = self->data[tn].link[1]; \
-        } else if ((tn = rep->size + 1) > rep->cap) \
-            C##_##X##_reserve(self, 4 + tn*3/2); \
+        } else { \
+            if ((tn = rep->head + 1) > rep->cap) C##_##X##_reserve(self, 4 + tn*3/2); \
+            ++_csmap_rep(self)->head; /* do after reserve */ \
+        } \
         C##_##X##_node_t* dn = &self->data[tn]; \
-        dn->link[0] = dn->link[1] = 0; dn->level = 1; \
+        dn->link[0] = dn->link[1] = 0; dn->level = level; \
         return (C##_##X##_size_t) tn; \
     } \
 \
@@ -420,7 +422,7 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
             dir = (c == -1); \
             it = d[it].link[dir]; \
         } \
-        it = C##_##X##_node_new_(self); d = self->data; \
+        it = C##_##X##_node_new_(self, 1); d = self->data; \
         *KEY_REF_##C(&d[it].value) = keyFromRaw(*rkey); \
         res->first = &d[it].value, res->second = true; \
         if (top == 0) return it; \
@@ -487,21 +489,20 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
     } \
 \
     static C##_##X##_size_t \
-    C##_##X##_clone_r_(C##_##X* self, const C##_##X##_node_t* src, C##_##X##_size_t tn) { \
-        if (tn == 0) return 0; \
-        C##_##X##_size_t cn = C##_##X##_node_new_(self); \
-        C##_##X##_node_t* d = self->data; \
-        d[cn].link[0] = C##_##X##_clone_r_(self, src, src[tn].link[0]); \
-        d[cn].link[1] = C##_##X##_clone_r_(self, src, src[tn].link[1]); \
-        d[cn].level = src[tn].level; \
-        d[cn].value = C##_##X##_value_clone(src[tn].value); \
-        return cn; \
+    C##_##X##_clone_r_(C##_##X* self, const C##_##X##_node_t* src, C##_##X##_size_t sn) { \
+        if (sn == 0) return 0; \
+        C##_##X##_size_t tx, tn = C##_##X##_node_new_(self, src[sn].level); \
+        self->data[tn].value = C##_##X##_value_clone(src[sn].value); \
+        tx = C##_##X##_clone_r_(self, src, src[sn].link[0]); self->data[tn].link[0] = tx; \
+        tx = C##_##X##_clone_r_(self, src, src[sn].link[1]); self->data[tn].link[1] = tx; \
+        return tn; \
     } \
     STC_DEF C##_##X \
-    C##_##X##_clone(C##_##X bst) { \
-        C##_##X clone = C##_##X##_with_capacity(_csmap_rep(&bst)->size); \
-        C##_##X##_size_t root = C##_##X##_clone_r_(&clone, bst.data, (C##_##X##_size_t) _csmap_rep(&bst)->root); \
+    C##_##X##_clone(C##_##X tree) { \
+        C##_##X clone = C##_##X##_with_capacity(_csmap_rep(&tree)->size); \
+        C##_##X##_size_t root = C##_##X##_clone_r_(&clone, tree.data, (C##_##X##_size_t) _csmap_rep(&tree)->root); \
         _csmap_rep(&clone)->root = root; \
+        _csmap_rep(&clone)->size = _csmap_rep(&tree)->size; \
         return clone; \
     } \
 \

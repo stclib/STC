@@ -195,11 +195,11 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         MAP_ONLY_##C( mappedDel(&val->second); ) \
     } \
     STC_INLINE size_t \
-    C##_##X##_bucket_count(C##_##X m) {return (size_t) m.bucket_count;} \
+    C##_##X##_bucket_count(C##_##X map) {return (size_t) map.bucket_count;} \
     STC_INLINE size_t \
-    C##_##X##_capacity(C##_##X m) {return (size_t) (m.bucket_count * m.max_load_factor);} \
+    C##_##X##_capacity(C##_##X map) {return (size_t) (map.bucket_count * map.max_load_factor);} \
     STC_INLINE void \
-    C##_##X##_swap(C##_##X* a, C##_##X* b) {c_swap(C##_##X, *a, *b);} \
+    C##_##X##_swap(C##_##X *map1, C##_##X *map2) {c_swap(C##_##X, *map1, *map2);} \
     STC_INLINE void \
     C##_##X##_set_load_factors(C##_##X* self, float min_load, float max_load) { \
         self->min_load_factor = min_load; \
@@ -208,9 +208,9 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     STC_API C##_##X \
     C##_##X##_with_capacity(size_t cap); \
     STC_API C##_##X \
-    C##_##X##_clone(C##_##X m); \
+    C##_##X##_clone(C##_##X map); \
     STC_API void \
-    C##_##X##_reserve(C##_##X* self, size_t size); \
+    C##_##X##_reserve(C##_##X* self, size_t capacity); \
     STC_API void \
     C##_##X##_del(C##_##X* self); \
     STC_API void \
