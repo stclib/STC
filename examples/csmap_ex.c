@@ -13,7 +13,7 @@ int main(int argc, char **argv)
     csmap_i map = csmap_i_init();
     time_t seed = time(NULL);
 
-    size_t n = 10000000;
+    size_t n = 1000000;
     uint64_t mask = (1ull << 28) - 1;
     csmap_i_iter_t it;
 

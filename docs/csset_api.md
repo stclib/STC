@@ -41,17 +41,16 @@ void                csset_X_del(csset_X* self);
 bool                csset_X_empty(csset_X m);
 size_t              csset_X_size(csset_X m);
 
-void                csset_X_push_n(csset_X* self, const RawKey arr[], size_t size);
-
-csset_X_result_t    csset_X_emplace(csset_X* self, RawKey rkey);
-csset_X_result_t    csset_X_insert(csset_X* self, RawKey rkey);
-
-size_t              csset_X_erase(csset_X* self, RawKey rkey);
-csset_X_iter_t      csset_X_erase_at(csset_X* self, csset_X_iter_t pos);
-
 csset_X_iter_t      csset_X_find(const csset_X* self, RawKey rkey);
 csset_X_value_t*    csset_X_find_it(const csset_X* self, RawKey rkey, csset_X_iter_t* out);
 bool                csset_X_contains(const csset_X* self, RawKey rkey);
+
+void                csset_X_push_n(csset_X* self, const RawKey arr[], size_t size);
+csset_X_result_t    csset_X_emplace(csset_X* self, RawKey rkey);
+csset_X_result_t    csset_X_insert(csset_X* self, Key key);
+
+size_t              csset_X_erase(csset_X* self, RawKey rkey);
+csset_X_iter_t      csset_X_erase_at(csset_X* self, csset_X_iter_t pos);
 
 csset_X_iter_t      csset_X_begin(csset_X* self);
 csset_X_iter_t      csset_X_end(csset_X* self);

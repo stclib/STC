@@ -61,26 +61,24 @@ void                cmap_X_swap(cmap_X* a, cmap_X* b);
 
 void                cmap_X_del(cmap_X* self);
 
-bool                cmap_X_empty(cmap_X m);
-size_t              cmap_X_size(cmap_X m);
-size_t              cmap_X_bucket_count(cmap_X m);                                           // num. of allocated buckets
-size_t              cmap_X_capacity(cmap_X m);                                               // buckets * max_load_factor
+bool                cmap_X_empty(cmap_X map);
+size_t              cmap_X_size(cmap_X map);
+size_t              cmap_X_capacity(cmap_X map);                                             // buckets * max_load_factor
+size_t              cmap_X_bucket_count(cmap_X map);                                         // num. of allocated buckets
+
+cmap_X_iter_t       cmap_X_find(const cmap_X* self, RawKey rkey);
+bool                cmap_X_contains(const cmap_X* self, RawKey rkey);
 
 void                cmap_X_push_n(cmap_X* self, const cmap_X_rawvalue_t arr[], size_t size);
-
+cmap_X_result_t     cmap_X_put(cmap_X* self, RawKey rkey, RawMapped rmapped);
 cmap_X_result_t     cmap_X_emplace(cmap_X* self, RawKey rkey, RawMapped rmapped);            // no change if rkey in map
-cmap_X_result_t     cmap_X_insert(cmap_X* self, cmap_X_rawvalue_t rval);                     // same, but takes rawvalue param
-cmap_X_result_t     cmap_X_insert_or_assign(cmap_X* self, RawKey rkey, RawMapped rmapped);
-cmap_X_result_t     cmap_X_put(cmap_X* self, RawKey rkey, RawMapped rmapped);                // same as insert_or_assign()
-cmap_X_result_t     cmap_X_put_mapped(cmap_X* self, RawKey rkey, Mapped mapped);             // same, but takes Mapped param
+cmap_X_result_t     cmap_X_insert(cmap_X* self, cmap_X_value_t val);                         // like emplace.
+cmap_X_result_t     cmap_X_insert_or_assign(cmap_X* self, Key key, Mapped mapped);           // like put
 cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, RawKey rkey);                              // rkey must be in map
 
 size_t              cmap_X_erase(cmap_X* self, RawKey rkey);
 void                cmap_X_erase_entry(cmap_X* self, cmap_X_value_t* entry);
 cmap_X_iter_t       cmap_X_erase_at(cmap_X* self, cmap_X_iter_t pos);
-
-cmap_X_iter_t       cmap_X_find(const cmap_X* self, RawKey rkey);
-bool                cmap_X_contains(const cmap_X* self, RawKey rkey);
 
 cmap_X_iter_t       cmap_X_begin(cmap_X* self);
 cmap_X_iter_t       cmap_X_end(cmap_X* self);

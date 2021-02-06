@@ -225,46 +225,52 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* data[]; };
     } \
 \
     STC_API C##_##X##_result_t \
-    C##_##X##_insert_key(C##_##X* self, RawKey rkey); \
+    C##_##X##_insert_entry_(C##_##X* self, RawKey rkey); \
+\
 \
     STC_INLINE C##_##X##_result_t \
-    C##_##X##_emplace(C##_##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped) ) { \
-        C##_##X##_result_t res = C##_##X##_insert_key(self, rkey); \
-        MAP_ONLY_##C( if (res.second) res.first->second = mappedFromRaw(rmapped); ) \
+    C##_##X##_emplace(C##_##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
+        C##_##X##_result_t res = C##_##X##_insert_entry_(self, rkey); \
+        if (res.second) { \
+            *KEY_REF_##C(res.first) = keyFromRaw(rkey); \
+            MAP_ONLY_##C(res.first->second = mappedFromRaw(rmapped);) \
+        } \
         return res; \
     } \
     STC_INLINE C##_##X##_result_t \
-    C##_##X##_insert(C##_##X* self, C##_##X##_rawvalue_t raw) { \
-        return SET_ONLY_##C( C##_##X##_insert_key(self, raw) ) \
-               MAP_ONLY_##C( C##_##X##_emplace(self, raw.first, raw.second) ); \
+    C##_##X##_put(C##_##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
+        C##_##X##_result_t res = C##_##X##_insert_entry_(self, rkey); \
+                      if (res.second) *KEY_REF_##C(res.first) = keyFromRaw(rkey); \
+        MAP_ONLY_##C( else mappedDel(&res.first->second); \
+                      res.first->second = mappedFromRaw(rmapped); ) \
+        return res; \
     } \
     STC_INLINE void \
     C##_##X##_push_n(C##_##X* self, const C##_##X##_rawvalue_t arr[], size_t n) { \
-        for (size_t i=0; i<n; ++i) C##_##X##_insert(self, arr[i]); \
+        for (size_t i=0; i<n; ++i) SET_ONLY_##C( C##_##X##_emplace(self, arr[i]); ) \
+                                   MAP_ONLY_##C( C##_##X##_put(self, arr[i].first, arr[i].second); ) \
+    } \
+\
+    STC_INLINE C##_##X##_result_t \
+    C##_##X##_insert(C##_##X* self, C##_##X##_value_t val) { \
+        C##_##X##_result_t res = C##_##X##_insert_entry_(self, keyToRaw(KEY_REF_##C(&val))); \
+        if (res.second) *res.first = val; else C##_##X##_value_del(&val); \
+        return res; \
     } \
 \
     MAP_ONLY_##C( \
-    STC_INLINE C##_##X##_result_t \
-    C##_##X##_put(C##_##X* self, RawKey rkey, RawMapped rmapped) { \
-        C##_##X##_result_t res = C##_##X##_insert_key(self, rkey); \
-        if (!res.second) mappedDel(&res.first->second); \
-        res.first->second = mappedFromRaw(rmapped); return res; \
-    } \
-    STC_INLINE C##_##X##_result_t \
-    C##_##X##_insert_or_assign(C##_##X* self, RawKey rkey, RawMapped rmapped) { \
-        return C##_##X##_put(self, rkey, rmapped); \
-    } \
-    STC_INLINE C##_##X##_result_t \
-    C##_##X##_put_mapped(C##_##X* self, RawKey rkey, Mapped mapped) { \
-        C##_##X##_result_t res = C##_##X##_insert_key(self, rkey); \
-        if (!res.second) mappedDel(&res.first->second); \
-        res.first->second = mapped; return res; \
-    } \
-    STC_INLINE C##_##X##_mapped_t* \
-    C##_##X##_at(const C##_##X* self, RawKey rkey) { \
-        C##_##X##_iter_t it; \
-        return &C##_##X##_find_it(self, rkey, &it)->second; \
-    }) \
+        STC_INLINE C##_##X##_result_t \
+        C##_##X##_insert_or_assign(C##_##X* self, Key key, Mapped mapped) { \
+            C##_##X##_result_t res = C##_##X##_insert_entry_(self, keyToRaw(&key)); \
+            if (res.second) res.first->first = key; else keyDel(&key); \
+            mappedDel(&res.first->second); res.first->second = mapped; \
+            return res; \
+        } \
+        STC_INLINE C##_##X##_mapped_t* \
+        C##_##X##_at(const C##_##X* self, RawKey rkey) { \
+            C##_##X##_iter_t it; \
+            return &C##_##X##_find_it(self, rkey, &it)->second; \
+        }) \
 \
     STC_API C##_##X##_value_t* C##_##X##_front(C##_##X* self); \
     STC_API C##_##X##_value_t* C##_##X##_back(C##_##X* self); \
@@ -413,7 +419,7 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
     } \
 \
     static inline C##_##X##_size_t \
-    C##_##X##_insert_key_i_(C##_##X* self, C##_##X##_size_t tn, const C##_##X##_rawkey_t* rkey, C##_##X##_result_t* res) { \
+    C##_##X##insert_entry_i_(C##_##X* self, C##_##X##_size_t tn, const C##_##X##_rawkey_t* rkey, C##_##X##_result_t* res) { \
         C##_##X##_size_t up[64], it = tn; \
         C##_##X##_node_t* d = self->data; \
         int c, top = 0, dir = 0; \
@@ -425,7 +431,6 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
             it = d[it].link[dir]; \
         } \
         it = C##_##X##_node_new_(self, 1); d = self->data; \
-        *KEY_REF_##C(&d[it].value) = keyFromRaw(*rkey); \
         res->first = &d[it].value, res->second = true; \
         if (top == 0) return it; \
         d[up[top - 1]].link[dir] = it; \
@@ -439,9 +444,9 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
     } \
 \
     STC_DEF C##_##X##_result_t \
-    C##_##X##_insert_key(C##_##X* self, RawKey rkey) { \
+    C##_##X##_insert_entry_(C##_##X* self, RawKey rkey) { \
         C##_##X##_result_t res = {NULL, false}; \
-        C##_##X##_size_t tn = C##_##X##_insert_key_i_(self, (C##_##X##_size_t) _csmap_rep(self)->root, &rkey, &res); \
+        C##_##X##_size_t tn = C##_##X##insert_entry_i_(self, (C##_##X##_size_t) _csmap_rep(self)->root, &rkey, &res); \
         _csmap_rep(self)->root = tn; \
         _csmap_rep(self)->size += res.second; \
         return res; \
