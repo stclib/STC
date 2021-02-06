@@ -10,11 +10,12 @@ using_csset_str();
 
 int main(int argc, char **argv)
 {
-    csmap_i map = csmap_i_init();
+    size_t n = 1000000;
+
+    csmap_i map = csmap_i_with_capacity(n);
     time_t seed = time(NULL);
 
-    size_t n = 1000000;
-    uint64_t mask = (1ull << 28) - 1;
+    uint64_t mask = (1ull << 31) - 1;
     csmap_i_iter_t it;
 
     stc64_srandom(seed);
@@ -22,17 +23,22 @@ int main(int argc, char **argv)
         uint64_t val = stc64_random() & mask;
         csmap_i_emplace(&map, val, i);
     }
-    printf("size %zu\n\n", csmap_i_size(map));
+    printf("size1: %zu, %zu\n", csmap_i_size(map), csmap_i_capacity(map));
     stc64_srandom(seed);
     c_forrange (n - 20)
         csmap_i_erase(&map, stc64_random() & mask);
 
     size_t val = 500000;
-    csmap_i_emplace(&map, val, 5);
+    c_forrange (i, n) {
+        uint64_t val = stc64_random() & mask;
+        csmap_i_emplace(&map, val, i);
+    }
+
+    printf("size2: %zu, %zu\n", csmap_i_size(map), csmap_i_capacity(map));
 
     int k = 0;
     c_foreach (i, csmap_i, map)
-        printf("%2d %d: %zu\n", ++k, i.ref->first, i.ref->second);
+        if (k < 20) printf("%2d %d: %zu\n", ++k, i.ref->first, i.ref->second);
 
     csmap_i_find_it(&map, val, &it);
     printf("\nmin/max: %d -- %d: found: %d. size: %zu\n", csmap_i_front(&map)->first,

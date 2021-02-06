@@ -146,12 +146,12 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
 \
     typedef SET_ONLY_##C( C##_##X##_key_t ) \
             MAP_ONLY_##C( struct {C##_##X##_key_t first; \
-                                      C##_##X##_mapped_t second;} ) \
+                                  C##_##X##_mapped_t second;} ) \
     C##_##X##_value_t; \
 \
     typedef SET_ONLY_##C( C##_##X##_rawkey_t ) \
             MAP_ONLY_##C( struct {C##_##X##_rawkey_t first; \
-                                      C##_##X##_rawmapped_t second;} ) \
+                                  C##_##X##_rawmapped_t second;} ) \
     C##_##X##_rawvalue_t; \
 \
     typedef struct { \
