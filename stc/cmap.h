@@ -56,7 +56,7 @@ int main(void) {
 #include <string.h>
 
 #define _cmap_inits   {NULL, NULL, 0, 0, 0.15f, 0.85f}
-typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
+typedef struct {size_t idx; uint32_t hx;} chash_bucket_t;
 
 #define using_cmap(...) \
     c_MACRO_OVERLOAD(using_cmap, __VA_ARGS__)
@@ -192,7 +192,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     STC_INLINE size_t \
     C##_##X##_bucket_count(C##_##X map) {return (size_t) map.bucket_count;} \
     STC_INLINE size_t \
-    C##_##X##_capacity(C##_##X map) {return (size_t) (map.bucket_count * map.max_load_factor);} \
+    C##_##X##_capacity(C##_##X map) {return (size_t) (map.bucket_count*map.max_load_factor);} \
     STC_INLINE void \
     C##_##X##_swap(C##_##X *map1, C##_##X *map2) {c_swap(C##_##X, *map1, *map2);} \
     STC_INLINE void \
@@ -210,15 +210,18 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     C##_##X##_del(C##_##X* self); \
     STC_API void \
     C##_##X##_clear(C##_##X* self); \
-    STC_API C##_##X##_iter_t \
-    C##_##X##_find(const C##_##X* self, RawKey rkey); \
-    STC_API bool \
-    C##_##X##_contains(const C##_##X* self, RawKey rkey); \
 \
     STC_API C##_##X##_result_t \
     C##_##X##_insert_entry_(C##_##X* self, RawKey rkey); \
-    STC_API C##_bucket_t \
-    C##_##X##_bucket(const C##_##X* self, const C##_##X##_rawkey_t* rkeyptr); \
+    STC_API chash_bucket_t \
+    C##_##X##_bucket_(const C##_##X* self, const C##_##X##_rawkey_t* rkeyptr); \
+\
+    STC_API C##_##X##_iter_t \
+    C##_##X##_find(const C##_##X* self, RawKey rkey); \
+    STC_INLINE bool \
+    C##_##X##_contains(const C##_##X* self, RawKey rkey) { \
+        return self->size && self->_hashx[C##_##X##_bucket_(self, &rkey).idx]; \
+    } \
 \
     STC_INLINE C##_##X##_result_t \
     C##_##X##_emplace(C##_##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
@@ -260,7 +263,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
         } \
         STC_INLINE C##_##X##_mapped_t* \
         C##_##X##_at(const C##_##X* self, RawKey rkey) { \
-            C##_bucket_t b = C##_##X##_bucket(self, &rkey); \
+            chash_bucket_t b = C##_##X##_bucket_(self, &rkey); \
             assert(self->_hashx[b.idx]); \
             return &self->table[b.idx].second; \
         }) \
@@ -288,7 +291,7 @@ typedef struct {size_t idx; uint32_t hx;} cmap_bucket_t, cset_bucket_t;
     STC_INLINE size_t \
     C##_##X##_erase(C##_##X* self, RawKey rkey) { \
         if (self->size == 0) return 0; \
-        C##_bucket_t b = C##_##X##_bucket(self, &rkey); \
+        chash_bucket_t b = C##_##X##_bucket_(self, &rkey); \
         return self->_hashx[b.idx] ? C##_##X##_erase_entry(self, self->table + b.idx), 1 : 0; \
     } \
     STC_INLINE C##_##X##_iter_t \
@@ -340,11 +343,11 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
         memset(self->_hashx, 0, self->bucket_count); \
     } \
 \
-    STC_DEF C##_bucket_t \
-    C##_##X##_bucket(const C##_##X* self, const C##_##X##_rawkey_t* rkeyptr) { \
+    STC_DEF chash_bucket_t \
+    C##_##X##_bucket_(const C##_##X* self, const C##_##X##_rawkey_t* rkeyptr) { \
         uint32_t sx, hash = keyHashRaw(rkeyptr, sizeof(C##_##X##_rawkey_t)); \
         size_t cap = self->bucket_count; \
-        C##_bucket_t b = {chash_reduce(hash, cap), (hash & chash_HASH) | chash_USED}; \
+        chash_bucket_t b = {chash_reduce(hash, cap), (hash & chash_HASH) | chash_USED}; \
         uint8_t* hashx = self->_hashx; \
         while ((sx = hashx[b.idx])) { \
             if (sx == b.hx) { \
@@ -360,23 +363,19 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
     C##_##X##_find(const C##_##X* self, RawKey rkey) { \
         C##_##X##_iter_t it = {NULL}; \
         if (self->size == 0) return it; \
-        C##_bucket_t b = C##_##X##_bucket(self, &rkey); \
+        chash_bucket_t b = C##_##X##_bucket_(self, &rkey); \
         if (*(it._hx = self->_hashx+b.idx)) it.ref = self->table+b.idx; \
         return it; \
     } \
-    STC_DEF bool \
-    C##_##X##_contains(const C##_##X* self, RawKey rkey) { \
-        return self->size && self->_hashx[C##_##X##_bucket(self, &rkey).idx]; \
-    } \
 \
     STC_INLINE void C##_##X##_reserve_expand_(C##_##X* self) { \
-        if (self->size + 1 >= self->bucket_count * self->max_load_factor) \
+        if (self->size + 1 >= self->bucket_count*self->max_load_factor) \
             C##_##X##_reserve(self, 5 + self->size * 3 / 2); \
     } \
     STC_DEF C##_##X##_result_t \
     C##_##X##_insert_entry_(C##_##X* self, RawKey rkey) { \
         C##_##X##_reserve_expand_(self); \
-        C##_bucket_t b = C##_##X##_bucket(self, &rkey); \
+        chash_bucket_t b = C##_##X##_bucket_(self, &rkey); \
         C##_##X##_result_t res = {&self->table[b.idx], !self->_hashx[b.idx]}; \
         if (res.second) { \
             self->_hashx[b.idx] = (uint8_t) b.hx; \
@@ -416,7 +415,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
         for (size_t i = 0; i < oldcap; ++i, ++e) \
             if (tmp._hashx[i]) { \
                 RawKey r = keyToRaw(KEY_REF_##C(e)); \
-                C##_bucket_t b = C##_##X##_bucket(self, &r); \
+                chash_bucket_t b = C##_##X##_bucket_(self, &r); \
                 slot[b.idx] = *e, \
                 hashx[b.idx] = (uint8_t) b.hx; \
             } \
@@ -440,7 +439,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
                 slot[i] = slot[j], hashx[i] = hashx[j], i = j; \
         } while (true); \
         hashx[i] = 0, k = --self->size; \
-        if ((float) k / cap < self->min_load_factor && k > 512) \
+        if (k < cap*self->min_load_factor && k > 512) \
             C##_##X##_reserve(self, k*1.2); \
     }
 
