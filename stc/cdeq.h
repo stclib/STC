@@ -68,9 +68,13 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
     STC_API void \
     cdeq_##X##_del(cdeq_##X* self); \
     STC_API void \
+    _cdeq_##X##_expand(cdeq_##X* self, size_t n, bool at_front); \
+    STC_API void \
     cdeq_##X##_resize(cdeq_##X* self, size_t size, Value fill_val); \
     STC_API void \
-    _cdeq_##X##_expand(cdeq_##X* self, size_t n, bool at_front); \
+    cdeq_##X##_reserve(cdeq_##X* self, size_t n) { \
+        _cdeq_##X##_expand(self, (n - _cdeq_rep(self)->size)*2/3, false); \
+    } \
     STC_INLINE void \
     cdeq_##X##_swap(cdeq_##X* a, cdeq_##X* b) {c_swap(cdeq_##X, *a, *b);} \
 \
@@ -223,6 +227,7 @@ static inline double _maxf(double x, double y) {return x > y ? x : y;}
 \
     STC_DEF void \
     cdeq_##X##_push_n(cdeq_##X *self, const cdeq_##X##_rawvalue_t arr[], size_t n) { \
+        if (!n) return; \
         _cdeq_##X##_expand(self, n, false); \
         cdeq_##X##_value_t* p = self->data + _cdeq_rep(self)->size; \
         for (size_t i=0; i < n; ++i) *p++ = valueFromRaw(arr[i]); \
@@ -231,10 +236,10 @@ static inline double _maxf(double x, double y) {return x > y ? x : y;}
 \
     STC_DEF void \
     cdeq_##X##_clear(cdeq_##X* self) { \
-        cdeq_##X##_value_t* p = self->data; if (p) { \
-            for (cdeq_##X##_value_t* q = p + _cdeq_rep(self)->size; p != q; ++p) \
+        struct cdeq_rep* rep = _cdeq_rep(self); if (rep->cap) { \
+            for (cdeq_##X##_value_t *p = self->data, *q = p + rep->size; p != q; ++p) \
                 valueDestroy(p); \
-            _cdeq_rep(self)->size = 0; \
+            rep->size = 0; \
         } \
     } \
     STC_DEF void \

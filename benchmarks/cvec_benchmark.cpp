@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <time.h>
 #include <stc/crandom.h>
-#include <stc/cdeq.h>
+#include <stc/cvec.h>
 
 #ifdef __cplusplus
-#include <deque>
+#include <vector>
 #endif
 
 enum {INSERT, ERASE, FIND, ITER, DESTRUCT, N_TESTS};
@@ -16,23 +16,21 @@ uint64_t seed = 1, mask1 = 0xfffffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
 
-using_cdeq(x, size_t);
+using_cvec(x, size_t);
 
 #ifdef __cplusplus
-Sample test_std_deque() {
-    typedef std::deque<size_t> container;
-    Sample s = {"std-deque"};
+Sample test_std_vector() {
+    typedef std::vector<size_t> container;
+    Sample s = {"std-vector"};
     {
         s.test[INSERT].t1 = clock();
         container con;
         stc64_srandom(seed);
-        c_forrange (N/2) con.push_front(stc64_random() & mask1);
-        c_forrange (N/2) { con.push_back(stc64_random() & mask1); con.pop_front(); }
-        c_forrange (N/2) con.push_back(stc64_random() & mask1);
+        c_forrange (N) con.push_back(stc64_random() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = con.size();
         s.test[ERASE].t1 = clock();
-        c_forrange (N/2) { con.pop_front(); con.pop_back(); }
+        c_forrange (N) con.pop_back();
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = con.size();
      }{
@@ -53,35 +51,32 @@ Sample test_std_deque() {
 #endif
 
 
-Sample test_stc_deque() {
-    typedef cdeq_x container;
-    Sample s = {"stc-deque"};
+Sample test_stc_vector() {
+    typedef cvec_x container;
+    Sample s = {"stc-vector"};
     {
         s.test[INSERT].t1 = clock();
-        container con = cdeq_x_init();
-        cdeq_x_reserve(&con, N);
+        container con = cvec_x_init();
         stc64_srandom(seed);
-        c_forrange (N/2) cdeq_x_push_front(&con, stc64_random() & mask1);
-        c_forrange (N/2) { cdeq_x_push_back(&con, stc64_random() & mask1); cdeq_x_pop_front(&con); }
-        c_forrange (N/2) cdeq_x_push_back(&con, stc64_random() & mask1);
+        c_forrange (N) cvec_x_push_back(&con, stc64_random() & mask1);
         s.test[INSERT].t2 = clock();
-        s.test[INSERT].sum = cdeq_x_size(con);
+        s.test[INSERT].sum = cvec_x_size(con);
         s.test[ERASE].t1 = clock();
-        c_forrange (N/2) { cdeq_x_pop_front(&con); cdeq_x_pop_back(&con); }
+        c_forrange (N) { cvec_x_pop_back(&con); }
         s.test[ERASE].t2 = clock();
-        s.test[ERASE].sum = cdeq_x_size(con);
-        cdeq_x_del(&con);
+        s.test[ERASE].sum = cvec_x_size(con);
+        cvec_x_del(&con);
      }{
         stc64_srandom(seed);
-        container con = cdeq_x_init();
-        c_forrange (N) cdeq_x_push_back(&con, stc64_random() & mask1);
+        container con = cvec_x_init();
+        c_forrange (N) cvec_x_push_back(&con, stc64_random() & mask1);
         s.test[ITER].t1 = clock();
         size_t sum = 0;
-        c_forrange (i, N) sum += *cdeq_x_at(&con, i);
+        c_forrange (i, N) sum += *cvec_x_at(&con, i);
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();
-        cdeq_x_del(&con);
+        cvec_x_del(&con);
      }
      s.test[DESTRUCT].t2 = clock();
      s.test[DESTRUCT].sum = 0;
@@ -90,11 +85,11 @@ Sample test_stc_deque() {
 
 int main()
 {
-    Sample std_s[SAMPLES + 1], stc_s[SAMPLES + 1];
+    Sample std_s[SAMPLES + 1] = {0}, stc_s[SAMPLES + 1] = {0};
     c_forrange (i, int, SAMPLES) {
-        printf("deque benchmark sample %d\n", i);
-        std_s[i] = test_std_deque();
-        stc_s[i] = test_stc_deque();
+        printf("vector benchmark sample %d\n", i);
+        std_s[i] = test_std_vector();
+        stc_s[i] = test_stc_vector();
         if (i > 0) c_forrange (j, int, N_TESTS) {
             if (secs(std_s[i].test[j]) < secs(std_s[0].test[j])) std_s[0].test[j] = std_s[i].test[j];
             if (secs(stc_s[i].test[j]) < secs(stc_s[0].test[j])) stc_s[0].test[j] = stc_s[i].test[j];

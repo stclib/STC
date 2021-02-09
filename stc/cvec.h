@@ -205,6 +205,7 @@ static struct cvec_rep _cvec_inits = {0, 0};
 \
     STC_DEF void \
     cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_rawvalue_t arr[], size_t n) { \
+        if (!n) return; \
         cvec_##X##_reserve(self, _cvec_rep(self)->size + n); \
         cvec_##X##_value_t* p = self->data + _cvec_rep(self)->size; \
         for (size_t i=0; i < n; ++i) *p++ = valueFromRaw(arr[i]); \
@@ -213,9 +214,10 @@ static struct cvec_rep _cvec_inits = {0, 0};
 \
     STC_DEF void \
     cvec_##X##_clear(cvec_##X* self) { \
-        cvec_##X##_value_t* p = self->data; if (p) { \
-            for (cvec_##X##_value_t* q = p + _cvec_rep(self)->size; p != q; ++p) valueDestroy(p); \
-            _cvec_rep(self)->size = 0; \
+        struct cvec_rep* rep = _cvec_rep(self); if (rep->cap) { \
+            for (cvec_##X##_value_t *p = self->data, *q = p + rep->size; p != q; ++p) \
+                valueDestroy(p); \
+            rep->size = 0; \
         } \
     } \
     STC_DEF void \
