@@ -8,6 +8,7 @@
 #endif
 
 enum {INSERT, ERASE, FIND, ITER, DESTRUCT, N_TESTS};
+const char* operations[] = {"insert", "erase", "find", "iter", "destruct"};
 typedef struct { time_t t1, t2; uint64_t sum; float fac; } Range;
 typedef struct { const char* name; Range test[N_TESTS]; } Sample;
 enum {SAMPLES = 3, N = 100000000};
@@ -21,7 +22,7 @@ using_cdeq(x, size_t);
 #ifdef __cplusplus
 Sample test_std_deque() {
     typedef std::deque<size_t> container;
-    Sample s = {"std-deque"};
+    Sample s = {"std,deque"};
     {
         s.test[INSERT].t1 = clock();
         container con;
@@ -50,16 +51,18 @@ Sample test_std_deque() {
      s.test[DESTRUCT].sum = 0;
      return s;
 }
+#else
+Sample test_std_deque() { Sample s = {"std-deque"}; return s;}
 #endif
 
 
 Sample test_stc_deque() {
     typedef cdeq_x container;
-    Sample s = {"stc-deque"};
+    Sample s = {"STC,deque"};
     {
         s.test[INSERT].t1 = clock();
         container con = cdeq_x_init();
-        cdeq_x_reserve(&con, N);
+        //cdeq_x_reserve(&con, N);
         stc64_srandom(seed);
         c_forrange (N/2) cdeq_x_push_front(&con, stc64_random() & mask1);
         c_forrange (N/2) { cdeq_x_push_back(&con, stc64_random() & mask1); cdeq_x_pop_front(&con); }
@@ -88,11 +91,10 @@ Sample test_stc_deque() {
      return s;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
     Sample std_s[SAMPLES + 1], stc_s[SAMPLES + 1];
     c_forrange (i, int, SAMPLES) {
-        printf("deque benchmark sample %d\n", i);
         std_s[i] = test_std_deque();
         stc_s[i] = test_stc_deque();
         if (i > 0) c_forrange (j, int, N_TESTS) {
@@ -103,11 +105,9 @@ int main()
     }
     float std_sum = 0, stc_sum = 0;
     c_forrange (j, N_TESTS) { std_sum += secs(std_s[0].test[j]); stc_sum += secs(stc_s[0].test[j]); }
-    printf("Test-name, Insert, Erase, Find, Iter, Destruct, Total, Ratio\n");
-
-    printf("%s", std_s[0].name); c_forrange (j, N_TESTS) printf(", %.3f", secs(std_s[0].test[j]));
-    printf(", %.3f, 1.000\n", std_sum);
-
-    printf("%s", stc_s[0].name); c_forrange (j, N_TESTS) printf(", %.3f", secs(stc_s[0].test[j]));
-    printf(", %.3f, %.3f\n", stc_sum, std_sum/stc_sum);
+    if (argv[1][0] == '1') printf("compiler,library,container,count,operation,time,ratio\n");
+    c_forrange (j, N_TESTS) printf("%s,%s,%d,%s,%.3f,%.3f\n", argv[2], std_s[0].name, N, operations[j], secs(std_s[0].test[j]), 1.0f);
+                            printf("%s,%s,%d,%s,%.3f,%.3f\n", argv[2], std_s[0].name, N, "total", std_sum, 1.0f);
+    c_forrange (j, N_TESTS) printf("%s,%s,%d,%s,%.3f,%.3f\n", argv[2], stc_s[0].name, N, operations[j], secs(stc_s[0].test[j]), secs(std_s[0].test[j]) ? secs(stc_s[0].test[j])/secs(std_s[0].test[j]) : 1.0f);
+                            printf("%s,%s,%d,%s,%.3f,%.3f\n", argv[2], stc_s[0].name, N, "total", stc_sum, stc_sum/std_sum);
 }

@@ -8,29 +8,26 @@
 #endif
 
 enum {INSERT, ERASE, FIND, ITER, DESTRUCT, N_TESTS};
+const char* operations[] = {"insert", "erase", "find", "iter", "destruct"};
 typedef struct { time_t t1, t2; uint64_t sum; float fac; } Range;
 typedef struct { const char* name; Range test[N_TESTS]; } Sample;
-enum {SAMPLES = 3, N = 10000000};
-
+enum {SAMPLES = 2, N = 8000000};
 uint64_t seed = 1, mask1 = 0xffffffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
 
-static inline uint32_t hash64(const void* data, size_t len) {
-    uint64_t x = *(const uint64_t *)data * 11400714819323198485ull;
-    return x ^ (x >> 24);
-}
 using_cmap(x, size_t, size_t, c_default_equals, c_default_hash32);
 
 #ifdef __cplusplus
-Sample test_std_map() {
+Sample test_std_unordered_map() {
     typedef std::unordered_map<size_t, size_t> container;
-    Sample s = {"std-unordered_map"};
+    Sample s = {"std,unordered_map"};
     {
         stc64_srandom(seed);
         s.test[INSERT].t1 = clock();
         container con;
-        c_forrange (i, N) con.emplace(stc64_random() & mask1, i);
+        c_forrange (i, N/2) con.emplace(stc64_random() & mask1, i);
+        c_forrange (i, N/2) con.emplace(i, i);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = con.size();
         stc64_srandom(seed);
@@ -41,11 +38,13 @@ Sample test_std_map() {
      }{
         container con;
         stc64_srandom(seed);
-        c_forrange (i, N) con.emplace(stc64_random() & mask1, i);
+        c_forrange (i, N/2) con.emplace(stc64_random() & mask1, i);
+        c_forrange (i, N/2) con.emplace(i, i);
         stc64_srandom(seed);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
-        c_forrange (N) sum += con.find(stc64_random() & mask1)->second;
+        container::iterator it;
+        c_forrange (N) if ((it = con.find(stc64_random() & mask1)) != con.end()) sum += it->second;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
@@ -59,17 +58,20 @@ Sample test_std_map() {
      s.test[DESTRUCT].sum = 0;
      return s;
 }
+#else
+Sample test_std_unordered_map() { Sample s = {"std-unordered_map"}; return s;}
 #endif
 
 
-Sample test_stc_map() {
+Sample test_stc_unordered_map() {
     typedef cmap_x container;
-    Sample s = {"stc-unordered_map"};
+    Sample s = {"STC,unordered_map"};
     {
         stc64_srandom(seed);
         s.test[INSERT].t1 = clock();
         container con = cmap_x_init();
-        c_forrange (i, N) cmap_x_emplace(&con, stc64_random() & mask1, i);
+        c_forrange (i, N/2) cmap_x_emplace(&con, stc64_random() & mask1, i);
+        c_forrange (i, N/2) cmap_x_emplace(&con, i, i);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = cmap_x_size(con);
         stc64_srandom(seed);
@@ -81,11 +83,13 @@ Sample test_stc_map() {
      }{
         container con = cmap_x_init();
         stc64_srandom(seed);
-        c_forrange (i, N) cmap_x_emplace(&con, stc64_random() & mask1, i);
+        c_forrange (i, N/2) cmap_x_emplace(&con, stc64_random() & mask1, i);
+        c_forrange (i, N/2) cmap_x_emplace(&con, i, i);
         stc64_srandom(seed);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
-        c_forrange (N) sum += cmap_x_find(&con, stc64_random() & mask1).ref->second;
+        cmap_x_iter_t it;
+        c_forrange (N) if ((it = cmap_x_find(&con, stc64_random() & mask1)).ref) sum += it.ref->second;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
@@ -101,13 +105,12 @@ Sample test_stc_map() {
      return s;
 }
 
-int main()
+int main(int argc, char* argv[])
 {
     Sample std_s[SAMPLES + 1], stc_s[SAMPLES + 1];
     c_forrange (i, int, SAMPLES) {
-        printf("unordered_map benchmark sample %d\n", i);
-        std_s[i] = test_std_map();
-        stc_s[i] = test_stc_map();
+        std_s[i] = test_std_unordered_map();
+        stc_s[i] = test_stc_unordered_map();
         if (i > 0) c_forrange (j, int, N_TESTS) {
             if (secs(std_s[i].test[j]) < secs(std_s[0].test[j])) std_s[0].test[j] = std_s[i].test[j];
             if (secs(stc_s[i].test[j]) < secs(stc_s[0].test[j])) stc_s[0].test[j] = stc_s[i].test[j];
@@ -116,11 +119,9 @@ int main()
     }
     float std_sum = 0, stc_sum = 0;
     c_forrange (j, N_TESTS) { std_sum += secs(std_s[0].test[j]); stc_sum += secs(stc_s[0].test[j]); }
-    printf("Test-name, Insert, Erase, Find, Iter, Destruct, Total, Ratio\n");
-
-    printf("%s", std_s[0].name); c_forrange (j, N_TESTS) printf(", %.3f", secs(std_s[0].test[j]));
-    printf(", %.3f, 1.000\n", std_sum);
-
-    printf("%s", stc_s[0].name); c_forrange (j, N_TESTS) printf(", %.3f", secs(stc_s[0].test[j]));
-    printf(", %.3f, %.3f\n", stc_sum, std_sum/stc_sum);
+    if (argv[1][0] == '1') printf("compiler,library,container,count,operation,time,ratio\n");
+    c_forrange (j, N_TESTS) printf("%s,%s,%d,%s,%.3f,%.3f\n", argv[2], std_s[0].name, N, operations[j], secs(std_s[0].test[j]), 1.0f);
+                            printf("%s,%s,%d,%s,%.3f,%.3f\n", argv[2], std_s[0].name, N, "total", std_sum, 1.0f);
+    c_forrange (j, N_TESTS) printf("%s,%s,%d,%s,%.3f,%.3f\n", argv[2], stc_s[0].name, N, operations[j], secs(stc_s[0].test[j]), secs(std_s[0].test[j]) ? secs(stc_s[0].test[j])/secs(std_s[0].test[j]) : 1.0f);
+                            printf("%s,%s,%d,%s,%.3f,%.3f\n", argv[2], stc_s[0].name, N, "total", stc_sum, stc_sum/std_sum);
 }

@@ -138,20 +138,22 @@ After erasing elements found:
 
 Highlights
 ----------
-- **User friendly** - Incredible easy to use and deploy. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments for customization of value- *comparison*, *destruction*, *cloning*, *convertion types*, and more. Most methods have similar named corresponding methods in STL.
-- **Extreme performance** - The associative containers **cmap** and **cset** are more than ***4 times faster than c++ STL equivalents***, *std::unordered_map* and *std::unordered_set*! **csmap** and **csset** are more than 20% faster than *std::unordered_map/set* Also **cdeq** is significantly faster than *std::deque* in most cases, however implementations vary between different c++ compilers. See *Performance*.
-- **Full type safety** - No error prone casting of container types and elements back and forth from your containers. Less obscure bugs in your code. The compiler will let you know when retrieving or passing wrong container or element types to the methods.
-- **Uniform API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** are intuitive and uniform across the various containers, as can be seen from the example above.
-- **Small footprint** - Both source code and generated executables are small. The executable from the above example with six different containers is *18 kb in size*, when compiled with TinyC.
-- **Dual mode compilation** - Can be used a simple header-only library with static methods (default), or as a traditional library by defining symbol STC_HEADER in your project. See below for instructions.
+- **User friendly** - Incredible easy to use and deploy. Just include the header and you are good to go.  The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of value- *comparison*, *destruction*, *cloning*, *convertion types*, and more.
+- **Amazing performance** - All the containers are either about equal or faster than c++ STL containers. **cmap** and **cset** are in general around ***3 times faster*** than the c++ STL equivalents with the included generic hash key, and **csmap** and **csset** have 20% faster lookup time than *std::map / std::set* See *Performance* below.
+- **Fully memory managed** - As stated above, all containers will destruct keys, values via destructor passed as macro parameters to the ***using***-declaration. Also smart pointers are supported to be stored, see **csptr**.
+- **Full type safety** - Avoids error-prone casting of container types and elements back and forth from your containers.
+- **Uniform API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have a uniform and intuitive usage across the various containers.
+- **Small footprint** - Small source code and generated executables. The executable from the above example with six different containers is *26 kb in size* compiled with TinyC.
+- **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See below how to.
 
 Installation
 ------------
 
-Because it is headers-only, files can simply be included in your program. The methods will be static by default (some inlined). You may add the project folder to CPATH environment variable, to let gcc, clang, or tinyc locate the headers.
+Because it is headers-only, headers can simply be included in your program. The methods are static by default (some inlined). You may add the project folder to CPATH environment variable, to let GCC, Clang, and TinyC locate the headers.
 
-If containers are extensively used accross several translation units with common instantiated container types, it is recommended to build as a "library", to minimize executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option, and place all the instantiations of containers used in a single C source file, e.g.:
+If containers are used accross several translation units with common instantiated container types, it is recommended to build as a "library" to minimize the executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option in your build environment, and place all the instantiations of containers used in a single C source file, e.g.:
 ```c
+// stc_libs.c
 #define STC_IMPLEMENTATION
 #include <stc/cstr.h>
 #include <stc/cmap.h>
@@ -163,65 +165,23 @@ using_cmap(ii, int, int);
 using_cset(ix, int64_t);
 using_cvec(i, int);
 using_clist(pt, struct Point);
-...
 ```
 Performance
 -----------
 
-All containers have templated intrusive elements. The unordered map and set are among the most performance critical containers. **cmap** and **cset** are among the very fastest unordered map implementations available, also considering highly optimized c++ implementations. Below are some benchmarks for this.
+All containers have templated intrusive elements. The unordered map and set are among the most performance critical containers. **cmap** and **cset** are among the very fastest unordered map implementations available, also considering highly optimized c++ implementations.
 
-Compiled with clang -O3 -x c++, v10.0 on windows, Ryzen 7 2700X CPU. Similar results with VC and g++.
+Compiled with Win-Clang++ v11, Mingw64 g++ 9.20, VC19, Linux-clang v10. CPU: Ryzen 7 2700X CPU @4Ghz. 
+The black bars indicates performance variation between the various compilers.
 
-- **CMAP** = stc/*cmap*
-- KMAP = klib/*khash*
-- UMAP = *std::unordered_map*
-- SMAP = *spp::sparse_hash_map*
-- BMAP = *ska::bytell_hash_map*
-- FMAP = *ska::flat_hash_map*
-- RMAP = *robin_hood::unordered_map*
-- HMAP = *tsl::hopscotch_map*
-```
-Random keys are in range [0, 2^24), seed = 1600720716:
+![Benchmark](benchmarks/pics/benchmark.png)
 
-Unordered maps: 30000000 repeats of Insert random key + try to remove a random key:
-CMAP: time:  4.35, sum: 450000015000000, size: 8153497, erased 10922466
-KMAP: time:  3.37, sum: 450000015000000, size: 8153497, erased 10922466
-UMAP: time: 11.19, sum: 450000015000000, size: 8153497, erased 10922466
-SMAP: time: 14.21, sum: 450000015000000, size: 8153497, erased 10922466
-BMAP: time:  5.00, sum: 450000015000000, size: 8153497, erased 10922466
-FMAP: time:  4.68, sum: 450000015000000, size: 8153497, erased 10922466
-RMAP: time:  3.16, sum: 450000015000000, size: 8153497, erased 10922466
-HMAP: time:  4.49, sum: 450000015000000, size: 8153497, erased 10922466
-
-Unordered maps: Insert 30000000 index keys, then remove them in same order:
-CMAP: time:  3.27, erased 30000000
-KMAP: time:  2.86, erased 30000000
-UMAP: time: 15.80, erased 30000000
-SMAP: time: 22.60, erased 30000000
-BMAP: time:  7.93, erased 30000000
-FMAP: time:  5.91, erased 30000000
-RMAP: time:  3.22, erased 30000000
-HMAP: time:  5.91, erased 30000000
-
-Unordered maps: Insert 30000000 random keys, then remove them in same order:
-CMAP: time:  3.16, erased 13971002
-KMAP: time:  4.05, erased 13971002
-UMAP: time: 10.77, erased 13971002
-SMAP: time: 13.77, erased 13971002
-BMAP: time:  5.27, erased 13971002
-FMAP: time:  4.41, erased 13971002
-RMAP: time:  3.21, erased 13971002
-HMAP: time:  4.50, erased 13971002
-
-Unordered maps: Iterate 30000000 random keys:
-CMAP: time:  0.23, size: 13971002, sum 1344701724191145
-UMAP: time:  3.32, size: 13971002, sum 1344701724191145
-SMAP: time:  0.33, size: 13971002, sum 1344701724191145
-BMAP: time:  0.60, size: 13971002, sum 1344701724191145
-FMAP: time:  0.56, size: 13971002, sum 1344701724191145
-HMAP: time:  0.51, size: 13971002, sum 1344701724191145
-```
-From these tests *cmap*, *robin_hood* and *khash* are almost equally fast. std::unordered_map is very slow in comparison.
+This shows that most of the STC containers performs fairly equal to the std counterparts, which is
+a great achievement as c++ containers have been optimized for decades. Still, **cmap** is almost 3 times
+faster on insert and erase, and has orders of magnitude faster iteration and destruction. Also notable
+is **csmap**, which has significantly faster lookup than *std::map*'s typical red-black tree
+implementation. **csmap** uses an AA-tree (Arne Andersson, 1993), which tends to create a flatter
+structure (more balanced) than red-black trees.
 
 Memory efficiency
 -----------------
