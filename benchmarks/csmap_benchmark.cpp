@@ -12,7 +12,6 @@ const char* operations[] = {"insert", "erase", "find", "iter", "destruct"};
 typedef struct { time_t t1, t2; uint64_t sum; float fac; } Range;
 typedef struct { const char* name; Range test[N_TESTS]; } Sample;
 enum {SAMPLES = 2, N = 4000000};
-
 uint64_t seed = 1, mask1 = 0xfffffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
@@ -119,11 +118,13 @@ int main(int argc, char* argv[])
             if (stc_s[i].test[j].sum != stc_s[0].test[j].sum) printf("Error in sum: test %d, sample %d\n", i, j);
         }
     }
+    const char* comp = argc > 1 ? argv[1] : "test";
+    bool header = (argc > 2 && argv[2][0] == '1');
     float std_sum = 0, stc_sum = 0;
     c_forrange (j, N_TESTS) { std_sum += secs(std_s[0].test[j]); stc_sum += secs(stc_s[0].test[j]); }
-    if (argv[1][0] == '1') printf("compiler,library,container,count,operation,time,ratio\n");
-    c_forrange (j, N_TESTS) printf("%s,%s,%d,%s,%.3f,%.3f\n", argv[2], std_s[0].name, N, operations[j], secs(std_s[0].test[j]), 1.0f);
-                            printf("%s,%s,%d,%s,%.3f,%.3f\n", argv[2], std_s[0].name, N, "total", std_sum, 1.0f);
-    c_forrange (j, N_TESTS) printf("%s,%s,%d,%s,%.3f,%.3f\n", argv[2], stc_s[0].name, N, operations[j], secs(stc_s[0].test[j]), secs(std_s[0].test[j]) ? secs(stc_s[0].test[j])/secs(std_s[0].test[j]) : 1.0f);
-                            printf("%s,%s,%d,%s,%.3f,%.3f\n", argv[2], stc_s[0].name, N, "total", stc_sum, stc_sum/std_sum);
+    if (header) printf("Compiler,Library,C,Method,Seconds,Ratio\n");
+    c_forrange (j, N_TESTS) printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, std_s[0].name, N, operations[j], secs(std_s[0].test[j]), 1.0f);
+                            printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, std_s[0].name, N, "total", std_sum, 1.0f);
+    c_forrange (j, N_TESTS) printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, stc_s[0].name, N, operations[j], secs(stc_s[0].test[j]), secs(std_s[0].test[j]) ? secs(stc_s[0].test[j])/secs(std_s[0].test[j]) : 1.0f);
+                            printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, stc_s[0].name, N, "total", stc_sum, stc_sum/std_sum);
 }

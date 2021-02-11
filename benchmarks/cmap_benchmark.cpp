@@ -16,7 +16,11 @@ uint64_t seed = 1, mask1 = 0xffffffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
 
-using_cmap(x, size_t, size_t, c_default_equals, c_default_hash32);
+static inline uint32_t hash64(const void* data, size_t len) {
+    uint64_t x = *(const uint64_t *)data * 11400714819323198485ull;
+    return x ^ (x >> 32);
+}
+using_cmap(x, size_t, size_t, c_default_equals, hash64);
 
 #ifdef __cplusplus
 Sample test_std_unordered_map() {
@@ -117,11 +121,13 @@ int main(int argc, char* argv[])
             if (stc_s[i].test[j].sum != stc_s[0].test[j].sum) printf("Error in sum: test %d, sample %d\n", i, j);
         }
     }
+    const char* comp = argc > 1 ? argv[1] : "test";
+    bool header = (argc > 2 && argv[2][0] == '1');
     float std_sum = 0, stc_sum = 0;
     c_forrange (j, N_TESTS) { std_sum += secs(std_s[0].test[j]); stc_sum += secs(stc_s[0].test[j]); }
-    if (argv[1][0] == '1') printf("compiler,library,container,count,operation,time,ratio\n");
-    c_forrange (j, N_TESTS) printf("%s,%s,%d,%s,%.3f,%.3f\n", argv[2], std_s[0].name, N, operations[j], secs(std_s[0].test[j]), 1.0f);
-                            printf("%s,%s,%d,%s,%.3f,%.3f\n", argv[2], std_s[0].name, N, "total", std_sum, 1.0f);
-    c_forrange (j, N_TESTS) printf("%s,%s,%d,%s,%.3f,%.3f\n", argv[2], stc_s[0].name, N, operations[j], secs(stc_s[0].test[j]), secs(std_s[0].test[j]) ? secs(stc_s[0].test[j])/secs(std_s[0].test[j]) : 1.0f);
-                            printf("%s,%s,%d,%s,%.3f,%.3f\n", argv[2], stc_s[0].name, N, "total", stc_sum, stc_sum/std_sum);
+    if (header) printf("Compiler,Library,C,Method,Seconds,Ratio\n");
+    c_forrange (j, N_TESTS) printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, std_s[0].name, N, operations[j], secs(std_s[0].test[j]), 1.0f);
+                            printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, std_s[0].name, N, "total", std_sum, 1.0f);
+    c_forrange (j, N_TESTS) printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, stc_s[0].name, N, operations[j], secs(stc_s[0].test[j]), secs(std_s[0].test[j]) ? secs(stc_s[0].test[j])/secs(std_s[0].test[j]) : 1.0f);
+                            printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, stc_s[0].name, N, "total", stc_sum, stc_sum/std_sum);
 }
