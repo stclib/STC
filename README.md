@@ -138,13 +138,13 @@ After erasing elements found:
 
 Highlights
 ----------
-- **User friendly** - Incredible easy to use and deploy. Just include the header and you are good to go.  The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of value- *comparison*, *destruction*, *cloning*, *convertion types*, and more.
-- **Amazing performance** - All the containers are either about equal or faster than c++ STL containers. **cmap** and **cset** are in general around ***3 times faster*** than the c++ STL equivalents with the included generic hash key, and **csmap** and **csset** have 20% faster lookup time than *std::map / std::set* See *Performance* below.
-- **Fully memory managed** - As stated above, all containers will destruct keys, values via destructor passed as macro parameters to the ***using***-declaration. Also smart pointers are supported to be stored, see **csptr**.
-- **Full type safety** - Avoids error-prone casting of container types and elements back and forth from your containers.
+- **User friendly** - Super easy usage, just include the header and you are good to go. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of value- *comparison*, *destruction*, *cloning*, *convertion types*, and more.
+- **Unparalleled performance** - All the containers are either equal or faster than c++ STL containers. See performance bar chart below.
+- **Fully memory managed** - All containers will destruct keys, values via destructor passed as macro parameters to the ***using_***-declaration. Also smart-pointers are supported and can be stored in containers, see ***csptr***.
+- **Fully type safe** - Avoids error-prone casting of container types and elements back and forth from the containers.
 - **Uniform API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have a uniform and intuitive usage across the various containers.
 - **Small footprint** - Small source code and generated executables. The executable from the above example with six different containers is *26 kb in size* compiled with TinyC.
-- **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See below how to.
+- **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See below how-to.
 
 Installation
 ------------
@@ -169,19 +169,20 @@ using_clist(pt, struct Point);
 Performance
 -----------
 
-All containers have templated intrusive elements. The unordered map and set are among the most performance critical containers. **cmap** and **cset** are among the very fastest unordered map implementations available, also considering highly optimized c++ implementations.
+All containers have templated intrusive elements. The unordered map and set are among the most performance critical containers. **cmap** and **cset** are among the very fastest unordered map implementations available, also compared with highly optimized c++ implementations.
 
 Compiled with Win-Clang++ v11, Mingw64 g++ 9.20, VC19, Linux-clang v10. CPU: Ryzen 7 2700X CPU @4Ghz. 
-The black bars indicates performance variation between the various compilers.
+The black bars indicates performance variation between various platforms/compilers.
 
 ![Benchmark](benchmarks/pics/benchmark.png)
 
-This shows that most of the STC containers performs fairly equal to the std counterparts, which is
-a great achievement as c++ containers have been optimized for decades. Still, **cmap** is almost 3 times
-faster on insert and erase, and has orders of magnitude faster iteration and destruction. Also notable
-is **csmap**, which has significantly faster lookup than *std::map*'s typical red-black tree
-implementation. **csmap** uses an AA-tree (Arne Andersson, 1993), which tends to create a flatter
-structure (more balanced) than red-black trees.
+This shows that most of the STC containers performs either equal or better than c++ std counterparts, which
+is a significant achievement as c++ containers have been optimized for decades. E.g., *cmap* with default 
+hash key is almost 3 times faster then *std::unordered_map* on insert and erase, and has orders of magnitude
+faster iteration and destruction. Additionally, *csmap* has notable faster lookups than *std::map*'s typical 
+red-black tree implementation. *csmap* uses an AA-tree (Arne Andersson, 1993), which tends to create a flatter
+structure (more balanced) than red-black trees. But be aware that both *std::map* and *csmap* are more than an 
+order of magnitude slower than the unordered maps.
 
 Memory efficiency
 -----------------
@@ -189,22 +190,8 @@ Memory efficiency
 The containers are memory efficent, i.e. they occupy as little memory as practical possible.
 - **cstr**, **cvec**: Type size: one pointer. The size and capacity is stored as part of the heap allocation that also holds the vector elements.
 - **clist**: Type size: one pointer. Each node allocates block storing value and next pointer.
-- **cdeq**:  Type size: two pointers. Otherwise equal to cvec.
-- **cmap**: Type size: 4 pointers. cmap uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
-- **cset**: Same as cmap, but this uses a table of keys only, not (key, value) pairs.
+- **cdeq**:  Type size: two pointers. Otherwise like *cvec*.
+- **cmap**: Type size: 4 pointers. *cmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
+- **csmap**: Type size: 1 pointer only. *csmap* manages its own array of tree-nodes for allocation efficiency. Each node uses two 32-bit words by default for left/right childs, and one byte for `level`. *csmap* can be configured to allow more than 2^32 elements, ie. 2^64, but it will double the overhead per node.
 - **carray**: carray1, carray2 and carray3. Type size: One pointer plus one, two, or three size_t variables to store dimensions. Arrays are allocated as one contiguous block of heap memory.
-
-More on **cmap**
-----------------
-
-**cmap** uses closed hashing, and default max load-factor is 0.85.
-
-You can customize the destroy-, hash-, equals- functions, but also define a convertion from a raw/literal type to the key-type specified. This is very useful when e.g. having cstr as key, and therefore a few using-macros are pre-defined
-for **cmap** with **cstr** keys and/or values:
-
-- *using_cmap_strkey(tag, valuetype)*
-- *using_cmap_strval(tag, keytype)*
-- *using_cmap_str()* // cstr -> cstr
-- *using_cset_str()* // cstr set
-
-To customize your own cmap type to work like these, you may want to look at examples. One shows how to use a custom struct as a hash map key, by using the optional parameters of *using_cmap()*.
+- **csptr**: a shared-pointer uses two pointers, one for the data and one for the reference counter.
