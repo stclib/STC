@@ -63,7 +63,7 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
     cdeq_##X##_value_from_raw(RawValue raw) {return valueFromRaw(raw);} \
     STC_INLINE cdeq_##X##_value_t \
     cdeq_##X##_value_clone(cdeq_##X##_value_t val) {return valueFromRaw(valueToRaw(&val));} \
-    STC_INLINE void \
+    STC_API void \
     cdeq_##X##_clear(cdeq_##X* self); \
     STC_API void \
     cdeq_##X##_del(cdeq_##X* self); \
@@ -71,7 +71,7 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
     _cdeq_##X##_expand(cdeq_##X* self, size_t n, bool at_front); \
     STC_API void \
     cdeq_##X##_resize(cdeq_##X* self, size_t size, Value fill_val); \
-    STC_API void \
+    STC_INLINE void \
     cdeq_##X##_reserve(cdeq_##X* self, size_t n) { \
         _cdeq_##X##_expand(self, (n - _cdeq_rep(self)->size)*2/3, false); \
     } \

@@ -32,17 +32,23 @@ Others:
 
 Performance
 -----------
-The chart uses average times from results of four compilers: Win-Clang++ v11, Mingw64 g++ 9.20, VC19, Linux-clang v10. CPU: Ryzen 7 2700X CPU @4Ghz. 
+The chart uses average times from results of three compilers: Win-Clang++ v11, Mingw64 g++ 9.20, VC19. CPU: Ryzen 7 2700X CPU @4Ghz. 
 The black bars indicates performance variation between various platforms/compilers.
 
 ![Benchmark](benchmarks/pics/benchmark.png)
 
-This shows that the STC containers performs either equal or better than the c++ std counterparts (which
-have been optimized for decades). **cmap** with default hash key is almost 3 times faster than *std::unordered_map*
-on insert and erase, and has orders of magnitude faster iteration and destruction. Additionally, **csmap** is notable
+This shows that the STC containers performs either equal or better than the c++ std counterparts.
+**cmap** with default hash key is almost 3 times faster than *std::unordered_map* in this test,
+on insert and erase, and has orders of magnitude faster iteration and destruction! Additionally, **csmap** is noticable
 faster on lookup than *std::map*'s typical red-black tree implementation. *csmap* uses an AA-tree (Arne Andersson, 1993),
 which tends to create a flatter structure (more balanced) than red-black trees. Be aware of though, both *csmap* and 
 *std::map* and are much slower than the unordered map implementations (`n` is half in the benchmarks).
+
+Notes:
+- Iteration/summing is repeated 4 times.
+- Find is not executed for *forward list*, *deque*, and *vector* because they have no native find.
+- **deque** - *insert*: 1/3 push_front(), 1/3 push_back()+push_front(), 1/3 push_back().
+- **map and unordered map** - *insert*: 1/2 random numbers, 1/2 sequential numbers. *erase*: 1/2 keys are in the map, 1/2 keys are random.
 
 Highlights
 ----------

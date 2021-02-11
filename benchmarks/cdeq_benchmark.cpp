@@ -12,7 +12,7 @@ enum {INSERT, ERASE, FIND, ITER, DESTRUCT, N_TESTS};
 const char* operations[] = {"insert", "erase", "find", "iter", "destruct"};
 typedef struct { time_t t1, t2; uint64_t sum; float fac; } Range;
 typedef struct { const char* name; Range test[N_TESTS]; } Sample;
-enum {SAMPLES = 2, N = 100000000, S = 0x3ffc};
+enum {SAMPLES = 2, N = 100000000, S = 0x3ffc, R = 4};
 uint64_t seed = 1, mask1 = 0xfffffff, mask2 = 0xffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
@@ -27,13 +27,13 @@ Sample test_std_deque() {
         s.test[INSERT].t1 = clock();
         container con;
         stc64_srandom(seed);
-        c_forrange (N/2) con.push_front(stc64_random() & mask1);
-        c_forrange (N/2) { con.push_back(stc64_random() & mask1); con.pop_front(); }
-        c_forrange (N/2) con.push_back(stc64_random() & mask1);
+        c_forrange (N/3) con.push_front(stc64_random() & mask1);
+        c_forrange (N/3) {con.push_back(stc64_random() & mask1); con.pop_front();}
+        c_forrange (N/3) con.push_back(stc64_random() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = con.size();
         s.test[ERASE].t1 = clock();
-        c_forrange (N/2) { con.pop_front(); con.pop_back(); }
+        c_forrange (con.size()/2) { con.pop_front(); con.pop_back(); }
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = con.size();
      }{
@@ -49,7 +49,7 @@ Sample test_std_deque() {
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
         sum = 0;
-        c_forrange (i, N) sum += con[i];
+        c_forrange (R) c_forrange (i, N) sum += con[i];
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();
@@ -72,12 +72,12 @@ Sample test_stc_deque() {
         //cdeq_x_reserve(&con, N);
         stc64_srandom(seed);
         c_forrange (N/3) cdeq_x_push_front(&con, stc64_random() & mask1);
-        c_forrange (N/3) { cdeq_x_push_back(&con, stc64_random() & mask1); cdeq_x_pop_front(&con); }
+        c_forrange (N/3) {cdeq_x_push_back(&con, stc64_random() & mask1); cdeq_x_pop_front(&con);}
         c_forrange (N/3) cdeq_x_push_back(&con, stc64_random() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = cdeq_x_size(con);
         s.test[ERASE].t1 = clock();
-        c_forrange (N/2) { cdeq_x_pop_front(&con); cdeq_x_pop_back(&con); }
+        c_forrange (cdeq_x_size(con)/2) { cdeq_x_pop_front(&con); cdeq_x_pop_back(&con); }
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = cdeq_x_size(con);
         cdeq_x_del(&con);
@@ -93,7 +93,7 @@ Sample test_stc_deque() {
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
         sum = 0;
-        c_forrange (i, N) sum += *cdeq_x_at(&con, i);
+        c_forrange (R) c_forrange (i, N) sum += *cdeq_x_at(&con, i);
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();

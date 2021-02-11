@@ -11,7 +11,7 @@ enum {INSERT, ERASE, FIND, ITER, DESTRUCT, N_TESTS};
 const char* operations[] = {"insert", "erase", "find", "iter", "destruct"};
 typedef struct { time_t t1, t2; uint64_t sum; float fac; } Range;
 typedef struct { const char* name; Range test[N_TESTS]; } Sample;
-enum {SAMPLES = 2, N = 8000000};
+enum {SAMPLES = 2, N = 8000000, R = 4};
 uint64_t seed = 1, mask1 = 0xffffffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
@@ -53,7 +53,7 @@ Sample test_std_unordered_map() {
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
         sum = 0;
-        for (auto i: con) sum += i.second;
+        c_forrange (R) for (auto i: con) sum += i.second;
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();
@@ -98,7 +98,7 @@ Sample test_stc_unordered_map() {
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
         sum = 0;
-        c_foreach (i, cmap_x, con) sum += i.ref->second;
+        c_forrange (R) c_foreach (i, cmap_x, con) sum += i.ref->second;
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();
