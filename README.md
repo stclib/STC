@@ -41,8 +41,8 @@ This shows that the STC containers performs either equal or better than the c++ 
 have been optimized for decades). **cmap** with default hash key is almost 3 times faster than *std::unordered_map*
 on insert and erase, and has orders of magnitude faster iteration and destruction. Additionally, **csmap** is notable
 faster on lookup than *std::map*'s typical red-black tree implementation. *csmap* uses an AA-tree (Arne Andersson, 1993),
-which tends to create a flatter structure (more balanced) than red-black trees. Be aware of though, both *std::map* and
-*csmap* are more than an order of magnitude slower than the unordered map implementations (n is 20 times smaller in the benchmarks).
+which tends to create a flatter structure (more balanced) than red-black trees. Be aware of though, both *csmap* and 
+*std::map* and are much slower than the unordered map implementations (`n` is half in the benchmarks).
 
 Highlights
 ----------
