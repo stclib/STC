@@ -32,20 +32,17 @@ Others:
 
 Performance
 -----------
-
-All containers have templated intrusive elements. The unordered map and set are among the most performance critical containers. **cmap** and **cset** are among the very fastest unordered map implementations available, also compared with highly optimized c++ implementations.
-
-Compiled with Win-Clang++ v11, Mingw64 g++ 9.20, VC19, Linux-clang v10. CPU: Ryzen 7 2700X CPU @4Ghz. 
+The chart uses average times from results of four compilers: Win-Clang++ v11, Mingw64 g++ 9.20, VC19, Linux-clang v10. CPU: Ryzen 7 2700X CPU @4Ghz. 
 The black bars indicates performance variation between various platforms/compilers.
 
 ![Benchmark](benchmarks/pics/benchmark.png)
 
-This shows that most of the STC containers performs either equal or better than the c++ std counterparts, which
-have been optimized for decades. E.g., *cmap* with default hash key is almost 3 times faster then *std::unordered_map*
-on insert and erase, and has orders of magnitude faster iteration and destruction. Additionally, *csmap* has notable
-faster lookups than *std::map*'s typical  red-black tree implementation. *csmap* uses an AA-tree (Arne Andersson, 1993),
-which tends to create a flatter structure (more balanced) than red-black trees. But be aware that both *std::map* and
-*csmap* are more than an  order of magnitude slower than the unordered maps.
+This shows that the STC containers performs either equal or better than the c++ std counterparts (which
+have been optimized for decades). **cmap** with default hash key is almost 3 times faster than *std::unordered_map*
+on insert and erase, and has orders of magnitude faster iteration and destruction. Additionally, **csmap** is notable
+faster on lookup than *std::map*'s typical red-black tree implementation. *csmap* uses an AA-tree (Arne Andersson, 1993),
+which tends to create a flatter structure (more balanced) than red-black trees. Be aware of though, both *std::map* and
+*csmap* are more than an order of magnitude slower than the unordered map implementations (n is 20 times smaller in the benchmarks).
 
 Highlights
 ----------
@@ -198,3 +195,9 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 - **csmap**: Type size: 1 pointer only. *csmap* manages its own array of tree-nodes for allocation efficiency. Each node uses two 32-bit words by default for left/right childs, and one byte for `level`. *csmap* can be configured to allow more than 2^32 elements, ie. 2^64, but it will double the overhead per node.
 - **carray**: carray1, carray2 and carray3. Type size: One pointer plus one, two, or three size_t variables to store dimensions. Arrays are allocated as one contiguous block of heap memory.
 - **csptr**: a shared-pointer uses two pointers, one for the data and one for the reference counter.
+
+FAQ
+---
+- Why is **cmap** so fast?
+- How come **cvec_str_emplace_back()** can take a `const char *` argument, when its value type **cstr** cannot be directly assigned with a `const char *`?
+- more ...
