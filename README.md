@@ -30,6 +30,36 @@ Others:
 - [***coption*** - Implements ***coption_get()***, similar to posix **getopt_long()**](docs/coption_api.md)
 - [***crandom*** - A novel, extremely fast *PRNG* named **stc64**](docs/crandom_api.md)
 
+Performance
+-----------
+
+All containers have templated intrusive elements. The unordered map and set are among the most performance critical containers. **cmap** and **cset** are among the very fastest unordered map implementations available, also compared with highly optimized c++ implementations.
+
+Compiled with Win-Clang++ v11, Mingw64 g++ 9.20, VC19, Linux-clang v10. CPU: Ryzen 7 2700X CPU @4Ghz. 
+The black bars indicates performance variation between various platforms/compilers.
+
+![Benchmark](benchmarks/pics/benchmark.png)
+
+This shows that most of the STC containers performs either equal or better than the c++ std counterparts, which
+have been optimized for decades. E.g., *cmap* with default hash key is almost 3 times faster then *std::unordered_map*
+on insert and erase, and has orders of magnitude faster iteration and destruction. Additionally, *csmap* has notable
+faster lookups than *std::map*'s typical  red-black tree implementation. *csmap* uses an AA-tree (Arne Andersson, 1993),
+which tends to create a flatter structure (more balanced) than red-black trees. But be aware that both *std::map* and
+*csmap* are more than an  order of magnitude slower than the unordered maps.
+
+Highlights
+----------
+- **User friendly** - Super easy usage, just include the header and you are good to go. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of value- *comparison*, *destruction*, *cloning*, *convertion types*, and more.
+- **Unparalleled performance** - All the containers are either equal or faster than c++ STL containers.
+- **Fully memory managed** - All containers will destruct keys, values via destructor passed as macro parameters to the ***using_***-declaration. Also smart-pointers are supported and can be stored in containers, see ***csptr***.
+- **Fully type safe** - Avoids error-prone casting of container types and elements back and forth from the containers.
+- **Uniform API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have a uniform and intuitive usage across the various containers.
+- **Small footprint** - Small source code and generated executables. The executable from the above example with six different containers is *26 kb in size* compiled with TinyC.
+- **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See below how-to.
+
+Usage
+-----
+
 The usage of the containers is similar to the c++ standard containers in STL, so it should be easy if you are familiar with them.
 All containers are generic/templated, except for **cstr** and **cbits**. No casting is used, so containers are typesafe like
 templates in c++. A basic usage example:
@@ -136,16 +166,6 @@ After erasing elements found:
  map: [10: 1] [30: 3] [40: 4]
 ```
 
-Highlights
-----------
-- **User friendly** - Super easy usage, just include the header and you are good to go. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of value- *comparison*, *destruction*, *cloning*, *convertion types*, and more.
-- **Unparalleled performance** - All the containers are either equal or faster than c++ STL containers. See performance bar chart below.
-- **Fully memory managed** - All containers will destruct keys, values via destructor passed as macro parameters to the ***using_***-declaration. Also smart-pointers are supported and can be stored in containers, see ***csptr***.
-- **Fully type safe** - Avoids error-prone casting of container types and elements back and forth from the containers.
-- **Uniform API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have a uniform and intuitive usage across the various containers.
-- **Small footprint** - Small source code and generated executables. The executable from the above example with six different containers is *26 kb in size* compiled with TinyC.
-- **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See below how-to.
-
 Installation
 ------------
 
@@ -166,23 +186,6 @@ using_cset(ix, int64_t);
 using_cvec(i, int);
 using_clist(pt, struct Point);
 ```
-Performance
------------
-
-All containers have templated intrusive elements. The unordered map and set are among the most performance critical containers. **cmap** and **cset** are among the very fastest unordered map implementations available, also compared with highly optimized c++ implementations.
-
-Compiled with Win-Clang++ v11, Mingw64 g++ 9.20, VC19, Linux-clang v10. CPU: Ryzen 7 2700X CPU @4Ghz. 
-The black bars indicates performance variation between various platforms/compilers.
-
-![Benchmark](benchmarks/pics/benchmark.png)
-
-This shows that most of the STC containers performs either equal or better than c++ std counterparts, which
-is a significant achievement as c++ containers have been optimized for decades. E.g., *cmap* with default 
-hash key is almost 3 times faster then *std::unordered_map* on insert and erase, and has orders of magnitude
-faster iteration and destruction. Additionally, *csmap* has notable faster lookups than *std::map*'s typical 
-red-black tree implementation. *csmap* uses an AA-tree (Arne Andersson, 1993), which tends to create a flatter
-structure (more balanced) than red-black trees. But be aware that both *std::map* and *csmap* are more than an 
-order of magnitude slower than the unordered maps.
 
 Memory efficiency
 -----------------
