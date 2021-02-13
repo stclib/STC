@@ -34,17 +34,17 @@ Performance
 -----------
 ![Benchmark](benchmarks/pics/benchmark.png)
 
-STC containers performs either equal or better than the c++ std counterparts. **cmap** *insert* is almost 4x times faster than 
-*std::unordered_map* in this benchmark and 2x times faster than *erase*! It is an order of magnitude faster on iteration and destruction.
+STC containers performs either about equal or better than the c++ std counterparts. **cmap** *insert* is almost 4x times faster than 
+*std::unordered_map* in this benchmark, and 2x times faster than *erase*! Iteration and destruction is an order of magnitude faster.
 **csmap** has noticable faster lookup than *std::map*'s typical red-black tree implementation. It uses an AA-tree (Arne Andersson, 1993),
 which tends to create a flatter structure (more balanced) than red-black trees.
 
 Notes:
-- The barchart uses average times from results of three compilers: Win-Clang++ v11, Mingw64 g++ 9.20, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
-- Container with value types uint64_t, and pairs of (uint64_t, uint64_t) for the maps.
+- The barchart shows average times from results from three platforms: Win-Clang++ v11, Mingw64 g++ 9.20, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
+- Containers uses value types uint64_t and pairs of (uint64_t, uint64_t) for the maps.
 - Black bars indicates performance variation between various platforms/compilers.
-- Iteration is repeated 4 times.
-- *find* is not executed for *forward list*, *deque*, and *vector* because they have no native find.
+- Iteration is repeated 4 times over n elements.
+- *find* is not executed for *forward_list*, *deque*, and *vector* because c++ std have no native *find*.
 - **deque** - *insert*: n/3 push_front(), n/3 push_back()+push_front(), n/3 push_back().
 - **map and unordered map** - *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys are in the map, n/2 keys are random.
 
@@ -56,7 +56,7 @@ Highlights
 - **Fully type safe** - Avoids error-prone casting of container types and elements back and forth from the containers.
 - **Uniform API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have a uniform and intuitive usage across the various containers.
 - **Small footprint** - Small source code and generated executables. The executable from the above example with six different containers is *26 kb in size* compiled with TinyC.
-- **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See below how-to.
+- **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See next how-to.
 
 Usage
 -----
