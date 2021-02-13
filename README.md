@@ -206,7 +206,7 @@ FAQ
 
 **A**: It uses open addressing which holds all buckets in one block of memory. It has a separate array for precomputed hashes/used buckets - one byte per bucket. Further if avoids modulus operations and erases elements without leaving tombstones. Modern architechtures favors simple code and cached memory access, so linear probing is actually as fast or faster than the more advanced Robin Hood and Hopscotch hashing schemes, which also requires tombstones. **cmap** does not rely on wasteful power-of-two array sizes, it actually expands only by 1.5x when required.
 
-**Q**: Why can **cvec_str_emplace_back()** take a `const char *` argument, when its value type `cstr` cannot be directly assigned from a `const char *`*?
+**Q**: Why can **cvec_str_emplace_back()** take `const char *` argument when its value type `cstr` cannot be directly assigned from a `const char *`?
 
 **A**: STC containers simulates automatic type convertion found in c++. Most containers can take an optional "rawvalue" type as template parameter in the **using_**-declaration, along with back and forth convertion methods to the container value type. By default, rawvalue is equal to value. Various **emplace()**, **cmap_put()** and lookup methods accepts the rawvalue type, which is  convenient e.g. for strings.
 
