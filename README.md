@@ -32,23 +32,21 @@ Others:
 
 Performance
 -----------
-The chart uses average times from results of three compilers: Win-Clang++ v11, Mingw64 g++ 9.20, VC19. CPU: Ryzen 7 2700X CPU @4Ghz. 
-The black bars indicates performance variation between various platforms/compilers.
-
 ![Benchmark](benchmarks/pics/benchmark.png)
 
-This shows that the STC containers performs either equal or better than the c++ std counterparts.
-**cmap** with default hash key is almost 3 times faster than *std::unordered_map* in this test,
-on insert and erase, and has orders of magnitude faster iteration and destruction! Additionally, **csmap** is noticable
-faster on lookup than *std::map*'s typical red-black tree implementation. *csmap* uses an AA-tree (Arne Andersson, 1993),
-which tends to create a flatter structure (more balanced) than red-black trees. Be aware of though, both *csmap* and 
-*std::map* and are much slower than the unordered map implementations (`n` is half in the benchmarks).
+STC containers performs either equal or better than the c++ std counterparts. **cmap** *insert* is almost 4x times faster than 
+*std::unordered_map* in this benchmark and 2x times faster than *erase*! It is an order of magnitude faster on iteration and destruction.
+**csmap** has noticable faster lookup than *std::map*'s typical red-black tree implementation. It uses an AA-tree (Arne Andersson, 1993),
+which tends to create a flatter structure (more balanced) than red-black trees.
 
 Notes:
-- Iteration/summing is repeated 4 times.
-- Find is not executed for *forward list*, *deque*, and *vector* because they have no native find.
-- **deque** - *insert*: 1/3 push_front(), 1/3 push_back()+push_front(), 1/3 push_back().
-- **map and unordered map** - *insert*: 1/2 random numbers, 1/2 sequential numbers. *erase*: 1/2 keys are in the map, 1/2 keys are random.
+- The barchart uses average times from results of three compilers: Win-Clang++ v11, Mingw64 g++ 9.20, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
+- Container with value types uint64_t, and pairs of (uint64_t, uint64_t) for the maps.
+- Black bars indicates performance variation between various platforms/compilers.
+- Iteration is repeated 4 times.
+- *find* is not executed for *forward list*, *deque*, and *vector* because they have no native find.
+- **deque** - *insert*: n/3 push_front(), n/3 push_back()+push_front(), n/3 push_back().
+- **map and unordered map** - *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys are in the map, n/2 keys are random.
 
 Highlights
 ----------
@@ -204,12 +202,12 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 
 FAQ
 ---
-**Q**: *How did you make **cmap** so fast?*
+**Q**: *How can **cmap** be so fast?*
 
 **A**: It uses open addressing which holds all buckets in one block of memory. It has a separate array for precomputed hashes/used buckets - one byte per bucket. Further if avoids modulus operations and erases elements without leaving tombstones. Modern architechtures favors simple code and cached memory access, so linear probing is actually as fast or faster than the more advanced Robin Hood and Hopscotch hashing schemes, which also requires tombstones. **cmap** does not rely on wasteful power-of-two array sizes, it actually expands only by 1.5x when required.
 
-**Q**: *How come **cvec_str_emplace_back()** can take a `const char *` argument, when its value type `cstr` cannot be directly assigned from a `const char *`*?
+**Q**: Why can **cvec_str_emplace_back()** take a `const char *` argument, when its value type `cstr` cannot be directly assigned from a `const char *`*?
 
-**A**: STC containers simulates automatic type convertion found in c++. All containers can take an optional "rawvalue" type as template parameter in the **using_**-declaration, along with back and forth convertion methods to the container value type. By default, rawvalue is equal to value. Various **emplace()**, **cmap_put()** and lookup methods accepts the rawvalue type, which is  convenient e.g. for strings.
+**A**: STC containers simulates automatic type convertion found in c++. Most containers can take an optional "rawvalue" type as template parameter in the **using_**-declaration, along with back and forth convertion methods to the container value type. By default, rawvalue is equal to value. Various **emplace()**, **cmap_put()** and lookup methods accepts the rawvalue type, which is  convenient e.g. for strings.
 
-It is also useful for map insertions, because values are only conditionally inserted - the **emplace()** method construct a cstr object from a rawvalue only when needed. **using_cvec_str()** declares `cvec_str` container type with predefined `cstr` value and `const char *` rawvalue, along with convertion methods.
+Raw-value is also useful for map insertions, because values are only conditionally inserted - the **emplace()** method construct a cstr object from a rawvalue only when needed. **using_cvec_str()** declares the `cvec_str` container type with predefined `cstr` value and `const char *` rawvalue, along with convertion methods.
