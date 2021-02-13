@@ -55,7 +55,7 @@ Highlights
 - **Fully memory managed** - All containers will destruct keys, values via destructor passed as macro parameters to the ***using_***-declaration. Also smart-pointers are supported and can be stored in containers, see ***csptr***.
 - **Fully type safe** - Avoids error-prone casting of container types and elements back and forth from the containers.
 - **Uniform API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have a uniform and intuitive usage across the various containers.
-- **Small footprint** - Small source code and generated executables. The executable from the above example with six different containers is *26 kb in size* compiled with TinyC.
+- **Small footprint** - Small source code and generated executables. The executable from the example below using six different containers is *26 kb in size* compiled with TinyC.
 - **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See next how-to.
 
 Usage
