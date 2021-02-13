@@ -136,6 +136,9 @@ typedef struct {size_t idx; uint32_t hx;} chash_bucket_t;
 #define MAP_ONLY_cmap(...) __VA_ARGS__
 #define KEY_REF_cset(vp)   (vp)
 #define KEY_REF_cmap(vp)   (&(vp)->first)
+#ifndef CMAP_SIZE_T
+#define CMAP_SIZE_T uint32_t
+#endif
 
 #define _using_CHASH(X, C, Key, Mapped, keyEqualsRaw, keyHashRaw, mappedDel, mappedFromRaw, \
                         keyDel, keyFromRaw, keyToRaw, RawKey, mappedToRaw, RawMapped) \
@@ -143,6 +146,7 @@ typedef struct {size_t idx; uint32_t hx;} chash_bucket_t;
     typedef Mapped C##_##X##_mapped_t; \
     typedef RawKey C##_##X##_rawkey_t; \
     typedef RawMapped C##_##X##_rawmapped_t; \
+    typedef CMAP_SIZE_T C##_##X##_size_t; \
 \
     typedef SET_ONLY_##C( C##_##X##_key_t ) \
             MAP_ONLY_##C( struct {C##_##X##_key_t first; \
@@ -162,7 +166,7 @@ typedef struct {size_t idx; uint32_t hx;} chash_bucket_t;
     typedef struct { \
         C##_##X##_value_t* table; \
         uint8_t* _hashx; \
-        uint32_t size, bucket_count; \
+        C##_##X##_size_t size, bucket_count; \
         float min_load_factor; \
         float max_load_factor; \
     } C##_##X; \
@@ -300,12 +304,18 @@ typedef struct {size_t idx; uint32_t hx;} chash_bucket_t;
         C##_##X##_next(&pos); return pos; \
     } \
 \
-    STC_API uint32_t c_default_hash(const void *data, size_t len); \
-    STC_API uint32_t c_default_hash32(const void* data, size_t len); \
-\
     _implement_CHASH(X, C, Key, Mapped, keyEqualsRaw, keyHashRaw, mappedDel, keyDel, \
                         keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
     typedef C##_##X C##_##X##_t
+
+STC_API    uint64_t c_default_hash(const void *data, size_t len);
+STC_INLINE uint64_t c_default_hash32(const void* data, size_t len) {
+    return *(const uint32_t *)data * 2654435769u;
+}
+STC_INLINE uint64_t c_default_hash64(const void* data, size_t len) {
+    return *(const uint64_t *)data * 11400714819323198485ull;
+}
+#define cstr_hash_raw(p, ignored) c_default_hash(*(p), strlen(*(p)))
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
@@ -443,17 +453,25 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
             C##_##X##_reserve(self, k*1.2); \
     }
 
-STC_DEF uint32_t c_default_hash(const void *data, size_t len) {
-    const volatile uint16_t *key = (const uint16_t *) data;
-    uint64_t x = *key++ * 11400714819323198485llu;
-    while (len -= 2) x = (*key++ + x) * 11400714819323198485llu;
-    return (uint32_t) x;
-}
-STC_DEF uint32_t c_default_hash32(const void* data, size_t len) {
-    const volatile uint32_t *key = (const uint32_t *) data;
-    uint64_t x = *key++ * 2654435769ull;
-    while (len -= 4) x = (*key++ + x) * 2654435769ull;
-    return (uint32_t) x;
+STC_DEF uint64_t c_default_hash(const void *key, size_t len) {
+    const uint64_t m = 11400714819323198485ull; // 0xc6a4a7935bd1e995;
+    uint64_t k, h = m + len;
+    const unsigned char *p = (const uint8_t *) key,
+                        *end = p + (len & ~7ull);
+    for (; p != end; p += 8) {
+        memcpy(&k, p, 8);
+        h ^= k*m;
+    }
+    switch (len & 7) {
+        case 7: h ^= (uint64_t) p[6] << 48;
+        case 6: h ^= (uint64_t) p[5] << 40;
+        case 5: h ^= (uint64_t) p[4] << 32;
+        case 4: h ^= (uint64_t) p[3] << 24;
+        case 3: h ^= (uint64_t) p[2] << 16;
+        case 2: h ^= (uint64_t) p[1] << 8;
+        case 1: h ^= (uint64_t) p[0]; h *= m;
+    }
+    return h ^ (h >> 15);
 }
 
 #else

@@ -15,13 +15,6 @@
 enum {N1 = 4000000, S1 = 1, MaxLoadFactor100 = 80};
 uint64_t seed = time(NULL);
 
-static inline uint32_t hash32(const void* data, size_t len) {
-    return *(const uint32_t *)data * 2654435769u;
-}
-static inline uint32_t hash64(const void* data, size_t len) {
-    uint64_t x = *(const uint64_t *)data * 11400714819323198485ull;
-    return x ^ (x >> 24);
-}
 template <class K, class V> using umap = std::unordered_map<K, V>;
 template <class K, class V> using bmap = ska::bytell_hash_map<K, V>;
 template <class K, class V> using fmap = ska::flat_hash_map<K, V>;
@@ -41,8 +34,8 @@ DEFMAP(map_i, <int, int>);
 DEFMAP(map_x, <uint64_t, uint64_t>);
 DEFMAP(map_s, <std::string, std::string>);
 
-using_cmap(i, int, int, c_default_equals, hash32);
-using_cmap(x, uint64_t, uint64_t, c_default_equals, hash64);
+using_cmap(i, int, int, c_default_equals, c_default_hash32);
+using_cmap(x, uint64_t, uint64_t, c_default_equals, c_default_hash64);
 using_cmap_strkey(s, cstr, cstr_del, cstr_clone);
 
 PICOBENCH_SUITE("Map1");

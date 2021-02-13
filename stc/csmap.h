@@ -127,15 +127,31 @@ int main(void) {
 #define CSMAP_SIZE_T uint32_t
 #endif
 
-#define _using_AATREE_types(X, C, Key, Mapped) \
+struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
+#define _csmap_rep(self) c_container_of((self)->nodes, struct csmap_rep, nodes)
+
+#define _using_AATREE(X, C, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \
+                         keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
     typedef Key C##_##X##_key_t; \
     typedef Mapped C##_##X##_mapped_t; \
+    typedef RawKey C##_##X##_rawkey_t; \
+    typedef RawMapped C##_##X##_rawmapped_t; \
     typedef CSMAP_SIZE_T C##_##X##_size_t; \
 \
     typedef SET_ONLY_##C( C##_##X##_key_t ) \
             MAP_ONLY_##C( struct {C##_##X##_key_t first; \
                                   C##_##X##_mapped_t second;} ) \
     C##_##X##_value_t; \
+\
+    typedef SET_ONLY_##C( C##_##X##_rawkey_t ) \
+            MAP_ONLY_##C( struct {C##_##X##_rawkey_t first; \
+                                  C##_##X##_rawmapped_t second;} ) \
+    C##_##X##_rawvalue_t; \
+\
+    typedef struct { \
+        C##_##X##_value_t *first; \
+        bool second; /* inserted */ \
+    } C##_##X##_result_t; \
 \
     typedef struct C##_##X##_node { \
         C##_##X##_size_t link[2]; \
@@ -144,34 +160,15 @@ int main(void) {
     } C##_##X##_node_t; \
 \
     typedef struct { \
+        C##_##X##_node_t* nodes; \
+    } C##_##X; \
+\
+    typedef struct { \
         C##_##X##_value_t *ref; \
         C##_##X##_node_t *_d; \
         int _top; \
         C##_##X##_size_t _tn, _st[48]; \
-    } C##_##X##_iter_t
-
-struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
-#define _csmap_rep(self) c_container_of((self)->nodes, struct csmap_rep, nodes)
-
-#define _using_AATREE(X, C, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \
-                         keyFromRaw, keyToRaw, RawKey, mappedFromRaw, mappedToRaw, RawMapped) \
-    _using_AATREE_types(X, C, Key, Mapped); \
-\
-    typedef struct { \
-        C##_##X##_node_t* nodes; \
-    } C##_##X; \
-\
-    typedef RawKey C##_##X##_rawkey_t; \
-    typedef RawMapped C##_##X##_rawmapped_t; \
-    typedef SET_ONLY_##C( C##_##X##_rawkey_t ) \
-            MAP_ONLY_##C( struct {C##_##X##_rawkey_t first; \
-                                  C##_##X##_rawmapped_t second;} ) \
-    C##_##X##_rawvalue_t; \
-\
-    typedef struct { \
-        C##_##X##_value_t *first; \
-        bool second; \
-    } C##_##X##_result_t; \
+    } C##_##X##_iter_t; \
 \
     STC_API C##_##X C##_##X##_init(void); \
     STC_API C##_##X C##_##X##_clone(C##_##X tree); \

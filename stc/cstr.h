@@ -218,25 +218,12 @@ cstr_iends_with(cstr_t s, const char* needle) {
 }
 
 /* cvec/cmap API functions: */
-
-STC_INLINE uint32_t
-c_string_hash(const char* str) {
-    uint32_t hash = 5381, c; /* djb2 */
-    const uint8_t* p = (const uint8_t*) str;
-    while ((c = *p++)) hash = ((hash << 5) + hash) ^ c;
-    return hash;
-}
-STC_INLINE
-uint32_t cstr_hash_raw(const char* const* p, size_t none) {
-    return c_string_hash(*p);
-}
-
 #define  cstr_to_raw(x)          ((x)->str)
 #define  cstr_compare_raw(x, y)  strcmp(*(x), *(y))
 #define  cstr_equals_raw(x, y)   (strcmp(*(x), *(y)) == 0)
 #define  cstr_compare_ref(x, y)  strcmp((x)->str, (y)->str)
 #define  cstr_equals_ref(x, y)   (strcmp((x)->str, (y)->str) == 0)
-#define  cstr_hash_ref(x, none)  c_string_hash((x)->str)
+#define  cstr_hash_ref(x, none)  c_default_hash((x)->str, cstr_size(x)))
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
@@ -270,7 +257,7 @@ STC_DEF cstr_t
 cstr_from_n(const char* str, size_t len) {
     if (len == 0) return cstr_inits;
     struct cstr_rep* rep = (struct cstr_rep*) c_malloc(_cstr_opt_mem(len));
-    cstr_t s = {strncpy(rep->str, str, len)};
+    cstr_t s = {(char *) memcpy(rep->str, str, len)};
     s.str[rep->size = len] = '\0';
     rep->cap = _cstr_opt_cap(len);
     return s;
@@ -332,7 +319,7 @@ cstr_append_n(cstr_t* self, const char* str, size_t len) {
         if (newlen > _cstr_rep(self)->cap) {
             /* handle self append */
             size_t off = (size_t) (str - self->str);
-            cstr_reserve(self, newlen * 3 / 2);
+            cstr_reserve(self, newlen*3/2);
             if (off <= oldlen) str = self->str + off;
         }
         memcpy(&self->str[oldlen], str, len);
@@ -346,7 +333,7 @@ STC_INLINE void _cstr_internal_move(cstr_t* self, size_t pos1, size_t pos2) {
         return;
     size_t len = _cstr_rep(self)->size, newlen = len + pos2 - pos1;
     if (newlen > _cstr_rep(self)->cap)
-        cstr_reserve(self, newlen * 3 / 2);
+        cstr_reserve(self, newlen*3/2);
     memmove(&self->str[pos2], &self->str[pos1], len - pos1);
     self->str[_cstr_rep(self)->size = newlen] = '\0';
 }
@@ -377,7 +364,7 @@ cstr_getdelim(cstr_t *self, int delim, FILE *fp) {
         return false;
     for (;;) {
         if (pos == cap)
-            cap = cstr_reserve(self, cap * 3 / 2 + 34);
+            cap = cstr_reserve(self, cap*3/2 + 34);
         if (c == delim || c == EOF) {
             self->str[_cstr_rep(self)->size = pos] = '\0';
             return true;

@@ -204,10 +204,12 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 
 FAQ
 ---
-- **Q**: Why is **cmap** so fast?
-- **A**: Many reasons. It uses open addressing which holds all buckets in one block of memory. It uses a separate array for precomputed hashes/used buckets - only one byte per bucket. It avoids modulus operations and erases elements without leaving tombstones. Modern architechtures favors simple code and cached memory access, so linear probing is actually as fast or faster than the more advanced Robin Hood and Hopscotch hashing schemes, and they require tombstones. **cmap** does not rely on wasteful power-of-two array sizes, it actually expands only by 1.5x when required.
+**Q**: *How did you make **cmap** so fast?*
 
-- **Q**: How come **cvec_str_emplace_back()** can take a `const char *` argument, when its value type `cstr` cannot be directly assigned from a `const char *`?
-- **A**: STC containers simulates automatic type convertion found in c++. All containers can take an optional "rawvalue" type as template parameter in the **using_**-declaration, along with back and forth convertion methods to the container value type. By default, rawvalue is equal to value. Various **emplace()**, **cmap_put()** and lookup methods accepts the rawvalue type, which is  convenient e.g. for strings.
+**A**: It uses open addressing which holds all buckets in one block of memory. It has a separate array for precomputed hashes/used buckets - one byte per bucket. Further if avoids modulus operations and erases elements without leaving tombstones. Modern architechtures favors simple code and cached memory access, so linear probing is actually as fast or faster than the more advanced Robin Hood and Hopscotch hashing schemes, which also requires tombstones. **cmap** does not rely on wasteful power-of-two array sizes, it actually expands only by 1.5x when required.
+
+**Q**: *How come **cvec_str_emplace_back()** can take a `const char *` argument, when its value type `cstr` cannot be directly assigned from a `const char *`*?
+
+**A**: STC containers simulates automatic type convertion found in c++. All containers can take an optional "rawvalue" type as template parameter in the **using_**-declaration, along with back and forth convertion methods to the container value type. By default, rawvalue is equal to value. Various **emplace()**, **cmap_put()** and lookup methods accepts the rawvalue type, which is  convenient e.g. for strings.
 
 It is also useful for map insertions, because values are only conditionally inserted - the **emplace()** method construct a cstr object from a rawvalue only when needed. **using_cvec_str()** declares `cvec_str` container type with predefined `cstr` value and `const char *` rawvalue, along with convertion methods.

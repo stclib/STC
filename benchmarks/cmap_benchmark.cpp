@@ -16,11 +16,7 @@ uint64_t seed = 1, mask1 = 0xffffffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
 
-static inline uint32_t hash64(const void* data, size_t len) {
-    uint64_t x = *(const uint64_t *)data * 11400714819323198485ull;
-    return x ^ (x >> 32);
-}
-using_cmap(x, size_t, size_t, c_default_equals, hash64);
+using_cmap(x, size_t, size_t, c_default_equals, c_default_hash64);
 
 #ifdef __cplusplus
 Sample test_std_unordered_map() {
