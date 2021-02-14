@@ -34,10 +34,10 @@ Performance
 -----------
 ![Benchmark](benchmarks/pics/benchmark.png)
 
-STC containers performs either about equal or better than the c++ std counterparts. **cmap** *insert* is almost 4x times faster than 
-*std::unordered_map* in this benchmark, and 2x times faster than *erase*! Iteration and destruction is an order of magnitude faster.
-**csmap** has noticable faster lookup than *std::map*'s typical red-black tree implementation. It uses an AA-tree (Arne Andersson, 1993),
-which tends to create a flatter structure (more balanced) than red-black trees.
+STC containers performs either about equal or better than the c++ std counterparts. **cmap** *insert* is almost 4x times faster
+than *std::unordered_map* in this benchmark, and 2x times faster *erase*! Iteration and destruction is an order of magnitude
+faster. **csmap** has noticable faster lookup than *std::map*'s typical red-black tree implementation. It uses an AA-tree
+(Arne Andersson, 1993), which tends to create a flatter structure (more balanced) than red-black trees.
 
 Notes:
 - The barchart shows average times from results from three platforms: Win-Clang++ v11, Mingw64 g++ 9.20, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
@@ -55,7 +55,7 @@ Highlights
 - **Fully memory managed** - All containers will destruct keys, values via destructor passed as macro parameters to the ***using_***-declaration. Also smart-pointers are supported and can be stored in containers, see ***csptr***.
 - **Fully type safe** - Avoids error-prone casting of container types and elements back and forth from the containers.
 - **Uniform API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have a uniform and intuitive usage across the various containers.
-- **Small footprint** - Small source code and generated executables. The executable from the example below using six different containers is *26 kb in size* compiled with TinyC.
+- **Small footprint** - Small source code and generated executables. The executable from the example below using six different containers is *27 kb in size* compiled with TinyC.
 - **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See next how-to.
 
 Usage
@@ -170,9 +170,12 @@ After erasing elements found:
 Installation
 ------------
 
-Because it is headers-only, headers can simply be included in your program. The methods are static by default (some inlined). You may add the project folder to CPATH environment variable, to let GCC, Clang, and TinyC locate the headers.
+Because it is headers-only, headers can simply be included in your program. The methods are static by default (some inlined).
+You may add the project folder to CPATH environment variable, to let GCC, Clang, and TinyC locate the headers.
 
-If containers are used accross several translation units with common instantiated container types, it is recommended to build as a "library" to minimize the executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option in your build environment, and place all the instantiations of containers used in a single C source file, e.g.:
+If containers are used accross several translation units with common instantiated container types, it is recommended to
+build as a "library" to minimize the executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option
+in your build environment, and place all the instantiations of containers used in a single C source file, e.g.:
 ```c
 // stc_libs.c
 #define STC_IMPLEMENTATION
@@ -196,18 +199,28 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 - **clist**: Type size: one pointer. Each node allocates block storing value and next pointer.
 - **cdeq**:  Type size: two pointers. Otherwise like *cvec*.
 - **cmap**: Type size: 4 pointers. *cmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
-- **csmap**: Type size: 1 pointer only. *csmap* manages its own array of tree-nodes for allocation efficiency. Each node uses two 32-bit words by default for left/right childs, and one byte for `level`. *csmap* can be configured to allow more than 2^32 elements, ie. 2^64, but it will double the overhead per node.
+- **csmap**: Type size: 1 pointer. *csmap* manages its own array of tree-nodes for allocation efficiency. Each node uses two 32-bit words by default for left/right childs, and one byte for `level`. *csmap* can be configured to allow more than 2^32 elements, ie. 2^64, but it will double the overhead per node.
 - **carray**: carray1, carray2 and carray3. Type size: One pointer plus one, two, or three size_t variables to store dimensions. Arrays are allocated as one contiguous block of heap memory.
 - **csptr**: a shared-pointer uses two pointers, one for the data and one for the reference counter.
 
 FAQ
 ---
-**Q**: *How can **cmap** be so fast?*
+**Q**: *How come **cmap** is so fast?*
 
-**A**: It uses open addressing which holds all buckets in one block of memory. It has a separate array for precomputed hashes/used buckets - one byte per bucket. Further if avoids modulus operations and erases elements without leaving tombstones. Modern architechtures favors simple code and cached memory access, so linear probing is actually as fast or faster than the more advanced Robin Hood and Hopscotch hashing schemes, which also requires tombstones. **cmap** does not rely on wasteful power-of-two array sizes, it actually expands only by 1.5x when required.
+**A**: It uses open addressing which holds all buckets in one block of memory. It has a separate array for precomputed
+hashes/used buckets - one byte per bucket. Further if avoids modulus operations and erases elements without leaving
+tombstones. Modern architechtures favors simple code and cached memory access, so linear probing is actually as fast
+or faster than the more advanced Robin Hood and Hopscotch hashing schemes, which also requires tombstones. **cmap**
+does not rely on wasteful power-of-two array sizes, it actually expands only by 1.5x when required.
 
-**Q**: Why can **cvec_str_emplace_back()** take `const char *` argument when its value type `cstr` cannot be directly assigned from a `const char *`?
+**Q**: Why can **cvec_str_emplace_back()** take `const char *` argument when its value type `cstr` cannot be directly
+assigned from a `const char *`?
 
-**A**: STC containers simulates automatic type convertion found in c++. Most containers can take an optional "rawvalue" type as template parameter in the **using_**-declaration, along with back and forth convertion methods to the container value type. By default, rawvalue is equal to value. Various **emplace()**, **cmap_put()** and lookup methods accepts the rawvalue type, which is  convenient e.g. for strings.
+**A**: STC containers simulates automatic type convertion found in c++. Most containers can take an optional
+"rawvalue" type as template parameter in the **using_**-declaration, along with back and forth convertion methods
+to the container value type. By default, rawvalue is equal to value. Various **emplace()**, **cmap_put()** and
+lookup methods accepts the rawvalue type, which is  convenient e.g. for strings.
 
-Raw-value is also useful for map insertions, because values are only conditionally inserted - the **emplace()** method construct a cstr object from a rawvalue only when needed. **using_cvec_str()** declares the `cvec_str` container type with predefined `cstr` value and `const char *` rawvalue, along with convertion methods.
+The use of rawvalues are also useful for map insertions, because values are conditionally inserted - the **emplace()**
+method constructs a cstr object from a rawvalue when needed only. The shorthand **using_cvec_str()** declares `cvec_str`
+container type with `cstr` value and `const char *` rawvalue, along with convertion methods.

@@ -309,13 +309,10 @@ typedef struct {size_t idx; uint32_t hx;} chash_bucket_t;
     typedef C##_##X C##_##X##_t
 
 STC_API    uint64_t c_default_hash(const void *data, size_t len);
-STC_INLINE uint64_t c_default_hash32(const void* data, size_t len) {
-    return *(const uint32_t *)data * 2654435769u;
-}
-STC_INLINE uint64_t c_default_hash64(const void* data, size_t len) {
-    return *(const uint64_t *)data * 11400714819323198485ull;
-}
-#define cstr_hash_raw(p, ignored) c_default_hash(*(p), strlen(*(p)))
+STC_INLINE uint64_t c_default_hash32(const void* data, size_t len)
+           {return *(const uint32_t *)data * 2654435769u;}
+STC_INLINE uint64_t c_default_hash64(const void* data, size_t len)
+           {return *(const uint64_t *)data * 11400714819323198485ull;}
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
@@ -454,7 +451,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
     }
 
 STC_DEF uint64_t c_default_hash(const void *key, size_t len) {
-    const uint64_t m = 11400714819323198485ull; // 0xc6a4a7935bd1e995;
+    const uint64_t m = 0xc6a4a7935bd1e995;
     uint64_t k, h = m + len;
     const unsigned char *p = (const uint8_t *) key,
                         *end = p + (len & ~7ull);

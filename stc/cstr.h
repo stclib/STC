@@ -221,9 +221,9 @@ cstr_iends_with(cstr_t s, const char* needle) {
 #define  cstr_to_raw(x)          ((x)->str)
 #define  cstr_compare_raw(x, y)  strcmp(*(x), *(y))
 #define  cstr_equals_raw(x, y)   (strcmp(*(x), *(y)) == 0)
+#define  cstr_hash_raw(p, none)  c_default_hash(*(p), strlen(*(p)))
 #define  cstr_compare_ref(x, y)  strcmp((x)->str, (y)->str)
 #define  cstr_equals_ref(x, y)   (strcmp((x)->str, (y)->str) == 0)
-#define  cstr_hash_ref(x, none)  c_default_hash((x)->str, cstr_size(x)))
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 

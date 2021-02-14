@@ -36,7 +36,7 @@ DEFMAP(map_s, <std::string, std::string>);
 
 using_cmap(i, int, int, c_default_equals, c_default_hash32);
 using_cmap(x, uint64_t, uint64_t, c_default_equals, c_default_hash64);
-using_cmap_strkey(s, cstr, cstr_del, cstr_clone);
+using_cmap_str();
 
 PICOBENCH_SUITE("Map1");
 
@@ -228,24 +228,24 @@ static void ins_and_access_cmap_s(picobench::state& s)
 {
     cstr str = cstr_with_size(s.arg(), 'x');
     size_t result = 0;
-    cmap_s map = cmap_s_init();
-    cmap_s_set_load_factors(&map, 0.0, MaxLoadFactor100 / 100.0);
+    cmap_str map = cmap_str_init();
+    cmap_str_set_load_factors(&map, 0.0, MaxLoadFactor100 / 100.0);
     stc64_srandom(seed);
 
     picobench::scope scope(s);
     c_forrange (s.iterations()) {
         randomize(str.str, cstr_size(str));
-        cmap_s_put(&map, str.str, cstr_clone(str));
+        cmap_str_put(&map, str.str, str.str);
         randomize(str.str, cstr_size(str));
-        cmap_s_iter_t it = cmap_s_find(&map, str.str);
+        cmap_str_iter_t it = cmap_str_find(&map, str.str);
         if (it.ref) {
             ++result;
-            cmap_s_erase_at(&map, it);
+            cmap_str_erase_at(&map, it);
         }
     }
-    s.set_result(result + cmap_s_size(map));
+    s.set_result(result + cmap_str_size(map));
     cstr_del(&str);
-    cmap_s_del(&map);
+    cmap_str_del(&map);
 }
 
 #define P samples(S1).iterations({N1/5, N1/5, N1/5, N1/10, N1/40}).args({13, 7, 8, 100, 1000})
