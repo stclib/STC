@@ -49,9 +49,10 @@ STC_API size_t  cstr_find(cstr_t s, const char* needle);
 STC_API size_t  cstr_find_n(cstr_t s, const char* needle, size_t pos, size_t nlen);
 STC_API size_t  cstr_ifind_n(cstr_t s, const char* needle, size_t pos, size_t nlen);
 
+STC_API void*   c_memccpy(void* restrict dst, const void* restrict src, int c, size_t n);
 STC_API int     c_strncasecmp(const char* s1, const char* s2, size_t n);
 STC_API char*   c_strnfind(const char* s, const char* needle, size_t nmax);
-STC_DEF char*   c_istrnfind(const char* s, const char* needle, size_t nmax);
+STC_API char*   c_istrnfind(const char* s, const char* needle, size_t nmax);
 
 struct cstr_rep { size_t size, cap; char str[sizeof(size_t)]; };
 #define _cstr_rep(self) c_container_of((self)->str, struct cstr_rep, str)
@@ -390,6 +391,23 @@ cstr_ifind_n(cstr_t s, const char* needle, size_t pos, size_t nlen) {
     if (pos > _cstr_rep(&s)->size) return cstr_npos;
     char* res = c_istrnfind(s.str + pos, needle, nlen);
     return res ? res - s.str : cstr_npos;
+}
+
+/* http://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord */
+STC_DEF void*
+c_memccpy(void* restrict dst, const void* restrict src, int c, size_t n) {
+    enum {w = sizeof(uintptr_t)};
+    #define __z (~(uintptr_t)0/255)
+    const uint8_t* s = (const uint8_t *) src; uint8_t *d = (uint8_t *) dst, *e = d + n;
+    const uint8_t *align = (const uint8_t *)(((uintptr_t)s + w-1) & ~(w-1));
+    while (s != align) if ((*d++ = *s++) == (uint8_t) c) return d;
+    for (; d + w <= e; s += w, d += w) {
+        const uintptr_t x = *(uintptr_t *) s;
+        if (((x - __z) & ~x & __z*128) ^ (__z * (uint8_t) c)) break; /* hasvalue */
+        memcpy(d, &x, w);
+    }
+    while (d < e) if ((*d++ = *s++) == (uint8_t) c) return d;
+    return NULL;
 }
 
 STC_DEF int

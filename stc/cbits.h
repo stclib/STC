@@ -104,13 +104,13 @@ STC_INLINE void cbits_reset(cbits_t *self, size_t i) {
     self->_arr[i >> 6] &= ~(1ull << (i & 63));
 }
 STC_INLINE void cbits_set_value(cbits_t *self, size_t i, bool value) {
-    value ? cbits_set(self, i) : cbits_reset(self, i);
+    self->_arr[i >> 6] ^= (-(uint64_t)value ^ self->_arr[i >> 6]) & 1ull << (i & 63);
 }
 STC_INLINE void cbits_flip(cbits_t *self, size_t i) {
     self->_arr[i >> 6] ^= 1ull << (i & 63);
 }
 STC_INLINE void cbits_set_all(cbits_t *self, bool value) {
-    memset(self->_arr, value ? 0xff : 0x0, ((self->size + 63) >> 6) * 8);
+    memset(self->_arr, -value, ((self->size + 63) >> 6) * 8);
 }
 STC_INLINE void cbits_set_all64(cbits_t *self, uint64_t pattern) {
     size_t n = (self->size + 63) >> 6;
@@ -198,7 +198,7 @@ STC_DEF void cbits_resize(cbits_t* self, size_t size, bool value) {
     self->_arr = (uint64_t *) c_realloc(self->_arr, new_n * 8);
     self->size = size;
     if (new_n >= old_n) {
-        memset(self->_arr + old_n, value ? 0xff : 0x0, (new_n - old_n) * 8);
+        memset(self->_arr + old_n, -value, (new_n - old_n) * 8);
         if (old_n > 0) {
             uint64_t m = (1ull << (osize & 63)) - 1; /* mask */
             value ? (self->_arr[old_n - 1] |= ~m) : (self->_arr[old_n - 1] &= m);

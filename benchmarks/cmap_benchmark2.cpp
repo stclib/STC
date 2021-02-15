@@ -4,6 +4,7 @@
 #include <cmath>
 #include <string>
 #include <unordered_map>
+#include <stdexcept>
 #include "others/bytell_hash_map.hpp"
 #include "others/robin_hood.hpp"
 #include "others/hopscotch_map.h"
