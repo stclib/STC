@@ -1,3 +1,5 @@
+@echo off
+call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Community\VC\Auxiliary\Build\vcvars64.bat" >nul
 cl.exe -nologo -EHsc -std:c++latest -I.. -O2 cdeq_benchmark.cpp >nul
 cl.exe -nologo -EHsc -std:c++latest -I.. -O2 clist_benchmark.cpp >nul
 cl.exe -nologo -EHsc -std:c++latest -I.. -O2 cmap_benchmark.cpp >nul

@@ -1,7 +1,7 @@
 import seaborn as sns
 import pandas as pd
 import matplotlib.pyplot as plt
-sns.set_theme(style="whitegrid")
+#sns.set_theme(style="whitegrid")
 
 df = pd.read_csv('plot_perf.csv')
 df = df[df.Method != 'total']
