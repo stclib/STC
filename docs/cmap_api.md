@@ -87,8 +87,10 @@ cmap_X_mapped_t*    cmap_X_itval(cmap_X_iter_t it);
 
 cmap_X_value_t      cmap_X_value_clone(cmap_X_value_t val);
 void                cmap_X_value_del(cmap_X_value_t* val);
-uint32_t            c_default_hash(const void *data, size_t len);
-uint32_t            c_default_hash32(const void* data, size_t len);
+
+uint64_t            c_default_hash(const void *data, size_t len);
+uint64_t            c_default_hash32(const void* data, size_t ignored);
+uint64_t            c_default_hash64(const void* data, size_t ignored);
 ```
 
 ## Types
@@ -282,7 +284,7 @@ typedef struct VikingRaw {
 } VikingRaw;
 
 uint32_t vikingraw_hash(const VikingRaw* raw, size_t ignore) {
-    uint32_t hash = c_string_hash(raw->name) ^ (c_string_hash(raw->country) << 3);
+    uint32_t hash = c_strhash(raw->name) ^ (c_strhash(raw->country) << 3);
     return hash;
 }
 static inline int vikingraw_equals(const VikingRaw* rx, const VikingRaw* ry) {

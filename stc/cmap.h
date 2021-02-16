@@ -309,9 +309,9 @@ typedef struct {size_t idx; uint32_t hx;} chash_bucket_t;
     typedef C##_##X C##_##X##_t
 
 STC_API    uint64_t c_default_hash(const void *data, size_t len);
-STC_INLINE uint64_t c_default_hash32(const void* data, size_t len)
+STC_INLINE uint64_t c_default_hash32(const void* data, size_t ignored)
            {return *(const uint32_t *)data * 2654435769u;}
-STC_INLINE uint64_t c_default_hash64(const void* data, size_t len)
+STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
            {return *(const uint64_t *)data * 11400714819323198485ull;}
 
 /* -------------------------- IMPLEMENTATION ------------------------- */

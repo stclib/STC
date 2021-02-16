@@ -96,11 +96,13 @@ Iterator methods, typically used via the general *c_foreach* macro.
         const char*  cstr_to_raw(const cstr* x);
         int          cstr_compare_raw(const char** x, const char** y);
         bool         cstr_equals_raw(const char** x, const char** y);
-        uint32_t     cstr_hash_raw(const char* const* spp, size_t ignored);
+        uint32_t     cstr_hash_raw(const char* const* x, size_t ignored);
+
+        char*        c_strcopy(const char* src, char* dst, const char* dst_end, int termin);
         int          c_strncasecmp(const char* s1, const char* s2, size_t n);
         char*        c_strnfind(const char* str, const char* needle, size_t nmax);
         char*        c_istrnfind(const char* str, const char* needle, size_t nmax);
-        uint32_t     c_string_hash(const char* str);
+        uint32_t     c_strhash(const char* str);
 ```
 Helper methods, used by other container types.
 

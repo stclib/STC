@@ -49,10 +49,12 @@ STC_API size_t  cstr_find(cstr_t s, const char* needle);
 STC_API size_t  cstr_find_n(cstr_t s, const char* needle, size_t pos, size_t nlen);
 STC_API size_t  cstr_ifind_n(cstr_t s, const char* needle, size_t pos, size_t nlen);
 
-STC_API void*   c_memccpy(void* dst, const void* src, int c, size_t n);
+STC_API char*   c_strcopy(const char* src, char* dst, const char* dst_end, int termin);
 STC_API int     c_strncasecmp(const char* s1, const char* s2, size_t n);
 STC_API char*   c_strnfind(const char* s, const char* needle, size_t nmax);
 STC_API char*   c_istrnfind(const char* s, const char* needle, size_t nmax);
+STC_INLINE
+uint64_t        c_strhash(const char* s) {return c_default_hash(s, strlen(s));}
 
 struct cstr_rep { size_t size, cap; char str[sizeof(size_t)]; };
 #define _cstr_rep(self) c_container_of((self)->str, struct cstr_rep, str)
@@ -218,7 +220,7 @@ cstr_iends_with(cstr_t s, const char* needle) {
     return n <= sz ? c_strncasecmp(s.str + sz - n, needle, n) == 0 : false;
 }
 
-/* cvec/cmap API functions: */
+/* cvec/cmap adaption functions: */
 #define  cstr_to_raw(x)          ((x)->str)
 #define  cstr_compare_raw(x, y)  strcmp(*(x), *(y))
 #define  cstr_equals_raw(x, y)   (strcmp(*(x), *(y)) == 0)
@@ -394,18 +396,16 @@ cstr_ifind_n(cstr_t s, const char* needle, size_t pos, size_t nlen) {
 }
 
 /* http://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord */
-STC_DEF void*
-c_memccpy(void* dst, const void* src, int c, size_t n) {
+STC_DEF char*
+c_strcopy(const char* s, char* d, const char* d_end, int c) {
     enum {w = sizeof(uintptr_t)};
-    #define _mc_z (~(uintptr_t)0/255)
-    const uint8_t* s = (const uint8_t *) src; 
-    uint8_t *d = (uint8_t *) dst, *end = d + n;
-    for (uintptr_t x; d + w <= end; s += w, d += w) {
+    #define _sc_z (~(uintptr_t)0/255)
+    for (uintptr_t x; d + w <= d_end; s += w, d += w) {
         memcpy(&x, s, w); /* check if x contains c: */
-        if (((x - _mc_z) & ~x & _mc_z*128) ^ (_mc_z*(uint8_t) c)) break;
+        if (((x - _sc_z) & ~x & _sc_z<<7) ^ (_sc_z*(uint8_t) c)) break;
         memcpy(d, &x, w);
     }
-    while (d < end) if ((*d++ = *s++) == (uint8_t) c) return d;
+    while (d < d_end) if ((*d++ = *s++) == (uint8_t) c) return d - 1;
     return NULL;
 }
 
