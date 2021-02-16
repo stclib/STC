@@ -44,7 +44,7 @@ Notes:
 - Containers uses value types `uint64_t` and pairs of `uint64_t`for the maps.
 - Black bars indicates performance variation between various platforms/compilers.
 - Iterations are repeated 4 times over n elements.
-- *find* is not executed for *forward_list*, *deque*, and *vector* because the c++ containers have no native *find*.
+- *find* is not executed for *forward_list*, *deque*, and *vector* because these c++ containers have no native *find*.
 - **deque** - *insert*: n/3 push_front(), n/3 push_back()+push_front(), n/3 push_back().
 - **map and unordered map** - *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys are in the map, n/2 keys are random.
 
@@ -57,6 +57,7 @@ Highlights
 - **Uniform API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have a uniform and intuitive usage across the various containers.
 - **Small footprint** - Small source code and generated executables. The executable from the example below using six different containers is *27 kb in size* compiled with TinyC.
 - **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See next how-to.
+- **No callback functions** - All passed template argument functions/macros are directly called from the implementation, no slow callbacks which requires storage.
 
 Usage
 -----
@@ -171,7 +172,7 @@ Installation
 ------------
 
 Because it is headers-only, headers can simply be included in your program. The methods are static by default (some inlined).
-You may add the project folder to CPATH environment variable, to let GCC, Clang, and TinyC locate the headers.
+You may add the project folder to **CPATH** environment variable, to let GCC, Clang, and TinyC locate the headers.
 
 If containers are used accross several translation units with common instantiated container types, it is recommended to
 build as a "library" to minimize the executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option
@@ -191,10 +192,37 @@ using_cvec(i, int);
 using_clist(pt, struct Point);
 ```
 
+Non POD-type container elements
+-------------------------------
+
+For STC containers with dynamic allocated elements e.g. **cstr**, the elements are ***moved*** into the containers, not *copied*! Methods like
+**push_back()**, **push_front()**, **insert()**, **insert_or_assign()** takes element values. Typical usage is therefore:
+```c
+cvec_str_push_back(&vec, cstr_from("Hello"));
+cvec_str_push_back(&vec, cstr_clone(mycstr));
+cmap_str_insert_or_assign(&vec, cstr_from("Hello"), cstr_clone(mycstr));
+```
+However, most templated STC containers can simulate automatic type convertion. You may specify an optional
+convertion/"rawvalue"-type as a template parameter in the **using_**-declaration, along with back and forth convertion methods
+to the container value type. By default, *rawvalue has the same type as value*. Methods like **emplace_back()**, 
+**emplace_front()**, **emplace()**, **put()** takes the rawvalue-type instead of value. Adding literal strings to 
+containers with **cstr**-elements becomes simple:
+```c
+cvec_str_emplace_back(&vec, "Hello");
+clist_str_emplace_front(&list, "Hello");
+```
+Rawvalues are also beneficial for **find()** and map insertions, because key and mapped values are only conditionally inserted.
+The **emplace()** and **put()** methods constructs cstr-objects from the rawvalues only when they are needed:
+```c
+cmap_str_emplace(&map, "Hello", "world"); // no cstr constructed if "Hello" is already in the map.
+cmap_str_put(&map, "Hello", "world");     // similar, but a cstr_from("world") call is always made in put.
+it = cmap_str_find(&map, "Hello");        // No cstr-object is constructed for lookup, although keys are of cstr-type.
+```
+
 Memory efficiency
 -----------------
 
-The containers are memory efficent, i.e. they occupy as little memory as practical possible.
+STC containers are very memory efficent.
 - **cstr**, **cvec**: Type size: one pointer. The size and capacity is stored as part of the heap allocation that also holds the vector elements.
 - **clist**: Type size: one pointer. Each node allocates block storing value and next pointer.
 - **cdeq**:  Type size: two pointers. Otherwise like *cvec*.
@@ -203,26 +231,3 @@ The containers are memory efficent, i.e. they occupy as little memory as practic
 - **carray**: carray1, carray2 and carray3. Type size: One pointer plus one, two, or three size_t variables to store dimensions. Arrays are allocated as one contiguous block of heap memory.
 - **csptr**: a shared-pointer uses two pointers, one for the data and one for the reference counter.
 
-Important notes
----------------
-
-For STC containers with dynamic allocated elements e.g. **cstr**, elements are moved into containers, e.g:
-```c
-cvec_str_push_back(&vec, cstr_from("Hello"));
-cvec_str_push_back(&vec, cstr_clone(mycstr));
-cmap_str_insert_or_assign(&vec, cstr_from("Hello"), cstr_clone(mycstr));
-```
-Most templated STC container can simulate automatic type convertion like in c++. You may specify an optional
-"rawvalue" type as template parameter in the **using_**-declaration, along with back and forth convertion methods
-to the container value type. By default, rawvalue is equal to value. Methods like **emplace_back()**, 
-**emplace_front()**, **emplace()**, **cmap_put()** takes a rawvalue type instead of value. This makes adding
-literal strings to containers with **cstr**-elements easy:
-```c
-cvec_str_emplace_back(&vec, "Hello");
-```
-Rawvalues are also beneficial for map insertions, because key and mapped values are only conditionally inserted.
-The **emplace()** and **put()** methods constructs cstr-objects from the rawvalues only when it is needed:
-```c
-cmap_str_emplace(&map, "Hello", "world"); // no cstr constructed if "Hello" is in the map.
-cmap_str_put(&map, "Hello", "world");     // similar, but cstr "world" is always constructed.
-```
