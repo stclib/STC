@@ -208,6 +208,8 @@ to the container value type. By default, *rawvalue has the same type as value*. 
 **emplace_front()**, **emplace()**, **put()** takes the rawvalue-type instead of value. Adding literal strings to 
 containers with **cstr**-elements becomes simple:
 ```c
+using_cvec_str();                         // predefined using-statement for cvec of cstr, with `const char*` as rawvalue.
+...
 cvec_str_emplace_back(&vec, "Hello");
 clist_str_emplace_front(&list, "Hello");
 ```
