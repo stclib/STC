@@ -398,13 +398,14 @@ STC_DEF void*
 c_memccpy(void* dst, const void* src, int c, size_t n) {
     enum {w = sizeof(uintptr_t)};
     #define _mc_z (~(uintptr_t)0/255)
-    const uint8_t* s = (const uint8_t *) src; uint8_t *d = (uint8_t *) dst, *e = d + n;
-    for (uintptr_t x; d + (w*2) <= e; s += w, d += w) {
-        memcpy(&x, s, w);
-        if (((x - _mc_z) & ~x & _mc_z*128) ^ (_mc_z*(uint8_t) c)) break; // hasvalue
+    const uint8_t* s = (const uint8_t *) src; 
+    uint8_t *d = (uint8_t *) dst, *end = d + n;
+    for (uintptr_t x; d + w <= end; s += w, d += w) {
+        memcpy(&x, s, w); /* check if x contains c: */
+        if (((x - _mc_z) & ~x & _mc_z*128) ^ (_mc_z*(uint8_t) c)) break;
         memcpy(d, &x, w);
     }
-    while (d < e) if ((*d++ = *s++) == (uint8_t) c) return d;
+    while (d < end) if ((*d++ = *s++) == (uint8_t) c) return d;
     return NULL;
 }
 
