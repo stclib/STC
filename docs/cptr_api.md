@@ -66,7 +66,84 @@ int                 csptr_X_compare(csptr_X* x, csptr_X* y);
 
 ## Example
 
-This example shows three different ways to store struct Person in vectors: 1) `cvec<Person>`, 2) `cvec<Person *>`, and 3) `cvec<csptr<Person>>`.
+Managed raw pointers (cptr) in a cvec.
+```c
+#include <stc/cptr.h>
+#include <stc/cstr.h>
+#include <stc/cvec.h>
+
+typedef struct { cstr_t name, last; } Person;
+
+Person* Person_make(Person* p, const char* name, const char* last) {
+    p->name = cstr_from(name), p->last = cstr_from(last);
+    return p;
+}
+void Person_del(Person* p) {
+    printf("Destroy: %s %s\n", p->name.str, p->last.str);
+    c_del(cstr, &p->name, &p->last);
+}
+// declare managed pointer and cvec with pointers
+using_cptr(pe, Person, c_no_compare, Person_del, c_no_clone);
+using_cvec(pe, Person*, c_no_compare, cptr_pe_del, c_no_clone);
+
+int main() {
+    cvec_pe vec = cvec_pe_init();
+    cvec_pe_push_back(&vec, Person_make(c_new(Person), "John", "Smiths"));
+    cvec_pe_push_back(&vec, Person_make(c_new(Person), "Jane", "Doe"));
+
+    c_foreach (i, cvec_pe, vec)
+        printf("%s %s\n", (*i.ref)->name.str, (*i.ref)->last.str);
+    cvec_pe_del(&vec);
+}
+```
+Output:
+```
+Average Joe
+Joe Blow
+Destroy: Average Joe
+Destroy: Joe Blow
+```
+## Example 2
+
+Simple shared pointer (csptr) usage.
+```c
+#include <stc/cptr.h>
+#include <stc/cstr.h>
+
+typedef struct { cstr_t name, last; } Person;
+
+Person* Person_make(Person* p, const char* name, const char* last) {
+    p->name = cstr_from(name), p->last = cstr_from(last);
+    return p;
+}
+void Person_del(Person* p) {
+    printf("Destroy: %s %s\n", p->name.str, p->last.str);
+    c_del(cstr, &p->name, &p->last);
+}
+
+using_csptr(pe, Person, c_no_compare, Person_del);
+
+int main() {
+    csptr_pe p = csptr_pe_from(Person_make(c_new(Person), "John", "Smiths"));
+    csptr_pe q = csptr_pe_clone(p); // means: share the pointer
+    
+    printf("Person: %s %s. uses: %zu\n", p.get->name.str, p.get->last.str, *p.use_count);
+    csptr_pe_del(&p);
+
+    printf("Last man standing: %s %s. uses: %zu\n", q.get->name.str, q.get->last.str, *q.use_count);
+    csptr_pe_del(&q);
+}
+```
+Output:
+```
+Person: John Smiths. uses: 2
+Last man standing: John Smiths. uses: 1
+Destroy: John Smiths
+```
+
+### Example 2
+
+Advanced: Three different ways to store Person in vectors: 1) `cvec<Person>`, 2) `cvec<Person *>`, and 3) `cvec<csptr<Person>>`.
 ```c
 #include <stc/cptr.h>
 #include <stc/cstr.h>

@@ -44,13 +44,13 @@ int Person_compare(const Person* p, const Person* q) {
     return cmp == 0 ? strcmp(p->last.str, q->last.str) : cmp;
 }
 
-using_cptr(pe, Person, Person_del, Person_compare);
-using_cvec(pe, Person*, cptr_pe_del, cptr_pe_compare);
+using_cptr(pe, Person, Person_compare, Person_del, c_no_clone);
+using_cvec(pe, Person*, cptr_pe_compare, cptr_pe_del, c_no_clone);
 
 int main() {
     cvec_pe vec = cvec_pe_init();
-    cvec_pe_push_back(&vec, Person_make(c_new(Person), "Joe", "Jordan"));
-    cvec_pe_push_back(&vec, Person_make(c_new(Person), "Jane", "Jacobs"));
+    cvec_pe_push_back(&vec, Person_make(c_new(Person), "John", "Smiths"));
+    cvec_pe_push_back(&vec, Person_make(c_new(Person), "Jane", "Doe"));
 
     c_foreach (i, cvec_pe, vec)
         printf("%s %s\n", (*i.ref)->name.str, (*i.ref)->last.str);
@@ -113,13 +113,13 @@ void Person_del(Person* p) {
     c_del(cstr, &p->name, &p->last);
 }
 
-using_csptr(pe, Person, Person_del);
+using_csptr(pe, Person, c_no_compare, Person_del);
 
 int main() {
-    csptr_pe p = csptr_pe_make(Person_make(c_new(Person), "Joe", "Jordan"));
+    csptr_pe p = csptr_pe_from(Person_make(c_new(Person), "John", "Smiths"));
     csptr_pe q = csptr_pe_clone(p); // share the pointer
 
-    printf("%s %s: %d\n", q.get->name.str, q.get->last.str, *q.use_count);
+    printf("%s %s. uses: %zu\n", q.get->name.str, q.get->last.str, *q.use_count);
     c_del(csptr_pe, &p, &q);
 }
 */
@@ -161,9 +161,6 @@ typedef long atomic_count_t;
 
 #define using_csptr_3(X, Value, valueCompare) \
     using_csptr_4(X, Value, valueCompare, c_default_del)
-
-#define using_csptr_5(X, Value, valueCompare, valueDestroy, dummyValueClone) \
-    using_csptr_4(X, Value, valueCompare, valueDestroy)
 
 #define using_csptr_4(X, Value, valueCompare, valueDestroy) \
     typedef Value csptr_##X##_value_t; \
