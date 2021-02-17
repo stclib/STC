@@ -260,7 +260,7 @@ Output:
 ```
 
 ### Example 5
-Advanced only: Demonstrate use of a complex key type.
+Advanced, rare usage: Complex key type.
 ```c
 #include <stdio.h>
 #include <stc/cmap.h>

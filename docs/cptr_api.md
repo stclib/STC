@@ -33,7 +33,9 @@ All cptr definitions and prototypes may be included in your C source file by inc
 
 ## Methods
 
-The *\*_del()* and *\*_compare()* methods are defined based on the methods passed to the *using_\*ptr()* macro. For *csptr* use *csptr_X_clone(p)* when sharing ownership of the pointed-to object to others. See example below.
+The *del()* and *compare()* methods are defined based on the arguments passed to the **using**-macro. For **csptr**, use *csptr_X_clone(p)* when sharing ownership of the pointed-to object. See examples below.
+
+### Managed raw pointer
 ```c
 cptr_X              cptr_X_init(void);
 cptr_X              cptr_X_clone(cptr_X ptr);
@@ -41,12 +43,13 @@ void                cptr_X_reset(cptr_X* self, cptr_X_value_t* ptr);
 void                cptr_X_del(cptr_X* self);
 int                 cptr_X_compare(cptr_X* x, cptr_X* y);
 ```
+### Shared pointer
 ```c
 csptr_X             csptr_X_from(csptr_X_value_t* ptr);
 csptr_X             csptr_X_make(csptr_X_value_t val);
-csptr_X             csptr_X_clone(csptr_X sptr);
 void                csptr_X_reset(csptr_X* self, csptr_X_value_t* ptr);
-void                csptr_X_del(csptr_X* self);
+csptr_X             csptr_X_clone(csptr_X sptr);    // share the pointer (increase use count)
+void                csptr_X_del(csptr_X* self);     // decrease use count, destroy if 0
 int                 csptr_X_compare(csptr_X* x, csptr_X* y);
 ```
 
@@ -98,12 +101,12 @@ int main() {
 ```
 Output:
 ```
-Average Joe
-Joe Blow
-Destroy: Average Joe
-Destroy: Joe Blow
+John Smiths
+Jane Doe
+Destroy: John Smiths
+Destroy: Jane Doe
 ```
-## Example 2
+### Example 2
 
 Simple shared pointer (csptr) usage.
 ```c
@@ -141,7 +144,7 @@ Last man standing: John Smiths. uses: 1
 Destroy: John Smiths
 ```
 
-### Example 2
+### Example 3
 
 Advanced: Three different ways to store Person in vectors: 1) `cvec<Person>`, 2) `cvec<Person *>`, and 3) `cvec<csptr<Person>>`.
 ```c
