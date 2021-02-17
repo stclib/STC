@@ -2,15 +2,15 @@
 
 The following handy macros are completely safe to use, i.e. they have no side-effects.
 
-#### c_init, c_push_items
-**c_init** declares and initializes any container with an array of elements. **c_push_items** adds elements to any existing container.
+### c_init, c_push_items
+**c_init** declares and initializes any container with an array of elements. **c_push_items** adds elements to any existing container:
 ```c
 c_init (cvec_i, vec, {1, 2, 3});
 c_push_items(&vec, cvec_i, {4, 5, 6});
 ```
 
-#### c_forrange
-Declare an iterator and specify a range to iterate with a for loop. Like python's ***for i in range()*** function:
+### c_forrange
+Declare an iterator and specify a range to iterate with a for loop. Like python's ***for i in range()*** loop:
 
 | Usage                                         | Python equivalent                    |
 |:----------------------------------------------|:-------------------------------------|
@@ -31,7 +31,7 @@ c_forrange (i, int, 30, 0, -5) printf(" %d", i);
 // 30 25 20 15 10 5
 ```
 
-#### c_foreach
+### c_foreach
 
 | Usage                                         | Description                     |
 |:----------------------------------------------|:--------------------------------|
@@ -49,7 +49,7 @@ c_foreach (i, csset_x, it, csset_x_end(&set)) printf(" %d", *i.ref);
 // 7 12 23
 ```
 
-#### c_withfile, c_breakwith
+### c_withfile, c_breakwith
 Simplifies reading a file. Use **c_breakwith** if you need to break out of the block. Example:
 ```c
 // Put each line of a text file into a vector of strings
@@ -74,7 +74,7 @@ readFile(const char* name) {
 }
 ```
 
-#### c_new, c_del
+### c_new, c_del
 
 | Usage                          | Meaning                                 |
 |:-------------------------------|:----------------------------------------|
@@ -89,8 +89,9 @@ cstr a = cstr_from("Hello"), b = cstr_from("World");
 c_del(cstr, &a, &b);
 ```
 
-#### c_malloc, c_calloc, c_realloc, c_free
+### c_malloc, c_calloc, c_realloc, c_free
 Memory allocator for the entire library. Macros can be overloaded by the user.
 
-#### c_swap(type, x, y), c_arraylen(array)
-**c_swap**: Simple macro for swapping internals of two objects. **c_arraylen**: Return number of elements in an array, e.g. `int array[] = {1, 2, 3, 4}; 
+### c_swap, c_arraylen
+- **c_swap(type, x, y)**: Simple macro for swapping internals of two objects. 
+- **c_arraylen(array)**: Return number of elements in an array, e.g. `int array[] = {1, 2, 3, 4}; 
