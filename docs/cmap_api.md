@@ -202,8 +202,8 @@ Demonstrate cmap with plain-old-data key type Vec3i and int as mapped type: cmap
 
 typedef struct { int x, y, z; } Vec3i;
 
-using_cmap(v3, Vec3i, int, c_mem_equals,      // key: compare Vec3i bit-by-bit 
-                           c_default_hash32); // key: hash Vec3i in 32-bits word-by-word.
+using_cmap(v3, Vec3i, int, c_mem_equals,    // compare Vec3i bitwise 
+                           c_default_hash); // hash Vec3i bitwise.
 
 int main()
 {
