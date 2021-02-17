@@ -206,9 +206,9 @@ However, most templated STC containers can simulate automatic type convertion. Y
 convertion/"rawvalue"-type as a template parameter in the **using_**-declaration, along with back and forth convertion methods
 to the container value type. By default, *rawvalue has the same type as value*. Methods like **emplace_back()**, 
 **emplace_front()**, **emplace()**, **put()** takes the rawvalue-type instead of value. Adding literal strings to 
-containers with **cstr**-elements becomes simple:
+containers with **cstr**-elements becomes:
 ```c
-using_cvec_str();                         // predefined using-statement for cvec of cstr, with `const char*` as rawvalue.
+using_cvec_str();  // predefined using-statement for cvec of cstr, with 'const char*' as rawvalue type.
 ...
 cvec_str_emplace_back(&vec, "Hello");
 clist_str_emplace_front(&list, "Hello");
@@ -218,7 +218,7 @@ The **emplace()** and **put()** methods constructs cstr-objects from the rawvalu
 ```c
 cmap_str_emplace(&map, "Hello", "world"); // no cstr constructed if "Hello" is already in the map.
 cmap_str_put(&map, "Hello", "world");     // similar, but a cstr_from("world") call is always made in put.
-it = cmap_str_find(&map, "Hello");        // No cstr-object is constructed for lookup, although keys are of cstr-type.
+it = cmap_str_find(&map, "Hello");        // no cstr constructed for lookup, although keys are cstr-type.
 ```
 
 Memory efficiency
