@@ -6,10 +6,10 @@ STC - Standard Template Containers
 Introduction
 ------------
 
-A modern, templated, user-friendly, fast, fully typesafe, and customizable container library for C99,
-with a cross-containers uniform API, similar to c++ STL.
+A modern, templated, user-friendly, fast, fully type-safe, and customizable container library for C99,
+with a uniform API across the containers, and is similar to the c++ standard library containers API.
 
-This is a compact, header-only library with the all the major "standard" data containers, except for the multi-map/set variants:
+It is a compact, header-only library with the all the major "standard" data containers, except for the multi-map/set variants:
 - [***carray*** - Templated **multi-dimensional array** type](docs/carray_api.md)
 - [***cbits*** - A **std::bitset** / **boost::dynamic_bitset** alike type](docs/cbits_api.md)
 - [***cdeq*** - Templated **std::deque** alike type](docs/cdeq_api.md)
@@ -34,27 +34,26 @@ Performance
 -----------
 ![Benchmark](benchmarks/pics/benchmark.png)
 
-STC containers performs either about equal or better than the c++ std counterparts. **cmap** *insert* is almost ***4x*** times faster
-than *std::unordered_map* in this benchmark, and ***2x*** times faster than *erase*! Iteration and destruction is an order of magnitude
-faster. **csmap** has noticable faster lookup than *std::map*'s typical red-black tree implementation. It uses an AA-tree
-(Arne Andersson, 1993), which tends to create a flatter structure (more balanced) than red-black trees. **cvec** is only slighly slower than *std::vector*.
+STC containers performs either about equal or better than the c++ std counterparts. **cmap** crushes *std::unordered_map* across the board! 
+**csmap** has noticable faster lookup than *std::map*'s typical red-black tree implementation. It uses an AA-tree (Arne Andersson, 1993),
+which tends to create a flatter structure (more balanced) than red-black trees. **cvec** is only slighly slower than *std::vector*.
 
 Notes:
 - The barchart shows average test times from three platforms: Win-Clang++ v11, Mingw64 g++ 9.20, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
 - Containers uses value types `uint64_t` and pairs of `uint64_t`for the maps.
 - Black bars indicates performance variation between various platforms/compilers.
 - Iterations are repeated 4 times over n elements.
-- *find* is not executed for *forward_list*, *deque*, and *vector* because these c++ containers have no native *find*.
-- **deque** - *insert*: n/3 push_front(), n/3 push_back()+push_front(), n/3 push_back().
-- **map and unordered map** - *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys are in the map, n/2 keys are random.
+- **find()**: not executed for *forward_list*, *deque*, and *vector* because these c++ containers have no native *find()*.
+- **deque**: *insert*: n/3 push_front(), n/3 push_back()+push_front(), n/3 push_back().
+- **map and unordered map**: *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys are in the map, n/2 keys are random.
 
 Highlights
 ----------
 - **User friendly** - Super easy usage, just include the header and you are good to go. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of value- *comparison*, *destruction*, *cloning*, *convertion types*, and more.
-- **Unparalleled performance** - All the containers are either equal or faster than c++ STL containers.
-- **Fully memory managed** - All containers will destruct keys, values via destructor passed as macro parameters to the ***using_***-declaration. Also smart-pointers are supported and can be stored in containers, see ***csptr***.
+- **Unparalleled performance** - The containers are about equal and sometimes much faster than the c++ STL containers.
+- **Fully memory managed** - All containers will destruct keys/values via destructor passed as macro parameters to the ***using_***-declaration. Also smart-pointers are supported and can be stored in containers, see ***csptr***.
 - **Fully type safe** - Avoids error-prone casting of container types and elements back and forth from the containers.
-- **Uniform API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have a uniform and intuitive usage across the various containers.
+- **Uniform, easy-to-learn API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have uniform and intuitive usage across the various containers.
 - **Small footprint** - Small source code and generated executables. The executable from the example below using six different containers is *27 kb in size* compiled with TinyC.
 - **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See next how-to.
 - **No callback functions** - All passed template argument functions/macros are directly called from the implementation, no slow callbacks which requires storage.
@@ -63,7 +62,7 @@ Usage
 -----
 
 The usage of the containers is similar to the c++ standard containers in STL, so it should be easy if you are familiar with them.
-All containers are generic/templated, except for **cstr** and **cbits**. No casting is used, so containers are typesafe like
+All containers are generic/templated, except for **cstr** and **cbits**. No casting is used, so containers are type-safe like
 templates in c++. A basic usage example:
 ```c
 #include <stc/cvec.h>
@@ -176,7 +175,7 @@ You may add the project folder to **CPATH** environment variable, to let GCC, Cl
 
 If containers are used accross several translation units with common instantiated container types, it is recommended to
 build as a "library" to minimize the executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option
-in your build environment, and place all the instantiations of containers used in a single C source file, e.g.:
+in your build environment, and place all the instantiations of containers used in a single C-source file, e.g.:
 ```c
 // stc_libs.c
 #define STC_IMPLEMENTATION
@@ -205,19 +204,20 @@ cmap_str_insert_or_assign(&vec, cstr_from("Hello"), cstr_clone(mycstr));
 However, most templated STC containers can simulate automatic type convertion. You may specify an optional
 convertion/"rawvalue"-type as a template parameter in the **using_**-declaration, along with back and forth convertion methods
 to the container value type. By default, *rawvalue has the same type as value*. Methods like **emplace_back()**, 
-**emplace_front()**, **emplace()**, **put()** takes the rawvalue-type instead of value. Adding literal strings to 
-containers with **cstr**-elements becomes:
+**emplace_front()**, **emplace()**, **put()** takes the rawvalue-type instead of value. Adding C-strings to 
+containers with cstr-elements becomes:
 ```c
 using_cvec_str();  // predefined using-statement for cvec of cstr, with 'const char*' as rawvalue type.
 ...
 cvec_str_emplace_back(&vec, "Hello");
+cmap_str_put(&map, "Hello", mycstr.str);
 clist_str_emplace_front(&list, "Hello");
 ```
 Rawvalues are also beneficial for **find()** and map insertions, because key and mapped values are only conditionally inserted.
-The **emplace()** and **put()** methods constructs cstr-objects from the rawvalues only when they are needed:
+The **emplace()** and **put()** methods constructs cstr-objects from the rawvalues only when needed:
 ```c
-cmap_str_emplace(&map, "Hello", "world"); // no cstr constructed if "Hello" is already in the map.
-cmap_str_put(&map, "Hello", "world");     // similar, but a cstr_from("world") call is always made in put.
+cmap_str_emplace(&map, "Hello", "world"); // no cstr is constructed if "Hello" is already in the map.
+cmap_str_put(&map, "Hello", "world!!");   // similar, but a cstr_from("world!!") call is always made in put.
 it = cmap_str_find(&map, "Hello");        // no cstr constructed for lookup, although keys are cstr-type.
 ```
 
