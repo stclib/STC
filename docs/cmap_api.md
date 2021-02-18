@@ -70,10 +70,10 @@ cmap_X_iter_t       cmap_X_find(const cmap_X* self, RawKey rkey);
 bool                cmap_X_contains(const cmap_X* self, RawKey rkey);
 
 void                cmap_X_push_n(cmap_X* self, const cmap_X_rawvalue_t arr[], size_t size);
-cmap_X_result_t     cmap_X_put(cmap_X* self, RawKey rkey, RawMapped rmapped);
 cmap_X_result_t     cmap_X_emplace(cmap_X* self, RawKey rkey, RawMapped rmapped);            // no change if rkey in map
-cmap_X_result_t     cmap_X_insert(cmap_X* self, cmap_X_value_t val);                         // like emplace.
-cmap_X_result_t     cmap_X_insert_or_assign(cmap_X* self, Key key, Mapped mapped);           // like put
+cmap_X_result_t     cmap_X_put(cmap_X* self, RawKey rkey, RawMapped rmapped);                // std::map::operator[]
+cmap_X_result_t     cmap_X_insert(cmap_X* self, Key key, Mapped mapped);                     // like emplace, other params
+cmap_X_result_t     cmap_X_insert_or_assign(cmap_X* self, Key key, Mapped mapped);           // like put, other params
 cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, RawKey rkey);                              // rkey must be in map
 
 size_t              cmap_X_erase(cmap_X* self, RawKey rkey);

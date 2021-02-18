@@ -61,10 +61,10 @@ csmap_X_value_t*    csmap_X_find_it(const csmap_X* self, RawKey rkey, csmap_X_it
 bool                csmap_X_contains(const csmap_X* self, RawKey rkey);
 
 void                csmap_X_push_n(csmap_X* self, const csmap_X_rawvalue_t arr[], size_t size);
-csmap_X_result_t    csmap_X_put(csmap_X* self, RawKey rkey, RawMapped rmapped);               // like std::map::operator[]
 csmap_X_result_t    csmap_X_emplace(csmap_X* self, RawKey rkey, RawMapped rmapped);           // no change if rkey in map
-csmap_X_result_t    csmap_X_insert(csmap_X* self, csmap_X_value_t val);                       // like emplace
-csmap_X_result_t    csmap_X_insert_or_assign(csmap_X* self, Key key, Mapped mapped);          // like put
+csmap_X_result_t    csmap_X_put(csmap_X* self, RawKey rkey, RawMapped rmapped);               // std::map::operator[]
+csmap_X_result_t    csmap_X_insert(csmap_X* self, Key key, Mapped mapped);                    // like emplace, other params
+csmap_X_result_t    csmap_X_insert_or_assign(csmap_X* self, Key key, Mapped mapped);          // like put, other params
 csmap_X_mapped_t*   csmap_X_at(const csmap_X* self, RawKey rkey);                             // rkey must be in map.
 
 size_t              csmap_X_erase(csmap_X* self, RawKey rkey);

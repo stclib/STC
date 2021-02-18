@@ -249,9 +249,10 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
     } \
 \
     STC_INLINE C##_##X##_result_t \
-    C##_##X##_insert(C##_##X* self, C##_##X##_value_t val) { \
-        C##_##X##_result_t res = C##_##X##_insert_entry_(self, keyToRaw(KEY_REF_##C(&val))); \
-        if (res.second) *res.first = val; else C##_##X##_value_del(&val); \
+    C##_##X##_insert(C##_##X* self, Key key MAP_ONLY_##C(, Mapped mapped)) { \
+        C##_##X##_result_t res = C##_##X##_insert_entry_(self, keyToRaw(&key)); \
+        if (res.second) {*KEY_REF_##C(res.first) = key; MAP_ONLY_##C( res.first->second = mapped; )} \
+        else            {keyDel(&key); MAP_ONLY_##C( mappedDel(&mapped); )} \
         return res; \
     } \
 \
