@@ -49,7 +49,6 @@ STC_API size_t  cstr_find(cstr_t s, const char* needle);
 STC_API size_t  cstr_find_n(cstr_t s, const char* needle, size_t pos, size_t nlen);
 STC_API size_t  cstr_ifind_n(cstr_t s, const char* needle, size_t pos, size_t nlen);
 
-STC_API char*   c_strcopy(const char* src, char* dst, const char* dst_end, int termin);
 STC_API int     c_strncasecmp(const char* s1, const char* s2, size_t n);
 STC_API char*   c_strnfind(const char* s, const char* needle, size_t nmax);
 STC_API char*   c_istrnfind(const char* s, const char* needle, size_t nmax);
@@ -395,17 +394,6 @@ cstr_ifind_n(cstr_t s, const char* needle, size_t pos, size_t nlen) {
 }
 
 /* http://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord */
-STC_DEF char*
-c_strcopy(const char* s, char* d, const char* d_end, int c) {
-    enum {w = sizeof(uintptr_t)}; const uintptr_t z = ~(uintptr_t)0/255;
-    for (uintptr_t x; d + w <= d_end; s += w, d += w) {
-        memcpy(&x, s, w); /* check if x contains c: */
-        if (((x - z) & ~x & z<<7) ^ (z*(uint8_t) c)) break;
-        memcpy(d, &x, w);
-    }
-    while (d < d_end) if ((*d++ = *s++) == (uint8_t) c) return d - 1;
-    return NULL;
-}
 
 STC_DEF int
 c_strncasecmp(const char* s1, const char* s2, size_t n) {

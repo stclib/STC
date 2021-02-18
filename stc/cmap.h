@@ -437,7 +437,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
         C##_##X##_value_t* slot = self->table; \
         uint8_t* hashx = self->_hashx; \
         C##_##X##_value_del(&slot[i]); \
-        do { /* delete without leaving tombstone */ \
+        for (;;) { /* delete without leaving tombstone */ \
             if (++j == cap) j = 0; \
             if (! hashx[j]) \
                 break; \
@@ -445,7 +445,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
             k = chash_reduce(keyHashRaw(&r, sizeof(RawKey)), cap); \
             if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */ \
                 slot[i] = slot[j], hashx[i] = hashx[j], i = j; \
-        } while (true); \
+        } \
         hashx[i] = 0, k = --self->size; \
         if (k < cap*self->min_load_factor && k > 512) \
             C##_##X##_reserve(self, k*1.2); \
@@ -454,12 +454,8 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
 STC_DEF uint64_t c_default_hash(const void *key, size_t len) {
     const uint64_t m = 0xc6a4a7935bd1e995;
     uint64_t k, h = m + len;
-    const unsigned char *p = (const uint8_t *) key,
-                        *end = p + (len & ~7ull);
-    for (; p != end; p += 8) {
-        memcpy(&k, p, 8);
-        h ^= k*m;
-    }
+    const uint8_t *p = (const uint8_t *)key, *end = p + (len & ~7ull);
+    for (; p != end; p += 8) {memcpy(&k, p, 8); h ^= k*m;}
     switch (len & 7) {
         case 7: h ^= (uint64_t) p[6] << 48;
         case 6: h ^= (uint64_t) p[5] << 40;
