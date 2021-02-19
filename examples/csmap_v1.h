@@ -219,46 +219,52 @@ int main(void) {
     } \
 \
     STC_API C##_##X##_result_t \
-    C##_##X##_insert_key(C##_##X* self, RawKey rkey); \
+    C##_##X##_insert_entry_(C##_##X* self, RawKey rkey); \
 \
     STC_INLINE C##_##X##_result_t \
-    C##_##X##_emplace(C##_##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped) ) { \
-        C##_##X##_result_t res = C##_##X##_insert_key(self, rkey); \
-        MAP_ONLY_##C( if (res.second) res.first->second = mappedFromRaw(rmapped); ) \
+    C##_##X##_emplace(C##_##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
+        C##_##X##_result_t res = C##_##X##_insert_entry_(self, rkey); \
+        if (res.second) { \
+            *KEY_REF_##C(res.first) = keyFromRaw(rkey); \
+            MAP_ONLY_##C(res.first->second = mappedFromRaw(rmapped);) \
+        } \
         return res; \
     } \
     STC_INLINE C##_##X##_result_t \
-    C##_##X##_insert(C##_##X* self, C##_##X##_rawvalue_t raw) { \
-        return SET_ONLY_##C( C##_##X##_insert_key(self, raw) ) \
-               MAP_ONLY_##C( C##_##X##_emplace(self, raw.first, raw.second) ); \
+    C##_##X##_put(C##_##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
+        C##_##X##_result_t res = C##_##X##_insert_entry_(self, rkey); \
+                      if (res.second) *KEY_REF_##C(res.first) = keyFromRaw(rkey); \
+        MAP_ONLY_##C( else mappedDel(&res.first->second); \
+                      res.first->second = mappedFromRaw(rmapped); ) \
+        return res; \
     } \
     STC_INLINE void \
     C##_##X##_push_n(C##_##X* self, const C##_##X##_rawvalue_t arr[], size_t n) { \
-        for (size_t i=0; i<n; ++i) C##_##X##_insert(self, arr[i]); \
+        for (size_t i=0; i<n; ++i) SET_ONLY_##C( C##_##X##_emplace(self, arr[i]); ) \
+                                   MAP_ONLY_##C( C##_##X##_put(self, arr[i].first, arr[i].second); ) \
+    } \
+\
+    STC_INLINE C##_##X##_result_t \
+    C##_##X##_insert(C##_##X* self, Key key MAP_ONLY_##C(, Mapped mapped)) { \
+        C##_##X##_result_t res = C##_##X##_insert_entry_(self, keyToRaw(&key)); \
+        if (res.second) {*KEY_REF_##C(res.first) = key; MAP_ONLY_##C( res.first->second = mapped; )} \
+        else            {keyDel(&key); MAP_ONLY_##C( mappedDel(&mapped); )} \
+        return res; \
     } \
 \
     MAP_ONLY_##C( \
-    STC_INLINE C##_##X##_result_t \
-    C##_##X##_put(C##_##X* self, RawKey rkey, RawMapped rmapped) { \
-        C##_##X##_result_t res = C##_##X##_insert_key(self, rkey); \
-        if (!res.second) mappedDel(&res.first->second); \
-        res.first->second = mappedFromRaw(rmapped); return res; \
-    } \
-    STC_INLINE C##_##X##_result_t \
-    C##_##X##_insert_or_assign(C##_##X* self, RawKey rkey, RawMapped rmapped) { \
-        return C##_##X##_put(self, rkey, rmapped); \
-    } \
-    STC_INLINE C##_##X##_result_t \
-    C##_##X##_put_mapped(C##_##X* self, RawKey rkey, Mapped mapped) { \
-        C##_##X##_result_t res = C##_##X##_insert_key(self, rkey); \
-        if (!res.second) mappedDel(&res.first->second); \
-        res.first->second = mapped; return res; \
-    } \
-    STC_INLINE C##_##X##_mapped_t* \
-    C##_##X##_at(const C##_##X* self, RawKey rkey) { \
-        C##_##X##_iter_t it; \
-        return &C##_##X##_find_it(self, rkey, &it)->second; \
-    }) \
+        STC_INLINE C##_##X##_result_t \
+        C##_##X##_insert_or_assign(C##_##X* self, Key key, Mapped mapped) { \
+            C##_##X##_result_t res = C##_##X##_insert_entry_(self, keyToRaw(&key)); \
+            if (res.second) res.first->first = key; else keyDel(&key); \
+            mappedDel(&res.first->second); res.first->second = mapped; \
+            return res; \
+        } \
+        STC_INLINE C##_##X##_mapped_t* \
+        C##_##X##_at(const C##_##X* self, RawKey rkey) { \
+            C##_##X##_iter_t it; \
+            return &C##_##X##_find_it(self, rkey, &it)->second; \
+        }) \
 \
     STC_INLINE C##_##X##_value_t* \
     C##_##X##_front(C##_##X* self) { \
@@ -371,47 +377,8 @@ int main(void) {
         return tn; \
     } \
 \
-/*\
-    static C##_##X##_node_t*  ** recursive version ** \
-    C##_##X##_insert_key_r_(C##_##X##_node_t* tn, const C##_##X##_rawkey_t* rkey, C##_##X##_result_t* res) { \
-        if (tn->level == 0) { \
-            tn = c_new_1(C##_##X##_node_t); \
-            res->first = &tn->value, res->second = true; \
-            tn->link[0] = tn->link[1] = (C##_##X##_node_t*) &cbst_nil, tn->level = 1; \
-            *KEY_REF_##C(&tn->value) = keyFromRaw(*rkey); \
-            return tn; \
-        } \
-        C##_##X##_rawkey_t r = keyToRaw(KEY_REF_##C(&tn->value)); \
-        int c = keyCompareRaw(&r, rkey); \
-        if (c == 0) { res->first = &tn->value; return tn; } \
-        tn->link[c == -1] = C##_##X##_insert_key_r_(tn->link[c == -1], rkey, res); \
-        tn = C##_##X##_skew_(tn); \
-        tn = C##_##X##_split_(tn); \
-        return tn; \
-    } \
-\
-    static C##_##X##_size_t ** recursive version, array based ** \
-    C##_##X##_insert_key_r_(C##_##X* self, C##_##X##_size_t tn, const C##_##X##_rawkey_t* rkey, C##_##X##_result_t* res) { \
-        if (tn == 0) { \
-            tn = C##_##X##_node_new_(self); \
-            *KEY_REF_##C(&self->data[tn].value) = keyFromRaw(*rkey); \
-            res->first = &self->data[tn].value, res->second = true; \
-            return tn; \
-        } \
-        C##_##X##_rawkey_t r = keyToRaw(KEY_REF_##C(&self->data[tn].value)); \
-        int c = keyCompareRaw(&r, rkey), dir; \
-        if (c == 0) { res->first = &self->data[tn].value; return tn; } \
-        dir = (c == -1); \
-        C##_##X##_size_t node = C##_##X##_insert_key_r_(self, self->data[tn].link[dir], rkey, res); \
-        C##_##X##_node_t *d = self->data; \
-        d[tn].link[dir] = node; \
-        tn = C##_##X##_skew_(d, tn); \
-        tn = C##_##X##_split_(d, tn); \
-        return tn; \
-    } \
-*/\
     static inline C##_##X##_node_t* \
-    C##_##X##_insert_key_i_(C##_##X##_node_t* tn, const C##_##X##_rawkey_t* rkey, C##_##X##_result_t* res) { \
+    C##_##X##_insert_entry_i_(C##_##X##_node_t* tn, const C##_##X##_rawkey_t* rkey, C##_##X##_result_t* res) { \
         C##_##X##_node_t *up[64], *it = tn; \
         int c, top = 0, dir = 0; \
         while (it->level) { \
@@ -421,7 +388,6 @@ int main(void) {
             it = it->link[(dir = (c == -1))]; \
         } \
         tn = c_new_1(C##_##X##_node_t); \
-        *KEY_REF_##C(&tn->value) = keyFromRaw(*rkey); \
         res->first = &tn->value, res->second = true; \
         tn->link[0] = tn->link[1] = (C##_##X##_node_t*) &cbst_nil, tn->level = 1; \
         if (top == 0) return tn; \
@@ -436,9 +402,9 @@ int main(void) {
     } \
 \
     STC_DEF C##_##X##_result_t \
-    C##_##X##_insert_key(C##_##X* self, RawKey rkey) { \
+    C##_##X##_insert_entry_(C##_##X* self, RawKey rkey) { \
         C##_##X##_result_t res = {NULL, false}; \
-        self->root = C##_##X##_insert_key_i_(self->root, &rkey, &res); \
+        self->root = C##_##X##_insert_entry_i_(self->root, &rkey, &res); \
         self->size += res.second; \
         return res; \
     } \

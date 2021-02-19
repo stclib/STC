@@ -177,7 +177,7 @@ int main()
     /* put replaces existing mapped value: */
     cmap_id_put(&idnames, 110, "White");
     /* put a constructed mapped value into map: */
-    cmap_id_put_mapped(&idnames, 120, cstr_from_fmt("#%08x", col));
+    cmap_id_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
     /* emplace inserts only when key does not exist: */
     cmap_id_emplace(&idnames, 100, "Green");
 

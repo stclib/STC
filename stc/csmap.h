@@ -224,7 +224,6 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
     STC_API C##_##X##_result_t \
     C##_##X##_insert_entry_(C##_##X* self, RawKey rkey); \
 \
-\
     STC_INLINE C##_##X##_result_t \
     C##_##X##_emplace(C##_##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
         C##_##X##_result_t res = C##_##X##_insert_entry_(self, rkey); \
