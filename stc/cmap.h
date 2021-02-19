@@ -262,9 +262,8 @@ typedef struct {size_t idx; uint32_t hx;} chash_bucket_t;
         STC_INLINE C##_##X##_result_t \
         C##_##X##_insert_or_assign(C##_##X* self, Key key, Mapped mapped) { \
             C##_##X##_result_t res = C##_##X##_insert_entry_(self, keyToRaw(&key)); \
-            if (res.second) res.first->first = key; else keyDel(&key); \
-            mappedDel(&res.first->second); res.first->second = mapped; \
-            return res; \
+            if (res.second) res.first->first = key; else {keyDel(&key); mappedDel(&res.first->second);} \
+            res.first->second = mapped; return res; \
         } \
         STC_INLINE C##_##X##_mapped_t* \
         C##_##X##_at(const C##_##X* self, RawKey rkey) { \

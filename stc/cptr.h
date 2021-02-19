@@ -44,8 +44,8 @@ int Person_compare(const Person* p, const Person* q) {
     return cmp == 0 ? strcmp(p->last.str, q->last.str) : cmp;
 }
 
-using_cptr(pe, Person, Person_compare, Person_del, c_no_clone);
-using_cvec(pe, Person*, cptr_pe_compare, cptr_pe_del, c_no_clone);
+using_cptr(pe, Person, Person_compare, Person_del);
+using_cvec(pe, Person*, cptr_pe_compare, cptr_pe_del);
 
 int main() {
     cvec_pe vec = cvec_pe_init();
@@ -65,9 +65,9 @@ int main() {
     using_cptr_3(X, Value, c_default_compare)
 
 #define using_cptr_3(X, Value, valueCompare) \
-    using_cptr_5(X, Value, valueCompare, c_default_del, c_default_clone)
+    using_cptr_4(X, Value, valueCompare, c_default_del)
 
-#define using_cptr_5(X, Value, valueCompare, valueDestroy, valueClone) \
+#define using_cptr_4(X, Value, valueCompare, valueDestroy) \
     typedef Value cptr_##X##_value_t; \
     typedef cptr_##X##_value_t *cptr_##X; \
 \
@@ -77,11 +77,7 @@ int main() {
         c_free(*self); \
     } \
     STC_INLINE cptr_##X \
-    cptr_##X##_clone(cptr_##X ptr) { \
-        cptr_##X clone = c_new_1(Value); \
-        *clone = valueClone(*ptr); \
-        return clone; \
-    } \
+    cptr_##X##_clone(cptr_##X ptr) { return ptr; } \
 \
     STC_INLINE void \
     cptr_##X##_reset(cptr_##X* self, cptr_##X##_value_t* p) { \
@@ -93,12 +89,16 @@ int main() {
     cptr_##X##_compare(cptr_##X* x, cptr_##X* y) { \
         return valueCompare(*x, *y); \
     } \
+    STC_INLINE int \
+    cptr_##X##_equals(cptr_##X* x, cptr_##X* y) { \
+        return valueCompare(*x, *y) == 0; \
+    } \
     typedef cptr_##X cptr_##X##_t
 
 
 
-/* csptr: std::shared_ptr -like type: */
-/*
+/* csptr: std::shared_ptr -like type:
+
 #include <stc/cptr.h>
 #include <stc/cstr.h>
 
@@ -200,6 +200,10 @@ typedef long atomic_count_t;
     STC_INLINE int \
     csptr_##X##_compare(csptr_##X* x, csptr_##X* y) { \
         return valueCompare(x->get, y->get); \
+    } \
+    STC_INLINE int \
+    csptr_##X##_equals(csptr_##X* x, csptr_##X* y) { \
+        return valueCompare(x->get, y->get) == 0; \
     } \
     typedef csptr_##X csptr_##X##_t
 
