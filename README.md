@@ -191,35 +191,44 @@ using_cvec(i, int);
 using_clist(pt, struct Point);
 ```
 
-Non POD-type container elements
--------------------------------
-
-For STC containers with dynamic allocated elements e.g. **cstr**, the elements are ***moved*** into the containers, not *copied*! Methods like
-**push_back()**, **push_front()**, **insert()**, **insert_or_assign()** takes element values. Typical usage is therefore:
+Non POD-type container elements (advanced)
+------------------------------------------
+For STC containers with dynamic allocated elements, some care must be taken when declaring the containers.
+In C, objects are ***moved*** (bitwise), not *cloned* like in c++, when copied. When adding elements to
+containers, methods like **push_back()**, **push_front()**, **insert()**, and **insert_or_assign()**
+takes element values as arguments. Typical usage is to construct or clone elements when adding them,
+e.g. for containers of cstr:
 ```c
 cvec_str_push_back(&vec, cstr_from("Hello"));
 cvec_str_push_back(&vec, cstr_clone(mycstr));
-cmap_str_insert_or_assign(&vec, cstr_from("Hello"), cstr_clone(mycstr));
+cmap_str_insert(&vec, cstr_from("Hello"), cstr_clone(mycstr));
 ```
-However, most templated STC containers can simulate automatic type convertion. You may specify an optional
-convertion/"rawvalue"-type as a template parameter in the **using_**-declaration, along with back and forth convertion methods
-to the container value type. By default, *rawvalue has the same type as value*. Methods like **emplace_back()**, 
-**emplace_front()**, **emplace()**, **put()** takes the rawvalue-type instead of value. Adding C-strings to 
-containers with cstr-elements becomes:
+However, most templated STC containers can emulate automatic type convertion. The **using**-declaration
+may be given an optional convertion/"rawvalue"-type as template parameter, along with a back and forth
+convertion methods to the container value type. By default, *rawvalue has the same type as value*. Methods
+like **emplace_back()**, **emplace_front()**, **emplace()** and **put()** accepts rawvalue-type instead of
+value-type elements. Adding C-strings to containers with cstr-elements becomes simply:
 ```c
 using_cvec_str();  // predefined using-statement for cvec of cstr, with 'const char*' as rawvalue type.
+using_clist_str(); // ...
 ...
-cvec_str_emplace_back(&vec, "Hello");
-cmap_str_put(&map, "Hello", mycstr.str);
-clist_str_emplace_front(&list, "Hello");
+cvec_str_emplace_back(&vec, "Hello");     // cstr_from("Hello") is done inside emplace_back().
+clist_str_emplace_front(&list, "Hello");  // same here.
 ```
-Rawvalues are also beneficial for **find()** and map insertions, because key and mapped values are only conditionally inserted.
-The **emplace()** and **put()** methods constructs cstr-objects from the rawvalues only when needed:
+But rawvalues are also beneficial for **find()** and map insertions, because keys and mapped values are
+conditionally inserted. The **emplace()** and **put()** methods constructs cstr-objects from the rawvalues only
+when required:
 ```c
 cmap_str_emplace(&map, "Hello", "world"); // no cstr is constructed if "Hello" is already in the map.
-cmap_str_put(&map, "Hello", "world!!");   // similar, but a cstr_from("world!!") call is always made in put.
+cmap_str_put(&map, "Hello", "world!!");   // similar, but cstr_from("world!!") call is always made in put.
 it = cmap_str_find(&map, "Hello");        // no cstr constructed for lookup, although keys are cstr-type.
 ```
+In the **cmap_str_insert()** example at the top of this section, both the key and mapped value are first constructed,
+then destructed if the key is already in the map, which is less efficient. For containers other than maps and sets,
+this is not an issue.
+
+Non-POD map or set keys are rarely needed, except for strings, still the last example on the **cmap** page
+demonstrates how to declare such maps.
 
 Memory efficiency
 -----------------
