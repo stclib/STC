@@ -197,17 +197,17 @@ Demonstrate cmap with plain-old-data key type Vec3i and int as mapped type: cmap
 
 typedef struct { int x, y, z; } Vec3i;
 
-using_cmap(v3, Vec3i, int, c_mem_equals,    // compare Vec3i bitwise 
+using_cmap(v3, Vec3i, int, c_memcmp_equals, // compare Vec3i bitwise 
                            c_default_hash); // hash Vec3i bitwise.
 
 int main()
 {
     cmap_v3 vecs = cmap_v3_init();
 
-    cmap_v3_emplace_put(&vecs, (Vec3i){100,   0,   0}, 1);
-    cmap_v3_emplace_put(&vecs, (Vec3i){  0, 100,   0}, 2);
-    cmap_v3_emplace_put(&vecs, (Vec3i){  0,   0, 100}, 3);
-    cmap_v3_emplace_put(&vecs, (Vec3i){100, 100, 100}, 4);
+    cmap_v3_emplace(&vecs, (Vec3i){100,   0,   0}, 1);
+    cmap_v3_emplace(&vecs, (Vec3i){  0, 100,   0}, 2);
+    cmap_v3_emplace(&vecs, (Vec3i){  0,   0, 100}, 3);
+    cmap_v3_emplace(&vecs, (Vec3i){100, 100, 100}, 4);
 
     c_foreach (i, cmap_v3, vecs)
         printf("{ %3d, %3d, %3d }: %d\n", i.ref->first.x,  i.ref->first.y,  i.ref->first.z,  i.ref->second);
@@ -235,10 +235,10 @@ using_cmap(iv, int, Vec3i);
 int main()
 {
     cmap_iv vecs = cmap_iv_init();
-    cmap_iv_emplace_put(&vecs, 1, (Vec3i){100,   0,   0});
-    cmap_iv_emplace_put(&vecs, 2, (Vec3i){  0, 100,   0});
-    cmap_iv_emplace_put(&vecs, 3, (Vec3i){  0,   0, 100});
-    cmap_iv_emplace_put(&vecs, 4, (Vec3i){100, 100, 100});
+    cmap_iv_emplace(&vecs, 1, (Vec3i){100,   0,   0});
+    cmap_iv_emplace(&vecs, 2, (Vec3i){  0, 100,   0});
+    cmap_iv_emplace(&vecs, 3, (Vec3i){  0,   0, 100});
+    cmap_iv_emplace(&vecs, 4, (Vec3i){100, 100, 100});
 
     c_foreach (i, cmap_iv, vecs)
         printf("%d: { %3d, %3d, %3d }\n", i.ref->first, i.ref->second.x,  i.ref->second.y,  i.ref->second.z);
@@ -294,11 +294,10 @@ static inline VikingRaw viking_toRaw(Viking* vk) {
     VikingRaw raw = {vk->name.str, vk->country.str}; return raw;
 }
 
-// With this in place, we use the full using_cmap() macro to define {Viking -> int} hash map type:
+// With this in place, we use the using_cmap_keyarg() macro to define {Viking -> int} hash map type:
 
-using_cmap(vk, Viking, int, vikingraw_equals, vikingraw_hash,
-                            c_default_del, c_default_clone, // mapped: int => use default.
-                            viking_del, viking_fromRaw, viking_toRaw, VikingRaw);
+using_cmap_keyarg(vk, Viking, int, vikingraw_equals, vikingraw_hash,
+                      viking_del, viking_fromRaw, viking_toRaw, VikingRaw);
 
 int main()
 {

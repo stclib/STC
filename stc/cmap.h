@@ -39,9 +39,9 @@ int main(void) {
     cset_sx_del(&s);
 
     cmap_mx m = cmap_mx_init();
-    cmap_mx_emplace_put(&m, 5, 'a');
-    cmap_mx_emplace_put(&m, 8, 'b');
-    cmap_mx_emplace_put(&m, 12, 'c');
+    cmap_mx_emplace(&m, 5, 'a');
+    cmap_mx_emplace(&m, 8, 'b');
+    cmap_mx_emplace(&m, 12, 'c');
     cmap_mx_iter_t it = cmap_mx_find(&m, 10); // none
     char val = cmap_mx_find(&m, 5).ref->second;
     cmap_mx_emplace_put(&m, 5, 'd'); // update
@@ -65,17 +65,17 @@ typedef struct {size_t idx; uint32_t hx;} chash_bucket_t;
 
 #define using_cmap_5(X, Key, Mapped, keyEquals, keyHash) \
     using_cmap_9(X, Key, Mapped, keyEquals, keyHash, \
-                    c_default_del, c_default_clone, c_default_to_raw, Mapped)
+                    c_default_del, c_default_fromraw, c_default_toraw, Mapped)
 
 #define using_cmap_6(X, Key, Mapped, keyEquals, keyHash, mappedDel) \
     using_cmap_9(X, Key, Mapped, keyEquals, keyHash, \
-                    mappedDel, c_no_clone, c_default_to_raw, Mapped)
+                    mappedDel, c_no_fromraw, c_default_toraw, Mapped)
 
 #define using_cmap_9(X, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                           mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
     _using_CHASH(X, cmap, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                     mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
-                    c_default_del, c_default_clone, c_default_to_raw, Key)
+                    c_default_del, c_default_fromraw, c_default_toraw, Key)
 
 #define using_cmap_13(X, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                          mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
@@ -87,11 +87,11 @@ typedef struct {size_t idx; uint32_t hx;} chash_bucket_t;
 #define using_cmap_keyarg(...) c_MACRO_OVERLOAD(using_cmap_keyarg, __VA_ARGS__)
 #define using_cmap_keyarg_6(X, Key, Mapped, keyEquals, keyHash, keyDel) \
     using_cmap_keyarg_9(X, Key, Mapped, keyEquals, keyHash, \
-                           keyDel, c_no_clone, c_default_to_raw, Key)
+                           keyDel, c_no_fromraw, c_default_toraw, Key)
 #define using_cmap_keyarg_9(X, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                                keyDel, keyFromRaw, keyToRaw, RawKey) \
     _using_CHASH(X, cmap, Key, Mapped, keyEqualsRaw, keyHashRaw, \
-                    c_default_del, c_default_clone, c_default_to_raw, Mapped, \
+                    c_default_del, c_default_fromraw, c_default_toraw, Mapped, \
                     keyDel, keyFromRaw, keyToRaw, RawKey)
 
 /* cset: */
@@ -102,10 +102,10 @@ typedef struct {size_t idx; uint32_t hx;} chash_bucket_t;
     using_cset_4(X, Key, c_default_equals, c_default_hash)
 
 #define using_cset_4(X, Key, keyEquals, keyHash) \
-    using_cset_8(X, Key, keyEquals, keyHash, c_default_del, c_default_clone, c_default_to_raw, Key)
+    using_cset_8(X, Key, keyEquals, keyHash, c_default_del, c_default_fromraw, c_default_toraw, Key)
 
 #define using_cset_5(X, Key, keyEquals, keyHash, keyDel) \
-    using_cset_8(X, Key, keyEquals, keyHash, keyDel, c_no_clone, c_default_to_raw, Key)
+    using_cset_8(X, Key, keyEquals, keyHash, keyDel, c_no_fromraw, c_default_toraw, Key)
 
 #define using_cset_8(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
     _using_CHASH(X, cset, Key, Key, keyEqualsRaw, keyHashRaw, \
@@ -117,17 +117,17 @@ typedef struct {size_t idx; uint32_t hx;} chash_bucket_t;
     _using_CHASH_strkey(str, cset, cstr_t, _UNUSED_, _UNUSED_, _UNUSED_, void)
 #define using_cmap_str() \
     _using_CHASH(str, cmap, cstr_t, cstr_t, cstr_equals_raw, cstr_hash_raw, \
-                      cstr_del, cstr_from, cstr_to_raw, const char*, \
-                      cstr_del, cstr_from, cstr_to_raw, const char*)
+                      cstr_del, cstr_from, cstr_c_str, const char*, \
+                      cstr_del, cstr_from, cstr_c_str, const char*)
 
 #define using_cmap_strkey(...) \
     c_MACRO_OVERLOAD(using_cmap_strkey, __VA_ARGS__)
 
 #define using_cmap_strkey_2(X, Mapped) \
-    _using_CHASH_strkey(X, cmap, Mapped, c_default_del, c_default_clone, c_default_to_raw, Mapped)
+    _using_CHASH_strkey(X, cmap, Mapped, c_default_del, c_default_fromraw, c_default_toraw, Mapped)
 
 #define using_cmap_strkey_3(X, Mapped, mappedDel) \
-    _using_CHASH_strkey(X, cmap, Mapped, mappedDel, c_no_clone, c_default_to_raw, Mapped)
+    _using_CHASH_strkey(X, cmap, Mapped, mappedDel, c_no_fromraw, c_default_toraw, Mapped)
 
 #define using_cmap_strkey_6(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
     _using_CHASH_strkey(X, cmap, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped)
@@ -135,7 +135,7 @@ typedef struct {size_t idx; uint32_t hx;} chash_bucket_t;
 #define _using_CHASH_strkey(X, C, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
     _using_CHASH(X, C, cstr_t, Mapped, cstr_equals_raw, cstr_hash_raw, \
                     mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
-                    cstr_del, cstr_from, cstr_to_raw, const char*)
+                    cstr_del, cstr_from, cstr_c_str, const char*)
 
 #define using_cmap_strval(...) \
     c_MACRO_OVERLOAD(using_cmap_strval, __VA_ARGS__)
@@ -144,14 +144,14 @@ typedef struct {size_t idx; uint32_t hx;} chash_bucket_t;
     using_cmap_strval_4(X, Key, c_default_equals, c_default_hash)
 
 #define using_cmap_strval_4(X, Key, keyEquals, keyHash) \
-    using_cmap_strval_8(X, Key, keyEquals, keyHash, c_default_del, c_default_clone, c_default_to_raw, Key)
+    using_cmap_strval_8(X, Key, keyEquals, keyHash, c_default_del, c_default_fromraw, c_default_toraw, Key)
 
 #define using_cmap_strval_5(X, Key, keyEquals, keyHash, keyDel) \
-    using_cmap_strval_8(X, Key, keyEquals, keyHash, keyDel, c_no_clone, c_default_to_raw, Key)
+    using_cmap_strval_8(X, Key, keyEquals, keyHash, keyDel, c_no_fromraw, c_default_toraw, Key)
 
 #define using_cmap_strval_8(X, Key, keyEquals, keyHash, keyDel, keyFromRaw, keyToRaw, RawKey) \
     _using_CHASH(X, cmap, Key, cstr_t, keyEquals, keyHash, \
-                    cstr_del, cstr_from, cstr_to_raw, const char*, \
+                    cstr_del, cstr_from, cstr_c_str, const char*, \
                     keyDel, keyFromRaw, keyToRaw, RawKey)
 
 #define SET_ONLY_cset(...) __VA_ARGS__

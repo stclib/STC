@@ -81,14 +81,14 @@
 #define c_default_compare(x, y) c_less_compare(c_default_less, x, y)
 #define c_default_less(x, y)    (*(x) < *(y))
 #define c_less_compare(less, x, y) (less(y, x) - less(x, y))
-#define c_no_compare(x, y)      (assert(!"c_no_compare"), 0)
+#define c_no_compare(x, y)      (assert(!"c_no_compare() called"), 0)
 
 #define c_default_equals(x, y)  (*(x) == *(y))
-#define c_mem_equals(x, y)      (memcmp(x, y, sizeof *(x)) == 0)
+#define c_memcmp_equals(x, y)   (memcmp(x, y, sizeof *(x)) == 0)
 
-#define c_default_clone(x)      (x)
-#define c_no_clone(x)           (assert(!"c_no_clone"), x)
-#define c_default_to_raw(ptr)   (*(ptr))
+#define c_no_fromraw(x)         (assert(!"emplace*() with c_no_fromraw"), x)
+#define c_default_fromraw(x)    (x)
+#define c_default_toraw(ptr)    (*(ptr))
 
 #define c_default_del(ptr)      ((void) (ptr))
 

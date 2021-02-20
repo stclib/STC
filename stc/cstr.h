@@ -218,12 +218,15 @@ cstr_iends_with(cstr_t s, const char* needle) {
 }
 
 /* cvec/cmap adaption functions: */
-#define  cstr_to_raw(x)          ((x)->str)
+#define  cstr_c_str(x)           ((x)->str)
 #define  cstr_compare_raw(x, y)  strcmp(*(x), *(y))
 #define  cstr_equals_raw(x, y)   (strcmp(*(x), *(y)) == 0)
 #define  cstr_hash_raw(p, none)  c_default_hash(*(p), strlen(*(p)))
+
 #define  cstr_compare_ref(x, y)  strcmp((x)->str, (y)->str)
 #define  cstr_equals_ref(x, y)   (strcmp((x)->str, (y)->str) == 0)
+#define  cstr_hash_ref(p, none)  c_default_hash((p)->str, cstr_size(*(p)))
+
 #define  c_strhash(s)            c_default_hash(s, strlen(s))
 
 /* -------------------------- IMPLEMENTATION ------------------------- */

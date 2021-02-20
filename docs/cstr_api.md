@@ -93,7 +93,7 @@ Iterator methods, typically used via the general *c_foreach* macro.
 ```
 `1-2)` Read a line of text from *stream* and store it in string. Line is separated by *delim*, which is *'\n'* in `1)`.
 ```c
-        const char*  cstr_to_raw(const cstr* x);
+        const char*  cstr_c_str(const cstr* x);
         int          cstr_compare_raw(const char** x, const char** y);
         bool         cstr_equals_raw(const char** x, const char** y);
         uint32_t     cstr_hash_raw(const char* const* x, size_t ignored);

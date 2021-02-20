@@ -124,8 +124,8 @@ void mapdemo1()
 {
     printf("\nMAPDEMO1\n");
     cmap_ii nums = cmap_ii_init();
-    cmap_ii_emplace_put(&nums, 8, 64);
-    cmap_ii_emplace_put(&nums, 11, 121);
+    cmap_ii_emplace(&nums, 8, 64);
+    cmap_ii_emplace(&nums, 11, 121);
     printf("val 8: %d\n", *cmap_ii_at(&nums, 8));
     cmap_ii_del(&nums);
 }
@@ -159,9 +159,9 @@ void mapdemo3()
 {
     printf("\nMAPDEMO3\n");
     cmap_str table = cmap_str_init();
-    cmap_str_emplace_put(&table, "Map", "test");
-    cmap_str_emplace_put(&table, "Make", "my");
-    cmap_str_emplace_put(&table, "Sunny", "day");
+    cmap_str_emplace(&table, "Map", "test");
+    cmap_str_emplace(&table, "Make", "my");
+    cmap_str_emplace(&table, "Sunny", "day");
     cmap_str_value_t *e = cmap_str_find(&table, "Make").ref;
     c_foreach (i, cmap_str, table)
         printf("entry: %s: %s\n", i.ref->first.str, i.ref->second.str);

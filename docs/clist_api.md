@@ -29,7 +29,7 @@ Default values are given above for args not specified. `X` is a type tag name an
 will affect the names of all clist types and methods. E.g. declaring `using_clist(my, int);`, `X` should
 be replaced by `my` in all of the following documentation. `using_clist_str()` is a shorthand for
 ```c
-using_clist(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_to_raw, const char*)
+using_clist(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
 ```
 
 ## Header file

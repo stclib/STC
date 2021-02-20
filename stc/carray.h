@@ -48,10 +48,10 @@ int main()
 
 #define using_carray(...) c_MACRO_OVERLOAD(using_carray, __VA_ARGS__)
 #define using_carray_2(X, Value) \
-    using_carray_4(X, Value, c_default_del, c_default_clone)
+    using_carray_4(X, Value, c_default_del, c_default_fromraw)
 
 #define using_carray_3(X, Value, valueDestroy) \
-    using_carray_4(X, Value, valueDestroy, c_no_clone)
+    using_carray_4(X, Value, valueDestroy, c_no_fromraw)
 
 #define using_carray_4(X, Value, valueDestroy, valueClone) \
 \

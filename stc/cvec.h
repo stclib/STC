@@ -31,11 +31,11 @@
 #define using_cvec_2(X, Value) \
                     using_cvec_3(X, Value, c_default_compare)
 #define using_cvec_3(X, Value, valueCompare) \
-                    using_cvec_7(X, Value, valueCompare, c_default_del, c_default_clone, c_default_to_raw, Value)
+                    using_cvec_7(X, Value, valueCompare, c_default_del, c_default_fromraw, c_default_toraw, Value)
 #define using_cvec_4(X, Value, valueCompare, valueDestroy) \
-                    using_cvec_7(X, Value, valueCompare, valueDestroy, c_no_clone, c_default_to_raw, Value)
+                    using_cvec_7(X, Value, valueCompare, valueDestroy, c_no_fromraw, c_default_toraw, Value)
 #define using_cvec_str() \
-                    using_cvec_7(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_to_raw, const char*)
+                    using_cvec_7(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
 
 #define typedefs_cvec(X, Value, RawValue) \
     typedef Value cvec_##X##_value_t; \

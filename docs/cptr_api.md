@@ -11,7 +11,7 @@ The pointed-to elements are automatically destructed and deleted when the contai
 ```c
 using_cptr(X, Value, valueCompare=c_default_compare,
                      valueDestroy=c_default_del,
-                     valueClone=c_default_clone)
+                     valueClone=c_default_fromraw)
 
 using_csptr(X, Value, valueCompare=c_default_compare,
                       valueDestroy=c_default_del,
@@ -86,8 +86,8 @@ void Person_del(Person* p) {
     c_del(cstr, &p->name, &p->last);
 }
 // declare managed pointer and cvec with pointers
-using_cptr(pe, Person, c_no_compare, Person_del, c_no_clone);
-using_cvec(pe, Person*, c_no_compare, cptr_pe_del, c_no_clone);
+using_cptr(pe, Person, c_no_compare, Person_del, c_no_fromraw);
+using_cvec(pe, Person*, c_no_compare, cptr_pe_del, c_no_fromraw);
 
 int main() {
     cvec_pe vec = cvec_pe_init();

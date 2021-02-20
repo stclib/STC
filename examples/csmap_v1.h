@@ -50,19 +50,19 @@ int main(void) {
     using_csmap_4(X, Key, Mapped, c_default_compare)
 
 #define using_csmap_4(X, Key, Mapped, keyCompare) \
-    using_csmap_6(X, Key, Mapped, keyCompare, c_default_del, c_default_clone)
+    using_csmap_6(X, Key, Mapped, keyCompare, c_default_del, c_default_fromraw)
 
 #define using_csmap_6(X, Key, Mapped, keyCompare, mappedDel, mappedClone) \
-    using_csmap_8(X, Key, Mapped, keyCompare, mappedDel, mappedClone, c_default_del, c_default_clone)
+    using_csmap_8(X, Key, Mapped, keyCompare, mappedDel, mappedClone, c_default_del, c_default_fromraw)
 
 #define using_csmap_8(X, Key, Mapped, keyCompare, mappedDel, mappedClone, keyDel, keyClone) \
     using_csmap_10(X, Key, Mapped, keyCompare, mappedDel, mappedClone, \
-                      keyDel, keyClone, c_default_to_raw, Key)
+                      keyDel, keyClone, c_default_toraw, Key)
 
 #define using_csmap_10(X, Key, Mapped, keyCompareRaw, mappedDel, mappedClone, \
                           keyDel, keyFromRaw, keyToRaw, RawKey) \
     _using_CBST(X, csmap, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \
-                   keyFromRaw, keyToRaw, RawKey, mappedClone, c_default_to_raw, Mapped)
+                   keyFromRaw, keyToRaw, RawKey, mappedClone, c_default_toraw, Mapped)
 
 /* csset: */
 #define using_csset(...) \
@@ -72,10 +72,10 @@ int main(void) {
     using_csset_3(X, Key, c_default_compare)
 
 #define using_csset_3(X, Key, keyCompare) \
-    using_csset_5(X, Key, keyCompare, c_default_del, c_default_clone)
+    using_csset_5(X, Key, keyCompare, c_default_del, c_default_fromraw)
 
 #define using_csset_5(X, Key, keyCompare, keyDel, keyClone) \
-    using_csset_7(X, Key, keyCompare, keyDel, keyClone, c_default_to_raw, Key)
+    using_csset_7(X, Key, keyCompare, keyDel, keyClone, c_default_toraw, Key)
 
 #define using_csset_7(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
     _using_CBST(X, csset, Key, Key, keyCompareRaw, _UNUSED_, keyDel, \
@@ -86,20 +86,20 @@ int main(void) {
     _using_CBST_strkey(str, csset, cstr_t, _UNUSED_, _UNUSED_)
 #define using_csmap_str() \
     _using_CBST(str, csmap, cstr_t, cstr_t, cstr_compare_raw, cstr_del, cstr_del, \
-                     cstr_from, cstr_to_raw, const char*, cstr_from, cstr_to_raw, const char*)
+                     cstr_from, cstr_c_str, const char*, cstr_from, cstr_c_str, const char*)
 
 #define using_csmap_strkey(...) \
     c_MACRO_OVERLOAD(using_csmap_strkey, __VA_ARGS__)
 
 #define using_csmap_strkey_2(X, Mapped) \
-    _using_CBST_strkey(X, csmap, Mapped, c_default_del, c_default_clone)
+    _using_CBST_strkey(X, csmap, Mapped, c_default_del, c_default_fromraw)
 
 #define using_csmap_strkey_4(X, Mapped, mappedDel, mappedClone) \
     _using_CBST_strkey(X, csmap, Mapped, mappedDel, mappedClone)
 
 #define _using_CBST_strkey(X, C, Mapped, mappedDel, mappedClone) \
     _using_CBST(X, C, cstr_t, Mapped, cstr_compare_raw, mappedDel, cstr_del, \
-                   cstr_from, cstr_to_raw, const char*, mappedClone, c_default_to_raw, Mapped)
+                   cstr_from, cstr_c_str, const char*, mappedClone, c_default_toraw, Mapped)
 
 #define using_csmap_strval(...) \
     c_MACRO_OVERLOAD(using_csmap_strval, __VA_ARGS__)
@@ -108,14 +108,14 @@ int main(void) {
     using_csmap_strval_3(X, Key, c_default_compare)
 
 #define using_csmap_strval_3(X, Key, keyCompare) \
-    using_csmap_strval_5(X, Key, keyCompare, c_default_del, c_default_clone)
+    using_csmap_strval_5(X, Key, keyCompare, c_default_del, c_default_fromraw)
 
 #define using_csmap_strval_5(X, Key, keyCompare, keyDel, keyClone) \
-    using_csmap_strval_7(X, Key, keyCompare, keyDel, keyClone, c_default_to_raw, Key)
+    using_csmap_strval_7(X, Key, keyCompare, keyDel, keyClone, c_default_toraw, Key)
 
 #define using_csmap_strval_7(X, Key, keyCompare, keyDel, keyFromRaw, keyToRaw, RawKey) \
     _using_CBST(X, csmap, Key, cstr_t, keyCompare, cstr_del, keyDel, \
-                   keyFromRaw, keyToRaw, RawKey, cstr_from, cstr_to_raw, const char*)
+                   keyFromRaw, keyToRaw, RawKey, cstr_from, cstr_c_str, const char*)
 
 #define SET_ONLY_csset(...) __VA_ARGS__
 #define SET_ONLY_csmap(...)

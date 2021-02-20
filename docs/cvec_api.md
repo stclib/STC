@@ -26,7 +26,7 @@ be replaced by `my` in all of the following documentation.
 
 `using_cvec_str()` is a shorthand for:
 ```
-using_cvec(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_to_raw, const char*)
+using_cvec(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
 ```
 
 ## Header file
