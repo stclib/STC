@@ -76,8 +76,6 @@ int main() {
         valueDestroy(*self); \
         c_free(*self); \
     } \
-    STC_INLINE cptr_##X \
-    cptr_##X##_clone(cptr_##X ptr) { return ptr; } \
 \
     STC_INLINE void \
     cptr_##X##_reset(cptr_##X* self, cptr_##X##_value_t* p) { \

@@ -67,7 +67,7 @@ int main(int argc, char **argv)
   printf("\nPhone book after erasing Tariq and Elliott:\n");
   print_phone_book(phone_book);
 
-  cmap_str_put(&phone_book, "Zak Byers", "(555) 396-188");
+  cmap_str_emplace_put(&phone_book, "Zak Byers", "(555) 396-188");
 
   printf("\nPhone book after update phone of Zak Byers:\n");
   print_phone_book(phone_book);

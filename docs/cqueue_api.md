@@ -34,9 +34,10 @@ bool                    cqueue_X_empty(cqueue_X q);
 cqueue_X_value_t*       cqueue_X_front(cqueue_X* self);
 cqueue_X_value_t*       cqueue_X_back(cqueue_X* self);
 
-void                    cqueue_X_push_n(cqueue_X *self, const cqueue_X_rawvalue_t arr[], size_t size);
-void                    cqueue_X_emplace(cqueue_X* self, cqueue_X_rawvalue_t raw);
 void                    cqueue_X_push(cqueue_X* self, cqueue_X_value_t value);
+void                    cqueue_X_emplace(cqueue_X* self, cqueue_X_rawvalue_t raw);
+void                    cqueue_X_push_n(cqueue_X *self, const cqueue_X_rawvalue_t arr[], size_t size);
+
 void                    cqueue_X_pop(cqueue_X* self);
 
 cqueue_X_iter_t         cqueue_X_begin(cqueue_X* self);

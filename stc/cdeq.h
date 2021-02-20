@@ -31,9 +31,9 @@
 #define using_cdeq_2(X, Value) \
                     using_cdeq_3(X, Value, c_default_compare)
 #define using_cdeq_3(X, Value, valueCompare) \
-                    using_cdeq_5(X, Value, valueCompare, c_default_del, c_default_clone)
-#define using_cdeq_5(X, Value, valueCompare, valueDestroy, valueClone) \
-                    using_cdeq_7(X, Value, valueCompare, valueDestroy, valueClone, c_default_to_raw, Value)
+                    using_cdeq_7(X, Value, valueCompare, c_default_del, c_default_clone, c_default_to_raw, Value)
+#define using_cdeq_4(X, Value, valueCompare, valueDestroy) \
+                    using_cdeq_7(X, Value, valueCompare, valueDestroy, c_no_clone, c_default_to_raw, Value)
 #define using_cdeq_str() \
                     using_cdeq_7(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_to_raw, const char*)
 

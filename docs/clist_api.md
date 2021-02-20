@@ -17,11 +17,11 @@ See the c++ class [std::forward_list](https://en.cppreference.com/w/cpp/containe
 ## Declaration
 
 ```c
-using_clist(X, Value, valueCompareRaw=c_default_compare,
-                      valueDestroy=c_default_del,
-                      valueFromRaw=c_default_clone,
-                      valueToRaw=c_default_to_raw,
-                      RawValue=Value)
+using_clist(X, Value);
+using_clist(X, Value, valueCompareRaw);
+using_clist(X, Value, valueCompareRaw, valueDestroy);
+using_clist(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue);
+
 using_clist_str()
 ```
 The macro `using_clist()` can be instantiated with 2, 3, 5, or 7 arguments in the global scope.
@@ -54,17 +54,18 @@ size_t              clist_X_size(clist_X list); // note: O(n)
 clist_X_value_t*    clist_X_front(clist_X* self);
 clist_X_value_t*    clist_X_back(clist_X* self);
 
-void                clist_X_emplace_front(clist_X* self, RawValue raw);
 void                clist_X_push_front(clist_X* self, Value value);
+void                clist_X_emplace_front(clist_X* self, RawValue raw);
+
+                    // non-std:
+void                clist_X_push_back(clist_X* self, Value value);
+void                clist_X_emplace_back(clist_X* self, RawValue raw);
+void                clist_X_push_n(clist_X *self, const clist_X_rawvalue_t arr[], size_t size);
+
 void                clist_X_pop_front(clist_X* self);
 
-                    // non-std: push back, complexity O(1)
-void                clist_X_push_n(clist_X *self, const clist_X_rawvalue_t arr[], size_t size);
-void                clist_X_emplace_back(clist_X* self, RawValue ref);
-void                clist_X_push_back(clist_X* self, Value value);
-
+clist_X_iter_t      clist_X_insert_after(clist_X* self, clist_X_iter_t it, Value value);
 clist_X_iter_t      clist_X_emplace_after(clist_X* self, clist_X_iter_t it, RawValue raw);
-clist_X_iter_t      clist_X_insert_after(clist_X* self, clist_X_iter_t it, Value raw);
 
 clist_X_iter_t      clist_X_erase_after(clist_X* self, clist_X_iter_t it);
 clist_X_iter_t      clist_X_erase_range_after(clist_X* self, clist_X_iter_t it1, clist_X_iter_t it2);
@@ -173,19 +174,19 @@ using_clist(i, int);
 
 int main ()
 {
-  c_init (clist_i, L, {10, 20, 30, 40, 50});
-                                               // 10 20 30 40 50
-  clist_i_iter_t it = clist_i_begin(&L);       // ^
-  it = clist_i_erase_after(&L, it);            // 10 30 40 50
-                                               //    ^
-  clist_i_iter_t end = clist_i_end(&L);        //
-  it = clist_i_erase_range_after(&L, it, end); // 10 30
-                                               //       ^
-  printf("mylist contains:");
-  c_foreach (x, clist_i, L) printf(" %d", *x.ref);
-  puts("");
+    c_init (clist_i, L, {10, 20, 30, 40, 50});
+                                                 // 10 20 30 40 50
+    clist_i_iter_t it = clist_i_begin(&L);       // ^
+    it = clist_i_erase_after(&L, it);            // 10 30 40 50
+                                                 //    ^
+    clist_i_iter_t end = clist_i_end(&L);        //
+    it = clist_i_erase_range_after(&L, it, end); // 10 30
+                                                 //       ^
+    printf("mylist contains:");
+    c_foreach (x, clist_i, L) printf(" %d", *x.ref);
+    puts("");
 
-  clist_i_del(&L);
+    clist_i_del(&L);
 }
 ```
 Output:

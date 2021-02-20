@@ -8,41 +8,37 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 ## Declaration
 
 ```c
-using_csmap(X, Key, Mapped, keyCompareRaw=c_default_compare,
-                            mappedDestroy=c_default_del,
-                            mappedClone=c_default_clone,
-                            keyDestroy=c_default_del,
-                            keyFromRaw=c_default_clone,
-                            keyToRaw=c_default_to_raw,
-                            RawKey=Key)
+using_csmap(X, Key, Mapped);
+using_csmap(X, Key, Mapped, keyCompare);
+using_csmap(X, Key, Mapped, keyCompare, mappedDestroy);
+using_csmap(X, Key, Mapped, keyCompare, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped);
+using_csmap(X, Key, Mapped, keyCompareRaw, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped,
+                                           keyDestroy, keyFromRaw, keyToRaw, RawKey);
+using_csmap_keyarg(X, Key, Mapped, keyCompare, keyDestroy);
+using_csmap_keyarg(X, Key, Mapped, keyCompareRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
 
-using_csmap_strkey(X, Mapped, mappedDestroy=c_default_del,
-                              mappedClone=c_default_clone)
+using_csmap_strkey(X, Mapped);                     // csmap(str, cstr, Mapped, ...)
+using_csmap_strkey(X, Mapped, mappedDestroy);
+using_csmap_strkey(X, Mapped, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped);
 
-using_csmap_strval(X, Key, keyCompare=c_default_compare,
-                           keyDestroy=c_default_del,
-                           keyFromRaw=c_default_clone,
-                           keyToRaw=c_default_to_raw,
-                           RawKey=Key)
-using_csmap_str()
+using_csmap_strval(X, Key);                        // csmap(str, Key, cstr, ...)
+using_csmap_strval(X, Key, keyCompare);
+using_csmap_strval(X, Key, keyCompare, keyDestroy);
+using_csmap_strval(X, Key, keyCompareRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
+
+using_csmap_str();                                 // csmap(str, cstr, cstr, ...)
 ```
-The macro `using_csmap()` can be instantiated with 3, 4, 6, 8, or 10 arguments in the global scope.
+The `using_csmap()` macro family must be instantiated in the global scope.
 Default values are given above for args not specified. `X` is a type tag name and
 will affect the names of all csmap types and methods. E.g. declaring `using_csmap(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.
-
-`using_csmap_strkey()` and `using_csmap_strval()` are special macros defined by
-`using_csmap()`. The macro `using_csmap_str()` is a shorthand for
-```c
-using_csmap(str, cstr, cstr, cstr_compare_raw, cstr_del, cstr_from, ...)
-```
 
 ## Header file
 
 All csmap definitions and prototypes may be included in your C source file by including a single header file.
 
 ```c
-#include "stc/csmap.h"
+#include <stc/csmap.h>
 ```
 ## Methods
 
@@ -60,11 +56,12 @@ csmap_X_iter_t      csmap_X_find(const csmap_X* self, RawKey rkey);
 csmap_X_value_t*    csmap_X_find_it(const csmap_X* self, RawKey rkey, csmap_X_iter_t* out);  // return NULL if not found
 bool                csmap_X_contains(const csmap_X* self, RawKey rkey);
 
-void                csmap_X_push_n(csmap_X* self, const csmap_X_rawvalue_t arr[], size_t size);
+csmap_X_result_t    csmap_X_insert(csmap_X* self, Key key, Mapped mapped);                    // no change if key in map
+csmap_X_result_t    csmap_X_insert_or_assign(csmap_X* self, Key key, Mapped mapped);          // always update mapped
 csmap_X_result_t    csmap_X_emplace(csmap_X* self, RawKey rkey, RawMapped rmapped);           // no change if rkey in map
-csmap_X_result_t    csmap_X_put(csmap_X* self, RawKey rkey, RawMapped rmapped);               // std::map::operator[]
-csmap_X_result_t    csmap_X_insert(csmap_X* self, Key key, Mapped mapped);                    // like emplace, other params
-csmap_X_result_t    csmap_X_insert_or_assign(csmap_X* self, Key key, Mapped mapped);          // like put, other params
+csmap_X_result_t    csmap_X_emplace_put(csmap_X* self, RawKey rkey, RawMapped rmapped); // always update rmapped
+void                csmap_X_push_n(csmap_X* self, const csmap_X_rawvalue_t arr[], size_t size);
+
 csmap_X_mapped_t*   csmap_X_at(const csmap_X* self, RawKey rkey);                             // rkey must be in map.
 
 size_t              csmap_X_erase(csmap_X* self, RawKey rkey);
@@ -152,7 +149,7 @@ int main()
         {110, "Blue"},
     });
     /* put replaces existing mapped value: */
-    csmap_id_put(&idnames, 110, "White");
+    csmap_id_emplace_put(&idnames, 110, "White");
     /* put a constructed mapped value into map: */
     csmap_id_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
     /* emplace inserts only when key does not exist: */
@@ -192,10 +189,10 @@ int main()
 {
     csmap_vi vecs = csmap_vi_init();
 
-    csmap_vi_put(&vecs, (Vec3i){100,   0,   0}, 1);
-    csmap_vi_put(&vecs, (Vec3i){  0, 100,   0}, 2);
-    csmap_vi_put(&vecs, (Vec3i){  0,   0, 100}, 3);
-    csmap_vi_put(&vecs, (Vec3i){100, 100, 100}, 4);
+    csmap_vi_emplace_put(&vecs, (Vec3i){100,   0,   0}, 1);
+    csmap_vi_emplace_put(&vecs, (Vec3i){  0, 100,   0}, 2);
+    csmap_vi_emplace_put(&vecs, (Vec3i){  0,   0, 100}, 3);
+    csmap_vi_emplace_put(&vecs, (Vec3i){100, 100, 100}, 4);
 
     c_foreach (i, csmap_vi, vecs)
         printf("{ %3d, %3d, %3d }: %d\n", i.ref->first.x, i.ref->first.y, i.ref->first.z, i.ref->second);
@@ -223,10 +220,10 @@ using_csmap(iv, int, Vec3i);
 int main()
 {
     csmap_iv vecs = csmap_iv_init();
-    csmap_iv_put(&vecs, 1, (Vec3i){100,   0,   0});
-    csmap_iv_put(&vecs, 2, (Vec3i){  0, 100,   0});
-    csmap_iv_put(&vecs, 3, (Vec3i){  0,   0, 100});
-    csmap_iv_put(&vecs, 4, (Vec3i){100, 100, 100});
+    csmap_iv_emplace_put(&vecs, 1, (Vec3i){100,   0,   0});
+    csmap_iv_emplace_put(&vecs, 2, (Vec3i){  0, 100,   0});
+    csmap_iv_emplace_put(&vecs, 3, (Vec3i){  0,   0, 100});
+    csmap_iv_emplace_put(&vecs, 4, (Vec3i){100, 100, 100});
 
     c_foreach (i, csmap_iv, vecs)
         printf("%d: { %3d, %3d, %3d }\n", i.ref->first, i.ref->second.x, i.ref->second.y, i.ref->second.z);

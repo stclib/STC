@@ -12,7 +12,6 @@ void viking_del(Viking* vk) {
     cstr_del(&vk->country);
 }
 
-
 // Define Viking raw struct with hash, equals, and convertion functions between Viking and VikingRaw structs:
 
 typedef struct VikingRaw {
@@ -31,16 +30,14 @@ static inline int vikingraw_equals(const VikingRaw* rx, const VikingRaw* ry) {
 static inline Viking viking_fromRaw(VikingRaw raw) { // note: parameter is by value
     Viking vk = {cstr_from(raw.name), cstr_from(raw.country)}; return vk;
 }
-
 static inline VikingRaw viking_toRaw(Viking* vk) {
     VikingRaw raw = {vk->name.str, vk->country.str}; return raw;
 }
 
-// With this in place, we use the full using_cmap() macro to define {Viking -> int} hash map type:
+// With this in place, we use the using_cmap_keyarg() macro to define {Viking -> int} hash map type:
 
-using_cmap(vk, Viking, int, vikingraw_equals, vikingraw_hash,
-                            c_default_del, c_default_clone,
-                            viking_del, viking_fromRaw, viking_toRaw, VikingRaw);
+using_cmap_keyarg(vk, Viking, int, vikingraw_equals, vikingraw_hash,
+                      viking_del, viking_fromRaw, viking_toRaw, VikingRaw);
 
 int main()
 {
@@ -50,7 +47,7 @@ int main()
         { {"Olaf", "Denmark"}, 24},
         { {"Harald", "Iceland"}, 12},
     });
-    cmap_vk_put(&vikings, (VikingRaw){"Bjorn", "Sweden"}, 10);
+    cmap_vk_emplace_put(&vikings, (VikingRaw){"Bjorn", "Sweden"}, 10);
 
     VikingRaw lookup = {"Einar", "Norway"};
 

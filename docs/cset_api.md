@@ -7,13 +7,11 @@ A **cset** is an associative container that contains a set of unique objects of 
 ## Declaration
 
 ```c
-using_cset(X, Key, keyEqualsRaw=c_default_equals,
-                   keyHashRaw=c_default_hash,
-                   keyDestroy=c_default_del,
-                   keyFromRaw=c_default_clone,
-                   keyToRaw=c_default_to_raw,                           
-                   RawKey=Key)
-using_cset_str()                           
+using_cset(X, Key);
+using_cset(X, Key, keyEqualsRaw, keyHashRaw);
+using_cset(X, Key, keyEqualsRaw, keyHashRaw, keyDestroy);
+using_cset(X, Key, keyEqualsRaw, keyHashRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
+using_cset_str();
 ```
 The macro `using_cset()` can be instantiated with 2, 4, 6, or 8 arguments in the global scope.
 Default values are given above for args not specified. `X` is a type tag name and
@@ -51,13 +49,13 @@ size_t              cset_X_capacity(cset_X set);
 cset_X_iter_t       cset_X_find(const cset_X* self, RawKey rkey);
 bool                cset_X_contains(const cset_X* self, RawKey rkey);
 
-void                cset_X_push_n(cset_X* self, const RawKey arr[], size_t size);
-cset_X_result_t     cset_X_emplace(cset_X* self, RawKey rkey);
 cset_X_result_t     cset_X_insert(cset_X* self, Key key);
+cset_X_result_t     cset_X_emplace(cset_X* self, RawKey rkey);
+void                cset_X_push_n(cset_X* self, const RawKey arr[], size_t size);
 
 size_t              cset_X_erase(cset_X* self, RawKey rkey);
-void                cset_X_erase_entry(cset_X* self, cset_X_key_t* key);
 cset_X_iter_t       cset_X_erase_at(cset_X* self, cset_X_iter_t pos);
+void                cset_X_erase_entry(cset_X* self, cset_X_key_t* key);
 
 cset_X_iter_t       cset_X_begin(cset_X* self);
 cset_X_iter_t       cset_X_end(cset_X* self);

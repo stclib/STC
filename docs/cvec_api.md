@@ -12,11 +12,11 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ## Declaration
 
 ```c
-using_cvec(X, Value, valueCompareRaw=c_default_compare,
-                     valueDestroy=c_default_del,
-                     valueFromRaw=c_default_clone,
-                     valueToRaw=c_default_to_raw,
-                     RawValue=Value)
+using_cvec(X, Value);
+using_cvec(X, Value, valueCompareRaw);
+using_cvec(X, Value, valueCompareRaw, valueDestroy);
+using_cvec(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue);
+
 using_cvec_str()
 ```
 The macro `using_cvec()` can be instantiated with 2, 3, 5, or 7 arguments in the global scope.
@@ -60,19 +60,20 @@ cvec_X_value_t*     cvec_X_at(cvec_X* self, size_t idx);
 cvec_X_value_t*     cvec_X_front(cvec_X* self);
 cvec_X_value_t*     cvec_X_back(cvec_X* self);
 
-void                cvec_X_push_n(cvec_X *self, const cvec_X_rawvalue_t arr[], size_t size);
-void                cvec_X_emplace_back(cvec_X* self, RawValue raw);
 void                cvec_X_push_back(cvec_X* self, Value value);
+void                cvec_X_emplace_back(cvec_X* self, RawValue raw);
+void                cvec_X_push_n(cvec_X *self, const cvec_X_rawvalue_t arr[], size_t size);
+
 void                cvec_X_pop_back(cvec_X* self);
 
-cvec_X_iter_t       cvec_X_emplace(cvec_X* self, size_t idx, RawValue raw);
-cvec_X_iter_t       cvec_X_emplace_at(cvec_X* self, cvec_X_iter_t pos, RawValue raw);
 cvec_X_iter_t       cvec_X_insert(cvec_X* self, size_t idx, Value value);
 cvec_X_iter_t       cvec_X_insert_at(cvec_X* self, cvec_X_iter_t pos, Value value);
 cvec_X_iter_t       cvec_X_insert_range(cvec_X* self, cvec_X_iter_t pos,
                                         cvec_X_iter_t first, cvec_X_iter_t finish);
 cvec_X_iter_t       cvec_X_insert_range_p(cvec_X* self, cvec_X_value_t* pos,
                                           const cvec_X_value_t* pfirst, const cvec_X_value_t* pfinish);
+cvec_X_iter_t       cvec_X_emplace(cvec_X* self, size_t idx, RawValue raw);
+cvec_X_iter_t       cvec_X_emplace_at(cvec_X* self, cvec_X_iter_t pos, RawValue raw);
 
 cvec_X_iter_t       cvec_X_erase(cvec_X* self, size_t idx, size_t n);
 cvec_X_iter_t       cvec_X_erase_at(cvec_X* self, cvec_X_iter_t pos);

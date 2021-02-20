@@ -50,6 +50,9 @@ int main()
 #define using_carray_2(X, Value) \
     using_carray_4(X, Value, c_default_del, c_default_clone)
 
+#define using_carray_3(X, Value, valueDestroy) \
+    using_carray_4(X, Value, valueDestroy, c_no_clone)
+
 #define using_carray_4(X, Value, valueDestroy, valueClone) \
 \
     typedef Value carray1##X##_value_t; \

@@ -127,7 +127,7 @@ static void ins_and_erase_csmap_i(picobench::state& s)
     csmap_i_clear(&map);
     stc64_srandom(seed);
     c_forrange (i, s.iterations())
-        csmap_i_put(&map, stc64_random() & mask, i);
+        csmap_i_emplace_put(&map, stc64_random() & mask, i);
 
     stc64_srandom(seed);
     c_forrange (s.iterations())
@@ -222,7 +222,7 @@ static void ins_and_access_csmap_s(picobench::state& s)
     picobench::scope scope(s);
     c_forrange (s.iterations()) {
         randomize(str.str, cstr_size(str));
-        csmap_s_put(&map, str.str, cstr_clone(str));
+        csmap_s_emplace_put(&map, str.str, cstr_clone(str));
         randomize(str.str, cstr_size(str));
         csmap_s_iter_t it = csmap_s_find(&map, str.str);
         if (it.ref) {
@@ -282,7 +282,7 @@ static void iterate_csmap_x(picobench::state& s)
 
     // measure insert then iterate whole map
     c_forrange (n, s.iterations()) {
-        csmap_x_put(&map, stc64_random(), n);
+        csmap_x_emplace_put(&map, stc64_random(), n);
         if (!(n & K)) c_foreach (i, csmap_x, map)
             result += i.ref->second;
     }

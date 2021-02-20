@@ -5,10 +5,10 @@
 
 void check_del(float* v) {printf("destroy %g\n", *v);}
 
-using_carray(f, float, check_del, c_default_clone); // normally omit the last 2 arguments - float type need no destroy.
-using_clist(a, carray2f, c_no_compare, carray2f_del, carray2f_clone);
-using_cmap(l, int, clist_a, c_default_equals, c_default_hash, clist_a_del, clist_a_clone);
-using_cmap_strkey(s, cmap_l, cmap_l_del, cmap_l_clone);
+using_carray(f, float, check_del);
+using_clist(a, carray2f, c_no_compare, carray2f_del);
+using_cmap(l, int, clist_a, c_default_equals, c_default_hash, clist_a_del);
+using_cmap_strkey(s, cmap_l, cmap_l_del);
 
 int main() {
     int xdim = 4, ydim = 6;
@@ -26,8 +26,8 @@ int main() {
     // Put in some data.
     *carray2f_at(&arr_a, y, x) = 3.1415927f; // aa[y][x]
     clist_a_push_back(&tableList, arr_a);
-    cmap_l_put(&listMap, tableKey, tableList);
-    cmap_s_put(&myMap, strKey, listMap);
+    cmap_l_insert(&listMap, tableKey, tableList);
+    cmap_s_insert(&myMap, cstr_from(strKey), listMap);
 
     // Access the data entry
     carray2f arr_b = *clist_a_back(&cmap_l_find(&cmap_s_find(&myMap, strKey).ref->second, tableKey).ref->second);

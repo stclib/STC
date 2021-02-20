@@ -5,7 +5,7 @@
 #include <stc/cpque.h>
 #include <stc/clist.h>
 
-using_cmap(id, int, cstr, c_default_equals, c_default_hash, cstr_del, cstr_clone); // Map of int -> cstr
+using_cmap(id, int, cstr, c_default_equals, c_default_hash, cstr_del); // Map of int -> cstr
 using_cmap_strkey(cnt, int);
 
 typedef struct {int x, y;} ipair_t;
@@ -46,11 +46,9 @@ int main(void)
 
     int year = 2020;
     cmap_id idnames = cmap_id_init();
-    c_push_items(&idnames, cmap_id, {
-        {100, cstr_from("Hello")},
-        {110, cstr_from("World")},
-        {120, cstr_from_fmt("Howdy, -%d-", year)},
-    });
+    cmap_id_insert(&idnames, 100, cstr_from("Hello"));
+    cmap_id_insert(&idnames, 110, cstr_from("World"));
+    cmap_id_insert(&idnames, 120, cstr_from_fmt("Howdy, -%d-", year));
 
     c_foreach (i, cmap_id, idnames)
         printf("%d: %s\n", i.ref->first, i.ref->second.str);

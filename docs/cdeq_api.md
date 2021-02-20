@@ -8,12 +8,12 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 ## Declaration
 
 ```c
-using_cdeq(X, Value, valueCompareRaw=c_default_compare,
-                     valueDestroy=c_default_del,
-                     valueFromRaw=c_default_clone,
-                     valueToRaw=c_default_to_raw,
-                     RawValue=Value)
-using_cdeq_str()
+using_cdeq(X, Value);
+using_cdeq(X, Value, valueCompareRaw);
+using_cdeq(X, Value, valueCompareRaw, valueDestroy);
+using_cdeq(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue);
+
+using_cdeq_str();
 ```
 The macro `using_cdeq()` can be instantiated with 2, 3, 5, or 7 arguments in the global scope.
 Defaults values are given above for args not specified. `X` is a type tag name and
@@ -60,11 +60,12 @@ cdeq_X_iter_t       cdeq_X_find(const cdeq_X* self, RawValue raw);
 cdeq_X_iter_t       cdeq_X_find_in_range(const cdeq_X* self,
                                          cdeq_X_iter_t first, cdeq_X_iter_t finish, RawValue raw);
 
-void                cdeq_X_push_n(cdeq_X *self, const cdeq_X_rawvalue_t arr[], size_t size);
 void                cdeq_X_push_front(cdeq_X* self, Value value);
 void                cdeq_X_push_back(cdeq_X* self, Value value);
 void                cdeq_X_emplace_front(cdeq_X* self, RawValue raw);
 void                cdeq_X_emplace_back(cdeq_X* self, RawValue raw);
+void                cdeq_X_push_n(cdeq_X *self, const cdeq_X_rawvalue_t arr[], size_t size);
+
 void                cdeq_X_pop_front(cdeq_X* self);
 void                cdeq_X_pop_back(cdeq_X* self);
 

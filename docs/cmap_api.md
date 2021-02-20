@@ -9,43 +9,37 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 ## Declaration
 
 ```c
-using_cmap(X, Key, Mapped, keyEqualsRaw=c_default_equals,
-                           keyHashRaw=c_default_hash,
-                           mappedDestroy=c_default_del,
-                           mappedClone=c_default_clone,
-                           keyDestroy=c_default_del,
-                           keyFromRaw=c_default_clone,
-                           keyToRaw=c_default_to_raw,
-                           RawKey=Key)
+using_cmap(X, Key, Mapped);
+using_cmap(X, Key, Mapped, keyEquals, keyHash);
+using_cmap(X, Key, Mapped, keyEquals, keyHash, mappedDestroy);
+using_cmap(X, Key, Mapped, keyEquals, keyHash, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped);
+using_cmap(X, Key, Mapped, keyEqualsRaw, keyHashRaw, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped,
+                                                     keyDestroy, keyFromRaw, keyToRaw, RawKey);
+using_cmap_keyarg(X, Key, Mapped, keyEquals, keyHash, keyDestroy);
+using_cmap_keyarg(X, Key, Mapped, keyEqualsRaw, keyHashRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
 
-using_cmap_strkey(X, Mapped, mappedDestroy=c_default_del,
-                             mappedClone=c_default_clone)
+using_cmap_strkey(X, Mapped);                    // cmap(str, cstr, Mapped, ...)
+using_cmap_strkey(X, Mapped, mappedDestroy);
+using_cmap_strkey(X, Mapped, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped);
 
-using_cmap_strval(X, Key, keyEquals=c_default_equals,
-                          keyHash=c_default_hash,
-                          keyDestroy=c_default_del,
-                          keyFromRaw=c_default_clone,
-                          keyToRaw=c_default_to_raw,
-                          RawKey=Key)
-using_cmap_str()
+using_cmap_strval(X, Key);                       // cmap(str, Key, cstr, ...)
+using_cmap_strval(X, Key, keyEquals, keyHash);
+using_cmap_strval(X, Key, keyEquals, keyHash, keyDestroy);
+using_cmap_strval(X, Key, keyEqualsRaw, keyHashRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
+
+using_cmap_str()                                 // cmap(str, cstr, cstr, ...)
 ```
-The macro `using_cmap()` can be instantiated with 3, 5, 7, 9, or 11 arguments in the global scope.
+The `using_cmap()` macro family must be instantiated in the global scope.
 Default values are given above for args not specified. `X` is a type tag name and
 will affect the names of all cmap types and methods. E.g. declaring `using_cmap(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.
-
-`using_cmap_strkey()` and `using_cmap_strval()` are special macros defined by
-`using_cmap()`. The macro `using_cmap_str()` is a shorthand for
-```c
-using_cmap(str, cstr_t, cstr_t, cstr_del, ...) // uses char* as "raw" types
-```
 
 ## Header file
 
 All cmap definitions and prototypes may be included in your C source file by including a single header file.
 
 ```c
-#include "stc/cmap.h"
+#include <stc/cmap.h>
 ```
 ## Methods
 
@@ -69,12 +63,13 @@ size_t              cmap_X_bucket_count(cmap_X map);                            
 cmap_X_iter_t       cmap_X_find(const cmap_X* self, RawKey rkey);
 bool                cmap_X_contains(const cmap_X* self, RawKey rkey);
 
-void                cmap_X_push_n(cmap_X* self, const cmap_X_rawvalue_t arr[], size_t size);
+cmap_X_result_t     cmap_X_insert(cmap_X* self, Key key, Mapped mapped);                     // no change if key in map
+cmap_X_result_t     cmap_X_insert_or_assign(cmap_X* self, Key key, Mapped mapped);           // always update mapped
 cmap_X_result_t     cmap_X_emplace(cmap_X* self, RawKey rkey, RawMapped rmapped);            // no change if rkey in map
-cmap_X_result_t     cmap_X_put(cmap_X* self, RawKey rkey, RawMapped rmapped);                // std::map::operator[]
-cmap_X_result_t     cmap_X_insert(cmap_X* self, Key key, Mapped mapped);                     // like emplace, other params
-cmap_X_result_t     cmap_X_insert_or_assign(cmap_X* self, Key key, Mapped mapped);           // like put, other params
-cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, RawKey rkey);                              // rkey must be in map
+cmap_X_result_t     cmap_X_emplace_put(cmap_X* self, RawKey rkey, RawMapped rmapped);        // always update rmapped
+void                cmap_X_push_n(cmap_X* self, const cmap_X_rawvalue_t arr[], size_t size);
+
+cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, RawKey rkey);                              // rkey must be in map.
 
 size_t              cmap_X_erase(cmap_X* self, RawKey rkey);
 void                cmap_X_erase_entry(cmap_X* self, cmap_X_value_t* entry);
@@ -175,7 +170,7 @@ int main()
         {110, "Blue"},
     });
     /* put replaces existing mapped value: */
-    cmap_id_put(&idnames, 110, "White");
+    cmap_id_emplace_put(&idnames, 110, "White");
     /* put a constructed mapped value into map: */
     cmap_id_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
     /* emplace inserts only when key does not exist: */
@@ -209,10 +204,10 @@ int main()
 {
     cmap_v3 vecs = cmap_v3_init();
 
-    cmap_v3_put(&vecs, (Vec3i){100,   0,   0}, 1);
-    cmap_v3_put(&vecs, (Vec3i){  0, 100,   0}, 2);
-    cmap_v3_put(&vecs, (Vec3i){  0,   0, 100}, 3);
-    cmap_v3_put(&vecs, (Vec3i){100, 100, 100}, 4);
+    cmap_v3_emplace_put(&vecs, (Vec3i){100,   0,   0}, 1);
+    cmap_v3_emplace_put(&vecs, (Vec3i){  0, 100,   0}, 2);
+    cmap_v3_emplace_put(&vecs, (Vec3i){  0,   0, 100}, 3);
+    cmap_v3_emplace_put(&vecs, (Vec3i){100, 100, 100}, 4);
 
     c_foreach (i, cmap_v3, vecs)
         printf("{ %3d, %3d, %3d }: %d\n", i.ref->first.x,  i.ref->first.y,  i.ref->first.z,  i.ref->second);
@@ -240,10 +235,10 @@ using_cmap(iv, int, Vec3i);
 int main()
 {
     cmap_iv vecs = cmap_iv_init();
-    cmap_iv_put(&vecs, 1, (Vec3i){100,   0,   0});
-    cmap_iv_put(&vecs, 2, (Vec3i){  0, 100,   0});
-    cmap_iv_put(&vecs, 3, (Vec3i){  0,   0, 100});
-    cmap_iv_put(&vecs, 4, (Vec3i){100, 100, 100});
+    cmap_iv_emplace_put(&vecs, 1, (Vec3i){100,   0,   0});
+    cmap_iv_emplace_put(&vecs, 2, (Vec3i){  0, 100,   0});
+    cmap_iv_emplace_put(&vecs, 3, (Vec3i){  0,   0, 100});
+    cmap_iv_emplace_put(&vecs, 4, (Vec3i){100, 100, 100});
 
     c_foreach (i, cmap_iv, vecs)
         printf("%d: { %3d, %3d, %3d }\n", i.ref->first, i.ref->second.x,  i.ref->second.y,  i.ref->second.z);
@@ -312,7 +307,7 @@ int main()
         { {"Olaf", "Denmark"}, 24 },
         { {"Harald", "Iceland"}, 12 },
     });
-    cmap_vk_put(&vikings, (VikingRaw){"Bjorn", "Sweden"}, 10);
+    cmap_vk_emplace_put(&vikings, (VikingRaw){"Bjorn", "Sweden"}, 10);
     
     VikingRaw lookup = {"Einar", "Norway"};
 

@@ -236,7 +236,7 @@ static void ins_and_access_cmap_s(picobench::state& s)
     picobench::scope scope(s);
     c_forrange (s.iterations()) {
         randomize(str.str, cstr_size(str));
-        cmap_str_put(&map, str.str, str.str);
+        cmap_str_emplace_put(&map, str.str, str.str);
         randomize(str.str, cstr_size(str));
         cmap_str_iter_t it = cmap_str_find(&map, str.str);
         if (it.ref) {
@@ -303,7 +303,7 @@ static void iterate_cmap_x(picobench::state& s)
 
     // measure insert then iterate whole map
     c_forrange (n, s.iterations()) {
-        cmap_x_put(&map, stc64_random(), n);
+        cmap_x_emplace_put(&map, stc64_random(), n);
         if (!(n & K)) c_foreach (i, cmap_x, map)
             result += i.ref->second;
     }

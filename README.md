@@ -220,7 +220,7 @@ conditionally inserted. The **emplace()** and **put()** methods constructs cstr-
 when required:
 ```c
 cmap_str_emplace(&map, "Hello", "world"); // no cstr is constructed if "Hello" is already in the map.
-cmap_str_put(&map, "Hello", "world!!");   // similar, but cstr_from("world!!") call is always made in put.
+cmap_str_emplace_put(&map, "Hello", "world!!");   // similar, but cstr_from("world!!") call is always made in put.
 it = cmap_str_find(&map, "Hello");        // no cstr constructed for lookup, although keys are cstr-type.
 ```
 In the **cmap_str_insert()** example at the top of this section, both the key and mapped value are first constructed,

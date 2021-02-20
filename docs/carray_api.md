@@ -9,8 +9,8 @@ See the c++ class [boost::multi_array](https://www.boost.org/doc/libs/release/li
 ## Declaration
 
 ```c
-using_carray(X, Value, valueDestroy=c_default_del, 
-                       valueClone=c_default_clone)
+using_carray(X, Value);
+using_carray(X, Value, valueDestroy);
 ```
 The macro `using_carray()` can be instantiated with 2 or 4 arguments in the global scope.
 Default values are given above for args not specified. `X` and `N` are type tags and

@@ -8,12 +8,11 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 ## Declaration
 
 ```c
-using_csset(X, Key, keyCompare=c_default_compare,
-                    keyDestroy=c_default_del,
-                    keyFromRaw=c_default_clone,
-                    keyToRaw=c_default_to_raw,                           
-                    RawKey=Key)
-using_csset_str()                           
+using_csset(X, Key);
+using_csset(X, Key, keyCompare);
+using_csset(X, Key, keyCompare, keyDestroy);
+using_csset(X, Key, keyCompare, keyDestroy, keyFromRaw, keyToRaw, RawKey);
+using_csset_str();
 ```
 The macro `using_csset()` can be instantiated with 2, 3, 5, or 7 arguments in the global scope.
 Default values are given above for args not specified. `X` is a type tag name and
@@ -45,9 +44,9 @@ csset_X_iter_t      csset_X_find(const csset_X* self, RawKey rkey);
 csset_X_value_t*    csset_X_find_it(const csset_X* self, RawKey rkey, csset_X_iter_t* out);
 bool                csset_X_contains(const csset_X* self, RawKey rkey);
 
-void                csset_X_push_n(csset_X* self, const RawKey arr[], size_t size);
-csset_X_result_t    csset_X_emplace(csset_X* self, RawKey rkey);
 csset_X_result_t    csset_X_insert(csset_X* self, Key key);
+csset_X_result_t    csset_X_emplace(csset_X* self, RawKey rkey);
+void                csset_X_push_n(csset_X* self, const RawKey arr[], size_t size);
 
 size_t              csset_X_erase(csset_X* self, RawKey rkey);
 csset_X_iter_t      csset_X_erase_at(csset_X* self, csset_X_iter_t pos);
