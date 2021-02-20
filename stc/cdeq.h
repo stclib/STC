@@ -60,7 +60,7 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
     STC_INLINE size_t \
     cdeq_##X##_capacity(cdeq_##X deq) {return _cdeq_rep(&deq)->cap;} \
     STC_INLINE Value \
-    cdeq_##X##_value_from_raw(RawValue raw) {return valueFromRaw(raw);} \
+    cdeq_##X##_value_fromraw(RawValue raw) {return valueFromRaw(raw);} \
     STC_INLINE cdeq_##X##_value_t \
     cdeq_##X##_value_clone(cdeq_##X##_value_t val) {return valueFromRaw(valueToRaw(&val));} \
     STC_API void \
@@ -100,7 +100,7 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
     } \
 \
     STC_API void \
-    cdeq_##X##_push_n(cdeq_##X *self, const cdeq_##X##_rawvalue_t arr[], size_t n); \
+    cdeq_##X##_emplace_n(cdeq_##X *self, const cdeq_##X##_rawvalue_t arr[], size_t n); \
     STC_API void \
     cdeq_##X##_push_back(cdeq_##X* self, Value value); \
     STC_INLINE void \
@@ -226,7 +226,7 @@ static inline double _maxf(double x, double y) {return x > y ? x : y;}
     } \
 \
     STC_DEF void \
-    cdeq_##X##_push_n(cdeq_##X *self, const cdeq_##X##_rawvalue_t arr[], size_t n) { \
+    cdeq_##X##_emplace_n(cdeq_##X *self, const cdeq_##X##_rawvalue_t arr[], size_t n) { \
         if (!n) return; \
         _cdeq_##X##_expand(self, n, false); \
         cdeq_##X##_value_t* p = self->data + _cdeq_rep(self)->size; \

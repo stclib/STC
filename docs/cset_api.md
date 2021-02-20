@@ -51,7 +51,7 @@ bool                cset_X_contains(const cset_X* self, RawKey rkey);
 
 cset_X_result_t     cset_X_insert(cset_X* self, Key key);
 cset_X_result_t     cset_X_emplace(cset_X* self, RawKey rkey);
-void                cset_X_push_n(cset_X* self, const RawKey arr[], size_t size);
+void                cset_X_emplace_n(cset_X* self, const RawKey arr[], size_t size);
 
 size_t              cset_X_erase(cset_X* self, RawKey rkey);
 cset_X_iter_t       cset_X_erase_at(cset_X* self, cset_X_iter_t pos);

@@ -231,7 +231,7 @@ int main(void) {
         return res; \
     } \
     STC_INLINE C##_##X##_result_t \
-    C##_##X##_put(C##_##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
+    C##_##X##_emplace_put(C##_##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
         C##_##X##_result_t res = C##_##X##_insert_entry_(self, rkey); \
                       if (res.second) *KEY_REF_##C(res.first) = keyFromRaw(rkey); \
         MAP_ONLY_##C( else mappedDel(&res.first->second); \
@@ -239,9 +239,9 @@ int main(void) {
         return res; \
     } \
     STC_INLINE void \
-    C##_##X##_push_n(C##_##X* self, const C##_##X##_rawvalue_t arr[], size_t n) { \
+    C##_##X##_emplace_n(C##_##X* self, const C##_##X##_rawvalue_t arr[], size_t n) { \
         for (size_t i=0; i<n; ++i) SET_ONLY_##C( C##_##X##_emplace(self, arr[i]); ) \
-                                   MAP_ONLY_##C( C##_##X##_put(self, arr[i].first, arr[i].second); ) \
+                                   MAP_ONLY_##C( C##_##X##_emplace(self, arr[i].first, arr[i].second); ) \
     } \
 \
     STC_INLINE C##_##X##_result_t \

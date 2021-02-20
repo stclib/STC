@@ -60,7 +60,7 @@ struct cvec_rep { size_t size, cap; void* data[]; };
     STC_INLINE bool \
     cvec_##X##_empty(cvec_##X vec) {return !_cvec_rep(&vec)->size;} \
     STC_INLINE Value \
-    cvec_##X##_value_from_raw(RawValue raw) {return valueFromRaw(raw);} \
+    cvec_##X##_value_fromraw(RawValue raw) {return valueFromRaw(raw);} \
     STC_INLINE cvec_##X##_value_t \
     cvec_##X##_value_clone(cvec_##X##_value_t val) {return valueFromRaw(valueToRaw(&val));} \
     STC_INLINE void \
@@ -95,7 +95,7 @@ struct cvec_rep { size_t size, cap; void* data[]; };
         cvec_##X##_del(self); *self = x; \
     } \
     STC_API void \
-    cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_rawvalue_t arr[], size_t size); \
+    cvec_##X##_emplace_n(cvec_##X *self, const cvec_##X##_rawvalue_t arr[], size_t size); \
     STC_API void \
     cvec_##X##_push_back(cvec_##X* self, Value value); \
     STC_INLINE void \
@@ -204,7 +204,7 @@ static struct cvec_rep _cvec_inits = {0, 0};
     } \
 \
     STC_DEF void \
-    cvec_##X##_push_n(cvec_##X *self, const cvec_##X##_rawvalue_t arr[], size_t n) { \
+    cvec_##X##_emplace_n(cvec_##X *self, const cvec_##X##_rawvalue_t arr[], size_t n) { \
         if (!n) return; \
         cvec_##X##_reserve(self, _cvec_rep(self)->size + n); \
         cvec_##X##_value_t* p = self->data + _cvec_rep(self)->size; \

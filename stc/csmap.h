@@ -262,7 +262,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
         return res; \
     } \
     STC_INLINE void \
-    C##_##X##_push_n(C##_##X* self, const C##_##X##_rawvalue_t arr[], size_t n) { \
+    C##_##X##_emplace_n(C##_##X* self, const C##_##X##_rawvalue_t arr[], size_t n) { \
         for (size_t i=0; i<n; ++i) SET_ONLY_##C( C##_##X##_emplace(self, arr[i]); ) \
                                    MAP_ONLY_##C( C##_##X##_emplace(self, arr[i].first, arr[i].second); ) \
     } \

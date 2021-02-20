@@ -62,7 +62,7 @@ cvec_X_value_t*     cvec_X_back(cvec_X* self);
 
 void                cvec_X_push_back(cvec_X* self, Value value);
 void                cvec_X_emplace_back(cvec_X* self, RawValue raw);
-void                cvec_X_push_n(cvec_X *self, const cvec_X_rawvalue_t arr[], size_t size);
+void                cvec_X_emplace_n(cvec_X *self, const cvec_X_rawvalue_t arr[], size_t size);
 
 void                cvec_X_pop_back(cvec_X* self);
 
@@ -116,7 +116,7 @@ int main()
 {
     // Create a vector containing integers
     cvec_i vec = cvec_i_init();
-    c_push_items(&vec, cvec_i, {7, 5, 16, 8});
+    c_emplace_n(&vec, cvec_i, {7, 5, 16, 8});
 
     // Add two more integers to vector
     cvec_i_push_back(&vec, 25);

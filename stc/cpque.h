@@ -78,10 +78,10 @@
     cpque_##X##_push(cpque_##X* self, cpque_##X##_value_t value); \
     STC_INLINE void \
     cpque_##X##_emplace(cpque_##X* self, cpque_##X##_rawvalue_t raw) { \
-        cpque_##X##_push(self, ctype##_value_from_raw(raw)); \
+        cpque_##X##_push(self, ctype##_value_fromraw(raw)); \
     } \
     STC_API void \
-    cpque_##X##_push_n(cpque_##X *self, const cpque_##X##_rawvalue_t arr[], size_t size); \
+    cpque_##X##_emplace_n(cpque_##X *self, const cpque_##X##_rawvalue_t arr[], size_t size); \
 \
     implement_cpque(X, ctype, cmpOpr)
 
@@ -129,7 +129,7 @@
         if (c != n) arr[c] = value; \
     } \
     STC_API void \
-    cpque_##X##_push_n(cpque_##X *self, const cpque_##X##_rawvalue_t arr[], size_t size) { \
+    cpque_##X##_emplace_n(cpque_##X *self, const cpque_##X##_rawvalue_t arr[], size_t size) { \
         for (size_t i=0; i<size; ++i) cpque_##X##_push(self, arr[i]); \
     } \
 \

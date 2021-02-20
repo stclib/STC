@@ -108,7 +108,7 @@ STC_API size_t _clist_size(const clist_void* self);
     STC_INLINE size_t \
     clist_##X##_size(clist_##X ls) {return _clist_size((const clist_void*) &ls);} \
     STC_INLINE Value \
-    clist_##X##_value_from_raw(RawValue raw) {return valueFromRaw(raw);} \
+    clist_##X##_value_fromraw(RawValue raw) {return valueFromRaw(raw);} \
     STC_INLINE clist_##X##_value_t \
     clist_##X##_value_clone(clist_##X##_value_t val) {return valueFromRaw(valueToRaw(&val));} \
 \
@@ -120,7 +120,7 @@ STC_API size_t _clist_size(const clist_void* self);
     clist_##X##_clear(clist_##X* self) {clist_##X##_del(self);} \
 \
     STC_API void \
-    clist_##X##_push_n(clist_##X *self, const clist_##X##_rawvalue_t arr[], size_t size); \
+    clist_##X##_emplace_n(clist_##X *self, const clist_##X##_rawvalue_t arr[], size_t size); \
     STC_API void \
     clist_##X##_push_back(clist_##X* self, Value value); \
     STC_INLINE void \
@@ -240,7 +240,7 @@ STC_API size_t _clist_size(const clist_void* self);
         if (!self->last) self->last = entry; \
     } \
     STC_DEF void \
-    clist_##X##_push_n(clist_##X *self, const clist_##X##_rawvalue_t arr[], size_t size) { \
+    clist_##X##_emplace_n(clist_##X *self, const clist_##X##_rawvalue_t arr[], size_t size) { \
         for (size_t i=0; i<size; ++i) clist_##X##_push_back(self, valueFromRaw(arr[i])); \
     } \
 \

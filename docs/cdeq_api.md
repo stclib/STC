@@ -64,7 +64,7 @@ void                cdeq_X_push_front(cdeq_X* self, Value value);
 void                cdeq_X_push_back(cdeq_X* self, Value value);
 void                cdeq_X_emplace_front(cdeq_X* self, RawValue raw);
 void                cdeq_X_emplace_back(cdeq_X* self, RawValue raw);
-void                cdeq_X_push_n(cdeq_X *self, const cdeq_X_rawvalue_t arr[], size_t size);
+void                cdeq_X_emplace_n(cdeq_X *self, const cdeq_X_rawvalue_t arr[], size_t size);
 
 void                cdeq_X_pop_front(cdeq_X* self);
 void                cdeq_X_pop_back(cdeq_X* self);
@@ -119,7 +119,7 @@ int main() {
         printf(" %d", *i.ref);
     puts("");
 
-    c_push_items(&q, cdeq_i, {1, 4, 5, 22, 33, 2});
+    c_emplace_n(&q, cdeq_i, {1, 4, 5, 22, 33, 2});
     c_foreach (i, cdeq_i, q)
         printf(" %d", *i.ref);
     puts("");

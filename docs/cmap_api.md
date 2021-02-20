@@ -67,7 +67,7 @@ cmap_X_result_t     cmap_X_insert(cmap_X* self, Key key, Mapped mapped);        
 cmap_X_result_t     cmap_X_insert_or_assign(cmap_X* self, Key key, Mapped mapped);           // always update mapped
 cmap_X_result_t     cmap_X_emplace(cmap_X* self, RawKey rkey, RawMapped rmapped);            // no change if rkey in map
 cmap_X_result_t     cmap_X_emplace_put(cmap_X* self, RawKey rkey, RawMapped rmapped);        // always update rmapped
-void                cmap_X_push_n(cmap_X* self, const cmap_X_rawvalue_t arr[], size_t size);
+void                cmap_X_emplace_n(cmap_X* self, const cmap_X_rawvalue_t arr[], size_t size);
 
 cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, RawKey rkey);                              // rkey must be in map.
 

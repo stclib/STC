@@ -88,8 +88,8 @@
         ctype##_emplace_back(self, raw); \
     } \
     STC_INLINE void \
-    cqueue_##X##_push_n(cqueue_##X *self, const cqueue_##X##_rawvalue_t arr[], size_t size) { \
-        ctype##_push_n(self, arr, size); \
+    cqueue_##X##_emplace_n(cqueue_##X *self, const cqueue_##X##_rawvalue_t arr[], size_t size) { \
+        ctype##_emplace_n(self, arr, size); \
     } \
     typedef ctype##_iter_t cqueue_##X##_iter_t; \
     STC_INLINE cqueue_##X##_iter_t \

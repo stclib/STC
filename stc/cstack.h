@@ -75,8 +75,8 @@
         ctype##_emplace_back(self, raw); \
     } \
     STC_INLINE void \
-    cstack_##X##_push_n(cstack_##X *self, const cstack_##X##_rawvalue_t arr[], size_t size) { \
-        ctype##_push_n(self, arr, size); \
+    cstack_##X##_emplace_n(cstack_##X *self, const cstack_##X##_rawvalue_t arr[], size_t size) { \
+        ctype##_emplace_n(self, arr, size); \
     } \
     typedef ctype##_iter_t cstack_##X##_iter_t; \
     STC_INLINE cstack_##X##_iter_t \

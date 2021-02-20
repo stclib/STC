@@ -117,16 +117,16 @@
 #define c_breakwith continue
 
 #define c_init(ctype, c, ...) \
-    ctype c = ctype##_init(); c_push_items(&c, ctype, __VA_ARGS__)
+    ctype c = ctype##_init(); c_emplace_n(&c, ctype, __VA_ARGS__)
 
-#define c_push_items(self, ctype, ...) do { \
+#define c_emplace_n(self, ctype, ...) do { \
     const ctype##_rawvalue_t __arr[] = __VA_ARGS__; \
-    ctype##_push_n(self, __arr, sizeof __arr/sizeof *__arr); \
+    ctype##_emplace_n(self, __arr, c_arraylen(__arr)); \
 } while (0)
 
 #define c_del(ctype, ...) do { \
-    ctype##_t* __arr[] = {__VA_ARGS__}; \
-    for (size_t __i=0; __i<sizeof __arr/sizeof *__arr; ++__i) \
+    ctype* __arr[] = {__VA_ARGS__}; \
+    for (size_t __i = 0; __i < c_arraylen(__arr); ++__i) \
         ctype##_del(__arr[__i]); \
 } while (0)
 
