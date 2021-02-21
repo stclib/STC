@@ -19,8 +19,7 @@ using_cvec(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, Ra
 
 using_cvec_str()
 ```
-The macro `using_cvec()` can be instantiated with 2, 3, 5, or 7 arguments in the global scope.
-Defaults values are given above for args not specified. `X` is a type tag name and
+The macro `using_cvec()` must be instantiated in the global scope. `X` is a type tag name and
 will affect the names of all cvec types and methods. E.g. declaring `using_cvec(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.
 
@@ -82,8 +81,8 @@ cvec_X_iter_t       cvec_X_erase_range_p(cvec_X* self, cvec_X_value_t* pfirst, c
 
 cvec_X_iter_t       cvec_X_find(const cvec_X* self, RawValue raw);
 cvec_X_iter_t       cvec_X_find_in_range(cvec_X_iter_t i1, cvec_X_iter_t i2, RawValue raw);
-bool                cvec_X_bsearch(const cvec_X* self, RawValue raw);
-bool                cvec_X_bsearch_in_range(cvec_X_iter_t i1, cvec_X_iter_t i2, RawValue raw);
+cvec_X_iter_t       cvec_X_bsearch(const cvec_X* self, RawValue raw);
+cvec_X_iter_t       cvec_X_bsearch_in_range(cvec_X_iter_t i1, cvec_X_iter_t i2, RawValue raw);
 void                cvec_X_sort(cvec_X* self);
 void                cvec_X_sort_range(cvec_X_iter_t i1, cvec_X_iter_t i2,
                                       int(*cmp)(const cvec_X_value_t*, const cvec_X_value_t*));

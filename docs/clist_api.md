@@ -24,8 +24,7 @@ using_clist(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, R
 
 using_clist_str()
 ```
-The macro `using_clist()` can be instantiated with 2, 3, 5, or 7 arguments in the global scope.
-Default values are given above for args not specified. `X` is a type tag name and
+The macro `using_clist()` must be instantiated in the global scope. `X` is a type tag name and
 will affect the names of all clist types and methods. E.g. declaring `using_clist(my, int);`, `X` should
 be replaced by `my` in all of the following documentation. `using_clist_str()` is a shorthand for
 ```c

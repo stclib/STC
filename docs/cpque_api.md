@@ -10,13 +10,13 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ```c
 using_cpque(X, ctype, direction)
 ```
-The macro `using_cpque()` must be instantiated in the global scope.
-**cpque** uses normally **cvec_X** or **cdeq_X** as underlying implementation, specified as `ctype`.
-The *direction* must be given as `<` or `>`, specifying *max-heap* or *min-heap* for the priority queue.
+The macro `using_cpque()` must be instantiated in the global scope. **cpque** uses normally **cvec_X**
+or **cdeq_X** as underlying implementation, specified as `ctype`. The *direction* must be given as
+`<` or `>`, specifying *max-heap* or *min-heap* for the priority queue.
 
-Note that the function `{ctype}_value_compare(x, y)` defined by the underlying vector type is used to
+Note that the function *`ctype`_value_compare(x, y)* defined by the underlying vector type is used to
 compare values (priorities). `X` is a type tag name and will affect the names of all cpque types and methods.
-Declaring `using_cpque(my, cvec_my, >);`, `X` should be replaced by `my` in the following documentation.
+Declaring `using_cpque(my, cvec_my, >)`, `X` should be replaced by `my` in the following documentation.
 
 ## Header file
 

@@ -14,12 +14,11 @@ using_csset(X, Key, keyCompare, keyDestroy);
 using_csset(X, Key, keyCompare, keyDestroy, keyFromRaw, keyToRaw, RawKey);
 using_csset_str();
 ```
-The macro `using_csset()` can be instantiated with 2, 3, 5, or 7 arguments in the global scope.
-Default values are given above for args not specified. `X` is a type tag name and
+The macro `using_csset()` must be instantiated in the global scope. `X` is a type tag name and
 will affect the names of all csset types and methods. E.g. declaring `using_csset(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.
 
-`using_csset_str()` is a predefined macro for `using_csset(str, cstr_t, ...)`.
+`using_csset_str()` is a predefined macro for `using_csset(str, cstr, ...)`.
 
 ## Header file
 

@@ -28,8 +28,7 @@ using_csmap_strval(X, Key, keyCompareRaw, keyDestroy, keyFromRaw, keyToRaw, RawK
 
 using_csmap_str();                                // using_csmap(str, cstr, cstr, ...)
 ```
-The `using_csmap()` macro family must be instantiated in the global scope.
-Default values are given above for args not specified. `X` is a type tag name and
+The `using_csmap()` macro family must be instantiated in the global scope. `X` is a type tag name and
 will affect the names of all csmap types and methods. E.g. declaring `using_csmap(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.
 

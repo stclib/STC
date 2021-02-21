@@ -29,8 +29,7 @@ using_cmap_strval(X, Key, keyEqualsRaw, keyHashRaw, keyDestroy, keyFromRaw, keyT
 
 using_cmap_str()                                // using_cmap(str, cstr, cstr, ...)
 ```
-The `using_cmap()` macro family must be instantiated in the global scope.
-Default values are given above for args not specified. `X` is a type tag name and
+The `using_cmap()` macro family must be instantiated in the global scope. `X` is a type tag name and
 will affect the names of all cmap types and methods. E.g. declaring `using_cmap(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.
 
@@ -72,7 +71,6 @@ void                cmap_X_emplace_n(cmap_X* self, const cmap_X_rawvalue_t arr[]
 cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, RawKey rkey);                              // rkey must be in map.
 
 size_t              cmap_X_erase(cmap_X* self, RawKey rkey);
-void                cmap_X_erase_entry(cmap_X* self, cmap_X_value_t* entry);
 cmap_X_iter_t       cmap_X_erase_at(cmap_X* self, cmap_X_iter_t pos);
 
 cmap_X_iter_t       cmap_X_begin(cmap_X* self);
@@ -82,10 +80,15 @@ cmap_X_mapped_t*    cmap_X_itval(cmap_X_iter_t it);
 
 cmap_X_value_t      cmap_X_value_clone(cmap_X_value_t val);
 void                cmap_X_value_del(cmap_X_value_t* val);
-
+```
+```
 uint64_t            c_default_hash(const void *data, size_t len);
-uint64_t            c_default_hash32(const void* data, size_t ignored);
-uint64_t            c_default_hash64(const void* data, size_t ignored);
+uint64_t            c_default_hash32(const void* data, size_t len=4);
+uint64_t            c_default_hash64(const void* data, size_t len=8);
+int                 c_default_equals(const RawKey* a, const RawKey* b);
+void                c_default_destruct(Value* val);
+Value               c_default_fromraw(RawValue raw);
+RawValue            c_default_toraw(Value* val);
 ```
 
 ## Types

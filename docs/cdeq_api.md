@@ -15,8 +15,7 @@ using_cdeq(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, Ra
 
 using_cdeq_str();
 ```
-The macro `using_cdeq()` can be instantiated with 2, 3, 5, or 7 arguments in the global scope.
-Defaults values are given above for args not specified. `X` is a type tag name and
+The macro `using_cdeq()` must be instantiated in the global scope. `X` is a type tag name and
 will affect the names of all cdeq types and methods. E.g. declaring `using_cdeq(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.
 

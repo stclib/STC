@@ -13,12 +13,11 @@ using_cset(X, Key, keyEqualsRaw, keyHashRaw, keyDestroy);
 using_cset(X, Key, keyEqualsRaw, keyHashRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
 using_cset_str();
 ```
-The macro `using_cset()` can be instantiated with 2, 4, 6, or 8 arguments in the global scope.
-Default values are given above for args not specified. `X` is a type tag name and
+The macro `using_cset()` must be instantiated in the global scope. `X` is a type tag name and
 will affect the names of all cset types and methods. E.g. declaring `using_cset(my, int);`, `X` should
 be replaced by `my` in all of the following documentation.
 
-`using_cset_str()` is a predefined macro for `using_cset(str, cstr_t, ...)`.
+`using_cset_str()` is a predefined macro for `using_cset(str, cstr, ...)`.
 
 ## Header file
 
@@ -55,7 +54,6 @@ void                cset_X_emplace_n(cset_X* self, const RawKey arr[], size_t si
 
 size_t              cset_X_erase(cset_X* self, RawKey rkey);
 cset_X_iter_t       cset_X_erase_at(cset_X* self, cset_X_iter_t pos);
-void                cset_X_erase_entry(cset_X* self, cset_X_key_t* key);
 
 cset_X_iter_t       cset_X_begin(cset_X* self);
 cset_X_iter_t       cset_X_end(cset_X* self);
@@ -64,8 +62,6 @@ cset_X_value_t*     cset_X_itval(cset_X_iter_t it);
 
 cset_X_value_t      cset_X_value_clone(cset_X_value_t val);
 void                cset_X_value_del(cset_X_value_t* val);
-uint32_t            c_default_hash(const void *data, size_t len);
-uint32_t            c_default_hash32(const void* data, size_t len);
 ```
 
 ## Types
