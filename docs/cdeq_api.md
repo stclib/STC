@@ -117,7 +117,7 @@ int main() {
         printf(" %d", *i.ref);
     puts("");
 
-    c_emplace_n(&q, cdeq_i, {1, 4, 5, 22, 33, 2});
+    c_emplace_items(&q, cdeq_i, {1, 4, 5, 22, 33, 2});
     c_foreach (i, cdeq_i, q)
         printf(" %d", *i.ref);
     puts("");

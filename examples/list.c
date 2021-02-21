@@ -33,7 +33,7 @@ int main() {
     puts("");
 
     clist_fx_clear(&list);
-    c_emplace_n(&list, clist_fx, {10, 20, 30, 40, 30, 50});
+    c_emplace_items(&list, clist_fx, {10, 20, 30, 40, 30, 50});
     c_foreach (i, clist_fx, list) printf(" %g", *i.ref);
     puts("");
 

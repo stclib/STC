@@ -44,7 +44,7 @@ int main(void) {
     cmap_mx_emplace(&m, 12, 'c');
     cmap_mx_iter_t it = cmap_mx_find(&m, 10); // none
     char val = cmap_mx_find(&m, 5).ref->second;
-    cmap_mx_emplace_put(&m, 5, 'd'); // update
+    cmap_mx_emplace_or_assign(&m, 5, 'd'); // update
     cmap_mx_erase(&m, 8);
     c_foreach (i, cmap_mx, m)
         printf("map %d: %c\n", i.ref->first, i.ref->second);
@@ -262,7 +262,7 @@ typedef struct {size_t idx; uint32_t hx;} chash_bucket_t;
         return res; \
     } \
     STC_INLINE C##_##X##_result_t \
-    C##_##X##_emplace_put(C##_##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
+    C##_##X##_emplace_or_assign(C##_##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
         C##_##X##_result_t res = C##_##X##_insert_entry_(self, rkey); \
                       if (res.second) *KEY_REF_##C(res.first) = keyFromRaw(rkey); \
         MAP_ONLY_##C( else mappedDel(&res.first->second); \

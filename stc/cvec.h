@@ -184,7 +184,7 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     STC_API cvec_##X##_iter_t \
     cvec_##X##_bsearch_in_range(cvec_##X##_iter_t i1, cvec_##X##_iter_t i2, RawValue raw); \
     STC_INLINE cvec_##X##_iter_t \
-    cvec_##X##_bsearch(cvec_##X* self, RawValue raw) { \
+    cvec_##X##_bsearch(const cvec_##X* self, RawValue raw) { \
         return cvec_##X##_bsearch_in_range(cvec_##X##_begin(self), cvec_##X##_end(self), raw); \
     } \
     STC_INLINE void \

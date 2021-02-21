@@ -117,9 +117,9 @@
 #define c_breakwith continue
 
 #define c_init(ctype, c, ...) \
-    ctype c = ctype##_init(); c_emplace_n(&c, ctype, __VA_ARGS__)
+    ctype c = ctype##_init(); c_emplace_items(&c, ctype, __VA_ARGS__)
 
-#define c_emplace_n(self, ctype, ...) do { \
+#define c_emplace_items(self, ctype, ...) do { \
     const ctype##_rawvalue_t __arr[] = __VA_ARGS__; \
     ctype##_emplace_n(self, __arr, c_arraylen(__arr)); \
 } while (0)

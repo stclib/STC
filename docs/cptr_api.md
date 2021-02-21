@@ -9,13 +9,13 @@ The pointed-to elements are automatically destructed and deleted when the contai
 ## Declaration
 
 ```c
-using_cptr(X, Value, valueCompare=c_default_compare,
-                     valueDestroy=c_default_del,
-                     valueClone=c_default_fromraw)
+using_cptr(X, Value);
+using_cptr(X, Value, valueCompare);
+using_cptr(X, Value, valueCompare, valueDestroy);
 
-using_csptr(X, Value, valueCompare=c_default_compare,
-                      valueDestroy=c_default_del,
-                      valueClone=ignored)
+using_csptr(X, Value);
+using_csptr(X, Value, valueCompare);
+using_csptr(X, Value, valueCompare, valueDestroy);
 ```
 The macro `using_cptr()` must be instantiated in the global scope. `X` is a type tag name and will
 affect the names of all cptr types and methods. E.g. declaring `using_cptr(my, cvec_my);`,

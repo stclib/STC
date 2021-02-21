@@ -136,9 +136,9 @@ void mapdemo2()
 {
     printf("\nMAPDEMO2\n");
     cmap_si nums = cmap_si_init();
-    cmap_si_emplace_put(&nums, "Hello", 64);
-    cmap_si_emplace_put(&nums, "Groovy", 121);
-    cmap_si_emplace_put(&nums, "Groovy", 200); // overwrite previous
+    cmap_si_emplace_or_assign(&nums, "Hello", 64);
+    cmap_si_emplace_or_assign(&nums, "Groovy", 121);
+    cmap_si_emplace_or_assign(&nums, "Groovy", 200); // overwrite previous
 
     // iterate the map:
     for (cmap_si_iter_t i = cmap_si_begin(&nums); i.ref != cmap_si_end(&nums).ref; cmap_si_next(&i))

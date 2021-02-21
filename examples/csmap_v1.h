@@ -231,7 +231,7 @@ int main(void) {
         return res; \
     } \
     STC_INLINE C##_##X##_result_t \
-    C##_##X##_emplace_put(C##_##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
+    C##_##X##_emplace_or_assign(C##_##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
         C##_##X##_result_t res = C##_##X##_insert_entry_(self, rkey); \
                       if (res.second) *KEY_REF_##C(res.first) = keyFromRaw(rkey); \
         MAP_ONLY_##C( else mappedDel(&res.first->second); \

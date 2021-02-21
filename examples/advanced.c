@@ -42,12 +42,12 @@ using_cmap_keyarg(vk, Viking, int, vikingraw_equals, vikingraw_hash,
 int main()
 {
     cmap_vk vikings = cmap_vk_init();
-    c_emplace_n(&vikings, cmap_vk, {
+    c_emplace_items(&vikings, cmap_vk, {
         { {"Einar", "Norway"}, 20},
         { {"Olaf", "Denmark"}, 24},
         { {"Harald", "Iceland"}, 12},
     });
-    cmap_vk_emplace_put(&vikings, (VikingRaw){"Bjorn", "Sweden"}, 10);
+    cmap_vk_emplace_or_assign(&vikings, (VikingRaw){"Bjorn", "Sweden"}, 10);
 
     VikingRaw lookup = {"Einar", "Norway"};
 

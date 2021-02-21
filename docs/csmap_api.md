@@ -53,13 +53,13 @@ bool                csmap_X_empty(csmap_X map);
 size_t              csmap_X_size(csmap_X map);
 
 csmap_X_iter_t      csmap_X_find(const csmap_X* self, RawKey rkey);
-csmap_X_value_t*    csmap_X_find_it(const csmap_X* self, RawKey rkey, csmap_X_iter_t* out);  // return NULL if not found
+csmap_X_value_t*    csmap_X_find_it(const csmap_X* self, RawKey rkey, csmap_X_iter_t* out);   // return NULL if not found
 bool                csmap_X_contains(const csmap_X* self, RawKey rkey);
 
 csmap_X_result_t    csmap_X_insert(csmap_X* self, Key key, Mapped mapped);                    // no change if key in map
 csmap_X_result_t    csmap_X_insert_or_assign(csmap_X* self, Key key, Mapped mapped);          // always update mapped
 csmap_X_result_t    csmap_X_emplace(csmap_X* self, RawKey rkey, RawMapped rmapped);           // no change if rkey in map
-csmap_X_result_t    csmap_X_emplace_put(csmap_X* self, RawKey rkey, RawMapped rmapped); // always update rmapped
+csmap_X_result_t    csmap_X_emplace_or_assign(csmap_X* self, RawKey rkey, RawMapped rmapped); // always update rmapped
 void                csmap_X_emplace_n(csmap_X* self, const csmap_X_rawvalue_t arr[], size_t size);
 
 csmap_X_mapped_t*   csmap_X_at(const csmap_X* self, RawKey rkey);                             // rkey must be in map.
@@ -149,7 +149,7 @@ int main()
         {110, "Blue"},
     });
     /* put replaces existing mapped value: */
-    csmap_id_emplace_put(&idnames, 110, "White");
+    csmap_id_emplace_or_assign(&idnames, 110, "White");
     /* put a constructed mapped value into map: */
     csmap_id_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
     /* emplace inserts only when key does not exist: */

@@ -82,7 +82,7 @@ cvec_X_iter_t       cvec_X_erase_range_p(cvec_X* self, cvec_X_value_t* pfirst, c
 
 cvec_X_iter_t       cvec_X_find(const cvec_X* self, RawValue raw);
 cvec_X_iter_t       cvec_X_find_in_range(cvec_X_iter_t i1, cvec_X_iter_t i2, RawValue raw);
-bool                cvec_X_bsearch(const cvec_X* self);
+bool                cvec_X_bsearch(const cvec_X* self, RawValue raw);
 bool                cvec_X_bsearch_in_range(cvec_X_iter_t i1, cvec_X_iter_t i2, RawValue raw);
 void                cvec_X_sort(cvec_X* self);
 void                cvec_X_sort_range(cvec_X_iter_t i1, cvec_X_iter_t i2,
@@ -116,7 +116,7 @@ int main()
 {
     // Create a vector containing integers
     cvec_i vec = cvec_i_init();
-    c_emplace_n(&vec, cvec_i, {7, 5, 16, 8});
+    c_emplace_items(&vec, cvec_i, {7, 5, 16, 8});
 
     // Add two more integers to vector
     cvec_i_push_back(&vec, 25);

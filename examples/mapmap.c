@@ -16,7 +16,7 @@ int main(void) {
     cmap_str_emplace(&cmap_cfg_insert(&config, cstr_from("group"), init).first->second, "proj3", "Oil");
     cmap_str_emplace(&cmap_cfg_insert(&config, cstr_from("admin"), init).first->second, "employees", "2302");
 
-    cmap_str_emplace_put(&cmap_cfg_insert(&config, cstr_from("group"), init).first->second, "proj2", "Wind"); // Update
+    cmap_str_emplace_or_assign(&cmap_cfg_insert(&config, cstr_from("group"), init).first->second, "proj2", "Wind"); // Update
 
     c_foreach (i, cmap_cfg, config)
         c_foreach (j, cmap_str, i.ref->second)

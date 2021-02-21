@@ -66,7 +66,7 @@ bool                cmap_X_contains(const cmap_X* self, RawKey rkey);
 cmap_X_result_t     cmap_X_insert(cmap_X* self, Key key, Mapped mapped);                     // no change if key in map
 cmap_X_result_t     cmap_X_insert_or_assign(cmap_X* self, Key key, Mapped mapped);           // always update mapped
 cmap_X_result_t     cmap_X_emplace(cmap_X* self, RawKey rkey, RawMapped rmapped);            // no change if rkey in map
-cmap_X_result_t     cmap_X_emplace_put(cmap_X* self, RawKey rkey, RawMapped rmapped);        // always update rmapped
+cmap_X_result_t     cmap_X_emplace_or_assign(cmap_X* self, RawKey rkey, RawMapped rmapped);  // always update rmapped
 void                cmap_X_emplace_n(cmap_X* self, const cmap_X_rawvalue_t arr[], size_t size);
 
 cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, RawKey rkey);                              // rkey must be in map.
@@ -170,7 +170,7 @@ int main()
         {110, "Blue"},
     });
     /* put replaces existing mapped value: */
-    cmap_id_emplace_put(&idnames, 110, "White");
+    cmap_id_emplace_or_assign(&idnames, 110, "White");
     /* put a constructed mapped value into map: */
     cmap_id_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
     /* emplace inserts only when key does not exist: */
@@ -304,7 +304,7 @@ int main()
         { {"Olaf", "Denmark"}, 24 },
         { {"Harald", "Iceland"}, 12 },
     });
-    cmap_vk_emplace_put(&vikings, (VikingRaw){"Bjorn", "Sweden"}, 10);
+    cmap_vk_emplace_or_assign(&vikings, (VikingRaw){"Bjorn", "Sweden"}, 10);
     
     VikingRaw lookup = {"Einar", "Norway"};
 

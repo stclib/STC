@@ -2,11 +2,11 @@
 
 The following handy macros are completely safe to use, i.e. they have no side-effects.
 
-### c_init, c_emplace_n
-**c_init** declares and initializes any container with an array of elements. **c_emplace_n** adds elements to any existing container:
+### c_init, c_emplace_items
+**c_init** declares and initializes any container with an array of elements. **c_emplace_items** adds elements to any existing container:
 ```c
 c_init (cvec_i, vec, {1, 2, 3});
-c_emplace_n(&vec, cvec_i, {4, 5, 6});
+c_emplace_items(&vec, cvec_i, {4, 5, 6});
 ```
 
 ### c_forrange
