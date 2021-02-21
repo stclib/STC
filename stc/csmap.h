@@ -66,11 +66,11 @@ int main(void) {
                      mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
                      keyDel, keyFromRaw, keyToRaw, RawKey)
 
-#define using_csmap_keyarg(...) c_MACRO_OVERLOAD(using_csmap_keyarg, __VA_ARGS__)
-#define using_csmap_keyarg_5(X, Key, Mapped, keyCompare, keyDel) \
-    using_csmap_keyarg_8(X, Key, Mapped, keyCompare, \
+#define using_csmap_keydef(...) c_MACRO_OVERLOAD(using_csmap_keydef, __VA_ARGS__)
+#define using_csmap_keydef_5(X, Key, Mapped, keyCompare, keyDel) \
+    using_csmap_keydef_8(X, Key, Mapped, keyCompare, \
                             keyDel, c_no_fromraw, c_default_toraw, Key)
-#define using_csmap_keyarg_8(X, Key, Mapped, keyCompareRaw, \
+#define using_csmap_keydef_8(X, Key, Mapped, keyCompareRaw, \
                                 keyDel, keyFromRaw, keyToRaw, RawKey) \
     _using_AATREE(X, csmap, Key, Mapped, keyCompareRaw, \
                      c_default_del, c_default_fromraw, c_default_toraw, Mapped, \

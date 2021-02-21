@@ -84,11 +84,11 @@ typedef struct {size_t idx; uint32_t hx;} chash_bucket_t;
                     mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
                     keyDel, keyFromRaw, keyToRaw, RawKey)
 
-#define using_cmap_keyarg(...) c_MACRO_OVERLOAD(using_cmap_keyarg, __VA_ARGS__)
-#define using_cmap_keyarg_6(X, Key, Mapped, keyEquals, keyHash, keyDel) \
-    using_cmap_keyarg_9(X, Key, Mapped, keyEquals, keyHash, \
+#define using_cmap_keydef(...) c_MACRO_OVERLOAD(using_cmap_keydef, __VA_ARGS__)
+#define using_cmap_keydef_6(X, Key, Mapped, keyEquals, keyHash, keyDel) \
+    using_cmap_keydef_9(X, Key, Mapped, keyEquals, keyHash, \
                            keyDel, c_no_fromraw, c_default_toraw, Key)
-#define using_cmap_keyarg_9(X, Key, Mapped, keyEqualsRaw, keyHashRaw, \
+#define using_cmap_keydef_9(X, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                                keyDel, keyFromRaw, keyToRaw, RawKey) \
     _using_CHASH(X, cmap, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                     c_default_del, c_default_fromraw, c_default_toraw, Mapped, \

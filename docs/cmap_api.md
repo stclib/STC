@@ -15,19 +15,19 @@ using_cmap(X, Key, Mapped, keyEquals, keyHash, mappedDestroy);
 using_cmap(X, Key, Mapped, keyEquals, keyHash, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped);
 using_cmap(X, Key, Mapped, keyEqualsRaw, keyHashRaw, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped,
                                                      keyDestroy, keyFromRaw, keyToRaw, RawKey);
-using_cmap_keyarg(X, Key, Mapped, keyEquals, keyHash, keyDestroy);
-using_cmap_keyarg(X, Key, Mapped, keyEqualsRaw, keyHashRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
+using_cmap_keydef(X, Key, Mapped, keyEquals, keyHash, keyDestroy);
+using_cmap_keydef(X, Key, Mapped, keyEqualsRaw, keyHashRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
 
-using_cmap_strkey(X, Mapped);                    // using_cmap(str, cstr, Mapped, ...)
+using_cmap_strkey(X, Mapped);                   // using_cmap(X, cstr, Mapped, ...)
 using_cmap_strkey(X, Mapped, mappedDestroy);
 using_cmap_strkey(X, Mapped, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped);
 
-using_cmap_strval(X, Key);                       // using_cmap(str, Key, cstr, ...)
+using_cmap_strval(X, Key);                      // using_cmap(X, Key, cstr, ...)
 using_cmap_strval(X, Key, keyEquals, keyHash);
 using_cmap_strval(X, Key, keyEquals, keyHash, keyDestroy);
 using_cmap_strval(X, Key, keyEqualsRaw, keyHashRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
 
-using_cmap_str()                                 // using_cmap(str, cstr, cstr, ...)
+using_cmap_str()                                // using_cmap(str, cstr, cstr, ...)
 ```
 The `using_cmap()` macro family must be instantiated in the global scope.
 Default values are given above for args not specified. `X` is a type tag name and
@@ -293,8 +293,8 @@ static inline VikingRaw viking_toRaw(Viking* vk) {
     VikingRaw raw = {vk->name.str, vk->country.str}; return raw;
 }
 
-// With this in place, we use the using_cmap_keyarg() macro to define {Viking -> int} hash map type:
-using_cmap_keyarg(vk, Viking, int, vikingraw_equals, vikingraw_hash,
+// With this in place, we use the using_cmap_keydef() macro to define {Viking -> int} hash map type:
+using_cmap_keydef(vk, Viking, int, vikingraw_equals, vikingraw_hash,
                       viking_del, viking_fromRaw, viking_toRaw, VikingRaw);
 
 int main()

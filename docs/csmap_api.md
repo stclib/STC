@@ -14,14 +14,14 @@ using_csmap(X, Key, Mapped, keyCompare, mappedDestroy);
 using_csmap(X, Key, Mapped, keyCompare, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped);
 using_csmap(X, Key, Mapped, keyCompareRaw, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped,
                                            keyDestroy, keyFromRaw, keyToRaw, RawKey);
-using_csmap_keyarg(X, Key, Mapped, keyCompare, keyDestroy);
-using_csmap_keyarg(X, Key, Mapped, keyCompareRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
+using_csmap_keydef(X, Key, Mapped, keyCompare, keyDestroy);
+using_csmap_keydef(X, Key, Mapped, keyCompareRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
 
-using_csmap_strkey(X, Mapped);                    // using_csmap(str, cstr, Mapped, ...)
+using_csmap_strkey(X, Mapped);                    // using_csmap(X, cstr, Mapped, ...)
 using_csmap_strkey(X, Mapped, mappedDestroy);
 using_csmap_strkey(X, Mapped, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped);
 
-using_csmap_strval(X, Key);                       // using_csmap(str, Key, cstr, ...)
+using_csmap_strval(X, Key);                       // using_csmap(X, Key, cstr, ...)
 using_csmap_strval(X, Key, keyCompare);
 using_csmap_strval(X, Key, keyCompare, keyDestroy);
 using_csmap_strval(X, Key, keyCompareRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);

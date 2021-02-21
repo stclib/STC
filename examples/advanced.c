@@ -34,9 +34,9 @@ static inline VikingRaw viking_toRaw(Viking* vk) {
     VikingRaw raw = {vk->name.str, vk->country.str}; return raw;
 }
 
-// With this in place, we use the using_cmap_keyarg() macro to define {Viking -> int} hash map type:
+// With this in place, we use the using_cmap_keydef() macro to define {Viking -> int} hash map type:
 
-using_cmap_keyarg(vk, Viking, int, vikingraw_equals, vikingraw_hash,
+using_cmap_keydef(vk, Viking, int, vikingraw_equals, vikingraw_hash,
                       viking_del, viking_fromRaw, viking_toRaw, VikingRaw);
 
 int main()
