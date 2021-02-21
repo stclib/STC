@@ -57,7 +57,6 @@ void vectordemo1()
 }
 
 
-
 using_cvec_str();
 
 void vectordemo2()

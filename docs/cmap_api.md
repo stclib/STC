@@ -18,16 +18,16 @@ using_cmap(X, Key, Mapped, keyEqualsRaw, keyHashRaw, mappedDestroy, mappedFromRa
 using_cmap_keyarg(X, Key, Mapped, keyEquals, keyHash, keyDestroy);
 using_cmap_keyarg(X, Key, Mapped, keyEqualsRaw, keyHashRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
 
-using_cmap_strkey(X, Mapped);                    // cmap(str, cstr, Mapped, ...)
+using_cmap_strkey(X, Mapped);                    // using_cmap(str, cstr, Mapped, ...)
 using_cmap_strkey(X, Mapped, mappedDestroy);
 using_cmap_strkey(X, Mapped, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped);
 
-using_cmap_strval(X, Key);                       // cmap(str, Key, cstr, ...)
+using_cmap_strval(X, Key);                       // using_cmap(str, Key, cstr, ...)
 using_cmap_strval(X, Key, keyEquals, keyHash);
 using_cmap_strval(X, Key, keyEquals, keyHash, keyDestroy);
 using_cmap_strval(X, Key, keyEqualsRaw, keyHashRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
 
-using_cmap_str()                                 // cmap(str, cstr, cstr, ...)
+using_cmap_str()                                 // using_cmap(str, cstr, cstr, ...)
 ```
 The `using_cmap()` macro family must be instantiated in the global scope.
 Default values are given above for args not specified. `X` is a type tag name and
@@ -289,13 +289,11 @@ static inline int vikingraw_equals(const VikingRaw* rx, const VikingRaw* ry) {
 static inline Viking viking_fromRaw(VikingRaw raw) { // note: parameter is by value
     Viking vk = {cstr_from(raw.name), cstr_from(raw.country)}; return vk;
 }
-
 static inline VikingRaw viking_toRaw(Viking* vk) {
     VikingRaw raw = {vk->name.str, vk->country.str}; return raw;
 }
 
 // With this in place, we use the using_cmap_keyarg() macro to define {Viking -> int} hash map type:
-
 using_cmap_keyarg(vk, Viking, int, vikingraw_equals, vikingraw_hash,
                       viking_del, viking_fromRaw, viking_toRaw, VikingRaw);
 

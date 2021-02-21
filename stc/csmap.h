@@ -147,7 +147,7 @@ int main(void) {
 #endif
 
 struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
-#define _csmap_rep(self) c_container_of((self)->nodes, struct csmap_rep, nodes)
+#define csmap_rep_(self) c_container_of((self)->nodes, struct csmap_rep, nodes)
 
 #define _using_AATREE(X, C, Key, Mapped, keyCompareRaw, \
                          mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
@@ -202,11 +202,11 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
         return x; \
     } \
     STC_INLINE bool \
-    C##_##X##_empty(C##_##X tree) {return _csmap_rep(&tree)->size == 0;} \
+    C##_##X##_empty(C##_##X tree) {return csmap_rep_(&tree)->size == 0;} \
     STC_INLINE size_t \
-    C##_##X##_size(C##_##X tree) {return _csmap_rep(&tree)->size;} \
+    C##_##X##_size(C##_##X tree) {return csmap_rep_(&tree)->size;} \
     STC_INLINE size_t \
-    C##_##X##_capacity(C##_##X tree) {return _csmap_rep(&tree)->cap;} \
+    C##_##X##_capacity(C##_##X tree) {return csmap_rep_(&tree)->cap;} \
     STC_API void \
     C##_##X##_del(C##_##X* self); \
     STC_INLINE void \
@@ -294,7 +294,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
 \
     STC_INLINE C##_##X##_iter_t \
     C##_##X##_begin(C##_##X* self) { \
-        C##_##X##_iter_t it = {NULL, self->nodes, 0, (C##_##X##_size_t) _csmap_rep(self)->root}; \
+        C##_##X##_iter_t it = {NULL, self->nodes, 0, (C##_##X##_size_t) csmap_rep_(self)->root}; \
         if (it._tn) C##_##X##_next(&it); \
         return it; \
     } \
@@ -335,21 +335,21 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
     STC_DEF C##_##X##_value_t* \
     C##_##X##_front(C##_##X* self) { \
         C##_##X##_node_t *d = self->nodes; \
-        C##_##X##_size_t tn = (C##_##X##_size_t) _csmap_rep(self)->root; \
+        C##_##X##_size_t tn = (C##_##X##_size_t) csmap_rep_(self)->root; \
         while (d[tn].link[0]) tn = d[tn].link[0]; \
         return &d[tn].value; \
     } \
     STC_DEF C##_##X##_value_t* \
     C##_##X##_back(C##_##X* self) { \
         C##_##X##_node_t *d = self->nodes; \
-        C##_##X##_size_t tn = (C##_##X##_size_t) _csmap_rep(self)->root; \
+        C##_##X##_size_t tn = (C##_##X##_size_t) csmap_rep_(self)->root; \
         while (d[tn].link[1]) tn = d[tn].link[1]; \
         return &d[tn].value; \
     } \
 \
     STC_DEF void \
     C##_##X##_reserve(C##_##X* self, size_t cap) { \
-        struct csmap_rep* rep = _csmap_rep(self); \
+        struct csmap_rep* rep = csmap_rep_(self); \
         C##_##X##_size_t oldcap = rep->cap; \
         if (cap > oldcap) { \
             rep = (struct csmap_rep*) c_realloc(oldcap ? rep : NULL, \
@@ -363,13 +363,13 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
 \
     STC_DEF C##_##X##_size_t \
     C##_##X##_node_new_(C##_##X* self, int level) { \
-        size_t tn; struct csmap_rep *rep = _csmap_rep(self); \
+        size_t tn; struct csmap_rep *rep = csmap_rep_(self); \
         if (rep->disp) { \
             tn = rep->disp; \
             rep->disp = self->nodes[tn].link[1]; \
         } else { \
             if ((tn = rep->head + 1) > rep->cap) C##_##X##_reserve(self, 4 + tn*3/2); \
-            ++_csmap_rep(self)->head; /* do after reserve */ \
+            ++csmap_rep_(self)->head; /* do after reserve */ \
         } \
         C##_##X##_node_t* dn = &self->nodes[tn]; \
         dn->link[0] = dn->link[1] = 0; dn->level = level; \
@@ -378,7 +378,7 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
 \
     STC_DEF C##_##X##_value_t* \
     C##_##X##_find_it(const C##_##X* self, C##_##X##_rawkey_t rkey, C##_##X##_iter_t* out) { \
-        C##_##X##_size_t tn = _csmap_rep(self)->root; \
+        C##_##X##_size_t tn = csmap_rep_(self)->root; \
         C##_##X##_node_t *d = out->_d = self->nodes; \
         out->_top = 0; \
         while (tn) { \
@@ -457,9 +457,9 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
     STC_DEF C##_##X##_result_t \
     C##_##X##_insert_entry_(C##_##X* self, RawKey rkey) { \
         C##_##X##_result_t res = {NULL, false}; \
-        C##_##X##_size_t tn = C##_##X##insert_entry_i_(self, (C##_##X##_size_t) _csmap_rep(self)->root, &rkey, &res); \
-        _csmap_rep(self)->root = tn; \
-        _csmap_rep(self)->size += res.second; \
+        C##_##X##_size_t tn = C##_##X##insert_entry_i_(self, (C##_##X##_size_t) csmap_rep_(self)->root, &rkey, &res); \
+        csmap_rep_(self)->root = tn; \
+        csmap_rep_(self)->size += res.second; \
         return res; \
     } \
 \
@@ -504,8 +504,8 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
     STC_DEF int \
     C##_##X##_erase(C##_##X* self, RawKey rkey) { \
         int erased = 0; \
-        C##_##X##_size_t root = C##_##X##_erase_r_(self->nodes, (C##_##X##_size_t) _csmap_rep(self)->root, &rkey, &erased); \
-        if (erased) {_csmap_rep(self)->root = root; --_csmap_rep(self)->size;} \
+        C##_##X##_size_t root = C##_##X##_erase_r_(self->nodes, (C##_##X##_size_t) csmap_rep_(self)->root, &rkey, &erased); \
+        if (erased) {csmap_rep_(self)->root = root; --csmap_rep_(self)->size;} \
         return erased; \
     } \
 \
@@ -520,10 +520,10 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
     } \
     STC_DEF C##_##X \
     C##_##X##_clone(C##_##X tree) { \
-        C##_##X clone = C##_##X##_with_capacity(_csmap_rep(&tree)->size); \
-        C##_##X##_size_t root = C##_##X##_clone_r_(&clone, tree.nodes, (C##_##X##_size_t) _csmap_rep(&tree)->root); \
-        _csmap_rep(&clone)->root = root; \
-        _csmap_rep(&clone)->size = _csmap_rep(&tree)->size; \
+        C##_##X clone = C##_##X##_with_capacity(csmap_rep_(&tree)->size); \
+        C##_##X##_size_t root = C##_##X##_clone_r_(&clone, tree.nodes, (C##_##X##_size_t) csmap_rep_(&tree)->root); \
+        csmap_rep_(&clone)->root = root; \
+        csmap_rep_(&clone)->size = csmap_rep_(&tree)->size; \
         return clone; \
     } \
 \
@@ -537,9 +537,9 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
     } \
     STC_DEF void \
     C##_##X##_del(C##_##X* self) { \
-        if (_csmap_rep(self)->root) { \
-            C##_##X##_del_r_(self->nodes, (C##_##X##_size_t) _csmap_rep(self)->root); \
-            c_free(_csmap_rep(self)); \
+        if (csmap_rep_(self)->root) { \
+            C##_##X##_del_r_(self->nodes, (C##_##X##_size_t) csmap_rep_(self)->root); \
+            c_free(csmap_rep_(self)); \
         } \
     }
 

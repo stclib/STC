@@ -17,16 +17,16 @@ using_csmap(X, Key, Mapped, keyCompareRaw, mappedDestroy, mappedFromRaw, mappedT
 using_csmap_keyarg(X, Key, Mapped, keyCompare, keyDestroy);
 using_csmap_keyarg(X, Key, Mapped, keyCompareRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
 
-using_csmap_strkey(X, Mapped);                     // csmap(str, cstr, Mapped, ...)
+using_csmap_strkey(X, Mapped);                    // using_csmap(str, cstr, Mapped, ...)
 using_csmap_strkey(X, Mapped, mappedDestroy);
 using_csmap_strkey(X, Mapped, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped);
 
-using_csmap_strval(X, Key);                        // csmap(str, Key, cstr, ...)
+using_csmap_strval(X, Key);                       // using_csmap(str, Key, cstr, ...)
 using_csmap_strval(X, Key, keyCompare);
 using_csmap_strval(X, Key, keyCompare, keyDestroy);
 using_csmap_strval(X, Key, keyCompareRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
 
-using_csmap_str();                                 // csmap(str, cstr, cstr, ...)
+using_csmap_str();                                // using_csmap(str, cstr, cstr, ...)
 ```
 The `using_csmap()` macro family must be instantiated in the global scope.
 Default values are given above for args not specified. `X` is a type tag name and

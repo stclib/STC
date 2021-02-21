@@ -1,10 +1,10 @@
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
-#include "stc/crandom.h"
-#include "stc/cstr.h"
-#include "stc/cmap.h"
-#include "stc/cvec.h"
+#include <stc/crandom.h>
+#include <stc/cstr.h>
+#include <stc/cmap.h>
+#include <stc/cvec.h>
 
 // Declare int -> int hashmap. Uses typetag 'i' for ints.
 using_cmap(i, int, size_t);

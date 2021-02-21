@@ -1,7 +1,7 @@
 # STC [cdeq](../stc/cdeq.h): Double Ended Queue
 ![Deque](pics/deque.jpg)
 
-A **cdeq** is an indexed sequence container that allows fast insertion and deletion at both its beginning and its end. Note that this container is implemented similar to a vector, but has the same performance profile for both *push_back()* and *push_front()* as *cvec_X_push_back()*. Iterators may be invalidated after push-operations.
+A **cdeq** is an indexed sequence container that allows fast insertion and deletion at both its beginning and its end. Note that this container is implemented similar to a vector, but has the same performance profile for both *push_back()* and *push_front()* as *cdeq_X_push_back()*. Iterators may be invalidated after push-operations.
 
 See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque) for a functional description.
 
@@ -56,10 +56,6 @@ cdeq_X_value_t*     cdeq_X_at(cdeq_X* self, size_t idx);
 cdeq_X_value_t*     cdeq_X_front(cdeq_X* self);
 cdeq_X_value_t*     cdeq_X_back(cdeq_X* self);
 
-cdeq_X_iter_t       cdeq_X_find(const cdeq_X* self, RawValue raw);
-cdeq_X_iter_t       cdeq_X_find_in_range(const cdeq_X* self,
-                                         cdeq_X_iter_t first, cdeq_X_iter_t finish, RawValue raw);
-
 void                cdeq_X_push_front(cdeq_X* self, Value value);
 void                cdeq_X_push_back(cdeq_X* self, Value value);
 void                cdeq_X_emplace_front(cdeq_X* self, RawValue raw);
@@ -83,9 +79,11 @@ cdeq_X_iter_t       cdeq_X_erase_at(cdeq_X* self, cdeq_X_iter_t pos);
 cdeq_X_iter_t       cdeq_X_erase_range(cdeq_X* self, cdeq_X_iter_t first, cdeq_X_iter_t finish);
 cdeq_X_iter_t       cdeq_X_erase_range_p(cdeq_X* self, cdeq_X_value_t* pfirst, cdeq_X_value_t* pfinish);
 
+cdeq_X_iter_t       cdeq_X_find(const cdeq_X* self, RawValue raw);
+cdeq_X_iter_t       cdeq_X_find_in_range(cdeq_X_iter_t i1, cdeq_X_iter_t i2, RawValue raw);
 void                cdeq_X_sort(cdeq_X* self);
-void                cdeq_X_sort_with(cdeq_X* self, size_t ifirst, size_t ifinish,
-                                     int(*cmp)(const cdeq_X_value_t*, const cdeq_X_value_t*));
+void                cdeq_X_sort_range(cdeq_X_iter_t i1, cdeq_X_iter_t i2,
+                                      int(*cmp)(const cdeq_X_value_t*, const cdeq_X_value_t*));
 
 cdeq_X_iter_t       cdeq_X_begin(const cdeq_X* self);
 cdeq_X_iter_t       cdeq_X_end(const cdeq_X* self);
