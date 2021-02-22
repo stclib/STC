@@ -11,11 +11,11 @@ The pointed-to elements are automatically destructed and deleted when the contai
 ```c
 using_cptr(X, Value);
 using_cptr(X, Value, valueCompare);
-using_cptr(X, Value, valueCompare, valueDestroy);
+using_cptr(X, Value, valueCompare, valueDel);
 
 using_csptr(X, Value);
 using_csptr(X, Value, valueCompare);
-using_csptr(X, Value, valueCompare, valueDestroy);
+using_csptr(X, Value, valueCompare, valueDel);
 ```
 The macro `using_cptr()` must be instantiated in the global scope. `X` is a type tag name and will
 affect the names of all cptr types and methods. E.g. declaring `using_cptr(my, cvec_my);`,
@@ -166,16 +166,15 @@ void Person_del(Person* p) {
 }
 
 // 1. cvec of Person struct; emplace and cloning disabled.
-using_cvec(pe, Person, Person_compare, Person_del);
+using_cvec(pe, Person, Person_compare, Person_del, c_no_clone);
 
 // 2. cvec of raw/owned pointers to Person; emplace and cloning disabled.
 using_cptr(pe, Person, Person_compare, Person_del);
-using_cvec(pp, Person*, cptr_pe_compare, cptr_pe_del);
+using_cvec(pp, Person*, cptr_pe_compare, cptr_pe_del, c_no_clone);
 
-// 3. cvec of shared-ptr to Person.
+// 3. cvec of shared-ptr to Person - with emplace_back() and cloning cvec ENABLED.
 using_csptr(pe, Person, Person_compare, Person_del);
-// To enable emplace_back() and cloning cvec, add 3 more args:
-using_cvec(ps, csptr_pe, csptr_pe_compare, csptr_pe_del, csptr_pe_clone, c_default_toraw, csptr_pe);
+using_cvec(ps, csptr_pe, csptr_pe_compare, csptr_pe_del, csptr_pe_clone);
 
 const char* names[] = {
     "Joe", "Jordan",
@@ -206,6 +205,7 @@ int main() {
 
     // Append a shared copy of vec3.data[0]. Will only be destructed once!
     cvec_ps_emplace_back(&vec3, vec3.data[0]);
+    //cvec_ps_push_back(&vec3, csptr_pe_clone(vec3.data[0])); // alternativ
     puts("\n3. Sorted vec3 of shared-pointer to Person:");
     cvec_ps_sort(&vec3);
     c_foreach (i, cvec_ps, vec3)
@@ -214,12 +214,12 @@ int main() {
     // Share vec3.data[1] with elem1 variable.
     csptr_pe elem1 = csptr_pe_clone(vec3.data[1]);
 
-    puts("\nDestroy vec3:");
-    cvec_ps_del(&vec3); // destroy the unique/unshared elements (two)
-    puts("\nDestroy vec2:");
-    cvec_pp_del(&vec2);
     puts("\nDestroy vec1:");
     cvec_pe_del(&vec1);
+    puts("\nDestroy vec2:");
+    cvec_pp_del(&vec2);
+    puts("\nDestroy vec3:");
+    cvec_ps_del(&vec3);
 
     puts("\nDestroy elem1:");
     csptr_pe_del(&elem1);
@@ -227,23 +227,25 @@ int main() {
 ```
 Output:
 ```
-1. sorted cvec of Person :
+1. Sorted vec1 of Person:
   Annie Aniston
   Jane Jacobs
   Joe Jordan
 
-2. sorted cvec of pointer to Person :       
+2. Sorted vec2 of pointer to Person:
   Annie Aniston
   Jane Jacobs
   Joe Jordan
 
-3. sorted cvec of shared-pointer to Person :
+3. Sorted vec3 of shared-pointer to Person:
   Annie Aniston
   Jane Jacobs
   Joe Jordan
+  Joe Jordan
 
-Destroy vec3:
+Destroy vec1:
 del: Annie
+del: Jane
 del: Joe
 
 Destroy vec2:
@@ -251,11 +253,10 @@ del: Annie
 del: Jane
 del: Joe
 
-Destroy vec1:
+Destroy vec3:
 del: Annie
-del: Jane
 del: Joe
 
-Destroy elem:
+Destroy elem1:
 del: Jane
 ```

@@ -31,9 +31,9 @@
 #define using_cvec_2(X, Value) \
                     using_cvec_3(X, Value, c_default_compare)
 #define using_cvec_3(X, Value, valueCompare) \
-                    using_cvec_7(X, Value, valueCompare, c_default_del, c_default_fromraw, c_default_toraw, Value)
-#define using_cvec_4(X, Value, valueCompare, valueDestroy) \
-                    using_cvec_7(X, Value, valueCompare, valueDestroy, c_no_fromraw, c_default_toraw, Value)
+                    using_cvec_7(X, Value, valueCompare, c_plain_del, c_plain_fromraw, c_plain_toraw, Value)
+#define using_cvec_5(X, Value, valueCompare, valueDel, valueFromRaw) \
+                    using_cvec_7(X, Value, valueCompare, valueDel, valueFromRaw, c_plain_toraw, Value)
 #define using_cvec_str() \
                     using_cvec_7(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
 
@@ -49,7 +49,7 @@ struct cvec_rep { size_t size, cap; void* data[]; };
 #define cvec_rep_(self) c_container_of((self)->data, struct cvec_rep, data)
 typedef int (*c_cmp_fn)(const void*, const void*);
 
-#define using_cvec_7(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue) \
+#define using_cvec_7(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
     typedefs_cvec(X, Value, RawValue); \
 \
     STC_API cvec_##X \
@@ -105,7 +105,7 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     } \
     STC_INLINE void \
     cvec_##X##_pop_back(cvec_##X* self) { \
-        valueDestroy(&self->data[--cvec_rep_(self)->size]); \
+        valueDel(&self->data[--cvec_rep_(self)->size]); \
     } \
 \
     STC_API cvec_##X##_iter_t \
@@ -197,7 +197,7 @@ typedef int (*c_cmp_fn)(const void*, const void*);
         cvec_##X##_sort_range(cvec_##X##_begin(self), cvec_##X##_end(self), cvec_##X##_value_compare); \
     } \
 \
-    _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue) \
+    _c_implement_cvec_7(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
     typedef cvec_##X cvec_##X##_t
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
@@ -205,7 +205,7 @@ typedef int (*c_cmp_fn)(const void*, const void*);
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 static struct cvec_rep _cvec_inits = {0, 0};
 
-#define _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue) \
+#define _c_implement_cvec_7(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
 \
     STC_DEF cvec_##X \
     cvec_##X##_init(void) { \
@@ -225,7 +225,7 @@ static struct cvec_rep _cvec_inits = {0, 0};
     cvec_##X##_clear(cvec_##X* self) { \
         struct cvec_rep* rep = cvec_rep_(self); if (rep->cap) { \
             for (cvec_##X##_value_t *p = self->data, *q = p + rep->size; p != q; ++p) \
-                valueDestroy(p); \
+                valueDel(p); \
             rep->size = 0; \
         } \
     } \
@@ -253,7 +253,7 @@ static struct cvec_rep _cvec_inits = {0, 0};
         cvec_##X##_reserve(self, len); \
         struct cvec_rep* rep = cvec_rep_(self); \
         size_t i, n = rep->size; \
-        for (i = len; i < n; ++i) valueDestroy(self->data + i); \
+        for (i = len; i < n; ++i) valueDel(self->data + i); \
         for (i = n; i < len; ++i) self->data[i] = null_val; \
         if (rep->cap) rep->size = len; \
     } \
@@ -294,7 +294,7 @@ static struct cvec_rep _cvec_inits = {0, 0};
         intptr_t len = finish - first; \
         if (len > 0) { \
             cvec_##X##_value_t* p = first, *end = self->data + cvec_rep_(self)->size; \
-            while (p != finish) valueDestroy(p++); \
+            while (p != finish) valueDel(p++); \
             memmove(first, finish, (end - finish) * sizeof(Value)); \
             cvec_rep_(self)->size -= len; \
         } \
@@ -332,7 +332,7 @@ static struct cvec_rep _cvec_inits = {0, 0};
     }
 
 #else
-#define _c_implement_cvec_7(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue)
+#define _c_implement_cvec_7(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue)
 #endif
 
 #endif

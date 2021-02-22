@@ -10,8 +10,8 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 ```c
 using_csset(X, Key);
 using_csset(X, Key, keyCompare);
-using_csset(X, Key, keyCompare, keyDestroy);
-using_csset(X, Key, keyCompare, keyDestroy, keyFromRaw, keyToRaw, RawKey);
+using_csset(X, Key, keyCompare, keyDel, keyClone);
+using_csset(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey);
 using_csset_str();
 ```
 The macro `using_csset()` must be instantiated in the global scope. `X` is a type tag name and
@@ -54,9 +54,6 @@ csset_X_iter_t      csset_X_begin(csset_X* self);
 csset_X_iter_t      csset_X_end(csset_X* self);
 void                csset_X_next(csset_X_iter_t* it);
 csset_X_value_t*    csset_X_itval(csset_X_iter_t it);
-
-csset_X_value_t     csset_X_value_clone(csset_X_value_t val);
-void                csset_X_value_del(csset_X_value_t* val);
 ```
 
 ## Types

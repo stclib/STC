@@ -8,9 +8,9 @@ A **cset** is an associative container that contains a set of unique objects of 
 
 ```c
 using_cset(X, Key);
-using_cset(X, Key, keyEqualsRaw, keyHashRaw);
-using_cset(X, Key, keyEqualsRaw, keyHashRaw, keyDestroy);
-using_cset(X, Key, keyEqualsRaw, keyHashRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
+using_cset(X, Key, keyEquals, keyHash);
+using_cset(X, Key, keyEquals, keyHash, keyDel, keyClone);
+using_cset(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey);
 using_cset_str();
 ```
 The macro `using_cset()` must be instantiated in the global scope. `X` is a type tag name and
@@ -59,9 +59,6 @@ cset_X_iter_t       cset_X_begin(cset_X* self);
 cset_X_iter_t       cset_X_end(cset_X* self);
 void                cset_X_next(cset_X_iter_t* it);
 cset_X_value_t*     cset_X_itval(cset_X_iter_t it);
-
-cset_X_value_t      cset_X_value_clone(cset_X_value_t val);
-void                cset_X_value_del(cset_X_value_t* val);
 ```
 
 ## Types

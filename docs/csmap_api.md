@@ -10,21 +10,21 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 ```c
 using_csmap(X, Key, Mapped);
 using_csmap(X, Key, Mapped, keyCompare);
-using_csmap(X, Key, Mapped, keyCompare, mappedDestroy);
-using_csmap(X, Key, Mapped, keyCompare, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped);
-using_csmap(X, Key, Mapped, keyCompareRaw, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped,
-                                           keyDestroy, keyFromRaw, keyToRaw, RawKey);
-using_csmap_keydef(X, Key, Mapped, keyCompare, keyDestroy);
-using_csmap_keydef(X, Key, Mapped, keyCompareRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
+using_csmap(X, Key, Mapped, keyCompare, mappedDel, mappedClone);
+using_csmap(X, Key, Mapped, keyCompare, mappedDel, mappedFromRaw, mappedToRaw, RawMapped);
+using_csmap(X, Key, Mapped, keyCompareRaw, mappedDel, mappedFromRaw, mappedToRaw, RawMapped,
+                                           keyDel, keyFromRaw, keyToRaw, RawKey);
+using_csmap_keydef(X, Key, Mapped, keyCompare, keyDel, keyClone);
+using_csmap_keydef(X, Key, Mapped, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey);
 
 using_csmap_strkey(X, Mapped);                    // using_csmap(X, cstr, Mapped, ...)
-using_csmap_strkey(X, Mapped, mappedDestroy);
-using_csmap_strkey(X, Mapped, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped);
+using_csmap_strkey(X, Mapped, mappedDel, mappedClone);
+using_csmap_strkey(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped);
 
 using_csmap_strval(X, Key);                       // using_csmap(X, Key, cstr, ...)
 using_csmap_strval(X, Key, keyCompare);
-using_csmap_strval(X, Key, keyCompare, keyDestroy);
-using_csmap_strval(X, Key, keyCompareRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
+using_csmap_strval(X, Key, keyCompare, keyDel, keyClone);
+using_csmap_strval(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey);
 
 using_csmap_str();                                // using_csmap(str, cstr, cstr, ...)
 ```
@@ -70,9 +70,6 @@ csmap_X_iter_t      csmap_X_begin(csmap_X* self);
 csmap_X_iter_t      csmap_X_end(csmap_X* self);
 void                csmap_X_next(csmap_X_iter_t* it);
 csmap_X_mapped_t*   csmap_X_itval(csmap_X_iter_t it);
-
-csmap_X_value_t     csmap_X_value_clone(csmap_X_value_t val);
-void                csmap_X_value_del(csmap_X_value_t* val);
 ```
 ## Types
 

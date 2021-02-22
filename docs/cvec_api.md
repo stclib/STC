@@ -13,9 +13,9 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 
 ```c
 using_cvec(X, Value);
-using_cvec(X, Value, valueCompareRaw);
-using_cvec(X, Value, valueCompareRaw, valueDestroy);
-using_cvec(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue);
+using_cvec(X, Value, valueCompare);
+using_cvec(X, Value, valueCompare, valueDel, valueClone);
+using_cvec(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue);
 
 using_cvec_str()
 ```

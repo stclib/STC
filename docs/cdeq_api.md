@@ -9,9 +9,9 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 
 ```c
 using_cdeq(X, Value);
-using_cdeq(X, Value, valueCompareRaw);
-using_cdeq(X, Value, valueCompareRaw, valueDestroy);
-using_cdeq(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue);
+using_cdeq(X, Value, valueCompare);
+using_cdeq(X, Value, valueCompare, valueDel, valueClone);
+using_cdeq(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue);
 
 using_cdeq_str();
 ```

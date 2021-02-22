@@ -5,10 +5,10 @@
 
 void check_del(float* v) {printf("destroy %g\n", *v);}
 
-using_carray(f, float, check_del);
-using_clist(a, carray2f, c_no_compare, carray2f_del);
-using_cmap(l, int, clist_a, c_default_equals, c_default_hash, clist_a_del);
-using_cmap_strkey(s, cmap_l, cmap_l_del);
+using_carray(f, float, check_del, c_plain_fromraw);
+using_clist(a, carray2f, c_no_compare, carray2f_del, c_no_clone);
+using_cmap(l, int, clist_a, c_default_equals, c_default_hash, clist_a_del, c_no_clone);
+using_cmap_strkey(s, cmap_l, cmap_l_del, c_no_clone);
 
 int main() {
     int xdim = 4, ydim = 6;

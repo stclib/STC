@@ -10,7 +10,7 @@ See the c++ class [boost::multi_array](https://www.boost.org/doc/libs/release/li
 
 ```c
 using_carray(X, Value);
-using_carray(X, Value, valueDestroy);
+using_carray(X, Value, valueDel, valueClone);
 ```
 The macro `using_carray()` must be instantiated in the global scope. `X` and `N` are type tags and
 will affect the names of all cset types and methods. E.g. declaring `using_carray(my, int);`, `X` should

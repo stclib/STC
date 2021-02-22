@@ -48,12 +48,9 @@ int main()
 
 #define using_carray(...) c_MACRO_OVERLOAD(using_carray, __VA_ARGS__)
 #define using_carray_2(X, Value) \
-    using_carray_4(X, Value, c_default_del, c_default_fromraw)
+    using_carray_4(X, Value, c_plain_del, c_plain_fromraw)
 
-#define using_carray_3(X, Value, valueDestroy) \
-    using_carray_4(X, Value, valueDestroy, c_no_fromraw)
-
-#define using_carray_4(X, Value, valueDestroy, valueClone) \
+#define using_carray_4(X, Value, valueDel, valueClone) \
 \
     typedef Value carray1##X##_value_t; \
     typedef carray1##X##_value_t carray2##X##_value_t, carray3##X##_value_t; \
@@ -86,9 +83,9 @@ int main()
     STC_INLINE size_t \
     carray3##X##_zdim(carray3##X a) {return _carray_zdim(a);} \
 \
-    _using_carray_common(1, X, Value, valueDestroy, valueClone) \
-    _using_carray_common(2, X, Value, valueDestroy, valueClone) \
-    _using_carray_common(3, X, Value, valueDestroy, valueClone) \
+    _using_carray_common(1, X, Value, valueDel, valueClone) \
+    _using_carray_common(2, X, Value, valueDel, valueClone) \
+    _using_carray_common(3, X, Value, valueDel, valueClone) \
 \
     STC_INLINE carray1##X \
     carray1##X##_init(size_t xdim, Value val) { \
@@ -166,7 +163,7 @@ int main()
 #define _carray_ydim(a) (a)._ydim
 #define _carray_zdim(a) (a)._zdim
 
-#define _using_carray_common(D, X, Value, valueDestroy, valueClone) \
+#define _using_carray_common(D, X, Value, valueDel, valueClone) \
     typedef struct { Value *ref; } carray##D##X##_iter_t; \
 \
     STC_INLINE carray##D##X##_iter_t \
@@ -184,7 +181,7 @@ int main()
     carray##D##X##_del(carray##D##X* self) { \
         if (self->_xdim & _carray_OWN) { \
             c_foreach_3 (i, carray##D##X, *self) \
-                valueDestroy(i.ref); \
+                valueDel(i.ref); \
             c_free(self->data); \
         } \
     } \

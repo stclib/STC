@@ -11,21 +11,21 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 ```c
 using_cmap(X, Key, Mapped);
 using_cmap(X, Key, Mapped, keyEquals, keyHash);
-using_cmap(X, Key, Mapped, keyEquals, keyHash, mappedDestroy);
-using_cmap(X, Key, Mapped, keyEquals, keyHash, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped);
-using_cmap(X, Key, Mapped, keyEqualsRaw, keyHashRaw, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped,
-                                                     keyDestroy, keyFromRaw, keyToRaw, RawKey);
-using_cmap_keydef(X, Key, Mapped, keyEquals, keyHash, keyDestroy);
-using_cmap_keydef(X, Key, Mapped, keyEqualsRaw, keyHashRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
+using_cmap(X, Key, Mapped, keyEquals, keyHash, mappedDel, mappedClone);
+using_cmap(X, Key, Mapped, keyEquals, keyHash, mappedDel, mappedFromRaw, mappedToRaw, RawMapped);
+using_cmap(X, Key, Mapped, keyEqualsRaw, keyHashRaw, mappedDel, mappedFromRaw, mappedToRaw, RawMapped,
+                                                     keyDel, keyFromRaw, keyToRaw, RawKey);
+using_cmap_keydef(X, Key, Mapped, keyEquals, keyHash, keyDel, keyClone);
+using_cmap_keydef(X, Key, Mapped, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey);
 
 using_cmap_strkey(X, Mapped);                   // using_cmap(X, cstr, Mapped, ...)
-using_cmap_strkey(X, Mapped, mappedDestroy);
-using_cmap_strkey(X, Mapped, mappedDestroy, mappedFromRaw, mappedToRaw, RawMapped);
+using_cmap_strkey(X, Mapped, mappedDel, mappedClone);
+using_cmap_strkey(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped);
 
 using_cmap_strval(X, Key);                      // using_cmap(X, Key, cstr, ...)
 using_cmap_strval(X, Key, keyEquals, keyHash);
-using_cmap_strval(X, Key, keyEquals, keyHash, keyDestroy);
-using_cmap_strval(X, Key, keyEqualsRaw, keyHashRaw, keyDestroy, keyFromRaw, keyToRaw, RawKey);
+using_cmap_strval(X, Key, keyEquals, keyHash, keyDel, keyClone);
+using_cmap_strval(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey);
 
 using_cmap_str()                                // using_cmap(str, cstr, cstr, ...)
 ```
@@ -77,18 +77,16 @@ cmap_X_iter_t       cmap_X_begin(cmap_X* self);
 cmap_X_iter_t       cmap_X_end(cmap_X* self);
 void                cmap_X_next(cmap_X_iter_t* it);
 cmap_X_mapped_t*    cmap_X_itval(cmap_X_iter_t it);
-
-cmap_X_value_t      cmap_X_value_clone(cmap_X_value_t val);
-void                cmap_X_value_del(cmap_X_value_t* val);
 ```
 ```
 uint64_t            c_default_hash(const void *data, size_t len);
 uint64_t            c_default_hash32(const void* data, size_t len=4);
 uint64_t            c_default_hash64(const void* data, size_t len=8);
 int                 c_default_equals(const RawKey* a, const RawKey* b);
-void                c_default_destruct(Value* val);
-Value               c_default_fromraw(RawValue raw);
-RawValue            c_default_toraw(Value* val);
+void                c_plain_del(Type* val);
+Value               c_no_clone(Type val);
+Value               c_plain_fromraw(RawType raw);
+RawType             c_plain_toraw(Type* val);
 ```
 
 ## Types
@@ -200,7 +198,7 @@ Demonstrate cmap with plain-old-data key type Vec3i and int as mapped type: cmap
 
 typedef struct { int x, y, z; } Vec3i;
 
-using_cmap(v3, Vec3i, int, c_memcmp_equals, // compare Vec3i bitwise 
+using_cmap(v3, Vec3i, int, c_plain_equals, // compare Vec3i bitwise 
                            c_default_hash); // hash Vec3i bitwise.
 
 int main()

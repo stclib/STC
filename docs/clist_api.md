@@ -18,9 +18,9 @@ See the c++ class [std::forward_list](https://en.cppreference.com/w/cpp/containe
 
 ```c
 using_clist(X, Value);
-using_clist(X, Value, valueCompareRaw);
-using_clist(X, Value, valueCompareRaw, valueDestroy);
-using_clist(X, Value, valueCompareRaw, valueDestroy, valueFromRaw, valueToRaw, RawValue);
+using_clist(X, Value, valueCompare);
+using_clist(X, Value, valueCompare, valueDel, valueClone);
+using_clist(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue);
 
 using_clist_str()
 ```

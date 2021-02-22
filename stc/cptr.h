@@ -45,7 +45,7 @@ int Person_compare(const Person* p, const Person* q) {
 }
 
 using_cptr(pe, Person, Person_compare, Person_del);
-using_cvec(pe, Person*, cptr_pe_compare, cptr_pe_del);
+using_cvec(pe, Person*, cptr_pe_compare, cptr_pe_del, c_no_clone);
 
 int main() {
     cvec_pe vec = cvec_pe_init();
@@ -65,15 +65,15 @@ int main() {
     using_cptr_3(X, Value, c_default_compare)
 
 #define using_cptr_3(X, Value, valueCompare) \
-    using_cptr_4(X, Value, valueCompare, c_default_del)
+    using_cptr_4(X, Value, valueCompare, c_plain_del)
 
-#define using_cptr_4(X, Value, valueCompare, valueDestroy) \
+#define using_cptr_4(X, Value, valueCompare, valueDel) \
     typedef Value cptr_##X##_value_t; \
     typedef cptr_##X##_value_t *cptr_##X; \
 \
     STC_INLINE void \
     cptr_##X##_del(cptr_##X* self) { \
-        valueDestroy(*self); \
+        valueDel(*self); \
         c_free(*self); \
     } \
 \
@@ -158,9 +158,9 @@ typedef long atomic_count_t;
     using_csptr_3(X, Value, c_default_compare)
 
 #define using_csptr_3(X, Value, valueCompare) \
-    using_csptr_4(X, Value, valueCompare, c_default_del)
+    using_csptr_4(X, Value, valueCompare, c_plain_del)
 
-#define using_csptr_4(X, Value, valueCompare, valueDestroy) \
+#define using_csptr_4(X, Value, valueCompare, valueDel) \
     typedef Value csptr_##X##_value_t; \
     typedef struct { csptr_##X##_value_t* get; atomic_count_t* use_count; } csptr_##X; \
 \
@@ -185,7 +185,7 @@ typedef long atomic_count_t;
     csptr_##X##_del(csptr_##X* self) { \
         if (self->use_count && atomic_decrement(self->use_count) == 0) { \
             c_free(self->use_count); \
-            valueDestroy(self->get); \
+            valueDel(self->get); \
             c_free(self->get); \
         } \
     } \
