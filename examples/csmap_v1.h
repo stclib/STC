@@ -50,19 +50,19 @@ int main(void) {
     using_csmap_4(X, Key, Mapped, c_default_compare)
 
 #define using_csmap_4(X, Key, Mapped, keyCompare) \
-    using_csmap_6(X, Key, Mapped, keyCompare, c_plain_del, c_plain_fromraw)
+    using_csmap_6(X, Key, Mapped, keyCompare, c_trivial_del, c_trivial_fromraw)
 
 #define using_csmap_6(X, Key, Mapped, keyCompare, mappedDel, mappedClone) \
-    using_csmap_8(X, Key, Mapped, keyCompare, mappedDel, mappedClone, c_plain_del, c_plain_fromraw)
+    using_csmap_8(X, Key, Mapped, keyCompare, mappedDel, mappedClone, c_trivial_del, c_trivial_fromraw)
 
 #define using_csmap_8(X, Key, Mapped, keyCompare, mappedDel, mappedClone, keyDel, keyClone) \
     using_csmap_10(X, Key, Mapped, keyCompare, mappedDel, mappedClone, \
-                      keyDel, keyClone, c_plain_toraw, Key)
+                      keyDel, keyClone, c_trivial_toraw, Key)
 
 #define using_csmap_10(X, Key, Mapped, keyCompareRaw, mappedDel, mappedClone, \
                           keyDel, keyFromRaw, keyToRaw, RawKey) \
     _using_CBST(X, csmap, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \
-                   keyFromRaw, keyToRaw, RawKey, mappedClone, c_plain_toraw, Mapped)
+                   keyFromRaw, keyToRaw, RawKey, mappedClone, c_trivial_toraw, Mapped)
 
 /* csset: */
 #define using_csset(...) \
@@ -72,10 +72,10 @@ int main(void) {
     using_csset_3(X, Key, c_default_compare)
 
 #define using_csset_3(X, Key, keyCompare) \
-    using_csset_5(X, Key, keyCompare, c_plain_del, c_plain_fromraw)
+    using_csset_5(X, Key, keyCompare, c_trivial_del, c_trivial_fromraw)
 
 #define using_csset_5(X, Key, keyCompare, keyDel, keyClone) \
-    using_csset_7(X, Key, keyCompare, keyDel, keyClone, c_plain_toraw, Key)
+    using_csset_7(X, Key, keyCompare, keyDel, keyClone, c_trivial_toraw, Key)
 
 #define using_csset_7(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
     _using_CBST(X, csset, Key, Key, keyCompareRaw, _UNUSED_, keyDel, \
@@ -92,14 +92,14 @@ int main(void) {
     c_MACRO_OVERLOAD(using_csmap_strkey, __VA_ARGS__)
 
 #define using_csmap_strkey_2(X, Mapped) \
-    _using_CBST_strkey(X, csmap, Mapped, c_plain_del, c_plain_fromraw)
+    _using_CBST_strkey(X, csmap, Mapped, c_trivial_del, c_trivial_fromraw)
 
 #define using_csmap_strkey_4(X, Mapped, mappedDel, mappedClone) \
     _using_CBST_strkey(X, csmap, Mapped, mappedDel, mappedClone)
 
 #define _using_CBST_strkey(X, C, Mapped, mappedDel, mappedClone) \
     _using_CBST(X, C, cstr_t, Mapped, cstr_compare_raw, mappedDel, cstr_del, \
-                   cstr_from, cstr_c_str, const char*, mappedClone, c_plain_toraw, Mapped)
+                   cstr_from, cstr_c_str, const char*, mappedClone, c_trivial_toraw, Mapped)
 
 #define using_csmap_strval(...) \
     c_MACRO_OVERLOAD(using_csmap_strval, __VA_ARGS__)
@@ -108,10 +108,10 @@ int main(void) {
     using_csmap_strval_3(X, Key, c_default_compare)
 
 #define using_csmap_strval_3(X, Key, keyCompare) \
-    using_csmap_strval_5(X, Key, keyCompare, c_plain_del, c_plain_fromraw)
+    using_csmap_strval_5(X, Key, keyCompare, c_trivial_del, c_trivial_fromraw)
 
 #define using_csmap_strval_5(X, Key, keyCompare, keyDel, keyClone) \
-    using_csmap_strval_7(X, Key, keyCompare, keyDel, keyClone, c_plain_toraw, Key)
+    using_csmap_strval_7(X, Key, keyCompare, keyDel, keyClone, c_trivial_toraw, Key)
 
 #define using_csmap_strval_7(X, Key, keyCompare, keyDel, keyFromRaw, keyToRaw, RawKey) \
     _using_CBST(X, csmap, Key, cstr_t, keyCompare, cstr_del, keyDel, \

@@ -83,13 +83,13 @@
 #define c_no_compare(x, y)      (assert(!"c_no_compare() called"), 0)
 
 #define c_default_equals(x, y)  (*(x) == *(y))
-#define c_plain_equals(x, y)    (memcmp(x, y, sizeof *(x)) == 0)
+#define c_trivial_equals(x, y)  (memcmp(x, y, sizeof *(x)) == 0)
 
-#define c_plain_fromraw(x)      (x)
-#define c_no_clone(x)           (assert(!"emplace*() with c_no_clone"), x)
-#define c_plain_toraw(ptr)    (*(ptr))
+#define c_no_clone(x)           (assert(!"c_no_clone() called"), x)
+#define c_trivial_fromraw(x)    (x)
+#define c_trivial_toraw(ptr)    (*(ptr))
 
-#define c_plain_del(ptr)      ((void) (ptr))
+#define c_trivial_del(ptr)      ((void) (ptr))
 
 /* Generic algorithms */
 

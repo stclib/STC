@@ -79,15 +79,16 @@ cmap_X_iter_t       cmap_X_end(cmap_X* self);
 void                cmap_X_next(cmap_X_iter_t* it);
 cmap_X_mapped_t*    cmap_X_itval(cmap_X_iter_t it);
 ```
-```
-uint64_t            c_default_hash(const void *data, size_t len);
+```c
+uint64_t            c_default_hash(const void *data, size_t len);       // bytewise hash
 uint64_t            c_default_hash32(const void* data, size_t len=4);
 uint64_t            c_default_hash64(const void* data, size_t len=8);
 int                 c_default_equals(const RawKey* a, const RawKey* b);
-void                c_plain_del(Type* val);
-Value               c_no_clone(Type val);
-Value               c_plain_fromraw(RawType raw);
-RawType             c_plain_toraw(Type* val);
+int                 c_trivial_equals(const RawKey* a, const RawKey* b); // bitwise
+Type                c_no_clone(Type val);
+Type                c_trivial_fromraw(Type val);                        // plain copy
+Type                c_trivial_toraw(Type* val);
+void                c_trivial_del(Type* val);                           // does nothing
 ```
 
 ## Types
@@ -199,8 +200,8 @@ Demonstrate cmap with plain-old-data key type Vec3i and int as mapped type: cmap
 
 typedef struct { int x, y, z; } Vec3i;
 
-using_cmap(v3, Vec3i, int, c_plain_equals, // compare Vec3i bitwise 
-                           c_default_hash); // hash Vec3i bitwise.
+using_cmap(v3, Vec3i, int, c_trivial_equals, // bitwise equals
+                           c_default_hash);  // bytewise hash
 
 int main()
 {

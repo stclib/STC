@@ -65,7 +65,7 @@ int main() {
     using_cptr_3(X, Value, c_default_compare)
 
 #define using_cptr_3(X, Value, valueCompare) \
-    using_cptr_4(X, Value, valueCompare, c_plain_del)
+    using_cptr_4(X, Value, valueCompare, c_trivial_del)
 
 #define using_cptr_4(X, Value, valueCompare, valueDel) \
     typedef Value cptr_##X##_value_t; \
@@ -158,7 +158,7 @@ typedef long atomic_count_t;
     using_csptr_3(X, Value, c_default_compare)
 
 #define using_csptr_3(X, Value, valueCompare) \
-    using_csptr_4(X, Value, valueCompare, c_plain_del)
+    using_csptr_4(X, Value, valueCompare, c_trivial_del)
 
 #define using_csptr_4(X, Value, valueCompare, valueDel) \
     typedef Value csptr_##X##_value_t; \
