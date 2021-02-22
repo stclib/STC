@@ -32,7 +32,7 @@ All cpque definitions and prototypes may be included in your C source file by in
 cpque_X                 cpque_X_init(void);
 cpque_X                 cpque_X_clone(cpque_X pq);
 void                    cpque_X_make_heap(cpque_X* self);
-void                    cpque_X_del(cpque_X* self);
+void                    cpque_X_del(cpque_X* self);      // destructor
 
 size_t                  cpque_X_size(cpque_X pq);
 bool                    cpque_X_empty(cpque_X pq);

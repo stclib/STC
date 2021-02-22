@@ -34,7 +34,7 @@ csset_X             csset_X_init(void);
 csset_X             csset_X_clone(csset_x set);
 void                csset_X_clear(csset_X* self);
 void                csset_X_swap(csset_X* a, csset_X* b);
-void                csset_X_del(csset_X* self);
+void                csset_X_del(csset_X* self);      // destructor
 
 bool                csset_X_empty(csset_X m);
 size_t              csset_X_size(csset_X m);
@@ -54,6 +54,8 @@ csset_X_iter_t      csset_X_begin(csset_X* self);
 csset_X_iter_t      csset_X_end(csset_X* self);
 void                csset_X_next(csset_X_iter_t* it);
 csset_X_value_t*    csset_X_itval(csset_X_iter_t it);
+
+csset_X_value_t     csset_X_value_clone(csset_X_value_t val);
 ```
 
 ## Types

@@ -46,7 +46,7 @@ csmap_X             csmap_X_init(void);
 csmap_X             csmap_X_clone(csmap_x map);
 void                csmap_X_clear(csmap_X* self);
 void                csmap_X_swap(csmap_X* a, csmap_X* b);
-void                csmap_X_del(csmap_X* self);
+void                csmap_X_del(csmap_X* self);      // destructor
 
 bool                csmap_X_empty(csmap_X map);
 size_t              csmap_X_size(csmap_X map);
@@ -71,6 +71,8 @@ csmap_X_iter_t      csmap_X_begin(csmap_X* self);
 csmap_X_iter_t      csmap_X_end(csmap_X* self);
 void                csmap_X_next(csmap_X_iter_t* it);
 csmap_X_mapped_t*   csmap_X_itval(csmap_X_iter_t it);
+
+csmap_X_value_t     csmap_X_value_clone(csmap_X_value_t val);
 ```
 ## Types
 

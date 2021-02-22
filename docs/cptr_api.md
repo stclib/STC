@@ -38,7 +38,7 @@ The *del()* and *compare()* methods are defined based on the arguments passed to
 cptr_X              cptr_X_init(void);
 cptr_X              cptr_X_clone(cptr_X ptr);
 void                cptr_X_reset(cptr_X* self, cptr_X_value_t* ptr);
-void                cptr_X_del(cptr_X* self);
+void                cptr_X_del(cptr_X* self);         // destructor
 int                 cptr_X_compare(cptr_X* x, cptr_X* y);
 ```
 ### Shared pointer
@@ -46,8 +46,8 @@ int                 cptr_X_compare(cptr_X* x, cptr_X* y);
 csptr_X             csptr_X_from(csptr_X_value_t* ptr);
 csptr_X             csptr_X_make(csptr_X_value_t val);
 void                csptr_X_reset(csptr_X* self, csptr_X_value_t* ptr);
-csptr_X             csptr_X_clone(csptr_X sptr);    // share the pointer (increase use count)
-void                csptr_X_del(csptr_X* self);     // decrease use count, destroy if 0
+csptr_X             csptr_X_clone(csptr_X sptr);      // share the pointer (increase use count)
+void                csptr_X_del(csptr_X* self);       // destructor: decrease use count, destroy if 0
 int                 csptr_X_compare(csptr_X* x, csptr_X* y);
 ```
 

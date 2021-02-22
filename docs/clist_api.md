@@ -45,7 +45,7 @@ clist_X             clist_X_init(void);
 clist_X             clist_X_clone(clist_X list);
 
 void                clist_X_clear(clist_X* self);
-void                clist_X_del(clist_X* self);
+void                clist_X_del(clist_X* self);      // destructor
 
 bool                clist_X_empty(clist_X list);
 size_t              clist_X_size(clist_X list); // note: O(n)

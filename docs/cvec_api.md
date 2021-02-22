@@ -49,7 +49,7 @@ void                cvec_X_reserve(cvec_X* self, size_t cap);
 void                cvec_X_resize(cvec_X* self, size_t size, Value fill);
 void                cvec_X_swap(cvec_X* a, cvec_X* b);
 
-void                cvec_X_del(cvec_X* self);
+void                cvec_X_del(cvec_X* self);      // destructor
 
 bool                cvec_X_empty(cvec_X vec);
 size_t              cvec_X_size(cvec_X vec);

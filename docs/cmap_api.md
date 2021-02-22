@@ -52,7 +52,7 @@ void                cmap_X_clear(cmap_X* self);
 void                cmap_X_reserve(cmap_X* self, size_t size);
 void                cmap_X_swap(cmap_X* a, cmap_X* b);
 
-void                cmap_X_del(cmap_X* self);
+void                cmap_X_del(cmap_X* self);                                                // destructor
 
 bool                cmap_X_empty(cmap_X map);
 size_t              cmap_X_size(cmap_X map);
@@ -78,6 +78,8 @@ cmap_X_iter_t       cmap_X_begin(cmap_X* self);
 cmap_X_iter_t       cmap_X_end(cmap_X* self);
 void                cmap_X_next(cmap_X_iter_t* it);
 cmap_X_mapped_t*    cmap_X_itval(cmap_X_iter_t it);
+
+cmap_X_value_t      cmap_X_value_clone(cmap_X_value_t val);
 ```
 ```c
 uint64_t            c_default_hash(const void *data, size_t len);       // bytewise hash

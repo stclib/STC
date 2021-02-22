@@ -27,7 +27,7 @@ All cqueue definitions and prototypes may be included in your C source file by i
 ```c
 cqueue_X                cqueue_X_init(void);
 cqueue_X                cqueue_X_clone(cqueue_X q);
-void                    cqueue_X_del(cqueue_X* self);
+void                    cqueue_X_del(cqueue_X* self);      // destructor
 
 size_t                  cqueue_X_size(cqueue_X q);
 bool                    cqueue_X_empty(cqueue_X q);

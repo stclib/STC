@@ -45,7 +45,7 @@ void                cdeq_X_reserve(cdeq_X* self, size_t cap);
 void                cdeq_X_resize(cdeq_X* self, size_t size, Value fill);
 void                cdeq_X_swap(cdeq_X* a, cdeq_X* b);
 
-void                cdeq_X_del(cdeq_X* self);
+void                cdeq_X_del(cdeq_X* self);      // destructor
 
 bool                cdeq_X_empty(cdeq_X deq);
 size_t              cdeq_X_size(cdeq_X deq);
