@@ -49,9 +49,9 @@ Notes:
 
 Highlights
 ----------
-- **User friendly** - Super easy usage, just include the header and you are good to go. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of value- *comparison*, *destruction*, *cloning*, *convertion types*, and more.
+- **User friendly** - Super easy usage, just include the header and you are good to go. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of value- *comparison*, *destruction*, *cloning*, *conversion types*, and more.
 - **Unparalleled performance** - The containers are about equal and sometimes much faster than the c++ STL containers.
-- **Fully memory managed** - All containers will destruct keys/values via destructor passed as macro parameters to the ***using_***-declaration. Also smart-pointers are supported and can be stored in containers, see ***csptr***.
+- **Fully memory managed** - All containers will destruct keys/values via destructor passed as macro parameters to the ***using_***-declaration. Also, smart-pointers are supported and can be stored in containers, see ***csptr***.
 - **Fully type safe** - Avoids error-prone casting of container types and elements back and forth from the containers.
 - **Uniform, easy-to-learn API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have uniform and intuitive usage across the various containers.
 - **Small footprint** - Small source code and generated executables. The executable from the example below using six different containers is *27 kb in size* compiled with TinyC.
@@ -173,9 +173,9 @@ Installation
 Because it is headers-only, headers can simply be included in your program. The methods are static by default (some inlined).
 You may add the project folder to **CPATH** environment variable, to let GCC, Clang, and TinyC locate the headers.
 
-If containers are used accross several translation units with common instantiated container types, it is recommended to
-build as a "library" to minimize the executable size. To enable this mode, specify **-DSTC_HEADER** as compiler option
-in your build environment, and place all the instantiations of containers used in a single C-source file, e.g.:
+If containers are used across several translation units with common instantiated container types, it is recommended to
+build as a "library" to minimize the executable size. To enable this mode, specify **-DSTC_HEADER** as a compiler option
+in your build environment and place all the instantiations of containers used in a single C-source file, e.g.:
 ```c
 // stc_libs.c
 #define STC_IMPLEMENTATION
@@ -201,49 +201,56 @@ non-trivial container elements, e.g. smart pointers or elements using dynamic me
 and the following does not apply for maps of these types.
 
 The **emplace** methods ***constructs*** or ***clones*** their own copy of the elements to be added.
-In contrast, the non-emplace methods, requires elements to be explicitely constructed or cloned before adding them.
+In contrast, the non-emplace methods requires elements to be explicitly constructed or cloned before adding them.
 
-String is the most commonly used non-trivial data type. STC containers have proper pre-defined
+Strings are the most commonly used non-trivial data type. STC containers have proper pre-defined
 **using_**-declarations for cstr-elements, so they are fail-safe to use both with **emplace**
 and non-emplace methods:
 ```c
 using_cvec_str(); // vector of string (cstr)
 ...
-cstr s = cstr_from("a new string");
 cvec_str vec = cvec_str_init();
+cstr s = cstr_from("a new string");
+
 cvec_str_push_back(&vec, cstr_from("Hello")); // construct and add string
 cvec_str_push_back(&vec, cstr_clone(s));      // clone and add an existing string
+
 cvec_str_emplace_back(&vec, "Yay, literal");  // internally constructs cstr from string-literal
 cvec_str_emplace_back(&vec, cstr_clone(s));   // Logical and compile ERROR! wrong input type
-cvec_str_emplace_back(&vec, s.str);           // Ok: const char* type.
-cvec_del(&vec); cstr_del(&s);
+cvec_str_emplace_back(&vec, s.str);           // Ok: const char* type (= rawvalue).
+
+cstr_del(&s);
+cvec_del(&vec);
 ```
-The **using**-declarations may be given an optional convertion/"rawvalue"-type as template parameter,
-along with a back and forth convertion methods to the container value type. By default, *rawvalue 
-has the same type as value*. 
+This is made possible because the **using**-declarations may be given an optional
+convertion/"rawvalue"-type as template parameter, along with a back and forth convertion 
+methods to the container value type. By default, *rawvalue has the same type as value*. 
 
 Rawvalues are also beneficial for **find()** and *map insertions*. The **emplace()** methods constructs
 *cstr*-objects from the rawvalues, but only when required:
 ```c
 cmap_str_emplace(&map, "Hello", "world");
-// Two cstr-objects was constructed by emplace
+// Two cstr-objects were constructed by emplace
+
 cmap_str_emplace(&map, "Hello", "again");
 // No cstr was constructed because "Hello" was already in the map.
+
 cmap_str_emplace_or_assign(&map, "Hello", "there");
-// Only cstr_from("there") was constructed ("world" was destructed and replaced).
+// Only cstr_from("there") constructed. "world" was destructed and replaced.
+
 cmap_str_insert(&map, cstr_from("Hello"), cstr_from("you"));
 // Two cstr's constructed outside call, but both destructed by insert 
-// because "Hello" existed. No mem-leak but inefficient.
+// because "Hello" existed. No mem-leak but less efficient.
+
 it = cmap_str_find(&map, "Hello");
 // No cstr constructed for lookup, although keys are cstr-type.
 ```
-Map- and set is normally used with trivial types, except for strings. However, the last
-example on the **cmap** page demonstrates how to specify a map with non-trivial elements.
+Map and set are normally used with trivial value types, except for strings. The last
+example on the **cmap** page demonstrates how to specify a map with non-trivial keys.
 
 Memory efficiency
 -----------------
 
-STC containers are very memory efficent.
 - **cstr**, **cvec**: Type size: one pointer. The size and capacity is stored as part of the heap allocation that also holds the vector elements.
 - **clist**: Type size: one pointer. Each node allocates block storing value and next pointer.
 - **cdeq**:  Type size: two pointers. Otherwise like *cvec*.
