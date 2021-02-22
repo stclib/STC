@@ -85,7 +85,7 @@ void Person_del(Person* p) {
 }
 // declare managed pointer and cvec with pointers
 using_cptr(pe, Person, c_no_compare, Person_del);
-using_cvec(pe, Person*, c_no_compare, cptr_pe_del);
+using_cvec(pe, Person*, c_no_compare, cptr_pe_del, c_no_clone);
 
 int main() {
     cvec_pe vec = cvec_pe_init();

@@ -9,7 +9,7 @@
 #define PICOBENCH_IMPLEMENT_WITH_MAIN
 #include "picobench.hpp"
 
-enum {N1 = 2000000, S1 = 1};
+enum {N1 = 1000000, S1 = 1};
 uint64_t seed = time(NULL); // 18237129837891;
 
 using omap_i = std::map<int, int>;
@@ -18,7 +18,7 @@ using omap_s = std::map<std::string, std::string>;
 
 using_csmap(i, int, int);
 using_csmap(x, uint64_t, uint64_t);
-using_csmap_strkey(s, cstr, cstr_del, cstr_clone);
+using_csmap_str();
 
 PICOBENCH_SUITE("Map1");
 
@@ -201,7 +201,7 @@ static void ins_and_access_s(picobench::state& s)
     picobench::scope scope(s);
     c_forrange (s.iterations()) {
         randomize(&str[0], str.size());
-        map[str] = str;
+        map.emplace(str, str);
         randomize(&str[0], str.size());
         auto it = map.find(str);
         if (it != map.end()) {
@@ -216,23 +216,23 @@ static void ins_and_access_csmap_s(picobench::state& s)
 {
     cstr str = cstr_with_size(s.arg(), 'x');
     size_t result = 0;
-    csmap_s map = csmap_s_init();
+    csmap_str map = csmap_str_init();
     stc64_srandom(seed);
 
     picobench::scope scope(s);
     c_forrange (s.iterations()) {
         randomize(str.str, cstr_size(str));
-        csmap_s_emplace_or_assign(&map, str.str, cstr_clone(str));
+        csmap_str_emplace(&map, str.str, str.str);
         randomize(str.str, cstr_size(str));
-        csmap_s_iter_t it = csmap_s_find(&map, str.str);
+        csmap_str_iter_t it = csmap_str_find(&map, str.str);
         if (it.ref) {
             ++result;
-            csmap_s_erase(&map, it.ref->first.str);
+            csmap_str_erase(&map, it.ref->first.str);
         }
     }
-    s.set_result(result + csmap_s_size(map));
+    s.set_result(result + csmap_str_size(map));
     cstr_del(&str);
-    csmap_s_del(&map);
+    csmap_str_del(&map);
 }
 
 #define P samples(S1).iterations({N1/5, N1/5, N1/5, N1/10, N1/40}).args({13, 7, 8, 100, 1000})

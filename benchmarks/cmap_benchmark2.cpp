@@ -214,13 +214,9 @@ static void ins_and_access_s(picobench::state& s)
     picobench::scope scope(s);
     c_forrange (s.iterations()) {
         randomize(&str[0], str.size());
-        map[str] = str;
+        map.emplace(str, str);
         randomize(&str[0], str.size());
-        auto it = map.find(str);
-        if (it != map.end()) {
-            ++result;
-            map.erase(it);
-        }
+        result += map.erase(str);
     }
     s.set_result(result + map.size());
 }
@@ -236,13 +232,9 @@ static void ins_and_access_cmap_s(picobench::state& s)
     picobench::scope scope(s);
     c_forrange (s.iterations()) {
         randomize(str.str, cstr_size(str));
-        cmap_str_emplace_or_assign(&map, str.str, str.str);
+        cmap_str_emplace(&map, str.str, str.str);
         randomize(str.str, cstr_size(str));
-        cmap_str_iter_t it = cmap_str_find(&map, str.str);
-        if (it.ref) {
-            ++result;
-            cmap_str_erase_at(&map, it);
-        }
+        result += cmap_str_erase(&map, str.str);
     }
     s.set_result(result + cmap_str_size(map));
     cstr_del(&str);
