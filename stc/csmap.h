@@ -253,14 +253,6 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
         } \
         return res; \
     } \
-    STC_INLINE C##_##X##_result_t \
-    C##_##X##_emplace_or_assign(C##_##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
-        C##_##X##_result_t res = C##_##X##_insert_entry_(self, rkey); \
-                      if (res.second) *KEY_REF_##C(res.first) = keyFromRaw(rkey); \
-        MAP_ONLY_##C( else mappedDel(&res.first->second); \
-                      res.first->second = mappedFromRaw(rmapped); ) \
-        return res; \
-    } \
     STC_INLINE void \
     C##_##X##_emplace_n(C##_##X* self, const C##_##X##_rawvalue_t arr[], size_t n) { \
         for (size_t i=0; i<n; ++i) SET_ONLY_##C( C##_##X##_emplace(self, arr[i]); ) \
@@ -279,8 +271,19 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
         STC_INLINE C##_##X##_result_t \
         C##_##X##_insert_or_assign(C##_##X* self, Key key, Mapped mapped) { \
             C##_##X##_result_t res = C##_##X##_insert_entry_(self, keyToRaw(&key)); \
-            if (res.second) res.first->first = key; else {keyDel(&key); mappedDel(&res.first->second);} \
+            if (res.second) res.first->first = key; \
+            else {keyDel(&key); mappedDel(&res.first->second);} \
             res.first->second = mapped; return res; \
+        } \
+        STC_INLINE C##_##X##_result_t \
+        C##_##X##_put(C##_##X* self, Key k, Mapped m) \
+            {return C##_##X##_insert_or_assign(self, k, m);} \
+        STC_INLINE C##_##X##_result_t \
+        C##_##X##_emplace_or_assign(C##_##X* self, RawKey rkey, RawMapped rmapped) { \
+            C##_##X##_result_t res = C##_##X##_insert_entry_(self, rkey); \
+            if (res.second) res.first->first = keyFromRaw(rkey); \
+            else mappedDel(&res.first->second); \
+            res.first->second = mappedFromRaw(rmapped); return res; \
         } \
         STC_INLINE C##_##X##_mapped_t* \
         C##_##X##_at(const C##_##X* self, RawKey rkey) { \

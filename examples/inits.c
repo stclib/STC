@@ -5,8 +5,8 @@
 #include <stc/cpque.h>
 #include <stc/clist.h>
 
-using_cmap(id, int, cstr, c_default_equals, c_default_hash, cstr_del, c_no_clone); // Map of int -> cstr
-using_cmap_strkey(cnt, int);
+using_cmap_strval(id, int); // Map of int => cstr
+using_cmap_strkey(cnt, int); // Map of cstr => int
 
 typedef struct {int x, y;} ipair_t;
 inline static int ipair_compare(const ipair_t* a, const ipair_t* b) {
@@ -46,7 +46,7 @@ int main(void)
 
     int year = 2020;
     cmap_id idnames = cmap_id_init();
-    cmap_id_insert(&idnames, 100, cstr_from("Hello"));
+    cmap_id_emplace(&idnames, 100, "Hello");
     cmap_id_insert(&idnames, 110, cstr_from("World"));
     cmap_id_insert(&idnames, 120, cstr_from_fmt("Howdy, -%d-", year));
 
@@ -80,13 +80,7 @@ int main(void)
 
     // CVEC PAIR
 
-    cvec_ip pairs1 = cvec_ip_init();
-    c_emplace_items(&pairs1, cvec_ip, {
-        {5, 6},
-        {3, 4},
-        {1, 2},
-        {7, 8},
-    });
+    c_init (cvec_ip, pairs1, { {5, 6}, {3, 4}, {1, 2}, {7, 8} });
     cvec_ip_sort(&pairs1);
 
     c_foreach (i, cvec_ip, pairs1)
@@ -96,13 +90,7 @@ int main(void)
 
     // CLIST PAIR
 
-    clist_ip pairs2 = clist_ip_init();
-    c_emplace_items(&pairs2, clist_ip, {
-        {5, 6},
-        {3, 4},
-        {1, 2},
-        {7, 8},
-    });
+    c_init (clist_ip, pairs2, { {5, 6}, {3, 4}, {1, 2}, {7, 8} });
     clist_ip_sort(&pairs2);
 
     c_foreach (i, clist_ip, pairs2)
