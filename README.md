@@ -10,25 +10,25 @@ A modern, templated, user-friendly, fast, fully type-safe, and customizable cont
 with a uniform API across the containers, and is similar to the c++ standard library containers API.
 
 It is a compact, header-only library with the all the major "standard" data containers, except for the multi-map/set variants:
-- [***carray*** - Templated **multi-dimensional array** type](docs/carray_api.md)
-- [***cbits*** - A **std::bitset** / **boost::dynamic_bitset** alike type](docs/cbits_api.md)
-- [***cdeq*** - Templated **std::deque** alike type](docs/cdeq_api.md)
-- [***clist*** - Templated **std::forward_list** alike type](docs/clist_api.md)
-- [***cmap*** - Templated **std::unordered_map** alike type](docs/cmap_api.md)
-- [***cpque*** - Templated **std::priority_queue** alike adapter type](docs/cpque_api.md)
-- [***cptr*** - Container pointers and **std::shared_ptr** alike support](docs/cptr_api.md)
-- [***cqueue*** - Templated **std::queue** alike adapter type](docs/cqueue_api.md)
-- [***cset*** - Templated **std::unordered_set** alike type](docs/cset_api.md)
-- [***csmap*** - Templated sorted map **std::map** alike type](docs/csmap_api.md)
-- [***csset*** - Templated sorted set **std::set** alike type](docs/csset_api.md)
-- [***cstack*** - Templated **std::stack** alike adapter type](docs/cstack_api.md)
-- [***cstr*** - A **std::string** alike type](docs/cstr_api.md)
-- [***cvec*** - Templated **std::vector** alike type](docs/cvec_api.md)
+- [***carray*** - **multi-dim array** type](docs/carray_api.md)
+- [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
+- [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)
+- [***clist*** - **std::forward_list** alike type](docs/clist_api.md)
+- [***cmap*** - **std::unordered_map** alike type](docs/cmap_api.md)
+- [***cpque*** - **std::priority_queue** alike (adapter) type](docs/cpque_api.md)
+- [***cptr*** - **std::shared_ptr** alike support](docs/cptr_api.md)
+- [***cqueue*** - **std::queue** alike (adapter) type](docs/cqueue_api.md)
+- [***cset*** - **std::unordered_set** alike type](docs/cset_api.md)
+- [***csmap*** - **std::map** sorted map alike type](docs/csmap_api.md)
+- [***csset*** - **std::set** sorted set alike type](docs/csset_api.md)
+- [***cstack*** - **std::stack** alike (adapter) type](docs/cstack_api.md)
+- [***cstr*** - **std::string** alike type](docs/cstr_api.md)
+- [***cvec*** - **std::vector** alike type](docs/cvec_api.md)
 
 Others:
-- [***ccommon*** - General definitions and handy, safe-to-use macros](docs/ccommon_api.md)
-- [***coption*** - Implements ***coption_get()***, similar to posix **getopt_long()**](docs/coption_api.md)
-- [***crandom*** - A novel, extremely fast *PRNG* named **stc64**](docs/crandom_api.md)
+- [***ccommon*** - Very handy macros and general definitions](docs/ccommon_api.md)
+- [***coption*** - POSIX **getopt_long()** alike method](docs/coption_api.md)
+- [***crandom*** - A novel extremely fast *PRNG* named **stc64**](docs/crandom_api.md)
 
 Performance
 -----------
@@ -191,44 +191,54 @@ using_cvec(i, int);
 using_clist(pt, struct Point);
 ```
 
-Non POD-type container elements (advanced)
-------------------------------------------
-For STC containers with dynamic allocated elements, some care must be taken when declaring the containers.
-In C, objects are ***moved*** (bitwise), not *cloned* like in c++, when copied. When adding elements to
-containers, methods like **push_back()**, **push_front()**, **insert()**, and **insert_or_assign()**
-takes element values as arguments. Typical usage is to construct or clone elements when adding them,
-e.g. for containers of cstr:
-```c
-cvec_str_push_back(&vec, cstr_from("Hello"));
-cvec_str_push_back(&vec, cstr_clone(mycstr));
-cmap_str_insert(&vec, cstr_from("Hello"), cstr_clone(mycstr));
-```
-However, most templated STC containers can emulate automatic type convertion. The **using**-declaration
-may be given an optional convertion/"rawvalue"-type as template parameter, along with a back and forth
-convertion methods to the container value type. By default, *rawvalue has the same type as value*. Methods
-like **emplace_back()**, **emplace_front()**, **emplace()** and **put()** accepts rawvalue-type instead of
-value-type elements. Adding C-strings to containers with cstr-elements becomes simply:
-```c
-using_cvec_str();  // predefined using-statement for cvec of cstr, with 'const char*' as rawvalue type.
-using_clist_str(); // ...
-...
-cvec_str_emplace_back(&vec, "Hello");     // cstr_from("Hello") is done inside emplace_back().
-clist_str_emplace_front(&list, "Hello");  // same here.
-```
-But rawvalues are also beneficial for **find()** and map insertions, because keys and mapped values are
-conditionally inserted. The **emplace()** and **put()** methods constructs cstr-objects from the rawvalues only
-when required:
-```c
-cmap_str_emplace(&map, "Hello", "world"); // no cstr is constructed if "Hello" is already in the map.
-cmap_str_emplace_or_assign(&map, "Hello", "world!!");   // similar, but cstr_from("world!!") call is always made in put.
-it = cmap_str_find(&map, "Hello");        // no cstr constructed for lookup, although keys are cstr-type.
-```
-In the **cmap_str_insert()** example at the top of this section, both the key and mapped value are first constructed,
-then destructed if the key is already in the map, which is less efficient. For containers other than maps and sets,
-this is not an issue.
+*emplace* versus non-emplace container methods
+------------------------------------------------
+STC, like c++ STL, has two sets of methods for adding elements to containers. One set begins with -**emplace**,
+e.g. **cvec_X_emplace_back()**. This is a convenient alternative to **cvec_X_push_back()** when dealing
+non-trivial container elements, e.g. smart pointers or elements using dynamic memory. 
 
-Non-POD map or set keys are rarely needed, except for strings, still the last example on the **cmap** page
-demonstrates how to declare such maps.
+***Note***: For integral or trivial element types, **emplace** and corresponding non-emplace methods are identical,
+and the following does not apply for maps of these types.
+
+The **emplace** methods ***constructs*** or ***clones*** their own copy of the elements to be added.
+In contrast, the non-emplace methods, requires elements to be explicitely constructed or cloned before adding them.
+
+String is the most commonly used non-trivial data type. STC containers have proper pre-defined
+**using_**-declarations for cstr-elements, so they are fail-safe to use both with **emplace**
+and non-emplace methods:
+```c
+using_cvec_str(); // vector of string (cstr)
+...
+cstr s = cstr_from("a new string");
+cvec_str vec = cvec_str_init();
+cvec_str_push_back(&vec, cstr_from("Hello")); // construct and add string
+cvec_str_push_back(&vec, cstr_clone(s));      // clone and add an existing string
+cvec_str_emplace_back(&vec, "Yay, literal");  // internally constructs cstr from string-literal
+cvec_str_emplace_back(&vec, cstr_clone(s));   // Logical and compile ERROR! wrong input type
+cvec_str_emplace_back(&vec, s.str);           // Ok: const char* type.
+cvec_del(&vec); cstr_del(&s);
+```
+The **using**-declarations may be given an optional convertion/"rawvalue"-type as template parameter,
+along with a back and forth convertion methods to the container value type. By default, *rawvalue 
+has the same type as value*. 
+
+Rawvalues are also beneficial for **find()** and *map insertions*. The **emplace()** methods constructs
+*cstr*-objects from the rawvalues, but only when required:
+```c
+cmap_str_emplace(&map, "Hello", "world");
+// Two cstr-objects was constructed by emplace
+cmap_str_emplace(&map, "Hello", "again");
+// No cstr was constructed because "Hello" was already in the map.
+cmap_str_emplace_or_assign(&map, "Hello", "there");
+// Only cstr_from("there") was constructed ("world" was destructed and replaced).
+cmap_str_insert(&map, cstr_from("Hello"), cstr_from("you"));
+// Two cstr's constructed outside call, but both destructed by insert 
+// because "Hello" existed. No mem-leak but inefficient.
+it = cmap_str_find(&map, "Hello");
+// No cstr constructed for lookup, although keys are cstr-type.
+```
+Map- and set is normally used with trivial types, except for strings. However, the last
+example on the **cmap** page demonstrates how to specify a map with non-trivial elements.
 
 Memory efficiency
 -----------------
