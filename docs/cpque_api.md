@@ -16,7 +16,7 @@ or **cdeq_X** as underlying implementation, specified as `ctype`. The *direction
 
 Note that the function *`ctype`_value_compare(x, y)* defined by the underlying vector type is used to
 compare values (priorities). `X` is a type tag name and will affect the names of all cpque types and methods.
-Declaring `using_cpque(my, cvec_my, >)`, `X` should be replaced by `my` in the following documentation.
+Declaring `using_cpque(i, cvec_i, >)`, `X` should be replaced by `i` in the following documentation.
 
 ## Header file
 

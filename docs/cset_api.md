@@ -14,8 +14,8 @@ using_cset(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKe
 using_cset_str();
 ```
 The macro `using_cset()` must be instantiated in the global scope. `X` is a type tag name and
-will affect the names of all cset types and methods. E.g. declaring `using_cset(my, int);`, `X` should
-be replaced by `my` in all of the following documentation.
+will affect the names of all cset types and methods. E.g. declaring `using_cset(i, int);`, `X` should
+be replaced by `i` in all of the following documentation.
 
 `using_cset_str()` is a predefined macro for `using_cset(str, cstr, ...)`.
 

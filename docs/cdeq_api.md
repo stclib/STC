@@ -16,8 +16,8 @@ using_cdeq(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawVal
 using_cdeq_str();
 ```
 The macro `using_cdeq()` must be instantiated in the global scope. `X` is a type tag name and
-will affect the names of all cdeq types and methods. E.g. declaring `using_cdeq(my, int);`, `X` should
-be replaced by `my` in all of the following documentation.
+will affect the names of all cdeq types and methods. E.g. declaring `using_cdeq(i, int);`, `X` should
+be replaced by `i` in all of the following documentation.
 
 `using_cdeq_str()` is a shorthand for:
 ```

@@ -18,8 +18,8 @@ using_csptr(X, Value, valueCompare);
 using_csptr(X, Value, valueCompare, valueDel);
 ```
 The macro `using_cptr()` must be instantiated in the global scope. `X` is a type tag name and will
-affect the names of all cptr types and methods. E.g. declaring `using_cptr(my, cvec_my);`,
-`X` should be replaced by `my` in all of the following documentation.
+affect the names of all cptr types and methods. E.g. declaring `using_cptr(v4, Vec4);`,
+`X` should be replaced by `v4` in all of the following documentation.
 
 ## Header file
 

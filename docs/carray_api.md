@@ -13,8 +13,8 @@ using_carray(X, Value);
 using_carray(X, Value, valueDel, valueClone);
 ```
 The macro `using_carray()` must be instantiated in the global scope. `X` and `N` are type tags and
-will affect the names of all cset types and methods. E.g. declaring `using_carray(my, int);`, `X` should
-be replaced by `my` in all of the following documentation. The `N` character should be replaced by `1`, `2` or `3`.
+will affect the names of all cset types and methods. E.g. declaring `using_carray(i, int);`, `X` should
+be replaced by `i` in all of the following documentation. The `N` character should be replaced by `1`, `2` or `3`.
 
 ## Header file
 

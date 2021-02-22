@@ -30,8 +30,8 @@ using_cmap_strval(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw
 using_cmap_str()                                // using_cmap(str, cstr, cstr, ...)
 ```
 The `using_cmap()` macro family must be instantiated in the global scope. `X` is a type tag name and
-will affect the names of all cmap types and methods. E.g. declaring `using_cmap(my, int);`, `X` should
-be replaced by `my` in all of the following documentation.
+will affect the names of all cmap types and methods. E.g. declaring `using_cmap(ii, int, int);`, `X` should
+be replaced by `ii` in all of the following documentation.
 
 ## Header file
 
