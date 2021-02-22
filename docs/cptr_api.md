@@ -21,8 +21,6 @@ The macro `using_cptr()` must be instantiated in the global scope. `X` is a type
 affect the names of all cptr types and methods. E.g. declaring `using_cptr(my, cvec_my);`,
 `X` should be replaced by `my` in all of the following documentation.
 
-Note: for shared-ptr **csptr**, "cloning" is done by pointer sharing (ref counting), so *valueClone* is not required and ignored.
-
 ## Header file
 
 All cptr definitions and prototypes may be included in your C source file by including a single header file.
@@ -86,8 +84,8 @@ void Person_del(Person* p) {
     c_del(cstr, &p->name, &p->last);
 }
 // declare managed pointer and cvec with pointers
-using_cptr(pe, Person, c_no_compare, Person_del, c_no_fromraw);
-using_cvec(pe, Person*, c_no_compare, cptr_pe_del, c_no_fromraw);
+using_cptr(pe, Person, c_no_compare, Person_del);
+using_cvec(pe, Person*, c_no_compare, cptr_pe_del);
 
 int main() {
     cvec_pe vec = cvec_pe_init();
@@ -166,22 +164,18 @@ void Person_del(Person* p) {
     printf("del: %s\n", p->name.str);
     c_del(cstr, &p->name, &p->last);
 }
-Person Person_clone(Person p) {
-    p.name = cstr_clone(p.name);
-    p.last = cstr_clone(p.last);
-    return p;
-}
 
-// 1. cvec of Person struct
-using_cvec(pe, Person, Person_compare, Person_del, Person_clone);
+// 1. cvec of Person struct; emplace and cloning disabled.
+using_cvec(pe, Person, Person_compare, Person_del);
 
-// 2. cvec of raw/owned pointers to Person
-using_cptr(pe, Person, Person_compare, Person_del, Person_clone);
-using_cvec(pp, Person*, cptr_pe_compare, cptr_pe_del, cptr_pe_clone);
+// 2. cvec of raw/owned pointers to Person; emplace and cloning disabled.
+using_cptr(pe, Person, Person_compare, Person_del);
+using_cvec(pp, Person*, cptr_pe_compare, cptr_pe_del);
 
 // 3. cvec of shared-ptr to Person.
-using_csptr(pe, Person, Person_compare, Person_del); // clone is done internally by "sharing"
-using_cvec(ps, csptr_pe, csptr_pe_compare, csptr_pe_del, Person_clone);
+using_csptr(pe, Person, Person_compare, Person_del);
+// To enable emplace_back() and cloning cvec, add 3 more args:
+using_cvec(ps, csptr_pe, csptr_pe_compare, csptr_pe_del, csptr_pe_clone, c_default_toraw, csptr_pe);
 
 const char* names[] = {
     "Joe", "Jordan",
@@ -200,33 +194,35 @@ int main() {
         cvec_pp_push_back(&vec2, Person_make(c_new(Person), names[i], names[i+1]));
         cvec_ps_push_back(&vec3, csptr_pe_from(Person_make(c_new(Person), names[i], names[i+1])));
     }
-    puts("1. sorted cvec of Person :");
+    puts("1. Sorted vec1 of Person:");
     cvec_pe_sort(&vec1);
     c_foreach (i, cvec_pe, vec1)
         printf("  %s %s\n", i.ref->name.str, i.ref->last.str);
 
-    puts("\n2. sorted cvec of pointer to Person :");
+    puts("\n2. Sorted vec2 of pointer to Person:");
     cvec_pp_sort(&vec2);
     c_foreach (i, cvec_pp, vec2)
         printf("  %s %s\n", (*i.ref)->name.str, (*i.ref)->last.str);
 
-    puts("\n3. sorted cvec of shared-pointer to Person :");
+    // Append a shared copy of vec3.data[0]. Will only be destructed once!
+    cvec_ps_emplace_back(&vec3, vec3.data[0]);
+    puts("\n3. Sorted vec3 of shared-pointer to Person:");
     cvec_ps_sort(&vec3);
     c_foreach (i, cvec_ps, vec3)
         printf("  %s %s\n", i.ref->get->name.str, i.ref->get->last.str);
 
-    // share vec3[1] with elem variable.
-    csptr_pe elem = csptr_pe_clone(vec3.data[1]);
+    // Share vec3.data[1] with elem1 variable.
+    csptr_pe elem1 = csptr_pe_clone(vec3.data[1]);
 
     puts("\nDestroy vec3:");
-    cvec_ps_del(&vec3); // destroys all elements, but elem!
+    cvec_ps_del(&vec3); // destroy the unique/unshared elements (two)
     puts("\nDestroy vec2:");
     cvec_pp_del(&vec2);
     puts("\nDestroy vec1:");
     cvec_pe_del(&vec1);
 
-    puts("\nDestroy elem:");
-    csptr_pe_del(&elem);
+    puts("\nDestroy elem1:");
+    csptr_pe_del(&elem1);
 }
 ```
 Output:
