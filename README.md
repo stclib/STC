@@ -34,28 +34,29 @@ Performance
 -----------
 ![Benchmark](benchmarks/pics/benchmark.png)
 
-STC containers performs either about equal or better than the c++ std counterparts. **cmap** crushes *std::unordered_map* across the board! 
-**csmap** has noticable faster lookup than *std::map*'s typical red-black tree implementation. It uses an AA-tree (Arne Andersson, 1993),
-which tends to create a flatter structure (more balanced) than red-black trees. **cvec** is only slighly slower than *std::vector*.
+STC containers performs either about equal or better than the c++ std counterparts. **cmap** ***crushes*** *std::unordered_map* across the board. 
+**cdeq**, **cmap**, and **csmap** all have multiple times faster iteration of elements and destruction than the c++ equivalents. **csmap** also
+has noticable faster lookup than *std::map*'s typical red-black tree implementation. It uses an AA-tree (Arne Andersson, 1993), which tends to
+create a flatter structure (more balanced) than red-black trees. **cvec** is only slightly slower than *std::vector*.
 
 Notes:
 - The barchart shows average test times from three platforms: Win-Clang++ v11, Mingw64 g++ 9.20, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
 - Containers uses value types `uint64_t` and pairs of `uint64_t`for the maps.
 - Black bars indicates performance variation between various platforms/compilers.
 - Iterations are repeated 4 times over n elements.
-- **find()**: not executed for *forward_list*, *deque*, and *vector* because these c++ containers have no native *find()*.
-- **deque**: *insert*: n/3 push_front(), n/3 push_back()+push_front(), n/3 push_back().
-- **map and unordered map**: *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys are in the map, n/2 keys are random.
+- **find()**: not executed for *forward_list*, *deque*, and *vector* because these c++ containers does not have native *find()*.
+- **deque**: *insert*: n/3 push_front(), n/3 push_back()+pop_front(), n/3 push_back().
+- **map and unordered map**: *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys in the map, n/2 random keys.
 
 Highlights
 ----------
 - **User friendly** - Super easy usage, just include the header and you are good to go. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of value- *comparison*, *destruction*, *cloning*, *conversion types*, and more.
-- **Unparalleled performance** - The containers are about equal and sometimes much faster than the c++ STL containers.
-- **Fully memory managed** - All containers will destruct keys/values via destructor passed as macro parameters to the ***using_***-declaration. Also, smart-pointers are supported and can be stored in containers, see ***csptr***.
+- **Unparalleled performance** - The containers are about equal and often much faster than the c++ STL containers.
+- **Fully memory managed** - All containers will destruct keys/values via destructor passed as macro parameters to the ***using***-declaration. Also, smart-pointers are supported and can be stored in containers, see ***csptr***.
 - **Fully type safe** - Avoids error-prone casting of container types and elements back and forth from the containers.
 - **Uniform, easy-to-learn API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have uniform and intuitive usage across the various containers.
 - **Small footprint** - Small source code and generated executables. The executable from the example below using six different containers is *27 kb in size* compiled with TinyC.
-- **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See next how-to.
+- **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See the Installation section.
 - **No callback functions** - All passed template argument functions/macros are directly called from the implementation, no slow callbacks which requires storage.
 
 Usage
@@ -194,11 +195,11 @@ using_clist(pt, struct Point);
 The *emplace* versus non-emplace container methods
 --------------------------------------------------
 STC, like c++ STL, has two sets of methods for adding elements to containers. One set begins 
-with -**emplace**, e.g. **cvec_X_emplace_back()**. This is a convenient alternative to
+with **emplace**, e.g. **cvec_X_emplace_back()**. This is a convenient alternative to
 **cvec_X_push_back()** when dealing non-trivial container elements, e.g. smart pointers or
 elements using dynamic memory. 
 
-| Move input into container | Construct element from input | Containers               |
+| Move input into container | Construct element from input | Container               |
 |:--------------------------|:-----------------------------|:-------------------------|
 | insert()                  | emplace()                    | cmap, cset, csmap, csset |
 | insert_or_assign(), put() | emplace_or_assign()          | cmap, csmap              |
@@ -207,13 +208,13 @@ elements using dynamic memory.
 | insert_after()            | emplace_after()              | clist                    |
 
 ***Note***: For integral or trivial element types, **emplace** and corresponding non-emplace methods are
-identical, and the following does not apply for maps and sets of those types.
+identical, so the following does not apply for containers of such types.
 
 The **emplace** methods ***constructs*** or ***clones*** their own copy of the element to be added.
 In contrast, the non-emplace methods requires elements to be explicitly constructed or cloned before adding them.
 
 Strings are the most commonly used non-trivial data type. STC containers have proper pre-defined
-**using_**-declarations for cstr-elements, so they are fail-safe to use both with **emplace**
+**using**-declarations for cstr-elements, so they are fail-safe to use both with the **emplace**
 and non-emplace methods:
 ```c
 using_cvec_str(); // vector of string (cstr)
