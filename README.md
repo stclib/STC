@@ -34,7 +34,7 @@ Performance
 -----------
 ![Benchmark](benchmarks/pics/benchmark.png)
 
-STC containers performs either about equal or better than the c++ std counterparts. **cmap** ***crushes*** *std::unordered_map* across the board! 
+STC containers performs either about equal or better than the c++ std counterparts. **cmap** ***crushes*** *std::unordered_map* across the board. 
 **cdeq**, **cmap**, and **csmap** all have multiple times faster iteration of elements and destruction. **csmap** also has noticable faster lookup than
 *std::map*'s typical red-black tree implementation. It uses an AA-tree (Arne Andersson, 1993), which tends to create a flatter structure
 (more balanced) than red-black trees. **cvec** is only slightly slower than *std::vector*.
@@ -208,13 +208,13 @@ elements using dynamic memory.
 | insert_after()            | emplace_after()              | clist                    |
 
 ***Note***: For integral or trivial element types, **emplace** and corresponding non-emplace methods are
-identical, and the following does not apply for maps and sets of those types.
+identical, so the following does not apply for containers of such types.
 
 The **emplace** methods ***constructs*** or ***clones*** their own copy of the element to be added.
 In contrast, the non-emplace methods requires elements to be explicitly constructed or cloned before adding them.
 
 Strings are the most commonly used non-trivial data type. STC containers have proper pre-defined
-**using_**-declarations for cstr-elements, so they are fail-safe to use both with **emplace**
+**using**-declarations for cstr-elements, so they are fail-safe to use both with the **emplace**
 and non-emplace methods:
 ```c
 using_cvec_str(); // vector of string (cstr)
