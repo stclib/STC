@@ -37,16 +37,16 @@ Performance
 STC containers performs either about equal or better than the c++ std counterparts. **cmap** ***crushes*** *std::unordered_map* across the board! 
 **cdeq**, **cmap**, and **csmap** all have multiple times faster iteration of elements and destruction. **csmap** also has noticable faster lookup than
 *std::map*'s typical red-black tree implementation. It uses an AA-tree (Arne Andersson, 1993), which tends to create a flatter structure
-(more balanced) than red-black trees. **cvec** is only slighly slower than *std::vector*.
+(more balanced) than red-black trees. **cvec** is only slightly slower than *std::vector*.
 
 Notes:
 - The barchart shows average test times from three platforms: Win-Clang++ v11, Mingw64 g++ 9.20, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
 - Containers uses value types `uint64_t` and pairs of `uint64_t`for the maps.
 - Black bars indicates performance variation between various platforms/compilers.
 - Iterations are repeated 4 times over n elements.
-- **find()**: not executed for *forward_list*, *deque*, and *vector* because these c++ containers have no native *find()*.
-- **deque**: *insert*: n/3 push_front(), n/3 push_back()+push_front(), n/3 push_back().
-- **map and unordered map**: *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys are in the map, n/2 keys are random.
+- **find()**: not executed for *forward_list*, *deque*, and *vector* because these c++ containers does not have native *find()*.
+- **deque**: *insert*: n/3 push_front(), n/3 push_back()+pop_front(), n/3 push_back().
+- **map and unordered map**: *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys in the map, n/2 random keys.
 
 Highlights
 ----------
