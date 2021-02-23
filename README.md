@@ -52,11 +52,11 @@ Highlights
 ----------
 - **User friendly** - Super easy usage, just include the header and you are good to go. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of value- *comparison*, *destruction*, *cloning*, *conversion types*, and more.
 - **Unparalleled performance** - The containers are about equal and often much faster than the c++ STL containers.
-- **Fully memory managed** - All containers will destruct keys/values via destructor passed as macro parameters to the ***using_***-declaration. Also, smart-pointers are supported and can be stored in containers, see ***csptr***.
+- **Fully memory managed** - All containers will destruct keys/values via destructor passed as macro parameters to the ***using***-declaration. Also, smart-pointers are supported and can be stored in containers, see ***csptr***.
 - **Fully type safe** - Avoids error-prone casting of container types and elements back and forth from the containers.
 - **Uniform, easy-to-learn API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have uniform and intuitive usage across the various containers.
 - **Small footprint** - Small source code and generated executables. The executable from the example below using six different containers is *27 kb in size* compiled with TinyC.
-- **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See next how-to.
+- **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See the Installation section.
 - **No callback functions** - All passed template argument functions/macros are directly called from the implementation, no slow callbacks which requires storage.
 
 Usage
