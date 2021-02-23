@@ -35,9 +35,9 @@ Performance
 ![Benchmark](benchmarks/pics/benchmark.png)
 
 STC containers performs either about equal or better than the c++ std counterparts. **cmap** ***crushes*** *std::unordered_map* across the board. 
-**cdeq**, **cmap**, and **csmap** all have multiple times faster iteration of elements and destruction. **csmap** also has noticable faster lookup than
-*std::map*'s typical red-black tree implementation. It uses an AA-tree (Arne Andersson, 1993), which tends to create a flatter structure
-(more balanced) than red-black trees. **cvec** is only slightly slower than *std::vector*.
+**cdeq**, **cmap**, and **csmap** all have multiple times faster iteration of elements and destruction than the c++ equivalents. **csmap** also
+has noticable faster lookup than *std::map*'s typical red-black tree implementation. It uses an AA-tree (Arne Andersson, 1993), which tends to
+create a flatter structure (more balanced) than red-black trees. **cvec** is only slightly slower than *std::vector*.
 
 Notes:
 - The barchart shows average test times from three platforms: Win-Clang++ v11, Mingw64 g++ 9.20, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
