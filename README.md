@@ -34,9 +34,10 @@ Performance
 -----------
 ![Benchmark](benchmarks/pics/benchmark.png)
 
-STC containers performs either about equal or better than the c++ std counterparts. **cmap** crushes *std::unordered_map* across the board! 
-**csmap** has noticable faster lookup than *std::map*'s typical red-black tree implementation. It uses an AA-tree (Arne Andersson, 1993),
-which tends to create a flatter structure (more balanced) than red-black trees. **cvec** is only slighly slower than *std::vector*.
+STC containers performs either about equal or better than the c++ std counterparts. **cmap** ***crushes*** *std::unordered_map* across the board! 
+**cdeq**, **cmap**, and **csmap** all have multiple times faster iteration of elements and destruction. **csmap** also has noticable faster lookup than
+*std::map*'s typical red-black tree implementation. It uses an AA-tree (Arne Andersson, 1993), which tends to create a flatter structure
+(more balanced) than red-black trees. **cvec** is only slighly slower than *std::vector*.
 
 Notes:
 - The barchart shows average test times from three platforms: Win-Clang++ v11, Mingw64 g++ 9.20, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
@@ -50,7 +51,7 @@ Notes:
 Highlights
 ----------
 - **User friendly** - Super easy usage, just include the header and you are good to go. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of value- *comparison*, *destruction*, *cloning*, *conversion types*, and more.
-- **Unparalleled performance** - The containers are about equal and sometimes much faster than the c++ STL containers.
+- **Unparalleled performance** - The containers are about equal and often much faster than the c++ STL containers.
 - **Fully memory managed** - All containers will destruct keys/values via destructor passed as macro parameters to the ***using_***-declaration. Also, smart-pointers are supported and can be stored in containers, see ***csptr***.
 - **Fully type safe** - Avoids error-prone casting of container types and elements back and forth from the containers.
 - **Uniform, easy-to-learn API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have uniform and intuitive usage across the various containers.
@@ -194,11 +195,11 @@ using_clist(pt, struct Point);
 The *emplace* versus non-emplace container methods
 --------------------------------------------------
 STC, like c++ STL, has two sets of methods for adding elements to containers. One set begins 
-with -**emplace**, e.g. **cvec_X_emplace_back()**. This is a convenient alternative to
+with **emplace**, e.g. **cvec_X_emplace_back()**. This is a convenient alternative to
 **cvec_X_push_back()** when dealing non-trivial container elements, e.g. smart pointers or
 elements using dynamic memory. 
 
-| Move input into container | Construct element from input | Containers               |
+| Move input into container | Construct element from input | Container               |
 |:--------------------------|:-----------------------------|:-------------------------|
 | insert()                  | emplace()                    | cmap, cset, csmap, csset |
 | insert_or_assign(), put() | emplace_or_assign()          | cmap, csmap              |
