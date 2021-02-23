@@ -191,16 +191,25 @@ using_cvec(i, int);
 using_clist(pt, struct Point);
 ```
 
-*emplace* versus non-emplace container methods
-------------------------------------------------
-STC, like c++ STL, has two sets of methods for adding elements to containers. One set begins with -**emplace**,
-e.g. **cvec_X_emplace_back()**. This is a convenient alternative to **cvec_X_push_back()** when dealing
-non-trivial container elements, e.g. smart pointers or elements using dynamic memory. 
+The *emplace* versus non-emplace container methods
+--------------------------------------------------
+STC, like c++ STL, has two sets of methods for adding elements to containers. One set begins 
+with -**emplace**, e.g. **cvec_X_emplace_back()**. This is a convenient alternative to
+**cvec_X_push_back()** when dealing non-trivial container elements, e.g. smart pointers or
+elements using dynamic memory. 
 
-***Note***: For integral or trivial element types, **emplace** and corresponding non-emplace methods are identical,
-and the following does not apply for maps of these types.
+| Move input into container | Construct element from input | Containers               |
+|:--------------------------|:-----------------------------|:-------------------------|
+| insert()                  | emplace()                    | cmap, cset, csmap, csset |
+| insert_or_assign(), put() | emplace_or_assign()          | cmap, csmap              |
+| push_back()               | emplace_back()               | cvec, cdeq, clist        |
+| push_front()              | emplace_front()              | cvec, cdeq, clist        |
+| insert_after()            | emplace_after()              | clist                    |
 
-The **emplace** methods ***constructs*** or ***clones*** their own copy of the elements to be added.
+***Note***: For integral or trivial element types, **emplace** and corresponding non-emplace methods are
+identical, and the following does not apply for maps and sets of those types.
+
+The **emplace** methods ***constructs*** or ***clones*** their own copy of the element to be added.
 In contrast, the non-emplace methods requires elements to be explicitly constructed or cloned before adding them.
 
 Strings are the most commonly used non-trivial data type. STC containers have proper pre-defined
@@ -216,8 +225,8 @@ cvec_str_push_back(&vec, cstr_from("Hello")); // construct and add string
 cvec_str_push_back(&vec, cstr_clone(s));      // clone and add an existing string
 
 cvec_str_emplace_back(&vec, "Yay, literal");  // internally constructs cstr from string-literal
-cvec_str_emplace_back(&vec, cstr_clone(s));   // Logical and compile ERROR! wrong input type
-cvec_str_emplace_back(&vec, s.str);           // Ok: const char* type (= rawvalue).
+cvec_str_emplace_back(&vec, cstr_clone(s));   // <-- COMPILE ERROR: wrong input type
+cvec_str_emplace_back(&vec, s.str);           // Ok: const char* input type (= rawvalue).
 
 cstr_del(&s);
 cvec_del(&vec);
@@ -245,8 +254,8 @@ cmap_str_insert(&map, cstr_from("Hello"), cstr_from("you"));
 it = cmap_str_find(&map, "Hello");
 // No cstr constructed for lookup, although keys are cstr-type.
 ```
-Map and set are normally used with trivial value types, except for strings. The last
-example on the **cmap** page demonstrates how to specify a map with non-trivial keys.
+Apart from strings, maps and sets are normally used with trivial value types. However, the
+last example on the **cmap** page demonstrates how to specify a map with non-trivial keys.
 
 Memory efficiency
 -----------------

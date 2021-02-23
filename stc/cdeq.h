@@ -31,9 +31,9 @@
 #define using_cdeq_2(X, Value) \
                     using_cdeq_3(X, Value, c_default_compare)
 #define using_cdeq_3(X, Value, valueCompare) \
-                    using_cdeq_7(X, Value, valueCompare, c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Value)
+                    using_cdeq_7(X, Value, valueCompare, c_plain_del, c_plain_fromraw, c_plain_toraw, Value)
 #define using_cdeq_5(X, Value, valueCompare, valueDel, valueFromRaw) \
-                    using_cdeq_7(X, Value, valueCompare, valueDel, valueFromRaw, c_trivial_toraw, Value)
+                    using_cdeq_7(X, Value, valueCompare, valueDel, valueFromRaw, c_plain_toraw, Value)
 #define using_cdeq_str() \
                     using_cdeq_7(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
 
@@ -74,7 +74,7 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     cdeq_##X##_resize(cdeq_##X* self, size_t size, Value fill_val); \
     STC_INLINE void \
     cdeq_##X##_reserve(cdeq_##X* self, size_t n) { \
-        _cdeq_##X##_expand(self, (n - cdeq_rep_(self)->size)*1.5, false); \
+        _cdeq_##X##_expand(self, (n - cdeq_rep_(self)->size)*0.65, false); \
     } \
     STC_INLINE void \
     cdeq_##X##_swap(cdeq_##X* a, cdeq_##X* b) {c_swap(cdeq_##X, *a, *b);} \
