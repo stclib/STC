@@ -83,14 +83,6 @@
         int _state; \
     } clist_##X##_iter_t
 
-#define c_emplace_after(self, ctype, pos, ...) do { \
-    ctype* __self = self; \
-    ctype##_iter_t __pos = pos; \
-    const ctype##_rawvalue_t __arr[] = __VA_ARGS__; \
-    for (size_t __i=0; __i<sizeof __arr/sizeof *__arr; ++__i) \
-        __pos = ctype##_emplace_after(__self, __pos, __arr[__i]); \
-} while (0)
-
 
 using_clist_types(void, int);
 STC_API size_t _clist_size(const clist_void* self);
