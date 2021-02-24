@@ -110,8 +110,7 @@ void test3(void)
     before = clock();
     sum = 0;
     c_forrange (N) {
-        //sum += stc64_rand(&rng);
-        sum += rand();
+        sum += stc64_rand(&rng);
     }
     diff = clock() - before;
     printf("stc64_random:\t\t%.02f, %zu sz:%zu\n", (float) diff / CLOCKS_PER_SEC, sum, sizeof rng);
