@@ -40,7 +40,7 @@ has noticable faster lookup than *std::map*'s typical red-black tree implementat
 create a flatter structure (more balanced) than red-black trees. **cvec** is only slightly slower than *std::vector*.
 
 Notes:
-- The barchart shows average test times from three platforms: Win-Clang++ v11, Mingw64 g++ 9.20, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
+- The barchart shows average test times over three platforms: Win-Clang++ v11, Mingw64 g++ 9.20, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
 - Containers uses value types `uint64_t` and pairs of `uint64_t`for the maps.
 - Black bars indicates performance variation between various platforms/compilers.
 - Iterations are repeated 4 times over n elements.
@@ -82,7 +82,7 @@ int main(void) {
     cvec_i_del(&vec);
 }
 ```
-And with multiple containers...
+With six different containers:
 ```c
 #include <stc/cset.h>
 #include <stc/cvec.h>
@@ -207,8 +207,8 @@ elements using dynamic memory.
 | push_front()              | emplace_front()              | cvec, cdeq, clist        |
 | insert_after()            | emplace_after()              | clist                    |
 
-***Note***: For integral or trivial element types, **emplace** and corresponding non-emplace methods are
-identical, so the following does not apply for containers of such types.
+***Note***: For containers of integral or trivial element types, **emplace** and corresponding non-emplace methods are
+identical, so the following does not apply for those.
 
 The **emplace** methods ***constructs*** or ***clones*** their own copy of the element to be added.
 In contrast, the non-emplace methods requires elements to be explicitly constructed or cloned before adding them.
@@ -233,7 +233,7 @@ cstr_del(&s);
 cvec_del(&vec);
 ```
 This is made possible because the **using**-declarations may be given an optional
-convertion/"rawvalue"-type as template parameter, along with a back and forth convertion 
+conversion/"rawvalue"-type as template parameter, along with a back and forth conversion 
 methods to the container value type. By default, *rawvalue has the same type as value*. 
 
 Rawvalues are also beneficial for **find()** and *map insertions*. The **emplace()** methods constructs
@@ -265,7 +265,7 @@ Memory efficiency
 - **clist**: Type size: one pointer. Each node allocates block storing value and next pointer.
 - **cdeq**:  Type size: two pointers. Otherwise like *cvec*.
 - **cmap**: Type size: 4 pointers. *cmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
-- **csmap**: Type size: 1 pointer. *csmap* manages its own array of tree-nodes for allocation efficiency. Each node uses two 32-bit words by default for left/right childs, and one byte for `level`. *csmap* can be configured to allow more than 2^32 elements, ie. 2^64, but it will double the overhead per node.
+- **csmap**: Type size: 1 pointer. *csmap* manages its own array of tree-nodes for allocation efficiency. Each node uses two 32-bit words by default for left/right child, and one byte for `level`. *csmap* can be configured to allow more than 2^32 elements, ie. 2^64, but it will double the overhead per node.
 - **carray**: carray1, carray2 and carray3. Type size: One pointer plus one, two, or three size_t variables to store dimensions. Arrays are allocated as one contiguous block of heap memory.
 - **csptr**: a shared-pointer uses two pointers, one for the data and one for the reference counter.
 

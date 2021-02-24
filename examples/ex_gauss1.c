@@ -41,7 +41,7 @@ int main()
     cvec_e_sort(&vhist);
 
     // Print the gaussian bar chart
-    cstr_t bar = cstr_init();
+    cstr bar = cstr_init();
     c_foreach (i, cvec_e, vhist) {
         size_t n = (size_t) (i.ref->second * StdDev * Scale * 2.5 / N);
         if (n > 0) {

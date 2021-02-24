@@ -11,9 +11,9 @@ int main ()
   // replace signatures used in the same order as described above:
 
   // Ustring positions:                        0123456789*123456789*12345
-  cstr_t s = cstr_from(base);              // "this is a test string."
+  cstr s = cstr_from(base);              // "this is a test string."
   
-  cstr_t m = cstr_clone(s);
+  cstr m = cstr_clone(s);
   cstr_append(&m, m.str);
   cstr_append(&m, m.str);
   printf("%s\n", m.str);

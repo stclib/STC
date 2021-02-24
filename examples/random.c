@@ -22,7 +22,7 @@ int main()
         sum += n;
         if (n >= 0 && n < R) ++hist[n];
     }
-    cstr_t bar = cstr_inits;
+    cstr bar = cstr_init();
     c_forrange (i, int, R)  {
         cstr_resize(&bar, hist[i] * 25ull * R / N2, '*');
         printf("%3d %s\n", i, bar.str);

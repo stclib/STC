@@ -91,7 +91,7 @@ Helper methods, used by other container types.
 
 | Type name         | Type definition                  | Used to represent...     |
 |:------------------|:---------------------------------|:-------------------------|
-| `cstr, cstr_t`    | `struct { const char *str; }`    | The string type          |
+| `cstr`            | `struct { const char *str; }`    | The string type          |
 | `cstr_value_t`    | `char`                           | The string element type  |
 | `cstr_iter_t`     | `struct { cstr_value_t *ref; }`  | cstr iterator            |
 
@@ -99,8 +99,7 @@ Helper methods, used by other container types.
 
 | Name              | Value            |
 |:------------------|:-----------------|
-|  `cstr_inits`     | `{...}`          |
-|  `cstr_npos`      | `-1ull`          |
+|  `cstr_npos`      | `(-1ull)`        |
 
 ## Example
 ```c

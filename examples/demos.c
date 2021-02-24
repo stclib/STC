@@ -8,7 +8,7 @@
 void stringdemo1()
 {
     printf("\nSTRINGDEMO1\n");
-    cstr_t cs = cstr_from("one-nine-three-seven-five");
+    cstr cs = cstr_from("one-nine-three-seven-five");
     printf("%s.\n", cs.str);
 
     cstr_insert(&cs, 3, "-two");

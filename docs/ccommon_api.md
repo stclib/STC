@@ -1,6 +1,6 @@
 # STC [ccommon](../stc/ccommon.h): Common definitions and handy macros
 
-The following handy macros are completely safe to use, i.e. they have no side-effects.
+The following handy macros are safe to use, i.e. have no side-effects.
 
 ### c_init, c_emplace_items
 **c_init** declares and initializes any container with an array of elements. **c_emplace_items** adds elements to any existing container:
@@ -50,27 +50,26 @@ c_foreach (i, csset_x, it, csset_x_end(&set)) printf(" %d", *i.ref);
 ```
 
 ### c_withfile, c_breakwith
-Simplifies reading a file. Use **c_breakwith** if you need to break out of the block. Example:
+Simplifies reading a file. Use only **c_breakwith** to break out of the block if needed. Example:
 ```c
-// Put each line of a text file into a vector of strings
+// Load each line of a text file into a vector of strings
 #include <errno.h>
 #include <stc/cstr.h>
 #include <stc/cvec.h>
 
 using_cvec_str();
 
-cvec_str // on return, check global errno variable for errors
-readFile(const char* name) {
+cvec_str readFile(const char* name) {
     cvec_str vec = cvec_str_init();
 
-    // Next line handles declaring, opening, and closing a FILE*
-    c_withfile (f, fopen(name, "r")) {
-        cstr_t line = cstr_inits;
-        while (cstr_getline(&line, f))
+    // Next line declares, opens, and closes the FILE*
+    c_withfile (fp, fopen(name, "r")) {
+        cstr_t line = cstr_init();
+        while (cstr_getline(&line, fp))
             cvec_str_emplace_back(&vec, line.str);
         cstr_del(&line);
     }
-    return vec;
+    return vec;   // receiver should check errno variable
 }
 ```
 
@@ -94,4 +93,4 @@ Memory allocator for the entire library. Macros can be overloaded by the user.
 
 ### c_swap, c_arraylen
 - **c_swap(type, x, y)**: Simple macro for swapping internals of two objects. 
-- **c_arraylen(array)**: Return number of elements in an array, e.g. `int array[] = {1, 2, 3, 4}; 
+- **c_arraylen(array)**: Return number of elements in an array, e.g. `int array[] = {1, 2, 3, 4};` 
