@@ -196,18 +196,22 @@ static void ins_and_access_s(picobench::state& s)
     std::string str(s.arg(), 'x');
     size_t result = 0;
     MapStr map;
-    stc64_srandom(seed);
 
     picobench::scope scope(s);
+    stc64_srandom(seed);
     c_forrange (s.iterations()) {
         randomize(&str[0], str.size());
         map.emplace(str, str);
+    }
+    stc64_srandom(seed);
+    c_forrange (s.iterations()) {
         randomize(&str[0], str.size());
-        auto it = map.find(str);
+        result += map.erase(str);
+        /*auto it = map.find(str);
         if (it != map.end()) {
             ++result;
             map.erase(it);
-        }
+        }*/
     }
     s.set_result(result + map.size());
 }
@@ -217,18 +221,22 @@ static void ins_and_access_csmap_s(picobench::state& s)
     cstr str = cstr_with_size(s.arg(), 'x');
     size_t result = 0;
     csmap_str map = csmap_str_init();
-    stc64_srandom(seed);
 
     picobench::scope scope(s);
+    stc64_srandom(seed);
     c_forrange (s.iterations()) {
         randomize(str.str, cstr_size(str));
         csmap_str_emplace(&map, str.str, str.str);
+    }
+    stc64_srandom(seed);
+    c_forrange (s.iterations()) {
         randomize(str.str, cstr_size(str));
-        csmap_str_iter_t it = csmap_str_find(&map, str.str);
+        result += csmap_str_erase(&map, str.str);
+        /*csmap_str_iter_t it = csmap_str_find(&map, str.str);
         if (it.ref) {
             ++result;
             csmap_str_erase(&map, it.ref->first.str);
-        }
+        }*/
     }
     s.set_result(result + csmap_str_size(map));
     cstr_del(&str);
