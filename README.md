@@ -130,8 +130,9 @@ int main(void) {
     cdeq_i_iter_t i3 = cdeq_i_find(&deq, 20);
     clist_i_iter_t i4 = clist_i_find_before(&lst, 20);
     csmap_i_iter_t i5 = csmap_i_find(&map, 20);
-    printf("\nFound: %d, (%g, %g), %d, %d, [%d: %d]\n", *i1.ref, i2.ref->x, i2.ref->y, *i3.ref,
-                                                        *clist_i_fwd(i4, 1).ref, i5.ref->first, i5.ref->second);
+    printf("\nFound: %d, (%g, %g), %d, %d, [%d: %d]\n", *i1.ref, i2.ref->x, i2.ref->y,
+                                                        *i3.ref, *clist_i_fwd(i4, 1).ref,
+                                                        i5.ref->first, i5.ref->second);
     // erase the elements found
     cset_i_erase_at(&set, i1);
     cvec_p_erase_at(&vec, i2);
@@ -199,7 +200,7 @@ with **emplace**, e.g. **cvec_X_emplace_back()**. This is a convenient alternati
 **cvec_X_push_back()** when dealing non-trivial container elements, e.g. smart pointers or
 elements using dynamic memory. 
 
-| Move input into container | Construct element from input | Container               |
+| Move and insert element   | Construct element in-place   | Container               |
 |:--------------------------|:-----------------------------|:-------------------------|
 | insert()                  | emplace()                    | cmap, cset, csmap, csset |
 | insert_or_assign(), put() | emplace_or_assign()          | cmap, csmap              |
@@ -257,6 +258,15 @@ it = cmap_str_find(&map, "Hello");
 ```
 Apart from strings, maps and sets are normally used with trivial value types. However, the
 last example on the **cmap** page demonstrates how to specify a map with non-trivial keys.
+
+Note that some map method arguments are different between STC maps and c++ STL:
+
+| STC maps                             | C++ STL maps
+|:-------------------------------------|:------------------------------|
+| insert(Key, Mapped)                  | insert(Value)                 |
+| emplace(RawKey, RawMapped)           | emplace(Key, Mapped)          |
+| insert_or_assign(Key, Mapped)        | insert_or_assign(Key, Mapped) |
+| emplace_or_assign(RawKey, RawMapped) | <not available>               |
 
 Memory efficiency
 -----------------
