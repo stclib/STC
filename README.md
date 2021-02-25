@@ -266,7 +266,7 @@ Note that some map method arguments are different between STC maps and c++ STL:
 | insert(Key, Mapped)                  | insert(Value)                 |
 | emplace(RawKey, RawMapped)           | emplace(Key, Mapped)          |
 | insert_or_assign(Key, Mapped)        | insert_or_assign(Key, Mapped) |
-| emplace_or_assign(RawKey, RawMapped) | <not available>               |
+| emplace_or_assign(RawKey, RawMapped) | N/A                           |
 
 Memory efficiency
 -----------------
