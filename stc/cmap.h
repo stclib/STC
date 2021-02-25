@@ -347,7 +347,7 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-#define chash_reduce(x, N) ((uint32_t) (((uint64_t) (x) * (N)) >> 32))
+#define chash_reduce32(x, N) ((uint32_t) (((uint64_t)(uint32_t)(x) * (N)) >> 32))
 #define chash_entry_index(h, entryPtr) ((entryPtr) - (h).table)
 enum {chash_HASH = 0x7f, chash_USED = 0x80};
 
@@ -384,7 +384,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
     C##_##X##_bucket_(const C##_##X* self, const C##_##X##_rawkey_t* rkeyptr) { \
         uint32_t sx, hash = keyHashRaw(rkeyptr, sizeof(C##_##X##_rawkey_t)); \
         size_t cap = self->bucket_count; \
-        chash_bucket_t b = {chash_reduce(hash, cap), (hash & chash_HASH) | chash_USED}; \
+        chash_bucket_t b = {chash_reduce32(hash, cap), (hash & chash_HASH) | chash_USED}; \
         uint8_t* hashx = self->_hashx; \
         while ((sx = hashx[b.idx])) { \
             if (sx == b.hx) { \
@@ -471,7 +471,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
             if (! hashx[j]) \
                 break; \
             RawKey r = keyToRaw(KEY_REF_##C(slot + j)); \
-            k = chash_reduce(keyHashRaw(&r, sizeof(RawKey)), cap); \
+            k = chash_reduce32(keyHashRaw(&r, sizeof(RawKey)), cap); \
             if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */ \
                 slot[i] = slot[j], hashx[i] = hashx[j], i = j; \
         } \
