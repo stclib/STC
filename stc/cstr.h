@@ -50,8 +50,8 @@ STC_API size_t  cstr_find_n(cstr_t s, const char* needle, size_t pos, size_t nle
 STC_API size_t  cstr_ifind_n(cstr_t s, const char* needle, size_t pos, size_t nlen);
 
 STC_API int     c_strncasecmp(const char* s1, const char* s2, size_t n);
-STC_API char*   c_strnfind(const char* s, const char* needle, size_t nmax);
-STC_API char*   c_istrnfind(const char* s, const char* needle, size_t nmax);
+STC_API char*   c_strnstr(const char* s, const char* needle, size_t nmax);
+STC_API char*   c_strncasestr(const char* s, const char* needle, size_t nmax);
 
 struct cstr_rep { size_t size, cap; char str[sizeof(size_t)]; };
 #define cstr_rep_(self) c_container_of((self)->str, struct cstr_rep, str)
@@ -194,7 +194,7 @@ cstr_contains(cstr_t s, const char* needle) {
 }
 STC_INLINE bool
 cstr_icontains(cstr_t s, const char* needle) {
-    return c_istrnfind(s.str, needle, cstr_npos) != NULL;
+    return c_strncasestr(s.str, needle, cstr_npos) != NULL;
 }
 
 STC_INLINE bool
@@ -385,17 +385,16 @@ cstr_find(cstr_t s, const char* needle) {
 STC_DEF size_t
 cstr_find_n(cstr_t s, const char* needle, size_t pos, size_t nlen) {
     if (pos > cstr_rep_(&s)->size) return cstr_npos;
-    char* res = c_strnfind(s.str + pos, needle, nlen);
+    char* res = c_strnstr(s.str + pos, needle, nlen);
     return res ? res - s.str : cstr_npos;
 }
 STC_DEF size_t
 cstr_ifind_n(cstr_t s, const char* needle, size_t pos, size_t nlen) {
     if (pos > cstr_rep_(&s)->size) return cstr_npos;
-    char* res = c_istrnfind(s.str + pos, needle, nlen);
+    char* res = c_strncasestr(s.str + pos, needle, nlen);
     return res ? res - s.str : cstr_npos;
 }
 
-/* http://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord */
 
 STC_DEF int
 c_strncasecmp(const char* s1, const char* s2, size_t n) {
@@ -405,7 +404,7 @@ c_strncasecmp(const char* s1, const char* s2, size_t n) {
 }
 
 STC_DEF char*
-c_strnfind(const char* s, const char* needle, size_t nmax) {
+c_strnstr(const char* s, const char* needle, size_t nmax) {
     ptrdiff_t sum = 0;
     const char *t = s, *p = needle;
     while (*p && nmax--) {
@@ -422,7 +421,7 @@ c_strnfind(const char* s, const char* needle, size_t nmax) {
 }
 
 STC_DEF char*
-c_istrnfind(const char* s, const char* needle, size_t nmax) {
+c_strncasestr(const char* s, const char* needle, size_t nmax) {
     ptrdiff_t sum = 0;
     const char *t = s, *p = needle;
     while (*p && nmax--) {
@@ -438,6 +437,6 @@ c_istrnfind(const char* s, const char* needle, size_t nmax) {
     }
 }
 
+/* http://graphics.stanford.edu/~seander/bithacks.html#ZeroInWord */
 #endif
-
 #endif
