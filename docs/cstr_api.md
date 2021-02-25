@@ -74,17 +74,17 @@ char*        cstr_itval(cstr_iter_t it);
 bool         cstr_getline(cstr *self, FILE *stream);                  // cstr_getdelim(self, '\n', stream)
 bool         cstr_getdelim(cstr *self, int delim, FILE *stream);
 ```
+Helper methods:
 ```c
 const char*  cstr_c_str(const cstr* x);
 int          cstr_compare_raw(const char** x, const char** y);
 bool         cstr_equals_raw(const char** x, const char** y);
-uint32_t     cstr_hash_raw(const char* const* x, size_t ignored);
+uint64_t     cstr_hash_raw(const char* const* x, size_t ignored);
 int          c_strncasecmp(const char* s1, const char* s2, size_t n);
-char*        c_strnfind(const char* str, const char* needle, size_t n);
-char*        c_istrnfind(const char* str, const char* needle, size_t n);
-uint32_t     c_strhash(const char* str);
+char*        c_strnstr(const char* str, const char* needle, size_t n);
+char*        c_strncasestr(const char* str, const char* needle, size_t n);
+uint64_t     c_strhash(const char* str);
 ```
-Helper methods, used by other container types.
 
 ## Types
 
