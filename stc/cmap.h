@@ -56,7 +56,7 @@ int main(void) {
 #include <string.h>
 
 #define _cmap_inits   {NULL, NULL, 0, 0, 0.15f, 0.85f}
-typedef struct {size_t idx; uint32_t hx;} chash_bucket_t;
+typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
 
 #define using_cmap(...) c_MACRO_OVERLOAD(using_cmap, __VA_ARGS__)
 
@@ -347,9 +347,12 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-#define chash_reduce32(x, N) ((uint32_t) (((uint64_t)(uint32_t)(x) * (N)) >> 32))
-#define chash_entry_index(h, entryPtr) ((entryPtr) - (h).table)
-enum {chash_HASH = 0x7f, chash_USED = 0x80};
+#define           fastrange_uint32_t(x, n) ((size_t) (((uint32_t)(x)*(uint64_t)(n)) >> 32))
+#ifdef c_umul128
+STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) {uint64_t l,h; c_umul128(x,n,&l,&h); return h;}
+#endif
+#define chash_index_(h, entryPtr) ((entryPtr) - (h).table)
+enum {chash_HASH_ = 0x7f, chash_USED_ = 0x80};
 
 #define _implement_CHASH(X, C, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                             mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
@@ -382,10 +385,10 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
 \
     STC_DEF chash_bucket_t \
     C##_##X##_bucket_(const C##_##X* self, const C##_##X##_rawkey_t* rkeyptr) { \
-        uint32_t sx, hash = keyHashRaw(rkeyptr, sizeof(C##_##X##_rawkey_t)); \
-        size_t cap = self->bucket_count; \
-        chash_bucket_t b = {chash_reduce32(hash, cap), (hash & chash_HASH) | chash_USED}; \
-        uint8_t* hashx = self->_hashx; \
+        const size_t hash = keyHashRaw(rkeyptr, sizeof(C##_##X##_rawkey_t)); \
+        uint_fast8_t sx; size_t cap = self->bucket_count; \
+        chash_bucket_t b = {_c_SELECT(fastrange,CMAP_SIZE_T)(hash, cap), (hash & chash_HASH_) | chash_USED_}; \
+        const uint8_t* hashx = self->_hashx; \
         while ((sx = hashx[b.idx])) { \
             if (sx == b.hx) { \
                 C##_##X##_rawkey_t r = keyToRaw(KEY_REF_##C(self->table + b.idx)); \
@@ -442,7 +445,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
         C##_##X tmp = { \
             c_new_2 (C##_##X##_value_t, newcap), \
             (uint8_t *) c_calloc(newcap + 1, sizeof(uint8_t)), \
-            self->size, (uint32_t) newcap, \
+            self->size, (C##_##X##_size_t) newcap, \
             self->min_load_factor, self->max_load_factor \
         }; \
         /* Rehash: */ \
@@ -462,7 +465,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
 \
     STC_DEF void \
     C##_##X##_erase_entry(C##_##X* self, C##_##X##_value_t* val) { \
-        size_t i = chash_entry_index(*self, val), j = i, k, cap = self->bucket_count; \
+        size_t i = chash_index_(*self, val), j = i, k, cap = self->bucket_count; \
         C##_##X##_value_t* slot = self->table; \
         uint8_t* hashx = self->_hashx; \
         C##_##X##_value_del(&slot[i]); \
@@ -471,7 +474,7 @@ enum {chash_HASH = 0x7f, chash_USED = 0x80};
             if (! hashx[j]) \
                 break; \
             RawKey r = keyToRaw(KEY_REF_##C(slot + j)); \
-            k = chash_reduce32(keyHashRaw(&r, sizeof(RawKey)), cap); \
+            k = _c_SELECT(fastrange,CMAP_SIZE_T)(keyHashRaw(&r, sizeof(RawKey)), cap); \
             if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */ \
                 slot[i] = slot[j], hashx[i] = hashx[j], i = j; \
         } \
