@@ -314,12 +314,10 @@ static struct cvec_rep _cvec_inits = {0, 0};
         cvec_##X##_iter_t mid, last = i2; \
         while (i1.ref != i2.ref) { \
             mid.ref = i1.ref + ((i2.ref - i1.ref)>>1); \
-            RawValue m = valueToRaw(mid.ref); \
-            switch (valueCompareRaw(&raw, &m)) { \
-                case 0: return mid; \
-                case -1: i2.ref = mid.ref; break; \
-                case 1: i1.ref = mid.ref + 1; \
-            } \
+            int c; RawValue m = valueToRaw(mid.ref); \
+            if ((c = valueCompareRaw(&raw, &m)) == 0) return mid; \
+            else if (c < 0) i2.ref = mid.ref; \
+            else i1.ref = mid.ref + 1; \
         } \
         return last; \
     } \

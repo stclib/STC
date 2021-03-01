@@ -385,12 +385,10 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
         C##_##X##_node_t *d = out->_d = self->nodes; \
         out->_top = 0; \
         while (tn) { \
-            C##_##X##_rawkey_t rx = keyToRaw(KEY_REF_##C(&d[tn].value)); \
-            switch (keyCompareRaw(&rx, &rkey)) { \
-                case -1: tn = d[tn].link[1]; break; \
-                case 1: out->_st[out->_top++] = tn; tn = d[tn].link[0]; break; \
-                case 0: out->_tn = d[tn].link[1]; return (out->ref = &d[tn].value); \
-            } \
+            int c; C##_##X##_rawkey_t rx = keyToRaw(KEY_REF_##C(&d[tn].value)); \
+            if ((c = keyCompareRaw(&rx, &rkey)) < 0) tn = d[tn].link[1]; \
+            else if (c > 0) {out->_st[out->_top++] = tn; tn = d[tn].link[0];} \
+            else {out->_tn = d[tn].link[1]; return (out->ref = &d[tn].value);} \
         } \
         return (out->ref = NULL); \
     } \

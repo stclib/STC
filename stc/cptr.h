@@ -180,6 +180,11 @@ typedef long atomic_count_t;
         if (ptr.use_count) atomic_increment(ptr.use_count); \
         return ptr; \
     } \
+    STC_INLINE csptr_##X \
+    csptr_##X##_move(csptr_##X* self) { \
+        csptr_##X x = *self; self->use_count = NULL; \
+        return x; \
+    } \
 \
     STC_INLINE void \
     csptr_##X##_del(csptr_##X* self) { \

@@ -329,12 +329,10 @@ int main(void) {
         C##_##X##_node_t *tn = self->root; \
         out->_top = 0; \
         while (tn->level) { \
-            C##_##X##_rawkey_t rx = keyToRaw(KEY_REF_##C(&tn->value)); \
-            switch (keyCompareRaw(&rx, &rkey)) { \
-                case -1: tn = tn->link[1]; break; \
-                case 1: out->_st[out->_top++] = tn; tn = tn->link[0]; break; \
-                case 0: out->_tn = tn->link[1]; return (out->ref = &tn->value); \
-            } \
+            int c; C##_##X##_rawkey_t rx = keyToRaw(KEY_REF_##C(&tn->value)); \
+            if ((c = keyCompareRaw(&rx, &rkey)) < 0) tn = tn->link[1]; \
+            else if (c > 0) {out->_st[out->_top++] = tn; tn = tn->link[0];} \
+            else {out->_tn = tn->link[1]; return (out->ref = &tn->value);} \
         } \
         return (out->ref = NULL); \
     } \
