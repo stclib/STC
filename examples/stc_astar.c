@@ -19,7 +19,7 @@ typedef struct {
 MazePoint
 mpoint_init(int x, int y, int width)
 {
-    return (MazePoint) { x, y, 0, width };
+    MazePoint p = { x, y, 0, width }; return p;
 }
 
 int
