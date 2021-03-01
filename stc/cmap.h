@@ -352,7 +352,6 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
 STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) {uint64_t l,h; c_umul128(x,n,&l,&h); return h;}
 #endif
 #define chash_index_(h, entryPtr) ((entryPtr) - (h).table)
-enum {chash_HASH_ = 0x7f, chash_USED_ = 0x80};
 
 #define _implement_CHASH(X, C, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                             mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
@@ -385,9 +384,9 @@ enum {chash_HASH_ = 0x7f, chash_USED_ = 0x80};
 \
     STC_DEF chash_bucket_t \
     C##_##X##_bucket_(const C##_##X* self, const C##_##X##_rawkey_t* rkeyptr) { \
-        const size_t hash = keyHashRaw(rkeyptr, sizeof(C##_##X##_rawkey_t)); \
+        const uint64_t hash = keyHashRaw(rkeyptr, sizeof(C##_##X##_rawkey_t)); \
         uint_fast8_t sx; size_t cap = self->bucket_count; \
-        chash_bucket_t b = {_c_SELECT(fastrange,CMAP_SIZE_T)(hash, cap), (hash & chash_HASH_) | chash_USED_}; \
+        chash_bucket_t b = {_c_SELECT(fastrange,CMAP_SIZE_T)(hash, cap), (uint_fast8_t)(hash | 0x80)}; \
         const uint8_t* hashx = self->_hashx; \
         while ((sx = hashx[b.idx])) { \
             if (sx == b.hx) { \
@@ -418,7 +417,7 @@ enum {chash_HASH_ = 0x7f, chash_USED_ = 0x80};
         chash_bucket_t b = C##_##X##_bucket_(self, &rkey); \
         C##_##X##_result_t res = {&self->table[b.idx], !self->_hashx[b.idx]}; \
         if (res.second) { \
-            self->_hashx[b.idx] = (uint8_t) b.hx; \
+            self->_hashx[b.idx] = b.hx; \
             ++self->size; \
         } \
         return res; \

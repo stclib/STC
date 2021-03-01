@@ -3719,7 +3719,10 @@ public:
         rep(std::move(o.rep), alloc)
     {}
 
-    sparse_hash_map& operator=(sparse_hash_map &&o) = default;
+    sparse_hash_map& operator=(sparse_hash_map &&o)
+    {
+        rep = std::move(o.rep);
+    }
 #endif
 
 #if !defined(SPP_NO_CXX11_HDR_INITIALIZER_LIST)

@@ -7,21 +7,18 @@
 
 #ifdef __cplusplus
 #include <unordered_map>
-#include "others/bytell_hash_map.hpp"
 #include "others/robin_hood.hpp"
-#include "others/hopscotch_map.h"
+#include "others/skarupke/bytell_hash_map.hpp"
+#include "others/tsl/hopscotch_map.h"
+#include "others/tsl/robin_map.h"
 #include "others/sparsepp/spp.h"
 template<typename C> inline void destroy_me(C& c) { C().swap(c); }
 #endif
 
 // Visual Studio: compile with -TP to force C++:  cl -TP -EHsc -O2 benchmark.c
 
-static inline uint32_t fibonacci_hash(const void* data, size_t len) {
-    return (uint32_t) (((*(const uint64_t *) data) * 11400714819323198485llu) >> 24);
-}
-
 // cmap and khash template expansion
-using_cmap(ii, int64_t, int64_t, c_default_equals, fibonacci_hash); // c_default_hash);
+using_cmap(ii, int64_t, int64_t, c_default_equals, c_default_hash64); // c_default_hash);
 KHASH_MAP_INIT_INT64(ii, int64_t)
 
 
@@ -103,6 +100,18 @@ stc64_t rng;
 #define HMAP_BUCKETS(X)           UMAP_BUCKETS(X)
 #define HMAP_CLEAR(X)             UMAP_CLEAR(X)
 #define HMAP_DTOR(X)              UMAP_DTOR(X)
+
+#define OMAP_SETUP(X, Key, Value) tsl::robin_map<Key, Value> map; map.max_load_factor(max_load_factor)
+#define OMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
+#define OMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
+#define OMAP_FIND(X, key)         UMAP_FIND(X, key)
+#define OMAP_ERASE(X, key)        UMAP_ERASE(X, key)
+#define OMAP_FOR(X, i)            UMAP_FOR(X, i)
+#define OMAP_ITEM(X, i)           UMAP_ITEM(X, i)
+#define OMAP_SIZE(X)              UMAP_SIZE(X)
+#define OMAP_BUCKETS(X)           UMAP_BUCKETS(X)
+#define OMAP_CLEAR(X)             UMAP_CLEAR(X)
+#define OMAP_DTOR(X)              UMAP_DTOR(X)
 
 #define RMAP_SETUP(X, Key, Value) robin_hood::unordered_map<Key, Value> map
 #define RMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
