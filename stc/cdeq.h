@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CDEQ__H__
-#define CDEQ__H__
+#ifndef CDEQ_H_INCLUDED
+#define CDEQ_H_INCLUDED
 
 #include "ccommon.h"
 #include <stdlib.h>

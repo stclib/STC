@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CCOMMON__H__
-#define CCOMMON__H__
+#ifndef CCOMMON_H_INCLUDED
+#define CCOMMON_H_INCLUDED
 
 #define __USE_MINGW_ANSI_STDIO 1
 
@@ -75,7 +75,7 @@
 #define c_free(p)               free(p)
 #endif
 
-#define c_swap(T, x, y)         do { T __t = x; x = y; y = __t; } while (0)
+#define c_swap(T, x, y)         do { T _c_t = x; x = y; y = _c_t; } while (0)
 #define c_arraylen(a)           (sizeof (a)/sizeof (a)[0])
 
 #define c_default_compare(x, y) (c_default_less(y, x) - c_default_less(x, y))
@@ -110,23 +110,23 @@
 #define c_withfile(f, open) for (FILE *f = open; f; fclose(f), f = NULL)
 #define c_withbuffer(b, type, n) c_withbuffer_x(b, type, n, 256)
 #define c_withbuffer_x(b, type, n, BYTES) \
-    for (type __b[((BYTES) - 1) / sizeof(type) + 1], \
-               *b = (n) * sizeof *b > (BYTES) ? c_new_2(type, n) : __b; \
-         b; b != __b ? c_free(b) : (void)0, b = NULL)
+    for (type _c_b[((BYTES) - 1) / sizeof(type) + 1], \
+               *b = (n) * sizeof *b > (BYTES) ? c_new_2(type, n) : _c_b; \
+         b; b != _c_b ? c_free(b) : (void)0, b = NULL)
 #define c_breakwith continue
 
 #define c_init(ctype, c, ...) \
     ctype c = ctype##_init(); c_emplace_items(&c, ctype, __VA_ARGS__)
 
 #define c_emplace_items(self, ctype, ...) do { \
-    const ctype##_rawvalue_t __arr[] = __VA_ARGS__; \
-    ctype##_emplace_n(self, __arr, c_arraylen(__arr)); \
+    const ctype##_rawvalue_t _c_arr[] = __VA_ARGS__; \
+    ctype##_emplace_n(self, _c_arr, c_arraylen(_c_arr)); \
 } while (0)
 
 #define c_del(ctype, ...) do { \
-    ctype* __arr[] = {__VA_ARGS__}; \
-    for (size_t __i = 0; __i < c_arraylen(__arr); ++__i) \
-        ctype##_del(__arr[__i]); \
+    ctype* _c_arr[] = {__VA_ARGS__}; \
+    for (size_t _c_i = 0; _c_i < c_arraylen(_c_arr); ++_c_i) \
+        ctype##_del(_c_arr[_c_i]); \
 } while (0)
 
 #if defined(__SIZEOF_INT128__)

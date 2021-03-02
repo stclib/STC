@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CMAP__H__
-#define CMAP__H__
+#ifndef CMAP_H_INCLUDED
+#define CMAP_H_INCLUDED
 
 // Unordered set/map - implemented as closed hashing with linear probing and no tombstones.
 /*
@@ -109,12 +109,12 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
 
 #define using_cset_8(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
     _using_CHASH(X, cset, Key, Key, keyEqualsRaw, keyHashRaw, \
-                    _UNUSED_, _UNUSED_, _UNUSED_, void, \
+                    @@, @@, @@, void, \
                     keyDel, keyFromRaw, keyToRaw, RawKey)
 
 /* cset_str, cmap_str, cmap_strkey, cmap_strval: */
 #define using_cset_str() \
-    _using_CHASH_strkey(str, cset, cstr_t, _UNUSED_, _UNUSED_, _UNUSED_, void)
+    _using_CHASH_strkey(str, cset, cstr_t, @@, @@, @@, void)
 #define using_cmap_str() \
     _using_CHASH(str, cmap, cstr_t, cstr_t, cstr_equals_raw, cstr_hash_raw, \
                       cstr_del, cstr_from, cstr_c_str, const char*, \

@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CLIST__H__
-#define CLIST__H__
+#ifndef CLIST_H_INCLUDED
+#define CLIST_H_INCLUDED
 
 /*  Circular Singly-linked Lists.
 

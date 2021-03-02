@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CSTR__H__
-#define CSTR__H__
+#ifndef CSTR_H_INCLUDED
+#define CSTR_H_INCLUDED
 
 #include "ccommon.h"
 #include <stdlib.h> /* malloc */

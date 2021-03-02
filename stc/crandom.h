@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CRANDOM__H__
-#define CRANDOM__H__
+#ifndef CRANDOM_H_INCLUDED
+#define CRANDOM_H_INCLUDED
 
 /*
 // crandom: Pseudo-random number generator

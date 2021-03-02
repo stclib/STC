@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CSMAP__H__
-#define CSMAP__H__
+#ifndef CSMAP_H_INCLUDED
+#define CSMAP_H_INCLUDED
 
 // Sorted/Ordered set and map - implemented as an AA-tree.
 /*
@@ -78,12 +78,12 @@ int main(void) {
     using_csset_7(X, Key, keyCompare, keyDel, keyClone, c_trivial_toraw, Key)
 
 #define using_csset_7(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
-    _using_CBST(X, csset, Key, Key, keyCompareRaw, _UNUSED_, keyDel, \
-                   keyFromRaw, keyToRaw, RawKey, _UNUSED_, _UNUSED_, void)
+    _using_CBST(X, csset, Key, Key, keyCompareRaw, @@, keyDel, \
+                   keyFromRaw, keyToRaw, RawKey, @@, @@, void)
 
 /* csset_str, csmap_str, csmap_strkey, csmap_strval: */
 #define using_csset_str() \
-    _using_CBST_strkey(str, csset, cstr_t, _UNUSED_, _UNUSED_)
+    _using_CBST_strkey(str, csset, cstr_t, @@, @@)
 #define using_csmap_str() \
     _using_CBST(str, csmap, cstr_t, cstr_t, cstr_compare_raw, cstr_del, cstr_del, \
                      cstr_from, cstr_c_str, const char*, cstr_from, cstr_c_str, const char*)

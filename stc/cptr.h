@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CPTR__H__
-#define CPTR__H__
+#ifndef CPTR_H_INCLUDED
+#define CPTR_H_INCLUDED
 
 /* cptr: std::unique_ptr -like type */
 /*

@@ -44,8 +44,8 @@
         cpque_f_del(&queue);
     }
 */
-#ifndef CPQUEUE__H__
-#define CPQUEUE__H__
+#ifndef CPQUEUE_H_INCLUDED
+#define CPQUEUE_H_INCLUDED
 
 #include "cvec.h"
 

@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CQUEUE__H__
-#define CQUEUE__H__
+#ifndef CQUEUE_H_INCLUDED
+#define CQUEUE_H_INCLUDED
 
 /*  Queue adapter, default uses clist.
 

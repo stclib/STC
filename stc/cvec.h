@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CVEC__H__
-#define CVEC__H__
+#ifndef CVEC_H_INCLUDED
+#define CVEC_H_INCLUDED
 
 #include "ccommon.h"
 #include <stdlib.h>

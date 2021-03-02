@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CSTACK__H__
-#define CSTACK__H__
+#ifndef CSTACK_H_INCLUDED
+#define CSTACK_H_INCLUDED
 
 /*  Stack adapter, default uses cvec.
 

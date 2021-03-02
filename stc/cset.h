@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CSET__H__
-#define CSET__H__
+#ifndef CSET_H_INCLUDED
+#define CSET_H_INCLUDED
 
 // Unordered set - implemented as closed hashing with linear probing and no tombstones.
 

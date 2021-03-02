@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CSSET__H__
-#define CSSET__H__
+#ifndef CSSET_H_INCLUDED
+#define CSSET_H_INCLUDED
 
 // Sorted set - implemented as an AA-tree (balanced binary tree).
 

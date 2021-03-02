@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef COPTION__H__
-#define COPTION__H__
+#ifndef COPTION_H_INCLUDED
+#define COPTION_H_INCLUDED
 
 /*
 // Inspired by https://attractivechaos.wordpress.com/2018/08/31/a-survey-of-argument-parsing-libraries-in-c-c

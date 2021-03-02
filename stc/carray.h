@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CARRAY__H__
-#define CARRAY__H__
+#ifndef CARRAY_H_INCLUDED
+#define CARRAY_H_INCLUDED
 
 #include <stdlib.h>
 #include "ccommon.h"

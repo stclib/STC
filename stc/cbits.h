@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CBITSET__H__
-#define CBITSET__H__
+#ifndef CBITSET_H_INCLUDED
+#define CBITSET_H_INCLUDED
 
 /*
 Similar to boost::dynamic_bitset / std::bitset
