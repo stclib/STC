@@ -66,7 +66,7 @@ static stc64_t stc64_global = {{0x26aa069ea2fb1a4d, 0x70c72c95cd592d04, 0x504f33
 STC_INLINE void stc64_srandom(uint64_t seed) { stc64_global = stc64_init(seed); }
 STC_INLINE uint64_t stc64_random(void) { return stc64_rand(&stc64_global); }
 
-/* Float64 random number in range [low, high). */
+/* Float64 random number in range [0.0, 1.0). */
 STC_INLINE double stc64_randf(stc64_t* rng) {
     union {uint64_t i; double f;} u = {0x3FF0000000000000ull | (stc64_rand(rng) >> 12)};
     return u.f - 1.0;

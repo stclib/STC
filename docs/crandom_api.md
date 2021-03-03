@@ -7,14 +7,14 @@ and can generate bounded uniform and normal distributed random numbers.
 See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ functionality.
 
 **stc64** is a novel, extremely fast PRNG by Tyge Løvset, suited for parallel usage. It features a
-Weyl-sequence as part of the state. It is faster than *sfc64*, *wyhash64*, *pcg64*, and *xoshiro256\*\**
-on common platforms. It does not require fast multiplication or 128-bit integer operations. It has a
-256 bit state, but updates only 192 bit per generated number.
+Weyl-sequence as part of the state. In general testing, **stc64** is the fastest among *pcg64*,
+*xoshiro256`**`*, *sfc64*, and *lehmer64*. On some platforms, *wyrand64* is faster, but it has only
+128-bit state with no minimum period length guarantee. *stc64* does not require fast multiplication
+or 128-bit integer operations. It has 256 bit state, but updates only 192 bit per generated number.
 
-There is no *jump function*, but by incrementing the Weyl-increment by 2, it starts a new
-unique 2^64 *minimum* length period. Note that for each Weyl-increment (state[3]), the period
-length is about 2^126 with a high probability. For a single thread, a minimum period of 2^127
-is generated when the Weyl-increment is incremented by 2 every 2^64 output.
+There is no *jump function*, but for each odd number Weyl-increment (state[3]), it starts a new
+unique 2^64 *minimum* length period. For a single thread, a minimum period of 2^127 is generated
+when the Weyl-increment is incremented by 2 every 2^64 output.
 
 **stc64** passes *PractRand*, tested up to 8TB output, Vigna's Hamming weight test, and simple
 correlation tests, i.e. *n* interleaved streams with only one-bit differences in initial state.
@@ -41,27 +41,23 @@ All cstr definitions and prototypes may be included in your C source file by inc
 ## Methods
 
 ```c
-        void                stc64_srandom(uint64_t seed);
-        uint64_t            stc64_random(void);
+void                stc64_srandom(uint64_t seed);                            // seed global rng
+uint64_t            stc64_random(void);                                      // range [0, 2^64 - 1]
 
- 1)     stc64_t             stc64_init(uint64_t seed);
- 2)     stc64_t             stc64_with_seq(uint64_t seed, uint64_t seq);
+stc64_t             stc64_init(uint64_t seed);
+stc64_t             stc64_with_seq(uint64_t seed, uint64_t seq);             // init with stream
 
- 3)     uint64_t            stc64_rand(stc64_t* rng);
- 4)     double              stc64_randf(stc64_t* rng);
+uint64_t            stc64_rand(stc64_t* rng);                                // range [0, 2^64 - 1]
+double              stc64_randf(stc64_t* rng);                               // range [0.0, 1.0)
 
- 5)     stc64_uniform_t     stc64_uniform_init(int64_t low, int64_t high);
- 6)     int64_t             stc64_uniform(stc64_t* rng, stc64_uniform_t* dist);
- 7)     stc64_uniformf_t    stc64_uniformf_init(double low, double high);
- 8)     double              stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist);
+stc64_uniform_t     stc64_uniform_init(int64_t low, int64_t high);           // uniform-distribution
+int64_t             stc64_uniform(stc64_t* rng, stc64_uniform_t* dist);      // range [low, high]
+stc64_uniformf_t    stc64_uniformf_init(double lowf, double highf);
+double              stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist);    // range [lowf, highf)
 
- 9)     stc64_normalf_t     stc64_normalf_init(double mean, double stddev);
-10)     double              stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
+stc64_normalf_t     stc64_normalf_init(double mean, double stddev);          // normal-distribution
+double              stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
 ```
-`1-2)` PRNG 64-bit engine initializers. `3)` Integer generator, range \[0, 2^64).
-`4)` Double RNG with range \[0, 1). `5-6)` Uniform integer RNG with range \[*low*, *high*].
-`7-8)` Uniform double RNG with range \[*low*, *high*). `9-10)` Normal-distributed double
-RNG, around 68% of the values fall within the range [*mean* - *stddev*, *mean* + *stddev*].
 
 ## Example
 ```c

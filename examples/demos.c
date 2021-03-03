@@ -161,11 +161,12 @@ void mapdemo3()
     cmap_str_emplace(&table, "Map", "test");
     cmap_str_emplace(&table, "Make", "my");
     cmap_str_emplace(&table, "Sunny", "day");
-    cmap_str_value_t *e = cmap_str_find(&table, "Make").ref;
+    cmap_str_iter_t it = cmap_str_find(&table, "Make");
     c_foreach (i, cmap_str, table)
         printf("entry: %s: %s\n", i.ref->first.str, i.ref->second.str);
-    printf("size %zu: remove: Make: %s\n", cmap_str_size(table), e->second.str);
-    cmap_str_erase(&table, "Make");
+    printf("size %zu: remove: Make: %s\n", cmap_str_size(table), it.ref->second.str);
+    //cmap_str_erase(&table, "Make");
+    cmap_str_erase_at(&table, it);
 
     printf("size %zu\n", cmap_str_size(table));
     c_foreach (i, cmap_str, table)
