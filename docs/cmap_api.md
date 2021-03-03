@@ -82,15 +82,15 @@ cmap_X_mapped_t*    cmap_X_itval(cmap_X_iter_t it);
 cmap_X_value_t      cmap_X_value_clone(cmap_X_value_t val);
 ```
 ```c
-uint64_t            c_default_hash(const void *data, size_t len);       // bytewise hash
-uint64_t            c_default_hash32(const void* data, size_t len=4);
-uint64_t            c_default_hash64(const void* data, size_t len=8);
-int                 c_default_equals(const RawKey* a, const RawKey* b);
-int                 c_trivial_equals(const RawKey* a, const RawKey* b); // bitwise
+uint64_t            c_default_hash(const void *data, size_t len);         // key any trivial type
+uint64_t            c_default_hash32(const void* data, size_t);           // key one 32bit int
+uint64_t            c_default_hash64(const void* data, size_t);           // key one 64bit int
+int                 c_default_equals(const RawKey* a, const RawKey* b);   // the == operator
+int                 c_trivial_equals(const RawKey* a, const RawKey* b);   // memcmp
 Type                c_no_clone(Type val);
-Type                c_trivial_fromraw(Type val);                        // plain copy
+Type                c_trivial_fromraw(Type val);                          // plain copy
 Type                c_trivial_toraw(Type* val);
-void                c_trivial_del(Type* val);                           // does nothing
+void                c_trivial_del(Type* val);                             // does nothing
 ```
 
 ## Types
@@ -106,8 +106,6 @@ void                c_trivial_del(Type* val);                           // does 
 | `cmap_X_rawvalue_t`  | `struct { RawKey first; RawMapped second; }`    | RawKey + RawMapped type       |
 | `cmap_X_result_t`    | `struct { cmap_X_value_t *first; bool second; }`| Result of insert/put/emplace  |
 | `cmap_X_iter_t`      | `struct { cmap_X_value_t *ref; ... }`           | Iterator type                 |
-
-`c_default_hash` requires Key to be 16-bit aligned, and size to be a multiple of 16. There is also a `c_default_hash32` which is slightly faster.
 
 ## Constants and macros
 
