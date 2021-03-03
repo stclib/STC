@@ -5,7 +5,6 @@ STC - Standard Template Containers
 
 Introduction
 ------------
-
 A modern, templated, user-friendly, fast, fully type-safe, and customizable container library for C99,
 with a uniform API across the containers, and is similar to the c++ standard library containers API.
 
@@ -32,10 +31,10 @@ Others:
 
 Highlights
 ----------
-- **User friendly** - Just include the header and you are good to go. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of value- *comparison*, *destruction*, *cloning*, *conversion types*, and more.
+- **User friendly** - Just include the header and you are good to go. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of element- *comparison*, *destruction*, *cloning*, *conversion types*, and more.
 - **Unparalleled performance** - The containers are about equal and often much faster than the c++ STL containers.
 - **Fully memory managed** - All containers will destruct keys/values via destructor passed as macro parameters to the ***using***-declaration. Also, smart-pointers are supported and can be stored in containers, see ***csptr***.
-- **Fully type safe** - Avoids error-prone casting of container types and elements back and forth from the containers.
+- **Fully type safe** - Because of templating, it avoids error-prone casting of container types and elements back and forth from the containers.
 - **Uniform, easy-to-learn API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have uniform and intuitive usage across the various containers.
 - **Small footprint** - Small source code and generated executables. The executable from the example below using six different containers is *27 kb in size* compiled with TinyC.
 - **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See the Installation section.
@@ -44,7 +43,6 @@ Highlights
 Performance
 -----------
 ![Benchmark](benchmarks/pics/benchmark.png)
-
 Benchmark notes:
 - The barchart shows average test times over three platforms: Win-Clang++ v11, Mingw64 g++ 9.20, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
 - Containers uses value types `uint64_t` and pairs of `uint64_t`for the maps.
@@ -56,7 +54,6 @@ Benchmark notes:
 
 Usage
 -----
-
 The usage of the containers is similar to the c++ standard containers in STL, so it should be easy if you are familiar with them.
 All containers are generic/templated, except for **cstr** and **cbits**. No casting is used, so containers are type-safe like
 templates in c++. A basic usage example:
@@ -166,7 +163,6 @@ After erasing elements found:
 
 Installation
 ------------
-
 Because it is headers-only, headers can simply be included in your program. The methods are static by default (some inlined).
 You may add the project folder to **CPATH** environment variable, to let GCC, Clang, and TinyC locate the headers.
 
@@ -265,7 +261,6 @@ Note that some map method arguments are different between STC maps and c++ STL:
 
 Memory efficiency
 -----------------
-
 - **cstr**, **cvec**: Type size: one pointer. The size and capacity is stored as part of the heap allocation that also holds the vector elements.
 - **clist**: Type size: one pointer. Each node allocates block storing value and next pointer.
 - **cdeq**:  Type size: two pointers. Otherwise like *cvec*.
@@ -273,4 +268,3 @@ Memory efficiency
 - **csmap**: Type size: 1 pointer. *csmap* manages its own array of tree-nodes for allocation efficiency. Each node uses two 32-bit words by default for left/right child, and one byte for `level`. *csmap* can be configured to allow more than 2^32 elements, ie. 2^64, but it will double the overhead per node.
 - **carray**: carray1, carray2 and carray3. Type size: One pointer plus one, two, or three size_t variables to store dimensions. Arrays are allocated as one contiguous block of heap memory.
 - **csptr**: a shared-pointer uses two pointers, one for the data and one for the reference counter.
-
