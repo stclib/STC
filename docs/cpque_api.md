@@ -20,7 +20,7 @@ Declaring `using_cpque(i, cvec_i, >)`, `X` should be replaced by `i` in the foll
 
 ## Header file
 
-All cpque definitions and prototypes may be included in your C source file by including a single header file.
+All cpque definitions and prototypes are available by including a single header file.
 
 ```c
 #include "stc/cpque.h"

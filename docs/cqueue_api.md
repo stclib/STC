@@ -16,7 +16,7 @@ a **cdeq_X** or **clist_X** type as underlying implementation, given as `ctype`.
 
 ## Header file
 
-All cqueue definitions and prototypes may be included in your C source file by including a single header file.
+All cqueue definitions and prototypes are available by including a single header file.
 
 ```c
 #include "stc/cqueue.h" /* includes default underlying implementation header cdeq.h */

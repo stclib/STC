@@ -23,7 +23,7 @@ affect the names of all cptr types and methods. E.g. declaring `using_cptr(v4, V
 
 ## Header file
 
-All cptr definitions and prototypes may be included in your C source file by including a single header file.
+All cptr and csptr definitions and prototypes are available by including a single header file.
 
 ```c
 #include "stc/cptr.h"

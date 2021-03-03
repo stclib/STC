@@ -7,7 +7,7 @@ See the c++ class [std::basic_string](https://en.cppreference.com/w/cpp/string/b
 
 ## Header file
 
-All cstr definitions and prototypes may be included in your C source file by including a single header file.
+All cstr definitions and prototypes are available by including a single header file.
 
 ```c
 #include "stc/cstr.h"

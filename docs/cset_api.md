@@ -21,7 +21,7 @@ be replaced by `i` in all of the following documentation.
 
 ## Header file
 
-All cset definitions and prototypes may be included in your C source file by including a single header file.
+All cset definitions and prototypes are available by including a single header file.
 
 ```c
 #include "stc/cset.h"

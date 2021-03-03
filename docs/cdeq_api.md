@@ -26,7 +26,7 @@ using_cdeq(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const
 
 ## Header file
 
-All cdeq definitions and prototypes may be included in your C source file by including a single header file.
+All cdeq definitions and prototypes are available by including a single header file.
 
 ```c
 #include "stc/cdeq.h"

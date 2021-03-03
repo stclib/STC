@@ -9,7 +9,7 @@ for a functional description.
 
 ## Header file
 
-All cstr definitions and prototypes may be included in your C source file by including a single header file.
+All cbits definitions and prototypes are available by including a single header file.
 
 ```c
 #include "stc/cbits.h"

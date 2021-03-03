@@ -17,7 +17,7 @@ affect the names of all cstack types and methods. E.g. declaring `using_cstack(i
 
 ## Header file
 
-All cstack definitions and prototypes may be included in your C source file by including a single header file.
+All cstack definitions and prototypes are available by including a single header file.
 
 ```c
 #include "stc/cstack.h" /* includes default underlying implementation header cvec.h */

@@ -33,7 +33,7 @@ using_clist(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, cons
 
 ## Header file
 
-All clist definitions and prototypes may be included in your C source file by including a single header file.
+All clist definitions and prototypes are available by including a single header file.
 
 ```c
 #include "stc/clist.h"

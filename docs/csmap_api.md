@@ -37,7 +37,7 @@ be replaced by `ii` in all of the following documentation.
 
 ## Header file
 
-All csmap definitions and prototypes may be included in your C source file by including a single header file.
+All csmap definitions and prototypes are available by including a single header file.
 
 ```c
 #include <stc/csmap.h>

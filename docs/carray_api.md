@@ -18,7 +18,7 @@ be replaced by `i` in all of the following documentation. The `N` character shou
 
 ## Header file
 
-All **carray** definitions and prototypes may be included in your C source file by including a single header file.
+All carray definitions and prototypes are available by including a single header file.
 
 ```c
 #include "stc/carray.h"

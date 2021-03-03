@@ -12,28 +12,19 @@ Weyl-sequence as part of the state. In general testing, **stc64** is the fastest
 128-bit state with no minimum period length guarantee. *stc64* does not require fast multiplication
 or 128-bit integer operations. It has 256 bit state, but updates only 192 bit per generated number.
 
-There is no *jump function*, but for each odd number Weyl-increment (state[3]), it starts a new
+There is no *jump function*, but each odd number Weyl-increment (state[3]), starts a new
 unique 2^64 *minimum* length period. For a single thread, a minimum period of 2^127 is generated
 when the Weyl-increment is incremented by 2 every 2^64 output.
 
-**stc64** passes *PractRand*, tested up to 8TB output, Vigna's Hamming weight test, and simple
+**stc64** passes *PractRand* (tested up to 8TB output), Vigna's Hamming weight test, and simple
 correlation tests, i.e. *n* interleaved streams with only one-bit differences in initial state.
 
 For more, see the PRNG shootout by Vigna: http://prng.di.unimi.it and the debate between the authors of
 xoshiro and pcg (Vigna/O'Neill) PRNGs: https://www.pcg-random.org/posts/on-vignas-pcg-critique.html
 
-## Types
-
-| Name               | Type definition                           | Used to represent...         |
-|:-------------------|:------------------------------------------|:-----------------------------|
-| `stc64_t`          | `struct {uint64_t state[4];}`             | The PRNG engine type         |
-| `stc64_uniform_t`  | `struct {int64_t lower; uint64_t range;}` | Integer uniform distribution |
-| `stc64_uniformf_t` | `struct {double lower, range;}`           | Real number uniform distr.   |
-| `stc64_normalf_t`  | `struct {double mean, stddev;}`           | Normal distribution type     |
-
 ## Header file
 
-All cstr definitions and prototypes may be included in your C source file by including a single header file.
+All crandom definitions and prototypes are available by including a single header file.
 ```c
 #include "stc/crandom.h"
 ```
@@ -58,6 +49,14 @@ double              stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist);    // 
 stc64_normalf_t     stc64_normalf_init(double mean, double stddev);          // normal-distribution
 double              stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
 ```
+## Types
+
+| Name               | Type definition                           | Used to represent...         |
+|:-------------------|:------------------------------------------|:-----------------------------|
+| `stc64_t`          | `struct {uint64_t state[4];}`             | The PRNG engine type         |
+| `stc64_uniform_t`  | `struct {int64_t lower; uint64_t range;}` | Integer uniform distribution |
+| `stc64_uniformf_t` | `struct {double lower, range;}`           | Real number uniform distr.   |
+| `stc64_normalf_t`  | `struct {double mean, stddev;}`           | Normal distribution type     |
 
 ## Example
 ```c
