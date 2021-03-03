@@ -28,7 +28,7 @@ The macro `using_clist()` must be instantiated in the global scope. `X` is a typ
 will affect the names of all clist types and methods. E.g. declaring `using_clist(i, int);`, `X` should
 be replaced by `i` in all of the following documentation. `using_clist_str()` is a shorthand for
 ```c
-using_clist(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
+using_clist(str, cstr, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
 ```
 
 ## Header file

@@ -25,7 +25,7 @@ be replaced by `i` in all of the following documentation.
 
 `using_cvec_str()` is a shorthand for:
 ```
-using_cvec(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
+using_cvec(str, cstr, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
 ```
 
 ## Header file
@@ -155,9 +155,9 @@ int main() {
     cvec_str_emplace_back(&names, "Joe");
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
 
-    cstr_t tmp = cstr_from_fmt("%d elements so far", cvec_str_size(names));
+    cstr tmp = cstr_from_fmt("%d elements so far", cvec_str_size(names));
 
-    // emplace_back() will not compile if adding a new cstr_t type. Use push_back():
+    // emplace_back() will not compile if adding a new cstr type. Use push_back():
     cvec_str_push_back(&names, tmp); // tmp is moved to names, do not del() it.
 
     printf("%s\n", names.data[1].str); // Access the second element

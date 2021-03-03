@@ -31,7 +31,7 @@ Others:
 
 Highlights
 ----------
-- **User friendly** - Just include the header and you are good to go. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of element- *comparison*, *destruction*, *cloning*, *conversion types*, and more.
+- **User friendly** - Just include the headers and you are good. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of element- *comparison*, *destruction*, *cloning*, *conversion types*, and more.
 - **Unparalleled performance** - The containers are about equal and often much faster than the c++ STL containers.
 - **Fully memory managed** - All containers will destruct keys/values via destructor passed as macro parameters to the ***using***-declaration. Also, smart-pointers are supported and can be stored in containers, see ***csptr***.
 - **Fully type safe** - Because of templating, it avoids error-prone casting of container types and elements back and forth from the containers.

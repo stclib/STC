@@ -73,7 +73,7 @@ Managed raw pointers (cptr) in a cvec.
 #include <stc/cstr.h>
 #include <stc/cvec.h>
 
-typedef struct { cstr_t name, last; } Person;
+typedef struct { cstr name, last; } Person;
 
 Person* Person_make(Person* p, const char* name, const char* last) {
     p->name = cstr_from(name), p->last = cstr_from(last);
@@ -111,7 +111,7 @@ Simple shared pointer (csptr) usage.
 #include <stc/cptr.h>
 #include <stc/cstr.h>
 
-typedef struct { cstr_t name, last; } Person;
+typedef struct { cstr name, last; } Person;
 
 Person* Person_make(Person* p, const char* name, const char* last) {
     p->name = cstr_from(name), p->last = cstr_from(last);
@@ -150,7 +150,7 @@ Advanced: Three different ways to store Person in vectors: 1) `cvec<Person>`, 2)
 #include <stc/cstr.h>
 #include <stc/cvec.h>
 
-typedef struct { cstr_t name, last; } Person;
+typedef struct { cstr name, last; } Person;
 
 Person* Person_make(Person* p, const char* name, const char* last) {
     p->name = cstr_from(name), p->last = cstr_from(last);

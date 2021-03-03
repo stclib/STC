@@ -21,7 +21,7 @@ be replaced by `i` in all of the following documentation.
 
 `using_cdeq_str()` is a shorthand for:
 ```
-using_cdeq(str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
+using_cdeq(str, cstr, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
 ```
 
 ## Header file
