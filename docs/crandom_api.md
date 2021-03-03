@@ -1,18 +1,22 @@
 # STC [crandom](../stc/crandom.h): Pseudo Random Number Generator
 ![Random](pics/random.jpg)
 
-This describes the API of module **crandom**. It features a *64-bit PRNG* named **stc64**,
-and can generate bounded uniform and normal distributed random numbers.
+This features a *64-bit PRNG* named **stc64**, and can generate bounded uniform and normal
+distributed random numbers.
 
 See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ functionality.
+
+## Description
 
 **stc64** is a novel, extremely fast PRNG by Tyge Løvset, suited for parallel usage. It features a
 Weyl-sequence as part of the state. In general testing, **stc64** is the fastest among *pcg64*,
 *xoshiro256`**`*, *sfc64*, and *lehmer64*. On some platforms, *wyrand64* is faster, but it has only
-128-bit state with no minimum period length guarantee. *stc64* does not require fast multiplication
-or 128-bit integer operations. It has 256 bit state, but updates only 192 bit per generated number.
+128-bit state with no minimum period length guarantee. 
 
-There is no *jump function*, but each odd number Weyl-increment (state[3]), starts a new
+**stc64** does not require fast multiplication or 128-bit integer operations. It has 256 bit state,
+but updates only 192 bit per generated number.
+
+There is no *jump function*, but each odd number Weyl-increment (state[3]) starts a new
 unique 2^64 *minimum* length period. For a single thread, a minimum period of 2^127 is generated
 when the Weyl-increment is incremented by 2 every 2^64 output.
 
