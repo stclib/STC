@@ -30,27 +30,9 @@ Others:
 - [***coption*** - POSIX **getopt_long()** alike method](docs/coption_api.md)
 - [***crandom*** - A novel extremely fast *PRNG* named **stc64**](docs/crandom_api.md)
 
-Performance
------------
-![Benchmark](benchmarks/pics/benchmark.png)
-
-STC containers performs either about equal or better than the c++ std counterparts. **cmap** ***crushes*** *std::unordered_map* across the board. 
-**cdeq**, **cmap**, and **csmap** all have multiple times faster iteration of elements and destruction than the c++ equivalents. **csmap** also
-has noticable faster lookup than *std::map*'s typical red-black tree implementation. It uses an AA-tree (Arne Andersson, 1993), which tends to
-create a flatter structure (more balanced) than red-black trees. **cvec** is only slightly slower than *std::vector*.
-
-Notes:
-- The barchart shows average test times over three platforms: Win-Clang++ v11, Mingw64 g++ 9.20, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
-- Containers uses value types `uint64_t` and pairs of `uint64_t`for the maps.
-- Black bars indicates performance variation between various platforms/compilers.
-- Iterations are repeated 4 times over n elements.
-- **find()**: not executed for *forward_list*, *deque*, and *vector* because these c++ containers does not have native *find()*.
-- **deque**: *insert*: n/3 push_front(), n/3 push_back()+pop_front(), n/3 push_back().
-- **map and unordered map**: *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys in the map, n/2 random keys.
-
 Highlights
 ----------
-- **User friendly** - Super easy usage, just include the header and you are good to go. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using_***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of value- *comparison*, *destruction*, *cloning*, *conversion types*, and more.
+- **User friendly** - Just include the header and you are good to go. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of value- *comparison*, *destruction*, *cloning*, *conversion types*, and more.
 - **Unparalleled performance** - The containers are about equal and often much faster than the c++ STL containers.
 - **Fully memory managed** - All containers will destruct keys/values via destructor passed as macro parameters to the ***using***-declaration. Also, smart-pointers are supported and can be stored in containers, see ***csptr***.
 - **Fully type safe** - Avoids error-prone casting of container types and elements back and forth from the containers.
@@ -58,6 +40,19 @@ Highlights
 - **Small footprint** - Small source code and generated executables. The executable from the example below using six different containers is *27 kb in size* compiled with TinyC.
 - **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See the Installation section.
 - **No callback functions** - All passed template argument functions/macros are directly called from the implementation, no slow callbacks which requires storage.
+
+Performance
+-----------
+![Benchmark](benchmarks/pics/benchmark.png)
+
+Benchmark notes:
+- The barchart shows average test times over three platforms: Win-Clang++ v11, Mingw64 g++ 9.20, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
+- Containers uses value types `uint64_t` and pairs of `uint64_t`for the maps.
+- Black bars indicates performance variation between various platforms/compilers.
+- Iterations are repeated 4 times over n elements.
+- **find()**: not executed for *forward_list*, *deque*, and *vector* because these c++ containers does not have native *find()*.
+- **deque**: *insert*: n/3 push_front(), n/3 push_back()+pop_front(), n/3 push_back().
+- **map and unordered map**: *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys in the map, n/2 random keys.
 
 Usage
 -----

@@ -284,8 +284,9 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
             res.first->second = mapped; return res; \
         } \
         STC_INLINE C##_##X##_result_t \
-        C##_##X##_put(C##_##X* self, Key k, Mapped m) \
-            {return C##_##X##_insert_or_assign(self, k, m);} \
+        C##_##X##_put(C##_##X* self, Key k, Mapped m) { /* shorter, like operator[] */ \
+            return C##_##X##_insert_or_assign(self, k, m); \
+        } \
         STC_INLINE C##_##X##_result_t \
         C##_##X##_emplace_or_assign(C##_##X* self, RawKey rkey, RawMapped rmapped) { \
             C##_##X##_result_t res = C##_##X##_insert_entry_(self, rkey); \

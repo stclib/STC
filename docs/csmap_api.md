@@ -1,7 +1,10 @@
 # STC [csmap](../stc/csmap.h): Sorted Map
 ![Map](pics/smap.jpg)
 
-A **csmap** is a sorted associative container that contains key-value pairs with unique keys. Keys are sorted by using the comparison function *keyCompare*. Search, removal, and insertion operations have logarithmic complexity. **csmap** is implemented as an AA-tree.
+A **csmap** is a sorted associative container that contains key-value pairs with unique keys. Keys are sorted by
+using the comparison function *keyCompare*. Search, removal, and insertion operations have logarithmic complexity.
+**csmap** is implemented as an AA-tree (Arne Andersson, 1993), which tends to create a flatter structure
+(slightly more balanced) than red-black trees.
 
 See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) for a functional description.
 
