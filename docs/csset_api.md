@@ -1,7 +1,7 @@
 # STC [csset](../stc/csmap.h): Sorted Set
 ![Set](pics/sset.jpg)
 
-A **csset** is an associative container that contains a sorted set of unique objects of type *Key*. Sorting is done using the key comparison function *keyCompare*. Search, removal, and insertion operations have logarithmic complexity. **csset** is implemented as a AA-tree.
+A **csset** is an associative container that contains a sorted set of unique objects of type *Key*. Sorting is done using the key comparison function *keyCompare*. Search, removal, and insertion operations have logarithmic complexity. **csset** is implemented as an AA-tree.
 
 See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) for a functional description.
 

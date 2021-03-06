@@ -67,7 +67,7 @@
 
 #define c_new(...)              c_MACRO_OVERLOAD(c_new, __VA_ARGS__)
 #define c_new_1(T)              ((T *) c_malloc(sizeof(T)))
-#define c_new_2(T, n)           ((T *) c_malloc(sizeof(T) * (n)))
+#define c_new_2(T, n)           ((T *) c_malloc(sizeof(T)*(n)))
 #ifndef c_malloc
 #define c_malloc(sz)            malloc(sz)
 #define c_calloc(n, sz)         calloc(n, sz)
@@ -95,9 +95,11 @@
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
 #define c_foreach_3(it, ctype, cnt) \
-    for (ctype##_iter_t it = ctype##_begin(&cnt), it##_end_ = ctype##_end(&cnt); it.ref != it##_end_.ref; ctype##_next(&it))
+    for (ctype##_iter_t it = ctype##_begin(&cnt), it##_end_ = ctype##_end(&cnt) \
+         ; it.ref != it##_end_.ref; ctype##_next(&it))
 #define c_foreach_4(it, ctype, start, finish) \
-    for (ctype##_iter_t it = start, it##_end_ = finish; it.ref != it##_end_.ref; ctype##_next(&it))
+    for (ctype##_iter_t it = start, it##_end_ = finish \
+         ; it.ref != it##_end_.ref; ctype##_next(&it))
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
 #define c_forrange_1(stop) for (size_t _c_i=0, _c_end_=stop; _c_i < _c_end_; ++_c_i)
@@ -105,14 +107,15 @@
 #define c_forrange_3(i, type, stop) for (type i=0, i##_end_=stop; i < i##_end_; ++i)
 #define c_forrange_4(i, type, start, stop) for (type i=start, i##_end_=stop; i < i##_end_; ++i)
 #define c_forrange_5(i, type, start, stop, step) \
-    for (type i=start, i##_inc_=step, i##_end_=(stop) - (0 < i##_inc_); (i <= i##_end_) == (0 < i##_inc_); i += i##_inc_)
+    for (type i=start, i##_inc_=step, i##_end_=(stop) - (0 < i##_inc_) \
+         ; (i <= i##_end_) == (0 < i##_inc_); i += i##_inc_)
 
 #define c_withfile(f, open) for (FILE *f = open; f; fclose(f), f = NULL)
 #define c_withbuffer(b, type, n) c_withbuffer_x(b, type, n, 256)
 #define c_withbuffer_x(b, type, n, BYTES) \
     for (type _c_b[((BYTES) - 1) / sizeof(type) + 1], \
-               *b = (n) * sizeof *b > (BYTES) ? c_new_2(type, n) : _c_b; \
-         b; b != _c_b ? c_free(b) : (void)0, b = NULL)
+                *b = (n)*sizeof *b > (BYTES) ? c_new_2(type, n) : _c_b \
+         ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)
 #define c_breakwith continue
 
 #define c_init(ctype, c, ...) \
@@ -131,7 +134,7 @@
 
 #if defined(__SIZEOF_INT128__)
     #define c_umul128(a, b, lo, hi) \
-        do { __uint128_t _z = (__uint128_t)(a) * (b); \
+        do { __uint128_t _z = (__uint128_t)(a)*(b); \
              *(lo) = (uint64_t)_z, *(hi) = _z >> 64; } while(0)
 #elif defined(_MSC_VER) && defined(_WIN64)
     #include <intrin.h>
