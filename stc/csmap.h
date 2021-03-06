@@ -297,13 +297,13 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
     STC_API void C##_##X##_next(C##_##X##_iter_t* it); \
 \
     STC_INLINE C##_##X##_iter_t \
-    C##_##X##_begin(C##_##X* self) { \
+    C##_##X##_begin(const C##_##X* self) { \
         C##_##X##_iter_t it = {NULL, self->nodes, 0, (C##_##X##_size_t) _csmap_rep(self)->root}; \
         if (it._tn) C##_##X##_next(&it); \
         return it; \
     } \
     STC_INLINE C##_##X##_iter_t \
-    C##_##X##_end(C##_##X* self) {\
+    C##_##X##_end(const C##_##X* self) {\
         C##_##X##_iter_t it = {NULL}; return it; \
     } \
     STC_INLINE C##_##X##_mapped_t* \

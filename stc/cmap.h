@@ -302,13 +302,13 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
         }) \
 \
     STC_INLINE C##_##X##_iter_t \
-    C##_##X##_begin(C##_##X* self) { \
+    C##_##X##_begin(const C##_##X* self) { \
         C##_##X##_iter_t it = {self->table, self->_hashx}; \
         if (it._hx) while (*it._hx == 0) ++it.ref, ++it._hx; \
         return it; \
     } \
     STC_INLINE C##_##X##_iter_t \
-    C##_##X##_end(C##_##X* self) {\
+    C##_##X##_end(const C##_##X* self) {\
         C##_##X##_iter_t it = {self->table + self->bucket_count}; return it; \
     } \
     STC_INLINE void \

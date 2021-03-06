@@ -286,12 +286,12 @@ int main(void) {
     C##_##X##_next(C##_##X##_iter_t* it); \
 \
     STC_INLINE C##_##X##_iter_t \
-    C##_##X##_begin(C##_##X* self) { \
+    C##_##X##_begin(const C##_##X* self) { \
         C##_##X##_iter_t it = {NULL, 0, self->root}; \
         C##_##X##_next(&it); return it; \
     } \
     STC_INLINE C##_##X##_iter_t \
-    C##_##X##_end(C##_##X* self) {\
+    C##_##X##_end(const C##_##X* self) {\
         C##_##X##_iter_t it = {NULL}; return it; \
     } \
     STC_INLINE C##_##X##_mapped_t* \

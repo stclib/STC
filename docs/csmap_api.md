@@ -70,8 +70,8 @@ csmap_X_mapped_t*   csmap_X_at(const csmap_X* self, RawKey rkey);               
 size_t              csmap_X_erase(csmap_X* self, RawKey rkey);
 csmap_X_iter_t      csmap_X_erase_at(csmap_X* self, csmap_X_iter_t pos);
 
-csmap_X_iter_t      csmap_X_begin(csmap_X* self);
-csmap_X_iter_t      csmap_X_end(csmap_X* self);
+csmap_X_iter_t      csmap_X_begin(const csmap_X* self);
+csmap_X_iter_t      csmap_X_end(const csmap_X* self);
 void                csmap_X_next(csmap_X_iter_t* it);
 csmap_X_mapped_t*   csmap_X_itval(csmap_X_iter_t it);
 

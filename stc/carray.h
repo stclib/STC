@@ -167,11 +167,11 @@ int main()
     typedef struct { Value *ref; } carray##D##X##_iter_t; \
 \
     STC_INLINE carray##D##X##_iter_t \
-    carray##D##X##_begin(carray##D##X* a) { \
+    carray##D##X##_begin(const carray##D##X* a) { \
         carray##D##X##_iter_t it = {a->data}; return it; \
     } \
     STC_INLINE carray##D##X##_iter_t \
-    carray##D##X##_end(carray##D##X* a) { \
+    carray##D##X##_end(const carray##D##X* a) { \
         carray##D##X##_iter_t it = {a->data + carray##D##X##_size(*a)}; return it; \
     } \
     STC_INLINE void \

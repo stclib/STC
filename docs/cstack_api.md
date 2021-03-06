@@ -40,8 +40,8 @@ void                    cstack_X_emplace_n(cstack_X *self, const cstack_X_rawval
 
 void                    cstack_X_pop(cstack_X* self);
 
-cstack_X_iter_t         cstack_X_begin(cstack_X* self);
-cstack_X_iter_t         cstack_X_end(cstack_X* self);
+cstack_X_iter_t         cstack_X_begin(const cstack_X* self);
+cstack_X_iter_t         cstack_X_end(const cstack_X* self);
 void                    cstack_X_next(cstack_X_iter_t* it);
 cstack_X_value_t*       cstack_X_itval(cstack_X_iter_t it);
 

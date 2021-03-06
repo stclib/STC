@@ -80,9 +80,9 @@
     } \
     typedef ctype##_iter_t cstack_##X##_iter_t; \
     STC_INLINE cstack_##X##_iter_t \
-    cstack_##X##_begin(cstack_##X* self) {return ctype##_begin(self);} \
+    cstack_##X##_begin(const cstack_##X* self) {return ctype##_begin(self);} \
     STC_INLINE cstack_##X##_iter_t \
-    cstack_##X##_end(cstack_##X* self) {return ctype##_end(self);} \
+    cstack_##X##_end(const cstack_##X* self) {return ctype##_end(self);} \
     STC_INLINE void \
     cstack_##X##_next(cstack_##X##_iter_t* it) {ctype##_next(it);} \
     STC_INLINE cstack_##X##_value_t* \

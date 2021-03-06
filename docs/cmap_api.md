@@ -74,8 +74,8 @@ cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, RawKey rkey);                 
 size_t              cmap_X_erase(cmap_X* self, RawKey rkey);
 cmap_X_iter_t       cmap_X_erase_at(cmap_X* self, cmap_X_iter_t pos);
 
-cmap_X_iter_t       cmap_X_begin(cmap_X* self);
-cmap_X_iter_t       cmap_X_end(cmap_X* self);
+cmap_X_iter_t       cmap_X_begin(const cmap_X* self);
+cmap_X_iter_t       cmap_X_end(const cmap_X* self);
 void                cmap_X_next(cmap_X_iter_t* it);
 cmap_X_mapped_t*    cmap_X_itval(cmap_X_iter_t it);
 
