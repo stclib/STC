@@ -292,8 +292,8 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
             return &C##_##X##_find_it(self, rkey, &it)->second; \
         }) \
 \
-    STC_API C##_##X##_value_t* C##_##X##_front(C##_##X* self); \
-    STC_API C##_##X##_value_t* C##_##X##_back(C##_##X* self); \
+    STC_API C##_##X##_value_t* C##_##X##_front(const C##_##X* self); \
+    STC_API C##_##X##_value_t* C##_##X##_back(const C##_##X* self); \
     STC_API void C##_##X##_next(C##_##X##_iter_t* it); \
 \
     STC_INLINE C##_##X##_iter_t \
@@ -337,14 +337,14 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
     } \
 \
     STC_DEF C##_##X##_value_t* \
-    C##_##X##_front(C##_##X* self) { \
+    C##_##X##_front(const C##_##X* self) { \
         C##_##X##_node_t *d = self->nodes; \
         C##_##X##_size_t tn = (C##_##X##_size_t) _csmap_rep(self)->root; \
         while (d[tn].link[0]) tn = d[tn].link[0]; \
         return &d[tn].value; \
     } \
     STC_DEF C##_##X##_value_t* \
-    C##_##X##_back(C##_##X* self) { \
+    C##_##X##_back(const C##_##X* self) { \
         C##_##X##_node_t *d = self->nodes; \
         C##_##X##_size_t tn = (C##_##X##_size_t) _csmap_rep(self)->root; \
         while (d[tn].link[1]) tn = d[tn].link[1]; \

@@ -166,11 +166,11 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     } \
 \
     STC_INLINE cdeq_##X##_value_t* \
-    cdeq_##X##_front(cdeq_##X* self) {return self->data;} \
+    cdeq_##X##_front(const cdeq_##X* self) {return self->data;} \
     STC_INLINE cdeq_##X##_value_t* \
-    cdeq_##X##_back(cdeq_##X* self) {return self->data + cdeq_rep_(self)->size - 1;} \
+    cdeq_##X##_back(const cdeq_##X* self) {return self->data + cdeq_rep_(self)->size - 1;} \
     STC_INLINE cdeq_##X##_value_t* \
-    cdeq_##X##_at(cdeq_##X* self, size_t i) { \
+    cdeq_##X##_at(const cdeq_##X* self, size_t i) { \
         assert(i < cdeq_rep_(self)->size); \
         return self->data + i; \
     } \

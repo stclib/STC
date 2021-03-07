@@ -74,9 +74,9 @@
     STC_INLINE bool \
     cqueue_##X##_empty(cqueue_##X q) {return ctype##_empty(q);} \
     STC_INLINE cqueue_##X##_value_t* \
-    cqueue_##X##_front(cqueue_##X* self) {return ctype##_front(self);} \
+    cqueue_##X##_front(const cqueue_##X* self) {return ctype##_front(self);} \
     STC_INLINE cqueue_##X##_value_t* \
-    cqueue_##X##_back(cqueue_##X* self) {return ctype##_back(self);} \
+    cqueue_##X##_back(const cqueue_##X* self) {return ctype##_back(self);} \
     STC_INLINE void \
     cqueue_##X##_pop(cqueue_##X* self) {ctype##_pop_front(self);} \
     STC_INLINE void \

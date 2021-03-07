@@ -149,11 +149,11 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     } \
 \
     STC_INLINE cvec_##X##_value_t* \
-    cvec_##X##_front(cvec_##X* self) {return self->data;} \
+    cvec_##X##_front(const cvec_##X* self) {return self->data;} \
     STC_INLINE cvec_##X##_value_t* \
-    cvec_##X##_back(cvec_##X* self) {return self->data + _cvec_rep(self)->size - 1;} \
+    cvec_##X##_back(const cvec_##X* self) {return self->data + _cvec_rep(self)->size - 1;} \
     STC_INLINE cvec_##X##_value_t* \
-     cvec_##X##_at(cvec_##X* self, size_t i) { \
+     cvec_##X##_at(const cvec_##X* self, size_t i) { \
         assert(i < _cvec_rep(self)->size); \
         return self->data + i; \
     } \

@@ -31,8 +31,8 @@ void                    cqueue_X_del(cqueue_X* self);      // destructor
 
 size_t                  cqueue_X_size(cqueue_X q);
 bool                    cqueue_X_empty(cqueue_X q);
-cqueue_X_value_t*       cqueue_X_front(cqueue_X* self);
-cqueue_X_value_t*       cqueue_X_back(cqueue_X* self);
+cqueue_X_value_t*       cqueue_X_front(const cqueue_X* self);
+cqueue_X_value_t*       cqueue_X_back(const cqueue_X* self);
 
 void                    cqueue_X_push(cqueue_X* self, cqueue_X_value_t value);
 void                    cqueue_X_emplace(cqueue_X* self, cqueue_X_rawvalue_t raw);

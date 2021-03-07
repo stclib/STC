@@ -51,9 +51,9 @@ bool                cdeq_X_empty(cdeq_X deq);
 size_t              cdeq_X_size(cdeq_X deq);
 size_t              cdeq_X_capacity(cdeq_X deq);
 
-cdeq_X_value_t*     cdeq_X_at(cdeq_X* self, size_t idx);
-cdeq_X_value_t*     cdeq_X_front(cdeq_X* self);
-cdeq_X_value_t*     cdeq_X_back(cdeq_X* self);
+cdeq_X_value_t*     cdeq_X_at(const cdeq_X* self, size_t idx);
+cdeq_X_value_t*     cdeq_X_front(const cdeq_X* self);
+cdeq_X_value_t*     cdeq_X_back(const cdeq_X* self);
 
 void                cdeq_X_push_front(cdeq_X* self, Value value);
 void                cdeq_X_push_back(cdeq_X* self, Value value);

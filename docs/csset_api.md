@@ -50,8 +50,8 @@ void                csset_X_emplace_n(csset_X* self, const RawKey arr[], size_t 
 size_t              csset_X_erase(csset_X* self, RawKey rkey);
 csset_X_iter_t      csset_X_erase_at(csset_X* self, csset_X_iter_t pos);
 
-csset_X_iter_t      csset_X_begin(csset_X* self);
-csset_X_iter_t      csset_X_end(csset_X* self);
+csset_X_iter_t      csset_X_begin(const csset_X* self);
+csset_X_iter_t      csset_X_end(const csset_X* self);
 void                csset_X_next(csset_X_iter_t* it);
 csset_X_value_t*    csset_X_itval(csset_X_iter_t it);
 

@@ -42,16 +42,16 @@ size_t              carrayNX_xdim(carrayNX arr);
 size_t              carrayNX_ydim(carrayNX arr); // not N=3
 size_t              carrayNX_zdim(carrayNX arr); // only N=3
 
-Value*              carray1X_at(carray1X *self, size_t x);
-Value*              carray2X_at(carray2X *self, size_t y, size_t x);
-Value*              carray3X_at(carray3X *self, size_t z, size_t y, size_t x);
+Value*              carray1X_at(const carray1X *self, size_t x);
+Value*              carray2X_at(const carray2X *self, size_t y, size_t x);
+Value*              carray3X_at(const carray3X *self, size_t z, size_t y, size_t x);
 
-carray1X            carray2X_at1(carray2X *self, size_t y);
-carray2X            carray3X_at1(carray3X *self, size_t z);
-carray1X            carray3X_at2(carray3X *self, size_t z, size_t y);
+carray1X            carray2X_at1(const carray2X *self, size_t y);
+carray2X            carray3X_at1(const carray3X *self, size_t z);
+carray1X            carray3X_at2(const carray3X *self, size_t z, size_t y);
 
-carrayNX_iter_t     carrayNX_begin(carrayNX* self);
-carrayNX_iter_t     carrayNX_end(carrayNX* self);
+carrayNX_iter_t     carrayNX_begin(const carrayNX* self);
+carrayNX_iter_t     carrayNX_end(const carrayNX* self);
 void                carrayNX_next(carrayNX_iter_t* it);
 carrayNX_value_t*   carrayNX_itval(carrayNX_iter_t it);
 ```

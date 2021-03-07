@@ -128,30 +128,30 @@ int main()
     } \
 \
     STC_INLINE Value* \
-    carray1##X##_at(carray1##X *a, size_t x) { return a->data + x; } \
+    carray1##X##_at(const carray1##X *a, size_t x) { return a->data + x; } \
     \
     STC_INLINE carray1##X \
-    carray2##X##_at1(carray2##X *a, size_t y) { \
+    carray2##X##_at1(const carray2##X *a, size_t y) { \
         carray1##X sub = {a->data + y*_carray_xdim(*a), _carray_xdim(*a)}; \
         return sub; \
     } \
     STC_INLINE Value* \
-    carray2##X##_at(carray2##X *a, size_t y, size_t x) { \
+    carray2##X##_at(const carray2##X *a, size_t y, size_t x) { \
         return a->data + y*_carray_xdim(*a) + x; \
     } \
 \
     STC_INLINE carray2##X \
-    carray3##X##_at1(carray3##X *a, size_t z) { \
+    carray3##X##_at1(const carray3##X *a, size_t z) { \
         carray2##X sub = {a->data + z*_carray_ydim(*a)*_carray_xdim(*a), _carray_xdim(*a), _carray_ydim(*a)}; \
         return sub; \
     } \
     STC_INLINE carray1##X \
-    carray3##X##_at2(carray3##X *a, size_t z, size_t y) { \
+    carray3##X##_at2(const carray3##X *a, size_t z, size_t y) { \
         carray1##X sub = {a->data + (z*_carray_ydim(*a) + y)*_carray_xdim(*a), _carray_xdim(*a)}; \
         return sub; \
     } \
     STC_INLINE Value* \
-    carray3##X##_at(carray3##X *a, size_t z, size_t y, size_t x) { \
+    carray3##X##_at(const carray3##X *a, size_t z, size_t y, size_t x) { \
         return a->data + (z*_carray_ydim(*a) + y)*_carray_xdim(*a) + x; \
     } \
     typedef carray1##X carray1##X##_t

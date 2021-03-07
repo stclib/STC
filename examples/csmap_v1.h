@@ -270,13 +270,13 @@ int main(void) {
         }) \
 \
     STC_INLINE C##_##X##_value_t* \
-    C##_##X##_front(C##_##X* self) { \
+    C##_##X##_front(const C##_##X* self) { \
         C##_##X##_node_t *tn = self->root; \
         while (tn->link[0]->level) tn = tn->link[0]; \
         return &tn->value; \
     } \
     STC_INLINE C##_##X##_value_t* \
-    C##_##X##_back(C##_##X* self) { \
+    C##_##X##_back(const C##_##X* self) { \
         C##_##X##_node_t *tn = self->root; \
         while (tn->link[1]->level) tn = tn->link[1]; \
         return &tn->value; \

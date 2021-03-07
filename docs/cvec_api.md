@@ -55,9 +55,9 @@ bool                cvec_X_empty(cvec_X vec);
 size_t              cvec_X_size(cvec_X vec);
 size_t              cvec_X_capacity(cvec_X vec);
 
-cvec_X_value_t*     cvec_X_at(cvec_X* self, size_t idx);
-cvec_X_value_t*     cvec_X_front(cvec_X* self);
-cvec_X_value_t*     cvec_X_back(cvec_X* self);
+cvec_X_value_t*     cvec_X_at(const cvec_X* self, size_t idx);
+cvec_X_value_t*     cvec_X_front(const cvec_X* self);
+cvec_X_value_t*     cvec_X_back(const cvec_X* self);
 
 void                cvec_X_push_back(cvec_X* self, Value value);
 void                cvec_X_emplace_back(cvec_X* self, RawValue raw);

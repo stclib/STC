@@ -197,9 +197,9 @@ STC_API size_t _clist_size(const clist_void* self);
     clist_##X##_sort(clist_##X* self); \
 \
     STC_INLINE Value* \
-    clist_##X##_front(clist_##X* self) {return &self->last->next->value;} \
+    clist_##X##_front(const clist_##X* self) {return &self->last->next->value;} \
     STC_INLINE Value* \
-    clist_##X##_back(clist_##X* self) {return &self->last->value;} \
+    clist_##X##_back(const clist_##X* self) {return &self->last->value;} \
 \
     _c_implement_clist_7(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
     typedef clist_##X clist_##X##_t

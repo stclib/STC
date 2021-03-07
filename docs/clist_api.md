@@ -50,8 +50,8 @@ void                clist_X_del(clist_X* self);      // destructor
 bool                clist_X_empty(clist_X list);
 size_t              clist_X_size(clist_X list); // note: O(n)
 
-clist_X_value_t*    clist_X_front(clist_X* self);
-clist_X_value_t*    clist_X_back(clist_X* self);
+clist_X_value_t*    clist_X_front(const clist_X* self);
+clist_X_value_t*    clist_X_back(const clist_X* self);
 
 void                clist_X_push_front(clist_X* self, Value value);
 void                clist_X_emplace_front(clist_X* self, RawValue raw);
