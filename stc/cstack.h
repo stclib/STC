@@ -63,7 +63,7 @@
     STC_INLINE bool \
     cstack_##X##_empty(cstack_##X st) {return ctype##_empty(st);} \
     STC_INLINE cstack_##X##_value_t* \
-    cstack_##X##_top(cstack_##X* self) {return ctype##_back(self);} \
+    cstack_##X##_top(const cstack_##X* self) {return ctype##_back(self);} \
     STC_INLINE void \
     cstack_##X##_pop(cstack_##X* self) {ctype##_pop_back(self);} \
     STC_INLINE void \

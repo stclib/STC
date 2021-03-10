@@ -32,7 +32,7 @@ void                    cstack_X_del(cstack_X* self);      // destructor
 
 size_t                  cstack_X_size(cstack_X st);
 bool                    cstack_X_empty(cstack_X st);
-cstack_X_value_t*       cstack_X_top(cstack_X* self);
+cstack_X_value_t*       cstack_X_top(const cstack_X* self);
 
 void                    cstack_X_push(cstack_X* self, cstack_X_value_t value);
 void                    cstack_X_emplace(cstack_X* self, cstack_X_rawvalue_t raw);
