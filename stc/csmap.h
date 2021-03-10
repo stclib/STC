@@ -432,7 +432,7 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
     } \
 \
     static inline C##X##_size_t \
-    C##X##insert_entry_i_(C##X* self, C##X##_size_t tn, const C##X##_rawkey_t* rkey, C##X##_result_t* res) { \
+    C##X##_insert_entry_i_(C##X* self, C##X##_size_t tn, const C##X##_rawkey_t* rkey, C##X##_result_t* res) { \
         C##X##_size_t up[64], it = tn; \
         C##X##_node_t* d = self->nodes; \
         int c, top = 0, dir = 0; \
@@ -459,7 +459,7 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
     STC_DEF C##X##_result_t \
     C##X##_insert_entry_(C##X* self, RawKey rkey) { \
         C##X##_result_t res = {NULL, false}; \
-        C##X##_size_t tn = C##X##insert_entry_i_(self, (C##X##_size_t) _csmap_rep(self)->root, &rkey, &res); \
+        C##X##_size_t tn = C##X##_insert_entry_i_(self, (C##X##_size_t) _csmap_rep(self)->root, &rkey, &res); \
         _csmap_rep(self)->root = tn; \
         _csmap_rep(self)->size += res.second; \
         return res; \
