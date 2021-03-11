@@ -108,13 +108,8 @@ void                c_trivial_del(Type* val);                             // doe
 | `cmap_X_result_t`    | `struct { cmap_X_value_t *ref; bool inserted; }`| Result of insert/put/emplace  |
 | `cmap_X_iter_t`      | `struct { cmap_X_value_t *ref; ... }`           | Iterator type                 |
 
-## Constants and macros
-
-| Name                                        | Purpose                |
-|:--------------------------------------------|:-----------------------|
-|  `c_try_emplace(self, ctype, rkey, mapped)` | Emplace if key exist   |
-
 ## Examples
+
 ```c
 #include <stdio.h>
 #include "stc/cstr.h"
