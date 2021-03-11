@@ -35,7 +35,7 @@ int main(void) {
     cset_sx_insert(&s, 5);
     cset_sx_insert(&s, 8);
     c_foreach (i, cset_sx, s)
-        printf("set %d\n", i.ref->second);
+        printf("set %d\n", *i.ref);
     cset_sx_del(&s);
 
     cmap_mx m = cmap_mx_init();
