@@ -54,6 +54,7 @@ void                cset_X_emplace_n(cset_X* self, const RawKey arr[], size_t si
 
 size_t              cset_X_erase(cset_X* self, RawKey rkey);
 cset_X_iter_t       cset_X_erase_at(cset_X* self, cset_X_iter_t pos);
+void                cset_X_erase_entry(cset_X* self, cset_X_value_t* entry);
 
 cset_X_iter_t       cset_X_begin(const cset_X* self);
 cset_X_iter_t       cset_X_end(const cset_X* self);
@@ -65,15 +66,15 @@ cset_X_value_t      cset_X_value_clone(cset_X_value_t val);
 
 ## Types
 
-| Type name            | Type definition                       | Used to represent...     |
-|:---------------------|:--------------------------------------|:-------------------------|
-| `cset_X`             | `struct { ... }`                      | The cset type            |
-| `cset_X_rawkey_t`    | `RawKey`                              | The raw key type         |
-| `cset_X_rawvalue_t`  | `cset_X_rawkey_t`                     | The raw key type         |
-| `cset_X_key_t`       | `Key`                                 | The key type             |
-| `cset_X_value_t`     | `cset_X_key_t`                        | The value type           |
-| `cset_X_result_t`    | `struct { Key first; bool second; }`  | Result of insert/emplace |
-| `cset_X_iter_t`      | `struct { cset_X_value_t *ref; ... }` | Iterator type            |
+| Type name            | Type definition                                  | Used to represent...     |
+|:---------------------|:-------------------------------------------------|:-------------------------|
+| `cset_X`             | `struct { ... }`                                 | The cset type            |
+| `cset_X_rawkey_t`    | `RawKey`                                         | The raw key type         |
+| `cset_X_rawvalue_t`  | `cset_X_rawkey_t`                                | The raw key type         |
+| `cset_X_key_t`       | `Key`                                            | The key type             |
+| `cset_X_value_t`     | `cset_X_key_t`                                   | The value type           |
+| `cset_X_result_t`    | `struct { cset_X_value_t* ref; bool inserted; }` | Result of insert/emplace |
+| `cset_X_iter_t`      | `struct { cset_X_value_t *ref; ... }`            | Iterator type            |
 
 ## Example
 ```c
