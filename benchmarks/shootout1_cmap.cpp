@@ -145,7 +145,7 @@ static void ins_and_access_cmap_i(picobench::state& s)
 
     picobench::scope scope(s);
     c_forrange (N1)
-        result += ++cmap_i_emplace(&map, stc64_random() & mask, 0).first->second;
+        result += ++cmap_i_emplace(&map, stc64_random() & mask, 0).ref->second;
     s.set_result(result);
     cmap_i_del(&map);
 }

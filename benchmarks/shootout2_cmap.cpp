@@ -32,8 +32,8 @@ stc64_t rng;
 
 #define CMAP_SETUP(X, Key, Value) cmap_##X map = cmap_##X##_init() \
                                   ; cmap_##X##_set_load_factors(&map, 0.0, max_load_factor)
-#define CMAP_PUT(X, key, val)     cmap_##X##_emplace_or_assign(&map, key, val).first->second
-#define CMAP_EMPLACE(X, key, val) cmap_##X##_emplace(&map, key, val).first->second
+#define CMAP_PUT(X, key, val)     cmap_##X##_emplace_or_assign(&map, key, val).ref->second
+#define CMAP_EMPLACE(X, key, val) cmap_##X##_emplace(&map, key, val).ref->second
 #define CMAP_ERASE(X, key)        cmap_##X##_erase(&map, key)
 #define CMAP_FIND(X, key)         (cmap_##X##_find(map, key) != NULL)
 #define CMAP_FOR(X, i)            c_foreach (i, cmap_##X, map)

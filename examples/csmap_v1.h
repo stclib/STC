@@ -163,8 +163,8 @@ int main(void) {
     C##X##_rawvalue_t; \
 \
     typedef struct { \
-        C##X##_value_t *first; \
-        bool second; \
+        C##X##_value_t *ref; \
+        bool inserted; \
     } C##X##_result_t; \
 \
     STC_API C##X \
@@ -224,9 +224,9 @@ int main(void) {
     STC_INLINE C##X##_result_t \
     C##X##_emplace(C##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
         C##X##_result_t res = C##X##_insert_entry_(self, rkey); \
-        if (res.second) { \
-            *KEY_REF_##C(res.first) = keyFromRaw(rkey); \
-            MAP_ONLY_##C(res.first->second = mappedFromRaw(rmapped);) \
+        if (res.inserted) { \
+            *KEY_REF_##C(res.ref) = keyFromRaw(rkey); \
+            MAP_ONLY_##C(res.ref->second = mappedFromRaw(rmapped);) \
         } \
         return res; \
     } \
@@ -239,8 +239,8 @@ int main(void) {
     STC_INLINE C##X##_result_t \
     C##X##_insert(C##X* self, Key key MAP_ONLY_##C(, Mapped mapped)) { \
         C##X##_result_t res = C##X##_insert_entry_(self, keyToRaw(&key)); \
-        if (res.second) {*KEY_REF_##C(res.first) = key; MAP_ONLY_##C( res.first->second = mapped; )} \
-        else            {keyDel(&key); MAP_ONLY_##C( mappedDel(&mapped); )} \
+        if (res.inserted) {*KEY_REF_##C(res.ref) = key; MAP_ONLY_##C( res.ref->second = mapped; )} \
+        else              {keyDel(&key); MAP_ONLY_##C( mappedDel(&mapped); )} \
         return res; \
     } \
 \
@@ -248,9 +248,9 @@ int main(void) {
         STC_INLINE C##X##_result_t \
         C##X##_insert_or_assign(C##X* self, Key key, Mapped mapped) { \
             C##X##_result_t res = C##X##_insert_entry_(self, keyToRaw(&key)); \
-            if (res.second) res.first->first = key; \
-            else {keyDel(&key); mappedDel(&res.first->second);} \
-            res.first->second = mapped; return res; \
+            if (res.inserted) res.ref->first = key; \
+            else {keyDel(&key); mappedDel(&res.ref->second);} \
+            res.ref->second = mapped; return res; \
         } \
         STC_INLINE C##X##_result_t \
         C##X##_put(C##X* self, Key k, Mapped m) { \
@@ -259,9 +259,9 @@ int main(void) {
         STC_INLINE C##X##_result_t \
         C##X##_emplace_or_assign(C##X* self, RawKey rkey, RawMapped rmapped) { \
             C##X##_result_t res = C##X##_insert_entry_(self, rkey); \
-            if (res.second) res.first->first = keyFromRaw(rkey); \
-            else mappedDel(&res.first->second); \
-            res.first->second = mappedFromRaw(rmapped); return res; \
+            if (res.inserted) res.ref->first = keyFromRaw(rkey); \
+            else mappedDel(&res.ref->second); \
+            res.ref->second = mappedFromRaw(rmapped); return res; \
         } \
         STC_INLINE C##X##_mapped_t* \
         C##X##_at(const C##X* self, RawKey rkey) { \
@@ -296,7 +296,7 @@ int main(void) {
     } \
     STC_INLINE C##X##_mapped_t* \
     C##X##_itval(C##X##_iter_t it) {return SET_ONLY_##C( it.ref ) \
-                                                 MAP_ONLY_##C( &it.ref->second );} \
+                                           MAP_ONLY_##C( &it.ref->second );} \
 \
     STC_API C##X##_node_t* \
     C##X##_erase_r_(C##X##_node_t *tn, const C##X##_rawkey_t* rkey, int *erased); \
@@ -406,7 +406,7 @@ int main(void) {
     C##X##_insert_entry_(C##X* self, RawKey rkey) { \
         C##X##_result_t res = {NULL, false}; \
         self->root = C##X##_insert_entry_i_(self->root, &rkey, &res); \
-        self->size += res.second; \
+        self->size += res.inserted; \
         return res; \
     } \
 \

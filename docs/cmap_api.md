@@ -73,6 +73,7 @@ cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, RawKey rkey);                 
 
 size_t              cmap_X_erase(cmap_X* self, RawKey rkey);
 cmap_X_iter_t       cmap_X_erase_at(cmap_X* self, cmap_X_iter_t pos);
+void                cmap_X_erase_entry(cmap_X* self, cmap_X_value_t* entry);
 
 cmap_X_iter_t       cmap_X_begin(const cmap_X* self);
 cmap_X_iter_t       cmap_X_end(const cmap_X* self);
@@ -104,7 +105,7 @@ void                c_trivial_del(Type* val);                             // doe
 | `cmap_X_mapped_t`    | `Mapped`                                        | The mapped type               |
 | `cmap_X_value_t`     | `struct { Key first; Mapped second; }`          | The value type                |
 | `cmap_X_rawvalue_t`  | `struct { RawKey first; RawMapped second; }`    | RawKey + RawMapped type       |
-| `cmap_X_result_t`    | `struct { cmap_X_value_t *first; bool second; }`| Result of insert/put/emplace  |
+| `cmap_X_result_t`    | `struct { cmap_X_value_t *ref; bool inserted; }`| Result of insert/put/emplace  |
 | `cmap_X_iter_t`      | `struct { cmap_X_value_t *ref; ... }`           | Iterator type                 |
 
 ## Constants and macros
@@ -313,7 +314,7 @@ int main()
 
     cmap_vk_value_t *e = cmap_vk_find(&vikings, lookup).ref;
     e->second += 3; // add 3 hp points to Einar
-    cmap_vk_emplace(&vikings, lookup, 0).first->second += 5; // add 5 more to Einar
+    cmap_vk_emplace(&vikings, lookup, 0).ref->second += 5; // add 5 more to Einar
 
     c_foreach (k, cmap_vk, vikings) {
         printf("%s of %s has %d hp\n", k.ref->first.name.str, k.ref->first.country.str, k.ref->second);

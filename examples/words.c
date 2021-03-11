@@ -28,7 +28,7 @@ int main1()
 
     cmap_si word_map = cmap_si_init();
     c_foreach (w, cvec_str, words)
-        cmap_si_emplace(&word_map, w.ref->str, 0).first->second += 1;
+        cmap_si_emplace(&word_map, w.ref->str, 0).ref->second += 1;
 
     c_foreach (i, cmap_si, word_map) {
         printf("%d occurrences of word '%s'\n", i.ref->second, i.ref->first.str);

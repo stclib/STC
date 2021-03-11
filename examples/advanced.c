@@ -53,7 +53,7 @@ int main()
     VikingRaw einar = {"Einar", "Norway"};
     cmap_vk_value_t *e = cmap_vk_find(&vikings, einar).ref;
     e->second += 3; // add 3 hp points to Einar
-    cmap_vk_emplace(&vikings, einar, 0).first->second += 5; // add 5 more to Einar
+    cmap_vk_emplace(&vikings, einar, 0).ref->second += 5; // add 5 more to Einar
 
     c_foreach (k, cmap_vk, vikings) {
         printf("%s of %s has %d hp\n", k.ref->first.name.str, k.ref->first.country.str, k.ref->second);

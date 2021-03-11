@@ -79,17 +79,17 @@ csmap_X_value_t     csmap_X_value_clone(csmap_X_value_t val);
 ```
 ## Types
 
-| Type name             | Type definition                                  | Used to represent...         |
-|:----------------------|:------------------------------------------------ |:-----------------------------|
-| `csmap_X`             | `struct { ... }`                                 | The csmap type               |
-| `csmap_X_rawkey_t`    | `RawKey`                                         | The raw key type             |
-| `csmap_X_rawmapped_t` | `RawMapped`                                      | The raw mapped type          |
-| `csmap_X_key_t`       | `Key`                                            | The key type                 |
-| `csmap_X_mapped_t`    | `Mapped`                                         | The mapped type              |
-| `csmap_X_value_t`     | `struct { Key first; Mapped second; }`           | The value type               |
-| `csmap_X_rawvalue_t`  | `struct { RawKey first; RawMapped second; }`     | RawKey + RawVal type         |
-| `csmap_X_result_t`    | `struct { csmap_X_value_t first; bool second; }` | Result of insert/put/emplace |
-| `csmap_X_iter_t`      | `struct { csmap_X_value_t *ref; ... }`           | Iterator type                |
+| Type name             | Type definition                                   | Used to represent...         |
+|:----------------------|:--------------------------------------------------|:-----------------------------|
+| `csmap_X`             | `struct { ... }`                                  | The csmap type               |
+| `csmap_X_rawkey_t`    | `RawKey`                                          | The raw key type             |
+| `csmap_X_rawmapped_t` | `RawMapped`                                       | The raw mapped type          |
+| `csmap_X_key_t`       | `Key`                                             | The key type                 |
+| `csmap_X_mapped_t`    | `Mapped`                                          | The mapped type              |
+| `csmap_X_value_t`     | `struct { Key first; Mapped second; }`            | The value type               |
+| `csmap_X_rawvalue_t`  | `struct { RawKey first; RawMapped second; }`      | RawKey + RawVal type         |
+| `csmap_X_result_t`    | `struct { csmap_X_value_t *ref; bool inserted; }` | Result of insert/put/emplace |
+| `csmap_X_iter_t`      | `struct { csmap_X_value_t *ref; ... }`            | Iterator type                |
 
 ## Examples
 ```c

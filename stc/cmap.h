@@ -184,8 +184,8 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
     C##X##_rawvalue_t; \
 \
     typedef struct { \
-        C##X##_value_t *first; \
-        bool second; /* inserted */ \
+        C##X##_value_t *ref; \
+        bool inserted; \
     } C##X##_result_t; \
 \
     typedef struct { \
@@ -255,9 +255,9 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
     STC_INLINE C##X##_result_t \
     C##X##_emplace(C##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
         C##X##_result_t res = C##X##_insert_entry_(self, rkey); \
-        if (res.second) { \
-            *KEY_REF_##C(res.first) = keyFromRaw(rkey); \
-            MAP_ONLY_##C(res.first->second = mappedFromRaw(rmapped);) \
+        if (res.inserted) { \
+            *KEY_REF_##C(res.ref) = keyFromRaw(rkey); \
+            MAP_ONLY_##C(res.ref->second = mappedFromRaw(rmapped);) \
         } \
         return res; \
     } \
@@ -270,8 +270,8 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
     STC_INLINE C##X##_result_t \
     C##X##_insert(C##X* self, Key key MAP_ONLY_##C(, Mapped mapped)) { \
         C##X##_result_t res = C##X##_insert_entry_(self, keyToRaw(&key)); \
-        if (res.second) {*KEY_REF_##C(res.first) = key; MAP_ONLY_##C( res.first->second = mapped; )} \
-        else            {keyDel(&key); MAP_ONLY_##C( mappedDel(&mapped); )} \
+        if (res.inserted) {*KEY_REF_##C(res.ref) = key; MAP_ONLY_##C( res.ref->second = mapped; )} \
+        else              {keyDel(&key); MAP_ONLY_##C( mappedDel(&mapped); )} \
         return res; \
     } \
 \
@@ -279,9 +279,9 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
         STC_INLINE C##X##_result_t \
         C##X##_insert_or_assign(C##X* self, Key key, Mapped mapped) { \
             C##X##_result_t res = C##X##_insert_entry_(self, keyToRaw(&key)); \
-            if (res.second) res.first->first = key; \
-            else {keyDel(&key); mappedDel(&res.first->second);} \
-            res.first->second = mapped; return res; \
+            if (res.inserted) res.ref->first = key; \
+            else {keyDel(&key); mappedDel(&res.ref->second);} \
+            res.ref->second = mapped; return res; \
         } \
         STC_INLINE C##X##_result_t \
         C##X##_put(C##X* self, Key k, Mapped m) { /* shorter, like operator[] */ \
@@ -290,9 +290,9 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
         STC_INLINE C##X##_result_t \
         C##X##_emplace_or_assign(C##X* self, RawKey rkey, RawMapped rmapped) { \
             C##X##_result_t res = C##X##_insert_entry_(self, rkey); \
-            if (res.second) res.first->first = keyFromRaw(rkey); \
-            else mappedDel(&res.first->second); \
-            res.first->second = mappedFromRaw(rmapped); return res; \
+            if (res.inserted) res.ref->first = keyFromRaw(rkey); \
+            else mappedDel(&res.ref->second); \
+            res.ref->second = mappedFromRaw(rmapped); return res; \
         } \
         STC_INLINE C##X##_mapped_t* \
         C##X##_at(const C##X* self, RawKey rkey) { \
@@ -317,7 +317,7 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
     } \
     STC_INLINE C##X##_mapped_t* \
     C##X##_itval(C##X##_iter_t it) {return SET_ONLY_##C( it.ref ) \
-                                                 MAP_ONLY_##C( &it.ref->second );} \
+                                           MAP_ONLY_##C( &it.ref->second );} \
 \
     STC_API void \
     C##X##_erase_entry(C##X* self, C##X##_value_t* val); \
@@ -417,7 +417,7 @@ STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) {uint64_t l,h; c_um
         C##X##_reserve_expand_(self); \
         chash_bucket_t b = C##X##_bucket_(self, &rkey); \
         C##X##_result_t res = {&self->table[b.idx], !self->_hashx[b.idx]}; \
-        if (res.second) { \
+        if (res.inserted) { \
             self->_hashx[b.idx] = b.hx; \
             ++self->size; \
         } \

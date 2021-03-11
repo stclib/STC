@@ -169,8 +169,8 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
     C##X##_rawvalue_t; \
 \
     typedef struct { \
-        C##X##_value_t *first; \
-        bool second; /* inserted */ \
+        C##X##_value_t *ref; \
+        bool inserted; \
     } C##X##_result_t; \
 \
     typedef struct C##X##_node { \
@@ -247,9 +247,9 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
     STC_INLINE C##X##_result_t \
     C##X##_emplace(C##X* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
         C##X##_result_t res = C##X##_insert_entry_(self, rkey); \
-        if (res.second) { \
-            *KEY_REF_##C(res.first) = keyFromRaw(rkey); \
-            MAP_ONLY_##C(res.first->second = mappedFromRaw(rmapped);) \
+        if (res.inserted) { \
+            *KEY_REF_##C(res.ref) = keyFromRaw(rkey); \
+            MAP_ONLY_##C(res.ref->second = mappedFromRaw(rmapped);) \
         } \
         return res; \
     } \
@@ -262,8 +262,8 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
     STC_INLINE C##X##_result_t \
     C##X##_insert(C##X* self, Key key MAP_ONLY_##C(, Mapped mapped)) { \
         C##X##_result_t res = C##X##_insert_entry_(self, keyToRaw(&key)); \
-        if (res.second) {*KEY_REF_##C(res.first) = key; MAP_ONLY_##C( res.first->second = mapped; )} \
-        else            {keyDel(&key); MAP_ONLY_##C( mappedDel(&mapped); )} \
+        if (res.inserted) {*KEY_REF_##C(res.ref) = key; MAP_ONLY_##C( res.ref->second = mapped; )} \
+        else              {keyDel(&key); MAP_ONLY_##C( mappedDel(&mapped); )} \
         return res; \
     } \
 \
@@ -271,9 +271,9 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
         STC_INLINE C##X##_result_t \
         C##X##_insert_or_assign(C##X* self, Key key, Mapped mapped) { \
             C##X##_result_t res = C##X##_insert_entry_(self, keyToRaw(&key)); \
-            if (res.second) res.first->first = key; \
-            else {keyDel(&key); mappedDel(&res.first->second);} \
-            res.first->second = mapped; return res; \
+            if (res.inserted) res.ref->first = key; \
+            else {keyDel(&key); mappedDel(&res.ref->second);} \
+            res.ref->second = mapped; return res; \
         } \
         STC_INLINE C##X##_result_t \
         C##X##_put(C##X* self, Key k, Mapped m) { \
@@ -282,9 +282,9 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
         STC_INLINE C##X##_result_t \
         C##X##_emplace_or_assign(C##X* self, RawKey rkey, RawMapped rmapped) { \
             C##X##_result_t res = C##X##_insert_entry_(self, rkey); \
-            if (res.second) res.first->first = keyFromRaw(rkey); \
-            else mappedDel(&res.first->second); \
-            res.first->second = mappedFromRaw(rmapped); return res; \
+            if (res.inserted) res.ref->first = keyFromRaw(rkey); \
+            else mappedDel(&res.ref->second); \
+            res.ref->second = mappedFromRaw(rmapped); return res; \
         } \
         STC_INLINE C##X##_mapped_t* \
         C##X##_at(const C##X* self, RawKey rkey) { \
@@ -439,12 +439,12 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
         while (it) { \
             up[top++] = it; \
             C##X##_rawkey_t raw = keyToRaw(KEY_REF_##C(&d[it].value)); \
-            if ((c = keyCompareRaw(&raw, rkey)) == 0) {res->first = &d[it].value; return tn;} \
+            if ((c = keyCompareRaw(&raw, rkey)) == 0) {res->ref = &d[it].value; return tn;} \
             dir = (c == -1); \
             it = d[it].link[dir]; \
         } \
         it = C##X##_node_new_(self, 1); d = self->nodes; \
-        res->first = &d[it].value, res->second = true; \
+        res->ref = &d[it].value, res->inserted = true; \
         if (top == 0) return it; \
         d[up[top - 1]].link[dir] = it; \
         while (top--) { \
@@ -461,7 +461,7 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
         C##X##_result_t res = {NULL, false}; \
         C##X##_size_t tn = C##X##_insert_entry_i_(self, (C##X##_size_t) _csmap_rep(self)->root, &rkey, &res); \
         _csmap_rep(self)->root = tn; \
-        _csmap_rep(self)->size += res.second; \
+        _csmap_rep(self)->size += res.inserted; \
         return res; \
     } \
 \
