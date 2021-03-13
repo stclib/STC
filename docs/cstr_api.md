@@ -23,6 +23,8 @@ cstr         cstr_from_n(const char* str, size_t n);
 cstr         cstr_from_fmt(const char* fmt, ...);                     // printf() formatting
 
 cstr         cstr_clone(cstr s);
+cstr*        cstr_take(cstr* self, cstr s);                           // take the constructed or moved string
+cstr         cstr_move(cstr* self);                                   // move string to caller, leave empty string
 void         cstr_del(cstr *self);                                    // destructor
 
 size_t       cstr_size(cstr s);
@@ -33,21 +35,24 @@ bool         cstr_empty(cstr s);
 size_t       cstr_reserve(cstr* self, size_t capacity);
 void         cstr_resize(cstr* self, size_t len, char fill);
 void         cstr_clear(cstr* self);
+
 cstr*        cstr_assign(cstr* self, const char* str);
+cstr*        cstr_assign_s(cstr* self, cstr s);
 cstr*        cstr_assign_n(cstr* self, const char* str, size_t n);
-cstr*        cstr_take(cstr* self, cstr s);                           // take the constructed or moved string
-cstr         cstr_move(cstr* self);                                   // move string to caller, leave empty string
 
 cstr*        cstr_append(cstr* self, const char* str);
+cstr*        cstr_append_s(cstr* self, cstr s);
 cstr*        cstr_append_n(cstr* self, const char* str, size_t n);  // appends len characters
-void         cstr_push_back(cstr* self, char ch);
-void         cstr_pop_back(cstr* self);
+
 void         cstr_insert(cstr* self, size_t pos, const char* str);
+void         cstr_insert_s(cstr* self, size_t pos, cstr s);
 void         cstr_insert_n(cstr* self, size_t pos, const char* str, size_t n);
+
+void         cstr_replace(cstr* self, size_t pos, size_t len, const char* str);
+void         cstr_replace_s(cstr* self, size_t pos, size_t len, cstr s);
+void         cstr_replace_n(cstr* self, size_t pos, size_t len, const char* str, size_t n);
 void         cstr_erase(cstr* self, size_t pos);
 void         cstr_erase_n(cstr* self, size_t pos, size_t n);
-void         cstr_replace(cstr* self, size_t pos, size_t len, const char* str);
-void         cstr_replace_n(cstr* self, size_t pos, size_t len, const char* str, size_t n);
 
 int          cstr_compare(const cstr *s1, const cstr *s2);
 bool         cstr_equals(cstr s, const char* str);
@@ -63,6 +68,8 @@ bool         cstr_ibegins_with(cstr s, const char* substr);
 bool         cstr_ends_with(cstr s, const char* substr);
 bool         cstr_iends_with(cstr s, const char* substr);
 
+void         cstr_push_back(cstr* self, char ch);
+void         cstr_pop_back(cstr* self);
 char*        cstr_front(cstr* self);
 char*        cstr_back(cstr* self);
 

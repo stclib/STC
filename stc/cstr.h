@@ -116,6 +116,10 @@ STC_INLINE cstr_t*
 cstr_assign(cstr_t* self, const char* str) {
     return cstr_assign_n(self, str, strlen(str));
 }
+STC_INLINE cstr_t*
+cstr_assign_s(cstr_t* self, cstr s) {
+    return cstr_assign_n(self, s.str, _cstr_rep(&s)->size);
+}
 
 STC_INLINE cstr_t*
 cstr_take(cstr_t* self, cstr_t s) {
@@ -135,6 +139,11 @@ STC_INLINE cstr_t*
 cstr_append(cstr_t* self, const char* str) {
     return cstr_append_n(self, str, strlen(str));
 }
+STC_INLINE cstr_t*
+cstr_append_s(cstr_t* self, cstr s) {
+    return cstr_append_n(self, s.str, _cstr_rep(&s)->size);
+}
+
 STC_INLINE void
 cstr_push_back(cstr_t* self, char value) {
     cstr_append_n(self, &value, 1);
@@ -153,9 +162,19 @@ cstr_insert(cstr_t* self, size_t pos, const char* str) {
     cstr_replace_n(self, pos, 0, str, strlen(str));
 }
 STC_INLINE void
+cstr_insert_s(cstr_t* self, size_t pos, cstr s) {
+    cstr_replace_n(self, pos, 0, s.str, _cstr_rep(&s)->size);
+}
+
+STC_INLINE void
 cstr_replace(cstr_t* self, size_t pos, size_t len, const char* str) {
     cstr_replace_n(self, pos, len, str, strlen(str));
 }
+STC_INLINE void
+cstr_replace_s(cstr_t* self, size_t pos, size_t len, cstr s) {
+    cstr_replace_n(self, pos, len, s.str, _cstr_rep(&s)->size);
+}
+
 STC_INLINE void
 cstr_erase(cstr_t* self, size_t pos) {cstr_erase_n(self, pos, 1);}
 

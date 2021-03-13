@@ -64,7 +64,7 @@ bool                cmap_X_contains(const cmap_X* self, RawKey rkey);
 
 cmap_X_result_t     cmap_X_insert(cmap_X* self, Key key, Mapped mapped);                     // no change if key in map
 cmap_X_result_t     cmap_X_insert_or_assign(cmap_X* self, Key key, Mapped mapped);           // always update mapped
-cmap_X_result_t     cmap_X_put(cmap_X* self, RawKey rkey, RawMapped rmapped);                // alias for insert_or_assign
+cmap_X_result_t     cmap_X_put(cmap_X* self, Key key, Mapped mapped);                        // alias for insert_or_assign
 cmap_X_result_t     cmap_X_emplace(cmap_X* self, RawKey rkey, RawMapped rmapped);            // no change if rkey in map
 cmap_X_result_t     cmap_X_emplace_or_assign(cmap_X* self, RawKey rkey, RawMapped rmapped);  // always update rmapped
 void                cmap_X_emplace_n(cmap_X* self, const cmap_X_rawvalue_t arr[], size_t size);

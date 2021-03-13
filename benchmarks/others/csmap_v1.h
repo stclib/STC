@@ -385,11 +385,11 @@ int main(void) {
         while (it->level) { \
             up[top++] = it; \
             C##X##_rawkey_t r = keyToRaw(KEY_REF_##C(&it->value)); \
-            if ((c = keyCompareRaw(&r, rkey)) == 0) {res->first = &it->value; return tn;} \
+            if ((c = keyCompareRaw(&r, rkey)) == 0) {res->ref = &it->value; return tn;} \
             it = it->link[(dir = (c == -1))]; \
         } \
         tn = c_new_1(C##X##_node_t); \
-        res->first = &tn->value, res->second = true; \
+        res->ref = &tn->value, res->inserted = true; \
         tn->link[0] = tn->link[1] = (C##X##_node_t*) &aatree_nil, tn->level = 1; \
         if (top == 0) return tn; \
         up[top - 1]->link[dir] = tn; \
