@@ -73,7 +73,7 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     STC_API void \
     cvec_##X##_resize(cvec_##X* self, size_t size, Value fill_val); \
     STC_INLINE void \
-    cvec_##X##_swap(cvec_##X* a, cvec_##X* b) {c_swap(cvec_##X##_value_t*, a->data, b->data);} \
+    cvec_##X##_swap(cvec_##X* a, cvec_##X* b) {c_swap(cvec_##X, *a, *b);} \
 \
     STC_INLINE cvec_##X \
     cvec_##X##_with_size(size_t size, Value null_val) { \

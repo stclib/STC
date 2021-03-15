@@ -229,12 +229,16 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
     STC_API C##X##_value_t* \
     C##X##_find_it(const C##X* self, RawKey rkey, C##X##_iter_t* out); \
 \
+    STC_API C##X##_iter_t \
+    C##X##_lower_bound(const C##X* self, RawKey rkey); \
+\
     STC_INLINE C##X##_iter_t \
     C##X##_find(const C##X* self, RawKey rkey) { \
         C##X##_iter_t it; \
         C##X##_find_it(self, rkey, &it); \
         return it; \
     } \
+\
     STC_INLINE bool \
     C##X##_contains(const C##X* self, RawKey rkey) { \
         C##X##_iter_t it; \
@@ -387,11 +391,26 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
         out->_top = 0; \
         while (tn) { \
             int c; C##X##_rawkey_t rx = keyToRaw(KEY_REF_##C(&d[tn].value)); \
-            if ((c = keyCompareRaw(&rx, &rkey)) < 0) tn = d[tn].link[1]; \
-            else if (c > 0) {out->_st[out->_top++] = tn; tn = d[tn].link[0];} \
-            else {out->_tn = d[tn].link[1]; return (out->ref = &d[tn].value);} \
+            if ((c = keyCompareRaw(&rx, &rkey)) < 0) \
+                tn = d[tn].link[1]; \
+            else if (c > 0) \
+                { out->_st[out->_top++] = tn; tn = d[tn].link[0]; } \
+            else \
+                { out->_tn = d[tn].link[1]; return (out->ref = &d[tn].value); } \
         } \
         return (out->ref = NULL); \
+    } \
+\
+    STC_DEF C##X##_iter_t \
+    C##X##_lower_bound(const C##X* self, RawKey rkey) { \
+        C##X##_iter_t it; \
+        C##X##_find_it(self, rkey, &it); \
+        if (!it.ref && it._top) { \
+            C##X##_size_t tn = it._st[--it._top]; \
+            it._tn = it._d[tn].link[1]; \
+            it.ref = &it._d[tn].value; \
+        } \
+        return it; \
     } \
 \
     STC_DEF void \

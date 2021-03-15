@@ -61,15 +61,15 @@ size_t              cmap_X_bucket_count(cmap_X map);                            
 
 cmap_X_iter_t       cmap_X_find(const cmap_X* self, RawKey rkey);
 bool                cmap_X_contains(const cmap_X* self, RawKey rkey);
+cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, RawKey rkey);                              // rkey must be in map.
 
 cmap_X_result_t     cmap_X_insert(cmap_X* self, Key key, Mapped mapped);                     // no change if key in map
 cmap_X_result_t     cmap_X_insert_or_assign(cmap_X* self, Key key, Mapped mapped);           // always update mapped
 cmap_X_result_t     cmap_X_put(cmap_X* self, Key key, Mapped mapped);                        // alias for insert_or_assign
+
 cmap_X_result_t     cmap_X_emplace(cmap_X* self, RawKey rkey, RawMapped rmapped);            // no change if rkey in map
 cmap_X_result_t     cmap_X_emplace_or_assign(cmap_X* self, RawKey rkey, RawMapped rmapped);  // always update rmapped
 void                cmap_X_emplace_n(cmap_X* self, const cmap_X_rawvalue_t arr[], size_t size);
-
-cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, RawKey rkey);                              // rkey must be in map.
 
 size_t              cmap_X_erase(cmap_X* self, RawKey rkey);
 cmap_X_iter_t       cmap_X_erase_at(cmap_X* self, cmap_X_iter_t pos);
