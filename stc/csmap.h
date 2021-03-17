@@ -35,7 +35,7 @@ int main(void) {
     csset_sx_insert(&s, 5);
     csset_sx_insert(&s, 8);
     c_foreach (i, csset_sx, s)
-        printf("set %d\n", i.ref->second);
+        printf("set %d\n", *i.ref);
     csset_sx_del(&s);
 }
 */
