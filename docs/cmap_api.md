@@ -51,7 +51,6 @@ cmap_X              cmap_X_clone(cmap_x map);
 void                cmap_X_clear(cmap_X* self);
 void                cmap_X_reserve(cmap_X* self, size_t size);
 void                cmap_X_swap(cmap_X* a, cmap_X* b);
-
 void                cmap_X_del(cmap_X* self);                                                // destructor
 
 bool                cmap_X_empty(cmap_X map);

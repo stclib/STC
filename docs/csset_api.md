@@ -34,12 +34,13 @@ csset_X             csset_X_init(void);
 csset_X             csset_X_clone(csset_x set);
 void                csset_X_clear(csset_X* self);
 void                csset_X_swap(csset_X* a, csset_X* b);
-void                csset_X_del(csset_X* self);             // destructor
+void                csset_X_del(csset_X* self);                                             // destructor
 
-bool                csset_X_empty(csset_X m);
-size_t              csset_X_size(csset_X m);
+bool                csset_X_empty(csset_X set);
+size_t              csset_X_size(csset_X set);
 
 csset_X_iter_t      csset_X_find(const csset_X* self, RawKey rkey);
+csset_X_iter_t      csset_X_lower_bound(const csset_X* self, RawKey rkey);                  // find closest entry >= rkey
 csset_X_value_t*    csset_X_find_it(const csset_X* self, RawKey rkey, csset_X_iter_t* out);
 bool                csset_X_contains(const csset_X* self, RawKey rkey);
 

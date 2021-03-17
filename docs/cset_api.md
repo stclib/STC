@@ -37,13 +37,12 @@ cset_X              cset_X_clone(cset_x set);
 void                cset_X_clear(cset_X* self);
 void                cset_X_reserve(cset_X* self, size_t size);
 void                cset_X_swap(cset_X* a, cset_X* b);
-
-void                cset_X_del(cset_X* self);      // destructor
+void                cset_X_del(cset_X* self);                             // destructor
 
 bool                cset_X_empty(cset_X set);
-size_t              cset_X_size(cset_X set);
+size_t              cset_X_size(cset_X set);                              // num. of allocated buckets
+size_t              cset_X_capacity(cset_X set);                          // buckets * max_load_factor
 size_t              cset_X_bucket_count(cset_X set);
-size_t              cset_X_capacity(cset_X set);
 
 cset_X_iter_t       cset_X_find(const cset_X* self, RawKey rkey);
 bool                cset_X_contains(const cset_X* self, RawKey rkey);
