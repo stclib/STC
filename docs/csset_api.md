@@ -32,6 +32,7 @@ All csset definitions and prototypes are available by including a single header 
 ```c
 csset_X             csset_X_init(void);
 csset_X             csset_X_clone(csset_x set);
+
 void                csset_X_clear(csset_X* self);
 void                csset_X_swap(csset_X* a, csset_X* b);
 void                csset_X_del(csset_X* self);                                             // destructor
@@ -99,7 +100,7 @@ int main ()
     c_del(csset_str, &first, &second, &third, &fourth);
 
     printf("fifth contains:\n\n");
-    c_foreach (i, csset_str, fifth) 
+    c_foreach (i, csset_str, fifth)
         printf("%s\n", i.ref->str);
 
     csset_str_del(&fifth);

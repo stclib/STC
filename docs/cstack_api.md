@@ -28,6 +28,8 @@ All cstack definitions and prototypes are available by including a single header
 ```c
 cstack_X                cstack_X_init(void);
 cstack_X                cstack_X_clone(cstack_X st);
+
+void                    cstack_X_clear(cstack_X* self);
 void                    cstack_X_del(cstack_X* self);      // destructor
 
 size_t                  cstack_X_size(cstack_X st);

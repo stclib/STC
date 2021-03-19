@@ -48,7 +48,6 @@ void                cvec_X_shrink_to_fit(cvec_X* self);
 void                cvec_X_reserve(cvec_X* self, size_t cap);
 void                cvec_X_resize(cvec_X* self, size_t size, Value fill);
 void                cvec_X_swap(cvec_X* a, cvec_X* b);
-
 void                cvec_X_del(cvec_X* self);      // destructor
 
 bool                cvec_X_empty(cvec_X vec);
@@ -205,7 +204,7 @@ int main(void) {
     cvec_u vec = cvec_u_init();
     cvec_u_push_back(&vec, (User) {cstr_from("admin"), 0});
     cvec_u_push_back(&vec, (User) {cstr_from("joe"), 1});
-    
+
     cvec_u vec2 = cvec_u_clone(vec);
     c_foreach (i, cvec_u, vec2)
         printf("%s: %d\n", i.ref->name.str, i.ref->id);

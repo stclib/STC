@@ -57,6 +57,8 @@
     STC_INLINE cstack_##X##_value_t \
     cstack_##X##_value_clone(cstack_##X##_value_t val) {return ctype##_value_clone(val);} \
     STC_INLINE void \
+    cstack_##X##_clear(cstack_##X* self) {ctype##_clear(self);} \
+    STC_INLINE void \
     cstack_##X##_del(cstack_##X* self) {ctype##_del(self);} \
     STC_INLINE size_t \
     cstack_##X##_size(cstack_##X st) {return ctype##_size(st);} \

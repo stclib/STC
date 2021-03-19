@@ -20,45 +20,45 @@ All cbits definitions and prototypes are available by including a single header 
 cbits            cbits_init(void);
 cbits            cbits_with_size(size_t size, bool value);
 cbits            cbits_from_str(const char* str);
+cbits            cbits_clone(cbits other);
 
-cbits            cbits_clone(cbits_t other);
-void             cbits_resize(cbits_t* self, size_t size, bool value);
+void             cbits_clear(cbits* self);
+void             cbits_resize(cbits* self, size_t size, bool value);
+void             cbits_del(cbits* self);
 
-cbits            cbits_intersect(cbits_t s1, cbits_t s2);
-cbits            cbits_union(cbits_t s1, cbits_t s2);
-cbits            cbits_xor(cbits_t s1, cbits_t s2);
-cbits            cbits_not(cbits_t s1);
+cbits            cbits_intersect(cbits s1, cbits s2);
+cbits            cbits_union(cbits s1, cbits s2);
+cbits            cbits_xor(cbits s1, cbits s2);
+cbits            cbits_not(cbits s1);
 
-void             cbits_del(cbits_t* self);
+cbits*           cbits_assign(cbits* self, cbits other);
+cbits*           cbits_take(cbits* self, cbits other);
+cbits            cbits_move(cbits* self);
 
-cbits*           cbits_assign(cbits_t* self, cbits_t other);
-cbits*           cbits_take(cbits_t* self, cbits_t other);
-cbits            cbits_move(cbits_t* self);
+size_t           cbits_size(cbits set);
+size_t           cbits_count(cbits set);
+bool             cbits_is_disjoint(cbits set, cbits other);
+bool             cbits_is_subset(cbits set, cbits other);
+bool             cbits_is_superset(cbits set, cbits other);
+char*            cbits_to_str(cbits set, char* str, size_t start, intptr_t stop);
 
-size_t           cbits_size(cbits_t set);
-size_t           cbits_count(cbits_t set);
-bool             cbits_is_disjoint(cbits_t set, cbits_t other);
-bool             cbits_is_subset(cbits_t set, cbits_t other);
-bool             cbits_is_superset(cbits_t set, cbits_t other);
-char*            cbits_to_str(cbits_t set, char* str, size_t start, intptr_t stop);
+bool             cbits_test(cbits set, size_t i);
+bool             cbits_at(cbits set, size_t i);   // same as cbits_test()
 
-bool             cbits_test(cbits_t set, size_t i);
-bool             cbits_at(cbits_t set, size_t i);   // same as cbits_test()
+void             cbits_set(cbits *self, size_t i);
+void             cbits_reset(cbits *self, size_t i);
+void             cbits_set_value(cbits *self, size_t i, bool value);
+void             cbits_flip(cbits *self, size_t i);
+void             cbits_set_all(cbits *self, bool value);
+void             cbits_set_all64(cbits *self, uint64_t pattern);
+void             cbits_flip_all(cbits *self);
 
-void             cbits_set(cbits_t *self, size_t i);
-void             cbits_reset(cbits_t *self, size_t i);
-void             cbits_set_value(cbits_t *self, size_t i, bool value);
-void             cbits_flip(cbits_t *self, size_t i);
-void             cbits_set_all(cbits_t *self, bool value);
-void             cbits_set_all64(cbits_t *self, uint64_t pattern);
-void             cbits_flip_all(cbits_t *self);
+void             cbits_intersect_with(cbits *self, cbits other);
+void             cbits_union_with(cbits *self, cbits other);
+void             cbits_xor_with(cbits *self, cbits other);
 
-void             cbits_intersect_with(cbits_t *self, cbits_t other);
-void             cbits_union_with(cbits_t *self, cbits_t other);
-void             cbits_xor_with(cbits_t *self, cbits_t other);
-
-cbits_iter_t     cbits_begin(cbits_t* self);
-cbits_iter_t     cbits_end(cbits_t* self);
+cbits_iter_t     cbits_begin(cbits* self);
+cbits_iter_t     cbits_end(cbits* self);
 void             cbits_next(cbits_iter_t* it);
 bool             cbits_itval(cbits_iter_t it);
 ```

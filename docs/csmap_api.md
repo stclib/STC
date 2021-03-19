@@ -47,6 +47,7 @@ All csmap definitions and prototypes are available by including a single header 
 ```c
 csmap_X             csmap_X_init(void);
 csmap_X             csmap_X_clone(csmap_x map);
+
 void                csmap_X_clear(csmap_X* self);
 void                csmap_X_swap(csmap_X* a, csmap_X* b);
 void                csmap_X_del(csmap_X* self);                                               // destructor
@@ -172,7 +173,7 @@ Output:
 ```
 
 ### Example 3
-Demonstrate csmap with plain-old-data key type Vec3i and int as mapped type: csmap<Vec3i, int>. 
+Demonstrate csmap with plain-old-data key type Vec3i and int as mapped type: csmap<Vec3i, int>.
 ```c
 #include "stc/csmap.h"
 #include <stdio.h>

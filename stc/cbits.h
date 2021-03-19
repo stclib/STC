@@ -57,34 +57,27 @@ int main() {
 
 typedef struct cbits { uint64_t* _arr; size_t size; } cbits_t, cbits;
 
-STC_API cbits_t      cbits_with_size(size_t size, bool value);
-STC_API cbits_t      cbits_from_str(const char* str);
-STC_API char*        cbits_to_str(cbits_t set, char* str, size_t start, intptr_t stop);
-STC_API cbits_t      cbits_clone(cbits_t other);
-STC_API void         cbits_resize(cbits_t* self, size_t size, bool value);
-STC_API size_t       cbits_count(cbits_t set);
-STC_API bool         cbits_is_disjoint(cbits_t set, cbits_t other);
-STC_API bool         cbits_is_subset(cbits_t set, cbits_t other);
-STC_API bool         cbits_is_superset(cbits_t set, cbits_t other);
+STC_API cbits_t     cbits_with_size(size_t size, bool value);
+STC_API cbits_t     cbits_from_str(const char* str);
+STC_API char*       cbits_to_str(cbits_t set, char* str, size_t start, intptr_t stop);
+STC_API cbits_t     cbits_clone(cbits_t other);
+STC_API void        cbits_resize(cbits_t* self, size_t size, bool value);
+STC_API cbits_t*    cbits_assign(cbits_t* self, cbits_t other);
+STC_API size_t      cbits_count(cbits_t set);
+STC_API bool        cbits_is_disjoint(cbits_t set, cbits_t other);
+STC_API bool        cbits_is_subset(cbits_t set, cbits_t other);
+STC_API bool        cbits_is_superset(cbits_t set, cbits_t other);
 
-STC_INLINE size_t    cbits_size(cbits_t set) {return set.size;}
-#define              cbits_inits {NULL, 0}
+STC_INLINE cbits_t  cbits_init() { cbits_t set = {NULL, 0}; return set; }
+STC_INLINE void     cbits_clear(cbits_t* self) { self->size = 0; }
+STC_INLINE void     cbits_del(cbits_t* self) { c_free(self->_arr); }
+STC_INLINE size_t   cbits_size(cbits_t set) { return set.size; }
 
-STC_INLINE cbits_t cbits_init() {
-    cbits_t bs = cbits_inits; return bs;
-}
-STC_INLINE void cbits_del(cbits_t* self) {
-    c_free(self->_arr);
-}
-
-STC_DEF cbits_t* cbits_take(cbits_t* self, cbits_t other) {
-    if (self->_arr != other._arr) cbits_del(self), *self = other;
+STC_INLINE cbits_t* cbits_take(cbits_t* self, cbits_t other) {
+    if (self->_arr != other._arr) {cbits_del(self); *self = other;}
     return self;
 }
-STC_DEF cbits_t* cbits_assign(cbits_t* self, cbits_t other) {
-    if (self->_arr != other._arr) cbits_del(self), *self = cbits_clone(other);
-    return self;
-}
+
 STC_INLINE cbits_t cbits_move(cbits_t* self) {
     cbits_t tmp = *self; self->_arr = NULL, self->size = 0;
     return tmp;
@@ -93,6 +86,7 @@ STC_INLINE cbits_t cbits_move(cbits_t* self) {
 STC_INLINE bool cbits_test(cbits_t set, size_t i) {
     return (set._arr[i >> 6] & (1ull << (i & 63))) != 0;
 }
+
 STC_INLINE bool cbits_at(cbits_t set, size_t i) {
     return (set._arr[i >> 6] & (1ull << (i & 63))) != 0;
 }
@@ -100,22 +94,28 @@ STC_INLINE bool cbits_at(cbits_t set, size_t i) {
 STC_INLINE void cbits_set(cbits_t *self, size_t i) {
     self->_arr[i >> 6] |= 1ull << (i & 63);
 }
+
 STC_INLINE void cbits_reset(cbits_t *self, size_t i) {
     self->_arr[i >> 6] &= ~(1ull << (i & 63));
 }
+
 STC_INLINE void cbits_set_value(cbits_t *self, size_t i, bool value) {
     self->_arr[i >> 6] ^= (-(uint64_t)value ^ self->_arr[i >> 6]) & 1ull << (i & 63);
 }
+
 STC_INLINE void cbits_flip(cbits_t *self, size_t i) {
     self->_arr[i >> 6] ^= 1ull << (i & 63);
 }
+
 STC_INLINE void cbits_set_all(cbits_t *self, bool value) {
     memset(self->_arr, -(int)value, ((self->size + 63) >> 6) * 8);
 }
+
 STC_INLINE void cbits_set_all64(cbits_t *self, uint64_t pattern) {
     size_t n = (self->size + 63) >> 6;
     for (size_t i=0; i<n; ++i) self->_arr[i] = pattern;
 }
+
 STC_INLINE void cbits_flip_all(cbits_t *self) {
     size_t n = (self->size + 63) >> 6;
     for (size_t i=0; i<n; ++i) self->_arr[i] ^= ~0ull;
@@ -144,14 +144,17 @@ STC_INLINE cbits_t cbits_intersect(cbits_t s1, cbits_t s2) {
     cbits_t set = cbits_clone(s1);
     cbits_intersect_with(&set, s2); return set;
 }
+
 STC_INLINE cbits_t cbits_union(cbits_t s1, cbits_t s2) {
     cbits_t set = cbits_clone(s1);
     cbits_union_with(&set, s2); return set;
 }
+
 STC_INLINE cbits_t cbits_xor(cbits_t s1, cbits_t s2) {
     cbits_t set = cbits_clone(s1);
     cbits_xor_with(&set, s2); return set;
 }
+
 STC_INLINE cbits_t cbits_not(cbits_t s1) {
     cbits_t set = cbits_clone(s1);
     cbits_flip_all(&set); return set;
@@ -163,19 +166,16 @@ typedef struct {
 } cbits_iter_t;
 
 STC_INLINE cbits_iter_t
-cbits_begin(cbits_t* self) {
-    cbits_iter_t it = {self, 0}; return it;
-}
-STC_INLINE cbits_iter_t
-cbits_end(cbits_t* self) {
-    cbits_iter_t it = {self, self->size}; return it;
-}
-STC_INLINE void
-cbits_next(cbits_iter_t* it) {++it->ref;}
+cbits_begin(cbits_t* self) { cbits_iter_t it = {self, 0}; return it; }
 
-STC_INLINE bool cbits_itval(cbits_iter_t it) {
-    return cbits_test(*it._bs, it.ref);
-}
+STC_INLINE cbits_iter_t
+cbits_end(cbits_t* self) { cbits_iter_t it = {self, self->size}; return it; }
+
+STC_INLINE void
+cbits_next(cbits_iter_t* it) { ++it->ref; }
+
+STC_INLINE bool
+cbits_itval(cbits_iter_t it) { return cbits_test(*it._bs, it.ref); }
 
 #if defined(__GNUC__) || defined(__clang__)
     STC_INLINE uint64_t cpopcount64(uint64_t x) {return __builtin_popcountll(x);}
@@ -192,6 +192,13 @@ STC_INLINE bool cbits_itval(cbits_iter_t it) {
 #endif
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
+
+STC_DEF cbits_t* cbits_assign(cbits_t* self, cbits_t other) {
+    if (self->_arr == other._arr) return self;
+    if (self->size != other.size) return cbits_take(self, cbits_clone(other));
+    memcpy(self->_arr, other._arr, ((other.size + 63) >> 6)*8);
+    return self;
+}
 
 STC_DEF void cbits_resize(cbits_t* self, size_t size, bool value) {
     size_t new_n = (size + 63) >> 6, osize = self->size, old_n = (osize + 63) >> 6;

@@ -21,8 +21,8 @@ cstr         cstr_with_size(size_t len, char fill);                   // repeat 
 cstr         cstr_from(const char* str);
 cstr         cstr_from_n(const char* str, size_t n);
 cstr         cstr_from_fmt(const char* fmt, ...);                     // printf() formatting
-
 cstr         cstr_clone(cstr s);
+
 cstr*        cstr_take(cstr* self, cstr s);                           // take the constructed or moved string
 cstr         cstr_move(cstr* self);                                   // move string to caller, leave empty string
 void         cstr_del(cstr *self);                                    // destructor
@@ -37,12 +37,12 @@ void         cstr_resize(cstr* self, size_t len, char fill);
 void         cstr_clear(cstr* self);
 
 cstr*        cstr_assign(cstr* self, const char* str);
-cstr*        cstr_assign_s(cstr* self, cstr s);
+cstr*        cstr_assign_s(cstr* self, cstr s);                       // cstr_take(self, cstr_clone(s))
 cstr*        cstr_assign_n(cstr* self, const char* str, size_t n);
 
 cstr*        cstr_append(cstr* self, const char* str);
 cstr*        cstr_append_s(cstr* self, cstr s);
-cstr*        cstr_append_n(cstr* self, const char* str, size_t n);    // appends len characters
+cstr*        cstr_append_n(cstr* self, const char* str, size_t n);    // appends n characters
 
 void         cstr_insert(cstr* self, size_t pos, const char* str);
 void         cstr_insert_s(cstr* self, size_t pos, cstr s);
@@ -88,7 +88,7 @@ const char*  cstr_c_str(const cstr* x);
 int          cstr_compare_raw(const char** x, const char** y);
 bool         cstr_equals_raw(const char** x, const char** y);
 uint64_t     cstr_hash_raw(const char* const* x, size_t ignored);
-int          c_strncasecmp(const char* s1, const char* s2, size_t n);
+int          c_strncasecmp(const char* str1, const char* str2, size_t n);
 char*        c_strnstr(const char* str, const char* needle, size_t n);
 char*        c_strncasestr(const char* str, const char* needle, size_t n);
 uint64_t     c_strhash(const char* str);

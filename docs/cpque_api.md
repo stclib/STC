@@ -3,7 +3,7 @@
 A priority queue is a container adaptor that provides constant time lookup of the largest (by default) element, at the expense of logarithmic insertion and extraction.
 A user-provided argument `<`or `>` must be supplied to set the ordering, e.g. using `>` would cause the smallest element to appear as the top().
 
-See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/container/priority_queue) for a functional reference. 
+See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/container/priority_queue) for a functional reference.
 
 ## Declaration
 
@@ -31,13 +31,14 @@ All cpque definitions and prototypes are available by including a single header 
 ```c
 cpque_X                 cpque_X_init(void);
 cpque_X                 cpque_X_clone(cpque_X pq);
+
+void                    cpque_X_clear(cpque_X* self);
 void                    cpque_X_make_heap(cpque_X* self);
 void                    cpque_X_del(cpque_X* self);      // destructor
 
 size_t                  cpque_X_size(cpque_X pq);
 bool                    cpque_X_empty(cpque_X pq);
-const
-cpque_X_value_t*        cpque_X_top(const cpque_X* self);
+const cpque_X_value_t*  cpque_X_top(const cpque_X* self);
 
 void                    cpque_X_push(cpque_X* self, cpque_X_value_t value);
 void                    cpque_X_emplace(cpque_X* self, cpque_X_rawvalue_t raw);

@@ -11,7 +11,7 @@ using_cqueue(X, ctype)
 ```
 The macro `using_cqueue()` must be instantiated in the global scope. **cqueue** uses normally
 a **cdeq_X** or **clist_X** type as underlying implementation, given as `ctype`. See example below for usage.
-`X` is a type tag name and will affect the names of all cqueue types and methods. E.g. declaring 
+`X` is a type tag name and will affect the names of all cqueue types and methods. E.g. declaring
 `using_cqueue(i, clist_i)`, `X` should be replaced by `i` in all of the following documentation.
 
 ## Header file
@@ -27,6 +27,8 @@ All cqueue definitions and prototypes are available by including a single header
 ```c
 cqueue_X                cqueue_X_init(void);
 cqueue_X                cqueue_X_clone(cqueue_X q);
+
+void                    cqueue_X_clear(cqueue_X* self);
 void                    cqueue_X_del(cqueue_X* self);      // destructor
 
 size_t                  cqueue_X_size(cqueue_X q);

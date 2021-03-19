@@ -68,6 +68,8 @@
     STC_INLINE cqueue_##X##_value_t \
     cqueue_##X##_value_clone(cqueue_##X##_value_t val) {return ctype##_value_clone(val);} \
     STC_INLINE void \
+    cqueue_##X##_clear(cqueue_##X* self) {ctype##_clear(self);} \
+    STC_INLINE void \
     cqueue_##X##_del(cqueue_##X* self) {ctype##_del(self);} \
     STC_INLINE size_t \
     cqueue_##X##_size(cqueue_##X q) {return ctype##_size(q);} \

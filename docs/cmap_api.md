@@ -45,10 +45,10 @@ All cmap definitions and prototypes are available by including a single header f
 ```c
 cmap_X              cmap_X_init(void);
 cmap_X              cmap_X_with_capacity(size_t cap);
-void                cmap_X_set_load_factors(cmap_X* self, float min_load, float max_load);
-
 cmap_X              cmap_X_clone(cmap_x map);
+
 void                cmap_X_clear(cmap_X* self);
+void                cmap_X_set_load_factors(cmap_X* self, float min_load, float max_load);
 void                cmap_X_reserve(cmap_X* self, size_t size);
 void                cmap_X_swap(cmap_X* a, cmap_X* b);
 void                cmap_X_del(cmap_X* self);                                                // destructor
@@ -188,7 +188,7 @@ Output:
 ```
 
 ### Example 3
-Demonstrate cmap with plain-old-data key type Vec3i and int as mapped type: cmap<Vec3i, int>. 
+Demonstrate cmap with plain-old-data key type Vec3i and int as mapped type: cmap<Vec3i, int>.
 ```c
 #include "stc/cmap.h"
 #include <stdio.h>
@@ -303,7 +303,7 @@ int main()
         { {"Harald", "Iceland"}, 12 },
     });
     cmap_vk_emplace_or_assign(&vikings, (VikingRaw){"Bjorn", "Sweden"}, 10);
-    
+
     VikingRaw lookup = {"Einar", "Norway"};
 
     cmap_vk_value_t *e = cmap_vk_find(&vikings, lookup).ref;

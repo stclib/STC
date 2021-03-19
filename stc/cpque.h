@@ -60,12 +60,15 @@
     cpque_##X##_clone(cpque_##X pq) {return ctype##_clone(pq);} \
     STC_INLINE cpque_##X##_value_t \
     cpque_##X##_value_clone(cpque_##X##_value_t val) {return ctype##_value_clone(val);} \
+    STC_INLINE void \
+    cpque_##X##_clear(cpque_##X* self) {ctype##_clear(self);} \
+    STC_INLINE void \
+    cpque_##X##_del(cpque_##X* self) {ctype##_del(self);} \
+\
     STC_INLINE size_t \
     cpque_##X##_size(cpque_##X pq) {return ctype##_size(pq);} \
     STC_INLINE bool \
     cpque_##X##_empty(cpque_##X pq) {return ctype##_empty(pq);} \
-    STC_INLINE void \
-    cpque_##X##_del(cpque_##X* self) {ctype##_del(self);} \
     STC_API void \
     cpque_##X##_make_heap(cpque_##X* self); \
     STC_API void \

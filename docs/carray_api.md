@@ -29,12 +29,11 @@ All carray definitions and prototypes are available by including a single header
 carray1X            carray1X_init(size_t xdim, Value val);
 carray2X            carray2X_init(size_t ydim, size_t xdim, Value val);
 carray3X            carray3X_init(size_t zdim, size_t ydim, size_t xdim, Value val);
-
 carray1X            carray1X_from(Value* array, size_t xdim);
 carray2X            carray2X_from(Value* array, size_t ydim, size_t xdim);
 carray3X            carray3X_from(Value* array, size_t zdim, size_t ydim, size_t xdim);
-
 carrayNX            carrayNX_clone(carrayNX arr);
+
 void                carrayNX_del(carrayNX* self);
 
 size_t              carrayNX_size(carrayNX arr);
