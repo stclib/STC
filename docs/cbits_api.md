@@ -26,24 +26,18 @@ void             cbits_clear(cbits* self);
 void             cbits_resize(cbits* self, size_t size, bool value);
 void             cbits_del(cbits* self);
 
-cbits            cbits_intersect(cbits s1, cbits s2);
-cbits            cbits_union(cbits s1, cbits s2);
-cbits            cbits_xor(cbits s1, cbits s2);
-cbits            cbits_not(cbits s1);
-
 cbits*           cbits_assign(cbits* self, cbits other);
 cbits*           cbits_take(cbits* self, cbits other);
 cbits            cbits_move(cbits* self);
 
 size_t           cbits_size(cbits set);
 size_t           cbits_count(cbits set);
-bool             cbits_is_disjoint(cbits set, cbits other);
-bool             cbits_is_subset(cbits set, cbits other);
-bool             cbits_is_superset(cbits set, cbits other);
-char*            cbits_to_str(cbits set, char* str, size_t start, intptr_t stop);
 
 bool             cbits_test(cbits set, size_t i);
-bool             cbits_at(cbits set, size_t i);   // same as cbits_test()
+bool             cbits_at(cbits set, size_t i);    // same as cbits_test()
+bool             cbits_is_subset(cbits set, cbits other);
+bool             cbits_is_disjoint(cbits set, cbits other);
+char*            cbits_to_str(cbits set, char* str, size_t start, intptr_t stop);
 
 void             cbits_set(cbits *self, size_t i);
 void             cbits_reset(cbits *self, size_t i);
@@ -53,14 +47,9 @@ void             cbits_set_all(cbits *self, bool value);
 void             cbits_set_all64(cbits *self, uint64_t pattern);
 void             cbits_flip_all(cbits *self);
 
-void             cbits_intersect_with(cbits *self, cbits other);
-void             cbits_union_with(cbits *self, cbits other);
-void             cbits_xor_with(cbits *self, cbits other);
-
-cbits_iter_t     cbits_begin(cbits* self);
-cbits_iter_t     cbits_end(cbits* self);
-void             cbits_next(cbits_iter_t* it);
-bool             cbits_itval(cbits_iter_t it);
+void             cbits_intersect(cbits *self, cbits other);
+void             cbits_union(cbits *self, cbits other);
+void             cbits_xor(cbits *self, cbits other);
 ```
 
 ## Types

@@ -28,10 +28,10 @@ int main() {
     c_forrange (i, int, set.size)
         printf("%d", cbits_test(set, i));
 
-    puts("\nIterator:");
+    puts("\nIterate:");
     printf("%4zu: ", set.size);
-    c_foreach (i, cbits, set)
-        printf("%d", cbits_itval(i));
+    c_forrange (i, int, set.size)
+        printf("%d", cbits_test(set, i));
     puts("");
 
     cbits_t s2 = cbits_clone(set);
@@ -45,7 +45,7 @@ int main() {
     puts("");
 
     printf(" xor: ");
-    cbits_xor_with(&set, s2);
+    cbits_xor(&set, s2);
     c_forrange (i, int, set.size)
         printf("%d", cbits_test(set, i));
     puts("");

@@ -64,9 +64,8 @@ STC_API cbits_t     cbits_clone(cbits_t other);
 STC_API void        cbits_resize(cbits_t* self, size_t size, bool value);
 STC_API cbits_t*    cbits_assign(cbits_t* self, cbits_t other);
 STC_API size_t      cbits_count(cbits_t set);
-STC_API bool        cbits_is_disjoint(cbits_t set, cbits_t other);
 STC_API bool        cbits_is_subset(cbits_t set, cbits_t other);
-STC_API bool        cbits_is_superset(cbits_t set, cbits_t other);
+STC_API bool        cbits_is_disjoint(cbits_t set, cbits_t other);
 
 STC_INLINE cbits_t  cbits_init() { cbits_t set = {NULL, 0}; return set; }
 STC_INLINE void     cbits_clear(cbits_t* self) { self->size = 0; }
@@ -122,60 +121,23 @@ STC_INLINE void cbits_flip_all(cbits_t *self) {
 }
 
 /* Intersection */
-STC_INLINE void cbits_intersect_with(cbits_t *self, cbits_t other) {
+STC_INLINE void cbits_intersect(cbits_t *self, cbits_t other) {
     assert(self->size == other.size);
     size_t n = (self->size + 63) >> 6;
     for (size_t i=0; i<n; ++i) self->_arr[i] &= other._arr[i];
 }
 /* Union */
-STC_INLINE void cbits_union_with(cbits_t *self, cbits_t other) {
+STC_INLINE void cbits_union(cbits_t *self, cbits_t other) {
     assert(self->size == other.size);
     size_t n = (self->size + 63) >> 6;
     for (size_t i=0; i<n; ++i) self->_arr[i] |= other._arr[i];
 }
 /* Exclusive disjunction */
-STC_INLINE void cbits_xor_with(cbits_t *self, cbits_t other) {
+STC_INLINE void cbits_xor(cbits_t *self, cbits_t other) {
     assert(self->size == other.size);
     size_t n = (self->size + 63) >> 6;
     for (size_t i=0; i<n; ++i) self->_arr[i] ^= other._arr[i];
 }
-
-STC_INLINE cbits_t cbits_intersect(cbits_t s1, cbits_t s2) {
-    cbits_t set = cbits_clone(s1);
-    cbits_intersect_with(&set, s2); return set;
-}
-
-STC_INLINE cbits_t cbits_union(cbits_t s1, cbits_t s2) {
-    cbits_t set = cbits_clone(s1);
-    cbits_union_with(&set, s2); return set;
-}
-
-STC_INLINE cbits_t cbits_xor(cbits_t s1, cbits_t s2) {
-    cbits_t set = cbits_clone(s1);
-    cbits_xor_with(&set, s2); return set;
-}
-
-STC_INLINE cbits_t cbits_not(cbits_t s1) {
-    cbits_t set = cbits_clone(s1);
-    cbits_flip_all(&set); return set;
-}
-
-typedef struct {
-    cbits_t *_bs;
-    size_t ref;
-} cbits_iter_t;
-
-STC_INLINE cbits_iter_t
-cbits_begin(cbits_t* self) { cbits_iter_t it = {self, 0}; return it; }
-
-STC_INLINE cbits_iter_t
-cbits_end(cbits_t* self) { cbits_iter_t it = {self, self->size}; return it; }
-
-STC_INLINE void
-cbits_next(cbits_iter_t* it) { ++it->ref; }
-
-STC_INLINE bool
-cbits_itval(cbits_iter_t it) { return cbits_test(*it._bs, it.ref); }
 
 #if defined(__GNUC__) || defined(__clang__)
     STC_INLINE uint64_t cpopcount64(uint64_t x) {return __builtin_popcountll(x);}
@@ -243,19 +205,18 @@ STC_DEF size_t cbits_count(cbits_t s) {
     return count;
 }
 
-#define _cbits_SETOP(OPR) \
+#define _cbits_SETOP(OPR, x) \
     assert(s.size == other.size); \
     if (s.size == 0) return false; /* ? */ \
     size_t n = ((s.size + 63) >> 6) - 1; \
     for (size_t i=0; i<n; ++i) \
-        if ((s._arr[i] OPR other._arr[i]) != s._arr[i]) \
+        if ((s._arr[i] OPR other._arr[i]) != x) \
             return false; \
-    uint64_t m = (1ull << (s.size & 63)) - 1, last = s._arr[n] & m; \
-    return (last OPR (other._arr[n] & m)) == last
+    uint64_t i = n, m = (1ull << (s.size & 63)) - 1; \
+    return ((s._arr[i] & m) OPR (other._arr[i] & m)) == (x & m)
 
-STC_DEF bool cbits_is_disjoint(cbits_t s, cbits_t other) { _cbits_SETOP(^); }
-STC_DEF bool cbits_is_subset(cbits_t s, cbits_t other) { _cbits_SETOP(|); }
-STC_DEF bool cbits_is_superset(cbits_t s, cbits_t other) { _cbits_SETOP(&); }
+STC_DEF bool cbits_is_subset(cbits_t s, cbits_t other) { _cbits_SETOP(|, s._arr[i]); }
+STC_DEF bool cbits_is_disjoint(cbits_t s, cbits_t other) { _cbits_SETOP(^, ~0ull); }
 
 #endif
 #endif
