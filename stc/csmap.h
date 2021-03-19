@@ -28,15 +28,16 @@
 #include <stdio.h>
 #include <stc/csmap.h>
 using_csset(i, int);        // Set of int
-using_csmap(ic, int, char); // Map of int -> char
 
 int main(void) {
-    csset_sx s = csset_sx_init();
-    csset_sx_insert(&s, 5);
-    csset_sx_insert(&s, 8);
-    c_foreach (i, csset_sx, s)
-        printf("set %d\n", *i.ref);
-    csset_sx_del(&s);
+    csset_i s = csset_i_init();
+    csset_i_insert(&s, 5);
+    csset_i_insert(&s, 8);
+    csset_i_insert(&s, 3);
+    csset_i_insert(&s, 5);
+    c_foreach (k, csset_i, s)
+        printf("set %d\n", *k.ref);
+    csset_i_del(&s);
 }
 */
 #include "ccommon.h"
