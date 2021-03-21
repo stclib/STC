@@ -175,7 +175,7 @@ void mapdemo3()
 }
 
 
-using_carray(f, float);
+using_carray3(f, float);
 
 void arraydemo1()
 {
