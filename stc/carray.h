@@ -129,9 +129,8 @@ int main() {
     STC_DEF carray2##X carray2##X##_from(carray2##X##_value_t* block, size_t xdim, size_t ydim) { \
         size_t n = xdim * ydim; \
         carray2##X _arr = {c_new_2(carray2##X##_value_t*, xdim), xdim, ydim}; \
-        _arr.at[0] = block; \
-        for (size_t x = 1; x < xdim; ++x) \
-            _arr.at[x] = _arr.at[x - 1] + ydim; \
+        for (size_t x = 0; x < xdim; ++x, block += ydim) \
+            _arr.at[x] = block; \
         return _arr; \
     } \
 \
@@ -163,15 +162,10 @@ int main() {
 \
     STC_DEF carray3##X carray3##X##_from(carray3##X##_value_t* block, size_t xdim, size_t ydim, size_t zdim) { \
         carray3##X _arr = {c_new_2(carray3##X##_value_t**, xdim*(ydim + 1)), xdim, ydim, zdim}; \
-        _arr.at[0] = (carray3##X##_value_t**) &_arr.at[xdim]; \
-        _arr.at[0][0] = block; \
-        for (size_t x = 1, m = zdim*ydim; x < xdim; ++x) { \
-            _arr.at[x] = _arr.at[x - 1] + ydim; \
-            _arr.at[x][0] = _arr.at[x - 1][0] + m; \
-        } \
-        for (size_t x = 0; x < xdim; ++x) \
-            for (size_t y = 1; y < ydim; ++y) \
-                _arr.at[x][y] = _arr.at[x][y - 1] + zdim; \
+        carray3##X##_value_t** p = (carray3##X##_value_t**) &_arr.at[xdim]; \
+        for (size_t x = 0, y; x < xdim; ++x, p += ydim) \
+            for (_arr.at[x] = p, y = 0; y < ydim; ++y, block += zdim) \
+                _arr.at[x][y] = block; \
         return _arr; \
     } \
 \
