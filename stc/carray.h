@@ -70,8 +70,10 @@ int main() {
     STC_API carray2##X carray2##X##_clone(carray2##X src); \
 \
     STC_INLINE size_t carray2##X##_size(carray2##X arr) { return arr.xdim*arr.ydim; } \
-    STC_INLINE carray2##X##_value_t* carray2##X##_data(carray2##X* self) { return self->at[0]; } \
-    STC_INLINE void carray2##X##_del_internals(carray2##X* self) { c_free(self->at); } \
+    STC_INLINE carray2##X##_value_t *carray2##X##_data(carray2##X* self) { return self->at[0]; } \
+    STC_INLINE carray2##X##_value_t *carray2##X##_release(carray2##X* self) { \
+        carray2##X##_value_t *t = self->at[0]; c_free(self->at); self->at = NULL; return t; \
+    } \
 \
     STC_INLINE carray2##X##_iter_t carray2##X##_begin(const carray2##X* self) { \
         carray2##X##_iter_t it = {self->at[0]}; return it; \
@@ -102,8 +104,10 @@ int main() {
     STC_API carray3##X carray3##X##_clone(carray3##X src); \
 \
     STC_INLINE size_t carray3##X##_size(carray3##X arr) { return arr.xdim*arr.ydim*arr.zdim; } \
-    STC_INLINE carray3##X##_value_t* carray3##X##_data(carray3##X* self) { return self->at[0][0]; } \
-    STC_INLINE void carray3##X##_del_internals(carray3##X* self) { c_free(self->at); } \
+    STC_INLINE carray3##X##_value_t *carray3##X##_data(carray3##X* self) { return self->at[0][0]; } \
+    STC_INLINE carray3##X##_value_t *carray3##X##_release(carray3##X* self) { \
+        carray3##X##_value_t *t = **self->at; c_free(self->at); self->at = NULL; return t; \
+    } \
 \
     STC_INLINE carray3##X##_iter_t carray3##X##_begin(const carray3##X* self) { \
         carray3##X##_iter_t it = {self->at[0][0]}; return it; \
@@ -148,6 +152,7 @@ int main() {
     } \
 \
     STC_DEF void carray2##X##_del(carray2##X* self) { \
+        if (!self->at) return; \
         for (carray2##X##_value_t* p = self->at[0], *e = p + self->xdim*self->ydim; p != e; ++p) \
             valueDel(p); \
         c_free(self->at[0]); /* data */ \
@@ -187,6 +192,7 @@ int main() {
     } \
 \
     STC_DEF void carray3##X##_del(carray3##X* self) { \
+        if (!self->at) return; \
         for (carray3##X##_value_t* p = **self->at, *e = p + carray3##X##_size(*self); p != e; ++p) \
             valueDel(p); \
         c_free(self->at[0][0]); /* data */ \

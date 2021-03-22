@@ -33,8 +33,8 @@ All carray definitions and prototypes are available by including a single header
 carray2X            carray2X_init(size_t xdim, size_t ydim, Value val);
 carray2X            carray2X_from(Value* array, size_t xdim, size_t ydim);
 carray2X            carray2X_clone(carray2X arr);
+Value*              carray2X_release(carray2X* self);       // give away data
 void                carray2X_del(carray2X* self);
-void                carray2X_del_internals(carray2X* self); // destroy pointers only
 
 size_t              carray2X_size(carray2X arr);
 Value*              carray2X_data(carray2X* self);          // contiguous memory
@@ -47,8 +47,8 @@ void                carray2X_next(carray2X_iter_t* it);
 carray3X            carray3X_init(size_t xdim, size_t ydim, size_t zdim, Value val);
 carray3X            carray3X_from(Value* array, size_t xdim, size_t ydim, size_t zdim);
 carray3X            carray3X_clone(carray3X arr);
+Value*              carray3X_release(carray3X* self);       // give away data
 void                carray3X_del(carray3X* self);
-void                carray3X_del_internals(carray3X* self); // destroy pointers only
 
 size_t              carray3X_size(carray3X arr);
 Value*              carray3X_data(carray3X* self);          // contiguous memory
