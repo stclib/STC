@@ -6,32 +6,39 @@
 void check_del(float* v) {printf("destroy %g\n", *v);}
 
 using_carray2(f, float, check_del, c_trivial_fromraw);
-using_clist(a, carray2f, c_no_compare, carray2f_del, c_no_clone);
-using_cmap(l, int, clist_a, c_default_equals, c_default_hash, clist_a_del, c_no_clone);
-using_cmap_strkey(s, cmap_l, cmap_l_del, c_no_clone);
+using_clist(arr, carray2f, c_no_compare, carray2f_del, c_no_clone);
+using_cmap(lst, int, clist_arr, c_default_equals, c_default_hash, clist_arr_del, c_no_clone);
+using_cmap_strkey(map, cmap_lst, cmap_lst_del, c_no_clone);
+// c++:
+// using array2f = std::array<std::array<float, 6>, 4>>;
+// using map_lst = std::unordered_map<int, std::forward_list<array2f>>;
+// using map_map = std::unordered_map<std::string, map_lst>;
 
 int main() {
     int xdim = 4, ydim = 6;
-    int x = 1, y = 5, tableKey = 42;
+    int x = 1, y = 3, tableKey = 42;
     const char* strKey = "first";
-    cmap_l listMap = cmap_l_init();
 
-    cmap_s myMap = cmap_s_init();
+    cmap_map myMap = cmap_map_init();
+    cmap_lst listMap = cmap_lst_init();
+    clist_arr tableList = clist_arr_init();
+    carray2f arr2 = carray2f_init(xdim, ydim, 1.f);
 
-    // Construct.
-    carray2f arr_a = carray2f_init(ydim, xdim, 0.f);
-    printf("arr_a: (%zu, %zu)\n", carray2f_ydim(arr_a), carray2f_xdim(arr_a));
+    printf("arr2 size: %zu x %zu\n", arr2.xdim, arr2.ydim);
 
-    clist_a tableList = clist_a_init();
-    // Put in some data.
-    *carray2f_at(&arr_a, y, x) = 3.1415927f; // aa[y][x]
-    clist_a_push_back(&tableList, arr_a);
-    cmap_l_insert(&listMap, tableKey, tableList);
-    cmap_s_insert(&myMap, cstr_from(strKey), listMap);
+    // Put in some data in 2D array
+    arr2.at[x][y] = 3.1415927f;
+    clist_arr_push_back(&tableList, arr2);
+    cmap_lst_insert(&listMap, tableKey, tableList);
+    cmap_map_insert(&myMap, cstr_from(strKey), listMap);
 
     // Access the data entry
-    carray2f arr_b = *clist_a_back(&cmap_l_find(&cmap_s_find(&myMap, strKey).ref->second, tableKey).ref->second);
-    printf("value (%d, %d) is: %f\n", y, x, *carray2f_at(&arr_b, y, x));
+    cmap_lst* mapl = &cmap_map_find(&myMap, strKey).ref->second;
+    clist_arr* lsta = &cmap_lst_find(mapl, tableKey).ref->second;
+    carray2f arr = *clist_arr_back(lsta);
 
-    cmap_s_del(&myMap); // free up everything!
+    printf("value (%d, %d) is: %f\n", x, y, arr.at[x][y]);
+
+    arr2.at[x][y] = 1.41421356f; // change the value in array
+    cmap_map_del(&myMap); // free up everything!
 }

@@ -1,89 +1,106 @@
 # STC [carray](../stc/carray.h): Multi-dimensional Array
 ![Array](pics/array.jpg)
 
-The **carray** containers provides templates for multidimensional arrays of contiguous data It supports 1-, 2- and
+The **carray** containers provides templates for multidimensional arrays. It supports 2- and
 3-dimensional arrays, which are allocated from the heap as a single contiguous block of memory.
+The carrays can be used almost like regular constant size multi-dimensional arrays in C, and has
+the same property of storing data in one block of memory, which can be passed to any method.
 
 See the c++ class [boost::multi_array](https://www.boost.org/doc/libs/release/libs/multi_array) for similar functionality.
 
 ## Declaration
 
 ```c
-using_carray(X, Value);
-using_carray(X, Value, valueDel, valueClone);
+using_carray2(X, Value);
+using_carray2(X, Value, valueDel, valueClone);
+using_carray3(X, Value);
+using_carray3(X, Value, valueDel, valueClone);
 ```
-The macro `using_carray()` must be instantiated in the global scope. `X` and `N` are type tags and
-will affect the names of all cset types and methods. E.g. declaring `using_carray(i, int);`, `X` should
-be replaced by `i` in all of the following documentation. The `N` character should be replaced by `1`, `2` or `3`.
+The macro `using_carray2()` must be instantiated in the global scope. `X` and `N` are type tags and
+will affect the names of all cset types and methods. E.g. declaring `using_carray3(i, int);`, `X` should
+be replaced by `i` in all of the following documentation.
 
 ## Header file
 
 All carray definitions and prototypes are available by including a single header file.
 
 ```c
-#include "stc/carray.h"
+#include <stc/carray.h>
 ```
 ## Methods
 
 ```c
-carray1X            carray1X_init(size_t xdim, Value val);
-carray2X            carray2X_init(size_t ydim, size_t xdim, Value val);
-carray3X            carray3X_init(size_t zdim, size_t ydim, size_t xdim, Value val);
-carray1X            carray1X_from(Value* array, size_t xdim);
-carray2X            carray2X_from(Value* array, size_t ydim, size_t xdim);
-carray3X            carray3X_from(Value* array, size_t zdim, size_t ydim, size_t xdim);
-carrayNX            carrayNX_clone(carrayNX arr);
+carray2X            carray2X_init(size_t xdim, size_t ydim, Value val);
+carray2X            carray2X_from(Value* array, size_t xdim, size_t ydim);
+carray2X            carray2X_clone(carray2X arr);
+void                carray2X_del(carray2X* self);
+void                carray2X_del_internals(carray2X* self); // destroy pointers only
 
-void                carrayNX_del(carrayNX* self);
+size_t              carray2X_size(carray2X arr);
+Value*              carray2X_data(carray2X* self);          // contiguous memory
 
-size_t              carrayNX_size(carrayNX arr);
-size_t              carrayNX_xdim(carrayNX arr);
-size_t              carrayNX_ydim(carrayNX arr); // not N=3
-size_t              carrayNX_zdim(carrayNX arr); // only N=3
+carray2X_iter_t     carray2X_begin(const carray2X* self);
+carray2X_iter_t     carray2X_end(const carray2X* self);
+void                carray2X_next(carray2X_iter_t* it);
+```
+```c
+carray3X            carray3X_init(size_t xdim, size_t ydim, size_t zdim, Value val);
+carray3X            carray3X_from(Value* array, size_t xdim, size_t ydim, size_t zdim);
+carray3X            carray3X_clone(carray3X arr);
+void                carray3X_del(carray3X* self);
+void                carray3X_del_internals(carray3X* self); // destroy pointers only
 
-Value*              carray1X_at(const carray1X *self, size_t x);
-Value*              carray2X_at(const carray2X *self, size_t y, size_t x);
-Value*              carray3X_at(const carray3X *self, size_t z, size_t y, size_t x);
+size_t              carray3X_size(carray3X arr);
+Value*              carray3X_data(carray3X* self);          // contiguous memory
 
-carray1X            carray2X_at1(const carray2X *self, size_t y);
-carray2X            carray3X_at1(const carray3X *self, size_t z);
-carray1X            carray3X_at2(const carray3X *self, size_t z, size_t y);
-
-carrayNX_iter_t     carrayNX_begin(const carrayNX* self);
-carrayNX_iter_t     carrayNX_end(const carrayNX* self);
-void                carrayNX_next(carrayNX_iter_t* it);
-carrayNX_value_t*   carrayNX_itval(carrayNX_iter_t it);
+carray3X_iter_t     carray3X_begin(const carray3X* self);
+carray3X_iter_t     carray3X_end(const carray3X* self);
+void                carray3X_next(carray3X_iter_t* it);
 ```
 ## Types
 
-| Type name            | Type definition               | Used to represent...      |
-|:---------------------|:------------------------------|:--------------------------|
-| `carrayNX`           | `struct { ... }`              | The carray type           |
-| `carrayNX_value_t`   | `Value`                       | The value type            |
-| `carrayNX_iter_t`    | `struct { Value *ref; }`      | Iterator type             |
+| Type name            | Type definition                                  | Used to represent...      |
+|:---------------------|:-------------------------------------------------|:--------------------------|
+| `carray2X`           | `struct { Value **at; size_t xdim,ydim; }`       | The carray2 type           |
+| `carray2X_value_t`   | `Value`                                          | The value type            |
+| `carray2X_iter_t`    | `struct { Value *ref; }`                         | Iterator type             |
+| `carray3X`           | `struct { Value ***at; size_t xdim,ydim,zdim; }` | The carray3 type           |
+| `carray3X_value_t`   | `Value`                                          | The value type            |
+| `carray3X_iter_t`    | `struct { Value *ref; }`                         | Iterator type             |
 
 ## Example
 ```c
-#include <stdio.h>
 #include "stc/carray.h"
+#include <stdio.h>
 
-using_carray(f, float);
+using_carray3(f, float);
+using_carray2(i, uint32_t);
 
 int main()
 {
+    // Ex1
     carray3f a3 = carray3f_init(30, 20, 10, 0.0f);  // define a3[30][20][10], init with 0.0f.
-    *carray3f_at(&a3, 5, 4, 3) = 3.14f;             // a3[5][4][3] = 3.14
+    a3.at[5][4][3] = 3.14f;
 
-    carray1f a1 = carray3f_at2(&a3, 5, 4);          // sub-array a3[5][4] (no data copy).
-    carray2f a2 = carray3f_at1(&a3, 5);             // sub-array a3[5]
+    float *a1 = a3.at[5][4];
+    float **a2 = a3.at[5];
 
-    printf("%f\n", *carray1f_at(&a1, 3));           // a1[3] (3.14f)
-    printf("%f\n", *carray2f_at(&a2, 4, 3));        // a2[4][3] (3.14f)
-    printf("%f\n", *carray3f_at(&a3, 5, 4, 3));     // a3[5][4][3] (3.14f)
-    // ...
-    carray1f_del(&a1); // does nothing, since it is a sub-array.
-    carray2f_del(&a2); // same.
-    carray3f_del(&a3); // free array, and invalidates a1, a2.
+    printf("%f\n", a1[3]); // 3.14
+    printf("%f\n", a2[4][3]); // 3.14
+    printf("%f\n", a3.at[5][4][3]); // 3.14
+    carray3f_del(&a3); // free array
+
+    // Ex2
+    carray2i image = carray2i_from(c_new(uint32_t, 256*128), 256, 128); // no value init
+    int n = 0;
+    c_foreach (i, carray2i, image) {
+        uint32_t t = n++ % 256;
+        *i.ref = t | t << 8 | t << 16 | 255;
+    }
+
+    for (int y=0; y<image.ydim; ++y)
+        image.at[y][y] = 0xffffffff;
+    carray2i_del(&image);
 }
 ```
 Output:

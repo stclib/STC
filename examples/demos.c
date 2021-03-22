@@ -181,23 +181,22 @@ void arraydemo1()
 {
     printf("\nARRAYDEMO1\n");
     carray3f a3 = carray3f_init(30, 20, 10, 0.0f);
-    *carray3f_at(&a3, 5, 4, 3) = 10.2f;    // a3[5][4][3]
-    carray2f a2 = carray3f_at1(&a3, 5);    // sub-array reference: a2 = a3[5]
-    carray1f a1 = carray3f_at2(&a3, 5, 4); // sub-array reference: a1 = a3[5][4]
+    a3.at[5][4][3] = 10.2f;
+    float **a2 = a3.at[5];
+    float *a1 = a3.at[5][4];
 
-    printf("a3: %zu: (%zu, %zu, %zu) = %zu\n", sizeof(a3), carray3f_xdim(a3), carray3f_ydim(a3), carray3f_zdim(a3), carray3f_size(a3));
-    printf("a2: %zu: (%zu, %zu) = %zu\n", sizeof(a2), carray2f_xdim(a2), carray2f_ydim(a2), carray2f_size(a2));
+    printf("a3: %zu: (%zu, %zu, %zu) = %zu\n", sizeof(a3), a3.xdim, a3.ydim, a3.zdim, carray3f_size(a3));
 
-    printf("%f\n", a1.data[3]);                 // lookup a1[3] (=10.2f)
-    printf("%f\n", *carray2f_at(&a2, 4, 3));    // lookup a2[4][3] (=10.2f)
-    printf("%f\n", *carray3f_at(&a3, 5, 4, 3)); // lookup a3[5][4][3] (=10.2f)
+    printf("%g\n", a1[3]); // = 10.2
+    printf("%g\n", a2[4][3]); // = 10.2
+    printf("%g\n", a3.at[5][4][3]); // = 10.2
 
+    float x = 0.0;
     c_foreach (i, carray3f, a3)
-        *i.ref = 1.0f;
-    printf("%f\n", *carray3f_at(&a3, 29, 19, 9));
+        *i.ref = ++x;
+    printf("%g\n", a3.at[29][19][9]); // = 6000
 
-    carray2f_del(&a2); // does nothing, since it is a sub-array.
-    carray3f_del(&a3); // also invalidates a2.
+    carray3f_del(&a3);
 }
 
 
