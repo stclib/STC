@@ -1,4 +1,4 @@
-# STC [carray](../stc/carray.h): Multi-dimensional Array
+# STC [carray](../stc/carray.h): Dynamic Multi-dimensional Array
 ![Array](pics/array.jpg)
 
 The **carray** containers provides templates for multidimensional arrays. It supports 2- and
@@ -79,7 +79,8 @@ using_carray2(i, uint32_t);
 int main()
 {
     // Ex1
-    carray3f a3 = carray3f_init(30, 20, 10, 0.0f);  // define a3[30][20][10], init with 0.0f.
+    int xd = 30, yd = 20, zd = 10;
+    carray3f a3 = carray3f_init(xd, yd, zd, 0.0f);  // define a3[30][20][10], init with 0.0f.
     a3.at[5][4][3] = 3.14f;
 
     float *a1 = a3.at[5][4];
@@ -91,7 +92,8 @@ int main()
     carray3f_del(&a3); // free array
 
     // Ex2
-    carray2i image = carray2i_from(c_new(uint32_t, 256*128), 256, 128); // no value init
+    int w = 256, h = 128;
+    carray2i image = carray2i_from(c_new(uint32_t, w*h), w, h); // no value init
     int n = 0;
     c_foreach (i, carray2i, image) {
         uint32_t t = n++ % 256;
