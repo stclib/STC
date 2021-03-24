@@ -38,6 +38,7 @@ void                carray2X_del(carray2X* self);
 
 size_t              carray2X_size(carray2X arr);
 Value*              carray2X_data(carray2X* self);          // contiguous memory
+Value*              carray2X_at(carray2X* self, size_t x, size_t y);
 
 carray2X_iter_t     carray2X_begin(const carray2X* self);
 carray2X_iter_t     carray2X_end(const carray2X* self);
@@ -52,6 +53,7 @@ void                carray3X_del(carray3X* self);
 
 size_t              carray3X_size(carray3X arr);
 Value*              carray3X_data(carray3X* self);          // contiguous memory
+Value*              carray3X_at(carray3X* self, size_t x, size_t y, size_t z);
 
 carray3X_iter_t     carray3X_begin(const carray3X* self);
 carray3X_iter_t     carray3X_end(const carray3X* self);
@@ -67,6 +69,8 @@ void                carray3X_next(carray3X_iter_t* it);
 | `carray3X`           | `struct { Value ***at; size_t xdim,ydim,zdim; }` | The carray3 type           |
 | `carray3X_value_t`   | `Value`                                          | The value type            |
 | `carray3X_iter_t`    | `struct { Value *ref; }`                         | Iterator type             |
+
+The **carray** elements can be accessed like `carray3i arr = ...; int val = arr.at[x][y][z];`, or with `carray3i_at(&arr, x, y, z)`.
 
 ## Example
 ```c

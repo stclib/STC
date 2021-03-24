@@ -70,16 +70,19 @@ int main() {
     STC_API carray2##X carray2##X##_clone(carray2##X src); \
 \
     STC_INLINE size_t carray2##X##_size(carray2##X arr) { return arr.xdim*arr.ydim; } \
-    STC_INLINE carray2##X##_value_t *carray2##X##_data(carray2##X* self) { return self->at[0]; } \
+    STC_INLINE carray2##X##_value_t *carray2##X##_data(carray2##X* self) { return *self->at; } \
+    STC_INLINE carray2##X##_value_t *carray2##X##_at(carray2##X* self, size_t x, size_t y) { \
+        return *self->at + self->ydim*x + y; \
+    } \
     STC_INLINE carray2##X##_value_t *carray2##X##_release(carray2##X* self) { \
-        carray2##X##_value_t *t = self->at[0]; c_free(self->at); self->at = NULL; return t; \
+        carray2##X##_value_t *t = *self->at; c_free(self->at); self->at = NULL; return t; \
     } \
 \
     STC_INLINE carray2##X##_iter_t carray2##X##_begin(const carray2##X* self) { \
-        carray2##X##_iter_t it = {self->at[0]}; return it; \
+        carray2##X##_iter_t it = {*self->at}; return it; \
     } \
     STC_INLINE carray2##X##_iter_t carray2##X##_end(const carray2##X* self) { \
-        carray2##X##_iter_t it = {self->at[0] + carray2##X##_size(*self)}; return it; \
+        carray2##X##_iter_t it = {*self->at + carray2##X##_size(*self)}; return it; \
     } \
     STC_INLINE void carray2##X##_next(carray2##X##_iter_t* it) { ++it->ref; } \
 \
@@ -104,16 +107,19 @@ int main() {
     STC_API carray3##X carray3##X##_clone(carray3##X src); \
 \
     STC_INLINE size_t carray3##X##_size(carray3##X arr) { return arr.xdim*arr.ydim*arr.zdim; } \
-    STC_INLINE carray3##X##_value_t *carray3##X##_data(carray3##X* self) { return self->at[0][0]; } \
+    STC_INLINE carray3##X##_value_t *carray3##X##_data(carray3##X* self) { return **self->at; } \
+    STC_INLINE carray3##X##_value_t *carray3##X##_at(carray3##X* self, size_t x, size_t y, size_t z) { \
+        return **self->at + self->zdim*(self->ydim*x + y) + z; \
+    } \
     STC_INLINE carray3##X##_value_t *carray3##X##_release(carray3##X* self) { \
         carray3##X##_value_t *t = **self->at; c_free(self->at); self->at = NULL; return t; \
     } \
 \
     STC_INLINE carray3##X##_iter_t carray3##X##_begin(const carray3##X* self) { \
-        carray3##X##_iter_t it = {self->at[0][0]}; return it; \
+        carray3##X##_iter_t it = {**self->at}; return it; \
     } \
     STC_INLINE carray3##X##_iter_t carray3##X##_end(const carray3##X* self) { \
-        carray3##X##_iter_t it = {self->at[0][0] + carray3##X##_size(*self)}; return it; \
+        carray3##X##_iter_t it = {**self->at + carray3##X##_size(*self)}; return it; \
     } \
     STC_INLINE void carray3##X##_next(carray3##X##_iter_t* it) { ++it->ref; } \
 \
