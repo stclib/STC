@@ -200,18 +200,18 @@ elements using dynamic memory.
 | push_front()              | emplace_front()              | cdeq, clist              |
 | insert_after()            | emplace_after()              | clist                    |
 
-Note these differences between STC and c++ STL maps:
+For containers of integral or trivial element types, **emplace** and corresponding  non-emplace
+methods are identical, so the following does not apply for those.
+
+The **emplace** methods ***construct*** or ***clone*** their own copy of the element to be added.
+In contrast, the non-emplace methods requires elements to be explicitly constructed or cloned before adding them.
+
+A few of the differences between STC and c++ STL maps methods are:
 
 | STC maps                             | C++ STL maps                  |
 |:-------------------------------------|:------------------------------|
 | insert(Key, Mapped)                  | insert(Value)                 |
 | emplace_or_assign(RawKey, RawMapped) | N/A                           |
-
-For containers of integral or trivial element types, **emplace** and corresponding 
-non-emplace methods are identical, so the following does not apply for those.
-
-The **emplace** methods ***construct*** or ***clone*** their own copy of the element to be added.
-In contrast, the non-emplace methods requires elements to be explicitly constructed or cloned before adding them.
 
 Strings are the most commonly used non-trivial data type. STC containers have proper pre-defined
 **using**-declarations for cstr-elements, so they are fail-safe to use both with the **emplace**
