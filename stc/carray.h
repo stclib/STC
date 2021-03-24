@@ -52,8 +52,6 @@ int main() {
 }
 */
 
-// carray2:
-
 #define using_carray2(...) c_MACRO_OVERLOAD(using_carray2, __VA_ARGS__)
 
 #define using_carray2_2(X, Value) \
@@ -163,6 +161,8 @@ int main() {
         c_free(self->at[0]); /* data */ \
         c_free(self->at); \
     }
+
+// carray3 impl.
 
 #define _c_implement_carray3_4(X, Value, valueDel, valueClone) \
 \
