@@ -5,9 +5,11 @@ A **cdeq** is an indexed sequence container that allows fast insertion and delet
 
 See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque) for a functional description.
 
-## Declaration
+## Header file and declaration
 
 ```c
+#include <stc/cdeq.h>
+
 using_cdeq(X, Value);
 using_cdeq(X, Value, valueCompare);
 using_cdeq(X, Value, valueCompare, valueDel, valueClone);
@@ -24,13 +26,6 @@ be replaced by `i` in all of the following documentation.
 using_cdeq(str, cstr, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
 ```
 
-## Header file
-
-All cdeq definitions and prototypes are available by including a single header file.
-
-```c
-#include <stc/cdeq.h>
-```
 ## Methods
 
 ```c

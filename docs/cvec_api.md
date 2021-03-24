@@ -9,15 +9,17 @@ Reallocations are usually costly operations in terms of performance. The *cvec_X
 
 See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vector) for a functional description.
 
-## Declaration
+## Header file and declaration
 
 ```c
+#include <stc/cvec.h>
+
 using_cvec(X, Value);
 using_cvec(X, Value, valueCompare);
 using_cvec(X, Value, valueCompare, valueDel, valueClone);
 using_cvec(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue);
 
-using_cvec_str()
+using_cvec_str();    // using_cvec(str, cstr, ...)
 ```
 The macro `using_cvec()` must be instantiated in the global scope. `X` is a type tag name and
 will affect the names of all cvec types and methods. E.g. declaring `using_cvec(i, int);`, `X` should
@@ -28,13 +30,6 @@ be replaced by `i` in all of the following documentation.
 using_cvec(str, cstr, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
 ```
 
-## Header file
-
-All cvec definitions and prototypes are available by including a single header file.
-
-```c
-#include <stc/cvec.h>
-```
 ## Methods
 
 ```c

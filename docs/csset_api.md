@@ -5,28 +5,22 @@ A **csset** is an associative container that contains a sorted set of unique obj
 
 See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) for a functional description.
 
-## Declaration
+## Header file and declaration
 
 ```c
+#include <stc/csset.h>
+
 using_csset(X, Key);
 using_csset(X, Key, keyCompare);
 using_csset(X, Key, keyCompare, keyDel, keyClone);
 using_csset(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey);
-using_csset_str();
+
+using_csset_str();  // using_csset(str, cstr, ...)
 ```
 The macro `using_csset()` must be instantiated in the global scope. `X` is a type tag name and
 will affect the names of all csset types and methods. E.g. declaring `using_csset(i, int);`, `X` should
 be replaced by `i` in all of the following documentation.
 
-`using_csset_str()` is a predefined macro for `using_csset(str, cstr, ...)`.
-
-## Header file
-
-All csset definitions and prototypes are available by including a single header file.
-
-```c
-#include <stc/csset.h>
-```
 ## Methods
 
 ```c

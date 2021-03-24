@@ -5,9 +5,11 @@ A user-provided argument `<`or `>` must be supplied to set the ordering, e.g. us
 
 See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/container/priority_queue) for a functional reference.
 
-## Declaration
+## Header file and declaration
 
 ```c
+#include <stc/cpque.h>
+
 using_cpque(X, ctype, direction)
 ```
 The macro `using_cpque()` must be instantiated in the global scope. **cpque** uses normally **cvec_X**
@@ -17,14 +19,6 @@ or **cdeq_X** as underlying implementation, specified as `ctype`. The *direction
 Note that the function *`ctype`_value_compare(x, y)* defined by the underlying vector type is used to
 compare values (priorities). `X` is a type tag name and will affect the names of all cpque types and methods.
 Declaring `using_cpque(i, cvec_i, >)`, `X` should be replaced by `i` in the following documentation.
-
-## Header file
-
-All cpque definitions and prototypes are available by including a single header file.
-
-```c
-#include <stc/cpque.h>
-```
 
 ## Methods
 

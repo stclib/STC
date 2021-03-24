@@ -14,15 +14,17 @@ however computed in **O**(*n*) time.
 
 See the c++ class [std::forward_list](https://en.cppreference.com/w/cpp/container/forward_list) for a functional description.
 
-## Declaration
+## Header file and declaration
 
 ```c
+#include <stc/clist.h>
+
 using_clist(X, Value);
 using_clist(X, Value, valueCompare);
 using_clist(X, Value, valueCompare, valueDel, valueClone);
 using_clist(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue);
 
-using_clist_str()
+using_clist_str()    // using_clist(str, cstr, ...)
 ```
 The macro `using_clist()` must be instantiated in the global scope. `X` is a type tag name and
 will affect the names of all clist types and methods. E.g. declaring `using_clist(i, int);`, `X` should
@@ -31,13 +33,6 @@ be replaced by `i` in all of the following documentation. `using_clist_str()` is
 using_clist(str, cstr, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
 ```
 
-## Header file
-
-All clist definitions and prototypes are available by including a single header file.
-
-```c
-#include <stc/clist.h>
-```
 ## Methods
 
 ```c

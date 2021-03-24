@@ -27,16 +27,16 @@ void             cbits_resize(cbits* self, size_t size, bool value);
 void             cbits_del(cbits* self);
 
 cbits*           cbits_assign(cbits* self, cbits other);
-cbits*           cbits_take(cbits* self, cbits other);
-cbits            cbits_move(cbits* self);
+cbits*           cbits_take(cbits* self, cbits other);       // give other to self
+cbits            cbits_move(cbits* self);                    // transfer self to caller
 
 size_t           cbits_size(cbits set);
-size_t           cbits_count(cbits set);
+size_t           cbits_count(cbits set);                     // count number of bits set
 
 bool             cbits_test(cbits set, size_t i);
-bool             cbits_at(cbits set, size_t i);    // same as cbits_test()
-bool             cbits_is_subset(cbits set, cbits other);
-bool             cbits_is_disjoint(cbits set, cbits other);
+bool             cbits_at(cbits set, size_t i);              // same as cbits_test()
+bool             cbits_is_subset(cbits set, cbits other);    // is set a subset of other?
+bool             cbits_is_disjoint(cbits set, cbits other);  // xor test
 char*            cbits_to_str(cbits set, char* str, size_t start, intptr_t stop);
 
 void             cbits_set(cbits *self, size_t i);
@@ -49,7 +49,7 @@ void             cbits_flip_all(cbits *self);
 
 void             cbits_intersect(cbits *self, cbits other);
 void             cbits_union(cbits *self, cbits other);
-void             cbits_xor(cbits *self, cbits other);
+void             cbits_xor(cbits *self, cbits other);        // set of disjoint bits
 ```
 
 ## Types

@@ -6,9 +6,11 @@ The pointed-to elements are automatically destructed and deleted when the contai
 
  See the c++ classes [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr) for a functional reference.
 
-## Declaration
+## Header file and declaration
 
 ```c
+#include <stc/cptr.h>
+
 using_cptr(X, Value);
 using_cptr(X, Value, valueCompare);
 using_cptr(X, Value, valueCompare, valueDel);
@@ -20,14 +22,6 @@ using_csptr(X, Value, valueCompare, valueDel);
 The macro `using_cptr()` must be instantiated in the global scope. `X` is a type tag name and will
 affect the names of all cptr types and methods. E.g. declaring `using_cptr(v4, Vec4);`,
 `X` should be replaced by `v4` in all of the following documentation.
-
-## Header file
-
-All cptr and csptr definitions and prototypes are available by including a single header file.
-
-```c
-#include <stc/cptr.h>
-```
 
 ## Methods
 

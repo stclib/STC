@@ -8,9 +8,11 @@ the same property of storing data in one block of memory, which can be passed to
 
 See the c++ class [boost::multi_array](https://www.boost.org/doc/libs/release/libs/multi_array) for similar functionality.
 
-## Declaration
+## Header file and declaration
 
 ```c
+#include <stc/carray.h>
+
 using_carray2(X, Value);
 using_carray2(X, Value, valueDel, valueClone);
 using_carray3(X, Value);
@@ -19,10 +21,6 @@ using_carray3(X, Value, valueDel, valueClone);
 The macro `using_carray2()` must be instantiated in the global scope. `X` and `N` are type tags and
 will affect the names of all cset types and methods. E.g. declaring `using_carray3(i, int);`, `X` should
 be replaced by `i` in all of the following documentation.
-
-## Header file
-
-All carray definitions and prototypes are available by including a single header file.
 
 ```c
 #include <stc/carray.h>

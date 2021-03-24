@@ -4,28 +4,22 @@
 A **cset** is an associative container that contains a set of unique objects of type Key. Search, insertion, and removal have average constant-time complexity. See the c++ class
 [std::unordered_set](https://en.cppreference.com/w/cpp/container/unordered_set) for a functional description.
 
-## Declaration
+## Header file and declaration
 
 ```c
+#include <stc/cset.h>
+
 using_cset(X, Key);
 using_cset(X, Key, keyEquals, keyHash);
 using_cset(X, Key, keyEquals, keyHash, keyDel, keyClone);
 using_cset(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey);
-using_cset_str();
+
+using_cset_str();  // using_cset(str, cstr, ...)
 ```
 The macro `using_cset()` must be instantiated in the global scope. `X` is a type tag name and
 will affect the names of all cset types and methods. E.g. declaring `using_cset(i, int);`, `X` should
 be replaced by `i` in all of the following documentation.
 
-`using_cset_str()` is a predefined macro for `using_cset(str, cstr, ...)`.
-
-## Header file
-
-All cset definitions and prototypes are available by including a single header file.
-
-```c
-#include <stc/cset.h>
-```
 ## Methods
 
 ```c
@@ -34,14 +28,14 @@ cset_X              cset_X_with_capacity(size_t cap);
 cset_X              cset_X_clone(cset_x set);
 
 void                cset_X_clear(cset_X* self);
-void                cset_X_set_load_factors(cset_X* self, float min_load, float max_load);
+void                cset_X_set_load_factors(cset_X* self, float min_load, float max_load);   // default: 0.15, 0.85
 void                cset_X_reserve(cset_X* self, size_t size);
 void                cset_X_swap(cset_X* a, cset_X* b);
-void                cset_X_del(cset_X* self);                             // destructor
+void                cset_X_del(cset_X* self);                                                // destructor
 
 bool                cset_X_empty(cset_X set);
-size_t              cset_X_size(cset_X set);                              // num. of allocated buckets
-size_t              cset_X_capacity(cset_X set);                          // buckets * max_load_factor
+size_t              cset_X_size(cset_X set);                                                 // num. of allocated buckets
+size_t              cset_X_capacity(cset_X set);                                             // buckets * max_load_factor
 size_t              cset_X_bucket_count(cset_X set);
 
 cset_X_iter_t       cset_X_find(const cset_X* self, RawKey rkey);

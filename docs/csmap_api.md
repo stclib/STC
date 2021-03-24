@@ -8,9 +8,11 @@ using the comparison function *keyCompare*. Search, removal, and insertion opera
 
 See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) for a functional description.
 
-## Declaration
+## Header file and declaration
 
 ```c
+#include <stc/csmap.h>
+
 using_csmap(X, Key, Mapped);
 using_csmap(X, Key, Mapped, keyCompare);
 using_csmap(X, Key, Mapped, keyCompare, mappedDel, mappedClone);
@@ -35,13 +37,6 @@ The `using_csmap()` macro family must be instantiated in the global scope. `X` i
 will affect the names of all csmap types and methods. E.g. declaring `using_csmap(ii, int, int);`, `X` should
 be replaced by `ii` in all of the following documentation.
 
-## Header file
-
-All csmap definitions and prototypes are available by including a single header file.
-
-```c
-#include <stc/csmap.h>
-```
 ## Methods
 
 ```c

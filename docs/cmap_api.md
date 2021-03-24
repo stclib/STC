@@ -6,9 +6,11 @@ and removal of elements have average constant-time complexity. Internally, the e
 
 See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_map) for a functional description.
 
-## Declaration
+## Header file and declaration
 
 ```c
+#include <stc/cmap.h>
+
 using_cmap(X, Key, Mapped);
 using_cmap(X, Key, Mapped, keyEquals, keyHash);
 using_cmap(X, Key, Mapped, keyEquals, keyHash, mappedDel, mappedClone);
@@ -33,13 +35,6 @@ The `using_cmap()` macro family must be instantiated in the global scope. `X` is
 will affect the names of all cmap types and methods. E.g. declaring `using_cmap(ii, int, int);`, `X` should
 be replaced by `ii` in all of the following documentation.
 
-## Header file
-
-All cmap definitions and prototypes are available by including a single header file.
-
-```c
-#include <stc/cmap.h>
-```
 ## Methods
 
 ```c
@@ -48,7 +43,7 @@ cmap_X              cmap_X_with_capacity(size_t cap);
 cmap_X              cmap_X_clone(cmap_x map);
 
 void                cmap_X_clear(cmap_X* self);
-void                cmap_X_set_load_factors(cmap_X* self, float min_load, float max_load);
+void                cmap_X_set_load_factors(cmap_X* self, float min_load, float max_load);   // default: 0.15, 0.85
 void                cmap_X_reserve(cmap_X* self, size_t size);
 void                cmap_X_swap(cmap_X* a, cmap_X* b);
 void                cmap_X_del(cmap_X* self);                                                // destructor

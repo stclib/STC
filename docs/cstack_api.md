@@ -5,23 +5,17 @@ The **cstack** is a container adapter that gives the programmer the functionalit
 
 See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack)  for a functional description.
 
-## Declaration
+## Header file and declaration
 
 ```c
+#include <stc/cstack.h> /* includes default underlying implementation header cvec.h */
+
 using_cstack(X, ctype)
 ```
 The macro `using_cstack()` must be instantiated in the global scope. **cstack** uses normally
 a **cvec_X** or **cdeq_X** type as underlying implementation, given as `ctype`. `X` is a type tag name and will
 affect the names of all cstack types and methods. E.g. declaring `using_cstack(i, cvec_i);`,
 `X` should be replaced by `i` in all of the following documentation.
-
-## Header file
-
-All cstack definitions and prototypes are available by including a single header file.
-
-```c
-#include <stc/cstack.h> /* includes default underlying implementation header cvec.h */
-```
 
 ## Methods
 
