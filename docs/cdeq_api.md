@@ -29,7 +29,7 @@ using_cdeq(str, cstr, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const c
 All cdeq definitions and prototypes are available by including a single header file.
 
 ```c
-#include "stc/cdeq.h"
+#include <stc/cdeq.h>
 ```
 ## Methods
 
@@ -104,8 +104,8 @@ cdeq_X_value_t      cdeq_X_value_clone(cdeq_X_value_t val);
 
 ## Examples
 ```c
-#include <stdio.h>
 #include <stc/cdeq.h>
+#include <stdio.h>
 
 using_cdeq(i, int);
 

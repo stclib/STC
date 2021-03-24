@@ -41,8 +41,8 @@ int                 coption_get(coption *opt, int argc, char *argv[],
 ## Example
 
 ```c
+#include <stc/coption.h>
 #include <stdio.h>
-#include "stc/coption.h"
 
 int main(int argc, char *argv[]) {
     static coption_long long_options[] = {

@@ -95,9 +95,8 @@ csmap_X_value_t     csmap_X_value_clone(csmap_X_value_t val);
 
 ## Examples
 ```c
-#include <stdio.h>
-#include "stc/cstr.h"
-#include "stc/csmap.h"
+#include <stc/csmap.h>
+#include <stc/cstr.h>
 
 using_csmap_str();
 
@@ -139,8 +138,8 @@ The HEX of color BLACK is:[#000000]
 ### Example 2
 This example uses a csmap with cstr as mapped value, by the `using_csmap_strval(id, int)` macro.
 ```c
-#include "stc/cstr.h"
-#include "stc/csmap.h"
+#include <stc/csmap.h>
+#include <stc/cstr.h>
 
 /* csmap<int, cstr>: */
 using_csmap_strval(id, int);
@@ -175,7 +174,7 @@ Output:
 ### Example 3
 Demonstrate csmap with plain-old-data key type Vec3i and int as mapped type: csmap<Vec3i, int>.
 ```c
-#include "stc/csmap.h"
+#include <stc/csmap.h>
 #include <stdio.h>
 
 typedef struct { int x, y, z; } Vec3i;
@@ -215,7 +214,7 @@ Output:
 ### Example 4
 Inverse: demonstrate csmap with mapped POD type Vec3i: csmap<int, Vec3i>:
 ```c
-#include "stc/csmap.h"
+#include <stc/csmap.h>
 #include <stdio.h>
 
 typedef struct { int x, y, z; } Vec3i;

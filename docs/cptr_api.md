@@ -26,7 +26,7 @@ affect the names of all cptr types and methods. E.g. declaring `using_cptr(v4, V
 All cptr and csptr definitions and prototypes are available by including a single header file.
 
 ```c
-#include "stc/cptr.h"
+#include <stc/cptr.h>
 ```
 
 ## Methods
@@ -70,8 +70,8 @@ int                 csptr_X_compare(csptr_X* x, csptr_X* y);
 Managed raw pointers (cptr) in a cvec.
 ```c
 #include <stc/cptr.h>
-#include <stc/cstr.h>
 #include <stc/cvec.h>
+#include <stc/cstr.h>
 
 typedef struct { cstr name, last; } Person;
 

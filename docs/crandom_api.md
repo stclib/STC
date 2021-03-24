@@ -31,7 +31,7 @@ xoshiro and pcg (Vigna/O'Neill) PRNGs: https://www.pcg-random.org/posts/on-vigna
 
 All crandom definitions and prototypes are available by including a single header file.
 ```c
-#include "stc/crandom.h"
+#include <stc/crandom.h>
 ```
 
 ## Methods

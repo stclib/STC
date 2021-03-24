@@ -23,7 +23,7 @@ Declaring `using_cpque(i, cvec_i, >)`, `X` should be replaced by `i` in the foll
 All cpque definitions and prototypes are available by including a single header file.
 
 ```c
-#include "stc/cpque.h"
+#include <stc/cpque.h>
 ```
 
 ## Methods
@@ -60,9 +60,9 @@ cpque_X_value_t         cpque_X_value_clone(cpque_X_value_t val);
 
 ## Example
 ```c
+#include <stc/cpque.h>
+#include <stc/crandom.h>
 #include <stdio.h>
-#include "stc/cpque.h"
-#include "stc/crandom.h"
 
 using_cvec(i, int64_t);
 using_cpque(i, cvec_i, >); // adaptor type, '>' = min-heap

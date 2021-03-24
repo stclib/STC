@@ -74,8 +74,8 @@ The **carray** elements can be accessed like `carray3i arr = ...; int val = arr.
 
 ## Example
 ```c
-#include "stc/carray.h"
 #include <stdio.h>
+#include <stc/carray.h>
 
 using_carray3(f, float);
 using_carray2(i, uint32_t);

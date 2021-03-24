@@ -25,7 +25,7 @@ be replaced by `i` in all of the following documentation.
 All csset definitions and prototypes are available by including a single header file.
 
 ```c
-#include "stc/csset.h"
+#include <stc/csset.h>
 ```
 ## Methods
 
@@ -74,9 +74,8 @@ csset_X_value_t     csset_X_value_clone(csset_X_value_t val);
 
 ## Example
 ```c
-#include <stdio.h>
+#include <stc/csset.h>
 #include <stc/cstr.h>
-#include <stc/csmap.h>
 
 using_csset_str();
 

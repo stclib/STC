@@ -181,7 +181,7 @@ in your build environment and place all the instantiations of containers used in
 using_cmap(ii, int, int);
 using_cset(ix, int64_t);
 using_cvec(i, int);
-using_clist(pt, struct Point);
+using_clist(p, struct Point);
 ```
 
 The *emplace* versus non-emplace container methods
@@ -191,16 +191,24 @@ with **emplace**, e.g. **cvec_X_emplace_back()**. This is a convenient alternati
 **cvec_X_push_back()** when dealing non-trivial container elements, e.g. smart pointers or
 elements using dynamic memory. 
 
-| Move and insert element   | Construct element in-place   | Container               |
+| Move and insert element   | Construct element in-place   | Container                |
 |:--------------------------|:-----------------------------|:-------------------------|
 | insert()                  | emplace()                    | cmap, cset, csmap, csset |
 | insert_or_assign(), put() | emplace_or_assign()          | cmap, csmap              |
+| push()                    | emplace()                    | cstack, cqueue, cpque    |
 | push_back()               | emplace_back()               | cvec, cdeq, clist        |
 | push_front()              | emplace_front()              | cdeq, clist              |
 | insert_after()            | emplace_after()              | clist                    |
 
-***Note***: For containers of integral or trivial element types, **emplace** and corresponding non-emplace methods are
-identical, so the following does not apply for those.
+Note these differences between STC and c++ STL maps:
+
+| STC maps                             | C++ STL maps                  |
+|:-------------------------------------|:------------------------------|
+| insert(Key, Mapped)                  | insert(Value)                 |
+| emplace_or_assign(RawKey, RawMapped) | N/A                           |
+
+For containers of integral or trivial element types, **emplace** and corresponding 
+non-emplace methods are identical, so the following does not apply for those.
 
 The **emplace** methods ***construct*** or ***clone*** their own copy of the element to be added.
 In contrast, the non-emplace methods requires elements to be explicitly constructed or cloned before adding them.
@@ -249,15 +257,6 @@ it = cmap_str_find(&map, "Hello");
 ```
 Apart from strings, maps and sets are normally used with trivial value types. However, the
 last example on the **cmap** page demonstrates how to specify a map with non-trivial keys.
-
-Note that some map method arguments are different between STC maps and c++ STL:
-
-| STC maps                             | C++ STL maps
-|:-------------------------------------|:------------------------------|
-| insert(Key, Mapped)                  | insert(Value)                 |
-| emplace(RawKey, RawMapped)           | emplace(Key, Mapped)          |
-| insert_or_assign(Key, Mapped)        | insert_or_assign(Key, Mapped) |
-| emplace_or_assign(RawKey, RawMapped) | N/A                           |
 
 Memory efficiency
 -----------------

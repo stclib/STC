@@ -10,7 +10,7 @@ See the c++ class [std::basic_string](https://en.cppreference.com/w/cpp/string/b
 All cstr definitions and prototypes are available by including a single header file.
 
 ```c
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 ```
 ## Methods
 

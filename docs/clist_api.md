@@ -36,7 +36,7 @@ using_clist(str, cstr, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const 
 All clist definitions and prototypes are available by including a single header file.
 
 ```c
-#include "stc/clist.h"
+#include <stc/clist.h>
 ```
 ## Methods
 
@@ -130,8 +130,9 @@ clist_i_splice_after(&L2, clist_i_begin(&L2), &tmp);
 
 Interleave *push_front()* / *push_back()* then *sort()*:
 ```c
+#include <stc/clist.h>
 #include <stdio.h>
-#include "stc/clist.h"
+
 using_clist(d, double);
 
 int main() {

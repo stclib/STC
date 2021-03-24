@@ -20,7 +20,7 @@ affect the names of all cstack types and methods. E.g. declaring `using_cstack(i
 All cstack definitions and prototypes are available by including a single header file.
 
 ```c
-#include "stc/cstack.h" /* includes default underlying implementation header cvec.h */
+#include <stc/cstack.h> /* includes default underlying implementation header cvec.h */
 ```
 
 ## Methods
@@ -61,22 +61,24 @@ cstack_X_value_t        cstack_X_value_clone(cstack_X_value_t val);
 
 ## Example
 ```c
+#include <stc/cstack.h>
 #include <stdio.h>
-#include "stc/cstack.h"
 
 using_cvec(i, int);
 using_cstack(i, cvec_i);
 
 int main() {
-    cstack_i stack = cstack_i_init();
+    cstack_i S = cstack_i_init();
 
     for (int i=0; i < 100; ++i)
-        cstack_i_push(&stack, i*i);
+        cstack_i_push(&S, i*i);
 
     for (int i=0; i < 90; ++i)
-        cstack_i_pop(&stack);
+        cstack_i_pop(&S);
 
-    printf("top: %d\n", *cstack_i_top(&stack));
+    printf("top: %d\n", *cstack_i_top(&S));
+
+    cstack_i_del(&S);
 }
 ```
 Output:

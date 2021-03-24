@@ -33,7 +33,7 @@ using_cvec(str, cstr, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const c
 All cvec definitions and prototypes are available by including a single header file.
 
 ```c
-#include "stc/cvec.h"
+#include <stc/cvec.h>
 ```
 ## Methods
 
@@ -106,8 +106,9 @@ cvec_X_value_t      cvec_X_value_clone(cvec_X_value_t val);
 
 ## Examples
 ```c
+#include <stc/cvec.h>
 #include <stdio.h>
-#include "stc/cvec.h"
+
 using_cvec(i, int);
 
 int main()
@@ -143,8 +144,8 @@ sorted:  5 7 8 13 16 25
 ```
 ### Example 2
 ```c
-#include "stc/cstr.h"
-#include "stc/cvec.h"
+#include <stc/cvec.h>
+#include <stc/cstr.h>
 
 using_cvec_str();
 

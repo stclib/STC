@@ -12,7 +12,7 @@ for a functional description.
 All cbits definitions and prototypes are available by including a single header file.
 
 ```c
-#include "stc/cbits.h"
+#include <stc/cbits.h>
 ```
 ## Methods
 
@@ -61,8 +61,8 @@ void             cbits_xor(cbits *self, cbits other);
 
 ## Example
 ```c
+#include <stc/cbits.h>
 #include <stdio.h>
-#include "stc/cbits.h"
 
 static inline cbits sieveOfEratosthenes(size_t n)
 {

@@ -110,9 +110,8 @@ void                c_trivial_del(Type* val);                             // doe
 ## Examples
 
 ```c
-#include <stdio.h>
-#include "stc/cstr.h"
-#include "stc/cmap.h"
+#include <stc/cmap.h>
+#include <stc/cstr.h>
 
 using_cmap_str();
 
@@ -154,8 +153,8 @@ The HEX of color BLACK is:[#000000]
 ### Example 2
 This example uses a cmap with cstr as mapped value, by the `using_cmap_strval(id, int)` macro.
 ```c
-#include "stc/cstr.h"
-#include "stc/cmap.h"
+#include <stc/cmap.h>
+#include <stc/cstr.h>
 
 /* cmap<int, cstr>: */
 using_cmap_strval(id, int);
@@ -190,7 +189,7 @@ Output:
 ### Example 3
 Demonstrate cmap with plain-old-data key type Vec3i and int as mapped type: cmap<Vec3i, int>.
 ```c
-#include "stc/cmap.h"
+#include <stc/cmap.h>
 #include <stdio.h>
 
 typedef struct { int x, y, z; } Vec3i;
@@ -224,7 +223,7 @@ Output:
 ### Example 4
 Inverse: demonstrate cmap with mapped POD type Vec3i: cmap<int, Vec3i>:
 ```c
-#include "stc/cmap.h"
+#include <stc/cmap.h>
 #include <stdio.h>
 
 typedef struct { int x, y, z; } Vec3i;
@@ -255,7 +254,6 @@ Output:
 ### Example 5
 Advanced, rare usage: Complex key type.
 ```c
-#include <stdio.h>
 #include <stc/cmap.h>
 #include <stc/cstr.h>
 

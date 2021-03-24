@@ -19,7 +19,7 @@ a **cdeq_X** or **clist_X** type as underlying implementation, given as `ctype`.
 All cqueue definitions and prototypes are available by including a single header file.
 
 ```c
-#include "stc/cqueue.h" /* includes default underlying implementation header cdeq.h */
+#include <stc/cqueue.h> /* includes default underlying implementation header cdeq.h */
 ```
 
 ## Methods
@@ -61,26 +61,26 @@ cqueue_X_value_t        cqueue_X_value_clone(cqueue_X_value_t val);
 
 ## Examples
 ```c
+#include <stc/cqueue.h>
 #include <stdio.h>
-#include "stc/cqueue.h"
 
 using_cdeq(i, int);
 using_cqueue(i, cdeq_i);
 
 int main() {
-    cqueue_i queue = cqueue_i_init();
+    cqueue_i Q = cqueue_i_init();
 
     // push() and pop() a few.
     c_forrange (i, 20)
-        cqueue_i_push(&queue, i);
+        cqueue_i_push(&Q, i);
 
     c_forrange (5)
-        cqueue_i_pop(&queue);
+        cqueue_i_pop(&Q);
 
-    c_foreach (i, cqueue_i, queue)
+    c_foreach (i, cqueue_i, Q)
         printf(" %d", *i.ref);
 
-    cqueue_i_del(&queue);
+    cqueue_i_del(&Q);
 }
 ```
 Output:
@@ -88,28 +88,29 @@ Output:
 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19
 ```
 ### Example 2
+Use clist as underlying cqueue implementation.
 ```c
+#include <stc/cqueue.h>
+#include <stc/clist.h>
 #include <stdio.h>
-#include "stc/cqueue.h"
-#include "stc/clist.h"
 
-using_cdeq(i, int);
+using_clist(i, int);
 using_cqueue(i, clist_i);
 
 int main() {
-    cqueue_i queue = cqueue_i_init();
+    cqueue_i Q = cqueue_i_init();
 
     // push() and pop() a few.
     c_forrange (i, 20)
-        cqueue_i_push(&queue, i);
+        cqueue_i_push(&Q, i);
 
     c_forrange (5)
-        cqueue_i_pop(&queue);
+        cqueue_i_pop(&Q);
 
-    c_foreach (i, cqueue_i, queue)
+    c_foreach (i, cqueue_i, Q)
         printf(" %d", *i.ref);
 
-    cqueue_i_del(&queue);
+    cqueue_i_del(&Q);
 }
 ```
 Output:
