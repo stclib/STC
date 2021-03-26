@@ -25,9 +25,8 @@ It is a compact, header-only library with the all the major "standard" data cont
 - [***cvec*** - **std::vector** alike type](docs/cvec_api.md)
 
 Others:
-- [***ccommon*** - Very handy macros and general definitions](docs/ccommon_api.md)
-- [***coption*** - POSIX **getopt_long()** alike method](docs/coption_api.md)
 - [***crandom*** - A novel extremely fast *PRNG* named **stc64**](docs/crandom_api.md)
+- [***ccommon*** - Some handy macros and general definitions](docs/ccommon_api.md)
 
 Highlights
 ----------
