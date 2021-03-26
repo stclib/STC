@@ -5,7 +5,7 @@
 #include <stc/cpque.h>
 
 using_cvec(f, float);
-using_cpque(f, cvec_f, >);
+using_cpque(f, cvec_f, -c_default_compare);
 
 int main()
 {

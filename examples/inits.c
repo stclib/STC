@@ -17,7 +17,7 @@ inline static int ipair_compare(const ipair_t* a, const ipair_t* b) {
 using_cvec(ip, ipair_t, ipair_compare);
 using_clist(ip, ipair_t, ipair_compare);
 using_cvec(f, float);
-using_cpque(f, cvec_f, >);
+using_cpque(f, cvec_f);
 
 int main(void)
 {
@@ -34,7 +34,7 @@ int main(void)
     cpque_f_make_heap(&floats);
     c_emplace_items(&floats, cpque_f, {40.0f, 20.0f, 50.0f, 30.0f, 10.0f});
 
-    // sorted:
+    puts("\npop and show high priorites first:");
     while (! cpque_f_empty(floats)) {
         printf("%.1f ", *cpque_f_top(&floats));
         cpque_f_pop(&floats);

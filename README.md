@@ -1,7 +1,7 @@
 ![Standard Template Containers](docs/pics/containers.jpg)
 
-STC - Standard Template Containers
-==================================
+STC - Standard Template Containers for C
+========================================
 
 Introduction
 ------------

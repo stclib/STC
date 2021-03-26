@@ -7,7 +7,7 @@
 #include <stc/crandom.h>
 
 using_cvec(i, int64_t);
-using_cpque(i, cvec_i, >); // min-heap (increasing values)
+using_cpque(i, cvec_i, -c_default_compare); // min-heap (increasing values)
 
 int main() {
     size_t N = 10000000;

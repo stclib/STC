@@ -4,12 +4,12 @@
 // Implements c++ example: https://en.cppreference.com/w/cpp/container/priority_queue
 
 using_cvec(i, int);
-using_cpque(imax, cvec_i);
-using_cpque(imin, cvec_i, >);
+#define imix_less(x, y) ((*(x) ^ 1) < (*(y) ^ 1))
+#define imix_cmp(x, y) c_less_compare(imix_less, x, y)
 
-#define myless(left, right) ((left ^ 1) < (right ^ 1))
-static int cmp(const int *x, const int *y) { return myless(*y, *x) - myless(*x, *y); }
-using_cpque(imix, cvec_i, <, cmp);
+using_cpque(imax, cvec_i);
+using_cpque(imin, cvec_i, -c_default_compare);
+using_cpque(imix, cvec_i, imix_cmp);
 
 #define PRINT_Q(Q) \
     void print_##Q(Q q) { \
@@ -37,13 +37,13 @@ int main() {
 
     print_cpque_imax(q);
 
-    cpque_imin q2 = cpque_imin_init(); 
+    cpque_imin q2 = cpque_imin_init();
     cpque_imin_emplace_n(&q2, data, c_arraylen(data));
 
     print_cpque_imin(q2);
 
-    // Using myless cmp to compare elements.
-    cpque_imix q3 = cpque_imix_init(); 
+    // Using imix_less to compare elements.
+    cpque_imix q3 = cpque_imix_init();
 
     c_forrange (n, c_arraylen(data))
         cpque_imix_push(&q3, n);

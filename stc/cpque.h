@@ -26,7 +26,7 @@
     #include <stc/crandom.h>
     #include <stc/cpque.h>
     using_cvec(f, float);
-    using_cpque(f, cvec_f, >); // min-heap (increasing values)
+    using_cpque(f, cvec_f, -c_default_compare); // min-heap (increasing values)
 
     int main() {
         stc64_t rng = stc64_init(1234);
@@ -52,12 +52,9 @@
 #define using_cpque(...) c_MACRO_OVERLOAD(using_cpque, __VA_ARGS__)
 
 #define using_cpque_2(X, ctype) \
-    using_cpque_3(X, ctype, <)
+    using_cpque_3(X, ctype, ctype##_value_compare)
 
-#define using_cpque_3(X, ctype, cmpOpr) /* cmpOpr: < or > */ \
-    using_cpque_4(X, ctype, cmpOpr, ctype##_value_compare)
-
-#define using_cpque_4(X, ctype, cmpOpr, valueCompare) \
+#define using_cpque_3(X, ctype, valueCompare) \
     typedef ctype##_t cpque_##X; \
     typedef ctype##_value_t cpque_##X##_value_t; \
     typedef ctype##_rawvalue_t cpque_##X##_rawvalue_t; \
@@ -94,7 +91,7 @@
     STC_API void \
     cpque_##X##_emplace_n(cpque_##X *self, const cpque_##X##_rawvalue_t arr[], size_t size); \
 \
-    _c_implement_cpque(X, ctype, cmpOpr, valueCompare) \
+    _c_implement_cpque(X, ctype, valueCompare) \
     typedef cpque_##X cpque_##X##_t
 
 
@@ -102,14 +99,14 @@
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-#define _c_implement_cpque(X, ctype, cmpOpr, valueCompare) \
+#define _c_implement_cpque(X, ctype, valueCompare) \
 \
     STC_INLINE void \
     _cpque_##X##_sift_down(cpque_##X##_value_t* arr, size_t i, size_t n) { \
         size_t r = i, c = i << 1; \
         while (c <= n) { \
-            c += (c < n && valueCompare(&arr[c], &arr[c + 1]) cmpOpr 0); \
-            if (valueCompare(&arr[r], &arr[c]) cmpOpr 0) { \
+            c += (c < n && valueCompare(&arr[c], &arr[c + 1]) < 0); \
+            if (valueCompare(&arr[r], &arr[c]) < 0) { \
                 cpque_##X##_value_t tmp = arr[r]; arr[r] = arr[c]; arr[r = c] = tmp; \
             } else \
                 return; \
@@ -138,7 +135,7 @@
         ctype##_push_back(self, value); /* sift-up the value */ \
         size_t n = cpque_##X##_size(*self), c = n; \
         cpque_##X##_value_t *arr = self->data - 1; \
-        for (; c > 1 && valueCompare(&arr[c >> 1], &value) cmpOpr 0; c >>= 1) \
+        for (; c > 1 && valueCompare(&arr[c >> 1], &value) < 0; c >>= 1) \
             arr[c] = arr[c >> 1]; \
         if (c != n) arr[c] = value; \
     } \
@@ -148,7 +145,7 @@
     }
 
 #else
-#define _c_implement_cpque(X, ctype, cmpOpr, valueCompare)
+#define _c_implement_cpque(X, ctype, valueCompare)
 #endif
 
 #endif

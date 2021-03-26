@@ -65,6 +65,7 @@
 #define c_container_of(ptr, type, member) \
         ((type *)((char *)(ptr) - offsetof(type, member)))
 
+#define c_struct(S)             typedef struct S S; struct S
 #define c_new(...)              c_MACRO_OVERLOAD(c_new, __VA_ARGS__)
 #define c_new_1(T)              ((T *) c_malloc(sizeof(T)))
 #define c_new_2(T, n)           ((T *) c_malloc(sizeof(T)*(n)))
@@ -78,9 +79,10 @@
 #define c_swap(T, x, y)         do { T _c_t = x; x = y; y = _c_t; } while (0)
 #define c_arraylen(a)           (sizeof (a)/sizeof (a)[0])
 
-#define c_default_compare(x, y) (c_default_less(y, x) - c_default_less(x, y))
+#define c_default_compare(x, y) c_less_compare(c_default_less, x, y)
 #define c_default_less(x, y)    (*(x) < *(y))
 #define c_no_compare(x, y)      (assert(!"c_no_compare() called"), 0)
+#define c_less_compare(less, x, y) (less(y, x) - less(x, y))
 
 #define c_default_equals(x, y)  (*(x) == *(y))
 #define c_trivial_equals(x, y)  (memcmp(x, y, sizeof *(x)) == 0)

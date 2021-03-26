@@ -10,13 +10,12 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ```c
 #include <stc/cpque.h>
 
-using_cpque(X, ctype);                     // default dir = `<` : max-heap
-using_cpque(X, ctype, dir);                // uses valueCompare from ctype
-using_cpque(X, ctype, dir, valueCompare);
+using_cpque(X, ctype);                // uses valueCompare from ctype
+using_cpque(X, ctype, valueCompare);
 ```
 The macro `using_cpque()` must be instantiated in the global scope. **cpque** uses normally **cvec_X**
-or **cdeq_X** as underlying implementation, specified as `ctype`. The *dir* must be given as
-`<` or `>`, specifying *max-heap* or *min-heap* for the priority queue.
+or **cdeq_X** as underlying implementation, specified as `ctype`. The *valueCompare* can be specified
+to control the order in the priority queue.
 
 By default, the function *`ctype`_value_compare(x, y)* from the underlying vector type is used for
 comparing values (priorities). `X` is a type tag name and will affect the names of all cpque types and methods.
@@ -61,7 +60,7 @@ cpque_X_value_t         cpque_X_value_clone(cpque_X_value_t val);
 #include <stdio.h>
 
 using_cvec(i, int64_t);
-using_cpque(i, cvec_i, >); // adaptor type, '>' = min-heap
+using_cpque(i, cvec_i, -c_default_compare); // min-heap
 
 int main()
 {
