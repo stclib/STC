@@ -58,6 +58,7 @@ int main() {
 typedef struct cbits { uint64_t* _arr; size_t size; } cbits_t, cbits;
 
 STC_API cbits_t     cbits_with_size(size_t size, bool value);
+STC_API cbits_t     cbits_with_values(size_t size, uint64_t pattern);
 STC_API cbits_t     cbits_from_str(const char* str);
 STC_API char*       cbits_to_str(cbits_t set, char* str, size_t start, intptr_t stop);
 STC_API cbits_t     cbits_clone(cbits_t other);
@@ -110,7 +111,7 @@ STC_INLINE void cbits_set_all(cbits_t *self, bool value) {
     memset(self->_arr, -(int)value, ((self->size + 63) >> 6) * 8);
 }
 
-STC_INLINE void cbits_set_all64(cbits_t *self, uint64_t pattern) {
+STC_INLINE void cbits_set_values(cbits_t *self, uint64_t pattern) {
     size_t n = (self->size + 63) >> 6;
     for (size_t i=0; i<n; ++i) self->_arr[i] = pattern;
 }
@@ -180,9 +181,9 @@ STC_DEF cbits_t cbits_with_size(size_t size, bool value) {
     cbits_set_all(&set, value);
     return set;
 }
-STC_DEF cbits_t cbits_with_pattern(size_t size, uint64_t pattern) {
+STC_DEF cbits_t cbits_with_values(size_t size, uint64_t pattern) {
     cbits_t set = {(uint64_t *) c_malloc(((size + 63) >> 6) * 8), size};
-    cbits_set_all64(&set, pattern);
+    cbits_set_values(&set, pattern);
     return set;
 }
 STC_DEF cbits_t cbits_from_str(const char* str) {

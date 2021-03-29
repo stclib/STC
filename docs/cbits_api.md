@@ -19,6 +19,7 @@ All cbits definitions and prototypes are available by including a single header 
 ```c
 cbits            cbits_init(void);
 cbits            cbits_with_size(size_t size, bool value);
+cbits            cbits_with_values(size_t size, uint64_t pattern);
 cbits            cbits_from_str(const char* str);
 cbits            cbits_clone(cbits other);
 
@@ -35,17 +36,17 @@ size_t           cbits_count(cbits set);                     // count number of 
 
 bool             cbits_test(cbits set, size_t i);
 bool             cbits_at(cbits set, size_t i);              // same as cbits_test()
-bool             cbits_is_subset(cbits set, cbits other);    // is set a subset of other?
-bool             cbits_is_disjoint(cbits set, cbits other);  // xor test
+bool             cbits_subset_of(cbits set, cbits other);    // is set a subset of other?
+bool             cbits_disjoint(cbits set, cbits other);     // no common bits
 char*            cbits_to_str(cbits set, char* str, size_t start, intptr_t stop);
 
 void             cbits_set(cbits *self, size_t i);
 void             cbits_reset(cbits *self, size_t i);
-void             cbits_set_value(cbits *self, size_t i, bool value);
-void             cbits_flip(cbits *self, size_t i);
 void             cbits_set_all(cbits *self, bool value);
-void             cbits_set_all64(cbits *self, uint64_t pattern);
+void             cbits_set_value(cbits *self, size_t i, bool value);
+void             cbits_set_values(cbits *self, uint64_t pattern);
 void             cbits_flip_all(cbits *self);
+void             cbits_flip(cbits *self, size_t i);
 
 void             cbits_intersect(cbits *self, cbits other);
 void             cbits_union(cbits *self, cbits other);
