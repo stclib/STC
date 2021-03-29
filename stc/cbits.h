@@ -64,8 +64,8 @@ STC_API cbits_t     cbits_clone(cbits_t other);
 STC_API void        cbits_resize(cbits_t* self, size_t size, bool value);
 STC_API cbits_t*    cbits_assign(cbits_t* self, cbits_t other);
 STC_API size_t      cbits_count(cbits_t set);
-STC_API bool        cbits_is_subset(cbits_t set, cbits_t other);
-STC_API bool        cbits_is_disjoint(cbits_t set, cbits_t other);
+STC_API bool        cbits_subset_of(cbits_t set, cbits_t other);
+STC_API bool        cbits_disjoint(cbits_t set, cbits_t other);
 
 STC_INLINE cbits_t  cbits_init() { cbits_t set = {NULL, 0}; return set; }
 STC_INLINE void     cbits_clear(cbits_t* self) { self->size = 0; }
@@ -180,6 +180,11 @@ STC_DEF cbits_t cbits_with_size(size_t size, bool value) {
     cbits_set_all(&set, value);
     return set;
 }
+STC_DEF cbits_t cbits_with_pattern(size_t size, uint64_t pattern) {
+    cbits_t set = {(uint64_t *) c_malloc(((size + 63) >> 6) * 8), size};
+    cbits_set_all64(&set, pattern);
+    return set;
+}
 STC_DEF cbits_t cbits_from_str(const char* str) {
     const char* p = str; while (*p) ++p;
     cbits_t set = cbits_with_size(p - str, false);
@@ -197,26 +202,24 @@ STC_DEF cbits_t cbits_clone(cbits_t other) {
     return set;
 }
 STC_DEF size_t cbits_count(cbits_t s) {
-    size_t count = 0, n = ((s.size + 63) >> 6) - 1;
-    if (s.size > 0) {
-        for (size_t i=0; i<n; ++i) count += cpopcount64(s._arr[i]);
-        count += cpopcount64(s._arr[n] & ((1ull << (s.size & 63)) - 1));
-    }
+    size_t count = 0, n = s.size >> 6;
+    for (size_t i = 0; i < n; ++i) count += cpopcount64(s._arr[i]);
+    count += cpopcount64(s._arr[n] & ((1ull << (s.size & 63)) - 1));
     return count;
 }
 
 #define _cbits_SETOP(OPR, x) \
     assert(s.size == other.size); \
     if (s.size == 0) return false; /* ? */ \
-    size_t n = ((s.size + 63) >> 6) - 1; \
-    for (size_t i=0; i<n; ++i) \
+    size_t n = s.size >> 6; \
+    for (size_t i = 0; i < n; ++i) \
         if ((s._arr[i] OPR other._arr[i]) != x) \
             return false; \
     uint64_t i = n, m = (1ull << (s.size & 63)) - 1; \
     return ((s._arr[i] & m) OPR (other._arr[i] & m)) == (x & m)
 
-STC_DEF bool cbits_is_subset(cbits_t s, cbits_t other) { _cbits_SETOP(|, s._arr[i]); }
-STC_DEF bool cbits_is_disjoint(cbits_t s, cbits_t other) { _cbits_SETOP(^, ~0ull); }
+STC_DEF bool cbits_subset_of(cbits_t s, cbits_t other) { _cbits_SETOP(|, s._arr[i]); }
+STC_DEF bool cbits_disjoint(cbits_t s, cbits_t other) { _cbits_SETOP(&, 0); }
 
 #endif
 #endif
