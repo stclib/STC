@@ -204,7 +204,7 @@ STC_DEF cbits_t cbits_clone(cbits_t other) {
 STC_DEF size_t cbits_count(cbits_t s) {
     size_t count = 0, n = s.size >> 6;
     for (size_t i = 0; i < n; ++i) count += cpopcount64(s._arr[i]);
-    count += cpopcount64(s._arr[n] & ((1ull << (s.size & 63)) - 1));
+    if (s.size & 63) count += cpopcount64(s._arr[n] & ((1ull << (s.size & 63)) - 1));
     return count;
 }
 
