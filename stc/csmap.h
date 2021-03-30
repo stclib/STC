@@ -27,17 +27,22 @@
 /*
 #include <stdio.h>
 #include <stc/csmap.h>
-using_csset(i, int);        // Set of int
+using_csmap(mx, int, char); // Sorted map<int, char>
 
 int main(void) {
-    csset_i s = csset_i_init();
-    csset_i_insert(&s, 5);
-    csset_i_insert(&s, 8);
-    csset_i_insert(&s, 3);
-    csset_i_insert(&s, 5);
-    c_foreach (k, csset_i, s)
-        printf("set %d\n", *k.ref);
-    csset_i_del(&s);
+    csmap_mx m = csmap_mx_init();
+    csmap_mx_emplace(&m, 5, 'a');
+    csmap_mx_emplace(&m, 8, 'b');
+    csmap_mx_emplace(&m, 12, 'c');
+
+    csmap_mx_iter_t it = csmap_mx_find(&m, 10); // none
+    char val = csmap_mx_find(&m, 5).ref->second;
+    csmap_mx_emplace_or_assign(&m, 5, 'd'); // update
+    csmap_mx_erase(&m, 8);
+
+    c_foreach (i, csmap_mx, m)
+        printf("map %d: %c\n", i.ref->first, i.ref->second);
+    csmap_mx_del(&m);
 }
 */
 #include "ccommon.h"
@@ -77,27 +82,7 @@ int main(void) {
                      c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Mapped, \
                      keyDel, keyFromRaw, keyToRaw, RawKey)
 
-/* csset: */
-#define using_csset(...) \
-    c_MACRO_OVERLOAD(using_csset, __VA_ARGS__)
-
-#define using_csset_2(X, Key) \
-    using_csset_3(X, Key, c_default_compare)
-#define using_csset_3(X, Key, keyCompare) \
-    using_csset_5(X, Key, keyCompare, c_trivial_del, c_trivial_fromraw)
-#define using_csset_4(X, Key, keyCompare, keyDel) \
-    using_csset_5(X, Key, keyCompare, keyDel, c_no_clone)
-#define using_csset_5(X, Key, keyCompare, keyDel, keyClone) \
-    using_csset_7(X, Key, keyCompare, keyDel, keyClone, c_trivial_toraw, Key)
-
-#define using_csset_7(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
-    _using_AATREE(X, csset_, Key, Key, keyCompareRaw, \
-                     @@, @@, @@, void, \
-                     keyDel, keyFromRaw, keyToRaw, RawKey)
-
-/* csset_str, csmap_str, csmap_strkey, csmap_strval: */
-#define using_csset_str() \
-    _using_AATREE_strkey(str, csset_, cstr_t, @@, @@, @@, void)
+/* csmap_str, csmap_strkey, csmap_strval: */
 #define using_csmap_str() \
     _using_AATREE(str, csmap_, cstr_t, cstr_t, cstr_compare_raw, \
                        cstr_del, cstr_from, cstr_c_str, const char*, \
@@ -137,11 +122,8 @@ int main(void) {
                      cstr_del, cstr_from, cstr_c_str, const char*, \
                      keyDel, keyFromRaw, keyToRaw, RawKey)
 
-#define SET_ONLY_csset_(...) __VA_ARGS__
 #define SET_ONLY_csmap_(...)
-#define MAP_ONLY_csset_(...)
 #define MAP_ONLY_csmap_(...) __VA_ARGS__
-#define KEY_REF_csset_(vp)   (vp)
 #define KEY_REF_csmap_(vp)   (&(vp)->first)
 #ifndef CSMAP_SIZE_T
 #define CSMAP_SIZE_T uint32_t

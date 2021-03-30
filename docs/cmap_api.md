@@ -13,7 +13,7 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 
 using_cmap(X, Key, Mapped);
 using_cmap(X, Key, Mapped, keyEquals, keyHash);
-using_cmap(X, Key, Mapped, keyEquals, keyHash, mappedDel, mappedClone);
+using_cmap(X, Key, Mapped, keyEquals, keyHash, mappedDel, mappedClone = c_no_clone);
 using_cmap(X, Key, Mapped, keyEquals, keyHash, mappedDel, mappedFromRaw, mappedToRaw, RawMapped);
 using_cmap(X, Key, Mapped, keyEqualsRaw, keyHashRaw, mappedDel, mappedFromRaw, mappedToRaw, RawMapped,
                                                      keyDel, keyFromRaw, keyToRaw, RawKey);
@@ -21,12 +21,12 @@ using_cmap_keydef(X, Key, Mapped, keyEquals, keyHash, keyDel, keyClone);
 using_cmap_keydef(X, Key, Mapped, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey);
 
 using_cmap_strkey(X, Mapped);                   // using_cmap(X, cstr, Mapped, ...)
-using_cmap_strkey(X, Mapped, mappedDel, mappedClone);
+using_cmap_strkey(X, Mapped, mappedDel, mappedClone = c_no_clone);
 using_cmap_strkey(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped);
 
 using_cmap_strval(X, Key);                      // using_cmap(X, Key, cstr, ...)
 using_cmap_strval(X, Key, keyEquals, keyHash);
-using_cmap_strval(X, Key, keyEquals, keyHash, keyDel, keyClone);
+using_cmap_strval(X, Key, keyEquals, keyHash, keyDel, keyClone = c_no_clone);
 using_cmap_strval(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey);
 
 using_cmap_str()                                // using_cmap(str, cstr, cstr, ...)

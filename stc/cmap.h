@@ -25,27 +25,22 @@
 
 // Unordered set/map - implemented as closed hashing with linear probing and no tombstones.
 /*
-#include <stdio.h>
 #include <stc/cmap.h>
-using_cset(sx, int);       // Set of int
+#include <stdio.h>
+
 using_cmap(mx, int, char); // Map of int -> char
 
 int main(void) {
-    cset_sx s = cset_sx_init();
-    cset_sx_insert(&s, 5);
-    cset_sx_insert(&s, 8);
-    c_foreach (i, cset_sx, s)
-        printf("set %d\n", *i.ref);
-    cset_sx_del(&s);
-
     cmap_mx m = cmap_mx_init();
     cmap_mx_emplace(&m, 5, 'a');
     cmap_mx_emplace(&m, 8, 'b');
     cmap_mx_emplace(&m, 12, 'c');
+
     cmap_mx_iter_t it = cmap_mx_find(&m, 10); // none
     char val = cmap_mx_find(&m, 5).ref->second;
     cmap_mx_emplace_or_assign(&m, 5, 'd'); // update
     cmap_mx_erase(&m, 8);
+
     c_foreach (i, cmap_mx, m)
         printf("map %d: %c\n", i.ref->first, i.ref->second);
     cmap_mx_del(&m);
@@ -86,36 +81,18 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
                     keyDel, keyFromRaw, keyToRaw, RawKey)
 
 #define using_cmap_keydef(...) c_MACRO_OVERLOAD(using_cmap_keydef, __VA_ARGS__)
+
 #define using_cmap_keydef_7(X, Key, Mapped, keyEquals, keyHash, keyDel, keyClone) \
     using_cmap_keydef_9(X, Key, Mapped, keyEquals, keyHash, \
                            keyDel, keyClone, c_trivial_toraw, Key)
+
 #define using_cmap_keydef_9(X, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                                keyDel, keyFromRaw, keyToRaw, RawKey) \
     _using_CHASH(X, cmap_, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                     c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Mapped, \
                     keyDel, keyFromRaw, keyToRaw, RawKey)
 
-/* cset: */
-#define using_cset(...) \
-    c_MACRO_OVERLOAD(using_cset, __VA_ARGS__)
-
-#define using_cset_2(X, Key) \
-    using_cset_4(X, Key, c_default_equals, c_default_hash)
-#define using_cset_4(X, Key, keyEquals, keyHash) \
-    using_cset_6(X, Key, keyEquals, keyHash, c_trivial_del, c_trivial_fromraw)
-#define using_cset_5(X, Key, keyEquals, keyHash, keyDel) \
-    using_cset_6(X, Key, keyEquals, keyHash, keyDel, c_no_clone)
-#define using_cset_6(X, Key, keyEquals, keyHash, keyDel, keyClone) \
-    using_cset_8(X, Key, keyEquals, keyHash, keyDel, keyClone, c_trivial_toraw, Key)
-
-#define using_cset_8(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
-    _using_CHASH(X, cset_, Key, Key, keyEqualsRaw, keyHashRaw, \
-                    @@, @@, @@, void, \
-                    keyDel, keyFromRaw, keyToRaw, RawKey)
-
-/* cset_str, cmap_str, cmap_strkey, cmap_strval: */
-#define using_cset_str() \
-    _using_CHASH_strkey(str, cset_, cstr_t, @@, @@, @@, void)
+/* cmap_str, cmap_strkey, cmap_strval: */
 #define using_cmap_str() \
     _using_CHASH(str, cmap_, cstr_t, cstr_t, cstr_equals_raw, cstr_hash_raw, \
                       cstr_del, cstr_from, cstr_c_str, const char*, \
@@ -155,11 +132,8 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
                     cstr_del, cstr_from, cstr_c_str, const char*, \
                     keyDel, keyFromRaw, keyToRaw, RawKey)
 
-#define SET_ONLY_cset_(...) __VA_ARGS__
 #define SET_ONLY_cmap_(...)
-#define MAP_ONLY_cset_(...)
 #define MAP_ONLY_cmap_(...) __VA_ARGS__
-#define KEY_REF_cset_(vp)   (vp)
 #define KEY_REF_cmap_(vp)   (&(vp)->first)
 #ifndef CMAP_SIZE_T
 #define CMAP_SIZE_T uint32_t

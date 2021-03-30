@@ -16,7 +16,7 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 
 using_cvec(X, Value);
 using_cvec(X, Value, valueCompare);
-using_cvec(X, Value, valueCompare, valueDel, valueClone);
+using_cvec(X, Value, valueCompare, valueDel, valueClone = c_no_clone);
 using_cvec(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue);
 
 using_cvec_str();    // using_cvec(str, cstr, ...)

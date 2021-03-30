@@ -12,7 +12,7 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 
 using_csset(X, Key);
 using_csset(X, Key, keyCompare);
-using_csset(X, Key, keyCompare, keyDel, keyClone);
+using_csset(X, Key, keyCompare, keyDel, keyClone = c_no_clone);
 using_csset(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey);
 
 using_csset_str();  // using_csset(str, cstr, ...)

@@ -11,7 +11,7 @@ A **cset** is an associative container that contains a set of unique objects of 
 
 using_cset(X, Key);
 using_cset(X, Key, keyEquals, keyHash);
-using_cset(X, Key, keyEquals, keyHash, keyDel, keyClone);
+using_cset(X, Key, keyEquals, keyHash, keyDel, keyClone = c_no_clone);
 using_cset(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey);
 
 using_cset_str();  // using_cset(str, cstr, ...)

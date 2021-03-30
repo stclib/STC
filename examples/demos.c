@@ -1,6 +1,7 @@
 #include <stc/cvec.h>
 #include <stc/clist.h>
 #include <stc/carray.h>
+#include <stc/cset.h>
 #include <stc/cmap.h>
 #include <stc/cstr.h>
 

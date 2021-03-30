@@ -24,7 +24,51 @@
 #define CSSET_H_INCLUDED
 
 // Sorted set - implemented as an AA-tree (balanced binary tree).
+/*
+#include <stc/csset.h>
+#include <stdio.h>
+
+using_csset(i, int);        // sorted set of int
+
+int main(void) {
+    csset_i s = csset_i_init();
+    csset_i_insert(&s, 5);
+    csset_i_insert(&s, 8);
+    csset_i_insert(&s, 3);
+    csset_i_insert(&s, 5);
+
+    c_foreach (k, csset_i, s)
+        printf("set %d\n", *k.ref);
+    csset_i_del(&s);
+}
+*/
 
 #include "csmap.h"
+
+/* csset: */
+#define using_csset(...) \
+    c_MACRO_OVERLOAD(using_csset, __VA_ARGS__)
+
+#define using_csset_2(X, Key) \
+    using_csset_3(X, Key, c_default_compare)
+#define using_csset_3(X, Key, keyCompare) \
+    using_csset_5(X, Key, keyCompare, c_trivial_del, c_trivial_fromraw)
+#define using_csset_4(X, Key, keyCompare, keyDel) \
+    using_csset_5(X, Key, keyCompare, keyDel, c_no_clone)
+#define using_csset_5(X, Key, keyCompare, keyDel, keyClone) \
+    using_csset_7(X, Key, keyCompare, keyDel, keyClone, c_trivial_toraw, Key)
+
+#define using_csset_7(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
+    _using_AATREE(X, csset_, Key, Key, keyCompareRaw, \
+                     @@, @@, @@, void, \
+                     keyDel, keyFromRaw, keyToRaw, RawKey)
+
+/* csset_str: */
+#define using_csset_str() \
+    _using_AATREE_strkey(str, csset_, cstr_t, @@, @@, @@, void)
+
+#define SET_ONLY_csset_(...) __VA_ARGS__
+#define MAP_ONLY_csset_(...)
+#define KEY_REF_csset_(vp)   (vp)
 
 #endif

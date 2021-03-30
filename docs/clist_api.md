@@ -21,7 +21,7 @@ See the c++ class [std::forward_list](https://en.cppreference.com/w/cpp/containe
 
 using_clist(X, Value);
 using_clist(X, Value, valueCompare);
-using_clist(X, Value, valueCompare, valueDel, valueClone);
+using_clist(X, Value, valueCompare, valueDel, valueClone = c_no_clone);
 using_clist(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue);
 
 using_clist_str()    // using_clist(str, cstr, ...)
