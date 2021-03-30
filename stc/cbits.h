@@ -211,13 +211,13 @@ STC_DEF size_t cbits_count(cbits_t s) {
 
 #define _cbits_SETOP(OPR, x) \
     assert(s.size == other.size); \
-    if (s.size == 0) return false; /* ? */ \
     size_t n = s.size >> 6; \
     for (size_t i = 0; i < n; ++i) \
         if ((s._arr[i] OPR other._arr[i]) != x) \
             return false; \
+    if (!(s.size & 63)) return true; \
     uint64_t i = n, m = (1ull << (s.size & 63)) - 1; \
-    return ((s._arr[i] & m) OPR (other._arr[i] & m)) == (x & m)
+    return ((s._arr[i] OPR other._arr[i]) & m) == (x & m)
 
 STC_DEF bool cbits_subset_of(cbits_t s, cbits_t other) { _cbits_SETOP(|, s._arr[i]); }
 STC_DEF bool cbits_disjoint(cbits_t s, cbits_t other) { _cbits_SETOP(&, 0); }
