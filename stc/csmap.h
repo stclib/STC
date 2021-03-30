@@ -48,10 +48,10 @@ int main(void) {
 
 #define using_csmap_3(X, Key, Mapped) \
     using_csmap_4(X, Key, Mapped, c_default_compare)
-
 #define using_csmap_4(X, Key, Mapped, keyCompare) \
-    using_csmap_8(X, Key, Mapped, keyCompare, c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Mapped)
-
+    using_csmap_6(X, Key, Mapped, keyCompare, c_trivial_del, c_trivial_fromraw)
+#define using_csmap_5(X, Key, Mapped, keyCompare, mappedDel) \
+    using_csmap_6(X, Key, Mapped, keyCompare, mappedDel, c_no_clone)
 #define using_csmap_6(X, Key, Mapped, keyCompare, mappedDel, mappedClone) \
     using_csmap_8(X, Key, Mapped, keyCompare, mappedDel, mappedClone, c_trivial_toraw, Mapped)
 
@@ -83,10 +83,10 @@ int main(void) {
 
 #define using_csset_2(X, Key) \
     using_csset_3(X, Key, c_default_compare)
-
 #define using_csset_3(X, Key, keyCompare) \
-    using_csset_7(X, Key, keyCompare, c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Key)
-
+    using_csset_5(X, Key, keyCompare, c_trivial_del, c_trivial_fromraw)
+#define using_csset_4(X, Key, keyCompare, keyDel) \
+    using_csset_5(X, Key, keyCompare, keyDel, c_no_clone)
 #define using_csset_5(X, Key, keyCompare, keyDel, keyClone) \
     using_csset_7(X, Key, keyCompare, keyDel, keyClone, c_trivial_toraw, Key)
 
@@ -107,11 +107,11 @@ int main(void) {
     c_MACRO_OVERLOAD(using_csmap_strkey, __VA_ARGS__)
 
 #define using_csmap_strkey_2(X, Mapped) \
-    _using_AATREE_strkey(X, csmap_, Mapped, c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Mapped)
-
+    using_csmap_strkey_4(X, Mapped, c_trivial_del, c_trivial_fromraw)
+#define using_csmap_strkey_3(X, Mapped, mappedDel) \
+    using_csmap_strkey_4(X, Mapped, mappedDel, c_no_clone)
 #define using_csmap_strkey_4(X, Mapped, mappedDel, mappedClone) \
     _using_AATREE_strkey(X, csmap_, Mapped, mappedDel, mappedClone, c_trivial_toraw, Mapped)
-
 #define using_csmap_strkey_6(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
     _using_AATREE_strkey(X, csmap_, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped)
 
@@ -125,10 +125,10 @@ int main(void) {
 
 #define using_csmap_strval_2(X, Key) \
     using_csmap_strval_3(X, Key, c_default_compare)
-
 #define using_csmap_strval_3(X, Key, keyCompare) \
-    using_csmap_strval_7(X, Key, keyCompare, c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Key)
-
+    using_csmap_strval_5(X, Key, keyCompare, c_trivial_del, c_trivial_fromraw)
+#define using_csmap_strval_4(X, Key, keyCompare, keyDel) \
+    using_csmap_strval_5(X, Key, keyCompare, keyDel, c_no_clone)
 #define using_csmap_strval_5(X, Key, keyCompare, keyDel, keyClone) \
     using_csmap_strval_7(X, Key, keyCompare, keyDel, keyClone, c_trivial_toraw, Key)
 

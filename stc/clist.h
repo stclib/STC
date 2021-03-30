@@ -59,7 +59,9 @@
 #define using_clist_2(X, Value) \
                     using_clist_3(X, Value, c_default_compare)
 #define using_clist_3(X, Value, valueCompare) \
-                    using_clist_7(X, Value, valueCompare, c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Value)
+                    using_clist_5(X, Value, valueCompare, c_trivial_del, c_trivial_fromraw)
+#define using_clist_4(X, Value, valueCompare, valueDel) \
+                    using_clist_5(X, Value, valueCompare, valueDel, c_no_clone)
 #define using_clist_5(X, Value, valueCompare, valueDel, valueClone) \
                     using_clist_7(X, Value, valueCompare, valueDel, valueClone, c_trivial_toraw, Value)
 #define using_clist_str() \

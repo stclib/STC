@@ -31,7 +31,9 @@
 #define using_cvec_2(X, Value) \
                     using_cvec_3(X, Value, c_default_compare)
 #define using_cvec_3(X, Value, valueCompare) \
-                    using_cvec_7(X, Value, valueCompare, c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Value)
+                    using_cvec_5(X, Value, valueCompare, c_trivial_del, c_trivial_fromraw)
+#define using_cvec_4(X, Value, valueCompare, valueDel) \
+                    using_cvec_5(X, Value, valueCompare, valueDel, c_no_clone)
 #define using_cvec_5(X, Value, valueCompare, valueDel, valueClone) \
                     using_cvec_7(X, Value, valueCompare, valueDel, valueClone, c_trivial_toraw, Value)
 #define using_cvec_str() \

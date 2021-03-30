@@ -62,11 +62,12 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
 
 #define using_cmap_3(X, Key, Mapped) \
     using_cmap_5(X, Key, Mapped, c_default_equals, c_default_hash)
-
 #define using_cmap_5(X, Key, Mapped, keyEquals, keyHash) \
-    using_cmap_9(X, Key, Mapped, keyEquals, keyHash, \
-                    c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Mapped)
-
+    using_cmap_7(X, Key, Mapped, keyEquals, keyHash, \
+                    c_trivial_del, c_trivial_fromraw)
+#define using_cmap_6(X, Key, Mapped, keyEquals, keyHash, mappedDel) \
+    using_cmap_7(X, Key, Mapped, keyEquals, keyHash, \
+                    mappedDel, c_no_clone)
 #define using_cmap_7(X, Key, Mapped, keyEquals, keyHash, mappedDel, mappedClone) \
     using_cmap_9(X, Key, Mapped, keyEquals, keyHash, \
                     mappedDel, mappedClone, c_trivial_toraw, Mapped)
@@ -100,10 +101,10 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
 
 #define using_cset_2(X, Key) \
     using_cset_4(X, Key, c_default_equals, c_default_hash)
-
 #define using_cset_4(X, Key, keyEquals, keyHash) \
-    using_cset_8(X, Key, keyEquals, keyHash, c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Key)
-
+    using_cset_6(X, Key, keyEquals, keyHash, c_trivial_del, c_trivial_fromraw)
+#define using_cset_5(X, Key, keyEquals, keyHash, keyDel) \
+    using_cset_6(X, Key, keyEquals, keyHash, keyDel, c_no_clone)
 #define using_cset_6(X, Key, keyEquals, keyHash, keyDel, keyClone) \
     using_cset_8(X, Key, keyEquals, keyHash, keyDel, keyClone, c_trivial_toraw, Key)
 
@@ -124,11 +125,11 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
     c_MACRO_OVERLOAD(using_cmap_strkey, __VA_ARGS__)
 
 #define using_cmap_strkey_2(X, Mapped) \
-    _using_CHASH_strkey(X, cmap_, Mapped, c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Mapped)
-
+    using_cmap_strkey_4(X, Mapped, c_trivial_del, c_trivial_fromraw)
+#define using_cmap_strkey_3(X, Mapped, mappedDel) \
+    using_cmap_strkey_4(X, Mapped, mappedDel, c_no_clone)
 #define using_cmap_strkey_4(X, Mapped, mappedDel, mappedClone) \
     _using_CHASH_strkey(X, cmap_, Mapped, mappedDel, mappedClone, c_trivial_toraw, Mapped)
-
 #define using_cmap_strkey_6(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
     _using_CHASH_strkey(X, cmap_, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped)
 
@@ -142,10 +143,10 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
 
 #define using_cmap_strval_2(X, Key) \
     using_cmap_strval_4(X, Key, c_default_equals, c_default_hash)
-
 #define using_cmap_strval_4(X, Key, keyEquals, keyHash) \
-    using_cmap_strval_8(X, Key, keyEquals, keyHash, c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Key)
-
+    using_cmap_strval_6(X, Key, keyEquals, keyHash, c_trivial_del, c_trivial_fromraw)
+#define using_cmap_strval_5(X, Key, keyEquals, keyHash, keyDel) \
+    using_cmap_strval_6(X, Key, keyEquals, keyHash, keyDel, c_no_clone)
 #define using_cmap_strval_6(X, Key, keyEquals, keyHash, keyDel, keyClone) \
     using_cmap_strval_8(X, Key, keyEquals, keyHash, keyDel, keyClone, c_trivial_toraw, Key)
 
