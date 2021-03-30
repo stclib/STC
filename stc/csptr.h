@@ -20,84 +20,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CPTR_H_INCLUDED
-#define CPTR_H_INCLUDED
+#ifndef CSPTR_H_INCLUDED
+#define CSPTR_H_INCLUDED
 
-/* cptr: std::unique_ptr -like type */
-/*
-#include <stc/cptr.h>
-#include <stc/cstr.h>
-#include <stc/cvec.h>
-
-typedef struct { cstr name, last; } Person;
-
-Person* Person_make(Person* p, const char* name, const char* last) {
-    p->name = cstr_from(name), p->last = cstr_from(last);
-    return p;
-}
-void Person_del(Person* p) {
-    printf("del: %s\n", p->name.str);
-    c_del(cstr, &p->name, &p->last);
-}
-int Person_compare(const Person* p, const Person* q) {
-    int cmp = strcmp(p->name.str, q->name.str);
-    return cmp == 0 ? strcmp(p->last.str, q->last.str) : cmp;
-}
-
-using_cptr(pe, Person, Person_compare, Person_del);
-using_cvec(pe, Person*, cptr_pe_compare, cptr_pe_del, c_no_clone);
-
-int main() {
-    cvec_pe vec = cvec_pe_init();
-    cvec_pe_push_back(&vec, Person_make(c_new(Person), "John", "Smiths"));
-    cvec_pe_push_back(&vec, Person_make(c_new(Person), "Jane", "Doe"));
-
-    c_foreach (i, cvec_pe, vec)
-        printf("%s %s\n", (*i.ref)->name.str, (*i.ref)->last.str);
-    cvec_pe_del(&vec);
-}
-*/
 #include "ccommon.h"
-
-#define using_cptr(...) c_MACRO_OVERLOAD(using_cptr, __VA_ARGS__)
-
-#define using_cptr_2(X, Value) \
-    using_cptr_3(X, Value, c_default_compare)
-
-#define using_cptr_3(X, Value, valueCompare) \
-    using_cptr_4(X, Value, valueCompare, c_trivial_del)
-
-#define using_cptr_4(X, Value, valueCompare, valueDel) \
-    typedef Value cptr_##X##_value_t; \
-    typedef cptr_##X##_value_t *cptr_##X; \
-\
-    STC_INLINE void \
-    cptr_##X##_del(cptr_##X* self) { \
-        valueDel(*self); \
-        c_free(*self); \
-    } \
-\
-    STC_INLINE void \
-    cptr_##X##_reset(cptr_##X* self, cptr_##X##_value_t* p) { \
-        cptr_##X##_del(self); \
-        *self = p; \
-    } \
-\
-    STC_INLINE int \
-    cptr_##X##_compare(cptr_##X* x, cptr_##X* y) { \
-        return valueCompare(*x, *y); \
-    } \
-    STC_INLINE int \
-    cptr_##X##_equals(cptr_##X* x, cptr_##X* y) { \
-        return valueCompare(*x, *y) == 0; \
-    } \
-    typedef cptr_##X cptr_##X##_t
-
-
 
 /* csptr: std::shared_ptr -like type:
 
-#include <stc/cptr.h>
+#include <stc/csptr.h>
 #include <stc/cstr.h>
 
 typedef struct { cstr name, last; } Person;
@@ -152,6 +82,8 @@ typedef long atomic_count_t;
     }
 #endif
 
+#define csptr_null {NULL, NULL}
+
 #define using_csptr(...) c_MACRO_OVERLOAD(using_csptr, __VA_ARGS__)
 
 #define using_csptr_2(X, Value) \
@@ -182,8 +114,9 @@ typedef long atomic_count_t;
     } \
     STC_INLINE csptr_##X \
     csptr_##X##_move(csptr_##X* self) { \
-        csptr_##X x = *self; self->use_count = NULL; \
-        return x; \
+        csptr_##X ptr = *self; \
+        self->get = NULL, self->use_count = NULL; \
+        return ptr; \
     } \
 \
     STC_INLINE void \
@@ -195,7 +128,12 @@ typedef long atomic_count_t;
         } \
     } \
     STC_INLINE void \
-    csptr_##X##_reset(csptr_##X* self, csptr_##X##_value_t* p) { \
+    csptr_##X##_reset(csptr_##X* self) { \
+        csptr_##X##_del(self); \
+        self->use_count = NULL, self->get = NULL; \
+    } \
+    STC_INLINE void \
+    csptr_##X##_reset_to(csptr_##X* self, csptr_##X##_value_t* p) { \
         csptr_##X##_del(self); \
         *self = csptr_##X##_from(p); \
     } \
@@ -204,7 +142,7 @@ typedef long atomic_count_t;
     csptr_##X##_compare(csptr_##X* x, csptr_##X* y) { \
         return valueCompare(x->get, y->get); \
     } \
-    STC_INLINE int \
+    STC_INLINE bool \
     csptr_##X##_equals(csptr_##X* x, csptr_##X* y) { \
         return valueCompare(x->get, y->get) == 0; \
     } \

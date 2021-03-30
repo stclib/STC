@@ -15,7 +15,7 @@ It is a compact, header-only library with the all the major "standard" data cont
 - [***clist*** - **std::forward_list** alike type](docs/clist_api.md)
 - [***cmap*** - **std::unordered_map** alike type](docs/cmap_api.md)
 - [***cpque*** - **std::priority_queue** alike (adapter) type](docs/cpque_api.md)
-- [***cptr*** - **std::shared_ptr** alike support](docs/cptr_api.md)
+- [***csptr*** - **std::shared_ptr** alike support](docs/csptr_api.md)
 - [***cqueue*** - **std::queue** alike (adapter) type](docs/cqueue_api.md)
 - [***cset*** - **std::unordered_set** alike type](docs/cset_api.md)
 - [***csmap*** - **std::map** sorted map alike type](docs/csmap_api.md)
@@ -32,7 +32,7 @@ Highlights
 ----------
 - **User friendly** - Just include the headers and you are good. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of element- *comparison*, *destruction*, *cloning*, *conversion types*, and more.
 - **Unparalleled performance** - The containers are about equal and often much faster than the c++ STL containers.
-- **Fully memory managed** - All containers will destruct keys/values via destructor passed as macro parameters to the ***using***-declaration. Also, smart-pointers are supported and can be stored in containers, see ***csptr***.
+- **Fully memory managed** - All containers will destruct keys/values via destructor passed as macro parameters to the ***using***-declaration. Also, shared pointers are supported and can be stored in containers, see ***csptr***.
 - **Fully type safe** - Because of templating, it avoids error-prone casting of container types and elements back and forth from the containers.
 - **Uniform, easy-to-learn API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have uniform and intuitive usage across the various containers.
 - **Small footprint** - Small source code and generated executables. The executable from the example below using six different containers is *27 kb in size* compiled with TinyC.

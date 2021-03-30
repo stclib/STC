@@ -5,11 +5,11 @@
 
 cbits sieveOfEratosthenes(size_t n)
 {
-    cbits bits = cbits_with_size(n>>1, true);
-    size_t q = (size_t) sqrt(n);
-
-    for (size_t i = 3; i <= q; i += 2) {
-        for (size_t j = i; j < n; j += 2) {
+    cbits bits = cbits_with_size(n/2 + 1, true);
+    size_t q = (size_t) sqrt(n) + 1;
+    for (size_t i = 3; i < q; i += 2) {
+        size_t j = i;
+        for (; j < n; j += 2) {
             if (cbits_test(bits, j>>1)) {
                 i = j;
                 break;
@@ -23,7 +23,7 @@ cbits sieveOfEratosthenes(size_t n)
 
 int main(void)
 {
-    size_t n = 100000000;
+    size_t n = 1000000000;
     printf("computing prime numbers up to %zu\n", n);
 
     clock_t t1 = clock();
