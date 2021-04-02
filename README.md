@@ -120,16 +120,16 @@ int main(void) {
     cset_i_iter_t i1 = cset_i_find(&set, 20);
     cvec_p_iter_t i2 = cvec_p_find(&vec, (struct Point) {20, 2});
     cdeq_i_iter_t i3 = cdeq_i_find(&deq, 20);
-    clist_i_iter_t i4 = clist_i_find_before(&lst, 20);
+    clist_i_iter_t i4 = clist_i_find(&lst, 20);
     csmap_i_iter_t i5 = csmap_i_find(&map, 20);
     printf("\nFound: %d, (%g, %g), %d, %d, [%d: %d]\n", *i1.ref, i2.ref->x, i2.ref->y,
-                                                        *i3.ref, *clist_i_fwd(i4, 1).ref,
+                                                        *i3.ref, *i4.ref,
                                                         i5.ref->first, i5.ref->second);
     // erase the elements found
     cset_i_erase_at(&set, i1);
     cvec_p_erase_at(&vec, i2);
     cdeq_i_erase_at(&deq, i3);
-    clist_i_erase_after(&lst, i4);
+    clist_i_erase_at(&lst, i4);
     csmap_i_erase_at(&map, i5);
 
     printf("After erasing elements found:");
@@ -191,14 +191,13 @@ with **emplace**, e.g. **cvec_X_emplace_back()**. This is a convenient alternati
 **cvec_X_push_back()** when dealing non-trivial container elements, e.g. smart pointers or
 elements using dynamic memory. 
 
-| Move and insert element   | Construct element in-place   | Container                |
-|:--------------------------|:-----------------------------|:-------------------------|
-| insert()                  | emplace()                    | cmap, cset, csmap, csset |
-| insert_or_assign(), put() | emplace_or_assign()          | cmap, csmap              |
-| push()                    | emplace()                    | cstack, cqueue, cpque    |
-| push_back()               | emplace_back()               | cvec, cdeq, clist        |
-| push_front()              | emplace_front()              | cdeq, clist              |
-| insert_after()            | emplace_after()              | clist                    |
+| Move and insert element   | Construct element in-place   | Container                       |
+|:--------------------------|:-----------------------------|:--------------------------------|
+| insert()                  | emplace()                    | cmap, cset, csmap, csset, clist |
+| insert_or_assign(), put() | emplace_or_assign()          | cmap, csmap                     |
+| push()                    | emplace()                    | cstack, cqueue, cpque           |
+| push_back()               | emplace_back()               | cvec, cdeq, clist               |
+| push_front()              | emplace_front()              | cdeq, clist                     |
 
 For containers of integral or trivial element types, **emplace** and corresponding  non-emplace
 methods are identical, so the following does not apply for those.

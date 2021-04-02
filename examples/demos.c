@@ -86,18 +86,21 @@ void listdemo1()
         clist_ix_push_back(&nums, i);
     for (int i = 100; i < 110; ++i)
         clist_ix_push_back(&nums2, i);
-    c_foreach (i, clist_ix, nums)
-        printf("value: %d\n", *i.ref);
-    /* merge/append nums2 to nums */
-    clist_ix_splice_front(&nums, &nums2);
+
+    /* splice nums2 to front of nums */
+    clist_ix_splice(&nums, clist_ix_begin(&nums), &nums2);
     c_foreach (i, clist_ix, nums)
         printf("spliced: %d\n", *i.ref);
+    puts("");
 
-    *clist_ix_find(&nums, 100).ref *= 10;
-    clist_ix_sort(&nums);                     // Sort the array
-    clist_ix_remove(&nums, 105);
+    *clist_ix_find(&nums, 104).ref += 50;
+    clist_ix_remove(&nums, 103);
+    clist_ix_iter_t it = clist_ix_begin(&nums);
+    clist_ix_erase_range(&nums, clist_ix_fwd(it, 5), clist_ix_fwd(it, 15));
     clist_ix_pop_front(&nums);
-    clist_ix_push_front(&nums, -99);
+    clist_ix_push_back(&nums, -99);
+    clist_ix_sort(&nums);
+
     c_foreach (i, clist_ix, nums)
         printf("sorted: %d\n", *i.ref);
     clist_ix_del(&nums);

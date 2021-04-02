@@ -80,8 +80,9 @@
     } clist_##X; \
 \
     typedef struct { \
-        clist_##X##_node_t* const *_last, *_prev; \
+        clist_##X##_node_t* const* _last; \
         clist_##X##_value_t* ref; \
+        int _state; \
     } clist_##X##_iter_t
 
 
@@ -129,65 +130,74 @@ STC_API size_t _clist_size(const clist_void* self);
 \
     STC_API clist_##X##_node_t* \
     _clist_##X##_erase_after(clist_##X* self, clist_##X##_node_t* node); \
-\
     STC_INLINE void \
     clist_##X##_pop_front(clist_##X* self) { \
         _clist_##X##_erase_after(self, self->last); \
     } \
     STC_INLINE clist_##X##_iter_t \
+    clist_##X##_before_begin(const clist_##X* self) { \
+        clist_##X##_value_t *last = self->last ? &self->last->value : NULL; \
+        clist_##X##_iter_t it = {&self->last, last, -1}; return it; \
+    } \
+    STC_INLINE clist_##X##_iter_t \
     clist_##X##_begin(const clist_##X* self) { \
         clist_##X##_value_t* head = self->last ? &self->last->next->value : NULL; \
-        clist_##X##_iter_t it = {&self->last, self->last, head}; return it; \
+        clist_##X##_iter_t it = {&self->last, head, 0}; return it; \
+    } \
+    STC_INLINE clist_##X##_iter_t \
+    clist_##X##_last(const clist_##X* self) { \
+        clist_##X##_value_t *last = self->last ? &self->last->value : NULL; \
+        clist_##X##_iter_t it = {&self->last, last, 0}; return it; \
     } \
     STC_INLINE clist_##X##_iter_t \
     clist_##X##_end(const clist_##X* self) { \
-        clist_##X##_iter_t it = {&self->last, NULL, NULL}; return it; \
+        clist_##X##_iter_t it = {NULL, NULL}; return it; \
     } \
     STC_INLINE void \
     clist_##X##_next(clist_##X##_iter_t* it) { \
-        clist_##X##_node_t* node = it->_prev = _clist_node(X, it->ref); \
-        it->ref = (node == *it->_last ? NULL : &node->next->value); \
+        clist_##X##_node_t* node = _clist_node(X, it->ref); \
+        it->ref = ((it->_state += node == *it->_last) == 1) ? NULL : &node->next->value; \
     } \
     STC_INLINE clist_##X##_iter_t \
     clist_##X##_fwd(clist_##X##_iter_t it, size_t n) { \
-        while (n-- && it.ref) clist_##X##_next(&it); \
-        return it; \
+        while (n-- && it.ref) clist_##X##_next(&it); return it; \
     } \
+    STC_INLINE clist_##X##_value_t* \
+    clist_##X##_itval(clist_##X##_iter_t it) {return it.ref;} \
     \
     STC_API clist_##X##_iter_t \
-    clist_##X##_insert(clist_##X* self, clist_##X##_iter_t pos, Value value); \
+    clist_##X##_insert_after(clist_##X* self, clist_##X##_iter_t pos, Value value); \
     STC_INLINE clist_##X##_iter_t \
-    clist_##X##_emplace(clist_##X* self, clist_##X##_iter_t pos, RawValue raw) { \
-        return clist_##X##_insert(self, pos, valueFromRaw(raw)); \
+    clist_##X##_emplace_after(clist_##X* self, clist_##X##_iter_t pos, RawValue raw) { \
+        return clist_##X##_insert_after(self, pos, valueFromRaw(raw)); \
     } \
     STC_API clist_##X##_iter_t \
-    clist_##X##_erase_at(clist_##X* self, clist_##X##_iter_t pos); \
+    clist_##X##_erase_after(clist_##X* self, clist_##X##_iter_t pos); \
     STC_API clist_##X##_iter_t \
-    clist_##X##_erase_range(clist_##X* self, clist_##X##_iter_t pos, clist_##X##_iter_t finish); \
+    clist_##X##_erase_range_after(clist_##X* self, clist_##X##_iter_t pos, clist_##X##_iter_t finish); \
 \
-    STC_API void \
-    clist_##X##_splice(clist_##X* self, clist_##X##_iter_t pos, clist_##X* other); \
-    STC_API clist_##X \
-    clist_##X##_splice_out(clist_##X* self, clist_##X##_iter_t pos1, clist_##X##_iter_t pos2); \
-\
-    STC_INLINE void \
-    clist_##X##_splice_range(clist_##X* self, clist_##X##_iter_t pos, \
-                             clist_##X* other, clist_##X##_iter_t pos1, clist_##X##_iter_t pos2) { \
-        clist_##X tmp = clist_##X##_splice_out(other, pos1, pos2); \
-        clist_##X##_splice(self, pos, &tmp); \
+    STC_API clist_##X##_iter_t \
+    clist_##X##_splice_after(clist_##X* self, clist_##X##_iter_t pos, clist_##X* other); \
+    STC_INLINE clist_##X##_iter_t \
+    clist_##X##_splice_front(clist_##X* self, clist_##X* other) { \
+        return clist_##X##_splice_after(self, clist_##X##_before_begin(self), other); \
+    } \
+    STC_INLINE clist_##X##_iter_t \
+    clist_##X##_splice_back(clist_##X* self, clist_##X* other) { \
+        return clist_##X##_splice_after(self, clist_##X##_last(self), other); \
     } \
 \
+    STC_API clist_##X##_iter_t \
+    clist_##X##_find_before_in_range(const clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t finish, RawValue val); \
+    STC_API clist_##X##_iter_t \
+    clist_##X##_find_before(const clist_##X* self, RawValue val); \
+    STC_API clist_##X##_iter_t \
+    clist_##X##_find(const clist_##X* self, RawValue val); \
     STC_API size_t \
     clist_##X##_remove(clist_##X* self, RawValue val); \
     STC_API void \
     clist_##X##_sort(clist_##X* self); \
-    STC_API clist_##X##_iter_t \
-    clist_##X##_find_in_range(const clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t finish, RawValue val); \
 \
-    STC_INLINE clist_##X##_iter_t \
-    clist_##X##_find(const clist_##X* self, RawValue val) { \
-        return clist_##X##_find_in_range(self, clist_##X##_begin(self), clist_##X##_end(self), val); \
-    } \
     STC_INLINE Value* \
     clist_##X##_front(const clist_##X* self) {return &self->last->next->value;} \
     STC_INLINE Value* \
@@ -224,42 +234,50 @@ STC_API size_t _clist_size(const clist_void* self);
         if (!self->last) self->last = entry; \
     } \
     STC_DEF void \
-    clist_##X##_emplace_n(clist_##X *self, const clist_##X##_rawvalue_t arr[], size_t n) { \
-        for (size_t i=0; i<n; ++i) clist_##X##_push_back(self, valueFromRaw(arr[i])); \
+    clist_##X##_emplace_n(clist_##X *self, const clist_##X##_rawvalue_t arr[], size_t size) { \
+        for (size_t i=0; i<size; ++i) clist_##X##_push_back(self, valueFromRaw(arr[i])); \
     } \
 \
     STC_DEF clist_##X##_iter_t \
-    clist_##X##_insert(clist_##X* self, clist_##X##_iter_t pos, Value value) { \
-        clist_##X##_node_t* node = pos._prev ? pos._prev : self->last; \
+    clist_##X##_insert_after(clist_##X* self, clist_##X##_iter_t pos, Value value) { \
+        clist_##X##_node_t* node = pos.ref ? _clist_node(X, pos.ref) : NULL; \
         _c_clist_insert_after(self, X, node, value); \
-        pos.ref = &entry->value; \
-        if (!self->last || !pos._prev) { \
-            pos._prev = self->last ? self->last : entry; \
-            self->last = entry; \
-        } \
-        return pos; \
-    } \
-\
-    STC_DEF clist_##X##_iter_t \
-    clist_##X##_erase_at(clist_##X* self, clist_##X##_iter_t pos) { \
-        clist_##X##_node_t* node = pos._prev; clist_##X##_next(&pos); \
-        return _clist_##X##_erase_after(self, node) ? pos : clist_##X##_end(self); \
+        if (!node || node == self->last && pos._state == 0) self->last = entry; \
+        pos.ref = &entry->value, pos._state = 0; return pos; \
     } \
     STC_DEF clist_##X##_iter_t \
-    clist_##X##_erase_range(clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t finish) { \
-        clist_##X##_node_t* node = first._prev, *done = finish.ref ? _clist_node(X, finish.ref) : NULL; \
+    clist_##X##_erase_after(clist_##X* self, clist_##X##_iter_t pos) { \
+        _clist_##X##_erase_after(self, _clist_node(X, pos.ref)); \
+        clist_##X##_next(&pos); return pos; \
+    } \
+    STC_DEF clist_##X##_iter_t \
+    clist_##X##_erase_range_after(clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t finish) { \
+        clist_##X##_node_t* node = _clist_node(X, first.ref), *done = finish.ref ? _clist_node(X, finish.ref) : NULL; \
         while (node && node->next != done) \
             node = _clist_##X##_erase_after(self, node); \
-        return node ? finish : clist_##X##_end(self); \
+        clist_##X##_next(&first); return first; \
     } \
 \
     STC_DEF clist_##X##_iter_t \
-    clist_##X##_find_in_range(const clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t finish, RawValue val) { \
-        c_foreach_4 (i, clist_##X, first, finish) { \
+    clist_##X##_find_before_in_range(const clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t finish, RawValue val) { \
+        clist_##X##_iter_t i = first; \
+        for (clist_##X##_next(&i); i.ref != finish.ref; clist_##X##_next(&i)) { \
             RawValue r = valueToRaw(i.ref); \
-            if (valueCompareRaw(&r, &val) == 0) return i; \
+            if (valueCompareRaw(&r, &val) == 0) return first; \
+            first = i; \
         } \
         return clist_##X##_end(self); \
+    } \
+    STC_DEF clist_##X##_iter_t \
+    clist_##X##_find_before(const clist_##X* self, RawValue val) { \
+        clist_##X##_iter_t it = clist_##X##_find_before_in_range(self, clist_##X##_before_begin(self), clist_##X##_end(self), val); \
+        return it; \
+    } \
+    STC_DEF clist_##X##_iter_t \
+    clist_##X##_find(const clist_##X* self, RawValue val) { \
+        clist_##X##_iter_t it = clist_##X##_find_before_in_range(self, clist_##X##_before_begin(self), clist_##X##_end(self), val); \
+        if (it.ref != clist_##X##_end(self).ref) clist_##X##_next(&it); \
+        return it; \
     } \
 \
     STC_DEF clist_##X##_node_t* \
@@ -287,28 +305,28 @@ STC_API size_t _clist_size(const clist_void* self);
         return n; \
     } \
 \
-    STC_DEF void \
-    clist_##X##_splice(clist_##X* self, clist_##X##_iter_t pos, clist_##X* other) { \
-        if (!self->last) \
+    STC_DEF clist_##X##_iter_t \
+    clist_##X##_splice_after(clist_##X* self, clist_##X##_iter_t pos, clist_##X* other) { \
+        clist_##X##_iter_t it = clist_##X##_last(other); \
+        if (!pos.ref) \
             self->last = other->last; \
         else if (other->last) { \
-            clist_##X##_node_t *p = pos._prev ? pos._prev : self->last, *next = p->next; \
-            p->next = other->last->next; \
+            clist_##X##_node_t *node = _clist_node(X, pos.ref), *next = node->next; \
+            node->next = other->last->next; \
             other->last->next = next; \
-            if (!pos._prev) self->last = other->last; \
+            if (node == self->last && pos._state == 0) self->last = other->last; \
         } \
         other->last = NULL; \
+        it._last = &self->last; return it; \
     } \
 \
     STC_DEF clist_##X \
     clist_##X##_splice_out(clist_##X* self, clist_##X##_iter_t pos1, clist_##X##_iter_t pos2) { \
-        clist_##X##_node_t *p1 = pos1._prev, *next1 = _clist_node(X, pos1.ref), \
-                           *p2 = pos2._prev ? pos2._prev : self->last; \
-        clist_##X list = {p2}; \
-        if (!(p1 && p2)) return list; \
-        p1->next = p2->next, p2->next = next1; \
-        if (self->last == p2) self->last = p1; \
-        return list; \
+        clist_##X##_node_t *node1 = _clist_node(X, pos1.ref), *next1 = node1->next, \
+                           *node2 = _clist_node(X, pos2.ref); \
+        node1->next = node2->next, node2->next = next1; \
+        if (self->last == node2) self->last = node1; \
+        clist_##X list = {node2}; return list; \
     } \
 \
     STC_INLINE int \
