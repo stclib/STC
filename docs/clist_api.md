@@ -9,15 +9,15 @@ Unlike the c++ class *std::forward_list*, **clist** has an API similar to *std::
 occupies only one pointer in memory, and like *std::forward_list* the length of the list is not stored.
 The method *clist_X_size()* is available, however computed in **O**(*n*) time.
 
-Iterator invalidation: Adding, removing and moving the elements within the list, or across several lists
+***Iterator invalidation***: Adding, removing and moving the elements within the list, or across several lists
 will invalidate other iterators currently refering to these elements and their immediate succesive elements.
 However, an iterator to a succesive element can both be dereferenced and advanced. After advancing (using 
-*clist_X_next(&it)* or *it = cslist_X_fwd(it, n)*), the iterator is in a fully valid state. This implies:
+*clist_X_next(&it)* or *it = cslist_X_fwd(it, n)*), the iterator is in a valid state. This implies:
 
-- `clist_X_insert(&L, clist_X_fwd(it,1))`, is valid only unless `*it.ref` was removed.
-- `clist_X_erase_at(&L, clist_X_fwd(it,1))` is valid only unless `*it.ref`was removed or `clist_X_fwd(it,1)` is `end`.
-- Iterators returned from *clist_X_insert()* and *clist_X_erase_at()* are either valid or `end`.
-- Multiple elements can be safely removed from a list via multiple iterators if done in back to front order.
+- `clist_X_insert(&L, clist_X_fwd(it,1))` is valid, unless `*it.ref` was removed.
+- `clist_X_erase_at(&L, clist_X_fwd(it,1))` is valid, unless `*it.ref`was removed or `clist_X_fwd(it,1)` is `end`.
+- Iterators returned from *clist_X_insert()* and *clist_X_erase_at()* are always valid or `end`.
+- Elements can be safely removed from a list via multiple iterators if done in back to front order.
 
 See the c++ class [std::forward_list](https://en.cppreference.com/w/cpp/container/forward_list) for a functional description.
 
@@ -74,7 +74,7 @@ size_t              clist_X_remove(clist_X* self, RawValue raw);                
 void                clist_X_splice(clist_X* self, clist_X_iter_t it, clist_X* other);
 void                clist_X_splice_range(clist_X* self, clist_X_iter_t it,
                                          clist_X* other, clist_X_iter_t it1, clist_X_iter_t it2);
-                    // non-std: splice [it1, it2) out of self, returned as clist 
+                    // non-std: splice out [it1, it2) of self, returned as a clist 
 clist_X             clist_X_splice_out(clist_X* self, clist_X_iter_t it1, clist_X_iter_t it2);
 
 clist_X_iter_t      clist_X_find(const clist_X* self, RawValue raw);
