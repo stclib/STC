@@ -7,15 +7,15 @@ Fast random access is not supported.
 Unlike the c++ class *std::forward_list*, **clist** has an API similar to *std::list*, and also supports
 *push_back()* (**O**(1) time). It is still implemented as a singly-linked list. A **clist** object
 occupies only one pointer in memory, and like *std::forward_list* the length of the list is not stored.
-The method *clist_X_size()* is available, however computed in **O**(*n*) time.
+The method *clist_X_distance()* returns size of list, computed in **O**(*n*) time.
 
 ***Iterator invalidation***: Adding, removing and moving the elements within the list, or across several lists
 will invalidate other iterators currently refering to these elements and their immediate succesive elements.
 However, an iterator to a succesive element can both be dereferenced and advanced. After advancing (using 
 *clist_X_next(&it)* or *it = cslist_X_fwd(it, n)*), the iterator is in a valid state. This implies:
 
-- `clist_X_insert(&L, clist_X_fwd(it,1))` is valid, unless `*it.ref` was removed.
-- `clist_X_erase_at(&L, clist_X_fwd(it,1))` is valid, unless `*it.ref`was removed or `clist_X_fwd(it,1)` is `end`.
+- `clist_X_insert(&L, clist_X_fwd(it,1))` (insert_after) is well formed if element at `it` exists.
+- `clist_X_erase_at(&L, clist_X_fwd(it,1))` (erase_after) is well formed if element at `it` exists and is not last in list.
 - Iterators returned from *clist_X_insert()* and *clist_X_erase_at()* are always valid or `end`.
 - Elements can be safely removed from a list via multiple iterators if done in back to front order.
 
@@ -50,7 +50,7 @@ void                clist_X_clear(clist_X* self);
 void                clist_X_del(clist_X* self);                                     // destructor
 
 bool                clist_X_empty(clist_X list);
-size_t              clist_X_size(clist_X list);                                     // note: O(n)
+size_t              clist_X_distance(clist_X list);                                 // size() in O(n)
 
 clist_X_value_t*    clist_X_front(const clist_X* self);
 clist_X_value_t*    clist_X_back(const clist_X* self);
@@ -87,7 +87,7 @@ clist_X_iter_t      clist_X_begin(const clist_X* self);
 clist_X_iter_t      clist_X_end(const clist_X* self);
 void                clist_X_next(clist_X_iter_t* it);
 
-                    // non-std: return iterator advanced n elements forward:
+                    // non-std: iterator advanced n elements forward. returns end if `it` == end.
 clist_X_iter_t      clist_X_fwd(clist_X_iter it, size_t n);
 clist_X_value_t     clist_X_value_clone(clist_X_value_t val);
 ```
