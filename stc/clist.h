@@ -230,22 +230,23 @@ STC_API size_t _clist_size(const clist_void* self);
 \
     STC_DEF clist_##X##_iter_t \
     clist_##X##_insert(clist_##X* self, clist_##X##_iter_t pos, Value value) { \
-        clist_##X##_node_t* node = pos._prev ? pos._prev : self->last; \
+        clist_##X##_node_t* node = pos.ref ? pos._prev : self->last; \
         _c_clist_insert_after(self, X, node, value); \
-        pos.ref = &entry->value; \
-        if (!self->last || !pos._prev) { \
+        if (!self->last || !pos.ref) { \
             pos._prev = self->last ? self->last : entry; \
             self->last = entry; \
         } \
+        pos.ref = &entry->value; \
         return pos; \
     } \
 \
     STC_DEF clist_##X##_iter_t \
     clist_##X##_erase_at(clist_##X* self, clist_##X##_iter_t pos) { \
-        clist_##X##_node_t* node = pos._prev; \
-        if (pos.ref == self->last) pos.ref = pos._prev = NULL; \
-        else pos.ref = &_clist_node(X, pos.ref)->next->value; \
-        _clist_##X##_erase_after(self, node); return pos; \
+        clist_##X##_node_t *node = _clist_node(X, pos.ref); \
+        if (node == self->last) pos.ref = NULL; \
+        else pos.ref = &node->next->value; \
+        _clist_##X##_erase_after(self, pos._prev); \
+        return pos; \
     } \
     STC_DEF clist_##X##_iter_t \
     clist_##X##_erase_range(clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t finish) { \
