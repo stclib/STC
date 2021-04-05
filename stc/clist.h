@@ -168,12 +168,12 @@ STC_API size_t _clist_size(const clist_void* self);
     STC_API void \
     clist_##X##_splice(clist_##X* self, clist_##X##_iter_t pos, clist_##X* other); \
     STC_API clist_##X \
-    clist_##X##_splice_out(clist_##X* self, clist_##X##_iter_t pos1, clist_##X##_iter_t pos2); \
+    clist_##X##_split(clist_##X* self, clist_##X##_iter_t pos1, clist_##X##_iter_t pos2); \
 \
     STC_INLINE void \
     clist_##X##_splice_range(clist_##X* self, clist_##X##_iter_t pos, \
                              clist_##X* other, clist_##X##_iter_t pos1, clist_##X##_iter_t pos2) { \
-        clist_##X tmp = clist_##X##_splice_out(other, pos1, pos2); \
+        clist_##X tmp = clist_##X##_split(other, pos1, pos2); \
         clist_##X##_splice(self, pos, &tmp); \
     } \
 \
@@ -304,13 +304,15 @@ STC_API size_t _clist_size(const clist_void* self);
     } \
 \
     STC_DEF clist_##X \
-    clist_##X##_splice_out(clist_##X* self, clist_##X##_iter_t pos1, clist_##X##_iter_t pos2) { \
-        clist_##X##_node_t *p1 = pos1._prev, *next1 = _clist_node(X, pos1.ref), \
-                           *p2 = pos2._prev ? pos2._prev : self->last; \
-        clist_##X list = {p2}; \
-        if (!(p1 && p2)) return list; \
-        p1->next = p2->next, p2->next = next1; \
-        if (self->last == p2) self->last = p1; \
+    clist_##X##_split(clist_##X* self, clist_##X##_iter_t pos1, clist_##X##_iter_t pos2) { \
+        clist_##X##_node_t *p1 = pos1.ref ? pos1._prev : NULL, \
+                           *p2 = pos2.ref ? pos2._prev : self->last; \
+        clist_##X list = {NULL}; \
+        if (p1 && p2) { \
+            p1->next = p2->next, p2->next = _clist_node(X, pos1.ref); \
+            if (self->last == p2) self->last = pos2.ref ? p1 : NULL; \
+            list.last = p2; \
+        } \
         return list; \
     } \
 \

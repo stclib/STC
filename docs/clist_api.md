@@ -74,8 +74,8 @@ size_t              clist_X_remove(clist_X* self, RawValue raw);                
 void                clist_X_splice(clist_X* self, clist_X_iter_t it, clist_X* other);
 void                clist_X_splice_range(clist_X* self, clist_X_iter_t it,
                                          clist_X* other, clist_X_iter_t it1, clist_X_iter_t it2);
-                    // non-std: splice out [it1, it2) of self, returned as a clist 
-clist_X             clist_X_splice_out(clist_X* self, clist_X_iter_t it1, clist_X_iter_t it2);
+                    // non-std: split out [it1, it2) from self, returned as a clist
+clist_X             clist_X_split(clist_X* self, clist_X_iter_t it1, clist_X_iter_t it2);
 
 clist_X_iter_t      clist_X_find(const clist_X* self, RawValue raw);
 clist_X_iter_t      clist_X_find_in_range(const clist_X* self,
