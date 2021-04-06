@@ -250,7 +250,8 @@ STC_API size_t _clist_size(const clist_void* self);
     } \
     STC_DEF clist_##X##_iter_t \
     clist_##X##_erase_range(clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t finish) { \
-        clist_##X##_node_t* node = first._prev, *done = finish.ref ? _clist_node(X, finish.ref) : NULL; \
+        clist_##X##_node_t *node = first.ref ? first._prev : NULL, \
+                           *done = finish.ref ? _clist_node(X, finish.ref) : NULL; \
         while (node && node->next != done) \
             node = _clist_##X##_erase_after(self, node); \
         return finish; \
@@ -295,10 +296,10 @@ STC_API size_t _clist_size(const clist_void* self);
         if (!self->last) \
             self->last = other->last; \
         else if (other->last) { \
-            clist_##X##_node_t *p = pos._prev ? pos._prev : self->last, *next = p->next; \
+            clist_##X##_node_t *p = pos.ref ? pos._prev : self->last, *next = p->next; \
             p->next = other->last->next; \
             other->last->next = next; \
-            if (!pos._prev) self->last = other->last; \
+            if (!pos.ref) self->last = other->last; \
         } \
         other->last = NULL; \
     } \
