@@ -305,14 +305,13 @@ STC_API size_t _clist_size(const clist_void* self);
 \
     STC_DEF clist_##X \
     clist_##X##_split(clist_##X* self, clist_##X##_iter_t pos1, clist_##X##_iter_t pos2) { \
-        clist_##X##_node_t *p1 = pos1.ref ? pos1._prev : NULL, \
-                           *p2 = pos2.ref ? pos2._prev : self->last; \
         clist_##X list = {NULL}; \
-        if (p1 && p2) { \
-            p1->next = p2->next, p2->next = _clist_node(X, pos1.ref); \
-            if (self->last == p2) self->last = pos2.ref ? p1 : NULL; \
-            list.last = p2; \
-        } \
+        if (pos1.ref == pos2.ref) return list; \
+        clist_##X##_node_t *p1 = pos1._prev, \
+                           *p2 = pos2.ref ? pos2._prev : self->last; \
+        p1->next = p2->next, p2->next = _clist_node(X, pos1.ref); \
+        if (self->last == p2) self->last = (p1 == p2) ? NULL : p1; \
+        list.last = p2; \
         return list; \
     } \
 \
