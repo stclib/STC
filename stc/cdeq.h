@@ -56,32 +56,42 @@ typedef int (*c_cmp_fn)(const void*, const void*);
 #define _c_using_cdeq(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
     typedefs_cdeq(CX, Value, RawValue); \
 \
-    STC_API CX \
-    CX##_init(void); \
-    STC_INLINE bool \
-    CX##_empty(CX deq) {return !cdeq_rep_(&deq)->size;} \
-    STC_INLINE size_t \
-    CX##_size(CX deq) {return cdeq_rep_(&deq)->size;} \
-    STC_INLINE size_t \
-    CX##_capacity(CX deq) {return cdeq_rep_(&deq)->cap;} \
-    STC_INLINE Value \
-    CX##_value_fromraw(RawValue raw) {return valueFromRaw(raw);} \
-    STC_INLINE Value \
-    CX##_value_clone(Value val) {return valueFromRaw(valueToRaw(&val));} \
-    STC_API void \
-    CX##_clear(CX* self); \
-    STC_API void \
-    CX##_del(CX* self); \
-    STC_API void \
-    CX##_expand_(CX* self, size_t n, bool at_front); \
-    STC_API void \
-    CX##_resize(CX* self, size_t size, Value fill_val); \
-    STC_INLINE void \
-    CX##_reserve(CX* self, size_t n) { \
-        CX##_expand_(self, (n - cdeq_rep_(self)->size)*0.65, false); \
-    } \
-    STC_INLINE void \
-    CX##_swap(CX* a, CX* b) {c_swap(CX, *a, *b);} \
+    STC_API CX          CX##_init(void); \
+    STC_API CX          CX##_clone(CX deq); \
+    STC_INLINE bool     CX##_empty(CX deq) {return !cdeq_rep_(&deq)->size;} \
+    STC_INLINE size_t   CX##_size(CX deq) {return cdeq_rep_(&deq)->size;} \
+    STC_INLINE size_t   CX##_capacity(CX deq) {return cdeq_rep_(&deq)->cap;} \
+    STC_INLINE Value    CX##_value_fromraw(RawValue raw) \
+                            {return valueFromRaw(raw);} \
+    STC_INLINE Value    CX##_value_clone(Value val) \
+                            {return valueFromRaw(valueToRaw(&val));} \
+    STC_API void        CX##_clear(CX* self); \
+    STC_API void        CX##_del(CX* self); \
+    STC_API void        CX##_expand_(CX* self, size_t n, bool at_front); \
+    STC_API void        CX##_resize(CX* self, size_t size, Value fill_val); \
+    STC_INLINE void     CX##_reserve(CX* self, size_t n) \
+                            {CX##_expand_(self, (n - cdeq_rep_(self)->size)*0.65, false);} \
+    STC_INLINE void     CX##_swap(CX* a, CX* b) {c_swap(CX, *a, *b);} \
+\
+    STC_API void        CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t n); \
+    STC_API void        CX##_push_back(CX* self, Value value); \
+    STC_API void        CX##_push_front(CX* self, Value value); \
+    STC_INLINE void     CX##_emplace_back(CX* self, RawValue raw) \
+                            {CX##_push_back(self, valueFromRaw(raw));} \
+    STC_INLINE void     CX##_emplace_front(CX* self, RawValue raw) \
+                            {CX##_push_front(self, valueFromRaw(raw));} \
+    STC_INLINE void     CX##_pop_back(CX* self) \
+                            {valueDel(&self->data[--cdeq_rep_(self)->size]);} \
+    STC_INLINE void     CX##_pop_front(CX* self) \
+                            {valueDel(self->data++); --cdeq_rep_(self)->size;} \
+    STC_INLINE \
+    CX##_value_t*       CX##_front(const CX* self) {return self->data;} \
+    STC_INLINE \
+    CX##_value_t*       CX##_back(const CX* self) \
+                            {return self->data + cdeq_rep_(self)->size - 1;} \
+    STC_INLINE \
+    CX##_value_t*       CX##_at(const CX* self, size_t i) \
+                            {assert(i < cdeq_rep_(self)->size); return self->data + i;} \
 \
     STC_INLINE CX \
     CX##_with_size(size_t size, Value null_val) { \
@@ -95,38 +105,11 @@ typedef int (*c_cmp_fn)(const void*, const void*);
         CX##_expand_(&x, size, false); \
         return x; \
     } \
-    STC_API CX \
-    CX##_clone(CX deq); \
 \
     STC_INLINE void \
     CX##_shrink_to_fit(CX *self) { \
         CX x = CX##_clone(*self); \
         CX##_del(self); *self = x; \
-    } \
-\
-    STC_API void \
-    CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t n); \
-    STC_API void \
-    CX##_push_back(CX* self, Value value); \
-    STC_INLINE void \
-    CX##_emplace_back(CX* self, RawValue raw) { \
-        CX##_push_back(self, valueFromRaw(raw)); \
-    } \
-    STC_INLINE void \
-    CX##_pop_back(CX* self) { \
-        valueDel(&self->data[--cdeq_rep_(self)->size]); \
-    } \
-\
-    STC_API void \
-    CX##_push_front(CX* self, Value value); \
-    STC_INLINE void \
-    CX##_emplace_front(CX* self, RawValue raw) { \
-        CX##_push_front(self, valueFromRaw(raw)); \
-    } \
-    STC_INLINE void \
-    CX##_pop_front(CX* self) { \
-        valueDel(self->data++); \
-        --cdeq_rep_(self)->size; \
     } \
 \
     STC_API CX##_iter_t \
@@ -167,16 +150,6 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     STC_INLINE CX##_iter_t \
     CX##_erase(CX* self, size_t idx, size_t n) { \
         return CX##_erase_range_p(self, self->data + idx, self->data + idx + n); \
-    } \
-\
-    STC_INLINE CX##_value_t* \
-    CX##_front(const CX* self) {return self->data;} \
-    STC_INLINE CX##_value_t* \
-    CX##_back(const CX* self) {return self->data + cdeq_rep_(self)->size - 1;} \
-    STC_INLINE CX##_value_t* \
-    CX##_at(const CX* self, size_t i) { \
-        assert(i < cdeq_rep_(self)->size); \
-        return self->data + i; \
     } \
 \
     STC_INLINE CX##_iter_t \
