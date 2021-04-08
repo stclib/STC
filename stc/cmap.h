@@ -148,14 +148,14 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
     typedef RawMapped C##X##_rawmapped_t; \
     typedef CMAP_SIZE_T C##X##_size_t; \
 \
-    typedef SET_ONLY_##C( C##X##_key_t ) \
-            MAP_ONLY_##C( struct {C##X##_key_t first; \
-                                  C##X##_mapped_t second;} ) \
+    typedef SET_ONLY_##C( Key ) \
+            MAP_ONLY_##C( struct {Key first; \
+                                  Mapped second;} ) \
     C##X##_value_t; \
 \
-    typedef SET_ONLY_##C( C##X##_rawkey_t ) \
-            MAP_ONLY_##C( struct {C##X##_rawkey_t first; \
-                                  C##X##_rawmapped_t second;} ) \
+    typedef SET_ONLY_##C( RawKey ) \
+            MAP_ONLY_##C( struct {RawKey first; \
+                                  RawMapped second;} ) \
     C##X##_rawvalue_t; \
 \
     typedef struct { \
@@ -360,13 +360,13 @@ STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) {uint64_t l,h; c_um
 \
     STC_DEF chash_bucket_t \
     C##X##_bucket_(const C##X* self, const C##X##_rawkey_t* rkeyptr) { \
-        const uint64_t hash = keyHashRaw(rkeyptr, sizeof(C##X##_rawkey_t)); \
+        const uint64_t hash = keyHashRaw(rkeyptr, sizeof(RawKey)); \
         uint_fast8_t sx; size_t cap = self->bucket_count; \
         chash_bucket_t b = {_c_SELECT(fastrange,CMAP_SIZE_T)(hash, cap), (uint_fast8_t)(hash | 0x80)}; \
         const uint8_t* hashx = self->_hashx; \
         while ((sx = hashx[b.idx])) { \
             if (sx == b.hx) { \
-                C##X##_rawkey_t r = keyToRaw(KEY_REF_##C(self->table + b.idx)); \
+                RawKey r = keyToRaw(KEY_REF_##C(self->table + b.idx)); \
                 if (keyEqualsRaw(&r, rkeyptr)) break; \
             } \
             if (++b.idx == cap) b.idx = 0; \

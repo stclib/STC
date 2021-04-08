@@ -146,9 +146,9 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
                                   C##X##_mapped_t second;} ) \
     C##X##_value_t; \
 \
-    typedef SET_ONLY_##C( C##X##_rawkey_t ) \
-            MAP_ONLY_##C( struct {C##X##_rawkey_t first; \
-                                  C##X##_rawmapped_t second;} ) \
+    typedef SET_ONLY_##C( RawKey ) \
+            MAP_ONLY_##C( struct {RawKey first; \
+                                  RawMapped second;} ) \
     C##X##_rawvalue_t; \
 \
     typedef struct { \
@@ -366,12 +366,12 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
     } \
 \
     STC_DEF C##X##_value_t* \
-    C##X##_find_it(const C##X* self, C##X##_rawkey_t rkey, C##X##_iter_t* out) { \
+    C##X##_find_it(const C##X* self, RawKey rkey, C##X##_iter_t* out) { \
         C##X##_size_t tn = _csmap_rep(self)->root; \
         C##X##_node_t *d = out->_d = self->nodes; \
         out->_top = 0; \
         while (tn) { \
-            int c; C##X##_rawkey_t rx = keyToRaw(KEY_REF_##C(&d[tn].value)); \
+            int c; RawKey rx = keyToRaw(KEY_REF_##C(&d[tn].value)); \
             if ((c = keyCompareRaw(&rx, &rkey)) < 0) \
                 tn = d[tn].link[1]; \
             else if (c > 0) \
@@ -438,7 +438,7 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
         int c, top = 0, dir = 0; \
         while (it) { \
             up[top++] = it; \
-            C##X##_rawkey_t raw = keyToRaw(KEY_REF_##C(&d[it].value)); \
+            RawKey raw = keyToRaw(KEY_REF_##C(&d[it].value)); \
             if ((c = keyCompareRaw(&raw, rkey)) == 0) {res->ref = &d[it].value; return tn;} \
             dir = (c == -1); \
             it = d[it].link[dir]; \
@@ -468,7 +468,7 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
     static C##X##_size_t \
     C##X##_erase_r_(C##X##_node_t *d, C##X##_size_t tn, const C##X##_rawkey_t* rkey, int *erased) { \
         if (tn == 0) return 0; \
-        C##X##_rawkey_t raw = keyToRaw(KEY_REF_##C(&d[tn].value)); \
+        RawKey raw = keyToRaw(KEY_REF_##C(&d[tn].value)); \
         C##X##_size_t tx; int c = keyCompareRaw(&raw, rkey); \
         if (c != 0) \
             d[tn].link[c == -1] = C##X##_erase_r_(d, d[tn].link[c == -1], rkey, erased); \
@@ -513,8 +513,8 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
 \
     STC_DEF C##X##_iter_t \
     C##X##_erase_at(C##X* self, C##X##_iter_t pos) { \
-        C##X##_rawkey_t raw = keyToRaw(KEY_REF_##C(pos.ref)); C##X##_next(&pos); \
-        C##X##_rawkey_t nxt = keyToRaw(KEY_REF_##C(pos.ref)); \
+        RawKey raw = keyToRaw(KEY_REF_##C(pos.ref)); C##X##_next(&pos); \
+        RawKey nxt = keyToRaw(KEY_REF_##C(pos.ref)); \
         C##X##_erase(self, raw); \
         C##X##_find_it(self, nxt, &pos); \
         return pos; \
