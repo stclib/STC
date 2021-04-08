@@ -80,7 +80,7 @@
     STC_API void            CX##_push(CX* self, CX##_value_t value); \
     STC_INLINE void         CX##_emplace(CX* self, CX##_rawvalue_t raw) \
                                 {CX##_push(self, ctype##_value_fromraw(raw));} \
-    STC_API void            CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t size); \
+    STC_API void            CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t n); \
 \
     _c_implement_cpque(CX, ctype, valueCompare)
 
@@ -129,9 +129,11 @@
             arr[c] = arr[c >> 1]; \
         if (c != n) arr[c] = value; \
     } \
+\
     STC_API void \
-    CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t size) { \
-        for (size_t i=0; i<size; ++i) CX##_push(self, arr[i]); \
+    CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t n) { \
+        for (size_t i = 0; i < n; ++i) \
+            CX##_push(self, ctype##_value_fromraw(arr[i])); \
     } \
     typedef CX CX##_t
 
