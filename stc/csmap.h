@@ -72,24 +72,26 @@ int main(void) {
                     mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
                     keyDel, keyFromRaw, keyToRaw, RawKey)
 
+
 #define using_csmap_keydef(...) c_MACRO_OVERLOAD(using_csmap_keydef, __VA_ARGS__)
+
 #define using_csmap_keydef_6(X, Key, Mapped, keyCompare, keyDel, keyClone) \
     using_csmap_keydef_8(X, Key, Mapped, keyCompare, \
                             keyDel, keyClone, c_trivial_toraw, Key)
+
 #define using_csmap_keydef_8(X, Key, Mapped, keyCompareRaw, \
                                 keyDel, keyFromRaw, keyToRaw, RawKey) \
     _c_using_aatree(csmap_##X, csmap_, Key, Mapped, keyCompareRaw, \
                     c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Mapped, \
                     keyDel, keyFromRaw, keyToRaw, RawKey)
 
-/* csmap_str, csmap_strkey, csmap_strval: */
 #define using_csmap_str() \
     _c_using_aatree(csmap_str, csmap_, cstr_t, cstr_t, cstr_compare_raw, \
                     cstr_del, cstr_from, cstr_c_str, const char*, \
                     cstr_del, cstr_from, cstr_c_str, const char*)
 
-#define using_csmap_strkey(...) \
-    c_MACRO_OVERLOAD(using_csmap_strkey, __VA_ARGS__)
+
+#define using_csmap_strkey(...) c_MACRO_OVERLOAD(using_csmap_strkey, __VA_ARGS__)
 
 #define using_csmap_strkey_2(X, Mapped) \
     using_csmap_strkey_4(X, Mapped, c_trivial_del, c_trivial_fromraw)
@@ -105,8 +107,8 @@ int main(void) {
                     mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
                     cstr_del, cstr_from, cstr_c_str, const char*)
 
-#define using_csmap_strval(...) \
-    c_MACRO_OVERLOAD(using_csmap_strval, __VA_ARGS__)
+
+#define using_csmap_strval(...) c_MACRO_OVERLOAD(using_csmap_strval, __VA_ARGS__)
 
 #define using_csmap_strval_2(X, Key) \
     using_csmap_strval_3(X, Key, c_default_compare)
@@ -128,9 +130,9 @@ int main(void) {
 #ifndef CSMAP_SIZE_T
 #define CSMAP_SIZE_T uint32_t
 #endif
-
 struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
 #define _csmap_rep(self) c_container_of((self)->nodes, struct csmap_rep, nodes)
+
 
 #define _c_using_aatree(CX, C, Key, Mapped, keyCompareRaw, \
                         mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \

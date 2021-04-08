@@ -59,47 +59,47 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
     using_cmap_5(X, Key, Mapped, c_default_equals, c_default_hash)
 #define using_cmap_5(X, Key, Mapped, keyEquals, keyHash) \
     using_cmap_7(X, Key, Mapped, keyEquals, keyHash, \
-                    c_trivial_del, c_trivial_fromraw)
+                 c_trivial_del, c_trivial_fromraw)
 #define using_cmap_6(X, Key, Mapped, keyEquals, keyHash, mappedDel) \
     using_cmap_7(X, Key, Mapped, keyEquals, keyHash, \
-                    mappedDel, c_no_clone)
+                 mappedDel, c_no_clone)
 #define using_cmap_7(X, Key, Mapped, keyEquals, keyHash, mappedDel, mappedClone) \
     using_cmap_9(X, Key, Mapped, keyEquals, keyHash, \
-                    mappedDel, mappedClone, c_trivial_toraw, Mapped)
+                 mappedDel, mappedClone, c_trivial_toraw, Mapped)
 
 #define using_cmap_9(X, Key, Mapped, keyEquals, keyHash, \
-                        mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
+                     mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
     _c_using_chash(cmap_##X, cmap_, Key, Mapped, keyEquals, keyHash, \
                    mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
                    c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Key)
 
 #define using_cmap_13(X, Key, Mapped, keyEqualsRaw, keyHashRaw, \
-                         mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
-                         keyDel, keyFromRaw, keyToRaw, RawKey) \
+                      mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
+                      keyDel, keyFromRaw, keyToRaw, RawKey) \
     _c_using_chash(cmap_##X, cmap_, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                    mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
                    keyDel, keyFromRaw, keyToRaw, RawKey)
+
 
 #define using_cmap_keydef(...) c_MACRO_OVERLOAD(using_cmap_keydef, __VA_ARGS__)
 
 #define using_cmap_keydef_7(X, Key, Mapped, keyEquals, keyHash, keyDel, keyClone) \
     using_cmap_keydef_9(X, Key, Mapped, keyEquals, keyHash, \
-                           keyDel, keyClone, c_trivial_toraw, Key)
+                        keyDel, keyClone, c_trivial_toraw, Key)
 
 #define using_cmap_keydef_9(X, Key, Mapped, keyEqualsRaw, keyHashRaw, \
-                               keyDel, keyFromRaw, keyToRaw, RawKey) \
+                            keyDel, keyFromRaw, keyToRaw, RawKey) \
     _c_using_chash(cmap_##X, cmap_, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                    c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Mapped, \
                    keyDel, keyFromRaw, keyToRaw, RawKey)
 
-/* cmap_str, cmap_strkey, cmap_strval: */
 #define using_cmap_str() \
     _c_using_chash(cmap_str, cmap_, cstr_t, cstr_t, cstr_equals_raw, cstr_hash_raw, \
                    cstr_del, cstr_from, cstr_c_str, const char*, \
                    cstr_del, cstr_from, cstr_c_str, const char*)
 
-#define using_cmap_strkey(...) \
-    c_MACRO_OVERLOAD(using_cmap_strkey, __VA_ARGS__)
+
+#define using_cmap_strkey(...) c_MACRO_OVERLOAD(using_cmap_strkey, __VA_ARGS__)
 
 #define using_cmap_strkey_2(X, Mapped) \
     using_cmap_strkey_4(X, Mapped, c_trivial_del, c_trivial_fromraw)
@@ -115,8 +115,8 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
                    mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
                    cstr_del, cstr_from, cstr_c_str, const char*)
 
-#define using_cmap_strval(...) \
-    c_MACRO_OVERLOAD(using_cmap_strval, __VA_ARGS__)
+
+#define using_cmap_strval(...) c_MACRO_OVERLOAD(using_cmap_strval, __VA_ARGS__)
 
 #define using_cmap_strval_2(X, Key) \
     using_cmap_strval_4(X, Key, c_default_equals, c_default_hash)
@@ -138,6 +138,7 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
 #ifndef CMAP_SIZE_T
 #define CMAP_SIZE_T uint32_t
 #endif
+
 
 #define _c_using_chash(CX, C, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                        mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \

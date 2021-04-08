@@ -65,10 +65,10 @@ void                clist_X_push_back(clist_X* self, Value value);
 void                clist_X_emplace_back(clist_X* self, RawValue raw);
 void                clist_X_emplace_n(clist_X *self, const clist_X_rawvalue_t arr[], size_t size);
 
-clist_X_iter_t      clist_X_insert(clist_X* self, clist_X_iter_t it, Value value);  // return iter to new elem; `it` may be end
+clist_X_iter_t      clist_X_insert(clist_X* self, clist_X_iter_t it, Value value);  // return iter to new elem; 'it' may be end
 clist_X_iter_t      clist_X_emplace(clist_X* self, clist_X_iter_t it, RawValue raw);
 
-clist_X_iter_t      clist_X_erase_at(clist_X* self, clist_X_iter_t it);             // return iter before it
+clist_X_iter_t      clist_X_erase_at(clist_X* self, clist_X_iter_t it);             // return iter after it
 clist_X_iter_t      clist_X_erase_range(clist_X* self, clist_X_iter_t it1, clist_X_iter_t it2);
 size_t              clist_X_remove(clist_X* self, RawValue raw);                    // removes all elements equal to raw
 
