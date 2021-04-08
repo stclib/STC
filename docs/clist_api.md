@@ -1,4 +1,4 @@
-# STC [clist](../stc/clist.h): Forward List
+# STC [clist](../stc/clist.h): Singly Linked List
 ![List](pics/list.jpg)
 
 The **clist** container supports fast insertion and removal of elements from anywhere in the container.
@@ -7,7 +7,7 @@ Fast random access is not supported.
 Unlike the c++ class *std::forward_list*, **clist** has an API similar to *std::list*, and also supports
 *push_back()* (**O**(1) time). It is still implemented as a singly-linked list. A **clist** object
 occupies only one pointer in memory, and like *std::forward_list* the length of the list is not stored.
-The method *clist_X_distance()* returns size of list, computed in **O**(*n*) time.
+The method *clist_X_count()* returns size of list, computed in **O**(*n*) time.
 
 ***Iterator invalidation***: Adding, removing and moving the elements within the list, or across several lists
 will invalidate other iterators currently refering to these elements and their immediate succesive elements.
@@ -19,7 +19,8 @@ However, an iterator to a succesive element can both be dereferenced and advance
 - Iterators returned from *clist_X_insert()* and *clist_X_erase_at()* are always valid or `end`.
 - Elements can be safely removed from a list via multiple iterators if done in back to front order.
 
-See the c++ class [std::forward_list](https://en.cppreference.com/w/cpp/container/forward_list) for a functional description.
+See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) for similar API and
+[std::forward_list](https://en.cppreference.com/w/cpp/container/forward_list) for a functional description.
 
 ## Header file and declaration
 
@@ -50,7 +51,7 @@ void                clist_X_clear(clist_X* self);
 void                clist_X_del(clist_X* self);                                     // destructor
 
 bool                clist_X_empty(clist_X list);
-size_t              clist_X_distance(clist_X list);                                 // size() in O(n)
+size_t              clist_X_count(clist_X list);                                    // size() in O(n)
 
 clist_X_value_t*    clist_X_front(const clist_X* self);
 clist_X_value_t*    clist_X_back(const clist_X* self);

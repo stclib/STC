@@ -99,7 +99,7 @@ STC_API size_t _clist_size(const clist_void* self);
     STC_INLINE bool \
     clist_##X##_empty(clist_##X lst) {return lst.last == NULL;} \
     STC_INLINE size_t \
-    clist_##X##_distance(clist_##X lst) {return _clist_size((const clist_void*) &lst);} \
+    clist_##X##_count(clist_##X lst) {return _clist_size((const clist_void*) &lst);} \
     STC_INLINE Value \
     clist_##X##_value_fromraw(RawValue raw) {return valueFromRaw(raw);} \
     STC_INLINE clist_##X##_value_t \
@@ -243,11 +243,11 @@ STC_API size_t _clist_size(const clist_void* self);
     STC_DEF clist_##X##_iter_t \
     clist_##X##_erase_at(clist_##X* self, clist_##X##_iter_t pos) { \
         clist_##X##_node_t *node = _clist_node(X, pos.ref); \
-        if (node == self->last) pos.ref = NULL; \
-        else pos.ref = &node->next->value; \
+        pos.ref = (node == self->last) ? NULL : &node->next->value; \
         _clist_##X##_erase_after(self, pos._prev); \
         return pos; \
     } \
+\
     STC_DEF clist_##X##_iter_t \
     clist_##X##_erase_range(clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t finish) { \
         clist_##X##_node_t *node = first.ref ? first._prev : NULL, \
