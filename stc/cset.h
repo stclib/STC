@@ -57,13 +57,13 @@ int main(void) {
     using_cset_8(X, Key, keyEquals, keyHash, keyDel, keyClone, c_trivial_toraw, Key)
 
 #define using_cset_8(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
-    _using_CHASH(X, cset_, Key, Key, keyEqualsRaw, keyHashRaw, \
-                    @@, @@, @@, void, \
-                    keyDel, keyFromRaw, keyToRaw, RawKey)
+    _c_using_chash(cset_##X, cset_, Key, Key, keyEqualsRaw, keyHashRaw, \
+                   @@, @@, @@, void, \
+                   keyDel, keyFromRaw, keyToRaw, RawKey)
 
 /* cset_str: */
 #define using_cset_str() \
-    _using_CHASH_strkey(str, cset_, cstr_t, @@, @@, @@, void)
+    _c_using_chash_strkey(str, cset_, cstr_t, @@, @@, @@, void)
 
 #define SET_ONLY_cset_(...) __VA_ARGS__
 #define MAP_ONLY_cset_(...)

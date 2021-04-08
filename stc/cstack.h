@@ -46,50 +46,37 @@
 #include "cvec.h"
 
 #define using_cstack(X, ctype) \
-    typedef ctype##_t cstack_##X; \
-    typedef ctype##_value_t cstack_##X##_value_t; \
-    typedef ctype##_rawvalue_t cstack_##X##_rawvalue_t; \
+    _c_using_cstack(cstack_##X, ctype)
+
+#define _c_using_cstack(CX, ctype) \
+    typedef ctype##_t CX; \
+    typedef ctype##_value_t CX##_value_t; \
+    typedef ctype##_rawvalue_t CX##_rawvalue_t; \
+    typedef ctype##_iter_t CX##_iter_t; \
 \
-    STC_INLINE cstack_##X \
-    cstack_##X##_init(void) {return ctype##_init();} \
-    STC_INLINE cstack_##X \
-    cstack_##X##_clone(cstack_##X st) {return ctype##_clone(st);} \
-    STC_INLINE cstack_##X##_value_t \
-    cstack_##X##_value_clone(cstack_##X##_value_t val) {return ctype##_value_clone(val);} \
-    STC_INLINE void \
-    cstack_##X##_clear(cstack_##X* self) {ctype##_clear(self);} \
-    STC_INLINE void \
-    cstack_##X##_del(cstack_##X* self) {ctype##_del(self);} \
-    STC_INLINE size_t \
-    cstack_##X##_size(cstack_##X st) {return ctype##_size(st);} \
-    STC_INLINE bool \
-    cstack_##X##_empty(cstack_##X st) {return ctype##_empty(st);} \
-    STC_INLINE cstack_##X##_value_t* \
-    cstack_##X##_top(const cstack_##X* self) {return ctype##_back(self);} \
-    STC_INLINE void \
-    cstack_##X##_pop(cstack_##X* self) {ctype##_pop_back(self);} \
-    STC_INLINE void \
-    cstack_##X##_push(cstack_##X* self, ctype##_value_t value) { \
-        ctype##_push_back(self, value); \
-    } \
-    STC_INLINE void \
-    cstack_##X##_emplace(cstack_##X* self, cstack_##X##_rawvalue_t raw) { \
-        ctype##_emplace_back(self, raw); \
-    } \
-    STC_INLINE void \
-    cstack_##X##_emplace_n(cstack_##X *self, const cstack_##X##_rawvalue_t arr[], size_t size) { \
-        ctype##_emplace_n(self, arr, size); \
-    } \
-    typedef ctype##_iter_t cstack_##X##_iter_t; \
-    STC_INLINE cstack_##X##_iter_t \
-    cstack_##X##_begin(const cstack_##X* self) {return ctype##_begin(self);} \
-    STC_INLINE cstack_##X##_iter_t \
-    cstack_##X##_end(const cstack_##X* self) {return ctype##_end(self);} \
-    STC_INLINE void \
-    cstack_##X##_next(cstack_##X##_iter_t* it) {ctype##_next(it);} \
-    STC_INLINE cstack_##X##_value_t* \
-    cstack_##X##_itval(cstack_##X##_iter_t it) {return ctype##_itval(it);} \
+    STC_INLINE CX               CX##_init(void) {return ctype##_init();} \
+    STC_INLINE CX               CX##_clone(CX st) {return ctype##_clone(st);} \
+    STC_INLINE CX##_value_t     CX##_value_clone(CX##_value_t val) \
+                                    {return ctype##_value_clone(val);} \
+    STC_INLINE void             CX##_clear(CX* self) {ctype##_clear(self);} \
+    STC_INLINE void             CX##_del(CX* self) {ctype##_del(self);} \
 \
-    typedef cstack_##X cstack_##X##_t
+    STC_INLINE size_t           CX##_size(CX st) {return ctype##_size(st);} \
+    STC_INLINE bool             CX##_empty(CX st) {return ctype##_empty(st);} \
+    STC_INLINE CX##_value_t*    CX##_top(const CX* self) {return ctype##_back(self);} \
+\
+    STC_INLINE void             CX##_pop(CX* self) {ctype##_pop_back(self);} \
+    STC_INLINE void             CX##_push(CX* self, ctype##_value_t value) \
+                                    {ctype##_push_back(self, value);} \
+    STC_INLINE void             CX##_emplace(CX* self, CX##_rawvalue_t raw) \
+                                    {ctype##_emplace_back(self, raw);} \
+    STC_INLINE void             CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t n) \
+                                    {ctype##_emplace_n(self, arr, n);} \
+\
+    STC_INLINE CX##_iter_t      CX##_begin(const CX* self) {return ctype##_begin(self);} \
+    STC_INLINE CX##_iter_t      CX##_end(const CX* self) {return ctype##_end(self);} \
+    STC_INLINE void             CX##_next(CX##_iter_t* it) {ctype##_next(it);} \
+ \
+    typedef CX CX##_t
 
 #endif

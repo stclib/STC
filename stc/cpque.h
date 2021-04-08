@@ -52,62 +52,52 @@
 #define using_cpque(...) c_MACRO_OVERLOAD(using_cpque, __VA_ARGS__)
 
 #define using_cpque_2(X, ctype) \
-    using_cpque_3(X, ctype, ctype##_value_compare)
-
+    _c_using_cpque(cpque_##X, ctype, ctype##_value_compare)
 #define using_cpque_3(X, ctype, valueCompare) \
-    typedef ctype##_t cpque_##X; \
-    typedef ctype##_value_t cpque_##X##_value_t; \
-    typedef ctype##_rawvalue_t cpque_##X##_rawvalue_t; \
+    _c_using_cpque(cpque_##X, ctype, valueCompare)
+
+#define _c_using_cpque(CX, ctype, valueCompare) \
+    typedef ctype##_t CX; \
+    typedef ctype##_value_t CX##_value_t; \
+    typedef ctype##_rawvalue_t CX##_rawvalue_t; \
 \
-    STC_INLINE cpque_##X \
-    cpque_##X##_init(void) {return ctype##_init();} \
-    STC_INLINE cpque_##X \
-    cpque_##X##_clone(cpque_##X pq) {return ctype##_clone(pq);} \
-    STC_INLINE cpque_##X##_value_t \
-    cpque_##X##_value_clone(cpque_##X##_value_t val) {return ctype##_value_clone(val);} \
-    STC_INLINE void \
-    cpque_##X##_clear(cpque_##X* self) {ctype##_clear(self);} \
-    STC_INLINE void \
-    cpque_##X##_del(cpque_##X* self) {ctype##_del(self);} \
+    STC_INLINE CX           CX##_init(void) {return ctype##_init();} \
+    STC_INLINE CX           CX##_clone(CX pq) {return ctype##_clone(pq);} \
+    STC_INLINE CX##_value_t CX##_value_clone(CX##_value_t val) \
+                                {return ctype##_value_clone(val);} \
+    STC_INLINE void         CX##_clear(CX* self) {ctype##_clear(self);} \
+    STC_INLINE void         CX##_del(CX* self) {ctype##_del(self);} \
 \
-    STC_INLINE size_t \
-    cpque_##X##_size(cpque_##X pq) {return ctype##_size(pq);} \
-    STC_INLINE bool \
-    cpque_##X##_empty(cpque_##X pq) {return ctype##_empty(pq);} \
-    STC_API void \
-    cpque_##X##_make_heap(cpque_##X* self); \
-    STC_API void \
-    cpque_##X##_erase_at(cpque_##X* self, size_t i); \
-    STC_INLINE const cpque_##X##_value_t* \
-    cpque_##X##_top(const cpque_##X* self) {return &self->data[0];} \
-    STC_INLINE void \
-    cpque_##X##_pop(cpque_##X* self) {cpque_##X##_erase_at(self, 0);} \
-    STC_API void \
-    cpque_##X##_push(cpque_##X* self, cpque_##X##_value_t value); \
-    STC_INLINE void \
-    cpque_##X##_emplace(cpque_##X* self, cpque_##X##_rawvalue_t raw) { \
-        cpque_##X##_push(self, ctype##_value_fromraw(raw)); \
-    } \
-    STC_API void \
-    cpque_##X##_emplace_n(cpque_##X *self, const cpque_##X##_rawvalue_t arr[], size_t size); \
+    STC_INLINE size_t       CX##_size(CX pq) {return ctype##_size(pq);} \
+    STC_INLINE bool         CX##_empty(CX pq) {return ctype##_empty(pq);} \
+    \
+    STC_API void            CX##_make_heap(CX* self); \
+    STC_API void            CX##_erase_at(CX* self, size_t i); \
+    STC_INLINE \
+    const CX##_value_t*     CX##_top(const CX* self) {return &self->data[0];} \
+    STC_INLINE void         CX##_pop(CX* self) {CX##_erase_at(self, 0);} \
+    \
+    STC_API void            CX##_push(CX* self, CX##_value_t value); \
+    STC_INLINE void         CX##_emplace(CX* self, CX##_rawvalue_t raw) \
+                                {CX##_push(self, ctype##_value_fromraw(raw));} \
+    STC_API void            CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t size); \
 \
-    _c_implement_cpque(X, ctype, valueCompare) \
-    typedef cpque_##X cpque_##X##_t
+    _c_implement_cpque(CX, ctype, valueCompare)
 
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-#define _c_implement_cpque(X, ctype, valueCompare) \
+#define _c_implement_cpque(CX, ctype, valueCompare) \
 \
     STC_INLINE void \
-    _cpque_##X##_sift_down(cpque_##X##_value_t* arr, size_t i, size_t n) { \
+    CX##_sift_down_(CX##_value_t* arr, size_t i, size_t n) { \
         size_t r = i, c = i << 1; \
         while (c <= n) { \
             c += (c < n && valueCompare(&arr[c], &arr[c + 1]) < 0); \
             if (valueCompare(&arr[r], &arr[c]) < 0) { \
-                cpque_##X##_value_t tmp = arr[r]; arr[r] = arr[c]; arr[r = c] = tmp; \
+                CX##_value_t tmp = arr[r]; arr[r] = arr[c]; arr[r = c] = tmp; \
             } else \
                 return; \
             c <<= 1; \
@@ -115,37 +105,38 @@
     } \
 \
     STC_API void \
-    cpque_##X##_make_heap(cpque_##X* self) { \
-        size_t n = cpque_##X##_size(*self); \
-        cpque_##X##_value_t *arr = self->data - 1; \
+    CX##_make_heap(CX* self) { \
+        size_t n = CX##_size(*self); \
+        CX##_value_t *arr = self->data - 1; \
         for (size_t k = n >> 1; k != 0; --k) \
-            _cpque_##X##_sift_down(arr, k, n); \
+            CX##_sift_down_(arr, k, n); \
     } \
 \
     STC_API void \
-    cpque_##X##_erase_at(cpque_##X* self, size_t i) { \
-        size_t n = cpque_##X##_size(*self) - 1; \
+    CX##_erase_at(CX* self, size_t i) { \
+        size_t n = CX##_size(*self) - 1; \
         self->data[i] = self->data[n]; \
         ctype##_pop_back(self); \
-        _cpque_##X##_sift_down(self->data - 1, i + 1, n); \
+        CX##_sift_down_(self->data - 1, i + 1, n); \
     } \
 \
     STC_API void \
-    cpque_##X##_push(cpque_##X* self, cpque_##X##_value_t value) { \
+    CX##_push(CX* self, CX##_value_t value) { \
         ctype##_push_back(self, value); /* sift-up the value */ \
-        size_t n = cpque_##X##_size(*self), c = n; \
-        cpque_##X##_value_t *arr = self->data - 1; \
+        size_t n = CX##_size(*self), c = n; \
+        CX##_value_t *arr = self->data - 1; \
         for (; c > 1 && valueCompare(&arr[c >> 1], &value) < 0; c >>= 1) \
             arr[c] = arr[c >> 1]; \
         if (c != n) arr[c] = value; \
     } \
     STC_API void \
-    cpque_##X##_emplace_n(cpque_##X *self, const cpque_##X##_rawvalue_t arr[], size_t size) { \
-        for (size_t i=0; i<size; ++i) cpque_##X##_push(self, arr[i]); \
-    }
+    CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t size) { \
+        for (size_t i=0; i<size; ++i) CX##_push(self, arr[i]); \
+    } \
+    typedef CX CX##_t
 
 #else
-#define _c_implement_cpque(X, ctype, valueCompare)
+#define _c_implement_cpque(CX, ctype, valueCompare)
 #endif
 
 #endif

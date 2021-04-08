@@ -39,7 +39,6 @@ void                    cqueue_X_pop(cqueue_X* self);
 cqueue_X_iter_t         cqueue_X_begin(const cqueue_X* self);
 cqueue_X_iter_t         cqueue_X_end(const cqueue_X* self);
 void                    cqueue_X_next(cqueue_X_iter_t* it);
-cqueue_X_value_t*       cqueue_X_itval(cqueue_X_iter_t it);
 
 cqueue_X_value_t        cqueue_X_value_clone(cqueue_X_value_t val);
 ```

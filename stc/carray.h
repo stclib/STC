@@ -55,108 +55,116 @@ int main() {
 #define using_carray2(...) c_MACRO_OVERLOAD(using_carray2, __VA_ARGS__)
 
 #define using_carray2_2(X, Value) \
-    using_carray2_4(X, Value, c_trivial_del, c_trivial_fromraw)
-
+    _c_using_carray2(carray2##X, Value, c_trivial_del, c_trivial_fromraw)
+#define using_carray2_3(X, Value, valueDel) \
+    _c_using_carray2(carray2##X, Value, valueDel, c_no_clone)
 #define using_carray2_4(X, Value, valueDel, valueClone) \
+    _c_using_carray2(carray2##X, Value, valueDel, valueClone)
+
+#define _c_using_carray2(CX, Value, valueDel, valueClone) \
 \
-    typedef Value carray2##X##_value_t; \
-    typedef struct { carray2##X##_value_t **at; size_t xdim, ydim; } carray2##X; \
-    typedef struct { carray2##X##_value_t *ref; } carray2##X##_iter_t; \
+    typedef Value CX##_value_t; \
+    typedef struct { CX##_value_t **at; size_t xdim, ydim; } CX; \
+    typedef struct { CX##_value_t *ref; } CX##_iter_t; \
 \
-    STC_API carray2##X carray2##X##_from(carray2##X##_value_t* block, size_t xdim, size_t ydim); \
-    STC_API carray2##X carray2##X##_init(size_t xdim, size_t ydim, Value value); \
-    STC_API carray2##X carray2##X##_clone(carray2##X src); \
+    STC_API CX CX##_from(CX##_value_t* block, size_t xdim, size_t ydim); \
+    STC_API CX CX##_init(size_t xdim, size_t ydim, Value value); \
+    STC_API CX CX##_clone(CX src); \
 \
-    STC_INLINE size_t carray2##X##_size(carray2##X arr) { return arr.xdim*arr.ydim; } \
-    STC_INLINE carray2##X##_value_t *carray2##X##_data(carray2##X* self) { return *self->at; } \
-    STC_INLINE carray2##X##_value_t *carray2##X##_at(carray2##X* self, size_t x, size_t y) { \
+    STC_INLINE size_t CX##_size(CX arr) { return arr.xdim*arr.ydim; } \
+    STC_INLINE CX##_value_t *CX##_data(CX* self) { return *self->at; } \
+    STC_INLINE CX##_value_t *CX##_at(CX* self, size_t x, size_t y) { \
         return *self->at + self->ydim*x + y; \
     } \
-    STC_INLINE carray2##X##_value_t *carray2##X##_release(carray2##X* self) { \
-        carray2##X##_value_t *t = *self->at; c_free(self->at); self->at = NULL; return t; \
+    STC_INLINE CX##_value_t *CX##_release(CX* self) { \
+        CX##_value_t *t = *self->at; c_free(self->at); self->at = NULL; return t; \
     } \
 \
-    STC_INLINE carray2##X##_iter_t carray2##X##_begin(const carray2##X* self) { \
-        carray2##X##_iter_t it = {*self->at}; return it; \
+    STC_INLINE CX##_iter_t CX##_begin(const CX* self) { \
+        CX##_iter_t it = {*self->at}; return it; \
     } \
-    STC_INLINE carray2##X##_iter_t carray2##X##_end(const carray2##X* self) { \
-        carray2##X##_iter_t it = {*self->at + carray2##X##_size(*self)}; return it; \
+    STC_INLINE CX##_iter_t CX##_end(const CX* self) { \
+        CX##_iter_t it = {*self->at + CX##_size(*self)}; return it; \
     } \
-    STC_INLINE void carray2##X##_next(carray2##X##_iter_t* it) { ++it->ref; } \
+    STC_INLINE void CX##_next(CX##_iter_t* it) { ++it->ref; } \
 \
-    _c_implement_carray2_4(X, Value, valueDel, valueClone) \
-    STC_API void carray2##X##_del(carray2##X* self)
+    _c_implement_carray2(CX, Value, valueDel, valueClone) \
+    STC_API void CX##_del(CX* self)
 
 // carray3:
 
 #define using_carray3(...) c_MACRO_OVERLOAD(using_carray3, __VA_ARGS__)
 
 #define using_carray3_2(X, Value) \
-    using_carray3_4(X, Value, c_trivial_del, c_trivial_fromraw)
-
+    _c_using_carray3(carray3##X, Value, c_trivial_del, c_trivial_fromraw)
+#define using_carray3_3(X, Value, valueDel) \
+    _c_using_carray3(carray3##X, Value, valueDel, c_no_clone)
 #define using_carray3_4(X, Value, valueDel, valueClone) \
+    _c_using_carray3(carray3##X, Value, valueDel, valueClone)
+
+#define _c_using_carray3(CX, Value, valueDel, valueClone) \
 \
-    typedef Value carray3##X##_value_t; \
-    typedef struct { carray3##X##_value_t ***at; size_t xdim, ydim, zdim; } carray3##X; \
-    typedef struct { carray3##X##_value_t *ref; } carray3##X##_iter_t; \
+    typedef Value CX##_value_t; \
+    typedef struct { CX##_value_t ***at; size_t xdim, ydim, zdim; } CX; \
+    typedef struct { CX##_value_t *ref; } CX##_iter_t; \
 \
-    STC_API carray3##X carray3##X##_from(carray3##X##_value_t* block, size_t xdim, size_t ydim, size_t zdim); \
-    STC_API carray3##X carray3##X##_init(size_t xdim, size_t ydim, size_t zdim, Value value); \
-    STC_API carray3##X carray3##X##_clone(carray3##X src); \
+    STC_API CX CX##_from(CX##_value_t* block, size_t xdim, size_t ydim, size_t zdim); \
+    STC_API CX CX##_init(size_t xdim, size_t ydim, size_t zdim, Value value); \
+    STC_API CX CX##_clone(CX src); \
 \
-    STC_INLINE size_t carray3##X##_size(carray3##X arr) { return arr.xdim*arr.ydim*arr.zdim; } \
-    STC_INLINE carray3##X##_value_t *carray3##X##_data(carray3##X* self) { return **self->at; } \
-    STC_INLINE carray3##X##_value_t *carray3##X##_at(carray3##X* self, size_t x, size_t y, size_t z) { \
+    STC_INLINE size_t CX##_size(CX arr) { return arr.xdim*arr.ydim*arr.zdim; } \
+    STC_INLINE CX##_value_t *CX##_data(CX* self) { return **self->at; } \
+    STC_INLINE CX##_value_t *CX##_at(CX* self, size_t x, size_t y, size_t z) { \
         return **self->at + self->zdim*(self->ydim*x + y) + z; \
     } \
-    STC_INLINE carray3##X##_value_t *carray3##X##_release(carray3##X* self) { \
-        carray3##X##_value_t *t = **self->at; c_free(self->at); self->at = NULL; return t; \
+    STC_INLINE CX##_value_t *CX##_release(CX* self) { \
+        CX##_value_t *t = **self->at; c_free(self->at); self->at = NULL; return t; \
     } \
 \
-    STC_INLINE carray3##X##_iter_t carray3##X##_begin(const carray3##X* self) { \
-        carray3##X##_iter_t it = {**self->at}; return it; \
+    STC_INLINE CX##_iter_t CX##_begin(const CX* self) { \
+        CX##_iter_t it = {**self->at}; return it; \
     } \
-    STC_INLINE carray3##X##_iter_t carray3##X##_end(const carray3##X* self) { \
-        carray3##X##_iter_t it = {**self->at + carray3##X##_size(*self)}; return it; \
+    STC_INLINE CX##_iter_t CX##_end(const CX* self) { \
+        CX##_iter_t it = {**self->at + CX##_size(*self)}; return it; \
     } \
-    STC_INLINE void carray3##X##_next(carray3##X##_iter_t* it) { ++it->ref; } \
+    STC_INLINE void CX##_next(CX##_iter_t* it) { ++it->ref; } \
 \
-    _c_implement_carray3_4(X, Value, valueDel, valueClone) \
-    STC_API void carray3##X##_del(carray3##X* self)
+    _c_implement_carray3(CX, Value, valueDel, valueClone) \
+    STC_API void CX##_del(CX* self)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-#define _c_implement_carray2_4(X, Value, valueDel, valueClone) \
+#define _c_implement_carray2(CX, Value, valueDel, valueClone) \
 \
-    STC_DEF carray2##X carray2##X##_from(carray2##X##_value_t* block, size_t xdim, size_t ydim) { \
+    STC_DEF CX CX##_from(CX##_value_t* block, size_t xdim, size_t ydim) { \
         size_t n = xdim * ydim; \
-        carray2##X _arr = {c_new_2(carray2##X##_value_t*, xdim), xdim, ydim}; \
+        CX _arr = {c_new_2(CX##_value_t*, xdim), xdim, ydim}; \
         for (size_t x = 0; x < xdim; ++x, block += ydim) \
             _arr.at[x] = block; \
         return _arr; \
     } \
 \
-    STC_DEF carray2##X carray2##X##_init(size_t xdim, size_t ydim, Value value) { \
+    STC_DEF CX CX##_init(size_t xdim, size_t ydim, Value value) { \
         size_t n = xdim*ydim; \
-        carray2##X _arr = carray2##X##_from(c_new_2(carray2##X##_value_t, n), xdim, ydim); \
-        for (carray2##X##_value_t* p = _arr.at[0], *e = p + n; p != e; ++p) \
+        CX _arr = CX##_from(c_new_2(CX##_value_t, n), xdim, ydim); \
+        for (CX##_value_t* p = _arr.at[0], *e = p + n; p != e; ++p) \
             *p = value; \
         return _arr; \
     } \
 \
-    STC_DEF carray2##X carray2##X##_clone(carray2##X src) { \
+    STC_DEF CX CX##_clone(CX src) { \
         size_t n = src.xdim*src.ydim; \
-        carray2##X _arr = carray2##X##_from(c_new_2(carray2##X##_value_t, n), src.xdim, src.ydim); \
-        for (carray2##X##_value_t* p = _arr.at[0], *q = src.at[0], *e = p + n; p != e; ++p, ++q) \
+        CX _arr = CX##_from(c_new_2(CX##_value_t, n), src.xdim, src.ydim); \
+        for (CX##_value_t* p = _arr.at[0], *q = src.at[0], *e = p + n; p != e; ++p, ++q) \
             *p = valueClone(*q); \
         return _arr; \
     } \
 \
-    STC_DEF void carray2##X##_del(carray2##X* self) { \
+    STC_DEF void CX##_del(CX* self) { \
         if (!self->at) return; \
-        for (carray2##X##_value_t* p = self->at[0], *e = p + self->xdim*self->ydim; p != e; ++p) \
+        for (CX##_value_t* p = self->at[0], *e = p + self->xdim*self->ydim; p != e; ++p) \
             valueDel(p); \
         c_free(self->at[0]); /* data */ \
         c_free(self->at); \
@@ -164,44 +172,44 @@ int main() {
 
 // carray3 impl.
 
-#define _c_implement_carray3_4(X, Value, valueDel, valueClone) \
+#define _c_implement_carray3(CX, Value, valueDel, valueClone) \
 \
-    STC_DEF carray3##X carray3##X##_from(carray3##X##_value_t* block, size_t xdim, size_t ydim, size_t zdim) { \
-        carray3##X _arr = {c_new_2(carray3##X##_value_t**, xdim*(ydim + 1)), xdim, ydim, zdim}; \
-        carray3##X##_value_t** p = (carray3##X##_value_t**) &_arr.at[xdim]; \
+    STC_DEF CX CX##_from(CX##_value_t* block, size_t xdim, size_t ydim, size_t zdim) { \
+        CX _arr = {c_new_2(CX##_value_t**, xdim*(ydim + 1)), xdim, ydim, zdim}; \
+        CX##_value_t** p = (CX##_value_t**) &_arr.at[xdim]; \
         for (size_t x = 0, y; x < xdim; ++x, p += ydim) \
             for (_arr.at[x] = p, y = 0; y < ydim; ++y, block += zdim) \
                 _arr.at[x][y] = block; \
         return _arr; \
     } \
 \
-    STC_DEF carray3##X carray3##X##_init(size_t xdim, size_t ydim, size_t zdim, Value value) { \
+    STC_DEF CX CX##_init(size_t xdim, size_t ydim, size_t zdim, Value value) { \
         size_t n = xdim*ydim*zdim; \
-        carray3##X _arr = carray3##X##_from(c_new_2(carray3##X##_value_t, n), xdim, ydim, zdim); \
-        for (carray3##X##_value_t* p = **_arr.at, *e = p + n; p != e; ++p) \
+        CX _arr = CX##_from(c_new_2(CX##_value_t, n), xdim, ydim, zdim); \
+        for (CX##_value_t* p = **_arr.at, *e = p + n; p != e; ++p) \
             *p = value; \
         return _arr; \
     } \
 \
-    STC_DEF carray3##X carray3##X##_clone(carray3##X src) { \
-        size_t n = carray3##X##_size(src); \
-        carray3##X _arr = carray3##X##_from(c_new_2(carray3##X##_value_t, n), src.xdim, src.ydim, src.zdim); \
-        for (carray3##X##_value_t* p = **_arr.at, *q = **src.at, *e = p + n; p != e; ++p, ++q) \
+    STC_DEF CX CX##_clone(CX src) { \
+        size_t n = CX##_size(src); \
+        CX _arr = CX##_from(c_new_2(CX##_value_t, n), src.xdim, src.ydim, src.zdim); \
+        for (CX##_value_t* p = **_arr.at, *q = **src.at, *e = p + n; p != e; ++p, ++q) \
             *p = valueClone(*q); \
         return _arr; \
     } \
 \
-    STC_DEF void carray3##X##_del(carray3##X* self) { \
+    STC_DEF void CX##_del(CX* self) { \
         if (!self->at) return; \
-        for (carray3##X##_value_t* p = **self->at, *e = p + carray3##X##_size(*self); p != e; ++p) \
+        for (CX##_value_t* p = **self->at, *e = p + CX##_size(*self); p != e; ++p) \
             valueDel(p); \
         c_free(self->at[0][0]); /* data */ \
         c_free(self->at); /* pointers */ \
     }
 
 #else
-#define _c_implement_carray2_4(X, Value, valueDel, valueClone)
-#define _c_implement_carray3_4(X, Value, valueDel, valueClone)
+#define _c_implement_carray2(CX, Value, valueDel, valueClone)
+#define _c_implement_carray3(CX, Value, valueDel, valueClone)
 #endif
 
 #endif

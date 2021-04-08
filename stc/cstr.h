@@ -110,7 +110,6 @@ cstr_end(cstr_t* self) {
     cstr_iter_t it = {self->str + _cstr_rep(self)->size}; return it;
 }
 STC_INLINE void cstr_next(cstr_iter_t* it) { ++it->ref; }
-STC_INLINE char* cstr_itval(cstr_iter_t it) {return it.ref;}
 
 STC_INLINE cstr_t*
 cstr_assign(cstr_t* self, const char* str) {

@@ -49,7 +49,6 @@ csset_X_iter_t      csset_X_erase_at(csset_X* self, csset_X_iter_t pos);
 csset_X_iter_t      csset_X_begin(const csset_X* self);
 csset_X_iter_t      csset_X_end(const csset_X* self);
 void                csset_X_next(csset_X_iter_t* it);
-csset_X_value_t*    csset_X_itval(csset_X_iter_t it);
 
 csset_X_value_t     csset_X_value_clone(csset_X_value_t val);
 ```

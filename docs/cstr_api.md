@@ -77,7 +77,6 @@ char*        cstr_back(cstr* self);
 cstr_iter_t  cstr_begin(cstr* self);
 cstr_iter_t  cstr_end(cstr* self);
 void         cstr_next(cstr_iter_t* it);
-char*        cstr_itval(cstr_iter_t it);
 
 bool         cstr_getline(cstr *self, FILE *stream);                  // cstr_getdelim(self, '\n', stream)
 bool         cstr_getdelim(cstr *self, int delim, FILE *stream);

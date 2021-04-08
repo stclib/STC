@@ -72,7 +72,6 @@ void                cmap_X_erase_entry(cmap_X* self, cmap_X_value_t* entry);
 cmap_X_iter_t       cmap_X_begin(const cmap_X* self);
 cmap_X_iter_t       cmap_X_end(const cmap_X* self);
 void                cmap_X_next(cmap_X_iter_t* it);
-cmap_X_mapped_t*    cmap_X_itval(cmap_X_iter_t it);
 
 cmap_X_value_t      cmap_X_value_clone(cmap_X_value_t val);
 ```

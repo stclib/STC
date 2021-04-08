@@ -59,13 +59,11 @@ int main(void) {
     using_csset_7(X, Key, keyCompare, keyDel, keyClone, c_trivial_toraw, Key)
 
 #define using_csset_7(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
-    _using_AATREE(X, csset_, Key, Key, keyCompareRaw, \
-                     @@, @@, @@, void, \
-                     keyDel, keyFromRaw, keyToRaw, RawKey)
+    _c_using_aatree(csset_##X, csset_, Key, Key, keyCompareRaw, \
+                    @@, @@, @@, void, keyDel, keyFromRaw, keyToRaw, RawKey)
 
-/* csset_str: */
 #define using_csset_str() \
-    _using_AATREE_strkey(str, csset_, cstr_t, @@, @@, @@, void)
+    _c_using_aatree_strkey(str, csset_, cstr_t, @@, @@, @@, void)
 
 #define SET_ONLY_csset_(...) __VA_ARGS__
 #define MAP_ONLY_csset_(...)

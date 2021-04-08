@@ -57,52 +57,37 @@
 #include "cdeq.h"
 
 #define using_cqueue(X, ctype) \
-    typedef ctype##_t cqueue_##X; \
-    typedef ctype##_value_t cqueue_##X##_value_t; \
-    typedef ctype##_rawvalue_t cqueue_##X##_rawvalue_t; \
+    _c_using_cqueue(cqueue_##X, ctype)
+
+#define _c_using_cqueue(CX, ctype) \
+    typedef ctype##_t CX; \
+    typedef ctype##_value_t CX##_value_t; \
+    typedef ctype##_rawvalue_t CX##_rawvalue_t; \
+    typedef ctype##_iter_t CX##_iter_t; \
 \
-    STC_INLINE cqueue_##X \
-    cqueue_##X##_init(void) {return ctype##_init();} \
-    STC_INLINE cqueue_##X \
-    cqueue_##X##_clone(cqueue_##X q) {return ctype##_clone(q);} \
-    STC_INLINE cqueue_##X##_value_t \
-    cqueue_##X##_value_clone(cqueue_##X##_value_t val) {return ctype##_value_clone(val);} \
-    STC_INLINE void \
-    cqueue_##X##_clear(cqueue_##X* self) {ctype##_clear(self);} \
-    STC_INLINE void \
-    cqueue_##X##_del(cqueue_##X* self) {ctype##_del(self);} \
-    STC_INLINE size_t \
-    cqueue_##X##_size(cqueue_##X q) {return ctype##_size(q);} \
-    STC_INLINE bool \
-    cqueue_##X##_empty(cqueue_##X q) {return ctype##_empty(q);} \
-    STC_INLINE cqueue_##X##_value_t* \
-    cqueue_##X##_front(const cqueue_##X* self) {return ctype##_front(self);} \
-    STC_INLINE cqueue_##X##_value_t* \
-    cqueue_##X##_back(const cqueue_##X* self) {return ctype##_back(self);} \
-    STC_INLINE void \
-    cqueue_##X##_pop(cqueue_##X* self) {ctype##_pop_front(self);} \
-    STC_INLINE void \
-    cqueue_##X##_push(cqueue_##X* self, ctype##_value_t value) { \
-        ctype##_push_back(self, value); \
-    } \
-    STC_INLINE void \
-    cqueue_##X##_emplace(cqueue_##X* self, cqueue_##X##_rawvalue_t raw) { \
-        ctype##_emplace_back(self, raw); \
-    } \
-    STC_INLINE void \
-    cqueue_##X##_emplace_n(cqueue_##X *self, const cqueue_##X##_rawvalue_t arr[], size_t size) { \
-        ctype##_emplace_n(self, arr, size); \
-    } \
-    typedef ctype##_iter_t cqueue_##X##_iter_t; \
-    STC_INLINE cqueue_##X##_iter_t \
-    cqueue_##X##_begin(const cqueue_##X* self) {return ctype##_begin(self);} \
-    STC_INLINE cqueue_##X##_iter_t \
-    cqueue_##X##_end(const cqueue_##X* self) {return ctype##_end(self);} \
-    STC_INLINE void \
-    cqueue_##X##_next(cqueue_##X##_iter_t* it) {ctype##_next(it);} \
-    STC_INLINE cqueue_##X##_value_t* \
-    cqueue_##X##_itval(cqueue_##X##_iter_t it) {return ctype##_itval(it);} \
+    STC_INLINE CX               CX##_init(void) {return ctype##_init();} \
+    STC_INLINE CX               CX##_clone(CX q) {return ctype##_clone(q);} \
+    STC_INLINE CX##_value_t     CX##_value_clone(CX##_value_t val) \
+                                    {return ctype##_value_clone(val);} \
+    STC_INLINE void             CX##_clear(CX* self) {ctype##_clear(self);} \
+    STC_INLINE void             CX##_del(CX* self) {ctype##_del(self);} \
 \
-    typedef cqueue_##X cqueue_##X##_t
+    STC_INLINE size_t           CX##_size(CX q) {return ctype##_size(q);} \
+    STC_INLINE bool             CX##_empty(CX q) {return ctype##_empty(q);} \
+    STC_INLINE CX##_value_t*    CX##_front(const CX* self) {return ctype##_front(self);} \
+    STC_INLINE CX##_value_t*    CX##_back(const CX* self) {return ctype##_back(self);} \
+\
+    STC_INLINE void             CX##_pop(CX* self) {ctype##_pop_front(self);} \
+    STC_INLINE void             CX##_push(CX* self, ctype##_value_t value) \
+                                    {ctype##_push_back(self, value);} \
+    STC_INLINE void             CX##_emplace(CX* self, CX##_rawvalue_t raw) \
+                                    {ctype##_emplace_back(self, raw);} \
+    STC_INLINE void             CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t n) \
+                                    {ctype##_emplace_n(self, arr, n);} \
+\
+    STC_INLINE CX##_iter_t      CX##_begin(const CX* self) {return ctype##_begin(self);} \
+    STC_INLINE CX##_iter_t      CX##_end(const CX* self) {return ctype##_end(self);} \
+    STC_INLINE void             CX##_next(CX##_iter_t* it) {ctype##_next(it);} \
+    typedef CX CX##_t
 
 #endif

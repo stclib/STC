@@ -84,7 +84,6 @@ void                cvec_X_sort_range(cvec_X_iter_t i1, cvec_X_iter_t i2,
 cvec_X_iter_t       cvec_X_begin(const cvec_X* self);
 cvec_X_iter_t       cvec_X_end(const cvec_X* self);
 void                cvec_X_next(cvec_X_iter_t* it);
-cvec_X_value_t*     cvec_X_itval(cvec_X_iter_t it);
 size_t              cvec_X_index(const cvec_X vec, cvec_X_iter_t it);
 
 cvec_X_value_t      cvec_X_value_clone(cvec_X_value_t val);

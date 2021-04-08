@@ -82,7 +82,6 @@ void                cdeq_X_sort_range(cdeq_X_iter_t i1, cdeq_X_iter_t i2,
 cdeq_X_iter_t       cdeq_X_begin(const cdeq_X* self);
 cdeq_X_iter_t       cdeq_X_end(const cdeq_X* self);
 void                cdeq_X_next(cdeq_X_iter_t* it);
-cdeq_X_value_t*     cdeq_X_itval(cdeq_X_iter_t it);
 size_t              cdeq_X_index(const cdeq_X deq, cdeq_X_iter_t it);
 
 cdeq_X_value_t      cdeq_X_value_clone(cdeq_X_value_t val);
