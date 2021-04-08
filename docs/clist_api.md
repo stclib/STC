@@ -14,10 +14,10 @@ will invalidate other iterators currently refering to these elements and their i
 However, an iterator to a succesive element can both be dereferenced and advanced. After advancing (using 
 *clist_X_next(&it)* or *it = cslist_X_fwd(it, n)*), the iterator is in a valid state. This implies:
 
-- `clist_X_insert(&L, clist_X_fwd(it,1))` (insert_after) is well formed if element at `it` exists.
-- `clist_X_erase_at(&L, clist_X_fwd(it,1))` (erase_after) is well formed if element at `it` exists and is not last in list.
+- `clist_X_insert(&L, clist_X_fwd(it,1), x)` is identical to *std::forward_list* L.insert_after(it, x)*.
+- `clist_X_erase_at(&L, clist_X_fwd(it,1))` is identical to *std::forward_list* L.erase_after(it)*.
 - Iterators returned from *clist_X_insert()* and *clist_X_erase_at()* are always valid or `end`.
-- Elements can be safely removed from a list via multiple iterators if done in back to front order.
+- Elements can be safely removed from a list via multiple iterators if done back to front order.
 
 See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) for similar API and
 [std::forward_list](https://en.cppreference.com/w/cpp/container/forward_list) for a functional description.

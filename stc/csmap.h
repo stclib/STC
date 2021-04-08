@@ -299,10 +299,8 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
     STC_API int \
     C##X##_erase(C##X* self, RawKey rkey); \
 \
-    STC_INLINE int \
-    C##X##_erase_at(C##X* self, C##X##_iter_t pos) { \
-        return C##X##_erase(self, keyToRaw(KEY_REF_##C(pos.ref))); \
-    } \
+    STC_API C##X##_iter_t \
+    C##X##_erase_at(C##X* self, C##X##_iter_t pos); \
 \
     _implement_AATREE(X, C, Key, Mapped, keyCompareRaw, \
                          mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
@@ -511,6 +509,15 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
         C##X##_size_t root = C##X##_erase_r_(self->nodes, (C##X##_size_t) _csmap_rep(self)->root, &rkey, &erased); \
         if (erased) {_csmap_rep(self)->root = root; --_csmap_rep(self)->size;} \
         return erased; \
+    } \
+\
+    STC_DEF C##X##_iter_t \
+    C##X##_erase_at(C##X* self, C##X##_iter_t pos) { \
+        C##X##_rawkey_t raw = keyToRaw(KEY_REF_##C(pos.ref)); C##X##_next(&pos); \
+        C##X##_rawkey_t nxt = keyToRaw(KEY_REF_##C(pos.ref)); \
+        C##X##_erase(self, raw); \
+        C##X##_find_it(self, nxt, &pos); \
+        return pos; \
     } \
 \
     static C##X##_size_t \

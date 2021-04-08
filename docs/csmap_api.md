@@ -65,7 +65,7 @@ csmap_X_result_t    csmap_X_emplace_or_assign(csmap_X* self, RawKey rkey, RawMap
 void                csmap_X_emplace_n(csmap_X* self, const csmap_X_rawvalue_t arr[], size_t size);
 
 size_t              csmap_X_erase(csmap_X* self, RawKey rkey);
-csmap_X_iter_t      csmap_X_erase_at(csmap_X* self, csmap_X_iter_t pos);
+csmap_X_iter_t      csmap_X_erase_at(csmap_X* self, csmap_X_iter_t pos);                      // returns iter to next element
 
 csmap_X_iter_t      csmap_X_begin(const csmap_X* self);
 csmap_X_iter_t      csmap_X_end(const csmap_X* self);
