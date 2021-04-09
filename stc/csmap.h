@@ -175,29 +175,30 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
         CX##_size_t _tn, _st[48]; \
     } CX##_iter_t; \
 \
-    STC_API CX CX##_init(void); \
-    STC_API CX CX##_clone(CX tree); \
+    STC_API CX            CX##_init(void); \
+    STC_API CX            CX##_clone(CX tree); \
+    STC_API void          CX##_del(CX* self); \
+    STC_API void          CX##_reserve(CX* self, size_t cap); \
+    STC_INLINE bool       CX##_empty(CX tree) {return _csmap_rep(&tree)->size == 0;} \
+    STC_INLINE size_t     CX##_size(CX tree) {return _csmap_rep(&tree)->size;} \
+    STC_INLINE size_t     CX##_capacity(CX tree) {return _csmap_rep(&tree)->cap;} \
+    STC_INLINE void       CX##_clear(CX* self) {CX##_del(self); *self = CX##_init();} \
+    STC_INLINE void       CX##_swap(CX* a, CX* b) {c_swap(CX, *a, *b);} \
+    STC_API CX##_value_t* CX##_find_it(const CX* self, RawKey rkey, CX##_iter_t* out); \
+    STC_API CX##_iter_t   CX##_lower_bound(const CX* self, RawKey rkey); \
+    STC_API CX##_value_t* CX##_front(const CX* self); \
+    STC_API CX##_value_t* CX##_back(const CX* self); \
+    STC_API int           CX##_erase(CX* self, RawKey rkey); \
+    STC_API CX##_iter_t   CX##_erase_at(CX* self, CX##_iter_t pos); \
+    STC_API CX##_iter_t   CX##_erase_range(CX* self, CX##_iter_t it1, CX##_iter_t it2); \
+    STC_API CX##_result_t CX##_insert_entry_(CX* self, RawKey rkey); \
 \
-    STC_API void \
-    CX##_reserve(CX* self, size_t cap); \
     STC_INLINE CX \
     CX##_with_capacity(size_t size) { \
         CX x = CX##_init(); \
         CX##_reserve(&x, size); \
         return x; \
     } \
-    STC_INLINE bool \
-    CX##_empty(CX tree) {return _csmap_rep(&tree)->size == 0;} \
-    STC_INLINE size_t \
-    CX##_size(CX tree) {return _csmap_rep(&tree)->size;} \
-    STC_INLINE size_t \
-    CX##_capacity(CX tree) {return _csmap_rep(&tree)->cap;} \
-    STC_API void \
-    CX##_del(CX* self); \
-    STC_INLINE void \
-    CX##_clear(CX* self) {CX##_del(self); *self = CX##_init();} \
-    STC_INLINE void \
-    CX##_swap(CX* a, CX* b) {c_swap(CX, *a, *b);} \
 \
     STC_INLINE void \
     CX##_value_del(CX##_value_t* val) { \
@@ -210,12 +211,6 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
         MAP_ONLY_##C( val.second = mappedFromRaw(mappedToRaw(&val.second)); ) \
         return val; \
     } \
-\
-    STC_API CX##_value_t* \
-    CX##_find_it(const CX* self, RawKey rkey, CX##_iter_t* out); \
-\
-    STC_API CX##_iter_t \
-    CX##_lower_bound(const CX* self, RawKey rkey); \
 \
     STC_INLINE CX##_iter_t \
     CX##_find(const CX* self, RawKey rkey) { \
@@ -230,9 +225,6 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
         return CX##_find_it(self, rkey, &it) != NULL; \
     } \
 \
-    STC_API CX##_result_t \
-    CX##_insert_entry_(CX* self, RawKey rkey); \
-\
     STC_INLINE CX##_result_t \
     CX##_emplace(CX* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
         CX##_result_t res = CX##_insert_entry_(self, rkey); \
@@ -242,6 +234,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
         } \
         return res; \
     } \
+\
     STC_INLINE void \
     CX##_emplace_n(CX* self, const CX##_rawvalue_t arr[], size_t n) { \
         for (size_t i=0; i<n; ++i) SET_ONLY_##C( CX##_emplace(self, arr[i]); ) \
@@ -268,6 +261,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
         CX##_put(CX* self, Key k, Mapped m) { \
             return CX##_insert_or_assign(self, k, m); \
         } \
+\
         STC_INLINE CX##_result_t \
         CX##_emplace_or_assign(CX* self, RawKey rkey, RawMapped rmapped) { \
             CX##_result_t res = CX##_insert_entry_(self, rkey); \
@@ -275,31 +269,27 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
             else mappedDel(&res.ref->second); \
             res.ref->second = mappedFromRaw(rmapped); return res; \
         } \
+\
         STC_INLINE CX##_mapped_t* \
         CX##_at(const CX* self, RawKey rkey) { \
             CX##_iter_t it; \
             return &CX##_find_it(self, rkey, &it)->second; \
         }) \
 \
-    STC_API CX##_value_t* CX##_front(const CX* self); \
-    STC_API CX##_value_t* CX##_back(const CX* self); \
-    STC_API void CX##_next(CX##_iter_t* it); \
+    STC_API void \
+    CX##_next(CX##_iter_t* it); \
 \
     STC_INLINE CX##_iter_t \
     CX##_begin(const CX* self) { \
-        CX##_iter_t it = {NULL, self->nodes, 0, (CX##_size_t) _csmap_rep(self)->root}; \
+        CX##_iter_t it; it._d = self->nodes, it._top = 0; \
+        it._tn = (CX##_size_t) _csmap_rep(self)->root; \
         if (it._tn) CX##_next(&it); \
         return it; \
     } \
     STC_INLINE CX##_iter_t \
     CX##_end(const CX* self) {\
-        CX##_iter_t it = {NULL}; return it; \
+        CX##_iter_t it; it.ref = NULL; return it; \
     } \
-    STC_API int \
-    CX##_erase(CX* self, RawKey rkey); \
-\
-    STC_API CX##_iter_t \
-    CX##_erase_at(CX* self, CX##_iter_t pos); \
 \
     _c_implement_aatree(CX, C, Key, Mapped, keyCompareRaw, \
                         mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
@@ -511,12 +501,26 @@ static struct csmap_rep _smap_inits = {0, 0, 0, 0};
     } \
 \
     STC_DEF CX##_iter_t \
-    CX##_erase_at(CX* self, CX##_iter_t pos) { \
-        RawKey raw = keyToRaw(KEY_REF_##C(pos.ref)); CX##_next(&pos); \
-        RawKey nxt = keyToRaw(KEY_REF_##C(pos.ref)); \
+    CX##_erase_at(CX* self, CX##_iter_t it) { \
+        RawKey raw = keyToRaw(KEY_REF_##C(it.ref)); CX##_next(&it); \
+        RawKey nxt = keyToRaw(KEY_REF_##C(it.ref)); \
         CX##_erase(self, raw); \
-        CX##_find_it(self, nxt, &pos); \
-        return pos; \
+        CX##_find_it(self, nxt, &it); \
+        return it; \
+    } \
+\
+    STC_DEF CX##_iter_t \
+    CX##_erase_range(CX* self, CX##_iter_t it1, CX##_iter_t it2) { \
+        CX##_rawkey_t *arr = NULL, nxt; size_t sz=0, cap=0; \
+        for (; it1.ref != it2.ref; CX##_next(&it1), ++sz) { \
+            if (sz == cap) arr = (CX##_rawkey_t*) c_realloc(arr, sizeof arr[0]*(cap = (sz + 6)*1.5)); \
+            arr[sz] = keyToRaw(KEY_REF_##C(it1.ref)); \
+        } \
+        if (it2.ref) nxt = keyToRaw(KEY_REF_##C(it2.ref)); \
+        for (size_t i=0; i<sz; ++i) CX##_erase(self, arr[i]); \
+        c_free(arr); \
+        if (it2.ref) CX##_find_it(self, nxt, &it2); \
+        return it2; \
     } \
 \
     static CX##_size_t \

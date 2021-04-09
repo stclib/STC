@@ -60,7 +60,6 @@ void                clist_X_push_front(clist_X* self, Value value);
 void                clist_X_emplace_front(clist_X* self, RawValue raw);
 void                clist_X_pop_front(clist_X* self);
 
-                    // non-std:
 void                clist_X_push_back(clist_X* self, Value value);
 void                clist_X_emplace_back(clist_X* self, RawValue raw);
 void                clist_X_emplace_n(clist_X *self, const clist_X_rawvalue_t arr[], size_t size);
@@ -88,7 +87,7 @@ clist_X_iter_t      clist_X_begin(const clist_X* self);
 clist_X_iter_t      clist_X_end(const clist_X* self);
 void                clist_X_next(clist_X_iter_t* it);
 
-                    // non-std: iterator advanced n elements forward. returns end if `it` == end.
+                    // advance iter n elements forward. accepts and can return end.
 clist_X_iter_t      clist_X_fwd(clist_X_iter it, size_t n);
 clist_X_value_t     clist_X_value_clone(clist_X_value_t val);
 ```
