@@ -11,12 +11,12 @@ The method *clist_X_count()* returns size of list, computed in **O**(*n*) time.
 
 ***Iterator invalidation***: Adding, removing and moving the elements within the list, or across several lists
 will invalidate other iterators currently refering to these elements and their immediate succesive elements.
-However, an iterator to a succesive element can both be dereferenced and advanced. After advancing (using 
-*clist_X_next(&it)* or *it = cslist_X_fwd(it, n)*), the iterator is in a valid state. This implies:
+However, an iterator to a succesive element can both be dereferenced and advanced. After advancing, the
+iterator is in a valid state. This implies:
 
-- `clist_X_insert(&L, clist_X_fwd(it,1), x)` is identical to *std::forward_list* L.insert_after(it, x)*.
-- `clist_X_erase_at(&L, clist_X_fwd(it,1))` is identical to *std::forward_list* L.erase_after(it)*.
-- Iterators returned from *clist_X_insert()* and *clist_X_erase_at()* are always valid or `end`.
+- `clist_X_insert(&L, clist_X_fwd(it,1), x)` is identical to *std::forward_list* `L.insert_after(it, x)`.
+- `clist_X_erase_at(&L, clist_X_fwd(it,1))` is identical to *std::forward_list* `L.erase_after(it)`.
+- Iterators returned from *clist_X_insert()* and *clist_X_erase_at()* are always valid.
 - Elements can be safely removed from a list via multiple iterators if done back to front order.
 
 See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) for similar API and
