@@ -59,7 +59,6 @@ int main(void) {
             using_csmap_6(X, Key, Mapped, keyCompare, mappedDel, c_no_clone)
 #define using_csmap_6(X, Key, Mapped, keyCompare, mappedDel, mappedClone) \
             using_csmap_8(X, Key, Mapped, keyCompare, mappedDel, mappedClone, c_trivial_toraw, Mapped)
-
 #define using_csmap_8(X, Key, Mapped, keyCompare, mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
             using_csmap_12(X, Key, Mapped, keyCompare, \
                            mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
@@ -123,6 +122,15 @@ int main(void) {
             _c_using_aatree(csmap_##X, csmap_, Key, cstr_t, keyCompareRaw, \
                             cstr_del, cstr_from, cstr_c_str, const char*, \
                             keyDel, keyFromRaw, keyToRaw, RawKey)
+
+#define SET_ONLY_csmap_(...)
+#define MAP_ONLY_csmap_(...) __VA_ARGS__
+#define KEY_REF_csmap_(vp)   (&(vp)->first)
+#ifndef CSMAP_SIZE_T
+#define CSMAP_SIZE_T uint32_t
+#endif
+struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
+#define _csmap_rep(self) c_container_of((self)->nodes, struct csmap_rep, nodes)
 
 
 #define _c_using_aatree(CX, C, Key, Mapped, keyCompareRaw, \
@@ -286,15 +294,6 @@ int main(void) {
                         mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
                         keyDel, keyFromRaw, keyToRaw, RawKey) \
     struct stc_trailing_semicolon
-
-#define SET_ONLY_csmap_(...)
-#define MAP_ONLY_csmap_(...) __VA_ARGS__
-#define KEY_REF_csmap_(vp)   (&(vp)->first)
-#ifndef CSMAP_SIZE_T
-#define CSMAP_SIZE_T uint32_t
-#endif
-struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
-#define _csmap_rep(self) c_container_of((self)->nodes, struct csmap_rep, nodes)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 

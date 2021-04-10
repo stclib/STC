@@ -67,8 +67,10 @@
             using_clist_7(X, Value, valueCompare, valueDel, valueClone, c_trivial_toraw, Value)
 #define using_clist_7(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
             _c_using_clist(clist_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue)
+
 #define using_clist_str() \
             _c_using_clist(clist_str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
+
 
 #define _c_using_clist_types(CX, Value) \
     typedef Value CX##_value_t; \
@@ -86,6 +88,10 @@
         CX##_node_t *const*_last, *_prev; \
         CX##_value_t *ref; \
     } CX##_iter_t
+
+_c_using_clist_types(clist_VOID, int);
+STC_API size_t _clist_size(const clist_VOID* self);
+#define _clist_node(CX, vp) c_container_of(vp, CX##_node_t, value)
 
 
 #define _c_using_clist(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
@@ -125,7 +131,6 @@
 \
     STC_API void        CX##_splice(CX* self, CX##_iter_t it, CX* other); \
     STC_API CX          CX##_split(CX* self, CX##_iter_t it1, CX##_iter_t it2); \
-\
     STC_API void        CX##_sort(CX* self); \
     STC_API CX##_iter_t CX##_find_in_range(const CX* self, CX##_iter_t it1, CX##_iter_t it2, RawValue val); \
 \
@@ -137,15 +142,18 @@
         CX##_value_t* head = self->last ? &self->last->next->value : NULL; \
         CX##_iter_t it = {&self->last, self->last, head}; return it; \
     } \
+\
     STC_INLINE CX##_iter_t \
     CX##_end(const CX* self) { \
         CX##_iter_t it = {NULL}; return it; \
     } \
+\
     STC_INLINE void \
     CX##_next(CX##_iter_t* it) { \
         CX##_node_t* node = it->_prev = _clist_node(CX, it->ref); \
         it->ref = (node == *it->_last ? NULL : &node->next->value); \
     } \
+\
     STC_INLINE CX##_iter_t \
     CX##_fwd(CX##_iter_t it, size_t n) { \
         while (n-- && it.ref) CX##_next(&it); \
@@ -166,10 +174,6 @@
 \
     _c_implement_clist(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
     struct stc_trailing_semicolon
-
-_c_using_clist_types(clist_VOID, int);
-STC_API size_t _clist_size(const clist_VOID* self);
-#define _clist_node(CX, vp) c_container_of(vp, CX##_node_t, value)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 

@@ -63,12 +63,11 @@ int main(void) {
 #define using_cmap_7(X, Key, Mapped, keyEquals, keyHash, mappedDel, mappedClone) \
             using_cmap_9(X, Key, Mapped, keyEquals, keyHash, \
                          mappedDel, mappedClone, c_trivial_toraw, Mapped)
-
 #define using_cmap_9(X, Key, Mapped, keyEquals, keyHash, \
                      mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
-            _c_using_chash(cmap_##X, cmap_, Key, Mapped, keyEquals, keyHash, \
-                           mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
-                           c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Key)
+            using_cmap_13(X, Key, Mapped, keyEquals, keyHash, \
+                          mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
+                          c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Key)
 
 #define using_cmap_13(X, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                       mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
@@ -128,6 +127,21 @@ int main(void) {
             _c_using_chash(cmap_##X, cmap_, Key, cstr_t, keyEqualsRaw, keyHashRaw, \
                            cstr_del, cstr_from, cstr_c_str, const char*, \
                            keyDel, keyFromRaw, keyToRaw, RawKey)
+
+#define SET_ONLY_cmap_(...)
+#define MAP_ONLY_cmap_(...) __VA_ARGS__
+#define KEY_REF_cmap_(vp)   (&(vp)->first)
+#ifndef CMAP_SIZE_T
+#define CMAP_SIZE_T uint32_t
+#endif
+#define _cmap_inits {NULL, NULL, 0, 0, 0.15f, 0.85f}
+typedef struct      {size_t idx; uint_fast8_t hx;} chash_bucket_t; \
+
+STC_API    uint64_t c_default_hash(const void *data, size_t len);
+STC_INLINE uint64_t c_default_hash32(const void* data, size_t ignored)
+           {return *(const uint32_t *)data * 0xc6a4a7935bd1e99d;}
+STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
+           {return *(const uint64_t *)data * 0xc6a4a7935bd1e99d;}
 
 
 #define _c_using_chash(CX, C, Key, Mapped, keyEqualsRaw, keyHashRaw, \
@@ -288,22 +302,6 @@ int main(void) {
                        mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
                        keyDel, keyFromRaw, keyToRaw, RawKey) \
     struct stc_trailing_semicolon
-
-
-#define SET_ONLY_cmap_(...)
-#define MAP_ONLY_cmap_(...) __VA_ARGS__
-#define KEY_REF_cmap_(vp)   (&(vp)->first)
-#ifndef CMAP_SIZE_T
-#define CMAP_SIZE_T uint32_t
-#endif
-#define _cmap_inits {NULL, NULL, 0, 0, 0.15f, 0.85f}
-typedef struct      {size_t idx; uint_fast8_t hx;} chash_bucket_t; \
-
-STC_API    uint64_t c_default_hash(const void *data, size_t len);
-STC_INLINE uint64_t c_default_hash32(const void* data, size_t ignored)
-           {return *(const uint32_t *)data * 0xc6a4a7935bd1e99d;}
-STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
-           {return *(const uint64_t *)data * 0xc6a4a7935bd1e99d;}
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 

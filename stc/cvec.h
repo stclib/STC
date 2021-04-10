@@ -28,6 +28,7 @@
 #include <string.h>
 
 #define using_cvec(...) c_MACRO_OVERLOAD(using_cvec, __VA_ARGS__)
+
 #define using_cvec_2(X, Value) \
             using_cvec_3(X, Value, c_default_compare)
 #define using_cvec_3(X, Value, valueCompare) \
@@ -38,10 +39,16 @@
             using_cvec_7(X, Value, valueCompare, valueDel, valueClone, c_trivial_toraw, Value)
 #define using_cvec_7(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
             _c_using_cvec(cvec_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue)
+
 #define using_cvec_str() \
             _c_using_cvec(cvec_str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
 
-    
+
+struct cvec_rep { size_t size, cap; void* data[]; };
+#define _cvec_rep(self) c_container_of((self)->data, struct cvec_rep, data)
+typedef int (*c_cmp_fn)(const void*, const void*);
+
+
 #define _c_using_cvec(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
 \
     typedef Value       CX##_value_t; \
@@ -182,10 +189,6 @@
 \
     _c_implement_cvec(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
     struct stc_trailing_semicolon
-
-struct cvec_rep { size_t size, cap; void* data[]; };
-#define _cvec_rep(self) c_container_of((self)->data, struct cvec_rep, data)
-typedef int (*c_cmp_fn)(const void*, const void*);
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 

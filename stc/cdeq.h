@@ -28,6 +28,7 @@
 #include <string.h>
 
 #define using_cdeq(...) c_MACRO_OVERLOAD(using_cdeq, __VA_ARGS__)
+
 #define using_cdeq_2(X, Value) \
             using_cdeq_3(X, Value, c_default_compare)
 #define using_cdeq_3(X, Value, valueCompare) \
@@ -38,8 +39,14 @@
             using_cdeq_7(X, Value, valueCompare, valueDel, valueClone, c_trivial_toraw, Value)
 #define using_cdeq_7(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
             _c_using_cdeq(cdeq_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue)
+
 #define using_cdeq_str() \
             _c_using_cdeq(cdeq_str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
+
+
+struct cdeq_rep { size_t size, cap; void* base[]; };
+#define cdeq_rep_(self) c_container_of((self)->_base, struct cdeq_rep, base)
+typedef int (*c_cmp_fn)(const void*, const void*);
 
 
 #define _c_using_cdeq(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
@@ -177,10 +184,6 @@
     } \
     _c_implement_cdeq(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
     struct stc_trailing_semicolon
-
-struct cdeq_rep { size_t size, cap; void* base[]; };
-#define cdeq_rep_(self) c_container_of((self)->_base, struct cdeq_rep, base)
-typedef int (*c_cmp_fn)(const void*, const void*);
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
