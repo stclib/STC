@@ -74,23 +74,19 @@
     typedef Value CX##_value_t; \
 \
     typedef struct CX##_node { \
-        struct CX##_node* next; \
+        struct CX##_node *next; \
         CX##_value_t value; \
     } CX##_node_t; \
 \
     typedef struct { \
-        CX##_node_t* last; \
+        CX##_node_t *last; \
     } CX; \
 \
     typedef struct { \
-        CX##_node_t* const *_last, *_prev; \
-        CX##_value_t* ref; \
+        CX##_node_t *const*_last, *_prev; \
+        CX##_value_t *ref; \
     } CX##_iter_t
 
-
-_c_using_clist_types(clist_VOID, int);
-STC_API size_t _clist_size(const clist_VOID* self);
-#define _clist_node(CX, vp) c_container_of(vp, CX##_node_t, value)
 
 #define _c_using_clist(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
 \
@@ -170,6 +166,10 @@ STC_API size_t _clist_size(const clist_VOID* self);
 \
     _c_implement_clist(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
     struct stc_trailing_semicolon
+
+_c_using_clist_types(clist_VOID, int);
+STC_API size_t _clist_size(const clist_VOID* self);
+#define _clist_node(CX, vp) c_container_of(vp, CX##_node_t, value)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 

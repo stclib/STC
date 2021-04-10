@@ -55,7 +55,10 @@ int main() {
 #include <string.h>
 #include "ccommon.h"
 
-typedef struct cbits { uint64_t* _arr; size_t size; } cbits_t, cbits;
+typedef struct cbits {
+    uint64_t *at64; 
+    size_t size; 
+} cbits, cbits_t;
 
 STC_API cbits_t     cbits_with_size(size_t size, bool value);
 STC_API cbits_t     cbits_with_values(size_t size, uint64_t pattern);
@@ -70,74 +73,74 @@ STC_API bool        cbits_disjoint(cbits_t set, cbits_t other);
 
 STC_INLINE cbits_t  cbits_init() { cbits_t set = {NULL, 0}; return set; }
 STC_INLINE void     cbits_clear(cbits_t* self) { self->size = 0; }
-STC_INLINE void     cbits_del(cbits_t* self) { c_free(self->_arr); }
+STC_INLINE void     cbits_del(cbits_t* self) { c_free(self->at64); }
 STC_INLINE size_t   cbits_size(cbits_t set) { return set.size; }
 
 STC_INLINE cbits_t* cbits_take(cbits_t* self, cbits_t other) {
-    if (self->_arr != other._arr) {cbits_del(self); *self = other;}
+    if (self->at64 != other.at64) {cbits_del(self); *self = other;}
     return self;
 }
 
 STC_INLINE cbits_t cbits_move(cbits_t* self) {
-    cbits_t tmp = *self; self->_arr = NULL, self->size = 0;
+    cbits_t tmp = *self; self->at64 = NULL, self->size = 0;
     return tmp;
 }
 
 STC_INLINE bool cbits_test(cbits_t set, size_t i) {
-    return (set._arr[i >> 6] & (1ull << (i & 63))) != 0;
+    return (set.at64[i >> 6] & (1ull << (i & 63))) != 0;
 }
 
 STC_INLINE bool cbits_at(cbits_t set, size_t i) {
-    return (set._arr[i >> 6] & (1ull << (i & 63))) != 0;
+    return (set.at64[i >> 6] & (1ull << (i & 63))) != 0;
 }
 
 STC_INLINE void cbits_set(cbits_t *self, size_t i) {
-    self->_arr[i >> 6] |= 1ull << (i & 63);
+    self->at64[i >> 6] |= 1ull << (i & 63);
 }
 
 STC_INLINE void cbits_reset(cbits_t *self, size_t i) {
-    self->_arr[i >> 6] &= ~(1ull << (i & 63));
+    self->at64[i >> 6] &= ~(1ull << (i & 63));
 }
 
 STC_INLINE void cbits_set_value(cbits_t *self, size_t i, bool value) {
-    self->_arr[i >> 6] ^= (-(uint64_t)value ^ self->_arr[i >> 6]) & 1ull << (i & 63);
+    self->at64[i >> 6] ^= (-(uint64_t)value ^ self->at64[i >> 6]) & 1ull << (i & 63);
 }
 
 STC_INLINE void cbits_flip(cbits_t *self, size_t i) {
-    self->_arr[i >> 6] ^= 1ull << (i & 63);
+    self->at64[i >> 6] ^= 1ull << (i & 63);
 }
 
 STC_INLINE void cbits_set_all(cbits_t *self, bool value) {
-    memset(self->_arr, -(int)value, ((self->size + 63) >> 6) * 8);
+    memset(self->at64, -(int)value, ((self->size + 63) >> 6) * 8);
 }
 
 STC_INLINE void cbits_set_values(cbits_t *self, uint64_t pattern) {
     size_t n = (self->size + 63) >> 6;
-    for (size_t i=0; i<n; ++i) self->_arr[i] = pattern;
+    for (size_t i=0; i<n; ++i) self->at64[i] = pattern;
 }
 
 STC_INLINE void cbits_flip_all(cbits_t *self) {
     size_t n = (self->size + 63) >> 6;
-    for (size_t i=0; i<n; ++i) self->_arr[i] ^= ~0ull;
+    for (size_t i=0; i<n; ++i) self->at64[i] ^= ~0ull;
 }
 
 /* Intersection */
 STC_INLINE void cbits_intersect(cbits_t *self, cbits_t other) {
     assert(self->size == other.size);
     size_t n = (self->size + 63) >> 6;
-    for (size_t i=0; i<n; ++i) self->_arr[i] &= other._arr[i];
+    for (size_t i=0; i<n; ++i) self->at64[i] &= other.at64[i];
 }
 /* Union */
 STC_INLINE void cbits_union(cbits_t *self, cbits_t other) {
     assert(self->size == other.size);
     size_t n = (self->size + 63) >> 6;
-    for (size_t i=0; i<n; ++i) self->_arr[i] |= other._arr[i];
+    for (size_t i=0; i<n; ++i) self->at64[i] |= other.at64[i];
 }
 /* Exclusive disjunction */
 STC_INLINE void cbits_xor(cbits_t *self, cbits_t other) {
     assert(self->size == other.size);
     size_t n = (self->size + 63) >> 6;
-    for (size_t i=0; i<n; ++i) self->_arr[i] ^= other._arr[i];
+    for (size_t i=0; i<n; ++i) self->at64[i] ^= other.at64[i];
 }
 
 #if defined(__GNUC__) || defined(__clang__)
@@ -157,21 +160,21 @@ STC_INLINE void cbits_xor(cbits_t *self, cbits_t other) {
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
 STC_DEF cbits_t* cbits_assign(cbits_t* self, cbits_t other) {
-    if (self->_arr == other._arr) return self;
+    if (self->at64 == other.at64) return self;
     if (self->size != other.size) return cbits_take(self, cbits_clone(other));
-    memcpy(self->_arr, other._arr, ((other.size + 63) >> 6)*8);
+    memcpy(self->at64, other.at64, ((other.size + 63) >> 6)*8);
     return self;
 }
 
 STC_DEF void cbits_resize(cbits_t* self, size_t size, bool value) {
     size_t new_n = (size + 63) >> 6, osize = self->size, old_n = (osize + 63) >> 6;
-    self->_arr = (uint64_t *) c_realloc(self->_arr, new_n * 8);
+    self->at64 = (uint64_t *) c_realloc(self->at64, new_n * 8);
     self->size = size;
     if (new_n >= old_n) {
-        memset(self->_arr + old_n, -(int)value, (new_n - old_n) * 8);
+        memset(self->at64 + old_n, -(int)value, (new_n - old_n) * 8);
         if (old_n > 0) {
             uint64_t m = (1ull << (osize & 63)) - 1; /* mask */
-            value ? (self->_arr[old_n - 1] |= ~m) : (self->_arr[old_n - 1] &= m);
+            value ? (self->at64[old_n - 1] |= ~m) : (self->at64[old_n - 1] &= m);
         }
     }
 }
@@ -199,13 +202,13 @@ STC_DEF char* cbits_to_str(cbits_t set, char* out, size_t start, intptr_t stop) 
 }
 STC_DEF cbits_t cbits_clone(cbits_t other) {
     size_t bytes = ((other.size + 63) >> 6) * 8;
-    cbits_t set = {(uint64_t *) memcpy(c_malloc(bytes), other._arr, bytes), other.size};
+    cbits_t set = {(uint64_t *) memcpy(c_malloc(bytes), other.at64, bytes), other.size};
     return set;
 }
 STC_DEF size_t cbits_count(cbits_t s) {
     size_t count = 0, n = s.size >> 6;
-    for (size_t i = 0; i < n; ++i) count += cpopcount64(s._arr[i]);
-    if (s.size & 63) count += cpopcount64(s._arr[n] & ((1ull << (s.size & 63)) - 1));
+    for (size_t i = 0; i < n; ++i) count += cpopcount64(s.at64[i]);
+    if (s.size & 63) count += cpopcount64(s.at64[n] & ((1ull << (s.size & 63)) - 1));
     return count;
 }
 
@@ -213,13 +216,13 @@ STC_DEF size_t cbits_count(cbits_t s) {
     assert(s.size == other.size); \
     size_t n = s.size >> 6; \
     for (size_t i = 0; i < n; ++i) \
-        if ((s._arr[i] OPR other._arr[i]) != x) \
+        if ((s.at64[i] OPR other.at64[i]) != x) \
             return false; \
     if (!(s.size & 63)) return true; \
     uint64_t i = n, m = (1ull << (s.size & 63)) - 1; \
-    return ((s._arr[i] OPR other._arr[i]) & m) == (x & m)
+    return ((s.at64[i] OPR other.at64[i]) & m) == (x & m)
 
-STC_DEF bool cbits_subset_of(cbits_t s, cbits_t other) { _cbits_SETOP(|, s._arr[i]); }
+STC_DEF bool cbits_subset_of(cbits_t s, cbits_t other) { _cbits_SETOP(|, s.at64[i]); }
 STC_DEF bool cbits_disjoint(cbits_t s, cbits_t other) { _cbits_SETOP(&, 0); }
 
 #endif

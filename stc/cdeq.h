@@ -41,20 +41,13 @@
 #define using_cdeq_str() \
             _c_using_cdeq(cdeq_str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
 
-#define typedefs_cdeq(CX, Value, RawValue) \
-    typedef Value CX##_value_t; \
-    typedef RawValue CX##_rawvalue_t; \
-    typedef struct { CX##_value_t *ref; } CX##_iter_t; \
-    typedef struct { \
-        CX##_value_t *base, *data; \
-    } CX
-
-struct cdeq_rep { size_t size, cap; void* base[]; };
-#define cdeq_rep_(self) c_container_of((self)->base, struct cdeq_rep, base)
-typedef int (*c_cmp_fn)(const void*, const void*);
 
 #define _c_using_cdeq(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
-    typedefs_cdeq(CX, Value, RawValue); \
+\
+    typedef Value       CX##_value_t; \
+    typedef RawValue    CX##_rawvalue_t; \
+    typedef struct      {CX##_value_t *ref; } CX##_iter_t; \
+    typedef struct      {CX##_value_t *_base, *data;} CX; \
 \
     STC_API CX          CX##_init(void); \
     STC_API CX          CX##_clone(CX deq); \
@@ -185,12 +178,16 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     _c_implement_cdeq(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
     struct stc_trailing_semicolon
 
+struct cdeq_rep { size_t size, cap; void* base[]; };
+#define cdeq_rep_(self) c_container_of((self)->_base, struct cdeq_rep, base)
+typedef int (*c_cmp_fn)(const void*, const void*);
+
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
 static struct cdeq_rep _cdeq_inits = {0, 0};
-#define              _cdeq_nfront(self) ((self)->data - (self)->base)
+#define              _cdeq_nfront(self) ((self)->data - (self)->_base)
 static inline double _minf(double x, double y) {return x < y ? x : y;}
 static inline double _maxf(double x, double y) {return x > y ? x : y;}
 
@@ -230,7 +227,7 @@ static inline double _maxf(double x, double y) {return x > y ? x : y;}
     CX##_expand_(CX* self, size_t n, bool at_front) { \
         struct cdeq_rep* rep = cdeq_rep_(self); \
         size_t len = rep->size, cap = rep->cap; \
-        size_t nfront = self->data - self->base, nback = cap - (nfront + len); \
+        size_t nfront = self->data - self->_base, nback = cap - (nfront + len); \
         if (at_front && nfront >= n || !at_front && nback >= n) \
             return; \
         if ((len + n)*1.3 > cap) { \
@@ -238,15 +235,15 @@ static inline double _maxf(double x, double y) {return x > y ? x : y;}
             rep = (struct cdeq_rep*) c_realloc(rep->cap ? rep : NULL, \
                                                sizeof(struct cdeq_rep) + cap*sizeof(Value)); \
             rep->size = len, rep->cap = cap; \
-            self->base = (CX##_value_t *) rep->base; \
-            self->data = self->base + nfront; \
+            self->_base = (CX##_value_t *) rep->base; \
+            self->data = self->_base + nfront; \
             CX##_expand_(self, n, at_front); \
             return; \
         } \
         size_t unused = cap - (len + n); \
         size_t pos = at_front ? _maxf(unused*0.5, (float) unused - nback) + n \
                               : _minf(unused*0.5, nfront); \
-        self->data = (CX##_value_t *) memmove(self->base + pos, self->data, len*sizeof(Value)); \
+        self->data = (CX##_value_t *) memmove(self->_base + pos, self->data, len*sizeof(Value)); \
     } \
 \
     STC_DEF void \
@@ -260,7 +257,7 @@ static inline double _maxf(double x, double y) {return x > y ? x : y;}
 \
     STC_DEF void \
     CX##_push_front(CX* self, Value value) { \
-        if (self->data == self->base) \
+        if (self->data == self->_base) \
             CX##_expand_(self, 1, true); \
         *--self->data = value; \
         ++cdeq_rep_(self)->size; \

@@ -124,15 +124,6 @@ int main(void) {
                             cstr_del, cstr_from, cstr_c_str, const char*, \
                             keyDel, keyFromRaw, keyToRaw, RawKey)
 
-#define SET_ONLY_csmap_(...)
-#define MAP_ONLY_csmap_(...) __VA_ARGS__
-#define KEY_REF_csmap_(vp)   (&(vp)->first)
-#ifndef CSMAP_SIZE_T
-#define CSMAP_SIZE_T uint32_t
-#endif
-struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
-#define _csmap_rep(self) c_container_of((self)->nodes, struct csmap_rep, nodes)
-
 
 #define _c_using_aatree(CX, C, Key, Mapped, keyCompareRaw, \
                         mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
@@ -165,7 +156,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
     } CX##_node_t; \
 \
     typedef struct { \
-        CX##_node_t* nodes; \
+        CX##_node_t *nodes; \
     } CX; \
 \
     typedef struct { \
@@ -295,6 +286,15 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
                         mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
                         keyDel, keyFromRaw, keyToRaw, RawKey) \
     struct stc_trailing_semicolon
+
+#define SET_ONLY_csmap_(...)
+#define MAP_ONLY_csmap_(...) __VA_ARGS__
+#define KEY_REF_csmap_(vp)   (&(vp)->first)
+#ifndef CSMAP_SIZE_T
+#define CSMAP_SIZE_T uint32_t
+#endif
+struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
+#define _csmap_rep(self) c_container_of((self)->nodes, struct csmap_rep, nodes)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 

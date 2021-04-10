@@ -41,20 +41,13 @@
 #define using_cvec_str() \
             _c_using_cvec(cvec_str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
 
-#define typedefs_cvec(CX, Value, RawValue) \
-    typedef Value CX##_value_t; \
-    typedef RawValue CX##_rawvalue_t; \
-    typedef struct { CX##_value_t *ref; } CX##_iter_t; \
-    typedef struct { \
-        CX##_value_t* data; \
-    } CX
     
-struct cvec_rep { size_t size, cap; void* data[]; };
-#define _cvec_rep(self) c_container_of((self)->data, struct cvec_rep, data)
-typedef int (*c_cmp_fn)(const void*, const void*);
-
 #define _c_using_cvec(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
-    typedefs_cvec(CX, Value, RawValue); \
+\
+    typedef Value       CX##_value_t; \
+    typedef RawValue    CX##_rawvalue_t; \
+    typedef struct      {CX##_value_t *ref;} CX##_iter_t; \
+    typedef struct      {CX##_value_t *data;} CX; \
 \
     STC_API CX          CX##_init(void); \
     STC_API CX          CX##_clone(CX vec); \
@@ -189,6 +182,10 @@ typedef int (*c_cmp_fn)(const void*, const void*);
 \
     _c_implement_cvec(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
     struct stc_trailing_semicolon
+
+struct cvec_rep { size_t size, cap; void* data[]; };
+#define _cvec_rep(self) c_container_of((self)->data, struct cvec_rep, data)
+typedef int (*c_cmp_fn)(const void*, const void*);
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
