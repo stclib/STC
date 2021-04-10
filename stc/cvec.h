@@ -29,17 +29,17 @@
 
 #define using_cvec(...) c_MACRO_OVERLOAD(using_cvec, __VA_ARGS__)
 #define using_cvec_2(X, Value) \
-                    using_cvec_3(X, Value, c_default_compare)
+            using_cvec_3(X, Value, c_default_compare)
 #define using_cvec_3(X, Value, valueCompare) \
-                    using_cvec_5(X, Value, valueCompare, c_trivial_del, c_trivial_fromraw)
+            using_cvec_5(X, Value, valueCompare, c_trivial_del, c_trivial_fromraw)
 #define using_cvec_4(X, Value, valueCompare, valueDel) \
-                    using_cvec_5(X, Value, valueCompare, valueDel, c_no_clone)
+            using_cvec_5(X, Value, valueCompare, valueDel, c_no_clone)
 #define using_cvec_5(X, Value, valueCompare, valueDel, valueClone) \
-                    using_cvec_7(X, Value, valueCompare, valueDel, valueClone, c_trivial_toraw, Value)
+            using_cvec_7(X, Value, valueCompare, valueDel, valueClone, c_trivial_toraw, Value)
 #define using_cvec_7(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
-                    _c_using_cvec(cvec_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue)
+            _c_using_cvec(cvec_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue)
 #define using_cvec_str() \
-                    _c_using_cvec(cvec_str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
+            _c_using_cvec(cvec_str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
 
 #define typedefs_cvec(CX, Value, RawValue) \
     typedef Value CX##_value_t; \
@@ -68,7 +68,6 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     STC_API void        CX##_reserve(CX* self, size_t cap); \
     STC_API void        CX##_resize(CX* self, size_t size, Value fill_val); \
     STC_INLINE void     CX##_swap(CX* a, CX* b) {c_swap(CX, *a, *b);} \
-\
     STC_API void        CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t size); \
     STC_API void        CX##_push_back(CX* self, Value value); \
     STC_INLINE void     CX##_emplace_back(CX* self, RawValue raw) \
@@ -105,20 +104,20 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     CX##_insert_range_p(CX* self, CX##_value_t* pos, const CX##_value_t* pfirst, const CX##_value_t* pfinish); \
 \
     STC_INLINE CX##_iter_t \
-    CX##_insert_range(CX* self, CX##_iter_t pos, CX##_iter_t first, CX##_iter_t finish) { \
-        return CX##_insert_range_p(self, pos.ref, first.ref, finish.ref); \
+    CX##_insert_range(CX* self, CX##_iter_t it, CX##_iter_t it1, CX##_iter_t it2) { \
+        return CX##_insert_range_p(self, it.ref, it1.ref, it2.ref); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_insert_at(CX* self, CX##_iter_t pos, Value value) { \
-        return CX##_insert_range_p(self, pos.ref, &value, &value + 1); \
+    CX##_insert_at(CX* self, CX##_iter_t it, Value value) { \
+        return CX##_insert_range_p(self, it.ref, &value, &value + 1); \
     } \
     STC_INLINE CX##_iter_t \
     CX##_insert(CX* self, size_t idx, Value value) { \
         return CX##_insert_range_p(self, self->data + idx, &value, &value + 1); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_emplace_at(CX* self, CX##_iter_t pos, RawValue raw) { \
-        return CX##_insert_at(self, pos, valueFromRaw(raw)); \
+    CX##_emplace_at(CX* self, CX##_iter_t it, RawValue raw) { \
+        return CX##_insert_at(self, it, valueFromRaw(raw)); \
     } \
     STC_INLINE CX##_iter_t \
     CX##_emplace(CX* self, size_t idx, RawValue raw) { \
@@ -129,12 +128,12 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     CX##_erase_range_p(CX* self, CX##_value_t* first, CX##_value_t* finish); \
 \
     STC_INLINE CX##_iter_t \
-    CX##_erase_range(CX* self, CX##_iter_t first, CX##_iter_t finish) { \
-        return CX##_erase_range_p(self, first.ref, finish.ref); \
+    CX##_erase_range(CX* self, CX##_iter_t it1, CX##_iter_t it2) { \
+        return CX##_erase_range_p(self, it1.ref, it2.ref); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_erase_at(CX* self, CX##_iter_t pos) { \
-        return CX##_erase_range_p(self, pos.ref, pos.ref + 1); \
+    CX##_erase_at(CX* self, CX##_iter_t it) { \
+        return CX##_erase_range_p(self, it.ref, it.ref + 1); \
     } \
     STC_INLINE CX##_iter_t \
     CX##_erase(CX* self, size_t idx, size_t n) { \
@@ -166,7 +165,7 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     CX##_index(CX vec, CX##_iter_t it) {return it.ref - vec.data;} \
 \
     STC_API CX##_iter_t \
-    CX##_find_in_range(CX##_iter_t first, CX##_iter_t finish, RawValue raw); \
+    CX##_find_in_range(CX##_iter_t it1, CX##_iter_t it2, RawValue raw); \
     STC_INLINE CX##_iter_t \
     CX##_find(const CX* self, RawValue raw) { \
         return CX##_find_in_range(CX##_begin(self), CX##_end(self), raw); \
@@ -189,7 +188,7 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     } \
 \
     _c_implement_cvec(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
-    typedef CX CX##_t
+    struct stc_trailing_semicolon
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 

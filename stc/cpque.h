@@ -52,12 +52,12 @@
 #define using_cpque(...) c_MACRO_OVERLOAD(using_cpque, __VA_ARGS__)
 
 #define using_cpque_2(X, ctype) \
-    _c_using_cpque(cpque_##X, ctype, ctype##_value_compare)
+            _c_using_cpque(cpque_##X, ctype, ctype##_value_compare)
 #define using_cpque_3(X, ctype, valueCompare) \
-    _c_using_cpque(cpque_##X, ctype, valueCompare)
+            _c_using_cpque(cpque_##X, ctype, valueCompare)
 
 #define _c_using_cpque(CX, ctype, valueCompare) \
-    typedef ctype##_t CX; \
+    typedef ctype CX; \
     typedef ctype##_value_t CX##_value_t; \
     typedef ctype##_rawvalue_t CX##_rawvalue_t; \
 \
@@ -82,7 +82,8 @@
                                 {CX##_push(self, ctype##_value_fromraw(raw));} \
     STC_API void            CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t n); \
 \
-    _c_implement_cpque(CX, ctype, valueCompare)
+    _c_implement_cpque(CX, ctype, valueCompare) \
+    struct stc_trailing_semicolon
 
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
@@ -135,7 +136,6 @@
         for (size_t i = 0; i < n; ++i) \
             CX##_push(self, ctype##_value_fromraw(arr[i])); \
     } \
-    typedef CX CX##_t
 
 #else
 #define _c_implement_cpque(CX, ctype, valueCompare)

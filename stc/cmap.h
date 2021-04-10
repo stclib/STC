@@ -50,94 +50,84 @@ int main(void) {
 #include <stdlib.h>
 #include <string.h>
 
-#define _cmap_inits   {NULL, NULL, 0, 0, 0.15f, 0.85f}
-typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
-
 #define using_cmap(...) c_MACRO_OVERLOAD(using_cmap, __VA_ARGS__)
 
 #define using_cmap_3(X, Key, Mapped) \
-    using_cmap_5(X, Key, Mapped, c_default_equals, c_default_hash)
+            using_cmap_5(X, Key, Mapped, c_default_equals, c_default_hash)
 #define using_cmap_5(X, Key, Mapped, keyEquals, keyHash) \
-    using_cmap_7(X, Key, Mapped, keyEquals, keyHash, \
-                 c_trivial_del, c_trivial_fromraw)
+            using_cmap_7(X, Key, Mapped, keyEquals, keyHash, \
+                         c_trivial_del, c_trivial_fromraw)
 #define using_cmap_6(X, Key, Mapped, keyEquals, keyHash, mappedDel) \
-    using_cmap_7(X, Key, Mapped, keyEquals, keyHash, \
-                 mappedDel, c_no_clone)
+            using_cmap_7(X, Key, Mapped, keyEquals, keyHash, \
+                         mappedDel, c_no_clone)
 #define using_cmap_7(X, Key, Mapped, keyEquals, keyHash, mappedDel, mappedClone) \
-    using_cmap_9(X, Key, Mapped, keyEquals, keyHash, \
-                 mappedDel, mappedClone, c_trivial_toraw, Mapped)
+            using_cmap_9(X, Key, Mapped, keyEquals, keyHash, \
+                         mappedDel, mappedClone, c_trivial_toraw, Mapped)
 
 #define using_cmap_9(X, Key, Mapped, keyEquals, keyHash, \
                      mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
-    _c_using_chash(cmap_##X, cmap_, Key, Mapped, keyEquals, keyHash, \
-                   mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
-                   c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Key)
+            _c_using_chash(cmap_##X, cmap_, Key, Mapped, keyEquals, keyHash, \
+                           mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
+                           c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Key)
 
 #define using_cmap_13(X, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                       mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
                       keyDel, keyFromRaw, keyToRaw, RawKey) \
-    _c_using_chash(cmap_##X, cmap_, Key, Mapped, keyEqualsRaw, keyHashRaw, \
-                   mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
-                   keyDel, keyFromRaw, keyToRaw, RawKey)
+            _c_using_chash(cmap_##X, cmap_, Key, Mapped, keyEqualsRaw, keyHashRaw, \
+                           mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
+                           keyDel, keyFromRaw, keyToRaw, RawKey)
 
 
 #define using_cmap_keydef(...) c_MACRO_OVERLOAD(using_cmap_keydef, __VA_ARGS__)
 
 #define using_cmap_keydef_7(X, Key, Mapped, keyEquals, keyHash, keyDel, keyClone) \
-    using_cmap_keydef_9(X, Key, Mapped, keyEquals, keyHash, \
-                        keyDel, keyClone, c_trivial_toraw, Key)
+            using_cmap_keydef_9(X, Key, Mapped, keyEquals, keyHash, \
+                                keyDel, keyClone, c_trivial_toraw, Key)
 
 #define using_cmap_keydef_9(X, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                             keyDel, keyFromRaw, keyToRaw, RawKey) \
-    _c_using_chash(cmap_##X, cmap_, Key, Mapped, keyEqualsRaw, keyHashRaw, \
-                   c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Mapped, \
-                   keyDel, keyFromRaw, keyToRaw, RawKey)
+            _c_using_chash(cmap_##X, cmap_, Key, Mapped, keyEqualsRaw, keyHashRaw, \
+                           c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Mapped, \
+                           keyDel, keyFromRaw, keyToRaw, RawKey)
 
 #define using_cmap_str() \
-    _c_using_chash(cmap_str, cmap_, cstr_t, cstr_t, cstr_equals_raw, cstr_hash_raw, \
-                   cstr_del, cstr_from, cstr_c_str, const char*, \
-                   cstr_del, cstr_from, cstr_c_str, const char*)
+            _c_using_chash(cmap_str, cmap_, cstr_t, cstr_t, cstr_equals_raw, cstr_hash_raw, \
+                           cstr_del, cstr_from, cstr_c_str, const char*, \
+                           cstr_del, cstr_from, cstr_c_str, const char*)
 
 
 #define using_cmap_strkey(...) c_MACRO_OVERLOAD(using_cmap_strkey, __VA_ARGS__)
 
 #define using_cmap_strkey_2(X, Mapped) \
-    using_cmap_strkey_4(X, Mapped, c_trivial_del, c_trivial_fromraw)
+            using_cmap_strkey_4(X, Mapped, c_trivial_del, c_trivial_fromraw)
 #define using_cmap_strkey_3(X, Mapped, mappedDel) \
-    using_cmap_strkey_4(X, Mapped, mappedDel, c_no_clone)
+            using_cmap_strkey_4(X, Mapped, mappedDel, c_no_clone)
 #define using_cmap_strkey_4(X, Mapped, mappedDel, mappedClone) \
-    _c_using_chash_strkey(X, cmap_, Mapped, mappedDel, mappedClone, c_trivial_toraw, Mapped)
+            _c_using_chash_strkey(X, cmap_, Mapped, mappedDel, mappedClone, c_trivial_toraw, Mapped)
 #define using_cmap_strkey_6(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
-    _c_using_chash_strkey(X, cmap_, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped)
+            _c_using_chash_strkey(X, cmap_, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped)
 
 #define _c_using_chash_strkey(X, C, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
-    _c_using_chash(C##X, C, cstr_t, Mapped, cstr_equals_raw, cstr_hash_raw, \
-                   mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
-                   cstr_del, cstr_from, cstr_c_str, const char*)
+            _c_using_chash(C##X, C, cstr_t, Mapped, cstr_equals_raw, cstr_hash_raw, \
+                           mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
+                           cstr_del, cstr_from, cstr_c_str, const char*)
 
 
 #define using_cmap_strval(...) c_MACRO_OVERLOAD(using_cmap_strval, __VA_ARGS__)
 
 #define using_cmap_strval_2(X, Key) \
-    using_cmap_strval_4(X, Key, c_default_equals, c_default_hash)
+            using_cmap_strval_4(X, Key, c_default_equals, c_default_hash)
 #define using_cmap_strval_4(X, Key, keyEquals, keyHash) \
-    using_cmap_strval_6(X, Key, keyEquals, keyHash, c_trivial_del, c_trivial_fromraw)
+            using_cmap_strval_6(X, Key, keyEquals, keyHash, c_trivial_del, c_trivial_fromraw)
 #define using_cmap_strval_5(X, Key, keyEquals, keyHash, keyDel) \
-    using_cmap_strval_6(X, Key, keyEquals, keyHash, keyDel, c_no_clone)
+            using_cmap_strval_6(X, Key, keyEquals, keyHash, keyDel, c_no_clone)
 #define using_cmap_strval_6(X, Key, keyEquals, keyHash, keyDel, keyClone) \
-    using_cmap_strval_8(X, Key, keyEquals, keyHash, keyDel, keyClone, c_trivial_toraw, Key)
+            using_cmap_strval_8(X, Key, keyEquals, keyHash, keyDel, keyClone, c_trivial_toraw, Key)
 
 #define using_cmap_strval_8(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
-    _c_using_chash(cmap_##X, cmap_, Key, cstr_t, keyEqualsRaw, keyHashRaw, \
-                   cstr_del, cstr_from, cstr_c_str, const char*, \
-                   keyDel, keyFromRaw, keyToRaw, RawKey)
-
-#define SET_ONLY_cmap_(...)
-#define MAP_ONLY_cmap_(...) __VA_ARGS__
-#define KEY_REF_cmap_(vp)   (&(vp)->first)
-#ifndef CMAP_SIZE_T
-#define CMAP_SIZE_T uint32_t
-#endif
+            _c_using_chash(cmap_##X, cmap_, Key, cstr_t, keyEqualsRaw, keyHashRaw, \
+                           cstr_del, cstr_from, cstr_c_str, const char*, \
+                           keyDel, keyFromRaw, keyToRaw, RawKey)
 
 
 #define _c_using_chash(CX, C, Key, Mapped, keyEqualsRaw, keyHashRaw, \
@@ -177,57 +167,45 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
         uint8_t* _hx; \
     } CX##_iter_t; \
 \
-    STC_INLINE CX \
-    CX##_init(void) {CX m = _cmap_inits; return m;} \
-    STC_INLINE bool \
-    CX##_empty(CX m) {return m.size == 0;} \
-    STC_INLINE size_t \
-    CX##_size(CX m) {return (size_t) m.size;} \
+    STC_API chash_bucket_t  CX##_bucket_(const CX* self, const CX##_rawkey_t* rkeyptr); \
+    STC_API CX##_result_t   CX##_insert_entry_(CX* self, RawKey rkey); \
+\
+    STC_INLINE CX           CX##_init(void) {CX m = _cmap_inits; return m;} \
+    STC_API CX              CX##_with_capacity(size_t cap); \
+    STC_API CX              CX##_clone(CX map); \
+    STC_API void            CX##_reserve(CX* self, size_t capacity); \
+    STC_API void            CX##_del(CX* self); \
+    STC_API void            CX##_clear(CX* self); \
+    STC_INLINE bool         CX##_empty(CX m) {return m.size == 0;} \
+    STC_INLINE size_t       CX##_size(CX m) {return (size_t) m.size;} \
+    STC_INLINE size_t       CX##_bucket_count(CX map) {return (size_t) map.bucket_count;} \
+    STC_INLINE size_t       CX##_capacity(CX map) \
+                                {return (size_t) (map.bucket_count*map.max_load_factor);} \
+    STC_INLINE void         CX##_swap(CX *map1, CX *map2) {c_swap(CX, *map1, *map2);} \
+    STC_API CX##_iter_t     CX##_find(const CX* self, RawKey rkey); \
+    STC_INLINE bool         CX##_contains(const CX* self, RawKey rkey) \
+                                {return self->size && self->_hashx[CX##_bucket_(self, &rkey).idx];} \
+    STC_API void            CX##_erase_entry(CX* self, CX##_value_t* val); \
+\
     STC_INLINE CX##_value_t \
     CX##_value_clone(CX##_value_t val) { \
         *KEY_REF_##C(&val) = keyFromRaw(keyToRaw(KEY_REF_##C(&val))); \
         MAP_ONLY_##C( val.second = mappedFromRaw(mappedToRaw(&val.second)); ) \
         return val; \
     } \
+\
     STC_INLINE void \
     CX##_value_del(CX##_value_t* val) { \
         keyDel(KEY_REF_##C(val)); \
         MAP_ONLY_##C( mappedDel(&val->second); ) \
     } \
-    STC_INLINE size_t \
-    CX##_bucket_count(CX map) {return (size_t) map.bucket_count;} \
-    STC_INLINE size_t \
-    CX##_capacity(CX map) {return (size_t) (map.bucket_count*map.max_load_factor);} \
-    STC_INLINE void \
-    CX##_swap(CX *map1, CX *map2) {c_swap(CX, *map1, *map2);} \
+\
     STC_INLINE void \
     CX##_set_load_factors(CX* self, float min_load, float max_load) { \
         self->min_load_factor = min_load; \
         self->max_load_factor = max_load; \
     } \
-    STC_API CX \
-    CX##_with_capacity(size_t cap); \
-    STC_API CX \
-    CX##_clone(CX map); \
-    STC_API void \
-    CX##_reserve(CX* self, size_t capacity); \
-    STC_API void \
-    CX##_del(CX* self); \
-    STC_API void \
-    CX##_clear(CX* self); \
-\
-    STC_API CX##_result_t \
-    CX##_insert_entry_(CX* self, RawKey rkey); \
-    STC_API chash_bucket_t \
-    CX##_bucket_(const CX* self, const CX##_rawkey_t* rkeyptr); \
-\
-    STC_API CX##_iter_t \
-    CX##_find(const CX* self, RawKey rkey); \
-    STC_INLINE bool \
-    CX##_contains(const CX* self, RawKey rkey) { \
-        return self->size && self->_hashx[CX##_bucket_(self, &rkey).idx]; \
-    } \
-\
+ \
     STC_INLINE CX##_result_t \
     CX##_emplace(CX* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
         CX##_result_t res = CX##_insert_entry_(self, rkey); \
@@ -237,6 +215,7 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
         } \
         return res; \
     } \
+\
     STC_INLINE void \
     CX##_emplace_n(CX* self, const CX##_rawvalue_t arr[], size_t n) { \
         for (size_t i=0; i<n; ++i) SET_ONLY_##C( CX##_emplace(self, arr[i]); ) \
@@ -292,14 +271,13 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
         while ((++it->ref, *++it->_hx == 0)) ; \
     } \
 \
-    STC_API void \
-    CX##_erase_entry(CX* self, CX##_value_t* val); \
     STC_INLINE size_t \
     CX##_erase(CX* self, RawKey rkey) { \
         if (self->size == 0) return 0; \
         chash_bucket_t b = CX##_bucket_(self, &rkey); \
         return self->_hashx[b.idx] ? CX##_erase_entry(self, self->table + b.idx), 1 : 0; \
     } \
+\
     STC_INLINE CX##_iter_t \
     CX##_erase_at(CX* self, CX##_iter_t pos) { \
         CX##_erase_entry(self, pos.ref); \
@@ -309,7 +287,17 @@ typedef struct {size_t idx; uint_fast8_t hx;} chash_bucket_t;
     _c_implement_chash(CX, C, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                        mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
                        keyDel, keyFromRaw, keyToRaw, RawKey) \
-    typedef CX CX##_t
+    struct stc_trailing_semicolon
+
+
+#define SET_ONLY_cmap_(...)
+#define MAP_ONLY_cmap_(...) __VA_ARGS__
+#define KEY_REF_cmap_(vp)   (&(vp)->first)
+#ifndef CMAP_SIZE_T
+#define CMAP_SIZE_T uint32_t
+#endif
+#define _cmap_inits {NULL, NULL, 0, 0, 0.15f, 0.85f}
+typedef struct      {size_t idx; uint_fast8_t hx;} chash_bucket_t; \
 
 STC_API    uint64_t c_default_hash(const void *data, size_t len);
 STC_INLINE uint64_t c_default_hash32(const void* data, size_t ignored)
@@ -321,11 +309,13 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-#define           fastrange_uint32_t(x, n) ((size_t) (((uint32_t)(x)*(uint64_t)(n)) >> 32))
 #ifdef c_umul128
-STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) {uint64_t l,h; c_umul128(x,n,&l,&h); return h;}
+STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) \
+    {uint64_t l, h; c_umul128(x, n, &l, &h); return h;}
 #endif
+#define fastrange_uint32_t(x, n) ((size_t) (((uint32_t)(x)*(uint64_t)(n)) >> 32))
 #define chash_index_(h, entryPtr) ((entryPtr) - (h).table)
+
 
 #define _c_implement_chash(CX, C, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                            mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \

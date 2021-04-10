@@ -48,22 +48,21 @@ int main(void) {
     c_MACRO_OVERLOAD(using_cset, __VA_ARGS__)
 
 #define using_cset_2(X, Key) \
-    using_cset_4(X, Key, c_default_equals, c_default_hash)
+            using_cset_4(X, Key, c_default_equals, c_default_hash)
 #define using_cset_4(X, Key, keyEquals, keyHash) \
-    using_cset_6(X, Key, keyEquals, keyHash, c_trivial_del, c_trivial_fromraw)
+            using_cset_6(X, Key, keyEquals, keyHash, c_trivial_del, c_trivial_fromraw)
 #define using_cset_5(X, Key, keyEquals, keyHash, keyDel) \
-    using_cset_6(X, Key, keyEquals, keyHash, keyDel, c_no_clone)
+            using_cset_6(X, Key, keyEquals, keyHash, keyDel, c_no_clone)
 #define using_cset_6(X, Key, keyEquals, keyHash, keyDel, keyClone) \
-    using_cset_8(X, Key, keyEquals, keyHash, keyDel, keyClone, c_trivial_toraw, Key)
+            using_cset_8(X, Key, keyEquals, keyHash, keyDel, keyClone, c_trivial_toraw, Key)
 
 #define using_cset_8(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
-    _c_using_chash(cset_##X, cset_, Key, Key, keyEqualsRaw, keyHashRaw, \
-                   @@, @@, @@, void, \
-                   keyDel, keyFromRaw, keyToRaw, RawKey)
+            _c_using_chash(cset_##X, cset_, Key, Key, keyEqualsRaw, keyHashRaw, \
+                           @@, @@, @@, void, keyDel, keyFromRaw, keyToRaw, RawKey)
 
 /* cset_str: */
 #define using_cset_str() \
-    _c_using_chash_strkey(str, cset_, cstr_t, @@, @@, @@, void)
+            _c_using_chash_strkey(str, cset_, cstr_t, @@, @@, @@, void)
 
 #define SET_ONLY_cset_(...) __VA_ARGS__
 #define MAP_ONLY_cset_(...)

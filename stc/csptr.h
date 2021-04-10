@@ -87,65 +87,77 @@ typedef long atomic_count_t;
 #define using_csptr(...) c_MACRO_OVERLOAD(using_csptr, __VA_ARGS__)
 
 #define using_csptr_2(X, Value) \
-    using_csptr_3(X, Value, c_default_compare)
-
+            using_csptr_3(X, Value, c_default_compare)
 #define using_csptr_3(X, Value, valueCompare) \
-    using_csptr_4(X, Value, valueCompare, c_trivial_del)
+            using_csptr_4(X, Value, valueCompare, c_trivial_del)
+#define using_csptr_4(X, Value, valueCompare, valueDel) \    
+            _c_using_csptr(csptr_##X, Value, valueCompare, valueDel)
 
-#define using_csptr_4(X, Value, valueCompare, valueDel) \
-    typedef Value csptr_##X##_value_t; \
-    typedef struct { csptr_##X##_value_t* get; atomic_count_t* use_count; } csptr_##X; \
+
+#define _c_using_csptr(CX, Value, valueCompare, valueDel) \
+    typedef Value CX##_value_t; \
 \
-    STC_INLINE csptr_##X \
-    csptr_##X##_from(csptr_##X##_value_t* p) { \
-        csptr_##X ptr = {p}; \
+    typedef struct { \
+        CX##_value_t* get; \
+        atomic_count_t* use_count; \
+    } CX; \
+\
+    STC_INLINE CX \
+    CX##_from(CX##_value_t* p) { \
+        CX ptr = {p}; \
         if (p) *(ptr.use_count = c_new_1(atomic_count_t)) = 1; \
         return ptr; \
     } \
-    STC_INLINE csptr_##X \
-    csptr_##X##_make(csptr_##X##_value_t val) { \
-        csptr_##X ptr = {c_new_1(csptr_##X##_value_t), c_new_1(atomic_count_t)}; \
+\
+    STC_INLINE CX \
+    CX##_make(CX##_value_t val) { \
+        CX ptr = {c_new_1(CX##_value_t), c_new_1(atomic_count_t)}; \
         *ptr.get = val, *ptr.use_count = 1; return ptr; \
     } \
-    STC_INLINE csptr_##X \
-    csptr_##X##_clone(csptr_##X ptr) { \
+\
+    STC_INLINE CX \
+    CX##_clone(CX ptr) { \
         if (ptr.use_count) atomic_increment(ptr.use_count); \
         return ptr; \
     } \
-    STC_INLINE csptr_##X \
-    csptr_##X##_move(csptr_##X* self) { \
-        csptr_##X ptr = *self; \
+\
+    STC_INLINE CX \
+    CX##_move(CX* self) { \
+        CX ptr = *self; \
         self->get = NULL, self->use_count = NULL; \
         return ptr; \
     } \
 \
     STC_INLINE void \
-    csptr_##X##_del(csptr_##X* self) { \
+    CX##_del(CX* self) { \
         if (self->use_count && atomic_decrement(self->use_count) == 0) { \
-            c_free(self->use_count); \
             valueDel(self->get); \
+            c_free(self->use_count); \
             c_free(self->get); \
         } \
     } \
+\
     STC_INLINE void \
-    csptr_##X##_reset(csptr_##X* self) { \
-        csptr_##X##_del(self); \
+    CX##_reset(CX* self) { \
+        CX##_del(self); \
         self->use_count = NULL, self->get = NULL; \
     } \
+\
     STC_INLINE void \
-    csptr_##X##_reset_to(csptr_##X* self, csptr_##X##_value_t* p) { \
-        csptr_##X##_del(self); \
-        *self = csptr_##X##_from(p); \
+    CX##_reset_to(CX* self, CX##_value_t* p) { \
+        CX##_del(self); \
+        *self = CX##_from(p); \
     } \
 \
     STC_INLINE int \
-    csptr_##X##_compare(csptr_##X* x, csptr_##X* y) { \
+    CX##_compare(CX* x, CX* y) { \
         return valueCompare(x->get, y->get); \
     } \
+\
     STC_INLINE bool \
-    csptr_##X##_equals(csptr_##X* x, csptr_##X* y) { \
+    CX##_equals(CX* x, CX* y) { \
         return valueCompare(x->get, y->get) == 0; \
     } \
-    typedef csptr_##X csptr_##X##_t
+    struct stc_trailing_semicolon
 
 #endif

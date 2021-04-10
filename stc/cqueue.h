@@ -57,10 +57,10 @@
 #include "cdeq.h"
 
 #define using_cqueue(X, ctype) \
-    _c_using_cqueue(cqueue_##X, ctype)
+            _c_using_cqueue(cqueue_##X, ctype)
 
 #define _c_using_cqueue(CX, ctype) \
-    typedef ctype##_t CX; \
+    typedef ctype CX; \
     typedef ctype##_value_t CX##_value_t; \
     typedef ctype##_rawvalue_t CX##_rawvalue_t; \
     typedef ctype##_iter_t CX##_iter_t; \
@@ -88,6 +88,6 @@
     STC_INLINE CX##_iter_t      CX##_begin(const CX* self) {return ctype##_begin(self);} \
     STC_INLINE CX##_iter_t      CX##_end(const CX* self) {return ctype##_end(self);} \
     STC_INLINE void             CX##_next(CX##_iter_t* it) {ctype##_next(it);} \
-    typedef CX CX##_t
+    struct stc_trailing_semicolon
 
 #endif

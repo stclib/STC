@@ -29,17 +29,17 @@
 
 #define using_cdeq(...) c_MACRO_OVERLOAD(using_cdeq, __VA_ARGS__)
 #define using_cdeq_2(X, Value) \
-                    using_cdeq_3(X, Value, c_default_compare)
+            using_cdeq_3(X, Value, c_default_compare)
 #define using_cdeq_3(X, Value, valueCompare) \
-                    using_cdeq_5(X, Value, valueCompare, c_trivial_del, c_trivial_fromraw)
+            using_cdeq_5(X, Value, valueCompare, c_trivial_del, c_trivial_fromraw)
 #define using_cdeq_4(X, Value, valueCompare, valueDel) \
-                    using_cdeq_5(X, Value, valueCompare, valueDel, c_no_clone)
+            using_cdeq_5(X, Value, valueCompare, valueDel, c_no_clone)
 #define using_cdeq_5(X, Value, valueCompare, valueDel, valueClone) \
-                    using_cdeq_7(X, Value, valueCompare, valueDel, valueClone, c_trivial_toraw, Value)
+            using_cdeq_7(X, Value, valueCompare, valueDel, valueClone, c_trivial_toraw, Value)
 #define using_cdeq_7(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
-                    _c_using_cdeq(cdeq_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue)
+            _c_using_cdeq(cdeq_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue)
 #define using_cdeq_str() \
-                    _c_using_cdeq(cdeq_str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
+            _c_using_cdeq(cdeq_str, cstr_t, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
 
 #define typedefs_cdeq(CX, Value, RawValue) \
     typedef Value CX##_value_t; \
@@ -116,20 +116,20 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     CX##_insert_range_p(CX* self, CX##_value_t* pos, const CX##_value_t* pfirst, const CX##_value_t* pfinish); \
 \
     STC_INLINE CX##_iter_t \
-    CX##_insert_range(CX* self, CX##_iter_t pos, CX##_iter_t first, CX##_iter_t finish) { \
-        return CX##_insert_range_p(self, pos.ref, first.ref, finish.ref); \
+    CX##_insert_range(CX* self, CX##_iter_t it, CX##_iter_t first, CX##_iter_t finish) { \
+        return CX##_insert_range_p(self, it.ref, first.ref, finish.ref); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_insert_at(CX* self, CX##_iter_t pos, Value value) { \
-        return CX##_insert_range_p(self, pos.ref, &value, &value + 1); \
+    CX##_insert_at(CX* self, CX##_iter_t it, Value value) { \
+        return CX##_insert_range_p(self, it.ref, &value, &value + 1); \
     } \
     STC_INLINE CX##_iter_t \
     CX##_insert(CX* self, size_t idx, Value value) { \
         return CX##_insert_range_p(self, self->data + idx, &value, &value + 1); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_emplace_at(CX* self, CX##_iter_t pos, RawValue raw) { \
-        return CX##_insert_at(self, pos, valueFromRaw(raw)); \
+    CX##_emplace_at(CX* self, CX##_iter_t it, RawValue raw) { \
+        return CX##_insert_at(self, it, valueFromRaw(raw)); \
     } \
     STC_INLINE CX##_iter_t \
     CX##_emplace(CX* self, size_t idx, RawValue raw) { \
@@ -144,8 +144,8 @@ typedef int (*c_cmp_fn)(const void*, const void*);
         return CX##_erase_range_p(self, first.ref, finish.ref); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_erase_at(CX* self, CX##_iter_t pos) { \
-        return CX##_erase_range_p(self, pos.ref, pos.ref + 1); \
+    CX##_erase_at(CX* self, CX##_iter_t it) { \
+        return CX##_erase_range_p(self, it.ref, it.ref + 1); \
     } \
     STC_INLINE CX##_iter_t \
     CX##_erase(CX* self, size_t idx, size_t n) { \
@@ -183,7 +183,7 @@ typedef int (*c_cmp_fn)(const void*, const void*);
         CX##_sort_range(CX##_begin(self), CX##_end(self), CX##_value_compare); \
     } \
     _c_implement_cdeq(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
-    typedef CX CX##_t
+    struct stc_trailing_semicolon
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
