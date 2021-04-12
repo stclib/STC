@@ -171,7 +171,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
         CX##_value_t *ref; \
         CX##_node_t *_d; \
         int _top; \
-        CX##_size_t _tn, _st[40]; \
+        CX##_size_t _tn, _st[36]; \
     } CX##_iter_t; \
 \
     STC_API CX            CX##_init(void); \

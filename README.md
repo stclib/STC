@@ -8,7 +8,11 @@ Introduction
 A modern, templated, user-friendly, fast, fully type-safe, and customizable container library for C99,
 with a uniform API across the containers, and is similar to the c++ standard library containers API.
 
-It is a compact, header-only library with the all the major "standard" data containers, except for the multi-map/set variants:
+Please read [this blog](https://iafisher.com/blog/2020/06/type-safe-generics-in-c) by Ian Fisher for
+an introduction to type-safe generic data structures in C.
+
+STC is a compact, header-only library with the all the major "standard" data containers, except for 
+the multi-map/set variants:
 - [***carray*** - **multi-dim array** type](docs/carray_api.md)
 - [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
 - [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)

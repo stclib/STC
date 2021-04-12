@@ -7,7 +7,7 @@ Fast random access is not supported.
 Unlike the c++ class *std::forward_list*, **clist** has an API similar to ***std::list***, and also supports
 *push_back()* (**O**(1) time). It is still implemented as a singly-linked list. A **clist** object
 occupies only one pointer in memory, and like *std::forward_list* the length of the list is not stored.
-The method *clist_X_count()* returns size of list, computed in **O**(*n*) time.
+All functions have **O**(1) complexity, apart from *clist_X_count()*, which returns size of list in **O**(*n*) time.
 
 ***Iterator invalidation***: Adding, removing and moving the elements within the list, or across several lists
 will invalidate other iterators currently refering to these elements and their immediate succesive elements.
@@ -51,7 +51,7 @@ void                clist_X_clear(clist_X* self);
 void                clist_X_del(clist_X* self);                                     // destructor
 
 bool                clist_X_empty(clist_X list);
-size_t              clist_X_count(clist_X list);                                    // size() in O(n)
+size_t              clist_X_count(clist_X list);                                    // size() in O(n) time
 
 clist_X_value_t*    clist_X_front(const clist_X* self);
 clist_X_value_t*    clist_X_back(const clist_X* self);
@@ -60,11 +60,11 @@ void                clist_X_push_front(clist_X* self, Value value);
 void                clist_X_emplace_front(clist_X* self, RawValue raw);
 void                clist_X_pop_front(clist_X* self);
 
-void                clist_X_push_back(clist_X* self, Value value);
+void                clist_X_push_back(clist_X* self, Value value);                  // note: no pop_back().
 void                clist_X_emplace_back(clist_X* self, RawValue raw);
 void                clist_X_emplace_n(clist_X *self, const clist_X_rawvalue_t arr[], size_t size);
 
-clist_X_iter_t      clist_X_insert(clist_X* self, clist_X_iter_t it, Value value);  // return iter to new elem; 'it' may be end
+clist_X_iter_t      clist_X_insert(clist_X* self, clist_X_iter_t it, Value value);  // return iter to new elem; End allowed
 clist_X_iter_t      clist_X_emplace(clist_X* self, clist_X_iter_t it, RawValue raw);
 
 clist_X_iter_t      clist_X_erase_at(clist_X* self, clist_X_iter_t it);             // return iter after it
@@ -72,9 +72,9 @@ clist_X_iter_t      clist_X_erase_range(clist_X* self, clist_X_iter_t it1, clist
 size_t              clist_X_remove(clist_X* self, RawValue raw);                    // removes all elements equal to raw
 
 void                clist_X_splice(clist_X* self, clist_X_iter_t it, clist_X* other);
-void                clist_X_splice_range(clist_X* self, clist_X_iter_t it,
+void                clist_X_splice_range(clist_X* self, clist_X_iter_t it,          // see std::list::splice() docs
                                          clist_X* other, clist_X_iter_t it1, clist_X_iter_t it2);
-                    // non-std: split out [it1, it2) from self, returned as a clist
+                    // split out [it1, it2) from self, and return as a clist
 clist_X             clist_X_split(clist_X* self, clist_X_iter_t it1, clist_X_iter_t it2);
 
 clist_X_iter_t      clist_X_find(const clist_X* self, RawValue raw);
@@ -87,8 +87,7 @@ clist_X_iter_t      clist_X_begin(const clist_X* self);
 clist_X_iter_t      clist_X_end(const clist_X* self);
 void                clist_X_next(clist_X_iter_t* it);
 
-                    // advance iter n elements forward. accepts and can return end.
-clist_X_iter_t      clist_X_fwd(clist_X_iter it, size_t n);
+clist_X_iter_t      clist_X_fwd(clist_X_iter it, size_t n);                         // return it n elements ahead. End allowed.
 clist_X_value_t     clist_X_value_clone(clist_X_value_t val);
 ```
 
