@@ -346,14 +346,14 @@ STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) \
 \
     STC_DEF chash_bucket_t \
     CX##_bucket_(const CX* self, const CX##_rawkey_t* rkeyptr) { \
-        const uint64_t hash = keyHashRaw(rkeyptr, sizeof(RawKey)); \
+        const uint64_t hash = keyHashRaw(rkeyptr, sizeof *rkeyptr); \
         uint_fast8_t sx; size_t cap = self->bucket_count; \
         chash_bucket_t b = {_c_SELECT(fastrange,CMAP_SIZE_T)(hash, cap), (uint_fast8_t)(hash | 0x80)}; \
         const uint8_t* hashx = self->_hashx; \
         while ((sx = hashx[b.idx])) { \
             if (sx == b.hx) { \
-                RawKey r = keyToRaw(KEY_REF_##C(self->table + b.idx)); \
-                if (keyEqualsRaw(&r, rkeyptr)) break; \
+                CX##_rawkey_t raw = keyToRaw(KEY_REF_##C(self->table + b.idx)); \
+                if (keyEqualsRaw(&raw, rkeyptr)) break; \
             } \
             if (++b.idx == cap) b.idx = 0; \
         } \
@@ -415,8 +415,8 @@ STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) \
         uint8_t* hashx = self->_hashx; \
         for (size_t i = 0; i < oldcap; ++i, ++e) \
             if (tmp._hashx[i]) { \
-                RawKey r = keyToRaw(KEY_REF_##C(e)); \
-                chash_bucket_t b = CX##_bucket_(self, &r); \
+                CX##_rawkey_t raw = keyToRaw(KEY_REF_##C(e)); \
+                chash_bucket_t b = CX##_bucket_(self, &raw); \
                 slot[b.idx] = *e, \
                 hashx[b.idx] = (uint8_t) b.hx; \
             } \
@@ -434,8 +434,8 @@ STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) \
             if (++j == cap) j = 0; \
             if (! hashx[j]) \
                 break; \
-            RawKey r = keyToRaw(KEY_REF_##C(slot + j)); \
-            k = _c_SELECT(fastrange,CMAP_SIZE_T)(keyHashRaw(&r, sizeof(RawKey)), cap); \
+            CX##_rawkey_t raw = keyToRaw(KEY_REF_##C(slot + j)); \
+            k = _c_SELECT(fastrange,CMAP_SIZE_T)(keyHashRaw(&raw, sizeof raw), cap); \
             if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */ \
                 slot[i] = slot[j], hashx[i] = hashx[j], i = j; \
         } \

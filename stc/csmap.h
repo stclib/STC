@@ -171,7 +171,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
         CX##_value_t *ref; \
         CX##_node_t *_d; \
         int _top; \
-        CX##_size_t _tn, _st[48]; \
+        CX##_size_t _tn, _st[40]; \
     } CX##_iter_t; \
 \
     STC_API CX            CX##_init(void); \
@@ -359,8 +359,8 @@ static struct csmap_rep _csmap_inits = {0, 0, 0, 0};
         CX##_node_t *d = out->_d = self->nodes; \
         out->_top = 0; \
         while (tn) { \
-            int c; RawKey rx = keyToRaw(KEY_REF_##C(&d[tn].value)); \
-            if ((c = keyCompareRaw(&rx, &rkey)) < 0) \
+            int c; CX##_rawkey_t raw = keyToRaw(KEY_REF_##C(&d[tn].value)); \
+            if ((c = keyCompareRaw(&raw, &rkey)) < 0) \
                 tn = d[tn].link[1]; \
             else if (c > 0) \
                 { out->_st[out->_top++] = tn; tn = d[tn].link[0]; } \
@@ -501,7 +501,7 @@ static struct csmap_rep _csmap_inits = {0, 0, 0, 0};
 \
     STC_DEF CX##_iter_t \
     CX##_erase_at(CX* self, CX##_iter_t it) { \
-        RawKey raw = keyToRaw(KEY_REF_##C(it.ref)), nxt; \
+        CX##_rawkey_t raw = keyToRaw(KEY_REF_##C(it.ref)), nxt; \
         CX##_next(&it); \
         if (it.ref) nxt = keyToRaw(KEY_REF_##C(it.ref)); \
         CX##_erase(self, raw); \
@@ -511,14 +511,14 @@ static struct csmap_rep _csmap_inits = {0, 0, 0, 0};
 \
     STC_DEF CX##_iter_t \
     CX##_erase_range(CX* self, CX##_iter_t it1, CX##_iter_t it2) { \
-        CX##_rawkey_t *arr = NULL, nxt; size_t sz=0, cap=0; \
+        CX##_rawkey_t nxt, *arr = NULL; size_t sz=0, cap=0; \
         for (; it1.ref != it2.ref; CX##_next(&it1), ++sz) { \
-            if (sz == cap) arr = (CX##_rawkey_t*) c_realloc(arr, sizeof arr[0]*(cap = (sz + 6)*1.5)); \
+            if (sz == cap) arr = (CX##_rawkey_t*) c_realloc((void *) arr, sizeof arr[0]*(cap = (sz + 6)*1.5)); \
             arr[sz] = keyToRaw(KEY_REF_##C(it1.ref)); \
         } \
         if (it2.ref) nxt = keyToRaw(KEY_REF_##C(it2.ref)); \
         for (size_t i=0; i<sz; ++i) CX##_erase(self, arr[i]); \
-        c_free(arr); \
+        c_free((void *) arr); \
         if (it2.ref) CX##_find_it(self, nxt, &it2); \
         return it2; \
     } \
