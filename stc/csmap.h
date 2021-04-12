@@ -501,10 +501,11 @@ static struct csmap_rep _csmap_inits = {0, 0, 0, 0};
 \
     STC_DEF CX##_iter_t \
     CX##_erase_at(CX* self, CX##_iter_t it) { \
-        RawKey raw = keyToRaw(KEY_REF_##C(it.ref)); CX##_next(&it); \
-        RawKey nxt = keyToRaw(KEY_REF_##C(it.ref)); \
+        RawKey raw = keyToRaw(KEY_REF_##C(it.ref)), nxt; \
+        CX##_next(&it); \
+        if (it.ref) nxt = keyToRaw(KEY_REF_##C(it.ref)); \
         CX##_erase(self, raw); \
-        CX##_find_it(self, nxt, &it); \
+        if (it.ref) CX##_find_it(self, nxt, &it); \
         return it; \
     } \
 \

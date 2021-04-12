@@ -1,10 +1,10 @@
-# STC [clist](../stc/clist.h): Singly Linked List
+# STC [clist](../stc/clist.h): Forward List
 ![List](pics/list.jpg)
 
 The **clist** container supports fast insertion and removal of elements from anywhere in the container.
 Fast random access is not supported.
 
-Unlike the c++ class *std::forward_list*, **clist** has an API similar to *std::list*, and also supports
+Unlike the c++ class *std::forward_list*, **clist** has an API similar to ***std::list***, and also supports
 *push_back()* (**O**(1) time). It is still implemented as a singly-linked list. A **clist** object
 occupies only one pointer in memory, and like *std::forward_list* the length of the list is not stored.
 The method *clist_X_count()* returns size of list, computed in **O**(*n*) time.
