@@ -511,16 +511,16 @@ static struct csmap_rep _csmap_inits = {0, 0, 0, 0};
 \
     STC_DEF CX##_iter_t \
     CX##_erase_range(CX* self, CX##_iter_t it1, CX##_iter_t it2) { \
-        CX##_rawkey_t nxt, *arr = NULL; size_t sz=0, cap=0; \
-        for (; it1.ref != it2.ref; CX##_next(&it1), ++sz) { \
-            if (sz == cap) arr = (CX##_rawkey_t*) c_realloc((void *) arr, sizeof arr[0]*(cap = (sz + 6)*1.5)); \
-            arr[sz] = keyToRaw(KEY_REF_##C(it1.ref)); \
+        if (!it2.ref) { while (it1.ref) it1 = CX##_erase_at(self, it1); \
+                        return it1; } \
+        CX##_key_t k1 = *KEY_REF_##C(it1.ref), k2 = *KEY_REF_##C(it2.ref); \
+        CX##_rawkey_t r1 = keyToRaw(&k1); \
+        for (;;) { \
+            if (memcmp(&k1, &k2, sizeof k1) == 0) return it1; \
+            CX##_next(&it1); k1 = *KEY_REF_##C(it1.ref); \
+            CX##_erase(self, r1); \
+            CX##_find_it(self, (r1 = keyToRaw(&k1)), &it1); \
         } \
-        if (it2.ref) nxt = keyToRaw(KEY_REF_##C(it2.ref)); \
-        for (size_t i=0; i<sz; ++i) CX##_erase(self, arr[i]); \
-        c_free((void *) arr); \
-        if (it2.ref) CX##_find_it(self, nxt, &it2); \
-        return it2; \
     } \
 \
     static CX##_size_t \
