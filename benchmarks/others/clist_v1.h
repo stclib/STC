@@ -114,7 +114,7 @@ STC_API size_t _clist_size(const clist_void* self);
     clist_##X##_clear(clist_##X* self) {clist_##X##_del(self);} \
 \
     STC_API void \
-    clist_##X##_emplace_n(clist_##X *self, const clist_##X##_rawvalue_t arr[], size_t size); \
+    clist_##X##_emplace_n(clist_##X *self, const clist_##X##_rawvalue_t arr[], size_t n); \
     STC_API void \
     clist_##X##_push_back(clist_##X* self, Value value); \
     STC_INLINE void \
@@ -188,7 +188,7 @@ STC_API size_t _clist_size(const clist_void* self);
     } \
 \
     STC_API clist_##X##_iter_t \
-    clist_##X##_find_before_in_range(const clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t finish, RawValue val); \
+    clist_##X##_find_before_in(const clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t finish, RawValue val); \
     STC_API clist_##X##_iter_t \
     clist_##X##_find_before(const clist_##X* self, RawValue val); \
     STC_API clist_##X##_iter_t \
@@ -234,8 +234,8 @@ STC_API size_t _clist_size(const clist_void* self);
         if (!self->last) self->last = entry; \
     } \
     STC_DEF void \
-    clist_##X##_emplace_n(clist_##X *self, const clist_##X##_rawvalue_t arr[], size_t size) { \
-        for (size_t i=0; i<size; ++i) clist_##X##_push_back(self, valueFromRaw(arr[i])); \
+    clist_##X##_emplace_n(clist_##X *self, const clist_##X##_rawvalue_t arr[], size_t n) { \
+        for (size_t i=0; i<n; ++i) clist_##X##_push_back(self, valueFromRaw(arr[i])); \
     } \
 \
     STC_DEF clist_##X##_iter_t \
@@ -259,7 +259,7 @@ STC_API size_t _clist_size(const clist_void* self);
     } \
 \
     STC_DEF clist_##X##_iter_t \
-    clist_##X##_find_before_in_range(const clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t finish, RawValue val) { \
+    clist_##X##_find_before_in(const clist_##X* self, clist_##X##_iter_t first, clist_##X##_iter_t finish, RawValue val) { \
         clist_##X##_iter_t i = first; \
         for (clist_##X##_next(&i); i.ref != finish.ref; clist_##X##_next(&i)) { \
             RawValue r = valueToRaw(i.ref); \
@@ -270,12 +270,12 @@ STC_API size_t _clist_size(const clist_void* self);
     } \
     STC_DEF clist_##X##_iter_t \
     clist_##X##_find_before(const clist_##X* self, RawValue val) { \
-        clist_##X##_iter_t it = clist_##X##_find_before_in_range(self, clist_##X##_before_begin(self), clist_##X##_end(self), val); \
+        clist_##X##_iter_t it = clist_##X##_find_before_in(self, clist_##X##_before_begin(self), clist_##X##_end(self), val); \
         return it; \
     } \
     STC_DEF clist_##X##_iter_t \
     clist_##X##_find(const clist_##X* self, RawValue val) { \
-        clist_##X##_iter_t it = clist_##X##_find_before_in_range(self, clist_##X##_before_begin(self), clist_##X##_end(self), val); \
+        clist_##X##_iter_t it = clist_##X##_find_before_in(self, clist_##X##_before_begin(self), clist_##X##_end(self), val); \
         if (it.ref != clist_##X##_end(self).ref) clist_##X##_next(&it); \
         return it; \
     } \

@@ -72,7 +72,7 @@
     STC_INLINE bool         CX##_empty(CX pq) {return ctype##_empty(pq);} \
     \
     STC_API void            CX##_make_heap(CX* self); \
-    STC_API void            CX##_erase_at(CX* self, size_t i); \
+    STC_API void            CX##_erase_at(CX* self, size_t idx); \
     STC_INLINE \
     const CX##_value_t*     CX##_top(const CX* self) {return &self->data[0];} \
     STC_INLINE void         CX##_pop(CX* self) {CX##_erase_at(self, 0);} \
@@ -114,11 +114,11 @@
     } \
 \
     STC_API void \
-    CX##_erase_at(CX* self, size_t i) { \
+    CX##_erase_at(CX* self, size_t idx) { \
         size_t n = CX##_size(*self) - 1; \
-        self->data[i] = self->data[n]; \
+        self->data[idx] = self->data[n]; \
         ctype##_pop_back(self); \
-        CX##_sift_down_(self->data - 1, i + 1, n); \
+        CX##_sift_down_(self->data - 1, idx + 1, n); \
     } \
 \
     STC_API void \

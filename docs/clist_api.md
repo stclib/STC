@@ -15,8 +15,8 @@ However, an iterator to a succesive element can both be dereferenced and advance
 iterator is in a valid state. This implies:
 
 - `clist_X_insert(&L, clist_X_fwd(it,1), x)` is identical to *std::forward_list* `L.insert_after(it, x)`.
-- `clist_X_erase_at(&L, clist_X_fwd(it,1))` is identical to *std::forward_list* `L.erase_after(it)`.
-- Iterators returned from *clist_X_insert()* and *clist_X_erase_at()* are always valid.
+- `clist_X_erase_it(&L, clist_X_fwd(it,1))` is identical to *std::forward_list* `L.erase_after(it)`.
+- Iterators returned from *clist_X_insert()* and *clist_X_erase_it()* are always valid.
 - Elements can be safely removed from a list via multiple iterators if done back to front order.
 
 See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) for similar API and
@@ -48,10 +48,10 @@ clist_X             clist_X_init(void);
 clist_X             clist_X_clone(clist_X list);
 
 void                clist_X_clear(clist_X* self);
-void                clist_X_del(clist_X* self);                                     // destructor
+void                clist_X_del(clist_X* self);                                       // destructor
 
 bool                clist_X_empty(clist_X list);
-size_t              clist_X_count(clist_X list);                                    // size() in O(n) time
+size_t              clist_X_count(clist_X list);                                      // size() in O(n) time
 
 clist_X_value_t*    clist_X_front(const clist_X* self);
 clist_X_value_t*    clist_X_back(const clist_X* self);
@@ -60,26 +60,26 @@ void                clist_X_push_front(clist_X* self, Value value);
 void                clist_X_emplace_front(clist_X* self, RawValue raw);
 void                clist_X_pop_front(clist_X* self);
 
-void                clist_X_push_back(clist_X* self, Value value);                  // note: no pop_back().
-void                clist_X_emplace_back(clist_X* self, RawValue raw);
-void                clist_X_emplace_n(clist_X *self, const clist_X_rawvalue_t arr[], size_t size);
+void                clist_X_push_back(clist_X* self, Value value);                    // note no pop_back().
+void                clist_X_emplace_back(clist_X* self, RawValue raw);                // note no emplace_back().
+void                clist_X_emplace_n(clist_X *self, const clist_X_rawvalue_t arr[], size_t n);
 
-clist_X_iter_t      clist_X_insert(clist_X* self, clist_X_iter_t it, Value value);  // return iter to new elem; End allowed
+clist_X_iter_t      clist_X_insert(clist_X* self, clist_X_iter_t it, Value value); // return iter to new elem
 clist_X_iter_t      clist_X_emplace(clist_X* self, clist_X_iter_t it, RawValue raw);
 
-clist_X_iter_t      clist_X_erase_at(clist_X* self, clist_X_iter_t it);             // return iter after it
+clist_X_iter_t      clist_X_erase_it(clist_X* self, clist_X_iter_t it);               // return iter after it
 clist_X_iter_t      clist_X_erase_range(clist_X* self, clist_X_iter_t it1, clist_X_iter_t it2);
-size_t              clist_X_remove(clist_X* self, RawValue raw);                    // removes all elements equal to raw
+size_t              clist_X_remove(clist_X* self, RawValue raw);                      // removes all elements equal to raw
 
 void                clist_X_splice(clist_X* self, clist_X_iter_t it, clist_X* other);
-void                clist_X_splice_range(clist_X* self, clist_X_iter_t it,          // see std::list::splice() docs
+void                clist_X_splice_range(clist_X* self, clist_X_iter_t it,            // see std::list::splice() docs
                                          clist_X* other, clist_X_iter_t it1, clist_X_iter_t it2);
                     // split out [it1, it2) from self, and return as a clist
 clist_X             clist_X_split(clist_X* self, clist_X_iter_t it1, clist_X_iter_t it2);
 
 clist_X_iter_t      clist_X_find(const clist_X* self, RawValue raw);
-clist_X_iter_t      clist_X_find_in_range(const clist_X* self,
-                                          clist_X_iter_t it1, clist_X_iter_t it2, RawValue raw);
+clist_X_iter_t      clist_X_find_in(const clist_X* self,
+                                    clist_X_iter_t it1, clist_X_iter_t it2, RawValue raw);
 
 void                clist_X_sort(clist_X* self);
 
@@ -139,7 +139,7 @@ sorted:  1 2 3 4 5 6 7 8 9 10 20 30 40 50 60 70 80 90
 ```
 ### Example 2
 
-Use of *erase_at()* and *erase_range()*:
+Use of *erase_it()* and *erase_range()*:
 ```c
 // erasing from clist
 #include <stc/clist.h>
@@ -153,7 +153,7 @@ int main ()
                                                  // 10 20 30 40 50
     clist_i_iter_t it = clist_i_begin(&L);       // ^
     clist_i_next(&it); 
-    it = clist_i_erase_at(&L, it);               // 10 30 40 50
+    it = clist_i_erase_it(&L, it);               // 10 30 40 50
                                                  //    ^
     clist_i_iter_t end = clist_i_end(&L);        //
     clist_i_next(&it);

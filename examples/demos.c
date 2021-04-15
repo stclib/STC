@@ -46,10 +46,10 @@ void vectordemo1()
         cvec_ix_push_back(&bignums, i * i);
 
     printf("erase - %d: %zu\n", 3, bignums.data[3]);
-    cvec_ix_erase(&bignums, 3, 1); // erase index 3
+    cvec_ix_erase_n(&bignums, 3, 1); // erase index 3
 
     cvec_ix_pop_back(&bignums);      // erase the last
-    cvec_ix_erase(&bignums, 0, 1); // erase the first
+    cvec_ix_erase_n(&bignums, 0, 1); // erase the first
 
     for (size_t i = 0; i < cvec_ix_size(bignums); ++i) {
         printf("%zu: %zu\n", i, bignums.data[i]);
@@ -170,7 +170,7 @@ void mapdemo3()
         printf("entry: %s: %s\n", i.ref->first.str, i.ref->second.str);
     printf("size %zu: remove: Make: %s\n", cmap_str_size(table), it.ref->second.str);
     //cmap_str_erase(&table, "Make");
-    cmap_str_erase_at(&table, it);
+    cmap_str_erase_it(&table, it);
 
     printf("size %zu\n", cmap_str_size(table));
     c_foreach (i, cmap_str, table)

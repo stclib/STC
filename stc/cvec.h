@@ -108,20 +108,20 @@ typedef int (*c_cmp_fn)(const void*, const void*);
         return CX##_insert_range_p(self, it.ref, it1.ref, it2.ref); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_insert_at(CX* self, CX##_iter_t it, Value value) { \
+    CX##_insert(CX* self, CX##_iter_t it, Value value) { \
         return CX##_insert_range_p(self, it.ref, &value, &value + 1); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_insert(CX* self, size_t idx, Value value) { \
+    CX##_insert_at(CX* self, size_t idx, Value value) { \
         return CX##_insert_range_p(self, self->data + idx, &value, &value + 1); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_emplace_at(CX* self, CX##_iter_t it, RawValue raw) { \
-        return CX##_insert_at(self, it, valueFromRaw(raw)); \
+    CX##_emplace(CX* self, CX##_iter_t it, RawValue raw) { \
+        return CX##_insert(self, it, valueFromRaw(raw)); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_emplace(CX* self, size_t idx, RawValue raw) { \
-        return CX##_insert(self, idx, valueFromRaw(raw)); \
+    CX##_emplace_at(CX* self, size_t idx, RawValue raw) { \
+        return CX##_insert_at(self, idx, valueFromRaw(raw)); \
     } \
 \
     STC_API CX##_iter_t \
@@ -132,11 +132,11 @@ typedef int (*c_cmp_fn)(const void*, const void*);
         return CX##_erase_range_p(self, it1.ref, it2.ref); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_erase_at(CX* self, CX##_iter_t it) { \
+    CX##_erase_it(CX* self, CX##_iter_t it) { \
         return CX##_erase_range_p(self, it.ref, it.ref + 1); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_erase(CX* self, size_t idx, size_t n) { \
+    CX##_erase_n(CX* self, size_t idx, size_t n) { \
         return CX##_erase_range_p(self, self->data + idx, self->data + idx + n); \
     } \
 \
@@ -146,9 +146,9 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     CX##_back(const CX* self) {return self->data + _cvec_rep(self)->size - 1;} \
 \
     STC_INLINE CX##_value_t* \
-     CX##_at(const CX* self, size_t i) { \
-        assert(i < _cvec_rep(self)->size); \
-        return self->data + i; \
+    CX##_at(const CX* self, size_t idx) { \
+        assert(idx < _cvec_rep(self)->size); \
+        return self->data + idx; \
     } \
 \
     STC_INLINE CX##_iter_t \
@@ -165,17 +165,17 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     CX##_index(CX vec, CX##_iter_t it) {return it.ref - vec.data;} \
 \
     STC_API CX##_iter_t \
-    CX##_find_in_range(CX##_iter_t it1, CX##_iter_t it2, RawValue raw); \
+    CX##_find_in(CX##_iter_t it1, CX##_iter_t it2, RawValue raw); \
     STC_INLINE CX##_iter_t \
     CX##_find(const CX* self, RawValue raw) { \
-        return CX##_find_in_range(CX##_begin(self), CX##_end(self), raw); \
+        return CX##_find_in(CX##_begin(self), CX##_end(self), raw); \
     } \
 \
     STC_API CX##_iter_t \
-    CX##_bsearch_in_range(CX##_iter_t i1, CX##_iter_t i2, RawValue raw); \
+    CX##_bsearch_in(CX##_iter_t i1, CX##_iter_t i2, RawValue raw); \
     STC_INLINE CX##_iter_t \
     CX##_bsearch(const CX* self, RawValue raw) { \
-        return CX##_bsearch_in_range(CX##_begin(self), CX##_end(self), raw); \
+        return CX##_bsearch_in(CX##_begin(self), CX##_end(self), raw); \
     } \
     STC_INLINE void \
     CX##_sort_range(CX##_iter_t i1, CX##_iter_t i2, \
@@ -293,7 +293,7 @@ static struct cvec_rep _cvec_inits = {0, 0};
     } \
 \
     STC_DEF CX##_iter_t \
-    CX##_find_in_range(CX##_iter_t i1, CX##_iter_t i2, RawValue raw) { \
+    CX##_find_in(CX##_iter_t i1, CX##_iter_t i2, RawValue raw) { \
         for (; i1.ref != i2.ref; ++i1.ref) { \
             RawValue r = valueToRaw(i1.ref); \
             if (valueCompareRaw(&raw, &r) == 0) return i1; \
@@ -301,7 +301,7 @@ static struct cvec_rep _cvec_inits = {0, 0};
         return i2; \
     } \
     STC_DEF CX##_iter_t \
-    CX##_bsearch_in_range(CX##_iter_t i1, CX##_iter_t i2, RawValue raw) { \
+    CX##_bsearch_in(CX##_iter_t i1, CX##_iter_t i2, RawValue raw) { \
         CX##_iter_t mid, last = i2; \
         while (i1.ref != i2.ref) { \
             mid.ref = i1.ref + ((i2.ref - i1.ref)>>1); \

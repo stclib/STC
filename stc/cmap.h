@@ -293,9 +293,9 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
     } \
 \
     STC_INLINE CX##_iter_t \
-    CX##_erase_at(CX* self, CX##_iter_t pos) { \
-        CX##_erase_entry(self, pos.ref); \
-        CX##_next(&pos); return pos; \
+    CX##_erase_it(CX* self, CX##_iter_t it) { \
+        CX##_erase_entry(self, it.ref); \
+        CX##_next(&it); return it; \
     } \
 \
     _c_implement_chash(CX, C, Key, Mapped, keyEqualsRaw, keyHashRaw, \

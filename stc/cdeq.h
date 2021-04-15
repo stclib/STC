@@ -90,8 +90,8 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     CX##_value_t*       CX##_back(const CX* self) \
                             {return self->data + cdeq_rep_(self)->size - 1;} \
     STC_INLINE \
-    CX##_value_t*       CX##_at(const CX* self, size_t i) \
-                            {assert(i < cdeq_rep_(self)->size); return self->data + i;} \
+    CX##_value_t*       CX##_at(const CX* self, size_t idx) \
+                            {assert(idx < cdeq_rep_(self)->size); return self->data + idx;} \
 \
     STC_INLINE CX \
     CX##_with_size(size_t size, Value null_val) { \
@@ -120,20 +120,20 @@ typedef int (*c_cmp_fn)(const void*, const void*);
         return CX##_insert_range_p(self, it.ref, first.ref, finish.ref); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_insert_at(CX* self, CX##_iter_t it, Value value) { \
+    CX##_insert(CX* self, CX##_iter_t it, Value value) { \
         return CX##_insert_range_p(self, it.ref, &value, &value + 1); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_insert(CX* self, size_t idx, Value value) { \
+    CX##_insert_at(CX* self, size_t idx, Value value) { \
         return CX##_insert_range_p(self, self->data + idx, &value, &value + 1); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_emplace_at(CX* self, CX##_iter_t it, RawValue raw) { \
-        return CX##_insert_at(self, it, valueFromRaw(raw)); \
+    CX##_emplace(CX* self, CX##_iter_t it, RawValue raw) { \
+        return CX##_insert(self, it, valueFromRaw(raw)); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_emplace(CX* self, size_t idx, RawValue raw) { \
-        return CX##_insert(self, idx, valueFromRaw(raw)); \
+    CX##_emplace_at(CX* self, size_t idx, RawValue raw) { \
+        return CX##_insert_at(self, idx, valueFromRaw(raw)); \
     } \
 \
     STC_API CX##_iter_t \
@@ -144,11 +144,11 @@ typedef int (*c_cmp_fn)(const void*, const void*);
         return CX##_erase_range_p(self, first.ref, finish.ref); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_erase_at(CX* self, CX##_iter_t it) { \
+    CX##_erase_it(CX* self, CX##_iter_t it) { \
         return CX##_erase_range_p(self, it.ref, it.ref + 1); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_erase(CX* self, size_t idx, size_t n) { \
+    CX##_erase_n(CX* self, size_t idx, size_t n) { \
         return CX##_erase_range_p(self, self->data + idx, self->data + idx + n); \
     } \
 \
@@ -166,10 +166,10 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     CX##_index(CX deq, CX##_iter_t it) {return it.ref - deq.data;} \
 \
     STC_API CX##_iter_t \
-    CX##_find_in_range(CX##_iter_t first, CX##_iter_t finish, RawValue raw); \
+    CX##_find_in(CX##_iter_t first, CX##_iter_t finish, RawValue raw); \
     STC_INLINE CX##_iter_t \
     CX##_find(const CX* self, RawValue raw) { \
-        return CX##_find_in_range(CX##_begin(self), CX##_end(self), raw); \
+        return CX##_find_in(CX##_begin(self), CX##_end(self), raw); \
     } \
     STC_API int \
     CX##_value_compare(const CX##_value_t* x, const CX##_value_t* y); \
@@ -314,7 +314,7 @@ static inline double _maxf(double x, double y) {return x > y ? x : y;}
     } \
 \
     STC_DEF CX##_iter_t \
-    CX##_find_in_range(CX##_iter_t i1, CX##_iter_t i2, RawValue raw) { \
+    CX##_find_in(CX##_iter_t i1, CX##_iter_t i2, RawValue raw) { \
         for (; i1.ref != i2.ref; ++i1.ref) { \
             RawValue r = valueToRaw(i1.ref); \
             if (valueCompareRaw(&raw, &r) == 0) return i1; \

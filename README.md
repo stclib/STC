@@ -7,9 +7,8 @@ Introduction
 ------------
 A modern, templated, user-friendly, fast, fully type-safe, and customizable container library for C99,
 with a uniform API across the containers, and is similar to the c++ standard library containers API.
-
-Please read [this blog](https://iafisher.com/blog/2020/06/type-safe-generics-in-c) by Ian Fisher for
-an introduction to type-safe generic data structures in C.
+For an introduction to templated containers, please read the blog by Ian Fisher on
+[type-safe generic data structures in C](https://iafisher.com/blog/2020/06/type-safe-generics-in-c).
 
 STC is a compact, header-only library with the all the major "standard" data containers, except for 
 the multi-map/set variants:
@@ -130,11 +129,11 @@ int main(void) {
                                                         *i3.ref, *i4.ref,
                                                         i5.ref->first, i5.ref->second);
     // erase the elements found
-    cset_i_erase_at(&set, i1);
-    cvec_p_erase_at(&vec, i2);
-    cdeq_i_erase_at(&deq, i3);
-    clist_i_erase_at(&lst, i4);
-    csmap_i_erase_at(&map, i5);
+    cset_i_erase_it(&set, i1);
+    cvec_p_erase_it(&vec, i2);
+    cdeq_i_erase_it(&deq, i3);
+    clist_i_erase_it(&lst, i4);
+    csmap_i_erase_it(&map, i5);
 
     printf("After erasing elements found:");
     printf("\n set:"); c_foreach (i, cset_i, set) printf(" %d", *i.ref);
@@ -195,26 +194,18 @@ with **emplace**, e.g. **cvec_X_emplace_back()**. This is a convenient alternati
 **cvec_X_push_back()** when dealing non-trivial container elements, e.g. smart pointers or
 elements using dynamic memory. 
 
-| Move and insert element   | Construct element in-place   | Container                       |
-|:--------------------------|:-----------------------------|:--------------------------------|
-| insert()                  | emplace()                    | cmap, cset, csmap, csset, clist |
-| insert_or_assign(), put() | emplace_or_assign()          | cmap, csmap                     |
-| push()                    | emplace()                    | cstack, cqueue, cpque           |
-| push_back()               | emplace_back()               | cvec, cdeq, clist               |
-| push_front()              | emplace_front()              | cdeq, clist                     |
-
-For containers of integral or trivial element types, **emplace** and corresponding  non-emplace
-methods are identical, so the following does not apply for those.
-
 The **emplace** methods ***construct*** or ***clone*** their own copy of the element to be added.
-In contrast, the non-emplace methods requires elements to be explicitly constructed or cloned before adding them.
+In contrast, the non-emplace methods requires elements to be explicitly constructed or cloned 
+before adding them. For containers of integral or trivial element types, **emplace** and 
+corresponding non-emplace methods are identical, so the following does not apply for those.
 
-A few of the differences between STC and c++ STL maps methods are:
-
-| STC maps                             | C++ STL maps                  |
-|:-------------------------------------|:------------------------------|
-| insert(Key, Mapped)                  | insert(Value)                 |
-| emplace_or_assign(RawKey, RawMapped) | N/A                           |
+| Move and insert element   | Construct element in-place   | Container                                   |
+|:--------------------------|:-----------------------------|:--------------------------------------------|
+| insert()                  | emplace()                    | cmap, cset, csmap, csset, cvec, cdeq, clist |
+| insert_or_assign(), put() | emplace_or_assign()          | cmap, csmap                                 |
+| push()                    | emplace()                    | cstack, cqueue, cpque                       |
+| push_back()               | emplace_back()               | cvec, cdeq, clist                           |
+| push_front()              | emplace_front()              | cdeq, clist                                 |
 
 Strings are the most commonly used non-trivial data type. STC containers have proper pre-defined
 **using**-declarations for cstr-elements, so they are fail-safe to use both with the **emplace**
@@ -260,6 +251,16 @@ it = cmap_str_find(&map, "Hello");
 ```
 Apart from strings, maps and sets are normally used with trivial value types. However, the
 last example on the **cmap** page demonstrates how to specify a map with non-trivial keys.
+
+Erase methods
+-------------
+| Name                      | Description                  | Container                                   |
+|:--------------------------|:-----------------------------|:--------------------------------------------|
+| erase()                   | key based                    | csmap, csset, cmap, cset                    |
+| erase_it()                | iterator based               | csmap, csset, cmap, cset, cvec, cdeq, clist |
+| erase_range()             | iterator based               | csmap, csset, cvec, cdeq, clist             |
+| erase_n()                 | index based                  | cvec, cdeq                                  |
+| remove()                  | remove all matching values   | clist                                       |
 
 Memory efficiency
 -----------------

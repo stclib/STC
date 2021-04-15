@@ -10,7 +10,7 @@ int main ()
                                                  // 10 20 30 40 50
     clist_i_iter_t it = clist_i_begin(&L);       // ^
     clist_i_next(&it); 
-    it = clist_i_erase_at(&L, it);               // 10 30 40 50
+    it = clist_i_erase_it(&L, it);               // 10 30 40 50
                                                  //    ^
     clist_i_iter_t end = clist_i_end(&L);        //
     clist_i_next(&it);

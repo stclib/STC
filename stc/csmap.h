@@ -188,7 +188,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
     STC_API CX##_value_t* CX##_front(const CX* self); \
     STC_API CX##_value_t* CX##_back(const CX* self); \
     STC_API int           CX##_erase(CX* self, RawKey rkey); \
-    STC_API CX##_iter_t   CX##_erase_at(CX* self, CX##_iter_t pos); \
+    STC_API CX##_iter_t   CX##_erase_it(CX* self, CX##_iter_t it); \
     STC_API CX##_iter_t   CX##_erase_range(CX* self, CX##_iter_t it1, CX##_iter_t it2); \
     STC_API CX##_result_t CX##_insert_entry_(CX* self, RawKey rkey); \
 \
@@ -500,7 +500,7 @@ static struct csmap_rep _csmap_inits = {0, 0, 0, 0};
     } \
 \
     STC_DEF CX##_iter_t \
-    CX##_erase_at(CX* self, CX##_iter_t it) { \
+    CX##_erase_it(CX* self, CX##_iter_t it) { \
         CX##_rawkey_t raw = keyToRaw(KEY_REF_##C(it.ref)), nxt; \
         CX##_next(&it); \
         if (it.ref) nxt = keyToRaw(KEY_REF_##C(it.ref)); \
@@ -511,7 +511,7 @@ static struct csmap_rep _csmap_inits = {0, 0, 0, 0};
 \
     STC_DEF CX##_iter_t \
     CX##_erase_range(CX* self, CX##_iter_t it1, CX##_iter_t it2) { \
-        if (!it2.ref) { while (it1.ref) it1 = CX##_erase_at(self, it1); \
+        if (!it2.ref) { while (it1.ref) it1 = CX##_erase_it(self, it1); \
                         return it1; } \
         CX##_key_t k1 = *KEY_REF_##C(it1.ref), k2 = *KEY_REF_##C(it2.ref); \
         CX##_rawkey_t r1 = keyToRaw(&k1); \

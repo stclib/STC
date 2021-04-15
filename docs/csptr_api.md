@@ -39,7 +39,7 @@ The *csptr_X_compare()*, *csptr_X_equals()* and *csptr_X_del()* methods are defi
 csptr_X             csptr_X_from(csptr_X_value_t* ptr);     // constructor
 csptr_X             csptr_X_make(csptr_X_value_t val);      // make_shared
 void                csptr_X_reset(csptr_X* self);
-void                csptr_X_reset_to(csptr_X* self, csptr_X_value_t* ptr);
+void                csptr_X_reset_with(csptr_X* self, csptr_X_value_t* ptr);
 
 csptr_X             csptr_X_clone(csptr_X sptr);            // share the pointer (increase use count)
 void                csptr_X_move(csptr_X* self);            // transfer ownership instead of sharing. 
@@ -49,10 +49,11 @@ int                 csptr_X_compare(csptr_X* x, csptr_X* y);
 bool                csptr_X_equals(csptr_X* x, csptr_X* y);
 ```
 
-## Types
+## Types and constants
 
 | Type name           | Type definition                                               | Used to represent...     |
 |:--------------------|:--------------------------------------------------------------|:-------------------------|
+| `csptr_null`        | `{NULL, NULL}`                                                | Init nullptr const       |
 | `csptr_X`           | `struct { csptr_X_value_t* get; atomic_count_t* use_count; }` | The csptr type           |
 | `csptr_X_value_t`   | `Value`                                                       | The csptr element type   |
 | `atomic_count_t`    | `long`                                                        | The reference counter    |

@@ -143,10 +143,11 @@ typedef long atomic_count_t;
         self->use_count = NULL, self->get = NULL; \
     } \
 \
-    STC_INLINE void \
-    CX##_reset_to(CX* self, CX##_value_t* p) { \
+    STC_INLINE CX##_value_t* \
+    CX##_reset_with(CX* self, CX##_value_t* p) { \
         CX##_del(self); \
         *self = CX##_from(p); \
+        return self->get; \
     } \
 \
     STC_INLINE int \
