@@ -58,15 +58,16 @@ void         cstr_erase_n(cstr* self, size_t pos, size_t n);
 int          cstr_compare(const cstr *s1, const cstr *s2);
 bool         cstr_equals(cstr s, const char* str);
 bool         cstr_equals_s(cstr s, cstr s2);
-bool         cstr_iequals(cstr s, const char* str);                   // prefix i = case-insensitive
 size_t       cstr_find(cstr s, const char* substr);
 size_t       cstr_find_n(cstr s, const char* substr, size_t pos, size_t n);
-size_t       cstr_ifind_n(cstr s, const char* substr, size_t pos, size_t n);
 bool         cstr_contains(cstr s, const char* substr);
-bool         cstr_icontains(cstr s, const char* substr);
 bool         cstr_begins_with(cstr s, const char* substr);
-bool         cstr_ibegins_with(cstr s, const char* substr);
 bool         cstr_ends_with(cstr s, const char* substr);
+
+bool         cstr_iequals(cstr s, const char* str);                   // prefix i = case-insensitive
+size_t       cstr_ifind_n(cstr s, const char* substr, size_t pos, size_t n);
+bool         cstr_icontains(cstr s, const char* substr);
+bool         cstr_ibegins_with(cstr s, const char* substr);
 bool         cstr_iends_with(cstr s, const char* substr);
 
 void         cstr_push_back(cstr* self, char ch);

@@ -4,6 +4,10 @@
 A **cmap** is an associative container that contains key-value pairs with unique keys. Search, insertion,
 and removal of elements have average constant-time complexity. Internally, the elements are not sorted in any particular order, but organized into buckets. Which bucket an element is placed into depends entirely on the hash of its key. This allows fast access to individual elements, since once the hash is computed, it refers to the exact bucket the element is placed into. It is implemented as closed hashing (aka open addressing) with linear probing, and without leaving tombstones on erase.
 
+***Iterator invalidation***: References and iterators are invalidated after erase. No iterators are invalidated after insert.
+The order of elements is preserved after erase and insert. This makes it possible to erase individual elements while iterating
+through the container by using the returned iterator from *erase_it()*, which references the next element.
+
 See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_map) for a functional description.
 
 ## Header file and declaration

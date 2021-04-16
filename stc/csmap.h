@@ -421,20 +421,20 @@ static struct csmap_rep _csmap_inits = {0, 0, 0, 0};
 \
     static inline CX##_size_t \
     CX##_insert_entry_i_(CX* self, CX##_size_t tn, const CX##_rawkey_t* rkey, CX##_result_t* res) { \
-        CX##_size_t up[64], it = tn; \
+        CX##_size_t up[64], tx = tn; \
         CX##_node_t* d = self->nodes; \
         int c, top = 0, dir = 0; \
-        while (it) { \
-            up[top++] = it; \
-            RawKey raw = keyToRaw(KEY_REF_##C(&d[it].value)); \
-            if ((c = keyCompareRaw(&raw, rkey)) == 0) {res->ref = &d[it].value; return tn;} \
+        while (tx) { \
+            up[top++] = tx; \
+            RawKey raw = keyToRaw(KEY_REF_##C(&d[tx].value)); \
+            if ((c = keyCompareRaw(&raw, rkey)) == 0) {res->ref = &d[tx].value; return tn;} \
             dir = (c == -1); \
-            it = d[it].link[dir]; \
+            tx = d[tx].link[dir]; \
         } \
-        it = CX##_node_new_(self, 1); d = self->nodes; \
-        res->ref = &d[it].value, res->inserted = true; \
-        if (top == 0) return it; \
-        d[up[top - 1]].link[dir] = it; \
+        tx = CX##_node_new_(self, 1); d = self->nodes; \
+        res->ref = &d[tx].value, res->inserted = true; \
+        if (top == 0) return tx; \
+        d[up[top - 1]].link[dir] = tx; \
         while (top--) { \
             if (top) dir = (d[up[top - 1]].link[1] == up[top]); \
             up[top] = CX##_skew_(d, up[top]); \

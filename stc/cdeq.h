@@ -113,35 +113,32 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     } \
 \
     STC_API CX##_iter_t \
-    CX##_insert_range_p(CX* self, CX##_value_t* pos, const CX##_value_t* pfirst, const CX##_value_t* pfinish); \
-\
-    STC_INLINE CX##_iter_t \
-    CX##_insert_range(CX* self, CX##_iter_t it, CX##_iter_t first, CX##_iter_t finish) { \
-        return CX##_insert_range_p(self, it.ref, first.ref, finish.ref); \
-    } \
+    CX##_insert_range_p(CX* self, CX##_value_t* pos, const CX##_value_t* p1, \
+                                                     const CX##_value_t* p2, bool clone); \
     STC_INLINE CX##_iter_t \
     CX##_insert(CX* self, CX##_iter_t it, Value value) { \
-        return CX##_insert_range_p(self, it.ref, &value, &value + 1); \
-    } \
-    STC_INLINE CX##_iter_t \
-    CX##_insert_at(CX* self, size_t idx, Value value) { \
-        return CX##_insert_range_p(self, self->data + idx, &value, &value + 1); \
+        it = CX##_insert_range_p(self, it.ref, &value, &value + 1, false); \
+        *it.ref = value; return it; \
     } \
     STC_INLINE CX##_iter_t \
     CX##_emplace(CX* self, CX##_iter_t it, RawValue raw) { \
         return CX##_insert(self, it, valueFromRaw(raw)); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_emplace_at(CX* self, size_t idx, RawValue raw) { \
-        return CX##_insert_at(self, idx, valueFromRaw(raw)); \
+    CX##_insert_range(CX* self, CX##_iter_t it, CX##_iter_t it1, CX##_iter_t it2) { \
+        return CX##_insert_range_p(self, it.ref, it1.ref, it2.ref, true); \
+    } \
+    STC_INLINE CX##_iter_t \
+    CX##_insert_at(CX* self, size_t idx, const CX##_value_t arr[], size_t n) { \
+        return CX##_insert_range_p(self, self->data + idx, arr, arr + n, true); \
     } \
 \
     STC_API CX##_iter_t \
-    CX##_erase_range_p(CX* self, CX##_value_t* first, CX##_value_t* finish); \
+    CX##_erase_range_p(CX* self, CX##_value_t* p1, CX##_value_t* p2); \
 \
     STC_INLINE CX##_iter_t \
-    CX##_erase_range(CX* self, CX##_iter_t first, CX##_iter_t finish) { \
-        return CX##_erase_range_p(self, first.ref, finish.ref); \
+    CX##_erase_range(CX* self, CX##_iter_t it1, CX##_iter_t it2) { \
+        return CX##_erase_range_p(self, it1.ref, it2.ref); \
     } \
     STC_INLINE CX##_iter_t \
     CX##_erase_it(CX* self, CX##_iter_t it) { \
@@ -166,7 +163,7 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     CX##_index(CX deq, CX##_iter_t it) {return it.ref - deq.data;} \
 \
     STC_API CX##_iter_t \
-    CX##_find_in(CX##_iter_t first, CX##_iter_t finish, RawValue raw); \
+    CX##_find_in(CX##_iter_t p1, CX##_iter_t p2, RawValue raw); \
     STC_INLINE CX##_iter_t \
     CX##_find(const CX* self, RawValue raw) { \
         return CX##_find_in(CX##_begin(self), CX##_end(self), raw); \
@@ -276,14 +273,14 @@ static inline double _maxf(double x, double y) {return x > y ? x : y;}
     CX##_clone(CX deq) { \
         size_t len = cdeq_rep_(&deq)->size; \
         CX out = CX##_with_capacity(len); \
-        CX##_insert_range_p(&out, out.data, deq.data, deq.data + len); \
+        CX##_insert_range_p(&out, out.data, deq.data, deq.data + len, true); \
         return out; \
     } \
 \
     STC_DEF CX##_iter_t \
     CX##_insert_range_p(CX* self, CX##_value_t* pos, \
-                              const CX##_value_t* first, const CX##_value_t* finish) { \
-        size_t n = finish - first, idx = pos - self->data, size = cdeq_rep_(self)->size; \
+                        const CX##_value_t* p1, const CX##_value_t* p2, bool clone) { \
+        size_t n = p2 - p1, idx = pos - self->data, size = cdeq_rep_(self)->size; \
         bool at_front = (idx*2 < size); \
         CX##_expand_(self, n, at_front); \
         if (at_front) { \
@@ -295,22 +292,21 @@ static inline double _maxf(double x, double y) {return x > y ? x : y;}
         } \
         CX##_iter_t it = {pos}; \
         if (n) cdeq_rep_(self)->size += n; \
-        while (first != finish) \
-            *pos++ = valueFromRaw(valueToRaw(first++)); \
+        if (clone) while (p1 != p2) *pos++ = valueFromRaw(valueToRaw(p1++)); \
         return it; \
     } \
 \
     STC_DEF CX##_iter_t \
-    CX##_erase_range_p(CX* self, CX##_value_t* first, CX##_value_t* finish) { \
-        intptr_t len = finish - first; \
+    CX##_erase_range_p(CX* self, CX##_value_t* p1, CX##_value_t* p2) { \
+        intptr_t len = p2 - p1; \
         if (len > 0) { \
-            CX##_value_t* p = first, *end = self->data + cdeq_rep_(self)->size; \
-            while (p != finish) valueDel(p++); \
-            if (first == self->data) self->data += len; \
-            else memmove(first, finish, (end - finish) * sizeof(Value)); \
+            CX##_value_t* p = p1, *end = self->data + cdeq_rep_(self)->size; \
+            while (p != p2) valueDel(p++); \
+            if (p1 == self->data) self->data += len; \
+            else memmove(p1, p2, (end - p2) * sizeof(Value)); \
             cdeq_rep_(self)->size -= len; \
         } \
-        CX##_iter_t it = {first}; return it; \
+        CX##_iter_t it = {p1}; return it; \
     } \
 \
     STC_DEF CX##_iter_t \

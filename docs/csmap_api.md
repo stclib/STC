@@ -6,6 +6,10 @@ using the comparison function *keyCompare*. Search, removal, and insertion opera
 **csmap** is implemented as an AA-tree (Arne Andersson, 1993), which tends to create a flatter structure
 (slightly more balanced) than red-black trees.
 
+***Iterator invalidation***: Iterators are invalidated after insert and erase. References are only invalidated
+after erase. It is possible to erase individual elements while iterating through the container by using the 
+returned iterator from *erase_it()*, which references the next element. Alternatively *erase_range()* can be used.
+
 See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) for a functional description.
 
 ## Header file and declaration
