@@ -200,6 +200,7 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
     STC_INLINE bool         CX##_contains(const CX* self, RawKey rkey) \
                                 {return self->size && self->_hashx[CX##_bucket_(self, &rkey).idx];} \
     STC_API void            CX##_erase_entry(CX* self, CX##_value_t* val); \
+    STC_API CX##_iter_t     CX##_erase_it(CX* self, CX##_iter_t it); \
 \
     STC_INLINE CX##_value_t \
     CX##_value_clone(CX##_value_t val) { \
@@ -290,13 +291,6 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
         if (self->size == 0) return 0; \
         chash_bucket_t b = CX##_bucket_(self, &rkey); \
         return self->_hashx[b.idx] ? CX##_erase_entry(self, self->table + b.idx), 1 : 0; \
-    } \
-\
-    STC_INLINE CX##_iter_t \
-    CX##_erase_it(CX* self, CX##_iter_t it) { \
-        CX##_erase_entry(self, it.ref); \
-        if (*it._hx == 0) CX##_next(&it); \
-        return it; \
     } \
 \
     _c_implement_chash(CX, C, Key, Mapped, keyEqualsRaw, keyHashRaw, \
@@ -443,7 +437,17 @@ STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) \
         hashx[i] = 0, k = --self->size; \
         if (k < cap*self->min_load_factor && k > 512) \
             CX##_reserve(self, k*1.2); \
+    } \
+\
+    STC_DEF CX##_iter_t \
+    CX##_erase_it(CX* self, CX##_iter_t it) { \
+        size_t idx = it.ref - self->table; \
+        CX##_erase_entry(self, it.ref); \
+        it.ref = self->table + idx, it._hx = self->_hashx + idx; \
+        if (*it._hx == 0) CX##_next(&it); \
+        return it; \
     }
+
 
 STC_DEF uint64_t c_default_hash(const void *key, size_t len) {
     const uint64_t m = 0xb5ad4eceda1ce2a9;
