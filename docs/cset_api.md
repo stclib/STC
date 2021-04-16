@@ -28,8 +28,9 @@ cset_X              cset_X_with_capacity(size_t cap);
 cset_X              cset_X_clone(cset_x set);
 
 void                cset_X_clear(cset_X* self);
-void                cset_X_set_load_factors(cset_X* self, float min_load, float max_load);   // default: 0.15, 0.85
+void                cset_X_max_load_factor(cset_X* self, float max_load);                    // default: 0.85
 void                cset_X_reserve(cset_X* self, size_t size);
+void                cset_X_shrink_to_fit(cset_X* self);
 void                cset_X_swap(cset_X* a, cset_X* b);
 void                cset_X_del(cset_X* self);                                                // destructor
 

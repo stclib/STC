@@ -134,7 +134,7 @@ int main(void) {
 #ifndef CMAP_SIZE_T
 #define CMAP_SIZE_T uint32_t
 #endif
-#define _cmap_inits {NULL, NULL, 0, 0, 0.15f, 0.85f}
+#define _cmap_inits {NULL, NULL, 0, 0, 0.85f}
 typedef struct      {size_t idx; uint_fast8_t hx;} chash_bucket_t; \
 
 STC_API    uint64_t c_default_hash(const void *data, size_t len);
@@ -172,7 +172,6 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
         CX##_value_t* table; \
         uint8_t* _hashx; \
         CX##_size_t size, bucket_count; \
-        float min_load_factor; \
         float max_load_factor; \
     } CX; \
 \
@@ -188,19 +187,20 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
     STC_API CX              CX##_with_capacity(size_t cap); \
     STC_API CX              CX##_clone(CX map); \
     STC_API void            CX##_reserve(CX* self, size_t capacity); \
+    STC_INLINE void         CX##_shrink_to_fit(CX* self) {CX##_reserve(self, self->size);} \
+    STC_INLINE void         CX##_max_load_factor(CX* self, float ml) {self->max_load_factor = ml;} \
     STC_API void            CX##_del(CX* self); \
     STC_API void            CX##_clear(CX* self); \
     STC_INLINE bool         CX##_empty(CX m) {return m.size == 0;} \
     STC_INLINE size_t       CX##_size(CX m) {return (size_t) m.size;} \
     STC_INLINE size_t       CX##_bucket_count(CX map) {return (size_t) map.bucket_count;} \
     STC_INLINE size_t       CX##_capacity(CX map) \
-                                {return (size_t) (map.bucket_count*map.max_load_factor);} \
+                                {return (size_t) (map.bucket_count * map.max_load_factor);} \
     STC_INLINE void         CX##_swap(CX *map1, CX *map2) {c_swap(CX, *map1, *map2);} \
     STC_API CX##_iter_t     CX##_find(const CX* self, RawKey rkey); \
     STC_INLINE bool         CX##_contains(const CX* self, RawKey rkey) \
                                 {return self->size && self->_hashx[CX##_bucket_(self, &rkey).idx];} \
     STC_API void            CX##_erase_entry(CX* self, CX##_value_t* val); \
-    STC_API CX##_iter_t     CX##_erase_it(CX* self, CX##_iter_t it); \
 \
     STC_INLINE CX##_value_t \
     CX##_value_clone(CX##_value_t val) { \
@@ -215,12 +215,6 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
         MAP_ONLY_##C( mappedDel(&val->second); ) \
     } \
 \
-    STC_INLINE void \
-    CX##_set_load_factors(CX* self, float min_load, float max_load) { \
-        self->min_load_factor = min_load; \
-        self->max_load_factor = max_load; \
-    } \
- \
     STC_INLINE CX##_result_t \
     CX##_emplace(CX* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
         CX##_result_t res = CX##_insert_entry_(self, rkey); \
@@ -291,6 +285,13 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
         if (self->size == 0) return 0; \
         chash_bucket_t b = CX##_bucket_(self, &rkey); \
         return self->_hashx[b.idx] ? CX##_erase_entry(self, self->table + b.idx), 1 : 0; \
+    } \
+\
+    STC_INLINE CX##_iter_t \
+    CX##_erase_it(CX* self, CX##_iter_t it) { \
+        CX##_erase_entry(self, it.ref); \
+        if (*it._hx == 0) CX##_next(&it); \
+        return it; \
     } \
 \
     _c_implement_chash(CX, C, Key, Mapped, keyEqualsRaw, keyHashRaw, \
@@ -364,13 +365,10 @@ STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) \
         return it; \
     } \
 \
-    STC_INLINE void CX##_reserve_expand_(CX* self) { \
-        if (self->size + 1 >= self->bucket_count*self->max_load_factor) \
-            CX##_reserve(self, 5 + self->size * 3 / 2); \
-    } \
     STC_DEF CX##_result_t \
     CX##_insert_entry_(CX* self, RawKey rkey) { \
-        CX##_reserve_expand_(self); \
+        if (self->size + 1 >= (CX##_size_t) (self->bucket_count * self->max_load_factor)) \
+            CX##_reserve(self, 8 + self->size * 3 / 2); \
         chash_bucket_t b = CX##_bucket_(self, &rkey); \
         CX##_result_t res = {&self->table[b.idx], !self->_hashx[b.idx]}; \
         if (res.inserted) { \
@@ -385,7 +383,7 @@ STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) \
         CX clone = { \
             c_new_2(CX##_value_t, m.bucket_count), \
             (uint8_t *) memcpy(c_malloc(m.bucket_count + 1), m._hashx, m.bucket_count + 1), \
-            m.size, m.bucket_count, m.min_load_factor, m.max_load_factor \
+            m.size, m.bucket_count, m.max_load_factor \
         }; \
         CX##_value_t *e = m.table, *end = e + m.bucket_count, *dst = clone.table; \
         for (uint8_t *hx = m._hashx; e != end; ++hx, ++e, ++dst) \
@@ -397,12 +395,12 @@ STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) \
     CX##_reserve(CX* self, size_t newcap) { \
         if (newcap < self->size) return; \
         size_t oldcap = self->bucket_count; \
-        newcap = (size_t) (newcap / self->max_load_factor) | 1; \
+        newcap = (size_t) (2 + newcap / self->max_load_factor) | 1; \
         CX tmp = { \
             c_new_2 (CX##_value_t, newcap), \
             (uint8_t *) c_calloc(newcap + 1, sizeof(uint8_t)), \
             self->size, (CX##_size_t) newcap, \
-            self->min_load_factor, self->max_load_factor \
+            self->max_load_factor \
         }; \
         /* Rehash: */ \
         tmp._hashx[newcap] = 0xff; c_swap(CX, *self, tmp); \
@@ -434,18 +432,8 @@ STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) \
             if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */ \
                 slot[i] = slot[j], hashx[i] = hashx[j], i = j; \
         } \
-        hashx[i] = 0, k = --self->size; \
-        if (k < cap*self->min_load_factor && k > 512) \
-            CX##_reserve(self, k*1.2); \
-    } \
-\
-    STC_DEF CX##_iter_t \
-    CX##_erase_it(CX* self, CX##_iter_t it) { \
-        size_t idx = it.ref - self->table; \
-        CX##_erase_entry(self, it.ref); \
-        it.ref = self->table + idx, it._hx = self->_hashx + idx; \
-        if (*it._hx == 0) CX##_next(&it); \
-        return it; \
+        hashx[i] = 0; \
+        --self->size; \
     }
 
 

@@ -70,7 +70,7 @@ static void ins_and_erase_i(picobench::state& s)
 static void ins_and_erase_cmap_i(picobench::state& s)
 {
     cmap_i map = cmap_i_init();
-    cmap_i_set_load_factors(&map, 0.0, (int)MaxLoadFactor100 / 100.0);
+    cmap_i_max_load_factor(&map, (int)MaxLoadFactor100 / 100.0);
     stc64_srandom(seed);
 
     picobench::scope scope(s);
@@ -90,7 +90,7 @@ static void ins_and_erase_cmap_i(picobench::state& s)
 static void ins_and_erase_cmap_x(picobench::state& s)
 {
     cmap_x map = cmap_x_init();
-    cmap_x_set_load_factors(&map, 0.0, (int)MaxLoadFactor100 / 100.0);
+    cmap_x_max_load_factor(&map, (int)MaxLoadFactor100 / 100.0);
     stc64_srandom(seed);
 
     picobench::scope scope(s);
@@ -140,7 +140,7 @@ static void ins_and_access_cmap_i(picobench::state& s)
     uint64_t mask = (1ull << s.arg()) - 1;
     size_t result = 0;
     cmap_i map = cmap_i_init();
-    cmap_i_set_load_factors(&map, 0.0, (int)MaxLoadFactor100 / 100.0);
+    cmap_i_max_load_factor(&map, (int)MaxLoadFactor100 / 100.0);
     stc64_srandom(seed);
 
     picobench::scope scope(s);
@@ -193,7 +193,7 @@ static void ins_and_access_cmap_s(picobench::state& s)
     cstr str = cstr_with_size(s.arg(), 'x');
     size_t result = 0;
     cmap_str map = cmap_str_init();
-    cmap_str_set_load_factors(&map, 0.0, (int)MaxLoadFactor100 / 100.0);
+    cmap_str_max_load_factor(&map, (int)MaxLoadFactor100 / 100.0);
     stc64_srandom(seed);
 
     picobench::scope scope(s);
@@ -254,7 +254,7 @@ static void iterate_x(picobench::state& s)
 static void iterate_cmap_x(picobench::state& s)
 {
     cmap_x map = cmap_x_init();
-    cmap_x_set_load_factors(&map, 0.3, (int)MaxLoadFactor100 / 100.0);
+    cmap_x_max_load_factor(&map, (int)MaxLoadFactor100 / 100.0);
     uint64_t K = (1ull << s.arg()) - 1;
 
     picobench::scope scope(s);
