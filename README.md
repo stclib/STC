@@ -256,10 +256,10 @@ Erase methods
 -------------
 | Name                      | Description                  | Container                                   |
 |:--------------------------|:-----------------------------|:--------------------------------------------|
-| erase()                   | key based                    | csmap, csset, cmap, cset                    |
+| erase()                   | key based                    | csmap, csset, cmap, cset, cstr              |
 | erase_it()                | iterator based               | csmap, csset, cmap, cset, cvec, cdeq, clist |
 | erase_range()             | iterator based               | csmap, csset, cvec, cdeq, clist             |
-| erase_n()                 | index based                  | cvec, cdeq                                  |
+| erase_n()                 | index based                  | cvec, cdeq, cstr                            |
 | remove()                  | remove all matching values   | clist                                       |
 
 Memory efficiency

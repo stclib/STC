@@ -6,7 +6,7 @@ using_cvec_str();
 
 cvec_str read_file(const char* name) {
     cvec_str vec = cvec_str_init();
-    c_withfile (f, fopen(name, "r")) {
+    for (FILE* f = fopen(name, "r"); f; fclose(f), f=NULL) {
         cstr line = cstr_init();
         while (cstr_getline(&line, f))
             cvec_str_emplace_back(&vec, line.str);

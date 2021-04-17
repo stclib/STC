@@ -72,7 +72,7 @@ int main()
     // Push ten million random numbers to priority queue, plus some negative ones.
     c_forrange (N)
         cpque_i_push(&heap, stc64_uniform(&rng, &dist));
-    c_emplace_items(&heap, cpque_i, {-231, -32, -873, -4, -343});
+    c_emplace(cpque_i, heap, {-231, -32, -873, -4, -343});
 
     // Extract and display the fifty smallest.
     c_forrange (50) {

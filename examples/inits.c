@@ -24,7 +24,7 @@ int main(void)
     // CVEC FLOAT / PRIORITY QUEUE
 
     cvec_f floats = cvec_f_init();
-    c_emplace_items(&floats, cvec_f, {4.0f, 2.0f, 5.0f, 3.0f, 1.0f});
+    c_emplace(cvec_f, floats, {4.0f, 2.0f, 5.0f, 3.0f, 1.0f});
 
     c_foreach (i, cvec_f, floats) printf("%.1f ", *i.ref);
     puts("");
@@ -32,7 +32,7 @@ int main(void)
     // CVEC PRIORITY QUEUE
 
     cpque_f_make_heap(&floats);
-    c_emplace_items(&floats, cpque_f, {40.0f, 20.0f, 50.0f, 30.0f, 10.0f});
+    c_emplace(cpque_f, floats, {40.0f, 20.0f, 50.0f, 30.0f, 10.0f});
 
     puts("\npop and show high priorites first:");
     while (! cpque_f_empty(floats)) {
@@ -58,7 +58,7 @@ int main(void)
     // CMAP CNT
 
     cmap_cnt countries = cmap_cnt_init();
-    c_emplace_items(&countries, cmap_cnt, {
+    c_emplace(cmap_cnt, countries, {
         {"Norway", 100},
         {"Denmark", 50},
         {"Iceland", 10},

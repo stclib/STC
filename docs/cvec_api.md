@@ -106,7 +106,7 @@ int main()
 {
     // Create a vector containing integers
     cvec_i vec = cvec_i_init();
-    c_emplace_items(&vec, cvec_i, {7, 5, 16, 8});
+    c_emplace(cvec_i, vec, {7, 5, 16, 8});
 
     // Add two more integers to vector
     cvec_i_push_back(&vec, 25);

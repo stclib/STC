@@ -121,11 +121,11 @@
 #define c_breakwith continue
 
 #define c_init(ctype, c, ...) \
-    ctype c = ctype##_init(); c_emplace_items(&c, ctype, __VA_ARGS__)
+    ctype c = ctype##_init(); c_emplace(ctype, c, __VA_ARGS__)
 
-#define c_emplace_items(self, ctype, ...) do { \
+#define c_emplace(ctype, c, ...) do { \
     const ctype##_rawvalue_t _c_arr[] = __VA_ARGS__; \
-    ctype##_emplace_n(self, _c_arr, c_arraylen(_c_arr)); \
+    ctype##_emplace_n(&(c), _c_arr, c_arraylen(_c_arr)); \
 } while (0)
 
 #define c_del(ctype, ...) do { \

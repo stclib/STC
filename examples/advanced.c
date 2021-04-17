@@ -42,7 +42,7 @@ using_cmap_keydef(vk, Viking, int, vikingraw_equals, vikingraw_hash,
 int main()
 {
     cmap_vk vikings = cmap_vk_init();
-    c_emplace_items(&vikings, cmap_vk, {
+    c_emplace(cmap_vk, vikings, {
         { {"Einar", "Norway"}, 20},
         { {"Olaf", "Denmark"}, 24},
         { {"Harald", "Iceland"}, 12},
