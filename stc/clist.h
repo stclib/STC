@@ -129,7 +129,7 @@ STC_API size_t _clist_size(const clist_VOID* self);
     STC_API CX##_iter_t CX##_erase_range(CX* self, CX##_iter_t it1, CX##_iter_t it2); \
     STC_API size_t      CX##_remove(CX* self, RawValue val); \
 \
-    STC_API void        CX##_splice(CX* self, CX##_iter_t it, CX* other); \
+    STC_API CX##_iter_t CX##_splice(CX* self, CX##_iter_t it, CX* other); \
     STC_API CX          CX##_split(CX* self, CX##_iter_t it1, CX##_iter_t it2); \
     STC_API void        CX##_sort(CX* self); \
     STC_API CX##_iter_t CX##_find_in(const CX* self, CX##_iter_t it1, CX##_iter_t it2, RawValue val); \
@@ -160,11 +160,11 @@ STC_API size_t _clist_size(const clist_VOID* self);
         return it; \
     } \
 \
-    STC_INLINE void \
+    STC_INLINE CX##_iter_t \
     CX##_splice_range(CX* self, CX##_iter_t it, \
                       CX* other, CX##_iter_t it1, CX##_iter_t it2) { \
         CX tmp = CX##_split(other, it1, it2); \
-        CX##_splice(self, it, &tmp); \
+        return CX##_splice(self, it, &tmp); \
     } \
 \
     STC_INLINE CX##_iter_t \
@@ -232,7 +232,7 @@ STC_API size_t _clist_size(const clist_VOID* self);
     STC_DEF CX##_iter_t \
     CX##_erase_range(CX* self, CX##_iter_t it1, CX##_iter_t it2) { \
         CX##_node_t *node = it1.ref ? it1._prev : NULL, \
-                           *done = it2.ref ? _clist_node(CX, it2.ref) : NULL; \
+                    *done = it2.ref ? _clist_node(CX, it2.ref) : NULL; \
         while (node && node->next != done) \
             node = CX##_erase_after_(self, node); \
         return it2; \
@@ -272,17 +272,18 @@ STC_API size_t _clist_size(const clist_VOID* self);
         return n; \
     } \
 \
-    STC_DEF void \
+    STC_DEF CX##_iter_t \
     CX##_splice(CX* self, CX##_iter_t it, CX* other) { \
         if (!self->last) \
             self->last = other->last; \
         else if (other->last) { \
             CX##_node_t *p = it.ref ? it._prev : self->last, *next = p->next; \
-            p->next = other->last->next; \
-            other->last->next = next; \
-            if (!it.ref) self->last = other->last; \
+            it._prev = other->last; \
+            p->next = it._prev->next; \
+            it._prev->next = next; \
+            if (!it.ref) self->last = it._prev; \
         } \
-        other->last = NULL; \
+        other->last = NULL; return it; \
     } \
 \
     STC_DEF CX \

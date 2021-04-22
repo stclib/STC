@@ -98,7 +98,7 @@ using namespace std;
 
 int main(void)
 {
-  enum {N = 800000000};
+  enum {N = 2000000000};
   uint64_t* recipient = new uint64_t[N];
   static stc64_t rng;
   init_state(rng.state, 12345123);
@@ -109,6 +109,7 @@ int main(void)
 
   clock_t beg, end;
   for (size_t ti = 0; ti < 4; ti++) {
+    init_state(rng.state, 12345123);
     cout << endl << "ROUND " << ti+1 << endl;
     beg = clock();
     for (size_t i = 0; i < N; i++)
@@ -151,6 +152,7 @@ int main(void)
 
     cout << "Next we do random number computations only, doing no work."
          << endl;
+    init_state(rng.state, 12345123);
     uint64_t s = 0;
     beg = clock();
     for (size_t i = 0; i < N; i++)
