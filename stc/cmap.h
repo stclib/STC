@@ -180,27 +180,27 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
         uint8_t* _hx; \
     } CX##_iter_t; \
 \
-    STC_API chash_bucket_t  CX##_bucket_(const CX* self, const CX##_rawkey_t* rkeyptr); \
-    STC_API CX##_result_t   CX##_insert_entry_(CX* self, RawKey rkey); \
-\
-    STC_INLINE CX           CX##_init(void) {CX m = _cmap_inits; return m;} \
     STC_API CX              CX##_with_capacity(size_t cap); \
     STC_API CX              CX##_clone(CX map); \
-    STC_API void            CX##_reserve(CX* self, size_t capacity); \
-    STC_INLINE void         CX##_shrink_to_fit(CX* self) {CX##_reserve(self, self->size);} \
-    STC_INLINE void         CX##_max_load_factor(CX* self, float ml) {self->max_load_factor = ml;} \
     STC_API void            CX##_del(CX* self); \
     STC_API void            CX##_clear(CX* self); \
+    STC_API void            CX##_reserve(CX* self, size_t capacity); \
+    STC_API chash_bucket_t  CX##_bucket_(const CX* self, const CX##_rawkey_t* rkeyptr); \
+    STC_API CX##_result_t   CX##_insert_entry_(CX* self, RawKey rkey); \
+    STC_API CX##_iter_t     CX##_find(const CX* self, RawKey rkey); \
+    STC_API void            CX##_erase_entry(CX* self, CX##_value_t* val); \
+\
+    STC_INLINE CX           CX##_init(void) {CX m = _cmap_inits; return m;} \
+    STC_INLINE void         CX##_shrink_to_fit(CX* self) {CX##_reserve(self, self->size);} \
+    STC_INLINE void         CX##_max_load_factor(CX* self, float ml) {self->max_load_factor = ml;} \
     STC_INLINE bool         CX##_empty(CX m) {return m.size == 0;} \
-    STC_INLINE size_t       CX##_size(CX m) {return (size_t) m.size;} \
-    STC_INLINE size_t       CX##_bucket_count(CX map) {return (size_t) map.bucket_count;} \
+    STC_INLINE size_t       CX##_size(CX m) {return m.size;} \
+    STC_INLINE size_t       CX##_bucket_count(CX map) {return map.bucket_count;} \
     STC_INLINE size_t       CX##_capacity(CX map) \
                                 {return (size_t) (map.bucket_count * map.max_load_factor);} \
     STC_INLINE void         CX##_swap(CX *map1, CX *map2) {c_swap(CX, *map1, *map2);} \
-    STC_API CX##_iter_t     CX##_find(const CX* self, RawKey rkey); \
     STC_INLINE bool         CX##_contains(const CX* self, RawKey rkey) \
                                 {return self->size && self->_hashx[CX##_bucket_(self, &rkey).idx];} \
-    STC_API void            CX##_erase_entry(CX* self, CX##_value_t* val); \
 \
     STC_INLINE CX##_value_t \
     CX##_value_clone(CX##_value_t val) { \
@@ -288,7 +288,7 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
     } \
 \
     STC_INLINE CX##_iter_t \
-    CX##_erase_it(CX* self, CX##_iter_t it) { \
+    CX##_erase_at(CX* self, CX##_iter_t it) { \
         CX##_erase_entry(self, it.ref); \
         if (*it._hx == 0) CX##_next(&it); \
         return it; \

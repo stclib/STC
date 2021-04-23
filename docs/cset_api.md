@@ -47,7 +47,7 @@ cset_X_result_t     cset_X_emplace(cset_X* self, RawKey rkey);
 void                cset_X_emplace_n(cset_X* self, const RawKey arr[], size_t n);
 
 size_t              cset_X_erase(cset_X* self, RawKey rkey);                                 // return 0 or 1
-cset_X_iter_t       cset_X_erase_it(cset_X* self, cset_X_iter_t it);                         // return iter after it
+cset_X_iter_t       cset_X_erase_at(cset_X* self, cset_X_iter_t it);                         // return iter after it
 void                cset_X_erase_entry(cset_X* self, cset_X_value_t* entry);
 
 cset_X_iter_t       cset_X_begin(const cset_X* self);

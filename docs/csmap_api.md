@@ -8,7 +8,7 @@ using the comparison function *keyCompare*. Search, removal, and insertion opera
 
 ***Iterator invalidation***: Iterators are invalidated after insert and erase. References are only invalidated
 after erase. It is possible to erase individual elements while iterating through the container by using the 
-returned iterator from *erase_it()*, which references the next element. Alternatively *erase_range()* can be used.
+returned iterator from *erase_at()*, which references the next element. Alternatively *erase_range()* can be used.
 
 See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) for a functional description.
 
@@ -69,7 +69,7 @@ csmap_X_result_t    csmap_X_emplace_or_assign(csmap_X* self, RawKey rkey, RawMap
 void                csmap_X_emplace_n(csmap_X* self, const csmap_X_rawvalue_t arr[], size_t n);
 
 size_t              csmap_X_erase(csmap_X* self, RawKey rkey);
-csmap_X_iter_t      csmap_X_erase_it(csmap_X* self, csmap_X_iter_t it);                         // returns iter after it
+csmap_X_iter_t      csmap_X_erase_at(csmap_X* self, csmap_X_iter_t it);                         // returns iter after it
 csmap_X_iter_t      csmap_X_erase_range(csmap_X* self, csmap_X_iter_t it1, csmap_X_iter_t it2); // returns updated it2
 
 csmap_X_iter_t      csmap_X_begin(const csmap_X* self);

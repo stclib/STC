@@ -66,7 +66,7 @@ cdeq_X_iter_t       cdeq_X_insert_at(cdeq_X* self, size_t idx, const Value arr[]
 cdeq_X_iter_t       cdeq_X_emplace(cdeq_X* self, cdeq_X_iter_t it, RawValue raw);
 void                cdeq_X_emplace_n(cdeq_X *self, const RawValue arr[], size_t n);          // emplace_back only
 
-cdeq_X_iter_t       cdeq_X_erase_it(cdeq_X* self, cdeq_X_iter_t it);
+cdeq_X_iter_t       cdeq_X_erase_at(cdeq_X* self, cdeq_X_iter_t it);
 cdeq_X_iter_t       cdeq_X_erase_range(cdeq_X* self, cdeq_X_iter_t it1, cdeq_X_iter_t it2);
 cdeq_X_iter_t       cdeq_X_erase_n(cdeq_X* self, size_t idx, size_t n);
 

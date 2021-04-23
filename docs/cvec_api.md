@@ -65,7 +65,7 @@ cvec_X_iter_t       cvec_X_insert_at(cvec_X* self, size_t idx, const Value[] arr
 cvec_X_iter_t       cvec_X_emplace(cvec_X* self, cvec_X_iter_t it, RawValue raw);
 void                cvec_X_emplace_n(cvec_X *self, const RawValue arr[], size_t n);          // emplace_back only
 
-cvec_X_iter_t       cvec_X_erase_it(cvec_X* self, cvec_X_iter_t it);
+cvec_X_iter_t       cvec_X_erase_at(cvec_X* self, cvec_X_iter_t it);
 cvec_X_iter_t       cvec_X_erase_range(cvec_X* self, cvec_X_iter_t i1, cvec_X_iter_t i2);
 cvec_X_iter_t       cvec_X_erase_n(cvec_X* self, size_t idx, size_t n);
 

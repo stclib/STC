@@ -15,7 +15,7 @@ int main()
     c_foreach (k, csset_i, it, csset_i_end(&set)) printf(" %d", *k.ref); puts("");
 
     printf("Erase values >= %d:\n", val);
-    while (it.ref) it = csset_i_erase_it(&set, it);
+    while (it.ref) it = csset_i_erase_at(&set, it);
     c_foreach (k, csset_i, set) printf(" %d", *k.ref); puts("");
 
     val = 35;

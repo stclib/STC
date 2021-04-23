@@ -10,7 +10,7 @@ hashing (aka open addressing) with linear probing, and without leaving tombstone
 ***Iterator invalidation***: References and iterators are invalidated after erase. No iterators are invalidated after insert,
 unless the hash-table need to be extended. The hash table size can be reserved prior to inserts if the total max size is known.
 The order of elements is preserved after erase and insert. This makes it possible to erase individual elements while iterating
-through the container by using the returned iterator from *erase_it()*, which references the next element.
+through the container by using the returned iterator from *erase_at()*, which references the next element.
 
 See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_map) for a functional description.
 
@@ -75,7 +75,7 @@ cmap_X_result_t     cmap_X_emplace_or_assign(cmap_X* self, RawKey rkey, RawMappe
 void                cmap_X_emplace_n(cmap_X* self, const cmap_X_rawvalue_t arr[], size_t n);
 
 size_t              cmap_X_erase(cmap_X* self, RawKey rkey);                                 // return 0 or 1
-cmap_X_iter_t       cmap_X_erase_it(cmap_X* self, cmap_X_iter_t it);                         // return iter after it
+cmap_X_iter_t       cmap_X_erase_at(cmap_X* self, cmap_X_iter_t it);                         // return iter after it
 void                cmap_X_erase_entry(cmap_X* self, cmap_X_value_t* entry);
 
 cmap_X_iter_t       cmap_X_begin(const cmap_X* self);

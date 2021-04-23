@@ -178,19 +178,21 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
     STC_API CX            CX##_clone(CX tree); \
     STC_API void          CX##_del(CX* self); \
     STC_API void          CX##_reserve(CX* self, size_t cap); \
-    STC_INLINE bool       CX##_empty(CX tree) {return _csmap_rep(&tree)->size == 0;} \
-    STC_INLINE size_t     CX##_size(CX tree) {return _csmap_rep(&tree)->size;} \
-    STC_INLINE size_t     CX##_capacity(CX tree) {return _csmap_rep(&tree)->cap;} \
-    STC_INLINE void       CX##_clear(CX* self) {CX##_del(self); *self = CX##_init();} \
-    STC_INLINE void       CX##_swap(CX* a, CX* b) {c_swap(CX, *a, *b);} \
     STC_API CX##_value_t* CX##_find_it(const CX* self, RawKey rkey, CX##_iter_t* out); \
     STC_API CX##_iter_t   CX##_lower_bound(const CX* self, RawKey rkey); \
     STC_API CX##_value_t* CX##_front(const CX* self); \
     STC_API CX##_value_t* CX##_back(const CX* self); \
     STC_API int           CX##_erase(CX* self, RawKey rkey); \
-    STC_API CX##_iter_t   CX##_erase_it(CX* self, CX##_iter_t it); \
+    STC_API CX##_iter_t   CX##_erase_at(CX* self, CX##_iter_t it); \
     STC_API CX##_iter_t   CX##_erase_range(CX* self, CX##_iter_t it1, CX##_iter_t it2); \
     STC_API CX##_result_t CX##_insert_entry_(CX* self, RawKey rkey); \
+    STC_API void          CX##_next(CX##_iter_t* it); \
+\
+    STC_INLINE bool       CX##_empty(CX tree) {return _csmap_rep(&tree)->size == 0;} \
+    STC_INLINE size_t     CX##_size(CX tree) {return _csmap_rep(&tree)->size;} \
+    STC_INLINE size_t     CX##_capacity(CX tree) {return _csmap_rep(&tree)->cap;} \
+    STC_INLINE void       CX##_clear(CX* self) {CX##_del(self); *self = CX##_init();} \
+    STC_INLINE void       CX##_swap(CX* a, CX* b) {c_swap(CX, *a, *b);} \
 \
     STC_INLINE CX \
     CX##_with_capacity(size_t size) { \
@@ -256,9 +258,10 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
             else {keyDel(&key); mappedDel(&res.ref->second);} \
             res.ref->second = mapped; return res; \
         } \
+\
         STC_INLINE CX##_result_t \
-        CX##_put(CX* self, Key k, Mapped m) { \
-            return CX##_insert_or_assign(self, k, m); \
+        CX##_put(CX* self, Key key, Mapped mapped) { \
+            return CX##_insert_or_assign(self, key, mapped); \
         } \
 \
         STC_INLINE CX##_result_t \
@@ -275,9 +278,6 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
             return &CX##_find_it(self, rkey, &it)->second; \
         }) \
 \
-    STC_API void \
-    CX##_next(CX##_iter_t* it); \
-\
     STC_INLINE CX##_iter_t \
     CX##_begin(const CX* self) { \
         CX##_iter_t it; it._d = self->nodes, it._top = 0; \
@@ -285,6 +285,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
         if (it._tn) CX##_next(&it); \
         return it; \
     } \
+\
     STC_INLINE CX##_iter_t \
     CX##_end(const CX* self) {\
         CX##_iter_t it; it.ref = NULL; return it; \
@@ -316,6 +317,7 @@ static struct csmap_rep _csmap_inits = {0, 0, 0, 0};
         while (d[tn].link[0]) tn = d[tn].link[0]; \
         return &d[tn].value; \
     } \
+\
     STC_DEF CX##_value_t* \
     CX##_back(const CX* self) { \
         CX##_node_t *d = self->nodes; \
@@ -419,7 +421,7 @@ static struct csmap_rep _csmap_inits = {0, 0, 0, 0};
         return tn; \
     } \
 \
-    static inline CX##_size_t \
+    STC_DEF CX##_size_t \
     CX##_insert_entry_i_(CX* self, CX##_size_t tn, const CX##_rawkey_t* rkey, CX##_result_t* res) { \
         CX##_size_t up[64], tx = tn; \
         CX##_node_t* d = self->nodes; \
@@ -453,7 +455,7 @@ static struct csmap_rep _csmap_inits = {0, 0, 0, 0};
         return res; \
     } \
 \
-    static CX##_size_t \
+    STC_DEF CX##_size_t \
     CX##_erase_r_(CX##_node_t *d, CX##_size_t tn, const CX##_rawkey_t* rkey, int *erased) { \
         if (tn == 0) return 0; \
         RawKey raw = keyToRaw(KEY_REF_##C(&d[tn].value)); \
@@ -500,7 +502,7 @@ static struct csmap_rep _csmap_inits = {0, 0, 0, 0};
     } \
 \
     STC_DEF CX##_iter_t \
-    CX##_erase_it(CX* self, CX##_iter_t it) { \
+    CX##_erase_at(CX* self, CX##_iter_t it) { \
         CX##_rawkey_t raw = keyToRaw(KEY_REF_##C(it.ref)), nxt; \
         CX##_next(&it); \
         if (it.ref) nxt = keyToRaw(KEY_REF_##C(it.ref)); \
@@ -511,7 +513,7 @@ static struct csmap_rep _csmap_inits = {0, 0, 0, 0};
 \
     STC_DEF CX##_iter_t \
     CX##_erase_range(CX* self, CX##_iter_t it1, CX##_iter_t it2) { \
-        if (!it2.ref) { while (it1.ref) it1 = CX##_erase_it(self, it1); \
+        if (!it2.ref) { while (it1.ref) it1 = CX##_erase_at(self, it1); \
                         return it1; } \
         CX##_key_t k1 = *KEY_REF_##C(it1.ref), k2 = *KEY_REF_##C(it2.ref); \
         CX##_rawkey_t r1 = keyToRaw(&k1); \
@@ -541,7 +543,7 @@ static struct csmap_rep _csmap_inits = {0, 0, 0, 0};
         return clone; \
     } \
 \
-    static void \
+    STC_DEF void \
     CX##_del_r_(CX##_node_t* d, CX##_size_t tn) { \
         if (tn) { \
             CX##_del_r_(d, d[tn].link[0]); \

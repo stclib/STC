@@ -170,7 +170,7 @@ void mapdemo3()
         printf("entry: %s: %s\n", i.ref->first.str, i.ref->second.str);
     printf("size %zu: remove: Make: %s\n", cmap_str_size(table), it.ref->second.str);
     //cmap_str_erase(&table, "Make");
-    cmap_str_erase_it(&table, it);
+    cmap_str_erase_at(&table, it);
 
     printf("size %zu\n", cmap_str_size(table));
     c_foreach (i, cmap_str, table)

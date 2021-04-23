@@ -129,11 +129,11 @@ int main(void) {
                                                         *i3.ref, *i4.ref,
                                                         i5.ref->first, i5.ref->second);
     // erase the elements found
-    cset_i_erase_it(&set, i1);
-    cvec_p_erase_it(&vec, i2);
-    cdeq_i_erase_it(&deq, i3);
-    clist_i_erase_it(&lst, i4);
-    csmap_i_erase_it(&map, i5);
+    cset_i_erase_at(&set, i1);
+    cvec_p_erase_at(&vec, i2);
+    cdeq_i_erase_at(&deq, i3);
+    clist_i_erase_at(&lst, i4);
+    csmap_i_erase_at(&map, i5);
 
     printf("After erasing elements found:");
     printf("\n set:"); c_foreach (i, cset_i, set) printf(" %d", *i.ref);
@@ -257,7 +257,7 @@ Erase methods
 | Name                      | Description                  | Container                                   |
 |:--------------------------|:-----------------------------|:--------------------------------------------|
 | erase()                   | key based                    | csmap, csset, cmap, cset, cstr              |
-| erase_it()                | iterator based               | csmap, csset, cmap, cset, cvec, cdeq, clist |
+| erase_at()                | iterator based               | csmap, csset, cmap, cset, cvec, cdeq, clist |
 | erase_range()             | iterator based               | csmap, csset, cvec, cdeq, clist             |
 | erase_n()                 | index based                  | cvec, cdeq, cstr                            |
 | remove()                  | remove all matching values   | clist                                       |

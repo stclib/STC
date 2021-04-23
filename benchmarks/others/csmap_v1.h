@@ -308,7 +308,7 @@ int main(void) {
         self->size -= erased; return erased; \
     } \
     STC_INLINE size_t \
-    C##X##_erase_it(C##X* self, C##X##_iter_t pos) { \
+    C##X##_erase_at(C##X* self, C##X##_iter_t pos) { \
         return C##X##_erase(self, keyToRaw(KEY_REF_##C(pos.ref))); \
     } \
 \

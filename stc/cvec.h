@@ -58,18 +58,23 @@ typedef int (*c_cmp_fn)(const void*, const void*);
 \
     STC_API CX          CX##_init(void); \
     STC_API CX          CX##_clone(CX vec); \
+    STC_API void        CX##_del(CX* self); \
+    STC_API void        CX##_clear(CX* self); \
+    STC_API void        CX##_reserve(CX* self, size_t cap); \
+    STC_API void        CX##_resize(CX* self, size_t size, Value fill_val); \
+    STC_API int         CX##_value_compare(const CX##_value_t* x, const CX##_value_t* y); \
+    STC_API CX##_iter_t CX##_find_in(CX##_iter_t it1, CX##_iter_t it2, RawValue raw); \
+    STC_API CX##_iter_t CX##_bsearch_in(CX##_iter_t it1, CX##_iter_t it2, RawValue raw); \
+    STC_API void        CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t size); \
+    STC_API void        CX##_push_back(CX* self, Value value); \
+    STC_API CX##_iter_t CX##_erase_range_p(CX* self, CX##_value_t* p1, CX##_value_t* p2); \
+    STC_API CX##_iter_t CX##_insert_range_p(CX* self, CX##_value_t* pos, const CX##_value_t* p1, \
+                                                                         const CX##_value_t* p2, bool clone); \
     STC_INLINE size_t   CX##_size(CX vec) { return _cvec_rep(&vec)->size; } \
     STC_INLINE size_t   CX##_capacity(CX vec) { return _cvec_rep(&vec)->cap; } \
     STC_INLINE bool     CX##_empty(CX vec) {return !_cvec_rep(&vec)->size;} \
     STC_INLINE Value    CX##_value_fromraw(RawValue raw) {return valueFromRaw(raw);} \
-    STC_API int         CX##_value_compare(const CX##_value_t* x, const CX##_value_t* y); \
-    STC_INLINE void     CX##_clear(CX* self); \
-    STC_API void        CX##_del(CX* self); \
-    STC_API void        CX##_reserve(CX* self, size_t cap); \
-    STC_API void        CX##_resize(CX* self, size_t size, Value fill_val); \
     STC_INLINE void     CX##_swap(CX* a, CX* b) {c_swap(CX, *a, *b);} \
-    STC_API void        CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t size); \
-    STC_API void        CX##_push_back(CX* self, Value value); \
     STC_INLINE void     CX##_emplace_back(CX* self, RawValue raw) \
                             {CX##_push_back(self, valueFromRaw(raw));} \
     STC_INLINE void     CX##_pop_back(CX* self) \
@@ -100,8 +105,6 @@ typedef int (*c_cmp_fn)(const void*, const void*);
         return valueFromRaw(valueToRaw(&val)); \
     } \
 \
-    STC_API CX##_iter_t CX##_insert_range_p(CX* self, CX##_value_t* pos, const CX##_value_t* p1, \
-                                                                         const CX##_value_t* p2, bool clone); \
     STC_INLINE CX##_iter_t \
     CX##_insert(CX* self, CX##_iter_t it, Value value) { \
         it = CX##_insert_range_p(self, it.ref, &value, &value + 1, false); \
@@ -120,15 +123,12 @@ typedef int (*c_cmp_fn)(const void*, const void*);
         return CX##_insert_range_p(self, self->data + idx, arr, arr + n, true); \
     } \
 \
-    STC_API CX##_iter_t \
-    CX##_erase_range_p(CX* self, CX##_value_t* p1, CX##_value_t* p2); \
-\
     STC_INLINE CX##_iter_t \
     CX##_erase_range(CX* self, CX##_iter_t it1, CX##_iter_t it2) { \
         return CX##_erase_range_p(self, it1.ref, it2.ref); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_erase_it(CX* self, CX##_iter_t it) { \
+    CX##_erase_at(CX* self, CX##_iter_t it) { \
         return CX##_erase_range_p(self, it.ref, it.ref + 1); \
     } \
     STC_INLINE CX##_iter_t \
@@ -160,15 +160,11 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     STC_INLINE size_t \
     CX##_index(CX vec, CX##_iter_t it) {return it.ref - vec.data;} \
 \
-    STC_API CX##_iter_t \
-    CX##_find_in(CX##_iter_t it1, CX##_iter_t it2, RawValue raw); \
     STC_INLINE CX##_iter_t \
     CX##_find(const CX* self, RawValue raw) { \
         return CX##_find_in(CX##_begin(self), CX##_end(self), raw); \
     } \
 \
-    STC_API CX##_iter_t \
-    CX##_bsearch_in(CX##_iter_t i1, CX##_iter_t i2, RawValue raw); \
     STC_INLINE CX##_iter_t \
     CX##_bsearch(const CX* self, RawValue raw) { \
         return CX##_bsearch_in(CX##_begin(self), CX##_end(self), raw); \
@@ -216,6 +212,7 @@ static struct cvec_rep _cvec_inits = {0, 0};
             rep->size = 0; \
         } \
     } \
+\
     STC_DEF void \
     CX##_del(CX* self) { \
         CX##_clear(self); \
@@ -235,6 +232,7 @@ static struct cvec_rep _cvec_inits = {0, 0};
             rep->cap = cap; \
         } \
     } \
+\
     STC_DEF void \
     CX##_resize(CX* self, size_t len, Value null_val) { \
         CX##_reserve(self, len); \
@@ -296,6 +294,7 @@ static struct cvec_rep _cvec_inits = {0, 0};
         } \
         return i2; \
     } \
+\
     STC_DEF CX##_iter_t \
     CX##_bsearch_in(CX##_iter_t i1, CX##_iter_t i2, RawValue raw) { \
         CX##_iter_t mid, last = i2; \
