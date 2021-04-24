@@ -184,8 +184,6 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
 
 static struct cdeq_rep _cdeq_inits = {0, 0};
 #define              _cdeq_nfront(self) ((self)->data - (self)->_base)
-static inline float c_minf(float x, float y) {return x < y ? x : y;}
-static inline float c_maxf(float x, float y) {return x > y ? x : y;}
 
 #define _c_implement_cdeq(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
 \
@@ -223,22 +221,20 @@ static inline float c_maxf(float x, float y) {return x > y ? x : y;}
     CX##_expand_(CX* self, size_t n, bool at_front) { \
         struct cdeq_rep* rep = cdeq_rep_(self); \
         size_t len = rep->size, cap = rep->cap; \
-        size_t nfront = self->data - self->_base, nback = cap - (nfront + len); \
+        size_t nfront = self->data - self->_base, nback = cap - len - nfront; \
         if (at_front && nfront >= n || !at_front && nback >= n) \
             return; \
-        if ((len + n)*1.3 > cap) { \
-            cap = (len + n + 6)*1.8; \
+        if ((len + n)*1.4 > cap) { \
+            cap = (len + n + 6)*2; \
             rep = (struct cdeq_rep*) c_realloc(rep->cap ? rep : NULL, \
                                                sizeof(struct cdeq_rep) + cap*sizeof(Value)); \
             rep->size = len, rep->cap = cap; \
             self->_base = (CX##_value_t *) rep->base; \
             self->data = self->_base + nfront; \
-            CX##_expand_(self, n, at_front); \
-            return; \
         } \
-        size_t unused = cap - (len + n); \
-        size_t pos = (size_t) (at_front ? c_maxf(unused*0.5f, unused - nback) + n \
-                                        : c_minf(unused*0.5f, nfront)); \
+        size_t pos = (cap - (len + n)) / 2; \
+        if (at_front && nback < pos) pos += pos - nback; \
+        else if (!at_front && nfront < pos) pos = nfront; \
         self->data = (CX##_value_t *) memmove(self->_base + pos, self->data, len*sizeof(Value)); \
     } \
 \
