@@ -225,9 +225,9 @@ static struct cdeq_rep _cdeq_inits = {0, 0};
         if (at_front && nfront >= n || !at_front && nback >= n) \
             return; \
         if ((len + n)*1.4 > cap) { \
-            cap = (len + n + 6)*2; \
+            cap = (len + 6)*2 + n; \
             rep = (struct cdeq_rep*) c_realloc(rep->cap ? rep : NULL, \
-                                               sizeof(struct cdeq_rep) + cap*sizeof(Value)); \
+                                               offsetof(struct cdeq_rep, base) + cap*sizeof(Value)); \
             rep->size = len, rep->cap = cap; \
             self->_base = (CX##_value_t *) rep->base; \
             self->data = self->_base + nfront; \
@@ -235,7 +235,8 @@ static struct cdeq_rep _cdeq_inits = {0, 0};
         size_t pos = (cap - (len + n)) / 2; \
         if (at_front && nback < pos) pos += pos - nback; \
         else if (!at_front && nfront < pos) pos = nfront; \
-        self->data = (CX##_value_t *) memmove(self->_base + pos, self->data, len*sizeof(Value)); \
+        if (pos != nfront) \
+            self->data = (CX##_value_t *) memmove(self->_base + pos, self->data, len*sizeof(Value)); \
     } \
 \
     STC_DEF void \

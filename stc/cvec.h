@@ -226,7 +226,7 @@ static struct cvec_rep _cvec_inits = {0, 0};
         size_t len = rep->size, oldcap = rep->cap; \
         if (cap > oldcap) { \
             rep = (struct cvec_rep*) c_realloc(oldcap ? rep : NULL, \
-                                               sizeof(struct cvec_rep) + cap*sizeof(Value)); \
+                                               offsetof(struct cvec_rep, data) + cap*sizeof(Value)); \
             self->data = (CX##_value_t*) rep->data; \
             rep->size = len; \
             rep->cap = cap; \
