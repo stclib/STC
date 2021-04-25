@@ -46,7 +46,6 @@
 
 struct cvec_rep { size_t size, cap; void* data[]; };
 #define _cvec_rep(self) c_container_of((self)->data, struct cvec_rep, data)
-typedef int (*c_cmp_fn)(const void*, const void*);
 
 
 #define _c_using_cvec(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
@@ -172,7 +171,7 @@ typedef int (*c_cmp_fn)(const void*, const void*);
     STC_INLINE void \
     CX##_sort_range(CX##_iter_t i1, CX##_iter_t i2, \
                           int(*cmp)(const CX##_value_t*, const CX##_value_t*)) { \
-        qsort(i1.ref, i2.ref - i1.ref, sizeof(CX##_value_t), (c_cmp_fn) cmp); \
+        qsort(i1.ref, i2.ref - i1.ref, sizeof(CX##_value_t), (int(*)(const void*, const void*)) cmp); \
     } \
     STC_INLINE void \
     CX##_sort(CX* self) { \

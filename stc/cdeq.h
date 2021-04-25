@@ -233,10 +233,9 @@ static struct cdeq_rep _cdeq_inits = {0, 0};
             self->data = self->_base + nfront; \
         } \
         size_t pos = (cap - (len + n)) / 2; \
+        if (!at_front && nfront < pos) return; \
         if (at_front && nback < pos) pos += pos - nback; \
-        else if (!at_front && nfront < pos) pos = nfront; \
-        if (pos != nfront) \
-            self->data = (CX##_value_t *) memmove(self->_base + pos, self->data, len*sizeof(Value)); \
+        self->data = (CX##_value_t *) memmove(self->_base + pos, self->data, len*sizeof(Value)); \
     } \
 \
     STC_DEF void \
