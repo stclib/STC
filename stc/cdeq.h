@@ -183,7 +183,7 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
 static struct cdeq_rep _cdeq_inits = {0, 0};
-#define              _cdeq_nfront(self) ((self)->data - (self)->_base)
+#define _cdeq_nfront(self) ((self)->data - (self)->_base)
 
 #define _c_implement_cdeq(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
 \
@@ -224,17 +224,17 @@ static struct cdeq_rep _cdeq_inits = {0, 0};
         size_t nfront = self->data - self->_base, nback = cap - len - nfront; \
         if (at_front && nfront >= n || !at_front && nback >= n) \
             return; \
-        if ((len + n)*1.4 > cap) { \
-            cap = (len + 6)*2 + n; \
+        if ((len + n)*1.2 > cap) { \
+            cap = (len + 4)*1.8 + n; \
             rep = (struct cdeq_rep*) c_realloc(rep->cap ? rep : NULL, \
                                                offsetof(struct cdeq_rep, base) + cap*sizeof(Value)); \
             rep->size = len, rep->cap = cap; \
             self->_base = (CX##_value_t *) rep->base; \
             self->data = self->_base + nfront; \
         } \
-        size_t pos = (cap - (len + n)) / 2; \
+        size_t unused = cap - (len + n), pos = unused/2; \
         if (!at_front && nfront < pos) return; \
-        if (at_front && nback < pos) pos += pos - nback; \
+        if (at_front && nback < pos) pos = unused - nback; \
         self->data = (CX##_value_t *) memmove(self->_base + pos, self->data, len*sizeof(Value)); \
     } \
 \
