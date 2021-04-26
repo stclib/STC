@@ -10,9 +10,11 @@ See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ fu
 
 **stc64** is a novel, extremely fast PRNG by Tyge Løvset, suited for parallel usage. It features a
 Weyl-sequence as part of the state. In general testing, **stc64** is the fastest among *pcg64*,
-*xoshiro256`**`*, *sfc64*, and *lehmer64*. *wyrand* is faster on platforms with fast 128-bit 
-multiplication, and has 2^64 period length (https://github.com/lemire/SwiftWyhash/issues/10).
-However, it is not suited for massive parallel usage due to its limited total minimal period length.
+*xoshiro256`**`*, *sfc64*, and *lehmer64*. 
+
+*wyrand* is faster on platforms with fast 128-bit multiplication, and has 2^64 period length
+(https://github.com/lemire/SwiftWyhash/issues/10). However, *wyrand* is not suited for massive
+parallel usage due to its limited total minimal period length.
 
 **stc64** does not require multiplication or 128-bit integer operations. It has 256 bit state,
 but updates only 192 bit per generated number.
