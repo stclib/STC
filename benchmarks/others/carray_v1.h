@@ -77,7 +77,7 @@ int main()
 \
     STC_INLINE carray1##X \
     carray1##X##_init(size_t xdim, Value val) { \
-        carray1##X##_value_t* m = c_new_2(carray1##X##_value_t, xdim); \
+        carray1##X##_value_t* m = c_new_n(carray1##X##_value_t, xdim); \
         for (size_t i=0; i<xdim; ++i) m[i] = val; \
         carray1##X a = {m, xdim | _carray_OWN}; \
         return a; \
@@ -85,7 +85,7 @@ int main()
     STC_INLINE carray2##X \
     carray2##X##_init(size_t ydim, size_t xdim, Value val) { \
         const size_t n = ydim * xdim; \
-        carray2##X##_value_t* m = c_new_2(carray2##X##_value_t, n); \
+        carray2##X##_value_t* m = c_new_n(carray2##X##_value_t, n); \
         for (size_t i=0; i<n; ++i) m[i] = val; \
         carray2##X a = {m, xdim | _carray_OWN, ydim}; \
         return a; \
@@ -144,7 +144,7 @@ int main()
     STC_INLINE carray3##X \
     carray3##X##_init(size_t zdim, size_t ydim, size_t xdim, Value val) { \
         const size_t n = zdim * ydim * xdim; \
-        carray3##X##_value_t* m = c_new_2(carray3##X##_value_t, n); \
+        carray3##X##_value_t* m = c_new_n(carray3##X##_value_t, n); \
         for (size_t i=0; i<n; ++i) m[i] = val; \
         carray3##X a = {m, xdim | _carray_OWN, ydim, zdim}; \
         return a; \
@@ -204,7 +204,7 @@ int main()
     STC_INLINE carray##D##X \
     carray##D##X##_clone(carray##D##X arr) { \
         carray##D##X cp = arr; size_t k = 0; \
-        cp.data = c_new_2(carray1##X##_value_t, carray##D##X##_size(arr)); \
+        cp.data = c_new_n(carray1##X##_value_t, carray##D##X##_size(arr)); \
         c_foreach_3 (i, carray##D##X, arr) \
             cp.data[k++] = valueClone(*i.ref); \
         return cp; \

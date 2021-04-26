@@ -140,7 +140,7 @@ int main() {
 \
     STC_DEF CX CX##_from(CX##_value_t* block, size_t xdim, size_t ydim) { \
         size_t n = xdim * ydim; \
-        CX _arr = {c_new_2(CX##_value_t*, xdim), xdim, ydim}; \
+        CX _arr = {c_new_n(CX##_value_t*, xdim), xdim, ydim}; \
         for (size_t x = 0; x < xdim; ++x, block += ydim) \
             _arr.at[x] = block; \
         return _arr; \
@@ -148,7 +148,7 @@ int main() {
 \
     STC_DEF CX CX##_init(size_t xdim, size_t ydim, Value value) { \
         size_t n = xdim*ydim; \
-        CX _arr = CX##_from(c_new_2(CX##_value_t, n), xdim, ydim); \
+        CX _arr = CX##_from(c_new_n(CX##_value_t, n), xdim, ydim); \
         for (CX##_value_t* p = _arr.at[0], *e = p + n; p != e; ++p) \
             *p = value; \
         return _arr; \
@@ -156,7 +156,7 @@ int main() {
 \
     STC_DEF CX CX##_clone(CX src) { \
         size_t n = src.xdim*src.ydim; \
-        CX _arr = CX##_from(c_new_2(CX##_value_t, n), src.xdim, src.ydim); \
+        CX _arr = CX##_from(c_new_n(CX##_value_t, n), src.xdim, src.ydim); \
         for (CX##_value_t* p = _arr.at[0], *q = src.at[0], *e = p + n; p != e; ++p, ++q) \
             *p = valueClone(*q); \
         return _arr; \
@@ -175,7 +175,7 @@ int main() {
 #define _c_implement_carray3(CX, Value, valueDel, valueClone) \
 \
     STC_DEF CX CX##_from(CX##_value_t* block, size_t xdim, size_t ydim, size_t zdim) { \
-        CX _arr = {c_new_2(CX##_value_t**, xdim*(ydim + 1)), xdim, ydim, zdim}; \
+        CX _arr = {c_new_n(CX##_value_t**, xdim*(ydim + 1)), xdim, ydim, zdim}; \
         CX##_value_t** p = (CX##_value_t**) &_arr.at[xdim]; \
         for (size_t x = 0, y; x < xdim; ++x, p += ydim) \
             for (_arr.at[x] = p, y = 0; y < ydim; ++y, block += zdim) \
@@ -185,7 +185,7 @@ int main() {
 \
     STC_DEF CX CX##_init(size_t xdim, size_t ydim, size_t zdim, Value value) { \
         size_t n = xdim*ydim*zdim; \
-        CX _arr = CX##_from(c_new_2(CX##_value_t, n), xdim, ydim, zdim); \
+        CX _arr = CX##_from(c_new_n(CX##_value_t, n), xdim, ydim, zdim); \
         for (CX##_value_t* p = **_arr.at, *e = p + n; p != e; ++p) \
             *p = value; \
         return _arr; \
@@ -193,7 +193,7 @@ int main() {
 \
     STC_DEF CX CX##_clone(CX src) { \
         size_t n = CX##_size(src); \
-        CX _arr = CX##_from(c_new_2(CX##_value_t, n), src.xdim, src.ydim, src.zdim); \
+        CX _arr = CX##_from(c_new_n(CX##_value_t, n), src.xdim, src.ydim, src.zdim); \
         for (CX##_value_t* p = **_arr.at, *q = **src.at, *e = p + n; p != e; ++p, ++q) \
             *p = valueClone(*q); \
         return _arr; \

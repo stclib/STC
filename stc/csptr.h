@@ -105,13 +105,13 @@ typedef long atomic_count_t;
     STC_INLINE CX \
     CX##_from(CX##_value_t* p) { \
         CX ptr = {p}; \
-        if (p) *(ptr.use_count = c_new_1(atomic_count_t)) = 1; \
+        if (p) *(ptr.use_count = c_new(atomic_count_t)) = 1; \
         return ptr; \
     } \
 \
     STC_INLINE CX \
     CX##_make(CX##_value_t val) { \
-        CX ptr = {c_new_1(CX##_value_t), c_new_1(atomic_count_t)}; \
+        CX ptr = {c_new(CX##_value_t), c_new(atomic_count_t)}; \
         *ptr.get = val, *ptr.use_count = 1; return ptr; \
     } \
 \

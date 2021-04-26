@@ -381,9 +381,10 @@ STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) \
     STC_DEF CX \
     CX##_clone(CX m) { \
         CX clone = { \
-            c_new_2(CX##_value_t, m.bucket_count), \
+            c_new_n(CX##_value_t, m.bucket_count), \
             (uint8_t *) memcpy(c_malloc(m.bucket_count + 1), m._hashx, m.bucket_count + 1), \
-            m.size, m.bucket_count, m.max_load_factor \
+            m.size, m.bucket_count, \
+            m.max_load_factor \
         }; \
         CX##_value_t *e = m.table, *end = e + m.bucket_count, *dst = clone.table; \
         for (uint8_t *hx = m._hashx; e != end; ++hx, ++e, ++dst) \
@@ -397,7 +398,7 @@ STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) \
         size_t oldcap = self->bucket_count; \
         newcap = (size_t) (2 + newcap / self->max_load_factor) | 1; \
         CX tmp = { \
-            c_new_2 (CX##_value_t, newcap), \
+            c_new_n(CX##_value_t, newcap), \
             (uint8_t *) c_calloc(newcap + 1, sizeof(uint8_t)), \
             self->size, (CX##_size_t) newcap, \
             self->max_load_factor \

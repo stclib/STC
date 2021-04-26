@@ -388,7 +388,7 @@ int main(void) {
             if ((c = keyCompareRaw(&r, rkey)) == 0) {res->ref = &it->value; return tn;} \
             it = it->link[(dir = (c == -1))]; \
         } \
-        tn = c_new_1(C##X##_node_t); \
+        tn = c_new(C##X##_node_t); \
         res->ref = &tn->value, res->inserted = true; \
         tn->link[0] = tn->link[1] = (C##X##_node_t*) &aatree_nil, tn->level = 1; \
         if (top == 0) return tn; \
@@ -448,7 +448,7 @@ int main(void) {
     STC_DEF C##X##_node_t* \
     C##X##_clone_r_(C##X##_node_t *tn) { \
         if (! tn->level) return tn; \
-        C##X##_node_t *cn = c_new_1(C##X##_node_t); \
+        C##X##_node_t *cn = c_new(C##X##_node_t); \
         cn->link[0] = C##X##_clone_r_(tn->link[0]); \
         cn->link[1] = C##X##_clone_r_(tn->link[1]); \
         cn->level = tn->level; \

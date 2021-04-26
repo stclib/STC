@@ -5,8 +5,8 @@ The following handy macros are safe to use, i.e. have no side-effects.
 ### c_init, c_emplace
 **c_init** declares and initializes any container with an array of elements. **c_emplace** adds elements to any existing container:
 ```c
-c_init (cvec_i, vec, {1, 2, 3});     // declare and emplace
-c_emplace(cvec_i, vec, {4, 5, 6});   // adds to existing vec
+c_init(cvec_i, vec, {1, 2, 3});     // declare and emplace
+c_emplace(cvec_i, vec, {4, 5, 6});  // adds to existing vec
 ```
 
 ### c_forrange
@@ -15,7 +15,7 @@ Declare an iterator and specify a range to iterate with a for loop. Like python'
 | Usage                                         | Python equivalent                    |
 |:----------------------------------------------|:-------------------------------------|
 | `c_forrange (stop)`                           | `for _ in range(stop):`              |
-| `c_forrange (i, stop) // IterType=size_t`     | `for i in range(stop):`              |
+| `c_forrange (i, stop) // IterType = size_t`   | `for i in range(stop):`              |
 | `c_forrange (i, IterType, stop)`              | `for i in range(stop):`              |
 | `c_forrange (i, IterType, start, stop)`       | `for i in range(start, stop):`       |
 | `c_forrange (i, IterType, start, stop, step)` | `for i in range(start, stop, step):` |
@@ -49,8 +49,15 @@ c_foreach (i, csset_x, it, csset_x_end(&set)) printf(" %d", *i.ref);
 // 7 12 23
 ```
 
-### c_withfile, c_breakwith
-Simplifies reading a file. Use only **c_breakwith** to break out of the block if needed. Example:
+### c_withfile, c_withbuffer, c_breakwith
+Simplifies reading a file. Use only **c_breakwith** to break out of the block if needed.
+**c_withbuffer** uses stack memory if buf is up to 256 bytes, and heap memory otherwise:
+
+| Usage                          | Description                       |
+|:-------------------------------|:----------------------------------|
+| `c_withfile (fp, fileopen)`    | `Declare, open and close file`    |
+| `c_withbuffer (buf, type, n)`  | `Declare, allocate and free buf`  |
+
 ```c
 // Load each line of a text file into a vector of strings
 #include <errno.h>
@@ -73,15 +80,15 @@ cvec_str readFile(const char* name) {
 }
 ```
 
-### c_new, c_del
+### c_new, c_new_n, c_del
 
 | Usage                          | Meaning                                 |
 |:-------------------------------|:----------------------------------------|
 | `c_new (type)`                 | `(type *) c_malloc(sizeof(type))`       |
-| `c_new (type, N)`              | `(type *) c_malloc((N) * sizeof(type))` |
+| `c_new_n (type, N)`            | `(type *) c_malloc((N)*sizeof(type))`   |
 | `c_del (ctype, c1, ..., cN)`   | `ctype_del(c1); ... ctype_del(cN)`      |
 ```c
-int* array = c_new (int, 100);
+int* array = c_new_n (int, 100);
 c_free(array);
 
 cstr a = cstr_from("Hello"), b = cstr_from("World");

@@ -95,7 +95,7 @@ int main()
 
     // Ex2
     int w = 256, h = 128;
-    carray2i image = carray2i_from(c_new(uint32_t, w*h), w, h); // no value init
+    carray2i image = carray2i_from(c_new_n(uint32_t, w*h), w, h); // no value init
     int n = 0;
     c_foreach (i, carray2i, image) {
         uint32_t t = n++ % 256;
