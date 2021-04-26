@@ -430,7 +430,7 @@ static struct csmap_rep _csmap_inits = {0, 0, 0, 0};
             up[top++] = tx; \
             RawKey raw = keyToRaw(KEY_REF_##C(&d[tx].value)); \
             if ((c = keyCompareRaw(&raw, rkey)) == 0) {res->ref = &d[tx].value; return tn;} \
-            dir = (c == -1); \
+            dir = (c < 0); \
             tx = d[tx].link[dir]; \
         } \
         tx = CX##_node_new_(self, 1); d = self->nodes; \
@@ -461,7 +461,7 @@ static struct csmap_rep _csmap_inits = {0, 0, 0, 0};
         RawKey raw = keyToRaw(KEY_REF_##C(&d[tn].value)); \
         CX##_size_t tx; int c = keyCompareRaw(&raw, rkey); \
         if (c != 0) \
-            d[tn].link[c == -1] = CX##_erase_r_(d, d[tn].link[c == -1], rkey, erased); \
+            d[tn].link[c < 0] = CX##_erase_r_(d, d[tn].link[c < 0], rkey, erased); \
         else { \
             if (!*erased) {CX##_value_del(&d[tn].value); *erased = 1;} \
             if (d[tn].link[0] && d[tn].link[1]) { \

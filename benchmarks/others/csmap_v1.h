@@ -386,7 +386,7 @@ int main(void) {
             up[top++] = it; \
             C##X##_rawkey_t r = keyToRaw(KEY_REF_##C(&it->value)); \
             if ((c = keyCompareRaw(&r, rkey)) == 0) {res->ref = &it->value; return tn;} \
-            it = it->link[(dir = (c == -1))]; \
+            it = it->link[(dir = (c < 0))]; \
         } \
         tn = c_new(C##X##_node_t); \
         res->ref = &tn->value, res->inserted = true; \
@@ -417,7 +417,7 @@ int main(void) {
         C##X##_rawkey_t raw = keyToRaw(KEY_REF_##C(&tn->value)); \
         C##X##_node_t *tx; int c = keyCompareRaw(&raw, rkey); \
         if (c != 0) \
-            tn->link[c == -1] = C##X##_erase_r_(tn->link[c == -1], rkey, erased); \
+            tn->link[c < 0] = C##X##_erase_r_(tn->link[c < 0], rkey, erased); \
         else { \
             if (!*erased) {C##X##_value_del(&tn->value); *erased = 1;} \
             if (tn->link[0]->level && tn->link[1]->level) { \
