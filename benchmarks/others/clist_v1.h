@@ -108,14 +108,14 @@ STC_API size_t _clist_count(const clist_VOID* self);
     STC_API CX          CX##_split_after(CX* self, CX##_iter_t pos1, CX##_iter_t pos2); \
     STC_API void        CX##_splice_after(CX* self, CX##_iter_t pos, CX* other); \
     STC_DEF void        CX##_splice_after_range(CX* self, CX##_iter_t pos, CX* other, CX##_iter_t i1, CX##_iter_t i2); \
-    STC_API CX##_iter_t CX##_find_before_in(const CX* self, CX##_iter_t first, CX##_iter_t finish, RawValue val); \
-    STC_API CX##_iter_t CX##_find_before(const CX* self, RawValue val); \
     STC_API CX##_iter_t CX##_find(const CX* self, RawValue val); \
+    STC_API CX##_iter_t CX##_find_before(const CX* self, RawValue val); \
+    STC_API CX##_iter_t CX##_find_before_in(CX##_iter_t it1, CX##_iter_t it2, RawValue val); \
     STC_API void        CX##_sort(CX* self); \
     STC_API size_t      CX##_remove(CX* self, RawValue val); \
     STC_API CX##_iter_t CX##_insert_after(CX* self, CX##_iter_t pos, Value value); \
     STC_API CX##_iter_t CX##_erase_after(CX* self, CX##_iter_t pos); \
-    STC_API CX##_iter_t CX##_erase_range_after(CX* self, CX##_iter_t pos, CX##_iter_t finish); \
+    STC_API CX##_iter_t CX##_erase_range_after(CX* self, CX##_iter_t pos, CX##_iter_t it2); \
     STC_API CX##_node_t* CX##_erase_after_(CX* self, CX##_node_t* node); \
 \
     STC_INLINE CX       CX##_init(void) {CX lst = {NULL}; return lst;} \
@@ -229,33 +229,33 @@ STC_API size_t _clist_count(const clist_VOID* self);
     } \
 \
     STC_DEF CX##_iter_t \
-    CX##_erase_range_after(CX* self, CX##_iter_t first, CX##_iter_t finish) { \
-        CX##_node_t* node = _clist_node(CX, first.ref), *done = finish.ref ? _clist_node(CX, finish.ref) : NULL; \
+    CX##_erase_range_after(CX* self, CX##_iter_t it1, CX##_iter_t it2) { \
+        CX##_node_t* node = _clist_node(CX, it1.ref), *done = it2.ref ? _clist_node(CX, it2.ref) : NULL; \
         while (node && node->next != done) \
             node = CX##_erase_after_(self, node); \
-        CX##_next(&first); return first; \
+        CX##_next(&it1); return it1; \
     } \
 \
     STC_DEF CX##_iter_t \
-    CX##_find_before_in(const CX* self, CX##_iter_t first, CX##_iter_t finish, RawValue val) { \
-        CX##_iter_t i = first; \
-        for (CX##_next(&i); i.ref != finish.ref; CX##_next(&i)) { \
+    CX##_find_before_in(CX##_iter_t it1, CX##_iter_t it2, RawValue val) { \
+        CX##_iter_t i = it1; \
+        for (CX##_next(&i); i.ref != it2.ref; CX##_next(&i)) { \
             RawValue r = valueToRaw(i.ref); \
-            if (valueCompareRaw(&r, &val) == 0) return first; \
-            first = i; \
+            if (valueCompareRaw(&r, &val) == 0) return it1; \
+            it1 = i; \
         } \
-        return CX##_end(self); \
+        it1.ref = NULL; return it1; \
     } \
 \
     STC_DEF CX##_iter_t \
     CX##_find_before(const CX* self, RawValue val) { \
-        CX##_iter_t it = CX##_find_before_in(self, CX##_before_begin(self), CX##_end(self), val); \
+        CX##_iter_t it = CX##_find_before_in(CX##_before_begin(self), CX##_end(self), val); \
         return it; \
     } \
 \
     STC_DEF CX##_iter_t \
     CX##_find(const CX* self, RawValue val) { \
-        CX##_iter_t it = CX##_find_before_in(self, CX##_before_begin(self), CX##_end(self), val); \
+        CX##_iter_t it = CX##_find_before_in(CX##_before_begin(self), CX##_end(self), val); \
         if (it.ref != CX##_end(self).ref) CX##_next(&it); \
         return it; \
     } \

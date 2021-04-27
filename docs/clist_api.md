@@ -77,8 +77,7 @@ clist_X_iter_t      clist_X_splice_range(clist_X* self, clist_X_iter_t it,      
                                          clist_X* other, clist_X_iter_t it1, clist_X_iter_t it2);
 
 clist_X_iter_t      clist_X_find(const clist_X* self, RawValue raw);
-clist_X_iter_t      clist_X_find_in(const clist_X* self,
-                                    clist_X_iter_t it1, clist_X_iter_t it2, RawValue raw);
+clist_X_iter_t      clist_X_find_in(clist_X_iter_t it1, clist_X_iter_t it2, RawValue raw);
 
 void                clist_X_sort(clist_X* self);
 
