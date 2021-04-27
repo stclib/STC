@@ -221,11 +221,11 @@ static struct cdeq_rep _cdeq_inits = {0, 0};
     CX##_expand_(CX* self, size_t n, bool at_front) { \
         struct cdeq_rep* rep = cdeq_rep_(self); \
         size_t len = rep->size, cap = rep->cap; \
-        size_t nfront = self->data - self->_base, nback = cap - len - nfront; \
+        size_t nfront = _cdeq_nfront(self), nback = cap - len - nfront; \
         if (at_front && nfront >= n || !at_front && nback >= n) \
             return; \
-        if ((len + n)*1.2 > cap) { \
-            cap = (len + 4)*1.8 + n; \
+        if (len*1.2 + n > cap) { \
+            cap = (size_t) (len*1.8) + n + 6; \
             rep = (struct cdeq_rep*) c_realloc(rep->cap ? rep : NULL, \
                                                offsetof(struct cdeq_rep, base) + cap*sizeof(Value)); \
             rep->size = len, rep->cap = cap; \
