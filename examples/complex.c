@@ -27,7 +27,7 @@ int main() {
     printf("arr2 size: %zu x %zu\n", arr2.xdim, arr2.ydim);
 
     // Put in some data in 2D array
-    arr2.at[x][y] = 3.1415927f;
+    arr2.data[x][y] = 3.1415927f;
     clist_arr_push_back(&tableList, arr2);
     cmap_lst_insert(&listMap, tableKey, tableList);
     cmap_map_insert(&myMap, cstr_from(strKey), listMap);
@@ -37,8 +37,8 @@ int main() {
     clist_arr* lsta = &cmap_lst_find(mapl, tableKey).ref->second;
     carray2f arr = *clist_arr_back(lsta);
 
-    printf("value (%d, %d) is: %f\n", x, y, arr.at[x][y]);
+    printf("value (%d, %d) is: %f\n", x, y, arr.data[x][y]);
 
-    arr2.at[x][y] = 1.41421356f; // change the value in array
+    arr2.data[x][y] = 1.41421356f; // change the value in array
     cmap_map_del(&myMap); // free up everything!
 }

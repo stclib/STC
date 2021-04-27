@@ -59,16 +59,16 @@ void                carray3X_next(carray3X_iter_t* it);
 ```
 ## Types
 
-| Type name            | Type definition                                  | Used to represent...      |
-|:---------------------|:-------------------------------------------------|:--------------------------|
-| `carray2X`           | `struct { Value **at; size_t xdim,ydim; }`       | The carray2 type           |
-| `carray2X_value_t`   | `Value`                                          | The value type            |
-| `carray2X_iter_t`    | `struct { Value *ref; }`                         | Iterator type             |
-| `carray3X`           | `struct { Value ***at; size_t xdim,ydim,zdim; }` | The carray3 type           |
-| `carray3X_value_t`   | `Value`                                          | The value type            |
-| `carray3X_iter_t`    | `struct { Value *ref; }`                         | Iterator type             |
+| Type name            | Type definition                                    | Used to represent...      |
+|:---------------------|:---------------------------------------------------|:--------------------------|
+| `carray2X`           | `struct { Value **data; size_t xdim,ydim; }`       | The carray2 type          |
+| `carray2X_value_t`   | `Value`                                            | The value type            |
+| `carray2X_iter_t`    | `struct { Value *ref; }`                           | Iterator type             |
+| `carray3X`           | `struct { Value ***data; size_t xdim,ydim,zdim; }` | The carray3 type          |
+| `carray3X_value_t`   | `Value`                                            | The value type            |
+| `carray3X_iter_t`    | `struct { Value *ref; }`                           | Iterator type             |
 
-The **carray** elements can be accessed like `carray3i arr = ...; int val = arr.at[x][y][z];`, or with `carray3i_at(&arr, x, y, z)`.
+The **carray** elements can be accessed like `carray3i arr = ...; int val = arr.data[x][y][z];`, or with `carray3i_at(&arr, x, y, z)`.
 
 ## Example
 ```c
@@ -83,14 +83,14 @@ int main()
     // Ex1
     int xd = 30, yd = 20, zd = 10;
     carray3f a3 = carray3f_init(xd, yd, zd, 0.0f);  // define a3[30][20][10], init with 0.0f.
-    a3.at[5][4][3] = 3.14f;
+    a3.data[5][4][3] = 3.14f;
 
-    float *a1 = a3.at[5][4];
-    float **a2 = a3.at[5];
+    float *a1 = a3.data[5][4];
+    float **a2 = a3.data[5];
 
     printf("%f\n", a1[3]); // 3.14
     printf("%f\n", a2[4][3]); // 3.14
-    printf("%f\n", a3.at[5][4][3]); // 3.14
+    printf("%f\n", a3.data[5][4][3]); // 3.14
     carray3f_del(&a3); // free array
 
     // Ex2
@@ -103,7 +103,7 @@ int main()
     }
 
     for (int y=0; y<image.ydim; ++y)
-        image.at[y][y] = 0xffffffff;
+        image.data[y][y] = 0xffffffff;
     carray2i_del(&image);
 }
 ```

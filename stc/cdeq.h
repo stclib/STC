@@ -232,9 +232,10 @@ static struct cdeq_rep _cdeq_inits = {0, 0};
             self->_base = (CX##_value_t *) rep->base; \
             self->data = self->_base + nfront; \
         } \
-        size_t unused = cap - (len + n), pos = unused/2; \
-        if (!at_front && nfront < pos) return; \
-        if (at_front && nback < pos) pos = unused - nback; \
+        size_t unused = cap - len, pos = unused/2; \
+        if (at_front) { if (len == 0) pos = unused; \
+                        else if (nback < pos) pos = unused - nback; } \
+        else if (nfront < pos) return; \
         self->data = (CX##_value_t *) memmove(self->_base + pos, self->data, len*sizeof(Value)); \
     } \
 \
