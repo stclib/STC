@@ -225,7 +225,7 @@ static struct cdeq_rep _cdeq_inits = {0, 0};
         if (at_front && nfront >= n || !at_front && nback >= n) \
             return; \
         if (len*1.2 + n > cap) { \
-            cap = (size_t) (len*1.8) + n + 6; \
+            cap = (size_t) (len*1.8) + n + 7; \
             rep = (struct cdeq_rep*) c_realloc(rep->cap ? rep : NULL, \
                                                offsetof(struct cdeq_rep, base) + cap*sizeof(Value)); \
             rep->size = len, rep->cap = cap; \
