@@ -57,10 +57,10 @@
 #define _c_ARG_N(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, N,...) N
 #define _c_RSEQ_N 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 #define _c_APPLY_ARG_N(ARGS) _c_EXPAND(_c_ARG_N ARGS)
-#define _c_VA_ARG_SIZE(...) _c_EXPAND(_c_APPLY_ARG_N((__VA_ARGS__, _c_RSEQ_N)))
+#define _c_ARG_COUNT(...) _c_EXPAND(_c_APPLY_ARG_N((__VA_ARGS__, _c_RSEQ_N)))
 #define _c_SELECT(NAME, NUM) _c_CAT( NAME ## _, NUM)
 
-#define c_MACRO_OVERLOAD(NAME, ...) _c_SELECT(NAME, _c_VA_ARG_SIZE(__VA_ARGS__))(__VA_ARGS__)
+#define c_MACRO_OVERLOAD(NAME, ...) _c_SELECT(NAME, _c_ARG_COUNT(__VA_ARGS__))(__VA_ARGS__)
 #define c_static_assert(cond, ...) typedef char _static_assert_[(cond) ? 1 : -1]
 #define c_container_of(ptr, type, member) \
         ((type *)((char *)(ptr) - offsetof(type, member)))
