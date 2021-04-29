@@ -54,11 +54,12 @@ void                csmap_X_del(csmap_X* self);                                 
 bool                csmap_X_empty(csmap_X map);
 size_t              csmap_X_size(csmap_X map);
 
-csmap_X_iter_t      csmap_X_find(const csmap_X* self, RawKey rkey);
-csmap_X_iter_t      csmap_X_lower_bound(const csmap_X* self, RawKey rkey);                      // find closest entry >= rkey
 bool                csmap_X_contains(const csmap_X* self, RawKey rkey);
-csmap_X_value_t*    csmap_X_find_it(const csmap_X* self, RawKey rkey, csmap_X_iter_t* out);     // return NULL if not found
 csmap_X_mapped_t*   csmap_X_at(const csmap_X* self, RawKey rkey);                               // rkey must be in map.
+csmap_X_value_t*    csmap_X_get(const csmap_X* self, RawKey rkey);                              // return NULL if not found
+csmap_X_iter_t      csmap_X_lower_bound(const csmap_X* self, RawKey rkey);                      // find closest entry >= rkey
+csmap_X_iter_t      csmap_X_find(const csmap_X* self, RawKey rkey);
+csmap_X_value_t*    csmap_X_find_it(const csmap_X* self, RawKey rkey, csmap_X_iter_t* out);     // return NULL if not found
 
 csmap_X_result_t    csmap_X_insert(csmap_X* self, Key key, Mapped mapped);                      // no change if key in map
 csmap_X_result_t    csmap_X_insert_or_assign(csmap_X* self, Key key, Mapped mapped);            // always update mapped
@@ -85,10 +86,10 @@ csmap_X_value_t     csmap_X_value_clone(csmap_X_value_t val);
 | `csmap_X`             | `struct { ... }`                                  | The csmap type               |
 | `csmap_X_rawkey_t`    | `RawKey`                                          | The raw key type             |
 | `csmap_X_rawmapped_t` | `RawMapped`                                       | The raw mapped type          |
-| `csmap_X_rawvalue_t`  | `struct { RawKey first; RawMapped second; }`      | RawKey + RawVal type         |
+| `csmap_X_rawvalue_t`  | `struct { RawKey first; RawMapped second; }`      | RawKey+RawMapped type        |
 | `csmap_X_key_t`       | `Key`                                             | The key type                 |
 | `csmap_X_mapped_t`    | `Mapped`                                          | The mapped type              |
-| `csmap_X_value_t`     | `struct { Key first; Mapped second; }`            | The value type               |
+| `csmap_X_value_t`     | `struct { const Key first; Mapped second; }`      | The value: key is immutable  |
 | `csmap_X_result_t`    | `struct { csmap_X_value_t *ref; bool inserted; }` | Result of insert/put/emplace |
 | `csmap_X_iter_t`      | `struct { csmap_X_value_t *ref; ... }`            | Iterator type                |
 

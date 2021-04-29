@@ -30,7 +30,7 @@ static inline int vikingraw_equals(const VikingRaw* rx, const VikingRaw* ry) {
 static inline Viking viking_fromRaw(VikingRaw raw) { // note: parameter is by value
     Viking vk = {cstr_from(raw.name), cstr_from(raw.country)}; return vk;
 }
-static inline VikingRaw viking_toRaw(Viking* vk) {
+static inline VikingRaw viking_toRaw(const Viking* vk) {
     VikingRaw raw = {vk->name.str, vk->country.str}; return raw;
 }
 

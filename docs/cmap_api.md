@@ -62,9 +62,10 @@ size_t              cmap_X_size(cmap_X map);
 size_t              cmap_X_capacity(cmap_X map);                                             // buckets * max_load_factor
 size_t              cmap_X_bucket_count(cmap_X map);                                         // num. of allocated buckets
 
-cmap_X_iter_t       cmap_X_find(const cmap_X* self, RawKey rkey);
 bool                cmap_X_contains(const cmap_X* self, RawKey rkey);
 cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, RawKey rkey);                              // rkey must be in map.
+cmap_X_value_t*     cmap_X_get(const cmap_X* self, RawKey rkey);                             // return NULL if not found
+cmap_X_iter_t       cmap_X_find(const cmap_X* self, RawKey rkey);
 
 cmap_X_result_t     cmap_X_insert(cmap_X* self, Key key, Mapped mapped);                     // no change if key in map
 cmap_X_result_t     cmap_X_insert_or_assign(cmap_X* self, Key key, Mapped mapped);           // always update mapped
@@ -106,7 +107,7 @@ void                c_trivial_del(Type* val);                             // doe
 | `cmap_X_rawvalue_t`  | `struct { RawKey first; RawMapped second; }`    | RawKey + RawMapped type       |
 | `cmap_X_key_t`       | `Key`                                           | The key type                  |
 | `cmap_X_mapped_t`    | `Mapped`                                        | The mapped type               |
-| `cmap_X_value_t`     | `struct { Key first; Mapped second; }`          | The value type                |
+| `cmap_X_value_t`     | `struct { const Key first; Mapped second; }`    | The value: key is immutable   |
 | `cmap_X_result_t`    | `struct { cmap_X_value_t *ref; bool inserted; }`| Result of insert/put/emplace  |
 | `cmap_X_iter_t`      | `struct { cmap_X_value_t *ref; ... }`           | Iterator type                 |
 

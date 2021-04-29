@@ -184,23 +184,23 @@ using_carray3(f, float);
 void arraydemo1()
 {
     printf("\nARRAYDEMO1\n");
-    carray3f a3 = carray3f_init(30, 20, 10, 0.0f);
-    a3.data[5][4][3] = 10.2f;
-    float **a2 = a3.data[5];
-    float *a1 = a3.data[5][4];
+    carray3f arr3 = carray3f_with_value(30, 20, 10, 0.0f);
+    arr3.data[5][4][3] = 10.2f;
+    float **arr2 = arr3.data[5];
+    float *arr1 = arr3.data[5][4];
 
-    printf("a3: %zu: (%zu, %zu, %zu) = %zu\n", sizeof(a3), a3.xdim, a3.ydim, a3.zdim, carray3f_size(a3));
+    printf("arr3: %zu: (%zu, %zu, %zu) = %zu\n", sizeof(arr3), arr3.xdim, arr3.ydim, arr3.zdim, carray3f_size(arr3));
 
-    printf("%g\n", a1[3]); // = 10.2
-    printf("%g\n", a2[4][3]); // = 10.2
-    printf("%g\n", a3.data[5][4][3]); // = 10.2
+    printf("%g\n", arr1[3]); // = 10.2
+    printf("%g\n", arr2[4][3]); // = 10.2
+    printf("%g\n", arr3.data[5][4][3]); // = 10.2
 
     float x = 0.0;
-    c_foreach (i, carray3f, a3)
+    c_foreach (i, carray3f, arr3)
         *i.ref = ++x;
-    printf("%g\n", a3.data[29][19][9]); // = 6000
+    printf("%g\n", arr3.data[29][19][9]); // = 6000
 
-    carray3f_del(&a3);
+    carray3f_del(&arr3);
 }
 
 

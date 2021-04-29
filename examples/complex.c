@@ -22,7 +22,7 @@ int main() {
     cmap_map myMap = cmap_map_init();
     cmap_lst listMap = cmap_lst_init();
     clist_arr tableList = clist_arr_init();
-    carray2f arr2 = carray2f_init(xdim, ydim, 1.f);
+    carray2f arr2 = carray2f_with_value(xdim, ydim, 1.f);
 
     printf("arr2 size: %zu x %zu\n", arr2.xdim, arr2.ydim);
 

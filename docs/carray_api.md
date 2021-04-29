@@ -28,14 +28,15 @@ be replaced by `i` in all of the following documentation.
 ## Methods
 
 ```c
-carray2X            carray2X_init(size_t xdim, size_t ydim, Value val);
-carray2X            carray2X_from(Value* array, size_t xdim, size_t ydim);
+carray2X            carray2X_init(size_t xdim, size_t ydim);
+carray2X            carray2X_with_value(size_t xdim, size_t ydim, Value val);
+carray2X            carray2X_with_storage(size_t xdim, size_t ydim, Value* array);
 carray2X            carray2X_clone(carray2X arr);
-Value*              carray2X_release(carray2X* self);       // give away data
+Value*              carray2X_release(carray2X* self);       // release storage (not freed)
 void                carray2X_del(carray2X* self);
 
 size_t              carray2X_size(carray2X arr);
-Value*              carray2X_data(carray2X* self);          // contiguous memory
+Value*              carray2X_data(carray2X* self);          // access storage data
 Value*              carray2X_at(carray2X* self, size_t x, size_t y);
 
 carray2X_iter_t     carray2X_begin(const carray2X* self);
@@ -43,14 +44,15 @@ carray2X_iter_t     carray2X_end(const carray2X* self);
 void                carray2X_next(carray2X_iter_t* it);
 ```
 ```c
-carray3X            carray3X_init(size_t xdim, size_t ydim, size_t zdim, Value val);
-carray3X            carray3X_from(Value* array, size_t xdim, size_t ydim, size_t zdim);
+carray3X            carray3X_init(size_t xdim, size_t ydim, size_t zdim);
+carray3X            carray3X_with_value(size_t xdim, size_t ydim, size_t zdim, Value val);
+carray3X            carray3X_with_storage(size_t xdim, size_t ydim, size_t zdim, Value* array);
 carray3X            carray3X_clone(carray3X arr);
-Value*              carray3X_release(carray3X* self);       // give away data
+Value*              carray3X_release(carray3X* self);       // release storage (not freed)
 void                carray3X_del(carray3X* self);
 
 size_t              carray3X_size(carray3X arr);
-Value*              carray3X_data(carray3X* self);          // contiguous memory
+Value*              carray3X_data(carray3X* self);          // access storage data
 Value*              carray3X_at(carray3X* self, size_t x, size_t y, size_t z);
 
 carray3X_iter_t     carray3X_begin(const carray3X* self);
@@ -59,14 +61,14 @@ void                carray3X_next(carray3X_iter_t* it);
 ```
 ## Types
 
-| Type name            | Type definition                                    | Used to represent...      |
-|:---------------------|:---------------------------------------------------|:--------------------------|
-| `carray2X`           | `struct { Value **data; size_t xdim,ydim; }`       | The carray2 type          |
-| `carray2X_value_t`   | `Value`                                            | The value type            |
-| `carray2X_iter_t`    | `struct { Value *ref; }`                           | Iterator type             |
-| `carray3X`           | `struct { Value ***data; size_t xdim,ydim,zdim; }` | The carray3 type          |
-| `carray3X_value_t`   | `Value`                                            | The value type            |
-| `carray3X_iter_t`    | `struct { Value *ref; }`                           | Iterator type             |
+| Type name            | Type definition                                      | Used to represent...      |
+|:---------------------|:-----------------------------------------------------|:--------------------------|
+| `carray2X`           | `struct { Value **data; size_t xdim, ydim; }`        | The carray2 type          |
+| `carray2X_value_t`   | `Value`                                              | The value type            |
+| `carray2X_iter_t`    | `struct { Value *ref; }`                             | Iterator type             |
+| `carray3X`           | `struct { Value ***data; size_t xdim, ydim, zdim; }` | The carray3 type          |
+| `carray3X_value_t`   | `Value`                                              | The value type            |
+| `carray3X_iter_t`    | `struct { Value *ref; }`                             | Iterator type             |
 
 The **carray** elements can be accessed like `carray3i arr = ...; int val = arr.data[x][y][z];`, or with `carray3i_at(&arr, x, y, z)`.
 
@@ -82,20 +84,20 @@ int main()
 {
     // Ex1
     int xd = 30, yd = 20, zd = 10;
-    carray3f a3 = carray3f_init(xd, yd, zd, 0.0f);  // define a3[30][20][10], init with 0.0f.
-    a3.data[5][4][3] = 3.14f;
+    carray3f arr3 = carray3f_init(xd, yd, zd, 0.0f);  // define arr3[30][20][10], init with 0.0f.
+    arr3.data[5][4][3] = 3.14f;
 
-    float *a1 = a3.data[5][4];
-    float **a2 = a3.data[5];
+    float *arr1 = arr3.data[5][4];
+    float **arr2 = arr3.data[5];
 
-    printf("%f\n", a1[3]); // 3.14
-    printf("%f\n", a2[4][3]); // 3.14
-    printf("%f\n", a3.data[5][4][3]); // 3.14
-    carray3f_del(&a3); // free array
+    printf("%f\n", arr1[3]); // 3.14
+    printf("%f\n", arr2[4][3]); // 3.14
+    printf("%f\n", arr3.data[5][4][3]); // 3.14
+    carray3f_del(&arr3); // free array
 
     // Ex2
     int w = 256, h = 128;
-    carray2i image = carray2i_from(c_new_n(uint32_t, w*h), w, h); // no value init
+    carray2i image = carray2i_init(w, h);
     int n = 0;
     c_foreach (i, carray2i, image) {
         uint32_t t = n++ % 256;
