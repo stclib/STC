@@ -166,15 +166,17 @@ using_cmap_strval(id, int);
 int main()
 {
     uint32_t col = 0xcc7744ff;
-    c_init (cmap_id, idnames, {
-        {100, "Red"},
-        {110, "Blue"},
-    });
-    /* put replaces existing mapped value: */
+
+    cmap_id idnames = cmap_id_init();
+    c_emplace(cmap_id, idnames, { {100, "Red"}, {110, "Blue"} });
+    
+    /* replace existing mapped value: */
     cmap_id_emplace_or_assign(&idnames, 110, "White");
-    /* put a constructed mapped value into map: */
+    
+    /* insert a new constructed mapped string into map: */
     cmap_id_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
-    /* emplace inserts only when key does not exist: */
+    
+    /* emplace/insert does nothing if key already exist: */
     cmap_id_emplace(&idnames, 100, "Green");
 
     c_foreach (i, cmap_id, idnames)
@@ -198,22 +200,22 @@ Demonstrate cmap with plain-old-data key type Vec3i and int as mapped type: cmap
 
 typedef struct { int x, y, z; } Vec3i;
 
-using_cmap(v3, Vec3i, int, c_trivial_equals, // bitwise equals
+using_cmap(vi, Vec3i, int, c_trivial_equals, // bitwise equals
                            c_default_hash);  // bytewise hash
 
 int main()
 {
-    cmap_v3 vecs = cmap_v3_init();
+    cmap_vi vecs = cmap_vi_init();
 
-    cmap_v3_emplace(&vecs, (Vec3i){100,   0,   0}, 1);
-    cmap_v3_emplace(&vecs, (Vec3i){  0, 100,   0}, 2);
-    cmap_v3_emplace(&vecs, (Vec3i){  0,   0, 100}, 3);
-    cmap_v3_emplace(&vecs, (Vec3i){100, 100, 100}, 4);
+    cmap_vi_emplace(&vecs, (Vec3i){100,   0,   0}, 1);
+    cmap_vi_emplace(&vecs, (Vec3i){  0, 100,   0}, 2);
+    cmap_vi_emplace(&vecs, (Vec3i){  0,   0, 100}, 3);
+    cmap_vi_emplace(&vecs, (Vec3i){100, 100, 100}, 4);
 
-    c_foreach (i, cmap_v3, vecs)
+    c_foreach (i, cmap_vi, vecs)
         printf("{ %3d, %3d, %3d }: %d\n", i.ref->first.x,  i.ref->first.y,  i.ref->first.z,  i.ref->second);
 
-    cmap_v3_del(&vecs);
+    cmap_vi_del(&vecs);
 }
 ```
 Output:
@@ -256,72 +258,51 @@ Output:
 ```
 
 ### Example 5
-Advanced, rare usage: Complex key type.
+Advanced, complex key type: struct.
 ```c
 #include <stc/cmap.h>
 #include <stc/cstr.h>
 
-typedef struct Viking {
+typedef struct {
     cstr name;
     cstr country;
 } Viking;
 
-void viking_del(Viking* vk) {
-    cstr_del(&vk->name);
-    cstr_del(&vk->country);
+static int Viking_equals(const Viking* a, const Viking* b) {
+    return cstr_equals_s(a->name, b->name) && cstr_equals_s(a->country, b->country);
 }
 
-// Define Viking raw struct with hash, equals, and convertion functions between Viking and VikingRaw structs:
-
-typedef struct VikingRaw {
-    const char* name;
-    const char* country;
-} VikingRaw;
-
-uint32_t vikingraw_hash(const VikingRaw* raw, size_t ignore) {
-    uint32_t hash = c_strhash(raw->name) ^ (c_strhash(raw->country) << 3);
-    return hash;
-}
-static inline int vikingraw_equals(const VikingRaw* rx, const VikingRaw* ry) {
-    return strcmp(rx->name, ry->name) == 0 && strcmp(rx->country, ry->country) == 0;
+static uint32_t Viking_hash(const Viking* a, int ignored) {
+    return c_strhash(a->name.str) ^ (c_strhash(a->country.str) >> 15);
 }
 
-static inline Viking viking_fromRaw(VikingRaw raw) { // note: parameter is by value
-    Viking vk = {cstr_from(raw.name), cstr_from(raw.country)}; return vk;
-}
-static inline VikingRaw viking_toRaw(Viking* vk) {
-    VikingRaw raw = {vk->name.str, vk->country.str}; return raw;
+static void Viking_del(Viking* v) {
+    c_del(cstr, &v->name, &v->country);
 }
 
-// With this in place, we use the using_cmap_keydef() macro to define {Viking -> int} hash map type:
-using_cmap_keydef(vk, Viking, int, vikingraw_equals, vikingraw_hash,
-                      viking_del, viking_fromRaw, viking_toRaw, VikingRaw);
+using_cmap_keydef(v, Viking, int, Viking_equals, Viking_hash, Viking_del, c_no_clone);
 
 int main()
 {
-    c_init (cmap_vk, vikings, {
-        { {"Einar", "Norway"}, 20 },
-        { {"Olaf", "Denmark"}, 24 },
-        { {"Harald", "Iceland"}, 12 },
-    });
-    cmap_vk_emplace_or_assign(&vikings, (VikingRaw){"Bjorn", "Sweden"}, 10);
+    // Use a HashMap to store the vikings' health points.
+    cmap_v vikings = cmap_v_init();
 
-    VikingRaw lookup = {"Einar", "Norway"};
+    cmap_v_insert(&vikings, (Viking){cstr_from("Einar"), cstr_from("Norway")}, 25);
+    cmap_v_insert(&vikings, (Viking){cstr_from("Olaf"), cstr_from("Denmark")}, 24);
+    cmap_v_insert(&vikings, (Viking){cstr_from("Harald"), cstr_from("Iceland")}, 12);
+    cmap_v_insert(&vikings, (Viking){cstr_from("Einar"), cstr_from("Denmark")}, 21);
 
-    cmap_vk_value_t *e = cmap_vk_find(&vikings, lookup).ref;
-    e->second += 3; // add 3 hp points to Einar
-    cmap_vk_emplace(&vikings, lookup, 0).ref->second += 5; // add 5 more to Einar
-
-    c_foreach (k, cmap_vk, vikings) {
-        printf("%s of %s has %d hp\n", k.ref->first.name.str, k.ref->first.country.str, k.ref->second);
+    // Print the status of the vikings.
+    c_foreach (i, cmap_v, vikings) {
+        printf("%s from %s has %d hp\n", i.ref->first.name.str, i.ref->first.country.str, i.ref->second);
     }
-    cmap_vk_del(&vikings);
+    cmap_v_del(&vikings);
 }
 ```
 Output:
 ```
-Olaf of Denmark has 24 hp
-Bjorn of Sweden has 10 hp
-Einar of Norway has 28 hp
-Harald of Iceland has 12 hp
+Olaf from Denmark has 24 hp
+Einar from Denmark has 21 hp
+Einar from Norway has 25 hp
+Harald from Iceland has 12 hp
 ```
