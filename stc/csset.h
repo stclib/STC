@@ -62,7 +62,7 @@ int main(void) {
                             @@, @@, @@, void, keyDel, keyFromRaw, keyToRaw, RawKey)
 
 #define using_csset_str() \
-            _c_using_aatree_strkey(str, csset_, cstr_t, @@, @@, @@, void)
+            _c_using_aatree_strkey(str, csset_, cstr, @@, @@, @@, void)
 
 #define SET_ONLY_csset_(...) __VA_ARGS__
 #define MAP_ONLY_csset_(...)

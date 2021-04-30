@@ -90,7 +90,7 @@ int main(void) {
                            keyDel, keyFromRaw, keyToRaw, RawKey)
 
 #define using_cmap_str() \
-            _c_using_chash(cmap_str, cmap_, cstr_t, cstr_t, cstr_equals_raw, cstr_hash_raw, \
+            _c_using_chash(cmap_str, cmap_, cstr, cstr, cstr_equals_raw, cstr_hash_raw, \
                            cstr_del, cstr_from, cstr_c_str, const char*, \
                            cstr_del, cstr_from, cstr_c_str, const char*)
 
@@ -107,7 +107,7 @@ int main(void) {
             _c_using_chash_strkey(X, cmap_, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped)
 
 #define _c_using_chash_strkey(X, C, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
-            _c_using_chash(C##X, C, cstr_t, Mapped, cstr_equals_raw, cstr_hash_raw, \
+            _c_using_chash(C##X, C, cstr, Mapped, cstr_equals_raw, cstr_hash_raw, \
                            mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
                            cstr_del, cstr_from, cstr_c_str, const char*)
 
@@ -124,7 +124,7 @@ int main(void) {
             using_cmap_strval_8(X, Key, keyEquals, keyHash, keyDel, keyClone, c_trivial_toraw, Key)
 
 #define using_cmap_strval_8(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
-            _c_using_chash(cmap_##X, cmap_, Key, cstr_t, keyEqualsRaw, keyHashRaw, \
+            _c_using_chash(cmap_##X, cmap_, Key, cstr, keyEqualsRaw, keyHashRaw, \
                            cstr_del, cstr_from, cstr_c_str, const char*, \
                            keyDel, keyFromRaw, keyToRaw, RawKey)
 

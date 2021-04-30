@@ -62,7 +62,7 @@ int main(void) {
 
 /* cset_str: */
 #define using_cset_str() \
-            _c_using_chash_strkey(str, cset_, cstr_t, @@, @@, @@, void)
+            _c_using_chash_strkey(str, cset_, cstr, @@, @@, @@, void)
 
 #define SET_ONLY_cset_(...) __VA_ARGS__
 #define MAP_ONLY_cset_(...)

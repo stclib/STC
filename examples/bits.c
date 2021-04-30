@@ -34,7 +34,7 @@ int main() {
         printf("%d", cbits_test(set, i));
     puts("");
 
-    cbits_t s2 = cbits_clone(set);
+    cbits s2 = cbits_clone(set);
     cbits_flip_all(&s2);
     cbits_set(&s2, 16);
     cbits_set(&s2, 17);

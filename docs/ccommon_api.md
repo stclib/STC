@@ -71,7 +71,7 @@ cvec_str readFile(const char* name) {
 
     // Next line declares, opens, and closes the FILE*
     c_withfile (fp, fopen(name, "r")) {
-        cstr_t line = cstr_init();
+        cstr line = cstr_init();
         while (cstr_getline(&line, fp))
             cvec_str_emplace_back(&vec, line.str);
         cstr_del(&line);
