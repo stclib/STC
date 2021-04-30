@@ -47,13 +47,10 @@ int main(void) {
 
 #define using_csmap_3(X, Key, Mapped) \
             using_csmap_4(X, Key, Mapped, c_default_compare)
-
 #define using_csmap_4(X, Key, Mapped, keyCompare) \
             using_csmap_6(X, Key, Mapped, keyCompare, c_trivial_del, c_trivial_fromraw)
-
 #define using_csmap_6(X, Key, Mapped, keyCompare, mappedDel, mappedClone) \
             using_csmap_8(X, Key, Mapped, keyCompare, mappedDel, mappedClone, c_trivial_del, c_trivial_fromraw)
-
 #define using_csmap_8(X, Key, Mapped, keyCompare, mappedDel, mappedClone, keyDel, keyClone) \
             using_csmap_10(X, Key, Mapped, keyCompare, mappedDel, mappedClone, \
                            keyDel, keyClone, c_trivial_toraw, Key)
@@ -68,13 +65,10 @@ int main(void) {
 
 #define using_csset_2(X, Key) \
             using_csset_3(X, Key, c_default_compare)
-
 #define using_csset_3(X, Key, keyCompare) \
             using_csset_5(X, Key, keyCompare, c_trivial_del, c_trivial_fromraw)
-
 #define using_csset_5(X, Key, keyCompare, keyDel, keyClone) \
             using_csset_7(X, Key, keyCompare, keyDel, keyClone, c_trivial_toraw, Key)
-
 #define using_csset_7(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
             _c_using_aatree(csset_##X, csset_, Key, Key, keyCompareRaw, @@, keyDel, \
                             keyFromRaw, keyToRaw, RawKey, @@, @@, void)
@@ -91,10 +85,8 @@ int main(void) {
 
 #define using_csmap_strkey_2(X, Mapped) \
             _c_using_aatree_strkey(X, csmap_, Mapped, c_trivial_del, c_trivial_fromraw)
-
 #define using_csmap_strkey_4(X, Mapped, mappedDel, mappedClone) \
             _c_using_aatree_strkey(X, csmap_, Mapped, mappedDel, mappedClone)
-
 #define _c_using_aatree_strkey(X, C, Mapped, mappedDel, mappedClone) \
             _c_using_aatree(C##X, C, cstr_t, Mapped, cstr_compare_raw, mappedDel, cstr_del, \
                             cstr_from, cstr_c_str, const char*, mappedClone, c_trivial_toraw, Mapped)
@@ -104,13 +96,10 @@ int main(void) {
 
 #define using_csmap_strval_2(X, Key) \
             using_csmap_strval_3(X, Key, c_default_compare)
-
 #define using_csmap_strval_3(X, Key, keyCompare) \
             using_csmap_strval_5(X, Key, keyCompare, c_trivial_del, c_trivial_fromraw)
-
 #define using_csmap_strval_5(X, Key, keyCompare, keyDel, keyClone) \
             using_csmap_strval_7(X, Key, keyCompare, keyDel, keyClone, c_trivial_toraw, Key)
-
 #define using_csmap_strval_7(X, Key, keyCompare, keyDel, keyFromRaw, keyToRaw, RawKey) \
             _c_using_aatree(csmap_##X, csmap_, Key, cstr_t, keyCompare, cstr_del, keyDel, \
                             keyFromRaw, keyToRaw, RawKey, cstr_from, cstr_c_str, const char*)
@@ -140,7 +129,7 @@ int main(void) {
     typedef struct { \
         CX##_value_t *ref; \
         int _top; \
-        CX##_node_t *_tn, *_st[48]; \
+        CX##_node_t *_tn, *_st[36]; \
     } CX##_iter_t
 
 
@@ -165,59 +154,38 @@ int main(void) {
         bool inserted; \
     } CX##_result_t; \
 \
-    STC_API CX \
-    CX##_init(void); \
-    STC_INLINE bool \
-    CX##_empty(CX m) {return m.size == 0;} \
-    STC_INLINE size_t \
-    CX##_size(CX m) {return m.size;} \
+    STC_API CX               CX##_init(void); \
+    STC_API CX##_value_t*    CX##_find_it(const CX* self, RawKey rkey, CX##_iter_t* out); \
+    STC_API CX##_node_t*     CX##_erase_r_(CX##_node_t *tn, const CX##_rawkey_t* rkey, int *erased); \
+    STC_API void             CX##_del_r_(CX##_node_t* tn); \
+    STC_API CX##_node_t*     CX##_clone_r_(CX##_node_t *tn); \
+    STC_API CX##_result_t    CX##_insert_entry_(CX* self, RawKey rkey); \
+    STC_API void             CX##_next(CX##_iter_t* it); \
 \
-    STC_API void \
-    CX##_del_r_(CX##_node_t* tn); \
-\
-    STC_INLINE void \
-    CX##_del(CX* self) {CX##_del_r_(self->root);} \
-    STC_INLINE void \
-    CX##_clear(CX* self) {CX##_del(self); *self = CX##_init();} \
-    STC_INLINE void \
-    CX##_swap(CX* a, CX* b) {c_swap(CX, *a, *b);} \
+    STC_INLINE bool          CX##_empty(CX m) {return m.size == 0;} \
+    STC_INLINE size_t        CX##_size(CX m) {return m.size;} \
+    STC_INLINE void          CX##_del(CX* self) {CX##_del_r_(self->root);} \
+    STC_INLINE void          CX##_clear(CX* self) {CX##_del(self); *self = CX##_init();} \
+    STC_INLINE void          CX##_swap(CX* a, CX* b) {c_swap(CX, *a, *b);} \
+    STC_INLINE CX            CX##_clone(CX t) {CX c = {CX##_clone_r_(t.root), t.size}; return c;} \
+    STC_INLINE CX##_iter_t   CX##_find(const CX* self, RawKey rkey) \
+                                {CX##_iter_t it; CX##_find_it(self, rkey, &it); return it;} \
+    STC_INLINE bool          CX##_contains(const CX* self, RawKey rkey) \
+                                {CX##_iter_t it; return CX##_find_it(self, rkey, &it) != NULL;} \
+    STC_INLINE CX##_value_t* CX##_get(const CX* self, RawKey rkey) \
+                                {CX##_iter_t it; return CX##_find_it(self, rkey, &it);} \
 \
     STC_INLINE void \
     CX##_value_del(CX##_value_t* val) { \
         keyDel(KEY_REF_##C(val)); \
         MAP_ONLY_##C( mappedDel(&val->second); ) \
     } \
-    STC_INLINE CX##_value_t \
-    CX##_value_clone(CX##_value_t val) { \
-        *KEY_REF_##C(&val) = keyFromRaw(keyToRaw(KEY_REF_##C(&val))); \
-        MAP_ONLY_##C( val.second = mappedFromRaw(mappedToRaw(&val.second)); ) \
-        return val; \
-    } \
 \
-    STC_API CX##_node_t* CX##_clone_r_(CX##_node_t *tn); \
-    STC_INLINE CX \
-    CX##_clone(CX bst) { \
-        CX clone = {CX##_clone_r_(bst.root), bst.size}; \
-        return clone; \
+    STC_INLINE void \
+    CX##_value_clone(CX##_value_t* dst, CX##_value_t* val) { \
+        *KEY_REF_##C(dst) = keyFromRaw(keyToRaw(KEY_REF_##C(val))); \
+        MAP_ONLY_##C( dst->second = mappedFromRaw(mappedToRaw(&val->second)); ) \
     } \
-\
-    STC_API CX##_value_t* \
-    CX##_find_it(const CX* self, RawKey rkey, CX##_iter_t* out); \
-\
-    STC_INLINE CX##_iter_t \
-    CX##_find(const CX* self, RawKey rkey) { \
-        CX##_iter_t it; \
-        CX##_find_it(self, rkey, &it); \
-        return it; \
-    } \
-    STC_INLINE bool \
-    CX##_contains(const CX* self, RawKey rkey) { \
-        CX##_iter_t it; \
-        return CX##_find_it(self, rkey, &it) != NULL; \
-    } \
-\
-    STC_API CX##_result_t \
-    CX##_insert_entry_(CX* self, RawKey rkey); \
 \
     STC_INLINE CX##_result_t \
     CX##_emplace(CX* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
@@ -228,6 +196,7 @@ int main(void) {
         } \
         return res; \
     } \
+\
     STC_INLINE void \
     CX##_emplace_n(CX* self, const CX##_rawvalue_t arr[], size_t n) { \
         for (size_t i=0; i<n; ++i) SET_ONLY_##C( CX##_emplace(self, arr[i]); ) \
@@ -250,10 +219,12 @@ int main(void) {
             else {keyDel(&key); mappedDel(&res.ref->second);} \
             res.ref->second = mapped; return res; \
         } \
+    \
         STC_INLINE CX##_result_t \
         CX##_put(CX* self, Key k, Mapped m) { \
             return CX##_insert_or_assign(self, k, m); \
         } \
+    \
         STC_INLINE CX##_result_t \
         CX##_emplace_or_assign(CX* self, RawKey rkey, RawMapped rmapped) { \
             CX##_result_t res = CX##_insert_entry_(self, rkey); \
@@ -261,6 +232,7 @@ int main(void) {
             else mappedDel(&res.ref->second); \
             res.ref->second = mappedFromRaw(rmapped); return res; \
         } \
+    \
         STC_INLINE CX##_mapped_t* \
         CX##_at(const CX* self, RawKey rkey) { \
             CX##_iter_t it; \
@@ -273,6 +245,7 @@ int main(void) {
         while (tn->link[0]->level) tn = tn->link[0]; \
         return &tn->value; \
     } \
+\
     STC_INLINE CX##_value_t* \
     CX##_back(const CX* self) { \
         CX##_node_t *tn = self->root; \
@@ -280,24 +253,16 @@ int main(void) {
         return &tn->value; \
     } \
 \
-    STC_API void \
-    CX##_next(CX##_iter_t* it); \
-\
     STC_INLINE CX##_iter_t \
     CX##_begin(const CX* self) { \
         CX##_iter_t it = {NULL, 0, self->root}; \
         CX##_next(&it); return it; \
     } \
+\
     STC_INLINE CX##_iter_t \
     CX##_end(const CX* self) {\
         CX##_iter_t it = {NULL}; return it; \
     } \
-    STC_INLINE CX##_mapped_t* \
-    CX##_itval(CX##_iter_t it) {return SET_ONLY_##C( it.ref ) \
-                                           MAP_ONLY_##C( &it.ref->second );} \
-\
-    STC_API CX##_node_t* \
-    CX##_erase_r_(CX##_node_t *tn, const CX##_rawkey_t* rkey, int *erased); \
 \
     STC_INLINE size_t \
     CX##_erase(CX* self, RawKey rkey) { \
@@ -305,9 +270,10 @@ int main(void) {
         self->root = CX##_erase_r_(self->root, &rkey, &erased); \
         self->size -= erased; return erased; \
     } \
+\
     STC_INLINE size_t \
-    CX##_erase_at(CX* self, CX##_iter_t pos) { \
-        return CX##_erase(self, keyToRaw(KEY_REF_##C(pos.ref))); \
+    CX##_erase_at(CX* self, CX##_iter_t it) { \
+        return CX##_erase(self, keyToRaw(KEY_REF_##C(it.ref))); \
     } \
 \
     _c_implement_aatree(CX, C, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \
@@ -378,13 +344,13 @@ int main(void) {
 \
     static inline CX##_node_t* \
     CX##_insert_entry_i_(CX##_node_t* tn, const CX##_rawkey_t* rkey, CX##_result_t* res) { \
-        CX##_node_t *up[64], *it = tn; \
+        CX##_node_t *up[64], *tx = tn; \
         int c, top = 0, dir = 0; \
-        while (it->level) { \
-            up[top++] = it; \
-            CX##_rawkey_t r = keyToRaw(KEY_REF_##C(&it->value)); \
-            if ((c = keyCompareRaw(&r, rkey)) == 0) {res->ref = &it->value; return tn;} \
-            it = it->link[(dir = (c < 0))]; \
+        while (tx->level) { \
+            up[top++] = tx; \
+            CX##_rawkey_t r = keyToRaw(KEY_REF_##C(&tx->value)); \
+            if ((c = keyCompareRaw(&r, rkey)) == 0) {res->ref = &tx->value; return tn;} \
+            tx = tx->link[(dir = (c < 0))]; \
         } \
         tn = c_new(CX##_node_t); \
         res->ref = &tn->value, res->inserted = true; \
@@ -450,7 +416,7 @@ int main(void) {
         cn->link[0] = CX##_clone_r_(tn->link[0]); \
         cn->link[1] = CX##_clone_r_(tn->link[1]); \
         cn->level = tn->level; \
-        cn->value = CX##_value_clone(tn->value); \
+        CX##_value_clone(&cn->value, &tn->value); \
         return cn; \
     } \
 \
