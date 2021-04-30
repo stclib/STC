@@ -258,7 +258,7 @@ Output:
 ```
 
 ### Example 5
-Advanced, complex key type: struct.
+Advanced 1: Key type is struct.
 ```c
 #include <stc/cmap.h>
 #include <stc/cstr.h>
@@ -280,29 +280,94 @@ static void Viking_del(Viking* v) {
     c_del(cstr, &v->name, &v->country);
 }
 
-using_cmap_keydef(v, Viking, int, Viking_equals, Viking_hash, Viking_del, c_no_clone);
+using_cmap_keydef(vk, Viking, int, Viking_equals, Viking_hash, Viking_del, c_no_clone);
 
 int main()
 {
     // Use a HashMap to store the vikings' health points.
-    cmap_v vikings = cmap_v_init();
+    cmap_vk vikings = cmap_vk_init();
 
-    cmap_v_insert(&vikings, (Viking){cstr_from("Einar"), cstr_from("Norway")}, 25);
-    cmap_v_insert(&vikings, (Viking){cstr_from("Olaf"), cstr_from("Denmark")}, 24);
-    cmap_v_insert(&vikings, (Viking){cstr_from("Harald"), cstr_from("Iceland")}, 12);
-    cmap_v_insert(&vikings, (Viking){cstr_from("Einar"), cstr_from("Denmark")}, 21);
+    cmap_vk_insert(&vikings, (Viking){cstr_from("Einar"), cstr_from("Norway")}, 25);
+    cmap_vk_insert(&vikings, (Viking){cstr_from("Olaf"), cstr_from("Denmark")}, 24);
+    cmap_vk_insert(&vikings, (Viking){cstr_from("Harald"), cstr_from("Iceland")}, 12);
+    cmap_vk_insert(&vikings, (Viking){cstr_from("Einar"), cstr_from("Denmark")}, 21);
+    
+    Viking lookup = (Viking){cstr_from("Einar"), cstr_from("Norway")};
+    printf("Lookup: Einar of Norway has %d hp\n\n", *cmap_vk_at(&vikings, lookup));
+    Viking_del(&lookup);
 
     // Print the status of the vikings.
-    c_foreach (i, cmap_v, vikings) {
-        printf("%s from %s has %d hp\n", i.ref->first.name.str, i.ref->first.country.str, i.ref->second);
+    c_foreach (i, cmap_vk, vikings) {
+        printf("%s of %s has %d hp\n", i.ref->first.name.str, i.ref->first.country.str, i.ref->second);
     }
-    cmap_v_del(&vikings);
+    cmap_vk_del(&vikings);
 }
 ```
 Output:
 ```
-Olaf from Denmark has 24 hp
-Einar from Denmark has 21 hp
-Einar from Norway has 25 hp
-Harald from Iceland has 12 hp
+Olaf of Denmark has 24 hp
+Einar of Denmark has 21 hp
+Einar of Norway has 25 hp
+Harald of Iceland has 12 hp
+```
+
+### Example 6
+Advanced 2: In example 5 we needed to construct a lookup key which allocated strings, and then had to free it after. In this example we use
+rawtype feature to make it even simpler to use. Note that we must use the emplace() methods to add "raw" type entries (otherwise compile error):
+```c
+#include <stc/cmap.h>
+#include <stc/cstr.h>
+
+typedef struct {
+    cstr name;
+    cstr country;
+} Viking;
+
+static void Viking_del(Viking* v) {
+    c_del(cstr, &v->name, &v->country);
+}
+
+// Define a "raw" type with equals, hash, fromraw, toraw functions:
+
+typedef struct {
+    const char* name;
+    const char* country;
+} RViking;
+
+static int RViking_equals(const RViking* r1, const RViking* r2) {
+    return !strcmp(r1->name, r2->name) && !strcmp(r1->country, r2->country);
+}
+
+static uint32_t RViking_hash(const RViking* r, int ignored) {
+    return c_strhash(r->name) ^ (c_strhash(r->country) >> 15);
+}
+
+static Viking Viking_fromR(RViking r) {return (Viking){cstr_from(r.name), cstr_from(r.country)};}
+static RViking Viking_toR(const Viking* v) {return (RViking){v->name.str, v->country.str};}
+
+using_cmap_keydef(vk, Viking, int, RViking_equals, RViking_hash, Viking_del,
+                      Viking_fromR, Viking_toR, RViking);
+
+int main()
+{
+    // Use a HashMap to store the vikings' health points.
+    cmap_vk vikings = cmap_vk_init();
+  
+    // insert works as before, takes a constructed Viking object
+    cmap_vk_insert(&vikings, (Viking){cstr_from("Einar"), cstr_from("Norway")}, 25);
+    cmap_vk_insert(&vikings, (Viking){cstr_from("Olaf"), cstr_from("Denmark")}, 24);
+
+    // emplace is simple to use now.
+    cmap_vk_emplace(&vikings, (RViking){"Harald", "Iceland"}, 12);
+    cmap_vk_emplace(&vikings, (RViking){"Einar", "Denmark"}, 21);
+
+    // And lookup uses "raw" key type, so no need construct/destruct key:
+    printf("Lookup: Einar of Norway has %d hp\n\n", *cmap_vk_at(&vikings, (RViking){"Einar", "Norway"}));
+
+    // Print the status of the vikings.
+    c_foreach (i, cmap_vk, vikings) {
+        printf("%s of %s has %d hp\n", i.ref->first.name.str, i.ref->first.country.str, i.ref->second);
+    }
+    cmap_vk_del(&vikings);
+}
 ```
