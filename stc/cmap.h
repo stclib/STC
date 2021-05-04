@@ -205,25 +205,25 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
                                 {return CX##_find(self, rkey).ref;} \
 \
     STC_INLINE void \
-    CX##_value_clone(CX##_value_t* dst, CX##_value_t* val) { \
-        *(CX##_key_t*) KEY_REF_##C(dst) = keyFromRaw(keyToRaw(KEY_REF_##C(val))); \
-        MAP_ONLY_##C( dst->second = mappedFromRaw(mappedToRaw(&val->second)); ) \
+    CX##_value_clone(CX##_value_t* _dst, CX##_value_t* _val) { \
+        *(CX##_key_t*) KEY_REF_##C(_dst) = keyFromRaw(keyToRaw(KEY_REF_##C(_val))); \
+        MAP_ONLY_##C( _dst->second = mappedFromRaw(mappedToRaw(&_val->second)); ) \
     } \
 \
     STC_INLINE void \
-    CX##_value_del(CX##_value_t* val) { \
-        keyDel((CX##_key_t*) KEY_REF_##C(val)); \
-        MAP_ONLY_##C( mappedDel(&val->second); ) \
+    CX##_value_del(CX##_value_t* _val) { \
+        keyDel((CX##_key_t*) KEY_REF_##C(_val)); \
+        MAP_ONLY_##C( mappedDel(&_val->second); ) \
     } \
 \
     STC_INLINE CX##_result_t \
     CX##_emplace(CX* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
-        CX##_result_t res = CX##_insert_entry_(self, rkey); \
-        if (res.inserted) { \
-            *(CX##_key_t*) KEY_REF_##C(res.ref) = keyFromRaw(rkey); \
-            MAP_ONLY_##C(res.ref->second = mappedFromRaw(rmapped);) \
+        CX##_result_t _res = CX##_insert_entry_(self, rkey); \
+        if (_res.inserted) { \
+            *(CX##_key_t*) KEY_REF_##C(_res.ref) = keyFromRaw(rkey); \
+            MAP_ONLY_##C(_res.ref->second = mappedFromRaw(rmapped);) \
         } \
-        return res; \
+        return _res; \
     } \
 \
     STC_INLINE void \
@@ -233,20 +233,20 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
     } \
 \
     STC_INLINE CX##_result_t \
-    CX##_insert(CX* self, Key key MAP_ONLY_##C(, Mapped mapped)) { \
-        CX##_result_t res = CX##_insert_entry_(self, keyToRaw(&key)); \
-        if (res.inserted) {*(CX##_key_t*) KEY_REF_##C(res.ref) = key; MAP_ONLY_##C( res.ref->second = mapped; )} \
-        else              {keyDel(&key); MAP_ONLY_##C( mappedDel(&mapped); )} \
-        return res; \
+    CX##_insert(CX* self, Key _key MAP_ONLY_##C(, Mapped _mapped)) { \
+        CX##_result_t _res = CX##_insert_entry_(self, keyToRaw(&_key)); \
+        if (_res.inserted) {*(CX##_key_t*) KEY_REF_##C(_res.ref) = _key; MAP_ONLY_##C( _res.ref->second = _mapped; )} \
+        else              {keyDel(&_key); MAP_ONLY_##C( mappedDel(&_mapped); )} \
+        return _res; \
     } \
 \
     MAP_ONLY_##C( \
         STC_INLINE CX##_result_t \
-        CX##_insert_or_assign(CX* self, Key key, Mapped mapped) { \
-            CX##_result_t res = CX##_insert_entry_(self, keyToRaw(&key)); \
-            if (res.inserted) *(CX##_key_t*) &res.ref->first = key; \
-            else {keyDel(&key); mappedDel(&res.ref->second);} \
-            res.ref->second = mapped; return res; \
+        CX##_insert_or_assign(CX* self, Key _key, Mapped _mapped) { \
+            CX##_result_t _res = CX##_insert_entry_(self, keyToRaw(&_key)); \
+            if (_res.inserted) *(CX##_key_t*) &_res.ref->first = _key; \
+            else {keyDel(&_key); mappedDel(&_res.ref->second);} \
+            _res.ref->second = _mapped; return _res; \
         } \
     \
         STC_INLINE CX##_result_t \
@@ -256,10 +256,10 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
     \
         STC_INLINE CX##_result_t \
         CX##_emplace_or_assign(CX* self, RawKey rkey, RawMapped rmapped) { \
-            CX##_result_t res = CX##_insert_entry_(self, rkey); \
-            if (res.inserted) *(CX##_key_t*) &res.ref->first = keyFromRaw(rkey); \
-            else mappedDel(&res.ref->second); \
-            res.ref->second = mappedFromRaw(rmapped); return res; \
+            CX##_result_t _res = CX##_insert_entry_(self, rkey); \
+            if (_res.inserted) *(CX##_key_t*) &_res.ref->first = keyFromRaw(rkey); \
+            else mappedDel(&_res.ref->second); \
+            _res.ref->second = mappedFromRaw(rmapped); return _res; \
         } \
     \
         STC_INLINE CX##_mapped_t* \
@@ -347,16 +347,16 @@ STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) \
 \
     STC_DEF chash_bucket_t \
     CX##_bucket_(const CX* self, const CX##_rawkey_t* rkeyptr) { \
-        const uint64_t hash = keyHashRaw(rkeyptr, sizeof *rkeyptr); \
-        uint_fast8_t sx; size_t cap = self->bucket_count; \
-        chash_bucket_t b = {_c_SELECT(fastrange,CMAP_SIZE_T)(hash, cap), (uint_fast8_t)(hash | 0x80)}; \
-        const uint8_t* hashx = self->_hashx; \
-        while ((sx = hashx[b.idx])) { \
-            if (sx == b.hx) { \
-                CX##_rawkey_t raw = keyToRaw(KEY_REF_##C(self->table + b.idx)); \
-                if (keyEqualsRaw(&raw, rkeyptr)) break; \
+        const uint64_t _hash = keyHashRaw(rkeyptr, sizeof *rkeyptr); \
+        uint_fast8_t _hx; size_t _cap = self->bucket_count; \
+        chash_bucket_t b = {_c_SELECT(fastrange,CMAP_SIZE_T)(_hash, _cap), (uint_fast8_t)(_hash | 0x80)}; \
+        const uint8_t* _hashx = self->_hashx; \
+        while ((_hx = _hashx[b.idx])) { \
+            if (_hx == b.hx) { \
+                CX##_rawkey_t _raw = keyToRaw(KEY_REF_##C(self->table + b.idx)); \
+                if (keyEqualsRaw(&_raw, rkeyptr)) break; \
             } \
-            if (++b.idx == cap) b.idx = 0; \
+            if (++b.idx == _cap) b.idx = 0; \
         } \
         return b; \
     } \
@@ -398,47 +398,47 @@ STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) \
     } \
 \
     STC_DEF void \
-    CX##_reserve(CX* self, size_t newcap) { \
-        if (newcap < self->size) return; \
-        size_t oldcap = self->bucket_count; \
-        newcap = (size_t) (2 + newcap / self->max_load_factor) | 1; \
-        CX tmp = { \
-            c_new_n(CX##_value_t, newcap), \
-            (uint8_t *) c_calloc(newcap + 1, sizeof(uint8_t)), \
-            self->size, (CX##_size_t) newcap, \
+    CX##_reserve(CX* self, size_t _newcap) { \
+        if (_newcap < self->size) return; \
+        size_t _oldcap = self->bucket_count; \
+        _newcap = (size_t) (2 + _newcap / self->max_load_factor) | 1; \
+        CX _tmp = { \
+            c_new_n(CX##_value_t, _newcap), \
+            (uint8_t *) c_calloc(_newcap + 1, sizeof(uint8_t)), \
+            self->size, (CX##_size_t) _newcap, \
             self->max_load_factor \
         }; \
         /* Rehash: */ \
-        tmp._hashx[newcap] = 0xff; c_swap(CX, *self, tmp); \
-        CX##_value_t* e = tmp.table, *slot = self->table; \
-        uint8_t* hashx = self->_hashx; \
-        for (size_t i = 0; i < oldcap; ++i, ++e) \
-            if (tmp._hashx[i]) { \
-                CX##_rawkey_t raw = keyToRaw(KEY_REF_##C(e)); \
-                chash_bucket_t b = CX##_bucket_(self, &raw); \
-                memcpy((void *) &slot[b.idx], e, sizeof *e); \
-                hashx[b.idx] = (uint8_t) b.hx; \
+        _tmp._hashx[_newcap] = 0xff; c_swap(CX, *self, _tmp); \
+        CX##_value_t* e = _tmp.table, *_slot = self->table; \
+        uint8_t* _hashx = self->_hashx; \
+        for (size_t i = 0; i < _oldcap; ++i, ++e) \
+            if (_tmp._hashx[i]) { \
+                CX##_rawkey_t _raw = keyToRaw(KEY_REF_##C(e)); \
+                chash_bucket_t b = CX##_bucket_(self, &_raw); \
+                memcpy((void *) &_slot[b.idx], e, sizeof *e); \
+                _hashx[b.idx] = (uint8_t) b.hx; \
             } \
-        c_free(tmp._hashx); \
-        c_free((void *) tmp.table); \
+        c_free(_tmp._hashx); \
+        c_free((void *) _tmp.table); \
     } \
 \
     STC_DEF void \
-    CX##_erase_entry(CX* self, CX##_value_t* val) { \
-        size_t i = chash_index_(*self, val), j = i, k, cap = self->bucket_count; \
-        CX##_value_t* slot = self->table; \
-        uint8_t* hashx = self->_hashx; \
-        CX##_value_del(&slot[i]); \
+    CX##_erase_entry(CX* self, CX##_value_t* _val) { \
+        size_t i = chash_index_(*self, _val), j = i, k, _cap = self->bucket_count; \
+        CX##_value_t* _slot = self->table; \
+        uint8_t* _hashx = self->_hashx; \
+        CX##_value_del(&_slot[i]); \
         for (;;) { /* delete without leaving tombstone */ \
-            if (++j == cap) j = 0; \
-            if (! hashx[j]) \
+            if (++j == _cap) j = 0; \
+            if (! _hashx[j]) \
                 break; \
-            CX##_rawkey_t raw = keyToRaw(KEY_REF_##C(slot+j)); \
-            k = _c_SELECT(fastrange,CMAP_SIZE_T)(keyHashRaw(&raw, sizeof raw), cap); \
+            CX##_rawkey_t _raw = keyToRaw(KEY_REF_##C(_slot+j)); \
+            k = _c_SELECT(fastrange,CMAP_SIZE_T)(keyHashRaw(&_raw, sizeof _raw), _cap); \
             if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */ \
-                memcpy((void *) &slot[i], &slot[j], sizeof *slot), hashx[i] = hashx[j], i = j; \
+                memcpy((void *) &_slot[i], &_slot[j], sizeof *_slot), _hashx[i] = _hashx[j], i = j; \
         } \
-        hashx[i] = 0; \
+        _hashx[i] = 0; \
         --self->size; \
     }
 

@@ -164,10 +164,17 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
         return CX##_find_in(CX##_begin(self), CX##_end(self), raw); \
     } \
 \
+    STC_INLINE CX##_value_t* \
+    CX##_get(const CX* self, RawValue raw) { \
+        CX##_iter_t end = CX##_end(self); \
+        CX##_value_t* val = CX##_find_in(CX##_begin(self), end, raw).ref; \
+        return val == end.ref ? NULL : val; \
+    } \
+\
     STC_INLINE void \
     CX##_sort_range(CX##_iter_t i1, CX##_iter_t i2, \
-                    int(*cmp)(const CX##_value_t*, const CX##_value_t*)) { \
-        qsort(i1.ref, i2.ref - i1.ref, sizeof *i1.ref, (int(*)(const void*, const void*)) cmp); \
+                    int(*_cmp_)(const CX##_value_t*, const CX##_value_t*)) { \
+        qsort(i1.ref, i2.ref - i1.ref, sizeof *i1.ref, (int(*)(const void*, const void*)) _cmp_); \
     } \
 \
     STC_INLINE void \
@@ -287,6 +294,7 @@ static struct cdeq_rep _cdeq_inits = {0, 0};
         CX##_iter_t it = {pos}; \
         if (n) cdeq_rep_(self)->size += n; \
         if (clone) while (p1 != p2) *pos++ = valueFromRaw(valueToRaw(p1++)); \
+        else memcpy(pos, p1, n*sizeof *p1); \
         return it; \
     } \
 \

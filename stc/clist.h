@@ -175,6 +175,11 @@ STC_API size_t _clist_count(const clist_VOID* self);
         return CX##_find_in(CX##_begin(self), CX##_end(self), val); \
     } \
 \
+    STC_INLINE CX##_value_t* \
+    CX##_get(const CX* self, RawValue val) { \
+        return CX##_find_in(CX##_begin(self), CX##_end(self), val).ref; \
+    } \
+\
     _c_implement_clist(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
     struct stc_trailing_semicolon
 

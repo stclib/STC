@@ -66,8 +66,13 @@
         ((type *)((char *)(ptr) - offsetof(type, member)))
 
 #define c_struct(S)             typedef struct S S; struct S
-#define c_new(T)                ((T *) c_malloc(sizeof(T)))
-#define c_new_n(T, n)           ((T *) c_malloc(sizeof(T)*(n)))
+#if __cplusplus
+#define c_new(T)                static_cast<T*>(c_malloc(sizeof(T))
+#define c_new_n(T, n)           static_cast<T*>(c_malloc(sizeof(T[n]))
+#else
+#define c_new(T)                c_malloc(sizeof(T))
+#define c_new_n(T, n)           c_malloc(sizeof(T[n]))
+#endif
 #ifndef c_malloc
 #define c_malloc(sz)            malloc(sz)
 #define c_calloc(n, sz)         calloc(n, sz)

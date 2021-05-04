@@ -72,6 +72,8 @@ cdeq_X_iter_t       cdeq_X_erase_n(cdeq_X* self, size_t idx, size_t n);
 
 cdeq_X_iter_t       cdeq_X_find(const cdeq_X* self, RawValue raw);
 cdeq_X_iter_t       cdeq_X_find_in(cdeq_X_iter_t i1, cdeq_X_iter_t i2, RawValue raw);
+cdeq_X_value_t*     cdeq_X_get(const cdeq_X* self, RawValue raw);                            // returns NULL if not found
+
 void                cdeq_X_sort(cdeq_X* self);
 void                cdeq_X_sort_range(cdeq_X_iter_t i1, cdeq_X_iter_t i2,
                                       int(*cmp)(const cdeq_X_value_t*, const cdeq_X_value_t*));
