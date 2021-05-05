@@ -113,42 +113,50 @@ struct cvec_rep { size_t size, cap; void* data[]; };
     } \
 \
     STC_INLINE CX##_iter_t \
-    CX##_insert(CX* self, CX##_iter_t it, Value value) { \
-        return CX##_insert_range_p(self, it.ref, &value, &value + 1, false); \
+    CX##_insert(CX* self, size_t idx, Value value) { \
+        return CX##_insert_range_p(self, self->data + idx, &value, &value + 1, false); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_insert_at(CX* self, size_t idx, const CX##_value_t arr[], size_t n) { \
+    CX##_insert_n(CX* self, size_t idx, const CX##_value_t arr[], size_t n) { \
         return CX##_insert_range_p(self, self->data + idx, arr, arr + n, false); \
+    } \
+    STC_INLINE CX##_iter_t \
+    CX##_insert_at(CX* self, CX##_iter_t it, Value value) { \
+        return CX##_insert_range_p(self, it.ref, &value, &value + 1, false); \
     } \
 \
     STC_INLINE CX##_iter_t \
-    CX##_emplace(CX* self, CX##_iter_t it, RawValue raw) { \
+    CX##_emplace(CX* self, size_t idx, RawValue raw) { \
+        return CX##_emplace_range_p(self, self->data + idx, &raw, &raw + 1); \
+    } \
+    STC_INLINE CX##_iter_t \
+    CX##_emplace_n(CX* self, size_t idx, const CX##_rawvalue_t arr[], size_t n) { \
+        return CX##_emplace_range_p(self, self->data + idx, arr, arr + n); \
+    } \
+    STC_INLINE CX##_iter_t \
+    CX##_emplace_at(CX* self, CX##_iter_t it, RawValue raw) { \
         return CX##_emplace_range_p(self, it.ref, &raw, &raw + 1); \
     } \
     STC_INLINE CX##_iter_t \
     CX##_emplace_range(CX* self, CX##_iter_t it, CX##_iter_t it1, CX##_iter_t it2) { \
         return CX##_insert_range_p(self, it.ref, it1.ref, it2.ref, true); \
     } \
-    STC_INLINE CX##_iter_t \
-    CX##_emplace_at(CX* self, size_t idx, const CX##_rawvalue_t arr[], size_t n) { \
-        return CX##_emplace_range_p(self, self->data + idx, arr, arr + n); \
-    } \
     STC_INLINE void \
-    CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t n) { \
+    CX##_emplace_items(CX *self, const CX##_rawvalue_t arr[], size_t n) { \
         CX##_emplace_range_p(self, self->data + _cvec_rep(self)->size, arr, arr + n); \
     } \
 \
     STC_INLINE CX##_iter_t \
-    CX##_erase_range(CX* self, CX##_iter_t it1, CX##_iter_t it2) { \
-        return CX##_erase_range_p(self, it1.ref, it2.ref); \
+    CX##_erase_n(CX* self, size_t idx, size_t n) { \
+        return CX##_erase_range_p(self, self->data + idx, self->data + idx + n); \
     } \
     STC_INLINE CX##_iter_t \
     CX##_erase_at(CX* self, CX##_iter_t it) { \
         return CX##_erase_range_p(self, it.ref, it.ref + 1); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_erase_n(CX* self, size_t idx, size_t n) { \
-        return CX##_erase_range_p(self, self->data + idx, self->data + idx + n); \
+    CX##_erase_range(CX* self, CX##_iter_t it1, CX##_iter_t it2) { \
+        return CX##_erase_range_p(self, it1.ref, it2.ref); \
     } \
 \
     STC_INLINE CX##_value_t* \

@@ -56,18 +56,18 @@ void                cdeq_X_push_back(cdeq_X* self, Value value);
 void                cdeq_X_emplace_back(cdeq_X* self, RawValue raw);
 void                cdeq_X_pop_back(cdeq_X* self); 
 
-cdeq_X_iter_t       cdeq_X_insert(cdeq_X* self, cdeq_X_iter_t it, Value value);               // move value 
-cdeq_X_iter_t       cdeq_X_insert_at(cdeq_X* self, size_t idx, const Value[] arr, size_t n);  // move arr values
+cdeq_X_iter_t       cdeq_X_insert(cdeq_X* self, size_t idx, Value value);                        // move value 
+cdeq_X_iter_t       cdeq_X_insert_at(cdeq_X* self, cdeq_X_iter_t it, Value value);               // move value 
+cdeq_X_iter_t       cdeq_X_insert_n(cdeq_X* self, size_t idx, const Value[] arr, size_t n);      // move arr values
 
-cdeq_X_iter_t       cdeq_X_emplace(cdeq_X* self, cdeq_X_iter_t it, RawValue raw);
-cdeq_X_iter_t       cdeq_X_emplace_range(cdeq_X* self, cdeq_X_iter_t it,
-                                         cdeq_X_iter_t i1, cdeq_X_iter_t i2);                 // note: does clone
-cdeq_X_iter_t       cdeq_X_emplace_at(cdeq_X* self, size_t idx, const RawValue[] arr, size_t n);
-void                cdeq_X_emplace_n(cdeq_X *self, const RawValue arr[], size_t n);           // emplace_at back
+cdeq_X_iter_t       cdeq_X_emplace(cdeq_X* self, size_t idx, RawValue raw);
+cdeq_X_iter_t       cdeq_X_emplace_n(cdeq_X* self, size_t idx, const RawValue[] arr, size_t n);
+cdeq_X_iter_t       cdeq_X_emplace_at(cdeq_X* self, cdeq_X_iter_t it, RawValue raw);
+cdeq_X_iter_t       cdeq_X_emplace_range(cdeq_X* self, cdeq_X_iter_t it1, cdeq_X_iter_t it2);    // will clone
 
+cdeq_X_iter_t       cdeq_X_erase_n(cdeq_X* self, size_t idx, size_t n);
 cdeq_X_iter_t       cdeq_X_erase_at(cdeq_X* self, cdeq_X_iter_t it);
 cdeq_X_iter_t       cdeq_X_erase_range(cdeq_X* self, cdeq_X_iter_t it1, cdeq_X_iter_t it2);
-cdeq_X_iter_t       cdeq_X_erase_n(cdeq_X* self, size_t idx, size_t n);
 
 cdeq_X_iter_t       cdeq_X_find(const cdeq_X* self, RawValue raw);
 cdeq_X_iter_t       cdeq_X_find_in(cdeq_X_iter_t i1, cdeq_X_iter_t i2, RawValue raw);
@@ -80,7 +80,6 @@ void                cdeq_X_sort_range(cdeq_X_iter_t i1, cdeq_X_iter_t i2,
 cdeq_X_iter_t       cdeq_X_begin(const cdeq_X* self);
 cdeq_X_iter_t       cdeq_X_end(const cdeq_X* self);
 void                cdeq_X_next(cdeq_X_iter_t* it);
-size_t              cdeq_X_index(const cdeq_X deq, cdeq_X_iter_t it);
 
 cdeq_X_value_t      cdeq_X_value_clone(cdeq_X_value_t val);
 ```

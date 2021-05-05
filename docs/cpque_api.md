@@ -37,7 +37,7 @@ const cpque_X_value_t*  cpque_X_top(const cpque_X* self);
 
 void                    cpque_X_push(cpque_X* self, cpque_X_value_t value);
 void                    cpque_X_emplace(cpque_X* self, cpque_X_rawvalue_t raw);
-void                    cpque_X_emplace_n(cpque_X *self, const cpque_X_rawvalue_t arr[], size_t n);
+void                    cpque_X_emplace_items(cpque_X *self, const cpque_X_rawvalue_t arr[], size_t n);
 
 void                    cpque_X_pop(cpque_X* self);
 void                    cpque_X_erase_at(cpque_X* self, size_t idx);

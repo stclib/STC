@@ -38,7 +38,7 @@ int main() {
     print_cpque_imax(q);
 
     cpque_imin q2 = cpque_imin_init();
-    cpque_imin_emplace_n(&q2, data, c_arraylen(data));
+    cpque_imin_emplace_items(&q2, data, c_arraylen(data));
 
     print_cpque_imin(q2);
 

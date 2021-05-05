@@ -32,7 +32,7 @@ cstack_X_value_t*       cstack_X_top(const cstack_X* self);
 
 void                    cstack_X_push(cstack_X* self, cstack_X_value_t value);
 void                    cstack_X_emplace(cstack_X* self, cstack_X_rawvalue_t raw);
-void                    cstack_X_emplace_n(cstack_X *self, const cstack_X_rawvalue_t arr[], size_t n);
+void                    cstack_X_emplace_items(cstack_X *self, const cstack_X_rawvalue_t arr[], size_t n);
 
 void                    cstack_X_pop(cstack_X* self);
 

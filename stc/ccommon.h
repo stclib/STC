@@ -67,8 +67,8 @@
 
 #define c_struct(S)             typedef struct S S; struct S
 #if __cplusplus
-#define c_new(T)                static_cast<T*>(c_malloc(sizeof(T))
-#define c_new_n(T, n)           static_cast<T*>(c_malloc(sizeof(T[n]))
+#define c_new(T)                static_cast<T*>(c_malloc(sizeof(T)))
+#define c_new_n(T, n)           static_cast<T*>(c_malloc(sizeof(T)*(n)))
 #else
 #define c_new(T)                c_malloc(sizeof(T))
 #define c_new_n(T, n)           c_malloc(sizeof(T[n]))
@@ -129,7 +129,7 @@
 
 #define c_emplace(CX, c, ...) do { \
     const CX##_rawvalue_t _c_arr[] = __VA_ARGS__; \
-    CX##_emplace_n(&(c), _c_arr, c_arraylen(_c_arr)); \
+    CX##_emplace_items(&(c), _c_arr, c_arraylen(_c_arr)); \
 } while (0)
 
 #define c_del(CX, ...) do { \

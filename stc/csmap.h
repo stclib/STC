@@ -234,7 +234,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
     } \
 \
     STC_INLINE void \
-    CX##_emplace_n(CX* self, const CX##_rawvalue_t arr[], size_t n) { \
+    CX##_emplace_items(CX* self, const CX##_rawvalue_t arr[], size_t n) { \
         for (size_t i=0; i<n; ++i) SET_ONLY_##C( CX##_emplace(self, arr[i]); ) \
                                    MAP_ONLY_##C( CX##_emplace(self, arr[i].first, arr[i].second); ) \
     } \

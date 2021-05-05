@@ -104,7 +104,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
     STC_API void        CX##_push_back(CX* self, Value value); \
     STC_API void        CX##_push_front(CX* self, Value value); \
     STC_API CX##_iter_t CX##_insert(CX* self, CX##_iter_t it, Value value); \
-    STC_API void        CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t n); \
+    STC_API void        CX##_emplace_items(CX *self, const CX##_rawvalue_t arr[], size_t n); \
     STC_API CX##_iter_t CX##_erase_at(CX* self, CX##_iter_t it); \
     STC_API CX##_iter_t CX##_erase_range(CX* self, CX##_iter_t it1, CX##_iter_t it2); \
     STC_API size_t      CX##_remove(CX* self, RawValue val); \
@@ -213,7 +213,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
     } \
 \
     STC_DEF void \
-    CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t n) { \
+    CX##_emplace_items(CX *self, const CX##_rawvalue_t arr[], size_t n) { \
         for (size_t i=0; i<n; ++i) CX##_push_back(self, valueFromRaw(arr[i])); \
     } \
 \

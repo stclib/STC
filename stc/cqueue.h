@@ -82,8 +82,8 @@
                                     {ctype##_push_back(self, value);} \
     STC_INLINE void             CX##_emplace(CX* self, CX##_rawvalue_t raw) \
                                     {ctype##_emplace_back(self, raw);} \
-    STC_INLINE void             CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t n) \
-                                    {ctype##_emplace_n(self, arr, n);} \
+    STC_INLINE void             CX##_emplace_items(CX *self, const CX##_rawvalue_t arr[], size_t n) \
+                                    {ctype##_emplace_items(self, arr, n);} \
 \
     STC_INLINE CX##_iter_t      CX##_begin(const CX* self) {return ctype##_begin(self);} \
     STC_INLINE CX##_iter_t      CX##_end(const CX* self) {return ctype##_end(self);} \

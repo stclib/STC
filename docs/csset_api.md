@@ -42,7 +42,7 @@ csset_X_value_t*    csset_X_find_it(const csset_X* self, RawKey rkey, csset_X_it
 
 csset_X_result_t    csset_X_insert(csset_X* self, Key key);
 csset_X_result_t    csset_X_emplace(csset_X* self, RawKey rkey);
-void                csset_X_emplace_n(csset_X* self, const RawKey arr[], size_t n);
+void                csset_X_emplace_items(csset_X* self, const RawKey arr[], size_t n);
 
 size_t              csset_X_erase(csset_X* self, RawKey rkey);
 csset_X_iter_t      csset_X_erase_at(csset_X* self, csset_X_iter_t it);                         // return iter after it

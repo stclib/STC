@@ -67,7 +67,7 @@ csmap_X_result_t    csmap_X_put(csmap_X* self, Key key, Mapped mapped);         
 
 csmap_X_result_t    csmap_X_emplace(csmap_X* self, RawKey rkey, RawMapped rmapped);             // no change if rkey in map
 csmap_X_result_t    csmap_X_emplace_or_assign(csmap_X* self, RawKey rkey, RawMapped rmapped);   // always update rmapped
-void                csmap_X_emplace_n(csmap_X* self, const csmap_X_rawvalue_t arr[], size_t n);
+void                csmap_X_emplace_items(csmap_X* self, const csmap_X_rawvalue_t arr[], size_t n);
 
 size_t              csmap_X_erase(csmap_X* self, RawKey rkey);
 csmap_X_iter_t      csmap_X_erase_at(csmap_X* self, csmap_X_iter_t it);                         // returns iter after it
