@@ -59,16 +59,18 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
     STC_API CX          CX##_clone(CX deq); \
     STC_API void        CX##_clear(CX* self); \
     STC_API void        CX##_del(CX* self); \
-    STC_API void        CX##_expand_(CX* self, size_t n, bool at_front); \
-    STC_API void        CX##_resize(CX* self, size_t size, Value fill_val); \
+    STC_API void        CX##_expand_left_(CX* self, size_t idx, size_t n); \
+    STC_API void        CX##_expand_right_(CX* self, size_t idx, size_t n); \
     STC_API CX##_iter_t CX##_find_in(CX##_iter_t p1, CX##_iter_t p2, RawValue raw); \
     STC_API int         CX##_value_compare(const CX##_value_t* x, const CX##_value_t* y); \
     STC_API void        CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t n); \
     STC_API void        CX##_push_back(CX* self, Value value); \
     STC_API void        CX##_push_front(CX* self, Value value); \
     STC_API CX##_iter_t CX##_erase_range_p(CX* self, CX##_value_t* p1, CX##_value_t* p2); \
-    STC_API CX##_iter_t CX##_insert_range_p(CX* self, CX##_value_t* pos, const CX##_value_t* p1, \
-                                                                         const CX##_value_t* p2, bool clone); \
+    STC_API CX##_iter_t CX##_insert_range_p(CX* self, CX##_value_t* pos, \
+                                            const CX##_value_t* p1, const CX##_value_t* p2, bool clone); \
+    STC_API CX##_iter_t CX##_emplace_range_p(CX* self, CX##_value_t* pos, \
+                                             const CX##_rawvalue_t* p1, const CX##_rawvalue_t* p2); \
     STC_INLINE bool     CX##_empty(CX deq) {return !cdeq_rep_(&deq)->size;} \
     STC_INLINE size_t   CX##_size(CX deq) {return cdeq_rep_(&deq)->size;} \
     STC_INLINE size_t   CX##_capacity(CX deq) {return cdeq_rep_(&deq)->cap;} \
@@ -76,8 +78,6 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
     STC_INLINE Value    CX##_value_fromraw(RawValue raw) {return valueFromRaw(raw);} \
     STC_INLINE Value    CX##_value_clone(Value val) \
                             {return valueFromRaw(valueToRaw(&val));} \
-    STC_INLINE void     CX##_reserve(CX* self, size_t n) \
-                            {CX##_expand_(self, (n - cdeq_rep_(self)->size)*0.65, false);} \
     STC_INLINE void     CX##_emplace_back(CX* self, RawValue raw) \
                             {CX##_push_back(self, valueFromRaw(raw));} \
     STC_INLINE void     CX##_emplace_front(CX* self, RawValue raw) \
@@ -96,22 +96,22 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
                             {assert(idx < cdeq_rep_(self)->size); return self->data + idx;} \
 \
     STC_INLINE CX \
-    CX##_with_size(size_t size, Value null_val) { \
-        CX x = CX##_init(); \
-        CX##_resize(&x, size, null_val); \
-        return x; \
+    CX##_with_capacity(size_t n) { \
+        CX cx = CX##_init(); \
+        CX##_expand_right_(&cx, 0, n); \
+        return cx; \
     } \
-    STC_INLINE CX \
-    CX##_with_capacity(size_t size) { \
-        CX x = CX##_init(); \
-        CX##_expand_(&x, size, false); \
-        return x; \
+\
+    STC_INLINE void \
+    CX##_reserve(CX* self, size_t n) { \
+        size_t sz = cdeq_rep_(self)->size; \
+        if (n > sz) CX##_expand_right_(self, sz, n - sz); \
     } \
 \
     STC_INLINE void \
     CX##_shrink_to_fit(CX *self) { \
-        CX x = CX##_clone(*self); \
-        CX##_del(self); *self = x; \
+        CX cx = CX##_clone(*self); \
+        CX##_del(self); *self = cx; \
     } \
 \
     STC_INLINE CX##_iter_t \
@@ -120,16 +120,21 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
         *it.ref = value; return it; \
     } \
     STC_INLINE CX##_iter_t \
+    CX##_insert_at(CX* self, size_t idx, const CX##_value_t arr[], size_t n) { \
+        return CX##_insert_range_p(self, self->data + idx, arr, arr + n, true); \
+    } \
+\
+    STC_INLINE CX##_iter_t \
     CX##_emplace(CX* self, CX##_iter_t it, RawValue raw) { \
-        return CX##_insert(self, it, valueFromRaw(raw)); \
+        return CX##_emplace_range_p(self, it.ref, &raw, &raw + 1); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_insert_range(CX* self, CX##_iter_t it, CX##_iter_t it1, CX##_iter_t it2) { \
+    CX##_emplace_range(CX* self, CX##_iter_t it, CX##_iter_t it1, CX##_iter_t it2) { \
         return CX##_insert_range_p(self, it.ref, it1.ref, it2.ref, true); \
     } \
     STC_INLINE CX##_iter_t \
-    CX##_insert_at(CX* self, size_t idx, const CX##_value_t arr[], size_t n) { \
-        return CX##_insert_range_p(self, self->data + idx, arr, arr + n, true); \
+    CX##_emplace_at(CX* self, size_t idx, const CX##_rawvalue_t arr[], size_t n) { \
+        return CX##_emplace_range_p(self, self->data + idx, arr, arr + n); \
     } \
 \
     STC_INLINE CX##_iter_t \
@@ -203,8 +208,9 @@ static struct cdeq_rep _cdeq_inits = {0, 0};
     STC_DEF void \
     CX##_emplace_n(CX *self, const CX##_rawvalue_t arr[], size_t n) { \
         if (!n) return; \
-        CX##_expand_(self, n, false); \
-        CX##_value_t* p = self->data + cdeq_rep_(self)->size; \
+        size_t sz = cdeq_rep_(self)->size; \
+        CX##_expand_right_(self, sz, n); \
+        CX##_value_t* p = self->data + sz; \
         for (size_t i=0; i < n; ++i) *p++ = valueFromRaw(arr[i]); \
         cdeq_rep_(self)->size += n; \
     } \
@@ -217,6 +223,7 @@ static struct cdeq_rep _cdeq_inits = {0, 0};
             rep->size = 0; \
         } \
     } \
+\
     STC_DEF void \
     CX##_del(CX* self) { \
         CX##_clear(self); \
@@ -224,89 +231,113 @@ static struct cdeq_rep _cdeq_inits = {0, 0};
             c_free(cdeq_rep_(self)); \
     } \
 \
-    STC_DEF void \
-    CX##_expand_(CX* self, size_t n, bool at_front) { \
+    STC_DEF size_t \
+    CX##_realloc_(CX* self, size_t n) { \
         struct cdeq_rep* rep = cdeq_rep_(self); \
-        size_t len = rep->size, cap = rep->cap; \
-        size_t nfront = _cdeq_nfront(self), nback = cap - len - nfront; \
-        if (at_front && nfront >= n || !at_front && nback >= n) \
-            return; \
-        if (len*1.2 + n > cap) { \
-            cap = (size_t) (len*1.8) + n + 7; \
-            rep = (struct cdeq_rep*) c_realloc(rep->cap ? rep : NULL, \
-                                               offsetof(struct cdeq_rep, base) + cap*sizeof(Value)); \
-            rep->size = len, rep->cap = cap; \
-            self->_base = (CX##_value_t *) rep->base; \
-            self->data = self->_base + nfront; \
-        } \
-        size_t unused = cap - len, pos = unused/2; \
-        if (at_front) { if (len == 0) pos = unused; \
-                        else if (nback < pos) pos = unused - nback; } \
-        else if (nfront < pos) return; \
-        self->data = (CX##_value_t *) memmove(self->_base + pos, self->data, len*sizeof(Value)); \
+        size_t sz = rep->size, cap = (size_t) (sz*1.7) + n + 7; \
+        size_t nfront = _cdeq_nfront(self); \
+        rep = (struct cdeq_rep*) c_realloc(rep->cap ? rep : NULL, \
+                                           offsetof(struct cdeq_rep, base) + cap*sizeof(Value)); \
+        rep->size = sz, rep->cap = cap; \
+        self->_base = (CX##_value_t *) rep->base; \
+        self->data = self->_base + nfront; \
+        return cap; \
     } \
 \
     STC_DEF void \
-    CX##_resize(CX* self, size_t size, Value null_val) { \
-        CX##_expand_(self, size, false); \
-        size_t i, n = cdeq_rep_(self)->size; \
-        for (i=size; i<n; ++i) valueDel(self->data + i); \
-        for (i=n; i<size; ++i) self->data[i] = null_val; \
-        if (self->data) cdeq_rep_(self)->size = size; \
+    CX##_expand_left_(CX* self, size_t idx, size_t n) { \
+        struct cdeq_rep* rep = cdeq_rep_(self); \
+        size_t sz = rep->size, cap = rep->cap; \
+        size_t nfront = _cdeq_nfront(self), nback = cap - sz - nfront; \
+        if (nfront >= n) { \
+            self->data = (CX##_value_t *) memmove(self->data - n, self->data, idx*sizeof(Value)); \
+        } else { \
+            if (sz*1.3 + n > cap) cap = CX##_realloc_(self, n); \
+            size_t unused = cap - (sz + n); \
+            size_t pos = (nback*2 < unused) ? unused - nback : unused/2; \
+            memmove(self->_base + pos + idx + n, self->data + idx, (sz - idx)*sizeof(Value)); \
+            self->data = (CX##_value_t *) memmove(self->_base + pos, self->data, idx*sizeof(Value)); \
+        } \
+    } \
+\
+    STC_DEF void \
+    CX##_expand_right_(CX* self, size_t idx, size_t n) { \
+        struct cdeq_rep* rep = cdeq_rep_(self); \
+        size_t sz = rep->size, cap = rep->cap, nfront = _cdeq_nfront(self); \
+        size_t nback = cap - sz - nfront; \
+        if (nback >= n || sz*1.3 + n > cap && CX##_realloc_(self, n)) { \
+            memmove(self->data + idx + n, self->data + idx, (sz - idx)*sizeof(Value)); \
+        } else { \
+            size_t unused = cap - (sz + n); \
+            size_t pos = (nfront*2 < unused) ? nfront : unused/2; \
+            memmove(self->_base + pos, self->data, idx*sizeof(Value)); \
+            memmove(self->data + pos + idx + n, self->data + idx, (sz - idx)*sizeof(Value)); \
+            self->data = ((CX##_value_t *) self->_base) + pos; \
+        } \
+    } \
+\
+    STC_DEF CX##_value_t* \
+    CX##_insert_space_(CX* self, CX##_value_t* pos, size_t n) { \
+        size_t idx = pos - self->data; \
+        if (idx*2 < cdeq_rep_(self)->size) CX##_expand_left_(self, idx, n); \
+        else                               CX##_expand_right_(self, idx, n); \
+        if (n) cdeq_rep_(self)->size += n; \
+        return self->data + idx; \
     } \
 \
     STC_DEF void \
     CX##_push_front(CX* self, Value value) { \
         if (self->data == self->_base) \
-            CX##_expand_(self, 1, true); \
-        *--self->data = value; \
+            CX##_expand_left_(self, 0, 1); \
+        else \
+            --self->data; \
+        *self->data = value; \
         ++cdeq_rep_(self)->size; \
     } \
 \
     STC_DEF void \
     CX##_push_back(CX* self, Value value) { \
-        if (_cdeq_nfront(self) + cdeq_rep_(self)->size == cdeq_rep_(self)->cap) \
-            CX##_expand_(self, 1, false); \
+        struct cdeq_rep* rep = cdeq_rep_(self); \
+        if (_cdeq_nfront(self) + rep->size == rep->cap) \
+            CX##_expand_right_(self, rep->size, 1); \
         self->data[cdeq_rep_(self)->size++] = value; \
     } \
 \
     STC_DEF CX \
     CX##_clone(CX deq) { \
-        size_t len = cdeq_rep_(&deq)->size; \
-        CX out = CX##_with_capacity(len); \
-        CX##_insert_range_p(&out, out.data, deq.data, deq.data + len, true); \
+        size_t sz = cdeq_rep_(&deq)->size; \
+        CX out = CX##_with_capacity(sz); \
+        CX##_insert_range_p(&out, out.data, deq.data, deq.data + sz, true); \
         return out; \
     } \
 \
     STC_DEF CX##_iter_t \
-    CX##_insert_range_p(CX* self, CX##_value_t* pos, \
-                        const CX##_value_t* p1, const CX##_value_t* p2, bool clone) { \
-        size_t n = p2 - p1, idx = pos - self->data, size = cdeq_rep_(self)->size; \
-        bool at_front = (idx*2 < size); \
-        CX##_expand_(self, n, at_front); \
-        if (at_front) { \
-            memmove(self->data - n, self->data, idx*sizeof(Value)); \
-            pos = (self->data -= n) + idx; \
-        } else { \
-            pos = self->data + idx; \
-            memmove(pos + n, pos, (size - idx)*sizeof(Value)); \
-        } \
+    CX##_insert_range_p(CX* self, CX##_value_t* pos, const CX##_value_t* p1, \
+                                                     const CX##_value_t* p2, bool clone) { \
+        pos = CX##_insert_space_(self, pos, p2 - p1); \
         CX##_iter_t it = {pos}; \
-        if (n) cdeq_rep_(self)->size += n; \
         if (clone) while (p1 != p2) *pos++ = valueFromRaw(valueToRaw(p1++)); \
-        else memcpy(pos, p1, n*sizeof *p1); \
+        else memcpy(pos, p1, (p2 - p1)*sizeof *p1); \
+        return it; \
+    } \
+\
+    STC_DEF CX##_iter_t \
+    CX##_emplace_range_p(CX* self, CX##_value_t* pos, const CX##_rawvalue_t* p1, const CX##_rawvalue_t* p2) { \
+        pos = CX##_insert_space_(self, pos, p2 - p1); \
+        CX##_iter_t it = {pos}; \
+        while (p1 != p2) *pos++ = valueFromRaw(*p1++); \
         return it; \
     } \
 \
     STC_DEF CX##_iter_t \
     CX##_erase_range_p(CX* self, CX##_value_t* p1, CX##_value_t* p2) { \
-        intptr_t len = p2 - p1; \
-        if (len > 0) { \
+        size_t n = p2 - p1; \
+        if (n > 0) { \
             CX##_value_t* p = p1, *end = self->data + cdeq_rep_(self)->size; \
             while (p != p2) valueDel(p++); \
-            if (p1 == self->data) self->data += len; \
+            if (p1 == self->data) self->data += n; \
             else memmove(p1, p2, (end - p2) * sizeof(Value)); \
-            cdeq_rep_(self)->size -= len; \
+            cdeq_rep_(self)->size -= n; \
         } \
         CX##_iter_t it = {p1}; return it; \
     } \

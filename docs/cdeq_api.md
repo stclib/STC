@@ -30,14 +30,12 @@ using_cdeq(str, cstr, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const c
 
 ```c
 cdeq_X              cdeq_X_init(void);
-cdeq_X              cdeq_X_with_size(size_t size, Value fill);
 cdeq_X              cdeq_X_with_capacity(size_t size);
 cdeq_X              cdeq_X_clone(cdeq_X deq);
 
 void                cdeq_X_clear(cdeq_X* self);
 void                cdeq_X_shrink_to_fit(cdeq_X* self);
 void                cdeq_X_reserve(cdeq_X* self, size_t cap);
-void                cdeq_X_resize(cdeq_X* self, size_t size, Value fill);
 void                cdeq_X_swap(cdeq_X* a, cdeq_X* b);
 
 void                cdeq_X_del(cdeq_X* self);      // destructor
@@ -58,13 +56,14 @@ void                cdeq_X_push_back(cdeq_X* self, Value value);
 void                cdeq_X_emplace_back(cdeq_X* self, RawValue raw);
 void                cdeq_X_pop_back(cdeq_X* self); 
 
-cdeq_X_iter_t       cdeq_X_insert(cdeq_X* self, cdeq_X_iter_t it, Value value);              // expects new/cloned value
-cdeq_X_iter_t       cdeq_X_insert_range(cdeq_X* self, cdeq_X_iter_t it,
-                                        cdeq_X_iter_t it1, cdeq_X_iter_t it2);               // clones input values
-cdeq_X_iter_t       cdeq_X_insert_at(cdeq_X* self, size_t idx, const Value arr[], size_t n); // clones input values
+cdeq_X_iter_t       cdeq_X_insert(cdeq_X* self, cdeq_X_iter_t it, Value value);               // move value 
+cdeq_X_iter_t       cdeq_X_insert_at(cdeq_X* self, size_t idx, const Value[] arr, size_t n);  // move arr values
 
 cdeq_X_iter_t       cdeq_X_emplace(cdeq_X* self, cdeq_X_iter_t it, RawValue raw);
-void                cdeq_X_emplace_n(cdeq_X *self, const RawValue arr[], size_t n);          // emplace_back only
+cdeq_X_iter_t       cdeq_X_emplace_range(cdeq_X* self, cdeq_X_iter_t it,
+                                         cdeq_X_iter_t i1, cdeq_X_iter_t i2);                 // note: does clone
+cdeq_X_iter_t       cdeq_X_emplace_at(cdeq_X* self, size_t idx, const RawValue[] arr, size_t n);
+void                cdeq_X_emplace_n(cdeq_X *self, const RawValue arr[], size_t n);           // emplace_at back
 
 cdeq_X_iter_t       cdeq_X_erase_at(cdeq_X* self, cdeq_X_iter_t it);
 cdeq_X_iter_t       cdeq_X_erase_range(cdeq_X* self, cdeq_X_iter_t it1, cdeq_X_iter_t it2);

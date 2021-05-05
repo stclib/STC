@@ -94,22 +94,22 @@ struct cvec_rep { size_t size, cap; void* data[]; };
 \
     STC_INLINE CX \
     CX##_with_size(size_t size, Value null_val) { \
-        CX x = CX##_init(); \
-        CX##_resize(&x, size, null_val); \
-        return x; \
+        CX cx = CX##_init(); \
+        CX##_resize(&cx, size, null_val); \
+        return cx; \
     } \
 \
     STC_INLINE CX \
     CX##_with_capacity(size_t size) { \
-        CX x = CX##_init(); \
-        CX##_reserve(&x, size); \
-        return x; \
+        CX cx = CX##_init(); \
+        CX##_reserve(&cx, size); \
+        return cx; \
     } \
 \
     STC_INLINE void \
     CX##_shrink_to_fit(CX *self) { \
-        CX x = CX##_clone(*self); \
-        CX##_del(self); *self = x; \
+        CX cx = CX##_clone(*self); \
+        CX##_del(self); *self = cx; \
     } \
 \
     STC_INLINE CX##_iter_t \
