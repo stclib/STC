@@ -147,6 +147,10 @@ struct cvec_rep { size_t size, cap; void* data[]; };
     } \
 \
     STC_INLINE CX##_iter_t \
+    CX##_erase(CX* self, size_t idx) { \
+        return CX##_erase_range_p(self, self->data + idx, self->data + idx + 1); \
+    } \
+    STC_INLINE CX##_iter_t \
     CX##_erase_n(CX* self, size_t idx, size_t n) { \
         return CX##_erase_range_p(self, self->data + idx, self->data + idx + n); \
     } \

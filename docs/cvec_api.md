@@ -58,14 +58,15 @@ void                cvec_X_emplace_back(cvec_X* self, RawValue raw);
 void                cvec_X_pop_back(cvec_X* self);
 
 cvec_X_iter_t       cvec_X_insert(cvec_X* self, size_t idx, Value value);                        // move value 
-cvec_X_iter_t       cvec_X_insert_at(cvec_X* self, cvec_X_iter_t it, Value value);               // move value 
 cvec_X_iter_t       cvec_X_insert_n(cvec_X* self, size_t idx, const Value[] arr, size_t n);      // move arr values
+cvec_X_iter_t       cvec_X_insert_at(cvec_X* self, cvec_X_iter_t it, Value value);               // move value 
 
 cvec_X_iter_t       cvec_X_emplace(cvec_X* self, size_t idx, RawValue raw);
 cvec_X_iter_t       cvec_X_emplace_n(cvec_X* self, size_t idx, const RawValue[] arr, size_t n);
 cvec_X_iter_t       cvec_X_emplace_at(cvec_X* self, cvec_X_iter_t it, RawValue raw);
 cvec_X_iter_t       cvec_X_emplace_range(cvec_X* self, cvec_X_iter_t it1, cvec_X_iter_t it2);    // will clone
 
+cvec_X_iter_t       cvec_X_erase(cvec_X* self, size_t idx);
 cvec_X_iter_t       cvec_X_erase_n(cvec_X* self, size_t idx, size_t n);
 cvec_X_iter_t       cvec_X_erase_at(cvec_X* self, cvec_X_iter_t it);
 cvec_X_iter_t       cvec_X_erase_range(cvec_X* self, cvec_X_iter_t it1, cvec_X_iter_t it2);
@@ -107,23 +108,25 @@ int main()
 {
     // Create a vector containing integers
     cvec_i vec = cvec_i_init();
-    c_emplace(cvec_i, vec, {7, 5, 16, 8});
 
-    // Add two more integers to vector
+    // Add two integers to vector
     cvec_i_push_back(&vec, 25);
     cvec_i_push_back(&vec, 13);
 
+    // Append a set of numbers
+    c_emplace(cvec_i, vec, {7, 5, 16, 8});
+
     printf("initial: ");
-    c_foreach (n, cvec_i, vec) {
-        printf(" %d", *n.ref);
+    c_foreach (k, cvec_i, vec) {
+        printf(" %d", *k.ref);
     }
 
     // Sort the vector
     cvec_i_sort(&vec);
 
     printf("\nsorted: ");
-    c_foreach (n, cvec_i, vec) {
-        printf(" %d", *n.ref);
+    c_foreach (k, cvec_i, vec) {
+        printf(" %d", *k.ref);
     }
 
     cvec_i_del(&vec);

@@ -67,7 +67,8 @@ void                clist_X_emplace_items(clist_X *self, const clist_X_rawvalue_
 clist_X_iter_t      clist_X_insert(clist_X* self, clist_X_iter_t it, Value value);        // return iter to new elem
 clist_X_iter_t      clist_X_emplace(clist_X* self, clist_X_iter_t it, RawValue raw);
 
-clist_X_iter_t      clist_X_erase_at(clist_X* self, clist_X_iter_t it);                   // return iter after it
+clist_X_iter_t      clist_X_erase(clist_X* self, clist_X_iter_t it);                      // return iter after it
+clist_X_iter_t      clist_X_erase_at(clist_X* self, clist_X_iter_t it);                   // alias for erase()
 clist_X_iter_t      clist_X_erase_range(clist_X* self, clist_X_iter_t it1, clist_X_iter_t it2);
 size_t              clist_X_remove(clist_X* self, RawValue raw);                          // removes all elements equal to raw
 

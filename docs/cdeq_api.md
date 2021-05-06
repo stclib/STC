@@ -57,14 +57,15 @@ void                cdeq_X_emplace_back(cdeq_X* self, RawValue raw);
 void                cdeq_X_pop_back(cdeq_X* self); 
 
 cdeq_X_iter_t       cdeq_X_insert(cdeq_X* self, size_t idx, Value value);                        // move value 
-cdeq_X_iter_t       cdeq_X_insert_at(cdeq_X* self, cdeq_X_iter_t it, Value value);               // move value 
 cdeq_X_iter_t       cdeq_X_insert_n(cdeq_X* self, size_t idx, const Value[] arr, size_t n);      // move arr values
+cdeq_X_iter_t       cdeq_X_insert_at(cdeq_X* self, cdeq_X_iter_t it, Value value);               // move value 
 
 cdeq_X_iter_t       cdeq_X_emplace(cdeq_X* self, size_t idx, RawValue raw);
 cdeq_X_iter_t       cdeq_X_emplace_n(cdeq_X* self, size_t idx, const RawValue[] arr, size_t n);
 cdeq_X_iter_t       cdeq_X_emplace_at(cdeq_X* self, cdeq_X_iter_t it, RawValue raw);
 cdeq_X_iter_t       cdeq_X_emplace_range(cdeq_X* self, cdeq_X_iter_t it1, cdeq_X_iter_t it2);    // will clone
 
+cdeq_X_iter_t       cdeq_X_erase(cdeq_X* self, size_t idx);
 cdeq_X_iter_t       cdeq_X_erase_n(cdeq_X* self, size_t idx, size_t n);
 cdeq_X_iter_t       cdeq_X_erase_at(cdeq_X* self, cdeq_X_iter_t it);
 cdeq_X_iter_t       cdeq_X_erase_range(cdeq_X* self, cdeq_X_iter_t it1, cdeq_X_iter_t it2);

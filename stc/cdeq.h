@@ -148,6 +148,10 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
     } \
 \
     STC_INLINE CX##_iter_t \
+    CX##_erase(CX* self, size_t idx) { \
+        return CX##_erase_range_p(self, self->data + idx, self->data + idx + 1); \
+    } \
+    STC_INLINE CX##_iter_t \
     CX##_erase_n(CX* self, size_t idx, size_t n) { \
         return CX##_erase_range_p(self, self->data + idx, self->data + idx + n); \
     } \
@@ -260,8 +264,8 @@ static struct cdeq_rep _cdeq_inits = {0, 0};
     STC_DEF void \
     CX##_expand_right_(CX* self, size_t idx, size_t n) { \
         struct cdeq_rep* rep = _cdeq_rep(self); \
-        size_t sz = rep->size, cap = rep->cap, nfront = _cdeq_nfront(self); \
-        size_t nback = cap - sz - nfront; \
+        size_t sz = rep->size, cap = rep->cap; \
+        size_t nfront = _cdeq_nfront(self), nback = cap - sz - nfront; \
         if (nback >= n || sz*1.3 + n > cap && CX##_realloc_(self, n)) { \
             memmove(self->data + idx + n, self->data + idx, (sz - idx)*sizeof(Value)); \
         } else { \
@@ -278,7 +282,7 @@ static struct cdeq_rep _cdeq_inits = {0, 0};
         size_t idx = pos - self->data; \
         if (idx*2 < _cdeq_rep(self)->size) CX##_expand_left_(self, idx, n); \
         else                               CX##_expand_right_(self, idx, n); \
-        if (n) _cdeq_rep(self)->size += n; \
+        if (n) _cdeq_rep(self)->size += n; /* do only if size > 0 */ \
         return self->data + idx; \
     } \
 \

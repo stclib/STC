@@ -187,7 +187,6 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
     STC_API void             CX##_reserve(CX* self, size_t capacity); \
     STC_API chash_bucket_t   CX##_bucket_(const CX* self, const CX##_rawkey_t* rkeyptr); \
     STC_API CX##_result_t    CX##_insert_entry_(CX* self, RawKey rkey); \
-    STC_API CX##_iter_t      CX##_find(const CX* self, RawKey rkey); \
     STC_API void             CX##_erase_entry(CX* self, CX##_value_t* val); \
 \
     STC_INLINE CX            CX##_init(void) {CX m = _cmap_inits; return m;} \
@@ -201,8 +200,6 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
     STC_INLINE void          CX##_swap(CX *map1, CX *map2) {c_swap(CX, *map1, *map2);} \
     STC_INLINE bool          CX##_contains(const CX* self, RawKey rkey) \
                                 {return self->size && self->_hashx[CX##_bucket_(self, &rkey).idx];} \
-    STC_INLINE CX##_value_t* CX##_get(const CX* self, RawKey rkey) \
-                                {return CX##_find(self, rkey).ref;} \
 \
     STC_INLINE void \
     CX##_value_clone(CX##_value_t* _dst, CX##_value_t* _val) { \
@@ -269,6 +266,19 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
         }) \
 \
     STC_INLINE CX##_iter_t \
+    CX##_find(const CX* self, RawKey rkey) { \
+        CX##_iter_t it = {NULL}; \
+        if (self->size == 0) return it; \
+        chash_bucket_t b = CX##_bucket_(self, &rkey); \
+        if (*(it._hx = self->_hashx+b.idx)) it.ref = self->table+b.idx; \
+        return it; \
+    } \
+\
+    STC_INLINE CX##_value_t* \
+    CX##_get(const CX* self, RawKey rkey) \
+        {return CX##_find(self, rkey).ref;} \
+\
+    STC_INLINE CX##_iter_t \
     CX##_begin(const CX* self) { \
         CX##_iter_t it = {self->table, self->_hashx}; \
         if (it._hx) while (*it._hx == 0) ++it.ref, ++it._hx; \
@@ -276,14 +286,12 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
     } \
 \
     STC_INLINE CX##_iter_t \
-    CX##_end(const CX* self) {\
-        CX##_iter_t it = {self->table + self->bucket_count}; return it; \
-    } \
+    CX##_end(const CX* self) \
+        {CX##_iter_t it = {self->table + self->bucket_count}; return it;} \
 \
     STC_INLINE void \
-    CX##_next(CX##_iter_t* it) { \
-        while ((++it->ref, *++it->_hx == 0)) ; \
-    } \
+    CX##_next(CX##_iter_t* it) \
+        {while ((++it->ref, *++it->_hx == 0)) ;} \
 \
     STC_INLINE size_t \
     CX##_erase(CX* self, RawKey rkey) { \
@@ -359,15 +367,6 @@ STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) \
             if (++b.idx == _cap) b.idx = 0; \
         } \
         return b; \
-    } \
-\
-    STC_DEF CX##_iter_t \
-    CX##_find(const CX* self, RawKey rkey) { \
-        CX##_iter_t it = {NULL}; \
-        if (self->size == 0) return it; \
-        chash_bucket_t b = CX##_bucket_(self, &rkey); \
-        if (*(it._hx = self->_hashx+b.idx)) it.ref = self->table+b.idx; \
-        return it; \
     } \
 \
     STC_DEF CX##_result_t \
