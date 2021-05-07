@@ -55,7 +55,7 @@ int main() {
 #define using_carray2(...) c_MACRO_OVERLOAD(using_carray2, __VA_ARGS__)
 
 #define using_carray2_2(X, Value) \
-            _c_using_carray2(carray2##X, Value, c_trivial_del, c_trivial_fromraw)
+            _c_using_carray2(carray2##X, Value, c_default_del, c_default_fromraw)
 #define using_carray2_3(X, Value, valueDel) \
             _c_using_carray2(carray2##X, Value, valueDel, c_no_clone)
 #define using_carray2_4(X, Value, valueDel, valueClone) \
@@ -99,7 +99,7 @@ int main() {
 #define using_carray3(...) c_MACRO_OVERLOAD(using_carray3, __VA_ARGS__)
 
 #define using_carray3_2(X, Value) \
-    _c_using_carray3(carray3##X, Value, c_trivial_del, c_trivial_fromraw)
+    _c_using_carray3(carray3##X, Value, c_default_del, c_default_fromraw)
 #define using_carray3_3(X, Value, valueDel) \
     _c_using_carray3(carray3##X, Value, valueDel, c_no_clone)
 #define using_carray3_4(X, Value, valueDel, valueClone) \

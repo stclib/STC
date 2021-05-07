@@ -5,7 +5,7 @@
 
 void check_del(float* v) {printf("destroy %g\n", *v);}
 
-using_carray2(f, float, check_del, c_trivial_fromraw);
+using_carray2(f, float, check_del, c_default_fromraw);
 using_clist(arr, carray2f, c_no_compare, carray2f_del, c_no_clone);
 using_cmap(lst, int, clist_arr, c_default_equals, c_default_hash, clist_arr_del, c_no_clone);
 using_cmap_strkey(map, cmap_lst, cmap_lst_del, c_no_clone);

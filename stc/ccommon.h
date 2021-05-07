@@ -89,13 +89,17 @@
 #define c_less_compare(less, x, y) (less(y, x) - less(x, y))
 
 #define c_default_equals(x, y)  (*(x) == *(y))
-#define c_trivial_equals(x, y)  (memcmp(x, y, sizeof *(x)) == 0)
+#define c_memcmp_equals(x, y)   (memcmp(x, y, sizeof *(x)) == 0)
+
+#define c_rawstr_compare(x, y)  strcmp(*(x), *(y))
+#define c_rawstr_equals(x, y)   (strcmp(*(x), *(y)) == 0)
+#define c_rawstr_hash(p, none)  c_default_hash(*(p), strlen(*(p)))
 
 #define c_no_clone(x)           (assert(!"c_no_clone() called"), x)
-#define c_trivial_fromraw(x)    (x)
-#define c_trivial_toraw(ptr)    (*(ptr))
+#define c_default_fromraw(x)    (x)
+#define c_default_toraw(ptr)    (*(ptr))
 
-#define c_trivial_del(ptr)      ((void) (ptr))
+#define c_default_del(ptr)      ((void) (ptr))
 
 /* Generic algorithms */
 

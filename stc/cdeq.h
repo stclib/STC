@@ -32,11 +32,11 @@
 #define using_cdeq_2(X, Value) \
             using_cdeq_3(X, Value, c_default_compare)
 #define using_cdeq_3(X, Value, valueCompare) \
-            using_cdeq_5(X, Value, valueCompare, c_trivial_del, c_trivial_fromraw)
+            using_cdeq_5(X, Value, valueCompare, c_default_del, c_default_fromraw)
 #define using_cdeq_4(X, Value, valueCompare, valueDel) \
             using_cdeq_5(X, Value, valueCompare, valueDel, c_no_clone)
 #define using_cdeq_5(X, Value, valueCompare, valueDel, valueClone) \
-            using_cdeq_7(X, Value, valueCompare, valueDel, valueClone, c_trivial_toraw, Value)
+            using_cdeq_7(X, Value, valueCompare, valueDel, valueClone, c_default_toraw, Value)
 #define using_cdeq_7(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
             _c_using_cdeq(cdeq_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue)
 

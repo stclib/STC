@@ -50,11 +50,11 @@ int main(void) {
 #define using_cset_2(X, Key) \
             using_cset_4(X, Key, c_default_equals, c_default_hash)
 #define using_cset_4(X, Key, keyEquals, keyHash) \
-            using_cset_6(X, Key, keyEquals, keyHash, c_trivial_del, c_trivial_fromraw)
+            using_cset_6(X, Key, keyEquals, keyHash, c_default_del, c_default_fromraw)
 #define using_cset_5(X, Key, keyEquals, keyHash, keyDel) \
             using_cset_6(X, Key, keyEquals, keyHash, keyDel, c_no_clone)
 #define using_cset_6(X, Key, keyEquals, keyHash, keyDel, keyClone) \
-            using_cset_8(X, Key, keyEquals, keyHash, keyDel, keyClone, c_trivial_toraw, Key)
+            using_cset_8(X, Key, keyEquals, keyHash, keyDel, keyClone, c_default_toraw, Key)
 
 #define using_cset_8(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
             _c_using_chash(cset_##X, cset_, Key, Key, keyEqualsRaw, keyHashRaw, \

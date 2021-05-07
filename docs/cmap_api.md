@@ -91,11 +91,11 @@ uint64_t            c_string_hash(const char* str);                       // use
 uint64_t            c_default_hash32(const void* data, size_t);           // key one 32bit int
 uint64_t            c_default_hash64(const void* data, size_t);           // key one 64bit int
 int                 c_default_equals(const RawKey* a, const RawKey* b);   // the == operator
-int                 c_trivial_equals(const RawKey* a, const RawKey* b);   // memcmp
+int                 c_memcmp_equals(const RawKey* a, const RawKey* b);    // uses memcmp
 Type                c_no_clone(Type val);
-Type                c_trivial_fromraw(Type val);                          // plain copy
-Type                c_trivial_toraw(Type* val);
-void                c_trivial_del(Type* val);                             // does nothing
+Type                c_default_fromraw(Type val);                          // plain copy
+Type                c_default_toraw(Type* val);
+void                c_default_del(Type* val);                             // does nothing
 ```
 
 ## Types
@@ -201,7 +201,7 @@ Demonstrate cmap with plain-old-data key type Vec3i and int as mapped type: cmap
 
 typedef struct { int x, y, z; } Vec3i;
 
-using_cmap(vi, Vec3i, int, c_trivial_equals, // bitwise equals
+using_cmap(vi, Vec3i, int, c_memcmp_equals, // bitwise equals
                            c_default_hash);  // bytewise hash
 
 int main()

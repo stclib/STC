@@ -48,17 +48,17 @@ int main(void) {
 #define using_csmap_3(X, Key, Mapped) \
             using_csmap_4(X, Key, Mapped, c_default_compare)
 #define using_csmap_4(X, Key, Mapped, keyCompare) \
-            using_csmap_6(X, Key, Mapped, keyCompare, c_trivial_del, c_trivial_fromraw)
+            using_csmap_6(X, Key, Mapped, keyCompare, c_default_del, c_default_fromraw)
 #define using_csmap_6(X, Key, Mapped, keyCompare, mappedDel, mappedClone) \
-            using_csmap_8(X, Key, Mapped, keyCompare, mappedDel, mappedClone, c_trivial_del, c_trivial_fromraw)
+            using_csmap_8(X, Key, Mapped, keyCompare, mappedDel, mappedClone, c_default_del, c_default_fromraw)
 #define using_csmap_8(X, Key, Mapped, keyCompare, mappedDel, mappedClone, keyDel, keyClone) \
             using_csmap_10(X, Key, Mapped, keyCompare, mappedDel, mappedClone, \
-                           keyDel, keyClone, c_trivial_toraw, Key)
+                           keyDel, keyClone, c_default_toraw, Key)
 
 #define using_csmap_10(X, Key, Mapped, keyCompareRaw, mappedDel, mappedClone, \
                        keyDel, keyFromRaw, keyToRaw, RawKey) \
             _c_using_aatree(csmap_##X, csmap_, Key, Mapped, keyCompareRaw, mappedDel, keyDel, \
-                            keyFromRaw, keyToRaw, RawKey, mappedClone, c_trivial_toraw, Mapped)
+                            keyFromRaw, keyToRaw, RawKey, mappedClone, c_default_toraw, Mapped)
 
 /* csset: */
 #define using_csset(...) c_MACRO_OVERLOAD(using_csset, __VA_ARGS__)
@@ -66,9 +66,9 @@ int main(void) {
 #define using_csset_2(X, Key) \
             using_csset_3(X, Key, c_default_compare)
 #define using_csset_3(X, Key, keyCompare) \
-            using_csset_5(X, Key, keyCompare, c_trivial_del, c_trivial_fromraw)
+            using_csset_5(X, Key, keyCompare, c_default_del, c_default_fromraw)
 #define using_csset_5(X, Key, keyCompare, keyDel, keyClone) \
-            using_csset_7(X, Key, keyCompare, keyDel, keyClone, c_trivial_toraw, Key)
+            using_csset_7(X, Key, keyCompare, keyDel, keyClone, c_default_toraw, Key)
 #define using_csset_7(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
             _c_using_aatree(csset_##X, csset_, Key, Key, keyCompareRaw, @@, keyDel, \
                             keyFromRaw, keyToRaw, RawKey, @@, @@, void)
@@ -84,12 +84,12 @@ int main(void) {
 #define using_csmap_strkey(...) c_MACRO_OVERLOAD(using_csmap_strkey, __VA_ARGS__)
 
 #define using_csmap_strkey_2(X, Mapped) \
-            _c_using_aatree_strkey(X, csmap_, Mapped, c_trivial_del, c_trivial_fromraw)
+            _c_using_aatree_strkey(X, csmap_, Mapped, c_default_del, c_default_fromraw)
 #define using_csmap_strkey_4(X, Mapped, mappedDel, mappedClone) \
             _c_using_aatree_strkey(X, csmap_, Mapped, mappedDel, mappedClone)
 #define _c_using_aatree_strkey(X, C, Mapped, mappedDel, mappedClone) \
             _c_using_aatree(C##X, C, cstr, Mapped, c_rawstr_compare, mappedDel, cstr_del, \
-                            cstr_from, cstr_toraw, const char*, mappedClone, c_trivial_toraw, Mapped)
+                            cstr_from, cstr_toraw, const char*, mappedClone, c_default_toraw, Mapped)
 
 
 #define using_csmap_strval(...) c_MACRO_OVERLOAD(using_csmap_strval, __VA_ARGS__)
@@ -97,9 +97,9 @@ int main(void) {
 #define using_csmap_strval_2(X, Key) \
             using_csmap_strval_3(X, Key, c_default_compare)
 #define using_csmap_strval_3(X, Key, keyCompare) \
-            using_csmap_strval_5(X, Key, keyCompare, c_trivial_del, c_trivial_fromraw)
+            using_csmap_strval_5(X, Key, keyCompare, c_default_del, c_default_fromraw)
 #define using_csmap_strval_5(X, Key, keyCompare, keyDel, keyClone) \
-            using_csmap_strval_7(X, Key, keyCompare, keyDel, keyClone, c_trivial_toraw, Key)
+            using_csmap_strval_7(X, Key, keyCompare, keyDel, keyClone, c_default_toraw, Key)
 #define using_csmap_strval_7(X, Key, keyCompare, keyDel, keyFromRaw, keyToRaw, RawKey) \
             _c_using_aatree(csmap_##X, csmap_, Key, cstr, keyCompare, cstr_del, keyDel, \
                             keyFromRaw, keyToRaw, RawKey, cstr_from, cstr_toraw, const char*)

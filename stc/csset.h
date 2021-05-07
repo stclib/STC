@@ -51,11 +51,11 @@ int main(void) {
 #define using_csset_2(X, Key) \
             using_csset_3(X, Key, c_default_compare)
 #define using_csset_3(X, Key, keyCompare) \
-            using_csset_5(X, Key, keyCompare, c_trivial_del, c_trivial_fromraw)
+            using_csset_5(X, Key, keyCompare, c_default_del, c_default_fromraw)
 #define using_csset_4(X, Key, keyCompare, keyDel) \
             using_csset_5(X, Key, keyCompare, keyDel, c_no_clone)
 #define using_csset_5(X, Key, keyCompare, keyDel, keyClone) \
-            using_csset_7(X, Key, keyCompare, keyDel, keyClone, c_trivial_toraw, Key)
+            using_csset_7(X, Key, keyCompare, keyDel, keyClone, c_default_toraw, Key)
 
 #define using_csset_7(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
             _c_using_aatree(csset_##X, csset_, Key, Key, keyCompareRaw, \

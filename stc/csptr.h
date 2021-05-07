@@ -89,7 +89,7 @@ typedef long atomic_count_t;
 #define using_csptr_2(X, Value) \
             using_csptr_3(X, Value, c_default_compare)
 #define using_csptr_3(X, Value, valueCompare) \
-            using_csptr_4(X, Value, valueCompare, c_trivial_del)
+            using_csptr_4(X, Value, valueCompare, c_default_del)
 #define using_csptr_4(X, Value, valueCompare, valueDel) \
             _c_using_csptr(csptr_##X, Value, valueCompare, valueDel)
 

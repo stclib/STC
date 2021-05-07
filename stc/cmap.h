@@ -56,18 +56,18 @@ int main(void) {
             using_cmap_5(X, Key, Mapped, c_default_equals, c_default_hash)
 #define using_cmap_5(X, Key, Mapped, keyEquals, keyHash) \
             using_cmap_7(X, Key, Mapped, keyEquals, keyHash, \
-                         c_trivial_del, c_trivial_fromraw)
+                         c_default_del, c_default_fromraw)
 #define using_cmap_6(X, Key, Mapped, keyEquals, keyHash, mappedDel) \
             using_cmap_7(X, Key, Mapped, keyEquals, keyHash, \
                          mappedDel, c_no_clone)
 #define using_cmap_7(X, Key, Mapped, keyEquals, keyHash, mappedDel, mappedClone) \
             using_cmap_9(X, Key, Mapped, keyEquals, keyHash, \
-                         mappedDel, mappedClone, c_trivial_toraw, Mapped)
+                         mappedDel, mappedClone, c_default_toraw, Mapped)
 #define using_cmap_9(X, Key, Mapped, keyEquals, keyHash, \
                      mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
             using_cmap_13(X, Key, Mapped, keyEquals, keyHash, \
                           mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
-                          c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Key)
+                          c_default_del, c_default_fromraw, c_default_toraw, Key)
 
 #define using_cmap_13(X, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                       mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
@@ -81,12 +81,12 @@ int main(void) {
 
 #define using_cmap_keydef_7(X, Key, Mapped, keyEquals, keyHash, keyDel, keyClone) \
             using_cmap_keydef_9(X, Key, Mapped, keyEquals, keyHash, \
-                                keyDel, keyClone, c_trivial_toraw, Key)
+                                keyDel, keyClone, c_default_toraw, Key)
 
 #define using_cmap_keydef_9(X, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                             keyDel, keyFromRaw, keyToRaw, RawKey) \
             _c_using_chash(cmap_##X, cmap_, Key, Mapped, keyEqualsRaw, keyHashRaw, \
-                           c_trivial_del, c_trivial_fromraw, c_trivial_toraw, Mapped, \
+                           c_default_del, c_default_fromraw, c_default_toraw, Mapped, \
                            keyDel, keyFromRaw, keyToRaw, RawKey)
 
 #define using_cmap_str() \
@@ -98,11 +98,11 @@ int main(void) {
 #define using_cmap_strkey(...) c_MACRO_OVERLOAD(using_cmap_strkey, __VA_ARGS__)
 
 #define using_cmap_strkey_2(X, Mapped) \
-            using_cmap_strkey_4(X, Mapped, c_trivial_del, c_trivial_fromraw)
+            using_cmap_strkey_4(X, Mapped, c_default_del, c_default_fromraw)
 #define using_cmap_strkey_3(X, Mapped, mappedDel) \
             using_cmap_strkey_4(X, Mapped, mappedDel, c_no_clone)
 #define using_cmap_strkey_4(X, Mapped, mappedDel, mappedClone) \
-            _c_using_chash_strkey(X, cmap_, Mapped, mappedDel, mappedClone, c_trivial_toraw, Mapped)
+            _c_using_chash_strkey(X, cmap_, Mapped, mappedDel, mappedClone, c_default_toraw, Mapped)
 #define using_cmap_strkey_6(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
             _c_using_chash_strkey(X, cmap_, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped)
 
@@ -117,11 +117,11 @@ int main(void) {
 #define using_cmap_strval_2(X, Key) \
             using_cmap_strval_4(X, Key, c_default_equals, c_default_hash)
 #define using_cmap_strval_4(X, Key, keyEquals, keyHash) \
-            using_cmap_strval_6(X, Key, keyEquals, keyHash, c_trivial_del, c_trivial_fromraw)
+            using_cmap_strval_6(X, Key, keyEquals, keyHash, c_default_del, c_default_fromraw)
 #define using_cmap_strval_5(X, Key, keyEquals, keyHash, keyDel) \
             using_cmap_strval_6(X, Key, keyEquals, keyHash, keyDel, c_no_clone)
 #define using_cmap_strval_6(X, Key, keyEquals, keyHash, keyDel, keyClone) \
-            using_cmap_strval_8(X, Key, keyEquals, keyHash, keyDel, keyClone, c_trivial_toraw, Key)
+            using_cmap_strval_8(X, Key, keyEquals, keyHash, keyDel, keyClone, c_default_toraw, Key)
 
 #define using_cmap_strval_8(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
             _c_using_chash(cmap_##X, cmap_, Key, cstr, keyEqualsRaw, keyHashRaw, \
