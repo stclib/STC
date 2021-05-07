@@ -167,10 +167,6 @@ cstr_iends_with(cstr s, const char* needle) {
 }
 
 /* cvec/cmap adaption functions: */
-#define  c_rawstr_compare(rx, ry) strcmp(*(rx), *(ry))
-#define  c_rawstr_equals(rx, ry)  (strcmp(*(rx), *(ry)) == 0)
-#define  c_rawstr_hash(rp, none)  c_default_hash(*(rp), strlen(*(rp)))
-
 #define  cstr_toraw(xp)           ((xp)->str)
 #define  cstr_compare_ref(xp, yp) strcmp((xp)->str, (yp)->str)
 #define  cstr_equals_ref(xp, yp)  (strcmp((xp)->str, (yp)->str) == 0)
