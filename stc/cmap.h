@@ -90,9 +90,9 @@ int main(void) {
                            keyDel, keyFromRaw, keyToRaw, RawKey)
 
 #define using_cmap_str() \
-            _c_using_chash(cmap_str, cmap_, cstr, cstr, cstr_equals_raw, cstr_hash_raw, \
-                           cstr_del, cstr_from, cstr_c_str, const char*, \
-                           cstr_del, cstr_from, cstr_c_str, const char*)
+            _c_using_chash(cmap_str, cmap_, cstr, cstr, c_rstr_equals, c_rstr_hash, \
+                           cstr_del, cstr_from, cstr_toraw, const char*, \
+                           cstr_del, cstr_from, cstr_toraw, const char*)
 
 
 #define using_cmap_strkey(...) c_MACRO_OVERLOAD(using_cmap_strkey, __VA_ARGS__)
@@ -107,9 +107,9 @@ int main(void) {
             _c_using_chash_strkey(X, cmap_, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped)
 
 #define _c_using_chash_strkey(X, C, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
-            _c_using_chash(C##X, C, cstr, Mapped, cstr_equals_raw, cstr_hash_raw, \
+            _c_using_chash(C##X, C, cstr, Mapped, c_rstr_equals, c_rstr_hash, \
                            mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
-                           cstr_del, cstr_from, cstr_c_str, const char*)
+                           cstr_del, cstr_from, cstr_toraw, const char*)
 
 
 #define using_cmap_strval(...) c_MACRO_OVERLOAD(using_cmap_strval, __VA_ARGS__)
@@ -125,7 +125,7 @@ int main(void) {
 
 #define using_cmap_strval_8(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
             _c_using_chash(cmap_##X, cmap_, Key, cstr, keyEqualsRaw, keyHashRaw, \
-                           cstr_del, cstr_from, cstr_c_str, const char*, \
+                           cstr_del, cstr_from, cstr_toraw, const char*, \
                            keyDel, keyFromRaw, keyToRaw, RawKey)
 
 #define SET_ONLY_cmap_(...)
@@ -138,11 +138,12 @@ int main(void) {
 typedef struct      {size_t idx; uint_fast8_t hx;} chash_bucket_t; \
 
 STC_API    uint64_t c_default_hash(const void *data, size_t len);
+STC_INLINE uint64_t c_string_hash(const char *s)
+    {return c_default_hash(s, strlen(s));}
 STC_INLINE uint64_t c_default_hash32(const void* data, size_t ignored)
-           {return *(const uint32_t *)data * 0xc6a4a7935bd1e99d;}
+    {return *(const uint32_t *)data * 0xc6a4a7935bd1e99d;}
 STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
-           {return *(const uint64_t *)data * 0xc6a4a7935bd1e99d;}
-
+    {return *(const uint64_t *)data * 0xc6a4a7935bd1e99d;}
 
 #define _c_using_chash(CX, C, Key, Mapped, keyEqualsRaw, keyHashRaw, \
                        mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \

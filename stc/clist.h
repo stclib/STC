@@ -69,7 +69,7 @@
             _c_using_clist(clist_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue)
 
 #define using_clist_str() \
-            _c_using_clist(clist_str, cstr, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
+            _c_using_clist(clist_str, cstr, c_rstr_compare, cstr_del, cstr_from, cstr_toraw, const char*)
 
 
 #define _c_using_clist_types(CX, Value) \
@@ -99,7 +99,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
     _c_using_clist_types(CX, Value); \
     typedef RawValue CX##_rawvalue_t; \
 \
-    STC_API CX              CX##_clone(CX list); \
+    STC_API CX              CX##_clone(CX cx); \
     STC_API void            CX##_del(CX* self); \
     STC_API void            CX##_push_back(CX* self, Value value); \
     STC_API void            CX##_push_front(CX* self, Value value); \
@@ -114,10 +114,10 @@ STC_API size_t _clist_count(const clist_VOID* self);
     STC_API CX##_iter_t     CX##_find_in(CX##_iter_t it1, CX##_iter_t it2, RawValue val); \
     STC_API CX##_node_t*    CX##_erase_after_(CX* self, CX##_node_t* node); \
 \
-    STC_INLINE CX           CX##_init(void) {CX lst = {NULL}; return lst;} \
-    STC_INLINE bool         CX##_empty(CX lst) {return lst.last == NULL;} \
-    STC_INLINE size_t       CX##_count(CX lst) \
-                                {return _clist_count((const clist_VOID*) &lst);} \
+    STC_INLINE CX           CX##_init(void) {CX cx = {NULL}; return cx;} \
+    STC_INLINE bool         CX##_empty(CX cx) {return cx.last == NULL;} \
+    STC_INLINE size_t       CX##_count(CX cx) \
+                                {return _clist_count((const clist_VOID*) &cx);} \
     STC_INLINE void         CX##_clear(CX* self) {CX##_del(self);} \
     STC_INLINE Value        CX##_value_clone(Value val) \
                                 {return valueFromRaw(valueToRaw(&val));} \
@@ -190,9 +190,9 @@ STC_API size_t _clist_count(const clist_VOID* self);
 #define _c_implement_clist(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
 \
     STC_DEF CX \
-    CX##_clone(CX list) { \
+    CX##_clone(CX cx) { \
         CX out = CX##_init(); \
-        c_foreach_3 (it, CX, list) CX##_emplace_back(&out, valueToRaw(it.ref)); \
+        c_foreach_3 (it, CX, cx) CX##_emplace_back(&out, valueToRaw(it.ref)); \
         return out; \
     } \
 \
@@ -297,14 +297,14 @@ STC_API size_t _clist_count(const clist_VOID* self);
 \
     STC_DEF CX \
     CX##_split(CX* self, CX##_iter_t it1, CX##_iter_t it2) { \
-        CX list = {NULL}; \
-        if (it1.ref == it2.ref) return list; \
+        CX cx = {NULL}; \
+        if (it1.ref == it2.ref) return cx; \
         CX##_node_t *p1 = it1.prev, \
                     *p2 = it2.ref ? it2.prev : self->last; \
         p1->next = p2->next, p2->next = _clist_node(CX, it1.ref); \
         if (self->last == p2) self->last = (p1 == p2) ? NULL : p1; \
-        list.last = p2; \
-        return list; \
+        cx.last = p2; \
+        return cx; \
     } \
 \
     STC_DEF int \

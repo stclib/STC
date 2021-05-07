@@ -27,7 +27,7 @@ be replaced by `i` in all of the following documentation.
 
 `using_cvec_str()` is a shorthand for:
 ```
-using_cvec(str, cstr, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
+using_cvec(str, cstr, c_rstr_compare, cstr_del, cstr_from, cstr_toraw, const char*)
 ```
 
 ## Methods
@@ -64,7 +64,10 @@ cvec_X_iter_t       cvec_X_insert_at(cvec_X* self, cvec_X_iter_t it, Value value
 cvec_X_iter_t       cvec_X_emplace(cvec_X* self, size_t idx, RawValue raw);
 cvec_X_iter_t       cvec_X_emplace_n(cvec_X* self, size_t idx, const RawValue[] arr, size_t n);
 cvec_X_iter_t       cvec_X_emplace_at(cvec_X* self, cvec_X_iter_t it, RawValue raw);
-cvec_X_iter_t       cvec_X_emplace_range(cvec_X* self, cvec_X_iter_t it1, cvec_X_iter_t it2);    // will clone
+cvec_X_iter_t       cvec_X_emplace_range(cvec_X* self, cvec_X_iter_t it, 
+                                         cvec_X_iter_t it1, cvec_X_iter_t it2);                 // will clone
+cvec_X_iter_t       cvec_X_emplace_range_p(cvec_X* self, Value* pos, 
+                                           const Value* p1, const Value* p2);
 
 cvec_X_iter_t       cvec_X_erase(cvec_X* self, size_t idx);
 cvec_X_iter_t       cvec_X_erase_n(cvec_X* self, size_t idx, size_t n);
@@ -79,7 +82,7 @@ cvec_X_iter_t       cvec_X_bsearch_in(cvec_X_iter_t i1, cvec_X_iter_t i2, RawVal
 
 void                cvec_X_sort(cvec_X* self);
 void                cvec_X_sort_range(cvec_X_iter_t i1, cvec_X_iter_t i2,
-                                      int(*cmp)(const cvec_X_value_t*, const cvec_X_value_t*));
+                                      int(*cmp)(const Value*, const Value*));
 
 cvec_X_iter_t       cvec_X_begin(const cvec_X* self);
 cvec_X_iter_t       cvec_X_end(const cvec_X* self);
@@ -116,7 +119,7 @@ int main()
     // Append a set of numbers
     c_emplace(cvec_i, vec, {7, 5, 16, 8});
 
-    printf("initial: ");
+    printf("initial:");
     c_foreach (k, cvec_i, vec) {
         printf(" %d", *k.ref);
     }
@@ -124,7 +127,7 @@ int main()
     // Sort the vector
     cvec_i_sort(&vec);
 
-    printf("\nsorted: ");
+    printf("\nsorted:");
     c_foreach (k, cvec_i, vec) {
         printf(" %d", *k.ref);
     }
@@ -134,8 +137,8 @@ int main()
 ```
 Output:
 ```
-initial:  7 5 16 8 25 13
-sorted:  5 7 8 13 16 25
+initial: 25 13 7 5 16 8
+sorted: 5 7 8 13 16 25
 ```
 ### Example 2
 ```c

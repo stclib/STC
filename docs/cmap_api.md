@@ -87,6 +87,7 @@ cmap_X_value_t      cmap_X_value_clone(cmap_X_value_t val);
 ```
 ```c
 uint64_t            c_default_hash(const void *data, size_t len);         // key any trivial type
+uint64_t            c_string_hash(const char* str);                       // uses c_default_hash()
 uint64_t            c_default_hash32(const void* data, size_t);           // key one 32bit int
 uint64_t            c_default_hash64(const void* data, size_t);           // key one 64bit int
 int                 c_default_equals(const RawKey* a, const RawKey* b);   // the == operator
@@ -273,7 +274,7 @@ static int Viking_equals(const Viking* a, const Viking* b) {
 }
 
 static uint32_t Viking_hash(const Viking* a, int ignored) {
-    return c_strhash(a->name.str) ^ (c_strhash(a->country.str) >> 15);
+    return cstr_hash(a->name) ^ (cstr_hash(a->country) >> 15);
 }
 
 static void Viking_del(Viking* v) {
@@ -339,7 +340,7 @@ static int RViking_equals(const RViking* r1, const RViking* r2) {
 }
 
 static uint32_t RViking_hash(const RViking* r, int ignored) {
-    return c_strhash(r->name) ^ (c_strhash(r->country) >> 15);
+    return c_string_hash(r->name) ^ (c_string_hash(r->country) >> 15);
 }
 
 static Viking Viking_fromR(RViking r) {return (Viking){cstr_from(r.name), cstr_from(r.country)};}

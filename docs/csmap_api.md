@@ -63,7 +63,7 @@ csmap_X_value_t*    csmap_X_find_it(const csmap_X* self, RawKey rkey, csmap_X_it
 
 csmap_X_result_t    csmap_X_insert(csmap_X* self, Key key, Mapped mapped);                      // no change if key in map
 csmap_X_result_t    csmap_X_insert_or_assign(csmap_X* self, Key key, Mapped mapped);            // always update mapped
-csmap_X_result_t    csmap_X_put(csmap_X* self, Key key, Mapped mapped);                         // alias for insert_or_assign
+csmap_X_result_t    csmap_X_put(csmap_X* self, Key key, Mapped mapped);                         // same as insert_or_assign()
 
 csmap_X_result_t    csmap_X_emplace(csmap_X* self, RawKey rkey, RawMapped rmapped);             // no change if rkey in map
 csmap_X_result_t    csmap_X_emplace_or_assign(csmap_X* self, RawKey rkey, RawMapped rmapped);   // always update rmapped

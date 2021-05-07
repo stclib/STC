@@ -41,7 +41,7 @@
             _c_using_cvec(cvec_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue)
 
 #define using_cvec_str() \
-            _c_using_cvec(cvec_str, cstr, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
+            _c_using_cvec(cvec_str, cstr, c_rstr_compare, cstr_del, cstr_from, cstr_toraw, const char*)
 
 
 struct cvec_rep { size_t size, cap; void* data[]; };
@@ -56,7 +56,7 @@ struct cvec_rep { size_t size, cap; void* data[]; };
     typedef struct {CX##_value_t *data;} CX; \
 \
     STC_API CX              CX##_init(void); \
-    STC_API CX              CX##_clone(CX vec); \
+    STC_API CX              CX##_clone(CX cx); \
     STC_API void            CX##_del(CX* self); \
     STC_API void            CX##_clear(CX* self); \
     STC_API void            CX##_reserve(CX* self, size_t cap); \
@@ -71,9 +71,9 @@ struct cvec_rep { size_t size, cap; void* data[]; };
     STC_API CX##_iter_t     CX##_emplace_range_p(CX* self, CX##_value_t* pos, \
                                                  const CX##_rawvalue_t* p1, const CX##_rawvalue_t* p2); \
 \
-    STC_INLINE size_t       CX##_size(CX vec) { return _cvec_rep(&vec)->size; } \
-    STC_INLINE size_t       CX##_capacity(CX vec) { return _cvec_rep(&vec)->cap; } \
-    STC_INLINE bool         CX##_empty(CX vec) {return !_cvec_rep(&vec)->size;} \
+    STC_INLINE size_t       CX##_size(CX cx) { return _cvec_rep(&cx)->size; } \
+    STC_INLINE size_t       CX##_capacity(CX cx) { return _cvec_rep(&cx)->cap; } \
+    STC_INLINE bool         CX##_empty(CX cx) {return !_cvec_rep(&cx)->size;} \
     STC_INLINE Value        CX##_value_fromraw(RawValue raw) {return valueFromRaw(raw);} \
     STC_INLINE void         CX##_swap(CX* a, CX* b) {c_swap(CX, *a, *b);} \
     STC_INLINE CX##_value_t*CX##_front(const CX* self) {return self->data;} \
@@ -90,7 +90,8 @@ struct cvec_rep { size_t size, cap; void* data[]; };
     STC_INLINE CX##_iter_t  CX##_end(const CX* self) \
                                 {CX##_iter_t it = {self->data + _cvec_rep(self)->size}; return it;} \
     STC_INLINE void         CX##_next(CX##_iter_t* it) {++it->ref;} \
-    STC_INLINE size_t       CX##_index(CX vec, CX##_iter_t it) {return it.ref - vec.data;} \
+    STC_INLINE CX##_iter_t  CX##_adv(CX##_iter_t it, intptr_t offs) {it.ref += offs; return it;} \
+    STC_INLINE size_t       CX##_idx(CX cx, CX##_iter_t it) {return it.ref - cx.data;} \
 \
     STC_INLINE CX \
     CX##_with_size(size_t size, Value null_val) { \
@@ -207,8 +208,8 @@ static struct cvec_rep _cvec_inits = {0, 0};
 \
     STC_DEF CX \
     CX##_init(void) { \
-        CX vec = {(CX##_value_t *) _cvec_inits.data}; \
-        return vec; \
+        CX cx = {(CX##_value_t *) _cvec_inits.data}; \
+        return cx; \
     } \
 \
     STC_DEF void \
@@ -259,10 +260,10 @@ static struct cvec_rep _cvec_inits = {0, 0};
     } \
 \
     STC_DEF CX \
-    CX##_clone(CX vec) { \
-        size_t len = _cvec_rep(&vec)->size; \
+    CX##_clone(CX cx) { \
+        size_t len = _cvec_rep(&cx)->size; \
         CX out = CX##_with_capacity(len); \
-        CX##_insert_range_p(&out, out.data, vec.data, vec.data + len, true); \
+        CX##_insert_range_p(&out, out.data, cx.data, cx.data + len, true); \
         return out; \
     } \
 \

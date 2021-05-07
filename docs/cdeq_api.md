@@ -23,7 +23,7 @@ be replaced by `i` in all of the following documentation.
 
 `using_cdeq_str()` is a shorthand for:
 ```
-using_cdeq(str, cstr, cstr_compare_raw, cstr_del, cstr_from, cstr_c_str, const char*)
+using_cdeq(str, cstr, c_rstr_compare, cstr_del, cstr_from, cstr_toraw, const char*)
 ```
 
 ## Methods
@@ -63,7 +63,10 @@ cdeq_X_iter_t       cdeq_X_insert_at(cdeq_X* self, cdeq_X_iter_t it, Value value
 cdeq_X_iter_t       cdeq_X_emplace(cdeq_X* self, size_t idx, RawValue raw);
 cdeq_X_iter_t       cdeq_X_emplace_n(cdeq_X* self, size_t idx, const RawValue[] arr, size_t n);
 cdeq_X_iter_t       cdeq_X_emplace_at(cdeq_X* self, cdeq_X_iter_t it, RawValue raw);
-cdeq_X_iter_t       cdeq_X_emplace_range(cdeq_X* self, cdeq_X_iter_t it1, cdeq_X_iter_t it2);    // will clone
+cdeq_X_iter_t       cdeq_X_emplace_range(cdeq_X* self, cdeq_X_iter_t it, 
+                                         cdeq_X_iter_t it1, cdeq_X_iter_t it2);                 // will clone
+cdeq_X_iter_t       cdeq_X_emplace_range_p(cdeq_X* self, Value* pos, 
+                                           const Value* p1, const Value* p2);
 
 cdeq_X_iter_t       cdeq_X_erase(cdeq_X* self, size_t idx);
 cdeq_X_iter_t       cdeq_X_erase_n(cdeq_X* self, size_t idx, size_t n);
@@ -76,7 +79,7 @@ cdeq_X_value_t*     cdeq_X_get(const cdeq_X* self, RawValue raw);               
 
 void                cdeq_X_sort(cdeq_X* self);
 void                cdeq_X_sort_range(cdeq_X_iter_t i1, cdeq_X_iter_t i2,
-                                      int(*cmp)(const cdeq_X_value_t*, const cdeq_X_value_t*));
+                                      int(*cmp)(const Value*, const Value*));
 
 cdeq_X_iter_t       cdeq_X_begin(const cdeq_X* self);
 cdeq_X_iter_t       cdeq_X_end(const cdeq_X* self);

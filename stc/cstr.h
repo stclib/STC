@@ -167,16 +167,15 @@ cstr_iends_with(cstr s, const char* needle) {
 }
 
 /* cvec/cmap adaption functions: */
-#define  cstr_c_str(x)           ((x)->str)
-#define  cstr_compare_raw(x, y)  strcmp(*(x), *(y))
-#define  cstr_equals_raw(x, y)   (strcmp(*(x), *(y)) == 0)
-#define  cstr_hash_raw(p, none)  c_default_hash(*(p), strlen(*(p)))
+#define  c_rstr_compare(rx, ry)   strcmp(*(rx), *(ry))
+#define  c_rstr_equals(rx, ry)    (strcmp(*(rx), *(ry)) == 0)
+#define  c_rstr_hash(rp, none)    c_default_hash(*(rp), strlen(*(rp)))
 
-#define  cstr_compare_ref(x, y)  strcmp((x)->str, (y)->str)
-#define  cstr_equals_ref(x, y)   (strcmp((x)->str, (y)->str) == 0)
-#define  cstr_hash_ref(p, none)  c_default_hash((p)->str, cstr_size(*(p)))
-
-#define  c_strhash(s)            c_default_hash(s, strlen(s))
+#define  cstr_toraw(xp)           ((xp)->str)
+#define  cstr_compare_ref(xp, yp) strcmp((xp)->str, (yp)->str)
+#define  cstr_equals_ref(xp, yp)  (strcmp((xp)->str, (yp)->str) == 0)
+#define  cstr_hash_ref(xp, none)  c_default_hash((xp)->str, cstr_size(*(xp)))
+#define  cstr_hash(x)             c_default_hash((x).str, cstr_size(x))
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 

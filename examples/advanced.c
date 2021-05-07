@@ -20,7 +20,7 @@ typedef struct VikingRaw {
 } VikingRaw;
 
 uint64_t vikingraw_hash(const VikingRaw* raw, size_t ignore) {
-    uint64_t hash = c_strhash(raw->name) ^ (c_strhash(raw->country) >> 15);
+    uint64_t hash = c_string_hash(raw->name) ^ (c_string_hash(raw->country) >> 15);
     return hash;
 }
 static inline int vikingraw_equals(const VikingRaw* rx, const VikingRaw* ry) {
