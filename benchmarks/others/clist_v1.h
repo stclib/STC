@@ -69,7 +69,7 @@
             _c_using_clist(clist_##X, Value, valueCompare, valueDel, valueFromRaw, valueToRaw, RawValue)
 
 #define using_clist_str() \
-            _c_using_clist(clist_str, cstr, c_rstr_compare, cstr_del, cstr_from, cstr_toraw, const char*)
+            _c_using_clist(clist_str, cstr, c_rawstr_compare, cstr_del, cstr_from, cstr_toraw, const char*)
 
 
 #define _c_using_clist_types(CX, Value) \

@@ -85,7 +85,7 @@ int main(void) {
                             keyDel, keyFromRaw, keyToRaw, RawKey)
 
 #define using_csmap_str() \
-            _c_using_aatree(csmap_str, csmap_, cstr, cstr, c_rstr_compare, \
+            _c_using_aatree(csmap_str, csmap_, cstr, cstr, c_rawstr_compare, \
                             cstr_del, cstr_from, cstr_toraw, const char*, \
                             cstr_del, cstr_from, cstr_toraw, const char*)
 
@@ -102,7 +102,7 @@ int main(void) {
             _c_using_aatree_strkey(X, csmap_, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped)
 
 #define _c_using_aatree_strkey(X, C, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
-            _c_using_aatree(C##X, C, cstr, Mapped, c_rstr_compare, \
+            _c_using_aatree(C##X, C, cstr, Mapped, c_rawstr_compare, \
                             mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
                             cstr_del, cstr_from, cstr_toraw, const char*)
 
