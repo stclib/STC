@@ -39,10 +39,12 @@ void         cstr_clear(cstr* self);
 cstr*        cstr_assign(cstr* self, const char* str);
 cstr*        cstr_assign_s(cstr* self, cstr s);                       // cstr_take(self, cstr_clone(s))
 cstr*        cstr_assign_n(cstr* self, const char* str, size_t n);
+cstr*        cstr_assign_fmt(cstr* self, const char* fmt, ...);       // printf() formatting
 
 cstr*        cstr_append(cstr* self, const char* str);
 cstr*        cstr_append_s(cstr* self, cstr s);
 cstr*        cstr_append_n(cstr* self, const char* str, size_t n);    // appends n characters
+cstr*        cstr_append_fmt(cstr* self, const char* fmt, ...);       // printf() formatting
 
 void         cstr_insert(cstr* self, size_t pos, const char* str);
 void         cstr_insert_s(cstr* self, size_t pos, cstr s);
@@ -51,6 +53,7 @@ void         cstr_insert_n(cstr* self, size_t pos, const char* str, size_t n);
 void         cstr_replace(cstr* self, size_t pos, size_t len, const char* str);
 void         cstr_replace_s(cstr* self, size_t pos, size_t len, cstr s);
 void         cstr_replace_n(cstr* self, size_t pos, size_t len, const char* str, size_t n);
+size_t       cstr_replace_all(cstr* self, const char* find, const char* replace);
 
 void         cstr_erase(cstr* self, size_t pos);
 void         cstr_erase_n(cstr* self, size_t pos, size_t n);
