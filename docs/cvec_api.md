@@ -27,7 +27,7 @@ be replaced by `i` in all of the following documentation.
 
 `using_cvec_str()` is a shorthand for:
 ```
-using_cvec(str, cstr, c_rstr_compare, cstr_del, cstr_from, cstr_toraw, const char*)
+using_cvec(str, cstr, c_rawstr_compare, cstr_del, cstr_from, cstr_toraw, const char*)
 ```
 
 ## Methods

@@ -88,9 +88,9 @@ bool         cstr_getdelim(cstr *self, int delim, FILE *stream);
 Helper methods:
 ```c
 const char*  cstr_toraw(const cstr* x);
-int          c_rstr_compare(const char** x, const char** y);
-bool         c_rstr_equals(const char** x, const char** y);
-uint64_t     c_rstr_hash(const char* const* x, size_t ignored);
+int          c_rawstr_compare(const char** x, const char** y);
+bool         c_rawstr_equals(const char** x, const char** y);
+uint64_t     c_rawstr_hash(const char* const* x, size_t ignored);
 int          c_strncasecmp(const char* str1, const char* str2, size_t n);
 char*        c_strnstr(const char* str, const char* needle, size_t n);
 char*        c_strncasestr(const char* str, const char* needle, size_t n);
