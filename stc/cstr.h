@@ -320,6 +320,7 @@ cstr_replace_all(cstr* self, const char* find, const char* replace) {
         cstr_append(&out, replace);
         from = pos + find_len; ++n;
     }
+    if (!n) return 0;
     cstr_append(&out, self->str + from);
     cstr_del(self); *self = out;
     return n;
