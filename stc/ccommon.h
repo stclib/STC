@@ -120,6 +120,7 @@
     for (type i=start, i##_inc_=step, i##_end_=(stop) - (0 < i##_inc_) \
          ; (i <= i##_end_) == (0 < i##_inc_); i += i##_inc_)
 
+#define c_with(start, end) for (int _c_w = (start, 0); !_c_w; end, ++_c_w)
 #define c_withfile(f, open) for (FILE *f = open; f; fclose(f), f = NULL)
 #define c_withbuffer(b, type, n) c_withbuffer_x(b, type, n, 256)
 #define c_withbuffer_x(b, type, n, BYTES) \

@@ -220,18 +220,18 @@ cstr_from_n(const char* str, size_t n) {
 #  pragma warning(push)
 #  pragma warning(disable: 4996)
 #endif
-///
+
 STC_DEF void
-cstr_vfmt(cstr* self, size_t pos, const char* fmt, va_list args) {
+cstr_vfmt(cstr* self, const char* fmt, va_list args) {
     va_list args2;
     va_copy(args2, args);
     int len = vsnprintf(NULL, (size_t)0, fmt, args);
-    cstr_reserve(self, pos + len);
-    vsprintf(self->str + pos, fmt, args2);
+    cstr_reserve(self, len);
+    vsprintf(self->str, fmt, args2);
     va_end(args2);
-    _cstr_rep(self)->size = pos + len;
+    _cstr_rep(self)->size = len;
 }
-///
+
 #if defined(__clang__)
 #  pragma clang diagnostic pop
 #elif defined(_MSC_VER)
@@ -242,24 +242,18 @@ STC_DEF cstr
 cstr_from_fmt(const char* fmt, ...) {
     cstr ret = cstr_inits;
     va_list args; va_start(args, fmt);
-    cstr_vfmt(&ret, 0, fmt, args);
+    cstr_vfmt(&ret, fmt, args);
     va_end(args);
     return ret;
 }
 
 STC_DEF cstr*
 cstr_assign_fmt(cstr* self, const char* fmt, ...) {
+    cstr ret = cstr_inits;
     va_list args; va_start(args, fmt);
-    cstr_vfmt(self, 0, fmt, args);
+    cstr_vfmt(&ret, fmt, args);
     va_end(args);
-    return self;
-}
-
-STC_DEF cstr*
-cstr_append_fmt(cstr* self, const char* fmt, ...) {
-    va_list args; va_start(args, fmt);
-    cstr_vfmt(self, cstr_size(*self), fmt, args);
-    va_end(args);
+    cstr_del(self); *self = ret;
     return self;
 }
 
