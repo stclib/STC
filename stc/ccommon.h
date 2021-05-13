@@ -43,7 +43,7 @@
 #  define STC_API extern
 #  define STC_DEF
 #  define STC_LIBRARY_ONLY(...) __VA_ARGS__
-#  define STC_STATIC_ONLY(...) 
+#  define STC_STATIC_ONLY(...)
 #else
 #  define STC_API static inline
 #  define STC_DEF static inline
@@ -69,9 +69,11 @@
 #if __cplusplus
 #define c_new(T)                static_cast<T*>(c_malloc(sizeof(T)))
 #define c_new_n(T, n)           static_cast<T*>(c_malloc(sizeof(T)*(n)))
+#define c_cast(T)               T
 #else
 #define c_new(T)                c_malloc(sizeof(T))
-#define c_new_n(T, n)           c_malloc(sizeof(T[n]))
+#define c_new_n(T, n)           c_malloc(sizeof(T)*(n))
+#define c_cast(T)               (T)
 #endif
 #ifndef c_malloc
 #define c_malloc(sz)            malloc(sz)

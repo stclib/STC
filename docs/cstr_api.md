@@ -16,6 +16,7 @@ All cstr definitions and prototypes are available by including a single header f
 
 ```c
 cstr         cstr_init(void);                                         // constructor
+cstr         cstr_new(const char literal_only[]);                     // constructor
 cstr         cstr_with_capacity(size_t cap);
 cstr         cstr_with_size(size_t len, char fill);                   // repeat fill len times
 cstr         cstr_from(const char* str);
@@ -37,9 +38,9 @@ void         cstr_resize(cstr* self, size_t len, char fill);
 void         cstr_clear(cstr* self);
 
 cstr*        cstr_assign(cstr* self, const char* str);
-cstr*        cstr_assign_s(cstr* self, cstr s);                       // cstr_take(self, cstr_clone(s))
 cstr*        cstr_assign_n(cstr* self, const char* str, size_t n);    // assign n first chars of str
 cstr*        cstr_assign_fmt(cstr* self, const char* fmt, ...);       // printf() formatting
+cstr*        cstr_copy(cstr* self, cstr s);                           // cstr_take(self, cstr_clone(s))
 
 cstr*        cstr_append(cstr* self, const char* str);
 cstr*        cstr_append_s(cstr* self, cstr s);
@@ -84,9 +85,13 @@ void         cstr_next(cstr_iter_t* it);
 bool         cstr_getline(cstr *self, FILE *stream);                  // cstr_getdelim(self, '\n', stream)
 bool         cstr_getdelim(cstr *self, int delim, FILE *stream);
 ```
-Helper methods:
+
+Note that all methods with arguments `(..., const char* str, size_t n)`, `n` must be within the range of `str` length.
+
+#### Helper methods:
 ```c
-const char*  cstr_toraw(const cstr* x);
+const char*  cstr_toraw(const cstr* self);
+
 int          c_rawstr_compare(const char** x, const char** y);
 bool         c_rawstr_equals(const char** x, const char** y);
 uint64_t     c_rawstr_hash(const char* const* x, size_t ignored);
@@ -105,26 +110,30 @@ char*        c_strncasestr(const char* str, const char* needle, size_t n);
 
 ## Constants and macros
 
-| Name              | Value            |
-|:------------------|:-----------------|
-|  `cstr_npos`      | `(-1ull)`        |
+| Name              | Value             |
+|:------------------|:------------------|
+|  `cstr_npos`      | `((size_t) -1)`   |
+|  `cstr_null       | cstr null value   |
 
 ## Example
 ```c
 #include <stc/cstr.h>
 
 int main() {
-    cstr s1 = cstr_from("one-nine-three-seven-five");
-    printf("%s.\n", s1.str);
+    cstr s0 = cstr_new("Initialization without using strlen().");
+    printf("%s\nLength: %zu\n\n", s0.str, cstr_size(s0));
+
+    cstr s1 = cstr_from("one-nine-three-seven-five.");
+    printf("%s\n", s1.str);
 
     cstr_insert(&s1, 3, "-two");
-    printf("%s.\n", s1.str);
+    printf("%s\n", s1.str);
 
     cstr_erase_n(&s1, 7, 5); // -nine
-    printf("%s.\n", s1.str);
+    printf("%s\n", s1.str);
 
-    cstr_replace(&s1, cstr_find(&s1, "seven"), 5, "four");
-    printf("%s.\n", s1.str);
+    cstr_replace(&s1, cstr_find(s1, "seven"), 5, "four");
+    printf("%s\n", s1.str);
 
     // reassign:
     cstr_assign(&s1, "one two three four five six seven");
@@ -134,7 +143,7 @@ int main() {
     cstr full_path = cstr_from_fmt("%s/%s.%s", "directory", "filename", "ext");
     printf("%s\n", full_path.str);
 
-    c_del(cstr, &s1, &full_path);
+    c_del(cstr, &s0, &s1, &full_path);
 }
 ```
 Output:
