@@ -11,7 +11,7 @@ using_cmap_strkey(si, int);
 
 int main1()
 {
-    c_init (clist_str, lwords, {
+    c_var (clist_str, lwords, {
         "this", "sentence", "is", "not", "a", "sentence",
         "this", "sentence", "is", "a", "hoax"
     });
@@ -21,7 +21,7 @@ int main1()
         printf("%s\n", w.ref->str);
     puts("");
 
-    c_init (cvec_str, words, {
+    c_var (cvec_str, words, {
         "this", "sentence", "is", "not", "a", "sentence",
         "this", "sentence", "is", "a", "hoax"
     });

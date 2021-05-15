@@ -102,28 +102,27 @@ using_csmap_str();
 
 int main()
 {
-    // Create an unordered_map of three strings (that map to strings)
-    c_init (csmap_str, u, {
+    // Create an unordered_map of three strings (maps to string)
+    c_var (csmap_str, colors, {
         {"RED", "#FF0000"},
         {"GREEN", "#00FF00"},
         {"BLUE", "#0000FF"}
     });
 
     // Iterate and print keys and values of unordered map
-    c_foreach (n, csmap_str, u) {
-        printf("Key:[%s] Value:[%s]\n", n.ref->first.str, n.ref->second.str);
+    c_foreach (i, csmap_str, colors) {
+        printf("Key:[%s] Value:[%s]\n", i.ref->first.str, i.ref->second.str);
     }
 
     // Add two new entries to the unordered map
-    csmap_str_emplace(&u, "BLACK", "#000000");
-    csmap_str_emplace(&u, "WHITE", "#FFFFFF");
+    csmap_str_emplace(&colors, "BLACK", "#000000");
+    csmap_str_emplace(&colors, "WHITE", "#FFFFFF");
 
     // Output values by key
-    printf("The HEX of color RED is:[%s]\n", csmap_str_at(&u, "RED")->str);
-    printf("The HEX of color BLACK is:[%s]\n", csmap_str_at(&u, "BLACK")->str);
+    printf("The HEX of color RED is:[%s]\n", csmap_str_at(&colors, "RED")->str);
+    printf("The HEX of color BLACK is:[%s]\n", csmap_str_at(&colors, "BLACK")->str);
 
-    csmap_str_del(&u);
-    return 0;
+    csmap_str_del(&colors);
 }
 ```
 Output:
@@ -147,7 +146,7 @@ using_csmap_strval(id, int);
 int main()
 {
     uint32_t col = 0xcc7744ff;
-    c_init (csmap_id, idnames, {
+    c_var (csmap_id, idnames, {
         {100, "Red"},
         {110, "Blue"},
     });
@@ -155,7 +154,7 @@ int main()
     csmap_id_emplace_or_assign(&idnames, 110, "White");
     /* put a constructed mapped value into map: */
     csmap_id_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
-    /* emplace inserts only when key does not exist: */
+    /* emplace adds only when key does not exist: */
     csmap_id_emplace(&idnames, 100, "Green");
 
     c_foreach (i, csmap_id, idnames)

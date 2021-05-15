@@ -2,10 +2,10 @@
 
 The following handy macros are safe to use, i.e. have no side-effects.
 
-### c_init, c_emplace
-**c_init** declares and initializes any container with an array of elements. **c_emplace** adds elements to any existing container:
+### c_var, c_emplace
+**c_var** declares and initializes any container with an array of elements. **c_emplace** adds elements to any existing container:
 ```c
-c_init(cvec_i, vec, {1, 2, 3});     // declare and emplace
+c_var(cvec_i, vec, {1, 2, 3});     // declare and emplace
 c_emplace(cvec_i, vec, {4, 5, 6});  // adds to existing vec
 ```
 
@@ -41,7 +41,7 @@ c_forrange (i, int, 30, 0, -5) printf(" %d", i);
 ```c
 using_csset(x, int);
 ...
-c_init (csset_x, set, {23, 3, 7, 5, 12});
+c_var (csset_x, set, {23, 3, 7, 5, 12});
 c_foreach (i, csset_x, set) printf(" %d", *i.ref);
 // 3 5 7 12 23
 csset_x_iter_t it = csset_x_find(&set, 7);

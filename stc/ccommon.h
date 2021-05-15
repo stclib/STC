@@ -131,7 +131,7 @@
          ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)
 #define c_breakwith continue
 
-#define c_init(CX, c, ...) \
+#define c_var(CX, c, ...) \
     CX c = CX##_init(); c_emplace(CX, c, __VA_ARGS__)
 
 #define c_emplace(CX, c, ...) do { \

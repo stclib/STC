@@ -5,7 +5,7 @@ using_csset(i, int);
 
 int main()
 {
-    c_init(csset_i, set, {30, 20, 80, 40, 60, 90, 10, 70, 50});
+    c_var (csset_i, set, {30, 20, 80, 40, 60, 90, 10, 70, 50});
     c_foreach (k, csset_i, set) printf(" %d", *k.ref); puts("");
 
     int val = 64;

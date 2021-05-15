@@ -103,13 +103,13 @@ using_cqueue(i, cdeq_i);                    // queue, using deque as adapter
 using_csmap(i, int, int);                   // sorted map
 
 int main(void) {
-    // define and initialize
-    c_init (cset_i, set, {10, 20, 30});
-    c_init (cvec_p, vec, { {10, 1}, {20, 2}, {30, 3} });
-    c_init (cdeq_i, deq, {10, 20, 30});
-    c_init (clist_i, lst, {10, 20, 30});
-    c_init (cqueue_i, que, {10, 20, 30});
-    c_init (csmap_i, map, { {20, 2}, {10, 1}, {30, 3} });
+    // shorthand for define + initialize containers with c_var():
+    c_var (cset_i, set, {10, 20, 30});
+    c_var (cvec_p, vec, { {10, 1}, {20, 2}, {30, 3} });
+    c_var (cdeq_i, deq, {10, 20, 30});
+    c_var (clist_i, lst, {10, 20, 30});
+    c_var (cqueue_i, que, {10, 20, 30});
+    c_var (csmap_i, map, { {20, 2}, {10, 1}, {30, 3} });
 
     // add one more element to each container
     cset_i_insert(&set, 40);

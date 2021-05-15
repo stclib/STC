@@ -109,7 +109,7 @@ Interleave *push_front()* / *push_back()* then *sort()*:
 using_clist(d, double);
 
 int main() {
-    c_init (clist_d, list, {
+    c_var (clist_d, list, {
         10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0
     });
 
@@ -148,7 +148,7 @@ using_clist(i, int);
 
 int main ()
 {
-    c_init (clist_i, L, {10, 20, 30, 40, 50});
+    c_var (clist_i, L, {10, 20, 30, 40, 50});
                                                  // 10 20 30 40 50
     clist_i_iter_t it = clist_i_begin(&L);       // ^
     clist_i_next(&it); 
@@ -180,8 +180,8 @@ Splice `[30, 40]` from *L2* into *L1* before `3`:
 using_clist(i, int);
 
 int main() {
-    c_init (clist_i, L1, {1, 2, 3, 4, 5});
-    c_init (clist_i, L2, {10, 20, 30, 40, 50});
+    c_var (clist_i, L1, {1, 2, 3, 4, 5});
+    c_var (clist_i, L2, {10, 20, 30, 40, 50});
 
     clist_i_iter_t i = clist_i_fwd(clist_i_begin(&L1), 2);
     clist_i_iter_t j1 = clist_i_fwd(clist_i_begin(&L2), 2), j2 = clist_i_fwd(j1, 2);

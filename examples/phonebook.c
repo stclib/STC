@@ -39,11 +39,11 @@ int main(int argc, char **argv)
 {
     c_static_assert(3 == 3, "hello");
 
-    c_init (cset_str, names, {"Hello", "Cool", "True"});
+    c_var (cset_str, names, {"Hello", "Cool", "True"});
     c_foreach (i, cset_str, names) printf("set: %s\n", i.ref->str);
 
     bool erased;
-    c_init (cmap_str, phone_book, {
+    c_var (cmap_str, phone_book, {
         {"Lilia Friedman", "(892) 670-4739"},
         {"Tariq Beltran", "(489) 600-7575"},
         {"Laiba Juarez", "(303) 885-5692"},

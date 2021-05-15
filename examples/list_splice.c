@@ -14,8 +14,8 @@ void print_ilist(const char* s, clist_i list)
 
 int main ()
 {
-    c_init (clist_i, list1, { 1, 2, 3, 4, 5 });
-    c_init (clist_i, list2, { 10, 20, 30, 40, 50 });
+    c_var (clist_i, list1, { 1, 2, 3, 4, 5 });
+    c_var (clist_i, list2, { 10, 20, 30, 40, 50 });
 
     clist_i_iter_t it = clist_i_fwd(clist_i_begin(&list1), 2);
     it = clist_i_splice(&list1, it, &list2);

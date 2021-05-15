@@ -80,7 +80,7 @@ int main(void)
 
     // CVEC PAIR
 
-    c_init (cvec_ip, pairs1, { {5, 6}, {3, 4}, {1, 2}, {7, 8} });
+    c_var (cvec_ip, pairs1, { {5, 6}, {3, 4}, {1, 2}, {7, 8} });
     cvec_ip_sort(&pairs1);
 
     c_foreach (i, cvec_ip, pairs1)
@@ -90,7 +90,7 @@ int main(void)
 
     // CLIST PAIR
 
-    c_init (clist_ip, pairs2, { {5, 6}, {3, 4}, {1, 2}, {7, 8} });
+    c_var (clist_ip, pairs2, { {5, 6}, {3, 4}, {1, 2}, {7, 8} });
     clist_ip_sort(&pairs2);
 
     c_foreach (i, clist_ip, pairs2)

@@ -77,8 +77,8 @@ using_csset_str();
 int main ()
 {
     csset_str first = csset_str_init(); // empty
-    c_init (csset_str, second, {"red", "green", "blue"});
-    c_init (csset_str, third, {"orange", "pink", "yellow"});
+    c_var (csset_str, second, {"red", "green", "blue"});
+    c_var (csset_str, third, {"orange", "pink", "yellow"});
 
     csset_str fourth = csset_str_init();
     csset_str_emplace(&fourth, "potatoes");

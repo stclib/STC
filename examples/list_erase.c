@@ -6,7 +6,7 @@ using_clist(i, int);
 
 int main ()
 {
-    c_init (clist_i, L, {10, 20, 30, 40, 50});
+    c_var (clist_i, L, {10, 20, 30, 40, 50});
                                                  // 10 20 30 40 50
     clist_i_iter_t it = clist_i_begin(&L);       // ^
     clist_i_next(&it); 

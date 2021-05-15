@@ -80,8 +80,8 @@ using_cset_str();
 int main ()
 {
     cset_str first = cset_str_init(); // empty
-    c_init (cset_str, second, {"red", "green", "blue"});
-    c_init (cset_str, third, {"orange", "pink", "yellow"});
+    c_var (cset_str, second, {"red", "green", "blue"});
+    c_var (cset_str, third, {"orange", "pink", "yellow"});
 
     cset_str fourth = cset_str_init();
     cset_str_emplace(&fourth, "potatoes");
