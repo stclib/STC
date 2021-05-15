@@ -86,9 +86,9 @@ struct cvec_rep { size_t size, cap; void* data[]; };
     STC_INLINE Value        CX##_value_clone(CX##_value_t val) \
                                 {return valueFromRaw(valueToRaw(&val));} \
     STC_INLINE CX##_iter_t  CX##_begin(const CX* self) \
-                                {CX##_iter_t it = {self->data}; return it;} \
+                                {return c_make(CX##_iter_t){self->data};} \
     STC_INLINE CX##_iter_t  CX##_end(const CX* self) \
-                                {CX##_iter_t it = {self->data + _cvec_rep(self)->size}; return it;} \
+                                {return c_make(CX##_iter_t){self->data + _cvec_rep(self)->size};} \
     STC_INLINE void         CX##_next(CX##_iter_t* it) {++it->ref;} \
     STC_INLINE CX##_iter_t  CX##_adv(CX##_iter_t it, intptr_t offs) {it.ref += offs; return it;} \
     STC_INLINE size_t       CX##_idx(CX cx, CX##_iter_t it) {return it.ref - cx.data;} \
@@ -306,7 +306,7 @@ static struct cvec_rep _cvec_inits = {0, 0};
             memmove(p1, p2, (end - p2) * sizeof(Value)); \
             _cvec_rep(self)->size -= len; \
         } \
-        CX##_iter_t it = {p1}; return it; \
+        return c_make(CX##_iter_t){.ref = p1}; \
     } \
 \
     STC_DEF CX##_iter_t \

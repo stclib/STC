@@ -84,10 +84,10 @@ int main() {
     } \
 \
     STC_INLINE CX##_iter_t CX##_begin(const CX* self) { \
-        CX##_iter_t it = {*self->data}; return it; \
+        return c_make(CX##_iter_t){*self->data}; \
     } \
     STC_INLINE CX##_iter_t CX##_end(const CX* self) { \
-        CX##_iter_t it = {*self->data + self->xdim*self->ydim}; return it; \
+        return c_make(CX##_iter_t){*self->data + self->xdim*self->ydim}; \
     } \
     STC_INLINE void CX##_next(CX##_iter_t* it) { ++it->ref; } \
 \
@@ -131,10 +131,10 @@ int main() {
     } \
 \
     STC_INLINE CX##_iter_t CX##_begin(const CX* self) { \
-        CX##_iter_t it = {**self->data}; return it; \
+        return c_make(CX##_iter_t){**self->data}; \
     } \
     STC_INLINE CX##_iter_t CX##_end(const CX* self) { \
-        CX##_iter_t it = {**self->data + CX##_size(*self)}; return it; \
+        return c_make(CX##_iter_t){**self->data + CX##_size(*self)}; \
     } \
     STC_INLINE void CX##_next(CX##_iter_t* it) { ++it->ref; } \
 \

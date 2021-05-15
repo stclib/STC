@@ -77,7 +77,7 @@ STC_API stc64_uniform_t stc64_uniform_init(int64_t low, int64_t high);
 
 /* Float64 uniform distributed RNG, range [low, high). */
 STC_INLINE stc64_uniformf_t stc64_uniformf_init(double low, double high) {
-    stc64_uniformf_t dist = {low, high - low}; return dist;
+    return c_make(stc64_uniformf_t){low, high - low};
 }
 STC_INLINE double stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist) {
     return stc64_randf(rng)*dist->range + dist->lower;
@@ -96,7 +96,7 @@ STC_INLINE int64_t stc64_uniform(stc64_t* rng, stc64_uniform_t* d) {
 
 /* Normal distributed RNG, Float64. */
 STC_INLINE stc64_normalf_t stc64_normalf_init(double mean, double stddev) {
-    stc64_normalf_t dist = {mean, stddev, 0.0, 0}; return dist;
+    return c_make(stc64_normalf_t){mean, stddev, 0.0, 0};
 }
 STC_API double stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
 

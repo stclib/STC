@@ -28,10 +28,10 @@ static inline int vikingraw_equals(const VikingRaw* rx, const VikingRaw* ry) {
 }
 
 static inline Viking viking_fromRaw(VikingRaw raw) { // note: parameter is by value
-    Viking vk = {cstr_from(raw.name), cstr_from(raw.country)}; return vk;
+    return c_make(Viking){cstr_from(raw.name), cstr_from(raw.country)};
 }
 static inline VikingRaw viking_toRaw(const Viking* vk) {
-    VikingRaw raw = {vk->name.str, vk->country.str}; return raw;
+    return c_make(VikingRaw){vk->name.str, vk->country.str};
 }
 
 // With this in place, we use the using_cmap_keydef() macro to define {Viking -> int} hash map type:

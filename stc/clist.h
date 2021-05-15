@@ -114,7 +114,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
     STC_API CX##_iter_t     CX##_find_in(CX##_iter_t it1, CX##_iter_t it2, RawValue val); \
     STC_API CX##_node_t*    CX##_erase_after_(CX* self, CX##_node_t* node); \
 \
-    STC_INLINE CX           CX##_init(void) {CX cx = {NULL}; return cx;} \
+    STC_INLINE CX           CX##_init(void) {return c_make(CX){NULL};} \
     STC_INLINE bool         CX##_empty(CX cx) {return cx.last == NULL;} \
     STC_INLINE size_t       CX##_count(CX cx) \
                                 {return _clist_count((const clist_VOID*) &cx);} \
@@ -138,18 +138,18 @@ STC_API size_t _clist_count(const clist_VOID* self);
 \
     STC_INLINE CX##_iter_t \
     CX##_iter(const CX* self, CX##_node_t* prev) { \
-        CX##_iter_t it = {&self->last, prev, &prev->next->value}; return it; \
+        return c_make(CX##_iter_t){&self->last, prev, &prev->next->value}; \
     } \
 \
     STC_INLINE CX##_iter_t \
     CX##_begin(const CX* self) { \
         CX##_value_t* head = self->last ? &self->last->next->value : NULL; \
-        CX##_iter_t it = {&self->last, self->last, head}; return it; \
+        return c_make(CX##_iter_t){&self->last, self->last, head}; \
     } \
 \
     STC_INLINE CX##_iter_t \
     CX##_end(const CX* self) { \
-        CX##_iter_t it = {NULL}; return it; \
+        return c_make(CX##_iter_t){NULL}; \
     } \
 \
     STC_INLINE void \

@@ -13,7 +13,7 @@ int main()
 
     uint64_t sum = 0;
 
-    stc64_normalf_t dist2 = stc64_normalf_init(R / 2.0, R / 6.0);
+    stc64_normalf_t dist2 = stc64_normalf_init((float)R / 2.0, (float)R / 6.0);
     size_t N2 = 10000000;
     int hist[R] = {0};
     sum = 0;
@@ -28,10 +28,10 @@ int main()
         printf("%3d %s\n", i, bar.str);
     }
 
-    clock_t diff, before;    
+    clock_t diff, before;
 
     sum = 0;
-    before = clock();    
+    before = clock();
     c_forrange (N)  {
         sum += stc64_rand(&rng);
     }
@@ -40,7 +40,7 @@ int main()
 
     stc64_uniform_t dist1 = stc64_uniform_init(0, 1000);
     sum = 0;
-    before = clock();    
+    before = clock();
     c_forrange (N)  {
         sum += stc64_uniform(&rng, &dist1);
     }

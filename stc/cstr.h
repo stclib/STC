@@ -67,13 +67,13 @@ STC_API char*           c_strncasestr(const char* s, const char* needle, size_t 
 
 STC_INLINE cstr         cstr_init() { return cstr_null; }
 #define                 cstr_new(literal) \
-                            cstr_from_n(literal, sizeof c_cast(strlit_t){literal} - 1)
+                            cstr_from_n(literal, sizeof c_make(strlit_t){literal} - 1)
 STC_INLINE cstr         cstr_from(const char* str)
                             { return cstr_from_n(str, strlen(str)); }
 STC_INLINE size_t       cstr_size(cstr s) { return _cstr_rep(&s)->size; }
 STC_INLINE size_t       cstr_length(cstr s) { return _cstr_rep(&s)->size; }
 STC_INLINE size_t       cstr_capacity(cstr s) { return _cstr_rep(&s)->cap; }
-STC_INLINE size_t       cstr_empty(cstr s) { return _cstr_rep(&s)->size == 0; }
+STC_INLINE bool         cstr_empty(cstr s) { return _cstr_rep(&s)->size == 0; }
 STC_INLINE void         cstr_del(cstr* self)
                             { if (_cstr_rep(self)->cap) c_free(_cstr_rep(self)); }
 STC_INLINE cstr         cstr_clone(cstr s)
@@ -108,9 +108,9 @@ STC_INLINE char*        cstr_front(cstr* self) { return self->str; }
 STC_INLINE char*        cstr_back(cstr* self)
                             { return self->str + _cstr_rep(self)->size - 1; }
 STC_INLINE cstr_iter_t  cstr_begin(cstr* self)
-                            { return c_cast(cstr_iter_t){self->str}; }
+                            { return c_make(cstr_iter_t){self->str}; }
 STC_INLINE cstr_iter_t  cstr_end(cstr* self)
-                            { return c_cast(cstr_iter_t){self->str + _cstr_rep(self)->size}; }
+                            { return c_make(cstr_iter_t){self->str + _cstr_rep(self)->size}; }
 STC_INLINE void         cstr_next(cstr_iter_t* it) {++it->ref; }
 STC_INLINE bool         cstr_equals(cstr s1, const char* str)
                             { return strcmp(s1.str, str) == 0; }
@@ -122,10 +122,6 @@ STC_INLINE bool         cstr_contains(cstr s, const char* needle)
                             { return strstr(s.str, needle) != NULL; }
 STC_INLINE bool         cstr_icontains(cstr s, const char* needle)
                             { return c_strncasestr(s.str, needle, cstr_npos) != NULL; }
-STC_INLINE bool         cstr_begins_with(cstr s, const char* needle)
-                            { return strncmp(s.str, needle, strlen(needle)) == 0; }
-STC_INLINE bool         cstr_ibegins_with(cstr s, const char* needle)
-                            { return c_strncasecmp(s.str, needle, strlen(needle)) == 0; }
 STC_INLINE bool         cstr_getline(cstr *self, FILE *stream)
                             { return cstr_getdelim(self, '\n', stream); }
 
@@ -159,15 +155,27 @@ cstr_move(cstr* self) {
 }
 
 STC_INLINE bool
-cstr_ends_with(cstr s, const char* needle) {
-    size_t n = strlen(needle), sz = _cstr_rep(&s)->size;
-    return n <= sz ? memcmp(s.str + sz - n, needle, n) == 0 : false;
+cstr_begins_with(cstr s, const char* sub) {
+    while (*sub && *s.str == *sub) ++s.str, ++sub;
+    return *sub == 0;
 }
 
 STC_INLINE bool
-cstr_iends_with(cstr s, const char* needle) {
-    size_t n = strlen(needle), sz = _cstr_rep(&s)->size;
-    return n <= sz ? c_strncasecmp(s.str + sz - n, needle, n) == 0 : false;
+cstr_ends_with(cstr s, const char* sub) {
+    size_t n = strlen(sub), sz = _cstr_rep(&s)->size;
+    return n <= sz ? memcmp(s.str + sz - n, sub, n) == 0 : false;
+}
+
+STC_INLINE bool
+cstr_ibegins_with(cstr s, const char* sub) {
+    while (*sub && tolower(*s.str) == tolower(*sub)) ++s.str, ++sub;
+    return *sub == 0;
+}
+
+STC_INLINE bool
+cstr_iends_with(cstr s, const char* sub) {
+    size_t n = strlen(sub), sz = _cstr_rep(&s)->size;
+    return n <= sz ? c_strncasecmp(s.str + sz - n, sub, n) == 0 : false;
 }
 
 /* cvec/cmap adaption functions: */

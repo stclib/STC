@@ -91,9 +91,9 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
     STC_INLINE CX##_value_t* CX##_at(const CX* self, size_t idx) \
                                 {assert(idx < _cdeq_rep(self)->size); return self->data + idx;} \
     STC_INLINE CX##_iter_t   CX##_begin(const CX* self) \
-                                {CX##_iter_t it = {self->data}; return it;} \
+                                {return c_make(CX##_iter_t){self->data};} \
     STC_INLINE CX##_iter_t   CX##_end(const CX* self) \
-                                {CX##_iter_t it = {self->data + _cdeq_rep(self)->size}; return it;} \
+                                {return c_make(CX##_iter_t){self->data + _cdeq_rep(self)->size};} \
     STC_INLINE void          CX##_next(CX##_iter_t* it) {++it->ref;} \
     STC_INLINE CX##_iter_t   CX##_adv(CX##_iter_t it, intptr_t offs) {it.ref += offs; return it;} \
     STC_INLINE size_t        CX##_idx(CX cx, CX##_iter_t it) {return it.ref - cx.data;} \
@@ -206,7 +206,7 @@ static struct cdeq_rep _cdeq_inits = {0, 0};
     STC_DEF CX \
     CX##_init(void) { \
         CX##_value_t *b = (CX##_value_t *) _cdeq_inits.base; \
-        CX cx = {b, b}; return cx; \
+        return c_make(CX){b, b}; \
     } \
 \
     STC_DEF void \
@@ -333,7 +333,7 @@ static struct cdeq_rep _cdeq_inits = {0, 0};
             else memmove(p1, p2, (end - p2) * sizeof(Value)); \
             _cdeq_rep(self)->size -= n; \
         } \
-        CX##_iter_t it = {p1}; return it; \
+        return c_make(CX##_iter_t){p1}; \
     } \
 \
     STC_DEF CX##_iter_t \

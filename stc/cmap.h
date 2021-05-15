@@ -190,7 +190,7 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
     STC_API CX##_result_t    CX##_insert_entry_(CX* self, RawKey rkey); \
     STC_API void             CX##_erase_entry(CX* self, CX##_value_t* val); \
 \
-    STC_INLINE CX            CX##_init(void) {CX m = _cmap_inits; return m;} \
+    STC_INLINE CX            CX##_init(void) {return c_make(CX)_cmap_inits;} \
     STC_INLINE void          CX##_shrink_to_fit(CX* self) {CX##_reserve(self, self->size);} \
     STC_INLINE void          CX##_max_load_factor(CX* self, float ml) {self->max_load_factor = ml;} \
     STC_INLINE bool          CX##_empty(CX m) {return m.size == 0;} \
@@ -288,7 +288,7 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
 \
     STC_INLINE CX##_iter_t \
     CX##_end(const CX* self) \
-        {CX##_iter_t it = {self->table + self->bucket_count}; return it;} \
+        {return c_make(CX##_iter_t){self->table + self->bucket_count};} \
 \
     STC_INLINE void \
     CX##_next(CX##_iter_t* it) \
