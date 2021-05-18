@@ -25,6 +25,7 @@ the multi-map/set variants:
 - [***csset*** - **std::set** sorted set alike type](docs/csset_api.md)
 - [***cstack*** - **std::stack** alike (adapter) type](docs/cstack_api.md)
 - [***cstr*** - **std::string** alike type](docs/cstr_api.md)
+- [***csview*** - **std::string_view** alike type](docs/csview_api.md)
 - [***cvec*** - **std::vector** alike type](docs/cvec_api.md)
 
 Others:
