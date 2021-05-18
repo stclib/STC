@@ -125,32 +125,32 @@ int main()
     printf("%s\nLength: %zu\n\n", text.str, text.size);
 
     // cvec of cstr elements, using csview as "emplace" type
-    c_var (cvec_sv, vec, {
-        c_sv("Element 1"),
+    c_var (cvec_sv, vec, {  // defines vec with 3 cstr elements.
+        c_sv("Element 1"),  // will be converted to cstr.
         c_sv("Element 2"),
         c_sv("Element 3")
     });
-    
-    // push constructed cstr directly
-    cvec_sv_push_back(&vec, cstr_new("Second last element"));
-    // emplace constructs cstr from a csview
-    cvec_sv_emplace_back(&vec, c_sv("Last element"));
+    c_defer (cvec_sv_del(&vec))  // defer destruction to end of block.
+    {
+        // push constructed cstr directly
+        cvec_sv_push_back(&vec, cstr_new("Second last element"));
+        // emplace constructs cstr from a csview
+        cvec_sv_emplace_back(&vec, c_sv("Last element"));
 
-    c_foreach (i, cvec_sv, vec)
-        printf("%s\n", i.ref->str);
+        c_foreach (i, cvec_sv, vec)
+            printf("%s\n", i.ref->str);
+    }
 
-    c_var (cmap_si, map, {
-        {c_sv("hello"), 100},
-        {c_sv("world"), 200}
-    });
-    cmap_si_emplace(&map, c_sv("gone mad"), 300);
+    c_withvar (cmap_si, map) // defines map and defers destruction.
+    {
+        cmap_si_emplace(&map, c_sv("hello"), 100);
+        cmap_si_emplace(&map, c_sv("world"), 200);
+        cmap_si_emplace(&map, c_sv("gone mad"), 300);
 
-    // cmap_si_get() knows the length of "world" without strlen().
-    cmap_si_value_t* v = cmap_si_get(&map, c_sv("world"));
-    printf("\n%s: %d\n", v->first.str, v->second);
-
-    cmap_si_del(&map);
-    cvec_sv_del(&vec);
+        // Efficient lookup: no string allocation or strlen() takes place:
+        cmap_si_value_t* v = cmap_si_get(&map, c_sv("world"));
+        printf("\n%s: %d\n", v->first.str, v->second);
+    }
 }
 ```
 Output:
