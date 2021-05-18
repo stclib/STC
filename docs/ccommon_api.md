@@ -50,11 +50,11 @@ c_foreach (i, csset_x, it, csset_x_end(&set)) printf(" %d", *i.ref);
 ```
 
 ### c_with, c_withbuffer, c_breakwith
-General defer in block mechanics. **c_withbuffer** is special for buffers, uses stack memory if buf is up to 256 bytes,
+General ***defer*** mechanics. **c_withbuffer** is special for buffers, uses stack memory if buf is up to 256 bytes,
 and heap memory otherwise.
 
-***NB***: Use only **c_breakwith** to break out of the block if needed, never use **return**, **break**,
-or **goto** inside a with-block.
+***NB***: Use ***only*** **c_breakwith** to break out of the block if needed, ***never*** use `return`, `break`,
+or `goto` inside a **c_with**-block.
 
 | Usage                          | Description                          |
 |:-------------------------------|:-------------------------------------|
