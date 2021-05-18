@@ -22,11 +22,13 @@ All csview definitions and prototypes are available by including a single header
 ## Methods
 
 ```c
-csview        csview_new(const char literal_only[]);                     // csview from literal, no strlen()
 csview        c_sv(const char literal_only[]);                           // shorthand for csview_new()
+csview        csview_new(const char literal_only[]);                     // csview from literal, no strlen()
 csview        csview_from(const char* str);                              // construct
 csview        csview_from_n(const char* str, size_t n);                  // construct
 csview        csview_from_s(cstr s);                                     // construct
+csview        csview_remove_prefix(csview sv, size_t n);
+csview        csview_remove_suffix(csview sv, size_t n);
 csview        csview_substr(csview sv, size_t pos, size_t n);
  
 size_t        csview_size(csview sv);
@@ -79,9 +81,11 @@ uint64_t      csview_hash_ref(const csview* x, size_t ignored);
 
 ## Constants and macros
 
-| Name              | Value             |
-|:------------------|:------------------|
-|  `csview_null`    | csview null value |
+| Name             | Value              | Usage                            |
+|:-----------------|:-------------------|:---------------------------------|
+| `csview_null`    | same as `c_sv("")` | `sview = csview_null;`           |
+| `c_sv(literal)`  | csview constructor | `sview = c_sv("hello, world");`  |
+| `csview_PRN(sv)` | printf argument    | `printf("%.*s", csview_PRN(sv));`|
 
 ## Container adaptors
 ```
@@ -106,23 +110,31 @@ using_cset_sv()
 
 ## Example
 ```c
+#include <stc/csview.h>
+#include <stc/cvec.h>
 #include <stc/cmap.h>
 
-using_cmap_svkey(si, int); // cmap<cstr, int> with csview as convertion type
-using_cvec_sv();           // cvec<cstr> with csview as convertion type
+// cmap<cstr, int> with csview as convertion type
+using_cmap_svkey(si, int);
+// cvec<cstr> with csview as convertion type
+using_cvec_sv();
 
 int main()
 {
     csview text = c_sv("A long and winded literal string");
     printf("%s\nLength: %zu\n\n", text.str, text.size);
 
+    // cvec of cstr elements, using csview as "emplace" type
     c_var (cvec_sv, vec, {
         c_sv("Element 1"),
         c_sv("Element 2"),
         c_sv("Element 3")
     });
+    
+    // push constructed cstr directly
     cvec_sv_push_back(&vec, cstr_new("Second last element"));
-    cvec_sv_emplace_back(&vec, c_sv("Last element")); // converts from csview to cstr
+    // emplace constructs cstr from a csview
+    cvec_sv_emplace_back(&vec, c_sv("Last element"));
 
     c_foreach (i, cvec_sv, vec)
         printf("%s\n", i.ref->str);
@@ -133,6 +145,7 @@ int main()
     });
     cmap_si_emplace(&map, c_sv("gone mad"), 300);
 
+    // cmap_si_get() knows the length of "world" without strlen().
     cmap_si_value_t* v = cmap_si_get(&map, c_sv("world"));
     printf("\n%s: %d\n", v->first.str, v->second);
 

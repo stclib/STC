@@ -33,10 +33,10 @@ c_forrange (i, int, 30, 0, -5) printf(" %d", i);
 
 ### c_foreach
 
-| Usage                                         | Description                     |
-|:----------------------------------------------|:--------------------------------|
-| `c_foreach (it, ctype, container)`            | `Iteratate all elements `       |
-| `c_foreach (it, ctype, it1, it2)`             | `Iterate the range [it1, it2)`  |
+| Usage                                | Description                  |
+|:-------------------------------------|:-----------------------------|
+| `c_foreach (it, ctype, container)`   | Iteratate all elements       |
+| `c_foreach (it, ctype, it1, it2)`    | Iterate the range [it1, it2) |
 
 ```c
 using_csset(x, int);
@@ -49,44 +49,58 @@ c_foreach (i, csset_x, it, csset_x_end(&set)) printf(" %d", *i.ref);
 // 7 12 23
 ```
 
-### c_withfile, c_withbuffer, c_breakwith
-Simplifies reading a file. Use only **c_breakwith** to break out of the block if needed.
-**c_withbuffer** uses stack memory if buf is up to 256 bytes, and heap memory otherwise:
+### c_with, c_withbuffer, c_breakwith
+General defer in block mechanics. **c_withbuffer** is special for buffers, uses stack memory if buf is up to 256 bytes,
+and heap memory otherwise.
 
-| Usage                          | Description                       |
-|:-------------------------------|:----------------------------------|
-| `c_withfile (fp, fileopen)`    | `Declare, open and close file`    |
-| `c_withbuffer (buf, type, n)`  | `Declare, allocate and free buf`  |
+***NB***: Use only **c_breakwith** to break out of the block if needed, never use **return**, **break**,
+or **goto** inside a with-block.
+
+| Usage                          | Description                          |
+|:-------------------------------|:-------------------------------------|
+| `c_with (acquire, release)`    | Do `acquire`. Defer `release` to end |
+| `c_withbuffer (buf, type, n)`  | Declare, allocate and free buf       |
+
+The `acquire`argument must be of the form: `type var = get_resource`.
 
 ```c
-// Load each line of a text file into a vector of strings
+// Example: Load each line of a text file into a vector of strings
 #include <errno.h>
 #include <stc/cstr.h>
 #include <stc/cvec.h>
 
 using_cvec_str();
 
-cvec_str readFile(const char* name) {
+cvec_str readFile(const char* name)
+{
+    // receiver should check errno variable
     cvec_str vec = cvec_str_init();
 
-    // Next line declares, opens, and closes the FILE*
-    c_withfile (fp, fopen(name, "r")) {
-        cstr line = cstr_init();
-        while (cstr_getline(&line, fp))
-            cvec_str_emplace_back(&vec, line.str);
-        cstr_del(&line);
-    }
-    return vec;   // receiver should check errno variable
+    c_with (FILE* fp = fopen(name, "r"), fclose(fp))
+        c_with (cstr line = cstr_null, cstr_del(&line))
+            while (cstr_getline(&line, fp))
+                cvec_str_emplace_back(&vec, line.str);
+
+    return vec;
+}
+
+int main()
+{
+    c_with (cvec_str x = readFile(__FILE__), cvec_str_del(&x))
+        c_foreach (i, cvec_str, x)
+            printf("%s\n", i.ref->str);
 }
 ```
 
-### c_new, c_new_n, c_del
+### c_new, c_new_n, c_del, c_make
 
 | Usage                          | Meaning                                 |
 |:-------------------------------|:----------------------------------------|
 | `c_new (type)`                 | `(type *) c_malloc(sizeof(type))`       |
 | `c_new_n (type, N)`            | `(type *) c_malloc((N)*sizeof(type))`   |
-| `c_del (ctype, c1, ..., cN)`   | `ctype_del(c1); ... ctype_del(cN)`      |
+| `c_del (ctype, &c1, ..., &cN)` | `ctype_del(&c1); ... ctype_del(&cN)`    |
+| `c_make(type){value...}`       | `(type){value...}` // c++ compatability |
+
 ```c
 int* array = c_new_n (int, 100);
 c_free(array);

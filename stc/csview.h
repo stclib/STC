@@ -29,6 +29,7 @@ typedef                 struct { const char* str; size_t size; } csview;
 typedef                 struct { const char *ref; } csview_iter_t;
 typedef                 char csview_value_t;
 #define                 csview_null  c_make(csview){"", 0}
+#define                 csview_PRN(sv) (int)(sv).size, (sv).str
 
 #define                 csview_new(literal) \
                             c_make(csview){literal, sizeof c_make(strlit_t){literal} - 1}
@@ -38,10 +39,12 @@ STC_INLINE csview       csview_from(const char* str)
                             { return c_make(csview){str, strlen(str)}; }
 STC_INLINE csview       csview_from_n(const char* str, size_t n)
                             { return c_make(csview){str, n}; }
-STC_INLINE csview       csview_from_v(csview sv, size_t pos)
-                            { sv.str += pos, sv.size -= pos; return sv; }
 STC_INLINE csview       csview_from_s(cstr s)
                             { return c_make(csview){s.str, _cstr_rep(&s)->size}; }
+STC_INLINE csview       csview_remove_prefix(csview sv, size_t n)
+                            { sv.str += n, sv.size -= n; return sv; }
+STC_INLINE csview       csview_remove_suffix(csview sv, size_t n)
+                            { sv.size -= n; return sv; }
 STC_INLINE csview       csview_substr(csview sv, size_t pos, size_t n)
                             { sv.str += pos, sv.size = n; return sv; }
 
@@ -52,13 +55,13 @@ STC_INLINE void         csview_clear(csview* self) { *self = csview_null; }
 STC_INLINE const char*  csview_front(const csview* self) { return self->str; }
 STC_INLINE const char*  csview_back(const csview* self) { return self->str + self->size - 1; }
 
+STC_INLINE bool         csview_equals(csview sv, csview sv2)
+                            { return sv.size == sv2.size && !memcmp(sv.str, sv2.str, sv.size); }
 STC_INLINE size_t       csview_find(csview sv, csview needle)
                             { char* res = c_strnstrn(sv.str, needle.str, sv.size, needle.size);
                               return res ? res - sv.str : cstr_npos; }
-STC_INLINE bool         csview_equals(csview sv, csview sv2)
-                            { return sv.size == sv2.size && !memcmp(sv.str, sv2.str, sv.size); }
-STC_INLINE bool         csview_contains(csview sv, csview sub)
-                            { return c_strnstrn(sv.str, sub.str, sv.size, sub.size) != NULL; }
+STC_INLINE bool         csview_contains(csview sv, csview needle)
+                            { return c_strnstrn(sv.str, needle.str, sv.size, needle.size) != NULL; }
 STC_INLINE bool         csview_begins_with(csview sv, csview sub)
                             { if (sub.size > sv.size) return false;
                               return !memcmp(sv.str, sub.str, sub.size); }
@@ -85,13 +88,13 @@ STC_INLINE void         cstr_insert_v(cstr* self, size_t pos, csview sv)
                             { cstr_replace_n(self, pos, 0, sv.str, sv.size); }
 STC_INLINE void         cstr_replace_v(cstr* self, size_t pos, size_t len, csview sv)
                             { cstr_replace_n(self, pos, len, sv.str, sv.size); }
+STC_INLINE bool         cstr_equals_v(cstr s, csview sv)
+                            { return sv.size == cstr_size(s) && !memcmp(s.str, sv.str, sv.size); }
 STC_INLINE size_t       cstr_find_v(cstr s, csview needle)
                             { char* res = c_strnstrn(s.str, needle.str, cstr_size(s), needle.size);
                               return res ? res - s.str : cstr_npos; }
-STC_INLINE bool         cstr_equals_v(cstr s, csview sv)
-                            { return sv.size == cstr_size(s) && !memcmp(s.str, sv.str, sv.size); }
-STC_INLINE bool         cstr_contains_v(cstr s, csview sub)
-                            { return c_strnstrn(s.str, sub.str, cstr_size(s), sub.size) != NULL; }
+STC_INLINE bool         cstr_contains_v(cstr s, csview needle)
+                            { return c_strnstrn(s.str, needle.str, cstr_size(s), needle.size) != NULL; }
 STC_INLINE bool         cstr_begins_with_v(cstr s, csview sub)
                             { if (sub.size > cstr_size(s)) return false;
                               return !memcmp(s.str, sub.str, sub.size); }
