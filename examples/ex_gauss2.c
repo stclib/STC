@@ -30,7 +30,7 @@ int main()
     // Print the gaussian bar chart
     cstr bar = cstr_init();
     c_foreach (i, csmap_i, mhist) {
-        size_t n = (size_t) (i.ref->second * StdDev * Scale * 2.5 / N);
+        size_t n = (size_t) (i.ref->second * StdDev * Scale * 2.5 / (float)N);
         if (n > 0) {
             cstr_resize(&bar, n, '*');
             printf("%4d %s\n", i.ref->first, bar.str);

@@ -67,7 +67,7 @@ int main() {
     typedef struct { CX##_value_t **data; size_t xdim, ydim; } CX; \
     typedef struct { CX##_value_t *ref; } CX##_iter_t; \
 \
-    STC_API CX CX##_with_value(size_t xdim, size_t ydim, Value value); \
+    STC_API CX CX##_with_values(size_t xdim, size_t ydim, Value value); \
     STC_API CX CX##_with_storage(size_t xdim, size_t ydim, CX##_value_t* storage); \
     STC_API CX CX##_clone(CX src); \
 \
@@ -111,7 +111,7 @@ int main() {
     typedef struct { CX##_value_t ***data; size_t xdim, ydim, zdim; } CX; \
     typedef struct { CX##_value_t *ref; } CX##_iter_t; \
 \
-    STC_API CX CX##_with_value(size_t xdim, size_t ydim, size_t zdim, Value value); \
+    STC_API CX CX##_with_values(size_t xdim, size_t ydim, size_t zdim, Value value); \
     STC_API CX CX##_with_storage(size_t xdim, size_t ydim, size_t zdim, CX##_value_t* storage); \
     STC_API CX CX##_clone(CX src); \
 \
@@ -154,7 +154,7 @@ int main() {
         return _arr; \
     } \
 \
-    STC_DEF CX CX##_with_value(size_t xdim, size_t ydim, Value value) { \
+    STC_DEF CX CX##_with_values(size_t xdim, size_t ydim, Value value) { \
         CX _arr = CX##_init(xdim, ydim); \
         for (CX##_value_t* p = _arr.data[0], *e = p + xdim*ydim; p != e; ++p) \
             *p = value; \
@@ -189,7 +189,7 @@ int main() {
         return _arr; \
     } \
 \
-    STC_DEF CX CX##_with_value(size_t xdim, size_t ydim, size_t zdim, Value value) { \
+    STC_DEF CX CX##_with_values(size_t xdim, size_t ydim, size_t zdim, Value value) { \
         CX _arr = CX##_init(xdim, ydim, zdim); \
         for (CX##_value_t* p = **_arr.data, *e = p + xdim*ydim*zdim; p != e; ++p) \
             *p = value; \

@@ -15,12 +15,12 @@ All cstr definitions and prototypes are available by including a single header f
 ## Methods
 
 ```c
-cstr         cstr_init(void);                                         // constructor
-cstr         cstr_new(const char literal_only[]);                     // constructor
+cstr         cstr_init(void);                                         // constructor; same as cstr_null.
+cstr         cstr_new(const char literal_only[]);                     // cstr from literal; no strlen().
+cstr         cstr_from(const char* str);                              // constructor using strlen()
+cstr         cstr_from_n(const char* str, size_t n);                  // constructor with specified length
 cstr         cstr_with_capacity(size_t cap);
 cstr         cstr_with_size(size_t len, char fill);                   // repeat fill len times
-cstr         cstr_from(const char* str);
-cstr         cstr_from_n(const char* str, size_t n);
 cstr         cstr_from_fmt(const char* fmt, ...);                     // printf() formatting
 cstr         cstr_clone(cstr s);
 
@@ -62,14 +62,14 @@ int          cstr_compare(const cstr *s1, const cstr *s2);
 bool         cstr_equals(cstr s, const char* str);
 bool         cstr_equals_s(cstr s, cstr s2);
 size_t       cstr_find(cstr s, const char* substr);
-size_t       cstr_find_n(cstr s, const char* substr, size_t pos, size_t n);
-bool         cstr_contains(cstr s, const char* substr);
+size_t       cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax);
+bool         cstr_contains(cstr s, const char* needle);
 bool         cstr_begins_with(cstr s, const char* substr);
 bool         cstr_ends_with(cstr s, const char* substr);
 
 bool         cstr_iequals(cstr s, const char* str);                   // prefix i = case-insensitive
-size_t       cstr_ifind_n(cstr s, const char* substr, size_t pos, size_t n);
-bool         cstr_icontains(cstr s, const char* substr);
+size_t       cstr_ifind_n(cstr s, const char* needle, size_t pos, size_t nmax);
+bool         cstr_icontains(cstr s, const char* needle);
 bool         cstr_ibegins_with(cstr s, const char* substr);
 bool         cstr_iends_with(cstr s, const char* substr);
 
@@ -96,8 +96,8 @@ int          c_rawstr_compare(const char** x, const char** y);
 bool         c_rawstr_equals(const char** x, const char** y);
 uint64_t     c_rawstr_hash(const char* const* x, size_t ignored);
 int          c_strncasecmp(const char* str1, const char* str2, size_t n);
-char*        c_strnstr(const char* str, const char* needle, size_t n);
-char*        c_strncasestr(const char* str, const char* needle, size_t n);
+char*        c_strnstrn(const char* str, const char* needle, size_t slen, size_t nmax);
+char*        c_strncasestrn(const char* str, const char* needle, size_t slen, size_t nmax);
 ```
 
 ## Types
@@ -113,7 +113,7 @@ char*        c_strncasestr(const char* str, const char* needle, size_t n);
 | Name              | Value             |
 |:------------------|:------------------|
 |  `cstr_npos`      | `((size_t) -1)`   |
-|  `cstr_null       | cstr null value   |
+|  `cstr_null`      | cstr null value   |
 
 ## Example
 ```c

@@ -29,7 +29,7 @@ be replaced by `i` in all of the following documentation.
 
 ```c
 carray2X            carray2X_init(size_t xdim, size_t ydim);
-carray2X            carray2X_with_value(size_t xdim, size_t ydim, Value val);
+carray2X            carray2X_with_values(size_t xdim, size_t ydim, Value val);
 carray2X            carray2X_with_storage(size_t xdim, size_t ydim, Value* array);
 carray2X            carray2X_clone(carray2X arr);
 Value*              carray2X_release(carray2X* self);       // release storage (not freed)
@@ -45,7 +45,7 @@ void                carray2X_next(carray2X_iter_t* it);
 ```
 ```c
 carray3X            carray3X_init(size_t xdim, size_t ydim, size_t zdim);
-carray3X            carray3X_with_value(size_t xdim, size_t ydim, size_t zdim, Value val);
+carray3X            carray3X_with_values(size_t xdim, size_t ydim, size_t zdim, Value val);
 carray3X            carray3X_with_storage(size_t xdim, size_t ydim, size_t zdim, Value* array);
 carray3X            carray3X_clone(carray3X arr);
 Value*              carray3X_release(carray3X* self);       // release storage (not freed)

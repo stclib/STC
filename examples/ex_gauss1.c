@@ -10,12 +10,12 @@
 using_cmap(i, int, size_t);
 
 // Declare int vector with map entries that can be sorted by map keys.
-struct mapval {int first; size_t second;};
-static int compare(struct mapval *a, struct mapval *b) {
+c_struct (mapval) {int first; size_t second;};
+static int compare(mapval *a, mapval *b) {
     return c_default_compare(&a->first, &b->first);
 }
 
-using_cvec(e, struct mapval, compare);
+using_cvec(e, mapval, compare);
 
 int main()
 {
@@ -39,13 +39,13 @@ int main()
     // Transfer map to vec and sort it by map keys.
     cvec_e vhist = cvec_e_init();
     c_foreach (i, cmap_i, mhist)
-        cvec_e_push_back(&vhist, (struct mapval){i.ref->first, i.ref->second});
+        cvec_e_push_back(&vhist, c_make(mapval){i.ref->first, i.ref->second});
     cvec_e_sort(&vhist);
 
     // Print the gaussian bar chart
     cstr bar = cstr_init();
     c_foreach (i, cvec_e, vhist) {
-        size_t n = (size_t) (i.ref->second * StdDev * Scale * 2.5 / N);
+        size_t n = (size_t) (i.ref->second * StdDev * Scale * 2.5 / (float)N);
         if (n > 0) {
             cstr_resize(&bar, n, '*');
             printf("%4d %s\n", i.ref->first, bar.str);

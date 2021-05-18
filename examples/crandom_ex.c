@@ -13,7 +13,7 @@ int main()
 
     uint64_t sum = 0;
 
-    stc64_normalf_t dist2 = stc64_normalf_init(R / 2.0, R / 6.0);
+    stc64_normalf_t dist2 = stc64_normalf_init((float)R / 2.0, (float)R / 6.0);
     size_t N2 = 10000000;
     int hist[R] = {0};
     sum = 0;

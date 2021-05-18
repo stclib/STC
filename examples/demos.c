@@ -184,7 +184,7 @@ using_carray3(f, float);
 void arraydemo1()
 {
     printf("\nARRAYDEMO1\n");
-    carray3f arr3 = carray3f_with_value(30, 20, 10, 0.0f);
+    carray3f arr3 = carray3f_with_values(30, 20, 10, 0.0f);
     arr3.data[5][4][3] = 10.2f;
     float **arr2 = arr3.data[5];
     float *arr1 = arr3.data[5][4];
