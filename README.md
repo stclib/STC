@@ -215,17 +215,16 @@ and non-emplace methods:
 using_cvec_str(); // vector of string (cstr)
 ...
 cvec_str vec = cvec_str_init();
-cstr s = cstr_from("a new string");
+cstr s = cstr_new("a string literal");            // cstr_new() for literals; no strlen() usage
+c_defer (cvec_str_del(&vec), cstr_del(&s))        // defer the destructors to end of block:
+{
+    cvec_str_push_back(&vec, cstr_from("Hello")); // construct and add string from const char*
+    cvec_str_push_back(&vec, cstr_clone(s));      // clone and add an existing string
 
-cvec_str_push_back(&vec, cstr_from("Hello")); // construct and add string
-cvec_str_push_back(&vec, cstr_clone(s));      // clone and add an existing string
-
-cvec_str_emplace_back(&vec, "Yay, literal");  // internally constructs cstr from string-literal
-cvec_str_emplace_back(&vec, cstr_clone(s));   // <-- COMPILE ERROR: wrong input type
-cvec_str_emplace_back(&vec, s.str);           // Ok: const char* input type (= rawvalue).
-
-cstr_del(&s);
-cvec_del(&vec);
+    cvec_str_emplace_back(&vec, "Yay, literal");  // internally constructs cstr from string-literal
+    cvec_str_emplace_back(&vec, cstr_clone(s));   // <-- COMPILE ERROR: wrong input type
+    cvec_str_emplace_back(&vec, s.str);           // Ok: const char* input type (= rawvalue).
+}
 ```
 This is made possible because the **using**-declarations may be given an optional
 conversion/"rawvalue"-type as template parameter, along with a back and forth conversion 
