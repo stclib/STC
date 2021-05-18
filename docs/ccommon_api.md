@@ -76,11 +76,11 @@ cvec_str readFile(const char* name)
     // receiver should check errno variable
     cvec_str vec = cvec_str_init();
 
-    c_with (FILE* fp = fopen(name, "r"), fclose(fp))
+    c_with (FILE* fp = fopen(name, "r"), fclose(fp)) {
         c_with (cstr line = cstr_null, cstr_del(&line))
             while (cstr_getline(&line, fp))
                 cvec_str_emplace_back(&vec, line.str);
-
+    }
     return vec;
 }
 
