@@ -15,27 +15,28 @@ int main1()
         "this", "sentence", "is", "not", "a", "sentence",
         "this", "sentence", "is", "a", "hoax"
     });
+    c_defer (clist_str_del(&lwords))
+    {
+        clist_str_push_back(&lwords, cstr_from_fmt("%.15f", sqrt(2)));
+        c_foreach (w, clist_str, lwords)
+            printf("%s\n", w.ref->str);
+        puts("");
 
-    clist_str_push_back(&lwords, cstr_from_fmt("%.15f", sqrt(2)));
-    c_foreach (w, clist_str, lwords)
-        printf("%s\n", w.ref->str);
-    puts("");
+        c_var (cvec_str, words, {
+            "this", "sentence", "is", "not", "a", "sentence",
+            "this", "sentence", "is", "a", "hoax"
+        });
+        c_defer (cvec_str_del(&words))
+        {
+            cmap_si word_map = cmap_si_init();
+            c_foreach (w, cvec_str, words)
+                cmap_si_emplace(&word_map, w.ref->str, 0).ref->second += 1;
 
-    c_var (cvec_str, words, {
-        "this", "sentence", "is", "not", "a", "sentence",
-        "this", "sentence", "is", "a", "hoax"
-    });
-
-    cmap_si word_map = cmap_si_init();
-    c_foreach (w, cvec_str, words)
-        cmap_si_emplace(&word_map, w.ref->str, 0).ref->second += 1;
-
-    c_foreach (i, cmap_si, word_map) {
-        printf("%d occurrences of word '%s'\n", i.ref->second, i.ref->first.str);
+            c_foreach (i, cmap_si, word_map) {
+                printf("%d occurrences of word '%s'\n", i.ref->second, i.ref->first.str);
+            }
+        }
     }
-
-    cmap_si_del(&word_map);
-    cvec_str_del(&words);
     return 0;
 }
 

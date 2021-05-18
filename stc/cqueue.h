@@ -35,23 +35,23 @@
         stc64_t rng = stc64_init(1234);
         stc64_uniform_t dist = stc64_uniform_init(rng, 0, n);
 
-        cqueue_i queue = cqueue_i_init();
+        c_withvar (cqueue_i, queue)
+        {
+            // Push ten million random numbers onto the queue.
+            for (int i=0; i<n; ++i)
+                cqueue_i_push(&queue, stc64_uniform(&dist));
 
-        // Push ten million random numbers onto the queue.
-        for (int i=0; i<n; ++i)
-            cqueue_i_push(&queue, stc64_uniform(&dist));
-
-        // Push or pop on the queue ten million times
-        printf("%d\n", n);
-        for (int i=n; i>0; --i) {
-            int r = stc64_uniform(&dist);
-            if (r & 1)
-                ++n, cqueue_i_push(&queue, r);
-            else
-                --n, cqueue_i_pop(&queue);
+            // Push or pop on the queue ten million times
+            printf("%d\n", n);
+            for (int i=n; i>0; --i) {
+                int r = stc64_uniform(&dist);
+                if (r & 1)
+                    ++n, cqueue_i_push(&queue, r);
+                else
+                    --n, cqueue_i_pop(&queue);
+            }
         }
         printf("%d\n", n);
-        cqueue_i_del(&queue);
     }
 */
 #include "cdeq.h"

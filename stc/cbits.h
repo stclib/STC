@@ -30,25 +30,26 @@ Similar to boost::dynamic_bitset / std::bitset
 #include "cbits.h"
 
 int main() {
-    cbits bset = cbits_with_size(23, true);
-    cbits_reset(&bset, 9);
-    cbits_resize(&bset, 43, false);
+    c_with (cbits bset = cbits_with_size(23, true), cbits_del(&bset))
+    {
+        cbits_reset(&bset, 9);
+        cbits_resize(&bset, 43, false);
 
-    printf("%4zu: ", bset.size);
-    c_forrange (i, bset.size)
-        printf("%d", cbits_at(&bset, i));
-    puts("");
-    cbits_set(&bset, 28);
-    cbits_resize(&bset, 77, true);
-    cbits_resize(&bset, 93, false);
-    cbits_resize(&bset, 102, true);
-    cbits_set_value(&bset, 99, false);
+        printf("%4zu: ", bset.size);
+        c_forrange (i, bset.size)
+            printf("%d", cbits_at(&bset, i));
+        puts("");
+        cbits_set(&bset, 28);
+        cbits_resize(&bset, 77, true);
+        cbits_resize(&bset, 93, false);
+        cbits_resize(&bset, 102, true);
+        cbits_set_value(&bset, 99, false);
 
-    printf("%4zu: ", bset.size);
-    c_forrange (i, bset.size)
-        printf("%d", cbits_at(&bset, i));
-    puts("");
-    cbits_del(&bset);
+        printf("%4zu: ", bset.size);
+        c_forrange (i, bset.size)
+            printf("%d", cbits_at(&bset, i));
+        puts("");
+    }
 }
 */
 #include <stdlib.h>

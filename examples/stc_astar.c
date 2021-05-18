@@ -77,55 +77,57 @@ astar(cstr maze, int width)
 {
     MazePoint start = mpnt_from(maze, "@", width);
     MazePoint goal = mpnt_from(maze, "!", width);
+
+    cdeq_pnt path = cdeq_pnt_init(); // returned
+    
     cpque_pnt frontier = cpque_pnt_init();
     csmap_step came_from = csmap_step_init();
     csmap_cost cost_so_far = csmap_cost_init();
-
-    cpque_pnt_push(&frontier, start);
-    csmap_cost_insert(&cost_so_far, start, 0);
-
-    while (!cpque_pnt_empty(frontier))
+    c_defer (cpque_pnt_del(&frontier),
+             csmap_step_del(&came_from),
+             csmap_cost_del(&cost_so_far))
     {
-        MazePoint current = *cpque_pnt_top(&frontier);
-        cpque_pnt_pop(&frontier);
-        if (mpnt_equal(&current, &goal))
-            break;
-        MazePoint deltas[] = {
-            { -1, +1, 0, width }, { 0, +1, 0, width }, { 1, +1, 0, width },
-            { -1,  0, 0, width }, /* ~ ~ ~ ~ ~ ~ ~ */  { 1,  0, 0, width },
-            { -1, -1, 0, width }, { 0, -1, 0, width }, { 1, -1, 0, width },
-        };
+        cpque_pnt_push(&frontier, start);
+        csmap_cost_insert(&cost_so_far, start, 0);
 
-        c_forrange (i, c_arraylen(deltas))
+        while (!cpque_pnt_empty(frontier))
         {
-            MazePoint delta = deltas[i];
-            MazePoint next = mpnt_init(current.x + delta.x, current.y + delta.y, width);
-            int new_cost = *csmap_cost_at(&cost_so_far, current);
-            if (maze.str[mpnt_index(&next)] != '#')
+            MazePoint current = *cpque_pnt_top(&frontier);
+            cpque_pnt_pop(&frontier);
+            if (mpnt_equal(&current, &goal))
+                break;
+            MazePoint deltas[] = {
+                { -1, +1, 0, width }, { 0, +1, 0, width }, { 1, +1, 0, width },
+                { -1,  0, 0, width }, /* ~ ~ ~ ~ ~ ~ ~ */  { 1,  0, 0, width },
+                { -1, -1, 0, width }, { 0, -1, 0, width }, { 1, -1, 0, width },
+            };
+
+            c_forrange (i, c_arraylen(deltas))
             {
-                csmap_cost_value_t* cost = csmap_cost_find(&cost_so_far, next).ref;
-                if (!cost || new_cost < cost->second)
+                MazePoint delta = deltas[i];
+                MazePoint next = mpnt_init(current.x + delta.x, current.y + delta.y, width);
+                int new_cost = *csmap_cost_at(&cost_so_far, current);
+                if (maze.str[mpnt_index(&next)] != '#')
                 {
-                    csmap_cost_put(&cost_so_far, next, new_cost); // update
-                    next.priorty = new_cost + abs(goal.x - next.x) + abs(goal.y - next.y);
-                    cpque_pnt_push(&frontier, next);
-                    csmap_step_put(&came_from, next, current);
+                    csmap_cost_value_t* cost = csmap_cost_find(&cost_so_far, next).ref;
+                    if (!cost || new_cost < cost->second)
+                    {
+                        csmap_cost_put(&cost_so_far, next, new_cost); // update
+                        next.priorty = new_cost + abs(goal.x - next.x) + abs(goal.y - next.y);
+                        cpque_pnt_push(&frontier, next);
+                        csmap_step_put(&came_from, next, current);
+                    }
                 }
             }
         }
+        MazePoint current = goal;
+        while(!mpnt_equal(&current, &start))
+        {
+            cdeq_pnt_push_front(&path, current);
+            current = *csmap_step_at(&came_from, current);
+        }
+        cdeq_pnt_push_front(&path, start);
     }
-    MazePoint current = goal;
-    cdeq_pnt path = cdeq_pnt_init();
-
-    while(!mpnt_equal(&current, &start))
-    {
-        cdeq_pnt_push_front(&path, current);
-        current = *csmap_step_at(&came_from, current);
-    }
-    cdeq_pnt_push_front(&path, start);
-    cpque_pnt_del(&frontier);
-    csmap_step_del(&came_from);
-    csmap_cost_del(&cost_so_far);
     return path;
 }
 

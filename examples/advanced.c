@@ -41,22 +41,22 @@ using_cmap_keydef(vk, Viking, int, vikingraw_equals, vikingraw_hash,
 
 int main()
 {
-    cmap_vk vikings = cmap_vk_init();
-    c_emplace(cmap_vk, vikings, {
-        { {"Einar", "Norway"}, 20},
-        { {"Olaf", "Denmark"}, 24},
-        { {"Harald", "Iceland"}, 12},
-    });
-    VikingRaw bjorn = {"Bjorn", "Sweden"};
-    cmap_vk_emplace_or_assign(&vikings, bjorn, 10);
+    c_with (cmap_vk vikings = cmap_vk_init(), cmap_vk_del(&vikings)) {
+        c_emplace(cmap_vk, vikings, {
+            { {"Einar", "Norway"}, 20},
+            { {"Olaf", "Denmark"}, 24},
+            { {"Harald", "Iceland"}, 12},
+        });
+        VikingRaw bjorn = {"Bjorn", "Sweden"};
+        cmap_vk_emplace_or_assign(&vikings, bjorn, 10);
 
-    VikingRaw einar = {"Einar", "Norway"};
-    cmap_vk_value_t *e = cmap_vk_find(&vikings, einar).ref;
-    e->second += 3; // add 3 hp points to Einar
-    cmap_vk_emplace(&vikings, einar, 0).ref->second += 5; // add 5 more to Einar
+        VikingRaw einar = {"Einar", "Norway"};
+        cmap_vk_value_t *e = cmap_vk_find(&vikings, einar).ref;
+        e->second += 3; // add 3 hp points to Einar
+        cmap_vk_emplace(&vikings, einar, 0).ref->second += 5; // add 5 more to Einar
 
-    c_foreach (k, cmap_vk, vikings) {
-        printf("%s of %s has %d hp\n", k.ref->first.name.str, k.ref->first.country.str, k.ref->second);
+        c_foreach (k, cmap_vk, vikings) {
+            printf("%s of %s has %d hp\n", k.ref->first.name.str, k.ref->first.country.str, k.ref->second);
+        }
     }
-    cmap_vk_del(&vikings);
 }

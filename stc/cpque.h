@@ -32,16 +32,18 @@
         stc64_t rng = stc64_init(1234);
         stc64_uniformf_t dist = stc64_uniformf_init(10.0f, 100.0f);
 
-        cpque_f queue = cpque_f_init();
-        // Push ten million random numbers onto the queue.
-        for (int i=0; i<10000000; ++i)
-            cpque_f_push(&queue, stc64_uniformf(&rng, dist));
-        // Extract the 100 smallest.
-        for (int i=0; i<100; ++i) {
-            printf("%f ", *cpque_f_top(queue));
-            cpque_f_pop(&queue);
+        c_withvar (cpque_f, queue)
+        {
+            // Push ten million random numbers onto the queue.
+            for (int i=0; i<10000000; ++i)
+                cpque_f_push(&queue, stc64_uniformf(&rng, dist));
+
+            // Extract the 100 smallest.
+            for (int i=0; i<100; ++i) {
+                printf("%f ", *cpque_f_top(queue));
+                cpque_f_pop(&queue);
+            }
         }
-        cpque_f_del(&queue);
     }
 */
 #ifndef CPQUEUE_H_INCLUDED

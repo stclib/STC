@@ -122,9 +122,12 @@
     for (type i=start, i##_inc_=step, i##_end_=(stop) - (0 < i##_inc_) \
          ; (i <= i##_end_) == (0 < i##_inc_); i += i##_inc_)
 
-#define c_with(start, end) for (start, *_c_w = NULL; !_c_w; ++_c_w, end)
-#define c_withbuffer(b, type, n) c_withbuffer_x(b, type, n, 256)
-#define c_withbuffer_x(b, type, n, BYTES) \
+#define c_defer(...) for (int _c_ii = 0; !_c_ii; ++_c_ii, __VA_ARGS__)
+#define c_with(start, end) for (start, *_c_ii = NULL; !_c_ii; ++_c_ii, end)
+#define c_withvar(ctype, var) c_with (ctype var = ctype##_init(), ctype##_del(&var))
+
+#define c_withbuf(b, type, n) c_withbuf_N(b, type, n, 256)
+#define c_withbuf_N(b, type, n, BYTES) \
     for (type _c_b[((BYTES) - 1) / sizeof(type) + 1], \
                 *b = (n)*sizeof *b > (BYTES) ? c_new_n(type, n) : _c_b \
          ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)

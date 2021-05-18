@@ -9,29 +9,29 @@
 void stringdemo1()
 {
     printf("\nSTRINGDEMO1\n");
-    cstr cs = cstr_from("one-nine-three-seven-five");
-    printf("%s.\n", cs.str);
+    c_with (cstr cs = cstr_from("one-nine-three-seven-five"), cstr_del(&cs))
+    {
+        printf("%s.\n", cs.str);
 
-    cstr_insert(&cs, 3, "-two");
-    printf("%s.\n", cs.str);
+        cstr_insert(&cs, 3, "-two");
+        printf("%s.\n", cs.str);
 
-    cstr_erase_n(&cs, 7, 5); // -nine
-    printf("%s.\n", cs.str);
+        cstr_erase_n(&cs, 7, 5); // -nine
+        printf("%s.\n", cs.str);
 
-    cstr_replace(&cs, cstr_find(cs, "seven"), 5, "four");
-    printf("%s.\n", cs.str);
+        cstr_replace(&cs, cstr_find(cs, "seven"), 5, "four");
+        printf("%s.\n", cs.str);
 
-    cstr_take(&cs, cstr_from_fmt("%s *** %s", cs.str, cs.str));
-    printf("%s.\n", cs.str);
+        cstr_take(&cs, cstr_from_fmt("%s *** %s", cs.str, cs.str));
+        printf("%s.\n", cs.str);
 
-    printf("find \"four\": %s\n", cs.str + cstr_find(cs, "four"));
+        printf("find \"four\": %s\n", cs.str + cstr_find(cs, "four"));
 
-    // reassign:
-    cstr_assign(&cs, "one two three four five six seven");
-    cstr_append(&cs, " eight");
-    printf("append: %s\n", cs.str);
-
-    cstr_del(&cs);
+        // reassign:
+        cstr_assign(&cs, "one two three four five six seven");
+        cstr_append(&cs, " eight");
+        printf("append: %s\n", cs.str);
+    }
 }
 
 
@@ -40,21 +40,22 @@ using_cvec(ix, int64_t); // ix is just an example tag name.
 void vectordemo1()
 {
     printf("\nVECTORDEMO1\n");
-    cvec_ix bignums = cvec_ix_init();
-    cvec_ix_reserve(&bignums, 100);
-    for (size_t i = 10; i <= 100; i += 10)
-        cvec_ix_push_back(&bignums, i * i);
+    c_with (cvec_ix bignums = cvec_ix_with_capacity(100), cvec_ix_del(&bignums))
+    {
+        cvec_ix_reserve(&bignums, 100);
+        for (size_t i = 10; i <= 100; i += 10)
+            cvec_ix_push_back(&bignums, i * i);
 
-    printf("erase - %d: %zu\n", 3, bignums.data[3]);
-    cvec_ix_erase_n(&bignums, 3, 1); // erase index 3
+        printf("erase - %d: %zu\n", 3, bignums.data[3]);
+        cvec_ix_erase_n(&bignums, 3, 1); // erase index 3
 
-    cvec_ix_pop_back(&bignums);      // erase the last
-    cvec_ix_erase_n(&bignums, 0, 1); // erase the first
+        cvec_ix_pop_back(&bignums);      // erase the last
+        cvec_ix_erase_n(&bignums, 0, 1); // erase the first
 
-    for (size_t i = 0; i < cvec_ix_size(bignums); ++i) {
-        printf("%zu: %zu\n", i, bignums.data[i]);
+        for (size_t i = 0; i < cvec_ix_size(bignums); ++i) {
+            printf("%zu: %zu\n", i, bignums.data[i]);
+        }
     }
-    cvec_ix_del(&bignums);
 }
 
 
@@ -63,17 +64,17 @@ using_cvec_str();
 void vectordemo2()
 {
     printf("\nVECTORDEMO2\n");
-    cvec_str names = cvec_str_init();
-    cvec_str_emplace_back(&names, "Mary");
-    cvec_str_emplace_back(&names, "Joe");
-    cvec_str_emplace_back(&names, "Chris");
-    cstr_assign(&names.data[1], "Jane");      // replace Joe
-    printf("names[1]: %s\n", names.data[1].str);
+    c_withvar (cvec_str, names) {
+        cvec_str_emplace_back(&names, "Mary");
+        cvec_str_emplace_back(&names, "Joe");
+        cvec_str_emplace_back(&names, "Chris");
+        cstr_assign(&names.data[1], "Jane");      // replace Joe
+        printf("names[1]: %s\n", names.data[1].str);
 
-    cvec_str_sort(&names);                     // Sort the array
-    c_foreach (i, cvec_str, names)
-        printf("sorted: %s\n", i.ref->str);
-    cvec_str_del(&names);
+        cvec_str_sort(&names);                     // Sort the array
+        c_foreach (i, cvec_str, names)
+            printf("sorted: %s\n", i.ref->str);
+    }
 }
 
 using_clist(ix, int);
@@ -82,28 +83,30 @@ void listdemo1()
 {
     printf("\nLISTDEMO1\n");
     clist_ix nums = clist_ix_init(), nums2 = clist_ix_init();
-    for (int i = 0; i < 10; ++i)
-        clist_ix_push_back(&nums, i);
-    for (int i = 100; i < 110; ++i)
-        clist_ix_push_back(&nums2, i);
+    c_defer (clist_ix_del(&nums), clist_ix_del(&nums2)) 
+    {
+        for (int i = 0; i < 10; ++i)
+            clist_ix_push_back(&nums, i);
+        for (int i = 100; i < 110; ++i)
+            clist_ix_push_back(&nums2, i);
 
-    /* splice nums2 to front of nums */
-    clist_ix_splice(&nums, clist_ix_begin(&nums), &nums2);
-    c_foreach (i, clist_ix, nums)
-        printf("spliced: %d\n", *i.ref);
-    puts("");
+        /* splice nums2 to front of nums */
+        clist_ix_splice(&nums, clist_ix_begin(&nums), &nums2);
+        c_foreach (i, clist_ix, nums)
+            printf("spliced: %d\n", *i.ref);
+        puts("");
 
-    *clist_ix_find(&nums, 104).ref += 50;
-    clist_ix_remove(&nums, 103);
-    clist_ix_iter_t it = clist_ix_begin(&nums);
-    clist_ix_erase_range(&nums, clist_ix_fwd(it, 5), clist_ix_fwd(it, 15));
-    clist_ix_pop_front(&nums);
-    clist_ix_push_back(&nums, -99);
-    clist_ix_sort(&nums);
+        *clist_ix_find(&nums, 104).ref += 50;
+        clist_ix_remove(&nums, 103);
+        clist_ix_iter_t it = clist_ix_begin(&nums);
+        clist_ix_erase_range(&nums, clist_ix_fwd(it, 5), clist_ix_fwd(it, 15));
+        clist_ix_pop_front(&nums);
+        clist_ix_push_back(&nums, -99);
+        clist_ix_sort(&nums);
 
-    c_foreach (i, clist_ix, nums)
-        printf("sorted: %d\n", *i.ref);
-    clist_ix_del(&nums);
+        c_foreach (i, clist_ix, nums)
+            printf("sorted: %d\n", *i.ref);
+    }
 }
 
 using_cset(i, int);

@@ -30,19 +30,20 @@
 using_csmap(mx, int, char); // Sorted map<int, char>
 
 int main(void) {
-    csmap_mx m = csmap_mx_init();
-    csmap_mx_insert(&m, 5, 'a');
-    csmap_mx_insert(&m, 8, 'b');
-    csmap_mx_insert(&m, 12, 'c');
+    c_withvar (csmap_mx, m)
+    {
+        csmap_mx_insert(&m, 5, 'a');
+        csmap_mx_insert(&m, 8, 'b');
+        csmap_mx_insert(&m, 12, 'c');
 
-    csmap_mx_iter_t it = csmap_mx_find(&m, 10); // none
-    char val = csmap_mx_find(&m, 5).ref->second;
-    csmap_mx_put(&m, 5, 'd'); // update
-    csmap_mx_erase(&m, 8);
+        csmap_mx_iter_t it = csmap_mx_find(&m, 10); // none
+        char val = csmap_mx_find(&m, 5).ref->second;
+        csmap_mx_put(&m, 5, 'd'); // update
+        csmap_mx_erase(&m, 8);
 
-    c_foreach (i, csmap_mx, m)
-        printf("map %d: %c\n", i.ref->first, i.ref->second);
-    csmap_mx_del(&m);
+        c_foreach (i, csmap_mx, m)
+            printf("map %d: %c\n", i.ref->first, i.ref->second);
+    }
 }
 */
 #include "ccommon.h"

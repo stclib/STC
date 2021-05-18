@@ -5,7 +5,7 @@ The following handy macros are safe to use, i.e. have no side-effects.
 ### c_var, c_emplace
 **c_var** declares and initializes any container with an array of elements. **c_emplace** adds elements to any existing container:
 ```c
-c_var(cvec_i, vec, {1, 2, 3});     // declare and emplace
+c_var (cvec_i, vec, {1, 2, 3});     // declare and emplace
 c_emplace(cvec_i, vec, {4, 5, 6});  // adds to existing vec
 ```
 
@@ -49,17 +49,19 @@ c_foreach (i, csset_x, it, csset_x_end(&set)) printf(" %d", *i.ref);
 // 7 12 23
 ```
 
-### c_with, c_withbuffer, c_breakwith
-General defer in block mechanics. **c_withbuffer** is special for buffers, uses stack memory if buf is up to 256 bytes,
-and heap memory otherwise.
+### c_defer, c_with, c_withvar, c_withbuf, c_breakwith
+General defer mechanics. These macros allows to specify destructors explicitly or implicitly where the
+constructors are defined. This ensures that resources are released after usage, and avoids memory leaks.
 
-***NB***: Use only **c_breakwith** to break out of the block if needed, never use **return**, **break**,
-or **goto** inside a with-block.
+**NB**: ***Only*** use `c_breakwith` to break out of the `c_with`-block if needed. ***Never*** use `return`,
+`break`, or `goto` inside the block.
 
-| Usage                          | Description                          |
-|:-------------------------------|:-------------------------------------|
-| `c_with (acquire, release)`    | Do `acquire`. Defer `release` to end |
-| `c_withbuffer (buf, type, n)`  | Declare, allocate and free buf       |
+| Usage                          | Description                                      |
+|:-------------------------------|:-------------------------------------------------|
+| `c_with (acquire, release)`    | Do `acquire`. Defer `release` to end of block    |
+| `c_defer (release)`            | Defer `release` to end of defer block            |
+| `c_withvar (ctype, v)`         | `c_with (ctype v = ctype_init(), ctype_del(&v))` |
+| `c_withbuf (buf, type, n)`     | Declare, allocate and free memory buffer         |
 
 The `acquire`argument must be of the form: `type var = get_resource`.
 
@@ -76,11 +78,11 @@ cvec_str readFile(const char* name)
     // receiver should check errno variable
     cvec_str vec = cvec_str_init();
 
-    c_with (FILE* fp = fopen(name, "r"), fclose(fp))
+    c_with (FILE* fp = fopen(name, "r"), fclose(fp)) {
         c_with (cstr line = cstr_null, cstr_del(&line))
             while (cstr_getline(&line, fp))
                 cvec_str_emplace_back(&vec, line.str);
-
+    }
     return vec;
 }
 

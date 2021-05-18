@@ -32,15 +32,16 @@
     using_cstack(i, cvec_i);
 
     int main() {
-        cstack_i stack = cstack_i_init();
+        c_withvar (cstack_i, stack)
+        {
+            for (int i=0; i<100; ++i)
+                cstack_i_push(&stack, i*i);
 
-        for (int i=0; i<100; ++i)
-            cstack_i_push(&stack, i*i);
+            for (int i=0; i<90; ++i)
+                cstack_i_pop(&stack);
 
-        for (int i=0; i<90; ++i)
-            cstack_i_pop(&stack);
-
-        printf("top: %d\n", *cstack_i_top(&stack));
+            printf("top: %d\n", *cstack_i_top(&stack));
+        }
     }
 */
 #include "cvec.h"

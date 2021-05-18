@@ -34,19 +34,21 @@ void test_distribution(void)
     printf("distribution test: 2^%d values\n", BITS);
     stc64_t rng = stc64_init(seed);
     const size_t N = 1ull << BITS ;
-    cmap_x map = cmap_x_init();
+    
+    c_with (cmap_x map = cmap_x_init(), cmap_x_del(&map)) {
+        c_forrange (N) {
+            uint64_t k = stc64_rand(&rng);
+            cmap_x_emplace(&map, k & 0xf, 0).ref->second += 1;
+        }
 
-    c_forrange (N) {
-        uint64_t k = stc64_rand(&rng);
-        cmap_x_emplace(&map, k & 0xf, 0).ref->second += 1;
+        uint64_t sum = 0;
+        c_foreach (i, cmap_x, map) sum += i.ref->second;
+        sum /= map.size;
+
+        c_foreach (i, cmap_x, map) {
+            printf("%4u: %zu - %zu: %11.8f\n", i.ref->first, i.ref->second, sum, (1 - (double) i.ref->second / sum));
+        }
     }
-
-    uint64_t sum = 0;
-    c_foreach (i, cmap_x, map) sum += i.ref->second;
-    sum /= map.size;
-
-    c_foreach (i, cmap_x, map)
-        printf("%4u: %zu - %zu: %11.8f\n", i.ref->first, i.ref->second, sum, (1 - (double) i.ref->second / sum));
 }
 
 int main()

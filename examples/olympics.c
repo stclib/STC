@@ -54,24 +54,23 @@ using_csmap_strkey(ol, clist_ol, clist_ol_del, c_no_clone);
 
 int main()
 {
-    csmap_ol multimap = csmap_ol_init();
-    clist_ol empty = clist_ol_init();
+    c_withvar (csmap_ol, multimap) {
+        clist_ol empty = clist_ol_init();
 
-    for (int i = 0; i<c_arraylen(ol_data); ++i) {
-        struct OlympicsData* it = &ol_data[i];
-        OlympicLocation loc = {.year=it->year, .city=cstr_from(it->city), .date=cstr_from(it->date)};
-        // Insert an empty list for each new country, and append the entry to the list.
-        // If list already exist in map, it returns it from the insert function.
-        clist_ol_push_back(&csmap_ol_insert(&multimap, cstr_from(it->country), empty).ref->second, loc);
-    }
+        for (int i = 0; i<c_arraylen(ol_data); ++i) {
+            struct OlympicsData* it = &ol_data[i];
+            OlympicLocation loc = {.year=it->year, .city=cstr_from(it->city), .date=cstr_from(it->date)};
+            // Insert an empty list for each new country, and append the entry to the list.
+            // If list already exist in map, it returns it from the insert function.
+            clist_ol_push_back(&csmap_ol_insert(&multimap, cstr_from(it->country), empty).ref->second, loc);
+        }
 
-    c_foreach (country, csmap_ol, multimap) {
-        clist_ol_sort(&country.ref->second); // Sort locations by year for each country.
-        c_foreach (loc, clist_ol, country.ref->second)
-            printf("%s: %d, %s, %s\n", country.ref->first.str, loc.ref->year,
-                                                               loc.ref->city.str,
-                                                               loc.ref->date.str);
+        c_foreach (country, csmap_ol, multimap) {
+            clist_ol_sort(&country.ref->second); // Sort locations by year for each country.
+            c_foreach (loc, clist_ol, country.ref->second)
+                printf("%s: %d, %s, %s\n", country.ref->first.str, loc.ref->year,
+                                                                   loc.ref->city.str,
+                                                                   loc.ref->date.str);
+        }
     }
-    // cleanup everything
-    csmap_ol_del(&multimap);
 }

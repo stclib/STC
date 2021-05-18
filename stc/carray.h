@@ -33,22 +33,21 @@ using_carray2(i, int);
 
 int main() {
     int w = 7, h = 5;
-    carray2i image = carray2i_init(w, h);
+    c_with (carray2i image = carray2i_init(w, h), carray2i_del(&image)) 
+    {
+        int *dat = carray2i_data(&image);
+        for (int i = 0; i < carray2i_size(image); ++i)
+            dat[i] = i;
 
-    int *dat = carray2i_data(&image);
-    for (int i = 0; i < carray2i_size(image); ++i)
-        dat[i] = i;
+        for (int x = 0; x < image.xdim; ++x)
+            for (int y = 0; y < image.ydim; ++y)
+                printf(" %d", image.data[x][y]);
+        puts("\n");
 
-    for (int x = 0; x < image.xdim; ++x)
-        for (int y = 0; y < image.ydim; ++y)
-            printf(" %d", image.data[x][y]);
-    puts("\n");
-
-    c_foreach (i, carray2i, image)
-        printf(" %d", *i.ref);
-    puts("");
-
-    carray2i_del(&image);
+        c_foreach (i, carray2i, image)
+            printf(" %d", *i.ref);
+        puts("");
+    }
 }
 */
 

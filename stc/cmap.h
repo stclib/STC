@@ -31,19 +31,20 @@
 using_cmap(mx, int, char); // Map of int -> char
 
 int main(void) {
-    cmap_mx m = cmap_mx_init();
-    cmap_mx_emplace(&m, 5, 'a');
-    cmap_mx_emplace(&m, 8, 'b');
-    cmap_mx_emplace(&m, 12, 'c');
+    c_withvar (cmap_mx, m)
+    {
+        cmap_mx_emplace(&m, 5, 'a');
+        cmap_mx_emplace(&m, 8, 'b');
+        cmap_mx_emplace(&m, 12, 'c');
 
-    cmap_mx_iter_t it = cmap_mx_find(&m, 10); // none
-    char val = cmap_mx_find(&m, 5).ref->second;
-    cmap_mx_emplace_or_assign(&m, 5, 'd'); // update
-    cmap_mx_erase(&m, 8);
+        cmap_mx_iter_t it = cmap_mx_find(&m, 10); // none
+        char val = cmap_mx_find(&m, 5).ref->second;
+        cmap_mx_emplace_or_assign(&m, 5, 'd'); // update
+        cmap_mx_erase(&m, 8);
 
-    c_foreach (i, cmap_mx, m)
-        printf("map %d: %c\n", i.ref->first, i.ref->second);
-    cmap_mx_del(&m);
+        c_foreach (i, cmap_mx, m)
+            printf("map %d: %c\n", i.ref->first, i.ref->second);
+    }
 }
 */
 #include "ccommon.h"
