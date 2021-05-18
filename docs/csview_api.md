@@ -121,7 +121,7 @@ using_cvec_sv();
 
 int main()
 {
-    csview text = c_sv("A long and winded literal string");
+    csview text = c_sv("The length of this literal is evaluated at compile time and stored in csview text.");
     printf("%s\nLength: %zu\n\n", text.str, text.size);
 
     // cvec of cstr elements, using csview as "emplace" type
