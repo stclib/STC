@@ -150,17 +150,18 @@ int main()
         {100, "Red"},
         {110, "Blue"},
     });
-    /* put replaces existing mapped value: */
-    csmap_id_emplace_or_assign(&idnames, 110, "White");
-    /* put a constructed mapped value into map: */
-    csmap_id_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
-    /* emplace adds only when key does not exist: */
-    csmap_id_emplace(&idnames, 100, "Green");
+    c_defer (csmap_id_del(&idnames)) 
+    {
+        /* put replaces existing mapped value: */
+        csmap_id_emplace_or_assign(&idnames, 110, "White");
+        /* put a constructed mapped value into map: */
+        csmap_id_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
+        /* emplace adds only when key does not exist: */
+        csmap_id_emplace(&idnames, 100, "Green");
 
-    c_foreach (i, csmap_id, idnames)
-        printf("%d: %s\n", i.ref->first, i.ref->second.str);
-
-    csmap_id_del(&idnames);
+        c_foreach (i, csmap_id, idnames)
+            printf("%d: %s\n", i.ref->first, i.ref->second.str);
+    }
 }
 ```
 Output:
@@ -189,17 +190,16 @@ using_csmap(vi, Vec3i, int, Vec3i_compare);
 
 int main()
 {
-    csmap_vi vecs = csmap_vi_init();
+    c_withvar (csmap_vi, vecs) // define, init and defer destruction of vecs
+    {
+      csmap_vi_emplace(&vecs, (Vec3i){100,   0,   0}, 1);
+      csmap_vi_emplace(&vecs, (Vec3i){  0, 100,   0}, 2);
+      csmap_vi_emplace(&vecs, (Vec3i){  0,   0, 100}, 3);
+      csmap_vi_emplace(&vecs, (Vec3i){100, 100, 100}, 4);
 
-    csmap_vi_emplace(&vecs, (Vec3i){100,   0,   0}, 1);
-    csmap_vi_emplace(&vecs, (Vec3i){  0, 100,   0}, 2);
-    csmap_vi_emplace(&vecs, (Vec3i){  0,   0, 100}, 3);
-    csmap_vi_emplace(&vecs, (Vec3i){100, 100, 100}, 4);
-
-    c_foreach (i, csmap_vi, vecs)
-        printf("{ %3d, %3d, %3d }: %d\n", i.ref->first.x, i.ref->first.y, i.ref->first.z, i.ref->second);
-
-    csmap_vi_del(&vecs);
+      c_foreach (i, csmap_vi, vecs)
+          printf("{ %3d, %3d, %3d }: %d\n", i.ref->first.x, i.ref->first.y, i.ref->first.z, i.ref->second);
+    }
 }
 ```
 Output:
