@@ -190,12 +190,12 @@ using_csmap(vi, Vec3i, int, Vec3i_compare);
 
 int main()
 {
-    c_withvar (csmap_vi, vecs) // define, init and defer destruction of vecs
+    c_with (csmap_vi vecs = csmap_vi_init(), csmap_vi_del(&vecs))
     {
-      csmap_vi_emplace(&vecs, (Vec3i){100,   0,   0}, 1);
-      csmap_vi_emplace(&vecs, (Vec3i){  0, 100,   0}, 2);
-      csmap_vi_emplace(&vecs, (Vec3i){  0,   0, 100}, 3);
-      csmap_vi_emplace(&vecs, (Vec3i){100, 100, 100}, 4);
+      csmap_vi_insert(&vecs, (Vec3i){100,   0,   0}, 1);
+      csmap_vi_insert(&vecs, (Vec3i){  0, 100,   0}, 2);
+      csmap_vi_insert(&vecs, (Vec3i){  0,   0, 100}, 3);
+      csmap_vi_insert(&vecs, (Vec3i){100, 100, 100}, 4);
 
       c_foreach (i, csmap_vi, vecs)
           printf("{ %3d, %3d, %3d }: %d\n", i.ref->first.x, i.ref->first.y, i.ref->first.z, i.ref->second);
@@ -223,10 +223,10 @@ int main()
 {
     c_with (csmap_iv vecs = csmap_iv_init(), csmap_iv_del(&vecs))
     {
-        csmap_iv_emplace(&vecs, 1, (Vec3i){100,   0,   0});
-        csmap_iv_emplace(&vecs, 2, (Vec3i){  0, 100,   0});
-        csmap_iv_emplace(&vecs, 3, (Vec3i){  0,   0, 100});
-        csmap_iv_emplace(&vecs, 4, (Vec3i){100, 100, 100});
+        csmap_iv_insert(&vecs, 1, (Vec3i){100,   0,   0});
+        csmap_iv_insert(&vecs, 2, (Vec3i){  0, 100,   0});
+        csmap_iv_insert(&vecs, 3, (Vec3i){  0,   0, 100});
+        csmap_iv_insert(&vecs, 4, (Vec3i){100, 100, 100});
 
         c_foreach (i, csmap_iv, vecs)
             printf("%d: { %3d, %3d, %3d }\n", i.ref->first, i.ref->second.x, i.ref->second.y, i.ref->second.z);
