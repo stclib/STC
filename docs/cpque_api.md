@@ -68,18 +68,20 @@ int main()
     stc64_t rng = stc64_init(1234);
     stc64_uniform_t dist = stc64_uniform_init(0, N * 10);
 
-    cpque_i heap = cpque_i_init();
-    // Push ten million random numbers to priority queue, plus some negative ones.
-    c_forrange (N)
-        cpque_i_push(&heap, stc64_uniform(&rng, &dist));
-    c_emplace(cpque_i, heap, {-231, -32, -873, -4, -343});
+    // Declare heap, with defered del()
+    c_with (cpque_i heap = cpque_i_init(), cpque_i_del(&heap))
+    {
+        // Push ten million random numbers to priority queue, plus some negative ones.
+        c_forrange (N)
+            cpque_i_push(&heap, stc64_uniform(&rng, &dist));
+        c_emplace(cpque_i, heap, {-231, -32, -873, -4, -343});
 
-    // Extract and display the fifty smallest.
-    c_forrange (50) {
-        printf("%zd ", *cpque_i_top(&heap));
-        cpque_i_pop(&heap);
+        // Extract and display the fifty smallest.
+        c_forrange (50) {
+            printf("%zd ", *cpque_i_top(&heap));
+            cpque_i_pop(&heap);
+        }
     }
-    cpque_i_del(&heap);
 }
 ```
 Output:

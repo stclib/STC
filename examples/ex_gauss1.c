@@ -29,29 +29,28 @@ int main()
     stc64_t rng = stc64_init(seed);
     stc64_normalf_t dist = stc64_normalf_init(Mean, StdDev);
 
-    c_withvar (cvec_e, vhist) {
-
-        // Create histogram map
-        c_withvar (cmap_i, mhist) {
-            c_forrange (N) {
-                int index = (int) round( stc64_normalf(&rng, &dist) );
-                cmap_i_emplace(&mhist, index, 0).ref->second += 1;
-            }
-
-            // Transfer map to vec and sort it by map keys.
-            c_foreach (i, cmap_i, mhist)
-                cvec_e_push_back(&vhist, c_make(mapval){i.ref->first, i.ref->second});
+    // Create and init histogram vec and map with defered destructors:
+    c_withvar (cvec_e, vhist)
+    c_withvar (cmap_i, mhist)
+    {
+        c_forrange (N) {
+            int index = (int) round( stc64_normalf(&rng, &dist) );
+            cmap_i_emplace(&mhist, index, 0).ref->second += 1;
         }
+
+        // Transfer map to vec and sort it by map keys.
+        c_foreach (i, cmap_i, mhist)
+            cvec_e_push_back(&vhist, c_make(mapval){i.ref->first, i.ref->second});
+
         cvec_e_sort(&vhist);
 
         // Print the gaussian bar chart
-        c_withvar (cstr, bar) {
-            c_foreach (i, cvec_e, vhist) {
-                size_t n = (size_t) (i.ref->second * StdDev * Scale * 2.5 / (float)N);
-                if (n > 0) {
-                    cstr_resize(&bar, n, '*');
-                    printf("%4d %s\n", i.ref->first, bar.str);
-                }
+        c_with (cstr bar = cstr_null, cstr_del(&bar))
+        c_foreach (i, cvec_e, vhist) {
+            size_t n = (size_t) (i.ref->second * StdDev * Scale * 2.5 / (float)N);
+            if (n > 0) {
+                cstr_resize(&bar, n, '*');
+                printf("%4d %s\n", i.ref->first, bar.str);
             }
         }
     }

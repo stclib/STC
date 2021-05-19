@@ -46,28 +46,38 @@ void OlympicLocation_del(OlympicLocation* self) {
 }
 
 // Create a clist<OlympicLocation>, can be sorted by year.
-using_clist(ol, OlympicLocation, OlympicLocation_compare, OlympicLocation_del);
+using_clist(OL, OlympicLocation, OlympicLocation_compare, OlympicLocation_del);
 
-// Create a csmap<cstr, clist_ol> where key is country
-using_csmap_strkey(ol, clist_ol, clist_ol_del, c_no_clone);
+// Create a csmap<cstr, clist_OL> where key is country
+using_csmap_strkey(OL, clist_OL, clist_OL_del, c_no_clone);
 
 
 int main()
 {
-    c_withvar (csmap_ol, multimap) {
-        clist_ol empty = clist_ol_init();
+    // Define the multimap with destructor defered to when block is completed.
+    c_with (csmap_OL multimap = csmap_OL_init(), csmap_OL_del(&multimap))
+    {
+        clist_OL empty = clist_OL_init();
 
-        for (int i = 0; i<c_arraylen(ol_data); ++i) {
+        for (int i = 0; i < c_arraylen(ol_data); ++i)
+        {
             struct OlympicsData* it = &ol_data[i];
-            OlympicLocation loc = {.year=it->year, .city=cstr_from(it->city), .date=cstr_from(it->date)};
+            OlympicLocation loc = {.year = it->year,
+                                   .city = cstr_from(it->city),
+                                   .date = cstr_from(it->date)};
             // Insert an empty list for each new country, and append the entry to the list.
             // If list already exist in map, it returns it from the insert function.
-            clist_ol_push_back(&csmap_ol_insert(&multimap, cstr_from(it->country), empty).ref->second, loc);
+            clist_OL_push_back(&csmap_OL_insert(&multimap, cstr_from(it->country), empty).ref->second, loc);
         }
 
-        c_foreach (country, csmap_ol, multimap) {
-            clist_ol_sort(&country.ref->second); // Sort locations by year for each country.
-            c_foreach (loc, clist_ol, country.ref->second)
+        // Iterate the multimap:
+        c_foreach (country, csmap_OL, multimap)
+        {
+            // Sort locations by year for each country.
+            clist_OL_sort(&country.ref->second);
+
+            // Loop the locations for a country sorted by year
+            c_foreach (loc, clist_OL, country.ref->second)
                 printf("%s: %d, %s, %s\n", country.ref->first.str, loc.ref->year,
                                                                    loc.ref->city.str,
                                                                    loc.ref->date.str);

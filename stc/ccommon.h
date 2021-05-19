@@ -114,13 +114,13 @@
          ; it.ref != it##_end_.ref; CX##_next(&it))
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
-#define c_forrange_1(stop) for (size_t _c_i=0, _c_end_=stop; _c_i < _c_end_; ++_c_i)
-#define c_forrange_2(i, stop) for (size_t i=0, i##_end_=stop; i < i##_end_; ++i)
-#define c_forrange_3(i, type, stop) for (type i=0, i##_end_=stop; i < i##_end_; ++i)
-#define c_forrange_4(i, type, start, stop) for (type i=start, i##_end_=stop; i < i##_end_; ++i)
+#define c_forrange_1(stop) for (size_t _c_ii=0, _c_end=stop; _c_ii < _c_end; ++_c_ii)
+#define c_forrange_2(i, stop) for (size_t i=0, _c_end=stop; i < _c_end; ++i)
+#define c_forrange_3(i, type, stop) for (type i=0, _c_end=stop; i < _c_end; ++i)
+#define c_forrange_4(i, type, start, stop) for (type i=start, _c_end=stop; i < _c_end; ++i)
 #define c_forrange_5(i, type, start, stop, step) \
-    for (type i=start, i##_inc_=step, i##_end_=(stop) - (0 < i##_inc_) \
-         ; (i <= i##_end_) == (0 < i##_inc_); i += i##_inc_)
+    for (type i=start, _c_inc=step, _c_end=(stop) - (0 < _c_inc) \
+         ; (i <= _c_end) == (0 < _c_inc); i += _c_inc)
 
 #define c_defer(...) for (int _c_ii = 0; !_c_ii; ++_c_ii, __VA_ARGS__)
 #define c_with(start, end) for (start, *_c_ii = NULL; !_c_ii; ++_c_ii, end)

@@ -6,7 +6,8 @@ using_clist(i, int);
 
 int main ()
 {
-    c_withvar (clist_i, L) {
+    c_with (clist_i L = clist_i_init(), clist_i_del(&L))
+    {
         c_emplace(clist_i, L, {10, 20, 30, 40, 50});
                                                     // 10 20 30 40 50
         clist_i_iter_t it = clist_i_begin(&L);      // ^

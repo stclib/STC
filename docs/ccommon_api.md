@@ -56,14 +56,17 @@ constructors are defined. This ensures that resources are released after usage, 
 **NB**: ***Only*** use `c_breakwith` to break out of the `c_with`-block if needed. ***Never*** use `return`,
 `break`, or `goto` inside the block.
 
-| Usage                          | Description                                      |
-|:-------------------------------|:-------------------------------------------------|
-| `c_with (acquire, release)`    | Do `acquire`. Defer `release` to end of block    |
-| `c_defer (release)`            | Defer `release` to end of defer block            |
-| `c_withvar (ctype, v)`         | `c_with (ctype v = ctype_init(), ctype_del(&v))` |
-| `c_withbuf (buf, type, n)`     | Declare, allocate and free memory buffer         |
+| Usage                            | Description                                       |
+|:---------------------------------|:--------------------------------------------------|
+| `c_with (acquire, release)`      | Do `acquire`. Defer `release` to end of block     |
+| `c_defer (release...)`           | Defer `release` to end of defer block             |
+| `c_withvar (type, var)`          | `c_with (type var = type_init(), type_del(&var))` |
+| `c_withbuf (buf, type, n)`       | Declare, allocate and free memory buffer          |
 
 The `acquire`argument must be of the form: `type var = get_resource`.
+**c_with** and **c_defer** are general macros, whereas **c_withvar** requires that there 
+are methods *type_init()* to create and return an object of type, and *type_del()* 
+that destructs the object. These are available for all STC containers.
 
 ```c
 // Example: Load each line of a text file into a vector of strings

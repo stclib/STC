@@ -64,7 +64,7 @@ using_cvec_str();
 void vectordemo2()
 {
     printf("\nVECTORDEMO2\n");
-    c_withvar (cvec_str, names) {
+    c_with (cvec_str names = cvec_str_init(), cvec_str_del(&names)) {
         cvec_str_emplace_back(&names, "Mary");
         cvec_str_emplace_back(&names, "Joe");
         cvec_str_emplace_back(&names, "Chris");
@@ -142,20 +142,20 @@ using_cmap_strkey(si, int); // Shorthand macro for the general using_cmap expans
 void mapdemo2()
 {
     printf("\nMAPDEMO2\n");
-    cmap_si nums = cmap_si_init();
-    cmap_si_emplace_or_assign(&nums, "Hello", 64);
-    cmap_si_emplace_or_assign(&nums, "Groovy", 121);
-    cmap_si_emplace_or_assign(&nums, "Groovy", 200); // overwrite previous
+    c_with (cmap_si nums = cmap_si_init(), cmap_si_del(&nums))
+    {
+        cmap_si_emplace_or_assign(&nums, "Hello", 64);
+        cmap_si_emplace_or_assign(&nums, "Groovy", 121);
+        cmap_si_emplace_or_assign(&nums, "Groovy", 200); // overwrite previous
 
-    // iterate the map:
-    for (cmap_si_iter_t i = cmap_si_begin(&nums); i.ref != cmap_si_end(&nums).ref; cmap_si_next(&i))
-        printf("long: %s: %d\n", i.ref->first.str, i.ref->second);
+        // iterate the map:
+        for (cmap_si_iter_t i = cmap_si_begin(&nums); i.ref != cmap_si_end(&nums).ref; cmap_si_next(&i))
+            printf("long: %s: %d\n", i.ref->first.str, i.ref->second);
 
-    // or rather use the short form:
-    c_foreach (i, cmap_si, nums)
-        printf("short: %s: %d\n", i.ref->first.str, i.ref->second);
-
-    cmap_si_del(&nums);
+        // or rather use the short form:
+        c_foreach (i, cmap_si, nums)
+            printf("short: %s: %d\n", i.ref->first.str, i.ref->second);
+    }
 }
 
 

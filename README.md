@@ -10,9 +10,9 @@ with a uniform API across the containers, and is similar to the c++ standard lib
 For an introduction to templated containers, please read the blog by Ian Fisher on
 [type-safe generic data structures in C](https://iafisher.com/blog/2020/06/type-safe-generics-in-c).
 
-STC is a compact, header-only library with the all the major "standard" data containers, except for 
-the multi-map/set variants:
-- [***carray*** - **multi-dim array** type](docs/carray_api.md)
+STC is a compact, header-only library with the all the major "standard" data containers, except for the
+multimap/set variants. However, there is an example how to create a multimap in the examples folder.
+- [***carray*** - **multi-dim dynamic array** type](docs/carray_api.md)
 - [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
 - [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)
 - [***clist*** - **std::forward_list** alike type](docs/clist_api.md)

@@ -84,7 +84,8 @@ int main()
 {
     // Ex1
     int xd = 30, yd = 20, zd = 10;
-    carray3f arr3 = carray3f_init(xd, yd, zd, 0.0f);  // define arr3[30][20][10], init with 0.0f.
+    // define arr3[30][20][10], initialized with zeros.
+    carray3f arr3 = carray3f_with_values(xd, yd, zd, 0.0f);
     arr3.data[5][4][3] = 3.14f;
 
     float *arr1 = arr3.data[5][4];

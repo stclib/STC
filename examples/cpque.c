@@ -31,24 +31,22 @@ int main()
 {
     const int data[] = {1,8,5,6,3,4,0,9,7,2};
 
-    c_withvar (cpque_imax, q)
-    {
-        c_forrange (n, c_arraylen(data))
-            cpque_imax_push(&q, n);
-        print_cpque_imax(q);
-    }
-
+    c_withvar (cpque_imax, q)  // init() and defered del()
     c_withvar (cpque_imin, q2)
-    {
-        cpque_imin_emplace_items(&q2, data, c_arraylen(data));
-        print_cpque_imin(q2);
-    }
-
-    // Using imix_less to compare elements.
     c_withvar (cpque_imix, q3)
     {
         c_forrange (n, c_arraylen(data))
+            cpque_imax_push(&q, n);
+
+        print_cpque_imax(q);
+
+        cpque_imin_emplace_items(&q2, data, c_arraylen(data));
+        print_cpque_imin(q2);
+
+        // Using imix_less to compare elements.
+        c_forrange (n, c_arraylen(data))
             cpque_imix_push(&q3, n);
+
         print_cpque_imix(q3);
     }
 }

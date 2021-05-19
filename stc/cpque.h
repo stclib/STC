@@ -32,7 +32,7 @@
         stc64_t rng = stc64_init(1234);
         stc64_uniformf_t dist = stc64_uniformf_init(10.0f, 100.0f);
 
-        c_withvar (cpque_f, queue)
+        c_with (cpque_f queue = cpque_f_init(), cpque_f_del(&queue))
         {
             // Push ten million random numbers onto the queue.
             for (int i=0; i<10000000; ++i)

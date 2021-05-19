@@ -206,17 +206,17 @@ using_cmap(vi, Vec3i, int, c_memcmp_equals, // bitwise equals
 
 int main()
 {
-    cmap_vi vecs = cmap_vi_init();
+    // Define map with defered destruct
+    c_with (cmap_vi vecs = cmap_vi_init(), cmap_vi_del(&vecs))
+    {
+        cmap_vi_emplace(&vecs, (Vec3i){100,   0,   0}, 1);
+        cmap_vi_emplace(&vecs, (Vec3i){  0, 100,   0}, 2);
+        cmap_vi_emplace(&vecs, (Vec3i){  0,   0, 100}, 3);
+        cmap_vi_emplace(&vecs, (Vec3i){100, 100, 100}, 4);
 
-    cmap_vi_emplace(&vecs, (Vec3i){100,   0,   0}, 1);
-    cmap_vi_emplace(&vecs, (Vec3i){  0, 100,   0}, 2);
-    cmap_vi_emplace(&vecs, (Vec3i){  0,   0, 100}, 3);
-    cmap_vi_emplace(&vecs, (Vec3i){100, 100, 100}, 4);
-
-    c_foreach (i, cmap_vi, vecs)
-        printf("{ %3d, %3d, %3d }: %d\n", i.ref->first.x,  i.ref->first.y,  i.ref->first.z,  i.ref->second);
-
-    cmap_vi_del(&vecs);
+        c_foreach (i, cmap_vi, vecs)
+            printf("{ %3d, %3d, %3d }: %d\n", i.ref->first.x,  i.ref->first.y,  i.ref->first.z,  i.ref->second);
+    }
 }
 ```
 Output:
@@ -238,16 +238,16 @@ using_cmap(iv, int, Vec3i);
 
 int main()
 {
-    cmap_iv vecs = cmap_iv_init();
-    cmap_iv_emplace(&vecs, 1, (Vec3i){100,   0,   0});
-    cmap_iv_emplace(&vecs, 2, (Vec3i){  0, 100,   0});
-    cmap_iv_emplace(&vecs, 3, (Vec3i){  0,   0, 100});
-    cmap_iv_emplace(&vecs, 4, (Vec3i){100, 100, 100});
+    c_with (cmap_iv vecs = cmap_iv_init(), cmap_iv_del(&vecs))
+    {
+        cmap_iv_emplace(&vecs, 1, (Vec3i){100,   0,   0});
+        cmap_iv_emplace(&vecs, 2, (Vec3i){  0, 100,   0});
+        cmap_iv_emplace(&vecs, 3, (Vec3i){  0,   0, 100});
+        cmap_iv_emplace(&vecs, 4, (Vec3i){100, 100, 100});
 
-    c_foreach (i, cmap_iv, vecs)
-        printf("%d: { %3d, %3d, %3d }\n", i.ref->first, i.ref->second.x,  i.ref->second.y,  i.ref->second.z);
-
-    cmap_iv_del(&vecs);
+        c_foreach (i, cmap_iv, vecs)
+            printf("%d: { %3d, %3d, %3d }\n", i.ref->first, i.ref->second.x,  i.ref->second.y,  i.ref->second.z);
+    }
 }
 ```
 Output:

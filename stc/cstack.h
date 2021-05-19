@@ -32,7 +32,7 @@
     using_cstack(i, cvec_i);
 
     int main() {
-        c_withvar (cstack_i, stack)
+        c_with (cstack_i stack = cstack_i_init(), cstack_i_del(&stack))
         {
             for (int i=0; i<100; ++i)
                 cstack_i_push(&stack, i*i);

@@ -221,16 +221,16 @@ using_csmap(iv, int, Vec3i);
 
 int main()
 {
-    csmap_iv vecs = csmap_iv_init();
-    csmap_iv_emplace(&vecs, 1, (Vec3i){100,   0,   0});
-    csmap_iv_emplace(&vecs, 2, (Vec3i){  0, 100,   0});
-    csmap_iv_emplace(&vecs, 3, (Vec3i){  0,   0, 100});
-    csmap_iv_emplace(&vecs, 4, (Vec3i){100, 100, 100});
+    c_with (csmap_iv vecs = csmap_iv_init(), csmap_iv_del(&vecs))
+    {
+        csmap_iv_emplace(&vecs, 1, (Vec3i){100,   0,   0});
+        csmap_iv_emplace(&vecs, 2, (Vec3i){  0, 100,   0});
+        csmap_iv_emplace(&vecs, 3, (Vec3i){  0,   0, 100});
+        csmap_iv_emplace(&vecs, 4, (Vec3i){100, 100, 100});
 
-    c_foreach (i, csmap_iv, vecs)
-        printf("%d: { %3d, %3d, %3d }\n", i.ref->first, i.ref->second.x, i.ref->second.y, i.ref->second.z);
-
-    csmap_iv_del(&vecs);
+        c_foreach (i, csmap_iv, vecs)
+            printf("%d: { %3d, %3d, %3d }\n", i.ref->first, i.ref->second.x, i.ref->second.y, i.ref->second.z);
+    }
 }
 ```
 Output:
