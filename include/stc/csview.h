@@ -56,6 +56,7 @@ STC_INLINE void         csview_clear(csview* self) { *self = csview_null; }
 STC_INLINE const char*  csview_front(const csview* self) { return self->str; }
 STC_INLINE const char*  csview_back(const csview* self) { return self->str + self->size - 1; }
 
+#define                 csview_hash(sv)  c_default_hash((sv).str, (sv).size)
 STC_INLINE bool         csview_equals(csview sv, csview sv2)
                             { return sv.size == sv2.size && !memcmp(sv.str, sv2.str, sv.size); }
 STC_INLINE size_t       csview_find(csview sv, csview needle)
@@ -74,6 +75,22 @@ STC_INLINE csview_iter_t csview_begin(const csview* self)
 STC_INLINE csview_iter_t csview_end(const csview* self)
                             { return c_make(csview_iter_t){self->str + self->size}; }
 STC_INLINE void          csview_next(csview_iter_t* it) { ++it->ref; }
+
+
+STC_INLINE csview csview_first_token(csview sv, csview sep) {
+    const char* res = c_strnstrn(sv.str, sep.str, sv.size, sep.size); 
+    return c_make(csview){sv.str, (res ? res - sv.str : sv.size)};
+}
+
+STC_INLINE csview csview_next_token(csview sv, csview sep, csview token) {
+    if (token.str - sv.str + token.size == sv.size)
+        return c_make(csview){sv.str + sv.size, 0};
+    token.str += token.size + sep.size;
+    size_t n = sv.size - (token.str - sv.str);
+    const char* res = c_strnstrn(token.str, sep.str, n, sep.size);
+    token.size = res ? res - token.str : n;
+    return token;
+}
 
 /* cstr interaction with csview: */
 

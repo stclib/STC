@@ -84,11 +84,11 @@ uint64_t      csview_hash_ref(const csview* x, size_t ignored);
 
 ## Constants and macros
 
-| Name             | Value               | Usage                            |
-|:-----------------|:------------------ -|:---------------------------------|
-| `csview_null`    | same as `c_lit("")` | `sview = csview_null;`           |
-| `c_lit(literal)` | csview constructor  | `sview = c_lit("hello, world");` |
-| `csview_ARG(sv)` | printf argument     | `printf("%.*s", csview_ARG(sv));`|
+| Name             | Value               | Usage                             |
+|:-----------------|:--------------------|:----------------------------------|
+| `csview_null`    | same as `c_lit("")` | `sview = csview_null;`            |
+| `c_lit(literal)` | csview constructor  | `sview = c_lit("hello, world");`  |
+| `csview_ARG(sv)` | printf argument     | `printf("%.*s", csview_ARG(sv));` |
 
 ## Container adaptors
 ```
@@ -168,4 +168,27 @@ Second last element
 Last element
 
 world: 200
+```
+### Example 2: string view tokensizer
+Splits strings into tokens. **No** memory allocations, *strlen()*, or string zero-termination dependency.
+```c
+#include <stc/csview.h>
+
+void splitstring(csview str, csview sep)
+{
+    csview token = csview_first_token(str, sep);
+    for (;;) {
+        printf("token: \"%.*s\"\n", csview_ARG(token));
+        if (csview_end(&token).ref == csview_end(&str).ref) break;
+        token = csview_next_token(str, sep, token);
+    }
+    puts("--");
+}
+
+int main()
+{
+    splitstring(c_lit("//This is//double slash//separated//string"), c_lit("//"));
+    splitstring(c_lit("This has no matching separator"), c_lit("xx"));
+    splitstring(c_lit("Split,this,string,now,ok,"), c_lit(","));
+}
 ```
