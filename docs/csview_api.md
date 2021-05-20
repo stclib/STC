@@ -169,7 +169,7 @@ Last element
 
 world: 200
 ```
-### Example 2: string view tokensizer
+### Example 2: csview tokenizer (string split)
 Splits strings into tokens. **No** memory allocations, *strlen()*, or string zero-termination dependency.
 ```c
 #include <stc/csview.h>
