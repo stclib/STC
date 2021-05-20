@@ -1,4 +1,4 @@
-# STC [cstr](../stc/cstr.h): String
+# STC [cstr](../include/stc/cstr.h): String
 ![String](pics/string.jpg)
 
 A **cstr** object represent sequences of characters. It supports an interface similar to that of a standard container of bytes, but adding features specifically designed to operate with strings of single-byte characters, terminated by the null character.

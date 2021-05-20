@@ -1,4 +1,4 @@
-# STC [cbits](../stc/cbits.h): Bitset
+# STC [cbits](../include/stc/cbits.h): Bitset
 ![Bitset](pics/bitset.jpg)
 
 A **cbits** represents a set of bits. It provides accesses to the value of individual bits via *cbits_test()* and provides the bitwise operators that one can apply to builtin integers. The number of bits in the set is specified at runtime via a parameter to the constructor *cbits_with_size()* or by *cbits_resize()*. A **cbits** bitset can be manipulated by standard logic operators and converted to and from strings.

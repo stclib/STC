@@ -1,4 +1,4 @@
-# STC [csview](../stc/csview.h): String View
+# STC [csview](../include/stc/csview.h): String View
 ![String](pics/string.jpg)
 
 The type **csview** is a string view and can refer to a constant contiguous sequence of char-elements with the first

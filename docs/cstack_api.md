@@ -1,4 +1,4 @@
-# STC [cstack](../stc/cstack.h): Stack
+# STC [cstack](../include/stc/cstack.h): Stack
 ![Stack](pics/stack.jpg)
 
 The **cstack** is a container adapter that gives the programmer the functionality of a stack - specifically, a LIFO (last-in, first-out) data structure. The class template acts as a wrapper to the underlying container - only a specific set of functions is provided. The stack pushes and pops the element from the back of the underlying container, known as the top of the stack.

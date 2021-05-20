@@ -1,4 +1,4 @@
-# STC [clist](../stc/clist.h): Forward List
+# STC [clist](../include/stc/clist.h): Forward List
 ![List](pics/list.jpg)
 
 The **clist** container supports fast insertion and removal of elements from anywhere in the container.

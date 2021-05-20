@@ -1,4 +1,4 @@
-# STC [cmap](../stc/cmap.h): Unordered Map
+# STC [cmap](../include/stc/cmap.h): Unordered Map
 ![Map](pics/map.jpg)
 
 A **cmap** is an associative container that contains key-value pairs with unique keys. Search, insertion, and removal of elements

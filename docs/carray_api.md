@@ -1,4 +1,4 @@
-# STC [carray](../stc/carray.h): Dynamic Multi-dimensional Array
+# STC [carray](../include/stc/carray.h): Dynamic Multi-dimensional Array
 ![Array](pics/array.jpg)
 
 The **carray** containers provides templates for multidimensional arrays. It supports 2- and

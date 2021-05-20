@@ -1,4 +1,4 @@
-# STC [coption](../stc/coption.h): Command line argument parsing
+# STC [coption](../include/stc/coption.h): Command line argument parsing
 
 This describes the API of the *coption_get()* function for command line argument parsing.
 

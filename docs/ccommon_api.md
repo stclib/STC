@@ -1,4 +1,4 @@
-# STC [ccommon](../stc/ccommon.h): Common definitions and handy macros
+# STC [ccommon](../include/stc/ccommon.h): Common definitions and handy macros
 
 The following handy macros are safe to use, i.e. have no side-effects.
 

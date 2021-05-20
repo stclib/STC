@@ -1,4 +1,4 @@
-# STC [crandom](../stc/crandom.h): Pseudo Random Number Generator
+# STC [crandom](../include/stc/crandom.h): Pseudo Random Number Generator
 ![Random](pics/random.jpg)
 
 This features a *64-bit PRNG* named **stc64**, and can generate bounded uniform and normal

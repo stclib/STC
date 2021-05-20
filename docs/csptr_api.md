@@ -1,4 +1,4 @@
-# STC [csptr](../stc/csptr.h): Shared Pointers
+# STC [csptr](../include/stc/csptr.h): Shared Pointers
 
 **csptr** is a smart pointer that retains shared ownership of an object through a pointer. 
 Several **csptr** objects may own the same object. The object is destroyed and its memory

@@ -1,4 +1,4 @@
-# STC [csmap](../stc/csmap.h): Sorted Map
+# STC [csmap](../include/stc/csmap.h): Sorted Map
 ![Map](pics/smap.jpg)
 
 A **csmap** is a sorted associative container that contains key-value pairs with unique keys. Keys are sorted by
