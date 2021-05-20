@@ -16,7 +16,7 @@ All cstr definitions and prototypes are available by including a single header f
 
 ```c
 cstr         cstr_init(void);                                         // constructor; same as cstr_null.
-cstr         cstr_new(const char literal_only[]);                     // cstr from literal; no strlen().
+cstr         cstr_lit(const char literal_only[]);                     // cstr from literal; no strlen().
 cstr         cstr_from(const char* str);                              // constructor using strlen()
 cstr         cstr_from_n(const char* str, size_t n);                  // constructor with specified length
 cstr         cstr_with_capacity(size_t cap);
@@ -120,7 +120,7 @@ char*        c_strncasestrn(const char* str, const char* needle, size_t slen, si
 #include <stc/cstr.h>
 
 int main() {
-    cstr s0 = cstr_new("Initialization without using strlen().");
+    cstr s0 = cstr_lit("Initialization without using strlen().");
     printf("%s\nLength: %zu\n\n", s0.str, cstr_size(s0));
 
     cstr s1 = cstr_from("one-nine-three-seven-five.");

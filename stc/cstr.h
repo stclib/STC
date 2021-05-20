@@ -66,7 +66,7 @@ STC_API char*           c_strnstrn(const char* s, const char* needle, size_t sle
 STC_API char*           c_strncasestrn(const char* s, const char* needle, size_t slen, size_t nmax);
 
 STC_INLINE cstr         cstr_init() { return cstr_null; }
-#define                 cstr_new(literal) \
+#define                 cstr_lit(literal) \
                             cstr_from_n(literal, sizeof c_make(strlit_t){literal} - 1)
 STC_INLINE cstr         cstr_from(const char* str)
                             { return cstr_from_n(str, strlen(str)); }

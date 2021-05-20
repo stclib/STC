@@ -289,6 +289,12 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
         return c_make(CX##_iter_t){.ref = NULL}; \
     } \
 \
+    STC_INLINE CX##_iter_t \
+    CX##_fwd(CX##_iter_t it, size_t n) { \
+        while (n-- && it.ref) CX##_next(&it); \
+        return it; \
+    } \
+\
     _c_implement_aatree(CX, C, Key, Mapped, keyCompareRaw, \
                         mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
                         keyDel, keyFromRaw, keyToRaw, RawKey) \

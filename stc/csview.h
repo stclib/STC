@@ -29,18 +29,22 @@ typedef                 struct { const char* str; size_t size; } csview;
 typedef                 struct { const char *ref; } csview_iter_t;
 typedef                 char csview_value_t;
 #define                 csview_null  c_make(csview){"", 0}
-#define                 csview_PRN(sv) (int)(sv).size, (sv).str
+#define                 csview_ARG(sv) (int)(sv).size, (sv).str
 
-#define                 csview_new(literal) \
-                            c_make(csview){literal, sizeof c_make(strlit_t){literal} - 1}
-#define                 c_sv(literal) \
-                            csview_new(literal)
+#define                 c_lit(literal) \
+                            csview_lit(literal)
+STC_INLINE csview       c_sv(cstr s)
+                            { return c_make(csview){s.str, _cstr_rep(&s)->size}; }
 STC_INLINE csview       csview_from(const char* str)
                             { return c_make(csview){str, strlen(str)}; }
 STC_INLINE csview       csview_from_n(const char* str, size_t n)
                             { return c_make(csview){str, n}; }
+
+#define                 csview_lit(literal) \
+                            c_make(csview){literal, sizeof c_make(strlit_t){literal} - 1}
 STC_INLINE csview       csview_from_s(cstr s)
                             { return c_make(csview){s.str, _cstr_rep(&s)->size}; }
+
 STC_INLINE csview       csview_remove_prefix(csview sv, size_t n)
                             { sv.str += n, sv.size -= n; return sv; }
 STC_INLINE csview       csview_remove_suffix(csview sv, size_t n)
