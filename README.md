@@ -168,7 +168,7 @@ After erasing elements found:
 Installation
 ------------
 Because it is headers-only, headers can simply be included in your program. The methods are static by default (some inlined).
-You may add the project folder to **CPATH** environment variable, to let GCC, Clang, and TinyC locate the headers.
+You may add the *include* folder to the **CPATH** environment variable to let GCC, Clang, and TinyC locate the headers.
 
 If containers are used across several translation units with common instantiated container types, it is recommended to
 build as a "library" to minimize the executable size. To enable this mode, specify **-DSTC_HEADER** as a compiler option
