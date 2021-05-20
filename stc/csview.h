@@ -39,18 +39,15 @@ STC_INLINE csview       csview_from(const char* str)
                             { return c_make(csview){str, strlen(str)}; }
 STC_INLINE csview       csview_from_n(const char* str, size_t n)
                             { return c_make(csview){str, n}; }
-
 #define                 csview_lit(literal) \
                             c_make(csview){literal, sizeof c_make(strlit_t){literal} - 1}
 STC_INLINE csview       csview_from_s(cstr s)
                             { return c_make(csview){s.str, _cstr_rep(&s)->size}; }
 
-STC_INLINE csview       csview_remove_prefix(csview sv, size_t n)
-                            { sv.str += n, sv.size -= n; return sv; }
-STC_INLINE csview       csview_remove_suffix(csview sv, size_t n)
-                            { sv.size -= n; return sv; }
-STC_INLINE csview       csview_substr(csview sv, size_t pos, size_t n)
-                            { sv.str += pos, sv.size = n; return sv; }
+STC_INLINE csview       csview_trimmed(csview sv, size_t left, size_t right)
+                            { sv.str += left, sv.size -= left + right; return sv; }
+STC_INLINE csview       csview_trimmed_s(cstr s, size_t left, size_t right)
+                            { return c_make(csview){s.str + left, _cstr_rep(&s)->size - right - left}; }
 
 STC_INLINE size_t       csview_size(csview sv) { return sv.size; }
 STC_INLINE size_t       csview_length(csview sv) { return sv.size; }

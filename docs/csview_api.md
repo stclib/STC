@@ -9,6 +9,9 @@ Its lifetime is limited by the source string storage. It keeps the length of the
 when passing it around. It is faster when using`csview` as convertion type (raw) than `const char*` in associative
 containers with cstr keys. E.g. prefer `using_cmap_svkey()` over `using_cmap_strkey()`.
 
+Note that a **csview** may not be null-terminated, and should therefore be printed the following way: 
+`printf("%.*s", csview_ARG(sv))`.
+
 See the c++ class [std::basic_string_view](https://en.cppreference.com/w/cpp/string/basic_string_view) for a functional
 description.
 
@@ -24,21 +27,18 @@ All csview definitions and prototypes are available by including a single header
 ```c
 csview        c_lit(const char literal_only[]);                     // csview from literal, no strlen()
 csview        c_sv(cstr s);                                         // construct csview from cstr
-
 csview        csview_from(const char* str);                         // construct from (const char*)
 csview        csview_from_n(const char* str, size_t n);             // construct 
 csview        csview_from_s(cstr s);                                // same as c_sv()
 csview        csview_lit(const char literal_only[]);                // same as c_lit()
-
-csview        csview_remove_prefix(csview sv, size_t n);
-csview        csview_remove_suffix(csview sv, size_t n);
-csview        csview_substr(csview sv, size_t pos, size_t n);
 
 size_t        csview_size(csview sv);
 size_t        csview_length(csview sv);
 bool          csview_empty(csview sv);
 
 void          csview_clear(csview* self);
+csview        csview_trimmed(csview sv, size_t left, size_t right);
+csview        csview_trimmed_s(cstr s, size_t left, size_t right);
 
 bool          csview_equals(csview sv, csview sv2);
 size_t        csview_find(csview sv, csview needle);
