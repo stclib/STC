@@ -115,36 +115,17 @@ using_cset_sv()
 
 // cmap<cstr, int> with csview as convertion type
 using_cmap_svkey(si, int);
-// cvec<cstr> with csview as convertion type
-using_cvec_sv();
 
 int main()
 {
     csview text = c_lit("The length of this literal is evaluated at compile time and stored in csview text.");
     printf("%s\nLength: %zu\n\n", text.str, text.size);
 
-    // cvec of cstr elements, using csview as "emplace" type
-    c_var (cvec_sv, vec, {  // defines vec with 3 cstr elements.
-        c_lit("Element 1"),  // will be converted to cstr.
-        c_lit("Element 2"),
-        c_lit("Element 3")
-    });
-    c_defer (cvec_sv_del(&vec))  // defer destruction to end of block.
-    {
-        // push constructed cstr directly
-        cvec_sv_push_back(&vec, cstr_lit("Second last element"));
-        // emplace constructs cstr from a csview
-        cvec_sv_emplace_back(&vec, c_lit("Last element"));
-
-        c_foreach (i, cvec_sv, vec)
-            printf("%s\n", i.ref->str);
-    }
-
     c_withvar (cmap_si, map) // defines map and defers destruction.
     {
         cmap_si_emplace(&map, c_lit("hello"), 100);
         cmap_si_emplace(&map, c_lit("world"), 200);
-        cmap_si_emplace(&map, c_lit("gone mad"), 300);
+        cmap_si_emplace(&map, c_lit("hello"), 300); // already in map, ignored
 
         // Efficient lookup: no string allocation or strlen() takes place:
         cmap_si_value_t* v = cmap_si_get(&map, c_lit("world"));
@@ -156,12 +137,6 @@ Output:
 ```
 A long and winded literal string
 Length: 32
-
-Great
-Fantastic
-Sensational
-Second last element
-Last element
 
 world: 200
 ```
