@@ -13,10 +13,10 @@ constructors are defined. This ensures that resources are released after usage, 
 |:---------------------------------|:--------------------------------------------------|
 | `c_with (acquire, release)`      | Do `acquire`. Defer `release` to end of block     |
 | `c_defer (release...)`           | Defer `release` to end of defer block             |
-| `c_withvar (type, var)`          | `c_with (type var = type_init(), type_del(&var))` |
+| `c_withvar (type, v1,...v3)`     | `c_with (type v1 = type_init(), type_del(&v1))`   |
 | `c_withbuf (buf, type, n)`       | Declare, allocate and free memory buffer          |
 
-The `acquire`argument must be of the form: `type var = get_resource`.
+The `acquire`argument must be of the form: `type var = getResource`.
 **c_with** and **c_defer** are general macros, whereas **c_withvar** requires that there 
 are methods *type_init()* to create and return an object of type, and *type_del()* 
 that destructs the object. These are available for all STC containers.

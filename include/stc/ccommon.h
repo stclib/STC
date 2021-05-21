@@ -122,9 +122,13 @@
     for (type i=start, _c_inc=step, _c_end=(stop) - (0 < _c_inc) \
          ; (i <= _c_end) == (0 < _c_inc); i += _c_inc)
 
-#define c_defer(...) for (int _c_ii = 0; !_c_ii; ++_c_ii, __VA_ARGS__)
 #define c_with(start, end) for (start, *_c_ii = NULL; !_c_ii; ++_c_ii, end)
-#define c_withvar(ctype, var) c_with (ctype var = ctype##_init(), ctype##_del(&var))
+#define c_withvar(...) c_MACRO_OVERLOAD(c_withvar, __VA_ARGS__)
+#define c_withvar_2(CX, var) c_with (CX var = CX##_init(), CX##_del(&var))
+#define c_withvar_3(CX, v1, v2) c_with (_c_EXPAND(CX v1 = CX##_init(), v2 = v1), (CX##_del(&v2), CX##_del(&v1)))
+#define c_withvar_4(CX, v1, v2, v3) c_with (_c_EXPAND(CX v1 = CX##_init(), v2 = v1, v3 = v1), \
+                                            (CX##_del(&v3), CX##_del(&v2), CX##_del(&v1)))
+#define c_defer(...) for (int _c_ii = 0; !_c_ii; ++_c_ii, __VA_ARGS__)
 
 #define c_withbuf(b, type, n) c_withbuf_N(b, type, n, 256)
 #define c_withbuf_N(b, type, n, BYTES) \
