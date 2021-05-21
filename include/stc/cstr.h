@@ -78,6 +78,8 @@ STC_INLINE void         cstr_del(cstr* self)
                             { if (_cstr_rep(self)->cap) c_free(_cstr_rep(self)); }
 STC_INLINE cstr         cstr_clone(cstr s)
                             { return cstr_from_n(s.str, _cstr_rep(&s)->size); }
+STC_INLINE cstr         cstr_substr(cstr s, size_t pos, size_t n)
+                            { return cstr_from_n(s.str + pos, n); }
 STC_INLINE void         cstr_clear(cstr* self)
                             { self->str[_cstr_rep(self)->size = 0] = '\0'; }
 STC_INLINE cstr*        cstr_assign(cstr* self, const char* str)

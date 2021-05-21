@@ -43,11 +43,10 @@ STC_INLINE csview       csview_from_n(const char* str, size_t n)
                             c_make(csview){literal, sizeof c_make(strlit_t){literal} - 1}
 STC_INLINE csview       csview_from_s(cstr s)
                             { return c_make(csview){s.str, _cstr_rep(&s)->size}; }
-
+STC_INLINE csview       csview_substr(csview sv, size_t pos, size_t n)
+                            { sv.str += pos, sv.size = n; return sv; }
 STC_INLINE csview       csview_trimmed(csview sv, size_t left, size_t right)
                             { sv.str += left, sv.size -= left + right; return sv; }
-STC_INLINE csview       csview_trimmed_s(cstr s, size_t left, size_t right)
-                            { return c_make(csview){s.str + left, _cstr_rep(&s)->size - right - left}; }
 
 STC_INLINE size_t       csview_size(csview sv) { return sv.size; }
 STC_INLINE size_t       csview_length(csview sv) { return sv.size; }
@@ -98,6 +97,8 @@ STC_INLINE cstr         cstr_from_v(csview sv)
                             { return cstr_from_n(sv.str, sv.size); }
 STC_INLINE csview       cstr_to_v(const cstr* self)
                             { return c_make(csview){self->str, _cstr_rep(self)->size}; }
+STC_INLINE csview       cstr_trimmed(cstr s, size_t left, size_t right)
+                            { return csview_trimmed(c_sv(s), left, right); }
 STC_INLINE cstr*        cstr_assign_v(cstr* self, csview sv)
                             { return cstr_assign_n(self, sv.str, sv.size); }
 STC_INLINE cstr*        cstr_append_v(cstr* self, csview sv)
@@ -119,7 +120,6 @@ STC_INLINE bool         cstr_begins_with_v(cstr s, csview sub)
 STC_INLINE bool         cstr_ends_with_v(cstr s, csview sub)
                             { if (sub.size > cstr_size(s)) return false;
                               return !memcmp(s.str + cstr_size(s) - sub.size, sub.str, sub.size); }
-
 
 /* ---- Adaptor functions ---- */
 
