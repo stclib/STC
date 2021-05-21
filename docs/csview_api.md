@@ -90,12 +90,8 @@ uint64_t      csview_hash_ref(const csview* x, size_t ignored);
 | `c_lit(literal)` | csview constructor  | `sview = c_lit("hello, world");`  |
 | `csview_ARG(sv)` | printf argument     | `printf("%.*s", csview_ARG(sv));` |
 
-## Container adaptors
+## Associative cstr-containers with csview emplace/lookup API
 ```
-using_cvec_sv()
-using_cdeq_sv()
-using_clist_sv()
-
 using_csmap_svkey(X, Mapped)
 using_csmap_svkey(X, Mapped, mappedDel)
 using_csmap_svkey(X, Mapped, mappedDel, mappedClone)
@@ -169,26 +165,62 @@ Last element
 
 world: 200
 ```
+
 ### Example 2: csview tokenizer (string split)
-Splits strings into tokens. **No** memory allocations, *strlen()*, or string zero-termination dependency.
+Splits strings into tokens. *print_split()* makes **no** memory allocations, *strlen()* calls, or has null-terminated string dependency. *string_split()* returns a cstr vector.
 ```c
 #include <stc/csview.h>
+#include <stc/cvec.h>
 
-void splitstring(csview str, csview sep)
+void print_split(csview str, csview sep)
 {
     csview token = csview_first_token(str, sep);
     for (;;) {
-        printf("token: \"%.*s\"\n", csview_ARG(token));
+        // print non-null-terminated csview
+        printf("\"%.*s\"\n", csview_ARG(token));
         if (csview_end(&token).ref == csview_end(&str).ref) break;
         token = csview_next_token(str, sep, token);
     }
-    puts("--");
+}
+
+using_cvec_str();
+
+cvec_str string_split(csview str, csview sep)
+{
+    cvec_str vec = cvec_str_init();
+    csview token = csview_first_token(str, sep);
+    for (;;) {
+        cvec_str_push_back(&vec, cstr_from_v(token));
+        if (csview_end(&token).ref == csview_end(&str).ref) break;
+        token = csview_next_token(str, sep, token);
+    }
+    return vec;
 }
 
 int main()
 {
-    splitstring(c_lit("//This is//double slash//separated//string"), c_lit("//"));
-    splitstring(c_lit("This has no matching separator"), c_lit("xx"));
-    splitstring(c_lit("Split,this,string,now,ok,"), c_lit(","));
+    print_split(c_lit("//This is a//double-slash//separated//string"), c_lit("//")); puts("");
+    print_split(c_lit("This has no matching separator"), c_lit("xx")); puts("");
+
+    c_with (cvec_str v = string_split(c_lit("Split,this,,string,now,"), c_lit(",")), cvec_str_del(&v))
+        c_foreach (i, cvec_str, v)
+            printf("\"%s\"\n", i.ref->str);
 }
+```
+Output:
+```
+""
+"This is a"
+"double-slash"
+"separated"
+"string"
+
+"This has no matching separator"
+
+"Split"
+"this"
+""
+"string"
+"now"
+""
 ```

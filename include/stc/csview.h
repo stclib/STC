@@ -128,15 +128,7 @@ STC_INLINE bool         csview_equals_ref(const csview* a, const csview* b)
                             { return a->size == b->size && !memcmp(a->str, b->str, a->size); }
 #define                 csview_hash_ref(xp, none)  c_default_hash((xp)->str, (xp)->size)
 
-/* ---- Containers ---- */
-
-#define using_cvec_sv() \
-    using_cvec(sv, cstr, csview_compare_ref, cstr_del, cstr_from_v, cstr_to_v, csview)
-#define using_cdeq_sv() \
-    using_cdeq(sv, cstr, csview_compare_ref, cstr_del, cstr_from_v, cstr_to_v, csview)
-#define using_clist_sv() \
-    using_clist(sv, cstr, csview_compare_ref, cstr_del, cstr_from_v, cstr_to_v, csview)
-
+/* ---- Associative cstr-containers with csview emplace/lookup API ---- */
 
 #define using_csmap_svkey(...) c_MACRO_OVERLOAD(using_csmap_svkey, __VA_ARGS__)
 
