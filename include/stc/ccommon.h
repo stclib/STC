@@ -135,15 +135,15 @@
     for (type _c_b[((BYTES) - 1) / sizeof(type) + 1], \
                 *b = (n)*sizeof *b > (BYTES) ? c_new_n(type, n) : _c_b \
          ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)
-#define c_breakwith continue
-#define c_breakdefer continue
+#define c_exitwith continue
+#define c_exitdefer continue
 
 #define c_var(CX, c, ...) \
     CX c = CX##_init(); c_emplace(CX, c, __VA_ARGS__)
 
-#define c_emplace(CX, c, ...) do { \
+#define c_emplace(CX, cx, ...) do { \
     const CX##_rawvalue_t _c_arr[] = __VA_ARGS__; \
-    CX##_emplace_items(&(c), _c_arr, c_arraylen(_c_arr)); \
+    CX##_emplace_items(&(cx), _c_arr, c_arraylen(_c_arr)); \
 } while (0)
 
 #define c_del(CX, ...) do { \

@@ -2,12 +2,13 @@
 
 The following handy macros are safe to use, i.e. have no side-effects.
 
-### c_defer, c_with, c_withvar, c_withbuf, c_breakwith
-General *defer* mechanics. These macros allows to specify destructors explicitly or implicitly where the
-constructors are defined. This ensures that resources are released after usage, and avoids memory leaks.
-**c_with / c_withvar** are inspired by Python's *with* statement.
+### c_defer, c_with, c_withvar, c_withbuf, c_exitwith/c_exitdefer
+General ***defer*** mechanics. These macros allows to specify a resource release explicitly or implicitly where the
+resource acquisition is made. This ensures that resources are released after usage, and avoids memory leaks.
+**c_with / c_withvar** are inspired by Python's *with* statement, and **c_defer** from Go language.
 
-**NB**: ***Only*** use `c_breakwith` or `c_breakdefer` to break out of `c_with`/`c_defer`-blocks. ***Never*** use `return`, `break`, or `goto` inside such a block.
+**NB**: ***Only*** use `c_exitwith`/`c_exitdefer` to break out of `c_with*`/`c_defer`-blocks.
+***Never*** use `return`, `goto` or `break` inside such a block.
 
 | Usage                            | Description                                       |
 |:---------------------------------|:--------------------------------------------------|
@@ -19,7 +20,7 @@ constructors are defined. This ensures that resources are released after usage, 
 The `acquire`argument must be of the form: `type var = getResource`.
 **c_with** and **c_defer** are general macros, whereas **c_withvar** requires that there 
 are methods *type_init()* to create and return an object of type, and *type_del()* 
-that destructs the object. These are available for all STC containers.
+which destructs the object. These are available for all STC containers.
 
 ```c
 // Example: Load each line of a text file into a vector of strings
