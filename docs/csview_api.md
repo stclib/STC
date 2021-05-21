@@ -40,6 +40,9 @@ void          csview_clear(csview* self);
 csview        csview_trimmed(csview sv, size_t left, size_t right);
 csview        csview_trimmed_s(cstr s, size_t left, size_t right);
 
+csview        csview_first_token(csview sv, csview sep);
+csview        csview_next_token(csview sv, csview sep, csview token);
+
 bool          csview_equals(csview sv, csview sv2);
 size_t        csview_find(csview sv, csview needle);
 bool          csview_contains(csview sv, csview needle);
@@ -142,7 +145,8 @@ world: 200
 ```
 
 ### Example 2: csview tokenizer (string split)
-Splits strings into tokens. *print_split()* makes **no** memory allocations, *strlen()* calls, or has null-terminated string dependency. *string_split()* returns a cstr vector.
+Splits strings into tokens. *print_split()* calls make **no** memory allocations, *strlen()* calls, or depends on
+null-terminated strings. *string_split()* function returns a vector of cstr.
 ```c
 #include <stc/csview.h>
 #include <stc/cvec.h>
@@ -174,8 +178,10 @@ cvec_str string_split(csview str, csview sep)
 
 int main()
 {
-    print_split(c_lit("//This is a//double-slash//separated//string"), c_lit("//")); puts("");
-    print_split(c_lit("This has no matching separator"), c_lit("xx")); puts("");
+    print_split(c_lit("//This is a//double-slash//separated//string"), c_lit("//"));
+    puts("");
+    print_split(c_lit("This has no matching separator"), c_lit("xx"));
+    puts("");
 
     c_with (cvec_str v = string_split(c_lit("Split,this,,string,now,"), c_lit(",")), cvec_str_del(&v))
         c_foreach (i, cvec_str, v)
