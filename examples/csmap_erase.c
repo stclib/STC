@@ -1,5 +1,5 @@
 // map_erase.c
-// https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#emplace
+// https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-16
 #include <stc/csmap.h>
 #include <stc/cstr.h>
 #include <stdio.h>
@@ -27,13 +27,12 @@ int main()
         puts("Starting data of map m1 is:");
         printmap(m1);
         // The 1st member function removes an element at a given position
-        csmap_my_iter_t it = csmap_my_begin(&m1); csmap_my_next(&it);
-        csmap_my_erase_at(&m1, it);
+        csmap_my_erase_at(&m1, csmap_my_fwd(csmap_my_begin(&m1), 1));
         puts("After the 2nd element is deleted, the map m1 is:");
         printmap(m1);
     }
 
-    c_with (csmap_my m2 = csmap_my_init(), csmap_my_del(&m2))
+    c_withvar (csmap_my, m2)
     {
         // Fill in some data to test with, one at a time, using emplace
         c_emplace(csmap_my, m2, {
@@ -55,7 +54,7 @@ int main()
         printmap(m2);
     }
 
-    c_with (csmap_my m3 = csmap_my_init(), csmap_my_del(&m3))
+    c_withvar (csmap_my, m3)
     {
         // Fill in some data to test with, one at a time, using emplace
         csmap_my_emplace(&m3, 1, "red");
@@ -75,5 +74,4 @@ int main()
         puts("After the element with a key of 2 is deleted, the map m3 is:");
         printmap(m3);
     }
-
 }

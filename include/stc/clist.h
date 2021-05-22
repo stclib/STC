@@ -120,10 +120,10 @@ STC_API size_t _clist_count(const clist_VOID* self);
     STC_INLINE size_t       CX##_count(CX cx) \
                                 {return _clist_count((const clist_VOID*) &cx);} \
     STC_INLINE void         CX##_clear(CX* self) {CX##_del(self);} \
+    STC_INLINE Value        CX##_value_fromraw(RawValue raw) {return valueFromRaw(raw);} \
+    STC_INLINE RawValue     CX##_value_toraw(CX##_value_t* pval) {return valueToRaw(pval);} \
     STC_INLINE Value        CX##_value_clone(Value val) \
                                 {return valueFromRaw(valueToRaw(&val));} \
-    STC_INLINE Value        CX##_value_fromraw(RawValue raw) \
-                                {return valueFromRaw(raw);} \
     STC_INLINE void         CX##_pop_front(CX* self) \
                                 {CX##_erase_after_(self, self->last);} \
     STC_INLINE CX##_iter_t  CX##_erase(CX* self, CX##_iter_t it) \

@@ -88,6 +88,7 @@ cvec_X_iter_t       cvec_X_begin(const cvec_X* self);
 cvec_X_iter_t       cvec_X_end(const cvec_X* self);
 void                cvec_X_next(cvec_X_iter_t* iter);
 
+cvec_X_rawvalue_t   cvec_X_value_toraw(cvec_X_value_t* pval);
 cvec_X_value_t      cvec_X_value_clone(cvec_X_value_t val);
 ```
 

@@ -75,6 +75,7 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
     STC_INLINE size_t        CX##_capacity(CX cx) {return _cdeq_rep(&cx)->cap;} \
     STC_INLINE void          CX##_swap(CX* a, CX* b) {c_swap(CX, *a, *b);} \
     STC_INLINE Value         CX##_value_fromraw(RawValue raw) {return valueFromRaw(raw);} \
+    STC_INLINE RawValue      CX##_value_toraw(CX##_value_t* pval) {return valueToRaw(pval);} \
     STC_INLINE Value         CX##_value_clone(Value val) \
                                 {return valueFromRaw(valueToRaw(&val));} \
     STC_INLINE void          CX##_emplace_back(CX* self, RawValue raw) \

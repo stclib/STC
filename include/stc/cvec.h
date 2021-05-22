@@ -75,6 +75,9 @@ struct cvec_rep { size_t size, cap; void* data[]; };
     STC_INLINE size_t       CX##_capacity(CX cx) { return _cvec_rep(&cx)->cap; } \
     STC_INLINE bool         CX##_empty(CX cx) {return !_cvec_rep(&cx)->size;} \
     STC_INLINE Value        CX##_value_fromraw(RawValue raw) {return valueFromRaw(raw);} \
+    STC_INLINE RawValue     CX##_value_toraw(CX##_value_t* val) {return valueToRaw(val);} \
+    STC_INLINE Value        CX##_value_clone(CX##_value_t val) \
+                                {return valueFromRaw(valueToRaw(&val));} \
     STC_INLINE void         CX##_swap(CX* a, CX* b) {c_swap(CX, *a, *b);} \
     STC_INLINE CX##_value_t*CX##_front(const CX* self) {return self->data;} \
     STC_INLINE CX##_value_t*CX##_back(const CX* self) \
@@ -83,8 +86,6 @@ struct cvec_rep { size_t size, cap; void* data[]; };
                                 {CX##_push_back(self, valueFromRaw(raw));} \
     STC_INLINE void         CX##_pop_back(CX* self) \
                                 {valueDel(&self->data[--_cvec_rep(self)->size]);} \
-    STC_INLINE Value        CX##_value_clone(CX##_value_t val) \
-                                {return valueFromRaw(valueToRaw(&val));} \
     STC_INLINE CX##_iter_t  CX##_begin(const CX* self) \
                                 {return c_make(CX##_iter_t){self->data};} \
     STC_INLINE CX##_iter_t  CX##_end(const CX* self) \

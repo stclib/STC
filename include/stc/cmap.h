@@ -209,6 +209,12 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
         MAP_ONLY_##C( _dst->second = mappedFromRaw(mappedToRaw(&_val->second)); ) \
     } \
 \
+    STC_INLINE CX##_rawvalue_t \
+    CX##_value_toraw(CX##_value_t* val) { \
+        return SET_ONLY_##C( keyToRaw(val) ) \
+               MAP_ONLY_##C( c_make(CX##_rawvalue_t){keyToRaw(&val->first), mappedToRaw(&val->second)} ); \
+    } \
+\
     STC_INLINE void \
     CX##_value_del(CX##_value_t* _val) { \
         keyDel((CX##_key_t*) KEY_REF_##C(_val)); \

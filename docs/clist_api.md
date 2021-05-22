@@ -85,8 +85,9 @@ void                clist_X_sort(clist_X* self);
 clist_X_iter_t      clist_X_begin(const clist_X* self);
 clist_X_iter_t      clist_X_end(const clist_X* self);
 void                clist_X_next(clist_X_iter_t* it);
-
 clist_X_iter_t      clist_X_fwd(clist_X_iter it, size_t n);                        // return it n elements ahead. End allowed.
+
+clist_X_rawvalue_t  clist_X_value_toraw(clist_X_value_t* pval);
 clist_X_value_t     clist_X_value_clone(clist_X_value_t val);
 ```
 
