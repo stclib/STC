@@ -93,8 +93,12 @@ uint64_t      csview_hash_ref(const csview* x, size_t ignored);
 | `c_lit(literal)` | csview constructor  | `sview = c_lit("hello, world");`  |
 | `csview_ARG(sv)` | printf argument     | `printf("%.*s", csview_ARG(sv));` |
 
-## Associative cstr-containers with csview emplace/lookup API
+## cstr-containers with csview emplace/lookup API
 ```
+using_cvec_sv()
+using_cdeq_sv()
+using_clist_sv()
+
 using_csmap_svkey(X, Mapped)
 using_csmap_svkey(X, Mapped, mappedDel)
 using_csmap_svkey(X, Mapped, mappedDel, mappedClone)

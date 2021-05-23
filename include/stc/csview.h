@@ -29,18 +29,17 @@ typedef                 struct { const char* str; size_t size; } csview;
 typedef                 struct { const char *ref; } csview_iter_t;
 typedef                 char csview_value_t;
 #define                 csview_null  c_make(csview){"", 0}
-#define                 csview_ARG(sv) (int)(sv).size, (sv).str
+#define                 csview_ARG(sv)  (int)(sv).size, (sv).str
 
-#define                 c_lit(literal) \
-                            csview_lit(literal)
-STC_INLINE csview       c_sv(cstr s)
-                            { return c_make(csview){s.str, _cstr_rep(&s)->size}; }
+#define                 c_lit(literal) csview_lit(literal)
+#define                 c_sv(s) csview_from_s(s)
+
+#define                 csview_lit(literal) \
+                            c_make(csview){literal, sizeof c_make(strlit_t){literal} - 1}
 STC_INLINE csview       csview_from(const char* str)
                             { return c_make(csview){str, strlen(str)}; }
 STC_INLINE csview       csview_from_n(const char* str, size_t n)
                             { return c_make(csview){str, n}; }
-#define                 csview_lit(literal) \
-                            c_make(csview){literal, sizeof c_make(strlit_t){literal} - 1}
 STC_INLINE csview       csview_from_s(cstr s)
                             { return c_make(csview){s.str, _cstr_rep(&s)->size}; }
 STC_INLINE csview       csview_substr(csview sv, size_t pos, size_t n)
@@ -128,7 +127,15 @@ STC_INLINE bool         csview_equals_ref(const csview* a, const csview* b)
                             { return a->size == b->size && !memcmp(a->str, b->str, a->size); }
 #define                 csview_hash_ref(xp, none)  c_default_hash((xp)->str, (xp)->size)
 
-/* ---- Associative cstr-containers with csview emplace/lookup API ---- */
+/* ---- cstr-containers with csview emplace/lookup API ---- */
+
+#define using_cvec_sv() \
+    using_cvec(sv, cstr, csview_compare_ref, cstr_del, cstr_from_v, cstr_to_v, csview)
+#define using_cdeq_sv() \
+    using_cdeq(sv, cstr, csview_compare_ref, cstr_del, cstr_from_v, cstr_to_v, csview)
+#define using_clist_sv() \
+    using_clist(sv, cstr, csview_compare_ref, cstr_del, cstr_from_v, cstr_to_v, csview)
+
 
 #define using_csmap_svkey(...) c_MACRO_OVERLOAD(using_csmap_svkey, __VA_ARGS__)
 
