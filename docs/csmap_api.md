@@ -152,7 +152,7 @@ int main()
         {100, "Red"},
         {110, "Blue"},
     });
-    c_defer (csmap_id_del(&idnames)) 
+    c_fordefer (csmap_id_del(&idnames)) 
     {
         /* put replaces existing mapped value: */
         csmap_id_emplace_or_assign(&idnames, 110, "White");

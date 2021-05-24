@@ -216,7 +216,7 @@ using_cvec_str(); // vector of string (cstr)
 ...
 cvec_str vec = cvec_str_init();
 cstr s = cstr_lit("a string literal");            // cstr_lit() for literals; no strlen() usage
-c_defer (cvec_str_del(&vec), cstr_del(&s))        // defer the destructors to end of block:
+c_fordefer (cvec_str_del(&vec), cstr_del(&s))     // defer the destructors to end of block:
 {
     cvec_str_push_back(&vec, cstr_from("Hello")); // construct and add string from const char*
     cvec_str_push_back(&vec, cstr_clone(s));      // clone and add an existing string
