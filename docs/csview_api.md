@@ -10,7 +10,7 @@ when passing it around. It is faster when using`csview` as convertion type (raw)
 containers with cstr keys. E.g. prefer `using_cmap_svkey()` over `using_cmap_strkey()`.
 
 Note that a **csview** may not be null-terminated, and should therefore be printed the following way: 
-`printf("%.*s", csview_ARG(sv))`.
+`printf("%.*s", csview_arg(sv))`.
 
 See the c++ class [std::basic_string_view](https://en.cppreference.com/w/cpp/string/basic_string_view) for a functional
 description.
@@ -91,7 +91,7 @@ uint64_t      csview_hash_ref(const csview* x, size_t ignored);
 |:-----------------|:--------------------|:----------------------------------|
 | `csview_null`    | same as `c_lit("")` | `sview = csview_null;`            |
 | `c_lit(literal)` | csview constructor  | `sview = c_lit("hello, world");`  |
-| `csview_ARG(sv)` | printf argument     | `printf("%.*s", csview_ARG(sv));` |
+| `csview_arg(sv)` | printf argument     | `printf("%.*s", csview_arg(sv));` |
 
 ## cstr-containers with csview emplace/lookup API
 ```
@@ -160,7 +160,7 @@ void print_split(csview str, csview sep)
     csview token = csview_first_token(str, sep);
     for (;;) {
         // print non-null-terminated csview
-        printf("\"%.*s\"\n", csview_ARG(token));
+        printf("\"%.*s\"\n", csview_arg(token));
         if (csview_end(&token).ref == csview_end(&str).ref) break;
         token = csview_next_token(str, sep, token);
     }
