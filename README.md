@@ -214,16 +214,16 @@ and non-emplace methods:
 ```c
 using_cvec_str(); // vector of string (cstr)
 ...
-cvec_str vec = cvec_str_init();
-cstr s = cstr_lit("a string literal");            // cstr_lit() for literals; no strlen() usage
-c_fordefer (cvec_str_del(&vec), cstr_del(&s))     // defer the destructors to end of block:
+c_fordefer (cvec_str vec = cvec_str_init(), cvec_str_del(&vec))   // defer vector destructor to end of block
+c_fordefer (cstr s = cstr_lit("a string literal"), cstr_del(&s))  // cstr_lit() for literals; no strlen() usage
 {
-    cvec_str_push_back(&vec, cstr_from("Hello")); // construct and add string from const char*
-    cvec_str_push_back(&vec, cstr_clone(s));      // clone and add an existing string
+    const char* hello = "Hello";
+    cvec_str_push_back(&vec, cstr_from(hello);    // construct and add string from const char*
+    cvec_str_push_back(&vec, cstr_clone(s));      // clone and add an existing cstr
 
     cvec_str_emplace_back(&vec, "Yay, literal");  // internally constructs cstr from string-literal
-    cvec_str_emplace_back(&vec, cstr_clone(s));   // <-- COMPILE ERROR: wrong input type
-    cvec_str_emplace_back(&vec, s.str);           // Ok: const char* input type (= rawvalue).
+    cvec_str_emplace_back(&vec, cstr_clone(s));   // <-- COMPILE ERROR: expects const char*
+    cvec_str_emplace_back(&vec, s.str);           // Ok: const char* input type.
 }
 ```
 This is made possible because the **using**-declarations may be given an optional
