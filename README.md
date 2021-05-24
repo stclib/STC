@@ -190,14 +190,14 @@ using_clist(p, struct Point);
 
 The *emplace* versus non-emplace container methods
 --------------------------------------------------
-STC, like c++ STL, has two sets of methods for adding elements to containers. One set begins 
+STC, like c++ STL, has two sets of methods for adding elements to containers. One set begins
 with **emplace**, e.g. **cvec_X_emplace_back()**. This is a convenient alternative to
 **cvec_X_push_back()** when dealing non-trivial container elements, e.g. smart pointers or
-elements using dynamic memory. 
+elements using dynamic memory.
 
 The **emplace** methods ***construct*** or ***clone*** their own copy of the element to be added.
-In contrast, the non-emplace methods requires elements to be explicitly constructed or cloned 
-before adding them. For containers of integral or trivial element types, **emplace** and 
+In contrast, the non-emplace methods requires elements to be explicitly constructed or cloned
+before adding them. For containers of integral or trivial element types, **emplace** and
 corresponding non-emplace methods are identical, so the following does not apply for those.
 
 | Move and insert element   | Construct element in-place   | Container                                   |
@@ -214,21 +214,21 @@ and non-emplace methods:
 ```c
 using_cvec_str(); // vector of string (cstr)
 ...
-cvec_str vec = cvec_str_init();
-cstr s = cstr_lit("a string literal");            // cstr_lit() for literals; no strlen() usage
-c_fordefer (cvec_str_del(&vec), cstr_del(&s))     // defer the destructors to end of block:
+c_forvar (cvec_str vec = cvec_str_init(), cvec_str_del(&vec))   // defer vector destructor to end of block
+c_forvar (cstr s = cstr_lit("a string literal"), cstr_del(&s))  // cstr_lit() for literals; no strlen() usage
 {
-    cvec_str_push_back(&vec, cstr_from("Hello")); // construct and add string from const char*
-    cvec_str_push_back(&vec, cstr_clone(s));      // clone and add an existing string
+    const char* hello = "Hello";
+    cvec_str_push_back(&vec, cstr_from(hello);    // construct and add string from const char*
+    cvec_str_push_back(&vec, cstr_clone(s));      // clone and add an existing cstr
 
     cvec_str_emplace_back(&vec, "Yay, literal");  // internally constructs cstr from string-literal
-    cvec_str_emplace_back(&vec, cstr_clone(s));   // <-- COMPILE ERROR: wrong input type
-    cvec_str_emplace_back(&vec, s.str);           // Ok: const char* input type (= rawvalue).
+    cvec_str_emplace_back(&vec, cstr_clone(s));   // <-- COMPILE ERROR: expects const char*
+    cvec_str_emplace_back(&vec, s.str);           // Ok: const char* input type.
 }
 ```
 This is made possible because the **using**-declarations may be given an optional
-conversion/"rawvalue"-type as template parameter, along with a back and forth conversion 
-methods to the container value type. By default, *rawvalue has the same type as value*. 
+conversion/"rawvalue"-type as template parameter, along with a back and forth conversion
+methods to the container value type. By default, *rawvalue has the same type as value*.
 
 Rawvalues are also beneficial for **find()** and *map insertions*. The **emplace()** methods constructs
 *cstr*-objects from the rawvalues, but only when required:
@@ -243,7 +243,7 @@ cmap_str_emplace_or_assign(&map, "Hello", "there");
 // Only cstr_from("there") constructed. "world" was destructed and replaced.
 
 cmap_str_insert(&map, cstr_from("Hello"), cstr_from("you"));
-// Two cstr's constructed outside call, but both destructed by insert 
+// Two cstr's constructed outside call, but both destructed by insert
 // because "Hello" existed. No mem-leak but less efficient.
 
 it = cmap_str_find(&map, "Hello");
