@@ -41,7 +41,7 @@ using_cmap_keydef(vk, Viking, int, vikingraw_equals, vikingraw_hash,
 
 int main()
 {
-    c_fordefer (cmap_vk vikings = cmap_vk_init(), cmap_vk_del(&vikings)) {
+    c_forvar (cmap_vk vikings = cmap_vk_init(), cmap_vk_del(&vikings)) {
         c_emplace(cmap_vk, vikings, {
             { {"Einar", "Norway"}, 20},
             { {"Olaf", "Denmark"}, 24},

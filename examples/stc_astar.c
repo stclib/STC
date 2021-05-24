@@ -83,9 +83,9 @@ astar(cstr maze, int width)
     cpque_pnt frontier = cpque_pnt_init();
     csmap_step came_from = csmap_step_init();
     csmap_cost cost_so_far = csmap_cost_init();
-    c_fordefer ((cpque_pnt_del(&frontier),
-                 csmap_step_del(&came_from),
-                 csmap_cost_del(&cost_so_far)))
+    c_fordefer (cpque_pnt_del(&frontier),
+                csmap_step_del(&came_from),
+                csmap_cost_del(&cost_so_far))
     {
         cpque_pnt_push(&frontier, start);
         csmap_cost_insert(&cost_so_far, start, 0);

@@ -39,14 +39,14 @@ int main(int argc, char **argv)
 {
     c_static_assert(3 == 3, "hello");
 
-    c_fordefer (cset_str names = cset_str_init(), cset_str_del(&names)) {
+    c_forvar (cset_str names = cset_str_init(), cset_str_del(&names)) {
         c_emplace (cset_str, names, {"Hello", "Cool", "True"});
         c_foreach (i, cset_str, names) printf("%s ", i.ref->str);
         puts("");
     }
 
     bool erased;
-    c_fordefer (cmap_str phone_book = cmap_str_init(), cmap_str_del(&phone_book)) {
+    c_forvar (cmap_str phone_book = cmap_str_init(), cmap_str_del(&phone_book)) {
         c_emplace (cmap_str, phone_book, {
             {"Lilia Friedman", "(892) 670-4739"},
             {"Tariq Beltran", "(489) 600-7575"},

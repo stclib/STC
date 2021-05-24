@@ -208,7 +208,7 @@ using_cmap(vi, Vec3i, int, c_memcmp_equals, // bitwise equals
 int main()
 {
     // Define map with defered destruct
-    c_fordefer (cmap_vi vecs = cmap_vi_init(), cmap_vi_del(&vecs))
+    c_forvar (cmap_vi vecs = cmap_vi_init(), cmap_vi_del(&vecs))
     {
         cmap_vi_insert(&vecs, (Vec3i){100,   0,   0}, 1);
         cmap_vi_insert(&vecs, (Vec3i){  0, 100,   0}, 2);
@@ -239,7 +239,7 @@ using_cmap(iv, int, Vec3i);
 
 int main()
 {
-    c_fordefer (cmap_iv vecs = cmap_iv_init(), cmap_iv_del(&vecs))
+    c_forvar (cmap_iv vecs = cmap_iv_init(), cmap_iv_del(&vecs))
     {
         cmap_iv_insert(&vecs, 1, (Vec3i){100,   0,   0});
         cmap_iv_insert(&vecs, 2, (Vec3i){  0, 100,   0});

@@ -152,7 +152,7 @@ int main()
         {100, "Red"},
         {110, "Blue"},
     });
-    c_fordefer (csmap_id_del(&idnames)) 
+    c_forvar (csmap_id_del(&idnames)) 
     {
         /* put replaces existing mapped value: */
         csmap_id_emplace_or_assign(&idnames, 110, "White");
@@ -192,7 +192,7 @@ using_csmap(vi, Vec3i, int, Vec3i_compare);
 
 int main()
 {
-    c_fordefer (csmap_vi vecs = csmap_vi_init(), csmap_vi_del(&vecs))
+    c_forvar (csmap_vi vecs = csmap_vi_init(), csmap_vi_del(&vecs))
     {
       csmap_vi_insert(&vecs, (Vec3i){100,   0,   0}, 1);
       csmap_vi_insert(&vecs, (Vec3i){  0, 100,   0}, 2);
@@ -223,7 +223,7 @@ using_csmap(iv, int, Vec3i);
 
 int main()
 {
-    c_fordefer (csmap_iv vecs = csmap_iv_init(), csmap_iv_del(&vecs))
+    c_forvar (csmap_iv vecs = csmap_iv_init(), csmap_iv_del(&vecs))
     {
         csmap_iv_insert(&vecs, 1, (Vec3i){100,   0,   0});
         csmap_iv_insert(&vecs, 2, (Vec3i){  0, 100,   0});

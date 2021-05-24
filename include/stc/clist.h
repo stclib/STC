@@ -35,7 +35,7 @@
     using_clist(ix, int64_t);
 
     int main() {
-        c_fordefer (clist_ix list = clist_ix_init(), clist_ix_del(&list))
+        c_forvar (clist_ix list = clist_ix_init(), clist_ix_del(&list))
         {
             stc64_t rng = stc64_init(12345);
             int n;

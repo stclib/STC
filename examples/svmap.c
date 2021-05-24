@@ -9,7 +9,7 @@ int main() {
     csview fox = c_lit("The quick brown fox jumps over the lazy dog.");
     printf("\"%s\", length=%zu\n", fox.str, fox.size);
 
-    c_fordefer (cmap_si frequencies = cmap_si_init(), cmap_si_del(&frequencies))
+    c_forvar (cmap_si frequencies = cmap_si_init(), cmap_si_del(&frequencies))
     {
         // Non-emplace: cstr element API
         cmap_si_insert(&frequencies, cstr_lit("thousand"), 1000);

@@ -13,7 +13,7 @@ int main ()
     // Ustring positions:                        0123456789*123456789*12345
     cstr s = cstr_from(base);              // "this is a test string."
     cstr m = cstr_clone(s);
-    c_fordefer ((cstr_del(&s), cstr_del(&m))) {
+    c_fordefer (cstr_del(&s), cstr_del(&m)) {
         cstr_append(&m, m.str);
         cstr_append(&m, m.str);
         printf("%s\n", m.str);
@@ -25,8 +25,8 @@ int main ()
         cstr_replace(&s, 8, 10, "just a");       // "this is just a phrase."     (3)
         printf("(3) %s\n", s.str);
         cstr_replace_n(&s, 8, 6,"a shorty", 7);  // "this is a short phrase."    (4)
-        printf("(4) %s\n", s.str);  
+        printf("(4) %s\n", s.str);
         cstr_replace(&s, 22, 1, "!!!");          // "this is a short phrase!!!"  (5)
-        printf("(5) %s\n", s.str);  
-    }  
+        printf("(5) %s\n", s.str);
+    }
 }

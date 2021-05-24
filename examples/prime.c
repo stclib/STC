@@ -27,7 +27,7 @@ int main(void)
     printf("computing prime numbers up to %zu\n", n);
 
     clock_t t1 = clock();
-    c_fordefer (cbits primes = sieveOfEratosthenes(n + 1), cbits_del(&primes)) {
+    c_forvar (cbits primes = sieveOfEratosthenes(n + 1), cbits_del(&primes)) {
         size_t np = cbits_count(primes);
         clock_t t2 = clock();
 

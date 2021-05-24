@@ -9,7 +9,7 @@
 void stringdemo1()
 {
     printf("\nSTRINGDEMO1\n");
-    c_fordefer (cstr cs = cstr_from("one-nine-three-seven-five"), cstr_del(&cs))
+    c_forvar (cstr cs = cstr_from("one-nine-three-seven-five"), cstr_del(&cs))
     {
         printf("%s.\n", cs.str);
 
@@ -40,7 +40,7 @@ using_cvec(ix, int64_t); // ix is just an example tag name.
 void vectordemo1()
 {
     printf("\nVECTORDEMO1\n");
-    c_fordefer (cvec_ix bignums = cvec_ix_with_capacity(100), cvec_ix_del(&bignums))
+    c_forvar (cvec_ix bignums = cvec_ix_with_capacity(100), cvec_ix_del(&bignums))
     {
         cvec_ix_reserve(&bignums, 100);
         for (size_t i = 10; i <= 100; i += 10)
@@ -64,7 +64,7 @@ using_cvec_str();
 void vectordemo2()
 {
     printf("\nVECTORDEMO2\n");
-    c_fordefer (cvec_str names = cvec_str_init(), cvec_str_del(&names)) {
+    c_forvar (cvec_str names = cvec_str_init(), cvec_str_del(&names)) {
         cvec_str_emplace_back(&names, "Mary");
         cvec_str_emplace_back(&names, "Joe");
         cvec_str_emplace_back(&names, "Chris");
@@ -82,8 +82,8 @@ using_clist(ix, int);
 void listdemo1()
 {
     printf("\nLISTDEMO1\n");
-    c_fordefer (clist_ix nums = clist_ix_init(), clist_ix_del(&nums))
-    c_fordefer (clist_ix nums2 = clist_ix_init(), clist_ix_del(&nums2))
+    c_forvar (clist_ix nums = clist_ix_init(), clist_ix_del(&nums))
+    c_forvar (clist_ix nums2 = clist_ix_init(), clist_ix_del(&nums2))
     {
         for (int i = 0; i < 10; ++i)
             clist_ix_push_back(&nums, i);
@@ -142,7 +142,7 @@ using_cmap_strkey(si, int); // Shorthand macro for the general using_cmap expans
 void mapdemo2()
 {
     printf("\nMAPDEMO2\n");
-    c_fordefer (cmap_si nums = cmap_si_init(), cmap_si_del(&nums))
+    c_forvar (cmap_si nums = cmap_si_init(), cmap_si_del(&nums))
     {
         cmap_si_emplace_or_assign(&nums, "Hello", 64);
         cmap_si_emplace_or_assign(&nums, "Groovy", 121);

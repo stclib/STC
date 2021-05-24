@@ -23,7 +23,7 @@ int main(void)
 {
     // CVEC FLOAT / PRIORITY QUEUE
 
-    c_fordefer (cvec_f floats = cvec_f_init(), cvec_f_del(&floats)) {
+    c_forvar (cvec_f floats = cvec_f_init(), cvec_f_del(&floats)) {
         c_emplace(cvec_f, floats, {4.0f, 2.0f, 5.0f, 3.0f, 1.0f});
 
         c_foreach (i, cvec_f, floats) printf("%.1f ", *i.ref);
@@ -45,7 +45,7 @@ int main(void)
     // CMAP ID
 
     int year = 2020;
-    c_fordefer (cmap_id idnames = cmap_id_init(), cmap_id_del(&idnames)) {
+    c_forvar (cmap_id idnames = cmap_id_init(), cmap_id_del(&idnames)) {
         cmap_id_emplace(&idnames, 100, "Hello");
         cmap_id_insert(&idnames, 110, cstr_from("World"));
         cmap_id_insert(&idnames, 120, cstr_from_fmt("Howdy, -%d-", year));
@@ -57,7 +57,7 @@ int main(void)
 
     // CMAP CNT
 
-    c_fordefer (cmap_cnt countries = cmap_cnt_init(), cmap_cnt_del(&countries)) {
+    c_forvar (cmap_cnt countries = cmap_cnt_init(), cmap_cnt_del(&countries)) {
         c_emplace(cmap_cnt, countries, {
             {"Norway", 100},
             {"Denmark", 50},
@@ -80,7 +80,7 @@ int main(void)
 
     // CVEC PAIR
 
-    c_fordefer (cvec_ip pairs1 = cvec_ip_init(), cvec_ip_del(&pairs1)) {
+    c_forvar (cvec_ip pairs1 = cvec_ip_init(), cvec_ip_del(&pairs1)) {
         c_emplace (cvec_ip, pairs1, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
         cvec_ip_sort(&pairs1);
 
@@ -91,7 +91,7 @@ int main(void)
 
     // CLIST PAIR
 
-    c_fordefer (clist_ip pairs2 = clist_ip_init(), clist_ip_del(&pairs2)) {
+    c_forvar (clist_ip pairs2 = clist_ip_init(), clist_ip_del(&pairs2)) {
         c_emplace(clist_ip, pairs2, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
         clist_ip_sort(&pairs2);
 

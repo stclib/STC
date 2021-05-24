@@ -21,8 +21,8 @@ int main()
     stc64_normalf_t dist = stc64_normalf_init(Mean, StdDev);
 
     // Create and init histogram map with defered destruct
-    c_fordefer (csmap_i mhist = csmap_i_init(), csmap_i_del(&mhist))
-    c_fordefer (cstr bar = cstr_init(), cstr_del(&bar))
+    c_forvar (csmap_i mhist = csmap_i_init(), csmap_i_del(&mhist))
+    c_forvar (cstr bar = cstr_init(), cstr_del(&bar))
     {
         c_forrange (N) {
             int index = (int) round( stc64_normalf(&rng, &dist) );

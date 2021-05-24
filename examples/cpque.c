@@ -31,9 +31,9 @@ int main()
 {
     const int data[] = {1,8,5,6,3,4,0,9,7,2};
 
-    c_fordefer (cpque_imax q = cpque_imax_init(), cpque_imax_del(&q))  // init() and defered del()
-    c_fordefer (cpque_imin q2 = cpque_imin_init(), cpque_imin_del(&q2))
-    c_fordefer (cpque_imix q3 = cpque_imix_init(), cpque_imix_del(&q3))
+    c_forvar (cpque_imax q = cpque_imax_init(), cpque_imax_del(&q))  // init() and defered del()
+    c_forvar (cpque_imin q2 = cpque_imin_init(), cpque_imin_del(&q2))
+    c_forvar (cpque_imix q3 = cpque_imix_init(), cpque_imix_del(&q3))
     {
         c_forrange (n, c_arraylen(data))
             cpque_imax_push(&q, n);

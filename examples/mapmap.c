@@ -9,7 +9,7 @@ using_cmap_str();
 using_cmap_strkey(cfg, cmap_str, cmap_str_del, c_no_clone);
 
 int main(void) {
-    c_fordefer (cmap_cfg cfg = cmap_cfg_init(), cmap_cfg_del(&cfg)) {
+    c_forvar (cmap_cfg cfg = cmap_cfg_init(), cmap_cfg_del(&cfg)) {
         cmap_str init = cmap_str_init();
         cmap_str_emplace(&cmap_cfg_insert(&cfg, cstr_from("user"), init).ref->second, "name", "Joe");
         cmap_str_emplace(&cmap_cfg_insert(&cfg, cstr_from("user"), init).ref->second, "groups", "proj1,proj3");

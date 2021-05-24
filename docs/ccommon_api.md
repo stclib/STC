@@ -2,23 +2,25 @@
 
 The following handy macros are safe to use, i.e. have no side-effects.
 
-### c_fordefer, c_forbuffer
+### c_forvar, c_fordefer, c_forbuffer
 General ***defer*** mechanics for resource acquisition. These macros allows to specify the release of the
 resource where the resource acquisition is made. This ensures that resources are released after usage.
 
-**NB**: These macros are one-time **for**-loops. ***Do only*** use `continue` in order to break out of a 
-`c_fordefer` / `c_forbuffer`-block. ***Do not*** use `return`, `goto` or `break`, as it will prevent the
-`release`-statement to be executed at the end.
+**Note**: These macros are one-time executed **for**-loops. ***Only*** use `continue` in order to break out
+of a `c_forvar` / `c_fordefer`-block. ***Do not*** use `return`, `goto` or `break`, as it will prevent the
+`release`-statement to be executed at the end. The same applies for `c_forbuffer`.
 
 | Usage                            | Description                                       |
 |:---------------------------------|:--------------------------------------------------|
-| `c_fordefer (acquire, release)`  | Do `acquire`. Defer `release` to end of block     |
-| `c_fordefer (release)`           | Defer execution of `release` to end of block      |
+| `c_forvar (acquire, release...)` | Do `acquire`. Defer `release` to end of block     |
+| `c_fordefer (release...)`        | Defer execution of `release` to end of block      |
 | `c_forbuffer (buf, type, n)`     | Declare, allocate and free memory buffer          |
 
-The `acquire`argument must be of the form: `type var = getResource`. Note that the `release` argument can be 
-a list of statements enclosed in parathesises. **c_forbuffer** uses stack memory if buffer is <= to 256 bytes,
-othewise it uses more expensive heap memory.
+The `acquire`argument must be of the form: `type var = GetResource`. Note that the `release` argument can be 
+a list of statements enclosed in parathesises. `c_forvar` can handle multiple variables of same type by using
+the `c_arg` macro: `c_forvar (c_arg(cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world"), cstr_del(&s1), cstr_del(&s2))`.
+
+**c_forbuffer** uses stack memory if buffer is <= to 256 bytes, othewise it uses the slower heap memory.
 
 ```c
 // Example: Load each line of a text file into a vector of strings
@@ -33,8 +35,8 @@ cvec_str readFile(const char* name)
     // receiver should check errno variable
     cvec_str vec = cvec_str_init();
 
-    c_fordefer (FILE* fp = fopen(name, "r"), fclose(fp)) {
-        c_fordefer (cstr line = cstr_null, cstr_del(&line))
+    c_forvar (FILE* fp = fopen(name, "r"), fclose(fp)) {
+        c_forvar (cstr line = cstr_null, cstr_del(&line))
             while (cstr_getline(&line, fp))
                 cvec_str_emplace_back(&vec, line.str);
     }
@@ -43,7 +45,7 @@ cvec_str readFile(const char* name)
 
 int main()
 {
-    c_fordefer (cvec_str x = readFile(__FILE__), cvec_str_del(&x))
+    c_forvar (cvec_str x = readFile(__FILE__), cvec_str_del(&x))
         c_foreach (i, cvec_str, x)
             printf("%s\n", i.ref->str);
 }

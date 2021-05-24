@@ -25,7 +25,7 @@ void print_istr(csmap_istr map) {
 int main()
 {
     // insert single values
-    c_fordefer (csmap_ii m1 = csmap_ii_init(), csmap_ii_del(&m1)) {
+    c_forvar (csmap_ii m1 = csmap_ii_init(), csmap_ii_del(&m1)) {
         csmap_ii_insert(&m1, 1, 10);
         csmap_ii_insert(&m1, 2, 20);
 
@@ -52,9 +52,8 @@ int main()
     }
 
     // The templatized version inserting a jumbled range
-    // c_fordefer_var(type, v) is shorthand for: c_fordefer (type v = type_init(), type_del(&v))
-    c_fordefer (csmap_ii m2 = csmap_ii_init(), csmap_ii_del(&m2))
-    c_fordefer (cvec_ii v = cvec_ii_init(), cvec_ii_del(&v)) {
+    c_forvar (csmap_ii m2 = csmap_ii_init(), csmap_ii_del(&m2))
+    c_forvar (cvec_ii v = cvec_ii_init(), cvec_ii_del(&v)) {
         cvec_ii_push_back(&v, (cvec_ii_value_t){43, 294});
         cvec_ii_push_back(&v, (cvec_ii_value_t){41, 262});
         cvec_ii_push_back(&v, (cvec_ii_value_t){45, 330});
@@ -73,7 +72,7 @@ int main()
     }
 
     // The templatized versions move-constructing elements
-    c_fordefer (csmap_istr m3 = csmap_istr_init(), csmap_istr_del(&m3)) {
+    c_forvar (csmap_istr m3 = csmap_istr_init(), csmap_istr_del(&m3)) {
         csmap_istr_value_t ip1 = {475, cstr_lit("blue")}, ip2 = {510, cstr_lit("green")};
 
         // single element
@@ -88,7 +87,7 @@ int main()
         puts("");
     }
 
-    c_fordefer (csmap_ii m4 = csmap_ii_init(), csmap_ii_del(&m4)) {
+    c_forvar (csmap_ii m4 = csmap_ii_init(), csmap_ii_del(&m4)) {
         // Insert the elements from an initializer_list
         c_emplace(csmap_ii, m4, { { 4, 44 }, { 2, 22 }, { 3, 33 }, { 1, 11 }, { 5, 55 } });
         puts("After initializer_list insertion, m4 contains:");

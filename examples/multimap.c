@@ -55,7 +55,7 @@ using_csmap_strkey(OL, clist_OL, clist_OL_del, c_no_clone);
 int main()
 {
     // Define the multimap with destructor defered to when block is completed.
-    c_fordefer (csmap_OL multimap = csmap_OL_init(), csmap_OL_del(&multimap))
+    c_forvar (csmap_OL multimap = csmap_OL_init(), csmap_OL_del(&multimap))
     {
         clist_OL empty = clist_OL_init();
 

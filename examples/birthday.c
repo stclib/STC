@@ -35,7 +35,7 @@ void test_distribution(void)
     stc64_t rng = stc64_init(seed);
     const size_t N = 1ull << BITS ;
     
-    c_fordefer (cmap_x map = cmap_x_init(), cmap_x_del(&map)) {
+    c_forvar (cmap_x map = cmap_x_init(), cmap_x_del(&map)) {
         c_forrange (N) {
             uint64_t k = stc64_rand(&rng);
             cmap_x_emplace(&map, k & 0xf, 0).ref->second += 1;

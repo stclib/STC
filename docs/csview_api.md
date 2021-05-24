@@ -128,7 +128,7 @@ int main()
     csview text = c_lit("The length of this literal is evaluated at compile time and stored in csview text.");
     printf("%s\nLength: %zu\n\n", text.str, text.size);
 
-    c_fordefer (cmap_si map = csmap_si_init(), csmap_si_del(&map))
+    c_forvar (cmap_si map = csmap_si_init(), csmap_si_del(&map))
     {
         cmap_si_emplace(&map, c_lit("hello"), 100);
         cmap_si_emplace(&map, c_lit("world"), 200);
@@ -187,7 +187,7 @@ int main()
     print_split(c_lit("This has no matching separator"), c_lit("xx"));
     puts("");
 
-    c_fordefer (cvec_str v = string_split(c_lit("Split,this,,string,now,"), c_lit(",")), cvec_str_del(&v))
+    c_forvar (cvec_str v = string_split(c_lit("Split,this,,string,now,"), c_lit(",")), cvec_str_del(&v))
         c_foreach (i, cvec_str, v)
             printf("\"%s\"\n", i.ref->str);
 }
