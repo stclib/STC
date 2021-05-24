@@ -13,7 +13,7 @@ int main() {
     size_t N = 10000000;
     stc64_t rng = stc64_init(time(NULL));
     stc64_uniform_t dist = stc64_uniform_init(0, N * 10);
-    c_withvar (cpque_i, heap)
+    c_fordefer (cpque_i heap = cpque_i_init(), cpque_i_del(&heap))
     {
         // Push ten million random numbers to priority queue
         c_forrange (N)

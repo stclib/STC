@@ -307,7 +307,7 @@ STC_DEF void
 cstr_replace_n(cstr* self, size_t pos, size_t len, const char* str, size_t n) {
     size_t sz = cstr_size(*self);
     if (len > sz - pos) len = sz - pos;
-    c_withbuf (xstr, char, n) {
+    c_forbuffer (xstr, char, n) {
         memcpy(xstr, str, n);
         _cstr_internal_move(self, pos + len, pos + n);
         memcpy(&self->str[pos], xstr, n);

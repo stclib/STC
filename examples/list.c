@@ -8,7 +8,7 @@ int main() {
     int k;
     const int n = 2000000;
 
-    c_withvar (clist_fx, list) {
+    c_fordefer (clist_fx list = clist_fx_init(), clist_fx_del(&list)) {
         stc64_t rng = stc64_init(1234);
         stc64_uniformf_t dist = stc64_uniformf_init(100.0f, n);
         int m = 0;

@@ -30,7 +30,7 @@ Similar to boost::dynamic_bitset / std::bitset
 #include "cbits.h"
 
 int main() {
-    c_with (cbits bset = cbits_with_size(23, true), cbits_del(&bset))
+    c_fordefer (cbits bset = cbits_with_size(23, true), cbits_del(&bset))
     {
         cbits_reset(&bset, 9);
         cbits_resize(&bset, 43, false);

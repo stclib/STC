@@ -11,7 +11,7 @@ using_cstack(c, cvec_c);
 int main() {
     cstack_i stack = cstack_i_init();
     cstack_c chars = cstack_c_init();
-    c_defer (cstack_i_del(&stack), cstack_c_del(&chars))
+    c_fordefer ((cstack_i_del(&stack), cstack_c_del(&chars)))
     {
         c_forrange (i, int, 101) 
             cstack_i_push(&stack, i*i);

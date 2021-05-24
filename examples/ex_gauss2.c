@@ -21,7 +21,8 @@ int main()
     stc64_normalf_t dist = stc64_normalf_init(Mean, StdDev);
 
     // Create and init histogram map with defered destruct
-    c_withvar (csmap_i, mhist)
+    c_fordefer (csmap_i mhist = csmap_i_init(), csmap_i_del(&mhist))
+    c_fordefer (cstr bar = cstr_init(), cstr_del(&bar))
     {
         c_forrange (N) {
             int index = (int) round( stc64_normalf(&rng, &dist) );
@@ -29,7 +30,6 @@ int main()
         }
 
         // Print the gaussian bar chart
-        c_withvar (cstr, bar)
         c_foreach (i, csmap_i, mhist) {
             size_t n = (size_t) (i.ref->second * StdDev * Scale * 2.5 / (float)N);
             if (n > 0) {

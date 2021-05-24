@@ -17,7 +17,7 @@ int main() {
     stc64_t rng = stc64_init(1234);
     dist = stc64_uniform_init(0, n);
 
-    c_withvar (cqueue_i, queue)
+    c_fordefer (cqueue_i queue = cqueue_i_init(), cqueue_i_del(&queue))
     {
         // Push ten million random numbers onto the queue.
         c_forrange (n)

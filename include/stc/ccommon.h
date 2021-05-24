@@ -53,12 +53,13 @@
 
 /* Macro overloading feature support: https://rextester.com/ONP80107 */
 #define _c_CAT( A, B ) A ## B
+#define _c_SELECT(NAME, NUM) _c_CAT( NAME ## _, NUM)
 #define _c_EXPAND(...) __VA_ARGS__
 #define _c_ARG_N(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, N,...) N
 #define _c_RSEQ_N 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 #define _c_APPLY_ARG_N(ARGS) _c_EXPAND(_c_ARG_N ARGS)
 #define _c_ARG_COUNT(...) _c_EXPAND(_c_APPLY_ARG_N((__VA_ARGS__, _c_RSEQ_N)))
-#define _c_SELECT(NAME, NUM) _c_CAT( NAME ## _, NUM)
+#define _c_LABEL(id) _c_SELECT(_c_label_##id, __LINE__)
 
 #define c_MACRO_OVERLOAD(NAME, ...) _c_SELECT(NAME, _c_ARG_COUNT(__VA_ARGS__))(__VA_ARGS__)
 #define c_static_assert(cond, ...) typedef char _static_assert_[(cond) ? 1 : -1]
@@ -122,21 +123,15 @@
     for (type i=start, _c_inc=step, _c_end=(stop) - (0 < _c_inc) \
          ; (i <= _c_end) == (0 < _c_inc); i += _c_inc)
 
-#define c_with(start, end) for (start, *_c_ii = NULL; !_c_ii; ++_c_ii, end)
-#define c_withvar(...) c_MACRO_OVERLOAD(c_withvar, __VA_ARGS__)
-#define c_withvar_2(CX, var) c_with (CX var = CX##_init(), CX##_del(&var))
-#define c_withvar_3(CX, v1, v2) c_with (_c_EXPAND(CX v1 = CX##_init(), v2 = v1), (CX##_del(&v2), CX##_del(&v1)))
-#define c_withvar_4(CX, v1, v2, v3) c_with (_c_EXPAND(CX v1 = CX##_init(), v2 = v1, v3 = v1), \
-                                            (CX##_del(&v3), CX##_del(&v2), CX##_del(&v1)))
-#define c_defer(...) for (int _c_ii = 0; !_c_ii; ++_c_ii, __VA_ARGS__)
+#define c_fordefer(...) c_MACRO_OVERLOAD(c_fordefer, __VA_ARGS__)
+#define c_fordefer_1(release) for (int _c_ii = 0; !_c_ii; ++_c_ii, release)
+#define c_fordefer_2(acquire, release) for (acquire, *_c_ii = NULL; !_c_ii; ++_c_ii, release)
 
-#define c_withbuf(b, type, n) c_withbuf_N(b, type, n, 256)
-#define c_withbuf_N(b, type, n, BYTES) \
+#define c_forbuffer(b, type, n) c_forbuffer_N(b, type, n, 256)
+#define c_forbuffer_N(b, type, n, BYTES) \
     for (type _c_b[((BYTES) - 1) / sizeof(type) + 1], \
                 *b = (n)*sizeof *b > (BYTES) ? c_new_n(type, n) : _c_b \
          ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)
-#define c_exitwith continue
-#define c_exitdefer continue
 
 #define c_var(CX, c, ...) \
     CX c = CX##_init(); c_emplace(CX, c, __VA_ARGS__)

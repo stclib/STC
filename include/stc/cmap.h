@@ -31,7 +31,7 @@
 using_cmap(mx, int, char); // Map of int -> char
 
 int main(void) {
-    c_with (cmap_mx m = cmap_mx_init(), cmap_mx_del(&m))
+    c_fordefer (cmap_mx m = cmap_mx_init(), cmap_mx_del(&m))
     {
         cmap_mx_emplace(&m, 5, 'a');
         cmap_mx_emplace(&m, 8, 'b');

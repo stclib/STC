@@ -6,7 +6,7 @@ using_clist(i, int);
 
 int main ()
 {
-    c_with (clist_i L = clist_i_init(), clist_i_del(&L))
+    c_fordefer (clist_i L = clist_i_init(), clist_i_del(&L))
     {
         c_emplace(clist_i, L, {10, 20, 30, 40, 50});
                                                     // 10 20 30 40 50

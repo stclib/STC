@@ -14,10 +14,11 @@ void print_ilist(const char* s, clist_i list)
 
 int main ()
 {
-    c_var (clist_i, list1, {1, 2, 3, 4, 5});
-    c_var (clist_i, list2, {10, 20, 30, 40, 50});
-    c_defer (clist_i_del(&list1), clist_i_del(&list2))
+    c_fordefer (clist_i list1 = clist_i_init(), clist_i_del(&list1))
+    c_fordefer (clist_i list2 = clist_i_init(), clist_i_del(&list2))
     {
+        c_emplace(clist_i, list1, {1, 2, 3, 4, 5});
+        c_emplace(clist_i, list2, {10, 20, 30, 40, 50});
         clist_i_iter_t it = clist_i_fwd(clist_i_begin(&list1), 2);
         it = clist_i_splice(&list1, it, &list2);
 

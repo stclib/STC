@@ -2,25 +2,23 @@
 
 The following handy macros are safe to use, i.e. have no side-effects.
 
-### c_defer, c_with, c_withvar, c_withbuf, c_exitwith/c_exitdefer
-General ***defer*** mechanics. These macros allows to specify a resource release explicitly or implicitly where the
-resource acquisition is made. This ensures that resources are released after usage, and avoids memory leaks.
-**c_with / c_withvar** are inspired by Python's *with* statement, and **c_defer** from Go language.
+### c_fordefer, c_forbuffer
+General ***defer*** mechanics for resource acquisition. These macros allows to specify the release of the
+resource where the resource acquisition is made. This ensures that resources are released after usage.
 
-**NB**: ***Only*** use `c_exitwith`/`c_exitdefer` to break out of `c_with*`/`c_defer`-blocks.
-***Never*** use `return`, `goto` or `break` inside such a block.
+**NB**: These macros are one-time **for**-loops. ***Do only*** use `continue` in order to break out of a 
+`c_fordefer` / `c_forbuffer`-block. ***Do not*** use `return`, `goto` or `break`, as it will prevent the
+`release`-statement to be executed at the end.
 
 | Usage                            | Description                                       |
 |:---------------------------------|:--------------------------------------------------|
-| `c_with (acquire, release)`      | Do `acquire`. Defer `release` to end of block     |
-| `c_defer (release...)`           | Defer `release` to end of defer block             |
-| `c_withvar (type, v1,...v3)`     | `c_with (type v1 = type_init(), type_del(&v1))`   |
-| `c_withbuf (buf, type, n)`       | Declare, allocate and free memory buffer          |
+| `c_fordefer (acquire, release)`  | Do `acquire`. Defer `release` to end of block     |
+| `c_fordefer (release)`           | Defer execution of `release` to end of block      |
+| `c_forbuffer (buf, type, n)`     | Declare, allocate and free memory buffer          |
 
-The `acquire`argument must be of the form: `type var = getResource`.
-**c_with** and **c_defer** are general macros, whereas **c_withvar** requires that there 
-are methods *type_init()* to create and return an object of type, and *type_del()* 
-which destructs the object. These are available for all STC containers.
+The `acquire`argument must be of the form: `type var = getResource`. Note that the `release` argument can be 
+a list of statements enclosed in parathesises. **c_forbuffer** uses stack memory if buffer is <= to 256 bytes,
+othewise it uses more expensive heap memory.
 
 ```c
 // Example: Load each line of a text file into a vector of strings
@@ -35,8 +33,8 @@ cvec_str readFile(const char* name)
     // receiver should check errno variable
     cvec_str vec = cvec_str_init();
 
-    c_with (FILE* fp = fopen(name, "r"), fclose(fp)) {
-        c_with (cstr line = cstr_null, cstr_del(&line))
+    c_fordefer (FILE* fp = fopen(name, "r"), fclose(fp)) {
+        c_fordefer (cstr line = cstr_null, cstr_del(&line))
             while (cstr_getline(&line, fp))
                 cvec_str_emplace_back(&vec, line.str);
     }
@@ -45,7 +43,7 @@ cvec_str readFile(const char* name)
 
 int main()
 {
-    c_with (cvec_str x = readFile(__FILE__), cvec_str_del(&x))
+    c_fordefer (cvec_str x = readFile(__FILE__), cvec_str_del(&x))
         c_foreach (i, cvec_str, x)
             printf("%s\n", i.ref->str);
 }

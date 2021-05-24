@@ -26,7 +26,7 @@ void insert(csmap_m* mmap, int key, const char* str)
 
 int main()
 {
-    c_with (csmap_m mmap = csmap_m_init(), csmap_m_del(&mmap))
+    c_fordefer (csmap_m mmap = csmap_m_init(), csmap_m_del(&mmap))
     {
         // list-initialize
         struct {int i; const char* s;} vals[] = {{2, "foo"}, {2, "bar"}, {3, "baz"}, {1, "abc"}, {5, "def"}};

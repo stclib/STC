@@ -33,7 +33,7 @@ using_carray2(i, int);
 
 int main() {
     int w = 7, h = 5;
-    c_with (carray2i image = carray2i_init(w, h), carray2i_del(&image)) 
+    c_fordefer (carray2i image = carray2i_init(w, h), carray2i_del(&image)) 
     {
         int *dat = carray2i_data(&image);
         for (int i = 0; i < carray2i_size(image); ++i)

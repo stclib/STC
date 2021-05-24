@@ -38,8 +38,8 @@ void findit(csmap_istr c, csmap_istr_key_t val) {
 
 int main()
 {
-    c_withvar (csmap_istr, m1)
-    c_withvar (cvec_istr, v) {
+    c_fordefer (csmap_istr m1 = csmap_istr_init(), csmap_istr_del(&m1))
+    c_fordefer (cvec_istr v = cvec_istr_init(), cvec_istr_del(&v)) {
         c_emplace(csmap_istr, m1, { { 40, "Zr" }, { 45, "Rh" } });
         puts("The starting map m1 is (key, value):");
         print_collection_csmap_istr(m1);

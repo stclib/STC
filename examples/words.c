@@ -15,7 +15,7 @@ int main1()
         "this", "sentence", "is", "not", "a", "sentence",
         "this", "sentence", "is", "a", "hoax"
     });
-    c_defer (clist_str_del(&lwords))
+    c_fordefer (clist_str_del(&lwords))
     {
         clist_str_push_back(&lwords, cstr_from_fmt("%.15f", sqrt(2)));
         c_foreach (w, clist_str, lwords)
@@ -26,7 +26,7 @@ int main1()
             "this", "sentence", "is", "not", "a", "sentence",
             "this", "sentence", "is", "a", "hoax"
         });
-        c_defer (cvec_str_del(&words))
+        c_fordefer (cvec_str_del(&words))
         {
             cmap_si word_map = cmap_si_init();
             c_foreach (w, cvec_str, words)

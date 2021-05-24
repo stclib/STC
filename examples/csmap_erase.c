@@ -15,7 +15,7 @@ void printmap(csmap_my map)
 
 int main()
 {
-    c_with (csmap_my m1 = csmap_my_init(), csmap_my_del(&m1))
+    c_fordefer (csmap_my m1 = csmap_my_init(), csmap_my_del(&m1))
     {
         // Fill in some data to test with, one at a time
         csmap_my_emplace(&m1, 1, "A");
@@ -32,7 +32,7 @@ int main()
         printmap(m1);
     }
 
-    c_withvar (csmap_my, m2)
+    c_fordefer (csmap_my m2 = csmap_my_init(), csmap_my_del(&m2))
     {
         // Fill in some data to test with, one at a time, using emplace
         c_emplace(csmap_my, m2, {
@@ -54,7 +54,7 @@ int main()
         printmap(m2);
     }
 
-    c_withvar (csmap_my, m3)
+    c_fordefer (csmap_my m3 = csmap_my_init(), csmap_my_del(&m3))
     {
         // Fill in some data to test with, one at a time, using emplace
         csmap_my_emplace(&m3, 1, "red");
