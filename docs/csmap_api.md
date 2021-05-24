@@ -152,13 +152,13 @@ int main()
         {100, "Red"},
         {110, "Blue"},
     });
-    c_forvar (csmap_id_del(&idnames)) 
+    c_fordefer (csmap_id_del(&idnames)) 
     {
-        /* put replaces existing mapped value: */
+        // put replaces existing mapped value:
         csmap_id_emplace_or_assign(&idnames, 110, "White");
-        /* put a constructed mapped value into map: */
+        // put a constructed mapped value into map:
         csmap_id_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
-        /* emplace adds only when key does not exist: */
+        // emplace adds only when key does not exist:
         csmap_id_emplace(&idnames, 100, "Green");
 
         c_foreach (i, csmap_id, idnames)
