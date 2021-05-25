@@ -105,7 +105,7 @@ char*        c_strncasestrn(const char* str, const char* needle, size_t slen, si
 
 | Type name         | Type definition                  | Used to represent...     |
 |:------------------|:---------------------------------|:-------------------------|
-| `cstr`            | `struct { const char *str; }`    | The string type          |
+| `cstr`            | `struct { char *str; }`          | The string type          |
 | `cstr_value_t`    | `char`                           | The string element type  |
 | `cstr_iter_t`     | `struct { cstr_value_t *ref; }`  | cstr iterator            |
 
