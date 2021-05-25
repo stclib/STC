@@ -199,14 +199,14 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-static struct cdeq_rep _cdeq_inits = {0, 0};
+static struct cdeq_rep _cdeq_sentinel = {0, 0};
 #define _cdeq_nfront(self) ((self)->data - (self)->_base)
 
 #define _c_implement_cdeq(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
 \
     STC_DEF CX \
     CX##_init(void) { \
-        CX##_value_t *b = (CX##_value_t *) _cdeq_inits.base; \
+        CX##_value_t *b = (CX##_value_t *) _cdeq_sentinel.base; \
         return c_make(CX){b, b}; \
     } \
 \

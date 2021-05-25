@@ -308,14 +308,14 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-static struct csmap_rep _csmap_inits = {0, 0, 0, 0};
+static struct csmap_rep _csmap_sentinel = {0, 0, 0, 0, 0};
 
 #define _c_implement_aatree(CX, C, Key, Mapped, keyCompareRaw, \
                             mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
                             keyDel, keyFromRaw, keyToRaw, RawKey) \
     STC_DEF CX \
     CX##_init(void) { \
-        CX tree = {(CX##_node_t *) _csmap_inits.nodes}; \
+        CX tree = {(CX##_node_t *) _csmap_sentinel.nodes}; \
         return tree; \
     } \
 \

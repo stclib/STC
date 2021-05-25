@@ -203,13 +203,13 @@ struct cvec_rep { size_t size, cap; void* data[]; };
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-static struct cvec_rep _cvec_inits = {0, 0};
+static struct cvec_rep _cvec_sentinel = {0, 0};
 
 #define _c_implement_cvec(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
 \
     STC_DEF CX \
     CX##_init(void) { \
-        CX cx = {(CX##_value_t *) _cvec_inits.data}; \
+        CX cx = {(CX##_value_t *) _cvec_sentinel.data}; \
         return cx; \
     } \
 \

@@ -81,8 +81,8 @@ STC_INLINE csview csview_first_token(csview sv, csview sep) {
 }
 
 STC_INLINE csview csview_next_token(csview sv, csview sep, csview token) {
-    if (token.str - sv.str + token.size == sv.size)
-        return c_make(csview){sv.str + sv.size, 0};
+    if (&token.str[token.size] == &sv.str[sv.size])
+        return c_make(csview){&sv.str[sv.size], 0};
     token.str += token.size + sep.size;
     size_t n = sv.size - (token.str - sv.str);
     const char* res = c_strnstrn(token.str, sep.str, n, sep.size);

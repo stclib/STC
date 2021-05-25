@@ -33,7 +33,10 @@ int main()
     print_split(c_lit("This has no matching separator"), c_lit("xx")); puts("");
 
     puts("Output from string_split():");
-    c_forvar (cvec_str v = string_split(c_lit("Split,this,,string,now,"), c_lit(",")), cvec_str_del(&v))
-        c_foreach (i, cvec_str, v)
+    cstr string = cstr_lit("Split,this,,string,now,");
+    cvec_str vec = string_split(c_sv(string), c_lit(","));
+
+    c_fordefer (cvec_str_del(&vec), cstr_del(&string))
+        c_foreach (i, cvec_str, vec)
             printf("\t\"%s\"\n", i.ref->str);
 }
