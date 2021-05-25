@@ -20,10 +20,11 @@ The **c_forbuffer** uses stack memory if buffer is <= to 256 bytes, othewise it 
 | `c_forbuffer (buf, type, n)`     | Declare, allocate and free memory buffer          |
 
 The `acquire`argument must be of the form: `type var = GetResource`. For multiple variables, use multiple
-`c_forvar` in sequence, or if variables are of same type, the `c_arg` macro can be used:
-```
+**c_forvar** in sequence, or if variables are of same type, the **c_arg** macro can be used:
+```c
 c_forvar (c_arg(cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world")), cstr_del(&s1), cstr_del(&s2))
 {
+    printf("%s %s\n", s1.str, s2.str);
 }
 ```
 **Example**: Load each line of a text file into a vector of strings:
