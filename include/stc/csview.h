@@ -96,8 +96,6 @@ STC_INLINE cstr         cstr_from_v(csview sv)
                             { return cstr_from_n(sv.str, sv.size); }
 STC_INLINE csview       cstr_to_v(const cstr* self)
                             { return c_make(csview){self->str, _cstr_rep(self)->size}; }
-STC_INLINE csview       cstr_trimmed(cstr s, size_t left, size_t right)
-                            { return csview_trimmed(c_sv(s), left, right); }
 STC_INLINE cstr*        cstr_assign_v(cstr* self, csview sv)
                             { return cstr_assign_n(self, sv.str, sv.size); }
 STC_INLINE cstr*        cstr_append_v(cstr* self, csview sv)

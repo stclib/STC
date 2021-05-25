@@ -59,7 +59,6 @@ void          csview_next(csview_iter_t* it);
 ```c
 cstr          cstr_from_v(csview sv);
 csview        cstr_to_v(const cstr* self);
-csview        cstr_trimmed(cstr s, size_t left, size_t right);
 cstr*         cstr_assign_v(cstr* self, csview sv);
 cstr*         cstr_append_v(cstr* self, csview sv);
 void          cstr_insert_v(cstr* self, size_t pos, csview sv);

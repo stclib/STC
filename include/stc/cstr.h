@@ -80,6 +80,8 @@ STC_INLINE cstr         cstr_clone(cstr s)
                             { return cstr_from_n(s.str, _cstr_rep(&s)->size); }
 STC_INLINE cstr         cstr_substr(cstr s, size_t pos, size_t n)
                             { return cstr_from_n(s.str + pos, n); }
+STC_INLINE cstr*        cstr_trim(cstr* self, size_t left, size_t right)
+                            { return cstr_assign_n(self, self->str + left, _cstr_rep(self)->size - left - right); }
 STC_INLINE void         cstr_clear(cstr* self)
                             { self->str[_cstr_rep(self)->size = 0] = '\0'; }
 STC_INLINE cstr*        cstr_assign(cstr* self, const char* str)

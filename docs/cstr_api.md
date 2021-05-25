@@ -42,6 +42,7 @@ cstr*        cstr_assign(cstr* self, const char* str);
 cstr*        cstr_assign_n(cstr* self, const char* str, size_t n);    // assign n first chars of str
 cstr*        cstr_assign_fmt(cstr* self, const char* fmt, ...);       // printf() formatting
 cstr*        cstr_copy(cstr* self, cstr s);                           // cstr_take(self, cstr_clone(s))
+cstr*        cstr_trim(cstr* self, size_t left, size_t right);
 
 cstr*        cstr_append(cstr* self, const char* str);
 cstr*        cstr_append_s(cstr* self, cstr s);
