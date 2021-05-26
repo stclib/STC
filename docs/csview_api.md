@@ -37,9 +37,9 @@ size_t        csview_length(csview sv);
 bool          csview_empty(csview sv);
 void          csview_clear(csview* self);
 
-csview        csview_substr(csview sv, size_t pos, size_t n);
-csview        csview_trimmed(csview sv, size_t left, size_t right);
-csview        csview_first_token(csview sv, csview sep);
+csview        csview_substr(csview sv, intptr_t pos, size_t n);    // negative pos count from end
+csview        csview_slice(csview sv, intptr_t p1, intptr_t p2);   // negative p1,p2 count from end
+csview        csview_first_token(csview sv, csview sep);           // see split example below.
 csview        csview_next_token(csview sv, csview sep, csview token);
 
 bool          csview_equals(csview sv, csview sv2);

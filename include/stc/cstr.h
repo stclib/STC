@@ -78,10 +78,16 @@ STC_INLINE void         cstr_del(cstr* self)
                             { if (_cstr_rep(self)->cap) c_free(_cstr_rep(self)); }
 STC_INLINE cstr         cstr_clone(cstr s)
                             { return cstr_from_n(s.str, _cstr_rep(&s)->size); }
-STC_INLINE cstr         cstr_substr(cstr s, size_t pos, size_t n)
-                            { return cstr_from_n(s.str + pos, n); }
-STC_INLINE cstr*        cstr_trim(cstr* self, size_t left, size_t right)
-                            { return cstr_assign_n(self, self->str + left, _cstr_rep(self)->size - left - right); }
+STC_INLINE cstr*        cstr_substr(cstr* self, intptr_t pos, size_t n) {
+                            size_t sz = _cstr_rep(self)->size;
+                            if (pos < 0) pos += sz; if (pos + n > sz) n = sz - pos;
+                            return cstr_assign_n(self, self->str + pos, n);
+                        }
+STC_INLINE cstr*        cstr_slice(cstr* self, intptr_t p1, intptr_t p2) {
+                            size_t sz = _cstr_rep(self)->size;
+                            if (p1 < 0) p1 += sz; if (p2 < 0) p2 += sz; if (p2 > sz) p2 = sz;
+                            return cstr_assign_n(self, self->str + p1, p2 > p1 ? p2 - p1 : 0);
+                        }
 STC_INLINE void         cstr_clear(cstr* self)
                             { self->str[_cstr_rep(self)->size = 0] = '\0'; }
 STC_INLINE cstr*        cstr_assign(cstr* self, const char* str)

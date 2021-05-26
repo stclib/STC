@@ -23,7 +23,6 @@ cstr         cstr_with_capacity(size_t cap);
 cstr         cstr_with_size(size_t len, char fill);                   // repeat fill len times
 cstr         cstr_from_fmt(const char* fmt, ...);                     // printf() formatting
 cstr         cstr_clone(cstr s);
-cstr         cstr_substr(cstr s, size_t pos, size_t n);
 
 cstr*        cstr_take(cstr* self, cstr s);                           // take the constructed or moved string
 cstr         cstr_move(cstr* self);                                   // move string to caller, leave empty string
@@ -42,8 +41,9 @@ cstr*        cstr_assign(cstr* self, const char* str);
 cstr*        cstr_assign_n(cstr* self, const char* str, size_t n);    // assign n first chars of str
 cstr*        cstr_assign_fmt(cstr* self, const char* fmt, ...);       // printf() formatting
 cstr*        cstr_copy(cstr* self, cstr s);                           // cstr_take(self, cstr_clone(s))
-cstr*        cstr_trim(cstr* self, size_t left, size_t right);
-
+cstr*        cstr_substr(cstr* self, intptr_t pos, size_t n);         // negative pos count from end
+cstr*        cstr_slice(cstr* self, intptr_t p1, intptr_t p2);        // negative p1,p2 count from end.
+                                                                      // substr(), slice() modifies self 
 cstr*        cstr_append(cstr* self, const char* str);
 cstr*        cstr_append_s(cstr* self, cstr s);
 cstr*        cstr_append_n(cstr* self, const char* str, size_t n);

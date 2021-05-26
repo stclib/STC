@@ -42,11 +42,16 @@ STC_INLINE csview       csview_from_n(const char* str, size_t n)
                             { return c_make(csview){str, n}; }
 STC_INLINE csview       csview_from_s(cstr s)
                             { return c_make(csview){s.str, _cstr_rep(&s)->size}; }
-STC_INLINE csview       csview_substr(csview sv, size_t pos, size_t n)
-                            { sv.str += pos, sv.size = n; return sv; }
-STC_INLINE csview       csview_trimmed(csview sv, size_t left, size_t right)
-                            { sv.str += left, sv.size -= left + right; return sv; }
-
+STC_INLINE csview       csview_substr(csview sv, intptr_t pos, size_t n) {
+                            if (pos < 0) pos += sv.size; 
+                            if (pos + n > sv.size) n = sv.size - pos;
+                            sv.str += pos, sv.size = n; return sv;
+                        }
+STC_INLINE csview       csview_slice(csview sv, intptr_t p1, intptr_t p2) {
+                            if (p1 < 0) p1 += sv.size; if (p2 < 0) p2 += sv.size;
+                            if (p2 > sv.size) p2 = sv.size;
+                            sv.str += p1, sv.size = p2 > p1 ? p2 - p1 : 0; return sv; 
+                        }
 STC_INLINE size_t       csview_size(csview sv) { return sv.size; }
 STC_INLINE size_t       csview_length(csview sv) { return sv.size; }
 STC_INLINE bool         csview_empty(csview sv) { return sv.size == 0; }
