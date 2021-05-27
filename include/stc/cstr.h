@@ -34,7 +34,7 @@ typedef                 struct { char* str; } cstr;
 typedef                 struct { char *ref; } cstr_iter_t;
 typedef                 char                  cstr_value_t;
 
-#define cstr_npos       ((size_t) (-1))
+#define cstr_npos       INTPTR_MAX
 STC_LIBRARY_ONLY(       extern const cstr cstr_null; )
 
 struct cstr_rep         { size_t size, cap; char str[sizeof(size_t)]; };
@@ -61,6 +61,7 @@ STC_API size_t          cstr_find(cstr s, const char* needle);
 STC_API size_t          cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax);
 STC_API size_t          cstr_ifind_n(cstr s, const char* needle, size_t pos, size_t nmax);
 STC_API bool            cstr_getdelim(cstr *self, int delim, FILE *stream);
+
 STC_API int             c_strncasecmp(const char* s1, const char* s2, size_t nmax);
 STC_API char*           c_strnstrn(const char* s, const char* needle, size_t slen, size_t nmax);
 STC_API char*           c_strncasestrn(const char* s, const char* needle, size_t slen, size_t nmax);
@@ -78,16 +79,6 @@ STC_INLINE void         cstr_del(cstr* self)
                             { if (_cstr_rep(self)->cap) c_free(_cstr_rep(self)); }
 STC_INLINE cstr         cstr_clone(cstr s)
                             { return cstr_from_n(s.str, _cstr_rep(&s)->size); }
-STC_INLINE cstr*        cstr_substr(cstr* self, intptr_t pos, size_t n) {
-                            size_t sz = _cstr_rep(self)->size;
-                            if (pos < 0) pos += sz; if (pos + n > sz) n = sz - pos;
-                            return cstr_assign_n(self, self->str + pos, n);
-                        }
-STC_INLINE cstr*        cstr_slice(cstr* self, intptr_t p1, intptr_t p2) {
-                            size_t sz = _cstr_rep(self)->size;
-                            if (p1 < 0) p1 += sz; if (p2 < 0) p2 += sz; if (p2 > sz) p2 = sz;
-                            return cstr_assign_n(self, self->str + p1, p2 > p1 ? p2 - p1 : 0);
-                        }
 STC_INLINE void         cstr_clear(cstr* self)
                             { self->str[_cstr_rep(self)->size = 0] = '\0'; }
 STC_INLINE cstr*        cstr_assign(cstr* self, const char* str)

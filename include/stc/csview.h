@@ -29,7 +29,7 @@ typedef                 struct { const char* str; size_t size; } csview;
 typedef                 struct { const char *ref; } csview_iter_t;
 typedef                 char csview_value_t;
 #define                 csview_null  c_make(csview){"", 0}
-#define                 csview_arg(sv)  (int)(sv).size, (sv).str
+#define                 csview_ARG(sv)  (int)(sv).size, (sv).str
 
 #define                 c_lit(literal) csview_lit(literal)
 #define                 c_sv(s) csview_from_s(s)
@@ -42,16 +42,6 @@ STC_INLINE csview       csview_from_n(const char* str, size_t n)
                             { return c_make(csview){str, n}; }
 STC_INLINE csview       csview_from_s(cstr s)
                             { return c_make(csview){s.str, _cstr_rep(&s)->size}; }
-STC_INLINE csview       csview_substr(csview sv, intptr_t pos, size_t n) {
-                            if (pos < 0) pos += sv.size; 
-                            if (pos + n > sv.size) n = sv.size - pos;
-                            sv.str += pos, sv.size = n; return sv;
-                        }
-STC_INLINE csview       csview_slice(csview sv, intptr_t p1, intptr_t p2) {
-                            if (p1 < 0) p1 += sv.size; if (p2 < 0) p2 += sv.size;
-                            if (p2 > sv.size) p2 = sv.size;
-                            sv.str += p1, sv.size = p2 > p1 ? p2 - p1 : 0; return sv; 
-                        }
 STC_INLINE size_t       csview_size(csview sv) { return sv.size; }
 STC_INLINE size_t       csview_length(csview sv) { return sv.size; }
 STC_INLINE bool         csview_empty(csview sv) { return sv.size == 0; }
@@ -79,20 +69,31 @@ STC_INLINE csview_iter_t csview_end(const csview* self)
                             { return c_make(csview_iter_t){self->str + self->size}; }
 STC_INLINE void          csview_next(csview_iter_t* it) { ++it->ref; }
 
+STC_INLINE csview csview_substr(csview sv, intptr_t pos, size_t n) {
+    if (pos < 0) pos += sv.size; 
+    if (pos + n > sv.size) n = sv.size - pos;
+    sv.str += pos, sv.size = n; return sv;
+}
+
+STC_INLINE csview csview_slice(csview sv, intptr_t p1, intptr_t p2) {
+    if (p1 < 0) p1 += sv.size; if (p2 < 0) p2 += sv.size;
+    if (p2 > sv.size) p2 = sv.size;
+    sv.str += p1, sv.size = p2 > p1 ? p2 - p1 : 0; return sv; 
+}
 
 STC_INLINE csview csview_first_token(csview sv, csview sep) {
     const char* res = c_strnstrn(sv.str, sep.str, sv.size, sep.size); 
     return c_make(csview){sv.str, (res ? res - sv.str : sv.size)};
 }
 
-STC_INLINE csview csview_next_token(csview sv, csview sep, csview token) {
-    if (&token.str[token.size] == &sv.str[sv.size])
+STC_INLINE csview csview_next_token(csview sv, csview sep, csview tok) {
+    if (&tok.str[tok.size] == &sv.str[sv.size])
         return c_make(csview){&sv.str[sv.size], 0};
-    token.str += token.size + sep.size;
-    size_t n = sv.size - (token.str - sv.str);
-    const char* res = c_strnstrn(token.str, sep.str, n, sep.size);
-    token.size = res ? res - token.str : n;
-    return token;
+    tok.str += tok.size + sep.size;
+    size_t n = sv.size - (tok.str - sv.str);
+    const char* res = c_strnstrn(tok.str, sep.str, n, sep.size);
+    tok.size = res ? res - tok.str : n;
+    return tok;
 }
 
 /* cstr interaction with csview: */
@@ -101,6 +102,10 @@ STC_INLINE cstr         cstr_from_v(csview sv)
                             { return cstr_from_n(sv.str, sv.size); }
 STC_INLINE csview       cstr_to_v(const cstr* self)
                             { return c_make(csview){self->str, _cstr_rep(self)->size}; }
+STC_INLINE csview       cstr_substr(cstr s, intptr_t pos, size_t n) 
+                            { return csview_substr(csview_from_s(s), pos, n); };
+STC_INLINE csview       cstr_slice(cstr s, intptr_t p1, intptr_t p2)
+                            { return csview_slice(csview_from_s(s), p1, p2); };
 STC_INLINE cstr*        cstr_assign_v(cstr* self, csview sv)
                             { return cstr_assign_n(self, sv.str, sv.size); }
 STC_INLINE cstr*        cstr_append_v(cstr* self, csview sv)

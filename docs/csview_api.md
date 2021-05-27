@@ -10,7 +10,7 @@ when passing it around. It is faster when using`csview` as convertion type (raw)
 containers with cstr keys. E.g. prefer `using_cmap_svkey()` over `using_cmap_strkey()`.
 
 Note that a **csview** may not be null-terminated, and should therefore be printed the following way: 
-`printf("%.*s", csview_arg(sv))`.
+`printf("%.*s", csview_ARG(sv))`.
 
 See the c++ class [std::basic_string_view](https://en.cppreference.com/w/cpp/string/basic_string_view) for a functional
 description.
@@ -38,7 +38,7 @@ bool          csview_empty(csview sv);
 void          csview_clear(csview* self);
 
 csview        csview_substr(csview sv, intptr_t pos, size_t n);    // negative pos count from end
-csview        csview_slice(csview sv, intptr_t p1, intptr_t p2);   // negative p1,p2 count from end
+csview        csview_slice(csview sv, intptr_t p1, intptr_t p2);   // negative p1, p2 count from end
 csview        csview_first_token(csview sv, csview sep);           // see split example below.
 csview        csview_next_token(csview sv, csview sep, csview token);
 
@@ -59,6 +59,8 @@ void          csview_next(csview_iter_t* it);
 ```c
 cstr          cstr_from_v(csview sv);
 csview        cstr_to_v(const cstr* self);
+csview        cstr_substr(cstr s, intptr_t pos, size_t n);    // negative pos count from end
+csview        cstr_slice(cstr s, intptr_t p1, intptr_t p2);   // negative p1, p2 count from end
 cstr*         cstr_assign_v(cstr* self, csview sv);
 cstr*         cstr_append_v(cstr* self, csview sv);
 void          cstr_insert_v(cstr* self, size_t pos, csview sv);
@@ -90,7 +92,7 @@ uint64_t      csview_hash_ref(const csview* x, size_t ignored);
 |:-----------------|:--------------------|:----------------------------------|
 | `csview_null`    | same as `c_lit("")` | `sview = csview_null;`            |
 | `c_lit(literal)` | csview constructor  | `sview = c_lit("hello, world");`  |
-| `csview_arg(sv)` | printf argument     | `printf("%.*s", csview_arg(sv));` |
+| `csview_ARG(sv)` | printf argument     | `printf("%.*s", csview_ARG(sv));` |
 
 ## cstr-containers with csview emplace/lookup API
 ```
@@ -159,7 +161,7 @@ void print_split(csview str, csview sep)
     csview token = csview_first_token(str, sep);
     for (;;) {
         // print non-null-terminated csview
-        printf("\"%.*s\"\n", csview_arg(token));
+        printf("\"%.*s\"\n", csview_ARG(token));
         if (csview_end(&token).ref == csview_end(&str).ref) break;
         token = csview_next_token(str, sep, token);
     }
@@ -207,4 +209,34 @@ Output:
 "string"
 "now"
 ""
+```
+### Example 3
+```c
+#include <stc/csview.h>
+
+int main ()
+{
+    cstr str1 = cstr_lit("We think in generalities, but we live in details.");
+                                                   // (quoting Alfred N. Whitehead)
+
+    csview sv1 = cstr_substr(str1, 3, 5);           // "think"
+    size_t pos = cstr_find(str1, "live");           // position of "live" in str
+    csview sv2 = cstr_substr(str1, pos, cstr_npos); // get from "live" to the end
+
+    printf("%.*s %.*s\n", csview_ARG(sv1), csview_ARG(sv2));
+
+    cstr s1 = cstr_lit("Apples are red");
+    cstr s2 = cstr_from_v(cstr_substr(s1, 11, 3)); // "red"
+    printf("%s\n", s2.str);
+    cstr s3 = cstr_from_v(cstr_substr(s1, 0, 6)); // "Apples"
+    printf("%s\n", s3.str);
+
+    c_del(cstr, &str1, &s1, &s2, &s3);
+}
+```
+Output:
+```
+think live in details.        
+red
+Apples
 ```

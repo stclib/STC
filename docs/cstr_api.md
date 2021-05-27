@@ -41,9 +41,7 @@ cstr*        cstr_assign(cstr* self, const char* str);
 cstr*        cstr_assign_n(cstr* self, const char* str, size_t n);    // assign n first chars of str
 cstr*        cstr_assign_fmt(cstr* self, const char* fmt, ...);       // printf() formatting
 cstr*        cstr_copy(cstr* self, cstr s);                           // cstr_take(self, cstr_clone(s))
-cstr*        cstr_substr(cstr* self, intptr_t pos, size_t n);         // negative pos count from end
-cstr*        cstr_slice(cstr* self, intptr_t p1, intptr_t p2);        // negative p1,p2 count from end.
-                                                                      // substr(), slice() modifies self 
+
 cstr*        cstr_append(cstr* self, const char* str);
 cstr*        cstr_append_s(cstr* self, cstr s);
 cstr*        cstr_append_n(cstr* self, const char* str, size_t n);
@@ -63,17 +61,17 @@ void         cstr_erase_n(cstr* self, size_t pos, size_t n);
 int          cstr_compare(const cstr *s1, const cstr *s2);
 bool         cstr_equals(cstr s, const char* str);
 bool         cstr_equals_s(cstr s, cstr s2);
-size_t       cstr_find(cstr s, const char* substr);
+size_t       cstr_find(cstr s, const char* needle);
 size_t       cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax);
 bool         cstr_contains(cstr s, const char* needle);
-bool         cstr_begins_with(cstr s, const char* substr);
-bool         cstr_ends_with(cstr s, const char* substr);
+bool         cstr_begins_with(cstr s, const char* str);
+bool         cstr_ends_with(cstr s, const char* str);
 
 bool         cstr_iequals(cstr s, const char* str);                   // prefix i = case-insensitive
 size_t       cstr_ifind_n(cstr s, const char* needle, size_t pos, size_t nmax);
 bool         cstr_icontains(cstr s, const char* needle);
-bool         cstr_ibegins_with(cstr s, const char* substr);
-bool         cstr_iends_with(cstr s, const char* substr);
+bool         cstr_ibegins_with(cstr s, const char* str);
+bool         cstr_iends_with(cstr s, const char* str);
 
 void         cstr_push_back(cstr* self, char ch);
 void         cstr_pop_back(cstr* self);
@@ -114,7 +112,7 @@ char*        c_strncasestrn(const char* str, const char* needle, size_t slen, si
 
 | Name              | Value             |
 |:------------------|:------------------|
-|  `cstr_npos`      | `((size_t) -1)`   |
+|  `cstr_npos`      | `INTPTR_MAX`      |
 |  `cstr_null`      | cstr null value   |
 
 ## Example

@@ -48,10 +48,10 @@ clist_X             clist_X_init(void);
 clist_X             clist_X_clone(clist_X list);
 
 void                clist_X_clear(clist_X* self);
-void                clist_X_del(clist_X* self);                                           // destructor
+void                clist_X_del(clist_X* self);                                             // destructor
 
 bool                clist_X_empty(clist_X list);
-size_t              clist_X_count(clist_X list);                                          // size() in O(n) time
+size_t              clist_X_count(clist_X list);                                            // size() in O(n) time
 
 clist_X_value_t*    clist_X_front(const clist_X* self);
 clist_X_value_t*    clist_X_back(const clist_X* self);
@@ -60,21 +60,21 @@ void                clist_X_push_front(clist_X* self, Value value);
 void                clist_X_emplace_front(clist_X* self, RawValue raw);
 void                clist_X_pop_front(clist_X* self);
 
-void                clist_X_push_back(clist_X* self, Value value);                        // note: no pop_back().
+void                clist_X_push_back(clist_X* self, Value value);                          // note: no pop_back().
 void                clist_X_emplace_back(clist_X* self, RawValue raw);
 void                clist_X_emplace_items(clist_X *self, const clist_X_rawvalue_t arr[], size_t n);
 
-clist_X_iter_t      clist_X_insert(clist_X* self, clist_X_iter_t it, Value value);        // return iter to new elem
+clist_X_iter_t      clist_X_insert(clist_X* self, clist_X_iter_t it, Value value);          // return iter to new elem
 clist_X_iter_t      clist_X_emplace(clist_X* self, clist_X_iter_t it, RawValue raw);
 
-clist_X_iter_t      clist_X_erase(clist_X* self, clist_X_iter_t it);                      // return iter after it
-clist_X_iter_t      clist_X_erase_at(clist_X* self, clist_X_iter_t it);                   // alias for erase()
+clist_X_iter_t      clist_X_erase(clist_X* self, clist_X_iter_t it);                        // return iter after it
+clist_X_iter_t      clist_X_erase_at(clist_X* self, clist_X_iter_t it);                     // alias for erase()
 clist_X_iter_t      clist_X_erase_range(clist_X* self, clist_X_iter_t it1, clist_X_iter_t it2);
-size_t              clist_X_remove(clist_X* self, RawValue raw);                          // removes all elements equal to raw
+size_t              clist_X_remove(clist_X* self, RawValue raw);                            // removes matching elements
 
-clist_X             clist_X_split(clist_X* self, clist_X_iter_t it1, clist_X_iter_t it2); // split out [it1, it2)
-clist_X_iter_t      clist_X_splice(clist_X* self, clist_X_iter_t it, clist_X* other);     // return updated valid it
-clist_X_iter_t      clist_X_splice_range(clist_X* self, clist_X_iter_t it,                // return updated valid it
+clist_X             clist_X_split_off(clist_X* self, clist_X_iter_t i1, clist_X_iter_t i2); // split off [i1, i2)
+clist_X_iter_t      clist_X_splice(clist_X* self, clist_X_iter_t it, clist_X* other);       // return updated valid it
+clist_X_iter_t      clist_X_splice_range(clist_X* self, clist_X_iter_t it,                  // return updated valid it
                                          clist_X* other, clist_X_iter_t it1, clist_X_iter_t it2);
 
 clist_X_iter_t      clist_X_find(const clist_X* self, RawValue raw);
