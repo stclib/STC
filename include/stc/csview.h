@@ -70,14 +70,14 @@ STC_INLINE csview_iter_t csview_end(const csview* self)
 STC_INLINE void          csview_next(csview_iter_t* it) { ++it->ref; }
 
 STC_INLINE csview csview_substr(csview sv, intptr_t pos, size_t n) {
-    if (pos < 0) pos += sv.size; if (pos < 0) pos = 0;
-    if (pos + n > sv.size) n = sv.size - pos;
+    if (pos < 0) { pos += sv.size; if (pos < 0) pos = 0; }
+    if (pos > sv.size) pos = sv.size; if (pos + n > sv.size) n = sv.size - pos;
     sv.str += pos, sv.size = n; return sv;
 }
 
 STC_INLINE csview csview_slice(csview sv, intptr_t p1, intptr_t p2) {
-    if (p1 < 0) p1 += sv.size; if (p2 < 0) p2 += sv.size;
-    if (p1 < 0) p1 = 0; if (p2 > sv.size) p2 = sv.size;
+    if (p1 < 0) { p1 += sv.size; if (p1 < 0) p1 = 0; }
+    if (p2 < 0) p2 += sv.size; if (p2 > sv.size) p2 = sv.size;
     sv.str += p1, sv.size = p2 > p1 ? p2 - p1 : 0; return sv; 
 }
 
