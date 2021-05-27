@@ -77,7 +77,7 @@ STC_INLINE csview csview_substr(csview sv, intptr_t pos, size_t n) {
 
 STC_INLINE csview csview_slice(csview sv, intptr_t p1, intptr_t p2) {
     if (p1 < 0) p1 += sv.size; if (p2 < 0) p2 += sv.size;
-    if (p1 < 0) p1 = 0; if (p2 < 0) p2 = 0; if (p2 > sv.size) p2 = sv.size;
+    if (p1 < 0) p1 = 0; if (p2 > sv.size) p2 = sv.size;
     sv.str += p1, sv.size = p2 > p1 ? p2 - p1 : 0; return sv; 
 }
 
