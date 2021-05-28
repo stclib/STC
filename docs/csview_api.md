@@ -7,9 +7,9 @@ element of the sequence at position zero. The implementation holds two members: 
 **csview** is an efficient replacent for `const char*`. It never allocates memory, and therefore need not be destructed.
 Its lifetime is limited by the source string storage. It keeps the length of the string, and does not call *strlen()*
 when passing it around. It is faster when using`csview` as convertion type (raw) than `const char*` in associative
-containers with cstr keys. E.g. prefer `using_cmap_svkey()` over `using_cmap_strkey()`.
+containers with cstr keys. `using_cmap_svkey()` may perform better than `using_cmap_strkey()`.
 
-Note that a **csview** may not be null-terminated, and should therefore be printed the following way: 
+Note: a **csview** may ***not be null-terminated***, and must therefore be printed like: 
 `printf("%.*s", csview_ARG(sv))`.
 
 See the c++ class [std::basic_string_view](https://en.cppreference.com/w/cpp/string/basic_string_view) for a functional
@@ -35,6 +35,9 @@ csview        csview_lit(const char literal_only[]);                // same as c
 size_t        csview_size(csview sv);
 size_t        csview_length(csview sv);
 bool          csview_empty(csview sv);
+char          csview_front(csview sv);
+char          csview_back(csview sv);
+
 void          csview_clear(csview* self);
 
 csview        csview_substr(csview sv, intptr_t pos, size_t n);    // negative pos count from end
@@ -47,9 +50,6 @@ size_t        csview_find(csview sv, csview needle);
 bool          csview_contains(csview sv, csview needle);
 bool          csview_begins_with(csview sv, csview sub);
 bool          csview_ends_with(csview sv, csview sub);
-
-const char*   csview_front(const csview* self);
-const char*   csview_back(const csview* self);
 
 csview_iter_t csview_begin(const csview* self);
 csview_iter_t csview_end(const csview* self);
@@ -91,6 +91,7 @@ uint64_t      csview_hash_ref(const csview* x, size_t ignored);
 | Name             | Value               | Usage                             |
 |:-----------------|:--------------------|:----------------------------------|
 | `csview_null`    | same as `c_lit("")` | `sview = csview_null;`            |
+| `csview_npos`    | same as `cstr_npos` |                                   |
 | `c_lit(literal)` | csview constructor  | `sview = c_lit("hello, world");`  |
 | `csview_ARG(sv)` | printf argument     | `printf("%.*s", csview_ARG(sv));` |
 
