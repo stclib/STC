@@ -8,19 +8,20 @@ resource near the resource acquisition, and makes it easier to verify that resou
 
 **Note**: These macros are one-time executed **for**-loops. ***Only*** use `continue` in order to break out
 of a `c_forvar` / `c_fordefer`-block. ***Do not*** use `return`, `goto` or `break`, as it will prevent the
-`release`-statement to be executed at the end. The same applies for `c_forbuffer`. This is not particular to
+`end`-statement to be executed at the end. The same applies for `c_forbuffer`. This is not particular to
 the `c_for*()` macros, as one must always make sure to unwind temporary allocated resources before `return` in C.
 
 The **c_forbuffer** uses stack memory if buffer is <= to 256 bytes, othewise it uses the slower heap memory.
 
-| Usage                            | Description                                       |
-|:---------------------------------|:--------------------------------------------------|
-| `c_forvar (acquire, release...)` | Do `acquire`. Defer `release` to end of block     |
-| `c_fordefer (release...)`        | Defer execution of `release` to end of block      |
-| `c_forbuffer (buf, type, n)`     | Declare, allocate and free memory buffer          |
+| Usage                                  | Description                                       |
+|:---------------------------------------|:--------------------------------------------------|
+| `c_forvar (Type var=init, end...)`     | Declare `var`. Defer `end` to end of block        |
+| `c_forscope (start, end)`              | Execute `start`. Defer `end` to end of block      |
+| `c_fordefer (end...)`                  | Defer execution of `end` to end of block          |
+| `c_forbuffer (buf, type, n)`           | Declare, allocate and free memory buffer          |
 
-The `acquire`argument must be of the form: `type var = GetResource`. For multiple variables, use multiple
-**c_forvar** in sequence, or if variables are of same type, the **c_arg** macro can be used:
+For multiple variables, use either multiple **c_forvar** in sequence, or if variables are of same type,
+the **c_arg** macro can be used:
 ```c
 c_forvar (c_arg(cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world")), cstr_del(&s1), cstr_del(&s2))
 {

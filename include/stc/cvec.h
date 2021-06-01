@@ -27,6 +27,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define forward_cvec(X, Value) _cvec_types(cvec_##X, Value)
+
 #define using_cvec(...) c_MACRO_OVERLOAD(using_cvec, __VA_ARGS__)
 
 #define using_cvec_2(X, Value) \
@@ -38,22 +40,28 @@
 #define using_cvec_5(X, Value, valueCompare, valueDel, valueClone) \
             using_cvec_7(X, Value, valueCompare, valueDel, valueClone, c_default_toraw, Value)
 #define using_cvec_7(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
-            _c_using_cvec(cvec_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue)
+            _c_using_cvec(cvec_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue, c_true)
+#define using_cvec_8(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue, defineTypes) \
+            _c_using_cvec(cvec_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue, defineTypes)
 
 #define using_cvec_str() \
-            _c_using_cvec(cvec_str, cstr, c_rawstr_compare, cstr_del, cstr_from, cstr_toraw, const char*)
-
+            using_cvec_7(str, cstr, c_rawstr_compare, cstr_del, cstr_from, cstr_toraw, const char*)
 
 struct cvec_rep { size_t size, cap; void* data[]; };
 #define _cvec_rep(self) c_container_of((self)->data, struct cvec_rep, data)
 
+#define c_true(...)  __VA_ARGS__
+#define c_false(...)
 
-#define _c_using_cvec(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
-\
+#define _cvec_types(CX, Value) \
     typedef Value CX##_value_t; \
+    typedef struct { CX##_value_t *ref; } CX##_iter_t; \
+    typedef struct { CX##_value_t *data; } CX
+
+#define _c_using_cvec(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue, defineTypes) \
+\
+    defineTypes( _cvec_types(CX, Value); ) \
     typedef RawValue CX##_rawvalue_t; \
-    typedef struct {CX##_value_t *ref;} CX##_iter_t; \
-    typedef struct {CX##_value_t *data;} CX; \
 \
     STC_API CX              CX##_init(void); \
     STC_API CX              CX##_clone(CX cx); \

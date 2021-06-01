@@ -123,8 +123,9 @@
     for (type i=start, _c_inc=step, _c_end=(stop) - (0 < _c_inc) \
          ; (i <= _c_end) == (0 < _c_inc); i += _c_inc)
 
-#define c_forvar(acquire, ...) for (acquire, *_c_ii = NULL; !_c_ii; ++_c_ii, __VA_ARGS__)
+#define c_forvar(declvar, ...) for (declvar, *_c_ii = NULL; !_c_ii; ++_c_ii, __VA_ARGS__)
 #define c_arg(...) __VA_ARGS__
+#define c_forscope(start, end) for (int _c_ii = (start, 0); !_c_ii; ++_c_ii, end)
 #define c_fordefer(...) for (int _c_ii = 0; !_c_ii; ++_c_ii, __VA_ARGS__)
 
 #define c_forbuffer(b, type, n) c_forbuffer_N(b, type, n, 256)
