@@ -29,6 +29,7 @@ typedef                 struct { const char* str; size_t size; } csview;
 typedef                 struct { const char *ref; } csview_iter_t;
 typedef                 char csview_value_t;
 #define                 csview_null  c_make(csview){"", 0}
+#define                 csview_npos  cstr_npos
 #define                 csview_ARG(sv)  (int)(sv).size, (sv).str
 
 #define                 c_lit(literal) csview_lit(literal)
@@ -45,9 +46,10 @@ STC_INLINE csview       csview_from_s(cstr s)
 STC_INLINE size_t       csview_size(csview sv) { return sv.size; }
 STC_INLINE size_t       csview_length(csview sv) { return sv.size; }
 STC_INLINE bool         csview_empty(csview sv) { return sv.size == 0; }
+STC_INLINE char         csview_front(csview sv) { return sv.str[0]; }
+STC_INLINE char         csview_back(csview sv) { return sv.str[sv.size - 1]; }
+
 STC_INLINE void         csview_clear(csview* self) { *self = csview_null; }
-STC_INLINE const char*  csview_front(const csview* self) { return self->str; }
-STC_INLINE const char*  csview_back(const csview* self) { return self->str + self->size - 1; }
 
 #define                 csview_hash(sv)  c_default_hash((sv).str, (sv).size)
 STC_INLINE bool         csview_equals(csview sv, csview sv2)

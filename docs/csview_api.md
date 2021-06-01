@@ -7,9 +7,9 @@ element of the sequence at position zero. The implementation holds two members: 
 **csview** is an efficient replacent for `const char*`. It never allocates memory, and therefore need not be destructed.
 Its lifetime is limited by the source string storage. It keeps the length of the string, and does not call *strlen()*
 when passing it around. It is faster when using`csview` as convertion type (raw) than `const char*` in associative
-containers with cstr keys. E.g. prefer `using_cmap_svkey()` over `using_cmap_strkey()`.
+containers with cstr keys. `using_cmap_svkey()` may perform better than `using_cmap_strkey()`.
 
-Note that a **csview** may not be null-terminated, and should therefore be printed the following way: 
+Note: a **csview** may ***not be null-terminated***, and must therefore be printed like: 
 `printf("%.*s", csview_ARG(sv))`.
 
 See the c++ class [std::basic_string_view](https://en.cppreference.com/w/cpp/string/basic_string_view) for a functional
@@ -35,6 +35,9 @@ csview        csview_lit(const char literal_only[]);                // same as c
 size_t        csview_size(csview sv);
 size_t        csview_length(csview sv);
 bool          csview_empty(csview sv);
+char          csview_front(csview sv);
+char          csview_back(csview sv);
+
 void          csview_clear(csview* self);
 
 csview        csview_substr(csview sv, intptr_t pos, size_t n);    // negative pos count from end
@@ -47,9 +50,6 @@ size_t        csview_find(csview sv, csview needle);
 bool          csview_contains(csview sv, csview needle);
 bool          csview_begins_with(csview sv, csview sub);
 bool          csview_ends_with(csview sv, csview sub);
-
-const char*   csview_front(const csview* self);
-const char*   csview_back(const csview* self);
 
 csview_iter_t csview_begin(const csview* self);
 csview_iter_t csview_end(const csview* self);
@@ -91,6 +91,7 @@ uint64_t      csview_hash_ref(const csview* x, size_t ignored);
 | Name             | Value               | Usage                             |
 |:-----------------|:--------------------|:----------------------------------|
 | `csview_null`    | same as `c_lit("")` | `sview = csview_null;`            |
+| `csview_npos`    | same as `cstr_npos` |                                   |
 | `c_lit(literal)` | csview constructor  | `sview = c_lit("hello, world");`  |
 | `csview_ARG(sv)` | printf argument     | `printf("%.*s", csview_ARG(sv));` |
 
@@ -118,35 +119,30 @@ using_cset_sv()
 ## Example
 ```c
 #include <stc/csview.h>
-#include <stc/cvec.h>
-#include <stc/cmap.h>
 
-// cmap<cstr, int> with csview as convertion type
-using_cmap_svkey(si, int);
-
-int main()
+int main ()
 {
-    csview text = c_lit("The length of this literal is evaluated at compile time and stored in csview text.");
-    printf("%s\nLength: %zu\n\n", text.str, text.size);
+    cstr str1 = cstr_lit("We think in generalities, but we live in details.");
+                                                    // (quoting Alfred N. Whitehead)
 
-    c_forvar (cmap_si map = csmap_si_init(), csmap_si_del(&map))
-    {
-        cmap_si_emplace(&map, c_lit("hello"), 100);
-        cmap_si_emplace(&map, c_lit("world"), 200);
-        cmap_si_emplace(&map, c_lit("hello"), 300); // already in map, ignored
+    csview sv1 = cstr_substr(str1, 3, 5);           // "think"
+    size_t pos = cstr_find(str1, "live");           // position of "live" in str1
+    csview sv2 = cstr_substr(str1, pos, 4);         // get "live"
+    csview sv3 = cstr_slice(str1, -8, -1);          // get "details"
+    printf("%.*s %.*s %.*s\n", csview_ARG(sv1), csview_ARG(sv2), csview_ARG(sv3));
 
-        // Efficient lookup: no string allocation or strlen() takes place:
-        cmap_si_value_t* v = cmap_si_get(&map, c_lit("world"));
-        printf("\n%s: %d\n", v->first.str, v->second);
-    }
+    cstr s1 = cstr_lit("Apples are red");
+    cstr s2 = cstr_from_v(cstr_substr(s1, -3, 3));  // "red"
+    cstr s3 = cstr_from_v(cstr_substr(s1, 0, 6));   // "Apples"
+    printf("%s %s\n", s2, s3.str);
+
+    c_del(cstr, &str1, &s1, &s2, &s3);
 }
 ```
 Output:
 ```
-A long and winded literal string
-Length: 32
-
-world: 200
+think live details
+red Apples
 ```
 
 ### Example 2: csview tokenizer (string split)
@@ -213,30 +209,32 @@ Output:
 ### Example 3
 ```c
 #include <stc/csview.h>
+#include <stc/cvec.h>
+#include <stc/cmap.h>
 
-int main ()
+// cmap<cstr, int> with csview as convertion type
+using_cmap_svkey(si, int);
+
+int main()
 {
-    cstr str1 = cstr_lit("We think in generalities, but we live in details.");
-                                                   // (quoting Alfred N. Whitehead)
+    csview text = c_lit("The length of this literal is evaluated at compile time and stored in csview text.");
+    csview suffix = csview_substr(text, -12, cstr_npos); // from pos -12 to end
+    printf("%.*s\n", csview_ARG(suffix));
 
-    csview sv1 = cstr_substr(str1, 3, 5);           // "think"
-    size_t pos = cstr_find(str1, "live");           // position of "live" in str
-    csview sv2 = cstr_substr(str1, pos, cstr_npos); // get from "live" to the end
+    c_forvar (cmap_si map = cmap_si_init(), cmap_si_del(&map))
+    {
+        cmap_si_emplace(&map, c_lit("hello"), 100);
+        cmap_si_emplace(&map, c_lit("world"), 200);
+        cmap_si_emplace(&map, c_lit("hello"), 300); // already in map, ignored
 
-    printf("%.*s %.*s\n", csview_ARG(sv1), csview_ARG(sv2));
-
-    cstr s1 = cstr_lit("Apples are red");
-    cstr s2 = cstr_from_v(cstr_substr(s1, 11, 3)); // "red"
-    printf("%s\n", s2.str);
-    cstr s3 = cstr_from_v(cstr_substr(s1, 0, 6)); // "Apples"
-    printf("%s\n", s3.str);
-
-    c_del(cstr, &str1, &s1, &s2, &s3);
+        // Efficient lookup: no string allocation or strlen() takes place:
+        cmap_si_value_t* v = cmap_si_get(&map, c_lit("hello"));
+        printf("%s: %d\n", v->first.str, v->second);
+    }
 }
 ```
 Output:
 ```
-think live in details.        
-red
-Apples
+csview text.
+hello: 100
 ```
