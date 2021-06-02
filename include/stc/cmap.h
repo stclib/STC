@@ -151,7 +151,7 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
     typedef Mapped CX##_mapped_t; \
     typedef CMAP_SIZE_T CX##_size_t; \
 \
-    typedef SET_ONLY_##C( const CX##_key_t ) \
+    typedef SET_ONLY_##C( CX##_key_t ) \
             MAP_ONLY_##C( struct CX##_value_t ) \
     CX##_value_t; \
 \
@@ -178,7 +178,7 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
     _c_chash_types(CX, C, Key, Mapped); \
 \
     MAP_ONLY_##C( struct CX##_value_t { \
-        const CX##_key_t first; \
+        CX##_key_t first; \
         CX##_mapped_t second; \
     }; ) \
 \
@@ -212,7 +212,7 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
 \
     STC_INLINE void \
     CX##_value_clone(CX##_value_t* _dst, CX##_value_t* _val) { \
-        *(CX##_key_t*) KEY_REF_##C(_dst) = keyFromRaw(keyToRaw(KEY_REF_##C(_val))); \
+        *KEY_REF_##C(_dst) = keyFromRaw(keyToRaw(KEY_REF_##C(_val))); \
         MAP_ONLY_##C( _dst->second = mappedFromRaw(mappedToRaw(&_val->second)); ) \
     } \
 \
@@ -224,7 +224,7 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
 \
     STC_INLINE void \
     CX##_value_del(CX##_value_t* _val) { \
-        keyDel((CX##_key_t*) KEY_REF_##C(_val)); \
+        keyDel(KEY_REF_##C(_val)); \
         MAP_ONLY_##C( mappedDel(&_val->second); ) \
     } \
 \
@@ -232,7 +232,7 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
     CX##_emplace(CX* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
         CX##_result_t _res = CX##_insert_entry_(self, rkey); \
         if (_res.inserted) { \
-            *(CX##_key_t*) KEY_REF_##C(_res.ref) = keyFromRaw(rkey); \
+            *KEY_REF_##C(_res.ref) = keyFromRaw(rkey); \
             MAP_ONLY_##C(_res.ref->second = mappedFromRaw(rmapped);) \
         } \
         return _res; \
@@ -247,7 +247,7 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
     STC_INLINE CX##_result_t \
     CX##_insert(CX* self, Key _key MAP_ONLY_##C(, Mapped _mapped)) { \
         CX##_result_t _res = CX##_insert_entry_(self, keyToRaw(&_key)); \
-        if (_res.inserted) {*(CX##_key_t*) KEY_REF_##C(_res.ref) = _key; MAP_ONLY_##C( _res.ref->second = _mapped; )} \
+        if (_res.inserted) {*KEY_REF_##C(_res.ref) = _key; MAP_ONLY_##C( _res.ref->second = _mapped; )} \
         else              {keyDel(&_key); MAP_ONLY_##C( mappedDel(&_mapped); )} \
         return _res; \
     } \
@@ -256,7 +256,7 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
         STC_INLINE CX##_result_t \
         CX##_insert_or_assign(CX* self, Key _key, Mapped _mapped) { \
             CX##_result_t _res = CX##_insert_entry_(self, keyToRaw(&_key)); \
-            if (_res.inserted) *(CX##_key_t*) &_res.ref->first = _key; \
+            if (_res.inserted) _res.ref->first = _key; \
             else {keyDel(&_key); mappedDel(&_res.ref->second);} \
             _res.ref->second = _mapped; return _res; \
         } \
@@ -269,7 +269,7 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
         STC_INLINE CX##_result_t \
         CX##_emplace_or_assign(CX* self, RawKey rkey, RawMapped rmapped) { \
             CX##_result_t _res = CX##_insert_entry_(self, rkey); \
-            if (_res.inserted) *(CX##_key_t*) &_res.ref->first = keyFromRaw(rkey); \
+            if (_res.inserted) _res.ref->first = keyFromRaw(rkey); \
             else mappedDel(&_res.ref->second); \
             _res.ref->second = mappedFromRaw(rmapped); return _res; \
         } \

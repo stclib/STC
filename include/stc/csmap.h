@@ -138,7 +138,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
     typedef Mapped CX##_mapped_t; \
     typedef CSMAP_SIZE_T CX##_size_t; \
 \
-    typedef SET_ONLY_##C( const CX##_key_t ) \
+    typedef SET_ONLY_##C( CX##_key_t ) \
             MAP_ONLY_##C( struct CX##_value_t ) \
     CX##_value_t; \
 \
@@ -166,7 +166,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
     _c_aatree_types(CX, C, Key, Mapped); \
 \
     MAP_ONLY_##C( struct CX##_value_t { \
-        const CX##_key_t first; \
+        CX##_key_t first; \
         CX##_mapped_t second; \
     }; ) \
 \
@@ -221,12 +221,12 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
     } \
     STC_INLINE void \
     CX##_value_del(CX##_value_t* val) { \
-        keyDel((CX##_key_t*) KEY_REF_##C(val)); \
+        keyDel(KEY_REF_##C(val)); \
         MAP_ONLY_##C( mappedDel(&val->second); ) \
     } \
     STC_INLINE void \
     CX##_value_clone(CX##_value_t* dst, CX##_value_t* val) { \
-        *(CX##_key_t*) KEY_REF_##C(dst) = keyFromRaw(keyToRaw(KEY_REF_##C(val))); \
+        *KEY_REF_##C(dst) = keyFromRaw(keyToRaw(KEY_REF_##C(val))); \
         MAP_ONLY_##C( dst->second = mappedFromRaw(mappedToRaw(&val->second)); ) \
     } \
 \
@@ -241,7 +241,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
     CX##_emplace(CX* self, RawKey rkey MAP_ONLY_##C(, RawMapped rmapped)) { \
         CX##_result_t res = CX##_insert_entry_(self, rkey); \
         if (res.inserted) { \
-            *(CX##_key_t*) KEY_REF_##C(res.ref) = keyFromRaw(rkey); \
+            *KEY_REF_##C(res.ref) = keyFromRaw(rkey); \
             MAP_ONLY_##C(res.ref->second = mappedFromRaw(rmapped);) \
         } \
         return res; \
@@ -256,7 +256,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
     STC_INLINE CX##_result_t \
     CX##_insert(CX* self, Key key MAP_ONLY_##C(, Mapped mapped)) { \
         CX##_result_t res = CX##_insert_entry_(self, keyToRaw(&key)); \
-        if (res.inserted) {*(CX##_key_t*) KEY_REF_##C(res.ref) = key; MAP_ONLY_##C( res.ref->second = mapped; )} \
+        if (res.inserted) {*KEY_REF_##C(res.ref) = key; MAP_ONLY_##C( res.ref->second = mapped; )} \
         else              {keyDel(&key); MAP_ONLY_##C( mappedDel(&mapped); )} \
         return res; \
     } \
@@ -265,7 +265,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
         STC_INLINE CX##_result_t \
         CX##_insert_or_assign(CX* self, Key key, Mapped mapped) { \
             CX##_result_t res = CX##_insert_entry_(self, keyToRaw(&key)); \
-            if (res.inserted) *(CX##_key_t*) &res.ref->first = key; \
+            if (res.inserted) res.ref->first = key; \
             else {keyDel(&key); mappedDel(&res.ref->second);} \
             res.ref->second = mapped; return res; \
         } \
@@ -278,7 +278,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
         STC_INLINE CX##_result_t \
         CX##_emplace_or_assign(CX* self, RawKey rkey, RawMapped rmapped) { \
             CX##_result_t res = CX##_insert_entry_(self, rkey); \
-            if (res.inserted) *(CX##_key_t*) &res.ref->first = keyFromRaw(rkey); \
+            if (res.inserted) res.ref->first = keyFromRaw(rkey); \
             else mappedDel(&res.ref->second); \
             res.ref->second = mappedFromRaw(rmapped); return res; \
         } \

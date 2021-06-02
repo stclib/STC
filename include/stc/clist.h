@@ -56,6 +56,8 @@
 #include "ccommon.h"
 #include <stdlib.h>
 
+#define forward_clist(X, Value) _c_clist_types(clist_##X, Value)
+
 #define using_clist(...)   c_MACRO_OVERLOAD(using_clist, __VA_ARGS__)
 
 #define using_clist_2(X, Value) \
@@ -65,39 +67,45 @@
 #define using_clist_4(X, Value, valueCompare, valueDel) \
             using_clist_5(X, Value, valueCompare, valueDel, c_no_clone)
 #define using_clist_5(X, Value, valueCompare, valueDel, valueClone) \
-            _c_using_clist(clist_##X, Value, valueCompare, valueDel, valueClone, c_default_toraw, Value)
+            using_clist_7(X, Value, valueCompare, valueDel, valueClone, c_default_toraw, Value)
 #define using_clist_7(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
-            _c_using_clist(clist_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue)
+            _c_using_clist(clist_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue, c_true)
+#define using_clist_8(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue, defTypes) \
+            _c_using_clist(clist_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue, defTypes)
 
 #define using_clist_str() \
-            _c_using_clist(clist_str, cstr, c_rawstr_compare, cstr_del, cstr_from, cstr_toraw, const char*)
+            using_clist_7(str, cstr, c_rawstr_compare, cstr_del, cstr_from, cstr_toraw, const char*)
 
 
-#define _c_using_clist_types(CX, Value) \
+#define _c_clist_types(CX, Value) \
     typedef Value CX##_value_t; \
+    typedef struct CX##_node_t CX##_node_t; \
 \
-    typedef struct CX##_node { \
-        struct CX##_node *next; \
-        CX##_value_t value; \
-    } CX##_node_t; \
+    typedef struct { \
+        CX##_node_t *const *_last, *prev; \
+        CX##_value_t *ref; \
+    } CX##_iter_t; \
 \
     typedef struct { \
         CX##_node_t *last; \
-    } CX; \
-\
-    typedef struct { \
-        CX##_node_t *const*_last, *prev; \
-        CX##_value_t *ref; \
-    } CX##_iter_t
+    } CX
 
-_c_using_clist_types(clist_VOID, int);
+#define _c_clist_complete_types(CX) \
+    struct CX##_node_t { \
+        struct CX##_node_t *next; \
+        CX##_value_t value; \
+    }
+
+_c_clist_types(clist_VOID, int);
+_c_clist_complete_types(clist_VOID);
 STC_API size_t _clist_count(const clist_VOID* self);
 #define _clist_node(CX, vp) c_container_of(vp, CX##_node_t, value)
 
 
-#define _c_using_clist(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
+#define _c_using_clist(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue, defTypes) \
 \
-    _c_using_clist_types(CX, Value); \
+    defTypes( _c_clist_types(CX, Value); ) \
+    _c_clist_complete_types(CX); \
     typedef RawValue CX##_rawvalue_t; \
 \
     STC_API CX              CX##_clone(CX cx); \

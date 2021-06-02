@@ -27,6 +27,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define forward_cdeq(X, Value) _c_cdeq_types(cdeq_##X, Value)
+
 #define using_cdeq(...) c_MACRO_OVERLOAD(using_cdeq, __VA_ARGS__)
 
 #define using_cdeq_2(X, Value) \
@@ -38,22 +40,26 @@
 #define using_cdeq_5(X, Value, valueCompare, valueDel, valueClone) \
             using_cdeq_7(X, Value, valueCompare, valueDel, valueClone, c_default_toraw, Value)
 #define using_cdeq_7(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
-            _c_using_cdeq(cdeq_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue)
+            _c_using_cdeq(cdeq_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue, c_true)
+#define using_cdeq_8(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue, defTypes) \
+            _c_using_cdeq(cdeq_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue, defTypes)
 
 #define using_cdeq_str() \
-            _c_using_cdeq(cdeq_str, cstr, c_rawstr_compare, cstr_del, cstr_from, cstr_toraw, const char*)
+            using_cdeq_7(str, cstr, c_rawstr_compare, cstr_del, cstr_from, cstr_toraw, const char*)
 
 
 struct cdeq_rep { size_t size, cap; void* base[]; };
 #define _cdeq_rep(self) c_container_of((self)->_base, struct cdeq_rep, base)
 
-
-#define _c_using_cdeq(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue) \
-\
+#define _c_cdeq_types(CX, Value) \
     typedef Value CX##_value_t; \
-    typedef RawValue CX##_rawvalue_t; \
     typedef struct {CX##_value_t *ref; } CX##_iter_t; \
-    typedef struct {CX##_value_t *_base, *data;} CX; \
+    typedef struct {CX##_value_t *_base, *data;} CX
+
+#define _c_using_cdeq(CX, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue, defTypes) \
+\
+    defTypes( _c_cdeq_types(CX, Value); ) \
+    typedef RawValue CX##_rawvalue_t; \
 \
     STC_API CX               CX##_init(void); \
     STC_API CX               CX##_clone(CX cx); \
