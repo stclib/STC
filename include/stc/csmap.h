@@ -133,40 +133,21 @@ int main(void) {
 struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
 #define _csmap_rep(self) c_container_of((self)->nodes, struct csmap_rep, nodes)
 
-
-#define _c_using_aatree(CX, C, Key, Mapped, keyCompareRaw, \
-                        mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
-                        keyDel, keyFromRaw, keyToRaw, RawKey) \
+#define _c_aatree_types(CX, C, Key, Mapped) \
     typedef Key CX##_key_t; \
     typedef Mapped CX##_mapped_t; \
-    typedef RawKey CX##_rawkey_t; \
-    typedef RawMapped CX##_rawmapped_t; \
     typedef CSMAP_SIZE_T CX##_size_t; \
 \
     typedef SET_ONLY_##C( const CX##_key_t ) \
-            MAP_ONLY_##C( struct {const CX##_key_t first; \
-                                  CX##_mapped_t second;} ) \
+            MAP_ONLY_##C( struct CX##_value_t ) \
     CX##_value_t; \
-\
-    typedef SET_ONLY_##C( RawKey ) \
-            MAP_ONLY_##C( struct {RawKey first; \
-                                  RawMapped second;} ) \
-    CX##_rawvalue_t; \
 \
     typedef struct { \
         CX##_value_t *ref; \
         bool inserted; \
     } CX##_result_t; \
 \
-    typedef struct CX##_node { \
-        CX##_size_t link[2]; \
-        int8_t level; \
-        CX##_value_t value; \
-    } CX##_node_t; \
-\
-    typedef struct { \
-        CX##_node_t *nodes; \
-    } CX; \
+    typedef struct CX##_node_t CX##_node_t; \
 \
     typedef struct { \
         CX##_value_t *ref; \
@@ -174,6 +155,33 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
         int _top; \
         CX##_size_t _tn, _st[36]; \
     } CX##_iter_t; \
+\
+    typedef struct { \
+        CX##_node_t *nodes; \
+    } CX
+
+#define _c_using_aatree(CX, C, Key, Mapped, keyCompareRaw, \
+                        mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
+                        keyDel, keyFromRaw, keyToRaw, RawKey) \
+    _c_aatree_types(CX, C, Key, Mapped); \
+\
+    MAP_ONLY_##C( struct CX##_value_t { \
+        const CX##_key_t first; \
+        CX##_mapped_t second; \
+    }; ) \
+\
+    struct CX##_node_t { \
+        CX##_size_t link[2]; \
+        int8_t level; \
+        CX##_value_t value; \
+    }; \
+\
+    typedef RawKey CX##_rawkey_t; \
+    typedef RawMapped CX##_rawmapped_t; \
+    typedef SET_ONLY_##C( RawKey ) \
+            MAP_ONLY_##C( struct { RawKey first; \
+                                   RawMapped second; } ) \
+    CX##_rawvalue_t; \
 \
     STC_API CX               CX##_init(void); \
     STC_API CX               CX##_clone(CX tree); \

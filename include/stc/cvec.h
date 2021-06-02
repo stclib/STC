@@ -50,9 +50,6 @@
 struct cvec_rep { size_t size, cap; void* data[]; };
 #define _cvec_rep(self) c_container_of((self)->data, struct cvec_rep, data)
 
-#define c_true(...)  __VA_ARGS__
-#define c_false(...)
-
 #define _cvec_types(CX, Value) \
     typedef Value CX##_value_t; \
     typedef struct { CX##_value_t *ref; } CX##_iter_t; \

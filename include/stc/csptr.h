@@ -91,16 +91,22 @@ typedef long atomic_count_t;
 #define using_csptr_3(X, Value, valueCompare) \
             using_csptr_4(X, Value, valueCompare, c_default_del)
 #define using_csptr_4(X, Value, valueCompare, valueDel) \
-            _c_using_csptr(csptr_##X, Value, valueCompare, valueDel)
+            _c_using_csptr(csptr_##X, Value, valueCompare, valueDel, c_true)
+#define using_csptr_5(X, Value, valueCompare, valueDel, defineTypes) \
+            _c_using_csptr(csptr_##X, Value, valueCompare, valueDel, defineTypes)
 
+#define forward_csptr(X, Value) _csptr_types(csptr_##X, Value)
 
-#define _c_using_csptr(CX, Value, valueCompare, valueDel) \
+#define _csptr_types(CX, Value) \
     typedef Value CX##_value_t; \
 \
     typedef struct { \
         CX##_value_t* get; \
         atomic_count_t* use_count; \
-    } CX; \
+    } CX
+
+#define _c_using_csptr(CX, Value, valueCompare, valueDel, defineTypes) \
+    defineTypes( _csptr_types(CX, Value); ) \
 \
     STC_INLINE CX \
     CX##_from(CX##_value_t* p) { \

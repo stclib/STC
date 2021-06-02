@@ -146,24 +146,14 @@ STC_INLINE uint64_t c_default_hash32(const void* data, size_t ignored)
 STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
     {return *(const uint64_t *)data * 0xc6a4a7935bd1e99d;}
 
-#define _c_using_chash(CX, C, Key, Mapped, keyEqualsRaw, keyHashRaw, \
-                       mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
-                       keyDel, keyFromRaw, keyToRaw, RawKey) \
+#define _c_chash_types(CX, C, Key, Mapped) \
     typedef Key CX##_key_t; \
     typedef Mapped CX##_mapped_t; \
-    typedef RawKey CX##_rawkey_t; \
-    typedef RawMapped CX##_rawmapped_t; \
     typedef CMAP_SIZE_T CX##_size_t; \
 \
     typedef SET_ONLY_##C( const CX##_key_t ) \
-            MAP_ONLY_##C( struct {const CX##_key_t first; \
-                                  Mapped second;} ) \
+            MAP_ONLY_##C( struct CX##_value_t ) \
     CX##_value_t; \
-\
-    typedef SET_ONLY_##C( RawKey ) \
-            MAP_ONLY_##C( struct {RawKey first; \
-                                  RawMapped second;} ) \
-    CX##_rawvalue_t; \
 \
     typedef struct { \
         CX##_value_t *ref; \
@@ -171,16 +161,33 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
     } CX##_result_t; \
 \
     typedef struct { \
+        CX##_value_t *ref; \
+        uint8_t* _hx; \
+    } CX##_iter_t; \
+\
+    typedef struct { \
         CX##_value_t* table; \
         uint8_t* _hashx; \
         CX##_size_t size, bucket_count; \
         float max_load_factor; \
-    } CX; \
+    } CX
+
+#define _c_using_chash(CX, C, Key, Mapped, keyEqualsRaw, keyHashRaw, \
+                       mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
+                       keyDel, keyFromRaw, keyToRaw, RawKey) \
+    _c_chash_types(CX, C, Key, Mapped); \
 \
-    typedef struct { \
-        CX##_value_t *ref; \
-        uint8_t* _hx; \
-    } CX##_iter_t; \
+    MAP_ONLY_##C( struct CX##_value_t { \
+        const CX##_key_t first; \
+        CX##_mapped_t second; \
+    }; ) \
+\
+    typedef RawKey CX##_rawkey_t; \
+    typedef RawMapped CX##_rawmapped_t; \
+    typedef SET_ONLY_##C( RawKey ) \
+            MAP_ONLY_##C( struct { RawKey first; \
+                                   RawMapped second; } ) \
+    CX##_rawvalue_t; \
 \
     STC_API CX               CX##_with_capacity(size_t cap); \
     STC_API CX               CX##_clone(CX map); \

@@ -67,6 +67,7 @@
         ((type *)((char *)(ptr) - offsetof(type, member)))
 
 #define c_struct(S)             typedef struct S S; struct S
+#define c_arg(...)              __VA_ARGS__
 #if __cplusplus
 #define c_new(T)                static_cast<T*>(c_malloc(sizeof(T)))
 #define c_new_n(T, n)           static_cast<T*>(c_malloc(sizeof(T)*(n)))
@@ -104,6 +105,9 @@
 
 #define c_default_del(ptr)      ((void) (ptr))
 
+#define c_true(...)             __VA_ARGS__
+#define c_false(...)
+
 /* Generic algorithms */
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
@@ -124,9 +128,13 @@
          ; (i <= _c_end) == (0 < _c_inc); i += _c_inc)
 
 #define c_forvar(declvar, ...) for (declvar, *_c_ii = NULL; !_c_ii; ++_c_ii, __VA_ARGS__)
-#define c_arg(...) __VA_ARGS__
 #define c_forscope(start, end) for (int _c_ii = (start, 0); !_c_ii; ++_c_ii, end)
 #define c_fordefer(...) for (int _c_ii = 0; !_c_ii; ++_c_ii, __VA_ARGS__)
+
+#define c_forinitdel(...) c_MACRO_OVERLOAD(c_forinitdel, __VA_ARGS__)
+#define c_forinitdel_2(CX, a) c_forvar(CX a = CX##_init(), CX##_del(&a))
+#define c_forinitdel_3(CX, a, b) c_forvar(c_arg(CX a = CX##_init(), b = CX##_init()), CX##_del(&b), CX##_del(&a))
+#define c_forinitdel_4(CX, a, b, c) c_forvar(c_arg(CX a = CX##_init(), b = CX##_init(), c = CX##_init()), CX##_del(&c), CX##_del(&b), CX##_del(&a))
 
 #define c_forbuffer(b, type, n) c_forbuffer_N(b, type, n, 256)
 #define c_forbuffer_N(b, type, n, BYTES) \
