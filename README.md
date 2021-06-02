@@ -46,9 +46,9 @@ Highlights
 
 Performance
 -----------
-![Benchmark](benchmarks/pics/benchmark.png)
+![Benchmark](benchmarks/pics/benchmark.gif)
 Benchmark notes:
-- The barchart shows average test times over three platforms: Win-Clang++ v11, Mingw64 g++ 9.20, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
+- The barchart shows average test times over three platforms: Mingw64 10.30, Win-Clang 12, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
 - Containers uses value types `uint64_t` and pairs of `uint64_t`for the maps.
 - Black bars indicates performance variation between various platforms/compilers.
 - Iterations are repeated 4 times over n elements.
