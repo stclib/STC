@@ -2,7 +2,7 @@
 
 The following handy macros are safe to use, i.e. have no side-effects.
 
-### c_forvar, c_fordefer, c_forbuffer
+### c_fordefer, c_forscope, c_forvar, c_forvar_initdel
 General ***defer*** mechanics for resource acquisition. These macros allows to specify the release of the
 resource near the resource acquisition, and makes it easier to verify that resources will be released.
 
@@ -11,19 +11,23 @@ of a `c_forvar` / `c_fordefer`-block. ***Do not*** use `return`, `goto` or `brea
 `end`-statement to be executed at the end. The same applies for `c_forbuffer`. This is not particular to
 the `c_for*()` macros, as one must always make sure to unwind temporary allocated resources before `return` in C.
 
-The **c_forbuffer** uses stack memory if buffer is <= to 256 bytes, othewise it uses the slower heap memory.
+There is also a **c_forbuffer** macro which uses stack memory if buffer is <= to 256 bytes, othewise it uses
+the slower heap memory.
 
 | Usage                                  | Description                                       |
 |:---------------------------------------|:--------------------------------------------------|
-| `c_forvar (Type var=init, end...)`     | Declare `var`. Defer `end` to end of block        |
-| `c_forscope (start, end)`              | Execute `start`. Defer `end` to end of block      |
 | `c_fordefer (end...)`                  | Defer execution of `end` to end of block          |
+| `c_forscope (start, end)`              | Execute `start`. Defer `end` to end of block      |
+| `c_forvar (Type var=init, end...)`     | Declare `var`. Defer `end` to end of block        |
+| `c_forvar_initdel (Type, var...)`      | `c_forvar (Type var=Type_init(), Type_del(&var))` |
+|                                        |                                                   |
 | `c_forbuffer (buf, type, n)`           | Declare, allocate and free memory buffer          |
 
-For multiple variables, use either multiple **c_forvar** in sequence, or if variables are of same type,
-the **c_arg** macro can be used:
+For multiple variables, use either multiple **c_forvar** in sequence, or declare variable outside 
+scope and use **c_fordefer** or **c_forscope**. Also, **c_forvar_initdel** support up to 3 vars.
 ```c
-c_forvar (c_arg(cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world")), cstr_del(&s1), cstr_del(&s2))
+cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
+c_fordefer (cstr_del(&s1), cstr_del(&s2))
 {
     printf("%s %s\n", s1.str, s2.str);
 }
@@ -36,16 +40,15 @@ c_forvar (c_arg(cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world")), cstr_del(&
 
 using_cvec_str();
 
+// receiver should check errno variable
 cvec_str readFile(const char* name)
 {
-    // receiver should check errno variable
-    cvec_str vec = cvec_str_init();
+    cvec_str vec = cvec_str_init(); // returned
 
-    c_forvar (FILE* fp = fopen(name, "r"), fclose(fp)) {
+    c_forvar (FILE* fp = fopen(name, "r"), fclose(fp))
         c_forvar (cstr line = cstr_null, cstr_del(&line))
             while (cstr_getline(&line, fp))
                 cvec_str_emplace_back(&vec, line.str);
-    }
     return vec;
 }
 
