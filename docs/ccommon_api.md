@@ -4,12 +4,12 @@ The following handy macros are safe to use, i.e. have no side-effects.
 
 ### c_fordefer, c_forscope, c_forvar, c_forvar_initdel
 General ***defer*** mechanics for resource acquisition. These macros allows to specify the release of the
-resource near the resource acquisition, and makes it easier to verify that resources will be released.
+resource where the resource acquisition takes place. Makes it easier to verify that resources are released.
 
-**Note**: These macros are one-time executed **for**-loops. ***Only*** use `continue` in order to break out
-of a `c_forvar` / `c_fordefer`-block. ***Do not*** use `return`, `goto` or `break`, as it will prevent the
-`end`-statement to be executed at the end. The same applies for `c_forbuffer`. This is not particular to
-the `c_for*()` macros, as one must always make sure to unwind temporary allocated resources before `return` in C.
+**Note**: These macros are one-time executed **for-loops**. Use ***only*** `continue` in order to break out
+of a `c_for*`-block. ***Do not*** use `return`, `goto` or `break`, as they will prevent the `end`-statement to
+be executed when leaving scope. This is not particular to the `c_for*()` macros, as one must always make sure
+to unwind temporary allocated resources before a `return` in C.
 
 | Usage                                  | Description                                       |
 |:---------------------------------------|:--------------------------------------------------|
