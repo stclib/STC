@@ -131,10 +131,10 @@
 #define c_forscope(start, end) for (int _c_ii = (start, 0); !_c_ii; ++_c_ii, end)
 #define c_fordefer(...) for (int _c_ii = 0; !_c_ii; ++_c_ii, __VA_ARGS__)
 
-#define c_forinitdel(...) c_MACRO_OVERLOAD(c_forinitdel, __VA_ARGS__)
-#define c_forinitdel_2(CX, a) c_forvar(CX a = CX##_init(), CX##_del(&a))
-#define c_forinitdel_3(CX, a, b) c_forvar(c_arg(CX a = CX##_init(), b = CX##_init()), CX##_del(&b), CX##_del(&a))
-#define c_forinitdel_4(CX, a, b, c) c_forvar(c_arg(CX a = CX##_init(), b = CX##_init(), c = CX##_init()), CX##_del(&c), CX##_del(&b), CX##_del(&a))
+#define c_forvar_initdel(...) c_MACRO_OVERLOAD(c_forvar_initdel, __VA_ARGS__)
+#define c_forvar_initdel_2(CX, a) c_forvar(CX a = CX##_init(), CX##_del(&a))
+#define c_forvar_initdel_3(CX, a, b) c_forvar(c_arg(CX a = CX##_init(), b = CX##_init()), CX##_del(&b), CX##_del(&a))
+#define c_forvar_initdel_4(CX, a, b, c) c_forvar(c_arg(CX a = CX##_init(), b = CX##_init(), c = CX##_init()), CX##_del(&c), CX##_del(&b), CX##_del(&a))
 
 #define c_forbuffer(b, type, n) c_forbuffer_N(b, type, n, 256)
 #define c_forbuffer_N(b, type, n, BYTES) \
