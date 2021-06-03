@@ -11,17 +11,12 @@ of a `c_forvar` / `c_fordefer`-block. ***Do not*** use `return`, `goto` or `brea
 `end`-statement to be executed at the end. The same applies for `c_forbuffer`. This is not particular to
 the `c_for*()` macros, as one must always make sure to unwind temporary allocated resources before `return` in C.
 
-There is also a **c_forbuffer** macro which uses stack memory if buffer is <= to 256 bytes, othewise it uses
-the slower heap memory.
-
 | Usage                                  | Description                                       |
 |:---------------------------------------|:--------------------------------------------------|
 | `c_fordefer (end...)`                  | Defer execution of `end` to end of block          |
 | `c_forscope (start, end)`              | Execute `start`. Defer `end` to end of block      |
 | `c_forvar (Type var=init, end...)`     | Declare `var`. Defer `end` to end of block        |
 | `c_forvar_initdel (Type, var...)`      | `c_forvar (Type var=Type_init(), Type_del(&var))` |
-|                                        |                                                   |
-| `c_forbuffer (buf, type, n)`           | Declare, allocate and free memory buffer          |
 
 For multiple variables, use either multiple **c_forvar** in sequence, or declare variable outside 
 scope and use **c_fordefer** or **c_forscope**. Also, **c_forvar_initdel** support up to 3 vars.
