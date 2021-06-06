@@ -62,37 +62,35 @@ int main(void) {
             using_cmap_7(X, Key, Mapped, keyEquals, keyHash, \
                          mappedDel, c_no_clone)
 #define using_cmap_7(X, Key, Mapped, keyEquals, keyHash, mappedDel, mappedClone) \
-            using_cmap_9(X, Key, Mapped, keyEquals, keyHash, \
-                         mappedDel, mappedClone, c_default_toraw, Mapped)
-#define using_cmap_9(X, Key, Mapped, keyEquals, keyHash, \
-                     mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
-            using_cmap_13(X, Key, Mapped, keyEquals, keyHash, \
-                          mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
+            using_cmap_10(X, Key, Mapped, keyEquals, keyHash, \
+                         mappedDel, mappedClone, c_default_toraw, Mapped, c_true)
+#define using_cmap_10(X, Key, Mapped, keyEquals, keyHash, \
+                      mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes) \
+            using_cmap_14(X, Key, Mapped, keyEquals, keyHash, \
+                          mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes, \
                           c_default_del, c_default_fromraw, c_default_toraw, Key)
-
-#define using_cmap_13(X, Key, Mapped, keyEqualsRaw, keyHashRaw, \
-                      mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
+#define using_cmap_14(X, Key, Mapped, keyEqualsRaw, keyHashRaw, \
+                      mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes, \
                       keyDel, keyFromRaw, keyToRaw, RawKey) \
             _c_using_chash(cmap_##X, cmap_, Key, Mapped, keyEqualsRaw, keyHashRaw, \
-                           mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
+                           mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes, \
                            keyDel, keyFromRaw, keyToRaw, RawKey)
 
 
 #define using_cmap_keydef(...) c_MACRO_OVERLOAD(using_cmap_keydef, __VA_ARGS__)
 
 #define using_cmap_keydef_7(X, Key, Mapped, keyEquals, keyHash, keyDel, keyClone) \
-            using_cmap_keydef_9(X, Key, Mapped, keyEquals, keyHash, \
-                                keyDel, keyClone, c_default_toraw, Key)
-
-#define using_cmap_keydef_9(X, Key, Mapped, keyEqualsRaw, keyHashRaw, \
-                            keyDel, keyFromRaw, keyToRaw, RawKey) \
+            using_cmap_keydef_10(X, Key, Mapped, keyEquals, keyHash, \
+                                keyDel, keyClone, c_default_toraw, Key, c_true)
+#define using_cmap_keydef_10(X, Key, Mapped, keyEqualsRaw, keyHashRaw, \
+                            keyDel, keyFromRaw, keyToRaw, RawKey, defTypes) \
             _c_using_chash(cmap_##X, cmap_, Key, Mapped, keyEqualsRaw, keyHashRaw, \
-                           c_default_del, c_default_fromraw, c_default_toraw, Mapped, \
+                           c_default_del, c_default_fromraw, c_default_toraw, Mapped, defTypes, \
                            keyDel, keyFromRaw, keyToRaw, RawKey)
 
 #define using_cmap_str() \
             _c_using_chash(cmap_str, cmap_, cstr, cstr, c_rawstr_equals, c_rawstr_hash, \
-                           cstr_del, cstr_from, cstr_toraw, const char*, \
+                           cstr_del, cstr_from, cstr_toraw, const char*, c_true, \
                            cstr_del, cstr_from, cstr_toraw, const char*)
 
 
@@ -103,13 +101,12 @@ int main(void) {
 #define using_cmap_strkey_3(X, Mapped, mappedDel) \
             using_cmap_strkey_4(X, Mapped, mappedDel, c_no_clone)
 #define using_cmap_strkey_4(X, Mapped, mappedDel, mappedClone) \
-            _c_using_chash_strkey(X, cmap_, Mapped, mappedDel, mappedClone, c_default_toraw, Mapped)
-#define using_cmap_strkey_6(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
-            _c_using_chash_strkey(X, cmap_, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped)
-
-#define _c_using_chash_strkey(X, C, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
+            using_cmap_strkey_7(X, Mapped, mappedDel, mappedClone, c_default_toraw, Mapped, c_true)
+#define using_cmap_strkey_7(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes) \
+            _c_using_chash_strkey(X, cmap_, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes)
+#define _c_using_chash_strkey(X, C, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes) \
             _c_using_chash(C##X, C, cstr, Mapped, c_rawstr_equals, c_rawstr_hash, \
-                           mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
+                           mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes, \
                            cstr_del, cstr_from, cstr_toraw, const char*)
 
 
@@ -122,11 +119,10 @@ int main(void) {
 #define using_cmap_strval_5(X, Key, keyEquals, keyHash, keyDel) \
             using_cmap_strval_6(X, Key, keyEquals, keyHash, keyDel, c_no_clone)
 #define using_cmap_strval_6(X, Key, keyEquals, keyHash, keyDel, keyClone) \
-            using_cmap_strval_8(X, Key, keyEquals, keyHash, keyDel, keyClone, c_default_toraw, Key)
-
-#define using_cmap_strval_8(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
+            using_cmap_strval_9(X, Key, keyEquals, keyHash, keyDel, keyClone, c_default_toraw, Key, c_true)
+#define using_cmap_strval_9(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey, defTypes) \
             _c_using_chash(cmap_##X, cmap_, Key, cstr, keyEqualsRaw, keyHashRaw, \
-                           cstr_del, cstr_from, cstr_toraw, const char*, \
+                           cstr_del, cstr_from, cstr_toraw, const char*, defTypes, \
                            keyDel, keyFromRaw, keyToRaw, RawKey)
 
 #define SET_ONLY_cmap_(...)
@@ -173,9 +169,9 @@ STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
     } CX
 
 #define _c_using_chash(CX, C, Key, Mapped, keyEqualsRaw, keyHashRaw, \
-                       mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
+                       mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes, \
                        keyDel, keyFromRaw, keyToRaw, RawKey) \
-    _c_chash_types(CX, C, Key, Mapped); \
+    defTypes( _c_chash_types(CX, C, Key, Mapped); ) \
 \
     MAP_ONLY_##C( struct CX##_value_t { \
         CX##_key_t first; \

@@ -45,8 +45,9 @@ int main(void) {
 
 #include "csmap.h"
 
-#define using_csset(...) \
-    c_MACRO_OVERLOAD(using_csset, __VA_ARGS__)
+#define forward_csset(X, Key) _c_aatree_types(csset_##X, csset_, Key, Key)
+
+#define using_csset(...) c_MACRO_OVERLOAD(using_csset, __VA_ARGS__)
 
 #define using_csset_2(X, Key) \
             using_csset_3(X, Key, c_default_compare)
@@ -55,14 +56,13 @@ int main(void) {
 #define using_csset_4(X, Key, keyCompare, keyDel) \
             using_csset_5(X, Key, keyCompare, keyDel, c_no_clone)
 #define using_csset_5(X, Key, keyCompare, keyDel, keyClone) \
-            using_csset_7(X, Key, keyCompare, keyDel, keyClone, c_default_toraw, Key)
-
-#define using_csset_7(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
+            using_csset_8(X, Key, keyCompare, keyDel, keyClone, c_default_toraw, Key, c_true)
+#define using_csset_8(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey, defTypes) \
             _c_using_aatree(csset_##X, csset_, Key, Key, keyCompareRaw, \
-                            @@, @@, @@, void, keyDel, keyFromRaw, keyToRaw, RawKey)
+                            @@, @@, @@, void, defTypes, keyDel, keyFromRaw, keyToRaw, RawKey)
 
 #define using_csset_str() \
-            _c_using_aatree_strkey(str, csset_, cstr, @@, @@, @@, void)
+            _c_using_aatree_strkey(str, csset_, cstr, @@, @@, @@, void, c_true)
 
 #define SET_ONLY_csset_(...) __VA_ARGS__
 #define MAP_ONLY_csset_(...)

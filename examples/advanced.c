@@ -37,7 +37,7 @@ static inline VikingRaw viking_toRaw(const Viking* vk) {
 // With this in place, we use the using_cmap_keydef() macro to define {Viking -> int} hash map type:
 
 using_cmap_keydef(vk, Viking, int, vikingraw_equals, vikingraw_hash,
-                      viking_del, viking_fromRaw, viking_toRaw, VikingRaw);
+                      viking_del, viking_fromRaw, viking_toRaw, VikingRaw, c_true);
 
 int main()
 {

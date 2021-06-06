@@ -146,16 +146,19 @@ STC_INLINE bool         csview_equals_ref(const csview* a, const csview* b)
 #define using_csmap_strvkey_3(X, Mapped, mappedDel) \
             using_csmap_strvkey_4(X, Mapped, mappedDel, c_no_clone)
 #define using_csmap_strvkey_4(X, Mapped, mappedDel, mappedClone) \
-            using_csmap_strvkey_6(X, Mapped, mappedDel, mappedClone, c_default_toraw, Mapped)
-#define using_csmap_strvkey_6(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
+            using_csmap_strvkey_7(X, Mapped, mappedDel, mappedClone, c_default_toraw, Mapped, c_true)
+#define using_csmap_strvkey_7(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes) \
             _c_using_aatree(csmap_##X, csmap_, cstr, Mapped, csview_compare_ref, \
-                            mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
+                            mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes, \
                             cstr_del, cstr_from_v, cstr_to_v, csview)
+
 #define using_csmap_strv() \
-            using_csmap_strvkey_6(strv, cstr, cstr_del, cstr_from_v, cstr_to_v, csview)
+            _c_using_aatree(csmap_strv, csmap_, cstr, cstr, csview_equals_ref, csview_hash_ref, \
+                           cstr_del, cstr_from_v, cstr_to_v, csview, c_true, \
+                           cstr_del, cstr_from_v, cstr_to_v, csview)
 #define using_csset_strv() \
             _c_using_aatree(csset_strv, csset_, cstr, cstr, csview_compare_ref, \
-                            @@, @@, @@, void, cstr_del, cstr_from_v, cstr_to_v, csview)
+                            @@, @@, @@, void, c_true, cstr_del, cstr_from_v, cstr_to_v, csview)
 
 
 #define using_cmap_strvkey(...) c_MACRO_OVERLOAD(using_cmap_strvkey, __VA_ARGS__)
@@ -165,15 +168,18 @@ STC_INLINE bool         csview_equals_ref(const csview* a, const csview* b)
 #define using_cmap_strvkey_3(X, Mapped, mappedDel) \
             using_cmap_strvkey_4(X, Mapped, mappedDel, c_no_clone)
 #define using_cmap_strvkey_4(X, Mapped, mappedDel, mappedClone) \
-            using_cmap_strvkey_6(X, Mapped, mappedDel, mappedClone, c_default_toraw, Mapped)
-#define using_cmap_strvkey_6(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped) \
+            using_cmap_strvkey_7(X, Mapped, mappedDel, mappedClone, c_default_toraw, Mapped, c_true)
+#define using_cmap_strvkey_7(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes) \
             _c_using_chash(cmap_##X, cmap_, cstr, Mapped, csview_equals_ref, csview_hash_ref, \
-                            mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
-                            cstr_del, cstr_from_v, cstr_to_v, csview)
+                           mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes, \
+                           cstr_del, cstr_from_v, cstr_to_v, csview)
+
 #define using_cmap_strv() \
-            using_cmap_strvkey_6(strv, cstr, cstr_del, cstr_from_v, cstr_to_v, csview)
+            _c_using_chash(cmap_strv, cmap_, cstr, cstr, csview_equals_ref, csview_hash_ref, \
+                           cstr_del, cstr_from_v, cstr_to_v, csview, c_true, \
+                           cstr_del, cstr_from_v, cstr_to_v, csview)
 #define using_cset_strv() \
             _c_using_chash(cset_strv, cset_, cstr, cstr, csview_equals_ref, csview_hash_ref, \
-                           @@, @@, @@, void, cstr_del, cstr_from_v, cstr_to_v, csview)
+                           @@, @@, @@, void, c_true, cstr_del, cstr_from_v, cstr_to_v, csview)
 
 #endif

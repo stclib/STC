@@ -43,9 +43,9 @@ int main(void) {
 
 #include "cmap.h"
 
-/* cset: */
-#define using_cset(...) \
-    c_MACRO_OVERLOAD(using_cset, __VA_ARGS__)
+#define forward_cset(X, Key) _c_chash_types(cset_##X, cset_, Key, Key)
+
+#define using_cset(...) c_MACRO_OVERLOAD(using_cset, __VA_ARGS__)
 
 #define using_cset_2(X, Key) \
             using_cset_4(X, Key, c_default_equals, c_default_hash)
@@ -54,15 +54,14 @@ int main(void) {
 #define using_cset_5(X, Key, keyEquals, keyHash, keyDel) \
             using_cset_6(X, Key, keyEquals, keyHash, keyDel, c_no_clone)
 #define using_cset_6(X, Key, keyEquals, keyHash, keyDel, keyClone) \
-            using_cset_8(X, Key, keyEquals, keyHash, keyDel, keyClone, c_default_toraw, Key)
-
-#define using_cset_8(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey) \
+            using_cset_9(X, Key, keyEquals, keyHash, keyDel, keyClone, c_default_toraw, Key, c_true)
+#define using_cset_9(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey, defTypes) \
             _c_using_chash(cset_##X, cset_, Key, Key, keyEqualsRaw, keyHashRaw, \
-                           @@, @@, @@, void, keyDel, keyFromRaw, keyToRaw, RawKey)
+                           @@, @@, @@, void, defTypes, keyDel, keyFromRaw, keyToRaw, RawKey)
 
 /* cset_str: */
 #define using_cset_str() \
-            _c_using_chash_strkey(str, cset_, cstr, @@, @@, @@, void)
+            _c_using_chash_strkey(str, cset_, cstr, @@, @@, @@, void, c_true)
 
 #define SET_ONLY_cset_(...) __VA_ARGS__
 #define MAP_ONLY_cset_(...)
