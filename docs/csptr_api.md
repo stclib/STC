@@ -69,9 +69,8 @@ bool                csptr_X_equals(csptr_X* x, csptr_X* y);
 
 typedef struct { cstr name, last; } Person;
 
-Person* Person_make(Person* p, const char* name, const char* last) {
-    p->name = cstr_from(name), p->last = cstr_from(last);
-    return p;
+Person Person_init(const char* name, const char* last) {
+    return (Person){.name = cstr_from(name), .last = cstr_from(last)};
 }
 void Person_del(Person* p) {
     printf("Destroy: %s %s\n", p->name.str, p->last.str);
@@ -81,9 +80,9 @@ void Person_del(Person* p) {
 using_csptr(pe, Person, c_no_compare, Person_del);
 
 int main() {
-    csptr_pe p = csptr_pe_from(Person_make(c_new(Person), "John", "Smiths"));
+    csptr_pe p = csptr_pe_make(Person_init("John", "Smiths"));
     csptr_pe q = csptr_pe_clone(p); // means: share the pointer
-    
+
     printf("Person: %s %s. uses: %zu\n", p.get->name.str, p.get->last.str, *p.use_count);
     csptr_pe_del(&p);
 
