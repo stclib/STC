@@ -82,7 +82,9 @@ typedef long atomic_count_t;
     }
 #endif
 
+#define forward_csptr(X, Value) _csptr_types(csptr_##X, Value)
 #define csptr_null {NULL, NULL}
+
 
 #define using_csptr(...) c_MACRO_OVERLOAD(using_csptr, __VA_ARGS__)
 
@@ -95,8 +97,6 @@ typedef long atomic_count_t;
 #define using_csptr_5(X, Value, valueCompare, valueDel, defineTypes) \
             _c_using_csptr(csptr_##X, Value, valueCompare, valueDel, defineTypes)
 
-#define forward_csptr(X, Value) _csptr_types(csptr_##X, Value)
-
 #define _csptr_types(CX, Value) \
     typedef Value CX##_value_t; \
 \
@@ -107,6 +107,7 @@ typedef long atomic_count_t;
 
 #define _c_using_csptr(CX, Value, valueCompare, valueDel, defineTypes) \
     defineTypes( _csptr_types(CX, Value); ) \
+    struct CX##_rep_ {atomic_count_t cnt; CX##_value_t val;}; \
 \
     STC_INLINE CX \
     CX##_from(CX##_value_t* p) { \
@@ -117,8 +118,10 @@ typedef long atomic_count_t;
 \
     STC_INLINE CX \
     CX##_make(CX##_value_t val) { \
-        CX ptr = {c_new(CX##_value_t), c_new(atomic_count_t)}; \
-        *ptr.get = val, *ptr.use_count = 1; return ptr; \
+        CX ptr; struct CX##_rep_ *rep = c_new(struct CX##_rep_); \
+        *(ptr.use_count = &rep->cnt) = 1; \
+        *(ptr.get = &rep->val) = val; \
+        return ptr; \
     } \
 \
     STC_INLINE CX \
@@ -138,8 +141,8 @@ typedef long atomic_count_t;
     CX##_del(CX* self) { \
         if (self->use_count && atomic_decrement(self->use_count) == 0) { \
             valueDel(self->get); \
+            if (self->get != &((struct CX##_rep_*)self->use_count)->val) c_free(self->get); \
             c_free(self->use_count); \
-            c_free(self->get); \
         } \
     } \
 \
@@ -153,6 +156,21 @@ typedef long atomic_count_t;
     CX##_reset_with(CX* self, CX##_value_t* p) { \
         CX##_del(self); \
         *self = CX##_from(p); \
+        return self->get; \
+    } \
+\
+    STC_INLINE CX##_value_t* \
+    CX##_assign(CX* self, CX##_value_t val) { \
+        CX##_del(self); \
+        *self = CX##_make(val); \
+        return self->get; \
+    } \
+\
+    STC_INLINE CX##_value_t* \
+    CX##_copy(CX* self, CX ptr) { \
+        CX##_del(self); \
+        if (ptr.use_count) atomic_increment(ptr.use_count); \
+        *self = ptr; \
         return self->get; \
     } \
 \
