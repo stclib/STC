@@ -53,32 +53,19 @@ int main() {
 */
 typedef long atomic_count_t;
 #if defined(__GNUC__) || defined(__clang__)
-    STC_INLINE void atomic_increment(atomic_count_t* pw) {__atomic_add_fetch(pw, 1, __ATOMIC_SEQ_CST);}
-    STC_INLINE atomic_count_t atomic_decrement(atomic_count_t* pw) {return __atomic_sub_fetch(pw, 1, __ATOMIC_SEQ_CST);}
+    #define c_atomic_increment(v) (void)__atomic_add_fetch(v, 1, __ATOMIC_SEQ_CST)
+    #define c_atomic_decrement(v) __atomic_sub_fetch(v, 1, __ATOMIC_SEQ_CST)
 #elif defined(_MSC_VER)
     #include <intrin.h>
-    STC_INLINE void atomic_increment(atomic_count_t* pw) {_InterlockedIncrement(pw);}
-    STC_INLINE atomic_count_t atomic_decrement(atomic_count_t* pw) {return _InterlockedDecrement(pw);}
+    #define c_atomic_increment(v) (void)_InterlockedIncrement(v)
+    #define c_atomic_decrement(v) _InterlockedDecrement(v)
 #elif defined(__i386__) || defined(__x86_64__)
-    STC_INLINE void atomic_increment(atomic_count_t* pw) {
-        __asm__ (
-            "lock\n\t"
-            "incl %0":
-            "=m"( *pw ): // ++*pw // output (%0)
-            "m"( *pw ):  // input (%1)
-            "cc"         // clobbers
-        );
-    }
-    STC_INLINE atomic_count_t atomic_decrement(atomic_count_t* pw) {
-        int r;
-        __asm__ __volatile__ (
-            "lock\n\t"
-            "xadd %1, %0":
-            "=m"( *pw ), "=r"( r ): // int r = *pw; // outputs (%0, %1)
-            "m"( *pw ), "1"( -1 ):  // *pw += -1;   // inputs (%2, %3 == %1)
-            "memory", "cc"          // clobbers
-        );
-        return r - 1;
+    STC_INLINE void c_atomic_increment(atomic_count_t* v)
+        { __asm__ __volatile__("lock; incq %0" :"=m"(*v) :"m"(*v)); }
+    STC_INLINE atomic_count_t c_atomic_decrement(atomic_count_t* v) {
+        atomic_count_t i = -1;
+        __asm__ __volatile__("lock; xadd %0, %1" :"=r"(i) :"m"(*v), "0"(i));
+        return i - 1;
     }
 #endif
 
@@ -126,7 +113,7 @@ typedef long atomic_count_t;
 \
     STC_INLINE CX \
     CX##_clone(CX ptr) { \
-        if (ptr.use_count) atomic_increment(ptr.use_count); \
+        if (ptr.use_count) c_atomic_increment(ptr.use_count); \
         return ptr; \
     } \
 \
@@ -139,7 +126,7 @@ typedef long atomic_count_t;
 \
     STC_INLINE void \
     CX##_del(CX* self) { \
-        if (self->use_count && atomic_decrement(self->use_count) == 0) { \
+        if (self->use_count && c_atomic_decrement(self->use_count) == 0) { \
             valueDel(self->get); \
             if (self->get != &((struct CX##_rep_*)self->use_count)->val) c_free(self->get); \
             c_free(self->use_count); \
@@ -169,7 +156,7 @@ typedef long atomic_count_t;
     STC_INLINE CX##_value_t* \
     CX##_copy(CX* self, CX ptr) { \
         CX##_del(self); \
-        if (ptr.use_count) atomic_increment(ptr.use_count); \
+        if (ptr.use_count) c_atomic_increment(ptr.use_count); \
         *self = ptr; \
         return self->get; \
     } \
