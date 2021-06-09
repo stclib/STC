@@ -38,18 +38,19 @@ The *csptr_X_compare()*, *csptr_X_equals()* and *csptr_X_del()* methods are defi
 ```c
 csptr_X             csptr_X_from(Value* p);       // constructor
 csptr_X             csptr_X_make(Value val);      // make_shared
+
 void                csptr_X_reset(csptr_X* self);
-void                csptr_X_reset_with(csptr_X* self, Value* p);
+csptr_X_value_t*    csptr_X_reset_from(csptr_X* self, Value* p);
+csptr_X_value_t*    csptr_X_reset_make(csptr_X* self, Value val); // assign new sptr with value
 
-csptr_X_value_t*    csptr_X_assign(csptr_X* self, Value val); // assign new sptr with value
-csptr_X_value_t*    csptr_X_copy(csptr_X* self, csptr_X ptr); // assign a shared copy
+csptr_X_value_t*    csptr_X_copy(csptr_X* self, CX other);        // copy shared (increase use count)
+csptr_X             csptr_X_clone(csptr_X ptr);                   // clone shared (increase use count)
 
-csptr_X             csptr_X_clone(csptr_X ptr);               // share the pointer (increase use count)
-void                csptr_X_move(csptr_X* self);              // transfer ownership instead of sharing. 
-void                csptr_X_del(csptr_X* self);               // destructor: decrease use count, destroy at 0
+void                csptr_X_move(csptr_X* self);                  // transfer ownership instead of sharing. 
+void                csptr_X_del(csptr_X* self);                   // destruct: decrease use count, free at 0
 
-int                 csptr_X_compare(csptr_X* x, csptr_X* y);
-bool                csptr_X_equals(csptr_X* x, csptr_X* y);
+int                 csptr_X_compare(const csptr_X* x, const csptr_X* y);
+bool                csptr_X_equals(const csptr_X* x, const csptr_X* y);
 ```
 
 ## Types and constants
@@ -77,17 +78,17 @@ void Person_del(Person* p) {
     c_del(cstr, &p->name, &p->last);
 }
 
-using_csptr(pe, Person, c_no_compare, Person_del);
+using_csptr(person, Person, c_no_compare, Person_del);
 
 int main() {
-    csptr_pe p = csptr_pe_make(Person_init("John", "Smiths"));
-    csptr_pe q = csptr_pe_clone(p); // means: share the pointer
+    csptr_person p = csptr_person_make(Person_init("John", "Smiths"));
+    csptr_person q = csptr_person_clone(p); // means: share the pointer
 
     printf("Person: %s %s. uses: %zu\n", p.get->name.str, p.get->last.str, *p.use_count);
-    csptr_pe_del(&p);
+    csptr_person_del(&p);
 
     printf("Last man standing: %s %s. uses: %zu\n", q.get->name.str, q.get->last.str, *q.use_count);
-    csptr_pe_del(&q);
+    csptr_person_del(&q);
 }
 ```
 Output:

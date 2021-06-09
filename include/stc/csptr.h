@@ -32,23 +32,22 @@
 
 typedef struct { cstr name, last; } Person;
 
-Person* Person_make(Person* p, const char* name, const char* last) {
-    p->name = cstr_from(name), p->last = cstr_from(last);
-    return p;
+Person Person_init(const char* name, const char* last) {
+    return (Person){.name = cstr_from(name), .last = cstr_from(last)};
 }
 void Person_del(Person* p) {
     printf("del: %s\n", p->name.str);
     c_del(cstr, &p->name, &p->last);
 }
 
-using_csptr(pe, Person, c_no_compare, Person_del);
+using_csptr(person, Person, c_no_compare, Person_del);
 
 int main() {
-    csptr_pe p = csptr_pe_from(Person_make(c_new(Person), "John", "Smiths"));
-    csptr_pe q = csptr_pe_clone(p); // share the pointer
+    csptr_person p = csptr_person_make(Person_init("John", "Smiths"));
+    csptr_person q = csptr_person_clone(p); // share the pointer
 
     printf("%s %s. uses: %zu\n", q.get->name.str, q.get->last.str, *q.use_count);
-    c_del(csptr_pe, &p, &q);
+    c_del(csptr_person, &p, &q);
 }
 */
 typedef long atomic_count_t;
@@ -140,14 +139,14 @@ typedef long atomic_count_t;
     } \
 \
     STC_INLINE CX##_value_t* \
-    CX##_reset_with(CX* self, CX##_value_t* p) { \
+    CX##_reset_from(CX* self, CX##_value_t* p) { \
         CX##_del(self); \
         *self = CX##_from(p); \
         return self->get; \
     } \
 \
     STC_INLINE CX##_value_t* \
-    CX##_assign(CX* self, CX##_value_t val) { \
+    CX##_reset_make(CX* self, CX##_value_t val) { \
         CX##_del(self); \
         *self = CX##_make(val); \
         return self->get; \
@@ -156,18 +155,18 @@ typedef long atomic_count_t;
     STC_INLINE CX##_value_t* \
     CX##_copy(CX* self, CX ptr) { \
         CX##_del(self); \
-        if (ptr.use_count) c_atomic_increment(ptr.use_count); \
         *self = ptr; \
+        if (self->use_count) c_atomic_increment(self->use_count); \
         return self->get; \
     } \
 \
     STC_INLINE int \
-    CX##_compare(CX* x, CX* y) { \
+    CX##_compare(const CX* x, const CX* y) { \
         return valueCompare(x->get, y->get); \
     } \
 \
     STC_INLINE bool \
-    CX##_equals(CX* x, CX* y) { \
+    CX##_equals(const CX* x, const CX* y) { \
         return valueCompare(x->get, y->get) == 0; \
     } \
     struct stc_trailing_semicolon
