@@ -139,7 +139,7 @@ typedef long atomic_count_t;
     } \
 \
     STC_INLINE CX##_value_t* \
-    CX##_reset_from(CX* self, CX##_value_t* p) { \
+    CX##_reset_with(CX* self, CX##_value_t* p) { \
         CX##_del(self); \
         *self = CX##_from(p); \
         return self->get; \

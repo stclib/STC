@@ -40,7 +40,7 @@ csptr_X             csptr_X_from(Value* p);                       // constructor
 csptr_X             csptr_X_make(Value val);                      // make_shared; fast
 
 void                csptr_X_reset(csptr_X* self);
-csptr_X_value_t*    csptr_X_reset_from(csptr_X* self, Value* p);  // slower than reset_make().
+csptr_X_value_t*    csptr_X_reset_with(csptr_X* self, Value* p);  // slower than reset_make().
 csptr_X_value_t*    csptr_X_reset_make(csptr_X* self, Value val); // assign new sptr with value
 
 csptr_X_value_t*    csptr_X_copy(csptr_X* self, CX other);        // copy shared (increase use count)
