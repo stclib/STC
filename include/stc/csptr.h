@@ -25,7 +25,7 @@
 
 #include "ccommon.h"
 
-/* csptr: std::shared_ptr -like type:
+/* csptr: shared_ptr type
 
 #include <stc/csptr.h>
 #include <stc/cstr.h>
@@ -36,7 +36,7 @@ Person Person_init(const char* name, const char* last) {
     return (Person){.name = cstr_from(name), .last = cstr_from(last)};
 }
 void Person_del(Person* p) {
-    printf("del: %s\n", p->name.str);
+    printf("del: %s %s\n", p->name.str, p->last.str);
     c_del(cstr, &p->name, &p->last);
 }
 
