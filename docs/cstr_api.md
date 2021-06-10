@@ -64,13 +64,13 @@ bool         cstr_equals_s(cstr s, cstr s2);
 size_t       cstr_find(cstr s, const char* needle);
 size_t       cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax);
 bool         cstr_contains(cstr s, const char* needle);
-bool         cstr_begins_with(cstr s, const char* str);
+bool         cstr_starts_with(cstr s, const char* str);
 bool         cstr_ends_with(cstr s, const char* str);
 
 bool         cstr_iequals(cstr s, const char* str);                   // prefix i = case-insensitive
 size_t       cstr_ifind_n(cstr s, const char* needle, size_t pos, size_t nmax);
 bool         cstr_icontains(cstr s, const char* needle);
-bool         cstr_ibegins_with(cstr s, const char* str);
+bool         cstr_istarts_with(cstr s, const char* str);
 bool         cstr_iends_with(cstr s, const char* str);
 
 void         cstr_push_back(cstr* self, char ch);

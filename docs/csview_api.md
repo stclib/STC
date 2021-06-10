@@ -48,7 +48,7 @@ csview        csview_next_token(csview sv, csview sep, csview token);
 bool          csview_equals(csview sv, csview sv2);
 size_t        csview_find(csview sv, csview needle);
 bool          csview_contains(csview sv, csview needle);
-bool          csview_begins_with(csview sv, csview sub);
+bool          csview_starts_with(csview sv, csview sub);
 bool          csview_ends_with(csview sv, csview sub);
 
 csview_iter_t csview_begin(const csview* self);
@@ -69,7 +69,7 @@ void          cstr_replace_v(cstr* self, size_t pos, size_t len, csview sv);
 bool          cstr_equals_v(cstr s, csview sv);
 size_t        cstr_find_v(cstr s, csview needle);
 bool          cstr_contains_v(cstr s, csview needle);
-bool          cstr_begins_with_v(cstr s, csview sub);
+bool          cstr_starts_with_v(cstr s, csview sub);
 bool          cstr_ends_with_v(cstr s, csview sub);
 ```
 #### Helper methods

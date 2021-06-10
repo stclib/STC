@@ -59,7 +59,7 @@ STC_INLINE size_t       csview_find(csview sv, csview needle)
                               return res ? res - sv.str : cstr_npos; }
 STC_INLINE bool         csview_contains(csview sv, csview needle)
                             { return c_strnstrn(sv.str, needle.str, sv.size, needle.size) != NULL; }
-STC_INLINE bool         csview_begins_with(csview sv, csview sub)
+STC_INLINE bool         csview_starts_with(csview sv, csview sub)
                             { if (sub.size > sv.size) return false;
                               return !memcmp(sv.str, sub.str, sub.size); }
 STC_INLINE bool         csview_ends_with(csview sv, csview sub)
@@ -123,7 +123,7 @@ STC_INLINE size_t       cstr_find_v(cstr s, csview needle)
                               return res ? res - s.str : cstr_npos; }
 STC_INLINE bool         cstr_contains_v(cstr s, csview needle)
                             { return c_strnstrn(s.str, needle.str, cstr_size(s), needle.size) != NULL; }
-STC_INLINE bool         cstr_begins_with_v(cstr s, csview sub)
+STC_INLINE bool         cstr_starts_with_v(cstr s, csview sub)
                             { if (sub.size > cstr_size(s)) return false;
                               return !memcmp(s.str, sub.str, sub.size); }
 STC_INLINE bool         cstr_ends_with_v(cstr s, csview sub)

@@ -156,7 +156,7 @@ cstr_move(cstr* self) {
 }
 
 STC_INLINE bool
-cstr_begins_with(cstr s, const char* sub) {
+cstr_starts_with(cstr s, const char* sub) {
     while (*sub && *s.str == *sub) ++s.str, ++sub;
     return *sub == 0;
 }
@@ -168,7 +168,7 @@ cstr_ends_with(cstr s, const char* sub) {
 }
 
 STC_INLINE bool
-cstr_ibegins_with(cstr s, const char* sub) {
+cstr_istarts_with(cstr s, const char* sub) {
     while (*sub && tolower(*s.str) == tolower(*sub)) ++s.str, ++sub;
     return *sub == 0;
 }
