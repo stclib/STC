@@ -96,6 +96,12 @@ typedef long atomic_count_t;
     struct CX##_rep_ {atomic_count_t cnt; CX##_value_t val;}; \
 \
     STC_INLINE CX \
+    CX##_init() { return c_make(CX){NULL, NULL}; } \
+\
+    STC_INLINE atomic_count_t \
+    CX##_use_count(CX ptr) { return ptr.use_count ? *ptr.use_count : 0; } \
+\
+    STC_INLINE CX \
     CX##_from(CX##_value_t* p) { \
         CX ptr = {p}; \
         if (p) *(ptr.use_count = c_new(atomic_count_t)) = 1; \

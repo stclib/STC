@@ -36,18 +36,19 @@ Use *csptr_X_clone(p)* when sharing ownership of the pointed-to object. See exam
 The *csptr_X_compare()*, *csptr_X_equals()* and *csptr_X_del()* methods are defined based on the *valeCompare* and *valueDel* arguments passed to the **using**-macro.
 
 ```c
-csptr_X             csptr_X_from(Value* p);                       // constructor
-csptr_X             csptr_X_make(Value val);                      // make_shared; fast
+csptr_X             csptr_X_init();                               // empty constructor
+csptr_X             csptr_X_make(Value val);                      // make_shared constructor, fast
+csptr_X             csptr_X_from(Value* p);                       // construct from raw pointer
+csptr_X             csptr_X_clone(csptr_X ptr);                   // clone shared (increase use count)
+csptr_X             csptr_X_move(csptr_X* self);                  // fast transfer ownership to another sptr.
+
+void                csptr_X_del(csptr_X* self);                   // destruct (decrease use count, free at 0)
+long                csptr_X_use_count(csptr_X ptr);
 
 void                csptr_X_reset(csptr_X* self);
-csptr_X_value_t*    csptr_X_reset_with(csptr_X* self, Value* p);  // slower than reset_make().
 csptr_X_value_t*    csptr_X_reset_make(csptr_X* self, Value val); // assign new sptr with value
-
+csptr_X_value_t*    csptr_X_reset_with(csptr_X* self, Value* p);  // slower than reset_make().
 csptr_X_value_t*    csptr_X_copy(csptr_X* self, CX other);        // copy shared (increase use count)
-csptr_X             csptr_X_clone(csptr_X ptr);                   // clone shared (increase use count)
-
-csptr_X             csptr_X_move(csptr_X* self);                  // fast transfer ownership to another sptr.
-void                csptr_X_del(csptr_X* self);                   // destruct: decrease use count, free at 0
 
 int                 csptr_X_compare(const csptr_X* x, const csptr_X* y);
 bool                csptr_X_equals(const csptr_X* x, const csptr_X* y);
