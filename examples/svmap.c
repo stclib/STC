@@ -6,7 +6,7 @@
 using_cmap_strvkey(si, int);
 
 int main() {
-    csview fox = c_lit("The quick brown fox jumps over the lazy dog.");
+    csview fox = c_sv("The quick brown fox jumps over the lazy dog.");
     printf("\"%s\", length=%zu\n", fox.str, fox.size);
 
     c_forvar_initdel (cmap_si, frequencies)
@@ -18,13 +18,13 @@ int main() {
 
         // Emplace: csview element API
         const char* key = "hundred";
-        cmap_si_emplace(&frequencies, c_lit("hundred"), 300);           // c_lit() shorthand for csview_lit()
+        cmap_si_emplace(&frequencies, c_sv("hundred"), 300);            // c_sv() shorthand for csview_lit()
         cmap_si_emplace(&frequencies, csview_from_n(key, 4), 400);      // insert "hund"
         cmap_si_emplace_or_assign(&frequencies, csview_from(key), 500); // update
-        cmap_si_emplace(&frequencies, c_lit("hundred"), 600);           // ignored, already inserted
+        cmap_si_emplace(&frequencies, c_sv("hundred"), 600);            // ignored, already inserted
 
         // Lookup always uses "raw" type API, i.e. csview here.
-        printf("at(\"hundred\"): %d\n", *cmap_si_at(&frequencies, c_lit("hundred")));
+        printf("at(\"hundred\"): %d\n", *cmap_si_at(&frequencies, c_sv("hundred")));
 
         c_foreach (i, cmap_si, frequencies)
             printf("%s: %d\n", i.ref->first.str, i.ref->second);

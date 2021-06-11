@@ -28,12 +28,13 @@
 typedef                 struct { const char* str; size_t size; } csview;
 typedef                 struct { const char *ref; } csview_iter_t;
 typedef                 char csview_value_t;
+
 #define                 csview_null  c_make(csview){"", 0}
 #define                 csview_npos  cstr_npos
 #define                 csview_ARG(sv)  (int)(sv).size, (sv).str
 
-#define                 c_lit(literal) csview_lit(literal)
-#define                 c_sv(s) csview_from_s(s)
+#define                 c_sv(literal) csview_lit(literal)
+#define                 cstr_sv(s) csview_from_s(s)
 
 #define                 csview_lit(literal) \
                             c_make(csview){literal, sizeof c_make(strlit_t){literal} - 1}

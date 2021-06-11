@@ -25,12 +25,12 @@ All csview definitions and prototypes are available by including a single header
 ## Methods
 
 ```c
-csview        c_lit(const char literal_only[]);                     // csview from literal, no strlen()
-csview        c_sv(cstr s);                                         // construct csview from cstr
-csview        csview_from(const char* str);                         // construct from (const char*)
+csview        csview_from(const char* str);                         // make csview from const char*
 csview        csview_from_n(const char* str, size_t n);             // construct 
-csview        csview_from_s(cstr s);                                // same as c_sv()
-csview        csview_lit(const char literal_only[]);                // same as c_lit()
+csview        csview_from_s(cstr s);                                // same as cstr_sv()
+
+csview        csview_lit(const char literal_only[]);                // make csview from literal, no strlen()
+csview        c_sv(const char literal_only[]);                      // same as csview_lit()
 
 size_t        csview_size(csview sv);
 size_t        csview_length(csview sv);
@@ -57,10 +57,13 @@ void          csview_next(csview_iter_t* it);
 ```
 #### Extended cstr methods
 ```c
-cstr          cstr_from_v(csview sv);
-csview        cstr_to_v(const cstr* self);
-csview        cstr_substr(cstr s, intptr_t pos, size_t n);    // negative pos count from end
-csview        cstr_slice(cstr s, intptr_t p1, intptr_t p2);   // negative p1, p2 count from end
+cstr          cstr_from_v(csview sv);                         // construct cstr from csview
+
+csview        cstr_sv(cstr s);                                // convert to csview from cstr
+csview        cstr_to_v(const cstr* self);                    // convert to csview from cstr*
+csview        cstr_substr(cstr s, intptr_t pos, size_t n);    // negative pos counts from end
+csview        cstr_slice(cstr s, intptr_t p1, intptr_t p2);   // negative p1, p2 counts from end
+
 cstr*         cstr_assign_v(cstr* self, csview sv);
 cstr*         cstr_append_v(cstr* self, csview sv);
 void          cstr_insert_v(cstr* self, size_t pos, csview sv);
@@ -90,9 +93,8 @@ uint64_t      csview_hash_ref(const csview* x, size_t ignored);
 
 | Name             | Value               | Usage                             |
 |:-----------------|:--------------------|:----------------------------------|
-| `csview_null`    | same as `c_lit("")` | `sview = csview_null;`            |
+| `csview_null`    | same as `c_sv("")`  | `sview = csview_null;`            |
 | `csview_npos`    | same as `cstr_npos` |                                   |
-| `c_lit(literal)` | csview constructor  | `sview = c_lit("hello, world");`  |
 | `csview_ARG(sv)` | printf argument     | `printf("%.*s", csview_ARG(sv));` |
 
 ## Associative cstr-containers with csview emplace/lookup API
@@ -175,12 +177,12 @@ cvec_str string_split(csview str, csview sep)
 
 int main()
 {
-    print_split(c_lit("//This is a//double-slash//separated//string"), c_lit("//"));
+    print_split(c_sv("//This is a//double-slash//separated//string"), c_sv("//"));
     puts("");
-    print_split(c_lit("This has no matching separator"), c_lit("xx"));
+    print_split(c_sv("This has no matching separator"), c_sv("xx"));
     puts("");
 
-    c_forvar (cvec_str v = string_split(c_lit("Split,this,,string,now,"), c_lit(",")), cvec_str_del(&v))
+    c_forvar (cvec_str v = string_split(c_sv("Split,this,,string,now,"), c_sv(",")), cvec_str_del(&v))
         c_foreach (i, cvec_str, v)
             printf("\"%s\"\n", i.ref->str);
 }
@@ -213,18 +215,18 @@ using_cmap_strvkey(si, int);
 
 int main()
 {
-    csview text = c_lit("The length of this literal is evaluated at compile time and stored in csview text.");
+    csview text = c_sv("The length of this literal is evaluated at compile time and stored in csview text.");
     csview suffix = csview_substr(text, -12, cstr_npos); // from pos -12 to end
     printf("%.*s\n", csview_ARG(suffix));
 
     c_forvar_initdel (cmap_si, map)
     {
-        cmap_si_emplace(&map, c_lit("hello"), 100);
-        cmap_si_emplace(&map, c_lit("world"), 200);
-        cmap_si_emplace(&map, c_lit("hello"), 300); // already in map, ignored
+        cmap_si_emplace(&map, c_sv("hello"), 100);
+        cmap_si_emplace(&map, c_sv("world"), 200);
+        cmap_si_emplace(&map, c_sv("hello"), 300); // already in map, ignored
 
         // Efficient lookup: no string allocation or strlen() takes place:
-        cmap_si_value_t* val = cmap_si_get(&map, c_lit("hello"));
+        cmap_si_value_t* val = cmap_si_get(&map, c_sv("hello"));
         printf("%s: %d\n", val->first.str, val->second);
     }
 }

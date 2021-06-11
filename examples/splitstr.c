@@ -29,12 +29,12 @@ cvec_str string_split(csview str, csview sep)
 int main()
 {
     puts("Output from print_split():");
-    print_split(c_lit("//This is a//double-slash//separated//string"), c_lit("//")); puts("");
-    print_split(c_lit("This has no matching separator"), c_lit("xx")); puts("");
+    print_split(c_sv("//This is a//double-slash//separated//string"), c_sv("//")); puts("");
+    print_split(c_sv("This has no matching separator"), c_sv("xx")); puts("");
 
     puts("Output from string_split():");
     cstr string = cstr_lit("Split,this,,string,now,");
-    cvec_str vec = string_split(c_sv(string), c_lit(","));
+    cvec_str vec = string_split(cstr_sv(string), c_sv(","));
 
     c_fordefer (cvec_str_del(&vec), cstr_del(&string))
         c_foreach (i, cvec_str, vec)
