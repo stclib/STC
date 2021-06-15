@@ -284,7 +284,7 @@ cstr_append_n(cstr* self, const char* str, size_t n) {
     size_t oldlen = _cstr_rep(self)->size, newlen = oldlen + n;
     if (newlen > _cstr_rep(self)->cap) {
         size_t off = (size_t) (str - self->str); /* handle self append */
-        cstr_reserve(self, newlen*3/2);
+        cstr_reserve(self, newlen*3 >> 1);
         if (off <= oldlen) str = self->str + off;
     }
     memcpy(&self->str[oldlen], str, n);
@@ -297,7 +297,7 @@ STC_INLINE void _cstr_internal_move(cstr* self, size_t pos1, size_t pos2) {
         return;
     size_t len = _cstr_rep(self)->size, newlen = len + pos2 - pos1;
     if (newlen > _cstr_rep(self)->cap)
-        cstr_reserve(self, newlen*3/2);
+        cstr_reserve(self, newlen*3 >> 1);
     memmove(&self->str[pos2], &self->str[pos1], len - pos1);
     self->str[_cstr_rep(self)->size = newlen] = '\0';
 }
@@ -349,7 +349,7 @@ cstr_getdelim(cstr *self, int delim, FILE *fp) {
         return false;
     for (;;) {
         if (pos == cap)
-            cap = cstr_reserve(self, cap*3/2 + 16);
+            cap = cstr_reserve(self, (cap*3 >> 1) + 24);
         if (c == delim || c == EOF) {
             self->str[_cstr_rep(self)->size = pos] = '\0';
             return true;

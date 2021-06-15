@@ -137,7 +137,7 @@ STC_INLINE bool         csview_equals_ref(const csview* a, const csview* b)
                             cstr_del, cstr_from_v, cstr_to_v, csview)
 
 #define using_csmap_strv() \
-            _c_using_aatree(csmap_strv, csmap_, cstr, cstr, csview_equals_ref, csview_hash_ref, \
+            _c_using_aatree(csmap_strv, csmap_, cstr, cstr, csview_compare_ref, \
                            cstr_del, cstr_from_v, cstr_to_v, csview, c_true, \
                            cstr_del, cstr_from_v, cstr_to_v, csview)
 #define using_csset_strv() \
