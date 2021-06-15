@@ -36,6 +36,11 @@ typedef                 char csview_value_t;
 #define                 c_sv(literal) csview_lit(literal)
 #define                 cstr_sv(s) csview_from_s(s)
 
+STC_API csview          csview_substr(csview sv, intptr_t pos, size_t n);
+STC_API csview          csview_slice(csview sv, intptr_t p1, intptr_t p2);
+STC_API csview          csview_first_token(csview sv, csview sep);
+STC_API csview          csview_next_token(csview sv, csview sep, csview tok);
+
 #define                 csview_lit(literal) \
                             c_make(csview){literal, sizeof c_make(strlit_t){literal} - 1}
 STC_INLINE csview       csview_from(const char* str)
@@ -72,34 +77,10 @@ STC_INLINE csview_iter_t csview_end(const csview* self)
                             { return c_make(csview_iter_t){self->str + self->size}; }
 STC_INLINE void          csview_next(csview_iter_t* it) { ++it->ref; }
 
-STC_INLINE csview csview_substr(csview sv, intptr_t pos, size_t n) {
-    if (pos < 0) { pos += sv.size; if (pos < 0) pos = 0; }
-    if (pos > sv.size) pos = sv.size; if (pos + n > sv.size) n = sv.size - pos;
-    sv.str += pos, sv.size = n; return sv;
-}
-
-STC_INLINE csview csview_slice(csview sv, intptr_t p1, intptr_t p2) {
-    if (p1 < 0) { p1 += sv.size; if (p1 < 0) p1 = 0; }
-    if (p2 < 0) p2 += sv.size; if (p2 > sv.size) p2 = sv.size;
-    sv.str += p1, sv.size = p2 > p1 ? p2 - p1 : 0; return sv; 
-}
-
-STC_INLINE csview csview_first_token(csview sv, csview sep) {
-    const char* res = c_strnstrn(sv.str, sep.str, sv.size, sep.size); 
-    return c_make(csview){sv.str, (res ? res - sv.str : sv.size)};
-}
-
-STC_INLINE csview csview_next_token(csview sv, csview sep, csview tok) {
-    if (&tok.str[tok.size] == &sv.str[sv.size])
-        return c_make(csview){&sv.str[sv.size], 0};
-    tok.str += tok.size + sep.size;
-    size_t n = sv.size - (tok.str - sv.str);
-    const char* res = c_strnstrn(tok.str, sep.str, n, sep.size);
-    tok.size = res ? res - tok.str : n;
-    return tok;
-}
 
 /* cstr interaction with csview: */
+
+STC_API    cstr         cstr_from_replace_all(csview sv, csview find, csview replace);
 
 STC_INLINE cstr         cstr_from_v(csview sv)
                             { return cstr_from_n(sv.str, sv.size); }
@@ -117,6 +98,8 @@ STC_INLINE void         cstr_insert_v(cstr* self, size_t pos, csview sv)
                             { cstr_replace_n(self, pos, 0, sv.str, sv.size); }
 STC_INLINE void         cstr_replace_v(cstr* self, size_t pos, size_t len, csview sv)
                             { cstr_replace_n(self, pos, len, sv.str, sv.size); }
+STC_INLINE void         cstr_replace_all_v(cstr* self, csview find, csview replace)
+                            { cstr_take(self, cstr_from_replace_all(cstr_sv(*self), find, replace)); }
 STC_INLINE bool         cstr_equals_v(cstr s, csview sv)
                             { return sv.size == cstr_size(s) && !memcmp(s.str, sv.str, sv.size); }
 STC_INLINE size_t       cstr_find_v(cstr s, csview needle)
@@ -183,4 +166,55 @@ STC_INLINE bool         csview_equals_ref(const csview* a, const csview* b)
             _c_using_chash(cset_strv, cset_, cstr, cstr, csview_equals_ref, csview_hash_ref, \
                            @@, @@, @@, void, c_true, cstr_del, cstr_from_v, cstr_to_v, csview)
 
+/* -------------------------- IMPLEMENTATION ------------------------- */
+
+#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
+
+STC_DEF csview
+csview_substr(csview sv, intptr_t pos, size_t n) {
+    if (pos < 0) { pos += sv.size; if (pos < 0) pos = 0; }
+    if (pos > sv.size) pos = sv.size; if (pos + n > sv.size) n = sv.size - pos;
+    sv.str += pos, sv.size = n; return sv;
+}
+
+STC_DEF csview
+csview_slice(csview sv, intptr_t p1, intptr_t p2) {
+    if (p1 < 0) { p1 += sv.size; if (p1 < 0) p1 = 0; }
+    if (p2 < 0) p2 += sv.size; if (p2 > sv.size) p2 = sv.size;
+    sv.str += p1, sv.size = p2 > p1 ? p2 - p1 : 0; return sv; 
+}
+
+STC_DEF csview
+csview_first_token(csview sv, csview sep) {
+    const char* res = c_strnstrn(sv.str, sep.str, sv.size, sep.size); 
+    return c_make(csview){sv.str, (res ? res - sv.str : sv.size)};
+}
+
+STC_DEF csview
+csview_next_token(csview sv, csview sep, csview tok) {
+    if (&tok.str[tok.size] == &sv.str[sv.size])
+        return c_make(csview){&sv.str[sv.size], 0};
+    tok.str += tok.size + sep.size;
+    size_t n = sv.size - (tok.str - sv.str);
+    const char* res = c_strnstrn(tok.str, sep.str, n, sep.size);
+    tok.size = res ? res - tok.str : n;
+    return tok;
+}
+
+STC_DEF cstr
+cstr_from_replace_all(csview sv, csview find, csview replace) {
+    cstr out = cstr_null;
+    size_t from = 0, pos; char* res;
+    if (find.size)
+        while ((res = c_strnstrn(sv.str + from, find.str, sv.size - from, find.size))) {
+            pos = res - sv.str;
+            cstr_append_n(&out, sv.str + from, pos - from );
+            cstr_append_v(&out, replace);
+            from = pos + find.size;
+        }
+    cstr_append_n(&out, sv.str + from, sv.size - from);
+    return out;
+}
+
+#endif
 #endif

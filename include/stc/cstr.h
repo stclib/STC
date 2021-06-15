@@ -63,8 +63,8 @@ STC_API size_t          cstr_ifind_n(cstr s, const char* needle, size_t pos, siz
 STC_API bool            cstr_getdelim(cstr *self, int delim, FILE *stream);
 
 STC_API int             c_strncasecmp(const char* s1, const char* s2, size_t nmax);
-STC_API char*           c_strnstrn(const char* s, const char* needle, size_t slen, size_t nmax);
-STC_API char*           c_strncasestrn(const char* s, const char* needle, size_t slen, size_t nmax);
+STC_API char*           c_strnstrn(const char* s, const char* needle, size_t slen, size_t nlen);
+STC_API char*           c_strncasestrn(const char* s, const char* needle, size_t slen, size_t nlen);
 
 STC_INLINE cstr         cstr_init() { return cstr_null; }
 #define                 cstr_lit(literal) \
@@ -314,16 +314,19 @@ cstr_replace_n(cstr* self, size_t pos, size_t len, const char* str, size_t n) {
 }
 
 STC_DEF size_t
-cstr_replace_all(cstr* self, const char* find, const char* replace) {
+cstr_replace_all(cstr* self, const char* find, const char* repl) {
     cstr out = cstr_null;
-    size_t find_len = strlen(find), repl_len = strlen(replace), from = 0, n = 0, pos;
-    while ((pos = cstr_find_n(*self, find, from, cstr_npos)) != cstr_npos) {
-        cstr_append_n(&out, self->str + from, pos - from );
-        cstr_append_n(&out, replace, repl_len);
+    size_t len = cstr_size(*self), find_len = strlen(find), repl_len = strlen(repl);
+    size_t from = 0, n = 0, pos; char* res;
+    if (!find_len) return 0;
+    while ((res = c_strnstrn(self->str + from, find, len - from, find_len))) {
+        pos = res - self->str;
+        cstr_append_n(&out, self->str + from, pos - from);
+        cstr_append_n(&out, repl, repl_len);
         from = pos + find_len; ++n;
     }
     if (!n) return 0;
-    cstr_append_n(&out, self->str + from, cstr_size(*self) - from);
+    cstr_append_n(&out, self->str + from, len - from); 
     cstr_del(self); *self = out;
     return n;
 }
@@ -365,14 +368,16 @@ cstr_find(cstr s, const char* needle) {
 STC_DEF size_t
 cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax) {
     if (pos > _cstr_rep(&s)->size) return cstr_npos;
-    char* res = c_strnstrn(s.str + pos, needle, _cstr_rep(&s)->size - pos, nmax);
+    size_t nlen = strlen(needle);
+    char* res = c_strnstrn(s.str + pos, needle, _cstr_rep(&s)->size - pos, nmax < nlen ? nmax : nlen);
     return res ? res - s.str : cstr_npos;
 }
 
 STC_DEF size_t
 cstr_ifind_n(cstr s, const char* needle, size_t pos, size_t nmax) {
     if (pos > _cstr_rep(&s)->size) return cstr_npos;
-    char* res = c_strncasestrn(s.str + pos, needle, _cstr_rep(&s)->size - pos, nmax);
+    size_t nlen = strlen(needle);
+    char* res = c_strncasestrn(s.str + pos, needle, _cstr_rep(&s)->size - pos, nmax < nlen ? nmax : nlen);
     return res ? res - s.str : cstr_npos;
 }
 
@@ -384,26 +389,24 @@ c_strncasecmp(const char* s1, const char* s2, size_t nmax) {
 }
 
 STC_DEF char*
-c_strnstrn(const char *s, const char *needle, size_t slen, size_t nmax) {
-    size_t n = strlen(needle);
-    if (nmax < n) n = nmax;
-    if (n > slen) return NULL;
-    slen -= n;
+c_strnstrn(const char *s, const char *needle, size_t slen, size_t nlen) {
+    if (!nlen) return (char *)s;
+    if (nlen > slen) return NULL;
+    slen -= nlen;
     do {
-        if (*s == *needle && !memcmp(s, needle, n)) return (char *)s;
+        if (*s == *needle && !memcmp(s, needle, nlen)) return (char *)s;
         ++s;
     } while (slen--);
     return NULL;
 }
 
 STC_DEF char*
-c_strncasestrn(const char *s, const char *needle, size_t slen, size_t nmax) {
-    size_t n = strlen(needle);
-    if (nmax < n) n = nmax;
-    if (n > slen) return NULL;
-    int c = tolower(*needle); slen -= n;
+c_strncasestrn(const char *s, const char *needle, size_t slen, size_t nlen) {
+    if (!nlen) return (char *)s;
+    if (nlen > slen) return NULL;
+    int c = tolower(*needle); slen -= nlen;
     do {
-        if (tolower(*s) == c && !c_strncasecmp(s, needle, n)) return (char *)s;
+        if (tolower(*s) == c && !c_strncasecmp(s, needle, nlen)) return (char *)s;
         ++s;
     } while (slen--);
     return NULL;

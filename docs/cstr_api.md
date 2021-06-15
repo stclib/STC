@@ -96,8 +96,8 @@ int          c_rawstr_compare(const char** x, const char** y);
 bool         c_rawstr_equals(const char** x, const char** y);
 uint64_t     c_rawstr_hash(const char* const* x, size_t ignored);
 int          c_strncasecmp(const char* str1, const char* str2, size_t n);
-char*        c_strnstrn(const char* str, const char* needle, size_t slen, size_t nmax);
-char*        c_strncasestrn(const char* str, const char* needle, size_t slen, size_t nmax);
+char*        c_strnstrn(const char* str, const char* needle, size_t slen, size_t nlen);
+char*        c_strncasestrn(const char* str, const char* needle, size_t slen, size_t nlen);
 ```
 
 ## Types
