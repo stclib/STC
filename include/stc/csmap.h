@@ -362,7 +362,7 @@ static struct csmap_rep _csmap_sentinel = {0, 0, 0, 0, 0};
             tn = rep->disp; \
             rep->disp = self->nodes[tn].link[1]; \
         } else { \
-            if ((tn = rep->head + 1) > rep->cap) CX##_reserve(self, 4 + tn*3/2); \
+            if ((tn = rep->head + 1) > rep->cap) CX##_reserve(self, 4 + (tn*13 >> 3)); \
             ++_csmap_rep(self)->head; /* do after reserve */ \
         } \
         CX##_node_t* dn = &self->nodes[tn]; \

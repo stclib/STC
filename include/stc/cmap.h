@@ -383,7 +383,7 @@ STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) \
     STC_DEF CX##_result_t \
     CX##_insert_entry_(CX* self, RawKey rkey) { \
         if (self->size + 1 >= (CX##_size_t) (self->bucket_count * self->max_load_factor)) \
-            CX##_reserve(self, 8 + self->size * 3 / 2); \
+            CX##_reserve(self, 8 + (self->size*13ull >> 3)); \
         chash_bucket_t b = CX##_bucket_(self, &rkey); \
         CX##_result_t res = {&self->table[b.idx], !self->_hashx[b.idx]}; \
         if (res.inserted) { \

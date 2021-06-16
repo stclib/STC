@@ -122,7 +122,7 @@ STC_INLINE bool         cstr_iequals(cstr s, const char* str)
 STC_INLINE bool         cstr_contains(cstr s, const char* needle)
                             { return strstr(s.str, needle) != NULL; }
 STC_INLINE bool         cstr_icontains(cstr s, const char* needle)
-                            { return c_strncasestrn(s.str, needle, cstr_size(s), cstr_npos) != NULL; }
+                            { return c_strncasestrn(s.str, needle, cstr_size(s), strlen(needle)) != NULL; }
 STC_INLINE bool         cstr_getline(cstr *self, FILE *stream)
                             { return cstr_getdelim(self, '\n', stream); }
 
@@ -284,7 +284,7 @@ cstr_append_n(cstr* self, const char* str, size_t n) {
     size_t oldlen = _cstr_rep(self)->size, newlen = oldlen + n;
     if (newlen > _cstr_rep(self)->cap) {
         size_t off = (size_t) (str - self->str); /* handle self append */
-        cstr_reserve(self, newlen*3 >> 1);
+        cstr_reserve(self, (oldlen*13 >> 3) + n);
         if (off <= oldlen) str = self->str + off;
     }
     memcpy(&self->str[oldlen], str, n);
@@ -297,7 +297,7 @@ STC_INLINE void _cstr_internal_move(cstr* self, size_t pos1, size_t pos2) {
         return;
     size_t len = _cstr_rep(self)->size, newlen = len + pos2 - pos1;
     if (newlen > _cstr_rep(self)->cap)
-        cstr_reserve(self, newlen*3 >> 1);
+        cstr_reserve(self, (len*13 >> 3) + pos2 - pos1);
     memmove(&self->str[pos2], &self->str[pos1], len - pos1);
     self->str[_cstr_rep(self)->size = newlen] = '\0';
 }
@@ -349,7 +349,7 @@ cstr_getdelim(cstr *self, int delim, FILE *fp) {
         return false;
     for (;;) {
         if (pos == cap)
-            cap = cstr_reserve(self, (cap*3 >> 1) + 24);
+            cap = cstr_reserve(self, (cap*13 >> 3) + 16);
         if (c == delim || c == EOF) {
             self->str[_cstr_rep(self)->size = pos] = '\0';
             return true;

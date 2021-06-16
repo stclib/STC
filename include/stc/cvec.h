@@ -261,7 +261,7 @@ static struct cvec_rep _cvec_sentinel = {0, 0};
     CX##_push_back(CX* self, Value value) { \
         size_t len = _cvec_rep(self)->size; \
         if (len == CX##_capacity(*self)) \
-            CX##_reserve(self, 4 + len*1.5); \
+            CX##_reserve(self, (len*13 >> 3) + 4); \
         self->data[_cvec_rep(self)->size++] = value; \
     } \
 \
@@ -278,7 +278,7 @@ static struct cvec_rep _cvec_sentinel = {0, 0};
         size_t idx = pos - self->data, size = _cvec_rep(self)->size; \
         if (len == 0) return pos; \
         if (size + len > CX##_capacity(*self)) \
-            CX##_reserve(self, 4 + (size + len)*1.5), \
+            CX##_reserve(self, (size*13 >> 3) + len), \
             pos = self->data + idx; \
         _cvec_rep(self)->size += len; \
         memmove(pos + len, pos, (size - idx) * sizeof(Value)); \
