@@ -80,10 +80,11 @@ STC_INLINE void          csview_next(csview_iter_t* it) { ++it->ref; }
 
 /* cstr interaction with csview: */
 
-STC_API    cstr         cstr_from_replace_all(csview sv, csview find, csview replace);
-
 STC_INLINE cstr         cstr_from_v(csview sv)
                             { return cstr_from_n(sv.str, sv.size); }
+STC_INLINE cstr         cstr_from_replace_all_v(csview sv, csview find, csview repl) 
+                            { return cstr_from_replace_all(sv.str, sv.size, find.str, find.size,
+                                                           repl.str, repl.size); }
 STC_INLINE csview       cstr_to_v(const cstr* self)
                             { return c_make(csview){self->str, _cstr_rep(self)->size}; }
 STC_INLINE csview       cstr_substr(cstr s, intptr_t pos, size_t n) 
@@ -98,8 +99,6 @@ STC_INLINE void         cstr_insert_v(cstr* self, size_t pos, csview sv)
                             { cstr_replace_n(self, pos, 0, sv.str, sv.size); }
 STC_INLINE void         cstr_replace_v(cstr* self, size_t pos, size_t len, csview sv)
                             { cstr_replace_n(self, pos, len, sv.str, sv.size); }
-STC_INLINE void         cstr_replace_all_v(cstr* self, csview find, csview replace)
-                            { cstr_take(self, cstr_from_replace_all(cstr_sv(*self), find, replace)); }
 STC_INLINE bool         cstr_equals_v(cstr s, csview sv)
                             { return sv.size == cstr_size(s) && !memcmp(s.str, sv.str, sv.size); }
 STC_INLINE size_t       cstr_find_v(cstr s, csview needle)
@@ -114,57 +113,12 @@ STC_INLINE bool         cstr_ends_with_v(cstr s, csview sub)
                             { if (sub.size > cstr_size(s)) return false;
                               return !memcmp(s.str + cstr_size(s) - sub.size, sub.str, sub.size); }
 
-/* ---- Adaptor functions ---- */
+/* ---- Container helper functions ---- */
 
-#define                 csview_compare_ref(xp, yp)  strcmp((xp)->str, (yp)->str)
 STC_INLINE bool         csview_equals_ref(const csview* a, const csview* b)
                             { return a->size == b->size && !memcmp(a->str, b->str, a->size); }
-#define                 csview_hash_ref(xp, none)  c_default_hash((xp)->str, (xp)->size)
-
-/* ---- Associative cstr-containers with csview emplace/lookup API ---- */
-
-#define using_csmap_strvkey(...) c_MACRO_OVERLOAD(using_csmap_strvkey, __VA_ARGS__)
-
-#define using_csmap_strvkey_2(X, Mapped) \
-            using_csmap_strvkey_4(X, Mapped, c_default_del, c_default_fromraw)
-#define using_csmap_strvkey_3(X, Mapped, mappedDel) \
-            using_csmap_strvkey_4(X, Mapped, mappedDel, c_no_clone)
-#define using_csmap_strvkey_4(X, Mapped, mappedDel, mappedClone) \
-            using_csmap_strvkey_7(X, Mapped, mappedDel, mappedClone, c_default_toraw, Mapped, c_true)
-#define using_csmap_strvkey_7(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes) \
-            _c_using_aatree(csmap_##X, csmap_, cstr, Mapped, csview_compare_ref, \
-                            mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes, \
-                            cstr_del, cstr_from_v, cstr_to_v, csview)
-
-#define using_csmap_strv() \
-            _c_using_aatree(csmap_strv, csmap_, cstr, cstr, csview_compare_ref, \
-                           cstr_del, cstr_from_v, cstr_to_v, csview, c_true, \
-                           cstr_del, cstr_from_v, cstr_to_v, csview)
-#define using_csset_strv() \
-            _c_using_aatree(csset_strv, csset_, cstr, cstr, csview_compare_ref, \
-                            @@, @@, @@, void, c_true, cstr_del, cstr_from_v, cstr_to_v, csview)
-
-
-#define using_cmap_strvkey(...) c_MACRO_OVERLOAD(using_cmap_strvkey, __VA_ARGS__)
-
-#define using_cmap_strvkey_2(X, Mapped) \
-            using_cmap_strvkey_4(X, Mapped, c_default_del, c_default_fromraw)
-#define using_cmap_strvkey_3(X, Mapped, mappedDel) \
-            using_cmap_strvkey_4(X, Mapped, mappedDel, c_no_clone)
-#define using_cmap_strvkey_4(X, Mapped, mappedDel, mappedClone) \
-            using_cmap_strvkey_7(X, Mapped, mappedDel, mappedClone, c_default_toraw, Mapped, c_true)
-#define using_cmap_strvkey_7(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes) \
-            _c_using_chash(cmap_##X, cmap_, cstr, Mapped, csview_equals_ref, csview_hash_ref, \
-                           mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes, \
-                           cstr_del, cstr_from_v, cstr_to_v, csview)
-
-#define using_cmap_strv() \
-            _c_using_chash(cmap_strv, cmap_, cstr, cstr, csview_equals_ref, csview_hash_ref, \
-                           cstr_del, cstr_from_v, cstr_to_v, csview, c_true, \
-                           cstr_del, cstr_from_v, cstr_to_v, csview)
-#define using_cset_strv() \
-            _c_using_chash(cset_strv, cset_, cstr, cstr, csview_equals_ref, csview_hash_ref, \
-                           @@, @@, @@, void, c_true, cstr_del, cstr_from_v, cstr_to_v, csview)
+#define                 csview_hash_ref(xp, none) c_default_hash((xp)->str, (xp)->size)
+#define                 csview_compare_ref(xp, yp) strcmp((xp)->str, (yp)->str)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
@@ -199,21 +153,6 @@ csview_next_token(csview sv, csview sep, csview tok) {
     const char* res = c_strnstrn(tok.str, sep.str, n, sep.size);
     tok.size = res ? res - tok.str : n;
     return tok;
-}
-
-STC_DEF cstr
-cstr_from_replace_all(csview sv, csview find, csview replace) {
-    cstr out = cstr_null;
-    size_t from = 0, pos; char* res;
-    if (find.size)
-        while ((res = c_strnstrn(sv.str + from, find.str, sv.size - from, find.size))) {
-            pos = res - sv.str;
-            cstr_append_n(&out, sv.str + from, pos - from );
-            cstr_append_v(&out, replace);
-            from = pos + find.size;
-        }
-    cstr_append_n(&out, sv.str + from, sv.size - from);
-    return out;
 }
 
 #endif

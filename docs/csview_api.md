@@ -58,7 +58,7 @@ void          csview_next(csview_iter_t* it);
 #### Extended cstr methods
 ```c
 cstr          cstr_from_v(csview sv);                         // construct cstr from csview
-cstr          cstr_from_replace_all(csview sv, csview find, csview replace);
+cstr          cstr_from_replace_all_v(csview sv, csview find, csview replace);
 
 csview        cstr_sv(cstr s);                                // convert to csview from cstr
 csview        cstr_to_v(const cstr* self);                    // convert to csview from cstr*
@@ -69,7 +69,6 @@ cstr*         cstr_assign_v(cstr* self, csview sv);
 cstr*         cstr_append_v(cstr* self, csview sv);
 void          cstr_insert_v(cstr* self, size_t pos, csview sv);
 void          cstr_replace_v(cstr* self, size_t pos, size_t len, csview sv);
-void          cstr_replace_all_v(cstr* self, csview find, csview replace);
 
 bool          cstr_equals_v(cstr s, csview sv);
 size_t        cstr_find_v(cstr s, csview needle);

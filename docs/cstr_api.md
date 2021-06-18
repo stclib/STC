@@ -53,7 +53,7 @@ void         cstr_insert_n(cstr* self, size_t pos, const char* str, size_t n);
 void         cstr_replace(cstr* self, size_t pos, size_t len, const char* str);
 void         cstr_replace_s(cstr* self, size_t pos, size_t len, cstr s);
 void         cstr_replace_n(cstr* self, size_t pos, size_t len, const char* str, size_t n);
-size_t       cstr_replace_all(cstr* self, const char* find, const char* replace);
+void         cstr_replace_all(cstr* self, const char* find, const char* replace);
 
 void         cstr_erase(cstr* self, size_t pos);
 void         cstr_erase_n(cstr* self, size_t pos, size_t n);

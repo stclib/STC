@@ -49,13 +49,16 @@ typedef const char      strlit_t[];
 
 STC_API cstr            cstr_from_n(const char* str, size_t n);
 STC_API cstr            cstr_from_fmt(const char* fmt, ...);
+STC_API cstr            cstr_from_replace_all(const char* str, size_t str_len, 
+                                              const char* find, size_t find_len,
+                                              const char* repl, size_t repl_len);
 STC_API size_t          cstr_reserve(cstr* self, size_t cap);
 STC_API void            cstr_resize(cstr* self, size_t len, char fill);
 STC_API cstr*           cstr_assign_n(cstr* self, const char* str, size_t n);
 STC_API cstr*           cstr_assign_fmt(cstr* self, const char* fmt, ...);
 STC_API cstr*           cstr_append_n(cstr* self, const char* str, size_t n);
 STC_API void            cstr_replace_n(cstr* self, size_t pos, size_t len, const char* str, size_t n);
-STC_API size_t          cstr_replace_all(cstr* self, const char* find, const char* replace);
+STC_API void            cstr_replace_all(cstr* self, const char* find, const char* replace);
 STC_API void            cstr_erase_n(cstr* self, size_t pos, size_t n);
 STC_API size_t          cstr_find(cstr s, const char* needle);
 STC_API size_t          cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax);
@@ -313,22 +316,27 @@ cstr_replace_n(cstr* self, size_t pos, size_t len, const char* str, size_t n) {
     }
 }
 
-STC_DEF size_t
-cstr_replace_all(cstr* self, const char* find, const char* repl) {
+STC_DEF cstr
+cstr_from_replace_all(const char* str, size_t str_len, 
+                      const char* find, size_t find_len,
+                      const char* repl, size_t repl_len) {
     cstr out = cstr_null;
-    size_t len = cstr_size(*self), find_len = strlen(find), repl_len = strlen(repl);
-    size_t from = 0, n = 0, pos; char* res;
-    if (!find_len) return 0;
-    while ((res = c_strnstrn(self->str + from, find, len - from, find_len))) {
-        pos = res - self->str;
-        cstr_append_n(&out, self->str + from, pos - from);
-        cstr_append_n(&out, repl, repl_len);
-        from = pos + find_len; ++n;
-    }
-    if (!n) return 0;
-    cstr_append_n(&out, self->str + from, len - from); 
-    cstr_del(self); *self = out;
-    return n;
+    size_t from = 0, pos; char* res;
+    if (find_len)
+        while ((res = c_strnstrn(str + from, find, str_len - from, find_len))) {
+            pos = res - str;
+            cstr_append_n(&out, str + from, pos - from);
+            cstr_append_n(&out, repl, repl_len);
+            from = pos + find_len;
+        }
+    cstr_append_n(&out, str + from, str_len - from);
+    return out;
+}
+
+STC_DEF void
+cstr_replace_all(cstr* self, const char* find, const char* repl) {
+    cstr_take(self, cstr_from_replace_all(self->str, _cstr_rep(self)->size,
+                                          find, strlen(find), repl, strlen(repl)));
 }
 
 STC_DEF void
