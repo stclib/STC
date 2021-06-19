@@ -43,26 +43,37 @@ int main() {
 #include <string.h>
 #include <math.h>
 
-typedef struct {uint64_t state[4];}                        stc64_t;
+typedef struct {uint64_t state[5];}                        stc64_t;
 typedef struct {int64_t lower; uint64_t range, threshold;} stc64_uniform_t;
 typedef struct {double lower, range;}                      stc64_uniformf_t;
 typedef struct {double mean, stddev, next; unsigned has_next;} stc64_normalf_t;
 
+/* PRNG stc64.
+ * Extremely fast PRNG suited for parallel usage with Weyl-sequence parameter.
+ * 320bit state, 256bit mutable.
+ * Noticable faster than xoshiro and pcg, but slighly slower than wyrand64, 
+ * which only has a single 64-bit state and is unfit when longer periods or
+ * multiple threads are required.
+ * stc64 supports 2^63 unique threads with a minimum 2^64 period lengths each.
+ * Passes PractRand tested up to 8TB output, Vigna's Hamming weight test,
+ * and simple correlation tests, i.e. interleaved streams with one-bit diff state.
+ * The 16-bit version with LR=6, RS=5, LS=3 passes PractRand to multiple TB input.
+ */
 
-/* Stc64: random number generator, range [0, 2^64). PRNG copyright Tyge Løvset, NORCE Research, 2020 */
 STC_API stc64_t stc64_init(uint64_t seed);
 STC_API stc64_t stc64_with_seq(uint64_t seed, uint64_t seq);
 
 STC_INLINE uint64_t stc64_rand(stc64_t* rng) {
-    uint64_t *s = rng->state;
-    const uint64_t b = s[1], result = s[0] ^ (s[2] += s[3]|1);
-    s[0] = (b + (b << 3)) ^ (b >> 11);
-    s[1] = ((b << 24) | (b >> (64 - 24))) + result;
+    uint64_t *s = rng->state; enum {LR=24, RS=11, LS=3};
+    const uint64_t result = (s[0] ^ (s[3] += s[4]|1)) + s[1];
+    s[0] = s[1] ^ (s[1] >> RS);
+    s[1] = s[2] + (s[2] << LS);
+    s[2] = ((s[2] << LR) | (s[2] >> (64 - LR))) + result;
     return result;
 }
 
 /* Global random() */
-static stc64_t stc64_global = {{0x26aa069ea2fb1a4d, 0x70c72c95cd592d04, 0x504f333d3aa0b359, 0x6a09e667a754166b}};
+static stc64_t stc64_global = {{0x26aa069ea2fb1a4d, 0x70c72c95cd592d04, 0x504f333d3aa0b359, 0x26aa069ea2fb1a4d, 0x6a09e667a754166b}};
 STC_INLINE void stc64_srandom(uint64_t seed) { stc64_global = stc64_init(seed); }
 STC_INLINE uint64_t stc64_random(void) { return stc64_rand(&stc64_global); }
 
@@ -103,22 +114,11 @@ STC_API double stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-/* PRNG crandom: by Tyge Løvset, NORCE Research, 2020.
- * Extremely fast PRNG suited for parallel usage with Weyl-sequence parameter.
- * 256bit state, updates 192bit per rng.
-  * Faster than pcg, sfc64, xoshiro256** on most platforms.
- * wyrand64 is slightly faster, but has only 64-bit state,
- * unfit when longer periods or multiple threads are required.
- * stc64 supports 2^63 unique threads with a minimum 2^64 period lengths each.
- * Passes PractRand tested up to 8TB output, Vigna's Hamming weight test,
- * and simple correlation tests, i.e. interleaved streams with one-bit diff state.
- */
-
 STC_DEF stc64_t stc64_init(uint64_t seed) {
     return stc64_with_seq(seed, seed + 0x3504f333d3aa0b34);
 }
 STC_DEF stc64_t stc64_with_seq(uint64_t seed, uint64_t seq) {
-    stc64_t rng = {{seed, seed, seed, (seq << 1u) | 1u}};
+    stc64_t rng = {{seed, seed, seed, seed, (seq << 1) | 1}};
     for (int i = 0; i < 12; ++i) stc64_rand(&rng);
     return rng;
 }

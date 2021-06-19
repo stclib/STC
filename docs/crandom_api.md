@@ -8,25 +8,27 @@ See [random](https://en.cppreference.com/w/cpp/header/random) for similar c++ fu
 
 ## Description
 
-**stc64** is a novel, extremely fast PRNG by Tyge Løvset, suited for parallel usage. It features a
-Weyl-sequence as part of the state. In general testing, **stc64** is the fastest among *pcg64*,
-*xoshiro256`**`*, *sfc64*, and *lehmer64*. 
+**stc64** is a novel, extremely fast PRNG by Tyge Løvset, suited for parallel usage. It features
+Weyl-sequences as part of its state. It is inspired on *sfc64*, but has a different output function
+and state size.
 
-*wyrand* is faster on platforms with fast 128-bit multiplication, and has 2^64 period length
-(https://github.com/lemire/SwiftWyhash/issues/10). However, *wyrand* is not suited for massive
+**sfc64** is the fastest among *pcg*, *xoshiro`**`*, and *lehmer*. It is equally fast as *sfc64* on
+most platforms. *wyrand* is faster on platforms with fast 128-bit multiplication, and has 2^64 period
+length (https://github.com/lemire/SwiftWyhash/issues/10). However, *wyrand* is not suited for massive
 parallel usage due to its limited total minimal period length.
 
-**stc64** does not require multiplication or 128-bit integer operations. It has 256 bit state,
-but updates only 192 bit per generated number.
+**stc64** does not require multiplication or 128-bit integer operations. It has 320 bit state,
+but updates only 256 bit per generated number.
 
-There is no *jump function*, but each odd number Weyl-increment (state[3]) starts a new
+There is no *jump function*, but each odd number Weyl-increment (state[4]) starts a new
 unique 2^64 *minimum* length period. For a single thread, a minimum period of 2^127 is generated
 when the Weyl-increment is incremented by 2 every 2^64 output.
 
 **stc64** passes *PractRand* (tested up to 8TB output), Vigna's Hamming weight test, and simple
 correlation tests, i.e. *n* interleaved streams with only one-bit differences in initial state.
+Also 32-bit and 16-bit versions passes PractRand up to their size limits.
 
-For more, see the PRNG shootout by Vigna: http://prng.di.unimi.it and the debate between the authors of
+For more, see the PRNG shootout by Vigna: http://prng.di.unimi.it and a debate between the authors of
 xoshiro and pcg (Vigna/O'Neill) PRNGs: https://www.pcg-random.org/posts/on-vignas-pcg-critique.html
 
 ## Header file
