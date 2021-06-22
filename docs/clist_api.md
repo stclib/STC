@@ -4,20 +4,17 @@
 The **clist** container supports fast insertion and removal of elements from anywhere in the container.
 Fast random access is not supported.
 
-Unlike the c++ class *std::forward_list*, **clist** has an API similar to ***std::list***, and also supports
+Unlike the c++ class *std::forward_list*, **clist** has API similar to ***std::list***, and also supports
 *push_back()* (**O**(1) time). It is still implemented as a singly-linked list. A **clist** object
 occupies only one pointer in memory, and like *std::forward_list* the length of the list is not stored.
-All functions have **O**(1) complexity, apart from *clist_X_count()*, which returns size of list in **O**(*n*) time.
+All functions have **O**(1) complexity, apart from *clist_X_count()* and *clist_X_find()* which are **O**(*n*),
+and *clist_X_sort()* which is **O**(*n* log(*n*)).
 
 ***Iterator invalidation***: Adding, removing and moving the elements within the list, or across several lists
 will invalidate other iterators currently refering to these elements and their immediate succesive elements.
-However, an iterator to a succesive element can both be dereferenced and advanced. After advancing, the
-iterator is in a valid state. This implies:
-
-- `clist_X_insert(&L, clist_X_fwd(it,1), x)` is identical to *std::forward_list* `L.insert_after(it, x)`.
-- `clist_X_erase_at(&L, clist_X_fwd(it,1))` is identical to *std::forward_list* `L.erase_after(it)`.
-- Iterators returned from *clist_X_insert()* and *clist_X_erase_at()* are always valid.
-- Elements can be safely removed from a list via multiple iterators if done back to front order.
+However, an iterator to a succesive element can both be dereferenced and advanced. After advancing, it is 
+in a fully valid state. This implies that if `clist_X_insert(&L, clist_X_fwd(it,1), x)` and
+`clist_X_erase_at(&L, clist_X_fwd(it,1))` are used consistently, only iterators to erased elements are invalidated.
 
 See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) for similar API and
 [std::forward_list](https://en.cppreference.com/w/cpp/container/forward_list) for a functional description.
@@ -67,8 +64,7 @@ void                clist_X_emplace_items(clist_X *self, const clist_X_rawvalue_
 clist_X_iter_t      clist_X_insert(clist_X* self, clist_X_iter_t it, Value value);          // return iter to new elem
 clist_X_iter_t      clist_X_emplace(clist_X* self, clist_X_iter_t it, RawValue raw);
 
-clist_X_iter_t      clist_X_erase(clist_X* self, clist_X_iter_t it);                        // return iter after it
-clist_X_iter_t      clist_X_erase_at(clist_X* self, clist_X_iter_t it);                     // alias for erase()
+clist_X_iter_t      clist_X_erase_at(clist_X* self, clist_X_iter_t it);                     // return iter after it
 clist_X_iter_t      clist_X_erase_range(clist_X* self, clist_X_iter_t it1, clist_X_iter_t it2);
 size_t              clist_X_remove(clist_X* self, RawValue raw);                            // removes matching elements
 
