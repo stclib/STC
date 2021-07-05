@@ -34,7 +34,7 @@ typedef                 struct { char* str; } cstr;
 typedef                 struct { char *ref; } cstr_iter_t;
 typedef                 char                  cstr_value_t;
 
-#define cstr_npos       INTPTR_MAX
+#define cstr_npos       (SIZE_MAX >> 1)
 STC_LIBRARY_ONLY(       extern const cstr cstr_null; )
 
 struct cstr_rep         { size_t size, cap; char str[sizeof(size_t)]; };
@@ -49,7 +49,7 @@ typedef const char      strlit_t[];
 
 STC_API cstr            cstr_from_n(const char* str, size_t n);
 STC_API cstr            cstr_from_fmt(const char* fmt, ...);
-STC_API cstr            cstr_from_replace_all(const char* str, size_t str_len, 
+STC_API cstr            cstr_from_replace_all(const char* str, size_t str_len,
                                               const char* find, size_t find_len,
                                               const char* repl, size_t repl_len);
 STC_API size_t          cstr_reserve(cstr* self, size_t cap);
@@ -74,6 +74,8 @@ STC_INLINE cstr         cstr_init() { return cstr_null; }
                             cstr_from_n(literal, sizeof c_make(strlit_t){literal} - 1)
 STC_INLINE cstr         cstr_from(const char* str)
                             { return cstr_from_n(str, strlen(str)); }
+STC_INLINE const char*  cstr_str(const cstr* self) { return self->str; }
+STC_INLINE char*        cstr_data(cstr* self) { return self->str; }
 STC_INLINE size_t       cstr_size(cstr s) { return _cstr_rep(&s)->size; }
 STC_INLINE size_t       cstr_length(cstr s) { return _cstr_rep(&s)->size; }
 STC_INLINE size_t       cstr_capacity(cstr s) { return _cstr_rep(&s)->cap; }
@@ -167,7 +169,7 @@ cstr_starts_with(cstr s, const char* sub) {
 STC_INLINE bool
 cstr_ends_with(cstr s, const char* sub) {
     size_t n = strlen(sub), sz = _cstr_rep(&s)->size;
-    return n <= sz ? memcmp(s.str + sz - n, sub, n) == 0 : false;
+    return n <= sz && !memcmp(s.str + sz - n, sub, n);
 }
 
 STC_INLINE bool
@@ -179,7 +181,7 @@ cstr_istarts_with(cstr s, const char* sub) {
 STC_INLINE bool
 cstr_iends_with(cstr s, const char* sub) {
     size_t n = strlen(sub), sz = _cstr_rep(&s)->size;
-    return n <= sz ? c_strncasecmp(s.str + sz - n, sub, n) == 0 : false;
+    return n <= sz && !c_strncasecmp(s.str + sz - n, sub, n);
 }
 
 /* cvec/cmap adaption functions: */
@@ -317,7 +319,7 @@ cstr_replace_n(cstr* self, size_t pos, size_t len, const char* str, size_t n) {
 }
 
 STC_DEF cstr
-cstr_from_replace_all(const char* str, size_t str_len, 
+cstr_from_replace_all(const char* str, size_t str_len,
                       const char* find, size_t find_len,
                       const char* repl, size_t repl_len) {
     cstr out = cstr_null;
@@ -356,12 +358,12 @@ cstr_getdelim(cstr *self, int delim, FILE *fp) {
     if (c == EOF)
         return false;
     for (;;) {
-        if (pos == cap)
-            cap = cstr_reserve(self, (cap*13 >> 3) + 16);
         if (c == delim || c == EOF) {
-            self->str[_cstr_rep(self)->size = pos] = '\0';
+            if (cap) self->str[_cstr_rep(self)->size = pos] = '\0';
             return true;
         }
+        if (pos == cap)
+            cap = cstr_reserve(self, (cap*13 >> 3) + 16);
         self->str[pos++] = (char) c;
         c = fgetc(fp);
     }

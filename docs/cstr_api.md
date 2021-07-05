@@ -83,7 +83,7 @@ cstr_iter_t  cstr_end(cstr* self);
 void         cstr_next(cstr_iter_t* it);
 
 bool         cstr_getline(cstr *self, FILE *stream);                  // cstr_getdelim(self, '\n', stream)
-bool         cstr_getdelim(cstr *self, int delim, FILE *stream);
+bool         cstr_getdelim(cstr *self, int delim, FILE *stream);      // does not append delim to result
 ```
 
 Note that all methods with arguments `(..., const char* str, size_t n)`, `n` must be within the range of `str` length.

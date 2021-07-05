@@ -51,17 +51,20 @@
 #  define STC_STATIC_ONLY(...) __VA_ARGS__
 #endif
 
-/* Macro overloading feature support: https://rextester.com/ONP80107 */
-#define _c_CAT( A, B ) A ## B
-#define _c_SELECT(NAME, NUM) _c_CAT( NAME ## _, NUM)
+/* Macro overloading feature support based on: https://rextester.com/ONP80107 */
+#define c_MACRO_OVERLOAD(name, ...) \
+        _c_SELECT(name, _c_NUM_ARGS(__VA_ARGS__))(__VA_ARGS__)
+#define _c_SELECT(name, num) _c_CONCAT(name ## _, num)
+#define _c_CONCAT(a, b) a ## b
+#define _c_NUM_ARGS(...) _c_APPLY_ARG_N((__VA_ARGS__, _c_RSEQ_N))
+#define _c_APPLY_ARG_N(args) _c_EXPAND(_c_ARG_N args)
 #define _c_EXPAND(...) __VA_ARGS__
-#define _c_ARG_N(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, N,...) N
-#define _c_RSEQ_N 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
-#define _c_APPLY_ARG_N(ARGS) _c_EXPAND(_c_ARG_N ARGS)
-#define _c_ARG_COUNT(...) _c_EXPAND(_c_APPLY_ARG_N((__VA_ARGS__, _c_RSEQ_N)))
-#define _c_LABEL(id) _c_SELECT(_c_label_##id, __LINE__)
+#define _c_RSEQ_N 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, \
+                  16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+#define _c_ARG_N(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, \
+                 _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, \
+                 _23, _24, _25, _26, _27, _28, _29, _30, N, ...) N
 
-#define c_MACRO_OVERLOAD(NAME, ...) _c_SELECT(NAME, _c_ARG_COUNT(__VA_ARGS__))(__VA_ARGS__)
 #define c_static_assert(cond, ...) typedef char _static_assert_[(cond) ? 1 : -1]
 #define c_container_of(ptr, type, member) \
         ((type *)((char *)(ptr) - offsetof(type, member)))
@@ -139,7 +142,7 @@
 #define c_forbuffer(b, type, n) c_forbuffer_N(b, type, n, 256)
 #define c_forbuffer_N(b, type, n, BYTES) \
     for (type _c_b[((BYTES) - 1) / sizeof(type) + 1], \
-                *b = (n)*sizeof *b > (BYTES) ? c_new_n(type, n) : _c_b \
+         *b = (n)*sizeof *b > (BYTES) ? c_new_n(type, n) : _c_b \
          ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)
 
 #define c_var(CX, c, ...) \
@@ -162,10 +165,9 @@
              *(lo) = (uint64_t)_z, *(hi) = _z >> 64; } while(0)
 #elif defined(_MSC_VER) && defined(_WIN64)
     #include <intrin.h>
-    #define c_umul128(a, b, lo, hi) (*(lo) = _umul128(a, b, hi), (void)0)
+    #define c_umul128(a, b, lo, hi) ((void)(*(lo) = _umul128(a, b, hi)))
 #elif defined(__x86_64__)
     #define c_umul128(a, b, lo, hi) \
-        asm("mulq %[rhs]" : "=a" (*(lo)), "=d" (*(hi)) \
-                          : [lhs] "0" (a), [rhs] "rm" (b))
+        asm("mulq %3" : "=a"(*(lo)), "=d"(*(hi)) : "a"(a), "rm"(b))
 #endif
 #endif
