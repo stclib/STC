@@ -10,7 +10,7 @@
 using_cmap(i, int, size_t);
 
 // Declare int vector with map entries that can be sorted by map keys.
-c_struct (mapval) {int first; size_t second;};
+typedef struct {int first; size_t second;} mapval;
 static int compare(mapval *a, mapval *b) {
     return c_default_compare(&a->first, &b->first);
 }

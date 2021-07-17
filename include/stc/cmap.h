@@ -368,7 +368,7 @@ STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) \
     CX##_bucket_(const CX* self, const CX##_rawkey_t* rkeyptr) { \
         const uint64_t _hash = keyHashRaw(rkeyptr, sizeof *rkeyptr); \
         uint_fast8_t _hx; size_t _cap = self->bucket_count; \
-        chash_bucket_t b = {_c_SELECT(fastrange,CMAP_SIZE_T)(_hash, _cap), (uint_fast8_t)(_hash | 0x80)}; \
+        chash_bucket_t b = {c_SELECT(fastrange,CMAP_SIZE_T)(_hash, _cap), (uint_fast8_t)(_hash | 0x80)}; \
         const uint8_t* _hashx = self->_hashx; \
         while ((_hx = _hashx[b.idx])) { \
             if (_hx == b.hx) { \
@@ -444,7 +444,7 @@ STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n) \
             if (! _hashx[j]) \
                 break; \
             CX##_rawkey_t _raw = keyToRaw(KEY_REF_##C(_slot+j)); \
-            k = _c_SELECT(fastrange,CMAP_SIZE_T)(keyHashRaw(&_raw, sizeof _raw), _cap); \
+            k = c_SELECT(fastrange,CMAP_SIZE_T)(keyHashRaw(&_raw, sizeof _raw), _cap); \
             if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */ \
                 memcpy((void *) &_slot[i], &_slot[j], sizeof *_slot), _hashx[i] = _hashx[j], i = j; \
         } \

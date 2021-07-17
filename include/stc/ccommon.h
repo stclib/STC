@@ -53,12 +53,13 @@
 
 /* Macro overloading feature support based on: https://rextester.com/ONP80107 */
 #define c_MACRO_OVERLOAD(name, ...) \
-        _c_SELECT(name, _c_NUM_ARGS(__VA_ARGS__))(__VA_ARGS__)
-#define _c_SELECT(name, num) _c_CONCAT(name ## _, num)
-#define _c_CONCAT(a, b) a ## b
-#define _c_NUM_ARGS(...) _c_APPLY_ARG_N((__VA_ARGS__, _c_RSEQ_N))
-#define _c_APPLY_ARG_N(args) _c_EXPAND(_c_ARG_N args)
-#define _c_EXPAND(...) __VA_ARGS__
+        c_SELECT(name, c_NUM_ARGS(__VA_ARGS__))(__VA_ARGS__)
+#define c_SELECT(name, num) c_CONCAT(name ## _, num)
+#define c_CONCAT(a, b) a ## b
+#define c_EXPAND(...) __VA_ARGS__
+#define c_NUM_ARGS(...) _c_APPLY_ARG_N((__VA_ARGS__, _c_RSEQ_N))
+
+#define _c_APPLY_ARG_N(args) c_EXPAND(_c_ARG_N args)
 #define _c_RSEQ_N 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, \
                   16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 #define _c_ARG_N(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, \
@@ -69,8 +70,6 @@
 #define c_container_of(ptr, type, member) \
         ((type *)((char *)(ptr) - offsetof(type, member)))
 
-#define c_struct(S)             typedef struct S S; struct S
-#define c_arg(...)              __VA_ARGS__
 #if __cplusplus
 #define c_new(T)                static_cast<T*>(c_malloc(sizeof(T)))
 #define c_new_n(T, n)           static_cast<T*>(c_malloc(sizeof(T)*(n)))
@@ -135,9 +134,14 @@
 #define c_fordefer(...) for (int _c_ii = 0; !_c_ii; ++_c_ii, __VA_ARGS__)
 
 #define c_forvar_initdel(...) c_MACRO_OVERLOAD(c_forvar_initdel, __VA_ARGS__)
-#define c_forvar_initdel_2(CX, a) c_forvar(CX a = CX##_init(), CX##_del(&a))
-#define c_forvar_initdel_3(CX, a, b) c_forvar(c_arg(CX a = CX##_init(), b = CX##_init()), CX##_del(&b), CX##_del(&a))
-#define c_forvar_initdel_4(CX, a, b, c) c_forvar(c_arg(CX a = CX##_init(), b = CX##_init(), c = CX##_init()), CX##_del(&c), CX##_del(&b), CX##_del(&a))
+#define c_forvar_initdel_2(CX, a) \
+    c_forvar(CX a = CX##_init(), CX##_del(&a))
+#define c_forvar_initdel_3(CX, a, b) \
+    c_forvar(c_EXPAND(CX a = CX##_init(), b = CX##_init()), \
+             CX##_del(&b), CX##_del(&a))
+#define c_forvar_initdel_4(CX, a, b, c) \
+    c_forvar(c_EXPAND(CX a = CX##_init(), b = CX##_init(), c = CX##_init()), \
+             CX##_del(&c), CX##_del(&b), CX##_del(&a))
 
 #define c_forbuffer(b, type, n) c_forbuffer_N(b, type, n, 256)
 #define c_forbuffer_N(b, type, n, BYTES) \
