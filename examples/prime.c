@@ -28,13 +28,14 @@ int main(void)
 
     clock_t t1 = clock();
     c_forvar (cbits primes = sieveOfEratosthenes(n + 1), cbits_del(&primes)) {
+        puts("done");
         size_t np = cbits_count(primes);
         clock_t t2 = clock();
 
         printf("number of primes: %zu, time: %f\n", np, (t2 - t1) / (float)CLOCKS_PER_SEC);
-
-        printf(" 2"); for (size_t i = 3; i < 1000; i += 2)
-        if (cbits_test(primes, i>>1)) printf(" %zu", i);
+        printf("2");
+        for (size_t i = 3; i < 1000; i += 2)
+            if (cbits_test(primes, i>>1)) printf(" %zu", i);
         puts("");
     }
 }

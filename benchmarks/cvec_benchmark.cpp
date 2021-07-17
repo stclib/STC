@@ -89,7 +89,7 @@ Sample test_stc_vector() {
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
         sum = 0;
-        c_forrange (R) c_forrange (i, N) sum += *cvec_x_at(&con, i);
+        c_forrange (R) c_forrange (i, N) sum += con.data[i];
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();
