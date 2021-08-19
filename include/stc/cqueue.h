@@ -60,33 +60,33 @@
             _c_using_cqueue(cqueue_##X, ctype)
 
 #define _c_using_cqueue(CX, ctype) \
-    typedef ctype CX; \
+    typedef struct { ctype rep; size_t size; } CX; \
     typedef ctype##_value_t CX##_value_t; \
     typedef ctype##_rawvalue_t CX##_rawvalue_t; \
     typedef ctype##_iter_t CX##_iter_t; \
 \
-    STC_INLINE CX               CX##_init(void) {return ctype##_init();} \
-    STC_INLINE CX               CX##_clone(CX q) {return ctype##_clone(q);} \
+    STC_INLINE CX               CX##_init(void) {return c_make(CX){ctype##_init(), 0};} \
+    STC_INLINE CX               CX##_clone(CX q) {return c_make(CX){ctype##_clone(q.rep), q.size};} \
     STC_INLINE CX##_value_t     CX##_value_clone(CX##_value_t val) \
                                     {return ctype##_value_clone(val);} \
-    STC_INLINE void             CX##_clear(CX* self) {ctype##_clear(self);} \
-    STC_INLINE void             CX##_del(CX* self) {ctype##_del(self);} \
+    STC_INLINE void             CX##_clear(CX* self) {ctype##_clear(&self->rep); self->size = 0;} \
+    STC_INLINE void             CX##_del(CX* self) {ctype##_del(&self->rep);} \
 \
-    STC_INLINE size_t           CX##_size(CX q) {return ctype##_size(q);} \
-    STC_INLINE bool             CX##_empty(CX q) {return ctype##_empty(q);} \
-    STC_INLINE CX##_value_t*    CX##_front(const CX* self) {return ctype##_front(self);} \
-    STC_INLINE CX##_value_t*    CX##_back(const CX* self) {return ctype##_back(self);} \
+    STC_INLINE size_t           CX##_size(CX q) {return q.size;} \
+    STC_INLINE bool             CX##_empty(CX q) {return q.size == 0;} \
+    STC_INLINE CX##_value_t*    CX##_front(const CX* self) {return ctype##_front(&self->rep);} \
+    STC_INLINE CX##_value_t*    CX##_back(const CX* self) {return ctype##_back(&self->rep);} \
 \
-    STC_INLINE void             CX##_pop(CX* self) {ctype##_pop_front(self);} \
+    STC_INLINE void             CX##_pop(CX* self) {ctype##_pop_front(&self->rep); --self->size;} \
     STC_INLINE void             CX##_push(CX* self, ctype##_value_t value) \
-                                    {ctype##_push_back(self, value);} \
+                                    {ctype##_push_back(&self->rep, value); ++self->size;} \
     STC_INLINE void             CX##_emplace(CX* self, CX##_rawvalue_t raw) \
-                                    {ctype##_emplace_back(self, raw);} \
+                                    {ctype##_emplace_back(&self->rep, raw); ++self->size;} \
     STC_INLINE void             CX##_emplace_items(CX *self, const CX##_rawvalue_t arr[], size_t n) \
-                                    {ctype##_emplace_items(self, arr, n);} \
+                                    {ctype##_emplace_items(&self->rep, arr, n); self->size += n;} \
 \
-    STC_INLINE CX##_iter_t      CX##_begin(const CX* self) {return ctype##_begin(self);} \
-    STC_INLINE CX##_iter_t      CX##_end(const CX* self) {return ctype##_end(self);} \
+    STC_INLINE CX##_iter_t      CX##_begin(const CX* self) {return ctype##_begin(&self->rep);} \
+    STC_INLINE CX##_iter_t      CX##_end(const CX* self) {return ctype##_end(&self->rep);} \
     STC_INLINE void             CX##_next(CX##_iter_t* it) {ctype##_next(it);} \
     struct stc_trailing_semicolon
 

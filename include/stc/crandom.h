@@ -43,37 +43,48 @@ int main() {
 #include <string.h>
 #include <math.h>
 
-typedef struct {uint64_t state[5];}                        stc64_t;
-typedef struct {int64_t lower; uint64_t range, threshold;} stc64_uniform_t;
-typedef struct {double lower, range;}                      stc64_uniformf_t;
-typedef struct {double mean, stddev, next; unsigned has_next;} stc64_normalf_t;
+typedef struct { uint64_t state[5]; }                        stc64_t;
+typedef struct { uint32_t state[5]; }                        stc32_t;
+typedef struct { int64_t lower; uint64_t range, threshold; } stc64_uniform_t;
+typedef struct { double lower, range; }                      stc64_uniformf_t;
+typedef struct { double mean, stddev, next; unsigned has_next; } stc64_normalf_t;
 
 /* PRNG stc64.
  * Very fast PRNG suited for parallel usage with Weyl-sequence parameter.
  * 320-bit state, 256 bit is mutable.
- * Noticable faster than xoshiro and pcg, but slighly slower than wyrand64, 
- * which only has a single 64-bit state and therefore unfit when
- * multiple threads are required.
+ * Noticable faster than xoshiro and pcg, slighly slower than wyrand64 and 
+ * Romu, but these have restricted capacity for larger parallel jobs or unknown minimum periods.
  * stc64 supports 2^63 unique threads with a minimum 2^64 period lengths each.
- * Passes PractRand tested up to 8TB output, Vigna's Hamming weight test,
- * and simple correlation tests, i.e. interleaved streams with one-bit diff state.
- * The 16-bit version with LR=6, RS=5, LS=3 passes PractRand to multiple TB input.
+ * Passes all statistical tests, e.g PractRand and correlation tests, i.e. interleaved
+ * streams with one-bit diff state. Even the 16-bit version (LR=6, RS=5, LS=3) passes 
+ * PractRand to multiple TB input.
  */
 
 /* Global STC64 PRNG */
 STC_API void            stc64_srandom(uint64_t seed);
 STC_API uint64_t        stc64_random(void);
-/* STC64 PRNG state */ 
-STC_API stc64_t         stc64_init(uint64_t seed);
+
+/* Init with sequence number */
 STC_API stc64_t         stc64_with_seq(uint64_t seed, uint64_t seq);
+STC_API stc32_t         stc32_with_seq(uint32_t seed, uint32_t seq);
+
 /* Int64 uniform distributed RNG, range [low, high]. */
 STC_API stc64_uniform_t stc64_uniform_init(int64_t low, int64_t high);
+
 /* Float64 uniform distributed RNG, range [low, high). */
 STC_API stc64_uniformf_t stc64_uniformf_init(double low, double high);
+
 /* Normal distribution (double) */
 STC_API stc64_normalf_t stc64_normalf_init(double mean, double stddev);
 STC_API double          stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
 
+STC_INLINE stc64_t stc64_init(uint64_t seed) {
+    return stc64_with_seq(seed, seed + 0x3504f333d3aa0b37);
+}
+
+STC_INLINE stc32_t stc32_init(uint32_t seed) {
+    return stc32_with_seq(seed, seed + 0xd3aa0b37);
+}
 
 STC_INLINE uint64_t stc64_rand(stc64_t* rng) {
     uint64_t *s = rng->state; enum {LR=24, RS=11, LS=3};
@@ -81,6 +92,15 @@ STC_INLINE uint64_t stc64_rand(stc64_t* rng) {
     s[0] = s[1] ^ (s[1] >> RS);
     s[1] = s[2] + (s[2] << LS);
     s[2] = ((s[2] << LR) | (s[2] >> (64 - LR))) + result;
+    return result;
+}
+
+STC_INLINE uint32_t stc32_rand(stc32_t* rng) {
+    uint32_t *s = rng->state; enum {LR=21, RS=9, LS=3};
+    const uint32_t result = (s[0] ^ (s[3] += s[4])) + s[1];
+    s[0] = s[1] ^ (s[1] >> RS);
+    s[1] = s[2] + (s[2] << LS);
+    s[2] = ((s[2] << LR) | (s[2] >> (32 - LR))) + result;
     return result;
 }
 
@@ -125,14 +145,18 @@ STC_DEF uint64_t stc64_random(void) {
     return stc64_rand(&stc64_global);
 }
 
-STC_DEF stc64_t stc64_init(uint64_t seed) {
-    return stc64_with_seq(seed, seed + 0x3504f333d3aa0b34);
-}
-
 /* rng.state[4] must be odd */ 
 STC_DEF stc64_t stc64_with_seq(uint64_t seed, uint64_t seq) {
-    stc64_t rng = {{seed, seed, seed, seed, (seq << 1) | 1}};
-    for (int i = 0; i < 12; ++i) stc64_rand(&rng);
+    stc64_t rng = {{seed, seed+0x26aa069ea2fb1a4d, seed+0x70c72c95cd592d04,
+                          seed+0x504f333d3aa0b359, (seq << 1) | 1}};
+    for (int i = 0; i < 6; ++i) stc64_rand(&rng);
+    return rng;
+}
+
+STC_DEF stc32_t stc32_with_seq(uint32_t seed, uint32_t seq) {
+    stc32_t rng = {{seed, seed+0x26aa069e, seed+0xa2fb1a4d,
+                          seed+0x70c72c95, (seq << 1) | 1}};
+    for (int i = 0; i < 6; ++i) stc32_rand(&rng);
     return rng;
 }
 
