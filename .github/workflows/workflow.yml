@@ -6,6 +6,9 @@ on:
 jobs:
   build_and_test:
     runs-on: ubuntu-latest
+    env:
+      CFLAGS:   -Wall -Wno-unused-function -ggdb3 -fsanitize=address -fsanitize=undefined -fsanitize=pointer-compare -fsanitize=pointer-subtract
+      CXXFLAGS: -Wall -Wno-unused-function -ggdb3 -fsanitize=address -fsanitize=undefined -fsanitize=pointer-compare -fsanitize=pointer-subtract
     steps:
     - name: 'Checkout'
       uses: actions/checkout@v2
