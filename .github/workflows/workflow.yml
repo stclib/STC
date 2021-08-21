@@ -19,4 +19,5 @@ jobs:
         cxx: g++
         build-type: Release
         configure-options: -DBUILD_TESTING=1
+        ctest-options: --output-on-failure
         run-test: true
