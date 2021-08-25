@@ -26,7 +26,8 @@ using_print_collection(csmap_istr);
 using_print_collection(cvec_istr);
 
 
-void findit(csmap_istr c, csmap_istr_key_t val) {
+void findit(csmap_istr c, csmap_istr_key_t val)
+{
     printf("Trying find() on value %d\n", val);
     csmap_istr_value_t* result = csmap_istr_get(&c, val); // easier with get than find.
     if (result) {
@@ -38,8 +39,9 @@ void findit(csmap_istr c, csmap_istr_key_t val) {
 
 int main()
 {
-    c_forvar (csmap_istr m1 = csmap_istr_init(), csmap_istr_del(&m1))
-    c_forvar (cvec_istr v = cvec_istr_init(), cvec_istr_del(&v)) {
+    c_forauto (csmap_istr, m1)
+    c_forauto (cvec_istr, v)
+    {
         c_emplace(csmap_istr, m1, { { 40, "Zr" }, { 45, "Rh" } });
         puts("The starting map m1 is (key, value):");
         print_collection_csmap_istr(m1);
@@ -54,6 +56,7 @@ int main()
 
         puts("Inserting the following vector data into m1:");
         print_collection_cvec_istr(v);
+        
         c_foreach (i, cvec_istr, v) csmap_istr_emplace(&m1, i.ref->first, i.ref->second);
 
         puts("The modified map m1 is (key, value):");
