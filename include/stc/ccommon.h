@@ -133,13 +133,13 @@
 #define c_forscope(start, end) for (int _c_ii = (start, 0); !_c_ii; ++_c_ii, end)
 #define c_fordefer(...) for (int _c_ii = 0; !_c_ii; ++_c_ii, __VA_ARGS__)
 
-#define c_forvar_initdel(...) c_MACRO_OVERLOAD(c_forvar_initdel, __VA_ARGS__)
-#define c_forvar_initdel_2(CX, a) \
+#define c_forauto(...) c_MACRO_OVERLOAD(c_forauto, __VA_ARGS__)
+#define c_forauto_2(CX, a) \
     c_forvar(CX a = CX##_init(), CX##_del(&a))
-#define c_forvar_initdel_3(CX, a, b) \
+#define c_forauto_3(CX, a, b) \
     c_forvar(c_EXPAND(CX a = CX##_init(), b = CX##_init()), \
              CX##_del(&b), CX##_del(&a))
-#define c_forvar_initdel_4(CX, a, b, c) \
+#define c_forauto_4(CX, a, b, c) \
     c_forvar(c_EXPAND(CX a = CX##_init(), b = CX##_init(), c = CX##_init()), \
              CX##_del(&c), CX##_del(&b), CX##_del(&a))
 

@@ -2,25 +2,53 @@
 
 The following handy macros are safe to use, i.e. have no side-effects.
 
-### c_fordefer, c_forscope, c_forvar, c_forvar_initdel
+### c_fordefer, c_forscope, c_forvar, c_forauto
 General ***defer*** mechanics for resource acquisition. These macros allows to specify the release of the
 resource where the resource acquisition takes place. Makes it easier to verify that resources are released.
 
-**Note**: These macros are one-time executed **for-loops**. Use ***only*** `continue` in order to break out
-of a `c_for*`-block. ***Do not*** use `return`, `goto` or `break`, as they will prevent the `end`-statement to
-be executed when leaving scope. This is not particular to the `c_for*()` macros, as one must always make sure
-to unwind temporary allocated resources before a `return` in C.
+**NB**: These macros are one-time executed **for-loops**. Use ***only*** `continue` in order to break out
+of these four `c_for`-blocks. ***Do not*** use `return` or `goto` (or `break`) inside them, as they will
+prevent the `end`-statement to be executed when leaving scope. This is not particular to the `c_for*()`
+macros, as one must always make sure to unwind temporary allocated resources before a `return` in C.
 
 | Usage                                  | Description                                       |
 |:---------------------------------------|:--------------------------------------------------|
-| `c_fordefer (end...)`                  | Defer execution of `end` to end of block          |
-| `c_forscope (start, end)`              | Execute `start`. Defer `end` to end of block      |
 | `c_forvar (Type var=init, end...)`     | Declare `var`. Defer `end` to end of block        |
-| `c_forvar_initdel (Type, var...)`      | `c_forvar (Type var=Type_init(), Type_del(&var))` |
+| `c_forauto (Type, var...)`             | `c_forvar (Type var=Type_init(), Type_del(&var))` |
+| `c_forscope (start, end)`              | Execute `start`. Defer `end` to end of block      |
+| `c_fordefer (end...)`                  | Defer execution of `end` to end of block          |
 
-For multiple variables, use either multiple **c_forvar** in sequence, or declare variable outside 
-scope and use **c_fordefer** or **c_forscope**. Also, **c_forvar_initdel** support up to 3 vars.
+For multiple variables, use either multiple **c_forvar** in sequence, or declare variable outside
+scope and use **c_forscope** or **c_fordefer**. Also, **c_forauto** support up to 3 vars.
 ```c
+c_forvar (cstr s = cstr_lit("Hello"), cstr_del(&s))
+{
+    cstr_append(&s, " world");
+    printf("%s\n", s.str);
+}
+
+c_forauto (cstr, s1, s2)
+{
+    cstr_append(&s1, "Hello");
+    cstr_append(&s1, " world");
+
+    cstr_append(&s2, "Cool");
+    cstr_append(&s2, " stuff");
+
+    printf("%s %s\n", s1.str, s2.str);
+}
+
+using_cvec(i32, int32_t);
+...
+cvec_i32 vec;
+c_forscope (vec = cvec_i32_init(), cvec_i32_del(&vec))
+{
+    cvec_i32_push_back(&vec, 123);
+    cvec_i32_push_back(&vec, 321);
+
+    c_foreach (i, cvec_i32, vec) printf(" %d", *i.ref);
+}
+
 cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
 c_fordefer (cstr_del(&s1), cstr_del(&s2))
 {

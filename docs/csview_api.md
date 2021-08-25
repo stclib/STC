@@ -220,7 +220,7 @@ int main()
     csview suffix = csview_substr(text, -12, cstr_npos); // from pos -12 to end
     printf("%.*s\n", csview_ARG(suffix));
 
-    c_forvar_initdel (cmap_si, map)
+    c_forauto (cmap_si, map)
     {
         cmap_si_emplace(&map, c_sv("hello"), 100);
         cmap_si_emplace(&map, c_sv("world"), 200);

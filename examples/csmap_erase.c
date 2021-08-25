@@ -1,5 +1,5 @@
 // map_erase.c
-// https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-16
+// From C++ example: https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-16
 #include <stc/csmap.h>
 #include <stc/cstr.h>
 #include <stdio.h>
@@ -15,14 +15,14 @@ void printmap(csmap_my map)
 
 int main()
 {
-    c_forvar (csmap_my m1 = csmap_my_init(), csmap_my_del(&m1))
+    c_forauto (csmap_my, m1)
     {
         // Fill in some data to test with, one at a time
-        csmap_my_emplace(&m1, 1, "A");
-        csmap_my_emplace(&m1, 2, "B");
-        csmap_my_emplace(&m1, 3, "C");
-        csmap_my_emplace(&m1, 4, "D");
-        csmap_my_emplace(&m1, 5, "E");
+        csmap_my_insert(&m1, 1, cstr_lit("A"));
+        csmap_my_insert(&m1, 2, cstr_lit("B"));
+        csmap_my_insert(&m1, 3, cstr_lit("C"));
+        csmap_my_insert(&m1, 4, cstr_lit("D"));
+        csmap_my_insert(&m1, 5, cstr_lit("E"));
 
         puts("Starting data of map m1 is:");
         printmap(m1);
@@ -32,9 +32,9 @@ int main()
         printmap(m1);
     }
 
-    c_forvar (csmap_my m2 = csmap_my_init(), csmap_my_del(&m2))
+    c_forauto (csmap_my, m2)
     {
-        // Fill in some data to test with, one at a time, using emplace
+        // Fill in some data to test with, one at a time, using c_emplace()
         c_emplace(csmap_my, m2, {
             {10, "Bob"},
             {11, "Rob"},
@@ -54,7 +54,7 @@ int main()
         printmap(m2);
     }
 
-    c_forvar (csmap_my m3 = csmap_my_init(), csmap_my_del(&m3))
+    c_forauto (csmap_my, m3)
     {
         // Fill in some data to test with, one at a time, using emplace
         csmap_my_emplace(&m3, 1, "red");
@@ -62,8 +62,8 @@ int main()
         csmap_my_emplace(&m3, 3, "blue");
         csmap_my_emplace(&m3, 4, "green");
         csmap_my_emplace(&m3, 5, "orange");
-        csmap_my_emplace(&m3, 5, "purple");
-        csmap_my_emplace(&m3, 5, "pink");
+        csmap_my_emplace(&m3, 6, "purple");
+        csmap_my_emplace(&m3, 7, "pink");
 
         puts("Starting data of map m3 is:");
         printmap(m3);
