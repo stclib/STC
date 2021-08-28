@@ -57,8 +57,7 @@ STC_INLINE char         csview_back(csview sv) { return sv.str[sv.size - 1]; }
 
 STC_INLINE void         csview_clear(csview* self) { *self = csview_null; }
 
-#define                 csview_hash(sv)  c_default_hash((sv).str, (sv).size)
-STC_INLINE bool         csview_equals(csview sv, csview sv2)
+STC_INLINE bool         csview_equalto(csview sv, csview sv2)
                             { return sv.size == sv2.size && !memcmp(sv.str, sv2.str, sv.size); }
 STC_INLINE size_t       csview_find(csview sv, csview needle)
                             { char* res = c_strnstrn(sv.str, needle.str, sv.size, needle.size);
@@ -115,10 +114,9 @@ STC_INLINE bool         cstr_ends_with_v(cstr s, csview sub)
 
 /* ---- Container helper functions ---- */
 
-STC_INLINE bool         csview_equals_ref(const csview* a, const csview* b)
-                            { return a->size == b->size && !memcmp(a->str, b->str, a->size); }
-#define                 csview_hash_ref(xp, none) c_default_hash((xp)->str, (xp)->size)
-#define                 csview_compare_ref(xp, yp) strcmp((xp)->str, (yp)->str)
+#define                 csview_compare(xp, yp) strcmp((xp)->str, (yp)->str)
+#define                 csview_hash(xp, ...) c_default_hash((xp)->str, (xp)->size)
+#define                 csview_equals(xp, yp) (strcmp((xp)->str, (yp)->str) == 0)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 

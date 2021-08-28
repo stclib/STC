@@ -58,15 +58,15 @@ void         cstr_replace_all(cstr* self, const char* find, const char* replace)
 void         cstr_erase(cstr* self, size_t pos);
 void         cstr_erase_n(cstr* self, size_t pos, size_t n);
 
-bool         cstr_equals(cstr s, const char* str);
-bool         cstr_equals_s(cstr s, cstr s2);
+bool         cstr_equalto(cstr s, const char* str);
+bool         cstr_equalto_s(cstr s, cstr s2);
 size_t       cstr_find(cstr s, const char* needle);
 size_t       cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax);
 bool         cstr_contains(cstr s, const char* needle);
 bool         cstr_starts_with(cstr s, const char* str);
 bool         cstr_ends_with(cstr s, const char* str);
 
-bool         cstr_iequals(cstr s, const char* str);                   // prefix i = case-insensitive
+bool         cstr_iequalto(cstr s, const char* str);                   // prefix i = case-insensitive
 size_t       cstr_ifind_n(cstr s, const char* needle, size_t pos, size_t nmax);
 bool         cstr_icontains(cstr s, const char* needle);
 bool         cstr_istarts_with(cstr s, const char* str);
@@ -91,12 +91,13 @@ Note that all methods with arguments `(..., const char* str, size_t n)`, `n` mus
 ```c
 const char*  cstr_toraw(const cstr* self);
 
-int          cstr_compare_ref(const cstr *s1, const cstr *s2);
-bool         cstr_equals_ref(const cstr *s1, const cstr *s2);
+int          cstr_compare(const cstr *s1, const cstr *s2);
+bool         cstr_equals(const cstr *s1, const cstr *s2);
+bool         cstr_hash(const cstr *s, ...);
 
 int          c_rawstr_compare(const char** x, const char** y);
 bool         c_rawstr_equals(const char** x, const char** y);
-uint64_t     c_rawstr_hash(const char* const* x, size_t ignored);
+uint64_t     c_rawstr_hash(const char* const* x, ...);
 
 int          c_strncasecmp(const char* str1, const char* str2, size_t n);
 char*        c_strnstrn(const char* str, const char* needle, size_t slen, size_t nlen);

@@ -118,11 +118,11 @@ STC_INLINE cstr_iter_t  cstr_begin(cstr* self)
 STC_INLINE cstr_iter_t  cstr_end(cstr* self)
                             { return c_make(cstr_iter_t){self->str + _cstr_rep(self)->size}; }
 STC_INLINE void         cstr_next(cstr_iter_t* it) {++it->ref; }
-STC_INLINE bool         cstr_equals(cstr s, const char* str)
+STC_INLINE bool         cstr_equalto(cstr s, const char* str)
                             { return strcmp(s.str, str) == 0; }
-STC_INLINE bool         cstr_equals_s(cstr s1, cstr s2)
+STC_INLINE bool         cstr_equalto_s(cstr s1, cstr s2)
                             { return strcmp(s1.str, s2.str) == 0; }
-STC_INLINE bool         cstr_iequals(cstr s, const char* str)
+STC_INLINE bool         cstr_iequalto(cstr s, const char* str)
                             { return c_strncasecmp(s.str, str, cstr_npos) == 0; }
 STC_INLINE bool         cstr_contains(cstr s, const char* needle)
                             { return strstr(s.str, needle) != NULL; }
@@ -184,12 +184,11 @@ cstr_iends_with(cstr s, const char* sub) {
     return n <= sz && !c_strncasecmp(s.str + sz - n, sub, n);
 }
 
-/* cvec/cmap adaption functions: */
+/* container adaptor functions: */
 #define  cstr_toraw(xp)           ((xp)->str)
-#define  cstr_compare_ref(xp, yp) strcmp((xp)->str, (yp)->str)
-#define  cstr_equals_ref(xp, yp)  (strcmp((xp)->str, (yp)->str) == 0)
-#define  cstr_hash_ref(xp, none)  c_default_hash((xp)->str, cstr_size(*(xp)))
-#define  cstr_hash(x)             c_default_hash((x).str, cstr_size(x))
+#define  cstr_compare(xp, yp)     strcmp((xp)->str, (yp)->str)
+#define  cstr_equals(xp, yp)      (strcmp((xp)->str, (yp)->str) == 0)
+#define  cstr_hash(xp, ...)       c_default_hash((xp)->str, cstr_size(*(xp)))
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 

@@ -275,7 +275,7 @@ static int Viking_equals(const Viking* a, const Viking* b) {
 }
 
 static uint32_t Viking_hash(const Viking* a, int ignored) {
-    return cstr_hash(a->name) ^ (cstr_hash(a->country) >> 15);
+    return cstr_hash(&a->name) ^ (cstr_hash(&a->country) >> 15);
 }
 
 static void Viking_del(Viking* v) {
