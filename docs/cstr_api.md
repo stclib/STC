@@ -28,6 +28,8 @@ cstr*        cstr_take(cstr* self, cstr s);                           // take th
 cstr         cstr_move(cstr* self);                                   // move string to caller, leave empty string
 void         cstr_del(cstr *self);                                    // destructor
 
+const char*  cstr_str(const cstr* self);                              // self->str
+char*        cstr_data(cstr* self);                                   // self->str
 size_t       cstr_size(cstr s);
 size_t       cstr_length(cstr s);
 size_t       cstr_capacity(cstr s);
@@ -89,8 +91,6 @@ Note that all methods with arguments `(..., const char* str, size_t n)`, `n` mus
 
 #### Helper methods:
 ```c
-const char*  cstr_toraw(const cstr* self);
-
 int          cstr_compare(const cstr *s1, const cstr *s2);
 bool         cstr_equals(const cstr *s1, const cstr *s2);
 bool         cstr_hash(const cstr *s, ...);

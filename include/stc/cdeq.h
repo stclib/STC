@@ -45,7 +45,7 @@
             _c_using_cdeq(cdeq_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue, defTypes)
 
 #define using_cdeq_str() \
-            using_cdeq_7(str, cstr, c_rawstr_compare, cstr_del, cstr_from, cstr_toraw, const char*)
+            using_cdeq_7(str, cstr, c_rawstr_compare, cstr_del, cstr_from, cstr_str, const char*)
 
 
 struct cdeq_rep { size_t size, cap; void* base[]; };

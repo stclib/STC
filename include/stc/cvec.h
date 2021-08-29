@@ -45,7 +45,7 @@
             _c_using_cvec(cvec_##X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue, defTypes)
 
 #define using_cvec_str() \
-            using_cvec_7(str, cstr, c_rawstr_compare, cstr_del, cstr_from, cstr_toraw, const char*)
+            using_cvec_7(str, cstr, c_rawstr_compare, cstr_del, cstr_from, cstr_str, const char*)
 
 struct cvec_rep { size_t size, cap; void* data[]; };
 #define _cvec_rep(self) c_container_of((self)->data, struct cvec_rep, data)

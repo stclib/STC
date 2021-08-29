@@ -90,8 +90,8 @@ int main(void) {
 
 #define using_cmap_str() \
             _c_using_chash(cmap_str, cmap_, cstr, cstr, c_rawstr_equals, c_rawstr_hash, \
-                           cstr_del, cstr_from, cstr_toraw, const char*, c_true, \
-                           cstr_del, cstr_from, cstr_toraw, const char*)
+                           cstr_del, cstr_from, cstr_str, const char*, c_true, \
+                           cstr_del, cstr_from, cstr_str, const char*)
 
 
 #define using_cmap_strkey(...) c_MACRO_OVERLOAD(using_cmap_strkey, __VA_ARGS__)
@@ -107,7 +107,7 @@ int main(void) {
 #define _c_using_chash_strkey(X, C, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes) \
             _c_using_chash(C##X, C, cstr, Mapped, c_rawstr_equals, c_rawstr_hash, \
                            mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes, \
-                           cstr_del, cstr_from, cstr_toraw, const char*)
+                           cstr_del, cstr_from, cstr_str, const char*)
 
 
 #define using_cmap_strval(...) c_MACRO_OVERLOAD(using_cmap_strval, __VA_ARGS__)
@@ -122,7 +122,7 @@ int main(void) {
             using_cmap_strval_9(X, Key, keyEquals, keyHash, keyDel, keyClone, c_default_toraw, Key, c_true)
 #define using_cmap_strval_9(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey, defTypes) \
             _c_using_chash(cmap_##X, cmap_, Key, cstr, keyEqualsRaw, keyHashRaw, \
-                           cstr_del, cstr_from, cstr_toraw, const char*, defTypes, \
+                           cstr_del, cstr_from, cstr_str, const char*, defTypes, \
                            keyDel, keyFromRaw, keyToRaw, RawKey)
 
 #define SET_ONLY_cmap_(...)

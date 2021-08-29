@@ -23,7 +23,7 @@ be replaced by `i` in all of the following documentation.
 
 `using_cdeq_str()` is a shorthand for:
 ```
-using_cdeq(str, cstr, c_rawstr_compare, cstr_del, cstr_from, cstr_toraw, const char*)
+using_cdeq(str, cstr, c_rawstr_compare, cstr_del, cstr_from, cstr_str, const char*)
 ```
 
 ## Methods
