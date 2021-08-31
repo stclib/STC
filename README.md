@@ -39,7 +39,7 @@ Highlights
 - **Fully memory managed** - All containers will destruct keys/values via destructor passed as macro parameters to the ***using***-declaration. Also, shared pointers are supported and can be stored in containers, see ***csptr***.
 - **Fully type safe** - Because of templating, it avoids error-prone casting of container types and elements back and forth from the containers.
 - **Uniform, easy-to-learn API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have uniform and intuitive usage across the various containers.
-- **Small footprint** - Small source code and generated executables. The executable from the example below using six different containers is *27 kb in size* compiled with TinyC.
+- **Small footprint** - Small source code and generated executables. The executable from the example below with six different containers is *22 kb in size* compiled with gcc -Os on linux.
 - **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See the Installation section.
 - **No callback functions** - All passed template argument functions/macros are directly called from the implementation, no slow callbacks which requires storage.
 - **Compiles with C++ and C99** - C code can be compiled with C++.
@@ -64,18 +64,18 @@ templates in c++. A basic usage example:
 ```c
 #include <stc/cvec.h>
 
-using_cvec(i, int);
+using_cvec(f32, float);
 
 int main(void) {
-    cvec_i vec = cvec_i_init();
-    cvec_i_push_back(&vec, 10);
-    cvec_i_push_back(&vec, 20);
-    cvec_i_push_back(&vec, 30);
+    cvec_f32 vec = cvec_f32_init();
+    cvec_f32_push_back(&vec, 10.f);
+    cvec_f32_push_back(&vec, 20.f);
+    cvec_f32_push_back(&vec, 30.f);
 
-    c_foreach (i, cvec_i, vec)
-        printf(" %d", *i.ref);
+    c_foreach (i, cvec_f32, vec)
+        printf(" %g", *i.ref);
 
-    cvec_i_del(&vec);
+    cvec_f32_del(&vec);
 }
 ```
 With six different containers:
@@ -91,66 +91,68 @@ With six different containers:
 struct Point { float x, y; };
 
 int Point_compare(const struct Point* a, const struct Point* b) {
-    if (a->x != b->x) return 1 - 2*(a->x < b->x);
-    return (a->y > b->y) - (a->y < b->y);
+    int cmp = c_default_compare(&a->x, &b->x);
+    return cmp ? cmp : c_default_compare(&a->y, &b->y);
 }
 
 // declare container types
-using_cset(i, int);                         // unordered set
-using_cvec(p, struct Point, Point_compare); // vector, struct as elements
-using_cdeq(i, int);                         // deque
-using_clist(i, int);                        // singly linked list
-using_cqueue(i, cdeq_i);                    // queue, using deque as adapter
-using_csmap(i, int, int);                   // sorted map
+using_cset(i32, int);                         // unordered set
+using_cvec(pnt, struct Point, Point_compare); // vector, struct as elements
+using_cdeq(i32, int);                         // deque
+using_clist(i32, int);                        // singly linked list
+using_cqueue(i32, cdeq_i32);                  // queue, using deque as adapter
+using_csmap(i32, int, int);                   // sorted map
 
 int main(void) {
-    // shorthand for define + initialize containers with c_var():
-    c_var (cset_i, set, {10, 20, 30});
-    c_var (cvec_p, vec, { {10, 1}, {20, 2}, {30, 3} });
-    c_var (cdeq_i, deq, {10, 20, 30});
-    c_var (clist_i, lst, {10, 20, 30});
-    c_var (cqueue_i, que, {10, 20, 30});
-    c_var (csmap_i, map, { {20, 2}, {10, 1}, {30, 3} });
+    // define six containers with automatic call of init and del (destruction after scope exit)
+    c_forauto (cset_i32, set)
+    c_forauto (cvec_pnt, vec)
+    c_forauto (cdeq_i32, deq)
+    c_forauto (clist_i32, lst)
+    c_forauto (cqueue_i32, que)
+    c_forauto (csmap_i32, map)
+    {
+        // add some elements to each container
+        c_emplace(cset_i32, set, {10, 20, 30});
+        c_emplace(cvec_pnt, vec, { {10, 1}, {20, 2}, {30, 3} });
+        c_emplace(cdeq_i32, deq, {10, 20, 30});
+        c_emplace(clist_i32, lst, {10, 20, 30});
+        c_emplace(cqueue_i32, que, {10, 20, 30});
+        c_emplace(csmap_i32, map, { {20, 2}, {10, 1}, {30, 3} });
 
-    // add one more element to each container
-    cset_i_insert(&set, 40);
-    cvec_p_push_back(&vec, (struct Point) {40, 4});
-    cdeq_i_push_front(&deq, 5);
-    clist_i_push_front(&lst, 5);
-    cqueue_i_push(&que, 40);
-    csmap_i_emplace(&map, 40, 4);
+        // add one more element to each container
+        cset_i32_insert(&set, 40);
+        cvec_pnt_push_back(&vec, (struct Point) {40, 4});
+        cdeq_i32_push_front(&deq, 5);
+        clist_i32_push_front(&lst, 5);
+        cqueue_i32_push(&que, 40);
+        csmap_i32_emplace(&map, 40, 4);
 
-    // find an element in each container
-    cset_i_iter_t i1 = cset_i_find(&set, 20);
-    cvec_p_iter_t i2 = cvec_p_find(&vec, (struct Point) {20, 2});
-    cdeq_i_iter_t i3 = cdeq_i_find(&deq, 20);
-    clist_i_iter_t i4 = clist_i_find(&lst, 20);
-    csmap_i_iter_t i5 = csmap_i_find(&map, 20);
-    printf("\nFound: %d, (%g, %g), %d, %d, [%d: %d]\n", *i1.ref, i2.ref->x, i2.ref->y,
-                                                        *i3.ref, *i4.ref,
-                                                        i5.ref->first, i5.ref->second);
-    // erase the elements found
-    cset_i_erase_at(&set, i1);
-    cvec_p_erase_at(&vec, i2);
-    cdeq_i_erase_at(&deq, i3);
-    clist_i_erase_at(&lst, i4);
-    csmap_i_erase_at(&map, i5);
+        // find an element in each container
+        cset_i32_iter_t i1 = cset_i32_find(&set, 20);
+        cvec_pnt_iter_t i2 = cvec_pnt_find(&vec, (struct Point) {20, 2});
+        cdeq_i32_iter_t i3 = cdeq_i32_find(&deq, 20);
+        clist_i32_iter_t i4 = clist_i32_find(&lst, 20);
+        csmap_i32_iter_t i5 = csmap_i32_find(&map, 20);
+        printf("\nFound: %d, (%g, %g), %d, %d, [%d: %d]\n", *i1.ref, i2.ref->x, i2.ref->y,
+                                                            *i3.ref, *i4.ref,
+                                                            i5.ref->first, i5.ref->second);
+        // erase the elements found
+        cset_i32_erase_at(&set, i1);
+        cvec_pnt_erase_at(&vec, i2);
+        cdeq_i32_erase_at(&deq, i3);
+        clist_i32_erase_at(&lst, i4);
+        csmap_i32_erase_at(&map, i5);
 
-    printf("After erasing elements found:");
-    printf("\n set:"); c_foreach (i, cset_i, set) printf(" %d", *i.ref);
-    printf("\n vec:"); c_foreach (i, cvec_p, vec) printf(" (%g, %g)", i.ref->x, i.ref->y);
-    printf("\n deq:"); c_foreach (i, cdeq_i, deq) printf(" %d", *i.ref);
-    printf("\n lst:"); c_foreach (i, clist_i, lst) printf(" %d", *i.ref);
-    printf("\n que:"); c_foreach (i, cqueue_i, que) printf(" %d", *i.ref);
-    printf("\n map:"); c_foreach (i, csmap_i, map) printf(" [%d: %d]", i.ref->first, i.ref->second);
-
-    // cleanup
-    cset_i_del(&set);
-    cvec_p_del(&vec);
-    cdeq_i_del(&deq);
-    clist_i_del(&lst);
-    cqueue_i_del(&que);
-    csmap_i_del(&map);
+        printf("After erasing elements found:");
+        printf("\n set:"); c_foreach (i, cset_i32, set) printf(" %d", *i.ref);
+        printf("\n vec:"); c_foreach (i, cvec_pnt, vec) printf(" (%g, %g)", i.ref->x, i.ref->y);
+        printf("\n deq:"); c_foreach (i, cdeq_i32, deq) printf(" %d", *i.ref);
+        printf("\n lst:"); c_foreach (i, clist_i32, lst) printf(" %d", *i.ref);
+        printf("\n que:"); c_foreach (i, cqueue_i32, que) printf(" %d", *i.ref);
+        printf("\n map:"); c_foreach (i, csmap_i32, map) printf(" [%d: %d]", i.ref->first,
+                                                                             i.ref->second);
+    }
 }
 ```
 Output
