@@ -2,7 +2,7 @@
 
 The following handy macros are safe to use, i.e. have no side-effects.
 
-### c_fordefer, c_forscope, c_forvar, c_forauto
+### c_forvar, c_forauto, c_forscope, c_fordefer
 General ***defer*** mechanics for resource acquisition. These macros allows to specify the release of the
 resource where the resource acquisition takes place. Makes it easier to verify that resources are released.
 
@@ -94,10 +94,12 @@ int main()
 using_csset(x, int);
 ...
 c_var (csset_x, set, {23, 3, 7, 5, 12});
-c_foreach (i, csset_x, set) printf(" %d", *i.ref);
+c_foreach (i, csset_x, set)
+    printf(" %d", *i.ref);
 // 3 5 7 12 23
 csset_x_iter_t it = csset_x_find(&set, 7);
-c_foreach (i, csset_x, it, csset_x_end(&set)) printf(" %d", *i.ref);
+c_foreach (i, csset_x, it, csset_x_end(&set))
+    printf(" %d", *i.ref);
 // 7 12 23
 ```
 

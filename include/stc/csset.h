@@ -59,10 +59,11 @@ int main(void) {
             using_csset_8(X, Key, keyCompare, keyDel, keyClone, c_default_toraw, Key, c_true)
 #define using_csset_8(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey, defTypes) \
             _c_using_aatree(csset_##X, csset_, Key, Key, keyCompareRaw, \
-                            @@, @@, @@, void, defTypes, keyDel, keyFromRaw, keyToRaw, RawKey)
+                            @@, @@, @@, void, keyDel, keyFromRaw, keyToRaw, RawKey, defTypes)
 
 #define using_csset_str() \
-            _c_using_aatree_strkey(str, csset_, cstr, @@, @@, @@, void, c_true)
+            using_csset_8(str, cstr, c_rawstr_compare, cstr_del, \
+                          cstr_from, cstr_str, const char*, c_true)
 
 #define SET_ONLY_csset_(...) __VA_ARGS__
 #define MAP_ONLY_csset_(...)

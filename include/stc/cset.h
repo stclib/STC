@@ -57,11 +57,11 @@ int main(void) {
             using_cset_9(X, Key, keyEquals, keyHash, keyDel, keyClone, c_default_toraw, Key, c_true)
 #define using_cset_9(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey, defTypes) \
             _c_using_chash(cset_##X, cset_, Key, Key, keyEqualsRaw, keyHashRaw, \
-                           @@, @@, @@, void, defTypes, keyDel, keyFromRaw, keyToRaw, RawKey)
+                           @@, @@, @@, void, keyDel, keyFromRaw, keyToRaw, RawKey, defTypes)
 
-/* cset_str: */
 #define using_cset_str() \
-            _c_using_chash_strkey(str, cset_, cstr, @@, @@, @@, void, c_true)
+            using_cset_9(str, cstr, c_rawstr_equals, c_rawstr_hash, cstr_del, \
+                         cstr_from, cstr_str, const char*, c_true)
 
 #define SET_ONLY_cset_(...) __VA_ARGS__
 #define MAP_ONLY_cset_(...)

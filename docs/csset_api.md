@@ -13,9 +13,9 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 using_csset(X, Key);
 using_csset(X, Key, keyCompare);
 using_csset(X, Key, keyCompare, keyDel, keyClone = c_no_clone);
-using_csset(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey);
+using_csset(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey, flag);
 
-using_csset_str();  // using_csset(str, cstr, ...)
+using_csset_str();  // using_csset(str, cstr, cstr_del, cstr_from, cstr_str, const char*, c_true)
 ```
 The macro `using_csset()` must be instantiated in the global scope. `X` is a type tag name and
 will affect the names of all csset types and methods. E.g. declaring `using_csset(i, int);`, `X` should

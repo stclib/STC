@@ -19,27 +19,27 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 
 using_csmap(X, Key, Mapped);
 using_csmap(X, Key, Mapped, keyCompare);
-using_csmap(X, Key, Mapped, keyCompare, mappedDel, mappedClone);
+using_csmap(X, Key, Mapped, keyCompare, mappedDel, mappedClone = c_no_clone);
 using_csmap(X, Key, Mapped, keyCompare, mappedDel, mappedFromRaw, mappedToRaw, RawMapped);
 using_csmap(X, Key, Mapped, keyCompareRaw, mappedDel, mappedFromRaw, mappedToRaw, RawMapped,
-                                           keyDel, keyFromRaw, keyToRaw, RawKey);
+                                           keyDel, keyFromRaw, keyToRaw, RawKey, flag);
 using_csmap_keydef(X, Key, Mapped, keyCompare, keyDel, keyClone);
-using_csmap_keydef(X, Key, Mapped, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey);
+using_csmap_keydef(X, Key, Mapped, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey, flag);
 
 using_csmap_strkey(X, Mapped);                    // using_csmap(X, cstr, Mapped, ...)
 using_csmap_strkey(X, Mapped, mappedDel, mappedClone);
-using_csmap_strkey(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped);
+using_csmap_strkey(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped, flag);
 
 using_csmap_strval(X, Key);                       // using_csmap(X, Key, cstr, ...)
 using_csmap_strval(X, Key, keyCompare);
 using_csmap_strval(X, Key, keyCompare, keyDel, keyClone);
-using_csmap_strval(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey);
+using_csmap_strval(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey, flag);
 
 using_csmap_str();                                // using_csmap(str, cstr, cstr, ...)
 ```
 The `using_csmap()` macro family must be instantiated in the global scope. `X` is a type tag name and
 will affect the names of all csmap types and methods. E.g. declaring `using_csmap(ii, int, int);`, `X` should
-be replaced by `ii` in all of the following documentation.
+be replaced by `ii` in all of the following documentation. Argument `flag` is `c_true` by default.
 
 ## Methods
 

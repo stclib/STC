@@ -80,8 +80,8 @@ typedef long atomic_count_t;
             using_csptr_4(X, Value, valueCompare, c_default_del)
 #define using_csptr_4(X, Value, valueCompare, valueDel) \
             _c_using_csptr(csptr_##X, Value, valueCompare, valueDel, c_true)
-#define using_csptr_5(X, Value, valueCompare, valueDel, defineTypes) \
-            _c_using_csptr(csptr_##X, Value, valueCompare, valueDel, defineTypes)
+#define using_csptr_5(X, Value, valueCompare, valueDel, defTypes) \
+            _c_using_csptr(csptr_##X, Value, valueCompare, valueDel, defTypes)
 
 #define _csptr_types(CX, Value) \
     typedef Value CX##_value_t; \
@@ -91,8 +91,8 @@ typedef long atomic_count_t;
         atomic_count_t* use_count; \
     } CX
 
-#define _c_using_csptr(CX, Value, valueCompare, valueDel, defineTypes) \
-    defineTypes( _csptr_types(CX, Value); ) \
+#define _c_using_csptr(CX, Value, valueCompare, valueDel, defTypes) \
+    defTypes( _csptr_types(CX, Value); ) \
     struct CX##_rep_ {atomic_count_t cnt; CX##_value_t val;}; \
 \
     STC_INLINE CX \

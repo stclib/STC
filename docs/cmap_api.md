@@ -41,7 +41,7 @@ using_cmap_str()                                // using_cmap(str, cstr, cstr, .
 ```
 The `using_cmap()` macro family must be instantiated in the global scope. `X` is a type tag name and
 will affect the names of all cmap types and methods. E.g. declaring `using_cmap(ii, int, int);`, `X` should
-be replaced by `ii` in all of the following documentation.
+be replaced by `ii` in all of the following documentation. Argument `flag` is `c_true` by default.
 
 ## Methods
 

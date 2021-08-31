@@ -52,6 +52,7 @@ int main(void) {
 
 #define forward_csmap(X, Key, Mapped) _c_aatree_types(csmap_##X, csmap_, Key, Mapped)
 
+
 #define using_csmap(...) c_MACRO_OVERLOAD(using_csmap, __VA_ARGS__)
 
 #define using_csmap_3(X, Key, Mapped) \
@@ -64,14 +65,14 @@ int main(void) {
             using_csmap_9(X, Key, Mapped, keyCompare, mappedDel, mappedClone, c_default_toraw, Mapped, c_true)
 #define using_csmap_9(X, Key, Mapped, keyCompare, mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes) \
             using_csmap_13(X, Key, Mapped, keyCompare, \
-                           mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes, \
-                           c_default_del, c_default_fromraw, c_default_toraw, Key)
+                           mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
+                           c_default_del, c_default_fromraw, c_default_toraw, Key, defTypes)
 #define using_csmap_13(X, Key, Mapped, keyCompareRaw, \
-                       mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes, \
-                       keyDel, keyFromRaw, keyToRaw, RawKey) \
+                       mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
+                       keyDel, keyFromRaw, keyToRaw, RawKey, defTypes) \
             _c_using_aatree(csmap_##X, csmap_, Key, Mapped, keyCompareRaw, \
-                            mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes, \
-                            keyDel, keyFromRaw, keyToRaw, RawKey)
+                            mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
+                            keyDel, keyFromRaw, keyToRaw, RawKey, defTypes)
 
 
 #define using_csmap_keydef(...) c_MACRO_OVERLOAD(using_csmap_keydef, __VA_ARGS__)
@@ -82,13 +83,13 @@ int main(void) {
 #define using_csmap_keydef_9(X, Key, Mapped, keyCompareRaw, \
                              keyDel, keyFromRaw, keyToRaw, RawKey, defTypes) \
             _c_using_aatree(csmap_##X, csmap_, Key, Mapped, keyCompareRaw, \
-                            c_default_del, c_default_fromraw, c_default_toraw, Mapped, defTypes, \
-                            keyDel, keyFromRaw, keyToRaw, RawKey)
+                            c_default_del, c_default_fromraw, c_default_toraw, Mapped, \
+                            keyDel, keyFromRaw, keyToRaw, RawKey, defTypes)
 
 #define using_csmap_str() \
             _c_using_aatree(csmap_str, csmap_, cstr, cstr, c_rawstr_compare, \
-                            cstr_del, cstr_from, cstr_str, const char*, c_true, \
-                            cstr_del, cstr_from, cstr_str, const char*)
+                            cstr_del, cstr_from, cstr_str, const char*, \
+                            cstr_del, cstr_from, cstr_str, const char*, c_true)
 
 
 #define using_csmap_strkey(...) c_MACRO_OVERLOAD(using_csmap_strkey, __VA_ARGS__)
@@ -103,8 +104,8 @@ int main(void) {
             _c_using_aatree_strkey(X, csmap_, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes)
 #define _c_using_aatree_strkey(X, C, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes) \
             _c_using_aatree(C##X, C, cstr, Mapped, c_rawstr_compare, \
-                            mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes, \
-                            cstr_del, cstr_from, cstr_str, const char*)
+                            mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
+                            cstr_del, cstr_from, cstr_str, const char*, defTypes)
 
 
 #define using_csmap_strval(...) c_MACRO_OVERLOAD(using_csmap_strval, __VA_ARGS__)
@@ -119,8 +120,8 @@ int main(void) {
             using_csmap_strval_8(X, Key, keyCompare, keyDel, keyClone, c_default_toraw, Key, c_true)
 #define using_csmap_strval_8(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey, defTypes) \
             _c_using_aatree(csmap_##X, csmap_, Key, cstr, keyCompareRaw, \
-                            cstr_del, cstr_from, cstr_str, const char*, defTypes, \
-                            keyDel, keyFromRaw, keyToRaw, RawKey)
+                            cstr_del, cstr_from, cstr_str, const char*, \
+                            keyDel, keyFromRaw, keyToRaw, RawKey, defTypes)
 
 #define SET_ONLY_csmap_(...)
 #define MAP_ONLY_csmap_(...) __VA_ARGS__
@@ -159,8 +160,8 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
     } CX
 
 #define _c_using_aatree(CX, C, Key, Mapped, keyCompareRaw, \
-                        mappedDel, mappedFromRaw, mappedToRaw, RawMapped, defTypes, \
-                        keyDel, keyFromRaw, keyToRaw, RawKey) \
+                        mappedDel, mappedFromRaw, mappedToRaw, RawMapped, \
+                        keyDel, keyFromRaw, keyToRaw, RawKey, defTypes) \
     defTypes( _c_aatree_types(CX, C, Key, Mapped); ) \
 \
     MAP_ONLY_##C( struct CX##_value_t { \
