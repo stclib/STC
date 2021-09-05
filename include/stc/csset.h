@@ -43,30 +43,8 @@ int main(void) {
 }
 */
 
+#define i_CNT csset
+#define KEY_REF_csset(vp)   (vp)
 #include "csmap.h"
-
-#define forward_csset(X, Key) _c_aatree_types(csset_##X, csset_, Key, Key)
-
-#define using_csset(...) c_MACRO_OVERLOAD(using_csset, __VA_ARGS__)
-
-#define using_csset_2(X, Key) \
-            using_csset_3(X, Key, c_default_compare)
-#define using_csset_3(X, Key, keyCompare) \
-            using_csset_5(X, Key, keyCompare, c_default_del, c_default_fromraw)
-#define using_csset_4(X, Key, keyCompare, keyDel) \
-            using_csset_5(X, Key, keyCompare, keyDel, c_no_clone)
-#define using_csset_5(X, Key, keyCompare, keyDel, keyClone) \
-            using_csset_8(X, Key, keyCompare, keyDel, keyClone, c_default_toraw, Key, c_true)
-#define using_csset_8(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey, defTypes) \
-            _c_using_aatree(csset_##X, csset_, Key, Key, keyCompareRaw, \
-                            @@, @@, @@, void, keyDel, keyFromRaw, keyToRaw, RawKey, defTypes)
-
-#define using_csset_str() \
-            using_csset_8(str, cstr, c_rawstr_compare, cstr_del, \
-                          cstr_from, cstr_str, const char*, c_true)
-
-#define SET_ONLY_csset_(...) __VA_ARGS__
-#define MAP_ONLY_csset_(...)
-#define KEY_REF_csset_(vp)   (vp)
 
 #endif

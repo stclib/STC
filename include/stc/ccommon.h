@@ -54,8 +54,11 @@
 /* Macro overloading feature support based on: https://rextester.com/ONP80107 */
 #define c_MACRO_OVERLOAD(name, ...) \
         c_SELECT(name, c_NUM_ARGS(__VA_ARGS__))(__VA_ARGS__)
-#define c_SELECT(name, num) c_CONCAT(name ## _, num)
-#define c_CONCAT(a, b) a ## b
+#define c_SELECT(name, num) c_CONCAT3(name, _, num)
+#define c_CONCAT(a, b) a##b
+#define c_PASTE(a, b) c_CONCAT(a, b)
+#define c_CONCAT3(a, b, c) a##b##c
+#define c_PASTE3(a, b, c) c_CONCAT3(a, b, c)
 #define c_EXPAND(...) __VA_ARGS__
 #define c_NUM_ARGS(...) _c_APPLY_ARG_N((__VA_ARGS__, _c_RSEQ_N))
 
@@ -109,6 +112,8 @@
 
 #define c_true(...)             __VA_ARGS__
 #define c_false(...)
+#define _c_deftypes_            c_false
+#define _c_deftypes_i_FWD       c_true
 
 /* Generic algorithms */
 

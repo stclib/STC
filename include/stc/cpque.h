@@ -55,36 +55,36 @@
 
 #define using_cpque_2(X, ctype) \
             _c_using_cpque(cpque_##X, ctype, ctype##_value_compare)
-#define using_cpque_3(X, ctype, valueCompare) \
-            _c_using_cpque(cpque_##X, ctype, valueCompare)
+#define using_cpque_3(X, ctype, i_CMP) \
+            _c_using_cpque(cpque_##X, ctype, i_CMP)
 
-#define _c_using_cpque(CX, ctype, valueCompare) \
-    typedef ctype CX; \
-    typedef ctype##_value_t CX##_value_t; \
-    typedef ctype##_rawvalue_t CX##_rawvalue_t; \
+#define _c_using_cpque(Self, ctype, i_CMP) \
+    typedef ctype Self; \
+    typedef ctype##_value_t cx_value_t; \
+    typedef ctype##_rawvalue_t cx_rawvalue_t; \
 \
-    STC_INLINE CX           CX##_init(void) {return ctype##_init();} \
-    STC_INLINE CX           CX##_clone(CX pq) {return ctype##_clone(pq);} \
-    STC_INLINE CX##_value_t CX##_value_clone(CX##_value_t val) \
-                                {return ctype##_value_clone(val);} \
-    STC_INLINE void         CX##_clear(CX* self) {ctype##_clear(self);} \
-    STC_INLINE void         CX##_del(CX* self) {ctype##_del(self);} \
+    STC_INLINE Self           cx_memb(_init)(void) { return ctype##_init(); } \
+    STC_INLINE Self           cx_memb(_clone)(Self pq) { return ctype##_clone(pq); } \
+    STC_INLINE cx_value_t cx_memb(_value_clone)(cx_value_t val) \
+                                { return ctype##_value_clone(val); } \
+    STC_INLINE void         cx_memb(_clear)(Self* self) {ctype##_clear(self); } \
+    STC_INLINE void         cx_memb(_del)(Self* self) {ctype##_del(self); } \
 \
-    STC_INLINE size_t       CX##_size(CX pq) {return ctype##_size(pq);} \
-    STC_INLINE bool         CX##_empty(CX pq) {return ctype##_empty(pq);} \
+    STC_INLINE size_t       cx_memb(_size)(Self pq) { return ctype##_size(pq); } \
+    STC_INLINE bool         cx_memb(_empty)(Self pq) { return ctype##_empty(pq); } \
     \
-    STC_API void            CX##_make_heap(CX* self); \
-    STC_API void            CX##_erase_at(CX* self, size_t idx); \
+    STC_API void            cx_memb(_make_heap)(Self* self); \
+    STC_API void            cx_memb(_erase_at)(Self* self, size_t idx); \
     STC_INLINE \
-    const CX##_value_t*     CX##_top(const CX* self) {return &self->data[0];} \
-    STC_INLINE void         CX##_pop(CX* self) {CX##_erase_at(self, 0);} \
+    const cx_value_t*     cx_memb(_top)(const Self* self) { return &self->data[0]; } \
+    STC_INLINE void         cx_memb(_pop)(Self* self) {cx_memb(_erase_at)(self, 0); } \
     \
-    STC_API void            CX##_push(CX* self, CX##_value_t value); \
-    STC_INLINE void         CX##_emplace(CX* self, CX##_rawvalue_t raw) \
-                                {CX##_push(self, ctype##_value_fromraw(raw));} \
-    STC_API void            CX##_emplace_items(CX *self, const CX##_rawvalue_t arr[], size_t n); \
+    STC_API void            cx_memb(_push)(Self* self, cx_value_t value); \
+    STC_INLINE void         cx_memb(_emplace)(Self* self, cx_rawvalue_t raw) \
+                                {cx_memb(_push)(self, ctype##_value_fromraw(raw)); } \
+    STC_API void            cx_memb(_emplace_items)(Self *self, const cx_rawvalue_t arr[], size_t n); \
 \
-    _c_implement_cpque(CX, ctype, valueCompare) \
+    _c_implement_cpque(Self, ctype, i_CMP) \
     struct stc_trailing_semicolon
 
 
@@ -92,15 +92,15 @@
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-#define _c_implement_cpque(CX, ctype, valueCompare) \
+#define _c_implement_cpque(Self, ctype, i_CMP) \
 \
     STC_INLINE void \
-    CX##_sift_down_(CX##_value_t* arr, size_t i, size_t n) { \
+    cx_memb(_sift_down_)(cx_value_t* arr, size_t i, size_t n) { \
         size_t r = i, c = i << 1; \
         while (c <= n) { \
-            c += (c < n && valueCompare(&arr[c], &arr[c + 1]) < 0); \
-            if (valueCompare(&arr[r], &arr[c]) < 0) { \
-                CX##_value_t tmp = arr[r]; arr[r] = arr[c]; arr[r = c] = tmp; \
+            c += (c < n && i_CMP(&arr[c], &arr[c + 1]) < 0); \
+            if (i_CMP(&arr[r], &arr[c]) < 0) { \
+                cx_value_t tmp = arr[r]; arr[r] = arr[c]; arr[r = c] = tmp; \
             } else \
                 return; \
             c <<= 1; \
@@ -108,39 +108,39 @@
     } \
 \
     STC_API void \
-    CX##_make_heap(CX* self) { \
-        size_t n = CX##_size(*self); \
-        CX##_value_t *arr = self->data - 1; \
+    cx_memb(_make_heap)(Self* self) { \
+        size_t n = cx_memb(_size)(*self); \
+        cx_value_t *arr = self->data - 1; \
         for (size_t k = n >> 1; k != 0; --k) \
-            CX##_sift_down_(arr, k, n); \
+            cx_memb(_sift_down_)(arr, k, n); \
     } \
 \
     STC_API void \
-    CX##_erase_at(CX* self, size_t idx) { \
-        size_t n = CX##_size(*self) - 1; \
+    cx_memb(_erase_at)(Self* self, size_t idx) { \
+        size_t n = cx_memb(_size)(*self) - 1; \
         self->data[idx] = self->data[n]; \
         ctype##_pop_back(self); \
-        CX##_sift_down_(self->data - 1, idx + 1, n); \
+        cx_memb(_sift_down_)(self->data - 1, idx + 1, n); \
     } \
 \
     STC_API void \
-    CX##_push(CX* self, CX##_value_t value) { \
+    cx_memb(_push)(Self* self, cx_value_t value) { \
         ctype##_push_back(self, value); /* sift-up the value */ \
-        size_t n = CX##_size(*self), c = n; \
-        CX##_value_t *arr = self->data - 1; \
-        for (; c > 1 && valueCompare(&arr[c >> 1], &value) < 0; c >>= 1) \
+        size_t n = cx_memb(_size)(*self), c = n; \
+        cx_value_t *arr = self->data - 1; \
+        for (; c > 1 && i_CMP(&arr[c >> 1], &value) < 0; c >>= 1) \
             arr[c] = arr[c >> 1]; \
         if (c != n) arr[c] = value; \
     } \
 \
     STC_API void \
-    CX##_emplace_items(CX *self, const CX##_rawvalue_t arr[], size_t n) { \
+    cx_memb(_emplace_items)(Self *self, const cx_rawvalue_t arr[], size_t n) { \
         for (size_t i = 0; i < n; ++i) \
-            CX##_push(self, ctype##_value_fromraw(arr[i])); \
+            cx_memb(_push)(self, ctype##_value_fromraw(arr[i])); \
     } \
 
 #else
-#define _c_implement_cpque(CX, ctype, valueCompare)
+#define _c_implement_cpque(Self, ctype, i_CMP)
 #endif
 
 #endif

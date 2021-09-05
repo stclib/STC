@@ -50,169 +50,140 @@ int main() {
     }
 }
 */
-
-#define using_carray2(...) c_MACRO_OVERLOAD(using_carray2, __VA_ARGS__)
-
-#define using_carray2_2(X, Value) \
-            _c_using_carray2(carray2##X, Value, c_default_del, c_default_fromraw)
-#define using_carray2_3(X, Value, valueDel) \
-            _c_using_carray2(carray2##X, Value, valueDel, c_no_clone)
-#define using_carray2_4(X, Value, valueDel, valueClone) \
-            _c_using_carray2(carray2##X, Value, valueDel, valueClone)
-
-#define _c_using_carray2(CX, Value, valueDel, valueClone) \
+    defTypes( _c_carray2_types(Self, i_VAL); )
 \
-    typedef Value CX##_value_t; \
-    typedef struct { CX##_value_t **data; size_t xdim, ydim; } CX; \
-    typedef struct { CX##_value_t *ref; } CX##_iter_t; \
+    STC_API Self cx_memb(_with_values)(size_t xdim, size_t ydim, i_VAL value); \
+    STC_API Self cx_memb(_with_storage)(size_t xdim, size_t ydim, cx_value_t* storage); \
+    STC_API Self cx_memb(_clone)(Self src); \
 \
-    STC_API CX CX##_with_values(size_t xdim, size_t ydim, Value value); \
-    STC_API CX CX##_with_storage(size_t xdim, size_t ydim, CX##_value_t* storage); \
-    STC_API CX CX##_clone(CX src); \
-\
-    STC_INLINE CX CX##_init(size_t xdim, size_t ydim) { \
-        return CX##_with_storage(xdim, ydim, c_new_n(CX##_value_t, xdim*ydim)); \
+    STC_INLINE Self cx_memb(_init)(size_t xdim, size_t ydim) { \
+        return cx_memb(_with_storage)(xdim, ydim, c_new_n(cx_value_t, xdim*ydim)); \
     } \
-    STC_INLINE size_t CX##_size(CX arr) { return arr.xdim*arr.ydim; } \
-    STC_INLINE CX##_value_t *CX##_data(CX* self) { return *self->data; } \
-    STC_INLINE CX##_value_t *CX##_at(CX* self, size_t x, size_t y) { \
+    STC_INLINE size_t cx_memb(_size)(Self arr) { return arr.xdim*arr.ydim; } \
+    STC_INLINE cx_value_t *cx_memb(_data)(Self* self) { return *self->data; } \
+    STC_INLINE cx_value_t *cx_memb(_at)(Self* self, size_t x, size_t y) { \
         return *self->data + self->ydim*x + y; \
     } \
-    STC_INLINE CX##_value_t *CX##_release(CX* self) { \
-        CX##_value_t *t = *self->data; c_free(self->data); self->data = NULL; return t; \
+    STC_INLINE cx_value_t *cx_memb(_release)(Self* self) { \
+        cx_value_t *t = *self->data; c_free(self->data); self->data = NULL; return t; \
     } \
 \
-    STC_INLINE CX##_iter_t CX##_begin(const CX* self) { \
-        return c_make(CX##_iter_t){*self->data}; \
+    STC_INLINE cx_iter_t cx_memb(_begin)(const Self* self) { \
+        return c_make(cx_iter_t){*self->data}; \
     } \
-    STC_INLINE CX##_iter_t CX##_end(const CX* self) { \
-        return c_make(CX##_iter_t){*self->data + self->xdim*self->ydim}; \
+    STC_INLINE cx_iter_t cx_memb(_end)(const Self* self) { \
+        return c_make(cx_iter_t){*self->data + self->xdim*self->ydim}; \
     } \
-    STC_INLINE void CX##_next(CX##_iter_t* it) { ++it->ref; } \
+    STC_INLINE void cx_memb(_next)(cx_iter_t* it) { ++it->ref; } \
 \
-    _c_implement_carray2(CX, Value, valueDel, valueClone) \
-    STC_API void CX##_del(CX* self)
+    _c_implement_carray2(Self, i_VAL, i_VALDEL, i_VALFROM) \
+    STC_API void cx_memb(_del)(Self* self)
 
 // carray3:
 
-#define using_carray3(...) c_MACRO_OVERLOAD(using_carray3, __VA_ARGS__)
 
-#define using_carray3_2(X, Value) \
-    _c_using_carray3(carray3##X, Value, c_default_del, c_default_fromraw)
-#define using_carray3_3(X, Value, valueDel) \
-    _c_using_carray3(carray3##X, Value, valueDel, c_no_clone)
-#define using_carray3_4(X, Value, valueDel, valueClone) \
-    _c_using_carray3(carray3##X, Value, valueDel, valueClone)
-
-#define _c_using_carray3(CX, Value, valueDel, valueClone) \
+    defTypes( _c_carray3_types(Self, i_VAL); )
 \
-    typedef Value CX##_value_t; \
-    typedef struct { CX##_value_t ***data; size_t xdim, ydim, zdim; } CX; \
-    typedef struct { CX##_value_t *ref; } CX##_iter_t; \
+    STC_API Self cx_memb(_with_values)(size_t xdim, size_t ydim, size_t zdim, i_VAL value); \
+    STC_API Self cx_memb(_with_storage)(size_t xdim, size_t ydim, size_t zdim, cx_value_t* storage); \
+    STC_API Self cx_memb(_clone)(Self src); \
 \
-    STC_API CX CX##_with_values(size_t xdim, size_t ydim, size_t zdim, Value value); \
-    STC_API CX CX##_with_storage(size_t xdim, size_t ydim, size_t zdim, CX##_value_t* storage); \
-    STC_API CX CX##_clone(CX src); \
-\
-    STC_INLINE CX CX##_init(size_t xdim, size_t ydim, size_t zdim) { \
-        return CX##_with_storage(xdim, ydim, zdim, c_new_n(CX##_value_t, xdim*ydim*zdim)); \
+    STC_INLINE Self cx_memb(_init)(size_t xdim, size_t ydim, size_t zdim) { \
+        return cx_memb(_with_storage)(xdim, ydim, zdim, c_new_n(cx_value_t, xdim*ydim*zdim)); \
     } \
-    STC_INLINE size_t CX##_size(CX arr) { return arr.xdim*arr.ydim*arr.zdim; } \
-    STC_INLINE CX##_value_t* CX##_data(CX* self) { return **self->data; } \
-    STC_INLINE CX##_value_t* CX##_at(CX* self, size_t x, size_t y, size_t z) { \
+    STC_INLINE size_t cx_memb(_size)(Self arr) { return arr.xdim*arr.ydim*arr.zdim; } \
+    STC_INLINE cx_value_t* cx_memb(_data)(Self* self) { return **self->data; } \
+    STC_INLINE cx_value_t* cx_memb(_at)(Self* self, size_t x, size_t y, size_t z) { \
         return **self->data + self->zdim*(self->ydim*x + y) + z; \
     } \
 \
-    STC_INLINE CX##_value_t* CX##_release(CX* self) { \
-        CX##_value_t *values = **self->data; \
+    STC_INLINE cx_value_t* cx_memb(_release)(Self* self) { \
+        cx_value_t *values = **self->data; \
         c_free(self->data); self->data = NULL; \
         return values; \
     } \
 \
-    STC_INLINE CX##_iter_t CX##_begin(const CX* self) { \
-        return c_make(CX##_iter_t){**self->data}; \
+    STC_INLINE cx_iter_t cx_memb(_begin)(const Self* self) { \
+        return c_make(cx_iter_t){**self->data}; \
     } \
-    STC_INLINE CX##_iter_t CX##_end(const CX* self) { \
-        return c_make(CX##_iter_t){**self->data + CX##_size(*self)}; \
+    STC_INLINE cx_iter_t cx_memb(_end)(const Self* self) { \
+        return c_make(cx_iter_t){**self->data + cx_memb(_size)(*self)}; \
     } \
-    STC_INLINE void CX##_next(CX##_iter_t* it) { ++it->ref; } \
+    STC_INLINE void cx_memb(_next)(cx_iter_t* it) { ++it->ref; } \
 \
-    _c_implement_carray3(CX, Value, valueDel, valueClone) \
-    STC_API void CX##_del(CX* self)
+    _c_implement_carray3(Self, i_VAL, i_VALDEL, i_VALFROM) \
+    STC_API void cx_memb(_del)(Self* self)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-#define _c_implement_carray2(CX, Value, valueDel, valueClone) \
+#define _c_implement_carray2(Self, i_VAL, i_VALDEL, i_VALFROM) \
 \
-    STC_DEF CX CX##_with_storage(size_t xdim, size_t ydim, CX##_value_t* block) { \
-        CX _arr = {c_new_n(CX##_value_t*, xdim), xdim, ydim}; \
+    STC_DEF Self cx_memb(_with_storage)(size_t xdim, size_t ydim, cx_value_t* block) { \
+        Self _arr = {c_new_n(cx_value_t*, xdim), xdim, ydim}; \
         for (size_t x = 0; x < xdim; ++x, block += ydim) \
             _arr.data[x] = block; \
         return _arr; \
     } \
 \
-    STC_DEF CX CX##_with_values(size_t xdim, size_t ydim, Value value) { \
-        CX _arr = CX##_init(xdim, ydim); \
-        for (CX##_value_t* p = _arr.data[0], *e = p + xdim*ydim; p != e; ++p) \
+    STC_DEF Self cx_memb(_with_values)(size_t xdim, size_t ydim, i_VAL value) { \
+        Self _arr = cx_memb(_init)(xdim, ydim); \
+        for (cx_value_t* p = _arr.data[0], *e = p + xdim*ydim; p != e; ++p) \
             *p = value; \
         return _arr; \
     } \
 \
-    STC_DEF CX CX##_clone(CX src) { \
-        CX _arr = CX##_init(src.xdim, src.ydim); \
-        for (CX##_value_t* p = _arr.data[0], *q = src.data[0], *e = p + CX##_size(src); p != e; ++p, ++q) \
-            *p = valueClone(*q); \
+    STC_DEF Self cx_memb(_clone)(Self src) { \
+        Self _arr = cx_memb(_init)(src.xdim, src.ydim); \
+        for (cx_value_t* p = _arr.data[0], *q = src.data[0], *e = p + cx_memb(_size)(src); p != e; ++p, ++q) \
+            *p = i_VALFROM(*q); \
         return _arr; \
     } \
 \
-    STC_DEF void CX##_del(CX* self) { \
+    STC_DEF void cx_memb(_del)(Self* self) { \
         if (!self->data) return; \
-        for (CX##_value_t* p = self->data[0], *e = p + CX##_size(*self); p != e; ++p) \
-            valueDel(p); \
+        for (cx_value_t* p = self->data[0], *e = p + cx_memb(_size)(*self); p != e; ++p) \
+            i_VALDEL(p); \
         c_free(self->data[0]); /* data */ \
         c_free(self->data);    /* pointers */ \
     }
 
 // carray3 impl.
 
-#define _c_implement_carray3(CX, Value, valueDel, valueClone) \
+#define _c_implement_carray3(Self, i_VAL, i_VALDEL, i_VALFROM) \
 \
-    STC_DEF CX CX##_with_storage(size_t xdim, size_t ydim, size_t zdim, CX##_value_t* block) { \
-        CX _arr = {c_new_n(CX##_value_t**, xdim*(ydim + 1)), xdim, ydim, zdim}; \
-        CX##_value_t** p = (CX##_value_t**) &_arr.data[xdim]; \
+    STC_DEF Self cx_memb(_with_storage)(size_t xdim, size_t ydim, size_t zdim, cx_value_t* block) { \
+        Self _arr = {c_new_n(cx_value_t**, xdim*(ydim + 1)), xdim, ydim, zdim}; \
+        cx_value_t** p = (cx_value_t**) &_arr.data[xdim]; \
         for (size_t x = 0, y; x < xdim; ++x, p += ydim) \
             for (_arr.data[x] = p, y = 0; y < ydim; ++y, block += zdim) \
                 _arr.data[x][y] = block; \
         return _arr; \
     } \
 \
-    STC_DEF CX CX##_with_values(size_t xdim, size_t ydim, size_t zdim, Value value) { \
-        CX _arr = CX##_init(xdim, ydim, zdim); \
-        for (CX##_value_t* p = **_arr.data, *e = p + xdim*ydim*zdim; p != e; ++p) \
+    STC_DEF Self cx_memb(_with_values)(size_t xdim, size_t ydim, size_t zdim, i_VAL value) { \
+        Self _arr = cx_memb(_init)(xdim, ydim, zdim); \
+        for (cx_value_t* p = **_arr.data, *e = p + xdim*ydim*zdim; p != e; ++p) \
             *p = value; \
         return _arr; \
     } \
 \
-    STC_DEF CX CX##_clone(CX src) { \
-        CX _arr = CX##_init(src.xdim, src.ydim, src.zdim); \
-        for (CX##_value_t* p = **_arr.data, *q = **src.data, *e = p + CX##_size(src); p != e; ++p, ++q) \
-            *p = valueClone(*q); \
+    STC_DEF Self cx_memb(_clone)(Self src) { \
+        Self _arr = cx_memb(_init)(src.xdim, src.ydim, src.zdim); \
+        for (cx_value_t* p = **_arr.data, *q = **src.data, *e = p + cx_memb(_size)(src); p != e; ++p, ++q) \
+            *p = i_VALFROM(*q); \
         return _arr; \
     } \
 \
-    STC_DEF void CX##_del(CX* self) { \
+    STC_DEF void cx_memb(_del)(Self* self) { \
         if (!self->data) return; \
-        for (CX##_value_t* p = **self->data, *e = p + CX##_size(*self); p != e; ++p) \
-            valueDel(p); \
+        for (cx_value_t* p = **self->data, *e = p + cx_memb(_size)(*self); p != e; ++p) \
+            i_VALDEL(p); \
         c_free(self->data[0][0]); /* data */ \
         c_free(self->data);       /* pointers */ \
     }
 
-#else
-#define _c_implement_carray2(CX, Value, valueDel, valueClone)
-#define _c_implement_carray3(CX, Value, valueDel, valueClone)
 #endif
 
 #endif
