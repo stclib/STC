@@ -25,20 +25,20 @@
 
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
-#define cx_memb(name) c_PASTE(Self, name)
-#define Self c_PASTE3(i_MODULE, _, i_TAG)
-// typedef container types defined in forward.h
-#define cx_deftypes(macro, SELF, ...) macro(SELF, __VA_ARGS__)
-
-#define cx_value_t cx_memb(_value_t)
-#define cx_key_t cx_memb(_key_t)
-#define cx_mapped_t cx_memb(_mapped_t)
-#define cx_rawvalue_t cx_memb(_rawvalue_t)
-#define cx_rawkey_t cx_memb(_rawkey_t)
-#define cx_rawmapped_t cx_memb(_rawmapped_t)
-#define cx_iter_t cx_memb(_iter_t)
-#define cx_result_t cx_memb(_result_t)
-#define cx_node_t cx_memb(_node_t)
+  #define cx_memb(name) c_PASTE(Self, name)
+  #define Self c_PASTE3(i_MODULE, _, i_TAG)
+  // typedef container types defined in forward.h
+  #define cx_deftypes(macro, SELF, ...) macro(SELF, __VA_ARGS__)
+  
+  #define cx_value_t cx_memb(_value_t)
+  #define cx_key_t cx_memb(_key_t)
+  #define cx_mapped_t cx_memb(_mapped_t)
+  #define cx_rawvalue_t cx_memb(_rawvalue_t)
+  #define cx_rawkey_t cx_memb(_rawkey_t)
+  #define cx_rawmapped_t cx_memb(_rawmapped_t)
+  #define cx_iter_t cx_memb(_iter_t)
+  #define cx_result_t cx_memb(_result_t)
+  #define cx_node_t cx_memb(_node_t)
 #endif
 
 #if defined f_TAG
@@ -66,7 +66,9 @@
   #define i_VALTO   cstr_str
   #define i_VALRAW  const char*
 #endif
-
+#if defined i_KEY && !defined i_VAL
+  #define i_VAL i_KEY
+#endif
 #if !defined i_TAG && defined i_KEY_str
   #define i_TAG str
 #elif !defined i_TAG && defined i_KEY

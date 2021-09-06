@@ -89,20 +89,20 @@ STC_API size_t _clist_count(const clist_VOID* self);
     STC_INLINE size_t   cx_memb(_count)(Self lst) { return _clist_count((const clist_VOID*) &lst); } \
     STC_INLINE i_VAL    cx_memb(_value_fromraw)(i_VALRAW raw) { return i_VALFROM(raw); } \
     STC_INLINE i_VAL    cx_memb(_value_clone)(i_VAL val) { return i_VALFROM(i_VALTO(&val)); } \
-    STC_INLINE void     cx_memb(_clear)(Self* self) {cx_memb(_del)(self); } \
+    STC_INLINE void     cx_memb(_clear)(Self* self) { cx_memb(_del)(self); } \
     STC_INLINE void     cx_memb(_emplace_back)(Self* self, i_VALRAW raw) \
-                            {cx_memb(_push_back)(self, i_VALFROM(raw)); } \
+                            { cx_memb(_push_back)(self, i_VALFROM(raw)); } \
     STC_INLINE void     cx_memb(_emplace_front)(Self* self, i_VALRAW raw) \
-                            {cx_memb(_push_front)(self, i_VALFROM(raw)); } \
+                            { cx_memb(_push_front)(self, i_VALFROM(raw)); } \
     STC_INLINE cx_value_t* \
                         cx_memb(_front)(const Self* self) { return &self->last->next->value; } \
     STC_INLINE cx_value_t* \
                         cx_memb(_back)(const Self* self) { return &self->last->value; } \
-    STC_INLINE void     cx_memb(_pop_front)(Self* self) {cx_memb(_erase_after_)(self, self->last); } \
+    STC_INLINE void     cx_memb(_pop_front)(Self* self) { cx_memb(_erase_after_)(self, self->last); } \
     STC_INLINE void     cx_memb(_splice_front)(Self* self, Self* other) \
-                            {cx_memb(_splice_after)(self, cx_memb(_before_begin)(self), other); } \
+                            { cx_memb(_splice_after)(self, cx_memb(_before_begin)(self), other); } \
     STC_INLINE void     cx_memb(_splice_back)(Self* self, Self* other) \
-                            {cx_memb(_splice_after)(self, cx_memb(_last)(self), other); } \
+                            { cx_memb(_splice_after)(self, cx_memb(_last)(self), other); } \
 \
     STC_INLINE cx_iter_t \
     cx_memb(_emplace_after)(Self* self, cx_iter_t pos, i_VALRAW raw) { \

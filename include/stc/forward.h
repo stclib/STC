@@ -27,29 +27,21 @@
 #define forward_carray3(TAG, VAL) _c_carray3_types(carray2##TAG, VAL)
 #define forward_cdeq(TAG, VAL) _c_cdeq_types(cdeq_##TAG, VAL)
 #define forward_clist(TAG, VAL) _c_clist_types(clist_##TAG, VAL)
-#define forward_cmap(TAG, KEY, VAL) _c_chash_types(csmap_##TAG, cmap, KEY, VAL)
-#define forward_csmap(TAG, KEY, VAL) _c_aatree_types(csmap_##TAG, csmap, KEY, VAL)
-#define forward_cset(TAG, KEY) _c_chash_types(cset_##TAG, cset, KEY, KEY)
-#define forward_csset(TAG, KEY) _c_aatree_types(csset_##TAG, csset, KEY, KEY)
+#define forward_cmap(TAG, KEY, VAL) _c_chash_types(cmap_##TAG, KEY, VAL, c_true, c_false)
+#define forward_csmap(TAG, KEY, VAL) _c_aatree_types(csmap_##TAG, KEY, VAL, c_true, c_false)
+#define forward_cset(TAG, KEY) _c_chash_types(cset_##TAG, cset, KEY, KEY, c_false, c_true)
+#define forward_csset(TAG, KEY) _c_aatree_types(csset_##TAG, KEY, KEY, c_false, c_true)
 #define forward_csptr(TAG, VAL) _csptr_types(csptr_##TAG, VAL)
 #define forward_cpque(TAG, ctype) _c_cpque_types(cpque_##TAG, ctype)
 #define forward_cqueue(TAG, ctype) _c_cqueue_types(cqueue_##TAG, ctype)
 #define forward_cstack(TAG, ctype) _c_cstack_types(cstack_##TAG, ctype)
 #define forward_cvec(TAG, VAL) _c_cvec_types(cvec_##TAG, VAL)
 
-#define SET_ONLY_cmap_(...)
-#define MAP_ONLY_cmap_(...) __VA_ARGS__
-#define SET_ONLY_cset_(...) __VA_ARGS__
-#define MAP_ONLY_cset_(...)
-
-#define SET_ONLY_csmap_(...)
-#define MAP_ONLY_csmap_(...) __VA_ARGS__
-#define SET_ONLY_csset_(...) __VA_ARGS__
-#define MAP_ONLY_csset_(...)
-
 #ifndef MAP_SIZE_T
 #define MAP_SIZE_T uint32_t
 #endif
+#define c_true(...) __VA_ARGS__
+#define c_false(...)
 
 #define _c_carray2_types(SELF, VAL) \
     typedef VAL SELF##_value_t; \
@@ -79,13 +71,13 @@
         SELF##_node_t *last; \
     } SELF
 
-#define _c_chash_types(SELF, C, KEY, VAL) \
+#define _c_chash_types(SELF, KEY, VAL, MAP_ONLY, SET_ONLY) \
     typedef KEY SELF##_key_t; \
     typedef VAL SELF##_mapped_t; \
     typedef MAP_SIZE_T SELF##_size_t; \
 \
-    typedef SET_ONLY_##C( SELF##_key_t ) \
-            MAP_ONLY_##C( struct SELF##_value_t ) \
+    typedef SET_ONLY( SELF##_key_t ) \
+            MAP_ONLY( struct SELF##_value_t ) \
     SELF##_value_t; \
 \
     typedef struct { \
@@ -105,13 +97,13 @@
         float max_load_factor; \
     } SELF
 
-#define _c_aatree_types(SELF, C, KEY, VAL) \
+#define _c_aatree_types(SELF, KEY, VAL, MAP_ONLY, SET_ONLY) \
     typedef KEY SELF##_key_t; \
     typedef VAL SELF##_mapped_t; \
     typedef MAP_SIZE_T SELF##_size_t; \
 \
-    typedef SET_ONLY_##C( SELF##_key_t ) \
-            MAP_ONLY_##C( struct SELF##_value_t ) \
+    typedef SET_ONLY( SELF##_key_t ) \
+            MAP_ONLY( struct SELF##_value_t ) \
     SELF##_value_t; \
 \
     typedef struct { \

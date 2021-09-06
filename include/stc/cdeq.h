@@ -55,9 +55,9 @@
     STC_INLINE i_VAL         cx_memb(_value_clone)(i_VAL val) \
                                 { return i_VALFROM(i_VALTO(&val)); } \
     STC_INLINE void          cx_memb(_emplace_back)(Self* self, i_VALRAW raw) \
-                                {cx_memb(_push_back)(self, i_VALFROM(raw)); } \
+                                { cx_memb(_push_back)(self, i_VALFROM(raw)); } \
     STC_INLINE void          cx_memb(_emplace_front)(Self* self, i_VALRAW raw) \
-                                {cx_memb(_push_front)(self, i_VALFROM(raw)); } \
+                                { cx_memb(_push_front)(self, i_VALFROM(raw)); } \
     STC_INLINE void          cx_memb(_pop_back)(Self* self) \
                                 {i_VALDEL(&self->data[--_cdeq_rep(self)->size]); } \
     STC_INLINE void          cx_memb(_pop_front)(Self* self) \

@@ -77,11 +77,11 @@
     STC_API void            cx_memb(_erase_at)(Self* self, size_t idx); \
     STC_INLINE \
     const cx_value_t*     cx_memb(_top)(const Self* self) { return &self->data[0]; } \
-    STC_INLINE void         cx_memb(_pop)(Self* self) {cx_memb(_erase_at)(self, 0); } \
+    STC_INLINE void         cx_memb(_pop)(Self* self) { cx_memb(_erase_at)(self, 0); } \
     \
     STC_API void            cx_memb(_push)(Self* self, cx_value_t value); \
     STC_INLINE void         cx_memb(_emplace)(Self* self, cx_rawvalue_t raw) \
-                                {cx_memb(_push)(self, ctype##_value_fromraw(raw)); } \
+                                { cx_memb(_push)(self, ctype##_value_fromraw(raw)); } \
     STC_API void            cx_memb(_emplace_items)(Self *self, const cx_rawvalue_t arr[], size_t n); \
 \
     _c_implement_cpque(Self, ctype, i_CMP) \

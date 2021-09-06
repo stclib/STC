@@ -174,19 +174,19 @@ STC_INLINE Self         cx_memb(_init)(void) { return c_make(Self){NULL}; }
 STC_INLINE bool         cx_memb(_empty)(Self cx) { return cx.last == NULL; }
 STC_INLINE size_t       cx_memb(_count)(Self cx)
                             { return _clist_count((const clist_VOID*) &cx); }
-STC_INLINE void         cx_memb(_clear)(Self* self) {cx_memb(_del)(self); }
+STC_INLINE void         cx_memb(_clear)(Self* self) { cx_memb(_del)(self); }
 STC_INLINE i_VAL        cx_memb(_value_fromraw)(i_VALRAW raw) { return i_VALFROM(raw); }
 STC_INLINE i_VALRAW     cx_memb(_value_toraw)(cx_value_t* pval) { return i_VALTO(pval); }
 STC_INLINE i_VAL        cx_memb(_value_clone)(i_VAL val)
                             { return i_VALFROM(i_VALTO(&val)); }
 STC_INLINE void         cx_memb(_pop_front)(Self* self)
-                            {cx_memb(_erase_after_)(self, self->last); }
+                            { cx_memb(_erase_after_)(self, self->last); }
 STC_INLINE cx_iter_t    cx_memb(_erase)(Self* self, cx_iter_t it)
                             { return cx_memb(_erase_at)(self, it); }
 STC_INLINE void         cx_memb(_emplace_back)(Self* self, i_VALRAW raw)
-                            {cx_memb(_push_back)(self, i_VALFROM(raw)); }
+                            { cx_memb(_push_back)(self, i_VALFROM(raw)); }
 STC_INLINE void         cx_memb(_emplace_front)(Self* self, i_VALRAW raw)
-                            {cx_memb(_push_front)(self, i_VALFROM(raw)); }
+                            { cx_memb(_push_front)(self, i_VALFROM(raw)); }
 STC_INLINE cx_iter_t    cx_memb(_emplace)(Self* self, cx_iter_t it, i_VALRAW raw)
                             { return cx_memb(_insert)(self, it, i_VALFROM(raw)); }
 STC_INLINE cx_value_t*  cx_memb(_front)(const Self* self) { return &self->last->next->value; }

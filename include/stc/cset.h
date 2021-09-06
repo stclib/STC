@@ -20,15 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CSET_H_INCLUDED
-#define CSET_H_INCLUDED
 
 // Unordered set - implemented as closed hashing with linear probing and no tombstones.
 /*
+#define i_TAG sx
+#define i_KEY int
 #include <stc/cset.h>
 #include <stdio.h>
-
-using_cset(sx, int);    // Set of int
 
 int main(void) {
     cset_sx s = cset_sx_init();
@@ -41,8 +39,8 @@ int main(void) {
 }
 */
 
-#define i_CNT cmap
-#define KEY_REF_cset(vp)   (vp)
+#define i_MODULE cset
+#define cx_MAP_ONLY c_false
+#define cx_SET_ONLY c_true
+#define cx_keyref(vp) (vp)
 #include "cmap.h"
-
-#endif
