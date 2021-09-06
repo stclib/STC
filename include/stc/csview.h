@@ -25,8 +25,8 @@
 
 #include "cstr.h"
 
-typedef                 struct { const char* str; size_t size; } csview;
-typedef                 struct { const char *ref; } csview_iter_t;
+typedef                 struct csview { const char* str; size_t size; } csview;
+typedef                 struct csview_iter { const char *ref; } csview_iter_t;
 typedef                 char csview_value_t;
 
 #define                 csview_null  c_make(csview){"", 0}
@@ -81,12 +81,12 @@ STC_INLINE void          csview_next(csview_iter_t* it) { ++it->ref; }
 
 STC_INLINE cstr         cstr_from_v(csview sv)
                             { return cstr_from_n(sv.str, sv.size); }
-STC_INLINE cstr         cstr_from_replace_all_v(csview sv, csview find, csview repl) 
+STC_INLINE cstr         cstr_from_replace_all_v(csview sv, csview find, csview repl)
                             { return cstr_from_replace_all(sv.str, sv.size, find.str, find.size,
                                                            repl.str, repl.size); }
 STC_INLINE csview       cstr_to_v(const cstr* self)
                             { return c_make(csview){self->str, _cstr_rep(self)->size}; }
-STC_INLINE csview       cstr_substr(cstr s, intptr_t pos, size_t n) 
+STC_INLINE csview       cstr_substr(cstr s, intptr_t pos, size_t n)
                             { return csview_substr(csview_from_s(s), pos, n); }
 STC_INLINE csview       cstr_slice(cstr s, intptr_t p1, intptr_t p2)
                             { return csview_slice(csview_from_s(s), p1, p2); }
@@ -133,12 +133,12 @@ STC_DEF csview
 csview_slice(csview sv, intptr_t p1, intptr_t p2) {
     if (p1 < 0) { p1 += sv.size; if (p1 < 0) p1 = 0; }
     if (p2 < 0) p2 += sv.size; if (p2 > sv.size) p2 = sv.size;
-    sv.str += p1, sv.size = p2 > p1 ? p2 - p1 : 0; return sv; 
+    sv.str += p1, sv.size = p2 > p1 ? p2 - p1 : 0; return sv;
 }
 
 STC_DEF csview
 csview_first_token(csview sv, csview sep) {
-    const char* res = c_strnstrn(sv.str, sep.str, sv.size, sep.size); 
+    const char* res = c_strnstrn(sv.str, sep.str, sv.size, sep.size);
     return c_make(csview){sv.str, (res ? res - sv.str : sv.size)};
 }
 

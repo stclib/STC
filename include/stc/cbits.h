@@ -56,10 +56,10 @@ int main() {
 #include <string.h>
 #include "ccommon.h"
 
-typedef struct {
-    uint64_t *data64; 
-    size_t size; 
-} cbits;
+struct cbits {
+    uint64_t *data64;
+    size_t size;
+} typedef cbits;
 
 STC_API cbits       cbits_with_size(size_t size, bool value);
 STC_API cbits       cbits_with_values(size_t size, uint64_t pattern);

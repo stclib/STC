@@ -30,9 +30,9 @@
 #include <stdio.h> /* vsnprintf */
 #include <ctype.h>
 
-typedef                 struct { char* str; } cstr;
-typedef                 struct { char *ref; } cstr_iter_t;
-typedef                 char                  cstr_value_t;
+typedef                 struct cstr { char* str; } cstr;
+typedef                 struct cstr_iter { char *ref; } cstr_iter_t;
+typedef                 char cstr_value_t;
 
 #define cstr_npos       (SIZE_MAX >> 1)
 STC_LIBRARY_ONLY(       extern const cstr cstr_null; )
