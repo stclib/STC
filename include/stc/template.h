@@ -1,18 +1,9 @@
 #ifndef STC_TEMPLATE_INCLUDED
 #define STC_TEMPLATE_INCLUDED
 
-#if defined I_TAG
-  #define i_TAG I_TAG
-  #define i_IMP
-#endif
 #if defined f_TAG
   #define i_TAG f_TAG
   #define i_FWD
-#endif
-#if defined F_TAG
-  #define i_TAG F_TAG
-  #define i_FWD
-  #define i_IMP
 #endif
 
 #if defined i_KEY_str
@@ -36,27 +27,28 @@
   #define i_VALRAW  const char*
 #endif
 
-#if !defined i_TAG && (defined i_KEY_str || defined i_VAL_str)
+#if !defined i_TAG && defined i_KEY_str
   #define i_TAG str
-#endif
-#if !defined i_TAG && defined i_KEY
+#elif !defined i_TAG && defined i_KEY
   #define i_TAG i_KEY
+#elif !defined i_TAG && defined i_VAL_str
+  #define i_TAG str
 #elif !defined i_TAG && defined i_VAL
   #define i_TAG i_VAL
 #endif
 
-#define Self c_PASTE3(i_CNT, _, i_TAG)
+#define Self c_PASTE3(i_MODULE, _, i_TAG)
 #define cx_memb(name) c_PASTE(Self, name)
 
 #define cx_value_t cx_memb(_value_t)
 #define cx_rawvalue_t cx_memb(_rawvalue_t)
 #define cx_iter_t cx_memb(_iter_t)
 
-#if defined i_VALTO ^ defined i_VALRAW
-  #error i_VALTO and i_VALRAW must both be defined
+#if (defined i_VALTO ^ defined i_VALRAW) || (defined i_VALRAW && !defined i_VALFROM)
+  #error if i_VALRAW defined, both i_VALFROM and i_VALTO must be defined
 #endif
-#if defined i_KEYTO ^ defined i_KEYRAW
-  #error i_KEYTO and i_KEYRAW must both be defined
+#if (defined i_KEYTO ^ defined i_KEYRAW) || (defined i_KEYRAW && !defined i_KEYFROM)
+  #error if i_KEYRAW defined, both i_KEYFROM and i_KEYTO must be defined
 #endif
 
 #if defined i_KEY
@@ -75,6 +67,14 @@
     #define i_KEYRAW i_KEY
     #define i_KEYTO c_default_toraw
   #endif
+  #if !defined i_EQU && defined i_CMP
+    #define i_EQU !i_CMP
+  #elif !defined i_EQU
+    #define i_EQU c_default_equals
+  #endif
+  #ifndef i_HASH
+    #define i_HASH c_default_hash
+  #endif
 #endif
 
 #if !defined i_VALFROM && defined i_VALDEL
@@ -86,18 +86,11 @@
   #define i_VALRAW i_VAL
   #define i_VALTO c_default_toraw
 #endif
-
 #ifndef i_KEYDEL
   #define i_KEYDEL c_default_del
 #endif
 #ifndef i_VALDEL
   #define i_VALDEL c_default_del
-#endif
-#ifndef i_EQU
-  #define i_EQU c_default_equals
-#endif
-#ifndef i_HASH
-  #define i_HASH c_default_hash
 #endif
 #ifndef i_CMP
   #define i_CMP c_default_compare
@@ -112,7 +105,7 @@
 
 #else // -------------------------------------------------------
 
-#undef i_CNT
+#undef i_MODULE
 #undef i_TAG
 #undef f_TAG
 #undef i_IMP

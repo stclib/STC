@@ -39,7 +39,9 @@
 #endif
 #define STC_INLINE static inline
 
-#if defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
+#if !defined(STC_HEADER) && (defined(STC_IMPLEMENTATION) || defined(i_IMP))
+#  error STC_HEADER should be defined when STC_IMPLEMENTATION or i_IMP is used
+#elif defined(STC_HEADER) && (defined(STC_IMPLEMENTATION) || defined(i_IMP))
 #  define STC_API extern
 #  define STC_DEF
 #  define STC_LIBRARY_ONLY(...) __VA_ARGS__
@@ -109,11 +111,6 @@
 #define c_default_toraw(ptr)    (*(ptr))
 
 #define c_default_del(ptr)      ((void) (ptr))
-
-#define c_true(...)             __VA_ARGS__
-#define c_false(...)
-#define _c_deftypes_            c_false
-#define _c_deftypes_i_FWD       c_true
 
 /* Generic algorithms */
 
