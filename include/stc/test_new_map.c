@@ -18,7 +18,7 @@ int point_compare(const Point* a, const Point* b) {
     int c = c_default_compare(&a->x, &b->x);
     return c ? c : c_default_compare(&a->y, &b->y);
 }
-#define f_TAG pnt
+#define f_TAG pnt  // f=forward declared
 #define i_KEY Point
 #define i_VAL int
 #define i_CMP point_compare
@@ -27,7 +27,6 @@ int point_compare(const Point* a, const Point* b) {
 #define i_KEY_str
 #define i_VAL_str
 #include "cmap.h"
-
 
 #define i_KEY_str
 #include "cset.h"

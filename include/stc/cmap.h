@@ -118,10 +118,7 @@ STC_API void            cx_memb(_reserve)(Self* self, size_t capacity);
 STC_API chash_bucket_t  cx_memb(_bucket_)(const Self* self, const cx_rawkey_t* rkeyptr);
 STC_API cx_result_t     cx_memb(_insert_entry_)(Self* self, i_KEYRAW rkey);
 STC_API void            cx_memb(_erase_entry)(Self* self, cx_value_t* val);
-cx_MAP_ONLY(
-    STC_API cx_result_t cx_memb(_insert_or_assign)(Self* self, i_KEY _key, i_VAL _mapped);
-    STC_API cx_result_t cx_memb(_emplace_or_assign)(Self* self, i_KEYRAW rkey, i_VALRAW rmapped);
-)
+
 STC_INLINE Self         cx_memb(_init)(void) { return c_make(Self)_cmap_inits; }
 STC_INLINE void         cx_memb(_shrink_to_fit)(Self* self) { cx_memb(_reserve)(self, self->size); }
 STC_INLINE void         cx_memb(_max_load_factor)(Self* self, float ml) {self->max_load_factor = ml; }
@@ -133,6 +130,22 @@ STC_INLINE size_t       cx_memb(_capacity)(Self map)
 STC_INLINE void         cx_memb(_swap)(Self *map1, Self *map2) {c_swap(Self, *map1, *map2); }
 STC_INLINE bool         cx_memb(_contains)(const Self* self, i_KEYRAW rkey)
                             { return self->size && self->_hashx[cx_memb(_bucket_)(self, &rkey).idx]; }
+
+cx_MAP_ONLY(
+    STC_API cx_result_t cx_memb(_insert_or_assign)(Self* self, i_KEY _key, i_VAL _mapped);
+    STC_API cx_result_t cx_memb(_emplace_or_assign)(Self* self, i_KEYRAW rkey, i_VALRAW rmapped);
+                            
+    STC_INLINE cx_result_t  /* short-form, like operator[]: */
+    cx_memb(_put)(Self* self, i_KEY key, i_VAL mapped) { 
+        return cx_memb(_insert_or_assign)(self, key, mapped);
+    }
+    
+    STC_INLINE cx_mapped_t*
+    cx_memb(_at)(const Self* self, i_KEYRAW rkey) { 
+        chash_bucket_t b = cx_memb(_bucket_)(self, &rkey);
+        return &self->table[b.idx].second;
+    }
+)
 
 STC_INLINE void
 cx_memb(_value_clone)(cx_value_t* _dst, cx_value_t* _val) {
