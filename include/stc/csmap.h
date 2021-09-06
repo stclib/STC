@@ -56,7 +56,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
 #define _csmap_rep(self) c_container_of((self)->nodes, struct csmap_rep, nodes)
 
 #if !defined cx_forwarded
-    _c_aatree_types(Self, C, i_KEY, i_VAL); 
+    _c_aatree_types(Self, C, i_KEY, i_VAL);
 #endif
 
 \
@@ -380,7 +380,7 @@ static struct csmap_rep _csmap_sentinel = {0, 0, 0, 0, 0};
                 tx = d[tn].link[0]; \
                 while (d[tx].link[1]) \
                     tx = d[tx].link[1]; \
-                memcpy((void *) &d[tn].value, &d[tx].value, sizeof d[0].value); /* move */ \
+                d[tn].value = d[tx].value; /* move */ \
                 raw = i_KEYTO(cx_keyref(&d[tn].value)); \
                 d[tn].link[0] = cx_memb(_erase_r_)(d, d[tn].link[0], &raw, erased); \
             } else { /* unlink node */ \

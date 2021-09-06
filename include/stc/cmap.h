@@ -134,14 +134,14 @@ STC_INLINE bool         cx_memb(_contains)(const Self* self, i_KEYRAW rkey)
 cx_MAP_ONLY(
     STC_API cx_result_t cx_memb(_insert_or_assign)(Self* self, i_KEY _key, i_VAL _mapped);
     STC_API cx_result_t cx_memb(_emplace_or_assign)(Self* self, i_KEYRAW rkey, i_VALRAW rmapped);
-                            
+
     STC_INLINE cx_result_t  /* short-form, like operator[]: */
-    cx_memb(_put)(Self* self, i_KEY key, i_VAL mapped) { 
+    cx_memb(_put)(Self* self, i_KEY key, i_VAL mapped) {
         return cx_memb(_insert_or_assign)(self, key, mapped);
     }
-    
+
     STC_INLINE cx_mapped_t*
-    cx_memb(_at)(const Self* self, i_KEYRAW rkey) { 
+    cx_memb(_at)(const Self* self, i_KEYRAW rkey) {
         chash_bucket_t b = cx_memb(_bucket_)(self, &rkey);
         return &self->table[b.idx].second;
     }
@@ -346,7 +346,7 @@ cx_memb(_reserve)(Self* self, size_t _newcap) {
         if (_tmp._hashx[i]) {
             cx_rawkey_t _raw = i_KEYTO(cx_keyref(e));
             chash_bucket_t b = cx_memb(_bucket_)(self, &_raw);
-            memcpy((void *) &_slot[b.idx], e, sizeof *e);
+            _slot[b.idx] = *e;
             _hashx[b.idx] = (uint8_t) b.hx;
         }
     c_free(_tmp._hashx);
@@ -366,7 +366,7 @@ cx_memb(_erase_entry)(Self* self, cx_value_t* _val) {
         cx_rawkey_t _raw = i_KEYTO(cx_keyref(_slot+j));
         k = c_PASTE(fastrange_,MAP_SIZE_T)(i_HASH(&_raw, sizeof _raw), _cap);
         if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */
-            memcpy((void *) &_slot[i], &_slot[j], sizeof *_slot), _hashx[i] = _hashx[j], i = j;
+            _slot[i] = _slot[j], _hashx[i] = _hashx[j], i = j;
     }
     _hashx[i] = 0;
     --self->size;
