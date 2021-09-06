@@ -20,6 +20,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+ 
+/*
+#include <stc/cstr.h>
+#include <stc/forward.h>
+
+forward_cvec(i32, int);
+
+struct MyStruct {
+    cvec_i32 int_vec;
+    cstr name;
+} typedef MyStruct;
+
+#define i_VAL float
+#include <stc/cvec.h>
+
+#define i_VAL_str // special for cstr
+#include <stc/cvec.h>
+
+#define f_TAG i32 // f: forward declared above; shorthand for i_FWD
+#define i_VAL int
+#include <stc/cvec.h>
+
+int main() {
+    cvec_i32 vec = cvec_i32_init();
+    cvec_i32_push_back(&vec, 123);
+    cvec_i32_del(&vec);
+
+    cvec_float fvec = cvec_float_init();
+    cvec_float_push_back(&fvec, 123.3);
+    cvec_float_del(&fvec);
+
+    cvec_str svec = cvec_str_init();
+    cvec_str_emplace_back(&svec, "Hello, friend");
+    cvec_str_del(&svec);
+}
+*/
 
 #ifndef CVEC_H_INCLUDED
 #include "ccommon.h"
@@ -183,8 +219,10 @@ cx_memb(_sort)(Self* self) {
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
-#if defined i_IMP
+#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_IMP)
+
 #ifndef CVEC_H_INCLUDED
+#define CVEC_H_INCLUDED
 static struct cvec_Rep_ _cvec_sentinel = {0, 0};
 #endif
 
@@ -322,5 +360,4 @@ cx_memb(_value_compare)(const cx_value_t* x, const cx_value_t* y) {
 }
 
 #endif
-#define CVEC_H_INCLUDED
 #include "template.h"

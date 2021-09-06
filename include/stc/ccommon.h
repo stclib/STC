@@ -39,9 +39,7 @@
 #endif
 #define STC_INLINE static inline
 
-#if !defined(STC_HEADER) && (defined(STC_IMPLEMENTATION) || defined(i_IMP))
-#  error STC_HEADER should be defined when STC_IMPLEMENTATION or i_IMP is used
-#elif defined(STC_HEADER) && (defined(STC_IMPLEMENTATION) || defined(i_IMP))
+#if defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_IMP)
 #  define STC_API extern
 #  define STC_DEF
 #  define STC_LIBRARY_ONLY(...) __VA_ARGS__
