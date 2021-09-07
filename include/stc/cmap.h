@@ -25,24 +25,24 @@
 /*
 #include <stdio.h>
 
-#define i_tag mx
+#define i_tag ichar  // Map int => char
 #define i_key int
-#define i_val char // Map of int -> char
+#define i_val char
 #include <stc/cmap.h>
 
 int main(void) {
-    c_forvar (cmap_mx m = cmap_mx_init(), cmap_mx_del(&m))
+    c_forvar (cmap_ichar m = cmap_ichar_init(), cmap_ichar_del(&m))
     {
-        cmap_mx_emplace(&m, 5, 'a');
-        cmap_mx_emplace(&m, 8, 'b');
-        cmap_mx_emplace(&m, 12, 'c');
+        cmap_ichar_emplace(&m, 5, 'a');
+        cmap_ichar_emplace(&m, 8, 'b');
+        cmap_ichar_emplace(&m, 12, 'c');
 
-        cmap_mx_iter_t it = cmap_mx_find(&m, 10); // none
-        char val = cmap_mx_find(&m, 5).ref->second;
-        cmap_mx_emplace_or_assign(&m, 5, 'd'); // update
-        cmap_mx_erase(&m, 8);
+        cmap_ichar_value_t* v = cmap_ichar_get(&m, 10); // NULL
+        char val = *cmap_ichar_at(&m, 5);               // 'a'
+        cmap_ichar_emplace_or_assign(&m, 5, 'd');       // update
+        cmap_ichar_erase(&m, 8);
 
-        c_foreach (i, cmap_mx, m)
+        c_foreach (i, cmap_ichar, m)
             printf("map %d: %c\n", i.ref->first, i.ref->second);
     }
 }
@@ -170,7 +170,7 @@ cx_memb(_emplace)(Self* self, i_keyraw rkey cx_MAP_ONLY(, i_valraw rmapped)) {
     cx_result_t _res = cx_memb(_insert_entry_)(self, rkey);
     if (_res.inserted) {
         *cx_keyref(_res.ref) = i_keyfrom(rkey);
-        cx_MAP_ONLY(_res.ref->second = i_valfrom(rmapped);)
+        cx_MAP_ONLY( _res.ref->second = i_valfrom(rmapped); )
     }
     return _res;
 }
@@ -178,14 +178,14 @@ cx_memb(_emplace)(Self* self, i_keyraw rkey cx_MAP_ONLY(, i_valraw rmapped)) {
 STC_INLINE void
 cx_memb(_emplace_items)(Self* self, const cx_rawvalue_t arr[], size_t n) {
     for (size_t i=0; i<n; ++i) cx_SET_ONLY( cx_memb(_emplace)(self, arr[i]); )
-                                cx_MAP_ONLY( cx_memb(_emplace)(self, arr[i].first, arr[i].second); )
+                               cx_MAP_ONLY( cx_memb(_emplace)(self, arr[i].first, arr[i].second); )
 }
 
 STC_INLINE cx_result_t
 cx_memb(_insert)(Self* self, i_key _key cx_MAP_ONLY(, i_val _mapped)) {
     cx_result_t _res = cx_memb(_insert_entry_)(self, i_keyto(&_key));
     if (_res.inserted) { *cx_keyref(_res.ref) = _key; cx_MAP_ONLY( _res.ref->second = _mapped; )}
-    else              { i_keydel(&_key); cx_MAP_ONLY( i_valdel(&_mapped); )}
+    else               { i_keydel(&_key); cx_MAP_ONLY( i_valdel(&_mapped); )}
     return _res;
 }
 
@@ -363,7 +363,7 @@ cx_memb(_erase_entry)(Self* self, cx_value_t* _val) {
         if (++j == _cap) j = 0;
         if (! _hashx[j])
             break;
-        cx_rawkey_t _raw = i_keyto(cx_keyref(_slot+j));
+        cx_rawkey_t _raw = i_keyto(cx_keyref(_slot + j));
         k = c_PASTE(fastrange_,MAP_SIZE_T)(i_hash(&_raw, sizeof _raw), _cap);
         if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */
             _slot[i] = _slot[j], _hashx[i] = _hashx[j], i = j;
