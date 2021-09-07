@@ -78,7 +78,7 @@ _c_clist_complete_types(clist_VOID, dummy);
 #if !defined i_fwd
 cx_deftypes(_c_clist_types, Self, i_val);
 #endif
-cx_deftypes(_c_clist_complete_types, Self);
+cx_deftypes(_c_clist_complete_types, Self, dummy);
 typedef i_valraw cx_rawvalue_t;
 
 

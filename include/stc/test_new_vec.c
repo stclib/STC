@@ -1,5 +1,5 @@
-#include "cstr.h"
-#include "forward.h"
+#include <stc/cstr.h>
+#include <stc/forward.h>
 
 forward_cvec(i32, int);
 forward_cvec(pnt, struct Point);
@@ -12,7 +12,7 @@ struct MyStruct {
 
 #define f_tag i32
 #define i_val int
-#include "cvec.h"
+#include <stc/cvec.h>
 
 struct Point { int x, y; } typedef Point;
 int point_compare(const Point* a, const Point* b) {
@@ -22,13 +22,13 @@ int point_compare(const Point* a, const Point* b) {
 #define f_tag pnt
 #define i_val Point
 #define i_cmp point_compare
-#include "cvec.h"
+#include <stc/cvec.h>
 
 #define i_val float
-#include "cvec.h"
+#include <stc/cvec.h>
 
 #define i_val_str
-#include "cvec.h"
+#include <stc/cvec.h>
 
 
 int main()

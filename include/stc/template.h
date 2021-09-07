@@ -27,8 +27,8 @@
 #define STC_TEMPLATE_H_INCLUDED
   #define cx_memb(name) c_PASTE(Self, name)
   #define Self c_PASTE3(i_module, _, i_tag)
-  // typedef container types defined in forward.h
-  #define cx_deftypes(macro, SELF, ...) macro(SELF, __VA_ARGS__)
+  // typedef container types defined in forward.h. VC requires c_EXPAND.
+  #define cx_deftypes(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
   
   #define cx_value_t cx_memb(_value_t)
   #define cx_key_t cx_memb(_key_t)

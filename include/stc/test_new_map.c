@@ -1,5 +1,5 @@
-#include "cstr.h"
-#include "forward.h"
+#include <stc/cstr.h>
+#include <stc/forward.h>
 
 forward_cmap(pnt, struct Point, int);
 
@@ -11,7 +11,7 @@ struct MyStruct {
 
 #define i_key int
 #define i_val int
-#include "cmap.h"
+#include <stc/cmap.h>
 
 struct Point { int x, y; } typedef Point;
 int point_compare(const Point* a, const Point* b) {
@@ -22,14 +22,14 @@ int point_compare(const Point* a, const Point* b) {
 #define i_key Point
 #define i_val int
 #define i_cmp point_compare
-#include "cmap.h"
+#include <stc/cmap.h>
 
 #define i_key_str
 #define i_val_str
-#include "cmap.h"
+#include <stc/cmap.h>
 
 #define i_key_str
-#include "cset.h"
+#include <stc/cset.h>
 
 
 int main()
@@ -54,4 +54,4 @@ int main()
     cset_str sset = cset_str_init();
     cset_str_emplace(&sset, "Hello, friend");
     cset_str_del(&sset);
- }
+}
