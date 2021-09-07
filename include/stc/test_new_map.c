@@ -8,11 +8,12 @@ struct MyStruct {
     cstr name;
 } typedef MyStruct;
 
-
+// int => int map
 #define i_key int
 #define i_val int
 #include <stc/cmap.h>
 
+// Point => int map
 struct Point { int x, y; } typedef Point;
 int point_compare(const Point* a, const Point* b) {
     int c = c_default_compare(&a->x, &b->x);
@@ -24,10 +25,12 @@ int point_compare(const Point* a, const Point* b) {
 #define i_cmp point_compare
 #include <stc/cmap.h>
 
+// int => int map
 #define i_key_str
 #define i_val_str
 #include <stc/cmap.h>
 
+// string set
 #define i_key_str
 #include <stc/cset.h>
 

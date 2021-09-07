@@ -20,8 +20,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CSSET_H_INCLUDED
-#define CSSET_H_INCLUDED
 
 // Sorted set - implemented as an AA-tree (balanced binary tree).
 /*
@@ -43,8 +41,8 @@ int main(void) {
 }
 */
 
-#define i_cnt csset
-#define KEY_REF_csset(vp)   (vp)
+#define i_module csset
+#define cx_MAP_ONLY c_false
+#define cx_SET_ONLY c_true
+#define cx_keyref(vp) (vp)
 #include "csmap.h"
-
-#endif
