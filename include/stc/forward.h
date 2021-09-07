@@ -23,6 +23,8 @@
 #ifndef STC_FORWARD_H_INCLUDED
 #define STC_FORWARD_H_INCLUDED
 
+#include <stddef.h>
+
 #define forward_carray2(TAG, VAL) _c_carray2_types(carray2##TAG, VAL)
 #define forward_carray3(TAG, VAL) _c_carray3_types(carray2##TAG, VAL)
 #define forward_cdeq(TAG, VAL) _c_cdeq_types(cdeq_##TAG, VAL)
@@ -32,9 +34,9 @@
 #define forward_cset(TAG, KEY) _c_chash_types(cset_##TAG, cset, KEY, KEY, c_false, c_true)
 #define forward_csset(TAG, KEY) _c_aatree_types(csset_##TAG, KEY, KEY, c_false, c_true)
 #define forward_csptr(TAG, VAL) _csptr_types(csptr_##TAG, VAL)
-#define forward_cpque(TAG, ctype) _c_cpque_types(cpque_##TAG, ctype)
-#define forward_cqueue(TAG, ctype) _c_cqueue_types(cqueue_##TAG, ctype)
-#define forward_cstack(TAG, ctype) _c_cstack_types(cstack_##TAG, ctype)
+#define forward_cpque(TAG, VAL) _c_cpque_types(cpque_##TAG, VAL)
+#define forward_cstack(TAG, VAL) _c_cstack_types(cstack_##TAG, VAL)
+//#define forward_cqueue(TAG, VAL) _c_cqueue_types(cqueue_##TAG, VAL)
 #define forward_cvec(TAG, VAL) _c_cvec_types(cvec_##TAG, VAL)
 
 #ifndef MAP_SIZE_T
@@ -131,22 +133,20 @@
         long* use_count; \
     } SELF
 
-#define _c_cpque_types(SELF, ctype) \
-    typedef ctype##_value_t SELF##_value_t; \
-    typedef ctype##_rawvalue_t SELF##_rawvalue_t; \
-    typedef ctype SELF
+#define _c_cstack_types(SELF, VAL) \
+    typedef VAL SELF##_value_t; \
+    typedef struct { SELF##_value_t *ref; } SELF##_iter_t; \
+    typedef struct SELF { \
+        SELF##_value_t* data; \
+        size_t size, capacity; \
+    } SELF
 
-#define _c_cqueue_types(SELF, ctype) \
-    typedef ctype##_value_t SELF##_value_t; \
-    typedef ctype##_rawvalue_t SELF##_rawvalue_t; \
-    typedef ctype##_iter_t SELF##_iter_t; \
-    typedef struct { ctype rep; size_t size; } SELF
-
-#define _c_cstack_types(SELF, ctype) \
-    typedef ctype##_value_t SELF##_value_t; \
-    typedef ctype##_rawvalue_t SELF##_rawvalue_t; \
-    typedef ctype##_iter_t SELF##_iter_t; \
-    typedef ctype SELF
+#define _c_cpque_types(SELF, VAL) \
+    typedef VAL SELF##_value_t; \
+    typedef struct SELF { \
+        SELF##_value_t* data; \
+        size_t size, capacity; \
+    } SELF
 
 #define _c_cvec_types(SELF, VAL) \
     typedef VAL SELF##_value_t; \

@@ -21,126 +21,111 @@
  * SOFTWARE.
  */
 
-/*  Priority-Queue adapter (implemented as heap), default uses cvec.
+#ifndef CPQUE_H_INCLUDED
+#define CPQUE_H_INCLUDED
+#include <stdlib.h>
+#include "ccommon.h"
+#include "forward.h"
+#endif
 
-    #include <stc/crandom.h>
-    #include <stc/cpque.h>
-    using_cvec(f, float);
-    using_cpque(f, cvec_f, -c_default_compare); // min-heap (increasing values)
+#define i_module cpque
+#include "template.h"
 
-    int main() {
-        stc64_t rng = stc64_init(1234);
-        stc64_uniformf_t dist = stc64_uniformf_init(10.0f, 100.0f);
+#if !defined i_fwd
+   cx_deftypes(_c_cpque_types, Self, i_val);
+#endif
+typedef i_valraw cx_rawvalue_t;
 
-        c_forvar (cpque_f queue = cpque_f_init(), cpque_f_del(&queue))
-        {
-            // Push ten million random numbers onto the queue.
-            for (int i=0; i<10000000; ++i)
-                cpque_f_push(&queue, stc64_uniformf(&rng, dist));
+STC_API void cx_memb(_make_heap)(Self* self);
+STC_API void cx_memb(_erase_at)(Self* self, size_t idx);
+STC_API void cx_memb(_push)(Self* self, cx_value_t value);
+STC_API void cx_memb(_emplace_items)(Self *self, const cx_rawvalue_t arr[], size_t n);
+STC_API Self cx_memb(_clone)(Self q);
 
-            // Extract the 100 smallest.
-            for (int i=0; i<100; ++i) {
-                printf("%f ", *cpque_f_top(queue));
-                cpque_f_pop(&queue);
-            }
-        }
-    }
-*/
-#ifndef CPQUEUE_H_INCLUDED
-#define CPQUEUE_H_INCLUDED
+STC_INLINE Self cx_memb(_init)(void) 
+    { return (Self){0, 0, 0}; }
+STC_INLINE void cx_memb(_clear)(Self* self) 
+    { while (self->size) i_valdel(&self->data[--self->size]); }
+STC_INLINE size_t cx_memb(_size)(Self q)
+    { return q.size; }
+STC_INLINE bool cx_memb(_empty)(Self q)
+    { return !q.size; }
+STC_INLINE size_t cx_memb(_capacity)(Self q)
+    { return q.capacity; }
+STC_INLINE void cx_memb(_pop)(Self* self)
+    { cx_memb(_erase_at)(self, 0); }
+STC_INLINE cx_value_t* cx_memb(_top)(const Self* self)
+    { return &self->data[0]; }
+    
+STC_INLINE void cx_memb(_push_back_)(Self* self, cx_value_t value) {
+    if (self->size == self->capacity)
+        self->data = realloc(self->data, (self->capacity = self->size*3/2 + 4)*sizeof value);
+    self->data[ self->size++ ] = value;
+}
+STC_INLINE void cx_memb(_emplace)(Self* self, cx_rawvalue_t raw)
+    { cx_memb(_push)(self, i_valfrom(raw)); }
 
-#include "cvec.h"
-
-#define using_cpque(...) c_MACRO_OVERLOAD(using_cpque, __VA_ARGS__)
-
-#define using_cpque_2(X, ctype) \
-            _c_using_cpque(cpque_##X, ctype, ctype##_value_compare)
-#define using_cpque_3(X, ctype, i_cmp) \
-            _c_using_cpque(cpque_##X, ctype, i_cmp)
-
-#define _c_using_cpque(Self, ctype, i_cmp) \
-    typedef ctype Self; \
-    typedef ctype##_value_t cx_value_t; \
-    typedef ctype##_rawvalue_t cx_rawvalue_t; \
-\
-    STC_INLINE Self           cx_memb(_init)(void) { return ctype##_init(); } \
-    STC_INLINE Self           cx_memb(_clone)(Self pq) { return ctype##_clone(pq); } \
-    STC_INLINE cx_value_t cx_memb(_value_clone)(cx_value_t val) \
-                                { return ctype##_value_clone(val); } \
-    STC_INLINE void         cx_memb(_clear)(Self* self) {ctype##_clear(self); } \
-    STC_INLINE void         cx_memb(_del)(Self* self) {ctype##_del(self); } \
-\
-    STC_INLINE size_t       cx_memb(_size)(Self pq) { return ctype##_size(pq); } \
-    STC_INLINE bool         cx_memb(_empty)(Self pq) { return ctype##_empty(pq); } \
-    \
-    STC_API void            cx_memb(_make_heap)(Self* self); \
-    STC_API void            cx_memb(_erase_at)(Self* self, size_t idx); \
-    STC_INLINE \
-    const cx_value_t*     cx_memb(_top)(const Self* self) { return &self->data[0]; } \
-    STC_INLINE void         cx_memb(_pop)(Self* self) { cx_memb(_erase_at)(self, 0); } \
-    \
-    STC_API void            cx_memb(_push)(Self* self, cx_value_t value); \
-    STC_INLINE void         cx_memb(_emplace)(Self* self, cx_rawvalue_t raw) \
-                                { cx_memb(_push)(self, ctype##_value_fromraw(raw)); } \
-    STC_API void            cx_memb(_emplace_items)(Self *self, const cx_rawvalue_t arr[], size_t n); \
-\
-    _c_implement_cpque(Self, ctype, i_cmp) \
-    struct stc_trailing_semicolon
-
+STC_INLINE void cx_memb(_del)(Self* self)
+    { cx_memb(_clear)(self); free(self->data); }
+    
+STC_INLINE int cx_memb(_value_compare)(const cx_value_t* x, const cx_value_t* y) {
+    cx_rawvalue_t rx = i_valto(x), ry = i_valto(y);
+    return i_cmp(&rx, &ry);
+}
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
+#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
 
-#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
+STC_API void
+cx_memb(_sift_down_)(cx_value_t* arr, size_t i, size_t n) {
+    size_t r = i, c = i << 1;
+    while (c <= n) {
+        c += (c < n && i_cmp(&arr[c], &arr[c + 1]) < 0);
+        if (i_cmp(&arr[r], &arr[c]) < 0) {
+            cx_value_t tmp = arr[r]; arr[r] = arr[c]; arr[r = c] = tmp;
+        } else
+            return;
+        c <<= 1;
+    }
+}
 
-#define _c_implement_cpque(Self, ctype, i_cmp) \
-\
-    STC_INLINE void \
-    cx_memb(_sift_down_)(cx_value_t* arr, size_t i, size_t n) { \
-        size_t r = i, c = i << 1; \
-        while (c <= n) { \
-            c += (c < n && i_cmp(&arr[c], &arr[c + 1]) < 0); \
-            if (i_cmp(&arr[r], &arr[c]) < 0) { \
-                cx_value_t tmp = arr[r]; arr[r] = arr[c]; arr[r = c] = tmp; \
-            } else \
-                return; \
-            c <<= 1; \
-        } \
-    } \
-\
-    STC_API void \
-    cx_memb(_make_heap)(Self* self) { \
-        size_t n = cx_memb(_size)(*self); \
-        cx_value_t *arr = self->data - 1; \
-        for (size_t k = n >> 1; k != 0; --k) \
-            cx_memb(_sift_down_)(arr, k, n); \
-    } \
-\
-    STC_API void \
-    cx_memb(_erase_at)(Self* self, size_t idx) { \
-        size_t n = cx_memb(_size)(*self) - 1; \
-        self->data[idx] = self->data[n]; \
-        ctype##_pop_back(self); \
-        cx_memb(_sift_down_)(self->data - 1, idx + 1, n); \
-    } \
-\
-    STC_API void \
-    cx_memb(_push)(Self* self, cx_value_t value) { \
-        ctype##_push_back(self, value); /* sift-up the value */ \
-        size_t n = cx_memb(_size)(*self), c = n; \
-        cx_value_t *arr = self->data - 1; \
-        for (; c > 1 && i_cmp(&arr[c >> 1], &value) < 0; c >>= 1) \
-            arr[c] = arr[c >> 1]; \
-        if (c != n) arr[c] = value; \
-    } \
-\
-    STC_API void \
-    cx_memb(_emplace_items)(Self *self, const cx_rawvalue_t arr[], size_t n) { \
-        for (size_t i = 0; i < n; ++i) \
-            cx_memb(_push)(self, ctype##_value_fromraw(arr[i])); \
-    } \
+STC_API void
+cx_memb(_make_heap)(Self* self) {
+    size_t n = cx_memb(_size)(*self);
+    cx_value_t *arr = self->data - 1;
+    for (size_t k = n >> 1; k != 0; --k)
+        cx_memb(_sift_down_)(arr, k, n);
+}
 
-#else
-#define _c_implement_cpque(Self, ctype, i_cmp)
+STC_API Self cx_memb(_clone)(Self q) { 
+    Self out = {(cx_value_t*) c_malloc(q.size*sizeof(cx_value_t)), q.size, q.size};
+    for (cx_value_t *a = out.data, *b = a + q.size; a != b; ++a) *a = i_valfrom(i_valto(q.data++));
+    return out;
+}
+
+STC_API void
+cx_memb(_erase_at)(Self* self, size_t idx) {
+    size_t n = cx_memb(_size)(*self) - 1;
+    self->data[idx] = self->data[n];
+    --self->size;
+    cx_memb(_sift_down_)(self->data - 1, idx + 1, n);
+}
+
+STC_API void
+cx_memb(_push)(Self* self, cx_value_t value) {
+    cx_memb(_push_back_)(self, value); /* sift-up the value */
+    size_t n = cx_memb(_size)(*self), c = n;
+    cx_value_t *arr = self->data - 1;
+    for (; c > 1 && i_cmp(&arr[c >> 1], &value) < 0; c >>= 1)
+        arr[c] = arr[c >> 1];
+    if (c != n) arr[c] = value;
+}
+
+STC_API void
+cx_memb(_emplace_items)(Self *self, const cx_rawvalue_t arr[], size_t n) {
+    for (size_t i = 0; i < n; ++i)
+        cx_memb(_push)(self, i_valfrom(arr[i]));
+}
+
 #endif
-
-#endif
+#include "template.h"
