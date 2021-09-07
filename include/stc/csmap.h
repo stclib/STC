@@ -316,7 +316,7 @@ cx_memb(_next)(cx_iter_t *it) {
         it->ref = NULL;
 }
 
-static cx_memb(_size_t)
+STC_DEF cx_memb(_size_t)
 cx_memb(_skew_)(cx_node_t *d, cx_memb(_size_t) tn) {
     if (tn && d[d[tn].link[0]].level == d[tn].level) {
         cx_memb(_size_t) tmp = d[tn].link[0];
@@ -327,7 +327,7 @@ cx_memb(_skew_)(cx_node_t *d, cx_memb(_size_t) tn) {
     return tn;
 }
 
-static cx_memb(_size_t)
+STC_DEF cx_memb(_size_t)
 cx_memb(_split_)(cx_node_t *d, cx_memb(_size_t) tn) {
     if (d[d[d[tn].link[1]].link[1]].level == d[tn].level) {
         cx_memb(_size_t) tmp = d[tn].link[1];
@@ -442,7 +442,7 @@ cx_memb(_erase_range)(Self* self, cx_iter_t it1, cx_iter_t it2) {
     }
 }
 
-static cx_memb(_size_t)
+STC_DEF cx_memb(_size_t)
 cx_memb(_clone_r_)(Self* self, cx_node_t* src, cx_memb(_size_t) sn) {
     if (sn == 0) return 0;
     cx_memb(_size_t) tx, tn = cx_memb(_node_new_)(self, src[sn].level);

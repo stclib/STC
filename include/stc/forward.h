@@ -101,6 +101,7 @@
     typedef KEY SELF##_key_t; \
     typedef VAL SELF##_mapped_t; \
     typedef MAP_SIZE_T SELF##_size_t; \
+    typedef struct SELF##_node_t SELF##_node_t; \
 \
     typedef SET_ONLY( SELF##_key_t ) \
             MAP_ONLY( struct SELF##_value_t ) \
@@ -110,8 +111,6 @@
         SELF##_value_t *ref; \
         bool inserted; \
     } SELF##_result_t; \
-\
-    typedef struct SELF##_node_t SELF##_node_t; \
 \
     typedef struct { \
         SELF##_value_t *ref; \
