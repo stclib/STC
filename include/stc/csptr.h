@@ -68,11 +68,11 @@ typedef long atomic_count_t;
     }
 #endif
 
-#define forward_csptr(X, i_VAL) _csptr_types(csptr_##X, i_VAL)
+#define forward_csptr(X, i_val) _csptr_types(csptr_##X, i_val)
 #define csptr_null {NULL, NULL}
 
 
-    defTypes( _csptr_types(Self, i_VAL); ) \
+    defTypes( _csptr_types(Self, i_val); ) \
     struct cx_memb(_rep_) {atomic_count_t cnt; cx_value_t val; }; \
 \
     STC_INLINE Self \
@@ -112,7 +112,7 @@ typedef long atomic_count_t;
     STC_INLINE void \
     cx_memb(_del)(Self* self) { \
         if (self->use_count && c_atomic_decrement(self->use_count) == 0) { \
-            i_VALDEL(self->get); \
+            i_valdel(self->get); \
             if (self->get != &((struct cx_memb(_rep_)*)self->use_count)->val) c_free(self->get); \
             c_free(self->use_count); \
         } \
@@ -148,12 +148,12 @@ typedef long atomic_count_t;
 \
     STC_INLINE int \
     cx_memb(_compare)(const Self* x, const Self* y) { \
-        return i_CMP(x->get, y->get); \
+        return i_cmp(x->get, y->get); \
     } \
 \
     STC_INLINE bool \
     cx_memb(_equals)(const Self* x, const Self* y) { \
-        return i_CMP(x->get, y->get) == 0; \
+        return i_cmp(x->get, y->get) == 0; \
     } \
     struct stc_trailing_semicolon
 

@@ -55,10 +55,10 @@
 
 #define using_cpque_2(X, ctype) \
             _c_using_cpque(cpque_##X, ctype, ctype##_value_compare)
-#define using_cpque_3(X, ctype, i_CMP) \
-            _c_using_cpque(cpque_##X, ctype, i_CMP)
+#define using_cpque_3(X, ctype, i_cmp) \
+            _c_using_cpque(cpque_##X, ctype, i_cmp)
 
-#define _c_using_cpque(Self, ctype, i_CMP) \
+#define _c_using_cpque(Self, ctype, i_cmp) \
     typedef ctype Self; \
     typedef ctype##_value_t cx_value_t; \
     typedef ctype##_rawvalue_t cx_rawvalue_t; \
@@ -84,7 +84,7 @@
                                 { cx_memb(_push)(self, ctype##_value_fromraw(raw)); } \
     STC_API void            cx_memb(_emplace_items)(Self *self, const cx_rawvalue_t arr[], size_t n); \
 \
-    _c_implement_cpque(Self, ctype, i_CMP) \
+    _c_implement_cpque(Self, ctype, i_cmp) \
     struct stc_trailing_semicolon
 
 
@@ -92,14 +92,14 @@
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-#define _c_implement_cpque(Self, ctype, i_CMP) \
+#define _c_implement_cpque(Self, ctype, i_cmp) \
 \
     STC_INLINE void \
     cx_memb(_sift_down_)(cx_value_t* arr, size_t i, size_t n) { \
         size_t r = i, c = i << 1; \
         while (c <= n) { \
-            c += (c < n && i_CMP(&arr[c], &arr[c + 1]) < 0); \
-            if (i_CMP(&arr[r], &arr[c]) < 0) { \
+            c += (c < n && i_cmp(&arr[c], &arr[c + 1]) < 0); \
+            if (i_cmp(&arr[r], &arr[c]) < 0) { \
                 cx_value_t tmp = arr[r]; arr[r] = arr[c]; arr[r = c] = tmp; \
             } else \
                 return; \
@@ -128,7 +128,7 @@
         ctype##_push_back(self, value); /* sift-up the value */ \
         size_t n = cx_memb(_size)(*self), c = n; \
         cx_value_t *arr = self->data - 1; \
-        for (; c > 1 && i_CMP(&arr[c >> 1], &value) < 0; c >>= 1) \
+        for (; c > 1 && i_cmp(&arr[c >> 1], &value) < 0; c >>= 1) \
             arr[c] = arr[c >> 1]; \
         if (c != n) arr[c] = value; \
     } \
@@ -140,7 +140,7 @@
     } \
 
 #else
-#define _c_implement_cpque(Self, ctype, i_CMP)
+#define _c_implement_cpque(Self, ctype, i_cmp)
 #endif
 
 #endif

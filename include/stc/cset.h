@@ -23,8 +23,8 @@
 
 // Unordered set - implemented as closed hashing with linear probing and no tombstones.
 /*
-#define i_TAG sx
-#define i_KEY int
+#define i_tag sx
+#define i_key int
 #include <stc/cset.h>
 #include <stdio.h>
 
@@ -39,7 +39,7 @@ int main(void) {
 }
 */
 
-#define i_MODULE cset
+#define i_module cset
 #define cx_MAP_ONLY c_false
 #define cx_SET_ONLY c_true
 #define cx_keyref(vp) (vp)

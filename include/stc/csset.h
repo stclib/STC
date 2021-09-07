@@ -43,7 +43,7 @@ int main(void) {
 }
 */
 
-#define i_CNT csset
+#define i_cnt csset
 #define KEY_REF_csset(vp)   (vp)
 #include "csmap.h"
 

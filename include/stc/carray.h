@@ -50,9 +50,9 @@ int main() {
     }
 }
 */
-    defTypes( _c_carray2_types(Self, i_VAL); )
+    defTypes( _c_carray2_types(Self, i_val); )
 \
-    STC_API Self cx_memb(_with_values)(size_t xdim, size_t ydim, i_VAL value); \
+    STC_API Self cx_memb(_with_values)(size_t xdim, size_t ydim, i_val value); \
     STC_API Self cx_memb(_with_storage)(size_t xdim, size_t ydim, cx_value_t* storage); \
     STC_API Self cx_memb(_clone)(Self src); \
 \
@@ -76,15 +76,15 @@ int main() {
     } \
     STC_INLINE void cx_memb(_next)(cx_iter_t* it) { ++it->ref; } \
 \
-    _c_implement_carray2(Self, i_VAL, i_VALDEL, i_VALFROM) \
+    _c_implement_carray2(Self, i_val, i_valdel, i_valfrom) \
     STC_API void cx_memb(_del)(Self* self)
 
 // carray3:
 
 
-    defTypes( _c_carray3_types(Self, i_VAL); )
+    defTypes( _c_carray3_types(Self, i_val); )
 \
-    STC_API Self cx_memb(_with_values)(size_t xdim, size_t ydim, size_t zdim, i_VAL value); \
+    STC_API Self cx_memb(_with_values)(size_t xdim, size_t ydim, size_t zdim, i_val value); \
     STC_API Self cx_memb(_with_storage)(size_t xdim, size_t ydim, size_t zdim, cx_value_t* storage); \
     STC_API Self cx_memb(_clone)(Self src); \
 \
@@ -111,14 +111,14 @@ int main() {
     } \
     STC_INLINE void cx_memb(_next)(cx_iter_t* it) { ++it->ref; } \
 \
-    _c_implement_carray3(Self, i_VAL, i_VALDEL, i_VALFROM) \
+    _c_implement_carray3(Self, i_val, i_valdel, i_valfrom) \
     STC_API void cx_memb(_del)(Self* self)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-#define _c_implement_carray2(Self, i_VAL, i_VALDEL, i_VALFROM) \
+#define _c_implement_carray2(Self, i_val, i_valdel, i_valfrom) \
 \
     STC_DEF Self cx_memb(_with_storage)(size_t xdim, size_t ydim, cx_value_t* block) { \
         Self _arr = {c_new_n(cx_value_t*, xdim), xdim, ydim}; \
@@ -127,7 +127,7 @@ int main() {
         return _arr; \
     } \
 \
-    STC_DEF Self cx_memb(_with_values)(size_t xdim, size_t ydim, i_VAL value) { \
+    STC_DEF Self cx_memb(_with_values)(size_t xdim, size_t ydim, i_val value) { \
         Self _arr = cx_memb(_init)(xdim, ydim); \
         for (cx_value_t* p = _arr.data[0], *e = p + xdim*ydim; p != e; ++p) \
             *p = value; \
@@ -137,21 +137,21 @@ int main() {
     STC_DEF Self cx_memb(_clone)(Self src) { \
         Self _arr = cx_memb(_init)(src.xdim, src.ydim); \
         for (cx_value_t* p = _arr.data[0], *q = src.data[0], *e = p + cx_memb(_size)(src); p != e; ++p, ++q) \
-            *p = i_VALFROM(*q); \
+            *p = i_valfrom(*q); \
         return _arr; \
     } \
 \
     STC_DEF void cx_memb(_del)(Self* self) { \
         if (!self->data) return; \
         for (cx_value_t* p = self->data[0], *e = p + cx_memb(_size)(*self); p != e; ++p) \
-            i_VALDEL(p); \
+            i_valdel(p); \
         c_free(self->data[0]); /* data */ \
         c_free(self->data);    /* pointers */ \
     }
 
 // carray3 impl.
 
-#define _c_implement_carray3(Self, i_VAL, i_VALDEL, i_VALFROM) \
+#define _c_implement_carray3(Self, i_val, i_valdel, i_valfrom) \
 \
     STC_DEF Self cx_memb(_with_storage)(size_t xdim, size_t ydim, size_t zdim, cx_value_t* block) { \
         Self _arr = {c_new_n(cx_value_t**, xdim*(ydim + 1)), xdim, ydim, zdim}; \
@@ -162,7 +162,7 @@ int main() {
         return _arr; \
     } \
 \
-    STC_DEF Self cx_memb(_with_values)(size_t xdim, size_t ydim, size_t zdim, i_VAL value) { \
+    STC_DEF Self cx_memb(_with_values)(size_t xdim, size_t ydim, size_t zdim, i_val value) { \
         Self _arr = cx_memb(_init)(xdim, ydim, zdim); \
         for (cx_value_t* p = **_arr.data, *e = p + xdim*ydim*zdim; p != e; ++p) \
             *p = value; \
@@ -172,14 +172,14 @@ int main() {
     STC_DEF Self cx_memb(_clone)(Self src) { \
         Self _arr = cx_memb(_init)(src.xdim, src.ydim, src.zdim); \
         for (cx_value_t* p = **_arr.data, *q = **src.data, *e = p + cx_memb(_size)(src); p != e; ++p, ++q) \
-            *p = i_VALFROM(*q); \
+            *p = i_valfrom(*q); \
         return _arr; \
     } \
 \
     STC_DEF void cx_memb(_del)(Self* self) { \
         if (!self->data) return; \
         for (cx_value_t* p = **self->data, *e = p + cx_memb(_size)(*self); p != e; ++p) \
-            i_VALDEL(p); \
+            i_valdel(p); \
         c_free(self->data[0][0]); /* data */ \
         c_free(self->data);       /* pointers */ \
     }

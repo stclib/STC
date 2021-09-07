@@ -9,8 +9,8 @@ struct MyStruct {
 } typedef MyStruct;
 
 
-#define i_KEY int
-#define i_VAL int
+#define i_key int
+#define i_val int
 #include "cmap.h"
 
 struct Point { int x, y; } typedef Point;
@@ -18,17 +18,17 @@ int point_compare(const Point* a, const Point* b) {
     int c = c_default_compare(&a->x, &b->x);
     return c ? c : c_default_compare(&a->y, &b->y);
 }
-#define f_TAG pnt  // f=forward declared
-#define i_KEY Point
-#define i_VAL int
-#define i_CMP point_compare
+#define f_tag pnt  // f=forward declared
+#define i_key Point
+#define i_val int
+#define i_cmp point_compare
 #include "cmap.h"
 
-#define i_KEY_str
-#define i_VAL_str
+#define i_key_str
+#define i_val_str
 #include "cmap.h"
 
-#define i_KEY_str
+#define i_key_str
 #include "cset.h"
 
 

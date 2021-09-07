@@ -39,7 +39,7 @@
 #endif
 #define STC_INLINE static inline
 
-#if defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_IMP)
+#if defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
 #  define STC_API extern
 #  define STC_DEF
 #  define STC_LIBRARY_ONLY(...) __VA_ARGS__

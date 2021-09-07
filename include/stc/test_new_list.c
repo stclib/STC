@@ -10,8 +10,8 @@ struct MyStruct {
 } typedef MyStruct;
 
 
-#define f_TAG i32
-#define i_VAL int
+#define f_tag i32
+#define i_val int
 #include "clist.h"
 
 struct Point { int x, y; } typedef Point;
@@ -19,15 +19,15 @@ int point_compare(const Point* a, const Point* b) {
     int c = c_default_compare(&a->x, &b->x);
     return c ? c : c_default_compare(&a->y, &b->y);
 }
-#define f_TAG pnt
-#define i_VAL Point
-#define i_CMP point_compare
+#define f_tag pnt
+#define i_val Point
+#define i_cmp point_compare
 #include "clist.h"
 
-#define i_VAL float
+#define i_val float
 #include "clist.h"
 
-#define i_VAL_str
+#define i_val_str
 #include "clist.h"
 
 

@@ -28,17 +28,17 @@
 #include <string.h>
 
 \
-    defTypes( _c_cdeq_types(Self, i_VAL); ) \
-    typedef i_VALRAW cx_rawvalue_t; \
+    defTypes( _c_cdeq_types(Self, i_val); ) \
+    typedef i_valraw cx_rawvalue_t; \
 \
     STC_API Self               cx_memb(_init)(void); \
     STC_API Self               cx_memb(_clone)(Self cx); \
     STC_API void             cx_memb(_clear)(Self* self); \
     STC_API void             cx_memb(_del)(Self* self); \
-    STC_API cx_iter_t      cx_memb(_find_in)(cx_iter_t p1, cx_iter_t p2, i_VALRAW raw); \
+    STC_API cx_iter_t      cx_memb(_find_in)(cx_iter_t p1, cx_iter_t p2, i_valraw raw); \
     STC_API int              cx_memb(_value_compare)(const cx_value_t* x, const cx_value_t* y); \
-    STC_API void             cx_memb(_push_back)(Self* self, i_VAL value); \
-    STC_API void             cx_memb(_push_front)(Self* self, i_VAL value); \
+    STC_API void             cx_memb(_push_back)(Self* self, i_val value); \
+    STC_API void             cx_memb(_push_front)(Self* self, i_val value); \
     STC_API cx_iter_t      cx_memb(_erase_range_p)(Self* self, cx_value_t* p1, cx_value_t* p2); \
     STC_API cx_iter_t      cx_memb(_insert_range_p)(Self* self, cx_value_t* pos, \
                                                  const cx_value_t* p1, const cx_value_t* p2, bool clone); \
@@ -50,18 +50,18 @@
     STC_INLINE size_t        cx_memb(_size)(Self cx) { return _cdeq_rep(&cx)->size; } \
     STC_INLINE size_t        cx_memb(_capacity)(Self cx) { return _cdeq_rep(&cx)->cap; } \
     STC_INLINE void          cx_memb(_swap)(Self* a, Self* b) {c_swap(Self, *a, *b); } \
-    STC_INLINE i_VAL         cx_memb(_value_fromraw)(i_VALRAW raw) { return i_VALFROM(raw); } \
-    STC_INLINE i_VALRAW      cx_memb(_value_toraw)(cx_value_t* pval) { return i_VALTO(pval); } \
-    STC_INLINE i_VAL         cx_memb(_value_clone)(i_VAL val) \
-                                { return i_VALFROM(i_VALTO(&val)); } \
-    STC_INLINE void          cx_memb(_emplace_back)(Self* self, i_VALRAW raw) \
-                                { cx_memb(_push_back)(self, i_VALFROM(raw)); } \
-    STC_INLINE void          cx_memb(_emplace_front)(Self* self, i_VALRAW raw) \
-                                { cx_memb(_push_front)(self, i_VALFROM(raw)); } \
+    STC_INLINE i_val         cx_memb(_value_fromraw)(i_valraw raw) { return i_valfrom(raw); } \
+    STC_INLINE i_valraw      cx_memb(_value_toraw)(cx_value_t* pval) { return i_valto(pval); } \
+    STC_INLINE i_val         cx_memb(_value_clone)(i_val val) \
+                                { return i_valfrom(i_valto(&val)); } \
+    STC_INLINE void          cx_memb(_emplace_back)(Self* self, i_valraw raw) \
+                                { cx_memb(_push_back)(self, i_valfrom(raw)); } \
+    STC_INLINE void          cx_memb(_emplace_front)(Self* self, i_valraw raw) \
+                                { cx_memb(_push_front)(self, i_valfrom(raw)); } \
     STC_INLINE void          cx_memb(_pop_back)(Self* self) \
-                                {i_VALDEL(&self->data[--_cdeq_rep(self)->size]); } \
+                                {i_valdel(&self->data[--_cdeq_rep(self)->size]); } \
     STC_INLINE void          cx_memb(_pop_front)(Self* self) \
-                                {i_VALDEL(self->data++); --_cdeq_rep(self)->size; } \
+                                {i_valdel(self->data++); --_cdeq_rep(self)->size; } \
     STC_INLINE cx_value_t* cx_memb(_front)(const Self* self) { return self->data; } \
     STC_INLINE cx_value_t* cx_memb(_back)(const Self* self) \
                                 { return self->data + _cdeq_rep(self)->size - 1; } \
@@ -95,7 +95,7 @@
     } \
 \
     STC_INLINE cx_iter_t \
-    cx_memb(_insert)(Self* self, size_t idx, i_VAL value) { \
+    cx_memb(_insert)(Self* self, size_t idx, i_val value) { \
         return cx_memb(_insert_range_p)(self, self->data + idx, &value, &value + 1, false); \
     } \
     STC_INLINE cx_iter_t \
@@ -103,12 +103,12 @@
         return cx_memb(_insert_range_p)(self, self->data + idx, arr, arr + n, false); \
     } \
     STC_INLINE cx_iter_t \
-    cx_memb(_insert_at)(Self* self, cx_iter_t it, i_VAL value) { \
+    cx_memb(_insert_at)(Self* self, cx_iter_t it, i_val value) { \
         return cx_memb(_insert_range_p)(self, it.ref, &value, &value + 1, false); \
     } \
 \
     STC_INLINE cx_iter_t \
-    cx_memb(_emplace)(Self* self, size_t idx, i_VALRAW raw) { \
+    cx_memb(_emplace)(Self* self, size_t idx, i_valraw raw) { \
         return cx_memb(_emplace_range_p)(self, self->data + idx, &raw, &raw + 1); \
     } \
     STC_INLINE cx_iter_t \
@@ -116,7 +116,7 @@
         return cx_memb(_emplace_range_p)(self, self->data + idx, arr, arr + n); \
     } \
     STC_INLINE cx_iter_t \
-    cx_memb(_emplace_at)(Self* self, cx_iter_t it, i_VALRAW raw) { \
+    cx_memb(_emplace_at)(Self* self, cx_iter_t it, i_valraw raw) { \
         return cx_memb(_emplace_range_p)(self, it.ref, &raw, &raw + 1); \
     } \
     STC_INLINE cx_iter_t \
@@ -146,12 +146,12 @@
     } \
 \
     STC_INLINE cx_iter_t \
-    cx_memb(_find)(const Self* self, i_VALRAW raw) { \
+    cx_memb(_find)(const Self* self, i_valraw raw) { \
         return cx_memb(_find_in)(cx_memb(_begin)(self), cx_memb(_end)(self), raw); \
     } \
 \
     STC_INLINE cx_value_t* \
-    cx_memb(_get)(const Self* self, i_VALRAW raw) { \
+    cx_memb(_get)(const Self* self, i_valraw raw) { \
         cx_iter_t end = cx_memb(_end)(self); \
         cx_value_t* val = cx_memb(_find_in)(cx_memb(_begin)(self), end, raw).ref; \
         return val == end.ref ? NULL : val; \
@@ -168,7 +168,7 @@
         cx_memb(_sort_range)(cx_memb(_begin)(self), cx_memb(_end)(self), cx_memb(_value_compare)); \
     } \
 \
-    _c_implement_cdeq(Self, i_VAL, i_CMP, i_VALDEL, i_VALFROM, i_VALTO, i_VALRAW) \
+    _c_implement_cdeq(Self, i_val, i_cmp, i_valdel, i_valfrom, i_valto, i_valraw) \
     struct stc_trailing_semicolon
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
@@ -178,7 +178,7 @@
 static struct cdeq_rep _cdeq_sentinel = {0, 0};
 #define _cdeq_nfront(self) ((self)->data - (self)->_base)
 
-#define _c_implement_cdeq(Self, i_VAL, i_CMP, i_VALDEL, i_VALFROM, i_VALTO, i_VALRAW) \
+#define _c_implement_cdeq(Self, i_val, i_cmp, i_valdel, i_valfrom, i_valto, i_valraw) \
 \
     STC_DEF Self \
     cx_memb(_init)(void) { \
@@ -190,7 +190,7 @@ static struct cdeq_rep _cdeq_sentinel = {0, 0};
     cx_memb(_clear)(Self* self) { \
         struct cdeq_rep* rep = _cdeq_rep(self); if (rep->cap) { \
             for (cx_value_t *p = self->data, *q = p + rep->size; p != q; ++p) \
-                i_VALDEL(p); \
+                i_valdel(p); \
             rep->size = 0; \
         } \
     } \
@@ -208,7 +208,7 @@ static struct cdeq_rep _cdeq_sentinel = {0, 0};
         size_t sz = rep->size, cap = (size_t) (sz*1.7) + n + 7; \
         size_t nfront = _cdeq_nfront(self); \
         rep = (struct cdeq_rep*) c_realloc(rep->cap ? rep : NULL, \
-                                           offsetof(struct cdeq_rep, base) + cap*sizeof(i_VAL)); \
+                                           offsetof(struct cdeq_rep, base) + cap*sizeof(i_val)); \
         rep->size = sz, rep->cap = cap; \
         self->_base = (cx_value_t *) rep->base; \
         self->data = self->_base + nfront; \
@@ -221,13 +221,13 @@ static struct cdeq_rep _cdeq_sentinel = {0, 0};
         size_t sz = rep->size, cap = rep->cap; \
         size_t nfront = _cdeq_nfront(self), nback = cap - sz - nfront; \
         if (nfront >= n) { \
-            self->data = (cx_value_t *) memmove(self->data - n, self->data, idx*sizeof(i_VAL)); \
+            self->data = (cx_value_t *) memmove(self->data - n, self->data, idx*sizeof(i_val)); \
         } else { \
             if (sz*1.3 + n > cap) cap = cx_memb(_realloc_)(self, n); \
             size_t unused = cap - (sz + n); \
             size_t pos = (nback*2 < unused) ? unused - nback : unused/2; \
-            memmove(self->_base + pos + idx + n, self->data + idx, (sz - idx)*sizeof(i_VAL)); \
-            self->data = (cx_value_t *) memmove(self->_base + pos, self->data, idx*sizeof(i_VAL)); \
+            memmove(self->_base + pos + idx + n, self->data + idx, (sz - idx)*sizeof(i_val)); \
+            self->data = (cx_value_t *) memmove(self->_base + pos, self->data, idx*sizeof(i_val)); \
         } \
     } \
 \
@@ -237,12 +237,12 @@ static struct cdeq_rep _cdeq_sentinel = {0, 0};
         size_t sz = rep->size, cap = rep->cap; \
         size_t nfront = _cdeq_nfront(self), nback = cap - sz - nfront; \
         if (nback >= n || sz*1.3 + n > cap && cx_memb(_realloc_)(self, n)) { \
-            memmove(self->data + idx + n, self->data + idx, (sz - idx)*sizeof(i_VAL)); \
+            memmove(self->data + idx + n, self->data + idx, (sz - idx)*sizeof(i_val)); \
         } else { \
             size_t unused = cap - (sz + n); \
             size_t pos = (nfront*2 < unused) ? nfront : unused/2; \
-            memmove(self->_base + pos, self->data, idx*sizeof(i_VAL)); \
-            memmove(self->data + pos + idx + n, self->data + idx, (sz - idx)*sizeof(i_VAL)); \
+            memmove(self->_base + pos, self->data, idx*sizeof(i_val)); \
+            memmove(self->data + pos + idx + n, self->data + idx, (sz - idx)*sizeof(i_val)); \
             self->data = ((cx_value_t *) self->_base) + pos; \
         } \
     } \
@@ -257,7 +257,7 @@ static struct cdeq_rep _cdeq_sentinel = {0, 0};
     } \
 \
     STC_DEF void \
-    cx_memb(_push_front)(Self* self, i_VAL value) { \
+    cx_memb(_push_front)(Self* self, i_val value) { \
         if (self->data == self->_base) \
             cx_memb(_expand_left_)(self, 0, 1); \
         else \
@@ -267,7 +267,7 @@ static struct cdeq_rep _cdeq_sentinel = {0, 0};
     } \
 \
     STC_DEF void \
-    cx_memb(_push_back)(Self* self, i_VAL value) { \
+    cx_memb(_push_back)(Self* self, i_val value) { \
         struct cdeq_rep* rep = _cdeq_rep(self); \
         if (_cdeq_nfront(self) + rep->size == rep->cap) \
             cx_memb(_expand_right_)(self, rep->size, 1); \
@@ -287,7 +287,7 @@ static struct cdeq_rep _cdeq_sentinel = {0, 0};
                                                      const cx_value_t* p2, bool clone) { \
         pos = cx_memb(_insert_space_)(self, pos, p2 - p1); \
         cx_iter_t it = {pos}; \
-        if (clone) while (p1 != p2) *pos++ = i_VALFROM(i_VALTO(p1++)); \
+        if (clone) while (p1 != p2) *pos++ = i_valfrom(i_valto(p1++)); \
         else memcpy(pos, p1, (p2 - p1)*sizeof *p1); \
         return it; \
     } \
@@ -296,7 +296,7 @@ static struct cdeq_rep _cdeq_sentinel = {0, 0};
     cx_memb(_emplace_range_p)(Self* self, cx_value_t* pos, const cx_rawvalue_t* p1, const cx_rawvalue_t* p2) { \
         pos = cx_memb(_insert_space_)(self, pos, p2 - p1); \
         cx_iter_t it = {pos}; \
-        while (p1 != p2) *pos++ = i_VALFROM(*p1++); \
+        while (p1 != p2) *pos++ = i_valfrom(*p1++); \
         return it; \
     } \
 \
@@ -305,32 +305,32 @@ static struct cdeq_rep _cdeq_sentinel = {0, 0};
         size_t n = p2 - p1; \
         if (n > 0) { \
             cx_value_t* p = p1, *end = self->data + _cdeq_rep(self)->size; \
-            while (p != p2) i_VALDEL(p++); \
+            while (p != p2) i_valdel(p++); \
             if (p1 == self->data) self->data += n; \
-            else memmove(p1, p2, (end - p2) * sizeof(i_VAL)); \
+            else memmove(p1, p2, (end - p2) * sizeof(i_val)); \
             _cdeq_rep(self)->size -= n; \
         } \
         return c_make(cx_iter_t){p1}; \
     } \
 \
     STC_DEF cx_iter_t \
-    cx_memb(_find_in)(cx_iter_t i1, cx_iter_t i2, i_VALRAW raw) { \
+    cx_memb(_find_in)(cx_iter_t i1, cx_iter_t i2, i_valraw raw) { \
         for (; i1.ref != i2.ref; ++i1.ref) { \
-            i_VALRAW r = i_VALTO(i1.ref); \
-            if (i_CMP(&raw, &r) == 0) return i1; \
+            i_valraw r = i_valto(i1.ref); \
+            if (i_cmp(&raw, &r) == 0) return i1; \
         } \
         return i2; \
     } \
 \
     STC_DEF int \
     cx_memb(_value_compare)(const cx_value_t* x, const cx_value_t* y) { \
-        i_VALRAW rx = i_VALTO(x); \
-        i_VALRAW ry = i_VALTO(y); \
-        return i_CMP(&rx, &ry); \
+        i_valraw rx = i_valto(x); \
+        i_valraw ry = i_valto(y); \
+        return i_cmp(&rx, &ry); \
     }
 
 #else
-#define _c_implement_cdeq(Self, i_VAL, i_CMP, i_VALDEL, i_VALFROM, i_VALTO, i_VALRAW)
+#define _c_implement_cdeq(Self, i_val, i_cmp, i_valdel, i_valfrom, i_valto, i_valraw)
 #endif
 
 #endif

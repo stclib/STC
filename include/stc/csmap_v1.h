@@ -64,21 +64,21 @@ int main(void) {
     }
 
 #ifndef cx_forwarded
-    _c_aatree_types(Self, C, i_KEY, i_VAL);
+    _c_aatree_types(Self, C, i_key, i_val);
 #endif    
 
     _c_aatree_complete_types(Self, C); \
 \
-    typedef i_KEYRAW cx_rawkey_t; \
-    typedef i_VALRAW cx_memb(_rawmapped_t); \
+    typedef i_keyraw cx_rawkey_t; \
+    typedef i_valraw cx_memb(_rawmapped_t); \
     typedef cx_SET_ONLY( cx_rawkey_t ) \
             cx_MAP_ONLY( struct { cx_rawkey_t first; \
                                    cx_memb(_rawmapped_t) second; } ) \
     cx_rawvalue_t; \
 \
     STC_API Self               cx_memb(_init)(void); \
-    STC_API cx_value_t*    cx_memb(_find_it)(const Self* self, i_KEYRAW rkey, cx_iter_t* out); \
-    STC_API cx_iter_t      cx_memb(_lower_bound)(const Self* self, i_KEYRAW rkey); \
+    STC_API cx_value_t*    cx_memb(_find_it)(const Self* self, i_keyraw rkey, cx_iter_t* out); \
+    STC_API cx_iter_t      cx_memb(_lower_bound)(const Self* self, i_keyraw rkey); \
     STC_API cx_value_t*    cx_memb(_front)(const Self* self); \
     STC_API cx_value_t*    cx_memb(_back)(const Self* self); \
     STC_API cx_iter_t      cx_memb(_erase_at)(Self* self, cx_iter_t it); \
@@ -86,7 +86,7 @@ int main(void) {
     STC_API cx_node_t*     cx_memb(_erase_r_)(cx_node_t *tn, const cx_rawkey_t* rkey, int *erased); \
     STC_API void             cx_memb(_del_r_)(cx_node_t* tn); \
     STC_API cx_node_t*     cx_memb(_clone_r_)(cx_node_t *tn); \
-    STC_API cx_result_t    cx_memb(_insert_entry_)(Self* self, i_KEYRAW rkey); \
+    STC_API cx_result_t    cx_memb(_insert_entry_)(Self* self, i_keyraw rkey); \
     STC_API void             cx_memb(_next)(cx_iter_t* it); \
 \
     STC_INLINE bool          cx_memb(_empty)(Self cx) { return cx.size == 0; } \
@@ -95,31 +95,31 @@ int main(void) {
     STC_INLINE void          cx_memb(_clear)(Self* self) { cx_memb(_del)(self); *self = cx_memb(_init)(); } \
     STC_INLINE void          cx_memb(_swap)(Self* a, Self* b) {c_swap(Self, *a, *b); } \
     STC_INLINE Self            cx_memb(_clone)(Self cx) { return c_make(Self){ cx_memb(_clone_r_)(cx.root), cx.size}; } \
-    STC_INLINE cx_iter_t   cx_memb(_find)(const Self* self, i_KEYRAW rkey) \
+    STC_INLINE cx_iter_t   cx_memb(_find)(const Self* self, i_keyraw rkey) \
                                 {cx_iter_t it; cx_memb(_find_it)(self, rkey, &it); return it; } \
-    STC_INLINE bool          cx_memb(_contains)(const Self* self, i_KEYRAW rkey) \
+    STC_INLINE bool          cx_memb(_contains)(const Self* self, i_keyraw rkey) \
                                 {cx_iter_t it; return cx_memb(_find_it)(self, rkey, &it) != NULL; } \
-    STC_INLINE cx_value_t* cx_memb(_get)(const Self* self, i_KEYRAW rkey) \
+    STC_INLINE cx_value_t* cx_memb(_get)(const Self* self, i_keyraw rkey) \
                                 {cx_iter_t it; return cx_memb(_find_it)(self, rkey, &it); } \
 \
     STC_INLINE void \
     cx_memb(_value_del)(cx_value_t* val) { \
-        i_KEYDEL(cx_keyref(val)); \
-        cx_MAP_ONLY( i_VALDEL(&val->second); ) \
+        i_keydel(cx_keyref(val)); \
+        cx_MAP_ONLY( i_valdel(&val->second); ) \
     } \
 \
     STC_INLINE void \
     cx_memb(_value_clone)(cx_value_t* dst, cx_value_t* val) { \
-        *cx_keyref(dst) = i_KEYFROM(i_KEYTO(cx_keyref(val))); \
-        cx_MAP_ONLY( dst->second = i_VALFROM(i_VALTO(&val->second)); ) \
+        *cx_keyref(dst) = i_keyfrom(i_keyto(cx_keyref(val))); \
+        cx_MAP_ONLY( dst->second = i_valfrom(i_valto(&val->second)); ) \
     } \
 \
     STC_INLINE cx_result_t \
-    cx_memb(_emplace)(Self* self, i_KEYRAW rkey cx_MAP_ONLY(, i_VALRAW rmapped)) { \
+    cx_memb(_emplace)(Self* self, i_keyraw rkey cx_MAP_ONLY(, i_valraw rmapped)) { \
         cx_result_t res = cx_memb(_insert_entry_)(self, rkey); \
         if (res.inserted) { \
-            *cx_keyref(res.ref) = i_KEYFROM(rkey); \
-            cx_MAP_ONLY(res.ref->second = i_VALFROM(rmapped);) \
+            *cx_keyref(res.ref) = i_keyfrom(rkey); \
+            cx_MAP_ONLY(res.ref->second = i_valfrom(rmapped);) \
         } \
         return res; \
     } \
@@ -131,37 +131,37 @@ int main(void) {
     } \
 \
     STC_INLINE cx_result_t \
-    cx_memb(_insert)(Self* self, i_KEY key cx_MAP_ONLY(, i_VAL mapped)) { \
-        cx_result_t res = cx_memb(_insert_entry_)(self, i_KEYTO(&key)); \
+    cx_memb(_insert)(Self* self, i_key key cx_MAP_ONLY(, i_val mapped)) { \
+        cx_result_t res = cx_memb(_insert_entry_)(self, i_keyto(&key)); \
         if (res.inserted) {*cx_keyref(res.ref) = key; cx_MAP_ONLY( res.ref->second = mapped; )} \
-        else              {i_KEYDEL(&key); cx_MAP_ONLY( i_VALDEL(&mapped); )} \
+        else              {i_keydel(&key); cx_MAP_ONLY( i_valdel(&mapped); )} \
         return res; \
     } \
 \
     cx_MAP_ONLY( \
         STC_INLINE cx_result_t \
-        cx_memb(_insert_or_assign)(Self* self, i_KEY key, i_VAL mapped) { \
-            cx_result_t res = cx_memb(_insert_entry_)(self, i_KEYTO(&key)); \
+        cx_memb(_insert_or_assign)(Self* self, i_key key, i_val mapped) { \
+            cx_result_t res = cx_memb(_insert_entry_)(self, i_keyto(&key)); \
             if (res.inserted) res.ref->first = key; \
-            else {i_KEYDEL(&key); i_VALDEL(&res.ref->second); } \
+            else {i_keydel(&key); i_valdel(&res.ref->second); } \
             res.ref->second = mapped; return res; \
         } \
     \
         STC_INLINE cx_result_t \
-        cx_memb(_put)(Self* self, i_KEY key, i_VAL mapped) { \
+        cx_memb(_put)(Self* self, i_key key, i_val mapped) { \
             return cx_memb(_insert_or_assign)(self, key, mapped); \
         } \
     \
         STC_INLINE cx_result_t \
-        cx_memb(_emplace_or_assign)(Self* self, i_KEYRAW rkey, i_VALRAW rmapped) { \
+        cx_memb(_emplace_or_assign)(Self* self, i_keyraw rkey, i_valraw rmapped) { \
             cx_result_t res = cx_memb(_insert_entry_)(self, rkey); \
-            if (res.inserted) res.ref->first = i_KEYFROM(rkey); \
-            else i_VALDEL(&res.ref->second); \
-            res.ref->second = i_VALFROM(rmapped); return res; \
+            if (res.inserted) res.ref->first = i_keyfrom(rkey); \
+            else i_valdel(&res.ref->second); \
+            res.ref->second = i_valfrom(rmapped); return res; \
         } \
     \
         STC_INLINE cx_mapped_t* \
-        cx_memb(_at)(const Self* self, i_KEYRAW rkey) { \
+        cx_memb(_at)(const Self* self, i_keyraw rkey) { \
             cx_iter_t it; \
             return &cx_memb(_find_it)(self, rkey, &it)->second; \
         }) \
@@ -178,7 +178,7 @@ int main(void) {
     } \
 \
     STC_INLINE size_t \
-    cx_memb(_erase)(Self* self, i_KEYRAW rkey) { \
+    cx_memb(_erase)(Self* self, i_keyraw rkey) { \
         int erased = 0; \
         self->root = cx_memb(_erase_r_)(self->root, &rkey, &erased); \
         self->size -= erased; return erased; \
@@ -190,9 +190,9 @@ int main(void) {
         return it; \
     } \
 \
-    _c_implement_aatree(Self, C, i_KEY, i_VAL, i_CMP, \
-                        i_VALDEL, i_VALFROM, i_VALTO, i_VALRAW, \
-                        i_KEYDEL, i_KEYFROM, i_KEYTO, i_KEYRAW) \
+    _c_implement_aatree(Self, C, i_key, i_val, i_cmp, \
+                        i_valdel, i_valfrom, i_valto, i_valraw, \
+                        i_keydel, i_keyfrom, i_keyto, i_keyraw) \
     struct stc_trailing_semicolon
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
@@ -203,9 +203,9 @@ _c_aatree_types(csmap_SENTINEL, csmap_, int, int);
 _c_aatree_complete_types(csmap_SENTINEL, csmap_);
 static csmap_SENTINEL_node_t _aatree_sentinel = {&_aatree_sentinel, &_aatree_sentinel, 0};
 
-#define _c_implement_aatree(Self, C, i_KEY, i_VAL, i_CMP, \
-                            i_VALDEL, i_VALFROM, i_VALTO, i_VALRAW, \
-                            i_KEYDEL, i_KEYFROM, i_KEYTO, i_KEYRAW) \
+#define _c_implement_aatree(Self, C, i_key, i_val, i_cmp, \
+                            i_valdel, i_valfrom, i_valto, i_valraw, \
+                            i_keydel, i_keyfrom, i_keyto, i_keyraw) \
     STC_DEF Self \
     cx_memb(_init)(void) { \
         Self cx = {(cx_node_t *) &_aatree_sentinel, 0}; \
@@ -231,8 +231,8 @@ static csmap_SENTINEL_node_t _aatree_sentinel = {&_aatree_sentinel, &_aatree_sen
         cx_node_t *tn = self->root; \
         out->_top = 0; \
         while (tn->level) { \
-            int c; cx_rawkey_t rx = i_KEYTO(cx_keyref(&tn->value)); \
-            if ((c = i_CMP(&rx, &rkey)) < 0) tn = tn->link[1]; \
+            int c; cx_rawkey_t rx = i_keyto(cx_keyref(&tn->value)); \
+            if ((c = i_cmp(&rx, &rkey)) < 0) tn = tn->link[1]; \
             else if (c > 0) {out->_st[out->_top++] = tn; tn = tn->link[0]; } \
             else {out->_tn = tn->link[1]; return (out->ref = &tn->value); } \
         } \
@@ -240,7 +240,7 @@ static csmap_SENTINEL_node_t _aatree_sentinel = {&_aatree_sentinel, &_aatree_sen
     } \
 \
     STC_DEF cx_iter_t \
-    cx_memb(_lower_bound)(const Self* self, i_KEYRAW rkey) { \
+    cx_memb(_lower_bound)(const Self* self, i_keyraw rkey) { \
         cx_iter_t it; \
         cx_memb(_find_it)(self, rkey, &it); \
         if (!it.ref && it._top) { \
@@ -295,8 +295,8 @@ static csmap_SENTINEL_node_t _aatree_sentinel = {&_aatree_sentinel, &_aatree_sen
         int c, top = 0, dir = 0; \
         while (tx->level) { \
             up[top++] = tx; \
-            cx_rawkey_t r = i_KEYTO(cx_keyref(&tx->value)); \
-            if (!(c = i_CMP(&r, rkey))) {res->ref = &tx->value; return tn; } \
+            cx_rawkey_t r = i_keyto(cx_keyref(&tx->value)); \
+            if (!(c = i_cmp(&r, rkey))) {res->ref = &tx->value; return tn; } \
             tx = tx->link[(dir = (c < 0))]; \
         } \
         tn = c_new(cx_node_t); \
@@ -314,7 +314,7 @@ static csmap_SENTINEL_node_t _aatree_sentinel = {&_aatree_sentinel, &_aatree_sen
     } \
 \
     STC_DEF cx_result_t \
-    cx_memb(_insert_entry_)(Self* self, i_KEYRAW rkey) { \
+    cx_memb(_insert_entry_)(Self* self, i_keyraw rkey) { \
         cx_result_t res = {NULL, false}; \
         self->root = cx_memb(_insert_entry_i_)(self->root, &rkey, &res); \
         self->size += res.inserted; \
@@ -325,8 +325,8 @@ static csmap_SENTINEL_node_t _aatree_sentinel = {&_aatree_sentinel, &_aatree_sen
     cx_memb(_erase_r_)(cx_node_t *tn, const cx_rawkey_t* rkey, int *erased) { \
         if (tn->level == 0) \
             return tn; \
-        cx_rawkey_t raw = i_KEYTO(cx_keyref(&tn->value)); \
-        cx_node_t *tx; int c = i_CMP(&raw, rkey); \
+        cx_rawkey_t raw = i_keyto(cx_keyref(&tn->value)); \
+        cx_node_t *tx; int c = i_cmp(&raw, rkey); \
         if (c != 0) \
             tn->link[c < 0] = cx_memb(_erase_r_)(tn->link[c < 0], rkey, erased); \
         else { \
@@ -336,7 +336,7 @@ static csmap_SENTINEL_node_t _aatree_sentinel = {&_aatree_sentinel, &_aatree_sen
                 while (tx->link[1]->level) \
                     tx = tx->link[1]; \
                 tn->value = tx->value; \
-                raw = i_KEYTO(cx_keyref(&tn->value)); \
+                raw = i_keyto(cx_keyref(&tn->value)); \
                 tn->link[0] = cx_memb(_erase_r_)(tn->link[0], &raw, erased); \
             } else { \
                 tx = tn; \
@@ -357,9 +357,9 @@ static csmap_SENTINEL_node_t _aatree_sentinel = {&_aatree_sentinel, &_aatree_sen
     } \
     STC_DEF cx_iter_t \
     cx_memb(_erase_at)(Self* self, cx_iter_t it) { \
-        cx_rawkey_t raw = i_KEYTO(cx_keyref(it.ref)), nxt; \
+        cx_rawkey_t raw = i_keyto(cx_keyref(it.ref)), nxt; \
         cx_memb(_next)(&it); \
-        if (it.ref) nxt = i_KEYTO(cx_keyref(it.ref)); \
+        if (it.ref) nxt = i_keyto(cx_keyref(it.ref)); \
         cx_memb(_erase)(self, raw); \
         if (it.ref) cx_memb(_find_it)(self, nxt, &it); \
         return it; \
@@ -370,12 +370,12 @@ static csmap_SENTINEL_node_t _aatree_sentinel = {&_aatree_sentinel, &_aatree_sen
         if (!it2.ref) { while (it1.ref) it1 = cx_memb(_erase_at)(self, it1); \
                         return it1; } \
         cx_key_t k1 = *cx_keyref(it1.ref), k2 = *cx_keyref(it2.ref); \
-        cx_rawkey_t r1 = i_KEYTO(&k1); \
+        cx_rawkey_t r1 = i_keyto(&k1); \
         for (;;) { \
             if (memcmp(&k1, &k2, sizeof k1) == 0) return it1; \
             cx_memb(_next)(&it1); k1 = *cx_keyref(it1.ref); \
             cx_memb(_erase)(self, r1); \
-            cx_memb(_find_it)(self, (r1 = i_KEYTO(&k1)), &it1); \
+            cx_memb(_find_it)(self, (r1 = i_keyto(&k1)), &it1); \
         } \
     } \
 \

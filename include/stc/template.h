@@ -20,13 +20,13 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef i_TEMPLATE
-#define i_TEMPLATE
+#ifndef i_template
+#define i_template
 
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
   #define cx_memb(name) c_PASTE(Self, name)
-  #define Self c_PASTE3(i_MODULE, _, i_TAG)
+  #define Self c_PASTE3(i_module, _, i_tag)
   // typedef container types defined in forward.h
   #define cx_deftypes(macro, SELF, ...) macro(SELF, __VA_ARGS__)
   
@@ -41,112 +41,112 @@
   #define cx_node_t cx_memb(_node_t)
 #endif
 
-#if defined f_TAG
-  #define i_TAG f_TAG
-  #define i_FWD
+#if defined f_tag
+  #define i_tag f_tag
+  #define i_fwd
 #endif
 
-#if defined i_KEY_str
-  #define i_KEY     cstr
-  #define i_CMP     c_rawstr_compare
-  #define i_EQU     c_rawstr_equals
-  #define i_HASH    c_rawstr_hash
-  #define i_KEYDEL  cstr_del
-  #define i_KEYFROM cstr_from
-  #define i_KEYTO   cstr_str
-  #define i_KEYRAW  const char*
+#if defined i_key_str
+  #define i_key     cstr
+  #define i_cmp     c_rawstr_compare
+  #define i_equ     c_rawstr_equals
+  #define i_hash    c_rawstr_hash
+  #define i_keydel  cstr_del
+  #define i_keyfrom cstr_from
+  #define i_keyto   cstr_str
+  #define i_keyraw  const char*
 #endif
-#if defined i_VAL_str
-  #define i_VAL     cstr
-  #ifndef i_KEY
-  #define i_CMP     c_rawstr_compare
+#if defined i_val_str
+  #define i_val     cstr
+  #ifndef i_key
+  #define i_cmp     c_rawstr_compare
   #endif
-  #define i_VALDEL  cstr_del
-  #define i_VALFROM cstr_from
-  #define i_VALTO   cstr_str
-  #define i_VALRAW  const char*
+  #define i_valdel  cstr_del
+  #define i_valfrom cstr_from
+  #define i_valto   cstr_str
+  #define i_valraw  const char*
 #endif
-#if defined i_KEY && !defined i_VAL
-  #define i_VAL i_KEY
+#if defined i_key && !defined i_val
+  #define i_val i_key
 #endif
-#if !defined i_TAG && defined i_KEY_str
-  #define i_TAG str
-#elif !defined i_TAG && defined i_KEY
-  #define i_TAG i_KEY
-#elif !defined i_TAG && defined i_VAL_str
-  #define i_TAG str
-#elif !defined i_TAG && defined i_VAL
-  #define i_TAG i_VAL
+#if !defined i_tag && defined i_key_str
+  #define i_tag str
+#elif !defined i_tag && defined i_key
+  #define i_tag i_key
+#elif !defined i_tag && defined i_val_str
+  #define i_tag str
+#elif !defined i_tag && defined i_val
+  #define i_tag i_val
 #endif
 
-#if (defined i_VALTO ^ defined i_VALRAW) || (defined i_VALRAW && !defined i_VALFROM)
-  #error if i_VALRAW defined, both i_VALFROM and i_VALTO must be defined
+#if (defined i_valto ^ defined i_valraw) || (defined i_valraw && !defined i_valfrom)
+  #error if i_valraw defined, both i_valfrom and i_valto must be defined
 #endif
-#if (defined i_KEYTO ^ defined i_KEYRAW) || (defined i_KEYRAW && !defined i_KEYFROM)
-  #error if i_KEYRAW defined, both i_KEYFROM and i_KEYTO must be defined
-#endif
-
-#if defined i_KEY
-  #if !defined i_KEYFROM && defined i_KEYDEL
-    #define i_KEYFROM c_no_clone
-  #elif !defined i_KEYFROM
-    #define i_KEYFROM c_default_fromraw
-  #endif
-  #ifndef i_KEYRAW
-    #define i_KEYRAW i_KEY
-    #define i_KEYTO c_default_toraw
-  #endif
-  #if !defined i_EQU && defined i_CMP
-    #define i_EQU !i_CMP
-  #elif !defined i_EQU
-    #define i_EQU c_default_equals
-  #endif
-  #ifndef i_HASH
-    #define i_HASH c_default_hash
-  #endif
+#if (defined i_keyto ^ defined i_keyraw) || (defined i_keyraw && !defined i_keyfrom)
+  #error if i_keyraw defined, both i_keyfrom and i_keyto must be defined
 #endif
 
-#if !defined i_VALFROM && defined i_VALDEL
-  #define i_VALFROM c_no_clone
-#elif !defined i_VALFROM
-  #define i_VALFROM c_default_fromraw
+#if defined i_key
+  #if !defined i_keyfrom && defined i_keydel
+    #define i_keyfrom c_no_clone
+  #elif !defined i_keyfrom
+    #define i_keyfrom c_default_fromraw
+  #endif
+  #ifndef i_keyraw
+    #define i_keyraw i_key
+    #define i_keyto c_default_toraw
+  #endif
+  #if !defined i_equ && defined i_cmp
+    #define i_equ !i_cmp
+  #elif !defined i_equ
+    #define i_equ c_default_equals
+  #endif
+  #ifndef i_hash
+    #define i_hash c_default_hash
+  #endif
 #endif
-#ifndef i_VALRAW
-  #define i_VALRAW i_VAL
-  #define i_VALTO c_default_toraw
+
+#if !defined i_valfrom && defined i_valdel
+  #define i_valfrom c_no_clone
+#elif !defined i_valfrom
+  #define i_valfrom c_default_fromraw
 #endif
-#ifndef i_KEYDEL
-  #define i_KEYDEL c_default_del
+#ifndef i_valraw
+  #define i_valraw i_val
+  #define i_valto c_default_toraw
 #endif
-#ifndef i_VALDEL
-  #define i_VALDEL c_default_del
+#ifndef i_keydel
+  #define i_keydel c_default_del
 #endif
-#ifndef i_CMP
-  #define i_CMP c_default_compare
+#ifndef i_valdel
+  #define i_valdel c_default_del
+#endif
+#ifndef i_cmp
+  #define i_cmp c_default_compare
 #endif
 
 #else // -------------------------------------------------------
 
-#undef i_MODULE
-#undef i_TAG
-#undef f_TAG
-#undef i_IMP
-#undef i_FWD
-#undef i_CMP
-#undef i_EQU
-#undef i_HASH
-#undef i_VAL
-#undef i_VAL_str
-#undef i_VALDEL
-#undef i_VALFROM
-#undef i_VALTO
-#undef i_VALRAW
-#undef i_KEY
-#undef i_KEY_str
-#undef i_KEYDEL
-#undef i_KEYFROM
-#undef i_KEYTO
-#undef i_KEYRAW
+#undef i_module
+#undef i_tag
+#undef f_tag
+#undef i_imp
+#undef i_fwd
+#undef i_cmp
+#undef i_equ
+#undef i_hash
+#undef i_val
+#undef i_val_str
+#undef i_valdel
+#undef i_valfrom
+#undef i_valto
+#undef i_valraw
+#undef i_key
+#undef i_key_str
+#undef i_keydel
+#undef i_keyfrom
+#undef i_keyto
+#undef i_keyraw
 
-#undef i_TEMPLATE
+#undef i_template
 #endif
