@@ -63,8 +63,8 @@ int main() {
 #include <stdlib.h>
 #include <string.h>
 
-struct cvec_Rep_ { size_t size, cap; void* data[]; };
-#define cvec_rep_(self) c_container_of((self)->data, struct cvec_Rep_, data)
+struct cvec_rep { size_t size, cap; void* data[]; };
+#define cvec_rep_(self) c_container_of((self)->data, struct cvec_rep, data)
 #endif // CVEC_H_INCLUDED
 
 #define i_module cvec
@@ -218,12 +218,11 @@ cx_memb(_sort)(Self* self) {
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
 
 #ifndef CVEC_H_INCLUDED
 #define CVEC_H_INCLUDED
-static struct cvec_Rep_ _cvec_sentinel = {0, 0};
+static struct cvec_rep _cvec_sentinel = {0, 0};
 #endif
 
 STC_DEF Self
@@ -234,7 +233,7 @@ cx_memb(_init)(void) {
 
 STC_DEF void
 cx_memb(_clear)(Self* self) {
-    struct cvec_Rep_* rep = cvec_rep_(self); if (rep->cap) {
+    struct cvec_rep* rep = cvec_rep_(self); if (rep->cap) {
         for (cx_value_t *p = self->data, *q = p + rep->size; p != q; ++p)
             i_valdel(p);
         rep->size = 0;
@@ -250,11 +249,11 @@ cx_memb(_del)(Self* self) {
 
 STC_DEF void
 cx_memb(_reserve)(Self* self, size_t cap) {
-    struct cvec_Rep_* rep = cvec_rep_(self);
+    struct cvec_rep* rep = cvec_rep_(self);
     size_t len = rep->size, oldcap = rep->cap;
     if (cap > oldcap) {
-        rep = (struct cvec_Rep_*) c_realloc(oldcap ? rep : NULL,
-                                            offsetof(struct cvec_Rep_, data) + cap*sizeof(i_val));
+        rep = (struct cvec_rep*) c_realloc(oldcap ? rep : NULL,
+                                            offsetof(struct cvec_rep, data) + cap*sizeof(i_val));
         self->data = (cx_value_t*) rep->data;
         rep->size = len;
         rep->cap = cap;
@@ -264,7 +263,7 @@ cx_memb(_reserve)(Self* self, size_t cap) {
 STC_DEF void
 cx_memb(_resize)(Self* self, size_t len, i_val null_val) {
     cx_memb(_reserve)(self, len);
-    struct cvec_Rep_* rep = cvec_rep_(self);
+    struct cvec_rep* rep = cvec_rep_(self);
     size_t i, n = rep->size;
     for (i = len; i < n; ++i) i_valdel(self->data + i);
     for (i = n; i < len; ++i) self->data[i] = null_val;

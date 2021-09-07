@@ -37,24 +37,29 @@ int point_compare(const Point* a, const Point* b) {
 
 int main()
 {
-    csmap_int map = csmap_int_init();
-    csmap_int_insert(&map, 123, 321);
-    csmap_int_del(&map);
+    c_forauto (csmap_int, map)
+        csmap_int_insert(&map, 123, 321);
 
-    csmap_pnt pmap = csmap_pnt_init();
-    csmap_pnt_insert(&pmap, (Point){42, 14}, 1);
-    csmap_pnt_insert(&pmap, (Point){32, 94}, 2);
-    csmap_pnt_insert(&pmap, (Point){62, 81}, 3);
-    c_foreach (i, csmap_pnt, pmap)
-        printf(" (%d,%d: %d)", i.ref->first.x, i.ref->first.y, i.ref->second);
-    puts("");
-    csmap_pnt_del(&pmap);
+    c_forauto (csmap_pnt, pmap) {
+        csmap_pnt_insert(&pmap, (Point){42, 14}, 1);
+        csmap_pnt_insert(&pmap, (Point){32, 94}, 2);
+        csmap_pnt_insert(&pmap, (Point){62, 81}, 3);
+        c_foreach (i, csmap_pnt, pmap)
+            printf(" (%d,%d: %d)", i.ref->first.x, i.ref->first.y, i.ref->second);
+        puts("");
+    }
 
-    csmap_str smap = csmap_str_init();
-    csmap_str_emplace(&smap, "Hello, friend", "this is the mapped value");
-    csmap_str_del(&smap);
+    c_forauto (csmap_str, smap) {
+        csmap_str_emplace(&smap, "Hello, friend", "this is the mapped value");
+        csmap_str_emplace(&smap, "The brown fox", "jumped");
+        csmap_str_emplace(&smap, "This is the time", "for all good things");
+        c_foreach (i, csmap_str, smap)
+            printf(" (%s: %s)\n", i.ref->first.str, i.ref->second.str);
+    }
 
-    csset_str sset = csset_str_init();
-    csset_str_emplace(&sset, "Hello, friend");
-    csset_str_del(&sset);
+    c_forauto (csset_str, sset) {
+        csset_str_emplace(&sset, "Hello, friend");
+        csset_str_emplace(&sset, "Goodbye, foe");
+        printf("Found? %s\n", csset_str_contains(&sset, "Hello, friend") ? "true" : "false");
+    }
 }

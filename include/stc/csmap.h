@@ -24,23 +24,27 @@
 // Sorted/Ordered set and map - implemented as an AA-tree.
 /*
 #include <stdio.h>
+#include <stc/cstr.h>
+
+#define i_tag sx  // Sorted map<cstr, double>
+#define i_key_str
+#define i_val double
 #include <stc/csmap.h>
-using_csmap(mx, int, char); // Sorted map<int, char>
 
 int main(void) {
-    c_forvar (csmap_mx m = csmap_mx_init(), csmap_mx_del(&m))
+    c_forvar (csmap_sx m = csmap_sx_init(), csmap_sx_del(&m))
     {
-        csmap_mx_insert(&m, 5, 'a');
-        csmap_mx_insert(&m, 8, 'b');
-        csmap_mx_insert(&m, 12, 'c');
+        csmap_sx_emplace(&m, "Testing one", 1.234);
+        csmap_sx_emplace(&m, "Testing two", 12.34);
+        csmap_sx_emplace(&m, "Testing three", 123.4);
 
-        csmap_mx_iter_t it = csmap_mx_find(&m, 10); // none
-        char val = csmap_mx_find(&m, 5).ref->second;
-        csmap_mx_put(&m, 5, 'd'); // update
-        csmap_mx_erase(&m, 8);
+        csmap_sx_value_t *v = csmap_sx_get(&m, "Testing five"); // NULL
+        double num = *csmap_sx_at(&m, "Testing one");
+        csmap_sx_emplace_or_assign(&m, "Testing three", 1000.0); // update
+        csmap_sx_erase(&m, "Testing two");
 
-        c_foreach (i, csmap_mx, m)
-            printf("map %d: %c\n", i.ref->first, i.ref->second);
+        c_foreach (i, csmap_sx, m)
+            printf("map %s: %g\n", i.ref->first.str, i.ref->second);
     }
 }
 */
