@@ -309,7 +309,7 @@ cx_memb(_bucket_)(const Self* self, const cx_rawkey_t* rkeyptr) {
 
 STC_DEF cx_result_t
 cx_memb(_insert_entry_)(Self* self, i_keyraw rkey) {
-    if (self->size + 1 >= (cx_memb(_size_t)) (self->bucket_count * self->max_load_factor))
+    if (self->size + 1 >= (cx_size_t) (self->bucket_count * self->max_load_factor))
         cx_memb(_reserve)(self, 8 + (self->size*13ull >> 3));
     chash_bucket_t b = cx_memb(_bucket_)(self, &rkey);
     cx_result_t res = {&self->table[b.idx], !self->_hashx[b.idx]};
@@ -342,7 +342,7 @@ cx_memb(_reserve)(Self* self, size_t _newcap) {
     Self _tmp = {
         c_new_n(cx_value_t, _newcap),
         (uint8_t *) c_calloc(_newcap + 1, sizeof(uint8_t)),
-        self->size, (cx_memb(_size_t)) _newcap,
+        self->size, (cx_size_t) _newcap,
         self->max_load_factor
     };
     /* Rehash: */

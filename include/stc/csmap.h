@@ -76,7 +76,7 @@ cx_MAP_ONLY( struct cx_value_t {
     cx_mapped_t second;
 }; )
 struct cx_node_t {
-    cx_memb(_size_t) link[2];
+    cx_size_t link[2];
     int8_t level;
     cx_value_t value;
 };
@@ -183,7 +183,7 @@ cx_memb(_insert)(Self* self, i_key key cx_MAP_ONLY(, i_val mapped)) {
 STC_INLINE cx_iter_t
 cx_memb(_begin)(const Self* self) {
     cx_iter_t it; it._d = self->nodes, it._top = 0;
-    it._tn = (cx_memb(_size_t)) _csmap_rep(self)->root;
+    it._tn = (cx_size_t) _csmap_rep(self)->root;
     if (it._tn) cx_memb(_next)(&it);
     return it;
 }
@@ -216,7 +216,7 @@ cx_memb(_init)(void) {
 STC_DEF cx_value_t*
 cx_memb(_front)(const Self* self) {
     cx_node_t *d = self->nodes;
-    cx_memb(_size_t) tn = (cx_memb(_size_t)) _csmap_rep(self)->root;
+    cx_size_t tn = (cx_size_t) _csmap_rep(self)->root;
     while (d[tn].link[0]) tn = d[tn].link[0];
     return &d[tn].value;
 }
@@ -224,7 +224,7 @@ cx_memb(_front)(const Self* self) {
 STC_DEF cx_value_t*
 cx_memb(_back)(const Self* self) {
     cx_node_t *d = self->nodes;
-    cx_memb(_size_t) tn = (cx_memb(_size_t)) _csmap_rep(self)->root;
+    cx_size_t tn = (cx_size_t) _csmap_rep(self)->root;
     while (d[tn].link[1]) tn = d[tn].link[1];
     return &d[tn].value;
 }
@@ -232,7 +232,7 @@ cx_memb(_back)(const Self* self) {
 STC_DEF void
 cx_memb(_reserve)(Self* self, size_t cap) {
     struct csmap_rep* rep = _csmap_rep(self);
-    cx_memb(_size_t) oldcap = rep->cap;
+    cx_size_t oldcap = rep->cap;
     if (cap > oldcap) {
         rep = (struct csmap_rep*) c_realloc(oldcap ? rep : NULL,
                                             sizeof(struct csmap_rep) + (cap + 1)*sizeof(cx_node_t));
@@ -243,7 +243,7 @@ cx_memb(_reserve)(Self* self, size_t cap) {
     }
 }
 
-STC_DEF cx_memb(_size_t)
+STC_DEF cx_size_t
 cx_memb(_node_new_)(Self* self, int level) {
     size_t tn; struct csmap_rep *rep = _csmap_rep(self);
     if (rep->disp) {
@@ -255,7 +255,7 @@ cx_memb(_node_new_)(Self* self, int level) {
     }
     cx_node_t* dn = &self->nodes[tn];
     dn->link[0] = dn->link[1] = 0; dn->level = level;
-    return (cx_memb(_size_t)) tn;
+    return (cx_size_t) tn;
 }
 
 cx_MAP_ONLY(
@@ -278,7 +278,7 @@ cx_MAP_ONLY(
 
 STC_DEF cx_value_t*
 cx_memb(_find_it)(const Self* self, i_keyraw rkey, cx_iter_t* out) {
-    cx_memb(_size_t) tn = _csmap_rep(self)->root;
+    cx_size_t tn = _csmap_rep(self)->root;
     cx_node_t *d = out->_d = self->nodes;
     out->_top = 0;
     while (tn) {
@@ -298,7 +298,7 @@ cx_memb(_lower_bound)(const Self* self, i_keyraw rkey) {
     cx_iter_t it;
     cx_memb(_find_it)(self, rkey, &it);
     if (!it.ref && it._top) {
-        cx_memb(_size_t) tn = it._st[--it._top];
+        cx_size_t tn = it._st[--it._top];
         it._tn = it._d[tn].link[1];
         it.ref = &it._d[tn].value;
     }
@@ -307,7 +307,7 @@ cx_memb(_lower_bound)(const Self* self, i_keyraw rkey) {
 
 STC_DEF void
 cx_memb(_next)(cx_iter_t *it) {
-    cx_memb(_size_t) tn = it->_tn;
+    cx_size_t tn = it->_tn;
     if (it->_top || tn) {
         while (tn) {
             it->_st[it->_top++] = tn;
@@ -320,10 +320,10 @@ cx_memb(_next)(cx_iter_t *it) {
         it->ref = NULL;
 }
 
-STC_DEF cx_memb(_size_t)
-cx_memb(_skew_)(cx_node_t *d, cx_memb(_size_t) tn) {
+STC_DEF cx_size_t
+cx_memb(_skew_)(cx_node_t *d, cx_size_t tn) {
     if (tn && d[d[tn].link[0]].level == d[tn].level) {
-        cx_memb(_size_t) tmp = d[tn].link[0];
+        cx_size_t tmp = d[tn].link[0];
         d[tn].link[0] = d[tmp].link[1];
         d[tmp].link[1] = tn;
         tn = tmp;
@@ -331,10 +331,10 @@ cx_memb(_skew_)(cx_node_t *d, cx_memb(_size_t) tn) {
     return tn;
 }
 
-STC_DEF cx_memb(_size_t)
-cx_memb(_split_)(cx_node_t *d, cx_memb(_size_t) tn) {
+STC_DEF cx_size_t
+cx_memb(_split_)(cx_node_t *d, cx_size_t tn) {
     if (d[d[d[tn].link[1]].link[1]].level == d[tn].level) {
-        cx_memb(_size_t) tmp = d[tn].link[1];
+        cx_size_t tmp = d[tn].link[1];
         d[tn].link[1] = d[tmp].link[0];
         d[tmp].link[0] = tn;
         tn = tmp;
@@ -343,9 +343,9 @@ cx_memb(_split_)(cx_node_t *d, cx_memb(_size_t) tn) {
     return tn;
 }
 
-STC_DEF cx_memb(_size_t)
-cx_memb(_insert_entry_i_)(Self* self, cx_memb(_size_t) tn, const cx_rawkey_t* rkey, cx_result_t* res) {
-    cx_memb(_size_t) up[64], tx = tn;
+STC_DEF cx_size_t
+cx_memb(_insert_entry_i_)(Self* self, cx_size_t tn, const cx_rawkey_t* rkey, cx_result_t* res) {
+    cx_size_t up[64], tx = tn;
     cx_node_t* d = self->nodes;
     int c, top = 0, dir = 0;
     while (tx) {
@@ -371,17 +371,17 @@ cx_memb(_insert_entry_i_)(Self* self, cx_memb(_size_t) tn, const cx_rawkey_t* rk
 STC_DEF cx_result_t
 cx_memb(_insert_entry_)(Self* self, i_keyraw rkey) {
     cx_result_t res = {NULL, false};
-    cx_memb(_size_t) tn = cx_memb(_insert_entry_i_)(self, (cx_memb(_size_t)) _csmap_rep(self)->root, &rkey, &res);
+    cx_size_t tn = cx_memb(_insert_entry_i_)(self, (cx_size_t) _csmap_rep(self)->root, &rkey, &res);
     _csmap_rep(self)->root = tn;
     _csmap_rep(self)->size += res.inserted;
     return res;
 }
 
-STC_DEF cx_memb(_size_t)
-cx_memb(_erase_r_)(cx_node_t *d, cx_memb(_size_t) tn, const cx_rawkey_t* rkey, int *erased) {
+STC_DEF cx_size_t
+cx_memb(_erase_r_)(cx_node_t *d, cx_size_t tn, const cx_rawkey_t* rkey, int *erased) {
     if (tn == 0) return 0;
     i_keyraw raw = i_keyto(cx_keyref(&d[tn].value));
-    cx_memb(_size_t) tx; int c = i_cmp(&raw, rkey);
+    cx_size_t tx; int c = i_cmp(&raw, rkey);
     if (c != 0)
         d[tn].link[c < 0] = cx_memb(_erase_r_)(d, d[tn].link[c < 0], rkey, erased);
     else {
@@ -398,7 +398,7 @@ cx_memb(_erase_r_)(cx_node_t *d, cx_memb(_size_t) tn, const cx_rawkey_t* rkey, i
             tn = d[tn].link[ d[tn].link[0] == 0 ];
             /* move it to disposed nodes list */
             struct csmap_rep *rep = c_container_of(d, struct csmap_rep, nodes);
-            d[tx].link[1] = (cx_memb(_size_t)) rep->disp;
+            d[tx].link[1] = (cx_size_t) rep->disp;
             rep->disp = tx;
         }
     }
@@ -418,7 +418,7 @@ cx_memb(_erase_r_)(cx_node_t *d, cx_memb(_size_t) tn, const cx_rawkey_t* rkey, i
 STC_DEF int
 cx_memb(_erase)(Self* self, i_keyraw rkey) {
     int erased = 0;
-    cx_memb(_size_t) root = cx_memb(_erase_r_)(self->nodes, (cx_memb(_size_t)) _csmap_rep(self)->root, &rkey, &erased);
+    cx_size_t root = cx_memb(_erase_r_)(self->nodes, (cx_size_t) _csmap_rep(self)->root, &rkey, &erased);
     return erased ? (_csmap_rep(self)->root = root, --_csmap_rep(self)->size, 1) : 0;
 }
 
@@ -446,10 +446,10 @@ cx_memb(_erase_range)(Self* self, cx_iter_t it1, cx_iter_t it2) {
     }
 }
 
-STC_DEF cx_memb(_size_t)
-cx_memb(_clone_r_)(Self* self, cx_node_t* src, cx_memb(_size_t) sn) {
+STC_DEF cx_size_t
+cx_memb(_clone_r_)(Self* self, cx_node_t* src, cx_size_t sn) {
     if (sn == 0) return 0;
-    cx_memb(_size_t) tx, tn = cx_memb(_node_new_)(self, src[sn].level);
+    cx_size_t tx, tn = cx_memb(_node_new_)(self, src[sn].level);
     cx_memb(_value_clone)(&self->nodes[tn].value, &src[sn].value);
     tx = cx_memb(_clone_r_)(self, src, src[sn].link[0]); self->nodes[tn].link[0] = tx;
     tx = cx_memb(_clone_r_)(self, src, src[sn].link[1]); self->nodes[tn].link[1] = tx;
@@ -459,14 +459,14 @@ cx_memb(_clone_r_)(Self* self, cx_node_t* src, cx_memb(_size_t) sn) {
 STC_DEF Self
 cx_memb(_clone)(Self tree) {
     Self clone = cx_memb(_with_capacity)(_csmap_rep(&tree)->size);
-    cx_memb(_size_t) root = cx_memb(_clone_r_)(&clone, tree.nodes, (cx_memb(_size_t)) _csmap_rep(&tree)->root);
+    cx_size_t root = cx_memb(_clone_r_)(&clone, tree.nodes, (cx_size_t) _csmap_rep(&tree)->root);
     _csmap_rep(&clone)->root = root;
     _csmap_rep(&clone)->size = _csmap_rep(&tree)->size;
     return clone;
 }
 
 STC_DEF void
-cx_memb(_del_r_)(cx_node_t* d, cx_memb(_size_t) tn) {
+cx_memb(_del_r_)(cx_node_t* d, cx_size_t tn) {
     if (tn) {
         cx_memb(_del_r_)(d, d[tn].link[0]);
         cx_memb(_del_r_)(d, d[tn].link[1]);
@@ -477,7 +477,7 @@ cx_memb(_del_r_)(cx_node_t* d, cx_memb(_size_t) tn) {
 STC_DEF void
 cx_memb(_del)(Self* self) {
     if (_csmap_rep(self)->root) {
-        cx_memb(_del_r_)(self->nodes, (cx_memb(_size_t)) _csmap_rep(self)->root);
+        cx_memb(_del_r_)(self->nodes, (cx_size_t) _csmap_rep(self)->root);
         c_free(_csmap_rep(self));
     }
 }

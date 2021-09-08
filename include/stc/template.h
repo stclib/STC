@@ -39,6 +39,7 @@
   #define cx_iter_t cx_memb(_iter_t)
   #define cx_result_t cx_memb(_result_t)
   #define cx_node_t cx_memb(_node_t)
+  #define cx_size_t cx_memb(_size_t)
 #endif
 
 #if defined f_tag
