@@ -110,11 +110,12 @@ cx_memb(_make_heap)(Self* self) {
         cx_memb(_sift_down_)(arr, k, n);
 }
 
-STC_DEF Self cx_memb(_clone)(Self q) {
+STC_INLINE Self cx_memb(_clone)(Self q) {
     Self out = {(cx_value_t *) c_malloc(q.size*sizeof(cx_value_t)), q.size, q.size};
-    for (cx_value_t *a = out.data, *b = a + q.size; a != b; ++a) *a = i_valfrom(i_valto(q.data++));
+    for (size_t i = 0; i < q.size; ++i, ++q.data) out.data[i] = i_valfrom(i_valto(q.data));
     return out;
 }
+
 
 STC_DEF void
 cx_memb(_erase_at)(Self* self, size_t idx) {

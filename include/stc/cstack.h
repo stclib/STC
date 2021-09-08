@@ -73,7 +73,7 @@ STC_INLINE void cx_memb(_emplace)(Self* self, cx_rawvalue_t raw)
 
 STC_INLINE Self cx_memb(_clone)(Self v) {
     Self out = {(cx_value_t *) c_malloc(v.size*sizeof(cx_value_t)), v.size, v.size};
-    for (cx_value_t *a = out.data, *b = a + v.size; a != b; ++a) *a = i_valfrom(i_valto(v.data++));
+    for (size_t i = 0; i < v.size; ++i, ++v.data) out.data[i] = i_valfrom(i_valto(v.data));
     return out;
 }
 
