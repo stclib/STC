@@ -1,8 +1,8 @@
 #include <errno.h>
 #include <stc/cstr.h>
-#include <stc/cvec.h>
 
-using_cvec_str();
+#define i_val_str
+#include <stc/cvec.h>
 
 cvec_str read_file(const char* name) {
     cvec_str vec = cvec_str_init();

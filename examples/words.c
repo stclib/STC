@@ -1,40 +1,31 @@
 #include <math.h>
 #include <stc/cstr.h>
-#include <stc/cmap.h>
-#include <stc/clist.h>
+
+#define i_val_str
 #include <stc/cvec.h>
 
-using_cvec_str();
-using_clist_str();
-using_cmap_strkey(si, int);
-
+#define i_tag strn
+#define i_key_str
+#define i_val int
+#include <stc/cmap.h>
 
 int main1()
 {
-    c_var (clist_str, lwords, {
-        "this", "sentence", "is", "not", "a", "sentence",
-        "this", "sentence", "is", "a", "hoax"
-    });
-    c_fordefer (clist_str_del(&lwords))
+    c_forauto (cvec_str, words)
+    c_forauto (cmap_strn, word_map)
     {
-        clist_str_push_back(&lwords, cstr_from_fmt("%.15f", sqrt(2)));
-        c_foreach (w, clist_str, lwords)
-            printf("%s\n", w.ref->str);
-        puts("");
-
-        c_var (cvec_str, words, {
+        c_emplace (cvec_str, words, {
             "this", "sentence", "is", "not", "a", "sentence",
             "this", "sentence", "is", "a", "hoax"
         });
-        c_fordefer (cvec_str_del(&words))
-        {
-            cmap_si word_map = cmap_si_init();
-            c_foreach (w, cvec_str, words)
-                cmap_si_emplace(&word_map, w.ref->str, 0).ref->second += 1;
 
-            c_foreach (i, cmap_si, word_map) {
-                printf("%d occurrences of word '%s'\n", i.ref->second, i.ref->first.str);
-            }
+        c_foreach (w, cvec_str, words) {
+            cmap_strn_emplace(&word_map, w.ref->str, 0).ref->second += 1;
+        }
+
+        c_foreach (i, cmap_strn, word_map) {
+            printf("%d occurrences of word '%s'\n",
+                   i.ref->second, i.ref->first.str);
         }
     }
     return 0;

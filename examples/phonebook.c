@@ -22,12 +22,14 @@
 // Program to emulates the phone book.
 
 #include <stdio.h>
-#include <stc/cset.h>
-#include <stc/cmap.h>
 #include <stc/cstr.h>
 
-using_cmap_str();
-using_cset_str();
+#define i_key_str
+#define i_val_str
+#include <stc/cmap.h>
+
+#define i_key_str
+#include <stc/cset.h>
 
 void print_phone_book(cmap_str phone_book)
 {
@@ -39,14 +41,14 @@ int main(int argc, char **argv)
 {
     c_static_assert(3 == 3, "hello");
 
-    c_forvar (cset_str names = cset_str_init(), cset_str_del(&names)) {
+    c_forauto (cset_str, names) {
         c_emplace (cset_str, names, {"Hello", "Cool", "True"});
         c_foreach (i, cset_str, names) printf("%s ", i.ref->str);
         puts("");
     }
 
     bool erased;
-    c_forvar (cmap_str phone_book = cmap_str_init(), cmap_str_del(&phone_book)) {
+    c_forauto (cmap_str, phone_book) {
         c_emplace (cmap_str, phone_book, {
             {"Lilia Friedman", "(892) 670-4739"},
             {"Tariq Beltran", "(489) 600-7575"},
@@ -63,7 +65,7 @@ int main(int argc, char **argv)
         printf("\nPhone book after adding Zak Byers:\n");
         print_phone_book(phone_book);
 
-        if (cmap_str_find(&phone_book, "Tariq Beltran").ref != NULL)
+        if (cmap_str_contains(&phone_book, "Tariq Beltran"))
             printf("\nTariq Beltran is in phone book\n");
 
         erased = cmap_str_erase(&phone_book, "Tariq Beltran");

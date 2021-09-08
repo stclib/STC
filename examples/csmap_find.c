@@ -1,12 +1,17 @@
 // This implements the c++ std::map::find example at:
 // https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-17
-#include <stc/csmap.h>
-#include <stc/cvec.h>
 #include <stc/cstr.h>
 #include <stdio.h>
 
-using_csmap_strval(istr, int);
-using_cvec(istr, csmap_istr_rawvalue_t, c_no_compare);
+#define i_tag istr
+#define i_key int
+#define i_val_str
+#include <stc/csmap.h>
+
+#define i_tag istr
+#define i_val csmap_istr_rawvalue_t
+#define i_cmp c_no_compare
+#include <stc/cvec.h>
 
 void print_elem(csmap_istr_rawvalue_t p) {
     printf("(%d, %s) ", p.first, p.second);
@@ -56,7 +61,7 @@ int main()
 
         puts("Inserting the following vector data into m1:");
         print_collection_cvec_istr(v);
-        
+
         c_foreach (i, cvec_istr, v) csmap_istr_emplace(&m1, i.ref->first, i.ref->second);
 
         puts("The modified map m1 is (key, value):");

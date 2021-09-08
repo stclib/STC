@@ -5,10 +5,6 @@
 //     https://www.redblobgames.com/pathfinding/a-star/introduction.html
 
 #include <stc/cstr.h>
-#include <stc/cpque.h>
-#include <stc/cdeq.h>
-#include <stc/csmap.h>
-
 #include <stdio.h>
 
 typedef struct {
@@ -66,11 +62,27 @@ typedef struct {
     MazePoint b;
 } MazeStep;
 
-using_cdeq(pnt, MazePoint, c_no_compare);
-using_cpque(pnt, cdeq_pnt, mpnt_compare_priority);
-using_csmap(step, MazePoint, MazePoint, mpnt_key_compare);
-using_csmap(cost, MazePoint, int, mpnt_key_compare);
+#define i_tag pnt
+#define i_val MazePoint
+#define i_cmp c_no_compare
+#include <stc/cdeq.h>
 
+#define i_tag pnt
+#define i_val MazePoint
+#define i_cmp mpnt_compare_priority
+#include <stc/cpque.h>
+
+#define i_tag step
+#define i_key MazePoint
+#define i_val MazePoint
+#define i_cmp mpnt_key_compare
+#include <stc/csmap.h>
+
+#define i_tag cost
+#define i_key MazePoint
+#define i_val int
+#define i_cmp mpnt_key_compare
+#include <stc/csmap.h>
 
 cdeq_pnt
 astar(cstr maze, int width)
@@ -79,7 +91,7 @@ astar(cstr maze, int width)
     MazePoint goal = mpnt_from(maze, "!", width);
 
     cdeq_pnt path = cdeq_pnt_init(); // returned
-    
+
     cpque_pnt frontier = cpque_pnt_init();
     csmap_step came_from = csmap_step_init();
     csmap_cost cost_so_far = csmap_cost_init();

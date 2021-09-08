@@ -1,5 +1,4 @@
 #include <stc/csview.h>
-#include <stc/cvec.h>
 
 void print_split(csview str, csview sep)
 {
@@ -12,7 +11,8 @@ void print_split(csview str, csview sep)
     }
 }
 
-using_cvec_str();
+#define i_val_str
+#include <stc/cvec.h>
 
 cvec_str string_split(csview str, csview sep)
 {
