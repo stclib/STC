@@ -36,44 +36,54 @@
 #endif
 typedef i_valraw cx_rawvalue_t;
 
-STC_INLINE Self cx_memb(_init)(void) 
+STC_INLINE Self cx_memb(_init)(void)
     { return (Self){0, 0, 0}; }
-STC_INLINE void cx_memb(_clear)(Self* self) 
-    { while (self->size) i_valdel(&self->data[--self->size]); }
+
+STC_INLINE void cx_memb(_clear)(Self* self) {
+    size_t i = self->size; self->size = 0;
+    while (i--) i_valdel(&self->data[i]);
+}
+
+STC_INLINE void cx_memb(_del)(Self* self)
+    { cx_memb(_clear)(self); c_free(self->data); }
+
 STC_INLINE size_t cx_memb(_size)(Self v)
     { return v.size; }
+
 STC_INLINE bool cx_memb(_empty)(Self v)
     { return !v.size; }
+
 STC_INLINE size_t cx_memb(_capacity)(Self v)
     { return v.capacity; }
-STC_INLINE void cx_memb(_pop)(Self* self)
-    { --self->size; }
+
 STC_INLINE cx_value_t* cx_memb(_top)(const Self* self)
     { return &self->data[self->size - 1]; }
+
+STC_INLINE void cx_memb(_pop)(Self* self)
+    { --self->size; }
+
 STC_INLINE void cx_memb(_push)(Self* self, cx_value_t value) {
     if (self->size == self->capacity)
-        self->data = realloc(self->data, (self->capacity = self->size*3/2 + 4)*sizeof value);
+        self->data = (cx_value_t *) c_realloc(self->data, (self->capacity = self->size*3/2 + 4)*sizeof value);
     self->data[ self->size++ ] = value;
 }
+
 STC_INLINE void cx_memb(_emplace)(Self* self, cx_rawvalue_t raw)
     { cx_memb(_push)(self, i_valfrom(raw)); }
 
-STC_INLINE void cx_memb(_del)(Self* self) {
-    size_t i = self->size;
-    while (i--) i_valdel(&self->data[i]);
-    free(self->data);
+STC_INLINE Self cx_memb(_clone)(Self v) {
+    Self out = {(cx_value_t *) c_malloc(v.size*sizeof(cx_value_t)), v.size, v.size};
+    for (cx_value_t *a = out.data, *b = a + v.size; a != b; ++a) *a = i_valfrom(i_valto(v.data++));
+    return out;
 }
+
+STC_INLINE i_val cx_memb(_value_clone)(cx_value_t val)
+    { return i_valfrom(i_valto(&val)); }
 
 STC_INLINE cx_iter_t cx_memb(_begin)(const Self* self)
     { return c_make(cx_iter_t){self->data}; }
 STC_INLINE cx_iter_t cx_memb(_end)(const Self* self)
     { return c_make(cx_iter_t){self->data + self->size}; }
-STC_INLINE void cx_memb(_next)(cx_iter_t* it) {++it->ref; }
-
-STC_INLINE Self cx_memb(_clone)(Self v) {
-    Self out = {(cx_value_t*) c_malloc(v.size*sizeof(cx_value_t)), v.size, v.size};
-    for (cx_value_t *a = out.data, *b = a + v.size; a != b; ++a) *a = i_valfrom(i_valto(v.data++));
-    return out;
-}
+STC_INLINE void cx_memb(_next)(cx_iter_t* it) { ++it->ref; }
 
 #include "template.h"
