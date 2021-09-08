@@ -90,70 +90,7 @@ _c_clist_complete_types(clist_VOID, dummy);
 cx_deftypes(_c_clist_complete_types, Self, dummy);
 typedef i_valraw cx_rawvalue_t;
 
-#if !defined(STC_HEADER) || defined(i_imp) && i_imp == 2
-#ifndef CLIST_NON_TEMPLATED
-#define CLIST_NON_TEMPLATED
-
-STC_DEF size_t
-_clist_count(const clist_VOID* self) {
-    const clist_VOID_node_t *node = self->last;
-    if (!node) return 0;
-    size_t n = 1;
-    while ((node = node->next) != self->last) ++n;
-    return n;
-}
-
-// Singly linked list Mergesort implementation by Simon Tatham. O(n*log n).
-// https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
-STC_DEF clist_VOID_node_t *
-_clist_mergesort(clist_VOID_node_t *list, int (*cmp)(const clist_VOID_node_t*, const clist_VOID_node_t*)) {
-    clist_VOID_node_t *p, *q, *e, *tail, *oldhead;
-    int insize = 1, nmerges, psize, qsize, i;
-
-    while (1) {
-        p = oldhead = list;
-        list = tail = NULL;
-        nmerges = 0;
-
-        while (p) {
-            ++nmerges;
-            q = p, psize = 0;
-            for (i = 0; i < insize; ++i) {
-                ++psize;
-                q = (q->next == oldhead ? NULL : q->next);
-                if (!q) break;
-            }
-            qsize = insize;
-
-            while (psize > 0 || (qsize > 0 && q)) {
-                if (psize == 0) {
-                    e = q, q = q->next, --qsize;
-                    if (q == oldhead) q = NULL;
-                } else if (qsize == 0 || !q) {
-                    e = p, p = p->next, --psize;
-                    if (p == oldhead) p = NULL;
-                } else if (cmp(p, q) <= 0) {
-                    e = p, p = p->next, --psize;
-                    if (p == oldhead) p = NULL;
-                } else {
-                    e = q, q = q->next, --qsize;
-                    if (q == oldhead) q = NULL;
-                }
-                if (tail) tail->next = e; else list = e;
-                tail = e;
-            }
-            p = q;
-        }
-        tail->next = list;
-
-        if (nmerges <= 1)
-            return tail;
-
-        insize *= 2;
-    }
-}
-#endif
-#endif
+STC_API size_t _clist_count(const clist_VOID* self);
                     
 STC_API Self            cx_memb(_clone)(Self cx);
 STC_API void            cx_memb(_del)(Self* self);
@@ -366,11 +303,80 @@ cx_memb(_sort_cmp_)(const clist_VOID_node_t* x, const clist_VOID_node_t* y) {
     return i_cmp(&a, &b);
 }
 
+STC_API clist_VOID_node_t*
+_clist_mergesort(clist_VOID_node_t *list, int (*cmp)(const clist_VOID_node_t*, const clist_VOID_node_t*));
+
 STC_DEF void
 cx_memb(_sort)(Self* self) {
     if (self->last)
         self->last = (cx_node_t *) _clist_mergesort((clist_VOID_node_t *) self->last->next, cx_memb(_sort_cmp_));
 }
 
-#endif // IMPLEMENTATION
+#endif // TEMPLATE IMPLEMENTATION
+
+#if !defined(STC_HEADER) || defined(i_imp) && i_imp == 2
+#ifndef CLIST_NON_TEMPLATED
+#define CLIST_NON_TEMPLATED
+
+STC_DEF size_t
+_clist_count(const clist_VOID* self) {
+    const clist_VOID_node_t *node = self->last;
+    if (!node) return 0;
+    size_t n = 1;
+    while ((node = node->next) != self->last) ++n;
+    return n;
+}
+
+// Singly linked list Mergesort implementation by Simon Tatham. O(n*log n).
+// https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
+STC_DEF clist_VOID_node_t *
+_clist_mergesort(clist_VOID_node_t *list, int (*cmp)(const clist_VOID_node_t*, const clist_VOID_node_t*)) {
+    clist_VOID_node_t *p, *q, *e, *tail, *oldhead;
+    int insize = 1, nmerges, psize, qsize, i;
+
+    while (1) {
+        p = oldhead = list;
+        list = tail = NULL;
+        nmerges = 0;
+
+        while (p) {
+            ++nmerges;
+            q = p, psize = 0;
+            for (i = 0; i < insize; ++i) {
+                ++psize;
+                q = (q->next == oldhead ? NULL : q->next);
+                if (!q) break;
+            }
+            qsize = insize;
+
+            while (psize > 0 || (qsize > 0 && q)) {
+                if (psize == 0) {
+                    e = q, q = q->next, --qsize;
+                    if (q == oldhead) q = NULL;
+                } else if (qsize == 0 || !q) {
+                    e = p, p = p->next, --psize;
+                    if (p == oldhead) p = NULL;
+                } else if (cmp(p, q) <= 0) {
+                    e = p, p = p->next, --psize;
+                    if (p == oldhead) p = NULL;
+                } else {
+                    e = q, q = q->next, --qsize;
+                    if (q == oldhead) q = NULL;
+                }
+                if (tail) tail->next = e; else list = e;
+                tail = e;
+            }
+            p = q;
+        }
+        tail->next = list;
+
+        if (nmerges <= 1)
+            return tail;
+
+        insize *= 2;
+    }
+}
+#endif
+#endif
+
 #include "template.h"
