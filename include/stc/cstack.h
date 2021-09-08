@@ -84,6 +84,9 @@ STC_INLINE Self cx_memb(_clone)(Self v) {
     return out;
 }
 
+STC_INLINE void cx_memb(_emplace_items)(Self *self, const cx_rawvalue_t arr[], size_t n)
+    { for (size_t i = 0; i < n; ++i) cx_memb(_push)(self, i_valfrom(arr[i])); }
+
 STC_INLINE i_val cx_memb(_value_clone)(cx_value_t val)
     { return i_valfrom(i_valto(&val)); }
 

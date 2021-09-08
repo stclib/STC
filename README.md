@@ -34,9 +34,9 @@ Others:
 
 Highlights
 ----------
-- **User friendly** - Just include the headers and you are good. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***using***-declaration instantiates the container type to use. You may pass *optional* arguments to it for customization of element- *comparison*, *destruction*, *cloning*, *conversion types*, and more.
+- **User friendly** - Just include the headers and you are good. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***#define i_xxx***-declarations configures the container type to use. You may define various names to customize element-*comparison*, *destruction*, *cloning*, *conversion types*, and more.
 - **Unparalleled performance** - The containers are about equal and often much faster than the c++ STL containers.
-- **Fully memory managed** - All containers will destruct keys/values via destructor passed as macro parameters to the ***using***-declaration. Also, shared pointers are supported and can be stored in containers, see ***csptr***.
+- **Fully memory managed** - All containers will destruct keys/values via destructor defined as macro parameters before including the container header. Also, shared pointers are supported and can be stored in containers, see ***csptr***.
 - **Fully type safe** - Because of templating, it avoids error-prone casting of container types and elements back and forth from the containers.
 - **Uniform, easy-to-learn API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have uniform and intuitive usage across the various containers.
 - **Small footprint** - Small source code and generated executables. The executable from the example below with six different containers is *22 kb in size* compiled with gcc -Os on linux.
@@ -62,9 +62,9 @@ The usage of the containers is similar to the c++ standard containers in STL, so
 All containers are generic/templated, except for **cstr** and **cbits**. No casting is used, so containers are type-safe like
 templates in c++. A basic usage example:
 ```c
+#define i_tag f32
+#define i_val float
 #include <stc/cvec.h>
-
-using_cvec(f32, float);
 
 int main(void) {
     cvec_f32 vec = cvec_f32_init();
@@ -80,13 +80,8 @@ int main(void) {
 ```
 With six different containers:
 ```c
-#include <stc/cset.h>
-#include <stc/cvec.h>
-#include <stc/cdeq.h>
-#include <stc/clist.h>
-#include <stc/cqueue.h>
-#include <stc/csmap.h>
 #include <stdio.h>
+#include <stc/ccommon.h>
 
 struct Point { float x, y; };
 
@@ -95,13 +90,31 @@ int Point_compare(const struct Point* a, const struct Point* b) {
     return cmp ? cmp : c_default_compare(&a->y, &b->y);
 }
 
-// declare container types
-using_cset(i32, int);                         // unordered set
-using_cvec(pnt, struct Point, Point_compare); // vector, struct as elements
-using_cdeq(i32, int);                         // deque
-using_clist(i32, int);                        // singly linked list
-using_cqueue(i32, cdeq_i32);                  // queue, using deque as adapter
-using_csmap(i32, int, int);                   // sorted map
+#define i_tag i32
+#define i_key int
+#include <stc/cset.h>  // unordered set
+
+#define i_tag pnt
+#define i_val struct Point
+#define i_cmp Point_compare
+#include <stc/cvec.h>  // vector, struct as elements
+
+#define i_tag i32
+#define i_val int
+#include <stc/cdeq.h>  // deque of int
+
+#define i_tag i32
+#define i_val int
+#include <stc/clist.h> // singly linked list
+
+#define i_tag i32
+#define i_val int
+#include <stc/cstack.h>
+
+#define i_tag i32
+#define i_key int
+#define i_val int
+#include <stc/csmap.h> // sorted map
 
 int main(void) {
     // define six containers with automatic call of init and del (destruction after scope exit)
@@ -109,7 +122,7 @@ int main(void) {
     c_forauto (cvec_pnt, vec)
     c_forauto (cdeq_i32, deq)
     c_forauto (clist_i32, lst)
-    c_forauto (cqueue_i32, que)
+    c_forauto (cstack_i32, stk)
     c_forauto (csmap_i32, map)
     {
         // add some elements to each container
@@ -117,7 +130,7 @@ int main(void) {
         c_emplace(cvec_pnt, vec, { {10, 1}, {20, 2}, {30, 3} });
         c_emplace(cdeq_i32, deq, {10, 20, 30});
         c_emplace(clist_i32, lst, {10, 20, 30});
-        c_emplace(cqueue_i32, que, {10, 20, 30});
+        c_emplace(cstack_i32, stk, {10, 20, 30});
         c_emplace(csmap_i32, map, { {20, 2}, {10, 1}, {30, 3} });
 
         // add one more element to each container
@@ -125,8 +138,8 @@ int main(void) {
         cvec_pnt_push_back(&vec, (struct Point) {40, 4});
         cdeq_i32_push_front(&deq, 5);
         clist_i32_push_front(&lst, 5);
-        cqueue_i32_push(&que, 40);
-        csmap_i32_emplace(&map, 40, 4);
+        cstack_i32_push(&stk, 40);
+        csmap_i32_insert(&map, 40, 4);
 
         // find an element in each container
         cset_i32_iter_t i1 = cset_i32_find(&set, 20);
@@ -149,7 +162,7 @@ int main(void) {
         printf("\n vec:"); c_foreach (i, cvec_pnt, vec) printf(" (%g, %g)", i.ref->x, i.ref->y);
         printf("\n deq:"); c_foreach (i, cdeq_i32, deq) printf(" %d", *i.ref);
         printf("\n lst:"); c_foreach (i, clist_i32, lst) printf(" %d", *i.ref);
-        printf("\n que:"); c_foreach (i, cqueue_i32, que) printf(" %d", *i.ref);
+        printf("\n stk:"); c_foreach (i, cstack_i32, stk) printf(" %d", *i.ref);
         printf("\n map:"); c_foreach (i, csmap_i32, map) printf(" [%d: %d]", i.ref->first,
                                                                              i.ref->second);
     }
@@ -163,7 +176,7 @@ After erasing elements found:
  vec: (10, 1) (30, 3) (40, 4)
  deq: 5 10 30
  lst: 5 10 30
- que: 10 20 30 40
+ stk: 10 20 30 40
  map: [10: 1] [30: 3] [40: 4]
 ```
 
@@ -179,15 +192,23 @@ in your build environment and place all the instantiations of containers used in
 // stc_libs.c
 #define STC_IMPLEMENTATION
 #include <stc/cstr.h>
-#include <stc/cmap.h>
-#include <stc/cvec.h>
-#include <stc/clist.h>
 #include "Point.h"
 
-using_cmap(ii, int, int);
-using_cset(ix, int64_t);
-using_cvec(i, int);
-using_clist(p, struct Point);
+#define i_tag ii
+#define i_key int
+#define i_val int
+#include <stc/cmap.h>  // cmap int => int
+
+#define i_tag ix
+#define i_key int64_t
+#include <stc/cset.h>  // cset int64_t
+
+#define i_val int
+#include <stc/cvec.h>  // cvec int
+
+#define i_tag pnt
+#define i_val Point
+#include <stc/clist.h> // clist Point
 ```
 
 The *emplace* versus non-emplace container methods
@@ -211,10 +232,11 @@ corresponding non-emplace methods are identical, so the following does not apply
 | push_front()              | emplace_front()              | cdeq, clist                                 |
 
 Strings are the most commonly used non-trivial data type. STC containers have proper pre-defined
-**using**-declarations for cstr-elements, so they are fail-safe to use both with the **emplace**
+definitions for cstr container elements, so they are fail-safe to use both with the **emplace**
 and non-emplace methods:
 ```c
-using_cvec_str(); // vector of string (cstr)
+#define i_val_str
+#include <stc/cvec.h>   // vector of string (cstr)
 ...
 c_forvar (cvec_str vec = cvec_str_init(), cvec_str_del(&vec))   // defer vector destructor to end of block
 c_forvar (cstr s = cstr_lit("a string literal"), cstr_del(&s))  // cstr_lit() for literals; no strlen() usage
@@ -228,7 +250,7 @@ c_forvar (cstr s = cstr_lit("a string literal"), cstr_del(&s))  // cstr_lit() fo
     cvec_str_emplace_back(&vec, s.str);           // Ok: const char* input type.
 }
 ```
-This is made possible because the **using**-declarations may be given an optional
+This is made possible because the type configuration may be given an optional
 conversion/"rawvalue"-type as template parameter, along with a back and forth conversion
 methods to the container value type. By default, *rawvalue has the same type as value*.
 
