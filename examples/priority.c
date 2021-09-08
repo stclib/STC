@@ -1,13 +1,12 @@
 
 #include <stdio.h>
 #include <time.h>
-#include <stc/cvec.h>
-#include <stc/cpque.h>
-#include <stc/cmap.h>
 #include <stc/crandom.h>
 
-using_cvec(i, int64_t);
-using_cpque(i, cvec_i, -c_default_compare); // min-heap (increasing values)
+#define i_tag i
+#define i_val int64_t
+#define i_cmp -c_default_compare  // min-heap (increasing values)
+#include <stc/cpque.h>
 
 int main() {
     size_t N = 10000000;
@@ -16,6 +15,7 @@ int main() {
     c_forauto (cpque_i, heap)
     {
         // Push ten million random numbers to priority queue
+        printf("Push %zu numbers\n", N);
         c_forrange (N)
             cpque_i_push(&heap, stc64_uniform(&rng, &dist));
 
@@ -25,7 +25,7 @@ int main() {
         c_forrange (N)
             cpque_i_push(&heap, stc64_uniform(&rng, &dist));
 
-        // Extract the hundred smallest.
+        puts("Extract the hundred smallest.");
         c_forrange (100) {
             printf("%zd ", *cpque_i_top(&heap));
             cpque_i_pop(&heap);

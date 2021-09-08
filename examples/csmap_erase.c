@@ -1,10 +1,12 @@
 // map_erase.c
 // From C++ example: https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-16
-#include <stc/csmap.h>
 #include <stc/cstr.h>
 #include <stdio.h>
 
-using_csmap_strval(my, int);
+#define i_tag my
+#define i_key int
+#define i_val_str
+#include <stc/csmap.h>
 
 void printmap(csmap_my map)
 {
@@ -27,7 +29,7 @@ int main()
         puts("Starting data of map m1 is:");
         printmap(m1);
         // The 1st member function removes an element at a given position
-        csmap_my_erase_at(&m1, csmap_my_fwd(csmap_my_begin(&m1), 1));
+        csmap_my_erase_at(&m1, csmap_my_advance(csmap_my_begin(&m1), 1));
         puts("After the 2nd element is deleted, the map m1 is:");
         printmap(m1);
     }
@@ -45,7 +47,7 @@ int main()
 
         puts("Starting data of map m2 is:");
         printmap(m2);
-        csmap_my_iter_t it1 = csmap_my_fwd(csmap_my_begin(&m2), 1);
+        csmap_my_iter_t it1 = csmap_my_advance(csmap_my_begin(&m2), 1);
         csmap_my_iter_t it2 = csmap_my_find(&m2, csmap_my_back(&m2)->first);
         // The 2nd member function removes elements
         // in the range [First, Last)

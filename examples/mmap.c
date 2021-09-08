@@ -1,13 +1,17 @@
-#include <stc/csmap.h>
-#include <stc/clist.h>
-#include <stc/cstr.h>
-
 // This implements the multimap c++ example found at:
 // https://en.cppreference.com/w/cpp/container/multimap/insert
 
+#include <stc/cstr.h>
 // Map of int => clist_str. Note the negation of c_default_compare
-using_clist_str();
-using_csmap(mult, int, clist_str, -c_default_compare, clist_str_del);
+#define i_val_str
+#include <stc/clist.h>
+
+#define i_tag mult
+#define i_key int
+#define i_val clist_str
+#define i_valdel clist_str_del
+#define i_cmp -c_default_compare
+#include <stc/csmap.h>
 
 void print(const csmap_mult mmap)
 {

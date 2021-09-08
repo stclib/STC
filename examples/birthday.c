@@ -1,11 +1,13 @@
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
-
 #include <stc/crandom.h>
+
+#define i_tag ic
+#define i_key uint64_t
+#define i_val uint8_t
 #include <stc/cmap.h>
 
-using_cmap(ic, uint64_t, uint8_t);
 static uint64_t seed = 12345;
 
 static void test_repeats(void)
@@ -16,17 +18,21 @@ static void test_repeats(void)
 
     printf("birthday paradox: value range: 2^%d, testing repeats of 2^%d values\n", BITS, BITS_TEST);
     stc64_t rng = stc64_init(seed);
-    cmap_ic m = cmap_ic_init();
-    cmap_ic_reserve(&m, N);
-    c_forrange (i, N) {
-        uint64_t k = stc64_rand(&rng) & mask;
-        int v = cmap_ic_emplace(&m, k, 0).ref->second += 1;
-        if (v > 1) printf("repeated value %llx (%d) at 2^%d\n", k, v, (int) log2(i));
+    c_forauto (cmap_ic, m)
+    {
+        cmap_ic_reserve(&m, N);
+        c_forrange (i, N) {
+            uint64_t k = stc64_rand(&rng) & mask;
+            int v = cmap_ic_emplace(&m, k, 0).ref->second += 1;
+            if (v > 1) printf("repeated value %llx (%d) at 2^%d\n", k, v, (int) log2(i));
+        }
     }
 }
 
-
-using_cmap(x, uint32_t, uint64_t);
+#define i_tag x
+#define i_key uint32_t
+#define i_val uint64_t
+#include <stc/cmap.h>
 
 void test_distribution(void)
 {
@@ -35,7 +41,7 @@ void test_distribution(void)
     stc64_t rng = stc64_init(seed);
     const size_t N = 1ull << BITS ;
     
-    c_forvar (cmap_x map = cmap_x_init(), cmap_x_del(&map)) {
+    c_forauto (cmap_x, map) {
         c_forrange (N) {
             uint64_t k = stc64_rand(&rng);
             cmap_x_emplace(&map, k & 0xf, 0).ref->second += 1;

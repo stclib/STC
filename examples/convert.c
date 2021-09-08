@@ -1,14 +1,16 @@
 
-#include "stc/cmap.h"
-#include "stc/csmap.h"
-#include "stc/cvec.h"
-#include "stc/clist.h"
-#include "stc/cstr.h"
+#include <stc/cstr.h>
 #include <stdio.h>
 
-using_cmap_str();
-using_cvec_str();
-using_clist_str();
+#define i_key_str
+#define i_val_str
+#include <stc/cmap.h>
+
+#define i_val_str
+#include <stc/cvec.h>
+
+#define i_val_str
+#include <stc/clist.h>
 
 int main()
 {

@@ -1,15 +1,20 @@
-#include <stc/cpque.h>
+// Implements c++ example: https://en.cppreference.com/w/cpp/container/priority_queue
 #include <stdio.h>
 
-// Implements c++ example: https://en.cppreference.com/w/cpp/container/priority_queue
+#define i_tag imax
+#define i_val int
+#include <stc/cpque.h>
 
-using_cvec(i, int);
+#define i_tag imin
+#define i_val int
+#define i_cmp -c_default_compare
+#include <stc/cpque.h>
+
 #define imix_less(x, y) ((*(x) ^ 1) < (*(y) ^ 1))
-#define imix_cmp(x, y) c_less_compare(imix_less, x, y)
-
-using_cpque(imax, cvec_i);
-using_cpque(imin, cvec_i, -c_default_compare);
-using_cpque(imix, cvec_i, imix_cmp);
+#define i_tag imix
+#define i_val int
+#define i_cmp(x, y) c_less_compare(imix_less, x, y)
+#include <stc/cpque.h>
 
 #define PRINT_Q(Q) \
     void print_##Q(Q q) { \
@@ -31,9 +36,9 @@ int main()
 {
     const int data[] = {1,8,5,6,3,4,0,9,7,2};
 
-    c_forvar (cpque_imax q = cpque_imax_init(), cpque_imax_del(&q))  // init() and defered del()
-    c_forvar (cpque_imin q2 = cpque_imin_init(), cpque_imin_del(&q2))
-    c_forvar (cpque_imix q3 = cpque_imix_init(), cpque_imix_del(&q3))
+    c_forauto (cpque_imax, q)  // init() and defered del()
+    c_forauto (cpque_imin, q2)
+    c_forauto (cpque_imix, q3)
     {
         c_forrange (n, c_arraylen(data))
             cpque_imax_push(&q, n);

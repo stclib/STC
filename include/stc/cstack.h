@@ -32,14 +32,14 @@
 #include "template.h"
 
 #if !defined i_fwd
-   cx_deftypes(_c_cstack_types, Self, i_val);
+cx_deftypes(_c_cstack_types, Self, i_val);
 #endif
 typedef i_valraw cx_rawvalue_t;
 
 STC_INLINE Self cx_memb(_init)(void)
     { return (Self){0, 0, 0}; }
 
-STC_INLINE Self cx_memb(_init_with_capacity)(size_t cap) {
+STC_INLINE Self cx_memb(_with_capacity)(size_t cap) {
     Self out = {(cx_value_t *) c_malloc(cap*sizeof(cx_value_t)), 0, cap};
     return out;
 }
@@ -65,11 +65,13 @@ STC_INLINE cx_value_t* cx_memb(_top)(const Self* self)
     { return &self->data[self->size - 1]; }
 
 STC_INLINE void cx_memb(_pop)(Self* self)
-    { --self->size; }
+    { --self->size; i_valdel(&self->data[self->size]); }
 
 STC_INLINE void cx_memb(_push)(Self* self, cx_value_t value) {
-    if (self->size == self->capacity)
-        self->data = (cx_value_t *) c_realloc(self->data, (self->capacity = self->size*3/2 + 4)*sizeof value);
+    if (self->size == self->capacity) {
+        self->capacity = self->size*3/2 + 4;
+        self->data = (cx_value_t *)c_realloc(self->data, self->capacity*sizeof value);
+    }
     self->data[ self->size++ ] = value;
 }
 

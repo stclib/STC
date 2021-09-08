@@ -1,12 +1,14 @@
 
 #include <stdio.h>
 #include <stc/cstr.h>
+
+#define i_tag i
+#define i_val int
 #include <stc/cstack.h>
 
-using_cvec(i, int);
-using_cvec(c, char);
-using_cstack(i, cvec_i);
-using_cstack(c, cvec_c);
+#define i_tag c
+#define i_val char
+#include <stc/cstack.h>
 
 int main() {
     cstack_i stack = cstack_i_init();

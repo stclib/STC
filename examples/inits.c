@@ -1,12 +1,15 @@
 #include <stdio.h>
 #include <stc/cstr.h>
-#include <stc/cmap.h>
-#include <stc/cvec.h>
-#include <stc/cpque.h>
-#include <stc/clist.h>
 
-using_cmap_strval(id, int); // Map of int => cstr
-using_cmap_strkey(cnt, int); // Map of cstr => int
+#define i_tag id   // Map of int => cstr
+#define i_key int
+#define i_val_str
+#include <stc/cmap.h>
+
+#define i_tag cnt  // Map of cstr => int
+#define i_key_str
+#define i_val int
+#include <stc/cmap.h>
 
 typedef struct {int x, y;} ipair_t;
 inline static int ipair_compare(const ipair_t* a, const ipair_t* b) {
@@ -14,19 +17,31 @@ inline static int ipair_compare(const ipair_t* a, const ipair_t* b) {
     return cx == 0 ? c_default_compare(&a->y, &b->y) : cx;
 }
 
-using_cvec(ip, ipair_t, ipair_compare);
-using_clist(ip, ipair_t, ipair_compare);
-using_cvec(f, float);
-using_cpque(f, cvec_f);
+#define i_tag ip
+#define i_val ipair_t
+#define i_cmp ipair_compare
+#include <stc/cvec.h>
+
+#define i_tag ip
+#define i_val ipair_t
+#define i_cmp ipair_compare
+#include <stc/clist.h>
+
+#define i_tag f
+#define i_val float
+#include <stc/cpque.h>
 
 int main(void)
 {
     // CVEC FLOAT / PRIORITY QUEUE
 
-    c_forvar (cvec_f floats = cvec_f_init(), cvec_f_del(&floats)) {
-        c_emplace(cvec_f, floats, {4.0f, 2.0f, 5.0f, 3.0f, 1.0f});
+    c_forauto (cpque_f, floats) {
+        float nums[] = {4.0f, 2.0f, 5.0f, 3.0f, 1.0f};
 
-        c_foreach (i, cvec_f, floats) printf("%.1f ", *i.ref);
+        c_forrange (i, c_arraylen(nums)) {
+            cpque_f_push_back(&floats, nums[i]);
+            printf("%.1f ", floats.data[i]);
+        }
         puts("");
 
         // CVEC PRIORITY QUEUE
@@ -45,7 +60,7 @@ int main(void)
     // CMAP ID
 
     int year = 2020;
-    c_forvar (cmap_id idnames = cmap_id_init(), cmap_id_del(&idnames)) {
+    c_forauto (cmap_id, idnames) {
         cmap_id_emplace(&idnames, 100, "Hello");
         cmap_id_insert(&idnames, 110, cstr_from("World"));
         cmap_id_insert(&idnames, 120, cstr_from_fmt("Howdy, -%d-", year));
@@ -57,7 +72,7 @@ int main(void)
 
     // CMAP CNT
 
-    c_forvar (cmap_cnt countries = cmap_cnt_init(), cmap_cnt_del(&countries)) {
+    c_forauto (cmap_cnt, countries) {
         c_emplace(cmap_cnt, countries, {
             {"Norway", 100},
             {"Denmark", 50},
@@ -80,7 +95,7 @@ int main(void)
 
     // CVEC PAIR
 
-    c_forvar (cvec_ip pairs1 = cvec_ip_init(), cvec_ip_del(&pairs1)) {
+    c_forauto (cvec_ip, pairs1) {
         c_emplace (cvec_ip, pairs1, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
         cvec_ip_sort(&pairs1);
 
@@ -91,7 +106,7 @@ int main(void)
 
     // CLIST PAIR
 
-    c_forvar (clist_ip pairs2 = clist_ip_init(), clist_ip_del(&pairs2)) {
+    c_forauto (clist_ip, pairs2) {
         c_emplace(clist_ip, pairs2, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
         clist_ip_sort(&pairs2);
 

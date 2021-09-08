@@ -45,7 +45,7 @@ STC_API Self cx_memb(_clone)(Self q);
 STC_INLINE Self cx_memb(_init)(void)
     { return (Self){0, 0, 0}; }
 
-STC_INLINE Self cx_memb(_init_with_capacity)(size_t cap) {
+STC_INLINE Self cx_memb(_with_capacity)(size_t cap) {
     Self out = {(cx_value_t *) c_malloc(cap*sizeof(cx_value_t)), 0, cap};
     return out;
 }
@@ -84,6 +84,19 @@ STC_INLINE int cx_memb(_value_compare)(const cx_value_t* x, const cx_value_t* y)
     return i_cmp(&rx, &ry);
 }
 
+STC_INLINE void
+cx_memb(_push_back)(Self* self, cx_value_t value) {
+    if (self->size == self->capacity) {
+        self->capacity = self->size*3/2 + 4;
+        self->data = (cx_value_t *)c_realloc(self->data, self->capacity*sizeof value);
+    }
+    self->data[ self->size++ ] = value;
+}
+
+STC_INLINE void
+cx_memb(_pop_back)(Self* self)
+    { --self->size; i_valdel(&self->data[self->size]); }
+
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
 
@@ -98,13 +111,6 @@ cx_memb(_sift_down_)(cx_value_t* arr, size_t i, size_t n) {
             return;
         c <<= 1;
     }
-}
-
-STC_INLINE void
-cx_memb(_push_back_)(Self* self, cx_value_t value) {
-    if (self->size == self->capacity)
-        self->data = (cx_value_t *) c_realloc(self->data, (self->capacity = self->size*3/2 + 4)*sizeof value);
-    self->data[ self->size++ ] = value;
 }
 
 STC_DEF void
@@ -125,13 +131,13 @@ STC_DEF void
 cx_memb(_erase_at)(Self* self, size_t idx) {
     size_t n = cx_memb(_size)(*self) - 1;
     self->data[idx] = self->data[n];
-    --self->size;
+    cx_memb(_pop_back)(self);
     cx_memb(_sift_down_)(self->data - 1, idx + 1, n);
 }
 
 STC_DEF void
 cx_memb(_push)(Self* self, cx_value_t value) {
-    cx_memb(_push_back_)(self, value); /* sift-up the value */
+    cx_memb(_push_back)(self, value); /* sift-up the value */
     size_t n = cx_memb(_size)(*self), c = n;
     cx_value_t *arr = self->data - 1;
     for (; c > 1 && i_cmp(&arr[c >> 1], &value) < 0; c >>= 1)
