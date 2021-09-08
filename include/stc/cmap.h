@@ -57,34 +57,6 @@ int main(void) {
 
 #define _cmap_inits {NULL, NULL, 0, 0, 0.85f}
 typedef struct      { size_t idx; uint_fast8_t hx; } chash_bucket_t;
-
-#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
-
-STC_INLINE uint64_t c_default_hash(const void *key, size_t len) {
-    const uint64_t m = 0xb5ad4eceda1ce2a9;
-    uint64_t k, h = m + len;
-    const uint8_t *p = (const uint8_t *)key, *end = p + (len & ~7ull);
-    for (; p != end; p += 8) {memcpy(&k, p, 8); h ^= m*k; }
-    switch (len & 7) {
-        case 7: h ^= (uint64_t) p[6] << 48;
-        case 6: h ^= (uint64_t) p[5] << 40;
-        case 5: h ^= (uint64_t) p[4] << 32;
-        case 4: h ^= (uint64_t) p[3] << 24;
-        case 3: h ^= (uint64_t) p[2] << 16;
-        case 2: h ^= (uint64_t) p[1] << 8;
-        case 1: h ^= (uint64_t) p[0]; h *= m;
-    }
-    return h ^ (h >> 15);
-}
-
-STC_INLINE uint64_t c_string_hash(const char *s)
-    { return c_default_hash(s, strlen(s)); }
-STC_INLINE uint64_t c_default_hash32(const void* data, size_t ignored)
-    { return *(const uint32_t *)data * 0xc6a4a7935bd1e99d; }
-STC_INLINE uint64_t c_default_hash64(const void* data, size_t ignored)
-    { return *(const uint64_t *)data * 0xc6a4a7935bd1e99d; }
-
-#endif
 #endif // CMAP_H_INCLUDED
 
 #ifndef i_module
@@ -240,6 +212,29 @@ cx_memb(_erase_at)(Self* self, cx_iter_t it) {
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
+#if !defined(STC_HEADER) || defined(i_imp) && i_imp == 2
+#ifndef CMAP_NON_TEMPLATED
+#define CMAP_NON_TEMPLATED
+
+STC_DEF uint64_t c_default_hash(const void *key, size_t len) {
+    const uint64_t m = 0xb5ad4eceda1ce2a9;
+    uint64_t k, h = m + len;
+    const uint8_t *p = (const uint8_t *)key, *end = p + (len & ~7ull);
+    for (; p != end; p += 8) { memcpy(&k, p, 8); h ^= m*k; }
+    switch (len & 7) {
+        case 7: h ^= (uint64_t) p[6] << 48;
+        case 6: h ^= (uint64_t) p[5] << 40;
+        case 5: h ^= (uint64_t) p[4] << 32;
+        case 4: h ^= (uint64_t) p[3] << 24;
+        case 3: h ^= (uint64_t) p[2] << 16;
+        case 2: h ^= (uint64_t) p[1] << 8;
+        case 1: h ^= (uint64_t) p[0]; h *= m;
+    }
+    return h ^ (h >> 15);
+}
+#endif
+#endif
+
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
 
 //STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n)
@@ -379,7 +374,7 @@ cx_memb(_erase_entry)(Self* self, cx_value_t* _val) {
     --self->size;
 }
 
-#endif // IMPLEMENTATION
+#endif // TEMPLATED IMPLEMENTATION
 #undef cx_keyref
 #undef cx_MAP_ONLY
 #undef cx_SET_ONLY

@@ -109,6 +109,12 @@
 
 #define c_default_del(ptr)      ((void) (ptr))
 
+STC_API uint64_t c_default_hash(const void *key, size_t len);
+#define c_default_hash32(data, len_is_4) \
+    ((*(const uint32_t*)data * 0xc6a4a7935bd1e99d) >> 15)
+#define c_default_hash64(data, len_is_8) \
+    (*(const uint64_t *)data * 0xc6a4a7935bd1e99d)
+
 /* Generic algorithms */
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)

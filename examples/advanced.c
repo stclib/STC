@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stc/cmap.h>
 #include <stc/cstr.h>
 
 typedef struct Viking {
@@ -20,7 +19,7 @@ typedef struct VikingRaw {
 } VikingRaw;
 
 uint64_t vikingraw_hash(const VikingRaw* raw, size_t ignore) {
-    uint64_t hash = c_string_hash(raw->name) ^ (c_string_hash(raw->country) >> 15);
+    uint64_t hash = c_rawstr_hash(&raw->name) ^ (c_rawstr_hash(&raw->country) >> 15);
     return hash;
 }
 static inline int vikingraw_equals(const VikingRaw* rx, const VikingRaw* ry) {
@@ -34,10 +33,17 @@ static inline VikingRaw viking_toRaw(const Viking* vk) {
     return c_make(VikingRaw){vk->name.str, vk->country.str};
 }
 
-// With this in place, we use the using_cmap_keydef() macro to define {Viking -> int} hash map type:
-
-using_cmap_keydef(vk, Viking, int, vikingraw_equals, vikingraw_hash,
-                      viking_del, viking_fromRaw, viking_toRaw, VikingRaw, c_true);
+// With this in place, we define the Viking => int hash map type:
+#define i_tag     vk
+#define i_key     Viking
+#define i_val     int
+#define i_equ     vikingraw_equals
+#define i_hash    vikingraw_hash
+#define i_keydel  viking_del
+#define i_keyraw  VikingRaw
+#define i_keyfrom viking_fromRaw
+#define i_keyto   viking_toRaw
+#include <stc/cmap.h>
 
 int main()
 {

@@ -55,6 +55,7 @@
 */
 
 #ifndef CLIST_H_INCLUDED
+#define CLIST_H_INCLUDED
 #include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
@@ -70,20 +71,7 @@
     
 _c_clist_types(clist_VOID, int);
 _c_clist_complete_types(clist_VOID, dummy);
-#endif // CLIST_H_INCLUDED
 
-#define i_module clist
-#include "template.h"
-
-#if !defined i_fwd
-cx_deftypes(_c_clist_types, Self, i_val);
-#endif
-cx_deftypes(_c_clist_complete_types, Self, dummy);
-typedef i_valraw cx_rawvalue_t;
-
-
-#ifndef CLIST_H_INCLUDED
-#define CLIST_H_INCLUDED
 #define _c_clist_insert_after(self, Self, node, val) \
     cx_node_t *entry = c_new (cx_node_t); \
     if (node) entry->next = node->next, node->next = entry; \
@@ -91,8 +79,20 @@ typedef i_valraw cx_rawvalue_t;
     entry->value = val
     // +: set self->last based on node 
 
-#if !defined(STC_HEADER) || defined(i_imp) && (i_imp == 2)
-// NON TEMPLATED CODE
+#endif // CLIST_H_INCLUDED
+
+#define i_module clist
+#include "template.h"
+
+#if !defined i_fwd
+  cx_deftypes(_c_clist_types, Self, i_val);
+#endif
+cx_deftypes(_c_clist_complete_types, Self, dummy);
+typedef i_valraw cx_rawvalue_t;
+
+#if !defined(STC_HEADER) || defined(i_imp) && i_imp == 2
+#ifndef CLIST_NON_TEMPLATED
+#define CLIST_NON_TEMPLATED
 
 STC_DEF size_t
 _clist_count(const clist_VOID* self) {
