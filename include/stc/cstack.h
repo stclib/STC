@@ -39,6 +39,11 @@ typedef i_valraw cx_rawvalue_t;
 STC_INLINE Self cx_memb(_init)(void)
     { return (Self){0, 0, 0}; }
 
+STC_INLINE Self cx_memb(_init_with_capacity)(size_t cap) {
+    Self out = {(cx_value_t *) c_malloc(cap*sizeof(cx_value_t)), 0, cap};
+    return out;
+}
+
 STC_INLINE void cx_memb(_clear)(Self* self) {
     size_t i = self->size; self->size = 0;
     while (i--) i_valdel(&self->data[i]);
