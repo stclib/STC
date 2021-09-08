@@ -1,5 +1,3 @@
-#include <stc/csmap.h>
-#include <stc/clist.h>
 #include <stc/cstr.h>
 #include <stdio.h>
 
@@ -35,7 +33,6 @@ struct OlympicsData { int year; const char *city, *country, *date; } ol_data[] =
     {1924, "Chamonix", "France", "January 25 - February 5"},
 };
 
-
 typedef struct { int year; cstr city, date; } OlympicLocation;
 
 int OlympicLocation_compare(OlympicLocation* a, OlympicLocation* b) {
@@ -46,11 +43,18 @@ void OlympicLocation_del(OlympicLocation* self) {
 }
 
 // Create a clist<OlympicLocation>, can be sorted by year.
-using_clist(OL, OlympicLocation, OlympicLocation_compare, OlympicLocation_del);
+#define i_tag OL
+#define i_val OlympicLocation
+#define i_cmp OlympicLocation_compare
+#define i_valdel OlympicLocation_del
+#include <stc/clist.h>
 
 // Create a csmap<cstr, clist_OL> where key is country
-using_csmap_strkey(OL, clist_OL, clist_OL_del, c_no_clone);
-
+#define i_tag OL
+#define i_key_str
+#define i_val clist_OL
+#define i_valdel clist_OL_del
+#include <stc/csmap.h>
 
 int main()
 {

@@ -1,10 +1,4 @@
-#include <stc/cvec.h>
-#include <stc/clist.h>
-#include <stc/carray.h>
-#include <stc/cset.h>
-#include <stc/cmap.h>
 #include <stc/cstr.h>
-
 
 void stringdemo1()
 {
@@ -34,8 +28,9 @@ void stringdemo1()
     }
 }
 
-
-using_cvec(ix, int64_t); // ix is just an example tag name.
+#define i_tag ix
+#define i_val int64_t
+#include <stc/cvec.h>
 
 void vectordemo1()
 {
@@ -58,8 +53,8 @@ void vectordemo1()
     }
 }
 
-
-using_cvec_str();
+#define i_val_str
+#include <stc/cvec.h>
 
 void vectordemo2()
 {
@@ -77,7 +72,9 @@ void vectordemo2()
     }
 }
 
-using_clist(ix, int);
+#define i_tag ix
+#define i_val int
+#include <stc/clist.h>
 
 void listdemo1()
 {
@@ -99,7 +96,7 @@ void listdemo1()
         *clist_ix_find(&nums, 104).ref += 50;
         clist_ix_remove(&nums, 103);
         clist_ix_iter_t it = clist_ix_begin(&nums);
-        clist_ix_erase_range(&nums, clist_ix_fwd(it, 5), clist_ix_fwd(it, 15));
+        clist_ix_erase_range(&nums, clist_ix_advance(it, 5), clist_ix_advance(it, 15));
         clist_ix_pop_front(&nums);
         clist_ix_push_back(&nums, -99);
         clist_ix_sort(&nums);
@@ -109,7 +106,9 @@ void listdemo1()
     }
 }
 
-using_cset(i, int);
+#define i_tag i
+#define i_key int
+#include <stc/cset.h>
 
 void setdemo1()
 {
@@ -123,8 +122,10 @@ void setdemo1()
     cset_i_del(&nums);
 }
 
-
-using_cmap(ii, int, int);
+#define i_tag ii
+#define i_key int
+#define i_val int
+#include <stc/cmap.h>
 
 void mapdemo1()
 {
@@ -136,8 +137,10 @@ void mapdemo1()
     cmap_ii_del(&nums);
 }
 
-
-using_cmap_strkey(si, int); // Shorthand macro for the general using_cmap expansion.
+#define i_tag si
+#define i_key_str
+#define i_val int
+#include <stc/cmap.h>
 
 void mapdemo2()
 {
@@ -158,8 +161,9 @@ void mapdemo2()
     }
 }
 
-
-using_cmap_str();
+#define i_key_str
+#define i_val_str
+#include <stc/cmap.h>
 
 void mapdemo3()
 {
@@ -181,7 +185,8 @@ void mapdemo3()
     cmap_str_del(&table); // frees key and value cstrs, and hash table.
 }
 
-
+/*
+#include <stc/carray.h>
 using_carray3(f, float);
 
 void arraydemo1()
@@ -205,7 +210,7 @@ void arraydemo1()
 
     carray3f_del(&arr3);
 }
-
+*/
 
 
 int main()
@@ -218,5 +223,5 @@ int main()
     mapdemo1();
     mapdemo2();
     mapdemo3();
-    arraydemo1();
+    //arraydemo1();
 }
