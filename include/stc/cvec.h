@@ -98,7 +98,7 @@ STC_INLINE i_val        cx_memb(_value_fromraw)(i_valraw raw) { return i_valfrom
 STC_INLINE i_valraw     cx_memb(_value_toraw)(cx_value_t* val) { return i_valto(val); }
 STC_INLINE i_val        cx_memb(_value_clone)(cx_value_t val)
                             { return i_valfrom(i_valto(&val)); }
-STC_INLINE void         cx_memb(_swap)(Self* a, Self* b) {c_swap(Self, *a, *b); }
+STC_INLINE void         cx_memb(_swap)(Self* a, Self* b) { c_swap(Self, *a, *b); }
 STC_INLINE cx_value_t*  cx_memb(_front)(const Self* self) { return self->data; }
 STC_INLINE cx_value_t*  cx_memb(_back)(const Self* self)
                             { return self->data + cvec_rep_(self)->size - 1; }
@@ -110,9 +110,10 @@ STC_INLINE cx_iter_t    cx_memb(_begin)(const Self* self)
                             { return c_make(cx_iter_t){self->data}; }
 STC_INLINE cx_iter_t    cx_memb(_end)(const Self* self)
                             { return c_make(cx_iter_t){self->data + cvec_rep_(self)->size}; }
-STC_INLINE void         cx_memb(_next)(cx_iter_t* it) {++it->ref; }
-STC_INLINE cx_iter_t    cx_memb(_adv)(cx_iter_t it, intptr_t offs) {it.ref += offs; return it; }
-STC_INLINE size_t       cx_memb(_idx)(Self cx, cx_iter_t it) { return it.ref - cx.data; }
+STC_INLINE void         cx_memb(_next)(cx_iter_t* it) { ++it->ref; }
+STC_INLINE cx_iter_t    cx_memb(_advance)(cx_iter_t it, intptr_t offs) 
+                            { it.ref += offs; return it; }
+STC_INLINE size_t       cx_memb(_index)(Self cx, cx_iter_t it) { return it.ref - cx.data; }
 
 STC_INLINE Self
 cx_memb(_with_size)(size_t size, i_val null_val) {

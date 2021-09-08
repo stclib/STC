@@ -215,7 +215,14 @@ cx_memb(_end)(const Self* self)
 
 STC_INLINE void
 cx_memb(_next)(cx_iter_t* it)
-    {while ((++it->ref, *++it->_hx == 0)) ; }
+    { while ((++it->ref, *++it->_hx == 0)) ; }
+
+STC_INLINE cx_iter_t
+cx_memb(_advance)(cx_iter_t it, size_t n) {
+    // UB if n > elements left
+    while (n--) cx_memb(_next)(&it);
+    return it;
+}
 
 STC_INLINE size_t
 cx_memb(_erase)(Self* self, i_keyraw rkey) {

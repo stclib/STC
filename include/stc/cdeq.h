@@ -80,8 +80,9 @@ STC_INLINE cx_iter_t    cx_memb(_begin)(const Self* self)
 STC_INLINE cx_iter_t    cx_memb(_end)(const Self* self)
                             { return c_make(cx_iter_t){self->data + cdeq_rep_(self)->size}; }
 STC_INLINE void         cx_memb(_next)(cx_iter_t* it) { ++it->ref; }
-STC_INLINE cx_iter_t    cx_memb(_adv)(cx_iter_t it, intptr_t offs) { it.ref += offs; return it; }
-STC_INLINE size_t       cx_memb(_idx)(Self cx, cx_iter_t it) { return it.ref - cx.data; }
+STC_INLINE cx_iter_t    cx_memb(_advance)(cx_iter_t it, intptr_t offs) 
+                            { it.ref += offs; return it; }
+STC_INLINE size_t       cx_memb(_index)(Self cx, cx_iter_t it) { return it.ref - cx.data; }
 
 STC_INLINE Self
 cx_memb(_with_capacity)(size_t n) {

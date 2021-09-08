@@ -194,7 +194,7 @@ cx_memb(_end)(const Self* self) {
 }
 
 STC_INLINE cx_iter_t
-cx_memb(_fwd)(cx_iter_t it, size_t n) {
+cx_memb(_advance)(cx_iter_t it, size_t n) {
     while (n-- && it.ref) cx_memb(_next)(&it);
     return it;
 }
