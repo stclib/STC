@@ -72,12 +72,16 @@ cmap_X_value_t      cmap_X_value_clone(cmap_X_value_t val);
 cmap_X_rawvalue_t   cmap_X_value_toraw(cmap_X_value_t* pval);
 ```
 ```c
+int                 c_rawstr_compare(const char* const* a, const char* const* b);
+bool                c_rawstr_equals(const char* const* a, const char* const* b);
+uint64_t            c_rawstr_hash(const char* const* strp, ...);
+
 uint64_t            c_default_hash(const void *data, size_t len);         // key any trivial type
-uint64_t            c_string_hash(const char* str);                       // uses c_default_hash()
-uint64_t            c_default_hash32(const void* data, size_t);           // key one 32bit int
-uint64_t            c_default_hash64(const void* data, size_t);           // key one 64bit int
+uint64_t            c_default_hash32(const void* data, size_t is4);       // key one 32bit int
+uint64_t            c_default_hash64(const void* data, size_t is8);       // key one 64bit int
 int                 c_default_equals(const RawKey* a, const RawKey* b);   // the == operator
 int                 c_memcmp_equals(const RawKey* a, const RawKey* b);    // uses memcmp
+
 Type                c_no_clone(Type val);
 Type                c_default_fromraw(Type val);                          // plain copy
 Type                c_default_toraw(Type* val);
@@ -334,7 +338,7 @@ static int RViking_equals(const RViking* r1, const RViking* r2) {
 }
 
 static uint32_t RViking_hash(const RViking* r, int ignored) {
-    return c_string_hash(r->name) ^ (c_string_hash(r->country) >> 15);
+    return c_rawstr_hash(&r->name) ^ (c_rawstr_hash(&r->country) >> 15);
 }
 
 static Viking Viking_fromR(RViking r) {return (Viking){cstr_from(r.name), cstr_from(r.country)};}
