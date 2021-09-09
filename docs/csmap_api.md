@@ -15,31 +15,16 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 ## Header file and declaration
 
 ```c
+#define i_tag
+#define i_val       // required
+#define i_cmp       // required if i_val is a struct
+#define i_valdel
+#define i_valfrom
+#define i_valto
+#define i_valraw
 #include <stc/csmap.h>
-
-using_csmap(X, Key, Mapped);
-using_csmap(X, Key, Mapped, keyCompare);
-using_csmap(X, Key, Mapped, keyCompare, mappedDel, mappedClone = c_no_clone);
-using_csmap(X, Key, Mapped, keyCompare, mappedDel, mappedFromRaw, mappedToRaw, RawMapped);
-using_csmap(X, Key, Mapped, keyCompareRaw, mappedDel, mappedFromRaw, mappedToRaw, RawMapped,
-                                           keyDel, keyFromRaw, keyToRaw, RawKey, flag);
-using_csmap_keydef(X, Key, Mapped, keyCompare, keyDel, keyClone);
-using_csmap_keydef(X, Key, Mapped, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey, flag);
-
-using_csmap_strkey(X, Mapped);                    // using_csmap(X, cstr, Mapped, ...)
-using_csmap_strkey(X, Mapped, mappedDel, mappedClone);
-using_csmap_strkey(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped, flag);
-
-using_csmap_strval(X, Key);                       // using_csmap(X, Key, cstr, ...)
-using_csmap_strval(X, Key, keyCompare);
-using_csmap_strval(X, Key, keyCompare, keyDel, keyClone);
-using_csmap_strval(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey, flag);
-
-using_csmap_str();                                // using_csmap(str, cstr, cstr, ...)
 ```
-The `using_csmap()` macro family must be instantiated in the global scope. `X` is a type tag name and
-will affect the names of all csmap types and methods. E.g. declaring `using_csmap(ii, int, int);`, `X` should
-be replaced by `ii` in all of the following documentation. Argument `flag` is `c_true` by default.
+`X` should be replaced by the value of i_tag in all of the following documentation.
 
 ## Methods
 
@@ -97,10 +82,10 @@ csmap_X_rawvalue_t  csmap_X_value_toraw(csmap_X_value_t* pval);
 
 ## Examples
 ```c
-#include <stc/csmap.h>
 #include <stc/cstr.h>
 
-using_csmap_str();
+#define i_key_str
+#include <stc/csmap.h>
 
 int main()
 {
@@ -139,11 +124,12 @@ The HEX of color BLACK is:[#000000]
 ### Example 2
 This example uses a csmap with cstr as mapped value, by the `using_csmap_strval(id, int)` macro.
 ```c
-#include <stc/csmap.h>
 #include <stc/cstr.h>
 
-/* csmap<int, cstr>: */
-using_csmap_strval(id, int);
+#define i_tag id
+#define i_key int
+#define i_val_str
+#include <stc/csmap.h>
 
 int main()
 {
@@ -176,9 +162,6 @@ Output:
 ### Example 3
 Demonstrate csmap with plain-old-data key type Vec3i and int as mapped type: csmap<Vec3i, int>.
 ```c
-#include <stc/csmap.h>
-#include <stdio.h>
-
 typedef struct { int x, y, z; } Vec3i;
 
 static int Vec3i_compare(const Vec3i* a, const Vec3i* b) {
@@ -188,7 +171,12 @@ static int Vec3i_compare(const Vec3i* a, const Vec3i* b) {
     return (a->z > b->z) - (a->z < b->z);
 }
 
-using_csmap(vi, Vec3i, int, Vec3i_compare);
+#define i_tag vi
+#define i_key Vec3i
+#define i_val int
+#define i_cmp Vec3i_compare // uses c_default_hash
+#include <stc/csmap.h>
+#include <stdio.h>
 
 int main()
 {
@@ -215,11 +203,13 @@ Output:
 ### Example 4
 Inverse: demonstrate csmap with mapped POD type Vec3i: csmap<int, Vec3i>:
 ```c
+typedef struct { int x, y, z; } Vec3i;
+
+#define i_tag iv
+#define i_key int
+#define i_val Vec3i
 #include <stc/csmap.h>
 #include <stdio.h>
-
-typedef struct { int x, y, z; } Vec3i;
-using_csmap(iv, int, Vec3i);
 
 int main()
 {

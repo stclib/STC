@@ -12,23 +12,16 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ## Header file and declaration
 
 ```c
+#define i_tag
+#define i_val       // required
+#define i_cmp       // required if i_val is a struct
+#define i_valdel
+#define i_valfrom
+#define i_valto
+#define i_valraw
 #include <stc/cvec.h>
-
-using_cvec(X, Value);
-using_cvec(X, Value, valueCompare);
-using_cvec(X, Value, valueCompare, valueDel, valueClone = c_no_clone);
-using_cvec(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue);
-
-using_cvec_str();    // using_cvec(str, cstr, ...)
 ```
-The macro `using_cvec()` must be instantiated in the global scope. `X` is a type tag name and
-will affect the names of all cvec types and methods. E.g. declaring `using_cvec(i, int);`, `X` should
-be replaced by `i` in all of the following documentation.
-
-`using_cvec_str()` is a shorthand for:
-```
-using_cvec(str, cstr, c_rawstr_compare, cstr_del, cstr_from, cstr_str, const char*)
-```
+`X` should be replaced by the value of i_tag in all of the following documentation.
 
 ## Methods
 
@@ -103,10 +96,10 @@ cvec_X_value_t      cvec_X_value_clone(cvec_X_value_t val);
 
 ## Examples
 ```c
+#define i_tag i
+#define i_val int
 #include <stc/cvec.h>
 #include <stdio.h>
-
-using_cvec(i, int);
 
 int main()
 {
@@ -143,10 +136,10 @@ sorted: 5 7 8 13 16 25
 ```
 ### Example 2
 ```c
-#include <stc/cvec.h>
 #include <stc/cstr.h>
 
-using_cvec_str();
+#define i_val_str
+#include <stc/cvec.h>
 
 int main() {
     cvec_str names = cvec_str_init();
@@ -178,7 +171,6 @@ item: 2 elements so far
 Container with elements of structs:
 ```c
 #include <stc/cstr.h>
-#include <stc/cvec.h>
 
 typedef struct {
     cstr name; // dynamic string
@@ -198,7 +190,12 @@ User User_clone(User user) {
 }
 
 // declare a memory managed, clonable vector of users:
-using_cvec(u, User, User_compare, User_del, User_clone);
+#define i_tag u
+#define i_val User
+#define i_cmp User_compare
+#define i_valdel User_del
+#define i_valfrom User_clone
+#include <stc/cvec.h>
 
 int main(void) {
     cvec_u vec = cvec_u_init();

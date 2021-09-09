@@ -8,23 +8,16 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 ## Header file and declaration
 
 ```c
+#define i_tag
+#define i_val       // required
+#define i_cmp       // required if i_val is a struct
+#define i_valdel
+#define i_valfrom
+#define i_valto
+#define i_valraw
 #include <stc/cdeq.h>
-
-using_cdeq(X, Value);
-using_cdeq(X, Value, valueCompare);
-using_cdeq(X, Value, valueCompare, valueDel, valueClone = c_no_clone);
-using_cdeq(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue);
-
-using_cdeq_str();
 ```
-The macro `using_cdeq()` must be instantiated in the global scope. `X` is a type tag name and
-will affect the names of all cdeq types and methods. E.g. declaring `using_cdeq(i, int);`, `X` should
-be replaced by `i` in all of the following documentation.
-
-`using_cdeq_str()` is a shorthand for:
-```
-using_cdeq(str, cstr, c_rawstr_compare, cstr_del, cstr_from, cstr_str, const char*)
-```
+`X` should be replaced by the value of i_tag in all of the following documentation.
 
 ## Methods
 
@@ -100,10 +93,11 @@ cdeq_X_value_t      cdeq_X_value_clone(cdeq_X_value_t val);
 
 ## Examples
 ```c
+#define i_tag i
+#define i_val int
 #include <stc/cdeq.h>
-#include <stdio.h>
 
-using_cdeq(i, int);
+#include <stdio.h>
 
 int main() {
     cdeq_i q = cdeq_i_init();

@@ -55,12 +55,13 @@ cpque_X_value_t         cpque_X_value_clone(cpque_X_value_t val);
 
 ## Example
 ```c
-#include <stc/cpque.h>
 #include <stc/crandom.h>
 #include <stdio.h>
 
-using_cvec(i, int64_t);
-using_cpque(i, cvec_i, -c_default_compare); // min-heap
+#define i_tag i
+#define i_val int64_t
+#define i_cmp -c_default_compare // min-heap
+#include <stc/cpque.h>
 
 int main()
 {

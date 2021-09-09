@@ -8,14 +8,17 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 ## Header file and declaration
 
 ```c
-#include <stc/cstack.h> /* includes default underlying implementation header cvec.h */
-
-using_cstack(X, ctype)
+#define i_tag
+#define i_val       // required
+#define i_cmp       // required if i_val is a struct
+#define i_valdel
+#define i_valfrom
+#define i_valto
+#define i_valraw
+#include <stc/cstack.h>
 ```
-The macro `using_cstack()` must be instantiated in the global scope. **cstack** uses normally
-a **cvec_X** or **cdeq_X** type as underlying implementation, given as `ctype`. `X` is a type tag name and will
-affect the names of all cstack types and methods. E.g. declaring `using_cstack(i, cvec_i);`,
-`X` should be replaced by `i` in all of the following documentation.
+`X` should be replaced by the value of i_tag in all of the following documentation.
+
 
 ## Methods
 
@@ -54,11 +57,10 @@ cstack_X_value_t        cstack_X_value_clone(cstack_X_value_t val);
 
 ## Example
 ```c
+#define i_tag i
+#define i_val int
 #include <stc/cstack.h>
 #include <stdio.h>
-
-using_cvec(i, int);
-using_cstack(i, cvec_i);
 
 int main() {
     cstack_i S = cstack_i_init();

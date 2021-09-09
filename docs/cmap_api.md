@@ -17,31 +17,16 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 ## Header file and declaration
 
 ```c
+#define i_tag
+#define i_val       // required
+#define i_cmp       // required if i_val is a struct
+#define i_valdel
+#define i_valfrom
+#define i_valto
+#define i_valraw
 #include <stc/cmap.h>
-
-using_cmap(X, Key, Mapped);
-using_cmap(X, Key, Mapped, keyEquals, keyHash);
-using_cmap(X, Key, Mapped, keyEquals, keyHash, mappedDel, mappedClone = c_no_clone);
-using_cmap(X, Key, Mapped, keyEquals, keyHash, mappedDel, mappedFromRaw, mappedToRaw, RawMapped);
-using_cmap(X, Key, Mapped, keyEqualsRaw, keyHashRaw, mappedDel, mappedFromRaw, mappedToRaw, RawMapped,
-                                                     keyDel, keyFromRaw, keyToRaw, RawKey);
-using_cmap_keydef(X, Key, Mapped, keyEquals, keyHash, keyDel, keyClone);
-using_cmap_keydef(X, Key, Mapped, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey);
-
-using_cmap_strkey(X, Mapped);                   // using_cmap(X, cstr, Mapped, ...)
-using_cmap_strkey(X, Mapped, mappedDel, mappedClone = c_no_clone);
-using_cmap_strkey(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped);
-
-using_cmap_strval(X, Key);                      // using_cmap(X, Key, cstr, ...)
-using_cmap_strval(X, Key, keyEquals, keyHash);
-using_cmap_strval(X, Key, keyEquals, keyHash, keyDel, keyClone = c_no_clone);
-using_cmap_strval(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey);
-
-using_cmap_str()                                // using_cmap(str, cstr, cstr, ...)
 ```
-The `using_cmap()` macro family must be instantiated in the global scope. `X` is a type tag name and
-will affect the names of all cmap types and methods. E.g. declaring `using_cmap(ii, int, int);`, `X` should
-be replaced by `ii` in all of the following documentation. Argument `flag` is `c_true` by default.
+`X` should be replaced by the value of i_tag in all of the following documentation.
 
 ## Methods
 
@@ -116,10 +101,10 @@ void                c_default_del(Type* val);                             // doe
 ## Examples
 
 ```c
-#include <stc/cmap.h>
 #include <stc/cstr.h>
 
-using_cmap_str();
+#define i_key_str
+#include <stc/cmap.h>
 
 int main()
 {
@@ -159,11 +144,12 @@ The HEX of color BLACK is:[#000000]
 ### Example 2
 This example uses a cmap with cstr as mapped value, by the `using_cmap_strval(id, int)` macro.
 ```c
-#include <stc/cmap.h>
 #include <stc/cstr.h>
 
-/* cmap<int, cstr>: */
-using_cmap_strval(id, int);
+#define i_tag id
+#define i_key int
+#define i_val_str
+#include <stc/cmap.h>
 
 int main()
 {
@@ -197,13 +183,14 @@ Output:
 ### Example 3
 Demonstrate cmap with plain-old-data key type Vec3i and int as mapped type: cmap<Vec3i, int>.
 ```c
-#include <stc/cmap.h>
 #include <stdio.h>
-
 typedef struct { int x, y, z; } Vec3i;
 
-using_cmap(vi, Vec3i, int, c_memcmp_equals, // bitwise equals
-                           c_default_hash);  // bytewise hash
+#define i_tag vi
+#define i_key Vec3i
+#define i_val int
+#define i_cmp c_memcmp_equals // bitwise equals, uses c_default_hash
+#include <stc/cmap.h>
 
 int main()
 {
@@ -231,11 +218,13 @@ Output:
 ### Example 4
 Inverse: demonstrate cmap with mapped POD type Vec3i: cmap<int, Vec3i>:
 ```c
-#include <stc/cmap.h>
 #include <stdio.h>
-
 typedef struct { int x, y, z; } Vec3i;
-using_cmap(iv, int, Vec3i);
+
+#define i_tag iv
+#define i_key int
+#define i_val Vec3i
+#include <stc/cmap.h>
 
 int main()
 {
@@ -262,7 +251,6 @@ Output:
 ### Example 5
 Advanced 1: Key type is struct.
 ```c
-#include <stc/cmap.h>
 #include <stc/cstr.h>
 
 typedef struct {
@@ -282,7 +270,13 @@ static void Viking_del(Viking* v) {
     c_del(cstr, &v->name, &v->country);
 }
 
-using_cmap_keydef(vk, Viking, int, Viking_equals, Viking_hash, Viking_del, c_no_clone);
+#define i_tag vk
+#define i_key Viking
+#define i_val int
+#define i_valdel Viking_del
+#define i_equ Viking_equals
+#define i_hash Viking_hash
+#include <stc/cmap.h>
 
 int main()
 {
@@ -317,7 +311,6 @@ Harald of Iceland has 12 hp
 Advanced 2: In example 5 we needed to construct a lookup key which allocated strings, and then had to free it after. In this example we use
 rawtype feature to make it even simpler to use. Note that we must use the emplace() methods to add "raw" type entries (otherwise compile error):
 ```c
-#include <stc/cmap.h>
 #include <stc/cstr.h>
 
 typedef struct {
@@ -347,8 +340,16 @@ static uint32_t RViking_hash(const RViking* r, int ignored) {
 static Viking Viking_fromR(RViking r) {return (Viking){cstr_from(r.name), cstr_from(r.country)};}
 static RViking Viking_toR(const Viking* v) {return (RViking){v->name.str, v->country.str};}
 
-using_cmap_keydef(vk, Viking, int, RViking_equals, RViking_hash, Viking_del,
-                      Viking_fromR, Viking_toR, RViking);
+#define i_tag vk
+#define i_key Viking
+#define i_val int
+#define i_valdel Viking_del
+#define i_valraw RViking
+#define i_equ RViking_equals
+#define i_hash RViking_hash
+#define i_keyfrom Viking_fromR
+#define i_keyto Viking_toR
+#include <stc/cmap.h>
 
 int main()
 {

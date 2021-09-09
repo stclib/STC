@@ -7,18 +7,16 @@ A **cset** is an associative container that contains a set of unique objects of 
 ## Header file and declaration
 
 ```c
+#define i_tag
+#define i_val       // required
+#define i_cmp       // required if i_val is a struct
+#define i_valdel
+#define i_valfrom
+#define i_valto
+#define i_valraw
 #include <stc/cset.h>
-
-using_cset(X, Key);
-using_cset(X, Key, keyEquals, keyHash);
-using_cset(X, Key, keyEquals, keyHash, keyDel, keyClone = c_no_clone);
-using_cset(X, Key, keyEqualsRaw, keyHashRaw, keyDel, keyFromRaw, keyToRaw, RawKey, flag);
-
-using_cset_str();  // using_cset(str, cstr, c_rawstr_equals, c_rawstr_hash, cstr_del, ...)
 ```
-The macro `using_cset()` must be instantiated in the global scope. `X` is a type tag name and
-will affect the names of all cset types and methods. E.g. declaring `using_cset(i, int);`, `X` should
-be replaced by `i` in all of the following documentation.
+`X` should be replaced by the value of i_tag in all of the following documentation.
 
 ## Methods
 
@@ -72,10 +70,10 @@ cset_X_value_t      cset_X_value_clone(cset_X_value_t val);
 
 ## Example
 ```c
-#include <stc/cset.h>
 #include <stc/cstr.h>
 
-using_cset_str();
+#define i_key_str
+#include <stc/cset.h>
 
 int main ()
 {

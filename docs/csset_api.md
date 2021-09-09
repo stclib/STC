@@ -8,18 +8,16 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 ## Header file and declaration
 
 ```c
+#define i_tag
+#define i_val       // required
+#define i_cmp       // required if i_val is a struct
+#define i_valdel
+#define i_valfrom
+#define i_valto
+#define i_valraw
 #include <stc/csset.h>
-
-using_csset(X, Key);
-using_csset(X, Key, keyCompare);
-using_csset(X, Key, keyCompare, keyDel, keyClone = c_no_clone);
-using_csset(X, Key, keyCompareRaw, keyDel, keyFromRaw, keyToRaw, RawKey, flag);
-
-using_csset_str();  // using_csset(str, cstr, cstr_del, cstr_from, cstr_str, const char*, c_true)
 ```
-The macro `using_csset()` must be instantiated in the global scope. `X` is a type tag name and
-will affect the names of all csset types and methods. E.g. declaring `using_csset(i, int);`, `X` should
-be replaced by `i` in all of the following documentation.
+`X` should be replaced by the value of i_tag in all of the following documentation.
 
 ## Methods
 
@@ -69,10 +67,10 @@ csset_X_value_t     csset_X_value_clone(csset_X_value_t val);
 
 ## Example
 ```c
-#include <stc/csset.h>
 #include <stc/cstr.h>
 
-using_csset_str();
+#define i_key_str
+#include <stc/csset.h>
 
 int main ()
 {

@@ -54,11 +54,11 @@ cqueue_X_value_t        cqueue_X_value_clone(cqueue_X_value_t val);
 
 ## Examples
 ```c
+#define i_tag i
+#define i_val int
 #include <stc/cqueue.h>
-#include <stdio.h>
 
-using_cdeq(i, int);
-using_cqueue(i, cdeq_i);
+#include <stdio.h>
 
 int main() {
     cqueue_i Q = cqueue_i_init();

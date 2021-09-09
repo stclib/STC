@@ -22,21 +22,17 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 ## Header file and declaration
 
 ```c
+#define i_tag
+#define i_val       // required
+#define i_cmp       // required if i_val is a struct
+#define i_valdel
+#define i_valfrom
+#define i_valto
+#define i_valraw
 #include <stc/clist.h>
-
-using_clist(X, Value);
-using_clist(X, Value, valueCompare);
-using_clist(X, Value, valueCompare, valueDel, valueClone = c_no_clone);
-using_clist(X, Value, valueCompareRaw, valueDel, valueFromRaw, valueToRaw, RawValue);
-
-using_clist_str()
 ```
-The macro `using_clist()` must be instantiated in the global scope. `X` is a type tag name and
-will affect the names of all clist types and methods. E.g. declaring `using_clist(i, int);`, `X` should
-be replaced by `i` in all of the following documentation. `using_clist_str()` is a shorthand for
-```c
-using_clist(str, cstr, c_rawstr_compare, cstr_del, cstr_from, cstr_str, const char*)
-```
+
+`X` should be replaced by the value of i_tag in all of the following documentation.
 
 ## Methods
 
@@ -100,10 +96,10 @@ clist_X_value_t     clist_X_value_clone(clist_X_value_t val);
 
 Interleave *push_front()* / *push_back()* then *sort()*:
 ```c
+#define i_tag d
+#define i_val double
 #include <stc/clist.h>
 #include <stdio.h>
-
-using_clist(d, double);
 
 int main() {
     c_var (clist_d, list, {
@@ -138,10 +134,11 @@ sorted:  1 2 3 4 5 6 7 8 9 10 20 30 40 50 60 70 80 90
 Use of *erase_at()* and *erase_range()*:
 ```c
 // erasing from clist
+#define i_tag i
+#define i_val int
 #include <stc/clist.h>
-#include <stdio.h>
 
-using_clist(i, int);
+#include <stdio.h>
 
 int main ()
 {
@@ -171,10 +168,11 @@ mylist contains: 10 30
 
 Splice `[30, 40]` from *L2* into *L1* before `3`:
 ```c
+#define i_tag i
+#define i_val int
 #include <stc/clist.h>
-#include <stdio.h>
 
-using_clist(i, int);
+#include <stdio.h>
 
 int main() {
     c_var (clist_i, L1, {1, 2, 3, 4, 5});
