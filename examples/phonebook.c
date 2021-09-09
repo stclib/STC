@@ -39,7 +39,7 @@ void print_phone_book(cmap_str phone_book)
 
 int main(int argc, char **argv)
 {
-    c_static_assert(3 == 3, "hello");
+    c_static_assert(sizeof argc == 4);
 
     c_forauto (cset_str, names) {
         c_emplace (cset_str, names, {"Hello", "Cool", "True"});

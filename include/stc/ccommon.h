@@ -68,9 +68,10 @@
                  _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, \
                  _23, _24, _25, _26, _27, _28, _29, _30, N, ...) N
 
-#define c_static_assert(cond, ...) typedef char _static_assert_[(cond) ? 1 : -1]
+#define c_static_assert(cond) \
+    typedef char c_PASTE(_static_assert_line_, __LINE__)[(cond) ? 1 : -1]
 #define c_container_of(ptr, type, member) \
-        ((type *)((char *)(ptr) - offsetof(type, member)))
+    ((type *)((char *)(ptr) - offsetof(type, member)))
 
 #if __cplusplus
 #define c_new(T)                static_cast<T*>(c_malloc(sizeof(T)))
