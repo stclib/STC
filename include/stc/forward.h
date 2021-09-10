@@ -36,7 +36,7 @@
 #define forward_csptr(TAG, VAL) _csptr_types(csptr_##TAG, VAL)
 #define forward_cpque(TAG, VAL) _c_cpque_types(cpque_##TAG, VAL)
 #define forward_cstack(TAG, VAL) _c_cstack_types(cstack_##TAG, VAL)
-//#define forward_cqueue(TAG, VAL) _c_cqueue_types(cqueue_##TAG, VAL)
+#define forward_cqueue(TAG, VAL) _c_cdeq_types(cqueue_##TAG, VAL)
 #define forward_cvec(TAG, VAL) _c_cvec_types(cvec_##TAG, VAL)
 
 #ifndef MAP_SIZE_T

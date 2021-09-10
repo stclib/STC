@@ -1,12 +1,25 @@
 #include <stc/crandom.h>
+#include <stc/forward.h>
 #include <stdio.h>
+
+forward_cqueue(pnt, struct Point);
+
+struct Point { int x, y; } typedef Point;
+int point_compare(const Point* a, const Point* b) {
+    int c = c_default_compare(&a->x, &b->x);
+    return c ? c : c_default_compare(&a->y, &b->y);
+}
+#define f_tag pnt
+#define i_val Point
+#define i_cmp point_compare
+#include <stc/cqueue.h>
 
 #define i_val int
 #include <stc/cqueue.h>
 #include <time.h>
 
 int main() {
-    int n = 8000000;
+    int n = 60000000;
     stc64_t rng = stc64_init(time(NULL));
     stc64_uniform_t dist = stc64_uniform_init(0, n);
 
