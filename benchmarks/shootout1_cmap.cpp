@@ -1,6 +1,5 @@
 #include <stc/crandom.h>
 #include <stc/cstr.h>
-#include <stc/cmap.h>
 #include <cmath>
 #include <string>
 #include <unordered_map>
@@ -39,10 +38,21 @@ DEFMAP(map_i, <int, int>);
 DEFMAP(map_x, <uint64_t, uint64_t>);
 DEFMAP(map_s, <std::string, std::string>);
 
-using_cmap(i, int, int, c_default_equals, c_default_hash32);
-using_cmap(x, uint64_t, uint64_t, c_default_equals, c_default_hash64);
-using_cmap_str();
+#define i_tag i
+#define i_key int
+#define i_val int
+#define i_hash c_default_hash32
+#include <stc/cmap.h>
 
+#define i_tag x
+#define i_key size_t
+#define i_val size_t
+#define i_hash c_default_hash64
+#include <stc/cmap.h>
+
+#define i_key_str
+#define i_val_str
+#include <stc/cmap.h>
 
 PICOBENCH_SUITE("Map1");
 

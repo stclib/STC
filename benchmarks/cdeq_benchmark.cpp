@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <time.h>
 #include <stc/crandom.h>
-#include <stc/cdeq.h>
 
 #ifdef __cplusplus
 #include <deque>
@@ -17,7 +16,9 @@ uint64_t seed = 1, mask1 = 0xfffffff, mask2 = 0xffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
 
-using_cdeq(x, size_t);
+#define i_tag x
+#define i_val size_t
+#include <stc/cdeq.h>
 
 #ifdef __cplusplus
 Sample test_std_deque() {

@@ -2,7 +2,6 @@
 #include <time.h>
 #include <stc/crandom.h>
 #include <stc/cstr.h>
-#include <stc/cmap.h>
 #include "others/khash.h"
 
 #ifdef __cplusplus
@@ -18,7 +17,12 @@ template<typename C> inline void destroy_me(C& c) { C().swap(c); }
 // Visual Studio: compile with -TP to force C++:  cl -TP -EHsc -O2 benchmark.c
 
 // cmap and khash template expansion
-using_cmap(ii, int64_t, int64_t, c_default_equals, c_default_hash64); // c_default_hash);
+#define i_tag ii
+#define i_key int64_t
+#define i_val int64_t
+#define i_cmp c_default_hash64
+#include <stc/cmap.h>
+
 KHASH_MAP_INIT_INT64(ii, int64_t)
 
 

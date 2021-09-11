@@ -1,11 +1,11 @@
 #include <stdio.h>
 #include <time.h>
 #include <stc/crandom.h>
-#include <stc/cvec.h>
-#include <stc/cpque.h>
 
-using_cvec(f, float);
-using_cpque(f, cvec_f, -c_default_compare);
+#define i_tag x
+#define i_val float
+#define i_cmp -c_default_compare
+#include <stc/cpque.h>
 
 int main()
 {

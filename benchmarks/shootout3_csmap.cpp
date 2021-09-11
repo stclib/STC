@@ -1,7 +1,6 @@
 #include <iostream>
 #include <stc/crandom.h>
 #include <stc/cstr.h>
-#include <stc/csmap.h>
 #include <cmath>
 #include <string>
 #include <map>
@@ -16,9 +15,19 @@ using omap_i = std::map<int, int>;
 using omap_x = std::map<uint64_t, uint64_t>;
 using omap_s = std::map<std::string, std::string>;
 
-using_csmap(i, int, int);
-using_csmap(x, uint64_t, uint64_t);
-using_csmap_str();
+#define i_tag i
+#define i_key int
+#define i_val int
+#include <stc/csmap.h>
+
+#define i_tag x
+#define i_key size_t
+#define i_val size_t
+#include <stc/csmap.h>
+
+#define i_key_str
+#define i_val_str
+#include <stc/csmap.h>
 
 PICOBENCH_SUITE("Map1");
 

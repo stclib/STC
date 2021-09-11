@@ -234,7 +234,7 @@ cx_memb(_realloc_)(Self* self, size_t n) {
     size_t sz = rep->size, cap = (size_t) (sz*1.7) + n + 7;
     size_t nfront = _cdeq_nfront(self);
     rep = (struct cdeq_rep*) c_realloc(rep->cap ? rep : NULL,
-                                        offsetof(struct cdeq_rep, base) + cap*sizeof(i_val));
+                                       offsetof(struct cdeq_rep, base) + cap*sizeof(i_val));
     rep->size = sz, rep->cap = cap;
     self->_base = (cx_value_t *) rep->base;
     self->data = self->_base + nfront;
@@ -257,7 +257,7 @@ cx_memb(_expand_right_half_)(Self* self, size_t idx, size_t n) {
 #endif
         memmove(self->_base + pos, self->data, idx*sizeof(i_val));
         memmove(self->data + pos + idx + n, self->data + idx, (sz - idx)*sizeof(i_val));
-        self->data = ((cx_value_t *) self->_base) + pos;
+        self->data = self->_base + pos;
     }
 }
 
