@@ -46,7 +46,7 @@ STC_API Self            cx_memb(_clone)(Self cx);
 STC_API void            cx_memb(_clear)(Self* self);
 STC_API void            cx_memb(_del)(Self* self);
 STC_API void            cx_memb(_push_back)(Self* self, i_val value);
-STC_API void            cx_memb(_expand_right_)(Self* self, size_t idx, size_t n);
+STC_API void            cx_memb(_expand_right_half_)(Self* self, size_t idx, size_t n);
 
 #ifndef i_queue
 STC_API cx_iter_t       cx_memb(_find_in)(cx_iter_t p1, cx_iter_t p2, i_valraw raw);
@@ -85,7 +85,7 @@ STC_INLINE cx_iter_t    cx_memb(_advance)(cx_iter_t it, intptr_t offs)
 STC_INLINE Self
 cx_memb(_with_capacity)(size_t n) {
     Self cx = cx_memb(_init)();
-    cx_memb(_expand_right_)(&cx, 0, n);
+    cx_memb(_expand_right_half_)(&cx, 0, n);
     return cx;
 }
 
@@ -122,7 +122,7 @@ STC_INLINE size_t cx_memb(_index)(Self cx, cx_iter_t it) {
 STC_INLINE void
 cx_memb(_reserve)(Self* self, size_t n) {
     size_t sz = cdeq_rep_(self)->size;
-    if (n > sz) cx_memb(_expand_right_)(self, sz, n - sz);
+    if (n > sz) cx_memb(_expand_right_half_)(self, sz, n - sz);
 }
 
 STC_INLINE cx_iter_t
@@ -242,15 +242,19 @@ cx_memb(_realloc_)(Self* self, size_t n) {
 }
 
 STC_DEF void
-cx_memb(_expand_right_)(Self* self, size_t idx, size_t n) {
+cx_memb(_expand_right_half_)(Self* self, size_t idx, size_t n) {
     struct cdeq_rep* rep = cdeq_rep_(self);
     size_t sz = rep->size, cap = rep->cap;
     size_t nfront = _cdeq_nfront(self), nback = cap - sz - nfront;
     if (nback >= n || sz*1.3 + n > cap && cx_memb(_realloc_)(self, n)) {
         memmove(self->data + idx + n, self->data + idx, (sz - idx)*sizeof(i_val));
     } else {
+#ifdef i_queue
+        size_t pos = 0;
+#else
         size_t unused = cap - (sz + n);
         size_t pos = (nfront*2 < unused) ? nfront : unused/2;
+#endif
         memmove(self->_base + pos, self->data, idx*sizeof(i_val));
         memmove(self->data + pos + idx + n, self->data + idx, (sz - idx)*sizeof(i_val));
         self->data = ((cx_value_t *) self->_base) + pos;
@@ -261,7 +265,7 @@ STC_DEF void
 cx_memb(_push_back)(Self* self, i_val value) {
     struct cdeq_rep* rep = cdeq_rep_(self);
     if (_cdeq_nfront(self) + rep->size == rep->cap)
-        cx_memb(_expand_right_)(self, rep->size, 1);
+        cx_memb(_expand_right_half_)(self, rep->size, 1);
     self->data[cdeq_rep_(self)->size++] = value;
 }
 
@@ -277,7 +281,7 @@ cx_memb(_clone)(Self cx) {
 #ifndef i_queue
 
 STC_DEF void
-cx_memb(_expand_left_)(Self* self, size_t idx, size_t n) {
+cx_memb(_expand_left_half_)(Self* self, size_t idx, size_t n) {
     struct cdeq_rep* rep = cdeq_rep_(self);
     size_t sz = rep->size, cap = rep->cap;
     size_t nfront = _cdeq_nfront(self), nback = cap - sz - nfront;
@@ -295,8 +299,8 @@ cx_memb(_expand_left_)(Self* self, size_t idx, size_t n) {
 STC_DEF cx_value_t*
 cx_memb(_insert_space_)(Self* self, cx_value_t* pos, size_t n) {
     size_t idx = pos - self->data;
-    if (idx*2 < cdeq_rep_(self)->size) cx_memb(_expand_left_)(self, idx, n);
-    else                               cx_memb(_expand_right_)(self, idx, n);
+    if (idx*2 < cdeq_rep_(self)->size) cx_memb(_expand_left_half_)(self, idx, n);
+    else                               cx_memb(_expand_right_half_)(self, idx, n);
     if (n) cdeq_rep_(self)->size += n; /* do only if size > 0 */
     return self->data + idx;
 }
@@ -304,7 +308,7 @@ cx_memb(_insert_space_)(Self* self, cx_value_t* pos, size_t n) {
 STC_DEF void
 cx_memb(_push_front)(Self* self, i_val value) {
     if (self->data == self->_base)
-        cx_memb(_expand_left_)(self, 0, 1);
+        cx_memb(_expand_left_half_)(self, 0, 1);
     else
         --self->data;
     *self->data = value;
