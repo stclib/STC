@@ -1,15 +1,9 @@
 #include <stc/crandom.h>
-#include <stc/cqueue.h>
 #include <stdio.h>
 
-#if 1
-using_cdeq(i, int);
-using_cqueue(i, cdeq_i);
-#else
-#include <stc/clist.h>
-using_clist(i, int);
-using_cqueue(i, clist_i);
-#endif
+#define i_tag i
+#define i_val int
+#include <stc/cqueue.h>
 
 int main() {
     int n = 100000000;
@@ -17,7 +11,7 @@ int main() {
     stc64_t rng = stc64_init(1234);
     dist = stc64_uniform_init(0, n);
 
-    c_forvar (cqueue_i queue = cqueue_i_init(), cqueue_i_del(&queue))
+    c_forauto (cqueue_i, queue)
     {
         // Push ten million random numbers onto the queue.
         c_forrange (n)
@@ -25,7 +19,7 @@ int main() {
 
         // Push or pop on the queue ten million times
         printf("%d\n", n);
-        c_forrange (n) { // range uses initial n only.
+        c_forrange (n) { // forrange uses initial n only.
             int r = stc64_uniform(&rng, &dist);
             if (r & 1)
                 ++n, cqueue_i_push(&queue, r);

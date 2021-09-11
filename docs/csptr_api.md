@@ -21,13 +21,16 @@ See the c++ classes [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/s
 ## Header file and declaration
 
 ```c
+#define i_tag
+#define i_val       // required
+#define i_cmp       // required if i_val is a struct
+#define i_valdel
+#define i_valfrom
+#define i_valto
+#define i_valraw
 #include <stc/csptr.h>
-
-using_csptr(X, Value);
-using_csptr(X, Value, valueCompare);
-using_csptr(X, Value, valueCompare, valueDel);
 ```
-The macro `using_csptr()` must be instantiated in the global scope. `X` is a type tag name and will affect the names of all csptr types and methods. E.g. declaring `using_csptr(v4, Vec4)`, `X` should be replaced by `v4` in all of the following documentation.
+`X` should be replaced by the value of i_tag in all of the following documentation.
 
 ## Methods
 
@@ -78,6 +81,7 @@ void Person_del(Person* p) {
     printf("Destroy: %s %s\n", p->name.str, p->last.str);
     c_del(cstr, &p->name, &p->last);
 }
+
 
 using_csptr(person, Person, c_no_compare, Person_del);
 

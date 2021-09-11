@@ -8,18 +8,16 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ## Header file and declaration
 
 ```c
+#define i_tag
+#define i_val       // required
+#define i_cmp       // required if i_val is a struct
+#define i_valdel
+#define i_valfrom
+#define i_valto
+#define i_valraw
 #include <stc/cpque.h>
-
-using_cpque(X, ctype);                // uses valueCompare from ctype
-using_cpque(X, ctype, valueCompare);
 ```
-The macro `using_cpque()` must be instantiated in the global scope. **cpque** uses normally **cvec_X**
-or **cdeq_X** as underlying implementation, specified as `ctype`. The *valueCompare* can be specified
-to control the order in the priority queue.
-
-By default, the function *`ctype`_value_compare(x, y)* from the underlying vector type is used for
-comparing values (priorities). `X` is a type tag name and will affect the names of all cpque types and methods.
-When declaring `using_cpque(i, cvec_i)`, `X` should be replaced by `i` in the following documentation.
+`X` should be replaced by the value of i_tag in all of the following documentation.
 
 ## Methods
 
@@ -70,7 +68,7 @@ int main()
     stc64_uniform_t dist = stc64_uniform_init(0, N * 10);
 
     // Declare heap, with defered del()
-    c_forvar (cpque_i heap = cpque_i_init(), cpque_i_del(&heap))
+    c_forauto (cpque_i, heap)
     {
         // Push ten million random numbers to priority queue, plus some negative ones.
         c_forrange (N)

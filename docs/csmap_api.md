@@ -61,7 +61,7 @@ csmap_X_iter_t      csmap_X_erase_range(csmap_X* self, csmap_X_iter_t it1, csmap
 csmap_X_iter_t      csmap_X_begin(const csmap_X* self);
 csmap_X_iter_t      csmap_X_end(const csmap_X* self);
 void                csmap_X_next(csmap_X_iter_t* iter);
-csmap_X_iter_t      csmap_X_fwd(csmap_X_iter_t it, size_t n);
+csmap_X_iter_t      csmap_X_advance(csmap_X_iter_t it, size_t n);
 
 csmap_X_value_t     csmap_X_value_clone(csmap_X_value_t val);
 csmap_X_rawvalue_t  csmap_X_value_toraw(csmap_X_value_t* pval);
@@ -122,7 +122,7 @@ The HEX of color BLACK is:[#000000]
 ```
 
 ### Example 2
-This example uses a csmap with cstr as mapped value, by the `using_csmap_strval(id, int)` macro.
+This example uses a csmap with cstr as mapped value.
 ```c
 #include <stc/cstr.h>
 

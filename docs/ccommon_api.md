@@ -38,7 +38,9 @@ c_forauto (cstr, s1, s2)
     printf("%s %s\n", s1.str, s2.str);
 }
 
-using_cvec(i32, int32_t);
+#define i_tag i32
+#define i_val int32_t
+#include <stc/cvec.h>
 ...
 cvec_i32 vec;
 c_forscope (vec = cvec_i32_init(), cvec_i32_del(&vec))
@@ -59,9 +61,9 @@ c_fordefer (cstr_del(&s1), cstr_del(&s2))
 ```c
 #include <errno.h>
 #include <stc/cstr.h>
-#include <stc/cvec.h>
 
-using_cvec_str();
+#define i_val_str
+#include <stc/cvec.h>
 
 // receiver should check errno variable
 cvec_str readFile(const char* name)
@@ -91,9 +93,11 @@ int main()
 | `c_foreach (it, ctype, it1, it2)`    | Iterate the range [it1, it2) |
 
 ```c
-using_csset(x, int);
+#define i_tag x
+#define i_key int
+#include <stc/csset.h>
 ...
-c_var (csset_x, set, {23, 3, 7, 5, 12});
+c_emplace(csset_x, set, {23, 3, 7, 5, 12});
 c_foreach (i, csset_x, set)
     printf(" %d", *i.ref);
 // 3 5 7 12 23

@@ -146,7 +146,7 @@ The HEX of color BLACK is:[#000000]
 ```
 
 ### Example 2
-This example uses a cmap with cstr as mapped value, by the `using_cmap_strval(id, int)` macro.
+This example uses a cmap with cstr as mapped value.
 ```c
 #include <stc/cstr.h>
 

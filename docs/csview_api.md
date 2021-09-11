@@ -7,7 +7,7 @@ element of the sequence at position zero. The implementation holds two members: 
 **csview** is an efficient replacent for `const char*`. It never allocates memory, and therefore need not be destructed.
 Its lifetime is limited by the source string storage. It keeps the length of the string, and does not call *strlen()*
 when passing it around. It is faster when using`csview` as convertion type (raw) than `const char*` in associative
-containers with cstr keys. `using_cmap_strvkey()` may perform better than `using_cmap_strkey()`.
+containers with cstr keys.
 
 Note: a **csview** may ***not be null-terminated***, and must therefore be printed like: 
 `printf("%.*s", csview_ARG(sv))`.
@@ -98,23 +98,6 @@ uint64_t      csview_hash(const csview* x, ...);
 | `csview_npos`    | same as `cstr_npos` |                                   |
 | `csview_ARG(sv)` | printf argument     | `printf("%.*s", csview_ARG(sv));` |
 
-## Associative cstr-containers with csview emplace/lookup API
-```
-using_csmap_strvkey(X, Mapped)
-using_csmap_strvkey(X, Mapped, mappedDel)
-using_csmap_strvkey(X, Mapped, mappedDel, mappedClone)
-using_csmap_strvkey(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped)
-using_csmap_strv()
-using_csset_strv()
-
-using_cmap_strvkey(X, Mapped)
-using_cmap_strvkey(X, Mapped, mappedDel)
-using_cmap_strvkey(X, Mapped, mappedDel, mappedClone)
-using_cmap_strvkey(X, Mapped, mappedDel, mappedFromRaw, mappedToRaw, RawMapped)
-using_cmap_strv()
-using_cset_strv()
-```
-
 ## Example
 ```c
 #include <stc/csview.h>
@@ -149,7 +132,6 @@ Splits strings into tokens. *print_split()* makes **no** memory allocations or *
 and does not depend on null-terminated strings. *string_split()* function returns a vector of cstr.
 ```c
 #include <stc/csview.h>
-#include <stc/cvec.h>
 
 void print_split(csview str, csview sep)
 {
@@ -162,7 +144,8 @@ void print_split(csview str, csview sep)
     }
 }
 
-using_cvec_str();
+#define i_val_str
+#include <stc/cvec.h>
 
 cvec_str string_split(csview str, csview sep)
 {
@@ -204,36 +187,4 @@ Output:
 "string"
 "now"
 ""
-```
-### Example 3
-cmap cstr => int with csview as convertion type
-```c
-#include <stc/csview.h>
-#include <stc/cvec.h>
-#include <stc/cmap.h>
 
-using_cmap_strvkey(si, int);
-
-int main()
-{
-    csview text = c_sv("The length of this literal is evaluated at compile time and stored in csview text.");
-    csview suffix = csview_substr(text, -12, cstr_npos); // from pos -12 to end
-    printf("%.*s\n", csview_ARG(suffix));
-
-    c_forauto (cmap_si, map)
-    {
-        cmap_si_emplace(&map, c_sv("hello"), 100);
-        cmap_si_emplace(&map, c_sv("world"), 200);
-        cmap_si_emplace(&map, c_sv("hello"), 300); // already in map, ignored
-
-        // Efficient lookup: no string allocation or strlen() takes place:
-        cmap_si_value_t* val = cmap_si_get(&map, c_sv("hello"));
-        printf("%s: %d\n", val->first.str, val->second);
-    }
-}
-```
-Output:
-```
-csview text.
-hello: 100
-```

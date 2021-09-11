@@ -23,10 +23,11 @@
 
 // Sorted set - implemented as an AA-tree (balanced binary tree).
 /*
-#include <stc/csset.h>
 #include <stdio.h>
 
-using_csset(i, int);        // sorted set of int
+#define i_tag i
+#define i_key int
+#include <stc/csset.h> // sorted set of int
 
 int main(void) {
     csset_i s = csset_i_init();

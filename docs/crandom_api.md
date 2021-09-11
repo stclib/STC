@@ -69,15 +69,15 @@ double              stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
 
 ## Example
 ```c
-#include <stdio.h>
 #include <time.h>
-
 #include <stc/crandom.h>
-#include <stc/csmap.h>
 #include <stc/cstr.h>
 
 // Declare int -> int sorted map. Uses typetag 'i' for ints.
-using_csmap(i, int, size_t);
+#define i_tag i
+#define i_key int
+#define i_val size_t
+#include <stc/csmap.h>
 
 int main()
 {
@@ -95,7 +95,7 @@ int main()
     csmap_i mhist = csmap_i_init();
     c_forrange (N) {
         int index = (int) round( stc64_normalf(&rng, &dist) );
-        ++ csmap_i_emplace(&mhist, index, 0).ref->second;
+        csmap_i_emplace(&mhist, index, 0).ref->second += 1;
     }
 
     // Print the gaussian bar chart

@@ -1,9 +1,9 @@
 # STC [cstack](../include/stc/cstack.h): Stack
 ![Stack](pics/stack.jpg)
 
-The **cstack** is a container adapter that gives the programmer the functionality of a stack - specifically, a LIFO (last-in, first-out) data structure. The class template acts as a wrapper to the underlying container - only a specific set of functions is provided. The stack pushes and pops the element from the back of the underlying container, known as the top of the stack.
+The **cstack** is a container that gives the programmer the functionality of a stack - specifically, a LIFO (last-in, first-out) data structure. The stack pushes and pops the element from the back of the underlying container, known as the top of the stack.
 
-See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack)  for a functional description.
+See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack) for a functional description.
 
 ## Header file and declaration
 
@@ -18,7 +18,6 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 #include <stc/cstack.h>
 ```
 `X` should be replaced by the value of i_tag in all of the following documentation.
-
 
 ## Methods
 

@@ -287,7 +287,7 @@ int main(void) {
     } \
 \
     STC_INLINE CX##_iter_t \
-    CX##_fwd(CX##_iter_t it, size_t n) { \
+    CX##_advance(CX##_iter_t it, size_t n) { \
         while (n-- && it.ref) CX##_next(&it); \
         return it; \
     } \

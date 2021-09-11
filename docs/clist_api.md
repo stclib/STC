@@ -13,8 +13,8 @@ and *clist_X_sort()* which is **O**(*n* log(*n*)).
 ***Iterator invalidation***: Adding, removing and moving the elements within the list, or across several lists
 will invalidate other iterators currently refering to these elements and their immediate succesive elements.
 However, an iterator to a succesive element can both be dereferenced and advanced. After advancing, it is 
-in a fully valid state. This implies that if `clist_X_insert(&L, clist_X_fwd(it,1), x)` and
-`clist_X_erase_at(&L, clist_X_fwd(it,1))` are used consistently, only iterators to erased elements are invalidated.
+in a fully valid state. This implies that if `clist_X_insert(&L, clist_X_advance(it,1), x)` and
+`clist_X_erase_at(&L, clist_X_advance(it,1))` are used consistently, only iterators to erased elements are invalidated.
 
 See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) for similar API and
 [std::forward_list](https://en.cppreference.com/w/cpp/container/forward_list) for a functional description.
@@ -77,7 +77,7 @@ void                clist_X_sort(clist_X* self);
 clist_X_iter_t      clist_X_begin(const clist_X* self);
 clist_X_iter_t      clist_X_end(const clist_X* self);
 void                clist_X_next(clist_X_iter_t* it);
-clist_X_iter_t      clist_X_fwd(clist_X_iter it, size_t n);                        // return it n elements ahead. End allowed.
+clist_X_iter_t      clist_X_advance(clist_X_iter it, size_t n);                        // return it n elements ahead. End allowed.
 
 clist_X_rawvalue_t  clist_X_value_toraw(clist_X_value_t* pval);
 clist_X_value_t     clist_X_value_clone(clist_X_value_t val);
@@ -175,16 +175,19 @@ Splice `[30, 40]` from *L2* into *L1* before `3`:
 #include <stdio.h>
 
 int main() {
-    c_var (clist_i, L1, {1, 2, 3, 4, 5});
-    c_var (clist_i, L2, {10, 20, 30, 40, 50});
+    c_forauto (clist_i, L1, L2)
+    {
+        c_emplace(clist_i, L1, {1, 2, 3, 4, 5});
+        c_emplace(clist_i, L2, {10, 20, 30, 40, 50});
 
-    clist_i_iter_t i = clist_i_fwd(clist_i_begin(&L1), 2);
-    clist_i_iter_t j1 = clist_i_fwd(clist_i_begin(&L2), 2), j2 = clist_i_fwd(j1, 2);
+        clist_i_iter_t i = clist_i_advance(clist_i_begin(&L1), 2);
+        clist_i_iter_t j1 = clist_i_advance(clist_i_begin(&L2), 2), j2 = clist_i_advance(j1, 2);
 
-    clist_i_splice_range(&L1, i, &L2, j1, j2);
+        clist_i_splice_range(&L1, i, &L2, j1, j2);
 
-    c_foreach (i, clist_i, L1) printf(" %d", *i.ref); puts("");
-    c_foreach (i, clist_i, L2) printf(" %d", *i.ref); puts("");
+        c_foreach (i, clist_i, L1) printf(" %d", *i.ref); puts("");
+        c_foreach (i, clist_i, L2) printf(" %d", *i.ref); puts("");
+    }
 }
 ```
 Output:
