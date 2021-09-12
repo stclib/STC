@@ -53,7 +53,9 @@ int main() {
 }
 */
 
-#define i_module cqueue
+#ifndef i_prefix
+#define i_prefix cqueue_
+#endif
 #define i_queue
 #define _push_back _push
 #define _pop_front _pop

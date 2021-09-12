@@ -59,8 +59,8 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
 #define _csmap_rep(self) c_container_of((self)->nodes, struct csmap_rep, nodes)
 #endif // CSMAP_H_INCLUDED
 
-#ifndef i_module
-#define i_module csmap
+#ifndef i_prefix
+#define i_prefix csmap_
 #define cx_MAP_ONLY c_true
 #define cx_SET_ONLY c_false
 #define cx_keyref(vp) (&(vp)->first)

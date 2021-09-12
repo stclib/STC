@@ -26,7 +26,7 @@
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
   #define cx_memb(name) c_PASTE(Self, name)
-  #define Self c_PASTE3(i_module, _, i_tag)
+  #define Self c_PASTE(i_prefix, i_tag)
   // typedef container types defined in forward.h. VC requires c_EXPAND.
   #define cx_deftypes(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
   
@@ -128,7 +128,7 @@
 
 #else // -------------------------------------------------------
 
-#undef i_module
+#undef i_prefix
 #undef i_tag
 #undef f_tag
 #undef i_imp

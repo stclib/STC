@@ -81,7 +81,9 @@ _c_clist_complete_types(clist_VOID, dummy);
 
 #endif // CLIST_H_INCLUDED
 
-#define i_module clist
+#ifndef i_prefix
+#define i_prefix clist_
+#endif
 #include "template.h"
 
 #if !defined i_fwd

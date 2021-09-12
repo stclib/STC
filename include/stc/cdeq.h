@@ -31,8 +31,8 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
 #define cdeq_rep_(self) c_container_of((self)->_base, struct cdeq_rep, base)
 #endif // CDEQ_H_INCLUDED
 
-#ifndef i_module
-#define i_module cdeq
+#ifndef i_prefix
+#define i_prefix cdeq_
 #endif
 #include "template.h"
 

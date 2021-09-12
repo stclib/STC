@@ -42,7 +42,9 @@ int main(void) {
 }
 */
 
-#define i_module csset
+#ifndef i_prefix
+#define i_prefix csset_
+#endif
 #define cx_MAP_ONLY c_false
 #define cx_SET_ONLY c_true
 #define cx_keyref(vp) (vp)

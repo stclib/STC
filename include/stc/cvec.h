@@ -67,7 +67,9 @@ struct cvec_rep { size_t size, cap; void* data[]; };
 #define cvec_rep_(self) c_container_of((self)->data, struct cvec_rep, data)
 #endif // CVEC_H_INCLUDED
 
-#define i_module cvec
+#ifndef i_prefix
+#define i_prefix cvec_
+#endif
 #include "template.h"
 
 #if !defined i_fwd

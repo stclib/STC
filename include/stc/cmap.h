@@ -59,8 +59,8 @@ int main(void) {
 typedef struct      { size_t idx; uint_fast8_t hx; } chash_bucket_t;
 #endif // CMAP_H_INCLUDED
 
-#ifndef i_module
-#define i_module cmap
+#ifndef i_prefix
+#define i_prefix cmap_
 #define cx_MAP_ONLY c_true
 #define cx_SET_ONLY c_false
 #define cx_keyref(vp) (&(vp)->first)

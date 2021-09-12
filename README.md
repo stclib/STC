@@ -90,7 +90,6 @@ int Point_compare(const struct Point* a, const struct Point* b) {
     return cmp ? cmp : c_default_compare(&a->y, &b->y);
 }
 
-#define i_tag i32
 #define i_key int
 #include <stc/cset.h>  // unordered set
 
@@ -99,71 +98,67 @@ int Point_compare(const struct Point* a, const struct Point* b) {
 #define i_cmp Point_compare
 #include <stc/cvec.h>  // vector, struct as elements
 
-#define i_tag i32
 #define i_val int
 #include <stc/cdeq.h>  // deque of int
 
-#define i_tag i32
 #define i_val int
 #include <stc/clist.h> // singly linked list
 
-#define i_tag i32
 #define i_val int
 #include <stc/cstack.h>
 
-#define i_tag i32
 #define i_key int
 #define i_val int
 #include <stc/csmap.h> // sorted map
 
 int main(void) {
     // define six containers with automatic call of init and del (destruction after scope exit)
-    c_forauto (cset_i32, set)
+    c_forauto (cset_int, set)
     c_forauto (cvec_pnt, vec)
-    c_forauto (cdeq_i32, deq)
-    c_forauto (clist_i32, lst)
-    c_forauto (cstack_i32, stk)
-    c_forauto (csmap_i32, map)
+    c_forauto (cdeq_int, deq)
+    c_forauto (clist_int, lst)
+    c_forauto (cstack_int, stk)
+    c_forauto (csmap_int, map)
     {
         // add some elements to each container
-        c_emplace(cset_i32, set, {10, 20, 30});
+        c_emplace(cset_int, set, {10, 20, 30});
         c_emplace(cvec_pnt, vec, { {10, 1}, {20, 2}, {30, 3} });
-        c_emplace(cdeq_i32, deq, {10, 20, 30});
-        c_emplace(clist_i32, lst, {10, 20, 30});
-        c_emplace(cstack_i32, stk, {10, 20, 30});
-        c_emplace(csmap_i32, map, { {20, 2}, {10, 1}, {30, 3} });
+        c_emplace(cdeq_int, deq, {10, 20, 30});
+        c_emplace(clist_int, lst, {10, 20, 30});
+        c_emplace(cstack_int, stk, {10, 20, 30});
+        c_emplace(csmap_int, map, { {20, 2}, {10, 1}, {30, 3} });
 
         // add one more element to each container
-        cset_i32_insert(&set, 40);
+        cset_int_insert(&set, 40);
         cvec_pnt_push_back(&vec, (struct Point) {40, 4});
-        cdeq_i32_push_front(&deq, 5);
-        clist_i32_push_front(&lst, 5);
-        cstack_i32_push(&stk, 40);
-        csmap_i32_insert(&map, 40, 4);
+        cdeq_int_push_front(&deq, 5);
+        clist_int_push_front(&lst, 5);
+        cstack_int_push(&stk, 40);
+        csmap_int_insert(&map, 40, 4);
 
         // find an element in each container
-        cset_i32_iter_t i1 = cset_i32_find(&set, 20);
+        cset_int_iter_t i1 = cset_int_find(&set, 20);
         cvec_pnt_iter_t i2 = cvec_pnt_find(&vec, (struct Point) {20, 2});
-        cdeq_i32_iter_t i3 = cdeq_i32_find(&deq, 20);
-        clist_i32_iter_t i4 = clist_i32_find(&lst, 20);
-        csmap_i32_iter_t i5 = csmap_i32_find(&map, 20);
+        cdeq_int_iter_t i3 = cdeq_int_find(&deq, 20);
+        clist_int_iter_t i4 = clist_int_find(&lst, 20);
+        csmap_int_iter_t i5 = csmap_int_find(&map, 20);
         printf("\nFound: %d, (%g, %g), %d, %d, [%d: %d]\n", *i1.ref, i2.ref->x, i2.ref->y,
                                                             *i3.ref, *i4.ref,
                                                             i5.ref->first, i5.ref->second);
         // erase the elements found
-        cset_i32_erase_at(&set, i1);
+        cset_int_erase_at(&set, i1);
         cvec_pnt_erase_at(&vec, i2);
-        cdeq_i32_erase_at(&deq, i3);
-        clist_i32_erase_at(&lst, i4);
-        csmap_i32_erase_at(&map, i5);
+        cdeq_int_erase_at(&deq, i3);
+        clist_int_erase_at(&lst, i4);
+        csmap_int_erase_at(&map, i5);
 
         printf("After erasing elements found:");
-        printf("\n set:"); c_foreach (i, cset_i32, set) printf(" %d", *i.ref);
+        printf("\n set:"); c_foreach (i, cset_int, set) printf(" %d", *i.ref);
         printf("\n vec:"); c_foreach (i, cvec_pnt, vec) printf(" (%g, %g)", i.ref->x, i.ref->y);
-        printf("\n deq:"); c_foreach (i, cdeq_i32, deq) printf(" %d", *i.ref);
-        printf("\n lst:"); c_foreach (i, clist_i32, lst) printf(" %d", *i.ref);
-        printf("\n stk:"); c_foreach (i, cstack_i32, stk) printf(" %d", *i.ref);
-        printf("\n map:"); c_foreach (i, csmap_i32, map) printf(" [%d: %d]", i.ref->first,
+        printf("\n deq:"); c_foreach (i, cdeq_int, deq) printf(" %d", *i.ref);
+        printf("\n lst:"); c_foreach (i, clist_int, lst) printf(" %d", *i.ref);
+        printf("\n stk:"); c_foreach (i, cstack_int, stk) printf(" %d", *i.ref);
+        printf("\n map:"); c_foreach (i, csmap_int, map) printf(" [%d: %d]", i.ref->first,
                                                                              i.ref->second);
     }
 }

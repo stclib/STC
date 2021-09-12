@@ -28,7 +28,10 @@
 #include "forward.h"
 #endif
 
-#define i_module cpque
+#ifndef i_prefix
+#define i_prefix cpque_
+#endif
+
 #include "template.h"
 
 #if !defined i_fwd
@@ -43,7 +46,7 @@ STC_API void cx_memb(_emplace_items)(Self *self, const cx_rawvalue_t arr[], size
 STC_API Self cx_memb(_clone)(Self q);
 
 STC_INLINE Self cx_memb(_init)(void)
-    { return (Self){0, 0, 0}; }
+    { return c_make(Self){0, 0, 0}; }
 
 STC_INLINE Self cx_memb(_with_capacity)(size_t cap) {
     Self out = {(cx_value_t *) c_malloc(cap*sizeof(cx_value_t)), 0, cap};
