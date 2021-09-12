@@ -44,7 +44,7 @@ int main() {
 
     printf("stk size: %zu\n", cstack_f_size(stk));
 
-    // Put in some data in 2D array
+    // Put in some data in stack array
     stk.data[x] = 3.1415927f;
     clist_arr_push_back(&tableList, stk);
     cmap_lst_insert(&listMap, tableKey, tableList);

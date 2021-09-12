@@ -1,7 +1,6 @@
 // This implements the c++ std::map::find example at:
 // https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-17
 #include <stc/cstr.h>
-#include <stdio.h>
 
 #define i_tag istr
 #define i_key int

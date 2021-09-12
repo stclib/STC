@@ -1,27 +1,26 @@
-#include <errno.h>
 #include <stc/cstr.h>
+#include <errno.h>
 
 #define i_val_str
 #include <stc/cvec.h>
 
-cvec_str read_file(const char* name) {
+cvec_str read_file(const char* name)
+{
     cvec_str vec = cvec_str_init();
-    for (FILE* f = fopen(name, "r"); f; fclose(f), f=NULL) {
-        cstr line = cstr_init();
-        while (cstr_getline(&line, f))
-            cvec_str_emplace_back(&vec, line.str);
-        cstr_del(&line);
-    }
+    c_forvar (FILE* f = fopen(name, "r"), fclose(f))
+        c_forauto (cstr, line)
+            while (cstr_getline(&line, f))
+                cvec_str_emplace_back(&vec, line.str);
     return vec;
 }
 
-int main() {
-    cvec_str vec = read_file("read.c");
-    if (errno) printf("errno: %d\n", errno);
-
+int main()
+{
     int n = 0;
-    c_foreach (i, cvec_str, vec)
-        printf("%5d: %s\n", ++n, i.ref->str);
+    c_forvar (cvec_str vec = read_file(__FILE__), cvec_str_del(&vec))
+        c_foreach (i, cvec_str, vec)
+            printf("%5d: %s\n", ++n, i.ref->str);
 
-    cvec_str_del(&vec);
+    if (errno)
+        printf("error: read_file(" __FILE__ "). errno: %d\n", errno);
 }
