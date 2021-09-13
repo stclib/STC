@@ -24,7 +24,7 @@ static void test_repeats(void)
         c_forrange (i, N) {
             uint64_t k = stc64_rand(&rng) & mask;
             int v = cmap_ic_emplace(&m, k, 0).ref->second += 1;
-            if (v > 1) printf("repeated value %llx (%d) at 2^%d\n", k, v, (int) log2(i));
+            if (v > 1) printf("repeated value %zu (%d) at 2^%d\n", k, v, (int) log2(i));
         }
     }
 }
