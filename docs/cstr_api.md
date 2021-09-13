@@ -68,12 +68,6 @@ bool         cstr_contains(cstr s, const char* needle);
 bool         cstr_starts_with(cstr s, const char* str);
 bool         cstr_ends_with(cstr s, const char* str);
 
-bool         cstr_iequalto(cstr s, const char* str);                   // prefix i = case-insensitive
-size_t       cstr_ifind_n(cstr s, const char* needle, size_t pos, size_t nmax);
-bool         cstr_icontains(cstr s, const char* needle);
-bool         cstr_istarts_with(cstr s, const char* str);
-bool         cstr_iends_with(cstr s, const char* str);
-
 void         cstr_push_back(cstr* self, char ch);
 void         cstr_pop_back(cstr* self);
 char*        cstr_front(cstr* self);
@@ -99,9 +93,8 @@ int          c_rawstr_compare(const char** x, const char** y);
 bool         c_rawstr_equals(const char** x, const char** y);
 uint64_t     c_rawstr_hash(const char* const* x, ...);
 
-int          c_strncasecmp(const char* str1, const char* str2, size_t n);
 char*        c_strnstrn(const char* str, const char* needle, size_t slen, size_t nlen);
-char*        c_strncasestrn(const char* str, const char* needle, size_t slen, size_t nlen);
+int          c_strncasecmp(const char* str1, const char* str2, size_t n);
 ```
 
 ## Types

@@ -18,10 +18,9 @@ int main(void)
 {
     c_forauto (cmap_cfg, cfg)
     {
-        cmap_str init = cmap_str_init();
-        cmap_cfg_insert(&cfg, cstr_from("user"), init);
-        cmap_cfg_insert(&cfg, cstr_from("group"), init);
-        cmap_cfg_insert(&cfg, cstr_from("admin"), init);
+        cmap_cfg_insert(&cfg, cstr_from("user"), cmap_str_init());
+        cmap_cfg_insert(&cfg, cstr_from("group"), cmap_str_init());
+        cmap_cfg_insert(&cfg, cstr_from("admin"), cmap_str_init());
 
         cmap_str_emplace(cmap_cfg_at(&cfg, "user"), "name", "Joe");
         cmap_str_emplace(cmap_cfg_at(&cfg, "user"), "groups", "proj1,proj3");
@@ -34,6 +33,7 @@ int main(void)
 
         c_foreach (i, cmap_cfg, cfg)
             c_foreach (j, cmap_str, i.ref->second)
-                printf("%s: %s - %s (%u)\n", i.ref->first.str, j.ref->first.str, j.ref->second.str, i.ref->second.bucket_count);
+                printf("%s: %s - %s (%u)\n", i.ref->first.str, j.ref->first.str, j.ref->second.str, 
+                                             i.ref->second.bucket_count);
     }
 }

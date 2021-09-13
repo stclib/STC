@@ -62,12 +62,10 @@ STC_API void            cstr_replace_all(cstr* self, const char* find, const cha
 STC_API void            cstr_erase_n(cstr* self, size_t pos, size_t n);
 STC_API size_t          cstr_find(cstr s, const char* needle);
 STC_API size_t          cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax);
-STC_API size_t          cstr_ifind_n(cstr s, const char* needle, size_t pos, size_t nmax);
 STC_API bool            cstr_getdelim(cstr *self, int delim, FILE *stream);
 
-STC_API int             c_strncasecmp(const char* s1, const char* s2, size_t nmax);
 STC_API char*           c_strnstrn(const char* s, const char* needle, size_t slen, size_t nlen);
-STC_API char*           c_strncasestrn(const char* s, const char* needle, size_t slen, size_t nlen);
+STC_API int             c_strncasecmp(const char* s1, const char* s2, size_t nmax);
 
 STC_INLINE cstr         cstr_init() { return cstr_null; }
 #define                 cstr_lit(literal) \
@@ -122,12 +120,8 @@ STC_INLINE bool         cstr_equalto(cstr s, const char* str)
                             { return strcmp(s.str, str) == 0; }
 STC_INLINE bool         cstr_equalto_s(cstr s1, cstr s2)
                             { return strcmp(s1.str, s2.str) == 0; }
-STC_INLINE bool         cstr_iequalto(cstr s, const char* str)
-                            { return c_strncasecmp(s.str, str, cstr_npos) == 0; }
 STC_INLINE bool         cstr_contains(cstr s, const char* needle)
                             { return strstr(s.str, needle) != NULL; }
-STC_INLINE bool         cstr_icontains(cstr s, const char* needle)
-                            { return c_strncasestrn(s.str, needle, cstr_size(s), strlen(needle)) != NULL; }
 STC_INLINE bool         cstr_getline(cstr *self, FILE *stream)
                             { return cstr_getdelim(self, '\n', stream); }
 
@@ -170,18 +164,6 @@ STC_INLINE bool
 cstr_ends_with(cstr s, const char* sub) {
     size_t n = strlen(sub), sz = _cstr_rep(&s)->size;
     return n <= sz && !memcmp(s.str + sz - n, sub, n);
-}
-
-STC_INLINE bool
-cstr_istarts_with(cstr s, const char* sub) {
-    while (*sub && tolower(*s.str) == tolower(*sub)) ++s.str, ++sub;
-    return *sub == 0;
-}
-
-STC_INLINE bool
-cstr_iends_with(cstr s, const char* sub) {
-    size_t n = strlen(sub), sz = _cstr_rep(&s)->size;
-    return n <= sz && !c_strncasecmp(s.str + sz - n, sub, n);
 }
 
 /* container adaptor functions: */
@@ -382,14 +364,6 @@ cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax) {
     return res ? res - s.str : cstr_npos;
 }
 
-STC_DEF size_t
-cstr_ifind_n(cstr s, const char* needle, size_t pos, size_t nmax) {
-    if (pos > _cstr_rep(&s)->size) return cstr_npos;
-    size_t nlen = strlen(needle);
-    char* res = c_strncasestrn(s.str + pos, needle, _cstr_rep(&s)->size - pos, nmax < nlen ? nmax : nlen);
-    return res ? res - s.str : cstr_npos;
-}
-
 STC_DEF int
 c_strncasecmp(const char* s1, const char* s2, size_t nmax) {
     int ret = 0;
@@ -404,18 +378,6 @@ c_strnstrn(const char *s, const char *needle, size_t slen, size_t nlen) {
     slen -= nlen;
     do {
         if (*s == *needle && !memcmp(s, needle, nlen)) return (char *)s;
-        ++s;
-    } while (slen--);
-    return NULL;
-}
-
-STC_DEF char*
-c_strncasestrn(const char *s, const char *needle, size_t slen, size_t nlen) {
-    if (!nlen) return (char *)s;
-    if (nlen > slen) return NULL;
-    int c = tolower(*needle); slen -= nlen;
-    do {
-        if (tolower(*s) == c && !c_strncasecmp(s, needle, nlen)) return (char *)s;
         ++s;
     } while (slen--);
     return NULL;
