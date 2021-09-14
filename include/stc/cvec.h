@@ -224,7 +224,6 @@ cx_memb(_sort)(Self* self) {
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
 
 #ifndef CVEC_H_INCLUDED
-#define CVEC_H_INCLUDED
 static struct cvec_rep _cvec_sentinel = {0, 0};
 #endif
 
@@ -363,3 +362,4 @@ cx_memb(_value_compare)(const cx_value_t* x, const cx_value_t* y) {
 
 #endif
 #include "template.h"
+#define CVEC_H_INCLUDED

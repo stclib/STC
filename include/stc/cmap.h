@@ -49,7 +49,6 @@ int main(void) {
 */
 
 #ifndef CMAP_H_INCLUDED
-#define CMAP_H_INCLUDED
 #include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
@@ -212,9 +211,7 @@ cx_memb(_erase_at)(Self* self, cx_iter_t it) {
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
-#if !defined(STC_HEADER) || defined(i_imp) && i_imp == 2
-#ifndef CMAP_NON_TEMPLATED
-#define CMAP_NON_TEMPLATED
+#if !defined(STC_HEADER) && !defined(CMAP_H_INCLUDED) || defined(i_imp) && i_imp == 2
 
 STC_DEF uint64_t c_default_hash(const void *key, size_t len) {
     const uint64_t m = 0xb5ad4eceda1ce2a9;
@@ -232,15 +229,16 @@ STC_DEF uint64_t c_default_hash(const void *key, size_t len) {
     }
     return h ^ (h >> 15);
 }
-#endif
-#endif
+#endif // NON-TEMPLATED
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
 
+#ifndef CMAP_H_INCLUDED
 //STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n)
 //    { uint64_t lo, hi; c_umul128(x, n, &lo, &hi); return hi; }
 #define fastrange_uint32_t(x, n) ((size_t) (((uint32_t)(x)*(uint64_t)(n)) >> 32))
 #define chash_index_(h, entryPtr) ((entryPtr) - (h).table)
+#endif
 
 STC_DEF Self
 cx_memb(_with_capacity)(size_t cap) {
@@ -379,3 +377,4 @@ cx_memb(_erase_entry)(Self* self, cx_value_t* _val) {
 #undef cx_MAP_ONLY
 #undef cx_SET_ONLY
 #include "template.h"
+#define CMAP_H_INCLUDED

@@ -200,7 +200,6 @@ cx_memb(_sort)(Self* self) {
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
 
 #ifndef CDEQ_H_INCLUDED
-#define CDEQ_H_INCLUDED
 static struct cdeq_rep _cdeq_sentinel = {0, 0};
 #define _cdeq_nfront(self) ((self)->data - (self)->_base)
 #endif
@@ -365,3 +364,4 @@ cx_memb(_value_compare)(const cx_value_t* x, const cx_value_t* y) {
 #endif // i_queue
 #endif // IMPLEMENTATION
 #include "template.h"
+#define CDEQ_H_INCLUDED

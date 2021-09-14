@@ -26,7 +26,7 @@
 #include <stdlib.h>
 #include "ccommon.h"
 #include "forward.h"
-#endif
+#endif // CSTACK_H_INCLUDED
 
 #ifndef i_prefix
 #define i_prefix cstack_

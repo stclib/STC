@@ -55,7 +55,6 @@
 */
 
 #ifndef CLIST_H_INCLUDED
-#define CLIST_H_INCLUDED
 #include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
@@ -316,9 +315,7 @@ cx_memb(_sort)(Self* self) {
 
 #endif // TEMPLATE IMPLEMENTATION
 
-#if !defined(STC_HEADER) || defined(i_imp) && i_imp == 2
-#ifndef CLIST_NON_TEMPLATED
-#define CLIST_NON_TEMPLATED
+#if !defined(STC_HEADER) && !defined(CLIST_H_INCLUDED) || defined(i_imp) && i_imp == 2
 
 STC_DEF size_t
 _clist_count(const clist_VOID* self) {
@@ -378,7 +375,6 @@ _clist_mergesort(clist_VOID_node_t *list, int (*cmp)(const clist_VOID_node_t*, c
         insize *= 2;
     }
 }
-#endif
-#endif
-
+#endif // NON-TEMPLATE IMPLEMENTATION
 #include "template.h"
+#define CLIST_H_INCLUDED

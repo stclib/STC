@@ -22,7 +22,6 @@
  */
 
 #ifndef CPQUE_H_INCLUDED
-#define CPQUE_H_INCLUDED
 #include <stdlib.h>
 #include "ccommon.h"
 #include "forward.h"
@@ -156,3 +155,4 @@ cx_memb(_emplace_items)(Self *self, const cx_rawvalue_t arr[], size_t n) {
 
 #endif
 #include "template.h"
+#define CPQUE_H_INCLUDED

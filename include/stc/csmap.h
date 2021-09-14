@@ -203,9 +203,8 @@ cx_memb(_advance)(cx_iter_t it, size_t n) {
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
 
 #ifndef CSMAP_H_INCLUDED
-#define CSMAP_H_INCLUDED
 static struct csmap_rep _csmap_sentinel = {0, 0, 0, 0, 0};
-#endif
+#endif // CSMAP_H_INCLUDED
 
 STC_DEF Self
 cx_memb(_init)(void) {
@@ -487,3 +486,4 @@ cx_memb(_del)(Self* self) {
 #undef cx_MAP_ONLY
 #undef cx_SET_ONLY
 #include "template.h"
+#define CSMAP_H_INCLUDED
