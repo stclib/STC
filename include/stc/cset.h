@@ -42,7 +42,5 @@ int main(void) {
 #ifndef i_prefix
 #define i_prefix cset_
 #endif
-#define cx_MAP_ONLY c_false
-#define cx_SET_ONLY c_true
-#define cx_keyref(vp) (vp)
+#define cx_isset
 #include "cmap.h"

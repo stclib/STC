@@ -60,9 +60,15 @@ typedef struct      { size_t idx; uint_fast8_t hx; } chash_bucket_t;
 
 #ifndef i_prefix
 #define i_prefix cmap_
-#define cx_MAP_ONLY c_true
-#define cx_SET_ONLY c_false
-#define cx_keyref(vp) (&(vp)->first)
+#endif
+#ifdef cx_isset
+  #define cx_MAP_ONLY c_false
+  #define cx_SET_ONLY c_true
+  #define cx_keyref(vp) (vp)
+#else
+  #define cx_MAP_ONLY c_true
+  #define cx_SET_ONLY c_false
+  #define cx_keyref(vp) (&(vp)->first)
 #endif
 #include "template.h"
 #ifndef i_fwd
@@ -373,6 +379,7 @@ cx_memb(_erase_entry)(Self* self, cx_value_t* _val) {
 }
 
 #endif // TEMPLATED IMPLEMENTATION
+#undef cx_isset
 #undef cx_keyref
 #undef cx_MAP_ONLY
 #undef cx_SET_ONLY

@@ -61,9 +61,15 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
 
 #ifndef i_prefix
 #define i_prefix csmap_
-#define cx_MAP_ONLY c_true
-#define cx_SET_ONLY c_false
-#define cx_keyref(vp) (&(vp)->first)
+#endif
+#ifdef cx_isset
+  #define cx_MAP_ONLY c_false
+  #define cx_SET_ONLY c_true
+  #define cx_keyref(vp) (vp)
+#else
+  #define cx_MAP_ONLY c_true
+  #define cx_SET_ONLY c_false
+  #define cx_keyref(vp) (&(vp)->first)
 #endif
 #include "template.h"
 
@@ -482,6 +488,7 @@ cx_memb(_del)(Self* self) {
 }
 
 #endif // IMPLEMENTATION
+#undef cx_isset
 #undef cx_keyref
 #undef cx_MAP_ONLY
 #undef cx_SET_ONLY
