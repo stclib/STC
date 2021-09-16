@@ -33,7 +33,7 @@
 #define forward_csmap(TAG, KEY, VAL) _c_aatree_types(csmap_##TAG, KEY, VAL, c_true, c_false)
 #define forward_cset(TAG, KEY) _c_chash_types(cset_##TAG, cset, KEY, KEY, c_false, c_true)
 #define forward_csset(TAG, KEY) _c_aatree_types(csset_##TAG, KEY, KEY, c_false, c_true)
-#define forward_csptr(TAG, VAL) _csptr_types(csptr_##TAG, VAL)
+#define forward_csptr(TAG, VAL) _c_csptr_types(csptr_##TAG, VAL)
 #define forward_cpque(TAG, VAL) _c_cpque_types(cpque_##TAG, VAL)
 #define forward_cstack(TAG, VAL) _c_cstack_types(cstack_##TAG, VAL)
 #define forward_cqueue(TAG, VAL) _c_cdeq_types(cqueue_##TAG, VAL)
@@ -125,7 +125,7 @@
         SELF##_node_t *nodes; \
     } SELF
 
-#define _csptr_types(SELF, VAL) \
+#define _c_csptr_types(SELF, VAL) \
     typedef VAL SELF##_value_t; \
 \
     typedef struct { \

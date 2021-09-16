@@ -20,14 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CSPTR_H_INCLUDED
-#define CSPTR_H_INCLUDED
-
-#include "ccommon.h"
 
 /* csptr: shared_ptr type
-
-#include <stc/csptr.h>
 #include <stc/cstr.h>
 
 typedef struct { cstr name, last; } Person;
@@ -40,7 +34,10 @@ void Person_del(Person* p) {
     c_del(cstr, &p->name, &p->last);
 }
 
-using_csptr(person, Person, c_no_compare, Person_del);
+#define i_tag person
+#define i_val Person
+#define i_valdel Person_del
+#include <stc/csptr.h>
 
 int main() {
     csptr_person p = csptr_person_make(Person_init("John", "Smiths"));
@@ -50,6 +47,12 @@ int main() {
     c_del(csptr_person, &p, &q);
 }
 */
+
+#ifndef CSPTR_H_INCLUDED
+#define CSPTR_H_INCLUDED
+#include "ccommon.h"
+#include "forward.h"
+
 typedef long atomic_count_t;
 #if defined(__GNUC__) || defined(__clang__)
     #define c_atomic_increment(v) (void)__atomic_add_fetch(v, 1, __ATOMIC_SEQ_CST)
@@ -68,93 +71,96 @@ typedef long atomic_count_t;
     }
 #endif
 
-#define forward_csptr(X, i_val) _csptr_types(csptr_##X, i_val)
 #define csptr_null {NULL, NULL}
+#endif // CSPTR_H_INCLUDED
 
-
-    defTypes( _csptr_types(Self, i_val); ) \
-    struct cx_memb(_rep_) {atomic_count_t cnt; cx_value_t val; }; \
-\
-    STC_INLINE Self \
-    cx_memb(_init)() { return c_make(Self){NULL, NULL}; } \
-\
-    STC_INLINE atomic_count_t \
-    cx_memb(_use_count)(Self ptr) { return ptr.use_count ? *ptr.use_count : 0; } \
-\
-    STC_INLINE Self \
-    cx_memb(_from)(cx_value_t* p) { \
-        Self ptr = {p}; \
-        if (p) *(ptr.use_count = c_new(atomic_count_t)) = 1; \
-        return ptr; \
-    } \
-\
-    STC_INLINE Self \
-    cx_memb(_make)(cx_value_t val) { \
-        Self ptr; struct cx_memb(_rep_) *rep = c_new(struct cx_memb(_rep_)); \
-        *(ptr.use_count = &rep->cnt) = 1; \
-        *(ptr.get = &rep->val) = val; \
-        return ptr; \
-    } \
-\
-    STC_INLINE Self \
-    cx_memb(_clone)(Self ptr) { \
-        if (ptr.use_count) c_atomic_increment(ptr.use_count); \
-        return ptr; \
-    } \
-\
-    STC_INLINE Self \
-    cx_memb(_move)(Self* self) { \
-        Self ptr = *self; \
-        self->get = NULL, self->use_count = NULL; \
-        return ptr; \
-    } \
-\
-    STC_INLINE void \
-    cx_memb(_del)(Self* self) { \
-        if (self->use_count && c_atomic_decrement(self->use_count) == 0) { \
-            i_valdel(self->get); \
-            if (self->get != &((struct cx_memb(_rep_)*)self->use_count)->val) c_free(self->get); \
-            c_free(self->use_count); \
-        } \
-    } \
-\
-    STC_INLINE void \
-    cx_memb(_reset)(Self* self) { \
-        cx_memb(_del)(self); \
-        self->use_count = NULL, self->get = NULL; \
-    } \
-\
-    STC_INLINE cx_value_t* \
-    cx_memb(_reset_with)(Self* self, cx_value_t* p) { \
-        cx_memb(_del)(self); \
-        *self = cx_memb(_from)(p); \
-        return self->get; \
-    } \
-\
-    STC_INLINE cx_value_t* \
-    cx_memb(_reset_make)(Self* self, cx_value_t val) { \
-        cx_memb(_del)(self); \
-        *self = cx_memb(_make)(val); \
-        return self->get; \
-    } \
-\
-    STC_INLINE cx_value_t* \
-    cx_memb(_copy)(Self* self, Self ptr) { \
-        cx_memb(_del)(self); \
-        *self = ptr; \
-        if (self->use_count) c_atomic_increment(self->use_count); \
-        return self->get; \
-    } \
-\
-    STC_INLINE int \
-    cx_memb(_compare)(const Self* x, const Self* y) { \
-        return i_cmp(x->get, y->get); \
-    } \
-\
-    STC_INLINE bool \
-    cx_memb(_equals)(const Self* x, const Self* y) { \
-        return i_cmp(x->get, y->get) == 0; \
-    } \
-    struct stc_trailing_semicolon
-
+#ifndef i_prefix
+#define i_prefix csptr_
 #endif
+#include "template.h"
+
+#ifndef i_fwd
+cx_deftypes(_c_csptr_types, Self, i_val);
+#endif
+#define cx_csptr_rep struct cx_memb(_rep_)
+cx_csptr_rep { atomic_count_t cnt; cx_value_t val; };
+
+STC_INLINE Self
+cx_memb(_init)(void) { return c_make(Self){NULL, NULL}; }
+
+STC_INLINE atomic_count_t
+cx_memb(_use_count)(Self ptr) { return ptr.use_count ? *ptr.use_count : 0; }
+
+STC_INLINE Self
+cx_memb(_from)(cx_value_t* p) {
+    Self ptr = {p};
+    if (p) *(ptr.use_count = c_new(atomic_count_t)) = 1;
+    return ptr;
+}
+
+STC_INLINE Self
+cx_memb(_make)(cx_value_t val) {
+    Self ptr; cx_csptr_rep *rep = c_new(cx_csptr_rep);
+    *(ptr.use_count = &rep->cnt) = 1;
+    *(ptr.get = &rep->val) = val;
+    return ptr;
+}
+
+STC_INLINE Self
+cx_memb(_clone)(Self ptr) {
+    if (ptr.use_count) c_atomic_increment(ptr.use_count);
+    return ptr;
+}
+
+STC_INLINE Self
+cx_memb(_move)(Self* self) {
+    Self ptr = *self;
+    self->get = NULL, self->use_count = NULL;
+    return ptr;
+}
+
+STC_INLINE void
+cx_memb(_del)(Self* self) {
+    if (self->use_count && c_atomic_decrement(self->use_count) == 0) {
+        i_valdel(self->get);
+        if (self->get != &((cx_csptr_rep*)self->use_count)->val)
+            c_free(self->get);
+        c_free(self->use_count);
+    }
+}
+
+STC_INLINE void
+cx_memb(_reset)(Self* self) {
+    cx_memb(_del)(self);
+    self->use_count = NULL, self->get = NULL;
+}
+
+STC_INLINE cx_value_t*
+cx_memb(_reset_with)(Self* self, cx_value_t* p) {
+    cx_memb(_del)(self);
+    *self = cx_memb(_from)(p);
+    return self->get;
+}
+
+STC_INLINE cx_value_t*
+cx_memb(_reset_make)(Self* self, cx_value_t val) {
+    cx_memb(_del)(self);
+    *self = cx_memb(_make)(val);
+    return self->get;
+}
+
+STC_INLINE cx_value_t*
+cx_memb(_copy)(Self* self, Self ptr) {
+    cx_memb(_del)(self);
+    *self = ptr;
+    if (self->use_count) c_atomic_increment(self->use_count);
+    return self->get;
+}
+
+STC_INLINE int
+cx_memb(_compare)(const Self* x, const Self* y) {
+    return i_cmp(x->get, y->get);
+}
+
+#undef cx_csptr_rep
+#include "template.h"
