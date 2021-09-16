@@ -86,7 +86,7 @@ STC_API void            cx_memb(_resize)(Self* self, size_t size, i_val fill_val
 STC_API int             cx_memb(_value_compare)(const cx_value_t* x, const cx_value_t* y);
 STC_API cx_iter_t       cx_memb(_find_in)(cx_iter_t it1, cx_iter_t it2, i_valraw raw);
 STC_API cx_iter_t       cx_memb(_bsearch_in)(cx_iter_t it1, cx_iter_t it2, i_valraw raw);
-STC_API void            cx_memb(_push_back)(Self* self, i_val value);
+STC_API cx_value_t*     cx_memb(_push_back)(Self* self, i_val value);
 STC_API cx_iter_t       cx_memb(_erase_range_p)(Self* self, cx_value_t* p1, cx_value_t* p2);
 STC_API cx_iter_t       cx_memb(_insert_range_p)(Self* self, cx_value_t* pos,
                                                  const cx_value_t* p1, const cx_value_t* p2, bool clone);
@@ -104,8 +104,8 @@ STC_INLINE void         cx_memb(_swap)(Self* a, Self* b) { c_swap(Self, *a, *b);
 STC_INLINE cx_value_t*  cx_memb(_front)(const Self* self) { return self->data; }
 STC_INLINE cx_value_t*  cx_memb(_back)(const Self* self)
                             { return self->data + cvec_rep_(self)->size - 1; }
-STC_INLINE void         cx_memb(_emplace_back)(Self* self, i_valraw raw)
-                            { cx_memb(_push_back)(self, i_valfrom(raw)); }
+STC_INLINE cx_value_t*  cx_memb(_emplace_back)(Self* self, i_valraw raw)
+                            { return cx_memb(_push_back)(self, i_valfrom(raw)); }
 STC_INLINE void         cx_memb(_pop_back)(Self* self)
                             { i_valdel(&self->data[--cvec_rep_(self)->size]); }
 STC_INLINE cx_iter_t    cx_memb(_begin)(const Self* self)
@@ -272,12 +272,13 @@ cx_memb(_resize)(Self* self, size_t len, i_val null_val) {
     if (rep->cap) rep->size = len;
 }
 
-STC_DEF void
+STC_DEF cx_value_t*
 cx_memb(_push_back)(Self* self, i_val value) {
     size_t len = cvec_rep_(self)->size;
     if (len == cx_memb(_capacity)(*self))
         cx_memb(_reserve)(self, (len*13 >> 3) + 4);
-    self->data[cvec_rep_(self)->size++] = value;
+    cx_value_t *v = self->data + cvec_rep_(self)->size++;
+    *v = value; return v;
 }
 
 STC_DEF Self

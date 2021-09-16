@@ -95,8 +95,8 @@ STC_API size_t _clist_count(const clist_VOID* self);
                     
 STC_API Self            cx_memb(_clone)(Self cx);
 STC_API void            cx_memb(_del)(Self* self);
-STC_API void            cx_memb(_push_back)(Self* self, i_val value);
-STC_API void            cx_memb(_push_front)(Self* self, i_val value);
+STC_API cx_value_t*     cx_memb(_push_back)(Self* self, i_val value);
+STC_API cx_value_t*     cx_memb(_push_front)(Self* self, i_val value);
 STC_API cx_iter_t       cx_memb(_insert)(Self* self, cx_iter_t it, i_val value);
 STC_API void            cx_memb(_emplace_items)(Self *self, const cx_rawvalue_t arr[], size_t n);
 STC_API cx_iter_t       cx_memb(_erase_at)(Self* self, cx_iter_t it);
@@ -121,10 +121,10 @@ STC_INLINE void         cx_memb(_pop_front)(Self* self)
                             { cx_memb(_erase_after_)(self, self->last); }
 STC_INLINE cx_iter_t    cx_memb(_erase)(Self* self, cx_iter_t it)
                             { return cx_memb(_erase_at)(self, it); }
-STC_INLINE void         cx_memb(_emplace_back)(Self* self, i_valraw raw)
-                            { cx_memb(_push_back)(self, i_valfrom(raw)); }
-STC_INLINE void         cx_memb(_emplace_front)(Self* self, i_valraw raw)
-                            { cx_memb(_push_front)(self, i_valfrom(raw)); }
+STC_INLINE cx_value_t*  cx_memb(_emplace_back)(Self* self, i_valraw raw)
+                            { return cx_memb(_push_back)(self, i_valfrom(raw)); }
+STC_INLINE cx_value_t*  cx_memb(_emplace_front)(Self* self, i_valraw raw)
+                            { return cx_memb(_push_front)(self, i_valfrom(raw)); }
 STC_INLINE cx_iter_t    cx_memb(_emplace)(Self* self, cx_iter_t it, i_valraw raw)
                             { return cx_memb(_insert)(self, it, i_valfrom(raw)); }
 STC_INLINE cx_value_t*  cx_memb(_front)(const Self* self) { return &self->last->next->value; }
@@ -191,16 +191,18 @@ cx_memb(_del)(Self* self) {
     while (self->last) cx_memb(_erase_after_)(self, self->last);
 }
 
-STC_DEF void
+STC_DEF cx_value_t*
 cx_memb(_push_back)(Self* self, i_val value) {
     _c_clist_insert_after(self, Self, self->last, value);
     self->last = entry;
+    return &entry->value;
 }
 
-STC_DEF void
+STC_DEF cx_value_t*
 cx_memb(_push_front)(Self* self, i_val value) {
     _c_clist_insert_after(self, Self, self->last, value);
     if (!self->last) self->last = entry;
+    return &entry->value;
 }
 
 STC_DEF void
