@@ -9,7 +9,7 @@ int point_compare(const Point* a, const Point* b) {
     int c = c_default_compare(&a->x, &b->x);
     return c ? c : c_default_compare(&a->y, &b->y);
 }
-#define f_tag pnt
+#define F_tag pnt
 #define i_val Point
 #define i_cmp point_compare
 #include <stc/cqueue.h>

@@ -19,7 +19,7 @@ int Point_cmp(const Point* a, const Point* b) {
     int c = c_default_compare(&a->x, &b->x);
     return c ? c : c_default_compare(&a->y, &b->y);
 }
-#define f_tag pnt  // f: was forward declared.
+#define F_tag pnt  // F: was forward declared.
 #define i_val Point
 #define i_cmp Point_cmp
 #include "cpque.h"

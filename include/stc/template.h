@@ -42,12 +42,12 @@
   #define cx_size_t cx_memb(_size_t)
 #endif
 
-#if defined f_tag
-  #define i_tag f_tag
+#ifdef F_tag
+  #define i_tag F_tag
   #define i_fwd
 #endif
 
-#if defined i_key_str
+#ifdef i_key_str
   #define i_key     cstr
   #define i_cmp     c_rawstr_compare
   #define i_equ     c_rawstr_equals
@@ -57,7 +57,7 @@
   #define i_keyto   cstr_str
   #define i_keyraw  const char*
 #endif
-#if defined i_val_str
+#ifdef i_val_str
   #define i_val     cstr
   #ifndef i_key
   #define i_cmp     c_rawstr_compare
@@ -87,7 +87,7 @@
   #error if i_keyraw defined, both i_keyfrom and i_keyto must be defined
 #endif
 
-#if defined i_key
+#ifdef i_key
   #if !defined i_keyfrom && defined i_keydel
     #define i_keyfrom c_no_clone
   #elif !defined i_keyfrom
@@ -130,7 +130,7 @@
 
 #undef i_prefix
 #undef i_tag
-#undef f_tag
+#undef F_tag
 #undef i_imp
 #undef i_fwd
 #undef i_cmp

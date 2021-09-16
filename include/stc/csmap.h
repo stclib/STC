@@ -62,7 +62,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
 #ifndef i_prefix
 #define i_prefix csmap_
 #endif
-#ifdef cx_isset
+#ifdef i_isset
   #define cx_MAP_ONLY c_false
   #define cx_SET_ONLY c_true
   #define cx_keyref(vp) (vp)
@@ -384,13 +384,15 @@ cx_memb(_insert_entry_)(Self* self, i_keyraw rkey) {
 
 STC_DEF cx_size_t
 cx_memb(_erase_r_)(cx_node_t *d, cx_size_t tn, const cx_rawkey_t* rkey, int *erased) {
-    if (tn == 0) return 0;
+    if (tn == 0)
+        return 0;
     i_keyraw raw = i_keyto(cx_keyref(&d[tn].value));
     cx_size_t tx; int c = i_cmp(&raw, rkey);
     if (c != 0)
         d[tn].link[c < 0] = cx_memb(_erase_r_)(d, d[tn].link[c < 0], rkey, erased);
     else {
-        if (!(*erased)++) cx_memb(_value_del)(&d[tn].value);
+        if (!(*erased)++)
+            cx_memb(_value_del)(&d[tn].value);
         if (d[tn].link[0] && d[tn].link[1]) {
             tx = d[tn].link[0];
             while (d[tx].link[1])
@@ -411,11 +413,11 @@ cx_memb(_erase_r_)(cx_node_t *d, cx_size_t tn, const cx_rawkey_t* rkey, int *era
     if (d[d[tn].link[0]].level < d[tn].level - 1 || d[tx].level < d[tn].level - 1) {
         if (d[tx].level > --d[tn].level)
             d[tx].level = d[tn].level;
-                        tn = cx_memb(_skew_)(d, tn);
-        tx = d[tn].link[1] = cx_memb(_skew_)(d, d[tn].link[1]);
-                d[tx].link[1] = cx_memb(_skew_)(d, d[tx].link[1]);
-                        tn = cx_memb(_split_)(d, tn);
-                d[tn].link[1] = cx_memb(_split_)(d, d[tn].link[1]);
+                       tn = cx_memb(_skew_)(d, tn);
+       tx = d[tn].link[1] = cx_memb(_skew_)(d, d[tn].link[1]);
+            d[tx].link[1] = cx_memb(_skew_)(d, d[tx].link[1]);
+                       tn = cx_memb(_split_)(d, tn);
+            d[tn].link[1] = cx_memb(_split_)(d, d[tn].link[1]);
     }
     return tn;
 }
@@ -488,7 +490,7 @@ cx_memb(_del)(Self* self) {
 }
 
 #endif // IMPLEMENTATION
-#undef cx_isset
+#undef i_isset
 #undef cx_keyref
 #undef cx_MAP_ONLY
 #undef cx_SET_ONLY

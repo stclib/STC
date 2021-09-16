@@ -19,7 +19,7 @@ int point_compare(const Point* a, const Point* b) {
     int c = c_default_compare(&a->x, &b->x);
     return c ? c : c_default_compare(&a->y, &b->y);
 }
-#define f_tag pnt  // f=forward declared
+#define F_tag pnt  // F=forward declared
 #define i_key Point
 #define i_val int
 #define i_cmp point_compare

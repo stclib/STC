@@ -42,5 +42,5 @@ int main(void) {
 #ifndef i_prefix
 #define i_prefix cset_
 #endif
-#define cx_isset
+#define i_isset
 #include "cmap.h"
