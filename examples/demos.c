@@ -185,32 +185,34 @@ void mapdemo3()
     cmap_str_del(&table); // frees key and value cstrs, and hash table.
 }
 
-/*
-#include <stc/carray.h>
-using_carray3(f, float);
+//#define i_prefix carray3 // backward compatible.
+#define i_tag f
+#define i_val float
+#include <stc/carr3.h>
 
 void arraydemo1()
 {
     printf("\nARRAYDEMO1\n");
-    carray3f arr3 = carray3f_with_values(30, 20, 10, 0.0f);
-    arr3.data[5][4][3] = 10.2f;
-    float **arr2 = arr3.data[5];
-    float *arr1 = arr3.data[5][4];
+    c_forvar (carr3_f arr3 = carr3_f_with_values(30, 20, 10, 0.0f), 
+                             carr3_f_del(&arr3))
+    {
+        arr3.data[5][4][3] = 10.2f;
+        float **arr2 = arr3.data[5];
+        float *arr1 = arr3.data[5][4];
 
-    printf("arr3: %zu: (%zu, %zu, %zu) = %zu\n", sizeof(arr3), arr3.xdim, arr3.ydim, arr3.zdim, carray3f_size(arr3));
+        printf("arr3: %zu: (%zu, %zu, %zu) = %zu\n", sizeof(arr3), 
+               arr3.xdim, arr3.ydim, arr3.zdim, carr3_f_size(arr3));
 
-    printf("%g\n", arr1[3]); // = 10.2
-    printf("%g\n", arr2[4][3]); // = 10.2
-    printf("%g\n", arr3.data[5][4][3]); // = 10.2
+        printf("%g\n", arr1[3]); // = 10.2
+        printf("%g\n", arr2[4][3]); // = 10.2
+        printf("%g\n", arr3.data[5][4][3]); // = 10.2
 
-    float x = 0.0;
-    c_foreach (i, carray3f, arr3)
-        *i.ref = ++x;
-    printf("%g\n", arr3.data[29][19][9]); // = 6000
-
-    carray3f_del(&arr3);
+        float x = 0.0;
+        c_foreach (i, carr3_f, arr3)
+            *i.ref = ++x;
+        printf("%g\n", arr3.data[29][19][9]); // = 6000
+    }
 }
-*/
 
 
 int main()
@@ -223,5 +225,5 @@ int main()
     mapdemo1();
     mapdemo2();
     mapdemo3();
-    //arraydemo1();
+    arraydemo1();
 }

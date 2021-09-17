@@ -16,8 +16,8 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 
 ```c
 #define i_tag       // defaults to i_key name
-#define i_key       // value: REQUIRED
-#define i_val       // key: REQUIRED
+#define i_key       // key: REQUIRED
+#define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
 #define i_keyraw    // convertion "raw" type - defaults to i_key
 #define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
