@@ -114,6 +114,7 @@ void                c_default_del(Type* val);                             // doe
 #include <stc/cstr.h>
 
 #define i_key_str
+#define i_val_str
 #include <stc/cmap.h>
 
 int main()
@@ -318,8 +319,9 @@ Harald of Iceland has 12 hp
 ```
 
 ### Example 6
-Advanced 2: In example 5 we needed to construct a lookup key which allocated strings, and then had to free it after. In this example we use
-rawtype feature to make it even simpler to use. Note that we must use the emplace() methods to add "raw" type entries (otherwise compile error):
+Advanced 2: In example 5 we needed to construct a lookup key which allocated strings, and then had to free it after.
+In this example we use rawtype feature to make it even simpler to use. Note that we must use the emplace() methods
+to add "raw" type entries (otherwise compile error):
 ```c
 #include <stc/cstr.h>
 
@@ -332,23 +334,25 @@ static void Viking_del(Viking* v) {
     c_del(cstr, &v->name, &v->country);
 }
 
-// Define a "raw" type with equals, hash, fromraw, toraw functions:
+// Define a "raw" type that need no allocations,
+// and define equals, hash, fromraw, toraw functions:
 
 typedef struct {
     const char* name;
     const char* country;
 } RViking;
 
-static int RViking_equals(const RViking* r1, const RViking* r2) {
-    return !strcmp(r1->name, r2->name) && !strcmp(r1->country, r2->country);
-}
+static int RViking_equals(const RViking* r1, const RViking* r2)
+    { return !strcmp(r1->name, r2->name) && !strcmp(r1->country, r2->country); }
 
-static uint32_t RViking_hash(const RViking* r, int ignored) {
-    return c_rawstr_hash(&r->name) ^ (c_rawstr_hash(&r->country) >> 15);
-}
+static uint32_t RViking_hash(const RViking* r, int ignored)
+    { return c_rawstr_hash(&r->name) ^ (c_rawstr_hash(&r->country) >> 15); }
 
-static Viking Viking_fromR(RViking r) {return (Viking){cstr_from(r.name), cstr_from(r.country)};}
-static RViking Viking_toR(const Viking* v) {return (RViking){v->name.str, v->country.str};}
+static Viking Viking_fromR(RViking r) 
+    { return (Viking){cstr_from(r.name), cstr_from(r.country)}; }
+
+static RViking Viking_toR(const Viking* v) 
+    { return (RViking){v->name.str, v->country.str}; }
 
 #define i_tag vk
 #define i_key Viking
@@ -363,24 +367,24 @@ static RViking Viking_toR(const Viking* v) {return (RViking){v->name.str, v->cou
 
 int main()
 {
-    // Use a HashMap to store the vikings' health points.
-    cmap_vk vikings = cmap_vk_init();
-  
-    // insert works as before, takes a constructed Viking object
-    cmap_vk_insert(&vikings, (Viking){cstr_from("Einar"), cstr_from("Norway")}, 25);
-    cmap_vk_insert(&vikings, (Viking){cstr_from("Olaf"), cstr_from("Denmark")}, 24);
+    c_forauto (cmap_vk, vikings) // RAII
+    {
+        // Insert works as before, takes a constructed Viking object
+        cmap_vk_insert(&vikings, (Viking){cstr_from("Einar"), cstr_from("Norway")}, 25);
+        cmap_vk_insert(&vikings, (Viking){cstr_from("Olaf"), cstr_from("Denmark")}, 24);
 
-    // but emplace is simpler to use now.
-    cmap_vk_emplace(&vikings, (RViking){"Harald", "Iceland"}, 12);
-    cmap_vk_emplace(&vikings, (RViking){"Einar", "Denmark"}, 21);
+        // But emplace is simpler to use now - takes raw key argument
+        cmap_vk_emplace(&vikings, (RViking){"Harald", "Iceland"}, 12);
+        cmap_vk_emplace(&vikings, (RViking){"Einar", "Denmark"}, 21);
 
-    // and lookup uses "raw" key type, so no need construct/destruct key:
-    printf("Lookup: Einar of Norway has %d hp\n\n", *cmap_vk_at(&vikings, (RViking){"Einar", "Norway"}));
+        // Lookup also uses raw key type, so no need construct/destruct key:
+        printf("Lookup: Einar of Norway has %d hp\n\n", *cmap_vk_at(&vikings, (RViking){"Einar", "Norway"}));
 
-    // print the status of the vikings.
-    c_foreach (i, cmap_vk, vikings) {
-        printf("%s of %s has %d hp\n", i.ref->first.name.str, i.ref->first.country.str, i.ref->second);
+        // Print the status of the vikings.
+        c_foreach (i, cmap_vk, vikings) {
+            printf("%s of %s has %d hp\n", i.ref->first.name.str, 
+                                           i.ref->first.country.str, i.ref->second);
+        }
     }
-    cmap_vk_del(&vikings);
 }
 ```
