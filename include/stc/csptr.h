@@ -52,6 +52,7 @@ int main() {
 #define CSPTR_H_INCLUDED
 #include "ccommon.h"
 #include "forward.h"
+#include <stdlib.h>
 
 typedef long atomic_count_t;
 #if defined(__GNUC__) || defined(__clang__)

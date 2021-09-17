@@ -1,10 +1,9 @@
 # STC [carray](../include/stc/carray.h): Dynamic Multi-dimensional Array
 ![Array](pics/array.jpg)
 
-The **carray** containers provides templates for multidimensional arrays. It supports 2- and
-3-dimensional arrays, which are allocated from the heap as a single contiguous block of memory.
-The carrays can be used almost like regular constant size multi-dimensional arrays in C, and has
-the same property of storing data in one block of memory, which can be passed to any method.
+The **carr2** and **carr3** are templated 2D and 3D containers arrays. They are allocated on the heap as a single
+contiguous block of memory. The arrays can be indexed like regular constant size multi-dimensional arrays in C,
+which also store data as one contiguous block of memory.
 
 See the c++ class [boost::multi_array](https://www.boost.org/doc/libs/release/libs/multi_array) for similar functionality.
 
@@ -13,9 +12,7 @@ See the c++ class [boost::multi_array](https://www.boost.org/doc/libs/release/li
 ```c
 #define i_tag       // defaults to i_val name
 #define i_val       // value: REQUIRED
-#define i_cmp       // three-way compare two i_valraw* : REQUIRED IF i_valraw is a non-integral type
-#define i_valraw    // convertion "raw" type - defaults to i_val
-#define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
+#define i_valfrom   // clone func i_val => i_val - defaults to plain copy
 #define i_valdel    // destroy value func - defaults to empty destruct
 
 #include <stc/carr2.h> // or <stc/carr3.h>
@@ -62,14 +59,14 @@ void                carr3_X_next(carr3_X_iter_t* it);
 
 | Type name         | Type definition                                      | Used to represent... |
 |:------------------|:-----------------------------------------------------|:---------------------|
-| `carr2_X`         | `struct { Value **data; size_t xdim, ydim; }`        | The carray2 type     |
+| `carr2_X`         | `struct { Value **data; size_t xdim, ydim; }`        | The array 2D type    |
 | `carr2_X_value_t` | `Value`                                              | The value type       |
 | `carr2_X_iter_t`  | `struct { Value *ref; }`                             | Iterator type        |
-| `carr3_X`         | `struct { Value ***data; size_t xdim, ydim, zdim; }` | The carray3 type     |
+| `carr3_X`         | `struct { Value ***data; size_t xdim, ydim, zdim; }` | The array 3D type    |
 | `carr3_X_value_t` | `Value`                                              | The value type       |
 | `carr3_X_iter_t`  | `struct { Value *ref; }`                             | Iterator type        |
 
-The **carray** elements can be accessed like `carray3i arr = ...; int val = arr.data[x][y][z];`, or with `carray3i_at(&arr, x, y, z)`.
+The **carr3** elements can be accessed like `carr3_i arr = ...; int val = arr.data[x][y][z];`, or with `carr3_i_at(&arr, x, y, z)`.
 
 ## Example
 ```c

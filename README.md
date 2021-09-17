@@ -12,7 +12,7 @@ For an introduction to templated containers, please read the blog by Ian Fisher 
 
 STC is a compact, header-only library with the all the major "standard" data containers, except for the
 multimap/set variants. However, there is an example how to create a multimap in the examples folder.
-- [***carray*** - **multi-dim dynamic array** type](docs/carray_api.md)
+- [***carrN*** - **2D and 3D dynamic array** type](docs/carray_api.md)
 - [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
 - [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)
 - [***clist*** - **std::forward_list** alike type](docs/clist_api.md)
@@ -288,5 +288,5 @@ Memory efficiency
 - **cdeq**:  Type size: two pointers. Otherwise like *cvec*.
 - **cmap**: Type size: 4 pointers. *cmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
 - **csmap**: Type size: 1 pointer. *csmap* manages its own array of tree-nodes for allocation efficiency. Each node uses two 32-bit words by default for left/right child, and one byte for `level`. *csmap* can be configured to allow more than 2^32 elements, ie. 2^64, but it will double the overhead per node.
-- **carray**: carray1, carray2 and carray3. Type size: One pointer plus one, two, or three size_t variables to store dimensions. Arrays are allocated as one contiguous block of heap memory.
+- **carr2**, **carr3**: Type size: One pointer plus one, two, or three size_t variables to store dimensions. Arrays are allocated as one contiguous block of heap memory.
 - **csptr**: a shared-pointer uses two pointers, one for the data and one for the reference counter.
