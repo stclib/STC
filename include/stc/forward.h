@@ -25,8 +25,8 @@
 
 #include <stddef.h>
 
-#define forward_carray2(TAG, VAL) _c_carray2_types(carray2##TAG, VAL)
-#define forward_carray3(TAG, VAL) _c_carray3_types(carray2##TAG, VAL)
+#define forward_carr2(TAG, VAL) _c_carr2_types(carr2_##TAG, VAL)
+#define forward_carr3(TAG, VAL) _c_carr3_types(carr3_##TAG, VAL)
 #define forward_cdeq(TAG, VAL) _c_cdeq_types(cdeq_##TAG, VAL)
 #define forward_clist(TAG, VAL) _c_clist_types(clist_##TAG, VAL)
 #define forward_cmap(TAG, KEY, VAL) _c_chash_types(cmap_##TAG, KEY, VAL, c_true, c_false)
@@ -45,12 +45,12 @@
 #define c_true(...) __VA_ARGS__
 #define c_false(...)
 
-#define _c_carray2_types(SELF, VAL) \
+#define _c_carr2_types(SELF, VAL) \
     typedef VAL SELF##_value_t; \
     typedef struct { SELF##_value_t *ref; } SELF##_iter_t; \
     typedef struct { SELF##_value_t **data; size_t xdim, ydim; } SELF
 
-#define _c_carray3_types(SELF, VAL) \
+#define _c_carr3_types(SELF, VAL) \
     typedef VAL SELF##_value_t; \
     typedef struct { SELF##_value_t *ref; } SELF##_iter_t; \
     typedef struct { SELF##_value_t ***data; size_t xdim, ydim, zdim; } SELF
