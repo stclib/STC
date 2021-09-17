@@ -15,13 +15,18 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 ## Header file and declaration
 
 ```c
-#define i_tag
-#define i_val       // required
-#define i_cmp       // required if i_val is a struct
-#define i_valdel
-#define i_valfrom
-#define i_valto
-#define i_valraw
+#define i_tag       // defaults to i_key name
+#define i_key       // value: REQUIRED
+#define i_val       // key: REQUIRED
+#define i_cmp       // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
+#define i_keyraw    // convertion "raw" type - defaults to i_key
+#define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
+#define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
+#define i_keydel    // destroy key func - defaults to empty destruct
+#define i_valraw    // convertion "raw" type - defaults to i_val
+#define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
+#define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
+#define i_valdel    // destroy value func - defaults to empty destruct
 #include <stc/csmap.h>
 ```
 `X` should be replaced by the value of i_tag in all of the following documentation.

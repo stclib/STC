@@ -17,13 +17,19 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 ## Header file and declaration
 
 ```c
-#define i_tag
-#define i_val       // required
-#define i_cmp       // required if i_val is a struct
-#define i_valdel
-#define i_valfrom
-#define i_valto
-#define i_valraw
+#define i_tag       // defaults to i_key name
+#define i_key       // key: REQUIRED
+#define i_val       // value: REQUIRED
+#define i_equ       // equality comparison two i_keyraw*. REQUIRED IF i_keyraw is non-integral type
+#define i_cmp       // three-way compare two i_keyraw* : may be defined instead of i_equ
+#define i_keyraw    // convertion "raw" type - defaults to i_key
+#define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
+#define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
+#define i_keydel    // destroy key func - defaults to empty destruct
+#define i_valraw    // convertion "raw" type - defaults to i_val
+#define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
+#define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
+#define i_valdel    // destroy value func - defaults to empty destruct
 #include <stc/cmap.h>
 ```
 `X` should be replaced by the value of i_tag in all of the following documentation.
@@ -277,9 +283,9 @@ static void Viking_del(Viking* v) {
 #define i_tag vk
 #define i_key Viking
 #define i_val int
-#define i_valdel Viking_del
 #define i_equ Viking_equals
 #define i_hash Viking_hash
+#define i_keydel Viking_del
 #include <stc/cmap.h>
 
 int main()
@@ -347,12 +353,12 @@ static RViking Viking_toR(const Viking* v) {return (RViking){v->name.str, v->cou
 #define i_tag vk
 #define i_key Viking
 #define i_val int
-#define i_valdel Viking_del
-#define i_valraw RViking
 #define i_equ RViking_equals
 #define i_hash RViking_hash
+#define i_keyraw RViking
 #define i_keyfrom Viking_fromR
 #define i_keyto Viking_toR
+#define i_keydel Viking_del
 #include <stc/cmap.h>
 
 int main()
@@ -364,14 +370,14 @@ int main()
     cmap_vk_insert(&vikings, (Viking){cstr_from("Einar"), cstr_from("Norway")}, 25);
     cmap_vk_insert(&vikings, (Viking){cstr_from("Olaf"), cstr_from("Denmark")}, 24);
 
-    // emplace is simple to use now.
+    // but emplace is simpler to use now.
     cmap_vk_emplace(&vikings, (RViking){"Harald", "Iceland"}, 12);
     cmap_vk_emplace(&vikings, (RViking){"Einar", "Denmark"}, 21);
 
-    // And lookup uses "raw" key type, so no need construct/destruct key:
+    // and lookup uses "raw" key type, so no need construct/destruct key:
     printf("Lookup: Einar of Norway has %d hp\n\n", *cmap_vk_at(&vikings, (RViking){"Einar", "Norway"}));
 
-    // Print the status of the vikings.
+    // print the status of the vikings.
     c_foreach (i, cmap_vk, vikings) {
         printf("%s of %s has %d hp\n", i.ref->first.name.str, i.ref->first.country.str, i.ref->second);
     }

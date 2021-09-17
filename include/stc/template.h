@@ -29,7 +29,7 @@
   #define Self c_PASTE(i_prefix, i_tag)
   // typedef container types defined in forward.h. VC requires c_EXPAND.
   #define cx_deftypes(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
-  
+
   #define cx_value_t cx_memb(_value_t)
   #define cx_key_t cx_memb(_key_t)
   #define cx_mapped_t cx_memb(_mapped_t)
@@ -47,10 +47,36 @@
   #define i_fwd
 #endif
 
+#ifndef i_prefix_csptr
+#define i_prefix_csptr csptr_
+#endif
+#ifdef i_key_csptr
+  #ifndef i_tag
+  #define i_tag i_key_csptr
+  #endif
+  #define i_key c_PASTE(i_prefix_csptr, i_key_csptr)
+  #define i_cmp c_PASTE3(i_prefix_csptr, i_key_csptr, _compare)
+  #define i_keydel c_PASTE3(i_prefix_csptr, i_key_csptr, _del)
+  #define i_keyfrom c_PASTE3(i_prefix_csptr, i_key_csptr, _clone)
+#endif
+#ifdef i_val_csptr
+  #if !defined i_tag && !defined i_key
+  #define i_tag i_val_csptr
+  #endif
+  #define i_val c_PASTE(i_prefix_csptr, i_val_csptr)
+  #ifndef i_key
+  #define i_cmp c_PASTE3(i_prefix_csptr, i_val_csptr, _compare)
+  #endif
+  #define i_valdel c_PASTE3(i_prefix_csptr, i_val_csptr, _del)
+  #define i_valfrom c_PASTE3(i_prefix_csptr, i_val_csptr, _clone)
+#endif
+
 #ifdef i_key_str
   #define i_key     cstr
+  #ifndef i_tag
+  #define i_tag     str
+  #endif
   #define i_cmp     c_rawstr_compare
-  #define i_equ     c_rawstr_equals
   #define i_hash    c_rawstr_hash
   #define i_keydel  cstr_del
   #define i_keyfrom cstr_from
@@ -59,6 +85,9 @@
 #endif
 #ifdef i_val_str
   #define i_val     cstr
+  #if !defined i_tag && !defined i_key
+  #define i_tag     str
+  #endif
   #ifndef i_key
   #define i_cmp     c_rawstr_compare
   #endif
@@ -67,16 +96,13 @@
   #define i_valto   cstr_str
   #define i_valraw  const char*
 #endif
+
 #if defined i_key && !defined i_val
   #define i_val i_key
 #endif
-#if !defined i_tag && defined i_key_str
-  #define i_tag str
-#elif !defined i_tag && defined i_key
+#if !defined i_tag && defined i_key
   #define i_tag i_key
-#elif !defined i_tag && defined i_val_str
-  #define i_tag str
-#elif !defined i_tag && defined i_val
+#elif !defined i_tag
   #define i_tag i_val
 #endif
 
@@ -148,6 +174,9 @@
 #undef i_keyfrom
 #undef i_keyto
 #undef i_keyraw
+#undef i_key_csptr
+#undef i_val_csptr
+#undef i_prefix_csptr
 
 #undef i_template
 #endif

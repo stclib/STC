@@ -39,10 +39,10 @@ static inline VikingRaw viking_toRaw(const Viking* vk) {
 #define i_val     int
 #define i_equ     vikingraw_equals
 #define i_hash    vikingraw_hash
-#define i_keydel  viking_del
 #define i_keyraw  VikingRaw
 #define i_keyfrom viking_fromRaw
 #define i_keyto   viking_toRaw
+#define i_keydel  viking_del
 #include <stc/cmap.h>
 
 int main()

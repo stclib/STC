@@ -21,13 +21,10 @@ See the c++ classes [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/s
 ## Header file and declaration
 
 ```c
-#define i_tag
-#define i_val       // required
-#define i_cmp       // required if i_val is a struct
-#define i_valdel
-#define i_valfrom
-#define i_valto
-#define i_valraw
+#define i_tag       // defaults to i_val name
+#define i_val       // value: REQUIRED
+#define i_cmp       // three-way compare two i_val* : REQUIRED IF i_val is a non-integral type
+#define i_valdel    // destroy value func - defaults to empty destruct
 #include <stc/csptr.h>
 ```
 `X` should be replaced by the value of i_tag in all of the following documentation.
@@ -69,30 +66,31 @@ bool                csptr_X_equals(const csptr_X* x, const csptr_X* y);
 ## Example
 
 ```c
-#include <stc/csptr.h>
 #include <stc/cstr.h>
 
-typedef struct { cstr name, last; } Person;
+typedef struct { cstr name, surname; } Person;
 
-Person Person_init(const char* name, const char* last) {
-    return (Person){.name = cstr_from(name), .last = cstr_from(last)};
+Person Person_init(const char* name, const char* surname) {
+    return (Person){.name = cstr_from(name), .surname = cstr_from(surname)};
 }
 void Person_del(Person* p) {
-    printf("Destroy: %s %s\n", p->name.str, p->last.str);
-    c_del(cstr, &p->name, &p->last);
+    printf("Person_del: %s %s\n", p->name.str, p->surname.str);
+    c_del(cstr, &p->name, &p->surname);
 }
 
-
-using_csptr(person, Person, c_no_compare, Person_del);
+#define i_val Person
+#define i_cmp c_no_compare
+#define i_valdel Person_del
+#include <stc/csptr.h>
 
 int main() {
     csptr_person p = csptr_person_make(Person_init("John", "Smiths"));
     csptr_person q = csptr_person_clone(p); // means: share the pointer
 
-    printf("Person: %s %s. uses: %zu\n", p.get->name.str, p.get->last.str, *p.use_count);
+    printf("Person: %s %s. uses: %zu\n", p.get->name.str, p.get->surname.str, *p.use_count);
     csptr_person_del(&p);
 
-    printf("Last man standing: %s %s. uses: %zu\n", q.get->name.str, q.get->last.str, *q.use_count);
+    printf("Last man standing: %s %s. uses: %zu\n", q.get->name.str, q.get->surname.str, *q.use_count);
     csptr_person_del(&q);
 }
 ```
@@ -100,38 +98,37 @@ Output:
 ```
 Person: John Smiths. uses: 2
 Last man standing: John Smiths. uses: 1
-Destroy: John Smiths
+Person_del: John Smiths
 ```
 
 ### Example 2
 
-Advanced: Two different ways to store Person in vectors: 1) `cvec<Person>`, 2) `cvec< csptr<Person> >`.
+Vector of shared pointers to Person:
 ```c
-#include <stc/csptr.h>
 #include <stc/cstr.h>
-#include <stc/cvec.h>
 
-typedef struct { cstr name, last; } Person;
+typedef struct { cstr name, surname; } Person;
 
-Person* Person_make(Person* p, const char* name, const char* last) {
-    p->name = cstr_from(name), p->last = cstr_from(last);
-    return p;
-}
-int Person_compare(const Person* p, const Person* q) {
-    int cmp = strcmp(p->name.str, q->name.str);
-    return cmp == 0 ? strcmp(p->last.str, q->last.str) : cmp;
+Person Person_init(const char* name, const char* surname) {
+    return (Person){.name = cstr_from(name), .surname = cstr_from(surname)};
 }
 void Person_del(Person* p) {
-    printf("del: %s\n", p->name.str);
-    c_del(cstr, &p->name, &p->last);
+    printf("Person_del: %s %s\n", p->name.str, p->surname.str);
+    c_del(cstr, &p->name, &p->surname);
+}
+int Person_compare(const Person* p, const Person* q) {
+    int cmp = strcmp(p->surname.str, q->surname.str);
+    return cmp == 0 ? strcmp(p->name.str, q->name.str) : cmp;
 }
 
-// 1. cvec of Person struct; emplace and cloning disabled.
-using_cvec(pe, Person, Person_compare, Person_del, c_no_clone);
+#define i_tag pers
+#define i_val Person
+#define i_cmp Person_compare
+#define i_valdel Person_del
+#include <stc/csptr.h>
 
-// 2. cvec of shared-ptr to Person - with emplace_back() and cloning cvec ENABLED.
-using_csptr(pe, Person, Person_compare, Person_del);
-using_cvec(ps, csptr_pe, csptr_pe_compare, csptr_pe_del, csptr_pe_clone);
+#define i_val_csptr pers  // shorthand: derives other i_xxx defines from this. i_tag may be defined.
+#include <stc/cvec.h>
 
 const char* names[] = {
     "Joe", "Jordan",
@@ -140,60 +137,43 @@ const char* names[] = {
 };
 
 int main() {
-    cvec_pe vec1 = cvec_pe_init();
-    cvec_ps vec2 = cvec_ps_init();
+    cvec_pers vec = cvec_pers_init();
 
-    for (int i = 0; i < 6; i += 2) {
-        Person tmp;
-        cvec_pe_push_back(&vec1, *Person_make(&tmp, names[i], names[i+1]));
-        cvec_ps_push_back(&vec2, csptr_pe_from(Person_make(c_new(Person), names[i], names[i+1])));
+    for (int i = 0; i < c_arraylen(names); i += 2) {
+        cvec_pers_push_back(&vec, csptr_pers_make(Person_init(names[i], names[i+1])));
     }
-    puts("1. Sorted vec1 of Person:");
-    cvec_pe_sort(&vec1);
-    c_foreach (i, cvec_pe, vec1)
-        printf("  %s %s\n", i.ref->name.str, i.ref->last.str);
 
-    // Append a shared copy of vec2.data[0]. Will only be destructed once!
-    cvec_ps_emplace_back(&vec2, vec2.data[0]);   // emplace will internally call csptr_ps_clone()!
-    puts("\n2. Sorted vec2 of shared-pointer to Person:");
-    cvec_ps_sort(&vec2);
-    c_foreach (i, cvec_ps, vec2)
-        printf("  %s %s\n", i.ref->get->name.str, i.ref->get->last.str);
+    // Append a shared copy of vec.data[0]. Will only be destructed once!
+    cvec_pers_emplace_back(&vec, vec.data[0]);  // will internally call csptr_pers_clone()!
+    
+    puts("\nSorted vec of shared-pointer to Person:");
+    cvec_pers_sort(&vec);
+    
+    c_foreach (i, cvec_pers, vec)
+        printf("  %s, %s\n", i.ref->get->surname.str, i.ref->get->name.str);
 
-    // Share vec2.data[1] with elem1 variable.
-    csptr_pe elem1 = csptr_pe_clone(vec2.data[1]);
+    // Share vec.data[1] with elem1 variable.
+    csptr_pers elem1 = csptr_pers_clone(vec.data[1]);
 
-    puts("\nDestroy vec1:");
-    cvec_pe_del(&vec1);
-    puts("\nDestroy vec2:");
-    cvec_ps_del(&vec2);
+    puts("\nDestroy vec:");
+    cvec_pers_del(&vec);
 
     puts("\nDestroy elem1:");
-    csptr_pe_del(&elem1);
+    csptr_pers_del(&elem1);
 }
 ```
 Output:
 ```
-1. Sorted vec1 of Person:
-  Annie Aniston
-  Jane Jacobs
-  Joe Jordan
+Sorted vec of shared-pointer to Person:
+  Aniston, Annie
+  Jacobs, Jane
+  Jordan, Joe
+  Jordan, Joe
 
-2. Sorted vec2 of shared-pointer to Person:
-  Annie Aniston
-  Jane Jacobs
-  Joe Jordan
-  Joe Jordan
-
-Destroy vec1:
-del: Annie
-del: Jane
-del: Joe
-
-Destroy vec2:
-del: Annie
-del: Joe
+Destroy vec:
+Person_del: Annie Aniston
+Person_del: Joe Jordan
 
 Destroy elem1:
-del: Jane
+Person_del: Jane Jacobs
 ```

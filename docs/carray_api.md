@@ -11,81 +11,84 @@ See the c++ class [boost::multi_array](https://www.boost.org/doc/libs/release/li
 ## Header file and declaration
 
 ```c
-#include <stc/carray.h>
+#define i_tag       // defaults to i_val name
+#define i_val       // value: REQUIRED
+#define i_cmp       // three-way compare two i_valraw* : REQUIRED IF i_valraw is a non-integral type
+#define i_valraw    // convertion "raw" type - defaults to i_val
+#define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
+#define i_valdel    // destroy value func - defaults to empty destruct
 
-using_carray2(X, Value);
-using_carray2(X, Value, valueDel, valueClone);
-using_carray3(X, Value);
-using_carray3(X, Value, valueDel, valueClone);
+#include <stc/carr2.h> // or <stc/carr3.h>
 ```
-The macro `using_carray2()` must be instantiated in the global scope. `X` and `N` are type tags and
-will affect the names of all cset types and methods. E.g. declaring `using_carray3(i, int);`, `X` should
-be replaced by `i` in all of the following documentation.
+`X` should be replaced by the value of i_tag in all of the following documentation.
 
-```c
-#include <stc/carray.h>
-```
 ## Methods
 
+carr2_X:
 ```c
-carray2X            carray2X_init(size_t xdim, size_t ydim);
-carray2X            carray2X_with_values(size_t xdim, size_t ydim, Value val);
-carray2X            carray2X_with_storage(size_t xdim, size_t ydim, Value* array);
-carray2X            carray2X_clone(carray2X arr);
-Value*              carray2X_release(carray2X* self);       // release storage (not freed)
-void                carray2X_del(carray2X* self);
+carr2_X             carr2_X_init(size_t xdim, size_t ydim);
+carr2_X             carr2_X_with_values(size_t xdim, size_t ydim, Value val);
+carr2_X             carr2_X_with_storage(size_t xdim, size_t ydim, Value* array);
+carr2_X             carr2_X_clone(carr2_X arr);
+Value*              carr2_X_release(carr2_X* self);       // release storage (not freed)
+void                carr2_X_del(carr2_X* self);
 
-size_t              carray2X_size(carray2X arr);
-Value*              carray2X_data(carray2X* self);          // access storage data
-Value*              carray2X_at(carray2X* self, size_t x, size_t y);
+size_t              carr2_X_size(carr2_X arr);
+Value*              carr2_X_data(carr2_X* self);          // access storage data
+Value*              carr2_X_at(carr2_X* self, size_t x, size_t y);
 
-carray2X_iter_t     carray2X_begin(const carray2X* self);
-carray2X_iter_t     carray2X_end(const carray2X* self);
-void                carray2X_next(carray2X_iter_t* it);
+carr2_X_iter_t      carr2_X_begin(const carr2_X* self);
+carr2_X_iter_t      carr2_X_end(const carr2_X* self);
+void                carr2_X_next(carr2_X_iter_t* it);
 ```
+carr3:
 ```c
-carray3X            carray3X_init(size_t xdim, size_t ydim, size_t zdim);
-carray3X            carray3X_with_values(size_t xdim, size_t ydim, size_t zdim, Value val);
-carray3X            carray3X_with_storage(size_t xdim, size_t ydim, size_t zdim, Value* array);
-carray3X            carray3X_clone(carray3X arr);
-Value*              carray3X_release(carray3X* self);       // release storage (not freed)
-void                carray3X_del(carray3X* self);
+carr3_X             carr3_X_init(size_t xdim, size_t ydim, size_t zdim);
+carr3_X             carr3_X_with_values(size_t xdim, size_t ydim, size_t zdim, Value val);
+carr3_X             carr3_X_with_storage(size_t xdim, size_t ydim, size_t zdim, Value* array);
+carr3_X             carr3_X_clone(carr3_X arr);
+Value*              carr3_X_release(carr3_X* self);       // release storage (not freed)
+void                carr3_X_del(carr3_X* self);
 
-size_t              carray3X_size(carray3X arr);
-Value*              carray3X_data(carray3X* self);          // access storage data
-Value*              carray3X_at(carray3X* self, size_t x, size_t y, size_t z);
+size_t              carr3_X_size(carr3_X arr);
+Value*              carr3_X_data(carr3_X* self);          // access storage data
+Value*              carr3_X_at(carr3_X* self, size_t x, size_t y, size_t z);
 
-carray3X_iter_t     carray3X_begin(const carray3X* self);
-carray3X_iter_t     carray3X_end(const carray3X* self);
-void                carray3X_next(carray3X_iter_t* it);
+carr3_X_iter_t      carr3_X_begin(const carr3_X* self);
+carr3_X_iter_t      carr3_X_end(const carr3_X* self);
+void                carr3_X_next(carr3_X_iter_t* it);
 ```
 ## Types
 
-| Type name            | Type definition                                      | Used to represent...      |
-|:---------------------|:-----------------------------------------------------|:--------------------------|
-| `carray2X`           | `struct { Value **data; size_t xdim, ydim; }`        | The carray2 type          |
-| `carray2X_value_t`   | `Value`                                              | The value type            |
-| `carray2X_iter_t`    | `struct { Value *ref; }`                             | Iterator type             |
-| `carray3X`           | `struct { Value ***data; size_t xdim, ydim, zdim; }` | The carray3 type          |
-| `carray3X_value_t`   | `Value`                                              | The value type            |
-| `carray3X_iter_t`    | `struct { Value *ref; }`                             | Iterator type             |
+| Type name         | Type definition                                      | Used to represent... |
+|:------------------|:-----------------------------------------------------|:---------------------|
+| `carr2_X`         | `struct { Value **data; size_t xdim, ydim; }`        | The carray2 type     |
+| `carr2_X_value_t` | `Value`                                              | The value type       |
+| `carr2_X_iter_t`  | `struct { Value *ref; }`                             | Iterator type        |
+| `carr3_X`         | `struct { Value ***data; size_t xdim, ydim, zdim; }` | The carray3 type     |
+| `carr3_X_value_t` | `Value`                                              | The value type       |
+| `carr3_X_iter_t`  | `struct { Value *ref; }`                             | Iterator type        |
 
 The **carray** elements can be accessed like `carray3i arr = ...; int val = arr.data[x][y][z];`, or with `carray3i_at(&arr, x, y, z)`.
 
 ## Example
 ```c
 #include <stdio.h>
-#include <stc/carray.h>
 
-using_carray3(f, float);
-using_carray2(i, uint32_t);
+#define i_tag i
+#define i_val uint32_t
+#include <stc/carr2.h>
+
+#define i_tag f
+#define i_val float
+#include <stc/carr3.h>
 
 int main()
 {
     // Ex1
     int xd = 30, yd = 20, zd = 10;
     // define arr3[30][20][10], initialized with zeros.
-    carray3f arr3 = carray3f_with_values(xd, yd, zd, 0.0f);
+    carr3_f arr3 = carr3_f_with_values(xd, yd, zd, 0.0f);
     arr3.data[5][4][3] = 3.14f;
 
     float *arr1 = arr3.data[5][4];
@@ -94,20 +97,20 @@ int main()
     printf("%f\n", arr1[3]); // 3.14
     printf("%f\n", arr2[4][3]); // 3.14
     printf("%f\n", arr3.data[5][4][3]); // 3.14
-    carray3f_del(&arr3); // free array
+    carr3_f_del(&arr3); // free array
 
     // Ex2
     int w = 256, h = 128;
-    carray2i image = carray2i_init(w, h);
+    carr2_i image = carr2_i_init(w, h);
     int n = 0;
-    c_foreach (i, carray2i, image) {
+    c_foreach (i, carr2_i, image) {
         uint32_t t = n++ % 256;
         *i.ref = t | t << 8 | t << 16 | 255;
     }
 
-    for (int y=0; y<image.ydim; ++y)
+    for (int y = 0; y < image.ydim; ++y)
         image.data[y][y] = 0xffffffff;
-    carray2i_del(&image);
+    carr2_i_del(&image);
 }
 ```
 Output:
