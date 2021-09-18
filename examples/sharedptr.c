@@ -16,29 +16,44 @@ void int_del(int* x) {
 
 int main()
 {
-    c_forauto (cvec_int, vec)
-    c_forauto (csset_int, set)
+    c_forauto (cvec_int, vec) // raii
+    c_forauto (csset_int, set) // raii
     {
-        csset_int_insert(&set, csptr_int_make(2021));
-        csset_int_insert(&set, csptr_int_make(2012));
-        csset_int_insert(&set, csptr_int_make(2022));
-        csset_int_insert(&set, csptr_int_make(2015));
+        cvec_int_push_back(&vec, csptr_int_make(2021));
+        cvec_int_push_back(&vec, csptr_int_make(2012));
+        cvec_int_push_back(&vec, csptr_int_make(2022));
+        cvec_int_push_back(&vec, csptr_int_make(2015));
 
-        // add odd numbers from set to vec:
-        c_foreach (i, csset_int, set) {
-            if (*i.ref->get & 1)
-                cvec_int_push_back(&vec, csptr_int_clone(*i.ref));
-        }
-
-        printf("print set:");
-        c_foreach (i, csset_int, set) {
-            printf(" %d", *i.ref->get);
-        }
-
-        printf("\nprint vec:");
-        c_foreach (i, cvec_int, vec) {
-            printf(" %d", *i.ref->get);
-        }
+        printf("vec:");
+        c_foreach (i, cvec_int, vec) printf(" %d", *i.ref->get);
         puts("");
+
+        // add odd numbers from vec to set
+        c_foreach (i, cvec_int, vec)
+            if (*i.ref->get & 1)
+                csset_int_emplace(&set, *i.ref); // copy shared pointer => increments ref.
+
+        // erase the two last elements in vec
+        cvec_int_pop_back(&vec);
+        cvec_int_pop_back(&vec);
+
+        printf("vec:");
+        c_foreach (i, cvec_int, vec) printf(" %d", *i.ref->get);
+
+        printf("\nset:");
+        c_foreach (i, csset_int, set) printf(" %d", *i.ref->get);
+
+        puts("\nDone");
     }
 }
+
+/* output:
+vec: 2021 2012 2022 2015
+del: 2022
+vec: 2021 2012
+set: 2015 2021
+Done
+del: 2015
+del: 2021
+del: 2012
+*/

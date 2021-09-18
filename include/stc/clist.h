@@ -119,8 +119,6 @@ STC_INLINE i_val        cx_memb(_value_clone)(i_val val)
                             { return i_valfrom(i_valto(&val)); }
 STC_INLINE void         cx_memb(_pop_front)(Self* self)
                             { cx_memb(_erase_after_)(self, self->last); }
-STC_INLINE cx_iter_t    cx_memb(_erase)(Self* self, cx_iter_t it)
-                            { return cx_memb(_erase_at)(self, it); }
 STC_INLINE cx_value_t*  cx_memb(_emplace_back)(Self* self, i_valraw raw)
                             { return cx_memb(_push_back)(self, i_valfrom(raw)); }
 STC_INLINE cx_value_t*  cx_memb(_emplace_front)(Self* self, i_valraw raw)
