@@ -32,7 +32,7 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 #include <stc/clist.h>
 ```
 
-`X` should be replaced by the value of i_tag in all of the following documentation.
+`X` should be replaced by the value of ***i_tag*** in all of the following documentation.
 
 ## Methods
 

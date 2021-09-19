@@ -17,7 +17,7 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 #define i_keydel    // destroy key func - defaults to empty destruct
 #include <stc/csset.h>
 ```
-`X` should be replaced by the value of i_tag in all of the following documentation.
+`X` should be replaced by the value of ***i_tag*** in all of the following documentation.
 
 ## Methods
 

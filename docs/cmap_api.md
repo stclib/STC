@@ -32,7 +32,7 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_valdel    // destroy value func - defaults to empty destruct
 #include <stc/cmap.h>
 ```
-`X` should be replaced by the value of i_tag in all of the following documentation.
+`X` should be replaced by the value of ***i_tag*** in all of the following documentation.
 
 ## Methods
 

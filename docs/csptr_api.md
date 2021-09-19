@@ -27,14 +27,13 @@ See the c++ classes [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/s
 #define i_valdel    // destroy value func - defaults to empty destruct
 #include <stc/csptr.h>
 ```
-`X` should be replaced by the value of i_tag in all of the following documentation.
+`X` should be replaced by the value of ***i_tag*** in all of the following documentation.
 
 ## Methods
 
-Use *csptr_X_clone(p)* when sharing ownership of the pointed-to object. See examples below.
+The *csptr_X_compare()*, *csptr_X_del()* methods are defined based on the ***i_cmp*** and ***i_valdel*** macros specified.
 
-The *csptr_X_compare()*, *csptr_X_equals()* and *csptr_X_del()* methods are defined based on the *valeCompare* and *valueDel* arguments passed to the **using**-macro.
-
+Use *csptr_X_clone(p)* when sharing ownership of the pointed-to object. For shared pointers stored in containers, define ***i_val_csptr*** to the shared pointers tag instead of a ***i_val*** macro. See example below.
 ```c
 csptr_X             csptr_X_init();                               // empty constructor
 csptr_X             csptr_X_make(Value val);                      // make_shared constructor, fast
@@ -66,114 +65,67 @@ bool                csptr_X_equals(const csptr_X* x, const csptr_X* y);
 ## Example
 
 ```c
-#include <stc/cstr.h>
+#include <stdio.h>
 
-typedef struct { cstr name, surname; } Person;
-
-Person Person_init(const char* name, const char* surname) {
-    return (Person){.name = cstr_from(name), .surname = cstr_from(surname)};
-}
-void Person_del(Person* p) {
-    printf("Person_del: %s %s\n", p->name.str, p->surname.str);
-    c_del(cstr, &p->name, &p->surname);
+void int_del(int* x) {
+    printf("del: %d\n", *x);
 }
 
-#define i_val Person
-#define i_cmp c_no_compare
-#define i_valdel Person_del
-#include <stc/csptr.h>
+#define i_val int
+#define i_valdel int_del  // optional func to show elements destroyed
+#include <stc/csptr.h>    // define csptr_int shared pointers
 
-int main() {
-    csptr_person p = csptr_person_make(Person_init("John", "Smiths"));
-    csptr_person q = csptr_person_clone(p); // means: share the pointer
+#define i_key_csptr int   // refer to csptr_int definition above
+#include <stc/csset.h>    // define a sorted set of csptr_int
 
-    printf("Person: %s %s. uses: %zu\n", p.get->name.str, p.get->surname.str, *p.use_count);
-    csptr_person_del(&p);
-
-    printf("Last man standing: %s %s. uses: %zu\n", q.get->name.str, q.get->surname.str, *q.use_count);
-    csptr_person_del(&q);
-}
-```
-Output:
-```
-Person: John Smiths. uses: 2
-Last man standing: John Smiths. uses: 1
-Person_del: John Smiths
-```
-
-### Example 2
-
-Vector of shared pointers to Person:
-```c
-#include <stc/cstr.h>
-
-typedef struct { cstr name, surname; } Person;
-
-Person Person_init(const char* name, const char* surname) {
-    return (Person){.name = cstr_from(name), .surname = cstr_from(surname)};
-}
-void Person_del(Person* p) {
-    printf("Person_del: %s %s\n", p->name.str, p->surname.str);
-    c_del(cstr, &p->name, &p->surname);
-}
-int Person_compare(const Person* p, const Person* q) {
-    int cmp = strcmp(p->surname.str, q->surname.str);
-    return cmp == 0 ? strcmp(p->name.str, q->name.str) : cmp;
-}
-
-#define i_tag pers
-#define i_val Person
-#define i_cmp Person_compare
-#define i_valdel Person_del
-#include <stc/csptr.h>
-
-#define i_val_csptr pers  // shorthand: derives other i_xxx defines from this. i_tag may be defined.
+#define i_val_csptr int
 #include <stc/cvec.h>
 
-const char* names[] = {
-    "Joe", "Jordan",
-    "Annie", "Aniston",
-    "Jane", "Jacobs"
-};
+int main()
+{
+    c_forauto (cvec_int, vec)   // declare and init vec, call del at scope exit
+    c_forauto (csset_int, set)  // declare and init set, call del at scope exit
+    {
+        cvec_int_push_back(&vec, csptr_int_make(2021));
+        cvec_int_push_back(&vec, csptr_int_make(2012));
+        cvec_int_push_back(&vec, csptr_int_make(2022));
+        cvec_int_push_back(&vec, csptr_int_make(2015));
 
-int main() {
-    cvec_pers vec = cvec_pers_init();
+        printf("vec:");
+        c_foreach (i, cvec_int, vec) printf(" %d", *i.ref->get);
+        puts("");
 
-    for (int i = 0; i < c_arraylen(names); i += 2) {
-        cvec_pers_push_back(&vec, csptr_pers_make(Person_init(names[i], names[i+1])));
+        // add odd numbers from vec to set
+        c_foreach (i, cvec_int, vec)
+            if (*i.ref->get & 1)
+                csset_int_emplace(&set, *i.ref); // copy shared pointer => increments counter.
+
+        // erase the two last elements in vec
+        cvec_int_pop_back(&vec);
+        cvec_int_pop_back(&vec);
+
+        printf("vec:");
+        c_foreach (i, cvec_int, vec) printf(" %d", *i.ref->get);
+
+        printf("\nset:");
+        c_foreach (i, csset_int, set) printf(" %d", *i.ref->get);
+
+        c_forvar (csptr_int p = csptr_int_clone(vec.data[0]), csptr_int_del(&p)) {
+            printf("\n%d is now owned by %zu objects\n", *p.get, *p.use_count);
+        }
+
+        puts("\nDone");
     }
-
-    // Append a shared copy of vec.data[0]. Will only be destructed once!
-    cvec_pers_emplace_back(&vec, vec.data[0]);  // will internally call csptr_pers_clone()!
-    
-    puts("\nSorted vec of shared-pointer to Person:");
-    cvec_pers_sort(&vec);
-    
-    c_foreach (i, cvec_pers, vec)
-        printf("  %s, %s\n", i.ref->get->surname.str, i.ref->get->name.str);
-
-    // Share vec.data[1] with elem1 variable.
-    csptr_pers elem1 = csptr_pers_clone(vec.data[1]);
-
-    puts("\nDestroy vec:");
-    cvec_pers_del(&vec);
-
-    puts("\nDestroy elem1:");
-    csptr_pers_del(&elem1);
 }
 ```
 Output:
 ```
-Sorted vec of shared-pointer to Person:
-  Aniston, Annie
-  Jacobs, Jane
-  Jordan, Joe
-  Jordan, Joe
-
-Destroy vec:
-Person_del: Annie Aniston
-Person_del: Joe Jordan
-
-Destroy elem1:
-Person_del: Jane Jacobs
+vec: 2021 2012 2022 2015
+del: 2022
+vec: 2021 2012
+set: 2015 2021
+Done
+del: 2015
+del: 2021
+del: 2012
 ```

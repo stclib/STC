@@ -17,7 +17,7 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 #define i_valdel    // destroy value func - defaults to empty destruct
 #include <stc/cstack.h>
 ```
-`X` should be replaced by the value of i_tag in all of the following documentation.
+`X` should be replaced by the value of ***i_tag*** in all of the following documentation.
 
 ## Methods
 

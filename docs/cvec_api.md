@@ -21,7 +21,7 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 #define i_valdel    // destroy value func - defaults to empty destruct
 #include <stc/cvec.h>
 ```
-`X` should be replaced by the value of i_tag in all of the following documentation.
+`X` should be replaced by the value of ***i_tag*** in all of the following documentation.
 
 ## Methods
 

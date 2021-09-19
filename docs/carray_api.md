@@ -16,7 +16,7 @@ See the c++ class [boost::multi_array](https://www.boost.org/doc/libs/release/li
 
 #include <stc/carr2.h> // or <stc/carr3.h>
 ```
-`X` should be replaced by the value of i_tag in all of the following documentation.
+`X` should be replaced by the value of ***i_tag*** in all of the following documentation.
 
 ## Methods
 

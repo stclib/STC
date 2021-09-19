@@ -1,7 +1,7 @@
 # STC [cpque](../include/stc/cpque.h): Priority Queue
 
 A priority queue is a container adaptor that provides constant time lookup of the largest (by default) element, at the expense of logarithmic insertion and extraction.
-A user-provided argument `<`or `>` must be supplied to set the ordering, e.g. using `>` would cause the smallest element to appear as the top().
+A user-provided ***i_cmp*** may be defined to set the ordering, e.g. using ***-c_default_cmp*** would cause the smallest element to appear as the top() value.
 
 See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/container/priority_queue) for a functional reference.
 
@@ -17,7 +17,7 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 #define i_valdel    // destroy value func - defaults to empty destruct
 #include <stc/cpque.h>
 ```
-`X` should be replaced by the value of i_tag in all of the following documentation.
+`X` should be replaced by the value of ***i_tag*** in all of the following documentation.
 
 ## Methods
 
