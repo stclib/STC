@@ -9,6 +9,7 @@ int main()
         char buf[256];
         cbits_to_str(s1, buf, 0, -1);
         printf("buf: %s: %zu\n", buf, cbits_count(s1));
+        cbits_del(&s1);
 
         cbits_reset(&set, 9);
         cbits_resize(&set, 43, false);

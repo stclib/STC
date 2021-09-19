@@ -27,6 +27,7 @@ static void test_repeats(void)
             if (v > 1) printf("repeated value %zu (%d) at 2^%d\n", k, v, (int) log2(i));
         }
     }
+    cmap_ic_del(&m);
 }
 
 #define i_tag x
