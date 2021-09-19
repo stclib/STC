@@ -18,7 +18,7 @@ int main()
     int hist[R] = {0};
     sum = 0;
     c_forrange (N2)  {
-        int n = round((stc64_normalf(&rng, &dist2) + 0.5));
+        int n = (int) round((stc64_normalf(&rng, &dist2) + 0.5));
         sum += n;
         if (n >= 0 && n < R) ++hist[n];
     }

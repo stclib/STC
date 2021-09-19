@@ -6,7 +6,7 @@
 cbits sieveOfEratosthenes(size_t n)
 {
     cbits bits = cbits_with_size(n/2 + 1, true);
-    size_t q = (size_t) sqrt(n) + 1;
+    size_t q = (size_t) sqrt((double) n) + 1;
     for (size_t i = 3; i < q; i += 2) {
         size_t j = i;
         for (; j < n; j += 2) {
