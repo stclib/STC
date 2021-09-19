@@ -47,7 +47,7 @@ int main()
             printf("\n%d is now owned by %zu objects\n", *p.get, *p.use_count);
         }
 
-        puts("\nDone");
+        puts("Done");
     }
 }
 

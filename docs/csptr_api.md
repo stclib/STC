@@ -1,6 +1,6 @@
 # STC [csptr](../include/stc/csptr.h): Shared Pointers
 
-**csptr** is a smart pointer that retains shared ownership of an object through a pointer. 
+**csptr** is a smart pointer that retains shared ownership of an object through a pointer.
 Several **csptr** objects may own the same object. The object is destroyed and its memory
 deallocated when either of the following happens:
 
@@ -124,6 +124,7 @@ vec: 2021 2012 2022 2015
 del: 2022
 vec: 2021 2012
 set: 2015 2021
+2021 is now owned by 3 objects
 Done
 del: 2015
 del: 2021
