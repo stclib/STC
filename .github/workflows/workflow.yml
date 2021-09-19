@@ -1,0 +1,23 @@
+name: "Main Workflow"
+on:
+  pull_request:
+  push:
+
+jobs:
+  build_and_test:
+    runs-on: ubuntu-latest
+    env:
+      CFLAGS:   -Wall -Wno-unused-function -ggdb3 -fsanitize=address -fsanitize=undefined -fsanitize=pointer-compare -fsanitize=pointer-subtract
+      CXXFLAGS: -Wall -Wno-unused-function -ggdb3 -fsanitize=address -fsanitize=undefined -fsanitize=pointer-compare -fsanitize=pointer-subtract
+    steps:
+    - name: 'Checkout'
+      uses: actions/checkout@v2
+    - name: 'Build & Test'
+      uses: ashutoshvarma/action-cmake-build@master
+      with:
+        cc: gcc
+        cxx: g++
+        build-type: Release
+        configure-options: -DBUILD_TESTING=1
+        ctest-options: --output-on-failure
+        run-test: true

@@ -23,6 +23,7 @@ static void test_repeats(void)
         int v = cmap_ic_emplace(&m, k, 0).ref->second += 1;
         if (v > 1) printf("repeated value %llx (%d) at 2^%d\n", k, v, (int) log2(i));
     }
+    cmap_ic_del(&m);
 }
 
 
