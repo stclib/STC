@@ -1,5 +1,5 @@
 #!/bin/sh
-cc='gcc -std=c99 -pedantic'
+cc='g++ -std=c++17'
 #cc='clang'
 #cc='clang -c -DSTC_HEADER'
 #cc='cl -nologo'
@@ -18,7 +18,7 @@ if [ ! -z "$1" ] ; then
     cc=$@
 fi
 if [ $run = 0 ] ; then
-    for i in *.c ; do
+    for i in *.cpp ; do
         echo $cc -I../include $i
         $cc -I../include $i
     done

@@ -102,7 +102,8 @@
 
 #define c_rawstr_compare(x, y)  strcmp(*(x), *(y))
 #define c_rawstr_equals(x, y)   (strcmp(*(x), *(y)) == 0)
-#define c_rawstr_hash(p, ...)   c_default_hash(*(p), strlen(*(p)))
+#define c_rawstr_hash(p, dummy) c_default_hash(*(p), strlen(*(p)))
+#define c_strhash(s)        c_default_hash(s, strlen(s))
 
 #define c_no_clone(x)           (assert(!"c_no_clone() called"), x)
 #define c_default_fromraw(x)    (x)

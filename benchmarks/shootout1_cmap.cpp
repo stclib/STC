@@ -7,7 +7,6 @@
 #include "others/robin_hood.hpp"
 #include "others/skarupke/bytell_hash_map.hpp"
 #include "others/tsl/hopscotch_map.h"
-#include "others/tsl/robin_map.h"
 #include "others/sparsepp/spp.h"
 
 #define PICOBENCH_IMPLEMENT_WITH_MAIN
@@ -20,7 +19,6 @@ template <class K, class V> using umap = std::unordered_map<K, V>;
 template <class K, class V> using bmap = ska::bytell_hash_map<K, V>;
 template <class K, class V> using fmap = ska::flat_hash_map<K, V>;
 template <class K, class V> using hmap = tsl::hopscotch_map<K, V>;
-template <class K, class V> using omap = tsl::robin_map<K, V>;
 template <class K, class V> using smap = spp::sparse_hash_map<K, V>;
 template <class K, class V> using rmap = robin_hood::unordered_flat_map<K, V, robin_hood::hash<K>,
                                                                         std::equal_to<K>, MaxLoadFactor100>;
@@ -29,7 +27,6 @@ template <class K, class V> using rmap = robin_hood::unordered_flat_map<K, V, ro
     using b##map = bmap __VA_ARGS__; \
     using f##map = fmap __VA_ARGS__; \
     using h##map = hmap __VA_ARGS__; \
-    using o##map = omap __VA_ARGS__; \
     using s##map = smap __VA_ARGS__; \
     using r##map = rmap __VA_ARGS__
 
@@ -122,7 +119,6 @@ PICOBENCH(ins_and_erase_i<umap_x>).P;
 PICOBENCH(ins_and_erase_i<bmap_x>).P;
 PICOBENCH(ins_and_erase_i<fmap_x>).P;
 PICOBENCH(ins_and_erase_i<hmap_x>).P;
-PICOBENCH(ins_and_erase_i<omap_x>).P;
 PICOBENCH(ins_and_erase_i<smap_x>).P;
 PICOBENCH(ins_and_erase_i<rmap_x>).P;
 PICOBENCH(ins_and_erase_cmap_x).P;
@@ -165,7 +161,6 @@ PICOBENCH(ins_and_access_i<umap_i>).P;
 PICOBENCH(ins_and_access_i<bmap_i>).P;
 PICOBENCH(ins_and_access_i<fmap_i>).P;
 PICOBENCH(ins_and_access_i<hmap_i>).P;
-PICOBENCH(ins_and_access_i<omap_i>).P;
 PICOBENCH(ins_and_access_i<smap_i>).P;
 PICOBENCH(ins_and_access_i<rmap_i>).P;
 PICOBENCH(ins_and_access_cmap_i).P;
@@ -223,7 +218,6 @@ PICOBENCH(ins_and_access_s<umap_s>).P;
 PICOBENCH(ins_and_access_s<bmap_s>).P;
 PICOBENCH(ins_and_access_s<fmap_s>).P;
 PICOBENCH(ins_and_access_s<hmap_s>).P;
-PICOBENCH(ins_and_access_s<omap_s>).P;
 PICOBENCH(ins_and_access_s<smap_s>).P;
 PICOBENCH(ins_and_access_s<rmap_s>).P;
 PICOBENCH(ins_and_access_cmap_s).P;
@@ -297,7 +291,6 @@ PICOBENCH(iterate_x<umap_x>).P;
 PICOBENCH(iterate_x<bmap_x>).P;
 PICOBENCH(iterate_x<fmap_x>).P;
 PICOBENCH(iterate_x<hmap_x>).P;
-PICOBENCH(iterate_x<omap_x>).P;
 PICOBENCH(iterate_x<smap_x>).P;
 PICOBENCH(iterate_x<rmap_x>).P;
 PICOBENCH(iterate_cmap_x).P;

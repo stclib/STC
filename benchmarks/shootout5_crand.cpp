@@ -2,7 +2,7 @@
 #include <time.h>
 #include <random>
 #include "stc/crandom.h"
-#include "others/pcg_random.hpp"
+//#include "pcg_random.hpp"
 
 static struct stc32_state { stc64_t rng; uint64_t spare; unsigned n; } stc32_global =
     {{0x7a5fed, 0x8e3f52, 0x9bc713, 0x6a09e667a7541669}, 0, 0};
@@ -59,7 +59,7 @@ void test1(void)
     c_forrange (8) printf("%f ", fdist(rng));
     puts("\n");
 }
-
+/*
 void test2()
 {
     clock_t diff, before;
@@ -96,7 +96,7 @@ void test2()
     c_forrange (8) printf("%f ", fdist(rng));
     puts("\n");
 }
-
+*/
 
 void test3(void)
 {
@@ -132,6 +132,6 @@ void test3(void)
 int main()
 {
     test1();
-    test2();
+    //test2();
     test3();
 }

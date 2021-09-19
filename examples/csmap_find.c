@@ -26,8 +26,8 @@ void print_elem(csmap_istr_rawvalue_t p) {
         puts(""); \
     }
 
-using_print_collection(csmap_istr);
-using_print_collection(cvec_istr);
+using_print_collection(csmap_istr)
+using_print_collection(cvec_istr)
 
 
 void findit(csmap_istr c, csmap_istr_key_t val)

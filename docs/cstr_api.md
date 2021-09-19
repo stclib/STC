@@ -93,6 +93,7 @@ int          c_rawstr_compare(const char** x, const char** y);
 bool         c_rawstr_equals(const char** x, const char** y);
 uint64_t     c_rawstr_hash(const char* const* x, ...);
 
+uint64_t     c_strhash(const char* str);
 char*        c_strnstrn(const char* str, const char* needle, size_t slen, size_t nlen);
 int          c_strncasecmp(const char* str1, const char* str2, size_t n);
 ```

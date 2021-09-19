@@ -2,7 +2,7 @@
 #include <time.h>
 #include <stc/crandom.h>
 
-#define i_tag x
+#define i_tag f
 #define i_val float
 #define i_cmp -c_default_compare
 #include <stc/cpque.h>
@@ -18,7 +18,7 @@ int main()
     rng = stc64_init(seed);
     clock_t start = clock();
     c_forrange (i, int, N)
-        cvec_f_push_back(&pq, (float) stc64_randf(&rng)*100000);
+        cpque_f_push_back(&pq, (float) stc64_randf(&rng)*100000);
 
     cpque_f_make_heap(&pq);
     printf("Built priority queue: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);

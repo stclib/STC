@@ -346,7 +346,7 @@ static int RViking_equals(const RViking* r1, const RViking* r2)
     { return !strcmp(r1->name, r2->name) && !strcmp(r1->country, r2->country); }
 
 static uint32_t RViking_hash(const RViking* r, int ignored)
-    { return c_rawstr_hash(&r->name) ^ (c_rawstr_hash(&r->country) >> 15); }
+    { return c_strhash(r->name) ^ (c_strhash(r->country) >> 15); }
 
 static Viking Viking_fromR(RViking r) 
     { return (Viking){cstr_from(r.name), cstr_from(r.country)}; }
