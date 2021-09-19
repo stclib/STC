@@ -60,7 +60,7 @@ int main()
         clist_str_iter_t pos;
         c_foreach (e, csmap_mult, mmap)
             if ((pos = clist_str_find(&e.ref->second, "bar")).ref != clist_str_end(&e.ref->second).ref) {
-                clist_str_erase(&e.ref->second, pos);
+                clist_str_erase_at(&e.ref->second, pos);
                 break;
             }
         print(mmap);

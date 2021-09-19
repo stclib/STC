@@ -1,9 +1,8 @@
-# STC [carray](../include/stc/carray.h): Dynamic Multi-dimensional Array
+# STC [carr2, carr3](../include/stc/carray.h): Dynamic Multi-dimensional Arrays
 ![Array](pics/array.jpg)
 
-The **carr2** and **carr3** are templated 2D and 3D containers arrays. They are allocated on the heap as a single
-contiguous block of memory. The arrays can be indexed like regular constant size multi-dimensional arrays in C,
-which also store data as one contiguous block of memory.
+The **carr2** and **carr3** are templated 2D and 3D dynamic arrays. They are allocated on the heap as a single
+contiguous block of memory. The arrays can be indexed like regular constant size multi-dimensional arrays in C.
 
 See the c++ class [boost::multi_array](https://www.boost.org/doc/libs/release/libs/multi_array) for similar functionality.
 

@@ -5,19 +5,19 @@ void int_del(int* x) {
 }
 
 #define i_val int
-#define i_valdel int_del
-#include <stc/csptr.h>
+#define i_valdel int_del  // optional func to show elements destroyed
+#include <stc/csptr.h>    // define csptr_int shared pointers
 
-#define i_key_csptr int
-#include <stc/csset.h>
+#define i_key_csptr int   // refer to csptr_int definition above
+#include <stc/csset.h>    // define a sorted set of csptr_int
 
 #define i_val_csptr int
 #include <stc/cvec.h>
 
 int main()
 {
-    c_forauto (cvec_int, vec) // raii
-    c_forauto (csset_int, set) // raii
+    c_forauto (cvec_int, vec)   // declare and init vec, call del at scope exit
+    c_forauto (csset_int, set)  // declare and init set, call del at scope exit
     {
         cvec_int_push_back(&vec, csptr_int_make(2021));
         cvec_int_push_back(&vec, csptr_int_make(2012));
@@ -31,7 +31,7 @@ int main()
         // add odd numbers from vec to set
         c_foreach (i, cvec_int, vec)
             if (*i.ref->get & 1)
-                csset_int_emplace(&set, *i.ref); // copy shared pointer => increments ref.
+                csset_int_emplace(&set, *i.ref); // copy shared pointer => increments counter.
 
         // erase the two last elements in vec
         cvec_int_pop_back(&vec);

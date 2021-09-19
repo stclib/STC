@@ -3,6 +3,13 @@
 STC - Standard Template Containers for C
 ========================================
 
+News
+----
+**VERSION 2.X RELEASED**: This main version uses a different way to instantiate templated containers,
+and is not compatible with v1.X, however the usage is otherwise compatible with v1.X. The new style
+has multiple advantages, e.g. implementation does no longer contain long macro definitions to generate
+code. Also, specfiying template arguments is more user friendly and flexible.
+
 Introduction
 ------------
 A modern, templated, user-friendly, fast, fully type-safe, and customizable container library for C99,
@@ -12,7 +19,7 @@ For an introduction to templated containers, please read the blog by Ian Fisher 
 
 STC is a compact, header-only library with the all the major "standard" data containers, except for the
 multimap/set variants. However, there is an example how to create a multimap in the examples folder.
-- [***carrN*** - **2D and 3D dynamic array** type](docs/carray_api.md)
+- [***carr2, carr3*** - **2d** and **3d** dynamic **array** type](docs/carray_api.md)
 - [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
 - [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)
 - [***clist*** - **std::forward_list** alike type](docs/clist_api.md)
@@ -29,7 +36,7 @@ multimap/set variants. However, there is an example how to create a multimap in 
 - [***cvec*** - **std::vector** alike type](docs/cvec_api.md)
 
 Others:
-- [***crandom*** - A novel extremely fast *PRNG* named **stc64**](docs/crandom_api.md)
+- [***crandom*** - A novel very fast *PRNG* named **stc64**](docs/crandom_api.md)
 - [***ccommon*** - Some handy macros and general definitions](docs/ccommon_api.md)
 
 Highlights
@@ -192,33 +199,33 @@ in your build environment and place all the instantiations of containers used in
 #define i_tag ii
 #define i_key int
 #define i_val int
-#include <stc/cmap.h>  // cmap int => int
+#include <stc/cmap.h>  // cmap_ii: int => int
 
 #define i_tag ix
 #define i_key int64_t
-#include <stc/cset.h>  // cset int64_t
+#include <stc/cset.h>  // cset_ix
 
 #define i_val int
-#include <stc/cvec.h>  // cvec int
+#include <stc/cvec.h>  // cvec_int
 
 #define i_tag pnt
 #define i_val Point
-#include <stc/clist.h> // clist Point
+#include <stc/clist.h> // clist_pnt
 ```
 
 The *emplace* versus non-emplace container methods
 --------------------------------------------------
 STC, like c++ STL, has two sets of methods for adding elements to containers. One set begins
 with **emplace**, e.g. **cvec_X_emplace_back()**. This is a convenient alternative to
-**cvec_X_push_back()** when dealing non-trivial container elements, e.g. smart pointers or
-elements using dynamic memory.
+**cvec_X_push_back()** when dealing non-trivial container elements, e.g. strings, shared pointers or
+other elements using dynamic memory or shared resources.
 
-The **emplace** methods ***construct*** or ***clone*** their own copy of the element to be added.
-In contrast, the non-emplace methods requires elements to be explicitly constructed or cloned
-before adding them. For containers of integral or trivial element types, **emplace** and
-corresponding non-emplace methods are identical, so the following does not apply for those.
+The **emplace** methods ***constructs*** or ***clones*** the given elements before they are added
+to the container. In contrast, the *non-emplace* methods ***moves*** the given elements into the
+container. For containers of integral or trivial element types, **emplace** and corresponding
+*non-emplace* methods are identical.
 
-| Move and insert element   | Construct element in-place   | Container                                   |
+| non-emplace: Move         | emplace: Clone               | Container                                   |
 |:--------------------------|:-----------------------------|:--------------------------------------------|
 | insert()                  | emplace()                    | cmap, cset, csmap, csset, cvec, cdeq, clist |
 | insert_or_assign(), put() | emplace_or_assign()          | cmap, csmap                                 |
@@ -230,7 +237,7 @@ Strings are the most commonly used non-trivial data type. STC containers have pr
 definitions for cstr container elements, so they are fail-safe to use both with the **emplace**
 and non-emplace methods:
 ```c
-#define i_val_str
+#define i_val_str       // special macro to enable container of cstr
 #include <stc/cvec.h>   // vector of string (cstr)
 ...
 c_forvar (cvec_str vec = cvec_str_init(), cvec_str_del(&vec))   // defer vector destructor to end of block
