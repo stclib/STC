@@ -27,7 +27,6 @@ static void test_repeats(void)
             if (v > 1) printf("repeated value %zu (%d) at 2^%d\n", k, v, (int) log2(i));
         }
     }
-    cmap_ic_del(&m);
 }
 
 #define i_tag x
@@ -41,7 +40,7 @@ void test_distribution(void)
     printf("distribution test: 2^%d values\n", BITS);
     stc64_t rng = stc64_init(seed);
     const size_t N = 1ull << BITS ;
-    
+
     c_forauto (cmap_x, map) {
         c_forrange (N) {
             uint64_t k = stc64_rand(&rng);
