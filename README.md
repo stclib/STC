@@ -69,20 +69,19 @@ The usage of the containers is similar to the c++ standard containers in STL, so
 All containers are generic/templated, except for **cstr** and **cbits**. No casting is used, so containers are type-safe like
 templates in c++. A basic usage example:
 ```c
-#define i_tag f32
 #define i_val float
 #include <stc/cvec.h>
 
 int main(void) {
-    cvec_f32 vec = cvec_f32_init();
-    cvec_f32_push_back(&vec, 10.f);
-    cvec_f32_push_back(&vec, 20.f);
-    cvec_f32_push_back(&vec, 30.f);
+    cvec_float vec = cvec_float_init();
+    cvec_float_push_back(&vec, 10.f);
+    cvec_float_push_back(&vec, 20.f);
+    cvec_float_push_back(&vec, 30.f);
 
-    c_foreach (i, cvec_f32, vec)
+    c_foreach (i, cvec_float, vec)
         printf(" %g", *i.ref);
 
-    cvec_f32_del(&vec);
+    cvec_float_del(&vec);
 }
 ```
 With six different containers:
@@ -98,25 +97,25 @@ int Point_compare(const struct Point* a, const struct Point* b) {
 }
 
 #define i_key int
-#include <stc/cset.h>  // unordered set
+#include <stc/cset.h>  // cset_int: unordered set
 
 #define i_tag pnt
 #define i_val struct Point
 #define i_cmp Point_compare
-#include <stc/cvec.h>  // vector, struct as elements
+#include <stc/cvec.h>  // cvec_pnt: vector of struct Point
 
 #define i_val int
-#include <stc/cdeq.h>  // deque of int
+#include <stc/cdeq.h>  // cdeq_int: deque of int
 
 #define i_val int
-#include <stc/clist.h> // singly linked list
+#include <stc/clist.h> // clist_int: singly linked list
 
 #define i_val int
 #include <stc/cstack.h>
 
 #define i_key int
 #define i_val int
-#include <stc/csmap.h> // sorted map
+#include <stc/csmap.h> // csmap_int: sorted map int => int
 
 int main(void) {
     // define six containers with automatic call of init and del (destruction after scope exit)
@@ -288,12 +287,46 @@ Erase methods
 | erase_n()                 | index based                  | cvec, cdeq, cstr                            |
 | remove()                  | remove all matching values   | clist                                       |
 
+Forward declaring containers
+----------------------------
+It is possible to forward declare containers. This is useful when a container is part of a struct, 
+but still not expose or include the full implementation / API of the container.
+```
+// Header file
+#include <stc/forward.h> // only include data structures
+forward_cstack(pnt, struct Point); // declare cstack_pnt and cstack_pnt_value_t, cstack_pnt_iter_t;
+                                   // the element may be forward declared type as well
+typedef struct Dataset {
+    cstack_pnt vertices;
+    cstack_pnt colors;
+} Dataset;
+
+...
+// Implementation
+#define F_tag pnt  // define F_tag or an empty i_fwd if the container was forward declared.
+#define i_val struct Point
+#include <stc/cstack.h>
+```
+
+User-defined container prefix
+-----------------------------
+Define either i_prefix or i_tag as empty:
+```
+#define i_prefix
+#define i_tag ivec
+#define i_val int
+#include <stc/cvec.h>
+
+ivec vec = ivec_init();
+ivec_push_back(&vec, 1);
+```
+
 Memory efficiency
 -----------------
-- **cstr**, **cvec**: Type size: one pointer. The size and capacity is stored as part of the heap allocation that also holds the vector elements.
-- **clist**: Type size: one pointer. Each node allocates block storing value and next pointer.
-- **cdeq**:  Type size: two pointers. Otherwise like *cvec*.
-- **cmap**: Type size: 4 pointers. *cmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
-- **csmap**: Type size: 1 pointer. *csmap* manages its own array of tree-nodes for allocation efficiency. Each node uses two 32-bit words by default for left/right child, and one byte for `level`. *csmap* can be configured to allow more than 2^32 elements, ie. 2^64, but it will double the overhead per node.
-- **carr2**, **carr3**: Type size: One pointer plus one, two, or three size_t variables to store dimensions. Arrays are allocated as one contiguous block of heap memory.
-- **csptr**: a shared-pointer uses two pointers, one for the data and one for the reference counter.
+- **cstr**, **cvec**: Type size: 1 pointer. The size and capacity is stored as part of the heap allocation that also holds the vector elements.
+- **clist**: Type size: 1 pointer. Each node allocates a struct which stores the value and next pointer.
+- **cdeq**:  Type size: 2 pointers. Otherwise like *cvec*.
+- **cmap**: Type size: 4 pointers. *cmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.6x when reaching that.
+- **csmap**: Type size: 1 pointer. *csmap* manages its own array of tree-nodes for allocation efficiency. Each node uses only two 32-bit ints for child nodes, and one byte for `level`.
+- **carr2**, **carr3**: Type size: 1 pointer plus dimension variables. Arrays are allocated as one contiguous block of heap memory, and one allocation for pointers of indices to the array.
+- **csptr**: Type size: 2 pointers, one for the data and one for the reference counter.
