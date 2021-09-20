@@ -46,6 +46,7 @@ int main() {
 typedef struct stc64 { uint64_t state[5]; } stc64_t;
 typedef struct stc32 { uint32_t state[5]; } stc32_t;
 typedef struct stc64_uniform { int64_t lower; uint64_t range, threshold; } stc64_uniform_t;
+typedef struct stc32_uniform { int32_t lower; uint32_t range, threshold; } stc32_uniform_t;
 typedef struct stc64_uniformf { double lower, range; } stc64_uniformf_t;
 typedef struct stc64_normalf { double mean, stddev, next; unsigned has_next; } stc64_normalf_t;
 
@@ -68,8 +69,9 @@ STC_API uint64_t        stc64_random(void);
 STC_API stc64_t         stc64_with_seq(uint64_t seed, uint64_t seq);
 STC_API stc32_t         stc32_with_seq(uint32_t seed, uint32_t seq);
 
-/* Int64 uniform distributed RNG, range [low, high]. */
+/* Int uniform distributed RNG, range [low, high]. */
 STC_API stc64_uniform_t stc64_uniform_init(int64_t low, int64_t high);
+STC_API stc32_uniform_t stc32_uniform_init(int32_t low, int32_t high);
 
 /* Float64 uniform distributed RNG, range [low, high). */
 STC_API stc64_uniformf_t stc64_uniformf_init(double low, double high);
@@ -116,14 +118,18 @@ STC_INLINE double stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist) {
 }
 
 /* Unbiased bounded uniform distribution. */
+#ifdef c_umul128
 STC_INLINE int64_t stc64_uniform(stc64_t* rng, stc64_uniform_t* d) {
     uint64_t lo, hi;
-#ifdef c_umul128
     do { c_umul128(stc64_rand(rng), d->range, &lo, &hi); } while (lo < d->threshold);
-#else
-    hi = stc64_rand(rng) % d->range;
-#endif
     return d->lower + hi;
+}
+#endif
+
+STC_INLINE int32_t stc32_uniform(stc32_t* rng, stc32_uniform_t* d) {
+    uint64_t val;
+    do { val = stc32_rand(rng) * (uint64_t)d->range; } while ((uint32_t)val < d->threshold);
+    return d->lower + (val >> 32);
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
@@ -159,11 +165,17 @@ STC_DEF stc32_t stc32_with_seq(uint32_t seed, uint32_t seq) {
     for (int i = 0; i < 6; ++i) stc32_rand(&rng);
     return rng;
 }
-
-/* Init unbiased uniform uint64 RNG with bounds [low, high] */
+#ifdef c_umul128
+/* Init unbiased uniform uint RNG with bounds [low, high] */
 STC_DEF stc64_uniform_t stc64_uniform_init(int64_t low, int64_t high) {
     stc64_uniform_t dist = {low, (uint64_t) (high - low + 1)};
     dist.threshold = (uint64_t)(-dist.range) % dist.range;
+    return dist;
+}
+#endif
+STC_DEF stc32_uniform_t stc32_uniform_init(int32_t low, int32_t high) {
+    stc32_uniform_t dist = {low, (uint32_t) (high - low + 1)};
+    dist.threshold = (uint32_t)(-dist.range) % dist.range;
     return dist;
 }
 
