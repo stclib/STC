@@ -175,7 +175,7 @@ Splice `[30, 40]` from *L2* into *L1* before `3`:
 #include <stdio.h>
 
 int main() {
-    c_forauto (clist_i, L1, L2)
+    c_auto (clist_i, L1, L2)
     {
         c_emplace(clist_i, L1, {1, 2, 3, 4, 5});
         c_emplace(clist_i, L2, {10, 20, 30, 40, 50});

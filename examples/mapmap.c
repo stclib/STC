@@ -16,7 +16,7 @@
 
 int main(void)
 {
-    c_forauto (cmap_cfg, cfg)
+    c_auto (cmap_cfg, cfg)
     {
         cmap_cfg_insert(&cfg, cstr_from("user"), cmap_str_init());
         cmap_cfg_insert(&cfg, cstr_from("group"), cmap_str_init());

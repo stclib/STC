@@ -13,7 +13,7 @@ int main ()
     // Ustring positions:                        0123456789*123456789*12345
     cstr s = cstr_from(base);              // "this is a test string."
     cstr m = cstr_clone(s);
-    c_fordefer (cstr_del(&s), cstr_del(&m)) {
+    c_autoscope (0, cstr_del(&s), cstr_del(&m)) {
         cstr_append(&m, m.str);
         cstr_append(&m, m.str);
         printf("%s\n", m.str);

@@ -11,7 +11,7 @@ int main() {
     stc64_t rng = stc64_init(1234);
     dist = stc64_uniform_init(0, n);
 
-    c_forauto (cqueue_i, queue)
+    c_auto (cqueue_i, queue)
     {
         // Push ten million random numbers onto the queue.
         c_forrange (n)

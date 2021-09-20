@@ -28,12 +28,12 @@ void Person_del(Person* p) {
 #include <stc/csset.h>
 
 int main(void) {
-    c_forvar (csptr_person p = csptr_person_make(Person_init("John", "Smiths")), csptr_person_del(&p))
-    c_forvar (csptr_person q = csptr_person_clone(p), csptr_person_del(&q)) // share the pointer
+    c_autovar (csptr_person p = csptr_person_make(Person_init("John", "Smiths")), csptr_person_del(&p))
+    c_autovar (csptr_person q = csptr_person_clone(p), csptr_person_del(&q)) // share the pointer
     {
         printf("%s %s. uses: %zu\n", q.get->name.str, q.get->last.str, *q.use_count);
 
-        c_forauto (csset_iptr, map) {
+        c_auto (csset_iptr, map) {
             csset_iptr_insert(&map, csptr_int_make(2021));
             csset_iptr_insert(&map, csptr_int_make(2033));
 

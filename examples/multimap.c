@@ -59,7 +59,7 @@ void OlympicLocation_del(OlympicLocation* self) {
 int main()
 {
     // Define the multimap with destructor defered to when block is completed.
-    c_forauto (csmap_OL, multimap)
+    c_auto (csmap_OL, multimap)
     {
         const clist_OL empty = clist_OL_init();
 

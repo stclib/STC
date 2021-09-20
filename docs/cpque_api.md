@@ -68,7 +68,7 @@ int main()
     stc64_uniform_t dist = stc64_uniform_init(0, N * 10);
 
     // Declare heap, with defered del()
-    c_forauto (cpque_i, heap)
+    c_auto (cpque_i, heap)
     {
         // Push ten million random numbers to priority queue, plus some negative ones.
         c_forrange (N)

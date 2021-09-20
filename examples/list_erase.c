@@ -7,7 +7,7 @@
 
 int main ()
 {
-    c_forvar (clist_i L = clist_i_init(), clist_i_del(&L))
+    c_autovar (clist_i L = clist_i_init(), clist_i_del(&L))
     {
         c_emplace(clist_i, L, {10, 20, 30, 40, 50});
                                                     // 10 20 30 40 50

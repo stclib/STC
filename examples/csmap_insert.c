@@ -34,7 +34,7 @@ void print_istr(csmap_istr map) {
 int main()
 {
     // insert single values
-    c_forauto (csmap_ii, m1) {
+    c_auto (csmap_ii, m1) {
         csmap_ii_insert(&m1, 1, 10);
         csmap_ii_insert(&m1, 2, 20);
 
@@ -61,8 +61,8 @@ int main()
     }
 
     // The templatized version inserting a jumbled range
-    c_forauto (csmap_ii, m2)
-    c_forauto (cvec_ii, v) {
+    c_auto (csmap_ii, m2)
+    c_auto (cvec_ii, v) {
         typedef cvec_ii_value_t ipair;
         cvec_ii_push_back(&v, (ipair){43, 294});
         cvec_ii_push_back(&v, (ipair){41, 262});
@@ -82,7 +82,7 @@ int main()
     }
 
     // The templatized versions move-constructing elements
-    c_forauto (csmap_istr, m3) {
+    c_auto (csmap_istr, m3) {
         csmap_istr_value_t ip1 = {475, cstr_lit("blue")}, ip2 = {510, cstr_lit("green")};
 
         // single element
@@ -97,7 +97,7 @@ int main()
         puts("");
     }
 
-    c_forauto (csmap_ii, m4) {
+    c_auto (csmap_ii, m4) {
         // Insert the elements from an initializer_list
         c_emplace(csmap_ii, m4, { { 4, 44 }, { 2, 22 }, { 3, 33 }, { 1, 11 }, { 5, 55 } });
         puts("After initializer_list insertion, m4 contains:");

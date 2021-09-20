@@ -10,7 +10,7 @@ int main() {
     int k;
     const int n = 2000000;
 
-    c_forauto (clist_fx, list) 
+    c_auto (clist_fx, list) 
     {
         stc64_t rng = stc64_init(1234);
         stc64_uniformf_t dist = stc64_uniformf_init(100.0f, n);

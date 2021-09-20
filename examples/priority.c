@@ -12,7 +12,7 @@ int main() {
     size_t N = 10000000;
     stc64_t rng = stc64_init(time(NULL));
     stc64_uniform_t dist = stc64_uniform_init(0, N * 10);
-    c_forauto (cpque_i, heap)
+    c_auto (cpque_i, heap)
     {
         // Push ten million random numbers to priority queue
         printf("Push %zu numbers\n", N);

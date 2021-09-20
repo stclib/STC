@@ -7,8 +7,8 @@
 cvec_str read_file(const char* name)
 {
     cvec_str vec = cvec_str_init();
-    c_forvar (FILE* f = fopen(name, "r"), fclose(f))
-        c_forauto (cstr, line)
+    c_autovar (FILE* f = fopen(name, "r"), fclose(f))
+        c_auto (cstr, line)
             while (cstr_getline(&line, f))
                 cvec_str_emplace_back(&vec, line.str);
     return vec;
@@ -17,7 +17,7 @@ cvec_str read_file(const char* name)
 int main()
 {
     int n = 0;
-    c_forvar (cvec_str vec = read_file(__FILE__), cvec_str_del(&vec))
+    c_autovar (cvec_str vec = read_file(__FILE__), cvec_str_del(&vec))
         c_foreach (i, cvec_str, vec)
             printf("%5d: %s\n", ++n, i.ref->str);
 

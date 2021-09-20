@@ -206,7 +206,7 @@ typedef struct { int x, y, z; } Vec3i;
 int main()
 {
     // Define map with defered destruct
-    c_forvar (cmap_vi vecs = cmap_vi_init(), cmap_vi_del(&vecs))
+    c_autovar (cmap_vi vecs = cmap_vi_init(), cmap_vi_del(&vecs))
     {
         cmap_vi_insert(&vecs, (Vec3i){100,   0,   0}, 1);
         cmap_vi_insert(&vecs, (Vec3i){  0, 100,   0}, 2);
@@ -239,7 +239,7 @@ typedef struct { int x, y, z; } Vec3i;
 
 int main()
 {
-    c_forvar (cmap_iv vecs = cmap_iv_init(), cmap_iv_del(&vecs))
+    c_autovar (cmap_iv vecs = cmap_iv_init(), cmap_iv_del(&vecs))
     {
         cmap_iv_insert(&vecs, 1, (Vec3i){100,   0,   0});
         cmap_iv_insert(&vecs, 2, (Vec3i){  0, 100,   0});
@@ -367,7 +367,7 @@ static RViking Viking_toR(const Viking* v)
 
 int main()
 {
-    c_forauto (cmap_vk, vikings) // RAII
+    c_auto (cmap_vk, vikings) // RAII
     {
         // Insert works as before, takes a constructed Viking object
         cmap_vk_insert(&vikings, (Viking){cstr_from("Einar"), cstr_from("Norway")}, 25);

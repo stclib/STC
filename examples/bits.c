@@ -3,7 +3,7 @@
 
 int main() 
 {
-    c_forvar (cbits set = cbits_with_size(23, true), cbits_del(&set)) {
+    c_autovar (cbits set = cbits_with_size(23, true), cbits_del(&set)) {
         printf("count %zu, %zu\n", cbits_count(set), set.size);
         cbits s1 = cbits_from_str("1110100110111");
         char buf[256];
@@ -13,7 +13,7 @@ int main()
 
         cbits_reset(&set, 9);
         cbits_resize(&set, 43, false);
-        c_forbuffer (str, char, set.size + 1)
+        c_autobuf (str, char, set.size + 1)
             printf(" str: %s\n", cbits_to_str(set, str, 0, -1));
 
         printf("%4zu: ", set.size);
@@ -36,7 +36,7 @@ int main()
             printf("%d", cbits_test(set, i));
         puts("");
 
-        c_forvar (cbits s2 = cbits_clone(set), cbits_del(&s2)) {
+        c_autovar (cbits s2 = cbits_clone(set), cbits_del(&s2)) {
             cbits_flip_all(&s2);
             cbits_set(&s2, 16);
             cbits_set(&s2, 17);

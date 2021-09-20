@@ -36,9 +36,9 @@ int main()
 {
     const int data[] = {1,8,5,6,3,4,0,9,7,2};
 
-    c_forauto (cpque_imax, q)  // init() and defered del()
-    c_forauto (cpque_imin, q2)
-    c_forauto (cpque_imix, q3)
+    c_auto (cpque_imax, q)  // init() and defered del()
+    c_auto (cpque_imin, q2)
+    c_auto (cpque_imix, q3)
     {
         c_forrange (n, c_arraylen(data))
             cpque_imax_push(&q, n);

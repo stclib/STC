@@ -43,8 +43,8 @@ void findit(csmap_istr c, csmap_istr_key_t val)
 
 int main()
 {
-    c_forauto (csmap_istr, m1)
-    c_forauto (cvec_istr, v)
+    c_auto (csmap_istr, m1)
+    c_auto (cvec_istr, v)
     {
         c_emplace(csmap_istr, m1, { { 40, "Zr" }, { 45, "Rh" } });
         puts("The starting map m1 is (key, value):");

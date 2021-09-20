@@ -83,8 +83,8 @@ void int_del(int* x) {
 
 int main()
 {
-    c_forauto (cvec_int, vec)   // declare and init vec, call del at scope exit
-    c_forauto (csset_int, set)  // declare and init set, call del at scope exit
+    c_auto (cvec_int, vec)   // declare and init vec, call del at scope exit
+    c_auto (csset_int, set)  // declare and init set, call del at scope exit
     {
         cvec_int_push_back(&vec, csptr_int_make(2021));
         cvec_int_push_back(&vec, csptr_int_make(2012));
@@ -110,7 +110,7 @@ int main()
         printf("\nset:");
         c_foreach (i, csset_int, set) printf(" %d", *i.ref->get);
 
-        c_forvar (csptr_int p = csptr_int_clone(vec.data[0]), csptr_int_del(&p)) {
+        c_autovar (csptr_int p = csptr_int_clone(vec.data[0]), csptr_int_del(&p)) {
             printf("\n%d is now owned by %zu objects\n", *p.get, *p.use_count);
         }
 

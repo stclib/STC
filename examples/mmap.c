@@ -30,7 +30,7 @@ void insert(csmap_mult* mmap, int key, const char* str)
 
 int main()
 {
-    c_forauto (csmap_mult, mmap)
+    c_auto (csmap_mult, mmap)
     {
         // list-initialize
         struct {int i; const char* s;} vals[] = {{2, "foo"}, {2, "bar"}, {3, "baz"}, {1, "abc"}, {5, "def"}};

@@ -34,8 +34,8 @@ int main()
     stc64_normalf_t dist = stc64_normalf_init(Mean, StdDev);
 
     // Create and init histogram vec and map with defered destructors:
-    c_forauto (cvec_pair, histvec)
-    c_forauto (cmap_ii, histmap)
+    c_auto (cvec_pair, histvec)
+    c_auto (cmap_ii, histmap)
     {
         c_forrange (N) {
             int index = (int) round( stc64_normalf(&rng, &dist) );
@@ -49,7 +49,7 @@ int main()
         cvec_pair_sort(&histvec);
 
         // Print the gaussian bar chart
-        c_forauto (cstr, bar)
+        c_auto (cstr, bar)
         c_foreach (i, cvec_pair, histvec) {
             size_t n = (size_t) (i.ref->second * StdDev * Scale * 2.5 / (float)N);
             if (n > 0) {

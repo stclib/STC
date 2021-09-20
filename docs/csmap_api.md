@@ -143,7 +143,7 @@ int main()
         {100, "Red"},
         {110, "Blue"},
     });
-    c_fordefer (csmap_id_del(&idnames)) 
+    c_autoscope (0, csmap_id_del(&idnames)) 
     {
         // put replaces existing mapped value:
         csmap_id_emplace_or_assign(&idnames, 110, "White");
@@ -185,7 +185,7 @@ static int Vec3i_compare(const Vec3i* a, const Vec3i* b) {
 
 int main()
 {
-    c_forvar (csmap_vi vecs = csmap_vi_init(), csmap_vi_del(&vecs))
+    c_autovar (csmap_vi vecs = csmap_vi_init(), csmap_vi_del(&vecs))
     {
       csmap_vi_insert(&vecs, (Vec3i){100,   0,   0}, 1);
       csmap_vi_insert(&vecs, (Vec3i){  0, 100,   0}, 2);
@@ -218,7 +218,7 @@ typedef struct { int x, y, z; } Vec3i;
 
 int main()
 {
-    c_forvar (csmap_iv vecs = csmap_iv_init(), csmap_iv_del(&vecs))
+    c_autovar (csmap_iv vecs = csmap_iv_init(), csmap_iv_del(&vecs))
     {
         csmap_iv_insert(&vecs, 1, (Vec3i){100,   0,   0});
         csmap_iv_insert(&vecs, 2, (Vec3i){  0, 100,   0});

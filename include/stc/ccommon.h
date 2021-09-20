@@ -136,22 +136,22 @@ STC_API uint64_t c_default_hash(const void *key, size_t len);
     for (type i=start, _c_inc=step, _c_end=(stop) - (0 < _c_inc) \
          ; (i <= _c_end) == (0 < _c_inc); i += _c_inc)
 
-#define c_forvar(declvar, ...) for (declvar, *_c_ii = NULL; !_c_ii; ++_c_ii, __VA_ARGS__)
-#define c_forscope(start, end) for (int _c_ii = (start, 0); !_c_ii; ++_c_ii, end)
-#define c_fordefer(...) for (int _c_ii = 0; !_c_ii; ++_c_ii, __VA_ARGS__)
+#define c_autoscope(init, ...) for (int _c_ii = (init, 0); !_c_ii; ++_c_ii, __VA_ARGS__)
+#define c_autovar(declvar, ...) for (declvar, *_c_ii = NULL; !_c_ii; ++_c_ii, __VA_ARGS__)
+#define c_exitauto continue
 
-#define c_forauto(...) c_MACRO_OVERLOAD(c_forauto, __VA_ARGS__)
-#define c_forauto_2(CX, a) \
-    c_forvar(CX a = CX##_init(), CX##_del(&a))
-#define c_forauto_3(CX, a, b) \
-    c_forvar(c_EXPAND(CX a = CX##_init(), b = CX##_init()), \
-             CX##_del(&b), CX##_del(&a))
-#define c_forauto_4(CX, a, b, c) \
-    c_forvar(c_EXPAND(CX a = CX##_init(), b = CX##_init(), c = CX##_init()), \
-             CX##_del(&c), CX##_del(&b), CX##_del(&a))
+#define c_auto(...) c_MACRO_OVERLOAD(c_auto, __VA_ARGS__)
+#define c_auto_2(CX, a) \
+    c_autovar(CX a = CX##_init(), CX##_del(&a))
+#define c_auto_3(CX, a, b) \
+    c_autovar(c_EXPAND(CX a = CX##_init(), b = CX##_init()), \
+              CX##_del(&b), CX##_del(&a))
+#define c_auto_4(CX, a, b, c) \
+    c_autovar(c_EXPAND(CX a = CX##_init(), b = CX##_init(), c = CX##_init()), \
+              CX##_del(&c), CX##_del(&b), CX##_del(&a))
 
-#define c_forbuffer(b, type, n) c_forbuffer_N(b, type, n, 256)
-#define c_forbuffer_N(b, type, n, BYTES) \
+#define c_autobuf(b, type, n) c_autobuf_N(b, type, n, 256)
+#define c_autobuf_N(b, type, n, BYTES) \
     for (type _c_b[((BYTES) - 1) / sizeof(type) + 1], \
          *b = (n)*sizeof *b > (BYTES) ? c_new_n(type, n) : _c_b \
          ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)

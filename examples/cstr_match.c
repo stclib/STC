@@ -3,7 +3,7 @@
 
 int main()
 {
-    c_forvar (cstr ss = cstr_lit("The quick brown fox jumps over the lazy dog.JPG"), cstr_del(&ss)) {
+    c_autovar (cstr ss = cstr_lit("The quick brown fox jumps over the lazy dog.JPG"), cstr_del(&ss)) {
         size_t pos = cstr_find_n(ss, "brown", 0, 5);
         printf("%zu [%s]\n", pos, pos == cstr_npos ? "<NULL>" : &ss.str[pos]);
         printf("equals: %d\n", cstr_equalto(ss, "The quick brown fox jumps over the lazy dog.JPG"));

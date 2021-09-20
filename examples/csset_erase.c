@@ -5,7 +5,7 @@
 
 int main()
 {
-    c_forauto (csset_int, set)
+    c_auto (csset_int, set)
     {
         c_emplace(csset_int, set, {30, 20, 80, 40, 60, 90, 10, 70, 50});
         c_foreach (k, csset_int, set)

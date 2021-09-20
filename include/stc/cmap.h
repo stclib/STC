@@ -31,7 +31,7 @@
 #include <stc/cmap.h>
 
 int main(void) {
-    c_forvar (cmap_ichar m = cmap_ichar_init(), cmap_ichar_del(&m))
+    c_autovar (cmap_ichar m = cmap_ichar_init(), cmap_ichar_del(&m))
     {
         cmap_ichar_emplace(&m, 5, 'a');
         cmap_ichar_emplace(&m, 8, 'b');

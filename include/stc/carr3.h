@@ -34,7 +34,7 @@
 
 int main() {
     int w = 7, h = 5, d = 3;
-    c_forvar (carr3_int image = carr3_int_init(w, h, d), carr3_int_del(&image))
+    c_autovar (carr3_int image = carr3_int_init(w, h, d), carr3_int_del(&image))
     {
         int *dat = carr3_int_data(&image);
         for (int i = 0; i < carr3_int_size(image); ++i)

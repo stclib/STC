@@ -3,7 +3,7 @@
 void stringdemo1()
 {
     printf("\nSTRINGDEMO1\n");
-    c_forvar (cstr cs = cstr_from("one-nine-three-seven-five"), cstr_del(&cs))
+    c_autovar (cstr cs = cstr_from("one-nine-three-seven-five"), cstr_del(&cs))
     {
         printf("%s.\n", cs.str);
 
@@ -35,7 +35,7 @@ void stringdemo1()
 void vectordemo1()
 {
     printf("\nVECTORDEMO1\n");
-    c_forvar (cvec_ix bignums = cvec_ix_with_capacity(100), cvec_ix_del(&bignums))
+    c_autovar (cvec_ix bignums = cvec_ix_with_capacity(100), cvec_ix_del(&bignums))
     {
         cvec_ix_reserve(&bignums, 100);
         for (size_t i = 10; i <= 100; i += 10)
@@ -59,7 +59,7 @@ void vectordemo1()
 void vectordemo2()
 {
     printf("\nVECTORDEMO2\n");
-    c_forvar (cvec_str names = cvec_str_init(), cvec_str_del(&names)) {
+    c_autovar (cvec_str names = cvec_str_init(), cvec_str_del(&names)) {
         cvec_str_emplace_back(&names, "Mary");
         cvec_str_emplace_back(&names, "Joe");
         cvec_str_emplace_back(&names, "Chris");
@@ -79,8 +79,8 @@ void vectordemo2()
 void listdemo1()
 {
     printf("\nLISTDEMO1\n");
-    c_forvar (clist_ix nums = clist_ix_init(), clist_ix_del(&nums))
-    c_forvar (clist_ix nums2 = clist_ix_init(), clist_ix_del(&nums2))
+    c_autovar (clist_ix nums = clist_ix_init(), clist_ix_del(&nums))
+    c_autovar (clist_ix nums2 = clist_ix_init(), clist_ix_del(&nums2))
     {
         for (int i = 0; i < 10; ++i)
             clist_ix_push_back(&nums, i);
@@ -145,7 +145,7 @@ void mapdemo1()
 void mapdemo2()
 {
     printf("\nMAPDEMO2\n");
-    c_forvar (cmap_si nums = cmap_si_init(), cmap_si_del(&nums))
+    c_autovar (cmap_si nums = cmap_si_init(), cmap_si_del(&nums))
     {
         cmap_si_emplace_or_assign(&nums, "Hello", 64);
         cmap_si_emplace_or_assign(&nums, "Groovy", 121);
@@ -193,7 +193,7 @@ void mapdemo3()
 void arraydemo1()
 {
     printf("\nARRAYDEMO1\n");
-    c_forvar (carr3_f arr3 = carr3_f_with_values(30, 20, 10, 0.0f), 
+    c_autovar (carr3_f arr3 = carr3_f_with_values(30, 20, 10, 0.0f), 
                              carr3_f_del(&arr3))
     {
         arr3.data[5][4][3] = 10.2f;

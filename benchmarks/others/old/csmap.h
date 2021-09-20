@@ -30,7 +30,7 @@
 using_csmap(mx, int, char); // Sorted map<int, char>
 
 int main(void) {
-    c_forvar (csmap_mx m = csmap_mx_init(), csmap_mx_del(&m))
+    c_autovar (csmap_mx m = csmap_mx_init(), csmap_mx_del(&m))
     {
         csmap_mx_insert(&m, 5, 'a');
         csmap_mx_insert(&m, 8, 'b');

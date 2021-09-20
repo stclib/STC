@@ -39,10 +39,10 @@ int point_compare(const Point* a, const Point* b) {
 
 int main()
 {
-    c_forauto (csmap_int, map)
+    c_auto (csmap_int, map)
         csmap_int_insert(&map, 123, 321);
 
-    c_forauto (csmap_pnt, pmap) {
+    c_auto (csmap_pnt, pmap) {
         csmap_pnt_insert(&pmap, (Point){42, 14}, 1);
         csmap_pnt_insert(&pmap, (Point){32, 94}, 2);
         csmap_pnt_insert(&pmap, (Point){62, 81}, 3);
@@ -51,7 +51,7 @@ int main()
         puts("");
     }
 
-    c_forauto (csmap_str, smap) {
+    c_auto (csmap_str, smap) {
         csmap_str_emplace(&smap, "Hello, friend", "this is the mapped value");
         csmap_str_emplace(&smap, "The brown fox", "jumped");
         csmap_str_emplace(&smap, "This is the time", "for all good things");
@@ -59,7 +59,7 @@ int main()
             printf(" (%s: %s)\n", i.ref->first.str, i.ref->second.str);
     }
 
-    c_forauto (csset_str, sset) {
+    c_auto (csset_str, sset) {
         csset_str_emplace(&sset, "Hello, friend");
         csset_str_emplace(&sset, "Goodbye, foe");
         printf("Found? %s\n", csset_str_contains(&sset, "Hello, friend") ? "true" : "false");

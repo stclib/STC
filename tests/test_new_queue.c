@@ -23,7 +23,7 @@ int main() {
     stc64_t rng = stc64_init(time(NULL));
     stc64_uniform_t dist = stc64_uniform_init(0, n);
 
-    c_forauto (cqueue_int, Q)
+    c_auto (cqueue_int, Q)
     {
         // Push eight million random numbers onto the queue.
         for (int i=0; i<n; ++i)

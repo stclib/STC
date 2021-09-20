@@ -32,7 +32,7 @@
 #include <stc/csmap.h>
 
 int main(void) {
-    c_forvar (csmap_sx m = csmap_sx_init(), csmap_sx_del(&m))
+    c_autovar (csmap_sx m = csmap_sx_init(), csmap_sx_del(&m))
     {
         csmap_sx_emplace(&m, "Testing one", 1.234);
         csmap_sx_emplace(&m, "Testing two", 12.34);

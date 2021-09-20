@@ -35,7 +35,7 @@
     #include <stc/clist.h>
 
     int main() {
-        c_forvar (clist_ix list = clist_ix_init(), clist_ix_del(&list))
+        c_autovar (clist_ix list = clist_ix_init(), clist_ix_del(&list))
         {
             stc64_t rng = stc64_init(12345);
             int n;

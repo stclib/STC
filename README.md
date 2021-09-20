@@ -5,10 +5,11 @@ STC - Standard Template Containers for C
 
 News
 ----
-**VERSION 2.X RELEASED**: This main version uses a different way to instantiate templated containers,
-and is not compatible with v1.X, however the usage is otherwise compatible with v1.X. The new style
-has multiple advantages, e.g. implementation does no longer contain long macro definitions to generate
-code. Also, specfiying template arguments is more user friendly and flexible.
+**VERSION 2.X RELEASED**: There are two main breaking changes from V1.X.
+- STC V2.X uses a different way to instantiate templated containers which is not compatible with v1.X.
+- c_forauto, c_forvar, c_forscope are now renamed to **c_auto**, **c_autovar**, and **c_autoscope**. There is also a **c_exitauto** macro, which breaks out of an auto-block. The auto name refers to the original meaning of auto keyword in C, namely automatic stack allocated variable, however now it covers automatic resource (de)allocation in general. 
+
+The new teplate instantiation style has multiple advantages, e.g. implementation does not contain long macro definitions for code generation. Also, specfiying template arguments is more user friendly and flexible.
 
 Introduction
 ------------
@@ -120,12 +121,12 @@ int Point_compare(const struct Point* a, const struct Point* b) {
 
 int main(void) {
     // define six containers with automatic call of init and del (destruction after scope exit)
-    c_forauto (cset_int, set)
-    c_forauto (cvec_pnt, vec)
-    c_forauto (cdeq_int, deq)
-    c_forauto (clist_int, lst)
-    c_forauto (cstack_int, stk)
-    c_forauto (csmap_int, map)
+    c_auto (cset_int, set)
+    c_auto (cvec_pnt, vec)
+    c_auto (cdeq_int, deq)
+    c_auto (clist_int, lst)
+    c_auto (cstack_int, stk)
+    c_auto (csmap_int, map)
     {
         // add some elements to each container
         c_emplace(cset_int, set, {10, 20, 30});
@@ -240,8 +241,8 @@ and non-emplace methods:
 #define i_val_str       // special macro to enable container of cstr
 #include <stc/cvec.h>   // vector of string (cstr)
 ...
-c_forvar (cvec_str vec = cvec_str_init(), cvec_str_del(&vec))   // defer vector destructor to end of block
-c_forvar (cstr s = cstr_lit("a string literal"), cstr_del(&s))  // cstr_lit() for literals; no strlen() usage
+c_autovar (cvec_str vec = cvec_str_init(), cvec_str_del(&vec))   // defer vector destructor to end of block
+c_autovar (cstr s = cstr_lit("a string literal"), cstr_del(&s))  // cstr_lit() for literals; no strlen() usage
 {
     const char* hello = "Hello";
     cvec_str_push_back(&vec, cstr_from(hello);    // construct and add string from const char*
