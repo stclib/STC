@@ -1,7 +1,7 @@
-![Sublime Template Containers](docs/pics/containers.jpg)
+![STC](docs/pics/containers.jpg)
 
-STC - Sublime Template Containers for C
-========================================
+STC - Smart Templated Containers for C
+======================================
 
 News
 ----
