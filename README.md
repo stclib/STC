@@ -1,6 +1,6 @@
 ![STC](docs/pics/containers.jpg)
 
-STC - Smart Templated Containers for C
+STC - Smart Template Containers for C
 ======================================
 
 News
