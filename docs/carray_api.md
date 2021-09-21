@@ -58,12 +58,13 @@ void                carr3_X_next(carr3_X_iter_t* it);
 
 | Type name         | Type definition                                      | Used to represent... |
 |:------------------|:-----------------------------------------------------|:---------------------|
-| `carr2_X`         | `struct { Value **data; size_t xdim, ydim; }`        | The array 2D type    |
-| `carr2_X_value_t` | `Value`                                              | The value type       |
-| `carr2_X_iter_t`  | `struct { Value *ref; }`                             | Iterator type        |
-| `carr3_X`         | `struct { Value ***data; size_t xdim, ydim, zdim; }` | The array 3D type    |
-| `carr3_X_value_t` | `Value`                                              | The value type       |
-| `carr3_X_iter_t`  | `struct { Value *ref; }`                             | Iterator type        |
+| `carr2_X`         | `struct { i_val **data; size_t xdim, ydim; }`        | The array 2D type    |
+| `carr2_X_value_t` | `i_val`                                              | The value type       |
+| `carr2_X_iter_t`  | `struct { i_val *ref; }`                             | Iterator type        |
+|                   |                                                      |                      |
+| `carr3_X`         | `struct { i_val ***data; size_t xdim, ydim, zdim; }` | The array 3D type    |
+| `carr3_X_value_t` | `i_val`                                              | The value type       |
+| `carr3_X_iter_t`  | `struct { i_val *ref; }`                             | Iterator type        |
 
 The **carr3** elements can be accessed like `carr3_i arr = ...; int val = arr.data[x][y][z];`, or with `carr3_i_at(&arr, x, y, z)`.
 

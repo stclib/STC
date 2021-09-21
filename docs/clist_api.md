@@ -88,8 +88,8 @@ clist_X_value_t     clist_X_value_clone(clist_X_value_t val);
 | Type name             | Type definition                     | Used to represent...      |
 |:----------------------|:------------------------------------|:--------------------------|
 | `clist_X`             | `struct { clist_X_node_t* last; }`  | The clist type            |
-| `clist_X_value_t`     | `Value`                             | The clist element type    |
-| `clist_X_rawvalue_t`  | `RawValue`                          | clist raw value type      |
+| `clist_X_value_t`     | `i_val`                             | The clist element type    |
+| `clist_X_rawvalue_t`  | `i_valraw`                          | clist raw value type      |
 | `clist_X_iter_t`      | `struct { clist_value_t *ref; ... }`| clist iterator            |
 
 ## Example

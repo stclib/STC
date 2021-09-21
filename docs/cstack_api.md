@@ -1,7 +1,7 @@
 # STC [cstack](../include/stc/cstack.h): Stack
 ![Stack](pics/stack.jpg)
 
-The **cstack** is a container that gives the programmer the functionality of a stack - specifically, a LIFO (last-in, first-out) data structure. The stack pushes and pops the element from the back of the underlying container, known as the top of the stack.
+The **cstack** is a container that gives the programmer the functionality of a stack - specifically, a LIFO (last-in, first-out) data structure. The stack pushes and pops the element from the back of the container, known as the top of the stack.
 
 See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack) for a functional description.
 
@@ -49,10 +49,10 @@ cstack_X_value_t        cstack_X_value_clone(cstack_X_value_t val);
 
 | Type name             | Type definition                        | Used to represent...        |
 |:----------------------|:---------------------------------------|:----------------------------|
-| `cstack_X`            | Depends on underlying container type   | The cstack type             |
-| `cstack_X_value_t`    |                   "                    | The cstack element type     |
-| `cstack_X_rawvalue_t` |                   "                    | cstack raw value type       |
-| `cstack_X_iter_t`     |                   "                    | cstack iterator             |
+| `cstack_X`            | `struct { cstack_value_t *data; ... }` | The cstack type             |
+| `cstack_X_value_t`    | `i_val`                                | The cstack element type     |
+| `cstack_X_rawvalue_t` | `i_valraw`                             | cstack raw value type       |
+| `cstack_X_iter_t`     | `struct { cstack_value_t *ref; }`      | cstack iterator             |
 
 ## Example
 ```c

@@ -90,8 +90,8 @@ cvec_X_value_t      cvec_X_value_clone(cvec_X_value_t val);
 | Type name            | Type definition                     | Used to represent...   |
 |:---------------------|:------------------------------------|:-----------------------|
 | `cvec_X`             | `struct { cvec_X_value_t* data; }`  | The cvec type          |
-| `cvec_X_value_t`     | `Value`                             | The cvec value type    |
-| `cvec_X_rawvalue_t`  | `RawValue`                          | The raw value type     |
+| `cvec_X_value_t`     | `i_val`                             | The cvec value type    |
+| `cvec_X_rawvalue_t`  | `i_valraw`                          | The raw value type     |
 | `cvec_X_iter_t`      | `struct { cvec_X_value_t* ref; }`   | The iterator type      |
 
 ## Examples

@@ -87,8 +87,8 @@ cdeq_X_value_t      cdeq_X_value_clone(cdeq_X_value_t val);
 | Type name            | Type definition                     | Used to represent...   |
 |:---------------------|:------------------------------------|:-----------------------|
 | `cdeq_X`             | `struct { cdeq_X_value_t* data; }`  | The cdeq type          |
-| `cdeq_X_value_t`     | `Value`                             | The cdeq value type    |
-| `cdeq_X_rawvalue_t`  | `RawValue`                          | The raw value type     |
+| `cdeq_X_value_t`     | `i_val`                             | The cdeq value type    |
+| `cdeq_X_rawvalue_t`  | `i_valraw`                          | The raw value type     |
 | `cdeq_X_iter_t`      | `struct { cdeq_X_value_t* ref; }`   | The iterator type      |
 
 ## Examples

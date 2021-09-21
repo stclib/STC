@@ -48,8 +48,8 @@ cpque_X_value_t         cpque_X_value_clone(cpque_X_value_t val);
 | Type name            | Type definition                       | Used to represent...    |
 |:---------------------|:--------------------------------------|:------------------------|
 | `cpque_X`            | `struct {cpque_X_value_t* data; ...}` | The cpque type          |
-| `cpque_X_value_t`    | Depends on underlying container type  | The cpque element type  |
-| `cpque_X_rawvalue_t` |                   "                   | cpque raw value type    |
+| `cpque_X_value_t`    | `i_val`                               | The cpque element type  |
+| `cpque_X_rawvalue_t` | `i_valraw`                            | cpque raw value type    |
 
 ## Example
 ```c

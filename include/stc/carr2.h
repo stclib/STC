@@ -108,7 +108,7 @@ STC_DEF Self cx_memb(_with_values)(size_t xdim, size_t ydim, i_val value) {
 STC_DEF Self cx_memb(_clone)(Self src) {
     Self _arr = cx_memb(_init)(src.xdim, src.ydim);
     for (cx_value_t* p = _arr.data[0], *q = src.data[0], *e = p + cx_memb(_size)(src); p != e; ++p, ++q)
-        *p = i_valfrom(*q);
+        *p = i_valfrom(i_valto(q));
     return _arr;
 }
 

@@ -58,10 +58,10 @@ csset_X_value_t     csset_X_value_clone(csset_X_value_t val);
 | Type name            | Type definition                                   | Used to represent...        |
 |:---------------------|:--------------------------------------------------|:----------------------------|
 | `csset_X`            | `struct { ... }`                                  | The csset type              |
-| `csset_X_rawkey_t`   | `RawKey`                                          | The raw key type            |
-| `csset_X_rawvalue_t` | `csset_X_rawkey_t`                                | The raw key type            |
-| `csset_X_key_t`      | `Key`                                             | The key type                |
-| `csset_X_value_t`    | `const Key`                                       | The value: key is immutable |
+| `csset_X_rawkey_t`   | `i_rawkey`                                        | The raw key type            |
+| `csset_X_rawvalue_t` | `i_rawkey`                                        | The raw key type            |
+| `csset_X_key_t`      | `i_key`                                           | The key type                |
+| `csset_X_value_t`    | `i_key        `                                   | The value: key is immutable |
 | `csset_X_result_t`   | `struct { csset_X_value_t* ref; bool inserted; }` | Result of insert/emplace    |
 | `csset_X_iter_t`     | `struct { csset_X_value_t *ref; ... }`            | Iterator type               |
 

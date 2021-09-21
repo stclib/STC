@@ -99,12 +99,12 @@ void                c_default_del(Type* val);                             // doe
 | Type name            | Type definition                                 | Used to represent...          |
 |:---------------------|:------------------------------------------------|:------------------------------|
 | `cmap_X`             | `struct { ... }`                                | The cmap type                 |
-| `cmap_X_rawkey_t`    | `RawKey`                                        | The raw key type              |
-| `cmap_X_rawmapped_t` | `RawMapped`                                     | The raw mapped type           |
-| `cmap_X_rawvalue_t`  | `struct { RawKey first; RawMapped second; }`    | RawKey + RawMapped type       |
-| `cmap_X_key_t`       | `Key`                                           | The key type                  |
-| `cmap_X_mapped_t`    | `Mapped`                                        | The mapped type               |
-| `cmap_X_value_t`     | `struct { const Key first; Mapped second; }`    | The value: key is immutable   |
+| `cmap_X_rawkey_t`    | `i_keyraw`                                      | The raw key type              |
+| `cmap_X_rawmapped_t` | `i_valraw`                                      | The raw mapped type           |
+| `cmap_X_rawvalue_t`  | `struct { i_keyraw first; i_valraw second; }`   | RawKey + RawMapped type       |
+| `cmap_X_key_t`       | `i_key`                                         | The key type                  |
+| `cmap_X_mapped_t`    | `i_valraw`                                      | The mapped type               |
+| `cmap_X_value_t`     | `struct { const i_key first; i_val second; }`   | The value: key is immutable   |
 | `cmap_X_result_t`    | `struct { cmap_X_value_t *ref; bool inserted; }`| Result of insert/put/emplace  |
 | `cmap_X_iter_t`      | `struct { cmap_X_value_t *ref; ... }`           | Iterator type                 |
 

@@ -50,7 +50,7 @@ cqueue_X_value_t        cqueue_X_value_clone(cqueue_X_value_t val);
 
 | Type name             | Type definition                        | Used to represent...     |
 |:----------------------|:---------------------------------------|:-------------------------|
-| `cqueue_X`            | Depends on underlying container type   | The cqueue type          |
+| `cqueue_X`            | Same as `cdeq_X` type                  | The cqueue type          |
 | `cqueue_X_value_t`    |                   "                    | The cqueue element type  |
 | `cqueue_X_rawvalue_t` |                   "                    | cqueue raw value type    |
 | `cqueue_X_iter_t`     |                   "                    | cqueue iterator          |
