@@ -6,6 +6,7 @@ void int_del(int* x) {
 
 #define i_val int
 #define i_valdel int_del  // optional func to show elements destroyed
+#define i_nonatomic       // only for single thread; faster.
 #include <stc/csptr.h>    // define csptr_int shared pointers
 
 #define i_key_csptr int   // refer to csptr_int definition above

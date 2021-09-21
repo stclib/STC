@@ -124,6 +124,12 @@ cx_memb(_with_capacity)(size_t size) {
     return tree;
 }
 
+STC_INLINE void
+cx_memb(_copy)(Self *self, Self other) {
+    if (self->nodes == other.nodes) return;
+    cx_memb(_del)(self); *self = cx_memb(_clone)(other);
+}
+
 STC_INLINE cx_rawvalue_t
 cx_memb(_value_toraw)(cx_value_t* val) {
     return cx_SET_ONLY( i_keyto(val) )

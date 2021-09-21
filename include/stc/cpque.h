@@ -60,6 +60,11 @@ STC_INLINE void cx_memb(_clear)(Self* self) {
 STC_INLINE void cx_memb(_del)(Self* self)
     { cx_memb(_clear)(self); c_free(self->data); }
 
+STC_INLINE void cx_memb(_copy)(Self *self, Self other) {
+    if (self->data == other.data) return;
+    cx_memb(_del)(self); *self = cx_memb(_clone)(other);
+}
+
 STC_INLINE size_t cx_memb(_size)(Self q)
     { return q.size; }
 

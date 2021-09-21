@@ -1,7 +1,7 @@
 # STC [csset](../include/stc/csset.h): Sorted Set
 ![Set](pics/sset.jpg)
 
-A **csset** is an associative container that contains a sorted set of unique objects of type *Key*. Sorting is done using the key comparison function *keyCompare*. Search, removal, and insertion operations have logarithmic complexity. **csset** is implemented as an AA-tree.
+A **csset** is an associative container that contains a sorted set of unique objects of type *i_key*. Sorting is done using the key comparison function *keyCompare*. Search, removal, and insertion operations have logarithmic complexity. **csset** is implemented as an AA-tree.
 
 See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) for a functional description.
 
@@ -17,7 +17,7 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 #define i_keydel    // destroy key func - defaults to empty destruct
 #include <stc/csset.h>
 ```
-`X` should be replaced by the value of ***i_tag*** in all of the following documentation.
+`X` should be replaced by the value of `i_tag` in all of the following documentation.
 
 ## Methods
 
@@ -26,23 +26,24 @@ csset_X             csset_X_init(void);
 csset_X             csset_X_clone(csset_x set);
 
 void                csset_X_clear(csset_X* self);
+void                csset_X_copy(csset_X* self, csset_X other);
 void                csset_X_swap(csset_X* a, csset_X* b);
 void                csset_X_del(csset_X* self);                                                 // destructor
 
 bool                csset_X_empty(csset_X set);
 size_t              csset_X_size(csset_X set);
 
-bool                csset_X_contains(const csset_X* self, RawKey rkey);
-csset_X_value_t*    csset_X_get(const csset_X* self, RawKey rkey);                              // return NULL if not found
-csset_X_iter_t      csset_X_lower_bound(const csset_X* self, RawKey rkey);                      // find closest entry >= rkey
-csset_X_iter_t      csset_X_find(const csset_X* self, RawKey rkey);
-csset_X_value_t*    csset_X_find_it(const csset_X* self, RawKey rkey, csset_X_iter_t* out);     // return NULL if not found
+bool                csset_X_contains(const csset_X* self, i_keyraw rkey);
+csset_X_value_t*    csset_X_get(const csset_X* self, i_keyraw rkey);                            // return NULL if not found
+csset_X_iter_t      csset_X_lower_bound(const csset_X* self, i_keyraw rkey);                    // find closest entry >= rkey
+csset_X_iter_t      csset_X_find(const csset_X* self, i_keyraw rkey);
+csset_X_value_t*    csset_X_find_it(const csset_X* self, i_keyraw rkey, csset_X_iter_t* out);   // return NULL if not found
 
-csset_X_result_t    csset_X_insert(csset_X* self, Key key);
-csset_X_result_t    csset_X_emplace(csset_X* self, RawKey rkey);
-void                csset_X_emplace_items(csset_X* self, const RawKey arr[], size_t n);
+csset_X_result_t    csset_X_insert(csset_X* self, i_key key);
+csset_X_result_t    csset_X_emplace(csset_X* self, i_keyraw rkey);
+void                csset_X_emplace_items(csset_X* self, const i_keyraw arr[], size_t n);
 
-size_t              csset_X_erase(csset_X* self, RawKey rkey);
+size_t              csset_X_erase(csset_X* self, i_keyraw rkey);
 csset_X_iter_t      csset_X_erase_at(csset_X* self, csset_X_iter_t it);                         // return iter after it
 csset_X_iter_t      csset_X_erase_range(csset_X* self, csset_X_iter_t it1, csset_X_iter_t it2); // return updated it2
 

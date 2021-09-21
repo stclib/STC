@@ -16,7 +16,7 @@ See the c++ class [std::queue](https://en.cppreference.com/w/cpp/container/queue
 #define i_valdel    // destroy value func - defaults to empty destruct
 #include <stc/cqueue.h>
 ```
-`X` should be replaced by the value of ***i_tag*** in all of the following documentation.
+`X` should be replaced by the value of `i_tag` in all of the following documentation.
 
 
 ## Methods
@@ -26,6 +26,7 @@ cqueue_X                cqueue_X_init(void);
 cqueue_X                cqueue_X_clone(cqueue_X q);
 
 void                    cqueue_X_clear(cqueue_X* self);
+void                    cqueue_X_copy(cqueue_X* self, cqueue_X other);
 void                    cqueue_X_del(cqueue_X* self);      // destructor
 
 size_t                  cqueue_X_size(cqueue_X q);

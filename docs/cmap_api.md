@@ -32,7 +32,7 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_valdel    // destroy value func - defaults to empty destruct
 #include <stc/cmap.h>
 ```
-`X` should be replaced by the value of ***i_tag*** in all of the following documentation.
+`X` should be replaced by the value of `i_tag` in all of the following documentation.
 
 ## Methods
 
@@ -42,32 +42,33 @@ cmap_X              cmap_X_with_capacity(size_t cap);
 cmap_X              cmap_X_clone(cmap_x map);
 
 void                cmap_X_clear(cmap_X* self);
-void                cmap_X_max_load_factor(cmap_X* self, float max_load);                    // default: 0.85
+void                cmap_X_copy(cmap_X* self, cmap_X other);
+void                cmap_X_max_load_factor(cmap_X* self, float max_load);                     // default: 0.85
 void                cmap_X_reserve(cmap_X* self, size_t size);
 void                cmap_X_shrink_to_fit(cmap_X* self);
 void                cmap_X_swap(cmap_X* a, cmap_X* b);
-void                cmap_X_del(cmap_X* self);                                                // destructor
+void                cmap_X_del(cmap_X* self);                                                 // destructor
 
 bool                cmap_X_empty(cmap_X map);
 size_t              cmap_X_size(cmap_X map);
-size_t              cmap_X_capacity(cmap_X map);                                             // buckets * max_load_factor
-size_t              cmap_X_bucket_count(cmap_X map);                                         // num. of allocated buckets
+size_t              cmap_X_capacity(cmap_X map);                                              // buckets * max_load_factor
+size_t              cmap_X_bucket_count(cmap_X map);                                          // num. of allocated buckets
 
-bool                cmap_X_contains(const cmap_X* self, RawKey rkey);
-cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, RawKey rkey);                              // rkey must be in map.
-cmap_X_value_t*     cmap_X_get(const cmap_X* self, RawKey rkey);                             // return NULL if not found
-cmap_X_iter_t       cmap_X_find(const cmap_X* self, RawKey rkey);
+bool                cmap_X_contains(const cmap_X* self, i_keyraw rkey);
+cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, i_keyraw rkey);                             // rkey must be in map.
+cmap_X_value_t*     cmap_X_get(const cmap_X* self, i_keyraw rkey);                            // return NULL if not found
+cmap_X_iter_t       cmap_X_find(const cmap_X* self, i_keyraw rkey);
 
-cmap_X_result_t     cmap_X_insert(cmap_X* self, Key key, Mapped mapped);                     // no change if key in map
-cmap_X_result_t     cmap_X_insert_or_assign(cmap_X* self, Key key, Mapped mapped);           // always update mapped
-cmap_X_result_t     cmap_X_put(cmap_X* self, Key key, Mapped mapped);                        // alias for insert_or_assign
+cmap_X_result_t     cmap_X_insert(cmap_X* self, i_key key, i_val mapped);                     // no change if key in map
+cmap_X_result_t     cmap_X_insert_or_assign(cmap_X* self, i_key key, i_val mapped);           // always update mapped
+cmap_X_result_t     cmap_X_put(cmap_X* self, i_key key, i_val mapped);                        // alias for insert_or_assign
 
-cmap_X_result_t     cmap_X_emplace(cmap_X* self, RawKey rkey, RawMapped rmapped);            // no change if rkey in map
-cmap_X_result_t     cmap_X_emplace_or_assign(cmap_X* self, RawKey rkey, RawMapped rmapped);  // always update rmapped
+cmap_X_result_t     cmap_X_emplace(cmap_X* self, i_keyraw rkey, i_valraw rmapped);            // no change if rkey in map
+cmap_X_result_t     cmap_X_emplace_or_assign(cmap_X* self, i_keyraw rkey, i_valraw rmapped);  // always update rmapped
 void                cmap_X_emplace_items(cmap_X* self, const cmap_X_rawvalue_t arr[], size_t n);
 
-size_t              cmap_X_erase(cmap_X* self, RawKey rkey);                                 // return 0 or 1
-cmap_X_iter_t       cmap_X_erase_at(cmap_X* self, cmap_X_iter_t it);                         // return iter after it
+size_t              cmap_X_erase(cmap_X* self, i_keyraw rkey);                                // return 0 or 1
+cmap_X_iter_t       cmap_X_erase_at(cmap_X* self, cmap_X_iter_t it);                          // return iter after it
 void                cmap_X_erase_entry(cmap_X* self, cmap_X_value_t* entry);
 
 cmap_X_iter_t       cmap_X_begin(const cmap_X* self);
@@ -77,21 +78,24 @@ void                cmap_X_next(cmap_X_iter_t* it);
 cmap_X_value_t      cmap_X_value_clone(cmap_X_value_t val);
 cmap_X_rawvalue_t   cmap_X_value_toraw(cmap_X_value_t* pval);
 ```
+Helpers:
 ```c
+uint64_t            c_strhash(const char *str);                             // utility function
+
 int                 c_rawstr_compare(const char* const* a, const char* const* b);
 bool                c_rawstr_equals(const char* const* a, const char* const* b);
 uint64_t            c_rawstr_hash(const char* const* strp, ...);
 
-uint64_t            c_default_hash(const void *data, size_t len);         // key any trivial type
-uint64_t            c_default_hash32(const void* data, size_t is4);       // key one 32bit int
-uint64_t            c_default_hash64(const void* data, size_t is8);       // key one 64bit int
-int                 c_default_equals(const RawKey* a, const RawKey* b);   // the == operator
-int                 c_memcmp_equals(const RawKey* a, const RawKey* b);    // uses memcmp
+uint64_t            c_default_hash(const void *data, size_t len);           // key any trivial type
+uint64_t            c_default_hash32(const void* data, size_t is4);         // key one 32bit int
+uint64_t            c_default_hash64(const void* data, size_t is8);         // key one 64bit int
+int                 c_default_equals(const i_keyraw* a, const i_keyraw* b); // the == operator
+int                 c_memcmp_equals(const i_keyraw* a, const i_keyraw* b);  // uses memcmp
 
 Type                c_no_clone(Type val);
-Type                c_default_fromraw(Type val);                          // plain copy
+Type                c_default_fromraw(Type val);                            // plain copy
 Type                c_default_toraw(Type* val);
-void                c_default_del(Type* val);                             // does nothing
+void                c_default_del(Type* val);                               // does nothing
 ```
 
 ## Types
@@ -101,9 +105,9 @@ void                c_default_del(Type* val);                             // doe
 | `cmap_X`             | `struct { ... }`                                | The cmap type                 |
 | `cmap_X_rawkey_t`    | `i_keyraw`                                      | The raw key type              |
 | `cmap_X_rawmapped_t` | `i_valraw`                                      | The raw mapped type           |
-| `cmap_X_rawvalue_t`  | `struct { i_keyraw first; i_valraw second; }`   | RawKey + RawMapped type       |
+| `cmap_X_rawvalue_t`  | `struct { i_keyraw first; i_valraw second; }`   | i_keyraw + i_valraw type      |
 | `cmap_X_key_t`       | `i_key`                                         | The key type                  |
-| `cmap_X_mapped_t`    | `i_valraw`                                      | The mapped type               |
+| `cmap_X_mapped_t`    | `i_val`                                         | The mapped type               |
 | `cmap_X_value_t`     | `struct { const i_key first; i_val second; }`   | The value: key is immutable   |
 | `cmap_X_result_t`    | `struct { cmap_X_value_t *ref; bool inserted; }`| Result of insert/put/emplace  |
 | `cmap_X_iter_t`      | `struct { cmap_X_value_t *ref; ... }`           | Iterator type                 |

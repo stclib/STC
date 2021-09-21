@@ -128,6 +128,12 @@ STC_INLINE cx_iter_t    cx_memb(_emplace)(Self* self, cx_iter_t it, i_valraw raw
 STC_INLINE cx_value_t*  cx_memb(_front)(const Self* self) { return &self->last->next->value; }
 STC_INLINE cx_value_t*  cx_memb(_back)(const Self* self) { return &self->last->value; }
 
+STC_INLINE void
+cx_memb(_copy)(Self *self, Self other) {
+    if (self->last == other.last) return;
+    cx_memb(_del)(self); *self = cx_memb(_clone)(other);
+}
+
 STC_INLINE cx_iter_t
 cx_memb(_iter)(const Self* self, cx_node_t* prev) {
     return c_make(cx_iter_t){&self->last, prev, &prev->next->value};

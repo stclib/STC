@@ -24,10 +24,10 @@ cbits            cbits_from_str(const char* str);
 cbits            cbits_clone(cbits other);
 
 void             cbits_clear(cbits* self);
+cbits*           cbits_copy(cbits* self, cbits other);
 void             cbits_resize(cbits* self, size_t size, bool value);
 void             cbits_del(cbits* self);
 
-cbits*           cbits_assign(cbits* self, cbits other);
 cbits*           cbits_take(cbits* self, cbits other);       // give other to self
 cbits            cbits_move(cbits* self);                    // transfer self to caller
 

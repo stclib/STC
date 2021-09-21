@@ -16,7 +16,7 @@ See the c++ class [boost::multi_array](https://www.boost.org/doc/libs/release/li
 
 #include <stc/carr2.h> // or <stc/carr3.h>
 ```
-`X` should be replaced by the value of ***i_tag*** in all of the following documentation.
+`X` should be replaced by the value of `i_tag` in all of the following documentation.
 
 ## Methods
 
@@ -26,6 +26,7 @@ carr2_X             carr2_X_init(size_t xdim, size_t ydim);
 carr2_X             carr2_X_with_values(size_t xdim, size_t ydim, Value val);
 carr2_X             carr2_X_with_storage(size_t xdim, size_t ydim, Value* array);
 carr2_X             carr2_X_clone(carr2_X arr);
+void                carr2_X_copy(carr2_X* self, carr2_X other);
 Value*              carr2_X_release(carr2_X* self);       // release storage (not freed)
 void                carr2_X_del(carr2_X* self);
 
@@ -43,6 +44,7 @@ carr3_X             carr3_X_init(size_t xdim, size_t ydim, size_t zdim);
 carr3_X             carr3_X_with_values(size_t xdim, size_t ydim, size_t zdim, Value val);
 carr3_X             carr3_X_with_storage(size_t xdim, size_t ydim, size_t zdim, Value* array);
 carr3_X             carr3_X_clone(carr3_X arr);
+void                carr3_X_copy(carr3_X* self, carr3_X other);
 Value*              carr3_X_release(carr3_X* self);       // release storage (not freed)
 void                carr3_X_del(carr3_X* self);
 

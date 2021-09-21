@@ -272,6 +272,11 @@ STC_DEF void cx_memb(_clear)(Self* self) {
     memset(self->_hashx, 0, self->bucket_count);
 }
 
+STC_INLINE void cx_memb(_copy)(Self *self, Self other) {
+    if (self->table == other.table) return;
+    cx_memb(_del)(self); *self = cx_memb(_clone)(other);
+}
+
 cx_MAP_ONLY(
     STC_DEF cx_result_t
     cx_memb(_insert_or_assign)(Self* self, i_key _key, i_val _mapped) {

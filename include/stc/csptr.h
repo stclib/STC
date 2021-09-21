@@ -80,6 +80,13 @@ typedef long atomic_count_t;
 #endif
 #include "template.h"
 
+#ifdef i_nonatomic
+  #define cx_increment(v) (++*(v))
+  #define cx_decrement(v) (--*(v))
+#else
+  #define cx_increment(v) c_atomic_increment(v)
+  #define cx_decrement(v) c_atomic_decrement(v)
+#endif
 #ifndef i_fwd
 cx_deftypes(_c_csptr_types, Self, i_val);
 #endif
@@ -109,7 +116,7 @@ cx_memb(_make)(cx_value_t val) {
 
 STC_INLINE Self
 cx_memb(_clone)(Self ptr) {
-    if (ptr.use_count) c_atomic_increment(ptr.use_count);
+    if (ptr.use_count) cx_increment(ptr.use_count);
     return ptr;
 }
 
@@ -122,7 +129,7 @@ cx_memb(_move)(Self* self) {
 
 STC_INLINE void
 cx_memb(_del)(Self* self) {
-    if (self->use_count && c_atomic_decrement(self->use_count) == 0) {
+    if (self->use_count && cx_decrement(self->use_count) == 0) {
         i_valdel(self->get);
         if (self->get != &((cx_csptr_rep*)self->use_count)->val)
             c_free(self->get);
@@ -154,7 +161,7 @@ STC_INLINE cx_value_t*
 cx_memb(_copy)(Self* self, Self ptr) {
     cx_memb(_del)(self);
     *self = ptr;
-    if (self->use_count) c_atomic_increment(self->use_count);
+    if (self->use_count) cx_increment(self->use_count);
     return self->get;
 }
 
@@ -164,4 +171,7 @@ cx_memb(_compare)(const Self* x, const Self* y) {
 }
 
 #undef cx_csptr_rep
+#undef cx_increment
+#undef cx_decrement
+#undef i_nonatomic
 #include "template.h"

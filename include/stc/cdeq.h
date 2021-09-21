@@ -67,6 +67,10 @@ STC_INLINE i_val        cx_memb(_value_fromraw)(i_valraw raw) { return i_valfrom
 STC_INLINE i_valraw     cx_memb(_value_toraw)(cx_value_t* pval) { return i_valto(pval); }
 STC_INLINE i_val        cx_memb(_value_clone)(i_val val)
                             { return i_valfrom(i_valto(&val)); }
+STC_INLINE void         cx_memb(_copy)(Self *self, Self other) {
+                            if (self->data == other.data) return;
+                            cx_memb(_del)(self); *self = cx_memb(_clone)(other);
+                        }
 STC_INLINE cx_value_t*  cx_memb(_emplace_back)(Self* self, i_valraw raw)
                             { return cx_memb(_push_back)(self, i_valfrom(raw)); }
 STC_INLINE void         cx_memb(_pop_front)(Self* self)

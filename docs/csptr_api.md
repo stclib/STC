@@ -2,10 +2,7 @@
 
 **csptr** is a smart pointer that retains shared ownership of an object through a pointer.
 Several **csptr** objects may own the same object. The object is destroyed and its memory
-deallocated when either of the following happens:
-
-- the last remaining **csptr** owning the object is destroyed with *csptr_X_del()*;
-- the last remaining **csptr** owning the object is assigned another pointer via *csptr_X_clone()*, *csptr_X_move()* or by *csptr_X_reset()*.
+deallocated when the last remaining **csptr** owning the object is destroyed with *csptr_X_del()*;
 
 The object is destroyed using *csptr_X_del()* or a custom deleter that is supplied to **csptr**
 in the using-statement.
@@ -27,19 +24,20 @@ See the c++ classes [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/s
 #define i_valdel    // destroy value func - defaults to empty destruct
 #include <stc/csptr.h>
 ```
-`X` should be replaced by the value of ***i_tag*** in all of the following documentation.
+`X` should be replaced by the value of `i_tag` in all of the following documentation. When declaring a container with shared pointers, define the `i_val_csptr` with the csptr's `i_tag`. See example below.
 
 ## Methods
 
-The *csptr_X_compare()*, *csptr_X_del()* methods are defined based on the ***i_cmp*** and ***i_valdel*** macros specified.
+The *csptr_X_compare()*, *csptr_X_del()* methods are defined based on the `i_cmp` and `i_valdel` macros specified.
 
-Use *csptr_X_clone(p)* when sharing ownership of the pointed-to object. For shared pointers stored in containers, define ***i_val_csptr*** to the shared pointers tag instead of a ***i_val*** macro. See example below.
+Use *csptr_X_clone(p)* when sharing ownership of the pointed-to object. For shared pointers stored in containers, define `i_val_csptr` to the shared pointers tag instead of a `i_val` macro. See example below.
 ```c
 csptr_X             csptr_X_init();                               // empty constructor
 csptr_X             csptr_X_make(Value val);                      // make_shared constructor, fast
 csptr_X             csptr_X_from(Value* p);                       // construct from raw pointer
 csptr_X             csptr_X_clone(csptr_X ptr);                   // clone shared (increase use count)
 csptr_X             csptr_X_move(csptr_X* self);                  // fast transfer ownership to another sptr.
+csptr_X_value_t*    csptr_X_copy(csptr_X* self, csptr_X other);   // copy shared (increase use count)
 
 void                csptr_X_del(csptr_X* self);                   // destruct (decrease use count, free at 0)
 long                csptr_X_use_count(csptr_X ptr);
@@ -47,7 +45,6 @@ long                csptr_X_use_count(csptr_X ptr);
 void                csptr_X_reset(csptr_X* self);
 csptr_X_value_t*    csptr_X_reset_make(csptr_X* self, Value val); // assign new sptr with value
 csptr_X_value_t*    csptr_X_reset_with(csptr_X* self, Value* p);  // slower than reset_make().
-csptr_X_value_t*    csptr_X_copy(csptr_X* self, CX other);        // copy shared (increase use count)
 
 int                 csptr_X_compare(const csptr_X* x, const csptr_X* y);
 bool                csptr_X_equals(const csptr_X* x, const csptr_X* y);
@@ -79,7 +76,7 @@ void int_del(int* x) {
 #include <stc/csset.h>    // define a sorted set of csptr_int
 
 #define i_val_csptr int
-#include <stc/cvec.h>
+#include <stc/cvec.h>     // define a sorted vector of csptr_int
 
 int main()
 {

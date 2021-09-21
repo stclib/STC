@@ -21,7 +21,7 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 #define i_valdel    // destroy value func - defaults to empty destruct
 #include <stc/cvec.h>
 ```
-`X` should be replaced by the value of ***i_tag*** in all of the following documentation.
+`X` should be replaced by the value of `i_tag` in all of the following documentation.
 
 ## Methods
 
@@ -32,6 +32,7 @@ cvec_X              cvec_X_with_capacity(size_t size);
 cvec_X              cvec_X_clone(cvec_X vec);
 
 void                cvec_X_clear(cvec_X* self);
+void                cvec_X_copy(cvec_X* self, cvec_X other);
 void                cvec_X_shrink_to_fit(cvec_X* self);
 void                cvec_X_reserve(cvec_X* self, size_t cap);
 void                cvec_X_resize(cvec_X* self, size_t size, Value fill);
@@ -47,16 +48,16 @@ cvec_X_value_t*     cvec_X_front(const cvec_X* self);
 cvec_X_value_t*     cvec_X_back(const cvec_X* self);
 
 void                cvec_X_push_back(cvec_X* self, Value value);
-void                cvec_X_emplace_back(cvec_X* self, RawValue raw);
+void                cvec_X_emplace_back(cvec_X* self, i_valraw raw);
 void                cvec_X_pop_back(cvec_X* self);
 
 cvec_X_iter_t       cvec_X_insert(cvec_X* self, size_t idx, Value value);                        // move value 
 cvec_X_iter_t       cvec_X_insert_n(cvec_X* self, size_t idx, const Value[] arr, size_t n);      // move arr values
 cvec_X_iter_t       cvec_X_insert_at(cvec_X* self, cvec_X_iter_t it, Value value);               // move value 
 
-cvec_X_iter_t       cvec_X_emplace(cvec_X* self, size_t idx, RawValue raw);
-cvec_X_iter_t       cvec_X_emplace_n(cvec_X* self, size_t idx, const RawValue[] arr, size_t n);
-cvec_X_iter_t       cvec_X_emplace_at(cvec_X* self, cvec_X_iter_t it, RawValue raw);
+cvec_X_iter_t       cvec_X_emplace(cvec_X* self, size_t idx, i_valraw raw);
+cvec_X_iter_t       cvec_X_emplace_n(cvec_X* self, size_t idx, const i_valraw[] arr, size_t n);
+cvec_X_iter_t       cvec_X_emplace_at(cvec_X* self, cvec_X_iter_t it, i_valraw raw);
 cvec_X_iter_t       cvec_X_emplace_range(cvec_X* self, cvec_X_iter_t it, 
                                          cvec_X_iter_t it1, cvec_X_iter_t it2);                 // will clone
 cvec_X_iter_t       cvec_X_emplace_range_p(cvec_X* self, Value* pos, 
@@ -67,11 +68,11 @@ cvec_X_iter_t       cvec_X_erase_n(cvec_X* self, size_t idx, size_t n);
 cvec_X_iter_t       cvec_X_erase_at(cvec_X* self, cvec_X_iter_t it);
 cvec_X_iter_t       cvec_X_erase_range(cvec_X* self, cvec_X_iter_t it1, cvec_X_iter_t it2);
 
-cvec_X_iter_t       cvec_X_find(const cvec_X* self, RawValue raw);
-cvec_X_iter_t       cvec_X_find_in(cvec_X_iter_t i1, cvec_X_iter_t i2, RawValue raw);
-cvec_X_value_t*     cvec_X_get(const cvec_X* self, RawValue raw);                             // return NULL if not found
-cvec_X_iter_t       cvec_X_bsearch(const cvec_X* self, RawValue raw);
-cvec_X_iter_t       cvec_X_bsearch_in(cvec_X_iter_t i1, cvec_X_iter_t i2, RawValue raw);
+cvec_X_iter_t       cvec_X_find(const cvec_X* self, i_valraw raw);
+cvec_X_iter_t       cvec_X_find_in(cvec_X_iter_t i1, cvec_X_iter_t i2, i_valraw raw);
+cvec_X_value_t*     cvec_X_get(const cvec_X* self, i_valraw raw);                             // return NULL if not found
+cvec_X_iter_t       cvec_X_bsearch(const cvec_X* self, i_valraw raw);
+cvec_X_iter_t       cvec_X_bsearch_in(cvec_X_iter_t i1, cvec_X_iter_t i2, i_valraw raw);
 
 void                cvec_X_sort(cvec_X* self);
 void                cvec_X_sort_range(cvec_X_iter_t i1, cvec_X_iter_t i2,

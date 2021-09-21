@@ -17,7 +17,7 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 #define i_valdel    // destroy value func - defaults to empty destruct
 #include <stc/cpque.h>
 ```
-`X` should be replaced by the value of ***i_tag*** in all of the following documentation.
+`X` should be replaced by the value of `i_tag` in all of the following documentation.
 
 ## Methods
 
@@ -26,6 +26,7 @@ cpque_X                 cpque_X_init(void);
 cpque_X                 cpque_X_clone(cpque_X pq);
 
 void                    cpque_X_clear(cpque_X* self);
+void                    cpque_X_copy(cpque_X* self, cpque_X other);
 void                    cpque_X_make_heap(cpque_X* self);
 void                    cpque_X_del(cpque_X* self);      // destructor
 

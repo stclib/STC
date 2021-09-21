@@ -137,6 +137,12 @@ cx_memb(_shrink_to_fit)(Self *self) {
     cx_memb(_del)(self); *self = cx;
 }
 
+STC_INLINE void
+cx_memb(_copy)(Self *self, Self other) {
+    if (self->data == other.data) return;
+    cx_memb(_del)(self); *self = cx_memb(_clone)(other);
+}
+
 STC_INLINE cx_iter_t
 cx_memb(_insert)(Self* self, size_t idx, i_val value) {
     return cx_memb(_insert_range_p)(self, self->data + idx, &value, &value + 1, false);
