@@ -87,6 +87,22 @@ int main(void) {
     cvec_float_del(&vec);
 }
 ```
+In order to include two **cvec**s with different element types, include cvec.h twice. For structs, specify a compare function (or none), as `<` and `==` operators does not work on them (this enables sorting and searching).
+```c
+#define i_val struct One
+#define i_tag one
+#define i_cmp c_no_compare
+#include <stc/cvec.h>
+
+#define i_val struct Two
+#define i_tag two
+#define i_cmp c_no_compare
+#include <stc/cvec.h>
+...
+cvec_one v1 = cvec_one_init();
+cvec_two v2 = cvec_two_init();
+```
+
 With six different containers:
 ```c
 #include <stdio.h>
