@@ -42,6 +42,13 @@
   #define cx_size_t cx_memb(_size_t)
 #endif
 
+#if (defined i_valto ^ defined i_valraw) || (defined i_valraw && !defined i_valfrom)
+  #error if i_valraw defined, both i_valfrom and i_valto must be defined
+#endif
+#if (defined i_keyto ^ defined i_keyraw) || (defined i_keyraw && !defined i_keyfrom)
+  #error if i_keyraw defined, both i_keyfrom and i_keyto must be defined
+#endif
+
 #ifdef F_tag
   #define i_tag F_tag
   #define i_fwd
@@ -97,23 +104,13 @@
   #define i_valraw  const char*
 #endif
 
-#if defined i_key && !defined i_val
-  #define i_val i_key
-#endif
-#if !defined i_tag && defined i_key
-  #define i_tag i_key
-#elif !defined i_tag
-  #define i_tag i_val
-#endif
-
-#if (defined i_valto ^ defined i_valraw) || (defined i_valraw && !defined i_valfrom)
-  #error if i_valraw defined, both i_valfrom and i_valto must be defined
-#endif
-#if (defined i_keyto ^ defined i_keyraw) || (defined i_keyraw && !defined i_keyfrom)
-  #error if i_keyraw defined, both i_keyfrom and i_keyto must be defined
-#endif
-
 #ifdef i_key
+  #ifndef i_val
+    #define i_val i_key
+  #endif
+  #ifndef i_tag
+    #define i_tag i_key  
+  #endif
   #if !defined i_keyfrom && defined i_keydel
     #define i_keyfrom c_no_clone
   #elif !defined i_keyfrom
@@ -131,8 +128,14 @@
   #ifndef i_hash
     #define i_hash c_default_hash
   #endif
+  #ifndef i_keydel
+    #define i_keydel c_default_del
+  #endif
 #endif
 
+#ifndef i_tag
+  #define i_tag i_val
+#endif
 #if !defined i_valfrom && defined i_valdel
   #define i_valfrom c_no_clone
 #elif !defined i_valfrom
@@ -141,9 +144,6 @@
 #ifndef i_valraw
   #define i_valraw i_val
   #define i_valto c_default_toraw
-#endif
-#ifndef i_keydel
-  #define i_keydel c_default_del
 #endif
 #ifndef i_valdel
   #define i_valdel c_default_del
