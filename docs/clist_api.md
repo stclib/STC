@@ -50,15 +50,15 @@ size_t              clist_X_count(clist_X list);                                
 clist_X_value_t*    clist_X_front(const clist_X* self);
 clist_X_value_t*    clist_X_back(const clist_X* self);
 
-void                clist_X_push_front(clist_X* self, Value value);
+void                clist_X_push_front(clist_X* self, i_val value);
 void                clist_X_emplace_front(clist_X* self, i_valraw raw);
 void                clist_X_pop_front(clist_X* self);
 
-void                clist_X_push_back(clist_X* self, Value value);                          // note: no pop_back().
+void                clist_X_push_back(clist_X* self, i_val value);                          // note: no pop_back().
 void                clist_X_emplace_back(clist_X* self, i_valraw raw);
 void                clist_X_emplace_items(clist_X *self, const clist_X_rawvalue_t arr[], size_t n);
 
-clist_X_iter_t      clist_X_insert(clist_X* self, clist_X_iter_t it, Value value);          // return iter to new elem
+clist_X_iter_t      clist_X_insert(clist_X* self, clist_X_iter_t it, i_val value);          // return iter to new elem
 clist_X_iter_t      clist_X_emplace(clist_X* self, clist_X_iter_t it, i_valraw raw);
 
 clist_X_iter_t      clist_X_erase_at(clist_X* self, clist_X_iter_t it);                     // return iter after it

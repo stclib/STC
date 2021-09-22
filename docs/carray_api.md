@@ -23,16 +23,16 @@ See the c++ class [boost::multi_array](https://www.boost.org/doc/libs/release/li
 carr2_X:
 ```c
 carr2_X             carr2_X_init(size_t xdim, size_t ydim);
-carr2_X             carr2_X_with_values(size_t xdim, size_t ydim, Value val);
-carr2_X             carr2_X_with_storage(size_t xdim, size_t ydim, Value* array);
+carr2_X             carr2_X_with_values(size_t xdim, size_t ydim, i_val val);
+carr2_X             carr2_X_with_storage(size_t xdim, size_t ydim, i_val* array);
 carr2_X             carr2_X_clone(carr2_X arr);
 void                carr2_X_copy(carr2_X* self, carr2_X other);
-Value*              carr2_X_release(carr2_X* self);       // release storage (not freed)
+i_val*              carr2_X_release(carr2_X* self);       // release storage (not freed)
 void                carr2_X_del(carr2_X* self);
 
 size_t              carr2_X_size(carr2_X arr);
-Value*              carr2_X_data(carr2_X* self);          // access storage data
-Value*              carr2_X_at(carr2_X* self, size_t x, size_t y);
+i_val*              carr2_X_data(carr2_X* self);          // access storage data
+i_val*              carr2_X_at(carr2_X* self, size_t x, size_t y);
 
 carr2_X_iter_t      carr2_X_begin(const carr2_X* self);
 carr2_X_iter_t      carr2_X_end(const carr2_X* self);
@@ -41,16 +41,16 @@ void                carr2_X_next(carr2_X_iter_t* it);
 carr3:
 ```c
 carr3_X             carr3_X_init(size_t xdim, size_t ydim, size_t zdim);
-carr3_X             carr3_X_with_values(size_t xdim, size_t ydim, size_t zdim, Value val);
-carr3_X             carr3_X_with_storage(size_t xdim, size_t ydim, size_t zdim, Value* array);
+carr3_X             carr3_X_with_values(size_t xdim, size_t ydim, size_t zdim, i_val val);
+carr3_X             carr3_X_with_storage(size_t xdim, size_t ydim, size_t zdim, i_val* array);
 carr3_X             carr3_X_clone(carr3_X arr);
 void                carr3_X_copy(carr3_X* self, carr3_X other);
-Value*              carr3_X_release(carr3_X* self);       // release storage (not freed)
+i_val*              carr3_X_release(carr3_X* self);       // release storage (not freed)
 void                carr3_X_del(carr3_X* self);
 
 size_t              carr3_X_size(carr3_X arr);
-Value*              carr3_X_data(carr3_X* self);          // access storage data
-Value*              carr3_X_at(carr3_X* self, size_t x, size_t y, size_t z);
+i_val*              carr3_X_data(carr3_X* self);          // access storage data
+i_val*              carr3_X_at(carr3_X* self, size_t x, size_t y, size_t z);
 
 carr3_X_iter_t      carr3_X_begin(const carr3_X* self);
 carr3_X_iter_t      carr3_X_end(const carr3_X* self);

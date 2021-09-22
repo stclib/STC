@@ -33,8 +33,8 @@ The *csptr_X_compare()*, *csptr_X_del()* methods are defined based on the `i_cmp
 Use *csptr_X_clone(p)* when sharing ownership of the pointed-to object. For shared pointers stored in containers, define `i_val_csptr` to the shared pointers tag instead of a `i_val` macro. See example below.
 ```c
 csptr_X             csptr_X_init();                               // empty constructor
-csptr_X             csptr_X_make(Value val);                      // make_shared constructor, like std::make_shared()
-csptr_X             csptr_X_from(Value* p);                       // construct from raw pointer
+csptr_X             csptr_X_make(i_val val);                      // make_shared constructor, like std::make_shared()
+csptr_X             csptr_X_from(i_val* p);                       // construct from raw pointer
 csptr_X             csptr_X_clone(csptr_X ptr);                   // return ptr with increased use count
 csptr_X             csptr_X_move(csptr_X* self);                  // transfer ownership to another sptr.
 void                csptr_X_take(csptr_X* self, csptr_X other);   // take a new-created or moved csptr
@@ -44,8 +44,8 @@ void                csptr_X_del(csptr_X* self);                   // destruct (d
 long                csptr_X_use_count(csptr_X ptr);
 
 void                csptr_X_reset(csptr_X* self);
-void                csptr_X_reset_with(csptr_X* self, Value val); // make and assign new csptr with value
-void                csptr_X_reset_from(csptr_X* self, Value* p);  // create csptr from p.
+void                csptr_X_reset_with(csptr_X* self, i_val val); // make and assign new csptr with value
+void                csptr_X_reset_from(csptr_X* self, i_val* p);  // create csptr from p.
 
 int                 csptr_X_compare(const csptr_X* x, const csptr_X* y);
 bool                csptr_X_equals(const csptr_X* x, const csptr_X* y);
