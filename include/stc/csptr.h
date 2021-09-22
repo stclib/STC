@@ -157,12 +157,11 @@ cx_memb(_reset_make)(Self* self, cx_value_t val) {
     return self->get;
 }
 
-STC_INLINE cx_value_t*
+STC_INLINE void
 cx_memb(_copy)(Self* self, Self ptr) {
+    if (ptr.use_count) cx_increment(ptr.use_count);
     cx_memb(_del)(self);
     *self = ptr;
-    if (self->use_count) cx_increment(self->use_count);
-    return self->get;
 }
 
 STC_INLINE int
