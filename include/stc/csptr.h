@@ -163,7 +163,8 @@ cx_memb(_copy)(Self* self, Self ptr) {
 
 STC_INLINE void
 cx_memb(_take)(Self* self, Self ptr) {
-    cx_memb(_del)(self); *self = ptr;
+    if (self->get != ptr.get) cx_memb(_del)(self);
+    *self = ptr;
 }
 
 STC_INLINE int
