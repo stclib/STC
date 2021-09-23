@@ -76,8 +76,8 @@ void int_del(int* x) {
 #define i_key_csptr int   // refer to csptr_int definition above
 #include <stc/csset.h>    // define a sorted set of csptr_int
 
-#define i_val_csptr int
-#include <stc/cvec.h>     // define a sorted vector of csptr_int
+#define i_val_csptr int   // refer to csptr_int definition above
+#include <stc/cvec.h>     // define a vector of csptr_int
 
 int main()
 {

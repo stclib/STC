@@ -139,8 +139,8 @@
   #ifndef i_keydel
     #define i_keydel c_default_del
   #endif
-#elif defined i_keydel || defined i_keyfrom || defined i_keyraw || defined i_hash || defined i_equ
-  #warning i_key-related definitions without i_key are ignored.
+#elif defined i_isset || defined i_keydel || defined i_keyfrom || defined i_keyraw || defined i_hash || defined i_equ
+  #error i_key define is missing.
 #endif
 
 #ifndef i_tag
