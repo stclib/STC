@@ -23,8 +23,7 @@ void Person_del(Person* p) {
 #include <stc/csptr.h>
 
 #define i_tag iptr
-#define i_key csptr_int
-#define i_cmp csptr_int_compare
+#define i_key_csptr int
 #include <stc/csset.h>
 
 int main(void) {
@@ -32,14 +31,14 @@ int main(void) {
     c_autovar (csptr_person q = csptr_person_clone(p), csptr_person_del(&q)) // share the pointer
     {
         printf("%s %s. uses: %zu\n", q.get->name.str, q.get->last.str, *q.use_count);
+    }
 
-        c_auto (csset_iptr, map) {
-            csset_iptr_insert(&map, csptr_int_make(2021));
-            csset_iptr_insert(&map, csptr_int_make(2033));
+    c_auto (csset_iptr, map) {
+        csset_iptr_insert(&map, csptr_int_make(2021));
+        csset_iptr_insert(&map, csptr_int_make(2033));
 
-            c_foreach (i, csset_iptr, map)
-                printf(" %d", *i.ref->get);
-            puts("");
-        }
+        c_foreach (i, csset_iptr, map)
+            printf(" %d", *i.ref->get);
+        puts("");
     }
 }
