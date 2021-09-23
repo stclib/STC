@@ -36,7 +36,6 @@ const cpque_X_value_t*  cpque_X_top(const cpque_X* self);
 
 void                    cpque_X_push(cpque_X* self, cpque_X_value_t value);
 void                    cpque_X_emplace(cpque_X* self, cpque_X_rawvalue_t raw);
-void                    cpque_X_emplace_items(cpque_X *self, const cpque_X_rawvalue_t arr[], size_t n);
 
 void                    cpque_X_pop(cpque_X* self);
 void                    cpque_X_erase_at(cpque_X* self, size_t idx);
@@ -74,7 +73,7 @@ int main()
         // Push ten million random numbers to priority queue, plus some negative ones.
         c_forrange (N)
             cpque_i_push(&heap, stc64_uniform(&rng, &dist));
-        c_emplace(cpque_i, heap, {-231, -32, -873, -4, -343});
+        c_apply(cpque_i, push, &heap, {-231, -32, -873, -4, -343});
 
         // Extract and display the fifty smallest.
         c_forrange (50) {

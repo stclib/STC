@@ -56,7 +56,6 @@ void                clist_X_pop_front(clist_X* self);
 
 void                clist_X_push_back(clist_X* self, i_val value);                          // note: no pop_back().
 void                clist_X_emplace_back(clist_X* self, i_valraw raw);
-void                clist_X_emplace_items(clist_X *self, const clist_X_rawvalue_t arr[], size_t n);
 
 clist_X_iter_t      clist_X_insert(clist_X* self, clist_X_iter_t it, i_val value);          // return iter to new elem
 clist_X_iter_t      clist_X_emplace(clist_X* self, clist_X_iter_t it, i_valraw raw);
@@ -103,7 +102,8 @@ Interleave *push_front()* / *push_back()* then *sort()*:
 #include <stdio.h>
 
 int main() {
-    c_var (clist_d, list, {
+    clist_d list = clist_d_init();
+    c_apply(clist_d, push_back, &list, {
         10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0
     });
 
@@ -143,7 +143,8 @@ Use of *erase_at()* and *erase_range()*:
 
 int main ()
 {
-    c_var (clist_i, L, {10, 20, 30, 40, 50});
+    clist_i L = clist_i_init();
+    c_apply(clist_i, push_back, &L, {10, 20, 30, 40, 50});
                                                  // 10 20 30 40 50
     clist_i_iter_t it = clist_i_begin(&L);       // ^
     clist_i_next(&it); 
@@ -178,8 +179,8 @@ Splice `[30, 40]` from *L2* into *L1* before `3`:
 int main() {
     c_auto (clist_i, L1, L2)
     {
-        c_emplace(clist_i, L1, {1, 2, 3, 4, 5});
-        c_emplace(clist_i, L2, {10, 20, 30, 40, 50});
+        c_apply(clist_i, push_back, &L1, {1, 2, 3, 4, 5});
+        c_apply(clist_i, push_back, &L2, {10, 20, 30, 40, 50});
 
         clist_i_iter_t i = clist_i_advance(clist_i_begin(&L1), 2);
         clist_i_iter_t j1 = clist_i_advance(clist_i_begin(&L2), 2), j2 = clist_i_advance(j1, 2);

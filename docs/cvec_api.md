@@ -114,7 +114,7 @@ int main()
     cvec_i_push_back(&vec, 13);
 
     // Append a set of numbers
-    c_emplace(cvec_i, vec, {7, 5, 16, 8});
+    c_apply(cvec_i, push_back, &vec, {7, 5, 16, 8});
 
     printf("initial:");
     c_foreach (k, cvec_i, vec) {

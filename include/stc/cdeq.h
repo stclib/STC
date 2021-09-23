@@ -99,12 +99,6 @@ cx_memb(_shrink_to_fit)(Self *self) {
     cx_memb(_del)(self); *self = cx;
 }
 
-STC_INLINE void
-cx_memb(_emplace_items)(Self *self, const cx_rawvalue_t arr[], size_t n) {
-    for (size_t i = 0; i < n; ++i)
-        cx_memb(_push_back)(self, i_valfrom(arr[i]));
-}
-
 #ifndef i_queue
 
 STC_INLINE cx_value_t* cx_memb(_emplace_front)(Self* self, i_valraw raw) {

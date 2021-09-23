@@ -90,7 +90,7 @@ int main()
 #define i_key int
 #include <stc/csset.h>
 ...
-c_emplace(csset_x, set, {23, 3, 7, 5, 12});
+c_apply(csset_x, insert, &set, {23, 3, 7, 5, 12});
 c_foreach (i, csset_x, set)
     printf(" %d", *i.ref);
 // 3 5 7 12 23
@@ -122,11 +122,11 @@ c_forrange (i, int, 30, 0, -5) printf(" %d", i);
 // 30 25 20 15 10 5
 ```
 
-### c_var, c_emplace
-**c_var** declares and initializes any container with an array of elements. **c_emplace** adds elements to any existing container:
+### c_apply, c_apply_pair
+**c_apply** will apply a method on an existing container with the given array elements:
 ```c
-c_var (cvec_i, vec, {1, 2, 3});     // declare and emplace
-c_emplace(cvec_i, vec, {4, 5, 6});  // adds to existing vec
+c_apply (cvec_i, push_back, &vec, {1, 2, 3});   // apply multiple push_backs
+c_apply_pair(cmap_i, insert, &map, { {4, 5}, {6, 7} });  // inserts to existing map
 ```
 
 ### c_new, c_new_n, c_del, c_make

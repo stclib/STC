@@ -17,8 +17,8 @@ int main ()
 {
     c_auto (clist_i, list1, list2)
     {
-        c_emplace(clist_i, list1, {1, 2, 3, 4, 5});
-        c_emplace(clist_i, list2, {10, 20, 30, 40, 50});
+        c_apply(clist_i, push_back, &list1, {1, 2, 3, 4, 5});
+        c_apply(clist_i, push_back, &list2, {10, 20, 30, 40, 50});
         print_ilist("list1:", list1);
         print_ilist("list2:", list2);
 

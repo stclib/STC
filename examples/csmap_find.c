@@ -46,7 +46,7 @@ int main()
     c_auto (csmap_istr, m1)
     c_auto (cvec_istr, v)
     {
-        c_emplace(csmap_istr, m1, { { 40, "Zr" }, { 45, "Rh" } });
+        c_apply_pair(csmap_istr, emplace, &m1, {{40, "Zr"}, {45, "Rh"}});
         puts("The starting map m1 is (key, value):");
         print_collection_csmap_istr(m1);
 

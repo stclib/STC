@@ -146,12 +146,12 @@ int main(void) {
     c_auto (csmap_int, map)
     {
         // add some elements to each container
-        c_emplace(cset_int, set, {10, 20, 30});
-        c_emplace(cvec_pnt, vec, { {10, 1}, {20, 2}, {30, 3} });
-        c_emplace(cdeq_int, deq, {10, 20, 30});
-        c_emplace(clist_int, lst, {10, 20, 30});
-        c_emplace(cstack_int, stk, {10, 20, 30});
-        c_emplace(csmap_int, map, { {20, 2}, {10, 1}, {30, 3} });
+        c_apply(cset_int, insert, &set, {10, 20, 30});
+        c_apply(cvec_pnt, push_back, &vec, { {10, 1}, {20, 2}, {30, 3} });
+        c_apply(cdeq_int, push_back, &deq, {10, 20, 30});
+        c_apply(clist_int, push_back, &lst, {10, 20, 30});
+        c_apply(cstack_int, push, &stk, {10, 20, 30});
+        c_apply_pair(csmap_int, insert, &map, { {20, 2}, {10, 1}, {30, 3} });
 
         // add one more element to each container
         cset_int_insert(&set, 40);

@@ -42,14 +42,14 @@ int main(int argc, char **argv)
     c_static_assert(sizeof argc == 4);
 
     c_auto (cset_str, names) {
-        c_emplace (cset_str, names, {"Hello", "Cool", "True"});
+        c_apply(cset_str, emplace, &names, {"Hello", "Cool", "True"});
         c_foreach (i, cset_str, names) printf("%s ", i.ref->str);
         puts("");
     }
 
     bool erased;
     c_auto (cmap_str, phone_book) {
-        c_emplace (cmap_str, phone_book, {
+        c_apply_pair (cmap_str, emplace, &phone_book, {
             {"Lilia Friedman", "(892) 670-4739"},
             {"Tariq Beltran", "(489) 600-7575"},
             {"Laiba Juarez", "(303) 885-5692"},

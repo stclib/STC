@@ -14,7 +14,7 @@ int main1()
     c_auto (cvec_str, words)
     c_auto (cmap_strn, word_map)
     {
-        c_emplace (cvec_str, words, {
+        c_apply(cvec_str, emplace_back, &words, {
             "this", "sentence", "is", "not", "a", "sentence",
             "this", "sentence", "is", "a", "hoax"
         });

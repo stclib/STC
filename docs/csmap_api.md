@@ -58,7 +58,6 @@ csmap_X_result_t    csmap_X_put(csmap_X* self, i_key key, i_val mapped);        
 
 csmap_X_result_t    csmap_X_emplace(csmap_X* self, i_keyraw rkey, i_valraw rmapped);             // no change if rkey in map
 csmap_X_result_t    csmap_X_emplace_or_assign(csmap_X* self, i_keyraw rkey, i_valraw rmapped);   // always update rmapped
-void                csmap_X_emplace_items(csmap_X* self, const csmap_X_rawvalue_t arr[], size_t n);
 
 size_t              csmap_X_erase(csmap_X* self, i_keyraw rkey);
 csmap_X_iter_t      csmap_X_erase_at(csmap_X* self, csmap_X_iter_t it);                          // returns iter after it
@@ -96,7 +95,8 @@ csmap_X_rawvalue_t  csmap_X_value_toraw(csmap_X_value_t* pval);
 int main()
 {
     // Create an unordered_map of three strings (maps to string)
-    c_var (csmap_str, colors, {
+    csmap_str, colors = csmap_str_init();
+    c_apply(csmap_str, emplace, &colors, {
         {"RED", "#FF0000"},
         {"GREEN", "#00FF00"},
         {"BLUE", "#0000FF"}
@@ -140,7 +140,8 @@ This example uses a csmap with cstr as mapped value.
 int main()
 {
     uint32_t col = 0xcc7744ff;
-    c_var (csmap_id, idnames, {
+    csmap_id idnames = csmap_id_init();
+    c_apply(csmap_id, push_back, &idnames, {
         {100, "Red"},
         {110, "Blue"},
     });

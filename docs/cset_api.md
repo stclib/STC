@@ -46,7 +46,6 @@ cset_X_iter_t       cset_X_find(const cset_X* self, i_keyraw rkey);
 
 cset_X_result_t     cset_X_insert(cset_X* self, i_key key);
 cset_X_result_t     cset_X_emplace(cset_X* self, i_keyraw rkey);
-void                cset_X_emplace_items(cset_X* self, const i_keyraw arr[], size_t n);
 
 size_t              cset_X_erase(cset_X* self, i_keyraw rkey);                               // return 0 or 1
 cset_X_iter_t       cset_X_erase_at(cset_X* self, cset_X_iter_t it);                         // return iter after it
@@ -80,29 +79,28 @@ cset_X_value_t      cset_X_value_clone(cset_X_value_t val);
 
 int main ()
 {
-    cset_str first = cset_str_init(); // empty
-    c_var (cset_str, second, {"red", "green", "blue"});
-    c_var (cset_str, third, {"orange", "pink", "yellow"});
+    c_auto (cset_str, fifth)
+    {
+        c_auto (cset_str, first, second)
+        c_auto (cset_str, third, fourth)
+        {
+            c_apply(cset_str, emplace, &second, {"red", "green", "blue"});
+            c_apply(cset_str, emplace, &third, {"orange", "pink", "yellow"});
 
-    cset_str fourth = cset_str_init();
-    cset_str_emplace(&fourth, "potatoes");
-    cset_str_emplace(&fourth, "milk");
-    cset_str_emplace(&fourth, "flour");
+            cset_str_emplace(&fourth, "potatoes");
+            cset_str_emplace(&fourth, "milk");
+            cset_str_emplace(&fourth, "flour");
 
-    cset_str fifth = cset_str_clone(second);
-    c_foreach (i, cset_str, third)
-        cset_str_emplace(&fifth, i.ref->str);
-    c_foreach (i, cset_str, fourth)
-        cset_str_emplace(&fifth, i.ref->str);
-
-    c_del(cset_str, &first, &second, &third, &fourth);
-
-    printf("fifth contains:\n\n");
-    c_foreach (i, cset_str, fifth)
-        printf("%s\n", i.ref->str);
-
-    cset_str_del(&fifth);
-    return 0;
+            fifth = cset_str_clone(second);
+            c_foreach (i, cset_str, third)
+                cset_str_emplace(&fifth, i.ref->str);
+            c_foreach (i, cset_str, fourth)
+                cset_str_emplace(&fifth, i.ref->str);
+        }
+        printf("fifth contains:\n\n");
+        c_foreach (i, cset_str, fifth)
+            printf("%s\n", i.ref->str);
+    }
 }
 ```
 Output:

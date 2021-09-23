@@ -98,7 +98,6 @@ STC_API void            cx_memb(_del)(Self* self);
 STC_API cx_value_t*     cx_memb(_push_back)(Self* self, i_val value);
 STC_API cx_value_t*     cx_memb(_push_front)(Self* self, i_val value);
 STC_API cx_iter_t       cx_memb(_insert)(Self* self, cx_iter_t it, i_val value);
-STC_API void            cx_memb(_emplace_items)(Self *self, const cx_rawvalue_t arr[], size_t n);
 STC_API cx_iter_t       cx_memb(_erase_at)(Self* self, cx_iter_t it);
 STC_API cx_iter_t       cx_memb(_erase_range)(Self* self, cx_iter_t it1, cx_iter_t it2);
 STC_API size_t          cx_memb(_remove)(Self* self, i_valraw val);
@@ -207,11 +206,6 @@ cx_memb(_push_front)(Self* self, i_val value) {
     _c_clist_insert_after(self, Self, self->last, value);
     if (!self->last) self->last = entry;
     return &entry->value;
-}
-
-STC_DEF void
-cx_memb(_emplace_items)(Self *self, const cx_rawvalue_t arr[], size_t n) {
-    for (size_t i=0; i<n; ++i) cx_memb(_push_back)(self, i_valfrom(arr[i]));
 }
 
 STC_DEF cx_iter_t

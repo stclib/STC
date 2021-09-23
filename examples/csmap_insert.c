@@ -74,10 +74,10 @@ int main()
         c_foreach (e, cvec_ii, v) printf("(%d, %d) ", e.ref->first, e.ref->second);
         puts("");
 
-        csmap_ii_emplace_items(&m2, v.data, cvec_ii_size(v));
+        c_foreach (e, cvec_ii, v) csmap_ii_put(&m2, e.ref->first, e.ref->second);
 
         puts("The modified key and mapped values of m2 are:");
-        c_foreach (e, cvec_ii, v) printf("(%d, %d) ", e.ref->first, e.ref->second);
+        c_foreach (e, csmap_ii, m2) printf("(%d, %d) ", e.ref->first, e.ref->second);
         puts("\n");
     }
 
@@ -99,7 +99,7 @@ int main()
 
     c_auto (csmap_ii, m4) {
         // Insert the elements from an initializer_list
-        c_emplace(csmap_ii, m4, { { 4, 44 }, { 2, 22 }, { 3, 33 }, { 1, 11 }, { 5, 55 } });
+        c_apply_pair(csmap_ii, insert, &m4, { { 4, 44 }, { 2, 22 }, { 3, 33 }, { 1, 11 }, { 5, 55 } });
         puts("After initializer_list insertion, m4 contains:");
         print_ii(m4);
         puts("");

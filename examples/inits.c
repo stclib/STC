@@ -47,7 +47,7 @@ int main(void)
         // CVEC PRIORITY QUEUE
 
         cpque_f_make_heap(&floats);
-        c_emplace(cpque_f, floats, {40.0f, 20.0f, 50.0f, 30.0f, 10.0f});
+        c_apply(cpque_f, push, &floats, {40.0f, 20.0f, 50.0f, 30.0f, 10.0f});
 
         puts("\npop and show high priorites first:");
         while (! cpque_f_empty(floats)) {
@@ -73,7 +73,7 @@ int main(void)
     // CMAP CNT
 
     c_auto (cmap_cnt, countries) {
-        c_emplace(cmap_cnt, countries, {
+        c_apply_pair(cmap_cnt, emplace, &countries, {
             {"Norway", 100},
             {"Denmark", 50},
             {"Iceland", 10},
@@ -96,7 +96,7 @@ int main(void)
     // CVEC PAIR
 
     c_auto (cvec_ip, pairs1) {
-        c_emplace (cvec_ip, pairs1, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
+        c_apply(cvec_ip, push_back, &pairs1, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
         cvec_ip_sort(&pairs1);
 
         c_foreach (i, cvec_ip, pairs1)
@@ -107,7 +107,7 @@ int main(void)
     // CLIST PAIR
 
     c_auto (clist_ip, pairs2) {
-        c_emplace(clist_ip, pairs2, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
+        c_apply(clist_ip, push_back, &pairs2, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
         clist_ip_sort(&pairs2);
 
         c_foreach (i, clist_ip, pairs2)

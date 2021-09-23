@@ -178,12 +178,6 @@ cx_memb(_emplace)(Self* self, i_keyraw rkey cx_MAP_ONLY(, i_valraw rmapped)) {
     return res;
 }
 
-STC_INLINE void
-cx_memb(_emplace_items)(Self* self, const cx_rawvalue_t arr[], size_t n) {
-    for (size_t i=0; i<n; ++i) cx_SET_ONLY( cx_memb(_emplace)(self, arr[i]); )
-                               cx_MAP_ONLY( cx_memb(_emplace)(self, arr[i].first, arr[i].second); )
-}
-
 STC_INLINE cx_result_t
 cx_memb(_insert)(Self* self, i_key key cx_MAP_ONLY(, i_val mapped)) {
     cx_result_t res = cx_memb(_insert_entry_)(self, i_keyto(&key));

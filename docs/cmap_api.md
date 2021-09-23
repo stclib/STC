@@ -65,7 +65,6 @@ cmap_X_result_t     cmap_X_put(cmap_X* self, i_key key, i_val mapped);          
 
 cmap_X_result_t     cmap_X_emplace(cmap_X* self, i_keyraw rkey, i_valraw rmapped);            // no change if rkey in map
 cmap_X_result_t     cmap_X_emplace_or_assign(cmap_X* self, i_keyraw rkey, i_valraw rmapped);  // always update rmapped
-void                cmap_X_emplace_items(cmap_X* self, const cmap_X_rawvalue_t arr[], size_t n);
 
 size_t              cmap_X_erase(cmap_X* self, i_keyraw rkey);                                // return 0 or 1
 cmap_X_iter_t       cmap_X_erase_at(cmap_X* self, cmap_X_iter_t it);                          // return iter after it
@@ -124,7 +123,8 @@ void                c_default_del(Type* val);                               // d
 int main()
 {
     // Create an unordered_map of three strings (that map to strings)
-    c_var (cmap_str, u, {
+    cmap_str u = cmap_str_init();
+    c_apply_pair(cmap_str, emplace, &u, {
         {"RED", "#FF0000"},
         {"GREEN", "#00FF00"},
         {"BLUE", "#0000FF"}
@@ -171,7 +171,7 @@ int main()
     uint32_t col = 0xcc7744ff;
 
     cmap_id idnames = cmap_id_init();
-    c_emplace(cmap_id, idnames, { {100, "Red"}, {110, "Blue"} });
+    c_apply_pair(cmap_id, emplace, &idnames, { {100, "Red"}, {110, "Blue"} });
     
     /* replace existing mapped value: */
     cmap_id_emplace_or_assign(&idnames, 110, "White");

@@ -42,16 +42,15 @@ int main()
     {
         c_forrange (n, c_arraylen(data))
             cpque_imax_push(&q, n);
-
         print_cpque_imax(q);
 
-        cpque_imin_emplace_items(&q2, data, c_arraylen(data));
+        c_forrange (i, c_arraylen(data))
+            cpque_imin_push(&q2, data[i]);
         print_cpque_imin(q2);
 
         // Using imix_less to compare elements.
         c_forrange (n, c_arraylen(data))
             cpque_imix_push(&q3, n);
-
         print_cpque_imix(q3);
     }
 }

@@ -41,7 +41,6 @@ typedef i_valraw cx_rawvalue_t;
 STC_API void cx_memb(_make_heap)(Self* self);
 STC_API void cx_memb(_erase_at)(Self* self, size_t idx);
 STC_API void cx_memb(_push)(Self* self, cx_value_t value);
-STC_API void cx_memb(_emplace_items)(Self *self, const cx_rawvalue_t arr[], size_t n);
 STC_API Self cx_memb(_clone)(Self q);
 
 STC_INLINE Self cx_memb(_init)(void)
@@ -150,12 +149,6 @@ cx_memb(_push)(Self* self, cx_value_t value) {
     for (; c > 1 && i_cmp(&arr[c >> 1], &value) < 0; c >>= 1)
         arr[c] = arr[c >> 1];
     if (c != n) arr[c] = value;
-}
-
-STC_DEF void
-cx_memb(_emplace_items)(Self *self, const cx_rawvalue_t arr[], size_t n) {
-    for (size_t i = 0; i < n; ++i)
-        cx_memb(_push)(self, i_valfrom(arr[i]));
 }
 
 #endif

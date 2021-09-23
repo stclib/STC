@@ -36,8 +36,8 @@ int main()
 
     c_auto (csmap_my, m2)
     {
-        // Fill in some data to test with, one at a time, using c_emplace()
-        c_emplace(csmap_my, m2, {
+        // Fill in some data to test with, one at a time, using c_apply_pair()
+        c_apply_pair(csmap_my, emplace, &m2, {
             {10, "Bob"},
             {11, "Rob"},
             {12, "Robert"},

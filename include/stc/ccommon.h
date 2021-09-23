@@ -156,12 +156,18 @@ STC_API uint64_t c_default_hash(const void *key, size_t len);
          *b = (n)*sizeof *b > (BYTES) ? c_new_n(type, n) : _c_b \
          ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)
 
-#define c_var(CX, c, ...) \
-    CX c = CX##_init(); c_emplace(CX, c, __VA_ARGS__)
-
-#define c_emplace(CX, cx, ...) do { \
+#define c_apply(CX, method, cx, ...) do { \
     const CX##_rawvalue_t _c_arr[] = __VA_ARGS__; \
-    CX##_emplace_items(&(cx), _c_arr, c_arraylen(_c_arr)); \
+    CX* _c_cx = (cx); \
+    for (size_t _c_i = 0; _c_i < c_arraylen(_c_arr); ++_c_i) \
+        CX##_##method(_c_cx, _c_arr[_c_i]); \
+} while (0)
+
+#define c_apply_pair(CX, method, cx, ...) do { \
+    const CX##_rawvalue_t _c_arr[] = __VA_ARGS__; \
+    CX* _c_cx = (cx); \
+    for (size_t _c_i = 0; _c_i < c_arraylen(_c_arr); ++_c_i) \
+        CX##_##method(_c_cx, _c_arr[_c_i].first, _c_arr[_c_i].second); \
 } while (0)
 
 #define c_del(CX, ...) do { \
