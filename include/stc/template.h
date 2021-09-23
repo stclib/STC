@@ -104,6 +104,14 @@
   #define i_valraw  const char*
 #endif
 
+#if defined i_del && defined i_isset
+  #define i_keydel i_del
+#elif defined i_del && !defined i_key
+  #define i_valdel i_del
+#elif defined i_del
+  #error i_del not supported for maps, define i_keydel / i_valdel instead.
+#endif
+
 #ifdef i_key
   #ifndef i_val
     #define i_val i_key
@@ -131,6 +139,8 @@
   #ifndef i_keydel
     #define i_keydel c_default_del
   #endif
+#elif defined i_keydel || defined i_keyfrom || defined i_keyraw || defined i_hash || defined i_equ
+  #warning i_key-related definitions without i_key are ignored.
 #endif
 
 #ifndef i_tag
@@ -160,6 +170,7 @@
 #undef i_imp
 #undef i_fwd
 #undef i_cmp
+#undef i_del
 #undef i_equ
 #undef i_hash
 #undef i_val

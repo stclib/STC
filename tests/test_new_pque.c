@@ -8,10 +8,10 @@ struct MyStruct {
 };
 
 #define i_val int
-#include "cstack.h"
+#include <stc/cstack.h>
 
 #define i_val int
-#include "cpque.h"
+#include <stc/cpque.h>
 
 struct Point { int x, y; } typedef Point;
 
@@ -22,7 +22,7 @@ int Point_cmp(const Point* a, const Point* b) {
 #define F_tag pnt  // F: was forward declared.
 #define i_val Point
 #define i_cmp Point_cmp
-#include "cpque.h"
+#include <stc/cpque.h>
 
 #include <stdio.h>
 

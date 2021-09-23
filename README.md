@@ -272,7 +272,11 @@ c_autovar (cstr s = cstr_lit("a string literal"), cstr_del(&s))  // cstr_lit() f
 ```
 This is made possible because the type configuration may be given an optional
 conversion/"rawvalue"-type as template parameter, along with a back and forth conversion
-methods to the container value type. By default, *rawvalue has the same type as value*.
+methods to the container value type.
+
+Hence, `i_val x = ..., y = i_valfrom(i_valto(&x))` works as a *clone* function, where the output of 
+`i_valto()` is type `i_valraw`. Function `i_valfrom()` is a *clone* function when `i_valraw/i_valto` is
+undefined (i_valraw defaults to `i_val`). Same for `i_key`.
 
 Rawvalues are also beneficial for **find()** and *map insertions*. The **emplace()** methods constructs
 *cstr*-objects from the rawvalues, but only when required:

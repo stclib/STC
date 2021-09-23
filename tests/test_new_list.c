@@ -1,5 +1,5 @@
-#include "cstr.h"
-#include "forward.h"
+#include <stc/cstr.h>
+#include <stc/forward.h>
 
 forward_clist(i32, int);
 forward_clist(pnt, struct Point);
@@ -12,7 +12,7 @@ struct MyStruct {
 
 #define F_tag i32
 #define i_val int
-#include "clist.h"
+#include <stc/clist.h>
 
 struct Point { int x, y; } typedef Point;
 int point_compare(const Point* a, const Point* b) {
@@ -22,13 +22,13 @@ int point_compare(const Point* a, const Point* b) {
 #define F_tag pnt
 #define i_val Point
 #define i_cmp point_compare
-#include "clist.h"
+#include <stc/clist.h>
 
 #define i_val float
-#include "clist.h"
+#include <stc/clist.h>
 
 #define i_val_str
-#include "clist.h"
+#include <stc/clist.h>
 
 
 int main()

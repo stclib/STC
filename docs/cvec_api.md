@@ -23,6 +23,8 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
 
+`i_del` may be defined instead of `i_valdel` (or `i_keydel`) for all non-map containers.
+
 ## Methods
 
 ```c
