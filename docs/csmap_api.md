@@ -96,7 +96,7 @@ int main()
 {
     // Create an unordered_map of three strings (maps to string)
     csmap_str, colors = csmap_str_init();
-    c_apply(csmap_str, emplace, &colors, {
+    c_apply_pair(csmap_str, emplace, &colors, {
         {"RED", "#FF0000"},
         {"GREEN", "#00FF00"},
         {"BLUE", "#0000FF"}
@@ -141,7 +141,7 @@ int main()
 {
     uint32_t col = 0xcc7744ff;
     csmap_id idnames = csmap_id_init();
-    c_apply(csmap_id, push_back, &idnames, {
+    c_apply_pair(csmap_id, emplace, &idnames, {
         {100, "Red"},
         {110, "Blue"},
     });
