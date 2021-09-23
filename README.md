@@ -51,7 +51,7 @@ Highlights
 - **Small footprint** - Small source code and generated executables. The executable from the example below with six different containers is *22 kb in size* compiled with gcc -Os on linux.
 - **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See the Installation section.
 - **No callback functions** - All passed template argument functions/macros are directly called from the implementation, no slow callbacks which requires storage.
-- **Compiles with C++ and C99** - C code can be compiled with C++.
+- **Compiles with C++ and C99** - C code can be compiled with C++ (container element types must be POD).
 - **Container prefix and forward declaration** - Templated containers may have user defined prefix, e.g. MyVec_push_back(). They may also be forward declared without including the full API/implementation. See documentation below.
 
 Performance
