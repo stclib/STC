@@ -6,7 +6,6 @@ STC - Smart Template Containers for C
 News
 ----
 **VERSION 2.X RELEASED**: There are two main breaking changes from V1.X.
-- New name
 - Now uses a different way to instantiate templated containers, which is incompatible with v1.X.
 - c_forauto, c_forvar, c_forscope are now renamed to **c_auto**, **c_autovar**, and **c_autoscope**. There is also a **c_exitauto** macro, which breaks out of an auto-block. The auto name refers to the original meaning of auto keyword in C, namely automatic stack allocated variable, however now it covers automatic resource (de)allocation in general. 
 
