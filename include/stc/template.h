@@ -113,7 +113,7 @@
 #endif
 
 #ifdef i_key
-  #ifndef i_val
+  #ifdef i_isset
     #define i_val i_key
   #endif
   #ifndef i_tag
