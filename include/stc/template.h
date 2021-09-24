@@ -26,10 +26,7 @@
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
   #define cx_memb(name) c_PASTE(Self, name)
-  #define Self c_PASTE(i_prefix, i_tag)
-  // typedef container types defined in forward.h. VC requires c_EXPAND.
   #define cx_deftypes(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
-
   #define cx_value_t cx_memb(_value_t)
   #define cx_key_t cx_memb(_key_t)
   #define cx_mapped_t cx_memb(_mapped_t)
@@ -42,6 +39,7 @@
   #define cx_size_t cx_memb(_size_t)
 #endif
 
+#define Self c_PASTE(i_prefix, i_tag)
 #if defined i_valraw && !(defined i_valto && defined i_valfrom)
   #error if i_valraw or i_valto defined, i_valfrom must be defined
 #endif
@@ -139,7 +137,7 @@
   #ifndef i_keydel
     #define i_keydel c_default_del
   #endif
-#elif defined i_isset || defined i_keydel || defined i_keyfrom || defined i_keyraw || defined i_hash || defined i_equ
+#elif defined i_isset || defined i_hash || defined i_equ
   #error i_key define is missing.
 #endif
 
@@ -188,6 +186,7 @@
 #undef i_key_csptr
 #undef i_val_csptr
 #undef i_prefix_csptr
+#undef Self
 
 #undef i_template
 #endif
