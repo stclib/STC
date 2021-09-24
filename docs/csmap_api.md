@@ -94,7 +94,7 @@ csmap_X_rawvalue_t  csmap_X_value_toraw(csmap_X_value_t* pval);
 
 int main()
 {
-    // Create an unordered_map of three strings (maps to string)
+    // Create a sorted map of three strings (maps to string)
     csmap_str, colors = csmap_str_init();
     c_apply_pair(csmap_str, emplace, &colors, {
         {"RED", "#FF0000"},
@@ -102,12 +102,12 @@ int main()
         {"BLUE", "#0000FF"}
     });
 
-    // Iterate and print keys and values of unordered map
+    // Iterate and print keys and values of sorted map
     c_foreach (i, csmap_str, colors) {
         printf("Key:[%s] Value:[%s]\n", i.ref->first.str, i.ref->second.str);
     }
 
-    // Add two new entries to the unordered map
+    // Add two new entries to the sorted map
     csmap_str_emplace(&colors, "BLACK", "#000000");
     csmap_str_emplace(&colors, "WHITE", "#FFFFFF");
 
