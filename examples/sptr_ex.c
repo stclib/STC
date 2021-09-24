@@ -38,14 +38,13 @@ void Song_del(Song* s) {
 
 void example3()
 {
-    c_auto (cvec_song, v, v2) {
-        csptr_song songs[] = {
+    c_auto (cvec_song, v, v2)
+    {
+        c_apply(cvec_song, push_back, &v, {
             csptr_song_make(Song_from("Bob Dylan", "The Times They Are A Changing")),
             csptr_song_make(Song_from("Aretha Franklin", "Bridge Over Troubled Water")),
             csptr_song_make(Song_from("Thalia", "Entre El Mar y Una Estrella"))
-        };
-        c_forrange (i, c_arraylen(songs))
-            cvec_song_push_back(&v, songs[i]);
+        });
 
         c_foreach (s, cvec_song, v)
             if (!cstr_equalto(s.ref->get->artist, "Bob Dylan"))

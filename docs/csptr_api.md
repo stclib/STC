@@ -24,13 +24,20 @@ See the c++ classes [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/s
 #define i_valdel    // destroy value func - defaults to empty destruct
 #include <stc/csptr.h>
 ```
-`X` should be replaced by the value of `i_tag` in all of the following documentation. When declaring a container with shared pointers, define the `i_val_csptr` with the csptr's `i_tag`. See example below.
+`X` should be replaced by the value of `i_tag` in all of the following documentation.
+
+The *csptr_X_compare()*, *csptr_X_del()* methods are defined based on the `i_cmp` and `i_valdel`
+macros specified. Use *csptr_X_clone(p)* when sharing ownership of the pointed-to object. 
+
+When declaring a container with shared pointers, define the `i_val_csptr` with the csptr's `i_tag`.
+See example.
+
+Also for containers, make sure to pass the result of *csptr_X_make()* to *insert*, *push_back*,
+or *push*, and not an *emplace* function. The *csptr_X_make()* method creates a **csptr** with 
+use-count 1, and *emplace* will ***clone*** it and increase the count, causing a memory leak. Use
+*emplace* functions when sharing **csptr**s between containers or other existing shared pointers.
 
 ## Methods
-
-The *csptr_X_compare()*, *csptr_X_del()* methods are defined based on the `i_cmp` and `i_valdel` macros specified.
-
-Use *csptr_X_clone(p)* when sharing ownership of the pointed-to object. For shared pointers stored in containers, define `i_val_csptr` to the shared pointers tag instead of a `i_val` macro. See example below.
 ```c
 csptr_X             csptr_X_init();                               // empty constructor
 csptr_X             csptr_X_make(i_val val);                      // make_shared constructor, like std::make_shared()
