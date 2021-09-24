@@ -42,11 +42,11 @@
   #define cx_size_t cx_memb(_size_t)
 #endif
 
-#if (defined i_valto ^ defined i_valraw) || (defined i_valraw && !defined i_valfrom)
-  #error if i_valraw defined, both i_valfrom and i_valto must be defined
+#if defined i_valraw && !(defined i_valto && defined i_valfrom)
+  #error if i_valraw or i_valto defined, i_valfrom must be defined
 #endif
-#if (defined i_keyto ^ defined i_keyraw) || (defined i_keyraw && !defined i_keyfrom)
-  #error if i_keyraw defined, both i_keyfrom and i_keyto must be defined
+#if defined i_keyraw && !(defined i_keyto && defined i_keyfrom)
+  #error if i_keyraw or i_keyto defined, i_keyfrom a must be defined
 #endif
 
 #ifdef F_tag
