@@ -4,14 +4,22 @@
 Several **csptr** objects may own the same object. The object is destroyed and its memory
 deallocated when the last remaining **csptr** owning the object is destroyed with *csptr_X_del()*;
 
-The object is destroyed using *csptr_X_del()* or a custom deleter that is supplied to **csptr**
-in the using-statement.
-
-A **csptr** may also own no objects, in which case it is called empty.
+The object is destroyed using *csptr_X_del()*. A **csptr** may also own no objects, in which 
+case it is called empty. The *csptr_X_compare()*, *csptr_X_del()* methods are defined based on
+the `i_cmp` and `i_valdel` macros specified. Use *csptr_X_clone(p)* when sharing ownership of
+the pointed-to object. 
 
 All **csptr** functions can be called by multiple threads on different instances of **csptr** without
 additional synchronization even if these instances are copies and share ownership of the same object.
 **csptr** uses thread-safe atomic reference counting, through the *csptr_X_clone()* and *csptr_X_del()* methods.
+
+When declaring a container with shared pointers, define the `i_val_csptr` with the csptr's `i_tag`.
+See example.
+
+Also for containers, make sure to pass the result of *csptr_X_make()* to *insert*, *push_back*,
+or *push*, and not an *emplace* function. The *csptr_X_make()* method creates a **csptr** with 
+use-count 1, and *emplace* will ***clone*** it and increase the count, causing a memory leak. Use
+*emplace* functions when sharing **csptr**s between containers or other existing shared pointers.
 
 See the c++ classes [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr) for a functional reference.
 
@@ -25,17 +33,6 @@ See the c++ classes [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/s
 #include <stc/csptr.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
-
-The *csptr_X_compare()*, *csptr_X_del()* methods are defined based on the `i_cmp` and `i_valdel`
-macros specified. Use *csptr_X_clone(p)* when sharing ownership of the pointed-to object. 
-
-When declaring a container with shared pointers, define the `i_val_csptr` with the csptr's `i_tag`.
-See example.
-
-Also for containers, make sure to pass the result of *csptr_X_make()* to *insert*, *push_back*,
-or *push*, and not an *emplace* function. The *csptr_X_make()* method creates a **csptr** with 
-use-count 1, and *emplace* will ***clone*** it and increase the count, causing a memory leak. Use
-*emplace* functions when sharing **csptr**s between containers or other existing shared pointers.
 
 ## Methods
 ```c
