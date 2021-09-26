@@ -51,7 +51,7 @@ Highlights
 - **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See the Installation section.
 - **No callback functions** - All passed template argument functions/macros are directly called from the implementation, no slow callbacks which requires storage.
 - **Compiles with C++ and C99** - C code can be compiled with C++ (container element types must be POD).
-- **Container prefix and forward declaration** - Templated containers may have user defined prefix, e.g. MyVec_push_back(). They may also be forward declared without including the full API/implementation. See documentation below.
+- **Container prefix and forward declaration** - Templated containers may have user defined prefix, e.g. myvec_push_back(). They may also be forward declared without including the full API/implementation. See documentation below.
 
 Performance
 -----------
@@ -233,8 +233,8 @@ in your build environment and place all the instantiations of containers used in
 The *emplace* versus non-emplace container methods
 --------------------------------------------------
 STC, like c++ STL, has two sets of methods for adding elements to containers. One set begins
-with **emplace**, e.g. **cvec_X_emplace_back()**. This is a convenient alternative to
-**cvec_X_push_back()** when dealing non-trivial container elements, e.g. strings, shared pointers or
+with **emplace**, e.g. *cvec_X_emplace_back()*. This is a convenient alternative to
+*cvec_X_push_back()* when dealing non-trivial container elements, e.g. strings, shared pointers or
 other elements using dynamic memory or shared resources.
 
 The **emplace** methods ***constructs*** or ***clones*** the given elements before they are added
@@ -244,10 +244,10 @@ container. For containers of integral or trivial element types, **emplace** and 
 
 | non-emplace: Move         | emplace: Clone               | Container                                   |
 |:--------------------------|:-----------------------------|:--------------------------------------------|
-| insert()                  | emplace()                    | cmap, cset, csmap, csset, cvec, cdeq, clist |
+| insert()                  | emplace()                    | cmap, csmap, cset, csset, cdeq, clist, cvec |
 | insert_or_assign(), put() | emplace_or_assign()          | cmap, csmap                                 |
-| push()                    | emplace()                    | cstack, cqueue, cpque                       |
-| push_back()               | emplace_back()               | cvec, cdeq, clist                           |
+| push()                    | emplace()                    | cqueue, cpque, cstack                       |
+| push_back()               | emplace_back()               | cdeq, clist, cvec                           |
 | push_front()              | emplace_front()              | cdeq, clist                                 |
 
 Strings are the most commonly used non-trivial data type. STC containers have proper pre-defined
@@ -277,8 +277,8 @@ Hence, `i_val x = ..., y = i_valfrom(i_valto(&x))` works as a *clone* function, 
 `i_valto()` is type `i_valraw`. Function `i_valfrom()` is a *clone* function when `i_valraw/i_valto` is
 undefined (i_valraw defaults to `i_val`). Same for `i_key`.
 
-Rawvalues are also beneficial for **find()** and *map insertions*. The **emplace()** methods constructs
-*cstr*-objects from the rawvalues, but only when required:
+Rawvalues are also beneficial for **lookup** and **map insertions**. The **emplace** methods constructs
+`cstr`-objects from the rawvalues, but only when required:
 ```c
 cmap_str_emplace(&map, "Hello", "world");
 // Two cstr-objects were constructed by emplace
@@ -313,7 +313,7 @@ Forward declaring containers
 ----------------------------
 It is possible to forward declare containers. This is useful when a container is part of a struct, 
 but still not expose or include the full implementation / API of the container.
-```
+```c
 // Header file
 #include <stc/forward.h> // only include data structures
 forward_cstack(pnt, struct Point); // declare cstack_pnt and cstack_pnt_value_t, cstack_pnt_iter_t;
@@ -333,14 +333,14 @@ typedef struct Dataset {
 User-defined container prefix
 -----------------------------
 Define either i_prefix or i_tag as empty:
-```
+```c
 #define i_prefix
-#define i_tag ivec
+#define i_tag myvec
 #define i_val int
 #include <stc/cvec.h>
 
-ivec vec = ivec_init();
-ivec_push_back(&vec, 1);
+myvec vec = myvec_init();
+myvec_push_back(&vec, 1);
 ```
 
 Memory efficiency
