@@ -22,27 +22,27 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ## Methods
 
 ```c
-cpque_X                 cpque_X_init(void);
-cpque_X                 cpque_X_clone(cpque_X pq);
+cpque_X             cpque_X_init(void);
+cpque_X             cpque_X_clone(cpque_X pq);
 
-void                    cpque_X_clear(cpque_X* self);
-void                    cpque_X_reserve(cpque_X* self, size_t n);
-void                    cpque_X_copy(cpque_X* self, cpque_X other);
-void                    cpque_X_del(cpque_X* self);        // destructor
+void                cpque_X_clear(cpque_X* self);
+void                cpque_X_reserve(cpque_X* self, size_t n);
+void                cpque_X_copy(cpque_X* self, cpque_X other);
+void                cpque_X_del(cpque_X* self);        // destructor
 
-size_t                  cpque_X_size(cpque_X pq);
-bool                    cpque_X_empty(cpque_X pq);
-const cpque_X_value_t*  cpque_X_top(const cpque_X* self);
+size_t              cpque_X_size(cpque_X pq);
+bool                cpque_X_empty(cpque_X pq);
+cpque_X_value_t*    cpque_X_top(const cpque_X* self);
 
-void                    cpque_X_make_heap(cpque_X* self);  // call after using push_back().
-void                    cpque_X_push(cpque_X* self, cpque_X_value_t value);
-void                    cpque_X_emplace(cpque_X* self, cpque_X_rawvalue_t raw);
+void                cpque_X_make_heap(cpque_X* self);  // call after using push_back().
+void                cpque_X_push(cpque_X* self, cpque_X_value_t value);
+void                cpque_X_emplace(cpque_X* self, cpque_X_rawvalue_t raw);
 
-void                    cpque_X_pop(cpque_X* self);
-void                    cpque_X_erase_at(cpque_X* self, size_t idx);
+void                cpque_X_pop(cpque_X* self);
+void                cpque_X_erase_at(cpque_X* self, size_t idx);
 
-void                    cpque_X_push_back(cpque_X* self, cpque_X_value_t value); // breaks heap-property
-cpque_X_value_t         cpque_X_value_clone(cpque_X_value_t val);
+void                cpque_X_push_back(cpque_X* self, cpque_X_value_t value); // breaks heap-property
+cpque_X_value_t     cpque_X_value_clone(cpque_X_value_t val);
 ```
 
 ## Types

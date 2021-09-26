@@ -42,8 +42,9 @@ Others:
 
 Highlights
 ----------
-- **User friendly** - Just include the headers and you are good. The API and functionality is very close to c++ STL, and is fully listed in the docs. The ***#define i_xxx***-declarations configures the container type to use. You may define various names to customize element-*comparison*, *destruction*, *cloning*, *conversion types*, and more.
-- **Unparalleled performance** - The containers are about equal and often much faster than the c++ STL containers.
+- **User friendly** - Just include the headers and you are good. The API and functionality is very close to c++ STL, and is fully listed in the docs. 
+- **Templates** - Use `#define i_`**xxx** to specify container template arguments. There are templates for element-*type*, -*comparison*, -*destruction*, -*cloning*, -*conversion types*, and more.
+- **Unparalleled performance** - Some containers are much faster than the c++ STL containers, the rest are about equal in speed.
 - **Fully memory managed** - All containers will destruct keys/values via destructor defined as macro parameters before including the container header. Also, shared pointers are supported and can be stored in containers, see ***csptr***.
 - **Fully type safe** - Because of templating, it avoids error-prone casting of container types and elements back and forth from the containers.
 - **Uniform, easy-to-learn API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have uniform and intuitive usage across the various containers.
@@ -332,7 +333,7 @@ typedef struct Dataset {
 
 User-defined container prefix
 -----------------------------
-Define either i_prefix or i_tag as empty:
+Define either `i_prefix` or `i_tag` as empty:
 ```c
 #define i_prefix
 #define i_tag myvec
