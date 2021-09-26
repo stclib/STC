@@ -42,7 +42,13 @@ STC_INLINE Self cx_memb(_init)(void)
     { return c_make(Self){0, 0, 0}; }
 
 STC_INLINE Self cx_memb(_with_capacity)(size_t cap) {
-    Self out = {(cx_value_t *) c_malloc(cap*sizeof(cx_value_t)), 0, cap};
+    Self out = {(cx_value_t *) c_malloc(cap*sizeof(i_val)), 0, cap};
+    return out;
+}
+
+STC_INLINE Self cx_memb(_with_size)(size_t size, i_val fill) {
+    Self out = {(cx_value_t *) c_malloc(size*sizeof fill), size, size};
+    while (size) out.data[--size] = fill;
     return out;
 }
 
@@ -69,12 +75,17 @@ STC_INLINE cx_value_t* cx_memb(_top)(const Self* self)
 STC_INLINE void cx_memb(_pop)(Self* self)
     { --self->size; i_valdel(&self->data[self->size]); }
 
-STC_INLINE void cx_memb(_push)(Self* self, cx_value_t value) {
-    if (self->size == self->capacity) {
-        self->capacity = self->size*3/2 + 4;
-        self->data = (cx_value_t *)c_realloc(self->data, self->capacity*sizeof value);
-    }
-    self->data[ self->size++ ] = value;
+STC_INLINE void cx_memb(_reserve)(Self* self, size_t n) {
+    if (n >= self->size)
+        self->data = (cx_value_t *)c_realloc(self->data, (self->capacity = n)*sizeof(cx_rawvalue_t));
+}
+
+STC_INLINE void cx_memb(_shrink_to_fit)(Self* self)
+    { cx_memb(_reserve)(self, self->size); }
+
+STC_INLINE void cx_memb(_push)(Self* self, cx_value_t val) {
+    if (self->size == self->capacity) cx_memb(_reserve)(self, self->size*3/2 + 4);
+    self->data[ self->size++ ] = val;
 }
 
 STC_INLINE void cx_memb(_emplace)(Self* self, cx_rawvalue_t raw)
@@ -93,6 +104,8 @@ STC_INLINE void cx_memb(_copy)(Self *self, Self other) {
 
 STC_INLINE i_val cx_memb(_value_clone)(cx_value_t val)
     { return i_valfrom(i_valto(&val)); }
+STC_INLINE i_valraw cx_memb(_value_toraw)(cx_value_t* val)
+    { return i_valto(val); }
 
 STC_INLINE cx_iter_t cx_memb(_begin)(const Self* self)
     { return c_make(cx_iter_t){self->data}; }
