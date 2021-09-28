@@ -125,8 +125,13 @@ c_forrange (i, int, 30, 0, -5) printf(" %d", i);
 ### c_apply, c_apply_pair
 **c_apply** will apply a method on an existing container with the given array elements:
 ```c
-c_apply (cvec_i, push_back, &vec, {1, 2, 3});   // apply multiple push_backs
+c_apply(cvec_i, push_back, &vec, {1, 2, 3});   // apply multiple push_backs
 c_apply_pair(cmap_i, insert, &map, { {4, 5}, {6, 7} });  // inserts to existing map
+
+int arr[] = {1, 2, 3};
+cmap_i_value_t arr2[] = { {4, 5}, {6, 7} };
+c_apply_n(cvec_i, push_back, &vec, arr, c_arraylen(arr));
+c_apply_pair_n(cmap_i, insert, &map, arr2, c_arraylen(arr2));
 ```
 
 ### c_new, c_new_n, c_del, c_make

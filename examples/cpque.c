@@ -1,56 +1,46 @@
 // Implements c++ example: https://en.cppreference.com/w/cpp/container/priority_queue
 #include <stdio.h>
+#include <stc/ccommon.h>
 
-#define i_tag imax
-#define i_val int
-#include <stc/cpque.h>
+// Example of dynamic compare function
 
-#define i_tag imin
+static int (*icmp_fn)(const int* x, const int* y);
+
 #define i_val int
-#define i_cmp -c_default_compare
+#define i_cnt ipque
+#define i_cmp icmp_fn
 #include <stc/cpque.h>
 
 #define imix_less(x, y) ((*(x) ^ 1) < (*(y) ^ 1))
-#define i_tag imix
-#define i_val int
-#define i_cmp(x, y) c_less_compare(imix_less, x, y)
-#include <stc/cpque.h>
+static int imax_cmp(const int* x, const int* y) { return *x - *y; }
+static int imin_cmp(const int* x, const int* y) { return *y - *x; }
+static int imix_cmp(const int* x, const int* y) { return c_less_compare(imix_less, x, y); }
 
-#define PRINT_Q(Q) \
-    void print_##Q(Q q) { \
-        Q copy = Q##_clone(q); \
-        while (!Q##_empty(copy)) { \
-            printf("%d ", *Q##_top(&copy)); \
-            Q##_pop(&copy); \
-        } \
-        puts(""); \
-        Q##_del(&copy); \
+void print_pque(ipque q) {
+    ipque copy = ipque_clone(q);
+    while (!ipque_empty(copy)) {
+        printf("%d ", *ipque_top(&copy));
+        ipque_pop(&copy);
     }
-
-PRINT_Q(cpque_imin)
-PRINT_Q(cpque_imax)
-PRINT_Q(cpque_imix)
-
+    puts("");
+    ipque_del(&copy);
+}
 
 int main()
 {
-    const int data[] = {1,8,5,6,3,4,0,9,7,2};
-
-    c_auto (cpque_imax, q)  // init() and defered del()
-    c_auto (cpque_imin, q2)
-    c_auto (cpque_imix, q3)
+    const int data[] = {1,8,5,6,3,4,0,9,7,2}, n = c_arraylen(data);
+    c_auto (ipque, q, q2, q3)  // init() and defered del()
     {
-        c_forrange (n, c_arraylen(data))
-            cpque_imax_push(&q, n);
-        print_cpque_imax(q);
+        icmp_fn = imax_cmp;
+        c_apply_n(ipque, push, &q, data, n);
+        print_pque(q);
 
-        c_forrange (i, c_arraylen(data))
-            cpque_imin_push(&q2, data[i]);
-        print_cpque_imin(q2);
+        icmp_fn = imin_cmp;
+        c_apply_n(ipque, push, &q2, data, n);
+        print_pque(q2);
 
-        // Using imix_less to compare elements.
-        c_forrange (n, c_arraylen(data))
-            cpque_imix_push(&q3, n);
-        print_cpque_imix(q3);
+        icmp_fn = imix_cmp;
+        c_apply_n(ipque, push, &q3, data, n);
+        print_pque(q3);
     }
 }

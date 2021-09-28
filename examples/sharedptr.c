@@ -45,7 +45,7 @@ int main()
         c_foreach (i, csset_int, set) printf(" %d", *i.ref->get);
 
         c_autovar (csptr_int p = csptr_int_clone(vec.data[0]), csptr_int_del(&p)) {
-            printf("\n%d is now owned by %zu objects\n", *p.get, *p.use_count);
+            printf("\n%d is now owned by %u objects\n", *p.get, *p.use_count);
         }
 
         puts("Done");

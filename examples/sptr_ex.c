@@ -53,8 +53,8 @@ void example3()
         cvec_song_push_back(&v2, csptr_song_make(Song_from("Pink Floyd", "Dogs")));
 
         c_foreach (s, cvec_song, v2)
-            printf("%s - %s: refs %zu\n", s.ref->get->artist.str, s.ref->get->title.str,
-                                          *s.ref->use_count);
+            printf("%s - %s: refs %u\n", s.ref->get->artist.str, s.ref->get->title.str,
+                                         *s.ref->use_count);
     }
 }
 
