@@ -331,12 +331,11 @@ typedef struct Dataset {
 #include <stc/cstack.h>
 ```
 
-User-defined container prefix
------------------------------
-Define either `i_prefix` or `i_tag` as empty:
+User-defined container type name
+--------------------------------
+Define `i_cnt` instead of `i_tag`:
 ```c
-#define i_prefix
-#define i_tag myvec
+#define i_cnt myvec
 #define i_val int
 #include <stc/cvec.h>
 

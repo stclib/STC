@@ -51,6 +51,11 @@
   #define i_tag F_tag
   #define i_fwd
 #endif
+#ifdef i_cnt
+  #define i_tag i_cnt
+  #undef i_prefix
+  #define i_prefix
+#endif
 
 #ifndef i_prefix_csptr
 #define i_prefix_csptr csptr_
@@ -186,6 +191,7 @@
 #undef i_key_csptr
 #undef i_val_csptr
 #undef i_prefix_csptr
+#undef i_cnt
 #undef Self
 
 #undef i_template
