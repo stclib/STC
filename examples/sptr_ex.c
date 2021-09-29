@@ -5,7 +5,7 @@
 #include <stc/cstr.h>
 #include <stc/forward.h>
 
-forward_csptr(song, struct Song);
+forward_csptr(csptr_song, struct Song);
 struct Test {
     csptr_song song1;
     csptr_song song2;

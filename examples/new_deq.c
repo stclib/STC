@@ -1,8 +1,8 @@
 #include <stc/cstr.h>
 #include <stc/forward.h>
 
-forward_cdeq(i32, int);
-forward_cdeq(pnt, struct Point);
+forward_cdeq(cdeq_i32, int);
+forward_cdeq(cdeq_pnt, struct Point);
 
 struct MyStruct {
     cdeq_i32 intvec;

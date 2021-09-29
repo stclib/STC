@@ -1,6 +1,6 @@
 #include <stc/forward.h>
 
-forward_cpque(pnt, struct Point);
+forward_cpque(cpque_pnt, struct Point);
 
 struct MyStruct {
     cpque_pnt priority_queue;

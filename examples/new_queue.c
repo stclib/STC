@@ -2,7 +2,7 @@
 #include <stc/forward.h>
 #include <stdio.h>
 
-forward_cqueue(pnt, struct Point);
+forward_cqueue(cqueue_pnt, struct Point);
 
 struct Point { int x, y; } typedef Point;
 int point_compare(const Point* a, const Point* b) {

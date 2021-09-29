@@ -317,8 +317,8 @@ but still not expose or include the full implementation / API of the container.
 ```c
 // Header file
 #include <stc/forward.h> // only include data structures
-forward_cstack(pnt, struct Point); // declare cstack_pnt and cstack_pnt_value_t, cstack_pnt_iter_t;
-                                   // the element may be forward declared type as well
+forward_cstack(cstack_pnt, struct Point); // declare cstack_pnt and cstack_pnt_value_t, cstack_pnt_iter_t;
+                                          // the element may be forward declared type as well
 typedef struct Dataset {
     cstack_pnt vertices;
     cstack_pnt colors;
@@ -326,8 +326,9 @@ typedef struct Dataset {
 
 ...
 // Implementation
-#define F_tag pnt  // define F_tag or an empty i_fwd if the container was forward declared.
+#define i_fwd               // flag that the container was forward declared.
 #define i_val struct Point
+#define i_tag pnt
 #include <stc/cstack.h>
 ```
 

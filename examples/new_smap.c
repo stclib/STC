@@ -1,7 +1,7 @@
 #include <stc/cstr.h>
 #include <stc/forward.h>
 
-forward_csmap(pnt, struct Point, int);
+forward_csmap(csmap_pnt, struct Point, int);
 
 struct MyStruct {
     csmap_pnt pntmap;

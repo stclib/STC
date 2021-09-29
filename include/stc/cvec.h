@@ -25,7 +25,7 @@
 #include <stc/cstr.h>
 #include <stc/forward.h>
 
-forward_cvec(i32, int);
+forward_cvec(cvec_i32, int);
 
 struct MyStruct {
     cvec_i32 int_vec;

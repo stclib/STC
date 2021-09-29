@@ -25,19 +25,19 @@
 
 #include <stddef.h>
 
-#define forward_carr2(TAG, VAL) _c_carr2_types(carr2_##TAG, VAL)
-#define forward_carr3(TAG, VAL) _c_carr3_types(carr3_##TAG, VAL)
-#define forward_cdeq(TAG, VAL) _c_cdeq_types(cdeq_##TAG, VAL)
-#define forward_clist(TAG, VAL) _c_clist_types(clist_##TAG, VAL)
-#define forward_cmap(TAG, KEY, VAL) _c_chash_types(cmap_##TAG, KEY, VAL, c_true, c_false)
-#define forward_csmap(TAG, KEY, VAL) _c_aatree_types(csmap_##TAG, KEY, VAL, c_true, c_false)
-#define forward_cset(TAG, KEY) _c_chash_types(cset_##TAG, cset, KEY, KEY, c_false, c_true)
-#define forward_csset(TAG, KEY) _c_aatree_types(csset_##TAG, KEY, KEY, c_false, c_true)
-#define forward_csptr(TAG, VAL) _c_csptr_types(csptr_##TAG, VAL)
-#define forward_cpque(TAG, VAL) _c_cpque_types(cpque_##TAG, VAL)
-#define forward_cstack(TAG, VAL) _c_cstack_types(cstack_##TAG, VAL)
-#define forward_cqueue(TAG, VAL) _c_cdeq_types(cqueue_##TAG, VAL)
-#define forward_cvec(TAG, VAL) _c_cvec_types(cvec_##TAG, VAL)
+#define forward_carr2(CX, VAL) _c_carr2_types(CX, VAL)
+#define forward_carr3(CX, VAL) _c_carr3_types(CX, VAL)
+#define forward_cdeq(CX, VAL) _c_cdeq_types(CX, VAL)
+#define forward_clist(CX, VAL) _c_clist_types(CX, VAL)
+#define forward_cmap(CX, KEY, VAL) _c_chash_types(CX, KEY, VAL, c_true, c_false)
+#define forward_csmap(CX, KEY, VAL) _c_aatree_types(CX, KEY, VAL, c_true, c_false)
+#define forward_cset(CX, KEY) _c_chash_types(CX, cset, KEY, KEY, c_false, c_true)
+#define forward_csset(CX, KEY) _c_aatree_types(CX, KEY, KEY, c_false, c_true)
+#define forward_csptr(CX, VAL) _c_csptr_types(CX, VAL)
+#define forward_cpque(CX, VAL) _c_cpque_types(CX, VAL)
+#define forward_cstack(CX, VAL) _c_cstack_types(CX, VAL)
+#define forward_cqueue(CX, VAL) _c_cdeq_types(CX, VAL)
+#define forward_cvec(CX, VAL) _c_cvec_types(CX, VAL)
 
 #ifndef MAP_SIZE_T
 #define MAP_SIZE_T uint32_t

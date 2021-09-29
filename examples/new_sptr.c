@@ -1,7 +1,7 @@
 #include <stc/cstr.h>
 
 #include <stc/forward.h>
-forward_csptr(person, struct Person);
+forward_csptr(csptr_person, struct Person);
 
 struct Person { cstr name, last; } typedef Person;
 
