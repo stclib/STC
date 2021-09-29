@@ -23,7 +23,7 @@ void Person_del(Person* p) {
 #include <stc/csptr.h>
 
 #define i_tag iptr
-#define i_key_csptr int
+#define i_key_csptr csptr_int
 #include <stc/csset.h>
 
 int main(void) {

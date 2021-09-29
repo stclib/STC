@@ -5,20 +5,20 @@ void int_del(int* x) {
 }
 
 #define i_val int
-#define i_valdel int_del  // optional func to show elements destroyed
-#define i_nonatomic       // only for single thread; faster.
-#include <stc/csptr.h>    // define csptr_int shared pointers
+#define i_valdel int_del      // optional func to show elements destroyed
+#include <stc/csptr.h>        // csptr_int: shared pointer to int
 
-#define i_key_csptr int   // refer to csptr_int definition above
-#include <stc/csset.h>    // define a sorted set of csptr_int
+#define i_key_csptr csptr_int
+#define i_tag int
+#include <stc/csset.h>        // csset_int: csset<csptr_int>
 
-#define i_val_csptr int
-#include <stc/cvec.h>
-
+#define i_val_csptr csptr_int
+#define i_tag int
+#include <stc/cvec.h>         // cvec_int: cvec<csptr_int>
 int main()
 {
-    c_auto (cvec_int, vec)   // declare and init vec, call del at scope exit
-    c_auto (csset_int, set)  // declare and init set, call del at scope exit
+    c_auto (cvec_int, vec)
+    c_auto (csset_int, set)   // declare and init set, call del at scope exit
     {
         cvec_int_push_back(&vec, csptr_int_make(2021));
         cvec_int_push_back(&vec, csptr_int_make(2012));
@@ -51,14 +51,3 @@ int main()
         puts("Done");
     }
 }
-
-/* output:
-vec: 2021 2012 2022 2015
-del: 2022
-vec: 2021 2012
-set: 2015 2021
-Done
-del: 2015
-del: 2021
-del: 2012
-*/

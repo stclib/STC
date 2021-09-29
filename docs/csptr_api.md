@@ -13,7 +13,7 @@ All **csptr** functions can be called by multiple threads on different instances
 additional synchronization even if these instances are copies and share ownership of the same object.
 **csptr** uses thread-safe atomic reference counting, through the *csptr_X_clone()* and *csptr_X_del()* methods.
 
-When declaring a container with shared pointers, define the `i_val_csptr` with the csptr's `i_tag`.
+When declaring a container with shared pointers, define the `i_val_csptr` with the full csptr type.
 See example.
 
 Also for containers, make sure to pass the result of *csptr_X_make()* to *insert*, *push_back*,
@@ -74,25 +74,28 @@ void int_del(int* x) {
 }
 
 #define i_val int
-#define i_valdel int_del  // optional func to show elements destroyed
-#include <stc/csptr.h>    // define csptr_int shared pointers
+#define i_valdel int_del  // optional func to display elements destroyed
+#include <stc/csptr.h>    // csptr_int
 
-#define i_key_csptr int   // refer to csptr_int definition above
-#include <stc/csset.h>    // define a sorted set of csptr_int
+#define i_key_csptr csptr_int
+#define i_tag int
+#include <stc/csset.h>    // csset_int: csset<csptr_int>
 
-#define i_val_csptr int   // refer to csptr_int definition above
-#include <stc/cvec.h>     // define a vector of csptr_int
+#define i_val_csptr csptr_int
+#define i_tag int
+#include <stc/cvec.h>     // cvec_int: cvec<csptr_int>
 
 int main()
 {
     c_auto (cvec_int, vec)   // declare and init vec, call del at scope exit
     c_auto (csset_int, set)  // declare and init set, call del at scope exit
     {
-        cvec_int_push_back(&vec, csptr_int_make(2021));
-        cvec_int_push_back(&vec, csptr_int_make(2012));
-        cvec_int_push_back(&vec, csptr_int_make(2022));
-        cvec_int_push_back(&vec, csptr_int_make(2015));
-
+        c_apply(cvec_int, push_back, &vec, {
+            csptr_int_make(2021)),
+            csptr_int_make(2012)),
+            csptr_int_make(2022)),
+            csptr_int_make(2015)),
+        });
         printf("vec:");
         c_foreach (i, cvec_int, vec) printf(" %d", *i.ref->get);
         puts("");

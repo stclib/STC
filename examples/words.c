@@ -46,7 +46,7 @@ int main2()
 
     std::unordered_map<std::string, size_t>  word_map;
     for (const auto &w : words) {
-        ++word_map[w];
+        word_map[w] += 1;
     }
 
     for (const auto &pair : word_map) {

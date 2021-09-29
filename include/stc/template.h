@@ -57,28 +57,25 @@
   #define i_prefix
 #endif
 
-#ifndef i_prefix_csptr
-#define i_prefix_csptr csptr_
-#endif
 #ifdef i_key_csptr
   #ifndef i_tag
   #define i_tag i_key_csptr
   #endif
-  #define i_key c_PASTE(i_prefix_csptr, i_key_csptr)
-  #define i_cmp c_PASTE3(i_prefix_csptr, i_key_csptr, _compare)
-  #define i_keydel c_PASTE3(i_prefix_csptr, i_key_csptr, _del)
-  #define i_keyfrom c_PASTE3(i_prefix_csptr, i_key_csptr, _clone)
+  #define i_key i_key_csptr
+  #define i_cmp c_PASTE(i_key_csptr, _compare)
+  #define i_keydel c_PASTE(i_key_csptr, _del)
+  #define i_keyfrom c_PASTE(i_key_csptr, _clone)
 #endif
 #ifdef i_val_csptr
   #if !defined i_tag && !defined i_key
   #define i_tag i_val_csptr
   #endif
-  #define i_val c_PASTE(i_prefix_csptr, i_val_csptr)
+  #define i_val i_val_csptr
   #ifndef i_key
-  #define i_cmp c_PASTE3(i_prefix_csptr, i_val_csptr, _compare)
+  #define i_cmp c_PASTE(i_val_csptr, _compare)
   #endif
-  #define i_valdel c_PASTE3(i_prefix_csptr, i_val_csptr, _del)
-  #define i_valfrom c_PASTE3(i_prefix_csptr, i_val_csptr, _clone)
+  #define i_valdel c_PASTE(i_val_csptr, _del)
+  #define i_valfrom c_PASTE(i_val_csptr, _clone)
 #endif
 
 #ifdef i_key_str
@@ -190,7 +187,6 @@
 #undef i_keyraw
 #undef i_key_csptr
 #undef i_val_csptr
-#undef i_prefix_csptr
 #undef i_cnt
 #undef Self
 

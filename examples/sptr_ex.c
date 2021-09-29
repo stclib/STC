@@ -33,7 +33,8 @@ void Song_del(Song* s) {
 #define i_del Song_del
 #include <stc/csptr.h>
 
-#define i_val_csptr song
+#define i_val_csptr csptr_song
+#define i_tag song
 #include <stc/cvec.h>
 
 void example3()
@@ -48,9 +49,12 @@ void example3()
 
         c_foreach (s, cvec_song, v)
             if (!cstr_equalto(s.ref->get->artist, "Bob Dylan"))
-                cvec_song_emplace_back(&v2, *s.ref); // calls csptr_song_clone()
+                cvec_song_emplace_back(&v2, *s.ref); // note: calls csptr_song_clone()
 
-        cvec_song_push_back(&v2, csptr_song_make(Song_from("Pink Floyd", "Dogs")));
+        c_apply(cvec_song, push_back, &v2, {
+            csptr_song_make(Song_from("Michael Jackson", "Billie Jean")),
+            csptr_song_make(Song_from("Rihanna", "Stay")),
+        });
 
         c_foreach (s, cvec_song, v2)
             printf("%s - %s: refs %u\n", s.ref->get->artist.str, s.ref->get->title.str,
