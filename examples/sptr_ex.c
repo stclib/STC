@@ -27,8 +27,9 @@ void Song_del(Song* s) {
     c_del(cstr, &s->artist, &s->title);
 }
 
+#define i_fwd
+#define i_tag song
 #define i_val Song
-#define F_tag song
 #define i_cmp c_no_compare
 #define i_del Song_del
 #include <stc/csptr.h>

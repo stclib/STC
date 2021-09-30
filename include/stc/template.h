@@ -47,10 +47,6 @@
   #error if i_keyraw or i_keyto defined, i_keyfrom a must be defined
 #endif
 
-#ifdef F_tag
-  #define i_tag F_tag
-  #define i_fwd
-#endif
 #ifdef i_cnt
   #define i_tag i_cnt
   #undef i_prefix
@@ -166,7 +162,6 @@
 
 #undef i_prefix
 #undef i_tag
-#undef F_tag
 #undef i_imp
 #undef i_fwd
 #undef i_cmp

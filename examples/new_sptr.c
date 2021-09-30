@@ -1,8 +1,5 @@
 #include <stc/cstr.h>
 
-#include <stc/forward.h>
-forward_csptr(csptr_person, struct Person);
-
 struct Person { cstr name, last; } typedef Person;
 
 Person Person_init(const char* name, const char* last) {
@@ -13,11 +10,13 @@ void Person_del(Person* p) {
     c_del(cstr, &p->name, &p->last);
 }
 
-#define F_tag person
+#define i_tag person
 #define i_val Person
-#define i_valdel Person_del
+#define i_del Person_del
 #define i_cmp c_no_compare
 #include <stc/csptr.h>
+
+// ...
 
 #define i_val int
 #include <stc/csptr.h>

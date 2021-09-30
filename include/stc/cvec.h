@@ -38,7 +38,8 @@ struct MyStruct {
 #define i_val_str // special for cstr
 #include <stc/cvec.h>
 
-#define F_tag i32 // forward declared above; shorthand for i_fwd
+#define i_fwd // forward declared
+#define i_tag i32
 #define i_val int
 #include <stc/cvec.h>
 
