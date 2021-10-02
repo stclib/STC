@@ -55,7 +55,7 @@ int main(void) {
 #include <string.h>
 
 #define _cmap_inits {NULL, NULL, 0, 0, 0.85f}
-typedef struct      { size_t idx; uint_fast8_t hx; } chash_bucket_t;
+typedef struct      { MAP_SIZE_T idx; uint_fast8_t hx; } chash_bucket_t;
 #endif // CMAP_H_INCLUDED
 
 #ifndef i_prefix
@@ -162,16 +162,20 @@ cx_memb(_insert)(Self* self, i_key _key cx_MAP_ONLY(, i_val _mapped)) {
 
 STC_INLINE cx_iter_t
 cx_memb(_find)(const Self* self, i_keyraw rkey) {
-    cx_iter_t it = {NULL};
-    if (self->size == 0) return it;
-    chash_bucket_t b = cx_memb(_bucket_)(self, &rkey);
-    if (*(it._hx = self->_hashx+b.idx)) it.ref = self->table+b.idx;
-    return it;
+    cx_size_t idx = self->bucket_count;
+    if (self->size) {
+        chash_bucket_t b = cx_memb(_bucket_)(self, &rkey);
+        if (self->_hashx[b.idx]) idx = b.idx;
+    }
+    return c_make(cx_iter_t){self->table+idx, self->_hashx+idx};
 }
 
 STC_INLINE cx_value_t*
-cx_memb(_get)(const Self* self, i_keyraw rkey)
-    { return cx_memb(_find)(self, rkey).ref; }
+cx_memb(_get)(const Self* self, i_keyraw rkey) {
+    cx_size_t idx;
+    return self->size && self->_hashx[idx = cx_memb(_bucket_)(self, &rkey).idx] ?
+           self->table + idx : NULL;
+}
 
 STC_INLINE cx_iter_t
 cx_memb(_begin)(const Self* self) {
@@ -292,7 +296,7 @@ cx_MAP_ONLY(
 STC_DEF chash_bucket_t
 cx_memb(_bucket_)(const Self* self, const cx_rawkey_t* rkeyptr) {
     const uint64_t _hash = i_hash(rkeyptr, sizeof *rkeyptr);
-    uint_fast8_t _hx; size_t _cap = self->bucket_count;
+    uint_fast8_t _hx; cx_size_t _cap = self->bucket_count;
     chash_bucket_t b = {c_PASTE(fastrange_,MAP_SIZE_T)(_hash, _cap), (uint_fast8_t)(_hash | 0x80)};
     const uint8_t* _hashx = self->_hashx;
     while ((_hx = _hashx[b.idx])) {
