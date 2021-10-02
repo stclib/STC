@@ -35,25 +35,23 @@ int point_compare(const Point* a, const Point* b) {
 
 int main()
 {
-    clist_i32 lst = clist_i32_init();
-    clist_i32_push_back(&lst, 123);
-    clist_i32_del(&lst);
+    c_auto (clist_i32, lst)
+        clist_i32_push_back(&lst, 123);
 
-    clist_float flst = clist_float_init();
-    clist_float_push_back(&flst, 123.3);
-    clist_float_del(&flst);
+    c_auto (clist_pnt, plst) {
+        c_apply(clist_pnt, push_back, &plst, {{42, 14}, {32, 94}, {62, 81}});
+        clist_pnt_sort(&plst);
 
-    clist_pnt plst = clist_pnt_init();
-    clist_pnt_push_back(&plst, (Point){42, 14});
-    clist_pnt_push_back(&plst, (Point){32, 94});
-    clist_pnt_push_back(&plst, (Point){62, 81});
-    clist_pnt_sort(&plst);
-    c_foreach (i, clist_pnt, plst)
-        printf(" (%d %d)", i.ref->x, i.ref->y);
-    puts("");
-    clist_pnt_del(&plst);
+        c_foreach (i, clist_pnt, plst)
+            printf(" (%d %d)", i.ref->x, i.ref->y);
+        puts("");
+    }
 
-    clist_str slst = clist_str_init();
-    clist_str_emplace_back(&slst, "Hello, friend");
-    clist_str_del(&slst);
+    c_auto (clist_float, flst) {
+        c_apply(clist_float, push_back, &flst, {123.3, 321.2, -32.2, 78.2});
+        c_foreach (i, clist_float, flst) printf(" %g", *i.ref);
+    }
+
+    c_auto (clist_str, slst)
+        clist_str_emplace_back(&slst, "Hello, friend");
 }

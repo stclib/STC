@@ -237,7 +237,8 @@ cx_memb(_init)(void) {
 
 STC_DEF void
 cx_memb(_clear)(Self* self) {
-    struct cvec_rep* rep = cvec_rep_(self); if (rep->cap) {
+    struct cvec_rep* rep = cvec_rep_(self);
+    if (rep->cap) {
         for (cx_value_t *p = self->data, *q = p + rep->size; p != q; ++p)
             i_valdel(p);
         rep->size = 0;
