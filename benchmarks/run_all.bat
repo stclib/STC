@@ -1,4 +1,4 @@
-set out=plot_perf.csv
+set out=plot_win.csv
 echo Compiler,Library,C,Method,Seconds,Ratio> %out%
 sh run_gcc.sh >> %out%
 sh run_clang.sh >> %out%

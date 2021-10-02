@@ -1,5 +1,5 @@
 exe=''
-if [ "$OS" == 'Windows_NT' ]; then exe='.exe'; fi
+if [ "$OS" = "Windows_NT" ] ; then exe=".exe" ; fi
 clang++ -I../include -O3 -o cdeq_benchmark$exe   cdeq_benchmark.cpp
 clang++ -I../include -O3 -o clist_benchmark$exe  clist_benchmark.cpp
 clang++ -I../include -O3 -o cmap_benchmark$exe   cmap_benchmark.cpp
