@@ -135,13 +135,13 @@ cx_memb(_copy)(Self *self, Self other) {
 
 STC_INLINE cx_iter_t
 cx_memb(_iter)(const Self* self, cx_node_t* prev) {
-    return c_make(cx_iter_t){&self->last, prev, &prev->next->value};
+    return c_make(cx_iter_t){&prev->next->value, &self->last, prev};
 }
 
 STC_INLINE cx_iter_t
 cx_memb(_begin)(const Self* self) {
     cx_value_t* head = self->last ? &self->last->next->value : NULL;
-    return c_make(cx_iter_t){&self->last, self->last, head};
+    return c_make(cx_iter_t){head, &self->last, self->last};
 }
 
 STC_INLINE cx_iter_t
@@ -290,7 +290,7 @@ cx_memb(_split_off)(Self* self, cx_iter_t it1, cx_iter_t it2) {
     Self cx = {NULL};
     if (it1.ref == it2.ref) return cx;
     cx_node_t *p1 = it1.prev,
-                *p2 = it2.ref ? it2.prev : self->last;
+              *p2 = it2.ref ? it2.prev : self->last;
     p1->next = p2->next, p2->next = clist_node_(it1.ref);
     if (self->last == p2) self->last = (p1 == p2) ? NULL : p1;
     cx.last = p2;

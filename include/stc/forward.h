@@ -65,8 +65,8 @@
     typedef struct SELF##_node_t SELF##_node_t; \
 \
     typedef struct { \
-        SELF##_node_t *const *_last, *prev; \
         SELF##_value_t *ref; \
+        SELF##_node_t *const *_last, *prev; \
     } SELF##_iter_t; \
 \
     typedef struct { \
