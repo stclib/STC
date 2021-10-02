@@ -1,17 +1,7 @@
 // shared_ptr-examples.cpp
 // based on https://docs.microsoft.com/en-us/cpp/cpp/how-to-create-and-use-shared-ptr-instances?view=msvc-160
 
-#include <stdio.h>
 #include <stc/cstr.h>
-#include <stc/forward.h>
-
-forward_csptr(csptr_song, struct Song);
-struct Test {
-    csptr_song song1;
-    csptr_song song2;
-};
-
-// ...
 
 struct Song
 {
@@ -27,12 +17,11 @@ void Song_del(Song* s) {
     c_del(cstr, &s->artist, &s->title);
 }
 
-#define i_fwd
-#define i_tag song
 #define i_val Song
 #define i_cmp c_no_compare
 #define i_del Song_del
-#include <stc/csptr.h>
+#define i_tag song
+#include <stc/csptr.h> // define csptr_song
 
 #define i_val_csptr csptr_song
 #define i_tag song
