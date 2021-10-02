@@ -43,8 +43,8 @@ Sample test_std_deque() {
         c_forrange (N) con.push_back(stc64_random() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
-        container::iterator it;
         // Iteration - not inherent find - skipping
+        //container::iterator it;
         //c_forrange (S) if ((it = std::find(con.begin(), con.end(), stc64_random() & mask2)) != con.end()) sum += *it;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
@@ -88,8 +88,8 @@ Sample test_stc_deque() {
         c_forrange (N) cdeq_x_push_back(&con, stc64_random() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
-        cdeq_x_iter_t it;
-        //c_forrange (S) if ((it = cdeq_x_find(&con, stc64_random() & mask2)).ref) sum += *it.ref;
+        //cdeq_x_iter_t it, end = cdeq_x_end(&con);
+        //c_forrange (S) if ((it = cdeq_x_find(&con, stc64_random() & mask2)).ref != end.ref) sum += *it.ref;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();

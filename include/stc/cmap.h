@@ -240,7 +240,7 @@ STC_DEF uint64_t c_default_hash(const void *key, size_t len) {
 #ifndef CMAP_H_INCLUDED
 //STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n)
 //    { uint64_t lo, hi; c_umul128(x, n, &lo, &hi); return hi; }
-#define fastrange_uint32_t(x, n) ((size_t) (((uint32_t)(x)*(uint64_t)(n)) >> 32))
+#define fastrange_uint32_t(x, n) (uint32_t)((uint32_t)(x)*(uint64_t)(n) >> 32)
 #define chash_index_(h, entryPtr) ((entryPtr) - (h).table)
 #endif
 
