@@ -168,16 +168,10 @@ STC_API uint64_t c_default_hash(const void *key, size_t len);
     for (size_t _c_i = 0; _c_i < c_arraylen(_c_arr); ++_c_i) \
         CX##_##method(_c_cx, _c_arr[_c_i].first, _c_arr[_c_i].second); \
 } while (0)
-
 #define c_apply_n(CX, method, cx, arr, n) do { \
     CX* _c_cx = cx; \
     for (const CX##_rawvalue_t *_c_i = arr, *_c_end = _c_i+(n); _c_i != _c_end; ++_c_i) \
         CX##_##method(_c_cx, *_c_i); \
-} while (0)
-#define c_apply_pair_n(CX, method, cx, arr, n) do { \
-    CX* _c_cx = cx; \
-    for (const CX##_rawvalue_t *_c_i = arr, *_c_end = _c_i+(n); _c_i != _c_end; ++_c_i) \
-        CX##_##method(_c_cx, _c_i->first, _c_i->second); \
 } while (0)
 
 #define c_del(CX, ...) do { \

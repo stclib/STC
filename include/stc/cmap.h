@@ -162,11 +162,9 @@ cx_memb(_insert)(Self* self, i_key _key cx_MAP_ONLY(, i_val _mapped)) {
 
 STC_INLINE cx_iter_t
 cx_memb(_find)(const Self* self, i_keyraw rkey) {
-    cx_size_t idx = self->bucket_count;
-    if (self->size) {
-        chash_bucket_t b = cx_memb(_bucket_)(self, &rkey);
-        if (self->_hashx[b.idx]) idx = b.idx;
-    }
+    cx_size_t idx;
+    if (!(self->size && self->_hashx[idx = cx_memb(_bucket_)(self, &rkey).idx]))
+        idx = self->bucket_count;
     return c_make(cx_iter_t){self->table+idx, self->_hashx+idx};
 }
 
