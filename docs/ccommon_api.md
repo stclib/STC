@@ -2,7 +2,7 @@
 
 The following handy macros are safe to use, i.e. have no side-effects.
 
-### c_autoscope, c_autovar, c_auto, c_exitauto
+### c_auto, c_autovar, c_autoscope, c_autodefer
 General ***defer*** mechanics for resource acquisition. These macros allows to specify the release of the
 resource where the resource acquisition takes place. Makes it easier to verify that resources are released.
 
@@ -13,10 +13,11 @@ macros, as one must always make sure to unwind temporary allocated resources bef
 
 | Usage                                  | Description                                        |
 |:---------------------------------------|:---------------------------------------------------|
-| `c_autoscope (init, end...)`          | Execute `init`. Defer `end...` to end of block    |
-| `c_autovar (Type var=init, end...)`    | Declare `var`. Defer `end...` to end of block     |
 | `c_auto (Type, var...)`                | `c_autovar (Type var=Type_init(), Type_del(&var))` |
-| `c_exitauto;`                          | Break out of a `c_auto*`-block/scope               |
+| `c_autovar (Type var=init, end...)`    | Declare `var`. Defer `end...` to end of block      |
+| `c_autoscope (init, end...)`           | Execute `init`. Defer `end...` to end of block     |
+| `c_autodefer (end...)`                 | Defer `end...` to end of block                     |
+| `c_exitauto;`                          | Break safely out of a `c_auto*`-block/scope        |
 
 For multiple variables, use either multiple **c_autovar** in sequence, or declare variable outside
 scope and use **c_autoscope**. Also, **c_auto** support up to 3 variables.
@@ -45,7 +46,7 @@ c_autoscope (mydata_init(&data), mydata_destroy(&data))
 }
 
 cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
-c_autoscope (0, cstr_del(&s1), cstr_del(&s2))
+c_autodefer (cstr_del(&s1), cstr_del(&s2))
 {
     printf("%s %s\n", s1.str, s2.str);
 }
