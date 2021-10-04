@@ -54,30 +54,16 @@
 #endif
 
 #ifdef i_key_csptr
-  #ifndef i_tag
-  #define i_tag i_key_csptr
-  #endif
   #define i_key i_key_csptr
   #define i_cmp c_PASTE(i_key_csptr, _compare)
   #define i_keydel c_PASTE(i_key_csptr, _del)
   #define i_keyfrom c_PASTE(i_key_csptr, _clone)
 #endif
-#ifdef i_val_csptr
-  #if !defined i_tag && !defined i_key
-  #define i_tag i_val_csptr
-  #endif
-  #define i_val i_val_csptr
-  #ifndef i_key
-  #define i_cmp c_PASTE(i_val_csptr, _compare)
-  #endif
-  #define i_valdel c_PASTE(i_val_csptr, _del)
-  #define i_valfrom c_PASTE(i_val_csptr, _clone)
-#endif
 
 #ifdef i_key_str
   #define i_key     cstr
   #ifndef i_tag
-  #define i_tag     str
+    #define i_tag   str
   #endif
   #define i_cmp     c_rawstr_compare
   #define i_hash    c_rawstr_hash
@@ -86,13 +72,23 @@
   #define i_keyto   cstr_str
   #define i_keyraw  const char*
 #endif
+
+#ifdef i_val_csptr
+  #define i_val i_val_csptr
+  #ifndef i_key
+    #define i_cmp c_PASTE(i_val_csptr, _compare)
+  #endif
+  #define i_valdel c_PASTE(i_val_csptr, _del)
+  #define i_valfrom c_PASTE(i_val_csptr, _clone)
+#endif
+
 #ifdef i_val_str
   #define i_val     cstr
   #if !defined i_tag && !defined i_key
-  #define i_tag     str
+    #define i_tag   str
   #endif
   #ifndef i_key
-  #define i_cmp     c_rawstr_compare
+    #define i_cmp   c_rawstr_compare
   #endif
   #define i_valdel  cstr_del
   #define i_valfrom cstr_from
