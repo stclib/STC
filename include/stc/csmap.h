@@ -196,6 +196,7 @@ cx_memb(_begin)(const Self* self) {
 
 STC_INLINE cx_iter_t
 cx_memb(_end)(const Self* self) {
+    (void)self;
     return c_make(cx_iter_t){.ref = NULL};
 }
 
