@@ -15,9 +15,9 @@ uint64_t seed = 1, mask1 = 0xfffffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
 
-#define i_tag x
 #define i_key size_t
 #define i_val size_t
+#define i_tag x
 #include <stc/csmap.h>
 
 #ifdef __cplusplus

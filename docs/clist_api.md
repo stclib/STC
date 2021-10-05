@@ -22,13 +22,13 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 ## Header file and declaration
 
 ```c
-#define i_tag       // defaults to i_val name
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_valraw* : REQUIRED IF i_valraw is a non-integral type
+#define i_del       // destroy value func - defaults to empty destruct
 #define i_valraw    // convertion "raw" type - defaults to i_val
 #define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
 #define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
-#define i_valdel    // destroy value func - defaults to empty destruct
+#define i_tag       // defaults to i_val
 #include <stc/clist.h>
 ```
 
@@ -96,9 +96,10 @@ clist_X_value_t     clist_X_value_clone(clist_X_value_t val);
 
 Interleave *push_front()* / *push_back()* then *sort()*:
 ```c
-#define i_tag d
 #define i_val double
+#define i_tag d
 #include <stc/clist.h>
+
 #include <stdio.h>
 
 int main() {

@@ -7,8 +7,8 @@
 static int (*icmp_fn)(const int* x, const int* y);
 
 #define i_val int
-#define i_cnt ipque
 #define i_cmp icmp_fn
+#define i_cnt ipque
 #include <stc/cpque.h>
 
 #define imix_less(x, y) ((*(x) ^ 1) < (*(y) ^ 1))

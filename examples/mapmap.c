@@ -8,10 +8,10 @@
 #define i_val_str
 #include <stc/cmap.h>
 
-#define i_tag cfg
 #define i_key_str
 #define i_val cmap_str
 #define i_valdel cmap_str_del
+#define i_tag cfg
 #include <stc/cmap.h>
 
 int main(void)

@@ -2,14 +2,14 @@
 // https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-17
 #include <stc/cstr.h>
 
-#define i_tag istr
 #define i_key int
 #define i_val_str
+#define i_tag istr
 #include <stc/csmap.h>
 
-#define i_tag istr
 #define i_val csmap_istr_rawvalue_t
 #define i_cmp c_no_compare
+#define i_tag istr
 #include <stc/cvec.h>
 
 void print_elem(csmap_istr_rawvalue_t p) {

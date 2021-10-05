@@ -43,17 +43,17 @@ void OlympicLocation_del(OlympicLocation* self) {
 }
 
 // Create a clist<OlympicLocation>, can be sorted by year.
-#define i_tag OL
 #define i_val OlympicLocation
-#define i_valdel OlympicLocation_del
 #define i_cmp OlympicLocation_compare
+#define i_del OlympicLocation_del
+#define i_tag OL
 #include <stc/clist.h>
 
 // Create a csmap<cstr, clist_OL> where key is country name
-#define i_tag OL
 #define i_key_str
 #define i_val clist_OL
 #define i_valdel clist_OL_del
+#define i_tag OL
 #include <stc/csmap.h>
 
 int main()

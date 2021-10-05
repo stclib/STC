@@ -5,9 +5,9 @@
 #include <stc/cstr.h>
 
 // Declare int -> int hashmap. Uses typetag 'ii' for ints.
-#define i_tag ii
 #define i_key int32_t
 #define i_val size_t
+#define i_tag ii
 #include <stc/cmap.h>
 
 // Declare int vector with map entries that can be sorted by map keys.
@@ -16,9 +16,9 @@ static int compare(mapval *a, mapval *b) {
     return c_default_compare(&a->first, &b->first);
 }
 
-#define i_tag pair
 #define i_val mapval
 #define i_cmp compare
+#define i_tag pair
 #include <stc/cvec.h>
 
 int main()

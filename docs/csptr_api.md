@@ -26,10 +26,10 @@ See the c++ classes [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/s
 ## Header file and declaration
 
 ```c
-#define i_tag       // defaults to i_val name
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_val* : REQUIRED IF i_val is a non-integral type
-#define i_valdel    // destroy value func - defaults to empty destruct
+#define i_del       // destroy value func - defaults to empty destruct
+#define i_tag       // defaults to i_val
 #include <stc/csptr.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.

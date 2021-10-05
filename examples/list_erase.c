@@ -1,8 +1,8 @@
 // erasing from clist
 #include <stdio.h>
 
-#define i_tag i
 #define i_val int
+#define i_tag i
 #include <stc/clist.h>
 
 int main ()

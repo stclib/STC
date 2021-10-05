@@ -4,19 +4,19 @@
 // This implements the std::map insert c++ example at:
 // https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-19
 
-#define i_tag ii  // Map of int => int
 #define i_key int
 #define i_val int
+#define i_tag ii  // Map of int => int
 #include <stc/csmap.h>
 
-#define i_tag istr // Map of int => cstr
 #define i_key int
 #define i_val_str
+#define i_tag istr // Map of int => cstr
 #include <stc/csmap.h>
 
-#define i_tag ii
 #define i_val csmap_ii_rawvalue_t
 #define i_cmp c_no_compare
+#define i_tag ii
 #include <stc/cvec.h>
 
 void print_ii(csmap_ii map) {

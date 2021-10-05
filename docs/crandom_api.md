@@ -74,9 +74,9 @@ double              stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
 #include <stc/cstr.h>
 
 // Declare int -> int sorted map. Uses typetag 'i' for ints.
-#define i_tag i
 #define i_key int
 #define i_val size_t
+#define i_tag i
 #include <stc/csmap.h>
 
 int main()

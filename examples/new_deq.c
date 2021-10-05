@@ -10,9 +10,9 @@ struct MyStruct {
 } typedef MyStruct;
 
 
+#define i_val int
 #define i_fwd
 #define i_tag i32
-#define i_val int
 #include <stc/cdeq.h>
 
 struct Point { int x, y; } typedef Point;
@@ -21,10 +21,10 @@ int point_compare(const Point* a, const Point* b) {
     return c ? c : c_default_compare(&a->y, &b->y);
 }
 
-#define i_fwd
-#define i_tag pnt
 #define i_val Point
 #define i_cmp point_compare
+#define i_fwd
+#define i_tag pnt
 #include <stc/cdeq.h>
 
 #define i_val float

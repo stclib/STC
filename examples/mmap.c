@@ -6,11 +6,11 @@
 #define i_val_str
 #include <stc/clist.h>
 
-#define i_tag mult
 #define i_key int
 #define i_val clist_str
-#define i_valdel clist_str_del
 #define i_cmp -c_default_compare
+#define i_valdel clist_str_del
+#define i_tag mult
 #include <stc/csmap.h>
 
 void print(const csmap_mult mmap)

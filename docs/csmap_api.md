@@ -15,18 +15,18 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 ## Header file and declaration
 
 ```c
-#define i_tag       // defaults to i_key name
 #define i_key       // key: REQUIRED
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
+#define i_keydel    // destroy key func - defaults to empty destruct
 #define i_keyraw    // convertion "raw" type - defaults to i_key
 #define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
 #define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
-#define i_keydel    // destroy key func - defaults to empty destruct
+#define i_valdel    // destroy value func - defaults to empty destruct
 #define i_valraw    // convertion "raw" type - defaults to i_val
 #define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
 #define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
-#define i_valdel    // destroy value func - defaults to empty destruct
+#define i_tag       // defaults to i_key
 #include <stc/csmap.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -132,9 +132,9 @@ This example uses a csmap with cstr as mapped value.
 ```c
 #include <stc/cstr.h>
 
-#define i_tag id
 #define i_key int
 #define i_val_str
+#define i_tag id
 #include <stc/csmap.h>
 
 int main()
@@ -145,7 +145,7 @@ int main()
         {100, "Red"},
         {110, "Blue"},
     });
-    c_autoscope (0, csmap_id_del(&idnames)) 
+    c_autodefer (csmap_id_del(&idnames)) 
     {
         // put replaces existing mapped value:
         csmap_id_emplace_or_assign(&idnames, 110, "White");
@@ -178,10 +178,10 @@ static int Vec3i_compare(const Vec3i* a, const Vec3i* b) {
     return (a->z > b->z) - (a->z < b->z);
 }
 
-#define i_tag vi
 #define i_key Vec3i
 #define i_val int
 #define i_cmp Vec3i_compare // uses c_default_hash
+#define i_tag vi
 #include <stc/csmap.h>
 #include <stdio.h>
 

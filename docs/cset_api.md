@@ -7,15 +7,15 @@ A **cset** is an associative container that contains a set of unique objects of 
 ## Header file and declaration
 
 ```c
-#define i_tag       // defaults to i_key name
 #define i_key       // key: REQUIRED
 #define i_hash      // hash func: REQUIRED IF i_keyraw is a non-pod type
-#define i_equ       // equality comparison two i_keyraw*.  REQUIRED IF i_keyraw is a non-integral type
-#define i_cmp       // three-way compare two i_keyraw* : alternative to i_equ
+#define i_cmp       // three-way compare two i_keyraw*: REQUIRED IF i_keyraw is a non-integral type
+#define i_equ       // equality comparison two i_keyraw*: ALTERNATIVE to i_cmp 
+#define i_del       // destroy key func - defaults to empty destruct
 #define i_keyraw    // convertion "raw" type - defaults to i_key
 #define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
 #define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
-#define i_keydel    // destroy key func - defaults to empty destruct
+#define i_tag       // defaults to i_key
 #include <stc/cset.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.

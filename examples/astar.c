@@ -64,16 +64,16 @@ point_key_compare(const point* a, const point* b)
 #define i_cmp c_no_compare
 #include <stc/cdeq.h>
 
-#define i_tag pcost
 #define i_key point
 #define i_val int
 #define i_cmp point_key_compare
+#define i_tag pcost
 #include <stc/csmap.h>
 
-#define i_tag pstep
 #define i_key point
 #define i_val point
 #define i_cmp point_key_compare
+#define i_tag pstep
 #include <stc/csmap.h>
 
 cdeq_point

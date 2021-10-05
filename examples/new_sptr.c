@@ -10,10 +10,10 @@ void Person_del(Person* p) {
     c_del(cstr, &p->name, &p->last);
 }
 
-#define i_tag person
 #define i_val Person
 #define i_del Person_del
 #define i_cmp c_no_compare
+#define i_tag person
 #include <stc/csptr.h>
 
 // ...
@@ -21,8 +21,8 @@ void Person_del(Person* p) {
 #define i_val int
 #include <stc/csptr.h>
 
-#define i_tag iptr
 #define i_key_csptr csptr_int
+#define i_tag iptr
 #include <stc/csset.h>
 
 int main(void) {

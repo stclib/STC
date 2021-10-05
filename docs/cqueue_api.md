@@ -7,13 +7,13 @@ See the c++ class [std::queue](https://en.cppreference.com/w/cpp/container/queue
 
 ## Header file and declaration
 ```c
-#define i_tag       // defaults to i_val name
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_valraw* : REQUIRED IF i_valraw is a non-integral type
+#define i_del       // destroy value func - defaults to empty destruct
 #define i_valraw    // convertion "raw" type - defaults to i_val
 #define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
 #define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
-#define i_valdel    // destroy value func - defaults to empty destruct
+#define i_tag       // defaults to i_val
 #include <stc/cqueue.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -57,8 +57,8 @@ cqueue_X_value_t        cqueue_X_value_clone(cqueue_X_value_t val);
 
 ## Examples
 ```c
-#define i_tag i
 #define i_val int
+#define i_tag i
 #include <stc/cqueue.h>
 
 #include <stdio.h>

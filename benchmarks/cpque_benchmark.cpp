@@ -2,9 +2,9 @@
 #include <time.h>
 #include <stc/crandom.h>
 
-#define i_tag f
 #define i_val float
 #define i_cmp -c_default_compare
+#define i_tag f
 #include <stc/cpque.h>
 
 int main()

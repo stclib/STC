@@ -2,8 +2,8 @@
 #include <time.h>
 #include <stc/crandom.h>
 
-#define i_tag fx
 #define i_val double
+#define i_tag fx
 #include <stc/clist.h>
 
 int main() {

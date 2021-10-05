@@ -29,9 +29,9 @@ static void test_repeats(void)
     }
 }
 
-#define i_tag x
 #define i_key uint32_t
 #define i_val uint64_t
+#define i_tag x
 #include <stc/cmap.h>
 
 void test_distribution(void)

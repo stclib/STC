@@ -8,13 +8,13 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ## Header file and declaration
 
 ```c
-#define i_tag       // defaults to i_val name
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_valraw* : REQUIRED IF i_valraw is a non-integral type
+#define i_del       // destroy value func - defaults to empty destruct
 #define i_valraw    // convertion "raw" type - defaults to i_val
 #define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
 #define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
-#define i_valdel    // destroy value func - defaults to empty destruct
+#define i_tag       // defaults to i_val
 #include <stc/cpque.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -58,9 +58,9 @@ cpque_X_value_t     cpque_X_value_clone(cpque_X_value_t val);
 #include <stc/crandom.h>
 #include <stdio.h>
 
-#define i_tag i
 #define i_val int64_t
 #define i_cmp -c_default_compare // min-heap
+#define i_tag i
 #include <stc/cpque.h>
 
 int main()

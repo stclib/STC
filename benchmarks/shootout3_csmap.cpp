@@ -15,14 +15,14 @@ using omap_i = std::map<int, int>;
 using omap_x = std::map<uint64_t, uint64_t>;
 using omap_s = std::map<std::string, std::string>;
 
-#define i_tag i
 #define i_key int
 #define i_val int
+#define i_tag i
 #include <stc/csmap.h>
 
-#define i_tag x
 #define i_key size_t
 #define i_val size_t
+#define i_tag x
 #include <stc/csmap.h>
 
 #define i_key_str

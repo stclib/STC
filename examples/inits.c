@@ -1,14 +1,14 @@
 #include <stdio.h>
 #include <stc/cstr.h>
 
-#define i_tag id   // Map of int => cstr
 #define i_key int
 #define i_val_str
+#define i_tag id   // Map of int => cstr
 #include <stc/cmap.h>
 
-#define i_tag cnt  // Map of cstr => int
 #define i_key_str
 #define i_val int
+#define i_tag cnt  // Map of cstr => int
 #include <stc/cmap.h>
 
 typedef struct {int x, y;} ipair_t;
@@ -17,18 +17,19 @@ inline static int ipair_compare(const ipair_t* a, const ipair_t* b) {
     return cx == 0 ? c_default_compare(&a->y, &b->y) : cx;
 }
 
-#define i_tag ip
+
 #define i_val ipair_t
 #define i_cmp ipair_compare
+#define i_tag ip
 #include <stc/cvec.h>
 
-#define i_tag ip
 #define i_val ipair_t
 #define i_cmp ipair_compare
+#define i_tag ip
 #include <stc/clist.h>
 
-#define i_tag f
 #define i_val float
+#define i_tag f
 #include <stc/cpque.h>
 
 int main(void)

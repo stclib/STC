@@ -35,16 +35,16 @@ DEFMAP(map_i, <int, int>);
 DEFMAP(map_x, <uint64_t, uint64_t>);
 DEFMAP(map_s, <std::string, std::string>);
 
-#define i_tag i
 #define i_key int
 #define i_val int
 #define i_hash c_default_hash32
+#define i_tag i
 #include <stc/cmap.h>
 
-#define i_tag x
 #define i_key size_t
 #define i_val size_t
 #define i_hash c_default_hash64
+#define i_tag x
 #include <stc/cmap.h>
 
 #define i_key_str

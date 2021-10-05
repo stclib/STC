@@ -28,8 +28,8 @@ void stringdemo1()
     }
 }
 
-#define i_tag ix
 #define i_val int64_t
+#define i_tag ix
 #include <stc/cvec.h>
 
 void vectordemo1()
@@ -72,8 +72,8 @@ void vectordemo2()
     }
 }
 
-#define i_tag ix
 #define i_val int
+#define i_tag ix
 #include <stc/clist.h>
 
 void listdemo1()
@@ -106,8 +106,8 @@ void listdemo1()
     }
 }
 
-#define i_tag i
 #define i_key int
+#define i_tag i
 #include <stc/cset.h>
 
 void setdemo1()
@@ -122,9 +122,9 @@ void setdemo1()
     cset_i_del(&nums);
 }
 
-#define i_tag ii
 #define i_key int
 #define i_val int
+#define i_tag ii
 #include <stc/cmap.h>
 
 void mapdemo1()
@@ -137,9 +137,9 @@ void mapdemo1()
     cmap_ii_del(&nums);
 }
 
-#define i_tag si
 #define i_key_str
 #define i_val int
+#define i_tag si
 #include <stc/cmap.h>
 
 void mapdemo2()
@@ -186,8 +186,8 @@ void mapdemo3()
 }
 
 //#define i_prefix carray3 // backward compatible.
-#define i_tag f
 #define i_val float
+#define i_tag f
 #include <stc/carr3.h>
 
 void arraydemo1()

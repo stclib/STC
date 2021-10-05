@@ -16,10 +16,10 @@ template<typename C> inline void destroy_me(C& c) { C().swap(c); }
 // Visual Studio: compile with -TP to force C++:  cl -TP -EHsc -O2 benchmark.c
 
 // cmap and khash template expansion
-#define i_tag ii
 #define i_key int64_t
 #define i_val int64_t
 #define i_cmp c_default_hash64
+#define i_tag ii
 #include <stc/cmap.h>
 
 KHASH_MAP_INIT_INT64(ii, int64_t)

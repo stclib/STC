@@ -16,8 +16,8 @@ uint64_t seed = 1, mask1 = 0xfffffff, mask2 = 0xffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
 
-#define i_tag x
 #define i_val size_t
+#define i_tag x
 #include <stc/cvec.h>
 
 #ifdef __cplusplus

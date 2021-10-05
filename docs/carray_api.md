@@ -9,11 +9,11 @@ See the c++ class [boost::multi_array](https://www.boost.org/doc/libs/release/li
 ## Header file and declaration
 
 ```c
-#define i_tag       // defaults to i_val name
 #define i_val       // value: REQUIRED
+#define i_del       // destroy value func - defaults to empty destruct
 #define i_valfrom   // func Raw => i_val - defaults to plain copy
 #define i_valto     // func i_val => Raw - defaults to plain copy
-#define i_valdel    // destroy value func - defaults to empty destruct
+#define i_tag       // defaults to i_val
 
 #include <stc/carr2.h> // or <stc/carr3.h>
 ```
@@ -75,12 +75,12 @@ The **carr3** elements can be accessed like `carr3_i arr = ...; int val = arr.da
 ```c
 #include <stdio.h>
 
-#define i_tag i
 #define i_val uint32_t
+#define i_tag i
 #include <stc/carr2.h>
 
-#define i_tag f
 #define i_val float
+#define i_tag f
 #include <stc/carr3.h>
 
 int main()

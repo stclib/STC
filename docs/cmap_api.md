@@ -17,19 +17,19 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 ## Header file and declaration
 
 ```c
-#define i_tag       // defaults to i_key name
 #define i_key       // key: REQUIRED
 #define i_val       // value: REQUIRED
-#define i_equ       // equality comparison two i_keyraw*. REQUIRED IF i_keyraw is non-integral type
-#define i_cmp       // three-way compare two i_keyraw* : may be defined instead of i_equ
+#define i_cmp       // three-way compare two i_keyraw*: REQUIRED IF i_keyraw is non-integral type
+#define i_equ       // equality comparison two i_keyraw*: ALTERNATIVE to i_cmp
+#define i_keydel    // destroy key func - defaults to empty destruct
 #define i_keyraw    // convertion "raw" type - defaults to i_key
 #define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
 #define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
-#define i_keydel    // destroy key func - defaults to empty destruct
+#define i_valdel    // destroy value func - defaults to empty destruct
 #define i_valraw    // convertion "raw" type - defaults to i_val
 #define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
 #define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
-#define i_valdel    // destroy value func - defaults to empty destruct
+#define i_tag       // defaults to i_key
 #include <stc/cmap.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -161,9 +161,9 @@ This example uses a cmap with cstr as mapped value.
 ```c
 #include <stc/cstr.h>
 
-#define i_tag id
 #define i_key int
 #define i_val_str
+#define i_tag id
 #include <stc/cmap.h>
 
 int main()
@@ -201,10 +201,10 @@ Demonstrate cmap with plain-old-data key type Vec3i and int as mapped type: cmap
 #include <stdio.h>
 typedef struct { int x, y, z; } Vec3i;
 
-#define i_tag vi
 #define i_key Vec3i
 #define i_val int
-#define i_cmp c_memcmp_equals // bitwise equals, uses c_default_hash
+#define i_cmp c_memcmp_equals // bitwise compare, and use c_default_hash
+#define i_tag vi
 #include <stc/cmap.h>
 
 int main()
@@ -236,9 +236,9 @@ Inverse: demonstrate cmap with mapped POD type Vec3i: cmap<int, Vec3i>:
 #include <stdio.h>
 typedef struct { int x, y, z; } Vec3i;
 
-#define i_tag iv
 #define i_key int
 #define i_val Vec3i
+#define i_tag iv
 #include <stc/cmap.h>
 
 int main()
@@ -285,12 +285,12 @@ static void Viking_del(Viking* v) {
     c_del(cstr, &v->name, &v->country);
 }
 
-#define i_tag vk
 #define i_key Viking
 #define i_val int
 #define i_equ Viking_equals
 #define i_hash Viking_hash
-#define i_keydel Viking_del
+#define i_del Viking_del
+#define i_tag vk
 #include <stc/cmap.h>
 
 int main()
@@ -358,15 +358,15 @@ static Viking Viking_fromR(RViking r)
 static RViking Viking_toR(const Viking* v) 
     { return (RViking){v->name.str, v->country.str}; }
 
-#define i_tag vk
 #define i_key Viking
 #define i_val int
 #define i_equ RViking_equals
 #define i_hash RViking_hash
+#define i_keydel Viking_del
 #define i_keyraw RViking
 #define i_keyfrom Viking_fromR
 #define i_keyto Viking_toR
-#define i_keydel Viking_del
+#define i_tag vk
 #include <stc/cmap.h>
 
 int main()
