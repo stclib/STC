@@ -269,7 +269,7 @@ cx_MAP_ONLY(
     cx_memb(_insert_or_assign)(Self* self, i_key key, i_val mapped) {
         cx_result_t res = cx_memb(_insert_entry_)(self, i_keyto(&key));
         if (res.inserted) res.ref->first = key;
-        else {i_keydel(&key); i_valdel(&res.ref->second); }
+        else { i_keydel(&key); i_valdel(&res.ref->second); }
         res.ref->second = mapped; return res;
     }
 

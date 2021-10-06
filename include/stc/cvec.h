@@ -108,7 +108,7 @@ STC_INLINE cx_value_t*  cx_memb(_back)(const Self* self)
 STC_INLINE cx_value_t*  cx_memb(_emplace_back)(Self* self, i_valraw raw)
                             { return cx_memb(_push_back)(self, i_valfrom(raw)); }
 STC_INLINE void         cx_memb(_pop_back)(Self* self)
-                            { i_valdel(&self->data[--cvec_rep_(self)->size]); }
+                            { size_t i = --cvec_rep_(self)->size; i_valdel(&self->data[i]); }
 STC_INLINE cx_iter_t    cx_memb(_begin)(const Self* self)
                             { return c_make(cx_iter_t){self->data}; }
 STC_INLINE cx_iter_t    cx_memb(_end)(const Self* self)
@@ -270,7 +270,7 @@ cx_memb(_resize)(Self* self, size_t len, i_val null_val) {
     cx_memb(_reserve)(self, len);
     struct cvec_rep* rep = cvec_rep_(self);
     size_t i, n = rep->size;
-    for (i = len; i < n; ++i) i_valdel(self->data + i);
+    for (i = len; i < n; ++i) i_valdel(&self->data[i]);
     for (i = n; i < len; ++i) self->data[i] = null_val;
     if (rep->cap) rep->size = len;
 }
@@ -328,7 +328,7 @@ cx_memb(_erase_range_p)(Self* self, cx_value_t* p1, cx_value_t* p2) {
     intptr_t len = p2 - p1;
     if (len > 0) {
         cx_value_t* p = p1, *end = self->data + cvec_rep_(self)->size;
-        while (p != p2) i_valdel(p++);
+        while (p != p2) i_valdel(p), ++p;
         memmove(p1, p2, (end - p2) * sizeof(i_val));
         cvec_rep_(self)->size -= len;
     }

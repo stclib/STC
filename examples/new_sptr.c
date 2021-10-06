@@ -19,11 +19,12 @@ void Person_del(Person* p) {
 // ...
 
 #define i_val int
+#define i_del(x) printf("del: %d\n", *(x))
 #include <stc/csptr.h>
 
-#define i_key_csptr csptr_int
+#define i_val_csptr csptr_int
 #define i_tag iptr
-#include <stc/csset.h>
+#include <stc/cstack.h>
 
 int main(void) {
     c_autovar (csptr_person p = csptr_person_make(Person_init("John", "Smiths")), csptr_person_del(&p))
@@ -32,11 +33,14 @@ int main(void) {
         printf("%s %s. uses: %u\n", q.get->name.str, q.get->last.str, *q.use_count);
     }
 
-    c_auto (csset_iptr, map) {
-        csset_iptr_insert(&map, csptr_int_make(2021));
-        csset_iptr_insert(&map, csptr_int_make(2033));
+    c_auto (cstack_iptr, stk) {
+        cstack_iptr_push(&stk, csptr_int_make(10));
+        cstack_iptr_push(&stk, csptr_int_make(20));
+        cstack_iptr_push(&stk, csptr_int_make(30));
+        cstack_iptr_emplace(&stk, *cstack_iptr_top(&stk));
+        cstack_iptr_emplace(&stk, *cstack_iptr_begin(&stk).ref);
 
-        c_foreach (i, csset_iptr, map)
+        c_foreach (i, cstack_iptr, stk)
             printf(" %d", *i.ref->get);
         puts("");
     }

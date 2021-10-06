@@ -74,7 +74,7 @@ STC_INLINE void         cx_memb(_copy)(Self *self, Self other) {
 STC_INLINE cx_value_t*  cx_memb(_emplace_back)(Self* self, i_valraw raw)
                             { return cx_memb(_push_back)(self, i_valfrom(raw)); }
 STC_INLINE void         cx_memb(_pop_front)(Self* self)
-                            { i_valdel(self->data++); --cdeq_rep_(self)->size; }
+                            { i_valdel(self->data); ++self->data; --cdeq_rep_(self)->size; }
 STC_INLINE cx_value_t*  cx_memb(_back)(const Self* self)
                             { return self->data + cdeq_rep_(self)->size - 1; }
 STC_INLINE cx_value_t*  cx_memb(_front)(const Self* self) { return self->data; }
@@ -106,7 +106,7 @@ STC_INLINE cx_value_t* cx_memb(_emplace_front)(Self* self, i_valraw raw) {
 }
 
 STC_INLINE void cx_memb(_pop_back)(Self* self) {
-    i_valdel(&self->data[--cdeq_rep_(self)->size]);
+    size_t i = --cdeq_rep_(self)->size; i_valdel(&self->data[i]);
 }
 
 STC_INLINE cx_value_t* cx_memb(_at)(const Self* self, size_t idx) {
@@ -337,7 +337,7 @@ cx_memb(_erase_range_p)(Self* self, cx_value_t* p1, cx_value_t* p2) {
     size_t n = p2 - p1;
     if (n > 0) {
         cx_value_t* p = p1, *end = self->data + cdeq_rep_(self)->size;
-        while (p != p2) i_valdel(p++);
+        while (p != p2) i_valdel(p), ++p;
         if (p1 == self->data) self->data += n;
         else memmove(p1, p2, (end - p2) * sizeof(i_val));
         cdeq_rep_(self)->size -= n;

@@ -47,7 +47,7 @@ static inline VikingRaw viking_toRaw(const Viking* vk) {
 
 int main()
 {
-    c_autovar (cmap_vk vikings = cmap_vk_init(), cmap_vk_del(&vikings)) {
+    c_auto (cmap_vk, vikings) {
         c_apply_pair(cmap_vk, emplace, &vikings, {
             {{"Einar", "Norway"}, 20},
             {{"Olaf", "Denmark"}, 24},
