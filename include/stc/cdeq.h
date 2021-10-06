@@ -315,11 +315,11 @@ cx_memb(_push_front)(Self* self, i_val value) {
 }
 
 STC_DEF cx_iter_t
-cx_memb(_insert_range_p)(Self* self, cx_value_t* pos, const cx_value_t* p1,
-                                                    const cx_value_t* p2, bool clone) {
+cx_memb(_insert_range_p)(Self* self, cx_value_t* pos,
+                         const cx_value_t* p1, const cx_value_t* p2, bool clone) {
     pos = cx_memb(_insert_space_)(self, pos, p2 - p1);
     cx_iter_t it = {pos};
-    if (clone) while (p1 != p2) *pos++ = i_valfrom(i_valto(p1++));
+    if (clone) while (p1 != p2) { *pos++ = i_valfrom(i_valto(p1)); ++p1; }
     else memcpy(pos, p1, (p2 - p1)*sizeof *p1);
     return it;
 }
@@ -328,7 +328,7 @@ STC_DEF cx_iter_t
 cx_memb(_emplace_range_p)(Self* self, cx_value_t* pos, const cx_rawvalue_t* p1, const cx_rawvalue_t* p2) {
     pos = cx_memb(_insert_space_)(self, pos, p2 - p1);
     cx_iter_t it = {pos};
-    while (p1 != p2) *pos++ = i_valfrom(*p1++);
+    while (p1 != p2) { *pos++ = i_valfrom(*p1); ++p1; }
     return it;
 }
 
