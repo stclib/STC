@@ -310,7 +310,7 @@ cx_memb(_push_front)(Self* self, i_val value) {
     else
         --self->data;
     ++cdeq_rep_(self)->size;
-    *self->data = value; 
+    *self->data = value;
     return self->data;
 }
 
@@ -337,7 +337,7 @@ cx_memb(_erase_range_p)(Self* self, cx_value_t* p1, cx_value_t* p2) {
     size_t n = p2 - p1;
     if (n > 0) {
         cx_value_t* p = p1, *end = self->data + cdeq_rep_(self)->size;
-        while (p != p2) i_valdel(p), ++p;
+        while (p != p2) { i_valdel(p); ++p; }
         if (p1 == self->data) self->data += n;
         else memmove(p1, p2, (end - p2) * sizeof(i_val));
         cdeq_rep_(self)->size -= n;

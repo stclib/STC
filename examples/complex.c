@@ -35,27 +35,29 @@ int main() {
     int x = 1, y = 3, tableKey = 42;
     const char* strKey = "first";
 
-    cmap_map myMap = cmap_map_init();
-    cmap_lst listMap = cmap_lst_init();
-    clist_arr tableList = clist_arr_init();
-    cstack_f stk = cstack_f_with_capacity(xdim * ydim);
-    memset(stk.data, 0, xdim*ydim*sizeof *stk.data);
-    stk.size = stk.capacity;
+    c_auto (cmap_map, myMap)
+    {
+        cstack_f stk = cstack_f_with_capacity(xdim * ydim);
+        memset(stk.data, 0, xdim*ydim*sizeof *stk.data);
+        stk.size = stk.capacity;
 
-    printf("stk size: %zu\n", cstack_f_size(stk));
+        // Put in some data in stack array
+        stk.data[x] = 3.1415927f;
+        printf("stk size: %zu\n", cstack_f_size(stk));
 
-    // Put in some data in stack array
-    stk.data[x] = 3.1415927f;
-    clist_arr_push_back(&tableList, stk);
-    cmap_lst_insert(&listMap, tableKey, tableList);
-    cmap_map_insert(&myMap, cstr_from(strKey), listMap);
+        clist_arr tableList = clist_arr_init();
+        clist_arr_push_back(&tableList, stk);
 
-    // Access the data entry
-    cmap_lst* mapL = &cmap_map_find(&myMap, strKey).ref->second;
-    clist_arr* lstA = &cmap_lst_find(mapL, tableKey).ref->second;
-    cstack_f arr = *clist_arr_back(lstA);
-    printf("value (%d) is: %f\n", x, arr.data[x]);
+        cmap_lst listMap = cmap_lst_init();
+        cmap_lst_insert(&listMap, tableKey, tableList);
+        cmap_map_insert(&myMap, cstr_from(strKey), listMap);
 
-    stk.data[x] = 1.41421356f; // change the value in array
-    cmap_map_del(&myMap); // free up everything!
+        // Access the data entry
+        cmap_lst* mapL = &cmap_map_find(&myMap, strKey).ref->second;
+        clist_arr* lstA = &cmap_lst_find(mapL, tableKey).ref->second;
+        cstack_f arr = *clist_arr_back(lstA);
+        printf("value (%d) is: %f\n", x, arr.data[x]);
+
+        stk.data[x] = 1.41421356f; // change the value in array
+    }
 }

@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
- 
+
 /*
 #include <stc/cstr.h>
 #include <stc/forward.h>
@@ -114,7 +114,7 @@ STC_INLINE cx_iter_t    cx_memb(_begin)(const Self* self)
 STC_INLINE cx_iter_t    cx_memb(_end)(const Self* self)
                             { return c_make(cx_iter_t){self->data + cvec_rep_(self)->size}; }
 STC_INLINE void         cx_memb(_next)(cx_iter_t* it) { ++it->ref; }
-STC_INLINE cx_iter_t    cx_memb(_advance)(cx_iter_t it, intptr_t offs) 
+STC_INLINE cx_iter_t    cx_memb(_advance)(cx_iter_t it, intptr_t offs)
                             { it.ref += offs; return it; }
 STC_INLINE size_t       cx_memb(_index)(Self cx, cx_iter_t it) { return it.ref - cx.data; }
 
@@ -328,7 +328,7 @@ cx_memb(_erase_range_p)(Self* self, cx_value_t* p1, cx_value_t* p2) {
     intptr_t len = p2 - p1;
     if (len > 0) {
         cx_value_t* p = p1, *end = self->data + cvec_rep_(self)->size;
-        while (p != p2) i_valdel(p), ++p;
+        while (p != p2) { i_valdel(p); ++p; }
         memmove(p1, p2, (end - p2) * sizeof(i_val));
         cvec_rep_(self)->size -= len;
     }

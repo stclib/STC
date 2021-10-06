@@ -16,11 +16,14 @@ int main()
         csset_int_iter_t it;
         printf("Show values >= %d:\n", val);
         it = csset_int_lower_bound(&set, val);
+
         c_foreach (k, csset_int, it, csset_int_end(&set)) 
             printf(" %d", *k.ref); puts("");
 
         printf("Erase values >= %d:\n", val);
-        while (it.ref) it = csset_int_erase_at(&set, it);
+        while (it.ref != csset_int_end(&set).ref)
+            it = csset_int_erase_at(&set, it);
+
         c_foreach (k, csset_int, set)
             printf(" %d", *k.ref);
         puts("");
@@ -29,6 +32,7 @@ int main()
         printf("Erase values < %d:\n", val);
         it = csset_int_lower_bound(&set, val);
         csset_int_erase_range(&set, csset_int_begin(&set), it);
+
         c_foreach (k, csset_int, set)
             printf(" %d", *k.ref);
         puts("");
