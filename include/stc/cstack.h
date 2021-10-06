@@ -83,13 +83,14 @@ STC_INLINE void cx_memb(_reserve)(Self* self, size_t n) {
 STC_INLINE void cx_memb(_shrink_to_fit)(Self* self)
     { cx_memb(_reserve)(self, self->size); }
 
-STC_INLINE void cx_memb(_push)(Self* self, cx_value_t val) {
+STC_INLINE cx_value_t* cx_memb(_push)(Self* self, cx_value_t val) {
     if (self->size == self->capacity) cx_memb(_reserve)(self, self->size*3/2 + 4);
-    self->data[ self->size++ ] = val;
+    cx_value_t* vp = self->data + self->size++; 
+    *vp = val; return vp;
 }
 
-STC_INLINE void cx_memb(_emplace)(Self* self, cx_rawvalue_t raw)
-    { cx_memb(_push)(self, i_valfrom(raw)); }
+STC_INLINE cx_value_t* cx_memb(_emplace)(Self* self, cx_rawvalue_t raw)
+    { return cx_memb(_push)(self, i_valfrom(raw)); }
 
 STC_INLINE Self cx_memb(_clone)(Self v) {
     Self out = {(cx_value_t *) c_malloc(v.size*sizeof(cx_value_t)), v.size, v.size};

@@ -49,8 +49,8 @@ cvec_X_value_t*     cvec_X_at(const cvec_X* self, size_t idx);
 cvec_X_value_t*     cvec_X_front(const cvec_X* self);
 cvec_X_value_t*     cvec_X_back(const cvec_X* self);
 
-void                cvec_X_push_back(cvec_X* self, i_val value);
-void                cvec_X_emplace_back(cvec_X* self, i_valraw raw);
+cvec_X_value_t*     cvec_X_push_back(cvec_X* self, i_val value);
+cvec_X_value_t*     cvec_X_emplace_back(cvec_X* self, i_valraw raw);
 void                cvec_X_pop_back(cvec_X* self);
 
 cvec_X_iter_t       cvec_X_insert(cvec_X* self, size_t idx, i_val value);                        // move value 

@@ -42,12 +42,12 @@ cdeq_X_value_t*     cdeq_X_at(const cdeq_X* self, size_t idx);
 cdeq_X_value_t*     cdeq_X_front(const cdeq_X* self);
 cdeq_X_value_t*     cdeq_X_back(const cdeq_X* self);
 
-void                cdeq_X_push_front(cdeq_X* self, i_val value);
-void                cdeq_X_emplace_front(cdeq_X* self, i_valraw raw);
+cdeq_X_value_t*     cdeq_X_push_front(cdeq_X* self, i_val value);
+cdeq_X_value_t*     cdeq_X_emplace_front(cdeq_X* self, i_valraw raw);
 void                cdeq_X_pop_front(cdeq_X* self);
 
-void                cdeq_X_push_back(cdeq_X* self, i_val value);
-void                cdeq_X_emplace_back(cdeq_X* self, i_valraw raw);
+cdeq_X_value_t*     cdeq_X_push_back(cdeq_X* self, i_val value);
+cdeq_X_value_t*     cdeq_X_emplace_back(cdeq_X* self, i_valraw raw);
 void                cdeq_X_pop_back(cdeq_X* self); 
 
 cdeq_X_iter_t       cdeq_X_insert(cdeq_X* self, size_t idx, i_val value);                        // move value 

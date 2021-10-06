@@ -22,38 +22,38 @@ See the c++ class [std::queue](https://en.cppreference.com/w/cpp/container/queue
 ## Methods
 
 ```c
-cqueue_X                cqueue_X_init(void);
-cqueue_X                cqueue_X_clone(cqueue_X q);
+cqueue_X            cqueue_X_init(void);
+cqueue_X            cqueue_X_clone(cqueue_X q);
 
-void                    cqueue_X_clear(cqueue_X* self);
-void                    cqueue_X_copy(cqueue_X* self, cqueue_X other);
-void                    cqueue_X_del(cqueue_X* self);      // destructor
+void                cqueue_X_clear(cqueue_X* self);
+void                cqueue_X_copy(cqueue_X* self, cqueue_X other);
+void                cqueue_X_del(cqueue_X* self);       // destructor
 
-size_t                  cqueue_X_size(cqueue_X q);
-bool                    cqueue_X_empty(cqueue_X q);
-cqueue_X_value_t*       cqueue_X_front(const cqueue_X* self);
-cqueue_X_value_t*       cqueue_X_back(const cqueue_X* self);
+size_t              cqueue_X_size(cqueue_X q);
+bool                cqueue_X_empty(cqueue_X q);
+cqueue_X_value_t*   cqueue_X_front(const cqueue_X* self);
+cqueue_X_value_t*   cqueue_X_back(const cqueue_X* self);
 
-void                    cqueue_X_push(cqueue_X* self, cqueue_X_value_t value);
-void                    cqueue_X_emplace(cqueue_X* self, cqueue_X_rawvalue_t raw);
+cqueue_X_value_t*   cqueue_X_push(cqueue_X* self, i_val value);
+cqueue_X_value_t*   cqueue_X_emplace(cqueue_X* self, i_valraw raw);
 
-void                    cqueue_X_pop(cqueue_X* self);
+void                cqueue_X_pop(cqueue_X* self);
 
-cqueue_X_iter_t         cqueue_X_begin(const cqueue_X* self);
-cqueue_X_iter_t         cqueue_X_end(const cqueue_X* self);
-void                    cqueue_X_next(cqueue_X_iter_t* it);
+cqueue_X_iter_t     cqueue_X_begin(const cqueue_X* self);
+cqueue_X_iter_t     cqueue_X_end(const cqueue_X* self);
+void                cqueue_X_next(cqueue_X_iter_t* it);
 
-cqueue_X_value_t        cqueue_X_value_clone(cqueue_X_value_t val);
+i_val               cqueue_X_value_clone(i_val value);
 ```
 
 ## Types
 
-| Type name             | Type definition                        | Used to represent...     |
-|:----------------------|:---------------------------------------|:-------------------------|
-| `cqueue_X`            | Same as `cdeq_X` type                  | The cqueue type          |
-| `cqueue_X_value_t`    |                   "                    | The cqueue element type  |
-| `cqueue_X_rawvalue_t` |                   "                    | cqueue raw value type    |
-| `cqueue_X_iter_t`     |                   "                    | cqueue iterator          |
+| Type name             | Type definition      | Used to represent...     |
+|:----------------------|:---------------------|:-------------------------|
+| `cqueue_X`            | `cdeq_X`             | The cqueue type          |
+| `cqueue_X_value_t`    | `i_val`              | The cqueue element type  |
+| `cqueue_X_rawvalue_t` | `i_valraw`           | cqueue raw value type    |
+| `cqueue_X_iter_t`     | `cdeq_X_iter_t`      | cqueue iterator          |
 
 ## Examples
 ```c
