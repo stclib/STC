@@ -95,8 +95,10 @@ cx_memb(_with_capacity)(size_t n) {
 
 STC_INLINE void
 cx_memb(_shrink_to_fit)(Self *self) {
-    Self cx = cx_memb(_clone)(*self);
-    cx_memb(_del)(self); *self = cx;
+    if (cx_memb(_size)(*self) != cx_memb(_capacity)(*self)) {
+        Self cx = cx_memb(_clone)(*self);
+        cx_memb(_del)(self); *self = cx;
+    }
 }
 
 #ifndef i_queue

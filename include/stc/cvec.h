@@ -134,8 +134,7 @@ cx_memb(_with_capacity)(size_t size) {
 
 STC_INLINE void
 cx_memb(_shrink_to_fit)(Self *self) {
-    Self cx = cx_memb(_clone)(*self);
-    cx_memb(_del)(self); *self = cx;
+    cx_memb(_reserve)(self, cx_memb(_size)(*self));
 }
 
 STC_INLINE void
@@ -255,10 +254,10 @@ cx_memb(_del)(Self* self) {
 STC_DEF void
 cx_memb(_reserve)(Self* self, size_t cap) {
     struct cvec_rep* rep = cvec_rep_(self);
-    size_t len = rep->size, oldcap = rep->cap;
-    if (cap > oldcap) {
-        rep = (struct cvec_rep*) c_realloc(oldcap ? rep : NULL,
-                                            offsetof(struct cvec_rep, data) + cap*sizeof(i_val));
+    size_t len = rep->size;
+    if (cap >= len && cap != rep->cap) {
+        rep = (struct cvec_rep*) c_realloc(rep->cap ? rep : NULL,
+                                           offsetof(struct cvec_rep, data) + cap*sizeof(i_val));
         self->data = (cx_value_t*) rep->data;
         rep->size = len;
         rep->cap = cap;
@@ -267,7 +266,8 @@ cx_memb(_reserve)(Self* self, size_t cap) {
 
 STC_DEF void
 cx_memb(_resize)(Self* self, size_t len, i_val null_val) {
-    cx_memb(_reserve)(self, len);
+    if (len > cx_memb(_capacity)(*self))
+        cx_memb(_reserve)(self, len);
     struct cvec_rep* rep = cvec_rep_(self);
     size_t i, n = rep->size;
     for (i = len; i < n; ++i) i_valdel(&self->data[i]);
