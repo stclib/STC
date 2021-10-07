@@ -140,12 +140,13 @@ cx_memb(_erase_at)(Self* self, size_t idx) {
 
 STC_DEF void
 cx_memb(_push)(Self* self, cx_value_t value) {
-    cx_memb(_push_back)(self, value); /* sift-up the value */
-    size_t n = cx_memb(_size)(*self), c = n;
-    cx_value_t *arr = self->data - 1;
-    for (; c > 1 && i_cmp(&arr[c >> 1], &value) < 0; c >>= 1)
-        arr[c] = arr[c >> 1];
-    if (c != n) arr[c] = value;
+    if (self->size == self->capacity)
+        cx_memb(_reserve)(self, self->size*3/2 + 4);
+    cx_value_t *arr = self->data - 1; /* base 1 */
+    size_t i = ++self->size;
+    for (; i > 1 && i_cmp(&arr[i >> 1], &value) < 0; i >>= 1)
+        arr[i] = arr[i >> 1];
+    arr[i] = value;
 }
 
 #endif
