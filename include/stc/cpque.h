@@ -98,21 +98,17 @@ cx_memb(_push_back)(Self* self, cx_value_t value) {
 
 STC_INLINE void
 cx_memb(_pop_back)(Self* self)
-    { --self->size; i_valdel(&self->data[self->size]); }
+    { cx_value_t* p = &self->data[--self->size]; i_valdel(p); }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
 
 STC_DEF void
-cx_memb(_sift_down_)(cx_value_t* arr, size_t i, size_t n) {
-    size_t r = i, c = i << 1;
-    while (c <= n) {
+cx_memb(_sift_down_)(cx_value_t* arr, size_t idx, size_t n) {
+    for (size_t r = idx, c = idx << 1; c <= n; c <<= 1) {
         c += (c < n && i_cmp(&arr[c], &arr[c + 1]) < 0);
-        if (i_cmp(&arr[r], &arr[c]) < 0) {
-            cx_value_t tmp = arr[r]; arr[r] = arr[c]; arr[r = c] = tmp;
-        } else
-            return;
-        c <<= 1;
+        if (i_cmp(&arr[r], &arr[c]) >= 0) return;
+        cx_value_t t = arr[r]; arr[r] = arr[c]; arr[r = c] = t;
     }
 }
 
@@ -143,10 +139,10 @@ cx_memb(_push)(Self* self, cx_value_t value) {
     if (self->size == self->capacity)
         cx_memb(_reserve)(self, self->size*3/2 + 4);
     cx_value_t *arr = self->data - 1; /* base 1 */
-    size_t i = ++self->size;
-    for (; i > 1 && i_cmp(&arr[i >> 1], &value) < 0; i >>= 1)
-        arr[i] = arr[i >> 1];
-    arr[i] = value;
+    size_t c = ++self->size;
+    for (; c > 1 && i_cmp(&arr[c >> 1], &value) < 0; c >>= 1)
+        arr[c] = arr[c >> 1];
+    arr[c] = value;
 }
 
 #endif

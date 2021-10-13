@@ -108,7 +108,7 @@ STC_INLINE cx_value_t* cx_memb(_emplace_front)(Self* self, i_valraw raw) {
 }
 
 STC_INLINE void cx_memb(_pop_back)(Self* self) {
-    size_t i = --cdeq_rep_(self)->size; i_valdel(&self->data[i]);
+    cx_value_t* p = &self->data[--cdeq_rep_(self)->size]; i_valdel(p);
 }
 
 STC_INLINE cx_value_t* cx_memb(_at)(const Self* self, size_t idx) {

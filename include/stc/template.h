@@ -47,6 +47,10 @@
   #error if i_keyraw or i_keyto defined, i_keyfrom a must be defined
 #endif
 
+#if defined i_key_str || defined i_val_str
+  #include "cstr.h"
+#endif
+
 #ifdef i_cnt
   #define i_tag i_cnt
   #undef i_prefix

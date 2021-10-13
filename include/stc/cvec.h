@@ -108,7 +108,7 @@ STC_INLINE cx_value_t*  cx_memb(_back)(const Self* self)
 STC_INLINE cx_value_t*  cx_memb(_emplace_back)(Self* self, i_valraw raw)
                             { return cx_memb(_push_back)(self, i_valfrom(raw)); }
 STC_INLINE void         cx_memb(_pop_back)(Self* self)
-                            { size_t i = --cvec_rep_(self)->size; i_valdel(&self->data[i]); }
+                            { cx_value_t* p = &self->data[--cvec_rep_(self)->size]; i_valdel(p); }
 STC_INLINE cx_iter_t    cx_memb(_begin)(const Self* self)
                             { return c_make(cx_iter_t){self->data}; }
 STC_INLINE cx_iter_t    cx_memb(_end)(const Self* self)
@@ -265,13 +265,13 @@ cx_memb(_reserve)(Self* self, size_t cap) {
 }
 
 STC_DEF void
-cx_memb(_resize)(Self* self, size_t len, i_val null_val) {
+cx_memb(_resize)(Self* self, size_t len, i_val fill) {
     if (len > cx_memb(_capacity)(*self))
         cx_memb(_reserve)(self, len);
     struct cvec_rep* rep = cvec_rep_(self);
     size_t i, n = rep->size;
     for (i = len; i < n; ++i) i_valdel(&self->data[i]);
-    for (i = n; i < len; ++i) self->data[i] = null_val;
+    for (i = n; i < len; ++i) self->data[i] = fill;
     if (rep->cap) rep->size = len;
 }
 

@@ -123,28 +123,27 @@ void                c_default_del(Type* val);                               // d
 int main()
 {
     // Create an unordered_map of three strings (that map to strings)
-    cmap_str u = cmap_str_init();
-    c_apply_pair(cmap_str, emplace, &u, {
-        {"RED", "#FF0000"},
-        {"GREEN", "#00FF00"},
-        {"BLUE", "#0000FF"}
-    });
+    c_auto (cmap_str, u)
+    {
+        c_apply_pair(cmap_str, emplace, &u, {
+            {"RED", "#FF0000"},
+            {"GREEN", "#00FF00"},
+            {"BLUE", "#0000FF"}
+        });
 
-    // Iterate and print keys and values of unordered map
-    c_foreach (n, cmap_str, u) {
-        printf("Key:[%s] Value:[%s]\n", n.ref->first.str, n.ref->second.str);
+        // Iterate and print keys and values of unordered map
+        c_foreach (n, cmap_str, u) {
+            printf("Key:[%s] Value:[%s]\n", n.ref->first.str, n.ref->second.str);
+        }
+
+        // Add two new entries to the unordered map
+        cmap_str_emplace(&u, "BLACK", "#000000");
+        cmap_str_emplace(&u, "WHITE", "#FFFFFF");
+
+        // Output values by key
+        printf("The HEX of color RED is:[%s]\n", cmap_str_at(&u, "RED")->str);
+        printf("The HEX of color BLACK is:[%s]\n", cmap_str_at(&u, "BLACK")->str);
     }
-
-    // Add two new entries to the unordered map
-    cmap_str_emplace(&u, "BLACK", "#000000");
-    cmap_str_emplace(&u, "WHITE", "#FFFFFF");
-
-    // Output values by key
-    printf("The HEX of color RED is:[%s]\n", cmap_str_at(&u, "RED")->str);
-    printf("The HEX of color BLACK is:[%s]\n", cmap_str_at(&u, "BLACK")->str);
-
-    cmap_str_del(&u);
-    return 0;
 }
 ```
 Output:
@@ -170,22 +169,23 @@ int main()
 {
     uint32_t col = 0xcc7744ff;
 
-    cmap_id idnames = cmap_id_init();
-    c_apply_pair(cmap_id, emplace, &idnames, { {100, "Red"}, {110, "Blue"} });
-    
-    /* replace existing mapped value: */
-    cmap_id_emplace_or_assign(&idnames, 110, "White");
-    
-    /* insert a new constructed mapped string into map: */
-    cmap_id_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
-    
-    /* emplace/insert does nothing if key already exist: */
-    cmap_id_emplace(&idnames, 100, "Green");
+    c_auto (cmap_id, idnames)
+    {
+        c_apply_pair(cmap_id, emplace, &idnames, {
+            {100, "Red"}, {110, "Blue"}
+        });
+        // replace existing mapped value:
+        cmap_id_emplace_or_assign(&idnames, 110, "White");
+        
+        // insert a new constructed mapped string into map:
+        cmap_id_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
+        
+        // emplace/insert does nothing if key already exist:
+        cmap_id_emplace(&idnames, 100, "Green");
 
-    c_foreach (i, cmap_id, idnames)
-        printf("%d: %s\n", i.ref->first, i.ref->second.str);
-
-    cmap_id_del(&idnames);
+        c_foreach (i, cmap_id, idnames)
+            printf("%d: %s\n", i.ref->first, i.ref->second.str);
+    }
 }
 ```
 Output:
@@ -338,8 +338,8 @@ static void Viking_del(Viking* v) {
     c_del(cstr, &v->name, &v->country);
 }
 
-// Define a "raw" type that need no allocations,
-// and define equals, hash, fromraw, toraw functions:
+// Define a "raw" type that does not need allocations.
+// Define equals, hash, fromraw, toraw functions:
 
 typedef struct {
     const char* name;
@@ -360,10 +360,10 @@ static RViking Viking_toR(const Viking* v)
 
 #define i_key Viking
 #define i_val int
-#define i_equ RViking_equals
-#define i_hash RViking_hash
 #define i_keydel Viking_del
 #define i_keyraw RViking
+#define i_equ RViking_equals
+#define i_hash RViking_hash
 #define i_keyfrom Viking_fromR
 #define i_keyto Viking_toR
 #define i_tag vk
@@ -377,11 +377,11 @@ int main()
         cmap_vk_insert(&vikings, (Viking){cstr_from("Einar"), cstr_from("Norway")}, 25);
         cmap_vk_insert(&vikings, (Viking){cstr_from("Olaf"), cstr_from("Denmark")}, 24);
 
-        // But emplace is simpler to use now - takes raw key argument
+        // Emplace is simpler to use now - takes rawkey argument
         cmap_vk_emplace(&vikings, (RViking){"Harald", "Iceland"}, 12);
         cmap_vk_emplace(&vikings, (RViking){"Einar", "Denmark"}, 21);
 
-        // Lookup also uses raw key type, so no need construct/destruct key:
+        // Lookup also uses rawkey args, no need construct/destruct key:
         printf("Lookup: Einar of Norway has %d hp\n\n", *cmap_vk_at(&vikings, (RViking){"Einar", "Norway"}));
 
         // Print the status of the vikings.

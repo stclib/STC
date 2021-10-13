@@ -53,8 +53,9 @@ STC_INLINE Self cx_memb(_with_size)(size_t size, i_val fill) {
 }
 
 STC_INLINE void cx_memb(_clear)(Self* self) {
-    size_t i = self->size; self->size = 0;
-    while (i--) i_valdel(&self->data[i]);
+    cx_value_t *p = self->data + self->size;
+    while (p-- != self->data) i_valdel(p);
+    self->size = 0;
 }
 
 STC_INLINE void cx_memb(_del)(Self* self)
@@ -73,7 +74,7 @@ STC_INLINE cx_value_t* cx_memb(_top)(const Self* self)
     { return &self->data[self->size - 1]; }
 
 STC_INLINE void cx_memb(_pop)(Self* self)
-    { --self->size; i_valdel(&self->data[self->size]); }
+    { cx_value_t* p = &self->data[--self->size]; i_valdel(p); }
 
 STC_INLINE void cx_memb(_reserve)(Self* self, size_t n) {
     if (n >= self->size)
