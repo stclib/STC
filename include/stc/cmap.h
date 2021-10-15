@@ -213,34 +213,23 @@ cx_memb(_erase_at)(Self* self, cx_iter_t it) {
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
-#if !defined(STC_HEADER) && !defined(CMAP_H_INCLUDED) || defined(i_imp) && i_imp == 2
-
-STC_DEF uint64_t c_default_hash(const void *key, size_t len) {
-    const uint64_t m = 0xb5ad4eceda1ce2a9;
-    uint64_t k, h = m + len;
-    const uint8_t *p = (const uint8_t *)key, *end = p + (len & ~7ull);
-    for (; p != end; p += 8) { memcpy(&k, p, 8); h ^= m*k; }
-    switch (len & 7) {
-        case 7: h ^= (uint64_t) p[6] << 48; /* @fallthrough@ */
-        case 6: h ^= (uint64_t) p[5] << 40; /* @fallthrough@ */
-        case 5: h ^= (uint64_t) p[4] << 32; /* @fallthrough@ */
-        case 4: h ^= (uint64_t) p[3] << 24; /* @fallthrough@ */
-        case 3: h ^= (uint64_t) p[2] << 16; /* @fallthrough@ */
-        case 2: h ^= (uint64_t) p[1] << 8;  /* @fallthrough@ */
-        case 1: h ^= (uint64_t) p[0]; h *= m;
-    }
-    return h ^ (h >> 15);
-}
-#endif // NON-TEMPLATED
-
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
 
 #ifndef CMAP_H_INCLUDED
+#define _c_rotl(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
+STC_INLINE uint64_t c_default_hash(const void *key, size_t len) {
+    const char* str = (const char*)key;
+    uint64_t h = 0xb5ad4eceda1ce2a9;
+    for (size_t i = 0; i < len; ++i)
+        h ^= (_c_rotl(h, 4) ^ (h << 13)) + str[i];
+    return h;
+}
+
 //STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n)
 //    { uint64_t lo, hi; c_umul128(x, n, &lo, &hi); return hi; }
 #define fastrange_uint32_t(x, n) (uint32_t)((uint32_t)(x)*(uint64_t)(n) >> 32)
 #define chash_index_(h, entryPtr) ((entryPtr) - (h).table)
-#endif
+#endif // CMAP_H_INCLUDED
 
 STC_DEF Self
 cx_memb(_with_capacity)(size_t cap) {
