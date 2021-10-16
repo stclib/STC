@@ -115,7 +115,7 @@ STC_INLINE bool         cstr_ends_with_v(cstr s, csview sub)
 /* ---- Container helper functions ---- */
 
 #define                 csview_compare(xp, yp) strcmp((xp)->str, (yp)->str)
-#define                 csview_hash(xp, ...) c_default_hash((xp)->str, (xp)->size)
+#define                 csview_hash(xp, dummy) c_strhash((xp)->str)
 #define                 csview_equals(xp, yp) (strcmp((xp)->str, (yp)->str) == 0)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */

@@ -102,8 +102,7 @@
 
 #define c_rawstr_compare(x, y)  strcmp(*(x), *(y))
 #define c_rawstr_equals(x, y)   (strcmp(*(x), *(y)) == 0)
-#define c_rawstr_hash(p, dummy) c_default_hash(*(p), strlen(*(p)))
-#define c_strhash(s)            c_default_hash(s, strlen(s))
+#define c_rawstr_hash(p, dummy) c_strhash(*(p))
 
 #define c_no_clone(x)           (assert(!"c_no_clone() called"), x)
 #define c_default_fromraw(x)    (x)
@@ -111,6 +110,12 @@
 
 #define c_default_del(ptr)      ((void) (ptr))
 
+#define _c_rotl(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
+STC_INLINE uint64_t c_strhash(const char *str) {
+    int c; uint64_t h = 0xb5ad4eceda1ce2a9;
+    while ((c = *str++)) h = (_c_rotl(h, 4) ^ (h << 13)) + c;
+    return h;
+}
 STC_INLINE uint64_t c_default_hash(const void *key, size_t len);
 #define c_default_hash32(data, len_is_4) \
     ((*(const uint32_t*)data * 0xc6a4a7935bd1e99d) >> 15)

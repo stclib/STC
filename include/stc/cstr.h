@@ -167,10 +167,9 @@ cstr_ends_with(cstr s, const char* sub) {
 }
 
 /* container adaptor functions: */
-#define  cstr_toraw(xp)           ((xp)->str)  // deprecated
 #define  cstr_compare(xp, yp)     strcmp((xp)->str, (yp)->str)
 #define  cstr_equals(xp, yp)      (strcmp((xp)->str, (yp)->str) == 0)
-#define  cstr_hash(xp, ...)       c_default_hash((xp)->str, cstr_size(*(xp)))
+#define  cstr_hash(xp, dummy)     c_strhash((xp)->str)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 

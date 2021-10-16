@@ -216,12 +216,10 @@ cx_memb(_erase_at)(Self* self, cx_iter_t it) {
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
 
 #ifndef CMAP_H_INCLUDED
-#define _c_rotl(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 STC_INLINE uint64_t c_default_hash(const void *key, size_t len) {
-    const char* str = (const char*)key;
+    const char* str = (const char*)key, *e = str + len;
     uint64_t h = 0xb5ad4eceda1ce2a9;
-    for (size_t i = 0; i < len; ++i)
-        h ^= (_c_rotl(h, 4) ^ (h << 13)) + str[i];
+    while (str != e) h = (_c_rotl(h, 4) ^ (h << 13)) + *str++;
     return h;
 }
 
