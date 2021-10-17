@@ -220,7 +220,7 @@ STC_INLINE uint64_t c_default_hash(const void *key, size_t len) {
     const char* str = (const char*)key, *e = str + len;
     uint64_t h = 0xb5ad4eceda1ce2a9;
     while (str != e) h = (_c_rotl(h, 4) ^ (h << 13)) + *str++;
-    return h;
+    return h ^ (h >> 15);
 }
 
 //STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n)

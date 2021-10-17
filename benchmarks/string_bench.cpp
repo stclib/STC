@@ -72,6 +72,7 @@ void initLongStringVec(std::vector<std::string>& vs)
         vs[i] += vs[i];
         vs[i] += vs[0];
         vs[i] += vs[i];
+        vs[i] += vs[i];
         num += vs[i].size();
     }
     printf("avg len: %f\n", (float)num / vs.size());

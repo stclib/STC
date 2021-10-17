@@ -54,6 +54,7 @@ void initLongStringVec(cvec_str* vs)
         cstr_append(t, t->str);
         cstr_append(t, s->str);
         cstr_append(t, t->str);
+        cstr_append(t, t->str);
         lengths += cstr_size(*t);
     }
     printf("avg len: %f\n", (float)lengths / cvec_str_size(*vs));
