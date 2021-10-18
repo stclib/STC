@@ -26,7 +26,7 @@ point_init(int x, int y, int width)
 int
 point_compare_priority(const point* a, const point* b)
 {
-    return a->priorty < b->priorty;
+    return c_default_compare(&a->priorty, &b->priorty);
 }
 
 int

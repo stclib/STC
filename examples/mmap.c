@@ -1,7 +1,6 @@
 // This implements the multimap c++ example found at:
 // https://en.cppreference.com/w/cpp/container/multimap/insert
 
-#include <stc/cstr.h>
 // Map of int => clist_str. Note the negation of c_default_compare
 #define i_val_str
 #include <stc/clist.h>
