@@ -22,34 +22,32 @@
  */
 
 /*  Circular Singly-linked Lists.
-
-    This implements a std::forward_list-like class in C, but because it is circular,
-    it also support push* and splice* at both ends of the list. This makes it ideal
-    for being used as a queue, unlike std::forward_list. Basic usage is similar to cvec:
+    This implements a std::forward_list-like class in C. Because it is circular,
+    it also support both push_back() and push_front(), unlike std::forward_list:
 
     #include <stdio.h>
     #include <stc/crandom.h>
 
-    #define i_tag ix
     #define i_val int64_t
+    #define i_tag ix
     #include <stc/clist.h>
 
-    int main() {
-        c_autovar (clist_ix list = clist_ix_init(), clist_ix_del(&list))
+    int main()
+    {
+        c_auto (clist_ix, list)
         {
-            stc64_t rng = stc64_init(12345);
             int n;
-            for (int i=0; i<1000000; ++i) // one million
-                clist_ix_push_back(&list, stc64_rand(&rng) >> 32);
+            for (int i = 0; i < 1000000; ++i) // one million
+                clist_ix_push_back(&list, stc64_random() >> 32);
             n = 0;
             c_foreach (i, clist_ix, list)
-                if (++n % 10000 == 0) printf("%8d: %10zd\n", n, i.ref->value);
+                if (++n % 10000 == 0) printf("%8d: %10zu\n", n, *i.ref);
             // Sort them...
             clist_ix_sort(&list); // mergesort O(n*log n)
             n = 0;
             puts("sorted");
             c_foreach (i, clist_ix, list)
-                if (++n % 10000 == 0) printf("%8d: %10zd\n", n, i.ref->value);
+                if (++n % 10000 == 0) printf("%8d: %10zu\n", n, *i.ref);
         }
     }
 */
