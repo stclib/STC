@@ -18,7 +18,7 @@ template<typename C> inline void destroy_me(C& c) { C().swap(c); }
 // cmap and khash template expansion
 #define i_key int64_t
 #define i_val int64_t
-#define i_cmp c_default_hash64
+#define i_hash c_default_hash64
 #define i_tag ii
 #include <stc/cmap.h>
 
@@ -152,7 +152,7 @@ int rr = RR;
     difference = clock() - before; \
     printf(#M ": time: %5.02f, sum: %zu, erased %zu, size: %zu, buckets: %8zu\n", \
            (float) difference / CLOCKS_PER_SEC, checksum, erased, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
-    M##_CLEAR(X); \
+    M##_DTOR(X); \
 }
 
 #define MAP_TEST2(M, X) \
@@ -167,7 +167,7 @@ int rr = RR;
     difference = clock() - before; \
     printf(#M ": time: %5.02f, erased %zu, size: %zu, buckets: %8zu\n", \
            (float) difference / CLOCKS_PER_SEC, erased, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
-    M##_CLEAR(X); \
+    M##_DTOR(X); \
 }
 
 #define MAP_TEST3(M, X) \
@@ -184,7 +184,7 @@ int rr = RR;
     difference = clock() - before; \
     printf(#M ": time: %5.02f, erased %zu, size: %zu, buckets: %8zu\n", \
            (float) difference / CLOCKS_PER_SEC, erased, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
-    M##_CLEAR(X); \
+    M##_DTOR(X); \
 }
 
 #define MAP_TEST4(M, X) \
@@ -200,7 +200,7 @@ int rr = RR;
     difference = clock() - before; \
     printf(#M ": time: %5.02f, sum %zu, size: %zu, buckets: %8zu\n", \
            (float) difference / CLOCKS_PER_SEC, sum, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
-    M##_CLEAR(X); \
+    M##_DTOR(X); \
 }
 
 #define MAP_TEST5(M, X) \
@@ -215,7 +215,7 @@ int rr = RR;
     difference = clock() - before; \
     printf(#M ": time: %5.02f, sum: %zu, size: %zu, buckets: %8zu\n", \
            (float) difference / CLOCKS_PER_SEC, checksum, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
-    M##_CLEAR(X); \
+    M##_DTOR(X); \
 }
 
 #ifdef __cplusplus
@@ -234,7 +234,7 @@ int main(int argc, char* argv[])
     rr = argc == 2 ? atoi(argv[1]) : RR;
     seed = time(NULL);
 
-    printf("\nUnordered maps: Insert %d random keys:\n", N3);
+    printf("\nUnordered maps: Insert %d random (2^%d) keys:\n", N1, rr);
     RUN_TEST(5)
 
     printf("\nRandom keys are in range [0, 2^%d), seed = %zu:\n",  rr, seed);
