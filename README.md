@@ -6,20 +6,23 @@ STC - Smart Template Containers for C
 News
 ----
 **VERSION 2.X RELEASED**: There are two main breaking changes from V1.X.
-- Now uses a different way to instantiate templated containers, which is incompatible with v1.X.
-- c_forauto, c_forvar, c_forscope are now renamed to **c_auto**, **c_autovar**, and **c_autoscope**. There is also a **c_exitauto** macro, which breaks out of an auto-block. The auto name refers to the original meaning of auto keyword in C, namely automatic stack allocated variable, however now it covers automatic resource (de)allocation in general. 
+- Uses a different way to instantiate templated containers, which is incompatible with v1.X.
+- c_forauto, c_forvar, c_forscope macros are now renamed to **c_auto**, **c_autovar**, and **c_autoscope**. These are for automatic scope resource management, aka RAII.
 
-The new template instantiation style has multiple advantages, e.g. implementation does not contain long macro definitions for code generation. Also, specfiying template arguments is more user friendly and flexible.
+The new template instantiation style has multiple advantages, e.g. implementation does not contain long macro definitions for code generation. Also, specifying template arguments is more user friendly and flexible.
 
 Introduction
 ------------
-A modern, templated, user-friendly, fast, fully type-safe, and customizable container library for C99,
+STC is a modern, templated, user-friendly, fast, fully type-safe, and customizable container library for C99,
 with a uniform API across the containers, and is similar to the c++ standard library containers API.
+It is a compact, header-only library which includes the all the major "standard" data containers except for the
+multimap/set variants. There are examples on how to create multimaps in the examples folder.
+
 For an introduction to templated containers, please read the blog by Ian Fisher on
 [type-safe generic data structures in C](https://iafisher.com/blog/2020/06/type-safe-generics-in-c).
+Note that STC does not use long macro expansions anymore, but relies on one or more inclusions of the same file,
+which by the compiler is seen as different code because of macro name substitutions.
 
-STC is a compact, header-only library with the all the major "standard" data containers, except for the
-multimap/set variants. However, there is an example how to create a multimap in the examples folder.
 - [***carr2, carr3*** - **2d** and **3d** dynamic **array** type](docs/carray_api.md)
 - [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
 - [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)
@@ -90,13 +93,13 @@ int main(void) {
 In order to include two **cvec**s with different element types, include cvec.h twice. For structs, specify a compare function (or none), as `<` and `==` operators does not work on them (this enables sorting and searching).
 ```c
 #define i_val struct One
-#define i_tag one
 #define i_cmp c_no_compare
+#define i_tag one
 #include <stc/cvec.h>
 
 #define i_val struct Two
-#define i_tag two
 #define i_cmp c_no_compare
+#define i_tag two
 #include <stc/cvec.h>
 ...
 cvec_one v1 = cvec_one_init();
@@ -118,9 +121,9 @@ int Point_compare(const struct Point* a, const struct Point* b) {
 #define i_key int
 #include <stc/cset.h>  // cset_int: unordered set
 
-#define i_tag pnt
 #define i_val struct Point
 #define i_cmp Point_compare
+#define i_tag pnt
 #include <stc/cvec.h>  // cvec_pnt: vector of struct Point
 
 #define i_val int
@@ -214,20 +217,20 @@ in your build environment and place all the instantiations of containers used in
 #include <stc/cstr.h>
 #include "Point.h"
 
-#define i_tag ii
 #define i_key int
 #define i_val int
+#define i_tag ii
 #include <stc/cmap.h>  // cmap_ii: int => int
 
-#define i_tag ix
 #define i_key int64_t
+#define i_tag ix
 #include <stc/cset.h>  // cset_ix
 
 #define i_val int
 #include <stc/cvec.h>  // cvec_int
 
-#define i_tag pnt
 #define i_val Point
+#define i_tag pnt
 #include <stc/clist.h> // clist_pnt
 ```
 
@@ -258,14 +261,14 @@ and non-emplace methods:
 #define i_val_str       // special macro to enable container of cstr
 #include <stc/cvec.h>   // vector of string (cstr)
 ...
-c_autovar (cvec_str vec = cvec_str_init(), cvec_str_del(&vec))   // defer vector destructor to end of block
-c_autovar (cstr s = cstr_lit("a string literal"), cstr_del(&s))  // cstr_lit() for literals; no strlen() usage
+c_auto (cvec_str, vec)  // declare and call cvec_str_init() and defer cvec_str_del(&vec)
+c_autovar (cstr s = cstr_lit("a string literal"), cstr_del(&s))  // c_autovar is a more general c_auto.
 {
     const char* hello = "Hello";
     cvec_str_push_back(&vec, cstr_from(hello);    // construct and add string from const char*
-    cvec_str_push_back(&vec, cstr_clone(s));      // clone and add an existing cstr
+    cvec_str_push_back(&vec, cstr_clone(s));      // clone and append a cstr
 
-    cvec_str_emplace_back(&vec, "Yay, literal");  // internally constructs cstr from string-literal
+    cvec_str_emplace_back(&vec, "Yay, literal");  // internally constructs cstr from const char*
     cvec_str_emplace_back(&vec, cstr_clone(s));   // <-- COMPILE ERROR: expects const char*
     cvec_str_emplace_back(&vec, s.str);           // Ok: const char* input type.
 }
@@ -336,12 +339,13 @@ User-defined container type name
 --------------------------------
 Define `i_cnt` instead of `i_tag`:
 ```c
-#define i_cnt myvec
 #define i_val int
+#define i_cnt myvec
 #include <stc/cvec.h>
 
 myvec vec = myvec_init();
 myvec_push_back(&vec, 1);
+...
 ```
 
 Memory efficiency
