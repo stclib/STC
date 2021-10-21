@@ -5,6 +5,7 @@
 #include "others/khash.h"
 
 #ifdef __cplusplus
+#include <limits>
 #include <unordered_map>
 #include "others/robin_hood.hpp"
 #include "others/skarupke/bytell_hash_map.hpp"
@@ -18,7 +19,7 @@ template<typename C> inline void destroy_me(C& c) { C().swap(c); }
 // cmap and khash template expansion
 #define i_key int64_t
 #define i_val int64_t
-#define i_hash c_default_hash64
+#define i_hash c_default_hash32
 #define i_tag ii
 #include <stc/cmap.h>
 
