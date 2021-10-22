@@ -19,7 +19,7 @@ template<typename C> inline void destroy_me(C& c) { C().swap(c); }
 // cmap and khash template expansion
 #define i_key int64_t
 #define i_val int64_t
-#define i_hash c_default_hash32
+#define i_hash c_default_hash64
 #define i_tag ii
 #include <stc/cmap.h>
 
@@ -48,8 +48,8 @@ stc64_t rng;
 #define CMAP_DTOR(X)              cmap_##X##_del(&map)
 
 #define KMAP_SETUP(X, Key, Value) khash_t(ii)* map = kh_init(ii); khiter_t ki; int ret
-#define KMAP_PUT(X, key, val)     (*(ki = kh_put(ii, map, key, &ret), map->vals[ki] = val, &map->vals[ki]))
-#define KMAP_EMPLACE(X, key, val) (ki = kh_put(ii, map, key, &ret), ret ? (map->vals[ki] = val, 0) : 0, map->vals[ki])
+#define KMAP_PUT(X, key, val)     (*(ki = kh_put(ii, map, key, &ret), map->vals[ki] = val, map->vals+ki))
+#define KMAP_EMPLACE(X, key, val) (*(ki = kh_put(ii, map, key, &ret), ret ? (map->vals[ki] = val, 0) : 1, map->vals+ki))
 #define KMAP_ERASE(X, key)        ((ki = kh_get(ii, map, key)) != kh_end(map) ? kh_del(ii, map, ki), 1 : 0)
 #define KMAP_FIND(X, key)         (kh_get(ii, map, key) != kh_end(map))
 #define KMAP_SIZE(X)              kh_size(map)
