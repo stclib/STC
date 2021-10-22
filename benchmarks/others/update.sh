@@ -11,7 +11,6 @@ wget $martinus"robin_hood.h" -O "robin_hood.h"
 wget $skarupke"bytell_hash_map.hpp" -O "skarupke/bytell_hash_map.hpp"
 wget $skarupke"flat_hash_map.hpp" -O "skarupke/flat_hash_map.hpp"
 
-exit
 wget $greg"spp.h" -O "sparsepp/spp.h"
 wget $greg"spp_config.h" -O "sparsepp/spp_config.h"
 wget $greg"spp_dlalloc.h" -O "sparsepp/spp_dlalloc.h"

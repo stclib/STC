@@ -10,7 +10,7 @@
 //
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2018-2020 Martin Ankerl <http://martin.ankerl.com>
+// Copyright (c) 2018-2021 Martin Ankerl <http://martin.ankerl.com>
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -35,13 +35,14 @@
 
 // see https://semver.org/
 #define ROBIN_HOOD_VERSION_MAJOR 3  // for incompatible API changes
-#define ROBIN_HOOD_VERSION_MINOR 10 // for adding functionality in a backwards-compatible manner
-#define ROBIN_HOOD_VERSION_PATCH 0  // for backwards-compatible bug fixes
+#define ROBIN_HOOD_VERSION_MINOR 11 // for adding functionality in a backwards-compatible manner
+#define ROBIN_HOOD_VERSION_PATCH 3  // for backwards-compatible bug fixes
 
 #include <algorithm>
 #include <cstdlib>
 #include <cstring>
 #include <functional>
+#include <limits>
 #include <memory> // only to support hash of smart pointers
 #include <stdexcept>
 #include <string>
@@ -190,6 +191,17 @@ static Counts& counts() {
 #    endif
 #else
 #    define ROBIN_HOOD_PRIVATE_DEFINITION_HAS_NATIVE_WCHART() 1
+#endif
+
+// detect if MSVC supports the pair(std::piecewise_construct_t,...) consructor being constexpr
+#ifdef _MSC_VER
+#    if _MSC_VER <= 1900
+#        define ROBIN_HOOD_PRIVATE_DEFINITION_BROKEN_CONSTEXPR() 1
+#    else
+#        define ROBIN_HOOD_PRIVATE_DEFINITION_BROKEN_CONSTEXPR() 0
+#    endif
+#else
+#    define ROBIN_HOOD_PRIVATE_DEFINITION_BROKEN_CONSTEXPR() 0
 #endif
 
 // workaround missing "is_trivially_copyable" in g++ < 5.0
@@ -542,14 +554,6 @@ struct NodeAllocator<T, MinSize, MaxSize, true> {
 template <typename T, size_t MinSize, size_t MaxSize>
 struct NodeAllocator<T, MinSize, MaxSize, false> : public BulkPoolAllocator<T, MinSize, MaxSize> {};
 
-// dummy hash, unsed as mixer when robin_hood::hash is already used
-template <typename T>
-struct identity_hash {
-    constexpr size_t operator()(T const& obj) const noexcept {
-        return static_cast<size_t>(obj);
-    }
-};
-
 // c++14 doesn't have is_nothrow_swappable, and clang++ 6.0.1 doesn't like it either, so I'm making
 // my own here.
 namespace swappable {
@@ -610,14 +614,20 @@ struct pair {
         , second(std::forward<U2>(b)) {}
 
     template <typename... U1, typename... U2>
-    constexpr pair(
-        std::piecewise_construct_t /*unused*/, std::tuple<U1...> a,
-        std::tuple<U2...> b) noexcept(noexcept(pair(std::declval<std::tuple<U1...>&>(),
-                                                    std::declval<std::tuple<U2...>&>(),
-                                                    ROBIN_HOOD_STD::index_sequence_for<U1...>(),
-                                                    ROBIN_HOOD_STD::index_sequence_for<U2...>())))
+    // MSVC 2015 produces error "C2476: ‘constexpr’ constructor does not initialize all members"
+    // if this constructor is constexpr
+#if !ROBIN_HOOD(BROKEN_CONSTEXPR)
+    constexpr
+#endif
+        pair(std::piecewise_construct_t /*unused*/, std::tuple<U1...> a,
+             std::tuple<U2...>
+                 b) noexcept(noexcept(pair(std::declval<std::tuple<U1...>&>(),
+                                           std::declval<std::tuple<U2...>&>(),
+                                           ROBIN_HOOD_STD::index_sequence_for<U1...>(),
+                                           ROBIN_HOOD_STD::index_sequence_for<U2...>())))
         : pair(a, b, ROBIN_HOOD_STD::index_sequence_for<U1...>(),
-               ROBIN_HOOD_STD::index_sequence_for<U2...>()) {}
+               ROBIN_HOOD_STD::index_sequence_for<U2...>()) {
+    }
 
     // constructor called from the std::piecewise_construct_t ctor
     template <typename... U1, size_t... I1, typename... U2, size_t... I2>
@@ -728,23 +738,24 @@ inline size_t hash_bytes(void const* ptr, size_t len) noexcept {
     }
 
     h ^= h >> r;
-    h *= m;
-    h ^= h >> r;
+
+    // not doing the final step here, because this will be done by keyToIdx anyways
+    // h *= m;
+    // h ^= h >> r;
     return static_cast<size_t>(h);
 }
 
 inline size_t hash_int(uint64_t x) noexcept {
-    // inspired by lemire's strongly universal hashing
-    // https://lemire.me/blog/2018/08/15/fast-strongly-universal-64-bit-hashing-everywhere/
-    //
-    // Instead of shifts, we use rotations so we don't lose any bits.
-    //
-    // Added a final multiplcation with a constant for more mixing. It is most important that
-    // the lower bits are well mixed.
-    auto h1 = x * UINT64_C(0xA24BAED4963EE407);
-    auto h2 = detail::rotr(x, 32U) * UINT64_C(0x9FB21C651E98DF25);
-    auto h = detail::rotr(h1 + h2, 32U);
-    return static_cast<size_t>(h);
+    // tried lots of different hashes, let's stick with murmurhash3. It's simple, fast, well tested,
+    // and doesn't need any special 128bit operations.
+    x ^= x >> 33U;
+    x *= UINT64_C(0xff51afd7ed558ccd);
+    x ^= x >> 33U;
+
+    // not doing the final step here, because this will be done by keyToIdx anyways
+    // x *= UINT64_C(0xc4ceb9fe1a85ec53);
+    // x ^= x >> 33U;
+    return static_cast<size_t>(x);
 }
 
 // A thin wrapper around std::hash, performing an additional simple mixing step of the result.
@@ -1109,7 +1120,7 @@ private:
 
     using Node = DataNode<Self, IsFlat>;
 
-    // helpers for doInsert: extract first entry (only const required)
+    // helpers for insertKeyPrepareEmptySpot: extract first entry (only const required)
     ROBIN_HOOD(NODISCARD) key_type const& getFirstConst(Node const& n) const noexcept {
         return n.getFirst();
     }
@@ -1335,18 +1346,17 @@ private:
     // The upper 1-5 bits need to be a reasonable good hash, to save comparisons.
     template <typename HashKey>
     void keyToIdx(HashKey&& key, size_t* idx, InfoType* info) const {
-        // for a user-specified hash that is *not* robin_hood::hash, apply robin_hood::hash as
-        // an additional mixing step. This serves as a bad hash prevention, if the given data is
+        // In addition to whatever hash is used, add another mul & shift so we get better hashing.
+        // This serves as a bad hash prevention, if the given data is
         // badly mixed.
-        using Mix =
-            typename std::conditional<std::is_same<::robin_hood::hash<key_type>, hasher>::value,
-                                      ::robin_hood::detail::identity_hash<size_t>,
-                                      ::robin_hood::hash<size_t>>::type;
+        auto h = static_cast<uint64_t>(WHash::operator()(key));
+
+        h *= mHashMultiplier;
+        h ^= h >> 33U;
 
         // the lower InitialInfoNumBits are reserved for info.
-        auto h = Mix{}(WHash::operator()(key));
         *info = mInfoInc + static_cast<InfoType>((h & InfoMask) >> mInfoHashShift);
-        *idx = (h >> InitialInfoNumBits) & mMask;
+        *idx = (static_cast<size_t>(h) >> InitialInfoNumBits) & mMask;
     }
 
     // forwards the index by one, wrapping around at the end
@@ -1436,12 +1446,12 @@ private:
     }
 
     // inserts a keyval that is guaranteed to be new, e.g. when the hashmap is resized.
-    // @return index where the element was created
-    size_t insert_move(Node&& keyval) {
+    // @return True on success, false if something went wrong
+    void insert_move(Node&& keyval) {
         // we don't retry, fail if overflowing
         // don't need to check max num elements
         if (0 == mMaxNumElementsAllowed && !try_increase_info()) {
-            throwOverflowError(); // impossible to reach LCOV_EXCL_LINE
+            throwOverflowError();
         }
 
         size_t idx{};
@@ -1478,7 +1488,6 @@ private:
         mInfo[insertion_idx] = insertion_info;
 
         ++mNumElements;
-        return insertion_idx;
     }
 
 public:
@@ -1528,6 +1537,7 @@ public:
         , DataPool(std::move(static_cast<DataPool&>(o))) {
         ROBIN_HOOD_TRACE(this)
         if (o.mMask) {
+            mHashMultiplier = std::move(o.mHashMultiplier);
             mKeyVals = std::move(o.mKeyVals);
             mInfo = std::move(o.mInfo);
             mNumElements = std::move(o.mNumElements);
@@ -1546,6 +1556,7 @@ public:
             if (o.mMask) {
                 // only move stuff if the other map actually has some data
                 destroy();
+                mHashMultiplier = std::move(o.mHashMultiplier);
                 mKeyVals = std::move(o.mKeyVals);
                 mInfo = std::move(o.mInfo);
                 mNumElements = std::move(o.mNumElements);
@@ -1581,6 +1592,7 @@ public:
 
             ROBIN_HOOD_LOG("std::malloc " << numBytesTotal << " = calcNumBytesTotal("
                                           << numElementsWithBuffer << ")")
+            mHashMultiplier = o.mHashMultiplier;
             mKeyVals = static_cast<Node*>(
                 detail::assertNotNull<std::bad_alloc>(std::malloc(numBytesTotal)));
             // no need for calloc because clonData does memcpy
@@ -1648,6 +1660,7 @@ public:
         WHash::operator=(static_cast<const WHash&>(o));
         WKeyEqual::operator=(static_cast<const WKeyEqual&>(o));
         DataPool::operator=(static_cast<DataPool const&>(o));
+        mHashMultiplier = o.mHashMultiplier;
         mNumElements = o.mNumElements;
         mMask = o.mMask;
         mMaxNumElementsAllowed = o.mMaxNumElementsAllowed;
@@ -1715,13 +1728,54 @@ public:
     template <typename Q = mapped_type>
     typename std::enable_if<!std::is_void<Q>::value, Q&>::type operator[](const key_type& key) {
         ROBIN_HOOD_TRACE(this)
-        return doCreateByKey(key);
+        auto idxAndState = insertKeyPrepareEmptySpot(key);
+        switch (idxAndState.second) {
+        case InsertionState::key_found:
+            break;
+
+        case InsertionState::new_node:
+            ::new (static_cast<void*>(&mKeyVals[idxAndState.first]))
+                Node(*this, std::piecewise_construct, std::forward_as_tuple(key),
+                     std::forward_as_tuple());
+            break;
+
+        case InsertionState::overwrite_node:
+            mKeyVals[idxAndState.first] = Node(*this, std::piecewise_construct,
+                                               std::forward_as_tuple(key), std::forward_as_tuple());
+            break;
+
+        case InsertionState::overflow_error:
+            throwOverflowError();
+        }
+
+        return mKeyVals[idxAndState.first].getSecond();
     }
 
     template <typename Q = mapped_type>
     typename std::enable_if<!std::is_void<Q>::value, Q&>::type operator[](key_type&& key) {
         ROBIN_HOOD_TRACE(this)
-        return doCreateByKey(std::move(key));
+        auto idxAndState = insertKeyPrepareEmptySpot(key);
+        switch (idxAndState.second) {
+        case InsertionState::key_found:
+            break;
+
+        case InsertionState::new_node:
+            ::new (static_cast<void*>(&mKeyVals[idxAndState.first]))
+                Node(*this, std::piecewise_construct, std::forward_as_tuple(std::move(key)),
+                     std::forward_as_tuple());
+            break;
+
+        case InsertionState::overwrite_node:
+            mKeyVals[idxAndState.first] =
+                Node(*this, std::piecewise_construct, std::forward_as_tuple(std::move(key)),
+                     std::forward_as_tuple());
+            break;
+
+        case InsertionState::overflow_error:
+            throwOverflowError();
+        }
+
+        return mKeyVals[idxAndState.first].getSecond();
     }
 
     template <typename Iter>
@@ -1732,17 +1786,38 @@ public:
         }
     }
 
+    void insert(std::initializer_list<value_type> ilist) {
+        for (auto&& vt : ilist) {
+            insert(std::move(vt));
+        }
+    }
+
     template <typename... Args>
     std::pair<iterator, bool> emplace(Args&&... args) {
         ROBIN_HOOD_TRACE(this)
         Node n{*this, std::forward<Args>(args)...};
-        auto r = doInsert(std::move(n));
-        if (!r.second) {
-            // insertion not possible: destroy node
-            // NOLINTNEXTLINE(bugprone-use-after-move)
+        auto idxAndState = insertKeyPrepareEmptySpot(getFirstConst(n));
+        switch (idxAndState.second) {
+        case InsertionState::key_found:
             n.destroy(*this);
+            break;
+
+        case InsertionState::new_node:
+            ::new (static_cast<void*>(&mKeyVals[idxAndState.first])) Node(*this, std::move(n));
+            break;
+
+        case InsertionState::overwrite_node:
+            mKeyVals[idxAndState.first] = std::move(n);
+            break;
+
+        case InsertionState::overflow_error:
+            n.destroy(*this);
+            throwOverflowError();
+            break;
         }
-        return r;
+
+        return std::make_pair(iterator(mKeyVals + idxAndState.first, mInfo + idxAndState.first),
+                              InsertionState::key_found != idxAndState.second);
     }
 
     template <typename... Args>
@@ -1770,34 +1845,34 @@ public:
 
     template <typename Mapped>
     std::pair<iterator, bool> insert_or_assign(const key_type& key, Mapped&& obj) {
-        return insert_or_assign_impl(key, std::forward<Mapped>(obj));
+        return insertOrAssignImpl(key, std::forward<Mapped>(obj));
     }
 
     template <typename Mapped>
     std::pair<iterator, bool> insert_or_assign(key_type&& key, Mapped&& obj) {
-        return insert_or_assign_impl(std::move(key), std::forward<Mapped>(obj));
+        return insertOrAssignImpl(std::move(key), std::forward<Mapped>(obj));
     }
 
     template <typename Mapped>
     std::pair<iterator, bool> insert_or_assign(const_iterator hint, const key_type& key,
                                                Mapped&& obj) {
         (void)hint;
-        return insert_or_assign_impl(key, std::forward<Mapped>(obj));
+        return insertOrAssignImpl(key, std::forward<Mapped>(obj));
     }
 
     template <typename Mapped>
     std::pair<iterator, bool> insert_or_assign(const_iterator hint, key_type&& key, Mapped&& obj) {
         (void)hint;
-        return insert_or_assign_impl(std::move(key), std::forward<Mapped>(obj));
+        return insertOrAssignImpl(std::move(key), std::forward<Mapped>(obj));
     }
 
     std::pair<iterator, bool> insert(const value_type& keyval) {
         ROBIN_HOOD_TRACE(this)
-        return doInsert(keyval);
+        return emplace(keyval);
     }
 
     std::pair<iterator, bool> insert(value_type&& keyval) {
-        return doInsert(std::move(keyval));
+        return emplace(std::move(keyval));
     }
 
     // Returns 1 if key is found, 0 otherwise.
@@ -2032,6 +2107,10 @@ public:
         ROBIN_HOOD_TRACE(this)
         return MaxLoadFactor100 / 100.0F;
     }
+    void max_load_factor(float) const noexcept { // NOLINT(modernize-use-nodiscard)
+        ROBIN_HOOD_TRACE(this)
+    }
+
 
     // Average number of elements per bucket. Since we allow only 1 per bucket
     float load_factor() const noexcept { // NOLINT(modernize-use-nodiscard)
@@ -2043,17 +2122,6 @@ public:
         ROBIN_HOOD_TRACE(this)
         return mMask;
     }
-
-#ifndef IGNORE_STANDARD_METHODS
-    ROBIN_HOOD(NODISCARD) size_t bucket_count() const noexcept {
-        ROBIN_HOOD_TRACE(this)
-        return mMask;
-    }
-    void max_load_factor(float) {
-        ROBIN_HOOD_TRACE(this)
-        // warning, not used
-    }
-#endif
 
     ROBIN_HOOD(NODISCARD) size_t calcMaxNumElementsAllowed(size_t maxElements) const noexcept {
         if (ROBIN_HOOD_LIKELY(maxElements <= (std::numeric_limits<size_t>::max)() / 100)) {
@@ -2134,6 +2202,7 @@ private:
 
     // reserves space for at least the specified number of elements.
     // only works if numBuckets if power of two
+    // True on success, false otherwise
     void rehashPowerOfTwo(size_t numBuckets, bool forceFree) {
         ROBIN_HOOD_TRACE(this)
 
@@ -2143,18 +2212,20 @@ private:
         const size_t oldMaxElementsWithBuffer = calcNumElementsWithBuffer(mMask + 1);
 
         // resize operation: move stuff
-        init_data(numBuckets);
+        initData(numBuckets);
         if (oldMaxElementsWithBuffer > 1) {
             for (size_t i = 0; i < oldMaxElementsWithBuffer; ++i) {
                 if (oldInfo[i] != 0) {
+                    // might throw an exception, which is really bad since we are in the middle of
+                    // moving stuff.
                     insert_move(std::move(oldKeyVals[i]));
                     // destroy the node but DON'T destroy the data.
                     oldKeyVals[i].~Node();
                 }
             }
 
-            // this check is not necessary as it's guarded by the previous if, but it helps silence
-            // g++'s overeager "attempt to free a non-heap object 'map'
+            // this check is not necessary as it's guarded by the previous if, but it helps
+            // silence g++'s overeager "attempt to free a non-heap object 'map'
             // [-Werror=free-nonheap-object]" warning.
             if (oldKeyVals != reinterpret_cast_no_cast_align_warning<Node*>(&mMask)) {
                 // don't destroy old data: put it into the pool instead
@@ -2178,27 +2249,63 @@ private:
     template <typename OtherKey, typename... Args>
     std::pair<iterator, bool> try_emplace_impl(OtherKey&& key, Args&&... args) {
         ROBIN_HOOD_TRACE(this)
-        auto it = find(key);
-        if (it == end()) {
-            return emplace(std::piecewise_construct,
-                           std::forward_as_tuple(std::forward<OtherKey>(key)),
-                           std::forward_as_tuple(std::forward<Args>(args)...));
+        auto idxAndState = insertKeyPrepareEmptySpot(key);
+        switch (idxAndState.second) {
+        case InsertionState::key_found:
+            break;
+
+        case InsertionState::new_node:
+            ::new (static_cast<void*>(&mKeyVals[idxAndState.first])) Node(
+                *this, std::piecewise_construct, std::forward_as_tuple(std::forward<OtherKey>(key)),
+                std::forward_as_tuple(std::forward<Args>(args)...));
+            break;
+
+        case InsertionState::overwrite_node:
+            mKeyVals[idxAndState.first] = Node(*this, std::piecewise_construct,
+                                               std::forward_as_tuple(std::forward<OtherKey>(key)),
+                                               std::forward_as_tuple(std::forward<Args>(args)...));
+            break;
+
+        case InsertionState::overflow_error:
+            throwOverflowError();
+            break;
         }
-        return {it, false};
+
+        return std::make_pair(iterator(mKeyVals + idxAndState.first, mInfo + idxAndState.first),
+                              InsertionState::key_found != idxAndState.second);
     }
 
     template <typename OtherKey, typename Mapped>
-    std::pair<iterator, bool> insert_or_assign_impl(OtherKey&& key, Mapped&& obj) {
+    std::pair<iterator, bool> insertOrAssignImpl(OtherKey&& key, Mapped&& obj) {
         ROBIN_HOOD_TRACE(this)
-        auto it = find(key);
-        if (it == end()) {
-            return emplace(std::forward<OtherKey>(key), std::forward<Mapped>(obj));
+        auto idxAndState = insertKeyPrepareEmptySpot(key);
+        switch (idxAndState.second) {
+        case InsertionState::key_found:
+            mKeyVals[idxAndState.first].getSecond() = std::forward<Mapped>(obj);
+            break;
+
+        case InsertionState::new_node:
+            ::new (static_cast<void*>(&mKeyVals[idxAndState.first])) Node(
+                *this, std::piecewise_construct, std::forward_as_tuple(std::forward<OtherKey>(key)),
+                std::forward_as_tuple(std::forward<Mapped>(obj)));
+            break;
+
+        case InsertionState::overwrite_node:
+            mKeyVals[idxAndState.first] = Node(*this, std::piecewise_construct,
+                                               std::forward_as_tuple(std::forward<OtherKey>(key)),
+                                               std::forward_as_tuple(std::forward<Mapped>(obj)));
+            break;
+
+        case InsertionState::overflow_error:
+            throwOverflowError();
+            break;
         }
-        it->second = std::forward<Mapped>(obj);
-        return {it, false};
+
+        return std::make_pair(iterator(mKeyVals + idxAndState.first, mInfo + idxAndState.first),
+                              InsertionState::key_found != idxAndState.second);
     }
 
-    void init_data(size_t max_elements) {
+    void initData(size_t max_elements) {
         mNumElements = 0;
         mMask = max_elements - 1;
         mMaxNumElementsAllowed = calcMaxNumElementsAllowed(max_elements);
@@ -2220,86 +2327,34 @@ private:
         mInfoHashShift = InitialInfoHashShift;
     }
 
-    template <typename Arg, typename Q = mapped_type>
-    typename std::enable_if<!std::is_void<Q>::value, Q&>::type doCreateByKey(Arg&& key) {
-        while (true) {
+    enum class InsertionState { overflow_error, key_found, new_node, overwrite_node };
+
+    // Finds key, and if not already present prepares a spot where to pot the key & value.
+    // This potentially shifts nodes out of the way, updates mInfo and number of inserted
+    // elements, so the only operation left to do is create/assign a new node at that spot.
+    template <typename OtherKey>
+    std::pair<size_t, InsertionState> insertKeyPrepareEmptySpot(OtherKey&& key) {
+        for (int i = 0; i < 256; ++i) {
             size_t idx{};
             InfoType info{};
             keyToIdx(key, &idx, &info);
             nextWhileLess(&info, &idx);
 
-            // while we potentially have a match. Can't do a do-while here because when mInfo is
-            // 0 we don't want to skip forward
-            while (info == mInfo[idx]) {
-                if (WKeyEqual::operator()(key, mKeyVals[idx].getFirst())) {
-                    // key already exists, do not insert.
-                    return mKeyVals[idx].getSecond();
-                }
-                next(&info, &idx);
-            }
-
-            // unlikely that this evaluates to true
-            if (ROBIN_HOOD_UNLIKELY(mNumElements >= mMaxNumElementsAllowed)) {
-                increase_size();
-                continue;
-            }
-
-            // key not found, so we are now exactly where we want to insert it.
-            auto const insertion_idx = idx;
-            auto const insertion_info = info;
-            if (ROBIN_HOOD_UNLIKELY(insertion_info + mInfoInc > 0xFF)) {
-                mMaxNumElementsAllowed = 0;
-            }
-
-            // find an empty spot
-            while (0 != mInfo[idx]) {
-                next(&info, &idx);
-            }
-
-            auto& l = mKeyVals[insertion_idx];
-            if (idx == insertion_idx) {
-                // put at empty spot. This forwards all arguments into the node where the object
-                // is constructed exactly where it is needed.
-                ::new (static_cast<void*>(&l))
-                    Node(*this, std::piecewise_construct,
-                         std::forward_as_tuple(std::forward<Arg>(key)), std::forward_as_tuple());
-            } else {
-                shiftUp(idx, insertion_idx);
-                l = Node(*this, std::piecewise_construct,
-                         std::forward_as_tuple(std::forward<Arg>(key)), std::forward_as_tuple());
-            }
-
-            // mKeyVals[idx].getFirst() = std::move(key);
-            mInfo[insertion_idx] = static_cast<uint8_t>(insertion_info);
-
-            ++mNumElements;
-            return mKeyVals[insertion_idx].getSecond();
-        }
-    }
-
-    // This is exactly the same code as operator[], except for the return values
-    template <typename Arg>
-    std::pair<iterator, bool> doInsert(Arg&& keyval) {
-        while (true) {
-            size_t idx{};
-            InfoType info{};
-            keyToIdx(getFirstConst(keyval), &idx, &info);
-            nextWhileLess(&info, &idx);
-
             // while we potentially have a match
             while (info == mInfo[idx]) {
-                if (WKeyEqual::operator()(getFirstConst(keyval), mKeyVals[idx].getFirst())) {
+                if (WKeyEqual::operator()(key, mKeyVals[idx].getFirst())) {
                     // key already exists, do NOT insert.
                     // see http://en.cppreference.com/w/cpp/container/unordered_map/insert
-                    return std::make_pair<iterator, bool>(iterator(mKeyVals + idx, mInfo + idx),
-                                                          false);
+                    return std::make_pair(idx, InsertionState::key_found);
                 }
                 next(&info, &idx);
             }
 
             // unlikely that this evaluates to true
             if (ROBIN_HOOD_UNLIKELY(mNumElements >= mMaxNumElementsAllowed)) {
-                increase_size();
+                if (!increase_size()) {
+                    return std::make_pair(size_t(0), InsertionState::overflow_error);
+                }
                 continue;
             }
 
@@ -2315,20 +2370,19 @@ private:
                 next(&info, &idx);
             }
 
-            auto& l = mKeyVals[insertion_idx];
-            if (idx == insertion_idx) {
-                ::new (static_cast<void*>(&l)) Node(*this, std::forward<Arg>(keyval));
-            } else {
+            if (idx != insertion_idx) {
                 shiftUp(idx, insertion_idx);
-                l = Node(*this, std::forward<Arg>(keyval));
             }
-
             // put at empty spot
             mInfo[insertion_idx] = static_cast<uint8_t>(insertion_info);
-
             ++mNumElements;
-            return std::make_pair(iterator(mKeyVals + insertion_idx, mInfo + insertion_idx), true);
+            return std::make_pair(insertion_idx, idx == insertion_idx
+                                                     ? InsertionState::new_node
+                                                     : InsertionState::overwrite_node);
         }
+
+        // enough attempts failed, so finally give up.
+        return std::make_pair(size_t(0), InsertionState::overflow_error);
     }
 
     bool try_increase_info() {
@@ -2359,28 +2413,41 @@ private:
         return true;
     }
 
-    void increase_size() {
+    // True if resize was possible, false otherwise
+    bool increase_size() {
         // nothing allocated yet? just allocate InitialNumElements
         if (0 == mMask) {
-            init_data(InitialNumElements);
-            return;
+            initData(InitialNumElements);
+            return true;
         }
 
         auto const maxNumElementsAllowed = calcMaxNumElementsAllowed(mMask + 1);
         if (mNumElements < maxNumElementsAllowed && try_increase_info()) {
-            return;
+            return true;
         }
 
         ROBIN_HOOD_LOG("mNumElements=" << mNumElements << ", maxNumElementsAllowed="
                                        << maxNumElementsAllowed << ", load="
                                        << (static_cast<double>(mNumElements) * 100.0 /
                                            (static_cast<double>(mMask) + 1)))
-        // it seems we have a really bad hash function! don't try to resize again
-        if (mNumElements * 2 < calcMaxNumElementsAllowed(mMask + 1)) {
-            throwOverflowError();
-        }
 
-        rehashPowerOfTwo((mMask + 1) * 2, false);
+        if (mNumElements * 2 < calcMaxNumElementsAllowed(mMask + 1)) {
+            // we have to resize, even though there would still be plenty of space left!
+            // Try to rehash instead. Delete freed memory so we don't steadyily increase mem in case
+            // we have to rehash a few times
+            nextHashMultiplier();
+            rehashPowerOfTwo(mMask + 1, true);
+        } else {
+            // we've reached the capacity of the map, so the hash seems to work nice. Keep using it.
+            rehashPowerOfTwo((mMask + 1) * 2, false);
+        }
+        return true;
+    }
+
+    void nextHashMultiplier() {
+        // adding an *even* number, so that the multiplier will always stay odd. This is necessary
+        // so that the hash stays a mixing function (and thus doesn't have any information loss).
+        mHashMultiplier += UINT64_C(0xc4ceb9fe1a85ec54);
     }
 
     void destroy() {
@@ -2413,13 +2480,14 @@ private:
     }
 
     // members are sorted so no padding occurs
-    Node* mKeyVals = reinterpret_cast_no_cast_align_warning<Node*>(&mMask); // 8 byte  8
-    uint8_t* mInfo = reinterpret_cast<uint8_t*>(&mMask);                    // 8 byte 16
-    size_t mNumElements = 0;                                                // 8 byte 24
-    size_t mMask = 0;                                                       // 8 byte 32
-    size_t mMaxNumElementsAllowed = 0;                                      // 8 byte 40
-    InfoType mInfoInc = InitialInfoInc;                                     // 4 byte 44
-    InfoType mInfoHashShift = InitialInfoHashShift;                         // 4 byte 48
+    uint64_t mHashMultiplier = UINT64_C(0xc4ceb9fe1a85ec53);                // 8 byte  8
+    Node* mKeyVals = reinterpret_cast_no_cast_align_warning<Node*>(&mMask); // 8 byte 16
+    uint8_t* mInfo = reinterpret_cast<uint8_t*>(&mMask);                    // 8 byte 24
+    size_t mNumElements = 0;                                                // 8 byte 32
+    size_t mMask = 0;                                                       // 8 byte 40
+    size_t mMaxNumElementsAllowed = 0;                                      // 8 byte 48
+    InfoType mInfoInc = InitialInfoInc;                                     // 4 byte 52
+    InfoType mInfoHashShift = InitialInfoHashShift;                         // 4 byte 56
                                                     // 16 byte 56 if NodeAllocator
 };
 
