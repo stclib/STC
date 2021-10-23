@@ -108,11 +108,13 @@ STC_INLINE cx_value_t* cx_memb(_emplace_front)(Self* self, i_valraw raw) {
 }
 
 STC_INLINE void cx_memb(_pop_back)(Self* self) {
-    cx_value_t* p = &self->data[--cdeq_rep_(self)->size]; i_valdel(p);
+    cx_value_t* p = &self->data[--cdeq_rep_(self)->size];
+    i_valdel(p);
 }
 
 STC_INLINE cx_value_t* cx_memb(_at)(const Self* self, size_t idx) {
-    assert(idx < cdeq_rep_(self)->size); return self->data + idx;
+    assert(idx < cdeq_rep_(self)->size); 
+    return self->data + idx;
 }
 
 STC_INLINE size_t cx_memb(_index)(Self cx, cx_iter_t it) {

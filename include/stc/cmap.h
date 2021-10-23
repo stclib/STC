@@ -120,6 +120,7 @@ cx_MAP_ONLY(
     STC_INLINE cx_mapped_t*
     cx_memb(_at)(const Self* self, i_keyraw rkey) {
         chash_bucket_t b = cx_memb(_bucket_)(self, &rkey);
+        assert(self->_hashx[b.idx]);
         return &self->table[b.idx].second;
     }
 )
