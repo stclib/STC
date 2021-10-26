@@ -53,7 +53,7 @@ STC_INLINE Self cx_memb(_with_capacity)(size_t cap) {
 
 STC_INLINE void cx_memb(_reserve)(Self* self, size_t n) {
     if (n >= self->size)
-        self->data = (cx_value_t *)c_realloc(self->data, (self->capacity = n)*sizeof(cx_rawvalue_t));
+        self->data = (cx_value_t *)c_realloc(self->data, (self->capacity = n)*sizeof(cx_value_t));
 }
 
 STC_INLINE void cx_memb(_clear)(Self* self) {

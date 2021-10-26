@@ -23,6 +23,8 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 
 ```c
 cstack_X            cstack_X_init(void);
+cstack_X            cstack_with_capacity(size_t cap);
+cstack_X            cstack_with_size(size_t size, i_val fill);
 cstack_X            cstack_X_clone(cstack_X st);
 
 void                cstack_X_clear(cstack_X* self);
@@ -32,8 +34,10 @@ void                cstack_X_copy(cstack_X* self, cstack_X other);
 void                cstack_X_del(cstack_X* self);       // destructor
 
 size_t              cstack_X_size(cstack_X st);
+size_t              cstack_X_capacity(cstack_X st);
 bool                cstack_X_empty(cstack_X st);
 cstack_X_value_t*   cstack_X_top(const cstack_X* self);
+cstack_X_value_t*   cstack_X_at(const cstack_X* self, size_t idx);
 
 cstack_X_value_t*   cstack_X_push(cstack_X* self, i_val value);
 cstack_X_value_t*   cstack_X_emplace(cstack_X* self, i_valraw raw);

@@ -8,7 +8,7 @@ cc='gcc -std=c99 -pedantic'
 libs=''
 run=0
 if [ -z "$OS" ]; then
-    libs='-lm'
+    libs='-lm -pthread'
 fi
 if [ "$1" == '-h' -o "$1" == '--help' ]; then
   echo usage: runall.sh [-run] [compiler + options]

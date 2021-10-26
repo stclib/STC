@@ -172,10 +172,7 @@ STC_INLINE cx_iter_t
 cx_memb(_emplace_range)(Self* self, cx_iter_t it, cx_iter_t it1, cx_iter_t it2) {
     return cx_memb(_insert_range_p)(self, it.ref, it1.ref, it2.ref, true);
 }
-STC_INLINE cx_iter_t
-cx_memb(_erase)(Self* self, size_t idx) {
-    return cx_memb(_erase_range_p)(self, self->data + idx, self->data + idx + 1);
-}
+
 STC_INLINE cx_iter_t
 cx_memb(_erase_n)(Self* self, size_t idx, size_t n) {
     return cx_memb(_erase_range_p)(self, self->data + idx, self->data + idx + n);

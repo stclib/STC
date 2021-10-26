@@ -65,7 +65,6 @@ cvec_X_iter_t       cvec_X_emplace_range(cvec_X* self, cvec_X_iter_t it,
 cvec_X_iter_t       cvec_X_emplace_range_p(cvec_X* self, i_val* pos, 
                                            const i_val* p1, const i_val* p2);
 
-cvec_X_iter_t       cvec_X_erase(cvec_X* self, size_t idx);
 cvec_X_iter_t       cvec_X_erase_n(cvec_X* self, size_t idx, size_t n);
 cvec_X_iter_t       cvec_X_erase_at(cvec_X* self, cvec_X_iter_t it);
 cvec_X_iter_t       cvec_X_erase_range(cvec_X* self, cvec_X_iter_t it1, cvec_X_iter_t it2);

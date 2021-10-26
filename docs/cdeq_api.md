@@ -62,7 +62,6 @@ cdeq_X_iter_t       cdeq_X_emplace_range(cdeq_X* self, cdeq_X_iter_t it,
 cdeq_X_iter_t       cdeq_X_emplace_range_p(cdeq_X* self, i_val* pos, 
                                            const i_val* p1, const i_val* p2);
 
-cdeq_X_iter_t       cdeq_X_erase(cdeq_X* self, size_t idx);
 cdeq_X_iter_t       cdeq_X_erase_n(cdeq_X* self, size_t idx, size_t n);
 cdeq_X_iter_t       cdeq_X_erase_at(cdeq_X* self, cdeq_X_iter_t it);
 cdeq_X_iter_t       cdeq_X_erase_range(cdeq_X* self, cdeq_X_iter_t it1, cdeq_X_iter_t it2);
