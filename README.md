@@ -191,7 +191,7 @@ int main(void) {
     }
 }
 ```
-**Note**: Do ***not*** `return`/`goto` from inside a `c_auto*`-block. Instead, do `continue`, which will jump out of the block, and `return` after the block.
+**Note**: Do ***not*** `return` from inside a `c_auto*`-block. Instead, first `continue`, which will jump out of the block, then call `return` after the block.
 
 Output
 ```
