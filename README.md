@@ -191,6 +191,8 @@ int main(void) {
     }
 }
 ```
+**Note**: Do ***not*** call `return`/`goto` inside a `c_auto*`-block. Instead, call `continue`, which will jump out of the block, and call `return` after the block.
+
 Output
 ```
 Found: 20, (20, 2), 20, 20, [20: 2]
