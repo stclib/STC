@@ -58,7 +58,7 @@ stc64_t rng;
 
 #define UMAP_SETUP(X, Key, Value) std::unordered_map<Key, Value> map; map.max_load_factor(max_load_factor)
 #define UMAP_PUT(X, key, val)     (map[key] = val)
-#define UMAP_EMPLACE(X, key, val) (*map.emplace(key, val).first).second
+#define UMAP_EMPLACE(X, key, val) map.emplace(key, val).first->second
 #define UMAP_FIND(X, key)         (map.find(key) != map.end())
 #define UMAP_ERASE(X, key)        map.erase(key)
 #define UMAP_FOR(X, i)            for (auto i: map)

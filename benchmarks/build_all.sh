@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 cc='g++ -std=c++17'
 #cc='clang'
 #cc='clang -c -DSTC_HEADER'

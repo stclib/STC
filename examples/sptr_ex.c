@@ -47,7 +47,7 @@ void example3()
         });
 
         c_foreach (s, cvec_song, v2)
-            printf("%s - %s: refs %u\n", s.ref->get->artist.str, s.ref->get->title.str,
+            printf("%s - %s: refs %lu\n", s.ref->get->artist.str, s.ref->get->title.str,
                                          *s.ref->use_count);
     }
 }

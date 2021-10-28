@@ -1,6 +1,7 @@
 #include <cstdint>
 #include <iostream>
 #include <ctime>
+#include <random>
 #include <stc/crandom.h>
 
 static inline uint64_t rotl64(const uint64_t x, const int k)
@@ -20,20 +21,19 @@ static void init_state(uint64_t *rng, uint64_t seed) {
     for (int i=0; i<4; ++i) rng[i] = splitmix64();
 }
 
-/* jsf64 */
+/* romu_trio */
 
-static inline uint64_t jsf64(uint64_t *s) {
-  uint64_t e = s[0] - rotl64(s[1], 7);
-  s[0] = s[1] ^ rotl64(s[2], 13);
-  s[1] = s[2] + rotl64(s[3], 37);
-  s[2] = s[3] + e;
-  s[3] = e + s[0];
-  return s[3];
+uint64_t romu_trio(uint64_t s[3]) {
+   uint64_t xp = s[0], yp = s[1], zp = s[2];
+   s[0] = 15241094284759029579u * zp;
+   s[1] = yp - xp; s[1] = rotl64(s[1], 12);
+   s[2] = zp - yp; s[2] = rotl64(s[2], 44);
+   return xp;
 }
 
 /* sfc64 */
 
-static inline uint64_t sfc64(uint64_t *s) {
+static inline uint64_t sfc64(uint64_t s[4]) {
   uint64_t result = s[0] + s[1] + s[3]++;
   s[0] = s[1] ^ (s[1] >> 11);
   s[1] = s[2] + (s[2] << 3);
@@ -41,20 +41,24 @@ static inline uint64_t sfc64(uint64_t *s) {
   return result;
 }
 
-/* sfc64 with Weyl increment */
-static uint64_t weyl = 1234566789123ull;
-static inline uint64_t sfc64w(uint64_t *s) {
-  uint64_t result = s[0] + s[1] + (s[3] += weyl|1);
-  s[0] = s[1] ^ (s[1] >> 11);
-  s[1] = s[2] + (s[2] << 3);
-  s[2] = rotl64(s[2], 24) + result;
-  return result;
+/* xoshiro128+  */
+
+uint64_t xoroshiro128plus(uint64_t s[2]) {
+	const uint64_t s0 = s[0];
+	uint64_t s1 = s[1];
+	const uint64_t result = s0 + s1;
+
+	s1 ^= s0;
+	s[0] = rotl64(s0, 24) ^ s1 ^ (s1 << 16); // a, b
+	s[1] = rotl64(s1, 37); // c
+
+	return result;
 }
 
 
 /* xoshiro256**  */
 
-static inline uint64_t xoshiro256starstar(uint64_t* s) {
+static inline uint64_t xoshiro256starstar(uint64_t s[4]) {
   const uint64_t result = rotl64(s[1] * 5, 7) * 9;
   const uint64_t t = s[1] << 17;
   s[2] ^= s[0];
@@ -89,11 +93,6 @@ static inline uint64_t wyrand64(uint64_t *seed){
 }
 
 
-inline unsigned long long lehmer64(uint64_t* s) {
-  *(__uint128_t *)s *= 0xda942042e4dd58b5ull;
-  return *(__uint128_t *)s >> 64;
-}
-
 using namespace std;
 
 int main(void)
@@ -102,29 +101,40 @@ int main(void)
   uint64_t* recipient = new uint64_t[N];
   static stc64_t rng;
   init_state(rng.state, 12345123);
+  std::mt19937 mt(12345123);
 
   cout << "WARMUP"  << endl;
   for (size_t i = 0; i < N; i++)
     recipient[i] = wyrand64(rng.state);
 
   clock_t beg, end;
-  for (size_t ti = 0; ti < 4; ti++) {
+  for (size_t ti = 0; ti < 2; ti++) {
     init_state(rng.state, 12345123);
-    cout << endl << "ROUND " << ti+1 << endl;
+    cout << endl << "ROUND " << ti+1 << " ---------" << endl;
+
+    beg = clock();
+    for (size_t i = 0; i < N; i++)
+      recipient[i] = romu_trio(rng.state);
+    end = clock();
+    cout << "romu_trio:\t"
+         << (float(end - beg) / CLOCKS_PER_SEC)
+         << "s: " << recipient[312] << endl;
+
     beg = clock();
     for (size_t i = 0; i < N; i++)
       recipient[i] = wyrand64(rng.state);
     end = clock();
     cout << "wyrand64:\t"
          << (float(end - beg) / CLOCKS_PER_SEC)
-         << " s: " << recipient[312] << endl;
+         << "s: " << recipient[312] << endl;
+
     beg = clock();
     for (size_t i = 0; i < N; i++)
-      recipient[i] = sfc64w(rng.state);
+      recipient[i] = sfc64(rng.state);
     end = clock();
-    cout << "sfc64w:\t\t"
+    cout << "sfc64:\t\t"
          << (float(end - beg) / CLOCKS_PER_SEC)
-         << " s: " << recipient[312] << endl;
+         << "s: " << recipient[312] << endl;
 
     beg = clock();
     for (size_t i = 0; i < N; i++)
@@ -132,7 +142,15 @@ int main(void)
     end = clock();
     cout << "stc64:\t\t"
          << (float(end - beg) / CLOCKS_PER_SEC)
-         << " s: " << recipient[312] << endl;
+         << "s: " << recipient[312] << endl;
+
+    beg = clock();
+    for (size_t i = 0; i < N; i++)
+      recipient[i] = xoroshiro128plus(rng.state);
+    end = clock();
+    cout << "xoroshiro128+:\t"
+         << (float(end - beg) / CLOCKS_PER_SEC)
+         << "s: " << recipient[312] << endl;
 
     beg = clock();
     for (size_t i = 0; i < N; i++)
@@ -140,63 +158,15 @@ int main(void)
     end = clock();
     cout << "xoshiro256**:\t"
          << (float(end - beg) / CLOCKS_PER_SEC)
-         << " s: " << recipient[312] << endl;
+         << "s: " << recipient[312] << endl;
 
     beg = clock();
     for (size_t i = 0; i < N; i++)
-      recipient[i] = lehmer64(rng.state);
+      recipient[i] = mt();
     end = clock();
-    cout << "lehmer64:\t"
-         << ((float) end - beg) / CLOCKS_PER_SEC
-         << " s: " << recipient[312] << endl;
-
-    cout << "Next we do random number computations only, doing no work."
-         << endl;
-    init_state(rng.state, 12345123);
-    uint64_t s = 0;
-    beg = clock();
-    for (size_t i = 0; i < N; i++)
-      s += wyrand64(rng.state);
-    end = clock();
-    cout << "wyrand64:\t"
-         << ((float) end - beg) / CLOCKS_PER_SEC
-         << " s: " << s << endl;
-
-    s = 0;
-    beg = clock();
-    for (size_t i = 0; i < N; i++)
-      s += sfc64w(rng.state);
-    end = clock();
-    cout << "sfc64w:\t\t"
-         << ((float) end - beg) / CLOCKS_PER_SEC
-         << " s: " << s << endl;
-
-    s = 0;
-    beg = clock();
-    for (size_t i = 0; i < N; i++)
-      s += stc64_rand(&rng);
-    end = clock();
-    cout << "stc64:\t\t"
-         << ((float) end - beg) / CLOCKS_PER_SEC
-         << " s: " << s << endl;
-
-    s = 0;
-    beg = clock();
-    for (size_t i = 0; i < N; i++)
-      s += xoshiro256starstar(rng.state);
-    end = clock();
-    cout << "xoshiro256**:\t"
-         << ((float) end - beg) / CLOCKS_PER_SEC
-         << " s: " << s << endl;
-
-    s = 0;
-    beg = clock();
-    for (size_t i = 0; i < N; i++)
-      s += lehmer64(rng.state);
-    end = clock();
-    cout << "lehmer64:\t"
-         << ((float) end - beg) / CLOCKS_PER_SEC
-         << " s: " << s << endl;
+    cout << "std::mt19937:\t"
+         << (float(end - beg) / CLOCKS_PER_SEC)
+         << "s: " << recipient[312] << endl;
   }
   delete[] recipient;
   return 0;

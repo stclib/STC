@@ -30,7 +30,7 @@ int main(void) {
     c_autovar (csptr_person p = csptr_person_make(Person_init("John", "Smiths")), csptr_person_del(&p))
     c_autovar (csptr_person q = csptr_person_clone(p), csptr_person_del(&q)) // share the pointer
     {
-        printf("%s %s. uses: %u\n", q.get->name.str, q.get->last.str, *q.use_count);
+        printf("%s %s. uses: %lu\n", q.get->name.str, q.get->last.str, *q.use_count);
     }
 
     c_auto (cstack_iptr, stk) {
