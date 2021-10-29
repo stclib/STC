@@ -98,7 +98,7 @@ using namespace std;
 int main(void)
 {
   enum {N = 2000000000};
-  uint64_t* recipient = new uint64_t[N];
+  uint16_t* recipient = new uint16_t[N];
   static stc64_t rng;
   init_state(rng.state, 12345123);
   std::mt19937 mt(12345123);
