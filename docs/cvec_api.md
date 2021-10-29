@@ -45,61 +45,60 @@ bool                cvec_X_empty(cvec_X vec);
 size_t              cvec_X_size(cvec_X vec);
 size_t              cvec_X_capacity(cvec_X vec);
 
-cvec_X_value_t*     cvec_X_at(const cvec_X* self, size_t idx);
-cvec_X_value_t*     cvec_X_front(const cvec_X* self);
-cvec_X_value_t*     cvec_X_back(const cvec_X* self);
+cvec_X_value*       cvec_X_at(const cvec_X* self, size_t idx);
+cvec_X_value*       cvec_X_front(const cvec_X* self);
+cvec_X_value*       cvec_X_back(const cvec_X* self);
 
-cvec_X_value_t*     cvec_X_push_back(cvec_X* self, i_val value);
-cvec_X_value_t*     cvec_X_emplace_back(cvec_X* self, i_valraw raw);
+cvec_X_value*       cvec_X_push_back(cvec_X* self, i_val value);
+cvec_X_value*       cvec_X_emplace_back(cvec_X* self, i_valraw raw);
 void                cvec_X_pop_back(cvec_X* self);
 
-cvec_X_iter_t       cvec_X_insert(cvec_X* self, size_t idx, i_val value);                        // move value 
-cvec_X_iter_t       cvec_X_insert_n(cvec_X* self, size_t idx, const i_val[] arr, size_t n);      // move arr values
-cvec_X_iter_t       cvec_X_insert_at(cvec_X* self, cvec_X_iter_t it, i_val value);               // move value 
+cvec_X_iter         cvec_X_insert(cvec_X* self, size_t idx, i_val value);                        // move value 
+cvec_X_iter         cvec_X_insert_n(cvec_X* self, size_t idx, const i_val[] arr, size_t n);      // move arr values
+cvec_X_iter         cvec_X_insert_at(cvec_X* self, cvec_X_iter it, i_val value);               // move value 
 
-cvec_X_iter_t       cvec_X_emplace(cvec_X* self, size_t idx, i_valraw raw);
-cvec_X_iter_t       cvec_X_emplace_n(cvec_X* self, size_t idx, const i_valraw[] arr, size_t n);
-cvec_X_iter_t       cvec_X_emplace_at(cvec_X* self, cvec_X_iter_t it, i_valraw raw);
-cvec_X_iter_t       cvec_X_emplace_range(cvec_X* self, cvec_X_iter_t it, 
-                                         cvec_X_iter_t it1, cvec_X_iter_t it2);                 // will clone
-cvec_X_iter_t       cvec_X_emplace_range_p(cvec_X* self, i_val* pos, 
+cvec_X_iter         cvec_X_emplace(cvec_X* self, size_t idx, i_valraw raw);
+cvec_X_iter         cvec_X_emplace_n(cvec_X* self, size_t idx, const i_valraw[] arr, size_t n);
+cvec_X_iter         cvec_X_emplace_at(cvec_X* self, cvec_X_iter it, i_valraw raw);
+cvec_X_iter         cvec_X_emplace_range(cvec_X* self, cvec_X_iter it, 
+                                         cvec_X_iter it1, cvec_X_iter it2);                 // will clone
+cvec_X_iter         cvec_X_emplace_range_p(cvec_X* self, i_val* pos, 
                                            const i_val* p1, const i_val* p2);
 
-cvec_X_iter_t       cvec_X_erase_n(cvec_X* self, size_t idx, size_t n);
-cvec_X_iter_t       cvec_X_erase_at(cvec_X* self, cvec_X_iter_t it);
-cvec_X_iter_t       cvec_X_erase_range(cvec_X* self, cvec_X_iter_t it1, cvec_X_iter_t it2);
+cvec_X_iter         cvec_X_erase_n(cvec_X* self, size_t idx, size_t n);
+cvec_X_iter         cvec_X_erase_at(cvec_X* self, cvec_X_iter it);
+cvec_X_iter         cvec_X_erase_range(cvec_X* self, cvec_X_iter it1, cvec_X_iter it2);
 
-cvec_X_iter_t       cvec_X_find(const cvec_X* self, i_valraw raw);
-cvec_X_iter_t       cvec_X_find_in(cvec_X_iter_t i1, cvec_X_iter_t i2, i_valraw raw);
-cvec_X_value_t*     cvec_X_get(const cvec_X* self, i_valraw raw);                             // return NULL if not found
-cvec_X_iter_t       cvec_X_bsearch(const cvec_X* self, i_valraw raw);
-cvec_X_iter_t       cvec_X_bsearch_in(cvec_X_iter_t i1, cvec_X_iter_t i2, i_valraw raw);
+cvec_X_iter         cvec_X_find(const cvec_X* self, i_valraw raw);
+cvec_X_iter         cvec_X_find_in(cvec_X_iter i1, cvec_X_iter i2, i_valraw raw);
+cvec_X_value*       cvec_X_get(const cvec_X* self, i_valraw raw);                             // return NULL if not found
+cvec_X_iter         cvec_X_bsearch(const cvec_X* self, i_valraw raw);
+cvec_X_iter         cvec_X_bsearch_in(cvec_X_iter i1, cvec_X_iter i2, i_valraw raw);
 
 void                cvec_X_sort(cvec_X* self);
-void                cvec_X_sort_range(cvec_X_iter_t i1, cvec_X_iter_t i2,
+void                cvec_X_sort_range(cvec_X_iter i1, cvec_X_iter i2,
                                       int(*cmp)(const i_val*, const i_val*));
 
-cvec_X_iter_t       cvec_X_begin(const cvec_X* self);
-cvec_X_iter_t       cvec_X_end(const cvec_X* self);
-void                cvec_X_next(cvec_X_iter_t* iter);
+cvec_X_iter         cvec_X_begin(const cvec_X* self);
+cvec_X_iter         cvec_X_end(const cvec_X* self);
+void                cvec_X_next(cvec_X_iter* iter);
 
-cvec_X_rawvalue_t   cvec_X_value_toraw(cvec_X_value_t* pval);
-cvec_X_value_t      cvec_X_value_clone(cvec_X_value_t val);
+cvec_X_rawvalue     cvec_X_value_toraw(cvec_X_value* pval);
+cvec_X_value        cvec_X_value_clone(cvec_X_value val);
 ```
 
 ## Types
 
-| Type name            | Type definition                     | Used to represent...   |
-|:---------------------|:------------------------------------|:-----------------------|
-| `cvec_X`             | `struct { cvec_X_value_t* data; }`  | The cvec type          |
-| `cvec_X_value_t`     | `i_val`                             | The cvec value type    |
-| `cvec_X_rawvalue_t`  | `i_valraw`                          | The raw value type     |
-| `cvec_X_iter_t`      | `struct { cvec_X_value_t* ref; }`   | The iterator type      |
+| Type name          | Type definition                   | Used to represent...   |
+|:-------------------|:----------------------------------|:-----------------------|
+| `cvec_X`           | `struct { cvec_X_value* data; }`  | The cvec type          |
+| `cvec_X_value`     | `i_val`                           | The cvec value type    |
+| `cvec_X_rawvalue`  | `i_valraw`                        | The raw value type     |
+| `cvec_X_iter`      | `struct { cvec_X_value* ref; }`   | The iterator type      |
 
 ## Examples
 ```c
 #define i_val int
-#define i_tag i
 #include <stc/cvec.h>
 
 #include <stdio.h>
@@ -107,29 +106,28 @@ cvec_X_value_t      cvec_X_value_clone(cvec_X_value_t val);
 int main()
 {
     // Create a vector containing integers
-    cvec_i vec = cvec_i_init();
+    c_auto (cvec_int, vec)
+    {
+        // Add two integers to vector
+        cvec_int_push_back(&vec, 25);
+        cvec_int_push_back(&vec, 13);
 
-    // Add two integers to vector
-    cvec_i_push_back(&vec, 25);
-    cvec_i_push_back(&vec, 13);
+        // Append a set of numbers
+        c_apply(cvec_int, push_back, &vec, {7, 5, 16, 8});
 
-    // Append a set of numbers
-    c_apply(cvec_i, push_back, &vec, {7, 5, 16, 8});
+        printf("initial:");
+        c_foreach (k, cvec_int, vec) {
+            printf(" %d", *k.ref);
+        }
 
-    printf("initial:");
-    c_foreach (k, cvec_i, vec) {
-        printf(" %d", *k.ref);
+        // Sort the vector
+        cvec_int_sort(&vec);
+
+        printf("\nsorted:");
+        c_foreach (k, cvec_int, vec) {
+            printf(" %d", *k.ref);
+        }
     }
-
-    // Sort the vector
-    cvec_i_sort(&vec);
-
-    printf("\nsorted:");
-    c_foreach (k, cvec_i, vec) {
-        printf(" %d", *k.ref);
-    }
-
-    cvec_i_del(&vec);
 }
 ```
 Output:

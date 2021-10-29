@@ -179,7 +179,7 @@ static void ins_and_access_csmap_i(picobench::state& s)
     picobench::scope scope(s);
     c_forrange (s.iterations()) {
         result += ++csmap_i_emplace(&map, stc64_random() & mask, 0).ref->second;
-        csmap_i_value_t* val = csmap_i_get(&map, stc64_random() & mask);
+        csmap_i_value* val = csmap_i_get(&map, stc64_random() & mask);
         if (val) csmap_i_erase(&map, val->first);
     }
     s.set_result(result + csmap_i_size(map));
@@ -236,7 +236,7 @@ static void ins_and_access_csmap_s(picobench::state& s)
     c_forrange (s.iterations()) {
         randomize(str.str, cstr_size(str));
         result += csmap_str_erase(&map, str.str);
-        /*csmap_str_iter_t it = csmap_str_find(&map, str.str);
+        /*csmap_str_iter it = csmap_str_find(&map, str.str);
         if (it.ref) {
             ++result;
             csmap_str_erase(&map, it.ref->first.str);

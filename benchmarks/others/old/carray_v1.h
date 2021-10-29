@@ -53,15 +53,15 @@ int main()
 
 #define using_carray2_4(X, Value, valueDel, valueClone) \
 \
-    typedef Value carray1##X##_value_t, carray2##X##_value_t; \
+    typedef Value carray1##X##_value, carray2##X##_value; \
 \
     typedef struct { \
-        carray1##X##_value_t *data; \
+        carray1##X##_value *data; \
         size_t _xdim; \
     } carray1##X; \
 \
     typedef struct { \
-        carray2##X##_value_t *data; \
+        carray2##X##_value *data; \
         size_t _xdim, _ydim; \
     } carray2##X; \
 \
@@ -77,7 +77,7 @@ int main()
 \
     STC_INLINE carray1##X \
     carray1##X##_init(size_t xdim, Value val) { \
-        carray1##X##_value_t* m = c_new_n(carray1##X##_value_t, xdim); \
+        carray1##X##_value* m = c_new_n(carray1##X##_value, xdim); \
         for (size_t i=0; i<xdim; ++i) m[i] = val; \
         carray1##X a = {m, xdim | _carray_OWN}; \
         return a; \
@@ -85,24 +85,24 @@ int main()
     STC_INLINE carray2##X \
     carray2##X##_init(size_t ydim, size_t xdim, Value val) { \
         const size_t n = ydim * xdim; \
-        carray2##X##_value_t* m = c_new_n(carray2##X##_value_t, n); \
+        carray2##X##_value* m = c_new_n(carray2##X##_value, n); \
         for (size_t i=0; i<n; ++i) m[i] = val; \
         carray2##X a = {m, xdim | _carray_OWN, ydim}; \
         return a; \
     } \
 \
     STC_INLINE carray1##X \
-    carray1##X##_from(carray1##X##_value_t* array, size_t xdim) { \
+    carray1##X##_from(carray1##X##_value* array, size_t xdim) { \
         carray1##X a = {array, xdim}; \
         return a; \
     } \
     STC_INLINE carray2##X \
-    carray2##X##_from(carray2##X##_value_t* array, size_t ydim, size_t xdim) { \
+    carray2##X##_from(carray2##X##_value* array, size_t ydim, size_t xdim) { \
         carray2##X a = {array, xdim, ydim}; \
         return a; \
     } \
 \
-    STC_INLINE carray1##X##_value_t* \
+    STC_INLINE carray1##X##_value* \
     carray1##X##_at(const carray1##X *a, size_t x) { return a->data + x; } \
     \
     STC_INLINE carray1##X \
@@ -110,7 +110,7 @@ int main()
         carray1##X sub = {a->data + y*_carray_xdim(*a), _carray_xdim(*a)}; \
         return sub; \
     } \
-    STC_INLINE carray2##X##_value_t* \
+    STC_INLINE carray2##X##_value* \
     carray2##X##_at(const carray2##X *a, size_t y, size_t x) { \
         return a->data + y*_carray_xdim(*a) + x; \
     } \
@@ -125,10 +125,10 @@ int main()
 #define using_carray3_4(X, Value, valueDel, valueClone) \
 \
     using_carray2_4(X, Value, valueDel, valueClone); \
-    typedef Value carray3##X##_value_t; \
+    typedef Value carray3##X##_value; \
 \
     typedef struct { \
-        carray3##X##_value_t *data; \
+        carray3##X##_value *data; \
         size_t _xdim, _ydim, _zdim; \
     } carray3##X; \
 \
@@ -144,14 +144,14 @@ int main()
     STC_INLINE carray3##X \
     carray3##X##_init(size_t zdim, size_t ydim, size_t xdim, Value val) { \
         const size_t n = zdim * ydim * xdim; \
-        carray3##X##_value_t* m = c_new_n(carray3##X##_value_t, n); \
+        carray3##X##_value* m = c_new_n(carray3##X##_value, n); \
         for (size_t i=0; i<n; ++i) m[i] = val; \
         carray3##X a = {m, xdim | _carray_OWN, ydim, zdim}; \
         return a; \
     } \
 \
     STC_INLINE carray3##X \
-    carray3##X##_from(carray3##X##_value_t* array, size_t zdim, size_t ydim, size_t xdim) { \
+    carray3##X##_from(carray3##X##_value* array, size_t zdim, size_t ydim, size_t xdim) { \
         carray3##X a = {array, xdim, ydim, zdim}; \
         return a; \
     } \
@@ -166,7 +166,7 @@ int main()
         carray1##X sub = {a->data + (z*_carray_ydim(*a) + y)*_carray_xdim(*a), _carray_xdim(*a)}; \
         return sub; \
     } \
-    STC_INLINE carray3##X##_value_t* \
+    STC_INLINE carray3##X##_value* \
     carray3##X##_at(const carray3##X *a, size_t z, size_t y, size_t x) { \
         return a->data + (z*_carray_ydim(*a) + y)*_carray_xdim(*a) + x; \
     } \
@@ -180,18 +180,18 @@ int main()
 #define _carray_zdim(a) (a)._zdim
 
 #define _using_carray_common(D, X, Value, valueDel, valueClone) \
-    typedef struct { carray1##X##_value_t *ref; } carray##D##X##_iter_t; \
+    typedef struct { carray1##X##_value *ref; } carray##D##X##_iter; \
 \
-    STC_INLINE carray##D##X##_iter_t \
+    STC_INLINE carray##D##X##_iter \
     carray##D##X##_begin(const carray##D##X* a) { \
-        carray##D##X##_iter_t it = {a->data}; return it; \
+        carray##D##X##_iter it = {a->data}; return it; \
     } \
-    STC_INLINE carray##D##X##_iter_t \
+    STC_INLINE carray##D##X##_iter \
     carray##D##X##_end(const carray##D##X* a) { \
-        carray##D##X##_iter_t it = {a->data + carray##D##X##_size(*a)}; return it; \
+        carray##D##X##_iter it = {a->data + carray##D##X##_size(*a)}; return it; \
     } \
     STC_INLINE void \
-    carray##D##X##_next(carray##D##X##_iter_t* it) {++it->ref;} \
+    carray##D##X##_next(carray##D##X##_iter* it) {++it->ref;} \
 \
     STC_INLINE void \
     carray##D##X##_del(carray##D##X* self) { \
@@ -204,7 +204,7 @@ int main()
     STC_INLINE carray##D##X \
     carray##D##X##_clone(carray##D##X arr) { \
         carray##D##X cp = arr; size_t k = 0; \
-        cp.data = c_new_n(carray1##X##_value_t, carray##D##X##_size(arr)); \
+        cp.data = c_new_n(carray1##X##_value, carray##D##X##_size(arr)); \
         c_foreach_3 (i, carray##D##X, arr) \
             cp.data[k++] = valueClone(*i.ref); \
         return cp; \

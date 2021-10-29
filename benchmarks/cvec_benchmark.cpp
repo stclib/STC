@@ -84,7 +84,7 @@ Sample test_stc_vector() {
         c_forrange (N) cvec_x_push_back(&con, stc64_random() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
-        //cvec_x_iter_t it, end = cvec_x_end(&con);
+        //cvec_x_iter it, end = cvec_x_end(&con);
         //c_forrange (S) if ((it = cvec_x_find(&con, stc64_random() & mask2)).ref != end.ref) sum += *it.ref;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;

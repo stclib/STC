@@ -46,111 +46,111 @@
 #define c_false(...)
 
 #define _c_carr2_types(SELF, VAL) \
-    typedef VAL SELF##_value_t; \
-    typedef struct { SELF##_value_t *ref; } SELF##_iter_t; \
-    typedef struct { SELF##_value_t **data; size_t xdim, ydim; } SELF
+    typedef VAL SELF##_value; \
+    typedef struct { SELF##_value *ref; } SELF##_iter; \
+    typedef struct { SELF##_value **data; size_t xdim, ydim; } SELF
 
 #define _c_carr3_types(SELF, VAL) \
-    typedef VAL SELF##_value_t; \
-    typedef struct { SELF##_value_t *ref; } SELF##_iter_t; \
-    typedef struct { SELF##_value_t ***data; size_t xdim, ydim, zdim; } SELF
+    typedef VAL SELF##_value; \
+    typedef struct { SELF##_value *ref; } SELF##_iter; \
+    typedef struct { SELF##_value ***data; size_t xdim, ydim, zdim; } SELF
 
 #define _c_cdeq_types(SELF, VAL) \
-    typedef VAL SELF##_value_t; \
-    typedef struct {SELF##_value_t *ref; } SELF##_iter_t; \
-    typedef struct {SELF##_value_t *_base, *data;} SELF
+    typedef VAL SELF##_value, SELF##_value_t; \
+    typedef struct {SELF##_value *ref; } SELF##_iter, SELF##_iter_t; \
+    typedef struct {SELF##_value *_base, *data;} SELF
 
 #define _c_clist_types(SELF, VAL) \
-    typedef VAL SELF##_value_t; \
-    typedef struct SELF##_node_t SELF##_node_t; \
+    typedef VAL SELF##_value, SELF##_value_t; \
+    typedef struct SELF##_node SELF##_node; \
 \
     typedef struct { \
-        SELF##_value_t *ref; \
-        SELF##_node_t *const *_last, *prev; \
-    } SELF##_iter_t; \
+        SELF##_value *ref; \
+        SELF##_node *const *_last, *prev; \
+    } SELF##_iter, SELF##_iter_t; \
 \
     typedef struct { \
-        SELF##_node_t *last; \
+        SELF##_node *last; \
     } SELF
 
 #define _c_chash_types(SELF, KEY, VAL, MAP_ONLY, SET_ONLY) \
-    typedef KEY SELF##_key_t; \
-    typedef VAL SELF##_mapped_t; \
+    typedef KEY SELF##_key; \
+    typedef VAL SELF##_mapped; \
     typedef MAP_SIZE_T SELF##_size_t; \
 \
-    typedef SET_ONLY( SELF##_key_t ) \
-            MAP_ONLY( struct SELF##_value_t ) \
-    SELF##_value_t; \
+    typedef SET_ONLY( SELF##_key ) \
+            MAP_ONLY( struct SELF##_value ) \
+    SELF##_value, SELF##_value_t; \
 \
     typedef struct { \
-        SELF##_value_t *ref; \
+        SELF##_value *ref; \
         bool inserted; \
-    } SELF##_result_t; \
+    } SELF##_result, SELF##_result_t; \
 \
     typedef struct { \
-        SELF##_value_t *ref; \
+        SELF##_value *ref; \
         uint8_t* _hx; \
-    } SELF##_iter_t; \
+    } SELF##_iter, SELF##_iter_t; \
 \
     typedef struct { \
-        SELF##_value_t* table; \
+        SELF##_value* table; \
         uint8_t* _hashx; \
         SELF##_size_t size, bucket_count; \
         float max_load_factor; \
     } SELF
 
 #define _c_aatree_types(SELF, KEY, VAL, MAP_ONLY, SET_ONLY) \
-    typedef KEY SELF##_key_t; \
-    typedef VAL SELF##_mapped_t; \
+    typedef KEY SELF##_key; \
+    typedef VAL SELF##_mapped; \
     typedef MAP_SIZE_T SELF##_size_t; \
-    typedef struct SELF##_node_t SELF##_node_t; \
+    typedef struct SELF##_node SELF##_node; \
 \
-    typedef SET_ONLY( SELF##_key_t ) \
-            MAP_ONLY( struct SELF##_value_t ) \
-    SELF##_value_t; \
+    typedef SET_ONLY( SELF##_key ) \
+            MAP_ONLY( struct SELF##_value ) \
+    SELF##_value, SELF##_value_t; \
 \
     typedef struct { \
-        SELF##_value_t *ref; \
+        SELF##_value *ref; \
         bool inserted; \
-    } SELF##_result_t; \
+    } SELF##_result, SELF##_result_t; \
 \
     typedef struct { \
-        SELF##_value_t *ref; \
-        SELF##_node_t *_d; \
+        SELF##_value *ref; \
+        SELF##_node *_d; \
         int _top; \
         SELF##_size_t _tn, _st[36]; \
-    } SELF##_iter_t; \
+    } SELF##_iter, SELF##_iter_t; \
 \
     typedef struct { \
-        SELF##_node_t *nodes; \
+        SELF##_node *nodes; \
     } SELF
 
 #define _c_csptr_types(SELF, VAL) \
-    typedef VAL SELF##_value_t; \
+    typedef VAL SELF##_value; \
 \
     typedef struct { \
-        SELF##_value_t* get; \
+        SELF##_value* get; \
         long* use_count; \
     } SELF
 
 #define _c_cstack_types(SELF, VAL) \
-    typedef VAL SELF##_value_t; \
-    typedef struct { SELF##_value_t *ref; } SELF##_iter_t; \
+    typedef VAL SELF##_value; \
+    typedef struct { SELF##_value *ref; } SELF##_iter; \
     typedef struct SELF { \
-        SELF##_value_t* data; \
+        SELF##_value* data; \
         size_t size, capacity; \
     } SELF
 
 #define _c_cpque_types(SELF, VAL) \
-    typedef VAL SELF##_value_t; \
+    typedef VAL SELF##_value; \
     typedef struct SELF { \
-        SELF##_value_t* data; \
+        SELF##_value* data; \
         size_t size, capacity; \
     } SELF
 
 #define _c_cvec_types(SELF, VAL) \
-    typedef VAL SELF##_value_t; \
-    typedef struct { SELF##_value_t *ref; } SELF##_iter_t; \
-    typedef struct { SELF##_value_t *data; } SELF
+    typedef VAL SELF##_value, SELF##_value_t; \
+    typedef struct { SELF##_value *ref; } SELF##_iter, SELF##_iter_t; \
+    typedef struct { SELF##_value *data; } SELF
 
 #endif // STC_FORWARD_H_INCLUDED

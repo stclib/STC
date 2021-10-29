@@ -59,9 +59,9 @@
 #include <string.h>
 
 #define _c_clist_complete_types(SELF, dummy) \
-    struct SELF##_node_t { \
-        struct SELF##_node_t *next; \
-        SELF##_value_t value; \
+    struct SELF##_node { \
+        struct SELF##_node *next; \
+        SELF##_value value; \
     }
 
 #define clist_node_(vp) c_container_of(vp, _cx_node, value)
@@ -93,17 +93,17 @@ STC_API size_t _clist_count(const clist_VOID* self);
 
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_API void            _cx_memb(_del)(_cx_self* self);
-STC_API _cx_value*    _cx_memb(_push_back)(_cx_self* self, i_val value);
-STC_API _cx_value*    _cx_memb(_push_front)(_cx_self* self, i_val value);
-STC_API _cx_iter      _cx_memb(_insert)(_cx_self* self, _cx_iter it, i_val value);
-STC_API _cx_iter      _cx_memb(_erase_at)(_cx_self* self, _cx_iter it);
-STC_API _cx_iter      _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2);
+STC_API _cx_value*      _cx_memb(_push_back)(_cx_self* self, i_val value);
+STC_API _cx_value*      _cx_memb(_push_front)(_cx_self* self, i_val value);
+STC_API _cx_iter        _cx_memb(_insert)(_cx_self* self, _cx_iter it, i_val value);
+STC_API _cx_iter        _cx_memb(_erase_at)(_cx_self* self, _cx_iter it);
+STC_API _cx_iter        _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2);
 STC_API size_t          _cx_memb(_remove)(_cx_self* self, i_valraw val);
-STC_API _cx_iter      _cx_memb(_splice)(_cx_self* self, _cx_iter it, _cx_self* other);
+STC_API _cx_iter        _cx_memb(_splice)(_cx_self* self, _cx_iter it, _cx_self* other);
 STC_API _cx_self        _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2);
 STC_API void            _cx_memb(_sort)(_cx_self* self);
-STC_API _cx_iter      _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw val);
-STC_API _cx_node*     _cx_memb(_erase_after_)(_cx_self* self, _cx_node* node);
+STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw val);
+STC_API _cx_node*       _cx_memb(_erase_after_)(_cx_self* self, _cx_node* node);
 
 STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_make(_cx_self){NULL}; }
 STC_INLINE bool         _cx_memb(_empty)(_cx_self cx) { return cx.last == NULL; }
@@ -116,14 +116,14 @@ STC_INLINE i_val        _cx_memb(_value_clone)(i_val val)
                             { return i_valfrom(i_valto(&val)); }
 STC_INLINE void         _cx_memb(_pop_front)(_cx_self* self)
                             { _cx_memb(_erase_after_)(self, self->last); }
-STC_INLINE _cx_value* _cx_memb(_emplace_back)(_cx_self* self, i_valraw raw)
+STC_INLINE _cx_value*   _cx_memb(_emplace_back)(_cx_self* self, i_valraw raw)
                             { return _cx_memb(_push_back)(self, i_valfrom(raw)); }
-STC_INLINE _cx_value* _cx_memb(_emplace_front)(_cx_self* self, i_valraw raw)
+STC_INLINE _cx_value*   _cx_memb(_emplace_front)(_cx_self* self, i_valraw raw)
                             { return _cx_memb(_push_front)(self, i_valfrom(raw)); }
-STC_INLINE _cx_iter   _cx_memb(_emplace)(_cx_self* self, _cx_iter it, i_valraw raw)
+STC_INLINE _cx_iter     _cx_memb(_emplace)(_cx_self* self, _cx_iter it, i_valraw raw)
                             { return _cx_memb(_insert)(self, it, i_valfrom(raw)); }
-STC_INLINE _cx_value* _cx_memb(_front)(const _cx_self* self) { return &self->last->next->value; }
-STC_INLINE _cx_value* _cx_memb(_back)(const _cx_self* self) { return &self->last->value; }
+STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return &self->last->next->value; }
+STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self) { return &self->last->value; }
 
 STC_INLINE void
 _cx_memb(_copy)(_cx_self *self, _cx_self other) {
@@ -296,19 +296,19 @@ _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
 }
 
 STC_DEF int
-_cx_memb(_sort_cmp_)(const clist_VOID_node_t* x, const clist_VOID_node_t* y) {
+_cx_memb(_sort_cmp_)(const clist_VOID_node* x, const clist_VOID_node* y) {
     i_valraw a = i_valto(&((const _cx_node *) x)->value);
     i_valraw b = i_valto(&((const _cx_node *) y)->value);
     return i_cmp(&a, &b);
 }
 
-STC_API clist_VOID_node_t*
-_clist_mergesort(clist_VOID_node_t *list, int (*cmp)(const clist_VOID_node_t*, const clist_VOID_node_t*));
+STC_API clist_VOID_node*
+_clist_mergesort(clist_VOID_node *list, int (*cmp)(const clist_VOID_node*, const clist_VOID_node*));
 
 STC_DEF void
 _cx_memb(_sort)(_cx_self* self) {
     if (self->last)
-        self->last = (_cx_node *) _clist_mergesort((clist_VOID_node_t *) self->last->next, _cx_memb(_sort_cmp_));
+        self->last = (_cx_node *) _clist_mergesort((clist_VOID_node *) self->last->next, _cx_memb(_sort_cmp_));
 }
 
 #endif // TEMPLATE IMPLEMENTATION
@@ -317,7 +317,7 @@ _cx_memb(_sort)(_cx_self* self) {
 
 STC_DEF size_t
 _clist_count(const clist_VOID* self) {
-    const clist_VOID_node_t *node = self->last;
+    const clist_VOID_node *node = self->last;
     if (!node) return 0;
     size_t n = 1;
     while ((node = node->next) != self->last) ++n;
@@ -326,9 +326,9 @@ _clist_count(const clist_VOID* self) {
 
 // Singly linked list Mergesort implementation by Simon Tatham. O(n*log n).
 // https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
-STC_DEF clist_VOID_node_t *
-_clist_mergesort(clist_VOID_node_t *list, int (*cmp)(const clist_VOID_node_t*, const clist_VOID_node_t*)) {
-    clist_VOID_node_t *p, *q, *e, *tail, *oldhead;
+STC_DEF clist_VOID_node *
+_clist_mergesort(clist_VOID_node *list, int (*cmp)(const clist_VOID_node*, const clist_VOID_node*)) {
+    clist_VOID_node *p, *q, *e, *tail, *oldhead;
     int insize = 1, nmerges, psize, qsize, i;
 
     while (1) {

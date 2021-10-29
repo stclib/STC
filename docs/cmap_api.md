@@ -55,27 +55,27 @@ size_t              cmap_X_capacity(cmap_X map);                                
 size_t              cmap_X_bucket_count(cmap_X map);                                          // num. of allocated buckets
 
 bool                cmap_X_contains(const cmap_X* self, i_keyraw rkey);
-cmap_X_mapped_t*    cmap_X_at(const cmap_X* self, i_keyraw rkey);                             // rkey must be in map.
-cmap_X_value_t*     cmap_X_get(const cmap_X* self, i_keyraw rkey);                            // return NULL if not found
-cmap_X_iter_t       cmap_X_find(const cmap_X* self, i_keyraw rkey);
+cmap_X_mapped*      cmap_X_at(const cmap_X* self, i_keyraw rkey);                             // rkey must be in map.
+cmap_X_value*       cmap_X_get(const cmap_X* self, i_keyraw rkey);                            // return NULL if not found
+cmap_X_iter         cmap_X_find(const cmap_X* self, i_keyraw rkey);
 
-cmap_X_result_t     cmap_X_insert(cmap_X* self, i_key key, i_val mapped);                     // no change if key in map
-cmap_X_result_t     cmap_X_insert_or_assign(cmap_X* self, i_key key, i_val mapped);           // always update mapped
-cmap_X_result_t     cmap_X_put(cmap_X* self, i_key key, i_val mapped);                        // alias for insert_or_assign
+cmap_X_result       cmap_X_insert(cmap_X* self, i_key key, i_val mapped);                     // no change if key in map
+cmap_X_result       cmap_X_insert_or_assign(cmap_X* self, i_key key, i_val mapped);           // always update mapped
+cmap_X_result       cmap_X_put(cmap_X* self, i_key key, i_val mapped);                        // alias for insert_or_assign
 
-cmap_X_result_t     cmap_X_emplace(cmap_X* self, i_keyraw rkey, i_valraw rmapped);            // no change if rkey in map
-cmap_X_result_t     cmap_X_emplace_or_assign(cmap_X* self, i_keyraw rkey, i_valraw rmapped);  // always update rmapped
+cmap_X_result       cmap_X_emplace(cmap_X* self, i_keyraw rkey, i_valraw rmapped);            // no change if rkey in map
+cmap_X_result       cmap_X_emplace_or_assign(cmap_X* self, i_keyraw rkey, i_valraw rmapped);  // always update rmapped
 
 size_t              cmap_X_erase(cmap_X* self, i_keyraw rkey);                                // return 0 or 1
-cmap_X_iter_t       cmap_X_erase_at(cmap_X* self, cmap_X_iter_t it);                          // return iter after it
-void                cmap_X_erase_entry(cmap_X* self, cmap_X_value_t* entry);
+cmap_X_iter         cmap_X_erase_at(cmap_X* self, cmap_X_iter it);                          // return iter after it
+void                cmap_X_erase_entry(cmap_X* self, cmap_X_value* entry);
 
-cmap_X_iter_t       cmap_X_begin(const cmap_X* self);
-cmap_X_iter_t       cmap_X_end(const cmap_X* self);
-void                cmap_X_next(cmap_X_iter_t* it);
+cmap_X_iter         cmap_X_begin(const cmap_X* self);
+cmap_X_iter         cmap_X_end(const cmap_X* self);
+void                cmap_X_next(cmap_X_iter* it);
 
-cmap_X_value_t      cmap_X_value_clone(cmap_X_value_t val);
-cmap_X_rawvalue_t   cmap_X_value_toraw(cmap_X_value_t* pval);
+cmap_X_value        cmap_X_value_clone(cmap_X_value val);
+cmap_X_rawvalue     cmap_X_value_toraw(cmap_X_value* pval);
 ```
 Helpers:
 ```c
@@ -99,17 +99,17 @@ void                c_default_del(Type* val);                               // d
 
 ## Types
 
-| Type name            | Type definition                                 | Used to represent...          |
-|:---------------------|:------------------------------------------------|:------------------------------|
-| `cmap_X`             | `struct { ... }`                                | The cmap type                 |
-| `cmap_X_rawkey_t`    | `i_keyraw`                                      | The raw key type              |
-| `cmap_X_rawmapped_t` | `i_valraw`                                      | The raw mapped type           |
-| `cmap_X_rawvalue_t`  | `struct { i_keyraw first; i_valraw second; }`   | i_keyraw + i_valraw type      |
-| `cmap_X_key_t`       | `i_key`                                         | The key type                  |
-| `cmap_X_mapped_t`    | `i_val`                                         | The mapped type               |
-| `cmap_X_value_t`     | `struct { const i_key first; i_val second; }`   | The value: key is immutable   |
-| `cmap_X_result_t`    | `struct { cmap_X_value_t *ref; bool inserted; }`| Result of insert/put/emplace  |
-| `cmap_X_iter_t`      | `struct { cmap_X_value_t *ref; ... }`           | Iterator type                 |
+| Type name          | Type definition                                 | Used to represent...          |
+|:-------------------|:------------------------------------------------|:------------------------------|
+| `cmap_X`           | `struct { ... }`                                | The cmap type                 |
+| `cmap_X_rawkey`    | `i_keyraw`                                      | The raw key type              |
+| `cmap_X_rawmapped` | `i_valraw`                                      | The raw mapped type           |
+| `cmap_X_rawvalue`  | `struct { i_keyraw first; i_valraw second; }`   | i_keyraw + i_valraw type      |
+| `cmap_X_key`       | `i_key`                                         | The key type                  |
+| `cmap_X_mapped`    | `i_val`                                         | The mapped type               |
+| `cmap_X_value`     | `struct { const i_key first; i_val second; }`   | The value: key is immutable   |
+| `cmap_X_result`    | `struct { cmap_X_value *ref; bool inserted; }`  | Result of insert/put/emplace  |
+| `cmap_X_iter`      | `struct { cmap_X_value *ref; ... }`             | Iterator type                 |
 
 ## Examples
 

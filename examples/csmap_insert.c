@@ -14,7 +14,7 @@
 #define i_tag istr // Map of int => cstr
 #include <stc/csmap.h>
 
-#define i_val csmap_ii_rawvalue_t
+#define i_val csmap_ii_rawvalue
 #define i_cmp c_no_compare
 #define i_tag ii
 #include <stc/cvec.h>
@@ -42,9 +42,9 @@ int main()
         print_ii(m1);
 
         // intentionally attempt a duplicate, single element
-        csmap_ii_result_t ret = csmap_ii_insert(&m1, 1, 111);
+        csmap_ii_result ret = csmap_ii_insert(&m1, 1, 111);
         if (!ret.inserted) {
-            csmap_ii_value_t pr = *ret.ref;
+            csmap_ii_value pr = *ret.ref;
             puts("Insert failed, element with key value 1 already exists.");
             printf("  The existing element is (%d, %d)\n", pr.first, pr.second);
         }
@@ -63,7 +63,7 @@ int main()
     // The templatized version inserting a jumbled range
     c_auto (csmap_ii, m2)
     c_auto (cvec_ii, v) {
-        typedef cvec_ii_value_t ipair;
+        typedef cvec_ii_value ipair;
         cvec_ii_push_back(&v, (ipair){43, 294});
         cvec_ii_push_back(&v, (ipair){41, 262});
         cvec_ii_push_back(&v, (ipair){45, 330});
@@ -83,7 +83,7 @@ int main()
 
     // The templatized versions move-constructing elements
     c_auto (csmap_istr, m3) {
-        csmap_istr_value_t ip1 = {475, cstr_lit("blue")}, ip2 = {510, cstr_lit("green")};
+        csmap_istr_value ip1 = {475, cstr_lit("blue")}, ip2 = {510, cstr_lit("green")};
 
         // single element
         csmap_istr_insert(&m3, ip1.first, cstr_move(&ip1.second));

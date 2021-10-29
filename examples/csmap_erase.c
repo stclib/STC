@@ -47,8 +47,8 @@ int main()
 
         puts("Starting data of map m2 is:");
         printmap(m2);
-        mymap_iter_t it1 = mymap_advance(mymap_begin(&m2), 1);
-        mymap_iter_t it2 = mymap_find(&m2, mymap_back(&m2)->first);
+        mymap_iter it1 = mymap_advance(mymap_begin(&m2), 1);
+        mymap_iter it2 = mymap_find(&m2, mymap_back(&m2)->first);
         // The 2nd member function removes elements
         // in the range [First, Last)
         mymap_erase_range(&m2, it1, it2);

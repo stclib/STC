@@ -119,7 +119,7 @@ void benchmark(cvec_str vec_string, struct Maps maps)
     stopwatch = clock();
     for (size_t i = 0; i < MAX_LOOP; ++i)
     {
-        csmap_str_iter_t it, end = csmap_str_end(maps.snormal); 
+        csmap_str_iter it, end = csmap_str_end(maps.snormal); 
         for (size_t j = 0; j < cvec_str_size(vec_string); ++j)
         {
             csmap_str_find_it(maps.snormal, vec_string.data[j].str, &it);
@@ -136,7 +136,7 @@ void benchmark(cvec_str vec_string, struct Maps maps)
     stopwatch = clock();
     for (size_t i = 0; i < MAX_LOOP; ++i)
     {
-        cmap_str_iter_t it, end = cmap_str_end(maps.unormal); 
+        cmap_str_iter it, end = cmap_str_end(maps.unormal); 
         for (size_t j = 0; j < cvec_str_size(vec_string); ++j)
         {
             it = cmap_str_find(maps.unormal, vec_string.data[j].str);

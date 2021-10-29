@@ -11,11 +11,11 @@ int main ()
     {
         c_apply(clist_i, push_back, &L, {10, 20, 30, 40, 50});
                                                     // 10 20 30 40 50
-        clist_i_iter_t it = clist_i_begin(&L);      // ^
+        clist_i_iter it = clist_i_begin(&L);      // ^
         clist_i_next(&it);
         it = clist_i_erase_at(&L, it);              // 10 30 40 50
                                                     //    ^
-        clist_i_iter_t end = clist_i_end(&L);       //
+        clist_i_iter end = clist_i_end(&L);       //
         clist_i_next(&it);
         it = clist_i_erase_range(&L, it, end);      // 10 30
                                                     //       ^

@@ -19,7 +19,7 @@ void add(csmap_conf* map, const char* section, const char* entry, const char* va
 
 bool contains(csmap_conf* map, const char* section, const char* entry)
 {
-    csmap_conf_value_t *val = csmap_conf_get(map, section);
+    csmap_conf_value *val = csmap_conf_get(map, section);
     return val && csmap_sect_get(&val->second, entry);
 }
 

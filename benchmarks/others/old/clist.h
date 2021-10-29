@@ -289,7 +289,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
     STC_DEF void \
     _cx_memb(_sort)(_cx_self* self) { \
         if (self->last) \
-            self->last = (_cx_node *) _clist_mergesort((clist_VOID_node_t *) self->last->next, _cx_memb(_sort_cmp_)); \
+            self->last = (_cx_node *) _clist_mergesort((clist_VOID_node *) self->last->next, _cx_memb(_sort_cmp_)); \
     }
 
 
@@ -302,7 +302,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
 
 STC_DEF size_t
 _clist_count(const clist_VOID* self) {
-    const clist_VOID_node_t *nd = self->last;
+    const clist_VOID_node *nd = self->last;
     if (!nd) return 0;
     size_t n = 1;
     while ((nd = nd->next) != self->last) ++n;
@@ -312,9 +312,9 @@ _clist_count(const clist_VOID* self) {
 /* Singly linked list Mergesort implementation by Simon Tatham. O(n*log n).
  * https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
  */
-STC_DEF clist_VOID_node_t *
-_clist_mergesort(clist_VOID_node_t *list, int (*cmp)(const void*, const void*)) {
-    clist_VOID_node_t *p, *q, *e, *tail, *oldhead;
+STC_DEF clist_VOID_node *
+_clist_mergesort(clist_VOID_node *list, int (*cmp)(const void*, const void*)) {
+    clist_VOID_node *p, *q, *e, *tail, *oldhead;
     int insize = 1, nmerges, psize, qsize, i;
 
     while (1) {

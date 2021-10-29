@@ -22,7 +22,7 @@ int main ()
         print_ilist("list1:", list1);
         print_ilist("list2:", list2);
 
-        clist_i_iter_t it = clist_i_advance(clist_i_begin(&list1), 2);
+        clist_i_iter it = clist_i_advance(clist_i_begin(&list1), 2);
         it = clist_i_splice(&list1, it, &list2);
 
         puts("After splice");

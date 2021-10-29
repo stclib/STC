@@ -56,7 +56,7 @@ int main()
         print(mmap);
 
         // find and erase a specific entry
-        clist_str_iter_t pos;
+        clist_str_iter pos;
         c_foreach (e, csmap_mult, mmap)
             if ((pos = clist_str_find(&e.ref->second, "bar")).ref != clist_str_end(&e.ref->second).ref) {
                 clist_str_erase_at(&e.ref->second, pos);

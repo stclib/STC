@@ -57,7 +57,7 @@ int main()
         cmap_vk_emplace_or_assign(&vikings, bjorn, 10);
 
         VikingRaw einar = {"Einar", "Norway"};
-        cmap_vk_value_t *e = cmap_vk_find(&vikings, einar).ref;
+        cmap_vk_value *e = cmap_vk_find(&vikings, einar).ref;
         e->second += 3; // add 3 hp points to Einar
         cmap_vk_emplace(&vikings, einar, 0).ref->second += 5; // add 5 more to Einar
 

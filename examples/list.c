@@ -44,7 +44,7 @@ int main() {
         clist_fx_insert(&list, clist_fx_begin(&list), 5); // same as push_front()
         clist_fx_push_back(&list, 500);
         clist_fx_push_front(&list, 1964);
-        clist_fx_iter_t it = clist_fx_begin(&list);
+        clist_fx_iter it = clist_fx_begin(&list);
         printf("Full: ");
         c_foreach (i, clist_fx, list)
             printf(" %g", *i.ref);

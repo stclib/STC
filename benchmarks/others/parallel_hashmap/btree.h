@@ -699,7 +699,7 @@ namespace phmap {
 
         template <
             typename Compare, typename K, typename LK,
-            phmap::enable_if_t<!std::is_same<bool, phmap::invoke_result_t<
+            phmap::enable_if_t<!std::is_same<bool, phmap::invoke_result<
                                                        Compare, const K &, const LK &>>::value,
                                int> = 0>
             constexpr phmap::weak_ordering do_three_way_comparison(const Compare &compare,
@@ -708,7 +708,7 @@ namespace phmap {
         }
         template <
             typename Compare, typename K, typename LK,
-            phmap::enable_if_t<std::is_same<bool, phmap::invoke_result_t<Compare,
+            phmap::enable_if_t<std::is_same<bool, phmap::invoke_result<Compare,
             const K &, const LK &>>::value,
                                int> = 0>
             constexpr phmap::weak_ordering do_three_way_comparison(const Compare &compare,
@@ -730,7 +730,7 @@ namespace priv {
     // comparator.
     template <typename Compare, typename T>
     using btree_is_key_compare_to =
-        std::is_convertible<phmap::invoke_result_t<Compare, const T &, const T &>,
+        std::is_convertible<phmap::invoke_result<Compare, const T &, const T &>,
                             phmap::weak_ordering>;
 
     struct StringBtreeDefaultLess {
@@ -2494,7 +2494,7 @@ namespace priv {
 
         // Verify that key_compare returns an phmap::{weak,strong}_ordering or bool.
         using compare_result_type =
-            phmap::invoke_result_t<key_compare, key_type, key_type>;
+            phmap::invoke_result<key_compare, key_type, key_type>;
         static_assert(
             std::is_same<compare_result_type, bool>::value ||
             std::is_convertible<compare_result_type, phmap::weak_ordering>::value,

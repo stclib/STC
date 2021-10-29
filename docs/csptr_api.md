@@ -60,8 +60,8 @@ bool                csptr_X_equals(const csptr_X* x, const csptr_X* y);
 | Type name           | Type definition                                               | Used to represent...     |
 |:--------------------|:--------------------------------------------------------------|:-------------------------|
 | `csptr_null`        | `{NULL, NULL}`                                                | Init nullptr const       |
-| `csptr_X`           | `struct { csptr_X_value_t* get; atomic_count_t* use_count; }` | The csptr type           |
-| `csptr_X_value_t`   | `i_val`                                                       | The csptr element type   |
+| `csptr_X`           | `struct { csptr_X_value* get; atomic_count_t* use_count; }` | The csptr type           |
+| `csptr_X_value`   | `i_val`                                                       | The csptr element type   |
 | `atomic_count_t`    | `long`                                                        | The reference counter    |
 
 ## Example

@@ -95,7 +95,7 @@ c_apply(csset_x, insert, &set, {23, 3, 7, 5, 12});
 c_foreach (i, csset_x, set)
     printf(" %d", *i.ref);
 // 3 5 7 12 23
-csset_x_iter_t it = csset_x_find(&set, 7);
+csset_x_iter it = csset_x_find(&set, 7);
 c_foreach (i, csset_x, it, csset_x_end(&set))
     printf(" %d", *i.ref);
 // 7 12 23

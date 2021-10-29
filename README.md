@@ -165,11 +165,11 @@ int main(void) {
         csmap_int_insert(&map, 40, 4);
 
         // find an element in each container
-        cset_int_iter_t i1 = cset_int_find(&set, 20);
-        cvec_pnt_iter_t i2 = cvec_pnt_find(&vec, (struct Point) {20, 2});
-        cdeq_int_iter_t i3 = cdeq_int_find(&deq, 20);
-        clist_int_iter_t i4 = clist_int_find(&lst, 20);
-        csmap_int_iter_t i5 = csmap_int_find(&map, 20);
+        cset_int_iter i1 = cset_int_find(&set, 20);
+        cvec_pnt_iter i2 = cvec_pnt_find(&vec, (struct Point) {20, 2});
+        cdeq_int_iter i3 = cdeq_int_find(&deq, 20);
+        clist_int_iter i4 = clist_int_find(&lst, 20);
+        csmap_int_iter i5 = csmap_int_find(&map, 20);
         printf("\nFound: %d, (%g, %g), %d, %d, [%d: %d]\n", *i1.ref, i2.ref->x, i2.ref->y,
                                                             *i3.ref, *i4.ref,
                                                             i5.ref->first, i5.ref->second);
@@ -322,7 +322,7 @@ but still not expose or include the full implementation / API of the container.
 ```c
 // Header file
 #include <stc/forward.h> // only include data structures
-forward_cstack(cstack_pnt, struct Point); // declare cstack_pnt and cstack_pnt_value_t, cstack_pnt_iter_t;
+forward_cstack(cstack_pnt, struct Point); // declare cstack_pnt and cstack_pnt_value, cstack_pnt_iter;
                                           // the element may be forward declared type as well
 typedef struct Dataset {
     cstack_pnt vertices;

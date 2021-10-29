@@ -41,34 +41,34 @@ size_t              cset_X_capacity(cset_X set);                                
 size_t              cset_X_bucket_count(cset_X set);
 
 bool                cset_X_contains(const cset_X* self, i_keyraw rkey);
-cset_X_value_t*     cset_X_get(const cset_X* self, i_keyraw rkey);                           // return NULL if not found
-cset_X_iter_t       cset_X_find(const cset_X* self, i_keyraw rkey);
+cset_X_value*       cset_X_get(const cset_X* self, i_keyraw rkey);                           // return NULL if not found
+cset_X_iter         cset_X_find(const cset_X* self, i_keyraw rkey);
 
-cset_X_result_t     cset_X_insert(cset_X* self, i_key key);
-cset_X_result_t     cset_X_emplace(cset_X* self, i_keyraw rkey);
+cset_X_result       cset_X_insert(cset_X* self, i_key key);
+cset_X_result       cset_X_emplace(cset_X* self, i_keyraw rkey);
 
 size_t              cset_X_erase(cset_X* self, i_keyraw rkey);                               // return 0 or 1
-cset_X_iter_t       cset_X_erase_at(cset_X* self, cset_X_iter_t it);                         // return iter after it
-void                cset_X_erase_entry(cset_X* self, cset_X_value_t* entry);
+cset_X_iter         cset_X_erase_at(cset_X* self, cset_X_iter it);                         // return iter after it
+void                cset_X_erase_entry(cset_X* self, cset_X_value* entry);
 
-cset_X_iter_t       cset_X_begin(const cset_X* self);
-cset_X_iter_t       cset_X_end(const cset_X* self);
-void                cset_X_next(cset_X_iter_t* it);
+cset_X_iter         cset_X_begin(const cset_X* self);
+cset_X_iter         cset_X_end(const cset_X* self);
+void                cset_X_next(cset_X_iter* it);
 
-cset_X_value_t      cset_X_value_clone(cset_X_value_t val);
+cset_X_value        cset_X_value_clone(cset_X_value val);
 ```
 
 ## Types
 
-| Type name            | Type definition                                  | Used to represent...        |
-|:---------------------|:-------------------------------------------------|:----------------------------|
-| `cset_X`             | `struct { ... }`                                 | The cset type               |
-| `cset_X_rawkey_t`    | `i_keyraw`                                       | The raw key type            |
-| `cset_X_rawvalue_t`  | `i_keyraw`                                       | The raw value type          |
-| `cset_X_key_t`       | `i_key`                                          | The key type                |
-| `cset_X_value_t`     | `i_key`                                          | The value                   |
-| `cset_X_result_t`    | `struct { cset_X_value_t* ref; bool inserted; }` | Result of insert/emplace    |
-| `cset_X_iter_t`      | `struct { cset_X_value_t *ref; ... }`            | Iterator type               |
+| Type name          | Type definition                                  | Used to represent...        |
+|:-------------------|:-------------------------------------------------|:----------------------------|
+| `cset_X`           | `struct { ... }`                                 | The cset type               |
+| `cset_X_rawkey`    | `i_keyraw`                                       | The raw key type            |
+| `cset_X_rawvalue`  | `i_keyraw`                                       | The raw value type          |
+| `cset_X_key`       | `i_key`                                          | The key type                |
+| `cset_X_value`     | `i_key`                                          | The value                   |
+| `cset_X_result`    | `struct { cset_X_value* ref; bool inserted; }`   | Result of insert/emplace    |
+| `cset_X_iter`      | `struct { cset_X_value *ref; ... }`              | Iterator type               |
 
 ## Example
 ```c

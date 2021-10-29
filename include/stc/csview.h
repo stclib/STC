@@ -26,8 +26,8 @@
 #include "cstr.h"
 
 typedef                 struct csview { const char* str; size_t size; } csview;
-typedef                 struct csview_iter { const char *ref; } csview_iter_t;
-typedef                 char csview_value_t;
+typedef                 struct csview_iter { const char *ref; } csview_iter;
+typedef                 char csview_value;
 
 #define                 csview_null  c_make(csview){"", 0}
 #define                 csview_npos  cstr_npos
@@ -70,11 +70,11 @@ STC_INLINE bool         csview_starts_with(csview sv, csview sub)
 STC_INLINE bool         csview_ends_with(csview sv, csview sub)
                             { if (sub.size > sv.size) return false;
                               return !memcmp(sv.str + sv.size - sub.size, sub.str, sub.size); }
-STC_INLINE csview_iter_t csview_begin(const csview* self)
-                            { return c_make(csview_iter_t){self->str}; }
-STC_INLINE csview_iter_t csview_end(const csview* self)
-                            { return c_make(csview_iter_t){self->str + self->size}; }
-STC_INLINE void          csview_next(csview_iter_t* it) { ++it->ref; }
+STC_INLINE csview_iter  csview_begin(const csview* self)
+                            { return c_make(csview_iter){self->str}; }
+STC_INLINE csview_iter  csview_end(const csview* self)
+                            { return c_make(csview_iter){self->str + self->size}; }
+STC_INLINE void         csview_next(csview_iter* it) { ++it->ref; }
 
 
 /* cstr interaction with csview: */

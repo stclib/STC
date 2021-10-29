@@ -85,7 +85,7 @@ Sample test_stc_forward_list() {
         c_forrange (N) clist_x_push_front(&con, stc64_random() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
-        //clist_x_iter_t it, end = clist_x_end(&con);
+        //clist_x_iter it, end = clist_x_end(&con);
         //c_forrange (S) if ((it = clist_x_find(&con, stc64_random() & mask2)).ref != end.ref) sum += *it.ref;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;

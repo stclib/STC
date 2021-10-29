@@ -38,7 +38,7 @@ int main(void) {
         csmap_sx_emplace(&m, "Testing two", 12.34);
         csmap_sx_emplace(&m, "Testing three", 123.4);
 
-        csmap_sx_value_t *v = csmap_sx_get(&m, "Testing five"); // NULL
+        csmap_sx_value *v = csmap_sx_get(&m, "Testing five"); // NULL
         double num = *csmap_sx_at(&m, "Testing one");
         csmap_sx_emplace_or_assign(&m, "Testing three", 1000.0); // update
         csmap_sx_erase(&m, "Testing two");
@@ -88,23 +88,23 @@ struct _cx_node {
 };
 
 typedef i_keyraw _cx_rawkey;
-typedef i_valraw _cx_memb(_rawmapped_t);
+typedef i_valraw _cx_memb(_rawmapped);
 typedef cx_SET_ONLY( i_keyraw )
         cx_MAP_ONLY( struct { i_keyraw first; i_valraw second; } )
         _cx_rawvalue;
 
-STC_API _cx_self            _cx_memb(_init)(void);
-STC_API _cx_self            _cx_memb(_clone)(_cx_self tree);
+STC_API _cx_self        _cx_memb(_init)(void);
+STC_API _cx_self        _cx_memb(_clone)(_cx_self tree);
 STC_API void            _cx_memb(_del)(_cx_self* self);
 STC_API void            _cx_memb(_reserve)(_cx_self* self, size_t cap);
-STC_API _cx_value*     _cx_memb(_find_it)(const _cx_self* self, i_keyraw rkey, _cx_iter* out);
-STC_API _cx_iter       _cx_memb(_lower_bound)(const _cx_self* self, i_keyraw rkey);
-STC_API _cx_value*     _cx_memb(_front)(const _cx_self* self);
-STC_API _cx_value*     _cx_memb(_back)(const _cx_self* self);
+STC_API _cx_value*      _cx_memb(_find_it)(const _cx_self* self, i_keyraw rkey, _cx_iter* out);
+STC_API _cx_iter        _cx_memb(_lower_bound)(const _cx_self* self, i_keyraw rkey);
+STC_API _cx_value*      _cx_memb(_front)(const _cx_self* self);
+STC_API _cx_value*      _cx_memb(_back)(const _cx_self* self);
 STC_API int             _cx_memb(_erase)(_cx_self* self, i_keyraw rkey);
-STC_API _cx_iter       _cx_memb(_erase_at)(_cx_self* self, _cx_iter it);
-STC_API _cx_iter       _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2);
-STC_API _cx_result     _cx_memb(_insert_entry_)(_cx_self* self, i_keyraw rkey);
+STC_API _cx_iter        _cx_memb(_erase_at)(_cx_self* self, _cx_iter it);
+STC_API _cx_iter        _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2);
+STC_API _cx_result      _cx_memb(_insert_entry_)(_cx_self* self, i_keyraw rkey);
 STC_API void            _cx_memb(_next)(_cx_iter* it);
 
 STC_INLINE bool         _cx_memb(_empty)(_cx_self tree) { return _csmap_rep(&tree)->size == 0; }
@@ -114,7 +114,7 @@ STC_INLINE void         _cx_memb(_clear)(_cx_self* self) { _cx_memb(_del)(self);
 STC_INLINE void         _cx_memb(_swap)(_cx_self* a, _cx_self* b) { c_swap(_cx_self, *a, *b); }
 STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, i_keyraw rkey)
                             { _cx_iter it; return _cx_memb(_find_it)(self, rkey, &it) != NULL; }
-STC_INLINE _cx_value*  _cx_memb(_get)(const _cx_self* self, i_keyraw rkey)
+STC_INLINE _cx_value*   _cx_memb(_get)(const _cx_self* self, i_keyraw rkey)
                             { _cx_iter it; return _cx_memb(_find_it)(self, rkey, &it); }
 
 STC_INLINE _cx_self

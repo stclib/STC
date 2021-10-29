@@ -73,9 +73,9 @@ void         cstr_pop_back(cstr* self);
 char*        cstr_front(cstr* self);
 char*        cstr_back(cstr* self);
 
-cstr_iter_t  cstr_begin(cstr* self);
-cstr_iter_t  cstr_end(cstr* self);
-void         cstr_next(cstr_iter_t* it);
+cstr_iter    cstr_begin(cstr* self);
+cstr_iter    cstr_end(cstr* self);
+void         cstr_next(cstr_iter* it);
 
 bool         cstr_getline(cstr *self, FILE *stream);                  // cstr_getdelim(self, '\n', stream)
 bool         cstr_getdelim(cstr *self, int delim, FILE *stream);      // does not append delim to result
@@ -100,11 +100,11 @@ int          c_strncasecmp(const char* str1, const char* str2, size_t n);
 
 ## Types
 
-| Type name         | Type definition                  | Used to represent...     |
-|:------------------|:---------------------------------|:-------------------------|
-| `cstr`            | `struct { char *str; }`          | The string type          |
-| `cstr_value_t`    | `char`                           | The string element type  |
-| `cstr_iter_t`     | `struct { cstr_value_t *ref; }`  | cstr iterator            |
+| Type name       | Type definition                | Used to represent...     |
+|:----------------|:-------------------------------|:-------------------------|
+| `cstr`          | `struct { char *str; }`        | The string type          |
+| `cstr_value`    | `char`                         | The string element type  |
+| `cstr_iter`     | `struct { cstr_value *ref; }`  | cstr iterator            |
 
 ## Constants and macros
 

@@ -31,29 +31,29 @@ void                cqueue_X_del(cqueue_X* self);       // destructor
 
 size_t              cqueue_X_size(cqueue_X q);
 bool                cqueue_X_empty(cqueue_X q);
-cqueue_X_value_t*   cqueue_X_front(const cqueue_X* self);
-cqueue_X_value_t*   cqueue_X_back(const cqueue_X* self);
+cqueue_X_value*     cqueue_X_front(const cqueue_X* self);
+cqueue_X_value*     cqueue_X_back(const cqueue_X* self);
 
-cqueue_X_value_t*   cqueue_X_push(cqueue_X* self, i_val value);
-cqueue_X_value_t*   cqueue_X_emplace(cqueue_X* self, i_valraw raw);
+cqueue_X_value*     cqueue_X_push(cqueue_X* self, i_val value);
+cqueue_X_value*     cqueue_X_emplace(cqueue_X* self, i_valraw raw);
 
 void                cqueue_X_pop(cqueue_X* self);
 
-cqueue_X_iter_t     cqueue_X_begin(const cqueue_X* self);
-cqueue_X_iter_t     cqueue_X_end(const cqueue_X* self);
-void                cqueue_X_next(cqueue_X_iter_t* it);
+cqueue_X_iter       cqueue_X_begin(const cqueue_X* self);
+cqueue_X_iter       cqueue_X_end(const cqueue_X* self);
+void                cqueue_X_next(cqueue_X_iter* it);
 
 i_val               cqueue_X_value_clone(i_val value);
 ```
 
 ## Types
 
-| Type name             | Type definition      | Used to represent...     |
-|:----------------------|:---------------------|:-------------------------|
-| `cqueue_X`            | `cdeq_X`             | The cqueue type          |
-| `cqueue_X_value_t`    | `i_val`              | The cqueue element type  |
-| `cqueue_X_rawvalue_t` | `i_valraw`           | cqueue raw value type    |
-| `cqueue_X_iter_t`     | `cdeq_X_iter_t`      | cqueue iterator          |
+| Type name           | Type definition      | Used to represent...     |
+|:--------------------|:---------------------|:-------------------------|
+| `cqueue_X`          | `cdeq_X`             | The cqueue type          |
+| `cqueue_X_value`    | `i_val`              | The cqueue element type  |
+| `cqueue_X_rawvalue` | `i_valraw`           | cqueue raw value type    |
+| `cqueue_X_iter`     | `cdeq_X_iter`        | cqueue iterator          |
 
 ## Examples
 ```c

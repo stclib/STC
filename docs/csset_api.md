@@ -34,36 +34,36 @@ bool                csset_X_empty(csset_X set);
 size_t              csset_X_size(csset_X set);
 
 bool                csset_X_contains(const csset_X* self, i_keyraw rkey);
-csset_X_value_t*    csset_X_get(const csset_X* self, i_keyraw rkey);                            // return NULL if not found
-csset_X_iter_t      csset_X_lower_bound(const csset_X* self, i_keyraw rkey);                    // find closest entry >= rkey
-csset_X_iter_t      csset_X_find(const csset_X* self, i_keyraw rkey);
-csset_X_value_t*    csset_X_find_it(const csset_X* self, i_keyraw rkey, csset_X_iter_t* out);   // return NULL if not found
+csset_X_value*      csset_X_get(const csset_X* self, i_keyraw rkey);                            // return NULL if not found
+csset_X_iter        csset_X_lower_bound(const csset_X* self, i_keyraw rkey);                    // find closest entry >= rkey
+csset_X_iter        csset_X_find(const csset_X* self, i_keyraw rkey);
+csset_X_value*      csset_X_find_it(const csset_X* self, i_keyraw rkey, csset_X_iter* out);   // return NULL if not found
 
-csset_X_result_t    csset_X_insert(csset_X* self, i_key key);
-csset_X_result_t    csset_X_emplace(csset_X* self, i_keyraw rkey);
+csset_X_result      csset_X_insert(csset_X* self, i_key key);
+csset_X_result      csset_X_emplace(csset_X* self, i_keyraw rkey);
 
 size_t              csset_X_erase(csset_X* self, i_keyraw rkey);
-csset_X_iter_t      csset_X_erase_at(csset_X* self, csset_X_iter_t it);                         // return iter after it
-csset_X_iter_t      csset_X_erase_range(csset_X* self, csset_X_iter_t it1, csset_X_iter_t it2); // return updated it2
+csset_X_iter        csset_X_erase_at(csset_X* self, csset_X_iter it);                         // return iter after it
+csset_X_iter        csset_X_erase_range(csset_X* self, csset_X_iter it1, csset_X_iter it2); // return updated it2
 
-csset_X_iter_t      csset_X_begin(const csset_X* self);
-csset_X_iter_t      csset_X_end(const csset_X* self);
-void                csset_X_next(csset_X_iter_t* it);
+csset_X_iter        csset_X_begin(const csset_X* self);
+csset_X_iter        csset_X_end(const csset_X* self);
+void                csset_X_next(csset_X_iter* it);
 
-csset_X_value_t     csset_X_value_clone(csset_X_value_t val);
+csset_X_value       csset_X_value_clone(csset_X_value val);
 ```
 
 ## Types
 
-| Type name            | Type definition                                   | Used to represent...        |
-|:---------------------|:--------------------------------------------------|:----------------------------|
-| `csset_X`            | `struct { ... }`                                  | The csset type              |
-| `csset_X_rawkey_t`   | `i_rawkey`                                        | The raw key type            |
-| `csset_X_rawvalue_t` | `i_rawkey`                                        | The raw key type            |
-| `csset_X_key_t`      | `i_key`                                           | The key type                |
-| `csset_X_value_t`    | `i_key        `                                   | The value: key is immutable |
-| `csset_X_result_t`   | `struct { csset_X_value_t* ref; bool inserted; }` | Result of insert/emplace    |
-| `csset_X_iter_t`     | `struct { csset_X_value_t *ref; ... }`            | Iterator type               |
+| Type name          | Type definition                                   | Used to represent...        |
+|:-------------------|:--------------------------------------------------|:----------------------------|
+| `csset_X`          | `struct { ... }`                                  | The csset type              |
+| `csset_X_rawkey`   | `i_rawkey`                                        | The raw key type            |
+| `csset_X_rawvalue` | `i_rawkey`                                        | The raw key type            |
+| `csset_X_key`      | `i_key`                                           | The key type                |
+| `csset_X_value`    | `i_key        `                                   | The value: key is immutable |
+| `csset_X_result`   | `struct { csset_X_value* ref; bool inserted; }`   | Result of insert/emplace    |
+| `csset_X_iter`     | `struct { csset_X_value *ref; ... }`              | Iterator type               |
 
 ## Example
 ```c

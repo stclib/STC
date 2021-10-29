@@ -47,8 +47,8 @@ void                clist_X_del(clist_X* self);                                 
 bool                clist_X_empty(clist_X list);
 size_t              clist_X_count(clist_X list);                                            // size() in O(n) time
 
-clist_X_value_t*    clist_X_front(const clist_X* self);
-clist_X_value_t*    clist_X_back(const clist_X* self);
+clist_X_value*      clist_X_front(const clist_X* self);
+clist_X_value*      clist_X_back(const clist_X* self);
 
 void                clist_X_push_front(clist_X* self, i_val value);
 void                clist_X_emplace_front(clist_X* self, i_valraw raw);
@@ -57,40 +57,40 @@ void                clist_X_pop_front(clist_X* self);
 void                clist_X_push_back(clist_X* self, i_val value);                          // note: no pop_back().
 void                clist_X_emplace_back(clist_X* self, i_valraw raw);
 
-clist_X_iter_t      clist_X_insert(clist_X* self, clist_X_iter_t it, i_val value);          // return iter to new elem
-clist_X_iter_t      clist_X_emplace(clist_X* self, clist_X_iter_t it, i_valraw raw);
+clist_X_iter        clist_X_insert(clist_X* self, clist_X_iter it, i_val value);          // return iter to new elem
+clist_X_iter        clist_X_emplace(clist_X* self, clist_X_iter it, i_valraw raw);
 
-clist_X_iter_t      clist_X_erase_at(clist_X* self, clist_X_iter_t it);                     // return iter after it
-clist_X_iter_t      clist_X_erase_range(clist_X* self, clist_X_iter_t it1, clist_X_iter_t it2);
+clist_X_iter        clist_X_erase_at(clist_X* self, clist_X_iter it);                     // return iter after it
+clist_X_iter        clist_X_erase_range(clist_X* self, clist_X_iter it1, clist_X_iter it2);
 size_t              clist_X_remove(clist_X* self, i_valraw raw);                            // removes matching elements
 
-clist_X             clist_X_split_off(clist_X* self, clist_X_iter_t i1, clist_X_iter_t i2); // split off [i1, i2)
-clist_X_iter_t      clist_X_splice(clist_X* self, clist_X_iter_t it, clist_X* other);       // return updated valid it
-clist_X_iter_t      clist_X_splice_range(clist_X* self, clist_X_iter_t it,                  // return updated valid it
-                                         clist_X* other, clist_X_iter_t it1, clist_X_iter_t it2);
+clist_X             clist_X_split_off(clist_X* self, clist_X_iter i1, clist_X_iter i2); // split off [i1, i2)
+clist_X_iter        clist_X_splice(clist_X* self, clist_X_iter it, clist_X* other);       // return updated valid it
+clist_X_iter        clist_X_splice_range(clist_X* self, clist_X_iter it,                  // return updated valid it
+                                         clist_X* other, clist_X_iter it1, clist_X_iter it2);
 
-clist_X_iter_t      clist_X_find(const clist_X* self, i_valraw raw);
-clist_X_iter_t      clist_X_find_in(clist_X_iter_t it1, clist_X_iter_t it2, i_valraw raw);
+clist_X_iter        clist_X_find(const clist_X* self, i_valraw raw);
+clist_X_iter        clist_X_find_in(clist_X_iter it1, clist_X_iter it2, i_valraw raw);
 
 void                clist_X_sort(clist_X* self);
 
-clist_X_iter_t      clist_X_begin(const clist_X* self);
-clist_X_iter_t      clist_X_end(const clist_X* self);
-void                clist_X_next(clist_X_iter_t* it);
-clist_X_iter_t      clist_X_advance(clist_X_iter it, size_t n);                        // return it n elements ahead. End allowed.
+clist_X_iter        clist_X_begin(const clist_X* self);
+clist_X_iter        clist_X_end(const clist_X* self);
+void                clist_X_next(clist_X_iter* it);
+clist_X_iter        clist_X_advance(clist_X_iter it, size_t n);                        // return it n elements ahead. End allowed.
 
-clist_X_rawvalue_t  clist_X_value_toraw(clist_X_value_t* pval);
-clist_X_value_t     clist_X_value_clone(clist_X_value_t val);
+clist_X_rawvalue    clist_X_value_toraw(clist_X_value* pval);
+clist_X_value       clist_X_value_clone(clist_X_value val);
 ```
 
 ## Types
 
-| Type name             | Type definition                     | Used to represent...      |
-|:----------------------|:------------------------------------|:--------------------------|
-| `clist_X`             | `struct { clist_X_node_t* last; }`  | The clist type            |
-| `clist_X_value_t`     | `i_val`                             | The clist element type    |
-| `clist_X_rawvalue_t`  | `i_valraw`                          | clist raw value type      |
-| `clist_X_iter_t`      | `struct { clist_value_t *ref; ... }`| clist iterator            |
+| Type name           | Type definition                     | Used to represent...      |
+|:--------------------|:------------------------------------|:--------------------------|
+| `clist_X`           | `struct { clist_X_node* last; }`    | The clist type            |
+| `clist_X_value`     | `i_val`                             | The clist element type    |
+| `clist_X_rawvalue`  | `i_valraw`                          | clist raw value type      |
+| `clist_X_iter`      | `struct { clist_value *ref; ... }`  | clist iterator            |
 
 ## Example
 
@@ -147,11 +147,11 @@ int main ()
     clist_i L = clist_i_init();
     c_apply(clist_i, push_back, &L, {10, 20, 30, 40, 50});
                                                  // 10 20 30 40 50
-    clist_i_iter_t it = clist_i_begin(&L);       // ^
+    clist_i_iter it = clist_i_begin(&L);       // ^
     clist_i_next(&it); 
     it = clist_i_erase_at(&L, it);               // 10 30 40 50
                                                  //    ^
-    clist_i_iter_t end = clist_i_end(&L);        //
+    clist_i_iter end = clist_i_end(&L);        //
     clist_i_next(&it);
     it = clist_i_erase_range(&L, it, end);       // 10 30
                                                  //       ^
@@ -183,8 +183,8 @@ int main() {
         c_apply(clist_i, push_back, &L1, {1, 2, 3, 4, 5});
         c_apply(clist_i, push_back, &L2, {10, 20, 30, 40, 50});
 
-        clist_i_iter_t i = clist_i_advance(clist_i_begin(&L1), 2);
-        clist_i_iter_t j1 = clist_i_advance(clist_i_begin(&L2), 2), j2 = clist_i_advance(j1, 2);
+        clist_i_iter i = clist_i_advance(clist_i_begin(&L1), 2);
+        clist_i_iter j1 = clist_i_advance(clist_i_begin(&L2), 2), j2 = clist_i_advance(j1, 2);
 
         clist_i_splice_range(&L1, i, &L2, j1, j2);
 

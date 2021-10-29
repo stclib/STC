@@ -126,10 +126,10 @@ STC_INLINE uint64_t c_default_hash(const void *key, size_t len);
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
 #define c_foreach_3(it, CX, cnt) \
-    for (CX##_iter_t it = CX##_begin(&cnt), it##_end_ = CX##_end(&cnt) \
+    for (CX##_iter it = CX##_begin(&cnt), it##_end_ = CX##_end(&cnt) \
          ; it.ref != it##_end_.ref; CX##_next(&it))
 #define c_foreach_4(it, CX, start, finish) \
-    for (CX##_iter_t it = start, it##_end_ = finish \
+    for (CX##_iter it = start, it##_end_ = finish \
          ; it.ref != it##_end_.ref; CX##_next(&it))
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
@@ -163,20 +163,20 @@ STC_INLINE uint64_t c_default_hash(const void *key, size_t len);
          ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)
 
 #define c_apply(CX, method, cx, ...) do { \
-    const CX##_rawvalue_t _c_arr[] = __VA_ARGS__; \
+    const CX##_rawvalue _c_arr[] = __VA_ARGS__; \
     CX* _c_cx = cx; \
     for (size_t _c_i = 0; _c_i < c_arraylen(_c_arr); ++_c_i) \
         CX##_##method(_c_cx, _c_arr[_c_i]); \
 } while (0)
 #define c_apply_pair(CX, method, cx, ...) do { \
-    const CX##_rawvalue_t _c_arr[] = __VA_ARGS__; \
+    const CX##_rawvalue _c_arr[] = __VA_ARGS__; \
     CX* _c_cx = cx; \
     for (size_t _c_i = 0; _c_i < c_arraylen(_c_arr); ++_c_i) \
         CX##_##method(_c_cx, _c_arr[_c_i].first, _c_arr[_c_i].second); \
 } while (0)
 #define c_apply_n(CX, method, cx, arr, n) do { \
     CX* _c_cx = cx; \
-    for (const CX##_rawvalue_t *_c_i = arr, *_c_end = _c_i+(n); _c_i != _c_end; ++_c_i) \
+    for (const CX##_rawvalue *_c_i = arr, *_c_end = _c_i+(n); _c_i != _c_end; ++_c_i) \
         CX##_##method(_c_cx, *_c_i); \
 } while (0)
 

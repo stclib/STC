@@ -36,30 +36,30 @@ void                cstack_X_del(cstack_X* self);       // destructor
 size_t              cstack_X_size(cstack_X st);
 size_t              cstack_X_capacity(cstack_X st);
 bool                cstack_X_empty(cstack_X st);
-cstack_X_value_t*   cstack_X_top(const cstack_X* self);
-cstack_X_value_t*   cstack_X_at(const cstack_X* self, size_t idx);
+cstack_X_value*     cstack_X_top(const cstack_X* self);
+cstack_X_value*     cstack_X_at(const cstack_X* self, size_t idx);
 
-cstack_X_value_t*   cstack_X_push(cstack_X* self, i_val value);
-cstack_X_value_t*   cstack_X_emplace(cstack_X* self, i_valraw raw);
+cstack_X_value*     cstack_X_push(cstack_X* self, i_val value);
+cstack_X_value*     cstack_X_emplace(cstack_X* self, i_valraw raw);
 
 void                cstack_X_pop(cstack_X* self);
 
-cstack_X_iter_t     cstack_X_begin(const cstack_X* self);
-cstack_X_iter_t     cstack_X_end(const cstack_X* self);
-void                cstack_X_next(cstack_X_iter_t* it);
+cstack_X_iter       cstack_X_begin(const cstack_X* self);
+cstack_X_iter       cstack_X_end(const cstack_X* self);
+void                cstack_X_next(cstack_X_iter* it);
 
-i_valraw            cstack_X_value_toraw(cvec_X_value_t* pval);
+i_valraw            cstack_X_value_toraw(cvec_X_value* pval);
 i_val               cstack_X_value_clone(i_val value);
 ```
 
 ## Types
 
-| Type name             | Type definition                        | Used to represent...        |
-|:----------------------|:---------------------------------------|:----------------------------|
-| `cstack_X`            | `struct { cstack_value_t *data; ... }` | The cstack type             |
-| `cstack_X_value_t`    | `i_val`                                | The cstack element type     |
-| `cstack_X_rawvalue_t` | `i_valraw`                             | cstack raw value type       |
-| `cstack_X_iter_t`     | `struct { cstack_value_t *ref; }`      | cstack iterator             |
+| Type name           | Type definition                        | Used to represent...        |
+|:--------------------|:---------------------------------------|:----------------------------|
+| `cstack_X`          | `struct { cstack_value *data; ... }` | The cstack type             |
+| `cstack_X_value`    | `i_val`                                | The cstack element type     |
+| `cstack_X_rawvalue` | `i_valraw`                             | cstack raw value type       |
+| `cstack_X_iter`     | `struct { cstack_value *ref; }`      | cstack iterator             |
 
 ## Example
 ```c

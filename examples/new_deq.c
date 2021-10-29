@@ -36,25 +36,26 @@ int point_compare(const Point* a, const Point* b) {
 
 int main()
 {
-    cdeq_i32 vec = cdeq_i32_init();
-    cdeq_i32_push_back(&vec, 123);
-    cdeq_i32_del(&vec);
-
-    cdeq_float fvec = cdeq_float_init();
-    cdeq_float_push_back(&fvec, 123.3);
-    cdeq_float_del(&fvec);
-
-    cdeq_pnt pvec = cdeq_pnt_init();
-    cdeq_pnt_push_back(&pvec, (Point){42, 14});
-    cdeq_pnt_push_back(&pvec, (Point){32, 94});
-    cdeq_pnt_push_front(&pvec, (Point){62, 81});
-    cdeq_pnt_sort(&pvec);
-    c_foreach (i, cdeq_pnt, pvec)
-        printf(" (%d %d)", i.ref->x, i.ref->y);
-    puts("");
-    cdeq_pnt_del(&pvec);
-
-    cdeq_str svec = cdeq_str_init();
-    cdeq_str_emplace_back(&svec, "Hello, friend");
-    cdeq_str_del(&svec);
+    c_auto (cdeq_i32, vec)
+    {
+        cdeq_i32_push_back(&vec, 123);
+    }
+    c_auto (cdeq_float, fvec)
+    {
+        cdeq_float_push_back(&fvec, 123.3);
+    }
+    c_auto (cdeq_pnt, pvec)
+    {
+        cdeq_pnt_push_back(&pvec, (Point){42, 14});
+        cdeq_pnt_push_back(&pvec, (Point){32, 94});
+        cdeq_pnt_push_front(&pvec, (Point){62, 81});
+        cdeq_pnt_sort(&pvec);
+        c_foreach (i, cdeq_pnt, pvec)
+            printf(" (%d %d)", i.ref->x, i.ref->y);
+        puts("");
+    }
+    c_auto (cdeq_str, svec)
+    {
+        cdeq_str_emplace_back(&svec, "Hello, friend");
+    }
 }

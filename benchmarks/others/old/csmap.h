@@ -36,7 +36,7 @@ int main(void) {
         csmap_mx_insert(&m, 8, 'b');
         csmap_mx_insert(&m, 12, 'c');
 
-        csmap_mx_iter_t it = csmap_mx_find(&m, 10); // none
+        csmap_mx_iter it = csmap_mx_find(&m, 10); // none
         char val = csmap_mx_find(&m, 5).ref->second;
         csmap_mx_put(&m, 5, 'd'); // update
         csmap_mx_erase(&m, 8);
@@ -70,10 +70,10 @@ int main(void) {
     _c_aatree_complete_types(_cx_self, C); \
 \
     typedef i_keyraw _cx_rawkey; \
-    typedef i_valraw _cx_memb(_rawmapped_t); \
+    typedef i_valraw _cx_memb(_rawmapped); \
     typedef cx_SET_ONLY( _cx_rawkey ) \
             cx_MAP_ONLY( struct { _cx_rawkey first; \
-                                   _cx_memb(_rawmapped_t) second; } ) \
+                                   _cx_memb(_rawmapped) second; } ) \
     _cx_rawvalue; \
 \
     STC_API _cx_self               _cx_memb(_init)(void); \
@@ -201,7 +201,7 @@ int main(void) {
 
 _c_aatree_types(csmap_SENTINEL, csmap_, int, int);
 _c_aatree_complete_types(csmap_SENTINEL, csmap_);
-static csmap_SENTINEL_node_t _aatree_sentinel = {&_aatree_sentinel, &_aatree_sentinel, 0};
+static csmap_SENTINEL_node _aatree_sentinel = {&_aatree_sentinel, &_aatree_sentinel, 0};
 
 #define _c_implement_aatree(_cx_self, C, i_key, i_val, i_cmp, \
                             i_valdel, i_valfrom, i_valto, i_valraw, \

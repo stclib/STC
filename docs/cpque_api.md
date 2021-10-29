@@ -32,26 +32,26 @@ void                cpque_X_del(cpque_X* self);        // destructor
 
 size_t              cpque_X_size(cpque_X pq);
 bool                cpque_X_empty(cpque_X pq);
-cpque_X_value_t*    cpque_X_top(const cpque_X* self);
+cpque_X_value*      cpque_X_top(const cpque_X* self);
 
 void                cpque_X_make_heap(cpque_X* self);  // call after using push_back().
-void                cpque_X_push(cpque_X* self, cpque_X_value_t value);
-void                cpque_X_emplace(cpque_X* self, cpque_X_rawvalue_t raw);
+void                cpque_X_push(cpque_X* self, cpque_X_value value);
+void                cpque_X_emplace(cpque_X* self, cpque_X_rawvalue raw);
 
 void                cpque_X_pop(cpque_X* self);
 void                cpque_X_erase_at(cpque_X* self, size_t idx);
 
-void                cpque_X_push_back(cpque_X* self, cpque_X_value_t value); // breaks heap-property
-cpque_X_value_t     cpque_X_value_clone(cpque_X_value_t val);
+void                cpque_X_push_back(cpque_X* self, cpque_X_value value); // breaks heap-property
+cpque_X_value       cpque_X_value_clone(cpque_X_value val);
 ```
 
 ## Types
 
-| Type name            | Type definition                       | Used to represent...    |
-|:---------------------|:--------------------------------------|:------------------------|
-| `cpque_X`            | `struct {cpque_X_value_t* data; ...}` | The cpque type          |
-| `cpque_X_value_t`    | `i_val`                               | The cpque element type  |
-| `cpque_X_rawvalue_t` | `i_valraw`                            | cpque raw value type    |
+| Type name          | Type definition                       | Used to represent...    |
+|:-------------------|:--------------------------------------|:------------------------|
+| `cpque_X`          | `struct {cpque_X_value* data; ...}`   | The cpque type          |
+| `cpque_X_value`    | `i_val`                               | The cpque element type  |
+| `cpque_X_rawvalue` | `i_valraw`                            | cpque raw value type    |
 
 ## Example
 ```c

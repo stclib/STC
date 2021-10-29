@@ -91,7 +91,7 @@ Sample test_stc_map() {
         stc64_srandom(seed);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
-        csmap_x_value_t* val;
+        csmap_x_value* val;
         c_forrange (N) 
             if ((val = csmap_x_get(&con, stc64_random() & mask1)))
                 sum += val->second;

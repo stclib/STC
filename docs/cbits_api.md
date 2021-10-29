@@ -58,7 +58,7 @@ void             cbits_xor(cbits *self, cbits other);        // set of disjoint 
 | cbits               | Type definition           | Used to represent...         |
 |:--------------------|:--------------------------|:-----------------------------|
 | `cbits`             | `struct { ... }`          | The cbits type               |
-| `cbits_iter_t`      | `struct { ... }`          | The cbits iterator type      |
+| `cbits_iter`        | `struct { ... }`          | The cbits iterator type      |
 
 ## Example
 ```c

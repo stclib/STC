@@ -51,9 +51,9 @@ bool          csview_contains(csview sv, csview needle);
 bool          csview_starts_with(csview sv, csview sub);
 bool          csview_ends_with(csview sv, csview sub);
 
-csview_iter_t csview_begin(const csview* self);
-csview_iter_t csview_end(const csview* self);
-void          csview_next(csview_iter_t* it);
+csview_iter   csview_begin(const csview* self);
+csview_iter   csview_end(const csview* self);
+void          csview_next(csview_iter* it);
 ```
 #### Extended cstr methods
 ```c
@@ -84,11 +84,11 @@ uint64_t      csview_hash(const csview* x, ...);
 ```
 ## Types
 
-| Type name         | Type definition                           | Used to represent...     |
-|:------------------|:------------------------------------------|:-------------------------|
-| `csview`          | `struct { const char *str; size_t size }` | The string view type     |
-| `csview_value_t`  | `char`                                    | The string element type  |
-| `csview_iter_t`   | `struct { csview_value_t *ref; }`         | csview iterator          |
+| Type name       | Type definition                           | Used to represent...     |
+|:----------------|:------------------------------------------|:-------------------------|
+| `csview`        | `struct { const char *str; size_t size }` | The string view type     |
+| `csview_value`  | `char`                                    | The string element type  |
+| `csview_iter`   | `struct { csview_value *ref; }`           | csview iterator          |
 
 ## Constants and macros
 

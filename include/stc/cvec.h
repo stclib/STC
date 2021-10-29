@@ -78,20 +78,20 @@ struct cvec_rep { size_t size, cap; void* data[]; };
 #endif
 typedef i_valraw _cx_rawvalue;
 
-STC_API _cx_self            _cx_memb(_init)(void);
-STC_API _cx_self            _cx_memb(_clone)(_cx_self cx);
+STC_API _cx_self        _cx_memb(_init)(void);
+STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_API void            _cx_memb(_del)(_cx_self* self);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
 STC_API void            _cx_memb(_reserve)(_cx_self* self, size_t cap);
 STC_API void            _cx_memb(_resize)(_cx_self* self, size_t size, i_val fill_val);
 STC_API int             _cx_memb(_value_compare)(const _cx_value* x, const _cx_value* y);
-STC_API _cx_iter       _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw raw);
-STC_API _cx_iter       _cx_memb(_bsearch_in)(_cx_iter it1, _cx_iter it2, i_valraw raw);
-STC_API _cx_value*     _cx_memb(_push_back)(_cx_self* self, i_val value);
-STC_API _cx_iter       _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2);
-STC_API _cx_iter       _cx_memb(_insert_range_p)(_cx_self* self, _cx_value* pos,
+STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw raw);
+STC_API _cx_iter        _cx_memb(_bsearch_in)(_cx_iter it1, _cx_iter it2, i_valraw raw);
+STC_API _cx_value*      _cx_memb(_push_back)(_cx_self* self, i_val value);
+STC_API _cx_iter        _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2);
+STC_API _cx_iter        _cx_memb(_insert_range_p)(_cx_self* self, _cx_value* pos,
                                                  const _cx_value* p1, const _cx_value* p2, bool clone);
-STC_API _cx_iter       _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos,
+STC_API _cx_iter        _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos,
                                                   const _cx_rawvalue* p1, const _cx_rawvalue* p2);
 
 STC_INLINE size_t       _cx_memb(_size)(_cx_self cx) { return cvec_rep_(&cx)->size; }
@@ -102,19 +102,19 @@ STC_INLINE i_valraw     _cx_memb(_value_toraw)(_cx_value* val) { return i_valto(
 STC_INLINE i_val        _cx_memb(_value_clone)(_cx_value val)
                             { return i_valfrom(i_valto(&val)); }
 STC_INLINE void         _cx_memb(_swap)(_cx_self* a, _cx_self* b) { c_swap(_cx_self, *a, *b); }
-STC_INLINE _cx_value*  _cx_memb(_front)(const _cx_self* self) { return self->data; }
-STC_INLINE _cx_value*  _cx_memb(_back)(const _cx_self* self)
+STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return self->data; }
+STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self)
                             { return self->data + cvec_rep_(self)->size - 1; }
-STC_INLINE _cx_value*  _cx_memb(_emplace_back)(_cx_self* self, i_valraw raw)
+STC_INLINE _cx_value*   _cx_memb(_emplace_back)(_cx_self* self, i_valraw raw)
                             { return _cx_memb(_push_back)(self, i_valfrom(raw)); }
 STC_INLINE void         _cx_memb(_pop_back)(_cx_self* self)
                             { _cx_value* p = &self->data[--cvec_rep_(self)->size]; i_valdel(p); }
-STC_INLINE _cx_iter    _cx_memb(_begin)(const _cx_self* self)
+STC_INLINE _cx_iter     _cx_memb(_begin)(const _cx_self* self)
                             { return c_make(_cx_iter){self->data}; }
-STC_INLINE _cx_iter    _cx_memb(_end)(const _cx_self* self)
+STC_INLINE _cx_iter     _cx_memb(_end)(const _cx_self* self)
                             { return c_make(_cx_iter){self->data + cvec_rep_(self)->size}; }
 STC_INLINE void         _cx_memb(_next)(_cx_iter* it) { ++it->ref; }
-STC_INLINE _cx_iter    _cx_memb(_advance)(_cx_iter it, intptr_t offs)
+STC_INLINE _cx_iter     _cx_memb(_advance)(_cx_iter it, intptr_t offs)
                             { it.ref += offs; return it; }
 STC_INLINE size_t       _cx_memb(_index)(_cx_self cx, _cx_iter it) { return it.ref - cx.data; }
 

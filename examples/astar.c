@@ -107,7 +107,7 @@ astar(cstr* maze, int width)
                 int new_cost = *csmap_pcost_at(&costs, current);
                 if (maze->str[point_index(&next)] != '#')
                 {
-                    csmap_pcost_value_t *cost = csmap_pcost_get(&costs, next);
+                    csmap_pcost_value *cost = csmap_pcost_get(&costs, next);
                     if (cost == NULL || new_cost < cost->second)
                     {
                         csmap_pcost_insert(&costs, next, new_cost);

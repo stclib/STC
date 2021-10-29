@@ -37,7 +37,7 @@ int main(void) {
         cmap_ichar_emplace(&m, 8, 'b');
         cmap_ichar_emplace(&m, 12, 'c');
 
-        cmap_ichar_value_t* v = cmap_ichar_get(&m, 10); // NULL
+        cmap_ichar_value* v = cmap_ichar_get(&m, 10); // NULL
         char val = *cmap_ichar_at(&m, 5);               // 'a'
         cmap_ichar_emplace_or_assign(&m, 5, 'd');       // update
         cmap_ichar_erase(&m, 8);
@@ -81,7 +81,7 @@ cx_MAP_ONLY( struct _cx_value {
 }; )
 
 typedef i_keyraw _cx_rawkey;
-typedef i_valraw _cx_memb(_rawmapped_t);
+typedef i_valraw _cx_memb(_rawmapped);
 typedef cx_SET_ONLY( i_keyraw )
         cx_MAP_ONLY( struct { i_keyraw first;
                               i_valraw second; } )
@@ -93,7 +93,7 @@ STC_API void            _cx_memb(_del)(_cx_self* self);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
 STC_API void            _cx_memb(_reserve)(_cx_self* self, size_t capacity);
 STC_API chash_bucket_t  _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr);
-STC_API _cx_result    _cx_memb(_insert_entry_)(_cx_self* self, i_keyraw rkey);
+STC_API _cx_result      _cx_memb(_insert_entry_)(_cx_self* self, i_keyraw rkey);
 STC_API void            _cx_memb(_erase_entry)(_cx_self* self, _cx_value* val);
 
 STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_make(_cx_self)_cmap_inits; }
@@ -109,8 +109,8 @@ STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, i_keyraw rkey)
                             { return self->size && self->_hashx[_cx_memb(_bucket_)(self, &rkey).idx]; }
 
 cx_MAP_ONLY(
-    STC_API _cx_result _cx_memb(_insert_or_assign)(_cx_self* self, i_key _key, i_val _mapped);
-    STC_API _cx_result _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped);
+    STC_API _cx_result  _cx_memb(_insert_or_assign)(_cx_self* self, i_key _key, i_val _mapped);
+    STC_API _cx_result  _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped);
 
     STC_INLINE _cx_result  /* short-form, like operator[]: */
     _cx_memb(_put)(_cx_self* self, i_key key, i_val mapped) {

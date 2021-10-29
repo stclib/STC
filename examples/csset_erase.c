@@ -13,7 +13,7 @@ int main()
         puts("");
 
         int val = 64;
-        csset_int_iter_t it;
+        csset_int_iter it;
         printf("Show values >= %d:\n", val);
         it = csset_int_lower_bound(&set, val);
 

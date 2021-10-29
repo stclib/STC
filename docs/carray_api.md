@@ -35,9 +35,9 @@ size_t              carr2_X_size(carr2_X arr);
 i_val*              carr2_X_data(carr2_X* self);          // access storage data
 i_val*              carr2_X_at(carr2_X* self, size_t x, size_t y);
 
-carr2_X_iter_t      carr2_X_begin(const carr2_X* self);
-carr2_X_iter_t      carr2_X_end(const carr2_X* self);
-void                carr2_X_next(carr2_X_iter_t* it);
+carr2_X_iter        carr2_X_begin(const carr2_X* self);
+carr2_X_iter        carr2_X_end(const carr2_X* self);
+void                carr2_X_next(carr2_X_iter* it);
 ```
 carr3:
 ```c
@@ -53,21 +53,21 @@ size_t              carr3_X_size(carr3_X arr);
 i_val*              carr3_X_data(carr3_X* self);          // access storage data
 i_val*              carr3_X_at(carr3_X* self, size_t x, size_t y, size_t z);
 
-carr3_X_iter_t      carr3_X_begin(const carr3_X* self);
-carr3_X_iter_t      carr3_X_end(const carr3_X* self);
-void                carr3_X_next(carr3_X_iter_t* it);
+carr3_X_iter        carr3_X_begin(const carr3_X* self);
+carr3_X_iter        carr3_X_end(const carr3_X* self);
+void                carr3_X_next(carr3_X_iter* it);
 ```
 ## Types
 
 | Type name         | Type definition                                      | Used to represent... |
 |:------------------|:-----------------------------------------------------|:---------------------|
 | `carr2_X`         | `struct { i_val **data; size_t xdim, ydim; }`        | The array 2D type    |
-| `carr2_X_value_t` | `i_val`                                              | The value type       |
-| `carr2_X_iter_t`  | `struct { i_val *ref; }`                             | Iterator type        |
+| `carr2_X_value`   | `i_val`                                              | The value type       |
+| `carr2_X_iter`    | `struct { i_val *ref; }`                             | Iterator type        |
 |                   |                                                      |                      |
 | `carr3_X`         | `struct { i_val ***data; size_t xdim, ydim, zdim; }` | The array 3D type    |
-| `carr3_X_value_t` | `i_val`                                              | The value type       |
-| `carr3_X_iter_t`  | `struct { i_val *ref; }`                             | Iterator type        |
+| `carr3_X_value`   | `i_val`                                              | The value type       |
+| `carr3_X_iter`    | `struct { i_val *ref; }`                             | Iterator type        |
 
 The **carr3** elements can be accessed like `carr3_i arr = ...; int val = arr.data[x][y][z];`, or with `carr3_i_at(&arr, x, y, z)`.
 
