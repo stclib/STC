@@ -62,21 +62,21 @@ _cx_deftypes(_c_carr2_types, _cx_self, i_val);
 #endif
 
 STC_API _cx_self _cx_memb(_with_values)(size_t xdim, size_t ydim, i_val value);
-STC_API _cx_self _cx_memb(_with_storage)(size_t xdim, size_t ydim, _cx_value_t* storage);
+STC_API _cx_self _cx_memb(_with_storage)(size_t xdim, size_t ydim, _cx_value* storage);
 STC_API _cx_self _cx_memb(_clone)(_cx_self src);
-STC_API _cx_value_t* _cx_memb(_release)(_cx_self* self);
+STC_API _cx_value* _cx_memb(_release)(_cx_self* self);
 STC_API void _cx_memb(_del)(_cx_self* self);
 
 STC_INLINE _cx_self _cx_memb(_init)(size_t xdim, size_t ydim) {
-    return _cx_memb(_with_storage)(xdim, ydim, c_new_n(_cx_value_t, xdim*ydim));
+    return _cx_memb(_with_storage)(xdim, ydim, c_new_n(_cx_value, xdim*ydim));
 }
 STC_INLINE size_t _cx_memb(_size)(_cx_self arr)
     { return arr.xdim*arr.ydim; }
 
-STC_INLINE _cx_value_t *_cx_memb(_data)(_cx_self* self)
+STC_INLINE _cx_value *_cx_memb(_data)(_cx_self* self)
     { return *self->data; }
 
-STC_INLINE _cx_value_t *_cx_memb(_at)(_cx_self* self, size_t x, size_t y)
+STC_INLINE _cx_value *_cx_memb(_at)(_cx_self* self, size_t x, size_t y)
     { return *self->data + self->ydim*x + y; }
 
 STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
@@ -84,20 +84,20 @@ STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     _cx_memb(_del)(self); *self = _cx_memb(_clone)(other);
 }
 
-STC_INLINE _cx_iter_t _cx_memb(_begin)(const _cx_self* self)
-    { return c_make(_cx_iter_t){*self->data}; }
+STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self)
+    { return c_make(_cx_iter){*self->data}; }
 
-STC_INLINE _cx_iter_t _cx_memb(_end)(const _cx_self* self)
-    { return c_make(_cx_iter_t){*self->data + self->xdim*self->ydim}; }
+STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self)
+    { return c_make(_cx_iter){*self->data + self->xdim*self->ydim}; }
 
-STC_INLINE void _cx_memb(_next)(_cx_iter_t* it)
+STC_INLINE void _cx_memb(_next)(_cx_iter* it)
     { ++it->ref; }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
 
-STC_DEF _cx_self _cx_memb(_with_storage)(size_t xdim, size_t ydim, _cx_value_t* block) {
-    _cx_self _arr = {c_new_n(_cx_value_t*, xdim), xdim, ydim};
+STC_DEF _cx_self _cx_memb(_with_storage)(size_t xdim, size_t ydim, _cx_value* block) {
+    _cx_self _arr = {c_new_n(_cx_value*, xdim), xdim, ydim};
     for (size_t x = 0; x < xdim; ++x, block += ydim)
         _arr.data[x] = block;
     return _arr;
@@ -105,20 +105,20 @@ STC_DEF _cx_self _cx_memb(_with_storage)(size_t xdim, size_t ydim, _cx_value_t* 
 
 STC_DEF _cx_self _cx_memb(_with_values)(size_t xdim, size_t ydim, i_val value) {
     _cx_self _arr = _cx_memb(_init)(xdim, ydim);
-    for (_cx_value_t* p = _arr.data[0], *e = p + xdim*ydim; p != e; ++p)
+    for (_cx_value* p = _arr.data[0], *e = p + xdim*ydim; p != e; ++p)
         *p = value;
     return _arr;
 }
 
 STC_DEF _cx_self _cx_memb(_clone)(_cx_self src) {
     _cx_self _arr = _cx_memb(_init)(src.xdim, src.ydim);
-    for (_cx_value_t* p = _arr.data[0], *q = src.data[0], *e = p + _cx_memb(_size)(src); p != e; ++p, ++q)
+    for (_cx_value* p = _arr.data[0], *q = src.data[0], *e = p + _cx_memb(_size)(src); p != e; ++p, ++q)
         *p = i_valfrom(i_valto(q));
     return _arr;
 }
 
-STC_DEF _cx_value_t *_cx_memb(_release)(_cx_self* self) {
-    _cx_value_t *values = self->data[0];
+STC_DEF _cx_value *_cx_memb(_release)(_cx_self* self) {
+    _cx_value *values = self->data[0];
     c_free(self->data);
     self->data = NULL;
     return values;
@@ -126,7 +126,7 @@ STC_DEF _cx_value_t *_cx_memb(_release)(_cx_self* self) {
 
 STC_DEF void _cx_memb(_del)(_cx_self* self) {
     if (!self->data) return;
-    for (_cx_value_t* p = self->data[0], *e = p + _cx_memb(_size)(*self); p != e; ++p)
+    for (_cx_value* p = self->data[0], *e = p + _cx_memb(_size)(*self); p != e; ++p)
         i_valdel(p);
     c_free(self->data[0]); /* values */
     c_free(self->data);    /* pointers */

@@ -36,24 +36,24 @@
 #if !defined i_fwd
 _cx_deftypes(_c_cstack_types, _cx_self, i_val);
 #endif
-typedef i_valraw _cx_rawvalue_t;
+typedef i_valraw _cx_rawvalue;
 
 STC_INLINE _cx_self _cx_memb(_init)(void)
     { return c_make(_cx_self){0, 0, 0}; }
 
 STC_INLINE _cx_self _cx_memb(_with_capacity)(size_t cap) {
-    _cx_self out = {(_cx_value_t *) c_malloc(cap*sizeof(i_val)), 0, cap};
+    _cx_self out = {(_cx_value *) c_malloc(cap*sizeof(i_val)), 0, cap};
     return out;
 }
 
 STC_INLINE _cx_self _cx_memb(_with_size)(size_t size, i_val fill) {
-    _cx_self out = {(_cx_value_t *) c_malloc(size*sizeof fill), size, size};
+    _cx_self out = {(_cx_value *) c_malloc(size*sizeof fill), size, size};
     while (size) out.data[--size] = fill;
     return out;
 }
 
 STC_INLINE void _cx_memb(_clear)(_cx_self* self) {
-    _cx_value_t *p = self->data + self->size;
+    _cx_value *p = self->data + self->size;
     while (p-- != self->data) i_valdel(p);
     self->size = 0;
 }
@@ -70,34 +70,34 @@ STC_INLINE bool _cx_memb(_empty)(_cx_self v)
 STC_INLINE size_t _cx_memb(_capacity)(_cx_self v)
     { return v.capacity; }
 
-STC_INLINE _cx_value_t* _cx_memb(_top)(const _cx_self* self)
+STC_INLINE _cx_value* _cx_memb(_top)(const _cx_self* self)
     { return &self->data[self->size - 1]; }
 
 STC_INLINE void _cx_memb(_pop)(_cx_self* self)
-    { _cx_value_t* p = &self->data[--self->size]; i_valdel(p); }
+    { _cx_value* p = &self->data[--self->size]; i_valdel(p); }
 
 STC_INLINE void _cx_memb(_reserve)(_cx_self* self, size_t n) {
     if (n >= self->size)
-        self->data = (_cx_value_t *)c_realloc(self->data, (self->capacity = n)*sizeof(_cx_value_t));
+        self->data = (_cx_value *)c_realloc(self->data, (self->capacity = n)*sizeof(_cx_value));
 }
 
 STC_INLINE void _cx_memb(_shrink_to_fit)(_cx_self* self)
     { _cx_memb(_reserve)(self, self->size); }
 
-STC_INLINE _cx_value_t* _cx_memb(_push)(_cx_self* self, _cx_value_t val) {
+STC_INLINE _cx_value* _cx_memb(_push)(_cx_self* self, _cx_value val) {
     if (self->size == self->capacity) _cx_memb(_reserve)(self, self->size*3/2 + 4);
-    _cx_value_t* vp = self->data + self->size++; 
+    _cx_value* vp = self->data + self->size++; 
     *vp = val; return vp;
 }
 
-STC_INLINE _cx_value_t* _cx_memb(_emplace)(_cx_self* self, _cx_rawvalue_t raw)
+STC_INLINE _cx_value* _cx_memb(_emplace)(_cx_self* self, _cx_rawvalue raw)
     { return _cx_memb(_push)(self, i_valfrom(raw)); }
 
-STC_INLINE _cx_value_t* _cx_memb(_at)(const _cx_self* self, size_t idx)
+STC_INLINE _cx_value* _cx_memb(_at)(const _cx_self* self, size_t idx)
     { assert(idx < self->size); return self->data + idx; }
 
 STC_INLINE _cx_self _cx_memb(_clone)(_cx_self v) {
-    _cx_self out = {(_cx_value_t *) c_malloc(v.size*sizeof(_cx_value_t)), v.size, v.size};
+    _cx_self out = {(_cx_value *) c_malloc(v.size*sizeof(_cx_value)), v.size, v.size};
     for (size_t i = 0; i < v.size; ++i, ++v.data) out.data[i] = i_valfrom(i_valto(v.data));
     return out;
 }
@@ -107,17 +107,17 @@ STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     _cx_memb(_del)(self); *self = _cx_memb(_clone)(other);
 }
 
-STC_INLINE i_val _cx_memb(_value_clone)(_cx_value_t val)
+STC_INLINE i_val _cx_memb(_value_clone)(_cx_value val)
     { return i_valfrom(i_valto(&val)); }
-STC_INLINE i_valraw _cx_memb(_value_toraw)(_cx_value_t* val)
+STC_INLINE i_valraw _cx_memb(_value_toraw)(_cx_value* val)
     { return i_valto(val); }
 
-STC_INLINE _cx_iter_t _cx_memb(_begin)(const _cx_self* self)
-    { return c_make(_cx_iter_t){self->data}; }
-STC_INLINE _cx_iter_t _cx_memb(_end)(const _cx_self* self)
-    { return c_make(_cx_iter_t){self->data + self->size}; }
-STC_INLINE void _cx_memb(_next)(_cx_iter_t* it) { ++it->ref; }
-STC_INLINE _cx_iter_t _cx_memb(_advance)(_cx_iter_t it, intptr_t offs)
+STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self)
+    { return c_make(_cx_iter){self->data}; }
+STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self)
+    { return c_make(_cx_iter){self->data + self->size}; }
+STC_INLINE void _cx_memb(_next)(_cx_iter* it) { ++it->ref; }
+STC_INLINE _cx_iter _cx_memb(_advance)(_cx_iter it, intptr_t offs)
     { it.ref += offs; return it; }
 
 #include "template.h"
