@@ -59,78 +59,78 @@ int main() {
 #include "template.h"
 
 #ifndef i_fwd
-cx_deftypes(_c_carr3_types, Self, i_val);
+_cx_deftypes(_c_carr3_types, _cx_self, i_val);
 #endif
 
-STC_API Self cx_memb(_with_values)(size_t xdim, size_t ydim, size_t zdim, i_val value);
-STC_API Self cx_memb(_with_storage)(size_t xdim, size_t ydim, size_t zdim, cx_value_t* storage);
-STC_API Self cx_memb(_clone)(Self src);
-STC_API cx_value_t* cx_memb(_release)(Self* self);
-STC_API void cx_memb(_del)(Self* self);
+STC_API _cx_self _cx_memb(_with_values)(size_t xdim, size_t ydim, size_t zdim, i_val value);
+STC_API _cx_self _cx_memb(_with_storage)(size_t xdim, size_t ydim, size_t zdim, _cx_value_t* storage);
+STC_API _cx_self _cx_memb(_clone)(_cx_self src);
+STC_API _cx_value_t* _cx_memb(_release)(_cx_self* self);
+STC_API void _cx_memb(_del)(_cx_self* self);
 
-STC_INLINE Self cx_memb(_init)(size_t xdim, size_t ydim, size_t zdim) {
-    return cx_memb(_with_storage)(xdim, ydim, zdim, c_new_n(cx_value_t, xdim*ydim*zdim));
+STC_INLINE _cx_self _cx_memb(_init)(size_t xdim, size_t ydim, size_t zdim) {
+    return _cx_memb(_with_storage)(xdim, ydim, zdim, c_new_n(_cx_value_t, xdim*ydim*zdim));
 }
 
-STC_INLINE size_t cx_memb(_size)(Self arr)
+STC_INLINE size_t _cx_memb(_size)(_cx_self arr)
     { return arr.xdim*arr.ydim*arr.zdim; }
 
-STC_INLINE cx_value_t* cx_memb(_data)(Self* self)
+STC_INLINE _cx_value_t* _cx_memb(_data)(_cx_self* self)
     { return **self->data; }
 
-STC_INLINE cx_value_t* cx_memb(_at)(Self* self, size_t x, size_t y, size_t z)
+STC_INLINE _cx_value_t* _cx_memb(_at)(_cx_self* self, size_t x, size_t y, size_t z)
     { return **self->data + self->zdim*(self->ydim*x + y) + z; }
 
-STC_INLINE void cx_memb(_copy)(Self *self, Self other) {
+STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     if (self->data == other.data) return;
-    cx_memb(_del)(self); *self = cx_memb(_clone)(other);
+    _cx_memb(_del)(self); *self = _cx_memb(_clone)(other);
 }
 
-STC_INLINE cx_iter_t cx_memb(_begin)(const Self* self)
-    { return c_make(cx_iter_t){**self->data}; }
+STC_INLINE _cx_iter_t _cx_memb(_begin)(const _cx_self* self)
+    { return c_make(_cx_iter_t){**self->data}; }
 
-STC_INLINE cx_iter_t cx_memb(_end)(const Self* self)
-    { return c_make(cx_iter_t){**self->data + cx_memb(_size)(*self)}; }
+STC_INLINE _cx_iter_t _cx_memb(_end)(const _cx_self* self)
+    { return c_make(_cx_iter_t){**self->data + _cx_memb(_size)(*self)}; }
 
-STC_INLINE void cx_memb(_next)(cx_iter_t* it)
+STC_INLINE void _cx_memb(_next)(_cx_iter_t* it)
     { ++it->ref; }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
 
-STC_DEF Self cx_memb(_with_storage)(size_t xdim, size_t ydim, size_t zdim, cx_value_t* block) {
-    Self _arr = {c_new_n(cx_value_t**, xdim*(ydim + 1)), xdim, ydim, zdim};
-    cx_value_t** p = (cx_value_t**) &_arr.data[xdim];
+STC_DEF _cx_self _cx_memb(_with_storage)(size_t xdim, size_t ydim, size_t zdim, _cx_value_t* block) {
+    _cx_self _arr = {c_new_n(_cx_value_t**, xdim*(ydim + 1)), xdim, ydim, zdim};
+    _cx_value_t** p = (_cx_value_t**) &_arr.data[xdim];
     for (size_t x = 0, y; x < xdim; ++x, p += ydim)
         for (_arr.data[x] = p, y = 0; y < ydim; ++y, block += zdim)
             _arr.data[x][y] = block;
     return _arr;
 }
 
-STC_DEF Self cx_memb(_with_values)(size_t xdim, size_t ydim, size_t zdim, i_val value) {
-    Self _arr = cx_memb(_init)(xdim, ydim, zdim);
-    for (cx_value_t* p = **_arr.data, *e = p + xdim*ydim*zdim; p != e; ++p)
+STC_DEF _cx_self _cx_memb(_with_values)(size_t xdim, size_t ydim, size_t zdim, i_val value) {
+    _cx_self _arr = _cx_memb(_init)(xdim, ydim, zdim);
+    for (_cx_value_t* p = **_arr.data, *e = p + xdim*ydim*zdim; p != e; ++p)
         *p = value;
     return _arr;
 }
 
-STC_DEF Self cx_memb(_clone)(Self src) {
-    Self _arr = cx_memb(_init)(src.xdim, src.ydim, src.zdim);
-    for (cx_value_t* p = **_arr.data, *q = **src.data, *e = p + cx_memb(_size)(src); p != e; ++p, ++q)
+STC_DEF _cx_self _cx_memb(_clone)(_cx_self src) {
+    _cx_self _arr = _cx_memb(_init)(src.xdim, src.ydim, src.zdim);
+    for (_cx_value_t* p = **_arr.data, *q = **src.data, *e = p + _cx_memb(_size)(src); p != e; ++p, ++q)
         *p = i_valfrom(i_valto(q));
     return _arr;
 }
 
-STC_DEF cx_value_t* cx_memb(_release)(Self* self) {
-    cx_value_t *values = self->data[0][0];
+STC_DEF _cx_value_t* _cx_memb(_release)(_cx_self* self) {
+    _cx_value_t *values = self->data[0][0];
     c_free(self->data);
     self->data = NULL;
     return values;
 }
 
-STC_DEF void cx_memb(_del)(Self* self) {
+STC_DEF void _cx_memb(_del)(_cx_self* self) {
     if (!self->data) return;
-    for (cx_value_t* p = **self->data, *e = p + cx_memb(_size)(*self); p != e; ++p)
+    for (_cx_value_t* p = **self->data, *e = p + _cx_memb(_size)(*self); p != e; ++p)
         i_valdel(p);
     c_free(self->data[0][0]); /* data */
     c_free(self->data);       /* pointers */

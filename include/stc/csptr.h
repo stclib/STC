@@ -88,47 +88,47 @@ typedef long atomic_count_t;
   #define cx_decrement(v) c_atomic_decrement(v)
 #endif
 #ifndef i_fwd
-cx_deftypes(_c_csptr_types, Self, i_val);
+_cx_deftypes(_c_csptr_types, _cx_self, i_val);
 #endif
-#define cx_csptr_rep struct cx_memb(_rep_)
-cx_csptr_rep { atomic_count_t counter; cx_value_t value; };
+#define cx_csptr_rep struct _cx_memb(_rep_)
+cx_csptr_rep { atomic_count_t counter; _cx_value_t value; };
 
-STC_INLINE Self
-cx_memb(_init)(void) { return c_make(Self){NULL, NULL}; }
+STC_INLINE _cx_self
+_cx_memb(_init)(void) { return c_make(_cx_self){NULL, NULL}; }
 
 STC_INLINE atomic_count_t
-cx_memb(_use_count)(Self ptr) { return ptr.use_count ? *ptr.use_count : 0; }
+_cx_memb(_use_count)(_cx_self ptr) { return ptr.use_count ? *ptr.use_count : 0; }
 
-STC_INLINE Self
-cx_memb(_from)(cx_value_t* p) {
-    Self ptr = {p};
+STC_INLINE _cx_self
+_cx_memb(_from)(_cx_value_t* p) {
+    _cx_self ptr = {p};
     if (p) *(ptr.use_count = c_new(atomic_count_t)) = 1;
     return ptr;
 }
 
-STC_INLINE Self
-cx_memb(_make)(cx_value_t val) {
-    Self ptr; cx_csptr_rep *rep = c_new(cx_csptr_rep);
+STC_INLINE _cx_self
+_cx_memb(_make)(_cx_value_t val) {
+    _cx_self ptr; cx_csptr_rep *rep = c_new(cx_csptr_rep);
     *(ptr.use_count = &rep->counter) = 1;
     *(ptr.get = &rep->value) = val;
     return ptr;
 }
 
-STC_INLINE Self
-cx_memb(_clone)(Self ptr) {
+STC_INLINE _cx_self
+_cx_memb(_clone)(_cx_self ptr) {
     if (ptr.use_count) cx_increment(ptr.use_count);
     return ptr;
 }
 
-STC_INLINE Self
-cx_memb(_move)(Self* self) {
-    Self ptr = *self;
+STC_INLINE _cx_self
+_cx_memb(_move)(_cx_self* self) {
+    _cx_self ptr = *self;
     self->get = NULL, self->use_count = NULL;
     return ptr;
 }
 
 STC_INLINE void
-cx_memb(_del)(Self* self) {
+_cx_memb(_del)(_cx_self* self) {
     if (self->use_count && cx_decrement(self->use_count) == 0) {
         i_valdel(self->get);
         if (self->get != &((cx_csptr_rep *)self->use_count)->value)
@@ -138,37 +138,37 @@ cx_memb(_del)(Self* self) {
 }
 
 STC_INLINE void
-cx_memb(_reset)(Self* self) {
-    cx_memb(_del)(self);
+_cx_memb(_reset)(_cx_self* self) {
+    _cx_memb(_del)(self);
     self->use_count = NULL, self->get = NULL;
 }
 
 STC_INLINE void
-cx_memb(_reset_from)(Self* self, cx_value_t* p) {
-    cx_memb(_del)(self);
-    *self = cx_memb(_from)(p);
+_cx_memb(_reset_from)(_cx_self* self, _cx_value_t* p) {
+    _cx_memb(_del)(self);
+    *self = _cx_memb(_from)(p);
 }
 
 STC_INLINE void
-cx_memb(_reset_with)(Self* self, cx_value_t val) {
-    cx_memb(_del)(self);
-    *self = cx_memb(_make)(val);
+_cx_memb(_reset_with)(_cx_self* self, _cx_value_t val) {
+    _cx_memb(_del)(self);
+    *self = _cx_memb(_make)(val);
 }
 
 STC_INLINE void
-cx_memb(_copy)(Self* self, Self ptr) {
+_cx_memb(_copy)(_cx_self* self, _cx_self ptr) {
     if (ptr.use_count) cx_increment(ptr.use_count);
-    cx_memb(_del)(self); *self = ptr;
+    _cx_memb(_del)(self); *self = ptr;
 }
 
 STC_INLINE void
-cx_memb(_take)(Self* self, Self ptr) {
-    if (self->get != ptr.get) cx_memb(_del)(self);
+_cx_memb(_take)(_cx_self* self, _cx_self ptr) {
+    if (self->get != ptr.get) _cx_memb(_del)(self);
     *self = ptr;
 }
 
 STC_INLINE int
-cx_memb(_compare)(const Self* x, const Self* y) {
+_cx_memb(_compare)(const _cx_self* x, const _cx_self* y) {
     return i_cmp(x->get, y->get);
 }
 

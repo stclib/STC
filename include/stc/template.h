@@ -25,21 +25,21 @@
 
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
-  #define cx_memb(name) c_PASTE(Self, name)
-  #define cx_deftypes(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
-  #define cx_value_t cx_memb(_value_t)
-  #define cx_key_t cx_memb(_key_t)
-  #define cx_mapped_t cx_memb(_mapped_t)
-  #define cx_rawvalue_t cx_memb(_rawvalue_t)
-  #define cx_rawkey_t cx_memb(_rawkey_t)
-  #define cx_rawmapped_t cx_memb(_rawmapped_t)
-  #define cx_iter_t cx_memb(_iter_t)
-  #define cx_result_t cx_memb(_result_t)
-  #define cx_node_t cx_memb(_node_t)
-  #define cx_size_t cx_memb(_size_t)
+  #define _cx_self c_PASTE(i_prefix, i_tag)
+  #define _cx_memb(name) c_PASTE(_cx_self, name)
+  #define _cx_deftypes(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
+  #define _cx_value_t _cx_memb(_value_t)
+  #define _cx_key_t _cx_memb(_key_t)
+  #define _cx_mapped_t _cx_memb(_mapped_t)
+  #define _cx_rawvalue_t _cx_memb(_rawvalue_t)
+  #define _cx_rawkey_t _cx_memb(_rawkey_t)
+  #define _cx_rawmapped_t _cx_memb(_rawmapped_t)
+  #define _cx_iter_t _cx_memb(_iter_t)
+  #define _cx_result_t _cx_memb(_result_t)
+  #define _cx_node_t _cx_memb(_node_t)
+  #define _cx_size_t _cx_memb(_size_t)
 #endif
 
-#define Self c_PASTE(i_prefix, i_tag)
 #if defined i_valraw && !(defined i_valto && defined i_valfrom)
   #error if i_valraw or i_valto defined, i_valfrom must be defined
 #endif
@@ -183,7 +183,6 @@
 #undef i_key_csptr
 #undef i_val_csptr
 #undef i_cnt
-#undef Self
 
 #undef i_template
 #endif
