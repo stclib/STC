@@ -82,14 +82,14 @@ Helpers:
 uint64_t            c_strhash(const char *str);                             // utility function
 
 int                 c_rawstr_compare(const char* const* a, const char* const* b);
-bool                c_rawstr_equals(const char* const* a, const char* const* b);
+bool                c_rawstr_equalto(const char* const* a, const char* const* b);
 uint64_t            c_rawstr_hash(const char* const* strp, ...);
 
 uint64_t            c_default_hash(const void *data, size_t len);           // key any trivial type
 uint64_t            c_default_hash32(const void* data, size_t is4);         // key one 32bit int
 uint64_t            c_default_hash64(const void* data, size_t is8);         // key one 64bit int
-int                 c_default_equals(const i_keyraw* a, const i_keyraw* b); // the == operator
-int                 c_memcmp_equals(const i_keyraw* a, const i_keyraw* b);  // uses memcmp
+bool                c_default_equalto(const i_keyraw* a, const i_keyraw* b); // the == operator
+bool                c_memcmp_equalto(const i_keyraw* a, const i_keyraw* b);  // uses memcmp
 
 Type                c_no_clone(Type val);
 Type                c_default_fromraw(Type val);                            // plain copy
@@ -203,7 +203,7 @@ typedef struct { int x, y, z; } Vec3i;
 
 #define i_key Vec3i
 #define i_val int
-#define i_cmp c_memcmp_equals // bitwise compare, and use c_default_hash
+#define i_cmp c_memcmp_equalto // bitwise compare, and use c_default_hash
 #define i_tag vi
 #include <stc/cmap.h>
 
@@ -273,7 +273,7 @@ typedef struct {
     cstr country;
 } Viking;
 
-static int Viking_equals(const Viking* a, const Viking* b) {
+static bool Viking_equalto(const Viking* a, const Viking* b) {
     return cstr_equals_s(a->name, b->name) && cstr_equals_s(a->country, b->country);
 }
 
@@ -287,7 +287,7 @@ static void Viking_del(Viking* v) {
 
 #define i_key Viking
 #define i_val int
-#define i_equ Viking_equals
+#define i_equ Viking_equalto
 #define i_hash Viking_hash
 #define i_del Viking_del
 #define i_tag vk
@@ -346,7 +346,7 @@ typedef struct {
     const char* country;
 } RViking;
 
-static int RViking_equals(const RViking* r1, const RViking* r2)
+static bool RViking_equalto(const RViking* r1, const RViking* r2)
     { return !strcmp(r1->name, r2->name) && !strcmp(r1->country, r2->country); }
 
 static uint32_t RViking_hash(const RViking* r, int ignored)
@@ -362,7 +362,7 @@ static RViking Viking_toR(const Viking* v)
 #define i_val int
 #define i_keydel Viking_del
 #define i_keyraw RViking
-#define i_equ RViking_equals
+#define i_equ RViking_equalto
 #define i_hash RViking_hash
 #define i_keyfrom Viking_fromR
 #define i_keyto Viking_toR

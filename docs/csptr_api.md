@@ -52,7 +52,6 @@ void                csptr_X_reset_with(csptr_X* self, i_val val); // make and as
 void                csptr_X_reset_from(csptr_X* self, i_val* p);  // create csptr from p.
 
 int                 csptr_X_compare(const csptr_X* x, const csptr_X* y);
-bool                csptr_X_equals(const csptr_X* x, const csptr_X* y);
 ```
 
 ## Types and constants

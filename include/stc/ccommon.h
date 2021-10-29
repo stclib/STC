@@ -97,11 +97,11 @@
 #define c_no_compare(x, y)      (assert(!"c_no_compare() called"), (x)==(y))
 #define c_less_compare(less, x, y) (less(y, x) - less(x, y))
 
-#define c_default_equals(x, y)  (*(x) == *(y))
-#define c_memcmp_equals(x, y)   (memcmp(x, y, sizeof *(x)) == 0)
+#define c_default_equalto(x, y)  (*(x) == *(y))
+#define c_memcmp_equalto(x, y)   (memcmp(x, y, sizeof *(x)) == 0)
 
 #define c_rawstr_compare(x, y)  strcmp(*(x), *(y))
-#define c_rawstr_equals(x, y)   (strcmp(*(x), *(y)) == 0)
+#define c_rawstr_equalto(x, y)  (strcmp(*(x), *(y)) == 0)
 #define c_rawstr_hash(p, dummy) c_strhash(*(p))
 
 #define c_no_clone(x)           (assert(!"c_no_clone() called"), x)

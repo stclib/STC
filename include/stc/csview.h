@@ -57,7 +57,7 @@ STC_INLINE char         csview_back(csview sv) { return sv.str[sv.size - 1]; }
 
 STC_INLINE void         csview_clear(csview* self) { *self = csview_null; }
 
-STC_INLINE bool         csview_equalto(csview sv, csview sv2)
+STC_INLINE bool         csview_equals(csview sv, csview sv2)
                             { return sv.size == sv2.size && !memcmp(sv.str, sv2.str, sv.size); }
 STC_INLINE size_t       csview_find(csview sv, csview needle)
                             { char* res = c_strnstrn(sv.str, needle.str, sv.size, needle.size);
@@ -116,7 +116,7 @@ STC_INLINE bool         cstr_ends_with_v(cstr s, csview sub)
 
 #define                 csview_compare(xp, yp) strcmp((xp)->str, (yp)->str)
 #define                 csview_hash(xp, dummy) c_strhash((xp)->str)
-#define                 csview_equals(xp, yp) (strcmp((xp)->str, (yp)->str) == 0)
+#define                 csview_equalto(xp, yp) (strcmp((xp)->str, (yp)->str) == 0)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 

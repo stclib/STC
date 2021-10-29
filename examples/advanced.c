@@ -22,7 +22,7 @@ uint64_t vikingraw_hash(const VikingRaw* raw, size_t ignore) {
     uint64_t hash = c_strhash(raw->name) ^ (c_strhash(raw->country) >> 15);
     return hash;
 }
-static inline int vikingraw_equals(const VikingRaw* rx, const VikingRaw* ry) {
+static inline bool vikingraw_equalto(const VikingRaw* rx, const VikingRaw* ry) {
     return strcmp(rx->name, ry->name) == 0 && strcmp(rx->country, ry->country) == 0;
 }
 
@@ -37,7 +37,7 @@ static inline VikingRaw viking_toRaw(const Viking* vk) {
 #define i_tag     vk
 #define i_key     Viking
 #define i_val     int
-#define i_equ     vikingraw_equals
+#define i_equ     vikingraw_equalto
 #define i_hash    vikingraw_hash
 #define i_keyraw  VikingRaw
 #define i_keyfrom viking_fromRaw

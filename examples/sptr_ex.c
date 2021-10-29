@@ -38,7 +38,7 @@ void example3()
         });
 
         c_foreach (s, cvec_song, v)
-            if (!cstr_equalto(s.ref->get->artist, "Bob Dylan"))
+            if (!cstr_equals(s.ref->get->artist, "Bob Dylan"))
                 cvec_song_emplace_back(&v2, *s.ref); // note: calls csptr_song_clone()
 
         c_apply(cvec_song, push_back, &v2, {

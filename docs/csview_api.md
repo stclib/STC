@@ -45,7 +45,7 @@ csview        csview_slice(csview sv, intptr_t p1, intptr_t p2);   // negative p
 csview        csview_first_token(csview sv, csview sep);           // see split example below.
 csview        csview_next_token(csview sv, csview sep, csview token);
 
-bool          csview_equalto(csview sv, csview sv2);
+bool          csview_equals(csview sv, csview sv2);
 size_t        csview_find(csview sv, csview needle);
 bool          csview_contains(csview sv, csview needle);
 bool          csview_starts_with(csview sv, csview sub);
@@ -79,7 +79,7 @@ bool          cstr_ends_with_v(cstr s, csview sub);
 #### Helper methods
 ```c
 int           csview_compare(const csview* x, const csview* y);
-bool          csview_equals(const csview* x, const csview* y);
+bool          csview_equalto(const csview* x, const csview* y);
 uint64_t      csview_hash(const csview* x, ...);
 ```
 ## Types

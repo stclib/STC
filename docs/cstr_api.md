@@ -60,8 +60,8 @@ void         cstr_replace_all(cstr* self, const char* find, const char* replace)
 void         cstr_erase(cstr* self, size_t pos);
 void         cstr_erase_n(cstr* self, size_t pos, size_t n);
 
-bool         cstr_equalto(cstr s, const char* str);
-bool         cstr_equalto_s(cstr s, cstr s2);
+bool         cstr_equals(cstr s, const char* str);
+bool         cstr_equals_s(cstr s, cstr s2);
 size_t       cstr_find(cstr s, const char* needle);
 size_t       cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax);
 bool         cstr_contains(cstr s, const char* needle);
@@ -86,11 +86,11 @@ Note that all methods with arguments `(..., const char* str, size_t n)`, `n` mus
 #### Helper methods:
 ```c
 int          cstr_compare(const cstr *s1, const cstr *s2);
-bool         cstr_equals(const cstr *s1, const cstr *s2);
+bool         cstr_equalto(const cstr *s1, const cstr *s2);
 bool         cstr_hash(const cstr *s, ...);
 
 int          c_rawstr_compare(const char** x, const char** y);
-bool         c_rawstr_equals(const char** x, const char** y);
+bool         c_rawstr_equalto(const char** x, const char** y);
 uint64_t     c_rawstr_hash(const char* const* x, ...);
 
 uint64_t     c_strhash(const char* str);

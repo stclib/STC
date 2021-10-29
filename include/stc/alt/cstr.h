@@ -163,15 +163,15 @@ STC_INLINE cstr_size_t cstr_capacity(cstr s) {
     return cstr_select_(&s, cap(&s));
 }
 
-STC_INLINE bool cstr_equalto(cstr s1, const char* str) {
+STC_INLINE bool cstr_equals(cstr s1, const char* str) {
     return strcmp(cstr_str(&s1), str) == 0;
 }
 
-STC_INLINE bool cstr_equalto_s(cstr s1, cstr s2) {
+STC_INLINE bool cstr_equals_s(cstr s1, cstr s2) {
     return strcmp(cstr_str(&s1), cstr_str(&s2)) == 0;
 }
 
-STC_INLINE int cstr_equals(const cstr* s1, const cstr* s2) {
+STC_INLINE bool cstr_equalto(const cstr* s1, const cstr* s2) {
     return strcmp(cstr_str(s1), cstr_str(s2)) == 0;
 }
 

@@ -116,9 +116,9 @@ STC_INLINE cstr_iter    cstr_begin(cstr* self)
 STC_INLINE cstr_iter    cstr_end(cstr* self)
                             { return c_make(cstr_iter){self->str + _cstr_rep(self)->size}; }
 STC_INLINE void         cstr_next(cstr_iter* it) {++it->ref; }
-STC_INLINE bool         cstr_equalto(cstr s, const char* str)
+STC_INLINE bool         cstr_equals(cstr s, const char* str)
                             { return strcmp(s.str, str) == 0; }
-STC_INLINE bool         cstr_equalto_s(cstr s1, cstr s2)
+STC_INLINE bool         cstr_equals_s(cstr s1, cstr s2)
                             { return strcmp(s1.str, s2.str) == 0; }
 STC_INLINE bool         cstr_contains(cstr s, const char* needle)
                             { return strstr(s.str, needle) != NULL; }
@@ -168,7 +168,7 @@ cstr_ends_with(cstr s, const char* sub) {
 
 /* container adaptor functions: */
 #define  cstr_compare(xp, yp)     strcmp((xp)->str, (yp)->str)
-#define  cstr_equals(xp, yp)      (strcmp((xp)->str, (yp)->str) == 0)
+#define  cstr_equalto(xp, yp)     (strcmp((xp)->str, (yp)->str) == 0)
 #define  cstr_hash(xp, dummy)     c_strhash((xp)->str)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */

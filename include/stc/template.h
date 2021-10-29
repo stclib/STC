@@ -127,7 +127,7 @@
   #if !defined i_equ && defined i_cmp
     #define i_equ !i_cmp
   #elif !defined i_equ
-    #define i_equ c_default_equals
+    #define i_equ c_default_equalto
   #endif
   #ifndef i_hash
     #define i_hash c_default_hash
