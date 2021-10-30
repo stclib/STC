@@ -132,11 +132,6 @@ _cx_memb(_copy)(_cx_self *self, _cx_self other) {
 }
 
 STC_INLINE _cx_iter
-_cx_memb(_iterator)(const _cx_self* self, _cx_node* prev) {
-    return c_make(_cx_iter){&prev->next->value, &self->last, prev};
-}
-
-STC_INLINE _cx_iter
 _cx_memb(_begin)(const _cx_self* self) {
     _cx_value* head = self->last ? &self->last->next->value : NULL;
     return c_make(_cx_iter){head, &self->last, self->last};
@@ -161,7 +156,7 @@ _cx_memb(_advance)(_cx_iter it, size_t n) {
 
 STC_INLINE _cx_iter
 _cx_memb(_splice_range)(_cx_self* self, _cx_iter it,
-                  _cx_self* other, _cx_iter it1, _cx_iter it2) {
+                        _cx_self* other, _cx_iter it1, _cx_iter it2) {
     _cx_self tmp = _cx_memb(_split_off)(other, it1, it2);
     return _cx_memb(_splice)(self, it, &tmp);
 }
@@ -229,7 +224,7 @@ _cx_memb(_erase_at)(_cx_self* self, _cx_iter it) {
 STC_DEF _cx_iter
 _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
     _cx_node *node = it1.ref ? it1.prev : NULL,
-                *done = it2.ref ? clist_node_(it2.ref) : NULL;
+             *done = it2.ref ? clist_node_(it2.ref) : NULL;
     while (node && node->next != done)
         node = _cx_memb(_erase_after_)(self, node);
     return it2;
@@ -288,7 +283,7 @@ _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
     _cx_self cx = {NULL};
     if (it1.ref == it2.ref) return cx;
     _cx_node *p1 = it1.prev,
-              *p2 = it2.ref ? it2.prev : self->last;
+             *p2 = it2.ref ? it2.prev : self->last;
     p1->next = p2->next, p2->next = clist_node_(it1.ref);
     if (self->last == p2) self->last = (p1 == p2) ? NULL : p1;
     cx.last = p2;

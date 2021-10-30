@@ -67,7 +67,7 @@ cmap_X_result       cmap_X_emplace(cmap_X* self, i_keyraw rkey, i_valraw rmapped
 cmap_X_result       cmap_X_emplace_or_assign(cmap_X* self, i_keyraw rkey, i_valraw rmapped);  // always update rmapped
 
 size_t              cmap_X_erase(cmap_X* self, i_keyraw rkey);                                // return 0 or 1
-cmap_X_iter         cmap_X_erase_at(cmap_X* self, cmap_X_iter it);                          // return iter after it
+cmap_X_iter         cmap_X_erase_at(cmap_X* self, cmap_X_iter it);                            // return iter after it
 void                cmap_X_erase_entry(cmap_X* self, cmap_X_value* entry);
 
 cmap_X_iter         cmap_X_begin(const cmap_X* self);

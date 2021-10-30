@@ -50,7 +50,7 @@ csmap_X_mapped*     csmap_X_at(const csmap_X* self, i_keyraw rkey);             
 csmap_X_value*      csmap_X_get(const csmap_X* self, i_keyraw rkey);                             // return NULL if not found
 csmap_X_iter        csmap_X_lower_bound(const csmap_X* self, i_keyraw rkey);                     // find closest entry >= rkey
 csmap_X_iter        csmap_X_find(const csmap_X* self, i_keyraw rkey);
-csmap_X_value*      csmap_X_find_it(const csmap_X* self, i_keyraw rkey, csmap_X_iter* out);    // return NULL if not found
+csmap_X_value*      csmap_X_find_it(const csmap_X* self, i_keyraw rkey, csmap_X_iter* out);      // return NULL if not found
 
 csmap_X_result      csmap_X_insert(csmap_X* self, i_key key, i_val mapped);                      // no change if key in map
 csmap_X_result      csmap_X_insert_or_assign(csmap_X* self, i_key key, i_val mapped);            // always update mapped
@@ -60,8 +60,8 @@ csmap_X_result      csmap_X_emplace(csmap_X* self, i_keyraw rkey, i_valraw rmapp
 csmap_X_result      csmap_X_emplace_or_assign(csmap_X* self, i_keyraw rkey, i_valraw rmapped);   // always update rmapped
 
 size_t              csmap_X_erase(csmap_X* self, i_keyraw rkey);
-csmap_X_iter        csmap_X_erase_at(csmap_X* self, csmap_X_iter it);                          // returns iter after it
-csmap_X_iter        csmap_X_erase_range(csmap_X* self, csmap_X_iter it1, csmap_X_iter it2);  // returns updated it2
+csmap_X_iter        csmap_X_erase_at(csmap_X* self, csmap_X_iter it);                            // returns iter after it
+csmap_X_iter        csmap_X_erase_range(csmap_X* self, csmap_X_iter it1, csmap_X_iter it2);      // returns updated it2
 
 csmap_X_iter        csmap_X_begin(const csmap_X* self);
 csmap_X_iter        csmap_X_end(const csmap_X* self);

@@ -39,7 +39,7 @@ void                cvec_X_shrink_to_fit(cvec_X* self);
 void                cvec_X_reserve(cvec_X* self, size_t cap);
 void                cvec_X_resize(cvec_X* self, size_t size, i_val fill);
 void                cvec_X_swap(cvec_X* a, cvec_X* b);
-void                cvec_X_del(cvec_X* self);      // destructor
+void                cvec_X_del(cvec_X* self);                                                // destructor
 
 bool                cvec_X_empty(cvec_X vec);
 size_t              cvec_X_size(cvec_X vec);
@@ -53,15 +53,15 @@ cvec_X_value*       cvec_X_push_back(cvec_X* self, i_val value);
 cvec_X_value*       cvec_X_emplace_back(cvec_X* self, i_valraw raw);
 void                cvec_X_pop_back(cvec_X* self);
 
-cvec_X_iter         cvec_X_insert(cvec_X* self, size_t idx, i_val value);                        // move value 
-cvec_X_iter         cvec_X_insert_n(cvec_X* self, size_t idx, const i_val[] arr, size_t n);      // move arr values
-cvec_X_iter         cvec_X_insert_at(cvec_X* self, cvec_X_iter it, i_val value);               // move value 
+cvec_X_iter         cvec_X_insert(cvec_X* self, size_t idx, i_val value);                    // move value 
+cvec_X_iter         cvec_X_insert_n(cvec_X* self, size_t idx, const i_val[] arr, size_t n);  // move arr values
+cvec_X_iter         cvec_X_insert_at(cvec_X* self, cvec_X_iter it, i_val value);             // move value 
 
 cvec_X_iter         cvec_X_emplace(cvec_X* self, size_t idx, i_valraw raw);
 cvec_X_iter         cvec_X_emplace_n(cvec_X* self, size_t idx, const i_valraw[] arr, size_t n);
 cvec_X_iter         cvec_X_emplace_at(cvec_X* self, cvec_X_iter it, i_valraw raw);
 cvec_X_iter         cvec_X_emplace_range(cvec_X* self, cvec_X_iter it, 
-                                         cvec_X_iter it1, cvec_X_iter it2);                 // will clone
+                                         cvec_X_iter it1, cvec_X_iter it2);                  // will clone
 cvec_X_iter         cvec_X_emplace_range_p(cvec_X* self, i_val* pos, 
                                            const i_val* p1, const i_val* p2);
 
@@ -71,7 +71,7 @@ cvec_X_iter         cvec_X_erase_range(cvec_X* self, cvec_X_iter it1, cvec_X_ite
 
 cvec_X_iter         cvec_X_find(const cvec_X* self, i_valraw raw);
 cvec_X_iter         cvec_X_find_in(cvec_X_iter i1, cvec_X_iter i2, i_valraw raw);
-cvec_X_value*       cvec_X_get(const cvec_X* self, i_valraw raw);                             // return NULL if not found
+cvec_X_value*       cvec_X_get(const cvec_X* self, i_valraw raw);                            // return NULL if not found
 cvec_X_iter         cvec_X_bsearch(const cvec_X* self, i_valraw raw);
 cvec_X_iter         cvec_X_bsearch_in(cvec_X_iter i1, cvec_X_iter i2, i_valraw raw);
 

@@ -80,7 +80,7 @@ bool          cstr_ends_with_v(cstr s, csview sub);
 ```c
 int           csview_compare(const csview* x, const csview* y);
 bool          csview_equalto(const csview* x, const csview* y);
-uint64_t      csview_hash(const csview* x, ...);
+uint64_t      csview_hash(const csview* x, size_t dummy);
 ```
 ## Types
 
