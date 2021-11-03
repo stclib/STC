@@ -78,7 +78,10 @@ STC_INLINE size_t _cx_memb(_size)(_cx_self arr)
 STC_INLINE _cx_value* _cx_memb(_data)(_cx_self* self)
     { return **self->data; }
 
-STC_INLINE _cx_value* _cx_memb(_at)(_cx_self* self, size_t x, size_t y, size_t z)
+STC_INLINE _cx_value* _cx_memb(_elem)(_cx_self* self, size_t x, size_t y, size_t z)
+    { return **self->data + self->zdim*(self->ydim*x + y) + z; }
+
+STC_INLINE const _cx_value* _cx_memb(_at)(const _cx_self* self, size_t x, size_t y, size_t z)
     { return **self->data + self->zdim*(self->ydim*x + y) + z; }
 
 STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {

@@ -53,10 +53,10 @@ int main() {
         cmap_map_insert(&myMap, cstr_from(strKey), listMap);
 
         // Access the data entry
-        cmap_lst* mapL = &cmap_map_find(&myMap, strKey).ref->second;
-        clist_arr* lstA = &cmap_lst_find(mapL, tableKey).ref->second;
-        cstack_f arr = *clist_arr_back(lstA);
-        printf("value (%d) is: %f\n", x, arr.data[x]);
+        const cmap_lst* mapL = cmap_map_at(&myMap, strKey);
+        const clist_arr* lstA = cmap_lst_at(mapL, tableKey);
+        const cstack_f* arr = clist_arr_back(lstA);
+        printf("value (%d) is: %f\n", x, *cstack_f_at(arr, x));
 
         stk.data[x] = 1.41421356f; // change the value in array
     }

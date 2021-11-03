@@ -33,7 +33,8 @@ void                carr2_X_del(carr2_X* self);
 
 size_t              carr2_X_size(carr2_X arr);
 i_val*              carr2_X_data(carr2_X* self);          // access storage data
-i_val*              carr2_X_at(carr2_X* self, size_t x, size_t y);
+i_val*              carr2_X_elem(carr2_X* self, size_t x, size_t y);
+const i_val*        carr2_X_at(const carr2_X* self, size_t x, size_t y);
 
 carr2_X_iter        carr2_X_begin(const carr2_X* self);
 carr2_X_iter        carr2_X_end(const carr2_X* self);
@@ -46,12 +47,13 @@ carr3_X             carr3_X_with_values(size_t xdim, size_t ydim, size_t zdim, i
 carr3_X             carr3_X_with_storage(size_t xdim, size_t ydim, size_t zdim, i_val* array);
 carr3_X             carr3_X_clone(carr3_X arr);
 void                carr3_X_copy(carr3_X* self, carr3_X other);
-i_val*              carr3_X_release(carr3_X* self);       // release storage (not freed)
+i_val*              carr3_X_release(carr3_X* self);                               // release storage (not freed)
 void                carr3_X_del(carr3_X* self);
 
 size_t              carr3_X_size(carr3_X arr);
-i_val*              carr3_X_data(carr3_X* self);          // access storage data
-i_val*              carr3_X_at(carr3_X* self, size_t x, size_t y, size_t z);
+i_val*              carr3_X_data(carr3_X* self);                                  // storage data
+i_val*              carr3_X_elem(carr3_X* self, size_t x, size_t y, size_t z);
+const i_val*        carr3_X_at(const carr3_X* self, size_t x, size_t y, size_t z);
 
 carr3_X_iter        carr3_X_begin(const carr3_X* self);
 carr3_X_iter        carr3_X_end(const carr3_X* self);
