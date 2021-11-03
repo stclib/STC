@@ -117,7 +117,7 @@ cx_MAP_ONLY(
         return _cx_memb(_insert_or_assign)(self, key, mapped);
     }
 
-    STC_INLINE _cx_mapped*
+    STC_INLINE const _cx_mapped*
     _cx_memb(_at)(const _cx_self* self, i_keyraw rkey) {
         chash_bucket_t b = _cx_memb(_bucket_)(self, &rkey);
         assert(self->_hashx[b.idx]);
@@ -169,12 +169,16 @@ _cx_memb(_find)(const _cx_self* self, i_keyraw rkey) {
     return c_make(_cx_iter){self->table+idx, self->_hashx+idx};
 }
 
-STC_INLINE _cx_value*
+STC_INLINE const _cx_value*
 _cx_memb(_get)(const _cx_self* self, i_keyraw rkey) {
     _cx_size idx;
     return self->size && self->_hashx[idx = _cx_memb(_bucket_)(self, &rkey).idx] ?
            self->table + idx : NULL;
 }
+
+STC_INLINE _cx_value*
+_cx_memb(_mutget)(const _cx_self* self, i_keyraw rkey)
+    { return (_cx_value*) _cx_memb(_get)(self, rkey); }
 
 STC_INLINE _cx_iter
 _cx_memb(_begin)(const _cx_self* self) {

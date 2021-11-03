@@ -35,13 +35,14 @@ void                cset_X_shrink_to_fit(cset_X* self);
 void                cset_X_swap(cset_X* a, cset_X* b);
 void                cset_X_del(cset_X* self);                                                // destructor
 
-bool                cset_X_empty(cset_X set);
 size_t              cset_X_size(cset_X set);                                                 // num. of allocated buckets
 size_t              cset_X_capacity(cset_X set);                                             // buckets * max_load_factor
+bool                cset_X_empty(cset_X set);
 size_t              cset_X_bucket_count(cset_X set);
 
 bool                cset_X_contains(const cset_X* self, i_keyraw rkey);
-cset_X_value*       cset_X_get(const cset_X* self, i_keyraw rkey);                           // return NULL if not found
+const cset_X_value* cset_X_get(const cset_X* self, i_keyraw rkey);                           // return NULL if not found
+cset_X_value*       cset_X_mutget(cset_X* self, i_keyraw rkey);                              // mutable get
 cset_X_iter         cset_X_find(const cset_X* self, i_keyraw rkey);
 
 cset_X_result       cset_X_insert(cset_X* self, i_key key);

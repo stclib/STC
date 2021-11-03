@@ -91,7 +91,7 @@ Sample test_stc_unordered_map() {
         stc64_srandom(seed);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
-        cmap_x_value* val;
+        const cmap_x_value* val;
         c_forrange (N) 
             if ((val = cmap_x_get(&con, stc64_random() & mask1)))
                 sum += val->second;

@@ -112,7 +112,7 @@ STC_INLINE void _cx_memb(_pop_back)(_cx_self* self) {
     i_valdel(p);
 }
 
-STC_INLINE _cx_value* _cx_memb(_at)(const _cx_self* self, size_t idx) {
+STC_INLINE const _cx_value* _cx_memb(_at)(const _cx_self* self, size_t idx) {
     assert(idx < cdeq_rep_(self)->size); 
     return self->data + idx;
 }
@@ -175,12 +175,16 @@ _cx_memb(_find)(const _cx_self* self, i_valraw raw) {
     return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), raw);
 }
 
-STC_INLINE _cx_value*
+STC_INLINE const _cx_value*
 _cx_memb(_get)(const _cx_self* self, i_valraw raw) {
     _cx_iter end = _cx_memb(_end)(self);
     _cx_value* val = _cx_memb(_find_in)(_cx_memb(_begin)(self), end, raw).ref;
     return val == end.ref ? NULL : val;
 }
+
+STC_INLINE _cx_value*
+_cx_memb(_mutget)(_cx_self* self, i_valraw raw)
+    { return (_cx_value *) _cx_memb(_get)(self, raw); }
 
 STC_INLINE void
 _cx_memb(_sort_range)(_cx_iter i1, _cx_iter i2,

@@ -166,8 +166,13 @@ _cx_memb(_find)(const _cx_self* self, i_valraw val) {
     return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), val);
 }
 
-STC_INLINE _cx_value*
+STC_INLINE const _cx_value*
 _cx_memb(_get)(const _cx_self* self, i_valraw val) {
+    return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), val).ref;
+}
+
+STC_INLINE _cx_value*
+_cx_memb(_mutget)(_cx_self* self, i_valraw val) {
     return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), val).ref;
 }
 

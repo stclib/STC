@@ -42,15 +42,19 @@ void                csmap_X_copy(csmap_X* self, csmap_X other);
 void                csmap_X_swap(csmap_X* a, csmap_X* b);
 void                csmap_X_del(csmap_X* self);                                                  // destructor
 
-bool                csmap_X_empty(csmap_X map);
 size_t              csmap_X_size(csmap_X map);
+bool                csmap_X_empty(csmap_X map);
 
-bool                csmap_X_contains(const csmap_X* self, i_keyraw rkey);
-csmap_X_mapped*     csmap_X_at(const csmap_X* self, i_keyraw rkey);                              // rkey must be in map.
-csmap_X_value*      csmap_X_get(const csmap_X* self, i_keyraw rkey);                             // return NULL if not found
-csmap_X_iter        csmap_X_lower_bound(const csmap_X* self, i_keyraw rkey);                     // find closest entry >= rkey
-csmap_X_iter        csmap_X_find(const csmap_X* self, i_keyraw rkey);
-csmap_X_value*      csmap_X_find_it(const csmap_X* self, i_keyraw rkey, csmap_X_iter* out);      // return NULL if not found
+const csmap_X_mapped* csmap_X_at(const csmap_X* self, i_keyraw rkey);                            // rkey must be in map.
+const csmap_X_value*  csmap_X_get(const csmap_X* self, i_keyraw rkey);                           // return NULL if not found
+csmap_X_value*        csmap_X_mutget(csmap_X* self, i_keyraw rkey);                              // mutable get
+bool                  csmap_X_contains(const csmap_X* self, i_keyraw rkey);
+csmap_X_iter          csmap_X_find(const csmap_X* self, i_keyraw rkey);
+csmap_X_value*        csmap_X_find_it(const csmap_X* self, i_keyraw rkey, csmap_X_iter* out);    // return NULL if not found
+csmap_X_iter          csmap_X_lower_bound(const csmap_X* self, i_keyraw rkey);                   // find closest entry >= rkey
+
+csmap_X_value*      csmap_X_front(const csmap_X* self);
+csmap_X_value*      csmap_X_back(const csmap_X* self);
 
 csmap_X_result      csmap_X_insert(csmap_X* self, i_key key, i_val mapped);                      // no change if key in map
 csmap_X_result      csmap_X_insert_or_assign(csmap_X* self, i_key key, i_val mapped);            // always update mapped

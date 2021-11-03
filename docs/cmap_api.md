@@ -49,15 +49,16 @@ void                cmap_X_shrink_to_fit(cmap_X* self);
 void                cmap_X_swap(cmap_X* a, cmap_X* b);
 void                cmap_X_del(cmap_X* self);                                                 // destructor
 
-bool                cmap_X_empty(cmap_X map);
 size_t              cmap_X_size(cmap_X map);
 size_t              cmap_X_capacity(cmap_X map);                                              // buckets * max_load_factor
+bool                cmap_X_empty(cmap_X map);
 size_t              cmap_X_bucket_count(cmap_X map);                                          // num. of allocated buckets
 
-bool                cmap_X_contains(const cmap_X* self, i_keyraw rkey);
-cmap_X_mapped*      cmap_X_at(const cmap_X* self, i_keyraw rkey);                             // rkey must be in map.
-cmap_X_value*       cmap_X_get(const cmap_X* self, i_keyraw rkey);                            // return NULL if not found
-cmap_X_iter         cmap_X_find(const cmap_X* self, i_keyraw rkey);
+const cmap_X_mapped* cmap_X_at(const cmap_X* self, i_keyraw rkey);                            // rkey must be in map.
+const cmap_X_value*  cmap_X_get(const cmap_X* self, i_keyraw rkey);                           // const get
+cmap_X_value*        cmap_X_mutget(cmap_X* self, i_keyraw rkey);                              // mutable get
+bool                 cmap_X_contains(const cmap_X* self, i_keyraw rkey);
+cmap_X_iter          cmap_X_find(const cmap_X* self, i_keyraw rkey);                          // find element
 
 cmap_X_result       cmap_X_insert(cmap_X* self, i_key key, i_val mapped);                     // no change if key in map
 cmap_X_result       cmap_X_insert_or_assign(cmap_X* self, i_key key, i_val mapped);           // always update mapped

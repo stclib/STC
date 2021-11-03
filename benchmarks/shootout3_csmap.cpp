@@ -179,7 +179,7 @@ static void ins_and_access_csmap_i(picobench::state& s)
     picobench::scope scope(s);
     c_forrange (s.iterations()) {
         result += ++csmap_i_emplace(&map, stc64_random() & mask, 0).ref->second;
-        csmap_i_value* val = csmap_i_get(&map, stc64_random() & mask);
+        const csmap_i_value* val = csmap_i_get(&map, stc64_random() & mask);
         if (val) csmap_i_erase(&map, val->first);
     }
     s.set_result(result + csmap_i_size(map));

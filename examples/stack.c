@@ -11,9 +11,8 @@
 #include <stc/cstack.h>
 
 int main() {
-    cstack_i stack = cstack_i_init();
-    cstack_c chars = cstack_c_init();
-    c_autodefer (cstack_i_del(&stack), cstack_c_del(&chars))
+    c_auto (cstack_i, stack)
+    c_auto (cstack_c, chars)
     {
         c_forrange (i, int, 101)
             cstack_i_push(&stack, i*i);

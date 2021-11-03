@@ -30,14 +30,15 @@ void                csset_X_copy(csset_X* self, csset_X other);
 void                csset_X_swap(csset_X* a, csset_X* b);
 void                csset_X_del(csset_X* self);                                               // destructor
 
-bool                csset_X_empty(csset_X set);
 size_t              csset_X_size(csset_X set);
+bool                csset_X_empty(csset_X set);
 
-bool                csset_X_contains(const csset_X* self, i_keyraw rkey);
-csset_X_value*      csset_X_get(const csset_X* self, i_keyraw rkey);                          // return NULL if not found
-csset_X_iter        csset_X_lower_bound(const csset_X* self, i_keyraw rkey);                  // find closest entry >= rkey
-csset_X_iter        csset_X_find(const csset_X* self, i_keyraw rkey);
-csset_X_value*      csset_X_find_it(const csset_X* self, i_keyraw rkey, csset_X_iter* out);   // return NULL if not found
+const csset_X_value* csset_X_get(const csset_X* self, i_keyraw rkey);                         // const get
+csset_X_value*       csset_X_mutget(csset_X* self, i_keyraw rkey);                            // return NULL if not found
+bool                 csset_X_contains(const csset_X* self, i_keyraw rkey);
+csset_X_iter         csset_X_find(const csset_X* self, i_keyraw rkey);
+csset_X_value*       csset_X_find_it(const csset_X* self, i_keyraw rkey, csset_X_iter* out);  // return NULL if not found
+csset_X_iter         csset_X_lower_bound(const csset_X* self, i_keyraw rkey);                 // find closest entry >= rkey
 
 csset_X_result      csset_X_insert(csset_X* self, i_key key);
 csset_X_result      csset_X_emplace(csset_X* self, i_keyraw rkey);

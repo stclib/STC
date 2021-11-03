@@ -36,8 +36,9 @@ void                cstack_X_del(cstack_X* self);       // destructor
 size_t              cstack_X_size(cstack_X st);
 size_t              cstack_X_capacity(cstack_X st);
 bool                cstack_X_empty(cstack_X st);
-cstack_X_value*     cstack_X_top(const cstack_X* self);
-cstack_X_value*     cstack_X_at(const cstack_X* self, size_t idx);
+
+cstack_X_value*       cstack_X_top(const cstack_X* self);
+const cstack_X_value* cstack_X_at(const cstack_X* self, size_t idx);
 
 cstack_X_value*     cstack_X_push(cstack_X* self, i_val value);
 cstack_X_value*     cstack_X_emplace(cstack_X* self, i_valraw raw);

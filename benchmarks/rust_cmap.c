@@ -27,7 +27,6 @@ int main() {
         c_forrange (n) {
             uint64_t key = romu_trio(rng) & mask;
             cmap_u64_insert(&m, key, 0).ref->second += 1;
-            
         }
         printf("insert  : %zums  \tsize : %zu\n", (clock() - now)/ms, cmap_u64_size(m));
         now = clock();
