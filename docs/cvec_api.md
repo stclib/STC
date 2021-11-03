@@ -47,7 +47,7 @@ size_t              cvec_X_capacity(cvec_X vec);
 
 const cvec_X_value* cvec_X_at(const cvec_X* self, size_t idx);
 const cvec_X_value* cvec_X_get(const cvec_X* self, i_valraw raw);                            // return NULL if not found
-cvec_X_value*       cvec_X_getmut(cvec_X* self, i_valraw raw);                               // get mutable value
+cvec_X_value*       cvec_X_get_mut(cvec_X* self, i_valraw raw);                               // get mutable value
 cvec_X_iter         cvec_X_find(const cvec_X* self, i_valraw raw);
 cvec_X_iter         cvec_X_find_in(cvec_X_iter i1, cvec_X_iter i2, i_valraw raw);
 cvec_X_iter         cvec_X_bsearch(const cvec_X* self, i_valraw raw);

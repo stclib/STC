@@ -22,6 +22,7 @@ fn main() {
         let key: u64 = romu_trio(&mut rng) & mask;
         *m.entry(key).or_insert(0) += 1;
     }
+
     println!("insert  : {}ms  \tsize : {}", now.elapsed().as_millis(), m.len());
     let now = Instant::now();
     let mut sum = 0;

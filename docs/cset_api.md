@@ -42,7 +42,7 @@ size_t              cset_X_bucket_count(cset_X set);
 
 bool                cset_X_contains(const cset_X* self, i_keyraw rkey);
 const cset_X_value* cset_X_get(const cset_X* self, i_keyraw rkey);                           // return NULL if not found
-cset_X_value*       cset_X_getmut(cset_X* self, i_keyraw rkey);                              // mutable get
+cset_X_value*       cset_X_get_mut(cset_X* self, i_keyraw rkey);                             // mutable get
 cset_X_iter         cset_X_find(const cset_X* self, i_keyraw rkey);
 
 cset_X_result       cset_X_insert(cset_X* self, i_key key);

@@ -183,7 +183,7 @@ _cx_memb(_get)(const _cx_self* self, i_valraw raw) {
 }
 
 STC_INLINE _cx_value*
-_cx_memb(_getmut)(_cx_self* self, i_valraw raw)
+_cx_memb(_get_mut)(_cx_self* self, i_valraw raw)
     { return (_cx_value *) _cx_memb(_get)(self, raw); }
 
 STC_INLINE void

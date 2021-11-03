@@ -34,7 +34,7 @@ size_t               csset_X_size(csset_X set);
 bool                 csset_X_empty(csset_X set);
 
 const csset_X_value* csset_X_get(const csset_X* self, i_keyraw rkey);                         // const get
-csset_X_value*       csset_X_getmut(csset_X* self, i_keyraw rkey);                            // return NULL if not found
+csset_X_value*       csset_X_get_mut(csset_X* self, i_keyraw rkey);                           // return NULL if not found
 bool                 csset_X_contains(const csset_X* self, i_keyraw rkey);
 csset_X_iter         csset_X_find(const csset_X* self, i_keyraw rkey);
 csset_X_value*       csset_X_find_it(const csset_X* self, i_keyraw rkey, csset_X_iter* out);  // return NULL if not found
