@@ -76,11 +76,10 @@ STC_INLINE size_t _cx_memb(_size)(_cx_self arr)
 STC_INLINE _cx_value *_cx_memb(_data)(_cx_self* self)
     { return *self->data; }
 
-STC_INLINE _cx_value *_cx_memb(_elem)(_cx_self* self, size_t x, size_t y)
-    { return *self->data + self->ydim*x + y; }
-
-STC_INLINE const _cx_value *_cx_memb(_at)(const _cx_self* self, size_t x, size_t y)
-    { return *self->data + self->ydim*x + y; }
+STC_INLINE const _cx_value *_cx_memb(_at)(const _cx_self* self, size_t x, size_t y) {
+    assert(x < self->xdim && y < self->ydim);
+    return *self->data + self->ydim*x + y;
+}
 
 STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     if (self->data == other.data) return;
