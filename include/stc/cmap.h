@@ -177,7 +177,7 @@ _cx_memb(_get)(const _cx_self* self, i_keyraw rkey) {
 }
 
 STC_INLINE _cx_value*
-_cx_memb(_mutget)(const _cx_self* self, i_keyraw rkey)
+_cx_memb(_getmut)(const _cx_self* self, i_keyraw rkey)
     { return (_cx_value*) _cx_memb(_get)(self, rkey); }
 
 STC_INLINE _cx_iter

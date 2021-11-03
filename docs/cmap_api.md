@@ -56,7 +56,7 @@ size_t              cmap_X_bucket_count(cmap_X map);                            
 
 const cmap_X_mapped* cmap_X_at(const cmap_X* self, i_keyraw rkey);                            // rkey must be in map.
 const cmap_X_value*  cmap_X_get(const cmap_X* self, i_keyraw rkey);                           // const get
-cmap_X_value*        cmap_X_mutget(cmap_X* self, i_keyraw rkey);                              // mutable get
+cmap_X_value*        cmap_X_getmut(cmap_X* self, i_keyraw rkey);                              // mutable get
 bool                 cmap_X_contains(const cmap_X* self, i_keyraw rkey);
 cmap_X_iter          cmap_X_find(const cmap_X* self, i_keyraw rkey);                          // find element
 
