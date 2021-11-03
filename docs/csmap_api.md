@@ -34,16 +34,16 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 ## Methods
 
 ```c
-csmap_X             csmap_X_init(void);
-csmap_X             csmap_X_clone(csmap_x map);
+csmap_X               csmap_X_init(void);
+csmap_X               csmap_X_clone(csmap_x map);
 
-void                csmap_X_clear(csmap_X* self);
-void                csmap_X_copy(csmap_X* self, csmap_X other);
-void                csmap_X_swap(csmap_X* a, csmap_X* b);
-void                csmap_X_del(csmap_X* self);                                                  // destructor
+void                  csmap_X_clear(csmap_X* self);
+void                  csmap_X_copy(csmap_X* self, csmap_X other);
+void                  csmap_X_swap(csmap_X* a, csmap_X* b);
+void                  csmap_X_del(csmap_X* self);                                                // destructor
 
-size_t              csmap_X_size(csmap_X map);
-bool                csmap_X_empty(csmap_X map);
+size_t                csmap_X_size(csmap_X map);
+bool                  csmap_X_empty(csmap_X map);
 
 const csmap_X_mapped* csmap_X_at(const csmap_X* self, i_keyraw rkey);                            // rkey must be in map.
 const csmap_X_value*  csmap_X_get(const csmap_X* self, i_keyraw rkey);                           // return NULL if not found
@@ -53,27 +53,27 @@ csmap_X_iter          csmap_X_find(const csmap_X* self, i_keyraw rkey);
 csmap_X_value*        csmap_X_find_it(const csmap_X* self, i_keyraw rkey, csmap_X_iter* out);    // return NULL if not found
 csmap_X_iter          csmap_X_lower_bound(const csmap_X* self, i_keyraw rkey);                   // find closest entry >= rkey
 
-csmap_X_value*      csmap_X_front(const csmap_X* self);
-csmap_X_value*      csmap_X_back(const csmap_X* self);
+csmap_X_value*        csmap_X_front(const csmap_X* self);
+csmap_X_value*        csmap_X_back(const csmap_X* self);
 
-csmap_X_result      csmap_X_insert(csmap_X* self, i_key key, i_val mapped);                      // no change if key in map
-csmap_X_result      csmap_X_insert_or_assign(csmap_X* self, i_key key, i_val mapped);            // always update mapped
-csmap_X_result      csmap_X_put(csmap_X* self, i_key key, i_val mapped);                         // same as insert_or_assign()
+csmap_X_result        csmap_X_insert(csmap_X* self, i_key key, i_val mapped);                    // no change if key in map
+csmap_X_result        csmap_X_insert_or_assign(csmap_X* self, i_key key, i_val mapped);          // always update mapped
+csmap_X_result        csmap_X_put(csmap_X* self, i_key key, i_val mapped);                       // same as insert_or_assign()
 
-csmap_X_result      csmap_X_emplace(csmap_X* self, i_keyraw rkey, i_valraw rmapped);             // no change if rkey in map
-csmap_X_result      csmap_X_emplace_or_assign(csmap_X* self, i_keyraw rkey, i_valraw rmapped);   // always update rmapped
+csmap_X_result        csmap_X_emplace(csmap_X* self, i_keyraw rkey, i_valraw rmapped);           // no change if rkey in map
+csmap_X_result        csmap_X_emplace_or_assign(csmap_X* self, i_keyraw rkey, i_valraw rmapped); // always update rmapped
 
-size_t              csmap_X_erase(csmap_X* self, i_keyraw rkey);
-csmap_X_iter        csmap_X_erase_at(csmap_X* self, csmap_X_iter it);                            // returns iter after it
-csmap_X_iter        csmap_X_erase_range(csmap_X* self, csmap_X_iter it1, csmap_X_iter it2);      // returns updated it2
+size_t                csmap_X_erase(csmap_X* self, i_keyraw rkey);
+csmap_X_iter          csmap_X_erase_at(csmap_X* self, csmap_X_iter it);                          // returns iter after it
+csmap_X_iter          csmap_X_erase_range(csmap_X* self, csmap_X_iter it1, csmap_X_iter it2);    // returns updated it2
 
-csmap_X_iter        csmap_X_begin(const csmap_X* self);
-csmap_X_iter        csmap_X_end(const csmap_X* self);
-void                csmap_X_next(csmap_X_iter* iter);
-csmap_X_iter        csmap_X_advance(csmap_X_iter it, size_t n);
+csmap_X_iter          csmap_X_begin(const csmap_X* self);
+csmap_X_iter          csmap_X_end(const csmap_X* self);
+void                  csmap_X_next(csmap_X_iter* iter);
+csmap_X_iter          csmap_X_advance(csmap_X_iter it, size_t n);
 
-csmap_X_value       csmap_X_value_clone(csmap_X_value val);
-csmap_X_rawvalue    csmap_X_value_toraw(csmap_X_value* pval);
+csmap_X_value         csmap_X_value_clone(csmap_X_value val);
+csmap_X_rawvalue      csmap_X_value_toraw(csmap_X_value* pval);
 ```
 ## Types
 
