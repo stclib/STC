@@ -22,11 +22,12 @@ template<typename C> inline void destroy_me(C& c) { C().swap(c); }
 #define i_tag ii
 #include <stc/cmap.h>
 
-KHASH_MAP_INIT_INT64(ii, int64_t)
-
-
 size_t seed;
 static const float max_load_factor = 0.77f;
+
+KHASH_MAP_INIT_INT64(ii, int64_t)
+template <class K, class V> using robin_hood_flat_map = robin_hood::unordered_flat_map<
+                                    K, V, robin_hood::hash<K>, std::equal_to<K>, 77>;
 
 stc64_t rng;
 #define SEED(s) rng = stc64_init(seed)
@@ -38,7 +39,7 @@ stc64_t rng;
 #define CMAP_PUT(X, key, val)     cmap_##X##_emplace_or_assign(&map, key, val).ref->second
 #define CMAP_EMPLACE(X, key, val) cmap_##X##_emplace(&map, key, val).ref->second
 #define CMAP_ERASE(X, key)        cmap_##X##_erase(&map, key)
-#define CMAP_FIND(X, key)         cmap_##X##_contains(map, key)
+#define CMAP_FIND(X, key)         cmap_##X##_contains(&map, key)
 #define CMAP_FOR(X, i)            c_foreach (i, cmap_##X, map)
 #define CMAP_ITEM(X, i)           i.ref->second
 #define CMAP_SIZE(X)              cmap_##X##_size(map)
@@ -59,7 +60,7 @@ stc64_t rng;
 #define UMAP_SETUP(X, Key, Value) std::unordered_map<Key, Value> map; map.max_load_factor(max_load_factor)
 #define UMAP_PUT(X, key, val)     (map[key] = val)
 #define UMAP_EMPLACE(X, key, val) map.emplace(key, val).first->second
-#define UMAP_FIND(X, key)         (map.find(key) != map.end())
+#define UMAP_FIND(X, key)         int(map.find(key) != map.end())
 #define UMAP_ERASE(X, key)        map.erase(key)
 #define UMAP_FOR(X, i)            for (auto i: map)
 #define UMAP_ITEM(X, i)           i.second
@@ -67,18 +68,6 @@ stc64_t rng;
 #define UMAP_BUCKETS(X)           map.bucket_count()
 #define UMAP_CLEAR(X)             map.clear()
 #define UMAP_DTOR(X)              destroy_me(map)
-
-#define BMAP_SETUP(X, Key, Value) ska::bytell_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
-#define BMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
-#define BMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
-#define BMAP_FIND(X, key)         UMAP_FIND(X, key)
-#define BMAP_ERASE(X, key)        UMAP_ERASE(X, key)
-#define BMAP_FOR(X, i)            UMAP_FOR(X, i)
-#define BMAP_ITEM(X, i)           UMAP_ITEM(X, i)
-#define BMAP_SIZE(X)              UMAP_SIZE(X)
-#define BMAP_BUCKETS(X)           UMAP_BUCKETS(X)
-#define BMAP_CLEAR(X)             UMAP_CLEAR(X)
-#define BMAP_DTOR(X)              UMAP_DTOR(X)
 
 #define FMAP_SETUP(X, Key, Value) ska::flat_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
 #define FMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
@@ -104,7 +93,8 @@ stc64_t rng;
 #define HMAP_CLEAR(X)             UMAP_CLEAR(X)
 #define HMAP_DTOR(X)              UMAP_DTOR(X)
 
-#define RMAP_SETUP(X, Key, Value) robin_hood::unordered_map<Key, Value> map
+//#define RMAP_SETUP(X, Key, Value) robin_hood::unordered_map<Key, Value> map
+#define RMAP_SETUP(X, Key, Value) robin_hood_flat_map<Key, Value> map
 #define RMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
 #define RMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
 #define RMAP_FIND(X, key)         UMAP_FIND(X, key)
@@ -130,23 +120,24 @@ stc64_t rng;
 
 enum {
     RR =  27,
-    FAC = 3,
-    N0 = 10000000 * FAC,
-    N1 = 10000000 * FAC,
-    N2 = 10000000 * FAC,
-    N3 = 10000000 * FAC,
-    N4 = 10000000 * FAC,
+    N = 10000000,
+    N0 = N * 4,
+    N1 = N * 2,
+    N2 = N * 4,
+    N3 = N * 6,
+    N4 = N * 8,
+    N5 = N * 6,
 };
 int rr = RR;
 
 
-#define MAP_TEST0(M, X) \
+#define MAP_TEST0(M, X, n) \
 { \
     M##_SETUP(X, int64_t, int64_t); \
     uint64_t checksum = 0; \
     SEED(seed); \
     clock_t difference, before = clock(); \
-    for (size_t i = 0; i < N0; ++i) { \
+    for (size_t i = 0; i < n; ++i) { \
         checksum += ++ M##_EMPLACE(X, RAND(rr), i); \
     } \
     difference = clock() - before; \
@@ -155,13 +146,13 @@ int rr = RR;
     M##_DTOR(X); \
 }
 
-#define MAP_TEST1(M, X) \
+#define MAP_TEST1(M, X, n) \
 { \
     M##_SETUP(X, int64_t, int64_t); \
     uint64_t checksum = 0, erased = 0; \
     SEED(seed); \
     clock_t difference, before = clock(); \
-    for (size_t i = 0; i < N1; ++i) { \
+    for (size_t i = 0; i < n; ++i) { \
         checksum += ++ M##_EMPLACE(X, RAND(rr), i); \
         erased += M##_ERASE(X, RAND(rr)); \
     } \
@@ -171,14 +162,14 @@ int rr = RR;
     M##_DTOR(X); \
 }
 
-#define MAP_TEST2(M, X) \
+#define MAP_TEST2(M, X, n) \
 { \
     M##_SETUP(X, int64_t, int64_t); \
     size_t erased = 0; \
     clock_t difference, before = clock(); \
-    for (size_t i = 0; i < N2; ++i) \
+    for (size_t i = 0; i < n; ++i) \
         M##_PUT(X, i, i); \
-    for (size_t i = 0; i < N2; ++i) \
+    for (size_t i = 0; i < n; ++i) \
         erased += M##_ERASE(X, i); \
     difference = clock() - before; \
     printf(#M ": time: %5.02f, erased %zu, size: %zu, buckets: %8zu\n", \
@@ -186,16 +177,17 @@ int rr = RR;
     M##_DTOR(X); \
 }
 
-#define MAP_TEST3(M, X) \
+#define MAP_TEST3(M, X, n) \
 { \
     M##_SETUP(X, int64_t, int64_t); \
     size_t erased = 0; \
-    clock_t difference, before = clock(); \
+    clock_t difference, before; \
     SEED(seed); \
-    for (size_t i = 0; i < N3; ++i) \
+    for (size_t i = 0; i < n; ++i) \
         M##_PUT(X, RAND(rr), i); \
     SEED(seed); \
-    for (size_t i = 0; i < N3; ++i) \
+    before = clock(); \
+    for (size_t i = 0; i < n; ++i) \
         erased += M##_ERASE(X, RAND(rr)); \
     difference = clock() - before; \
     printf(#M ": time: %5.02f, erased %zu, size: %zu, buckets: %8zu\n", \
@@ -203,12 +195,12 @@ int rr = RR;
     M##_DTOR(X); \
 }
 
-#define MAP_TEST4(M, X) \
+#define MAP_TEST4(M, X, n) \
 { \
     M##_SETUP(X, int64_t, int64_t); \
     size_t sum = 0; \
     SEED(seed); \
-    for (size_t i = 0; i < N4; ++i) \
+    for (size_t i = 0; i < n; ++i) \
         M##_PUT(X, RAND(rr), i); \
     clock_t difference, before = clock(); \
     for (int k=0; k<5; k++) M##_FOR (X, i) \
@@ -219,14 +211,35 @@ int rr = RR;
     M##_DTOR(X); \
 }
 
+#define MAP_TEST5(M, X, n) \
+{ \
+    M##_SETUP(X, int64_t, int64_t); \
+    size_t found = 0; \
+    clock_t difference, before; \
+    SEED(seed); \
+    for (size_t i = 0; i < n; ++i) \
+        M##_PUT(X, RAND(rr), i); \
+    before = clock(); \
+    for (size_t i = 0; i < n/2; ++i) \
+        found += M##_FIND(X, RAND(rr)); \
+    SEED(seed); \
+    for (size_t i = 0; i < n/2; ++i) \
+        found += M##_FIND(X, RAND(rr)); \
+    difference = clock() - before; \
+    printf(#M ": time: %5.02f, found %zu, size: %zu, buckets: %8zu\n", \
+           (float) difference / CLOCKS_PER_SEC, found, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
+    M##_DTOR(X); \
+}
+
+
 #ifdef __cplusplus
-#define RUN_TEST(n) MAP_TEST##n(CMAP, ii) MAP_TEST##n(KMAP, ii) MAP_TEST##n(UMAP, ii) MAP_TEST##n(PMAP, ii) \
-                    MAP_TEST##n(BMAP, ii) MAP_TEST##n(FMAP, ii) MAP_TEST##n(RMAP, ii) /*MAP_TEST##n(HMAP, ii)*/
-#define RUNX_TEST(n) MAP_TEST##n(CMAP, ii) /*MAP_TEST##n(KMAP, ii)*/ MAP_TEST##n(UMAP, ii) MAP_TEST##n(PMAP, ii) \
-                    MAP_TEST##n(BMAP, ii) MAP_TEST##n(FMAP, ii) MAP_TEST##n(RMAP, ii) /*MAP_TEST##n(HMAP, ii)*/
+#define RUN_TEST(n) MAP_TEST##n(CMAP, ii, N##n) MAP_TEST##n(KMAP, ii, N##n) MAP_TEST##n(UMAP, ii, N##n) MAP_TEST##n(PMAP, ii, N##n) \
+                    MAP_TEST##n(FMAP, ii, N##n) MAP_TEST##n(RMAP, ii, N##n)
+#define RUNX_TEST(n) MAP_TEST##n(CMAP, ii, N##n) MAP_TEST##n(UMAP, ii, N##n) MAP_TEST##n(PMAP, ii, N##n) \
+                    MAP_TEST##n(FMAP, ii, N##n) MAP_TEST##n(RMAP, ii, N##n)
 #else
-#define RUN_TEST(n) MAP_TEST##n(CMAP, ii) MAP_TEST##n(KMAP, ii)
-#define RUNX_TEST(n) MAP_TEST##n(CMAP, ii)
+#define RUN_TEST(n) MAP_TEST##n(CMAP, ii, N##n) MAP_TEST##n(KMAP, ii, N##n)
+#define RUNX_TEST(n) MAP_TEST##n(CMAP, ii, N##n)
 #endif
 
 
@@ -235,26 +248,30 @@ int main(int argc, char* argv[])
     rr = argc == 2 ? atoi(argv[1]) : RR;
     seed = time(NULL);
 
-    printf("\nRandom keys are in range [0, 2^%d), seed = %zu:\n", rr, seed);
-    printf("CMAP = STC cmap\n"
-           "KMAP = Klib khash\n"
+    printf("\nUnordered hash map shootout\n\n");
+    printf("CMAP = https://github.com/tylov/STC\n"
+           "KMAP = https://github.com/attractivechaos/klib\n"
            "UMAP = std::unordered_map\n"
-           "PMAP = phmap::flat_hash_map\n"
-           "BMAP = ska::bytell_hash_map\n"
-           "FMAP = ska::flat_hash_map\n"
-           "RMAP = robin_hood::unordered_map\n");
-    printf("\nUnordered maps: Insert %d random keys:\n", N0);
+           "PMAP = https://github.com/greg7mdp/parallel-hashmap\n"
+           "FMAP = https://github.com/skarupke/flat_hash_map\n"
+           "RMAP = https://github.com/martinus/robin-hood-hashing\n");
+           
+    printf("\nRandom keys are in range [0, 2^%d), seed = %zu:\n", rr, seed);
+    printf("\nN=%d. Insert random keys:\n", N0);
     RUN_TEST(0)
 
-    printf("\nUnordered maps: %d insert random key + try to remove another random key:\n", N1);
+    printf("\nN=%d. Insert random key + try to remove another random key:\n", N1);
     RUN_TEST(1)
 
-    printf("\nUnordered maps: Insert %d sequential keys, then remove them in same order:\n", N2);
+    printf("\nN=%d. Insert sequential keys, then remove them in same order:\n", N2);
     RUN_TEST(2)
 
-    printf("\nUnordered maps: Insert %d random keys, then remove them in same order:\n", N3);
+    printf("\nN=%d. Remove random keys:\n", N3);
     RUN_TEST(3)
 
-    printf("\nUnordered maps: Iterate %d random keys:\n", N4);
+    printf("\nN=%d. Iterate random keys:\n", N4);
     RUNX_TEST(4)
+
+    printf("\nN=%d. Lookup random keys:\n", N5);
+    RUN_TEST(5)
 }
