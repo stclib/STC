@@ -67,7 +67,7 @@ stc64_t rng;
 #define UMAP_SIZE(X)              map.size()
 #define UMAP_BUCKETS(X)           map.bucket_count()
 #define UMAP_CLEAR(X)             map.clear()
-#define UMAP_DTOR(X)              destroy_me(map)
+#define UMAP_DTOR(X)              ((void)0) // destroy_me(map)
 
 #define FMAP_SETUP(X, Key, Value) ska::flat_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
 #define FMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
@@ -233,13 +233,13 @@ int rr = RR;
 
 
 #ifdef __cplusplus
-#define RUN_TEST(n) MAP_TEST##n(CMAP, ii, N##n) MAP_TEST##n(KMAP, ii, N##n) MAP_TEST##n(UMAP, ii, N##n) MAP_TEST##n(PMAP, ii, N##n) \
-                    MAP_TEST##n(FMAP, ii, N##n) MAP_TEST##n(RMAP, ii, N##n)
-#define RUNX_TEST(n) MAP_TEST##n(CMAP, ii, N##n) MAP_TEST##n(UMAP, ii, N##n) MAP_TEST##n(PMAP, ii, N##n) \
-                    MAP_TEST##n(FMAP, ii, N##n) MAP_TEST##n(RMAP, ii, N##n)
+#define RUN_TEST(n) MAP_TEST##n(KMAP, ii, N##n) MAP_TEST##n(CMAP, ii, N##n) MAP_TEST##n(PMAP, ii, N##n) \
+                    MAP_TEST##n(FMAP, ii, N##n) MAP_TEST##n(RMAP, ii, N##n) MAP_TEST##n(UMAP, ii, N##n) 
+#define ITR_TEST(n) MAP_TEST##n(CMAP, ii, N##n)                             MAP_TEST##n(PMAP, ii, N##n) \
+                    MAP_TEST##n(FMAP, ii, N##n) MAP_TEST##n(RMAP, ii, N##n) MAP_TEST##n(UMAP, ii, N##n)
 #else
-#define RUN_TEST(n) MAP_TEST##n(CMAP, ii, N##n) MAP_TEST##n(KMAP, ii, N##n)
-#define RUNX_TEST(n) MAP_TEST##n(CMAP, ii, N##n)
+#define RUN_TEST(n) MAP_TEST##n(KMAP, ii, N##n) MAP_TEST##n(CMAP, ii, N##n)
+#define ITR_TEST(n) MAP_TEST##n(CMAP, ii, N##n)
 #endif
 
 
@@ -251,10 +251,10 @@ int main(int argc, char* argv[])
     printf("\nUnordered hash map shootout\n\n");
     printf("CMAP = https://github.com/tylov/STC\n"
            "KMAP = https://github.com/attractivechaos/klib\n"
-           "UMAP = std::unordered_map\n"
            "PMAP = https://github.com/greg7mdp/parallel-hashmap\n"
            "FMAP = https://github.com/skarupke/flat_hash_map\n"
-           "RMAP = https://github.com/martinus/robin-hood-hashing\n");
+           "RMAP = https://github.com/martinus/robin-hood-hashing\n"
+           "UMAP = std::unordered_map\n");
            
     printf("\nRandom keys are in range [0, 2^%d), seed = %zu:\n", rr, seed);
     printf("\nN=%d. Insert random keys:\n", N0);
@@ -270,7 +270,7 @@ int main(int argc, char* argv[])
     RUN_TEST(3)
 
     printf("\nN=%d. Iterate random keys:\n", N4);
-    RUNX_TEST(4)
+    ITR_TEST(4)
 
     printf("\nN=%d. Lookup random keys:\n", N5);
     RUN_TEST(5)
