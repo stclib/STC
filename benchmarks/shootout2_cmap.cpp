@@ -118,18 +118,6 @@ stc64_t rng;
 #define PMAP_CLEAR(X)             UMAP_CLEAR(X)
 #define PMAP_DTOR(X)              UMAP_DTOR(X)
 
-enum {
-    RR =  27,
-    N = 10000000,
-    N0 = N * 4,
-    N1 = N * 2,
-    N2 = N * 4,
-    N3 = N * 6,
-    N4 = N * 8,
-    N5 = N * 6,
-};
-int rr = RR;
-
 
 #define MAP_TEST0(M, X, n) \
 { \
@@ -242,13 +230,28 @@ int rr = RR;
 #define ITR_TEST(n) MAP_TEST##n(CMAP, ii, N##n)
 #endif
 
+enum {
+    RR = 27,
+    NN = 10,
+    NF = 1000000,
+    F0 = 4,
+    F1 = 2,
+    F2 = 4,
+    F3 = 6,
+    F4 = 8,
+    F5 = 6,
+};
+
 
 int main(int argc, char* argv[])
 {
-    rr = argc == 2 ? atoi(argv[1]) : RR;
+    int nn = argc >= 2 ? atoi(argv[1]) : NN;
+    int rr = argc >= 3 ? atoi(argv[2]) : RR;
+    int n = NF * nn;
+    int N0 = n*F0, N1 = n*F1, N2 = n*F2, N3 = n*F3, N4 = n*F4, N5 = n*F5;
     seed = time(NULL);
 
-    printf("\nUnordered hash map shootout\n\n");
+    printf("\nUnordered hash map shootout\nUsage %s [n-base=%d key-bits=%d]\n\n", argv[0], NN, RR);
     printf("CMAP = https://github.com/tylov/STC\n"
            "KMAP = https://github.com/attractivechaos/klib\n"
            "PMAP = https://github.com/greg7mdp/parallel-hashmap\n"
@@ -256,7 +259,7 @@ int main(int argc, char* argv[])
            "RMAP = https://github.com/martinus/robin-hood-hashing\n"
            "UMAP = std::unordered_map\n");
            
-    printf("\nRandom keys are in range [0, 2^%d), seed = %zu:\n", rr, seed);
+    printf("\nN-base = %d. Random keys are in range [0, 2^%d). Seed = %zu:\n", nn, rr, seed);
     printf("\nN=%d. Insert random keys:\n", N0);
     RUN_TEST(0)
 
