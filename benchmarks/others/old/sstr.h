@@ -274,7 +274,7 @@ STC_DEF void sstr_internal_move_(sstr* self, size_t pos1, size_t pos2) {
     sstr_rep_t rep = sstr_rep_(self);
     sstr_size_t newlen = rep.size + pos2 - pos1;
     if (newlen > rep.cap)
-        rep.data = sstr_reserve(self, (rep.size*13 >> 3) + pos2 - pos1);
+        rep.data = sstr_reserve(self, (rep.size*3 >> 1) + pos2 - pos1);
     memmove(&rep.data[pos2], &rep.data[pos1], rep.size - pos1);
     sstr_set_size_(self, newlen);
 }
@@ -368,7 +368,7 @@ STC_DEF void sstr_append_n(sstr* self, const char* str, sstr_size_t n) {
     sstr_rep_t rep = sstr_rep_(self);
     if (rep.size + n > rep.cap) {
         sstr_size_t off = (sstr_size_t)(str - rep.data); /* handle self append */
-        rep.data = sstr_reserve(self, (rep.size*13 >> 3) + n);
+        rep.data = sstr_reserve(self, (rep.size*3 >> 1) + n);
         if (off <= rep.size) str = rep.data + off;
     }
     memcpy(rep.data + rep.size, str, n);
@@ -388,7 +388,7 @@ STC_DEF bool sstr_getdelim(sstr *self, int delim, FILE *fp) {
         }
         if (pos == rep.cap) {
             sstr_set_size_(self, pos);
-            rep.data = sstr_reserve(self, (rep.cap = (rep.cap*13 >> 3) + 16));
+            rep.data = sstr_reserve(self, (rep.cap = (rep.cap*3 >> 1) + 16));
         }
         rep.data[pos++] = (char) c;
         c = fgetc(fp);

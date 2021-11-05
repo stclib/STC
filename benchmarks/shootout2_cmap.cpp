@@ -4,16 +4,21 @@
 #include <stc/cstr.h>
 #include "others/khash.h"
 
+enum {max_load_factor = 77};
+
 #ifdef __cplusplus
 #include <limits>
 #include <unordered_map>
 #include "others/robin_hood.hpp"
 #include "others/skarupke/bytell_hash_map.hpp"
-#include "others/tsl/hopscotch_map.h"
 #include "others/parallel_hashmap/phmap.h"
-template<typename C> inline void destroy_me(C& c) { C().swap(c); }
+template<typename C> inline void std_destroy(C& c) { C().swap(c); }
+
+template <class K, class V> using robin_hood_flat_map = robin_hood::unordered_flat_map<
+                                  K, V, robin_hood::hash<K>, std::equal_to<K>, max_load_factor>;
 #endif
 
+KHASH_MAP_INIT_INT64(ii, int64_t)
 
 // cmap and khash template expansion
 #define i_key int64_t
@@ -22,20 +27,14 @@ template<typename C> inline void destroy_me(C& c) { C().swap(c); }
 #define i_tag ii
 #include <stc/cmap.h>
 
-size_t seed;
-static const float max_load_factor = 0.77f;
-
-KHASH_MAP_INIT_INT64(ii, int64_t)
-template <class K, class V> using robin_hood_flat_map = robin_hood::unordered_flat_map<
-                                    K, V, robin_hood::hash<K>, std::equal_to<K>, 77>;
-
 stc64_t rng;
+size_t seed;
 #define SEED(s) rng = stc64_init(seed)
-#define RAND(N) (stc64_rand(&rng) & ((1 << N) - 1))
+#define RAND(N) (stc64_rand(&rng) & (((uint64_t)1 << N) - 1))
 
 
 #define CMAP_SETUP(X, Key, Value) cmap_##X map = cmap_##X##_init() \
-                                  ; cmap_##X##_max_load_factor(&map, max_load_factor)
+                                  ; cmap_##X##_max_load_factor(&map, max_load_factor/100.0f)
 #define CMAP_PUT(X, key, val)     cmap_##X##_emplace_or_assign(&map, key, val).ref->second
 #define CMAP_EMPLACE(X, key, val) cmap_##X##_emplace(&map, key, val).ref->second
 #define CMAP_ERASE(X, key)        cmap_##X##_erase(&map, key)
@@ -57,7 +56,7 @@ stc64_t rng;
 #define KMAP_CLEAR(X)             kh_clear(ii, map)
 #define KMAP_DTOR(X)              kh_destroy(ii, map)
 
-#define UMAP_SETUP(X, Key, Value) std::unordered_map<Key, Value> map; map.max_load_factor(max_load_factor)
+#define UMAP_SETUP(X, Key, Value) std::unordered_map<Key, Value> map; map.max_load_factor(max_load_factor/100.0f)
 #define UMAP_PUT(X, key, val)     (map[key] = val)
 #define UMAP_EMPLACE(X, key, val) map.emplace(key, val).first->second
 #define UMAP_FIND(X, key)         int(map.find(key) != map.end())
@@ -67,9 +66,9 @@ stc64_t rng;
 #define UMAP_SIZE(X)              map.size()
 #define UMAP_BUCKETS(X)           map.bucket_count()
 #define UMAP_CLEAR(X)             map.clear()
-#define UMAP_DTOR(X)              ((void)0) // destroy_me(map)
+#define UMAP_DTOR(X)              std_destroy(map)
 
-#define FMAP_SETUP(X, Key, Value) ska::flat_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
+#define FMAP_SETUP(X, Key, Value) ska::flat_hash_map<Key, Value> map; map.max_load_factor(max_load_factor/100.0f)
 #define FMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
 #define FMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
 #define FMAP_FIND(X, key)         UMAP_FIND(X, key)
@@ -81,7 +80,7 @@ stc64_t rng;
 #define FMAP_CLEAR(X)             UMAP_CLEAR(X)
 #define FMAP_DTOR(X)              UMAP_DTOR(X)
 
-#define HMAP_SETUP(X, Key, Value) tsl::hopscotch_map<Key, Value> map; map.max_load_factor(max_load_factor)
+#define HMAP_SETUP(X, Key, Value) tsl::hopscotch_map<Key, Value> map; map.max_load_factor(max_load_factor/100.0f)
 #define HMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
 #define HMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
 #define HMAP_FIND(X, key)         UMAP_FIND(X, key)
@@ -106,7 +105,7 @@ stc64_t rng;
 #define RMAP_CLEAR(X)             UMAP_CLEAR(X)
 #define RMAP_DTOR(X)              UMAP_DTOR(X)
 
-#define PMAP_SETUP(X, Key, Value) phmap::flat_hash_map<Key, Value> map; map.max_load_factor(max_load_factor)
+#define PMAP_SETUP(X, Key, Value) phmap::flat_hash_map<Key, Value> map; map.max_load_factor(max_load_factor/100.0f)
 #define PMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
 #define PMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
 #define PMAP_FIND(X, key)         UMAP_FIND(X, key)

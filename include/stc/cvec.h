@@ -280,7 +280,7 @@ STC_DEF _cx_value*
 _cx_memb(_push_back)(_cx_self* self, i_val value) {
     size_t len = cvec_rep_(self)->size;
     if (len == _cx_memb(_capacity)(*self))
-        _cx_memb(_reserve)(self, (len*13 >> 3) + 4);
+        _cx_memb(_reserve)(self, (len*3 >> 1) + 4);
     _cx_value *v = self->data + cvec_rep_(self)->size++;
     *v = value; return v;
 }
@@ -298,7 +298,7 @@ _cx_memb(_insert_space_)(_cx_self* self, _cx_value* pos, size_t len) {
     size_t idx = pos - self->data, size = cvec_rep_(self)->size;
     if (len == 0) return pos;
     if (size + len > _cx_memb(_capacity)(*self))
-        _cx_memb(_reserve)(self, (size*13 >> 3) + len),
+        _cx_memb(_reserve)(self, (size*3 >> 1) + len),
         pos = self->data + idx;
     cvec_rep_(self)->size += len;
     memmove(pos + len, pos, (size - idx) * sizeof(i_val));

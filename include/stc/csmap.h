@@ -258,7 +258,7 @@ _cx_memb(_node_new_)(_cx_self* self, int level) {
         tn = rep->disp;
         rep->disp = self->nodes[tn].link[1];
     } else {
-        if ((tn = rep->head + 1) > rep->cap) _cx_memb(_reserve)(self, 4 + (tn*13 >> 3));
+        if ((tn = rep->head + 1) > rep->cap) _cx_memb(_reserve)(self, 4 + (tn*3 >> 1));
         ++_csmap_rep(self)->head; /* do after reserve */
     }
     _cx_node* dn = &self->nodes[tn];
