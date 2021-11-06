@@ -2,16 +2,16 @@
 #include <time.h>
 #include <stc/crandom.h>
 #include <stc/cstr.h>
-#include "others/khash.h"
+#include "external/khash.h"
 
 enum {max_load_factor = 77};
 
 #ifdef __cplusplus
 #include <limits>
 #include <unordered_map>
-#include "others/robin_hood.hpp"
-#include "others/skarupke/bytell_hash_map.hpp"
-#include "others/parallel_hashmap/phmap.h"
+#include "external/robin_hood.h"
+#include "external/skarupke/bytell_hash_map.hpp"
+#include "external/parallel_hashmap/phmap.h"
 template<typename C> inline void std_destroy(C& c) { C().swap(c); }
 
 template <class K, class V> using robin_hood_flat_map = robin_hood::unordered_flat_map<
@@ -119,38 +119,38 @@ size_t seed;
 
 
 #define MAP_TEST0(M, X, n) \
-{ \
+{   /* Insert, update */ \
     M##_SETUP(X, int64_t, int64_t); \
-    uint64_t checksum = 0; \
+    uint64_t sum = 0; \
     SEED(seed); \
     clock_t difference, before = clock(); \
     for (size_t i = 0; i < n; ++i) { \
-        checksum += ++ M##_EMPLACE(X, RAND(rr), i); \
+        sum += ++ M##_EMPLACE(X, RAND(keybits), i); \
     } \
     difference = clock() - before; \
-    printf(#M ": time: %5.02f, sum: %zu, size: %zu, buckets: %8zu\n", \
-           (float) difference / CLOCKS_PER_SEC, checksum, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
+    printf(#M ": time: %5.02f, size: %zu, buckets: %8zu, sum: %zu\n", \
+           (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), sum); \
     M##_DTOR(X); \
 }
 
 #define MAP_TEST1(M, X, n) \
-{ \
+{   /* Insert, update and erase another */ \
     M##_SETUP(X, int64_t, int64_t); \
-    uint64_t checksum = 0, erased = 0; \
+    uint64_t sum = 0, erased = 0; \
     SEED(seed); \
     clock_t difference, before = clock(); \
     for (size_t i = 0; i < n; ++i) { \
-        checksum += ++ M##_EMPLACE(X, RAND(rr), i); \
-        erased += M##_ERASE(X, RAND(rr)); \
+        sum += ++ M##_EMPLACE(X, RAND(keybits), i); \
+        erased += M##_ERASE(X, RAND(keybits)); \
     } \
     difference = clock() - before; \
-    printf(#M ": time: %5.02f, sum: %zu, erased %zu, size: %zu, buckets: %8zu\n", \
-           (float) difference / CLOCKS_PER_SEC, checksum, erased, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
+    printf(#M ": time: %5.02f, size: %zu, buckets: %8zu, erased %zu, sum: %zu\n", \
+           (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), erased, sum); \
     M##_DTOR(X); \
 }
 
 #define MAP_TEST2(M, X, n) \
-{ \
+{   /* Insert sequential keys, then erase them */ \
     M##_SETUP(X, int64_t, int64_t); \
     size_t erased = 0; \
     clock_t difference, before = clock(); \
@@ -159,121 +159,119 @@ size_t seed;
     for (size_t i = 0; i < n; ++i) \
         erased += M##_ERASE(X, i); \
     difference = clock() - before; \
-    printf(#M ": time: %5.02f, erased %zu, size: %zu, buckets: %8zu\n", \
-           (float) difference / CLOCKS_PER_SEC, erased, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
+    printf(#M ": time: %5.02f, size: %zu, buckets: %8zu, erased %zu\n", \
+           (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), erased); \
     M##_DTOR(X); \
 }
 
 #define MAP_TEST3(M, X, n) \
-{ \
+{   /* Erase elements */ \
     M##_SETUP(X, int64_t, int64_t); \
     size_t erased = 0; \
     clock_t difference, before; \
     SEED(seed); \
     for (size_t i = 0; i < n; ++i) \
-        M##_PUT(X, RAND(rr), i); \
+        M##_PUT(X, RAND(keybits), i); \
     SEED(seed); \
     before = clock(); \
     for (size_t i = 0; i < n; ++i) \
-        erased += M##_ERASE(X, RAND(rr)); \
+        erased += M##_ERASE(X, RAND(keybits)); \
     difference = clock() - before; \
-    printf(#M ": time: %5.02f, erased %zu, size: %zu, buckets: %8zu\n", \
-           (float) difference / CLOCKS_PER_SEC, erased, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
+    printf(#M ": time: %5.02f, size: %zu, buckets: %8zu, erased %zu\n", \
+           (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), erased); \
     M##_DTOR(X); \
 }
 
 #define MAP_TEST4(M, X, n) \
-{ \
+{   /* Iterate */ \
     M##_SETUP(X, int64_t, int64_t); \
-    size_t sum = 0; \
+    size_t sum = 0, m = 1ull << (keybits + 1), nn = n; \
+    if (nn < m) m = nn; \
     SEED(seed); \
-    for (size_t i = 0; i < n; ++i) \
-        M##_PUT(X, RAND(rr), i); \
+    for (size_t i = 0; i < m; ++i) \
+        M##_PUT(X, RAND(keybits), i); \
+    size_t x = 500000000/M##_SIZE(X); \
     clock_t difference, before = clock(); \
-    for (int k=0; k<5; k++) M##_FOR (X, i) \
-        sum += M##_ITEM(X, i); \
+    for (int k=0; k < x; k++) M##_FOR (X, it) \
+        sum += M##_ITEM(X, it); \
     difference = clock() - before; \
-    printf(#M ": time: %5.02f, sum %zu, size: %zu, buckets: %8zu\n", \
-           (float) difference / CLOCKS_PER_SEC, sum, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
+    printf(#M ": time: %5.02f, size: %zu, buckets: %8zu, repeats: %zu, sum: %zu\n", \
+           (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), x, sum); \
     M##_DTOR(X); \
 }
 
 #define MAP_TEST5(M, X, n) \
-{ \
+{   /* Lookup */ \
     M##_SETUP(X, int64_t, int64_t); \
-    size_t found = 0; \
+    size_t found = 0, m = 1ull << (keybits + 1), nn = n; \
     clock_t difference, before; \
+    if (nn < m) m = nn; \
     SEED(seed); \
-    for (size_t i = 0; i < n; ++i) \
-        M##_PUT(X, RAND(rr), i); \
+    for (size_t i = 0; i < m; ++i) \
+        M##_PUT(X, RAND(keybits), i); \
     before = clock(); \
-    for (size_t i = 0; i < n/2; ++i) \
-        found += M##_FIND(X, RAND(rr)); \
+    size_t x = m * 20000000/M##_SIZE(X); \
+    for (size_t i = 0; i < x; ++i) \
+        found += M##_FIND(X, RAND(keybits)); \
     SEED(seed); \
-    for (size_t i = 0; i < n/2; ++i) \
-        found += M##_FIND(X, RAND(rr)); \
+    for (size_t i = 0; i < x; ++i) \
+        found += M##_FIND(X, RAND(keybits)); \
     difference = clock() - before; \
-    printf(#M ": time: %5.02f, found %zu, size: %zu, buckets: %8zu\n", \
-           (float) difference / CLOCKS_PER_SEC, found, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X)); \
+    printf(#M ": time: %5.02f, size: %zu, buckets: %8zu, lookups: %zu, found: %zu\n", \
+           (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), x*2, found); \
     M##_DTOR(X); \
 }
 
 
 #ifdef __cplusplus
-#define RUN_TEST(n) MAP_TEST##n(KMAP, ii, N##n) MAP_TEST##n(CMAP, ii, N##n) MAP_TEST##n(PMAP, ii, N##n) \
+#define RUN_TEST(n) MAP_TEST##n(CMAP, ii, N##n) MAP_TEST##n(KMAP, ii, N##n) MAP_TEST##n(PMAP, ii, N##n) \
                     MAP_TEST##n(FMAP, ii, N##n) MAP_TEST##n(RMAP, ii, N##n) MAP_TEST##n(UMAP, ii, N##n) 
 #define ITR_TEST(n) MAP_TEST##n(CMAP, ii, N##n)                             MAP_TEST##n(PMAP, ii, N##n) \
                     MAP_TEST##n(FMAP, ii, N##n) MAP_TEST##n(RMAP, ii, N##n) MAP_TEST##n(UMAP, ii, N##n)
 #else
-#define RUN_TEST(n) MAP_TEST##n(KMAP, ii, N##n) MAP_TEST##n(CMAP, ii, N##n)
+#define RUN_TEST(n) MAP_TEST##n(CMAP, ii, N##n) MAP_TEST##n(KMAP, ii, N##n)
 #define ITR_TEST(n) MAP_TEST##n(CMAP, ii, N##n)
 #endif
 
 enum {
-    RR = 27,
-    NN = 10,
-    NF = 1000000,
-    F0 = 4,
-    F1 = 2,
-    F2 = 4,
-    F3 = 6,
-    F4 = 8,
-    F5 = 6,
+    DEFAULT_N_MILL = 50,
+    DEFAULT_KEYBITS = 25,
 };
-
 
 int main(int argc, char* argv[])
 {
-    int nn = argc >= 2 ? atoi(argv[1]) : NN;
-    int rr = argc >= 3 ? atoi(argv[2]) : RR;
-    int n = NF * nn;
-    int N0 = n*F0, N1 = n*F1, N2 = n*F2, N3 = n*F3, N4 = n*F4, N5 = n*F5;
+    int n_mill = argc >= 2 ? atoi(argv[1]) : DEFAULT_N_MILL;
+    int keybits = argc >= 3 ? atoi(argv[2]) : DEFAULT_KEYBITS;
+    int n = n_mill * 1000000;
+    int N0 = n, N1 = n/2, N2 = n/2, N3 = n, N4 = n, N5 = n;
     seed = time(NULL);
 
-    printf("\nUnordered hash map shootout\nUsage %s [n-base=%d key-bits=%d]\n\n", argv[0], NN, RR);
+    printf("\nUnordered hash map shootout\n");
     printf("CMAP = https://github.com/tylov/STC\n"
            "KMAP = https://github.com/attractivechaos/klib\n"
            "PMAP = https://github.com/greg7mdp/parallel-hashmap\n"
            "FMAP = https://github.com/skarupke/flat_hash_map\n"
            "RMAP = https://github.com/martinus/robin-hood-hashing\n"
-           "UMAP = std::unordered_map\n");
+           "UMAP = std::unordered_map\n\n");
            
-    printf("\nN-base = %d. Random keys are in range [0, 2^%d). Seed = %zu:\n", nn, rr, seed);
-    printf("\nN=%d. Insert random keys:\n", N0);
+    printf("Usage %s [n-million=%d key-bits=%d]\n", argv[0], DEFAULT_N_MILL, DEFAULT_KEYBITS);
+    printf("N-base = %d. Random keys are in range [0, 2^%d). Seed = %zu:\n", n_mill, keybits, seed);
+
+    printf("\nT0: Insert/update random keys:\n");
     RUN_TEST(0)
 
-    printf("\nN=%d. Insert random key + try to remove another random key:\n", N1);
+    printf("\nT1: Insert/update random key + try to remove another random key:\n");
     RUN_TEST(1)
 
-    printf("\nN=%d. Insert sequential keys, then remove them in same order:\n", N2);
+    printf("\nT2: Insert sequential keys, then remove them in same order:\n");
     RUN_TEST(2)
 
-    printf("\nN=%d. Remove random keys:\n", N3);
+    printf("\nT3: Remove random keys:\n");
     RUN_TEST(3)
 
-    printf("\nN=%d. Iterate random keys:\n", N4);
+    printf("\nT4: Iterate random keys:\n");
     ITR_TEST(4)
 
-    printf("\nN=%d. Lookup random keys:\n", N5);
+    printf("\nT5: Lookup random keys:\n");
     RUN_TEST(5)
 }

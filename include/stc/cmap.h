@@ -302,7 +302,7 @@ _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr) {
 STC_DEF _cx_result
 _cx_memb(_insert_entry_)(_cx_self* self, i_keyraw rkey) {
     if (self->size + 1 >= (_cx_size) (self->bucket_count * self->max_load_factor))
-        _cx_memb(_reserve)(self, 8 + ((size_t)self->size*3 >> 1));
+        _cx_memb(_reserve)(self, ((size_t)self->size*3 >> 1) + 4);
     chash_bucket_t b = _cx_memb(_bucket_)(self, &rkey);
     _cx_result res = {&self->table[b.idx], !self->_hashx[b.idx]};
     if (res.inserted) {

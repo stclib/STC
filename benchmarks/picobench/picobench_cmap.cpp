@@ -4,10 +4,10 @@
 #include <string>
 #include <unordered_map>
 #include <stdexcept>
-#include "others/robin_hood.hpp"
-#include "others/skarupke/bytell_hash_map.hpp"
-#include "others/tsl/hopscotch_map.h"
-#include "others/parallel_hashmap/phmap.h"
+#include "../external/robin_hood.h"
+#include "../external/skarupke/bytell_hash_map.hpp"
+#include "../external/tsl/hopscotch_map.h"
+#include "../external/parallel_hashmap/phmap.h"
 
 #define PICOBENCH_IMPLEMENT_WITH_MAIN
 #include "picobench.hpp"
