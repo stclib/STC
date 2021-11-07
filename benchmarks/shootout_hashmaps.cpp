@@ -12,9 +12,8 @@ enum {max_load_factor = 77};
 #include "external/robin_hood.h"
 #include "external/skarupke/bytell_hash_map.hpp"
 #include "external/parallel_hashmap/phmap.h"
-//#include "external/tsl/hopscotch_map.h"
-//#include "external/tsl/robin_map.h"
-//#include "external/tsl/sparse_map.h"
+#include "external/tsl/hopscotch_map.h"
+#include "external/tsl/robin_map.h"
 
 template<typename C> inline void std_destroy(C& c) { C().swap(c); }
 
@@ -88,7 +87,7 @@ size_t seed;
 
 #define HMAP_SETUP(X, Key, Value) tsl::hopscotch_map<Key, Value> map; map.max_load_factor(max_load_factor/100.0f)
 #define HMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
-#define HMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
+#define HMAP_EMPLACE(X, key, val) map.emplace(key, val).first.value()
 #define HMAP_FIND(X, key)         UMAP_FIND(X, key)
 #define HMAP_ERASE(X, key)        UMAP_ERASE(X, key)
 #define HMAP_FOR(X, i)            UMAP_FOR(X, i)
@@ -98,29 +97,17 @@ size_t seed;
 #define HMAP_CLEAR(X)             UMAP_CLEAR(X)
 #define HMAP_DTOR(X)              UMAP_DTOR(X)
 
-#define DMAP_SETUP(X, Key, Value) tsl::robin_map<Key, Value> map; map.max_load_factor(max_load_factor/100.0f)
-#define DMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
-#define DMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
-#define DMAP_FIND(X, key)         UMAP_FIND(X, key)
-#define DMAP_ERASE(X, key)        UMAP_ERASE(X, key)
-#define DMAP_FOR(X, i)            UMAP_FOR(X, i)
-#define DMAP_ITEM(X, i)           UMAP_ITEM(X, i)
-#define DMAP_SIZE(X)              UMAP_SIZE(X)
-#define DMAP_BUCKETS(X)           UMAP_BUCKETS(X)
-#define DMAP_CLEAR(X)             UMAP_CLEAR(X)
-#define DMAP_DTOR(X)              UMAP_DTOR(X)
-
-#define SMAP_SETUP(X, Key, Value) tsl::sparse_map<Key, Value> map; map.max_load_factor(max_load_factor/100.0f)
-#define SMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
-#define SMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
-#define SMAP_FIND(X, key)         UMAP_FIND(X, key)
-#define SMAP_ERASE(X, key)        UMAP_ERASE(X, key)
-#define SMAP_FOR(X, i)            UMAP_FOR(X, i)
-#define SMAP_ITEM(X, i)           UMAP_ITEM(X, i)
-#define SMAP_SIZE(X)              UMAP_SIZE(X)
-#define SMAP_BUCKETS(X)           UMAP_BUCKETS(X)
-#define SMAP_CLEAR(X)             UMAP_CLEAR(X)
-#define SMAP_DTOR(X)              UMAP_DTOR(X)
+#define TMAP_SETUP(X, Key, Value) tsl::robin_map<Key, Value> map; map.max_load_factor(max_load_factor/100.0f)
+#define TMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
+#define TMAP_EMPLACE(X, key, val) map.emplace(key, val).first.value()
+#define TMAP_FIND(X, key)         UMAP_FIND(X, key)
+#define TMAP_ERASE(X, key)        UMAP_ERASE(X, key)
+#define TMAP_FOR(X, i)            UMAP_FOR(X, i)
+#define TMAP_ITEM(X, i)           UMAP_ITEM(X, i)
+#define TMAP_SIZE(X)              UMAP_SIZE(X)
+#define TMAP_BUCKETS(X)           UMAP_BUCKETS(X)
+#define TMAP_CLEAR(X)             UMAP_CLEAR(X)
+#define TMAP_DTOR(X)              UMAP_DTOR(X)
 
 //#define RMAP_SETUP(X, Key, Value) robin_hood::unordered_map<Key, Value> map
 #define RMAP_SETUP(X, Key, Value) robin_hood_flat_map<Key, Value> map
@@ -254,8 +241,10 @@ size_t seed;
 
 
 #ifdef __cplusplus
-#define RUN_TEST(n) MAP_TEST##n(CMAP, ii, N##n) MAP_TEST##n(KMAP, ii, N##n) MAP_TEST##n(PMAP, ii, N##n) \
-                    MAP_TEST##n(FMAP, ii, N##n) MAP_TEST##n(RMAP, ii, N##n) MAP_TEST##n(UMAP, ii, N##n)
+#define RUN_TEST(n) MAP_TEST##n(CMAP, ii, N##n) MAP_TEST##n(KMAP, ii, N##n) \
+                    MAP_TEST##n(PMAP, ii, N##n) MAP_TEST##n(FMAP, ii, N##n) \
+                    MAP_TEST##n(RMAP, ii, N##n) MAP_TEST##n(HMAP, ii, N##n) \
+                    MAP_TEST##n(TMAP, ii, N##n) MAP_TEST##n(UMAP, ii, N##n)
 #else
 #define RUN_TEST(n) MAP_TEST##n(CMAP, ii, N##n) MAP_TEST##n(KMAP, ii, N##n)
 #endif
@@ -271,7 +260,7 @@ int main(int argc, char* argv[])
     int keybits = argc >= 3 ? atoi(argv[2]) : DEFAULT_KEYBITS;
     int n = n_mill * 1000000;
     int N0 = n, N1 = n/2, N2 = n/2, N3 = n, N4 = n, N5 = n;
-    seed = time(NULL);
+    seed = 1636306010; // time(NULL);
 
     printf("\nUnordered hash map shootout\n");
     printf("CMAP = https://github.com/tylov/STC\n"
@@ -279,6 +268,8 @@ int main(int argc, char* argv[])
            "PMAP = https://github.com/greg7mdp/parallel-hashmap\n"
            "FMAP = https://github.com/skarupke/flat_hash_map\n"
            "RMAP = https://github.com/martinus/robin-hood-hashing\n"
+           "HMAP = https://github.com/Tessil/hopscotch-map\n"
+           "TMAP = https://github.com/Tessil/robin-map\n"
            "UMAP = std::unordered_map\n\n");
            
     printf("Usage %s [n-million=%d key-bits=%d]\n", argv[0], DEFAULT_N_MILL, DEFAULT_KEYBITS);
