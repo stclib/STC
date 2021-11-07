@@ -12,6 +12,10 @@ enum {max_load_factor = 77};
 #include "external/robin_hood.h"
 #include "external/skarupke/bytell_hash_map.hpp"
 #include "external/parallel_hashmap/phmap.h"
+//#include "external/tsl/hopscotch_map.h"
+//#include "external/tsl/robin_map.h"
+//#include "external/tsl/sparse_map.h"
+
 template<typename C> inline void std_destroy(C& c) { C().swap(c); }
 
 template <class K, class V> using robin_hood_flat_map = robin_hood::unordered_flat_map<
@@ -46,15 +50,17 @@ size_t seed;
 #define CMAP_CLEAR(X)             cmap_##X##_clear(&map)
 #define CMAP_DTOR(X)              cmap_##X##_del(&map)
 
-#define KMAP_SETUP(X, Key, Value) khash_t(ii)* map = kh_init(ii); khiter_t ki; int ret
-#define KMAP_PUT(X, key, val)     (*(ki = kh_put(ii, map, key, &ret), map->vals[ki] = val, map->vals+ki))
-#define KMAP_EMPLACE(X, key, val) (*(ki = kh_put(ii, map, key, &ret), ret ? (map->vals[ki] = val, 0) : 1, map->vals+ki))
-#define KMAP_ERASE(X, key)        ((ki = kh_get(ii, map, key)) != kh_end(map) ? kh_del(ii, map, ki), 1 : 0)
-#define KMAP_FIND(X, key)         (kh_get(ii, map, key) != kh_end(map))
+#define KMAP_SETUP(X, Key, Value) khash_t(X)* map = kh_init(X); khiter_t ki; int ret
+#define KMAP_PUT(X, key, val)     (*(ki = kh_put(X, map, key, &ret), map->vals[ki] = val, map->vals+ki))
+#define KMAP_EMPLACE(X, key, val) (*(ki = kh_put(X, map, key, &ret), ret ? (map->vals[ki] = val, 0) : 1, map->vals+ki))
+#define KMAP_ERASE(X, key)        ((ki = kh_get(X, map, key)) != kh_end(map) ? kh_del(X, map, ki), 1 : 0)
+#define KMAP_FOR(X, i)            for (khint_t i = kh_begin(map); i != kh_end(map); ++i) if (kh_exist(map, i))
+#define KMAP_ITEM(X, i)           map->vals[i]
+#define KMAP_FIND(X, key)         (kh_get(X, map, key) != kh_end(map))
 #define KMAP_SIZE(X)              kh_size(map)
 #define KMAP_BUCKETS(X)           kh_n_buckets(map)
-#define KMAP_CLEAR(X)             kh_clear(ii, map)
-#define KMAP_DTOR(X)              kh_destroy(ii, map)
+#define KMAP_CLEAR(X)             kh_clear(X, map)
+#define KMAP_DTOR(X)              kh_destroy(X, map)
 
 #define UMAP_SETUP(X, Key, Value) std::unordered_map<Key, Value> map; map.max_load_factor(max_load_factor/100.0f)
 #define UMAP_PUT(X, key, val)     (map[key] = val)
@@ -91,6 +97,30 @@ size_t seed;
 #define HMAP_BUCKETS(X)           UMAP_BUCKETS(X)
 #define HMAP_CLEAR(X)             UMAP_CLEAR(X)
 #define HMAP_DTOR(X)              UMAP_DTOR(X)
+
+#define DMAP_SETUP(X, Key, Value) tsl::robin_map<Key, Value> map; map.max_load_factor(max_load_factor/100.0f)
+#define DMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
+#define DMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
+#define DMAP_FIND(X, key)         UMAP_FIND(X, key)
+#define DMAP_ERASE(X, key)        UMAP_ERASE(X, key)
+#define DMAP_FOR(X, i)            UMAP_FOR(X, i)
+#define DMAP_ITEM(X, i)           UMAP_ITEM(X, i)
+#define DMAP_SIZE(X)              UMAP_SIZE(X)
+#define DMAP_BUCKETS(X)           UMAP_BUCKETS(X)
+#define DMAP_CLEAR(X)             UMAP_CLEAR(X)
+#define DMAP_DTOR(X)              UMAP_DTOR(X)
+
+#define SMAP_SETUP(X, Key, Value) tsl::sparse_map<Key, Value> map; map.max_load_factor(max_load_factor/100.0f)
+#define SMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
+#define SMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
+#define SMAP_FIND(X, key)         UMAP_FIND(X, key)
+#define SMAP_ERASE(X, key)        UMAP_ERASE(X, key)
+#define SMAP_FOR(X, i)            UMAP_FOR(X, i)
+#define SMAP_ITEM(X, i)           UMAP_ITEM(X, i)
+#define SMAP_SIZE(X)              UMAP_SIZE(X)
+#define SMAP_BUCKETS(X)           UMAP_BUCKETS(X)
+#define SMAP_CLEAR(X)             UMAP_CLEAR(X)
+#define SMAP_DTOR(X)              UMAP_DTOR(X)
 
 //#define RMAP_SETUP(X, Key, Value) robin_hood::unordered_map<Key, Value> map
 #define RMAP_SETUP(X, Key, Value) robin_hood_flat_map<Key, Value> map
@@ -225,16 +255,13 @@ size_t seed;
 
 #ifdef __cplusplus
 #define RUN_TEST(n) MAP_TEST##n(CMAP, ii, N##n) MAP_TEST##n(KMAP, ii, N##n) MAP_TEST##n(PMAP, ii, N##n) \
-                    MAP_TEST##n(FMAP, ii, N##n) MAP_TEST##n(RMAP, ii, N##n) MAP_TEST##n(UMAP, ii, N##n) 
-#define ITR_TEST(n) MAP_TEST##n(CMAP, ii, N##n)                             MAP_TEST##n(PMAP, ii, N##n) \
                     MAP_TEST##n(FMAP, ii, N##n) MAP_TEST##n(RMAP, ii, N##n) MAP_TEST##n(UMAP, ii, N##n)
 #else
 #define RUN_TEST(n) MAP_TEST##n(CMAP, ii, N##n) MAP_TEST##n(KMAP, ii, N##n)
-#define ITR_TEST(n) MAP_TEST##n(CMAP, ii, N##n)
 #endif
 
 enum {
-    DEFAULT_N_MILL = 50,
+    DEFAULT_N_MILL = 40,
     DEFAULT_KEYBITS = 25,
 };
 
@@ -270,7 +297,7 @@ int main(int argc, char* argv[])
     RUN_TEST(3)
 
     printf("\nT4: Iterate random keys:\n");
-    ITR_TEST(4)
+    RUN_TEST(4)
 
     printf("\nT5: Lookup random keys:\n");
     RUN_TEST(5)
