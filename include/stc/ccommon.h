@@ -116,15 +116,15 @@
 #define _c_rotl(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
 STC_INLINE uint64_t c_strhash(const char *s) {
-    int c; uint64_t h = (uint64_t)*s++ << 26;
-    if (h) while ((c = *s++)) h = ((h << 5) - h) + c;
-    return h;
+    int c; uint64_t h = *s++;
+    if (h) while ((c = *s++)) h = (h << 10) - h + c;
+    return _c_rotl(h, 26) ^ h;
 }
-// len >= 2 and multiple of 16:
+// len = 2,4,6,...:
 STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
     const uint16_t *x = (const uint16_t*) key; 
-    uint64_t h = *x++; h += h << 11;
-    while ((len -= 2)) h ^= (h << 9) + *x++;
+    uint64_t h = *x++; h += h << 14;
+    while ((len -= 2)) h = (h << 10) - h + *x++;
     return h;
 }
 
