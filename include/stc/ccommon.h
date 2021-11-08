@@ -114,12 +114,20 @@
 #define c_default_del(ptr)      ((void) (ptr))
 
 #define _c_rotl(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
-STC_INLINE uint64_t c_strhash(const char *str) {
-    int c; uint64_t h = 0xb5ad4eceda1ce2a9;
-    while ((c = *str++)) h = (_c_rotl(h, 4) ^ (h << 13)) + c;
-    return h ^ (h >> 15);
+
+STC_INLINE uint64_t c_strhash(const char *s) {
+    int c; uint64_t h = (uint64_t)*s++ << 26;
+    if (h) while ((c = *s++)) h = ((h << 5) - h) + c;
+    return h;
 }
-STC_INLINE uint64_t c_default_hash(const void *key, size_t len);
+// len >= 2 and multiple of 16:
+STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
+    const uint16_t *x = (const uint16_t*) key; 
+    uint64_t h = *x++; h += h << 11;
+    while ((len -= 2)) h ^= (h << 9) + *x++;
+    return h;
+}
+
 #define c_default_hash32(data, len_is_4) \
     ((*(const uint32_t*)data * 0xc6a4a7935bd1e99d) >> 15)
 #define c_default_hash64(data, len_is_8) \
