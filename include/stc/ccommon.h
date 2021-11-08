@@ -77,13 +77,13 @@
 #  define c_new(T)              c_malloc(sizeof(T))
 #  define c_new_n(T, n)         c_malloc(sizeof(T)*(n))
 #  define c_make(T)             (T)
-#  define c_make_ptr(T, value)  memcpy(c_new(T), &(T){value}, sizeof(T))
+#  define c_make_ptr(T, ...)    memcpy(c_new(T), (T[]){__VA_ARGS__}, sizeof(T))
 #else
 #  include <new>
 #  define c_new(T)              static_cast<T*>(c_malloc(sizeof(T)))
 #  define c_new_n(T, n)         static_cast<T*>(c_malloc(sizeof(T)*(n)))
 #  define c_make(T)             T
-#  define c_make_ptr(T, value)  new (c_new(T)) T{value}
+#  define c_make_ptr(T, ...)    new (c_new(T)) T{__VA_ARGS__}
 #endif
 #ifndef c_malloc
 #  define c_malloc(sz)          malloc(sz)
