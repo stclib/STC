@@ -259,8 +259,8 @@ int main(int argc, char* argv[])
     int n_mill = argc >= 2 ? atoi(argv[1]) : DEFAULT_N_MILL;
     int keybits = argc >= 3 ? atoi(argv[2]) : DEFAULT_KEYBITS;
     int n = n_mill * 1000000;
-    int N0 = n, N1 = n, N2 = n/2, N3 = n, N4 = n, N5 = n;
-    seed = 1636306010; // time(NULL);
+    int N0 = n, N1 = n/2, N2 = n/2, N3 = n, N4 = n, N5 = n;
+    seed = time(NULL); // 1636306010;
 
     printf("\nUnordered hash map shootout\n");
     printf("CMAP = https://github.com/tylov/STC\n"
