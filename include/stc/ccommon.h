@@ -73,23 +73,23 @@
 #define c_container_of(ptr, type, member) \
     ((type *)((char *)(ptr) - offsetof(type, member)))
 
-#if __cplusplus
+#ifndef __cplusplus
+#  define c_new(T)              c_malloc(sizeof(T))
+#  define c_new_n(T, n)         c_malloc(sizeof(T)*(n))
+#  define c_make(T)             (T)
+#  define c_make_ptr(T, value)  memcpy(c_new(T), &(T){value}, sizeof(T))
+#else
 #  include <new>
 #  define c_new(T)              static_cast<T*>(c_malloc(sizeof(T)))
 #  define c_new_n(T, n)         static_cast<T*>(c_malloc(sizeof(T)*(n)))
 #  define c_make(T)             T
 #  define c_make_ptr(T, value)  new (c_new(T)) T{value}
-#else
-#  define c_new(T)              c_malloc(sizeof(T))
-#  define c_new_n(T, n)         c_malloc(sizeof(T)*(n))
-#  define c_make(T)             (T)
-#  define c_make_ptr(T, value)  memcpy(c_new(T), &(T){value}, sizeof(T))
 #endif
 #ifndef c_malloc
-#define c_malloc(sz)            malloc(sz)
-#define c_calloc(n, sz)         calloc(n, sz)
-#define c_realloc(p, sz)        realloc(p, sz)
-#define c_free(p)               free(p)
+#  define c_malloc(sz)          malloc(sz)
+#  define c_calloc(n, sz)       calloc(n, sz)
+#  define c_realloc(p, sz)      realloc(p, sz)
+#  define c_free(p)             free(p)
 #endif
 
 #define c_swap(T, x, y)         do { T _c_t = x; x = y; y = _c_t; } while (0)
