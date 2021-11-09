@@ -113,6 +113,8 @@
 
 #define c_default_del(ptr)      ((void) (ptr))
 
+/* Generic algorithms */
+
 #define _c_rotl(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
 STC_INLINE uint64_t c_strhash(const char *s) {
@@ -125,15 +127,12 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
     const uint16_t *x = (const uint16_t*) key; 
     uint64_t h = *x++; h += h << 14;
     while ((len -= 2)) h = (h << 10) - h + *x++;
-    return h;
+    return _c_rotl(h, 24) ^ h;
 }
-
 #define c_default_hash32(data, len_is_4) \
     ((*(const uint32_t*)data * 0xc6a4a7935bd1e99d) >> 15)
 #define c_default_hash64(data, len_is_8) \
     (*(const uint64_t *)data * 0xc6a4a7935bd1e99d)
-
-/* Generic algorithms */
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
 #define c_foreach_3(it, CX, cnt) \
