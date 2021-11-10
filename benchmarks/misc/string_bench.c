@@ -33,6 +33,8 @@ void initShortStringVec(cvec_str* vs)
     size_t lengths = 0;
     c_foreach (i, cvec_str, *vs)
     {
+        cstr_append_s(i.ref, *i.ref);
+        cstr_append_s(i.ref, *i.ref);
         lengths += cstr_size(*i.ref);
     }
     printf("avg len: %f\n", (float)lengths / cvec_str_size(*vs));
@@ -44,17 +46,17 @@ void initLongStringVec(cvec_str* vs)
     *vs = read_file("names.txt");
     cstr* s = vs->data;
     size_t lengths = 0;
-    cstr_append(s, s[1].str);
-    cstr_append(s, s[2].str);
-    cstr_append(s, s[3].str);
+    cstr_append_s(s, s[1]);
+    cstr_append_s(s, s[2]);
+    cstr_append_s(s, s[3]);
     for (int i=1; i < cvec_str_size(*vs); ++i)
     {
         cstr* t = vs->data + i;
-        cstr_append(t, t->str);
-        cstr_append(t, t->str);
-        cstr_append(t, s->str);
-        cstr_append(t, t->str);
-        cstr_append(t, t->str);
+        cstr_append_s(t, *t);
+        cstr_append_s(t, *t);
+        cstr_append_s(t, *s);
+        cstr_append_s(t, *t);
+        cstr_append_s(t, *t);
         lengths += cstr_size(*t);
     }
     printf("avg len: %f\n", (float)lengths / cvec_str_size(*vs));

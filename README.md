@@ -40,8 +40,9 @@ which by the compiler is seen as different code because of macro name substituti
 - [***cvec*** - **std::vector** alike type](docs/cvec_api.md)
 
 Others:
-- [***crandom*** - A novel very fast *PRNG* named **stc64**](docs/crandom_api.md)
 - [***ccommon*** - Some handy macros and general definitions](docs/ccommon_api.md)
+- [***crandom*** - A novel very fast *PRNG* named **stc64**](docs/crandom_api.md)
+- [***coption*** - Command line options scanner](docs/coption_api.md)
 
 Highlights
 ----------

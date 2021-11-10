@@ -8,15 +8,15 @@ See [getopt_long](https://www.freebsd.org/cgi/man.cgi?getopt_long(3)) for a simi
 
 ```c
 enum {
-    copt_no_argument = 0,
-    copt_required_argument = 1,
-    copt_optional_argument = 2
+    coption_no_argument = 0,
+    coption_required_argument = 1,
+    coption_optional_argument = 2
 };
 typedef struct {
     int ind;             /* equivalent to posix optind */
     int opt;             /* equivalent to posix optopt */
     const char *arg;     /* equivalent to posix optarg */
-    const char *faulty;  /* points to the faulty option, if any */
+    const char *badopt;  /* points to the bad option, if any */
     int longindex;       /* index of long option; or -1 if short */
     ...
 } coption;
@@ -46,13 +46,13 @@ int                 coption_get(coption *opt, int argc, char *argv[],
 
 int main(int argc, char *argv[]) {
     static coption_long long_options[] = {
-      {"verbose", copt_no_argument,       'V'},
-      {"help",    copt_no_argument,       'H'},
-      {"add",     copt_no_argument,       'a'},
-      {"append",  copt_no_argument,       'b'},
-      {"delete",  copt_required_argument, 'd'},
-      {"create",  copt_required_argument, 'c'},
-      {"file",    copt_required_argument, 'f'},
+      {"verbose", coption_no_argument,       'V'},
+      {"help",    coption_no_argument,       'H'},
+      {"add",     coption_no_argument,       'a'},
+      {"append",  coption_no_argument,       'b'},
+      {"delete",  coption_required_argument, 'd'},
+      {"create",  coption_required_argument, 'c'},
+      {"file",    coption_required_argument, 'f'},
       {NULL}
     };
     coption opt = coption_init();
@@ -70,10 +70,10 @@ int main(int argc, char *argv[]) {
                 printf("filename: %s\n", opt.arg);
                 break;
             case ':':
-                printf("option %s needs a value\n", opt.faulty);
+                printf("option %s needs a value\n", opt.badopt);
                 break;
             case '?':
-                printf("unknown option: %s\n", opt.faulty);
+                printf("unknown option: %s\n", opt.badopt);
                 break;
         }
     }
