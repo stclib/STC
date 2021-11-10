@@ -7,35 +7,33 @@ See [getopt_long](https://www.freebsd.org/cgi/man.cgi?getopt_long(3)) for a simi
 ## Types
 
 ```c
-enum {
-    coption_no_argument = 0,
-    coption_required_argument = 1,
-    coption_optional_argument = 2
-};
-typedef struct {
-    int ind;             /* equivalent to posix optind */
-    int opt;             /* equivalent to posix optopt */
-    const char *arg;     /* equivalent to posix optarg */
-    const char *badopt;  /* points to the bad option, if any */
-    int longindex;       /* index of long option; or -1 if short */
-    ...
-} coption;
+typedef enum {
+    coption_no_argument,
+    coption_required_argument,
+    coption_optional_argument
+} coption_type;
 
 typedef struct {
     const char *name;
-    int has_arg;
+    coption_type type;
     int val;
 } coption_long;
 
-const coption coption_inits;
+typedef struct {
+    int ind;            /* equivalent to posix optind */
+    int opt;            /* equivalent to posix optopt */
+    const char *optstr; /* points to the option string, if any */
+    const char *arg;    /* equivalent to posix optarg */
+    ...
+} coption;
 ```
 
 ## Methods
 
 ```c
-coption             coption_init(void);
-int                 coption_get(coption *opt, int argc, char *argv[],
-                                const char *shortopts, const coption_long *longopts);
+coption         coption_init(void);
+int             coption_get(coption *opt, int argc, char *argv[],
+                            const char *shortopts, const coption_long *longopts);
 ```
 
 ## Example
@@ -70,10 +68,10 @@ int main(int argc, char *argv[]) {
                 printf("filename: %s\n", opt.arg);
                 break;
             case ':':
-                printf("option %s needs a value\n", opt.badopt);
+                printf("option %s needs a value\n", opt.optstr);
                 break;
             case '?':
-                printf("unknown option: %s\n", opt.badopt);
+                printf("unknown option: %s\n", opt.optstr);
                 break;
         }
     }

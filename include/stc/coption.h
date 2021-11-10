@@ -23,7 +23,7 @@
 /*
 Inspired by https://attractivechaos.wordpress.com/2018/08/31/a-survey-of-argument-parsing-libraries-in-c-c
 Fixed major bugs with optional arguments (both long and short).
-Added arg->badopt output field, more consistent API.
+Added arg->optstr output field, more consistent API.
 
 coption_get() is similar to GNU's getopt_long(). Each call parses one option and
 returns the option name. opt->arg points to  the option argument if present.
@@ -47,8 +47,8 @@ int main(int argc, char *argv[])
     coption opt = coption_init();
     while ((c = coption_get(&opt, argc, argv, optstr, longopts)) != -1) {
         switch (c) {
-            case '?': printf("error: unknown option: %s\n", opt.badopt); break;
-            case ':': printf("error: missing argument for %s\n", opt.badopt); break;
+            case '?': printf("error: unknown option: %s\n", opt.optstr); break;
+            case ':': printf("error: missing argument for %s (%c)\n", opt.optstr, opt.opt); break;
             default:  printf("option: %c [%s]\n", opt.opt, opt.arg ? opt.arg : ""); break;
         }
     }
@@ -65,29 +65,29 @@ int main(int argc, char *argv[])
 #include <string.h>
 #include <stdbool.h>
 
-enum {
-    coption_no_argument       = 0,
-    coption_required_argument = 1,
-    coption_optional_argument = 2
-};
-typedef struct {
-    int ind;            /* equivalent to optind */
-    int opt;            /* equivalent to optopt */
-    const char *arg;    /* equivalent to optarg */
-    const char *badopt; /* points to the bad option */
-    int longindex;      /* idx of long option; or -1 if short */
-    int _i, _pos, _nargs;
-    char _badopt[4];
-} coption;
+typedef enum {
+    coption_no_argument,
+    coption_required_argument,
+    coption_optional_argument
+} coption_type;
 
 typedef struct {
     const char *name;
-    int has_arg;
+    coption_type type;
     int val;
 } coption_long;
 
+typedef struct {
+    int ind;            /* equivalent to optind */
+    int opt;            /* equivalent to optopt */
+    const char *optstr; /* points to the option string */
+    const char *arg;    /* equivalent to optarg */
+    int _i, _pos, _nargs;
+    char _optstr[4];
+} coption;
+
 static inline coption coption_init(void) {
-     coption opt = {1, 0, NULL, NULL, -1, 1, 0, 0, {'-', '?', '\0'}};
+     coption opt = {1, 0, NULL, NULL, 1, 0, 0, {'-', '?', '\0'}};
      return opt;
 }
 
@@ -112,7 +112,7 @@ static int coption_get(coption *opt, int argc, char *argv[],
         while (opt->_i < argc && (argv[opt->_i][0] != '-' || argv[opt->_i][1] == '\0'))
             ++opt->_i, ++opt->_nargs;
     }
-    opt->arg = 0, opt->longindex = -1, i0 = opt->_i;
+    opt->opt = 0, opt->optstr = NULL, opt->arg = NULL, i0 = opt->_i;
     if (opt->_i >= argc || argv[opt->_i][0] != '-' || argv[opt->_i][1] == '\0') {
         opt->ind = opt->_i - opt->_nargs;
         return -1;
@@ -123,7 +123,7 @@ static int coption_get(coption *opt, int argc, char *argv[],
             ++opt->_i, opt->ind = opt->_i - opt->_nargs;
             return -1;
         }
-        opt->opt = 0, optc = '?', opt->_pos = -1;
+        optc = '?', opt->_pos = -1;
         if (longopts) { /* parse long options */
             int k, n_exact = 0, n_partial = 0;
             const coption_long *o = 0, *o_exact = 0, *o_partial = 0;
@@ -133,18 +133,18 @@ static int coption_get(coption *opt, int argc, char *argv[],
                     if (longopts[k].name[j - 2] == 0) ++n_exact, o_exact = &longopts[k];
                     else ++n_partial, o_partial = &longopts[k];
                 }
-            opt->badopt = argv[opt->_i];
+            opt->optstr = argv[opt->_i];
             if (n_exact > 1 || (n_exact == 0 && n_partial > 1)) return '?';
             o = n_exact == 1? o_exact : n_partial == 1? o_partial : 0;
             if (o) {
-                opt->opt = optc = o->val, opt->longindex = o - longopts;
-                if (o->has_arg != coption_no_argument) {
+                opt->opt = optc = o->val;
+                if (o->type != coption_no_argument) {
                     if (argv[opt->_i][j] == '=') 
                         opt->arg = &argv[opt->_i][j + 1];
-                    else if (argv[opt->_i][j] == '\0' && opt->_i < argc - 1 && (o->has_arg == coption_required_argument ||
+                    else if (argv[opt->_i][j] == '\0' && opt->_i < argc - 1 && (o->type == coption_required_argument ||
                                                                                 argv[opt->_i + 1][0] != '-'))
                         opt->arg = argv[++opt->_i];
-                    else if (o->has_arg == coption_required_argument)
+                    else if (o->type == coption_required_argument)
                         optc = ':'; /* missing option argument */
                 }
             }
@@ -153,7 +153,7 @@ static int coption_get(coption *opt, int argc, char *argv[],
         const char *p;
         if (opt->_pos == 0) opt->_pos = 1;
         optc = opt->opt = argv[opt->_i][opt->_pos++];
-        opt->_badopt[1] = optc, opt->badopt = opt->_badopt;
+        opt->_optstr[1] = optc, opt->optstr = opt->_optstr;
         p = strchr((char *) shortopts, optc);
         if (p == 0) {
             optc = '?'; /* unknown option */
