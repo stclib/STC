@@ -14,10 +14,6 @@ impl Default for MyHasher {
     }
 }
 
-// fn rotl(h: u64, y: u64) -> u64 {
-//     (h << y) | (h >> (64 - y))
-// }
-
 impl Hasher for MyHasher {
     fn write(&mut self, bytes: &[u8]) {
         use std::convert::TryInto;
@@ -37,20 +33,15 @@ impl Hasher for MyHasher {
 
 type MyBuildHasher = BuildHasherDefault<MyHasher>;
 
-#[inline]
-fn romu_rotl(val: u64, r: u32) -> u64 {
-    return (val.wrapping_shl(r)).wrapping_add(val.wrapping_shr(64_u32.wrapping_sub(r)));
-}
-
 fn romu_trio(s: &mut [u64]) -> u64 {
     let xp = s[0];
     let yp = s[1];
     let zp = s[2];
     s[0] = 15241094284759029579_u64.wrapping_mul(zp);
     s[1] = yp.wrapping_sub(xp);
-    s[1] = romu_rotl(s[1], 12);
+    s[1] = s[1].rotate_left(12);
     s[2] = zp.wrapping_sub(yp);
-    s[2] = romu_rotl(s[2], 44);
+    s[2] = s[2].rotate_left(44);
     return xp;
 }
 
