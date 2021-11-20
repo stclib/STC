@@ -83,6 +83,10 @@ STC_INLINE const _cx_value* _cx_memb(_at)(const _cx_self* self, size_t x, size_t
     return **self->data + self->zdim*(self->ydim*x + y) + z;
 }
 
+STC_INLINE size_t _cx_memb(_idx)(const _cx_self* self, size_t x, size_t y, size_t z) {
+    return self->zdim*(self->ydim*x + y) + z;
+}
+
 STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     if (self->data == other.data) return;
     _cx_memb(_del)(self); *self = _cx_memb(_clone)(other);

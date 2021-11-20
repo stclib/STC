@@ -34,6 +34,7 @@ void                carr2_X_del(carr2_X* self);
 size_t              carr2_X_size(carr2_X arr);
 i_val*              carr2_X_data(carr2_X* self);          // access storage data
 const i_val*        carr2_X_at(const carr2_X* self, size_t x, size_t y);
+size_t              carr2_X_idx(const carr2_X* self, size_t x, size_t y);
 
 carr2_X_iter        carr2_X_begin(const carr2_X* self);
 carr2_X_iter        carr2_X_end(const carr2_X* self);
@@ -52,6 +53,7 @@ void                carr3_X_del(carr3_X* self);
 size_t              carr3_X_size(carr3_X arr);
 i_val*              carr3_X_data(carr3_X* self);                                  // storage data
 const i_val*        carr3_X_at(const carr3_X* self, size_t x, size_t y, size_t z);
+size_t              carr3_X_idx(const carr3_X* self, size_t x, size_t y, size_t z);
 
 carr3_X_iter        carr3_X_begin(const carr3_X* self);
 carr3_X_iter        carr3_X_end(const carr3_X* self);
