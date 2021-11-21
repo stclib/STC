@@ -85,7 +85,6 @@
 #  define c_make(T)             T
 #  define c_new(T, ...)         new (c_alloc(T)) T(__VA_ARGS__)
 #endif
-#define c_delete(T, ptr)        do { T* _p = ptr; T##_del(_p); c_free(_p); } while(0)
 #ifndef c_malloc
 #  define c_malloc(sz)          malloc(sz)
 #  define c_calloc(n, sz)       calloc(n, sz)
@@ -93,6 +92,7 @@
 #  define c_free(p)             free(p)
 #endif
 
+#define c_delete(T, ptr)        do { T* _p = ptr; T##_del(_p); c_free(_p); } while(0)
 #define c_swap(T, x, y)         do { T _c_t = x; x = y; y = _c_t; } while (0)
 #define c_arraylen(a)           (sizeof (a)/sizeof (a)[0])
 
