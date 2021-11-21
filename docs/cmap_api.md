@@ -44,7 +44,7 @@ cmap_X              cmap_X_clone(cmap_x map);
 void                cmap_X_clear(cmap_X* self);
 void                cmap_X_copy(cmap_X* self, cmap_X other);
 void                cmap_X_max_load_factor(cmap_X* self, float max_load);                     // default: 0.85
-void                cmap_X_reserve(cmap_X* self, size_t size);
+bool                cmap_X_reserve(cmap_X* self, size_t size);
 void                cmap_X_shrink_to_fit(cmap_X* self);
 void                cmap_X_swap(cmap_X* a, cmap_X* b);
 void                cmap_X_del(cmap_X* self);                                                 // destructor

@@ -46,7 +46,7 @@ STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
 STC_API void            _cx_memb(_del)(_cx_self* self);
 STC_API _cx_value*      _cx_memb(_push_back)(_cx_self* self, i_val value);
-STC_API void            _cx_memb(_expand_right_half_)(_cx_self* self, size_t idx, size_t n);
+STC_API bool            _cx_memb(_expand_right_half_)(_cx_self* self, size_t idx, size_t n);
 
 #ifndef i_queue
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter p1, _cx_iter p2, i_valraw raw);
@@ -121,10 +121,10 @@ STC_INLINE size_t _cx_memb(_index)(_cx_self cx, _cx_iter it) {
     return it.ref - cx.data;
 }
 
-STC_INLINE void
+STC_INLINE bool
 _cx_memb(_reserve)(_cx_self* self, size_t n) {
     size_t sz = cdeq_rep_(self)->size;
-    if (n > sz) _cx_memb(_expand_right_half_)(self, sz, n - sz);
+    return n <= sz || _cx_memb(_expand_right_half_)(self, sz, n - sz);
 }
 
 STC_INLINE _cx_iter
@@ -236,18 +236,20 @@ _cx_memb(_realloc_)(_cx_self* self, size_t n) {
     size_t nfront = _cdeq_nfront(self);
     rep = (struct cdeq_rep*) c_realloc(rep->cap ? rep : NULL,
                                        offsetof(struct cdeq_rep, base) + cap*sizeof(i_val));
+    if (!rep) return 0; 
     rep->size = sz, rep->cap = cap;
     self->_base = (_cx_value *) rep->base;
     self->data = self->_base + nfront;
     return cap;
 }
 
-STC_DEF void
+STC_DEF bool
 _cx_memb(_expand_right_half_)(_cx_self* self, size_t idx, size_t n) {
     struct cdeq_rep* rep = cdeq_rep_(self);
     size_t sz = rep->size, cap = rep->cap;
     size_t nfront = _cdeq_nfront(self), nback = cap - sz - nfront;
-    if (nback >= n || sz*1.3 + n > cap && _cx_memb(_realloc_)(self, n)) {
+    if (nback >= n || sz*1.3 + n > cap) {
+        if (!_cx_memb(_realloc_)(self, n)) return false;
         memmove(self->data + idx + n, self->data + idx, (sz - idx)*sizeof(i_val));
     } else {
 #ifdef i_queue
@@ -260,6 +262,7 @@ _cx_memb(_expand_right_half_)(_cx_self* self, size_t idx, size_t n) {
         memmove(self->data + pos + idx + n, self->data + idx, (sz - idx)*sizeof(i_val));
         self->data = self->_base + pos;
     }
+    return true;
 }
 
 STC_DEF _cx_value*

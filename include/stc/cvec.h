@@ -82,8 +82,8 @@ STC_API _cx_self        _cx_memb(_init)(void);
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_API void            _cx_memb(_del)(_cx_self* self);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
-STC_API void            _cx_memb(_reserve)(_cx_self* self, size_t cap);
-STC_API void            _cx_memb(_resize)(_cx_self* self, size_t size, i_val fill_val);
+STC_API bool            _cx_memb(_reserve)(_cx_self* self, size_t cap);
+STC_API bool            _cx_memb(_resize)(_cx_self* self, size_t size, i_val fill_val);
 STC_API int             _cx_memb(_value_compare)(const _cx_value* x, const _cx_value* y);
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw raw);
 STC_API _cx_iter        _cx_memb(_bsearch_in)(_cx_iter it1, _cx_iter it2, i_valraw raw);
@@ -252,28 +252,31 @@ _cx_memb(_del)(_cx_self* self) {
         c_free(cvec_rep_(self));
 }
 
-STC_DEF void
+STC_DEF bool
 _cx_memb(_reserve)(_cx_self* self, size_t cap) {
     struct cvec_rep* rep = cvec_rep_(self);
     size_t len = rep->size;
-    if (cap >= len && cap != rep->cap) {
+    if (cap >= len) {
         rep = (struct cvec_rep*) c_realloc(rep->cap ? rep : NULL,
                                            offsetof(struct cvec_rep, data) + cap*sizeof(i_val));
+        if (!rep) return false;
         self->data = (_cx_value*) rep->data;
         rep->size = len;
         rep->cap = cap;
     }
+    return true;
 }
 
-STC_DEF void
+STC_DEF bool
 _cx_memb(_resize)(_cx_self* self, size_t len, i_val fill) {
     if (len > _cx_memb(_capacity)(*self))
-        _cx_memb(_reserve)(self, len);
+        if (!_cx_memb(_reserve)(self, len)) return false;
     struct cvec_rep* rep = cvec_rep_(self);
     size_t i, n = rep->size;
     for (i = len; i < n; ++i) i_valdel(&self->data[i]);
     for (i = n; i < len; ++i) self->data[i] = fill;
     if (rep->cap) rep->size = len;
+    return true;
 }
 
 STC_DEF _cx_value*

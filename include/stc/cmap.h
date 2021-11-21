@@ -91,7 +91,7 @@ STC_API _cx_self        _cx_memb(_with_capacity)(size_t cap);
 STC_API _cx_self        _cx_memb(_clone)(_cx_self map);
 STC_API void            _cx_memb(_del)(_cx_self* self);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
-STC_API void            _cx_memb(_reserve)(_cx_self* self, size_t capacity);
+STC_API bool            _cx_memb(_reserve)(_cx_self* self, size_t capacity);
 STC_API chash_bucket_t  _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr);
 STC_API _cx_result      _cx_memb(_insert_entry_)(_cx_self* self, i_keyraw rkey);
 STC_API void            _cx_memb(_erase_entry)(_cx_self* self, _cx_value* val);
@@ -103,7 +103,7 @@ STC_INLINE bool         _cx_memb(_empty)(_cx_self m) { return m.size == 0; }
 STC_INLINE size_t       _cx_memb(_size)(_cx_self m) { return m.size; }
 STC_INLINE size_t       _cx_memb(_bucket_count)(_cx_self map) { return map.bucket_count; }
 STC_INLINE size_t       _cx_memb(_capacity)(_cx_self map)
-                            { return (size_t) (map.bucket_count * map.max_load_factor); }
+                            { return (size_t)(map.bucket_count ? (map.bucket_count - 2)*map.max_load_factor : 0.f); }
 STC_INLINE void         _cx_memb(_swap)(_cx_self *map1, _cx_self *map2) {c_swap(_cx_self, *map1, *map2); }
 STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, i_keyraw rkey)
                             { return self->size && self->_hashx[_cx_memb(_bucket_)(self, &rkey).idx]; }
@@ -319,9 +319,9 @@ _cx_memb(_clone)(_cx_self m) {
     return clone;
 }
 
-STC_DEF void
+STC_DEF bool
 _cx_memb(_reserve)(_cx_self* self, size_t _newcap) {
-    if (_newcap < self->size) return;
+    if (_newcap < self->size) return true;
     size_t _oldcap = self->bucket_count;
     _newcap = (size_t) (2 + _newcap / self->max_load_factor) | 1;
     _cx_self _tmp = {
@@ -331,7 +331,10 @@ _cx_memb(_reserve)(_cx_self* self, size_t _newcap) {
         self->max_load_factor
     };
     /* Rehash: */
-    _tmp._hashx[_newcap] = 0xff; c_swap(_cx_self, *self, _tmp);
+    bool ret = true;
+    if (!(_tmp.table && _tmp._hashx)) { ret = false; goto done; }
+    _tmp._hashx[_newcap] = 0xff;
+    c_swap(_cx_self, *self, _tmp);
     _cx_value* e = _tmp.table, *_slot = self->table;
     uint8_t* _hashx = self->_hashx;
     for (size_t i = 0; i < _oldcap; ++i, ++e)
@@ -341,8 +344,10 @@ _cx_memb(_reserve)(_cx_self* self, size_t _newcap) {
             _slot[b.idx] = *e;
             _hashx[b.idx] = (uint8_t) b.hx;
         }
+    done:
     c_free(_tmp._hashx);
     c_free((void *) _tmp.table);
+    return ret;
 }
 
 STC_DEF void

@@ -76,9 +76,10 @@ STC_INLINE _cx_value* _cx_memb(_top)(const _cx_self* self)
 STC_INLINE void _cx_memb(_pop)(_cx_self* self)
     { _cx_value* p = &self->data[--self->size]; i_valdel(p); }
 
-STC_INLINE void _cx_memb(_reserve)(_cx_self* self, size_t n) {
-    if (n >= self->size)
-        self->data = (_cx_value *)c_realloc(self->data, (self->capacity = n)*sizeof(_cx_value));
+STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, size_t n) {
+    if (n < self->size) return true;
+    _cx_value *t = (_cx_value *)c_realloc(self->data, n*sizeof *t);
+    return t ? (self->data = t, self->capacity = n) : 0;
 }
 
 STC_INLINE void _cx_memb(_shrink_to_fit)(_cx_self* self)

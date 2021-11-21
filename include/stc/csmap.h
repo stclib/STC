@@ -96,7 +96,7 @@ typedef cx_SET_ONLY( i_keyraw )
 STC_API _cx_self        _cx_memb(_init)(void);
 STC_API _cx_self        _cx_memb(_clone)(_cx_self tree);
 STC_API void            _cx_memb(_del)(_cx_self* self);
-STC_API void            _cx_memb(_reserve)(_cx_self* self, size_t cap);
+STC_API bool            _cx_memb(_reserve)(_cx_self* self, size_t cap);
 STC_API _cx_value*      _cx_memb(_find_it)(const _cx_self* self, i_keyraw rkey, _cx_iter* out);
 STC_API _cx_iter        _cx_memb(_lower_bound)(const _cx_self* self, i_keyraw rkey);
 STC_API _cx_value*      _cx_memb(_front)(const _cx_self* self);
@@ -237,18 +237,20 @@ _cx_memb(_back)(const _cx_self* self) {
     return &d[tn].value;
 }
 
-STC_DEF void
+STC_DEF bool
 _cx_memb(_reserve)(_cx_self* self, size_t cap) {
     struct csmap_rep* rep = _csmap_rep(self);
-    _cx_size oldcap = rep->cap;
-    if (cap > oldcap) {
+    if (cap >= rep->size) {
+        _cx_size oldcap = rep->cap;
         rep = (struct csmap_rep*) c_realloc(oldcap ? rep : NULL,
                                             sizeof(struct csmap_rep) + (cap + 1)*sizeof(_cx_node));
+        if (!rep) return false;
         if (oldcap == 0)
             memset(rep, 0, sizeof(struct csmap_rep) + sizeof(_cx_node));
         rep->cap = cap;
         self->nodes = (_cx_node *) rep->nodes;
     }
+    return true;
 }
 
 STC_DEF _cx_size
