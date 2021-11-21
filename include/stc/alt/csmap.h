@@ -299,7 +299,7 @@ static csmap_SENTINEL_node _aatree_sentinel = {&_aatree_sentinel, &_aatree_senti
             if (!(c = i_cmp(&r, rkey))) {res->ref = &tx->value; return tn; } \
             tx = tx->link[(dir = (c < 0))]; \
         } \
-        tn = c_new(_cx_node); \
+        tn = c_alloc(_cx_node); \
         res->ref = &tn->value, res->inserted = true; \
         tn->link[0] = tn->link[1] = (_cx_node*) &_aatree_sentinel, tn->level = 1; \
         if (top == 0) return tn; \
@@ -382,7 +382,7 @@ static csmap_SENTINEL_node _aatree_sentinel = {&_aatree_sentinel, &_aatree_senti
     STC_DEF _cx_node* \
     _cx_memb(_clone_r_)(_cx_node *tn) { \
         if (! tn->level) return tn; \
-        _cx_node *cn = c_new(_cx_node); \
+        _cx_node *cn = c_alloc(_cx_node); \
         cn->link[0] = _cx_memb(_clone_r_)(tn->link[0]); \
         cn->link[1] = _cx_memb(_clone_r_)(tn->link[1]); \
         cn->level = tn->level; \

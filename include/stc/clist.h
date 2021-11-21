@@ -70,7 +70,7 @@ _c_clist_types(clist_VOID, int);
 _c_clist_complete_types(clist_VOID, dummy);
 
 #define _c_clist_insert_after(self, _cx_self, node, val) \
-    _cx_node *entry = c_new (_cx_node); \
+    _cx_node *entry = c_alloc(_cx_node); \
     if (node) entry->next = node->next, node->next = entry; \
     else      entry->next = entry; \
     entry->value = val

@@ -69,7 +69,7 @@ STC_API _cx_value* _cx_memb(_release)(_cx_self* self);
 STC_API void _cx_memb(_del)(_cx_self* self);
 
 STC_INLINE _cx_self _cx_memb(_init)(size_t xdim, size_t ydim, size_t zdim) {
-    return _cx_memb(_with_storage)(xdim, ydim, zdim, c_new_n(_cx_value, xdim*ydim*zdim));
+    return _cx_memb(_with_storage)(xdim, ydim, zdim, c_alloc_n(_cx_value, xdim*ydim*zdim));
 }
 
 STC_INLINE size_t _cx_memb(_size)(_cx_self arr)
@@ -105,7 +105,7 @@ STC_INLINE void _cx_memb(_next)(_cx_iter* it)
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
 
 STC_DEF _cx_self _cx_memb(_with_storage)(size_t xdim, size_t ydim, size_t zdim, _cx_value* block) {
-    _cx_self _arr = {c_new_n(_cx_value**, xdim*(ydim + 1)), xdim, ydim, zdim};
+    _cx_self _arr = {c_alloc_n(_cx_value**, xdim*(ydim + 1)), xdim, ydim, zdim};
     _cx_value** p = (_cx_value**) &_arr.data[xdim];
     for (size_t x = 0, y; x < xdim; ++x, p += ydim)
         for (_arr.data[x] = p, y = 0; y < ydim; ++y, block += zdim)

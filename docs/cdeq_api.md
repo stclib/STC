@@ -28,7 +28,7 @@ cdeq_X              cdeq_X_clone(cdeq_X deq);
 
 void                cdeq_X_clear(cdeq_X* self);
 void                cdeq_X_copy(cdeq_X* self, cdeq_X other);
-void                cdeq_X_reserve(cdeq_X* self, size_t cap);
+bool                cdeq_X_reserve(cdeq_X* self, size_t cap);
 void                cdeq_X_shrink_to_fit(cdeq_X* self);
 void                cdeq_X_swap(cdeq_X* a, cdeq_X* b);
 void                cdeq_X_del(cdeq_X* self);                                                    // destructor

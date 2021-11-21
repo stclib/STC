@@ -35,8 +35,8 @@ cvec_X              cvec_X_clone(cvec_X vec);
 
 void                cvec_X_clear(cvec_X* self);
 void                cvec_X_copy(cvec_X* self, cvec_X other);
-void                cvec_X_reserve(cvec_X* self, size_t cap);
-void                cvec_X_resize(cvec_X* self, size_t size, i_val fill);
+bool                cvec_X_reserve(cvec_X* self, size_t cap);
+bool                cvec_X_resize(cvec_X* self, size_t size, i_val fill);
 void                cvec_X_shrink_to_fit(cvec_X* self);
 void                cvec_X_swap(cvec_X* a, cvec_X* b);
 void                cvec_X_del(cvec_X* self);                                                // destructor

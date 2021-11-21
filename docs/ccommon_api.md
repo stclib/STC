@@ -133,17 +133,22 @@ int arr[] = {1, 2, 3};
 c_apply_n(cvec_i, push_back, &vec, arr, c_arraylen(arr));
 ```
 
-### c_new, c_new_n, c_del, c_make
+### c_new, c_alloc, c_alloc_n, c_del, c_make
 
 | Usage                          | Meaning                                 |
 |:-------------------------------|:----------------------------------------|
-| `c_new (type)`                 | `(type *) c_malloc(sizeof(type))`       |
-| `c_new_n (type, N)`            | `(type *) c_malloc((N)*sizeof(type))`   |
+| `c_new (type, value)`          | Move value to a new object on the heap  |
+| `c_alloc (type)`               | `(type *) c_malloc(sizeof(type))`       |
+| `c_alloc_n (type, N)`          | `(type *) c_malloc((N)*sizeof(type))`   |
 | `c_del (ctype, &c1, ..., &cN)` | `ctype_del(&c1); ... ctype_del(&cN)`    |
 | `c_make(type){value...}`       | `(type){value...}` // c++ compatability |
 
 ```c
-int* array = c_new_n (int, 100);
+struct Pnt { double x, y, z; };
+struct Pnt *pnt = c_new (struct Pnt, {1.2, 3.4, 5.6});
+c_free(pnt);
+
+int* array = c_alloc_n (int, 100);
 c_free(array);
 
 cstr a = cstr_from("Hello"), b = cstr_from("World");

@@ -308,7 +308,7 @@ _cx_memb(_insert_entry_)(_cx_self* self, i_keyraw rkey) {
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self m) {
     _cx_self clone = {
-        c_new_n(_cx_value, m.bucket_count),
+        c_alloc_n(_cx_value, m.bucket_count),
         (uint8_t *) memcpy(c_malloc(m.bucket_count + 1), m._hashx, m.bucket_count + 1),
         m.size, m.bucket_count,
         m.max_load_factor
@@ -325,7 +325,7 @@ _cx_memb(_reserve)(_cx_self* self, const size_t _newcap) {
     const _cx_size _oldbuckets = self->bucket_count;
     const _cx_size _nbuckets = ((_cx_size)(_newcap/self->max_load_factor) + 2) | 1;
     _cx_self _tmp = {
-        c_new_n(_cx_value, _nbuckets),
+        c_alloc_n(_cx_value, _nbuckets),
         (uint8_t *) c_calloc(_nbuckets + 1, sizeof(uint8_t)),
         self->size, (_cx_size) _nbuckets,
         self->max_load_factor

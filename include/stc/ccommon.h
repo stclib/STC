@@ -74,17 +74,18 @@
     ((type *)((char *)(ptr) - offsetof(type, member)))
 
 #ifndef __cplusplus
-#  define c_new(T)              c_malloc(sizeof(T))
-#  define c_new_n(T, n)         c_malloc(sizeof(T)*(n))
+#  define c_alloc(T)            c_malloc(sizeof(T))
+#  define c_alloc_n(T, n)       c_malloc(sizeof(T)*(n))
 #  define c_make(T)             (T)
-#  define c_make_ptr(T, ...)    memcpy(c_new(T), (T[]){__VA_ARGS__}, sizeof(T))
+#  define c_new(T, ...)         memcpy(c_alloc(T), (T[]){__VA_ARGS__}, sizeof(T))
 #else
 #  include <new>
-#  define c_new(T)              static_cast<T*>(c_malloc(sizeof(T)))
-#  define c_new_n(T, n)         static_cast<T*>(c_malloc(sizeof(T)*(n)))
+#  define c_alloc(T)            static_cast<T*>(c_malloc(sizeof(T)))
+#  define c_alloc_n(T, n)       static_cast<T*>(c_malloc(sizeof(T)*(n)))
 #  define c_make(T)             T
-#  define c_make_ptr(T, ...)    new (c_new(T)) T{__VA_ARGS__}
+#  define c_new(T, ...)         new (c_alloc(T)) T(__VA_ARGS__)
 #endif
+#define c_delete(T, ptr)        do { T* _p = ptr; T##_del(_p); c_free(_p); } while(0)
 #ifndef c_malloc
 #  define c_malloc(sz)          malloc(sz)
 #  define c_calloc(n, sz)       calloc(n, sz)
@@ -169,7 +170,7 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
 #define c_autobuf(b, type, n) c_autobuf_N(b, type, n, 256)
 #define c_autobuf_N(b, type, n, BYTES) \
     for (type _c_b[((BYTES) - 1) / sizeof(type) + 1], \
-         *b = (n)*sizeof *b > (BYTES) ? c_new_n(type, n) : _c_b \
+         *b = (n)*sizeof *b > (BYTES) ? c_alloc_n(type, n) : _c_b \
          ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)
 
 #define c_apply(CX, method, cx, ...) do { \

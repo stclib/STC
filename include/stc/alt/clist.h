@@ -294,7 +294,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
 
 
 #define _c_clist_insert_after(self, _cx_self, node, val) \
-    _cx_node *entry = c_new (_cx_node); \
+    _cx_node *entry = c_alloc (_cx_node); \
     if (node) entry->next = node->next, node->next = entry; \
     else      entry->next = entry; \
     entry->value = val

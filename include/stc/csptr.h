@@ -102,13 +102,13 @@ _cx_memb(_use_count)(_cx_self ptr) { return ptr.use_count ? *ptr.use_count : 0; 
 STC_INLINE _cx_self
 _cx_memb(_from)(_cx_value* p) {
     _cx_self ptr = {p};
-    if (p) *(ptr.use_count = c_new(atomic_count_t)) = 1;
+    if (p) *(ptr.use_count = c_alloc(atomic_count_t)) = 1;
     return ptr;
 }
 
 STC_INLINE _cx_self
 _cx_memb(_make)(_cx_value val) {
-    _cx_self ptr; cx_csptr_rep *rep = c_new(cx_csptr_rep);
+    _cx_self ptr; cx_csptr_rep *rep = c_alloc(cx_csptr_rep);
     *(ptr.use_count = &rep->counter) = 1;
     *(ptr.get = &rep->value) = val;
     return ptr;
