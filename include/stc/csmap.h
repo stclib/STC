@@ -96,7 +96,7 @@ typedef cx_SET_ONLY( i_keyraw )
 STC_API _cx_self        _cx_memb(_init)(void);
 STC_API _cx_self        _cx_memb(_clone)(_cx_self tree);
 STC_API void            _cx_memb(_del)(_cx_self* self);
-STC_API bool            _cx_memb(_reserve)(_cx_self* self, size_t cap);
+STC_API bool            _cx_memb(_reserve)(_cx_self* self, const size_t cap);
 STC_API _cx_value*      _cx_memb(_find_it)(const _cx_self* self, i_keyraw rkey, _cx_iter* out);
 STC_API _cx_iter        _cx_memb(_lower_bound)(const _cx_self* self, i_keyraw rkey);
 STC_API _cx_value*      _cx_memb(_front)(const _cx_self* self);
@@ -120,9 +120,9 @@ STC_INLINE _cx_value*   _cx_memb(_get_mut)(_cx_self* self, i_keyraw rkey)
                             { _cx_iter it; return _cx_memb(_find_it)(self, rkey, &it); }
 
 STC_INLINE _cx_self
-_cx_memb(_with_capacity)(size_t size) {
+_cx_memb(_with_capacity)(const size_t cap) {
     _cx_self tree = _cx_memb(_init)();
-    _cx_memb(_reserve)(&tree, size);
+    _cx_memb(_reserve)(&tree, cap);
     return tree;
 }
 
@@ -238,7 +238,7 @@ _cx_memb(_back)(const _cx_self* self) {
 }
 
 STC_DEF bool
-_cx_memb(_reserve)(_cx_self* self, size_t cap) {
+_cx_memb(_reserve)(_cx_self* self, const size_t cap) {
     struct csmap_rep* rep = _csmap_rep(self);
     if (cap >= rep->size) {
         _cx_size oldcap = rep->cap;
