@@ -130,10 +130,12 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
     while (--len) h = (h << 10) - h + *x++;
     return _c_rotl(h, 26) ^ h;
 }
-#define c_default_hash32(data, len_is_4) \
+#define c_hash32(data, len_is_4) \
     ((*(const uint32_t*)data * 0xc6a4a7935bd1e99d) >> 15)
-#define c_default_hash64(data, len_is_8) \
+#define c_hash64(data, len_is_8) \
     (*(const uint64_t *)data * 0xc6a4a7935bd1e99d)
+#define c_default_hash32 c_hash32 // [deprecated]
+#define c_default_hash64 c_hash64 // [deprecated]
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
 #define c_foreach_3(it, CX, cnt) \

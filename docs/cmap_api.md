@@ -80,22 +80,22 @@ cmap_X_rawvalue     cmap_X_value_toraw(cmap_X_value* pval);
 ```
 Helpers:
 ```c
-uint64_t            c_strhash(const char *str);                             // utility function
+uint64_t            c_strhash(const char *str);                              // utility function
 
 int                 c_rawstr_compare(const char* const* a, const char* const* b);
 bool                c_rawstr_equalto(const char* const* a, const char* const* b);
 uint64_t            c_rawstr_hash(const char* const* strp, ...);
 
-uint64_t            c_default_hash(const void *data, size_t len);           // key any trivial type
-uint64_t            c_default_hash32(const void* data, size_t is4);         // key one 32bit int
-uint64_t            c_default_hash64(const void* data, size_t is8);         // key one 64bit int
+uint64_t            c_default_hash(const void *data, size_t len);            // key is any integral type
+uint64_t            c_hash32(const void* data, size_t is4);                  // key is one 32-bit int
+uint64_t            c_hash64(const void* data, size_t is8);                  // key is one 64-bit int
 bool                c_default_equalto(const i_keyraw* a, const i_keyraw* b); // the == operator
 bool                c_memcmp_equalto(const i_keyraw* a, const i_keyraw* b);  // uses memcmp
 
 Type                c_no_clone(Type val);
-Type                c_default_fromraw(Type val);                            // plain copy
+Type                c_default_fromraw(Type val);                             // plain copy
 Type                c_default_toraw(Type* val);
-void                c_default_del(Type* val);                               // does nothing
+void                c_default_del(Type* val);                                // does nothing
 ```
 
 ## Types

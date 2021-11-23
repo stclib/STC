@@ -15,15 +15,15 @@ uint64_t seed = 1, mask1 = 0xffffffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
 
-#define i_key size_t
-#define i_val size_t
-#define i_hash c_default_hash64
+#define i_key uint64_t
+#define i_val uint64_t
+#define i_hash c_hash64
 #define i_tag x
 #include <stc/cmap.h>
 
 #ifdef __cplusplus
 Sample test_std_unordered_map() {
-    typedef std::unordered_map<size_t, size_t> container;
+    typedef std::unordered_map<uint64_t, uint64_t> container;
     Sample s = {"std,unordered_map"};
     {
         stc64_srandom(seed);

@@ -31,19 +31,19 @@ template <class K, class V> using rmap = robin_hood::unordered_flat_map<K, V,
     using r##map = rmap __VA_ARGS__
 
 
-DEFMAP(map_i, <int, int>);
+DEFMAP(map_i, <int32_t, int32_t>);
 DEFMAP(map_x, <uint64_t, uint64_t>);
 DEFMAP(map_s, <std::string, std::string>);
 
-#define i_key int
-#define i_val int
-#define i_hash c_default_hash32
+#define i_key int32_t
+#define i_val int32_t
+#define i_hash c_hash32
 #define i_tag i
 #include <stc/cmap.h>
 
-#define i_key size_t
-#define i_val size_t
-#define i_hash c_default_hash64
+#define i_key uint64_t
+#define i_val uint64_t
+#define i_hash c_hash64
 #define i_tag x
 #include <stc/cmap.h>
 

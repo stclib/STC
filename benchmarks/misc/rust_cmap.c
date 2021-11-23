@@ -2,7 +2,7 @@
 #include <stdio.h>
 #define i_key uint64_t
 #define i_val uint64_t
-#define i_hash c_default_hash64
+#define i_hash c_hash64
 #define i_tag u64
 #include <stc/cmap.h>
 

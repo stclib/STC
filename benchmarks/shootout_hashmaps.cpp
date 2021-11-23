@@ -26,7 +26,7 @@ KHASH_MAP_INIT_INT64(ii, int64_t)
 // cmap and khash template expansion
 #define i_key int64_t
 #define i_val int64_t
-#define i_hash c_default_hash64
+#define i_hash c_hash64
 #define i_tag ii
 #include <stc/cmap.h>
 
@@ -207,7 +207,7 @@ size_t seed;
     SEED(seed); \
     for (size_t i = 0; i < m; ++i) \
         M##_PUT(X, RAND(keybits), i); \
-    size_t x = 500000000/M##_SIZE(X); \
+    size_t x = 300000000/M##_SIZE(X); \
     clock_t difference, before = clock(); \
     for (int k=0; k < x; k++) M##_FOR (X, it) \
         sum += M##_ITEM(X, it); \
@@ -227,7 +227,7 @@ size_t seed;
     for (size_t i = 0; i < m; ++i) \
         M##_PUT(X, RAND(keybits), i); \
     before = clock(); \
-    size_t x = m * 20000000/M##_SIZE(X); \
+    size_t x = m * 10000000/M##_SIZE(X); \
     for (size_t i = 0; i < x; ++i) \
         found += M##_FIND(X, RAND(keybits)); \
     SEED(seed); \
