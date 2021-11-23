@@ -123,12 +123,12 @@ STC_INLINE uint64_t c_strhash(const char *s) {
     if (h) while ((c = *s++)) h = (h << 10) - h + c;
     return _c_rotl(h, 26) ^ h;
 }
-// len = 2,4,6,...:
+// len >= 1
 STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
-    const uint16_t *x = (const uint16_t*) key; 
-    uint64_t h = *x++; h += h << 14;
-    while ((len -= 2)) h = (h << 10) - h + *x++;
-    return _c_rotl(h, 24) ^ h;
+    const uint8_t *x = (const uint8_t*) key; 
+    uint64_t h = *x++;
+    while (--len) h = (h << 10) - h + *x++;
+    return _c_rotl(h, 26) ^ h;
 }
 #define c_default_hash32(data, len_is_4) \
     ((*(const uint32_t*)data * 0xc6a4a7935bd1e99d) >> 15)

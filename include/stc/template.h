@@ -116,6 +116,9 @@
     #define i_tag i_key  
   #endif
   #if !defined i_keyfrom && defined i_keydel
+    #ifdef STC_DEBUG
+    #error i_keydel defined, but not i_keyfrom.
+    #endif
     #define i_keyfrom c_no_clone
   #elif !defined i_keyfrom
     #define i_keyfrom c_default_fromraw
@@ -143,6 +146,9 @@
   #define i_tag i_val
 #endif
 #if !defined i_valfrom && defined i_valdel
+  #ifdef STC_DEBUG
+  #error i_del/i_valdel defined, but not i_valfrom.
+  #endif
   #define i_valfrom c_no_clone
 #elif !defined i_valfrom
   #define i_valfrom c_default_fromraw
