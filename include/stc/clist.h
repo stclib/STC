@@ -98,11 +98,13 @@ STC_API _cx_value*      _cx_memb(_push_front)(_cx_self* self, i_val value);
 STC_API _cx_iter        _cx_memb(_insert)(_cx_self* self, _cx_iter it, i_val value);
 STC_API _cx_iter        _cx_memb(_erase_at)(_cx_self* self, _cx_iter it);
 STC_API _cx_iter        _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2);
+#ifndef i_cmp_none
 STC_API size_t          _cx_memb(_remove)(_cx_self* self, i_valraw val);
+STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw val);
+#endif
 STC_API _cx_iter        _cx_memb(_splice)(_cx_self* self, _cx_iter it, _cx_self* other);
 STC_API _cx_self        _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2);
 STC_API void            _cx_memb(_sort)(_cx_self* self);
-STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw val);
 STC_API _cx_node*       _cx_memb(_erase_after_)(_cx_self* self, _cx_node* node);
 
 STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_make(_cx_self){NULL}; }
@@ -161,6 +163,7 @@ _cx_memb(_splice_range)(_cx_self* self, _cx_iter it,
     return _cx_memb(_splice)(self, it, &tmp);
 }
 
+#ifndef i_cmp_none
 STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, i_valraw val) {
     return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), val);
@@ -175,6 +178,7 @@ STC_INLINE _cx_value*
 _cx_memb(_get_mut)(_cx_self* self, i_valraw val) {
     return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), val).ref;
 }
+#endif
 
 // -------------------------- IMPLEMENTATION -------------------------
 
@@ -235,15 +239,6 @@ _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
     return it2;
 }
 
-STC_DEF _cx_iter
-_cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw val) {
-    c_foreach (it, _cx_self, it1, it2) {
-        i_valraw r = i_valto(it.ref);
-        if (i_cmp(&r, &val) == 0) return it;
-    }
-    it2.ref = NULL; return it2;
-}
-
 STC_DEF _cx_node*
 _cx_memb(_erase_after_)(_cx_self* self, _cx_node* node) {
     _cx_node* del = node->next, *next = del->next;
@@ -252,21 +247,6 @@ _cx_memb(_erase_after_)(_cx_self* self, _cx_node* node) {
     else if (self->last == del) self->last = node, node = NULL;
     i_valdel(&del->value); c_free(del);
     return node;
-}
-
-STC_DEF size_t
-_cx_memb(_remove)(_cx_self* self, i_valraw val) {
-    size_t n = 0;
-    _cx_node* prev = self->last, *node;
-    while (prev) {
-        node = prev->next;
-        i_valraw r = i_valto(&node->value);
-        if (i_cmp(&r, &val) == 0)
-            prev = _cx_memb(_erase_after_)(self, prev), ++n;
-        else
-            prev = (node == self->last ? NULL : node);
-    }
-    return n;
 }
 
 STC_DEF _cx_iter
@@ -295,6 +275,32 @@ _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
     return cx;
 }
 
+#ifndef i_cmp_none
+
+STC_DEF _cx_iter
+_cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw val) {
+    c_foreach (it, _cx_self, it1, it2) {
+        i_valraw r = i_valto(it.ref);
+        if (i_cmp(&r, &val) == 0) return it;
+    }
+    it2.ref = NULL; return it2;
+}
+
+STC_DEF size_t
+_cx_memb(_remove)(_cx_self* self, i_valraw val) {
+    size_t n = 0;
+    _cx_node* prev = self->last, *node;
+    while (prev) {
+        node = prev->next;
+        i_valraw r = i_valto(&node->value);
+        if (i_cmp(&r, &val) == 0)
+            prev = _cx_memb(_erase_after_)(self, prev), ++n;
+        else
+            prev = (node == self->last ? NULL : node);
+    }
+    return n;
+}
+
 STC_DEF int
 _cx_memb(_sort_cmp_)(const clist_VOID_node* x, const clist_VOID_node* y) {
     i_valraw a = i_valto(&((const _cx_node *) x)->value);
@@ -310,6 +316,7 @@ _cx_memb(_sort)(_cx_self* self) {
     if (self->last)
         self->last = (_cx_node *) _clist_mergesort((clist_VOID_node *) self->last->next, _cx_memb(_sort_cmp_));
 }
+#endif // !i_cmp_none
 
 #endif // TEMPLATE IMPLEMENTATION
 
@@ -324,6 +331,7 @@ _clist_count(const clist_VOID* self) {
     return n;
 }
 
+#ifndef i_cmp_none
 // Singly linked list Mergesort implementation by Simon Tatham. O(n*log n).
 // https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
 STC_DEF clist_VOID_node *
@@ -373,6 +381,7 @@ _clist_mergesort(clist_VOID_node *list, int (*cmp)(const clist_VOID_node*, const
         insize *= 2;
     }
 }
+#endif // !i_cmp_none
 #endif // NON-TEMPLATE IMPLEMENTATION
 #include "template.h"
 #define CLIST_H_INCLUDED

@@ -18,7 +18,6 @@ void Song_del(Song* s) {
 }
 
 #define i_val Song
-#define i_cmp c_no_compare
 #define i_del Song_del
 #define i_tag song
 #include <stc/csptr.h> // define csptr_song

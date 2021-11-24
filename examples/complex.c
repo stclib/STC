@@ -8,7 +8,7 @@ void check_del(float* v) {printf("destroy %g\n", *v);}
 #include <stc/cstack.h>
 
 #define i_val cstack_f
-#define i_cmp c_no_compare
+#define i_cmp_none
 #define i_valdel cstack_f_del
 #define i_tag arr
 #include <stc/clist.h>

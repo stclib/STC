@@ -167,11 +167,16 @@ _cx_memb(_take)(_cx_self* self, _cx_self ptr) {
     *self = ptr;
 }
 
+#ifndef i_cmp_none
 STC_INLINE int
 _cx_memb(_compare)(const _cx_self* x, const _cx_self* y) {
+#ifdef i_cmp_default
+    return c_default_compare(&x->get, &y->get);
+#else
     return i_cmp(x->get, y->get);
+#endif
 }
-
+#endif
 #undef cx_csptr_rep
 #undef cx_increment
 #undef cx_decrement

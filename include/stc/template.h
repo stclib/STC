@@ -162,6 +162,7 @@
 #endif
 #ifndef i_cmp
   #define i_cmp c_default_compare
+  #define i_cmp_default
 #endif
 
 #else // -------------------------------------------------------
@@ -171,6 +172,8 @@
 #undef i_imp
 #undef i_fwd
 #undef i_cmp
+#undef i_cmp_none
+#undef i_cmp_default
 #undef i_del
 #undef i_equ
 #undef i_hash

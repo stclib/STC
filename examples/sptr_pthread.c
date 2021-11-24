@@ -14,7 +14,6 @@ struct Base
 void Base_del(Base* b) { printf("Base::~Base()\n"); }
 
 #define i_val Base
-#define i_cmp c_no_compare
 #define i_del Base_del
 #define i_tag base
 #include <stc/csptr.h>

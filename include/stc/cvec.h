@@ -84,9 +84,11 @@ STC_API void            _cx_memb(_del)(_cx_self* self);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
 STC_API bool            _cx_memb(_reserve)(_cx_self* self, const size_t cap);
 STC_API bool            _cx_memb(_resize)(_cx_self* self, const size_t size, i_val fill_val);
+#ifndef i_cmp_none
 STC_API int             _cx_memb(_value_compare)(const _cx_value* x, const _cx_value* y);
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw raw);
 STC_API _cx_iter        _cx_memb(_bsearch_in)(_cx_iter it1, _cx_iter it2, i_valraw raw);
+#endif
 STC_API _cx_value*      _cx_memb(_push_back)(_cx_self* self, i_val value);
 STC_API _cx_iter        _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2);
 STC_API _cx_iter        _cx_memb(_insert_range_p)(_cx_self* self, _cx_value* pos,
@@ -192,6 +194,8 @@ _cx_memb(_at)(const _cx_self* self, const size_t idx) {
     return self->data + idx;
 }
 
+#ifndef i_cmp_none
+
 STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, i_valraw raw) {
     return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), raw);
@@ -221,7 +225,7 @@ STC_INLINE void
 _cx_memb(_sort)(_cx_self* self) {
     _cx_memb(_sort_range)(_cx_memb(_begin)(self), _cx_memb(_end)(self), _cx_memb(_value_compare));
 }
-
+#endif // !i_cmp_none
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
 
@@ -339,6 +343,7 @@ _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
     return c_make(_cx_iter){.ref = p1};
 }
 
+#ifndef i_cmp_none
 STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, i_valraw raw) {
     for (; i1.ref != i2.ref; ++i1.ref) {
@@ -367,7 +372,7 @@ _cx_memb(_value_compare)(const _cx_value* x, const _cx_value* y) {
     i_valraw ry = i_valto(y);
     return i_cmp(&rx, &ry);
 }
-
+#endif // !i_cmp_none
 #endif
 #include "template.h"
 #define CVEC_H_INCLUDED

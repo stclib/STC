@@ -98,7 +98,7 @@
 
 #define c_default_compare(x, y) c_less_compare(c_default_less, x, y)
 #define c_default_less(x, y)    (*(x) < *(y))
-#define c_no_compare(x, y)      (assert(!"c_no_compare() called"), (x)==(y))
+#define c_no_compare(x, y)      (assert(!"c_no_compare() called"), (x)==(y)) // [deprecated]
 #define c_less_compare(less, x, y) (less(y, x) - less(x, y))
 
 #define c_default_equalto(x, y)  (*(x) == *(y))

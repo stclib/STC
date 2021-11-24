@@ -72,9 +72,9 @@ Benchmark notes:
 
 Usage
 -----
-The usage of the containers is similar to the c++ standard containers in STL, so it should be easy if you are familiar with them.
-All containers are generic/templated, except for **cstr** and **cbits**. No casting is used, so containers are type-safe like
-templates in c++. A basic usage example:
+The usage of the containers is similar to the c++ standard containers in STL, so it should be easy if you
+are familiar with them. All containers are generic/templated, except for **cstr** and **cbits**.
+No casting is used, so containers are type-safe like templates in c++. A basic usage example:
 ```c
 #define i_val float
 #include <stc/cvec.h>
@@ -91,15 +91,17 @@ int main(void) {
     cvec_float_del(&vec);
 }
 ```
-In order to include two **cvec**s with different element types, include cvec.h twice. For structs, specify a compare function (or none), as `<` and `==` operators does not work on them (this enables sorting and searching).
+In order to include two **cvec**s with different element types, include cvec.h twice. For structs,
+specify a compare function (as `<` and `==` operators does not work on them), or `i_cmp_none`. 
+This enables sorting and searching.
 ```c
 #define i_val struct One
-#define i_cmp c_no_compare
+#define i_cmp_none
 #define i_tag one
 #include <stc/cvec.h>
 
 #define i_val struct Two
-#define i_cmp c_no_compare
+#define i_cmp_none
 #define i_tag two
 #include <stc/cvec.h>
 ...
@@ -192,7 +194,8 @@ int main(void) {
     }
 }
 ```
-**Note**: Do ***not*** `return` from inside a `c_auto*`-block. Instead, first `continue`, which will jump out of the block, then call `return` after the block.
+**Note**: Do ***not*** `return` from inside a `c_auto*`-block. Instead, first `continue`, which will
+jump out of the block, then call `return` after the block.
 
 Output
 ```
@@ -208,12 +211,14 @@ After erasing elements found:
 
 Installation
 ------------
-Because it is headers-only, headers can simply be included in your program. The methods are static by default (some inlined).
-You may add the *include* folder to the **CPATH** environment variable to let GCC, Clang, and TinyC locate the headers.
+Because it is headers-only, headers can simply be included in your program. The methods are static
+by default (some inlined). You may add the *include* folder to the **CPATH** environment variable to
+let GCC, Clang, and TinyC locate the headers.
 
-If containers are used across several translation units with common instantiated container types, it is recommended to
-build as a "library" to minimize the executable size. To enable this mode, specify **-DSTC_HEADER** as a compiler option
-in your build environment and place all the instantiations of containers used in a single C-source file, e.g.:
+If containers are used across several translation units with common instantiated container types,
+it is recommended to build as a "library" to minimize the executable size. To enable this mode,
+specify **-DSTC_HEADER** as a compiler option in your build environment and place all the instantiations
+of containers used in a single C-source file, e.g.:
 ```c
 // stc_libs.c
 #define STC_IMPLEMENTATION

@@ -12,7 +12,6 @@ void Person_del(Person* p) {
 
 #define i_val Person
 #define i_del Person_del
-#define i_cmp c_no_compare
 #define i_tag person
 #include <stc/csptr.h>
 
