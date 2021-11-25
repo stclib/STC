@@ -96,7 +96,7 @@ typedef cx_SET_ONLY( i_keyraw )
 STC_API _cx_self        _cx_memb(_init)(void);
 STC_API _cx_self        _cx_memb(_clone)(_cx_self tree);
 STC_API void            _cx_memb(_del)(_cx_self* self);
-STC_API bool            _cx_memb(_reserve)(_cx_self* self, const size_t cap);
+STC_API bool            _cx_memb(_reserve)(_cx_self* self, size_t cap);
 STC_API _cx_value*      _cx_memb(_find_it)(const _cx_self* self, i_keyraw rkey, _cx_iter* out);
 STC_API _cx_iter        _cx_memb(_lower_bound)(const _cx_self* self, i_keyraw rkey);
 STC_API _cx_value*      _cx_memb(_front)(const _cx_self* self);

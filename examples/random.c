@@ -1,51 +1,42 @@
 #include <stdio.h>
 #include <time.h>
-#include <math.h>
 #include <stc/crandom.h>
-#include <stc/cstr.h>
 
 int main()
 {
-    enum {R = 30};
-    const size_t N = 1000000000;
-    uint64_t seed = 1234; // time(NULL);
+    const size_t N = 5000000000;
+    const uint64_t seed = time(NULL), range = 1000000;
     stc64_t rng = stc64_init(seed);
 
-    uint64_t sum = 0;
-
-    stc64_normalf_t dist2 = stc64_normalf_init((float)R / 2.0, (float)R / 6.0);
-    size_t N2 = 10000000;
-    int hist[R] = {0};
-    sum = 0;
-    c_forrange (N2)  {
-        int n = (int) round((stc64_normalf(&rng, &dist2) + 0.5));
-        sum += n;
-        if (n >= 0 && n < R) ++hist[n];
-    }
-    cstr bar = cstr_init();
-    c_forrange (i, int, R)  {
-        cstr_resize(&bar, hist[i] * 25ull * R / N2, '*');
-        printf("%3d %s\n", i, bar.str);
-    }
-
+    uint64_t sum;
     clock_t diff, before;
 
+    printf("Compare speed of full and unbiased ranged random numbers...\n");
     sum = 0;
     before = clock();
     c_forrange (N)  {
-        sum += stc64_rand(&rng);
+        sum += (uint32_t) stc64_rand(&rng);
     }
     diff = clock() - before;
-    printf("random : %f secs, %zu %f\n", (float) diff / CLOCKS_PER_SEC, N, (double) sum / N);
+    printf("full range\t\t: %f secs, %zu, avg: %f\n", (float) diff / CLOCKS_PER_SEC, N, (double) sum / N);
 
-    stc64_uniform_t dist1 = stc64_uniform_init(0, 1000);
+    stc64_uniform_t dist1 = stc64_uniform_init(0, range);
+    rng = stc64_init(seed);
     sum = 0;
     before = clock();
     c_forrange (N)  {
-        sum += stc64_uniform(&rng, &dist1);
+        sum += stc64_uniform(&rng, &dist1); // unbiased
     }
     diff = clock() - before;
-    printf("uniform: %f secs, %zu %f\n", (float) diff / CLOCKS_PER_SEC, N, (double) sum / N);
+    printf("unbiased 0-%zu\t: %f secs, %zu, avg: %f\n", range, (float) diff / CLOCKS_PER_SEC, N, (double) sum / N);
 
-    cstr_del(&bar);
+    sum = 0;
+    rng = stc64_init(seed);
+    before = clock();
+    c_forrange (N)  {
+        sum += stc64_rand(&rng) % (range + 1); // biased
+    }
+    diff = clock() - before;
+    printf("biased 0-%zu  \t: %f secs, %zu, avg: %f\n", range, (float) diff / CLOCKS_PER_SEC, N, (double) sum / N);
+
 }

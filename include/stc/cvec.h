@@ -82,8 +82,8 @@ STC_API _cx_self        _cx_memb(_init)(void);
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_API void            _cx_memb(_del)(_cx_self* self);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
-STC_API bool            _cx_memb(_reserve)(_cx_self* self, const size_t cap);
-STC_API bool            _cx_memb(_resize)(_cx_self* self, const size_t size, i_val fill_val);
+STC_API bool            _cx_memb(_reserve)(_cx_self* self, size_t cap);
+STC_API bool            _cx_memb(_resize)(_cx_self* self, size_t size, i_val fill_val);
 #ifndef i_cmp_none
 STC_API int             _cx_memb(_value_compare)(const _cx_value* x, const _cx_value* y);
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw raw);

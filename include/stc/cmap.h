@@ -87,11 +87,11 @@ typedef cx_SET_ONLY( i_keyraw )
                               i_valraw second; } )
 _cx_rawvalue;
 
-STC_API _cx_self        _cx_memb(_with_capacity)(const size_t cap);
+STC_API _cx_self        _cx_memb(_with_capacity)(size_t cap);
 STC_API _cx_self        _cx_memb(_clone)(_cx_self map);
 STC_API void            _cx_memb(_del)(_cx_self* self);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
-STC_API bool            _cx_memb(_reserve)(_cx_self* self, const size_t capacity);
+STC_API bool            _cx_memb(_reserve)(_cx_self* self, size_t capacity);
 STC_API chash_bucket_t  _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr);
 STC_API _cx_result      _cx_memb(_insert_entry_)(_cx_self* self, i_keyraw rkey);
 STC_API void            _cx_memb(_erase_entry)(_cx_self* self, _cx_value* val);

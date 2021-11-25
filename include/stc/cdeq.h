@@ -46,7 +46,7 @@ STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
 STC_API void            _cx_memb(_del)(_cx_self* self);
 STC_API _cx_value*      _cx_memb(_push_back)(_cx_self* self, i_val value);
-STC_API bool            _cx_memb(_expand_right_half_)(_cx_self* self, const size_t idx, const size_t n);
+STC_API bool            _cx_memb(_expand_right_half_)(_cx_self* self, size_t idx, size_t n);
 
 #ifndef i_queue
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter p1, _cx_iter p2, i_valraw raw);
