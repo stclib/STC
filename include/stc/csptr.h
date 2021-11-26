@@ -57,16 +57,19 @@ int main() {
 typedef long atomic_count_t;
 #if defined(__GNUC__) || defined(__clang__)
     #define c_atomic_increment(v) (void)__atomic_add_fetch(v, 1, __ATOMIC_SEQ_CST)
-    #define c_atomic_decrement(v) __atomic_sub_fetch(v, 1, __ATOMIC_SEQ_CST)
+    #define c_atomic_decrement(v) (bool)__atomic_sub_fetch(v, 1, __ATOMIC_SEQ_CST)
 #elif defined(_MSC_VER)
     #include <intrin.h>
     #define c_atomic_increment(v) (void)_InterlockedIncrement(v)
-    #define c_atomic_decrement(v) _InterlockedDecrement(v)
+    #define c_atomic_decrement(v) (bool)_InterlockedDecrement(v)
 #elif defined(__i386__) || defined(__x86_64__)
     STC_INLINE void c_atomic_increment(atomic_count_t* v)
-        { __asm__ __volatile__("lock; incq %0" :"=m"(*v) :"m"(*v)); }
-    STC_INLINE atomic_count_t c_atomic_decrement(atomic_count_t* v) 
-        { __asm__ __volatile__("lock; decq %0" :"=m"(*v) :"m"(*v)); return *v; }
+        { asm volatile("lock; incq %0" :"=m"(*v) :"m"(*v)); }
+    STC_INLINE bool c_atomic_decrement(atomic_count_t* v) {
+        unsigned char c;
+        asm volatile("lock; decq %0; sete %1" :"=m"(*v), "=qm"(c) :"m"(*v) :"memory");
+        return !c;
+    }
 #endif
 
 #define csptr_null {NULL, NULL}
