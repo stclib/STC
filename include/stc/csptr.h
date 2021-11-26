@@ -65,11 +65,8 @@ typedef long atomic_count_t;
 #elif defined(__i386__) || defined(__x86_64__)
     STC_INLINE void c_atomic_increment(atomic_count_t* v)
         { __asm__ __volatile__("lock; incq %0" :"=m"(*v) :"m"(*v)); }
-    STC_INLINE atomic_count_t c_atomic_decrement(atomic_count_t* v) {
-        atomic_count_t r;
-        __asm__ __volatile__("lock; xadd %0, %1" :"=r"(r) :"m"(*v), "0"(-1));
-        return r - 1;
-    }
+    STC_INLINE atomic_count_t c_atomic_decrement(atomic_count_t* v) 
+        { __asm__ __volatile__("lock; decq %0" :"=m"(*v) :"m"(*v)); return *v; }
 #endif
 
 #define csptr_null {NULL, NULL}

@@ -4,7 +4,7 @@
 
 int main()
 {
-    const size_t N = 5000000000;
+    const size_t N = 1000000000;
     const uint64_t seed = time(NULL), range = 1000000;
     stc64_t rng = stc64_init(seed);
 
