@@ -56,16 +56,16 @@ int main() {
 
 typedef long atomic_count_t;
 #if defined(__GNUC__) || defined(__clang__)
-    #define c_atomic_increment(v) (void)__atomic_add_fetch(v, 1, __ATOMIC_SEQ_CST)
-    #define c_atomic_decrement(v) (bool)__atomic_sub_fetch(v, 1, __ATOMIC_SEQ_CST)
+    #define c_atomic_inc(v) (void)__atomic_add_fetch(v, 1, __ATOMIC_SEQ_CST)
+    #define c_atomic_dec_and_test(v) !__atomic_sub_fetch(v, 1, __ATOMIC_SEQ_CST)
 #elif defined(_MSC_VER)
     #include <intrin.h>
-    #define c_atomic_increment(v) (void)_InterlockedIncrement(v)
-    #define c_atomic_decrement(v) (bool)_InterlockedDecrement(v)
+    #define c_atomic_inc(v) (void)_InterlockedIncrement(v)
+    #define c_atomic_dec_and_test(v) !_InterlockedDecrement(v)
 #elif defined(__i386__) || defined(__x86_64__)
-    STC_INLINE void c_atomic_increment(atomic_count_t* v)
+    STC_INLINE void c_atomic_inc(atomic_count_t* v)
         { asm volatile("lock; incq %0" :"=m"(*v) :"m"(*v)); }
-    STC_INLINE bool c_atomic_decrement(atomic_count_t* v) {
+    STC_INLINE bool c_atomic_dec_and_test(atomic_count_t* v) {
         unsigned char c;
         asm volatile("lock; decq %0; sete %1" :"=m"(*v), "=qm"(c) :"m"(*v) :"memory");
         return !c;
@@ -73,6 +73,7 @@ typedef long atomic_count_t;
 #endif
 
 #define csptr_null {NULL, NULL}
+#define _cx_csptr_rep struct _cx_memb(_rep_)
 #endif // CSPTR_H_INCLUDED
 
 #ifndef i_prefix
@@ -81,17 +82,16 @@ typedef long atomic_count_t;
 #include "template.h"
 
 #ifdef i_nonatomic
-  #define cx_increment(v) (++*(v))
-  #define cx_decrement(v) (--*(v))
+  #define _i_atomic_inc(v) (void)(++*(v))
+  #define _i_atomic_dec_and_test(v) !(--*(v))
 #else
-  #define cx_increment(v) c_atomic_increment(v)
-  #define cx_decrement(v) c_atomic_decrement(v)
+  #define _i_atomic_inc(v) c_atomic_inc(v)
+  #define _i_atomic_dec_and_test(v) c_atomic_dec_and_test(v)
 #endif
 #ifndef i_fwd
 _cx_deftypes(_c_csptr_types, _cx_self, i_val);
 #endif
-#define cx_csptr_rep struct _cx_memb(_rep_)
-cx_csptr_rep { atomic_count_t counter; _cx_value value; };
+_cx_csptr_rep { atomic_count_t counter; _cx_value value; };
 
 STC_INLINE _cx_self
 _cx_memb(_init)(void) { return c_make(_cx_self){NULL, NULL}; }
@@ -108,7 +108,7 @@ _cx_memb(_from)(_cx_value* p) {
 
 STC_INLINE _cx_self
 _cx_memb(_make)(_cx_value val) {
-    _cx_self ptr; cx_csptr_rep *rep = c_alloc(cx_csptr_rep);
+    _cx_self ptr; _cx_csptr_rep *rep = c_alloc(_cx_csptr_rep);
     *(ptr.use_count = &rep->counter) = 1;
     *(ptr.get = &rep->value) = val;
     return ptr;
@@ -116,7 +116,7 @@ _cx_memb(_make)(_cx_value val) {
 
 STC_INLINE _cx_self
 _cx_memb(_clone)(_cx_self ptr) {
-    if (ptr.use_count) cx_increment(ptr.use_count);
+    if (ptr.use_count) _i_atomic_inc(ptr.use_count);
     return ptr;
 }
 
@@ -129,9 +129,9 @@ _cx_memb(_move)(_cx_self* self) {
 
 STC_INLINE void
 _cx_memb(_del)(_cx_self* self) {
-    if (self->use_count && cx_decrement(self->use_count) == 0) {
+    if (self->use_count && _i_atomic_dec_and_test(self->use_count)) {
         i_valdel(self->get);
-        if (self->get != &((cx_csptr_rep *)self->use_count)->value)
+        if (self->get != &((_cx_csptr_rep *)self->use_count)->value)
             c_free(self->get);
         c_free(self->use_count);
     }
@@ -157,7 +157,7 @@ _cx_memb(_reset_with)(_cx_self* self, _cx_value val) {
 
 STC_INLINE void
 _cx_memb(_copy)(_cx_self* self, _cx_self ptr) {
-    if (ptr.use_count) cx_increment(ptr.use_count);
+    if (ptr.use_count) _i_atomic_inc(ptr.use_count);
     _cx_memb(_del)(self); *self = ptr;
 }
 
@@ -177,8 +177,7 @@ _cx_memb(_compare)(const _cx_self* x, const _cx_self* y) {
 #endif
 }
 #endif
-#undef cx_csptr_rep
-#undef cx_increment
-#undef cx_decrement
 #undef i_nonatomic
+#undef _i_atomic_inc
+#undef _i_atomic_dec_and_test
 #include "template.h"
