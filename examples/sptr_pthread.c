@@ -25,7 +25,7 @@ void* thr(csptr_base* lp)
     c_autoscope (pthread_mutex_lock(&mtx), pthread_mutex_unlock(&mtx))
     {
         printf("local pointer in a thread:\n"
-                "  p.get() = %p, p.use_count() = %zu\n", (void*)lp->get, *lp->use_count);
+                "  p.get() = %p, p.use_count() = %ld\n", (void*)lp->get, *lp->use_count);
     }
     /* atomically decrease ref. */
     csptr_base_del(lp);
@@ -37,7 +37,7 @@ int main()
     csptr_base p = csptr_base_make((Base){42});
 
     printf("Created a Base\n"
-           "  p.get() = %p, p.use_count() = %zu\n", (void*)p.get, *p.use_count);
+           "  p.get() = %p, p.use_count() = %ld\n", (void*)p.get, *p.use_count);
     enum {N = 3};
     pthread_t t[N];
     csptr_base c[N];
@@ -48,7 +48,7 @@ int main()
 
     printf("Shared ownership between %d threads and released\n"
            "ownership from main:\n"
-           "  p.get() = %p, p.use_count() = %zu\n", N, (void*)p.get, *p.use_count);
+           "  p.get() = %p, p.use_count() = %ld\n", N, (void*)p.get, *p.use_count);
     csptr_base_reset(&p);
 
     c_forrange (i, N) pthread_join(t[i], NULL);
