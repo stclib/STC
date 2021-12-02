@@ -5,6 +5,13 @@ STC - Smart Template Containers for C
 
 News
 ----
+Breaking changes for i_cmp_none and i_fwd:
+- Removed: i_cmp_none and i_fwd (replaced by c_no_compare and c_is_fwd args to i_opt).
+- Added compile-time disabling of clonable and comparable container elements, controlled by i_opt (c_no_clone | c_no_compare)
+- Added i_opt: can define multiple compile-time options: c_no_compare, c_no_clone, c_no_atomic, c_is_fwd: may be combined with | separator.
+- Except for csptr, when i_del / i_valdel / i_keydel is defined, also i_from / i_keyfrom / i_valfrom must be defined or i_opt c_no_clone.
+- For struct elements, either i_cmp must be defined (as before), or define i_opt c_no_compare (for non-associative containers only).
+
 **VERSION 2.X RELEASED**: There are two main breaking changes from V1.X.
 - Uses a different way to instantiate templated containers, which is incompatible with v1.X.
 - c_forauto, c_forvar, c_forscope macros are now renamed to **c_auto**, **c_autovar**, and **c_autoscope**. These are for automatic scope resource management, aka RAII.
@@ -91,17 +98,21 @@ int main(void) {
     cvec_float_del(&vec);
 }
 ```
-In order to include two **cvec**s with different element types, include cvec.h twice. For structs,
-specify a compare function (as `<` and `==` operators does not work on them), or `i_cmp_none`. 
-This enables sorting and searching.
+In order to include two **cvec**s with different element types, include cvec.h twice. For struct, a `i_cmp`
+compare function is required to enable sorting and searching (`<` and `==` operators is default and works
+for integral types only). Alternatively, `#define i_opt c_no_compare` to disable methods using comparison.
+
+Similarly, if a destructor `i_del` is defined, either define a `i_valfrom` construct/clone function
+or `#define i_opt c_no_clone` to disable cloning and emplace methods. Unless these requirements are met,
+compile errors are generated.
 ```c
 #define i_val struct One
-#define i_cmp_none
+#define i_opt c_no_compare
 #define i_tag one
 #include <stc/cvec.h>
 
 #define i_val struct Two
-#define i_cmp_none
+#define i_opt c_no_compare
 #define i_tag two
 #include <stc/cvec.h>
 ...
@@ -242,6 +253,37 @@ of containers used in a single C-source file, e.g.:
 #include <stc/clist.h> // clist_pnt
 ```
 
+Specifying template parameters
+------------------------------
+Each templated type requires one `#include`, even if it's the same container base type, as described earlier.
+The template parameters are given by a `#define i_xxxx` statement, where *xxxx* is the parameter name.
+The list of template parameters:
+
+- `i_tag`     - Container type tag. Defaults to same as `i_key`
+- `i_cnt`     - Container type name.
+- `i_opt`     - Boolean properties: may combine `c_no_compare`, `c_no_clone`, `c_is_fwd` with `|` character.
+
+- `i_key`     - Maps key type. **[required]** for cmap/csmap.
+- `i_val`     - The container **[required]** element type. For cmap/csmap, it is the mapped value.
+- `i_cmp`     - Three-way comparison of two `i_keyraw`, **[required]** for non-integral `i_keyraw`.
+- `i_equ`     - Equality comparison of two `i_keyraw`, `i_cmp` alternative.
+
+- `i_keydel`  - Destroy map key func - defaults to empty destructor.
+- `i_keyraw`  - Convertion "raw" type - defaults to `i_key` type.
+- `i_keyfrom` - Convertion func `i_keyraw` => `i_key` - defaults to simple copy. **[required]** if `i_keydel` is defined.
+- `i_keyto`   - Convertion func `i_key` => `i_keyraw` - defaults to simple copy.
+
+- `i_valdel`  - Destroy mapped or value func - defaults to empty destruct.
+- `i_valraw`  - Convertion "raw" type - defaults to `i_val` type.
+- `i_valfrom` - Convertion func `i_valraw` => `i_val` - defaults to simple copy.
+- `i_valto`   - Convertion func `i_val` => `i_valraw` - defaults to simple copy.
+
+An alternative to defining `i_cmp`, you may `#define i_opt c_no_compare` to disable methods using comparison.
+
+Similarly, if a destructor `i_del` is defined, either define `i_valfrom` constructor/clone function
+or `#define i_opt c_no_clone` to disable cloning and the emplace methods. Unless these requirements are met,
+compile errors are generated.
+
 The *emplace* versus non-emplace container methods
 --------------------------------------------------
 STC, like c++ STL, has two sets of methods for adding elements to containers. One set begins
@@ -337,7 +379,7 @@ typedef struct Dataset {
 
 ...
 // Implementation
-#define i_fwd               // flag that the container was forward declared.
+#define c_opt c_is_fwd                    // flag that the container was forward declared.
 #define i_val struct Point
 #define i_tag pnt
 #include <stc/cstack.h>

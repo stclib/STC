@@ -184,7 +184,6 @@ void mapdemo3()
     cmap_str_del(&table); // frees key and value cstrs, and hash table.
 }
 
-//#define i_prefix carray3 // backward compatible.
 #define i_val float
 #define i_tag f
 #include <stc/carr3.h>

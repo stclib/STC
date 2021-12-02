@@ -4,11 +4,12 @@ void check_del(float* v) {printf("destroy %g\n", *v);}
 
 #define i_val float
 #define i_valdel check_del
+#define i_opt c_no_clone
 #define i_tag f
 #include <stc/cstack.h>
 
 #define i_val cstack_f
-#define i_cmp_none
+#define i_opt c_no_clone|c_no_compare
 #define i_valdel cstack_f_del
 #define i_tag arr
 #include <stc/clist.h>
@@ -16,12 +17,14 @@ void check_del(float* v) {printf("destroy %g\n", *v);}
 #define i_key int
 #define i_val clist_arr
 #define i_valdel clist_arr_del
+#define i_opt c_no_clone
 #define i_tag lst
 #include <stc/cmap.h>
 
 #define i_key_str
 #define i_val cmap_lst
 #define i_valdel cmap_lst_del
+#define i_opt c_no_clone
 #define i_tag map
 #include <stc/cmap.h>
 

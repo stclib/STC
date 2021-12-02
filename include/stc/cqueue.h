@@ -53,10 +53,10 @@ int main() {
 }
 */
 
-#ifndef i_prefix
-#define i_prefix cqueue_
+#ifndef _i_prefix
+#define _i_prefix cqueue_
 #endif
-#define i_queue
+#define _i_queue
 #define _push_back _push
 #define _pop_front _pop
 
@@ -64,4 +64,4 @@ int main() {
 
 #undef _push_back
 #undef _pop_front
-#undef i_queue
+#undef _i_queue

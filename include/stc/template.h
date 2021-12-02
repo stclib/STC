@@ -20,12 +20,12 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef i_template
-#define i_template
+#ifndef _i_template
+#define _i_template
 
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
-  #define _cx_self c_PASTE(i_prefix, i_tag)
+  #define _cx_self c_PASTE(_i_prefix, i_tag)
   #define _cx_memb(name) c_PASTE(_cx_self, name)
   #define _cx_deftypes(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
   #define _cx_value _cx_memb(_value)
@@ -53,8 +53,8 @@
 
 #ifdef i_cnt
   #define i_tag i_cnt
-  #undef i_prefix
-  #define i_prefix
+  #undef _i_prefix
+  #define _i_prefix
 #endif
 
 #ifdef i_key_csptr
@@ -107,19 +107,23 @@
 #elif defined i_del
   #error i_del not supported for maps, define i_keydel / i_valdel instead.
 #endif
+#if defined i_from && defined i_isset
+  #define i_keyfrom i_from
+#elif defined i_from && !defined i_key
+  #define i_valfrom i_from
+#elif defined i_from
+  #error i_from not supported for maps, define i_keyfrom / i_valfrom instead.
+#endif
 
 #ifdef i_key
-  #ifdef i_isset
+  #ifdef _i_isset
     #define i_val i_key
   #endif
   #ifndef i_tag
     #define i_tag i_key  
   #endif
-  #if !defined i_keyfrom && defined i_keydel
-    #ifdef STC_DEBUG
-    #error i_keydel defined, but not i_keyfrom.
-    #endif
-    #define i_keyfrom c_no_clone
+  #if defined i_keydel && !defined i_keyfrom && !c_option(c_no_clone)
+    #error i_keydel defined requires defining i_keyfrom or '#define i_opt c_no_clone'
   #elif !defined i_keyfrom
     #define i_keyfrom c_default_fromraw
   #endif
@@ -138,18 +142,15 @@
   #ifndef i_keydel
     #define i_keydel c_default_del
   #endif
-#elif defined i_isset || defined i_hash || defined i_equ
+#elif defined _i_isset || defined i_hash || defined i_equ
   #error i_key define is missing.
 #endif
 
 #ifndef i_tag
   #define i_tag i_val
 #endif
-#if !defined i_valfrom && defined i_valdel
-  #ifdef STC_DEBUG
-  #error i_del/i_valdel defined, but not i_valfrom.
-  #endif
-  #define i_valfrom c_no_clone
+#if defined i_valdel && !defined i_valfrom && !c_option(c_no_clone)
+  #error i_del/i_valdel defined: requires also defining i_valfrom or '#define i_opt c_no_clone'
 #elif !defined i_valfrom
   #define i_valfrom c_default_fromraw
 #endif
@@ -162,18 +163,16 @@
 #endif
 #ifndef i_cmp
   #define i_cmp c_default_compare
-  #define i_cmp_default
+  #define _i_cmp_default
 #endif
 
 #else // -------------------------------------------------------
 
-#undef i_prefix
+#undef i_cnt
 #undef i_tag
 #undef i_imp
-#undef i_fwd
+#undef i_opt
 #undef i_cmp
-#undef i_cmp_none
-#undef i_cmp_default
 #undef i_del
 #undef i_equ
 #undef i_hash
@@ -181,6 +180,7 @@
 #undef i_val_str
 #undef i_valdel
 #undef i_valfrom
+#undef i_from
 #undef i_valto
 #undef i_valraw
 #undef i_key
@@ -191,7 +191,8 @@
 #undef i_keyraw
 #undef i_key_csptr
 #undef i_val_csptr
-#undef i_cnt
 
-#undef i_template
+#undef _i_prefix
+#undef _i_cmp_default
+#undef _i_template
 #endif

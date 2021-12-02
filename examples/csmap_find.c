@@ -8,7 +8,7 @@
 #include <stc/csmap.h>
 
 #define i_val csmap_istr_rawvalue
-#define i_cmp c_no_compare
+#define i_opt c_no_compare
 #define i_tag istr
 #include <stc/cvec.h>
 

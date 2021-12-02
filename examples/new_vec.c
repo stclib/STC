@@ -9,9 +9,9 @@ struct MyStruct {
     cvec_pnt pntvec;
 } typedef MyStruct;
 
-#define i_fwd pnt
-#define i_tag i32
 #define i_val int
+#define i_opt c_is_fwd
+#define i_tag i32
 #include <stc/cvec.h>
 
 struct Point { int x, y; } typedef Point;
@@ -22,7 +22,7 @@ int point_compare(const Point* a, const Point* b) {
 
 #define i_val Point
 #define i_cmp point_compare
-#define i_fwd pnt
+#define i_opt c_is_fwd
 #define i_tag pnt
 #include <stc/cvec.h>
 

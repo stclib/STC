@@ -3,13 +3,14 @@
 #define i_key_str
 #define i_val_str
 #define i_tag sect
-#include <stc/csmap.h>
+#include <stc/csmap.h> // csmap_sect
 
 #define i_key_str
 #define i_val csmap_sect
 #define i_valdel csmap_sect_del
+#define i_valfrom csmap_sect_clone
 #define i_tag conf
-#include <stc/csmap.h>
+#include <stc/csmap.h> // csmap_conf
 
 void add(csmap_conf* map, const char* section, const char* entry, const char* value)
 {

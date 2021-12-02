@@ -15,7 +15,7 @@
 #include <stc/csmap.h>
 
 #define i_val csmap_ii_rawvalue
-#define i_cmp c_no_compare
+#define i_opt c_no_compare
 #define i_tag ii
 #include <stc/cvec.h>
 

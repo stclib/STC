@@ -61,7 +61,7 @@ point_key_compare(const point* a, const point* b)
 #include <stc/cpque.h>
 
 #define i_val point
-#define i_cmp c_no_compare
+#define i_opt c_no_compare
 #include <stc/cdeq.h>
 
 #define i_key point

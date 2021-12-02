@@ -23,7 +23,7 @@ int point_compare(const Point* a, const Point* b) {
 #define i_key Point
 #define i_val int
 #define i_cmp point_compare
-#define i_fwd
+#define i_opt c_is_fwd
 #define i_tag pnt
 #include <stc/csmap.h>
 

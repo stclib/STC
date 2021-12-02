@@ -22,7 +22,7 @@ int Point_cmp(const Point* a, const Point* b) {
 
 #define i_val Point
 #define i_cmp Point_cmp
-#define i_fwd // forward declared.
+#define i_opt c_is_fwd
 #define i_tag pnt
 #include <stc/cpque.h>
 

@@ -9,6 +9,7 @@
 #define i_val clist_str
 #define i_cmp -c_default_compare
 #define i_valdel clist_str_del
+#define i_valfrom clist_str_clone
 #define i_tag mult
 #include <stc/csmap.h>
 

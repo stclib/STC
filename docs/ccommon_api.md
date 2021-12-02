@@ -155,6 +155,17 @@ cstr a = cstr_from("Hello"), b = cstr_from("World");
 c_del(cstr, &a, &b);
 ```
 
+### General predefined template parameter functions
+```
+int     c_default_compare(const Type*, const Type*);
+Type    c_default_fromraw(Type val);         // simple copy
+Type    c_default_toraw(const Type* val);    // dereference val
+void    c_default_del(Type* val);            // does nothing
+
+int     c_rawstr_compare(const char* const* a, const char* const* b);
+bool    c_rawstr_equalto(const char* const* a, const char* const* b);
+```
+
 ### c_malloc, c_calloc, c_realloc, c_free
 Memory allocator for the entire library. Macros can be overloaded by the user.
 

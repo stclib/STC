@@ -28,12 +28,12 @@
 #include "forward.h"
 #endif // CSTACK_H_INCLUDED
 
-#ifndef i_prefix
-#define i_prefix cstack_
+#ifndef _i_prefix
+#define _i_prefix cstack_
 #endif
 #include "template.h"
 
-#if !defined i_fwd
+#if !c_option(c_is_fwd)
 _cx_deftypes(_c_cstack_types, _cx_self, i_val);
 #endif
 typedef i_valraw _cx_rawvalue;
@@ -91,11 +91,13 @@ STC_INLINE _cx_value* _cx_memb(_push)(_cx_self* self, _cx_value val) {
     *vp = val; return vp;
 }
 
-STC_INLINE _cx_value* _cx_memb(_emplace)(_cx_self* self, _cx_rawvalue raw)
-    { return _cx_memb(_push)(self, i_valfrom(raw)); }
-
 STC_INLINE _cx_value* _cx_memb(_at)(const _cx_self* self, size_t idx)
     { assert(idx < self->size); return self->data + idx; }
+
+#if !c_option(c_no_clone)
+
+STC_INLINE _cx_value* _cx_memb(_emplace)(_cx_self* self, _cx_rawvalue raw)
+    { return _cx_memb(_push)(self, i_valfrom(raw)); }
 
 STC_INLINE _cx_self _cx_memb(_clone)(_cx_self v) {
     _cx_self out = {(_cx_value *) c_malloc(v.size*sizeof(_cx_value)), v.size, v.size};
@@ -112,6 +114,8 @@ STC_INLINE i_val _cx_memb(_value_clone)(_cx_value val)
     { return i_valfrom(i_valto(&val)); }
 STC_INLINE i_valraw _cx_memb(_value_toraw)(_cx_value* val)
     { return i_valto(val); }
+
+#endif // !c_no_clone
 
 STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self)
     { return c_make(_cx_iter){self->data}; }

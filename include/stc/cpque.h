@@ -27,13 +27,13 @@
 #include "forward.h"
 #endif
 
-#ifndef i_prefix
-#define i_prefix cpque_
+#ifndef _i_prefix
+#define _i_prefix cpque_
 #endif
 
 #include "template.h"
 
-#if !defined i_fwd
+#if !c_option(c_is_fwd)
    _cx_deftypes(_c_cpque_types, _cx_self, i_val);
 #endif
 typedef i_valraw _cx_rawvalue;
@@ -41,7 +41,6 @@ typedef i_valraw _cx_rawvalue;
 STC_API void _cx_memb(_make_heap)(_cx_self* self);
 STC_API void _cx_memb(_erase_at)(_cx_self* self, size_t idx);
 STC_API void _cx_memb(_push)(_cx_self* self, _cx_value value);
-STC_API _cx_self _cx_memb(_clone)(_cx_self q);
 
 STC_INLINE _cx_self _cx_memb(_init)(void)
     { return c_make(_cx_self){0}; }
@@ -65,11 +64,6 @@ STC_INLINE void _cx_memb(_clear)(_cx_self* self) {
 STC_INLINE void _cx_memb(_del)(_cx_self* self)
     { _cx_memb(_clear)(self); c_free(self->data); }
 
-STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
-    if (self->data == other.data) return;
-    _cx_memb(_del)(self); *self = _cx_memb(_clone)(other);
-}
-
 STC_INLINE size_t _cx_memb(_size)(_cx_self q)
     { return q.size; }
 
@@ -85,11 +79,20 @@ STC_INLINE _cx_value* _cx_memb(_top)(const _cx_self* self)
 STC_INLINE void _cx_memb(_pop)(_cx_self* self)
     { _cx_memb(_erase_at)(self, 0); }
 
+#if !c_option(c_no_clone)
+STC_API _cx_self _cx_memb(_clone)(_cx_self q);
+
+STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
+    if (self->data == other.data) return;
+    _cx_memb(_del)(self); *self = _cx_memb(_clone)(other);
+}
+
 STC_INLINE void _cx_memb(_emplace)(_cx_self* self, _cx_rawvalue raw)
     { _cx_memb(_push)(self, i_valfrom(raw)); }
 
 STC_INLINE i_val _cx_memb(_value_clone)(_cx_value val)
     { return i_valfrom(i_valto(&val)); }
+#endif
 
 STC_INLINE void
 _cx_memb(_push_back)(_cx_self* self, _cx_value value) {
@@ -121,12 +124,15 @@ _cx_memb(_make_heap)(_cx_self* self) {
         _cx_memb(_sift_down_)(arr, k, n);
 }
 
+#if !c_option(c_no_clone)
+
 STC_DEF _cx_self _cx_memb(_clone)(_cx_self q) {
     _cx_self out = _cx_memb(_with_capacity)(q.size);
     for (; out.size < out.capacity; ++out.size, ++q.data)
         out.data[out.size] = i_valfrom(i_valto(q.data));
     return out;
 }
+#endif
 
 STC_DEF void
 _cx_memb(_erase_at)(_cx_self* self, size_t idx) {

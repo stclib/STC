@@ -78,12 +78,12 @@ _c_clist_complete_types(clist_VOID, dummy);
 
 #endif // CLIST_H_INCLUDED
 
-#ifndef i_prefix
-#define i_prefix clist_
+#ifndef _i_prefix
+#define _i_prefix clist_
 #endif
 #include "template.h"
 
-#if !defined i_fwd
+#if !c_option(c_is_fwd)
   _cx_deftypes(_c_clist_types, _cx_self, i_val);
 #endif
 _cx_deftypes(_c_clist_complete_types, _cx_self, dummy);
@@ -91,14 +91,13 @@ typedef i_valraw _cx_rawvalue;
 
 STC_API size_t _clist_count(const clist_VOID* self);
 
-STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_API void            _cx_memb(_del)(_cx_self* self);
 STC_API _cx_value*      _cx_memb(_push_back)(_cx_self* self, i_val value);
 STC_API _cx_value*      _cx_memb(_push_front)(_cx_self* self, i_val value);
 STC_API _cx_iter        _cx_memb(_insert)(_cx_self* self, _cx_iter it, i_val value);
 STC_API _cx_iter        _cx_memb(_erase_at)(_cx_self* self, _cx_iter it);
 STC_API _cx_iter        _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2);
-#ifndef i_cmp_none
+#if !c_option(c_no_compare)
 STC_API size_t          _cx_memb(_remove)(_cx_self* self, i_valraw val);
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw val);
 #endif
@@ -107,31 +106,34 @@ STC_API _cx_self        _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_i
 STC_API void            _cx_memb(_sort)(_cx_self* self);
 STC_API _cx_node*       _cx_memb(_erase_after_)(_cx_self* self, _cx_node* node);
 
-STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_make(_cx_self){NULL}; }
-STC_INLINE bool         _cx_memb(_empty)(_cx_self cx) { return cx.last == NULL; }
-STC_INLINE size_t       _cx_memb(_count)(_cx_self cx)
-                            { return _clist_count((const clist_VOID*) &cx); }
-STC_INLINE void         _cx_memb(_clear)(_cx_self* self) { _cx_memb(_del)(self); }
-STC_INLINE i_val        _cx_memb(_value_fromraw)(i_valraw raw) { return i_valfrom(raw); }
-STC_INLINE i_valraw     _cx_memb(_value_toraw)(_cx_value* pval) { return i_valto(pval); }
-STC_INLINE i_val        _cx_memb(_value_clone)(i_val val)
-                            { return i_valfrom(i_valto(&val)); }
-STC_INLINE void         _cx_memb(_pop_front)(_cx_self* self)
-                            { _cx_memb(_erase_after_)(self, self->last); }
+#if !c_option(c_no_clone)
+STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_INLINE _cx_value*   _cx_memb(_emplace_back)(_cx_self* self, i_valraw raw)
                             { return _cx_memb(_push_back)(self, i_valfrom(raw)); }
 STC_INLINE _cx_value*   _cx_memb(_emplace_front)(_cx_self* self, i_valraw raw)
                             { return _cx_memb(_push_front)(self, i_valfrom(raw)); }
 STC_INLINE _cx_iter     _cx_memb(_emplace)(_cx_self* self, _cx_iter it, i_valraw raw)
                             { return _cx_memb(_insert)(self, it, i_valfrom(raw)); }
-STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return &self->last->next->value; }
-STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self) { return &self->last->value; }
-
+STC_INLINE i_val        _cx_memb(_value_fromraw)(i_valraw raw) 
+                            { return i_valfrom(raw); }
+STC_INLINE i_val        _cx_memb(_value_clone)(i_val val)
+                            { return i_valfrom(i_valto(&val)); }
 STC_INLINE void
 _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     if (self->last == other.last) return;
     _cx_memb(_del)(self); *self = _cx_memb(_clone)(other);
 }
+#endif
+STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_make(_cx_self){NULL}; }
+STC_INLINE bool         _cx_memb(_empty)(_cx_self cx) { return cx.last == NULL; }
+STC_INLINE size_t       _cx_memb(_count)(_cx_self cx)
+                            { return _clist_count((const clist_VOID*) &cx); }
+STC_INLINE void         _cx_memb(_clear)(_cx_self* self) { _cx_memb(_del)(self); }
+STC_INLINE i_valraw     _cx_memb(_value_toraw)(_cx_value* pval) { return i_valto(pval); }
+STC_INLINE void         _cx_memb(_pop_front)(_cx_self* self)
+                            { _cx_memb(_erase_after_)(self, self->last); }
+STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return &self->last->next->value; }
+STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self) { return &self->last->value; }
 
 STC_INLINE _cx_iter
 _cx_memb(_begin)(const _cx_self* self) {
@@ -163,7 +165,7 @@ _cx_memb(_splice_range)(_cx_self* self, _cx_iter it,
     return _cx_memb(_splice)(self, it, &tmp);
 }
 
-#ifndef i_cmp_none
+#if !c_option(c_no_compare)
 STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, i_valraw val) {
     return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), val);
@@ -184,12 +186,14 @@ _cx_memb(_get_mut)(_cx_self* self, i_valraw val) {
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
 
+#if !c_option(c_no_clone)
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self cx) {
     _cx_self out = _cx_memb(_init)();
     c_foreach (it, _cx_self, cx) _cx_memb(_emplace_back)(&out, i_valto(it.ref));
     return out;
 }
+#endif
 
 STC_DEF void
 _cx_memb(_del)(_cx_self* self) {
@@ -275,7 +279,7 @@ _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
     return cx;
 }
 
-#ifndef i_cmp_none
+#if !c_option(c_no_compare)
 
 STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw val) {
@@ -316,7 +320,7 @@ _cx_memb(_sort)(_cx_self* self) {
     if (self->last)
         self->last = (_cx_node *) _clist_mergesort((clist_VOID_node *) self->last->next, _cx_memb(_sort_cmp_));
 }
-#endif // !i_cmp_none
+#endif // !c_no_compare
 
 #endif // TEMPLATE IMPLEMENTATION
 
@@ -331,7 +335,8 @@ _clist_count(const clist_VOID* self) {
     return n;
 }
 
-#ifndef i_cmp_none
+#if !c_option(c_no_compare)
+
 // Singly linked list Mergesort implementation by Simon Tatham. O(n*log n).
 // https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
 STC_DEF clist_VOID_node *
@@ -381,7 +386,7 @@ _clist_mergesort(clist_VOID_node *list, int (*cmp)(const clist_VOID_node*, const
         insize *= 2;
     }
 }
-#endif // !i_cmp_none
+#endif // !c_no_compare
 #endif // NON-TEMPLATE IMPLEMENTATION
 #include "template.h"
 #define CLIST_H_INCLUDED

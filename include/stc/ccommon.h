@@ -98,20 +98,22 @@
 
 #define c_default_compare(x, y) c_less_compare(c_default_less, x, y)
 #define c_default_less(x, y)    (*(x) < *(y))
-#define c_no_compare(x, y)      (assert(!"c_no_compare() called"), (x)==(y)) // [deprecated]
+#define c_default_equalto(x, y) (*(x) == *(y))
+#define c_memcmp_equalto(x, y)  (memcmp(x, y, sizeof *(x)) == 0)
 #define c_less_compare(less, x, y) (less(y, x) - less(x, y))
-
-#define c_default_equalto(x, y)  (*(x) == *(y))
-#define c_memcmp_equalto(x, y)   (memcmp(x, y, sizeof *(x)) == 0)
 
 #define c_rawstr_compare(x, y)  strcmp(*(x), *(y))
 #define c_rawstr_equalto(x, y)  (strcmp(*(x), *(y)) == 0)
 #define c_rawstr_hash(p, dummy) c_strhash(*(p))
 
-#define c_no_clone(x)           (assert(!"c_no_clone() called"), x)
+#define c_option(flag)          ((i_opt) & (flag))
+#define c_is_fwd                1
+#define c_no_compare            2
+#define c_no_clone              4
+#define c_no_atomic             8
+
 #define c_default_fromraw(x)    (x)
 #define c_default_toraw(ptr)    (*(ptr))
-
 #define c_default_del(ptr)      ((void) (ptr))
 
 /* Generic algorithms */

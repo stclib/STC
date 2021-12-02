@@ -52,20 +52,22 @@ int main() {
 }
 */
 
-#ifndef i_prefix
-#define i_prefix carr2_
+#ifndef _i_prefix
+#define _i_prefix carr2_
 #endif
 #include "template.h"
-
-#ifndef i_fwd
+#if !c_option(c_is_fwd)
 _cx_deftypes(_c_carr2_types, _cx_self, i_val);
 #endif
 
-STC_API _cx_self _cx_memb(_with_values)(size_t xdim, size_t ydim, i_val value);
-STC_API _cx_self _cx_memb(_with_storage)(size_t xdim, size_t ydim, _cx_value* storage);
-STC_API _cx_self _cx_memb(_clone)(_cx_self src);
+STC_API _cx_self   _cx_memb(_with_values)(size_t xdim, size_t ydim, i_val value);
+STC_API _cx_self   _cx_memb(_with_storage)(size_t xdim, size_t ydim, _cx_value* storage);
 STC_API _cx_value* _cx_memb(_release)(_cx_self* self);
-STC_API void _cx_memb(_del)(_cx_self* self);
+STC_API void       _cx_memb(_del)(_cx_self* self);
+#if !c_option(c_no_clone)
+STC_API _cx_self   _cx_memb(_clone)(_cx_self src);
+STC_API void       _cx_memb(_copy)(_cx_self *self, _cx_self other);
+#endif
 
 STC_INLINE _cx_self _cx_memb(_init)(size_t xdim, size_t ydim) {
     return _cx_memb(_with_storage)(xdim, ydim, c_alloc_n(_cx_value, xdim*ydim));
@@ -83,11 +85,6 @@ STC_INLINE const _cx_value *_cx_memb(_at)(const _cx_self* self, size_t x, size_t
 
 STC_INLINE size_t _cx_memb(_idx)(const _cx_self* self, size_t x, size_t y) {
     return self->ydim*x + y;
-}
-
-STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
-    if (self->data == other.data) return;
-    _cx_memb(_del)(self); *self = _cx_memb(_clone)(other);
 }
 
 STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self)
@@ -116,12 +113,20 @@ STC_DEF _cx_self _cx_memb(_with_values)(size_t xdim, size_t ydim, i_val value) {
     return _arr;
 }
 
+#if !c_option(c_no_clone)
+
 STC_DEF _cx_self _cx_memb(_clone)(_cx_self src) {
     _cx_self _arr = _cx_memb(_init)(src.xdim, src.ydim);
     for (_cx_value* p = _arr.data[0], *q = src.data[0], *e = p + _cx_memb(_size)(src); p != e; ++p, ++q)
         *p = i_valfrom(i_valto(q));
     return _arr;
 }
+
+STC_DEF void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
+    if (self->data == other.data) return;
+    _cx_memb(_del)(self); *self = _cx_memb(_clone)(other);
+}
+#endif
 
 STC_DEF _cx_value *_cx_memb(_release)(_cx_self* self) {
     _cx_value *values = self->data[0];

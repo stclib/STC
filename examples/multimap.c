@@ -38,14 +38,21 @@ typedef struct { int year; cstr city, date; } OlympicLocation;
 int OlympicLocation_compare(OlympicLocation* a, OlympicLocation* b) {
     return a->year - b->year;
 }
+
+OlympicLocation OlympicLocation_clone(OlympicLocation loc) {
+    loc.city = cstr_clone(loc.city);
+    loc.date = cstr_clone(loc.date);
+    return loc;
+}
 void OlympicLocation_del(OlympicLocation* self) {
-    c_del (cstr, &self->city, &self->date);
+    c_del(cstr, &self->city, &self->date);
 }
 
 // Create a clist<OlympicLocation>, can be sorted by year.
 #define i_val OlympicLocation
 #define i_cmp OlympicLocation_compare
 #define i_del OlympicLocation_del
+#define i_from OlympicLocation_clone
 #define i_tag OL
 #include <stc/clist.h>
 
@@ -53,6 +60,7 @@ void OlympicLocation_del(OlympicLocation* self) {
 #define i_key_str
 #define i_val clist_OL
 #define i_valdel clist_OL_del
+#define i_valfrom clist_OL_clone
 #define i_tag OL
 #include <stc/csmap.h>
 

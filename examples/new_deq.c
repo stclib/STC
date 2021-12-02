@@ -11,7 +11,7 @@ struct MyStruct {
 
 
 #define i_val int
-#define i_fwd
+#define i_opt c_is_fwd
 #define i_tag i32
 #include <stc/cdeq.h>
 
@@ -23,7 +23,7 @@ int point_compare(const Point* a, const Point* b) {
 
 #define i_val Point
 #define i_cmp point_compare
-#define i_fwd
+#define i_opt c_is_fwd
 #define i_tag pnt
 #include <stc/cdeq.h>
 
