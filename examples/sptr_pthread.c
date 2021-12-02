@@ -20,8 +20,8 @@ void Base_del(Base* b) { printf("Base::~Base()\n"); }
 
 void* thr(csptr_base* lp)
 {
-    static pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
     sleep(1);
+    static pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
     c_autoscope (pthread_mutex_lock(&mtx), pthread_mutex_unlock(&mtx))
     {
         printf("local pointer in a thread:\n"

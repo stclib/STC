@@ -62,14 +62,10 @@ typedef long atomic_count_t;
     #include <intrin.h>
     #define c_atomic_inc(v) (void)_InterlockedIncrement(v)
     #define c_atomic_dec_and_test(v) !_InterlockedDecrement(v)
-#elif defined(__i386__) || defined(__x86_64__)
-    STC_INLINE void c_atomic_inc(atomic_count_t* v)
-        { asm volatile("lock; incq %0" :"=m"(*v) :"m"(*v)); }
-    STC_INLINE bool c_atomic_dec_and_test(atomic_count_t* v) {
-        unsigned char c;
-        asm volatile("lock; decq %0; sete %1" :"=m"(*v), "=qm"(c) :"m"(*v) :"memory");
-        return !c;
-    }
+#else
+    #include <stdatomic.h>
+    #define c_atomic_inc(v) (void)atomic_fetch_add(v, 1)
+    #define c_atomic_dec_and_test(v) (atomic_fetch_sub(v, 1) == 1)
 #endif
 
 #define csptr_null {NULL, NULL}
