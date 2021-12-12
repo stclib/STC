@@ -13,16 +13,15 @@ struct { double x, y; } typedef Point;
 #define i_tag pnt
 #include <stc/cset.h>
 
-/*
 // Map of int64 pointers: For fun, define valraw as int64_t for easy emplace call!
+typedef int64_t inttype;
 #define i_key_str
-#define i_valraw int64_t
-#define i_val i_valraw*
+#define i_valraw inttype
+#define i_val inttype*
 #define i_valdel(x) c_free(*(x))
-#define i_valfrom(raw) c_new(i_valraw, raw)
+#define i_valfrom(raw) c_new(inttype, raw)
 #define i_valto(x) **(x)
 #include <stc/cmap.h>
-*/
 
 int main()
 {
@@ -47,12 +46,11 @@ int main()
         puts("");
     }
 
-/*  // Need to check why this fails.
     c_auto (cmap_str, map)
     {
         printf("\nMap with pointer elements:\n");
-        cmap_str_insert(&map, cstr_lit("testing"), c_new(int, 999));
-        cmap_str_insert(&map, cstr_lit("done"), c_new(int, 111));
+        cmap_str_insert(&map, cstr_lit("testing"), c_new(inttype, 999));
+        cmap_str_insert(&map, cstr_lit("done"), c_new(inttype, 111));
 
         // Emplace: implicit key, val construction using i_keyfrom/i_valfrom:
         cmap_str_emplace(&map, "hello", 200);
@@ -61,5 +59,4 @@ int main()
         c_forpair (name, number, cmap_str, map)
             printf("%s: %zd\n", _.name.str, *_.number);
     }
-*/
 }
