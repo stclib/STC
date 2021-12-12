@@ -200,7 +200,7 @@ typedef struct { int x, y, z; } Vec3i;
 
 #define i_key Vec3i
 #define i_val int
-#define i_cmp c_memcmp_equalto // bitwise compare, and use c_default_hash
+#define i_equ c_memcmp_equalto // bitwise compare, and use c_default_hash
 #define i_tag vi
 #include <stc/cmap.h>
 
@@ -275,7 +275,7 @@ static bool Viking_equalto(const Viking* a, const Viking* b) {
 }
 
 static uint32_t Viking_hash(const Viking* a, int ignored) {
-    return cstr_hash(&a->name) ^ (cstr_hash(&a->country) >> 15);
+    return c_strhash(a->name.str) ^ (c_strhash(a->country.str) >> 15);
 }
 
 static void Viking_del(Viking* v) {
