@@ -16,13 +16,17 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 ## Header file and declaration
 
 ```c
-#define i_val       // value: REQUIRED
-#define i_cmp       // three-way compare two i_val* : REQUIRED IF i_val is a non-integral type
-#define i_del       // destroy value func - defaults to empty destruct
-#define i_tag       // defaults to i_val
-#include <stc/cbox.h>
+#define i_val           // value: REQUIRED
+#define i_cmp           // three-way compare two i_val* : REQUIRED IF i_val is a non-integral type
+#define i_del           // destroy value func - defaults to empty destruct
+#define i_from          // create from raw/clone func - REQUIRED if i_del is defined,
+                        // unless 'i_opt c_no_clone' is defined.
+#define i_tag           // type name tag, defaults to i_val
+#include <stc/cbox.h>    
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
+Define `i_opt` with `c_no_compare` if comparison between i_val's is not needed/available. Will then
+compare the pointer addresses when used. Additionally, `c_no_clone` or `i_is_fwd` may be defined.
 
 ## Methods
 ```c

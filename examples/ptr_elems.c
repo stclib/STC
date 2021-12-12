@@ -56,6 +56,6 @@ int main()
         cmap_str_emplace(&map, "goodbye", 400);
 
         c_forpair (name, number, cmap_str, map)
-            printf("%s: %d\n", _.name.str, *_.number);
+            printf("%s: %zd\n", _.name.str, *_.number);
     }
 }
