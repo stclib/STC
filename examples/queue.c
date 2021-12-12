@@ -2,6 +2,8 @@
 #include <stdio.h>
 
 #define i_val int
+#define i_del(x) printf("drop %d\n", *(x))
+#define i_from c_default_clone
 #define i_tag i
 #include <stc/cqueue.h>
 

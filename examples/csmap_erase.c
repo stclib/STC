@@ -5,7 +5,7 @@
 
 #define i_key int
 #define i_val_str
-#define i_cnt mymap
+#define i_type mymap
 #include <stc/csmap.h>
 
 void printmap(mymap m)

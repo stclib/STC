@@ -125,6 +125,7 @@ _cx_memb(_copy)(_cx_self *self, _cx_self other) {
 }
 #endif
 STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_make(_cx_self){NULL}; }
+STC_INLINE bool         _cx_memb(_reserve)(_cx_self* self, size_t n) { return true; }
 STC_INLINE bool         _cx_memb(_empty)(_cx_self cx) { return cx.last == NULL; }
 STC_INLINE size_t       _cx_memb(_count)(_cx_self cx)
                             { return _clist_count((const clist_VOID*) &cx); }

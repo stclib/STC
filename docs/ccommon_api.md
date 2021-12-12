@@ -79,26 +79,33 @@ int main()
 }
 ```
 
-### c_foreach
+### c_foreach, c_forpair
 
-| Usage                                | Description                  |
-|:-------------------------------------|:-----------------------------|
-| `c_foreach (it, ctype, container)`   | Iteratate all elements       |
-| `c_foreach (it, ctype, it1, it2)`    | Iterate the range [it1, it2) |
+| Usage                                      | Description                     |
+|:-------------------------------------------|:--------------------------------|
+| `c_foreach (it, ctype, container)`         | Iteratate all elements          |
+| `c_foreach (it, ctype, it1, it2)`          | Iterate the range [it1, it2)    |
+| `c_forpair (key, value, ctype, container)` | Iterate with structural binding |
 
 ```c
-#define i_tag x
 #define i_key int
-#include <stc/csset.h>
+#define i_val int
+#define i_tag ii
+#include <stc/csmap.h>
 ...
-c_apply(csset_x, insert, &set, {23, 3, 7, 5, 12});
-c_foreach (i, csset_x, set)
-    printf(" %d", *i.ref);
-// 3 5 7 12 23
-csset_x_iter it = csset_x_find(&set, 7);
-c_foreach (i, csset_x, it, csset_x_end(&set))
-    printf(" %d", *i.ref);
-// 7 12 23
+c_apply_pair(csmap_ii, insert, &map, {{23,1}, {3,2}, {7,3}, {5,4}, {12,5}});
+c_foreach (i, csmap_ii, map)
+    printf(" %d", i.ref->first);
+// out: 3 5 7 12 23
+
+csmap_ii_iter it = csmap_ii_find(&map, 7);
+c_foreach (i, csmap_ii, it, csmap_ii_end(&map))
+    printf(" %d", i.ref->first);
+// out: 7 12 23
+
+c_forpair (id, count, csmap_ii, map)
+    printf(" (%d %d)", _.id, _.count);
+// out: (3 2) (5 4) (7 3) (12 5) (23 1)
 ```
 
 ### c_forrange
@@ -124,7 +131,7 @@ c_forrange (i, int, 30, 0, -5) printf(" %d", i);
 ```
 
 ### c_apply, c_apply_pair, c_apply_n
-**c_apply** will apply a method on an existing container with the given array elements:
+**c_apply** will apply a method on a container with each of the elements in the given array:
 ```c
 c_apply(cvec_i, push_back, &vec, {1, 2, 3});   // apply multiple push_backs
 c_apply_pair(cmap_i, insert, &map, { {4, 5}, {6, 7} });  // inserts to existing map
@@ -158,7 +165,7 @@ c_del(cstr, &a, &b);
 ### General predefined template parameter functions
 ```
 int     c_default_compare(const Type*, const Type*);
-Type    c_default_fromraw(Type val);         // simple copy
+Type    c_default_clone(Type val);           // simple copy
 Type    c_default_toraw(const Type* val);    // dereference val
 void    c_default_del(Type* val);            // does nothing
 

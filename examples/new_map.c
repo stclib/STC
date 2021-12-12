@@ -21,6 +21,7 @@ int point_compare(const Point* a, const Point* b) {
     return c ? c : c_default_compare(&a->y, &b->y);
 }
 
+// Point => int map
 #define i_key Point
 #define i_val int
 #define i_cmp point_compare
@@ -28,7 +29,7 @@ int point_compare(const Point* a, const Point* b) {
 #define i_tag pnt
 #include <stc/cmap.h>
 
-// int => int map
+// cstr => cstr map
 #define i_key_str
 #define i_val_str
 #include <stc/cmap.h>

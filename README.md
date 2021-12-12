@@ -1,22 +1,26 @@
 ![STC](docs/pics/containers.jpg)
 
 STC - Smart Template Containers for C
-======================================
+=====================================
 
 News
 ----
-Breaking changes for i_cmp_none and i_fwd:
-- Removed: i_cmp_none and i_fwd (replaced by c_no_compare and c_is_fwd args to i_opt).
-- Added compile-time disabling of clonable and comparable container elements, controlled by i_opt (c_no_clone | c_no_compare)
-- Added i_opt: can define multiple compile-time options: c_no_compare, c_no_clone, c_no_atomic, c_is_fwd: may be combined with | separator.
-- Except for csptr, when i_del / i_valdel / i_keydel is defined, also i_from / i_keyfrom / i_valfrom must be defined or i_opt c_no_clone.
-- For struct elements, either i_cmp must be defined (as before), or define i_opt c_no_compare (for non-associative containers only).
+- Added **cbox** type: container of one element: similar to [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr)
+- Replaced example for **csptr** in docs.
+- Added [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structural binding" as in c++.
+- Deprecated *csptr_X_make()*. Renamed to *csptr_X_new()*. Corresponding **cbox** method is *cbox_X_new()*.
+- Deprecated *c_default_fromraw(raw)*. Renamed to *c_default_clone(raw)*.
+- Deprecated `i_key_csptr` / `i_val_csptr`. Use `i_key_ref` / `i_val_ref` when specifying containers with **csptr** or **cbox** elements.
+- Deprecated `i_cnt`. Use `i_type` instead to define the full container type name.
 
-**VERSION 2.X RELEASED**: There are two main breaking changes from V1.X.
+Previous:
+- Added `i_opt` template parameter: compile-time options: `c_no_compare`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`; may be combined with `|`
+- Removed: i_cmp_none and i_fwd: replaced by `c_no_compare` and `c_is_fwd` args to `i_opt`.
+
+VERSION 2.0 released. Two main breaking changes from V1.X.
 - Uses a different way to instantiate templated containers, which is incompatible with v1.X.
-- c_forauto, c_forvar, c_forscope macros are now renamed to **c_auto**, **c_autovar**, and **c_autoscope**. These are for automatic scope resource management, aka RAII.
-
-The new template instantiation style has multiple advantages, e.g. implementation does not contain long macro definitions for code generation. Also, specifying template arguments is more user friendly and flexible.
+- New **c_auto**, **c_autovar**, and **c_autoscope** macros. These are for automatic scope resource management, aka RAII.
+- The new template instantiation style has multiple advantages, e.g. implementation does not contain long macro definitions for code generation. Also, specifying template arguments is more user friendly and flexible.
 
 Introduction
 ------------
@@ -32,6 +36,7 @@ which by the compiler is seen as different code because of macro name substituti
 
 - [***carr2, carr3*** - **2d** and **3d** dynamic **array** type](docs/carray_api.md)
 - [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
+- [***cbox*** - **std::unique_ptr** alike type](docs/cbox_api.md)
 - [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)
 - [***clist*** - **std::forward_list** alike type](docs/clist_api.md)
 - [***cmap*** - **std::unordered_map** alike type](docs/cmap_api.md)
@@ -260,13 +265,13 @@ The template parameters are given by a `#define i_xxxx` statement, where *xxxx* 
 The list of template parameters:
 
 - `i_tag`     - Container type tag. Defaults to same as `i_key`
-- `i_cnt`     - Container type name.
-- `i_opt`     - Boolean properties: may combine `c_no_compare`, `c_no_clone`, `c_is_fwd` with `|` character.
+- `i_type`    - Full container type name (optional, alternative to `i_tag`).
+- `i_opt`     - Boolean properties: may combine `c_no_compare`, `c_no_clone`, `c_no_atomic`, `c_is_fwd` with `|` separator.
 
 - `i_key`     - Maps key type. **[required]** for cmap/csmap.
 - `i_val`     - The container **[required]** element type. For cmap/csmap, it is the mapped value.
 - `i_cmp`     - Three-way comparison of two `i_keyraw`, **[required]** for non-integral `i_keyraw`.
-- `i_equ`     - Equality comparison of two `i_keyraw`, `i_cmp` alternative.
+- `i_equ`     - Equality comparison of two `i_keyraw`- defaults to `!i_cmp`.
 
 - `i_keydel`  - Destroy map key func - defaults to empty destructor.
 - `i_keyraw`  - Convertion "raw" type - defaults to `i_key` type.
@@ -278,10 +283,11 @@ The list of template parameters:
 - `i_valfrom` - Convertion func `i_valraw` => `i_val` - defaults to simple copy.
 - `i_valto`   - Convertion func `i_val` => `i_valraw` - defaults to simple copy.
 
-An alternative to defining `i_cmp`, you may `#define i_opt c_no_compare` to disable methods using comparison.
+Instead of defining `i_cmp`, you may define `i_opt c_no_compare` to disable methods using comparison.
 
-Similarly, if a destructor `i_del` is defined, either define `i_valfrom` constructor/clone function
-or `#define i_opt c_no_clone` to disable cloning and the emplace methods. Unless these requirements are met,
+Instead of defining `i_valfrom`, you may define `i_opt c_no_clone` to disable methods using deep copy.
+
+If a destructor `i_del` is defined, then define either `i_valfrom` or `i_opt c_no_clone`, otherwise
 compile errors are generated.
 
 The *emplace* versus non-emplace container methods
@@ -291,7 +297,7 @@ with **emplace**, e.g. *cvec_X_emplace_back()*. This is a convenient alternative
 *cvec_X_push_back()* when dealing non-trivial container elements, e.g. strings, shared pointers or
 other elements using dynamic memory or shared resources.
 
-The **emplace** methods ***constructs*** or ***clones*** the given elements before they are added
+The **emplace** methods ***constructs*** or ***clones*** the given elements when they are added
 to the container. In contrast, the *non-emplace* methods ***moves*** the given elements into the
 container. For containers of integral or trivial element types, **emplace** and corresponding
 *non-emplace* methods are identical.
@@ -387,14 +393,14 @@ typedef struct Dataset {
 
 User-defined container type name
 --------------------------------
-Define `i_cnt` instead of `i_tag`:
+Define `i_type` instead of `i_tag`:
 ```c
+#define i_type MyVec
 #define i_val int
-#define i_cnt myvec
 #include <stc/cvec.h>
 
-myvec vec = myvec_init();
-myvec_push_back(&vec, 1);
+myvec vec = MyVec_init();
+MyVec_push_back(&vec, 1);
 ...
 ```
 

@@ -31,8 +31,8 @@ typedef                 char csview_value;
 
 #define                 csview_null  c_make(csview){"", 0}
 #define                 csview_npos  cstr_npos
-#define                 csview_ARG(sv)  (int)(sv).size, (sv).str
-
+#define                 c_svfmt      "%.*s"
+#define                 c_svarg(sv)  (int)(sv).size, (sv).str
 #define                 c_sv(literal) csview_lit(literal)
 #define                 cstr_sv(s) csview_from_s(s)
 

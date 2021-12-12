@@ -20,9 +20,10 @@ void Song_del(Song* s) {
 #define i_val Song
 #define i_del Song_del
 #define i_tag song
+#define i_opt c_no_compare
 #include <stc/csptr.h> // define csptr_song
 
-#define i_val_csptr csptr_song
+#define i_val_ref csptr_song
 #define i_tag song
 #include <stc/cvec.h>
 
@@ -31,9 +32,9 @@ void example3()
     c_auto (cvec_song, v, v2)
     {
         c_apply(cvec_song, push_back, &v, {
-            csptr_song_make(Song_from("Bob Dylan", "The Times They Are A Changing")),
-            csptr_song_make(Song_from("Aretha Franklin", "Bridge Over Troubled Water")),
-            csptr_song_make(Song_from("Thalia", "Entre El Mar y Una Estrella"))
+            csptr_song_new(Song_from("Bob Dylan", "The Times They Are A Changing")),
+            csptr_song_new(Song_from("Aretha Franklin", "Bridge Over Troubled Water")),
+            csptr_song_new(Song_from("Thalia", "Entre El Mar y Una Estrella"))
         });
 
         c_foreach (s, cvec_song, v)
@@ -41,8 +42,8 @@ void example3()
                 cvec_song_emplace_back(&v2, *s.ref); // note: calls csptr_song_clone()
 
         c_apply(cvec_song, push_back, &v2, {
-            csptr_song_make(Song_from("Michael Jackson", "Billie Jean")),
-            csptr_song_make(Song_from("Rihanna", "Stay")),
+            csptr_song_new(Song_from("Michael Jackson", "Billie Jean")),
+            csptr_song_new(Song_from("Rihanna", "Stay")),
         });
 
         c_foreach (s, cvec_song, v2)

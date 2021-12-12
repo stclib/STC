@@ -3,38 +3,45 @@
 
 struct { double x, y; } typedef Point;
 
-#define i_val Point*
-#define i_from(val) c_new(Point, *(val))
-#define i_del(pval) c_free(*(pval))
+// Set of Point pointers: define all template parameters "in-line"
+// Note it may be simpler to use a cbox for this.
+#define i_key Point*
+#define i_keydel(x) c_free(*(x))
+#define i_keyfrom(x) c_new(Point, *(x))
+#define i_hash(x, n) c_default_hash(*(x), sizeof *(x))
+#define i_equ(x, y) c_memcmp_equalto(*(x), *(y))
 #define i_tag pnt
-#include <stc/cvec.h>
+#include <stc/cset.h>
 
+// Map of int64 pointers: For fun, define valraw as int64_t for easy emplace call!
 #define i_key_str
-#define i_val int*
-#define i_valraw int
-#define i_valfrom(raw) c_new(int, raw)
-#define i_valto(pval) **(pval)
-#define i_valdel(pval) c_free(*(pval))
+#define i_valraw int64_t
+#define i_val i_valraw*
+#define i_valdel(x) c_free(*(x))
+#define i_valfrom(raw) c_new(i_valraw, raw)
+#define i_valto(x) **(x)
 #include <stc/cmap.h>
 
 int main()
 {
-    c_auto (cvec_pnt, vec, cpy)
+    c_auto (cset_pnt, set, cpy)
     {
-        printf("Vector with pointer elements:\n");
-        // c++: vec.push_back(new Point{1.2, 3.4});
-        cvec_pnt_push_back(&vec, c_new(Point, {1.2, 3.4}));
-        cvec_pnt_push_back(&vec, c_new(Point, {6.1, 4.7}));
+        printf("Set with pointer elements:\n");
+        // c++: set.insert(new Point{1.2, 3.4});
+        cset_pnt_insert(&set, c_new(Point, {1.2, 3.4}));
+        Point* q = *cset_pnt_insert(&set, c_new(Point, {6.1, 4.7})).ref;
+        cset_pnt_insert(&set, c_new(Point, {5.7, 2.3}));
 
-        cpy = cvec_pnt_clone(vec);
-        cpy.data[1]->x = 100;
+        cpy = cset_pnt_clone(set);
+        cset_pnt_erase(&cpy, q);
 
-        printf("vec:");
-        c_foreach (i, cvec_pnt, vec)
-            printf(" (%g %g)", (*i.ref)->x, (*i.ref)->y);
+        printf("set:");
+        c_foreach (i, cset_pnt, set)
+            printf(" (%g %g)", i.ref[0]->x, i.ref[0]->y);
+
         printf("\ncpy:");
-        c_foreach (i, cvec_pnt, cpy)
-            printf(" (%g %g)", (*i.ref)->x, (*i.ref)->y);
+        c_foreach (i, cset_pnt, cpy)
+            printf(" (%g %g)", i.ref[0]->x, i.ref[0]->y);
         puts("");
     }
 
@@ -48,7 +55,7 @@ int main()
         cmap_str_emplace(&map, "hello", 200);
         cmap_str_emplace(&map, "goodbye", 400);
 
-        c_foreach (i, cmap_str, map)
-            printf("%s: %d\n", i.ref->first.str, *i.ref->second);
+        c_forpair (name, number, cmap_str, map)
+            printf("%s: %d\n", _.name.str, *_.number);
     }
 }

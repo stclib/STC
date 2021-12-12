@@ -15,6 +15,7 @@ void Base_del(Base* b) { printf("Base::~Base()\n"); }
 
 #define i_val Base
 #define i_del Base_del
+#define i_opt c_no_compare
 #define i_tag base
 #include <stc/csptr.h>
 
@@ -34,7 +35,7 @@ void* thr(csptr_base* lp)
 
 int main()
 {
-    csptr_base p = csptr_base_make((Base){42});
+    csptr_base p = csptr_base_new((Base){42});
 
     printf("Created a Base\n"
            "  p.get() = %p, p.use_count() = %ld\n", (void*)p.get, *p.use_count);

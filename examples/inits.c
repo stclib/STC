@@ -13,8 +13,8 @@
 
 typedef struct {int x, y;} ipair_t;
 inline static int ipair_compare(const ipair_t* a, const ipair_t* b) {
-    int cx = c_default_compare(&a->x, &b->x);
-    return cx == 0 ? c_default_compare(&a->y, &b->y) : cx;
+    int c = c_default_compare(&a->x, &b->x);
+    return c ? c : c_default_compare(&a->y, &b->y);
 }
 
 
@@ -45,7 +45,7 @@ int main(void)
         }
         puts("");
 
-        // CVEC PRIORITY QUEUE
+        // PRIORITY QUEUE
 
         cpque_f_make_heap(&floats);
         c_apply(cpque_f, push, &floats, {40.0f, 20.0f, 50.0f, 30.0f, 10.0f});
@@ -89,8 +89,8 @@ int main(void)
         cmap_cnt_emplace(&countries, "Norway", 0).ref->second += 20;
         cmap_cnt_emplace(&countries, "Finland", 0).ref->second += 20;
 
-        c_foreach (i, cmap_cnt, countries)
-            printf("%s: %d\n", i.ref->first.str, i.ref->second);
+        c_forpair (country, health, cmap_cnt, countries)
+            printf("%s: %d\n", _.country.str, _.health);
         puts("");
     }
 

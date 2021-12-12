@@ -90,29 +90,30 @@ int main()
     // Ex1
     int xd = 30, yd = 20, zd = 10;
     // define arr3[30][20][10], initialized with zeros.
-    carr3_f arr3 = carr3_f_with_values(xd, yd, zd, 0.0f);
-    arr3.data[5][4][3] = 3.14f;
+    c_autovar (carr3_f arr3 = carr3_f_with_values(xd, yd, zd, 0.0f), 
+                              carr3_f_del(&arr3)) {
+        arr3.data[5][4][3] = 3.14f;
 
-    float *arr1 = arr3.data[5][4];
-    float **arr2 = arr3.data[5];
+        float *arr1 = arr3.data[5][4];
+        float **arr2 = arr3.data[5];
 
-    printf("%f\n", arr1[3]); // 3.14
-    printf("%f\n", arr2[4][3]); // 3.14
-    printf("%f\n", arr3.data[5][4][3]); // 3.14
-    carr3_f_del(&arr3); // free array
+        printf("%f\n", arr1[3]); // 3.14
+        printf("%f\n", arr2[4][3]); // 3.14
+        printf("%f\n", arr3.data[5][4][3]); // 3.14
+    }
 
     // Ex2
     int w = 256, h = 128;
-    carr2_i image = carr2_i_init(w, h);
-    int n = 0;
-    c_foreach (i, carr2_i, image) {
-        uint32_t t = n++ % 256;
-        *i.ref = t | t << 8 | t << 16 | 255;
-    }
+    c_autovar (carr2_i image = carr2_i_init(w, h), carr2_i_del(&image)) {
+        int n = 0;
+        c_foreach (i, carr2_i, image) {
+            uint32_t t = n++ % 256;
+            *i.ref = t | t << 8 | t << 16 | 255;
+        }
 
-    for (int y = 0; y < image.ydim; ++y)
-        image.data[y][y] = 0xffffffff;
-    carr2_i_del(&image);
+        for (int y = 0; y < image.ydim; ++y)
+            image.data[y][y] = 0xffffffff;
+    }
 }
 ```
 Output:

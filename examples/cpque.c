@@ -7,7 +7,7 @@ static int (*icmp_fn)(const int* x, const int* y);
 
 #define i_val int
 #define i_cmp icmp_fn
-#define i_cnt ipque
+#define i_type ipque
 #include <stc/cpque.h>
 
 #define imix_less(left, right) ((*(left) ^ 1) < (*(right) ^ 1))

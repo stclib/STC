@@ -92,60 +92,65 @@
 #  define c_free(p)             free(p)
 #endif
 
-#define c_delete(T, ptr)        do { T* _p = ptr; T##_del(_p); c_free(_p); } while(0)
+#define c_delete(T, ptr)        do { T *_c_p = ptr; T##_del(_c_p); c_free(_c_p); } while (0)
 #define c_swap(T, x, y)         do { T _c_t = x; x = y; y = _c_t; } while (0)
 #define c_arraylen(a)           (sizeof (a)/sizeof (a)[0])
+#define c_less_compare(less, x, y) (less(y, x) - less(x, y))
+#define c_default_less(x, y)    (*(x) < *(y))
 
 #define c_default_compare(x, y) c_less_compare(c_default_less, x, y)
-#define c_default_less(x, y)    (*(x) < *(y))
 #define c_default_equalto(x, y) (*(x) == *(y))
 #define c_memcmp_equalto(x, y)  (memcmp(x, y, sizeof *(x)) == 0)
-#define c_less_compare(less, x, y) (less(y, x) - less(x, y))
 
 #define c_rawstr_compare(x, y)  strcmp(*(x), *(y))
 #define c_rawstr_equalto(x, y)  (strcmp(*(x), *(y)) == 0)
-#define c_rawstr_hash(p, dummy) c_strhash(*(p))
+#define c_rawstr_hash(x, dummy) c_strhash(*(x))
 
-#define c_option(flag)          ((i_opt) & (flag))
-#define c_is_fwd                1
-#define c_no_compare            2
-#define c_no_clone              4
-#define c_no_atomic             8
-
-#define c_default_fromraw(x)    (x)
+#define c_default_clone(x)      (x)
+#define c_default_fromraw(x)    (x) // [deprecated]
 #define c_default_toraw(ptr)    (*(ptr))
 #define c_default_del(ptr)      ((void) (ptr))
 
+#define c_option(flag)          ((i_opt) & (flag))
+#define c_is_fwd                1
+#define c_no_atomic             2
+#define c_no_clone              4
+#define c_no_compare            8
+
 /* Generic algorithms */
 
-#define _c_rotl(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
+#define _c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
 STC_INLINE uint64_t c_strhash(const char *s) {
     int c; uint64_t h = *s++;
     if (h) while ((c = *s++)) h = (h << 10) - h + c;
-    return _c_rotl(h, 26) ^ h;
+    return _c_ROTL(h, 26) ^ h;
 }
 // len >= 1
 STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
     const uint8_t *x = (const uint8_t*) key; 
     uint64_t h = *x++;
     while (--len) h = (h << 10) - h + *x++;
-    return _c_rotl(h, 26) ^ h;
+    return _c_ROTL(h, 26) ^ h;
 }
 #define c_hash32(data, len_is_4) \
     ((*(const uint32_t*)data * 0xc6a4a7935bd1e99d) >> 15)
 #define c_hash64(data, len_is_8) \
     (*(const uint64_t *)data * 0xc6a4a7935bd1e99d)
-#define c_default_hash32 c_hash32 // [deprecated]
-#define c_default_hash64 c_hash64 // [deprecated]
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
-#define c_foreach_3(it, CX, cnt) \
-    for (CX##_iter it = CX##_begin(&cnt), it##_end_ = CX##_end(&cnt) \
-         ; it.ref != it##_end_.ref; CX##_next(&it))
-#define c_foreach_4(it, CX, start, finish) \
-    for (CX##_iter it = start, it##_end_ = finish \
-         ; it.ref != it##_end_.ref; CX##_next(&it))
+#define c_foreach_3(it, C, cnt) \
+    for (C##_iter it = C##_begin(&cnt), it##_end_ = C##_end(&cnt) \
+         ; it.ref != it##_end_.ref; C##_next(&it))
+#define c_foreach_4(it, C, start, finish) \
+    for (C##_iter it = start, it##_end_ = finish \
+         ; it.ref != it##_end_.ref; C##_next(&it))
+
+#define c_forpair(key, val, C, cnt) /* structured binding */ \
+    for (struct {C##_iter _it, _end; C##_key key; C##_mapped val;} \
+         _ = {C##_begin(&cnt), C##_end(&cnt)} \
+         ; _._it.ref != _._end.ref && (_.key = _._it.ref->first, _.val = _._it.ref->second, true) \
+         ; C##_next(&_._it))
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
 #define c_forrange_1(stop) for (size_t _c_ii=0, _c_end=stop; _c_ii < _c_end; ++_c_ii)
@@ -156,20 +161,22 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
     for (type i=start, _c_inc=step, _c_end=(stop) - (0 < _c_inc) \
          ; (i <= _c_end) == (0 < _c_inc); i += _c_inc)
 
-#define c_autoscope(init, ...) for (int _c_ii = (init, 0); !_c_ii; ++_c_ii, __VA_ARGS__)
 #define c_autovar(declvar, ...) for (declvar, *_c_ii = NULL; !_c_ii; ++_c_ii, __VA_ARGS__)
+#define c_autoscope(init, ...) for (int _c_ii = (init, 0); !_c_ii; ++_c_ii, __VA_ARGS__)
 #define c_autodefer(...) for (int _c_ii = 0; !_c_ii; ++_c_ii, __VA_ARGS__)
-#define c_exitauto continue
 
 #define c_auto(...) c_MACRO_OVERLOAD(c_auto, __VA_ARGS__)
-#define c_auto_2(CX, a) \
-    c_autovar(CX a = CX##_init(), CX##_del(&a))
-#define c_auto_3(CX, a, b) \
-    c_autovar(c_EXPAND(CX a = CX##_init(), b = CX##_init()), \
-              CX##_del(&b), CX##_del(&a))
-#define c_auto_4(CX, a, b, c) \
-    c_autovar(c_EXPAND(CX a = CX##_init(), b = CX##_init(), c = CX##_init()), \
-              CX##_del(&c), CX##_del(&b), CX##_del(&a))
+#define c_auto_2(C, a) \
+    c_autovar(C a = C##_init(), C##_del(&a))
+#define c_auto_3(C, a, b) \
+    c_autovar(c_EXPAND(C a = C##_init(), b = C##_init()), \
+              C##_del(&b), C##_del(&a))
+#define c_auto_4(C, a, b, c) \
+    c_autovar(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init()), \
+              C##_del(&c), C##_del(&b), C##_del(&a))
+#define c_auto_5(C, a, b, c, d) \
+    c_autovar(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
+              C##_del(&d), C##_del(&c), C##_del(&b), C##_del(&a))
 
 #define c_autobuf(b, type, n) c_autobuf_N(b, type, n, 256)
 #define c_autobuf_N(b, type, n, BYTES) \
@@ -177,28 +184,28 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
          *b = (n)*sizeof *b > (BYTES) ? c_alloc_n(type, n) : _c_b \
          ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)
 
-#define c_apply(CX, method, cx, ...) do { \
-    const CX##_rawvalue _c_arr[] = __VA_ARGS__; \
-    CX* _c_cx = cx; \
+#define c_apply(C, method, cx, ...) do { \
+    const C##_rawvalue _c_arr[] = __VA_ARGS__; \
+    C* _c_cx = cx; \
     for (size_t _c_i = 0; _c_i < c_arraylen(_c_arr); ++_c_i) \
-        CX##_##method(_c_cx, _c_arr[_c_i]); \
+        C##_##method(_c_cx, _c_arr[_c_i]); \
 } while (0)
-#define c_apply_pair(CX, method, cx, ...) do { \
-    const CX##_rawvalue _c_arr[] = __VA_ARGS__; \
-    CX* _c_cx = cx; \
+#define c_apply_pair(C, method, cx, ...) do { \
+    const C##_rawvalue _c_arr[] = __VA_ARGS__; \
+    C* _c_cx = cx; \
     for (size_t _c_i = 0; _c_i < c_arraylen(_c_arr); ++_c_i) \
-        CX##_##method(_c_cx, _c_arr[_c_i].first, _c_arr[_c_i].second); \
+        C##_##method(_c_cx, _c_arr[_c_i].first, _c_arr[_c_i].second); \
 } while (0)
-#define c_apply_n(CX, method, cx, arr, n) do { \
-    CX* _c_cx = cx; \
-    for (const CX##_rawvalue *_c_i = arr, *_c_end = _c_i+(n); _c_i != _c_end; ++_c_i) \
-        CX##_##method(_c_cx, *_c_i); \
+#define c_apply_n(C, method, cx, arr, n) do { \
+    C* _c_cx = cx; \
+    for (const C##_rawvalue *_c_i = arr, *_c_end = _c_i+(n); _c_i != _c_end; ++_c_i) \
+        C##_##method(_c_cx, *_c_i); \
 } while (0)
 
-#define c_del(CX, ...) do { \
-    CX* _c_arr[] = {__VA_ARGS__}; \
+#define c_del(C, ...) do { \
+    C* _c_arr[] = {__VA_ARGS__}; \
     for (size_t _c_i = 0; _c_i < c_arraylen(_c_arr); ++_c_i) \
-        CX##_del(_c_arr[_c_i]); \
+        C##_del(_c_arr[_c_i]); \
 } while (0)
 
 #if defined(__SIZEOF_INT128__)

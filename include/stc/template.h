@@ -41,63 +41,98 @@
 #endif
 
 #if defined i_valraw && !(defined i_valto && defined i_valfrom)
-  #error if i_valraw or i_valto defined, i_valfrom must be defined
+  #error "if i_valraw or i_valto defined, i_valfrom must be defined"
 #endif
 #if defined i_keyraw && !(defined i_keyto && defined i_keyfrom)
-  #error if i_keyraw or i_keyto defined, i_keyfrom a must be defined
+  #error "if i_keyraw or i_keyto defined, i_keyfrom a must be defined"
+#endif
+#ifdef i_key_csptr // [deprecated]
+  #define i_key_ref i_key_csptr
+  #error "i_key_csptr no longer supported: use new name i_key_ref"
+#endif
+#ifdef i_val_csptr // [deprecated]
+  #define i_val_ref i_val_csptr
+  #error "i_val_csptr no longer supported: use new name i_val_ref"
+#endif
+#ifdef i_cnt // [deprecated]
+  #define i_type i_cnt
+  #error "i_cnt no longer supported: use new name i_type"
+#endif
+
+#ifdef i_type
+  #define i_tag i_type
+  #undef _i_prefix
+  #define _i_prefix
 #endif
 
 #if defined i_key_str || defined i_val_str
   #include "cstr.h"
 #endif
 
-#ifdef i_cnt
-  #define i_tag i_cnt
-  #undef _i_prefix
-  #define _i_prefix
-#endif
-
-#ifdef i_key_csptr
-  #define i_key i_key_csptr
-  #define i_cmp c_PASTE(i_key_csptr, _compare)
-  #define i_keydel c_PASTE(i_key_csptr, _del)
-  #define i_keyfrom c_PASTE(i_key_csptr, _clone)
-#endif
-
-#ifdef i_key_str
-  #define i_key     cstr
+#if defined i_key_ref
+  #define i_key i_key_ref
+  #define i_keyfrom c_PASTE(i_key, _clone)
   #ifndef i_tag
-    #define i_tag   str
+    #define i_tag ref
   #endif
-  #define i_cmp     c_rawstr_compare
-  #define i_hash    c_rawstr_hash
-  #define i_keydel  cstr_del
+  #ifndef i_cmp
+    #define i_cmp c_PASTE(i_key, _compare)
+  #endif
+  #ifndef i_hash
+    #define i_hash c_PASTE(i_key, _hash)
+  #endif
+  #ifndef i_keydel
+    #define i_keydel c_PASTE(i_key, _del)
+  #endif
+
+#elif defined i_key_str
+
+  #define i_key cstr
   #define i_keyfrom cstr_from
-  #define i_keyto   cstr_str
-  #define i_keyraw  const char*
-#endif
-
-#ifdef i_val_csptr
-  #define i_val i_val_csptr
-  #ifndef i_key
-    #define i_cmp c_PASTE(i_val_csptr, _compare)
+  #define i_keyto cstr_str
+  #define i_keyraw const char*
+  #ifndef i_tag
+    #define i_tag str
   #endif
-  #define i_valdel c_PASTE(i_val_csptr, _del)
-  #define i_valfrom c_PASTE(i_val_csptr, _clone)
+  #ifndef i_cmp  
+    #define i_cmp c_rawstr_compare
+  #endif
+  #ifndef i_hash
+    #define i_hash c_rawstr_hash
+  #endif
+  #if !defined i_keydel
+    #define i_keydel cstr_del
+  #endif
 #endif
 
-#ifdef i_val_str
-  #define i_val     cstr
+#if defined i_val_ref
+  #define i_val i_val_ref
+  #define i_valfrom c_PASTE(i_val, _clone)
   #if !defined i_tag && !defined i_key
-    #define i_tag   str
+    #define i_tag ref
   #endif
-  #ifndef i_key
-    #define i_cmp   c_rawstr_compare
+  #if !defined i_cmp && !defined i_key
+    #define i_cmp c_PASTE(i_val, _compare)
   #endif
-  #define i_valdel  cstr_del
+  #if !defined i_valdel && !defined i_del
+    #define i_valdel c_PASTE(i_val, _del)
+  #endif
+
+#elif defined i_val_str
+
+  #define i_val     cstr
   #define i_valfrom cstr_from
   #define i_valto   cstr_str
   #define i_valraw  const char*
+  #if !defined i_tag && !defined i_key
+    #define i_tag   str
+  #endif
+  #if !defined i_cmp && !defined i_key
+    #define i_cmp   c_rawstr_compare
+  #endif
+  #if !defined i_valdel && !defined i_del
+    #define i_valdel cstr_del
+  #endif
 #endif
 
 #if defined i_del && defined i_isset
@@ -105,14 +140,14 @@
 #elif defined i_del && !defined i_key
   #define i_valdel i_del
 #elif defined i_del
-  #error i_del not supported for maps, define i_keydel / i_valdel instead.
+  #error "i_del not supported for maps, define i_keydel / i_valdel instead."
 #endif
 #if defined i_from && defined i_isset
   #define i_keyfrom i_from
 #elif defined i_from && !defined i_key
   #define i_valfrom i_from
 #elif defined i_from
-  #error i_from not supported for maps, define i_keyfrom / i_valfrom instead.
+  #error "i_from not supported for maps, define i_keyfrom / i_valfrom instead."
 #endif
 
 #ifdef i_key
@@ -122,10 +157,11 @@
   #ifndef i_tag
     #define i_tag i_key  
   #endif
-  #if defined i_keydel && !defined i_keyfrom && !c_option(c_no_clone)
-    #error i_keydel defined requires defining i_keyfrom or '#define i_opt c_no_clone'
-  #elif !defined i_keyfrom
-    #define i_keyfrom c_default_fromraw
+  #if !defined _i_has_internal_clone && defined i_keydel && !defined i_keyfrom && !c_option(c_no_clone)
+    #error "i_keydel defined but not i_keyfrom (e.g. as c_default_clone), or no 'i_opt c_no_clone'"
+  #endif
+  #if !defined i_keyfrom
+    #define i_keyfrom c_default_clone
   #endif
   #ifndef i_keyraw
     #define i_keyraw i_key
@@ -136,23 +172,21 @@
   #elif !defined i_equ
     #define i_equ c_default_equalto
   #endif
-  #ifndef i_hash
-    #define i_hash c_default_hash
-  #endif
   #ifndef i_keydel
     #define i_keydel c_default_del
   #endif
-#elif defined _i_isset || defined i_hash || defined i_equ
-  #error i_key define is missing.
+#elif defined _i_isset
+  #error "i_key define is missing."
 #endif
 
 #ifndef i_tag
   #define i_tag i_val
 #endif
-#if defined i_valdel && !defined i_valfrom && !c_option(c_no_clone)
-  #error i_del/i_valdel defined: requires also defining i_valfrom or '#define i_opt c_no_clone'
-#elif !defined i_valfrom
-  #define i_valfrom c_default_fromraw
+#if !defined _i_has_internal_clone && defined i_valdel && !defined i_valfrom && !c_option(c_no_clone)
+  #error "i_valdel/i_del defined but not i_valfrom (e.g. as c_default_clone), or no 'i_opt c_no_clone'"
+#endif
+#if !defined i_valfrom
+  #define i_valfrom c_default_clone
 #endif
 #ifndef i_valraw
   #define i_valraw i_val
@@ -163,12 +197,14 @@
 #endif
 #ifndef i_cmp
   #define i_cmp c_default_compare
-  #define _i_cmp_default
+#endif
+#ifndef i_hash
+  #define i_hash c_default_hash
 #endif
 
 #else // -------------------------------------------------------
 
-#undef i_cnt
+#undef i_type
 #undef i_tag
 #undef i_imp
 #undef i_opt
@@ -176,23 +212,25 @@
 #undef i_del
 #undef i_equ
 #undef i_hash
+#undef i_from
+
 #undef i_val
 #undef i_val_str
+#undef i_val_ref
 #undef i_valdel
-#undef i_valfrom
-#undef i_from
-#undef i_valto
 #undef i_valraw
+#undef i_valfrom
+#undef i_valto
+
 #undef i_key
 #undef i_key_str
+#undef i_key_ref
 #undef i_keydel
+#undef i_keyraw
 #undef i_keyfrom
 #undef i_keyto
-#undef i_keyraw
-#undef i_key_csptr
-#undef i_val_csptr
 
 #undef _i_prefix
-#undef _i_cmp_default
+#undef _i_has_internal_clone
 #undef _i_template
 #endif

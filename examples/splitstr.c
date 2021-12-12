@@ -5,7 +5,7 @@ void print_split(csview str, csview sep)
     csview token = csview_first_token(str, sep);
     for (;;) {
         // print non-null-terminated csview
-        printf("\t\"%.*s\"\n", csview_ARG(token));
+        printf("\t\"%.*s\"\n", c_svarg(token));
         if (csview_end(&token).ref == csview_end(&str).ref) break;
         token = csview_next_token(str, sep, token);
     }
