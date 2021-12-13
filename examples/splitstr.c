@@ -33,7 +33,7 @@ int main()
     print_split(c_sv("This has no matching separator"), c_sv("xx")); puts("");
 
     puts("Output from string_split():");
-    cstr string = cstr_lit("Split,this,,string,now,");
+    cstr string = cstr_new("Split,this,,string,now,");
     cvec_str vec = string_split(cstr_sv(string), c_sv(","));
 
     c_autodefer (cvec_str_del(&vec), cstr_del(&string))

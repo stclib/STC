@@ -295,12 +295,12 @@ int main()
     // Use a HashMap to store the vikings' health points.
     cmap_vk vikings = cmap_vk_init();
 
-    cmap_vk_insert(&vikings, (Viking){cstr_from("Einar"), cstr_from("Norway")}, 25);
-    cmap_vk_insert(&vikings, (Viking){cstr_from("Olaf"), cstr_from("Denmark")}, 24);
-    cmap_vk_insert(&vikings, (Viking){cstr_from("Harald"), cstr_from("Iceland")}, 12);
-    cmap_vk_insert(&vikings, (Viking){cstr_from("Einar"), cstr_from("Denmark")}, 21);
+    cmap_vk_insert(&vikings, (Viking){cstr_new("Einar"), cstr_new("Norway")}, 25);
+    cmap_vk_insert(&vikings, (Viking){cstr_new("Olaf"), cstr_new("Denmark")}, 24);
+    cmap_vk_insert(&vikings, (Viking){cstr_new("Harald"), cstr_new("Iceland")}, 12);
+    cmap_vk_insert(&vikings, (Viking){cstr_new("Einar"), cstr_new("Denmark")}, 21);
     
-    Viking lookup = (Viking){cstr_from("Einar"), cstr_from("Norway")};
+    Viking lookup = (Viking){cstr_new("Einar"), cstr_new("Norway")};
     printf("Lookup: Einar of Norway has %d hp\n\n", *cmap_vk_at(&vikings, lookup));
     Viking_del(&lookup);
 
@@ -371,8 +371,8 @@ int main()
     c_auto (cmap_vk, vikings) // RAII
     {
         // Insert works as before, takes a constructed Viking object
-        cmap_vk_insert(&vikings, (Viking){cstr_from("Einar"), cstr_from("Norway")}, 25);
-        cmap_vk_insert(&vikings, (Viking){cstr_from("Olaf"), cstr_from("Denmark")}, 24);
+        cmap_vk_insert(&vikings, (Viking){cstr_new("Einar"), cstr_new("Norway")}, 25);
+        cmap_vk_insert(&vikings, (Viking){cstr_new("Olaf"), cstr_new("Denmark")}, 24);
 
         // Emplace is simpler to use now - takes rawkey argument
         cmap_vk_emplace(&vikings, (RViking){"Harald", "Iceland"}, 12);

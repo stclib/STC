@@ -22,7 +22,7 @@ macros, as one must always make sure to unwind temporary allocated resources bef
 For multiple variables, use either multiple **c_autovar** in sequence, or declare variable outside
 scope and use **c_autoscope**. Also, **c_auto** support up to 3 variables.
 ```c
-c_autovar (cstr s = cstr_lit("Hello"), cstr_del(&s))
+c_autovar (cstr s = cstr_new("Hello"), cstr_del(&s))
 {
     cstr_append(&s, " world");
     printf("%s\n", s.str);
@@ -45,7 +45,7 @@ c_autoscope (mydata_init(&data), mydata_destroy(&data))
     printf("%s\n", mydata.name.str);
 }
 
-cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
+cstr s1 = cstr_new("Hello"), s2 = cstr_new("world");
 c_autodefer (cstr_del(&s1), cstr_del(&s2))
 {
     printf("%s %s\n", s1.str, s2.str);
@@ -158,7 +158,7 @@ c_free(pnt);
 int* array = c_alloc_n (int, 100);
 c_free(array);
 
-cstr a = cstr_from("Hello"), b = cstr_from("World");
+cstr a = cstr_new("Hello"), b = cstr_new("World");
 c_del(cstr, &a, &b);
 ```
 

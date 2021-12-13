@@ -3,7 +3,7 @@
 void stringdemo1()
 {
     printf("\nSTRINGDEMO1\n");
-    c_autovar (cstr cs = cstr_from("one-nine-three-seven-five"), cstr_del(&cs))
+    c_autovar (cstr cs = cstr_new("one-nine-three-seven-five"), cstr_del(&cs))
     {
         printf("%s.\n", cs.str);
 

@@ -83,7 +83,7 @@ int main()
 
     // The templatized versions move-constructing elements
     c_auto (csmap_istr, m3) {
-        csmap_istr_value ip1 = {475, cstr_lit("blue")}, ip2 = {510, cstr_lit("green")};
+        csmap_istr_value ip1 = {475, cstr_new("blue")}, ip2 = {510, cstr_new("green")};
 
         // single element
         csmap_istr_insert(&m3, ip1.first, cstr_move(&ip1.second));

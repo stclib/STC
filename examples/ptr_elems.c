@@ -49,8 +49,8 @@ int main()
     c_auto (cmap_str, map)
     {
         printf("\nMap with pointer elements:\n");
-        cmap_str_insert(&map, cstr_lit("testing"), c_new(inttype, 999));
-        cmap_str_insert(&map, cstr_lit("done"), c_new(inttype, 111));
+        cmap_str_insert(&map, cstr_new("testing"), c_new(inttype, 999));
+        cmap_str_insert(&map, cstr_new("done"), c_new(inttype, 111));
 
         // Emplace: implicit key, val construction using i_keyfrom/i_valfrom:
         cmap_str_emplace(&map, "hello", 200);

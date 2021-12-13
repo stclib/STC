@@ -132,7 +132,7 @@ astar(cstr* maze, int width)
 int
 main(void)
 {
-    c_autovar (cstr maze = cstr_lit(
+    c_autovar (cstr maze = cstr_new(
         "#########################################################################\n"
         "#   #               #               #           #                   #   #\n"
         "#   #   #########   #   #####   #########   #####   #####   #####   # ! #\n"

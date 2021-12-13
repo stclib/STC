@@ -202,8 +202,8 @@ User User_clone(User user) {
 
 int main(void) {
     cvec_u vec = cvec_u_init();
-    cvec_u_push_back(&vec, (User) {cstr_from("admin"), 0});
-    cvec_u_push_back(&vec, (User) {cstr_from("joe"), 1});
+    cvec_u_push_back(&vec, (User) {cstr_new("admin"), 0});
+    cvec_u_push_back(&vec, (User) {cstr_new("joe"), 1});
 
     cvec_u vec2 = cvec_u_clone(vec);
     c_foreach (i, cvec_u, vec2)

@@ -5,6 +5,7 @@ STC - Smart Template Containers for C
 
 News
 ----
+- Strings: Renamed constructor *cstr_lit()* to `cstr_new(lit)`. Renamed *cstr_assign_fmt()* to `cstr_printf()`.
 - Added **cbox** type: container of one element: similar to [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr)
 - Replaced example for **csptr** in docs.
 - Added [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structural binding" as in c++.
@@ -318,7 +319,7 @@ and non-emplace methods:
 #include <stc/cvec.h>   // vector of string (cstr)
 ...
 c_auto (cvec_str, vec)  // declare and call cvec_str_init() and defer cvec_str_del(&vec)
-c_autovar (cstr s = cstr_lit("a string literal"), cstr_del(&s))  // c_autovar is a more general c_auto.
+c_autovar (cstr s = cstr_new("a string literal"), cstr_del(&s))  // c_autovar is a more general c_auto.
 {
     const char* hello = "Hello";
     cvec_str_push_back(&vec, cstr_from(hello);    // construct and add string from const char*
@@ -347,9 +348,9 @@ cmap_str_emplace(&map, "Hello", "again");
 // No cstr was constructed because "Hello" was already in the map.
 
 cmap_str_emplace_or_assign(&map, "Hello", "there");
-// Only cstr_from("there") constructed. "world" was destructed and replaced.
+// Only cstr_new("there") constructed. "world" was destructed and replaced.
 
-cmap_str_insert(&map, cstr_from("Hello"), cstr_from("you"));
+cmap_str_insert(&map, cstr_new("Hello"), cstr_new("you"));
 // Two cstr's constructed outside call, but both destructed by insert
 // because "Hello" existed. No mem-leak but less efficient.
 

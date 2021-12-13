@@ -33,7 +33,7 @@ typedef                 char csview_value;
 #define                 csview_npos  cstr_npos
 #define                 c_svfmt      "%.*s"
 #define                 c_svarg(sv)  (int)(sv).size, (sv).str
-#define                 c_sv(literal) csview_lit(literal)
+#define                 c_sv(literal) csview_new(literal)
 #define                 cstr_sv(s) csview_from_s(s)
 
 STC_API csview          csview_substr(csview sv, intptr_t pos, size_t n);
@@ -41,8 +41,8 @@ STC_API csview          csview_slice(csview sv, intptr_t p1, intptr_t p2);
 STC_API csview          csview_first_token(csview sv, csview sep);
 STC_API csview          csview_next_token(csview sv, csview sep, csview tok);
 
-#define                 csview_lit(literal) \
-                            c_make(csview){literal, sizeof c_make(strlit_t){literal} - 1}
+#define                 csview_new(literal) \
+                            c_make(csview){literal, sizeof c_make(c_strlit){literal} - 1}
 STC_INLINE csview       csview_from(const char* str)
                             { return c_make(csview){str, strlen(str)}; }
 STC_INLINE csview       csview_from_n(const char* str, size_t n)

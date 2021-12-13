@@ -63,7 +63,7 @@ int main(void)
     int year = 2020;
     c_auto (cmap_id, idnames) {
         cmap_id_emplace(&idnames, 100, "Hello");
-        cmap_id_insert(&idnames, 110, cstr_from("World"));
+        cmap_id_insert(&idnames, 110, cstr_new("World"));
         cmap_id_insert(&idnames, 120, cstr_from_fmt("Howdy, -%d-", year));
 
         c_foreach (i, cmap_id, idnames)

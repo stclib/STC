@@ -5,7 +5,7 @@ int main()
 {
     c_autovar (cbits set = cbits_with_size(23, true), cbits_del(&set)) {
         printf("count %zu, %zu\n", cbits_count(set), set.size);
-        cbits s1 = cbits_from_str("1110100110111");
+        cbits s1 = cbits_new("1110100110111");
         char buf[256];
         cbits_to_str(s1, buf, 0, -1);
         printf("buf: %s: %zu\n", buf, cbits_count(s1));

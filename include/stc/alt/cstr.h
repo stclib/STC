@@ -84,7 +84,7 @@ STC_INLINE cstr_rep_t cstr_rep_(cstr* self) {
 
 /**************************** PUBLIC API **********************************/
 
-#define cstr_lit(lit) cstr_from_n(lit, sizeof((cstr_literal_t){lit}) - 1)
+#define cstr_new(lit) cstr_from_n(lit, sizeof((cstr_literal_t){lit}) - 1)
 #define cstr_npos (~(cstr_size_t)0 >> 1)
 
 STC_API char* cstr_reserve(cstr* self, cstr_size_t cap);

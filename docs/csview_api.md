@@ -25,12 +25,11 @@ All csview definitions and prototypes are available by including a single header
 ## Methods
 
 ```c
+csview        csview_new(const char literal_only[]);                // make csview from literal, no strlen()
+csview        csview_from_s(cstr s);                                // same as cstr_sv()
 csview        csview_from(const char* str);                         // make csview from const char*
 csview        csview_from_n(const char* str, size_t n);             // construct 
-csview        csview_from_s(cstr s);                                // same as cstr_sv()
-
-csview        csview_lit(const char literal_only[]);                // make csview from literal, no strlen()
-csview        c_sv(const char literal_only[]);                      // same as csview_lit()
+csview        c_sv(const char literal_only[]);                      // same as csview_new()
 
 size_t        csview_size(csview sv);
 size_t        csview_length(csview sv);
@@ -104,7 +103,7 @@ uint64_t      csview_hash(const csview* x, size_t dummy);
 
 int main ()
 {
-    cstr str1 = cstr_lit("We think in generalities, but we live in details.");
+    cstr str1 = cstr_new("We think in generalities, but we live in details.");
                                                     // (quoting Alfred N. Whitehead)
 
     csview sv1 = cstr_substr(str1, 3, 5);           // "think"
@@ -113,7 +112,7 @@ int main ()
     csview sv3 = cstr_slice(str1, -8, -1);          // get "details"
     printf("%.*s %.*s %.*s\n", csview_ARG(sv1), csview_ARG(sv2), csview_ARG(sv3));
 
-    cstr s1 = cstr_lit("Apples are red");
+    cstr s1 = cstr_new("Apples are red");
     cstr s2 = cstr_from_v(cstr_substr(s1, -3, 3));  // "red"
     cstr s3 = cstr_from_v(cstr_substr(s1, 0, 6));   // "Apples"
     printf("%s %s\n", s2, s3.str);

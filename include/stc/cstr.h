@@ -41,7 +41,6 @@ struct cstr_rep         { size_t size, cap; char str[sizeof(size_t)]; };
 #define _cstr_rep(self) c_container_of((self)->str, struct cstr_rep, str)
 STC_STATIC_ONLY(        static struct cstr_rep _cstr_nullrep = {0, 0, {0}};
                         static const cstr cstr_null = {_cstr_nullrep.str}; )
-typedef const char      strlit_t[];
 /* optimal memory: based on malloc_usable_size() sequence: 24, 40, 56, ... */
 #define _cstr_opt_mem(cap)  ((((offsetof(struct cstr_rep, str) + (cap) + 8)>>4)<<4) + 8)
 /* optimal string capacity: 7, 23, 39, ... */
@@ -55,7 +54,7 @@ STC_API cstr            cstr_from_replace_all(const char* str, size_t str_len,
 STC_API size_t          cstr_reserve(cstr* self, size_t cap);
 STC_API void            cstr_resize(cstr* self, size_t len, char fill);
 STC_API cstr*           cstr_assign_n(cstr* self, const char* str, size_t n);
-STC_API cstr*           cstr_assign_fmt(cstr* self, const char* fmt, ...);
+STC_API cstr*           cstr_printf(cstr* self, const char* fmt, ...);
 STC_API cstr*           cstr_append_n(cstr* self, const char* str, size_t n);
 STC_API void            cstr_replace_n(cstr* self, size_t pos, size_t len, const char* str, size_t n);
 STC_API void            cstr_replace_all(cstr* self, const char* find, const char* replace);
@@ -69,8 +68,8 @@ STC_API int             c_strncasecmp(const char* s1, const char* s2, size_t nma
 
 STC_INLINE cstr         cstr_init() { return cstr_null; }
 #define                 cstr_str(self) (self)->str
-#define                 cstr_lit(literal) \
-                            cstr_from_n(literal, sizeof c_make(strlit_t){literal} - 1)
+#define                 cstr_new(literal) \
+                            cstr_from_n(literal, sizeof c_make(c_strlit){literal} - 1)
 STC_INLINE cstr         cstr_from(const char* str)
                             { return cstr_from_n(str, strlen(str)); }
 STC_INLINE char*        cstr_data(cstr* self) { return self->str; }
@@ -244,7 +243,7 @@ cstr_from_fmt(const char* fmt, ...) {
 }
 
 STC_DEF cstr*
-cstr_assign_fmt(cstr* self, const char* fmt, ...) {
+cstr_printf(cstr* self, const char* fmt, ...) {
     cstr ret = cstr_null;
     va_list args; va_start(args, fmt);
     cstr_vfmt(&ret, fmt, args);
