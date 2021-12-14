@@ -25,11 +25,11 @@ All csview definitions and prototypes are available by including a single header
 ## Methods
 
 ```c
+csview        c_sv(const char literal_only[]);                      // alias for csview_new
 csview        csview_new(const char literal_only[]);                // make csview from literal, no strlen()
 csview        csview_from_s(cstr s);                                // same as cstr_sv()
 csview        csview_from(const char* str);                         // make csview from const char*
 csview        csview_from_n(const char* str, size_t n);             // construct 
-csview        c_sv(const char literal_only[]);                      // same as csview_new()
 
 size_t        csview_size(csview sv);
 size_t        csview_length(csview sv);
@@ -57,10 +57,10 @@ void          csview_next(csview_iter* it);
 #### Extended cstr methods
 ```c
 cstr          cstr_from_v(csview sv);                         // construct cstr from csview
+csview        cstr_to_v(const cstr* self);                    // convert to csview from cstr*
 cstr          cstr_from_replace_all_v(csview sv, csview find, csview replace);
 
 csview        cstr_sv(cstr s);                                // convert to csview from cstr
-csview        cstr_to_v(const cstr* self);                    // convert to csview from cstr*
 csview        cstr_substr(cstr s, intptr_t pos, size_t n);    // negative pos counts from end
 csview        cstr_slice(cstr s, intptr_t p1, intptr_t p2);   // negative p1, p2 counts from end
 
@@ -91,11 +91,12 @@ uint64_t      csview_hash(const csview* x, size_t dummy);
 
 ## Constants and macros
 
-| Name             | Value               | Usage                             |
-|:-----------------|:--------------------|:----------------------------------|
-| `csview_null`    | same as `c_sv("")`  | `sview = csview_null;`            |
-| `csview_npos`    | same as `cstr_npos` |                                   |
-| `csview_ARG(sv)` | printf argument     | `printf("%.*s", csview_ARG(sv));` |
+| Name           | Value                | Usage                                         |
+|:---------------|:---------------------|:----------------------------------------------|
+| `csview_null`  | same as `c_sv("")`   | `sview = csview_null;`                        |
+| `csview_npos`  | same as `cstr_npos`  |                                               |
+| `c_svarg(sv)`  | printf format csview |                                               |
+| `c_svfmt`      | printf argument      | `printf("view: " c_svfmt "\n", c_svarg(sv));` |
 
 ## Example
 ```c
@@ -110,7 +111,7 @@ int main ()
     size_t pos = cstr_find(str1, "live");           // position of "live" in str1
     csview sv2 = cstr_substr(str1, pos, 4);         // get "live"
     csview sv3 = cstr_slice(str1, -8, -1);          // get "details"
-    printf("%.*s %.*s %.*s\n", csview_ARG(sv1), csview_ARG(sv2), csview_ARG(sv3));
+    printf(c_svfmt c_svfmt c_svfmt "\n", c_svarg(sv1), c_svarg(sv2), c_svarg(sv3));
 
     cstr s1 = cstr_new("Apples are red");
     cstr s2 = cstr_from_v(cstr_substr(s1, -3, 3));  // "red"

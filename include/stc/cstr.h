@@ -37,14 +37,14 @@ typedef                 char cstr_value;
 #define cstr_npos       (SIZE_MAX >> 1)
 STC_LIBRARY_ONLY(       extern const cstr cstr_null; )
 
-struct cstr_rep         { size_t size, cap; char str[sizeof(size_t)]; };
-#define _cstr_rep(self) c_container_of((self)->str, struct cstr_rep, str)
-STC_STATIC_ONLY(        static struct cstr_rep _cstr_nullrep = {0, 0, {0}};
+typedef struct          { size_t size, cap; char str[sizeof(size_t)]; } _cstr_rep_t;
+#define _cstr_rep(self) c_container_of((self)->str, _cstr_rep_t, str)
+STC_STATIC_ONLY(        static _cstr_rep_t _cstr_nullrep = {0, 0, {0}};
                         static const cstr cstr_null = {_cstr_nullrep.str}; )
 /* optimal memory: based on malloc_usable_size() sequence: 24, 40, 56, ... */
-#define _cstr_opt_mem(cap)  ((((offsetof(struct cstr_rep, str) + (cap) + 8)>>4)<<4) + 8)
+#define _cstr_opt_mem(cap)  ((((offsetof(_cstr_rep_t, str) + (cap) + 8)>>4)<<4) + 8)
 /* optimal string capacity: 7, 23, 39, ... */
-#define _cstr_opt_cap(cap)  (_cstr_opt_mem(cap) - offsetof(struct cstr_rep, str) - 1)
+#define _cstr_opt_cap(cap)  (_cstr_opt_mem(cap) - offsetof(_cstr_rep_t, str) - 1)
 
 STC_API cstr            cstr_from_n(const char* str, size_t n);
 STC_API cstr            cstr_from_fmt(const char* fmt, ...);
@@ -174,15 +174,15 @@ cstr_ends_with(cstr s, const char* sub) {
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
 
-STC_LIBRARY_ONLY( static struct cstr_rep _cstr_nullrep = {0, 0, {0}};
+STC_LIBRARY_ONLY( static _cstr_rep_t _cstr_nullrep = {0, 0, {0}};
                   const cstr cstr_null = {_cstr_nullrep.str}; )
 
 STC_DEF size_t
 cstr_reserve(cstr* self, const size_t cap) {
-    struct cstr_rep* rep = _cstr_rep(self);
+    _cstr_rep_t* rep = _cstr_rep(self);
     const size_t oldcap = rep->cap;
     if (cap > oldcap) {
-        rep = (struct cstr_rep*) c_realloc(oldcap ? rep : NULL, _cstr_opt_mem(cap));
+        rep = (_cstr_rep_t*) c_realloc(oldcap ? rep : NULL, _cstr_opt_mem(cap));
         self->str = rep->str;
         if (oldcap == 0) self->str[rep->size = 0] = '\0';
         return (rep->cap = _cstr_opt_cap(cap));
@@ -201,7 +201,7 @@ cstr_resize(cstr* self, const size_t len, const char fill) {
 STC_DEF cstr
 cstr_from_n(const char* str, const size_t n) {
     if (n == 0) return cstr_null;
-    struct cstr_rep* rep = (struct cstr_rep*) c_malloc(_cstr_opt_mem(n));
+    _cstr_rep_t* rep = (_cstr_rep_t*) c_malloc(_cstr_opt_mem(n));
     cstr s = {(char *) memcpy(rep->str, str, n)};
     s.str[rep->size = n] = '\0';
     rep->cap = _cstr_opt_cap(n);
