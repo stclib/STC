@@ -19,16 +19,18 @@ struct {
 
 #define i_val Point
 #define i_opt c_no_compare
-#include <stc/cbox.h>
-
-#define i_val cbox_Point
-#define i_opt c_no_compare
-#define i_tag BoxPoint
-#include <stc/cbox.h>
+#include <stc/cbox.h> // cbox_Box
 
 #define i_val Rectangle
 #define i_opt c_no_compare
-#include <stc/cbox.h>
+#include <stc/cbox.h> // cbox_Rectangle
+
+// Box in box:
+#define i_val cbox_Point
+#define i_del(b) cbox_Point_del(b)
+#define i_opt c_no_compare|c_no_clone
+#define i_tag BoxPoint
+#include <stc/cbox.h> // cbox_BoxPoint
 
 Point origin(void) {
     return (Point){ .x=0.0, .y=0.0 };

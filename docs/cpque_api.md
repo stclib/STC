@@ -27,6 +27,7 @@ cpque_X             cpque_X_clone(cpque_X pq);
 
 void                cpque_X_clear(cpque_X* self);
 bool                cpque_X_reserve(cpque_X* self, size_t n);
+void                cpque_X_shrink_to_fit(cpque_X* self);
 void                cpque_X_copy(cpque_X* self, cpque_X other);
 void                cpque_X_del(cpque_X* self);        // destructor
 

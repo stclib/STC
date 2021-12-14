@@ -51,6 +51,9 @@ STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, size_t n) {
     return t ? (self->data = t, self->capacity = n) : 0;
 }
 
+STC_INLINE void _cx_memb(_shrink_to_fit)(_cx_self* self)
+    { _cx_memb(_reserve)(self, self->size); }
+
 STC_INLINE _cx_self _cx_memb(_with_capacity)(size_t cap) {
     _cx_self out = {0}; _cx_memb(_reserve)(&out, cap);
     return out;
@@ -136,9 +139,9 @@ STC_DEF _cx_self _cx_memb(_clone)(_cx_self q) {
 
 STC_DEF void
 _cx_memb(_erase_at)(_cx_self* self, size_t idx) {
-    size_t n = _cx_memb(_size)(*self) - 1;
+    i_valdel(&self->data[idx]);
+    size_t n = --self->size;
     self->data[idx] = self->data[n];
-    _cx_memb(_pop_back)(self);
     _cx_memb(_sift_down_)(self->data - 1, idx + 1, n);
 }
 
