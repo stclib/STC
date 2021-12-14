@@ -27,8 +27,9 @@ struct {
 
 // Box in box:
 #define i_val cbox_Point
-#define i_del(b) cbox_Point_del(b)
-#define i_opt c_no_compare|c_no_clone
+#define i_del(bp) cbox_Point_del(bp)
+#define i_from(b) cbox_Point_clone(b)
+#define i_opt c_no_compare
 #define i_tag BoxPoint
 #include <stc/cbox.h> // cbox_BoxPoint
 
