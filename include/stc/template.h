@@ -72,9 +72,6 @@
 #if defined i_key_ref
   #define i_key i_key_ref
   #define i_keyfrom c_PASTE(i_key, _clone)
-  #ifndef i_tag
-    #define i_tag ref
-  #endif
   #ifndef i_cmp
     #define i_cmp c_PASTE(i_key, _compare)
   #endif
@@ -108,9 +105,6 @@
 #if defined i_val_ref
   #define i_val i_val_ref
   #define i_valfrom c_PASTE(i_val, _clone)
-  #if !defined i_tag && !defined i_key
-    #define i_tag ref
-  #endif
   #if !defined i_cmp && !defined i_key
     #define i_cmp c_PASTE(i_val, _compare)
   #endif

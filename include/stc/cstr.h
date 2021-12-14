@@ -54,7 +54,7 @@ STC_API cstr            cstr_from_replace_all(const char* str, size_t str_len,
 STC_API size_t          cstr_reserve(cstr* self, size_t cap);
 STC_API void            cstr_resize(cstr* self, size_t len, char fill);
 STC_API cstr*           cstr_assign_n(cstr* self, const char* str, size_t n);
-STC_API cstr*           cstr_printf(cstr* self, const char* fmt, ...);
+STC_API int             cstr_printf(cstr* self, const char* fmt, ...);
 STC_API cstr*           cstr_append_n(cstr* self, const char* str, size_t n);
 STC_API void            cstr_replace_n(cstr* self, size_t pos, size_t len, const char* str, size_t n);
 STC_API void            cstr_replace_all(cstr* self, const char* find, const char* replace);
@@ -216,7 +216,7 @@ cstr_from_n(const char* str, const size_t n) {
 #  pragma warning(disable: 4996)
 #endif
 
-STC_DEF void
+STC_DEF int
 cstr_vfmt(cstr* self, const char* fmt, va_list args) {
     va_list args2;
     va_copy(args2, args);
@@ -224,7 +224,7 @@ cstr_vfmt(cstr* self, const char* fmt, va_list args) {
     cstr_reserve(self, len);
     vsprintf(self->str, fmt, args2);
     va_end(args2);
-    _cstr_rep(self)->size = len;
+    return _cstr_rep(self)->size = len;
 }
 
 #if defined(__clang__)
@@ -242,14 +242,16 @@ cstr_from_fmt(const char* fmt, ...) {
     return ret;
 }
 
-STC_DEF cstr*
+STC_DEF int
 cstr_printf(cstr* self, const char* fmt, ...) {
     cstr ret = cstr_null;
-    va_list args; va_start(args, fmt);
-    cstr_vfmt(&ret, fmt, args);
+    va_list args;
+    va_start(args, fmt);
+    int n = cstr_vfmt(&ret, fmt, args);
     va_end(args);
-    cstr_del(self); *self = ret;
-    return self;
+    cstr_del(self);
+    *self = ret;
+    return n;
 }
 
 STC_DEF cstr*
