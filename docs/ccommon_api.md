@@ -85,7 +85,7 @@ int main()
 |:-------------------------------------------|:--------------------------------|
 | `c_foreach (it, ctype, container)`         | Iteratate all elements          |
 | `c_foreach (it, ctype, it1, it2)`          | Iterate the range [it1, it2)    |
-| `c_forpair (key, value, ctype, container)` | Iterate with structural binding |
+| `c_forpair (key, value, ctype, container)` | Iterate with structured binding |
 
 ```c
 #define i_key int

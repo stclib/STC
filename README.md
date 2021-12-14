@@ -6,9 +6,9 @@ STC - Smart Template Containers for C
 News
 ----
 - Strings: Renamed constructor *cstr_lit()* to `cstr_new(lit)`. Renamed *cstr_assign_fmt()* to `cstr_printf()`.
-- Added **cbox** type: container of one element: similar to [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr)
-- Replaced example for **csptr** in docs.
-- Added [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structural binding" as in c++.
+- Added [**cbox**](docs/cbox_api.md) type: container of one element, similar to [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr)
+- Added [example for **csptr**](examples/sptr_to_maps.c).
+- Added [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding".
 - Deprecated *csptr_X_make()*. Renamed to *csptr_X_new()*. Corresponding **cbox** method is *cbox_X_new()*.
 - Deprecated *c_default_fromraw(raw)*. Renamed to *c_default_clone(raw)*.
 - Deprecated `i_key_csptr` / `i_val_csptr`. Use `i_key_ref` / `i_val_ref` when specifying containers with **csptr** or **cbox** elements.

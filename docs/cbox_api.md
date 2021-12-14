@@ -1,15 +1,17 @@
-# STC [cbox](../include/stc/cbox.h): Shared Pointers
+# STC [cbox](../include/stc/cbox.h): (Boxed) Heap Allocated Objects
 
-**cbox** is a container for one heap allocated object. A **cbox** is empty by default.
-The *cbox_X_compare()*, *cbox_X_del()* methods are defined based on the `i_cmp`
-and `i_valdel` macros specified. Use *cbox_X_clone(p)* to make a deep copy, which
-uses the `i_valfrom` macro if defined.
+**cbox** is a A box is a smart pointer to a heap allocated value of type X. A **cbox** can
+be empty. The *cbox_X_compare()*, *cbox_X_del()* methods are defined based on the `i_cmp`
+and `i_valdel` macros specified. Use *cbox_X_clone(p)* to make a deep copy, which uses the
+`i_valfrom` macro if defined.
 
-When declaring a container with cbox elements, define `i_val_ref` as the cbox type, see example.
+When declaring a container of **cbox** values, it is recommended to define `i_val_ref` to the
+cbox type instead of defining `i_val`. This will auto-set `i_del`, `i_from`, and `i_cmp` using 
+functions defined by the specified **cbox**.
 
 For containers, make sure to pass the result of create functions like *cbox_X_new()* **only** to 
-*insert()*, *push_back()*, and *push()* functions. Use *emplace()* functions to deep clone 
-already existing/owned cbox elements.
+*insert()*, *push_back()*, and *push()* functions. Use the *emplace()* functions in order to
+auto-*clone* an already existing/owned cbox element.
 
 See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr) for a functional reference, or Rust [std::boxed::Box](https://doc.rust-lang.org/std/boxed/struct.Box.html)
 
