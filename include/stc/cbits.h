@@ -196,13 +196,17 @@ STC_DEF cbits cbits_with_values(size_t size, uint64_t pattern) {
 }
 STC_DEF cbits cbits_from_n(const char* str, size_t n) {
     cbits set = cbits_with_size(n, false);
-    for (size_t i=0; i<set.size; ++i) if (str[i] == '1') cbits_set(&set, i);
+    for (size_t i=0; i<set.size; ++i)
+        if (str[i] == '1') cbits_set(&set, i);
     return set;
 }
 STC_DEF char* cbits_to_str(cbits set, char* out, size_t start, intptr_t stop) {
-    size_t end = stop < 0 ? set.size : stop;
-    for (size_t i=start; i<end; ++i) out[i] = cbits_test(set, i) ? '1' : '0';
-    out[end] = '\0'; return out;
+    if (stop < 0) stop = set.size;
+    memset(out, '0', stop - start);
+    for (intptr_t i=start; i<stop; ++i) 
+        if (cbits_test(set, i)) out[i - start] = '1';
+    out[stop - start] = '\0';
+    return out;
 }
 STC_DEF cbits cbits_clone(cbits other) {
     size_t bytes = ((other.size + 63) >> 6) * 8;
