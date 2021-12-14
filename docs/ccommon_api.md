@@ -93,7 +93,7 @@ int main()
 #define i_tag ii
 #include <stc/csmap.h>
 ...
-c_apply_pair(csmap_ii, insert, &map, {{23,1}, {3,2}, {7,3}, {5,4}, {12,5}});
+c_apply_pair(csmap_ii, insert, &map, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} });
 c_foreach (i, csmap_ii, map)
     printf(" %d", i.ref->first);
 // out: 3 5 7 12 23
