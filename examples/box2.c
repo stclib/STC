@@ -19,17 +19,15 @@ struct {
 
 #define i_val Point
 #define i_opt c_no_compare
-#include <stc/cbox.h> // cbox_Box
+#include <stc/cbox.h> // cbox_Point
 
 #define i_val Rectangle
 #define i_opt c_no_compare
 #include <stc/cbox.h> // cbox_Rectangle
 
 // Box in box:
-#define i_val cbox_Point
-#define i_del(bp) cbox_Point_del(bp)
-#define i_from(b) cbox_Point_clone(b)
-#define i_opt c_no_compare
+#define i_val_ref cbox_Point  // NB: adviced to use i_val_ref when value is a cbox or csptr!
+                              // it will auto-set i_del, i_from, i_cmp for you.
 #define i_tag BoxPoint
 #include <stc/cbox.h> // cbox_BoxPoint
 
