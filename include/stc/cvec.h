@@ -82,7 +82,7 @@ STC_API _cx_self        _cx_memb(_init)(void);
 STC_API void            _cx_memb(_del)(_cx_self* self);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
 STC_API bool            _cx_memb(_reserve)(_cx_self* self, size_t cap);
-STC_API bool            _cx_memb(_resize)(_cx_self* self, size_t size, i_val fill_val);
+STC_API bool            _cx_memb(_resize)(_cx_self* self, size_t size, i_val null);
 STC_API _cx_value*      _cx_memb(_push_back)(_cx_self* self, i_val value);
 STC_API _cx_iter        _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2);
 STC_API _cx_iter        _cx_memb(_insert_range_p)(_cx_self* self, _cx_value* pos,
@@ -147,9 +147,9 @@ STC_INLINE _cx_iter     _cx_memb(_advance)(_cx_iter it, intptr_t offs)
 STC_INLINE size_t       _cx_memb(_index)(_cx_self cx, _cx_iter it) { return it.ref - cx.data; }
 
 STC_INLINE _cx_self
-_cx_memb(_with_size)(const size_t size, i_val null_val) {
+_cx_memb(_with_size)(const size_t size, i_val null) {
     _cx_self cx = _cx_memb(_init)();
-    _cx_memb(_resize)(&cx, size, null_val);
+    _cx_memb(_resize)(&cx, size, null);
     return cx;
 }
 
@@ -263,7 +263,7 @@ STC_DEF bool
 _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
     struct cvec_rep* rep = cvec_rep_(self);
     const size_t len = rep->size;
-    if (cap >= len) {
+    if (cap > rep->cap || cap && cap == len) {
         rep = (struct cvec_rep*) c_realloc(rep->cap ? rep : NULL,
                                            offsetof(struct cvec_rep, data) + cap*sizeof(i_val));
         if (!rep) return false;
@@ -275,13 +275,12 @@ _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
 }
 
 STC_DEF bool
-_cx_memb(_resize)(_cx_self* self, const size_t len, i_val fill) {
-    if (len > _cx_memb(_capacity)(*self))
-        if (!_cx_memb(_reserve)(self, len)) return false;
+_cx_memb(_resize)(_cx_self* self, const size_t len, i_val null) {
+    if (!_cx_memb(_reserve)(self, len)) return false;
     struct cvec_rep *rep = cvec_rep_(self);
     const size_t n = rep->size;
     for (size_t i = len; i < n; ++i) i_valdel(&self->data[i]);
-    for (size_t i = n; i < len; ++i) self->data[i] = fill;
+    for (size_t i = n; i < len; ++i) self->data[i] = null;
     if (rep->cap) rep->size = len;
     return true;
 }

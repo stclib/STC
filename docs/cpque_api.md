@@ -3,17 +3,17 @@
 A priority queue is a container adaptor that provides constant time lookup of the largest (by default) element, at the expense of logarithmic insertion and extraction.
 A user-provided ***i_cmp*** may be defined to set the ordering, e.g. using ***-c_default_cmp*** would cause the smallest element to appear as the top() value.
 
+Note that **cpque** does not support `i_valraw` and `i_valto`, so only cloning via `i_valfrom` is available.
+
 See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/container/priority_queue) for a functional reference.
 
 ## Header file and declaration
 
 ```c
 #define i_val       // value: REQUIRED
-#define i_cmp       // three-way compare two i_valraw* : REQUIRED IF i_valraw is a non-integral type
+#define i_cmp       // three-way compare two i_val* : REQUIRED IF i_val is a non-integral type
 #define i_del       // destroy value func - defaults to empty destruct
-#define i_valraw    // convertion "raw" type - defaults to i_val
-#define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
-#define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
+#define i_valfrom   // convertion func i_val => i_val - defaults to plain copy
 #define i_tag       // defaults to i_val
 #include <stc/cpque.h>
 ```
@@ -37,7 +37,7 @@ cpque_X_value*      cpque_X_top(const cpque_X* self);
 
 void                cpque_X_make_heap(cpque_X* self);  // call after using push_back().
 void                cpque_X_push(cpque_X* self, cpque_X_value value);
-void                cpque_X_emplace(cpque_X* self, cpque_X_rawvalue raw);
+void                cpque_X_emplace(cpque_X* self, cpque_X_value val);     // clones value
 
 void                cpque_X_pop(cpque_X* self);
 void                cpque_X_erase_at(cpque_X* self, size_t idx);
@@ -52,7 +52,6 @@ cpque_X_value       cpque_X_value_clone(cpque_X_value val);
 |:-------------------|:--------------------------------------|:------------------------|
 | `cpque_X`          | `struct {cpque_X_value* data; ...}`   | The cpque type          |
 | `cpque_X_value`    | `i_val`                               | The cpque element type  |
-| `cpque_X_rawvalue` | `i_valraw`                            | cpque raw value type    |
 
 ## Example
 ```c

@@ -39,16 +39,9 @@ int main(void)
     c_auto (cpque_f, floats) {
         float nums[] = {4.0f, 2.0f, 5.0f, 3.0f, 1.0f};
 
-        c_forrange (i, c_arraylen(nums)) {
-            cpque_f_push_back(&floats, nums[i]);
-            printf("%.1f ", floats.data[i]);
-        }
-        puts("");
-
         // PRIORITY QUEUE
 
-        cpque_f_make_heap(&floats);
-        c_apply(cpque_f, push, &floats, {40.0f, 20.0f, 50.0f, 30.0f, 10.0f});
+        c_apply_n(cpque_f, push, &floats, nums, c_arraylen(nums));
 
         puts("\npop and show high priorites first:");
         while (! cpque_f_empty(floats)) {

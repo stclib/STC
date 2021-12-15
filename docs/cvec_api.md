@@ -29,14 +29,14 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 
 ```c
 cvec_X              cvec_X_init(void);
-cvec_X              cvec_X_with_size(size_t size, i_val fill);
+cvec_X              cvec_X_with_size(size_t size, i_val null);
 cvec_X              cvec_X_with_capacity(size_t size);
 cvec_X              cvec_X_clone(cvec_X vec);
 
 void                cvec_X_clear(cvec_X* self);
 void                cvec_X_copy(cvec_X* self, cvec_X other);
 bool                cvec_X_reserve(cvec_X* self, size_t cap);
-bool                cvec_X_resize(cvec_X* self, size_t size, i_val fill);
+bool                cvec_X_resize(cvec_X* self, size_t size, i_val null);
 void                cvec_X_shrink_to_fit(cvec_X* self);
 void                cvec_X_swap(cvec_X* a, cvec_X* b);
 void                cvec_X_del(cvec_X* self);                                                // destructor

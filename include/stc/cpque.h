@@ -46,9 +46,19 @@ STC_INLINE _cx_self _cx_memb(_init)(void)
     { return c_make(_cx_self){0}; }
 
 STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, size_t n) {
-    if (n != self->size && n < self->capacity) return true;
-    _cx_value *t = (_cx_value *)c_realloc(self->data, n*sizeof *t);
-    return t ? (self->data = t, self->capacity = n) : 0;
+    if (n != self->size && n <= self->capacity) return true;
+    _cx_value *d = (_cx_value *)c_realloc(self->data, n*sizeof *d);
+    return d ? (self->data = d, self->capacity = n, true) : false;
+}
+
+STC_INLINE bool
+_cx_memb(_resize)(_cx_self* self, const size_t len, i_val null) {
+    if (!_cx_memb(_reserve)(self, len)) return false;
+    const size_t n = self->size;
+    for (size_t i = len; i < n; ++i) i_valdel(&self->data[i]);
+    for (size_t i = n; i < len; ++i) self->data[i] = null;
+    self->size = len;
+    return true;
 }
 
 STC_INLINE void _cx_memb(_shrink_to_fit)(_cx_self* self)
@@ -90,22 +100,12 @@ STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     _cx_memb(_del)(self); *self = _cx_memb(_clone)(other);
 }
 
-STC_INLINE void _cx_memb(_emplace)(_cx_self* self, _cx_rawvalue raw)
-    { _cx_memb(_push)(self, i_valfrom(raw)); }
+STC_INLINE void _cx_memb(_emplace)(_cx_self* self, _cx_value val)
+    { _cx_memb(_push)(self, i_valfrom(val)); }
 
 STC_INLINE i_val _cx_memb(_value_clone)(_cx_value val)
-    { return i_valfrom(i_valto(&val)); }
+    { return i_valfrom(val); }
 #endif
-
-STC_INLINE void
-_cx_memb(_push_back)(_cx_self* self, _cx_value value) {
-    if (self->size == self->capacity) _cx_memb(_reserve)(self, self->size*3/2 + 4);
-    self->data[ self->size++ ] = value;
-}
-
-STC_INLINE void
-_cx_memb(_pop_back)(_cx_self* self)
-    { _cx_value* p = &self->data[--self->size]; i_valdel(p); }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
@@ -132,7 +132,7 @@ _cx_memb(_make_heap)(_cx_self* self) {
 STC_DEF _cx_self _cx_memb(_clone)(_cx_self q) {
     _cx_self out = _cx_memb(_with_capacity)(q.size);
     for (; out.size < out.capacity; ++out.size, ++q.data)
-        out.data[out.size] = i_valfrom(i_valto(q.data));
+        out.data[out.size] = i_valfrom(*q.data);
     return out;
 }
 #endif
