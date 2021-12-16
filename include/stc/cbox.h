@@ -151,9 +151,9 @@ _cx_memb(_take)(_cx_self* self, _cx_self other) {
 
 STC_INLINE uint64_t
 _cx_memb(_hash)(const _cx_self* self, size_t n) {
-    #if c_option(c_no_compare) && SIZE_MAX >> 32
+    #if (c_option(c_no_compare) || defined _i_default_compare) && SIZE_MAX >> 32
         return c_hash64(&self->get, 8);
-    #elif c_option(c_no_compare)
+    #elif (c_option(c_no_compare) || defined _i_default_compare)
         return c_hash32(&self->get, 4);
     #else
         i_valraw raw = i_valto(self->get);
@@ -163,7 +163,7 @@ _cx_memb(_hash)(const _cx_self* self, size_t n) {
 
 STC_INLINE int
 _cx_memb(_compare)(const _cx_self* x, const _cx_self* y) {
-    #if c_option(c_no_compare)
+    #if (c_option(c_no_compare) || defined _i_default_compare)
         return (int)(x->get - y->get);
     #else
         i_valraw rx = i_valto(x->get);

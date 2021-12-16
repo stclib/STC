@@ -20,7 +20,6 @@ void Song_del(Song* s) {
 #define i_val Song
 #define i_del Song_del
 #define i_tag song
-#define i_opt c_no_compare
 #include <stc/csptr.h> // define csptr_song
 
 #define i_val_ref csptr_song

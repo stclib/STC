@@ -4,10 +4,10 @@ void show_del(int* x) { printf("del: %d\n", *x); }
 
 #define i_val int
 #define i_del show_del        // this "destroy" func shows which elements are destroyed
-// csptr/cbox will try to use default comparison of i_val (int) if no cmp func is specified,
-// unless 'i_opt c_no_compare' is defined, in which case pointer addresses are compared.
-// See the different results by commenting in the next line.
-//#define i_opt c_no_compare
+// csptr/cbox will use pointer address comparison of i_val if no i_cmp func is specified,
+// or 'i_opt c_no_compare' is defined, otherwise i_cmp is used to compare object values.
+// See the different results by commenting out the next line.
+#define i_cmp(x, y) (*(x) - *(y))
 #include <stc/csptr.h>        // csptr_int: shared pointer to int
 
 #define i_val_ref csptr_int

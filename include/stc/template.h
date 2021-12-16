@@ -102,13 +102,29 @@
   #endif
 #endif
 
+/* Resolve i_del and i_from here */
+#if defined i_del && defined i_isset
+  #define i_keydel i_del
+#elif defined i_del && !defined i_key
+  #define i_valdel i_del
+#elif defined i_del
+  #error "i_del not supported for maps, define i_keydel / i_valdel instead."
+#endif
+#if defined i_from && defined i_isset
+  #define i_keyfrom i_from
+#elif defined i_from && !defined i_key
+  #define i_valfrom i_from
+#elif defined i_from
+  #error "i_from not supported for maps, define i_keyfrom / i_valfrom instead."
+#endif
+
 #if defined i_val_ref
   #define i_val i_val_ref
   #define i_valfrom c_PASTE(i_val, _clone)
   #if !defined i_cmp && !defined i_key
     #define i_cmp c_PASTE(i_val, _compare)
   #endif
-  #if !defined i_valdel && !defined i_del
+  #if !defined i_valdel
     #define i_valdel c_PASTE(i_val, _del)
   #endif
 
@@ -124,24 +140,9 @@
   #if !defined i_cmp && !defined i_key
     #define i_cmp   c_rawstr_compare
   #endif
-  #if !defined i_valdel && !defined i_del
+  #if !defined i_valdel
     #define i_valdel cstr_del
   #endif
-#endif
-
-#if defined i_del && defined i_isset
-  #define i_keydel i_del
-#elif defined i_del && !defined i_key
-  #define i_valdel i_del
-#elif defined i_del
-  #error "i_del not supported for maps, define i_keydel / i_valdel instead."
-#endif
-#if defined i_from && defined i_isset
-  #define i_keyfrom i_from
-#elif defined i_from && !defined i_key
-  #define i_valfrom i_from
-#elif defined i_from
-  #error "i_from not supported for maps, define i_keyfrom / i_valfrom instead."
 #endif
 
 #ifdef i_key
@@ -190,6 +191,7 @@
   #define i_valdel c_default_del
 #endif
 #ifndef i_cmp
+  #define _i_default_compare
   #define i_cmp c_default_compare
 #endif
 #ifndef i_hash
@@ -225,6 +227,7 @@
 #undef i_keyto
 
 #undef _i_prefix
+#undef _i_default_compare
 #undef _i_has_internal_clone
 #undef _i_template
 #endif

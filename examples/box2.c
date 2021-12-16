@@ -18,11 +18,9 @@ struct {
 } typedef Rectangle;
 
 #define i_val Point
-#define i_opt c_no_compare
 #include <stc/cbox.h> // cbox_Point
 
 #define i_val Rectangle
-#define i_opt c_no_compare
 #include <stc/cbox.h> // cbox_Rectangle
 
 // Box in box:
