@@ -23,49 +23,44 @@ void Person_drop(Person* p) {
     c_drop(cstr, &p->name, &p->last);
 }
 
-#define i_type PBox
+#define i_type PSPtr
 #define i_val_bind Person // binds Person_cmp, ...
-#include <stc/cbox.h>
+#include <stc/csptr.h>
 
 #define i_type Persons
-#define i_val_bind PBox // binds PBox_cmp, ...
+#define i_val_bind PSPtr // binds PSPtr_cmp, ...
 #include <stc/cvec.h>
 
 
 int main()
 {
     c_auto (Persons, vec)
-    c_auto (PBox, p, q)
+    c_auto (PSPtr, p, q)
     {
-        p = PBox_new(Person_new("Laura", "Palmer"));
+        p = PSPtr_new(Person_new("Laura", "Palmer"));
 
-        q = PBox_clone(p);
+        // We want a deep copy -- PSPtr_clone(p) only shares!
+        q = PSPtr_new(Person_clone(*p.get));
         cstr_assign(&q.get->name, "Leland");
 
         printf("orig: %s %s\n", p.get->name.str, p.get->last.str);
         printf("copy: %s %s\n", q.get->name.str, q.get->last.str);
 
-        Persons_push_back(&vec, PBox_new(Person_new("Dale", "Cooper")));
-        Persons_push_back(&vec, PBox_new(Person_new("Audrey", "Home")));
+        Persons_push_back(&vec, PSPtr_new(Person_new("Dale", "Cooper")));
+        Persons_push_back(&vec, PSPtr_new(Person_new("Audrey", "Home")));
         
-        // NB! Clone p and q to the vector using emplace_back()
+        // NB! Clone/share p and q to the vector using emplace_back()
         c_apply(Persons, emplace_back, &vec, {p, q});
 
         c_foreach (i, Persons, vec)
             printf("%s %s\n", i.ref->get->name.str, i.ref->get->last.str);
         puts("");
         
-        // Look-up Audrey! Use a (fake) temporary PBox for lookup.
+        // Look-up Audrey! Use a (fake) temporary PSPtr for lookup.
         c_autovar (Person a = Person_new("Audrey", "Home"), Person_drop(&a)) {
-            const PBox *v = Persons_get(&vec, (PBox){&a});
+            const PSPtr *v = Persons_get(&vec, (PSPtr){&a});
             if (v) printf("found: %s %s\n", v->get->name.str, v->get->last.str);
         }
-        puts("");
-
-        // Alternative to use cbox (when not placed in container).
-        Person *she = c_new(Person, Person_new("Shelly", "Johnson"));
-        printf("%s %s\n", she->name.str, she->last.str);
-        c_delete(Person, she); // drop and free
         puts("");
     }
 }
