@@ -36,12 +36,12 @@ static inline RViking Viking_toraw(const Viking* vk) {
 // With this in place, we define the Viking => int hash map type:
 #define i_type      Vikings
 #define i_key_bind  Viking
-#define i_val       int
 #define i_keyraw    RViking
-// i_key_bind auto-maps these functions:
+#define i_val       int
+// i_key_bind auto-binds these functions:
 //   #define i_hash     Viking_hash
 //   #define i_equ      Viking_equalto
-//   #define i_keyfrom  Viking_from // uses _from because i_keyraw is defined
+//   #define i_keyfrom  Viking_from // uses _from (not _clone) because i_keyraw is defined
 //   #define i_keyto    Viking_toraw
 //   #define i_keydrop  Viking_drop
 #include <stc/cmap.h>

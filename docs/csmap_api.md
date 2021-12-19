@@ -183,7 +183,7 @@ static int Vec3i_cmp(const Vec3i* a, const Vec3i* b) {
 
 #define i_key Vec3i
 #define i_val int
-#define i_cmp Vec3i_cmp // uses c_default_hash
+#define i_cmp Vec3i_cmp
 #define i_tag vi
 #include <stc/csmap.h>
 #include <stdio.h>

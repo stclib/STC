@@ -5,15 +5,15 @@ STC - Smart Template Containers for C
 
 News
 ----
-### Version 3.0 released. Migration guide for breaking changes from version 2.X:
-There are new general `i_key_bind` / `i_val_bind` template parameters which auto-binds a set of functions to the type specified, and can be used in place of `i_key` / `i_val`. Use the `_bind` variant for elements of Type which have following functions defined: *Type_cmp*, *Type_clone*, *Type_drop*, *Type_equalto*, and *Type_hash*. Only the functions required by the particular container needs to be defined, e.g. only **cmap** and **cset** require *Type_equalto* and *Type_hash* to be defined.
-You may still define template parameters with `i_val` / `i_key` as before, which is easier for simple element types.
+### Version 3.0 released
+There are new general `i_key_bind` / `i_val_bind` template parameters which auto-binds a set of functions to the type specified, and can be used in place of `i_key` / `i_val`. Use the `_bind` variant for elements of Type which have following functions defined: *Type_cmp*, *Type_clone*, *Type_drop*, *Type_equalto*, and *Type_hash*. Only the functions required by the particular container needs to be defined, e.g. only **cmap** and **cset** require *Type_equalto* and *Type_hash* to be defined. You can override these by defining `i_cmp`, `i_drop`, etc.
+It's still possible define template parameters with `i_val` / `i_key` as before, which is easier for simple element types, as defaults will be assigned to missing functions.
 
-Regex replace in VS Code:
+Migration guide from version 2 to 3. Replace (regular expresion) in VS Code:
 - `_del\b` → `_drop`
 - `_compare\b` → `_cmp`
 
-Whole word + Match case:
+Replace (whole word + match case):
 - `i_keydel` → `i_keydrop`
 - `i_valdel` → `i_valdrop`
 - `i_cnt` → `i_type`
@@ -29,7 +29,7 @@ Whole word + Match case:
 - Added [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding".
 - Deprecated *csptr_X_make()*. Renamed to *csptr_X_new()*. Corresponding **cbox** method is *cbox_X_new()*.
 - Deprecated *c_default_fromraw(raw)*. Renamed to *c_default_clone(raw)*.
-- Deprecated `i_key_csptr` / `i_val_csptr`. Use `i_key_bind` / `i_val_bind`
+- Deprecated `i_key_csptr` / `i_val_csptr`. Use `i_key_bind` / `i_val_bind` for types that has required functions defined.
 - Deprecated `i_cnt`. Use `i_type` instead to define the complete container type name.
 - Added `i_opt` template parameter: compile-time options: `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`; may be combined with `|`
 
@@ -39,9 +39,11 @@ Whole word + Match case:
 Introduction
 ------------
 STC is a modern, templated, user-friendly, fast, fully type-safe, and customizable container library for C99,
-with a uniform API across the containers, and is similar to the c++ standard library containers API.
+with a uniform API across the containers, and is similar to the c++ standard library containers API. It takes some
+inspirations from Rust and Python too.
+
 It is a compact, header-only library which includes the all the major "standard" data containers except for the
-multimap/set variants. There are examples on how to create multimaps in the examples folder.
+multimap/set variants. However, there are examples on how to create multimaps in the examples folder.
 
 For an introduction to templated containers, please read the blog by Ian Fisher on
 [type-safe generic data structures in C](https://iafisher.com/blog/2020/06/type-safe-generics-in-c).
