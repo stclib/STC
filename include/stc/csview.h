@@ -120,7 +120,7 @@ STC_INLINE int          csview_cmp(const csview* x, const csview* y) {
                             return c ? c : x->size - y->size;
                         }
 #define                 csview_hash(xp, dummy) c_strhash((xp)->str)
-#define                 csview_equalto(xp, yp) (csview_cmp(xp, yp) == 0)
+#define                 csview_eq(xp, yp) (!csview_cmp(xp, yp))
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 

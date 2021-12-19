@@ -78,7 +78,7 @@ bool          cstr_ends_with_v(cstr s, csview sub);
 #### Helper methods
 ```c
 int           csview_cmp(const csview* x, const csview* y);
-bool          csview_equalto(const csview* x, const csview* y);
+bool          csview_eq(const csview* x, const csview* y);
 uint64_t      csview_hash(const csview* x, size_t dummy);
 ```
 ## Types

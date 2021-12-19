@@ -6,21 +6,29 @@ STC - Smart Template Containers for C
 News
 ----
 ### Version 3.0 released
-There are new general `i_key_bind` / `i_val_bind` template parameters which auto-binds a set of functions to the type specified, and can be used in place of `i_key` / `i_val`. Use the `_bind` variant for elements of Type which have following functions defined: *Type_cmp*, *Type_clone*, *Type_drop*, *Type_equalto*, and *Type_hash*. Only the functions required by the particular container needs to be defined, e.g. only **cmap** and **cset** require *Type_equalto* and *Type_hash* to be defined. You can override these by defining `i_cmp`, `i_drop`, etc.
-It's still possible define template parameters with `i_val` / `i_key` as before, which is easier for simple element types, as defaults will be assigned to missing functions.
+There are new general `i_key_bind` / `i_val_bind` template parameters which auto-binds a set of functions
+to the type specified, and can be used in place of `i_key` / `i_val`. Use the `_bind` variant for elements
+of Type which have following functions defined: *Type_cmp*, *Type_clone*, *Type_drop*, *Type_hash*,
+and *Type_eq*. Only the functions required by the particular container needs to be defined. e.g. **cmap**
+and **cset** are the only types that requires *Type_hash* and *Type_eq* to be defined.
+You may override these by defining `i_cmp`, `i_drop`, etc. Template parameters with `i_val` / `i_key` may
+still be defined as before, which is often easier for simple element types.
 
 Migration guide from version 2 to 3. Replace (regular expresion) in VS Code:
 - `_del\b` → `_drop`
 - `_compare\b` → `_cmp`
+- `_equ\b` → `_eq`
 
 Replace (whole word + match case):
 - `i_keydel` → `i_keydrop`
 - `i_valdel` → `i_valdrop`
 - `i_cnt` → `i_type`
-- `i_key_csptr` → `i_key_bind`
-- `i_val_csptr` → `i_val_bind`
 - `cstr_lit` → `cstr_new`
 - `csptr_X_make` → `csptr_X_new`
+- `i_key_csptr` → `i_key_bind`
+- `i_val_csptr` → `i_val_bind`
+- `i_key_ref` → `i_key_bind`
+- `i_val_ref` → `i_val_bind`
 
 ### Final version 2.1
 - Strings: Renamed constructor *cstr_lit()* to `cstr_new(lit)`. Renamed *cstr_assign_fmt()* to `cstr_printf()`.
@@ -286,18 +294,19 @@ The list of template parameters:
 
 - `i_key`     - Maps key type. **[required]** for cmap/csmap.
 - `i_val`     - The container **[required]** element type. For cmap/csmap, it is the mapped value.
-- `i_cmp`     - Three-way comparison of two `i_keyraw`, **[required]** for non-integral `i_keyraw`.
-- `i_equ`     - Equality comparison of two `i_keyraw`- defaults to `!i_cmp`.
+- `i_cmp`     - Three-way comparison of two `i_keyraw *` - **[required]** for non-integral `i_keyraw`.
+- `i_hash`    - Hash function taking `i_keyraw *` and a size - defaults to `!i_cmp`.
+- `i_eq`      - Equality comparison of two `i_keyraw *` - defaults to `!i_cmp`. Companion with `i_hash`.
 
-- `i_keydrop`  - Destroy map key func - defaults to empty destructor.
+- `i_keydrop` - Destroy map key func - defaults to empty destructor.
 - `i_keyraw`  - Convertion "raw" type - defaults to `i_key` type.
-- `i_keyfrom` - Convertion func `i_keyraw` => `i_key` - defaults to simple copy. **[required]** if `i_keydrop` is defined.
-- `i_keyto`   - Convertion func `i_key` => `i_keyraw` - defaults to simple copy.
+- `i_keyfrom` - Convertion func `i_key` <= `i_keyraw`  - defaults to simple copy. **[required]** if `i_keydrop` is defined.
+- `i_keyto`   - Convertion func `i_key *` => `i_keyraw` - defaults to simple copy.
 
-- `i_valdrop`  - Destroy mapped or value func - defaults to empty destruct.
+- `i_valdrop` - Destroy mapped or value func - defaults to empty destruct.
 - `i_valraw`  - Convertion "raw" type - defaults to `i_val` type.
-- `i_valfrom` - Convertion func `i_valraw` => `i_val` - defaults to simple copy.
-- `i_valto`   - Convertion func `i_val` => `i_valraw` - defaults to simple copy.
+- `i_valfrom` - Convertion func `i_val` <= `i_valraw` - defaults to simple copy. **[required]** if `i_valdrop` is defined.
+- `i_valto`   - Convertion func `i_val *` => `i_valraw` - defaults to simple copy.
 
 Instead of defining `i_cmp`, you may define `i_opt c_no_cmp` to disable methods using comparison.
 

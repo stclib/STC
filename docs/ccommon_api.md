@@ -170,7 +170,7 @@ Type    c_default_toraw(const Type* val);    // dereference val
 void    c_default_drop(Type* val);            // does nothing
 
 int     c_rawstr_cmp(const char* const* a, const char* const* b);
-bool    c_rawstr_equalto(const char* const* a, const char* const* b);
+bool    c_rawstr_eq(const char* const* a, const char* const* b);
 ```
 
 ### c_malloc, c_calloc, c_realloc, c_free

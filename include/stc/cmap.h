@@ -293,7 +293,7 @@ _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr) {
     while ((_hx = _hashx[b.idx])) {
         if (_hx == b.hx) {
             _cx_rawkey _raw = i_keyto(_i_keyref(self->table + b.idx));
-            if (i_equ(&_raw, rkeyptr)) break;
+            if (i_eq(&_raw, rkeyptr)) break;
         }
         if (++b.idx == _cap) b.idx = 0;
     }

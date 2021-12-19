@@ -100,8 +100,8 @@ typedef const char              c_strlit[];
 #define c_default_less(x, y)    (*(x) < *(y))
 
 #define c_default_cmp(x, y)     c_less_cmp(c_default_less, x, y)
-#define c_default_equalto(x, y) (*(x) == *(y))
-#define c_memcmp_equalto(x, y)  (memcmp(x, y, sizeof *(x)) == 0)
+#define c_default_eq(x, y)      (*(x) == *(y))
+#define c_memcmp_eq(x, y)       (memcmp(x, y, sizeof *(x)) == 0)
 
 #define c_default_clone(x)      (x)
 #define c_default_fromraw(x)    (x) // [deprecated]
@@ -118,11 +118,11 @@ typedef const char              c_strlit[];
 
 typedef char* c_mutstr;
 typedef const char* c_rawstr;
-#define c_rawstr_cmp(x, y)  strcmp(*(x), *(y))
-#define c_rawstr_equalto(x, y)  (strcmp(*(x), *(y)) == 0)
-#define c_rawstr_hash(x, dummy) c_strhash(*(x))
+#define c_rawstr_cmp(xp, yp) strcmp(*(xp), *(yp))
+#define c_rawstr_eq(xp, yp) (!strcmp(*(xp), *(yp)))
+#define c_rawstr_hash(p, dummy) c_strhash(*(p))
 #define c_rawstr_clone(s) strcpy((char*)c_malloc(strlen(s) + 1), s)
-#define c_rawstr_drop(x) c_free((char *) &**(x))
+#define c_rawstr_drop(p) c_free((char *) &**(p))
 
 #define _c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 

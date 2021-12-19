@@ -167,7 +167,7 @@ STC_INLINE bool cstr_equals_s(cstr s1, cstr s2) {
     return strcmp(cstr_str(&s1), cstr_str(&s2)) == 0;
 }
 
-STC_INLINE bool cstr_equalto(const cstr* s1, const cstr* s2) {
+STC_INLINE bool cstr_eq(const cstr* s1, const cstr* s2) {
     return strcmp(cstr_str(s1), cstr_str(s2)) == 0;
 }
 

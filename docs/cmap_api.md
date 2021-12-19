@@ -20,14 +20,14 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_key       // key: REQUIRED
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_keyraw*: REQUIRED IF i_keyraw is non-integral type
-#define i_equ       // equality comparison two i_keyraw*: ALTERNATIVE to i_cmp
+#define i_eq        // equality comparison two i_keyraw*: ALTERNATIVE to i_cmp
 #define i_keydrop   // destroy key func - defaults to empty destruct
 #define i_keyraw    // convertion "raw" type - defaults to i_key
-#define i_keyfrom  // convertion func i_keyraw => i_key - defaults to plain copy
+#define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
 #define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
 #define i_valdrop   // destroy value func - defaults to empty destruct
 #define i_valraw    // convertion "raw" type - defaults to i_val
-#define i_valfrom  // convertion func i_valraw => i_val - defaults to plain copy
+#define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
 #define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
 #define i_tag       // defaults to i_key
 #include <stc/cmap.h>
@@ -89,9 +89,9 @@ uint64_t            c_hash64(const void* data, size_t is8);                     
 uint64_t            c_rawstr_hash(const char* const* strp, size_t unused);
 
 // equalto template parameter functions:
-bool                c_default_equalto(const i_keyraw* a, const i_keyraw* b);      // *a == *b
-bool                c_memcmp_equalto(const i_keyraw* a, const i_keyraw* b);       // !memcmp(a, b, sizeof *a)
-bool                c_rawstr_equalto(const char* const* a, const char* const* b); // !strcmp(*a, *b)
+bool                c_default_eq(const i_keyraw* a, const i_keyraw* b);      // *a == *b
+bool                c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);       // !memcmp(a, b, sizeof *a)
+bool                c_rawstr_eq(const char* const* a, const char* const* b); // !strcmp(*a, *b)
 ```
 
 ## Types
@@ -200,7 +200,7 @@ typedef struct { int x, y, z; } Vec3i;
 
 #define i_key Vec3i
 #define i_val int
-#define i_equ c_memcmp_equalto // bitwise compare, and use c_default_hash
+#define i_eq c_memcmp_eq // bitwise equal, and use c_default_hash
 #define i_tag vi
 #include <stc/cmap.h>
 
@@ -272,7 +272,7 @@ typedef struct {
 
 #define Viking_init() ((Viking){cstr_null, cstr_null})
 
-static inline bool RViking_equalto(const Viking* a, const Viking* b) {
+static inline bool RViking_eq(const Viking* a, const Viking* b) {
     return cstr_equals_s(a->name, b->name) && cstr_equals_s(a->country, b->country);
 }
 
@@ -294,7 +294,7 @@ void inline Viking_drop(Viking* vk) {
 #define i_key_bind Viking
 #define i_val int
 // i_key_bind auto-binds:
-//  #define i_equ RViking_equalto
+//  #define i_eq RViking_eq
 //  #define i_hash RViking_hash
 //  #define i_keyfrom Viking_clone
 //  #define i_drop Viking_drop
@@ -357,7 +357,7 @@ static inline uint64_t RViking_hash(const RViking* raw, size_t ignore) {
     uint64_t hash = c_strhash(raw->name) ^ (c_strhash(raw->country) >> 15);
     return hash;
 }
-static inline bool RViking_equalto(const RViking* rx, const RViking* ry) {
+static inline bool RViking_eq(const RViking* rx, const RViking* ry) {
     return strcmp(rx->name, ry->name) == 0 && strcmp(rx->country, ry->country) == 0;
 }
 
@@ -375,7 +375,7 @@ static inline RViking Viking_toraw(const Viking* vk) {
 #define i_keyraw    RViking
 // i_key_bind macro will make these functions auto-bind:
 //  #define i_hash     RViking_hash
-//  #define i_equ      RViking_equalto
+//  #define i_eq       RViking_eq
 //  #define i_keyfrom  Viking_from // uses _from because i_keyraw is defined
 //  #define i_keyto    Viking_toraw
 //  #define i_keydrop  Viking_drop

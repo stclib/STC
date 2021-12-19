@@ -204,7 +204,7 @@ _cx_memb(_cmp)(const _cx_self* x, const _cx_self* y) {
 }
 
 STC_INLINE bool
-_cx_memb(_equalto)(const _cx_self* x, const _cx_self* y) {
+_cx_memb(_eq)(const _cx_self* x, const _cx_self* y) {
     return !_cx_memb(_cmp)(x, y);
 }
 #undef _i_atomic_inc

@@ -86,12 +86,12 @@ Note that all methods with arguments `(..., const char* str, size_t n)`, `n` mus
 #### Helper methods:
 ```c
 int          cstr_cmp(const cstr *s1, const cstr *s2);
-bool         cstr_equalto(const cstr *s1, const cstr *s2);
+bool         cstr_eq(const cstr *s1, const cstr *s2);
 bool         cstr_hash(const cstr *s, ...);
 
 typedef      const char* c_rawstr;
 int          c_rawstr_cmp(const c_rawstr* x, const c_rawstr* y);
-bool         c_rawstr_equalto(const c_rawstr* x, const c_rawstr* y);
+bool         c_rawstr_eq(const c_rawstr* x, const c_rawstr* y);
 uint64_t     c_rawstr_hash(const c_rawstr* x, size_t dummy);
 
 uint64_t     c_strhash(const char* str);

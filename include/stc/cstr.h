@@ -167,9 +167,9 @@ cstr_ends_with(cstr s, const char* sub) {
 }
 
 /* container adaptor functions: */
-#define  cstr_cmp(xp, yp)         strcmp((xp)->str, (yp)->str)
-#define  cstr_equalto(xp, yp)     (strcmp((xp)->str, (yp)->str) == 0)
-#define  cstr_hash(xp, dummy)     c_strhash((xp)->str)
+#define  cstr_cmp(xp, yp)     strcmp((xp)->str, (yp)->str)
+#define  cstr_eq(xp, yp)      (!cstr_cmp(xp, yp))
+#define  cstr_hash(xp, dummy) c_strhash((xp)->str)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 

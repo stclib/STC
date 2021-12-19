@@ -48,9 +48,9 @@
   #define i_val_bind i_val_csptr
   #error "i_val_sptr/ref no longer supported: use new name i_val_bind"
 #endif
-#ifdef i_cnt // [deprecated]
+#if defined i_cnt || defined i_equ // [deprecated]
   #define i_type i_cnt
-  #error "i_cnt no longer supported: use new name i_type"
+  #error "i_cnt and i_equ no longer supported: use new name i_type / i_eq"
 #endif
 
 #ifdef i_type
@@ -88,8 +88,8 @@
   #ifndef i_cmp
     #define i_cmp c_PASTE(i_keyraw, _cmp)
   #endif
-  #ifndef i_equ
-    #define i_equ c_PASTE(i_keyraw, _equalto)
+  #ifndef i_eq
+    #define i_eq c_PASTE(i_keyraw, _eq)
   #endif
   #ifndef i_hash
     #define i_hash c_PASTE(i_keyraw, _hash)
@@ -170,10 +170,10 @@
     #define i_keyraw i_key
     #define i_keyto c_default_toraw
   #endif
-  #if !defined i_equ && defined i_cmp
-    #define i_equ !i_cmp
-  #elif !defined i_equ
-    #define i_equ c_default_equalto
+  #if !defined i_eq && defined i_cmp
+    #define i_eq !i_cmp
+  #elif !defined i_eq
+    #define i_eq c_default_eq
   #endif
   #ifndef i_keydrop
     #define i_keydrop c_default_drop
@@ -212,26 +212,26 @@
 #undef i_imp
 #undef i_opt
 #undef i_cmp
-#undef i_drop
-#undef i_equ
+#undef i_eq
 #undef i_hash
 #undef i_from
+#undef i_drop
 
 #undef i_val
 #undef i_val_str
 #undef i_val_bind
-#undef i_valdrop
 #undef i_valraw
 #undef i_valfrom
 #undef i_valto
+#undef i_valdrop
 
 #undef i_key
 #undef i_key_str
 #undef i_key_bind
-#undef i_keydrop
 #undef i_keyraw
 #undef i_keyfrom
 #undef i_keyto
+#undef i_keydrop
 
 #undef _i_prefix
 #undef _i_has_internal_clone
