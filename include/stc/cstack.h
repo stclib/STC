@@ -54,11 +54,11 @@ STC_INLINE _cx_self _cx_memb(_with_size)(size_t size, i_val fill) {
 
 STC_INLINE void _cx_memb(_clear)(_cx_self* self) {
     _cx_value *p = self->data + self->size;
-    while (p-- != self->data) i_valdel(p);
+    while (p-- != self->data) { i_valdrop(p); }
     self->size = 0;
 }
 
-STC_INLINE void _cx_memb(_del)(_cx_self* self)
+STC_INLINE void _cx_memb(_drop)(_cx_self* self)
     { _cx_memb(_clear)(self); c_free(self->data); }
 
 STC_INLINE size_t _cx_memb(_size)(_cx_self v)
@@ -74,7 +74,7 @@ STC_INLINE _cx_value* _cx_memb(_top)(const _cx_self* self)
     { return &self->data[self->size - 1]; }
 
 STC_INLINE void _cx_memb(_pop)(_cx_self* self)
-    { _cx_value* p = &self->data[--self->size]; i_valdel(p); }
+    { _cx_value* p = &self->data[--self->size]; i_valdrop(p); }
 
 STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, size_t n) {
     if (n < self->size) return true;
@@ -107,7 +107,7 @@ STC_INLINE _cx_self _cx_memb(_clone)(_cx_self v) {
 
 STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     if (self->data == other.data) return;
-    _cx_memb(_del)(self); *self = _cx_memb(_clone)(other);
+    _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
 }
 
 STC_INLINE i_val _cx_memb(_value_clone)(_cx_value val)

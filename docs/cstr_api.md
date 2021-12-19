@@ -26,7 +26,7 @@ cstr         cstr_clone(cstr s);
 
 cstr*        cstr_take(cstr* self, cstr s);                           // take the constructed or moved string
 cstr         cstr_move(cstr* self);                                   // move string to caller, leave empty string
-void         cstr_del(cstr *self);                                    // destructor
+void         cstr_drop(cstr *self);                                   // destructor
 
 const char*  cstr_str(const cstr* self);                              // self->str
 char*        cstr_data(cstr* self);                                   // self->str
@@ -85,13 +85,14 @@ Note that all methods with arguments `(..., const char* str, size_t n)`, `n` mus
 
 #### Helper methods:
 ```c
-int          cstr_compare(const cstr *s1, const cstr *s2);
+int          cstr_cmp(const cstr *s1, const cstr *s2);
 bool         cstr_equalto(const cstr *s1, const cstr *s2);
 bool         cstr_hash(const cstr *s, ...);
 
-int          c_rawstr_compare(const char** x, const char** y);
-bool         c_rawstr_equalto(const char** x, const char** y);
-uint64_t     c_rawstr_hash(const char* const* x, ...);
+typedef      const char* c_rawstr;
+int          c_rawstr_cmp(const c_rawstr* x, const c_rawstr* y);
+bool         c_rawstr_equalto(const c_rawstr* x, const c_rawstr* y);
+uint64_t     c_rawstr_hash(const c_rawstr* x, size_t dummy);
 
 uint64_t     c_strhash(const char* str);
 char*        c_strnstrn(const char* str, const char* needle, size_t slen, size_t nlen);
@@ -141,7 +142,7 @@ int main() {
     cstr full_path = cstr_from_fmt("%s/%s.%s", "directory", "filename", "ext");
     printf("%s\n", full_path.str);
 
-    c_del(cstr, &s0, &s1, &full_path);
+    c_drop(cstr, &s0, &s1, &full_path);
 }
 ```
 Output:

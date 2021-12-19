@@ -31,7 +31,7 @@
 #include <stc/cmap.h>
 
 int main(void) {
-    c_autovar (cmap_ichar m = cmap_ichar_init(), cmap_ichar_del(&m))
+    c_autovar (cmap_ichar m = cmap_ichar_init(), cmap_ichar_drop(&m))
     {
         cmap_ichar_emplace(&m, 5, 'a');
         cmap_ichar_emplace(&m, 8, 'b');
@@ -91,7 +91,7 @@ STC_API _cx_self        _cx_memb(_with_capacity)(size_t cap);
 #if !c_option(c_no_clone)
 STC_API _cx_self        _cx_memb(_clone)(_cx_self map);
 #endif
-STC_API void            _cx_memb(_del)(_cx_self* self);
+STC_API void            _cx_memb(_drop)(_cx_self* self);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
 STC_API bool            _cx_memb(_reserve)(_cx_self* self, size_t capacity);
 STC_API chash_bucket_t  _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr);
@@ -121,7 +121,7 @@ STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, i_keyraw rkey)
         return _cx_memb(_insert_or_assign)(self, key, mapped);
     }
 
-    STC_INLINE const _cx_mapped*
+    STC_INLINE _cx_mapped*
     _cx_memb(_at)(const _cx_self* self, i_keyraw rkey) {
         chash_bucket_t b = _cx_memb(_bucket_)(self, &rkey);
         assert(self->_hashx[b.idx]);
@@ -132,13 +132,14 @@ STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, i_keyraw rkey)
 #if !c_option(c_no_clone)
 STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     if (self->table == other.table) return;
-    _cx_memb(_del)(self); *self = _cx_memb(_clone)(other);
+    _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
 }
 
-STC_INLINE void
-_cx_memb(_value_clone)(_cx_value* _dst, _cx_value* _val) {
-    *_i_keyref(_dst) = i_keyfrom(i_keyto(_i_keyref(_val)));
-    _i_MAP_ONLY( _dst->second = i_valfrom(i_valto(&_val->second)); )
+STC_INLINE _cx_value
+_cx_memb(_value_clone)(_cx_value _val) {
+    *_i_keyref(&_val) = i_keyfrom(i_keyto(_i_keyref(&_val)));
+    _i_MAP_ONLY( _val.second = i_valfrom(i_valto(&_val.second)); )
+    return _val;
 }
 
 STC_INLINE _cx_result
@@ -159,16 +160,16 @@ _cx_memb(_value_toraw)(_cx_value* val) {
 }
 
 STC_INLINE void
-_cx_memb(_value_del)(_cx_value* _val) {
-    i_keydel(_i_keyref(_val));
-    _i_MAP_ONLY( i_valdel(&_val->second); )
+_cx_memb(_value_drop)(_cx_value* _val) {
+    i_keydrop(_i_keyref(_val));
+    _i_MAP_ONLY( i_valdrop(&_val->second); )
 }
 
 STC_INLINE _cx_result
 _cx_memb(_insert)(_cx_self* self, i_key _key _i_MAP_ONLY(, i_val _mapped)) {
     _cx_result _res = _cx_memb(_insert_entry_)(self, i_keyto(&_key));
     if (_res.inserted) { *_i_keyref(_res.ref) = _key; _i_MAP_ONLY( _res.ref->second = _mapped; )}
-    else               { i_keydel(&_key); _i_MAP_ONLY( i_valdel(&_mapped); )}
+    else               { i_keydrop(&_key); _i_MAP_ONLY( i_valdrop(&_mapped); )}
     return _res;
 }
 
@@ -249,10 +250,10 @@ STC_INLINE void _cx_memb(_wipe_)(_cx_self* self) {
     if (self->size == 0) return;
     _cx_value* e = self->table, *end = e + self->bucket_count;
     uint8_t *hx = self->_hashx;
-    for (; e != end; ++e) if (*hx++) _cx_memb(_value_del)(e);
+    for (; e != end; ++e) if (*hx++) _cx_memb(_value_drop)(e);
 }
 
-STC_DEF void _cx_memb(_del)(_cx_self* self) {
+STC_DEF void _cx_memb(_drop)(_cx_self* self) {
     _cx_memb(_wipe_)(self);
     c_free(self->_hashx);
     c_free((void *) self->table);
@@ -269,7 +270,7 @@ STC_DEF void _cx_memb(_clear)(_cx_self* self) {
     _cx_memb(_insert_or_assign)(_cx_self* self, i_key _key, i_val _mapped) {
         _cx_result _res = _cx_memb(_insert_entry_)(self, i_keyto(&_key));
         if (_res.inserted) _res.ref->first = _key;
-        else { i_keydel(&_key); i_valdel(&_res.ref->second); }
+        else { i_keydrop(&_key); i_valdrop(&_res.ref->second); }
         _res.ref->second = _mapped; return _res;
     }
     #if !c_option(c_no_clone)
@@ -277,7 +278,7 @@ STC_DEF void _cx_memb(_clear)(_cx_self* self) {
     _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped) {
         _cx_result _res = _cx_memb(_insert_entry_)(self, rkey);
         if (_res.inserted) _res.ref->first = i_keyfrom(rkey);
-        else i_valdel(&_res.ref->second);
+        else i_valdrop(&_res.ref->second);
         _res.ref->second = i_valfrom(rmapped); return _res;
     }
     #endif
@@ -323,7 +324,7 @@ _cx_memb(_clone)(_cx_self m) {
     };
     _cx_value *e = m.table, *end = e + m.bucket_count, *dst = clone.table;
     for (uint8_t *hx = m._hashx; e != end; ++hx, ++e, ++dst)
-        if (*hx) _cx_memb(_value_clone)(dst, e);
+        if (*hx) *dst = _cx_memb(_value_clone)(*e);
     return clone;
 }
 #endif
@@ -363,7 +364,7 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
     const _cx_size _cap = self->bucket_count;
     _cx_value* _slot = self->table;
     uint8_t* _hashx = self->_hashx;
-    _cx_memb(_value_del)(&_slot[i]);
+    _cx_memb(_value_drop)(&_slot[i]);
     for (;;) { /* delete without leaving tombstone */
         if (++j == _cap) j = 0;
         if (! _hashx[j])

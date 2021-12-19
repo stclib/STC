@@ -5,23 +5,36 @@ STC - Smart Template Containers for C
 
 News
 ----
+### Version 3.0 released. Migration guide for breaking changes from version 2.X:
+There are new general `i_key_bind` / `i_val_bind` template parameters which auto-binds a set of functions to the type specified, and can be used in place of `i_key` / `i_val`. Use the `_bind` variant for elements of Type which have following functions defined: *Type_cmp*, *Type_clone*, *Type_drop*, *Type_equalto*, and *Type_hash*. Only the functions required by the particular container needs to be defined, e.g. only **cmap** and **cset** require *Type_equalto* and *Type_hash* to be defined.
+You may still define template parameters with `i_val` / `i_key` as before, which is easier for simple element types.
+
+Regex replace in VS Code:
+- `_del\b` → `_drop`
+- `_compare\b` → `_cmp`
+
+Whole word + Match case:
+- `i_keydel` → `i_keydrop`
+- `i_valdel` → `i_valdrop`
+- `i_cnt` → `i_type`
+- `i_key_csptr` → `i_key_bind`
+- `i_val_csptr` → `i_val_bind`
+- `cstr_lit` → `cstr_new`
+- `csptr_X_make` → `csptr_X_new`
+
+### Final version 2.1
 - Strings: Renamed constructor *cstr_lit()* to `cstr_new(lit)`. Renamed *cstr_assign_fmt()* to `cstr_printf()`.
 - Added [**cbox**](docs/cbox_api.md) type: container of one element, similar to [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr)
 - Added [example for **csptr**](examples/sptr_to_maps.c).
 - Added [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding".
 - Deprecated *csptr_X_make()*. Renamed to *csptr_X_new()*. Corresponding **cbox** method is *cbox_X_new()*.
 - Deprecated *c_default_fromraw(raw)*. Renamed to *c_default_clone(raw)*.
-- Deprecated `i_key_csptr` / `i_val_csptr`. Use `i_key_ref` / `i_val_ref` when specifying containers with **csptr** or **cbox** elements.
-- Deprecated `i_cnt`. Use `i_type` instead to define the full container type name.
+- Deprecated `i_key_csptr` / `i_val_csptr`. Use `i_key_bind` / `i_val_bind`
+- Deprecated `i_cnt`. Use `i_type` instead to define the complete container type name.
+- Added `i_opt` template parameter: compile-time options: `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`; may be combined with `|`
 
-Previous:
-- Added `i_opt` template parameter: compile-time options: `c_no_compare`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`; may be combined with `|`
-- Removed: i_cmp_none and i_fwd: replaced by `c_no_compare` and `c_is_fwd` args to `i_opt`.
-
-VERSION 2.0 released. Two main breaking changes from V1.X.
+### Version 2.0. Two main breaking changes from V1.X.
 - Uses a different way to instantiate templated containers, which is incompatible with v1.X.
-- New **c_auto**, **c_autovar**, and **c_autoscope** macros. These are for automatic scope resource management, aka RAII.
-- The new template instantiation style has multiple advantages, e.g. implementation does not contain long macro definitions for code generation. Also, specifying template arguments is more user friendly and flexible.
 
 Introduction
 ------------
@@ -101,24 +114,24 @@ int main(void) {
     c_foreach (i, cvec_float, vec)
         printf(" %g", *i.ref);
 
-    cvec_float_del(&vec);
+    cvec_float_drop(&vec);
 }
 ```
 In order to include two **cvec**s with different element types, include cvec.h twice. For struct, a `i_cmp`
 compare function is required to enable sorting and searching (`<` and `==` operators is default and works
-for integral types only). Alternatively, `#define i_opt c_no_compare` to disable methods using comparison.
+for integral types only). Alternatively, `#define i_opt c_no_cmp` to disable methods using comparison.
 
-Similarly, if a destructor `i_del` is defined, either define a `i_valfrom` construct/clone function
+Similarly, if a destructor `i_drop` is defined, either define a `i_valfrom` construct/clone function
 or `#define i_opt c_no_clone` to disable cloning and emplace methods. Unless these requirements are met,
 compile errors are generated.
 ```c
 #define i_val struct One
-#define i_opt c_no_compare
+#define i_opt c_no_cmp
 #define i_tag one
 #include <stc/cvec.h>
 
 #define i_val struct Two
-#define i_opt c_no_compare
+#define i_opt c_no_cmp
 #define i_tag two
 #include <stc/cvec.h>
 ...
@@ -133,16 +146,16 @@ With six different containers:
 
 struct Point { float x, y; };
 
-int Point_compare(const struct Point* a, const struct Point* b) {
-    int cmp = c_default_compare(&a->x, &b->x);
-    return cmp ? cmp : c_default_compare(&a->y, &b->y);
+int Point_cmp(const struct Point* a, const struct Point* b) {
+    int cmp = c_default_cmp(&a->x, &b->x);
+    return cmp ? cmp : c_default_cmp(&a->y, &b->y);
 }
 
 #define i_key int
 #include <stc/cset.h>  // cset_int: unordered set
 
 #define i_val struct Point
-#define i_cmp Point_compare
+#define i_cmp Point_cmp
 #define i_tag pnt
 #include <stc/cvec.h>  // cvec_pnt: vector of struct Point
 
@@ -160,7 +173,7 @@ int Point_compare(const struct Point* a, const struct Point* b) {
 #include <stc/csmap.h> // csmap_int: sorted map int => int
 
 int main(void) {
-    // define six containers with automatic call of init and del (destruction after scope exit)
+    // define six containers with automatic call of init and drop (destruction after scope exit)
     c_auto (cset_int, set)
     c_auto (cvec_pnt, vec)
     c_auto (cdeq_int, deq)
@@ -267,28 +280,28 @@ The list of template parameters:
 
 - `i_tag`     - Container type tag. Defaults to same as `i_key`
 - `i_type`    - Full container type name (optional, alternative to `i_tag`).
-- `i_opt`     - Boolean properties: may combine `c_no_compare`, `c_no_clone`, `c_no_atomic`, `c_is_fwd` with `|` separator.
+- `i_opt`     - Boolean properties: may combine `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd` with `|` separator.
 
 - `i_key`     - Maps key type. **[required]** for cmap/csmap.
 - `i_val`     - The container **[required]** element type. For cmap/csmap, it is the mapped value.
 - `i_cmp`     - Three-way comparison of two `i_keyraw`, **[required]** for non-integral `i_keyraw`.
 - `i_equ`     - Equality comparison of two `i_keyraw`- defaults to `!i_cmp`.
 
-- `i_keydel`  - Destroy map key func - defaults to empty destructor.
+- `i_keydrop`  - Destroy map key func - defaults to empty destructor.
 - `i_keyraw`  - Convertion "raw" type - defaults to `i_key` type.
-- `i_keyfrom` - Convertion func `i_keyraw` => `i_key` - defaults to simple copy. **[required]** if `i_keydel` is defined.
+- `i_keyfrom` - Convertion func `i_keyraw` => `i_key` - defaults to simple copy. **[required]** if `i_keydrop` is defined.
 - `i_keyto`   - Convertion func `i_key` => `i_keyraw` - defaults to simple copy.
 
-- `i_valdel`  - Destroy mapped or value func - defaults to empty destruct.
+- `i_valdrop`  - Destroy mapped or value func - defaults to empty destruct.
 - `i_valraw`  - Convertion "raw" type - defaults to `i_val` type.
 - `i_valfrom` - Convertion func `i_valraw` => `i_val` - defaults to simple copy.
 - `i_valto`   - Convertion func `i_val` => `i_valraw` - defaults to simple copy.
 
-Instead of defining `i_cmp`, you may define `i_opt c_no_compare` to disable methods using comparison.
+Instead of defining `i_cmp`, you may define `i_opt c_no_cmp` to disable methods using comparison.
 
 Instead of defining `i_valfrom`, you may define `i_opt c_no_clone` to disable methods using deep copy.
 
-If a destructor `i_del` is defined, then define either `i_valfrom` or `i_opt c_no_clone`, otherwise
+If a destructor `i_drop` is defined, then define either `i_valfrom` or `i_opt c_no_clone`, otherwise
 compile errors are generated.
 
 The *emplace* versus non-emplace container methods
@@ -318,8 +331,8 @@ and non-emplace methods:
 #define i_val_str       // special macro to enable container of cstr
 #include <stc/cvec.h>   // vector of string (cstr)
 ...
-c_auto (cvec_str, vec)  // declare and call cvec_str_init() and defer cvec_str_del(&vec)
-c_autovar (cstr s = cstr_new("a string literal"), cstr_del(&s))  // c_autovar is a more general c_auto.
+c_auto (cvec_str, vec)  // declare and call cvec_str_init() and defer cvec_str_drop(&vec)
+c_autovar (cstr s = cstr_new("a string literal"), cstr_drop(&s))  // c_autovar is a more general c_auto.
 {
     const char* hello = "Hello";
     cvec_str_push_back(&vec, cstr_from(hello);    // construct and add string from const char*

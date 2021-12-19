@@ -114,9 +114,13 @@ STC_INLINE bool         cstr_ends_with_v(cstr s, csview sub)
 
 /* ---- Container helper functions ---- */
 
-#define                 csview_compare(xp, yp) strcmp((xp)->str, (yp)->str)
+STC_INLINE int          csview_cmp(const csview* x, const csview* y) { 
+                            const size_t m = x->size < y->size ? x->size : y->size; 
+                            const int c = memcmp(x->str, y->str, m);
+                            return c ? c : x->size - y->size;
+                        }
 #define                 csview_hash(xp, dummy) c_strhash((xp)->str)
-#define                 csview_equalto(xp, yp) (strcmp((xp)->str, (yp)->str) == 0)
+#define                 csview_equalto(xp, yp) (csview_cmp(xp, yp) == 0)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 

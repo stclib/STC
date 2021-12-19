@@ -77,7 +77,7 @@ Sample test_stc_vector() {
         c_forrange (N) { cvec_x_pop_back(&con); }
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = cvec_x_size(con);
-        cvec_x_del(&con);
+        cvec_x_drop(&con);
      }{
         stc64_srandom(seed);
         container con = cvec_x_init();
@@ -94,7 +94,7 @@ Sample test_stc_vector() {
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();
-        cvec_x_del(&con);
+        cvec_x_drop(&con);
      }
      s.test[DESTRUCT].t2 = clock();
      s.test[DESTRUCT].sum = 0;

@@ -108,8 +108,8 @@ int main()
         }
     }
     // Cleanup
-    cstr_del(&bar);
-    csmap_i_del(&mhist);
+    cstr_drop(&bar);
+    csmap_i_drop(&mhist);
 }
 ```
 Output:

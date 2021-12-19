@@ -12,19 +12,19 @@
 #include <stc/cmap.h>
 
 typedef struct {int x, y;} ipair_t;
-inline static int ipair_compare(const ipair_t* a, const ipair_t* b) {
-    int c = c_default_compare(&a->x, &b->x);
-    return c ? c : c_default_compare(&a->y, &b->y);
+inline static int ipair_cmp(const ipair_t* a, const ipair_t* b) {
+    int c = c_default_cmp(&a->x, &b->x);
+    return c ? c : c_default_cmp(&a->y, &b->y);
 }
 
 
 #define i_val ipair_t
-#define i_cmp ipair_compare
+#define i_cmp ipair_cmp
 #define i_tag ip
 #include <stc/cvec.h>
 
 #define i_val ipair_t
-#define i_cmp ipair_compare
+#define i_cmp ipair_cmp
 #define i_tag ip
 #include <stc/clist.h>
 

@@ -36,7 +36,7 @@ int main()
     cstr string = cstr_new("Split,this,,string,now,");
     cvec_str vec = string_split(cstr_sv(string), c_sv(","));
 
-    c_autodefer (cvec_str_del(&vec), cstr_del(&string))
+    c_autodefer (cvec_str_drop(&vec), cstr_drop(&string))
         c_foreach (i, cvec_str, vec)
             printf("\t\"%s\"\n", i.ref->str);
 }

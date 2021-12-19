@@ -26,25 +26,25 @@
 
 typedef struct { cstr name, last; } Person;
 
-Person Person_from(const char* name, const char* last) {
+Person Person_new(const char* name, const char* last) {
     return (Person){.name = cstr_from(name), .last = cstr_from(last)};
 }
-void Person_del(Person* p) {
-    printf("del: %s %s\n", p->name.str, p->last.str);
-    c_del(cstr, &p->name, &p->last);
+void Person_drop(Person* p) {
+    printf("drop: %s %s\n", p->name.str, p->last.str);
+    c_drop(cstr, &p->name, &p->last);
 }
 
 #define i_tag person
 #define i_val Person
-#define i_valdel Person_del
+#define i_valdrop Person_drop
 #include <stc/csptr.h>
 
 int main() {
-    csptr_person p = csptr_person_new(Person_from("John", "Smiths"));
+    csptr_person p = csptr_person_new(Person_new("John", "Smiths"));
     csptr_person q = csptr_person_clone(p); // share the pointer
 
     printf("%s %s. uses: %zu\n", q.get->name.str, q.get->last.str, *q.use_count);
-    c_del(csptr_person, &p, &q);
+    c_drop(csptr_person, &p, &q);
 }
 */
 
@@ -76,6 +76,7 @@ int main() {
 #endif
 #define _i_has_internal_clone
 #include "template.h"
+typedef i_valraw _cx_rawvalue;
 
 #if !c_option(c_no_atomic)
   #define _i_atomic_inc(v)          c_atomic_inc(v)
@@ -132,9 +133,9 @@ _cx_memb(_move)(_cx_self* self) {
 }
 
 STC_INLINE void
-_cx_memb(_del)(_cx_self* self) {
+_cx_memb(_drop)(_cx_self* self) {
     if (self->use_count && _i_atomic_dec_and_test(self->use_count)) {
-        i_valdel(self->get);
+        i_valdrop(self->get);
         if (self->get != &((_cx_csptr_rep *)self->use_count)->value)
             c_free(self->get);
         c_free(self->use_count);
@@ -143,19 +144,19 @@ _cx_memb(_del)(_cx_self* self) {
 
 STC_INLINE void
 _cx_memb(_reset)(_cx_self* self) {
-    _cx_memb(_del)(self);
+    _cx_memb(_drop)(self);
     self->use_count = NULL, self->get = NULL;
 }
 
 STC_INLINE void
 _cx_memb(_reset_with)(_cx_self* self, _cx_value* p) {
-    _cx_memb(_del)(self);
+    _cx_memb(_drop)(self);
     *self = _cx_memb(_with)(p);
 }
 
 STC_INLINE void
 _cx_memb(_reset_new)(_cx_self* self, i_val val) {
-    _cx_memb(_del)(self);
+    _cx_memb(_drop)(self);
     *self = _cx_memb(_new)(val);
 }
 
@@ -164,46 +165,47 @@ _cx_memb(_reset_new)(_cx_self* self, i_val val) {
         return _cx_memb(_new)(i_valfrom(raw));
     }
 
-    STC_INLINE void
-    _cx_memb(_reset_from)(_cx_self* self, i_valraw raw) {
-        _cx_memb(_del)(self);
-        *self = _cx_memb(_new)(i_valfrom(raw));
+    STC_INLINE i_valraw
+    _cx_memb(_toraw)(const _cx_self* self) { 
+        return i_valto(self->get);
     }
 #endif
 
 STC_INLINE void
 _cx_memb(_copy)(_cx_self* self, _cx_self ptr) {
     if (ptr.use_count) _i_atomic_inc(ptr.use_count);
-    _cx_memb(_del)(self); *self = ptr;
+    _cx_memb(_drop)(self); *self = ptr;
 }
 
 STC_INLINE void
 _cx_memb(_take)(_cx_self* self, _cx_self ptr) {
-    if (self->get != ptr.get) _cx_memb(_del)(self);
+    if (self->get != ptr.get) _cx_memb(_drop)(self);
     *self = ptr;
 }
 
 STC_INLINE uint64_t
 _cx_memb(_hash)(const _cx_self* self, size_t n) {
-    #if (c_option(c_no_compare) || defined _i_default_compare) && SIZE_MAX >> 32
+    #if c_option(c_no_cmp) && SIZE_MAX >> 32
         return c_hash64(&self->get, 8);
-    #elif (c_option(c_no_compare) || defined _i_default_compare)
+    #elif c_option(c_no_cmp)
         return c_hash32(&self->get, 4);
     #else
-        i_valraw raw = i_valto(self->get);
-        return i_hash(&raw, sizeof raw);
+        return i_hash(self->get, sizeof *self->get);
     #endif
 }
 
 STC_INLINE int
-_cx_memb(_compare)(const _cx_self* x, const _cx_self* y) {
-    #if (c_option(c_no_compare) || defined _i_default_compare)
-        return (int)(x->get - y->get);
+_cx_memb(_cmp)(const _cx_self* x, const _cx_self* y) {
+    #if c_option(c_no_cmp)
+        return c_default_cmp(&x->get, &y->get);
     #else
-        i_valraw rx = i_valto(x->get);
-        i_valraw ry = i_valto(y->get);
-        return i_cmp(&rx, &ry);
+        return i_cmp(x->get, y->get);
     #endif
+}
+
+STC_INLINE bool
+_cx_memb(_equalto)(const _cx_self* x, const _cx_self* y) {
+    return !_cx_memb(_cmp)(x, y);
 }
 #undef _i_atomic_inc
 #undef _i_atomic_dec_and_test

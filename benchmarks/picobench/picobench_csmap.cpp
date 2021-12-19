@@ -52,7 +52,7 @@ static void ctor_and_ins_one_csmap_i(picobench::state& s)
         csmap_i map = csmap_i_init();
         csmap_i_emplace(&map, n, 0);
         result += csmap_i_size(map);
-        csmap_i_del(&map);
+        csmap_i_drop(&map);
     }
     s.set_result(result);
 }
@@ -86,7 +86,7 @@ static void insert_csmap_i(picobench::state& s)
     c_forrange (n, s.iterations())
         csmap_i_emplace(&map, stc64_random() & 0xfffffff, n);
     s.set_result(csmap_i_size(map));
-    csmap_i_del(&map);
+    csmap_i_drop(&map);
 }
 
 #define P samples(S1).iterations({N1})
@@ -142,7 +142,7 @@ static void ins_and_erase_csmap_i(picobench::state& s)
     c_forrange (s.iterations())
         csmap_i_erase(&map, stc64_random() & mask);
     s.set_result(result);
-    csmap_i_del(&map);
+    csmap_i_drop(&map);
 }
 
 #define P samples(S1).iterations({N1/2, N1/2, N1/2, N1/2}).args({18, 23, 25, 31})
@@ -183,7 +183,7 @@ static void ins_and_access_csmap_i(picobench::state& s)
         if (val) csmap_i_erase(&map, val->first);
     }
     s.set_result(result + csmap_i_size(map));
-    csmap_i_del(&map);
+    csmap_i_drop(&map);
 }
 
 #define P samples(S1).iterations({N1, N1, N1, N1}).args({18, 23, 25, 31})
@@ -243,8 +243,8 @@ static void ins_and_access_csmap_s(picobench::state& s)
         }*/
     }
     s.set_result(result + csmap_str_size(map));
-    cstr_del(&str);
-    csmap_str_del(&map);
+    cstr_drop(&str);
+    csmap_str_drop(&map);
 }
 
 #define P samples(S1).iterations({N1/5, N1/5, N1/5, N1/10, N1/40}).args({13, 7, 8, 100, 1000})
@@ -309,7 +309,7 @@ static void iterate_csmap_x(picobench::state& s)
             result += i.ref->second;
     }
     s.set_result(result);
-    csmap_x_del(&map);
+    csmap_x_drop(&map);
 }
 
 

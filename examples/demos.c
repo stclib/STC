@@ -3,7 +3,7 @@
 void stringdemo1()
 {
     printf("\nSTRINGDEMO1\n");
-    c_autovar (cstr cs = cstr_new("one-nine-three-seven-five"), cstr_del(&cs))
+    c_autovar (cstr cs = cstr_new("one-nine-three-seven-five"), cstr_drop(&cs))
     {
         printf("%s.\n", cs.str);
 
@@ -35,7 +35,7 @@ void stringdemo1()
 void vectordemo1()
 {
     printf("\nVECTORDEMO1\n");
-    c_autovar (cvec_ix bignums = cvec_ix_with_capacity(100), cvec_ix_del(&bignums))
+    c_autovar (cvec_ix bignums = cvec_ix_with_capacity(100), cvec_ix_drop(&bignums))
     {
         cvec_ix_reserve(&bignums, 100);
         for (size_t i = 10; i <= 100; i += 10)
@@ -118,7 +118,7 @@ void setdemo1()
 
     c_foreach (i, cset_i, nums)
         printf("set: %d\n", *i.ref);
-    cset_i_del(&nums);
+    cset_i_drop(&nums);
 }
 
 #define i_key int
@@ -133,7 +133,7 @@ void mapdemo1()
     cmap_ii_emplace(&nums, 8, 64);
     cmap_ii_emplace(&nums, 11, 121);
     printf("val 8: %d\n", *cmap_ii_at(&nums, 8));
-    cmap_ii_del(&nums);
+    cmap_ii_drop(&nums);
 }
 
 #define i_key_str
@@ -181,7 +181,7 @@ void mapdemo3()
     printf("size %zu\n", cmap_str_size(table));
     c_foreach (i, cmap_str, table)
         printf("entry: %s: %s\n", i.ref->first.str, i.ref->second.str);
-    cmap_str_del(&table); // frees key and value cstrs, and hash table.
+    cmap_str_drop(&table); // frees key and value cstrs, and hash table.
 }
 
 #define i_val float
@@ -192,7 +192,7 @@ void arraydemo1()
 {
     printf("\nARRAYDEMO1\n");
     c_autovar (carr3_f arr3 = carr3_f_with_values(30, 20, 10, 0.0f), 
-                             carr3_f_del(&arr3))
+                             carr3_f_drop(&arr3))
     {
         arr3.data[5][4][3] = 10.2f;
         float **arr2 = arr3.data[5];

@@ -49,7 +49,7 @@
         puts("sorted");
         c_foreach (i, clist_ix, list)
             if (++n % 10000 == 0) printf("%8d: %10zd\n", n, i.ref->value);
-        clist_ix_del(&list);
+        clist_ix_drop(&list);
     }
 */
 #include <stc/ccommon.h>
@@ -61,13 +61,13 @@ _c_clist_types(clist_VOID, int);
 STC_API size_t _clist_count(const clist_VOID* self);
 #define _clist_node(_cx_self, vp) c_container_of(vp, _cx_node, value)
 
-#define _c_using_clist(_cx_self, i_val, i_cmp, i_valdel, i_valfrom, i_valto, i_valraw, defTypes) \
+#define _c_using_clist(_cx_self, i_val, i_cmp, i_valdrop, i_valfrom, i_valto, i_valraw, defTypes) \
 \
     defTypes( _c_clist_types(_cx_self, i_val); ) \
     typedef i_valraw _cx_rawvalue; \
 \
     STC_API _cx_self          _cx_memb(_clone)(_cx_self lst); \
-    STC_API void        _cx_memb(_del)(_cx_self* self); \
+    STC_API void        _cx_memb(_drop)(_cx_self* self); \
     STC_API void        _cx_memb(_push_back)(_cx_self* self, i_val value); \
     STC_API void        _cx_memb(_push_front)(_cx_self* self, i_val value); \
     STC_API void        _cx_memb(_emplace_items)(_cx_self *self, const _cx_rawvalue arr[], size_t n); \
@@ -89,7 +89,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
     STC_INLINE size_t   _cx_memb(_count)(_cx_self lst) { return _clist_count((const clist_VOID*) &lst); } \
     STC_INLINE i_val    _cx_memb(_value_fromraw)(i_valraw raw) { return i_valfrom(raw); } \
     STC_INLINE i_val    _cx_memb(_value_clone)(i_val val) { return i_valfrom(i_valto(&val)); } \
-    STC_INLINE void     _cx_memb(_clear)(_cx_self* self) { _cx_memb(_del)(self); } \
+    STC_INLINE void     _cx_memb(_clear)(_cx_self* self) { _cx_memb(_drop)(self); } \
     STC_INLINE void     _cx_memb(_emplace_back)(_cx_self* self, i_valraw raw) \
                             { _cx_memb(_push_back)(self, i_valfrom(raw)); } \
     STC_INLINE void     _cx_memb(_emplace_front)(_cx_self* self, i_valraw raw) \
@@ -143,13 +143,13 @@ STC_API size_t _clist_count(const clist_VOID* self);
         while (n-- && it.ref) _cx_memb(_next)(&it); return it; \
     } \
  \
-    _c_implement_clist(_cx_self, i_val, i_cmp, i_valdel, i_valfrom, i_valto, i_valraw) \
+    _c_implement_clist(_cx_self, i_val, i_cmp, i_valdrop, i_valfrom, i_valto, i_valraw) \
     struct stc_trailing_semicolon
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
 #if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
-#define _c_implement_clist(_cx_self, i_val, i_cmp, i_valdel, i_valfrom, i_valto, i_valraw) \
+#define _c_implement_clist(_cx_self, i_val, i_cmp, i_valdrop, i_valfrom, i_valto, i_valraw) \
 \
     STC_DEF _cx_self \
     _cx_memb(_clone)(_cx_self lst) { \
@@ -160,7 +160,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
     } \
 \
     STC_DEF void \
-    _cx_memb(_del)(_cx_self* self) { \
+    _cx_memb(_drop)(_cx_self* self) { \
         while (self->last) _cx_memb(_erase_after_)(self, self->last); \
     } \
 \
@@ -232,7 +232,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
         node->next = next; \
         if (del == next) self->last = node = NULL; \
         else if (self->last == del) self->last = node, node = NULL; \
-        i_valdel(&del->value); c_free(del); \
+        i_valdrop(&del->value); c_free(del); \
         return node; \
     } \
 \
@@ -361,7 +361,7 @@ _clist_mergesort(clist_VOID_node *list, int (*cmp)(const void*, const void*)) {
 }
 
 #else
-#define _c_implement_clist(_cx_self, i_val, i_cmp, i_valdel, i_valfrom, i_valto, i_valraw)
+#define _c_implement_clist(_cx_self, i_val, i_cmp, i_valdrop, i_valfrom, i_valto, i_valraw)
 #endif
 
 #endif

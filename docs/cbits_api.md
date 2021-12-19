@@ -27,7 +27,7 @@ cbits            cbits_clone(cbits other);
 void             cbits_clear(cbits* self);
 cbits*           cbits_copy(cbits* self, cbits other);
 void             cbits_resize(cbits* self, size_t size, bool value);
-void             cbits_del(cbits* self);
+void             cbits_drop(cbits* self);
 
 cbits*           cbits_take(cbits* self, cbits other);       // give other to self
 cbits            cbits_move(cbits* self);                    // transfer self to caller
@@ -103,7 +103,7 @@ int main(void)
        if (cbits_test(primes, i>>1)) printf(" %zu", i);
     puts("");
 
-    cbits_del(&primes);
+    cbits_drop(&primes);
 }
 ```
 Output:

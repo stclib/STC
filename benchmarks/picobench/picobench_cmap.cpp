@@ -91,7 +91,7 @@ static void ins_and_erase_cmap_i(picobench::state& s)
     c_forrange (s.iterations())
         cmap_i_erase(&map, stc64_random());
     s.set_result(cmap_i_size(map));
-    cmap_i_del(&map);
+    cmap_i_drop(&map);
 }
 
 static void ins_and_erase_cmap_x(picobench::state& s)
@@ -111,7 +111,7 @@ static void ins_and_erase_cmap_x(picobench::state& s)
     c_forrange (s.iterations())
         cmap_x_erase(&map, stc64_random());
     s.set_result(cmap_x_size(map));
-    cmap_x_del(&map);
+    cmap_x_drop(&map);
 }
 
 #define P samples(S1).iterations({N1/4})
@@ -153,7 +153,7 @@ static void ins_and_access_cmap_i(picobench::state& s)
     c_forrange (N1)
         result += ++cmap_i_emplace(&map, stc64_random() & mask, 0).ref->second;
     s.set_result(result);
-    cmap_i_del(&map);
+    cmap_i_drop(&map);
 }
 
 #define P samples(S1).iterations({N1, N1, N1, N1}).args({18, 23, 25, 31})
@@ -212,8 +212,8 @@ static void ins_and_access_cmap_s(picobench::state& s)
         result += cmap_str_erase(&map, str.str);
     }
     s.set_result(result + cmap_str_size(map));
-    cstr_del(&str);
-    cmap_str_del(&map);
+    cstr_drop(&str);
+    cmap_str_drop(&map);
 }
 
 #define P samples(S1).iterations({N1/5, N1/5, N1/5, N1/10, N1/40}).args({13, 7, 8, 100, 1000})
@@ -285,7 +285,7 @@ static void iterate_cmap_x(picobench::state& s)
             result += i.ref->second;
     }
     s.set_result(result);
-    cmap_x_del(&map);
+    cmap_x_drop(&map);
 }
 
 

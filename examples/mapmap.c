@@ -1,47 +1,67 @@
 // unordered_map<string, unordered_map<string, string>>:
 
+#define i_type People
 #define i_key_str
 #define i_val_str
-#define i_tag sect
-#include <stc/csmap.h> // csmap_sect
+#define i_keydrop(p) (printf("kdrop: %s\n", (p)->str), cstr_drop(p))
+#include <stc/csmap.h>
 
+#define i_type Departments
 #define i_key_str
-#define i_val csmap_sect
-#define i_valdel csmap_sect_del
-#define i_valfrom csmap_sect_clone
-#define i_tag conf
-#include <stc/csmap.h> // csmap_conf
+#define i_val_bind People
+#include <stc/csmap.h>
 
-void add(csmap_conf* map, const char* section, const char* entry, const char* value)
+#define i_type Stack
+#define i_val_bind People_value
+#define i_opt c_no_cmp
+//#define i_from People_value_clone
+//#define i_drop People_value_drop
+#include <stc/cstack.h>
+
+void add(Departments* deps, const char* name, const char* email, const char* dep)
 {
-    csmap_sect *smap = &csmap_conf_insert(map, cstr_from(section), csmap_sect_init()).ref->second;
-    csmap_sect_emplace_or_assign(smap, entry, value);
+    People *people = &Departments_insert(deps, cstr_from(dep), People_init()).ref->second;
+    People_emplace_or_assign(people, name, email);
 }
 
-bool contains(csmap_conf* map, const char* section, const char* entry)
+Stack contains(Departments* map, const char* name)
 {
-    const csmap_conf_value *val = csmap_conf_get(map, section);
-    return val && csmap_sect_get(&val->second, entry);
+    Stack stk = Stack_init();
+    const People_value* v;
+    c_foreach (i, Departments, *map)
+        if ((v = People_get(&i.ref->second, name))) {
+            Stack_push(&stk, People_value_clone(*v));
+        }
+    return stk;
 }
 
 int main(void)
 {
-    c_auto (csmap_conf, map)
+    c_auto (Departments, map)
     {
-        add(&map, "user", "name", "Joe");
-        add(&map, "user", "groups", "proj1,proj3");
-        add(&map, "group", "proj1", "Energy");
-        add(&map, "group", "proj2", "Windy");
-        add(&map, "group", "proj3", "Oil");
-        add(&map, "admin", "employees", "2302");
-        add(&map, "group", "proj2", "Wind"); // Update
+        add(&map, "Anna Kendro", "Anna@myplace.com", "Support");
+        add(&map, "Terry Dane", "Terry@myplace.com", "Development");
+        add(&map, "Kik Winston", "Kik@myplace.com", "Finance");
+        add(&map, "Nancy Drew", "Nancy@live.com", "Development");
+        add(&map, "Nick Denton", "Nick@myplace.com", "Finance");
+        add(&map, "Stan Whiteword", "Stan@myplace.com", "Marketing");
+        add(&map, "Serena Bath", "Serena@myplace.com", "Support");
+        add(&map, "Patrick Dust", "Patrick@myplace.com", "Finance");
+        add(&map, "Red Winger", "Red@gmail.com", "Marketing");
+        add(&map, "Nick Denton", "Nick@yahoo.com", "Support");
+        add(&map, "Colin Turth", "Colin@myplace.com", "Support");
+        add(&map, "Dennis Kay", "Dennis@mail.com", "Marketing");
+        add(&map, "Anne Dickens", "Anne@myplace.com", "Development");
 
-        printf("contains: %d\n", contains(&map, "group", "employees"));
-        printf("contains: %d\n", contains(&map, "admin", "name"));
-        printf("contains: %d\n", contains(&map, "admin", "employees"));
+        c_foreach (i, Departments, map)
+            c_forpair (name, email, People, i.ref->second)
+                printf("%s: %s - %s\n", i.ref->first.str, _.name.str, _.email.str);
+        puts("");
 
-        c_foreach (i, csmap_conf, map)
-            c_foreach (j, csmap_sect, i.ref->second)
-                printf("%s: %s - %s\n", i.ref->first.str, j.ref->first.str, j.ref->second.str);
+        c_auto (Stack, s) printf("found: %zu\n", Stack_size(s = contains(&map, "Nick Denton")));
+        c_auto (Stack, s) printf("found: %zu\n", Stack_size(s = contains(&map, "Patrick Dust")));
+        c_auto (Stack, s) printf("found: %zu\n", Stack_size(s = contains(&map, "Dennis Kay")));
+        c_auto (Stack, s) printf("found: %zu\n", Stack_size(s = contains(&map, "Serena Bath")));
+        puts("Done");
     }
 }

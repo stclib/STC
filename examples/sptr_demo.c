@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <string.h>
 
-void int_del(int* x) {
-    printf("del: %d\n", *x);
+void int_drop(int* x) {
+    printf("drop: %d\n", *x);
 }
 
 // csptr implements its own clone method using reference counting,
@@ -10,19 +10,19 @@ void int_del(int* x) {
 
 #define i_type iref         // set type name to be defined (instead of 'csptr_int')
 #define i_val int
-#define i_del int_del       // optional, just to display the elements destroyed
+#define i_drop int_drop     // optional, just to display the elements destroyed
 #include <stc/csptr.h>      // iref
 
-#define i_key_ref iref      // note: use i_key_ref instead of i_key for csptr/cbox elements
+#define i_key_bind iref     // note: use i_key_bind instead of i_key for csptr/cbox elements
 #include <stc/csset.h>      // csset_iref (like: std::set<std::shared_ptr<int>>)
 
-#define i_val_ref iref      // note: as above.
+#define i_val_bind iref     // note: as above.
 #include <stc/cvec.h>       // cvec_iref (like: std::vector<std::shared_ptr<int>>)
 
 int main()
 {
-    c_auto (cvec_iref, vec)   // declare and init vec, call cvec_iref_del() at scope exit
-    c_auto (csset_iref, set)  // declare and init set, call csset_iref_del() at scope exit
+    c_auto (cvec_iref, vec)   // declare and init vec, call cvec_iref_drop() at scope exit
+    c_auto (csset_iref, set)  // declare and init set, call csset_iref_drop() at scope exit
     {
         const int years[] = {2021, 2012, 2022, 2015};
         c_forrange (i, c_arraylen(years))
@@ -47,7 +47,7 @@ int main()
         printf("\nset:");
         c_foreach (i, csset_iref, set) printf(" %d", *i.ref->get);
 
-        c_autovar (iref p = iref_clone(vec.data[0]), iref_del(&p)) {
+        c_autovar (iref p = iref_clone(vec.data[0]), iref_drop(&p)) {
             printf("\n%d is now owned by %ld objects\n", *p.get, *p.use_count);
         }
 

@@ -10,10 +10,10 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 ```c
 #define i_key       // key: REQUIRED
 #define i_cmp       // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
-#define i_del       // destroy key func - defaults to empty destruct
+#define i_drop      // destroy key func - defaults to empty destruct
 #define i_keyraw    // convertion "raw" type - defaults to i_key
-#define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
-#define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
+#define i_keyfrom  // convertion func i_keyraw => i_key - defaults to plain copy
+#define i_keyto  // convertion func i_key* => i_keyraw - defaults to plain copy
 #define i_tag       // defaults to i_key
 #include <stc/csset.h>
 ```
@@ -28,7 +28,7 @@ csset_X              csset_X_clone(csset_x set);
 void                 csset_X_clear(csset_X* self);
 void                 csset_X_copy(csset_X* self, csset_X other);
 void                 csset_X_swap(csset_X* a, csset_X* b);
-void                 csset_X_del(csset_X* self);                                              // destructor
+void                 csset_X_drop(csset_X* self);                                              // destructor
 
 size_t               csset_X_size(csset_X set);
 bool                 csset_X_empty(csset_X set);
@@ -59,8 +59,8 @@ csset_X_value        csset_X_value_clone(csset_X_value val);
 | Type name          | Type definition                                   | Used to represent...        |
 |:-------------------|:--------------------------------------------------|:----------------------------|
 | `csset_X`          | `struct { ... }`                                  | The csset type              |
-| `csset_X_rawkey`   | `i_rawkey`                                        | The raw key type            |
-| `csset_X_rawvalue` | `i_rawkey`                                        | The raw key type            |
+| `csset_X_rawkey`   | `i_keyraw`                                        | The raw key type            |
+| `csset_X_rawvalue` | `i_keyraw`                                        | The raw key type            |
 | `csset_X_key`      | `i_key`                                           | The key type                |
 | `csset_X_value`    | `i_key        `                                   | The value: key is immutable |
 | `csset_X_result`   | `struct { csset_X_value* ref; bool inserted; }`   | Result of insert/emplace    |

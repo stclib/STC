@@ -4,7 +4,7 @@
 #include <stc/crandom.h>
 
 #define i_val int64_t
-#define i_cmp -c_default_compare  // min-heap (increasing values)
+#define i_cmp -c_default_cmp  // min-heap (increasing values)
 #define i_tag i
 #include <stc/cpque.h>
 

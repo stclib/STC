@@ -77,7 +77,7 @@ bool          cstr_ends_with_v(cstr s, csview sub);
 ```
 #### Helper methods
 ```c
-int           csview_compare(const csview* x, const csview* y);
+int           csview_cmp(const csview* x, const csview* y);
 bool          csview_equalto(const csview* x, const csview* y);
 uint64_t      csview_hash(const csview* x, size_t dummy);
 ```
@@ -118,7 +118,7 @@ int main ()
     cstr s3 = cstr_from_v(cstr_substr(s1, 0, 6));   // "Apples"
     printf("%s %s\n", s2, s3.str);
 
-    c_del(cstr, &str1, &s1, &s2, &s3);
+    c_drop(cstr, &str1, &s1, &s2, &s3);
 }
 ```
 Output:
@@ -166,7 +166,7 @@ int main()
     print_split(c_sv("This has no matching separator"), c_sv("xx"));
     puts("");
 
-    c_autovar (cvec_str v = string_split(c_sv("Split,this,,string,now,"), c_sv(",")), cvec_str_del(&v))
+    c_autovar (cvec_str v = string_split(c_sv("Split,this,,string,now,"), c_sv(",")), cvec_str_drop(&v))
         c_foreach (i, cvec_str, v)
             printf("\"%s\"\n", i.ref->str);
 }

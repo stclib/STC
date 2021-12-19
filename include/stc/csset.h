@@ -38,7 +38,7 @@ int main(void) {
 
     c_foreach (k, csset_i, s)
         printf("set %d\n", *k.ref);
-    csset_i_del(&s);
+    csset_i_drop(&s);
 }
 */
 

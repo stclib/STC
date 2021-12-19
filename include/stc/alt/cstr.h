@@ -41,7 +41,7 @@ typedef union {
 
 /**************************** PRIVATE API **********************************/
 
-enum { SSO_CAP = offsetof(cstr, lon.ncap) + sizeof((cstr){{0}}.lon.ncap) - 1 };
+enum { SSO_CAP = sizeof(_cstr_rep_t) - 1 };
 #define cstr_is_long(s)         (bool)((s)->sso.cap_len & 128)
 #define cstr_select_(s, memb)   (cstr_is_long(s) ? cstr_l_##memb : cstr_s_##memb)
 
@@ -52,18 +52,18 @@ enum { SSO_CAP = offsetof(cstr, lon.ncap) + sizeof((cstr){{0}}.lon.ncap) - 1 };
 #define cstr_s_end(s)           ((s)->sso.data + cstr_s_size(s))
 
 #if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-#define byte_rotl_(x, b)        ((x) << (b)*8 | (x) >> (sizeof(x) - (b))*8)
-#define cstr_l_cap(s)           (~byte_rotl_((s)->lon.ncap, sizeof((s)->lon.ncap) - 1))
-#define cstr_l_set_cap(s, cap)  ((s)->lon.ncap = ~byte_rotl_(cap, 1))
+    #define byte_rotl_(x, b)       ((x) << (b)*8 | (x) >> (sizeof(x) - (b))*8)
+    #define cstr_l_cap(s)          (~byte_rotl_((s)->lon.ncap, sizeof((s)->lon.ncap) - 1))
+    #define cstr_l_set_cap(s, cap) ((s)->lon.ncap = ~byte_rotl_(cap, 1))
 #else
-#define cstr_l_cap(s)           (~(s)->lon.ncap)
-#define cstr_l_set_cap(s, cap)  ((s)->lon.ncap = ~(cap))
+    #define cstr_l_cap(s)          (~(s)->lon.ncap)
+    #define cstr_l_set_cap(s, cap) ((s)->lon.ncap = ~(cap))
 #endif
 #define cstr_l_size(s)          ((s)->lon.size)
 #define cstr_l_set_size(s, len) ((s)->lon.data[(s)->lon.size = (len)] = 0)
 #define cstr_l_data(s)          (s)->lon.data
 #define cstr_l_end(s)           ((s)->lon.data + cstr_l_size(s))
-#define cstr_l_del(s)           free((s)->lon.data)
+#define cstr_l_drop(s)          free((s)->lon.data)
 
 STC_API char* cstr_init_(cstr* self, size_t len, size_t cap);
 STC_API void cstr_internal_move_(cstr* self, size_t pos1, size_t pos2);
@@ -74,15 +74,16 @@ STC_INLINE void cstr_set_size_(cstr* self, size_t len) {
 
 STC_INLINE _cstr_rep_t cstr_rep_(cstr* self) {
     return cstr_is_long(self)
-            ? c_make(_cstr_rep_t){self->lon.data, cstr_l_size(self), cstr_l_cap(self)}
-            : c_make(_cstr_rep_t){self->sso.data, cstr_s_size(self), cstr_s_cap(self)};
+        ? c_make(_cstr_rep_t){self->lon.data, cstr_l_size(self), cstr_l_cap(self)}
+        : c_make(_cstr_rep_t){self->sso.data, cstr_s_size(self), cstr_s_cap(self)};
 }
 
 /**************************** PUBLIC API **********************************/
 
 #define cstr_new(literal) cstr_from_n(literal, sizeof((c_strlit){literal}) - 1)
 #define cstr_npos (SIZE_MAX >> 1)
-#define cstr_null (cstr){.sso = {.cap_len = SSO_CAP}}
+#define cstr_null (c_make(cstr){.sso = {.cap_len = SSO_CAP}})
+#define cstr_toraw(self) cstr_str(self)
 
 STC_API char* cstr_reserve(cstr* self, size_t cap);
 STC_API void cstr_shrink_to_fit(cstr* self);
@@ -126,8 +127,8 @@ STC_INLINE cstr cstr_clone(cstr s) {
     return cstr_from_n(rep.data, rep.size);
 }
 
-STC_INLINE void cstr_del(cstr* self) {
-    if (cstr_is_long(self)) cstr_l_del(self);
+STC_INLINE void cstr_drop(cstr* self) {
+    if (cstr_is_long(self)) cstr_l_drop(self);
 }
 
 STC_INLINE void cstr_clear(cstr* self) {
@@ -170,7 +171,7 @@ STC_INLINE bool cstr_equalto(const cstr* s1, const cstr* s2) {
     return strcmp(cstr_str(s1), cstr_str(s2)) == 0;
 }
 
-STC_INLINE int cstr_compare(const cstr* s1, const cstr* s2) {
+STC_INLINE int cstr_cmp(const cstr* s1, const cstr* s2) {
     return strcmp(cstr_str(s1), cstr_str(s2));
 }
 

@@ -30,7 +30,7 @@ Similar to boost::dynamic_bitset / std::bitset
 #include "cbits.h"
 
 int main() {
-    c_autovar (cbits bset = cbits_with_size(23, true), cbits_del(&bset))
+    c_autovar (cbits bset = cbits_with_size(23, true), cbits_drop(&bset))
     {
         cbits_reset(&bset, 9);
         cbits_resize(&bset, 43, false);
@@ -75,14 +75,14 @@ STC_API bool        cbits_disjoint(cbits set, cbits other);
 STC_INLINE cbits    cbits_init() { return c_make(cbits){NULL, 0}; }
 STC_INLINE cbits    cbits_from(const char* s) { return cbits_from_n(s, strlen(s)); }
 STC_INLINE void     cbits_clear(cbits* self) { self->size = 0; }
-STC_INLINE void     cbits_del(cbits* self) { c_free(self->data64); }
+STC_INLINE void     cbits_drop(cbits* self) { c_free(self->data64); }
 STC_INLINE size_t   cbits_size(cbits set) { return set.size; }
 
 #define cbits_new(literal) \
     cbits_from_n(literal, sizeof c_make(c_strlit){literal} - 1)
 
 STC_INLINE cbits* cbits_take(cbits* self, cbits other) {
-    if (self->data64 != other.data64) {cbits_del(self); *self = other;}
+    if (self->data64 != other.data64) {cbits_drop(self); *self = other;}
     return self;
 }
 

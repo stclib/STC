@@ -1,35 +1,30 @@
 #include <stc/cstr.h>
 
-void check_del(float* v) {printf("destroy %g\n", *v);}
+void check_drop(float* v) {printf("destroy %g\n", *v);}
 
+#define i_type FloatStack
 #define i_val float
-#define i_valdel check_del
-#define i_opt c_no_clone
-#define i_tag f
+#define i_drop check_drop
+#define i_from c_default_clone
 #include <stc/cstack.h>
 
-#define i_val cstack_f
-#define i_opt c_no_clone|c_no_compare
-#define i_valdel cstack_f_del
-#define i_tag arr
+#define i_type StackList
+#define i_val_bind FloatStack
+#define i_opt c_no_cmp
 #include <stc/clist.h>
 
+#define i_type ListMap
 #define i_key int
-#define i_val clist_arr
-#define i_valdel clist_arr_del
-#define i_opt c_no_clone
-#define i_tag lst
+#define i_val_bind StackList
 #include <stc/cmap.h>
 
+#define i_type MapMap
 #define i_key_str
-#define i_val cmap_lst
-#define i_valdel cmap_lst_del
-#define i_opt c_no_clone
-#define i_tag map
+#define i_val_bind ListMap
 #include <stc/cmap.h>
 
 // c++:
-// using cstack_f = std::stack<float>;
+// using FloatStack = std::stack<float>;
 // using map_lst = std::unordered_map<int, std::forward_list<array2f>>;
 // using map_map = std::unordered_map<std::string, map_lst>;
 
@@ -38,29 +33,29 @@ int main() {
     int x = 1, y = 3, tableKey = 42;
     const char* strKey = "first";
 
-    c_auto (cmap_map, myMap)
+    c_auto (MapMap, mmap)
     {
-        cstack_f stk = cstack_f_with_capacity(xdim * ydim);
-        memset(stk.data, 0, xdim*ydim*sizeof *stk.data);
-        stk.size = stk.capacity;
+        FloatStack stack = FloatStack_with_capacity(xdim * ydim);
+        memset(stack.data, 0, xdim*ydim*sizeof *stack.data);
+        stack.size = stack.capacity;
 
         // Put in some data in stack array
-        stk.data[x] = 3.1415927f;
-        printf("stk size: %zu\n", cstack_f_size(stk));
+        stack.data[x] = 3.1415927f;
+        printf("stack size: %zu\n", FloatStack_size(stack));
 
-        clist_arr tableList = clist_arr_init();
-        clist_arr_push_back(&tableList, stk);
+        StackList list = StackList_init();
+        StackList_push_back(&list, stack);
 
-        cmap_lst listMap = cmap_lst_init();
-        cmap_lst_insert(&listMap, tableKey, tableList);
-        cmap_map_insert(&myMap, cstr_from(strKey), listMap);
+        ListMap lmap = ListMap_init();
+        ListMap_insert(&lmap, tableKey, list);
+        MapMap_insert(&mmap, cstr_from(strKey), lmap);
 
         // Access the data entry
-        const cmap_lst* mapL = cmap_map_at(&myMap, strKey);
-        const clist_arr* lstA = cmap_lst_at(mapL, tableKey);
-        const cstack_f* arr = clist_arr_back(lstA);
-        printf("value (%d) is: %f\n", x, *cstack_f_at(arr, x));
+        const ListMap* lmap_p = MapMap_at(&mmap, strKey);
+        const StackList* list_p = ListMap_at(lmap_p, tableKey);
+        const FloatStack* stack_p = StackList_back(list_p);
+        printf("value (%d) is: %f\n", x, *FloatStack_at(stack_p, x));
 
-        stk.data[x] = 1.41421356f; // change the value in array
+        stack.data[x] = 1.41421356f; // change the value in array
     }
 }

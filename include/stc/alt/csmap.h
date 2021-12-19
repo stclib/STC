@@ -30,7 +30,7 @@
 using_csmap(mx, int, char); // Sorted map<int, char>
 
 int main(void) {
-    c_autovar (csmap_mx m = csmap_mx_init(), csmap_mx_del(&m))
+    c_autovar (csmap_mx m = csmap_mx_init(), csmap_mx_drop(&m))
     {
         csmap_mx_insert(&m, 5, 'a');
         csmap_mx_insert(&m, 8, 'b');
@@ -91,8 +91,8 @@ int main(void) {
 \
     STC_INLINE bool          _cx_memb(_empty)(_cx_self cx) { return cx.size == 0; } \
     STC_INLINE size_t        _cx_memb(_size)(_cx_self cx) { return cx.size; } \
-    STC_INLINE void          _cx_memb(_del)(_cx_self* self) { _cx_memb(_del_r_)(self->root); } \
-    STC_INLINE void          _cx_memb(_clear)(_cx_self* self) { _cx_memb(_del)(self); *self = _cx_memb(_init)(); } \
+    STC_INLINE void          _cx_memb(_drop)(_cx_self* self) { _cx_memb(_del_r_)(self->root); } \
+    STC_INLINE void          _cx_memb(_clear)(_cx_self* self) { _cx_memb(_drop)(self); *self = _cx_memb(_init)(); } \
     STC_INLINE void          _cx_memb(_swap)(_cx_self* a, _cx_self* b) {c_swap(_cx_self, *a, *b); } \
     STC_INLINE _cx_self            _cx_memb(_clone)(_cx_self cx) { return c_make(_cx_self){ _cx_memb(_clone_r_)(cx.root), cx.size}; } \
     STC_INLINE _cx_iter   _cx_memb(_find)(const _cx_self* self, i_keyraw rkey) \
@@ -103,9 +103,9 @@ int main(void) {
                                 {_cx_iter it; return _cx_memb(_find_it)(self, rkey, &it); } \
 \
     STC_INLINE void \
-    _cx_memb(_value_del)(_cx_value* val) { \
-        i_keydel(_i_keyref(val)); \
-        _i_MAP_ONLY( i_valdel(&val->second); ) \
+    _cx_memb(_value_drop)(_cx_value* val) { \
+        i_keydrop(_i_keyref(val)); \
+        _i_MAP_ONLY( i_valdrop(&val->second); ) \
     } \
 \
     STC_INLINE void \
@@ -134,7 +134,7 @@ int main(void) {
     _cx_memb(_insert)(_cx_self* self, i_key key _i_MAP_ONLY(, i_val mapped)) { \
         _cx_result res = _cx_memb(_insert_entry_)(self, i_keyto(&key)); \
         if (res.inserted) {*_i_keyref(res.ref) = key; _i_MAP_ONLY( res.ref->second = mapped; )} \
-        else              {i_keydel(&key); _i_MAP_ONLY( i_valdel(&mapped); )} \
+        else              {i_keydrop(&key); _i_MAP_ONLY( i_valdrop(&mapped); )} \
         return res; \
     } \
 \
@@ -143,7 +143,7 @@ int main(void) {
         _cx_memb(_insert_or_assign)(_cx_self* self, i_key key, i_val mapped) { \
             _cx_result res = _cx_memb(_insert_entry_)(self, i_keyto(&key)); \
             if (res.inserted) res.ref->first = key; \
-            else {i_keydel(&key); i_valdel(&res.ref->second); } \
+            else {i_keydrop(&key); i_valdrop(&res.ref->second); } \
             res.ref->second = mapped; return res; \
         } \
     \
@@ -156,7 +156,7 @@ int main(void) {
         _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped) { \
             _cx_result res = _cx_memb(_insert_entry_)(self, rkey); \
             if (res.inserted) res.ref->first = i_keyfrom(rkey); \
-            else i_valdel(&res.ref->second); \
+            else i_valdrop(&res.ref->second); \
             res.ref->second = i_valfrom(rmapped); return res; \
         } \
     \
@@ -191,8 +191,8 @@ int main(void) {
     } \
 \
     _c_implement_aatree(_cx_self, C, i_key, i_val, i_cmp, \
-                        i_valdel, i_valfrom, i_valto, i_valraw, \
-                        i_keydel, i_keyfrom, i_keyto, i_keyraw) \
+                        i_valdrop, i_valfrom, i_valto, i_valraw, \
+                        i_keydrop, i_keyfrom, i_keyto, i_keyraw) \
     struct stc_trailing_semicolon
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
@@ -204,8 +204,8 @@ _c_aatree_complete_types(csmap_SENTINEL, csmap_);
 static csmap_SENTINEL_node _aatree_sentinel = {&_aatree_sentinel, &_aatree_sentinel, 0};
 
 #define _c_implement_aatree(_cx_self, C, i_key, i_val, i_cmp, \
-                            i_valdel, i_valfrom, i_valto, i_valraw, \
-                            i_keydel, i_keyfrom, i_keyto, i_keyraw) \
+                            i_valdrop, i_valfrom, i_valto, i_valraw, \
+                            i_keydrop, i_keyfrom, i_keyto, i_keyraw) \
     STC_DEF _cx_self \
     _cx_memb(_init)(void) { \
         _cx_self cx = {(_cx_node *) &_aatree_sentinel, 0}; \
@@ -330,7 +330,7 @@ static csmap_SENTINEL_node _aatree_sentinel = {&_aatree_sentinel, &_aatree_senti
         if (c != 0) \
             tn->link[c < 0] = _cx_memb(_erase_r_)(tn->link[c < 0], rkey, erased); \
         else { \
-            if (!*erased) { _cx_memb(_value_del)(&tn->value); *erased = 1; } \
+            if (!*erased) { _cx_memb(_value_drop)(&tn->value); *erased = 1; } \
             if (tn->link[0]->level && tn->link[1]->level) { \
                 tx = tn->link[0]; \
                 while (tx->link[1]->level) \
@@ -395,7 +395,7 @@ static csmap_SENTINEL_node _aatree_sentinel = {&_aatree_sentinel, &_aatree_senti
         if (tn->level != 0) { \
             _cx_memb(_del_r_)(tn->link[0]); \
             _cx_memb(_del_r_)(tn->link[1]); \
-            _cx_memb(_value_del)(&tn->value); \
+            _cx_memb(_value_drop)(&tn->value); \
             c_free(tn); \
         } \
     }

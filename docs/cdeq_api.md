@@ -10,7 +10,7 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 ```c
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_valraw* : REQUIRED IF i_valraw is a non-integral type
-#define i_del       // destroy value func - defaults to empty destruct
+#define i_drop      // destroy value func - defaults to empty destruct
 #define i_valraw    // convertion "raw" type - defaults to i_val
 #define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
 #define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
@@ -31,7 +31,7 @@ void                cdeq_X_copy(cdeq_X* self, cdeq_X other);
 bool                cdeq_X_reserve(cdeq_X* self, size_t cap);
 void                cdeq_X_shrink_to_fit(cdeq_X* self);
 void                cdeq_X_swap(cdeq_X* a, cdeq_X* b);
-void                cdeq_X_del(cdeq_X* self);                                                    // destructor
+void                cdeq_X_drop(cdeq_X* self);                                                    // destructor
 
 bool                cdeq_X_empty(cdeq_X deq);
 size_t              cdeq_X_size(cdeq_X deq);
@@ -119,7 +119,7 @@ int main() {
     c_foreach (i, cdeq_i, q)
         printf(" %d", *i.ref);
     puts("");
-    cdeq_i_del(&q);
+    cdeq_i_drop(&q);
 }
 ```
 Output:

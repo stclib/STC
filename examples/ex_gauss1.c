@@ -13,7 +13,7 @@
 // Declare int vector with map entries that can be sorted by map keys.
 struct {int first; size_t second;} typedef mapval;
 static int compare(mapval *a, mapval *b) {
-    return c_default_compare(&a->first, &b->first);
+    return c_default_cmp(&a->first, &b->first);
 }
 
 #define i_val mapval

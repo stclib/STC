@@ -6,7 +6,7 @@ struct { double x, y; } typedef Point;
 // Set of Point pointers: define all template parameters "in-line"
 // Note it may be simpler to use a cbox for this.
 #define i_key Point*
-#define i_keydel(x) c_free(*(x))
+#define i_keydrop(x) c_free(*(x))
 #define i_keyfrom(x) c_new(Point, *(x))
 #define i_hash(x, n) c_default_hash(*(x), sizeof *(x))
 #define i_equ(x, y) c_memcmp_equalto(*(x), *(y))
@@ -18,7 +18,7 @@ typedef int64_t inttype;
 #define i_key_str
 #define i_valraw inttype
 #define i_val inttype*
-#define i_valdel(x) c_free(*(x))
+#define i_valdrop(x) c_free(*(x))
 #define i_valfrom(raw) c_new(inttype, raw)
 #define i_valto(x) **(x)
 #include <stc/cmap.h>

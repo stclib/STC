@@ -24,10 +24,10 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 ```c
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_valraw* : REQUIRED IF i_valraw is a non-integral type
-#define i_del       // destroy value func - defaults to empty destruct
+#define i_drop      // destroy value func - defaults to empty destruct
 #define i_valraw    // convertion "raw" type - defaults to i_val
-#define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
 #define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
+#define i_from     // convertion func i_valraw => i_val - defaults to plain copy
 #define i_tag       // defaults to i_val
 #include <stc/clist.h>
 ```
@@ -42,7 +42,7 @@ clist_X             clist_X_clone(clist_X list);
 
 void                clist_X_clear(clist_X* self);
 void                clist_X_copy(clist_X* self, clist_X other);
-void                clist_X_del(clist_X* self);                                           // destructor
+void                clist_X_drop(clist_X* self);                                           // destructor
 
 bool                clist_X_empty(clist_X list);
 size_t              clist_X_count(clist_X list);                                          // size() in O(n) time
@@ -125,7 +125,7 @@ int main() {
     c_foreach (i, clist_d, list)
         printf(" %g", *i.ref);
 
-    clist_d_del(&list);
+    clist_d_drop(&list);
 }
 ```
 Output:
@@ -161,7 +161,7 @@ int main ()
     c_foreach (x, clist_i, L) printf(" %d", *x.ref);
     puts("");
 
-    clist_i_del(&L);
+    clist_i_drop(&L);
 }
 ```
 Output:

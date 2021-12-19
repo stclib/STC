@@ -82,7 +82,7 @@ Sample test_stc_map() {
         c_forrange (N) csmap_x_erase(&con, stc64_random() & mask1);
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = csmap_x_size(con);
-        csmap_x_del(&con);
+        csmap_x_drop(&con);
      }{
         container con = csmap_x_init();
         stc64_srandom(seed);
@@ -103,7 +103,7 @@ Sample test_stc_map() {
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();
-        csmap_x_del(&con);
+        csmap_x_drop(&con);
      }
      s.test[DESTRUCT].t2 = clock();
      s.test[DESTRUCT].sum = 0;

@@ -11,11 +11,10 @@ struct Base
     int value;
 } typedef Base;
 
-void Base_del(Base* b) { printf("Base::~Base()\n"); }
-
 #define i_val Base
-#define i_del Base_del
+#define i_drop(x) printf("Base::~Base()\n")
 #define i_tag base
+#define i_opt c_no_cmp
 #include <stc/csptr.h>
 
 void* thr(csptr_base* lp)
@@ -28,7 +27,7 @@ void* thr(csptr_base* lp)
                 "  p.get() = %p, p.use_count() = %ld\n", (void*)lp->get, *lp->use_count);
     }
     /* atomically decrease ref. */
-    csptr_base_del(lp);
+    csptr_base_drop(lp);
     return NULL;
 }
 

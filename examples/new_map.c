@@ -16,15 +16,15 @@ struct MyStruct {
 // Point => int map
 struct Point { int x, y; } typedef Point;
 
-int point_compare(const Point* a, const Point* b) {
-    int c = c_default_compare(&a->x, &b->x);
-    return c ? c : c_default_compare(&a->y, &b->y);
+int point_cmp(const Point* a, const Point* b) {
+    int c = a->x - b->x;
+    return c ? c : a->y - b->y;
 }
 
 // Point => int map
 #define i_key Point
 #define i_val int
-#define i_cmp point_compare
+#define i_cmp point_cmp
 #define i_opt c_is_fwd
 #define i_tag pnt
 #include <stc/cmap.h>

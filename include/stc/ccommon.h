@@ -93,32 +93,36 @@
 #endif
 
 typedef const char              c_strlit[];
-#define c_delete(T, ptr)        do { T *_c_p = ptr; T##_del(_c_p); c_free(_c_p); } while (0)
+#define c_delete(T, ptr)        do { T *_c_p = ptr; T##_drop(_c_p); c_free(_c_p); } while (0)
 #define c_swap(T, x, y)         do { T _c_t = x; x = y; y = _c_t; } while (0)
 #define c_arraylen(a)           (sizeof (a)/sizeof (a)[0])
-#define c_less_compare(less, x, y) (less(y, x) - less(x, y))
+#define c_less_cmp(less, x, y)  (less(y, x) - less(x, y))
 #define c_default_less(x, y)    (*(x) < *(y))
 
-#define c_default_compare(x, y) c_less_compare(c_default_less, x, y)
+#define c_default_cmp(x, y)     c_less_cmp(c_default_less, x, y)
 #define c_default_equalto(x, y) (*(x) == *(y))
 #define c_memcmp_equalto(x, y)  (memcmp(x, y, sizeof *(x)) == 0)
-
-#define c_rawstr_compare(x, y)  strcmp(*(x), *(y))
-#define c_rawstr_equalto(x, y)  (strcmp(*(x), *(y)) == 0)
-#define c_rawstr_hash(x, dummy) c_strhash(*(x))
 
 #define c_default_clone(x)      (x)
 #define c_default_fromraw(x)    (x) // [deprecated]
 #define c_default_toraw(ptr)    (*(ptr))
-#define c_default_del(ptr)      ((void) (ptr))
+#define c_default_drop(ptr)     ((void) (ptr))
 
 #define c_option(flag)          ((i_opt) & (flag))
 #define c_is_fwd                1
 #define c_no_atomic             2
 #define c_no_clone              4
-#define c_no_compare            8
+#define c_no_cmp                8
 
 /* Generic algorithms */
+
+typedef char* c_mutstr;
+typedef const char* c_rawstr;
+#define c_rawstr_cmp(x, y)  strcmp(*(x), *(y))
+#define c_rawstr_equalto(x, y)  (strcmp(*(x), *(y)) == 0)
+#define c_rawstr_hash(x, dummy) c_strhash(*(x))
+#define c_rawstr_clone(s) strcpy((char*)c_malloc(strlen(s) + 1), s)
+#define c_rawstr_drop(x) c_free((char *) &**(x))
 
 #define _c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
@@ -168,16 +172,16 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
 
 #define c_auto(...) c_MACRO_OVERLOAD(c_auto, __VA_ARGS__)
 #define c_auto_2(C, a) \
-    c_autovar(C a = C##_init(), C##_del(&a))
+    c_autovar(C a = C##_init(), C##_drop(&a))
 #define c_auto_3(C, a, b) \
     c_autovar(c_EXPAND(C a = C##_init(), b = C##_init()), \
-              C##_del(&b), C##_del(&a))
+              C##_drop(&b), C##_drop(&a))
 #define c_auto_4(C, a, b, c) \
     c_autovar(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init()), \
-              C##_del(&c), C##_del(&b), C##_del(&a))
+              C##_drop(&c), C##_drop(&b), C##_drop(&a))
 #define c_auto_5(C, a, b, c, d) \
     c_autovar(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
-              C##_del(&d), C##_del(&c), C##_del(&b), C##_del(&a))
+              C##_drop(&d), C##_drop(&c), C##_drop(&b), C##_drop(&a))
 
 #define c_autobuf(b, type, n) c_autobuf_N(b, type, n, 256)
 #define c_autobuf_N(b, type, n, BYTES) \
@@ -203,10 +207,10 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
         C##_##method(_c_cx, *_c_i); \
 } while (0)
 
-#define c_del(C, ...) do { \
+#define c_drop(C, ...) do { \
     C* _c_arr[] = {__VA_ARGS__}; \
     for (size_t _c_i = 0; _c_i < c_arraylen(_c_arr); ++_c_i) \
-        C##_del(_c_arr[_c_i]); \
+        C##_drop(_c_arr[_c_i]); \
 } while (0)
 
 #if defined(__SIZEOF_INT128__)

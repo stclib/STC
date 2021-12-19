@@ -6,12 +6,12 @@
 forward_cqueue(cqueue_pnt, struct Point);
 
 struct Point { int x, y; } typedef Point;
-int point_compare(const Point* a, const Point* b) {
-    int c = c_default_compare(&a->x, &b->x);
-    return c ? c : c_default_compare(&a->y, &b->y);
+int point_cmp(const Point* a, const Point* b) {
+    int c = c_default_cmp(&a->x, &b->x);
+    return c ? c : c_default_cmp(&a->y, &b->y);
 }
 #define i_val Point
-#define i_cmp point_compare
+#define i_cmp point_cmp
 #define i_opt c_is_fwd
 #define i_tag pnt
 #include <stc/cqueue.h>

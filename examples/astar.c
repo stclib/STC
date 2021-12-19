@@ -24,9 +24,9 @@ point_init(int x, int y, int width)
 }
 
 int
-point_compare_priority(const point* a, const point* b)
+point_cmp_priority(const point* a, const point* b)
 {
-    return c_default_compare(&a->priorty, &b->priorty);
+    return c_default_cmp(&a->priorty, &b->priorty);
 }
 
 int
@@ -49,7 +49,7 @@ point_index(const point* p)
 }
 
 int
-point_key_compare(const point* a, const point* b)
+point_key_cmp(const point* a, const point* b)
 {
     int i = point_index(a);
     int j = point_index(b);
@@ -57,22 +57,22 @@ point_key_compare(const point* a, const point* b)
 }
 
 #define i_val point
-#define i_cmp point_compare_priority
+#define i_cmp point_cmp_priority
 #include <stc/cpque.h>
 
 #define i_val point
-#define i_opt c_no_compare
+#define i_opt c_no_cmp
 #include <stc/cdeq.h>
 
 #define i_key point
 #define i_val int
-#define i_cmp point_key_compare
+#define i_cmp point_key_cmp
 #define i_tag pcost
 #include <stc/csmap.h>
 
 #define i_key point
 #define i_val point
-#define i_cmp point_key_compare
+#define i_cmp point_key_cmp
 #define i_tag pstep
 #include <stc/csmap.h>
 
@@ -155,10 +155,10 @@ main(void)
         "#   #       #   #   #           #           #   #       #               #\n"
         "# @ #   #####   #####   #####   #########   #####   #   #########   #   #\n"
         "#   #                   #           #               #               #   #\n"
-        "#########################################################################\n"), cstr_del(&maze))
+        "#########################################################################\n"), cstr_drop(&maze))
     {
         int width = cstr_find(maze, "\n") + 1;
-        c_autovar (cdeq_point path = astar(&maze, width), cdeq_point_del(&path))
+        c_autovar (cdeq_point path = astar(&maze, width), cdeq_point_drop(&path))
         {
             c_foreach (it, cdeq_point, path) maze.str[point_index(it.ref)] = 'x';
             printf("%s", maze.str);

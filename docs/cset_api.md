@@ -11,10 +11,10 @@ A **cset** is an associative container that contains a set of unique objects of 
 #define i_hash      // hash func: REQUIRED IF i_keyraw is a non-pod type
 #define i_cmp       // three-way compare two i_keyraw*: REQUIRED IF i_keyraw is a non-integral type
 #define i_equ       // equality comparison two i_keyraw*: ALTERNATIVE to i_cmp 
-#define i_del       // destroy key func - defaults to empty destruct
+#define i_drop      // destroy key func - defaults to empty destruct
 #define i_keyraw    // convertion "raw" type - defaults to i_key
-#define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
-#define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
+#define i_keyfrom  // convertion func i_keyraw => i_key - defaults to plain copy
+#define i_keyto  // convertion func i_key* => i_keyraw - defaults to plain copy
 #define i_tag       // defaults to i_key
 #include <stc/cset.h>
 ```
@@ -33,7 +33,7 @@ void                cset_X_max_load_factor(cset_X* self, float max_load);       
 bool                cset_X_reserve(cset_X* self, size_t size);
 void                cset_X_shrink_to_fit(cset_X* self);
 void                cset_X_swap(cset_X* a, cset_X* b);
-void                cset_X_del(cset_X* self);                                                // destructor
+void                cset_X_drop(cset_X* self);                                                // destructor
 
 size_t              cset_X_size(cset_X set);                                                 // num. of allocated buckets
 size_t              cset_X_capacity(cset_X set);                                             // buckets * max_load_factor

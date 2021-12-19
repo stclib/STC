@@ -14,7 +14,7 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ```c
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_valraw* : REQUIRED IF i_valraw is a non-integral type
-#define i_del       // destroy value func - defaults to empty destruct
+#define i_drop      // destroy value func - defaults to empty destruct
 #define i_valraw    // convertion "raw" type - defaults to i_val
 #define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
 #define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
@@ -23,7 +23,7 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
 
-`i_del` may be defined instead of `i_valdel` (or `i_keydel`) for all non-map containers.
+`i_drop` may be defined instead of `i_valdrop` (or `i_keydrop`) for all non-map containers.
 
 ## Methods
 
@@ -39,7 +39,7 @@ bool                cvec_X_reserve(cvec_X* self, size_t cap);
 bool                cvec_X_resize(cvec_X* self, size_t size, i_val null);
 void                cvec_X_shrink_to_fit(cvec_X* self);
 void                cvec_X_swap(cvec_X* a, cvec_X* b);
-void                cvec_X_del(cvec_X* self);                                                // destructor
+void                cvec_X_drop(cvec_X* self);                                               // destructor
 
 bool                cvec_X_empty(cvec_X vec);
 size_t              cvec_X_size(cvec_X vec);
@@ -47,7 +47,7 @@ size_t              cvec_X_capacity(cvec_X vec);
 
 const cvec_X_value* cvec_X_at(const cvec_X* self, size_t idx);
 const cvec_X_value* cvec_X_get(const cvec_X* self, i_valraw raw);                            // return NULL if not found
-cvec_X_value*       cvec_X_get_mut(cvec_X* self, i_valraw raw);                               // get mutable value
+cvec_X_value*       cvec_X_get_mut(cvec_X* self, i_valraw raw);                              // get mutable value
 cvec_X_iter         cvec_X_find(const cvec_X* self, i_valraw raw);
 cvec_X_iter         cvec_X_find_in(cvec_X_iter i1, cvec_X_iter i2, i_valraw raw);
 cvec_X_iter         cvec_X_bsearch(const cvec_X* self, i_valraw raw);
@@ -152,13 +152,13 @@ int main() {
     cstr tmp = cstr_from_fmt("%d elements so far", cvec_str_size(names));
 
     // emplace_back() will not compile if adding a new cstr type. Use push_back():
-    cvec_str_push_back(&names, tmp); // tmp is moved to names, do not del() it.
+    cvec_str_push_back(&names, tmp); // tmp is moved to names, do not drop() it.
 
     printf("%s\n", names.data[1].str); // Access the second element
 
     c_foreach (i, cvec_str, names)
         printf("item: %s\n", i.ref->str);
-    cvec_str_del(&names);
+    cvec_str_drop(&names);
 }
 ```
 Output:
@@ -179,12 +179,12 @@ typedef struct {
     int id;
 } User;
 
-int User_compare(const User* a, const User* b) {
+int User_cmp(const User* a, const User* b) {
     int c = strcmp(a->name.str, b->name.str);
     return c != 0 ? c : a->id - b->id;
 }
-void User_del(User* self) {
-    cstr_del(&self->name);
+void User_drop(User* self) {
+    cstr_drop(&self->name);
 }
 User User_clone(User user) {
     user.name = cstr_clone(user.name);
@@ -194,9 +194,9 @@ User User_clone(User user) {
 // Declare a memory managed, clonable vector of users.
 // Note that cvec_u_emplace_back() will clone input:
 #define i_val User
-#define i_cmp User_compare
-#define i_del User_del
-#define i_valfrom User_clone
+#define i_cmp User_cmp
+#define i_drop User_drop
+#define i_from User_clone
 #define i_tag u
 #include <stc/cvec.h>
 
@@ -209,6 +209,6 @@ int main(void) {
     c_foreach (i, cvec_u, vec2)
         printf("%s: %d\n", i.ref->name.str, i.ref->id);
 
-    c_del(cvec_u, &vec, &vec2); // cleanup
+    c_drop(cvec_u, &vec, &vec2); // cleanup
 }
 ```

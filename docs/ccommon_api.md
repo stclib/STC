@@ -13,7 +13,7 @@ macros, as one must always make sure to unwind temporary allocated resources bef
 
 | Usage                                  | Description                                        |
 |:---------------------------------------|:---------------------------------------------------|
-| `c_auto (Type, var...)`                | `c_autovar (Type var=Type_init(), Type_del(&var))` |
+| `c_auto (Type, var...)`                | `c_autovar (Type var=Type_init(), Type_drop(&var))` |
 | `c_autovar (Type var=init, end...)`    | Declare `var`. Defer `end...` to end of block      |
 | `c_autoscope (init, end...)`           | Execute `init`. Defer `end...` to end of block     |
 | `c_autodefer (end...)`                 | Defer `end...` to end of block                     |
@@ -22,7 +22,7 @@ macros, as one must always make sure to unwind temporary allocated resources bef
 For multiple variables, use either multiple **c_autovar** in sequence, or declare variable outside
 scope and use **c_autoscope**. Also, **c_auto** support up to 3 variables.
 ```c
-c_autovar (cstr s = cstr_new("Hello"), cstr_del(&s))
+c_autovar (cstr s = cstr_new("Hello"), cstr_drop(&s))
 {
     cstr_append(&s, " world");
     printf("%s\n", s.str);
@@ -46,7 +46,7 @@ c_autoscope (mydata_init(&data), mydata_destroy(&data))
 }
 
 cstr s1 = cstr_new("Hello"), s2 = cstr_new("world");
-c_autodefer (cstr_del(&s1), cstr_del(&s2))
+c_autodefer (cstr_drop(&s1), cstr_drop(&s2))
 {
     printf("%s %s\n", s1.str, s2.str);
 }
@@ -65,7 +65,7 @@ cvec_str readFile(const char* name)
     cvec_str vec = cvec_str_init(); // returned
 
     c_autovar (FILE* fp = fopen(name, "r"), fclose(fp))
-        c_autovar (cstr line = cstr_null, cstr_del(&line))
+        c_autovar (cstr line = cstr_null, cstr_drop(&line))
             while (cstr_getline(&line, fp))
                 cvec_str_emplace_back(&vec, line.str);
     return vec;
@@ -73,7 +73,7 @@ cvec_str readFile(const char* name)
 
 int main()
 {
-    c_autovar (cvec_str x = readFile(__FILE__), cvec_str_del(&x))
+    c_autovar (cvec_str x = readFile(__FILE__), cvec_str_drop(&x))
         c_foreach (i, cvec_str, x)
             printf("%s\n", i.ref->str);
 }
@@ -140,14 +140,14 @@ int arr[] = {1, 2, 3};
 c_apply_n(cvec_i, push_back, &vec, arr, c_arraylen(arr));
 ```
 
-### c_new, c_alloc, c_alloc_n, c_del, c_make
+### c_new, c_alloc, c_alloc_n, c_drop, c_make
 
 | Usage                          | Meaning                                 |
 |:-------------------------------|:----------------------------------------|
 | `c_new (type, value)`          | Move value to a new object on the heap  |
 | `c_alloc (type)`               | `(type *) c_malloc(sizeof(type))`       |
 | `c_alloc_n (type, N)`          | `(type *) c_malloc((N)*sizeof(type))`   |
-| `c_del (ctype, &c1, ..., &cN)` | `ctype_del(&c1); ... ctype_del(&cN)`    |
+| `c_drop (ctype, &c1, ..., &cN)` | `ctype_drop(&c1); ... ctype_drop(&cN)`    |
 | `c_make(type){value...}`       | `(type){value...}` // c++ compatability |
 
 ```c
@@ -159,17 +159,17 @@ int* array = c_alloc_n (int, 100);
 c_free(array);
 
 cstr a = cstr_new("Hello"), b = cstr_new("World");
-c_del(cstr, &a, &b);
+c_drop(cstr, &a, &b);
 ```
 
 ### General predefined template parameter functions
 ```
-int     c_default_compare(const Type*, const Type*);
+int     c_default_cmp(const Type*, const Type*);
 Type    c_default_clone(Type val);           // simple copy
 Type    c_default_toraw(const Type* val);    // dereference val
-void    c_default_del(Type* val);            // does nothing
+void    c_default_drop(Type* val);            // does nothing
 
-int     c_rawstr_compare(const char* const* a, const char* const* b);
+int     c_rawstr_cmp(const char* const* a, const char* const* b);
 bool    c_rawstr_equalto(const char* const* a, const char* const* b);
 ```
 
