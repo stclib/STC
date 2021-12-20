@@ -91,7 +91,7 @@ STC_INLINE _cx_value* _cx_memb(_push)(_cx_self* self, _cx_value val) {
     *vp = val; return vp;
 }
 
-STC_INLINE _cx_value* _cx_memb(_at)(const _cx_self* self, size_t idx)
+STC_INLINE const _cx_value* _cx_memb(_at)(const _cx_self* self, size_t idx)
     { assert(idx < self->size); return self->data + idx; }
 
 #if !c_option(c_no_clone)

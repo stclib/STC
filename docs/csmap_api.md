@@ -45,7 +45,7 @@ void                  csmap_X_drop(csmap_X* self);                              
 size_t                csmap_X_size(csmap_X map);
 bool                  csmap_X_empty(csmap_X map);
 
-csmap_X_mapped*       csmap_X_at(const csmap_X* self, i_keyraw rkey);                            // rkey must be in map.
+const csmap_X_mapped* csmap_X_at(const csmap_X* self, i_keyraw rkey);                            // rkey must be in map.
 const csmap_X_value*  csmap_X_get(const csmap_X* self, i_keyraw rkey);                           // return NULL if not found
 csmap_X_value*        csmap_X_get_mut(csmap_X* self, i_keyraw rkey);                             // mutable get
 bool                  csmap_X_contains(const csmap_X* self, i_keyraw rkey);

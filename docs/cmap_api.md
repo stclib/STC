@@ -391,8 +391,8 @@ int main()
         });
         Vikings_emplace_or_assign(&vikings, (RViking){"Bjorn", "Sweden"}, 10);
 
-        Vikings_value *einar = Vikings_find(&vikings, (RViking){"Einar", "Norway"}).ref;
-        if (einar) einar->second += 3; // add 3 hp points to Einar
+        Vikings_value *v = Vikings_get_mut(&vikings, (RViking){"Einar", "Norway"});
+        if (v) v->second += 3; // add 3 hp points to Einar
 
         c_forpair (viking, health, Vikings, vikings) {
             printf("%s of %s has %d hp\n", _.viking.name.str, _.viking.country.str, _.health);

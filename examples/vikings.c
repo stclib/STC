@@ -39,11 +39,11 @@ static inline RViking Viking_toraw(const Viking* vk) {
 #define i_keyraw    RViking
 #define i_val       int
 // i_key_bind auto-binds these functions:
-//   #define i_hash     Viking_hash
-//   #define i_eq       Viking_eq
-//   #define i_keyfrom  Viking_from // uses _from (not _clone) because i_keyraw is defined
-//   #define i_keyto    Viking_toraw
-//   #define i_keydrop  Viking_drop
+//   i_hash     => Viking_hash
+//   i_eq       => Viking_eq
+//   i_keyfrom  => Viking_from // not _clone because i_keyraw is defined
+//   i_keyto    => Viking_toraw
+//   i_keydrop  => Viking_drop
 #include <stc/cmap.h>
 
 int main()
@@ -58,8 +58,8 @@ int main()
         Vikings_emplace_or_assign(&vikings, bjorn, 10);
 
         RViking einar = {"Einar", "Norway"};
-        Vikings_value *e = Vikings_find(&vikings, einar).ref;
-        e->second += 3; // add 3 hp points to Einar
+        Vikings_value* v = Vikings_get_mut(&vikings, einar);
+        v->second += 3; // add 3 hp points to Einar
         Vikings_emplace(&vikings, einar, 0).ref->second += 5; // add 5 more to Einar
 
         c_forpair (viking, hp, Vikings, vikings) {
