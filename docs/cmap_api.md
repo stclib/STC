@@ -272,11 +272,11 @@ typedef struct {
 
 #define Viking_init() ((Viking){cstr_null, cstr_null})
 
-static inline bool RViking_eq(const Viking* a, const Viking* b) {
+static inline bool Viking_eq(const Viking* a, const Viking* b) {
     return cstr_equals_s(a->name, b->name) && cstr_equals_s(a->country, b->country);
 }
 
-static inline uint32_t RViking_hash(const Viking* a, int ignored) {
+static inline uint32_t Viking_hash(const Viking* a, int ignored) {
     return c_strhash(a->name.str) ^ (c_strhash(a->country.str) >> 15);
 }
 
@@ -285,7 +285,7 @@ static inline Viking Viking_clone(Viking v) {
     v.country = cstr_clone(v.country);
 }
 
-void inline Viking_drop(Viking* vk) {
+static inline void Viking_drop(Viking* vk) {
     cstr_drop(&vk->name);
     cstr_drop(&vk->country);
 }
@@ -294,8 +294,8 @@ void inline Viking_drop(Viking* vk) {
 #define i_key_bind Viking
 #define i_val int
 // i_key_bind auto-binds:
-//  #define i_eq RViking_eq
-//  #define i_hash RViking_hash
+//  #define i_eq Viking_eq
+//  #define i_hash Viking_hash
 //  #define i_keyfrom Viking_clone
 //  #define i_drop Viking_drop
 #include <stc/cmap.h>
