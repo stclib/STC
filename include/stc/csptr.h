@@ -156,7 +156,8 @@ _cx_memb(_clone)(_cx_self ptr) {
 STC_INLINE void
 _cx_memb(_copy)(_cx_self* self, _cx_self ptr) {
     if (ptr.use_count) _i_atomic_inc(ptr.use_count);
-    _cx_memb(_drop)(self); *self = ptr;
+    _cx_memb(_drop)(self);
+    *self = ptr;
 }
 
 STC_INLINE void
@@ -167,7 +168,7 @@ _cx_memb(_take)(_cx_self* self, _cx_self ptr) {
 
 STC_INLINE uint64_t
 _cx_memb(_hash)(const _cx_self* self, size_t n) {
-    #if c_option(c_no_cmp) && SIZE_MAX >> 32
+    #if c_option(c_no_cmp) && UINTPTR_MAX == UINT64_MAX
         return c_hash64(&self->get, 8);
     #elif c_option(c_no_cmp)
         return c_hash32(&self->get, 4);
