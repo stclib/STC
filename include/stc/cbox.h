@@ -83,7 +83,7 @@ STC_INLINE _cx_self
 _cx_memb(_init)(void) { return c_make(_cx_self){NULL}; }
 
 STC_INLINE _cx_self
-_cx_memb(_with)(i_val* p) { return c_make(_cx_self){p}; }
+_cx_memb(_from_ptr)(i_val* p) { return c_make(_cx_self){p}; }
 
 STC_INLINE _cx_self
 _cx_memb(_new)(i_val val) { 
@@ -107,12 +107,6 @@ _cx_memb(_reset)(_cx_self* self) {
     _cx_memb(_drop)(self); self->get = NULL;
 }
 
-// take ownership of *p
-STC_INLINE void
-_cx_memb(_reset_with)(_cx_self* self, _cx_value* p) {
-    _cx_memb(_drop)(self); self->get = p;
-}
-
 // take ownership of val
 STC_INLINE void
 _cx_memb(_reset_new)(_cx_self* self, i_val val) {
@@ -125,10 +119,6 @@ _cx_memb(_reset_new)(_cx_self* self, i_val val) {
     _cx_memb(_from)(i_valraw raw) { 
         return c_make(_cx_self){c_new(i_val, i_valfrom(raw))};
     }
-    STC_INLINE i_valraw
-    _cx_memb(_toraw)(const _cx_self* self) { 
-        return i_valto(self->get);
-    }
 
     STC_INLINE _cx_self
     _cx_memb(_clone)(_cx_self other) {
@@ -139,8 +129,8 @@ _cx_memb(_reset_new)(_cx_self* self, i_val val) {
     STC_INLINE void
     _cx_memb(_copy)(_cx_self* self, _cx_self other) {
         if (self->get == other.get) return;
-        if (other.get) _cx_memb(_reset_new)(self, *other.get);
-        else _cx_memb(_reset)(self);
+        _cx_memb(_reset)(self);
+        *self = _cx_memb(_clone)(other);
     }
 #endif
 
@@ -157,7 +147,8 @@ _cx_memb(_hash)(const _cx_self* self, size_t n) {
     #elif c_option(c_no_cmp)
         return c_hash32(&self->get, 4);
     #else
-        return i_hash(self->get, sizeof *self->get);
+        i_valraw rx = i_valto(self->get);
+        return i_hash(&rx, sizeof rx);
     #endif
 }
 
@@ -166,7 +157,8 @@ _cx_memb(_cmp)(const _cx_self* x, const _cx_self* y) {
     #if c_option(c_no_cmp)
         return c_default_cmp(&x->get, &y->get);
     #else
-        return i_cmp(x->get, y->get);
+        i_valraw rx = i_valto(x->get), ry = i_valto(x->get);
+        return i_cmp(&rx, &ry);
     #endif
 }
 

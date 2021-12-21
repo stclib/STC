@@ -97,15 +97,9 @@ STC_INLINE long
 _cx_memb(_use_count)(_cx_self ptr) { return ptr.use_count ? *ptr.use_count : 0; }
 
 STC_INLINE _cx_self
-_cx_memb(_with)(_cx_value* p) {
+_cx_memb(_from_ptr)(_cx_value* p) {
     _cx_self ptr = {p};
     if (p) *(ptr.use_count = c_alloc(long)) = 1;
-    return ptr;
-}
-
-STC_INLINE _cx_self
-_cx_memb(_view)(const _cx_value* p) {
-    _cx_self ptr = {(_cx_value*) p};
     return ptr;
 }
 
@@ -114,14 +108,6 @@ _cx_memb(_new)(i_val val) {
     _cx_self ptr; _cx_csptr_rep *rep = c_alloc(_cx_csptr_rep);
     *(ptr.use_count = &rep->counter) = 1;
     *(ptr.get = &rep->value) = val;
-    return ptr;
-}
-STC_INLINE _cx_self _cx_memb(_make)(i_val val) // [deprecated]
-    { return _cx_memb(_new)(val); }
-
-STC_INLINE _cx_self // does not use i_valfrom, so we can bypass c_no_clone
-_cx_memb(_clone)(_cx_self ptr) {
-    if (ptr.use_count) _i_atomic_inc(ptr.use_count);
     return ptr;
 }
 
@@ -149,12 +135,6 @@ _cx_memb(_reset)(_cx_self* self) {
 }
 
 STC_INLINE void
-_cx_memb(_reset_with)(_cx_self* self, _cx_value* p) {
-    _cx_memb(_drop)(self);
-    *self = _cx_memb(_with)(p);
-}
-
-STC_INLINE void
 _cx_memb(_reset_new)(_cx_self* self, i_val val) {
     _cx_memb(_drop)(self);
     *self = _cx_memb(_new)(val);
@@ -163,13 +143,15 @@ _cx_memb(_reset_new)(_cx_self* self, i_val val) {
 #if !c_option(c_no_clone)
     STC_INLINE _cx_self _cx_memb(_from)(i_valraw raw) { 
         return _cx_memb(_new)(i_valfrom(raw));
-    }
-
-    STC_INLINE i_valraw
-    _cx_memb(_toraw)(const _cx_self* self) { 
-        return i_valto(self->get);
-    }
+}
 #endif
+
+// does not use i_valfrom, so we can bypass c_no_clone
+STC_INLINE _cx_self 
+_cx_memb(_clone)(_cx_self ptr) {
+    if (ptr.use_count) _i_atomic_inc(ptr.use_count);
+    return ptr;
+}
 
 STC_INLINE void
 _cx_memb(_copy)(_cx_self* self, _cx_self ptr) {
@@ -190,7 +172,8 @@ _cx_memb(_hash)(const _cx_self* self, size_t n) {
     #elif c_option(c_no_cmp)
         return c_hash32(&self->get, 4);
     #else
-        return i_hash(self->get, sizeof *self->get);
+        i_valraw rx = i_valto(self->get);
+        return i_hash(&rx, sizeof rx);
     #endif
 }
 
@@ -199,7 +182,8 @@ _cx_memb(_cmp)(const _cx_self* x, const _cx_self* y) {
     #if c_option(c_no_cmp)
         return c_default_cmp(&x->get, &y->get);
     #else
-        return i_cmp(x->get, y->get);
+        i_valraw rx = i_valto(x->get), ry = i_valto(x->get);
+        return i_cmp(&rx, &ry);
     #endif
 }
 
