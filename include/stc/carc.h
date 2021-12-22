@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-/* csptr: shared_ptr type
+/* carc: atomic reference counted shared_ptr
 #include <stc/cstr.h>
 
 typedef struct { cstr name, last; } Person;
@@ -37,19 +37,19 @@ void Person_drop(Person* p) {
 #define i_tag person
 #define i_val Person
 #define i_valdrop Person_drop
-#include <stc/csptr.h>
+#include <stc/carc.h>
 
 int main() {
-    csptr_person p = csptr_person_new(Person_new("John", "Smiths"));
-    csptr_person q = csptr_person_clone(p); // share the pointer
+    carc_person p = carc_person_from(Person_new("John", "Smiths"));
+    carc_person q = carc_person_clone(p); // share the pointer
 
     printf("%s %s. uses: %zu\n", q.get->name.str, q.get->last.str, *q.use_count);
-    c_drop(csptr_person, &p, &q);
+    c_drop(carc_person, &p, &q);
 }
 */
 
-#ifndef CSPTR_H_INCLUDED
-#define CSPTR_H_INCLUDED
+#ifndef CARC_H_INCLUDED
+#define CARC_H_INCLUDED
 #include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
@@ -67,12 +67,12 @@ int main() {
     #define c_atomic_dec_and_test(v) (atomic_fetch_sub(v, 1) == 1)
 #endif
 
-#define csptr_null {NULL, NULL}
-#define _cx_csptr_rep struct _cx_memb(_rep_)
-#endif // CSPTR_H_INCLUDED
+#define carc_null {NULL, NULL}
+#define _cx_carc_rep struct _cx_memb(_rep_)
+#endif // CARC_H_INCLUDED
 
 #ifndef _i_prefix
-#define _i_prefix csptr_
+#define _i_prefix carc_
 #endif
 #define _i_has_internal_clone
 #include "template.h"
@@ -86,9 +86,9 @@ typedef i_valraw _cx_raw;
   #define _i_atomic_dec_and_test(v) !(--*(v))
 #endif
 #if !c_option(c_is_fwd)
-_cx_deftypes(_c_csptr_types, _cx_self, i_val);
+_cx_deftypes(_c_carc_types, _cx_self, i_val);
 #endif
-_cx_csptr_rep { long counter; i_val value; };
+_cx_carc_rep { long counter; i_val value; };
 
 STC_INLINE _cx_self
 _cx_memb(_init)(void) { return c_make(_cx_self){NULL, NULL}; }
@@ -105,7 +105,7 @@ _cx_memb(_from_ptr)(_cx_value* p) {
 
 STC_INLINE _cx_self
 _cx_memb(_from)(i_val val) {
-    _cx_self ptr; _cx_csptr_rep *rep = c_alloc(_cx_csptr_rep);
+    _cx_self ptr; _cx_carc_rep *rep = c_alloc(_cx_carc_rep);
     *(ptr.use_count = &rep->counter) = 1;
     *(ptr.get = &rep->value) = val;
     return ptr;
@@ -126,7 +126,7 @@ STC_INLINE void
 _cx_memb(_drop)(_cx_self* self) {
     if (self->use_count && _i_atomic_dec_and_test(self->use_count)) {
         i_valdrop(self->get);
-        if (self->get != &((_cx_csptr_rep *)self->use_count)->value)
+        if (self->get != &((_cx_carc_rep *)self->use_count)->value)
             c_free(self->get);
         c_free(self->use_count);
     }

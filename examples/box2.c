@@ -26,8 +26,8 @@ struct {
 #include <stc/cbox.h> // cbox_Rectangle
 
 // Box in box:
-#define i_val_bind cbox_Point  // NB: adviced to use i_val_arc when value is a cbox or csptr!
-                                // it will auto-set i_drop, i_from, i_cmp for you.
+#define i_val_sptr cbox_Point  // NB: adviced to use i_val_sptr when value is a cbox or carc!
+                               // it will auto-set i_drop, i_from, i_cmp for you.
 #define i_opt c_no_cmp
 #define i_tag BoxPoint
 #include <stc/cbox.h> // cbox_BoxPoint
@@ -62,10 +62,10 @@ int main(void) {
         });
 
         // The output of functions can be boxed
-        boxed_point = cbox_Point_new(origin());
+        boxed_point = cbox_Point_from(origin());
 
         // Double indirection
-        box_in_a_box = cbox_BoxPoint_new(boxed_origin());
+        box_in_a_box = cbox_BoxPoint_from(boxed_origin());
 
         printf("Point occupies %zu bytes on the stack\n",
                 sizeof(point));

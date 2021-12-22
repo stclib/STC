@@ -1,4 +1,4 @@
-# STC [cbox](../include/stc/cbox.h): (Boxed) Heap Allocated Objects
+# STC [cbox](../include/stc/cbox.h): Smart Pointer (Boxed object)
 
 **cbox** is a A box is a smart pointer to a heap allocated value of type X. A **cbox** can
 be empty. The *cbox_X_cmp()*, *cbox_X_drop()* methods are defined based on the `i_cmp`
@@ -21,7 +21,7 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_val           // value: REQUIRED
 #define i_cmp           // three-way compare two i_val* : REQUIRED IF i_val is a non-integral type
 #define i_drop          // destroy value func - defaults to empty destruct
-#define i_from         // create from raw/clone func - REQUIRED if i_drop is defined,
+#define i_from          // create from raw/clone func - REQUIRED if i_drop is defined,
                         // unless 'i_opt c_no_clone' is defined.
 #define i_tag           // type name tag, defaults to i_val
 #include <stc/cbox.h>    
@@ -76,7 +76,7 @@ void int_drop(int* x) {
 // both for the cbox type and the container of cbox elements. It will also 
 // disable emplace container functions.
 //
-// This applies to all container types, except those with csptr elements, as they
+// This applies to all container types, except those with carc elements, as they
 // define cloning internally.
 
 #define i_val int
@@ -84,11 +84,11 @@ void int_drop(int* x) {
 #define i_from c_default_clone
 #include <stc/cbox.h>         // cbox_int
 
-#define i_key_bind cbox_int   // note: use i_key_bind instead of i_key
+#define i_key_sptr cbox_int   // note: use i_key_sptr instead of i_key
 #define i_tag int             // tag otherwise defaults to 'ref'
 #include <stc/csset.h>        // csset_int (like: std::set<std::unique_ptr<int>>)
 
-#define i_val_bind cbox_int   // note: use i_val_bind instead of i_val
+#define i_val_sptr cbox_int   // note: use i_val_sptr instead of i_val
 #define i_tag int             // tag otherwise defaults to 'ref'
 #include <stc/cvec.h>         // cvec_int (like: std::vector<std::unique_ptr<int>>)
 

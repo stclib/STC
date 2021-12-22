@@ -21,10 +21,10 @@ void Song_drop(Song* s) {
 #define i_val Song
 #define i_drop Song_drop
 #define i_opt c_no_cmp
-#include <stc/csptr.h>
+#include <stc/carc.h>
 
 #define i_type SongVec
-#define i_val_ref SongPtr
+#define i_val_sptr SongPtr
 #include <stc/cvec.h>
 
 void example3()

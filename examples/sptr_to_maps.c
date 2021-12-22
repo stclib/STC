@@ -12,14 +12,14 @@
 // no need for atomic ref. count in single thread:
 // no compare function available for csmap:
 #define i_opt c_no_atomic|c_no_cmp
-#include <stc/csptr.h>
+#include <stc/carc.h>
 
 #define i_type Stack
-#define i_val_ref Arc // define i_val_bind for csptr/cbox value (not i_val)
+#define i_val_sptr Arc // define i_val_bind for carc/cbox value (not i_val)
 #include <stc/cstack.h>
 
 #define i_type List
-#define i_val_ref Arc // as above
+#define i_val_sptr Arc // as above
 #include <stc/clist.h>
 
 int main()
@@ -44,7 +44,7 @@ int main()
             {"Steve", 1979}, {"Rick", 1974}, {"Tracy", 2003}
         });
         
-        // Share two Maps from the stack with the list using emplace (clone the csptr):
+        // Share two Maps from the stack with the list using emplace (clone the carc):
         List_push_back(&list, Arc_clone(stack.data[0]));
         List_push_back(&list, Arc_clone(stack.data[1]));
         

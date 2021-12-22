@@ -199,7 +199,7 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
     for (size_t index = 0; index < _n; ++index) \
         { const T v = _c_arr[index]; method; } \
 } while (0)
-#define c_apply_it(v, method, C, ...) do { \
+#define c_apply_cnt(v, method, C, ...) do { \
     size_t index = 0; \
     c_foreach (_it, C, __VA_ARGS__) \
         { const C##_value v = *_it.ref; method; ++index; } \

@@ -14,29 +14,29 @@ void Person_drop(Person* p) {
 #define i_drop Person_drop
 #define i_opt c_no_cmp
 #define i_tag person
-#include <stc/csptr.h>
+#include <stc/carc.h>
 
 // ...
 
 #define i_val int
 #define i_drop(x) printf("drop: %d\n", *(x))
-#include <stc/csptr.h>
+#include <stc/carc.h>
 
-#define i_val_bind csptr_int
+#define i_val_bind carc_int
 #define i_tag iptr
 #include <stc/cstack.h>
 
 int main(void) {
-    c_autovar (csptr_person p = csptr_person_from(Person_new("John", "Smiths")), csptr_person_drop(&p))
-    c_autovar (csptr_person q = csptr_person_clone(p), csptr_person_drop(&q)) // share the pointer
+    c_autovar (carc_person p = carc_person_from(Person_new("John", "Smiths")), carc_person_drop(&p))
+    c_autovar (carc_person q = carc_person_clone(p), carc_person_drop(&q)) // share the pointer
     {
         printf("%s %s. uses: %lu\n", q.get->name.str, q.get->last.str, *q.use_count);
     }
 
     c_auto (cstack_iptr, stk) {
-        cstack_iptr_push(&stk, csptr_int_from(10));
-        cstack_iptr_push(&stk, csptr_int_from(20));
-        cstack_iptr_push(&stk, csptr_int_from(30));
+        cstack_iptr_push(&stk, carc_int_from(10));
+        cstack_iptr_push(&stk, carc_int_from(20));
+        cstack_iptr_push(&stk, carc_int_from(30));
         cstack_iptr_emplace(&stk, *cstack_iptr_top(&stk));
         cstack_iptr_emplace(&stk, *cstack_iptr_begin(&stk).ref);
 

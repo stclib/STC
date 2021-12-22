@@ -5,19 +5,20 @@ STC - Smart Template Containers for C
 
 News
 ----
-### Version 3.0 released
-There are new general `i_key_bind` / `i_val_bind` template parameters which auto-binds a set of functions
-to the type specified, and can be used in place of `i_key` / `i_val`. Use the `_bind` variant for elements
+### Version 3 released
+A lot of enhancements, additions and bugfixes. There are also a number of breaking changes (mostly renamings),
+see migrate guide below. 
+
+Added are new general `i_key_bind`/`i_val_bind` template parameters which auto-binds a set of functions
+to the type specified, and may be used in place of `i_key`/`i_val`. Use the `_bind` variant for elements
 of Type which have following functions defined: *Type_cmp*, *Type_clone*, *Type_drop*, *Type_hash*,
 and *Type_eq*. Only the functions required by the particular container needs to be defined. e.g. **cmap**
-and **cset** are the only types that requires *Type_hash* and *Type_eq* to be defined.
-You may override these by defining `i_cmp`, `i_drop`, etc. Template parameters with `i_val` / `i_key` may
-still be defined as before, which is often easier for simple element types.
+and **cset** are the only types that require *Type_hash* and *Type_eq* to be defined.
 
-Migration guide from version 2 to 3. Replace (regular expresion) in VS Code:
+### Migration guide from version 2 to 3.
+Replace (regular expression) in VS Code:
 - `_del\b` → `_drop`
 - `_compare\b` → `_cmp`
-- `csptr` → `cref`
 - `_rawvalue\b` → `_raw`
 - `_equ\b` → `_eq`
 
@@ -26,24 +27,25 @@ Replace (whole word + match case):
 - `i_valdel` → `i_valdrop`
 - `i_cnt` → `i_type`
 - `cstr_lit` → `cstr_new`
-- `csptr_X_make` → `csptr_X_new`
+- `csptr_X_make` → `carc_X_from`
 - `i_key_csptr` → `i_key_sptr`
 - `i_val_csptr` → `i_val_sptr`
 - `c_apply` → `c_apply_OLD` // replaced by new `c_apply`
 - `c_apply_pair` → `c_apply_pair_OLD` // replaced by new `c_apply`
 
-### Final version 2.1
+Non-regex, global match case replace:
+- `csptr` → `carc`
+
+### Brief summary of changes
 - Strings: Renamed constructor *cstr_lit()* to `cstr_new(lit)`. Renamed *cstr_assign_fmt()* to `cstr_printf()`.
-- Added [**cbox**](docs/cbox_api.md) type: container of one element, similar to [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr)
-- Added [example for **csptr**](examples/sptr_to_maps.c).
+- Added [**cbox**](docs/cbox_api.md) type: smart pointer, similar to [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr). Also renamed `csptr` to `carc` (atomic reference counted) smart pointer.
+- Added [example for **carc**](examples/sptr_to_maps.c).
 - Added [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding".
-- Renamed: *csptr_X_make()* to *csptr_X_new()*. Corresponding **cbox** method is *cbox_X_new()*.
+- Renamed: *csptr_X_make()* to *carc_X_from()*. Corresponding **cbox** method is *cbox_X_from()*.
 - Renamed: *c_default_fromraw(raw)* to *c_default_clone(raw)*.
-- Renamed: `i_key_csptr` / `i_val_csptr`. Use `i_key_sptr` / `i_val_sptr` for **csptr** and **cbox**.
+- Renamed: `i_key_csptr`/`i_val_csptr` to `i_key_sptr`/`i_val_sptr` for both **carc** and **cbox** values in containers.
 - Renamed: `i_cnt` to `i_type` for defining the complete container type name.
 - Added `i_opt` template parameter: compile-time options: `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`; may be combined with `|`
-
-### Version 2.0. Two main breaking changes from V1.X.
 - Uses a different way to instantiate templated containers, which is incompatible with v1.X.
 
 Introduction
@@ -67,7 +69,7 @@ which by the compiler is seen as different code because of macro name substituti
 - [***clist*** - **std::forward_list** alike type](docs/clist_api.md)
 - [***cmap*** - **std::unordered_map** alike type](docs/cmap_api.md)
 - [***cpque*** - **std::priority_queue** alike type](docs/cpque_api.md)
-- [***csptr*** - **std::shared_ptr** alike support](docs/csptr_api.md)
+- [***carc*** - **std::shared_ptr** alike support](docs/carc_api.md)
 - [***cqueue*** - **std::queue** alike type](docs/cqueue_api.md)
 - [***cset*** - **std::unordered_set** alike type](docs/cset_api.md)
 - [***csmap*** - **std::map** sorted map alike type](docs/csmap_api.md)
@@ -87,7 +89,7 @@ Highlights
 - **User friendly** - Just include the headers and you are good. The API and functionality is very close to c++ STL, and is fully listed in the docs. 
 - **Templates** - Use `#define i_{arg}` to specify container template arguments. There are templates for element-*type*, -*comparison*, -*destruction*, -*cloning*, -*conversion types*, and more.
 - **Unparalleled performance** - Some containers are much faster than the c++ STL containers, the rest are about equal in speed.
-- **Fully memory managed** - All containers will destruct keys/values via destructor defined as macro parameters before including the container header. Also, shared pointers are supported and can be stored in containers, see ***csptr***.
+- **Fully memory managed** - All containers will destruct keys/values via destructor defined as macro parameters before including the container header. Also, shared pointers are supported and can be stored in containers, see ***carc***.
 - **Fully type safe** - Because of templating, it avoids error-prone casting of container types and elements back and forth from the containers.
 - **Uniform, easy-to-learn API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have uniform and intuitive usage across the various containers.
 - **Small footprint** - Small source code and generated executables. The executable from the example below with six different containers is *22 kb in size* compiled with gcc -Os on linux.
@@ -114,19 +116,30 @@ The usage of the containers is similar to the c++ standard containers in STL, so
 are familiar with them. All containers are generic/templated, except for **cstr** and **cbits**.
 No casting is used, so containers are type-safe like templates in c++. A basic usage example:
 ```c
-#define i_val float
-#include <stc/cvec.h>
+#define i_type FVec    // if not defined, vector type would be cvec_float
+#define i_val float    // element type
+#include <stc/cvec.h>  // defines the FVec type
 
 int main(void) {
-    cvec_float vec = cvec_float_init();
-    cvec_float_push_back(&vec, 10.f);
-    cvec_float_push_back(&vec, 20.f);
-    cvec_float_push_back(&vec, 30.f);
+    FVec vec = FVec_init();
+    FVec_push_back(&vec, 10.f);
+    FVec_push_back(&vec, 20.f);
+    FVec_push_back(&vec, 30.f);
 
-    c_foreach (i, cvec_float, vec)
-        printf(" %g", *i.ref);
+    for (size_t i = 0; i < FVec_size(vec); ++i)
+        printf(" %g", vec.data[i]);
+    FVec_drop(&vec); // free memory
+}
+```
+However, a "better" way to write the same is:
+```c
+int main(void) {
+    c_auto (FVec, vec) {  // RAII
+        c_apply(v, FVec_push_back(&vec, v), float, {10.f, 20.f, 30.f});
 
-    cvec_float_drop(&vec);
+        c_foreach (i, FVec, vec) // generic iteration and element access
+            printf(" %g", *i.ref);
+    }
 }
 ```
 In order to include two **cvec**s with different element types, include cvec.h twice. For struct, a `i_cmp`
@@ -195,7 +208,7 @@ int main(void) {
     {
         // add some elements to each container
         c_apply(v, cset_int_insert(&set, v), int, {10, 20, 30});
-        c_apply(v, cvec_pnt_push_back(&vec, v), int, { {10, 1}, {20, 2}, {30, 3} });
+        c_apply(v, cvec_pnt_push_back(&vec, v), cvec_pnt_raw, { {10, 1}, {20, 2}, {30, 3} });
         c_apply(v, cdeq_int_push_back(&deq, v), int, {10, 20, 30});
         c_apply(v, clist_int_push_back(&lst, v), int, {10, 20, 30});
         c_apply(v, cstack_int_push(&stk, v), int, {10, 20, 30});
@@ -440,4 +453,4 @@ Memory efficiency
 - **cmap**: Type size: 4 pointers. *cmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.6x when reaching that.
 - **csmap**: Type size: 1 pointer. *csmap* manages its own array of tree-nodes for allocation efficiency. Each node uses only two 32-bit ints for child nodes, and one byte for `level`.
 - **carr2**, **carr3**: Type size: 1 pointer plus dimension variables. Arrays are allocated as one contiguous block of heap memory, and one allocation for pointers of indices to the array.
-- **csptr**: Type size: 2 pointers, one for the data and one for the reference counter.
+- **carc**: Type size: 2 pointers, one for the data and one for the reference counter.

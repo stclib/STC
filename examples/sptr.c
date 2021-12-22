@@ -25,10 +25,10 @@ void Person_drop(Person* p) {
 
 #define i_type PSPtr
 #define i_val_bind Person // binds Person_cmp, ...
-#include <stc/csptr.h>
+#include <stc/carc.h>
 
 #define i_type Persons
-#define i_val_ref PSPtr // binds PSPtr_cmp, ...
+#define i_val_sptr PSPtr // binds PSPtr_cmp, ...
 #include <stc/cvec.h>
 
 

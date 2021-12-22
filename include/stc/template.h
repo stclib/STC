@@ -61,9 +61,9 @@
   #ifndef i_tag
     #define i_tag str
   #endif
-#elif defined i_key_ref
-  #define i_key_bind i_key_ref
-  #define i_keyraw c_PASTE(i_key_ref, _value)
+#elif defined i_key_sptr
+  #define i_key_bind i_key_sptr
+  #define i_keyraw c_PASTE(i_key_sptr, _value)
 #endif
 
 #ifdef i_key_bind
@@ -120,9 +120,9 @@
   #if !defined i_tag && !defined i_key
     #define i_tag str
   #endif
-#elif defined i_val_ref
-  #define i_val_bind i_val_ref
-  #define i_valraw c_PASTE(i_val_ref, _value)
+#elif defined i_val_sptr
+  #define i_val_bind i_val_sptr
+  #define i_valraw c_PASTE(i_val_sptr, _value)
 #endif
 
 #ifdef i_val_bind
@@ -219,7 +219,7 @@
 
 #undef i_val
 #undef i_val_str
-#undef i_val_ref
+#undef i_val_sptr
 #undef i_val_bind
 #undef i_valraw
 #undef i_valfrom
@@ -228,7 +228,7 @@
 
 #undef i_key
 #undef i_key_str
-#undef i_key_ref
+#undef i_key_sptr
 #undef i_key_bind
 #undef i_keyraw
 #undef i_keyfrom

@@ -5,14 +5,14 @@ void show_drop(int* x) { printf("drop: %d\n", *x); }
 #define i_type Arc
 #define i_val int
 #define i_drop show_drop
-// csptr/cbox will use pointer address comparison of i_val
+// carc/cbox will use pointer address comparison of i_val
 // if 'i_opt c_no_cmp' is defined, otherwise i_cmp is used
-// to compare object values. See the twodifferences by
+// to compare object values. See the two differences by
 // commenting out the next line.
-#include <stc/csptr.h>       // Shared pointer to int
+#include <stc/carc.h>       // Shared pointer to int
 
 #define i_type Vec
-#define i_val_ref Arc
+#define i_val_sptr Arc
 #include <stc/cvec.h>        // Vec: cvec<Arc>
 
 
