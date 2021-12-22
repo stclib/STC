@@ -8,11 +8,12 @@
 
 #define i_key int
 #define i_val int
-#include <stc/cmap.h>
+#include <stc/csmap.h>
 
 int main() {
     {
-        std::map<std::string, int> food = {{"burger", 5}, {"pizza", 12}, {"steak", 15}};
+        std::map<std::string, int> food = 
+            {{"burger", 5}, {"pizza", 12}, {"steak", 15}};
         for (auto i: food)
             std::cout << i.first << ", " << i.second << std::endl;
         std::cout << std::endl;
@@ -35,12 +36,12 @@ int main() {
             std::cout << i.first << ", " << i.second << std::endl;
         std::cout << std::endl;
     }
-    c_auto (cmap_int, hist)
+    c_auto (csmap_int, hist)
     {
-        ++ cmap_int_emplace(&hist, 12, 100).ref->second;
-        ++ cmap_int_emplace(&hist, 13, 100).ref->second;
-        ++ cmap_int_emplace(&hist, 12, 100).ref->second;
-        c_foreach (i, cmap_int, hist)
+        ++ csmap_int_emplace(&hist, 12, 100).ref->second;
+        ++ csmap_int_emplace(&hist, 13, 100).ref->second;
+        ++ csmap_int_emplace(&hist, 12, 100).ref->second;
+        c_foreach (i, csmap_int, hist)
             printf("%d, %d\n", i.ref->first, i.ref->second);
         puts("");
     }
