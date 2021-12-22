@@ -72,7 +72,7 @@ int main() {
 #define _i_prefix cbox_
 #endif
 #include "template.h"
-typedef i_valraw _cx_rawvalue;
+typedef i_valraw _cx_raw;
 
 #if !c_option(c_is_fwd)
 _cx_deftypes(_c_cbox_types, _cx_self, i_val);

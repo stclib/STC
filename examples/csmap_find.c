@@ -7,12 +7,12 @@
 #define i_tag istr
 #include <stc/csmap.h>
 
-#define i_val csmap_istr_rawvalue
+#define i_val csmap_istr_raw
 #define i_opt c_no_cmp
 #define i_tag istr
 #include <stc/cvec.h>
 
-void print_elem(csmap_istr_rawvalue p) {
+void print_elem(csmap_istr_raw p) {
     printf("(%d, %s) ", p.first, p.second);
 }
 
@@ -45,7 +45,7 @@ int main()
     c_auto (csmap_istr, m1)
     c_auto (cvec_istr, v)
     {
-        c_apply(v, csmap_istr_emplace(&m1, c_pair(v)), csmap_istr_rawvalue, 
+        c_apply(v, csmap_istr_emplace(&m1, c_pair(v)), csmap_istr_raw, 
             {{40, "Zr"}, {45, "Rh"}});
         puts("The starting map m1 is (key, value):");
         print_collection_csmap_istr(m1);

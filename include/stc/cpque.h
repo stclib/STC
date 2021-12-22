@@ -36,7 +36,7 @@
 #if !c_option(c_is_fwd)
    _cx_deftypes(_c_cpque_types, _cx_self, i_val);
 #endif
-typedef i_valraw _cx_rawvalue;
+typedef i_valraw _cx_raw;
 
 STC_API void _cx_memb(_make_heap)(_cx_self* self);
 STC_API void _cx_memb(_erase_at)(_cx_self* self, size_t idx);

@@ -65,7 +65,7 @@ cset_X_value        cset_X_value_clone(cset_X_value val);
 |:-------------------|:-------------------------------------------------|:----------------------------|
 | `cset_X`           | `struct { ... }`                                 | The cset type               |
 | `cset_X_rawkey`    | `i_keyraw`                                       | The raw key type            |
-| `cset_X_rawvalue`  | `i_keyraw`                                       | The raw value type          |
+| `cset_X_raw`       | `i_keyraw`                                       | The raw value type          |
 | `cset_X_key`       | `i_key`                                          | The key type                |
 | `cset_X_value`     | `i_key`                                          | The value                   |
 | `cset_X_result`    | `struct { cset_X_value* ref; bool inserted; }`   | Result of insert/emplace    |

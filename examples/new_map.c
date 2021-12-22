@@ -48,14 +48,14 @@ int main()
     {
         cmap_int_insert(&map, 123, 321);
 
-        c_apply(v, cmap_pnt_insert(&pmap, c_pair(v)), cmap_pnt_rawvalue, {
+        c_apply(v, cmap_pnt_insert(&pmap, c_pair(v)), cmap_pnt_raw, {
             {{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}
         });
         c_foreach (i, cmap_pnt, pmap)
             printf(" (%d, %d: %d)", i.ref->first.x, i.ref->first.y, i.ref->second);
         puts("");
 
-        c_apply(v, cmap_str_emplace(&smap, c_pair(v)), cmap_str_rawvalue, {
+        c_apply(v, cmap_str_emplace(&smap, c_pair(v)), cmap_str_raw, {
             {"Hello, friend", "long time no see"},
             {"So long, friend", "see you around"},
         });

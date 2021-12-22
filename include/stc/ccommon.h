@@ -208,14 +208,14 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
 
 // [deprecated]
 #define c_apply_OLD(C, method, cx, ...) do { \
-    const C##_rawvalue _c_arr[] = __VA_ARGS__; \
+    const C##_raw _c_arr[] = __VA_ARGS__; \
     C* _c_cx = cx; \
     for (size_t _c_i = 0; _c_i < c_arraylen(_c_arr); ++_c_i) \
         C##_##method(_c_cx, _c_arr[_c_i]); \
 } while (0)
 // [deprecated]
 #define c_apply_pair_OLD(C, method, cx, ...) do { \
-    const C##_rawvalue _c_arr[] = __VA_ARGS__; \
+    const C##_raw _c_arr[] = __VA_ARGS__; \
     C* _c_cx = cx; \
     for (size_t _c_i = 0; _c_i < c_arraylen(_c_arr); ++_c_i) \
         C##_##method(_c_cx, _c_arr[_c_i].first, _c_arr[_c_i].second); \

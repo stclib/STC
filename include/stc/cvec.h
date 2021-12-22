@@ -76,7 +76,7 @@ struct cvec_rep { size_t size, cap; void* data[]; };
 #if !c_option(c_is_fwd)
    _cx_deftypes(_c_cvec_types, _cx_self, i_val);
 #endif
-typedef i_valraw _cx_rawvalue;
+typedef i_valraw _cx_raw;
 
 STC_API _cx_self        _cx_memb(_init)(void);
 STC_API void            _cx_memb(_drop)(_cx_self* self);
@@ -98,7 +98,7 @@ STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_API _cx_iter        _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
                                                  const _cx_value* p1, const _cx_value* p2);
 STC_API _cx_iter        _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos,
-                                                   const _cx_rawvalue* p1, const _cx_rawvalue* p2);
+                                                   const _cx_raw* p1, const _cx_raw* p2);
 STC_INLINE i_val        _cx_memb(_value_clone)(_cx_value val)
                             { return i_valfrom(i_valto(&val)); }
 STC_INLINE i_val        _cx_memb(_value_fromraw)(i_valraw raw) { return i_valfrom(raw); }
@@ -112,7 +112,7 @@ _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
 }
 STC_INLINE _cx_iter
-_cx_memb(_emplace_n)(_cx_self* self, const size_t idx, const _cx_rawvalue arr[], const size_t n) {
+_cx_memb(_emplace_n)(_cx_self* self, const size_t idx, const _cx_raw arr[], const size_t n) {
     return _cx_memb(_emplace_range_p)(self, self->data + idx, arr, arr + n);
 }
 STC_INLINE _cx_iter
@@ -350,7 +350,7 @@ _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
 
 STC_DEF _cx_iter
 _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos,
-                           const _cx_rawvalue* p1, const _cx_rawvalue* p2) {
+                           const _cx_raw* p1, const _cx_raw* p2) {
     pos = _cx_memb(_insert_space_)(self, pos, p2 - p1);
     _cx_iter it = {pos};
     for (; p1 != p2; ++p1) *pos++ = i_valfrom(*p1);

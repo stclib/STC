@@ -31,7 +31,7 @@
   #define _cx_value _cx_memb(_value)
   #define _cx_key _cx_memb(_key)
   #define _cx_mapped _cx_memb(_mapped)
-  #define _cx_rawvalue _cx_memb(_rawvalue)
+  #define _cx_raw _cx_memb(_raw)
   #define _cx_rawkey _cx_memb(_rawkey)
   #define _cx_rawmapped _cx_memb(_rawmapped)
   #define _cx_iter _cx_memb(_iter)

@@ -67,7 +67,7 @@ int main(void)
     // CMAP CNT
 
     c_auto (cmap_cnt, countries) {
-        c_apply(v, cmap_cnt_emplace(&countries, c_pair(v)), cmap_cnt_rawvalue, {
+        c_apply(v, cmap_cnt_emplace(&countries, c_pair(v)), cmap_cnt_raw, {
             {"Norway", 100},
             {"Denmark", 50},
             {"Iceland", 10},

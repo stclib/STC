@@ -78,7 +78,7 @@ cdeq_X_iter         cdeq_X_begin(const cdeq_X* self);
 cdeq_X_iter         cdeq_X_end(const cdeq_X* self);
 void                cdeq_X_next(cdeq_X_iter* it);
 
-cdeq_X_rawvalue     cdeq_X_value_toraw(cdeq_X_value* pval);
+cdeq_X_raw          cdeq_X_value_toraw(cdeq_X_value* pval);
 cdeq_X_value        cdeq_X_value_clone(cdeq_X_value val);
 ```
 
@@ -88,7 +88,7 @@ cdeq_X_value        cdeq_X_value_clone(cdeq_X_value val);
 |:-------------------|:------------------------------------|:-----------------------|
 | `cdeq_X`           | `struct { cdeq_X_value* data; }`  | The cdeq type          |
 | `cdeq_X_value`     | `i_val`                             | The cdeq value type    |
-| `cdeq_X_rawvalue`  | `i_valraw`                          | The raw value type     |
+| `cdeq_X_raw`       | `i_valraw`                          | The raw value type     |
 | `cdeq_X_iter`      | `struct { cdeq_X_value* ref; }`   | The iterator type      |
 
 ## Examples

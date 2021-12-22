@@ -101,17 +101,17 @@ int main()
         // POPULATE the stack with shared pointers to Map:
         Map *map;
         map = Stack_push(&stack, Arc_new(Map_init()))->get;
-        c_apply(v, Map_emplace(map, c_pair(v)), Map_rawvalue, {
+        c_apply(v, Map_emplace(map, c_pair(v)), Map_raw, {
             {"Joey", 1990}, {"Mary", 1995}, {"Joanna", 1992}
         });
         map = Stack_push(&stack, Arc_new(Map_init()))->get;
-        c_apply(v, Map_emplace(map, c_pair(v)), Map_rawvalue, {
+        c_apply(v, Map_emplace(map, c_pair(v)), Map_raw, {
             {"Rosanna", 2001}, {"Brad", 1999}, {"Jack", 1980}
         });
 
         // POPULATE the list:
         map = List_push_back(&list, Arc_new(Map_init()))->get;
-        c_apply(v, Map_emplace(map, c_pair(v)), Map_rawvalue, {
+        c_apply(v, Map_emplace(map, c_pair(v)), Map_raw, {
             {"Steve", 1979}, {"Rick", 1974}, {"Tracy", 2003}
         });
         

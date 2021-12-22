@@ -76,7 +76,7 @@ int main() {
 #endif
 #define _i_has_internal_clone
 #include "template.h"
-typedef i_valraw _cx_rawvalue;
+typedef i_valraw _cx_raw;
 
 #if !c_option(c_no_atomic)
   #define _i_atomic_inc(v)          c_atomic_inc(v)

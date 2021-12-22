@@ -87,7 +87,7 @@ _c_clist_complete_types(clist_VOID, dummy);
   _cx_deftypes(_c_clist_types, _cx_self, i_val);
 #endif
 _cx_deftypes(_c_clist_complete_types, _cx_self, dummy);
-typedef i_valraw _cx_rawvalue;
+typedef i_valraw _cx_raw;
 
 STC_API size_t _clist_count(const clist_VOID* self);
 

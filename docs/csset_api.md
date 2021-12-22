@@ -60,7 +60,7 @@ csset_X_value        csset_X_value_clone(csset_X_value val);
 |:-------------------|:--------------------------------------------------|:----------------------------|
 | `csset_X`          | `struct { ... }`                                  | The csset type              |
 | `csset_X_rawkey`   | `i_keyraw`                                        | The raw key type            |
-| `csset_X_rawvalue` | `i_keyraw`                                        | The raw key type            |
+| `csset_X_raw`      | `i_keyraw`                                        | The raw key type            |
 | `csset_X_key`      | `i_key`                                           | The key type                |
 | `csset_X_value`    | `i_key        `                                   | The value: key is immutable |
 | `csset_X_result`   | `struct { csset_X_value* ref; bool inserted; }`   | Result of insert/emplace    |

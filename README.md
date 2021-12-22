@@ -37,10 +37,10 @@ Replace (whole word + match case):
 - Added [**cbox**](docs/cbox_api.md) type: container of one element, similar to [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr)
 - Added [example for **csptr**](examples/sptr_to_maps.c).
 - Added [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding".
-- Deprecated *csptr_X_make()*. Renamed to *csptr_X_new()*. Corresponding **cbox** method is *cbox_X_new()*.
-- Deprecated *c_default_fromraw(raw)*. Renamed to *c_default_clone(raw)*.
-- Deprecated `i_key_csptr` / `i_val_csptr`. Use `i_key_bind` / `i_val_bind` for types that has required functions defined.
-- Deprecated `i_cnt`. Use `i_type` instead to define the complete container type name.
+- Renamed: *csptr_X_make()* to *csptr_X_new()*. Corresponding **cbox** method is *cbox_X_new()*.
+- Renamed: *c_default_fromraw(raw)* to *c_default_clone(raw)*.
+- Renamed: `i_key_csptr` / `i_val_csptr`. Use `i_key_sptr` / `i_val_sptr` for **csptr** and **cbox**.
+- Renamed: `i_cnt` to `i_type` for defining the complete container type name.
 - Added `i_opt` template parameter: compile-time options: `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`; may be combined with `|`
 
 ### Version 2.0. Two main breaking changes from V1.X.
@@ -200,7 +200,7 @@ int main(void) {
         c_apply(v, clist_int_push_back(&lst, v), int, {10, 20, 30});
         c_apply(v, cstack_int_push(&stk, v), int, {10, 20, 30});
         c_apply(v, csmap_int_insert(&map, c_pair(v)), 
-            csmap_int_rawvalue, { {20, 2}, {10, 1}, {30, 3} });
+            csmap_int_raw, { {20, 2}, {10, 1}, {30, 3} });
 
         // add one more element to each container
         cset_int_insert(&set, 40);

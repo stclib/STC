@@ -49,7 +49,7 @@ static inline RViking Viking_toraw(const Viking* vk) {
 int main()
 {
     c_auto (Vikings, vikings) {
-        c_apply(v, Vikings_emplace(&vikings, c_pair(v)), Vikings_rawvalue, {
+        c_apply(v, Vikings_emplace(&vikings, c_pair(v)), Vikings_raw, {
             {{"Einar", "Norway"}, 20},
             {{"Olaf", "Denmark"}, 24},
             {{"Harald", "Iceland"}, 12},

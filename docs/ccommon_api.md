@@ -137,7 +137,7 @@ c_forrange (i, int, 30, 0, -5) printf(" %d", i);
 // apply multiple push_backs
 c_apply(v, cvec_i_push_back(&vec, v), int, {1, 2, 3});
 // inserts to existing map
-c_apply(v, cmap_i_insert(&map, c_pair(v)), cmap_i_rawvalue, { {4, 5}, {6, 7} });
+c_apply(v, cmap_i_insert(&map, c_pair(v)), cmap_i_raw, { {4, 5}, {6, 7} });
 
 int arr[] = {1, 2, 3};
 c_apply_arr(v, cvec_i_push_back(&vec, v), int, arr, c_arraylen(arr));

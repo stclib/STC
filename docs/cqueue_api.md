@@ -52,7 +52,7 @@ i_val               cqueue_X_value_clone(i_val value);
 |:--------------------|:---------------------|:-------------------------|
 | `cqueue_X`          | `cdeq_X`             | The cqueue type          |
 | `cqueue_X_value`    | `i_val`              | The cqueue element type  |
-| `cqueue_X_rawvalue` | `i_valraw`           | cqueue raw value type    |
+| `cqueue_X_raw`      | `i_valraw`           | cqueue raw value type    |
 | `cqueue_X_iter`     | `cdeq_X_iter`        | cqueue iterator          |
 
 ## Examples

@@ -36,7 +36,7 @@
 #if !c_option(c_is_fwd)
 _cx_deftypes(_c_cstack_types, _cx_self, i_val);
 #endif
-typedef i_valraw _cx_rawvalue;
+typedef i_valraw _cx_raw;
 
 STC_INLINE _cx_self _cx_memb(_init)(void)
     { return c_make(_cx_self){0, 0, 0}; }
@@ -96,7 +96,7 @@ STC_INLINE const _cx_value* _cx_memb(_at)(const _cx_self* self, size_t idx)
 
 #if !c_option(c_no_clone)
 
-STC_INLINE _cx_value* _cx_memb(_emplace)(_cx_self* self, _cx_rawvalue raw)
+STC_INLINE _cx_value* _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
     { return _cx_memb(_push)(self, i_valfrom(raw)); }
 
 STC_INLINE _cx_self _cx_memb(_clone)(_cx_self v) {

@@ -64,13 +64,13 @@ STC_API size_t _clist_count(const clist_VOID* self);
 #define _c_using_clist(_cx_self, i_val, i_cmp, i_valdrop, i_valfrom, i_valto, i_valraw, defTypes) \
 \
     defTypes( _c_clist_types(_cx_self, i_val); ) \
-    typedef i_valraw _cx_rawvalue; \
+    typedef i_valraw _cx_raw; \
 \
     STC_API _cx_self          _cx_memb(_clone)(_cx_self lst); \
     STC_API void        _cx_memb(_drop)(_cx_self* self); \
     STC_API void        _cx_memb(_push_back)(_cx_self* self, i_val value); \
     STC_API void        _cx_memb(_push_front)(_cx_self* self, i_val value); \
-    STC_API void        _cx_memb(_emplace_items)(_cx_self *self, const _cx_rawvalue arr[], size_t n); \
+    STC_API void        _cx_memb(_emplace_items)(_cx_self *self, const _cx_raw arr[], size_t n); \
     STC_API _cx_self          _cx_memb(_split_after)(_cx_self* self, _cx_iter pos1, _cx_iter pos2); \
     STC_API void        _cx_memb(_splice_after)(_cx_self* self, _cx_iter pos, _cx_self* other); \
     STC_DEF void        _cx_memb(_splice_after_range)(_cx_self* self, _cx_iter pos, _cx_self* other, _cx_iter i1, _cx_iter i2); \
@@ -176,7 +176,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
     } \
 \
     STC_DEF void \
-    _cx_memb(_emplace_items)(_cx_self *self, const _cx_rawvalue arr[], size_t n) { \
+    _cx_memb(_emplace_items)(_cx_self *self, const _cx_raw arr[], size_t n) { \
         for (size_t i=0; i<n; ++i) _cx_memb(_push_back)(self, i_valfrom(arr[i])); \
     } \
 \

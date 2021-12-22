@@ -74,7 +74,7 @@ int main(void) {
     typedef _i_SET_ONLY( _cx_rawkey ) \
             _i_MAP_ONLY( struct { _cx_rawkey first; \
                                    _cx_memb(_rawmapped) second; } ) \
-    _cx_rawvalue; \
+    _cx_raw; \
 \
     STC_API _cx_self               _cx_memb(_init)(void); \
     STC_API _cx_value*    _cx_memb(_find_it)(const _cx_self* self, i_keyraw rkey, _cx_iter* out); \
@@ -125,7 +125,7 @@ int main(void) {
     } \
 \
     STC_INLINE void \
-    _cx_memb(_emplace_items)(_cx_self* self, const _cx_rawvalue arr[], size_t n) { \
+    _cx_memb(_emplace_items)(_cx_self* self, const _cx_raw arr[], size_t n) { \
         for (size_t i=0; i<n; ++i) _i_SET_ONLY( _cx_memb(_emplace)(self, arr[i]); ) \
                                    _i_MAP_ONLY( _cx_memb(_emplace)(self, arr[i].first, arr[i].second); ) \
     } \

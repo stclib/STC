@@ -55,11 +55,11 @@ i_val               cstack_X_value_clone(i_val value);
 
 ## Types
 
-| Type name           | Type definition                        | Used to represent...        |
-|:--------------------|:---------------------------------------|:----------------------------|
+| Type name           | Type definition                      | Used to represent...        |
+|:--------------------|:-------------------------------------|:----------------------------|
 | `cstack_X`          | `struct { cstack_value *data; ... }` | The cstack type             |
-| `cstack_X_value`    | `i_val`                                | The cstack element type     |
-| `cstack_X_rawvalue` | `i_valraw`                             | cstack raw value type       |
+| `cstack_X_value`    | `i_val`                              | The cstack element type     |
+| `cstack_X_raw`      | `i_valraw`                           | cstack raw value type       |
 | `cstack_X_iter`     | `struct { cstack_value *ref; }`      | cstack iterator             |
 
 ## Example

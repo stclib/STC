@@ -73,7 +73,7 @@ void                  csmap_X_next(csmap_X_iter* iter);
 csmap_X_iter          csmap_X_advance(csmap_X_iter it, size_t n);
 
 csmap_X_value         csmap_X_value_clone(csmap_X_value val);
-csmap_X_rawvalue      csmap_X_value_toraw(csmap_X_value* pval);
+csmap_X_raw           csmap_X_value_toraw(csmap_X_value* pval);
 ```
 ## Types
 
@@ -82,7 +82,7 @@ csmap_X_rawvalue      csmap_X_value_toraw(csmap_X_value* pval);
 | `csmap_X`           | `struct { ... }`                                  | The csmap type               |
 | `csmap_X_rawkey`    | `i_keyraw`                                        | The raw key type             |
 | `csmap_X_rawmapped` | `i_valraw`                                        | The raw mapped type          |
-| `csmap_X_rawvalue`  | `struct { i_keyraw first; i_valraw second; }`     | i_keyraw+i_valraw type       |
+| `csmap_X_raw`       | `struct { i_keyraw first; i_valraw second; }`     | i_keyraw+i_valraw type       |
 | `csmap_X_key`       | `i_key`                                           | The key type                 |
 | `csmap_X_mapped`    | `i_val`                                           | The mapped type              |
 | `csmap_X_value`     | `struct { const i_key first; i_val second; }`     | The value: key is immutable  |
@@ -100,7 +100,7 @@ int main()
     // Create a sorted map of three strings (maps to string)
     c_auto (csmap_str, colors) // RAII
     {
-        c_apply(v, csmap_str_emplace(&colors, c_pair(v)), csmap_str_rawvalue, {
+        c_apply(v, csmap_str_emplace(&colors, c_pair(v)), csmap_str_raw, {
             {"RED", "#FF0000"},
             {"GREEN", "#00FF00"},
             {"BLUE", "#0000FF"}
@@ -146,7 +146,7 @@ int main()
     csmap_id idnames = csmap_id_init();
     c_autodefer (csmap_id_drop(&idnames)) 
     {
-        c_apply(v, csmap_id_emplace(&idnames, c_pair(v)), csmap_id_rawvalue, {
+        c_apply(v, csmap_id_emplace(&idnames, c_pair(v)), csmap_id_raw, {
             {100, "Red"},
             {110, "Blue"},
         });

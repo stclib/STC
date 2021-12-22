@@ -19,7 +19,7 @@ int main() {
     }
     c_auto (cmap_str, food)
     {
-        c_apply(v, cmap_str_emplace(&food, c_pair(v)), cmap_str_rawvalue,
+        c_apply(v, cmap_str_emplace(&food, c_pair(v)), cmap_str_raw,
             {{"burger", 5}, {"pizza", 12}, {"steak", 15}});
         c_foreach (i, cmap_str, food)
             printf("%s, %d\n", i.ref->first.str, i.ref->second);

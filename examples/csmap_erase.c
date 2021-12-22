@@ -37,7 +37,7 @@ int main()
     c_auto (mymap, m2)
     {
         // Fill in some data to test with, one at a time, using c_apply()
-        c_apply(v, mymap_emplace(&m2, c_pair(v)), mymap_rawvalue, {
+        c_apply(v, mymap_emplace(&m2, c_pair(v)), mymap_raw, {
             {10, "Bob"},
             {11, "Rob"},
             {12, "Robert"},

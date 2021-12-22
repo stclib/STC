@@ -38,7 +38,7 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
 #if !c_option(c_is_fwd)
 _cx_deftypes(_c_cdeq_types, _cx_self, i_val);
 #endif
-typedef i_valraw _cx_rawvalue;
+typedef i_valraw _cx_raw;
 
 STC_API _cx_self        _cx_memb(_init)(void);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
@@ -51,7 +51,7 @@ STC_API void            _cx_memb(_shrink_to_fit)(_cx_self *self);
 STC_API _cx_iter        _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
                                                   const _cx_value* p1, const _cx_value* p2);
 STC_API _cx_iter        _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos,
-                                                   const _cx_rawvalue* p1, const _cx_rawvalue* p2);
+                                                   const _cx_raw* p1, const _cx_raw* p2);
 #endif // !c_no_clone
 
 #if !c_option(c_no_cmp)
@@ -166,7 +166,7 @@ _cx_memb(_emplace)(_cx_self* self, const size_t idx, i_valraw raw) {
     return _cx_memb(_emplace_range_p)(self, self->data + idx, &raw, &raw + 1);
 }
 STC_INLINE _cx_iter
-_cx_memb(_emplace_n)(_cx_self* self, const size_t idx, const _cx_rawvalue arr[], const size_t n) {
+_cx_memb(_emplace_n)(_cx_self* self, const size_t idx, const _cx_raw arr[], const size_t n) {
     return _cx_memb(_emplace_range_p)(self, self->data + idx, arr, arr + n);
 }
 STC_INLINE _cx_iter
@@ -369,7 +369,7 @@ _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
 #if !c_option(c_no_clone)
 
 STC_DEF _cx_iter
-_cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos, const _cx_rawvalue* p1, const _cx_rawvalue* p2) {
+_cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos, const _cx_raw* p1, const _cx_raw* p2) {
     pos = _cx_memb(_insert_space_)(self, pos, p2 - p1);
     _cx_iter it = {pos};
     for (; p1 != p2; ++p1) *pos++ = i_valfrom(*p1);

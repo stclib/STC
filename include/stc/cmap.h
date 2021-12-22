@@ -85,7 +85,7 @@ typedef i_valraw _cx_memb(_rawmapped);
 typedef _i_SET_ONLY( i_keyraw )
         _i_MAP_ONLY( struct { i_keyraw first;
                               i_valraw second; } )
-_cx_rawvalue;
+_cx_raw;
 
 STC_API _cx_self        _cx_memb(_with_capacity)(size_t cap);
 #if !c_option(c_no_clone)
@@ -153,10 +153,10 @@ _cx_memb(_emplace)(_cx_self* self, i_keyraw rkey _i_MAP_ONLY(, i_valraw rmapped)
 }
 #endif // !c_no_clone
 
-STC_INLINE _cx_rawvalue
+STC_INLINE _cx_raw
 _cx_memb(_value_toraw)(_cx_value* val) {
     return _i_SET_ONLY( i_keyto(val) )
-           _i_MAP_ONLY( c_make(_cx_rawvalue){i_keyto(&val->first), i_valto(&val->second)} );
+           _i_MAP_ONLY( c_make(_cx_raw){i_keyto(&val->first), i_valto(&val->second)} );
 }
 
 STC_INLINE void

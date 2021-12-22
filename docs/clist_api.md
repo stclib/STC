@@ -81,7 +81,7 @@ clist_X_iter        clist_X_end(const clist_X* self);
 void                clist_X_next(clist_X_iter* it);
 clist_X_iter        clist_X_advance(clist_X_iter it, size_t n);                           // return n elements ahead.
 
-clist_X_rawvalue    clist_X_value_toraw(clist_X_value* pval);
+clist_X_raw         clist_X_value_toraw(clist_X_value* pval);
 clist_X_value       clist_X_value_clone(clist_X_value val);
 ```
 
@@ -91,7 +91,7 @@ clist_X_value       clist_X_value_clone(clist_X_value val);
 |:--------------------|:------------------------------------|:--------------------------|
 | `clist_X`           | `struct { clist_X_node* last; }`    | The clist type            |
 | `clist_X_value`     | `i_val`                             | The clist element type    |
-| `clist_X_rawvalue`  | `i_valraw`                          | clist raw value type      |
+| `clist_X_raw`       | `i_valraw`                          | clist raw value type      |
 | `clist_X_iter`      | `struct { clist_value *ref; ... }`  | clist iterator            |
 
 ## Example

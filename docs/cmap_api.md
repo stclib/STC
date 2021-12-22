@@ -76,7 +76,7 @@ cmap_X_iter         cmap_X_end(const cmap_X* self);
 void                cmap_X_next(cmap_X_iter* it);
 
 cmap_X_value        cmap_X_value_clone(cmap_X_value val);
-cmap_X_rawvalue     cmap_X_value_toraw(cmap_X_value* pval);
+cmap_X_raw          cmap_X_value_toraw(cmap_X_value* pval);
 ```
 Helpers:
 ```c
@@ -101,7 +101,7 @@ bool                c_rawstr_eq(const char* const* a, const char* const* b); // 
 | `cmap_X`           | `struct { ... }`                                | The cmap type                 |
 | `cmap_X_rawkey`    | `i_keyraw`                                      | The raw key type              |
 | `cmap_X_rawmapped` | `i_valraw`                                      | The raw mapped type           |
-| `cmap_X_rawvalue`  | `struct { i_keyraw first; i_valraw second; }`   | i_keyraw + i_valraw type      |
+| `cmap_X_raw`       | `struct { i_keyraw first; i_valraw second; }`   | i_keyraw + i_valraw type      |
 | `cmap_X_key`       | `i_key`                                         | The key type                  |
 | `cmap_X_mapped`    | `i_val`                                         | The mapped type               |
 | `cmap_X_value`     | `struct { const i_key first; i_val second; }`   | The value: key is immutable   |
@@ -122,7 +122,7 @@ int main()
     // Create an unordered_map of three strings (that map to strings)
     c_auto (cmap_str, u)
     {
-        c_apply(v, cmap_str_emplace(&u, c_pair(v)), cmap_str_rawvalue, {
+        c_apply(v, cmap_str_emplace(&u, c_pair(v)), cmap_str_raw, {
             {"RED", "#FF0000"},
             {"GREEN", "#00FF00"},
             {"BLUE", "#0000FF"}
@@ -168,7 +168,7 @@ int main()
 
     c_auto (cmap_id, idnames)
     {
-        c_apply(v, cmap_id_emplace(&idnames, c_pair(v)), cmap_id_rawvalue, {
+        c_apply(v, cmap_id_emplace(&idnames, c_pair(v)), cmap_id_raw, {
             {100, "Red"}, {110, "Blue"}
         });
         // replace existing mapped value:
@@ -384,7 +384,7 @@ static inline RViking Viking_toraw(const Viking* vk) {
 int main()
 {
     c_auto (Vikings, vikings) {
-        c_apply(v, Vikings_emplace(&vikings, v), c_pair(v), Vikings_rawvalue, {
+        c_apply(v, Vikings_emplace(&vikings, v), c_pair(v), Vikings_raw, {
             {{"Einar", "Norway"}, 20},
             {{"Olaf", "Denmark"}, 24},
             {{"Harald", "Iceland"}, 12},
