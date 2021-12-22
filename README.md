@@ -6,47 +6,46 @@ STC - Smart Template Containers for C
 News
 ----
 ### Version 3 released
-A lot of enhancements, additions and bugfixes. There are also a number of breaking changes (mostly renamings),
-see migrate guide below. 
+Lots of enhancements, additions and bugfixes. There are also a number of breaking changes (mostly renamings),
+see migration guide below. 
 
-Added are new general `i_key_bind`/`i_val_bind` template parameters which auto-binds a set of functions
-to the type specified, and may be used in place of `i_key`/`i_val`. Use the `_bind` variant for elements
-of Type which have following functions defined: *Type_cmp*, *Type_clone*, *Type_drop*, *Type_hash*,
-and *Type_eq*. Only the functions required by the particular container needs to be defined. e.g. **cmap**
-and **cset** are the only types that require *Type_hash* and *Type_eq* to be defined.
-
-### Migration guide from version 2 to 3.
-Replace (regular expression) in VS Code:
-- `_del\b` → `_drop`
-- `_compare\b` → `_cmp`
-- `_rawvalue\b` → `_raw`
-- `_equ\b` → `_eq`
-
-Replace (whole word + match case):
-- `i_keydel` → `i_keydrop`
-- `i_valdel` → `i_valdrop`
-- `i_cnt` → `i_type`
-- `cstr_lit` → `cstr_new`
-- `csptr_X_make` → `carc_X_from`
-- `i_key_csptr` → `i_key_sptr`
-- `i_val_csptr` → `i_val_sptr`
-- `c_apply` → `c_apply_OLD` // replaced by new `c_apply`
-- `c_apply_pair` → `c_apply_pair_OLD` // replaced by new `c_apply`
-
-Non-regex, global match case replace:
-- `csptr` → `carc`
+This version is planned to freeze the API. Changes will be handled with deprecations,
+so it should be possible to build a code base with version 3 API without the need for updating code.
+Expect slow development, mostly handling of bug reports, issues, and improved documentation.
 
 ### Brief summary of changes
+- Added new general `i_key_bind`/`i_val_bind` template parameters which auto-binds a set of functions
+to the type specified. See template parameter description.
 - Strings: Renamed constructor *cstr_lit()* to `cstr_new(lit)`. Renamed *cstr_assign_fmt()* to `cstr_printf()`.
 - Added [**cbox**](docs/cbox_api.md) type: smart pointer, similar to [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr). Also renamed `csptr` to `carc` (atomic reference counted) smart pointer.
-- Added [example for **carc**](examples/sptr_to_maps.c).
-- Added [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding".
+- Added [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding", and improved **c_apply** macros.
 - Renamed: *csptr_X_make()* to *carc_X_from()*. Corresponding **cbox** method is *cbox_X_from()*.
 - Renamed: *c_default_fromraw(raw)* to *c_default_clone(raw)*.
 - Renamed: `i_key_csptr`/`i_val_csptr` to `i_key_sptr`/`i_val_sptr` for both **carc** and **cbox** values in containers.
 - Renamed: `i_cnt` to `i_type` for defining the complete container type name.
 - Added `i_opt` template parameter: compile-time options: `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`; may be combined with `|`
 - Uses a different way to instantiate templated containers, which is incompatible with v1.X.
+
+### Migration guide from version 2 to 3.
+Replace (regular expression) in VS Code:
+- `_del\b` ⟶ `_drop`
+- `_compare\b` ⟶ `_cmp`
+- `_rawvalue\b` ⟶ `_raw`
+- `_equ\b` ⟶ `_eq`
+
+Replace (whole word + match case):
+- `i_keydel` ⟶ `i_keydrop`
+- `i_valdel` ⟶ `i_valdrop`
+- `i_cnt` ⟶ `i_type`
+- `cstr_lit` ⟶ `cstr_new`
+- `csptr_X_make` ⟶ `carc_X_from`
+- `i_key_csptr` / `i_key_ref` ⟶ `i_key_sptr`
+- `i_val_csptr` / `i_val_ref` ⟶ `i_val_sptr`
+- `c_apply` ⟶ `c_apply_OLD` // replaced by new `c_apply`
+- `c_apply_pair` ⟶ `c_apply_pair_OLD` // replaced by new `c_apply`
+
+Non-regex, global match case replace:
+- `csptr` ⟶ `carc`
 
 Introduction
 ------------
@@ -208,7 +207,7 @@ int main(void) {
     {
         // add some elements to each container
         c_apply(v, cset_int_insert(&set, v), int, {10, 20, 30});
-        c_apply(v, cvec_pnt_push_back(&vec, v), cvec_pnt_raw, { {10, 1}, {20, 2}, {30, 3} });
+        c_apply(v, cvec_pnt_push_back(&vec, v), struct Point, { {10, 1}, {20, 2}, {30, 3} });
         c_apply(v, cdeq_int_push_back(&deq, v), int, {10, 20, 30});
         c_apply(v, clist_int_push_back(&lst, v), int, {10, 20, 30});
         c_apply(v, cstack_int_push(&stk, v), int, {10, 20, 30});
@@ -217,7 +216,7 @@ int main(void) {
 
         // add one more element to each container
         cset_int_insert(&set, 40);
-        cvec_pnt_push_back(&vec, (struct Point) {40, 4});
+        cvec_pnt_push_back(&vec, (struct Point){40, 4});
         cdeq_int_push_front(&deq, 5);
         clist_int_push_front(&lst, 5);
         cstack_int_push(&stk, 40);
@@ -225,7 +224,7 @@ int main(void) {
 
         // find an element in each container
         cset_int_iter i1 = cset_int_find(&set, 20);
-        cvec_pnt_iter i2 = cvec_pnt_find(&vec, (struct Point) {20, 2});
+        cvec_pnt_iter i2 = cvec_pnt_find(&vec, (struct Point){20, 2});
         cdeq_int_iter i3 = cdeq_int_find(&deq, 20);
         clist_int_iter i4 = clist_int_find(&lst, 20);
         csmap_int_iter i5 = csmap_int_find(&map, 20);
@@ -304,32 +303,39 @@ Each templated type requires one `#include`, even if it's the same container bas
 The template parameters are given by a `#define i_xxxx` statement, where *xxxx* is the parameter name.
 The list of template parameters:
 
-- `i_tag`     - Container type tag. Defaults to same as `i_key`
-- `i_type`    - Full container type name (optional, alternative to `i_tag`).
-- `i_opt`     - Boolean properties: may combine `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd` with `|` separator.
-
-- `i_key`     - Maps key type. **[required]** for cmap/csmap.
-- `i_val`     - The container **[required]** element type. For cmap/csmap, it is the mapped value.
-- `i_cmp`     - Three-way comparison of two `i_keyraw *` - **[required]** for non-integral `i_keyraw`.
+- `i_key`     - Element key type for map/set only. **[required]**.
+- `i_val`     - Element value type. **[required]**. For cmap/csmap, it is the mapped value type.
+- `i_cmp`     - Three-way comparison of two `i_keyraw or i_valraw` pointers - **[required]** for non-integral raw types unless `i_opt c_no_cmp` is defined.
 - `i_hash`    - Hash function taking `i_keyraw *` and a size - defaults to `!i_cmp`.
 - `i_eq`      - Equality comparison of two `i_keyraw *` - defaults to `!i_cmp`. Companion with `i_hash`.
 
-- `i_keydrop` - Destroy map key func - defaults to empty destructor.
-- `i_keyraw`  - Convertion "raw" type - defaults to `i_key` type.
-- `i_keyfrom` - Convertion func `i_key` <= `i_keyraw`  - defaults to simple copy. **[required]** if `i_keydrop` is defined.
-- `i_keyto`   - Convertion func `i_key *` => `i_keyraw` - defaults to simple copy.
+Properties:
+- `i_tag`     - Container type name tag. Defaults to same as `i_key`
+- `i_type`    - Full container type name. Alternative to `i_tag`.
+- `i_opt`     - Boolean properties: may combine `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd` with `|` separator.
 
+Key:
+- `i_keydrop` - Destroy map/set key func - defaults to empty destructor.
+- `i_keyraw`  - Convertion "raw" type - defaults to `i_key` type.
+- `i_keyfrom` - Convertion func `i_key` <= `i_keyraw`. **[required]** if `i_keydrop` is defined. Works as *clone* when `i_keyraw` == `i_key` type. 
+- `i_keyto`   - Convertion func `i_key *` => `i_keyraw`.
+
+Val:
 - `i_valdrop` - Destroy mapped or value func - defaults to empty destruct.
 - `i_valraw`  - Convertion "raw" type - defaults to `i_val` type.
-- `i_valfrom` - Convertion func `i_val` <= `i_valraw` - defaults to simple copy. **[required]** if `i_valdrop` is defined.
-- `i_valto`   - Convertion func `i_val *` => `i_valraw` - defaults to simple copy.
+- `i_valfrom` - Convertion func `i_val` <= `i_valraw`. **[required]** if `i_valdrop` is defined.  Works as *clone* when `i_valraw` == `i_val` type. 
+- `i_valto`   - Convertion func `i_val *` => `i_valraw`.
 
-Instead of defining `i_cmp`, you may define `i_opt c_no_cmp` to disable methods using comparison.
+Special:
+- `i_key_str` - Define key type `cstr` and container i_tag = `str`. It binds type convertion from/to const char*, and the cmp, eq, hash, and keydrop functions.
+- `i_key_sptr TYPE` - Define key type where TYPE is a smart pointer `carc` or `cbox`. I.e. not to be used when defining carc/cbox types themselves.
+- `i_key_bind TYPE` - General version of the two above - will auto-bind to standard named functions based on TYPE. Use for elements where the following functions are defined: *TYPE_cmp*, *TYPE_clone*, *TYPE_drop*, *TYPE_hash*, and *TYPE_eq*. Only the functions required by the particular container needs to be defined. e.g. **cmap** and **cset** are the only types that require *TYPE_hash* and *TYPE_eq* to be defined. *TYPE_cmp* and *TYPE_clone* are not required if `i_opt c_no_cmp|c_no_clone` is defined. *TYPE_drop* is always required when using `_bind`.
+- `i_val_str`, `i_val_sptr`, `i_val_bind` - Same as for key.
 
-Instead of defining `i_valfrom`, you may define `i_opt c_no_clone` to disable methods using deep copy.
-
-If a destructor `i_drop` is defined, then define either `i_valfrom` or `i_opt c_no_clone`, otherwise
-compile errors are generated.
+Notes:
+- Instead of defining `i_cmp`, you may define `i_opt c_no_cmp` to exclude methods using comparison.
+- Instead of defining `i_valfrom`, you may define `i_opt c_no_clone` to exclude methods using deep copy.
+- If a destructor `i_drop` is defined, then either `i_valfrom` or `i_opt c_no_clone` defined is required by the compiler.
 
 The *emplace* versus non-emplace container methods
 --------------------------------------------------
