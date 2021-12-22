@@ -335,9 +335,10 @@ Special:
 - `i_val_str`, `i_val_sptr`, `i_val_bind` - Same as for key.
 
 Notes:
+- For non-associative containers, `i_drop` and `i_from` may be defined instead of `i_valdrop` and `i_valfrom`.
 - Instead of defining `i_cmp`, you may define `i_opt c_no_cmp` to exclude methods using comparison.
-- Instead of defining `i_valfrom`, you may define `i_opt c_no_clone` to exclude methods using deep copy.
-- If a destructor `i_drop` is defined, then either `i_valfrom` or `i_opt c_no_clone` defined is required by the compiler.
+- Instead of defining `i_*from`, you may define `i_opt c_no_clone` to exclude methods using deep copy.
+- If a destructor `i_*drop` is defined, then either `i_*from` or `i_opt c_no_clone` is required to be defined.
 
 The *emplace* versus non-emplace container methods
 --------------------------------------------------
