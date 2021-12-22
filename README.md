@@ -14,11 +14,13 @@ so it should be possible to build a code base with version 3 API without the nee
 Expect slow development, mostly handling of bug reports, issues, and improved documentation.
 
 ### Brief summary of changes
+- Renamed `_del` to `_drop`, like the destructor name in Rust. Also `_compare` to `_cmp` and `_equ` to `_eq`.
 - Added new general `i_key_bind`/`i_val_bind` template parameters which auto-binds a set of functions
 to the type specified. See template parameter description.
-- Strings: Renamed constructor *cstr_lit()* to `cstr_new(lit)`. Renamed *cstr_assign_fmt()* to `cstr_printf()`.
-- Added [**cbox**](docs/cbox_api.md) type: smart pointer, similar to [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr). Also renamed `csptr` to `carc` (atomic reference counted) smart pointer.
-- Added [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding", and improved **c_apply** macros.
+- Renamed cstr constructor *cstr_lit()* to `cstr_new(literal)`. Renamed *cstr_assign_fmt()* to `cstr_printf()`.
+- Added [**cbox**](docs/cbox_api.md) type: smart pointer, similar to [Rust Box](https://doc.rust-lang.org/rust-by-example/std/box.html) and [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr).
+- Renamed **csptr** to [**carc**](docs/carc_api.md) (atomic reference counted) smart pointer.
+- Added [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding", and changed [**c_apply**](docs/ccommon_api.md) macros.
 - Renamed: *csptr_X_make()* to *carc_X_from()*. Corresponding **cbox** method is *cbox_X_from()*.
 - Renamed: *c_default_fromraw(raw)* to *c_default_clone(raw)*.
 - Renamed: `i_key_csptr`/`i_val_csptr` to `i_key_sptr`/`i_val_sptr` for both **carc** and **cbox** values in containers.
