@@ -28,7 +28,7 @@ void Person_drop(Person* p) {
 #include <stc/csptr.h>
 
 #define i_type Persons
-#define i_val_bind PSPtr // binds PSPtr_cmp, ...
+#define i_val_ref PSPtr // binds PSPtr_cmp, ...
 #include <stc/cvec.h>
 
 
@@ -37,30 +37,31 @@ int main()
     c_auto (Persons, vec)
     c_auto (PSPtr, p, q)
     {
-        p = PSPtr_new(Person_new("Laura", "Palmer"));
+        p = PSPtr_from(Person_new("Laura", "Palmer"));
 
         // We want a deep copy -- PSPtr_clone(p) only shares!
-        q = PSPtr_new(Person_clone(*p.get));
+        q = PSPtr_from(Person_clone(*p.get));
         cstr_assign(&q.get->name, "Leland");
 
         printf("orig: %s %s\n", p.get->name.str, p.get->last.str);
         printf("copy: %s %s\n", q.get->name.str, q.get->last.str);
 
-        Persons_push_back(&vec, PSPtr_new(Person_new("Dale", "Cooper")));
-        Persons_push_back(&vec, PSPtr_new(Person_new("Audrey", "Home")));
-        
-        // NB! Clone/share p and q to the vector using emplace_back()
-        c_apply(Persons, emplace_back, &vec, {p, q});
+        Persons_push_back(&vec, PSPtr_from(Person_new("Dale", "Cooper")));
+        Persons_push_back(&vec, PSPtr_from(Person_new("Audrey", "Home")));
+
+        // Clone/share p and q to the vector
+        c_apply(v, Persons_push_back(&vec, PSPtr_clone(v)), PSPtr, {p, q});
 
         c_foreach (i, Persons, vec)
             printf("%s %s\n", i.ref->get->name.str, i.ref->get->last.str);
         puts("");
-        
-        // Look-up Audrey! Use a (fake) temporary PSPtr for lookup.
+
+        // Look-up Audrey!
         c_autovar (Person a = Person_new("Audrey", "Home"), Person_drop(&a)) {
-            const PSPtr *v = Persons_get(&vec, (PSPtr){&a});
+            const PSPtr *v = Persons_get(&vec, a);
             if (v) printf("found: %s %s\n", v->get->name.str, v->get->last.str);
         }
+
         puts("");
     }
 }

@@ -40,14 +40,6 @@
   #define _cx_size _cx_memb(_size_t)
 #endif
 
-#if defined i_key_csptr || defined i_key_ref // [deprecated]
-  #define i_key_bind i_key_csptr
-  #error "i_key_csptr/ref no longer supported: use new name i_key_bind"
-#endif
-#if defined i_val_csptr || defined i_val_ref // [deprecated]
-  #define i_val_bind i_val_csptr
-  #error "i_val_sptr/ref no longer supported: use new name i_val_bind"
-#endif
 #if defined i_cnt || defined i_equ // [deprecated]
   #define i_type i_cnt
   #error "i_cnt and i_equ no longer supported: use new name i_type / i_eq"
@@ -69,6 +61,9 @@
   #ifndef i_tag
     #define i_tag str
   #endif
+#elif defined i_key_ref
+  #define i_key_bind i_key_ref
+  #define i_keyraw c_PASTE(i_key_ref, _value)
 #endif
 
 #ifdef i_key_bind
@@ -125,6 +120,9 @@
   #if !defined i_tag && !defined i_key
     #define i_tag str
   #endif
+#elif defined i_val_ref
+  #define i_val_bind i_val_ref
+  #define i_valraw c_PASTE(i_val_ref, _value)
 #endif
 
 #ifdef i_val_bind
@@ -167,6 +165,7 @@
     #define i_keyfrom c_default_clone
   #endif
   #ifndef i_keyraw
+    #define _i_keyraw_default
     #define i_keyraw i_key
     #define i_keyto c_default_toraw
   #endif
@@ -192,6 +191,7 @@
   #define i_valfrom c_default_clone
 #endif
 #ifndef i_valraw
+  #define _i_valraw_default
   #define i_valraw i_val
   #define i_valto c_default_toraw
 #endif
@@ -219,6 +219,7 @@
 
 #undef i_val
 #undef i_val_str
+#undef i_val_ref
 #undef i_val_bind
 #undef i_valraw
 #undef i_valfrom
@@ -227,6 +228,7 @@
 
 #undef i_key
 #undef i_key_str
+#undef i_key_ref
 #undef i_key_bind
 #undef i_keyraw
 #undef i_keyfrom
@@ -234,6 +236,8 @@
 #undef i_keydrop
 
 #undef _i_prefix
+#undef _i_valraw_default
+#undef _i_keyraw_default
 #undef _i_has_internal_clone
 #undef _i_template
 #endif

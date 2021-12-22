@@ -116,7 +116,7 @@ int main()
         cvec_int_push_back(&vec, 13);
 
         // Append a set of numbers
-        c_apply(cvec_int, push_back, &vec, {7, 5, 16, 8});
+        c_apply(v, cvec_int_push_back(&vec, v), int, {7, 5, 16, 8});
 
         printf("initial:");
         c_foreach (k, cvec_int, vec) {

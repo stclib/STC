@@ -33,24 +33,23 @@ compare the pointer addresses when used. Additionally, `c_no_clone` or `i_is_fwd
 ## Methods
 ```c
 cbox_X      cbox_X_init();                                    // return an empty cbox
-cbox_X      cbox_X_new(i_val val);                            // allocate new heap object with val. Take ownership of val.
-cbox_X      cbox_X_from(i_valraw raw);                        // like cbox_X_new(), but create owned value from raw.
-cbox_X      cbox_X_with(i_val* p);                            // create a cbox from a pointer. Takes ownership of p.
+cbox_X      cbox_X_new(i_valraw raw);                         // like cbox_X_from(), but create owned value from raw.
+cbox_X      cbox_X_from(i_val val);                           // allocate new heap object with val. Take ownership of val.
+cbox_X      cbox_X_from_ptr(i_val* p);                        // create a cbox from a pointer. Takes ownership of p.
 
 cbox_X      cbox_X_clone(cbox_X other);                       // return deep copied clone
 cbox_X      cbox_X_move(cbox_X* self);                        // transfer ownership to another cbox.
 void        cbox_X_take(cbox_X* self, cbox_X other);          // take ownership of other.
 void        cbox_X_copy(cbox_X* self, cbox_X other);          // deep copy to self
-
 void        cbox_X_drop(cbox_X* self);                         // destruct the contained object and free's it.
 
 void        cbox_X_reset(cbox_X* self);   
-void        cbox_X_reset_new(cbox_X* self, i_val val);        // assign new cbox with value. Takes ownership of val.
-void        cbox_X_reset_from(cbox_X* self, i_valraw raw);    // make and assign new cbox from raw value. 
-void        cbox_X_reset_with(cbox_X* self, i_val* p);        // create cbox with pointer p. Takes ownership of p.
+void        cbox_X_reset_from(cbox_X* self, i_val val);       // assign new cbox with value. Takes ownership of val.
 
-int         cbox_X_cmp(const cbox_X* x, const cbox_X* y);     // compares pointer addresses if 'i_opt c_no_cmp'
+uint64_t    cbox_X_value_hash(const i_val* x, size_t n);      // hash value
+int         cbox_X_value_cmp(const i_val* x, const i_val* y); // compares pointer addresses if 'i_opt c_no_cmp'
                                                               // is defined. Otherwise uses 'i_cmp' or default compare.
+bool        cbox_X_value_eq(const i_val* x, const i_val* y);  // cbox_X_value_cmp == 0
 ```
 ## Types and constants
 
@@ -98,7 +97,7 @@ int main()
     c_auto (cvec_int, vec)   // declare and init vec, call drop at scope exit
     c_auto (csset_int, set)  // declare and init set, call drop at scope exit
     {
-        c_apply(cvec_int, push_back, &vec, {
+        c_apply(v, cvec_int_push_back(&vec, v), cbox_int, {
             cbox_int_new(2021),
             cbox_int_new(2012),
             cbox_int_new(2022),

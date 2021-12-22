@@ -17,6 +17,8 @@ still be defined as before, which is often easier for simple element types.
 Migration guide from version 2 to 3. Replace (regular expresion) in VS Code:
 - `_del\b` → `_drop`
 - `_compare\b` → `_cmp`
+- `csptr` → `cref`
+- `_rawvalue\b` → `_raw`
 - `_equ\b` → `_eq`
 
 Replace (whole word + match case):
@@ -25,10 +27,10 @@ Replace (whole word + match case):
 - `i_cnt` → `i_type`
 - `cstr_lit` → `cstr_new`
 - `csptr_X_make` → `csptr_X_new`
-- `i_key_csptr` → `i_key_bind`
-- `i_val_csptr` → `i_val_bind`
-- `i_key_ref` → `i_key_bind`
-- `i_val_ref` → `i_val_bind`
+- `i_key_csptr` → `i_key_sptr`
+- `i_val_csptr` → `i_val_sptr`
+- `c_apply` → `c_apply_OLD` // replaced by new `c_apply`
+- `c_apply_pair` → `c_apply_pair_OLD` // replaced by new `c_apply`
 
 ### Final version 2.1
 - Strings: Renamed constructor *cstr_lit()* to `cstr_new(lit)`. Renamed *cstr_assign_fmt()* to `cstr_printf()`.
@@ -192,12 +194,13 @@ int main(void) {
     c_auto (csmap_int, map)
     {
         // add some elements to each container
-        c_apply(cset_int, insert, &set, {10, 20, 30});
-        c_apply(cvec_pnt, push_back, &vec, { {10, 1}, {20, 2}, {30, 3} });
-        c_apply(cdeq_int, push_back, &deq, {10, 20, 30});
-        c_apply(clist_int, push_back, &lst, {10, 20, 30});
-        c_apply(cstack_int, push, &stk, {10, 20, 30});
-        c_apply_pair(csmap_int, insert, &map, { {20, 2}, {10, 1}, {30, 3} });
+        c_apply(v, cset_int_insert(&set, v), int, {10, 20, 30});
+        c_apply(v, cvec_pnt_push_back(&vec, v), int, { {10, 1}, {20, 2}, {30, 3} });
+        c_apply(v, cdeq_int_push_back(&deq, v), int, {10, 20, 30});
+        c_apply(v, clist_int_push_back(&lst, v), int, {10, 20, 30});
+        c_apply(v, cstack_int_push(&stk, v), int, {10, 20, 30});
+        c_apply(v, csmap_int_insert(&map, c_pair(v)), 
+            csmap_int_rawvalue, { {20, 2}, {10, 1}, {30, 3} });
 
         // add one more element to each container
         cset_int_insert(&set, 40);

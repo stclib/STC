@@ -122,7 +122,7 @@ int main()
     // Create an unordered_map of three strings (that map to strings)
     c_auto (cmap_str, u)
     {
-        c_apply_pair(cmap_str, emplace, &u, {
+        c_apply(v, cmap_str_emplace(&u, c_pair(v)), cmap_str_rawvalue, {
             {"RED", "#FF0000"},
             {"GREEN", "#00FF00"},
             {"BLUE", "#0000FF"}
@@ -168,7 +168,7 @@ int main()
 
     c_auto (cmap_id, idnames)
     {
-        c_apply_pair(cmap_id, emplace, &idnames, {
+        c_apply(v, cmap_id_emplace(&idnames, c_pair(v)), cmap_id_rawvalue, {
             {100, "Red"}, {110, "Blue"}
         });
         // replace existing mapped value:
@@ -384,7 +384,7 @@ static inline RViking Viking_toraw(const Viking* vk) {
 int main()
 {
     c_auto (Vikings, vikings) {
-        c_apply_pair(Vikings, emplace, &vikings, {
+        c_apply(v, Vikings_emplace(&vikings, v), c_pair(v), Vikings_rawvalue, {
             {{"Einar", "Norway"}, 20},
             {{"Olaf", "Denmark"}, 24},
             {{"Harald", "Iceland"}, 12},

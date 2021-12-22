@@ -27,16 +27,16 @@ void Person_drop(Person* p) {
 #include <stc/cstack.h>
 
 int main(void) {
-    c_autovar (csptr_person p = csptr_person_new(Person_new("John", "Smiths")), csptr_person_drop(&p))
+    c_autovar (csptr_person p = csptr_person_from(Person_new("John", "Smiths")), csptr_person_drop(&p))
     c_autovar (csptr_person q = csptr_person_clone(p), csptr_person_drop(&q)) // share the pointer
     {
         printf("%s %s. uses: %lu\n", q.get->name.str, q.get->last.str, *q.use_count);
     }
 
     c_auto (cstack_iptr, stk) {
-        cstack_iptr_push(&stk, csptr_int_new(10));
-        cstack_iptr_push(&stk, csptr_int_new(20));
-        cstack_iptr_push(&stk, csptr_int_new(30));
+        cstack_iptr_push(&stk, csptr_int_from(10));
+        cstack_iptr_push(&stk, csptr_int_from(20));
+        cstack_iptr_push(&stk, csptr_int_from(30));
         cstack_iptr_emplace(&stk, *cstack_iptr_top(&stk));
         cstack_iptr_emplace(&stk, *cstack_iptr_begin(&stk).ref);
 

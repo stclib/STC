@@ -33,7 +33,7 @@ void* thr(csptr_base* lp)
 
 int main()
 {
-    csptr_base p = csptr_base_new((Base){42});
+    csptr_base p = csptr_base_from((Base){42});
 
     printf("Created a Base\n"
            "  p.get() = %p, p.use_count() = %ld\n", (void*)p.get, *p.use_count);

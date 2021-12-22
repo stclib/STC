@@ -13,10 +13,10 @@ void int_drop(int* x) {
 #define i_drop int_drop     // optional, just to display the elements destroyed
 #include <stc/csptr.h>      // iref
 
-#define i_key_bind iref     // note: use i_key_bind instead of i_key for csptr/cbox elements
+#define i_key_ref iref     // note: use i_key_bind instead of i_key for csptr/cbox elements
 #include <stc/csset.h>      // csset_iref (like: std::set<std::shared_ptr<int>>)
 
-#define i_val_bind iref     // note: as above.
+#define i_val_ref iref     // note: as above.
 #include <stc/cvec.h>       // cvec_iref (like: std::vector<std::shared_ptr<int>>)
 
 int main()
@@ -26,7 +26,7 @@ int main()
     {
         const int years[] = {2021, 2012, 2022, 2015};
         c_forrange (i, c_arraylen(years))
-            cvec_iref_push_back(&vec, iref_new(years[i]));
+            cvec_iref_push_back(&vec, iref_from(years[i]));
 
         printf("vec:");
         c_foreach (i, cvec_iref, vec) printf(" %d", *i.ref->get);
@@ -35,7 +35,7 @@ int main()
         // add odd numbers from vec to set
         c_foreach (i, cvec_iref, vec)
             if (*i.ref->get & 1)
-                csset_iref_emplace(&set, *i.ref); // copy shared pointer => increments counter.
+                csset_iref_insert(&set, iref_clone(*i.ref)); // copy shared pointer => increments counter.
 
         // erase the two last elements in vec
         cvec_iref_pop_back(&vec);

@@ -100,7 +100,7 @@ int main()
     // Create a sorted map of three strings (maps to string)
     c_auto (csmap_str, colors) // RAII
     {
-        c_apply_pair(csmap_str, emplace, &colors, {
+        c_apply(v, csmap_str_emplace(&colors, c_pair(v)), csmap_str_rawvalue, {
             {"RED", "#FF0000"},
             {"GREEN", "#00FF00"},
             {"BLUE", "#0000FF"}
@@ -146,7 +146,7 @@ int main()
     csmap_id idnames = csmap_id_init();
     c_autodefer (csmap_id_drop(&idnames)) 
     {
-        c_apply_pair(csmap_id, emplace, &idnames, {
+        c_apply(v, csmap_id_emplace(&idnames, c_pair(v)), csmap_id_rawvalue, {
             {100, "Red"},
             {110, "Blue"},
         });

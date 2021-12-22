@@ -9,11 +9,10 @@ void show_drop(int* x) { printf("drop: %d\n", *x); }
 // if 'i_opt c_no_cmp' is defined, otherwise i_cmp is used
 // to compare object values. See the twodifferences by
 // commenting out the next line.
-//#define i_opt c_no_cmp
 #include <stc/csptr.h>       // Shared pointer to int
 
 #define i_type Vec
-#define i_val_bind Arc
+#define i_val_ref Arc
 #include <stc/cvec.h>        // Vec: cvec<Arc>
 
 
@@ -23,11 +22,11 @@ int main()
     {
         const int v[] = {2012, 1990, 2012, 2019, 2015};
         c_forrange (i, c_arraylen(v))
-            Vec_push_back(&vec, Arc_new(v[i]));
+            Vec_push_back(&vec, Arc_from(v[i]));
         
         // clone the second 2012 and push it back.
         // note: cloning make sure that vec.data[2] has ref count 2.
-        Vec_emplace_back(&vec, vec.data[2]);
+        Vec_push_back(&vec, Arc_clone(vec.data[2]));
         
         printf("vec before erase :");
         c_foreach (i, Vec, vec)
@@ -36,12 +35,12 @@ int main()
 
         printf("erase vec.data[2]; or first matching value depending on compare.\n");
         Vec_iter it;
-        it = Vec_find(&vec, vec.data[2]);
+        it = Vec_find(&vec, *vec.data[2].get);
         if (it.ref != Vec_end(&vec).ref)
             Vec_erase_at(&vec, it);
 
         int year = 2015;
-        it = Vec_find(&vec, (Arc){&year}); // Ok as tmp only.
+        it = Vec_find(&vec, year); // Ok as tmp only.
         if (it.ref != Vec_end(&vec).ref)
             Vec_erase_at(&vec, it);
 

@@ -104,11 +104,15 @@ _cx_memb(_from_ptr)(_cx_value* p) {
 }
 
 STC_INLINE _cx_self
-_cx_memb(_new)(i_val val) {
+_cx_memb(_from)(i_val val) {
     _cx_self ptr; _cx_csptr_rep *rep = c_alloc(_cx_csptr_rep);
     *(ptr.use_count = &rep->counter) = 1;
     *(ptr.get = &rep->value) = val;
     return ptr;
+}
+
+STC_INLINE i_val _cx_memb(_toraw)(const _cx_self* self) { 
+    return *self->get;
 }
 
 STC_INLINE _cx_self
@@ -135,15 +139,15 @@ _cx_memb(_reset)(_cx_self* self) {
 }
 
 STC_INLINE void
-_cx_memb(_reset_new)(_cx_self* self, i_val val) {
+_cx_memb(_reset_from)(_cx_self* self, i_val val) {
     _cx_memb(_drop)(self);
-    *self = _cx_memb(_new)(val);
+    *self = _cx_memb(_from)(val);
 }
 
-#if !c_option(c_no_clone)
-    STC_INLINE _cx_self _cx_memb(_from)(i_valraw raw) { 
-        return _cx_memb(_new)(i_valfrom(raw));
-}
+#if !c_option(c_no_clone) && !defined _i_valraw_default
+    STC_INLINE _cx_self _cx_memb(_new)(i_valraw raw) { 
+        return _cx_memb(_from)(i_valfrom(raw));
+    }
 #endif
 
 // does not use i_valfrom, so we can bypass c_no_clone
@@ -167,30 +171,30 @@ _cx_memb(_take)(_cx_self* self, _cx_self ptr) {
 }
 
 STC_INLINE uint64_t
-_cx_memb(_hash)(const _cx_self* self, size_t n) {
+_cx_memb(_value_hash)(const _cx_value* x, size_t n) {
     #if c_option(c_no_cmp) && UINTPTR_MAX == UINT64_MAX
-        return c_hash64(&self->get, 8);
+        return c_hash64(&x, 8);
     #elif c_option(c_no_cmp)
-        return c_hash32(&self->get, 4);
+        return c_hash32(&x, 4);
     #else
-        i_valraw rx = i_valto(self->get);
+        i_valraw rx = i_valto(x);
         return i_hash(&rx, sizeof rx);
     #endif
 }
 
 STC_INLINE int
-_cx_memb(_cmp)(const _cx_self* x, const _cx_self* y) {
+_cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     #if c_option(c_no_cmp)
-        return c_default_cmp(&x->get, &y->get);
+        return c_default_cmp(&x, &y);
     #else
-        i_valraw rx = i_valto(x->get), ry = i_valto(x->get);
+        i_valraw rx = i_valto(x), ry = i_valto(x);
         return i_cmp(&rx, &ry);
     #endif
 }
 
 STC_INLINE bool
-_cx_memb(_eq)(const _cx_self* x, const _cx_self* y) {
-    return !_cx_memb(_cmp)(x, y);
+_cx_memb(_value_eq)(const _cx_value* x, const _cx_value* y) {
+    return !_cx_memb(_value_cmp)(x, y);
 }
 #undef _i_atomic_inc
 #undef _i_atomic_dec_and_test

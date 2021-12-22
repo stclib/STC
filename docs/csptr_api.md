@@ -35,35 +35,35 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 
 ## Methods
 ```c
-csptr_X      csptr_X_init();                                     // empty shared pointer
-csptr_X      csptr_X_new(i_val val);                             // create new heap allocated object. Take ownership of val.
-csptr_X      csptr_X_from(i_valraw raw);                         // like csptr_X_new(), but construct owned value from raw.
-csptr_X      csptr_X_with(i_val* p);                             // create a csptr from raw pointer. Takes ownership of p.
+csptr_X     csptr_X_init();                                      // empty shared pointer
+csptr_X     csptr_X_new(i_valraw raw);                           // like csptr_X_from(), but construct owned value from raw.
+csptr_X     csptr_X_from(i_val val);                             // create new heap allocated object. Take ownership of val.
+csptr_X     csptr_X_from_ptr(i_val* p);                          // create a csptr from raw pointer. Takes ownership of p.
     
-csptr_X      csptr_X_clone(csptr_X other);                        // return other with increased use count
-csptr_X      csptr_X_move(csptr_X* self);                         // transfer ownership to another csptr.
-void        csptr_X_take(csptr_X* self, csptr_X other);           // take ownership of other.
-void        csptr_X_copy(csptr_X* self, csptr_X other);           // copy shared (increase use count)
+csptr_X     csptr_X_clone(csptr_X other);                        // return other with increased use count
+csptr_X     csptr_X_move(csptr_X* self);                         // transfer ownership to another csptr.
+void        csptr_X_take(csptr_X* self, csptr_X other);          // take ownership of other.
+void        csptr_X_copy(csptr_X* self, csptr_X other);          // copy shared (increase use count)
     
 void        csptr_X_drop(csptr_X* self);                         // destruct (decrease use count, free at 0)
 long        csptr_X_use_count(csptr_X ptr);    
     
 void        csptr_X_reset(csptr_X* self);    
-void        csptr_X_reset_new(csptr_X* self, i_val val);         // assign new csptr with value. Takes ownership of val.
-void        csptr_X_reset_from(csptr_X* self, i_valraw raw);     // make and assign new csptr from raw value. 
-void        csptr_X_reset_with(csptr_X* self, i_val* p);         // create csptr with pointer p. Takes ownership of p.
+void        csptr_X_reset_from(csptr_X* self, i_val val);        // assign new csptr with value. Takes ownership of val.
 
-int         csptr_X_cmp(const csptr_X* x, const csptr_X* y);      // compares pointer addresses if 'i_opt c_no_cmp'
-                                                               // is defined. Otherwise uses 'i_cmp' or default compare.
+uint64_t    csptr_X_value_hash(const i_val* x, size_t n);        // hash value
+int         csptr_X_value_cmp(const i_val* x, const i_val* y);   // compares pointer addresses if 'i_opt c_no_cmp'
+                                                                 // is defined. Otherwise uses 'i_cmp' or default compare.
+bool        csptr_X_value_eq(const i_val* x, const i_val* y);    // cbox_X_value_cmp == 0
 ```
 
 ## Types and constants
 
-| Type name          | Type definition                                   | Used to represent...    |
-|:-------------------|:--------------------------------------------------|:------------------------|
-| `csptr_null`        | `{NULL, NULL}`                                    | Init nullptr const      |
-| `csptr_X`           | `struct { csptr_X_value* get; long* use_count; }`  | The csptr type           |
-| `csptr_X_value`     | `i_val`                                           | The csptr element type   |
+| Type name          | Type definition                                    | Used to represent...    |
+|:-------------------|:---------------------------------------------------|:------------------------|
+| `csptr_null`       | `{NULL, NULL}`                                     | Init nullptr const      |
+| `csptr_X`          | `struct { csptr_X_value* get; long* use_count; }`  | The csptr type          |
+| `csptr_X_value`    | `i_val`                                            | The csptr element type  |
 
 ## Example
 
@@ -101,17 +101,17 @@ int main()
         // POPULATE the stack with shared pointers to Map:
         Map *map;
         map = Stack_push(&stack, Arc_new(Map_init()))->get;
-        c_apply_pair (Map, emplace, map, {
+        c_apply(v, Map_emplace(map, c_pair(v)), Map_rawvalue, {
             {"Joey", 1990}, {"Mary", 1995}, {"Joanna", 1992}
         });
         map = Stack_push(&stack, Arc_new(Map_init()))->get;
-        c_apply_pair (Map, emplace, map, {
+        c_apply(v, Map_emplace(map, c_pair(v)), Map_rawvalue, {
             {"Rosanna", 2001}, {"Brad", 1999}, {"Jack", 1980}
         });
 
         // POPULATE the list:
         map = List_push_back(&list, Arc_new(Map_init()))->get;
-        c_apply_pair (Map, emplace, map, {
+        c_apply(v, Map_emplace(map, c_pair(v)), Map_rawvalue, {
             {"Steve", 1979}, {"Rick", 1974}, {"Tracy", 2003}
         });
         

@@ -86,8 +86,13 @@ STC_INLINE _cx_self
 _cx_memb(_from_ptr)(i_val* p) { return c_make(_cx_self){p}; }
 
 STC_INLINE _cx_self
-_cx_memb(_new)(i_val val) { 
+_cx_memb(_from)(i_val val) { 
     return c_make(_cx_self){c_new(i_val, val)};
+}
+
+STC_INLINE i_val
+_cx_memb(_toraw)(const _cx_self* self) { 
+    return *self->get;
 }
 
 // destructor
@@ -109,16 +114,18 @@ _cx_memb(_reset)(_cx_self* self) {
 
 // take ownership of val
 STC_INLINE void
-_cx_memb(_reset_new)(_cx_self* self, i_val val) {
+_cx_memb(_reset_from)(_cx_self* self, i_val val) {
     if (self->get) { i_valdrop(self->get); *self->get = val; }
     else self->get = c_new(i_val, val);
 }
 
-#if !c_option(c_no_clone)
+#if !c_option(c_no_clone) 
+    //#ifndef _i_valraw_default
     STC_INLINE _cx_self
-    _cx_memb(_from)(i_valraw raw) { 
+    _cx_memb(_new)(i_valraw raw) { 
         return c_make(_cx_self){c_new(i_val, i_valfrom(raw))};
     }
+    //#endif
 
     STC_INLINE _cx_self
     _cx_memb(_clone)(_cx_self other) {
@@ -141,29 +148,29 @@ _cx_memb(_take)(_cx_self* self, _cx_self other) {
 }
 
 STC_INLINE uint64_t
-_cx_memb(_hash)(const _cx_self* self, size_t n) {
+_cx_memb(_value_hash)(const _cx_value* x, size_t n) {
     #if c_option(c_no_cmp) && UINTPTR_MAX == UINT64_MAX
-        return c_hash64(&self->get, 8);
+        return c_hash64(&x, 8);
     #elif c_option(c_no_cmp)
-        return c_hash32(&self->get, 4);
+        return c_hash32(&x, 4);
     #else
-        i_valraw rx = i_valto(self->get);
+        i_valraw rx = i_valto(x);
         return i_hash(&rx, sizeof rx);
     #endif
 }
 
 STC_INLINE int
-_cx_memb(_cmp)(const _cx_self* x, const _cx_self* y) {
+_cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     #if c_option(c_no_cmp)
-        return c_default_cmp(&x->get, &y->get);
+        return c_default_cmp(&x, &y);
     #else
-        i_valraw rx = i_valto(x->get), ry = i_valto(x->get);
+        i_valraw rx = i_valto(x), ry = i_valto(x);
         return i_cmp(&rx, &ry);
     #endif
 }
 
 STC_INLINE bool
-_cx_memb(_eq)(const _cx_self* x, const _cx_self* y) {
-    return !_cx_memb(_cmp)(x, y);
+_cx_memb(_value_eq)(const _cx_value* x, const _cx_value* y) {
+    return !_cx_memb(_value_cmp)(x, y);
 }
 #include "template.h"

@@ -80,8 +80,10 @@ c_auto (csset_str, fifth)
         c_auto (csset_str, first, second)
         c_auto (csset_str, third, fourth)
         {
-            c_apply(csset_str, emplace, &second, {"red", "green", "blue"});
-            c_apply(csset_str, emplace, &third, {"orange", "pink", "yellow"});
+            c_apply(v, csset_str_emplace(&second, v), const char*,
+                {"red", "green", "blue"});
+            c_apply(v, csset_str_emplace(&third, v), const char*,
+                {"orange", "pink", "yellow"});
 
             csset_str_emplace(&fourth, "potatoes");
             csset_str_emplace(&fourth, "milk");

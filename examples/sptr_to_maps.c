@@ -15,11 +15,11 @@
 #include <stc/csptr.h>
 
 #define i_type Stack
-#define i_val_bind Arc // define i_val_bind for csptr/cbox value (not i_val)
+#define i_val_ref Arc // define i_val_bind for csptr/cbox value (not i_val)
 #include <stc/cstack.h>
 
 #define i_type List
-#define i_val_bind Arc // as above
+#define i_val_ref Arc // as above
 #include <stc/clist.h>
 
 int main()
@@ -29,28 +29,28 @@ int main()
     {
         // POPULATE stack with shared pointers to Maps:
         Map *map;
-        map = Stack_push(&stack, Arc_new(Map_init()))->get;
-        c_apply_pair (Map, emplace, map, {
+        map = Stack_push(&stack, Arc_from(Map_init()))->get;
+        c_apply(v, Map_emplace(map, c_pair(v)), Map_rawvalue, {
             {"Joey", 1990}, {"Mary", 1995}, {"Joanna", 1992}
         });
-        map = Stack_push(&stack, Arc_new(Map_init()))->get;
-        c_apply_pair (Map, emplace, map, {
+        map = Stack_push(&stack, Arc_from(Map_init()))->get;
+        c_apply(v, Map_emplace(map, c_pair(v)), Map_rawvalue, {
             {"Rosanna", 2001}, {"Brad", 1999}, {"Jack", 1980}
         });
 
         // POPULATE list:
-        map = List_push_back(&list, Arc_new(Map_init()))->get;
-        c_apply_pair (Map, emplace, map, {
+        map = List_push_back(&list, Arc_from(Map_init()))->get;
+        c_apply(v, Map_emplace(map, c_pair(v)), Map_rawvalue, {
             {"Steve", 1979}, {"Rick", 1974}, {"Tracy", 2003}
         });
         
         // Share two Maps from the stack with the list using emplace (clone the csptr):
-        List_emplace_back(&list, stack.data[0]);
-        List_emplace_back(&list, stack.data[1]);
+        List_push_back(&list, Arc_clone(stack.data[0]));
+        List_push_back(&list, Arc_clone(stack.data[1]));
         
         // Clone (deep copy) a Map from the stack to the list
         // List will contain two shared and two unshared maps.
-        map = List_push_back(&list, Arc_new(Map_clone(*stack.data[1].get)))->get;
+        map = List_push_back(&list, Arc_from(Map_clone(*stack.data[1].get)))->get;
         
         // Add one more element to the cloned map:
         Map_emplace_or_assign(map, "CLONED", 2021);

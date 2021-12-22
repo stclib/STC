@@ -93,7 +93,8 @@ int main()
 #define i_tag ii
 #include <stc/csmap.h>
 ...
-c_apply_pair(csmap_ii, insert, &map, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} });
+c_apply(v, csmap_ii_insert(&map, c_pair(v)), csmap_ii_value,
+    { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} });
 c_foreach (i, csmap_ii, map)
     printf(" %d", i.ref->first);
 // out: 3 5 7 12 23
@@ -130,14 +131,19 @@ c_forrange (i, int, 30, 0, -5) printf(" %d", i);
 // 30 25 20 15 10 5
 ```
 
-### c_apply, c_apply_pair, c_apply_n
-**c_apply** will apply a method on a container with each of the elements in the given array:
+### c_apply, c_apply_arr, c_apply_cnt, c_pair
+**c_apply** applies an expression on a container with each of the elements in the given array:
 ```c
-c_apply(cvec_i, push_back, &vec, {1, 2, 3});   // apply multiple push_backs
-c_apply_pair(cmap_i, insert, &map, { {4, 5}, {6, 7} });  // inserts to existing map
+// apply multiple push_backs
+c_apply(v, cvec_i_push_back(&vec, v), int, {1, 2, 3});
+// inserts to existing map
+c_apply(v, cmap_i_insert(&map, c_pair(v)), cmap_i_rawvalue, { {4, 5}, {6, 7} });
 
 int arr[] = {1, 2, 3};
-c_apply_n(cvec_i, push_back, &vec, arr, c_arraylen(arr));
+c_apply_arr(v, cvec_i_push_back(&vec, v), int, arr, c_arraylen(arr));
+
+// add keys from a map to a vec.
+c_apply_cnt(v, cvec_i_push_back(&vec, v.first), cmap_i, map);
 ```
 
 ### c_new, c_alloc, c_alloc_n, c_drop, c_make

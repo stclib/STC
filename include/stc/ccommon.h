@@ -189,22 +189,36 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
          *b = (n)*sizeof *b > (BYTES) ? c_alloc_n(type, n) : _c_b \
          ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)
 
-#define c_apply(C, method, cx, ...) do { \
+#define c_apply(v, method, T, ...) do { \
+    const T _c_arr[] = __VA_ARGS__; \
+    for (size_t index = 0; index < c_arraylen(_c_arr); ++index) \
+        { const T v = _c_arr[index]; method; } \
+} while (0)
+#define c_apply_arr(v, method, T, arr, n) do { \
+    const T* _c_arr = arr; size_t _n = n; \
+    for (size_t index = 0; index < _n; ++index) \
+        { const T v = _c_arr[index]; method; } \
+} while (0)
+#define c_apply_it(v, method, C, ...) do { \
+    size_t index = 0; \
+    c_foreach (_it, C, __VA_ARGS__) \
+        { const C##_value v = *_it.ref; method; ++index; } \
+} while (0)
+#define c_pair(v) (v).first, (v).second
+
+// [deprecated]
+#define c_apply_OLD(C, method, cx, ...) do { \
     const C##_rawvalue _c_arr[] = __VA_ARGS__; \
     C* _c_cx = cx; \
     for (size_t _c_i = 0; _c_i < c_arraylen(_c_arr); ++_c_i) \
         C##_##method(_c_cx, _c_arr[_c_i]); \
 } while (0)
-#define c_apply_pair(C, method, cx, ...) do { \
+// [deprecated]
+#define c_apply_pair_OLD(C, method, cx, ...) do { \
     const C##_rawvalue _c_arr[] = __VA_ARGS__; \
     C* _c_cx = cx; \
     for (size_t _c_i = 0; _c_i < c_arraylen(_c_arr); ++_c_i) \
         C##_##method(_c_cx, _c_arr[_c_i].first, _c_arr[_c_i].second); \
-} while (0)
-#define c_apply_n(C, method, cx, arr, n) do { \
-    C* _c_cx = cx; \
-    for (const C##_rawvalue *_c_i = arr, *_c_end = _c_i+(n); _c_i != _c_end; ++_c_i) \
-        C##_##method(_c_cx, *_c_i); \
 } while (0)
 
 #define c_drop(C, ...) do { \
