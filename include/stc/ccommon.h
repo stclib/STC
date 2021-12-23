@@ -192,12 +192,12 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
 #define c_apply(v, method, T, ...) do { \
     const T _c_arr[] = __VA_ARGS__; \
     for (size_t index = 0; index < c_arraylen(_c_arr); ++index) \
-        { const T v = _c_arr[index]; method; } \
+        { T v = _c_arr[index]; method; } \
 } while (0)
 #define c_apply_arr(v, method, T, arr, n) do { \
     const T* _c_arr = arr; size_t _n = n; \
     for (size_t index = 0; index < _n; ++index) \
-        { const T v = _c_arr[index]; method; } \
+        { T v = _c_arr[index]; method; } \
 } while (0)
 #define c_apply_cnt(v, method, C, ...) do { \
     size_t index = 0; \
