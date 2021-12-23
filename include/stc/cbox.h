@@ -120,12 +120,12 @@ _cx_memb(_reset_from)(_cx_self* self, i_val val) {
 }
 
 #if !c_option(c_no_clone) 
-    //#ifndef _i_valraw_default
+#if !defined _i_no_raw
     STC_INLINE _cx_self
     _cx_memb(_new)(i_valraw raw) { 
         return c_make(_cx_self){c_new(i_val, i_valfrom(raw))};
     }
-    //#endif
+#endif
 
     STC_INLINE _cx_self
     _cx_memb(_clone)(_cx_self other) {

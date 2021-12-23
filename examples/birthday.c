@@ -23,7 +23,7 @@ static void test_repeats(void)
         cmap_ic_reserve(&m, N);
         c_forrange (i, N) {
             uint64_t k = stc64_rand(&rng) & mask;
-            int v = cmap_ic_emplace(&m, k, 0).ref->second += 1;
+            int v = cmap_ic_insert(&m, k, 0).ref->second += 1;
             if (v > 1) printf("repeated value %zu (%d) at 2^%d\n", k, v, (int) log2((double) i));
         }
     }
@@ -44,7 +44,7 @@ void test_distribution(void)
     c_auto (cmap_x, map) {
         c_forrange (N) {
             uint64_t k = stc64_rand(&rng);
-            cmap_x_emplace(&map, k & 0xf, 0).ref->second += 1;
+            cmap_x_insert(&map, k & 0xf, 0).ref->second += 1;
         }
 
         uint64_t sum = 0;

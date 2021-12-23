@@ -147,7 +147,7 @@ _cx_memb(_value_drop)(_cx_value* val) {
 }
 
 #ifndef _i_isset
-    #if !c_option(c_no_clone)
+    #if !c_option(c_no_clone) && !defined _i_no_raw
     STC_API _cx_result _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped);
     #endif
     STC_API _cx_result _cx_memb(_insert_or_assign)(_cx_self* self, i_key key, i_val mapped);
@@ -181,7 +181,7 @@ _cx_memb(_value_clone)(_cx_value _val) {
     _i_MAP_ONLY( _val.second = i_valfrom(i_valto(&_val.second)); )
     return _val;
 }
-
+#if !defined _i_no_raw
 STC_INLINE _cx_result
 _cx_memb(_emplace)(_cx_self* self, i_keyraw rkey _i_MAP_ONLY(, i_valraw rmapped)) {
     _cx_result res = _cx_memb(_insert_entry_)(self, rkey);
@@ -191,6 +191,7 @@ _cx_memb(_emplace)(_cx_self* self, i_keyraw rkey _i_MAP_ONLY(, i_valraw rmapped)
     }
     return res;
 }
+#endif
 #endif // !c_no_clone
 
 STC_INLINE _cx_result
@@ -289,7 +290,7 @@ _cx_memb(_node_new_)(_cx_self* self, int level) {
         else { i_keydrop(&key); i_valdrop(&res.ref->second); }
         res.ref->second = mapped; return res;
     }
-    #if !c_option(c_no_clone)
+    #if !c_option(c_no_clone) && !defined _i_no_raw
     STC_DEF _cx_result
     _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped) {
         _cx_result res = _cx_memb(_insert_entry_)(self, rkey);

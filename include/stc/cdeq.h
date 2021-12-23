@@ -45,13 +45,15 @@ STC_API void            _cx_memb(_clear)(_cx_self* self);
 STC_API void            _cx_memb(_drop)(_cx_self* self);
 STC_API _cx_value*      _cx_memb(_push_back)(_cx_self* self, i_val value);
 STC_API bool            _cx_memb(_expand_right_half_)(_cx_self* self, size_t idx, size_t n);
+STC_API void            _cx_memb(_shrink_to_fit)(_cx_self *self);
 #ifndef _i_queue
 #if !c_option(c_no_clone)
-STC_API void            _cx_memb(_shrink_to_fit)(_cx_self *self);
 STC_API _cx_iter        _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
                                                   const _cx_value* p1, const _cx_value* p2);
+#if !defined _i_no_raw
 STC_API _cx_iter        _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos,
                                                    const _cx_raw* p1, const _cx_raw* p2);
+#endif
 #endif // !c_no_clone
 
 #if !c_option(c_no_cmp)
@@ -66,8 +68,10 @@ STC_API _cx_iter        _cx_memb(_insert_range_p)(_cx_self* self, _cx_value* pos
 
 #if !c_option(c_no_clone)
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
+#if !defined _i_no_raw
 STC_INLINE _cx_value*   _cx_memb(_emplace_back)(_cx_self* self, i_valraw raw)
                             { return _cx_memb(_push_back)(self, i_valfrom(raw)); }
+#endif
 STC_INLINE i_val        _cx_memb(_value_clone)(i_val val)
                             { return i_valfrom(i_valto(&val)); }
 STC_INLINE void         _cx_memb(_copy)(_cx_self *self, _cx_self other) {
@@ -150,7 +154,7 @@ _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
     return _cx_memb(_erase_range_p)(self, it1.ref, it2.ref);
 }
 
-#if !c_option(c_no_clone)
+#if !c_option(c_no_clone) && !defined _i_no_raw
 
 STC_INLINE _cx_iter
 _cx_memb(_emplace_range)(_cx_self* self, _cx_iter it, _cx_iter it1, _cx_iter it2) {
@@ -367,7 +371,7 @@ _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
 }
 
 #if !c_option(c_no_clone)
-
+#if !defined _i_no_raw
 STC_DEF _cx_iter
 _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos, const _cx_raw* p1, const _cx_raw* p2) {
     pos = _cx_memb(_insert_space_)(self, pos, p2 - p1);
@@ -375,7 +379,7 @@ _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos, const _cx_raw* p1, co
     for (; p1 != p2; ++p1) *pos++ = i_valfrom(*p1);
     return it;
 }
-
+#endif
 STC_DEF _cx_iter
 _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
                           const _cx_value* p1, const _cx_value* p2) {

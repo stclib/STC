@@ -37,8 +37,8 @@ int main(void) {
         cstack_iptr_push(&stk, carc_int_from(10));
         cstack_iptr_push(&stk, carc_int_from(20));
         cstack_iptr_push(&stk, carc_int_from(30));
-        cstack_iptr_emplace(&stk, *cstack_iptr_top(&stk));
-        cstack_iptr_emplace(&stk, *cstack_iptr_begin(&stk).ref);
+        cstack_iptr_push(&stk, *cstack_iptr_top(&stk));
+        cstack_iptr_push(&stk, *cstack_iptr_begin(&stk).ref);
 
         c_foreach (i, cstack_iptr, stk)
             printf(" %d", *i.ref->get);

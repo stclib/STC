@@ -165,7 +165,7 @@
     #define i_keyfrom c_default_clone
   #endif
   #ifndef i_keyraw
-    #define _i_keyraw_default
+    #define _i_no_keyraw
     #define i_keyraw i_key
     #define i_keyto c_default_toraw
   #endif
@@ -191,7 +191,9 @@
   #define i_valfrom c_default_clone
 #endif
 #ifndef i_valraw
-  #define _i_valraw_default
+  #if !defined i_key || defined _i_no_keyraw
+    #define _i_no_raw
+  #endif
   #define i_valraw i_val
   #define i_valto c_default_toraw
 #endif
@@ -236,8 +238,8 @@
 #undef i_keydrop
 
 #undef _i_prefix
-#undef _i_valraw_default
-#undef _i_keyraw_default
+#undef _i_no_raw
+#undef _i_no_keyraw
 #undef _i_has_internal_clone
 #undef _i_template
 #endif

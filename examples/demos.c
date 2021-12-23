@@ -130,8 +130,8 @@ void mapdemo1()
 {
     printf("\nMAPDEMO1\n");
     cmap_ii nums = cmap_ii_init();
-    cmap_ii_emplace(&nums, 8, 64);
-    cmap_ii_emplace(&nums, 11, 121);
+    cmap_ii_insert(&nums, 8, 64);
+    cmap_ii_insert(&nums, 11, 121);
     printf("val 8: %d\n", *cmap_ii_at(&nums, 8));
     cmap_ii_drop(&nums);
 }

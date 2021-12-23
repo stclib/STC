@@ -109,20 +109,21 @@ STC_API _cx_node*       _cx_memb(_erase_after_)(_cx_self* self, _cx_node* node);
 
 #if !c_option(c_no_clone)
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
+STC_INLINE i_val        _cx_memb(_value_clone)(i_val val)
+                            { return i_valfrom(i_valto(&val)); }
+STC_INLINE void
+_cx_memb(_copy)(_cx_self *self, _cx_self other) {
+    if (self->last == other.last) return;
+    _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
+}
+#if !defined _i_no_raw
 STC_INLINE _cx_value*   _cx_memb(_emplace_back)(_cx_self* self, i_valraw raw)
                             { return _cx_memb(_push_back)(self, i_valfrom(raw)); }
 STC_INLINE _cx_value*   _cx_memb(_emplace_front)(_cx_self* self, i_valraw raw)
                             { return _cx_memb(_push_front)(self, i_valfrom(raw)); }
 STC_INLINE _cx_iter     _cx_memb(_emplace)(_cx_self* self, _cx_iter it, i_valraw raw)
                             { return _cx_memb(_insert)(self, it, i_valfrom(raw)); }
-STC_INLINE i_val        _cx_memb(_value_clone)(i_val val)
-                            { return i_valfrom(i_valto(&val)); }
-
-STC_INLINE void
-_cx_memb(_copy)(_cx_self *self, _cx_self other) {
-    if (self->last == other.last) return;
-    _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
-}
+#endif
 #endif
 STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_make(_cx_self){NULL}; }
 STC_INLINE bool         _cx_memb(_reserve)(_cx_self* self, size_t n) { return true; }
@@ -190,7 +191,7 @@ _cx_memb(_get_mut)(_cx_self* self, i_valraw val) {
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self cx) {
     _cx_self out = _cx_memb(_init)();
-    c_foreach (it, _cx_self, cx) _cx_memb(_emplace_back)(&out, i_valto(it.ref));
+    c_foreach (it, _cx_self, cx) _cx_memb(_push_back)(&out, i_valfrom(i_valto(it.ref)));
     return out;
 }
 #endif

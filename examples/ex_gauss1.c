@@ -39,7 +39,7 @@ int main()
     {
         c_forrange (N) {
             int index = (int) round( stc64_normalf(&rng, &dist) );
-            cmap_ii_emplace(&histmap, index, 0).ref->second += 1;
+            cmap_ii_insert(&histmap, index, 0).ref->second += 1;
         }
 
         // Transfer map to vec and sort it by map keys.

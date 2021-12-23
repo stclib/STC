@@ -38,7 +38,7 @@ Point origin(void) {
 
 cbox_Point boxed_origin(void) {
     // Allocate this point on the heap, and return a pointer to it
-    return cbox_Point_new((Point){ .x=0.0, .y=0.0 });
+    return cbox_Point_from((Point){ .x=0.0, .y=0.0 });
 }
 
 
@@ -56,7 +56,7 @@ int main(void) {
     c_auto (cbox_Point, boxed_point)
     c_auto (cbox_BoxPoint, box_in_a_box)
     {
-        boxed_rectangle = cbox_Rectangle_new((Rectangle){
+        boxed_rectangle = cbox_Rectangle_from((Rectangle){
             .top_left = origin(),
             .bottom_right = (Point){ .x=3.0, .y=-4.0 }
         });

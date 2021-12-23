@@ -73,8 +73,8 @@ Sample test_stc_map() {
         stc64_srandom(seed);
         s.test[INSERT].t1 = clock();
         container con = csmap_x_init();
-        c_forrange (i, N/2) csmap_x_emplace(&con, stc64_random() & mask1, i);
-        c_forrange (i, N/2) csmap_x_emplace(&con, i, i);
+        c_forrange (i, N/2) csmap_x_insert(&con, stc64_random() & mask1, i);
+        c_forrange (i, N/2) csmap_x_insert(&con, i, i);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = csmap_x_size(con);
         stc64_srandom(seed);
@@ -86,8 +86,8 @@ Sample test_stc_map() {
      }{
         container con = csmap_x_init();
         stc64_srandom(seed);
-        c_forrange (i, N/2) csmap_x_emplace(&con, stc64_random() & mask1, i);
-        c_forrange (i, N/2) csmap_x_emplace(&con, i, i);
+        c_forrange (i, N/2) csmap_x_insert(&con, stc64_random() & mask1, i);
+        c_forrange (i, N/2) csmap_x_insert(&con, i, i);
         stc64_srandom(seed);
         s.test[FIND].t1 = clock();
         size_t sum = 0;

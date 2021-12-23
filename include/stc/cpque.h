@@ -99,12 +99,12 @@ STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     if (self->data == other.data) return;
     _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
 }
-
-STC_INLINE void _cx_memb(_emplace)(_cx_self* self, _cx_value val)
-    { _cx_memb(_push)(self, i_valfrom(val)); }
-
 STC_INLINE i_val _cx_memb(_value_clone)(_cx_value val)
     { return i_valfrom(val); }
+#if !defined _i_no_raw
+STC_INLINE void _cx_memb(_emplace)(_cx_self* self, _cx_value val)
+    { _cx_memb(_push)(self, i_valfrom(val)); }
+#endif
 #endif
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
