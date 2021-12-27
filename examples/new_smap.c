@@ -43,9 +43,11 @@ int main()
         csmap_int_insert(&map, 123, 321);
 
     c_auto (csmap_pnt, pmap) {
-        csmap_pnt_insert(&pmap, (Point){42, 14}, 1);
-        csmap_pnt_insert(&pmap, (Point){32, 94}, 2);
-        csmap_pnt_insert(&pmap, (Point){62, 81}, 3);
+        c_apply(v, csmap_pnt_insert(&pmap, c_pair(v)), csmap_pnt_value, {
+            {{42, 14}, 1},
+            {{32, 94}, 2},
+            {{62, 81}, 3},
+        });
         c_foreach (i, csmap_pnt, pmap)
             printf(" (%d,%d: %d)", i.ref->first.x, i.ref->first.y, i.ref->second);
         puts("");
