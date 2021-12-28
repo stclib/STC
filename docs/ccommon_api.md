@@ -6,18 +6,18 @@ The following handy macros are safe to use, i.e. have no side-effects.
 General ***defer*** mechanics for resource acquisition. These macros allows to specify the release of the
 resource where the resource acquisition takes place. Makes it easier to verify that resources are released.
 
-**NB**: These macros are one-time executed **for-loops**. Use ***only*** `c_exitauto` in order to break out
+**NB**: These macros are one-time executed **for-loops**. Use ***only*** `c_breakauto` in order to break out
 of these `c_auto*`-blocks! ***Do not*** use `return` or `goto` (or `break`) inside them, as they will
 prevent the `end`-statement to be executed when leaving scope. This is not particular to the `c_auto*()`
 macros, as one must always make sure to unwind temporary allocated resources before a `return` in C.
 
-| Usage                                  | Description                                        |
-|:---------------------------------------|:---------------------------------------------------|
-| `c_auto (Type, var...)`                | `c_autovar (Type var=Type_init(), Type_drop(&var))` |
-| `c_autovar (Type var=init, end...)`    | Declare `var`. Defer `end...` to end of block      |
-| `c_autoscope (init, end...)`           | Execute `init`. Defer `end...` to end of block     |
-| `c_autodefer (end...)`                 | Defer `end...` to end of block                     |
-| `c_exitauto;`                          | Break safely out of a `c_auto*`-block/scope        |
+| Usage                                  | Description                                          |
+|:---------------------------------------|:-----------------------------------------------------|
+| `c_auto (Type, var...)`                | `c_autovar (Type var=Type_init(), Type_drop(&var))`  |
+| `c_autovar (Type var=init, end...)`    | Declare `var`. Defer `end...` to end of block        |
+| `c_autoscope (init, end...)`           | Execute `init`. Defer `end...` to end of block       |
+| `c_autodefer (end...)`                 | Defer `end...` to end of block                       |
+| `c_breakauto;`                         | Break out of a `c_auto*`-block/scope without memleak |
 
 For multiple variables, use either multiple **c_autovar** in sequence, or declare variable outside
 scope and use **c_autoscope**. Also, **c_auto** support up to 3 variables.

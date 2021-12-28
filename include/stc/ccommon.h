@@ -169,6 +169,7 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
 #define c_autovar(declvar, ...) for (declvar, *_c_ii = NULL; !_c_ii; ++_c_ii, __VA_ARGS__)
 #define c_autoscope(init, ...) for (int _c_ii = (init, 0); !_c_ii; ++_c_ii, __VA_ARGS__)
 #define c_autodefer(...) for (int _c_ii = 0; !_c_ii; ++_c_ii, __VA_ARGS__)
+#define c_breakauto continue
 
 #define c_auto(...) c_MACRO_OVERLOAD(c_auto, __VA_ARGS__)
 #define c_auto_2(C, a) \
