@@ -6,30 +6,31 @@ STC - Smart Template Containers for C
 News
 ----
 ### Version 3 released
-Lots of enhancements, additions and bugfixes. There are also a number of breaking changes (mostly renamings),
-see migration guide below. 
+This version introduces lots of enhancements,  bugfixes and additions. There are also
+a number of breaking changes, see below for changes and the migration guide. 
 
-This version is planned to freeze the API. Changes will be handled with deprecations,
-so it should be possible to build a code base with version 3 API without the need for updating code.
-Expect slow development, mostly handling of bug reports, issues, and improved documentation.
+Version 3 is planned to freeze the API, as far as possible. Any changes will be handled with long 
+lasting deprecations, so it should be ready for creating production code using it.
 
 ### Brief summary of changes
-- Renamed `_del` to `_drop`, like the destructor name in Rust. Also `_compare` to `_cmp` and `_equ` to `_eq`.
-- Added new general `i_key_bind`/`i_val_bind` template parameters which auto-binds a set of functions
-to the type specified. See template parameter description.
-- Renamed cstr constructor *cstr_lit()* to `cstr_new(literal)`. Renamed *cstr_assign_fmt()* to `cstr_printf()`.
-- Added [**cbox**](docs/cbox_api.md) type: smart pointer, similar to [Rust Box](https://doc.rust-lang.org/rust-by-example/std/box.html) and [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr).
-- Renamed **csptr** to [**carc**](docs/carc_api.md) (atomic reference counted) smart pointer.
-- Added [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding", and changed [**c_apply**](docs/ccommon_api.md) macros.
-- Renamed: *csptr_X_make()* to *carc_X_from()*. Corresponding **cbox** method is *cbox_X_from()*.
-- Renamed: *c_default_fromraw(raw)* to *c_default_clone(raw)*.
-- Renamed: `i_key_csptr`/`i_val_csptr` to `i_key_sptr`/`i_val_sptr` for both **carc** and **cbox** values in containers.
-- Renamed: `i_cnt` to `i_type` for defining the complete container type name.
-- Added `i_opt` template parameter: compile-time options: `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`; may be combined with `|`
-- Uses a different way to instantiate templated containers, which is incompatible with v1.X.
+- Renamed: all ***_del*** to `_drop` (like destructors in Rust).
+- Renamed: all ***_compare*** to `_cmp`
+- Renamed: ***i_equ*** to `i_eq`, and ***_equalto*** to `_eq`.
+- Renamed: ***i_cnt*** to `i_type` for defining the complete container type name.
+- Renamed: type **csptr** to [**carc**](docs/carc_api.md) (atomic reference counted) smart pointer.
+- Renamed: ***i_key_csptr*** / ***i_val_csptr*** to `i_key_sptr` / `i_val_sptr` for specifying **carc** and **cbox** values in containers.
+- Renamed: *csptr_X_make()* to `carc_X_from()`.
+- Renamed: *cstr_lit()* to `cstr_new(literal)`, and *cstr_assign_fmt()* to `cstr_printf()`.
+- Renamed: *c_default_fromraw()* to `c_default_clone()`.
+- Changed: the [**c_apply**](docs/ccommon_api.md) macros API.
+- Replaced: *csview_first_token()* and *csview_next_token()* with one function: `csview_token()`.
+- Added: new general `i_key_bind` / `i_val_bind` template parameters which auto-binds template functions.
+- Added: `i_opt` template parameter: compile-time options: `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`; may be combined with `|`
+- Added: [**cbox**](docs/cbox_api.md) type: smart pointer, similar to [Rust Box](https://doc.rust-lang.org/rust-by-example/std/box.html) and [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr).
+- Added: [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding"
 
 ### Migration guide from version 2 to 3.
-Replace (regular expression) in VS Code:
+Replace (regular expression) globally in code base (VS Code):
 - `_del\b` ⟶ `_drop`
 - `_compare\b` ⟶ `_cmp`
 - `_rawvalue\b` ⟶ `_raw`
@@ -40,7 +41,6 @@ Replace (whole word + match case):
 - `i_valdel` ⟶ `i_valdrop`
 - `i_cnt` ⟶ `i_type`
 - `cstr_lit` ⟶ `cstr_new`
-- `csptr_X_make` ⟶ `carc_X_from`
 - `i_key_csptr` / `i_key_ref` ⟶ `i_key_sptr`
 - `i_val_csptr` / `i_val_ref` ⟶ `i_val_sptr`
 - `c_apply` ⟶ `c_apply_OLD` // replaced by new `c_apply`

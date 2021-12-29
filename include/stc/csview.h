@@ -143,8 +143,8 @@ STC_DEF csview
 csview_token(csview sv, csview sep, size_t* start) {
     csview slice = {sv.str + *start, sv.size - *start};
     const char* res = c_strnstrn(slice.str, sep.str, slice.size, sep.size);
-    csview tok = {slice.str, (res ? res - slice.str : slice.size)};
-    *start += tok.size + (res ? sep.size : 0);
+    csview tok = {slice.str, res ? res - slice.str : (sep.size = 0, slice.size)};
+    *start += tok.size + sep.size;
     return tok;
 }
 
