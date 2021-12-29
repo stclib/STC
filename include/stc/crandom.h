@@ -172,7 +172,9 @@ STC_DEF stc32_t stc32_with_seq(uint32_t seed, uint32_t seq) {
     for (int i = 0; i < 6; ++i) stc32_rand(&rng);
     return rng;
 }
-
+#ifdef _MSC_VER
+#pragma warning(disable: 4146) // unary minus operator applied to unsigned type
+#endif
 /* Init unbiased uniform uint RNG with bounds [low, high] */
 STC_DEF stc64_uniform_t stc64_uniform_init(int64_t low, int64_t high) {
     stc64_uniform_t dist = {low, (uint64_t) (high - low + 1)};
@@ -185,6 +187,9 @@ STC_DEF stc32_uniform_t stc32_uniform_init(int32_t low, int32_t high) {
     dist.threshold = (uint32_t)(-dist.range) % dist.range;
     return dist;
 }
+#ifdef _MSC_VER
+#pragma warning(default: 4146)
+#endif
 
 /* Init uniform distributed float64 RNG, range [low, high). */
 STC_DEF stc64_uniformf_t stc64_uniformf_init(double low, double high) {

@@ -23,14 +23,14 @@
 #ifndef CCOMMON_H_INCLUDED
 #define CCOMMON_H_INCLUDED
 
-#define __USE_MINGW_ANSI_STDIO 1
-
+#define _CRT_SECURE_NO_WARNINGS
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include <assert.h>
 
 #if defined(_MSC_VER)
+#  pragma warning(disable: 4116 4996) // unnamed type definition in parentheses
 #  define STC_FORCE_INLINE static __forceinline
 #elif defined(__GNUC__) || defined(__clang__)
 #  define STC_FORCE_INLINE static inline __attribute((always_inline))
@@ -191,12 +191,12 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
          ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)
 
 #define c_apply(v, method, T, ...) do { \
-    const T _c_arr[] = __VA_ARGS__; \
+    T _c_arr[] = __VA_ARGS__; \
     for (size_t index = 0; index < c_arraylen(_c_arr); ++index) \
         { T v = _c_arr[index]; method; } \
 } while (0)
 #define c_apply_arr(v, method, T, arr, n) do { \
-    const T* _c_arr = arr; size_t _n = n; \
+    T* _c_arr = arr; size_t _n = n; \
     for (size_t index = 0; index < _n; ++index) \
         { T v = _c_arr[index]; method; } \
 } while (0)

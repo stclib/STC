@@ -107,9 +107,15 @@ STC_INLINE void cbits_reset(cbits *self, size_t i) {
     self->data64[i >> 6] &= ~(1ull << (i & 63));
 }
 
+#ifdef _MSC_VER
+#pragma warning(disable: 4146) // unary minus operator applied to unsigned type
+#endif
 STC_INLINE void cbits_set_value(cbits *self, size_t i, bool value) {
     self->data64[i >> 6] ^= (-(uint64_t)value ^ self->data64[i >> 6]) & 1ull << (i & 63);
 }
+#ifdef _MSC_VER
+#pragma warning(default: 4146)
+#endif
 
 STC_INLINE void cbits_flip(cbits *self, size_t i) {
     self->data64[i >> 6] ^= 1ull << (i & 63);

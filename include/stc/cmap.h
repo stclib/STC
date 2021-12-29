@@ -105,7 +105,7 @@ STC_INLINE bool         _cx_memb(_empty)(_cx_self m) { return m.size == 0; }
 STC_INLINE size_t       _cx_memb(_size)(_cx_self m) { return m.size; }
 STC_INLINE size_t       _cx_memb(_bucket_count)(_cx_self map) { return map.bucket_count; }
 STC_INLINE size_t       _cx_memb(_capacity)(_cx_self map)
-                            { return map.bucket_count ? (map.bucket_count - 2)*map.max_load_factor : 0.f; }
+                            { return (size_t)(map.bucket_count ? (map.bucket_count - 2)*map.max_load_factor : 0.f); }
 STC_INLINE void         _cx_memb(_swap)(_cx_self *map1, _cx_self *map2) {c_swap(_cx_self, *map1, *map2); }
 STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, i_keyraw rkey)
                             { return self->size && self->_hashx[_cx_memb(_bucket_)(self, &rkey).idx]; }
