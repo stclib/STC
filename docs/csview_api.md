@@ -41,8 +41,7 @@ void          csview_clear(csview* self);
 
 csview        csview_substr(csview sv, intptr_t pos, size_t n);    // negative pos count from end
 csview        csview_slice(csview sv, intptr_t p1, intptr_t p2);   // negative p1, p2 count from end
-csview        csview_first_token(csview sv, csview sep);           // see split example below.
-csview        csview_next_token(csview sv, csview sep, csview token);
+csview        csview_token(csview sv, csview sep, size_t* start);  // see split example below.
 
 bool          csview_equals(csview sv, csview sv2);
 size_t        csview_find(csview sv, csview needle);
@@ -135,12 +134,11 @@ and does not depend on null-terminated strings. *string_split()* function return
 
 void print_split(csview str, csview sep)
 {
-    csview token = csview_first_token(str, sep);
-    for (;;) {
+    size_t pos = 0;
+    while (pos != str.size) {
+        csview tok = csview_token(str, sep, &pos);
         // print non-null-terminated csview
-        printf("\"%.*s\"\n", csview_ARG(token));
-        if (csview_end(&token).ref == csview_end(&str).ref) break;
-        token = csview_next_token(str, sep, token);
+        printf("[" c_svfmt "]\n", c_svarg(tok));
     }
 }
 
@@ -150,11 +148,10 @@ void print_split(csview str, csview sep)
 cvec_str string_split(csview str, csview sep)
 {
     cvec_str vec = cvec_str_init();
-    csview token = csview_first_token(str, sep);
-    for (;;) {
-        cvec_str_push_back(&vec, cstr_from_v(token));
-        if (csview_end(&token).ref == csview_end(&str).ref) break;
-        token = csview_next_token(str, sep, token);
+    size_t pos = 0;
+    while (pos != str.size) {
+        csview tok = csview_token(str, sep, &pos);
+        cvec_str_push_back(&vec, cstr_from_v(tok));
     }
     return vec;
 }
@@ -168,7 +165,7 @@ int main()
 
     c_autovar (cvec_str v = string_split(c_sv("Split,this,,string,now,"), c_sv(",")), cvec_str_drop(&v))
         c_foreach (i, cvec_str, v)
-            printf("\"%s\"\n", i.ref->str);
+            printf("[%s]\n", i.ref->str);
 }
 ```
 Output:

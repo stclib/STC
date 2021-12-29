@@ -1,10 +1,11 @@
 #include <stc/cstr.h>
 #include <stc/forward.h>
 
-forward_csmap(csmap_pnt, struct Point, int);
+forward_csmap(PMap, struct Point, int);
 
+// Use forward declared PMap in struct
 struct MyStruct {
-    csmap_pnt pntmap;
+    PMap pntmap;
     cstr name;
 } typedef MyStruct;
 
@@ -20,50 +21,55 @@ int point_cmp(const Point* a, const Point* b) {
     return c ? c : a->y - b->y;
 }
 
+#define i_type PMap
 #define i_key Point
 #define i_val int
 #define i_cmp point_cmp
 #define i_opt c_is_fwd
-#define i_tag pnt
 #include <stc/csmap.h>
 
-// int => int map
+// cstr => cstr map
+#define i_type SMap
 #define i_key_str
 #define i_val_str
 #include <stc/csmap.h>
 
-// string set
+// cstr set
+#define i_type SSet
 #define i_key_str
 #include <stc/csset.h>
 
 
 int main()
 {
-    c_auto (csmap_int, map)
-        csmap_int_insert(&map, 123, 321);
+    c_auto (csmap_int, imap) {
+        csmap_int_insert(&imap, 123, 321);
+    }
 
-    c_auto (csmap_pnt, pmap) {
-        c_apply(v, csmap_pnt_insert(&pmap, c_pair(v)), csmap_pnt_value, {
+    c_auto (PMap, pmap) {
+        c_apply(v, PMap_insert(&pmap, c_pair(v)), PMap_value, {
             {{42, 14}, 1},
             {{32, 94}, 2},
             {{62, 81}, 3},
         });
-        c_foreach (i, csmap_pnt, pmap)
-            printf(" (%d,%d: %d)", i.ref->first.x, i.ref->first.y, i.ref->second);
+        c_forpair (p, i, PMap, pmap)
+            printf(" (%d,%d: %d)", _.p.x, _.p.y, _.i);
         puts("");
     }
 
-    c_auto (csmap_str, smap) {
-        csmap_str_emplace(&smap, "Hello, friend", "this is the mapped value");
-        csmap_str_emplace(&smap, "The brown fox", "jumped");
-        csmap_str_emplace(&smap, "This is the time", "for all good things");
-        c_foreach (i, csmap_str, smap)
-            printf(" (%s: %s)\n", i.ref->first.str, i.ref->second.str);
+    c_auto (SMap, smap) {
+        c_apply(v, SMap_emplace(&smap, c_pair(v)), SMap_raw, {
+            {"Hello, friend", "this is the mapped value"},
+            {"The brown fox", "jumped"},
+            {"This is the time", "for all good things"},
+        });
+        c_forpair (i, j, SMap, smap)
+            printf(" (%s: %s)\n", _.i.str, _.j.str);
     }
 
-    c_auto (csset_str, sset) {
-        csset_str_emplace(&sset, "Hello, friend");
-        csset_str_emplace(&sset, "Goodbye, foe");
-        printf("Found? %s\n", csset_str_contains(&sset, "Hello, friend") ? "true" : "false");
+    c_auto (SSet, sset) {
+        SSet_emplace(&sset, "Hello, friend");
+        SSet_emplace(&sset, "Goodbye, foe");
+        printf("Found? %s\n", SSet_contains(&sset, "Hello, friend") ? "true" : "false");
     }
 }
