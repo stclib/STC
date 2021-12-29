@@ -24,10 +24,10 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 ```c
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_valraw* : REQUIRED IF i_valraw is a non-integral type
-#define i_del       // destroy value func - defaults to empty destruct
+#define i_drop      // destroy value func - defaults to empty destruct
 #define i_valraw    // convertion "raw" type - defaults to i_val
-#define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
 #define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
+#define i_from     // convertion func i_valraw => i_val - defaults to plain copy
 #define i_tag       // defaults to i_val
 #include <stc/clist.h>
 ```
@@ -42,7 +42,7 @@ clist_X             clist_X_clone(clist_X list);
 
 void                clist_X_clear(clist_X* self);
 void                clist_X_copy(clist_X* self, clist_X other);
-void                clist_X_del(clist_X* self);                                           // destructor
+void                clist_X_drop(clist_X* self);                                          // destructor
 
 bool                clist_X_empty(clist_X list);
 size_t              clist_X_count(clist_X list);                                          // size() in O(n) time
@@ -81,7 +81,7 @@ clist_X_iter        clist_X_end(const clist_X* self);
 void                clist_X_next(clist_X_iter* it);
 clist_X_iter        clist_X_advance(clist_X_iter it, size_t n);                           // return n elements ahead.
 
-clist_X_rawvalue    clist_X_value_toraw(clist_X_value* pval);
+clist_X_raw         clist_X_value_toraw(clist_X_value* pval);
 clist_X_value       clist_X_value_clone(clist_X_value val);
 ```
 
@@ -91,7 +91,7 @@ clist_X_value       clist_X_value_clone(clist_X_value val);
 |:--------------------|:------------------------------------|:--------------------------|
 | `clist_X`           | `struct { clist_X_node* last; }`    | The clist type            |
 | `clist_X_value`     | `i_val`                             | The clist element type    |
-| `clist_X_rawvalue`  | `i_valraw`                          | clist raw value type      |
+| `clist_X_raw`       | `i_valraw`                          | clist raw value type      |
 | `clist_X_iter`      | `struct { clist_value *ref; ... }`  | clist iterator            |
 
 ## Example
@@ -106,7 +106,7 @@ Interleave *push_front()* / *push_back()* then *sort()*:
 
 int main() {
     clist_d list = clist_d_init();
-    c_apply(clist_d, push_back, &list, {
+    c_apply(v, clist_d_push_back(&list, v), double, {
         10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0
     });
 
@@ -125,7 +125,7 @@ int main() {
     c_foreach (i, clist_d, list)
         printf(" %g", *i.ref);
 
-    clist_d_del(&list);
+    clist_d_drop(&list);
 }
 ```
 Output:
@@ -147,7 +147,7 @@ Use of *erase_at()* and *erase_range()*:
 int main ()
 {
     clist_i L = clist_i_init();
-    c_apply(clist_i, push_back, &L, {10, 20, 30, 40, 50});
+    c_apply(v, clist_i_push_back(&L, v), int, {10, 20, 30, 40, 50});
                                                 // 10 20 30 40 50
     clist_i_iter it = clist_i_begin(&L);        // ^
     clist_i_next(&it); 
@@ -161,7 +161,7 @@ int main ()
     c_foreach (x, clist_i, L) printf(" %d", *x.ref);
     puts("");
 
-    clist_i_del(&L);
+    clist_i_drop(&L);
 }
 ```
 Output:
@@ -182,8 +182,8 @@ Splice `[30, 40]` from *L2* into *L1* before `3`:
 int main() {
     c_auto (clist_i, L1, L2)
     {
-        c_apply(clist_i, push_back, &L1, {1, 2, 3, 4, 5});
-        c_apply(clist_i, push_back, &L2, {10, 20, 30, 40, 50});
+        c_apply(v, clist_i_push_back(&L1, v), int, {1, 2, 3, 4, 5});
+        c_apply(v, clist_i_push_back(&L2, v), int, {10, 20, 30, 40, 50});
 
         clist_i_iter i = clist_i_advance(clist_i_begin(&L1), 2);
         clist_i_iter j1 = clist_i_advance(clist_i_begin(&L2), 2), j2 = clist_i_advance(j1, 2);

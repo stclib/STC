@@ -12,19 +12,19 @@
 #include <stc/cmap.h>
 
 typedef struct {int x, y;} ipair_t;
-inline static int ipair_compare(const ipair_t* a, const ipair_t* b) {
-    int c = c_default_compare(&a->x, &b->x);
-    return c ? c : c_default_compare(&a->y, &b->y);
+inline static int ipair_cmp(const ipair_t* a, const ipair_t* b) {
+    int c = c_default_cmp(&a->x, &b->x);
+    return c ? c : c_default_cmp(&a->y, &b->y);
 }
 
 
 #define i_val ipair_t
-#define i_cmp ipair_compare
+#define i_cmp ipair_cmp
 #define i_tag ip
 #include <stc/cvec.h>
 
 #define i_val ipair_t
-#define i_cmp ipair_compare
+#define i_cmp ipair_cmp
 #define i_tag ip
 #include <stc/clist.h>
 
@@ -41,7 +41,7 @@ int main(void)
 
         // PRIORITY QUEUE
 
-        c_apply_n(cpque_f, push, &floats, nums, c_arraylen(nums));
+        c_apply_arr(v, cpque_f_push(&floats, v), float, nums, c_arraylen(nums));
 
         puts("\npop and show high priorites first:");
         while (! cpque_f_empty(floats)) {
@@ -67,7 +67,7 @@ int main(void)
     // CMAP CNT
 
     c_auto (cmap_cnt, countries) {
-        c_apply_pair(cmap_cnt, emplace, &countries, {
+        c_apply(v, cmap_cnt_emplace(&countries, c_pair(v)), cmap_cnt_raw, {
             {"Norway", 100},
             {"Denmark", 50},
             {"Iceland", 10},
@@ -90,7 +90,8 @@ int main(void)
     // CVEC PAIR
 
     c_auto (cvec_ip, pairs1) {
-        c_apply(cvec_ip, push_back, &pairs1, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
+        c_apply(p, cvec_ip_push_back(&pairs1, p), ipair_t, 
+            {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
         cvec_ip_sort(&pairs1);
 
         c_foreach (i, cvec_ip, pairs1)
@@ -101,7 +102,8 @@ int main(void)
     // CLIST PAIR
 
     c_auto (clist_ip, pairs2) {
-        c_apply(clist_ip, push_back, &pairs2, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
+        c_apply(p, clist_ip_push_back(&pairs2, p), ipair_t, 
+            {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
         clist_ip_sort(&pairs2);
 
         c_foreach (i, clist_ip, pairs2)

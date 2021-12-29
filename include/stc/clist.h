@@ -87,19 +87,20 @@ _c_clist_complete_types(clist_VOID, dummy);
   _cx_deftypes(_c_clist_types, _cx_self, i_val);
 #endif
 _cx_deftypes(_c_clist_complete_types, _cx_self, dummy);
-typedef i_valraw _cx_rawvalue;
+typedef i_valraw _cx_raw;
 
 STC_API size_t _clist_count(const clist_VOID* self);
 
-STC_API void            _cx_memb(_del)(_cx_self* self);
+STC_API void            _cx_memb(_drop)(_cx_self* self);
 STC_API _cx_value*      _cx_memb(_push_back)(_cx_self* self, i_val value);
 STC_API _cx_value*      _cx_memb(_push_front)(_cx_self* self, i_val value);
 STC_API _cx_iter        _cx_memb(_insert)(_cx_self* self, _cx_iter it, i_val value);
 STC_API _cx_iter        _cx_memb(_erase_at)(_cx_self* self, _cx_iter it);
 STC_API _cx_iter        _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2);
-#if !c_option(c_no_compare)
+#if !c_option(c_no_cmp)
 STC_API size_t          _cx_memb(_remove)(_cx_self* self, i_valraw val);
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw val);
+STC_API int             _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y);
 #endif
 STC_API _cx_iter        _cx_memb(_splice)(_cx_self* self, _cx_iter it, _cx_self* other);
 STC_API _cx_self        _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2);
@@ -108,29 +109,28 @@ STC_API _cx_node*       _cx_memb(_erase_after_)(_cx_self* self, _cx_node* node);
 
 #if !c_option(c_no_clone)
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
+STC_INLINE i_val        _cx_memb(_value_clone)(i_val val)
+                            { return i_valfrom(i_valto(&val)); }
+STC_INLINE void
+_cx_memb(_copy)(_cx_self *self, _cx_self other) {
+    if (self->last == other.last) return;
+    _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
+}
+#if !defined _i_no_raw
 STC_INLINE _cx_value*   _cx_memb(_emplace_back)(_cx_self* self, i_valraw raw)
                             { return _cx_memb(_push_back)(self, i_valfrom(raw)); }
 STC_INLINE _cx_value*   _cx_memb(_emplace_front)(_cx_self* self, i_valraw raw)
                             { return _cx_memb(_push_front)(self, i_valfrom(raw)); }
 STC_INLINE _cx_iter     _cx_memb(_emplace)(_cx_self* self, _cx_iter it, i_valraw raw)
                             { return _cx_memb(_insert)(self, it, i_valfrom(raw)); }
-STC_INLINE i_val        _cx_memb(_value_fromraw)(i_valraw raw) 
-                            { return i_valfrom(raw); }
-STC_INLINE i_val        _cx_memb(_value_clone)(i_val val)
-                            { return i_valfrom(i_valto(&val)); }
-STC_INLINE void
-_cx_memb(_copy)(_cx_self *self, _cx_self other) {
-    if (self->last == other.last) return;
-    _cx_memb(_del)(self); *self = _cx_memb(_clone)(other);
-}
+#endif
 #endif
 STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_make(_cx_self){NULL}; }
 STC_INLINE bool         _cx_memb(_reserve)(_cx_self* self, size_t n) { return true; }
 STC_INLINE bool         _cx_memb(_empty)(_cx_self cx) { return cx.last == NULL; }
 STC_INLINE size_t       _cx_memb(_count)(_cx_self cx)
                             { return _clist_count((const clist_VOID*) &cx); }
-STC_INLINE void         _cx_memb(_clear)(_cx_self* self) { _cx_memb(_del)(self); }
-STC_INLINE i_valraw     _cx_memb(_value_toraw)(_cx_value* pval) { return i_valto(pval); }
+STC_INLINE void         _cx_memb(_clear)(_cx_self* self) { _cx_memb(_drop)(self); }
 STC_INLINE void         _cx_memb(_pop_front)(_cx_self* self)
                             { _cx_memb(_erase_after_)(self, self->last); }
 STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return &self->last->next->value; }
@@ -166,7 +166,7 @@ _cx_memb(_splice_range)(_cx_self* self, _cx_iter it,
     return _cx_memb(_splice)(self, it, &tmp);
 }
 
-#if !c_option(c_no_compare)
+#if !c_option(c_no_cmp)
 STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, i_valraw val) {
     return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), val);
@@ -191,13 +191,13 @@ _cx_memb(_get_mut)(_cx_self* self, i_valraw val) {
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self cx) {
     _cx_self out = _cx_memb(_init)();
-    c_foreach (it, _cx_self, cx) _cx_memb(_emplace_back)(&out, i_valto(it.ref));
+    c_foreach (it, _cx_self, cx) _cx_memb(_push_back)(&out, i_valfrom(i_valto(it.ref)));
     return out;
 }
 #endif
 
 STC_DEF void
-_cx_memb(_del)(_cx_self* self) {
+_cx_memb(_drop)(_cx_self* self) {
     while (self->last) _cx_memb(_erase_after_)(self, self->last);
 }
 
@@ -250,7 +250,7 @@ _cx_memb(_erase_after_)(_cx_self* self, _cx_node* node) {
     node->next = next;
     if (del == next) self->last = node = NULL;
     else if (self->last == del) self->last = node, node = NULL;
-    i_valdel(&del->value); c_free(del);
+    i_valdrop(&del->value); c_free(del);
     return node;
 }
 
@@ -280,7 +280,7 @@ _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
     return cx;
 }
 
-#if !c_option(c_no_compare)
+#if !c_option(c_no_cmp)
 
 STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw val) {
@@ -321,7 +321,14 @@ _cx_memb(_sort)(_cx_self* self) {
     if (self->last)
         self->last = (_cx_node *) _clist_mergesort((clist_VOID_node *) self->last->next, _cx_memb(_sort_cmp_));
 }
-#endif // !c_no_compare
+
+STC_DEF int
+_cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
+    i_valraw rx = i_valto(x);
+    i_valraw ry = i_valto(y);
+    return i_cmp(&rx, &ry);
+}
+#endif // !c_no_cmp
 
 #endif // TEMPLATE IMPLEMENTATION
 
@@ -336,7 +343,7 @@ _clist_count(const clist_VOID* self) {
     return n;
 }
 
-#if !c_option(c_no_compare)
+#if !c_option(c_no_cmp)
 
 // Singly linked list Mergesort implementation by Simon Tatham. O(n*log n).
 // https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
@@ -387,7 +394,7 @@ _clist_mergesort(clist_VOID_node *list, int (*cmp)(const clist_VOID_node*, const
         insize *= 2;
     }
 }
-#endif // !c_no_compare
+#endif // !c_no_cmp
 #endif // NON-TEMPLATE IMPLEMENTATION
 #include "template.h"
 #define CLIST_H_INCLUDED

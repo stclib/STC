@@ -35,7 +35,22 @@ struct OlympicsData { int year; const char *city, *country, *date; } ol_data[] =
 
 typedef struct { int year; cstr city, date; } OlympicLocation;
 
-int OlympicLocation_compare(OlympicLocation* a, OlympicLocation* b) {
+int OlympicLocation_cmp(OlympicLocation* a, OlympicLocation* b);
+OlympicLocation OlympicLocation_clone(OlympicLocation loc);
+void OlympicLocation_drop(OlympicLocation* self);
+
+// Create a clist<OlympicLocation>, can be sorted by year.
+#define i_val_bind OlympicLocation // binds _cmp, _clone and _drop.
+#define i_tag OL
+#include <stc/clist.h>
+
+// Create a csmap<cstr, clist_OL> where key is country name
+#define i_key_str           // binds cstr_equ, cstr_hash, cstr_clone, ++
+#define i_val_bind clist_OL // binds clist_OL_clone, clist_OL_drop
+#define i_tag OL
+#include <stc/csmap.h>
+
+int OlympicLocation_cmp(OlympicLocation* a, OlympicLocation* b) {
     return a->year - b->year;
 }
 
@@ -44,25 +59,9 @@ OlympicLocation OlympicLocation_clone(OlympicLocation loc) {
     loc.date = cstr_clone(loc.date);
     return loc;
 }
-void OlympicLocation_del(OlympicLocation* self) {
-    c_del(cstr, &self->city, &self->date);
+void OlympicLocation_drop(OlympicLocation* self) {
+    c_drop(cstr, &self->city, &self->date);
 }
-
-// Create a clist<OlympicLocation>, can be sorted by year.
-#define i_val OlympicLocation
-#define i_cmp OlympicLocation_compare
-#define i_del OlympicLocation_del
-#define i_from OlympicLocation_clone
-#define i_tag OL
-#include <stc/clist.h>
-
-// Create a csmap<cstr, clist_OL> where key is country name
-#define i_key_str
-#define i_val clist_OL
-#define i_valdel clist_OL_del
-#define i_valfrom clist_OL_clone
-#define i_tag OL
-#include <stc/csmap.h>
 
 int main()
 {

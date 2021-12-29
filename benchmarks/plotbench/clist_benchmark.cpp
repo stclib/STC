@@ -78,7 +78,7 @@ Sample test_stc_forward_list() {
         c_forrange (N) clist_x_pop_front(&con);
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = 0;
-        clist_x_del(&con);
+        clist_x_drop(&con);
      }{
         stc64_srandom(seed);
         container con = clist_x_init();
@@ -95,7 +95,7 @@ Sample test_stc_forward_list() {
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();
-        clist_x_del(&con);
+        clist_x_drop(&con);
      }
      s.test[DESTRUCT].t2 = clock();
      s.test[DESTRUCT].sum = 0;

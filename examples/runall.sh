@@ -24,6 +24,7 @@ fi
 if [ $run = 0 ] ; then
     for i in *.c ; do
         echo $cc -I../include $i $libs
+        ../checkauto $i
         $cc -I../include $i $libs
     done
 else

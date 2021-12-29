@@ -38,8 +38,7 @@ typedef                 char csview_value;
 
 STC_API csview          csview_substr(csview sv, intptr_t pos, size_t n);
 STC_API csview          csview_slice(csview sv, intptr_t p1, intptr_t p2);
-STC_API csview          csview_first_token(csview sv, csview sep);
-STC_API csview          csview_next_token(csview sv, csview sep, csview tok);
+STC_API csview          csview_token(csview sv, csview sep, size_t* start);
 
 #define                 csview_new(literal) \
                             c_make(csview){literal, sizeof c_make(c_strlit){literal} - 1}
@@ -114,9 +113,13 @@ STC_INLINE bool         cstr_ends_with_v(cstr s, csview sub)
 
 /* ---- Container helper functions ---- */
 
-#define                 csview_compare(xp, yp) strcmp((xp)->str, (yp)->str)
+STC_INLINE int          csview_cmp(const csview* x, const csview* y) { 
+                            const size_t m = x->size < y->size ? x->size : y->size; 
+                            const int c = memcmp(x->str, y->str, m);
+                            return c ? c : x->size - y->size;
+                        }
 #define                 csview_hash(xp, dummy) c_strhash((xp)->str)
-#define                 csview_equalto(xp, yp) (strcmp((xp)->str, (yp)->str) == 0)
+#define                 csview_eq(xp, yp) (!csview_cmp(xp, yp))
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
@@ -137,19 +140,11 @@ csview_slice(csview sv, intptr_t p1, intptr_t p2) {
 }
 
 STC_DEF csview
-csview_first_token(csview sv, csview sep) {
-    const char* res = c_strnstrn(sv.str, sep.str, sv.size, sep.size);
-    return c_make(csview){sv.str, (res ? res - sv.str : sv.size)};
-}
-
-STC_DEF csview
-csview_next_token(csview sv, csview sep, csview tok) {
-    if (&tok.str[tok.size] == &sv.str[sv.size])
-        return c_make(csview){&sv.str[sv.size], 0};
-    tok.str += tok.size + sep.size;
-    size_t n = sv.size - (tok.str - sv.str);
-    const char* res = c_strnstrn(tok.str, sep.str, n, sep.size);
-    tok.size = res ? res - tok.str : n;
+csview_token(csview sv, csview sep, size_t* start) {
+    csview slice = {sv.str + *start, sv.size - *start};
+    const char* res = c_strnstrn(slice.str, sep.str, slice.size, sep.size);
+    csview tok = {slice.str, res ? res - slice.str : (sep.size = 0, slice.size)};
+    *start += tok.size + sep.size;
     return tok;
 }
 

@@ -16,15 +16,15 @@ struct MyStruct {
 // Point => int map
 struct Point { int x, y; } typedef Point;
 
-int point_compare(const Point* a, const Point* b) {
-    int c = c_default_compare(&a->x, &b->x);
-    return c ? c : c_default_compare(&a->y, &b->y);
+int point_cmp(const Point* a, const Point* b) {
+    int c = a->x - b->x;
+    return c ? c : a->y - b->y;
 }
 
 // Point => int map
 #define i_key Point
 #define i_val int
-#define i_cmp point_compare
+#define i_cmp point_cmp
 #define i_opt c_is_fwd
 #define i_tag pnt
 #include <stc/cmap.h>
@@ -48,19 +48,19 @@ int main()
     {
         cmap_int_insert(&map, 123, 321);
 
-        c_apply_pair(cmap_pnt, insert, &pmap, {
+        c_apply(v, cmap_pnt_insert(&pmap, c_pair(v)), cmap_pnt_raw, {
             {{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}
         });
         c_foreach (i, cmap_pnt, pmap)
             printf(" (%d, %d: %d)", i.ref->first.x, i.ref->first.y, i.ref->second);
         puts("");
 
-        c_apply_pair(cmap_str, emplace, &smap, {
+        c_apply(v, cmap_str_emplace(&smap, c_pair(v)), cmap_str_raw, {
             {"Hello, friend", "long time no see"},
             {"So long, friend", "see you around"},
         });
 
-        c_apply(cset_str, emplace, &sset, {
+        c_apply(v, cset_str_emplace(&sset, v), const char*, {
             "Hello, friend",
             "Nice to see you again",
             "So long, friend",

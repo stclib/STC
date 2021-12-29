@@ -5,30 +5,59 @@ STC - Smart Template Containers for C
 
 News
 ----
-- Strings: Renamed constructor *cstr_lit()* to `cstr_new(lit)`. Renamed *cstr_assign_fmt()* to `cstr_printf()`.
-- Added [**cbox**](docs/cbox_api.md) type: container of one element, similar to [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr)
-- Added [example for **csptr**](examples/sptr_to_maps.c).
-- Added [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding".
-- Deprecated *csptr_X_make()*. Renamed to *csptr_X_new()*. Corresponding **cbox** method is *cbox_X_new()*.
-- Deprecated *c_default_fromraw(raw)*. Renamed to *c_default_clone(raw)*.
-- Deprecated `i_key_csptr` / `i_val_csptr`. Use `i_key_ref` / `i_val_ref` when specifying containers with **csptr** or **cbox** elements.
-- Deprecated `i_cnt`. Use `i_type` instead to define the full container type name.
+### Version 3 released
+This version introduces lots of enhancements, bugfixes and additions. There are also
+a number of breaking changes, see below for changes and a migration guide. 
 
-Previous:
-- Added `i_opt` template parameter: compile-time options: `c_no_compare`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`; may be combined with `|`
-- Removed: i_cmp_none and i_fwd: replaced by `c_no_compare` and `c_is_fwd` args to `i_opt`.
+With version 3, the API is freezed as far as possible. Any changes will be handled with long 
+lasting deprecations, so you may develop production code using it.
 
-VERSION 2.0 released. Two main breaking changes from V1.X.
-- Uses a different way to instantiate templated containers, which is incompatible with v1.X.
-- New **c_auto**, **c_autovar**, and **c_autoscope** macros. These are for automatic scope resource management, aka RAII.
-- The new template instantiation style has multiple advantages, e.g. implementation does not contain long macro definitions for code generation. Also, specifying template arguments is more user friendly and flexible.
+### Brief summary of changes
+- Renamed: all ***_del*** to `_drop` (like destructors in Rust).
+- Renamed: all ***_compare*** to `_cmp`
+- Renamed: ***i_equ*** to `i_eq`, and ***_equalto*** to `_eq`.
+- Renamed: ***i_cnt*** to `i_type` for defining the complete container type name.
+- Renamed: type **csptr** to [**carc**](docs/carc_api.md) (atomic reference counted) smart pointer.
+- Renamed: ***i_key_csptr*** / ***i_val_csptr*** to `i_key_sptr` / `i_val_sptr` for specifying **carc** and **cbox** values in containers.
+- Renamed: *csptr_X_make()* to `carc_X_from()`.
+- Renamed: *cstr_lit()* to `cstr_new(literal)`, and *cstr_assign_fmt()* to `cstr_printf()`.
+- Renamed: *c_default_fromraw()* to `c_default_clone()`.
+- Changed: the [**c_apply**](docs/ccommon_api.md) macros API.
+- Replaced: *csview_first_token()* and *csview_next_token()* with one function: `csview_token()`.
+- Added: **checkauto** tool for checking that c-source files uses `c_auto*` macros correctly.
+- Added: general `i_key_bind` / `i_val_bind` template parameters which auto-binds template functions.
+- Added: `i_opt` template parameter: compile-time options: `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`; may be combined with `|`
+- Added: [**cbox**](docs/cbox_api.md) type: smart pointer, similar to [Rust Box](https://doc.rust-lang.org/rust-by-example/std/box.html) and [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr).
+- Added: [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding"
+
+### Migration guide from version 2 to 3.
+Replace (regular expression) globally in code base (VS Code):
+- `_del\b` ⟶ `_drop`
+- `_compare\b` ⟶ `_cmp`
+- `_rawvalue\b` ⟶ `_raw`
+- `_equ\b` ⟶ `_eq`
+
+Replace (whole word + match case):
+- `i_keydel` ⟶ `i_keydrop`
+- `i_valdel` ⟶ `i_valdrop`
+- `i_cnt` ⟶ `i_type`
+- `cstr_lit` ⟶ `cstr_new`
+- `i_key_csptr` / `i_key_ref` ⟶ `i_key_sptr`
+- `i_val_csptr` / `i_val_ref` ⟶ `i_val_sptr`
+- `c_apply` ⟶ `c_apply_OLD` // replaced by new `c_apply`
+- `c_apply_pair` ⟶ `c_apply_pair_OLD` // replaced by new `c_apply`
+
+Non-regex, global match case replace:
+- `csptr` ⟶ `carc`
 
 Introduction
 ------------
 STC is a modern, templated, user-friendly, fast, fully type-safe, and customizable container library for C99,
-with a uniform API across the containers, and is similar to the c++ standard library containers API.
+with a uniform API across the containers, and is similar to the c++ standard library containers API. It takes some
+inspirations from Rust and Python too.
+
 It is a compact, header-only library which includes the all the major "standard" data containers except for the
-multimap/set variants. There are examples on how to create multimaps in the examples folder.
+multimap/set variants. However, there are examples on how to create multimaps in the examples folder.
 
 For an introduction to templated containers, please read the blog by Ian Fisher on
 [type-safe generic data structures in C](https://iafisher.com/blog/2020/06/type-safe-generics-in-c).
@@ -42,7 +71,7 @@ which by the compiler is seen as different code because of macro name substituti
 - [***clist*** - **std::forward_list** alike type](docs/clist_api.md)
 - [***cmap*** - **std::unordered_map** alike type](docs/cmap_api.md)
 - [***cpque*** - **std::priority_queue** alike type](docs/cpque_api.md)
-- [***csptr*** - **std::shared_ptr** alike support](docs/csptr_api.md)
+- [***carc*** - **std::shared_ptr** alike support](docs/carc_api.md)
 - [***cqueue*** - **std::queue** alike type](docs/cqueue_api.md)
 - [***cset*** - **std::unordered_set** alike type](docs/cset_api.md)
 - [***csmap*** - **std::map** sorted map alike type](docs/csmap_api.md)
@@ -62,7 +91,7 @@ Highlights
 - **User friendly** - Just include the headers and you are good. The API and functionality is very close to c++ STL, and is fully listed in the docs. 
 - **Templates** - Use `#define i_{arg}` to specify container template arguments. There are templates for element-*type*, -*comparison*, -*destruction*, -*cloning*, -*conversion types*, and more.
 - **Unparalleled performance** - Some containers are much faster than the c++ STL containers, the rest are about equal in speed.
-- **Fully memory managed** - All containers will destruct keys/values via destructor defined as macro parameters before including the container header. Also, shared pointers are supported and can be stored in containers, see ***csptr***.
+- **Fully memory managed** - All containers will destruct keys/values via destructor defined as macro parameters before including the container header. Also, shared pointers are supported and can be stored in containers, see ***carc***.
 - **Fully type safe** - Because of templating, it avoids error-prone casting of container types and elements back and forth from the containers.
 - **Uniform, easy-to-learn API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have uniform and intuitive usage across the various containers.
 - **Small footprint** - Small source code and generated executables. The executable from the example below with six different containers is *22 kb in size* compiled with gcc -Os on linux.
@@ -89,36 +118,47 @@ The usage of the containers is similar to the c++ standard containers in STL, so
 are familiar with them. All containers are generic/templated, except for **cstr** and **cbits**.
 No casting is used, so containers are type-safe like templates in c++. A basic usage example:
 ```c
-#define i_val float
-#include <stc/cvec.h>
+#define i_type FVec    // if not defined, vector type would be cvec_float
+#define i_val float    // element type
+#include <stc/cvec.h>  // defines the FVec type
 
 int main(void) {
-    cvec_float vec = cvec_float_init();
-    cvec_float_push_back(&vec, 10.f);
-    cvec_float_push_back(&vec, 20.f);
-    cvec_float_push_back(&vec, 30.f);
+    FVec vec = FVec_init();
+    FVec_push_back(&vec, 10.f);
+    FVec_push_back(&vec, 20.f);
+    FVec_push_back(&vec, 30.f);
 
-    c_foreach (i, cvec_float, vec)
-        printf(" %g", *i.ref);
+    for (size_t i = 0; i < FVec_size(vec); ++i)
+        printf(" %g", vec.data[i]);
+    FVec_drop(&vec); // free memory
+}
+```
+However, a "better" way to write the same is:
+```c
+int main(void) {
+    c_auto (FVec, vec) {  // RAII
+        c_apply(v, FVec_push_back(&vec, v), float, {10.f, 20.f, 30.f});
 
-    cvec_float_del(&vec);
+        c_foreach (i, FVec, vec) // generic iteration and element access
+            printf(" %g", *i.ref);
+    }
 }
 ```
 In order to include two **cvec**s with different element types, include cvec.h twice. For struct, a `i_cmp`
 compare function is required to enable sorting and searching (`<` and `==` operators is default and works
-for integral types only). Alternatively, `#define i_opt c_no_compare` to disable methods using comparison.
+for integral types only). Alternatively, `#define i_opt c_no_cmp` to disable methods using comparison.
 
-Similarly, if a destructor `i_del` is defined, either define a `i_valfrom` construct/clone function
+Similarly, if a destructor `i_drop` is defined, either define a `i_valfrom` construct/clone function
 or `#define i_opt c_no_clone` to disable cloning and emplace methods. Unless these requirements are met,
 compile errors are generated.
 ```c
 #define i_val struct One
-#define i_opt c_no_compare
+#define i_opt c_no_cmp
 #define i_tag one
 #include <stc/cvec.h>
 
 #define i_val struct Two
-#define i_opt c_no_compare
+#define i_opt c_no_cmp
 #define i_tag two
 #include <stc/cvec.h>
 ...
@@ -133,16 +173,16 @@ With six different containers:
 
 struct Point { float x, y; };
 
-int Point_compare(const struct Point* a, const struct Point* b) {
-    int cmp = c_default_compare(&a->x, &b->x);
-    return cmp ? cmp : c_default_compare(&a->y, &b->y);
+int Point_cmp(const struct Point* a, const struct Point* b) {
+    int cmp = c_default_cmp(&a->x, &b->x);
+    return cmp ? cmp : c_default_cmp(&a->y, &b->y);
 }
 
 #define i_key int
 #include <stc/cset.h>  // cset_int: unordered set
 
 #define i_val struct Point
-#define i_cmp Point_compare
+#define i_cmp Point_cmp
 #define i_tag pnt
 #include <stc/cvec.h>  // cvec_pnt: vector of struct Point
 
@@ -160,7 +200,7 @@ int Point_compare(const struct Point* a, const struct Point* b) {
 #include <stc/csmap.h> // csmap_int: sorted map int => int
 
 int main(void) {
-    // define six containers with automatic call of init and del (destruction after scope exit)
+    // define six containers with automatic call of init and drop (destruction after scope exit)
     c_auto (cset_int, set)
     c_auto (cvec_pnt, vec)
     c_auto (cdeq_int, deq)
@@ -169,16 +209,17 @@ int main(void) {
     c_auto (csmap_int, map)
     {
         // add some elements to each container
-        c_apply(cset_int, insert, &set, {10, 20, 30});
-        c_apply(cvec_pnt, push_back, &vec, { {10, 1}, {20, 2}, {30, 3} });
-        c_apply(cdeq_int, push_back, &deq, {10, 20, 30});
-        c_apply(clist_int, push_back, &lst, {10, 20, 30});
-        c_apply(cstack_int, push, &stk, {10, 20, 30});
-        c_apply_pair(csmap_int, insert, &map, { {20, 2}, {10, 1}, {30, 3} });
+        c_apply(v, cset_int_insert(&set, v), int, {10, 20, 30});
+        c_apply(v, cvec_pnt_push_back(&vec, v), struct Point, { {10, 1}, {20, 2}, {30, 3} });
+        c_apply(v, cdeq_int_push_back(&deq, v), int, {10, 20, 30});
+        c_apply(v, clist_int_push_back(&lst, v), int, {10, 20, 30});
+        c_apply(v, cstack_int_push(&stk, v), int, {10, 20, 30});
+        c_apply(v, csmap_int_insert(&map, c_pair(v)), 
+            csmap_int_raw, { {20, 2}, {10, 1}, {30, 3} });
 
         // add one more element to each container
         cset_int_insert(&set, 40);
-        cvec_pnt_push_back(&vec, (struct Point) {40, 4});
+        cvec_pnt_push_back(&vec, (struct Point){40, 4});
         cdeq_int_push_front(&deq, 5);
         clist_int_push_front(&lst, 5);
         cstack_int_push(&stk, 40);
@@ -186,7 +227,7 @@ int main(void) {
 
         // find an element in each container
         cset_int_iter i1 = cset_int_find(&set, 20);
-        cvec_pnt_iter i2 = cvec_pnt_find(&vec, (struct Point) {20, 2});
+        cvec_pnt_iter i2 = cvec_pnt_find(&vec, (struct Point){20, 2});
         cdeq_int_iter i3 = cdeq_int_find(&deq, 20);
         clist_int_iter i4 = clist_int_find(&lst, 20);
         csmap_int_iter i5 = csmap_int_find(&map, 20);
@@ -265,31 +306,40 @@ Each templated type requires one `#include`, even if it's the same container bas
 The template parameters are given by a `#define i_xxxx` statement, where *xxxx* is the parameter name.
 The list of template parameters:
 
-- `i_tag`     - Container type tag. Defaults to same as `i_key`
-- `i_type`    - Full container type name (optional, alternative to `i_tag`).
-- `i_opt`     - Boolean properties: may combine `c_no_compare`, `c_no_clone`, `c_no_atomic`, `c_is_fwd` with `|` separator.
+- `i_key`     - Element key type for map/set only. **[required]**.
+- `i_val`     - Element value type. **[required]**. For cmap/csmap, it is the mapped value type.
+- `i_cmp`     - Three-way comparison of two `i_keyraw or i_valraw` pointers - **[required]** for non-integral raw types unless `i_opt c_no_cmp` is defined.
+- `i_hash`    - Hash function taking `i_keyraw *` and a size - defaults to `!i_cmp`.
+- `i_eq`      - Equality comparison of two `i_keyraw *` - defaults to `!i_cmp`. Companion with `i_hash`.
 
-- `i_key`     - Maps key type. **[required]** for cmap/csmap.
-- `i_val`     - The container **[required]** element type. For cmap/csmap, it is the mapped value.
-- `i_cmp`     - Three-way comparison of two `i_keyraw`, **[required]** for non-integral `i_keyraw`.
-- `i_equ`     - Equality comparison of two `i_keyraw`- defaults to `!i_cmp`.
+Properties:
+- `i_tag`     - Container type name tag. Defaults to same as `i_key`
+- `i_type`    - Full container type name. Alternative to `i_tag`.
+- `i_opt`     - Boolean properties: may combine `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd` with `|` separator.
 
-- `i_keydel`  - Destroy map key func - defaults to empty destructor.
+Key:
+- `i_keydrop` - Destroy map/set key func - defaults to empty destructor.
 - `i_keyraw`  - Convertion "raw" type - defaults to `i_key` type.
-- `i_keyfrom` - Convertion func `i_keyraw` => `i_key` - defaults to simple copy. **[required]** if `i_keydel` is defined.
-- `i_keyto`   - Convertion func `i_key` => `i_keyraw` - defaults to simple copy.
+- `i_keyfrom` - Convertion func `i_key` <= `i_keyraw`. **[required]** if `i_keydrop` is defined. Works as *clone* when `i_keyraw` == `i_key` type. 
+- `i_keyto`   - Convertion func `i_key *` => `i_keyraw`.
 
-- `i_valdel`  - Destroy mapped or value func - defaults to empty destruct.
+Val:
+- `i_valdrop` - Destroy mapped or value func - defaults to empty destruct.
 - `i_valraw`  - Convertion "raw" type - defaults to `i_val` type.
-- `i_valfrom` - Convertion func `i_valraw` => `i_val` - defaults to simple copy.
-- `i_valto`   - Convertion func `i_val` => `i_valraw` - defaults to simple copy.
+- `i_valfrom` - Convertion func `i_val` <= `i_valraw`. **[required]** if `i_valdrop` is defined.  Works as *clone* when `i_valraw` == `i_val` type. 
+- `i_valto`   - Convertion func `i_val *` => `i_valraw`.
 
-Instead of defining `i_cmp`, you may define `i_opt c_no_compare` to disable methods using comparison.
+Special:
+- `i_key_str` - Define key type `cstr` and container i_tag = `str`. It binds type convertion from/to const char*, and the cmp, eq, hash, and keydrop functions.
+- `i_key_sptr TYPE` - Define key type where TYPE is a smart pointer `carc` or `cbox`. I.e. not to be used when defining carc/cbox types themselves.
+- `i_key_bind TYPE` - General version of the two above - will auto-bind to standard named functions based on TYPE. Use for elements where the following functions are defined: *TYPE_cmp*, *TYPE_clone*, *TYPE_drop*, *TYPE_hash*, and *TYPE_eq*. Only the functions required by the particular container needs to be defined. e.g. **cmap** and **cset** are the only types that require *TYPE_hash* and *TYPE_eq* to be defined. *TYPE_cmp* and *TYPE_clone* are not required if `i_opt c_no_cmp|c_no_clone` is defined. *TYPE_drop* is always required when using `_bind`.
+- `i_val_str`, `i_val_sptr`, `i_val_bind` - Same as for key.
 
-Instead of defining `i_valfrom`, you may define `i_opt c_no_clone` to disable methods using deep copy.
-
-If a destructor `i_del` is defined, then define either `i_valfrom` or `i_opt c_no_clone`, otherwise
-compile errors are generated.
+Notes:
+- For non-associative containers, `i_drop` and `i_from` may be defined instead of `i_valdrop` and `i_valfrom`.
+- Instead of defining `i_cmp`, you may define `i_opt c_no_cmp` to exclude methods using comparison.
+- Instead of defining `i_*from`, you may define `i_opt c_no_clone` to exclude methods using deep copy.
+- If a destructor `i_*drop` is defined, then either `i_*from` or `i_opt c_no_clone` is required to be defined.
 
 The *emplace* versus non-emplace container methods
 --------------------------------------------------
@@ -318,8 +368,8 @@ and non-emplace methods:
 #define i_val_str       // special macro to enable container of cstr
 #include <stc/cvec.h>   // vector of string (cstr)
 ...
-c_auto (cvec_str, vec)  // declare and call cvec_str_init() and defer cvec_str_del(&vec)
-c_autovar (cstr s = cstr_new("a string literal"), cstr_del(&s))  // c_autovar is a more general c_auto.
+c_auto (cvec_str, vec)  // declare and call cvec_str_init() and defer cvec_str_drop(&vec)
+c_autovar (cstr s = cstr_new("a string literal"), cstr_drop(&s))  // c_autovar is a more general c_auto.
 {
     const char* hello = "Hello";
     cvec_str_push_back(&vec, cstr_from(hello);    // construct and add string from const char*
@@ -413,4 +463,4 @@ Memory efficiency
 - **cmap**: Type size: 4 pointers. *cmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.6x when reaching that.
 - **csmap**: Type size: 1 pointer. *csmap* manages its own array of tree-nodes for allocation efficiency. Each node uses only two 32-bit ints for child nodes, and one byte for `level`.
 - **carr2**, **carr3**: Type size: 1 pointer plus dimension variables. Arrays are allocated as one contiguous block of heap memory, and one allocation for pointers of indices to the array.
-- **csptr**: Type size: 2 pointers, one for the data and one for the reference counter.
+- **carc**: Type size: 2 pointers, one for the data and one for the reference counter.

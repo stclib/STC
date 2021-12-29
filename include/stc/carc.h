@@ -21,35 +21,35 @@
  * SOFTWARE.
  */
 
-/* csptr: shared_ptr type
+/* carc: atomic reference counted shared_ptr
 #include <stc/cstr.h>
 
 typedef struct { cstr name, last; } Person;
 
-Person Person_from(const char* name, const char* last) {
+Person Person_new(const char* name, const char* last) {
     return (Person){.name = cstr_from(name), .last = cstr_from(last)};
 }
-void Person_del(Person* p) {
-    printf("del: %s %s\n", p->name.str, p->last.str);
-    c_del(cstr, &p->name, &p->last);
+void Person_drop(Person* p) {
+    printf("drop: %s %s\n", p->name.str, p->last.str);
+    c_drop(cstr, &p->name, &p->last);
 }
 
 #define i_tag person
 #define i_val Person
-#define i_valdel Person_del
-#include <stc/csptr.h>
+#define i_valdrop Person_drop
+#include <stc/carc.h>
 
 int main() {
-    csptr_person p = csptr_person_new(Person_from("John", "Smiths"));
-    csptr_person q = csptr_person_clone(p); // share the pointer
+    carc_person p = carc_person_from(Person_new("John", "Smiths"));
+    carc_person q = carc_person_clone(p); // share the pointer
 
     printf("%s %s. uses: %zu\n", q.get->name.str, q.get->last.str, *q.use_count);
-    c_del(csptr_person, &p, &q);
+    c_drop(carc_person, &p, &q);
 }
 */
 
-#ifndef CSPTR_H_INCLUDED
-#define CSPTR_H_INCLUDED
+#ifndef CARC_H_INCLUDED
+#define CARC_H_INCLUDED
 #include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
@@ -67,15 +67,16 @@ int main() {
     #define c_atomic_dec_and_test(v) (atomic_fetch_sub(v, 1) == 1)
 #endif
 
-#define csptr_null {NULL, NULL}
-#define _cx_csptr_rep struct _cx_memb(_rep_)
-#endif // CSPTR_H_INCLUDED
+#define carc_null {NULL, NULL}
+#define _cx_carc_rep struct _cx_memb(_rep_)
+#endif // CARC_H_INCLUDED
 
 #ifndef _i_prefix
-#define _i_prefix csptr_
+#define _i_prefix carc_
 #endif
 #define _i_has_internal_clone
 #include "template.h"
+typedef i_valraw _cx_raw;
 
 #if !c_option(c_no_atomic)
   #define _i_atomic_inc(v)          c_atomic_inc(v)
@@ -85,9 +86,9 @@ int main() {
   #define _i_atomic_dec_and_test(v) !(--*(v))
 #endif
 #if !c_option(c_is_fwd)
-_cx_deftypes(_c_csptr_types, _cx_self, i_val);
+_cx_deftypes(_c_carc_types, _cx_self, i_val);
 #endif
-_cx_csptr_rep { long counter; i_val value; };
+_cx_carc_rep { long counter; i_val value; };
 
 STC_INLINE _cx_self
 _cx_memb(_init)(void) { return c_make(_cx_self){NULL, NULL}; }
@@ -96,32 +97,22 @@ STC_INLINE long
 _cx_memb(_use_count)(_cx_self ptr) { return ptr.use_count ? *ptr.use_count : 0; }
 
 STC_INLINE _cx_self
-_cx_memb(_with)(_cx_value* p) {
+_cx_memb(_from_ptr)(_cx_value* p) {
     _cx_self ptr = {p};
     if (p) *(ptr.use_count = c_alloc(long)) = 1;
     return ptr;
 }
 
 STC_INLINE _cx_self
-_cx_memb(_view)(const _cx_value* p) {
-    _cx_self ptr = {(_cx_value*) p};
-    return ptr;
-}
-
-STC_INLINE _cx_self
-_cx_memb(_new)(i_val val) {
-    _cx_self ptr; _cx_csptr_rep *rep = c_alloc(_cx_csptr_rep);
+_cx_memb(_from)(i_val val) {
+    _cx_self ptr; _cx_carc_rep *rep = c_alloc(_cx_carc_rep);
     *(ptr.use_count = &rep->counter) = 1;
     *(ptr.get = &rep->value) = val;
     return ptr;
 }
-STC_INLINE _cx_self _cx_memb(_make)(i_val val) // [deprecated]
-    { return _cx_memb(_new)(val); }
 
-STC_INLINE _cx_self // does not use i_valfrom, so we can bypass c_no_clone
-_cx_memb(_clone)(_cx_self ptr) {
-    if (ptr.use_count) _i_atomic_inc(ptr.use_count);
-    return ptr;
+STC_INLINE i_val _cx_memb(_toraw)(const _cx_self* self) { 
+    return *self->get;
 }
 
 STC_INLINE _cx_self
@@ -132,10 +123,10 @@ _cx_memb(_move)(_cx_self* self) {
 }
 
 STC_INLINE void
-_cx_memb(_del)(_cx_self* self) {
+_cx_memb(_drop)(_cx_self* self) {
     if (self->use_count && _i_atomic_dec_and_test(self->use_count)) {
-        i_valdel(self->get);
-        if (self->get != &((_cx_csptr_rep *)self->use_count)->value)
+        i_valdrop(self->get);
+        if (self->get != &((_cx_carc_rep *)self->use_count)->value)
             c_free(self->get);
         c_free(self->use_count);
     }
@@ -143,67 +134,67 @@ _cx_memb(_del)(_cx_self* self) {
 
 STC_INLINE void
 _cx_memb(_reset)(_cx_self* self) {
-    _cx_memb(_del)(self);
+    _cx_memb(_drop)(self);
     self->use_count = NULL, self->get = NULL;
 }
 
 STC_INLINE void
-_cx_memb(_reset_with)(_cx_self* self, _cx_value* p) {
-    _cx_memb(_del)(self);
-    *self = _cx_memb(_with)(p);
+_cx_memb(_reset_from)(_cx_self* self, i_val val) {
+    _cx_memb(_drop)(self);
+    *self = _cx_memb(_from)(val);
 }
 
-STC_INLINE void
-_cx_memb(_reset_new)(_cx_self* self, i_val val) {
-    _cx_memb(_del)(self);
-    *self = _cx_memb(_new)(val);
-}
-
-#if !c_option(c_no_clone)
-    STC_INLINE _cx_self _cx_memb(_from)(i_valraw raw) { 
-        return _cx_memb(_new)(i_valfrom(raw));
-    }
-
-    STC_INLINE void
-    _cx_memb(_reset_from)(_cx_self* self, i_valraw raw) {
-        _cx_memb(_del)(self);
-        *self = _cx_memb(_new)(i_valfrom(raw));
+#if !c_option(c_no_clone) && !defined _i_no_raw
+    STC_INLINE _cx_self _cx_memb(_new)(i_valraw raw) { 
+        return _cx_memb(_from)(i_valfrom(raw));
     }
 #endif
+
+// does not use i_valfrom, so we can bypass c_no_clone
+STC_INLINE _cx_self 
+_cx_memb(_clone)(_cx_self ptr) {
+    if (ptr.use_count) _i_atomic_inc(ptr.use_count);
+    return ptr;
+}
 
 STC_INLINE void
 _cx_memb(_copy)(_cx_self* self, _cx_self ptr) {
     if (ptr.use_count) _i_atomic_inc(ptr.use_count);
-    _cx_memb(_del)(self); *self = ptr;
+    _cx_memb(_drop)(self);
+    *self = ptr;
 }
 
 STC_INLINE void
 _cx_memb(_take)(_cx_self* self, _cx_self ptr) {
-    if (self->get != ptr.get) _cx_memb(_del)(self);
+    if (self->get != ptr.get) _cx_memb(_drop)(self);
     *self = ptr;
 }
 
 STC_INLINE uint64_t
-_cx_memb(_hash)(const _cx_self* self, size_t n) {
-    #if (c_option(c_no_compare) || defined _i_default_compare) && SIZE_MAX >> 32
-        return c_hash64(&self->get, 8);
-    #elif (c_option(c_no_compare) || defined _i_default_compare)
-        return c_hash32(&self->get, 4);
+_cx_memb(_value_hash)(const _cx_value* x, size_t n) {
+    #if c_option(c_no_cmp) && UINTPTR_MAX == UINT64_MAX
+        return c_hash64(&x, 8);
+    #elif c_option(c_no_cmp)
+        return c_hash32(&x, 4);
     #else
-        i_valraw raw = i_valto(self->get);
-        return i_hash(&raw, sizeof raw);
+        i_valraw rx = i_valto(x);
+        return i_hash(&rx, sizeof rx);
     #endif
 }
 
 STC_INLINE int
-_cx_memb(_compare)(const _cx_self* x, const _cx_self* y) {
-    #if (c_option(c_no_compare) || defined _i_default_compare)
-        return (int)(x->get - y->get);
+_cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
+    #if c_option(c_no_cmp)
+        return c_default_cmp(&x, &y);
     #else
-        i_valraw rx = i_valto(x->get);
-        i_valraw ry = i_valto(y->get);
+        i_valraw rx = i_valto(x), ry = i_valto(x);
         return i_cmp(&rx, &ry);
     #endif
+}
+
+STC_INLINE bool
+_cx_memb(_value_eq)(const _cx_value* x, const _cx_value* y) {
+    return !_cx_memb(_value_cmp)(x, y);
 }
 #undef _i_atomic_inc
 #undef _i_atomic_dec_and_test

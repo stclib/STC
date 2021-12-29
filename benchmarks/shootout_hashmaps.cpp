@@ -47,7 +47,7 @@ size_t seed;
 #define CMAP_SIZE(X)              cmap_##X##_size(map)
 #define CMAP_BUCKETS(X)           cmap_##X##_bucket_count(map)
 #define CMAP_CLEAR(X)             cmap_##X##_clear(&map)
-#define CMAP_DTOR(X)              cmap_##X##_del(&map)
+#define CMAP_DTOR(X)              cmap_##X##_drop(&map)
 
 #define KMAP_SETUP(X, Key, Value) khash_t(X)* map = kh_init(X); khiter_t ki; int ret
 #define KMAP_PUT(X, key, val)     (*(ki = kh_put(X, map, key, &ret), map->vals[ki] = val, map->vals+ki))

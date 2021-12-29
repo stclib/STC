@@ -26,7 +26,7 @@
 
 typedef struct { cstr name, last; } Person;
 
-Person Person_from(const char* name, const char* last) {
+Person Person_new(const char* name, const char* last) {
     return (Person){.name = cstr_from(name), .last = cstr_from(last)};
 }
 Person Person_clone(Person p) {
@@ -34,21 +34,21 @@ Person Person_clone(Person p) {
     p.last = cstr_clone(p.last);
     return p;
 }
-void Person_del(Person* p) {
-    printf("del: %s %s\n", p->name.str, p->last.str);
-    c_del(cstr, &p->name, &p->last);
+void Person_drop(Person* p) {
+    printf("drop: %s %s\n", p->name.str, p->last.str);
+    c_drop(cstr, &p->name, &p->last);
 }
 
 #define i_val Person
-#define i_valdel Person_del
+#define i_valdrop Person_drop
 #define i_valfrom Person_clone
-#define i_opt c_no_compare // compare by .get addresses only
+#define i_opt c_no_cmp // compare by .get addresses only
 #define i_tag prs
 #include <stc/cbox.h>
 
 int main() {
-    c_autovar (cbox_prs p = cbox_prs_new(Person_from("John", "Smiths")), cbox_prs_del(&p))
-    c_autovar (cbox_prs q = cbox_prs_clone(p), cbox_prs_del(&q))
+    c_autovar (cbox_prs p = cbox_prs_new(Person_new("John", "Smiths")), cbox_prs_drop(&p))
+    c_autovar (cbox_prs q = cbox_prs_clone(p), cbox_prs_drop(&q))
     {
         cstr_assign(&q.get->name, "Joe");
 
@@ -63,6 +63,7 @@ int main() {
 #include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
+#include <string.h>
 
 #define cbox_null {NULL}
 #endif // CBOX_H_INCLUDED
@@ -71,6 +72,7 @@ int main() {
 #define _i_prefix cbox_
 #endif
 #include "template.h"
+typedef i_valraw _cx_raw;
 
 #if !c_option(c_is_fwd)
 _cx_deftypes(_c_cbox_types, _cx_self, i_val);
@@ -81,17 +83,22 @@ STC_INLINE _cx_self
 _cx_memb(_init)(void) { return c_make(_cx_self){NULL}; }
 
 STC_INLINE _cx_self
-_cx_memb(_with)(i_val* p) { return c_make(_cx_self){p}; }
+_cx_memb(_from_ptr)(i_val* p) { return c_make(_cx_self){p}; }
 
 STC_INLINE _cx_self
-_cx_memb(_new)(i_val val) { 
+_cx_memb(_from)(i_val val) { 
     return c_make(_cx_self){c_new(i_val, val)};
+}
+
+STC_INLINE i_val
+_cx_memb(_toraw)(const _cx_self* self) { 
+    return *self->get;
 }
 
 // destructor
 STC_INLINE void
-_cx_memb(_del)(_cx_self* self) {
-    if (self->get) { i_valdel(self->get); c_free(self->get); }
+_cx_memb(_drop)(_cx_self* self) {
+    if (self->get) { i_valdrop(self->get); c_free(self->get); }
 }
 
 STC_INLINE _cx_self
@@ -102,32 +109,23 @@ _cx_memb(_move)(_cx_self* self) {
 
 STC_INLINE void
 _cx_memb(_reset)(_cx_self* self) {
-    _cx_memb(_del)(self); self->get = NULL;
-}
-
-// take ownership of *p
-STC_INLINE void
-_cx_memb(_reset_with)(_cx_self* self, _cx_value* p) {
-    _cx_memb(_del)(self); self->get = p;
+    _cx_memb(_drop)(self); self->get = NULL;
 }
 
 // take ownership of val
 STC_INLINE void
-_cx_memb(_reset_new)(_cx_self* self, i_val val) {
-    if (self->get) { i_valdel(self->get); *self->get = val; }
+_cx_memb(_reset_from)(_cx_self* self, i_val val) {
+    if (self->get) { i_valdrop(self->get); *self->get = val; }
     else self->get = c_new(i_val, val);
 }
 
-#if !c_option(c_no_clone)
+#if !c_option(c_no_clone) 
+#if !defined _i_no_raw
     STC_INLINE _cx_self
-    _cx_memb(_from)(i_valraw raw) { 
+    _cx_memb(_new)(i_valraw raw) { 
         return c_make(_cx_self){c_new(i_val, i_valfrom(raw))};
     }
-
-    STC_INLINE void
-    _cx_memb(_reset_from)(_cx_self* self, i_valraw raw) {
-        _cx_memb(_reset_new)(self, i_valfrom(raw));
-    }    
+#endif
 
     STC_INLINE _cx_self
     _cx_memb(_clone)(_cx_self other) {
@@ -138,37 +136,41 @@ _cx_memb(_reset_new)(_cx_self* self, i_val val) {
     STC_INLINE void
     _cx_memb(_copy)(_cx_self* self, _cx_self other) {
         if (self->get == other.get) return;
-        if (other.get) _cx_memb(_reset_new)(self, *other.get);
-        else _cx_memb(_reset)(self);
+        _cx_memb(_drop)(self);
+        *self = _cx_memb(_clone)(other);
     }
 #endif
 
 STC_INLINE void
 _cx_memb(_take)(_cx_self* self, _cx_self other) {
-    if (other.get != self->get) _cx_memb(_del)(self);
+    if (other.get != self->get) _cx_memb(_drop)(self);
     *self = other;
 }
 
 STC_INLINE uint64_t
-_cx_memb(_hash)(const _cx_self* self, size_t n) {
-    #if (c_option(c_no_compare) || defined _i_default_compare) && SIZE_MAX >> 32
-        return c_hash64(&self->get, 8);
-    #elif (c_option(c_no_compare) || defined _i_default_compare)
-        return c_hash32(&self->get, 4);
+_cx_memb(_value_hash)(const _cx_value* x, size_t n) {
+    #if c_option(c_no_cmp) && UINTPTR_MAX == UINT64_MAX
+        return c_hash64(&x, 8);
+    #elif c_option(c_no_cmp)
+        return c_hash32(&x, 4);
     #else
-        i_valraw raw = i_valto(self->get);
-        return i_hash(&raw, sizeof raw);
+        i_valraw rx = i_valto(x);
+        return i_hash(&rx, sizeof rx);
     #endif
 }
 
 STC_INLINE int
-_cx_memb(_compare)(const _cx_self* x, const _cx_self* y) {
-    #if (c_option(c_no_compare) || defined _i_default_compare)
-        return (int)(x->get - y->get);
+_cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
+    #if c_option(c_no_cmp)
+        return c_default_cmp(&x, &y);
     #else
-        i_valraw rx = i_valto(x->get);
-        i_valraw ry = i_valto(y->get);
+        i_valraw rx = i_valto(x), ry = i_valto(x);
         return i_cmp(&rx, &ry);
     #endif
+}
+
+STC_INLINE bool
+_cx_memb(_value_eq)(const _cx_value* x, const _cx_value* y) {
+    return !_cx_memb(_value_cmp)(x, y);
 }
 #include "template.h"

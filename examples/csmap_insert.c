@@ -14,8 +14,8 @@
 #define i_tag istr // Map of int => cstr
 #include <stc/csmap.h>
 
-#define i_val csmap_ii_rawvalue
-#define i_opt c_no_compare
+#define i_val csmap_ii_raw
+#define i_opt c_no_cmp
 #define i_tag ii
 #include <stc/cvec.h>
 
@@ -99,7 +99,8 @@ int main()
 
     c_auto (csmap_ii, m4) {
         // Insert the elements from an initializer_list
-        c_apply_pair(csmap_ii, insert, &m4, { { 4, 44 }, { 2, 22 }, { 3, 33 }, { 1, 11 }, { 5, 55 } });
+        c_apply(v, csmap_ii_insert(&m4, c_pair(v)), csmap_ii_raw,
+            { { 4, 44 }, { 2, 22 }, { 3, 33 }, { 1, 11 }, { 5, 55 } });
         puts("After initializer_list insertion, m4 contains:");
         print_ii(m4);
         puts("");

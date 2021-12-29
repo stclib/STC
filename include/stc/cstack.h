@@ -36,7 +36,7 @@
 #if !c_option(c_is_fwd)
 _cx_deftypes(_c_cstack_types, _cx_self, i_val);
 #endif
-typedef i_valraw _cx_rawvalue;
+typedef i_valraw _cx_raw;
 
 STC_INLINE _cx_self _cx_memb(_init)(void)
     { return c_make(_cx_self){0, 0, 0}; }
@@ -54,11 +54,11 @@ STC_INLINE _cx_self _cx_memb(_with_size)(size_t size, i_val fill) {
 
 STC_INLINE void _cx_memb(_clear)(_cx_self* self) {
     _cx_value *p = self->data + self->size;
-    while (p-- != self->data) i_valdel(p);
+    while (p-- != self->data) { i_valdrop(p); }
     self->size = 0;
 }
 
-STC_INLINE void _cx_memb(_del)(_cx_self* self)
+STC_INLINE void _cx_memb(_drop)(_cx_self* self)
     { _cx_memb(_clear)(self); c_free(self->data); }
 
 STC_INLINE size_t _cx_memb(_size)(_cx_self v)
@@ -74,7 +74,7 @@ STC_INLINE _cx_value* _cx_memb(_top)(const _cx_self* self)
     { return &self->data[self->size - 1]; }
 
 STC_INLINE void _cx_memb(_pop)(_cx_self* self)
-    { _cx_value* p = &self->data[--self->size]; i_valdel(p); }
+    { _cx_value* p = &self->data[--self->size]; i_valdrop(p); }
 
 STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, size_t n) {
     if (n < self->size) return true;
@@ -91,14 +91,14 @@ STC_INLINE _cx_value* _cx_memb(_push)(_cx_self* self, _cx_value val) {
     *vp = val; return vp;
 }
 
-STC_INLINE _cx_value* _cx_memb(_at)(const _cx_self* self, size_t idx)
+STC_INLINE const _cx_value* _cx_memb(_at)(const _cx_self* self, size_t idx)
     { assert(idx < self->size); return self->data + idx; }
 
 #if !c_option(c_no_clone)
-
-STC_INLINE _cx_value* _cx_memb(_emplace)(_cx_self* self, _cx_rawvalue raw)
+#if !defined _i_no_raw
+STC_INLINE _cx_value* _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
     { return _cx_memb(_push)(self, i_valfrom(raw)); }
-
+#endif
 STC_INLINE _cx_self _cx_memb(_clone)(_cx_self v) {
     _cx_self out = {(_cx_value *) c_malloc(v.size*sizeof(_cx_value)), v.size, v.size};
     for (size_t i = 0; i < v.size; ++i, ++v.data) out.data[i] = i_valfrom(i_valto(v.data));
@@ -107,7 +107,7 @@ STC_INLINE _cx_self _cx_memb(_clone)(_cx_self v) {
 
 STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     if (self->data == other.data) return;
-    _cx_memb(_del)(self); *self = _cx_memb(_clone)(other);
+    _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
 }
 
 STC_INLINE i_val _cx_memb(_value_clone)(_cx_value val)

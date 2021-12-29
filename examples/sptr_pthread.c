@@ -11,14 +11,13 @@ struct Base
     int value;
 } typedef Base;
 
-void Base_del(Base* b) { printf("Base::~Base()\n"); }
-
+#define i_type BaseRc
 #define i_val Base
-#define i_del Base_del
-#define i_tag base
-#include <stc/csptr.h>
+#define i_valdrop(x) printf("Drop Base: %d\n", (x)->value)
+#define i_opt c_no_cmp
+#include <stc/carc.h>
 
-void* thr(csptr_base* lp)
+void* thr(BaseRc* lp)
 {
     sleep(1);
     static pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
@@ -26,30 +25,32 @@ void* thr(csptr_base* lp)
     {
         printf("local pointer in a thread:\n"
                 "  p.get() = %p, p.use_count() = %ld\n", (void*)lp->get, *lp->use_count);
+        /* safe to modify base here */
+        lp->get->value += 1;
     }
     /* atomically decrease ref. */
-    csptr_base_del(lp);
+    BaseRc_drop(lp);
     return NULL;
 }
 
 int main()
 {
-    csptr_base p = csptr_base_new((Base){42});
+    BaseRc p = BaseRc_from((Base){0});
 
     printf("Created a Base\n"
            "  p.get() = %p, p.use_count() = %ld\n", (void*)p.get, *p.use_count);
     enum {N = 3};
     pthread_t t[N];
-    csptr_base c[N];
+    BaseRc c[N];
     c_forrange (i, N) {
-        c[i] = csptr_base_clone(p);
+        c[i] = BaseRc_clone(p);
         pthread_create(&t[i], NULL, (void*(*)(void*))thr, &c[i]);
     }
 
     printf("Shared ownership between %d threads and released\n"
            "ownership from main:\n"
            "  p.get() = %p, p.use_count() = %ld\n", N, (void*)p.get, *p.use_count);
-    csptr_base_reset(&p);
+    BaseRc_reset(&p);
 
     c_forrange (i, N) pthread_join(t[i], NULL);
     printf("All threads completed, the last one deleted Base\n");

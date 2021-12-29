@@ -13,7 +13,7 @@
 // Declare int vector with map entries that can be sorted by map keys.
 struct {int first; size_t second;} typedef mapval;
 static int compare(mapval *a, mapval *b) {
-    return c_default_compare(&a->first, &b->first);
+    return c_default_cmp(&a->first, &b->first);
 }
 
 #define i_val mapval
@@ -39,7 +39,7 @@ int main()
     {
         c_forrange (N) {
             int index = (int) round( stc64_normalf(&rng, &dist) );
-            cmap_ii_emplace(&histmap, index, 0).ref->second += 1;
+            cmap_ii_insert(&histmap, index, 0).ref->second += 1;
         }
 
         // Transfer map to vec and sort it by map keys.

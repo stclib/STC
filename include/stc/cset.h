@@ -35,7 +35,7 @@ int main(void) {
 
     c_foreach (i, cset_sx, s)
         printf("set %d\n", *i.ref);
-    cset_sx_del(&s);
+    cset_sx_drop(&s);
 }
 */
 

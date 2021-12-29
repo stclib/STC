@@ -32,7 +32,7 @@
 #include <stc/csmap.h>
 
 int main(void) {
-    c_autovar (csmap_sx m = csmap_sx_init(), csmap_sx_del(&m))
+    c_autovar (csmap_sx m = csmap_sx_init(), csmap_sx_drop(&m))
     {
         csmap_sx_emplace(&m, "Testing one", 1.234);
         csmap_sx_emplace(&m, "Testing two", 12.34);
@@ -91,13 +91,13 @@ typedef i_keyraw _cx_rawkey;
 typedef i_valraw _cx_memb(_rawmapped);
 typedef _i_SET_ONLY( i_keyraw )
         _i_MAP_ONLY( struct { i_keyraw first; i_valraw second; } )
-        _cx_rawvalue;
+        _cx_raw;
 
 STC_API _cx_self        _cx_memb(_init)(void);
 #if !c_option(c_no_clone)
 STC_API _cx_self        _cx_memb(_clone)(_cx_self tree);
 #endif
-STC_API void            _cx_memb(_del)(_cx_self* self);
+STC_API void            _cx_memb(_drop)(_cx_self* self);
 STC_API bool            _cx_memb(_reserve)(_cx_self* self, size_t cap);
 STC_API _cx_value*      _cx_memb(_find_it)(const _cx_self* self, i_keyraw rkey, _cx_iter* out);
 STC_API _cx_iter        _cx_memb(_lower_bound)(const _cx_self* self, i_keyraw rkey);
@@ -112,7 +112,7 @@ STC_API void            _cx_memb(_next)(_cx_iter* it);
 STC_INLINE bool         _cx_memb(_empty)(_cx_self tree) { return _csmap_rep(&tree)->size == 0; }
 STC_INLINE size_t       _cx_memb(_size)(_cx_self tree) { return _csmap_rep(&tree)->size; }
 STC_INLINE size_t       _cx_memb(_capacity)(_cx_self tree) { return _csmap_rep(&tree)->cap; }
-STC_INLINE void         _cx_memb(_clear)(_cx_self* self) { _cx_memb(_del)(self); *self = _cx_memb(_init)(); }
+STC_INLINE void         _cx_memb(_clear)(_cx_self* self) { _cx_memb(_drop)(self); *self = _cx_memb(_init)(); }
 STC_INLINE void         _cx_memb(_swap)(_cx_self* a, _cx_self* b) { c_swap(_cx_self, *a, *b); }
 STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, i_keyraw rkey)
                             { _cx_iter it; return _cx_memb(_find_it)(self, rkey, &it) != NULL; }
@@ -128,20 +128,26 @@ _cx_memb(_with_capacity)(const size_t cap) {
     return tree;
 }
 
-STC_INLINE _cx_rawvalue
+STC_INLINE _cx_raw
 _cx_memb(_value_toraw)(_cx_value* val) {
     return _i_SET_ONLY( i_keyto(val) )
-           _i_MAP_ONLY( c_make(_cx_rawvalue){i_keyto(&val->first), i_valto(&val->second)} );
+           _i_MAP_ONLY( c_make(_cx_raw){i_keyto(&val->first), i_valto(&val->second)} );
+}
+
+STC_INLINE int
+_cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
+    _cx_rawkey rx = i_keyto(_i_keyref(x)), ry = i_keyto(_i_keyref(y));
+    return i_cmp(&rx, &ry);
 }
 
 STC_INLINE void
-_cx_memb(_value_del)(_cx_value* val) {
-    i_keydel(_i_keyref(val));
-    _i_MAP_ONLY( i_valdel(&val->second); )
+_cx_memb(_value_drop)(_cx_value* val) {
+    i_keydrop(_i_keyref(val));
+    _i_MAP_ONLY( i_valdrop(&val->second); )
 }
 
 #ifndef _i_isset
-    #if !c_option(c_no_clone)
+    #if !c_option(c_no_clone) && !defined _i_no_raw
     STC_API _cx_result _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped);
     #endif
     STC_API _cx_result _cx_memb(_insert_or_assign)(_cx_self* self, i_key key, i_val mapped);
@@ -166,15 +172,16 @@ _cx_memb(_find)(const _cx_self* self, i_keyraw rkey) {
 STC_INLINE void
 _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     if (self->nodes == other.nodes) return;
-    _cx_memb(_del)(self); *self = _cx_memb(_clone)(other);
+    _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
 }
 
-STC_INLINE void
-_cx_memb(_value_clone)(_cx_value* dst, _cx_value* val) {
-    *_i_keyref(dst) = i_keyfrom(i_keyto(_i_keyref(val)));
-    _i_MAP_ONLY( dst->second = i_valfrom(i_valto(&val->second)); )
+STC_INLINE _cx_value
+_cx_memb(_value_clone)(_cx_value _val) {
+    *_i_keyref(&_val) = i_keyfrom(i_keyto(_i_keyref(&_val)));
+    _i_MAP_ONLY( _val.second = i_valfrom(i_valto(&_val.second)); )
+    return _val;
 }
-
+#if !defined _i_no_raw
 STC_INLINE _cx_result
 _cx_memb(_emplace)(_cx_self* self, i_keyraw rkey _i_MAP_ONLY(, i_valraw rmapped)) {
     _cx_result res = _cx_memb(_insert_entry_)(self, rkey);
@@ -184,13 +191,14 @@ _cx_memb(_emplace)(_cx_self* self, i_keyraw rkey _i_MAP_ONLY(, i_valraw rmapped)
     }
     return res;
 }
+#endif
 #endif // !c_no_clone
 
 STC_INLINE _cx_result
 _cx_memb(_insert)(_cx_self* self, i_key key _i_MAP_ONLY(, i_val mapped)) {
     _cx_result res = _cx_memb(_insert_entry_)(self, i_keyto(&key));
     if (res.inserted) { *_i_keyref(res.ref) = key; _i_MAP_ONLY( res.ref->second = mapped; )}
-    else              { i_keydel(&key); _i_MAP_ONLY( i_valdel(&mapped); )}
+    else              { i_keydrop(&key); _i_MAP_ONLY( i_valdrop(&mapped); )}
     return res;
 }
 
@@ -279,15 +287,15 @@ _cx_memb(_node_new_)(_cx_self* self, int level) {
     _cx_memb(_insert_or_assign)(_cx_self* self, i_key key, i_val mapped) {
         _cx_result res = _cx_memb(_insert_entry_)(self, i_keyto(&key));
         if (res.inserted) res.ref->first = key;
-        else { i_keydel(&key); i_valdel(&res.ref->second); }
+        else { i_keydrop(&key); i_valdrop(&res.ref->second); }
         res.ref->second = mapped; return res;
     }
-    #if !c_option(c_no_clone)
+    #if !c_option(c_no_clone) && !defined _i_no_raw
     STC_DEF _cx_result
     _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped) {
         _cx_result res = _cx_memb(_insert_entry_)(self, rkey);
         if (res.inserted) res.ref->first = i_keyfrom(rkey);
-        else i_valdel(&res.ref->second);
+        else i_valdrop(&res.ref->second);
         res.ref->second = i_valfrom(rmapped); return res;
     }
     #endif
@@ -404,7 +412,7 @@ _cx_memb(_erase_r_)(_cx_node *d, _cx_size tn, const _cx_rawkey* rkey, int *erase
         d[tn].link[c < 0] = _cx_memb(_erase_r_)(d, d[tn].link[c < 0], rkey, erased);
     else {
         if (!(*erased)++)
-            _cx_memb(_value_del)(&d[tn].value);
+            _cx_memb(_value_drop)(&d[tn].value);
         if (d[tn].link[0] && d[tn].link[1]) {
             tx = d[tn].link[0];
             while (d[tx].link[1])
@@ -470,7 +478,7 @@ STC_DEF _cx_size
 _cx_memb(_clone_r_)(_cx_self* self, _cx_node* src, _cx_size sn) {
     if (sn == 0) return 0;
     _cx_size tx, tn = _cx_memb(_node_new_)(self, src[sn].level);
-    _cx_memb(_value_clone)(&self->nodes[tn].value, &src[sn].value);
+    self->nodes[tn].value = _cx_memb(_value_clone)(src[sn].value);
     tx = _cx_memb(_clone_r_)(self, src, src[sn].link[0]); self->nodes[tn].link[0] = tx;
     tx = _cx_memb(_clone_r_)(self, src, src[sn].link[1]); self->nodes[tn].link[1] = tx;
     return tn;
@@ -491,12 +499,12 @@ _cx_memb(_del_r_)(_cx_node* d, _cx_size tn) {
     if (tn) {
         _cx_memb(_del_r_)(d, d[tn].link[0]);
         _cx_memb(_del_r_)(d, d[tn].link[1]);
-        _cx_memb(_value_del)(&d[tn].value);
+        _cx_memb(_value_drop)(&d[tn].value);
     }
 }
 
 STC_DEF void
-_cx_memb(_del)(_cx_self* self) {
+_cx_memb(_drop)(_cx_self* self) {
     if (_csmap_rep(self)->root) {
         _cx_memb(_del_r_)(self->nodes, (_cx_size) _csmap_rep(self)->root);
         c_free(_csmap_rep(self));

@@ -16,8 +16,8 @@ struct MyStruct {
 struct Point { int x, y; } typedef Point;
 
 int Point_cmp(const Point* a, const Point* b) {
-    int c = c_default_compare(&a->x, &b->x);
-    return c ? c : c_default_compare(&a->y, &b->y);
+    int c = a->x - b->x;
+    return c ? c : a->y - b->y;
 }
 
 #define i_val Point

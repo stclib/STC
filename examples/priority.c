@@ -4,7 +4,7 @@
 #include <stc/crandom.h>
 
 #define i_val int64_t
-#define i_cmp -c_default_compare  // min-heap (increasing values)
+#define i_cmp -c_default_cmp  // min-heap (increasing values)
 #define i_tag i
 #include <stc/cpque.h>
 
@@ -20,7 +20,7 @@ int main() {
             cpque_i_push(&heap, stc64_uniform(&rng, &dist));
 
         // push some negative numbers too.
-        c_apply(cpque_i, push, &heap, {-231, -32, -873, -4, -343});
+        c_apply(v, cpque_i_push(&heap, v), int, {-231, -32, -873, -4, -343});
 
         c_forrange (N)
             cpque_i_push(&heap, stc64_uniform(&rng, &dist));

@@ -10,7 +10,7 @@ See the c++ class [std::deque](https://en.cppreference.com/w/cpp/container/deque
 ```c
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_valraw* : REQUIRED IF i_valraw is a non-integral type
-#define i_del       // destroy value func - defaults to empty destruct
+#define i_drop      // destroy value func - defaults to empty destruct
 #define i_valraw    // convertion "raw" type - defaults to i_val
 #define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
 #define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
@@ -31,7 +31,7 @@ void                cdeq_X_copy(cdeq_X* self, cdeq_X other);
 bool                cdeq_X_reserve(cdeq_X* self, size_t cap);
 void                cdeq_X_shrink_to_fit(cdeq_X* self);
 void                cdeq_X_swap(cdeq_X* a, cdeq_X* b);
-void                cdeq_X_del(cdeq_X* self);                                                    // destructor
+void                cdeq_X_drop(cdeq_X* self);                                                    // destructor
 
 bool                cdeq_X_empty(cdeq_X deq);
 size_t              cdeq_X_size(cdeq_X deq);
@@ -78,7 +78,7 @@ cdeq_X_iter         cdeq_X_begin(const cdeq_X* self);
 cdeq_X_iter         cdeq_X_end(const cdeq_X* self);
 void                cdeq_X_next(cdeq_X_iter* it);
 
-cdeq_X_rawvalue     cdeq_X_value_toraw(cdeq_X_value* pval);
+cdeq_X_raw          cdeq_X_value_toraw(cdeq_X_value* pval);
 cdeq_X_value        cdeq_X_value_clone(cdeq_X_value val);
 ```
 
@@ -88,7 +88,7 @@ cdeq_X_value        cdeq_X_value_clone(cdeq_X_value val);
 |:-------------------|:------------------------------------|:-----------------------|
 | `cdeq_X`           | `struct { cdeq_X_value* data; }`  | The cdeq type          |
 | `cdeq_X_value`     | `i_val`                             | The cdeq value type    |
-| `cdeq_X_rawvalue`  | `i_valraw`                          | The raw value type     |
+| `cdeq_X_raw`       | `i_valraw`                          | The raw value type     |
 | `cdeq_X_iter`      | `struct { cdeq_X_value* ref; }`   | The iterator type      |
 
 ## Examples
@@ -106,7 +106,7 @@ int main() {
         printf(" %d", *i.ref);
     puts("");
 
-    c_apply(cdeq_i, push_back, &q, {1, 4, 5, 22, 33, 2});
+    c_apply(v, cdeq_i_push_back(&q, v), int, {1, 4, 5, 22, 33, 2});
     c_foreach (i, cdeq_i, q)
         printf(" %d", *i.ref);
     puts("");
@@ -119,7 +119,7 @@ int main() {
     c_foreach (i, cdeq_i, q)
         printf(" %d", *i.ref);
     puts("");
-    cdeq_i_del(&q);
+    cdeq_i_drop(&q);
 }
 ```
 Output:

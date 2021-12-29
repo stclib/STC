@@ -68,6 +68,7 @@ STC_API int             c_strncasecmp(const char* s1, const char* s2, size_t nma
 
 STC_INLINE cstr         cstr_init() { return cstr_null; }
 #define                 cstr_str(self) (self)->str
+#define                 cstr_toraw(self) (self)->str
 #define                 cstr_new(literal) \
                             cstr_from_n(literal, sizeof c_make(c_strlit){literal} - 1)
 STC_INLINE cstr         cstr_from(const char* str)
@@ -77,7 +78,7 @@ STC_INLINE size_t       cstr_size(cstr s) { return _cstr_rep(&s)->size; }
 STC_INLINE size_t       cstr_length(cstr s) { return _cstr_rep(&s)->size; }
 STC_INLINE size_t       cstr_capacity(cstr s) { return _cstr_rep(&s)->cap; }
 STC_INLINE bool         cstr_empty(cstr s) { return _cstr_rep(&s)->size == 0; }
-STC_INLINE void         cstr_del(cstr* self)
+STC_INLINE void         cstr_drop(cstr* self)
                             { if (_cstr_rep(self)->cap) c_free(_cstr_rep(self)); }
 STC_INLINE cstr         cstr_clone(cstr s)
                             { return cstr_from_n(s.str, _cstr_rep(&s)->size); }
@@ -166,9 +167,9 @@ cstr_ends_with(cstr s, const char* sub) {
 }
 
 /* container adaptor functions: */
-#define  cstr_compare(xp, yp)     strcmp((xp)->str, (yp)->str)
-#define  cstr_equalto(xp, yp)     (strcmp((xp)->str, (yp)->str) == 0)
-#define  cstr_hash(xp, dummy)     c_strhash((xp)->str)
+#define  cstr_cmp(xp, yp)     strcmp((xp)->str, (yp)->str)
+#define  cstr_eq(xp, yp)      (!cstr_cmp(xp, yp))
+#define  cstr_hash(xp, dummy) c_strhash((xp)->str)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
@@ -249,7 +250,7 @@ cstr_printf(cstr* self, const char* fmt, ...) {
     va_start(args, fmt);
     int n = cstr_vfmt(&ret, fmt, args);
     va_end(args);
-    cstr_del(self);
+    cstr_drop(self);
     *self = ret;
     return n;
 }

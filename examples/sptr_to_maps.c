@@ -3,22 +3,23 @@
 #define i_type Map
 #define i_key_str // strings
 #define i_val int
-#define i_keydel(p) (printf("del name: %s\n", (p)->str), cstr_del(p))
+#define i_keydrop(p) (printf("drop name: %s\n", (p)->str), cstr_drop(p))
 #include <stc/csmap.h>
 
 #define i_type Arc // (atomic) ref. counted type
 #define i_val Map
-#define i_del(p) (printf("del Arc:\n"), Map_del(p))
+#define i_drop(p) (printf("drop Arc:\n"), Map_drop(p))
 // no need for atomic ref. count in single thread:
-#define i_opt c_no_atomic 
-#include <stc/csptr.h>
+// no compare function available for csmap:
+#define i_opt c_no_atomic|c_no_cmp
+#include <stc/carc.h>
 
 #define i_type Stack
-#define i_val_ref Arc // define i_val_ref for csptr/cbox value (not i_val)
+#define i_val_sptr Arc // define i_val_bind for carc/cbox value (not i_val)
 #include <stc/cstack.h>
 
 #define i_type List
-#define i_val_ref Arc // as above
+#define i_val_sptr Arc // as above
 #include <stc/clist.h>
 
 int main()
@@ -28,28 +29,28 @@ int main()
     {
         // POPULATE stack with shared pointers to Maps:
         Map *map;
-        map = Stack_push(&stack, Arc_new(Map_init()))->get;
-        c_apply_pair (Map, emplace, map, {
+        map = Stack_push(&stack, Arc_from(Map_init()))->get;
+        c_apply(v, Map_emplace(map, c_pair(v)), Map_raw, {
             {"Joey", 1990}, {"Mary", 1995}, {"Joanna", 1992}
         });
-        map = Stack_push(&stack, Arc_new(Map_init()))->get;
-        c_apply_pair (Map, emplace, map, {
+        map = Stack_push(&stack, Arc_from(Map_init()))->get;
+        c_apply(v, Map_emplace(map, c_pair(v)), Map_raw, {
             {"Rosanna", 2001}, {"Brad", 1999}, {"Jack", 1980}
         });
 
         // POPULATE list:
-        map = List_push_back(&list, Arc_new(Map_init()))->get;
-        c_apply_pair (Map, emplace, map, {
+        map = List_push_back(&list, Arc_from(Map_init()))->get;
+        c_apply(v, Map_emplace(map, c_pair(v)), Map_raw, {
             {"Steve", 1979}, {"Rick", 1974}, {"Tracy", 2003}
         });
         
-        // Share two Maps from the stack with the list using emplace (clone the csptr):
-        List_emplace_back(&list, stack.data[0]);
-        List_emplace_back(&list, stack.data[1]);
+        // Share two Maps from the stack with the list using emplace (clone the carc):
+        List_push_back(&list, Arc_clone(stack.data[0]));
+        List_push_back(&list, Arc_clone(stack.data[1]));
         
         // Clone (deep copy) a Map from the stack to the list
         // List will contain two shared and two unshared maps.
-        map = List_push_back(&list, Arc_new(Map_clone(*stack.data[1].get)))->get;
+        map = List_push_back(&list, Arc_from(Map_clone(*stack.data[1].get)))->get;
         
         // Add one more element to the cloned map:
         Map_emplace_or_assign(map, "CLONED", 2021);

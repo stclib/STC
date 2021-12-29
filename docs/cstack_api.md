@@ -10,7 +10,7 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 ```c
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_valraw* : REQUIRED IF i_valraw is a non-integral type
-#define i_del       // destroy value func - defaults to empty destruct
+#define i_drop      // destroy value func - defaults to empty destruct
 #define i_valraw    // convertion "raw" type - defaults to i_val
 #define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
 #define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
@@ -31,7 +31,7 @@ void                cstack_X_clear(cstack_X* self);
 bool                cstack_X_reserve(cstack_X* self, size_t n);
 void                cstack_X_shrink_to_fit(cstack_X* self);
 void                cstack_X_copy(cstack_X* self, cstack_X other);
-void                cstack_X_del(cstack_X* self);       // destructor
+void                cstack_X_drop(cstack_X* self);       // destructor
 
 size_t              cstack_X_size(cstack_X st);
 size_t              cstack_X_capacity(cstack_X st);
@@ -55,11 +55,11 @@ i_val               cstack_X_value_clone(i_val value);
 
 ## Types
 
-| Type name           | Type definition                        | Used to represent...        |
-|:--------------------|:---------------------------------------|:----------------------------|
+| Type name           | Type definition                      | Used to represent...        |
+|:--------------------|:-------------------------------------|:----------------------------|
 | `cstack_X`          | `struct { cstack_value *data; ... }` | The cstack type             |
-| `cstack_X_value`    | `i_val`                                | The cstack element type     |
-| `cstack_X_rawvalue` | `i_valraw`                             | cstack raw value type       |
+| `cstack_X_value`    | `i_val`                              | The cstack element type     |
+| `cstack_X_raw`      | `i_valraw`                           | cstack raw value type       |
 | `cstack_X_iter`     | `struct { cstack_value *ref; }`      | cstack iterator             |
 
 ## Example
@@ -81,7 +81,7 @@ int main() {
 
     printf("top: %d\n", *cstack_i_top(&S));
 
-    cstack_i_del(&S);
+    cstack_i_drop(&S);
 }
 ```
 Output:

@@ -38,25 +38,27 @@ struct cdeq_rep { size_t size, cap; void* base[]; };
 #if !c_option(c_is_fwd)
 _cx_deftypes(_c_cdeq_types, _cx_self, i_val);
 #endif
-typedef i_valraw _cx_rawvalue;
+typedef i_valraw _cx_raw;
 
 STC_API _cx_self        _cx_memb(_init)(void);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
-STC_API void            _cx_memb(_del)(_cx_self* self);
+STC_API void            _cx_memb(_drop)(_cx_self* self);
 STC_API _cx_value*      _cx_memb(_push_back)(_cx_self* self, i_val value);
 STC_API bool            _cx_memb(_expand_right_half_)(_cx_self* self, size_t idx, size_t n);
+STC_API void            _cx_memb(_shrink_to_fit)(_cx_self *self);
 #ifndef _i_queue
 #if !c_option(c_no_clone)
-STC_API void            _cx_memb(_shrink_to_fit)(_cx_self *self);
 STC_API _cx_iter        _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
                                                   const _cx_value* p1, const _cx_value* p2);
+#if !defined _i_no_raw
 STC_API _cx_iter        _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos,
-                                                   const _cx_rawvalue* p1, const _cx_rawvalue* p2);
+                                                   const _cx_raw* p1, const _cx_raw* p2);
+#endif
 #endif // !c_no_clone
 
-#if !c_option(c_no_compare)
+#if !c_option(c_no_cmp)
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter p1, _cx_iter p2, i_valraw raw);
-STC_API int             _cx_memb(_value_compare)(const _cx_value* x, const _cx_value* y);
+STC_API int             _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y);
 #endif
 STC_API _cx_value*      _cx_memb(_push_front)(_cx_self* self, i_val value);
 STC_API _cx_iter        _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2);
@@ -66,13 +68,15 @@ STC_API _cx_iter        _cx_memb(_insert_range_p)(_cx_self* self, _cx_value* pos
 
 #if !c_option(c_no_clone)
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
+#if !defined _i_no_raw
 STC_INLINE _cx_value*   _cx_memb(_emplace_back)(_cx_self* self, i_valraw raw)
                             { return _cx_memb(_push_back)(self, i_valfrom(raw)); }
+#endif
 STC_INLINE i_val        _cx_memb(_value_clone)(i_val val)
                             { return i_valfrom(i_valto(&val)); }
 STC_INLINE void         _cx_memb(_copy)(_cx_self *self, _cx_self other) {
                             if (self->data == other.data) return;
-                            _cx_memb(_del)(self); *self = _cx_memb(_clone)(other);
+                            _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
                         }
 #endif
 STC_INLINE bool         _cx_memb(_empty)(_cx_self cx) { return !cdeq_rep_(&cx)->size; }
@@ -83,7 +87,7 @@ STC_INLINE i_val        _cx_memb(_value_fromraw)(i_valraw raw) { return i_valfro
 STC_INLINE i_valraw     _cx_memb(_value_toraw)(_cx_value* pval) { return i_valto(pval); }
 
 STC_INLINE void         _cx_memb(_pop_front)(_cx_self* self)
-                            { i_valdel(self->data); ++self->data; --cdeq_rep_(self)->size; }
+                            { i_valdrop(self->data); ++self->data; --cdeq_rep_(self)->size; }
 STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self)
                             { return self->data + cdeq_rep_(self)->size - 1; }
 STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return self->data; }
@@ -106,7 +110,7 @@ _cx_memb(_with_capacity)(const size_t n) {
 
 STC_INLINE void _cx_memb(_pop_back)(_cx_self* self) {
     _cx_value* p = &self->data[--cdeq_rep_(self)->size];
-    i_valdel(p);
+    i_valdrop(p);
 }
 
 STC_INLINE const _cx_value* _cx_memb(_at)(const _cx_self* self, const size_t idx) {
@@ -150,7 +154,7 @@ _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
     return _cx_memb(_erase_range_p)(self, it1.ref, it2.ref);
 }
 
-#if !c_option(c_no_clone)
+#if !c_option(c_no_clone) && !defined _i_no_raw
 
 STC_INLINE _cx_iter
 _cx_memb(_emplace_range)(_cx_self* self, _cx_iter it, _cx_iter it1, _cx_iter it2) {
@@ -166,7 +170,7 @@ _cx_memb(_emplace)(_cx_self* self, const size_t idx, i_valraw raw) {
     return _cx_memb(_emplace_range_p)(self, self->data + idx, &raw, &raw + 1);
 }
 STC_INLINE _cx_iter
-_cx_memb(_emplace_n)(_cx_self* self, const size_t idx, const _cx_rawvalue arr[], const size_t n) {
+_cx_memb(_emplace_n)(_cx_self* self, const size_t idx, const _cx_raw arr[], const size_t n) {
     return _cx_memb(_emplace_range_p)(self, self->data + idx, arr, arr + n);
 }
 STC_INLINE _cx_iter
@@ -175,7 +179,7 @@ _cx_memb(_emplace_at)(_cx_self* self, _cx_iter it, i_valraw raw) {
 }
 #endif // !c_no_clone
 
-#if !c_option(c_no_compare)
+#if !c_option(c_no_cmp)
 
 STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, i_valraw raw) {
@@ -201,9 +205,9 @@ _cx_memb(_sort_range)(_cx_iter i1, _cx_iter i2,
 
 STC_INLINE void
 _cx_memb(_sort)(_cx_self* self) {
-    _cx_memb(_sort_range)(_cx_memb(_begin)(self), _cx_memb(_end)(self), _cx_memb(_value_compare));
+    _cx_memb(_sort_range)(_cx_memb(_begin)(self), _cx_memb(_end)(self), _cx_memb(_value_cmp));
 }
-#endif // !c_no_compare
+#endif // !c_no_cmp
 #endif // _i_queue
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
@@ -224,8 +228,9 @@ STC_DEF void
 _cx_memb(_clear)(_cx_self* self) {
     struct cdeq_rep* rep = cdeq_rep_(self);
     if (rep->cap) {
-        for (_cx_value *p = self->data, *q = p + rep->size; p != q; ++p)
-            i_valdel(p);
+        for (_cx_value *p = self->data, *q = p + rep->size; p != q; ) {
+            --q; i_valdrop(q);
+        }
         rep->size = 0;
     }
 }
@@ -242,7 +247,7 @@ _cx_memb(_shrink_to_fit)(_cx_self *self) {
 }
 
 STC_DEF void
-_cx_memb(_del)(_cx_self* self) {
+_cx_memb(_drop)(_cx_self* self) {
     _cx_memb(_clear)(self);
     if (cdeq_rep_(self)->cap)
         c_free(cdeq_rep_(self));
@@ -357,7 +362,7 @@ _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
     const size_t n = p2 - p1;
     if (n > 0) {
         _cx_value* p = p1, *end = self->data + cdeq_rep_(self)->size;
-        for (; p != p2; ++p) i_valdel(p);
+        for (; p != p2; ++p) { i_valdrop(p); }
         if (p1 == self->data) self->data += n;
         else memmove(p1, p2, (end - p2) * sizeof(i_val));
         cdeq_rep_(self)->size -= n;
@@ -366,15 +371,15 @@ _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
 }
 
 #if !c_option(c_no_clone)
-
+#if !defined _i_no_raw
 STC_DEF _cx_iter
-_cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos, const _cx_rawvalue* p1, const _cx_rawvalue* p2) {
+_cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos, const _cx_raw* p1, const _cx_raw* p2) {
     pos = _cx_memb(_insert_space_)(self, pos, p2 - p1);
     _cx_iter it = {pos};
     for (; p1 != p2; ++p1) *pos++ = i_valfrom(*p1);
     return it;
 }
-
+#endif
 STC_DEF _cx_iter
 _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
                           const _cx_value* p1, const _cx_value* p2) {
@@ -385,7 +390,7 @@ _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
 }
 #endif // !c_option(c_no_clone)
 
-#if !c_option(c_no_compare)
+#if !c_option(c_no_cmp)
 
 STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, i_valraw raw) {
@@ -397,12 +402,12 @@ _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, i_valraw raw) {
 }
 
 STC_DEF int
-_cx_memb(_value_compare)(const _cx_value* x, const _cx_value* y) {
+_cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     i_valraw rx = i_valto(x);
     i_valraw ry = i_valto(y);
     return i_cmp(&rx, &ry);
 }
-#endif // !c_no_compare
+#endif // !c_no_cmp
 #endif // !_i_queue
 #endif // IMPLEMENTATION
 #include "template.h"

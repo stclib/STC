@@ -73,8 +73,8 @@ Sample test_stc_unordered_map() {
         stc64_srandom(seed);
         s.test[INSERT].t1 = clock();
         container con = cmap_x_init();
-        c_forrange (i, N/2) cmap_x_emplace(&con, stc64_random() & mask1, i);
-        c_forrange (i, N/2) cmap_x_emplace(&con, i, i);
+        c_forrange (i, N/2) cmap_x_insert(&con, stc64_random() & mask1, i);
+        c_forrange (i, N/2) cmap_x_insert(&con, i, i);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = cmap_x_size(con);
         stc64_srandom(seed);
@@ -82,12 +82,12 @@ Sample test_stc_unordered_map() {
         c_forrange (N) cmap_x_erase(&con, stc64_random() & mask1);
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = cmap_x_size(con);
-        cmap_x_del(&con);
+        cmap_x_drop(&con);
      }{
         container con = cmap_x_init();
         stc64_srandom(seed);
-        c_forrange (i, N/2) cmap_x_emplace(&con, stc64_random() & mask1, i);
-        c_forrange (i, N/2) cmap_x_emplace(&con, i, i);
+        c_forrange (i, N/2) cmap_x_insert(&con, stc64_random() & mask1, i);
+        c_forrange (i, N/2) cmap_x_insert(&con, i, i);
         stc64_srandom(seed);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
@@ -103,7 +103,7 @@ Sample test_stc_unordered_map() {
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();
-        cmap_x_del(&con);
+        cmap_x_drop(&con);
      }
      s.test[DESTRUCT].t2 = clock();
      s.test[DESTRUCT].sum = 0;

@@ -18,14 +18,17 @@ struct {
 } typedef Rectangle;
 
 #define i_val Point
+#define i_opt c_no_cmp
 #include <stc/cbox.h> // cbox_Point
 
 #define i_val Rectangle
+#define i_opt c_no_cmp
 #include <stc/cbox.h> // cbox_Rectangle
 
 // Box in box:
-#define i_val_ref cbox_Point  // NB: adviced to use i_val_ref when value is a cbox or csptr!
-                              // it will auto-set i_del, i_from, i_cmp for you.
+#define i_val_sptr cbox_Point  // NB: adviced to use i_val_sptr when value is a cbox or carc!
+                               // it will auto-set i_drop, i_from, i_cmp for you.
+#define i_opt c_no_cmp
 #define i_tag BoxPoint
 #include <stc/cbox.h> // cbox_BoxPoint
 
@@ -35,7 +38,7 @@ Point origin(void) {
 
 cbox_Point boxed_origin(void) {
     // Allocate this point on the heap, and return a pointer to it
-    return cbox_Point_new((Point){ .x=0.0, .y=0.0 });
+    return cbox_Point_from((Point){ .x=0.0, .y=0.0 });
 }
 
 
@@ -53,16 +56,16 @@ int main(void) {
     c_auto (cbox_Point, boxed_point)
     c_auto (cbox_BoxPoint, box_in_a_box)
     {
-        boxed_rectangle = cbox_Rectangle_new((Rectangle){
+        boxed_rectangle = cbox_Rectangle_from((Rectangle){
             .top_left = origin(),
             .bottom_right = (Point){ .x=3.0, .y=-4.0 }
         });
 
         // The output of functions can be boxed
-        boxed_point = cbox_Point_new(origin());
+        boxed_point = cbox_Point_from(origin());
 
         // Double indirection
-        box_in_a_box = cbox_BoxPoint_new(boxed_origin());
+        box_in_a_box = cbox_BoxPoint_from(boxed_origin());
 
         printf("Point occupies %zu bytes on the stack\n",
                 sizeof(point));

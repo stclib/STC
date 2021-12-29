@@ -18,11 +18,11 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 #define i_key       // key: REQUIRED
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
-#define i_keydel    // destroy key func - defaults to empty destruct
+#define i_keydrop    // destroy key func - defaults to empty destruct
 #define i_keyraw    // convertion "raw" type - defaults to i_key
 #define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
 #define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
-#define i_valdel    // destroy value func - defaults to empty destruct
+#define i_valdrop    // destroy value func - defaults to empty destruct
 #define i_valraw    // convertion "raw" type - defaults to i_val
 #define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
 #define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
@@ -40,7 +40,7 @@ csmap_X               csmap_X_clone(csmap_x map);
 void                  csmap_X_clear(csmap_X* self);
 void                  csmap_X_copy(csmap_X* self, csmap_X other);
 void                  csmap_X_swap(csmap_X* a, csmap_X* b);
-void                  csmap_X_del(csmap_X* self);                                                // destructor
+void                  csmap_X_drop(csmap_X* self);                                               // destructor
 
 size_t                csmap_X_size(csmap_X map);
 bool                  csmap_X_empty(csmap_X map);
@@ -73,7 +73,7 @@ void                  csmap_X_next(csmap_X_iter* iter);
 csmap_X_iter          csmap_X_advance(csmap_X_iter it, size_t n);
 
 csmap_X_value         csmap_X_value_clone(csmap_X_value val);
-csmap_X_rawvalue      csmap_X_value_toraw(csmap_X_value* pval);
+csmap_X_raw           csmap_X_value_toraw(csmap_X_value* pval);
 ```
 ## Types
 
@@ -82,7 +82,7 @@ csmap_X_rawvalue      csmap_X_value_toraw(csmap_X_value* pval);
 | `csmap_X`           | `struct { ... }`                                  | The csmap type               |
 | `csmap_X_rawkey`    | `i_keyraw`                                        | The raw key type             |
 | `csmap_X_rawmapped` | `i_valraw`                                        | The raw mapped type          |
-| `csmap_X_rawvalue`  | `struct { i_keyraw first; i_valraw second; }`     | i_keyraw+i_valraw type       |
+| `csmap_X_raw`       | `struct { i_keyraw first; i_valraw second; }`     | i_keyraw+i_valraw type       |
 | `csmap_X_key`       | `i_key`                                           | The key type                 |
 | `csmap_X_mapped`    | `i_val`                                           | The mapped type              |
 | `csmap_X_value`     | `struct { const i_key first; i_val second; }`     | The value: key is immutable  |
@@ -100,7 +100,7 @@ int main()
     // Create a sorted map of three strings (maps to string)
     c_auto (csmap_str, colors) // RAII
     {
-        c_apply_pair(csmap_str, emplace, &colors, {
+        c_apply(v, csmap_str_emplace(&colors, c_pair(v)), csmap_str_raw, {
             {"RED", "#FF0000"},
             {"GREEN", "#00FF00"},
             {"BLUE", "#0000FF"}
@@ -144,9 +144,9 @@ int main()
 {
     uint32_t col = 0xcc7744ff;
     csmap_id idnames = csmap_id_init();
-    c_autodefer (csmap_id_del(&idnames)) 
+    c_autodefer (csmap_id_drop(&idnames)) 
     {
-        c_apply_pair(csmap_id, emplace, &idnames, {
+        c_apply(v, csmap_id_emplace(&idnames, c_pair(v)), csmap_id_raw, {
             {100, "Red"},
             {110, "Blue"},
         });
@@ -174,7 +174,7 @@ Demonstrate csmap with plain-old-data key type Vec3i and int as mapped type: csm
 ```c
 typedef struct { int x, y, z; } Vec3i;
 
-static int Vec3i_compare(const Vec3i* a, const Vec3i* b) {
+static int Vec3i_cmp(const Vec3i* a, const Vec3i* b) {
     int c;
     if ((c = a->x - b->x) != 0) return c;
     if ((c = a->y - b->y) != 0) return c;
@@ -183,7 +183,7 @@ static int Vec3i_compare(const Vec3i* a, const Vec3i* b) {
 
 #define i_key Vec3i
 #define i_val int
-#define i_cmp Vec3i_compare // uses c_default_hash
+#define i_cmp Vec3i_cmp
 #define i_tag vi
 #include <stc/csmap.h>
 #include <stdio.h>
@@ -224,7 +224,7 @@ typedef struct { int x, y, z; } Vec3i;
 int main()
 {
     // equivalent to: c_auto (csmap_iv, vecs)
-    c_autovar (csmap_iv vecs = csmap_iv_init(), csmap_iv_del(&vecs))
+    c_autovar (csmap_iv vecs = csmap_iv_init(), csmap_iv_drop(&vecs))
     {
         csmap_iv_insert(&vecs, 1, (Vec3i){100, 0, 0});
         csmap_iv_insert(&vecs, 2, (Vec3i){0, 100, 0});

@@ -12,7 +12,7 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ```c
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_val* : REQUIRED IF i_val is a non-integral type
-#define i_del       // destroy value func - defaults to empty destruct
+#define i_drop      // destroy value func - defaults to empty destruct
 #define i_valfrom   // convertion func i_val => i_val - defaults to plain copy
 #define i_tag       // defaults to i_val
 #include <stc/cpque.h>
@@ -29,7 +29,7 @@ void                cpque_X_clear(cpque_X* self);
 bool                cpque_X_reserve(cpque_X* self, size_t n);
 void                cpque_X_shrink_to_fit(cpque_X* self);
 void                cpque_X_copy(cpque_X* self, cpque_X other);
-void                cpque_X_del(cpque_X* self);        // destructor
+void                cpque_X_drop(cpque_X* self);        // destructor
 
 size_t              cpque_X_size(cpque_X pq);
 bool                cpque_X_empty(cpque_X pq);
@@ -59,7 +59,7 @@ cpque_X_value       cpque_X_value_clone(cpque_X_value val);
 #include <stdio.h>
 
 #define i_val int64_t
-#define i_cmp -c_default_compare // min-heap
+#define i_cmp -c_default_cmp // min-heap
 #define i_tag i
 #include <stc/cpque.h>
 
@@ -69,13 +69,13 @@ int main()
     stc64_t rng = stc64_init(1234);
     stc64_uniform_t dist = stc64_uniform_init(0, N * 10);
 
-    // Declare heap, with defered del()
+    // Declare heap, with defered drop()
     c_auto (cpque_i, heap)
     {
         // Push ten million random numbers to priority queue, plus some negative ones.
         c_forrange (N)
             cpque_i_push(&heap, stc64_uniform(&rng, &dist));
-        c_apply(cpque_i, push, &heap, {-231, -32, -873, -4, -343});
+        c_apply(v, cpque_i_push(&heap, v), int, {-231, -32, -873, -4, -343});
 
         // Extract and display the fifty smallest.
         c_forrange (50) {

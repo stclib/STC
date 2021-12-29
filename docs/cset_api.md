@@ -8,10 +8,10 @@ A **cset** is an associative container that contains a set of unique objects of 
 
 ```c
 #define i_key       // key: REQUIRED
-#define i_hash      // hash func: REQUIRED IF i_keyraw is a non-pod type
 #define i_cmp       // three-way compare two i_keyraw*: REQUIRED IF i_keyraw is a non-integral type
-#define i_equ       // equality comparison two i_keyraw*: ALTERNATIVE to i_cmp 
-#define i_del       // destroy key func - defaults to empty destruct
+#define i_hash      // hash func: REQUIRED IF i_keyraw is a non-pod type
+#define i_eq        // equality comparison two i_keyraw*: !i_cmp will be used if not defined.
+#define i_drop      // destroy key func - defaults to empty destruct
 #define i_keyraw    // convertion "raw" type - defaults to i_key
 #define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
 #define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
@@ -33,7 +33,7 @@ void                cset_X_max_load_factor(cset_X* self, float max_load);       
 bool                cset_X_reserve(cset_X* self, size_t size);
 void                cset_X_shrink_to_fit(cset_X* self);
 void                cset_X_swap(cset_X* a, cset_X* b);
-void                cset_X_del(cset_X* self);                                                // destructor
+void                cset_X_drop(cset_X* self);                                               // destructor
 
 size_t              cset_X_size(cset_X set);                                                 // num. of allocated buckets
 size_t              cset_X_capacity(cset_X set);                                             // buckets * max_load_factor
@@ -65,7 +65,7 @@ cset_X_value        cset_X_value_clone(cset_X_value val);
 |:-------------------|:-------------------------------------------------|:----------------------------|
 | `cset_X`           | `struct { ... }`                                 | The cset type               |
 | `cset_X_rawkey`    | `i_keyraw`                                       | The raw key type            |
-| `cset_X_rawvalue`  | `i_keyraw`                                       | The raw value type          |
+| `cset_X_raw`       | `i_keyraw`                                       | The raw value type          |
 | `cset_X_key`       | `i_key`                                          | The key type                |
 | `cset_X_value`     | `i_key`                                          | The value                   |
 | `cset_X_result`    | `struct { cset_X_value* ref; bool inserted; }`   | Result of insert/emplace    |
@@ -85,8 +85,10 @@ int main ()
         c_auto (cset_str, first, second)
         c_auto (cset_str, third, fourth)
         {
-            c_apply(cset_str, emplace, &second, {"red", "green", "blue"});
-            c_apply(cset_str, emplace, &third, {"orange", "pink", "yellow"});
+            c_apply(v, cset_str_emplace(&second, v), const char*,
+                {"red", "green", "blue"});
+            c_apply(v, cset_str_emplace(&third, v), const char*,
+                {"orange", "pink", "yellow"});
 
             cset_str_emplace(&fourth, "potatoes");
             cset_str_emplace(&fourth, "milk");

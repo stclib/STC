@@ -20,12 +20,12 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_key       // key: REQUIRED
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_keyraw*: REQUIRED IF i_keyraw is non-integral type
-#define i_equ       // equality comparison two i_keyraw*: ALTERNATIVE to i_cmp
-#define i_keydel    // destroy key func - defaults to empty destruct
+#define i_eq        // equality comparison two i_keyraw*: ALTERNATIVE to i_cmp
+#define i_keydrop   // destroy key func - defaults to empty destruct
 #define i_keyraw    // convertion "raw" type - defaults to i_key
 #define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
 #define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
-#define i_valdel    // destroy value func - defaults to empty destruct
+#define i_valdrop   // destroy value func - defaults to empty destruct
 #define i_valraw    // convertion "raw" type - defaults to i_val
 #define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
 #define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
@@ -47,7 +47,7 @@ void                cmap_X_max_load_factor(cmap_X* self, float max_load);       
 bool                cmap_X_reserve(cmap_X* self, size_t size);
 void                cmap_X_shrink_to_fit(cmap_X* self);
 void                cmap_X_swap(cmap_X* a, cmap_X* b);
-void                cmap_X_del(cmap_X* self);                                                 // destructor
+void                cmap_X_drop(cmap_X* self);                                                // destructor
 
 size_t              cmap_X_size(cmap_X map);
 size_t              cmap_X_capacity(cmap_X map);                                              // buckets * max_load_factor
@@ -76,7 +76,7 @@ cmap_X_iter         cmap_X_end(const cmap_X* self);
 void                cmap_X_next(cmap_X_iter* it);
 
 cmap_X_value        cmap_X_value_clone(cmap_X_value val);
-cmap_X_rawvalue     cmap_X_value_toraw(cmap_X_value* pval);
+cmap_X_raw          cmap_X_value_toraw(cmap_X_value* pval);
 ```
 Helpers:
 ```c
@@ -89,9 +89,9 @@ uint64_t            c_hash64(const void* data, size_t is8);                     
 uint64_t            c_rawstr_hash(const char* const* strp, size_t unused);
 
 // equalto template parameter functions:
-bool                c_default_equalto(const i_keyraw* a, const i_keyraw* b);      // *a == *b
-bool                c_memcmp_equalto(const i_keyraw* a, const i_keyraw* b);       // !memcmp(a, b, sizeof *a)
-bool                c_rawstr_equalto(const char* const* a, const char* const* b); // !strcmp(*a, *b)
+bool                c_default_eq(const i_keyraw* a, const i_keyraw* b);      // *a == *b
+bool                c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);       // !memcmp(a, b, sizeof *a)
+bool                c_rawstr_eq(const char* const* a, const char* const* b); // !strcmp(*a, *b)
 ```
 
 ## Types
@@ -101,7 +101,7 @@ bool                c_rawstr_equalto(const char* const* a, const char* const* b)
 | `cmap_X`           | `struct { ... }`                                | The cmap type                 |
 | `cmap_X_rawkey`    | `i_keyraw`                                      | The raw key type              |
 | `cmap_X_rawmapped` | `i_valraw`                                      | The raw mapped type           |
-| `cmap_X_rawvalue`  | `struct { i_keyraw first; i_valraw second; }`   | i_keyraw + i_valraw type      |
+| `cmap_X_raw`       | `struct { i_keyraw first; i_valraw second; }`   | i_keyraw + i_valraw type      |
 | `cmap_X_key`       | `i_key`                                         | The key type                  |
 | `cmap_X_mapped`    | `i_val`                                         | The mapped type               |
 | `cmap_X_value`     | `struct { const i_key first; i_val second; }`   | The value: key is immutable   |
@@ -122,7 +122,7 @@ int main()
     // Create an unordered_map of three strings (that map to strings)
     c_auto (cmap_str, u)
     {
-        c_apply_pair(cmap_str, emplace, &u, {
+        c_apply(v, cmap_str_emplace(&u, c_pair(v)), cmap_str_raw, {
             {"RED", "#FF0000"},
             {"GREEN", "#00FF00"},
             {"BLUE", "#0000FF"}
@@ -168,7 +168,7 @@ int main()
 
     c_auto (cmap_id, idnames)
     {
-        c_apply_pair(cmap_id, emplace, &idnames, {
+        c_apply(v, cmap_id_emplace(&idnames, c_pair(v)), cmap_id_raw, {
             {100, "Red"}, {110, "Blue"}
         });
         // replace existing mapped value:
@@ -200,22 +200,22 @@ typedef struct { int x, y, z; } Vec3i;
 
 #define i_key Vec3i
 #define i_val int
-#define i_equ c_memcmp_equalto // bitwise compare, and use c_default_hash
+#define i_eq c_memcmp_eq // bitwise equal, and use c_default_hash
 #define i_tag vi
 #include <stc/cmap.h>
 
 int main()
 {
     // Define map with defered destruct
-    c_autovar (cmap_vi vecs = cmap_vi_init(), cmap_vi_del(&vecs))
+    c_autovar (cmap_vi vecs = cmap_vi_init(), cmap_vi_drop(&vecs))
     {
         cmap_vi_insert(&vecs, (Vec3i){100,   0,   0}, 1);
         cmap_vi_insert(&vecs, (Vec3i){  0, 100,   0}, 2);
         cmap_vi_insert(&vecs, (Vec3i){  0,   0, 100}, 3);
         cmap_vi_insert(&vecs, (Vec3i){100, 100, 100}, 4);
 
-        c_foreach (i, cmap_vi, vecs)
-            printf("{ %3d, %3d, %3d }: %d\n", i.ref->first.x,  i.ref->first.y,  i.ref->first.z,  i.ref->second);
+        c_forpair (vec, num, cmap_vi, vecs)
+            printf("{ %3d, %3d, %3d }: %d\n", _.vec.x,  _.vec.y,  _.vec.z,  _.num);
     }
 }
 ```
@@ -240,15 +240,15 @@ typedef struct { int x, y, z; } Vec3i;
 
 int main()
 {
-    c_autovar (cmap_iv vecs = cmap_iv_init(), cmap_iv_del(&vecs))
+    c_auto (cmap_iv, vecs) // shorthand for c_autovar with _init(), _drop().
     {
         cmap_iv_insert(&vecs, 1, (Vec3i){100,   0,   0});
         cmap_iv_insert(&vecs, 2, (Vec3i){  0, 100,   0});
         cmap_iv_insert(&vecs, 3, (Vec3i){  0,   0, 100});
         cmap_iv_insert(&vecs, 4, (Vec3i){100, 100, 100});
 
-        c_foreach (i, cmap_iv, vecs)
-            printf("%d: { %3d, %3d, %3d }\n", i.ref->first, i.ref->second.x,  i.ref->second.y,  i.ref->second.z);
+        c_forpair (num, vec, cmap_iv, vecs)
+            printf("%d: { %3d, %3d, %3d }\n", _.num_, _.vec.x,  _.vec.y,  _.vec.z);
     }
 }
 ```
@@ -270,45 +270,56 @@ typedef struct {
     cstr country;
 } Viking;
 
-static bool Viking_equalto(const Viking* a, const Viking* b) {
+#define Viking_init() ((Viking){cstr_null, cstr_null})
+
+static inline bool Viking_eq(const Viking* a, const Viking* b) {
     return cstr_equals_s(a->name, b->name) && cstr_equals_s(a->country, b->country);
 }
 
-static uint32_t Viking_hash(const Viking* a, int ignored) {
+static inline uint32_t Viking_hash(const Viking* a, int ignored) {
     return c_strhash(a->name.str) ^ (c_strhash(a->country.str) >> 15);
 }
 
-static void Viking_del(Viking* v) {
-    c_del(cstr, &v->name, &v->country);
+static inline Viking Viking_clone(Viking v) {
+    v.name = cstr_clone(v.name); 
+    v.country = cstr_clone(v.country);
 }
 
-#define i_key Viking
+static inline void Viking_drop(Viking* vk) {
+    cstr_drop(&vk->name);
+    cstr_drop(&vk->country);
+}
+
+#define i_type Vikings
+#define i_key_bind Viking
 #define i_val int
-#define i_equ Viking_equalto
-#define i_hash Viking_hash
-#define i_del Viking_del
-#define i_tag vk
+// i_key_bind auto-binds:
+//  #define i_eq Viking_eq
+//  #define i_hash Viking_hash
+//  #define i_keyfrom Viking_clone
+//  #define i_drop Viking_drop
 #include <stc/cmap.h>
 
 int main()
 {
     // Use a HashMap to store the vikings' health points.
-    cmap_vk vikings = cmap_vk_init();
+    c_auto (Vikings, vikings) // uses Vikings_init(), Vikings_drop()
+    {
+        Vikings_insert(&vikings, (Viking){cstr_new("Einar"), cstr_new("Norway")}, 25);
+        Vikings_insert(&vikings, (Viking){cstr_new("Olaf"), cstr_new("Denmark")}, 24);
+        Vikings_insert(&vikings, (Viking){cstr_new("Harald"), cstr_new("Iceland")}, 12);
+        Vikings_insert(&vikings, (Viking){cstr_new("Einar"), cstr_new("Denmark")}, 21);
+        
+        c_auto (Viking, lookup) {
+            lookup = (Viking){cstr_new("Einar"), cstr_new("Norway")};
+            printf("Lookup: Einar of Norway has %d hp\n\n", *Vikings_at(&vikings, lookup));
+        }
 
-    cmap_vk_insert(&vikings, (Viking){cstr_new("Einar"), cstr_new("Norway")}, 25);
-    cmap_vk_insert(&vikings, (Viking){cstr_new("Olaf"), cstr_new("Denmark")}, 24);
-    cmap_vk_insert(&vikings, (Viking){cstr_new("Harald"), cstr_new("Iceland")}, 12);
-    cmap_vk_insert(&vikings, (Viking){cstr_new("Einar"), cstr_new("Denmark")}, 21);
-    
-    Viking lookup = (Viking){cstr_new("Einar"), cstr_new("Norway")};
-    printf("Lookup: Einar of Norway has %d hp\n\n", *cmap_vk_at(&vikings, lookup));
-    Viking_del(&lookup);
-
-    // Print the status of the vikings.
-    c_foreach (i, cmap_vk, vikings) {
-        printf("%s of %s has %d hp\n", i.ref->first.name.str, i.ref->first.country.str, i.ref->second);
+        // Print the status of the vikings.
+        c_forpair (viking, hp, Vikings, vikings) {
+            printf("%s of %s has %d hp\n", _.viking.name.str, _.viking.country.str, _.hp);
+        }
     }
-    cmap_vk_del(&vikings);
 }
 ```
 Output:
@@ -326,65 +337,65 @@ to add "raw" type entries (otherwise compile error):
 ```c
 #include <stc/cstr.h>
 
-typedef struct {
+typedef struct Viking {
     cstr name;
     cstr country;
 } Viking;
 
-static void Viking_del(Viking* v) {
-    c_del(cstr, &v->name, &v->country);
+static inline void Viking_drop(Viking* v) {
+    c_drop(cstr, &v->name, &v->country);
 }
 
-// Define a "raw" type that does not need allocations.
-// Define equals, hash, fromraw, toraw functions:
+// Define Viking raw struct with hash, equalto, and convertion functions between Viking and RViking structs:
 
-typedef struct {
+typedef struct RViking {
     const char* name;
     const char* country;
 } RViking;
 
-static bool RViking_equalto(const RViking* r1, const RViking* r2)
-    { return !strcmp(r1->name, r2->name) && !strcmp(r1->country, r2->country); }
+static inline uint64_t RViking_hash(const RViking* raw, size_t ignore) {
+    uint64_t hash = c_strhash(raw->name) ^ (c_strhash(raw->country) >> 15);
+    return hash;
+}
+static inline bool RViking_eq(const RViking* rx, const RViking* ry) {
+    return strcmp(rx->name, ry->name) == 0 && strcmp(rx->country, ry->country) == 0;
+}
 
-static uint32_t RViking_hash(const RViking* r, int ignored)
-    { return c_strhash(r->name) ^ (c_strhash(r->country) >> 15); }
+static inline Viking Viking_from(RViking raw) {
+    return (Viking){cstr_from(raw.name), cstr_from(raw.country)};
+}
+static inline RViking Viking_toraw(const Viking* vk) {
+    return (RViking){vk->name.str, vk->country.str};
+}
 
-static Viking Viking_fromR(RViking r) 
-    { return (Viking){cstr_from(r.name), cstr_from(r.country)}; }
-
-static RViking Viking_toR(const Viking* v) 
-    { return (RViking){v->name.str, v->country.str}; }
-
-#define i_key Viking
-#define i_val int
-#define i_keydel Viking_del
-#define i_keyraw RViking
-#define i_equ RViking_equalto
-#define i_hash RViking_hash
-#define i_keyfrom Viking_fromR
-#define i_keyto Viking_toR
-#define i_tag vk
+// With this in place, we define the Viking => int hash map type:
+#define i_type      Vikings
+#define i_key_bind  Viking
+#define i_val       int
+#define i_keyraw    RViking
+// i_key_bind macro will make these functions auto-bind:
+//  #define i_hash     RViking_hash
+//  #define i_eq       RViking_eq
+//  #define i_keyfrom  Viking_from // uses _from because i_keyraw is defined
+//  #define i_keyto    Viking_toraw
+//  #define i_keydrop  Viking_drop
 #include <stc/cmap.h>
 
 int main()
 {
-    c_auto (cmap_vk, vikings) // RAII
-    {
-        // Insert works as before, takes a constructed Viking object
-        cmap_vk_insert(&vikings, (Viking){cstr_new("Einar"), cstr_new("Norway")}, 25);
-        cmap_vk_insert(&vikings, (Viking){cstr_new("Olaf"), cstr_new("Denmark")}, 24);
+    c_auto (Vikings, vikings) {
+        c_apply(v, Vikings_emplace(&vikings, v), c_pair(v), Vikings_raw, {
+            {{"Einar", "Norway"}, 20},
+            {{"Olaf", "Denmark"}, 24},
+            {{"Harald", "Iceland"}, 12},
+        });
+        Vikings_emplace_or_assign(&vikings, (RViking){"Bjorn", "Sweden"}, 10);
 
-        // Emplace is simpler to use now - takes rawkey argument
-        cmap_vk_emplace(&vikings, (RViking){"Harald", "Iceland"}, 12);
-        cmap_vk_emplace(&vikings, (RViking){"Einar", "Denmark"}, 21);
+        Vikings_value *v = Vikings_get_mut(&vikings, (RViking){"Einar", "Norway"});
+        if (v) v->second += 3; // add 3 hp points to Einar
 
-        // Lookup also uses rawkey args, no need construct/destruct key:
-        printf("Lookup: Einar of Norway has %d hp\n\n", *cmap_vk_at(&vikings, (RViking){"Einar", "Norway"}));
-
-        // Print the status of the vikings.
-        c_foreach (i, cmap_vk, vikings) {
-            printf("%s of %s has %d hp\n", i.ref->first.name.str, 
-                                           i.ref->first.country.str, i.ref->second);
+        c_forpair (viking, health, Vikings, vikings) {
+            printf("%s of %s has %d hp\n", _.viking.name.str, _.viking.country.str, _.health);
         }
     }
 }
