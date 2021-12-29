@@ -18,15 +18,19 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 #define i_key       // key: REQUIRED
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
-#define i_keydrop    // destroy key func - defaults to empty destruct
+
+#define i_keydrop   // destroy key func - defaults to empty destruct
 #define i_keyraw    // convertion "raw" type - defaults to i_key
 #define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
 #define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
-#define i_valdrop    // destroy value func - defaults to empty destruct
+
+#define i_valdrop   // destroy value func - defaults to empty destruct
 #define i_valraw    // convertion "raw" type - defaults to i_val
 #define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
 #define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
-#define i_tag       // defaults to i_key
+
+#define i_tag       // typename tag. defaults to i_key
+#define i_type      // full typename of the container
 #include <stc/csmap.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
