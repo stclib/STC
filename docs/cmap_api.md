@@ -47,7 +47,7 @@ void                cmap_X_max_load_factor(cmap_X* self, float max_load);       
 bool                cmap_X_reserve(cmap_X* self, size_t size);
 void                cmap_X_shrink_to_fit(cmap_X* self);
 void                cmap_X_swap(cmap_X* a, cmap_X* b);
-void                cmap_X_drop(cmap_X* self);                                                 // destructor
+void                cmap_X_drop(cmap_X* self);                                                // destructor
 
 size_t              cmap_X_size(cmap_X map);
 size_t              cmap_X_capacity(cmap_X map);                                              // buckets * max_load_factor

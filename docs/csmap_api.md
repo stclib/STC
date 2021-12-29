@@ -40,7 +40,7 @@ csmap_X               csmap_X_clone(csmap_x map);
 void                  csmap_X_clear(csmap_X* self);
 void                  csmap_X_copy(csmap_X* self, csmap_X other);
 void                  csmap_X_swap(csmap_X* a, csmap_X* b);
-void                  csmap_X_drop(csmap_X* self);                                                // destructor
+void                  csmap_X_drop(csmap_X* self);                                               // destructor
 
 size_t                csmap_X_size(csmap_X map);
 bool                  csmap_X_empty(csmap_X map);

@@ -20,7 +20,7 @@ macros, as one must always make sure to unwind temporary allocated resources bef
 | `c_breakauto;`                         | Break out of a `c_auto*`-block/scope without memleak |
 
 For multiple variables, use either multiple **c_autovar** in sequence, or declare variable outside
-scope and use **c_autoscope**. Also, **c_auto** support up to 3 variables.
+scope and use **c_autoscope**. Also, **c_auto** support up to 4 variables.
 ```c
 c_autovar (cstr s = cstr_new("Hello"), cstr_drop(&s))
 {

@@ -6,11 +6,11 @@ STC - Smart Template Containers for C
 News
 ----
 ### Version 3 released
-This version introduces lots of enhancements,  bugfixes and additions. There are also
-a number of breaking changes, see below for changes and the migration guide. 
+This version introduces lots of enhancements, bugfixes and additions. There are also
+a number of breaking changes, see below for changes and a migration guide. 
 
-Version 3 is planned to freeze the API, as far as possible. Any changes will be handled with long 
-lasting deprecations, so it should be ready for creating production code using it.
+With version 3, the API is freezed as far as possible. Any changes will be handled with long 
+lasting deprecations, so you may develop production code using it.
 
 ### Brief summary of changes
 - Renamed: all ***_del*** to `_drop` (like destructors in Rust).
@@ -24,7 +24,8 @@ lasting deprecations, so it should be ready for creating production code using i
 - Renamed: *c_default_fromraw()* to `c_default_clone()`.
 - Changed: the [**c_apply**](docs/ccommon_api.md) macros API.
 - Replaced: *csview_first_token()* and *csview_next_token()* with one function: `csview_token()`.
-- Added: new general `i_key_bind` / `i_val_bind` template parameters which auto-binds template functions.
+- Added: **checkauto** tool for checking that c-source files uses `c_auto*` macros correctly.
+- Added: general `i_key_bind` / `i_val_bind` template parameters which auto-binds template functions.
 - Added: `i_opt` template parameter: compile-time options: `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`; may be combined with `|`
 - Added: [**cbox**](docs/cbox_api.md) type: smart pointer, similar to [Rust Box](https://doc.rust-lang.org/rust-by-example/std/box.html) and [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr).
 - Added: [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding"

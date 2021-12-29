@@ -28,7 +28,7 @@ csset_X              csset_X_clone(csset_x set);
 void                 csset_X_clear(csset_X* self);
 void                 csset_X_copy(csset_X* self, csset_X other);
 void                 csset_X_swap(csset_X* a, csset_X* b);
-void                 csset_X_drop(csset_X* self);                                              // destructor
+void                 csset_X_drop(csset_X* self);                                             // destructor
 
 size_t               csset_X_size(csset_X set);
 bool                 csset_X_empty(csset_X set);

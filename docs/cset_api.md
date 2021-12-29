@@ -33,7 +33,7 @@ void                cset_X_max_load_factor(cset_X* self, float max_load);       
 bool                cset_X_reserve(cset_X* self, size_t size);
 void                cset_X_shrink_to_fit(cset_X* self);
 void                cset_X_swap(cset_X* a, cset_X* b);
-void                cset_X_drop(cset_X* self);                                                // destructor
+void                cset_X_drop(cset_X* self);                                               // destructor
 
 size_t              cset_X_size(cset_X set);                                                 // num. of allocated buckets
 size_t              cset_X_capacity(cset_X set);                                             // buckets * max_load_factor
