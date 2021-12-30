@@ -171,9 +171,9 @@ c_drop(cstr, &a, &b);
 ### General predefined template parameter functions
 ```
 int     c_default_cmp(const Type*, const Type*);
-Type    c_default_clone(Type val);           // simple copy
+Type    c_default_from(Type val);            // simple copy
 Type    c_default_toraw(const Type* val);    // dereference val
-void    c_default_drop(Type* val);            // does nothing
+void    c_default_drop(Type* val);           // does nothing
 
 int     c_rawstr_cmp(const char* const* a, const char* const* b);
 bool    c_rawstr_eq(const char* const* a, const char* const* b);

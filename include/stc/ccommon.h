@@ -103,8 +103,7 @@ typedef const char              c_strlit[];
 #define c_default_eq(x, y)      (*(x) == *(y))
 #define c_memcmp_eq(x, y)       (memcmp(x, y, sizeof *(x)) == 0)
 
-#define c_default_clone(x)      (x)
-#define c_default_fromraw(x)    (x) // [deprecated]
+#define c_default_from(x)       (x)
 #define c_default_toraw(ptr)    (*(ptr))
 #define c_default_drop(ptr)     ((void) (ptr))
 

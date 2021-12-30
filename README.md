@@ -21,7 +21,7 @@ lasting deprecations, so you may develop production code using it.
 - Renamed: ***i_key_csptr*** / ***i_val_csptr*** to `i_key_sptr` / `i_val_sptr` for specifying **carc** and **cbox** values in containers.
 - Renamed: *csptr_X_make()* to `carc_X_from()`.
 - Renamed: *cstr_lit()* to `cstr_new(literal)`, and *cstr_assign_fmt()* to `cstr_printf()`.
-- Renamed: *c_default_fromraw()* to `c_default_clone()`.
+- Renamed: *c_default_fromraw()* to `c_default_from()`.
 - Changed: the [**c_apply**](docs/ccommon_api.md) macros API.
 - Replaced: *csview_first_token()* and *csview_next_token()* with one function: `csview_token()`.
 - Added: **checkauto** tool for checking that c-source files uses `c_auto*` macros correctly.

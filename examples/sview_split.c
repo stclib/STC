@@ -1,5 +1,5 @@
 #include <stc/csview.h>
-#define c_arg(a) a
+
 int  main()
 {
     // No memory allocations or string length calculations!

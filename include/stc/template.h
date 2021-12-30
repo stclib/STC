@@ -159,10 +159,10 @@
     #define i_tag i_key  
   #endif
   #if !defined _i_has_internal_clone && defined i_keydrop && !defined i_keyfrom && !c_option(c_no_clone)
-    #error "i_keydrop defined but not i_keyfrom (e.g. as c_default_clone), or no 'i_opt c_no_clone'"
+    #error "i_keydrop defined but not i_keyfrom (e.g. as c_default_from), or no 'i_opt c_no_clone'"
   #endif
   #if !defined i_keyfrom
-    #define i_keyfrom c_default_clone
+    #define i_keyfrom c_default_from
   #endif
   #ifndef i_keyraw
     #define _i_no_keyraw
@@ -185,10 +185,10 @@
   #define i_tag i_val
 #endif
 #if !defined _i_has_internal_clone && defined i_valdrop && !defined i_valfrom && !c_option(c_no_clone)
-  #error "i_valdrop/i_drop defined but not i_valfrom (e.g. as c_default_clone), or no 'i_opt c_no_clone'"
+  #error "i_valdrop/i_drop defined but not i_valfrom (e.g. as c_default_from), or no 'i_opt c_no_clone'"
 #endif
 #if !defined i_valfrom
-  #define i_valfrom c_default_clone
+  #define i_valfrom c_default_from
 #endif
 #ifndef i_valraw
   #if !defined i_key || defined _i_no_keyraw

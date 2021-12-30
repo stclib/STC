@@ -81,7 +81,7 @@ void int_drop(int* x) {
 
 #define i_val int
 #define i_drop int_drop       // optional func, just to display elements destroyed
-#define i_from c_default_clone
+#define i_from c_default_from
 #include <stc/cbox.h>         // cbox_int
 
 #define i_key_sptr cbox_int   // note: use i_key_sptr instead of i_key
