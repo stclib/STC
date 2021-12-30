@@ -11,10 +11,13 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 
 ```c
 #define i_val       // value: REQUIRED
-#define i_cmp       // three-way compare two i_val* : REQUIRED IF i_val is a non-integral type
+#define i_cmp       // three-way compare two i_val* : REQUIRED IF i_val/i_valraw is a non-integral type
 #define i_drop      // destroy value func - defaults to empty destruct
-#define i_valfrom   // convertion func i_val => i_val - defaults to plain copy
+#define i_valraw    // convertion type
+#define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
+#define i_valto     // convertion func i_val* => i_valraw.
 #define i_tag       // defaults to i_val
+#define i_type      // container type name
 #include <stc/cpque.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -22,7 +25,9 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ## Methods
 
 ```c
-cpque_X             cpque_X_init(void);
+cpque_X             cpque_X_init(void);                    // create empty pri-queue.
+cpque_X             cpque_X_with_capacity(size_t cap);
+cpque_X             cpque_X_with_size(size_t size, i_val null);
 cpque_X             cpque_X_clone(cpque_X pq);
 
 void                cpque_X_clear(cpque_X* self);
@@ -33,17 +38,16 @@ void                cpque_X_drop(cpque_X* self);        // destructor
 
 size_t              cpque_X_size(cpque_X pq);
 bool                cpque_X_empty(cpque_X pq);
-cpque_X_value*      cpque_X_top(const cpque_X* self);
+i_val*              cpque_X_top(const cpque_X* self);
 
-void                cpque_X_make_heap(cpque_X* self);  // call after using push_back().
-void                cpque_X_push(cpque_X* self, cpque_X_value value);
-void                cpque_X_emplace(cpque_X* self, cpque_X_value val);     // clones value
+void                cpque_X_make_heap(cpque_X* self);  // heapify the vector.
+void                cpque_X_push(cpque_X* self, i_val value);
+void                cpque_X_emplace(cpque_X* self, i_valraw raw); // converts from raw
 
 void                cpque_X_pop(cpque_X* self);
 void                cpque_X_erase_at(cpque_X* self, size_t idx);
 
-void                cpque_X_push_back(cpque_X* self, cpque_X_value value); // breaks heap-property
-cpque_X_value       cpque_X_value_clone(cpque_X_value val);
+i_val               cpque_X_value_clone(i_val value);
 ```
 
 ## Types
