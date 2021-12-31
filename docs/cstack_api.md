@@ -23,27 +23,30 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 
 ```c
 cstack_X            cstack_X_init(void);
-cstack_X            cstack_with_capacity(size_t cap);
-cstack_X            cstack_with_size(size_t size, i_val fill);
+cstack_X            cstack_X_with_capacity(size_t cap);
+cstack_X            cstack_X_with_size(size_t size, i_val fill);
 cstack_X            cstack_X_clone(cstack_X st);
 
 void                cstack_X_clear(cstack_X* self);
 bool                cstack_X_reserve(cstack_X* self, size_t n);
 void                cstack_X_shrink_to_fit(cstack_X* self);
 void                cstack_X_copy(cstack_X* self, cstack_X other);
-void                cstack_X_drop(cstack_X* self);       // destructor
+void                cstack_X_drop(cstack_X* self);                       // destructor
 
 size_t              cstack_X_size(cstack_X st);
 size_t              cstack_X_capacity(cstack_X st);
 bool                cstack_X_empty(cstack_X st);
 
-cstack_X_value*       cstack_X_top(const cstack_X* self);
-const cstack_X_value* cstack_X_at(const cstack_X* self, size_t idx);
+i_val*              cstack_X_top(const cstack_X* self);
+const i_val*        cstack_X_at(const cstack_X* self, size_t idx);
 
-cstack_X_value*     cstack_X_push(cstack_X* self, i_val value);
-cstack_X_value*     cstack_X_emplace(cstack_X* self, i_valraw raw);
+i_val*              cstack_X_push(cstack_X* self, i_val value);
+i_val*              cstack_X_push_back(cstack_X* self, i_val value);     // same as push
+i_val*              cstack_X_emplace(cstack_X* self, i_valraw raw);
+i_val*              cstack_X_emplace_back(cstack_X* self, i_valraw raw); // same as emplace
 
 void                cstack_X_pop(cstack_X* self);
+void                cstack_X_pop_back(cstack_X* self);                   // same as pop
 
 cstack_X_iter       cstack_X_begin(const cstack_X* self);
 cstack_X_iter       cstack_X_end(const cstack_X* self);
@@ -64,24 +67,24 @@ i_val               cstack_X_value_clone(i_val value);
 
 ## Example
 ```c
+#define i_type IStack
 #define i_val int
-#define i_tag i
 #include <stc/cstack.h>
 
 #include <stdio.h>
 
 int main() {
-    cstack_i S = cstack_i_init();
+    IStack stk = IStack_init();
 
     for (int i=0; i < 100; ++i)
-        cstack_i_push(&S, i*i);
+        IStack_push(&stk, i*i);
 
     for (int i=0; i < 90; ++i)
-        cstack_i_pop(&S);
+        IStack_pop(&stk);
 
-    printf("top: %d\n", *cstack_i_top(&S));
+    printf("top: %d\n", *IStack_top(&stk));
 
-    cstack_i_drop(&S);
+    IStack_drop(&stk);
 }
 ```
 Output:

@@ -46,9 +46,9 @@ STC_INLINE _cx_self _cx_memb(_with_capacity)(size_t cap) {
     return out;
 }
 
-STC_INLINE _cx_self _cx_memb(_with_size)(size_t size, i_val fill) {
-    _cx_self out = {(_cx_value *) c_malloc(size*sizeof fill), size, size};
-    while (size) out.data[--size] = fill;
+STC_INLINE _cx_self _cx_memb(_with_size)(size_t size, i_val null) {
+    _cx_self out = {(_cx_value *) c_malloc(size*sizeof null), size, size};
+    while (size) out.data[--size] = null;
     return out;
 }
 
@@ -70,12 +70,6 @@ STC_INLINE bool _cx_memb(_empty)(_cx_self v)
 STC_INLINE size_t _cx_memb(_capacity)(_cx_self v)
     { return v.capacity; }
 
-STC_INLINE _cx_value* _cx_memb(_top)(const _cx_self* self)
-    { return &self->data[self->size - 1]; }
-
-STC_INLINE void _cx_memb(_pop)(_cx_self* self)
-    { _cx_value* p = &self->data[--self->size]; i_valdrop(p); }
-
 STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, size_t n) {
     if (n < self->size) return true;
     _cx_value *t = (_cx_value *)c_realloc(self->data, n*sizeof *t);
@@ -85,11 +79,21 @@ STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, size_t n) {
 STC_INLINE void _cx_memb(_shrink_to_fit)(_cx_self* self)
     { _cx_memb(_reserve)(self, self->size); }
 
+STC_INLINE _cx_value* _cx_memb(_top)(const _cx_self* self)
+    { return &self->data[self->size - 1]; }
+
 STC_INLINE _cx_value* _cx_memb(_push)(_cx_self* self, _cx_value val) {
     if (self->size == self->capacity) _cx_memb(_reserve)(self, self->size*3/2 + 4);
     _cx_value* vp = self->data + self->size++; 
     *vp = val; return vp;
 }
+STC_INLINE _cx_value* _cx_memb(_push_back)(_cx_self* self, _cx_value val)
+    { return _cx_memb(_push)(self, val); }
+
+STC_INLINE void _cx_memb(_pop)(_cx_self* self)
+    { _cx_value* p = &self->data[--self->size]; i_valdrop(p); }
+STC_INLINE void _cx_memb(_pop_back)(_cx_self* self)
+    { _cx_memb(_pop)(self); }
 
 STC_INLINE const _cx_value* _cx_memb(_at)(const _cx_self* self, size_t idx)
     { assert(idx < self->size); return self->data + idx; }
@@ -97,6 +101,8 @@ STC_INLINE const _cx_value* _cx_memb(_at)(const _cx_self* self, size_t idx)
 #if !c_option(c_no_clone)
 #if !defined _i_no_raw
 STC_INLINE _cx_value* _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
+    { return _cx_memb(_push)(self, i_valfrom(raw)); }
+STC_INLINE _cx_value* _cx_memb(_emplace_back)(_cx_self* self, _cx_raw raw)
     { return _cx_memb(_push)(self, i_valfrom(raw)); }
 #endif
 STC_INLINE _cx_self _cx_memb(_clone)(_cx_self v) {
