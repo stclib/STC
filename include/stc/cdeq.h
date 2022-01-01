@@ -211,7 +211,7 @@ _cx_memb(_sort)(_cx_self* self) {
 #endif // _i_queue
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
+#if !defined(STC_SHARED) || c_option(c_static) || defined(STC_IMPLEMENTATION)
 
 #ifndef CDEQ_H_INCLUDED
 static struct cdeq_rep _cdeq_sentinel = {0, 0};

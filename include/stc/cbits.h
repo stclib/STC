@@ -168,7 +168,7 @@ STC_INLINE void cbits_xor(cbits *self, cbits other) {
     }
 #endif
 
-#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
+#if !defined(STC_SHARED) || defined(STC_IMPLEMENTATION)
 
 STC_DEF cbits* cbits_copy(cbits* self, cbits other) {
     if (self->data64 == other.data64) return self;

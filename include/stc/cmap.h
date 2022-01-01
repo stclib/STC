@@ -231,7 +231,7 @@ _cx_memb(_erase_at)(_cx_self* self, _cx_iter it) {
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
-#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
+#if !defined(STC_SHARED) || c_option(c_static) || defined(STC_IMPLEMENTATION)
 
 #ifndef CMAP_H_INCLUDED
 //STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n)

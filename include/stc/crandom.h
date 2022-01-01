@@ -141,7 +141,7 @@ STC_INLINE int32_t stc32_uniform(stc32_t* rng, stc32_uniform_t* d) {
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
-#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
+#if !defined(STC_SHARED) || defined(STC_IMPLEMENTATION)
 
 /* Global random() */
 static stc64_t stc64_global = {{

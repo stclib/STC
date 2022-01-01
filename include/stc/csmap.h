@@ -223,7 +223,7 @@ _cx_memb(_advance)(_cx_iter it, size_t n) {
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
+#if !defined(STC_SHARED) || c_option(c_static) || defined(STC_IMPLEMENTATION)
 
 #ifndef CSMAP_H_INCLUDED
 static struct csmap_rep _csmap_sentinel = {0, 0, 0, 0, 0};

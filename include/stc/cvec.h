@@ -233,7 +233,7 @@ _cx_memb(_sort)(_cx_self* self) {
 }
 #endif // !c_no_cmp
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
+#if !defined(STC_SHARED) || c_option(c_static) || defined(STC_IMPLEMENTATION)
 
 #ifndef CVEC_H_INCLUDED
 static struct cvec_rep _cvec_sentinel = {0, 0};

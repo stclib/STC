@@ -123,7 +123,7 @@ STC_INLINE int          csview_cmp(const csview* x, const csview* y) {
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
-#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
+#if !defined(STC_SHARED) || defined(STC_IMPLEMENTATION)
 
 STC_DEF csview
 csview_substr(csview sv, intptr_t pos, size_t n) {

@@ -97,7 +97,7 @@ STC_INLINE void _cx_memb(_next)(_cx_iter* it)
     { ++it->ref; }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
+#if !defined(STC_SHARED) || c_option(c_static) || defined(STC_IMPLEMENTATION)
 
 STC_DEF _cx_self _cx_memb(_with_storage)(size_t xdim, size_t ydim, _cx_value* block) {
     _cx_self _arr = {c_alloc_n(_cx_value*, xdim), xdim, ydim};

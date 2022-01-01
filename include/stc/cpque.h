@@ -105,7 +105,7 @@ STC_INLINE void _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
 #endif
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
+#if !defined(STC_SHARED) || c_option(c_static) || defined(STC_IMPLEMENTATION)
 
 STC_DEF void
 _cx_memb(_sift_down_)(_cx_value* arr, const size_t idx, const size_t n) {

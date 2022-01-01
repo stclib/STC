@@ -173,7 +173,7 @@ cstr_ends_with(cstr s, const char* sub) {
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
-#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION)
+#if !defined(STC_SHARED) || c_option(c_static) || defined(STC_IMPLEMENTATION)
 
 STC_LIBRARY_ONLY( static _cstr_rep_t _cstr_nullrep = {0, 0, {0}};
                   const cstr cstr_null = {_cstr_nullrep.str}; )

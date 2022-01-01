@@ -39,18 +39,6 @@
 #endif
 #define STC_INLINE static inline
 
-#if defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
-#  define STC_API extern
-#  define STC_DEF
-#  define STC_LIBRARY_ONLY(...) __VA_ARGS__
-#  define STC_STATIC_ONLY(...)
-#else
-#  define STC_API static inline
-#  define STC_DEF static inline
-#  define STC_LIBRARY_ONLY(...)
-#  define STC_STATIC_ONLY(...) __VA_ARGS__
-#endif
-
 /* Macro overloading feature support based on: https://rextester.com/ONP80107 */
 #define c_MACRO_OVERLOAD(name, ...) \
     c_PASTE3(name, _, c_NUM_ARGS(__VA_ARGS__))(__VA_ARGS__)
@@ -112,6 +100,7 @@ typedef const char              c_strlit[];
 #define c_no_atomic             2
 #define c_no_clone              4
 #define c_no_cmp                8
+#define c_static                16
 
 /* Generic algorithms */
 
@@ -206,21 +195,6 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
 } while (0)
 #define c_pair(v) (v).first, (v).second
 
-// [deprecated]
-#define c_apply_OLD(C, method, cx, ...) do { \
-    const C##_raw _c_arr[] = __VA_ARGS__; \
-    C* _c_cx = cx; \
-    for (size_t _c_i = 0; _c_i < c_arraylen(_c_arr); ++_c_i) \
-        C##_##method(_c_cx, _c_arr[_c_i]); \
-} while (0)
-// [deprecated]
-#define c_apply_pair_OLD(C, method, cx, ...) do { \
-    const C##_raw _c_arr[] = __VA_ARGS__; \
-    C* _c_cx = cx; \
-    for (size_t _c_i = 0; _c_i < c_arraylen(_c_arr); ++_c_i) \
-        C##_##method(_c_cx, _c_arr[_c_i].first, _c_arr[_c_i].second); \
-} while (0)
-
 #define c_drop(C, ...) do { \
     C* _c_arr[] = {__VA_ARGS__}; \
     for (size_t _c_i = 0; _c_i < c_arraylen(_c_arr); ++_c_i) \
@@ -238,4 +212,23 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
     #define c_umul128(a, b, lo, hi) \
         asm("mulq %3" : "=a"(*(lo)), "=d"(*(hi)) : "a"(a), "rm"(b))
 #endif
+#endif
+
+#undef STC_API
+#undef STC_DEF
+#undef STC_LIBRARY_ONLY
+#undef STC_STATIC_ONLY
+#ifdef STC_HEADER // [deprecated]
+#  define STC_SHARED
+#endif
+#if !c_option(c_static) && (defined(STC_SHARED) || defined(STC_IMPLEMENTATION))
+#  define STC_API extern
+#  define STC_DEF
+#  define STC_LIBRARY_ONLY(...) __VA_ARGS__
+#  define STC_STATIC_ONLY(...)
+#else
+#  define STC_API static inline
+#  define STC_DEF static inline
+#  define STC_LIBRARY_ONLY(...)
+#  define STC_STATIC_ONLY(...) __VA_ARGS__
 #endif

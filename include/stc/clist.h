@@ -185,7 +185,7 @@ _cx_memb(_get_mut)(_cx_self* self, i_valraw val) {
 
 // -------------------------- IMPLEMENTATION -------------------------
 
-#if !defined(STC_HEADER) || defined(STC_IMPLEMENTATION) || defined(i_imp)
+#if !defined(STC_SHARED) || c_option(c_static) || defined(STC_IMPLEMENTATION)
 
 #if !c_option(c_no_clone)
 STC_DEF _cx_self
@@ -332,7 +332,8 @@ _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
 
 #endif // TEMPLATE IMPLEMENTATION
 
-#if !defined(STC_HEADER) && !defined(CLIST_H_INCLUDED) || defined(i_imp) && i_imp == 2
+#if !defined(CLIST_H_INCLUDED) && \
+    (!defined(STC_SHARED) || c_option(c_static) || defined(STC_IMPLEMENTATION))
 
 STC_DEF size_t
 _clist_count(const clist_VOID* self) {
@@ -344,7 +345,6 @@ _clist_count(const clist_VOID* self) {
 }
 
 #if !c_option(c_no_cmp)
-
 // Singly linked list Mergesort implementation by Simon Tatham. O(n*log n).
 // https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
 STC_DEF clist_VOID_node *
