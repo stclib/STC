@@ -9,6 +9,7 @@ static int braces_lev = 0, block_lev = 0;
 static int state = NORMAL;
 static unsigned int block[64] = {0}, block_type = 0;
 const char* fname;
+int errors = 0, warnings = 0;
 %}
 
 ID [_a-zA-Z][_a-zA-Z0-9]*
@@ -36,7 +37,6 @@ for             |
 while           |
 switch          { block_type |= LOOP; state = BRACES; }
 do              { block_type |= LOOP; state = BRACESDONE; }
-if              { state = BRACES; }
 c_autovar       |
 c_autoscope     |
 c_autodefer     |
@@ -46,7 +46,16 @@ c_auto          { block_type = AUTO; state = BRACES; }
                     state = BRACESDONE;
                   }
                 }
-;[ \t]*else     ;
+if              { if (state == BRACESDONE) {
+                    if (block_type == AUTO) {
+                      printf("%s:%d: warning: 'if' after c_auto* not enclosed in curly braces.\n"
+                             "    Make sure to enclose 'if - else' statement in { } after c_auto*.\n",
+                             fname, yylineno);
+                      ++warnings;                    
+                    }
+                    state = BRACES;
+                  }
+                }
 ;               { if (state == BRACESDONE) {
                     block_type = block[block_lev];
                     state = NORMAL;
@@ -56,24 +65,37 @@ c_auto          { block_type = AUTO; state = BRACES; }
 \}              { if (state != BRACES) block_type = block[--block_lev]; }
 return          { if (block_type == AUTO) {
                     printf("%s:%d: error: 'return' used inside a c_auto* scope.\n"
-                           "    Use 'c_breakauto' to exit the current c_auto* scope.\n", fname, yylineno);
+                           "    Use 'c_breakauto' to exit the current c_auto* scope.\n",
+                           fname, yylineno);
+                    ++errors;
                   } else if (block_type & AUTO) {
                     printf("%s:%d: error: 'return' used in a loop inside a c_auto* scope.\n"
-                           "    Use 'break' to exit loops, then 'c_breakauto' to exit c_auto*.\n", fname, yylineno);
+                           "    Use 'break' to exit loops, then 'c_breakauto' to exit c_auto*.\n",
+                           fname, yylineno);
+                    ++errors;
                   }
                 }
-break           { if (block_type == AUTO)
+break           { if (block_type == AUTO) {
                     printf("%s:%d: error: 'break' used inside a c_auto* scope.\n"
-                           "    Use 'c_breakauto' to exit the current c_auto* scope.\n", fname, yylineno);
+                           "    Use 'c_breakauto' to exit the current c_auto* scope.\n",
+                           fname, yylineno);
+                    ++errors;
+                  }
                 }
-continue        { if (block_type == AUTO)
+continue        { if (block_type == AUTO) {
                     printf("%s:%d: warning: 'continue' used inside a c_auto* scope.\n"
                            "    It will only break out of the current c_auto* scope.\n"
-                           "    Use 'c_breakauto' instead to make it explicit.\n", fname, yylineno);
+                           "    Use 'c_breakauto' instead to make it explicit.\n",
+                           fname, yylineno);
+                    ++warnings;
+                  }
                 }
-c_breakauto     { if (block_type != AUTO)
+c_breakauto     { if (block_type != AUTO) {
                     printf("%s:%d: warning: 'c_breakauto' used outside a c_auto* scope.\n"
-                           "    Did you mean 'continue' instead?", fname, yylineno);
+                           "    Did you mean 'continue' instead?",
+                           fname, yylineno);
+                    ++warnings;
+                  }
                 }
 {ID}            ;
 \n              ++yylineno;
@@ -98,4 +120,8 @@ int main(int argc, char **argv)
     }
 
     yylex();
+    if (errors + warnings)
+        printf("%d error%s, %d warning%s.\n", errors, errors == 1? "":"s",
+                                              warnings, warnings == 1? "":"s");
+    return errors;
 }
