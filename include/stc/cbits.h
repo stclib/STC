@@ -20,9 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include "ccommon.h"
+
 #ifndef CBITS_H_INCLUDED
 #define CBITS_H_INCLUDED
-
 /*
 Similar to boost::dynamic_bitset / std::bitset
 
@@ -54,7 +55,6 @@ int main() {
 */
 #include <stdlib.h>
 #include <string.h>
-#include "ccommon.h"
 
 struct cbits {
     uint64_t *data64;
@@ -168,7 +168,7 @@ STC_INLINE void cbits_xor(cbits *self, cbits other) {
     }
 #endif
 
-#if !defined(STC_SHARED) || defined(STC_IMPLEMENTATION)
+#if defined(_i_implement)
 
 STC_DEF cbits* cbits_copy(cbits* self, cbits other) {
     if (self->data64 == other.data64) return self;
@@ -241,3 +241,4 @@ STC_DEF bool cbits_disjoint(cbits s, cbits other) { _cbits_SETOP(&, 0); }
 
 #endif
 #endif
+#undef i_opt

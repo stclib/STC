@@ -20,10 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include "ccommon.h"
 
 #ifndef CPQUE_H_INCLUDED
 #include <stdlib.h>
-#include "ccommon.h"
 #include "forward.h"
 #endif
 
@@ -105,7 +105,7 @@ STC_INLINE void _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
 #endif
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if !defined(STC_SHARED) || c_option(c_static) || defined(STC_IMPLEMENTATION)
+#if defined(_i_implement)
 
 STC_DEF void
 _cx_memb(_sift_down_)(_cx_value* arr, const size_t idx, const size_t n) {
@@ -153,5 +153,5 @@ _cx_memb(_push)(_cx_self* self, _cx_value value) {
 }
 
 #endif
-#include "template.h"
 #define CPQUE_H_INCLUDED
+#include "template.h"

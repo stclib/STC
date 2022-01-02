@@ -20,9 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include "ccommon.h"
+
 #ifndef CARR3_H_INCLUDED
 #define CARR3_H_INCLUDED
-#include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
 #endif
@@ -101,7 +102,7 @@ STC_INLINE void _cx_memb(_next)(_cx_iter* it)
     { ++it->ref; }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if !defined(STC_SHARED) || c_option(c_static) || defined(STC_IMPLEMENTATION)
+#if defined(_i_implement)
 
 STC_DEF _cx_self _cx_memb(_with_storage)(size_t xdim, size_t ydim, size_t zdim, _cx_value* block) {
     _cx_self _arr = {c_alloc_n(_cx_value**, xdim*(ydim + 1)), xdim, ydim, zdim};

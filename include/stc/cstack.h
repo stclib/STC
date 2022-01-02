@@ -20,11 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include "ccommon.h"
 
 #ifndef CSTACK_H_INCLUDED
 #define CSTACK_H_INCLUDED
 #include <stdlib.h>
-#include "ccommon.h"
 #include "forward.h"
 #endif // CSTACK_H_INCLUDED
 

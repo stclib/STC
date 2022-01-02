@@ -57,9 +57,9 @@ int main() {
     cvec_str_drop(&svec);
 }
 */
+#include "ccommon.h"
 
 #ifndef CVEC_H_INCLUDED
-#include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>
@@ -233,7 +233,7 @@ _cx_memb(_sort)(_cx_self* self) {
 }
 #endif // !c_no_cmp
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if !defined(STC_SHARED) || c_option(c_static) || defined(STC_IMPLEMENTATION)
+#if defined(_i_implement)
 
 #ifndef CVEC_H_INCLUDED
 static struct cvec_rep _cvec_sentinel = {0, 0};
@@ -358,8 +358,8 @@ _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos,
     for (; p1 != p2; ++p1) *pos++ = i_valfrom(*p1);
     return it;
 }
-#endif
-#endif
+#endif // !_i_no_raw
+#endif // !c_no_clone
 
 #if !c_option(c_no_cmp)
 
@@ -392,6 +392,6 @@ _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     return i_cmp(&rx, &ry);
 }
 #endif // !c_no_cmp
-#endif
-#include "template.h"
+#endif // _i_implement
 #define CVEC_H_INCLUDED
+#include "template.h"

@@ -261,8 +261,7 @@ STC_INLINE bool cstr_getline(cstr *self, FILE *fp) {
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-
-#if !defined(STC_SHARED) || defined(STC_IMPLEMENTATION)
+#if defined(_i_implement)
 
 STC_DEF void cstr_internal_move_(cstr* self, size_t pos1, size_t pos2) {
     if (pos1 == pos2)
@@ -400,3 +399,4 @@ STC_DEF void cstr_erase_n(cstr* self, size_t pos, size_t n) {
 
 #endif
 #endif
+#undef i_opt

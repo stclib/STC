@@ -122,8 +122,7 @@ STC_INLINE int          csview_cmp(const csview* x, const csview* y) {
 #define                 csview_eq(xp, yp) (!csview_cmp(xp, yp))
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-
-#if !defined(STC_SHARED) || defined(STC_IMPLEMENTATION)
+#if defined(_i_implement)
 
 STC_DEF csview
 csview_substr(csview sv, intptr_t pos, size_t n) {
@@ -150,3 +149,4 @@ csview_token(csview sv, csview sep, size_t* start) {
 
 #endif
 #endif
+#undef i_opt

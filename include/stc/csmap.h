@@ -48,9 +48,9 @@ int main(void) {
     }
 }
 */
+#include "ccommon.h"
 
 #ifndef CSMAP_H_INCLUDED
-#include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>
@@ -223,7 +223,7 @@ _cx_memb(_advance)(_cx_iter it, size_t n) {
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if !defined(STC_SHARED) || c_option(c_static) || defined(STC_IMPLEMENTATION)
+#if defined(_i_implement)
 
 #ifndef CSMAP_H_INCLUDED
 static struct csmap_rep _csmap_sentinel = {0, 0, 0, 0, 0};
@@ -511,10 +511,10 @@ _cx_memb(_drop)(_cx_self* self) {
     }
 }
 
-#endif // IMPLEMENTATION
+#endif // _i_implement
 #undef _i_isset
 #undef _i_keyref
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY
-#include "template.h"
 #define CSMAP_H_INCLUDED
+#include "template.h"

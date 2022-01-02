@@ -197,7 +197,7 @@ int main(void) {
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
-#if !defined(STC_SHARED) || defined(STC_IMPLEMENTATION)
+#if defined(_i_implement)
 
 _c_aatree_types(csmap_SENTINEL, csmap_, int, int);
 _c_aatree_complete_types(csmap_SENTINEL, csmap_);

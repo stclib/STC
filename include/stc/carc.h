@@ -47,10 +47,10 @@ int main() {
     c_drop(carc_person, &p, &q);
 }
 */
+#include "ccommon.h"
 
 #ifndef CARC_H_INCLUDED
 #define CARC_H_INCLUDED
-#include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
 

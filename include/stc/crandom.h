@@ -20,9 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include "ccommon.h"
+
 #ifndef CRANDOM_H_INCLUDED
 #define CRANDOM_H_INCLUDED
-
 /*
 // crandom: Pseudo-random number generator
 #include "stc/crandom.h"
@@ -39,7 +40,6 @@ int main() {
     double xn = stc64_normalf(&rng, &dist3);
 }
 */
-#include "ccommon.h"
 #include <string.h>
 #include <math.h>
 
@@ -62,12 +62,15 @@ typedef struct stc64_normalf { double mean, stddev, next; unsigned has_next; } s
  */
 
 /* Global STC64 PRNG */
-STC_API void            stc64_srandom(uint64_t seed);
-STC_API uint64_t        stc64_random(void);
+STC_API void     stc64_srandom(uint64_t seed);
+STC_API uint64_t stc64_random(void);
+
+STC_API uint64_t stc64_rand(stc64_t* rng);
+STC_API uint32_t stc32_rand(stc32_t* rng);
 
 /* Init with sequence number */
-STC_API stc64_t         stc64_with_seq(uint64_t seed, uint64_t seq);
-STC_API stc32_t         stc32_with_seq(uint32_t seed, uint32_t seq);
+STC_API stc64_t  stc64_with_seq(uint64_t seed, uint64_t seq);
+STC_API stc32_t  stc32_with_seq(uint32_t seed, uint32_t seq);
 
 /* Int uniform distributed RNG, range [low, high]. */
 STC_API stc64_uniform_t stc64_uniform_init(int64_t low, int64_t high);
@@ -80,30 +83,15 @@ STC_API stc64_uniformf_t stc64_uniformf_init(double low, double high);
 STC_API stc64_normalf_t stc64_normalf_init(double mean, double stddev);
 STC_API double          stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
 
+/* Unbiased bounded uniform distribution. */
+STC_API int64_t stc64_uniform(stc64_t* rng, stc64_uniform_t* d);
+
 STC_INLINE stc64_t stc64_init(uint64_t seed) {
     return stc64_with_seq(seed, seed + 0x3504f333d3aa0b37);
 }
 
 STC_INLINE stc32_t stc32_init(uint32_t seed) {
     return stc32_with_seq(seed, seed + 0xd3aa0b37);
-}
-
-STC_INLINE uint64_t stc64_rand(stc64_t* rng) {
-    uint64_t *s = rng->state; enum {LR=24, RS=11, LS=3};
-    const uint64_t result = (s[0] ^ (s[3] += s[4])) + s[1];
-    s[0] = s[1] ^ (s[1] >> RS);
-    s[1] = s[2] + (s[2] << LS);
-    s[2] = ((s[2] << LR) | (s[2] >> (64 - LR))) + result;
-    return result;
-}
-
-STC_INLINE uint32_t stc32_rand(stc32_t* rng) {
-    uint32_t *s = rng->state; enum {LR=21, RS=9, LS=3};
-    const uint32_t result = (s[0] ^ (s[3] += s[4])) + s[1];
-    s[0] = s[1] ^ (s[1] >> RS);
-    s[1] = s[2] + (s[2] << LS);
-    s[2] = ((s[2] << LR) | (s[2] >> (32 - LR))) + result;
-    return result;
 }
 
 /* Float64 random number in range [0.0, 1.0). */
@@ -117,22 +105,6 @@ STC_INLINE double stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist) {
     return stc64_randf(rng)*dist->range + dist->lower;
 }
 
-/* Unbiased bounded uniform distribution. */
-STC_INLINE int64_t stc64_uniform(stc64_t* rng, stc64_uniform_t* d) {
-#ifdef c_umul128
-    uint64_t lo, hi;
-    do { c_umul128(stc64_rand(rng), d->range, &lo, &hi); } while (lo < d->threshold);
-    return d->lower + hi;
-#else
-    uint64_t x, r;
-    do {
-        x = stc64_rand(rng);
-        r = x % d->range;
-    } while (x - r > -d->range);
-    return d->lower + r;
-#endif
-}
-
 STC_INLINE int32_t stc32_uniform(stc32_t* rng, stc32_uniform_t* d) {
     uint64_t val;
     do { val = stc32_rand(rng) * (uint64_t)d->range; } while ((uint32_t)val < d->threshold);
@@ -140,8 +112,7 @@ STC_INLINE int32_t stc32_uniform(stc32_t* rng, stc32_uniform_t* d) {
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-
-#if !defined(STC_SHARED) || defined(STC_IMPLEMENTATION)
+#if defined(_i_implement)
 
 /* Global random() */
 static stc64_t stc64_global = {{
@@ -191,6 +162,39 @@ STC_DEF stc32_uniform_t stc32_uniform_init(int32_t low, int32_t high) {
 #pragma warning(default: 4146)
 #endif
 
+STC_DEF uint64_t stc64_rand(stc64_t* rng) {
+    uint64_t *s = rng->state; enum {LR=24, RS=11, LS=3};
+    const uint64_t result = (s[0] ^ (s[3] += s[4])) + s[1];
+    s[0] = s[1] ^ (s[1] >> RS);
+    s[1] = s[2] + (s[2] << LS);
+    s[2] = ((s[2] << LR) | (s[2] >> (64 - LR))) + result;
+    return result;
+}
+
+STC_DEF uint32_t stc32_rand(stc32_t* rng) {
+    uint32_t *s = rng->state; enum {LR=21, RS=9, LS=3};
+    const uint32_t result = (s[0] ^ (s[3] += s[4])) + s[1];
+    s[0] = s[1] ^ (s[1] >> RS);
+    s[1] = s[2] + (s[2] << LS);
+    s[2] = ((s[2] << LR) | (s[2] >> (32 - LR))) + result;
+    return result;
+}
+
+STC_DEF int64_t stc64_uniform(stc64_t* rng, stc64_uniform_t* d) {
+#ifdef c_umul128
+    uint64_t lo, hi;
+    do { c_umul128(stc64_rand(rng), d->range, &lo, &hi); } while (lo < d->threshold);
+    return d->lower + hi;
+#else
+    uint64_t x, r;
+    do {
+        x = stc64_rand(rng);
+        r = x % d->range;
+    } while (x - r > -d->range);
+    return d->lower + r;
+#endif
+}
+
 /* Init uniform distributed float64 RNG, range [low, high). */
 STC_DEF stc64_uniformf_t stc64_uniformf_init(double low, double high) {
     return c_make(stc64_uniformf_t){low, high - low};
@@ -214,6 +218,6 @@ STC_DEF double stc64_normalf(stc64_t* rng, stc64_normalf_t* dist) {
     dist->next = u2 * m;
     return (u1 * m) * dist->stddev + dist->mean;
 }
-
 #endif
 #endif
+#undef i_opt

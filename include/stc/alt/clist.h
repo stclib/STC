@@ -148,7 +148,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
-#if !defined(STC_SHARED) || defined(STC_IMPLEMENTATION)
+#if defined(_i_implement)
 #define _c_implement_clist(_cx_self, i_val, i_cmp, i_valdrop, i_valfrom, i_valto, i_valraw) \
 \
     STC_DEF _cx_self \

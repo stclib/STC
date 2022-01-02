@@ -51,9 +51,9 @@
         }
     }
 */
+#include "ccommon.h"
 
 #ifndef CLIST_H_INCLUDED
-#include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>
@@ -75,7 +75,6 @@ _c_clist_complete_types(clist_VOID, dummy);
     else      entry->next = entry; \
     entry->value = val
     // +: set self->last based on node 
-
 #endif // CLIST_H_INCLUDED
 
 #ifndef _i_prefix
@@ -184,8 +183,7 @@ _cx_memb(_get_mut)(_cx_self* self, i_valraw val) {
 #endif
 
 // -------------------------- IMPLEMENTATION -------------------------
-
-#if !defined(STC_SHARED) || c_option(c_static) || defined(STC_IMPLEMENTATION)
+#if defined(_i_implement)
 
 #if !c_option(c_no_clone)
 STC_DEF _cx_self
@@ -330,10 +328,7 @@ _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
 }
 #endif // !c_no_cmp
 
-#endif // TEMPLATE IMPLEMENTATION
-
-#if !defined(CLIST_H_INCLUDED) && \
-    (!defined(STC_SHARED) || c_option(c_static) || defined(STC_IMPLEMENTATION))
+#ifndef CLIST_H_INCLUDED
 
 STC_DEF size_t
 _clist_count(const clist_VOID* self) {
@@ -395,6 +390,7 @@ _clist_mergesort(clist_VOID_node *list, int (*cmp)(const clist_VOID_node*, const
     }
 }
 #endif // !c_no_cmp
-#endif // NON-TEMPLATE IMPLEMENTATION
-#include "template.h"
+#endif // !CLIST_H_INCLUDED
+#endif // _i_implement
 #define CLIST_H_INCLUDED
+#include "template.h"

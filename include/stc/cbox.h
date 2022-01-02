@@ -57,10 +57,10 @@ int main() {
     }
 }
 */
+#include "ccommon.h"
 
 #ifndef CBOX_H_INCLUDED
 #define CBOX_H_INCLUDED
-#include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>

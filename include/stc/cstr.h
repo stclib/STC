@@ -20,10 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#include "ccommon.h"
+
 #ifndef CSTR_H_INCLUDED
 #define CSTR_H_INCLUDED
 
-#include "ccommon.h"
 #include <stdlib.h> /* malloc */
 #include <string.h>
 #include <stdarg.h>
@@ -33,14 +34,16 @@
 typedef                 struct cstr { char* str; } cstr;
 typedef                 struct cstr_iter { char *ref; } cstr_iter;
 typedef                 char cstr_value;
-
-#define cstr_npos       (SIZE_MAX >> 1)
-STC_LIBRARY_ONLY(       extern const cstr cstr_null; )
+#define                 cstr_npos (SIZE_MAX >> 1)
 
 typedef struct          { size_t size, cap; char str[sizeof(size_t)]; } _cstr_rep_t;
 #define _cstr_rep(self) c_container_of((self)->str, _cstr_rep_t, str)
-STC_STATIC_ONLY(        static _cstr_rep_t _cstr_nullrep = {0, 0, {0}};
-                        static const cstr cstr_null = {_cstr_nullrep.str}; )
+#if defined(_i_static)
+                        static _cstr_rep_t _cstr_nullrep = {0, 0, {0}};
+                        static const cstr cstr_null = {_cstr_nullrep.str};
+#else
+                        extern const cstr cstr_null;
+#endif
 /* optimal memory: based on malloc_usable_size() sequence: 24, 40, 56, ... */
 #define _cstr_opt_mem(cap)  ((((offsetof(_cstr_rep_t, str) + (cap) + 8)>>4)<<4) + 8)
 /* optimal string capacity: 7, 23, 39, ... */
@@ -172,11 +175,12 @@ cstr_ends_with(cstr s, const char* sub) {
 #define  cstr_hash(xp, dummy) c_strhash((xp)->str)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
+#if defined(_i_implement)
 
-#if !defined(STC_SHARED) || c_option(c_static) || defined(STC_IMPLEMENTATION)
-
-STC_LIBRARY_ONLY( static _cstr_rep_t _cstr_nullrep = {0, 0, {0}};
-                  const cstr cstr_null = {_cstr_nullrep.str}; )
+#if !defined(_i_static)
+    static _cstr_rep_t _cstr_nullrep = {0, 0, {0}};
+    const cstr cstr_null = {_cstr_nullrep.str}; )
+#endif
 
 STC_DEF size_t
 cstr_reserve(cstr* self, const size_t cap) {
@@ -386,3 +390,4 @@ c_strnstrn(const char *s, const char *needle, size_t slen, const size_t nlen) {
 
 #endif
 #endif
+#undef i_opt

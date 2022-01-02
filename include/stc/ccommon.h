@@ -101,6 +101,7 @@ typedef const char              c_strlit[];
 #define c_no_clone              4
 #define c_no_cmp                8
 #define c_static                16
+#define c_shared                32
 
 /* Generic algorithms */
 
@@ -212,23 +213,21 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
     #define c_umul128(a, b, lo, hi) \
         asm("mulq %3" : "=a"(*(lo)), "=d"(*(hi)) : "a"(a), "rm"(b))
 #endif
-#endif
+#endif // CCOMMON_H_INCLUDED
 
 #undef STC_API
 #undef STC_DEF
-#undef STC_LIBRARY_ONLY
-#undef STC_STATIC_ONLY
-#ifdef STC_HEADER // [deprecated]
-#  define STC_SHARED
-#endif
-#if !c_option(c_static) && (defined(STC_SHARED) || defined(STC_IMPLEMENTATION))
+#undef _i_static
+#undef _i_implement
+
+#if (c_option(c_shared) || defined(STC_HEADER) || defined(STC_IMPLEMENTATION)) && !c_option(c_static)
 #  define STC_API extern
 #  define STC_DEF
-#  define STC_LIBRARY_ONLY(...) __VA_ARGS__
-#  define STC_STATIC_ONLY(...)
 #else
+#  define _i_static
 #  define STC_API static inline
 #  define STC_DEF static inline
-#  define STC_LIBRARY_ONLY(...)
-#  define STC_STATIC_ONLY(...) __VA_ARGS__
+#endif
+#if defined(STC_IMPLEMENTATION) ^ defined(_i_static)
+#  define _i_implement
 #endif

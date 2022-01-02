@@ -47,13 +47,12 @@ int main(void) {
     }
 }
 */
+#include "ccommon.h"
 
 #ifndef CMAP_H_INCLUDED
-#include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>
-
 #define _cmap_inits {NULL, NULL, 0, 0, 0.85f}
 typedef struct      { MAP_SIZE_T idx; uint_fast8_t hx; } chash_bucket_t;
 #endif // CMAP_H_INCLUDED
@@ -141,6 +140,7 @@ _cx_memb(_value_clone)(_cx_value _val) {
     _i_MAP_ONLY( _val.second = i_valfrom(i_valto(&_val.second)); )
     return _val;
 }
+
 #if !defined _i_no_raw
 STC_INLINE _cx_result
 _cx_memb(_emplace)(_cx_self* self, i_keyraw rkey _i_MAP_ONLY(, i_valraw rmapped)) {
@@ -230,8 +230,7 @@ _cx_memb(_erase_at)(_cx_self* self, _cx_iter it) {
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-
-#if !defined(STC_SHARED) || c_option(c_static) || defined(STC_IMPLEMENTATION)
+#if defined(_i_implement)
 
 #ifndef CMAP_H_INCLUDED
 //STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n)
@@ -274,6 +273,7 @@ STC_DEF void _cx_memb(_clear)(_cx_self* self) {
         else { i_keydrop(&_key); i_valdrop(&_res.ref->second); }
         _res.ref->second = _mapped; return _res;
     }
+
     #if !c_option(c_no_clone) && !defined _i_no_raw
     STC_DEF _cx_result
     _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped) {
@@ -379,10 +379,10 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
     --self->size;
 }
 
-#endif // TEMPLATED IMPLEMENTATION
+#endif // _i_implement
 #undef _i_isset
 #undef _i_keyref
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY
-#include "template.h"
 #define CMAP_H_INCLUDED
+#include "template.h"

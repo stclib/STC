@@ -20,8 +20,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef CDEQ_H_INCLUDED
 #include "ccommon.h"
+
+#ifndef CDEQ_H_INCLUDED
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>
@@ -211,7 +212,7 @@ _cx_memb(_sort)(_cx_self* self) {
 #endif // _i_queue
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if !defined(STC_SHARED) || c_option(c_static) || defined(STC_IMPLEMENTATION)
+#if defined(_i_implement)
 
 #ifndef CDEQ_H_INCLUDED
 static struct cdeq_rep _cdeq_sentinel = {0, 0};
