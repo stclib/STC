@@ -30,7 +30,7 @@ void check_drop(float* v) {printf("destroy %g\n", *v);}
 
 int main() {
     int xdim = 4, ydim = 6;
-    int x = 1, y = 3, tableKey = 42;
+    int x = 1, tableKey = 42;
     const char* strKey = "first";
 
     c_auto (MapMap, mmap)

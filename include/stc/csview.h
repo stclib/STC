@@ -126,16 +126,26 @@ STC_INLINE int          csview_cmp(const csview* x, const csview* y) {
 
 STC_DEF csview
 csview_substr(csview sv, intptr_t pos, size_t n) {
-    if (pos < 0) { pos += sv.size; if (pos < 0) pos = 0; }
-    if (pos > sv.size) pos = sv.size; if (pos + n > sv.size) n = sv.size - pos;
-    sv.str += pos, sv.size = n; return sv;
+    if (pos < 0) { 
+        pos += sv.size;
+        if (pos < 0) pos = 0;
+    }
+    if (pos > sv.size) pos = sv.size; 
+    if (pos + n > sv.size) n = sv.size - pos;
+    sv.str += pos, sv.size = n;
+    return sv;
 }
 
 STC_DEF csview
 csview_slice(csview sv, intptr_t p1, intptr_t p2) {
-    if (p1 < 0) { p1 += sv.size; if (p1 < 0) p1 = 0; }
-    if (p2 < 0) p2 += sv.size; if (p2 > sv.size) p2 = sv.size;
-    sv.str += p1, sv.size = p2 > p1 ? p2 - p1 : 0; return sv;
+    if (p1 < 0) { 
+        p1 += sv.size;
+        if (p1 < 0) p1 = 0;
+    }
+    if (p2 < 0) p2 += sv.size;
+    if (p2 > sv.size) p2 = sv.size;
+    sv.str += p1, sv.size = p2 > p1 ? p2 - p1 : 0;
+    return sv;
 }
 
 STC_DEF csview

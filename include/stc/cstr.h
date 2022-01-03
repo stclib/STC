@@ -38,12 +38,9 @@ typedef                 char cstr_value;
 
 typedef struct          { size_t size, cap; char str[]; } _cstr_rep_t;
 #define _cstr_rep(self) c_container_of((self)->str, _cstr_rep_t, str)
-#if defined(_i_static)
-                        static struct { size_t size, cap; char str[1]; } _cstr_nullrep = {0, 0, {0}};
-                        static const cstr cstr_null = {_cstr_nullrep.str};
-#else
-                        extern const cstr cstr_null;
-#endif
+static struct { size_t size, cap; char str[1]; } _cstr_nullrep = {0, 0, {0}};
+static const cstr cstr_null = {_cstr_nullrep.str};
+
 /* optimal memory: based on malloc_usable_size() sequence: 24, 40, 56, ... */
 #define _cstr_opt_mem(cap)  ((((offsetof(_cstr_rep_t, str) + (cap) + 8)>>4)<<4) + 8)
 /* optimal string capacity: 7, 23, 39, ... */
@@ -176,11 +173,6 @@ cstr_ends_with(cstr s, const char* sub) {
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(_i_implement)
-
-#if !defined(_i_static)
-    static struct { size_t size, cap; char str[1]; } _cstr_nullrep = {0, 0, {0}};
-    const cstr cstr_null = {_cstr_nullrep.str};
-#endif
 
 STC_DEF size_t
 cstr_reserve(cstr* self, const size_t cap) {
@@ -387,7 +379,6 @@ c_strnstrn(const char *s, const char *needle, size_t slen, const size_t nlen) {
     } while (slen--);
     return NULL;
 }
-
 #endif
 #endif
 #undef i_opt

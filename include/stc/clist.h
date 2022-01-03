@@ -100,10 +100,10 @@ STC_API _cx_iter        _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx
 STC_API size_t          _cx_memb(_remove)(_cx_self* self, i_valraw val);
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw val);
 STC_API int             _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y);
+STC_API void            _cx_memb(_sort)(_cx_self* self);
 #endif
 STC_API _cx_iter        _cx_memb(_splice)(_cx_self* self, _cx_iter it, _cx_self* other);
 STC_API _cx_self        _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2);
-STC_API void            _cx_memb(_sort)(_cx_self* self);
 STC_API _cx_node*       _cx_memb(_erase_after_)(_cx_self* self, _cx_node* node);
 
 #if !c_option(c_no_clone)

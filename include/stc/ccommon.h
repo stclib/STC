@@ -27,6 +27,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <stdbool.h>
+#include <string.h>
 #include <assert.h>
 
 #if defined(_MSC_VER)
@@ -127,15 +128,21 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
     while (--len) h = (h << 10) - h + *x++;
     return _c_ROTL(h, 26) ^ h;
 }
-#define c_hash32(data, len_is_4) \
-    ((*(const uint32_t*)data * 0xc6a4a7935bd1e99d) >> 15)
-#define c_hash64(data, len_is_8) \
-    (*(const uint64_t *)data * 0xc6a4a7935bd1e99d)
+STC_INLINE uint64_t c_hash32(const void* key, size_t len) {
+    uint32_t x; memcpy(&x, key, 4);
+    return x*0xc6a4a7935bd1e99d >> 15;
+}
+STC_INLINE uint64_t c_hash64(const void* key, size_t len) {
+    uint64_t x; memcpy(&x, key, 8);
+    return x*0xc6a4a7935bd1e99d;
+}
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
+
 #define c_foreach_3(it, C, cnt) \
     for (C##_iter it = C##_begin(&cnt), it##_end_ = C##_end(&cnt) \
          ; it.ref != it##_end_.ref; C##_next(&it))
+
 #define c_foreach_4(it, C, start, finish) \
     for (C##_iter it = start, it##_end_ = finish \
          ; it.ref != it##_end_.ref; C##_next(&it))

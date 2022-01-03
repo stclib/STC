@@ -57,6 +57,7 @@ int main(void) {
 
 struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
 #define _csmap_rep(self) c_container_of((self)->nodes, struct csmap_rep, nodes)
+static struct csmap_rep _csmap_sentinel = {0, 0, 0, 0, 0};
 #endif // CSMAP_H_INCLUDED
 
 #ifndef _i_prefix
@@ -93,10 +94,15 @@ typedef _i_SET_ONLY( i_keyraw )
         _i_MAP_ONLY( struct { i_keyraw first; i_valraw second; } )
         _cx_raw;
 
-STC_API _cx_self        _cx_memb(_init)(void);
 #if !c_option(c_no_clone)
 STC_API _cx_self        _cx_memb(_clone)(_cx_self tree);
+STC_API void            _cx_memb(_copy)(_cx_self *self, _cx_self other);
+STC_API _cx_value       _cx_memb(_value_clone)(_cx_value _val);
 #endif
+#if !defined _i_no_raw
+STC_API _cx_result      _cx_memb(_emplace)(_cx_self* self, i_keyraw rkey _i_MAP_ONLY(, i_valraw rmapped));
+#endif
+STC_API _cx_result      _cx_memb(_insert)(_cx_self* self, i_key key _i_MAP_ONLY(, i_val mapped));
 STC_API void            _cx_memb(_drop)(_cx_self* self);
 STC_API bool            _cx_memb(_reserve)(_cx_self* self, size_t cap);
 STC_API _cx_value*      _cx_memb(_find_it)(const _cx_self* self, i_keyraw rkey, _cx_iter* out);
@@ -112,7 +118,7 @@ STC_API void            _cx_memb(_next)(_cx_iter* it);
 STC_INLINE bool         _cx_memb(_empty)(_cx_self tree) { return _csmap_rep(&tree)->size == 0; }
 STC_INLINE size_t       _cx_memb(_size)(_cx_self tree) { return _csmap_rep(&tree)->size; }
 STC_INLINE size_t       _cx_memb(_capacity)(_cx_self tree) { return _csmap_rep(&tree)->cap; }
-STC_INLINE void         _cx_memb(_clear)(_cx_self* self) { _cx_memb(_drop)(self); *self = _cx_memb(_init)(); }
+
 STC_INLINE void         _cx_memb(_swap)(_cx_self* a, _cx_self* b) { c_swap(_cx_self, *a, *b); }
 STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, i_keyraw rkey)
                             { _cx_iter it; return _cx_memb(_find_it)(self, rkey, &it) != NULL; }
@@ -122,11 +128,21 @@ STC_INLINE _cx_value*   _cx_memb(_get_mut)(_cx_self* self, i_keyraw rkey)
                             { _cx_iter it; return _cx_memb(_find_it)(self, rkey, &it); }
 
 STC_INLINE _cx_self
+_cx_memb(_init)(void) {
+    _cx_self tree = {(_cx_node *)_csmap_sentinel.nodes};
+    return tree;
+}
+
+STC_INLINE _cx_self
 _cx_memb(_with_capacity)(const size_t cap) {
     _cx_self tree = _cx_memb(_init)();
     _cx_memb(_reserve)(&tree, cap);
     return tree;
 }
+
+STC_INLINE void
+_cx_memb(_clear)(_cx_self* self) 
+    { _cx_memb(_drop)(self); *self = _cx_memb(_init)(); }
 
 STC_INLINE _cx_raw
 _cx_memb(_value_toraw)(_cx_value* val) {
@@ -168,40 +184,6 @@ _cx_memb(_find)(const _cx_self* self, i_keyraw rkey) {
     return it;
 }
 
-#if !c_option(c_no_clone)
-STC_INLINE void
-_cx_memb(_copy)(_cx_self *self, _cx_self other) {
-    if (self->nodes == other.nodes) return;
-    _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
-}
-
-STC_INLINE _cx_value
-_cx_memb(_value_clone)(_cx_value _val) {
-    *_i_keyref(&_val) = i_keyfrom(i_keyto(_i_keyref(&_val)));
-    _i_MAP_ONLY( _val.second = i_valfrom(i_valto(&_val.second)); )
-    return _val;
-}
-#if !defined _i_no_raw
-STC_INLINE _cx_result
-_cx_memb(_emplace)(_cx_self* self, i_keyraw rkey _i_MAP_ONLY(, i_valraw rmapped)) {
-    _cx_result res = _cx_memb(_insert_entry_)(self, rkey);
-    if (res.inserted) {
-        *_i_keyref(res.ref) = i_keyfrom(rkey);
-        _i_MAP_ONLY(res.ref->second = i_valfrom(rmapped);)
-    }
-    return res;
-}
-#endif
-#endif // !c_no_clone
-
-STC_INLINE _cx_result
-_cx_memb(_insert)(_cx_self* self, i_key key _i_MAP_ONLY(, i_val mapped)) {
-    _cx_result res = _cx_memb(_insert_entry_)(self, i_keyto(&key));
-    if (res.inserted) { *_i_keyref(res.ref) = key; _i_MAP_ONLY( res.ref->second = mapped; )}
-    else              { i_keydrop(&key); _i_MAP_ONLY( i_valdrop(&mapped); )}
-    return res;
-}
-
 STC_INLINE _cx_iter
 _cx_memb(_begin)(const _cx_self* self) {
     _cx_iter it; it._d = self->nodes, it._top = 0;
@@ -225,16 +207,6 @@ _cx_memb(_advance)(_cx_iter it, size_t n) {
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(_i_implement)
 
-#ifndef CSMAP_H_INCLUDED
-static struct csmap_rep _csmap_sentinel = {0, 0, 0, 0, 0};
-#endif // CSMAP_H_INCLUDED
-
-STC_DEF _cx_self
-_cx_memb(_init)(void) {
-    _cx_self tree = {(_cx_node *) _csmap_sentinel.nodes};
-    return tree;
-}
-
 STC_DEF _cx_value*
 _cx_memb(_front)(const _cx_self* self) {
     _cx_node *d = self->nodes;
@@ -255,8 +227,9 @@ STC_DEF bool
 _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
     struct csmap_rep* rep = _csmap_rep(self), *oldrep;
     if (cap >= rep->size) {
-        oldrep = rep->cap ? rep : NULL;
-        rep = (struct csmap_rep*) c_realloc(oldrep,
+        // second test is bogus, but supresses gcc warning:
+        oldrep = rep->cap && rep != &_csmap_sentinel ? rep : NULL;
+        rep = (struct csmap_rep*) c_realloc(oldrep, 
                                             sizeof(struct csmap_rep) + (cap + 1)*sizeof(_cx_node));
         if (!rep) return false;
         if (oldrep == NULL)
@@ -282,6 +255,14 @@ _cx_memb(_node_new_)(_cx_self* self, int level) {
     return (_cx_size) tn;
 }
 
+STC_DEF _cx_result
+_cx_memb(_insert)(_cx_self* self, i_key key _i_MAP_ONLY(, i_val mapped)) {
+    _cx_result res = _cx_memb(_insert_entry_)(self, i_keyto(&key));
+    if (res.inserted) { *_i_keyref(res.ref) = key; _i_MAP_ONLY( res.ref->second = mapped; )}
+    else              { i_keydrop(&key); _i_MAP_ONLY( i_valdrop(&mapped); )}
+    return res;
+}
+
 #if !defined _i_isset
     STC_DEF _cx_result
     _cx_memb(_insert_or_assign)(_cx_self* self, i_key key, i_val mapped) {
@@ -290,6 +271,7 @@ _cx_memb(_node_new_)(_cx_self* self, int level) {
         else { i_keydrop(&key); i_valdrop(&res.ref->second); }
         res.ref->second = mapped; return res;
     }
+
     #if !c_option(c_no_clone) && !defined _i_no_raw
     STC_DEF _cx_result
     _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped) {
@@ -474,6 +456,19 @@ _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
 }
 
 #if !c_option(c_no_clone)
+STC_DEF void
+_cx_memb(_copy)(_cx_self *self, _cx_self other) {
+    if (self->nodes == other.nodes) return;
+    _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
+}
+
+STC_DEF _cx_value
+_cx_memb(_value_clone)(_cx_value _val) {
+    *_i_keyref(&_val) = i_keyfrom(i_keyto(_i_keyref(&_val)));
+    _i_MAP_ONLY( _val.second = i_valfrom(i_valto(&_val.second)); )
+    return _val;
+}
+
 STC_DEF _cx_size
 _cx_memb(_clone_r_)(_cx_self* self, _cx_node* src, _cx_size sn) {
     if (sn == 0) return 0;
@@ -492,6 +487,18 @@ _cx_memb(_clone)(_cx_self tree) {
     _csmap_rep(&clone)->size = _csmap_rep(&tree)->size;
     return clone;
 }
+
+#if !defined _i_no_raw
+STC_DEF _cx_result
+_cx_memb(_emplace)(_cx_self* self, i_keyraw rkey _i_MAP_ONLY(, i_valraw rmapped)) {
+    _cx_result res = _cx_memb(_insert_entry_)(self, rkey);
+    if (res.inserted) {
+        *_i_keyref(res.ref) = i_keyfrom(rkey);
+        _i_MAP_ONLY(res.ref->second = i_valfrom(rmapped);)
+    }
+    return res;
+}
+#endif
 #endif // !c_no_clone
 
 STC_DEF void
@@ -506,9 +513,10 @@ _cx_memb(_drop_r_)(_cx_node* d, _cx_size tn) {
 STC_DEF void
 _cx_memb(_drop)(_cx_self* self) {
     struct csmap_rep* rep = _csmap_rep(self);
-    if (rep->cap) {
+    // second test is bogus, but supresses gcc warning:
+    if (rep->cap && rep != &_csmap_sentinel) {
         _cx_memb(_drop_r_)(self->nodes, (_cx_size) rep->root);
-        c_free(rep);
+        c_free(rep);  // correct, but may give warning
     }
 }
 

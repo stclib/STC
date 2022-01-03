@@ -66,6 +66,7 @@ int main() {
 
 struct cvec_rep { size_t size, cap; void* data[]; };
 #define cvec_rep_(self) c_container_of((self)->data, struct cvec_rep, data)
+static struct cvec_rep _cvec_sentinel = {0, 0};
 #endif // CVEC_H_INCLUDED
 
 #ifndef _i_prefix
@@ -78,7 +79,6 @@ struct cvec_rep { size_t size, cap; void* data[]; };
 #endif
 typedef i_valraw _cx_raw;
 
-STC_API _cx_self        _cx_memb(_init)(void);
 STC_API void            _cx_memb(_drop)(_cx_self* self);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
 STC_API bool            _cx_memb(_reserve)(_cx_self* self, size_t cap);
@@ -100,11 +100,11 @@ STC_API _cx_iter        _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
 STC_INLINE i_val        _cx_memb(_value_clone)(_cx_value val)
                             { return i_valfrom(i_valto(&val)); }
 STC_INLINE i_val        _cx_memb(_value_fromraw)(i_valraw raw) { return i_valfrom(raw); }
-STC_INLINE void
-_cx_memb(_copy)(_cx_self *self, _cx_self other) {
-    if (self->data == other.data) return;
-    _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
-}
+STC_INLINE void         _cx_memb(_copy)(_cx_self *self, _cx_self other) {
+                            if (self->data == other.data) return;
+                            _cx_memb(_drop)(self);
+                            *self = _cx_memb(_clone)(other);
+                        }
 #if !defined _i_no_raw
 STC_API _cx_iter        _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos,
                                                    const _cx_raw* p1, const _cx_raw* p2);
@@ -148,6 +148,12 @@ STC_INLINE void         _cx_memb(_next)(_cx_iter* it) { ++it->ref; }
 STC_INLINE _cx_iter     _cx_memb(_advance)(_cx_iter it, intptr_t offs)
                             { it.ref += offs; return it; }
 STC_INLINE size_t       _cx_memb(_index)(_cx_self cx, _cx_iter it) { return it.ref - cx.data; }
+
+STC_INLINE _cx_self
+_cx_memb(_init)(void) {
+    _cx_self cx = {(_cx_value *) _cvec_sentinel.data};
+    return cx;
+}
 
 STC_INLINE _cx_self
 _cx_memb(_with_size)(const size_t size, i_val null) {
@@ -234,16 +240,6 @@ _cx_memb(_sort)(_cx_self* self) {
 #endif // !c_no_cmp
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(_i_implement)
-
-#ifndef CVEC_H_INCLUDED
-static struct cvec_rep _cvec_sentinel = {0, 0};
-#endif
-
-STC_DEF _cx_self
-_cx_memb(_init)(void) {
-    _cx_self cx = {(_cx_value *) _cvec_sentinel.data};
-    return cx;
-}
 
 STC_DEF void
 _cx_memb(_clear)(_cx_self* self) {

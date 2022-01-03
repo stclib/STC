@@ -6,7 +6,6 @@ int main ()
     const char *base = "this is a test string.";
     const char *s2 = "n example";
     const char *s3 = "sample phrase";
-    const char *s4 = "useful.";
 
     // replace signatures used in the same order as described above:
 

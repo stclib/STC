@@ -19,7 +19,8 @@ int main()
         it = csset_int_lower_bound(&set, val);
 
         c_foreach (k, csset_int, it, csset_int_end(&set)) 
-            printf(" %d", *k.ref); puts("");
+            printf(" %d", *k.ref);
+        puts("");
 
         printf("Erase values >= %d:\n", val);
         while (it.ref != csset_int_end(&set).ref)

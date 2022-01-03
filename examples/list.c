@@ -40,7 +40,7 @@ int main() {
         c_foreach (i, clist_fx, list) printf(" %g", *i.ref);
         puts("");
 
-        int removed = clist_fx_remove(&list, 30);
+        clist_fx_remove(&list, 30);
         clist_fx_insert(&list, clist_fx_begin(&list), 5); // same as push_front()
         clist_fx_push_back(&list, 500);
         clist_fx_push_front(&list, 1964);
