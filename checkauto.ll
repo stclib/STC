@@ -1,5 +1,5 @@
 /* Check for illegal return/break/continue usage inside a STC-lib c_auto* block (RAII).
- * Copyright Tyge Løvset, (c) 2021.
+ * Copyright Tyge Løvset, (c) 2022.
  */
 %{
 #include <stdbool.h>
