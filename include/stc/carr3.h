@@ -108,8 +108,8 @@ STC_DEF _cx_self _cx_memb(_with_storage)(size_t xdim, size_t ydim, size_t zdim, 
     _cx_self _arr = {c_alloc_n(_cx_value**, xdim*(ydim + 1)), xdim, ydim, zdim};
     _cx_value** p = (_cx_value**) &_arr.data[xdim];
     for (size_t x = 0, y; x < xdim; ++x, p += ydim)
-        for (_arr.data[x] = p, y = 0; y < ydim; ++y, block += zdim)
-            _arr.data[x][y] = block;
+        for (y = 0, _arr.data[x] = p; y < ydim; ++y, block += zdim)
+            p[y] = block;
     return _arr;
 }
 

@@ -36,10 +36,10 @@ typedef                 struct cstr_iter { char *ref; } cstr_iter;
 typedef                 char cstr_value;
 #define                 cstr_npos (SIZE_MAX >> 1)
 
-typedef struct          { size_t size, cap; char str[sizeof(size_t)]; } _cstr_rep_t;
+typedef struct          { size_t size, cap; char str[]; } _cstr_rep_t;
 #define _cstr_rep(self) c_container_of((self)->str, _cstr_rep_t, str)
 #if defined(_i_static)
-                        static _cstr_rep_t _cstr_nullrep = {0, 0, {0}};
+                        static struct { size_t size, cap; char str[1]; } _cstr_nullrep = {0, 0, {0}};
                         static const cstr cstr_null = {_cstr_nullrep.str};
 #else
                         extern const cstr cstr_null;
@@ -178,8 +178,8 @@ cstr_ends_with(cstr s, const char* sub) {
 #if defined(_i_implement)
 
 #if !defined(_i_static)
-    static _cstr_rep_t _cstr_nullrep = {0, 0, {0}};
-    const cstr cstr_null = {_cstr_nullrep.str}; )
+    static struct { size_t size, cap; char str[1]; } _cstr_nullrep = {0, 0, {0}};
+    const cstr cstr_null = {_cstr_nullrep.str};
 #endif
 
 STC_DEF size_t
@@ -207,9 +207,9 @@ STC_DEF cstr
 cstr_from_n(const char* str, const size_t n) {
     if (n == 0) return cstr_null;
     _cstr_rep_t* rep = (_cstr_rep_t*) c_malloc(_cstr_opt_mem(n));
-    cstr s = {(char *) memcpy(rep->str, str, n)};
-    s.str[rep->size = n] = '\0';
+    rep->str[rep->size = n] = '\0';
     rep->cap = _cstr_opt_cap(n);
+    cstr s = {(char *) memcpy(rep->str, str, n)};
     return s;
 }
 

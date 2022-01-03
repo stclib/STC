@@ -57,18 +57,18 @@
     typedef struct { SELF##_value ***data; size_t xdim, ydim, zdim; } SELF
 
 #define _c_cdeq_types(SELF, VAL) \
-    typedef VAL SELF##_value, SELF##_value_t; \
-    typedef struct {SELF##_value *ref; } SELF##_iter, SELF##_iter_t; \
+    typedef VAL SELF##_value; \
+    typedef struct {SELF##_value *ref; } SELF##_iter; \
     typedef struct {SELF##_value *_base, *data;} SELF
 
 #define _c_clist_types(SELF, VAL) \
-    typedef VAL SELF##_value, SELF##_value_t; \
+    typedef VAL SELF##_value; \
     typedef struct SELF##_node SELF##_node; \
 \
     typedef struct { \
         SELF##_value *ref; \
         SELF##_node *const *_last, *prev; \
-    } SELF##_iter, SELF##_iter_t; \
+    } SELF##_iter; \
 \
     typedef struct { \
         SELF##_node *last; \
@@ -81,17 +81,17 @@
 \
     typedef SET_ONLY( SELF##_key ) \
             MAP_ONLY( struct SELF##_value ) \
-    SELF##_value, SELF##_value_t; \
+    SELF##_value; \
 \
     typedef struct { \
         SELF##_value *ref; \
         bool inserted; \
-    } SELF##_result, SELF##_result_t; \
+    } SELF##_result; \
 \
     typedef struct { \
         SELF##_value *ref; \
         uint8_t* _hx; \
-    } SELF##_iter, SELF##_iter_t; \
+    } SELF##_iter; \
 \
     typedef struct { \
         SELF##_value* table; \
@@ -108,19 +108,19 @@
 \
     typedef SET_ONLY( SELF##_key ) \
             MAP_ONLY( struct SELF##_value ) \
-    SELF##_value, SELF##_value_t; \
+    SELF##_value; \
 \
     typedef struct { \
         SELF##_value *ref; \
         bool inserted; \
-    } SELF##_result, SELF##_result_t; \
+    } SELF##_result; \
 \
     typedef struct { \
         SELF##_value *ref; \
         SELF##_node *_d; \
         int _top; \
         SELF##_size_t _tn, _st[36]; \
-    } SELF##_iter, SELF##_iter_t; \
+    } SELF##_iter; \
 \
     typedef struct { \
         SELF##_node *nodes; \
@@ -156,8 +156,8 @@
     } SELF
 
 #define _c_cvec_types(SELF, VAL) \
-    typedef VAL SELF##_value, SELF##_value_t; \
-    typedef struct { SELF##_value *ref; } SELF##_iter, SELF##_iter_t; \
+    typedef VAL SELF##_value; \
+    typedef struct { SELF##_value *ref; } SELF##_iter; \
     typedef struct { SELF##_value *data; } SELF
 
 #endif // STC_FORWARD_H_INCLUDED

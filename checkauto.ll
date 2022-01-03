@@ -56,6 +56,7 @@ if              { if (state == BRACESDONE) {
                     state = BRACES;
                   }
                 }
+;[ \t]*else     ;
 ;               { if (state == BRACESDONE) {
                     block_type = block[block_lev];
                     state = NORMAL;
