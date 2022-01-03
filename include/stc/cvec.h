@@ -258,7 +258,7 @@ _cx_memb(_clear)(_cx_self* self) {
 
 STC_DEF void
 _cx_memb(_drop)(_cx_self* self) {
-    if (cvec_rep_(self) == &_cvec_sentinel) return;
+    if (!cvec_rep_(self)->cap) return;
     _cx_memb(_clear)(self);
     c_free(cvec_rep_(self));
 }

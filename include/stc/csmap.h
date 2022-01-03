@@ -255,7 +255,7 @@ STC_DEF bool
 _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
     struct csmap_rep* rep = _csmap_rep(self), *oldrep;
     if (cap >= rep->size) {
-        oldrep = rep == &_csmap_sentinel ? NULL : rep;
+        oldrep = rep->cap ? rep : NULL;
         rep = (struct csmap_rep*) c_realloc(oldrep,
                                             sizeof(struct csmap_rep) + (cap + 1)*sizeof(_cx_node));
         if (!rep) return false;
@@ -506,7 +506,7 @@ _cx_memb(_drop_r_)(_cx_node* d, _cx_size tn) {
 STC_DEF void
 _cx_memb(_drop)(_cx_self* self) {
     struct csmap_rep* rep = _csmap_rep(self);
-    if (rep != &_csmap_sentinel) {
+    if (rep->cap) {
         _cx_memb(_drop_r_)(self->nodes, (_cx_size) rep->root);
         c_free(rep);
     }
