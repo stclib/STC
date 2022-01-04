@@ -109,18 +109,26 @@ c_breakauto     { if (block_type != AUTO) {
 int main(int argc, char **argv)
 {
     if (argc == 1 || strcmp(argv[1], "--help") == 0) {
-        printf("usage: %s [--help] {C-file | -}\n", argv[0]);
+        printf("usage: %s [--help] {C-file... | -}\n", argv[0]);
         return 0;
     }
-    if (strcmp(argv[1], "-") == 0) {
-        fname = "<stdin>";
-        yyin = stdin;
-    } else {
-        fname = argv[1];
-        yyin = fopen(fname, "r");
-    }
 
-    yylex();
+    for (int i=1; i<argc; ++i) {
+        if (strcmp(argv[i], "-") == 0) {
+            fname = "<stdin>";
+            yyin = stdin;
+        } else {
+            fname = argv[i];
+            yyin = fopen(fname, "r");
+        }
+        yylineno = 1;
+        braces_lev = 0, block_lev = 0;
+        block_type = 0, state = NORMAL;
+
+        yylex();
+
+        fclose(yyin);
+    }
     if (errors + warnings)
         printf("%d error%s, %d warning%s.\n", errors, errors == 1? "":"s",
                                               warnings, warnings == 1? "":"s");
