@@ -118,7 +118,7 @@ STC_INLINE int          csview_cmp(const csview* x, const csview* y) {
                             const int c = memcmp(x->str, y->str, m);
                             return c ? c : x->size - y->size;
                         }
-#define                 csview_hash(xp, dummy) c_strhash((xp)->str)
+#define                 csview_hash(xp, dummy) c_default_hash((xp)->str, (xp)->size)
 #define                 csview_eq(xp, yp) (!csview_cmp(xp, yp))
 
 /* -------------------------- IMPLEMENTATION ------------------------- */

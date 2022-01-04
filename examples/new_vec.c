@@ -35,25 +35,22 @@ int point_cmp(const Point* a, const Point* b) {
 
 int main()
 {
-    cvec_i32 vec = cvec_i32_init();
-    cvec_i32_push_back(&vec, 123);
-    cvec_i32_drop(&vec);
+    c_auto (cvec_i32, vec)
+    c_auto (cvec_float, fvec)
+    c_auto (cvec_pnt, pvec)
+    c_auto (cvec_str, svec)
+    {
+        cvec_i32_push_back(&vec, 123);
+        cvec_float_push_back(&fvec, 123.3);
 
-    cvec_float fvec = cvec_float_init();
-    cvec_float_push_back(&fvec, 123.3);
-    cvec_float_drop(&fvec);
+        cvec_pnt_push_back(&pvec, (Point){42, 14});
+        cvec_pnt_push_back(&pvec, (Point){32, 94});
+        cvec_pnt_push_back(&pvec, (Point){62, 81});
+        cvec_pnt_sort(&pvec);
+        c_foreach (i, cvec_pnt, pvec)
+            printf(" (%d %d)", i.ref->x, i.ref->y);
+        puts("");
 
-    cvec_pnt pvec = cvec_pnt_init();
-    cvec_pnt_push_back(&pvec, (Point){42, 14});
-    cvec_pnt_push_back(&pvec, (Point){32, 94});
-    cvec_pnt_push_back(&pvec, (Point){62, 81});
-    cvec_pnt_sort(&pvec);
-    c_foreach (i, cvec_pnt, pvec)
-        printf(" (%d %d)", i.ref->x, i.ref->y);
-    puts("");
-    cvec_pnt_drop(&pvec);
-
-    cvec_str svec = cvec_str_init();
-    cvec_str_emplace_back(&svec, "Hello, friend");
-    cvec_str_drop(&svec);
+        cvec_str_emplace_back(&svec, "Hello, friend");
+    }
 }

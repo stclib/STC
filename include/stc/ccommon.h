@@ -121,8 +121,8 @@ STC_INLINE uint64_t c_strhash(const char *s) {
     if (h) while ((c = *s++)) h = (h << 10) - h + c;
     return _c_ROTL(h, 26) ^ h;
 }
-// len >= 1
 STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
+    if (!len) return 1;
     const uint8_t *x = (const uint8_t*) key; 
     uint64_t h = *x++;
     while (--len) h = (h << 10) - h + *x++;
