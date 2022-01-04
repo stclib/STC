@@ -254,9 +254,11 @@ _cx_memb(_clear)(_cx_self* self) {
 
 STC_DEF void
 _cx_memb(_drop)(_cx_self* self) {
-    if (!cvec_rep_(self)->cap) return;
+    struct cvec_rep* rep = cvec_rep_(self);
+    // second test to supress gcc -O2 warn: -Wfree-nonheap-object
+    if (rep->cap == 0 || rep == &_cvec_sentinel) return;
     _cx_memb(_clear)(self);
-    c_free(cvec_rep_(self));
+    c_free(rep);
 }
 
 STC_DEF bool

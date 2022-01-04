@@ -249,9 +249,11 @@ _cx_memb(_shrink_to_fit)(_cx_self *self) {
 
 STC_DEF void
 _cx_memb(_drop)(_cx_self* self) {
+    struct cdeq_rep* rep = cdeq_rep_(self);
+    // second test to supress gcc -O2 warn: -Wfree-nonheap-object
+    if (rep->cap == 0 || rep == &_cdeq_sentinel) return;
     _cx_memb(_clear)(self);
-    if (cdeq_rep_(self)->cap)
-        c_free(cdeq_rep_(self));
+    c_free(rep);
 }
 
 STC_DEF size_t

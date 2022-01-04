@@ -148,9 +148,9 @@ STC_INLINE uint64_t c_hash64(const void* key, size_t len) {
          ; it.ref != it##_end_.ref; C##_next(&it))
 
 #define c_forpair(key, val, C, cnt) /* structured binding */ \
-    for (struct {C##_iter _it, _end; C##_key key; C##_mapped val;} \
-         _ = {C##_begin(&cnt), C##_end(&cnt)} \
-         ; _._it.ref != _._end.ref && (_.key = _._it.ref->first, _.val = _._it.ref->second, true) \
+    for (struct {C##_iter _it; C##_value* _endref; C##_key key; C##_mapped val;} \
+         _ = {C##_begin(&cnt), C##_end(&cnt).ref} \
+         ; _._it.ref != _._endref && (_.key = _._it.ref->first, _.val = _._it.ref->second, true) \
          ; C##_next(&_._it))
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)

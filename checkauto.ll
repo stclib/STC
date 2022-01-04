@@ -27,11 +27,12 @@ STR \"([^"\\]|\\.)*\"
 <cmt>.          ;
 ^[ \t]*#.*\\\n  { ++yylineno; BEGIN(prep); }
 <prep>.*\\\n    ++yylineno;
-<prep>.*\n      { ++yylineno; BEGIN(INITIAL); }
+<prep>.*        BEGIN(INITIAL);
 ^[ \t]*#.*      ;
 {STR}           ;
 '\\?.'          ;
 c_foreach       |
+c_forpair       |
 c_forrange      |
 for             |
 while           |
@@ -129,6 +130,7 @@ int main(int argc, char **argv)
 
         fclose(yyin);
     }
+
     if (errors + warnings)
         printf("%d error%s, %d warning%s.\n", errors, errors == 1? "":"s",
                                               warnings, warnings == 1? "":"s");
