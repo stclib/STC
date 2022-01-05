@@ -5,10 +5,9 @@ STC - Smart Template Containers for C
 
 News
 ----
-### Version 3 released
+## Version 3 released
 This version introduces lots of enhancements, bugfixes and additions. There are also
-a number of breaking changes, see below for changes and a migration guide. 
-
+a number of breaking changes, see below for changes and [a migration guide from version 2 to 3](#-migration-guide-from-version-2-to-3). 
 With version 3, the API is freezed as far as possible. Any changes will be handled with long 
 lasting deprecations, so you may develop production code using it.
 
@@ -29,26 +28,6 @@ lasting deprecations, so you may develop production code using it.
 - Added: `i_opt` template parameter: compile-time options: `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`; may be combined with `|`
 - Added: [**cbox**](docs/cbox_api.md) type: smart pointer, similar to [Rust Box](https://doc.rust-lang.org/rust-by-example/std/box.html) and [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr).
 - Added: [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding"
-
-### Migration guide from version 2 to 3.
-Replace (regular expression) globally in code base (VS Code):
-- `_del\b` ⟶ `_drop`
-- `_compare\b` ⟶ `_cmp`
-- `_rawvalue\b` ⟶ `_raw`
-- `_equ\b` ⟶ `_eq`
-
-Replace (whole word + match case):
-- `i_keydel` ⟶ `i_keydrop`
-- `i_valdel` ⟶ `i_valdrop`
-- `i_cnt` ⟶ `i_type`
-- `cstr_lit` ⟶ `cstr_new`
-- `i_key_csptr` / `i_key_ref` ⟶ `i_key_sptr`
-- `i_val_csptr` / `i_val_ref` ⟶ `i_val_sptr`
-- `c_apply` ⟶ `c_apply_OLD` // replaced by new `c_apply`
-- `c_apply_pair` ⟶ `c_apply_pair_OLD` // replaced by new `c_apply`
-
-Non-regex, global match case replace:
-- `csptr` ⟶ `carc`
 
 Introduction
 ------------
@@ -464,3 +443,24 @@ Memory efficiency
 - **csmap**: Type size: 1 pointer. *csmap* manages its own array of tree-nodes for allocation efficiency. Each node uses only two 32-bit ints for child nodes, and one byte for `level`.
 - **carr2**, **carr3**: Type size: 1 pointer plus dimension variables. Arrays are allocated as one contiguous block of heap memory, and one allocation for pointers of indices to the array.
 - **carc**: Type size: 2 pointers, one for the data and one for the reference counter.
+
+
+# Migration guide from version 2 to 3
+Replace (regular expression) globally in code base (VS Code):
+- `_del\b` ⟶ `_drop`
+- `_compare\b` ⟶ `_cmp`
+- `_rawvalue\b` ⟶ `_raw`
+- `_equ\b` ⟶ `_eq`
+
+Replace (whole word + match case):
+- `i_keydel` ⟶ `i_keydrop`
+- `i_valdel` ⟶ `i_valdrop`
+- `i_cnt` ⟶ `i_type`
+- `cstr_lit` ⟶ `cstr_new`
+- `i_key_csptr` / `i_key_ref` ⟶ `i_key_sptr`
+- `i_val_csptr` / `i_val_ref` ⟶ `i_val_sptr`
+- `c_apply` ⟶ `c_apply_OLD` // replaced by new `c_apply`
+- `c_apply_pair` ⟶ `c_apply_pair_OLD` // replaced by new `c_apply`
+
+Non-regex, global match case replace:
+- `csptr` ⟶ `carc`
