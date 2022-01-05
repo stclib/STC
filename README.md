@@ -7,7 +7,7 @@ News
 ----
 ## Version 3 released
 This version introduces lots of enhancements, bugfixes and additions. There are also
-a number of breaking changes, see below for changes and [a migration guide from version 2 to 3](#-migration-guide-from-version-2-to-3). 
+a number of breaking changes, see below for changes and [a migration guide from version 2 to 3](#migration-guide-from-version-2-to-3).
 With version 3, the API is freezed as far as possible. Any changes will be handled with long 
 lasting deprecations, so you may develop production code using it.
 
