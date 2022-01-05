@@ -57,7 +57,7 @@
 
 #ifdef i_key_str
   #define i_key_bind cstr
-  #define i_keyraw c_rawstr
+  #define i_keyraw crawstr
   #ifndef i_tag
     #define i_tag str
   #endif
@@ -116,7 +116,7 @@
 
 #ifdef i_val_str
   #define i_val_bind cstr
-  #define i_valraw c_rawstr
+  #define i_valraw crawstr
   #if !defined i_tag && !defined i_key
     #define i_tag str
   #endif

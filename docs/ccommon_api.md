@@ -6,11 +6,6 @@ The following handy macros are safe to use, i.e. have no side-effects.
 General ***defer*** mechanics for resource acquisition. These macros allows to specify the release of the
 resource where the resource acquisition takes place. Makes it easier to verify that resources are released.
 
-**NB**: These macros are one-time executed **for-loops**. Use ***only*** `c_breakauto` in order to break out
-of these `c_auto*`-blocks! ***Do not*** use `return` or `goto` (or `break`) inside them, as they will
-prevent the `end`-statement to be executed when leaving scope. This is not particular to the `c_auto*()`
-macros, as one must always make sure to unwind temporary allocated resources before a `return` in C.
-
 | Usage                                  | Description                                          |
 |:---------------------------------------|:-----------------------------------------------------|
 | `c_auto (Type, var...)`                | `c_autovar (Type var=Type_init(), Type_drop(&var))`  |
@@ -76,6 +71,36 @@ int main()
     c_autovar (cvec_str x = readFile(__FILE__), cvec_str_drop(&x))
         c_foreach (i, cvec_str, x)
             printf("%s\n", i.ref->str);
+}
+```
+### The checkauto utility program (for RAII)
+The **checkauto** program will check the source code for any misuses of the `c_auto*` macros that
+will lead to resource leakages. The `c_auto*`- macros are implemented as one-time executed **for-loops**,
+so any `return` or `break` appearing within such a block will lead to resource leaks, as it will disable
+the cleanup/drop method to be called. However, a `break` may (originally) been intended to break an immediate
+loop/switch outside the `c_auto` scope, so it would not work as intended in any case. The **checkauto**
+tool will report any such misusages. In general, one should therefore first break out of any inner loops
+with `break`, then use `c_breakauto` to break out of the `c_auto` scope(s). After this `return` may be used.
+
+Note that this is not a particular issue with the `c_auto*`-macros, as one must always make sure to unwind
+temporary allocated resources before a `return` in C. However, by using `c_auto*`-macros,
+- it is much easier to automatically detect misplaced return/break between resource acquisition and destruction.
+- it prevent forgetting to call the destructor at the end.
+```c
+for (int i = 0; i<n; ++i) {
+    c_auto (List, list) {
+        List_push_back(&list, i);
+        if (cond1())
+            break; // checkauto Error
+        for (j = 0; j<m; ++j) {
+            if (cond2())
+                break;  // OK (breaks for-loop only)
+        }
+        if (cond3())
+            return; // checkauto Error
+    }
+    if (cond4())
+        return; // OK (outside c_auto)
 }
 ```
 
@@ -170,13 +195,15 @@ c_drop(cstr, &a, &b);
 
 ### General predefined template parameter functions
 ```
-int     c_default_cmp(const Type*, const Type*);
-Type    c_default_from(Type val);            // simple copy
-Type    c_default_toraw(const Type* val);    // dereference val
-void    c_default_drop(Type* val);           // does nothing
+int         c_default_cmp(const Type*, const Type*);
+Type        c_default_from(Type val);            // simple copy
+Type        c_default_toraw(const Type* val);    // dereference val
+void        c_default_drop(Type* val);           // does nothing
 
-int     c_rawstr_cmp(const char* const* a, const char* const* b);
-bool    c_rawstr_eq(const char* const* a, const char* const* b);
+typedef     const char* crawstr;
+int         crawstr_cmp(const crawstr* x, const crawstr* y);
+bool        crawstr_eq(const crawstr* x, const crawstr* y);
+uint64_t    crawstr_hash(const crawstr* x, size_t dummy);
 ```
 
 ### c_malloc, c_calloc, c_realloc, c_free

@@ -89,12 +89,6 @@ int          cstr_cmp(const cstr *s1, const cstr *s2);
 bool         cstr_eq(const cstr *s1, const cstr *s2);
 bool         cstr_hash(const cstr *s, ...);
 
-typedef      const char* c_rawstr;
-int          c_rawstr_cmp(const c_rawstr* x, const c_rawstr* y);
-bool         c_rawstr_eq(const c_rawstr* x, const c_rawstr* y);
-uint64_t     c_rawstr_hash(const c_rawstr* x, size_t dummy);
-
-uint64_t     c_strhash(const char* str);
 char*        c_strnstrn(const char* str, const char* needle, size_t slen, size_t nlen);
 int          c_strncasecmp(const char* str1, const char* str2, size_t n);
 ```

@@ -1,5 +1,5 @@
 #!/bin/bash
-cc='clang -O2 -Wall -std=c99 -pedantic'
+cc='gcc -O2 -Wall -std=c99 -pedantic'
 #cc='clang'
 #cc='clang -c -DSTC_HEADER'
 #cc='cl -nologo'

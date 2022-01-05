@@ -84,18 +84,16 @@ cmap_X_raw          cmap_X_value_toraw(cmap_X_value* pval);
 ```
 Helpers:
 ```c
-uint64_t            c_strhash(const char *str);                                   // utility function
+uint64_t            c_strhash(const char *str);                              // utility function
 
 // hash template parameter functions:
-uint64_t            c_default_hash(const void *data, size_t len);                 // key is any integral type
-uint64_t            c_hash32(const void* data, size_t is4);                       // key is one 32-bit int
-uint64_t            c_hash64(const void* data, size_t is8);                       // key is one 64-bit int
-uint64_t            c_rawstr_hash(const char* const* strp, size_t unused);
+uint64_t            c_default_hash(const void *data, size_t len);            // key is any integral type
+uint64_t            c_hash32(const void* data, size_t is4);                  // key is one 32-bit int
+uint64_t            c_hash64(const void* data, size_t is8);                  // key is one 64-bit int
 
 // equalto template parameter functions:
 bool                c_default_eq(const i_keyraw* a, const i_keyraw* b);      // *a == *b
 bool                c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);       // !memcmp(a, b, sizeof *a)
-bool                c_rawstr_eq(const char* const* a, const char* const* b); // !strcmp(*a, *b)
 ```
 
 ## Types

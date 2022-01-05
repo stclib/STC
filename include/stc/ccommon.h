@@ -106,13 +106,10 @@ typedef const char              c_strlit[];
 
 /* Generic algorithms */
 
-typedef char* c_mutstr;
-typedef const char* c_rawstr;
-#define c_rawstr_cmp(xp, yp) strcmp(*(xp), *(yp))
-#define c_rawstr_eq(xp, yp) (!strcmp(*(xp), *(yp)))
-#define c_rawstr_hash(p, dummy) c_strhash(*(p))
-#define c_rawstr_clone(s) strcpy((char*)c_malloc(strlen(s) + 1), s)
-#define c_rawstr_drop(p) c_free((char *) &**(p))
+typedef const char* crawstr;
+#define crawstr_cmp(xp, yp) strcmp(*(xp), *(yp))
+#define crawstr_eq(xp, yp) (!strcmp(*(xp), *(yp)))
+#define crawstr_hash(p, dummy) c_strhash(*(p))
 
 #define _c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 

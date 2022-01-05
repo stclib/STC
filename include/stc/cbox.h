@@ -24,36 +24,35 @@
 /* cbox: heap allocated boxed type
 #include <stc/cstr.h>
 
-typedef struct { cstr name, last; } Person;
+typedef struct { cstr name, email; } Person;
 
-Person Person_new(const char* name, const char* last) {
-    return (Person){.name = cstr_from(name), .last = cstr_from(last)};
+Person Person_from(const char* name, const char* email) {
+    return (Person){.name = cstr_from(name), .email = cstr_from(email)};
 }
 Person Person_clone(Person p) {
     p.name = cstr_clone(p.name);
-    p.last = cstr_clone(p.last);
+    p.email = cstr_clone(p.email);
     return p;
 }
 void Person_drop(Person* p) {
-    printf("drop: %s %s\n", p->name.str, p->last.str);
-    c_drop(cstr, &p->name, &p->last);
+    printf("drop: %s %s\n", p->name.str, p->email.str);
+    c_drop(cstr, &p->name, &p->email);
 }
 
-#define i_val Person
-#define i_valdrop Person_drop
-#define i_valfrom Person_clone
+#define i_val_bind Person // bind Person clone+drop fn's
 #define i_opt c_no_cmp // compare by .get addresses only
-#define i_tag prs
+#define i_type PBox
 #include <stc/cbox.h>
 
 int main() {
-    c_autovar (cbox_prs p = cbox_prs_new(Person_new("John", "Smiths")), cbox_prs_drop(&p))
-    c_autovar (cbox_prs q = cbox_prs_clone(p), cbox_prs_drop(&q))
+    c_auto (PBox, p, q)
     {
-        cstr_assign(&q.get->name, "Joe");
+        p = PBox_from(Person_from("John Smiths", "josmiths@gmail.com"));
+        q = PBox_clone(p);
+        cstr_assign(&q.get->name, "Joe Smiths");
 
-        printf("%s %s.\n", p.get->name.str, p.get->last.str);
-        printf("%s %s.\n", q.get->name.str, q.get->last.str);
+        printf("%s %s.\n", p.get->name.str, p.get->email.str);
+        printf("%s %s.\n", q.get->name.str, q.get->email.str);
     }
 }
 */
