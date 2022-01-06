@@ -126,10 +126,7 @@ vec: 2021 2012 2022 2015
 drop: 2015
 drop: 2022
 vec: 2021 2012
-set: 2015 2021
-Done
-drop: 2021
-drop: 2015
-drop: 2021
+set: 2021drop: 2021
 drop: 2012
+drop: 2021
 ```
