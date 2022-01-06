@@ -21,8 +21,10 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_val           // value: REQUIRED
 #define i_cmp           // three-way compare two i_val* : REQUIRED IF i_val is a non-integral type
 #define i_drop          // destroy value func - defaults to empty destruct
+#define i_valraw        // convertion type
 #define i_from          // create from raw/clone func - REQUIRED if i_drop is defined,
                         // unless 'i_opt c_no_clone' is defined.
+#define i_valto         // to-raw func.
 #define i_tag           // type name tag, defaults to i_val
 #include <stc/cbox.h>    
 ```
@@ -34,6 +36,7 @@ compare the pointer addresses when used. Additionally, `c_no_clone` or `i_is_fwd
 ```c
 cbox_X      cbox_X_init();                                    // return an empty cbox
 cbox_X      cbox_X_new(i_valraw raw);                         // like cbox_X_from(), but create owned value from raw.
+                                                              // nb! available only if i_valraw is defined.
 cbox_X      cbox_X_from(i_val val);                           // allocate new heap object with val. Take ownership of val.
 cbox_X      cbox_X_from_ptr(i_val* p);                        // create a cbox from a pointer. Takes ownership of p.
 
@@ -63,21 +66,10 @@ bool        cbox_X_value_eq(const i_val* x, const i_val* y);  // cbox_X_value_cm
 
 ```c
 #include <stdio.h>
-#include <string.h>
 
-void int_drop(int* x) {
+void int_drop(int* x) {       // for demo.
     printf("drop: %d\n", *x);
 }
-
-// When 'i_drop' is defined, you are also forced to define a clone function with
-// 'i_from', as it is normally required when i_drop destroys resources.
-//
-// If cloning is not needed, define 'i_opt c_no_clone' instead of 'i_from'
-// both for the cbox type and the container of cbox elements. It will also 
-// disable emplace container functions.
-//
-// This applies to all container types, except those with carc elements, as they
-// define cloning internally.
 
 #define i_val int
 #define i_drop int_drop       // optional func, just to display elements destroyed
@@ -98,10 +90,10 @@ int main()
     c_auto (csset_int, set)  // declare and init set, call drop at scope exit
     {
         c_apply(v, cvec_int_push_back(&vec, v), cbox_int, {
-            cbox_int_new(2021),
-            cbox_int_new(2012),
-            cbox_int_new(2022),
-            cbox_int_new(2015),
+            cbox_int_from(2021),
+            cbox_int_from(2012),
+            cbox_int_from(2022),
+            cbox_int_from(2015),
         });
         printf("vec:");
         c_foreach (i, cvec_int, vec) printf(" %d", *i.ref->get);
@@ -109,8 +101,11 @@ int main()
 
         // add odd numbers from vec to set
         c_foreach (i, cvec_int, vec)
-            if (*i.ref->get & 1)
-                csset_int_emplace(&set, *i.ref); // deep copy (clones) *i.ref object
+            if (*i.ref->get & 1) {
+                csset_int_emplace(&set, *i.ref->get); // clone
+                // same as:
+                //csset_int_insert(&set, cbox_int_clone(*i.ref));
+            }
 
         // erase the two last elements in vec
         cvec_int_pop_back(&vec);
