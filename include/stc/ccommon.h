@@ -159,7 +159,7 @@ STC_INLINE uint64_t c_hash64(const void* key, size_t len) {
     for (type i=start, _c_inc=step, _c_end=(stop) - (0 < _c_inc) \
          ; (i <= _c_end) == (0 < _c_inc); i += _c_inc)
 
-#define c_autovar(declvar, ...) for (declvar, *_c_ii = NULL; !_c_ii; ++_c_ii, __VA_ARGS__)
+#define c_autovar(declvar, ...) for (declvar, **_c_ii = NULL; !_c_ii; ++_c_ii, __VA_ARGS__)
 #define c_autoscope(init, ...) for (int _c_ii = (init, 0); !_c_ii; ++_c_ii, __VA_ARGS__)
 #define c_autodefer(...) for (int _c_ii = 0; !_c_ii; ++_c_ii, __VA_ARGS__)
 #define c_breakauto continue

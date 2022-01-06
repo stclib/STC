@@ -17,6 +17,15 @@ resource where the resource acquisition takes place. Makes it easier to verify t
 For multiple variables, use either multiple **c_autovar** in sequence, or declare variable outside
 scope and use **c_autoscope**. Also, **c_auto** support up to 4 variables.
 ```c
+c_autovar (uint8_t* buf = c_alloc_n(uint8_t, N), c_free(buf))
+c_autovar (FILE* f = fopen(fname, "rb"), fclose(f))
+{
+    int n = 0;
+    if (f && buf)
+        n = fread(buf, 1, N, f);
+    if (n > 0) doSomething(buf, n);
+}
+
 c_autovar (cstr s = cstr_new("Hello"), cstr_drop(&s))
 {
     cstr_append(&s, " world");
@@ -74,8 +83,8 @@ int main()
 }
 ```
 ### The checkauto utility program (for RAII)
-The **checkauto** program will check the source code for any misuses of the `c_auto*` macros that
-will lead to resource leakages. The `c_auto*`- macros are implemented as one-time executed **for-loops**,
+The **checkauto** program will check the source code for any misuses of the `c_auto*` macros which
+may lead to resource leakages. The `c_auto*`- macros are implemented as one-time executed **for-loops**,
 so any `return` or `break` appearing within such a block will lead to resource leaks, as it will disable
 the cleanup/drop method to be called. However, a `break` may (originally) been intended to break an immediate
 loop/switch outside the `c_auto` scope, so it would not work as intended in any case. The **checkauto**
