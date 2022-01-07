@@ -15,22 +15,24 @@ int main()
 
     c_auto (cregex, re)
     {
-        re = cregex_compile("[+-]?([0-9]*\\.)?[0-9]+([Ee][-+]?[0-9]+)?");
-        cregex_match_t m;
-        if (cregex_match(re, s, &m)) {
+        re = cregex_new("[+-]?([0-9]*\\.)?[0-9]+([Ee][-+]?[0-9]+)?");
+        cregex_match m;
+        if (cregex_find(re, s, &m)) {
             printf("Found digits at position %u-%u\n", m.match_begin, m.match_end);
         } else {
             printf("Could not find any digits\n");
         }
 
-        c_auto (cregex_res, matches) {
-            matches = cregex_match_all(re, s);
+        c_auto (cregex_result, matches) {
+            matches = cregex_find_all(re, s);
             csview sv = csview_from(s);
-            c_foreach (i, cregex_res, matches) {
+            c_foreach (i, cregex_result, matches) {
                 csview r = csview_slice(sv, i.ref->match_begin, i.ref->match_end);
                 printf(c_svfmt " / ", c_svarg(r));
             }
         }
+
+        
         puts("");
     }
 }

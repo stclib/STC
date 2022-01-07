@@ -38,10 +38,10 @@ typedef struct {
 typedef struct {
 	size_t match_begin;
 	size_t match_end;
-} cregex_match_t;
+} cregex_match;
 
-#define i_type cregex_res
-#define i_val cregex_match_t
+#define i_type cregex_result
+#define i_val cregex_match
 #include "cstack.h"
 
 typedef enum {
@@ -64,24 +64,27 @@ STC_INLINE cregex cregex_init(void)
     { cregex re = {NULL}; return re; }
 
 /* compile regular expression */
-STC_API cregex cregex_compile(const char *re);
+STC_API cregex cregex_new(const char *re);
 
 /* get error type if a function failed */
 STC_API cregex_error_t cregex_error(void);
 
+/* check if input s matches re */
+STC_DEF bool cregex_is_match(cregex re, const char *s);
+
 /* find the first matching substring in s */
-STC_API bool cregex_match(cregex re, const char *s, cregex_match_t *m);
+STC_API bool cregex_find(cregex re, const char *s, cregex_match *m);
 
 /* get all non-overlapping matches in string s. returns NULL
  * if no matches are found. returned value must be freed */
-STC_API cregex_res cregex_match_all(cregex re, const char *s);
+STC_API cregex_result cregex_find_all(cregex re, const char *s);
 
 /* get amount of capture groups inside of
  * a regular expression */
 STC_API size_t cregex_captures_len(cregex re);
 
 /* get captured slice from capture group number index */
-STC_API const cregex_match_t *cregex_capture(cregex re, size_t index);
+STC_API cregex_match cregex_capture(cregex re, size_t index);
 
 /* free regular expression */
 STC_API void cregex_drop(cregex *re);
@@ -114,9 +117,11 @@ static const uint8_t _rx_utf8d[] = {
 static inline uint32_t _rx_utf8_decode(uint32_t *state, uint32_t *codep,
 				   const uint32_t byte)
 {
-	uint32_t type = _rx_utf8d[byte];
-	*codep = (*state != _rx_UTF8_ACCEPT) ? (byte & 0x3fu) | (*codep << 6)
-					 : (0xff >> type) & (byte);
+	const uint32_t type = _rx_utf8d[byte];
+	const uint32_t x = (uint32_t) -(*state != _rx_UTF8_ACCEPT);
+
+	*codep = (x & ((byte & 0x3fu) | (*codep << 6)))  
+		   | (~x & ((0xff >> type) & (byte)));
 
 	*state = _rx_utf8d[256 + (*state << 4) + type];
 	return *state;
@@ -125,9 +130,10 @@ static inline uint32_t _rx_utf8_decode(uint32_t *state, uint32_t *codep,
 static bool _rx_utf8_count_codepoints(size_t *count, const uint8_t *s)
 {
 	uint32_t state = _rx_UTF8_ACCEPT, codepoint;
+	
 	for (*count = 0; *s; ++s)
 		*count += !_rx_utf8_decode(&state, &codepoint, *s);
-	return state == _rx_UTF8_ACCEPT; // NB! valid == true
+	return state == _rx_UTF8_ACCEPT;
 }
 
 STC_DEF bool cregex_valid_utf8(const char *s)
@@ -156,10 +162,11 @@ static inline uint32_t _rx_utf8_char_width(uint8_t c)
 
 static inline const char *_rx_utf8_next(const char *s)
 {
-	if (*s == 0)
-		return NULL;
-
-	return s + _rx_utf8_char_width((uint8_t)s[0]);
+	const char* t = s + _rx_utf8_char_width((uint8_t)s[0]);
+	
+	uintptr_t p = (uintptr_t)t;
+	p &= (uintptr_t) -(*s != 0);
+	return (const char *)p;
 }
 
 /* function pointer type used to evaluate if a regex node
@@ -198,7 +205,7 @@ typedef struct {
 typedef struct {
 	_rx_GenericNode generic;
 	union cregex_node *subexp;
-	cregex_match_t cap;
+	cregex_match cap;
 } _rx_CapNode;
 
 typedef struct {
@@ -897,7 +904,7 @@ static cregex_node *_rx_compile(const char *re, const char *end, cregex_node *no
 	return cur;
 }
 
-STC_DEF cregex cregex_compile(const char *re)
+STC_DEF cregex cregex_new(const char *re)
 {
     cregex ret = {NULL};
 
@@ -934,15 +941,14 @@ STC_DEF cregex_error_t cregex_error(void)
 	return _rx_CompileException.err;
 }
 
-STC_DEF bool cregex_match(cregex re, const char *s, cregex_match_t *m)
+STC_DEF bool cregex_is_match(cregex re, const char *s)
 {
-	clear_compile_exception();
+	const char *next = NULL;
+	return _rx_is_match(re.nodes, s, s, &next);
+}
 
-	if (re.nodes == NULL || s == NULL || m == NULL) {
-		_rx_CompileException.err = cregex_INVALID_PARAMS;
-		return false;
-	}
-
+STC_DEF bool cregex_find(cregex re, const char *s, cregex_match *m)
+{
 	m->match_begin = SIZE_MAX;
 	m->match_end = SIZE_MAX;
 
@@ -963,22 +969,22 @@ STC_DEF void cregex_drop(cregex *re)
 	free(re->nodes);
 }
 
-STC_DEF cregex_res cregex_match_all(cregex re, const char *s)
+STC_DEF cregex_result cregex_find_all(cregex re, const char *s)
 {
-	cregex_res matches = cregex_res_init();
+	cregex_result matches = cregex_result_init();
 	size_t offset = 0;
 
 	const char *s_end = s + strlen(s);
 	while (s < s_end) {
-		cregex_match_t tmp;
-		if (cregex_match(re, s, &tmp)) {
+		cregex_match tmp;
+		if (cregex_find(re, s, &tmp)) {
 			size_t end = tmp.match_end;
 			s += end;
 			tmp.match_begin += offset;
 			tmp.match_end += offset;
 
 			offset += end;
-			cregex_res_push(&matches, tmp);
+			cregex_result_push(&matches, tmp);
 		} else {
 			break;
 		}
@@ -1040,15 +1046,15 @@ static cregex_node *_rx_find_capture_node(cregex_node *node, size_t index)
 	}
 }
 
-STC_DEF const cregex_match_t *cregex_capture(cregex re, size_t index)
+STC_DEF cregex_match cregex_capture(cregex re, size_t index)
 {
 	_rx_CapNode *cap = (_rx_CapNode *)_rx_find_capture_node(re.nodes, index);
 
 	if (cap == NULL) {
-		return NULL;
+		return c_make(cregex_match){0, 0};
 	}
 
-	return &cap->cap;
+	return cap->cap;
 }
 
 #endif
