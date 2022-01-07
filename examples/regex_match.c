@@ -11,14 +11,14 @@ int main()
     const char *s = "Hello numeric world, there are 24 hours in a day, 3600 seconds in an hour."
                     " Around 365.25 days a year, and 52 weeks in a year."
                     " Boltzmann const: 1.38064852E-23, is very small."
-                    " Bohrradius is 5.29177210903e-11, and Avogadros number is 6.02214076e23. That's it.";
+                    " Bohrradius is 5.29177210903e-11, and Avogadros number is 6.02214076e23.";
 
     c_auto (cregex, re)
     {
         re = cregex_new("[+-]?([0-9]*\\.)?[0-9]+([Ee][-+]?[0-9]+)?");
-        cregex_match m;
-        if (cregex_find(re, s, &m)) {
-            printf("Found digits at position %u-%u\n", m.match_begin, m.match_end);
+        cregex_match match;
+        if (cregex_find(re, s, &match)) {
+            printf("Found digits at position %u-%u\n", match.start, match.end);
         } else {
             printf("Could not find any digits\n");
         }
@@ -27,12 +27,10 @@ int main()
             matches = cregex_find_all(re, s);
             csview sv = csview_from(s);
             c_foreach (i, cregex_result, matches) {
-                csview r = csview_slice(sv, i.ref->match_begin, i.ref->match_end);
+                csview r = csview_slice(sv, i.ref->start, i.ref->end);
                 printf(c_svfmt " / ", c_svarg(r));
             }
         }
-
-        
         puts("");
     }
 }
