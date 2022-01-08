@@ -296,7 +296,8 @@ _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr) {
             _cx_rawkey _raw = i_keyto(_i_keyref(self->table + b.idx));
             if (i_eq(&_raw, rkeyptr)) break;
         }
-        if (++b.idx == _cap) b.idx = 0;
+        _cx_size _mask = (_cx_size) -(++b.idx != _cap);
+        b.idx &= _mask; // b.idx = (b.idx + 1) % _cap
     }
     return b;
 }
@@ -367,7 +368,8 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
     uint8_t* _hashx = self->_hashx;
     _cx_memb(_value_drop)(&_slot[i]);
     for (;;) { /* delete without leaving tombstone */
-        if (++j == _cap) j = 0;
+        _cx_size _mask = (_cx_size) -(++j != _cap);
+        j &= _mask;
         if (! _hashx[j])
             break;
         _cx_rawkey _raw = i_keyto(_i_keyref(_slot + j));

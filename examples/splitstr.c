@@ -1,4 +1,4 @@
-#include <stc/csview.h>
+#include <stc/strings.h>
 
 void print_split(csview str, csview sep)
 {
@@ -6,7 +6,7 @@ void print_split(csview str, csview sep)
     while (pos != str.size) {
         csview tok = csview_token(str, sep, &pos);
         // print non-null-terminated csview
-        printf("[" c_svfmt "]\n", c_svarg(tok));
+        printf("[" c_PRIsv "]\n", c_ARGsv(tok));
     }
 }
 

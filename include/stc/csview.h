@@ -23,18 +23,17 @@
 #ifndef CSVIEW_H_INCLUDED
 #define CSVIEW_H_INCLUDED
 
-#include "cstr.h"
+#include "ccommon.h"
 
 typedef                 struct csview { const char* str; size_t size; } csview;
 typedef                 struct csview_iter { const char *ref; } csview_iter;
 typedef                 char csview_value;
 
 #define                 csview_null  c_make(csview){"", 0}
-#define                 csview_npos  cstr_npos
-#define                 c_svfmt      "%.*s"
-#define                 c_svarg(sv)  (int)(sv).size, (sv).str
+#define                 csview_npos  (SIZE_MAX >> 1)
+#define                 c_PRIsv      "%.*s"
+#define                 c_ARGsv(sv)  (int)(sv).size, (sv).str
 #define                 c_sv(literal) csview_new(literal)
-#define                 cstr_sv(s) csview_from_s(s)
 
 STC_API csview          csview_substr(csview sv, intptr_t pos, size_t n);
 STC_API csview          csview_slice(csview sv, intptr_t p1, intptr_t p2);
@@ -46,8 +45,6 @@ STC_INLINE csview       csview_from(const char* str)
                             { return c_make(csview){str, strlen(str)}; }
 STC_INLINE csview       csview_from_n(const char* str, size_t n)
                             { return c_make(csview){str, n}; }
-STC_INLINE csview       csview_from_s(cstr s)
-                            { return c_make(csview){s.str, _cstr_rep(&s)->size}; }
 STC_INLINE size_t       csview_size(csview sv) { return sv.size; }
 STC_INLINE size_t       csview_length(csview sv) { return sv.size; }
 STC_INLINE bool         csview_empty(csview sv) { return sv.size == 0; }
@@ -60,7 +57,7 @@ STC_INLINE bool         csview_equals(csview sv, csview sv2)
                             { return sv.size == sv2.size && !memcmp(sv.str, sv2.str, sv.size); }
 STC_INLINE size_t       csview_find(csview sv, csview needle)
                             { char* res = c_strnstrn(sv.str, needle.str, sv.size, needle.size);
-                              return res ? res - sv.str : cstr_npos; }
+                              return res ? res - sv.str : csview_npos; }
 STC_INLINE bool         csview_contains(csview sv, csview needle)
                             { return c_strnstrn(sv.str, needle.str, sv.size, needle.size) != NULL; }
 STC_INLINE bool         csview_starts_with(csview sv, csview sub)
@@ -74,42 +71,6 @@ STC_INLINE csview_iter  csview_begin(const csview* self)
 STC_INLINE csview_iter  csview_end(const csview* self)
                             { return c_make(csview_iter){self->str + self->size}; }
 STC_INLINE void         csview_next(csview_iter* it) { ++it->ref; }
-
-
-/* cstr interaction with csview: */
-
-STC_INLINE cstr         cstr_from_v(csview sv)
-                            { return cstr_from_n(sv.str, sv.size); }
-STC_INLINE cstr         cstr_from_replace_all_v(csview sv, csview find, csview repl)
-                            { return cstr_from_replace_all(sv.str, sv.size, find.str, find.size,
-                                                           repl.str, repl.size); }
-STC_INLINE csview       cstr_to_v(const cstr* self)
-                            { return c_make(csview){self->str, _cstr_rep(self)->size}; }
-STC_INLINE csview       cstr_substr(cstr s, intptr_t pos, size_t n)
-                            { return csview_substr(csview_from_s(s), pos, n); }
-STC_INLINE csview       cstr_slice(cstr s, intptr_t p1, intptr_t p2)
-                            { return csview_slice(csview_from_s(s), p1, p2); }
-STC_INLINE cstr*        cstr_assign_v(cstr* self, csview sv)
-                            { return cstr_assign_n(self, sv.str, sv.size); }
-STC_INLINE cstr*        cstr_append_v(cstr* self, csview sv)
-                            { return cstr_append_n(self, sv.str, sv.size); }
-STC_INLINE void         cstr_insert_v(cstr* self, size_t pos, csview sv)
-                            { cstr_replace_n(self, pos, 0, sv.str, sv.size); }
-STC_INLINE void         cstr_replace_v(cstr* self, size_t pos, size_t len, csview sv)
-                            { cstr_replace_n(self, pos, len, sv.str, sv.size); }
-STC_INLINE bool         cstr_equals_v(cstr s, csview sv)
-                            { return sv.size == cstr_size(s) && !memcmp(s.str, sv.str, sv.size); }
-STC_INLINE size_t       cstr_find_v(cstr s, csview needle)
-                            { char* res = c_strnstrn(s.str, needle.str, cstr_size(s), needle.size);
-                              return res ? res - s.str : cstr_npos; }
-STC_INLINE bool         cstr_contains_v(cstr s, csview needle)
-                            { return c_strnstrn(s.str, needle.str, cstr_size(s), needle.size) != NULL; }
-STC_INLINE bool         cstr_starts_with_v(cstr s, csview sub)
-                            { if (sub.size > cstr_size(s)) return false;
-                              return !memcmp(s.str, sub.str, sub.size); }
-STC_INLINE bool         cstr_ends_with_v(cstr s, csview sub)
-                            { if (sub.size > cstr_size(s)) return false;
-                              return !memcmp(s.str + cstr_size(s) - sub.size, sub.str, sub.size); }
 
 /* ---- Container helper functions ---- */
 

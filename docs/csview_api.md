@@ -21,6 +21,8 @@ All csview definitions and prototypes are available by including a single header
 
 ```c
 #include <stc/csview.h>
+// or, to use cstr+csview functionality:
+#include <stc/strings.h>
 ```
 ## Methods
 
@@ -94,8 +96,8 @@ uint64_t      csview_hash(const csview* x, size_t dummy);
 |:---------------|:---------------------|:----------------------------------------------|
 | `csview_null`  | same as `c_sv("")`   | `sview = csview_null;`                        |
 | `csview_npos`  | same as `cstr_npos`  |                                               |
-| `c_svarg(sv)`  | printf format csview |                                               |
-| `c_svfmt`      | printf argument      | `printf("view: " c_svfmt "\n", c_svarg(sv));` |
+| `c_PRIsv`      | printf format csview |                                               |
+| `c_ARGsv(sv)`  | printf argument      | `printf("view: " c_PRIsv "\n", c_ARGsv(sv));` |
 
 ## Example
 ```c
@@ -110,7 +112,7 @@ int main ()
     size_t pos = cstr_find(str1, "live");           // position of "live" in str1
     csview sv2 = cstr_substr(str1, pos, 4);         // get "live"
     csview sv3 = cstr_slice(str1, -8, -1);          // get "details"
-    printf(c_svfmt c_svfmt c_svfmt "\n", c_svarg(sv1), c_svarg(sv2), c_svarg(sv3));
+    printf(c_PRIsv c_PRIsv c_PRIsv "\n", c_ARGsv(sv1), c_ARGsv(sv2), c_ARGsv(sv3));
 
     cstr s1 = cstr_new("Apples are red");
     cstr s2 = cstr_from_v(cstr_substr(s1, -3, 3));  // "red"
@@ -138,12 +140,13 @@ void print_split(csview str, csview sep)
     while (pos != str.size) {
         csview tok = csview_token(str, sep, &pos);
         // print non-null-terminated csview
-        printf("[" c_svfmt "]\n", c_svarg(tok));
+        printf("[" c_PRIsv "]\n", c_ARGsv(tok));
     }
 }
 
 #define i_val_str
 #include <stc/cvec.h>
+#include <stc/strings.h>
 
 cvec_str string_split(csview str, csview sep)
 {

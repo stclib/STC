@@ -42,20 +42,16 @@
 
 /* Macro overloading feature support based on: https://rextester.com/ONP80107 */
 #define c_MACRO_OVERLOAD(name, ...) \
-    c_PASTE3(name, _, c_NUM_ARGS(__VA_ARGS__))(__VA_ARGS__)
+    c_PASTE(name, c_NUM_ARGS(__VA_ARGS__))(__VA_ARGS__)
 #define c_CONCAT(a, b) a ## b
 #define c_PASTE(a, b) c_CONCAT(a, b)
-#define c_CONCAT3(a, b, c) a ## b ## c
-#define c_PASTE3(a, b, c) c_CONCAT3(a, b, c)
 #define c_EXPAND(...) __VA_ARGS__
 #define c_NUM_ARGS(...) _c_APPLY_ARG_N((__VA_ARGS__, _c_RSEQ_N))
 
 #define _c_APPLY_ARG_N(args) c_EXPAND(_c_ARG_N args)
-#define _c_RSEQ_N 31, 30, 29, 28, 27, 26, 25, 24, 23, 22, 21, 20, 19, 18, 17, \
-                  16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
+#define _c_RSEQ_N 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 #define _c_ARG_N(_0, _1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, \
-                 _13, _14, _15, _16, _17, _18, _19, _20, _21, _22, \
-                 _23, _24, _25, _26, _27, _28, _29, _30, N, ...) N
+                 _13, _14, _15, N, ...) N
 
 #define c_static_assert(cond) \
     typedef char c_PASTE(_static_assert_line_, __LINE__)[(cond) ? 1 : -1]
@@ -102,7 +98,8 @@ typedef const char              c_strlit[];
 #define c_no_clone              4
 #define c_no_cmp                8
 #define c_static                16
-#define c_shared                32
+#define c_header                32
+#define c_implement             64
 
 /* Generic algorithms */
 
@@ -134,13 +131,25 @@ STC_INLINE uint64_t c_hash64(const void* key, size_t len) {
     return x*0xc6a4a7935bd1e99d;
 }
 
+STC_INLINE char* c_strnstrn(const char *s, const char *needle, size_t slen, const size_t nlen) {
+    if (!nlen) return (char *)s;
+    if (nlen > slen) return NULL;
+    slen -= nlen;
+    do {
+        if (*s == *needle && !memcmp(s, needle, nlen)) 
+            return (char *)s;
+        ++s;
+    } while (slen--);
+    return NULL;
+}
+
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
 
-#define c_foreach_3(it, C, cnt) \
+#define c_foreach3(it, C, cnt) \
     for (C##_iter it = C##_begin(&cnt), it##_end_ = C##_end(&cnt) \
          ; it.ref != it##_end_.ref; C##_next(&it))
 
-#define c_foreach_4(it, C, start, finish) \
+#define c_foreach4(it, C, start, finish) \
     for (C##_iter it = start, it##_end_ = finish \
          ; it.ref != it##_end_.ref; C##_next(&it))
 
@@ -151,11 +160,11 @@ STC_INLINE uint64_t c_hash64(const void* key, size_t len) {
          ; C##_next(&_._it))
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
-#define c_forrange_1(stop) for (size_t _c_ii=0, _c_end=stop; _c_ii < _c_end; ++_c_ii)
-#define c_forrange_2(i, stop) for (size_t i=0, _c_end=stop; i < _c_end; ++i)
-#define c_forrange_3(i, type, stop) for (type i=0, _c_end=stop; i < _c_end; ++i)
-#define c_forrange_4(i, type, start, stop) for (type i=start, _c_end=stop; i < _c_end; ++i)
-#define c_forrange_5(i, type, start, stop, step) \
+#define c_forrange1(stop) for (size_t _c_ii=0, _c_end=stop; _c_ii < _c_end; ++_c_ii)
+#define c_forrange2(i, stop) for (size_t i=0, _c_end=stop; i < _c_end; ++i)
+#define c_forrange3(i, type, stop) for (type i=0, _c_end=stop; i < _c_end; ++i)
+#define c_forrange4(i, type, start, stop) for (type i=start, _c_end=stop; i < _c_end; ++i)
+#define c_forrange5(i, type, start, stop, step) \
     for (type i=start, _c_inc=step, _c_end=(stop) - (0 < _c_inc) \
          ; (i <= _c_end) == (0 < _c_inc); i += _c_inc)
 
@@ -165,15 +174,15 @@ STC_INLINE uint64_t c_hash64(const void* key, size_t len) {
 #define c_breakauto continue
 
 #define c_auto(...) c_MACRO_OVERLOAD(c_auto, __VA_ARGS__)
-#define c_auto_2(C, a) \
+#define c_auto2(C, a) \
     c_autovar(C a = C##_init(), C##_drop(&a))
-#define c_auto_3(C, a, b) \
+#define c_auto3(C, a, b) \
     c_autovar(c_EXPAND(C a = C##_init(), b = C##_init()), \
               C##_drop(&b), C##_drop(&a))
-#define c_auto_4(C, a, b, c) \
+#define c_auto4(C, a, b, c) \
     c_autovar(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init()), \
               C##_drop(&c), C##_drop(&b), C##_drop(&a))
-#define c_auto_5(C, a, b, c, d) \
+#define c_auto5(C, a, b, c, d) \
     c_autovar(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
               C##_drop(&d), C##_drop(&c), C##_drop(&b), C##_drop(&a))
 
@@ -224,7 +233,8 @@ STC_INLINE uint64_t c_hash64(const void* key, size_t len) {
 #undef _i_static
 #undef _i_implement
 
-#if (c_option(c_shared) || defined(STC_HEADER) || defined(STC_IMPLEMENTATION)) && !c_option(c_static)
+#if !c_option(c_static) && (c_option(c_header) || c_option(c_implement) || \
+                            defined(STC_HEADER) || defined(STC_IMPLEMENTATION))
 #  define STC_API extern
 #  define STC_DEF
 #else
@@ -232,6 +242,6 @@ STC_INLINE uint64_t c_hash64(const void* key, size_t len) {
 #  define STC_API static inline
 #  define STC_DEF static inline
 #endif
-#if defined(STC_IMPLEMENTATION) ^ defined(_i_static)
+#if (c_option(c_implement) || defined(STC_IMPLEMENTATION)) ^ defined(_i_static)
 #  define _i_implement
 #endif

@@ -22,11 +22,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
 */
-#include "ccommon.h"
-
 #ifndef CREGEX_INCLUDED
 #define CREGEX_INCLUDED
 
+#include "ccommon.h"
+#include "utf8.h"
 #include <stdlib.h>
 #include <setjmp.h>
 #include <stdarg.h>
@@ -55,9 +55,6 @@ typedef enum {
     cregex_INVALID_COMPLEX_CLASS,
     cregex_UNCLOSED_SUBEXPRESSION,
 } cregex_error_t;
-
-/* check if a given string is valid utf8 */
-STC_API bool cregex_valid_utf8(const char *s);
 
 /* create an empty expression */
 STC_INLINE cregex cregex_init(void)
@@ -92,82 +89,6 @@ STC_API void cregex_drop(cregex *re);
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(_i_implement)
 
-enum {
-    _rx_UTF8_ACCEPT = 0,
-    _rx_UTF8_REJECT = 1
-};
-
-static const uint8_t _rx_utf8d[] = {
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 00..1f
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 20..3f
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 40..5f
-    0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, // 60..7f
-    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9, // 80..9f
-    7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7, // a0..bf
-    8,8,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2, // c0..df
-    0xa,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x3,0x4,0x3,0x3, // e0..ef
-    0xb,0x6,0x6,0x6,0x5,0x8,0x8,0x8,0x8,0x8,0x8,0x8,0x8,0x8,0x8,0x8, // f0..ff
-    0x0,0x1,0x2,0x3,0x5,0x8,0x7,0x1,0x1,0x1,0x4,0x6,0x1,0x1,0x1,0x1, // s0..s0
-    1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,1,1,1,1,1,0,1,0,1,1,1,1,1,1, // s1..s2
-    1,2,1,1,1,1,1,2,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1, // s3..s4
-    1,2,1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,3,1,3,1,1,1,1,1,1, // s5..s6
-    1,3,1,1,1,1,1,3,1,3,1,1,1,1,1,1,1,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1, // s7..s8
-};
-
-static inline uint32_t _rx_utf8_decode(uint32_t *state, uint32_t *codep,
-                   const uint32_t byte)
-{
-    const uint32_t type = _rx_utf8d[byte];
-    const uint32_t x = (uint32_t) -(*state != _rx_UTF8_ACCEPT);
-
-    *codep = (x & ((byte & 0x3fu) | (*codep << 6)))  
-           | (~x & ((0xff >> type) & (byte)));
-
-    *state = _rx_utf8d[256 + (*state << 4) + type];
-    return *state;
-}
-
-static bool _rx_utf8_count_codepoints(size_t *count, const uint8_t *s)
-{
-    uint32_t state = _rx_UTF8_ACCEPT, codepoint;
-    
-    for (*count = 0; *s; ++s)
-        *count += !_rx_utf8_decode(&state, &codepoint, *s);
-    return state == _rx_UTF8_ACCEPT;
-}
-
-STC_DEF bool cregex_valid_utf8(const char *s)
-{
-    size_t count;
-    bool valid = _rx_utf8_count_codepoints(&count, (const uint8_t *)s);
-    return valid;
-}
-
-static inline uint32_t _rx_utf8_peek(const char *s)
-{
-    uint32_t state = _rx_UTF8_ACCEPT, codepoint;
-    _rx_utf8_decode(&state, &codepoint, (uint8_t)s[0]);
-    return codepoint;
-}
-
-static inline uint32_t _rx_utf8_char_width(uint8_t c)
-{
-    uint32_t ret = ((c & 0xF0) == 0xE0);
-    ret += (ret << 1);                // 3
-    ret |= (c < 0x80);                // 1
-    ret |= ((c & 0xE0) == 0xC0) << 1; // 2
-    ret |= ((c & 0xF8) == 0xF0) << 2; // 4
-    return ret;
-}
-
-static inline const char *_rx_utf8_next(const char *s)
-{
-    const char* t = s + _rx_utf8_char_width((uint8_t)s[0]);
-    
-    uintptr_t p = (uintptr_t)t;
-    p &= (uintptr_t) -(*s != 0);
-    return (const char *)p;
-}
 
 /* function pointer type used to evaluate if a regex node
  * matched a given string */
@@ -243,8 +164,8 @@ static bool _rx_char_is_match(cregex_node *node, const char *orig, const char *c
         return false;
     }
 
-    *next = _rx_utf8_next(cur);
-    return node->chr.chr == _rx_utf8_peek(cur);
+    *next = utf8_next(cur);
+    return node->chr.chr == utf8_peek(cur);
 }
 
 static bool _rx_start_is_match(cregex_node *node, const char *orig, const char *cur,
@@ -272,7 +193,7 @@ static bool _rx_any_is_match(cregex_node *node, const char *orig, const char *cu
              const char **next)
 {
     if (*cur) {
-        *next = _rx_utf8_next(cur);
+        *next = utf8_next(cur);
         return true;
     }
 
@@ -305,8 +226,8 @@ static bool _rx_class_is_match(cregex_node *node, const char *orig, const char *
     if (*cur == 0)
         return false;
 
-    const uint32_t chr = _rx_utf8_peek(cur);
-    *next = _rx_utf8_next(cur);
+    const uint32_t chr = utf8_peek(cur);
+    *next = utf8_next(cur);
 
     bool found = false;
     for (_rx_RangeNode *range = cls->ranges; range != NULL;
@@ -362,7 +283,7 @@ struct {
 } _rx_CompileException;
 
 /* set global error value to the default value */
-static inline void clear_compile_exception(void)
+static inline void _rx_clear_compile_exception(void)
 {
     _rx_CompileException.err = cregex_OK;
     _rx_CompileException.s = NULL;
@@ -381,8 +302,8 @@ static size_t _rx_calc_compiled_escaped_len(const char *s, const char **leftover
     if (*s == 0)
         _rx_throw_compile_exception(cregex_UNEXPECTED_EOL, s);
 
-    const uint32_t chr = _rx_utf8_peek(s);
-    *leftover = _rx_utf8_next(s);
+    const uint32_t chr = utf8_peek(s);
+    *leftover = utf8_next(s);
 
     switch (chr) {
     case 's':
@@ -409,7 +330,7 @@ static size_t _rx_calc_compiled_escaped_len(const char *s, const char **leftover
 }
 
 static const size_t _rx_calc_compiled_class_len(const char *s,
-                        const char **leftover)
+                                                const char **leftover)
 {
     if (*s == '^')
         s++;
@@ -417,19 +338,19 @@ static const size_t _rx_calc_compiled_class_len(const char *s,
     size_t ret = 1;
 
     while (*s && *s != ']') {
-        uint32_t chr = _rx_utf8_peek(s);
-        s = _rx_utf8_next(s);
+        uint32_t chr = utf8_peek(s);
+        s = utf8_next(s);
         if (chr == '\\') {
-            s = _rx_utf8_next(s);
+            s = utf8_next(s);
         }
 
         if (*s == '-' && s[1] != ']') {
             s++;
-            chr = _rx_utf8_peek(s);
-            s = _rx_utf8_next(s);
+            chr = utf8_peek(s);
+            s = utf8_next(s);
 
             if (chr == '\\')
-                s = _rx_utf8_next(s);
+                s = utf8_next(s);
         }
 
         ret++;
@@ -452,9 +373,9 @@ static const size_t _rx_calc_compiled_len(const char *s)
     if (*s == 0) {
         return 1;
     } else {
-        const uint32_t chr = _rx_utf8_peek(s);
+        const uint32_t chr = utf8_peek(s);
         size_t ret = 0;
-        s = _rx_utf8_next(s);
+        s = utf8_next(s);
 
         switch (chr) {
         case '{': {
@@ -515,12 +436,12 @@ static size_t _rx_parse_digit(const char *s, const char **leftover)
     size_t ret = 0;
 
     while (*s) {
-        uint32_t chr = _rx_utf8_peek(s);
+        uint32_t chr = utf8_peek(s);
 
         if (_rx_is_digit(chr)) {
             ret *= 10;
             ret += chr - '0';
-            s = _rx_utf8_next(s);
+            s = utf8_next(s);
         } else {
             break;
         }
@@ -538,7 +459,7 @@ static void _rx_parse_complex_quant(const char *re, const char **leftover,
     if (*re == 0)
         _rx_throw_compile_exception(cregex_INVALID_COMPLEX_QUANT, re);
 
-    uint32_t tmp = _rx_utf8_peek(re);
+    uint32_t tmp = utf8_peek(re);
     size_t min = 0, max = SIZE_MAX;
 
     if (_rx_is_digit(tmp)) {
@@ -547,11 +468,11 @@ static void _rx_parse_complex_quant(const char *re, const char **leftover,
         _rx_throw_compile_exception(cregex_INVALID_COMPLEX_QUANT, re);
     }
 
-    tmp = _rx_utf8_peek(re);
+    tmp = utf8_peek(re);
 
     if (tmp == ',') {
-        re = _rx_utf8_next(re);
-        if (_rx_is_digit(_rx_utf8_peek(re)))
+        re = utf8_next(re);
+        if (_rx_is_digit(utf8_peek(re)))
             max = _rx_parse_digit(re, &re);
         else
             max = SIZE_MAX;
@@ -559,7 +480,7 @@ static void _rx_parse_complex_quant(const char *re, const char **leftover,
         max = min;
     }
 
-    tmp = _rx_utf8_peek(re);
+    tmp = utf8_peek(re);
     if (tmp == '}') {
         *leftover = re + 1;
         *min_p = min;
@@ -614,8 +535,8 @@ static cregex_node *_rx_compile_next_escaped(const char *re, const char **leftov
     if (*re == 0)
         _rx_throw_compile_exception(cregex_UNEXPECTED_EOL, re);
 
-    const uint32_t chr = _rx_utf8_peek(re);
-    *leftover = _rx_utf8_next(re);
+    const uint32_t chr = utf8_peek(re);
+    *leftover = utf8_next(re);
     cregex_node *ret = cur + 1;
 
     switch (chr) {
@@ -694,21 +615,21 @@ static cregex_node *_rx_compile_next_complex_class(const char *re,
     while (*re && *re != ']') {
         uint32_t first = 0, last = 0;
 
-        first = _rx_utf8_peek(re);
-        re = _rx_utf8_next(re);
+        first = utf8_peek(re);
+        re = utf8_next(re);
         if (first == '\\') {
             if (*re == 0)
                 _rx_throw_compile_exception(
                     cregex_INVALID_COMPLEX_CLASS, re);
 
-            first = _rx_utf8_peek(re);
-            re = _rx_utf8_next(re);
+            first = utf8_peek(re);
+            re = utf8_next(re);
         }
 
         if (*re == '-' && re[1] != ']' && re[1]) {
             re++;
-            last = _rx_utf8_peek(re);
-            re = _rx_utf8_next(re);
+            last = utf8_peek(re);
+            re = utf8_next(re);
 
             if (last == '\\') {
                 if (*re == 0)
@@ -716,8 +637,8 @@ static cregex_node *_rx_compile_next_complex_class(const char *re,
                         cregex_INVALID_COMPLEX_CLASS,
                         re);
 
-                last = _rx_utf8_peek(re);
-                re = _rx_utf8_next(re);
+                last = utf8_peek(re);
+                re = utf8_next(re);
             }
         } else {
             last = first;
@@ -813,8 +734,8 @@ static cregex_node *_rx_compile_next(const char *re, const char **leftover,
     if (*re == 0)
         return NULL;
 
-    const uint32_t chr = _rx_utf8_peek(re);
-    re = _rx_utf8_next(re);
+    const uint32_t chr = utf8_peek(re);
+    re = utf8_next(re);
     cregex_node *next = cur + 1;
 
     switch (chr) {
@@ -908,13 +829,13 @@ STC_DEF cregex cregex_new(const char *re)
 {
     cregex ret = {NULL};
 
-    clear_compile_exception();
+    _rx_clear_compile_exception();
     if (re == NULL) {
         _rx_CompileException.err = cregex_INVALID_PARAMS;
         return ret;
     }
 
-    if (!cregex_valid_utf8(re)) {
+    if (!utf8_is_valid(re)) {
         _rx_CompileException.err = cregex_INVALID_UTF8;
         _rx_CompileException.s = NULL;
         return ret;
@@ -952,7 +873,7 @@ STC_DEF bool cregex_find(cregex re, const char *s, cregex_match *m)
     m->start = SIZE_MAX;
     m->end = SIZE_MAX;
 
-    for (const char *tmp_s = s; *tmp_s; tmp_s = _rx_utf8_next(tmp_s)) {
+    for (const char *tmp_s = s; *tmp_s; tmp_s = utf8_next(tmp_s)) {
         const char *next = NULL;
         if (_rx_is_match(re.nodes, s, tmp_s, &next)) {
             m->start = tmp_s - s;

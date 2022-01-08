@@ -13,9 +13,7 @@ int main()
     stc64_t rng;
     int N = 10000000, M = 10;
 
-    cpque_f pq = cpque_f_init();
-    cpque_f_resize(&pq, N, 0.0f);
-
+    cpque_f pq = cpque_f_with_size(N, 0.0f);
     rng = stc64_init(seed);
     clock_t start = clock();
     c_forrange (i, N)

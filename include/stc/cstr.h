@@ -20,11 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "ccommon.h"
-
 #ifndef CSTR_H_INCLUDED
 #define CSTR_H_INCLUDED
 
+#include "ccommon.h"
 #include <stdlib.h> /* malloc */
 #include <string.h>
 #include <stdarg.h>
@@ -164,6 +163,14 @@ STC_INLINE bool
 cstr_ends_with(cstr s, const char* sub) {
     const size_t n = strlen(sub), sz = _cstr_rep(&s)->size;
     return n <= sz && !memcmp(s.str + sz - n, sub, n);
+}
+
+STC_INLINE int
+c_strncasecmp(const char* s1, const char* s2, size_t nmax) {
+    int ret = 0;
+    while (nmax-- && (ret = tolower(*s1++) - tolower(*s2)) == 0 && *s2++)
+        ;
+    return ret;
 }
 
 /* container adaptor functions: */
@@ -361,24 +368,6 @@ cstr_find_n(cstr s, const char* needle, const size_t pos, const size_t nmax) {
     return res ? res - s.str : cstr_npos;
 }
 
-STC_DEF int
-c_strncasecmp(const char* s1, const char* s2, size_t nmax) {
-    int ret = 0;
-    while (nmax-- && (ret = tolower(*s1++) - tolower(*s2)) == 0 && *s2++) ;
-    return ret;
-}
-
-STC_DEF char*
-c_strnstrn(const char *s, const char *needle, size_t slen, const size_t nlen) {
-    if (!nlen) return (char *)s;
-    if (nlen > slen) return NULL;
-    slen -= nlen;
-    do {
-        if (*s == *needle && !memcmp(s, needle, nlen)) return (char *)s;
-        ++s;
-    } while (slen--);
-    return NULL;
-}
 #endif
 #endif
 #undef i_opt

@@ -1,4 +1,4 @@
-#include <stc/csview.h>
+#include <stc/strings.h>
 
 int  main()
 {
@@ -9,8 +9,8 @@ int  main()
     const csview month = csview_token(date, c_sv("/"), &pos);
     const csview day = csview_token(date, c_sv("/"), &pos);
 
-    printf(c_svfmt ", " c_svfmt ", " c_svfmt "\n", 
-           c_svarg(year), c_svarg(month), c_svarg(day));
+    printf(c_PRIsv ", " c_PRIsv ", " c_PRIsv "\n", 
+           c_ARGsv(year), c_ARGsv(month), c_ARGsv(day));
 
     c_auto (cstr, y, m, d) {
         y = cstr_from_v(year), m = cstr_from_v(month), d = cstr_from_v(day);
