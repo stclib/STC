@@ -17,14 +17,14 @@ int main()
     {
         re = cregex_new("[+-]?([0-9]*\\.)?[0-9]+([Ee][-+]?[0-9]+)?");
         cregex_match match;
-        if (cregex_find(re, s, &match)) {
+        if (cregex_find(&re, s, &match)) {
             printf("Found digits at position %zu-%zu\n", match.start, match.end);
         } else {
             printf("Could not find any digits\n");
         }
 
         csview sv = {s, 0};
-        while (cregex_find_next_v(re, s, &sv)) {
+        while (cregex_find_next_v(&re, s, &sv)) {
             printf(c_PRIsv " ; ", c_ARGsv(sv));
         }
         puts("");

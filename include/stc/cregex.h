@@ -33,6 +33,7 @@
 
 typedef struct {
     union cregex_node *nodes;
+    const char* input;
 } cregex;
 
 typedef struct {
@@ -63,30 +64,34 @@ STC_API cregex cregex_new(const char *re);
 STC_API cregex_error_t cregex_error(void);
 
 /* check if input s matches re */
-STC_API bool cregex_is_match(cregex rx, const char *s);
+STC_API bool cregex_is_match(cregex *rx, const char *s);
 
 /* find the next matching substring in s */
-STC_API bool cregex_find_next(cregex rx, const char *s, cregex_match *m);
-STC_API bool cregex_find_next_v(cregex rx, const char *s, csview *sv);
+STC_API bool cregex_find_next(cregex *rx, const char *s, cregex_match *m);
+
+/* find the next matching substring in s, return as csview */
+STC_API bool cregex_find_next_v(cregex *rx, const char *s, csview *sv);
 
 /* find the first matching substring in s */
-STC_INLINE bool cregex_find(cregex rx, const char *s, cregex_match *m) {
+STC_INLINE bool cregex_find(cregex *rx, const char *s, cregex_match *m) {
     m->start = m->end = 0;
     return cregex_find_next(rx, s, m);
 }
 
-STC_INLINE bool cregex_find_v(cregex rx, const char *s, csview *sv) {
+STC_INLINE bool cregex_find_v(cregex *rx, const char *s, csview *sv) {
     sv->str = s, sv->size = 0;
     return cregex_find_next_v(rx, s, sv);
 }
 
 /* get captured slice from capture group number index */
-STC_API cregex_match cregex_capture(cregex rx, size_t index);
+STC_API bool cregex_capture(cregex rx, size_t index, cregex_match *m);
 
 /* get captured slice from capture group number index as a csview */
-STC_INLINE csview cregex_capture_v(cregex rx, const char* s, size_t index) {
-    cregex_match cap = cregex_capture(rx, index);
-    return c_make(csview){s + cap.start, cap.end - cap.start};
+STC_INLINE bool cregex_capture_v(cregex rx, size_t index, csview *sv) {
+    cregex_match m;
+    bool ret = cregex_capture(rx, index, &m);
+    *sv = c_make(csview){rx.input + m.start, m.end - m.start};
+    return ret;
 }
 
 /* get amount of capture groups inside of
@@ -872,31 +877,31 @@ STC_DEF cregex_error_t cregex_error(void)
     return _rx_CompileException.err;
 }
 
-STC_DEF bool cregex_is_match(cregex rx, const char *s)
+STC_DEF bool cregex_is_match(cregex* rx, const char *s)
 {
-    bool res = _rx_is_match(rx.nodes, s, s, &s);
+    rx->input = s;
+    bool res = _rx_is_match(rx->nodes, s, s, &s);
     return res && *s == 0;
 }
 
-STC_DEF bool cregex_find_next(cregex rx, const char *s, cregex_match *m)
+STC_DEF bool cregex_find_next(cregex *rx, const char *s, cregex_match *m)
 {
-    const char *it = s + m->end, *end = it, *next;
+    const char *it = s + m->end, *next;
+    rx->input = s;
 
-    for (; *it; end = it, it = utf8_next(it)) {
-        if (_rx_is_match(rx.nodes, s, it, &next)) {
+    for (; *it; it = utf8_next(it)) {
+        if (_rx_is_match(rx->nodes, s, it, &next)) {
             m->start = it - s;
             m->end = next - s;
             return true;
         }
     }
-    m->start = m->end = end - s;
     return false;
 }
 
-STC_API bool cregex_find_next_v(cregex rx, const char *s, csview *sv)
+STC_API bool cregex_find_next_v(cregex *rx, const char *s, csview *sv)
 {
-    cregex_match m;
-    m.start = sv->str - s, m.end = m.start + sv->size;
+    cregex_match m = { (size_t)(sv->str - s), m.start + sv->size };
     
     bool res = cregex_find_next(rx, s, &m);
     *sv = c_make(csview){s + m.start, m.end - m.start};
@@ -961,15 +966,14 @@ static cregex_node *_rx_find_capture_node(cregex_node *node, size_t index)
     }
 }
 
-STC_DEF cregex_match cregex_capture(cregex rx, size_t index)
+STC_DEF bool cregex_capture(cregex rx, size_t index, cregex_match *m)
 {
     _rx_CapNode *cap = (_rx_CapNode *)_rx_find_capture_node(rx.nodes, index);
 
-    if (cap == NULL) {
-        return c_make(cregex_match){0, 0};
-    }
+    if (!cap) return false;
 
-    return cap->cap;
+    *m = cap->cap;
+    return true;
 }
 
 #endif
