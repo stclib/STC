@@ -296,8 +296,8 @@ START_TEST(captures_cap)
         ck_assert(cregex_find(&re, "xxabcdcde", &match));
 
         cregex_match cap0, cap1;
-        cregex_capture(re, 0, &cap0);
-        cregex_capture(re, 1, &cap1);
+        cregex_capture(&re, 0, &cap0);
+        cregex_capture(&re, 1, &cap1);
 
         ck_assert_uint_eq(cap0.start, 2);
         ck_assert_uint_eq(cap0.end, 4);
