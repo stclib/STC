@@ -1,4 +1,6 @@
-#include <stc/strings.h>
+#define i_val_str
+#include <stc/cvec.h>
+#include <stc/csview.h>
 
 void print_split(csview str, csview sep)
 {
@@ -9,9 +11,6 @@ void print_split(csview str, csview sep)
         printf("[" c_PRIsv "]\n", c_ARGsv(tok));
     }
 }
-
-#define i_val_str
-#include <stc/cvec.h>
 
 cvec_str string_split(csview str, csview sep)
 {

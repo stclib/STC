@@ -1,5 +1,5 @@
-#ifndef STC_UTF8_INCLUDED
-#define STC_UTF8_INCLUDED
+#ifndef UTF8_H_INCLUDED
+#define UTF8_H_INCLUDED
 
 #include "ccommon.h"
 #include <ctype.h>

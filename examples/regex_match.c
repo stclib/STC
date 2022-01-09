@@ -25,7 +25,7 @@ int main()
 
         csview sv = {s, 0};
         while (cregex_find_next_v(re, s, &sv)) {
-            printf(c_PRIsv " | ", c_ARGsv(sv));
+            printf(c_PRIsv " ; ", c_ARGsv(sv));
         }
         puts("");
     }

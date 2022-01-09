@@ -1,4 +1,5 @@
-#include <stc/strings.h>
+#include <stc/cstr.h>
+#include <stc/csview.h>
 
 int  main()
 {

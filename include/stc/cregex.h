@@ -84,7 +84,7 @@ STC_INLINE bool cregex_find_v(cregex re, const char *s, csview *sv) {
 STC_API cregex_match cregex_capture(cregex re, size_t index);
 
 /* get captured slice from capture group number index as a csview */
-STC_INLINE csview cregex_capture_v(cregex re, size_t index, const char* s) {
+STC_INLINE csview cregex_capture_v(cregex re, const char* s, size_t index) {
     cregex_match cap = cregex_capture(re, index);
     return c_make(csview){s + cap.start, cap.end - cap.start};
 }

@@ -20,9 +20,8 @@ description.
 All csview definitions and prototypes are available by including a single header file.
 
 ```c
+#include <stc/cstr.h> // optional, include cstr+csview functionality
 #include <stc/csview.h>
-// or, to use cstr+csview functionality:
-#include <stc/strings.h>
 ```
 ## Methods
 
@@ -146,7 +145,7 @@ void print_split(csview str, csview sep)
 
 #define i_val_str
 #include <stc/cvec.h>
-#include <stc/strings.h>
+#include <stc/csview.h>
 
 cvec_str string_split(csview str, csview sep)
 {
