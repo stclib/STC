@@ -54,7 +54,7 @@ typedef enum {
 
 /* create an empty expression */
 STC_INLINE cregex cregex_init(void)
-    { cregex re = {NULL}; return re; }
+    { cregex rx = {NULL}; return rx; }
 
 /* compile regular expression */
 STC_API cregex cregex_new(const char *re);
@@ -63,38 +63,38 @@ STC_API cregex cregex_new(const char *re);
 STC_API cregex_error_t cregex_error(void);
 
 /* check if input s matches re */
-STC_API bool cregex_is_match(cregex re, const char *s);
+STC_API bool cregex_is_match(cregex rx, const char *s);
 
 /* find the next matching substring in s */
-STC_API bool cregex_find_next(cregex re, const char *s, cregex_match *m);
-STC_API bool cregex_find_next_v(cregex re, const char *s, csview *sv);
+STC_API bool cregex_find_next(cregex rx, const char *s, cregex_match *m);
+STC_API bool cregex_find_next_v(cregex rx, const char *s, csview *sv);
 
 /* find the first matching substring in s */
-STC_INLINE bool cregex_find(cregex re, const char *s, cregex_match *m) {
+STC_INLINE bool cregex_find(cregex rx, const char *s, cregex_match *m) {
     m->start = m->end = 0;
-    return cregex_find_next(re, s, m);
+    return cregex_find_next(rx, s, m);
 }
 
-STC_INLINE bool cregex_find_v(cregex re, const char *s, csview *sv) {
+STC_INLINE bool cregex_find_v(cregex rx, const char *s, csview *sv) {
     sv->str = s, sv->size = 0;
-    return cregex_find_next_v(re, s, sv);
+    return cregex_find_next_v(rx, s, sv);
 }
 
 /* get captured slice from capture group number index */
-STC_API cregex_match cregex_capture(cregex re, size_t index);
+STC_API cregex_match cregex_capture(cregex rx, size_t index);
 
 /* get captured slice from capture group number index as a csview */
-STC_INLINE csview cregex_capture_v(cregex re, const char* s, size_t index) {
-    cregex_match cap = cregex_capture(re, index);
+STC_INLINE csview cregex_capture_v(cregex rx, const char* s, size_t index) {
+    cregex_match cap = cregex_capture(rx, index);
     return c_make(csview){s + cap.start, cap.end - cap.start};
 }
 
 /* get amount of capture groups inside of
  * the regular expression */
-STC_API size_t cregex_capture_size(cregex re);
+STC_API size_t cregex_capture_size(cregex rx);
 
 /* free regular expression */
-STC_API void cregex_drop(cregex *re);
+STC_API void cregex_drop(cregex *rx);
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(_i_implement)
@@ -872,19 +872,18 @@ STC_DEF cregex_error_t cregex_error(void)
     return _rx_CompileException.err;
 }
 
-STC_DEF bool cregex_is_match(cregex re, const char *s)
+STC_DEF bool cregex_is_match(cregex rx, const char *s)
 {
-    const char *next; // = NULL;
-    bool res = _rx_is_match(re.nodes, s, s, &next);
-    return res && *next == 0;
+    bool res = _rx_is_match(rx.nodes, s, s, &s);
+    return res && *s == 0;
 }
 
-STC_DEF bool cregex_find_next(cregex re, const char *s, cregex_match *m)
+STC_DEF bool cregex_find_next(cregex rx, const char *s, cregex_match *m)
 {
     const char *it = s + m->end, *end = it, *next;
 
     for (; *it; end = it, it = utf8_next(it)) {
-        if (_rx_is_match(re.nodes, s, it, &next)) {
+        if (_rx_is_match(rx.nodes, s, it, &next)) {
             m->start = it - s;
             m->end = next - s;
             return true;
@@ -894,20 +893,20 @@ STC_DEF bool cregex_find_next(cregex re, const char *s, cregex_match *m)
     return false;
 }
 
-STC_API bool cregex_find_next_v(cregex re, const char *s, csview *sv)
+STC_API bool cregex_find_next_v(cregex rx, const char *s, csview *sv)
 {
     cregex_match m;
     m.start = sv->str - s, m.end = m.start + sv->size;
     
-    bool res = cregex_find_next(re, s, &m);
+    bool res = cregex_find_next(rx, s, &m);
     *sv = c_make(csview){s + m.start, m.end - m.start};
     return res;
 }
 
 
-STC_DEF void cregex_drop(cregex *re)
+STC_DEF void cregex_drop(cregex *rx)
 {
-    free(re->nodes);
+    free(rx->nodes);
 }
 
 /* calculate amount of capture groups
@@ -927,9 +926,9 @@ static size_t _rx_cap_node_count(cregex_node *nodes)
     }
 }
 
-STC_DEF size_t cregex_capture_size(cregex re)
+STC_DEF size_t cregex_capture_size(cregex rx)
 {
-    return _rx_cap_node_count(re.nodes);
+    return _rx_cap_node_count(rx.nodes);
 }
 
 static cregex_node *_rx_find_capture_node(cregex_node *node, size_t index)
@@ -962,9 +961,9 @@ static cregex_node *_rx_find_capture_node(cregex_node *node, size_t index)
     }
 }
 
-STC_DEF cregex_match cregex_capture(cregex re, size_t index)
+STC_DEF cregex_match cregex_capture(cregex rx, size_t index)
 {
-    _rx_CapNode *cap = (_rx_CapNode *)_rx_find_capture_node(re.nodes, index);
+    _rx_CapNode *cap = (_rx_CapNode *)_rx_find_capture_node(rx.nodes, index);
 
     if (cap == NULL) {
         return c_make(cregex_match){0, 0};
