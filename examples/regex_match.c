@@ -23,13 +23,9 @@ int main()
             printf("Could not find any digits\n");
         }
 
-        c_auto (cregex_result, matches) {
-            matches = cregex_find_all(re, s);
-            csview sv = csview_from(s);
-            c_foreach (i, cregex_result, matches) {
-                csview rs = csview_slice(sv, i.ref->start, i.ref->end);
-                printf(c_PRIsv " | ", c_ARGsv(rs));
-            }
+        csview sv = {s, 0};
+        while (cregex_find_next_v(re, s, &sv)) {
+            printf(c_PRIsv " | ", c_ARGsv(sv));
         }
         puts("");
     }

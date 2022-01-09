@@ -41,6 +41,7 @@ STC_API csview          csview_token(csview sv, csview sep, size_t* start);
 
 #define                 csview_new(literal) \
                             c_make(csview){literal, sizeof c_make(c_strlit){literal} - 1}
+STC_INLINE csview       csview_init() { return csview_null; }
 STC_INLINE csview       csview_from(const char* str)
                             { return c_make(csview){str, strlen(str)}; }
 STC_INLINE csview       csview_from_n(const char* str, size_t n)

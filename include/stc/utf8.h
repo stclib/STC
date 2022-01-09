@@ -80,7 +80,7 @@ STC_DEF uint32_t utf8_decode(uint32_t *state, uint32_t *codep,
     const uint32_t x = (uint32_t) -(*state != utf8_ACCEPT);
 
     *codep = (x & ((byte & 0x3fu) | (*codep << 6)))  
-           | (~x & ((0xff >> type) & (byte)));
+           | (~x & ((0xff >> type) & byte));
 
     return *state = utf8_table[256 + *state + type];
 }

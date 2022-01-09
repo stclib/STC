@@ -25,7 +25,7 @@
 #ifndef CREGEX_INCLUDED
 #define CREGEX_INCLUDED
 
-#include "ccommon.h"
+#include "csview.h"
 #include "utf8.h"
 #include <stdlib.h>
 #include <setjmp.h>
@@ -39,10 +39,6 @@ typedef struct {
     size_t start;
     size_t end;
 } cregex_match;
-
-#define i_type cregex_result
-#define i_val cregex_match
-#include "cstack.h"
 
 typedef enum {
     cregex_OK = 0,
@@ -67,21 +63,35 @@ STC_API cregex cregex_new(const char *re);
 STC_API cregex_error_t cregex_error(void);
 
 /* check if input s matches re */
-STC_DEF bool cregex_is_match(cregex re, const char *s);
+STC_API bool cregex_is_match(cregex re, const char *s);
+
+/* find the next matching substring in s */
+STC_API bool cregex_find_next(cregex re, const char *s, cregex_match *m);
+STC_API bool cregex_find_next_v(cregex re, const char *s, csview *sv);
 
 /* find the first matching substring in s */
-STC_API bool cregex_find(cregex re, const char *s, cregex_match *m);
+STC_INLINE bool cregex_find(cregex re, const char *s, cregex_match *m) {
+    m->start = m->end = 0;
+    return cregex_find_next(re, s, m);
+}
 
-/* get all non-overlapping matches in string s. returns NULL
- * if no matches are found. returned value must be freed */
-STC_API cregex_result cregex_find_all(cregex re, const char *s);
-
-/* get amount of capture groups inside of
- * a regular expression */
-STC_API size_t cregex_captures_len(cregex re);
+STC_INLINE bool cregex_find_v(cregex re, const char *s, csview *sv) {
+    sv->str = s, sv->size = 0;
+    return cregex_find_next_v(re, s, sv);
+}
 
 /* get captured slice from capture group number index */
 STC_API cregex_match cregex_capture(cregex re, size_t index);
+
+/* get captured slice from capture group number index as a csview */
+STC_INLINE csview cregex_capture_v(cregex re, size_t index, const char* s) {
+    cregex_match cap = cregex_capture(re, index);
+    return c_make(csview){s + cap.start, cap.end - cap.start};
+}
+
+/* get amount of capture groups inside of
+ * the regular expression */
+STC_API size_t cregex_capture_size(cregex re);
 
 /* free regular expression */
 STC_API void cregex_drop(cregex *re);
@@ -93,7 +103,7 @@ STC_API void cregex_drop(cregex *re);
 /* function pointer type used to evaluate if a regex node
  * matched a given string */
 typedef bool (*_rx_MatchFunc)(union cregex_node *node, const char *orig,
-              const char *cur, const char **next);
+                              const char *cur, const char **next);
 
 typedef struct _rx_GenericNode {
     union cregex_node *prev;
@@ -145,8 +155,8 @@ typedef union cregex_node {
     _rx_OrNode ior;
 } cregex_node;
 
-static bool _rx_is_match(cregex_node *node, const char *orig, const char *cur,
-             const char **next)
+static bool _rx_is_match(cregex_node *node, const char *orig,
+                         const char *cur, const char **next)
 {
     if (node == NULL) {
         *next = cur;
@@ -157,8 +167,8 @@ static bool _rx_is_match(cregex_node *node, const char *orig, const char *cur,
     }
 }
 
-static bool _rx_char_is_match(cregex_node *node, const char *orig, const char *cur,
-              const char **next)
+static bool _rx_char_is_match(cregex_node *node, const char *orig,
+                              const char *cur, const char **next)
 {
     if (*cur == 0) {
         return false;
@@ -168,29 +178,29 @@ static bool _rx_char_is_match(cregex_node *node, const char *orig, const char *c
     return node->chr.chr == utf8_peek(cur);
 }
 
-static bool _rx_start_is_match(cregex_node *node, const char *orig, const char *cur,
-               const char **next)
+static bool _rx_start_is_match(cregex_node *node, const char *orig,
+                               const char *cur, const char **next)
 {
     *next = cur;
     return true;
 }
 
 static bool _rx_anchor_begin_is_match(cregex_node *node, const char *orig,
-                  const char *cur, const char **next)
+                                      const char *cur, const char **next)
 {
     *next = cur;
     return strlen(orig) == strlen(cur);
 }
 
 static bool _rx_anchor_end_is_match(cregex_node *node, const char *orig,
-                const char *cur, const char **next)
+                                    const char *cur, const char **next)
 {
     *next = cur;
     return strlen(cur) == 0;
 }
 
-static bool _rx_any_is_match(cregex_node *node, const char *orig, const char *cur,
-             const char **next)
+static bool _rx_any_is_match(cregex_node *node, const char *orig,
+                             const char *cur, const char **next)
 {
     if (*cur) {
         *next = utf8_next(cur);
@@ -200,8 +210,8 @@ static bool _rx_any_is_match(cregex_node *node, const char *orig, const char *cu
     return false;
 }
 
-static bool _rx_quant_is_match(cregex_node *node, const char *orig, const char *cur,
-               const char **next)
+static bool _rx_quant_is_match(cregex_node *node, const char *orig,
+                               const char *cur, const char **next)
 {
     _rx_QuantNode *quant = (_rx_QuantNode *)node;
     size_t matches = 0;
@@ -218,8 +228,8 @@ static bool _rx_quant_is_match(cregex_node *node, const char *orig, const char *
     return matches >= quant->min;
 }
 
-static bool _rx_class_is_match(cregex_node *node, const char *orig, const char *cur,
-               const char **next)
+static bool _rx_class_is_match(cregex_node *node, const char *orig,
+                               const char *cur, const char **next)
 {
     _rx_ClassNode *cls = (_rx_ClassNode *)node;
 
@@ -244,8 +254,8 @@ static bool _rx_class_is_match(cregex_node *node, const char *orig, const char *
     return found;
 }
 
-static bool _rx_cap_is_match(cregex_node *node, const char *orig, const char *cur,
-             const char **next)
+static bool _rx_cap_is_match(cregex_node *node, const char *orig,
+                             const char *cur, const char **next)
 {
     _rx_CapNode *cap = (_rx_CapNode *)node;
 
@@ -258,8 +268,8 @@ static bool _rx_cap_is_match(cregex_node *node, const char *orig, const char *cu
     return false;
 }
 
-static bool _rx_or_is_match(cregex_node *node, const char *orig, const char *cur,
-    const char **next)
+static bool _rx_or_is_match(cregex_node *node, const char *orig,
+                            const char *cur, const char **next)
 {
     _rx_OrNode *ior = (_rx_OrNode *)node;
 
@@ -408,7 +418,7 @@ static const size_t _rx_calc_compiled_len(const char *s)
 }
 
 static void _rx_append_quant(cregex_node **prev, cregex_node *cur, size_t min,
-             size_t max, const char *re)
+                             size_t max, const char *re)
 {
     cur->generic.match = _rx_quant_is_match;
     cur->generic.next = NULL;
@@ -454,7 +464,7 @@ static size_t _rx_parse_digit(const char *s, const char **leftover)
 /* parse complex quantifier of format {m,n} 
  * valid formats: {,} {m,} {,n} {m} {m,n} */
 static void _rx_parse_complex_quant(const char *re, const char **leftover,
-                size_t *min_p, size_t *max_p)
+                                    size_t *min_p, size_t *max_p)
 {
     if (*re == 0)
         _rx_throw_compile_exception(cregex_INVALID_COMPLEX_QUANT, re);
@@ -530,7 +540,7 @@ static cregex_node *_rx_append_class(cregex_node *cur, bool negate, size_t n, ..
 
 /** _rx_compile escaped characters. return pointer to the next free node. */
 static cregex_node *_rx_compile_next_escaped(const char *re, const char **leftover,
-                       cregex_node *cur)
+                                             cregex_node *cur)
 {
     if (*re == 0)
         _rx_throw_compile_exception(cregex_UNEXPECTED_EOL, re);
@@ -593,8 +603,8 @@ static cregex_node *_rx_compile_next_escaped(const char *re, const char **leftov
 }
 
 static cregex_node *_rx_compile_next_complex_class(const char *re,
-                         const char **leftover,
-                         cregex_node *cur)
+                                                   const char **leftover,
+                                                   cregex_node *cur)
 {
     cur->generic.match = _rx_class_is_match;
     cur->generic.next = NULL;
@@ -690,7 +700,7 @@ static const char *_rx_find_closing_par(const char *s)
 static cregex_node *_rx_compile(const char *re, const char *end, cregex_node *nodes);
 
 static cregex_node *_rx_compile_next_cap(const char *re, const char **leftover,
-                   cregex_node *cur)
+                                         cregex_node *cur)
 {
     cur->cap.cap.start = 0;
     cur->cap.cap.end = 0;
@@ -729,7 +739,7 @@ static cregex_node *insert_or(cregex_node *cur, cregex_node **prev) {
 /* _rx_compile next node. returns address of next available node.
  * returns NULL if re is empty */
 static cregex_node *_rx_compile_next(const char *re, const char **leftover,
-                   cregex_node *prev, cregex_node *cur)
+                                     cregex_node *prev, cregex_node *cur)
 {
     if (*re == 0)
         return NULL;
@@ -864,54 +874,40 @@ STC_DEF cregex_error_t cregex_error(void)
 
 STC_DEF bool cregex_is_match(cregex re, const char *s)
 {
-    const char *next = NULL;
-    return _rx_is_match(re.nodes, s, s, &next);
+    const char *next; // = NULL;
+    bool res = _rx_is_match(re.nodes, s, s, &next);
+    return res && *next == 0;
 }
 
-STC_DEF bool cregex_find(cregex re, const char *s, cregex_match *m)
+STC_DEF bool cregex_find_next(cregex re, const char *s, cregex_match *m)
 {
-    m->start = SIZE_MAX;
-    m->end = SIZE_MAX;
+    const char *it = s + m->end, *end = it, *next;
 
-    for (const char *tmp_s = s; *tmp_s; tmp_s = utf8_next(tmp_s)) {
-        const char *next = NULL;
-        if (_rx_is_match(re.nodes, s, tmp_s, &next)) {
-            m->start = tmp_s - s;
+    for (; *it; end = it, it = utf8_next(it)) {
+        if (_rx_is_match(re.nodes, s, it, &next)) {
+            m->start = it - s;
             m->end = next - s;
             return true;
         }
     }
-
+    m->start = m->end = end - s;
     return false;
 }
+
+STC_API bool cregex_find_next_v(cregex re, const char *s, csview *sv)
+{
+    cregex_match m;
+    m.start = sv->str - s, m.end = m.start + sv->size;
+    
+    bool res = cregex_find_next(re, s, &m);
+    *sv = c_make(csview){s + m.start, m.end - m.start};
+    return res;
+}
+
 
 STC_DEF void cregex_drop(cregex *re)
 {
     free(re->nodes);
-}
-
-STC_DEF cregex_result cregex_find_all(cregex re, const char *s)
-{
-    cregex_result matches = cregex_result_init();
-    size_t offset = 0;
-
-    const char *s_end = s + strlen(s);
-    while (s < s_end) {
-        cregex_match tmp;
-        if (cregex_find(re, s, &tmp)) {
-            size_t end = tmp.end;
-            s += end;
-            tmp.start += offset;
-            tmp.end += offset;
-
-            offset += end;
-            cregex_result_push(&matches, tmp);
-        } else {
-            break;
-        }
-    }
-
-    return matches;
 }
 
 /* calculate amount of capture groups
@@ -931,7 +927,7 @@ static size_t _rx_cap_node_count(cregex_node *nodes)
     }
 }
 
-STC_DEF size_t cregex_captures_len(cregex re)
+STC_DEF size_t cregex_capture_size(cregex re)
 {
     return _rx_cap_node_count(re.nodes);
 }
