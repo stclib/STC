@@ -2,6 +2,9 @@
 #include <stc/csview.h>
 #include <stc/cregex.h>
 #include <stc/crandom.h>
+#define i_val double
+#define i_type Vecu64
+#include <stc/cstack.h>
 #include <time.h>
 
 
@@ -23,7 +26,7 @@ int main()
             printf("Could not find any digits\n");
         }
 
-        csview sv = {s, 0};
+        csview sv = {0};
         while (cregex_find_next_v(&re, s, &sv)) {
             printf(c_PRIsv " ; ", c_ARGsv(sv));
         }

@@ -24,13 +24,15 @@
 /* A string type with short string optimization in C99 with optimal short string
  * utilization (23 characters with 24 bytes string representation).
  */
-#ifndef CSTR_INCLUDED
-#define CSTR_INCLUDED
+#ifndef CSTR_H_INCLUDED
+#define CSTR_H_INCLUDED
 
 #include <stc/ccommon.h>
-#include <stdlib.h>
+#include <stdlib.h> /* malloc */
 #include <string.h>
-#include <stdio.h>
+#include <stdarg.h>
+#include <stdio.h> /* vsnprintf */
+#include <ctype.h>
 
 typedef struct { char* data; size_t size, cap; } _cstr_rep_t;
 

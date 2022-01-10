@@ -21,7 +21,7 @@ cvec_str read_file(const char* name)
     c_auto (cstr, line)
     c_autovar (FILE* f = fopen(name, "r"), fclose(f))
         while (cstr_getline(&line, f))
-            cvec_str_emplace_back(&data, line.str);
+            cvec_str_emplace_back(&data, cstr_str(&line));
     return data;
 }
 
@@ -124,7 +124,7 @@ void benchmark(cvec_str vec_string, struct Maps maps)
         csmap_str_iter it, end = csmap_str_end(maps.snormal); 
         for (size_t j = 0; j < cvec_str_size(vec_string); ++j)
         {
-            csmap_str_find_it(maps.snormal, vec_string.data[j].str, &it);
+            csmap_str_find_it(maps.snormal, cstr_str(&vec_string.data[j]), &it);
             if (it.ref != end.ref)
                 total += it.ref->second;
         }
@@ -141,7 +141,7 @@ void benchmark(cvec_str vec_string, struct Maps maps)
         cmap_str_iter it, end = cmap_str_end(maps.unormal); 
         for (size_t j = 0; j < cvec_str_size(vec_string); ++j)
         {
-            it = cmap_str_find(maps.unormal, vec_string.data[j].str);
+            it = cmap_str_find(maps.unormal, cstr_str(&vec_string.data[j]));
             if (it.ref != end.ref)
                 total += it.ref->second;
         }

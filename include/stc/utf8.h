@@ -9,18 +9,16 @@ enum utf8_state {
     utf8_REJECT = 12
 };
 
+typedef struct { bool valid; size_t size; } utf8_result;
+/* number of codepoints in the utf8 string s, or SIZE_MAX if invalid utf8: */
+STC_API size_t utf8_codepoint_count(const char *s);
+STC_API size_t utf8_codepoint_count_n(const char *s, size_t n);
+/* decode next utf8 codepoint. */
 STC_API uint32_t utf8_decode(uint32_t *state, uint32_t *codep, const uint32_t byte);
-STC_API bool utf8_valid_codepoints(const uint8_t *s, size_t *count);
-
-STC_INLINE bool utf8_is_valid(const char *s)
-{
-    size_t count;
-    return utf8_valid_codepoints((const uint8_t *)s, &count);
-}
 
 STC_INLINE uint32_t utf8_peek(const char *s)
 {
-    uint32_t state = utf8_ACCEPT, codepoint;
+    uint32_t state = 0, codepoint;
     utf8_decode(&state, &codepoint, (uint8_t)s[0]);
     return codepoint;
 }
@@ -44,16 +42,6 @@ STC_INLINE const char *utf8_next(const char *s)
     return (const char *)p;
 }
 
-// assumes input is valid utf8! Use utf8_valid_codepoints() if unsure.
-STC_INLINE size_t utf8_size(const char *s)
-{
-    size_t count = 0;
-    while (*s)
-        s += utf8_codepoint_width((uint8_t)*s), ++count;
-    return count;
-}
-
-
 // --------------------------- IMPLEMENTATION ---------------------------------
 #ifdef _i_implement
 
@@ -74,10 +62,10 @@ static const uint8_t utf8_table[] = {
 };
 
 STC_DEF uint32_t utf8_decode(uint32_t *state, uint32_t *codep,
-                                const uint32_t byte)
+                             const uint32_t byte)
 {
     const uint32_t type = utf8_table[byte];
-    const uint32_t x = (uint32_t) -(*state != utf8_ACCEPT);
+    const uint32_t x = (uint32_t) -(*state != 0);
 
     *codep = (x & ((byte & 0x3fu) | (*codep << 6)))  
            | (~x & ((0xff >> type) & byte));
@@ -85,13 +73,23 @@ STC_DEF uint32_t utf8_decode(uint32_t *state, uint32_t *codep,
     return *state = utf8_table[256 + *state + type];
 }
 
-STC_DEF bool utf8_valid_codepoints(const uint8_t *s, size_t *count)
+
+STC_DEF size_t utf8_codepoint_count(const char *s)
 {
-    uint32_t state = utf8_ACCEPT, codepoint;
-    
-    for (*count = 0; *s; ++s)
-        *count += utf8_decode(&state, &codepoint, *s) == utf8_ACCEPT;
-    return state == utf8_ACCEPT;
+    uint32_t state = 0, codepoint;
+    size_t size = 0;
+    while (*s)
+        size += !utf8_decode(&state, &codepoint, (uint8_t)*s++);
+    return size | (size_t) -(state != 0);
+}
+
+STC_DEF size_t utf8_codepoint_count_n(const char *s, size_t n)
+{
+    uint32_t state = 0, codepoint;
+    size_t size = 0;
+    while (n--)
+        size += !utf8_decode(&state, &codepoint, (uint8_t)*s++);
+    return size | (size_t) -(state != 0);
 }
 
 #endif
