@@ -20,18 +20,17 @@ SOFTWARE.
 #ifndef STC_UNISTD_H_
 #define STC_UNISTD_H_
 
-#ifndef _WIN32
+#ifdef _WIN32
 
-#include_next <unistd.h>
+#define WIN32_LEAN_AND_MEAN
+#include <io.h>
+#include <process.h>
+
+#define sleep(s) Sleep((s)*1000)
 
 #else
 
-#define WIN32_LEAN_AND_MEAN
-#include <windef.h>
-VOID WINAPI Sleep(_In_ DWORD dwMilliseconds);
-#define sleep(s) Sleep((s)*1000)
-
-#include <io.h> /* _access() */
+#include_next <unistd.h>
 
 #endif
 #endif /* STC_UNISTD_H_ */
