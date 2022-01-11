@@ -9,7 +9,6 @@ enum utf8_state {
     utf8_REJECT = 12
 };
 
-typedef struct { bool valid; size_t size; } utf8_result;
 /* number of codepoints in the utf8 string s, or SIZE_MAX if invalid utf8: */
 STC_API size_t utf8_codepoint_count(const char *s);
 STC_API size_t utf8_codepoint_count_n(const char *s, size_t n);
@@ -45,7 +44,7 @@ STC_INLINE const char *utf8_next(const char *s)
 // --------------------------- IMPLEMENTATION ---------------------------------
 #ifdef _i_implement
 
-static const uint8_t utf8_table[] = {
+STC_DEF const uint8_t utf8_table[] = {
      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -87,7 +86,7 @@ STC_DEF size_t utf8_codepoint_count_n(const char *s, size_t n)
 {
     uint32_t state = 0, codepoint;
     size_t size = 0;
-    while (n--)
+    while (n-- && *s)
         size += !utf8_decode(&state, &codepoint, (uint8_t)*s++);
     return size | (size_t) -(state != 0);
 }

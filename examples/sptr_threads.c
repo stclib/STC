@@ -1,9 +1,8 @@
 // example based on https://en.cppreference.com/w/cpp/memory/shared_ptr
-#if defined __GNUC__ || defined __linux__
 
 #include <stdio.h>
 #include <unistd.h>
-#include <pthread.h>
+#include <threads.h>
 #include <time.h>
 
 struct Base
@@ -17,14 +16,15 @@ struct Base
 #define i_opt c_no_cmp
 #include <stc/carc.h>
 
+mtx_t mtx;
+
 void* thr(BaseRc* lp)
 {
     sleep(1);
-    static pthread_mutex_t mtx = PTHREAD_MUTEX_INITIALIZER;
-    c_autoscope (pthread_mutex_lock(&mtx), pthread_mutex_unlock(&mtx))
+    c_autoscope (mtx_lock(&mtx), mtx_unlock(&mtx))
     {
         printf("local pointer in a thread:\n"
-                "  p.get() = %p, p.use_count() = %ld\n", (void*)lp->get, *lp->use_count);
+               "  p.get() = %p, p.use_count() = %ld\n", (void*)lp->get, *lp->use_count);
         /* safe to modify base here */
         lp->get->value += 1;
     }
@@ -37,14 +37,15 @@ int main()
 {
     BaseRc p = BaseRc_from((Base){0});
 
+    mtx_init(&mtx, mtx_plain);
     printf("Created a Base\n"
            "  p.get() = %p, p.use_count() = %ld\n", (void*)p.get, *p.use_count);
     enum {N = 3};
-    pthread_t t[N];
+    thrd_t t[N];
     BaseRc c[N];
     c_forrange (i, N) {
         c[i] = BaseRc_clone(p);
-        pthread_create(&t[i], NULL, (void*(*)(void*))thr, &c[i]);
+        thrd_create(&t[i], (thrd_start_t)thr, &c[i]);
     }
 
     printf("Shared ownership between %d threads and released\n"
@@ -52,10 +53,10 @@ int main()
            "  p.get() = %p, p.use_count() = %ld\n", N, (void*)p.get, *p.use_count);
     BaseRc_reset(&p);
 
-    c_forrange (i, N) pthread_join(t[i], NULL);
+    c_forrange (i, N) thrd_join(t[i], NULL);
     printf("All threads completed, the last one deleted Base\n");
 }
 
-#else
-int main() {}
+#ifdef STC_TINYCTHREAD_H_
+#include "../src/threads.c"
 #endif

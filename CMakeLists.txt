@@ -1,7 +1,14 @@
 cmake_minimum_required(VERSION 3.1)
+
 project(stc)
 add_library(stc INTERFACE)
 target_include_directories(stc INTERFACE include)
+
+find_package(FLEX)
+find_package(Threads)
+
+flex_target(checkauto src/checkauto.l ${CMAKE_CURRENT_BINARY_DIR}/lex.yy.c)
+add_executable(checkauto ${FLEX_checkauto_OUTPUTS})
 
 include(CTest)
 if(BUILD_TESTING)
@@ -9,6 +16,10 @@ if(BUILD_TESTING)
 	foreach(file IN LISTS examples)
 		get_filename_component(name "${file}" NAME_WE)
 		add_executable(${name} ${file})
+	target_compile_options(${name} PRIVATE "-pthread")
+	if(CMAKE_THREAD_LIBS_INIT)
+		target_link_libraries(${name} PRIVATE "${CMAKE_THREAD_LIBS_INIT}")
+	endif()
 		target_link_libraries(${name} PRIVATE stc m)
 		add_test(NAME ${name} COMMAND ${name})
 	endforeach()
