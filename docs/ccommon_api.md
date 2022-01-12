@@ -1,10 +1,11 @@
-# STC [ccommon](../include/stc/ccommon.h): Common definitions and handy macros
+# STC [ccommon](../include/stc/ccommon.h): RAII and iterator macros
 
-The following handy macros are safe to use, i.e. have no side-effects.
+The following macros are recommended to use, and they safe/have no side-effects.
 
 ### c_auto, c_autovar, c_autoscope, c_autodefer
-General ***defer*** mechanics for resource acquisition. These macros allows to specify the release of the
-resource where the resource acquisition takes place. Makes it easier to verify that resources are released.
+General ***defer*** mechanics for resource acquisition. These macros allows you to specify the
+freeing of the resources at the point where the acquisition takes place.
+The **checkauto** utility described below, ensures that the `c_auto*` macros are used correctly.
 
 | Usage                                  | Description                                          |
 |:---------------------------------------|:-----------------------------------------------------|
@@ -17,13 +18,14 @@ resource where the resource acquisition takes place. Makes it easier to verify t
 For multiple variables, use either multiple **c_autovar** in sequence, or declare variable outside
 scope and use **c_autoscope**. Also, **c_auto** support up to 4 variables.
 ```c
-c_autovar (uint8_t* buf = c_alloc_n(uint8_t, N), c_free(buf))
+c_autovar (uint8_t* buf = malloc(BUF_SIZE), free(buf))
 c_autovar (FILE* f = fopen(fname, "rb"), fclose(f))
 {
     int n = 0;
-    if (f && buf)
-        n = fread(buf, 1, N, f);
-    if (n > 0) doSomething(buf, n);
+    if (f && buf) {
+        n = fread(buf, 1, BUF_SIZE, f);
+        doSomething(buf, n);
+    }
 }
 
 c_autovar (cstr s = cstr_new("Hello"), cstr_drop(&s))
@@ -69,9 +71,9 @@ cvec_str readFile(const char* name)
     cvec_str vec = cvec_str_init(); // returned
 
     c_autovar (FILE* fp = fopen(name, "r"), fclose(fp))
-        c_autovar (cstr line = cstr_null, cstr_drop(&line))
-            while (cstr_getline(&line, fp))
-                cvec_str_emplace_back(&vec, line.str);
+    c_autovar (cstr line = cstr_null, cstr_drop(&line))
+        while (cstr_getline(&line, fp))
+            cvec_str_emplace_back(&vec, line.str);
     return vec;
 }
 
@@ -86,7 +88,7 @@ int main()
 The **checkauto** program will check the source code for any misuses of the `c_auto*` macros which
 may lead to resource leakages. The `c_auto*`- macros are implemented as one-time executed **for-loops**,
 so any `return` or `break` appearing within such a block will lead to resource leaks, as it will disable
-the cleanup/drop method to be called. However, a `break` may (originally) been intended to break an immediate
+the cleanup/drop method to be called. However, a `break` may (originally) been intended to break the immediate
 loop/switch outside the `c_auto` scope, so it would not work as intended in any case. The **checkauto**
 tool will report any such misusages. In general, one should therefore first break out of any inner loops
 with `break`, then use `c_breakauto` to break out of the `c_auto` scope(s). After this `return` may be used.
@@ -94,19 +96,19 @@ with `break`, then use `c_breakauto` to break out of the `c_auto` scope(s). Afte
 Note that this is not a particular issue with the `c_auto*`-macros, as one must always make sure to unwind
 temporary allocated resources before a `return` in C. However, by using `c_auto*`-macros,
 - it is much easier to automatically detect misplaced return/break between resource acquisition and destruction.
-- it prevent forgetting to call the destructor at the end.
+- it prevents forgetting to call the destructor at the end.
 ```c
 for (int i = 0; i<n; ++i) {
     c_auto (List, list) {
         List_push_back(&list, i);
         if (cond1())
-            break; // checkauto Error
+            break; // checkauto: Error
         for (j = 0; j<m; ++j) {
             if (cond2())
                 break;  // OK (breaks for-loop only)
         }
         if (cond3())
-            return; // checkauto Error
+            return; // checkauto: Error
     }
     if (cond4())
         return; // OK (outside c_auto)

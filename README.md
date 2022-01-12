@@ -3,31 +3,12 @@
 STC - Smart Template Containers for C
 =====================================
 
-News
-----
-## Version 3 released
+News: Version 3 released (Jan 2022)
+-----------------------------------
 This version introduces lots of enhancements, bugfixes and additions. There are also
-a number of breaking changes, see below for changes and [a migration guide from version 2 to 3](#migration-guide-from-version-2-to-3).
+a number of [breaking changes](#brief-summary-of-changes) and [a migration guide from version 2 to 3](#migration-guide-from-version-2-to-3).
 With version 3, the API is freezed as far as possible. Any changes will be handled with long 
 lasting deprecations, so you may develop production code using it.
-
-### Brief summary of changes
-- Renamed: all ***_del*** to `_drop` (like destructors in Rust).
-- Renamed: all ***_compare*** to `_cmp`
-- Renamed: ***i_equ*** to `i_eq`, and ***_equalto*** to `_eq`.
-- Renamed: ***i_cnt*** to `i_type` for defining the complete container type name.
-- Renamed: type **csptr** to [**carc**](docs/carc_api.md) (atomic reference counted) smart pointer.
-- Renamed: ***i_key_csptr*** / ***i_val_csptr*** to `i_key_sptr` / `i_val_sptr` for specifying **carc** and **cbox** values in containers.
-- Renamed: *csptr_X_make()* to `carc_X_from()`.
-- Renamed: *cstr_lit()* to `cstr_new(literal)`, and *cstr_assign_fmt()* to `cstr_printf()`.
-- Renamed: *c_default_fromraw()* to `c_default_from()`.
-- Changed: the [**c_apply**](docs/ccommon_api.md) macros API.
-- Replaced: *csview_first_token()* and *csview_next_token()* with one function: `csview_token()`.
-- Added: **checkauto** tool for checking that c-source files uses `c_auto*` macros correctly.
-- Added: general `i_key_bind` / `i_val_bind` template parameters which auto-binds template functions.
-- Added: `i_opt` template parameter: compile-time options: `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`; may be combined with `|`
-- Added: [**cbox**](docs/cbox_api.md) type: smart pointer, similar to [Rust Box](https://doc.rust-lang.org/rust-by-example/std/box.html) and [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr).
-- Added: [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding"
 
 Introduction
 ------------
@@ -43,6 +24,7 @@ For an introduction to templated containers, please read the blog by Ian Fisher 
 Note that STC does not use long macro expansions anymore, but relies on one or more inclusions of the same file,
 which by the compiler is seen as different code because of macro name substitutions.
 
+- [***ccommon*** - RAII and iterator macros](docs/ccommon_api.md)
 - [***carr2, carr3*** - **2d** and **3d** dynamic **array** type](docs/carray_api.md)
 - [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
 - [***cbox*** - **std::unique_ptr** alike type](docs/cbox_api.md)
@@ -61,7 +43,7 @@ which by the compiler is seen as different code because of macro name substituti
 - [***cvec*** - **std::vector** alike type](docs/cvec_api.md)
 
 Others:
-- [***ccommon*** - Some handy macros and general definitions](docs/ccommon_api.md)
+- [***threads*** - Mimic **C11-threads** (by Marcus Geelnard)](include/threads.h)
 - [***crandom*** - A novel very fast *PRNG* named **stc64**](docs/crandom_api.md)
 - [***coption*** - Command line options scanner](docs/coption_api.md)
 
@@ -444,8 +426,27 @@ Memory efficiency
 - **carr2**, **carr3**: Type size: 1 pointer plus dimension variables. Arrays are allocated as one contiguous block of heap memory, and one allocation for pointers of indices to the array.
 - **carc**: Type size: 2 pointers, one for the data and one for the reference counter.
 
+# Version 3
 
-# Migration guide from version 2 to 3
+## Brief summary of changes
+- Renamed: all ***_del*** to `_drop` (like destructors in Rust).
+- Renamed: all ***_compare*** to `_cmp`
+- Renamed: ***i_equ*** to `i_eq`, and ***_equalto*** to `_eq`.
+- Renamed: ***i_cnt*** to `i_type` for defining the complete container type name.
+- Renamed: type **csptr** to [**carc**](docs/carc_api.md) (atomic reference counted) smart pointer.
+- Renamed: ***i_key_csptr*** / ***i_val_csptr*** to `i_key_sptr` / `i_val_sptr` for specifying **carc** and **cbox** values in containers.
+- Renamed: *csptr_X_make()* to `carc_X_from()`.
+- Renamed: *cstr_lit()* to `cstr_new(literal)`, and *cstr_assign_fmt()* to `cstr_printf()`.
+- Renamed: *c_default_fromraw()* to `c_default_from()`.
+- Changed: the [**c_apply**](docs/ccommon_api.md) macros API.
+- Replaced: *csview_first_token()* and *csview_next_token()* with one function: `csview_token()`.
+- Added: **checkauto** tool for checking that c-source files uses `c_auto*` macros correctly.
+- Added: general `i_key_bind` / `i_val_bind` template parameters which auto-binds template functions.
+- Added: `i_opt` template parameter: compile-time options: `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`; may be combined with `|`
+- Added: [**cbox**](docs/cbox_api.md) type: smart pointer, similar to [Rust Box](https://doc.rust-lang.org/rust-by-example/std/box.html) and [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr).
+- Added: [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding"
+
+## Migration guide from version 2 to 3
 Replace (regular expression) globally in code base (VS Code):
 - `_del\b` ⟶ `_drop`
 - `_compare\b` ⟶ `_cmp`
