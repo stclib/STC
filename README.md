@@ -309,8 +309,11 @@ other elements using dynamic memory or shared resources.
 
 The **emplace** methods ***constructs*** or ***clones*** the given elements when they are added
 to the container. In contrast, the *non-emplace* methods ***moves*** the given elements into the
-container. For containers of integral or trivial element types, **emplace** and corresponding
-*non-emplace* methods are identical.
+container. 
+
+***Note***: For containers with integral/trivial element types, or when neither `i_keyraw/i_valraw` nor 
+`i_valfrom/i_valfrom` are defined, the **emplace** functions are *not* available (or needed), as it
+can easier lead to mistakes.
 
 | non-emplace: Move         | emplace: Clone               | Container                                   |
 |:--------------------------|:-----------------------------|:--------------------------------------------|
