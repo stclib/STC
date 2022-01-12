@@ -213,8 +213,6 @@ int main(void) {
     }
 }
 ```
-**Note**: Do ***not*** `return` from inside a `c_auto*`-block. Instead, first `continue`, which will
-jump out of the block, then call `return` after the block.
 
 Output
 ```
@@ -269,25 +267,25 @@ The list of template parameters:
 
 - `i_key`     - Element key type for map/set only. **[required]**.
 - `i_val`     - Element value type. **[required]**. For cmap/csmap, it is the mapped value type.
-- `i_cmp`     - Three-way comparison of two `i_keyraw or i_valraw` pointers - **[required]** for non-integral raw types unless `i_opt c_no_cmp` is defined.
-- `i_hash`    - Hash function taking `i_keyraw *` and a size - defaults to `!i_cmp`.
+- `i_cmp`     - Three-way comparison of two `i_keyraw or i_valraw` pointers - **[required]** for non-integral valraw types unless `i_opt c_no_cmp` is defined.
+- `i_hash`    - Hash function taking `i_keyraw *` and a size - defaults to `!i_cmp`. **[required]** for non-POD valraw type.
 - `i_eq`      - Equality comparison of two `i_keyraw *` - defaults to `!i_cmp`. Companion with `i_hash`.
 
 Properties:
 - `i_tag`     - Container type name tag. Defaults to same as `i_key`
 - `i_type`    - Full container type name. Alternative to `i_tag`.
-- `i_opt`     - Boolean properties: may combine `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd` with `|` separator.
+- `i_opt`     - Boolean properties: may combine `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`, `c_static`, `c_header`, `c_implement` with `|` separator.
 
 Key:
 - `i_keydrop` - Destroy map/set key func - defaults to empty destructor.
 - `i_keyraw`  - Convertion "raw" type - defaults to `i_key` type.
-- `i_keyfrom` - Convertion func `i_key` <= `i_keyraw`. **[required]** if `i_keydrop` is defined. Works as *clone* when `i_keyraw` == `i_key` type. 
+- `i_keyfrom` - Convertion func `i_key` <= `i_keyraw`. **[required]** if `i_keydrop` is defined. Works as *clone* when `i_keyraw` not specified. 
 - `i_keyto`   - Convertion func `i_key *` => `i_keyraw`.
 
 Val:
 - `i_valdrop` - Destroy mapped or value func - defaults to empty destruct.
 - `i_valraw`  - Convertion "raw" type - defaults to `i_val` type.
-- `i_valfrom` - Convertion func `i_val` <= `i_valraw`. **[required]** if `i_valdrop` is defined.  Works as *clone* when `i_valraw` == `i_val` type. 
+- `i_valfrom` - Convertion func `i_val` <= `i_valraw`. **[required]** if `i_valdrop` is defined.  Works as *clone* when `i_valraw` not specified. 
 - `i_valto`   - Convertion func `i_val *` => `i_valraw`.
 
 Special:
@@ -298,9 +296,9 @@ Special:
 
 Notes:
 - For non-associative containers, `i_drop` and `i_from` may be defined instead of `i_valdrop` and `i_valfrom`.
-- Instead of defining `i_cmp`, you may define `i_opt c_no_cmp` to exclude methods using comparison.
-- Instead of defining `i_*from`, you may define `i_opt c_no_clone` to exclude methods using deep copy.
-- If a destructor `i_*drop` is defined, then either `i_*from` or `i_opt c_no_clone` is required to be defined.
+- Instead of defining `i_cmp`, you may define `i_opt c_no_cmp` to disable methods using comparison.
+- Instead of defining `i_*from`, you may define `i_opt c_no_clone` to disabled emplace and clone-functions.
+- If a destructor `i_*drop` is defined, then either `i_*from` or `i_opt c_no_clone` must be defined.
 
 The *emplace* versus non-emplace container methods
 --------------------------------------------------
@@ -311,8 +309,11 @@ other elements using dynamic memory or shared resources.
 
 The **emplace** methods ***constructs*** or ***clones*** the given elements when they are added
 to the container. In contrast, the *non-emplace* methods ***moves*** the given elements into the
-container. For containers of integral or trivial element types, **emplace** and corresponding
-*non-emplace* methods are identical.
+container. 
+
+***Note***: For containers with integral/trivial element types, or when neither `i_keyraw/i_valraw` nor 
+`i_valfrom/i_valfrom` are defined, the **emplace** functions are *not* available (or needed), as it
+can easier lead to mistakes.
 
 | non-emplace: Move         | emplace: Clone               | Container                                   |
 |:--------------------------|:-----------------------------|:--------------------------------------------|
