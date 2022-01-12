@@ -10,10 +10,15 @@ enum utf8_state {
 };
 
 /* number of codepoints in the utf8 string s, or SIZE_MAX if invalid utf8: */
-STC_API size_t utf8_codepoint_count(const char *s);
-STC_API size_t utf8_codepoint_count_n(const char *s, size_t n);
+STC_API size_t utf8_size(const char *s);
+STC_API size_t utf8_size_n(const char *s, size_t n);
+STC_API const char* utf8_at(const char *s, size_t index);
+
 /* decode next utf8 codepoint. */
 STC_API uint32_t utf8_decode(uint32_t *state, uint32_t *codep, const uint32_t byte);
+
+STC_INLINE bool utf8_valid(const char* str)
+    { return utf8_size(str) != SIZE_MAX; }
 
 STC_INLINE uint32_t utf8_peek(const char *s)
 {
@@ -41,10 +46,38 @@ STC_INLINE const char *utf8_next(const char *s)
     return (const char *)p;
 }
 
-// --------------------------- IMPLEMENTATION ---------------------------------
-#ifdef _i_implement
+#ifdef CSVIEW_H_INCLUDED
+STC_INLINE size_t csview_size_utf8(csview sv)
+    { return utf8_size(sv.str); }
 
-STC_DEF const uint8_t utf8_table[] = {
+STC_INLINE bool csview_valid_utf8(csview sv)
+    { return utf8_valid(sv.str); }
+
+STC_INLINE csview csview_from_utf8cp(const char* str)
+    { return c_make(csview){str, utf8_codepoint_width((uint8_t)str[0])}; }
+
+STC_INLINE csview csview_at_utf8(const char* str, size_t idx)
+    { return csview_from_utf8cp(utf8_at(str, idx)); }
+#endif
+
+#ifdef CSTR_H_INCLUDED
+STC_INLINE size_t cstr_size_utf8(cstr s)
+    { return utf8_size(cstr_str(&s)); }
+
+STC_INLINE bool cstr_valid_utf8(cstr s)
+    { return utf8_valid(cstr_str(&s)); }
+
+#endif
+
+// --------------------------- IMPLEMENTATION ---------------------------------
+// Copyright (c) 2008-2009 Bjoern Hoehrmann <bjoern@hoehrmann.de>
+// See http://bjoern.hoehrmann.de/utf-8/decoder/dfa/ for details.
+
+#ifdef _i_implement
+#ifdef _i_static
+static
+#endif
+const uint8_t utf8_table[] = {
      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
      0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0, 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -73,23 +106,35 @@ STC_DEF uint32_t utf8_decode(uint32_t *state, uint32_t *codep,
 }
 
 
-STC_DEF size_t utf8_codepoint_count(const char *s)
+STC_DEF size_t utf8_size(const char *s)
 {
     uint32_t state = 0, codepoint;
     size_t size = 0;
+
     while (*s)
         size += !utf8_decode(&state, &codepoint, (uint8_t)*s++);
     return size | (size_t) -(state != 0);
 }
 
-STC_DEF size_t utf8_codepoint_count_n(const char *s, size_t n)
+STC_DEF size_t utf8_size_n(const char *s, size_t n)
 {
     uint32_t state = 0, codepoint;
     size_t size = 0;
-    while (n-- && *s)
+
+    while ((n-- != 0) & (*s != 0))
         size += !utf8_decode(&state, &codepoint, (uint8_t)*s++);
     return size | (size_t) -(state != 0);
 }
+
+STC_DEF const char* utf8_at(const char *s, size_t index)
+{
+    uint32_t state = 0, codepoint;
+   
+    for (size_t size = 0; (size < index) & (*s != 0); ++s)
+        size += !utf8_decode(&state, &codepoint, (uint8_t)*s);
+    return s;
+}
+
 
 #endif
 #endif
