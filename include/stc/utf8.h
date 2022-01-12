@@ -47,26 +47,25 @@ STC_INLINE const char *utf8_next(const char *s)
 }
 
 #ifdef CSVIEW_H_INCLUDED
-STC_INLINE size_t csview_size_utf8(csview sv)
-    { return utf8_size(sv.str); }
-
 STC_INLINE bool csview_valid_utf8(csview sv)
     { return utf8_valid(sv.str); }
 
-STC_INLINE csview csview_from_utf8cp(const char* str)
-    { return c_make(csview){str, utf8_codepoint_width((uint8_t)str[0])}; }
-
-STC_INLINE csview csview_at_utf8(const char* str, size_t idx)
-    { return csview_from_utf8cp(utf8_at(str, idx)); }
+STC_INLINE size_t csview_size_utf8(csview sv)
+    { return utf8_size(sv.str); }
 #endif
 
 #ifdef CSTR_H_INCLUDED
-STC_INLINE size_t cstr_size_utf8(cstr s)
-    { return utf8_size(cstr_str(&s)); }
-
 STC_INLINE bool cstr_valid_utf8(cstr s)
     { return utf8_valid(cstr_str(&s)); }
 
+STC_INLINE size_t cstr_size_utf8(cstr s)
+    { return utf8_size(cstr_str(&s)); }
+
+STC_INLINE csview cstr_at_utf8(cstr s, size_t idx) {
+    const char* str = utf8_at(cstr_str(&s), idx);
+    csview sv = {str, utf8_codepoint_width((uint8_t)str[0])};
+    return sv;
+}
 #endif
 
 // --------------------------- IMPLEMENTATION ---------------------------------
