@@ -121,7 +121,7 @@ _cx_memb(_reset_from)(_cx_self* self, i_val val) {
 #if !c_option(c_no_clone) 
 #if !defined _i_no_raw
     STC_INLINE _cx_self
-    _cx_memb(_new)(i_valraw raw) { 
+    _cx_memb(_new)(_cx_raw raw) { 
         return c_make(_cx_self){c_new(i_val, i_valfrom(raw))};
     }
 #endif
@@ -153,7 +153,7 @@ _cx_memb(_value_hash)(const _cx_value* x, size_t n) {
     #elif c_option(c_no_cmp)
         return c_hash32(&x, 4);
     #else
-        i_valraw rx = i_valto(x);
+        _cx_raw rx = i_valto(x);
         return i_hash(&rx, sizeof rx);
     #endif
 }
@@ -163,7 +163,7 @@ _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     #if c_option(c_no_cmp)
         return c_default_cmp(&x, &y);
     #else
-        i_valraw rx = i_valto(x), ry = i_valto(x);
+        _cx_raw rx = i_valto(x), ry = i_valto(x);
         return i_cmp(&rx, &ry);
     #endif
 }
@@ -173,7 +173,7 @@ _cx_memb(_value_eq)(const _cx_value* x, const _cx_value* y) {
     #if c_option(c_no_cmp)
         return x == y;
     #else
-        i_valraw rx = i_valto(x), ry = i_valto(x);
+        _cx_raw rx = i_valto(x), ry = i_valto(x);
         return i_eq(&rx, &ry);
     #endif
 }
