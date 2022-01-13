@@ -169,11 +169,6 @@
     #define i_keyraw i_key
     #define i_keyto c_default_toraw
   #endif
-  #if !defined i_eq && defined i_cmp
-    #define i_eq !i_cmp
-  #elif !defined i_eq
-    #define i_eq c_default_eq
-  #endif
   #ifndef i_keydrop
     #define i_keydrop c_default_drop
   #endif
@@ -199,6 +194,11 @@
 #endif
 #ifndef i_valdrop
   #define i_valdrop c_default_drop
+#endif
+#if !defined i_eq && defined i_cmp
+  #define i_eq !i_cmp
+#elif !defined i_eq
+  #define i_eq c_default_eq
 #endif
 #ifndef i_cmp
   #define i_cmp c_default_cmp

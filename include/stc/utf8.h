@@ -27,19 +27,20 @@ STC_INLINE uint32_t utf8_peek(const char *s)
     return codepoint;
 }
 
-STC_INLINE int utf8_codepoint_width(uint8_t c)
+STC_INLINE int utf8_codepoint_width(char c)
 {
-    int ret = (c & 0xF0) == 0xE0;
+    uint8_t u = (uint8_t)c;
+    int ret = (u & 0xF0) == 0xE0;
     ret += ret << 1;                       // 3
-    ret |= c < 0x80;                       // 1
-    ret |= ((0xC1 < c) & (c < 0xE0)) << 1; // 2
-    ret |= ((0xEF < c) & (c < 0xF5)) << 2; // 4
+    ret |= u < 0x80;                       // 1
+    ret |= ((0xC1 < u) & (u < 0xE0)) << 1; // 2
+    ret |= ((0xEF < u) & (u < 0xF5)) << 2; // 4
     return ret;
 }
 
 STC_INLINE const char *utf8_next(const char *s)
 {
-    const char* t = s + utf8_codepoint_width((uint8_t)s[0]);
+    const char* t = s + utf8_codepoint_width(s[0]);
     
     uintptr_t p = (uintptr_t)t;
     p &= (uintptr_t) -(*s != 0);
@@ -52,6 +53,12 @@ STC_INLINE bool csview_valid_utf8(csview sv)
 
 STC_INLINE size_t csview_size_utf8(csview sv)
     { return utf8_size(sv.str); }
+
+STC_INLINE csview csview_substr_utf8(csview sv, size_t pos, size_t n) {
+    sv.str = utf8_at(sv.str, pos);
+    sv.size = utf8_at(sv.str, n) - sv.str;
+    return sv;
+}
 #endif
 
 #ifdef CSTR_H_INCLUDED
@@ -61,9 +68,9 @@ STC_INLINE bool cstr_valid_utf8(cstr s)
 STC_INLINE size_t cstr_size_utf8(cstr s)
     { return utf8_size(cstr_str(&s)); }
 
-STC_INLINE csview cstr_at_utf8(cstr s, size_t idx) {
-    const char* str = utf8_at(cstr_str(&s), idx);
-    csview sv = {str, utf8_codepoint_width((uint8_t)str[0])};
+STC_INLINE csview cstr_substr_utf8(cstr s, size_t pos, size_t n) {
+    csview sv = {utf8_at(cstr_str(&s), pos)};
+    sv.size = utf8_at(sv.str, n) - sv.str;
     return sv;
 }
 #endif

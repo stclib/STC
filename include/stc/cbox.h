@@ -170,6 +170,11 @@ _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
 
 STC_INLINE bool
 _cx_memb(_value_eq)(const _cx_value* x, const _cx_value* y) {
-    return !_cx_memb(_value_cmp)(x, y);
+    #if c_option(c_no_cmp)
+        return x == y;
+    #else
+        i_valraw rx = i_valto(x), ry = i_valto(x);
+        return i_eq(&rx, &ry);
+    #endif
 }
 #include "template.h"
