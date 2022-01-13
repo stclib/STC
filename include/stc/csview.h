@@ -24,6 +24,7 @@
 #define CSVIEW_H_INCLUDED
 
 #include "ccommon.h"
+#include "utf8.h"
 
 typedef                 struct csview { const char* str; size_t size; } csview;
 typedef                 struct csview_iter { const char *ref; } csview_iter;
@@ -73,6 +74,20 @@ STC_INLINE csview_iter  csview_end(const csview* self)
                             { return c_make(csview_iter){self->str + self->size}; }
 STC_INLINE void         csview_next(csview_iter* it) { ++it->ref; }
 
+/* utf8 */
+STC_INLINE bool csview_valid_utf8(csview sv)
+    { return utf8_valid(sv.str); }
+
+STC_INLINE size_t csview_size_utf8(csview sv)
+    { return utf8_size(sv.str); }
+
+STC_INLINE csview utf8_substr(const char* str, size_t pos, size_t n) {
+    csview sv;
+    sv.str = utf8_at(str, pos);
+    sv.size = utf8_at(sv.str, n) - sv.str;
+    return sv;
+}
+
 /* csview interaction with cstr: */
 #ifdef CSTR_H_INCLUDED
 
@@ -96,8 +111,8 @@ STC_INLINE cstr*        cstr_append_v(cstr* self, csview sv)
                             { return cstr_append_n(self, sv.str, sv.size); }
 STC_INLINE void         cstr_insert_v(cstr* self, size_t pos, csview sv)
                             { cstr_replace_n(self, pos, 0, sv.str, sv.size); }
-STC_INLINE void         cstr_replace_v(cstr* self, size_t pos, size_t len, csview sv)
-                            { cstr_replace_n(self, pos, len, sv.str, sv.size); }
+STC_INLINE void         cstr_replace_v(cstr* self, csview sub, csview with)
+                            { cstr_replace_n(self, sub.str - self->str, sub.size, with.str, with.size); }
 STC_INLINE bool         cstr_equals_v(cstr s, csview sv)
                             { return sv.size == cstr_size(s) && !memcmp(s.str, sv.str, sv.size); }
 STC_INLINE size_t       cstr_find_v(cstr s, csview needle)

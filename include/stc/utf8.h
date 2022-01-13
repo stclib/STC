@@ -1,6 +1,21 @@
 #ifndef UTF8_H_INCLUDED
 #define UTF8_H_INCLUDED
+/*
+// Example:
+#include <stc/cstr.h>
+#include <stc/csview.h>
 
+int main()
+{
+    c_auto (cstr, s1) {
+        s1 = cstr_new("hell😀 world");
+        cstr_replace_v(&s1, utf8_substr(s1.str, 4, 1), c_sv("x"));
+        printf("%s\n", s1.str);
+    }
+}
+// Output:
+// Hellx world
+*/
 #include "ccommon.h"
 #include <ctype.h>
 
@@ -27,7 +42,7 @@ STC_INLINE uint32_t utf8_peek(const char *s)
     return codepoint;
 }
 
-STC_INLINE int utf8_codepoint_width(char c)
+STC_INLINE int utf8_codepoint_size(char c)
 {
     uint8_t u = (uint8_t)c;
     int ret = (u & 0xF0) == 0xE0;
@@ -40,40 +55,12 @@ STC_INLINE int utf8_codepoint_width(char c)
 
 STC_INLINE const char *utf8_next(const char *s)
 {
-    const char* t = s + utf8_codepoint_width(s[0]);
+    const char* t = s + utf8_codepoint_size(s[0]);
     
     uintptr_t p = (uintptr_t)t;
     p &= (uintptr_t) -(*s != 0);
     return (const char *)p;
 }
-
-#ifdef CSVIEW_H_INCLUDED
-STC_INLINE bool csview_valid_utf8(csview sv)
-    { return utf8_valid(sv.str); }
-
-STC_INLINE size_t csview_size_utf8(csview sv)
-    { return utf8_size(sv.str); }
-
-STC_INLINE csview csview_substr_utf8(csview sv, size_t pos, size_t n) {
-    sv.str = utf8_at(sv.str, pos);
-    sv.size = utf8_at(sv.str, n) - sv.str;
-    return sv;
-}
-#endif
-
-#ifdef CSTR_H_INCLUDED
-STC_INLINE bool cstr_valid_utf8(cstr s)
-    { return utf8_valid(cstr_str(&s)); }
-
-STC_INLINE size_t cstr_size_utf8(cstr s)
-    { return utf8_size(cstr_str(&s)); }
-
-STC_INLINE csview cstr_substr_utf8(cstr s, size_t pos, size_t n) {
-    csview sv = {utf8_at(cstr_str(&s), pos)};
-    sv.size = utf8_at(sv.str, n) - sv.str;
-    return sv;
-}
-#endif
 
 // --------------------------- IMPLEMENTATION ---------------------------------
 // Copyright (c) 2008-2009 Bjoern Hoehrmann <bjoern@hoehrmann.de>
@@ -135,9 +122,9 @@ STC_DEF size_t utf8_size_n(const char *s, size_t n)
 STC_DEF const char* utf8_at(const char *s, size_t index)
 {
     uint32_t state = 0, codepoint;
-   
-    for (size_t size = 0; (size < index) & (*s != 0); ++s)
-        size += !utf8_decode(&state, &codepoint, (uint8_t)*s);
+
+    for (size_t k = 0; (k < index) & (*s != 0); ++s)
+        k += !utf8_decode(&state, &codepoint, (uint8_t)*s);
     return s;
 }
 
