@@ -31,7 +31,6 @@
 #include <ctype.h>
 
 typedef                 struct cstr { char* str; } cstr;
-typedef                 struct cstr_iter { char *ref; } cstr_iter;
 typedef                 char cstr_value;
 #define                 cstr_npos (SIZE_MAX >> 1)
 
@@ -110,11 +109,6 @@ STC_INLINE void         cstr_erase(cstr* self, const size_t pos)
 STC_INLINE char*        cstr_front(cstr* self) { return self->str; }
 STC_INLINE char*        cstr_back(cstr* self)
                             { return self->str + _cstr_rep(self)->size - 1; }
-STC_INLINE cstr_iter    cstr_begin(cstr* self)
-                            { return c_make(cstr_iter){self->str}; }
-STC_INLINE cstr_iter    cstr_end(cstr* self)
-                            { return c_make(cstr_iter){self->str + _cstr_rep(self)->size}; }
-STC_INLINE void         cstr_next(cstr_iter* it) {++it->ref; }
 STC_INLINE bool         cstr_equals(cstr s, const char* str)
                             { return strcmp(s.str, str) == 0; }
 STC_INLINE bool         cstr_equals_s(cstr s1, cstr s2)

@@ -8,13 +8,18 @@
 int main()
 {
     c_auto (cstr, s1) {
-        s1 = cstr_new("hell😀 world");
-        cstr_replace_v(&s1, utf8_substr(s1.str, 4, 1), c_sv("x"));
+        s1 = cstr_new("hell😀 w😀rld");
+        cstr_replace_v(&s1, utf8_substr(s1.str, 7, 1), c_sv("x"));
         printf("%s\n", s1.str);
+
+        csview sv = csview_from_s(s1);
+        c_foreach (i, csview, sv)
+            printf(c_PRIsv ",", c_ARGsv(i.cp));
     }
 }
 // Output:
-// Hellx world
+// hell😀 wxrld
+// h,e,l,l,😀, ,w,x,r,l,d,
 */
 #include "ccommon.h"
 #include <ctype.h>
@@ -32,20 +37,21 @@ STC_API const char* utf8_at(const char *s, size_t index);
 /* decode next utf8 codepoint. */
 STC_API uint32_t utf8_decode(uint32_t *state, uint32_t *codep, const uint32_t byte);
 
-STC_INLINE bool utf8_valid(const char* str)
-    { return utf8_size(str) != SIZE_MAX; }
+STC_INLINE size_t utf8_pos(const char* s, size_t index) 
+    { return utf8_at(s, index) - s; }
 
-STC_INLINE uint32_t utf8_peek(const char *s)
-{
+STC_INLINE bool utf8_valid(const char* s)
+    { return utf8_size(s) != SIZE_MAX; }
+
+STC_INLINE uint32_t utf8_peek(const char *s) {
     uint32_t state = 0, codepoint;
-    utf8_decode(&state, &codepoint, (uint8_t)s[0]);
+    utf8_decode(&state, &codepoint, (uint8_t)*s);
     return codepoint;
 }
 
-STC_INLINE int utf8_codepoint_size(char c)
-{
+STC_INLINE size_t utf8_codepoint_size(char c) {
     uint8_t u = (uint8_t)c;
-    int ret = (u & 0xF0) == 0xE0;
+    size_t ret = (u & 0xF0) == 0xE0;
     ret += ret << 1;                       // 3
     ret |= u < 0x80;                       // 1
     ret |= ((0xC1 < u) & (u < 0xE0)) << 1; // 2
@@ -53,9 +59,8 @@ STC_INLINE int utf8_codepoint_size(char c)
     return ret;
 }
 
-STC_INLINE const char *utf8_next(const char *s)
-{
-    const char* t = s + utf8_codepoint_size(s[0]);
+STC_INLINE const char *utf8_next(const char *s) {
+    const char* t = s + utf8_codepoint_size(*s);
     
     uintptr_t p = (uintptr_t)t;
     p &= (uintptr_t) -(*s != 0);
@@ -127,7 +132,6 @@ STC_DEF const char* utf8_at(const char *s, size_t index)
         k += !utf8_decode(&state, &codepoint, (uint8_t)*s);
     return s;
 }
-
 
 #endif
 #endif
