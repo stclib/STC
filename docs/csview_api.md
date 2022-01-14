@@ -56,24 +56,24 @@ void          csview_next(csview_iter* it);
 ```
 #### Extended cstr methods
 ```c
-cstr          cstr_from_v(csview sv);                         // construct cstr from csview
-csview        cstr_to_v(const cstr* self);                    // convert to csview from cstr*
-cstr          cstr_from_replace_all_v(csview sv, csview find, csview replace);
+cstr          cstr_from_sv(csview sv);                        // construct cstr from csview
+csview        cstr_to_sv(const cstr* self);                   // convert to csview from cstr*
+cstr          cstr_from_replace_all_sv(csview sv, csview find, csview replace);
 
 csview        cstr_sv(cstr s);                                // convert to csview from cstr
 csview        cstr_substr(cstr s, intptr_t pos, size_t n);    // negative pos counts from end
 csview        cstr_slice(cstr s, intptr_t p1, intptr_t p2);   // negative p1, p2 counts from end
 
-cstr*         cstr_assign_v(cstr* self, csview sv);
-cstr*         cstr_append_v(cstr* self, csview sv);
-void          cstr_insert_v(cstr* self, size_t pos, csview sv);
-void          cstr_replace_v(cstr* self, size_t pos, size_t len, csview sv);
+cstr*         cstr_assign_sv(cstr* self, csview sv);
+cstr*         cstr_append_sv(cstr* self, csview sv);
+void          cstr_insert_sv(cstr* self, size_t pos, csview sv);
+void          cstr_replace_sv(cstr* self, size_t pos, size_t len, csview sv);
 
-bool          cstr_equals_v(cstr s, csview sv);
-size_t        cstr_find_v(cstr s, csview needle);
-bool          cstr_contains_v(cstr s, csview needle);
-bool          cstr_starts_with_v(cstr s, csview sub);
-bool          cstr_ends_with_v(cstr s, csview sub);
+bool          cstr_equals_sv(cstr s, csview sv);
+size_t        cstr_find_sv(cstr s, csview needle);
+bool          cstr_contains_sv(cstr s, csview needle);
+bool          cstr_starts_with_sv(cstr s, csview sub);
+bool          cstr_ends_with_sv(cstr s, csview sub);
 ```
 #### Helper methods
 ```c
@@ -114,8 +114,8 @@ int main ()
     printf(c_PRIsv c_PRIsv c_PRIsv "\n", c_ARGsv(sv1), c_ARGsv(sv2), c_ARGsv(sv3));
 
     cstr s1 = cstr_new("Apples are red");
-    cstr s2 = cstr_from_v(cstr_substr(s1, -3, 3));  // "red"
-    cstr s3 = cstr_from_v(cstr_substr(s1, 0, 6));   // "Apples"
+    cstr s2 = cstr_from_sv(cstr_substr(s1, -3, 3));  // "red"
+    cstr s3 = cstr_from_sv(cstr_substr(s1, 0, 6));   // "Apples"
     printf("%s %s\n", s2, s3.str);
 
     c_drop(cstr, &str1, &s1, &s2, &s3);
@@ -153,7 +153,7 @@ cvec_str string_split(csview str, csview sep)
     size_t pos = 0;
     while (pos != str.size) {
         csview tok = csview_token(str, sep, &pos);
-        cvec_str_push_back(&vec, cstr_from_v(tok));
+        cvec_str_push_back(&vec, cstr_from_sv(tok));
     }
     return vec;
 }

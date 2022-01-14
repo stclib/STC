@@ -14,7 +14,7 @@ int  main()
            c_ARGsv(year), c_ARGsv(month), c_ARGsv(day));
 
     c_auto (cstr, y, m, d) {
-        y = cstr_from_v(year), m = cstr_from_v(month), d = cstr_from_v(day);
+        y = cstr_from_sv(year), m = cstr_from_sv(month), d = cstr_from_sv(day);
         printf("%s, %s, %s\n", y.str, m.str, d.str);
     }
 }

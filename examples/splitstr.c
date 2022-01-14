@@ -18,7 +18,7 @@ cvec_str string_split(csview str, csview sep)
     size_t pos = 0;
     while (pos != str.size) {
         csview tok = csview_token(str, sep, &pos);
-        cvec_str_push_back(&vec, cstr_from_v(tok));
+        cvec_str_push_back(&vec, cstr_from_sv(tok));
     }
     return vec;
 }

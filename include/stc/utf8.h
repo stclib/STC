@@ -9,7 +9,7 @@ int main()
 {
     c_auto (cstr, s1) {
         s1 = cstr_new("hell😀 w😀rld");
-        cstr_replace_v(&s1, utf8_substr(s1.str, 7, 1), c_sv("x"));
+        cstr_replace_sv(&s1, utf8_substr(s1.str, 7, 1), c_sv("x"));
         printf("%s\n", s1.str);
 
         csview sv = csview_from_s(s1);
