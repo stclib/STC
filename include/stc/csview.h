@@ -24,11 +24,8 @@
 #define CSVIEW_H_INCLUDED
 
 #include "ccommon.h"
+#include "forward.h"
 #include "utf8.h"
-
-typedef                 struct csview { const char* str; size_t size; } csview;
-typedef                 union csview_iter { const char *ref; csview cp; } csview_iter;
-typedef                 char csview_value;
 
 #define                 csview_null  c_make(csview){"", 0}
 #define                 csview_npos  (SIZE_MAX >> 1)

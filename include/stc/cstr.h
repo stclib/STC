@@ -24,14 +24,13 @@
 #define CSTR_H_INCLUDED
 
 #include "ccommon.h"
+#include "forward.h"
 #include <stdlib.h> /* malloc */
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h> /* vsnprintf */
 #include <ctype.h>
 
-typedef                 struct cstr { char* str; } cstr;
-typedef                 char cstr_value;
 #define                 cstr_npos (SIZE_MAX >> 1)
 
 typedef struct          { size_t size, cap; char str[]; } _cstr_rep_t;
@@ -62,7 +61,6 @@ STC_API size_t          cstr_find_n(cstr s, const char* needle, size_t pos, size
 STC_API bool            cstr_getdelim(cstr *self, int delim, FILE *stream);
 
 STC_API char*           c_strnstrn(const char* s, const char* needle, size_t slen, size_t nlen);
-STC_API int             c_strncasecmp(const char* s1, const char* s2, size_t nmax);
 
 STC_INLINE cstr         cstr_init() { return cstr_null; }
 #define                 cstr_str(self) (self)->str

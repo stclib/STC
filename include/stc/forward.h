@@ -40,6 +40,13 @@
 #define forward_cqueue(CX, VAL) _c_cdeq_types(CX, VAL)
 #define forward_cvec(CX, VAL) _c_cvec_types(CX, VAL)
 
+typedef struct cstr { char* str; } cstr;
+typedef char cstr_value;
+
+typedef struct csview { const char* str; size_t size; } csview;
+typedef union csview_iter { const char *ref; csview cp; } csview_iter;
+typedef char csview_value;
+
 #ifndef MAP_SIZE_T
 #define MAP_SIZE_T uint32_t
 #endif

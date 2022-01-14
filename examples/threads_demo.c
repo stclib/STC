@@ -19,10 +19,10 @@ mtx_t mtx;
 
 void* thr(BaseArc* p)
 {
-    thrd_sleep(&(struct timespec){.tv_sec=1}, NULL); // sleep 1 sec
+    struct timespec one_sec = {.tv_sec=1};
+    thrd_sleep(&one_sec, NULL);
     BaseArc lp = BaseArc_clone(*p);  // thread-safe, even though the
                                      // shared use_count is incremented
-
     c_autoscope (mtx_lock(&mtx), mtx_unlock(&mtx))
     {
         printf("local pointer in a thread:\n"
@@ -30,7 +30,6 @@ void* thr(BaseArc* p)
         /* safe to modify base here */
         lp.get->value += 1;
     }
-    /* atomically decrease ref. */
     BaseArc_drop(&lp);
     BaseArc_drop(p);
     return NULL;
@@ -43,17 +42,19 @@ int main()
     mtx_init(&mtx, mtx_plain);
     printf("Created a shared Base\n"
            "  p.get() = %p, p.use_count() = %ld\n", (void*)p.get, BaseArc_use_count(p));
-    thrd_t t1, t2, t3;
-    thrd_create(&t1, (thrd_start_t)thr, (BaseArc[]){BaseArc_clone(p)});
-    thrd_create(&t2, (thrd_start_t)thr, (BaseArc[]){BaseArc_clone(p)});
-    thrd_create(&t3, (thrd_start_t)thr, (BaseArc[]){BaseArc_clone(p)});
+    enum {N = 3};
+    struct { thrd_t t; BaseArc p; } task[N];
+    c_forrange (i, N) { 
+        task[i].p = BaseArc_clone(p);
+        thrd_create(&task[i].t, (thrd_start_t)thr, &task[i].p);
+    }
 
     BaseArc_reset(&p);
-    printf("Shared ownership between 3 threads and released\n"
+    printf("Shared ownership between %d threads and released\n"
            "ownership from main:\n"
-           "  p.get() = %p, p.use_count() = %ld\n", (void*)p.get, BaseArc_use_count(p));
+           "  p.get() = %p, p.use_count() = %ld\n", N, (void*)p.get, BaseArc_use_count(p));
 
-    thrd_join(t1, NULL); thrd_join(t3, NULL); thrd_join(t3, NULL);
+    c_forrange (i, N) thrd_join(task[i].t, NULL);
     printf("All threads completed, the last one deleted Base\n");
 }
 
