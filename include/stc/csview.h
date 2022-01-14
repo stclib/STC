@@ -69,18 +69,18 @@ STC_INLINE bool         csview_ends_with(csview sv, csview sub)
                             { if (sub.size > sv.size) return false;
                               return !memcmp(sv.str + sv.size - sub.size, sub.str, sub.size); }
 STC_INLINE csview_iter  csview_begin(const csview* self)
-                            { return c_make(csview_iter){.cp = {self->str, utf8_codepoint_size(*self->str)}}; }
+                            { return c_make(csview_iter){.cp = {self->str, utf8_codepoint_size(self->str)}}; }
 STC_INLINE csview_iter  csview_end(const csview* self)
                             { return c_make(csview_iter){self->str + self->size}; }
 STC_INLINE void         csview_next(csview_iter* it)
-                            { it->ref += it->cp.size; it->cp.size = utf8_codepoint_size(*it->ref); }
+                            { it->ref += it->cp.size; it->cp.size = utf8_codepoint_size(it->ref); }
 
 /* utf8 */
-STC_INLINE bool csview_valid_utf8(csview sv)
-    { return utf8_valid(sv.str); }
+STC_INLINE bool utf8_valid_sv(csview sv)
+    { return utf8_size_n(sv.str, sv.size) != SIZE_MAX; }
 
-STC_INLINE size_t csview_size_utf8(csview sv)
-    { return utf8_size(sv.str); }
+STC_INLINE size_t utf8_size_sv(csview sv)
+    { return utf8_size_n(sv.str, sv.size); }
 
 STC_INLINE csview utf8_substr(const char* str, size_t pos, size_t n) {
     csview sv;

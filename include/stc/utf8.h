@@ -49,8 +49,8 @@ STC_INLINE uint32_t utf8_peek(const char *s) {
     return codepoint;
 }
 
-STC_INLINE size_t utf8_codepoint_size(char c) {
-    uint8_t u = (uint8_t)c;
+STC_INLINE size_t utf8_codepoint_size(const char* s) {
+    uint8_t u = *(const uint8_t *)s;
     size_t ret = (u & 0xF0) == 0xE0;
     ret += ret << 1;                       // 3
     ret |= u < 0x80;                       // 1
@@ -60,7 +60,7 @@ STC_INLINE size_t utf8_codepoint_size(char c) {
 }
 
 STC_INLINE const char *utf8_next(const char *s) {
-    const char* t = s + utf8_codepoint_size(*s);
+    const char* t = s + utf8_codepoint_size(s);
     
     uintptr_t p = (uintptr_t)t;
     p &= (uintptr_t) -(*s != 0);
