@@ -1,6 +1,5 @@
 
 #include <stdio.h>
-#include <stc/cstr.h>
 
 #define i_tag i
 #define i_val int
