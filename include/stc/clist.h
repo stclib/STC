@@ -304,14 +304,14 @@ _cx_memb(_remove)(_cx_self* self, i_valraw val) {
     return n;
 }
 
-STC_DEF int
+static int
 _cx_memb(_sort_cmp_)(const clist_VOID_node* x, const clist_VOID_node* y) {
     i_valraw a = i_valto(&((const _cx_node *) x)->value);
     i_valraw b = i_valto(&((const _cx_node *) y)->value);
     return i_cmp(&a, &b);
 }
 
-STC_API clist_VOID_node*
+static clist_VOID_node*
 _clist_mergesort(clist_VOID_node *list, int (*cmp)(const clist_VOID_node*, const clist_VOID_node*));
 
 STC_DEF void
@@ -342,7 +342,7 @@ _clist_count(const clist_VOID* self) {
 #if !c_option(c_no_cmp)
 // Singly linked list Mergesort implementation by Simon Tatham. O(n*log n).
 // https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
-STC_DEF clist_VOID_node *
+static clist_VOID_node *
 _clist_mergesort(clist_VOID_node *list, int (*cmp)(const clist_VOID_node*, const clist_VOID_node*)) {
     clist_VOID_node *p, *q, *e, *tail, *oldhead;
     int insize = 1, nmerges, psize, qsize, i;

@@ -296,7 +296,7 @@ _cx_memb(_push_back)(_cx_self* self, i_val value) {
     *v = value; return v;
 }
 
-STC_DEF _cx_value*
+static _cx_value*
 _cx_memb(_insert_space_)(_cx_self* self, _cx_value* pos, const size_t len) {
     const size_t idx = pos - self->data, size = cvec_rep_(self)->size;
     if (len == 0) return pos;
