@@ -57,8 +57,11 @@ typedef enum {
 STC_INLINE cregex cregex_init(void)
     { cregex rx = {NULL}; return rx; }
 
-/* compile regular expression */
+/* create and compile a regular expression */
 STC_API cregex cregex_new(const char *re);
+
+/* compile regular expression: reuse previous regex only */
+STC_API bool cregex_compile(cregex* rx, const char *re);
 
 /* get error type if a function failed */
 STC_API cregex_error_t cregex_error(void);
@@ -194,14 +197,14 @@ static bool _rx_anchor_begin_is_match(cregex_node *node, const char *orig,
                                       const char *cur, const char **next)
 {
     *next = cur;
-    return strlen(orig) == strlen(cur);
+    return orig == cur;
 }
 
 static bool _rx_anchor_end_is_match(cregex_node *node, const char *orig,
                                     const char *cur, const char **next)
 {
     *next = cur;
-    return strlen(cur) == 0;
+    return *cur == 0;
 }
 
 static bool _rx_any_is_match(cregex_node *node, const char *orig,
@@ -845,34 +848,32 @@ static cregex_node *_rx_compile(const char *re, const char *end, cregex_node *no
 
 STC_DEF cregex cregex_new(const char *re)
 {
-    cregex ret = {NULL};
+    cregex rx = {NULL};
+    cregex_compile(&rx, re);
+    return rx;
+}
 
+STC_DEF bool cregex_compile(cregex* rx, const char *re)
+{
     _rx_clear_compile_exception();
-    if (re == NULL) {
-        _rx_CompileException.err = cregex_INVALID_PARAMS;
-        return ret;
-    }
 
     if (!utf8_valid(re)) {
         _rx_CompileException.err = cregex_INVALID_UTF8;
         _rx_CompileException.s = NULL;
-        return ret;
+        return false;
     }
-
-    cregex_node *nodes = NULL;
 
     if (setjmp(_rx_CompileException.buf)) {
         // Error callback
-        free(nodes);
-        return ret;
+        c_free(rx->nodes);
+        rx->nodes = NULL;
+        return false;
     }
 
     const size_t compile_len = _rx_calc_compiled_len(re);
-    nodes = (cregex_node *)calloc(compile_len, sizeof(cregex_node));
-    _rx_compile(re, re + strlen(re), nodes);
-    ret.nodes = nodes;
-
-    return ret;
+    rx->nodes = (cregex_node *)c_realloc(rx->nodes, compile_len * sizeof(cregex_node));
+    _rx_compile(re, re + strlen(re), rx->nodes);
+    return true;
 }
 
 STC_DEF cregex_error_t cregex_error(void)
@@ -924,7 +925,7 @@ STC_API bool cregex_find_next_sv(cregex *rx, const char *s, csview *sv)
 
 STC_DEF void cregex_drop(cregex *rx)
 {
-    free(rx->nodes);
+    c_free(rx->nodes);
 }
 
 /* calculate amount of capture groups
