@@ -57,6 +57,9 @@ typedef enum {
 STC_INLINE cregex cregex_init(void)
     { cregex rx = {NULL}; return rx; }
 
+STC_INLINE bool cregex_valid(cregex rx)
+    { return rx.nodes != NULL; }
+
 /* create and compile a regular expression */
 STC_API cregex cregex_new(const char *re);
 
@@ -297,7 +300,7 @@ static bool _rx_or_is_match(cregex_node *node, const char *orig,
 }
 
 /* Global error value with callback address */
-struct {
+static struct {
     cregex_error_t err;
     const char *s;
     jmp_buf buf;

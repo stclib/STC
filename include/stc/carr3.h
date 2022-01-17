@@ -129,7 +129,7 @@ STC_DEF _cx_self _cx_memb(_clone)(_cx_self src) {
     return _arr;
 }
 
-STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
+STC_DEF void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     if (self->data == other.data) return;
     _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
 }

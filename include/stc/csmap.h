@@ -57,7 +57,6 @@ int main(void) {
 
 struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
 #define _csmap_rep(self) c_container_of((self)->nodes, struct csmap_rep, nodes)
-static struct csmap_rep _csmap_sentinel = {0, 0, 0, 0, 0};
 #endif // CSMAP_H_INCLUDED
 
 #ifndef _i_prefix
@@ -102,6 +101,7 @@ STC_API _cx_value       _cx_memb(_value_clone)(_cx_value _val);
 #if !defined _i_no_raw
 STC_API _cx_result      _cx_memb(_emplace)(_cx_self* self, i_keyraw rkey _i_MAP_ONLY(, i_valraw rmapped));
 #endif
+STC_API _cx_self        _cx_memb(_init)(void);
 STC_API _cx_result      _cx_memb(_insert)(_cx_self* self, i_key key _i_MAP_ONLY(, i_val mapped));
 STC_API void            _cx_memb(_drop)(_cx_self* self);
 STC_API bool            _cx_memb(_reserve)(_cx_self* self, size_t cap);
@@ -125,12 +125,6 @@ STC_INLINE const _cx_value* _cx_memb(_get)(const _cx_self* self, i_keyraw rkey)
                             { _cx_iter it; return _cx_memb(_find_it)(self, rkey, &it); }
 STC_INLINE _cx_value*   _cx_memb(_get_mut)(_cx_self* self, i_keyraw rkey)
                             { _cx_iter it; return _cx_memb(_find_it)(self, rkey, &it); }
-
-STC_INLINE _cx_self
-_cx_memb(_init)(void) {
-    _cx_self tree = {(_cx_node *)_csmap_sentinel.nodes};
-    return tree;
-}
 
 STC_INLINE _cx_self
 _cx_memb(_with_capacity)(const size_t cap) {
@@ -205,6 +199,16 @@ _cx_memb(_advance)(_cx_iter it, size_t n) {
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(_i_implement)
+
+#ifndef CSMAP_H_INCLUDED
+static struct csmap_rep _csmap_sentinel = {0, 0, 0, 0, 0};
+#endif
+
+STC_DEF _cx_self
+_cx_memb(_init)(void) {
+    _cx_self tree = {(_cx_node *)_csmap_sentinel.nodes};
+    return tree;
+}
 
 STC_DEF _cx_value*
 _cx_memb(_front)(const _cx_self* self) {

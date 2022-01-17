@@ -66,7 +66,6 @@ int main() {
 
 struct cvec_rep { size_t size, cap; void* data[]; };
 #define cvec_rep_(self) c_container_of((self)->data, struct cvec_rep, data)
-static struct cvec_rep _cvec_sentinel = {0, 0};
 #endif // CVEC_H_INCLUDED
 
 #ifndef _i_prefix
@@ -78,7 +77,7 @@ static struct cvec_rep _cvec_sentinel = {0, 0};
    _cx_deftypes(_c_cvec_types, _cx_self, i_val);
 #endif
 typedef i_valraw _cx_raw;
-
+STC_API _cx_self        _cx_memb(_init)(void);
 STC_API void            _cx_memb(_drop)(_cx_self* self);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
 STC_API bool            _cx_memb(_reserve)(_cx_self* self, size_t cap);
@@ -148,12 +147,6 @@ STC_INLINE void         _cx_memb(_next)(_cx_iter* it) { ++it->ref; }
 STC_INLINE _cx_iter     _cx_memb(_advance)(_cx_iter it, intptr_t offs)
                             { it.ref += offs; return it; }
 STC_INLINE size_t       _cx_memb(_index)(_cx_self cx, _cx_iter it) { return it.ref - cx.data; }
-
-STC_INLINE _cx_self
-_cx_memb(_init)(void) {
-    _cx_self cx = {(_cx_value *) _cvec_sentinel.data};
-    return cx;
-}
 
 STC_INLINE _cx_self
 _cx_memb(_with_size)(const size_t size, i_val null) {
@@ -240,6 +233,16 @@ _cx_memb(_sort)(_cx_self* self) {
 #endif // !c_no_cmp
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(_i_implement)
+
+#ifndef CVEC_H_INCLUDED
+static struct cvec_rep _cvec_sentinel = {0, 0};
+#endif
+
+STC_DEF _cx_self
+_cx_memb(_init)(void) {
+    _cx_self cx = {(_cx_value *) _cvec_sentinel.data};
+    return cx;
+}
 
 STC_DEF void
 _cx_memb(_clear)(_cx_self* self) {

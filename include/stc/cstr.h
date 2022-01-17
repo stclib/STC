@@ -31,12 +31,14 @@
 #include <stdio.h> /* vsnprintf */
 #include <ctype.h>
 
-#define                 cstr_npos (SIZE_MAX >> 1)
-
-typedef struct          { size_t size, cap; char str[]; } _cstr_rep_t;
+#define cstr_npos (SIZE_MAX >> 1)
+typedef struct { size_t size, cap; char str[]; } _cstr_rep_t;
 #define _cstr_rep(self) c_container_of((self)->str, _cstr_rep_t, str)
-static struct { size_t size, cap; char str[1]; } _cstr_nullrep = {0, 0, {0}};
-static const cstr cstr_null = {_cstr_nullrep.str};
+#ifdef _i_static 
+    static const cstr cstr_null;
+#else
+    extern const cstr cstr_null;
+#endif
 
 /* optimal memory: based on malloc_usable_size() sequence: 24, 40, 56, ... */
 #define _cstr_opt_mem(cap)  ((((offsetof(_cstr_rep_t, str) + (cap) + 8)>>4)<<4) + 8)
@@ -172,6 +174,12 @@ c_strncasecmp(const char* s1, const char* s2, size_t nmax) {
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(_i_implement)
+
+static struct { size_t size, cap; char str[1]; } _cstr_nullrep = {0, 0, {0}};
+#ifdef _i_static
+static
+#endif
+const cstr cstr_null = {_cstr_nullrep.str};
 
 STC_DEF size_t
 cstr_reserve(cstr* self, const size_t cap) {
