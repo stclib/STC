@@ -10,7 +10,7 @@ int main(int argc, char* argv[])
     c_auto (cstr, input)
     c_auto (cregex, float_expr)
     {
-        float_expr = cregex_new("[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)");
+        float_expr = cregex_new("[+-]?[0-9]+(\\.[0-9]*)?|\\.[0-9]+");
         // Until "q" is given, ask for another number
         while (true)
         {

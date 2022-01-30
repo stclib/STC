@@ -69,7 +69,7 @@ size_t          utf8_pos(const char* s, size_t index);          // from UTF8 ind
 const char*     utf8_next(const char *s);                       // next codepoint as char*; NULL if *s == 0
 uint32_t        utf8_peek(const char *s);                       // next codepoint as uint32_t
 
-size_t          utf8_codepoint_size(const char* s);             // 1-4 (0 if s[0] is illegal first cp char)
+size_t          utf8_codep_size(const char* s);                 // 1-4 (0 if s[0] is illegal first cp char)
 uint32_t        utf8_decode(uint32_t *state, uint32_t *codep, const uint32_t byte); // decode next utf8 codepoint.
 ```
 
