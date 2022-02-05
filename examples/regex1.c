@@ -10,7 +10,7 @@ int main(int argc, char* argv[])
     c_auto (cstr, input)
     c_auto (cregex, float_expr)
     {
-        float_expr = cregex_new("[+-]?[0-9]+(\\.[0-9]*)?|\\.[0-9]+");
+        float_expr = cregex_new("^[+-]?[0-9]+((\\.[0-9]*)?|\\.[0-9]+)$", 0);
         // Until "q" is given, ask for another number
         while (true)
         {
@@ -21,10 +21,12 @@ int main(int argc, char* argv[])
             if (cstr_equals(input, "q"))
                 break;
             
-            if (cregex_matches(&float_expr, input.str))
+            if (cregex_find(&float_expr, input.str, 0, NULL, 0) > 0)
                 printf("Input is a float\n");
             else
                 printf("Invalid input : Not a float\n");
         }
     }
 }
+
+#include "../src/cregex.c"

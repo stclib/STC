@@ -53,12 +53,6 @@ STC_INLINE size_t utf8_codep_size(const char *s) {
     return ctx.len;
 }
 
-STC_INLINE const char* utf8_next(const char *s) {
-    if (!*s) return NULL;
-    utf8_decode_t ctx = {UTF8_OK, 0};
-    return (const char*) utf8_nextc(&ctx, (const uint8_t*)s);
-}
-
 // --------------------------- IMPLEMENTATION ---------------------------------
 #ifdef _i_implement
 // https://news.ycombinator.com/item?id=15423674

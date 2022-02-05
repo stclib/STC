@@ -1,3 +1,4 @@
+#if 0
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
@@ -368,3 +369,4 @@ int main()
     compile_match_or();    
     printf("All tests succesful.\n");
 }
+#endif

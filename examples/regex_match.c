@@ -3,8 +3,6 @@
 #include <stc/cregex.h>
 #include <stc/crandom.h>
 #define i_val double
-#define i_type Vecu64
-#include <stc/cstack.h>
 #include <time.h>
 
 
@@ -18,18 +16,20 @@ int main()
 
     c_auto (cregex, re)
     {
-        re = cregex_new("[+-]?([0-9]*\\.)?[0-9]+([Ee][-+]?[0-9]+)?");
-        cregex_match match;
-        if (cregex_find(&re, s, &match)) {
-            printf("Found digits at position %zu-%zu\n", match.start, match.end);
+        int res = cregex_compile(&re, "[+-]?([0-9]*\\.)?\\d+([Ee][+-]?\\d+)?", 0);
+        printf("%d\n", res);
+        cregmatch m[10];
+        if (cregex_find(&re, s, 10, m, 0) > 0) {
+            printf("Found digits at position %zu-%zu\n", m[0].str - s, m[0].str - s + m[0].len);
         } else {
             printf("Could not find any digits\n");
         }
 
-        csview sv = {0};
-        while (cregex_find_next_sv(&re, s, &sv)) {
-            printf(c_PRIsv " ; ", c_ARGsv(sv));
+        while (cregex_find(&re, s, 1, m, creg_next) > 0) {
+            printf("%.*s ; ", m[0].len, m[0].str);
         }
         puts("");
     }
 }
+
+#include "../src/cregex.c"
