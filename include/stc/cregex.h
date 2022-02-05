@@ -32,6 +32,7 @@ THE SOFTWARE.
  * shorthand character classes, ++.
  */
 
+#include <stddef.h>
 #include <stdint.h>
 
 typedef enum {

@@ -26,7 +26,7 @@ int main()
         }
 
         while (cregex_find(&re, s, 1, m, creg_next) > 0) {
-            printf("%.*s ; ", m[0].len, m[0].str);
+            printf("%.*s ; ", (int)m[0].len, m[0].str);
         }
         puts("");
     }
