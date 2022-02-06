@@ -10,9 +10,9 @@ int main(int argc, char* argv[])
     c_auto (cstr, input)
     c_auto (cregex, float_expr)
     {
-        float_expr = cregex_new("^[+-]?[0-9]+((\\.[0-9]*)?|\\.[0-9]+)$", 0);
+        int res = cregex_compile(&float_expr, "^[+-]?[0-9]+((\\.[0-9]*)?|\\.[0-9]+)$", 0);
         // Until "q" is given, ask for another number
-        while (true)
+        if (res > 0) while (true)
         {
             printf("Enter a double precision number (q for quit): ");
             cstr_getline(&input, stdin);

@@ -387,9 +387,9 @@ int main()
 {
     c_auto (Vikings, vikings) {
         c_apply(v, Vikings_emplace(&vikings, v), c_pair(v), Vikings_raw, {
-            {{"Einar", "Norway"}, 20},
-            {{"Olaf", "Denmark"}, 24},
-            {{"Harald", "Iceland"}, 12},
+            { {"Einar", "Norway"}, 20 },
+            { {"Olaf", "Denmark"}, 24 },
+            { {"Harald", "Iceland"}, 12 },
         });
         Vikings_emplace_or_assign(&vikings, (RViking){"Bjorn", "Sweden"}, 10);
 

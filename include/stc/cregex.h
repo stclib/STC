@@ -72,28 +72,23 @@ typedef struct {
     size_t len;
 } cregmatch;
 
-/* return number of capture groups on success, or (negative) error code on failure. */
-int cregex_compile(cregex *rx, const char* pattern, int cflags);
-
 static inline cregex cregex_init(void) {
     cregex rx = {NULL}; return rx;
 }
 
-static inline cregex cregex_new(const char* pattern, int cflags) {
-    cregex rx;
-    cregex_compile(&rx, pattern, cflags);
-    return rx;
-}
-/* number of capture groups in the regex pattern */
+/* return number of capture groups on success, or (negative) error code on failure. */
+int cregex_compile(cregex *self, const char* pattern, int cflags);
+
+/* number of capture groups in a regex pattern */
 int cregex_captures(cregex rx);
 
 /* return number of capture groups on success, or (negative) error code on failure. */
-int cregex_find(const cregex *rx, const char* string, 
+int cregex_find(const cregex *self, const char* string, 
                 size_t nmatch, cregmatch match[], int mflags);
 
 void cregex_replace(const char* src, char* dst, int dsize,
                     int nmatch, const cregmatch match[]);
 
-void cregex_drop(cregex* preg);
+void cregex_drop(cregex* self);
 
 #endif

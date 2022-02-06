@@ -34,7 +34,8 @@ THE SOFTWARE.
 #include <stc/cregex.h>
 #include "cregex_utf8.c"
 
-typedef uint32_t Rune;
+typedef uint32_t Rune; /* Utf8 code point */
+typedef int32_t Token;
 /* max character classes per program */
 #define NCLASS creg_max_classes
 /* max subexpressions */
@@ -56,7 +57,7 @@ typedef struct
  */
 typedef struct Reinst
 {
-    int type;
+    Token type;
     union {
         Reclass *classp;        /* class pointer */
         Rune    rune;           /* character */
@@ -102,21 +103,22 @@ typedef struct Resublist
 /*
  * Actions and Tokens (Reinst types)
  *
- *  0x80-0x8F: operators, value => precedence
- *  0x90-0xAF: RUNE and char classes.
- *  0xB0-0xBF: tokens, i.e. operands for operators
+ *  0x800000-0x80FFFF: operators, value => precedence
+ *  0x810000-0x81FFFF: RUNE and char classes.
+ *  0x820000-0x82FFFF: tokens, i.e. operands for operators
  */
 enum {
-    OPERATOR    = 0x80,  /* Bitmask of all operators */
-    START       = 0x80,  /* Start, used for marker on stack */
-    RBRA        ,        /* Right bracket, ) */
-    LBRA        ,        /* Left bracket, ( */
-    OR          ,        /* Alternation, | */
-    CAT         ,        /* Concatentation, implicit operator */
-    STAR        ,        /* Closure, * */
-    PLUS        ,        /* a+ == aa* */
-    QUEST       ,        /* a? == a|nothing, i.e. 0 or 1 a's */
-    RUNE        = 0x90,
+    MASK        = 0xFF0000,
+    OPERATOR    = 0x800000,  /* Bitmask of all operators */
+    START       = 0x800001,  /* Start, used for marker on stack */
+    RBRA        ,            /* Right bracket, ) */
+    LBRA        ,            /* Left bracket, ( */
+    OR          ,            /* Alternation, | */
+    CAT         ,            /* Concatentation, implicit operator */
+    STAR        ,            /* Closure, * */
+    PLUS        ,            /* a+ == aa* */
+    QUEST       ,            /* a? == a|nothing, i.e. 0 or 1 a's */
+    RUNE        = 0x810000,
     CLS_d       , CLS_D, /* digit, non-digit */
     CLS_s       , CLS_S, /* space, non-space */
     CLS_w       , CLS_W, /* word, non-word */
@@ -130,7 +132,7 @@ enum {
     CLS_pr      , CLS_PR, /* print */
     CLS_up      , CLS_UP, /* upper */
     CLS_xd      , CLS_XD, /* xdigit */    
-    ANY         = 0xB0,   /* Any character except newline, . */
+    ANY         = 0x820000, /* Any character except newline, . */
     ANYNL       ,         /* Any character including newline, . */
     NOP         ,         /* No operation, internal use only */
     BOL         ,         /* Beginning of line, ^ */
@@ -139,7 +141,7 @@ enum {
     NCCLASS     ,         /* Negated character class, [] */
     WBOUND      ,         /* Non-word boundary, not consuming meta char */
     NWBOUND     ,         /* Word boundary, not consuming meta char */
-    END         = 0xBF,   /* Terminate: match found */
+    END         = 0x82FFFF, /* Terminate: match found */
 };
 
 /*
@@ -158,7 +160,7 @@ typedef struct Reljunk
 {
     Relist*     relist[2];
     Relist*     reliste[2];
-    int         starttype;
+    Token       starttype;
     Rune        startchar;
     const char* starts;
     const char* eol;
@@ -311,8 +313,8 @@ typedef struct Parser
     const char* exprp;   /* pointer to next character in source expression */
     Node andstack[NSTACK];
     Node* andp;
-    short atorstack[NSTACK];
-    short* atorp;
+    Token atorstack[NSTACK];
+    Token* atorp;
     short subidstack[NSTACK]; /* parallel to atorstack */
     short* subidp;
     short cursubid;      /* id of current subexpression */
@@ -330,10 +332,10 @@ typedef struct Parser
 } Parser;
 
 /* predeclared crap */
-static void _operator(Parser *par, int type);
+static void _operator(Parser *par, Token type);
 static void pushand(Parser *par, Reinst *first, Reinst *last);
-static void pushator(Parser *par, int type);
-static void evaluntil(Parser *par, int type);
+static void pushator(Parser *par, Token type);
+static void evaluntil(Parser *par, Token type);
 static int  bldcclass(Parser *par);
 
 static void
@@ -344,7 +346,7 @@ rcerror(Parser *par, cregex_error_t err)
 }
 
 static Reinst*
-newinst(Parser *par, int t)
+newinst(Parser *par, Token t)
 {
     par->freep->type = t;
     par->freep->l.left = 0;
@@ -353,7 +355,7 @@ newinst(Parser *par, int t)
 }
 
 static void
-operand(Parser *par, int t)
+operand(Parser *par, Token t)
 {
     Reinst *i;
 
@@ -371,7 +373,7 @@ operand(Parser *par, int t)
 }
 
 static void
-_operator(Parser *par, int t)
+_operator(Parser *par, Token t)
 {
     if (t==RBRA && --par->nbra<0)
         rcerror(par, creg_unmatchedrightparenthesis);
@@ -401,7 +403,7 @@ pushand(Parser *par, Reinst *f, Reinst *l)
 }
 
 static void
-pushator(Parser *par, int t)
+pushator(Parser *par, Token t)
 {
     if (par->atorp >= &par->atorstack[NSTACK])
         rcerror(par, creg_operatorstackoverflow);
@@ -410,7 +412,7 @@ pushator(Parser *par, int t)
 }
 
 static Node*
-popand(Parser *par, int op)
+popand(Parser *par, Token op)
 {
     Reinst *inst;
 
@@ -422,7 +424,7 @@ popand(Parser *par, int op)
     return --par->andp;
 }
 
-static int
+static Token
 popator(Parser *par)
 {
     if (par->atorp <= &par->atorstack[0])
@@ -432,7 +434,7 @@ popator(Parser *par)
 }
 
 static void
-evaluntil(Parser *par, int pri)
+evaluntil(Parser *par, Token pri)
 {
     Node *op1, *op2;
     Reinst *inst1, *inst2;
@@ -666,10 +668,10 @@ lex(Parser *par, int* dot_type)
     return RUNE;
 }
 
-static int
+static Token
 bldcclass(Parser *par)
 {
-    int type;
+    Token type;
     Rune r[NCCRUNE];
     Rune *p, *ep, *np;
     Rune rune;
@@ -767,9 +769,9 @@ bldcclass(Parser *par)
 }
 
 static Reprog*
-regcomp1(Parser *par, const char *s, int dot_type)
+regcomp1(Parser *par, const char *s, Token dot_type)
 {
-    int token;
+    Token token;
     Reprog *volatile pp;
 
     /* get memory for the program. estimated max usage */
@@ -803,7 +805,7 @@ regcomp1(Parser *par, const char *s, int dot_type)
     /* Start with a low priority operator to prime parser */
     pushator(par, START-1);
     while ((token = lex(par, &dot_type)) != END) {
-        if ((token & 0xF0) == OPERATOR)
+        if ((token & MASK) == OPERATOR)
             _operator(par, token);
         else
             operand(par, token);

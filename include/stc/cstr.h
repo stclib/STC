@@ -32,18 +32,18 @@
 #include <ctype.h>
 
 #define cstr_npos (SIZE_MAX >> 1)
-typedef struct { size_t size, cap; char str[sizeof(size_t)]; } _cstr_rep_t;
-#define _cstr_rep(self) c_container_of((self)->str, _cstr_rep_t, str)
+typedef struct { size_t size, cap; char chr; } _cstr_rep_t;
+#define _cstr_rep(self) c_container_of((self)->str, _cstr_rep_t, chr)
 #ifdef _i_static 
-    static _cstr_rep_t _cstr_nullrep = {0, 0, {0}};
-    static const cstr cstr_null = {_cstr_nullrep.str};
+    static _cstr_rep_t _cstr_nullrep = {0, 0, 0};
+    static const cstr cstr_null = {&_cstr_nullrep.chr};
 #else
     extern const cstr cstr_null;
 #endif
 /* optimal memory: based on malloc_usable_size() sequence: 24, 40, 56, ... */
-#define _cstr_opt_mem(cap)  ((((offsetof(_cstr_rep_t, str) + (cap) + 8)>>4)<<4) + 8)
+#define _cstr_opt_mem(cap)  ((((offsetof(_cstr_rep_t, chr) + (cap) + 8)>>4)<<4) + 8)
 /* optimal string capacity: 7, 23, 39, ... */
-#define _cstr_opt_cap(cap)  (_cstr_opt_mem(cap) - offsetof(_cstr_rep_t, str) - 1)
+#define _cstr_opt_cap(cap)  (_cstr_opt_mem(cap) - offsetof(_cstr_rep_t, chr) - 1)
 
 STC_API cstr            cstr_from_n(const char* str, size_t n);
 STC_API cstr            cstr_from_fmt(const char* fmt, ...);
@@ -186,7 +186,7 @@ cstr_reserve(cstr* self, const size_t cap) {
     const size_t oldcap = rep->cap;
     if (cap > oldcap) {
         rep = (_cstr_rep_t*) c_realloc(oldcap ? rep : NULL, _cstr_opt_mem(cap));
-        self->str = rep->str;
+        self->str = &rep->chr;
         if (oldcap == 0) self->str[rep->size = 0] = '\0';
         return (rep->cap = _cstr_opt_cap(cap));
     }
@@ -205,9 +205,9 @@ STC_DEF cstr
 cstr_from_n(const char* str, const size_t n) {
     if (n == 0) return cstr_null;
     _cstr_rep_t* rep = (_cstr_rep_t*) c_malloc(_cstr_opt_mem(n));
-    rep->str[rep->size = n] = '\0';
+    cstr s = {(char *) memcpy(&rep->chr, str, n)};
+    s.str[rep->size = n] = '\0';
     rep->cap = _cstr_opt_cap(n);
-    cstr s = {(char *) memcpy(rep->str, str, n)};
     return s;
 }
 

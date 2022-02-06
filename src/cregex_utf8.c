@@ -1046,12 +1046,12 @@ static inline int utf8_islower(uint32_t codep) {
     return (idx != -1) & (idx & 1);
 }
 
-static inline int utf8_toupper(uint32_t codep) {
+static inline uint32_t utf8_toupper(uint32_t codep) {
     int idx = cfold_lookup(codep);
     return (idx == -1) | !(idx & 1) ? codep : cfold_tab[idx - 1];
 }
 
-static inline int utf8_tolower(uint32_t codep) {
+static inline uint32_t utf8_tolower(uint32_t codep) {
     int idx = cfold_lookup(codep);
     return (idx == -1) | (idx & 1) ? codep : cfold_tab[idx + 1];
 }
