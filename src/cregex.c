@@ -71,7 +71,7 @@ typedef struct Reinst
 } Reinst;
 
 typedef struct {
-    bool ignorecase;
+    bool caseless;
     bool dotall;
 } Reflags;
 
@@ -119,6 +119,7 @@ enum {
     PLUS        ,            /* a+ == aa* */
     QUEST       ,            /* a? == a|nothing, i.e. 0 or 1 a's */
     RUNE        = 0x810000,
+    IRUNE,
     CLS_d       , CLS_D, /* digit, non-digit */
     CLS_s       , CLS_S, /* space, non-space */
     CLS_w       , CLS_W, /* word, non-word */
@@ -319,7 +320,9 @@ typedef struct Parser
     short* subidp;
     short cursubid;      /* id of current subexpression */
     int errors;
-    bool ignorecase;
+    Reflags flags;
+    Token dot_type;
+    Token rune_type;
     bool lastwasand;     /* Last token was operand */
     bool lexdone;
     short nbra;
@@ -363,9 +366,9 @@ operand(Parser *par, Token t)
         _operator(par, CAT);    /* catenate is implicit */
     i = newinst(par, t);
 
-    if (t == CCLASS || t == NCCLASS)
+    if ((t == CCLASS) | (t == NCCLASS))
         i->r.classp = par->yyclassp;
-    if (t == RUNE)
+    if ((t == RUNE) | (t == IRUNE))
         i->r.rune = par->yyrune;
 
     pushand(par, i, i);
@@ -629,8 +632,8 @@ nextc(Parser *par, Rune *rp)
     return false;
 }
 
-static int
-lex(Parser *par, int* dot_type)
+static Token
+lex(Parser *par)
 {
     int quoted;
     start:
@@ -639,7 +642,7 @@ lex(Parser *par, int* dot_type)
         case  0 : return END;
         case 'b': return WBOUND;
         case 'B': return NWBOUND;
-        default : return RUNE;
+        default : return par->rune_type;
     }
 
     switch (par->yyrune) {
@@ -648,15 +651,16 @@ lex(Parser *par, int* dot_type)
     case '?': return QUEST;
     case '+': return PLUS;
     case '|': return OR;
-    case '.': return *dot_type;
+    case '.': return par->dot_type;
     case '(': 
         if (par->exprp[0] == '?') {
-            for (int k = 1, inv = 0; ; ++k) switch (par->exprp[k]) {
+            for (int k = 1, enable = 1; ; ++k) switch (par->exprp[k]) {
                 case  0 : par->exprp += k; return END;
                 case ')': par->exprp += k + 1; goto start;
-                case '-': inv = 1; break;
-                case 's': *dot_type = inv ? ANY : ANYNL; break;
-                case 'i': par->ignorecase = !inv; break;
+                case '-': enable = 0; break;
+                case 's': if (!par->flags.dotall) par->dot_type = enable ? ANYNL : ANY; break;
+                case 'i': if (!par->flags.caseless) par->rune_type = enable ? IRUNE : RUNE; break;
+                default: rcerror(par, creg_unknownoperator); return 0;
             }
         }
         return LBRA;
@@ -665,7 +669,7 @@ lex(Parser *par, int* dot_type)
     case '$': return EOL;
     case '[': return bldcclass(par);
     }
-    return RUNE;
+    return par->rune_type;
 }
 
 static Token
@@ -722,7 +726,8 @@ bldcclass(Parser *par)
                 };
                 for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
                     if (!strncmp(par->exprp, cls[i].c, cls[i].n)) {
-                        rune = cls[i].r;
+                        rune = par->rune_type == IRUNE && (cls[i].r == CLS_lo || cls[i].r == CLS_up)
+                             ? CLS_al : cls[i].r;
                         par->exprp += cls[i].n;
                         break;
                     }
@@ -769,7 +774,7 @@ bldcclass(Parser *par)
 }
 
 static Reprog*
-regcomp1(Parser *par, const char *s, Token dot_type)
+regcomp1(Parser *par, const char *s, int cflags)
 {
     Token token;
     Reprog *volatile pp;
@@ -781,8 +786,8 @@ regcomp1(Parser *par, const char *s, Token dot_type)
         rcerror(par, creg_outofmemory);
         return NULL;
     }
-    pp->flags.ignorecase = false;
-    pp->flags.dotall = (dot_type == ANYNL);
+    pp->flags.caseless = (cflags & creg_caseless) != 0;
+    pp->flags.dotall = (cflags & creg_dotall) != 0;
     par->freep = pp->firstinst;
     par->classp = pp->cclass;
     par->errors = 0;
@@ -792,7 +797,9 @@ regcomp1(Parser *par, const char *s, Token dot_type)
 
     /* go compile the sucker */
     par->lexdone = false;
-    par->ignorecase = false;
+    par->flags = pp->flags;
+    par->rune_type = pp->flags.caseless ? IRUNE : RUNE;
+    par->dot_type = pp->flags.dotall ? ANYNL : ANY;
     par->exprp = s;
     par->nclass = 0;
     par->nbra = 0;
@@ -804,7 +811,7 @@ regcomp1(Parser *par, const char *s, Token dot_type)
 
     /* Start with a low priority operator to prime parser */
     pushator(par, START-1);
-    while ((token = lex(par, &dot_type)) != END) {
+    while ((token = lex(par)) != END) {
         if ((token & MASK) == OPERATOR)
             _operator(par, token);
         else
@@ -828,7 +835,6 @@ regcomp1(Parser *par, const char *s, Token dot_type)
     dump(pp);
 #endif
     pp = optimize(par, pp);
-    pp->flags.ignorecase |= par->ignorecase;
     pp->nsubids = par->cursubid;
 #ifdef DEBUG
     print("start: %d\n", par->andp->first-pp->firstinst);
@@ -892,7 +898,7 @@ regexec1(const Reprog *progp,    /* program to run */
     Rune r, *rp, *ep;
     int match = 0;
 
-    bool icase = progp->flags.ignorecase || (mflags & creg_caseless);
+    bool icase = progp->flags.caseless;
     checkstart = j->starttype;
     if (mp)
         for (i=0; i<ms; i++) {
@@ -908,9 +914,12 @@ regexec1(const Reprog *progp,    /* program to run */
         /* fast check for first char */
         if (checkstart) {
             switch (j->starttype) {
+            case IRUNE:
+                p = utfruneicase(s, j->startchar);
+                goto next1;
             case RUNE:
-                p = icase ? utfruneicase(s, j->startchar)
-                          : utfrune(s, j->startchar);
+                p = utfrune(s, j->startchar);
+                next1: 
                 if (p == NULL || s == j->eol)
                     return match;
                 s = p;
@@ -944,8 +953,9 @@ regexec1(const Reprog *progp,    /* program to run */
                 int ok = false;
 
                 switch (inst->type) {
-                case RUNE:    /* regular character */
-                    ok = runematch(inst->r.rune, r, icase);
+                case RUNE: 
+                case IRUNE:    /* regular character */
+                    ok = runematch(inst->r.rune, r, (icase = inst->type==IRUNE));
                     break;
                 case LBRA:
                     tlp->se.m[inst->r.subid].str = s;
@@ -1141,12 +1151,9 @@ void cregex_replace(
 
 int cregex_compile(cregex *rx, const char* pattern, int cflags) {
     Parser par;
-    rx->prog = regcomp1(&par, pattern, cflags & creg_dotall ? ANYNL : ANY);
-    if (rx->prog) {
-        if (cflags & creg_caseless)
-            rx->prog->flags.ignorecase = true;
+    rx->prog = regcomp1(&par, pattern, cflags);
+    if (rx->prog)
         return 1 + rx->prog->nsubids;
-    }
     return par.errors;
 }
 

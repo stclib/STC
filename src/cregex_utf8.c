@@ -3,7 +3,7 @@
 
 enum { UPPER = 0, LOWER = 1, HT_SIZE = 1997 };
 // based on unicode CaseFolding.txt
-static const uint32_t cfold[][2] = {
+static const uint16_t cfold[][2] = {
 {0x00041, 0x00061}, // LATIN CAPITAL LETTER A
 {0x00042, 0x00062}, // LATIN CAPITAL LETTER B
 {0x00043, 0x00063}, // LATIN CAPITAL LETTER C
@@ -1020,7 +1020,7 @@ static short cfold_idx[HT_SIZE] = {
 };
 
 static const size_t     cfold_len = sizeof cfold / sizeof cfold[0];
-static const uint32_t*  cfold_tab = &cfold[0][0];
+static const uint16_t*  cfold_tab = &cfold[0][0];
 
 static inline uint32_t hash(uint32_t key, size_t len) {
     uint64_t x = key*0xc6a4a7935bd1e99d;
