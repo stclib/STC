@@ -108,41 +108,46 @@ typedef struct Resublist
  *  0x820000-0x82FFFF: tokens, i.e. operands for operators
  */
 enum {
-    MASK        = 0xFF0000,
-    OPERATOR    = 0x800000,  /* Bitmask of all operators */
-    START       = 0x800001,  /* Start, used for marker on stack */
-    RBRA        ,            /* Right bracket, ) */
-    LBRA        ,            /* Left bracket, ( */
-    OR          ,            /* Alternation, | */
-    CAT         ,            /* Concatentation, implicit operator */
-    STAR        ,            /* Closure, * */
-    PLUS        ,            /* a+ == aa* */
-    QUEST       ,            /* a? == a|nothing, i.e. 0 or 1 a's */
-    RUNE        = 0x810000,
+    MASK        = 0xFF00000,
+    OPERATOR    = 0x8000000, /* Bitmask of all operators */
+    START       = 0x8000001, /* Start, used for marker on stack */
+    RBRA        ,           /* Right bracket, ) */
+    LBRA        ,           /* Left bracket, ( */
+    OR          ,           /* Alternation, | */
+    CAT         ,           /* Concatentation, implicit operator */
+    STAR        ,           /* Closure, * */
+    PLUS        ,           /* a+ == aa* */
+    QUEST       ,           /* a? == a|nothing, i.e. 0 or 1 a's */
+    RUNE        = 0x8100000,
     IRUNE,
-    CLS_d       , CLS_D, /* digit, non-digit */
-    CLS_s       , CLS_S, /* space, non-space */
-    CLS_w       , CLS_W, /* word, non-word */
-    CLS_an      , CLS_AN, /* alphanum */
-    CLS_al      , CLS_AL, /* alpha */
-    CLS_bl      , CLS_BL, /* blank */
-    CLS_pu      , CLS_PU, /* punct */    
-    CLS_ct      , CLS_CT, /* ctrl */
-    CLS_gr      , CLS_GR, /* graphic */
-    CLS_lo      , CLS_LO, /* lower */
-    CLS_up      , CLS_UP, /* upper */
-    CLS_pr      , CLS_PR, /* print */
-    CLS_xd      , CLS_XD, /* xdigit */    
-    ANY         = 0x820000, /* Any character except newline, . */
-    ANYNL       ,         /* Any character including newline, . */
-    NOP         ,         /* No operation, internal use only */
-    BOL         ,         /* Beginning of line, ^ */
-    EOL         ,         /* End of line, $ */
-    CCLASS      ,         /* Character class, [] */
-    NCCLASS     ,         /* Negated character class, [] */
-    WBOUND      ,         /* Non-word boundary, not consuming meta char */
-    NWBOUND     ,         /* Word boundary, not consuming meta char */
-    END         = 0x82FFFF, /* Terminate: match found */
+    ASC_d       , ASC_D,    /* digit, non-digit */
+    ASC_s       , ASC_S,    /* space, non-space */
+    ASC_w       , ASC_W,    /* word, non-word */
+    ASC_an      , ASC_AN,   /* alnum */
+    ASC_al      , ASC_AL,   /* alpha */
+    ASC_bl      , ASC_BL,   /* blank */
+    ASC_ct      , ASC_CT,   /* ctrl */
+    ASC_gr      , ASC_GR,   /* graphic */
+    ASC_lo      , ASC_LO,   /* lower */
+    ASC_up      , ASC_UP,   /* upper */
+    ASC_pr      , ASC_PR,   /* print */
+    ASC_pt      , ASC_PT,   /* punct */
+    ASC_xd      , ASC_XD,   /* xdigit */    
+    UNI_La      , UNX_La,   /* alpha */
+    UNI_Ll      , UNX_Ll,   /* lower */
+    UNI_Lu      , UNX_Lu,   /* upper */
+    UNI_P       , UNX_P,    /* punct */   
+    UNI_Zs      , UNX_Zs,   /* white space */
+    ANY         = 0x8200000, /* Any character except newline, . */
+    ANYNL       ,           /* Any character including newline, . */
+    NOP         ,           /* No operation, internal use only */
+    BOL         ,           /* Beginning of line, ^ */
+    EOL         ,           /* End of line, $ */
+    CCLASS      ,           /* Character class, [] */
+    NCCLASS     ,           /* Negated character class, [] */
+    WBOUND      ,           /* Non-word boundary, not consuming meta char */
+    NWBOUND     ,           /* Word boundary, not consuming meta char */
+    END         = 0x82FFFFF, /* Terminate: match found */
 };
 
 /*
@@ -552,48 +557,6 @@ optimize(Parser *par, Reprog *pp)
     return npp;
 }
 
-#ifdef  DEBUG
-static void
-dumpstack(Parser *par) {
-    Node *stk;
-    int *ip;
-
-    print("operators\n");
-    for (ip = par->atorstack; ip < par->atorp; ip++)
-        print("0%o\n", *ip);
-    print("operands\n");
-    for (stk = par->andstack; stk < par->andp; stk++)
-        print("0%o\t0%o\n", stk->first->type, stk->last->type);
-}
-
-static void
-dump(Reprog *pp)
-{
-    Reinst *l;
-    Rune *p;
-
-    l = pp->firstinst;
-    do {
-        print("%d:\t0%o\t%d\t%d", l-pp->firstinst, l->type,
-            l->l.left-pp->firstinst, l->r.right-pp->firstinst);
-        if (l->type == RUNE)
-            print("\t%C\n", l->r.rune);
-        else if (l->type == CCLASS || l->type == NCCLASS) {
-            print("\t[");
-            if (l->type == NCCLASS)
-                print("^");
-            for (p = l->r.classp->spans; p < l->r.classp->end; p += 2)
-                if (p[0] == p[1])
-                    print("%C", p[0]);
-                else
-                    print("%C-%C", p[0], p[1]);
-            print("]\n");
-        } else
-            print("\n");
-    } while (l++->type);
-}
-#endif
-
 static Reclass*
 newclass(Parser *par)
 {
@@ -618,34 +581,37 @@ nextc(Parser *par, Rune *rp)
             case 'r': *rp = '\r'; break;
             case 'v': *rp = '\v'; break;
             case 'f': *rp = '\f'; break;
-            case 'd': *rp = CLS_d; break;
-            case 'D': *rp = CLS_D; break;
-            case 's': *rp = CLS_s; break;
-            case 'S': *rp = CLS_S; break;
-            case 'w': *rp = CLS_w; break;
-            case 'W': *rp = CLS_W; break;
+            case 'd': *rp = ASC_d; break;
+            case 'D': *rp = ASC_D; break;
+            case 's': *rp = ASC_s; break;
+            case 'S': *rp = ASC_S; break;
+            case 'w': *rp = ASC_w; break;
+            case 'W': *rp = ASC_W; break;
+            case 'p': case 'P': { /* https://www.regular-expressions.info/unicode.html */
+                static struct { const char* c; int n, r; } cls[] = {
+                    {"{Ll}", 4, UNI_Ll}, {"{Lowercase_Letter}", 18, UNI_Ll}, 
+                    {"{Lu}", 4, UNI_Lu}, {"{Uppercase_Letter}", 18, UNI_Lu},
+                    {"{L&}", 4, UNI_La}, {"{Cased_Letter}", 14, UNI_La},
+                };
+                int inv = *rp == 'P';
+                for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
+                    if (!strncmp(par->exprp, cls[i].c, cls[i].n)) {
+                        if (par->rune_type == IRUNE && (cls[i].r == UNI_Ll || cls[i].r == UNI_Lu))
+                            *rp = UNI_La + inv;
+                        else 
+                            *rp = cls[i].r + inv;
+                        par->exprp += cls[i].n;
+                        break;
+                    }
+                if (*rp < OPERATOR) {
+                    rcerror(par, creg_unknownoperator);
+                    *rp = 0; break;
+                }
+            }
         }      
         return true;
-    } else if (*rp == '[' && par->exprp[0] == ':') {
-        static struct { const char* c; int n, r; } cls[] = {
-            {"alnum:]", 7, CLS_an}, {"alpha:]", 7, CLS_al}, {"blank:]", 7, CLS_bl}, 
-            {"cntrl:]", 7, CLS_ct}, {"digit:]", 7, CLS_d}, {"graph:]", 7, CLS_gr}, 
-            {"lower:]", 7, CLS_lo}, {"print:]", 7, CLS_pr}, {"punct:]", 7, CLS_pu},
-            {"space:]", 7, CLS_s}, {"upper:]", 7, CLS_up}, {"xdigit:]", 8, CLS_xd},
-            {"word:]", 6, CLS_w},
-        };
-        int inv = par->exprp[1] == '^', off = 1 + inv; 
-        for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
-            if (!strncmp(par->exprp + off, cls[i].c, cls[i].n)) {
-                if (par->rune_type == IRUNE && (cls[i].r == CLS_lo || cls[i].r == CLS_up))
-                    *rp = CLS_al + inv;
-                else 
-                    *rp = cls[i].r + inv;
-                par->exprp += off + cls[i].n;
-                break;
-            }
     }
-    else if (*rp == 0)
+    if (*rp == 0)
         par->lexdone = true;
     return false;
 }
@@ -733,26 +699,25 @@ bldcclass(Parser *par)
                     ep[-1] = rune;
                     continue;
                 }
-            }
-            /*if (rune == '[' && *par->exprp == ':') {
+            } else if (rune == '[' && *par->exprp == ':') {
                 static struct { const char* c; int n, r; } cls[] = {
-                    {"alnum:]", 7, CLS_an}, {"alpha:]", 7, CLS_al}, {"blank:]", 7, CLS_bl}, 
-                    {"cntrl:]", 7, CLS_ct}, {"digit:]", 7, CLS_d}, {"graph:]", 7, CLS_gr}, 
-                    {"lower:]", 7, CLS_lo}, {"print:]", 7, CLS_pr}, {"punct:]", 7, CLS_pu},
-                    {"space:]", 7, CLS_s}, {"upper:]", 7, CLS_up}, {"xdigit:]", 8, CLS_xd},
-                    {"word:]", 6, CLS_w},
+                    {"alnum:]", 7, ASC_an}, {"alpha:]", 7, ASC_al}, {"blank:]", 7, ASC_bl}, 
+                    {"cntrl:]", 7, ASC_ct}, {"digit:]", 7, ASC_d}, {"graph:]", 7, ASC_gr}, 
+                    {"lower:]", 7, ASC_lo}, {"print:]", 7, ASC_pr}, {"punct:]", 7, ASC_pt},
+                    {"space:]", 7, ASC_s}, {"upper:]", 7, ASC_up}, {"xdigit:]", 8, ASC_xd},
+                    {"word:]", 6, ASC_w},
                 };
                 int inv = par->exprp[1] == '^', off = 1 + inv; 
                 for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
                     if (!strncmp(par->exprp + off, cls[i].c, cls[i].n)) {
-                        if (par->rune_type == IRUNE && (cls[i].r == CLS_lo || cls[i].r == CLS_up))
-                            *rp = CLS_al + inv;
+                        if (par->rune_type == IRUNE && (cls[i].r == ASC_lo || cls[i].r == ASC_up))
+                            rune = ASC_al + inv;
                         else 
-                            *rp = cls[i].r + inv;
+                            rune = cls[i].r + inv;
                         par->exprp += off + cls[i].n;
                         break;
                     }
-            }*/
+            }
         }
         *ep++ = rune;
         *ep++ = rune;
@@ -875,32 +840,38 @@ runematch(Rune s, Rune r, bool icase)
 {
     int inv = 0;
     switch (s) {
-        case CLS_D: inv = 1; /* fallthrough */
-        case CLS_d: return inv ^ (isdigit(r) != 0);
-        case CLS_S: inv = 1;
-        case CLS_s: return inv ^ (isspace(r) != 0);
-        case CLS_W: inv = 1;
-        case CLS_w: return inv ^ (utf8_isalnum(r) | (r == '_'));
-        case CLS_AL: inv = 1;
-        case CLS_al: return inv ^ utf8_isalpha(r);
-        case CLS_BL: return ((r != ' ') & (r != '\t'));
-        case CLS_bl: return ((r == ' ') | (r == '\t'));
-        case CLS_CT: inv = 1;
-        case CLS_ct: return inv ^ (iscntrl(r) != 0);
-        case CLS_GR: inv = 1;
-        case CLS_gr: return inv ^ (isgraph(r) != 0);
-        case CLS_AN: inv = 1;
-        case CLS_an: return inv ^ utf8_isalnum(r);
-        case CLS_PR: inv = 1;
-        case CLS_pr: return inv ^ (isprint(r) != 0);
-        case CLS_PU: inv = 1;
-        case CLS_pu: return inv ^ (ispunct(r) != 0);
-        case CLS_XD: inv = 1;
-        case CLS_xd: return inv ^ (isxdigit(r) != 0);
-        case CLS_LO: inv = 1;
-        case CLS_lo: return inv ^ utf8_islower(r);
-        case CLS_UP: inv = 1;
-        case CLS_up: return inv ^ utf8_isupper(r);
+    case ASC_D: inv = 1; /* fallthrough */
+    case ASC_d: return inv ^ (isdigit(r) != 0);
+    case ASC_S: inv = 1;
+    case ASC_s: return inv ^ (isspace(r) != 0);
+    case ASC_W: inv = 1;
+    case ASC_w: return inv ^ ((isalnum(r) != 0) | (r == '_'));
+    case ASC_AL: inv = 1;
+    case ASC_al: return inv ^ (isalpha(r) != 0);
+    case ASC_LO: inv = 1;
+    case ASC_lo: return inv ^ (islower(r) != 0);
+    case ASC_UP: inv = 1;
+    case ASC_up: return inv ^ (isupper(r) != 0);
+    case ASC_BL: inv = 1;
+    case ASC_bl: return inv ^ ((r == ' ') | (r == '\t'));
+    case ASC_CT: inv = 1;
+    case ASC_ct: return inv ^ (iscntrl(r) != 0);
+    case ASC_GR: inv = 1;
+    case ASC_gr: return inv ^ (isgraph(r) != 0);
+    case ASC_AN: inv = 1;
+    case ASC_an: return inv ^ (isalnum(r) != 0);
+    case ASC_PR: inv = 1;
+    case ASC_pr: return inv ^ (isprint(r) != 0);
+    case ASC_PT: inv = 1;
+    case ASC_pt: return inv ^ (ispunct(r) != 0);
+    case ASC_XD: inv = 1;
+    case ASC_xd: return inv ^ (isxdigit(r) != 0);
+    case UNX_La: inv = 1;
+    case UNI_La: return inv ^ utf8_isalpha(r);
+    case UNX_Ll: inv = 1;
+    case UNI_Ll: return inv ^ utf8_islower(r);
+    case UNX_Lu: inv = 1;
+    case UNI_Lu: return inv ^ utf8_isupper(r);
     }
     return icase ? utf8_tolower(s) == utf8_tolower(r) : s == r;
 }
