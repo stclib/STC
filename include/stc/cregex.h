@@ -52,12 +52,13 @@ typedef enum {
 } cregex_error_t;
 
 enum {
-    /* flags */
-    creg_dotall = 1<<0,     /* compile */
-    creg_caseless = 1<<1,   /* compile+match */
-    creg_fullmatch = 1<<2,  /* match */
-    creg_next = 1<<3,       /* match */
-    creg_startend = 1<<4,   /* match */
+    /* compile flags */
+    creg_dotall = 1<<0,
+    creg_caseless = 1<<1,
+    /* execution flags */
+    creg_fullmatch = 1<<2,
+    creg_next = 1<<3,
+    creg_startend = 1<<4,
     /* limits */
     creg_max_classes = 16,
     creg_max_captures = 32,

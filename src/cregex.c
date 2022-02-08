@@ -166,7 +166,7 @@ typedef struct Reljunk
 {
     Relist*     relist[2];
     Relist*     reliste[2];
-    Token       starttype;
+    int         starttype;
     Rune        startchar;
     const char* starts;
     const char* eol;
@@ -326,8 +326,8 @@ typedef struct Parser
     short cursubid;      /* id of current subexpression */
     int errors;
     Reflags flags;
-    Token dot_type;
-    Token rune_type;
+    int dot_type;
+    int rune_type;
     bool lastwasand;     /* Last token was operand */
     bool lexdone;
     short nbra;
@@ -1078,8 +1078,9 @@ regexec9(const Reprog *progp,    /* program to run */
 
     j.starttype = 0;
     j.startchar = 0;
-    if (progp->startinst->type == RUNE && progp->startinst->r.rune < 128) {
-        j.starttype = RUNE;
+    int rune_type = progp->flags.caseless ? IRUNE : RUNE;
+    if (progp->startinst->type == rune_type && progp->startinst->r.rune < 128) {
+        j.starttype = rune_type;
         j.startchar = progp->startinst->r.rune;
     }
     if (progp->startinst->type == BOL)
