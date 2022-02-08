@@ -626,8 +626,26 @@ nextc(Parser *par, Rune *rp)
             case 'W': *rp = CLS_W; break;
         }      
         return true;
+    } else if (*rp == '[' && par->exprp[0] == ':') {
+        static struct { const char* c; int n, r; } cls[] = {
+            {"alnum:]", 7, CLS_an}, {"alpha:]", 7, CLS_al}, {"blank:]", 7, CLS_bl}, 
+            {"cntrl:]", 7, CLS_ct}, {"digit:]", 7, CLS_d}, {"graph:]", 7, CLS_gr}, 
+            {"lower:]", 7, CLS_lo}, {"print:]", 7, CLS_pr}, {"punct:]", 7, CLS_pu},
+            {"space:]", 7, CLS_s}, {"upper:]", 7, CLS_up}, {"xdigit:]", 8, CLS_xd},
+            {"word:]", 6, CLS_w},
+        };
+        int inv = par->exprp[1] == '^', off = 1 + inv; 
+        for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
+            if (!strncmp(par->exprp + off, cls[i].c, cls[i].n)) {
+                if (par->rune_type == IRUNE && (cls[i].r == CLS_lo || cls[i].r == CLS_up))
+                    *rp = CLS_al + inv;
+                else 
+                    *rp = cls[i].r + inv;
+                par->exprp += off + cls[i].n;
+                break;
+            }
     }
-    if (*rp == 0)
+    else if (*rp == 0)
         par->lexdone = true;
     return false;
 }
@@ -716,24 +734,25 @@ bldcclass(Parser *par)
                     continue;
                 }
             }
-            if (rune == '[' && *par->exprp == ':') {
+            /*if (rune == '[' && *par->exprp == ':') {
                 static struct { const char* c; int n, r; } cls[] = {
-                    {":alnum:]", 8, CLS_an}, {":alpha:]", 8, CLS_al}, {":blank:]", 8, CLS_bl}, 
-                    {":cntrl:]", 8, CLS_ct}, {":digit:]", 8, CLS_d}, {":graph:]", 8, CLS_gr}, 
-                    {":lower:]", 8, CLS_lo}, {":print:]", 8, CLS_pr}, {":punct:]", 8, CLS_pu},
-                    {":space:]", 8, CLS_s}, {":upper:]", 8, CLS_up}, {":xdigit:]", 9, CLS_xd},
-                    {":word:]", 7, CLS_w},
+                    {"alnum:]", 7, CLS_an}, {"alpha:]", 7, CLS_al}, {"blank:]", 7, CLS_bl}, 
+                    {"cntrl:]", 7, CLS_ct}, {"digit:]", 7, CLS_d}, {"graph:]", 7, CLS_gr}, 
+                    {"lower:]", 7, CLS_lo}, {"print:]", 7, CLS_pr}, {"punct:]", 7, CLS_pu},
+                    {"space:]", 7, CLS_s}, {"upper:]", 7, CLS_up}, {"xdigit:]", 8, CLS_xd},
+                    {"word:]", 6, CLS_w},
                 };
+                int inv = par->exprp[1] == '^', off = 1 + inv; 
                 for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
-                    if (!strncmp(par->exprp, cls[i].c, cls[i].n)) {
-                        if (par->rune_type == IRUNE && cls[i].r >= CLS_lo && cls[i].r <= CLS_UP)
-                            rune = cls[i].r == CLS_lo || cls[i].r == CLS_up ? CLS_al : CLS_AL;
+                    if (!strncmp(par->exprp + off, cls[i].c, cls[i].n)) {
+                        if (par->rune_type == IRUNE && (cls[i].r == CLS_lo || cls[i].r == CLS_up))
+                            *rp = CLS_al + inv;
                         else 
-                            rune = cls[i].r;
-                        par->exprp += cls[i].n;
+                            *rp = cls[i].r + inv;
+                        par->exprp += off + cls[i].n;
                         break;
                     }
-            }
+            }*/
         }
         *ep++ = rune;
         *ep++ = rune;
