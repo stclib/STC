@@ -130,8 +130,8 @@ enum {
     CLS_ct      , CLS_CT, /* ctrl */
     CLS_gr      , CLS_GR, /* graphic */
     CLS_lo      , CLS_LO, /* lower */
-    CLS_pr      , CLS_PR, /* print */
     CLS_up      , CLS_UP, /* upper */
+    CLS_pr      , CLS_PR, /* print */
     CLS_xd      , CLS_XD, /* xdigit */    
     ANY         = 0x820000, /* Any character except newline, . */
     ANYNL       ,         /* Any character including newline, . */
@@ -726,8 +726,10 @@ bldcclass(Parser *par)
                 };
                 for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
                     if (!strncmp(par->exprp, cls[i].c, cls[i].n)) {
-                        rune = par->rune_type == IRUNE && (cls[i].r == CLS_lo || cls[i].r == CLS_up)
-                             ? CLS_al : cls[i].r;
+                        if (par->rune_type == IRUNE && cls[i].r >= CLS_lo && cls[i].r <= CLS_UP)
+                            rune = cls[i].r == CLS_lo || cls[i].r == CLS_up ? CLS_al : CLS_AL;
+                        else 
+                            rune = cls[i].r;
                         par->exprp += cls[i].n;
                         break;
                     }
@@ -854,22 +856,32 @@ runematch(Rune s, Rune r, bool icase)
 {
     int inv = 0;
     switch (s) {
-        case CLS_D: inv = true; /* fallthrough */
+        case CLS_D: inv = 1; /* fallthrough */
         case CLS_d: return inv ^ (isdigit(r) != 0);
-        case CLS_S: inv = true;
+        case CLS_S: inv = 1;
         case CLS_s: return inv ^ (isspace(r) != 0);
-        case CLS_W: inv = true;
+        case CLS_W: inv = 1;
         case CLS_w: return inv ^ (utf8_isalnum(r) | (r == '_'));
-        case CLS_al: return utf8_isalpha(r);
+        case CLS_AL: inv = 1;
+        case CLS_al: return inv ^ utf8_isalpha(r);
+        case CLS_BL: return ((r != ' ') & (r != '\t'));
         case CLS_bl: return ((r == ' ') | (r == '\t'));
-        case CLS_ct: return iscntrl(r) != 0;
-        case CLS_gr: return isgraph(r) != 0;
-        case CLS_an: return utf8_isalnum(r);
-        case CLS_pr: return isprint(r) != 0;
-        case CLS_pu: return ispunct(r) != 0;
-        case CLS_xd: return isxdigit(r) != 0;
-        case CLS_lo: return icase ? utf8_isalpha(s) : utf8_islower(r);
-        case CLS_up: return icase ? utf8_isalpha(s) : utf8_isupper(r);
+        case CLS_CT: inv = 1;
+        case CLS_ct: return inv ^ (iscntrl(r) != 0);
+        case CLS_GR: inv = 1;
+        case CLS_gr: return inv ^ (isgraph(r) != 0);
+        case CLS_AN: inv = 1;
+        case CLS_an: return inv ^ utf8_isalnum(r);
+        case CLS_PR: inv = 1;
+        case CLS_pr: return inv ^ (isprint(r) != 0);
+        case CLS_PU: inv = 1;
+        case CLS_pu: return inv ^ (ispunct(r) != 0);
+        case CLS_XD: inv = 1;
+        case CLS_xd: return inv ^ (isxdigit(r) != 0);
+        case CLS_LO: inv = 1;
+        case CLS_lo: return inv ^ utf8_islower(r);
+        case CLS_UP: inv = 1;
+        case CLS_up: return inv ^ utf8_isupper(r);
     }
     return icase ? utf8_tolower(s) == utf8_tolower(r) : s == r;
 }
