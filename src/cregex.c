@@ -120,9 +120,9 @@ enum {
     QUEST       ,           /* a? == a|nothing, i.e. 0 or 1 a's */
     RUNE        = 0x8100000,
     IRUNE,
-    ASC_d       , ASC_D,    /* digit, non-digit */
-    ASC_s       , ASC_S,    /* space, non-space */
-    ASC_w       , ASC_W,    /* word, non-word */
+    ASC_d       , ASC_D,    /* dec digit, non-digit */
+    ASC_s       , ASC_S,    /* utf8 space, non-space */
+    ASC_w       , ASC_W,    /* utf8 word, non-word */
     ASC_an      , ASC_AN,   /* alnum */
     ASC_al      , ASC_AL,   /* alpha */
     ASC_bl      , ASC_BL,   /* blank */
@@ -133,16 +133,17 @@ enum {
     ASC_pr      , ASC_PR,   /* print */
     ASC_pt      , ASC_PT,   /* punct */
     ASC_xd      , ASC_XD,   /* xdigit */    
-    UNI_La      , UNX_La,   /* alpha */
-    UNI_Ll      , UNX_Ll,   /* lower */
-    UNI_Lu      , UNX_Lu,   /* upper */
-    UNI_P       , UNX_P,    /* punct */   
-    UNI_Zs      , UNX_Zs,   /* white space */
+    U8_La       , NU8_La,   /* utf8 alpha */
+    U8_Ll       , NU8_Ll,   /* utf8 lower */
+    U8_Lu       , NU8_Lu,   /* utf8 upper */
+    U8_Zs       , NU8_Zs,   /* utf8 white space */
+    U8_Xnx      , NU8_Xnx,  /* utf8 hex digit */
+    U8_Xan      , NU8_Xan,  /* utf8 alphanumeric */
     ANY         = 0x8200000, /* Any character except newline, . */
     ANYNL       ,           /* Any character including newline, . */
     NOP         ,           /* No operation, internal use only */
-    BOL         ,           /* Beginning of line, ^ */
-    EOL         ,           /* End of line, $ */
+    BOL         , BOS,      /* Beginning of line, string, ^ */
+    EOL         , EOS, EOZ, /* End of line, string, $ */
     CCLASS      ,           /* Character class, [] */
     NCCLASS     ,           /* Negated character class, [] */
     WBOUND      ,           /* Non-word boundary, not consuming meta char */
@@ -328,6 +329,7 @@ typedef struct Parser
     Reflags flags;
     int dot_type;
     int rune_type;
+    bool litmode;
     bool lastwasand;     /* Last token was operand */
     bool lexdone;
     short nbra;
@@ -575,7 +577,7 @@ nextc(Parser *par, Rune *rp)
     par->exprp += chartorune(rp, par->exprp);
     if (*rp == '\\') {
         par->exprp += chartorune(rp, par->exprp);
-        switch (*rp) {
+        if (!par->litmode) switch (*rp) {
             case 't': *rp = '\t'; break;
             case 'n': *rp = '\n'; break;
             case 'r': *rp = '\r'; break;
@@ -589,15 +591,18 @@ nextc(Parser *par, Rune *rp)
             case 'W': *rp = ASC_W; break;
             case 'p': case 'P': { /* https://www.regular-expressions.info/unicode.html */
                 static struct { const char* c; int n, r; } cls[] = {
-                    {"{Ll}", 4, UNI_Ll}, {"{Lowercase_Letter}", 18, UNI_Ll}, 
-                    {"{Lu}", 4, UNI_Lu}, {"{Uppercase_Letter}", 18, UNI_Lu},
-                    {"{L&}", 4, UNI_La}, {"{Cased_Letter}", 14, UNI_La},
+                    {"{Ll}", 4, U8_Ll}, {"{Lowercase_Letter}", 18, U8_Ll}, 
+                    {"{Lu}", 4, U8_Lu}, {"{Uppercase_Letter}", 18, U8_Lu},
+                    {"{L}", 3, U8_La}, {"{L&}", 4, U8_La}, {"{Cased_Letter}", 14, U8_La},
+                    {"{Zs}", 4, U8_Zs}, {"{Space_Separator}", 17, U8_Zs},
+                    {"{Xnx}", 5, U8_Xnx}, {"{Hex_Digit}", 11, U8_Xnx},
+                    {"{Xan}", 5, U8_Xan}, {"{Alphanumeric}", 14, U8_Xan},
                 };
                 int inv = *rp == 'P';
                 for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
                     if (!strncmp(par->exprp, cls[i].c, cls[i].n)) {
-                        if (par->rune_type == IRUNE && (cls[i].r == UNI_Ll || cls[i].r == UNI_Lu))
-                            *rp = UNI_La + inv;
+                        if (par->rune_type == IRUNE && (cls[i].r == U8_Ll || cls[i].r == U8_Lu))
+                            *rp = U8_La + inv;
                         else 
                             *rp = cls[i].r + inv;
                         par->exprp += cls[i].n;
@@ -613,7 +618,7 @@ nextc(Parser *par, Rune *rp)
     }
     if (*rp == 0)
         par->lexdone = true;
-    return false;
+    return par->litmode;
 }
 
 static Token
@@ -622,11 +627,21 @@ lex(Parser *par)
     int quoted;
     start:
     quoted = nextc(par, &par->yyrune);
-    if (quoted) switch (par->yyrune) {
+    if (quoted) {
+        if (par->litmode) {
+            if (par->yyrune == 'E') { par->litmode = false; goto start; }
+            return par->yyrune == 0 ? END : par->rune_type;
+        }
+        switch (par->yyrune) {
         case  0 : return END;
         case 'b': return WBOUND;
         case 'B': return NWBOUND;
+        case 'A': return BOS;
+        case 'z': return EOS;
+        case 'Z': return EOZ;
+        case 'Q': par->litmode = true; goto start;
         default : return par->rune_type;
+        }
     }
 
     switch (par->yyrune) {
@@ -642,8 +657,8 @@ lex(Parser *par)
                 case  0 : par->exprp += k; return END;
                 case ')': par->exprp += k + 1; goto start;
                 case '-': enable = 0; break;
-                case 's': if (!par->flags.dotall) par->dot_type = enable ? ANYNL : ANY; break;
-                case 'i': if (!par->flags.caseless) par->rune_type = enable ? IRUNE : RUNE; break;
+                case 's': if (!par->flags.dotall) par->dot_type = ANY + enable; break;
+                case 'i': if (!par->flags.caseless) par->rune_type = RUNE + enable; break;
                 default: rcerror(par, creg_unknownoperator); return 0;
             }
         }
@@ -786,6 +801,7 @@ regcomp1(Parser *par, const char *s, int cflags)
     par->flags = pp->flags;
     par->rune_type = pp->flags.caseless ? IRUNE : RUNE;
     par->dot_type = pp->flags.dotall ? ANYNL : ANY;
+    par->litmode = false;
     par->exprp = s;
     par->nclass = 0;
     par->nbra = 0;
@@ -843,9 +859,9 @@ runematch(Rune s, Rune r, bool icase)
     case ASC_D: inv = 1; /* fallthrough */
     case ASC_d: return inv ^ (isdigit(r) != 0);
     case ASC_S: inv = 1;
-    case ASC_s: return inv ^ (isspace(r) != 0);
+    case ASC_s: return inv ^ utf8_isspace(r);
     case ASC_W: inv = 1;
-    case ASC_w: return inv ^ ((isalnum(r) != 0) | (r == '_'));
+    case ASC_w: return inv ^ (utf8_isalnum(r) | (r == '_'));
     case ASC_AL: inv = 1;
     case ASC_al: return inv ^ (isalpha(r) != 0);
     case ASC_LO: inv = 1;
@@ -866,12 +882,18 @@ runematch(Rune s, Rune r, bool icase)
     case ASC_pt: return inv ^ (ispunct(r) != 0);
     case ASC_XD: inv = 1;
     case ASC_xd: return inv ^ (isxdigit(r) != 0);
-    case UNX_La: inv = 1;
-    case UNI_La: return inv ^ utf8_isalpha(r);
-    case UNX_Ll: inv = 1;
-    case UNI_Ll: return inv ^ utf8_islower(r);
-    case UNX_Lu: inv = 1;
-    case UNI_Lu: return inv ^ utf8_isupper(r);
+    case NU8_La: inv = 1;
+    case U8_La: return inv ^ utf8_isalpha(r);
+    case NU8_Ll: inv = 1;
+    case U8_Ll: return inv ^ utf8_islower(r);
+    case NU8_Lu: inv = 1;
+    case U8_Lu: return inv ^ utf8_isupper(r);
+    case NU8_Zs: inv = 1;
+    case U8_Zs: return inv ^ utf8_isspace(r);
+    case NU8_Xan: inv = 1;
+    case U8_Xan: return inv ^ utf8_isalnum(r);
+    case NU8_Xnx: inv = 1;
+    case U8_Xnx: return inv ^ utf8_isxdigit(r);
     }
     return icase ? utf8_tolower(s) == utf8_tolower(r) : s == r;
 }
@@ -972,23 +994,29 @@ regexec1(const Reprog *progp,    /* program to run */
                     ok = true;
                     break;
                 case BOL:
-                    if (s == bol || *(s-1) == '\n')
-                        continue;
+                    if (s == bol || s[-1] == '\n') continue;
+                    break;
+                case BOS:
+                    if (s == bol) continue;
                     break;
                 case EOL:
-                    if (s == j->eol || r == 0 || r == '\n')
-                        continue;
+                    if (r == '\n') continue;
+                case EOS: /* fallthrough */
+                    if (s == j->eol || r == 0) continue;
+                    break;
+                case EOZ:
+                    if (s == j->eol || r == 0 || r == '\n' && s[1] == 0) continue;
                     break;
                 case NWBOUND:
-                    ok = true; /* fallthrough */
-                case WBOUND:
-                    if (ok ^ (s == bol || s == j->eol || ((isalnum(s[-1]) || s[-1] == '_')
-                                                        ^ (isalnum(s[ 0]) || s[ 0] == '_'))))
+                    ok = true;
+                case WBOUND: /* fallthrough */
+                    if (ok ^ (s == bol || s == j->eol || ((utf8_isalnum(s[-1]) || s[-1] == '_')
+                                                        ^ (utf8_isalnum(s[ 0]) || s[ 0] == '_'))))
                         continue;
                     break;
                 case NCCLASS:
-                    ok = true; /* fallthrough */
-                case CCLASS:
+                    ok = true;
+                case CCLASS: /* fallthrough */
                     ep = inst->r.classp->end;
                     for (rp = inst->r.classp->spans; rp < ep; rp += 2) {
                         if ((r >= rp[0] && r <= rp[1]) || (rp[0] == rp[1] && runematch(rp[0], r, icase)))
