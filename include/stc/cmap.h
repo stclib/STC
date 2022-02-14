@@ -54,7 +54,7 @@ int main(void) {
 #include <stdlib.h>
 #include <string.h>
 #define _cmap_inits {NULL, NULL, 0, 0, 0.85f}
-typedef struct      { MAP_SIZE_T idx; uint_fast8_t hx; } chash_bucket_t;
+typedef struct      { MAP_SIZE_T idx; uint8_t hx; } chash_bucket_t;
 #endif // CMAP_H_INCLUDED
 
 #ifndef _i_prefix
@@ -288,8 +288,8 @@ STC_DEF void _cx_memb(_clear)(_cx_self* self) {
 STC_DEF chash_bucket_t
 _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr) {
     const uint64_t _hash = i_hash(rkeyptr, sizeof *rkeyptr);
-    uint_fast8_t _hx; _cx_size _cap = self->bucket_count;
-    chash_bucket_t b = {c_PASTE(fastrange_,MAP_SIZE_T)(_hash, _cap), (uint_fast8_t)(_hash | 0x80)};
+    uint8_t _hx; _cx_size _cap = self->bucket_count;
+    chash_bucket_t b = {c_PASTE(fastrange_,MAP_SIZE_T)(_hash, _cap), (uint8_t)(_hash | 0x80)};
     const uint8_t* _hashx = self->_hashx;
     while ((_hx = _hashx[b.idx])) {
         if (_hx == b.hx) {
