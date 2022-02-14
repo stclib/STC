@@ -132,13 +132,14 @@ enum {
     ASC_up      , ASC_UP,   /* upper */
     ASC_pr      , ASC_PR,   /* print */
     ASC_pt      , ASC_PT,   /* punct */
-    ASC_xd      , ASC_XD,   /* xdigit */    
+    ASC_xd      , ASC_XD,   /* xdigit */
     U8_La       , NU8_La,   /* utf8 alpha */
     U8_Ll       , NU8_Ll,   /* utf8 lower */
     U8_Lu       , NU8_Lu,   /* utf8 upper */
     U8_Zs       , NU8_Zs,   /* utf8 white space */
     U8_Xnx      , NU8_Xnx,  /* utf8 hex digit */
     U8_Xan      , NU8_Xan,  /* utf8 alphanumeric */
+    U8_Xw       , NU8_Xw,   /* utf8 word */
     ANY         = 0x8200000, /* Any character except newline, . */
     ANYNL       ,           /* Any character including newline, . */
     NOP         ,           /* No operation, internal use only */
@@ -189,7 +190,7 @@ chartorune(Rune *rune, const char *s)
     case 2: utf8_decode(&ctx, *b++);
     }
     *rune = ctx.codep;
-    return ctx.len;    
+    return ctx.len;
 }
 
 static const char*
@@ -585,25 +586,26 @@ nextc(Parser *par, Rune *rp)
             case 'f': *rp = '\f'; break;
             case 'd': *rp = ASC_d; break;
             case 'D': *rp = ASC_D; break;
-            case 's': *rp = ASC_s; break;
-            case 'S': *rp = ASC_S; break;
-            case 'w': *rp = ASC_w; break;
-            case 'W': *rp = ASC_W; break;
+            case 's': *rp = U8_Zs; break;
+            case 'S': *rp = NU8_Zs; break;
+            case 'w': *rp = U8_Xw; break;
+            case 'W': *rp = NU8_Xw; break;
             case 'p': case 'P': { /* https://www.regular-expressions.info/unicode.html */
                 static struct { const char* c; int n, r; } cls[] = {
-                    {"{Ll}", 4, U8_Ll}, {"{Lowercase_Letter}", 18, U8_Ll}, 
+                    {"{Ll}", 4, U8_Ll}, {"{Lowercase_Letter}", 18, U8_Ll},
                     {"{Lu}", 4, U8_Lu}, {"{Uppercase_Letter}", 18, U8_Lu},
                     {"{L}", 3, U8_La}, {"{L&}", 4, U8_La}, {"{Cased_Letter}", 14, U8_La},
                     {"{Zs}", 4, U8_Zs}, {"{Space_Separator}", 17, U8_Zs},
                     {"{Xnx}", 5, U8_Xnx}, {"{Hex_Digit}", 11, U8_Xnx},
                     {"{Xan}", 5, U8_Xan}, {"{Alphanumeric}", 14, U8_Xan},
+                    {"{Xw}", 4, U8_Xw}, {"{Word}", 6, U8_Xw},
                 };
                 int inv = *rp == 'P';
                 for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
                     if (!strncmp(par->exprp, cls[i].c, cls[i].n)) {
                         if (par->rune_type == IRUNE && (cls[i].r == U8_Ll || cls[i].r == U8_Lu))
                             *rp = U8_La + inv;
-                        else 
+                        else
                             *rp = cls[i].r + inv;
                         par->exprp += cls[i].n;
                         break;
@@ -613,7 +615,7 @@ nextc(Parser *par, Rune *rp)
                     *rp = 0; break;
                 }
             }
-        }      
+        }
         return true;
     }
     if (*rp == 0)
@@ -651,7 +653,7 @@ lex(Parser *par)
     case '+': return PLUS;
     case '|': return OR;
     case '.': return par->dot_type;
-    case '(': 
+    case '(':
         if (par->exprp[0] == '?') {
             for (int k = 1, enable = 1; ; ++k) switch (par->exprp[k]) {
                 case  0 : par->exprp += k; return END;
@@ -716,18 +718,18 @@ bldcclass(Parser *par)
                 }
             } else if (rune == '[' && *par->exprp == ':') {
                 static struct { const char* c; int n, r; } cls[] = {
-                    {"alnum:]", 7, ASC_an}, {"alpha:]", 7, ASC_al}, {"blank:]", 7, ASC_bl}, 
-                    {"cntrl:]", 7, ASC_ct}, {"digit:]", 7, ASC_d}, {"graph:]", 7, ASC_gr}, 
+                    {"alnum:]", 7, ASC_an}, {"alpha:]", 7, ASC_al}, {"blank:]", 7, ASC_bl},
+                    {"cntrl:]", 7, ASC_ct}, {"digit:]", 7, ASC_d}, {"graph:]", 7, ASC_gr},
                     {"lower:]", 7, ASC_lo}, {"print:]", 7, ASC_pr}, {"punct:]", 7, ASC_pt},
                     {"space:]", 7, ASC_s}, {"upper:]", 7, ASC_up}, {"xdigit:]", 8, ASC_xd},
                     {"word:]", 6, ASC_w},
                 };
-                int inv = par->exprp[1] == '^', off = 1 + inv; 
+                int inv = par->exprp[1] == '^', off = 1 + inv;
                 for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
                     if (!strncmp(par->exprp + off, cls[i].c, cls[i].n)) {
                         if (par->rune_type == IRUNE && (cls[i].r == ASC_lo || cls[i].r == ASC_up))
                             rune = ASC_al + inv;
-                        else 
+                        else
                             rune = cls[i].r + inv;
                         par->exprp += off + cls[i].n;
                         break;
@@ -851,7 +853,7 @@ out:
 }
 
 
-static int 
+static int
 runematch(Rune s, Rune r, bool icase)
 {
     int inv = 0;
@@ -859,9 +861,9 @@ runematch(Rune s, Rune r, bool icase)
     case ASC_D: inv = 1; /* fallthrough */
     case ASC_d: return inv ^ (isdigit(r) != 0);
     case ASC_S: inv = 1;
-    case ASC_s: return inv ^ utf8_isspace(r);
+    case ASC_s: return inv ^ (isspace(r) != 0);
     case ASC_W: inv = 1;
-    case ASC_w: return inv ^ (utf8_isalnum(r) | (r == '_'));
+    case ASC_w: return inv ^ (isalnum(r) | (r == '_'));
     case ASC_AL: inv = 1;
     case ASC_al: return inv ^ (isalpha(r) != 0);
     case ASC_LO: inv = 1;
@@ -894,6 +896,8 @@ runematch(Rune s, Rune r, bool icase)
     case U8_Xan: return inv ^ utf8_isalnum(r);
     case NU8_Xnx: inv = 1;
     case U8_Xnx: return inv ^ utf8_isxdigit(r);
+    case NU8_Xw: inv = 1;
+    case U8_Xw: return inv ^ (utf8_isalnum(r) | (r == '_'));
     }
     return icase ? utf8_tolower(s) == utf8_tolower(r) : s == r;
 }
@@ -943,7 +947,7 @@ regexec1(const Reprog *progp,    /* program to run */
                 goto next1;
             case RUNE:
                 p = utfrune(s, j->startchar);
-                next1: 
+                next1:
                 if (p == NULL || s == j->eol)
                     return match;
                 s = p;
@@ -977,7 +981,7 @@ regexec1(const Reprog *progp,    /* program to run */
                 int ok = false;
 
                 switch (inst->type) {
-                case RUNE: 
+                case RUNE:
                 case IRUNE:    /* regular character */
                     ok = runematch(inst->r.rune, r, (icase = inst->type==IRUNE));
                     break;
@@ -1085,7 +1089,7 @@ regexec9(const Reprog *progp,    /* program to run */
     const char *bol,    /* string to run machine on */
     int ms,             /* number of elements at mp */
     Resub mp[],         /* subexpression elements */
-    int mflags)         
+    int mflags)
 {
     Reljunk j;
     Relist relist0[LISTSIZE], relist1[LISTSIZE];
@@ -1166,7 +1170,7 @@ void cregex_replace(
                     *dp++ = *sp;
                 break;
             }
-        } else if (*sp == '&') {                
+        } else if (*sp == '&') {
             if (mp[0].str != NULL && mp != NULL && ms > 0)
                 for (ssp = mp[0].str; ssp < (mp[0].str + mp[0].len); ssp++)
                     if (dp < ep)
@@ -1192,7 +1196,7 @@ int cregex_captures(cregex rx) {
     return rx.prog ? 1 + rx.prog->nsubids : 0;
 }
 
-int cregex_find(const cregex *rx, const char* string, 
+int cregex_find(const cregex *rx, const char* string,
                 size_t nmatch, cregmatch match[], int mflags) {
     int res = regexec9(rx->prog, string, nmatch, match, mflags);
     switch (res) {
