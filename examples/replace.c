@@ -1,5 +1,6 @@
 
 #include <stc/cstr.h>
+#include <stc/utf8.h>
 
 int main ()
 {

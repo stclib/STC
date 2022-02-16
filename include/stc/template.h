@@ -44,11 +44,14 @@
   #define i_type i_cnt
   #error "i_cnt and i_equ no longer supported: use new name i_type / i_eq"
 #endif
-
 #ifdef i_type
   #define i_tag i_type
   #undef _i_prefix
   #define _i_prefix
+#endif
+
+#ifndef i_size
+  #define i_size uint32_t
 #endif
 
 #if defined i_key_str || defined i_val_str
@@ -236,6 +239,7 @@
 #undef i_keyfrom
 #undef i_keyto
 #undef i_keydrop
+#undef i_size
 
 #undef _i_prefix
 #undef _i_no_raw

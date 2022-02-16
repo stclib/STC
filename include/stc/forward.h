@@ -29,10 +29,10 @@
 #define forward_carr3(CX, VAL) _c_carr3_types(CX, VAL)
 #define forward_cdeq(CX, VAL) _c_cdeq_types(CX, VAL)
 #define forward_clist(CX, VAL) _c_clist_types(CX, VAL)
-#define forward_cmap(CX, KEY, VAL) _c_chash_types(CX, KEY, VAL, c_true, c_false)
-#define forward_csmap(CX, KEY, VAL) _c_aatree_types(CX, KEY, VAL, c_true, c_false)
-#define forward_cset(CX, KEY) _c_chash_types(CX, cset, KEY, KEY, c_false, c_true)
-#define forward_csset(CX, KEY) _c_aatree_types(CX, KEY, KEY, c_false, c_true)
+#define forward_cmap(CX, KEY, VAL, SZ) _c_chash_types(CX, KEY, VAL, SZ, c_true, c_false)
+#define forward_csmap(CX, KEY, VAL, SZ) _c_aatree_types(CX, KEY, VAL, SZ, c_true, c_false)
+#define forward_cset(CX, KEY, SZ) _c_chash_types(CX, cset, KEY, KEY, SZ, c_false, c_true)
+#define forward_csset(CX, KEY, SZ) _c_aatree_types(CX, KEY, KEY, SZ, c_false, c_true)
 #define forward_cbox(CX, VAL) _c_cbox_types(CX, VAL)
 #define forward_carc(CX, VAL) _c_carc_types(CX, VAL)
 #define forward_cpque(CX, VAL) _c_cpque_types(CX, VAL)
@@ -47,9 +47,6 @@ typedef struct csview { const char* str; size_t size; } csview;
 typedef union csview_iter { const char *ref; csview cp; } csview_iter;
 typedef char csview_value;
 
-#ifndef MAP_SIZE_T
-#define MAP_SIZE_T uint32_t
-#endif
 #define c_true(...) __VA_ARGS__
 #define c_false(...)
 
@@ -81,10 +78,10 @@ typedef char csview_value;
         SELF##_node *last; \
     } SELF
 
-#define _c_chash_types(SELF, KEY, VAL, MAP_ONLY, SET_ONLY) \
+#define _c_chash_types(SELF, KEY, VAL, SZ, MAP_ONLY, SET_ONLY) \
     typedef KEY SELF##_key; \
     typedef VAL SELF##_mapped; \
-    typedef MAP_SIZE_T SELF##_size_t; \
+    typedef SZ SELF##_size_t; \
 \
     typedef SET_ONLY( SELF##_key ) \
             MAP_ONLY( struct SELF##_value ) \
@@ -107,10 +104,10 @@ typedef char csview_value;
         float max_load_factor; \
     } SELF
 
-#define _c_aatree_types(SELF, KEY, VAL, MAP_ONLY, SET_ONLY) \
+#define _c_aatree_types(SELF, KEY, VAL, SZ, MAP_ONLY, SET_ONLY) \
     typedef KEY SELF##_key; \
     typedef VAL SELF##_mapped; \
-    typedef MAP_SIZE_T SELF##_size_t; \
+    typedef SZ SELF##_size_t; \
     typedef struct SELF##_node SELF##_node; \
 \
     typedef SET_ONLY( SELF##_key ) \

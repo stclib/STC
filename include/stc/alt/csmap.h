@@ -64,7 +64,7 @@ int main(void) {
     }
 
 #ifndef cx_forwarded
-    _c_aatree_types(_cx_self, C, i_key, i_val);
+    _c_aatree_types(_cx_self, C, i_key, i_val, i_size);
 #endif    
 
     _c_aatree_complete_types(_cx_self, C); \
@@ -199,7 +199,7 @@ int main(void) {
 
 #if defined(_i_implement)
 
-_c_aatree_types(csmap_SENTINEL, csmap_, int, int);
+_c_aatree_types(csmap_SENTINEL, csmap_, int, int, i_size);
 _c_aatree_complete_types(csmap_SENTINEL, csmap_);
 static csmap_SENTINEL_node _aatree_sentinel = {&_aatree_sentinel, &_aatree_sentinel, 0};
 

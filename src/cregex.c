@@ -1009,7 +1009,7 @@ regexec1(const Reprog *progp,    /* program to run */
                     if (s == j->eol || r == 0) continue;
                     break;
                 case EOZ:
-                    if (s == j->eol || r == 0 || r == '\n' && s[1] == 0) continue;
+                    if (s == j->eol || r == 0 || (r == '\n' && s[1] == 0)) continue;
                     break;
                 case NWBOUND:
                     ok = true;

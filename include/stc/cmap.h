@@ -54,7 +54,7 @@ int main(void) {
 #include <stdlib.h>
 #include <string.h>
 #define _cmap_inits {NULL, NULL, 0, 0, 0.85f}
-typedef struct      { MAP_SIZE_T idx; uint8_t hx; } chash_bucket_t;
+typedef struct      { size_t idx; uint8_t hx; } chash_bucket_t;
 #endif // CMAP_H_INCLUDED
 
 #ifndef _i_prefix
@@ -71,7 +71,7 @@ typedef struct      { MAP_SIZE_T idx; uint8_t hx; } chash_bucket_t;
 #endif
 #include "template.h"
 #if !c_option(c_is_fwd)
-_cx_deftypes(_c_chash_types, _cx_self, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY);
+_cx_deftypes(_c_chash_types, _cx_self, i_key, i_val, i_size, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
 
 _i_MAP_ONLY( struct _cx_value {
@@ -289,15 +289,15 @@ STC_DEF chash_bucket_t
 _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr) {
     const uint64_t _hash = i_hash(rkeyptr, sizeof *rkeyptr);
     uint8_t _hx; _cx_size _cap = self->bucket_count;
-    chash_bucket_t b = {c_PASTE(fastrange_,MAP_SIZE_T)(_hash, _cap), (uint8_t)(_hash | 0x80)};
+    chash_bucket_t b = {c_PASTE(fastrange_,i_size)(_hash, _cap), (uint8_t)(_hash | 0x80)};
     const uint8_t* _hashx = self->_hashx;
     while ((_hx = _hashx[b.idx])) {
         if (_hx == b.hx) {
             _cx_rawkey _raw = i_keyto(_i_keyref(self->table + b.idx));
             if (i_eq(&_raw, rkeyptr)) break;
         }
-        _cx_size _mask = (_cx_size) -(++b.idx != _cap);
-        b.idx &= _mask; // b.idx = (b.idx + 1) % _cap
+        if (++b.idx == _cap)
+            b.idx = 0;
     }
     return b;
 }
@@ -368,12 +368,12 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
     uint8_t* _hashx = self->_hashx;
     _cx_memb(_value_drop)(&_slot[i]);
     for (;;) { /* delete without leaving tombstone */
-        _cx_size _mask = (_cx_size) -(++j != _cap);
-        j &= _mask;
+        if (++j == _cap)
+            j = 0;
         if (! _hashx[j])
             break;
         _cx_rawkey _raw = i_keyto(_i_keyref(_slot + j));
-        k = c_PASTE(fastrange_,MAP_SIZE_T)(i_hash(&_raw, sizeof _raw), _cap);
+        k = c_PASTE(fastrange_,i_size)(i_hash(&_raw, sizeof _raw), _cap);
         if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */
             _slot[i] = _slot[j], _hashx[i] = _hashx[j], i = j;
     }

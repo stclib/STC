@@ -1,7 +1,7 @@
 #include <stc/cstr.h>
 #include <stc/forward.h>
 
-forward_csmap(PMap, struct Point, int);
+forward_csmap(PMap, struct Point, int, uint32_t);
 
 // Use forward declared PMap in struct
 struct MyStruct {

@@ -1,7 +1,7 @@
 #include <stc/cstr.h>
 #include <stc/forward.h>
 
-forward_cmap(cmap_pnt, struct Point, int);
+forward_cmap(cmap_pnt, struct Point, int, uint32_t);
 
 struct MyStruct {
     cmap_pnt pntmap;
