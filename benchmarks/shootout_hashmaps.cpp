@@ -209,7 +209,7 @@ size_t seed;
         M##_PUT(X, RAND(keybits), i); \
     size_t x = 300000000/M##_SIZE(X); \
     clock_t difference, before = clock(); \
-    for (int k=0; k < x; k++) M##_FOR (X, it) \
+    for (size_t k=0; k < x; k++) M##_FOR (X, it) \
         sum += M##_ITEM(X, it); \
     difference = clock() - before; \
     printf(#M ": time: %5.02f, size: %zu, buckets: %8zu, repeats: %zu, sum: %zu\n", \
@@ -256,10 +256,10 @@ enum {
 
 int main(int argc, char* argv[])
 {
-    int n_mill = argc >= 2 ? atoi(argv[1]) : DEFAULT_N_MILL;
-    int keybits = argc >= 3 ? atoi(argv[2]) : DEFAULT_KEYBITS;
-    int n = n_mill * 1000000;
-    int N0 = n, N1 = n/2, N2 = n/2, N3 = n, N4 = n, N5 = n;
+    unsigned n_mill = argc >= 2 ? atoi(argv[1]) : DEFAULT_N_MILL;
+    unsigned keybits = argc >= 3 ? atoi(argv[2]) : DEFAULT_KEYBITS;
+    unsigned n = n_mill * 1000000;
+    unsigned N0 = n, N1 = n/2, N2 = n/2, N3 = n, N4 = n, N5 = n;
     seed = time(NULL); // 1636306010;
 
     printf("\nUnordered hash map shootout\n");

@@ -233,10 +233,10 @@ _cx_memb(_erase_at)(_cx_self* self, _cx_iter it) {
 #if defined(_i_implement)
 
 #ifndef CMAP_H_INCLUDED
-//STC_INLINE size_t fastrange_uint64_t(uint64_t x, uint64_t n)
-//    { uint64_t lo, hi; c_umul128(x, n, &lo, &hi); return hi; }
-#define fastrange_uint32_t(x, n) (uint32_t)((uint32_t)(x)*(uint64_t)(n) >> 32)
-#define chash_index_(h, entryPtr) ((entryPtr) - (h).table)
+STC_INLINE size_t fastrange_size_t(uint64_t x, uint64_t n)
+    { uint64_t lo, hi; c_umul128(x, n, &lo, &hi); return (size_t)hi; }
+STC_INLINE size_t fastrange_uint32_t(uint64_t x, uint64_t n)
+    { return (size_t)((uint32_t)x*n >> 32); }
 #endif // CMAP_H_INCLUDED
 
 STC_DEF _cx_self
@@ -362,11 +362,11 @@ _cx_memb(_reserve)(_cx_self* self, const size_t _newcap) {
 
 STC_DEF void
 _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
-    _cx_size i = chash_index_(*self, _val), j = i, k;
+    _cx_size i = _val - self->table, j = i, k;
     const _cx_size _cap = self->bucket_count;
     _cx_value* _slot = self->table;
     uint8_t* _hashx = self->_hashx;
-    _cx_memb(_value_drop)(&_slot[i]);
+    _cx_memb(_value_drop)(_val);
     for (;;) { /* delete without leaving tombstone */
         if (++j == _cap)
             j = 0;

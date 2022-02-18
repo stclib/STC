@@ -208,7 +208,8 @@ static void ins_and_access_cmap_s(picobench::state& s)
         randomize(str.str, cstr_size(str));
         //if (cstr_size(str) > 30) { printf("%s\n", str.str); exit(0); }
         cmap_str_emplace(&map, str.str, str.str);
-        //randomize(str.str, cstr_size(str));
+
+        randomize(str.str, cstr_size(str));
         result += cmap_str_erase(&map, str.str);
     }
     s.set_result(result + cmap_str_size(map));

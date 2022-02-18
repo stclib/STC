@@ -1062,11 +1062,6 @@ static inline int utf8_isalpha(uint32_t codep) {
     return cfold_lookup(codep) != -1;
 }
 
-static inline int utf8_isalnum(uint32_t codep) {
-    if (codep < 128) return isalnum(codep) != 0;
-    return cfold_lookup(codep) != -1;
-}
-
 static inline int utf8_isspace(uint32_t codep) {
     static uint16_t t[] = {0x09, 0x0D, 0x20, 0x85, 0xA0, 0x1680,
                            0x2028, 0x2029, 0x202F, 0x205F, 0x3000};
@@ -1075,12 +1070,25 @@ static inline int utf8_isspace(uint32_t codep) {
     return (codep >= 0x2000) & (codep <= 0x200A);
 }
 
+static inline int utf8_isdigit(uint32_t codep) {
+    return ((codep >= '0') & (codep <= '9')) || 
+           ((codep >= 0xFF10) & (codep <= 0xFF19)) ||
+           ((codep >= 0x1D7CE) & (codep <= 0x1D7FF));
+}
+
 static inline int utf8_isxdigit(uint32_t codep) {
     static uint16_t t[] = {0x30, 0x39, 0x41, 0x46, 0x61, 0x66,
                            0xFF10, 0xFF19, 0xFF21, 0xFF26, 0xFF41, 0xFF46};
     for (int i=1; i<sizeof t/sizeof *t; i += 2)
         if (codep <= t[i]) return codep >= t[i - 1];
     return false;
+}
+
+static inline int utf8_isalnum(uint32_t codep) {
+    if (codep < 128) return isalnum(codep) != 0;
+    if ((codep >= 0xFF10) & (codep <= 0xFF19) ||
+       ((codep >= 0x1D7CE) & (codep <= 0x1D7FF))) return true;
+    return cfold_lookup(codep) != -1;
 }
 
 // ------------------------------------------------------------

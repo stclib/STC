@@ -120,26 +120,19 @@ enum {
     QUEST       ,           /* a? == a|nothing, i.e. 0 or 1 a's */
     RUNE        = 0x8100000,
     IRUNE,
-    ASC_d       , ASC_D,    /* dec digit, non-digit */
-    ASC_s       , ASC_S,    /* utf8 space, non-space */
-    ASC_w       , ASC_W,    /* utf8 word, non-word */
-    ASC_an      , ASC_AN,   /* alnum */
-    ASC_al      , ASC_AL,   /* alpha */
     ASC_bl      , ASC_BL,   /* blank */
     ASC_ct      , ASC_CT,   /* ctrl */
     ASC_gr      , ASC_GR,   /* graphic */
-    ASC_lo      , ASC_LO,   /* lower */
-    ASC_up      , ASC_UP,   /* upper */
     ASC_pr      , ASC_PR,   /* print */
     ASC_pt      , ASC_PT,   /* punct */
-    ASC_xd      , ASC_XD,   /* xdigit */
-    U8_La       , NU8_La,   /* utf8 alpha */
-    U8_Ll       , NU8_Ll,   /* utf8 lower */
-    U8_Lu       , NU8_Lu,   /* utf8 upper */
-    U8_Zs       , NU8_Zs,   /* utf8 white space */
-    U8_Xnx      , NU8_Xnx,  /* utf8 hex digit */
-    U8_Xan      , NU8_Xan,  /* utf8 alphanumeric */
-    U8_Xw       , NU8_Xw,   /* utf8 word */
+    U8_Nd       , U8N_Nd,    /* dec digit, non-digit */
+    U8_LC       , U8N_LC,   /* utf8 letter cased */
+    U8_Ll       , U8N_Ll,   /* utf8 letter lower */
+    U8_Lu       , U8N_Lu,   /* utf8 letter upper */
+    U8_Zs       , U8N_Zs,   /* utf8 white space */
+    U8_Xnx      , U8N_Xnx,  /* utf8 hex digit */
+    U8_Xan      , U8N_Xan,  /* utf8 alphanumeric */
+    U8_Xw       , U8N_Xw,   /* utf8 word */
     ANY         = 0x8200000, /* Any character except newline, . */
     ANYNL       ,           /* Any character including newline, . */
     NOP         ,           /* No operation, internal use only */
@@ -584,27 +577,35 @@ nextc(Parser *par, Rune *rp)
             case 'r': *rp = '\r'; break;
             case 'v': *rp = '\v'; break;
             case 'f': *rp = '\f'; break;
-            case 'd': *rp = ASC_d; break;
-            case 'D': *rp = ASC_D; break;
+            case 'd': *rp = U8_Nd; break;
+            case 'D': *rp = U8N_Nd; break;
             case 's': *rp = U8_Zs; break;
-            case 'S': *rp = NU8_Zs; break;
+            case 'S': *rp = U8N_Zs; break;
             case 'w': *rp = U8_Xw; break;
-            case 'W': *rp = NU8_Xw; break;
+            case 'W': *rp = U8N_Xw; break;
+            case 'x': if (*par->exprp != '{') break;
+                *rp = 0; sscanf(++par->exprp, "%x", rp);
+                while (*par->exprp) if (*par->exprp++ == '}') break;
+                break;
             case 'p': case 'P': { /* https://www.regular-expressions.info/unicode.html */
                 static struct { const char* c; int n, r; } cls[] = {
-                    {"{Ll}", 4, U8_Ll}, {"{Lowercase_Letter}", 18, U8_Ll},
-                    {"{Lu}", 4, U8_Lu}, {"{Uppercase_Letter}", 18, U8_Lu},
-                    {"{L}", 3, U8_La}, {"{L&}", 4, U8_La}, {"{Cased_Letter}", 14, U8_La},
-                    {"{Zs}", 4, U8_Zs}, {"{Space_Separator}", 17, U8_Zs},
-                    {"{Xnx}", 5, U8_Xnx}, {"{Hex_Digit}", 11, U8_Xnx},
-                    {"{Xan}", 5, U8_Xan}, {"{Alphanumeric}", 14, U8_Xan},
-                    {"{Xw}", 4, U8_Xw}, {"{Word}", 6, U8_Xw},
+                    {"{Alpha}", 7, U8_LC}, {"{LC}", 4, U8_LC}, 
+                    {"{Alnum}", 7, U8_Xan},
+                    {"{Digit}", 7, U8_Nd}, {"{Nd}", 4, U8_Nd},
+                    {"{Lower}", 7, U8_Ll}, {"{Ll}", 4, U8_Ll},
+                    {"{Space}", 7, U8_Zs}, {"{Zs}", 4, U8_Zs},
+                    {"{Upper}", 7, U8_Lu}, {"{Lu}", 4, U8_Lu},
+                    {"{XDigit}", 8, U8_Xnx},
+                    {"{Blank}", 7, ASC_bl},
+                    {"{Graph}", 7, ASC_gr},
+                    {"{Print}", 7, ASC_pr},
+                    {"{Punct}", 7, ASC_pt},
                 };
                 int inv = *rp == 'P';
                 for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
                     if (!strncmp(par->exprp, cls[i].c, cls[i].n)) {
                         if (par->rune_type == IRUNE && (cls[i].r == U8_Ll || cls[i].r == U8_Lu))
-                            *rp = U8_La + inv;
+                            *rp = U8_LC + inv;
                         else
                             *rp = cls[i].r + inv;
                         par->exprp += cls[i].n;
@@ -716,24 +717,6 @@ bldcclass(Parser *par)
                     ep[-1] = rune;
                     continue;
                 }
-            } else if (rune == '[' && *par->exprp == ':') {
-                static struct { const char* c; int n, r; } cls[] = {
-                    {"alnum:]", 7, ASC_an}, {"alpha:]", 7, ASC_al}, {"blank:]", 7, ASC_bl},
-                    {"cntrl:]", 7, ASC_ct}, {"digit:]", 7, ASC_d}, {"graph:]", 7, ASC_gr},
-                    {"lower:]", 7, ASC_lo}, {"print:]", 7, ASC_pr}, {"punct:]", 7, ASC_pt},
-                    {"space:]", 7, ASC_s}, {"upper:]", 7, ASC_up}, {"xdigit:]", 8, ASC_xd},
-                    {"word:]", 6, ASC_w},
-                };
-                int inv = par->exprp[1] == '^', off = 1 + inv;
-                for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
-                    if (!strncmp(par->exprp + off, cls[i].c, cls[i].n)) {
-                        if (par->rune_type == IRUNE && (cls[i].r == ASC_lo || cls[i].r == ASC_up))
-                            rune = ASC_al + inv;
-                        else
-                            rune = cls[i].r + inv;
-                        par->exprp += off + cls[i].n;
-                        break;
-                    }
             }
         }
         *ep++ = rune;
@@ -858,45 +841,31 @@ runematch(Rune s, Rune r, bool icase)
 {
     int inv = 0;
     switch (s) {
-    case ASC_D: inv = 1; /* fallthrough */
-    case ASC_d: return inv ^ (isdigit(r) != 0);
-    case ASC_S: inv = 1;
-    case ASC_s: return inv ^ (isspace(r) != 0);
-    case ASC_W: inv = 1;
-    case ASC_w: return inv ^ (isalnum(r) | (r == '_'));
-    case ASC_AL: inv = 1;
-    case ASC_al: return inv ^ (isalpha(r) != 0);
-    case ASC_LO: inv = 1;
-    case ASC_lo: return inv ^ (islower(r) != 0);
-    case ASC_UP: inv = 1;
-    case ASC_up: return inv ^ (isupper(r) != 0);
-    case ASC_BL: inv = 1;
+    case ASC_BL: inv = 1; /* fallthrough */
     case ASC_bl: return inv ^ ((r == ' ') | (r == '\t'));
     case ASC_CT: inv = 1;
     case ASC_ct: return inv ^ (iscntrl(r) != 0);
     case ASC_GR: inv = 1;
     case ASC_gr: return inv ^ (isgraph(r) != 0);
-    case ASC_AN: inv = 1;
-    case ASC_an: return inv ^ (isalnum(r) != 0);
     case ASC_PR: inv = 1;
     case ASC_pr: return inv ^ (isprint(r) != 0);
     case ASC_PT: inv = 1;
     case ASC_pt: return inv ^ (ispunct(r) != 0);
-    case ASC_XD: inv = 1;
-    case ASC_xd: return inv ^ (isxdigit(r) != 0);
-    case NU8_La: inv = 1;
-    case U8_La: return inv ^ utf8_isalpha(r);
-    case NU8_Ll: inv = 1;
+    case U8N_Nd: inv = 1;
+    case U8_Nd: return inv ^ (utf8_isdigit(r));
+    case U8N_LC: inv = 1;
+    case U8_LC: return inv ^ utf8_isalpha(r);
+    case U8N_Ll: inv = 1;
     case U8_Ll: return inv ^ utf8_islower(r);
-    case NU8_Lu: inv = 1;
+    case U8N_Lu: inv = 1;
     case U8_Lu: return inv ^ utf8_isupper(r);
-    case NU8_Zs: inv = 1;
+    case U8N_Zs: inv = 1;
     case U8_Zs: return inv ^ utf8_isspace(r);
-    case NU8_Xan: inv = 1;
+    case U8N_Xan: inv = 1;
     case U8_Xan: return inv ^ utf8_isalnum(r);
-    case NU8_Xnx: inv = 1;
+    case U8N_Xnx: inv = 1;
     case U8_Xnx: return inv ^ utf8_isxdigit(r);
-    case NU8_Xw: inv = 1;
+    case U8N_Xw: inv = 1;
     case U8_Xw: return inv ^ (utf8_isalnum(r) | (r == '_'));
     }
     return icase ? utf8_tolower(s) == utf8_tolower(r) : s == r;

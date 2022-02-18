@@ -122,13 +122,11 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
     while (--len) h = (h << 10) - h + *x++;
     return _c_ROTL(h, 26) ^ h;
 }
-STC_INLINE uint64_t c_hash32(const void* key, size_t len) {
-    uint32_t x; memcpy(&x, key, 4);
-    return x*0xc6a4a7935bd1e99d >> 15;
+STC_INLINE uint64_t c_hash32(const void* key, size_t n) {
+    return *(uint32_t *)key*0xc6a4a7935bd1e99d;
 }
-STC_INLINE uint64_t c_hash64(const void* key, size_t len) {
-    uint64_t x; memcpy(&x, key, 8);
-    return x*0xc6a4a7935bd1e99d;
+STC_INLINE uint64_t c_hash64(const void* key, size_t n) {
+    return *(uint64_t *)key*0xc6a4a7935bd1e99d;
 }
 
 STC_INLINE char* c_strnstrn(const char *s, const char *needle, size_t slen, const size_t nlen) {
