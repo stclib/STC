@@ -566,12 +566,15 @@ nextc(Parser *par, Rune *rp)
 {
     if (par->lexdone) {
         *rp = 0;
-        return true;
+        return 1;
     }
     par->exprp += chartorune(rp, par->exprp);
     if (*rp == '\\') {
+        if (par->litmode && *par->exprp != 'E')
+            return 1;
         par->exprp += chartorune(rp, par->exprp);
-        if (!par->litmode) switch (*rp) {
+        switch (*rp) {
+            case 'E': return par->litmode + 1;
             case 't': *rp = '\t'; break;
             case 'n': *rp = '\n'; break;
             case 'r': *rp = '\r'; break;
@@ -585,8 +588,10 @@ nextc(Parser *par, Rune *rp)
             case 'W': *rp = U8N_Xw; break;
             case 'x': if (*par->exprp != '{') break;
                 *rp = 0; sscanf(++par->exprp, "%x", rp);
-                while (*par->exprp) if (*par->exprp++ == '}') break;
-                break;
+                while (*par->exprp) if (*(par->exprp++) == '}') break;
+                if (par->exprp[-1] != '}')
+                    rcerror(par, creg_unmatchedrightparenthesis);
+                return 2;
             case 'p': case 'P': { /* https://www.regular-expressions.info/unicode.html */
                 static struct { const char* c; int n, r; } cls[] = {
                     {"{Alpha}", 7, U8_LC}, {"{LC}", 4, U8_LC}, 
@@ -613,11 +618,12 @@ nextc(Parser *par, Rune *rp)
                     }
                 if (*rp < OPERATOR) {
                     rcerror(par, creg_unknownoperator);
-                    *rp = 0; break;
+                    *rp = 0;
                 }
+                break;
             }
         }
-        return true;
+        return 1;
     }
     if (*rp == 0)
         par->lexdone = true;
@@ -631,8 +637,11 @@ lex(Parser *par)
     start:
     quoted = nextc(par, &par->yyrune);
     if (quoted) {
-        if (par->litmode) {
-            if (par->yyrune == 'E') { par->litmode = false; goto start; }
+        if (quoted == 2) {
+            if (par->litmode && par->yyrune == 'E') {
+                par->litmode = false;
+                goto start;
+            }
             return par->yyrune == 0 ? END : par->rune_type;
         }
         switch (par->yyrune) {
@@ -642,7 +651,8 @@ lex(Parser *par)
         case 'A': return BOS;
         case 'z': return EOS;
         case 'Z': return EOZ;
-        case 'Q': par->litmode = true; goto start;
+        case 'Q': par->litmode = true;
+                  goto start;
         default : return par->rune_type;
         }
     }
