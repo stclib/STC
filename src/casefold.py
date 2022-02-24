@@ -140,6 +140,7 @@ if __name__ == "__main__":
     print('''#include <stdint.h>
 #include <stdio.h>
 #include <ctype.h>
+#include <stc/utf8.h>
 #include <stdbool.h>''')
 
     cfold = make_casetable()
@@ -190,8 +191,7 @@ bool utf8_isspace(uint32_t c) {
 
 bool utf8_isdigit(uint32_t c) {
     return ((c >= '0') & (c <= '9')) || 
-           ((c >= 0xFF10) & (c <= 0xFF19)) ||
-           ((c >= 0x1D7CE) & (c <= 0x1D7FF));
+           ((c >= 0xFF10) & (c <= 0xFF19));
 }
 
 bool utf8_isxdigit(uint32_t c) {
@@ -204,36 +204,17 @@ bool utf8_isxdigit(uint32_t c) {
 
 bool utf8_isalnum(uint32_t c) {
     if (c < 128) return isalnum(c) != 0;
-    if ((c >= 0xFF10) & (c <= 0xFF19) ||
-       ((c >= 0x1D7CE) & (c <= 0x1D7FF))) return true;
+    if ((c >= 0xFF10) & (c <= 0xFF19)) return true;
+    return utf8_islower(c) || utf8_isupper(c);
+}
+
+bool utf8_isalpha(uint32_t c) {
+    if (c < 128) return isalpha(c) != 0;
     return utf8_islower(c) || utf8_isupper(c);
 }
 
 
 #ifdef TEST
-size_t utf8_encode(char *out, uint32_t c)
-{
-    char* p = out;
-    if (c < 0x80U) {
-        *p++ = (char) c;
-    } else if (c < 0x0800U) {
-        *p++ = (char) ((c>>6  & 0x1F) | 0xC0);
-        *p++ = (char) ((c     & 0x3F) | 0x80);
-    } else if (c < 0x010000U) {
-        if (c < 0xD800U || c >= 0xE000U) {
-            *p++ = (char) ((c>>12 & 0x0F) | 0xE0);
-            *p++ = (char) ((c>>6  & 0x3F) | 0x80);
-            *p++ = (char) ((c     & 0x3F) | 0x80);
-        }
-    } else if (c < 0x110000U) {
-        *p++ = (char) ((c>>18 & 0x07) | 0xF0);
-        *p++ = (char) ((c>>12 & 0x3F) | 0x80);
-        *p++ = (char) ((c>>6  & 0x3F) | 0x80);
-        *p++ = (char) ((c     & 0x3F) | 0x80);
-    }
-    return p - out;
-}
-
 int main()
 {
     for (int i=0; i < sizeof cfold_low/sizeof *cfold_low; ++i)
