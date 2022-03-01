@@ -250,7 +250,7 @@ int main()
         cmap_iv_insert(&vecs, 4, (Vec3i){100, 100, 100});
 
         c_forpair (num, vec, cmap_iv, vecs)
-            printf("%d: { %3d, %3d, %3d }\n", _.num_, _.vec.x,  _.vec.y,  _.vec.z);
+            printf("%d: { %3d, %3d, %3d }\n", _.num, _.vec.x,  _.vec.y,  _.vec.z);
     }
 }
 ```
@@ -386,7 +386,7 @@ static inline RViking Viking_toraw(const Viking* vk) {
 int main()
 {
     c_auto (Vikings, vikings) {
-        c_apply(v, Vikings_emplace(&vikings, v), c_pair(v), Vikings_raw, {
+        c_apply(v, Vikings_emplace(&vikings, c_pair(v)), Vikings_raw, {
             { {"Einar", "Norway"}, 20 },
             { {"Olaf", "Denmark"}, 24 },
             { {"Harald", "Iceland"}, 12 },
