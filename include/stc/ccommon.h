@@ -77,7 +77,7 @@
 #  define c_free(p)             free(p)
 #endif
 
-typedef const char              c_strlit[];
+#define c_strlen_lit(literal)   (sizeof "" literal - 1U)
 #define c_delete(T, ptr)        do { T *_c_p = ptr; T##_drop(_c_p); c_free(_c_p); } while (0)
 #define c_swap(T, x, y)         do { T _c_t = x; x = y; y = _c_t; } while (0)
 #define c_arraylen(a)           (sizeof (a)/sizeof (a)[0])

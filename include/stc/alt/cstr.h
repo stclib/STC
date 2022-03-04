@@ -82,7 +82,7 @@ STC_INLINE _cstr_rep_t cstr_rep_(cstr* self) {
 
 /**************************** PUBLIC API **********************************/
 
-#define cstr_new(literal) cstr_from_n(literal, sizeof((c_strlit){literal}) - 1)
+#define cstr_new(literal) cstr_from_n(literal, c_strlen_lit(literal))
 #define cstr_npos (SIZE_MAX >> 1)
 #define cstr_null (c_make(cstr){.sso = {.cap_len = SSO_CAP}})
 #define cstr_toraw(self) cstr_str(self)

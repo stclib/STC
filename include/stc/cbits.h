@@ -78,7 +78,7 @@ STC_INLINE void     cbits_drop(cbits* self) { c_free(self->data64); }
 STC_INLINE size_t   cbits_size(cbits set) { return set.size; }
 
 #define cbits_new(literal) \
-    cbits_from_n(literal, sizeof c_make(c_strlit){literal} - 1)
+    cbits_from_n(literal, c_strlen_lit(literal))
 
 STC_INLINE cbits* cbits_take(cbits* self, cbits other) {
     if (self->data64 != other.data64) {cbits_drop(self); *self = other;}

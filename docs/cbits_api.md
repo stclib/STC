@@ -18,7 +18,7 @@ All cbits definitions and prototypes are available by including a single header 
 
 ```c
 cbits            cbits_init(void);
-cbits            cbits_new(c_strlit literal);
+cbits            cbits_new(const char literal[]);
 cbits            cbits_from(const char* str);
 cbits            cbits_with_size(size_t size, bool value);
 cbits            cbits_with_values(size_t size, uint64_t pattern);

@@ -68,7 +68,7 @@ STC_INLINE cstr         cstr_init() { return cstr_null; }
 #define                 cstr_str(self) (self)->str
 #define                 cstr_toraw(self) (self)->str
 #define                 cstr_new(literal) \
-                            cstr_from_n(literal, sizeof c_make(c_strlit){literal} - 1)
+                            cstr_from_n(literal, c_strlen_lit(literal))
 STC_INLINE cstr         cstr_from(const char* str)
                             { return cstr_from_n(str, strlen(str)); }
 STC_INLINE char*        cstr_data(cstr* self) { return self->str; }
