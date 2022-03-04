@@ -25,7 +25,7 @@ int main()
                 c_forrange (j, cregex_captures(re))
                 {
                     csview cap = {m[j].str, m[j].len}; 
-                    printf("  submatch %zu: " c_PRIsv "\n", j, c_ARGsv(cap));
+                    printf("  submatch %" PRIuMAX ": " c_PRIsv "\n", j, c_ARGsv(cap));
                 }
                 puts("");
             }

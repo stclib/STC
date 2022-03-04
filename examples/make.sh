@@ -1,11 +1,14 @@
 #!/bin/bash
-cc='gcc -O2 -Wall -std=c99 -pedantic'
+cc='gcc -s -O2 -Wall -std=c99 -pedantic'
+#cc='clang -s -O2 -Wall -std=c99 -pedantic'
 #cc='clang'
 #cc='clang -c -DSTC_HEADER'
-#cc='cl -nologo'
+#cc='cl -O2 -nologo -W2 -MD'
 #cc='cl -nologo -TP'
 #cc='cl -nologo -std:c11'
 libs=''
+#oflag='/Fe:'
+oflag='-o '
 run=0
 if [ -z "$OS" ]; then
     libs='-lm -pthread'
@@ -24,8 +27,8 @@ fi
 
 if [ $run = 0 ] ; then
     for i in *.c ; do
-        echo $cc -I../include $i $libs
-        $cc -I../include $i $libs
+        echo $cc -I../include $i $libs $oflag$(basename $i .c).exe
+        $cc -I../include $i $libs $oflag$(basename $i .c).exe
     done
 else
     for i in *.c ; do
@@ -37,4 +40,4 @@ else
     done
 fi
 
-rm -f a.out *.o *.obj *.exe
+rm -f a.out *.o *.obj # *.exe

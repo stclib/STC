@@ -24,7 +24,7 @@ static void test_repeats(void)
         c_forrange (i, N) {
             uint64_t k = stc64_rand(&rng) & mask;
             int v = cmap_ic_insert(&m, k, 0).ref->second += 1;
-            if (v > 1) printf("repeated value %zu (%d) at 2^%d\n", k, v, (int) log2((double) i));
+            if (v > 1) printf("repeated value %" PRIuMAX " (%d) at 2^%d\n", k, v, (int) log2((double) i));
         }
     }
 }
@@ -52,7 +52,7 @@ void test_distribution(void)
         sum /= map.size;
 
         c_foreach (i, cmap_x, map) {
-            printf("%4u: %zu - %zu: %11.8f\n", i.ref->first, i.ref->second, sum, (1 - (double) i.ref->second / sum));
+            printf("%4u: %" PRIuMAX " - %" PRIuMAX ": %11.8f\n", i.ref->first, i.ref->second, sum, (1 - (double) i.ref->second / sum));
         }
     }
 }

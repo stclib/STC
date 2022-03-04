@@ -58,10 +58,10 @@ int main(void)
                 printf("%s: %s - %s\n", i.ref->first.str, _.name.str, _.email.str);
         puts("");
 
-        c_auto (Stack, s) printf("found: %zu\n", Stack_size(s = contains(&map, "Nick Denton")));
-        c_auto (Stack, s) printf("found: %zu\n", Stack_size(s = contains(&map, "Patrick Dust")));
-        c_auto (Stack, s) printf("found: %zu\n", Stack_size(s = contains(&map, "Dennis Kay")));
-        c_auto (Stack, s) printf("found: %zu\n", Stack_size(s = contains(&map, "Serena Bath")));
+        c_auto (Stack, s) printf("found: %" PRIuMAX "\n", Stack_size(s = contains(&map, "Nick Denton")));
+        c_auto (Stack, s) printf("found: %" PRIuMAX "\n", Stack_size(s = contains(&map, "Patrick Dust")));
+        c_auto (Stack, s) printf("found: %" PRIuMAX "\n", Stack_size(s = contains(&map, "Dennis Kay")));
+        c_auto (Stack, s) printf("found: %" PRIuMAX "\n", Stack_size(s = contains(&map, "Serena Bath")));
         puts("Done");
     }
 }

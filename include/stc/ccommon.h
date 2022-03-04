@@ -24,7 +24,7 @@
 #define CCOMMON_H_INCLUDED
 
 #define _CRT_SECURE_NO_WARNINGS
-#include <stdint.h>
+#include <inttypes.h>
 #include <stddef.h>
 #include <stdbool.h>
 #include <string.h>

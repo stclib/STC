@@ -149,5 +149,5 @@ void benchmark(cvec_str vec_string, struct Maps maps)
     grandtotal += total;
     printf(" timing:%5.0fms\n", (clock() - stopwatch) / (float)CLOCKS_PER_SEC * 1000.0f);
 
-    printf("C grandtotal: %zu <--- Ignore this\n", grandtotal);
+    printf("C grandtotal: %" PRIuMAX " <--- Ignore this\n", grandtotal);
 }

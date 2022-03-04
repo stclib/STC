@@ -109,7 +109,7 @@ int          c_strncasecmp(const char* str1, const char* str2, size_t n);
 
 int main() {
     cstr s0 = cstr_new("Initialization without using strlen().");
-    printf("%s\nLength: %zu\n\n", s0.str, cstr_size(s0));
+    printf("%s\nLength: %" PRIuMAX "\n\n", s0.str, cstr_size(s0));
 
     cstr s1 = cstr_new("one-nine-three-seven-five.");
     printf("%s\n", s1.str);

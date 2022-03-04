@@ -145,7 +145,7 @@ size_t seed;
         sum += ++ M##_EMPLACE(X, RAND(keybits), i); \
     } \
     difference = clock() - before; \
-    printf(#M ": time: %5.02f, size: %zu, buckets: %8zu, sum: %zu\n", \
+    printf(#M ": time: %5.02f, size: %" PRIuMAX ", buckets: %8zu, sum: %" PRIuMAX "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), sum); \
     M##_DTOR(X); \
 }
@@ -161,7 +161,7 @@ size_t seed;
         erased += M##_ERASE(X, RAND(keybits)); \
     } \
     difference = clock() - before; \
-    printf(#M ": time: %5.02f, size: %zu, buckets: %8zu, erased %zu, sum: %zu\n", \
+    printf(#M ": time: %5.02f, size: %" PRIuMAX ", buckets: %8zu, erased %" PRIuMAX ", sum: %" PRIuMAX "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), erased, sum); \
     M##_DTOR(X); \
 }
@@ -176,7 +176,7 @@ size_t seed;
     for (size_t i = 0; i < n; ++i) \
         erased += M##_ERASE(X, i); \
     difference = clock() - before; \
-    printf(#M ": time: %5.02f, size: %zu, buckets: %8zu, erased %zu\n", \
+    printf(#M ": time: %5.02f, size: %" PRIuMAX ", buckets: %8zu, erased %" PRIuMAX "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), erased); \
     M##_DTOR(X); \
 }
@@ -194,7 +194,7 @@ size_t seed;
     for (size_t i = 0; i < n; ++i) \
         erased += M##_ERASE(X, RAND(keybits)); \
     difference = clock() - before; \
-    printf(#M ": time: %5.02f, size: %zu, buckets: %8zu, erased %zu\n", \
+    printf(#M ": time: %5.02f, size: %" PRIuMAX ", buckets: %8zu, erased %" PRIuMAX "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), erased); \
     M##_DTOR(X); \
 }
@@ -212,7 +212,7 @@ size_t seed;
     for (size_t k=0; k < x; k++) M##_FOR (X, it) \
         sum += M##_ITEM(X, it); \
     difference = clock() - before; \
-    printf(#M ": time: %5.02f, size: %zu, buckets: %8zu, repeats: %zu, sum: %zu\n", \
+    printf(#M ": time: %5.02f, size: %" PRIuMAX ", buckets: %8zu, repeats: %" PRIuMAX ", sum: %" PRIuMAX "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), x, sum); \
     M##_DTOR(X); \
 }
@@ -234,7 +234,7 @@ size_t seed;
     for (size_t i = 0; i < x; ++i) \
         found += M##_FIND(X, RAND(keybits)); \
     difference = clock() - before; \
-    printf(#M ": time: %5.02f, size: %zu, buckets: %8zu, lookups: %zu, found: %zu\n", \
+    printf(#M ": time: %5.02f, size: %" PRIuMAX ", buckets: %8zu, lookups: %" PRIuMAX ", found: %" PRIuMAX "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), x*2, found); \
     M##_DTOR(X); \
 }
@@ -273,7 +273,7 @@ int main(int argc, char* argv[])
            "UMAP = std::unordered_map\n\n");
            
     printf("Usage %s [n-million=%d key-bits=%d]\n", argv[0], DEFAULT_N_MILL, DEFAULT_KEYBITS);
-    printf("N-base = %d. Random keys are in range [0, 2^%d). Seed = %zu:\n", n_mill, keybits, seed);
+    printf("N-base = %d. Random keys are in range [0, 2^%d). Seed = %" PRIuMAX ":\n", n_mill, keybits, seed);
 
     printf("\nT0: Insert/update random keys:\n");
     RUN_TEST(0)

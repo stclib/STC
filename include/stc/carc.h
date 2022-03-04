@@ -43,7 +43,7 @@ int main() {
     carc_person p = carc_person_from(Person_new("John", "Smiths"));
     carc_person q = carc_person_clone(p); // share the pointer
 
-    printf("%s %s. uses: %zu\n", q.get->name.str, q.get->last.str, *q.use_count);
+    printf("%s %s. uses: %" PRIuMAX "\n", q.get->name.str, q.get->last.str, *q.use_count);
     c_drop(carc_person, &p, &q);
 }
 */

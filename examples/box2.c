@@ -67,22 +67,22 @@ int main(void) {
         // Double indirection
         box_in_a_box = cbox_BoxPoint_from(boxed_origin());
 
-        printf("Point occupies %zu bytes on the stack\n",
+        printf("Point occupies %" PRIuMAX " bytes on the stack\n",
                 sizeof(point));
-        printf("Rectangle occupies %zu bytes on the stack\n",
+        printf("Rectangle occupies %" PRIuMAX " bytes on the stack\n",
                 sizeof(rectangle));
 
         // box size == pointer size
-        printf("Boxed point occupies %zu bytes on the stack\n",
+        printf("Boxed point occupies %" PRIuMAX " bytes on the stack\n",
                 sizeof(boxed_point));
-        printf("Boxed rectangle occupies %zu bytes on the stack\n",
+        printf("Boxed rectangle occupies %" PRIuMAX " bytes on the stack\n",
                 sizeof(boxed_rectangle));
-        printf("Boxed box occupies %zu bytes on the stack\n",
+        printf("Boxed box occupies %" PRIuMAX " bytes on the stack\n",
                 sizeof(box_in_a_box));
 
         // Copy the data contained in `boxed_point` into `unboxed_point`
         Point unboxed_point = *boxed_point.get;
-        printf("Unboxed point occupies %zu bytes on the stack\n",
+        printf("Unboxed point occupies %" PRIuMAX " bytes on the stack\n",
                 sizeof(unboxed_point));
     }
 }

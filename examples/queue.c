@@ -26,6 +26,6 @@ int main() {
             else
                 --n, cqueue_i_pop(&queue);
         }
-        printf("%d, %zu\n", n, cqueue_i_size(queue));
+        printf("%d, %" PRIuMAX "\n", n, cqueue_i_size(queue));
     }
 }

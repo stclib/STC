@@ -20,7 +20,7 @@ int main()
         printf("%d\n", res);
         cregmatch m[10];
         if (cregex_find(&re, s, 10, m, 0) > 0) {
-            printf("Found digits at position %zu-%zu\n", m[0].str - s, m[0].str - s + m[0].len);
+            printf("Found digits at position %" PRIuMAX "-%" PRIuMAX "\n", m[0].str - s, m[0].str - s + m[0].len);
         } else {
             printf("Could not find any digits\n");
         }

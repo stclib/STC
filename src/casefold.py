@@ -2,7 +2,7 @@
 import pandas as pd
 import numpy as np
 
-def read_unidata(catfilter, casefilter=None, big=False):
+def read_unidata(catfilter='Lu', casefilter='lowcase', big=False):
     ud = pd.read_csv("ucd/UnicodeData.txt", sep=';', converters={0: lambda x: int(x, base=16)},
                       names=['code', 'name', 'category', 'canclass', 'bidircat', 'chrdecomp',
                              'decdig', 'digval', 'numval', 'mirrored', 'uc1name', 'comment',
@@ -119,6 +119,7 @@ static struct CaseFold { uint16_t c0, c1, m1; } casefold[] = {''')
 
 def make_casetable():
     df = read_casefold()
+    #df = read_unidata()
     letters = make_caselist(df)
     cfold = make_casefold(letters)
     return cfold

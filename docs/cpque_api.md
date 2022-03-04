@@ -83,7 +83,7 @@ int main()
 
         // Extract and display the fifty smallest.
         c_forrange (50) {
-            printf("%zd ", *cpque_i_top(&heap));
+            printf("%" PRIdMAX " ", *cpque_i_top(&heap));
             cpque_i_pop(&heap);
         }
     }

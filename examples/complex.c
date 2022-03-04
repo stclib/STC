@@ -41,7 +41,7 @@ int main() {
 
         // Put in some data in stack array
         stack.data[x] = 3.1415927f;
-        printf("stack size: %zu\n", FloatStack_size(stack));
+        printf("stack size: %" PRIuMAX "\n", FloatStack_size(stack));
 
         StackList list = StackList_init();
         StackList_push_back(&list, stack);

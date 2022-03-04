@@ -159,7 +159,7 @@ Declare an iterator and specify a range to iterate with a for loop. Like python'
 ```c
 c_forrange (5) printf("x");
 // xxxxx
-c_forrange (i, 5) printf(" %zu", i);
+c_forrange (i, 5) printf(" %" PRIuMAX "", i);
 // 0 1 2 3 4
 c_forrange (i, int, -3, 3) printf(" %d", i);
 // -3 -2 -1 0 1 2
