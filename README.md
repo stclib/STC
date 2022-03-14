@@ -25,14 +25,14 @@ Note that STC does not use long macro expansions anymore, but relies on one or m
 which by the compiler is seen as different code because of macro name substitutions.
 
 - [***ccommon*** - RAII and iterator macros](docs/ccommon_api.md)
-- [***carr2, carr3*** - **2d** and **3d** dynamic **array** type](docs/carray_api.md)
+- [***carc*** - **std::shared_ptr** alike support](docs/carc_api.md)
+- [***carr2/3 - **2d** and **3d** dynamic **array** type](docs/carray_api.md)
 - [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
 - [***cbox*** - **std::unique_ptr** alike type](docs/cbox_api.md)
 - [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)
 - [***clist*** - **std::forward_list** alike type](docs/clist_api.md)
 - [***cmap*** - **std::unordered_map** alike type](docs/cmap_api.md)
 - [***cpque*** - **std::priority_queue** alike type](docs/cpque_api.md)
-- [***carc*** - **std::shared_ptr** alike support](docs/carc_api.md)
 - [***cqueue*** - **std::queue** alike type](docs/cqueue_api.md)
 - [***cset*** - **std::unordered_set** alike type](docs/cset_api.md)
 - [***csmap*** - **std::map** sorted map alike type](docs/csmap_api.md)
@@ -94,10 +94,11 @@ int main(void) {
     FVec_drop(&vec); // free memory
 }
 ```
-However, a "better" way to write the same is:
+A "better" way to write the same code is:
 ```c
 int main(void) {
-    c_auto (FVec, vec) {  // RAII
+    c_auto (FVec, vec) // RAII - create and destroy vec
+    {
         c_apply(v, FVec_push_back(&vec, v), float, {10.f, 20.f, 30.f});
 
         c_foreach (i, FVec, vec) // generic iteration and element access

@@ -240,6 +240,6 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle, size_t slen, cons
 #  define STC_API static inline
 #  define STC_DEF static inline
 #endif
-#if (c_option(c_implement) || defined(STC_IMPLEMENTATION)) ^ defined(_i_static)
+#if c_option(c_implement) || defined(STC_IMPLEMENTATION) || defined(_i_static)
 #  define _i_implement
 #endif

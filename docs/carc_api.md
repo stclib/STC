@@ -75,7 +75,7 @@ bool        carc_X_value_eq(const i_val* x, const i_val* y);   // cbox_X_value_c
 #define i_type Map
 #define i_key_str // strings
 #define i_val int
-#define i_keydrop(p) (printf("drop name: %s\n", (p)->str), cstr_drop(p))
+#define i_keydrop(p) (printf("  drop name: %s\n", (p)->str), cstr_drop(p))
 #include <stc/csmap.h>
 
 #define i_type Arc // (atomic) ref. counted type
@@ -104,44 +104,50 @@ int main()
         Map *map;
         map = Stack_push(&stack, Arc_from(Map_init()))->get;
         c_apply(v, Map_emplace(map, c_pair(v)), Map_raw, {
-            {"Joey", 1990}, {"Mary", 1995}, {"Joanna", 1992}
+            {"Joey", 1990},
+            {"Mary", 1995},
+            {"Joanna", 1992}
         });
         map = Stack_push(&stack, Arc_from(Map_init()))->get;
         c_apply(v, Map_emplace(map, c_pair(v)), Map_raw, {
-            {"Rosanna", 2001}, {"Brad", 1999}, {"Jack", 1980}
+            {"Rosanna", 2001},
+            {"Brad", 1999},
+            {"Jack", 1980}
         });
 
         // POPULATE the list:
         map = List_push_back(&list, Arc_from(Map_init()))->get;
         c_apply(v, Map_emplace(map, c_pair(v)), Map_raw, {
-            {"Steve", 1979}, {"Rick", 1974}, {"Tracy", 2003}
+            {"Steve", 1979},
+            {"Rick", 1974},
+            {"Tracy", 2003}
         });
         
-        // Share two Maps from the stack with the list using emplace (clones the carc):
-        List_emplace_back(&list, stack.data[0]);
-        List_emplace_back(&list, stack.data[1]);
+        // Share two Maps from the stack with the list by cloning(=sharing) the carc:
+        List_push_back(&list, Arc_clone(stack.data[0]));
+        List_push_back(&list, Arc_clone(stack.data[1]));
         
-        // Clone (deep copy) a Map from the stack to the list
+        // Deep-copy (not share) a Map from the stack to the list
         // List will contain two shared and two unshared maps.
         map = List_push_back(&list, Arc_from(Map_clone(*stack.data[1].get)))->get;
         
         // Add one more element to the cloned map:
-        Map_emplace_or_assign(map, "CLONED", 2021);
+        Map_emplace_or_assign(map, "Cloned", 2022);
 
         // Add one more element to the shared map:
-        Map_emplace_or_assign(stack.data[1].get, "SHARED", 2021);
-
+        Map_emplace_or_assign(stack.data[1].get, "Shared", 2022);
 
         puts("STACKS");
         c_foreach (i, Stack, stack) {
             c_forpair (name, year, Map, *i.ref->get)
-                printf(" %s:%d", _.name.str, _.year);
+                printf("  %s:%d", _.name.str, _.year);
             puts("");
         }
+
         puts("LIST");
         c_foreach (i, List, list) {
             c_forpair (name, year, Map, *i.ref->get)
-                printf(" %s:%d", _.name.str, _.year);
+                printf("  %s:%d", _.name.str, _.year);
             puts("");
         }
     }
@@ -150,29 +156,29 @@ int main()
 Output:
 ```
 STACKS
- Joanna:1992 Joey:1990 Mary:1995
- Brad:1999 Jack:1980 Rosanna:2001 SHARED:2021
+  Joanna:1992  Joey:1990  Mary:1995
+  Brad:1999  Jack:1980  Rosanna:2001  Shared:2022
 LIST
- Rick:1974 Steve:1979 Tracy:2003
- Joanna:1992 Joey:1990 Mary:1995
- Brad:1999 Jack:1980 Rosanna:2001 SHARED:2021
- Brad:1999 CLONED:2021 Jack:1980 Rosanna:2001
+  Rick:1974  Steve:1979  Tracy:2003
+  Joanna:1992  Joey:1990  Mary:1995
+  Brad:1999  Jack:1980  Rosanna:2001  Shared:2022
+  Brad:1999  Cloned:2022  Jack:1980  Rosanna:2001
 drop Arc:
-drop name: Rick
-drop name: Tracy
-drop name: Steve
+  drop name: Rick
+  drop name: Tracy
+  drop name: Steve
 drop Arc:
-drop name: CLONED
-drop name: Brad
-drop name: Rosanna
-drop name: Jack
+  drop name: Cloned
+  drop name: Brad
+  drop name: Rosanna
+  drop name: Jack
 drop Arc:
-drop name: Brad
-drop name: SHARED
-drop name: Rosanna
-drop name: Jack
+  drop name: Brad
+  drop name: Shared
+  drop name: Rosanna
+  drop name: Jack
 drop Arc:
-drop name: Joanna
-drop name: Mary
-drop name: Joey
+  drop name: Joanna
+  drop name: Mary
+  drop name: Joey
 ```
