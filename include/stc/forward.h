@@ -25,8 +25,10 @@
 
 #include <stddef.h>
 
+#define forward_carc(CX, VAL) _c_carc_types(CX, VAL)
 #define forward_carr2(CX, VAL) _c_carr2_types(CX, VAL)
 #define forward_carr3(CX, VAL) _c_carr3_types(CX, VAL)
+#define forward_cbox(CX, VAL) _c_cbox_types(CX, VAL)
 #define forward_cdeq(CX, VAL) _c_cdeq_types(CX, VAL)
 #define forward_clist(CX, VAL) _c_clist_types(CX, VAL)
 #define forward_cmap(CX, KEY, VAL) _c_chash_types(CX, KEY, VAL, uint32_t, c_true, c_false)
@@ -35,10 +37,8 @@
 #define forward_cset_huge(CX, KEY) _c_chash_types(CX, cset, KEY, KEY, size_t, c_false, c_true)
 #define forward_csmap(CX, KEY, VAL) _c_aatree_types(CX, KEY, VAL, uint32_t, c_true, c_false)
 #define forward_csset(CX, KEY) _c_aatree_types(CX, KEY, KEY, uint32_t, c_false, c_true)
-#define forward_cbox(CX, VAL) _c_cbox_types(CX, VAL)
-#define forward_carc(CX, VAL) _c_carc_types(CX, VAL)
-#define forward_cpque(CX, VAL) _c_cpque_types(CX, VAL)
 #define forward_cstack(CX, VAL) _c_cstack_types(CX, VAL)
+#define forward_cpque(CX, VAL) _c_cpque_types(CX, VAL)
 #define forward_cqueue(CX, VAL) _c_cdeq_types(CX, VAL)
 #define forward_cvec(CX, VAL) _c_cvec_types(CX, VAL)
 
@@ -46,11 +46,19 @@ typedef struct cstr { char* str; } cstr;
 typedef char cstr_value;
 
 typedef struct csview { const char* str; size_t size; } csview;
-typedef union csview_iter { const char *ref; csview cp; } csview_iter;
+typedef union csview_iter { const char *ref; csview codep; } csview_iter;
 typedef char csview_value;
 
 #define c_true(...) __VA_ARGS__
 #define c_false(...)
+
+#define _c_carc_types(SELF, VAL) \
+    typedef VAL SELF##_value; \
+\
+    typedef struct { \
+        SELF##_value* get; \
+        long* use_count; \
+    } SELF
 
 #define _c_carr2_types(SELF, VAL) \
     typedef VAL SELF##_value; \
@@ -61,6 +69,12 @@ typedef char csview_value;
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref; } SELF##_iter; \
     typedef struct { SELF##_value ***data; size_t xdim, ydim, zdim; } SELF
+
+#define _c_cbox_types(SELF, VAL) \
+    typedef VAL SELF##_value; \
+    typedef struct { \
+        SELF##_value* get; \
+    } SELF
 
 #define _c_cdeq_types(SELF, VAL) \
     typedef VAL SELF##_value; \
@@ -130,20 +144,6 @@ typedef char csview_value;
 \
     typedef struct { \
         SELF##_node *nodes; \
-    } SELF
-
-#define _c_cbox_types(SELF, VAL) \
-    typedef VAL SELF##_value; \
-    typedef struct { \
-        SELF##_value* get; \
-    } SELF
-
-#define _c_carc_types(SELF, VAL) \
-    typedef VAL SELF##_value; \
-\
-    typedef struct { \
-        SELF##_value* get; \
-        long* use_count; \
     } SELF
 
 #define _c_cstack_types(SELF, VAL) \

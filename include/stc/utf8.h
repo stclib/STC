@@ -9,17 +9,19 @@ int main()
 {
     c_auto (cstr, s1) {
         s1 = cstr_new("hell😀 w😀rld");
-        cstr_replace_sv(&s1, utf8_substr(s1.str, 7, 1), c_sv("x"));
+        printf("%s\n", s1.str);
+        cstr_replace_sv(&s1, utf8_substr(s1.str, 7, 1), c_sv("🐨"));
         printf("%s\n", s1.str);
 
         csview sv = csview_from_s(s1);
         c_foreach (i, csview, sv)
-            printf(c_PRIsv ",", c_ARGsv(i.cp));
+            printf(c_PRIsv ",", c_ARGsv(i.codep));
     }
 }
 // Output:
-// hell😀 wxrld
-// h,e,l,l,😀, ,w,x,r,l,d,
+// hell😀 w😀rld
+// hell😀 w🐨rld
+// h,e,l,l,😀, ,w,🐨,r,l,d,
 */
 #include "ccommon.h"
 #include <ctype.h>

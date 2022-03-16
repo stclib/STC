@@ -24,7 +24,7 @@ void Song_drop(Song* s) {
 #include <stc/carc.h>
 
 #define i_type SongVec
-#define i_val_sptr SongPtr
+#define i_val_arcbox SongPtr
 #include <stc/cvec.h>
 
 void example3()

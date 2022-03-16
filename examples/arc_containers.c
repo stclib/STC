@@ -15,11 +15,11 @@
 #include <stc/carc.h>
 
 #define i_type Stack
-#define i_val_sptr Arc // define i_val_bind for carc/cbox value (not i_val)
+#define i_val_arcbox Arc // define i_val_bind for carc/cbox value (not i_val)
 #include <stc/cstack.h>
 
 #define i_type List
-#define i_val_sptr Arc // as above
+#define i_val_arcbox Arc // as above
 #include <stc/clist.h>
 
 int main()

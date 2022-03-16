@@ -77,11 +77,11 @@ void int_drop(int* x) {
 #include <stc/cbox.h>
 
 #define i_type ISet
-#define i_key_sptr IBox       // NB: use i_key_sptr instead of i_key
+#define i_key_arcbox IBox     // NB: use i_key_arcbox instead of i_key
 #include <stc/csset.h>        // ISet : std::set<std::unique_ptr<int>>
 
 #define i_type IVec
-#define i_val_sptr IBox       // NB: use i_val_sptr instead of i_val
+#define i_val_arcbox IBox     // NB: use i_val_arcbox instead of i_val
 #include <stc/cvec.h>         // IVec : std::vector<std::unique_ptr<int>>
 
 int main()

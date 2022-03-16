@@ -28,7 +28,7 @@ void Person_drop(Person* p) {
 #include <stc/carc.h>
 
 #define i_type Persons
-#define i_val_sptr PSPtr // binds PSPtr_cmp, ...
+#define i_val_arcbox PSPtr // binds PSPtr_cmp, ...
 #include <stc/cvec.h>
 
 

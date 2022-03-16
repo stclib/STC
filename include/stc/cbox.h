@@ -163,7 +163,7 @@ _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     #if c_option(c_no_cmp)
         return c_default_cmp(&x, &y);
     #else
-        _cx_raw rx = i_valto(x), ry = i_valto(x);
+        _cx_raw rx = i_valto(x), ry = i_valto(y);
         return i_cmp(&rx, &ry);
     #endif
 }
@@ -173,7 +173,7 @@ _cx_memb(_value_eq)(const _cx_value* x, const _cx_value* y) {
     #if c_option(c_no_cmp)
         return x == y;
     #else
-        _cx_raw rx = i_valto(x), ry = i_valto(x);
+        _cx_raw rx = i_valto(x), ry = i_valto(y);
         return i_eq(&rx, &ry);
     #endif
 }

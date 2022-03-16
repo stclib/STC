@@ -40,9 +40,11 @@
   #define _cx_size _cx_memb(_size_t)
 #endif
 
-#if defined i_cnt || defined i_equ // [deprecated]
-  #define i_type i_cnt
-  #error "i_cnt and i_equ no longer supported: use new name i_type / i_eq"
+#ifdef i_key_sptr // [deprecated]
+  #define i_key_arcbox i_key_sptr
+#endif
+#ifdef i_val_sptr // [deprecated]
+  #define i_val_arcbox i_val_sptr
 #endif
 #ifdef i_type
   #define i_tag i_type
@@ -64,9 +66,9 @@
   #ifndef i_tag
     #define i_tag str
   #endif
-#elif defined i_key_sptr
-  #define i_key_bind i_key_sptr
-  #define i_keyraw c_PASTE(i_key_sptr, _value)
+#elif defined i_key_arcbox
+  #define i_key_bind i_key_arcbox
+  #define i_keyraw c_PASTE(i_key_arcbox, _value)
 #endif
 
 #ifdef i_key_bind
@@ -123,9 +125,9 @@
   #if !defined i_tag && !defined i_key
     #define i_tag str
   #endif
-#elif defined i_val_sptr
-  #define i_val_bind i_val_sptr
-  #define i_valraw c_PASTE(i_val_sptr, _value)
+#elif defined i_val_arcbox
+  #define i_val_bind i_val_arcbox
+  #define i_valraw c_PASTE(i_val_arcbox, _value)
 #endif
 
 #ifdef i_val_bind
@@ -221,10 +223,11 @@
 #undef i_hash
 #undef i_from
 #undef i_drop
+#undef i_size
 
 #undef i_val
 #undef i_val_str
-#undef i_val_sptr
+#undef i_val_arcbox
 #undef i_val_bind
 #undef i_valraw
 #undef i_valfrom
@@ -233,13 +236,12 @@
 
 #undef i_key
 #undef i_key_str
-#undef i_key_sptr
+#undef i_key_arcbox
 #undef i_key_bind
 #undef i_keyraw
 #undef i_keyfrom
 #undef i_keyto
 #undef i_keydrop
-#undef i_size
 
 #undef _i_prefix
 #undef _i_no_raw

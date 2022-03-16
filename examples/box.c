@@ -28,7 +28,7 @@ void Person_drop(Person* p) {
 #include <stc/cbox.h>
 
 #define i_type Persons
-#define i_val_sptr PBox // informs that PBox is a smart pointer.
+#define i_val_arcbox PBox // informs that PBox is a smart pointer.
 #include <stc/cvec.h>
 
 int main()

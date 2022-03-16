@@ -25,7 +25,7 @@ void Person_drop(Person* p) {
 #define i_drop(x) printf("drop: %d\n", *(x))
 #include <stc/carc.h>
 
-#define i_val_sptr SPtr
+#define i_val_arcbox SPtr
 #define i_tag iptr
 #include <stc/cstack.h>
 

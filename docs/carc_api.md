@@ -88,11 +88,11 @@ bool        carc_X_value_eq(const i_val* x, const i_val* y);   // cbox_X_value_c
 #include <stc/carc.h>
 
 #define i_type Stack
-#define i_val_sptr Arc // define i_val_sptr for carc/cbox value, not i_val or i_val_bind
+#define i_val_arcbox Arc // note: define i_val_arcbox for carc/cbox value
 #include <stc/cstack.h>
 
 #define i_type List
-#define i_val_sptr Arc // as above
+#define i_val_arcbox Arc // as above
 #include <stc/clist.h>
 
 int main()

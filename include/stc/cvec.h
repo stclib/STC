@@ -209,7 +209,7 @@ _cx_memb(_find)(const _cx_self* self, i_valraw raw) {
 STC_INLINE const _cx_value*
 _cx_memb(_get)(const _cx_self* self, i_valraw raw) {
     _cx_iter end = _cx_memb(_end)(self);
-    _cx_value* val = _cx_memb(_find_in)(_cx_memb(_begin)(self), end, raw).ref;
+    _cx_value* val = _cx_memb(_find)(self, raw).ref;
     return val == end.ref ? NULL : val;
 }
 
@@ -368,7 +368,7 @@ STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, i_valraw raw) {
     for (; i1.ref != i2.ref; ++i1.ref) {
         i_valraw r = i_valto(i1.ref);
-        if (i_cmp(&raw, &r) == 0) return i1;
+        if (i_eq(&raw, &r)) return i1;
     }
     return i2;
 }

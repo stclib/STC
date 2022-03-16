@@ -13,10 +13,10 @@ void int_drop(int* x) {
 #define i_drop int_drop     // optional, just to display the elements destroyed
 #include <stc/carc.h>       // iref
 
-#define i_key_sptr iref     // note: use i_key_bind instead of i_key for carc/cbox elements
+#define i_key_arcbox iref   // note: use i_key_bind instead of i_key for carc/cbox elements
 #include <stc/csset.h>      // csset_iref (like: std::set<std::shared_ptr<int>>)
 
-#define i_val_sptr iref     // note: as above.
+#define i_val_arcbox iref   // note: as above.
 #include <stc/cvec.h>       // cvec_iref (like: std::vector<std::shared_ptr<int>>)
 
 int main()

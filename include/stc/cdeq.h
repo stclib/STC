@@ -400,7 +400,7 @@ STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, i_valraw raw) {
     for (; i1.ref != i2.ref; ++i1.ref) {
         i_valraw r = i_valto(i1.ref);
-        if (i_cmp(&raw, &r) == 0) return i1;
+        if (i_eq(&raw, &r)) return i1;
     }
     return i2;
 }

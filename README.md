@@ -26,7 +26,7 @@ which by the compiler is seen as different code because of macro name substituti
 
 - [***ccommon*** - RAII and iterator macros](docs/ccommon_api.md)
 - [***carc*** - **std::shared_ptr** alike support](docs/carc_api.md)
-- [***carr2/3 - **2d** and **3d** dynamic **array** type](docs/carray_api.md)
+- [***carr2/3*** - **2d** and **3d** dynamic **array** type](docs/carray_api.md)
 - [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
 - [***cbox*** - **std::unique_ptr** alike type](docs/cbox_api.md)
 - [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)
@@ -291,9 +291,9 @@ Val:
 
 Special:
 - `i_key_str` - Define key type `cstr` and container i_tag = `str`. It binds type convertion from/to const char*, and the cmp, eq, hash, and keydrop functions.
-- `i_key_sptr TYPE` - Define key type where TYPE is a smart pointer `carc` or `cbox`. I.e. not to be used when defining carc/cbox types themselves.
+- `i_key_arcbox TYPE` - Define key type where TYPE is a smart pointer `carc` or `cbox`. I.e. not to be used when defining carc/cbox types themselves.
 - `i_key_bind TYPE` - General version of the two above - will auto-bind to standard named functions based on TYPE. Use for elements where the following functions are defined: *TYPE_cmp*, *TYPE_clone*, *TYPE_drop*, *TYPE_hash*, and *TYPE_eq*. Only the functions required by the particular container needs to be defined. e.g. **cmap** and **cset** are the only types that require *TYPE_hash* and *TYPE_eq* to be defined. *TYPE_cmp* and *TYPE_clone* are not required if `i_opt c_no_cmp|c_no_clone` is defined. *TYPE_drop* is always required when using `_bind`.
-- `i_val_str`, `i_val_sptr`, `i_val_bind` - Same as for key.
+- `i_val_str`, `i_val_bind`, `i_val_arcbox` - Same as for key.
 
 Notes:
 - For non-associative containers, `i_drop` and `i_from` may be defined instead of `i_valdrop` and `i_valfrom`.
@@ -436,7 +436,7 @@ Memory efficiency
 - Renamed: ***i_equ*** to `i_eq`, and ***_equalto*** to `_eq`.
 - Renamed: ***i_cnt*** to `i_type` for defining the complete container type name.
 - Renamed: type **csptr** to [**carc**](docs/carc_api.md) (atomic reference counted) smart pointer.
-- Renamed: ***i_key_csptr*** / ***i_val_csptr*** to `i_key_sptr` / `i_val_sptr` for specifying **carc** and **cbox** values in containers.
+- Renamed: ***i_key_csptr*** / ***i_val_csptr*** to `i_key_arcbox` / `i_val_arcbox` for specifying **carc** and **cbox** values in containers.
 - Renamed: *csptr_X_make()* to `carc_X_from()`.
 - Renamed: *cstr_lit()* to `cstr_new(literal)`, and *cstr_assign_fmt()* to `cstr_printf()`.
 - Renamed: *c_default_fromraw()* to `c_default_from()`.
@@ -460,10 +460,8 @@ Replace (whole word + match case):
 - `i_valdel` ⟶ `i_valdrop`
 - `i_cnt` ⟶ `i_type`
 - `cstr_lit` ⟶ `cstr_new`
-- `i_key_csptr` / `i_key_ref` ⟶ `i_key_sptr`
-- `i_val_csptr` / `i_val_ref` ⟶ `i_val_sptr`
-- `c_apply` ⟶ `c_apply_OLD` // replaced by new `c_apply`
-- `c_apply_pair` ⟶ `c_apply_pair_OLD` // replaced by new `c_apply`
+- `i_key_sptr` ⟶ `i_key_arcbox`
+- `i_val_sptr` ⟶ `i_val_arcbox`
 
 Non-regex, global match case replace:
 - `csptr` ⟶ `carc`

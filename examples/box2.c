@@ -26,8 +26,8 @@ struct {
 #include <stc/cbox.h> // cbox_Rectangle
 
 // Box in box:
-#define i_val_sptr cbox_Point  // NB: adviced to use i_val_sptr when value is a cbox or carc!
-                               // it will auto-set i_drop, i_from, i_cmp for you.
+#define i_val_arcbox cbox_Point  // NB: use i_val_arcbox when value is a cbox or carc!
+                                 // it will auto-set i_drop, i_from, i_cmp for you.
 #define i_opt c_no_cmp
 #define i_tag BoxPoint
 #include <stc/cbox.h> // cbox_BoxPoint
