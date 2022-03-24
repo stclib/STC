@@ -192,22 +192,22 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle, size_t slen, cons
          *b = (n)*sizeof *b > (BYTES) ? c_alloc_n(type, n) : _c_b \
          ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)
 
-#define c_apply(v, method, T, ...) do { \
+#define c_apply(v, action, T, ...) do { \
     typedef T _c_T; \
-    _c_T _c_arr[] = __VA_ARGS__; \
+    const _c_T _c_arr[] = __VA_ARGS__; \
     for (size_t index = 0; index < c_arraylen(_c_arr); ++index) \
-        { _c_T v = _c_arr[index]; method; } \
+        { const _c_T v = _c_arr[index]; action; } \
 } while (0)
-#define c_apply_arr(v, method, T, arr, n) do { \
+#define c_apply_arr(v, action, T, arr, n) do { \
     typedef T _c_T; \
-    _c_T* _c_arr = arr; size_t _n = n; \
+    const _c_T* _c_arr = arr; size_t _n = n; \
     for (size_t index = 0; index < _n; ++index) \
-        { _c_T v = _c_arr[index]; method; } \
+        { const _c_T v = _c_arr[index]; action; } \
 } while (0)
-#define c_apply_cnt(v, method, C, ...) do { \
+#define c_apply_cnt(v, action, C, ...) do { \
     size_t index = 0; \
     c_foreach (_it, C, __VA_ARGS__) \
-        { const C##_value v = *_it.ref; method; ++index; } \
+        { const C##_value v = *_it.ref; action; ++index; } \
 } while (0)
 #define c_pair(v) (v).first, (v).second
 
