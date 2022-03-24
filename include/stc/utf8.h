@@ -28,7 +28,7 @@ int main()
 
 /* number of codepoints in the utf8 string s, or SIZE_MAX if invalid utf8: */
 enum { UTF8_OK = 0, UTF8_ERROR = 4 };
-typedef struct { uint32_t state, codep, len; } utf8_decode_t;
+typedef struct { uint32_t state, codep, size; } utf8_decode_t;
 
 /* decode next utf8 codepoint. */
 STC_API size_t          utf8_encode(char *out, uint32_t c);
@@ -53,7 +53,7 @@ STC_INLINE uint32_t utf8_peek(const char *s) {
 STC_INLINE size_t utf8_codep_size(const char *s) {
     utf8_decode_t d = {UTF8_OK, 0};
     utf8_next(&d, (const uint8_t*)s);
-    return d.len;
+    return d.size;
 }
 
 // --------------------------- IMPLEMENTATION ---------------------------------
@@ -65,19 +65,19 @@ STC_DEF uint32_t utf8_decode(utf8_decode_t *d, const uint8_t b)
 {
     switch (d->state) {
     case UTF8_OK:
-        if      (b < 0x80) d->codep = b, d->len = 1;
-        else if (b < 0xC2) d->state = UTF8_ERROR, d->len = 0;
-        else if (b < 0xE0) d->state = 1, d->codep = b & 0x1F, d->len = 2;
-        else if (b < 0xF0) d->state = 2, d->codep = b & 0x0F, d->len = 3;
-        else if (b < 0xF5) d->state = 3, d->codep = b & 0x07, d->len = 4;
-        else d->state = UTF8_ERROR, d->len = 0;
+        if      (b < 0x80) d->codep = b, d->size = 1;
+        else if (b < 0xC2) d->state = UTF8_ERROR, d->size = 0;
+        else if (b < 0xE0) d->state = 1, d->codep = b & 0x1F, d->size = 2;
+        else if (b < 0xF0) d->state = 2, d->codep = b & 0x0F, d->size = 3;
+        else if (b < 0xF5) d->state = 3, d->codep = b & 0x07, d->size = 4;
+        else d->state = UTF8_ERROR, d->size = 0;
         break;
     case 1: case 2: case 3:
         if ((b & 0xC0) == 0x80) {
             d->state -= 1;
             d->codep = (d->codep << 6) | (b & 0x3F);
         } else
-            d->state = UTF8_ERROR, d->len = 0;
+            d->state = UTF8_ERROR, d->size = 0;
     }
     return d->state;
 }
@@ -107,7 +107,7 @@ STC_DEF size_t utf8_encode(char *out, uint32_t c)
 
 STC_DEF const uint8_t* utf8_next(utf8_decode_t *d, const uint8_t* u) {
     utf8_decode(d, *u++);
-    switch (d->len) {
+    switch (d->size) {
         case 4: utf8_decode(d, *u++);
         case 3: utf8_decode(d, *u++);
         case 2: utf8_decode(d, *u++);

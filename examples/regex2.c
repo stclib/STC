@@ -1,5 +1,4 @@
 #include <stc/cregex.h>
-#include <stc/csview.h>
 #include <stc/cstr.h>
 
 int main()
@@ -24,8 +23,7 @@ int main()
             {
                 c_forrange (j, cregex_captures(re))
                 {
-                    csview cap = {m[j].str, m[j].len}; 
-                    printf("  submatch %" PRIuMAX ": " c_PRIsv "\n", j, c_ARGsv(cap));
+                    printf("  submatch %" PRIuMAX ": " c_PRIsv "\n", j, c_ARGsv(m[j]));
                 }
                 puts("");
             }

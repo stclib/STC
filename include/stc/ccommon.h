@@ -42,19 +42,19 @@
 
 /* Macro overloading feature support based on: https://rextester.com/ONP80107 */
 #define c_MACRO_OVERLOAD(name, ...) \
-    c_PASTE(name, c_NUM_ARGS(__VA_ARGS__))(__VA_ARGS__)
-#define c_CONCAT(a, b) a ## b
-#define c_PASTE(a, b) c_CONCAT(a, b)
-#define c_EXPAND(...) __VA_ARGS__
-#define c_NUM_ARGS(...) _c_APPLY_ARG_N((__VA_ARGS__, _c_RSEQ_N))
+    c_paste(name, c_numargs(__VA_ARGS__))(__VA_ARGS__)
+#define c_concat(a, b) a ## b
+#define c_paste(a, b) c_concat(a, b)
+#define c_expand(...) __VA_ARGS__
+#define c_numargs(...) _c_APPLY_ARG_N((__VA_ARGS__, _c_RSEQ_N))
 
-#define _c_APPLY_ARG_N(args) c_EXPAND(_c_ARG_N args)
+#define _c_APPLY_ARG_N(args) c_expand(_c_ARG_N args)
 #define _c_RSEQ_N 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 #define _c_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, \
                  _14, _15, _16, N, ...) N
 
 #define c_static_assert(cond) \
-    typedef char c_PASTE(_static_assert_line_, __LINE__)[(cond) ? 1 : -1]
+    typedef char c_paste(_static_assert_line_, __LINE__)[(cond) ? 1 : -1]
 #define c_container_of(ptr, type, member) \
     ((type *)((char *)(ptr) - offsetof(type, member)))
 
@@ -166,23 +166,25 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle, size_t slen, cons
     for (type i=start, _c_inc=step, _c_end=(stop) - (0 < _c_inc) \
          ; (i <= _c_end) == (0 < _c_inc); i += _c_inc)
 
-#define c_autovar(declvar, ...) for (declvar, **_c_ii = NULL; !_c_ii; ++_c_ii, __VA_ARGS__)
-#define c_autoscope(init, ...) for (int _c_ii = (init, 0); !_c_ii; ++_c_ii, __VA_ARGS__)
+#define c_autovar(...) c_MACRO_OVERLOAD(c_autovar, __VA_ARGS__)
+#define c_autovar2(declvar, drop) for (declvar, **_c_ii = NULL; !_c_ii; ++_c_ii, drop)
+#define c_autovar3(declvar, cond, drop) for (declvar, **_c_ii = NULL; !_c_ii && (cond); ++_c_ii, drop)
+#define c_autoscope(init, drop) for (int _c_ii = (init, 0); !_c_ii; ++_c_ii, drop)
 #define c_autodefer(...) for (int _c_ii = 0; !_c_ii; ++_c_ii, __VA_ARGS__)
 #define c_breakauto continue
 
 #define c_auto(...) c_MACRO_OVERLOAD(c_auto, __VA_ARGS__)
 #define c_auto2(C, a) \
-    c_autovar(C a = C##_init(), C##_drop(&a))
+    c_autovar2(C a = C##_init(), C##_drop(&a))
 #define c_auto3(C, a, b) \
-    c_autovar(c_EXPAND(C a = C##_init(), b = C##_init()), \
-              C##_drop(&b), C##_drop(&a))
+    c_autovar2(c_expand(C a = C##_init(), b = C##_init()), \
+               (C##_drop(&b), C##_drop(&a)))
 #define c_auto4(C, a, b, c) \
-    c_autovar(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init()), \
-              C##_drop(&c), C##_drop(&b), C##_drop(&a))
+    c_autovar2(c_expand(C a = C##_init(), b = C##_init(), c = C##_init()), \
+               (C##_drop(&c), C##_drop(&b), C##_drop(&a)))
 #define c_auto5(C, a, b, c, d) \
-    c_autovar(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
-              C##_drop(&d), C##_drop(&c), C##_drop(&b), C##_drop(&a))
+    c_autovar2(c_expand(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
+               (C##_drop(&d), C##_drop(&c), C##_drop(&b), C##_drop(&a)))
 
 #define c_autobuf(b, type, n) c_autobuf_N(b, type, n, 256)
 #define c_autobuf_N(b, type, n, BYTES) \
@@ -191,14 +193,16 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle, size_t slen, cons
          ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)
 
 #define c_apply(v, method, T, ...) do { \
-    T _c_arr[] = __VA_ARGS__; \
+    typedef T _c_T; \
+    _c_T _c_arr[] = __VA_ARGS__; \
     for (size_t index = 0; index < c_arraylen(_c_arr); ++index) \
-        { T v = _c_arr[index]; method; } \
+        { _c_T v = _c_arr[index]; method; } \
 } while (0)
 #define c_apply_arr(v, method, T, arr, n) do { \
-    T* _c_arr = arr; size_t _n = n; \
+    typedef T _c_T; \
+    _c_T* _c_arr = arr; size_t _n = n; \
     for (size_t index = 0; index < _n; ++index) \
-        { T v = _c_arr[index]; method; } \
+        { _c_T v = _c_arr[index]; method; } \
 } while (0)
 #define c_apply_cnt(v, method, C, ...) do { \
     size_t index = 0; \

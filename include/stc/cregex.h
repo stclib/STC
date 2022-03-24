@@ -31,9 +31,7 @@ THE SOFTWARE.
  * This is a extended version of regexp9, supporting UTF8 input, common 
  * shorthand character classes, ++.
  */
-
-#include <stddef.h>
-#include <stdint.h>
+#include "csview.h"
 
 typedef enum {
     creg_nomatch = -1,
@@ -68,10 +66,7 @@ typedef struct {
     struct Reprog* prog;
 } cregex;
 
-typedef struct {
-    const char* str;
-    size_t len;
-} cregmatch;
+typedef csview cregmatch;
 
 static inline cregex cregex_init(void) {
     cregex rx = {NULL}; return rx;

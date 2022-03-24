@@ -85,14 +85,13 @@ STC_INLINE _cx_self
 _cx_memb(_from_ptr)(i_val* p) { return c_make(_cx_self){p}; }
 
 STC_INLINE _cx_self
-_cx_memb(_from)(i_val val) { 
-    return c_make(_cx_self){c_new(i_val, val)};
+_cx_memb(_from)(i_val val) { // c++: std::make_unique<i_val>(val)
+    _cx_self ptr = {c_alloc(i_val)};
+    *ptr.get = val; return ptr;
 }
 
 STC_INLINE i_val
-_cx_memb(_toraw)(const _cx_self* self) { 
-    return *self->get;
-}
+_cx_memb(_toraw)(const _cx_self* self) { return *self->get; }
 
 // destructor
 STC_INLINE void
@@ -121,9 +120,7 @@ _cx_memb(_reset_from)(_cx_self* self, i_val val) {
 #if !c_option(c_no_clone) 
 #if !defined _i_no_raw
     STC_INLINE _cx_self
-    _cx_memb(_new)(_cx_raw raw) { 
-        return c_make(_cx_self){c_new(i_val, i_valfrom(raw))};
-    }
+    _cx_memb(_new)(_cx_raw raw) { return _cx_memb(_from)(i_valfrom(raw)); }
 #endif
 
     STC_INLINE _cx_self

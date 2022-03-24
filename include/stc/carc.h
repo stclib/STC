@@ -104,7 +104,7 @@ _cx_memb(_from_ptr)(_cx_value* p) {
 }
 
 STC_INLINE _cx_self
-_cx_memb(_from)(i_val val) {
+_cx_memb(_from)(i_val val) { // c++: std::make_shared<i_val>(val)
     _cx_self ptr; _cx_carc_rep *rep = c_alloc(_cx_carc_rep);
     *(ptr.use_count = &rep->counter) = 1;
     *(ptr.get = &rep->value) = val;
@@ -145,9 +145,8 @@ _cx_memb(_reset_from)(_cx_self* self, i_val val) {
 }
 
 #if !c_option(c_no_clone) && !defined _i_no_raw
-    STC_INLINE _cx_self _cx_memb(_new)(_cx_raw raw) { 
-        return _cx_memb(_from)(i_valfrom(raw));
-    }
+    STC_INLINE _cx_self
+    _cx_memb(_new)(_cx_raw raw) { return _cx_memb(_from)(i_valfrom(raw)); }
 #endif
 
 // does not use i_valfrom, so we can bypass c_no_clone

@@ -25,9 +25,9 @@
 
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
-  #define _cx_self c_PASTE(_i_prefix, i_tag)
-  #define _cx_memb(name) c_PASTE(_cx_self, name)
-  #define _cx_deftypes(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
+  #define _cx_self c_paste(_i_prefix, i_tag)
+  #define _cx_memb(name) c_paste(_cx_self, name)
+  #define _cx_deftypes(macro, SELF, ...) c_expand(macro(SELF, __VA_ARGS__))
   #define _cx_value _cx_memb(_value)
   #define _cx_key _cx_memb(_key)
   #define _cx_mapped _cx_memb(_mapped)
@@ -68,34 +68,34 @@
   #endif
 #elif defined i_key_arcbox
   #define i_key_bind i_key_arcbox
-  #define i_keyraw c_PASTE(i_key_arcbox, _value)
+  #define i_keyraw c_paste(i_key_arcbox, _value)
 #endif
 
 #ifdef i_key_bind
   #define i_key i_key_bind
   #ifndef i_keyraw
     #ifndef i_keyfrom
-      #define i_keyfrom c_PASTE(i_key, _clone)
+      #define i_keyfrom c_paste(i_key, _clone)
     #endif
   #else
     #ifndef i_keyfrom
-      #define i_keyfrom c_PASTE(i_key, _from)
+      #define i_keyfrom c_paste(i_key, _from)
     #endif
     #ifndef i_keyto
-      #define i_keyto c_PASTE(i_key, _toraw)
+      #define i_keyto c_paste(i_key, _toraw)
     #endif
   #endif
   #ifndef i_cmp
-    #define i_cmp c_PASTE(i_keyraw, _cmp)
+    #define i_cmp c_paste(i_keyraw, _cmp)
   #endif
   #ifndef i_eq
-    #define i_eq c_PASTE(i_keyraw, _eq)
+    #define i_eq c_paste(i_keyraw, _eq)
   #endif
   #ifndef i_hash
-    #define i_hash c_PASTE(i_keyraw, _hash)
+    #define i_hash c_paste(i_keyraw, _hash)
   #endif
   #ifndef i_keydrop
-    #define i_keydrop c_PASTE(i_key, _drop)
+    #define i_keydrop c_paste(i_key, _drop)
   #endif
 #endif
 
@@ -127,28 +127,28 @@
   #endif
 #elif defined i_val_arcbox
   #define i_val_bind i_val_arcbox
-  #define i_valraw c_PASTE(i_val_arcbox, _value)
+  #define i_valraw c_paste(i_val_arcbox, _value)
 #endif
 
 #ifdef i_val_bind
   #define i_val i_val_bind
   #ifndef i_valraw
     #ifndef i_valfrom
-      #define i_valfrom c_PASTE(i_val, _clone)
+      #define i_valfrom c_paste(i_val, _clone)
     #endif
   #else
     #ifndef i_valfrom
-      #define i_valfrom c_PASTE(i_val, _from)
+      #define i_valfrom c_paste(i_val, _from)
     #endif
     #ifndef i_valto
-      #define i_valto c_PASTE(i_val, _toraw)
+      #define i_valto c_paste(i_val, _toraw)
     #endif
   #endif
   #if !defined i_cmp && !defined i_key
-    #define i_cmp c_PASTE(i_valraw, _cmp)
+    #define i_cmp c_paste(i_valraw, _cmp)
   #endif
   #ifndef i_valdrop
-    #define i_valdrop c_PASTE(i_val, _drop)
+    #define i_valdrop c_paste(i_val, _drop)
   #endif
 #endif
 

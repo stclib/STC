@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <stc/csview.h>
 #include <stc/cregex.h>
 #include <stc/crandom.h>
 #define i_val double
@@ -20,13 +19,13 @@ int main()
         printf("%d\n", res);
         cregmatch m[10];
         if (cregex_find(&re, s, 10, m, 0) > 0) {
-            printf("Found digits at position %" PRIuMAX "-%" PRIuMAX "\n", m[0].str - s, m[0].str - s + m[0].len);
+            printf("Found digits at position %" PRIuMAX "-%" PRIuMAX "\n", m[0].str - s, m[0].str - s + m[0].size);
         } else {
             printf("Could not find any digits\n");
         }
 
         while (cregex_find(&re, s, 10, m, creg_next) > 0) {
-            printf("%.*s ; ", (int)m[0].len, m[0].str);
+            printf(c_PRIsv " ; ", c_ARGsv(m[0]));
         }
         puts("");
     }

@@ -177,13 +177,13 @@ chartorune(Rune *rune, const char *s)
     utf8_decode_t ctx = {UTF8_OK};
     const uint8_t *b = (const uint8_t*)s;
     utf8_decode(&ctx, *b++);
-    switch (ctx.len) {
+    switch (ctx.size) {
     case 4: utf8_decode(&ctx, *b++);
     case 3: utf8_decode(&ctx, *b++);
     case 2: utf8_decode(&ctx, *b++);
     }
     *rune = ctx.codep;
-    return ctx.len;
+    return ctx.size;
 }
 
 static const char*
@@ -230,7 +230,7 @@ _renewmatch(Resub *mp, int ms, Resublist *sp, int nsubids)
     if (mp==NULL || ms<=0)
         return;
     if (mp[0].str == NULL || sp->m[0].str < mp[0].str ||
-       (sp->m[0].str == mp[0].str && sp->m[0].len > mp[0].len)) {
+       (sp->m[0].str == mp[0].str && sp->m[0].size > mp[0].size)) {
         for (i=0; i<ms && i<=nsubids; i++)
             mp[i] = sp->m[i];
     }
@@ -910,7 +910,7 @@ regexec1(const Reprog *progp,    /* program to run */
     if (mp)
         for (i=0; i<ms; i++) {
             mp[i].str = NULL;
-            mp[i].len = 0;
+            mp[i].size = 0;
         }
     j->relist[0][0].inst = NULL;
     j->relist[1][0].inst = NULL;
@@ -968,7 +968,7 @@ regexec1(const Reprog *progp,    /* program to run */
                     tlp->se.m[inst->r.subid].str = s;
                     continue;
                 case RBRA:
-                    tlp->se.m[inst->r.subid].len = s - tlp->se.m[inst->r.subid].str;
+                    tlp->se.m[inst->r.subid].size = s - tlp->se.m[inst->r.subid].str;
                     continue;
                 case ANY:
                     ok = (r != '\n');
@@ -1017,7 +1017,7 @@ regexec1(const Reprog *progp,    /* program to run */
                     match = !(mflags & creg_fullmatch) ||
                             ((s == j->eol || r == 0 || r == '\n') &&
                             (tlp->se.m[0].str == bol || tlp->se.m[0].str[-1] == '\n'));
-                    tlp->se.m[0].len = s - tlp->se.m[0].str;
+                    tlp->se.m[0].size = s - tlp->se.m[0].str;
                     if (mp != NULL)
                         _renewmatch(mp, ms, &tlp->se, progp->nsubids);
                     break;
@@ -1082,9 +1082,9 @@ regexec9(const Reprog *progp,    /* program to run */
 
     if (mp && mp->str && ms>0) {
         if (mflags & creg_startend)
-            j.starts = mp->str, j.eol = mp->str + mp->len;
+            j.starts = mp->str, j.eol = mp->str + mp->size;
         else if (mflags & creg_next)
-            j.starts = mp->str + mp->len;
+            j.starts = mp->str + mp->size;
     }
 
     j.starttype = 0;
@@ -1133,7 +1133,7 @@ void cregex_replace(
             case '5': case '6': case '7': case '8': case '9':
                 i = *sp - '0';
                 if (mp[i].str != NULL && mp != NULL && ms > i)
-                    for (ssp = mp[i].str; ssp < (mp[i].str + mp[i].len); ssp++)
+                    for (ssp = mp[i].str; ssp < (mp[i].str + mp[i].size); ssp++)
                         if (dp < ep)
                             *dp++ = *ssp;
                 break;
@@ -1151,7 +1151,7 @@ void cregex_replace(
             }
         } else if (*sp == '&') {
             if (mp[0].str != NULL && mp != NULL && ms > 0)
-                for (ssp = mp[0].str; ssp < (mp[0].str + mp[0].len); ssp++)
+                for (ssp = mp[0].str; ssp < (mp[0].str + mp[0].size); ssp++)
                     if (dp < ep)
                         *dp++ = *ssp;
         } else {
