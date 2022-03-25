@@ -37,11 +37,11 @@ int main()
         print_queue(q);
 
         icmp_fn = imin_cmp;
-        c_apply_arr(v, ipque_push(&q2, v), const int, data, n);
+        c_apply_arr(v, ipque_push(&q2, *v), const int, data, n);
         print_queue(q2);
 
         icmp_fn = imix_cmp;
-        c_apply_arr(v, ipque_push(&q3, v), const int, data, n);
+        c_apply_arr(v, ipque_push(&q3, *v), const int, data, n);
         print_queue(q3);
     }
 }

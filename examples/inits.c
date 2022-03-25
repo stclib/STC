@@ -37,11 +37,11 @@ int main(void)
     // CVEC FLOAT / PRIORITY QUEUE
 
     c_auto (cpque_f, floats) {
-        float nums[] = {4.0f, 2.0f, 5.0f, 3.0f, 1.0f};
+        const float nums[] = {4.0f, 2.0f, 5.0f, 3.0f, 1.0f};
 
         // PRIORITY QUEUE
 
-        c_apply_arr(v, cpque_f_push(&floats, v), float, nums, c_arraylen(nums));
+        c_apply_arr(v, cpque_f_push(&floats, *v), const float, nums, c_arraylen(nums));
 
         puts("\npop and show high priorites first:");
         while (! cpque_f_empty(floats)) {

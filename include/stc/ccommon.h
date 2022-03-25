@@ -200,14 +200,14 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle, size_t slen, cons
 } while (0)
 #define c_apply_arr(v, action, T, arr, n) do { \
     typedef T _c_T; \
-    const _c_T* _c_arr = arr; size_t _n = n; \
-    for (size_t index = 0; index < _n; ++index) \
-        { const _c_T v = _c_arr[index]; action; } \
+    _c_T *_c_arr = arr; \
+    for (size_t index = 0, _c_n = n; index < _c_n; ++index) \
+        { _c_T *v = _c_arr + index; action; } \
 } while (0)
 #define c_apply_cnt(v, action, C, ...) do { \
     size_t index = 0; \
     c_foreach (_it, C, __VA_ARGS__) \
-        { const C##_value v = *_it.ref; action; ++index; } \
+        { C##_value* v = _it.ref; action; ++index; } \
 } while (0)
 #define c_pair(v) (v).first, (v).second
 
