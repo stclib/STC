@@ -26,20 +26,15 @@
  */
 #ifndef CSTR_H_INCLUDED
 #define CSTR_H_INCLUDED
+#define CSTR_IS_SSO
 
 #include <stc/ccommon.h>
+#include <stc/forward.h>
 #include <stdlib.h> /* malloc */
 #include <string.h>
 #include <stdarg.h>
 #include <stdio.h> /* vsnprintf */
 #include <ctype.h>
-
-typedef struct { char* data; size_t size, cap; } _cstr_rep_t;
-
-typedef union {
-    struct { char data[sizeof(_cstr_rep_t) - 1], cap_len; } sso;
-    struct { char* data; size_t size, ncap; } lon;
-} cstr;
 
 /**************************** PRIVATE API **********************************/
 

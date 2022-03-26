@@ -14,7 +14,7 @@ int main() {
         );
         printf("%s\n", hello.str);
 
-        csview sv = csview_from_s(hello);
+        csview sv = csview_from_s(&hello);
         c_foreach (c, csview, sv)
             printf(c_PRIsv ",", c_ARGsv(c.codep));
     }
