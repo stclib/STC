@@ -120,6 +120,7 @@ uint64_t        csview_hash(const csview* x, size_t dummy);
 
 ## Example
 ```c
+#include <stc/cstr.h>
 #include <stc/csview.h>
 
 int main ()
