@@ -39,12 +39,12 @@
 /**************************** PRIVATE API **********************************/
 
 enum { SSO_CAP = sizeof(_cstr_rep_t) - 1 };
-#define cstr_is_long(s)         (bool)((s)->sso.cap_len & 128)
+#define cstr_is_long(s)         ((s)->sso.last > 127)
 #define cstr_select_(s, memb)   (cstr_is_long(s) ? cstr_l_##memb : cstr_s_##memb)
 
 #define cstr_s_cap(s)           SSO_CAP
-#define cstr_s_size(s)          ((size_t)(SSO_CAP - (s)->sso.cap_len))
-#define cstr_s_set_size(s, len) ((s)->sso.cap_len = SSO_CAP - (len), (s)->sso.data[len] = 0)
+#define cstr_s_size(s)          ((size_t)(SSO_CAP - (s)->sso.last))
+#define cstr_s_set_size(s, len) ((s)->sso.last = SSO_CAP - (len), (s)->sso.data[len] = 0)
 #define cstr_s_data(s)          (s)->sso.data
 #define cstr_s_end(s)           ((s)->sso.data + cstr_s_size(s))
 
@@ -79,7 +79,7 @@ STC_INLINE _cstr_rep_t cstr_rep_(cstr* self) {
 
 #define cstr_new(literal) cstr_from_n(literal, c_strlen_lit(literal))
 #define cstr_npos (SIZE_MAX >> 1)
-#define cstr_null (c_make(cstr){.sso = {.cap_len = SSO_CAP}})
+#define cstr_null (c_make(cstr){.sso = {.last = SSO_CAP}})
 #define cstr_toraw(self) cstr_str(self)
 
 STC_API char* cstr_reserve(cstr* self, size_t cap);

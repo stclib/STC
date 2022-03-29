@@ -45,7 +45,7 @@
 #ifdef CSTR_IS_SSO
 typedef struct { char* data; size_t size, cap; } _cstr_rep_t;
 typedef union {
-    struct { char data[sizeof(_cstr_rep_t) - 1], cap_len; } sso;
+    struct { char data[sizeof(_cstr_rep_t) - 1]; uint8_t last; } sso;
     struct { char* data; size_t size, ncap; } lon;
 } cstr;
 #else
