@@ -21,6 +21,14 @@ static inline uint64_t romutrio(void) {
    return xp;    
 }
 
+static void sromutrio(uint64_t seed) {
+   uint64_t *s = g_romutrio;
+   s[0] = 0x26aa069ea2fb1a4dULL + seed;
+   s[1] = 0x70c72c95cd592d04ULL + seed;
+   s[2] = 0x504f333d3aa0b359ULL + seed;
+}
+
+
 static const char CHARS[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=+";
 static const int ARRAY_SIZE = sizeof(CHARS) - 1;
 
@@ -64,13 +72,15 @@ void benchmark(L& vec, const int length, R addRandomString) {
 
 
 int main() {
+    sromutrio(1234);
     std::cerr << "length\ttime\tstd::string\n";
-
     for (int length = 1; length <= MAX_STRING_LENGTH; length++) {
         std::vector<std::string> vec; vec.reserve(BENCHMARK_SIZE);
         benchmark(vec, length, addRandomString_STD);
         std::cout << '\t' << vec[0] << '\n';
     }
+
+    sromutrio(1234);
     std::cerr << "\nlength\ttime\tSTC string\n";
     for (int length = 1; length <= MAX_STRING_LENGTH; length++) {
         cstack_str vec = cstack_str_with_capacity(BENCHMARK_SIZE);

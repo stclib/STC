@@ -65,12 +65,12 @@ STC_API bool            cstr_getdelim(cstr *self, int delim, FILE *stream);
 STC_API char*           c_strnstrn(const char* s, const char* needle, size_t slen, size_t nlen);
 
 STC_INLINE cstr         cstr_init() { return cstr_null; }
-#define                 cstr_str(self) (self)->str
 #define                 cstr_toraw(self) (self)->str
 #define                 cstr_new(literal) \
                             cstr_from_n(literal, c_strlen_lit(literal))
 STC_INLINE cstr         cstr_from(const char* str)
                             { return cstr_from_n(str, strlen(str)); }
+STC_INLINE const char*  cstr_str(const cstr* self) { return self->str; }
 STC_INLINE char*        cstr_data(cstr* self) { return self->str; }
 STC_INLINE size_t       cstr_size(cstr s) { return _cstr_rep(&s)->size; }
 STC_INLINE size_t       cstr_length(cstr s) { return _cstr_rep(&s)->size; }
