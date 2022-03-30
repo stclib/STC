@@ -68,12 +68,6 @@ STC_INLINE void _cstr_set_size(cstr* s, size_t len) {
     SSO_CALL(s, set_size(s, len));
 }
 
-STC_INLINE cstr_rep_t _cstr_rep(cstr* s) {
-    return cstr_is_long(s)
-        ? c_make(cstr_rep_t){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
-        : c_make(cstr_rep_t){s->sso.data, cstr_s_size(s), cstr_s_cap(s)};
-}
-
 /**************************** PUBLIC API **********************************/
 
 #define cstr_new(literal) cstr_from_n(literal, c_strlen_lit(literal))
@@ -91,7 +85,12 @@ STC_API bool cstr_getdelim(cstr *self, int delim, FILE *fp);
 STC_API void cstr_erase_n(cstr* self, size_t pos, size_t n);
 STC_API cstr cstr_from_fmt(const char* fmt, ...);
 STC_API int  cstr_printf(cstr* self, const char* fmt, ...);
-STC_API char* strnstrn(const char *s, const char *needle, size_t slen, size_t nlen);
+
+STC_INLINE cstr_rep_t cstr_rep(cstr* s) {
+    return cstr_is_long(s)
+        ? c_make(cstr_rep_t){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
+        : c_make(cstr_rep_t){s->sso.data, cstr_s_size(s), cstr_s_cap(s)};
+}
 
 STC_INLINE cstr cstr_init(void) {
     return cstr_null;
@@ -133,7 +132,7 @@ STC_INLINE cstr cstr_move(cstr* self) {
 }
 
 STC_INLINE cstr cstr_clone(cstr s) {
-    cstr_rep_t r = _cstr_rep(&s);
+    cstr_rep_t r = cstr_rep(&s);
     return cstr_from_n(r.data, r.size);
 }
 
@@ -214,7 +213,7 @@ STC_INLINE bool cstr_starts_with_s(cstr s, cstr sub) {
 }
 
 STC_INLINE bool cstr_ends_with(cstr s, const char* sub) {
-    cstr_rep_t r = _cstr_rep(&s); size_t n = strlen(sub);
+    cstr_rep_t r = cstr_rep(&s); size_t n = strlen(sub);
     return n <= r.size && memcmp(r.data + r.size - n, sub, n) == 0;
 }
 
@@ -227,7 +226,7 @@ STC_INLINE void cstr_assign(cstr* self, const char* str) {
 }
 
 STC_INLINE void cstr_copy(cstr* self, cstr s) {
-    cstr_rep_t r = _cstr_rep(&s);
+    cstr_rep_t r = cstr_rep(&s);
     cstr_assign_n(self, r.data, r.size);
 }
 
@@ -236,7 +235,7 @@ STC_INLINE void cstr_append(cstr* self, const char* str) {
 }
 
 STC_INLINE void cstr_append_s(cstr* self, cstr s) {
-    cstr_rep_t r = _cstr_rep(&s);
+    cstr_rep_t r = cstr_rep(&s);
     cstr_append_n(self, r.data, r.size);
 }
 
@@ -250,7 +249,7 @@ STC_INLINE void cstr_replace(cstr* self, size_t pos, size_t len, const char* str
 }
 
 STC_INLINE void cstr_replace_s(cstr* self, size_t pos, size_t len, cstr s) {
-    cstr_rep_t r = _cstr_rep(&s);
+    cstr_rep_t r = cstr_rep(&s);
     cstr_replace_n(self, pos, len, r.data, r.size);
 }
 
@@ -263,7 +262,7 @@ STC_INLINE void cstr_insert(cstr* self, size_t pos, const char* str) {
 }
 
 STC_INLINE void cstr_insert_s(cstr* self, size_t pos, cstr s) {
-    cstr_rep_t r = _cstr_rep(&s);
+    cstr_rep_t r = cstr_rep(&s);
     cstr_replace_n(self, pos, 0, r.data, r.size);
 }
 
@@ -277,7 +276,7 @@ STC_INLINE bool cstr_getline(cstr *self, FILE *fp) {
 STC_DEF void _cstr_internal_move(cstr* self, const size_t pos1, const size_t pos2) {
     if (pos1 == pos2)
         return;
-    cstr_rep_t r = _cstr_rep(self);
+    cstr_rep_t r = cstr_rep(self);
     const size_t newlen = r.size + pos2 - pos1;
     if (newlen > r.cap)
         r.data = cstr_reserve(self, (r.size*3 >> 1) + pos2 - pos1);
@@ -297,7 +296,7 @@ STC_DEF char* _cstr_init(cstr* self, const size_t len, const size_t cap) {
 }
 
 STC_DEF void cstr_shrink_to_fit(cstr* self) {
-    cstr_rep_t r = _cstr_rep(self);
+    cstr_rep_t r = cstr_rep(self);
     if (r.size == r.cap)
         return;
     if (r.size > SSO_CAP) {
@@ -332,7 +331,7 @@ STC_DEF char* cstr_reserve(cstr* self, const size_t cap) {
 }
 
 STC_DEF void cstr_resize(cstr* self, const size_t size, const char value) {
-    cstr_rep_t r = _cstr_rep(self);
+    cstr_rep_t r = cstr_rep(self);
     if (size > r.size) {
         if (size > r.cap) r.data = cstr_reserve(self, size);
         memset(r.data + r.size, value, size - r.size);
@@ -340,27 +339,16 @@ STC_DEF void cstr_resize(cstr* self, const size_t size, const char value) {
     _cstr_set_size(self, size);
 }
 
-STC_DEF char* strnstrn(const char *s, const char *needle, size_t slen, const size_t nlen) {
-    if (!nlen) return (char *)s;
-    if (nlen > slen) return NULL;
-    slen -= nlen;
-    do {
-        if (*s == *needle && !memcmp(s, needle, nlen)) return (char *)s;
-        ++s;
-    } while (slen--);
-    return NULL;
-}
-
 STC_DEF size_t cstr_find_n(cstr s, const char* needle, const size_t pos, const size_t nmax) {
-    cstr_rep_t r = _cstr_rep(&s);
+    cstr_rep_t r = cstr_rep(&s);
     const size_t nlen = (size_t) strlen(needle);
     if (pos > r.size) return cstr_npos;
-    char* res = strnstrn(r.data + pos, needle, r.size, nmax < nlen ? nmax : nlen);
+    char* res = c_strnstrn(r.data + pos, needle, r.size, nmax < nlen ? nmax : nlen);
     return res ? res - r.data : cstr_npos;
 }
 
 STC_DEF void cstr_assign_n(cstr* self, const char* str, const size_t n) {
-    cstr_rep_t r = _cstr_rep(self);
+    cstr_rep_t r = cstr_rep(self);
     if (n > r.cap) {
         r.data = (char *)c_realloc(cstr_is_long(self) ? r.data : NULL, n + 1);
         cstr_l_set_cap(self, n);
@@ -370,7 +358,7 @@ STC_DEF void cstr_assign_n(cstr* self, const char* str, const size_t n) {
 }
 
 STC_DEF void cstr_append_n(cstr* self, const char* str, const size_t n) {
-    cstr_rep_t r = _cstr_rep(self);
+    cstr_rep_t r = cstr_rep(self);
     if (r.size + n > r.cap) {
         const size_t off = (size_t)(str - r.data);
         r.data = cstr_reserve(self, (r.size*3 >> 1) + n);
@@ -385,7 +373,7 @@ STC_DEF bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
     if (c == EOF)
         return false;
     size_t pos = 0;
-    cstr_rep_t r = _cstr_rep(self);
+    cstr_rep_t r = cstr_rep(self);
     for (;;) {
         if (c == delim || c == EOF) {
             _cstr_set_size(self, pos);
@@ -401,7 +389,7 @@ STC_DEF bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
 }
 
 STC_DEF void cstr_erase_n(cstr* self, const size_t pos, size_t n) {
-    cstr_rep_t r = _cstr_rep(self);
+    cstr_rep_t r = cstr_rep(self);
     if (n > r.size - pos) n = r.size - pos;
     memmove(&r.data[pos], &r.data[pos + n], r.size - (pos + n));
     _cstr_set_size(self, r.size - n);
@@ -425,7 +413,6 @@ STC_DEF int cstr_vfmt(cstr* self, const char* fmt, va_list args) {
     _cstr_set_size(self, n);
     return n;
 }
-
 #if defined(__clang__)
 #  pragma clang diagnostic pop
 #elif defined(_MSC_VER)
