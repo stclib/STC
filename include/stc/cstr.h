@@ -50,7 +50,7 @@ STC_API cstr            cstr_from_fmt(const char* fmt, ...);
 STC_API cstr            cstr_from_replace_all(const char* str, size_t str_len,
                                               const char* find, size_t find_len,
                                               const char* repl, size_t repl_len);
-STC_API size_t          cstr_reserve(cstr* self, size_t cap);
+STC_API char*           cstr_reserve(cstr* self, size_t cap);
 STC_API void            cstr_resize(cstr* self, size_t len, char fill);
 STC_API cstr*           cstr_assign_n(cstr* self, const char* str, size_t n);
 STC_API int             cstr_printf(cstr* self, const char* fmt, ...);
@@ -176,17 +176,17 @@ static struct cstr_priv _cstr_nullrep = {0, 0, {0}};
 const cstr cstr_null = {_cstr_nullrep.str};
 #endif
 
-STC_DEF size_t
+STC_DEF char*
 cstr_reserve(cstr* self, const size_t cap) {
-    cstr_priv* prv = _cstr_p(self);
-    const size_t oldcap = prv->cap;
+    cstr_priv* p = _cstr_p(self);
+    const size_t oldcap = p->cap;
     if (cap > oldcap) {
-        prv = (cstr_priv*) c_realloc(oldcap ? prv : NULL, _cstr_opt_mem(cap));
-        self->str = prv->chr;
-        if (oldcap == 0) self->str[prv->size = 0] = '\0';
-        return (prv->cap = _cstr_opt_cap(cap));
+        p = (cstr_priv*) c_realloc(oldcap ? p : NULL, _cstr_opt_mem(cap));
+        self->str = p->chr;
+        if (oldcap == 0) self->str[p->size = 0] = '\0';
+        p->cap = _cstr_opt_cap(cap);
     }
-    return oldcap;
+    return self->str;
 }
 
 STC_DEF void
@@ -334,17 +334,20 @@ cstr_erase_n(cstr* self, const size_t pos, size_t n) {
 STC_DEF bool
 cstr_getdelim(cstr *self, const int delim, FILE *fp) {
     size_t pos = 0, cap = _cstr_p(self)->cap;
+    char* d = self->str;
     int c = fgetc(fp);
     if (c == EOF)
         return false;
     for (;;) {
         if (c == delim || c == EOF) {
-            if (cap) self->str[_cstr_p(self)->size = pos] = '\0';
+            if (cap) d[_cstr_p(self)->size = pos] = '\0';
             return true;
         }
-        if (pos == cap)
-            cap = cstr_reserve(self, (cap*3 >> 1) + 16);
-        self->str[pos++] = (char) c;
+        if (pos == cap) {
+            d = cstr_reserve(self, (cap*3 >> 1) + 16);
+            cap = cstr_capacity(*self);
+        }
+        d[pos++] = (char) c;
         c = fgetc(fp);
     }
 }

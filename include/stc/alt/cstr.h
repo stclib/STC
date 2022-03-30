@@ -62,7 +62,7 @@ enum { SSO_CAP = sizeof(cstr_rep_t) - 1 };
 #define cstr_l_drop(s)          c_free((s)->lon.data)
 
 STC_API char* _cstr_init(cstr* self, size_t len, size_t cap);
-STC_API void _cstr_internal_move(cstr* self, size_t pos1, size_t pos2);
+STC_API char* _cstr_internal_move(cstr* self, size_t pos1, size_t pos2);
 
 STC_INLINE void _cstr_set_size(cstr* s, size_t len) {
     SSO_CALL(s, set_size(s, len));
@@ -240,8 +240,8 @@ STC_INLINE void cstr_append_s(cstr* self, cstr s) {
 }
 
 STC_INLINE void cstr_replace_n(cstr* self, size_t pos, size_t len, const char* str, size_t n) {
-    _cstr_internal_move(self, pos + len, pos + n);
-    memcpy(&cstr_data(self)[pos], str, n);
+    char* d = _cstr_internal_move(self, pos + len, pos + n);
+    memcpy(d + pos, str, n);
 }
 
 STC_INLINE void cstr_replace(cstr* self, size_t pos, size_t len, const char* str) {
@@ -273,15 +273,16 @@ STC_INLINE bool cstr_getline(cstr *self, FILE *fp) {
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(_i_implement)
 
-STC_DEF void _cstr_internal_move(cstr* self, const size_t pos1, const size_t pos2) {
-    if (pos1 == pos2)
-        return;
+STC_DEF char* _cstr_internal_move(cstr* self, const size_t pos1, const size_t pos2) {
     cstr_rep_t r = cstr_rep(self);
-    const size_t newlen = r.size + pos2 - pos1;
-    if (newlen > r.cap)
-        r.data = cstr_reserve(self, (r.size*3 >> 1) + pos2 - pos1);
-    memmove(&r.data[pos2], &r.data[pos1], r.size - pos1);
-    _cstr_set_size(self, newlen);
+    if (pos1 != pos2) {
+        const size_t newlen = r.size + pos2 - pos1;
+        if (newlen > r.cap)
+            r.data = cstr_reserve(self, (r.size*3 >> 1) + pos2 - pos1);
+        memmove(&r.data[pos2], &r.data[pos1], r.size - pos1);
+        _cstr_set_size(self, newlen);
+    }
+    return r.data;
 }
 
 STC_DEF char* _cstr_init(cstr* self, const size_t len, const size_t cap) {
