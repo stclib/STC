@@ -40,12 +40,6 @@
   #define _cx_size _cx_memb(_size_t)
 #endif
 
-#ifdef i_key_sptr // [deprecated]
-  #define i_key_arcbox i_key_sptr
-#endif
-#ifdef i_val_sptr // [deprecated]
-  #define i_val_arcbox i_val_sptr
-#endif
 #ifdef i_type
   #define i_tag i_type
   #undef _i_prefix
@@ -163,9 +157,6 @@
   #ifndef i_tag
     #define i_tag i_key  
   #endif
-  #if !defined _i_has_internal_clone && defined i_keydrop && !defined i_keyfrom && !c_option(c_no_clone)
-    #error "i_keydrop defined but not i_keyfrom (e.g. as c_default_from), or no 'i_opt c_no_clone'"
-  #endif
   #if !defined i_keyfrom
     #define i_keyfrom c_default_from
   #endif
@@ -183,9 +174,6 @@
 
 #ifndef i_tag
   #define i_tag i_val
-#endif
-#if !defined _i_has_internal_clone && defined i_valdrop && !defined i_valfrom && !c_option(c_no_clone)
-  #error "i_valdrop/i_drop defined but not i_valfrom (e.g. as c_default_from), or no 'i_opt c_no_clone'"
 #endif
 #if !defined i_valfrom
   #define i_valfrom c_default_from
