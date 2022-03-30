@@ -43,13 +43,13 @@
 #define forward_cvec(CX, VAL) _c_cvec_types(CX, VAL)
 
 #ifdef CSTR_IS_SSO
-typedef struct { char* data; size_t size, cap; } _cstr_rep_t;
-typedef union {
-    struct { char data[sizeof(_cstr_rep_t) - 1]; uint8_t last; } sso;
-    struct { char* data; size_t size, ncap; } lon;
-} cstr;
+    typedef struct { char* data; size_t size, cap; } cstr_rep_t;
+    typedef union {
+        struct { char data[sizeof(cstr_rep_t) - 1]; uint8_t last; } sso;
+        struct { char* data; size_t size, ncap; } lon;
+    } cstr;
 #else
-  typedef struct cstr { char* str; } cstr;
+    typedef struct cstr { char* str; } cstr;
 #endif
 typedef char cstr_value;
 
