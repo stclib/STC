@@ -21,7 +21,7 @@
  * SOFTWARE.
  */
 
-#ifdef CSTR_USE_SSO
+#ifdef STC_USE_SSO
 #include "alt/cstr.h"
 #else
 #ifndef CSTR_H_INCLUDED

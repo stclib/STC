@@ -93,8 +93,8 @@
   #endif
 #endif
 
-#if defined i_keyraw && !(defined i_keyto && defined i_keyfrom)
-  #error "if i_keyraw defined, i_keyfrom and i_keyto must be defined"
+#if defined i_keyraw && !defined i_keyfrom
+  #error "if i_keyraw defined, i_keyfrom (and often i_keyto) must be defined"
 #endif
 
 /* Resolve i_drop and i_from here */
@@ -146,8 +146,8 @@
   #endif
 #endif
 
-#if defined i_valraw && !(defined i_valto && defined i_valfrom)
-  #error "if i_valraw defined, i_valfrom and i_valto must be defined"
+#if defined i_valraw && !defined i_valfrom
+  #error "if i_valraw defined, i_valfrom (and often i_valto) must be defined"
 #endif
 
 #ifdef i_key
@@ -158,11 +158,13 @@
     #define i_tag i_key  
   #endif
   #if !defined i_keyfrom
+    #define _i_no_keyraw
     #define i_keyfrom c_default_from
   #endif
   #ifndef i_keyraw
-    #define _i_no_keyraw
     #define i_keyraw i_key
+  #endif
+  #ifndef i_keyto
     #define i_keyto c_default_toraw
   #endif
   #ifndef i_keydrop
@@ -176,13 +178,15 @@
   #define i_tag i_val
 #endif
 #if !defined i_valfrom
-  #define i_valfrom c_default_from
-#endif
-#ifndef i_valraw
   #if !defined i_key || defined _i_no_keyraw
     #define _i_no_raw
   #endif
+  #define i_valfrom c_default_from
+#endif
+#ifndef i_valraw
   #define i_valraw i_val
+#endif
+#ifndef i_valto
   #define i_valto c_default_toraw
 #endif
 #ifndef i_valdrop

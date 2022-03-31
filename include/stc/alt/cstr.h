@@ -26,7 +26,7 @@
  */
 #ifndef CSTR_H_INCLUDED
 #define CSTR_H_INCLUDED
-#define CSTR_USE_SSO
+#define STC_USE_SSO 1
 
 #include <stc/ccommon.h>
 #include <stc/forward.h>
