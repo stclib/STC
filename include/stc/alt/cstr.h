@@ -26,7 +26,7 @@
  */
 #ifndef CSTR_H_INCLUDED
 #define CSTR_H_INCLUDED
-#define CSTR_IS_SSO
+#define CSTR_USE_SSO
 
 #include <stc/ccommon.h>
 #include <stc/forward.h>
@@ -79,8 +79,8 @@ STC_API char* cstr_reserve(cstr* self, size_t cap);
 STC_API void cstr_shrink_to_fit(cstr* self);
 STC_API void cstr_resize(cstr* self, size_t size, char value);
 STC_API size_t cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax);
-STC_API void cstr_assign_n(cstr* self, const char* str, size_t n);
-STC_API void cstr_append_n(cstr* self, const char* str, size_t n);
+STC_API cstr* cstr_assign_n(cstr* self, const char* str, size_t n);
+STC_API cstr* cstr_append_n(cstr* self, const char* str, size_t n);
 STC_API bool cstr_getdelim(cstr *self, int delim, FILE *fp);
 STC_API void cstr_erase_n(cstr* self, size_t pos, size_t n);
 STC_API cstr cstr_from_fmt(const char* fmt, ...);
@@ -348,7 +348,7 @@ STC_DEF size_t cstr_find_n(cstr s, const char* needle, const size_t pos, const s
     return res ? res - r.data : cstr_npos;
 }
 
-STC_DEF void cstr_assign_n(cstr* self, const char* str, const size_t n) {
+STC_DEF cstr* cstr_assign_n(cstr* self, const char* str, const size_t n) {
     cstr_rep_t r = cstr_rep(self);
     if (n > r.cap) {
         r.data = (char *)c_realloc(cstr_is_long(self) ? r.data : NULL, n + 1);
@@ -356,9 +356,10 @@ STC_DEF void cstr_assign_n(cstr* self, const char* str, const size_t n) {
     }
     memmove(r.data, str, n);
     _cstr_set_size(self, n);
+    return self;
 }
 
-STC_DEF void cstr_append_n(cstr* self, const char* str, const size_t n) {
+STC_DEF cstr* cstr_append_n(cstr* self, const char* str, const size_t n) {
     cstr_rep_t r = cstr_rep(self);
     if (r.size + n > r.cap) {
         const size_t off = (size_t)(str - r.data);
@@ -367,6 +368,7 @@ STC_DEF void cstr_append_n(cstr* self, const char* str, const size_t n) {
     }
     memcpy(r.data + r.size, str, n);
     _cstr_set_size(self, r.size + n);
+    return self;
 }
 
 STC_DEF bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {

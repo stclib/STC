@@ -20,6 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+
+#ifdef CSTR_USE_SSO
+#include "alt/cstr.h"
+#else
 #ifndef CSTR_H_INCLUDED
 #define CSTR_H_INCLUDED
 
@@ -368,4 +372,4 @@ cstr_find_n(cstr s, const char* needle, const size_t pos, const size_t nmax) {
 
 #endif
 #endif
-#undef i_opt
+#endif

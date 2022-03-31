@@ -94,9 +94,9 @@ STC_INLINE csview       csview_from_s(const cstr* self)
 
 STC_INLINE cstr         cstr_from_sv(csview sv)
                             { return cstr_from_n(sv.str, sv.size); }
-STC_INLINE cstr         cstr_from_replace_all_sv(csview sv, csview find, csview repl)
+/*STC_INLINE cstr         cstr_from_replace_all_sv(csview sv, csview find, csview repl)
                             { return cstr_from_replace_all(sv.str, sv.size, find.str, find.size,
-                                                           repl.str, repl.size); }
+                                                           repl.str, repl.size); }*/
 STC_INLINE csview       cstr_to_sv(const cstr* self)
                             { return c_make(csview){cstr_str(self), cstr_size(*self)}; }
 STC_INLINE csview       cstr_substr(const cstr* self, intptr_t pos, size_t n)
@@ -110,7 +110,7 @@ STC_INLINE cstr*        cstr_append_sv(cstr* self, csview sv)
 STC_INLINE void         cstr_insert_sv(cstr* self, size_t pos, csview sv)
                             { cstr_replace_n(self, pos, 0, sv.str, sv.size); }
 STC_INLINE void         cstr_replace_sv(cstr* self, csview sub, csview with)
-                            { cstr_replace_n(self, sub.str - self->str, sub.size, with.str, with.size); }
+                            { cstr_replace_n(self, sub.str - cstr_str(self), sub.size, with.str, with.size); }
 STC_INLINE bool         cstr_equals_sv(cstr s, csview sv)
                             { return sv.size == cstr_size(s) && !memcmp(cstr_str(&s), sv.str, sv.size); }
 STC_INLINE size_t       cstr_find_sv(cstr s, csview needle)
