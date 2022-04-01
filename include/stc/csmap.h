@@ -93,12 +93,10 @@ typedef _i_SET_ONLY( i_keyraw )
         _i_MAP_ONLY( struct { i_keyraw first; i_valraw second; } )
         _cx_raw;
 
-#if !c_option(c_no_clone)
+#if !defined _i_no_from
 STC_API _cx_self        _cx_memb(_clone)(_cx_self tree);
 STC_API void            _cx_memb(_copy)(_cx_self *self, _cx_self other);
 STC_API _cx_value       _cx_memb(_value_clone)(_cx_value _val);
-#endif
-#if !defined _i_no_raw
 STC_API _cx_result      _cx_memb(_emplace)(_cx_self* self, i_keyraw rkey _i_MAP_ONLY(, i_valraw rmapped));
 #endif
 STC_API _cx_self        _cx_memb(_init)(void);
@@ -156,7 +154,7 @@ _cx_memb(_value_drop)(_cx_value* val) {
 }
 
 #ifndef _i_isset
-    #if !c_option(c_no_clone) && !defined _i_no_raw
+    #if !defined _i_no_from
     STC_API _cx_result _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped);
     #endif
     STC_API _cx_result _cx_memb(_insert_or_assign)(_cx_self* self, i_key key, i_val mapped);
@@ -277,7 +275,7 @@ _cx_memb(_insert)(_cx_self* self, i_key key _i_MAP_ONLY(, i_val mapped)) {
         res.ref->second = mapped; return res;
     }
 
-    #if !c_option(c_no_clone) && !defined _i_no_raw
+    #if !defined _i_no_from
     STC_DEF _cx_result
     _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped) {
         _cx_result res = _cx_memb(_insert_entry_)(self, rkey);
@@ -460,7 +458,7 @@ _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
     }
 }
 
-#if !c_option(c_no_clone)
+#if !defined _i_no_from
 STC_DEF void
 _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     if (self->nodes == other.nodes) return;
@@ -493,7 +491,6 @@ _cx_memb(_clone)(_cx_self tree) {
     return clone;
 }
 
-#if !defined _i_no_raw
 STC_DEF _cx_result
 _cx_memb(_emplace)(_cx_self* self, i_keyraw rkey _i_MAP_ONLY(, i_valraw rmapped)) {
     _cx_result res = _cx_memb(_insert_entry_)(self, rkey);
@@ -503,8 +500,7 @@ _cx_memb(_emplace)(_cx_self* self, i_keyraw rkey _i_MAP_ONLY(, i_valraw rmapped)
     }
     return res;
 }
-#endif
-#endif // !c_no_clone
+#endif // !_i_no_from
 
 static void
 _cx_memb(_drop_r_)(_cx_node* d, _cx_size tn) {

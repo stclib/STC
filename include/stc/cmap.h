@@ -87,7 +87,7 @@ typedef _i_SET_ONLY( i_keyraw )
 _cx_raw;
 
 STC_API _cx_self        _cx_memb(_with_capacity)(size_t cap);
-#if !c_option(c_no_clone)
+#if !defined _i_no_from
 STC_API _cx_self        _cx_memb(_clone)(_cx_self map);
 #endif
 STC_API void            _cx_memb(_drop)(_cx_self* self);
@@ -110,7 +110,7 @@ STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, i_keyraw rkey)
                             { return self->size && self->_hashx[_cx_memb(_bucket_)(self, &rkey).idx]; }
 
 #ifndef _i_isset
-    #if !c_option(c_no_clone) && !defined _i_no_raw
+    #if !defined _i_no_from
     STC_API _cx_result  _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped);
     #endif
     STC_API _cx_result  _cx_memb(_insert_or_assign)(_cx_self* self, i_key _key, i_val _mapped);
@@ -128,7 +128,7 @@ STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, i_keyraw rkey)
     }
 #endif
 
-#if !c_option(c_no_clone)
+#if !defined _i_no_from
 STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     if (self->table == other.table) return;
     _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
@@ -141,7 +141,6 @@ _cx_memb(_value_clone)(_cx_value _val) {
     return _val;
 }
 
-#if !defined _i_no_raw
 STC_INLINE _cx_result
 _cx_memb(_emplace)(_cx_self* self, i_keyraw rkey _i_MAP_ONLY(, i_valraw rmapped)) {
     _cx_result _res = _cx_memb(_insert_entry_)(self, rkey);
@@ -151,8 +150,7 @@ _cx_memb(_emplace)(_cx_self* self, i_keyraw rkey _i_MAP_ONLY(, i_valraw rmapped)
     }
     return _res;
 }
-#endif
-#endif // !c_no_clone
+#endif // !_i_no_from
 
 STC_INLINE _cx_raw
 _cx_memb(_value_toraw)(_cx_value* val) {
@@ -274,7 +272,7 @@ STC_DEF void _cx_memb(_clear)(_cx_self* self) {
         _res.ref->second = _mapped; return _res;
     }
 
-    #if !c_option(c_no_clone) && !defined _i_no_raw
+    #if !defined _i_no_from
     STC_DEF _cx_result
     _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped) {
         _cx_result _res = _cx_memb(_insert_entry_)(self, rkey);
@@ -315,7 +313,7 @@ _cx_memb(_insert_entry_)(_cx_self* self, i_keyraw rkey) {
     return res;
 }
 
-#if !c_option(c_no_clone)
+#if !defined _i_no_from
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self m) {
     _cx_self clone = {

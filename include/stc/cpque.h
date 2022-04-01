@@ -88,7 +88,7 @@ STC_INLINE _cx_value* _cx_memb(_top)(const _cx_self* self)
 STC_INLINE void _cx_memb(_pop)(_cx_self* self)
     { _cx_memb(_erase_at)(self, 0); }
 
-#if !c_option(c_no_clone)
+#if !defined _i_no_from
 STC_API _cx_self _cx_memb(_clone)(_cx_self q);
 
 STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
@@ -98,10 +98,8 @@ STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
 STC_INLINE i_val _cx_memb(_value_clone)(_cx_value val)
     { return i_valfrom(i_valto(&val)); }
 
-#if !defined _i_no_raw
 STC_INLINE void _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
     { _cx_memb(_push)(self, i_valfrom(raw)); }
-#endif
 #endif
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
@@ -124,7 +122,7 @@ _cx_memb(_make_heap)(_cx_self* self) {
         _cx_memb(_sift_down_)(arr, k, n);
 }
 
-#if !c_option(c_no_clone)
+#if !defined _i_no_from
 STC_DEF _cx_self _cx_memb(_clone)(_cx_self q) {
     _cx_self out = _cx_memb(_with_capacity)(q.size);
     for (; out.size < out.capacity; ++out.size, ++q.data)

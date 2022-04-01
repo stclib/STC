@@ -74,7 +74,6 @@ int main() {
 #ifndef _i_prefix
 #define _i_prefix carc_
 #endif
-#define _i_has_internal_clone
 #include "template.h"
 typedef i_valraw _cx_raw;
 
@@ -144,7 +143,7 @@ _cx_memb(_reset_from)(_cx_self* self, i_val val) {
     *self = _cx_memb(_from)(val);
 }
 
-#if !c_option(c_no_clone) && !defined _i_no_raw
+#if !defined _i_no_from
     STC_INLINE _cx_self
     _cx_memb(_new)(_cx_raw raw) { return _cx_memb(_from)(i_valfrom(raw)); }
 #endif

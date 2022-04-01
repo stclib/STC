@@ -157,8 +157,12 @@
   #ifndef i_tag
     #define i_tag i_key  
   #endif
-  #if !defined i_keyfrom
-    #define _i_no_keyraw
+  #if !defined i_keyfrom && defined i_keydrop
+    #define _i_no_from
+  #elif defined i_keyfrom && !defined i_keydrop
+    #define _i_no_drop
+  #endif
+  #ifndef i_keyfrom
     #define i_keyfrom c_default_from
   #endif
   #ifndef i_keyraw
@@ -177,10 +181,12 @@
 #ifndef i_tag
   #define i_tag i_val
 #endif
-#if !defined i_valfrom
-  #if !defined i_key || defined _i_no_keyraw
-    #define _i_no_raw
-  #endif
+#if (!defined i_valfrom && defined i_valdrop) || c_option(c_no_clone)
+  #define _i_no_from
+#elif defined i_valfrom && !defined i_valdrop
+  #define _i_no_drop
+#endif
+#ifndef i_valfrom
   #define i_valfrom c_default_from
 #endif
 #ifndef i_valraw
@@ -236,8 +242,7 @@
 #undef i_keydrop
 
 #undef _i_prefix
-#undef _i_no_raw
-#undef _i_no_keyraw
-#undef _i_has_internal_clone
+#undef _i_no_from
+#undef _i_no_drop
 #undef _i_template
 #endif

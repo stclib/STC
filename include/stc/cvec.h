@@ -92,7 +92,7 @@ STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw 
 STC_API _cx_iter        _cx_memb(_bsearch_in)(_cx_iter it1, _cx_iter it2, i_valraw raw);
 #endif
 
-#if !c_option(c_no_clone)
+#if !defined _i_no_from
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_API _cx_iter        _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
                                                  const _cx_value* p1, const _cx_value* p2);
@@ -104,7 +104,6 @@ STC_INLINE void         _cx_memb(_copy)(_cx_self *self, _cx_self other) {
                             _cx_memb(_drop)(self);
                             *self = _cx_memb(_clone)(other);
                         }
-#if !defined _i_no_raw
 STC_API _cx_iter        _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos,
                                                    const _cx_raw* p1, const _cx_raw* p2);
 STC_INLINE _cx_value*   _cx_memb(_emplace_back)(_cx_self* self, i_valraw raw)
@@ -123,8 +122,7 @@ STC_INLINE _cx_iter
 _cx_memb(_emplace_range)(_cx_self* self, _cx_iter it, _cx_iter it1, _cx_iter it2) {
     return _cx_memb(_clone_range_p)(self, it.ref, it1.ref, it2.ref);
 }
-#endif
-#endif
+#endif // !_c_no_from
 
 STC_INLINE size_t       _cx_memb(_size)(_cx_self cx) { return cvec_rep_(&cx)->size; }
 STC_INLINE size_t       _cx_memb(_capacity)(_cx_self cx) { return cvec_rep_(&cx)->cap; }
@@ -332,7 +330,7 @@ _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
     return c_make(_cx_iter){.ref = p1};
 }
 
-#if !c_option(c_no_clone)
+#if !defined _i_no_from
 
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self cx) {
@@ -350,7 +348,7 @@ _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
     for (; p1 != p2; ++p1) *pos++ = i_valfrom(i_valto(p1));
     return it;
 }
-#if !defined _i_no_raw
+
 STC_DEF _cx_iter
 _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos,
                            const _cx_raw* p1, const _cx_raw* p2) {
@@ -359,8 +357,7 @@ _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos,
     for (; p1 != p2; ++p1) *pos++ = i_valfrom(*p1);
     return it;
 }
-#endif // !_i_no_raw
-#endif // !c_no_clone
+#endif // !_i_no_from
 
 #if !c_option(c_no_cmp)
 

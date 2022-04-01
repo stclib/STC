@@ -98,13 +98,12 @@ STC_INLINE void _cx_memb(_pop_back)(_cx_self* self)
 STC_INLINE const _cx_value* _cx_memb(_at)(const _cx_self* self, size_t idx)
     { assert(idx < self->size); return self->data + idx; }
 
-#if !c_option(c_no_clone)
-#if !defined _i_no_raw
+#if !defined _i_no_from
 STC_INLINE _cx_value* _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
     { return _cx_memb(_push)(self, i_valfrom(raw)); }
 STC_INLINE _cx_value* _cx_memb(_emplace_back)(_cx_self* self, _cx_raw raw)
     { return _cx_memb(_push)(self, i_valfrom(raw)); }
-#endif
+
 STC_INLINE _cx_self _cx_memb(_clone)(_cx_self v) {
     _cx_self out = {(_cx_value *) c_malloc(v.size*sizeof(_cx_value)), v.size, v.size};
     for (size_t i = 0; i < v.size; ++i, ++v.data) out.data[i] = i_valfrom(i_valto(v.data));
@@ -120,8 +119,7 @@ STC_INLINE i_val _cx_memb(_value_clone)(_cx_value val)
     { return i_valfrom(i_valto(&val)); }
 STC_INLINE i_valraw _cx_memb(_value_toraw)(_cx_value* val)
     { return i_valto(val); }
-
-#endif // !c_no_clone
+#endif // !_i_no_from
 
 STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self)
     { return c_make(_cx_iter){self->data}; }
