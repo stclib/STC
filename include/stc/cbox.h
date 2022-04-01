@@ -117,7 +117,7 @@ _cx_memb(_reset_from)(_cx_self* self, i_val val) {
     else self->get = c_new(i_val, val);
 }
 
-#if !defined _i_no_from
+#if !defined _i_no_clone
     STC_INLINE _cx_self
     _cx_memb(_new)(_cx_raw raw) { return _cx_memb(_from)(i_valfrom(raw)); }
 

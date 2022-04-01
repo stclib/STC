@@ -92,7 +92,7 @@ STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw 
 STC_API _cx_iter        _cx_memb(_bsearch_in)(_cx_iter it1, _cx_iter it2, i_valraw raw);
 #endif
 
-#if !defined _i_no_from
+#if !defined _i_no_clone
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_API _cx_iter        _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
                                                  const _cx_value* p1, const _cx_value* p2);
@@ -122,7 +122,7 @@ STC_INLINE _cx_iter
 _cx_memb(_emplace_range)(_cx_self* self, _cx_iter it, _cx_iter it1, _cx_iter it2) {
     return _cx_memb(_clone_range_p)(self, it.ref, it1.ref, it2.ref);
 }
-#endif // !_c_no_from
+#endif // !_i_no_clone
 
 STC_INLINE size_t       _cx_memb(_size)(_cx_self cx) { return cvec_rep_(&cx)->size; }
 STC_INLINE size_t       _cx_memb(_capacity)(_cx_self cx) { return cvec_rep_(&cx)->cap; }
@@ -330,7 +330,7 @@ _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
     return c_make(_cx_iter){.ref = p1};
 }
 
-#if !defined _i_no_from
+#if !defined _i_no_clone
 
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self cx) {
@@ -357,7 +357,7 @@ _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos,
     for (; p1 != p2; ++p1) *pos++ = i_valfrom(*p1);
     return it;
 }
-#endif // !_i_no_from
+#endif // !_i_no_clone
 
 #if !c_option(c_no_cmp)
 

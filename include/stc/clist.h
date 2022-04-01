@@ -106,7 +106,7 @@ STC_API _cx_iter        _cx_memb(_splice)(_cx_self* self, _cx_iter it, _cx_self*
 STC_API _cx_self        _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2);
 STC_API _cx_node*       _cx_memb(_erase_after_)(_cx_self* self, _cx_node* node);
 
-#if !defined _i_no_from
+#if !defined _i_no_clone
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_INLINE i_val        _cx_memb(_value_clone)(i_val val)
                             { return i_valfrom(i_valto(&val)); }
@@ -185,7 +185,7 @@ _cx_memb(_get_mut)(_cx_self* self, i_valraw val) {
 // -------------------------- IMPLEMENTATION -------------------------
 #if defined(_i_implement)
 
-#if !defined _i_no_from
+#if !defined _i_no_clone
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self cx) {
     _cx_self out = _cx_memb(_init)();
