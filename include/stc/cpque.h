@@ -98,8 +98,10 @@ STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
 STC_INLINE i_val _cx_memb(_value_clone)(_cx_value val)
     { return i_valfrom(i_valto(&val)); }
 
+#if !defined _i_no_emplace
 STC_INLINE void _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
     { _cx_memb(_push)(self, i_valfrom(raw)); }
+#endif
 #endif
 
 /* -------------------------- IMPLEMENTATION ------------------------- */

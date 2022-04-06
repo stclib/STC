@@ -150,6 +150,10 @@
   #error "if i_valraw defined, i_valfrom (and often i_valto) must be defined"
 #endif
 
+#if !defined i_keyraw && !defined i_valraw
+  #define _i_no_emplace
+#endif
+
 #ifdef i_key
   #ifdef _i_isset
     #define i_val i_key
@@ -239,5 +243,6 @@
 
 #undef _i_prefix
 #undef _i_no_clone
+#undef _i_no_emplace
 #undef _i_template
 #endif
