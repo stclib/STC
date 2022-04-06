@@ -77,6 +77,8 @@ STC_INLINE void     cbits_clear(cbits* self) { self->size = 0; }
 STC_INLINE void     cbits_drop(cbits* self) { c_free(self->data64); }
 STC_INLINE size_t   cbits_size(cbits set) { return set.size; }
 
+#define _cbits_bit(i) ((uint64_t)1 << ((i) & 63))
+
 #define cbits_new(literal) \
     cbits_from_n(literal, c_strlen_lit(literal))
 
@@ -91,33 +93,27 @@ STC_INLINE cbits cbits_move(cbits* self) {
 }
 
 STC_INLINE bool cbits_test(cbits set, size_t i) {
-    return (set.data64[i >> 6] & (1ull << (i & 63))) != 0;
+    return (set.data64[i >> 6] & _cbits_bit(i)) != 0;
 }
 
 STC_INLINE bool cbits_at(cbits set, size_t i) {
-    return (set.data64[i >> 6] & (1ull << (i & 63))) != 0;
+    return (set.data64[i >> 6] & _cbits_bit(i)) != 0;
 }
 
 STC_INLINE void cbits_set(cbits *self, size_t i) {
-    self->data64[i >> 6] |= 1ull << (i & 63);
+    self->data64[i >> 6] |= _cbits_bit(i);
 }
 
 STC_INLINE void cbits_reset(cbits *self, size_t i) {
-    self->data64[i >> 6] &= ~(1ull << (i & 63));
+    self->data64[i >> 6] &= ~_cbits_bit(i);
 }
 
-#ifdef _MSC_VER
-#pragma warning(disable: 4146) // unary minus operator applied to unsigned type
-#endif
 STC_INLINE void cbits_set_value(cbits *self, size_t i, bool value) {
-    self->data64[i >> 6] ^= (-(uint64_t)value ^ self->data64[i >> 6]) & 1ull << (i & 63);
+    self->data64[i >> 6] ^= ((uint64_t)-(int)value ^ self->data64[i >> 6]) & _cbits_bit(i);
 }
-#ifdef _MSC_VER
-#pragma warning(default: 4146)
-#endif
 
 STC_INLINE void cbits_flip(cbits *self, size_t i) {
-    self->data64[i >> 6] ^= 1ull << (i & 63);
+    self->data64[i >> 6] ^= _cbits_bit(i);
 }
 
 STC_INLINE void cbits_set_all(cbits *self, bool value) {
@@ -131,7 +127,7 @@ STC_INLINE void cbits_set_values(cbits *self, uint64_t pattern) {
 
 STC_INLINE void cbits_flip_all(cbits *self) {
     size_t n = (self->size + 63) >> 6;
-    for (size_t i=0; i<n; ++i) self->data64[i] ^= ~0ull;
+    for (size_t i=0; i<n; ++i) self->data64[i] ^= ~(uint64_t)0;
 }
 
 /* Intersection */
@@ -172,7 +168,7 @@ STC_INLINE void cbits_xor(cbits *self, cbits other) {
 STC_DEF cbits* cbits_copy(cbits* self, cbits other) {
     if (self->data64 == other.data64) return self;
     if (self->size != other.size) return cbits_take(self, cbits_clone(other));
-    memcpy(self->data64, other.data64, ((other.size + 63) >> 6)*8);
+    memcpy(self->data64, other.data64, ((other.size + 63) >> 6) * 8);
     return self;
 }
 
@@ -183,7 +179,7 @@ STC_DEF void cbits_resize(cbits* self, size_t size, bool value) {
     if (new_n >= old_n) {
         memset(self->data64 + old_n, -(int)value, (new_n - old_n) * 8);
         if (old_n > 0) {
-            uint64_t m = (1ull << (osize & 63)) - 1; /* mask */
+            uint64_t m = _cbits_bit(osize) - 1; /* mask */
             value ? (self->data64[old_n - 1] |= ~m) : (self->data64[old_n - 1] &= m);
         }
     }
@@ -221,7 +217,7 @@ STC_DEF cbits cbits_clone(cbits other) {
 STC_DEF size_t cbits_count(cbits s) {
     size_t count = 0, n = s.size >> 6;
     for (size_t i = 0; i < n; ++i) count += cpopcount64(s.data64[i]);
-    if (s.size & 63) count += cpopcount64(s.data64[n] & ((1ull << (s.size & 63)) - 1));
+    if (s.size & 63) count += cpopcount64(s.data64[n] & (_cbits_bit(s.size) - 1));
     return count;
 }
 
@@ -232,7 +228,7 @@ STC_DEF size_t cbits_count(cbits s) {
         if ((s.data64[i] OPR other.data64[i]) != x) \
             return false; \
     if (!(s.size & 63)) return true; \
-    uint64_t i = n, m = (1ull << (s.size & 63)) - 1; \
+    uint64_t i = n, m = _cbits_bit(s.size) - 1; \
     return ((s.data64[i] OPR other.data64[i]) & m) == (x & m)
 
 STC_DEF bool cbits_subset_of(cbits s, cbits other) { _cbits_SETOP(|, s.data64[i]); }

@@ -316,11 +316,11 @@ container.
 `i_valfrom/i_valfrom` are defined, the **emplace** functions are *not* available (or needed), as it
 can easier lead to mistakes.
 
-| non-emplace: Move         | emplace: Clone               | Container                                   |
+| non-emplace: Move         | emplace: Embedded copy       | Container                                   |
 |:--------------------------|:-----------------------------|:--------------------------------------------|
 | insert()                  | emplace()                    | cmap, csmap, cset, csset, cdeq, clist, cvec |
 | insert_or_assign(), put() | emplace_or_assign()          | cmap, csmap                                 |
-| push()                    | emplace()                    | cqueue, cpque, cstack                       |
+| push()                    | emplace()                    | cqueue, cpque, cstack, cdeq, cvec           |
 | push_back()               | emplace_back()               | cdeq, clist, cvec                           |
 | push_front()              | emplace_front()              | cdeq, clist                                 |
 

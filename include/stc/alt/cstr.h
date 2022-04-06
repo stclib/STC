@@ -37,15 +37,11 @@
 
 /**************************** PRIVATE API **********************************/
 
-enum { SSO_CAP = sizeof(cstr_rep_t) - 1 };
-#define SSO_CALL(s, call) (cstr_is_long(s) ? cstr_l_##call : cstr_s_##call)
-
-#define cstr_is_long(s)         ((s)->sso.last > 127)
-#define cstr_s_cap(s)           SSO_CAP
-#define cstr_s_size(s)          ((size_t)(SSO_CAP - (s)->sso.last))
-#define cstr_s_set_size(s, len) ((s)->sso.last = SSO_CAP - (len), (s)->sso.data[len] = 0)
-#define cstr_s_data(s)          (s)->sso.data
-#define cstr_s_end(s)           ((s)->sso.data + cstr_s_size(s))
+enum  { cstr_s_cap =            sizeof(cstr_rep_t) - 1 };
+#define cstr_s_size(s)          ((size_t)(cstr_s_cap - (s)->sml.last))
+#define cstr_s_set_size(s, len) ((s)->sml.last = cstr_s_cap - (len), (s)->sml.data[len] = 0)
+#define cstr_s_data(s)          (s)->sml.data
+#define cstr_s_end(s)           ((s)->sml.data + cstr_s_size(s))
 
 #if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
     #define byte_rotl_(x, b)       ((x) << (b)*8 | (x) >> (sizeof(x) - (b))*8)
@@ -61,18 +57,15 @@ enum { SSO_CAP = sizeof(cstr_rep_t) - 1 };
 #define cstr_l_end(s)           ((s)->lon.data + cstr_l_size(s))
 #define cstr_l_drop(s)          c_free((s)->lon.data)
 
+#define cstr_is_long(s)         ((s)->sml.last > 127)
 STC_API char* _cstr_init(cstr* self, size_t len, size_t cap);
 STC_API char* _cstr_internal_move(cstr* self, size_t pos1, size_t pos2);
-
-STC_INLINE void _cstr_set_size(cstr* s, size_t len) {
-    SSO_CALL(s, set_size(s, len));
-}
 
 /**************************** PUBLIC API **********************************/
 
 #define cstr_new(literal) cstr_from_n(literal, c_strlen_lit(literal))
 #define cstr_npos (SIZE_MAX >> 1)
-#define cstr_null (c_make(cstr){.sso = {.last = SSO_CAP}})
+#define cstr_null (c_make(cstr){.sml = {.last = cstr_s_cap}})
 #define cstr_toraw(self) cstr_str(self)
 
 STC_API char* cstr_reserve(cstr* self, size_t cap);
@@ -89,12 +82,11 @@ STC_API int  cstr_printf(cstr* self, const char* fmt, ...);
 STC_INLINE cstr_rep_t cstr_rep(cstr* s) {
     return cstr_is_long(s)
         ? c_make(cstr_rep_t){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
-        : c_make(cstr_rep_t){s->sso.data, cstr_s_size(s), cstr_s_cap(s)};
+        : c_make(cstr_rep_t){s->sml.data, cstr_s_size(s), cstr_s_cap};
 }
 
-STC_INLINE cstr cstr_init(void) {
-    return cstr_null;
-}
+STC_INLINE cstr cstr_init(void)
+    { return cstr_null; }
 
 STC_INLINE cstr cstr_from_n(const char* str, const size_t n) {
     cstr s;
@@ -102,9 +94,8 @@ STC_INLINE cstr cstr_from_n(const char* str, const size_t n) {
     return s;
 }
 
-STC_INLINE cstr cstr_from(const char* str) {
-    return cstr_from_n(str, strlen(str));
-}
+STC_INLINE cstr cstr_from(const char* str)
+    { return cstr_from_n(str, strlen(str)); }
 
 STC_INLINE cstr cstr_with_size(const size_t size, const char value) {
     cstr s;
@@ -137,7 +128,8 @@ STC_INLINE cstr cstr_clone(cstr s) {
 }
 
 STC_INLINE void cstr_drop(cstr* self) {
-    if (cstr_is_long(self)) cstr_l_drop(self);
+    if (cstr_is_long(self))
+        cstr_l_drop(self);
 }
 
 STC_INLINE void cstr_clear(cstr* self) {
@@ -145,62 +137,54 @@ STC_INLINE void cstr_clear(cstr* self) {
     cstr_s_set_size(self, 0);
 }
 
-STC_INLINE char* cstr_data(cstr* self) {
-    return SSO_CALL(self, data(self));
-}
+#define SSO_CALL(s, call) (cstr_is_long(s) ? cstr_l_##call : cstr_s_##call)
 
-STC_INLINE const char* cstr_str(const cstr* self) {
-    return SSO_CALL(self, data(self));
-}
+STC_INLINE void _cstr_set_size(cstr* self, size_t len)
+    { SSO_CALL(self, set_size(self, len)); }
 
-STC_INLINE bool cstr_empty(cstr s) {
-    return SSO_CALL(&s, size(&s)) == 0;
-}
+STC_INLINE char* cstr_data(cstr* self) 
+    { return SSO_CALL(self, data(self)); }
 
-STC_INLINE size_t cstr_size(cstr s) {
-    return SSO_CALL(&s, size(&s));
-}
+STC_INLINE const char* cstr_str(const cstr* self)
+    { return SSO_CALL(self, data(self)); }
 
-STC_INLINE size_t cstr_length(cstr s) {
-    return SSO_CALL(&s, size(&s));
-}
+STC_INLINE bool cstr_empty(cstr s) 
+    { return s.sml.last == cstr_s_cap; }
 
-STC_INLINE size_t cstr_capacity(cstr s) {
-    return SSO_CALL(&s, cap(&s));
-}
+STC_INLINE size_t cstr_size(cstr s)
+    { return SSO_CALL(&s, size(&s)); }
 
-STC_INLINE bool cstr_equals(cstr s1, const char* str) {
-    return strcmp(cstr_str(&s1), str) == 0;
-}
+STC_INLINE size_t cstr_length(cstr s)
+    { return SSO_CALL(&s, size(&s)); }
 
-STC_INLINE bool cstr_equals_s(cstr s1, cstr s2) {
-    return strcmp(cstr_str(&s1), cstr_str(&s2)) == 0;
-}
+STC_INLINE size_t cstr_capacity(cstr s)
+    { return cstr_is_long(&s) ? cstr_l_cap(&s) : cstr_s_cap; }
 
-STC_INLINE bool cstr_eq(const cstr* s1, const cstr* s2) {
-    return strcmp(cstr_str(s1), cstr_str(s2)) == 0;
-}
+STC_INLINE bool cstr_equals(cstr s1, const char* str)
+    { return strcmp(cstr_str(&s1), str) == 0; }
 
-STC_INLINE int cstr_cmp(const cstr* s1, const cstr* s2) {
-    return strcmp(cstr_str(s1), cstr_str(s2));
-}
+STC_INLINE bool cstr_equals_s(cstr s1, cstr s2)
+    { return strcmp(cstr_str(&s1), cstr_str(&s2)) == 0; }
+
+STC_INLINE bool cstr_eq(const cstr* s1, const cstr* s2)
+    { return strcmp(cstr_str(s1), cstr_str(s2)) == 0; }
+
+STC_INLINE int cstr_cmp(const cstr* s1, const cstr* s2)
+    { return strcmp(cstr_str(s1), cstr_str(s2)); }
 
 STC_INLINE size_t cstr_find(cstr s, const char* needle) {
     const char *str = cstr_str(&s), *res = strstr(str, needle);
     return res ? res - str : cstr_npos;
 }
 
-STC_INLINE bool cstr_find_s(cstr s, cstr needle) {
-   return cstr_find(s, cstr_str(&needle));
-}
+STC_INLINE bool cstr_find_s(cstr s, cstr needle)
+    { return cstr_find(s, cstr_str(&needle)); }
 
-STC_INLINE bool cstr_contains(cstr s, const char* needle) {
-   return strstr(cstr_str(&s), needle) != NULL;
-}
+STC_INLINE bool cstr_contains(cstr s, const char* needle)
+    { return strstr(cstr_str(&s), needle) != NULL; }
 
-STC_INLINE bool cstr_contains_s(cstr s, cstr needle) {
-   return strstr(cstr_str(&s), cstr_str(&needle)) != NULL;
-}
+STC_INLINE bool cstr_contains_s(cstr s, cstr needle)
+    { return strstr(cstr_str(&s), cstr_str(&needle)) != NULL; }
 
 STC_INLINE bool cstr_starts_with(cstr s, const char* sub) {
     const char* str = cstr_str(&s);
@@ -208,31 +192,27 @@ STC_INLINE bool cstr_starts_with(cstr s, const char* sub) {
     return *sub == 0;
 }
 
-STC_INLINE bool cstr_starts_with_s(cstr s, cstr sub) {
-   return cstr_starts_with(s, cstr_str(&sub));
-}
+STC_INLINE bool cstr_starts_with_s(cstr s, cstr sub)
+    { return cstr_starts_with(s, cstr_str(&sub)); }
 
 STC_INLINE bool cstr_ends_with(cstr s, const char* sub) {
     cstr_rep_t r = cstr_rep(&s); size_t n = strlen(sub);
     return n <= r.size && memcmp(r.data + r.size - n, sub, n) == 0;
 }
 
-STC_INLINE bool cstr_ends_with_s(cstr s, cstr sub) {
-   return cstr_ends_with(s, cstr_str(&sub));
-}
+STC_INLINE bool cstr_ends_with_s(cstr s, cstr sub)
+    { return cstr_ends_with(s, cstr_str(&sub)); }
 
-STC_INLINE void cstr_assign(cstr* self, const char* str) {
-    cstr_assign_n(self, str, strlen(str));
-}
+STC_INLINE void cstr_assign(cstr* self, const char* str)
+    { cstr_assign_n(self, str, strlen(str)); }
 
 STC_INLINE void cstr_copy(cstr* self, cstr s) {
     cstr_rep_t r = cstr_rep(&s);
     cstr_assign_n(self, r.data, r.size);
 }
 
-STC_INLINE void cstr_append(cstr* self, const char* str) {
-    cstr_append_n(self, str, strlen(str));
-}
+STC_INLINE void cstr_append(cstr* self, const char* str)
+    { cstr_append_n(self, str, strlen(str)); }
 
 STC_INLINE void cstr_append_s(cstr* self, cstr s) {
     cstr_rep_t r = cstr_rep(&s);
@@ -244,31 +224,27 @@ STC_INLINE void cstr_replace_n(cstr* self, size_t pos, size_t len, const char* s
     memcpy(d + pos, str, n);
 }
 
-STC_INLINE void cstr_replace(cstr* self, size_t pos, size_t len, const char* str) {
-    cstr_replace_n(self, pos, len, str, strlen(str));
-}
+STC_INLINE void cstr_replace(cstr* self, size_t pos, size_t len, const char* str)
+    { cstr_replace_n(self, pos, len, str, strlen(str)); }
 
 STC_INLINE void cstr_replace_s(cstr* self, size_t pos, size_t len, cstr s) {
     cstr_rep_t r = cstr_rep(&s);
     cstr_replace_n(self, pos, len, r.data, r.size);
 }
 
-STC_INLINE void cstr_insert_n(cstr* self, size_t pos, const char* str, size_t n) {
-    cstr_replace_n(self, pos, 0, str, n);
-}
+STC_INLINE void cstr_insert_n(cstr* self, size_t pos, const char* str, size_t n)
+    { cstr_replace_n(self, pos, 0, str, n); }
 
-STC_INLINE void cstr_insert(cstr* self, size_t pos, const char* str) {
-    cstr_replace_n(self, pos, 0, str, strlen(str));
-}
+STC_INLINE void cstr_insert(cstr* self, size_t pos, const char* str)
+    { cstr_replace_n(self, pos, 0, str, strlen(str)); }
 
 STC_INLINE void cstr_insert_s(cstr* self, size_t pos, cstr s) {
     cstr_rep_t r = cstr_rep(&s);
     cstr_replace_n(self, pos, 0, r.data, r.size);
 }
 
-STC_INLINE bool cstr_getline(cstr *self, FILE *fp) {
-    return cstr_getdelim(self, '\n', fp);
-}
+STC_INLINE bool cstr_getline(cstr *self, FILE *fp)
+    { return cstr_getdelim(self, '\n', fp); }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(_i_implement)
@@ -286,25 +262,25 @@ STC_DEF char* _cstr_internal_move(cstr* self, const size_t pos1, const size_t po
 }
 
 STC_DEF char* _cstr_init(cstr* self, const size_t len, const size_t cap) {
-    if (cap > SSO_CAP) {
+    if (cap > cstr_s_cap) {
         self->lon.data = (char *)c_malloc(cap + 1);
         cstr_l_set_size(self, len);
         cstr_l_set_cap(self, cap);
         return self->lon.data;
     }
     cstr_s_set_size(self, len);
-    return self->sso.data;
+    return self->sml.data;
 }
 
 STC_DEF void cstr_shrink_to_fit(cstr* self) {
     cstr_rep_t r = cstr_rep(self);
     if (r.size == r.cap)
         return;
-    if (r.size > SSO_CAP) {
+    if (r.size > cstr_s_cap) {
         self->lon.data = (char *)c_realloc(self->lon.data, r.size + 1);
         cstr_l_set_cap(self, r.size);
-    } else if (r.cap > SSO_CAP) {
-        memcpy(self->sso.data, r.data, r.size + 1);
+    } else if (r.cap > cstr_s_cap) {
+        memcpy(self->sml.data, r.data, r.size + 1);
         cstr_s_set_size(self, r.size);
         c_free(r.data);
     }
@@ -319,16 +295,16 @@ STC_DEF char* cstr_reserve(cstr* self, const size_t cap) {
         return self->lon.data;
     }
     /* from short to long: */
-    if (cap > cstr_s_cap(self)) {
+    if (cap > cstr_s_cap) {
         char* data = (char *)c_malloc(cap + 1);
         const size_t len = cstr_s_size(self);
-        memcpy(data, self->sso.data, len);
+        memcpy(data, self->sml.data, len);
         self->lon.data = data;
         cstr_l_set_size(self, len);
         cstr_l_set_cap(self, cap);
         return data;
     }
-    return self->sso.data;
+    return self->sml.data;
 }
 
 STC_DEF void cstr_resize(cstr* self, const size_t size, const char value) {

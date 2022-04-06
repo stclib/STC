@@ -17,7 +17,7 @@ int main()
             printf(" str: %s\n", cbits_to_str(set, str, 0, -1));
 
         printf("%4" PRIuMAX ": ", set.size);
-        c_forrange (i, int, set.size)
+        c_forrange (i, set.size)
             printf("%d", cbits_test(set, i));
         puts("");
 
@@ -27,12 +27,12 @@ int main()
         cbits_resize(&set, 102, true);
         cbits_set_value(&set, 99, false);
         printf("%4" PRIuMAX ": ", set.size);
-        c_forrange (i, int, set.size)
+        c_forrange (i, set.size)
             printf("%d", cbits_test(set, i));
 
         puts("\nIterate:");
         printf("%4" PRIuMAX ": ", set.size);
-        c_forrange (i, int, set.size)
+        c_forrange (i, set.size)
             printf("%d", cbits_test(set, i));
         puts("");
 
@@ -42,19 +42,19 @@ int main()
             cbits_set(&s2, 17);
             cbits_set(&s2, 18);
             printf(" new: ");
-            c_forrange (i, int, s2.size)
+            c_forrange (i, s2.size)
                 printf("%d", cbits_test(s2, i));
             puts("");
 
             printf(" xor: ");
             cbits_xor(&set, s2);
-            c_forrange (i, int, set.size)
+            c_forrange (i, set.size)
                 printf("%d", cbits_test(set, i));
             puts("");
 
             cbits_set_all(&set, false);
             printf("%4" PRIuMAX ": ", set.size);
-            c_forrange (i, int, set.size)
+            c_forrange (i, set.size)
                 printf("%d", cbits_test(set, i));
             puts("");
         }
