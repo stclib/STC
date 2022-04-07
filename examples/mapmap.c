@@ -24,15 +24,13 @@ void add(Departments* deps, const char* name, const char* email, const char* dep
     People_emplace_or_assign(people, name, email);
 }
 
-Stack contains(Departments* map, const char* name)
+int contains(Departments* map, const char* name)
 {
-    Stack stk = Stack_init();
-    const People_value* v;
+    int count = 0;
     c_foreach (i, Departments, *map)
-        if ((v = People_get(&i.ref->second, name))) {
-            Stack_push(&stk, People_value_clone(*v));
-        }
-    return stk;
+        if (People_contains(&i.ref->second, name))
+            ++count;
+    return count;
 }
 
 int main(void)
@@ -58,10 +56,10 @@ int main(void)
                 printf("%s: %s - %s\n", i.ref->first.str, _.name.str, _.email.str);
         puts("");
 
-        c_auto (Stack, s) printf("found: %" PRIuMAX "\n", Stack_size(s = contains(&map, "Nick Denton")));
-        c_auto (Stack, s) printf("found: %" PRIuMAX "\n", Stack_size(s = contains(&map, "Patrick Dust")));
-        c_auto (Stack, s) printf("found: %" PRIuMAX "\n", Stack_size(s = contains(&map, "Dennis Kay")));
-        c_auto (Stack, s) printf("found: %" PRIuMAX "\n", Stack_size(s = contains(&map, "Serena Bath")));
+        printf("found: %d\n", contains(&map, "Nick Denton"));
+        printf("found: %d\n", contains(&map, "Patrick Dust"));
+        printf("found: %d\n", contains(&map, "Dennis Kay"));
+        printf("found: %d\n", contains(&map, "Serena Bath"));
         puts("Done");
     }
 }

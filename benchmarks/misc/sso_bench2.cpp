@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
-#include <stc/alt/cstr.h>
+//#define STC_USE_SSO 1
 #define i_val_str
 #include <stc/cstack.h>
 
@@ -29,8 +29,7 @@ static void sromutrio(uint64_t seed) {
 }
 
 
-static const char CHARS[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=+";
-static const int ARRAY_SIZE = sizeof(CHARS) - 1;
+static const char CHARS[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=+-";
 
 static const int BENCHMARK_SIZE = 10000000;
 static const int MAX_STRING_LENGTH = 20;
@@ -39,7 +38,7 @@ using time_point = std::chrono::high_resolution_clock::time_point;
 
 void addRandomString_STD(std::vector<std::string>& vec, const int length) {
     std::string s(length, 0);
-    char* p = s.data();
+    char* p = &s[0];
     for (int i = 0; i < length; ++i) {
         p[i] = CHARS[romutrio() & 63];
     }
@@ -60,10 +59,13 @@ void addRandomString_STC(cstack_str& vec, const int length) {
 template <class L, typename R>
 void benchmark(L& vec, const int length, R addRandomString) {
     time_point t1 = std::chrono::high_resolution_clock::now();
-    
-    for (int i = 0; i < BENCHMARK_SIZE; i++) {
-        addRandomString(vec, length);
-    }
+
+    if (length == 0)
+        for (int i = 0; i < BENCHMARK_SIZE; i++)
+            addRandomString(vec, (i*13 & 31) + 1);
+    else 
+        for (int i = 0; i < BENCHMARK_SIZE; i++)
+            addRandomString(vec, length);
 
     time_point t2 = std::chrono::high_resolution_clock::now();
     const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
@@ -72,6 +74,23 @@ void benchmark(L& vec, const int length, R addRandomString) {
 
 
 int main() {
+    sromutrio(1234);
+    std::cerr << "length\ttime\tstd::string\n";
+    for (int k = 0; k < 4; k++) {
+        std::vector<std::string> vec; vec.reserve(BENCHMARK_SIZE);
+        benchmark(vec, 0, addRandomString_STD);
+        std::cout << '\t' << vec[0] << '\n';
+    }
+
+    sromutrio(1234);
+    std::cerr << "\nlength\ttime\tSTC string\n";
+    for (int k = 0; k < 4; k++) {
+        cstack_str vec = cstack_str_with_capacity(BENCHMARK_SIZE);
+        benchmark(vec, 0, addRandomString_STC);
+        std::cout << '\t' << cstr_str(&vec.data[0]) << '\n';
+        cstack_str_drop(&vec);
+    }
+
     sromutrio(1234);
     std::cerr << "length\ttime\tstd::string\n";
     for (int length = 1; length <= MAX_STRING_LENGTH; length++) {
