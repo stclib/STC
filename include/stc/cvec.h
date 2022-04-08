@@ -89,7 +89,7 @@ STC_API _cx_iter        _cx_memb(_insert_range_p)(_cx_self* self, _cx_value* pos
 #if !c_option(c_no_cmp)
 STC_API int             _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y);
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw raw);
-STC_API _cx_iter        _cx_memb(_bsearch_in)(_cx_iter it1, _cx_iter it2, i_valraw raw);
+STC_API _cx_iter        _cx_memb(_bsearch_in)(_cx_iter it1, _cx_iter it2, i_valraw raw, _cx_iter* lower_bound);
 #endif
 
 #if !defined _i_no_clone
@@ -219,7 +219,14 @@ _cx_memb(_get_mut)(const _cx_self* self, i_valraw raw)
 
 STC_INLINE _cx_iter
 _cx_memb(_bsearch)(const _cx_self* self, i_valraw raw)
-    { return _cx_memb(_bsearch_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), raw); }
+    { return _cx_memb(_bsearch_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), raw, NULL); }
+
+STC_INLINE _cx_iter
+_cx_memb(_lower_bound)(const _cx_self* self, i_valraw raw) {
+    _cx_iter lower;
+    _cx_memb(_bsearch_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), raw, &lower);
+    return lower;
+}
 
 STC_INLINE void
 _cx_memb(_sort_range)(_cx_iter i1, _cx_iter i2,
@@ -374,15 +381,16 @@ _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, i_valraw raw) {
 }
 
 STC_DEF _cx_iter
-_cx_memb(_bsearch_in)(_cx_iter i1, _cx_iter i2, i_valraw raw) {
+_cx_memb(_bsearch_in)(_cx_iter i1, _cx_iter i2, i_valraw raw, _cx_iter* lower_bound) {
     _cx_iter mid, last = i2;
     while (i1.ref != i2.ref) {
-        mid.ref = i1.ref + ((i2.ref - i1.ref)>>1);
+        mid.ref = i1.ref + ((i2.ref - i1.ref) >> 1);
         int c; i_valraw m = i_valto(mid.ref);
         if ((c = i_cmp(&raw, &m)) == 0) return mid;
         else if (c < 0) i2.ref = mid.ref;
         else i1.ref = mid.ref + 1;
     }
+    if (lower_bound) *lower_bound = i1;
     return last;
 }
 

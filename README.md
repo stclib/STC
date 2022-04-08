@@ -340,7 +340,7 @@ c_autovar (cstr s = cstr_new("a string literal"), cstr_drop(&s))  // c_autovar i
 
     cvec_str_emplace_back(&vec, "Yay, literal");  // internally constructs cstr from const char*
     cvec_str_emplace_back(&vec, cstr_clone(s));   // <-- COMPILE ERROR: expects const char*
-    cvec_str_emplace_back(&vec, s.str);           // Ok: const char* input type.
+    cvec_str_emplace_back(&vec, cstr_str(&s));    // Ok: const char* input type.
 }
 ```
 This is made possible because the type configuration may be given an optional

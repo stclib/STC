@@ -160,7 +160,7 @@ int main(void) {
             res.ref->second = i_valfrom(rmapped); return res; \
         } \
     \
-        STC_INLINE _cx_mapped* \
+        STC_INLINE const _cx_mapped* \
         _cx_memb(_at)(const _cx_self* self, i_keyraw rkey) { \
             _cx_iter it; \
             return &_cx_memb(_find_it)(self, rkey, &it)->second; \
