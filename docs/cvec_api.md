@@ -53,7 +53,7 @@ cvec_X_iter         cvec_X_find_in(cvec_X_iter i1, cvec_X_iter i2, i_valraw raw)
                     // On sorted vectors:
 cvec_X_iter         cvec_X_bsearch(const cvec_X* self, i_valraw raw);                        // at elem == raw, else end
 cvec_X_iter         cvec_X_lower_bound(const cvec_X* self, i_valraw raw);                    // at first elem >= raw, else end
-cvec_X_iter         cvec_X_bsearch_in(cvec_X_iter i1, cvec_X_iter i2, i_valraw raw, cvec_X_iter* lower_bound = NULL);
+cvec_X_iter         cvec_X_bsearch_in(cvec_X_iter i1, cvec_X_iter i2, i_valraw raw, cvec_X_iter* lower_bound);
 
 cvec_X_value*       cvec_X_front(const cvec_X* self);
 cvec_X_value*       cvec_X_back(const cvec_X* self);

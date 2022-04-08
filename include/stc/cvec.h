@@ -218,8 +218,10 @@ _cx_memb(_get_mut)(const _cx_self* self, i_valraw raw)
     { return (_cx_value*) _cx_memb(_get)(self, raw); }
 
 STC_INLINE _cx_iter
-_cx_memb(_bsearch)(const _cx_self* self, i_valraw raw)
-    { return _cx_memb(_bsearch_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), raw, NULL); }
+_cx_memb(_bsearch)(const _cx_self* self, i_valraw raw) {
+    _cx_iter lower;
+    return _cx_memb(_bsearch_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), raw, &lower);
+}
 
 STC_INLINE _cx_iter
 _cx_memb(_lower_bound)(const _cx_self* self, i_valraw raw) {
@@ -386,11 +388,11 @@ _cx_memb(_bsearch_in)(_cx_iter i1, _cx_iter i2, i_valraw raw, _cx_iter* lower_bo
     while (i1.ref != i2.ref) {
         mid.ref = i1.ref + ((i2.ref - i1.ref) >> 1);
         int c; i_valraw m = i_valto(mid.ref);
-        if ((c = i_cmp(&raw, &m)) == 0) return mid;
+        if ((c = i_cmp(&raw, &m)) == 0) return *lower_bound = mid;
         else if (c < 0) i2.ref = mid.ref;
         else i1.ref = mid.ref + 1;
     }
-    if (lower_bound) *lower_bound = i1;
+    *lower_bound = i1;
     return last;
 }
 
