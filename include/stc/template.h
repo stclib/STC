@@ -102,16 +102,16 @@
   #define i_keydrop i_drop
 #elif defined i_drop && !defined i_key
   #define i_valdrop i_drop
-#elif defined i_drop && !defined _i_isset
-  #error "i_drop not supported for maps, define i_keydrop / i_valdrop instead."
+#elif defined i_drop
+  #error "i_drop not supported when i_key defined. Define i_keydrop instead."
 #endif
 
 #if defined i_from && !defined i_keyfrom && defined _i_isset
   #define i_keyfrom i_from
 #elif defined i_from && !defined i_key
   #define i_valfrom i_from
-#elif defined i_from && !defined _i_isset
-  #error "i_from not supported for maps, define i_keyfrom / i_valfrom instead."
+#elif defined i_from
+  #error "i_from not supported when i_key defined. Define i_keyfrom instead."
 #endif
 
 #ifdef i_val_str
@@ -157,7 +157,9 @@
 
 /* Copy i_val* macros to i_key* if _i_isset */
 #if defined _i_isset && defined i_val
-  #define i_key i_val
+  #if !defined i_key
+    #define i_key i_val
+  #endif
   #if defined i_valraw && !defined i_keyraw
     #define i_keyraw i_valraw
   #endif
