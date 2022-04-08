@@ -98,18 +98,19 @@
 #endif
 
 /* Resolve i_drop and i_from here */
-#if defined i_drop && defined i_isset
+#if defined i_drop && !defined i_keydrop && defined _i_isset
   #define i_keydrop i_drop
 #elif defined i_drop && !defined i_key
   #define i_valdrop i_drop
-#elif defined i_drop
+#elif defined i_drop && !defined _i_isset
   #error "i_drop not supported for maps, define i_keydrop / i_valdrop instead."
 #endif
-#if defined i_from && defined i_isset
+
+#if defined i_from && !defined i_keyfrom && defined _i_isset
   #define i_keyfrom i_from
 #elif defined i_from && !defined i_key
   #define i_valfrom i_from
-#elif defined i_from
+#elif defined i_from && !defined _i_isset
   #error "i_from not supported for maps, define i_keyfrom / i_valfrom instead."
 #endif
 
@@ -154,8 +155,25 @@
   #define _i_no_emplace
 #endif
 
+/* Copy i_val* macros to i_key* if _i_isset */
+#if defined _i_isset && defined i_val
+  #define i_key i_val
+  #if defined i_valraw && !defined i_keyraw
+    #define i_keyraw i_valraw
+  #endif
+  #if defined i_valfrom && !defined i_keyfrom
+    #define i_keyfrom i_valfrom
+  #endif
+  #if defined i_valto && !defined i_keyto
+    #define i_keyto i_valto
+  #endif
+  #if defined i_valdrop && !defined i_keydrop
+    #define i_keydrop i_valdrop
+  #endif
+#endif
+
 #ifdef i_key
-  #ifdef _i_isset
+  #if defined _i_isset && !defined i_val
     #define i_val i_key
   #endif
   #ifndef i_tag
@@ -176,8 +194,6 @@
   #ifndef i_keydrop
     #define i_keydrop c_default_drop
   #endif
-#elif defined _i_isset
-  #error "i_key define is missing."
 #endif
 
 #ifndef i_tag
