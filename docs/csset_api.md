@@ -42,11 +42,12 @@ csset_X_value*       csset_X_find_it(const csset_X* self, i_keyraw rkey, csset_X
 csset_X_iter         csset_X_lower_bound(const csset_X* self, i_keyraw rkey);                 // find closest entry >= rkey
 
 csset_X_result       csset_X_insert(csset_X* self, i_key key);
+csset_X_result       csset_X_put(csset_X* self, i_key key);                                   // alias for insert()
 csset_X_result       csset_X_emplace(csset_X* self, i_keyraw rkey);
 
 size_t               csset_X_erase(csset_X* self, i_keyraw rkey);
-csset_X_iter         csset_X_erase_at(csset_X* self, csset_X_iter it);                         // return iter after it
-csset_X_iter         csset_X_erase_range(csset_X* self, csset_X_iter it1, csset_X_iter it2);   // return updated it2
+csset_X_iter         csset_X_erase_at(csset_X* self, csset_X_iter it);                        // return iter after it
+csset_X_iter         csset_X_erase_range(csset_X* self, csset_X_iter it1, csset_X_iter it2);  // return updated it2
 
 csset_X_iter         csset_X_begin(const csset_X* self);
 csset_X_iter         csset_X_end(const csset_X* self);

@@ -35,6 +35,7 @@ cqueue_X_value*     cqueue_X_front(const cqueue_X* self);
 cqueue_X_value*     cqueue_X_back(const cqueue_X* self);
 
 cqueue_X_value*     cqueue_X_push(cqueue_X* self, i_val value);
+cqueue_X_value*     cqueue_X_put(cqueue_X* self, i_val value);       // alias for push()
 cqueue_X_value*     cqueue_X_emplace(cqueue_X* self, i_valraw raw);
 
 void                cqueue_X_pop(cqueue_X* self);

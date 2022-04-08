@@ -117,11 +117,6 @@ STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, i_keyraw rkey)
     #endif
     STC_API _cx_result  _cx_memb(_insert_or_assign)(_cx_self* self, i_key _key, i_val _mapped);
 
-    STC_INLINE _cx_result  /* short-form, like operator[]: */
-    _cx_memb(_put)(_cx_self* self, i_key key, i_val mapped) {
-        return _cx_memb(_insert_or_assign)(self, key, mapped);
-    }
-
     STC_INLINE const _cx_mapped*
     _cx_memb(_at)(const _cx_self* self, i_keyraw rkey) {
         chash_bucket_t b = _cx_memb(_bucket_)(self, &rkey);
@@ -173,6 +168,12 @@ _cx_memb(_insert)(_cx_self* self, i_key _key _i_MAP_ONLY(, i_val _mapped)) {
     if (_res.inserted) { *_i_keyref(_res.ref) = _key; _i_MAP_ONLY( _res.ref->second = _mapped; )}
     else               { i_keydrop(&_key); _i_MAP_ONLY( i_valdrop(&_mapped); )}
     return _res;
+}
+
+STC_INLINE _cx_result
+_cx_memb(_put)(_cx_self* self, i_key _key _i_MAP_ONLY(, i_val _mapped)) {
+    return _i_SET_ONLY( _cx_memb(_insert)(self, _key) )
+           _i_MAP_ONLY( _cx_memb(_insert_or_assign)(self, _key, _mapped) );
 }
 
 STC_INLINE _cx_iter

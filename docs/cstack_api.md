@@ -41,12 +41,10 @@ i_val*              cstack_X_top(const cstack_X* self);
 const i_val*        cstack_X_at(const cstack_X* self, size_t idx);
 
 i_val*              cstack_X_push(cstack_X* self, i_val value);
-i_val*              cstack_X_push_back(cstack_X* self, i_val value);     // same as push
+i_val*              cstack_X_put(cstack_X* self, i_val value);           // alias for push
 i_val*              cstack_X_emplace(cstack_X* self, i_valraw raw);
-i_val*              cstack_X_emplace_back(cstack_X* self, i_valraw raw); // same as emplace
 
 void                cstack_X_pop(cstack_X* self);
-void                cstack_X_pop_back(cstack_X* self);                   // same as pop
 
 cstack_X_iter       cstack_X_begin(const cstack_X* self);
 cstack_X_iter       cstack_X_end(const cstack_X* self);

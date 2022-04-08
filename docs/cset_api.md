@@ -29,27 +29,28 @@ cset_X              cset_X_clone(cset_x set);
 
 void                cset_X_clear(cset_X* self);
 void                cset_X_copy(cset_X* self, cset_X other);
-void                cset_X_max_load_factor(cset_X* self, float max_load);                    // default: 0.85
+void                cset_X_max_load_factor(cset_X* self, float max_load);            // default: 0.85
 bool                cset_X_reserve(cset_X* self, size_t size);
 void                cset_X_shrink_to_fit(cset_X* self);
 void                cset_X_swap(cset_X* a, cset_X* b);
-void                cset_X_drop(cset_X* self);                                               // destructor
+void                cset_X_drop(cset_X* self);                                       // destructor
 
-size_t              cset_X_size(cset_X set);                                                 // num. of allocated buckets
-size_t              cset_X_capacity(cset_X set);                                             // buckets * max_load_factor
+size_t              cset_X_size(cset_X set);                                         // num. of allocated buckets
+size_t              cset_X_capacity(cset_X set);                                     // buckets * max_load_factor
 bool                cset_X_empty(cset_X set);
 size_t              cset_X_bucket_count(cset_X set);
 
 bool                cset_X_contains(const cset_X* self, i_keyraw rkey);
-const cset_X_value* cset_X_get(const cset_X* self, i_keyraw rkey);                           // return NULL if not found
-cset_X_value*       cset_X_get_mut(cset_X* self, i_keyraw rkey);                             // mutable get
+const cset_X_value* cset_X_get(const cset_X* self, i_keyraw rkey);                   // return NULL if not found
+cset_X_value*       cset_X_get_mut(cset_X* self, i_keyraw rkey);                     // mutable get
 cset_X_iter         cset_X_find(const cset_X* self, i_keyraw rkey);
 
 cset_X_result       cset_X_insert(cset_X* self, i_key key);
+cset_X_result       cset_X_put(cset_X* self, i_key key);                             // alias for insert()
 cset_X_result       cset_X_emplace(cset_X* self, i_keyraw rkey);
 
-size_t              cset_X_erase(cset_X* self, i_keyraw rkey);                               // return 0 or 1
-cset_X_iter         cset_X_erase_at(cset_X* self, cset_X_iter it);                           // return iter after it
+size_t              cset_X_erase(cset_X* self, i_keyraw rkey);                       // return 0 or 1
+cset_X_iter         cset_X_erase_at(cset_X* self, cset_X_iter it);                   // return iter after it
 void                cset_X_erase_entry(cset_X* self, cset_X_value* entry);
 
 cset_X_iter         cset_X_begin(const cset_X* self);

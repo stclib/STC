@@ -88,6 +88,8 @@ STC_INLINE void         _cx_memb(_swap)(_cx_self* a, _cx_self* b) {c_swap(_cx_se
 STC_INLINE i_val        _cx_memb(_value_fromraw)(i_valraw raw) { return i_valfrom(raw); }
 STC_INLINE i_valraw     _cx_memb(_value_toraw)(_cx_value* pval) { return i_valto(pval); }
 
+STC_INLINE _cx_value*   _cx_memb(_put)(_cx_self* self, i_val value)
+                            { return _cx_memb(_push_back)(self, value); }
 STC_INLINE void         _cx_memb(_pop_front)(_cx_self* self)
                             { i_valdrop(self->data); ++self->data; --cdeq_rep_(self)->size; }
 STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self)
