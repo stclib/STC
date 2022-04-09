@@ -298,10 +298,12 @@ _cx_memb(_reserve)(_cx_self* self, const size_t n) {
 
 STC_DEF _cx_value*
 _cx_memb(_push_back)(_cx_self* self, i_val value) {
-    struct cdeq_rep* rep = cdeq_rep_(self);
-    if (_cdeq_nfront(self) + rep->size == rep->cap)
-        _cx_memb(_expand_right_half_)(self, rep->size, 1);
-    _cx_value *v = self->data + cdeq_rep_(self)->size++;
+    struct cdeq_rep* r = cdeq_rep_(self);
+    if (_cdeq_nfront(self) + r->size == r->cap) {
+        _cx_memb(_expand_right_half_)(self, r->size, 1);
+        r = cdeq_rep_(self);
+    }
+    _cx_value *v = self->data + r->size++;
     *v = value; return v;
 }
 

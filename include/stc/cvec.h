@@ -299,22 +299,27 @@ _cx_memb(_resize)(_cx_self* self, const size_t len, i_val null) {
 
 STC_DEF _cx_value*
 _cx_memb(_push_back)(_cx_self* self, i_val value) {
-    const size_t len = cvec_rep_(self)->size;
-    if (len == _cx_memb(_capacity)(*self))
-        _cx_memb(_reserve)(self, (len*3 >> 1) + 4);
-    _cx_value *v = self->data + cvec_rep_(self)->size++;
+    struct cvec_rep *r = cvec_rep_(self);
+    if (r->size == r->cap) {
+        _cx_memb(_reserve)(self, (r->size*3 >> 1) + 4);
+        r = cvec_rep_(self);
+    }
+    _cx_value *v = self->data + r->size++;
     *v = value; return v;
 }
 
 static _cx_value*
 _cx_memb(_insert_space_)(_cx_self* self, _cx_value* pos, const size_t len) {
-    const size_t idx = pos - self->data, size = cvec_rep_(self)->size;
-    if (len == 0) return pos;
-    if (size + len > _cx_memb(_capacity)(*self))
-        _cx_memb(_reserve)(self, (size*3 >> 1) + len),
+    const size_t idx = pos - self->data;
+    struct cvec_rep* r = cvec_rep_(self);
+    if (!len) return pos;
+    if (r->size + len > r->cap) {
+        _cx_memb(_reserve)(self, (r->size*3 >> 1) + len);
+        r = cvec_rep_(self);
         pos = self->data + idx;
-    cvec_rep_(self)->size += len;
-    memmove(pos + len, pos, (size - idx) * sizeof(i_val));
+    }
+    memmove(pos + len, pos, (r->size - idx) * sizeof *pos);
+    r->size += len;
     return pos;
 }
 

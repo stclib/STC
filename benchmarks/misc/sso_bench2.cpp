@@ -2,7 +2,7 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
-//#define STC_USE_SSO 1
+#define STC_USE_SSO 1
 #define i_val_str
 #include <stc/cstack.h>
 
@@ -18,7 +18,7 @@ static inline uint64_t romutrio(void) {
    s[0] = 15241094284759029579u * zp;
    s[1] = yp - xp; s[1] = ROTL_(s[1], 12);
    s[2] = zp - yp; s[2] = ROTL_(s[2], 44);
-   return xp;    
+   return xp;
 }
 
 static void sromutrio(uint64_t seed) {
@@ -31,7 +31,7 @@ static void sromutrio(uint64_t seed) {
 
 static const char CHARS[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=+-";
 
-static const int BENCHMARK_SIZE = 10000000;
+static const int BENCHMARK_SIZE = 5000000;
 static const int MAX_STRING_LENGTH = 20;
 
 using time_point = std::chrono::high_resolution_clock::time_point;
@@ -63,7 +63,7 @@ void benchmark(L& vec, const int length, R addRandomString) {
     if (length == 0)
         for (int i = 0; i < BENCHMARK_SIZE; i++)
             addRandomString(vec, (i*13 & 31) + 1);
-    else 
+    else
         for (int i = 0; i < BENCHMARK_SIZE; i++)
             addRandomString(vec, length);
 

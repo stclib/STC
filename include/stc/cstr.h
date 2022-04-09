@@ -185,7 +185,7 @@ cstr_reserve(cstr* self, const size_t cap) {
     cstr_priv* p = _cstr_p(self);
     const size_t oldcap = p->cap;
     if (cap > oldcap) {
-        p = (cstr_priv*) c_realloc(oldcap ? p : NULL, _cstr_opt_mem(cap));
+        p = (cstr_priv*) c_realloc((oldcap != 0) & (p != &_cstr_nullrep) ? p : NULL, _cstr_opt_mem(cap));
         self->str = p->chr;
         if (oldcap == 0) self->str[p->size = 0] = '\0';
         p->cap = _cstr_opt_cap(cap);
