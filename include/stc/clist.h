@@ -93,7 +93,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
 STC_API void            _cx_memb(_drop)(_cx_self* self);
 STC_API _cx_value*      _cx_memb(_push_back)(_cx_self* self, i_val value);
 STC_API _cx_value*      _cx_memb(_push_front)(_cx_self* self, i_val value);
-STC_API _cx_iter        _cx_memb(_insert)(_cx_self* self, _cx_iter it, i_val value);
+STC_API _cx_iter        _cx_memb(_insert_at)(_cx_self* self, _cx_iter it, i_val value);
 STC_API _cx_iter        _cx_memb(_erase_at)(_cx_self* self, _cx_iter it);
 STC_API _cx_iter        _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2);
 #if !c_option(c_no_cmp)
@@ -120,12 +120,12 @@ STC_INLINE _cx_value*   _cx_memb(_emplace_back)(_cx_self* self, i_valraw raw)
                             { return _cx_memb(_push_back)(self, i_valfrom(raw)); }
 STC_INLINE _cx_value*   _cx_memb(_emplace_front)(_cx_self* self, i_valraw raw)
                             { return _cx_memb(_push_front)(self, i_valfrom(raw)); }
-STC_INLINE _cx_iter     _cx_memb(_emplace)(_cx_self* self, _cx_iter it, i_valraw raw)
-                            { return _cx_memb(_insert)(self, it, i_valfrom(raw)); }
+STC_INLINE _cx_iter     _cx_memb(_emplace_at)(_cx_self* self, _cx_iter it, i_valraw raw)
+                            { return _cx_memb(_insert_at)(self, it, i_valfrom(raw)); }
 #endif
 #endif
 
-STC_INLINE _cx_value*   _cx_memb(_put)(_cx_self* self, i_val value)
+STC_INLINE _cx_value*   _cx_memb(_push)(_cx_self* self, i_val value)
                             { return _cx_memb(_push_back)(self, value); }
 STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_make(_cx_self){NULL}; }
 STC_INLINE bool         _cx_memb(_reserve)(_cx_self* self, size_t n) { return true; }
@@ -217,7 +217,7 @@ _cx_memb(_push_front)(_cx_self* self, i_val value) {
 }
 
 STC_DEF _cx_iter
-_cx_memb(_insert)(_cx_self* self, _cx_iter it, i_val value) {
+_cx_memb(_insert_at)(_cx_self* self, _cx_iter it, i_val value) {
     _cx_node* node = it.ref ? it.prev : self->last;
     _c_clist_insert_after(self, _cx_self, node, value);
     if (!self->last || !it.ref) {

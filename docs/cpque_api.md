@@ -42,7 +42,6 @@ i_val*              cpque_X_top(const cpque_X* self);
 
 void                cpque_X_make_heap(cpque_X* self);  // heapify the vector.
 void                cpque_X_push(cpque_X* self, i_val value);
-void                cpque_X_put(cpque_X* self, i_val value);      // alias for push()
 void                cpque_X_emplace(cpque_X* self, i_valraw raw); // converts from raw
 
 void                cpque_X_pop(cpque_X* self);

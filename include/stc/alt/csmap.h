@@ -38,7 +38,7 @@ int main(void) {
 
         csmap_mx_iter it = csmap_mx_find(&m, 10); // none
         char val = csmap_mx_find(&m, 5).ref->second;
-        csmap_mx_put(&m, 5, 'd'); // update
+        csmap_mx_push(&m, 5, 'd'); // update
         csmap_mx_erase(&m, 8);
 
         c_foreach (i, csmap_mx, m)
@@ -148,7 +148,7 @@ int main(void) {
         } \
     \
         STC_INLINE _cx_result \
-        _cx_memb(_put)(_cx_self* self, i_key key, i_val mapped) { \
+        _cx_memb(_push)(_cx_self* self, i_key key, i_val mapped) { \
             return _cx_memb(_insert_or_assign)(self, key, mapped); \
         } \
     \

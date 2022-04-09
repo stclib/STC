@@ -87,9 +87,6 @@ STC_INLINE _cx_value* _cx_memb(_push)(_cx_self* self, _cx_value val) {
     _cx_value* vp = self->data + self->size++; 
     *vp = val; return vp;
 }
-STC_INLINE _cx_value* _cx_memb(_put)(_cx_self* self, _cx_value val)
-    { return _cx_memb(_push)(self, val); }
-
 STC_INLINE void _cx_memb(_pop)(_cx_self* self)
     { _cx_value* p = &self->data[--self->size]; i_valdrop(p); }
 

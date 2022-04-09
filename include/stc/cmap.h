@@ -171,7 +171,7 @@ _cx_memb(_insert)(_cx_self* self, i_key _key _i_MAP_ONLY(, i_val _mapped)) {
 }
 
 STC_INLINE _cx_result
-_cx_memb(_put)(_cx_self* self, i_key _key _i_MAP_ONLY(, i_val _mapped)) {
+_cx_memb(_push)(_cx_self* self, i_key _key _i_MAP_ONLY(, i_val _mapped)) {
     return _i_SET_ONLY( _cx_memb(_insert)(self, _key) )
            _i_MAP_ONLY( _cx_memb(_insert_or_assign)(self, _key, _mapped) );
 }

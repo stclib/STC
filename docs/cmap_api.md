@@ -66,7 +66,7 @@ cmap_X_iter          cmap_X_find(const cmap_X* self, i_keyraw rkey);            
 
 cmap_X_result       cmap_X_insert(cmap_X* self, i_key key, i_val mapped);                     // no change if key in map
 cmap_X_result       cmap_X_insert_or_assign(cmap_X* self, i_key key, i_val mapped);           // always update mapped
-cmap_X_result       cmap_X_put(cmap_X* self, i_key key, i_val mapped);                        // alias for insert_or_assign
+cmap_X_result       cmap_X_push(cmap_X* self, i_key key, i_val mapped);                       // alias for insert_or_assign
 
 cmap_X_result       cmap_X_emplace(cmap_X* self, i_keyraw rkey, i_valraw rmapped);            // no change if rkey in map
 cmap_X_result       cmap_X_emplace_or_assign(cmap_X* self, i_keyraw rkey, i_valraw rmapped);  // always update rmapped
@@ -107,7 +107,7 @@ bool                c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);       // 
 | `cmap_X_key`       | `i_key`                                         | The key type                  |
 | `cmap_X_mapped`    | `i_val`                                         | The mapped type               |
 | `cmap_X_value`     | `struct { const i_key first; i_val second; }`   | The value: key is immutable   |
-| `cmap_X_result`    | `struct { cmap_X_value *ref; bool inserted; }`  | Result of insert/put/emplace  |
+| `cmap_X_result`    | `struct { cmap_X_value *ref; bool inserted; }`  | Result of insert/emplace      |
 | `cmap_X_iter`      | `struct { cmap_X_value *ref; ... }`             | Iterator type                 |
 
 ## Examples

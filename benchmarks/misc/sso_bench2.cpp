@@ -3,6 +3,7 @@
 #include <vector>
 #include <chrono>
 #define STC_USE_SSO 1
+#define i_type svec
 #define i_val_str
 #include <stc/cstack.h>
 
@@ -46,14 +47,14 @@ void addRandomString_STD(std::vector<std::string>& vec, const int length) {
     vec.push_back(s);
 }
 
-void addRandomString_STC(cstack_str& vec, const int length) {
+void addRandomString_STC(svec& vec, const int length) {
     cstr s = cstr_with_size(length, 0);
     char* p = cstr_data(&s);
     for (int i = 0; i < length; ++i) {
         p[i] = CHARS[romutrio() & 63];
     }
     cstr_append_s(&s, s);
-    cstack_str_push(&vec, s);
+    svec_push(&vec, s);
 }
 
 template <class L, typename R>
@@ -85,10 +86,10 @@ int main() {
     sromutrio(1234);
     std::cerr << "\nlength\ttime\tSTC string\n";
     for (int k = 0; k < 4; k++) {
-        cstack_str vec = cstack_str_with_capacity(BENCHMARK_SIZE);
+        svec vec = svec_with_capacity(BENCHMARK_SIZE);
         benchmark(vec, 0, addRandomString_STC);
         std::cout << '\t' << cstr_str(&vec.data[0]) << '\n';
-        cstack_str_drop(&vec);
+        svec_drop(&vec);
     }
 
     sromutrio(1234);
@@ -102,10 +103,10 @@ int main() {
     sromutrio(1234);
     std::cerr << "\nlength\ttime\tSTC string\n";
     for (int length = 1; length <= MAX_STRING_LENGTH; length++) {
-        cstack_str vec = cstack_str_with_capacity(BENCHMARK_SIZE);
+        svec vec = svec_with_capacity(BENCHMARK_SIZE);
         benchmark(vec, length, addRandomString_STC);
         std::cout << '\t' << cstr_str(&vec.data[0]) << '\n';
-        cstack_str_drop(&vec);
+        svec_drop(&vec);
     }
 
     std::cerr << "size std::string : " << sizeof(std::string) << std::endl

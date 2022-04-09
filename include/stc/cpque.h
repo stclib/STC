@@ -42,9 +42,6 @@ STC_API void _cx_memb(_make_heap)(_cx_self* self);
 STC_API void _cx_memb(_erase_at)(_cx_self* self, size_t idx);
 STC_API void _cx_memb(_push)(_cx_self* self, _cx_value value);
 
-STC_INLINE void _cx_memb(_put)(_cx_self* self, _cx_value value)
-    { _cx_memb(_push)(self, value); }
-
 STC_INLINE _cx_self _cx_memb(_init)(void)
     { return c_make(_cx_self){NULL}; }
 
