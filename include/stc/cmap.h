@@ -133,8 +133,8 @@ STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
 
 STC_INLINE _cx_value
 _cx_memb(_value_clone)(_cx_value _val) {
-    *_i_keyref(&_val) = i_keyfrom(i_keyto(_i_keyref(&_val)));
-    _i_MAP_ONLY( _val.second = i_valfrom(i_valto(&_val.second)); )
+    i_keyraw k = i_keyto(_i_keyref(&_val)); *_i_keyref(&_val) = i_keyfrom(k);
+    _i_MAP_ONLY( i_valraw m = i_valto((&_val.second)); _val.second = i_valfrom(m); )
     return _val;
 }
 #if !defined _i_no_emplace
@@ -153,7 +153,7 @@ _cx_memb(_emplace)(_cx_self* self, i_keyraw rkey _i_MAP_ONLY(, i_valraw rmapped)
 STC_INLINE _cx_raw
 _cx_memb(_value_toraw)(_cx_value* val) {
     return _i_SET_ONLY( i_keyto(val) )
-           _i_MAP_ONLY( c_make(_cx_raw){i_keyto(&val->first), i_valto(&val->second)} );
+           _i_MAP_ONLY( c_make(_cx_raw){i_keyto((&val->first)), i_valto((&val->second))} );
 }
 
 STC_INLINE void
@@ -164,9 +164,9 @@ _cx_memb(_value_drop)(_cx_value* _val) {
 
 STC_INLINE _cx_result
 _cx_memb(_insert)(_cx_self* self, i_key _key _i_MAP_ONLY(, i_val _mapped)) {
-    _cx_result _res = _cx_memb(_insert_entry_)(self, i_keyto(&_key));
+    _cx_result _res = _cx_memb(_insert_entry_)(self, i_keyto((&_key)));
     if (_res.inserted) { *_i_keyref(_res.ref) = _key; _i_MAP_ONLY( _res.ref->second = _mapped; )}
-    else               { i_keydrop(&_key); _i_MAP_ONLY( i_valdrop((&_mapped)); )}
+    else               { i_keydrop((&_key)); _i_MAP_ONLY( i_valdrop((&_mapped)); )}
     return _res;
 }
 
@@ -270,9 +270,9 @@ STC_DEF void _cx_memb(_clear)(_cx_self* self) {
 #if !defined _i_isset
     STC_DEF _cx_result
     _cx_memb(_insert_or_assign)(_cx_self* self, i_key _key, i_val _mapped) {
-        _cx_result _res = _cx_memb(_insert_entry_)(self, i_keyto(&_key));
+        _cx_result _res = _cx_memb(_insert_entry_)(self, i_keyto((&_key)));
         if (_res.inserted) _res.ref->first = _key;
-        else { i_keydrop(&_key); i_valdrop((&_res.ref->second)); }
+        else { i_keydrop((&_key)); i_valdrop((&_res.ref->second)); }
         _res.ref->second = _mapped; return _res;
     }
 
@@ -282,7 +282,7 @@ STC_DEF void _cx_memb(_clear)(_cx_self* self) {
     _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped) {
         _cx_result _res = _cx_memb(_insert_entry_)(self, rkey);
         if (_res.inserted) _res.ref->first = i_keyfrom(rkey);
-        else i_valdrop((&_res.ref->second));
+        else { i_valdrop((&_res.ref->second)); }
         _res.ref->second = i_valfrom(rmapped); return _res;
     }
     #endif

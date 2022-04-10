@@ -124,7 +124,8 @@ _cx_memb(_reset_from)(_cx_self* self, i_val val) {
     STC_INLINE _cx_self
     _cx_memb(_clone)(_cx_self other) {
         if (!other.get) return other;
-        return c_make(_cx_self){c_new(i_val, i_valfrom(i_valto(other.get)))};
+        i_valraw r = i_valto(other.get);
+        return c_make(_cx_self){c_new(i_val, i_valfrom(r))};
     }
 
     STC_INLINE void

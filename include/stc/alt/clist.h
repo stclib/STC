@@ -88,7 +88,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
     STC_INLINE bool     _cx_memb(_empty)(_cx_self lst) { return lst.last == NULL; } \
     STC_INLINE size_t   _cx_memb(_count)(_cx_self lst) { return _clist_count((const clist_VOID*) &lst); } \
     STC_INLINE i_val    _cx_memb(_value_fromraw)(i_valraw raw) { return i_valfrom(raw); } \
-    STC_INLINE i_val    _cx_memb(_value_clone)(i_val val) { return i_valfrom(i_valto(&val)); } \
+    STC_INLINE i_val    _cx_memb(_value_clone)(i_val val) { i_valraw _r = i_valto((&val)); return i_valfrom(_r); } \
     STC_INLINE void     _cx_memb(_clear)(_cx_self* self) { _cx_memb(_drop)(self); } \
     STC_INLINE void     _cx_memb(_emplace_back)(_cx_self* self, i_valraw raw) \
                             { _cx_memb(_push_back)(self, i_valfrom(raw)); } \
@@ -242,7 +242,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
         _cx_node* prev = self->last, *node; \
         while (prev) { \
             node = prev->next; \
-            i_valraw r = i_valto(&node->value); \
+            i_valraw r = i_valto((&node->value)); \
             if (i_cmp((&r), (&val)) == 0) \
                 prev = _cx_memb(_erase_after_)(self, prev), ++n; \
             else \
@@ -281,8 +281,8 @@ STC_API size_t _clist_count(const clist_VOID* self);
 \
     STC_DEF int \
     _cx_memb(_sort_cmp_)(const void* x, const void* y) { \
-        i_valraw a = i_valto(&((_cx_node *) x)->value); \
-        i_valraw b = i_valto(&((_cx_node *) y)->value); \
+        i_valraw a = i_valto((&((_cx_node *) x)->value)); \
+        i_valraw b = i_valto((&((_cx_node *) y)->value)); \
         return i_cmp((&a), (&b)); \
     } \
 \

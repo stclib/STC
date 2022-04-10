@@ -109,7 +109,7 @@ STC_API _cx_node*       _cx_memb(_erase_after_)(_cx_self* self, _cx_node* node);
 #if !defined _i_no_clone
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_INLINE i_val        _cx_memb(_value_clone)(i_val val)
-                            { return i_valfrom(i_valto(&val)); }
+                            { i_valraw r = i_valto((&val)); return i_valfrom(r); }
 STC_INLINE void
 _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     if (self->last == other.last) return;
@@ -192,7 +192,9 @@ _cx_memb(_get_mut)(_cx_self* self, i_valraw val) {
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self cx) {
     _cx_self out = _cx_memb(_init)();
-    c_foreach (it, _cx_self, cx) _cx_memb(_push_back)(&out, i_valfrom(i_valto(it.ref)));
+    i_valraw r;
+    c_foreach (it, _cx_self, cx)
+        r = i_valto(it.ref), _cx_memb(_push_back)(&out, i_valfrom(r));
     return out;
 }
 #endif
@@ -298,7 +300,7 @@ _cx_memb(_remove)(_cx_self* self, i_valraw val) {
     _cx_node* prev = self->last, *node;
     while (prev) {
         node = prev->next;
-        i_valraw r = i_valto(&node->value);
+        i_valraw r = i_valto((&node->value));
         if (i_cmp((&r), (&val)) == 0)
             prev = _cx_memb(_erase_after_)(self, prev), ++n;
         else
@@ -309,8 +311,8 @@ _cx_memb(_remove)(_cx_self* self, i_valraw val) {
 
 static int
 _cx_memb(_sort_cmp_)(const clist_VOID_node* x, const clist_VOID_node* y) {
-    i_valraw a = i_valto(&((const _cx_node *) x)->value);
-    i_valraw b = i_valto(&((const _cx_node *) y)->value);
+    i_valraw a = i_valto((&((const _cx_node *) x)->value));
+    i_valraw b = i_valto((&((const _cx_node *) y)->value));
     return i_cmp((&a), (&b));
 }
 

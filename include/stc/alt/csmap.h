@@ -111,7 +111,7 @@ int main(void) {
     STC_INLINE void \
     _cx_memb(_value_clone)(_cx_value* dst, _cx_value* val) { \
         *_i_keyref(dst) = i_keyfrom(i_keyto(_i_keyref(val))); \
-        _i_MAP_ONLY( dst->second = i_valfrom(i_valto(&val->second)); ) \
+        _i_MAP_ONLY( i_valraw r = i_valto((&val->second)); dst->second = i_valfrom(r); ) \
     } \
 \
     STC_INLINE _cx_result \
@@ -132,18 +132,18 @@ int main(void) {
 \
     STC_INLINE _cx_result \
     _cx_memb(_insert)(_cx_self* self, i_key key _i_MAP_ONLY(, i_val mapped)) { \
-        _cx_result res = _cx_memb(_insert_entry_)(self, i_keyto(&key)); \
+        _cx_result res = _cx_memb(_insert_entry_)(self, i_keyto((&key))); \
         if (res.inserted) {*_i_keyref(res.ref) = key; _i_MAP_ONLY( res.ref->second = mapped; )} \
-        else              {i_keydrop(&key); _i_MAP_ONLY( i_valdrop((&mapped)); )} \
+        else              {i_keydrop((&key)); _i_MAP_ONLY( i_valdrop((&mapped)); )} \
         return res; \
     } \
 \
     _i_MAP_ONLY( \
         STC_INLINE _cx_result \
         _cx_memb(_insert_or_assign)(_cx_self* self, i_key key, i_val mapped) { \
-            _cx_result res = _cx_memb(_insert_entry_)(self, i_keyto(&key)); \
+            _cx_result res = _cx_memb(_insert_entry_)(self, i_keyto((&key))); \
             if (res.inserted) res.ref->first = key; \
-            else {i_keydrop(&key); i_valdrop((&res.ref->second)); } \
+            else {i_keydrop((&key)); i_valdrop((&res.ref->second)); } \
             res.ref->second = mapped; return res; \
         } \
     \
@@ -370,12 +370,12 @@ static csmap_SENTINEL_node _aatree_sentinel = {&_aatree_sentinel, &_aatree_senti
         if (!it2.ref) { while (it1.ref) it1 = _cx_memb(_erase_at)(self, it1); \
                         return it1; } \
         _cx_key k1 = *_i_keyref(it1.ref), k2 = *_i_keyref(it2.ref); \
-        _cx_rawkey r1 = i_keyto(&k1); \
+        _cx_rawkey r1 = i_keyto((&k1)); \
         for (;;) { \
             if (memcmp(&k1, &k2, sizeof k1) == 0) return it1; \
             _cx_memb(_next)(&it1); k1 = *_i_keyref(it1.ref); \
             _cx_memb(_erase)(self, r1); \
-            _cx_memb(_find_it)(self, (r1 = i_keyto(&k1)), &it1); \
+            _cx_memb(_find_it)(self, (r1 = i_keyto((&k1))), &it1); \
         } \
     } \
 \

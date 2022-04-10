@@ -103,7 +103,7 @@
 #elif defined i_drop && !defined i_key
   #define i_valdrop i_drop
 #elif defined i_drop
-  #error "i_drop not supported when i_key defined. Define i_keydrop instead."
+  #error "i_drop not supported when i_key defined. Define i_keydrop/i_valdrop instead."
 #endif
 
 #if defined i_from && !defined i_keyfrom && defined _i_isset
@@ -111,7 +111,7 @@
 #elif defined i_from && !defined i_key
   #define i_valfrom i_from
 #elif defined i_from
-  #error "i_from not supported when i_key defined. Define i_keyfrom instead."
+  #error "i_from not supported when i_key defined. Define i_keyfrom/i_valfrom instead."
 #endif
 
 #ifdef i_val_str

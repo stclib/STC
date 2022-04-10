@@ -96,7 +96,7 @@ STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
 }
 STC_INLINE i_val _cx_memb(_value_clone)(_cx_value val)
-    { return i_valfrom(i_valto(&val)); }
+    { i_valraw r = i_valto((&val)); return i_valfrom(r); }
 
 #if !defined _i_no_emplace
 STC_INLINE void _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
@@ -127,8 +127,9 @@ _cx_memb(_make_heap)(_cx_self* self) {
 #if !defined _i_no_clone
 STC_DEF _cx_self _cx_memb(_clone)(_cx_self q) {
     _cx_self out = _cx_memb(_with_capacity)(q.size);
-    for (; out.size < out.capacity; ++out.size, ++q.data)
-        out.data[out.size] = i_valfrom(i_valto(q.data));
+    i_valraw r;
+    for (; out.size < out.capacity; ++q.data)
+        r = i_valto(q.data), out.data[out.size++] = i_valfrom(r);
     return out;
 }
 #endif
