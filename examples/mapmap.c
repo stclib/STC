@@ -3,7 +3,7 @@
 #define i_type People
 #define i_key_str
 #define i_val_str
-#define i_keydrop(p) (printf("kdrop: %s\n", (p)->str), cstr_drop(p))
+#define i_keydrop(p) (printf("kdrop: %s\n", p->str), cstr_drop(p))
 #include <stc/csmap.h>
 
 #define i_type Departments
@@ -13,10 +13,12 @@
 
 #define i_type Stack
 #define i_val_bind People_value
-#define i_opt c_no_cmp
+// Shorthand for:
+//#define i_val People_value
+//#define i_cmp People_value_cmp
 //#define i_from People_value_clone
 //#define i_drop People_value_drop
-#include <stc/cstack.h>
+#include <stc/cvec.h>
 
 void add(Departments* deps, const char* name, const char* email, const char* dep)
 {

@@ -57,5 +57,11 @@ int main() {
 #define _i_prefix cqueue_
 #endif
 #define _i_queue
+#define _emplace_back _emplace
+#define _pop_front _pop
+
 #include "cdeq.h"
+
+#undef _emplace_back
+#undef _pop_front
 #undef _i_queue
