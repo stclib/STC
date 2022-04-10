@@ -287,7 +287,7 @@ STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw val) {
     c_foreach (it, _cx_self, it1, it2) {
         i_valraw r = i_valto(it.ref);
-        if (i_cmp(&r, &val) == 0) return it;
+        if (i_cmp((&r), (&val)) == 0) return it;
     }
     it2.ref = NULL; return it2;
 }
@@ -299,7 +299,7 @@ _cx_memb(_remove)(_cx_self* self, i_valraw val) {
     while (prev) {
         node = prev->next;
         i_valraw r = i_valto(&node->value);
-        if (i_cmp(&r, &val) == 0)
+        if (i_cmp((&r), (&val)) == 0)
             prev = _cx_memb(_erase_after_)(self, prev), ++n;
         else
             prev = (node == self->last ? NULL : node);
@@ -311,7 +311,7 @@ static int
 _cx_memb(_sort_cmp_)(const clist_VOID_node* x, const clist_VOID_node* y) {
     i_valraw a = i_valto(&((const _cx_node *) x)->value);
     i_valraw b = i_valto(&((const _cx_node *) y)->value);
-    return i_cmp(&a, &b);
+    return i_cmp((&a), (&b));
 }
 
 static clist_VOID_node*
@@ -327,7 +327,7 @@ STC_DEF int
 _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     i_valraw rx = i_valto(x);
     i_valraw ry = i_valto(y);
-    return i_cmp(&rx, &ry);
+    return i_cmp((&rx), (&ry));
 }
 #endif // !c_no_cmp
 

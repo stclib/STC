@@ -291,14 +291,14 @@ STC_DEF void _cx_memb(_clear)(_cx_self* self) {
 
 STC_DEF chash_bucket_t
 _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr) {
-    const uint64_t _hash = i_hash(rkeyptr, sizeof *rkeyptr);
+    const uint64_t _hash = i_hash(rkeyptr, (sizeof *rkeyptr));
     uint8_t _hx; _cx_size _cap = self->bucket_count;
     chash_bucket_t b = {c_paste(fastrange_,i_size)(_hash, _cap), (uint8_t)(_hash | 0x80)};
     const uint8_t* _hashx = self->_hashx;
     while ((_hx = _hashx[b.idx])) {
         if (_hx == b.hx) {
             _cx_rawkey _raw = i_keyto(_i_keyref(self->table + b.idx));
-            if (i_eq(&_raw, rkeyptr)) break;
+            if (i_eq((&_raw), rkeyptr)) break;
         }
         if (++b.idx == _cap)
             b.idx = 0;
@@ -377,7 +377,7 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
         if (! _hashx[j])
             break;
         _cx_rawkey _raw = i_keyto(_i_keyref(_slot + j));
-        k = c_paste(fastrange_,i_size)(i_hash(&_raw, sizeof _raw), _cap);
+        k = c_paste(fastrange_,i_size)(i_hash((&_raw), (sizeof _raw)), _cap);
         if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */
             _slot[i] = _slot[j], _hashx[i] = _hashx[j], i = j;
     }

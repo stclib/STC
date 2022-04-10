@@ -405,7 +405,7 @@ STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, i_valraw raw) {
     for (; i1.ref != i2.ref; ++i1.ref) {
         i_valraw r = i_valto(i1.ref);
-        if (i_eq(&raw, &r)) return i1;
+        if (i_eq((&raw), (&r))) return i1;
     }
     return i2;
 }
@@ -414,7 +414,7 @@ STC_DEF int
 _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     i_valraw rx = i_valto(x);
     i_valraw ry = i_valto(y);
-    return i_cmp(&rx, &ry);
+    return i_cmp((&rx), (&ry));
 }
 #endif // !c_no_cmp
 #endif // !_i_queue

@@ -146,7 +146,7 @@ _cx_memb(_value_toraw)(_cx_value* val) {
 STC_INLINE int
 _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     _cx_rawkey rx = i_keyto(_i_keyref(x)), ry = i_keyto(_i_keyref(y));
-    return i_cmp(&rx, &ry);
+    return i_cmp((&rx), (&ry));
 }
 
 STC_INLINE void
@@ -301,7 +301,7 @@ _cx_memb(_find_it)(const _cx_self* self, i_keyraw rkey, _cx_iter* out) {
     out->_top = 0;
     while (tn) {
         int c; _cx_rawkey raw = i_keyto(_i_keyref(&d[tn].value));
-        if ((c = i_cmp(&raw, &rkey)) < 0)
+        if ((c = i_cmp((&raw), (&rkey))) < 0)
             tn = d[tn].link[1];
         else if (c > 0)
             { out->_st[out->_top++] = tn; tn = d[tn].link[0]; }
@@ -369,7 +369,7 @@ _cx_memb(_insert_entry_i_)(_cx_self* self, _cx_size tn, const _cx_rawkey* rkey, 
     while (tx) {
         up[top++] = tx;
         i_keyraw raw = i_keyto(_i_keyref(&d[tx].value));
-        if ((c = i_cmp(&raw, rkey)) == 0) {res->ref = &d[tx].value; return tn; }
+        if ((c = i_cmp((&raw), rkey)) == 0) {res->ref = &d[tx].value; return tn; }
         dir = (c < 0);
         tx = d[tx].link[dir];
     }
@@ -400,7 +400,7 @@ _cx_memb(_erase_r_)(_cx_node *d, _cx_size tn, const _cx_rawkey* rkey, int *erase
     if (tn == 0)
         return 0;
     i_keyraw raw = i_keyto(_i_keyref(&d[tn].value));
-    _cx_size tx; int c = i_cmp(&raw, rkey);
+    _cx_size tx; int c = i_cmp((&raw), rkey);
     if (c != 0)
         d[tn].link[c < 0] = _cx_memb(_erase_r_)(d, d[tn].link[c < 0], rkey, erased);
     else {

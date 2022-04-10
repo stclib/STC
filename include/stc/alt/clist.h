@@ -207,7 +207,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
         _cx_iter i = it1; \
         for (_cx_memb(_next)(&i); i.ref != it2.ref; _cx_memb(_next)(&i)) { \
             i_valraw r = i_valto(i.ref); \
-            if (i_cmp(&r, &val) == 0) return it1; \
+            if (i_cmp((&r), (&val)) == 0) return it1; \
             it1 = i; \
         } \
         it1.ref = NULL; return it1; \
@@ -243,7 +243,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
         while (prev) { \
             node = prev->next; \
             i_valraw r = i_valto(&node->value); \
-            if (i_cmp(&r, &val) == 0) \
+            if (i_cmp((&r), (&val)) == 0) \
                 prev = _cx_memb(_erase_after_)(self, prev), ++n; \
             else \
                 prev = (node == self->last ? NULL : node); \
@@ -283,7 +283,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
     _cx_memb(_sort_cmp_)(const void* x, const void* y) { \
         i_valraw a = i_valto(&((_cx_node *) x)->value); \
         i_valraw b = i_valto(&((_cx_node *) y)->value); \
-        return i_cmp(&a, &b); \
+        return i_cmp((&a), (&b)); \
     } \
 \
     STC_DEF void \
