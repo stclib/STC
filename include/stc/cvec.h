@@ -295,7 +295,7 @@ _cx_memb(_resize)(_cx_self* self, const size_t len, i_val null) {
     if (!_cx_memb(_reserve)(self, len)) return false;
     struct cvec_rep *rep = cvec_rep_(self);
     const size_t n = rep->size;
-    for (size_t i = len; i < n; ++i) { i_valdrop(&self->data[i]); }
+    for (size_t i = len; i < n; ++i) { i_valdrop((self->data + i)); }
     for (size_t i = n; i < len; ++i) self->data[i] = null;
     if (rep->cap) rep->size = len;
     return true;

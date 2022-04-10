@@ -67,7 +67,7 @@ STC_INLINE _cx_self _cx_memb(_with_size)(const size_t size, i_val null) {
 
 STC_INLINE void _cx_memb(_clear)(_cx_self* self) {
     size_t i = self->size; self->size = 0;
-    while (i--) { i_valdrop(&self->data[i]); }
+    while (i--) { i_valdrop((self->data + i)); }
 }
 
 STC_INLINE void _cx_memb(_drop)(_cx_self* self)
@@ -135,7 +135,7 @@ STC_DEF _cx_self _cx_memb(_clone)(_cx_self q) {
 
 STC_DEF void
 _cx_memb(_erase_at)(_cx_self* self, const size_t idx) {
-    i_valdrop(&self->data[idx]);
+    i_valdrop((self->data + idx));
     const size_t n = --self->size;
     self->data[idx] = self->data[n];
     _cx_memb(_sift_down_)(self->data - 1, idx + 1, n);

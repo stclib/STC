@@ -251,7 +251,7 @@ _cx_memb(_erase_after_)(_cx_self* self, _cx_node* node) {
     node->next = next;
     if (del == next) self->last = node = NULL;
     else if (self->last == del) self->last = node, node = NULL;
-    i_valdrop(&del->value); c_free(del);
+    i_valdrop((&del->value)); c_free(del);
     return node;
 }
 
