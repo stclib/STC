@@ -369,7 +369,7 @@ _cx_memb(_insert_entry_i_)(_cx_self* self, _cx_size tn, const _cx_rawkey* rkey, 
     while (tx) {
         up[top++] = tx;
         i_keyraw raw = i_keyto(_i_keyref(&d[tx].value));
-        if ((c = i_cmp((&raw), rkey)) == 0) {res->ref = &d[tx].value; return tn; }
+        if (!(c = i_cmp((&raw), rkey))) { res->ref = &d[tx].value; return tn; }
         dir = (c < 0);
         tx = d[tx].link[dir];
     }

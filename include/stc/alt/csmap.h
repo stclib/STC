@@ -232,7 +232,7 @@ static csmap_SENTINEL_node _aatree_sentinel = {&_aatree_sentinel, &_aatree_senti
         out->_top = 0; \
         while (tn->level) { \
             int c; _cx_rawkey rx = i_keyto(_i_keyref(&tn->value)); \
-            if ((c = i_cmp((&rx), (&rkey))) < 0) tn = tn->link[1]; \
+            if ((c = (i_cmp((&rx), (&rkey)))) < 0) tn = tn->link[1]; \
             else if (c > 0) {out->_st[out->_top++] = tn; tn = tn->link[0]; } \
             else {out->_tn = tn->link[1]; return (out->ref = &tn->value); } \
         } \
@@ -296,7 +296,7 @@ static csmap_SENTINEL_node _aatree_sentinel = {&_aatree_sentinel, &_aatree_senti
         while (tx->level) { \
             up[top++] = tx; \
             _cx_rawkey r = i_keyto(_i_keyref(&tx->value)); \
-            if (!(c = i_cmp((&r), rkey))) {res->ref = &tx->value; return tn; } \
+            if (!(c = (i_cmp((&r), rkey)))) {res->ref = &tx->value; return tn; } \
             tx = tx->link[(dir = (c < 0))]; \
         } \
         tn = c_alloc(_cx_node); \
@@ -326,7 +326,7 @@ static csmap_SENTINEL_node _aatree_sentinel = {&_aatree_sentinel, &_aatree_senti
         if (tn->level == 0) \
             return tn; \
         _cx_rawkey raw = i_keyto(_i_keyref(&tn->value)); \
-        _cx_node *tx; int c = i_cmp((&raw), rkey); \
+        _cx_node *tx; int c = (i_cmp((&raw), rkey)); \
         if (c != 0) \
             tn->link[c < 0] = _cx_memb(_erase_r_)(tn->link[c < 0], rkey, erased); \
         else { \

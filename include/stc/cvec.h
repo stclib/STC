@@ -397,7 +397,7 @@ _cx_memb(_bsearch_in)(_cx_iter i1, _cx_iter i2, i_valraw raw, _cx_iter* lower_bo
     while (i1.ref != i2.ref) {
         mid.ref = i1.ref + ((i2.ref - i1.ref) >> 1);
         int c; i_valraw m = i_valto(mid.ref);
-        if ((c = i_cmp((&raw), (&m))) == 0) return *lower_bound = mid;
+        if (!(c = i_cmp((&raw), (&m)))) return *lower_bound = mid;
         else if (c < 0) i2.ref = mid.ref;
         else i1.ref = mid.ref + 1;
     }

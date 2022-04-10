@@ -207,7 +207,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
         _cx_iter i = it1; \
         for (_cx_memb(_next)(&i); i.ref != it2.ref; _cx_memb(_next)(&i)) { \
             i_valraw r = i_valto(i.ref); \
-            if (i_cmp((&r), (&val)) == 0) return it1; \
+            if (!(i_cmp((&r), (&val)))) return it1; \
             it1 = i; \
         } \
         it1.ref = NULL; return it1; \
@@ -243,7 +243,7 @@ STC_API size_t _clist_count(const clist_VOID* self);
         while (prev) { \
             node = prev->next; \
             i_valraw r = i_valto((&node->value)); \
-            if (i_cmp((&r), (&val)) == 0) \
+            if (!(i_cmp((&r), (&val)))) \
                 prev = _cx_memb(_erase_after_)(self, prev), ++n; \
             else \
                 prev = (node == self->last ? NULL : node); \
