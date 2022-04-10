@@ -217,7 +217,7 @@
   #define i_valdrop c_default_drop
 #endif
 #if !defined i_eq && defined i_cmp
-  #define i_eq !i_cmp
+  #define i_eq(x, y) !(i_cmp(x, y))
 #elif !defined i_eq
   #define i_eq c_default_eq
 #endif
