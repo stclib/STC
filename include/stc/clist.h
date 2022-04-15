@@ -122,8 +122,8 @@ STC_INLINE _cx_value*   _cx_memb(_emplace_front)(_cx_self* self, i_valraw raw)
                             { return _cx_memb(_push_front)(self, i_valfrom(raw)); }
 STC_INLINE _cx_iter     _cx_memb(_emplace_at)(_cx_self* self, _cx_iter it, i_valraw raw)
                             { return _cx_memb(_insert_at)(self, it, i_valfrom(raw)); }
-#endif
-#endif
+#endif // !_i_no_emplace
+#endif // !_i_no_clone
 
 STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_make(_cx_self){NULL}; }
 STC_INLINE bool         _cx_memb(_reserve)(_cx_self* self, size_t n) { return true; }

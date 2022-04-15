@@ -104,7 +104,8 @@ STC_INLINE _cx_value* _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
     { return _cx_memb(_push)(self, i_valfrom(raw)); }
 STC_INLINE _cx_value* _cx_memb(_emplace_back)(_cx_self* self, _cx_raw raw)
     { return _cx_memb(_push)(self,  i_valfrom(raw)); }
-#endif
+#endif // !_i_no_emplace
+
 STC_INLINE _cx_self _cx_memb(_clone)(_cx_self v) {
     _cx_self out = {(_cx_value *) c_malloc(v.size*sizeof(_cx_value)), v.size, v.size};
     i_valraw r;
@@ -112,7 +113,6 @@ STC_INLINE _cx_self _cx_memb(_clone)(_cx_self v) {
         r = i_valto(v.data), out.data[i++] = i_valfrom(r);
     return out;
 }
-
 STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     if (self->data == other.data) return;
     _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);

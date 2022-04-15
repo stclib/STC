@@ -347,7 +347,6 @@ _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
 }
 
 #if !defined _i_no_clone
-
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self cx) {
     const size_t len = cvec_rep_(&cx)->size;
@@ -366,6 +365,7 @@ _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
         r = i_valto(p1), *pos++ = i_valfrom(r);
     return it;
 }
+
 #if !defined _i_no_emplace
 STC_DEF _cx_iter
 _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos,
@@ -375,11 +375,10 @@ _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos,
     for (; p1 != p2; ++p1) *pos++ = i_valfrom((*p1));
     return it;
 }
-#endif
+#endif // !_i_no_emplace
 #endif // !_i_no_clone
 
 #if !c_option(c_no_cmp)
-
 STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, i_valraw raw) {
     for (; i1.ref != i2.ref; ++i1.ref) {
