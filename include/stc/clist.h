@@ -287,7 +287,7 @@ STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_valraw val) {
     c_foreach (it, _cx_self, it1, it2) {
         i_valraw r = i_valto(it.ref);
-        if (!(i_cmp((&r), (&val)))) return it;
+        if (i_eq((&r), (&val))) return it;
     }
     it2.ref = NULL; return it2;
 }
@@ -299,7 +299,7 @@ _cx_memb(_remove)(_cx_self* self, i_valraw val) {
     while (prev) {
         node = prev->next;
         i_valraw r = i_valto((&node->value));
-        if (!(i_cmp((&r), (&val))))
+        if (i_eq((&r), (&val)))
             prev = _cx_memb(_erase_after_)(self, prev), ++n;
         else
             prev = (node == self->last ? NULL : node);
