@@ -156,23 +156,19 @@ _cx_memb(_value_drop)(_cx_value* val) {
 }
 
 #ifndef _i_isset
-    #if !defined _i_no_clone
-    #if !defined _i_no_emplace
+    #if !defined _i_no_clone && !defined _i_no_emplace
     STC_API _cx_result _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped);
     #endif
-    #endif
     STC_API _cx_result _cx_memb(_insert_or_assign)(_cx_self* self, i_key key, i_val mapped);
+    
+    STC_INLINE _cx_result
+    _cx_memb(_put)(_cx_self* self, i_key _key, i_val _mapped) 
+        { return _cx_memb(_insert_or_assign)(self, _key, _mapped); }
 
     STC_INLINE const _cx_mapped*
     _cx_memb(_at)(const _cx_self* self, i_keyraw rkey)
         { _cx_iter it; return &_cx_memb(_find_it)(self, rkey, &it)->second; }
 #endif
-
-STC_INLINE _cx_result
-_cx_memb(_push)(_cx_self* self, i_key _key _i_MAP_ONLY(, i_val _mapped)) {
-    return _i_SET_ONLY( _cx_memb(_insert)(self, _key) )
-           _i_MAP_ONLY( _cx_memb(_insert_or_assign)(self, _key, _mapped) );
-}
 
 STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, i_keyraw rkey) {

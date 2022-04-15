@@ -43,9 +43,9 @@ which by the compiler is seen as different code because of macro name substituti
 - [***cvec*** - **std::vector** alike type](docs/cvec_api.md)
 
 Others:
-- [***threads*** - Mimic **C11-threads** (by Marcus Geelnard)](include/threads.h)
 - [***crandom*** - A novel very fast *PRNG* named **stc64**](docs/crandom_api.md)
 - [***coption*** - Command line options scanner](docs/coption_api.md)
+- [***threads*** - Mimic **C11-threads** (by Marcus Geelnard)](include/threads.h)
 
 Highlights
 ----------
@@ -290,15 +290,16 @@ Val:
 - `i_valto`   - Convertion func `i_val *` => `i_valraw`.
 
 Special:
-- `i_key_str` - Define key type `cstr` and container i_tag = `str`. It binds type convertion from/to const char*, and the cmp, eq, hash, and keydrop functions.
-- `i_key_arcbox TYPE` - Define key type where TYPE is a smart pointer `carc` or `cbox`. I.e. not to be used when defining carc/cbox types themselves.
-- `i_key_bind TYPE` - General version of the two above - will auto-bind to standard named functions based on TYPE. Use for elements where the following functions are defined: *TYPE_cmp*, *TYPE_clone*, *TYPE_drop*, *TYPE_hash*, and *TYPE_eq*. Only the functions required by the particular container needs to be defined. e.g. **cmap** and **cset** are the only types that require *TYPE_hash* and *TYPE_eq* to be defined. *TYPE_cmp* and *TYPE_clone* are not required if `i_opt c_no_cmp|c_no_clone` is defined. *TYPE_drop* is always required when using `_bind`.
-- `i_val_str`, `i_val_bind`, `i_val_arcbox` - Same as for key.
+- `i_key_str` - Define key type `cstr` and container i_tag = `str`. It binds type convertion from/to `const char*`, and the ***cmp***, ***eq***, ***hash***, and ***keydrop*** functions.
+- `i_key_arcbox TYPE` - Define container key type where TYPE is a smart pointer **carc** or **cbox**. NB: not to be used when defining carc/cbox types themselves.
+- `i_key_bind TYPE` - General version of the two above - will auto-bind to standard named functions: *TYPE_clone*, *TYPE_drop*, *TYPE_cmp*, *TYPE_eq*, *TYPE_hash*. Only functions required by the particular container need to be defined (*TYPE_drop* is always used). E.g., only **cmap** and **cset** uses *TYPE_hash* and *TYPE_eq*. And **cstack** does not use *TYPE_cmp*. *TYPE_clone* is not used if `#define i_opt c_no_clone` is specified. Likewise, *TYPE_cmp* is not used if `#define i_opt c_no_cmp` is specified.
+- `i_keyraw RAWTYPE` - If defined along with `i_key_bind`, the two functions `TYPE TYPE_from(i_valraw)` and `RAWTYPE TYPE_toraw(TYPE*)` are expected instead of `TYPE TYPE_clone(TYPE)`.  Cloning is done by `TYPE_from(TYPE_toraw(&val))`.  Functions ***cmp***, ***eq*** and ***hash*** to be bound must have name/signature: `int RAWTYPE_cmp(const RAWTYPE*, const RAWTYPE*)`, and similar for *RAWTYPE_eq* and *RAWTYPE_hash*.
+- `i_val_str`, `i_val_bind`, `i_val_arcbox` - Similar rules as for *key*.
 
 Notes:
 - For non-associative containers, `i_drop` and `i_from` may be defined instead of `i_valdrop` and `i_valfrom`.
-- Instead of defining `i_cmp`, you may define `i_opt c_no_cmp` to disable methods using comparison.
-- Instead of defining `i_*from`, you may define `i_opt c_no_clone` to disabled emplace and clone-functions.
+- Instead of defining `i_cmp`, you may define `i_opt c_no_cmp` to disable searching and sorting functions.
+- Instead of defining `i_*from`, you may define `i_opt c_no_clone` to disable emplace and clone-functions.
 - If a destructor `i_*drop` is defined, then either `i_*from` or `i_opt c_no_clone` must be defined.
 
 The *emplace* versus non-emplace container methods
@@ -319,7 +320,7 @@ can easier lead to mistakes.
 | non-emplace: Move          | emplace: Embedded copy       | Container                                   |
 |:---------------------------|:-----------------------------|:--------------------------------------------|
 | insert()                   | emplace()                    | cmap, csmap, cset, csset                    |
-| insert_or_assign(), push() | emplace_or_assign()          | cmap, csmap                                 |
+| insert_or_assign(), put()  | emplace_or_assign()          | cmap, csmap                                 |
 | push()                     | emplace()                    | cqueue, cpque, cstack                       |
 | push_back(), push()        | emplace_back()               | cdeq, clist, cvec                           |
 | push_front()               | emplace_front()              | cdeq, clist                                 |

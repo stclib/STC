@@ -109,10 +109,8 @@ STC_API _cx_iter        _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* po
                                                    const _cx_raw* p1, const _cx_raw* p2);
 STC_INLINE _cx_value*   _cx_memb(_emplace_back)(_cx_self* self, i_valraw raw)
                             { return _cx_memb(_push_back)(self, i_valfrom(raw)); }
-STC_INLINE _cx_iter
-_cx_memb(_emplace)(_cx_self* self, const size_t idx, _cx_raw val) {
-    return _cx_memb(_emplace_range_p)(self, self->data + idx, &val, &val + 1);
-}
+STC_INLINE _cx_value*   _cx_memb(_emplace)(_cx_self* self, i_valraw raw)
+                            { return _cx_memb(_push_back)(self, i_valfrom(raw)); }
 STC_INLINE _cx_iter
 _cx_memb(_emplace_n)(_cx_self* self, const size_t idx, const _cx_raw arr[], const size_t n) {
     return _cx_memb(_emplace_range_p)(self, self->data + idx, arr, arr + n);

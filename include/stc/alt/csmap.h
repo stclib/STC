@@ -148,7 +148,7 @@ int main(void) {
         } \
     \
         STC_INLINE _cx_result \
-        _cx_memb(_push)(_cx_self* self, i_key key, i_val mapped) { \
+        _cx_memb(_put)(_cx_self* self, i_key key, i_val mapped) { \
             return _cx_memb(_insert_or_assign)(self, key, mapped); \
         } \
     \

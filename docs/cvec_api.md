@@ -58,9 +58,11 @@ cvec_X_iter         cvec_X_bsearch_in(cvec_X_iter i1, cvec_X_iter i2, i_valraw r
 cvec_X_value*       cvec_X_front(const cvec_X* self);
 cvec_X_value*       cvec_X_back(const cvec_X* self);
 
-cvec_X_value*       cvec_X_emplace_back(cvec_X* self, i_valraw raw);
 cvec_X_value*       cvec_X_push_back(cvec_X* self, i_val value);
+cvec_X_value*       cvec_X_emplace_back(cvec_X* self, i_valraw raw);
 cvec_X_value*       cvec_X_push(cvec_X* self, i_val value);                                  // alias for push_back
+cvec_X_value*       cvec_X_emplace(cvec_X* self, i_valraw raw);                              // alias for emplace_back
+
 void                cvec_X_pop_back(cvec_X* self);
 void                cvec_X_pop(cvec_X* self);                                                // alias for pop_back
 
@@ -70,7 +72,6 @@ cvec_X_iter         cvec_X_insert_at(cvec_X* self, cvec_X_iter it, i_val value);
 cvec_X_iter         cvec_X_insert_range_p(cvec_X* self, i_val* pos,
                                           const i_val* p1, const i_val* p2);
 
-cvec_X_iter         cvec_X_emplace(cvec_X* self, size_t idx, i_valraw raw);
 cvec_X_iter         cvec_X_emplace_n(cvec_X* self, size_t idx, const i_valraw[] arr, size_t n);
 cvec_X_iter         cvec_X_emplace_at(cvec_X* self, cvec_X_iter it, i_valraw raw);
 cvec_X_iter         cvec_X_emplace_range(cvec_X* self, cvec_X_iter it,                       // will clone

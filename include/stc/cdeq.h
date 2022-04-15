@@ -46,7 +46,7 @@ STC_API _cx_self        _cx_memb(_with_capacity)(const size_t n);
 STC_API bool            _cx_memb(_reserve)(_cx_self* self, const size_t n);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
 STC_API void            _cx_memb(_drop)(_cx_self* self);
-STC_API _cx_value*      _cx_memb(_push)(_cx_self* self, i_val value);
+STC_API _cx_value*      _cx_memb(_push_back)(_cx_self* self, i_val value);
 STC_API void            _cx_memb(_shrink_to_fit)(_cx_self *self);
 #if !defined _i_queue
 #if !defined _i_no_clone
@@ -72,7 +72,7 @@ STC_API _cx_iter        _cx_memb(_insert_range_p)(_cx_self* self, _cx_value* pos
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 #if !defined _i_no_emplace
 STC_INLINE _cx_value*   _cx_memb(_emplace_back)(_cx_self* self, i_valraw raw)
-                            { return _cx_memb(_push)(self, i_valfrom(raw)); }
+                            { return _cx_memb(_push_back)(self, i_valfrom(raw)); }
 #endif
 STC_INLINE i_val        _cx_memb(_value_clone)(i_val val)
                             { i_valraw r = i_valto((&val)); return i_valfrom(r); }
@@ -102,9 +102,6 @@ STC_INLINE _cx_iter     _cx_memb(_advance)(_cx_iter it, intptr_t offs)
                             { it.ref += offs; return it; }
 
 #if !defined _i_queue
-
-STC_INLINE _cx_value*   _cx_memb(_push_back)(_cx_self* self, i_val value)
-                            { return _cx_memb(_push)(self, value); }
 
 STC_INLINE void         _cx_memb(_pop_back)(_cx_self* self)
                             { _cx_value* p = &self->data[--cdeq_rep_(self)->size]; i_valdrop(p); }
@@ -155,10 +152,6 @@ STC_INLINE _cx_value* _cx_memb(_emplace_front)(_cx_self* self, i_valraw raw) {
     return _cx_memb(_push_front)(self, i_valfrom(raw));
 }
 
-STC_INLINE _cx_iter
-_cx_memb(_emplace)(_cx_self* self, const size_t idx, i_valraw raw) {
-    return _cx_memb(_emplace_range_p)(self, self->data + idx, &raw, &raw + 1);
-}
 STC_INLINE _cx_iter
 _cx_memb(_emplace_n)(_cx_self* self, const size_t idx, const _cx_raw arr[], const size_t n) {
     return _cx_memb(_emplace_range_p)(self, self->data + idx, arr, arr + n);
@@ -295,8 +288,8 @@ _cx_memb(_reserve)(_cx_self* self, const size_t n) {
     return n <= sz || _cx_memb(_expand_right_half_)(self, sz, n - sz);
 }
 
-STC_DEF _cx_value* // push back
-_cx_memb(_push)(_cx_self* self, i_val value) {
+STC_DEF _cx_value*
+_cx_memb(_push_back)(_cx_self* self, i_val value) {
     struct cdeq_rep* r = cdeq_rep_(self);
     if (_cdeq_nfront(self) + r->size == r->cap) {
         _cx_memb(_expand_right_half_)(self, r->size, 1);
