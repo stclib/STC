@@ -82,7 +82,7 @@ STC_API void            _cx_memb(_drop)(_cx_self* self);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
 STC_API bool            _cx_memb(_reserve)(_cx_self* self, size_t cap);
 STC_API bool            _cx_memb(_resize)(_cx_self* self, size_t size, i_val null);
-STC_API _cx_value*      _cx_memb(_push_back)(_cx_self* self, i_val value);
+STC_API _cx_value*      _cx_memb(_push)(_cx_self* self, i_val value);
 STC_API _cx_iter        _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2);
 STC_API _cx_iter        _cx_memb(_insert_range_p)(_cx_self* self, _cx_value* pos,
                                                  const _cx_value* p1, const _cx_value* p2);
@@ -107,10 +107,10 @@ STC_INLINE void         _cx_memb(_copy)(_cx_self *self, _cx_self other) {
 #if !defined _i_no_emplace
 STC_API _cx_iter        _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos,
                                                    const _cx_raw* p1, const _cx_raw* p2);
-STC_INLINE _cx_value*   _cx_memb(_emplace_back)(_cx_self* self, i_valraw raw)
-                            { return _cx_memb(_push_back)(self, i_valfrom(raw)); }
 STC_INLINE _cx_value*   _cx_memb(_emplace)(_cx_self* self, i_valraw raw)
-                            { return _cx_memb(_push_back)(self, i_valfrom(raw)); }
+                            { return _cx_memb(_push)(self, i_valfrom(raw)); }
+STC_INLINE _cx_value*   _cx_memb(_emplace_back)(_cx_self* self, i_valraw raw)
+                            { return _cx_memb(_push)(self, i_valfrom(raw)); }
 STC_INLINE _cx_iter
 _cx_memb(_emplace_n)(_cx_self* self, const size_t idx, const _cx_raw arr[], const size_t n) {
     return _cx_memb(_emplace_range_p)(self, self->data + idx, arr, arr + n);
@@ -134,8 +134,8 @@ STC_INLINE void         _cx_memb(_swap)(_cx_self* a, _cx_self* b) { c_swap(_cx_s
 STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return self->data; }
 STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self)
                             { return self->data + cvec_rep_(self)->size - 1; }
-STC_INLINE _cx_value*   _cx_memb(_push)(_cx_self* self, i_val value)
-                            { return _cx_memb(_push_back)(self, value); }
+STC_INLINE _cx_value*   _cx_memb(_push_back)(_cx_self* self, i_val value)
+                            { return _cx_memb(_push)(self, value); }
 STC_INLINE void         _cx_memb(_pop_back)(_cx_self* self)
                             { _cx_value* p = &self->data[--cvec_rep_(self)->size]; i_valdrop(p); }
 STC_INLINE void         _cx_memb(_pop)(_cx_self* self) { _cx_memb(_pop_back)(self); }
@@ -300,7 +300,7 @@ _cx_memb(_resize)(_cx_self* self, const size_t len, i_val null) {
 }
 
 STC_DEF _cx_value*
-_cx_memb(_push_back)(_cx_self* self, i_val value) {
+_cx_memb(_push)(_cx_self* self, i_val value) {
     struct cvec_rep *r = cvec_rep_(self);
     if (r->size == r->cap) {
         _cx_memb(_reserve)(self, (r->size*3 >> 1) + 4);

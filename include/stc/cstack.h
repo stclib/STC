@@ -83,7 +83,8 @@ STC_INLINE _cx_value* _cx_memb(_top)(const _cx_self* self)
     { return &self->data[self->size - 1]; }
 
 STC_INLINE _cx_value* _cx_memb(_push)(_cx_self* self, _cx_value val) {
-    if (self->size == self->capacity) _cx_memb(_reserve)(self, self->size*3/2 + 4);
+    if (self->size == self->capacity)
+        _cx_memb(_reserve)(self, self->size*3/2 + 4);
     _cx_value* vp = self->data + self->size++; 
     *vp = val; return vp;
 }

@@ -58,13 +58,13 @@ cvec_X_iter         cvec_X_bsearch_in(cvec_X_iter i1, cvec_X_iter i2, i_valraw r
 cvec_X_value*       cvec_X_front(const cvec_X* self);
 cvec_X_value*       cvec_X_back(const cvec_X* self);
 
-cvec_X_value*       cvec_X_push_back(cvec_X* self, i_val value);
-cvec_X_value*       cvec_X_emplace_back(cvec_X* self, i_valraw raw);
-cvec_X_value*       cvec_X_push(cvec_X* self, i_val value);                                  // alias for push_back
-cvec_X_value*       cvec_X_emplace(cvec_X* self, i_valraw raw);                              // alias for emplace_back
+cvec_X_value*       cvec_X_push(cvec_X* self, i_val value);
+cvec_X_value*       cvec_X_emplace(cvec_X* self, i_valraw raw);
+cvec_X_value*       cvec_X_push_back(cvec_X* self, i_val value);                             // alias for push
+cvec_X_value*       cvec_X_emplace_back(cvec_X* self, i_valraw raw);                         // alias for emplace
 
-void                cvec_X_pop_back(cvec_X* self);
-void                cvec_X_pop(cvec_X* self);                                                // alias for pop_back
+void                cvec_X_pop(cvec_X* self);
+void                cvec_X_pop_back(cvec_X* self);                                           // alias for pop
 
 cvec_X_iter         cvec_X_insert(cvec_X* self, size_t idx, i_val value);                    // move value 
 cvec_X_iter         cvec_X_insert_n(cvec_X* self, size_t idx, const i_val[] arr, size_t n);  // move n values
@@ -117,11 +117,11 @@ int main()
     c_auto (cvec_int, vec)
     {
         // Add two integers to vector
-        cvec_int_push_back(&vec, 25);
-        cvec_int_push_back(&vec, 13);
+        cvec_int_push(&vec, 25);
+        cvec_int_push(&vec, 13);
 
         // Append a set of numbers
-        c_apply(v, cvec_int_push_back(&vec, v), int, {7, 5, 16, 8});
+        c_apply(v, cvec_int_push(&vec, v), int, {7, 5, 16, 8});
 
         printf("initial:");
         c_foreach (k, cvec_int, vec) {
@@ -152,14 +152,14 @@ sorted: 5 7 8 13 16 25
 
 int main() {
     cvec_str names = cvec_str_init();
-    cvec_str_emplace_back(&names, "Mary");
-    cvec_str_emplace_back(&names, "Joe");
+    cvec_str_emplace(&names, "Mary");
+    cvec_str_emplace(&names, "Joe");
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
 
     cstr tmp = cstr_from_fmt("%d elements so far", cvec_str_size(names));
 
-    // emplace_back() will not compile if adding a new cstr type. Use push_back():
-    cvec_str_push_back(&names, tmp); // tmp is moved to names, do not drop() it.
+    // emplace() will not compile if adding a new cstr type. Use push_back():
+    cvec_str_push(&names, tmp); // tmp is moved to names, do not drop() it.
 
     printf("%s\n", names.data[1].str); // Access the second element
 
@@ -209,8 +209,8 @@ User User_clone(User user) {
 
 int main(void) {
     cvec_u vec = cvec_u_init();
-    cvec_u_push_back(&vec, (User) {cstr_new("admin"), 0});
-    cvec_u_push_back(&vec, (User) {cstr_new("joe"), 1});
+    cvec_u_push(&vec, (User) {cstr_new("admin"), 0});
+    cvec_u_push(&vec, (User) {cstr_new("joe"), 1});
 
     cvec_u vec2 = cvec_u_clone(vec);
     c_foreach (i, cvec_u, vec2)
