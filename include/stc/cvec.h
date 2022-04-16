@@ -134,11 +134,11 @@ STC_INLINE void         _cx_memb(_swap)(_cx_self* a, _cx_self* b) { c_swap(_cx_s
 STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return self->data; }
 STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self)
                             { return self->data + cvec_rep_(self)->size - 1; }
+STC_INLINE void         _cx_memb(_pop)(_cx_self* self)
+                            { _cx_value* p = &self->data[--cvec_rep_(self)->size]; i_valdrop(p); }
 STC_INLINE _cx_value*   _cx_memb(_push_back)(_cx_self* self, i_val value)
                             { return _cx_memb(_push)(self, value); }
-STC_INLINE void         _cx_memb(_pop_back)(_cx_self* self)
-                            { _cx_value* p = &self->data[--cvec_rep_(self)->size]; i_valdrop(p); }
-STC_INLINE void         _cx_memb(_pop)(_cx_self* self) { _cx_memb(_pop_back)(self); }
+STC_INLINE void         _cx_memb(_pop_back)(_cx_self* self) { _cx_memb(_pop)(self); }
 STC_INLINE _cx_iter     _cx_memb(_begin)(const _cx_self* self)
                             { return c_make(_cx_iter){self->data}; }
 STC_INLINE _cx_iter     _cx_memb(_end)(const _cx_self* self)
@@ -195,8 +195,11 @@ _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
 
 STC_INLINE const _cx_value*
 _cx_memb(_at)(const _cx_self* self, const size_t idx) {
-    assert(idx < cvec_rep_(self)->size);
-    return self->data + idx;
+    assert(idx < cvec_rep_(self)->size); return self->data + idx;
+}
+STC_INLINE _cx_value*
+_cx_memb(_at_mut)(_cx_self* self, const size_t idx) {
+    assert(idx < cvec_rep_(self)->size); return self->data + idx;
 }
 
 #if !c_option(c_no_cmp)

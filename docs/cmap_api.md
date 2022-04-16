@@ -41,59 +41,60 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 ## Methods
 
 ```c
-cmap_X              cmap_X_init(void);
-cmap_X              cmap_X_with_capacity(size_t cap);
-cmap_X              cmap_X_clone(cmap_x map);
+cmap_X                cmap_X_init(void);
+cmap_X                cmap_X_with_capacity(size_t cap);
+cmap_X                cmap_X_clone(cmap_x map);
 
-void                cmap_X_clear(cmap_X* self);
-void                cmap_X_copy(cmap_X* self, cmap_X other);
-void                cmap_X_max_load_factor(cmap_X* self, float max_load);                     // default: 0.85
-bool                cmap_X_reserve(cmap_X* self, size_t size);
-void                cmap_X_shrink_to_fit(cmap_X* self);
-void                cmap_X_swap(cmap_X* a, cmap_X* b);
-void                cmap_X_drop(cmap_X* self);                                                // destructor
+void                  cmap_X_clear(cmap_X* self);
+void                  cmap_X_copy(cmap_X* self, cmap_X other);
+void                  cmap_X_max_load_factor(cmap_X* self, float max_load);                     // default: 0.85
+bool                  cmap_X_reserve(cmap_X* self, size_t size);
+void                  cmap_X_shrink_to_fit(cmap_X* self);
+void                  cmap_X_swap(cmap_X* a, cmap_X* b);
+void                  cmap_X_drop(cmap_X* self);                                                // destructor
 
-size_t              cmap_X_size(cmap_X map);
-size_t              cmap_X_capacity(cmap_X map);                                              // buckets * max_load_factor
-bool                cmap_X_empty(cmap_X map);
-size_t              cmap_X_bucket_count(cmap_X map);                                          // num. of allocated buckets
+size_t                cmap_X_size(cmap_X map);
+size_t                cmap_X_capacity(cmap_X map);                                              // buckets * max_load_factor
+bool                  cmap_X_empty(cmap_X map);
+size_t                cmap_X_bucket_count(cmap_X map);                                          // num. of allocated buckets
 
-const cmap_X_mapped* cmap_X_at(const cmap_X* self, i_keyraw rkey);                            // rkey must be in map.
-const cmap_X_value*  cmap_X_get(const cmap_X* self, i_keyraw rkey);                           // const get
-cmap_X_value*        cmap_X_get_mut(cmap_X* self, i_keyraw rkey);                             // mutable get
-bool                 cmap_X_contains(const cmap_X* self, i_keyraw rkey);
-cmap_X_iter          cmap_X_find(const cmap_X* self, i_keyraw rkey);                          // find element
+const cmap_X_mapped*  cmap_X_at(const cmap_X* self, i_keyraw rkey);                             // rkey must be in map
+cmap_X_mapped*        cmap_X_at_mut(cmap_X* self, i_keyraw rkey);                               // mutable at
+const cmap_X_value*   cmap_X_get(const cmap_X* self, i_keyraw rkey);                            // const get
+cmap_X_value*         cmap_X_get_mut(cmap_X* self, i_keyraw rkey);                              // mutable get
+bool                  cmap_X_contains(const cmap_X* self, i_keyraw rkey);
+cmap_X_iter           cmap_X_find(const cmap_X* self, i_keyraw rkey);                           // find element
 
-cmap_X_result       cmap_X_insert(cmap_X* self, i_key key, i_val mapped);                     // no change if key in map
-cmap_X_result       cmap_X_insert_or_assign(cmap_X* self, i_key key, i_val mapped);           // always update mapped
-cmap_X_result       cmap_X_put(cmap_X* self, i_key key, i_val mapped);                        // alias for insert_or_assign
+cmap_X_result         cmap_X_insert(cmap_X* self, i_key key, i_val mapped);                     // no change if key in map
+cmap_X_result         cmap_X_insert_or_assign(cmap_X* self, i_key key, i_val mapped);           // always update mapped
+cmap_X_result         cmap_X_put(cmap_X* self, i_key key, i_val mapped);                        // alias for insert_or_assign
 
-cmap_X_result       cmap_X_emplace(cmap_X* self, i_keyraw rkey, i_valraw rmapped);            // no change if rkey in map
-cmap_X_result       cmap_X_emplace_or_assign(cmap_X* self, i_keyraw rkey, i_valraw rmapped);  // always update rmapped
+cmap_X_result         cmap_X_emplace(cmap_X* self, i_keyraw rkey, i_valraw rmapped);            // no change if rkey in map
+cmap_X_result         cmap_X_emplace_or_assign(cmap_X* self, i_keyraw rkey, i_valraw rmapped);  // always update rmapped
 
-size_t              cmap_X_erase(cmap_X* self, i_keyraw rkey);                                // return 0 or 1
-cmap_X_iter         cmap_X_erase_at(cmap_X* self, cmap_X_iter it);                            // return iter after it
-void                cmap_X_erase_entry(cmap_X* self, cmap_X_value* entry);
+size_t                cmap_X_erase(cmap_X* self, i_keyraw rkey);                                // return 0 or 1
+cmap_X_iter           cmap_X_erase_at(cmap_X* self, cmap_X_iter it);                            // return iter after it
+void                  cmap_X_erase_entry(cmap_X* self, cmap_X_value* entry);
 
-cmap_X_iter         cmap_X_begin(const cmap_X* self);
-cmap_X_iter         cmap_X_end(const cmap_X* self);
-void                cmap_X_next(cmap_X_iter* it);
+cmap_X_iter           cmap_X_begin(const cmap_X* self);
+cmap_X_iter           cmap_X_end(const cmap_X* self);
+void                  cmap_X_next(cmap_X_iter* it);
 
-cmap_X_value        cmap_X_value_clone(cmap_X_value val);
-cmap_X_raw          cmap_X_value_toraw(cmap_X_value* pval);
+cmap_X_value          cmap_X_value_clone(cmap_X_value val);
+cmap_X_raw            cmap_X_value_toraw(cmap_X_value* pval);
 ```
 Helpers:
 ```c
-uint64_t            c_strhash(const char *str);                              // utility function
+uint64_t              c_strhash(const char *str);                              // utility function
 
 // hash template parameter functions:
-uint64_t            c_default_hash(const void *data, size_t len);            // key is any integral type
-uint64_t            c_hash32(const void* data, size_t is4);                  // key is one 32-bit int
-uint64_t            c_hash64(const void* data, size_t is8);                  // key is one 64-bit int
+uint64_t              c_default_hash(const void *data, size_t len);            // key is any integral type
+uint64_t              c_hash32(const void* data, size_t is4);                  // key is one 32-bit int
+uint64_t              c_hash64(const void* data, size_t is8);                  // key is one 64-bit int
 
 // equalto template parameter functions:
-bool                c_default_eq(const i_keyraw* a, const i_keyraw* b);      // *a == *b
-bool                c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);       // !memcmp(a, b, sizeof *a)
+bool                  c_default_eq(const i_keyraw* a, const i_keyraw* b);      // *a == *b
+bool                  c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);       // !memcmp(a, b, sizeof *a)
 ```
 
 ## Types

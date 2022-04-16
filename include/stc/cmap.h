@@ -110,10 +110,12 @@ STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, i_keyraw rkey)
                             { return self->size && self->_hashx[_cx_memb(_bucket_)(self, &rkey).idx]; }
 
 #ifndef _i_isset
+    STC_API _cx_result  _cx_memb(_insert_or_assign)(_cx_self* self, i_key _key, i_val _mapped);
     #if !defined _i_no_clone && !defined _i_no_emplace
     STC_API _cx_result  _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped);
+    STC_INLINE _cx_result  _cx_memb(_put_r)(_cx_self* self, i_keyraw rkey, i_valraw rmapped)
+        { return _cx_memb(_emplace_or_assign)(self, rkey, rmapped); }
     #endif
-    STC_API _cx_result  _cx_memb(_insert_or_assign)(_cx_self* self, i_key _key, i_val _mapped);
 
     STC_INLINE _cx_result
     _cx_memb(_put)(_cx_self* self, i_key _key, i_val _mapped)
@@ -125,6 +127,9 @@ STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, i_keyraw rkey)
         assert(self->_hashx[b.idx]);
         return &self->table[b.idx].second;
     }
+    STC_INLINE _cx_mapped*
+    _cx_memb(_at_mut)(_cx_self* self, i_keyraw rkey)
+        { return (_cx_mapped*)_cx_memb(_at)(self, rkey); }
 #endif // !_i_isset
 
 #if !defined _i_no_clone

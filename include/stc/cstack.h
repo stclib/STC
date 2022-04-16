@@ -98,6 +98,8 @@ STC_INLINE void _cx_memb(_pop_back)(_cx_self* self)
 
 STC_INLINE const _cx_value* _cx_memb(_at)(const _cx_self* self, size_t idx)
     { assert(idx < self->size); return self->data + idx; }
+STC_INLINE _cx_value* _cx_memb(_at_mut)(_cx_self* self, size_t idx)
+    { assert(idx < self->size); return self->data + idx; }
 
 #if !defined _i_no_clone
 #if !defined _i_no_emplace
