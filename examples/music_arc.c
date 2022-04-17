@@ -13,7 +13,7 @@ Song Song_new(const char* artist, const char* title)
     { return (Song){cstr_from(artist), cstr_from(title)}; }
 
 void Song_drop(Song* s) {
-    printf("drop: %s\n", s->title.str);
+    printf("drop: %s\n", cstr_str(&s->title));
     c_drop(cstr, &s->artist, &s->title);
 }
 
@@ -47,8 +47,9 @@ void example3()
         });
 
         c_foreach (s, SongVec, vec2)
-            printf("%s - %s: refs %lu\n", s.ref->get->artist.str, s.ref->get->title.str,
-                                         *s.ref->use_count);
+            printf("%s - %s: refs %lu\n", cstr_str(&s.ref->get->artist),
+                                          cstr_str(&s.ref->get->title),
+                                          *s.ref->use_count);
     }
 }
 

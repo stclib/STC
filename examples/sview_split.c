@@ -15,6 +15,6 @@ int  main()
 
     c_auto (cstr, y, m, d) {
         y = cstr_from_sv(year), m = cstr_from_sv(month), d = cstr_from_sv(day);
-        printf("%s, %s, %s\n", y.str, m.str, d.str);
+        printf("%s, %s, %s\n", cstr_str(&y), cstr_str(&m), cstr_str(&d));
     }
 }

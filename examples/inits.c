@@ -60,7 +60,7 @@ int main(void)
         cmap_id_insert(&idnames, 120, cstr_from_fmt("Howdy, -%d-", year));
 
         c_foreach (i, cmap_id, idnames)
-            printf("%d: %s\n", i.ref->first, i.ref->second.str);
+            printf("%d: %s\n", i.ref->first, cstr_str(&i.ref->second));
         puts("");
     }
 
@@ -83,7 +83,7 @@ int main(void)
         cmap_cnt_emplace(&countries, "Finland", 0).ref->second += 20;
 
         c_forpair (country, health, cmap_cnt, countries)
-            printf("%s: %d\n", _.country.str, _.health);
+            printf("%s: %d\n", cstr_str(&_.country), _.health);
         puts("");
     }
 

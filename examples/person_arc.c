@@ -8,8 +8,8 @@ Person Person_new(const char* name, const char* last) {
 }
 
 int Person_cmp(const Person* a, const Person* b) {
-    int c = strcmp(a->name.str, b->name.str);
-    return c ? c : strcmp(a->last.str, b->last.str);
+    int c = cstr_cmp(&a->name, &b->name);
+    return c ? c : cstr_cmp(&a->last, &b->last);
 }
 
 Person Person_clone(Person p) {
@@ -19,7 +19,7 @@ Person Person_clone(Person p) {
 }
 
 void Person_drop(Person* p) {
-    printf("drop: %s %s\n", p->name.str, p->last.str);
+    printf("drop: %s %s\n", cstr_str(&p->name), cstr_str(&p->last));
     c_drop(cstr, &p->name, &p->last);
 }
 
@@ -43,8 +43,8 @@ int main()
         q = PSPtr_from(Person_clone(*p.get));
         cstr_assign(&q.get->name, "Leland");
 
-        printf("orig: %s %s\n", p.get->name.str, p.get->last.str);
-        printf("copy: %s %s\n", q.get->name.str, q.get->last.str);
+        printf("orig: %s %s\n", cstr_str(&p.get->name), cstr_str(&p.get->last));
+        printf("copy: %s %s\n", cstr_str(&q.get->name), cstr_str(&q.get->last));
 
         Persons_push_back(&vec, PSPtr_from(Person_new("Dale", "Cooper")));
         Persons_push_back(&vec, PSPtr_from(Person_new("Audrey", "Home")));
@@ -53,13 +53,13 @@ int main()
         c_apply(v, Persons_push_back(&vec, PSPtr_clone(v)), PSPtr, {p, q});
 
         c_foreach (i, Persons, vec)
-            printf("%s %s\n", i.ref->get->name.str, i.ref->get->last.str);
+            printf("%s %s\n", cstr_str(&i.ref->get->name), cstr_str(&i.ref->get->last));
         puts("");
 
         // Look-up Audrey!
         c_autovar (Person a = Person_new("Audrey", "Home"), Person_drop(&a)) {
             const PSPtr *v = Persons_get(&vec, a);
-            if (v) printf("found: %s %s\n", v->get->name.str, v->get->last.str);
+            if (v) printf("found: %s %s\n", cstr_str(&v->get->name), cstr_str(&v->get->last));
         }
 
         puts("");

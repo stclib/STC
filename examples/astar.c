@@ -105,7 +105,7 @@ astar(cstr* maze, int width)
                 point delta = deltas[i];
                 point next = point_init(current.x + delta.x, current.y + delta.y, width);
                 int new_cost = *csmap_pcost_at(&costs, current);
-                if (maze->str[point_index(&next)] != '#')
+                if (cstr_str(maze)[point_index(&next)] != '#')
                 {
                     const csmap_pcost_value *cost = csmap_pcost_get(&costs, next);
                     if (cost == NULL || new_cost < cost->second)
@@ -160,8 +160,8 @@ main(void)
         int width = cstr_find(maze, "\n") + 1;
         c_autovar (cdeq_point path = astar(&maze, width), cdeq_point_drop(&path))
         {
-            c_foreach (it, cdeq_point, path) maze.str[point_index(it.ref)] = 'x';
-            printf("%s", maze.str);
+            c_foreach (it, cdeq_point, path) cstr_data(&maze)[point_index(it.ref)] = 'x';
+            printf("%s", cstr_str(&maze));
         }
     }
 }

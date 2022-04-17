@@ -23,26 +23,26 @@ int main()
         });
         puts("MAP:");
         c_foreach (i, cmap_str, map)
-            printf("  %s: %s\n", i.ref->first.str, i.ref->second.str);
+            printf("  %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
 
         puts("\nCLONE MAP:");
         mclone = cmap_str_clone(map);
         c_foreach (i, cmap_str, mclone)
-            printf("  %s: %s\n", i.ref->first.str, i.ref->second.str);
+            printf("  %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
 
         puts("\nCOPY MAP TO VECS:");
         c_foreach (i, cmap_str, mclone) {
-            cvec_str_emplace_back(&keys, i.ref->first.str);
-            cvec_str_emplace_back(&values, i.ref->second.str);
+            cvec_str_emplace_back(&keys, cstr_str(&i.ref->first));
+            cvec_str_emplace_back(&values, cstr_str(&i.ref->second));
         }
         c_forrange (i, cvec_str_size(keys))
-            printf("  %s: %s\n", keys.data[i].str, values.data[i].str);
+            printf("  %s: %s\n", cstr_str(keys.data + i), cstr_str(values.data + i));
 
         puts("\nCOPY VEC TO LIST:");
         c_foreach (i, cvec_str, keys)
-            clist_str_emplace_back(&list, i.ref->str);
+            clist_str_emplace_back(&list, cstr_str(i.ref));
 
         c_foreach (i, clist_str, list)
-            printf("  %s\n", i.ref->str);
+            printf("  %s\n", cstr_str(i.ref));
     }
 }

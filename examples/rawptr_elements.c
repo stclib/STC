@@ -57,6 +57,6 @@ int main()
         cmap_str_emplace(&map, "goodbye", 400);
 
         c_forpair (name, number, cmap_str, map)
-            printf("%s: %" PRIdMAX "\n", _.name.str, *_.number);
+            printf("%s: %" PRIdMAX "\n", cstr_str(&_.name), *_.number);
     }
 }

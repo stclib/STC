@@ -3,7 +3,7 @@
 #define i_type Map
 #define i_key_str // strings
 #define i_val int
-#define i_keydrop(p) (printf("drop name: %s\n", (p)->str), cstr_drop(p))
+#define i_keydrop(p) (printf("drop name: %s\n", cstr_str(p)), cstr_drop(p))
 #include <stc/csmap.h>
 
 #define i_type Arc // (atomic) ref. counted type
@@ -62,13 +62,13 @@ int main()
         puts("STACKS");
         c_foreach (i, Stack, stack) {
             c_forpair (name, year, Map, *i.ref->get)
-                printf(" %s:%d", _.name.str, _.year);
+                printf(" %s:%d", cstr_str(&_.name), _.year);
             puts("");
         }
         puts("LIST");
         c_foreach (i, List, list) {
             c_forpair (name, year, Map, *i.ref->get)
-                printf(" %s:%d", _.name.str, _.year);
+                printf(" %s:%d", cstr_str(&_.name), _.year);
             puts("");
         }
     }

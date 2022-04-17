@@ -198,6 +198,7 @@ static void ins_and_access_s(picobench::state& s)
 static void ins_and_access_cmap_s(picobench::state& s)
 {
     cstr str = cstr_with_size(s.arg(), 'x');
+    char* buf = cstr_data(&str);
     size_t result = 0;
     cmap_str map = cmap_str_init();
     cmap_str_max_load_factor(&map, (int)MaxLoadFactor100 / 100.0);
@@ -205,12 +206,12 @@ static void ins_and_access_cmap_s(picobench::state& s)
 
     picobench::scope scope(s);
     c_forrange (s.iterations()) {
-        randomize(str.str, cstr_size(str));
-        //if (cstr_size(str) > 30) { printf("%s\n", str.str); exit(0); }
-        cmap_str_emplace(&map, str.str, str.str);
+        randomize(buf, s.arg());
+        //if (s.arg() > 30) { printf("%s\n", buf); exit(0); }
+        cmap_str_emplace(&map, buf, buf);
 
-        randomize(str.str, cstr_size(str));
-        result += cmap_str_erase(&map, str.str);
+        randomize(buf, s.arg());
+        result += cmap_str_erase(&map, buf);
     }
     s.set_result(result + cmap_str_size(map));
     cstr_drop(&str);

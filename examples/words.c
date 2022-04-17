@@ -19,12 +19,12 @@ int main1()
         });
 
         c_foreach (w, cvec_str, words) {
-            cmap_str_emplace(&word_map, w.ref->str, 0).ref->second += 1;
+            cmap_str_emplace(&word_map, cstr_str(w.ref), 0).ref->second += 1;
         }
 
         c_foreach (i, cmap_str, word_map) {
             printf("%d occurrences of word '%s'\n",
-                   i.ref->second, i.ref->first.str);
+                   i.ref->second, cstr_str(&i.ref->first));
         }
     }
     return 0;

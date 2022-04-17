@@ -10,7 +10,7 @@ Person Person_clone(Person p) {
     return p;
 }
 void Person_drop(Person* p) {
-    printf("drop: %s %s\n", p->name.str, p->last.str);
+    printf("drop: %s %s\n", cstr_str(&p->name), cstr_str(&p->last));
     c_drop(cstr, &p->name, &p->last);
 }
 
@@ -37,7 +37,7 @@ int main(void) {
         q = carc_person_clone(p);
         r = carc_person_clone(p);
         s = carc_person_from(Person_clone(*p.get)); // deep copy
-        printf("%s %s. uses: %lu\n", r.get->name.str, s.get->last.str, *p.use_count);
+        printf("%s %s. uses: %lu\n", cstr_str(&r.get->name), cstr_str(&s.get->last), *p.use_count);
     }
 
     c_auto (cstack_iptr, stk) {

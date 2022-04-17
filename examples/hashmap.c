@@ -26,14 +26,14 @@ int main(void) {
 
         const cmap_str_value* v;
         if ((v = cmap_str_get(&contacts, "Daniel")))
-            printf("Calling Daniel: %s\n", call(v->second.str));
+            printf("Calling Daniel: %s\n", call(cstr_str(&v->second)));
         else
             printf("Don't have Daniel's number.");
 
         cmap_str_emplace(&contacts, "Daniel", "164-6743");
 
         if ((v = cmap_str_get(&contacts, "Ashley")))
-            printf("Calling Ashley: %s\n", call(v->second.str));
+            printf("Calling Ashley: %s\n", call(cstr_str(&v->second)));
         else
             printf("Don't have Ashley's number.");
 
@@ -41,7 +41,7 @@ int main(void) {
 
         puts("");
         c_forpair (contact, number, cmap_str, contacts) {
-            printf("Calling %s: %s\n", _.contact.str, call(_.number.str));
+            printf("Calling %s: %s\n", cstr_str(&_.contact), call(cstr_str(&_.number)));
         }
         puts("");
     }

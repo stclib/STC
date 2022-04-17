@@ -27,7 +27,7 @@ void print_ii(csmap_ii map) {
 
 void print_istr(csmap_istr map) {
     c_foreach (e, csmap_istr, map)
-        printf("(%d, %s) ", e.ref->first, e.ref->second.str);
+        printf("(%d, %s) ", e.ref->first, cstr_str(&e.ref->second));
     puts("");
 }
 

@@ -223,23 +223,24 @@ static void ins_and_access_s(picobench::state& s)
 static void ins_and_access_csmap_s(picobench::state& s)
 {
     cstr str = cstr_with_size(s.arg(), 'x');
+    char* buf = cstr_data(&str);
     size_t result = 0;
     csmap_str map = csmap_str_init();
 
     picobench::scope scope(s);
     stc64_srandom(seed);
     c_forrange (s.iterations()) {
-        randomize(str.str, cstr_size(str));
-        csmap_str_emplace(&map, str.str, str.str);
+        randomize(buf, s.arg());
+        csmap_str_emplace(&map, buf, buf);
     }
     stc64_srandom(seed);
     c_forrange (s.iterations()) {
-        randomize(str.str, cstr_size(str));
-        result += csmap_str_erase(&map, str.str);
-        /*csmap_str_iter it = csmap_str_find(&map, str.str);
+        randomize(buf, s.arg());
+        result += csmap_str_erase(&map, buf);
+        /*csmap_str_iter it = csmap_str_find(&map, buf);
         if (it.ref) {
             ++result;
-            csmap_str_erase(&map, it.ref->first.str);
+            csmap_str_erase(&map, cstr_str(&it.ref->first));
         }*/
     }
     s.set_result(result + csmap_str_size(map));

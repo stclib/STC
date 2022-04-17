@@ -34,7 +34,7 @@
 void print_phone_book(cmap_str phone_book)
 {
     c_foreach (i, cmap_str, phone_book)
-        printf("%s\t- %s\n", i.ref->first.str, i.ref->second.str);
+        printf("%s\t- %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
 }
 
 int main(int argc, char **argv)
@@ -42,7 +42,7 @@ int main(int argc, char **argv)
     c_auto (cset_str, names) {
         c_apply(v, cset_str_emplace(&names, v), const char*, 
             {"Hello", "Cool", "True"});
-        c_foreach (i, cset_str, names) printf("%s ", i.ref->str);
+        c_foreach (i, cset_str, names) printf("%s ", cstr_str(i.ref));
         puts("");
     }
 

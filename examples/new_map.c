@@ -66,6 +66,6 @@ int main()
             "So long, friend",
         });
         c_foreach (i, cset_str, sset)
-            printf(" %s\n", i.ref->str);
+            printf(" %s\n", cstr_str(i.ref));
     }
 }

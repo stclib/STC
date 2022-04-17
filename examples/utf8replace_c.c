@@ -5,14 +5,14 @@
 int main() {
     c_auto (cstr, hello) {
         hello = cstr_new("hell😀 world");
-        printf("%s\n", hello.str);
+        printf("%s\n", cstr_str(&hello));
 
         cstr_replace_sv(
             &hello, 
-            utf8_substr(hello.str, 4, 1), 
+            utf8_substr(cstr_str(&hello), 4, 1), 
             c_sv("🐨")
         );
-        printf("%s\n", hello.str);
+        printf("%s\n", cstr_str(&hello));
 
         csview sv = csview_from_s(&hello);
         c_foreach (c, csview, sv)

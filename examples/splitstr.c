@@ -32,5 +32,5 @@ int main()
 
     c_autovar (cvec_str v = string_split(c_sv("Split,this,,string,now,"), c_sv(",")), cvec_str_drop(&v))
         c_foreach (i, cvec_str, v)
-            printf("[%s]\n", i.ref->str);
+            printf("[%s]\n", cstr_str(i.ref));
 }

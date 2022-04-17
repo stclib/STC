@@ -17,7 +17,7 @@ void print(const char* lbl, const Multimap mmap)
     printf("%s ", lbl);
     c_foreach (e, Multimap, mmap) {
         c_foreach (s, clist_str, e.ref->second)
-            printf("{%d,%s} ", e.ref->first, s.ref->str);
+            printf("{%d,%s} ", e.ref->first, cstr_str(s.ref));
     }
     puts("");
 }

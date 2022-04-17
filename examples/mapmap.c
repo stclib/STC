@@ -3,7 +3,7 @@
 #define i_type People
 #define i_key_str
 #define i_val_str
-#define i_keydrop(p) (printf("kdrop: %s\n", p->str), cstr_drop(p))
+#define i_keydrop(p) (printf("kdrop: %s\n", cstr_str(p)), cstr_drop(p))
 #include <stc/csmap.h>
 
 #define i_type Departments
@@ -55,7 +55,7 @@ int main(void)
 
         c_foreach (i, Departments, map)
             c_forpair (name, email, People, i.ref->second)
-                printf("%s: %s - %s\n", i.ref->first.str, _.name.str, _.email.str);
+                printf("%s: %s - %s\n", cstr_str(&i.ref->first), cstr_str(&_.name), cstr_str(&_.email));
         puts("");
 
         printf("found: %d\n", contains(&map, "Nick Denton"));

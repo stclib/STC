@@ -56,6 +56,6 @@ int main()
         cstr_assign(&text2d.data[4][0], "world");
 
         c_foreach (i, carr2_str, text2d)
-            printf("line: %s\n", i.ref->str);
+            printf("line: %s\n", cstr_str(i.ref));
     }
 }

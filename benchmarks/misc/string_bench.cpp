@@ -19,7 +19,7 @@ std::vector<std::string> read_file(const char* name)
     c_auto (cstr, line)
     c_autovar (FILE* f = fopen(name, "r"), fclose(f))
         while (cstr_getline(&line, f))
-            data.emplace_back(line.str);
+            data.emplace_back(cstr_str(&line));
     return data;
 }
 

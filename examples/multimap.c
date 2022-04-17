@@ -70,7 +70,7 @@ int main()
     {
         const clist_OL empty = clist_OL_init();
 
-        for (int i = 0; i < c_arraylen(ol_data); ++i)
+        for (size_t i = 0; i < c_arraylen(ol_data); ++i)
         {
             struct OlympicsData* d = &ol_data[i];
             OlympicLocation loc = {.year = d->year,
@@ -90,9 +90,10 @@ int main()
         {
             // Loop the locations for a country sorted by year
             c_foreach (loc, clist_OL, country.ref->second)
-                printf("%s: %d, %s, %s\n", country.ref->first.str, loc.ref->year,
-                                                                   loc.ref->city.str,
-                                                                   loc.ref->date.str);
+                printf("%s: %d, %s, %s\n", cstr_str(&country.ref->first),
+                                                     loc.ref->year,
+                                           cstr_str(&loc.ref->city),
+                                           cstr_str(&loc.ref->date));
         }
     }
 }

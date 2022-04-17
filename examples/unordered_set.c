@@ -36,6 +36,6 @@ int main()
         // content
         printf("All elements :\n");
         c_foreach (itr, cset_str, stringSet)
-            printf("%s\n", itr.ref->str);
+            printf("%s\n", cstr_str(itr.ref));
     }
 }

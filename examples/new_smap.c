@@ -64,7 +64,7 @@ int main()
             {"This is the time", "for all good things"},
         });
         c_forpair (i, j, SMap, smap)
-            printf(" (%s: %s)\n", _.i.str, _.j.str);
+            printf(" (%s: %s)\n", cstr_str(&_.i), cstr_str(&_.j));
     }
 
     c_auto (SSet, sset) {

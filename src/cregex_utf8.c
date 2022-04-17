@@ -63,7 +63,7 @@ static uint8_t cfold_low[] = {
 };
 
 uint32_t utf8_tolower(uint32_t c) {
-    for (int i=0; i < sizeof casefold/sizeof *casefold; ++i) {
+    for (size_t i=0; i < sizeof casefold/sizeof *casefold; ++i) {
         if (c <= casefold[i].c1) {
             if (c < casefold[i].c0) return c;
             int d = casefold[i].m1 - casefold[i].c1;
@@ -75,11 +75,11 @@ uint32_t utf8_tolower(uint32_t c) {
 }
 
 uint32_t utf8_toupper(uint32_t c) {
-    for (int i=0; i < sizeof cfold_low/sizeof *cfold_low; ++i) {
+    for (size_t i=0; i < sizeof cfold_low/sizeof *cfold_low; ++i) {
         struct CaseFold cfold = casefold[cfold_low[i]];
         if (c <= cfold.m1) {
             int d = cfold.m1 - cfold.c1;
-            if (c < cfold.c0 + d) return c;
+            if (c < (uint32_t)(cfold.c0 + d)) return c;
             if (d == 1) return c - ((cfold.m1 & 1) == (c & 1));
             return c - d;
         }
@@ -98,7 +98,7 @@ bool utf8_islower(uint32_t c) {
 bool utf8_isspace(uint32_t c) {
     static uint16_t t[] = {0x20, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x85, 0xA0,
                            0x1680, 0x2028, 0x2029, 0x202F, 0x205F, 0x3000};
-    for (int i=0; i<sizeof t/sizeof *t; ++i)
+    for (size_t i=0; i<sizeof t/sizeof *t; ++i)
         if (c == t[i]) return true;
     return (c >= 0x2000) & (c <= 0x200A);
 }
@@ -111,7 +111,7 @@ bool utf8_isdigit(uint32_t c) {
 bool utf8_isxdigit(uint32_t c) {
     static uint16_t t[] = {0x30, 0x39, 0x41, 0x46, 0x61, 0x66, 0xFF10, 
                            0xFF19, 0xFF21, 0xFF26, 0xFF41, 0xFF46};
-    for (int i=1; i<sizeof t/sizeof *t; i += 2)
+    for (size_t i=1; i<sizeof t/sizeof *t; i += 2)
         if (c <= t[i]) return c >= t[i - 1];
     return false;
 }
@@ -131,7 +131,7 @@ bool utf8_isalpha(uint32_t c) {
 #ifdef TEST
 int main()
 {
-    for (int i=0; i < sizeof cfold_low/sizeof *cfold_low; ++i)
+    for (size_t i=0; i < sizeof cfold_low/sizeof *cfold_low; ++i)
     {
         char x[3][5]={0};
         uint32_t a = casefold[i].c0;
