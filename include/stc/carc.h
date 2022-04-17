@@ -30,7 +30,7 @@ Person Person_new(const char* name, const char* last) {
     return (Person){.name = cstr_from(name), .last = cstr_from(last)};
 }
 void Person_drop(Person* p) {
-    printf("drop: %s %s\n", p->name.str, p->last.str);
+    printf("drop: %s %s\n", cstr_str(&p->name), cstr_str(&p->last));
     c_drop(cstr, &p->name, &p->last);
 }
 
@@ -43,7 +43,7 @@ int main() {
     carc_person p = carc_person_from(Person_new("John", "Smiths"));
     carc_person q = carc_person_clone(p); // share the pointer
 
-    printf("%s %s. uses: %" PRIuMAX "\n", q.get->name.str, q.get->last.str, *q.use_count);
+    printf("%s %s. uses: %" PRIuMAX "\n", cstr_str(&q.get->name), cstr_str(&q.get->last), *q.use_count);
     c_drop(carc_person, &p, &q);
 }
 */

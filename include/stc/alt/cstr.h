@@ -37,6 +37,12 @@
 
 /**************************** PRIVATE API **********************************/
 
+#if defined __GNUC__ && !defined __clang__
+#  pragma GCC diagnostic push
+#  pragma GCC diagnostic ignored "-Warray-bounds"
+#  pragma GCC diagnostic ignored "-Wstringop-overflow="
+#endif
+
 enum  { cstr_s_cap =            sizeof(cstr_rep_t) - 1 };
 #define cstr_s_size(s)          ((size_t)(cstr_s_cap - (s)->sml.last))
 #define cstr_s_set_size(s, len) ((s)->sml.last = cstr_s_cap - (len), (s)->sml.data[len] = 0)
@@ -68,16 +74,17 @@ STC_API char* _cstr_internal_move(cstr* self, size_t pos1, size_t pos2);
 #define cstr_null (c_make(cstr){.sml = {.last = cstr_s_cap}})
 #define cstr_toraw(self) cstr_str(self)
 
-STC_API char* cstr_reserve(cstr* self, size_t cap);
-STC_API void cstr_shrink_to_fit(cstr* self);
-STC_API void cstr_resize(cstr* self, size_t size, char value);
-STC_API size_t cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax);
-STC_API cstr* cstr_assign_n(cstr* self, const char* str, size_t n);
-STC_API cstr* cstr_append_n(cstr* self, const char* str, size_t n);
-STC_API bool cstr_getdelim(cstr *self, int delim, FILE *fp);
-STC_API void cstr_erase_n(cstr* self, size_t pos, size_t n);
-STC_API cstr cstr_from_fmt(const char* fmt, ...);
-STC_API int  cstr_printf(cstr* self, const char* fmt, ...);
+STC_API char*   cstr_reserve(cstr* self, size_t cap);
+STC_API void    cstr_shrink_to_fit(cstr* self);
+STC_API void    cstr_resize(cstr* self, size_t size, char value);
+STC_API size_t  cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax);
+STC_API cstr*   cstr_assign_n(cstr* self, const char* str, size_t n);
+STC_API cstr*   cstr_append_n(cstr* self, const char* str, size_t n);
+STC_API bool    cstr_getdelim(cstr *self, int delim, FILE *fp);
+STC_API void    cstr_erase_n(cstr* self, size_t pos, size_t n);
+STC_API cstr    cstr_from_fmt(const char* fmt, ...);
+STC_API int     cstr_printf(cstr* self, const char* fmt, ...);
+STC_API void    cstr_replace_all(cstr* self, const char* find, const char* repl);
 
 STC_INLINE cstr_rep_t cstr_rep(cstr* s) {
     return cstr_is_long(s)
@@ -367,6 +374,30 @@ STC_DEF bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
     }
 }
 
+STC_DEF cstr
+cstr_from_replace_all(const char* str, const size_t str_len,
+                      const char* find, const size_t find_len,
+                      const char* repl, const size_t repl_len) {
+    cstr out = cstr_null;
+    size_t from = 0; char* res;
+    if (find_len)
+        while ((res = c_strnstrn(str + from, find, str_len - from, find_len))) {
+            const size_t pos = res - str;
+            cstr_append_n(&out, str + from, pos - from);
+            cstr_append_n(&out, repl, repl_len);
+            from = pos + find_len;
+        }
+    cstr_append_n(&out, str + from, str_len - from);
+    return out;
+}
+
+STC_DEF void
+cstr_replace_all(cstr* self, const char* find, const char* repl) {
+    cstr_rep_t r = cstr_rep(self);
+    cstr_take(self, cstr_from_replace_all(r.data, r.size, find, strlen(find),
+                                                          repl, strlen(repl)));
+}
+
 STC_DEF void cstr_erase_n(cstr* self, const size_t pos, size_t n) {
     cstr_rep_t r = cstr_rep(self);
     if (n > r.size - pos) n = r.size - pos;
@@ -415,6 +446,9 @@ STC_DEF int cstr_printf(cstr* self, const char* fmt, ...) {
     return n;
 }
 
+#endif // _i_implement
+#if defined __GNUC__ && !defined __clang__
+#  pragma GCC diagnostic pop
 #endif
-#endif
+#endif // CSTR_H_INCLUDED
 #undef i_opt

@@ -9,9 +9,9 @@ int main()
 {
     c_auto (cstr, s1) {
         s1 = cstr_new("hell😀 w😀rld");
-        printf("%s\n", s1.str);
-        cstr_replace_sv(&s1, utf8_substr(s1.str, 7, 1), c_sv("🐨"));
-        printf("%s\n", s1.str);
+        printf("%s\n", cstr_str(&s1));
+        cstr_replace_sv(&s1, utf8_substr(cstr_str(&s1), 7, 1), c_sv("🐨"));
+        printf("%s\n", cstr_str(&s1));
 
         csview sv = csview_from_s(s1);
         c_foreach (i, csview, sv)

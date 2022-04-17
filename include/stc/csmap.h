@@ -44,7 +44,7 @@ int main(void) {
         csmap_sx_erase(&m, "Testing two");
 
         c_foreach (i, csmap_sx, m)
-            printf("map %s: %g\n", i.ref->first.str, i.ref->second);
+            printf("map %s: %g\n", cstr_str(&i.ref->first), i.ref->second);
     }
 }
 */

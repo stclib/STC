@@ -65,6 +65,7 @@ STC_API void            cstr_erase_n(cstr* self, size_t pos, size_t n);
 STC_API size_t          cstr_find(cstr s, const char* needle);
 STC_API size_t          cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax);
 STC_API bool            cstr_getdelim(cstr *self, int delim, FILE *stream);
+STC_API void            cstr_replace_all(cstr* self, const char* find, const char* repl);
 
 STC_INLINE cstr         cstr_init() { return cstr_null; }
 #define                 cstr_toraw(self) (self)->str
@@ -176,8 +177,8 @@ STC_INLINE int c_strncasecmp(const char* s1, const char* s2, size_t nmax) {
 #if defined(_i_implement)
 
 #ifndef _i_static
-static struct cstr_priv _cstr_nullrep = {0, 0, {0}};
-const cstr cstr_null = {_cstr_nullrep.str};
+static cstr_priv _cstr_nullrep = {0, 0, {0}};
+const cstr cstr_null = {_cstr_nullrep.chr};
 #endif
 
 STC_DEF char*
@@ -373,3 +374,4 @@ cstr_find_n(cstr s, const char* needle, const size_t pos, const size_t nmax) {
 #endif
 #endif
 #endif
+#undef i_opt

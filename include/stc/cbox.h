@@ -35,7 +35,7 @@ Person Person_clone(Person p) {
     return p;
 }
 void Person_drop(Person* p) {
-    printf("drop: %s %s\n", p->name.str, p->email.str);
+    printf("drop: %s %s\n", cstr_str(&p->name), cstr_str(&p->email));
     c_drop(cstr, &p->name, &p->email);
 }
 
@@ -51,8 +51,8 @@ int main() {
         q = PBox_clone(p);
         cstr_assign(&q.get->name, "Joe Smiths");
 
-        printf("%s %s.\n", p.get->name.str, p.get->email.str);
-        printf("%s %s.\n", q.get->name.str, q.get->email.str);
+        printf("%s %s.\n", cstr_str(&p.get->name), cstr_str(&p.get->email));
+        printf("%s %s.\n", cstr_str(&q.get->name), cstr_str(&q.get->email));
     }
 }
 */

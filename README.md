@@ -320,7 +320,7 @@ can easier lead to mistakes.
 | non-emplace: Move          | emplace: Embedded copy       | Container                                   |
 |:---------------------------|:-----------------------------|:--------------------------------------------|
 | insert()                   | emplace()                    | cmap, csmap, cset, csset                    |
-| insert_or_assign(), put()  | emplace_or_assign()          | cmap, csmap                                 |
+| insert_or_assign(), put()  | emplace_or_assign(), put_r() | cmap, csmap                                 |
 | push()                     | emplace()                    | cqueue, cpque, cstack                       |
 | push_back(), push()        | emplace_back()               | cdeq, clist, cvec                           |
 | push_front()               | emplace_front()              | cdeq, clist                                 |
