@@ -3,12 +3,17 @@
 #define i_type People
 #define i_key_str
 #define i_val_str
-#define i_keydrop(p) (printf("kdrop: %s\n", cstr_str(p)), cstr_drop(p))
+#define i_keydrop(p) (printf("kdrop: %s\n", cstr_str(p)), cstr_drop(p)) // override
 #include <stc/csmap.h>
 
 #define i_type Departments
 #define i_key_str
 #define i_val_bind People
+// Shorthand for:
+//#define i_val People
+//#define i_cmp People_cmp
+//#define i_valfrom People_clone
+//#define i_valdrop People_drop
 #include <stc/csmap.h>
 
 #define i_type Stack

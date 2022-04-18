@@ -71,7 +71,7 @@ cmap_X_result         cmap_X_put(cmap_X* self, i_key key, i_val mapped);        
 
 cmap_X_result         cmap_X_emplace(cmap_X* self, i_keyraw rkey, i_valraw rmapped);            // no change if rkey in map
 cmap_X_result         cmap_X_emplace_or_assign(cmap_X* self, i_keyraw rkey, i_valraw rmapped);  // always update rmapped
-cmap_X_result         cmap_X_put_r(cmap_X* self, i_keyraw rkey, i_valraw rmapped);              // alias for emplace_or_assign
+cmap_X_result         cmap_X_put_raw(cmap_X* self, i_keyraw rkey, i_valraw rmapped);            // alias for emplace_or_assign
 
 size_t                cmap_X_erase(cmap_X* self, i_keyraw rkey);                                // return 0 or 1
 cmap_X_iter           cmap_X_erase_at(cmap_X* self, cmap_X_iter it);                            // return iter after it

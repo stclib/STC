@@ -316,13 +316,13 @@ container.
 `i_valfrom/i_valfrom` are defined, the **emplace** functions are *not* available (or needed), as it
 can easier lead to mistakes.
 
-| non-emplace: Move          | emplace: Embedded copy       | Container                                   |
-|:---------------------------|:-----------------------------|:--------------------------------------------|
-| insert()                   | emplace()                    | cmap, csmap, cset, csset                    |
-| insert_or_assign(), put()  | emplace_or_assign(), put_r() | cmap, csmap                                 |
-| push()                     | emplace()                    | cqueue, cpque, cstack                       |
-| push_back(), push()        | emplace_back()               | cdeq, clist, cvec                           |
-| push_front()               | emplace_front()              | cdeq, clist                                 |
+| non-emplace: Move          | emplace: Embedded copy         | Container                                   |
+|:---------------------------|:-------------------------------|:--------------------------------------------|
+| insert()                   | emplace()                      | cmap, csmap, cset, csset                    |
+| insert_or_assign(), put()  | emplace_or_assign(), put_raw() | cmap, csmap                                 |
+| push()                     | emplace()                      | cqueue, cpque, cstack                       |
+| push_back(), push()        | emplace_back()                 | cdeq, clist, cvec                           |
+| push_front()               | emplace_front()                | cdeq, clist                                 |
 
 Strings are the most commonly used non-trivial data type. STC containers have proper pre-defined
 definitions for cstr container elements, so they are fail-safe to use both with the **emplace**

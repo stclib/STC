@@ -159,8 +159,8 @@ _cx_memb(_value_drop)(_cx_value* val) {
     #if !defined _i_no_clone && !defined _i_no_emplace
     STC_API _cx_result _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped);
     STC_INLINE _cx_result
-    _cx_memb(_put_r)(_cx_self* self, i_keyraw rkey, i_valraw rmapped)
-        { return _cx_memb(_emplace_or_assign)(self, rkey, rmapped); }
+    _cx_memb(_put_raw)(_cx_self* self, i_keyraw rkey, i_valraw rmapped)
+        { return _cx_memb(_emplace_or_assign)(self, rkey, rmapped); } // alias
     #endif
     STC_API _cx_result _cx_memb(_insert_or_assign)(_cx_self* self, i_key key, i_val mapped);
     
