@@ -12,8 +12,8 @@ int main() {
 
     c_auto (clist_fx, list)
     {
-        stc64_t rng = stc64_init(1234);
-        stc64_uniformf_t dist = stc64_uniformf_init(100.0f, n);
+        stc64_t rng = stc64_new(1234);
+        stc64_uniformf_t dist = stc64_uniformf_new(100.0f, n);
         int m = 0;
         c_forrange (i, int, n)
             clist_fx_push_back(&list, stc64_uniformf(&rng, &dist)), ++m;

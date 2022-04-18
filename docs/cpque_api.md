@@ -70,8 +70,8 @@ i_val               cpque_X_value_clone(i_val value);
 int main()
 {
     size_t N = 10000000;
-    stc64_t rng = stc64_init(1234);
-    stc64_uniform_t dist = stc64_uniform_init(0, N * 10);
+    stc64_t rng = stc64_new(1234);
+    stc64_uniform_t dist = stc64_uniform_new(0, N * 10);
 
     // Declare heap, with defered drop()
     c_auto (cpque_i, heap)

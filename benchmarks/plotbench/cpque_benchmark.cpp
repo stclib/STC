@@ -17,7 +17,7 @@ void std_test()
     int N = 10000000, M = 10;
 
     std::priority_queue<float, std::vector<float>, std::greater<float>> pq;
-    rng = stc64_init(seed);
+    rng = stc64_new(seed);
     clock_t start = clock();
     c_forrange (i, N)
         pq.push((float) stc64_randf(&rng)*100000);
@@ -41,7 +41,7 @@ void stc_test()
 
     c_auto (cpque_f, pq)
     {
-        rng = stc64_init(seed);
+        rng = stc64_new(seed);
         clock_t start = clock();
         c_forrange (i, N)
             cpque_f_push(&pq, (float) stc64_randf(&rng)*100000);

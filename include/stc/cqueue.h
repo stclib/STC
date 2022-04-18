@@ -30,8 +30,8 @@
 
 int main() {
     int n = 10000000;
-    stc64_t rng = stc64_init(1234);
-    stc64_uniform_t dist = stc64_uniform_init(0, n);
+    stc64_t rng = stc64_new(1234);
+    stc64_uniform_t dist = stc64_uniform_new(0, n);
 
     c_auto (cqueue_int, Q)
     {

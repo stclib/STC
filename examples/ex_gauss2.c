@@ -17,8 +17,8 @@ int main()
 
     // Setup random engine with normal distribution.
     uint64_t seed = time(NULL);
-    stc64_t rng = stc64_init(seed);
-    stc64_normalf_t dist = stc64_normalf_init(Mean, StdDev);
+    stc64_t rng = stc64_new(seed);
+    stc64_normalf_t dist = stc64_normalf_new(Mean, StdDev);
 
     // Create and init histogram map with defered destruct
     c_auto (csmap_int, mhist)

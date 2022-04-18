@@ -17,7 +17,7 @@ static void test_repeats(void)
     const static uint64_t mask = (1ull << BITS) - 1;
 
     printf("birthday paradox: value range: 2^%d, testing repeats of 2^%d values\n", BITS, BITS_TEST);
-    stc64_t rng = stc64_init(seed);
+    stc64_t rng = stc64_new(seed);
     c_auto (cmap_ic, m)
     {
         cmap_ic_reserve(&m, N);
@@ -38,7 +38,7 @@ void test_distribution(void)
 {
     enum {BITS = 26};
     printf("distribution test: 2^%d values\n", BITS);
-    stc64_t rng = stc64_init(seed);
+    stc64_t rng = stc64_new(seed);
     const size_t N = 1ull << BITS ;
 
     c_auto (cmap_x, map) {

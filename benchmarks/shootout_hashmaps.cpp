@@ -32,7 +32,7 @@ KHASH_MAP_INIT_INT64(ii, int64_t)
 
 stc64_t rng;
 size_t seed;
-#define SEED(s) rng = stc64_init(seed)
+#define SEED(s) rng = stc64_new(seed)
 #define RAND(N) (stc64_rand(&rng) & (((uint64_t)1 << N) - 1))
 
 

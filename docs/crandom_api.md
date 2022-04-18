@@ -45,18 +45,18 @@ void                csrandom(uint64_t seed);                                 // 
 uint64_t            crandom(void);                                           // global stc64_rand(rng)
 double              crandomf(void);                                          // global stc64_randf(rng)
 
-stc64_t             stc64_init(uint64_t seed);
-stc64_t             stc64_with_seq(uint64_t seed, uint64_t seq);             // init with stream
+stc64_t             stc64_new(uint64_t seed);                                // stc64_init(s) is deprecated
+stc64_t             stc64_with_seq(uint64_t seed, uint64_t seq);             // with unique stream
 
 uint64_t            stc64_rand(stc64_t* rng);                                // range [0, 2^64 - 1]
 double              stc64_randf(stc64_t* rng);                               // range [0.0, 1.0)
 
-stc64_uniform_t     stc64_uniform_init(int64_t low, int64_t high);           // uniform-distribution
+stc64_uniform_t     stc64_uniform_new(int64_t low, int64_t high);            // uniform-distribution
 int64_t             stc64_uniform(stc64_t* rng, stc64_uniform_t* dist);      // range [low, high]
-stc64_uniformf_t    stc64_uniformf_init(double lowf, double highf);
+stc64_uniformf_t    stc64_uniformf_new(double lowf, double highf);
 double              stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist);    // range [lowf, highf)
 
-stc64_normalf_t     stc64_normalf_init(double mean, double stddev);          // normal-distribution
+stc64_normalf_t     stc64_normalf_new(double mean, double stddev);           // normal-distribution
 double              stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
 ```
 ## Types
@@ -89,8 +89,8 @@ int main()
 
     // Setup random engine with normal distribution.
     uint64_t seed = time(NULL);
-    stc64_t rng = stc64_init(seed);
-    stc64_normalf_t dist = stc64_normalf_init(Mean, StdDev);
+    stc64_t rng = stc64_new(seed);
+    stc64_normalf_t dist = stc64_normalf_new(Mean, StdDev);
 
     // Create histogram map
     csmap_i mhist = csmap_i_init();

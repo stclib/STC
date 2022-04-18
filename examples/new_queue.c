@@ -21,8 +21,8 @@ int point_cmp(const Point* a, const Point* b) {
 
 int main() {
     int n = 60000000;
-    stc64_t rng = stc64_init(time(NULL));
-    stc64_uniform_t dist = stc64_uniform_init(0, n);
+    stc64_t rng = stc64_new(time(NULL));
+    stc64_uniform_t dist = stc64_uniform_new(0, n);
 
     c_auto (cqueue_int, Q)
     {

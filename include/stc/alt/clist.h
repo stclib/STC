@@ -36,7 +36,7 @@
 
     int main() {
         clist_ix list = clist_ix_init();
-        stc64_t rng = stc64_init(12345);
+        stc64_t rng = stc64_new(12345);
         int n;
         for (int i=0; i<1000000; ++i) // one million
             clist_ix_push_back(&list, stc64_rand(&rng) >> 32);

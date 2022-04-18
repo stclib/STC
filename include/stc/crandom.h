@@ -29,10 +29,10 @@
 #include "stc/crandom.h"
 int main() {
     uint64_t seed = 123456789;
-    stc64_t rng = stc64_init(seed);
-    stc64_uniform_t dist1 = stc64_uniform_init(1, 6);
-    stc64_uniformf_t dist2 = stc64_uniformf_init(1.0, 10.0);
-    stc64_normalf_t dist3 = stc64_normalf_init(1.0, 10.0);
+    stc64_t rng = stc64_new(seed);
+    stc64_uniform_t dist1 = stc64_uniform_new(1, 6);
+    stc64_uniformf_t dist2 = stc64_uniformf_new(1.0, 10.0);
+    stc64_normalf_t dist3 = stc64_normalf_new(1.0, 10.0);
 
     uint64_t i = stc64_rand(&rng);
     int64_t iu = stc64_uniform(&rng, &dist1);
@@ -59,23 +59,21 @@ typedef struct stc64_normalf { double mean, stddev, next; unsigned has_next; } s
  * PractRand to multiple TB input.
  */
 
-/* Global STC64 PRNGs */
+/* Global stc64 PRNGs */
 STC_API void     csrandom(uint64_t seed);
 STC_API uint64_t crandom(void);
 STC_API double   crandomf(void);
 
-STC_INLINE void stc64_srandom(uint64_t seed) { csrandom(seed); } // alias
-STC_INLINE uint64_t stc64_random() { return crandom(); }         // alias
-
-/* Init with sequence number */
+/* Init stc64 prng with and without sequence number */
 STC_API stc64_t stc64_with_seq(uint64_t seed, uint64_t seq);
-
-/* Unbiased bounded uniform distribution. range [low, high] */
-STC_API int64_t stc64_uniform(stc64_t* rng, stc64_uniform_t* dist);
-
-STC_INLINE stc64_t stc64_init(uint64_t seed)
+STC_INLINE stc64_t stc64_new(uint64_t seed)
     { return stc64_with_seq(seed, seed + 0x3504f333d3aa0b37); }
 
+/* Unbiased bounded uniform distribution. range [low, high] */
+STC_API stc64_uniform_t stc64_uniform_new(int64_t low, int64_t high);
+STC_API int64_t stc64_uniform(stc64_t* rng, stc64_uniform_t* dist);
+
+/* Main stc64 prng */
 STC_INLINE uint64_t stc64_rand(stc64_t* rng) {
     uint64_t *s = rng->state; enum {LR=24, RS=11, LS=3};
     const uint64_t result = (s[0] ^ (s[3] += s[4])) + s[1];
@@ -97,12 +95,12 @@ STC_INLINE double stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist) {
 }
 
 /* Init uniform distributed float64 RNG, range [low, high). */
-STC_INLINE stc64_uniformf_t stc64_uniformf_init(double low, double high) {
+STC_INLINE stc64_uniformf_t stc64_uniformf_new(double low, double high) {
     return c_make(stc64_uniformf_t){low, high - low};
 }
 
 /* Marsaglia polar method for gaussian/normal distribution, float64. */
-STC_INLINE stc64_normalf_t stc64_normalf_init(double mean, double stddev) {
+STC_INLINE stc64_normalf_t stc64_normalf_new(double mean, double stddev) {
     return c_make(stc64_normalf_t){mean, stddev, 0.0, 0};
 }
 
@@ -121,6 +119,15 @@ STC_INLINE double stc64_normalf(stc64_t* rng, stc64_normalf_t* dist) {
     return (u1 * m) * dist->stddev + dist->mean;
 }
 
+/* Following functions are deprecated (will be removed in the future): */
+STC_INLINE void stc64_srandom(uint64_t seed) { csrandom(seed); }
+STC_INLINE uint64_t stc64_random() { return crandom(); }
+STC_INLINE stc64_t stc64_init(uint64_t seed) { return stc64_new(seed); }
+STC_INLINE stc64_uniformf_t stc64_uniformf_init(double low, double high)
+    { return stc64_uniformf_new(low, high); }
+STC_INLINE stc64_normalf_t stc64_normalf_init(double mean, double stddev)
+    { return stc64_normalf_new(mean, stddev); }
+
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(_i_implement)
 
@@ -132,7 +139,7 @@ static stc64_t stc64_global = {{
 }};
 
 STC_DEF void csrandom(uint64_t seed) {
-    stc64_global = stc64_init(seed);
+    stc64_global = stc64_new(seed);
 }
 
 STC_DEF uint64_t crandom(void) {
@@ -151,18 +158,12 @@ STC_DEF stc64_t stc64_with_seq(uint64_t seed, uint64_t seq) {
     return rng;
 }
 
-#ifdef _MSC_VER
-#pragma warning(disable: 4146) // unary minus operator applied to unsigned type
-#endif
 /* Init unbiased uniform uint RNG with bounds [low, high] */
-STC_DEF stc64_uniform_t stc64_uniform_init(int64_t low, int64_t high) {
+STC_DEF stc64_uniform_t stc64_uniform_new(int64_t low, int64_t high) {
     stc64_uniform_t dist = {low, (uint64_t) (high - low + 1)};
-    dist.threshold = (uint64_t)(-dist.range) % dist.range;
+    dist.threshold = (uint64_t)-(int64_t)dist.range % dist.range;
     return dist;
 }
-#ifdef _MSC_VER
-#pragma warning(default: 4146)
-#endif
 
 /* Int uniform distributed RNG, range [low, high]. */
 STC_DEF int64_t stc64_uniform(stc64_t* rng, stc64_uniform_t* d) {
