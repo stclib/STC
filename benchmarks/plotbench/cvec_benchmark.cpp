@@ -27,8 +27,8 @@ Sample test_std_vector() {
     {
         s.test[INSERT].t1 = clock();
         container con;
-        stc64_srandom(seed);
-        c_forrange (N) con.push_back(stc64_random() & mask1);
+        csrandom(seed);
+        c_forrange (N) con.push_back(crandom() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = con.size();
         s.test[ERASE].t1 = clock();
@@ -37,13 +37,13 @@ Sample test_std_vector() {
         s.test[ERASE].sum = con.size();
      }{
         container con;
-        stc64_srandom(seed);
-        c_forrange (N) con.push_back(stc64_random() & mask2);
+        csrandom(seed);
+        c_forrange (N) con.push_back(crandom() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         container::iterator it;
         // Iteration - not inherent find - skipping
-        //c_forrange (S) if ((it = std::find(con.begin(), con.end(), stc64_random() & mask2)) != con.end()) sum += *it;
+        //c_forrange (S) if ((it = std::find(con.begin(), con.end(), crandom() & mask2)) != con.end()) sum += *it;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
@@ -69,8 +69,8 @@ Sample test_stc_vector() {
     {
         s.test[INSERT].t1 = clock();
         container con = cvec_x_init();
-        stc64_srandom(seed);
-        c_forrange (N) cvec_x_push_back(&con, stc64_random() & mask1);
+        csrandom(seed);
+        c_forrange (N) cvec_x_push_back(&con, crandom() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = cvec_x_size(con);
         s.test[ERASE].t1 = clock();
@@ -79,13 +79,13 @@ Sample test_stc_vector() {
         s.test[ERASE].sum = cvec_x_size(con);
         cvec_x_drop(&con);
      }{
-        stc64_srandom(seed);
+        csrandom(seed);
         container con = cvec_x_init();
-        c_forrange (N) cvec_x_push_back(&con, stc64_random() & mask2);
+        c_forrange (N) cvec_x_push_back(&con, crandom() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         //cvec_x_iter it, end = cvec_x_end(&con);
-        //c_forrange (S) if ((it = cvec_x_find(&con, stc64_random() & mask2)).ref != end.ref) sum += *it.ref;
+        //c_forrange (S) if ((it = cvec_x_find(&con, crandom() & mask2)).ref != end.ref) sum += *it.ref;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();

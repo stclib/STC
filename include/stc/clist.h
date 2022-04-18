@@ -38,7 +38,7 @@
         {
             int n;
             for (int i = 0; i < 1000000; ++i) // one million
-                clist_ix_push_back(&list, stc64_random() >> 32);
+                clist_ix_push_back(&list, crandom() >> 32);
             n = 0;
             c_foreach (i, clist_ix, list)
                 if (++n % 10000 == 0) printf("%8d: %10zu\n", n, *i.ref);

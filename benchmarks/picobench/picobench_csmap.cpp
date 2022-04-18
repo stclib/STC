@@ -70,10 +70,10 @@ static void insert_i(picobench::state& s)
 {
     size_t result = 0;
     MapInt map;
-    stc64_srandom(seed);
+    csrandom(seed);
     picobench::scope scope(s);
     c_forrange (n, s.iterations())
-        map.emplace(stc64_random() & 0xfffffff, n);
+        map.emplace(crandom() & 0xfffffff, n);
     s.set_result(map.size());
 }
 
@@ -81,10 +81,10 @@ static void insert_csmap_i(picobench::state& s)
 {
     size_t result = 0;
     csmap_i map = csmap_i_init();
-    stc64_srandom(seed);
+    csrandom(seed);
     picobench::scope scope(s);
     c_forrange (n, s.iterations())
-        csmap_i_insert(&map, stc64_random() & 0xfffffff, n);
+        csmap_i_insert(&map, crandom() & 0xfffffff, n);
     s.set_result(csmap_i_size(map));
     csmap_i_drop(&map);
 }
@@ -103,21 +103,21 @@ static void ins_and_erase_i(picobench::state& s)
     size_t result = 0;
     uint64_t mask = (1ull << s.arg()) - 1;
     MapInt map;
-    stc64_srandom(seed);
+    csrandom(seed);
 
     picobench::scope scope(s);
     c_forrange (i, s.iterations())
-        map.emplace(stc64_random() & mask, i);
+        map.emplace(crandom() & mask, i);
     result = map.size();
 
     map.clear();
-    stc64_srandom(seed);
+    csrandom(seed);
     c_forrange (i, s.iterations())
-        map[stc64_random() & mask] = i;
+        map[crandom() & mask] = i;
 
-    stc64_srandom(seed);
+    csrandom(seed);
     c_forrange (s.iterations())
-        map.erase(stc64_random() & mask);
+        map.erase(crandom() & mask);
     s.set_result(result);
 }
 
@@ -126,21 +126,21 @@ static void ins_and_erase_csmap_i(picobench::state& s)
     size_t result = 0;
     uint64_t mask = (1ull << s.arg()) - 1;
     csmap_i map = csmap_i_init();
-    stc64_srandom(seed);
+    csrandom(seed);
 
     picobench::scope scope(s);
     c_forrange (i, s.iterations())
-        csmap_i_insert(&map, stc64_random() & mask, i);
+        csmap_i_insert(&map, crandom() & mask, i);
     result = csmap_i_size(map);
 
     csmap_i_clear(&map);
-    stc64_srandom(seed);
+    csrandom(seed);
     c_forrange (i, s.iterations())
-        csmap_i_insert_or_assign(&map, stc64_random() & mask, i);
+        csmap_i_insert_or_assign(&map, crandom() & mask, i);
 
-    stc64_srandom(seed);
+    csrandom(seed);
     c_forrange (s.iterations())
-        csmap_i_erase(&map, stc64_random() & mask);
+        csmap_i_erase(&map, crandom() & mask);
     s.set_result(result);
     csmap_i_drop(&map);
 }
@@ -158,12 +158,12 @@ static void ins_and_access_i(picobench::state& s)
     uint64_t mask = (1ull << s.arg()) - 1;
     size_t result = 0;
     MapInt map;
-    stc64_srandom(seed);
+    csrandom(seed);
 
     picobench::scope scope(s);
     c_forrange (s.iterations()) {
-        result += ++map[stc64_random() & mask];
-        auto it = map.find(stc64_random() & mask);
+        result += ++map[crandom() & mask];
+        auto it = map.find(crandom() & mask);
         if (it != map.end()) map.erase(it->first);
     }
     s.set_result(result + map.size());
@@ -174,12 +174,12 @@ static void ins_and_access_csmap_i(picobench::state& s)
     uint64_t mask = (1ull << s.arg()) - 1;
     size_t result = 0;
     csmap_i map = csmap_i_init();
-    stc64_srandom(seed);
+    csrandom(seed);
 
     picobench::scope scope(s);
     c_forrange (s.iterations()) {
-        result += ++csmap_i_insert(&map, stc64_random() & mask, 0).ref->second;
-        const csmap_i_value* val = csmap_i_get(&map, stc64_random() & mask);
+        result += ++csmap_i_insert(&map, crandom() & mask, 0).ref->second;
+        const csmap_i_value* val = csmap_i_get(&map, crandom() & mask);
         if (val) csmap_i_erase(&map, val->first);
     }
     s.set_result(result + csmap_i_size(map));
@@ -194,7 +194,7 @@ PICOBENCH(ins_and_access_csmap_i).P;
 PICOBENCH_SUITE("Map4");
 
 static void randomize(char* str, size_t len) {
-    union {uint64_t i; char c[8];} r = {.i = stc64_random()};
+    union {uint64_t i; char c[8];} r = {.i = crandom()};
     for (int i = len - 7, j = 0; i < len; ++j, ++i)
         str[i] = (r.c[j] & 63) + 48;
 }
@@ -207,12 +207,12 @@ static void ins_and_access_s(picobench::state& s)
     MapStr map;
 
     picobench::scope scope(s);
-    stc64_srandom(seed);
+    csrandom(seed);
     c_forrange (s.iterations()) {
         randomize(&str[0], str.size());
         map.emplace(str, str);
     }
-    stc64_srandom(seed);
+    csrandom(seed);
     c_forrange (s.iterations()) {
         randomize(&str[0], str.size());
         result += map.erase(str);
@@ -228,12 +228,12 @@ static void ins_and_access_csmap_s(picobench::state& s)
     csmap_str map = csmap_str_init();
 
     picobench::scope scope(s);
-    stc64_srandom(seed);
+    csrandom(seed);
     c_forrange (s.iterations()) {
         randomize(buf, s.arg());
         csmap_str_emplace(&map, buf, buf);
     }
-    stc64_srandom(seed);
+    csrandom(seed);
     c_forrange (s.iterations()) {
         randomize(buf, s.arg());
         result += csmap_str_erase(&map, buf);
@@ -262,22 +262,22 @@ static void iterate_x(picobench::state& s)
     uint64_t K = (1ull << s.arg()) - 1;
 
     picobench::scope scope(s);
-    stc64_srandom(seed);
+    csrandom(seed);
     size_t result = 0;
 
     // measure insert then iterate whole map
     c_forrange (n, s.iterations()) {
-        map[stc64_random()] = n;
+        map[crandom()] = n;
         if (!(n & K)) for (auto const& keyVal : map)
             result += keyVal.second;
     }
 
     // reset rng back to inital state
-    stc64_srandom(seed);
+    csrandom(seed);
 
     // measure erase then iterate whole map
     c_forrange (n, s.iterations()) {
-        map.erase(stc64_random());
+        map.erase(crandom());
         if (!(n & K)) for (auto const& keyVal : map)
             result += keyVal.second;
     }
@@ -290,22 +290,22 @@ static void iterate_csmap_x(picobench::state& s)
     uint64_t K = (1ull << s.arg()) - 1;
 
     picobench::scope scope(s);
-    stc64_srandom(seed);
+    csrandom(seed);
     size_t result = 0;
 
     // measure insert then iterate whole map
     c_forrange (n, s.iterations()) {
-        csmap_x_insert_or_assign(&map, stc64_random(), n);
+        csmap_x_insert_or_assign(&map, crandom(), n);
         if (!(n & K)) c_foreach (i, csmap_x, map)
             result += i.ref->second;
     }
 
     // reset rng back to inital state
-    stc64_srandom(seed);
+    csrandom(seed);
 
     // measure erase then iterate whole map
     c_forrange (n, s.iterations()) {
-        csmap_x_erase(&map, stc64_random());
+        csmap_x_erase(&map, crandom());
         if (!(n & K)) c_foreach (i, csmap_x, map)
             result += i.ref->second;
     }

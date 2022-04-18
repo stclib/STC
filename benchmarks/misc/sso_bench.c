@@ -12,10 +12,10 @@
 #include <stc/crandom.h>
 
 void rndstr(char buf[64], int max) {
-    unsigned n = stc64_random() % max;
+    unsigned n = crandom() % max;
     static char chr[64] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz_";
     c_forrange (i, n)
-        buf[i] = chr[stc64_random() & 63];
+        buf[i] = chr[crandom() & 63];
     buf[n] = '\0';
 }
 
@@ -27,7 +27,7 @@ int main(void) {
     c_auto (Map, map) {
         char buf[128];
 
-        stc64_srandom(time(NULL));
+        csrandom(time(NULL));
         printf("map\n");
         clock_t t0 = clock(), t1, t2;
         c_forrange (i, int, N) {

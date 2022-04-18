@@ -41,9 +41,9 @@ All crandom definitions and prototypes are available by including a single heade
 ## Methods
 
 ```c
-void                stc64_srandom(uint64_t seed);                            // seed global rng
-uint64_t            stc64_random(void);                                      // range [0, 2^64 - 1]
-double              stc64_randomf(void);                                     // range [0.0, 1.0)
+void                csrandom(uint64_t seed);                                 // seed global stc64 prng
+uint64_t            crandom(void);                                           // global stc64_rand(rng)
+double              crandomf(void);                                          // global stc64_randf(rng)
 
 stc64_t             stc64_init(uint64_t seed);
 stc64_t             stc64_with_seq(uint64_t seed, uint64_t seq);             // init with stream

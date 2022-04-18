@@ -25,28 +25,28 @@ Sample test_std_map() {
     typedef std::map<size_t, size_t> container;
     Sample s = {"std,map"};
     {
-        stc64_srandom(seed);
+        csrandom(seed);
         s.test[INSERT].t1 = clock();
         container con;
-        c_forrange (i, N/2) con.emplace(stc64_random() & mask1, i);
+        c_forrange (i, N/2) con.emplace(crandom() & mask1, i);
         c_forrange (i, N/2) con.emplace(i, i);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = con.size();
-        stc64_srandom(seed);
+        csrandom(seed);
         s.test[ERASE].t1 = clock();
-        c_forrange (N) con.erase(stc64_random() & mask1);
+        c_forrange (N) con.erase(crandom() & mask1);
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = con.size();
      }{
         container con;
-        stc64_srandom(seed);
-        c_forrange (i, N/2) con.emplace(stc64_random() & mask1, i);
+        csrandom(seed);
+        c_forrange (i, N/2) con.emplace(crandom() & mask1, i);
         c_forrange (i, N/2) con.emplace(i, i);
-        stc64_srandom(seed);
+        csrandom(seed);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         container::iterator it;
-        c_forrange (N) if ((it = con.find(stc64_random() & mask1)) != con.end()) sum += it->second;
+        c_forrange (N) if ((it = con.find(crandom() & mask1)) != con.end()) sum += it->second;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
@@ -70,30 +70,30 @@ Sample test_stc_map() {
     typedef csmap_x container;
     Sample s = {"STC,map"};
     {
-        stc64_srandom(seed);
+        csrandom(seed);
         s.test[INSERT].t1 = clock();
         container con = csmap_x_init();
-        c_forrange (i, N/2) csmap_x_insert(&con, stc64_random() & mask1, i);
+        c_forrange (i, N/2) csmap_x_insert(&con, crandom() & mask1, i);
         c_forrange (i, N/2) csmap_x_insert(&con, i, i);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = csmap_x_size(con);
-        stc64_srandom(seed);
+        csrandom(seed);
         s.test[ERASE].t1 = clock();
-        c_forrange (N) csmap_x_erase(&con, stc64_random() & mask1);
+        c_forrange (N) csmap_x_erase(&con, crandom() & mask1);
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = csmap_x_size(con);
         csmap_x_drop(&con);
      }{
         container con = csmap_x_init();
-        stc64_srandom(seed);
-        c_forrange (i, N/2) csmap_x_insert(&con, stc64_random() & mask1, i);
+        csrandom(seed);
+        c_forrange (i, N/2) csmap_x_insert(&con, crandom() & mask1, i);
         c_forrange (i, N/2) csmap_x_insert(&con, i, i);
-        stc64_srandom(seed);
+        csrandom(seed);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         const csmap_x_value* val;
         c_forrange (N) 
-            if ((val = csmap_x_get(&con, stc64_random() & mask1)))
+            if ((val = csmap_x_get(&con, crandom() & mask1)))
                 sum += val->second;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;

@@ -60,9 +60,12 @@ typedef struct stc64_normalf { double mean, stddev, next; unsigned has_next; } s
  */
 
 /* Global STC64 PRNGs */
-STC_API void     stc64_srandom(uint64_t seed);
-STC_API uint64_t stc64_random(void);
-STC_API double   stc64_randomf(void);
+STC_API void     csrandom(uint64_t seed);
+STC_API uint64_t crandom(void);
+STC_API double   crandomf(void);
+
+STC_INLINE void stc64_srandom(uint64_t seed) { csrandom(seed); } // alias
+STC_INLINE uint64_t stc64_random() { return crandom(); }         // alias
 
 /* Init with sequence number */
 STC_API stc64_t stc64_with_seq(uint64_t seed, uint64_t seq);
@@ -70,9 +73,8 @@ STC_API stc64_t stc64_with_seq(uint64_t seed, uint64_t seq);
 /* Unbiased bounded uniform distribution. range [low, high] */
 STC_API int64_t stc64_uniform(stc64_t* rng, stc64_uniform_t* dist);
 
-STC_INLINE stc64_t stc64_init(uint64_t seed) {
-    return stc64_with_seq(seed, seed + 0x3504f333d3aa0b37);
-}
+STC_INLINE stc64_t stc64_init(uint64_t seed)
+    { return stc64_with_seq(seed, seed + 0x3504f333d3aa0b37); }
 
 STC_INLINE uint64_t stc64_rand(stc64_t* rng) {
     uint64_t *s = rng->state; enum {LR=24, RS=11, LS=3};
@@ -129,15 +131,15 @@ static stc64_t stc64_global = {{
     0x6a09e667a754166b
 }};
 
-STC_DEF void stc64_srandom(uint64_t seed) {
+STC_DEF void csrandom(uint64_t seed) {
     stc64_global = stc64_init(seed);
 }
 
-STC_DEF uint64_t stc64_random(void) {
+STC_DEF uint64_t crandom(void) {
     return stc64_rand(&stc64_global);
 }
 
-STC_DEF double stc64_randomf(void) {
+STC_DEF double crandomf(void) {
     return stc64_randf(&stc64_global);
 }
 
