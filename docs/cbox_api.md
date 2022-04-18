@@ -5,8 +5,8 @@ be empty. The *cbox_X_cmp()*, *cbox_X_drop()* methods are defined based on the `
 and `i_valdrop` macros specified. Use *cbox_X_clone(p)* to make a deep copy, which uses the
 `i_valfrom` macro if defined.
 
-When declaring a container of **cbox** values, it is recommended to define `i_val_bind` to the
-cbox type instead of defining `i_val`. This will auto-set `i_drop`, `i_from`, and `i_cmp` using 
+When declaring a container of **cbox** values, define `i_val_arcbox` with the
+cbox type instead of defining `i_val`. This will auto-set `i_valdrop`, `i_valfrom`, and `i_cmp` using 
 functions defined by the specified **cbox**.
 
 For containers, make sure to pass the result of create functions like *cbox_X_new()* **only** to 
@@ -20,9 +20,9 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 ```c
 #define i_val           // value: REQUIRED
 #define i_cmp           // three-way compare two i_val* : REQUIRED IF i_val is a non-integral type
-#define i_drop          // destroy value func - defaults to empty destruct
+#define i_valdrop       // destroy value func - defaults to empty destruct
 #define i_valraw        // convertion type
-#define i_from          // create from raw/clone func - REQUIRED if i_drop is defined,
+#define i_valfrom          // create from raw/clone func - REQUIRED if i_valdrop is defined,
                         // unless 'i_opt c_no_clone' is defined.
 #define i_valto         // to-raw func.
 #define i_tag           // type name tag, defaults to i_val
@@ -72,8 +72,8 @@ void int_drop(int* x) {
 
 #define i_type IBox
 #define i_val int
-#define i_drop int_drop       // optional func, just to display elements destroyed
-#define i_from c_default_from // must specify because i_drop was defined.
+#define i_valdrop int_drop       // optional func, just to display elements destroyed
+#define i_valfrom c_default_from // must specify because i_valdrop was defined.
 #include <stc/cbox.h>
 
 #define i_type ISet
@@ -90,7 +90,8 @@ int main()
     c_auto (ISet, set)  // similar
     {
         c_apply(v, IVec_push(&vec, v), IBox, {
-            IBox_from(2021), IBox_from(2012), IBox_from(2022), IBox_from(2015),
+            IBox_from(2021), IBox_from(2012), 
+            IBox_from(2022), IBox_from(2015),
         });
 
         printf("vec:");

@@ -10,8 +10,8 @@ See the c++ class [boost::multi_array](https://www.boost.org/doc/libs/release/li
 
 ```c
 #define i_val       // value: REQUIRED
-#define i_drop      // destroy value func - defaults to empty destruct
-#define i_from     // func Raw => i_val - defaults to plain copy
+#define i_valdrop   // destroy value func - defaults to empty destruct
+#define i_valfrom   // func Raw => i_val - defaults to plain copy
 #define i_valto     // func i_val => Raw - defaults to plain copy
 #define i_tag       // defaults to i_val
 

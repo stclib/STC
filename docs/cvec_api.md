@@ -14,7 +14,7 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ```c
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_valraw* : REQUIRED IF i_valraw is a non-integral type
-#define i_drop      // destroy value func - defaults to empty destruct
+#define i_valdrop   // destroy value func - defaults to empty destruct
 #define i_valraw    // convertion "raw" type - defaults to i_val
 #define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
 #define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
@@ -23,7 +23,7 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
 
-`i_drop` may be defined instead of `i_valdrop` (or `i_keydrop`) for all non-map containers.
+`i_valdrop` may be defined instead of `i_valdrop` (or `i_keydrop`) for all non-map containers.
 
 ## Methods
 
@@ -202,8 +202,8 @@ User User_clone(User user) {
 // Note that cvec_u_emplace_back() will clone input:
 #define i_val User
 #define i_cmp User_cmp
-#define i_drop User_drop
-#define i_from User_clone
+#define i_valdrop User_drop
+#define i_valfrom User_clone
 #define i_tag u
 #include <stc/cvec.h>
 

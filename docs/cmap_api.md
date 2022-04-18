@@ -301,7 +301,7 @@ static inline void Viking_drop(Viking* vk) {
 //  #define i_eq Viking_eq
 //  #define i_hash Viking_hash
 //  #define i_keyfrom Viking_clone
-//  #define i_drop Viking_drop
+//  #define i_keydrop Viking_drop
 #include <stc/cmap.h>
 
 int main()

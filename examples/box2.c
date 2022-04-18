@@ -27,7 +27,7 @@ struct {
 
 // Box in box:
 #define i_val_arcbox cbox_Point  // NB: use i_val_arcbox when value is a cbox or carc!
-                                 // it will auto-set i_drop, i_from, i_cmp for you.
+                                 // it will auto-set i_valdrop, i_valfrom, i_cmp for you.
 #define i_opt c_no_cmp
 #define i_tag BoxPoint
 #include <stc/cbox.h> // cbox_BoxPoint

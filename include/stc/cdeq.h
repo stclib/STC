@@ -103,16 +103,16 @@ STC_INLINE _cx_iter     _cx_memb(_advance)(_cx_iter it, intptr_t offs)
 
 #if !defined _i_queue
 
+STC_INLINE size_t       _cx_memb(_index)(_cx_self cx, _cx_iter it)
+                            { return it.ref - cx.data; }
 STC_INLINE void         _cx_memb(_pop_back)(_cx_self* self)
                             { _cx_value* p = &self->data[--cdeq_rep_(self)->size]; i_valdrop(p); }
 
 STC_INLINE const _cx_value* _cx_memb(_at)(const _cx_self* self, const size_t idx) {
-    assert(idx < cdeq_rep_(self)->size); 
-    return self->data + idx;
+    assert(idx < cdeq_rep_(self)->size);  return self->data + idx;
 }
-
-STC_INLINE size_t _cx_memb(_index)(_cx_self cx, _cx_iter it) {
-    return it.ref - cx.data;
+STC_INLINE _cx_value* _cx_memb(_at_mut)(_cx_self* self, const size_t idx) {
+    assert(idx < cdeq_rep_(self)->size);  return self->data + idx;
 }
 
 STC_INLINE _cx_iter

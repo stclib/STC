@@ -27,7 +27,7 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ```c
 #define i_val             // value: REQUIRED
 #define i_cmp             // three-way compare two i_val* : REQUIRED IF i_val is a non-integral type
-#define i_drop            // destroy value func - defaults to empty destruct
+#define i_valdrop         // destroy value func - defaults to empty destruct
 #define i_tag             // defaults to i_val
 #define i_opt c_no_atomic // Non-atomic reference counting, like Rust Rc.
 #include <stc/carc.h>
@@ -80,8 +80,8 @@ bool        carc_X_value_eq(const i_val* x, const i_val* y);   // cbox_X_value_c
 
 #define i_type Arc // (atomic) ref. counted type
 #define i_val Map
-#define i_from Map_clone
-#define i_drop(p) (printf("drop Arc:\n"), Map_drop(p))
+#define i_valfrom Map_clone
+#define i_valdrop(p) (printf("drop Arc:\n"), Map_drop(p))
 // no comparison of Maps needed (or available), and
 // no need for atomic ref. count in single thread:
 #define i_opt c_no_cmp|c_no_atomic 

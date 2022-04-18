@@ -110,7 +110,7 @@ In order to include two **cvec**s with different element types, include cvec.h t
 compare function is required to enable sorting and searching (`<` and `==` operators is default and works
 for integral types only). Alternatively, `#define i_opt c_no_cmp` to disable methods using comparison.
 
-Similarly, if a destructor `i_drop` is defined, either define a `i_valfrom` construct/clone function
+Similarly, if a destructor `i_valdrop` is defined, either define a `i_valfrom` construct/clone function
 or `#define i_opt c_no_clone` to disable cloning and emplace methods. Unless these requirements are met,
 compile errors are generated.
 ```c
@@ -297,7 +297,6 @@ Special:
 - `i_val_str`, `i_val_bind`, `i_val_arcbox` - Similar rules as for *key*.
 
 Notes:
-- For non-associative containers, `i_drop` and `i_from` may be defined instead of `i_valdrop` and `i_valfrom`.
 - Instead of defining `i_cmp`, you may define `i_opt c_no_cmp` to disable searching and sorting functions.
 - Instead of defining `i_*from`, you may define `i_opt c_no_clone` to disable emplace and clone-functions.
 - If a destructor `i_*drop` is defined, then either `i_*from` or `i_opt c_no_clone` must be defined.

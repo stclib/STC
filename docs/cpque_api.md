@@ -12,7 +12,7 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ```c
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_val* : REQUIRED IF i_val/i_valraw is a non-integral type
-#define i_drop      // destroy value func - defaults to empty destruct
+#define i_valdrop   // destroy value func - defaults to empty destruct
 #define i_valraw    // convertion type
 #define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
 #define i_valto     // convertion func i_val* => i_valraw.

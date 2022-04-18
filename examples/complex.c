@@ -4,8 +4,8 @@ void check_drop(float* v) {printf("destroy %g\n", *v);}
 
 #define i_type FloatStack
 #define i_val float
-#define i_drop check_drop
-#define i_from c_default_from
+#define i_valdrop check_drop
+#define i_valfrom c_default_from
 #include <stc/cstack.h>
 
 #define i_type StackList

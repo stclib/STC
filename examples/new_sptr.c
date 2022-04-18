@@ -22,7 +22,7 @@ void Person_drop(Person* p) {
 // ...
 #define i_type SPtr
 #define i_val int
-#define i_drop(x) printf("drop: %d\n", *(x))
+#define i_valdrop(x) printf("drop: %d\n", *(x))
 #include <stc/carc.h>
 
 #define i_val_arcbox SPtr

@@ -19,7 +19,7 @@ void Song_drop(Song* s) {
 
 #define i_type SongPtr
 #define i_val Song
-#define i_drop Song_drop
+#define i_valdrop Song_drop
 #define i_opt c_no_cmp
 #include <stc/carc.h>
 

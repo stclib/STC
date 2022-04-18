@@ -16,8 +16,8 @@ struct { double x, y; } typedef Point;
 // Map of int64 pointers: For fun, define valraw as int64_t for easy emplace call!
 typedef int64_t inttype;
 #define i_key_str
-#define i_valraw inttype
 #define i_val inttype*
+#define i_valraw inttype
 #define i_valdrop(x) c_free(*(x))
 #define i_valfrom(raw) c_new(inttype, raw)
 #define i_valto(x) **(x)

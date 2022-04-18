@@ -16,8 +16,8 @@
 // Shorthand for:
 //#define i_val People_value
 //#define i_cmp People_value_cmp
-//#define i_from People_value_clone
-//#define i_drop People_value_drop
+//#define i_valfrom People_value_clone
+//#define i_valdrop People_value_drop
 #include <stc/cvec.h>
 
 void add(Departments* deps, const char* name, const char* email, const char* dep)

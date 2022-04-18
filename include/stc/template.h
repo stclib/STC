@@ -97,21 +97,11 @@
   #error "if i_keyraw defined, i_keyfrom (and often i_keyto) must be defined"
 #endif
 
-/* Resolve i_drop and i_from here */
-#if defined i_drop && !defined i_keydrop && defined _i_isset
-  #define i_keydrop i_drop
-#elif defined i_drop && !defined i_key
-  #define i_valdrop i_drop
-#elif defined i_drop
-  #error "i_drop not supported when i_key defined. Define i_keydrop/i_valdrop instead."
+#if defined i_drop
+  #error "i_drop not supported Define i_keydrop/i_valdrop instead."
 #endif
-
-#if defined i_from && !defined i_keyfrom && defined _i_isset
-  #define i_keyfrom i_from
-#elif defined i_from && !defined i_key
-  #define i_valfrom i_from
-#elif defined i_from
-  #error "i_from not supported when i_key defined. Define i_keyfrom/i_valfrom instead."
+#if defined i_from
+  #error "i_from not supported. Define i_keyfrom/i_valfrom instead."
 #endif
 
 #ifdef i_val_str
@@ -237,8 +227,6 @@
 #undef i_cmp
 #undef i_eq
 #undef i_hash
-#undef i_from
-#undef i_drop
 #undef i_size
 
 #undef i_val
