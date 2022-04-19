@@ -43,15 +43,15 @@ int main()
         c_apply(v, Map_emplace(map, c_pair(v)), Map_raw, {
             {"Steve", 1979}, {"Rick", 1974}, {"Tracy", 2003}
         });
-        
+
         // Share two Maps from the stack with the list using emplace (clone the carc):
         List_push_back(&list, Arc_clone(stack.data[0]));
         List_push_back(&list, Arc_clone(stack.data[1]));
-        
+
         // Clone (deep copy) a Map from the stack to the list
         // List will contain two shared and two unshared maps.
         map = List_push_back(&list, Arc_from(Map_clone(*stack.data[1].get)))->get;
-        
+
         // Add one more element to the cloned map:
         Map_emplace_or_assign(map, "CLONED", 2021);
 

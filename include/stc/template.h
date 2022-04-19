@@ -63,6 +63,7 @@
 #elif defined i_key_arcbox
   #define i_key_bind i_key_arcbox
   #define i_keyraw c_paste(i_key_arcbox, _value)
+  #define _i_no_emplace
 #endif
 
 #ifdef i_key_bind
@@ -112,6 +113,7 @@
 #elif defined i_val_arcbox
   #define i_val_bind i_val_arcbox
   #define i_valraw c_paste(i_val_arcbox, _value)
+  #define _i_no_emplace
 #endif
 
 #ifdef i_val_bind

@@ -37,7 +37,7 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ## Methods
 ```c
 carc_X      carc_X_init();                                     // empty shared pointer
-carc_X      carc_X_new(i_valraw raw);                          // like carc_X_from(), but construct owned value from raw.
+carc_X      carc_X_make(i_valraw raw);                         // like carc_X_from(), but construct owned value from raw.
 carc_X      carc_X_from(i_val val);                            // create new heap allocated object. Take ownership of val.
 carc_X      carc_X_from_ptr(i_val* p);                         // create a carc from raw pointer. Takes ownership of p.
 
