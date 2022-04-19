@@ -25,6 +25,7 @@ int point_cmp(const Point* a, const Point* b) {
 #define i_key Point
 #define i_val int
 #define i_cmp point_cmp
+#define i_hash c_default_hash
 #define i_opt c_is_fwd
 #define i_tag pnt
 #include <stc/cmap.h>

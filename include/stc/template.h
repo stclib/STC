@@ -94,11 +94,10 @@
 #endif
 
 #if defined i_keyraw && !defined i_keyfrom
-  #error "if i_keyraw defined, i_keyfrom (and often i_keyto) must be defined"
+  #error "if i_keyraw is defined, i_keyfrom (and normally i_keyto) must be defined"
 #endif
-
 #if defined i_drop
-  #error "i_drop not supported Define i_keydrop/i_valdrop instead."
+  #error "i_drop not supported. Define i_keydrop/i_valdrop instead."
 #endif
 #if defined i_from
   #error "i_from not supported. Define i_keyfrom/i_valfrom instead."
@@ -138,7 +137,7 @@
 #endif
 
 #if defined i_valraw && !defined i_valfrom
-  #error "if i_valraw defined, i_valfrom (and often i_valto) must be defined"
+  #error "if i_valraw is defined, i_valfrom (and normally i_valto) must be defined"
 #endif
 
 #if !defined i_keyraw && !defined i_valraw
@@ -173,6 +172,12 @@
   #endif
   #if !defined i_keyfrom && defined i_keydrop
     #define _i_no_clone
+  #endif
+  #if !defined i_hash && (defined i_keyfrom || defined i_cmp || defined i_eq)
+    #define _i_no_hash 1
+  #endif
+  #if !defined i_cmp && !defined i_eq && defined i_hash
+    #define _i_no_hash 2
   #endif
   #ifndef i_keyfrom
     #define i_keyfrom c_default_from
@@ -250,5 +255,6 @@
 #undef _i_prefix
 #undef _i_no_clone
 #undef _i_no_emplace
+#undef _i_no_hash
 #undef _i_template
 #endif
