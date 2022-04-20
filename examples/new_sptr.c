@@ -22,7 +22,8 @@ void Person_drop(Person* p) {
 // ...
 #define i_type SPtr
 #define i_val int
-#define i_valdrop(x) printf("drop: %d\n", *(x))
+#define i_valdrop(x) printf("drop: %d\n", *x)
+#define i_valfrom(i) i
 #include <stc/carc.h>
 
 #define i_val_arcbox SPtr
@@ -42,9 +43,9 @@ int main(void) {
 
     c_auto (cstack_iptr, stk) {
         puts("Ex2");
-        cstack_iptr_emplace(&stk, 10);
-        cstack_iptr_emplace(&stk, 20);
-        cstack_iptr_emplace(&stk, 30);
+        cstack_iptr_push(&stk, SPtr_make(10));
+        cstack_iptr_push(&stk, SPtr_make(20));
+        cstack_iptr_push(&stk, SPtr_make(30));
         cstack_iptr_push(&stk, SPtr_clone(*cstack_iptr_top(&stk)));
         cstack_iptr_push(&stk, SPtr_clone(*cstack_iptr_begin(&stk).ref));
 

@@ -145,8 +145,8 @@ STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
 
 STC_INLINE _cx_value
 _cx_memb(_value_clone)(_cx_value _val) {
-    i_keyraw k = i_keyto(_i_keyref(&_val)); *_i_keyref(&_val) = i_keyfrom(k);
-    _i_MAP_ONLY( i_valraw m = i_valto((&_val.second)); _val.second = i_valfrom(m); )
+    *_i_keyref(&_val) = i_keyclone((*_i_keyref(&_val)));
+    _i_MAP_ONLY( _val.second = i_valclone(_val.second); )
     return _val;
 }
 

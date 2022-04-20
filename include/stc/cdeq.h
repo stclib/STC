@@ -75,7 +75,7 @@ STC_INLINE _cx_value*   _cx_memb(_emplace_back)(_cx_self* self, i_valraw raw)
                             { return _cx_memb(_push_back)(self, i_valfrom(raw)); }
 #endif
 STC_INLINE i_val        _cx_memb(_value_clone)(i_val val)
-                            { i_valraw r = i_valto((&val)); return i_valfrom(r); }
+                            { return i_valclone(val); }
 STC_INLINE void         _cx_memb(_copy)(_cx_self *self, _cx_self other) {
                             if (self->data == other.data) return;
                             _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
@@ -303,9 +303,8 @@ _cx_memb(_clone)(_cx_self cx) {
     const size_t sz = cdeq_rep_(&cx)->size;
     _cx_self out = _cx_memb(_with_capacity)(sz);
     cdeq_rep_(&out)->size = sz;
-    i_valraw _r;
     for (size_t i = 0; i < sz; ++i)
-        _r = i_valto((cx.data + i)), out.data[i] = i_valfrom(_r);
+        out.data[i] = i_valclone(cx.data[i]);
     return out;
 }
 #endif
@@ -387,9 +386,8 @@ _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
                           const _cx_value* p1, const _cx_value* p2) {
     pos = _cx_memb(_insert_space_)(self, pos, p2 - p1);
     _cx_iter it = {pos};
-    i_valraw r;
     for (; p1 != p2; ++p1)
-        r = i_valto(p1), *pos++ = i_valfrom(r);
+        *pos++ = i_valclone((*p1));
     return it;
 }
 #endif // !_i_no_clone

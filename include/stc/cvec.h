@@ -97,7 +97,7 @@ STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_API _cx_iter        _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
                                                  const _cx_value* p1, const _cx_value* p2);
 STC_INLINE i_val        _cx_memb(_value_clone)(_cx_value val)
-                            { i_valraw r = i_valto((&val)); return i_valfrom(r); }
+                            { return i_valclone(val); }
 STC_INLINE i_val        _cx_memb(_value_fromraw)(i_valraw raw) { return i_valfrom(raw); }
 STC_INLINE void         _cx_memb(_copy)(_cx_self *self, _cx_self other) {
                             if (self->data == other.data) return;
@@ -363,9 +363,8 @@ _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
                          const _cx_value* p1, const _cx_value* p2) {
     pos = _cx_memb(_insert_space_)(self, pos, p2 - p1);
     _cx_iter it = {pos};
-    i_valraw r;
     for (; p1 != p2; ++p1)
-        r = i_valto(p1), *pos++ = i_valfrom(r);
+        *pos++ = i_valclone((*p1));
     return it;
 }
 

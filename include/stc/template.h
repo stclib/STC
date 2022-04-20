@@ -63,6 +63,7 @@
 #elif defined i_key_arcbox
   #define i_key_bind i_key_arcbox
   #define i_keyraw c_paste(i_key_arcbox, _value)
+  #define i_keyclone c_paste(i_key_arcbox, _clone)
   #define _i_no_emplace
 #endif
 
@@ -96,11 +97,9 @@
 
 #if defined i_keyraw && !defined i_keyfrom
   #error "if i_keyraw is defined, i_keyfrom (and normally i_keyto) must be defined"
-#endif
-#if defined i_drop
+#elif defined i_drop
   #error "i_drop not supported. Define i_keydrop/i_valdrop instead."
-#endif
-#if defined i_from
+#elif defined i_from
   #error "i_from not supported. Define i_keyfrom/i_valfrom instead."
 #endif
 
@@ -113,6 +112,7 @@
 #elif defined i_val_arcbox
   #define i_val_bind i_val_arcbox
   #define i_valraw c_paste(i_val_arcbox, _value)
+  #define i_valclone c_paste(i_val_arcbox, _clone)
   #define _i_no_emplace
 #endif
 
@@ -190,6 +190,9 @@
   #ifndef i_keyto
     #define i_keyto c_default_toraw
   #endif
+  #ifndef i_keyclone
+    #define i_keyclone(key) i_keyfrom((i_keyto((&(key)))))
+  #endif
   #ifndef i_keydrop
     #define i_keydrop c_default_drop
   #endif
@@ -209,6 +212,9 @@
 #endif
 #ifndef i_valto
   #define i_valto c_default_toraw
+#endif
+#ifndef i_valclone
+  #define i_valclone(val) i_valfrom((i_valto((&(val)))))
 #endif
 #ifndef i_valdrop
   #define i_valdrop c_default_drop
@@ -244,6 +250,7 @@
 #undef i_valfrom
 #undef i_valto
 #undef i_valdrop
+#undef i_valclone
 
 #undef i_key
 #undef i_key_str
@@ -253,6 +260,7 @@
 #undef i_keyfrom
 #undef i_keyto
 #undef i_keydrop
+#undef i_keyclone
 
 #undef _i_prefix
 #undef _i_no_clone
