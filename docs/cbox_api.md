@@ -67,13 +67,13 @@ bool        cbox_X_value_eq(const i_val* x, const i_val* y);  // cbox_X_value_cm
 ```c
 #include <stdio.h>
 void int_drop(int* x) {
-    printf("drop: %d\n", *x);
+    printf("\n drop %d", *x);
 }
 
 #define i_type IBox
 #define i_val int
-#define i_valdrop int_drop       // optional func, just to display elements destroyed
-#define i_valfrom c_default_from // must specify because i_valdrop was defined.
+#define i_valdrop int_drop    // optional func, just to display elements destroyed
+#define i_valfrom(x) x        // must specify because i_valdrop was defined.
 #include <stc/cbox.h>
 
 #define i_type ISet
@@ -97,21 +97,17 @@ int main()
         printf("vec:");
         c_foreach (i, IVec, vec)
             printf(" %d", *i.ref->get);
-        puts("");
 
         // add odd numbers from vec to set
         c_foreach (i, IVec, vec)
-            if (*i.ref->get & 1) {
-                ISet_emplace(&set, *i.ref->get); // clone
-                // same as:
-                //ISet_insert(&set, IBox_clone(*i.ref));
-            }
+            if (*i.ref->get & 1)
+                ISet_insert(&set, IBox_clone(*i.ref));
 
         // pop the two last elements in vec
         IVec_pop(&vec);
         IVec_pop(&vec);
 
-        printf("vec:");
+        printf("\nvec:");
         c_foreach (i, IVec, vec)
             printf(" %d", *i.ref->get);
 
@@ -124,10 +120,12 @@ int main()
 Output:
 ```
 vec: 2021 2012 2022 2015
-drop: 2015
-drop: 2022
+ drop 2015
+ drop 2022
 vec: 2021 2012
-set: 2021drop: 2021
-drop: 2012
-drop: 2021
+set: 2015 2021
+ drop 2021
+ drop 2015
+ drop 2012
+ drop 2021
 ```
