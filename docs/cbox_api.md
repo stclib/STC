@@ -9,10 +9,6 @@ When declaring a container of **cbox** values, define `i_val_arcbox` with the
 cbox type instead of defining `i_val`. This will auto-set `i_valdrop`, `i_valfrom`, and `i_cmp` using 
 functions defined by the specified **cbox**.
 
-For containers, make sure to pass the result of create functions like *cbox_X_make()* **only** to 
-*insert()*, *push_back()*, and *push()* functions. Use the *emplace()* functions in order to
-auto-*clone* an already existing/owned cbox element.
-
 See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr) for a functional reference, or Rust [std::boxed::Box](https://doc.rust-lang.org/std/boxed/struct.Box.html)
 
 ## Header file and declaration
@@ -35,8 +31,7 @@ compare the pointer addresses when used. Additionally, `c_no_clone` or `i_is_fwd
 ## Methods
 ```c
 cbox_X      cbox_X_init();                                    // return an empty cbox
-cbox_X      cbox_X_make(i_valraw raw);                        // like cbox_X_from(), but create owned value from raw.
-                                                              // NB! available only if i_valraw is defined.
+cbox_X      cbox_X_make(i_valraw raw);                        // create owned value from raw type.
 cbox_X      cbox_X_from(i_val val);                           // allocate new heap object with val. Take ownership of val.
 cbox_X      cbox_X_from_ptr(i_val* p);                        // create a cbox from a pointer. Takes ownership of p.
 

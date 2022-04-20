@@ -15,11 +15,6 @@ additional synchronization even if these instances are copies and share ownershi
 
 When declaring a container with shared pointers, define `i_val_bind` as the carc type, see example.
 
-Make sure to pass the result of create functions like *carc_X_from()* **only** to *insert()*,
-*push_back()*, and *push()* functions, as it is *moved* into the container. Use *emplace()* 
-method for sharing existing **carc**s between containers or other existing shared pointers,
-as they clone/share the input internally.
-
 See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr) for a functional reference, or Rust [std::sync::Arc](https://doc.rust-lang.org/std/sync/struct.Arc.html) / [std::rc::Rc](https://doc.rust-lang.org/std/rc/struct.Rc.html).
 
 ## Header file and declaration
@@ -37,7 +32,7 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ## Methods
 ```c
 carc_X      carc_X_init();                                     // empty shared pointer
-carc_X      carc_X_make(i_valraw raw);                         // like carc_X_from(), but construct owned value from raw.
+carc_X      carc_X_make(i_valraw raw);                         // construct owned value from raw type
 carc_X      carc_X_from(i_val val);                            // create new heap allocated object. Take ownership of val.
 carc_X      carc_X_from_ptr(i_val* p);                         // create a carc from raw pointer. Takes ownership of p.
 
