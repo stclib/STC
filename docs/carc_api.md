@@ -32,7 +32,7 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ## Methods
 ```c
 carc_X      carc_X_init();                                     // empty shared pointer
-carc_X      carc_X_make(i_valraw raw);                         // construct owned value from raw type
+carc_X      carc_X_make(i_valraw raw);                         // create owned value from raw type, if defined.
 carc_X      carc_X_from(i_val val);                            // create new heap allocated object. Take ownership of val.
 carc_X      carc_X_from_ptr(i_val* p);                         // create a carc from raw pointer. Takes ownership of p.
 

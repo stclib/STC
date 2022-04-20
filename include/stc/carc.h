@@ -143,8 +143,10 @@ _cx_memb(_reset_from)(_cx_self* self, i_val val) {
     *self = _cx_memb(_from)(val);
 }
 
-STC_INLINE _cx_self
-_cx_memb(_make)(_cx_raw raw) { return _cx_memb(_from)(i_valfrom(raw)); }
+#if !defined _i_no_clone
+    STC_INLINE _cx_self
+    _cx_memb(_make)(_cx_raw raw) { return _cx_memb(_from)(i_valfrom(raw)); }
+#endif // !_i_no_clone
 
 // does not use i_valfrom, so we can bypass c_no_clone
 STC_INLINE _cx_self 

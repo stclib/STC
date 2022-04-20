@@ -31,7 +31,7 @@ compare the pointer addresses when used. Additionally, `c_no_clone` or `i_is_fwd
 ## Methods
 ```c
 cbox_X      cbox_X_init();                                    // return an empty cbox
-cbox_X      cbox_X_make(i_valraw raw);                        // create owned value from raw type.
+cbox_X      cbox_X_make(i_valraw raw);                        // create owned value from raw type, if defined.
 cbox_X      cbox_X_from(i_val val);                           // allocate new heap object with val. Take ownership of val.
 cbox_X      cbox_X_from_ptr(i_val* p);                        // create a cbox from a pointer. Takes ownership of p.
 
