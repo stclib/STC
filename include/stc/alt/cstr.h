@@ -253,6 +253,11 @@ STC_INLINE void cstr_insert_s(cstr* self, size_t pos, cstr s) {
 STC_INLINE bool cstr_getline(cstr *self, FILE *fp)
     { return cstr_getdelim(self, '\n', fp); }
 
+/* container adaptor functions: */
+#define  cstr_cmp(xp, yp)     strcmp(cstr_str(xp), cstr_str(yp))
+#define  cstr_eq(xp, yp)      (!cstr_cmp(xp, yp))
+#define  cstr_hash(xp, dummy) c_strhash(cstr_str(xp))
+
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(_i_implement)
 

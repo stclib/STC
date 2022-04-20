@@ -133,6 +133,12 @@
   #if !defined i_cmp && !defined i_key
     #define i_cmp c_paste(i_valraw, _cmp)
   #endif
+  #if !defined i_hash && c_option(c_hash)
+    #define i_hash c_paste(i_val, _hash)
+  #endif
+  #if !defined i_eq && c_option(c_eq)
+    #define i_eq c_paste(i_val, _eq)
+  #endif
   #ifndef i_valdrop
     #define i_valdrop c_paste(i_val, _drop)
   #endif

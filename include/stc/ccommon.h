@@ -93,13 +93,15 @@
 #define c_default_drop(ptr)     ((void) (ptr))
 
 #define c_option(flag)          ((i_opt) & (flag))
-#define c_is_fwd                1
-#define c_no_atomic             2
-#define c_no_clone              4
-#define c_no_cmp                8
-#define c_static                16
-#define c_header                32
-#define c_implement             64
+#define c_is_fwd                (1<<0)
+#define c_no_atomic             (1<<1)
+#define c_no_clone              (1<<2)
+#define c_no_cmp                (1<<3)
+#define c_hash                  (1<<4)
+#define c_eq                    (1<<5)
+#define c_static                (1<<6)
+#define c_header                (1<<7)
+#define c_implement             (1<<8)
 
 /* Generic algorithms */
 
