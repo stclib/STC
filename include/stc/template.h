@@ -123,13 +123,11 @@
   #ifndef i_cmp
     #define i_cmp c_paste(i_keyraw, _cmp)
   #endif
-  #if defined _i_ishash
-    #ifndef i_eq
-      #define i_eq c_paste(i_keyraw, _eq)
-    #endif
-    #if !defined i_hash
-      #define i_hash c_paste(i_keyraw, _hash)
-    #endif
+  #if !defined i_eq && (defined _i_ishash || c_option(c_eq))
+    #define i_eq c_paste(i_keyraw, _eq)
+  #endif
+  #if !defined i_hash && (defined _i_ishash || c_option(c_hash))
+    #define i_hash c_paste(i_keyraw, _hash)
   #endif
 #endif
 
