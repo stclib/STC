@@ -160,6 +160,9 @@
   #if defined i_valraw && !defined i_keyraw
     #define i_keyraw i_valraw
   #endif
+  #if defined i_valclone && !defined i_keyclone
+    #define i_keyclone i_valclone
+  #endif
   #if defined i_valfrom && !defined i_keyfrom
     #define i_keyfrom i_valfrom
   #endif
