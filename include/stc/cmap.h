@@ -65,15 +65,15 @@ typedef struct      { size_t idx; uint8_t hx; } chash_bucket_t;
   #define _i_SET_ONLY c_true
   #define _i_keyref(vp) (vp)
 #else
+  #define _i_ismap
   #define _i_MAP_ONLY c_true
   #define _i_SET_ONLY c_false
   #define _i_keyref(vp) (&(vp)->first)
 #endif
+#define _i_ishash
 #include "template.h"
-#if _i_no_hash == 1
+#ifdef _i_no_hash
   #error "i_hash must be defined if i_cmp, i_eq or i_keyfrom is defined for cmap/cset. For basic types c_default_hash may be used."
-#elif _i_no_hash == 2
-  #error "i_cmp or i_eq must be defined if i_hash is defined. For basic types c_default_cmp may be used."
 #endif
 #if !c_option(c_is_fwd)
   _cx_deftypes(_c_chash_types, _cx_self, i_key, i_val, i_size, _i_MAP_ONLY, _i_SET_ONLY);
@@ -392,6 +392,8 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
 
 #endif // _i_implement
 #undef _i_isset
+#undef _i_ismap
+#undef _i_ishash
 #undef _i_keyref
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY

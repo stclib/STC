@@ -67,6 +67,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
   #define _i_SET_ONLY c_true
   #define _i_keyref(vp) (vp)
 #else
+  #define _i_ismap
   #define _i_MAP_ONLY c_true
   #define _i_SET_ONLY c_false
   #define _i_keyref(vp) (&(vp)->first)
@@ -533,6 +534,7 @@ _cx_memb(_drop)(_cx_self* self) {
 
 #endif // _i_implement
 #undef _i_isset
+#undef _i_ismap
 #undef _i_keyref
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY

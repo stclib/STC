@@ -25,7 +25,7 @@
 #include <stc/crandom.h>
 #include <stdio.h>
 
-#define i_val int
+#define i_key int
 #include <stc/cqueue.h>
 
 int main() {
