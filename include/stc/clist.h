@@ -122,6 +122,8 @@ STC_INLINE _cx_value*   _cx_memb(_emplace_front)(_cx_self* self, i_keyraw raw)
                             { return _cx_memb(_push_front)(self, i_keyfrom(raw)); }
 STC_INLINE _cx_iter     _cx_memb(_emplace_at)(_cx_self* self, _cx_iter it, i_keyraw raw)
                             { return _cx_memb(_insert_at)(self, it, i_keyfrom(raw)); }
+STC_INLINE _cx_value*   _cx_memb(_emplace)(_cx_self* self, i_keyraw raw)
+                            { return _cx_memb(_push_back)(self, i_keyfrom(raw)); }
 #endif // !_i_no_emplace
 #endif // !_i_no_clone
 
@@ -131,6 +133,8 @@ STC_INLINE bool         _cx_memb(_empty)(_cx_self cx) { return cx.last == NULL; 
 STC_INLINE size_t       _cx_memb(_count)(_cx_self cx)
                             { return _clist_count((const clist_VOID*) &cx); }
 STC_INLINE void         _cx_memb(_clear)(_cx_self* self) { _cx_memb(_drop)(self); }
+STC_INLINE _cx_value*   _cx_memb(_push)(_cx_self* self, i_key value)
+                            { return _cx_memb(_push_back)(self, value); }
 STC_INLINE void         _cx_memb(_pop_front)(_cx_self* self)
                             { _cx_memb(_erase_after_)(self, self->last); }
 STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return &self->last->next->value; }

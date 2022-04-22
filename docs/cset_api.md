@@ -46,6 +46,7 @@ cset_X_value*       cset_X_get_mut(cset_X* self, i_keyraw rkey);                
 cset_X_iter         cset_X_find(const cset_X* self, i_keyraw rkey);
 
 cset_X_result       cset_X_insert(cset_X* self, i_key key);
+cset_X_result       cset_X_push(cset_X* self, i_key key);                            // alias for insert.
 cset_X_result       cset_X_emplace(cset_X* self, i_keyraw rkey);
 
 size_t              cset_X_erase(cset_X* self, i_keyraw rkey);                       // return 0 or 1

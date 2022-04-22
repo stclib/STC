@@ -22,8 +22,9 @@ uint64_t RViking_hash(const RViking* raw, size_t ignore) {
     uint64_t hash = c_strhash(raw->name) ^ (c_strhash(raw->country) >> 15);
     return hash;
 }
-static inline bool RViking_eq(const RViking* rx, const RViking* ry) {
-    return strcmp(rx->name, ry->name) == 0 && strcmp(rx->country, ry->country) == 0;
+static inline int RViking_cmp(const RViking* rx, const RViking* ry) {
+    int c = strcmp(rx->name, ry->name);
+    return c ? c : strcmp(rx->country, ry->country);
 }
 
 static inline Viking Viking_from(RViking raw) { // note: parameter is by value
@@ -40,7 +41,7 @@ static inline RViking Viking_toraw(const Viking* vk) {
 #define i_val       int
 // i_key_bind auto-binds these functions:
 //   i_hash     => Viking_hash
-//   i_eq       => Viking_eq
+//   i_cmp      => Viking_cmp
 //   i_keyfrom  => Viking_from // not _clone because i_keyraw is defined
 //   i_keyto    => Viking_toraw
 //   i_keydrop  => Viking_drop

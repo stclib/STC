@@ -46,7 +46,7 @@ STC_API _cx_self        _cx_memb(_with_capacity)(const size_t n);
 STC_API bool            _cx_memb(_reserve)(_cx_self* self, const size_t n);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
 STC_API void            _cx_memb(_drop)(_cx_self* self);
-STC_API _cx_value*      _cx_memb(_push_back)(_cx_self* self, i_key value);
+STC_API _cx_value*      _cx_memb(_push)(_cx_self* self, i_key value);
 STC_API void            _cx_memb(_shrink_to_fit)(_cx_self *self);
 #if !defined _i_queue
 #if !defined _i_no_clone
@@ -71,8 +71,8 @@ STC_API _cx_iter        _cx_memb(_insert_range_p)(_cx_self* self, _cx_value* pos
 #if !defined _i_no_clone
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 #if !defined _i_no_emplace
-STC_INLINE _cx_value*   _cx_memb(_emplace_back)(_cx_self* self, i_keyraw raw)
-                            { return _cx_memb(_push_back)(self, i_keyfrom(raw)); }
+STC_INLINE _cx_value*   _cx_memb(_emplace)(_cx_self* self, i_keyraw raw)
+                            { return _cx_memb(_push)(self, i_keyfrom(raw)); }
 #endif
 STC_INLINE i_key        _cx_memb(_value_clone)(i_key val)
                             { return i_keyclone(val); }
@@ -115,6 +115,9 @@ STC_INLINE _cx_value* _cx_memb(_at_mut)(_cx_self* self, const size_t idx) {
     assert(idx < cdeq_rep_(self)->size);  return self->data + idx;
 }
 
+STC_INLINE _cx_value* _cx_memb(_push_back)(_cx_self* self, i_key value) {
+    return _cx_memb(_push)(self, value);
+}
 STC_INLINE _cx_iter
 _cx_memb(_insert)(_cx_self* self, const size_t idx, i_key value) {
     return _cx_memb(_insert_range_p)(self, self->data + idx, &value, &value + 1);
@@ -149,6 +152,10 @@ _cx_memb(_emplace_range)(_cx_self* self, _cx_iter it, _cx_iter it1, _cx_iter it2
 
 STC_INLINE _cx_value* _cx_memb(_emplace_front)(_cx_self* self, i_keyraw raw) {
     return _cx_memb(_push_front)(self, i_keyfrom(raw));
+}
+
+STC_INLINE _cx_value* _cx_memb(_emplace_back)(_cx_self* self, i_keyraw raw) {
+    return _cx_memb(_push)(self, i_keyfrom(raw));
 }
 
 STC_INLINE _cx_iter
@@ -287,7 +294,7 @@ _cx_memb(_reserve)(_cx_self* self, const size_t n) {
 }
 
 STC_DEF _cx_value*
-_cx_memb(_push_back)(_cx_self* self, i_key value) {
+_cx_memb(_push)(_cx_self* self, i_key value) {
     struct cdeq_rep* r = cdeq_rep_(self);
     if (_cdeq_nfront(self) + r->size == r->cap) {
         _cx_memb(_expand_right_half_)(self, r->size, 1);

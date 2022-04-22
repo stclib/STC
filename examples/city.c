@@ -1,7 +1,6 @@
 #include <stc/cstr.h>
 
-typedef struct
-{
+typedef struct {
     cstr name;
     cstr country;
     float lat, lon;
@@ -11,6 +10,10 @@ typedef struct
 static inline int City_cmp(const City* a, const City* b) {
     int c = cstr_cmp(&a->name, &b->name);
     return c ? c : cstr_cmp(&a->country, &b->country);
+}
+
+static inline uint64_t City_hash(const City* a, size_t n) {
+    return cstr_hash(&a->name, 0) ^ cstr_hash(&a->country, 0);
 }
 
 static inline City City_clone(City c) {
