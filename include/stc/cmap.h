@@ -178,8 +178,10 @@ _cx_memb(_insert)(_cx_self* self, i_key _key _i_MAP_ONLY(, i_val _mapped)) {
 }
 
 STC_INLINE _cx_result
-_cx_memb(_push)(_cx_self* self, i_key _key _i_MAP_ONLY(, i_val _mapped)) {
-    return _cx_memb(_insert)(self, _key _i_MAP_ONLY(, _mapped));
+_cx_memb(_push)(_cx_self* self, _cx_value _val) {
+    _cx_result _res = _cx_memb(_insert_entry_)(self, i_keyto(_i_keyref(&_val)));
+    if (_res.inserted) *_res.ref = _val; else _cx_memb(_value_drop)(&_val);
+    return _res;
 }
 
 STC_INLINE _cx_iter
