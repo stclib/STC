@@ -57,6 +57,7 @@ void                clist_X_pop_front(clist_X* self);
 void                clist_X_push_back(clist_X* self, i_val value);                        // note: no pop_back()
 void                clist_X_push(clist_X* self, i_val value);                             // alias for push_back()
 void                clist_X_emplace_back(clist_X* self, i_valraw raw);
+void                clist_X_emplace(clist_X* self, i_valraw raw);                         // alias for emplace_back()
 
 clist_X_iter        clist_X_insert_at(clist_X* self, clist_X_iter it, i_val value);       // return iter to new elem
 clist_X_iter        clist_X_emplace_at(clist_X* self, clist_X_iter it, i_valraw raw);

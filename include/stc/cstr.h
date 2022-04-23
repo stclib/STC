@@ -256,9 +256,10 @@ STC_INLINE bool cstr_getline(cstr *self, FILE *fp)
     { return cstr_getdelim(self, '\n', fp); }
 
 /* container adaptor functions: */
-#define  cstr_cmp(xp, yp)     strcmp(cstr_str(xp), cstr_str(yp))
-#define  cstr_eq(xp, yp)      (!cstr_cmp(xp, yp))
-#define  cstr_hash(xp, dummy) c_strhash(cstr_str(xp))
+#define             cstr_cmp(xp, yp) strcmp(cstr_str(xp), cstr_str(yp))
+#define             cstr_eq(xp, yp) (!cstr_cmp(xp, yp))
+STC_INLINE uint64_t cstr_hash(const cstr *self, size_t dummylen)
+    { return c_default_hash(cstr_str(self), cstr_size(*self)); }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(_i_implement)

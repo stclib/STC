@@ -26,7 +26,6 @@ KHASH_MAP_INIT_INT64(ii, int64_t)
 // cmap and khash template expansion
 #define i_key int64_t
 #define i_val int64_t
-#define i_hash c_hash64
 #define i_tag ii
 #include <stc/cmap.h>
 

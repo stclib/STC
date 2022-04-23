@@ -127,13 +127,14 @@ STC_INLINE bool         cstr_ends_with_sv(cstr s, csview sub)
 #endif
 /* ---- Container helper functions ---- */
 
-STC_INLINE int          csview_cmp(const csview* x, const csview* y) { 
-                            const size_t m = x->size < y->size ? x->size : y->size; 
-                            const int c = memcmp(x->str, y->str, m);
-                            return c ? c : x->size - y->size;
-                        }
-#define                 csview_hash(xp, dummy) c_default_hash((xp)->str, (xp)->size)
-#define                 csview_eq(xp, yp) (!csview_cmp(xp, yp))
+STC_INLINE int      csview_cmp(const csview* x, const csview* y) { 
+                        const size_t m = x->size < y->size ? x->size : y->size; 
+                        const int c = memcmp(x->str, y->str, m);
+                        return c ? c : x->size - y->size;
+                    }
+#define             csview_eq(xp, yp) (!csview_cmp(xp, yp))
+STC_INLINE uint64_t csview_hash(const csview *self, size_t sz)
+    { return c_default_hash(self->str, self->size); }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(_i_implement)

@@ -89,8 +89,6 @@ uint64_t              c_strhash(const char *str);                              /
 
 // hash template parameter functions:
 uint64_t              c_default_hash(const void *data, size_t len);            // key is any integral type
-uint64_t              c_hash32(const void* data, size_t is4);                  // key is one 32-bit int
-uint64_t              c_hash64(const void* data, size_t is8);                  // key is one 64-bit int
 
 // equalto template parameter functions:
 bool                  c_default_eq(const i_keyraw* a, const i_keyraw* b);      // *a == *b

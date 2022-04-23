@@ -2,7 +2,6 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
-#define STC_USE_SSO 1
 #define i_type svec
 #define i_val_str
 #include <stc/cstack.h>

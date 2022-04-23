@@ -37,13 +37,11 @@ DEFMAP(map_s, <std::string, std::string>);
 
 #define i_key int32_t
 #define i_val int32_t
-#define i_hash c_hash32
 #define i_tag i
 #include <stc/cmap.h>
 
 #define i_key uint64_t
 #define i_val uint64_t
-#define i_hash c_hash64
 #define i_tag x
 #include <stc/cmap.h>
 

@@ -1,5 +1,5 @@
 // https://gobyexample.com/maps
-#include <stc/alt/cstr.h>
+#include <stc/cstr.h>
 #define i_type Map
 #define i_key_str
 #define i_val int

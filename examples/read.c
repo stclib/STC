@@ -1,4 +1,4 @@
-#include <stc/alt/cstr.h>
+#include <stc/cstr.h>
 #define i_val_str
 #include <stc/cvec.h>
 #include <errno.h>

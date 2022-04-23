@@ -50,11 +50,15 @@
   #define i_size uint32_t
 #endif
 
-#if defined i_key_str || defined i_val_str
+#if defined i_key_str || defined i_val_str || defined i_key_ssv || defined i_val_ssv
   #include "cstr.h"
+  #if defined i_key_ssv || defined i_val_ssv
+  #include "csview.h"
+  #endif
 #endif
 
-#if !(defined i_key || defined i_key_str || defined i_key_bind || defined i_key_arcbox)
+#if !(defined i_key || defined i_key_str || defined i_key_ssv || \
+      defined i_key_bind || defined i_key_arcbox)
   #define _i_key_from_val
   #if defined _i_ismap
     #error "i_key* must be defined for maps."
@@ -63,6 +67,9 @@
   #if defined i_val_str
     #define i_key_str i_val_str
   #endif
+  #if defined i_val_ssv
+    #define i_key_ssv i_val_ssv
+  #endif  
   #if defined i_val_arcbox
     #define i_key_arcbox i_val_arcbox
   #endif
@@ -89,11 +96,19 @@
   #endif
 #endif
 
-#ifdef i_key_str
+#if defined i_key_str
   #define i_key_bind cstr
   #define i_keyraw crawstr
   #ifndef i_tag
     #define i_tag str
+  #endif
+#elif defined i_key_ssv
+  #define i_key_bind cstr
+  #define i_keyraw csview
+  #define i_keyfrom cstr_from_sv
+  #define i_keyto cstr_to_sv
+  #ifndef i_tag
+    #define i_tag ssv
   #endif
 #elif defined i_key_arcbox
   #define i_key_bind i_key_arcbox
@@ -144,9 +159,6 @@
 #if (!defined i_keyfrom && defined i_keydrop) || c_option(c_no_clone)
   #define _i_no_clone
 #endif
-#if !defined i_hash && (defined i_keyfrom || defined i_keyclone || defined i_cmp || defined i_eq)
-  #define _i_no_hash
-#endif
 #ifndef i_keyfrom
   #define i_keyfrom c_default_from
 #endif
@@ -181,6 +193,12 @@
 #ifdef i_val_str
   #define i_val_bind cstr
   #define i_valraw crawstr
+#elif defined i_val_ssv
+  #define i_val cstr
+  #define i_valraw csview
+  #define i_valfrom cstr_from_sv
+  #define i_valto cstr_to_sv
+  #define i_valdrop cstr_drop
 #elif defined i_val_arcbox
   #define i_val_bind i_val_arcbox
   #define i_valraw c_paste(i_val_arcbox, _value)
@@ -257,6 +275,7 @@
 
 #undef i_val
 #undef i_val_str
+#undef i_val_ssv
 #undef i_val_arcbox
 #undef i_val_bind
 #undef i_valraw
@@ -267,6 +286,7 @@
 
 #undef i_key
 #undef i_key_str
+#undef i_key_ssv
 #undef i_key_arcbox
 #undef i_key_bind
 #undef i_keyraw
