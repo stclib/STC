@@ -32,7 +32,7 @@ static void sromutrio(uint64_t seed) {
 static const char CHARS[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=+-";
 
 static const int BENCHMARK_SIZE = 5000000;
-static const int MAX_STRING_LENGTH = 25;
+static const int MAX_STRING_LENGTH = 30;
 
 using time_point = std::chrono::high_resolution_clock::time_point;
 
@@ -43,7 +43,7 @@ void addRandomString_STD(std::vector<std::string>& vec, const int length) {
         p[i] = CHARS[romutrio() & 63];
     }
     s.append(s);
-    vec.push_back(s);
+    vec.push_back(std::move(s));
 }
 
 void addRandomString_STC(svec& vec, const int length) {
