@@ -161,10 +161,10 @@ int main() {
     // emplace() will not compile if adding a new cstr type. Use push_back():
     cvec_str_push(&names, tmp); // tmp is moved to names, do not drop() it.
 
-    printf("%s\n", names.data[1].str); // Access the second element
+    printf("%s\n", cstr_str(&names.data[1])); // Access the second element
 
     c_foreach (i, cvec_str, names)
-        printf("item: %s\n", i.ref->str);
+        printf("item: %s\n", cstr_str(i.ref));
     cvec_str_drop(&names);
 }
 ```
@@ -187,7 +187,7 @@ typedef struct {
 } User;
 
 int User_cmp(const User* a, const User* b) {
-    int c = strcmp(a->name.str, b->name.str);
+    int c = strcmp(cstr_str(&a->name), cstr_str(&b->name));
     return c != 0 ? c : a->id - b->id;
 }
 void User_drop(User* self) {
@@ -214,7 +214,7 @@ int main(void) {
 
     cvec_u vec2 = cvec_u_clone(vec);
     c_foreach (i, cvec_u, vec2)
-        printf("%s: %d\n", i.ref->name.str, i.ref->id);
+        printf("%s: %d\n", cstr_str(&i.ref->name), i.ref->id);
 
     c_drop(cvec_u, &vec, &vec2); // cleanup
 }

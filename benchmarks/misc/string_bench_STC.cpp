@@ -69,7 +69,7 @@ void initShortStringVec(cvec_str* vs, cvec_sv* vsv)
     cvec_str_clear(vs);
     cvec_sv_clear(vsv);
     
-    *vs = read_file("names.txt");
+    cvec_str_copy(vs, read_file("names.txt"));
 /*
     cvec_str_emplace_back(vs, "Susan");
     cvec_str_emplace_back(vs, "Jason");
@@ -110,11 +110,11 @@ void initLongStringVec(cvec_str* vs, cvec_sv* vsv)
     cvec_str_clear(vs);
     cvec_sv_clear(vsv);
     
-    *vs = read_file("names.txt");
+    cvec_str_copy(vs, read_file("names.txt"));
     c_foreach (i, cvec_str, *vs) {
-    	cstr_append_s(i.ref, *i.ref);
-    	cstr_append_s(i.ref, *i.ref);
-    	cstr_append_s(i.ref, *i.ref);
+        cstr_append_s(i.ref, *i.ref);
+        cstr_append_s(i.ref, *i.ref);
+        cstr_append_s(i.ref, *i.ref);
     }    
 /*
     cvec_str_emplace_back(vs, "Susan Susan Susan Susan Susan Susan");

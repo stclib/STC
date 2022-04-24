@@ -97,13 +97,13 @@ int main ()
 
             fifth = cset_str_clone(second);
             c_foreach (i, cset_str, third)
-                cset_str_emplace(&fifth, i.ref->str);
+                cset_str_emplace(&fifth, cstr_str(i.ref));
             c_foreach (i, cset_str, fourth)
-                cset_str_emplace(&fifth, i.ref->str);
+                cset_str_emplace(&fifth, cstr_str(i.ref));
         }
         printf("fifth contains:\n\n");
         c_foreach (i, cset_str, fifth)
-            printf("%s\n", i.ref->str);
+            printf("%s\n", cstr_str(i.ref));
     }
 }
 ```

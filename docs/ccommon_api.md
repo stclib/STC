@@ -31,7 +31,7 @@ c_autovar (FILE* f = fopen(fname, "rb"), fclose(f))
 c_autovar (cstr s = cstr_new("Hello"), cstr_drop(&s))
 {
     cstr_append(&s, " world");
-    printf("%s\n", s.str);
+    printf("%s\n", cstr_str(&s));
 }
 
 c_auto (cstr, s1, s2)
@@ -42,19 +42,19 @@ c_auto (cstr, s1, s2)
     cstr_append(&s2, "Cool");
     cstr_append(&s2, " stuff");
 
-    printf("%s %s\n", s1.str, s2.str);
+    printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
 }
 
 MyData data;
 c_autoscope (mydata_init(&data), mydata_destroy(&data))
 {
-    printf("%s\n", mydata.name.str);
+    printf("%s\n", cstr_str(&mydata.name));
 }
 
 cstr s1 = cstr_new("Hello"), s2 = cstr_new("world");
 c_autodefer (cstr_drop(&s1), cstr_drop(&s2))
 {
-    printf("%s %s\n", s1.str, s2.str);
+    printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
 }
 ```
 **Example**: Load each line of a text file into a vector of strings:
@@ -73,7 +73,7 @@ cvec_str readFile(const char* name)
     c_autovar (FILE* fp = fopen(name, "r"), fclose(fp))
     c_autovar (cstr line = cstr_null, cstr_drop(&line))
         while (cstr_getline(&line, fp))
-            cvec_str_emplace_back(&vec, line.str);
+            cvec_str_emplace_back(&vec, cstr_str(&line));
     return vec;
 }
 
@@ -81,7 +81,7 @@ int main()
 {
     c_autovar (cvec_str x = readFile(__FILE__), cvec_str_drop(&x))
         c_foreach (i, cvec_str, x)
-            printf("%s\n", i.ref->str);
+            printf("%s\n", cstr_str(i.ref));
 }
 ```
 ### The checkauto utility program (for RAII)

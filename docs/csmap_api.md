@@ -113,7 +113,7 @@ int main()
 
         // Iterate and print keys and values of sorted map
         c_foreach (i, csmap_str, colors) {
-            printf("Key:[%s] Value:[%s]\n", i.ref->first.str, i.ref->second.str);
+            printf("Key:[%s] Value:[%s]\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
         }
 
         // Add two new entries to the sorted map
@@ -163,7 +163,7 @@ int main()
         csmap_id_emplace(&idnames, 100, "Green");
 
         c_foreach (i, csmap_id, idnames)
-            printf("%d: %s\n", i.ref->first, i.ref->second.str);
+            printf("%d: %s\n", i.ref->first, cstr_str(&i.ref->second));
     }
 }
 ```

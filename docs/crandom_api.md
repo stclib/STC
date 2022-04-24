@@ -105,7 +105,7 @@ int main()
         size_t n = (size_t) (i.ref->second * StdDev * Scale * 2.5 / N);
         if (n > 0) {
             cstr_resize(&bar, n, '*');
-            printf("%4d %s\n", i.ref->first, bar.str);
+            printf("%4d %s\n", i.ref->first, cstr_str(&bar));
         }
     }
     // Cleanup

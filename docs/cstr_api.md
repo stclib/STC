@@ -29,8 +29,8 @@ cstr*        cstr_take(cstr* self, cstr s);                           // take th
 cstr         cstr_move(cstr* self);                                   // move string to caller, leave empty string
 void         cstr_drop(cstr *self);                                   // destructor
 
-const char*  cstr_str(const cstr* self);                              // self->str
-char*        cstr_data(cstr* self);                                   // self->str
+const char*  cstr_str(const cstr* self);                              // access to const char*
+char*        cstr_data(cstr* self);                                   // access to char*
 size_t       cstr_size(cstr s);
 size_t       cstr_length(cstr s);
 size_t       cstr_capacity(cstr s);
@@ -110,27 +110,27 @@ int          c_strncasecmp(const char* str1, const char* str2, size_t n);
 
 int main() {
     cstr s0 = cstr_new("Initialization without using strlen().");
-    printf("%s\nLength: %" PRIuMAX "\n\n", s0.str, cstr_size(s0));
+    printf("%s\nLength: %" PRIuMAX "\n\n", cstr_str(&s0), cstr_size(s0));
 
     cstr s1 = cstr_new("one-nine-three-seven-five.");
-    printf("%s\n", s1.str);
+    printf("%s\n", cstr_str(&s1));
 
     cstr_insert(&s1, 3, "-two");
-    printf("%s\n", s1.str);
+    printf("%s\n", cstr_str(&s1));
 
     cstr_erase_n(&s1, 7, 5); // -nine
-    printf("%s\n", s1.str);
+    printf("%s\n", cstr_str(&s1));
 
     cstr_replace(&s1, cstr_find(s1, "seven"), 5, "four");
-    printf("%s\n", s1.str);
+    printf("%s\n", cstr_str(&s1));
 
     // reassign:
     cstr_assign(&s1, "one two three four five six seven");
     cstr_append(&s1, " eight");
-    printf("append: %s\n", s1.str);
+    printf("append: %s\n", cstr_str(&s1));
 
     cstr full_path = cstr_from_fmt("%s/%s.%s", "directory", "filename", "ext");
-    printf("%s\n", full_path.str);
+    printf("%s\n", cstr_str(&full_path));
 
     c_drop(cstr, &s0, &s1, &full_path);
 }

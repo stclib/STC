@@ -131,7 +131,7 @@ int main()
 
         // Iterate and print keys and values of unordered map
         c_foreach (n, cmap_str, u) {
-            printf("Key:[%s] Value:[%s]\n", n.ref->first.str, n.ref->second.str);
+            printf("Key:[%s] Value:[%s]\n", cstr_str(&n.ref->first), cstr_str(&n.ref->second));
         }
 
         // Add two new entries to the unordered map
@@ -182,7 +182,7 @@ int main()
         cmap_id_emplace(&idnames, 100, "Green");
 
         c_foreach (i, cmap_id, idnames)
-            printf("%d: %s\n", i.ref->first, i.ref->second.str);
+            printf("%d: %s\n", i.ref->first, cstr_str(&i.ref->second));
     }
 }
 ```
@@ -279,7 +279,7 @@ static inline int Viking_cmp(const Viking* a, const Viking* b) {
 }
 
 static inline uint32_t Viking_hash(const Viking* a, int ignored) {
-    return c_strhash(a->name.str) ^ (c_strhash(a->country.str) >> 15);
+    return c_strhash(cstr_str(&a->name)) ^ (c_strhash(cstr_str(&a->country)) >> 15);
 }
 
 static inline Viking Viking_clone(Viking v) {
@@ -319,7 +319,7 @@ int main()
 
         // Print the status of the vikings.
         c_forpair (viking, hp, Vikings, vikings) {
-            printf("%s of %s has %d hp\n", _.viking.name.str, _.viking.country.str, _.hp);
+            printf("%s of %s has %d hp\n", cstr_str(&_.viking.name), cstr_str(&_.viking.country), _.hp);
         }
     }
 }
@@ -369,7 +369,7 @@ static inline Viking Viking_from(RViking raw) {
     return (Viking){cstr_from(raw.name), cstr_from(raw.country)};
 }
 static inline RViking Viking_toraw(const Viking* vk) {
-    return (RViking){vk->name.str, vk->country.str};
+    return (RViking){cstr_str(&vk->name), cstr_str(&vk->country)};
 }
 
 // With this in place, we define the Viking => int hash map type:
@@ -399,7 +399,7 @@ int main()
         if (v) v->second += 3; // add 3 hp points to Einar
 
         c_forpair (viking, health, Vikings, vikings) {
-            printf("%s of %s has %d hp\n", _.viking.name.str, _.viking.country.str, _.health);
+            printf("%s of %s has %d hp\n", cstr_str(&_.viking.name), cstr_str(&_.viking.country), _.health);
         }
     }
 }
