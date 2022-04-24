@@ -139,8 +139,8 @@ int main()
         cmap_str_emplace(&u, "WHITE", "#FFFFFF");
 
         // Output values by key
-        printf("The HEX of color RED is:[%s]\n", cmap_str_at(&u, "RED")->str);
-        printf("The HEX of color BLACK is:[%s]\n", cmap_str_at(&u, "BLACK")->str);
+        printf("The HEX of color RED is:[%s]\n", cstr_str(cmap_str_at(&u, "RED")));
+        printf("The HEX of color BLACK is:[%s]\n", cstr_str(cmap_str_at(&u, "BLACK")));
     }
 }
 ```

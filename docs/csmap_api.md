@@ -121,8 +121,8 @@ int main()
         csmap_str_emplace(&colors, "WHITE", "#FFFFFF");
 
         // Output values by key
-        printf("The HEX of color RED is:[%s]\n", csmap_str_at(&colors, "RED")->str);
-        printf("The HEX of color BLACK is:[%s]\n", csmap_str_at(&colors, "BLACK")->str);
+        printf("The HEX of color RED is:[%s]\n", cstr_str(csmap_str_at(&colors, "RED")));
+        printf("The HEX of color BLACK is:[%s]\n", cstr_str(csmap_str_at(&colors, "BLACK")));
     }
 }
 ```
