@@ -1,6 +1,5 @@
 #!/bin/bash
 cc='g++ -std=c++17'
-#cc='g++ -std=c++17 -DSTC_USE_SSO'
 #cc='clang'
 #cc='clang -c -DSTC_HEADER'
 #cc='cl -nologo'

@@ -44,7 +44,7 @@
 
 typedef struct { char* data; size_t size, cap; } cstr_rep_t;
 typedef char cstr_value;
-#ifdef STC_USE_SSO
+#ifndef STC_OLD_CSTR
     typedef union {
         struct { char data[sizeof(cstr_rep_t) - 1]; unsigned char last; } sml;
         struct { char* data; size_t size, ncap; } lon;

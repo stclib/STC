@@ -1,7 +1,7 @@
 #!/bin/bash
 cc='gcc -s -O2 -Wall -std=c99 -pedantic'
 #cc='gcc -x c++ -s -O2 -Wall -std=c++20'
-#cc='clang -s -O2 -Wall -std=c99 -pedantic -DSTC_USE_SSO'
+#cc='clang -s -O2 -Wall -std=c99 -pedantic -DSTC_OLD_CSTR'
 #cc='clang'
 #cc='clang -c -DSTC_HEADER'
 #cc='cl -O2 -nologo -W2 -MD'

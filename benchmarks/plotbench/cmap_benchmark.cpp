@@ -17,7 +17,6 @@ static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
 
 #define i_key uint64_t
 #define i_val uint64_t
-#define i_hash c_hash64
 #define i_tag x
 #include <stc/cmap.h>
 

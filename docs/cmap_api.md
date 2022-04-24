@@ -67,11 +67,10 @@ cmap_X_iter           cmap_X_find(const cmap_X* self, i_keyraw rkey);           
 
 cmap_X_result         cmap_X_insert(cmap_X* self, i_key key, i_val mapped);                     // no change if key in map
 cmap_X_result         cmap_X_insert_or_assign(cmap_X* self, i_key key, i_val mapped);           // always update mapped
-cmap_X_result         cmap_X_put(cmap_X* self, i_key key, i_val mapped);                        // alias for insert_or_assign
+cmap_X_result         cmap_X_push(cmap_X* self, cmap_X_value entry);                            // similar to insert
 
 cmap_X_result         cmap_X_emplace(cmap_X* self, i_keyraw rkey, i_valraw rmapped);            // no change if rkey in map
 cmap_X_result         cmap_X_emplace_or_assign(cmap_X* self, i_keyraw rkey, i_valraw rmapped);  // always update rmapped
-cmap_X_result         cmap_X_put_raw(cmap_X* self, i_keyraw rkey, i_valraw rmapped);            // alias for emplace_or_assign
 
 size_t                cmap_X_erase(cmap_X* self, i_keyraw rkey);                                // return 0 or 1
 cmap_X_iter           cmap_X_erase_at(cmap_X* self, cmap_X_iter it);                            // return iter after it
@@ -90,8 +89,6 @@ uint64_t              c_strhash(const char *str);                              /
 
 // hash template parameter functions:
 uint64_t              c_default_hash(const void *data, size_t len);            // key is any integral type
-uint64_t              c_hash32(const void* data, size_t is4);                  // key is one 32-bit int
-uint64_t              c_hash64(const void* data, size_t is8);                  // key is one 64-bit int
 
 // equalto template parameter functions:
 bool                  c_default_eq(const i_keyraw* a, const i_keyraw* b);      // *a == *b
@@ -276,8 +273,9 @@ typedef struct {
 
 #define Viking_init() ((Viking){cstr_null, cstr_null})
 
-static inline bool Viking_eq(const Viking* a, const Viking* b) {
-    return cstr_equals_s(a->name, b->name) && cstr_equals_s(a->country, b->country);
+static inline int Viking_cmp(const Viking* a, const Viking* b) {
+    int c = cstr_cmp(&a->name, &b->name);
+    return c ? c : cstr_cmp(&a->country, &b->country);
 }
 
 static inline uint32_t Viking_hash(const Viking* a, int ignored) {
@@ -298,7 +296,7 @@ static inline void Viking_drop(Viking* vk) {
 #define i_key_bind Viking
 #define i_val int
 // i_key_bind auto-binds:
-//  #define i_eq Viking_eq
+//  #define i_cmp Viking_cmp
 //  #define i_hash Viking_hash
 //  #define i_keyfrom Viking_clone
 //  #define i_keydrop Viking_drop
@@ -361,8 +359,10 @@ static inline uint64_t RViking_hash(const RViking* raw, size_t ignore) {
     uint64_t hash = c_strhash(raw->name) ^ (c_strhash(raw->country) >> 15);
     return hash;
 }
-static inline bool RViking_eq(const RViking* rx, const RViking* ry) {
-    return strcmp(rx->name, ry->name) == 0 && strcmp(rx->country, ry->country) == 0;
+
+static inline int RViking_cmp(const RViking* rx, const RViking* ry) {
+    int c = strcmp(rx->name, ry->name);
+    return c ? c : strcmp(rx->country, ry->country);
 }
 
 static inline Viking Viking_from(RViking raw) {
@@ -379,7 +379,7 @@ static inline RViking Viking_toraw(const Viking* vk) {
 #define i_keyraw    RViking
 // i_key_bind macro will make these functions auto-bind:
 //  #define i_hash     RViking_hash
-//  #define i_eq       RViking_eq
+//  #define i_cmp      RViking_cmp
 //  #define i_keyfrom  Viking_from // uses _from because i_keyraw is defined
 //  #define i_keyto    Viking_toraw
 //  #define i_keydrop  Viking_drop

@@ -2,7 +2,6 @@
 #include <iostream>
 #include <vector>
 #include <chrono>
-#define STC_USE_SSO 1
 #define i_type svec
 #define i_val_str
 #include <stc/cstack.h>
@@ -33,7 +32,7 @@ static void sromutrio(uint64_t seed) {
 static const char CHARS[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=+-";
 
 static const int BENCHMARK_SIZE = 5000000;
-static const int MAX_STRING_LENGTH = 20;
+static const int MAX_STRING_LENGTH = 30;
 
 using time_point = std::chrono::high_resolution_clock::time_point;
 
@@ -44,7 +43,7 @@ void addRandomString_STD(std::vector<std::string>& vec, const int length) {
         p[i] = CHARS[romutrio() & 63];
     }
     s.append(s);
-    vec.push_back(s);
+    vec.push_back(std::move(s));
 }
 
 void addRandomString_STC(svec& vec, const int length) {
@@ -54,7 +53,7 @@ void addRandomString_STC(svec& vec, const int length) {
         p[i] = CHARS[romutrio() & 63];
     }
     cstr_append_s(&s, s);
-    svec_push(&vec, s);
+    svec_push_back(&vec, s);
 }
 
 template <class L, typename R>
@@ -75,7 +74,8 @@ void benchmark(L& vec, const int length, R addRandomString) {
 
 
 int main() {
-    sromutrio(1234);
+    uint64_t seed = 4321;
+    sromutrio(seed);
     std::cerr << "length\ttime\tstd::string\n";
     for (int k = 0; k < 4; k++) {
         std::vector<std::string> vec; vec.reserve(BENCHMARK_SIZE);
@@ -83,7 +83,7 @@ int main() {
         std::cout << '\t' << vec[0] << '\n';
     }
 
-    sromutrio(1234);
+    sromutrio(seed);
     std::cerr << "\nlength\ttime\tSTC string\n";
     for (int k = 0; k < 4; k++) {
         svec vec = svec_with_capacity(BENCHMARK_SIZE);
@@ -92,7 +92,7 @@ int main() {
         svec_drop(&vec);
     }
 
-    sromutrio(1234);
+    sromutrio(seed);
     std::cerr << "length\ttime\tstd::string\n";
     for (int length = 1; length <= MAX_STRING_LENGTH; length++) {
         std::vector<std::string> vec; vec.reserve(BENCHMARK_SIZE);
@@ -100,7 +100,7 @@ int main() {
         std::cout << '\t' << vec[0] << '\n';
     }
 
-    sromutrio(1234);
+    sromutrio(seed);
     std::cerr << "\nlength\ttime\tSTC string\n";
     for (int length = 1; length <= MAX_STRING_LENGTH; length++) {
         svec vec = svec_with_capacity(BENCHMARK_SIZE);
@@ -109,7 +109,7 @@ int main() {
         svec_drop(&vec);
     }
 
-    std::cerr << "size std::string : " << sizeof(std::string) << std::endl
-              << "size STC string  : " << sizeof(cstr) << std::endl;
+    std::cerr << "sizeof std::string : " << sizeof(std::string) << std::endl
+              << "sizeof STC string  : " << sizeof(cstr) << std::endl;
     return 0;
 }

@@ -22,6 +22,7 @@ cstr         cstr_from_n(const char* str, size_t n);                  // constru
 cstr         cstr_with_capacity(size_t cap);
 cstr         cstr_with_size(size_t len, char fill);                   // repeat fill len times
 cstr         cstr_from_fmt(const char* fmt, ...);                     // printf() formatting
+cstr         cstr_from_replace_all_sv(csview sv, csview find, csview repl);
 cstr         cstr_clone(cstr s);
 
 cstr*        cstr_take(cstr* self, cstr s);                           // take the constructed or moved string

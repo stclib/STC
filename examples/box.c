@@ -7,6 +7,10 @@ Person Person_new(const char* name, const char* last) {
     return (Person){.name = cstr_from(name), .last = cstr_from(last)};
 }
 
+uint64_t Person_hash(const Person* a, size_t n) {
+    return cstr_hash(&a->name, 0) ^ cstr_hash(&a->last, 0);
+}
+
 int Person_cmp(const Person* a, const Person* b) {
     int c = cstr_cmp(&a->name, &b->name);
     return c ? c : cstr_cmp(&a->last, &b->last);

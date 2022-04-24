@@ -20,106 +20,125 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
-/* A string type with short string optimization in C99 with optimal short string
- * utilization (23 characters with 24 bytes string representation).
- */
 #ifndef CSTR_H_INCLUDED
 #define CSTR_H_INCLUDED
-#define STC_USE_SSO 1
+#define STC_OLD_CSTR 1
 
 #include <stc/ccommon.h>
 #include <stc/forward.h>
 #include <stdlib.h> /* malloc */
+#include <string.h>
 #include <stdarg.h>
 #include <stdio.h> /* vsnprintf */
 #include <ctype.h>
 
-/**************************** PRIVATE API **********************************/
-
-#if defined __GNUC__ && !defined __clang__
-#  pragma GCC diagnostic push
-#  pragma GCC diagnostic ignored "-Warray-bounds"
-#  pragma GCC diagnostic ignored "-Wstringop-overflow="
-#endif
-
-enum  { cstr_s_cap =            sizeof(cstr_rep_t) - 1 };
-#define cstr_s_size(s)          ((size_t)(cstr_s_cap - (s)->sml.last))
-#define cstr_s_set_size(s, len) ((s)->sml.last = cstr_s_cap - (len), (s)->sml.data[len] = 0)
-#define cstr_s_data(s)          (s)->sml.data
-#define cstr_s_end(s)           ((s)->sml.data + cstr_s_size(s))
-
-#if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
-    #define byte_rotl_(x, b)       ((x) << (b)*8 | (x) >> (sizeof(x) - (b))*8)
-    #define cstr_l_cap(s)          (~byte_rotl_((s)->lon.ncap, sizeof((s)->lon.ncap) - 1))
-    #define cstr_l_set_cap(s, cap) ((s)->lon.ncap = ~byte_rotl_(cap, 1))
-#else
-    #define cstr_l_cap(s)          (~(s)->lon.ncap)
-    #define cstr_l_set_cap(s, cap) ((s)->lon.ncap = ~(cap))
-#endif
-#define cstr_l_size(s)          ((s)->lon.size)
-#define cstr_l_set_size(s, len) ((s)->lon.data[(s)->lon.size = (len)] = 0)
-#define cstr_l_data(s)          (s)->lon.data
-#define cstr_l_end(s)           ((s)->lon.data + cstr_l_size(s))
-#define cstr_l_drop(s)          c_free((s)->lon.data)
-
-#define cstr_is_long(s)         ((s)->sml.last > 127)
-STC_API char* _cstr_init(cstr* self, size_t len, size_t cap);
-STC_API char* _cstr_internal_move(cstr* self, size_t pos1, size_t pos2);
-
-/**************************** PUBLIC API **********************************/
-
-#define cstr_new(literal) cstr_from_n(literal, c_strlen_lit(literal))
 #define cstr_npos (SIZE_MAX >> 1)
-#define cstr_null (c_make(cstr){.sml = {.last = cstr_s_cap}})
-#define cstr_toraw(self) cstr_str(self)
+typedef struct { size_t size, cap; char chr[1]; } cstr_priv;
+#define _cstr_p(self) c_container_of((self)->str, cstr_priv, chr)
+#ifdef _i_static 
+    static cstr_priv _cstr_nullrep = {0, 0, {0}};
+    static const cstr cstr_null = {_cstr_nullrep.chr};
+#else
+    extern const cstr cstr_null;
+#endif
+/* optimal memory: based on malloc_usable_size() sequence: 24, 40, 56, ... */
+#define _cstr_opt_mem(cap)  ((((offsetof(cstr_priv, chr) + (cap) + 8)>>4)<<4) + 8)
+/* optimal string capacity: 7, 23, 39, ... */
+#define _cstr_opt_cap(cap)  (_cstr_opt_mem(cap) - offsetof(cstr_priv, chr) - 1)
 
-STC_API char*   cstr_reserve(cstr* self, size_t cap);
-STC_API void    cstr_shrink_to_fit(cstr* self);
-STC_API void    cstr_resize(cstr* self, size_t size, char value);
-STC_API size_t  cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax);
-STC_API cstr*   cstr_assign_n(cstr* self, const char* str, size_t n);
-STC_API cstr*   cstr_append_n(cstr* self, const char* str, size_t n);
-STC_API bool    cstr_getdelim(cstr *self, int delim, FILE *fp);
-STC_API void    cstr_erase_n(cstr* self, size_t pos, size_t n);
-STC_API cstr    cstr_from_fmt(const char* fmt, ...);
-STC_API int     cstr_printf(cstr* self, const char* fmt, ...);
-STC_API void    cstr_replace_all(cstr* self, const char* find, const char* repl);
+STC_API cstr            cstr_from_n(const char* str, size_t n);
+STC_API cstr            cstr_from_fmt(const char* fmt, ...);
+STC_API cstr            cstr_from_replace_all(const char* str, size_t str_len,
+                                              const char* find, size_t find_len,
+                                              const char* repl, size_t repl_len);
+STC_API char*           cstr_reserve(cstr* self, size_t cap);
+STC_API void            cstr_resize(cstr* self, size_t len, char fill);
+STC_API cstr*           cstr_assign_n(cstr* self, const char* str, size_t n);
+STC_API int             cstr_printf(cstr* self, const char* fmt, ...);
+STC_API cstr*           cstr_append_n(cstr* self, const char* str, size_t n);
+STC_API void            cstr_replace_n(cstr* self, size_t pos, size_t len, const char* str, size_t n);
+STC_API void            cstr_replace_all(cstr* self, const char* find, const char* replace);
+STC_API void            cstr_erase_n(cstr* self, size_t pos, size_t n);
+STC_API size_t          cstr_find(cstr s, const char* needle);
+STC_API size_t          cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax);
+STC_API bool            cstr_getdelim(cstr *self, int delim, FILE *stream);
+STC_API void            cstr_replace_all(cstr* self, const char* find, const char* repl);
 
-STC_INLINE cstr_rep_t cstr_rep(cstr* s) {
-    return cstr_is_long(s)
-        ? c_make(cstr_rep_t){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
-        : c_make(cstr_rep_t){s->sml.data, cstr_s_size(s), cstr_s_cap};
-}
+STC_INLINE cstr         cstr_init() { return cstr_null; }
+#define                 cstr_toraw(self) (self)->str
+#define                 cstr_new(literal) \
+                            cstr_from_n(literal, c_strlen_lit(literal))
+STC_INLINE cstr         cstr_from(const char* str)
+                            { return cstr_from_n(str, strlen(str)); }
+STC_INLINE const char*  cstr_str(const cstr* self) { return self->str; }
+STC_INLINE char*        cstr_data(cstr* self) { return self->str; }
+STC_INLINE size_t       cstr_size(cstr s) { return _cstr_p(&s)->size; }
+STC_INLINE size_t       cstr_length(cstr s) { return _cstr_p(&s)->size; }
+STC_INLINE size_t       cstr_capacity(cstr s) { return _cstr_p(&s)->cap; }
+STC_INLINE bool         cstr_empty(cstr s) { return _cstr_p(&s)->size == 0; }
+STC_INLINE void         cstr_drop(cstr* self)
+                            { if (_cstr_p(self)->cap) c_free(_cstr_p(self)); }
+STC_INLINE cstr         cstr_clone(cstr s)
+                            { return cstr_from_n(s.str, _cstr_p(&s)->size); }
+STC_INLINE void         cstr_clear(cstr* self)
+                            { self->str[_cstr_p(self)->size = 0] = '\0'; }
+STC_INLINE cstr*        cstr_assign(cstr* self, const char* str)
+                            { return cstr_assign_n(self, str, strlen(str)); }
+STC_INLINE cstr*        cstr_copy(cstr* self, cstr s)
+                            { return cstr_assign_n(self, s.str, _cstr_p(&s)->size); }
+STC_INLINE cstr*        cstr_append(cstr* self, const char* str)
+                            { return cstr_append_n(self, str, strlen(str)); }
+STC_INLINE cstr*        cstr_append_s(cstr* self, cstr s)
+                            { return cstr_append_n(self, s.str, _cstr_p(&s)->size); }
+STC_INLINE void         cstr_push_back(cstr* self, char value)
+                            { cstr_append_n(self, &value, 1); }
+STC_INLINE void         cstr_pop_back(cstr* self)
+                            { self->str[ --_cstr_p(self)->size ] = '\0'; }
+STC_INLINE void         cstr_insert_n(cstr* self, const size_t pos, const char* str, const size_t n)
+                            { cstr_replace_n(self, pos, 0, str, n); }
+STC_INLINE void         cstr_insert(cstr* self, const size_t pos, const char* str)
+                            { cstr_replace_n(self, pos, 0, str, strlen(str)); }
+STC_INLINE void         cstr_insert_s(cstr* self, const size_t pos, cstr s)
+                            { cstr_replace_n(self, pos, 0, s.str, _cstr_p(&s)->size); }
+STC_INLINE void         cstr_replace(cstr* self, const size_t pos, const size_t len, const char* str)
+                            { cstr_replace_n(self, pos, len, str, strlen(str)); }
+STC_INLINE void         cstr_replace_s(cstr* self, const size_t pos, const size_t len, cstr s)
+                            { cstr_replace_n(self, pos, len, s.str, _cstr_p(&s)->size); }
+STC_INLINE void         cstr_erase(cstr* self, const size_t pos)
+                            { cstr_erase_n(self, pos, 1); }
+STC_INLINE char*        cstr_front(cstr* self) { return self->str; }
+STC_INLINE char*        cstr_back(cstr* self)
+                            { return self->str + _cstr_p(self)->size - 1; }
+STC_INLINE bool         cstr_equals(cstr s, const char* str)
+                            { return strcmp(s.str, str) == 0; }
+STC_INLINE bool         cstr_equals_s(cstr s1, cstr s2)
+                            { return strcmp(s1.str, s2.str) == 0; }
+STC_INLINE bool         cstr_contains(cstr s, const char* needle)
+                            { return strstr(s.str, needle) != NULL; }
+STC_INLINE bool         cstr_getline(cstr *self, FILE *stream)
+                            { return cstr_getdelim(self, '\n', stream); }
 
-STC_INLINE cstr cstr_init(void)
-    { return cstr_null; }
-
-STC_INLINE cstr cstr_from_n(const char* str, const size_t n) {
-    cstr s;
-    memcpy(_cstr_init(&s, n, n), str, n);
-    return s;
-}
-
-STC_INLINE cstr cstr_from(const char* str)
-    { return cstr_from_n(str, strlen(str)); }
-
-STC_INLINE cstr cstr_with_size(const size_t size, const char value) {
-    cstr s;
-    memset(_cstr_init(&s, size, size), value, size);
-    return s;
+STC_INLINE cstr_rep_t cstr_rep(cstr* s) { 
+    cstr_priv* p = _cstr_p(s);
+    return c_make(cstr_rep_t){s->str, p->size, p->cap};
 }
 
 STC_INLINE cstr cstr_with_capacity(const size_t cap) {
-    cstr s;
-    _cstr_init(&s, 0, cap);
+    cstr s = cstr_null;
+    cstr_reserve(&s, cap);
     return s;
 }
 
-STC_INLINE cstr* cstr_take(cstr* self, const cstr s) {
-    if (cstr_is_long(self) && self->lon.data != s.lon.data)
-        cstr_l_drop(self);
-    *self = s;
+STC_INLINE cstr cstr_with_size(const size_t len, const char fill) {
+    cstr s = cstr_null;
+    cstr_resize(&s, len, fill);
+    return s;
+}
+
+STC_INLINE cstr* cstr_take(cstr* self, cstr s) {
+    if (self->str != s.str && _cstr_p(self)->cap)
+        c_free(_cstr_p(self));
+    self->str = s.str;
     return self;
 }
 
@@ -129,253 +148,155 @@ STC_INLINE cstr cstr_move(cstr* self) {
     return tmp;
 }
 
-STC_INLINE cstr cstr_clone(cstr s) {
-    cstr_rep_t r = cstr_rep(&s);
-    return cstr_from_n(r.data, r.size);
-}
-
-STC_INLINE void cstr_drop(cstr* self) {
-    if (cstr_is_long(self))
-        cstr_l_drop(self);
-}
-
-STC_INLINE void cstr_clear(cstr* self) {
-    cstr_drop(self);
-    cstr_s_set_size(self, 0);
-}
-
-#define SSO_CALL(s, call) (cstr_is_long(s) ? cstr_l_##call : cstr_s_##call)
-
-STC_INLINE void _cstr_set_size(cstr* self, size_t len)
-    { SSO_CALL(self, set_size(self, len)); }
-
-STC_INLINE char* cstr_data(cstr* self) 
-    { return SSO_CALL(self, data(self)); }
-
-STC_INLINE const char* cstr_str(const cstr* self)
-    { return SSO_CALL(self, data(self)); }
-
-STC_INLINE bool cstr_empty(cstr s) 
-    { return s.sml.last == cstr_s_cap; }
-
-STC_INLINE size_t cstr_size(cstr s)
-    { return SSO_CALL(&s, size(&s)); }
-
-STC_INLINE size_t cstr_length(cstr s)
-    { return SSO_CALL(&s, size(&s)); }
-
-STC_INLINE size_t cstr_capacity(cstr s)
-    { return cstr_is_long(&s) ? cstr_l_cap(&s) : cstr_s_cap; }
-
-STC_INLINE bool cstr_equals(cstr s1, const char* str)
-    { return strcmp(cstr_str(&s1), str) == 0; }
-
-STC_INLINE bool cstr_equals_s(cstr s1, cstr s2)
-    { return strcmp(cstr_str(&s1), cstr_str(&s2)) == 0; }
-
-STC_INLINE bool cstr_eq(const cstr* s1, const cstr* s2)
-    { return strcmp(cstr_str(s1), cstr_str(s2)) == 0; }
-
-STC_INLINE int cstr_cmp(const cstr* s1, const cstr* s2)
-    { return strcmp(cstr_str(s1), cstr_str(s2)); }
-
-STC_INLINE size_t cstr_find(cstr s, const char* needle) {
-    const char *str = cstr_str(&s), *res = strstr(str, needle);
-    return res ? res - str : cstr_npos;
-}
-
-STC_INLINE bool cstr_find_s(cstr s, cstr needle)
-    { return cstr_find(s, cstr_str(&needle)); }
-
-STC_INLINE bool cstr_contains(cstr s, const char* needle)
-    { return strstr(cstr_str(&s), needle) != NULL; }
-
-STC_INLINE bool cstr_contains_s(cstr s, cstr needle)
-    { return strstr(cstr_str(&s), cstr_str(&needle)) != NULL; }
-
 STC_INLINE bool cstr_starts_with(cstr s, const char* sub) {
-    const char* str = cstr_str(&s);
-    while (*sub && *str == *sub) ++str, ++sub;
+    while (*sub && *s.str == *sub) ++s.str, ++sub;
     return *sub == 0;
 }
 
-STC_INLINE bool cstr_starts_with_s(cstr s, cstr sub)
-    { return cstr_starts_with(s, cstr_str(&sub)); }
-
 STC_INLINE bool cstr_ends_with(cstr s, const char* sub) {
-    cstr_rep_t r = cstr_rep(&s); size_t n = strlen(sub);
-    return n <= r.size && memcmp(r.data + r.size - n, sub, n) == 0;
+    const size_t n = strlen(sub), sz = _cstr_p(&s)->size;
+    return n <= sz && !memcmp(s.str + sz - n, sub, n);
 }
 
-STC_INLINE bool cstr_ends_with_s(cstr s, cstr sub)
-    { return cstr_ends_with(s, cstr_str(&sub)); }
-
-STC_INLINE void cstr_assign(cstr* self, const char* str)
-    { cstr_assign_n(self, str, strlen(str)); }
-
-STC_INLINE void cstr_copy(cstr* self, cstr s) {
-    cstr_rep_t r = cstr_rep(&s);
-    cstr_assign_n(self, r.data, r.size);
+STC_INLINE int c_strncasecmp(const char* s1, const char* s2, size_t nmax) {
+    int ret = 0;
+    while (nmax-- && (ret = tolower(*s1++) - tolower(*s2)) == 0 && *s2++)
+        ;
+    return ret;
 }
-
-STC_INLINE void cstr_append(cstr* self, const char* str)
-    { cstr_append_n(self, str, strlen(str)); }
-
-STC_INLINE void cstr_append_s(cstr* self, cstr s) {
-    cstr_rep_t r = cstr_rep(&s);
-    cstr_append_n(self, r.data, r.size);
-}
-
-STC_INLINE void cstr_replace_n(cstr* self, size_t pos, size_t len, const char* str, size_t n) {
-    char* d = _cstr_internal_move(self, pos + len, pos + n);
-    memcpy(d + pos, str, n);
-}
-
-STC_INLINE void cstr_replace(cstr* self, size_t pos, size_t len, const char* str)
-    { cstr_replace_n(self, pos, len, str, strlen(str)); }
-
-STC_INLINE void cstr_replace_s(cstr* self, size_t pos, size_t len, cstr s) {
-    cstr_rep_t r = cstr_rep(&s);
-    cstr_replace_n(self, pos, len, r.data, r.size);
-}
-
-STC_INLINE void cstr_insert_n(cstr* self, size_t pos, const char* str, size_t n)
-    { cstr_replace_n(self, pos, 0, str, n); }
-
-STC_INLINE void cstr_insert(cstr* self, size_t pos, const char* str)
-    { cstr_replace_n(self, pos, 0, str, strlen(str)); }
-
-STC_INLINE void cstr_insert_s(cstr* self, size_t pos, cstr s) {
-    cstr_rep_t r = cstr_rep(&s);
-    cstr_replace_n(self, pos, 0, r.data, r.size);
-}
-
-STC_INLINE bool cstr_getline(cstr *self, FILE *fp)
-    { return cstr_getdelim(self, '\n', fp); }
 
 /* container adaptor functions: */
-#define  cstr_cmp(xp, yp)     strcmp(cstr_str(xp), cstr_str(yp))
+#define  cstr_cmp(xp, yp)     strcmp((xp)->str, (yp)->str)
 #define  cstr_eq(xp, yp)      (!cstr_cmp(xp, yp))
-#define  cstr_hash(xp, dummy) c_strhash(cstr_str(xp))
+#define  cstr_hash(xp, dummy) c_strhash((xp)->str)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(_i_implement)
 
-STC_DEF char* _cstr_internal_move(cstr* self, const size_t pos1, const size_t pos2) {
-    cstr_rep_t r = cstr_rep(self);
-    if (pos1 != pos2) {
-        const size_t newlen = r.size + pos2 - pos1;
-        if (newlen > r.cap)
-            r.data = cstr_reserve(self, (r.size*3 >> 1) + pos2 - pos1);
-        memmove(&r.data[pos2], &r.data[pos1], r.size - pos1);
-        _cstr_set_size(self, newlen);
+#ifndef _i_static
+static cstr_priv _cstr_nullrep = {0, 0, {0}};
+const cstr cstr_null = {_cstr_nullrep.chr};
+#endif
+
+STC_DEF char*
+cstr_reserve(cstr* self, const size_t cap) {
+    cstr_priv* p = _cstr_p(self);
+    const size_t oldcap = p->cap;
+    if (cap > oldcap) {
+        p = (cstr_priv*) c_realloc(((oldcap != 0) & (p != &_cstr_nullrep)) ? p : NULL, _cstr_opt_mem(cap));
+        self->str = p->chr;
+        if (oldcap == 0) self->str[p->size = 0] = '\0';
+        p->cap = _cstr_opt_cap(cap);
     }
-    return r.data;
+    return self->str;
 }
 
-STC_DEF char* _cstr_init(cstr* self, const size_t len, const size_t cap) {
-    if (cap > cstr_s_cap) {
-        self->lon.data = (char *)c_malloc(cap + 1);
-        cstr_l_set_size(self, len);
-        cstr_l_set_cap(self, cap);
-        return self->lon.data;
-    }
-    cstr_s_set_size(self, len);
-    return self->sml.data;
+STC_DEF void
+cstr_resize(cstr* self, const size_t len, const char fill) {
+    const size_t n =  _cstr_p(self)->size;
+    cstr_reserve(self, len);
+    if (len > n) memset(self->str + n, fill, len - n);
+    if (len | n) self->str[_cstr_p(self)->size = len] = '\0';
 }
 
-STC_DEF void cstr_shrink_to_fit(cstr* self) {
-    cstr_rep_t r = cstr_rep(self);
-    if (r.size == r.cap)
+STC_DEF cstr
+cstr_from_n(const char* str, const size_t n) {
+    if (n == 0) return cstr_null;
+    cstr_priv* prv = (cstr_priv*) c_malloc(_cstr_opt_mem(n));
+    cstr s = {(char *) memcpy(prv->chr, str, n)};
+    s.str[prv->size = n] = '\0';
+    prv->cap = _cstr_opt_cap(n);
+    return s;
+}
+
+#if defined(__clang__)
+#  pragma clang diagnostic push
+#  pragma clang diagnostic ignored "-Wdeprecated-declarations"
+#elif defined(_MSC_VER)
+#  pragma warning(push)
+#  pragma warning(disable: 4996)
+#endif
+
+STC_DEF int
+cstr_vfmt(cstr* self, const char* fmt, va_list args) {
+    va_list args2;
+    va_copy(args2, args);
+    int len = vsnprintf(NULL, (size_t)0, fmt, args);
+    cstr_reserve(self, len);
+    vsprintf(self->str, fmt, args2);
+    va_end(args2);
+    return _cstr_p(self)->size = len;
+}
+
+#if defined(__clang__)
+#  pragma clang diagnostic pop
+#elif defined(_MSC_VER)
+#  pragma warning(pop)
+#endif
+
+STC_DEF cstr
+cstr_from_fmt(const char* fmt, ...) {
+    cstr ret = cstr_null;
+    va_list args; va_start(args, fmt);
+    cstr_vfmt(&ret, fmt, args);
+    va_end(args);
+    return ret;
+}
+
+STC_DEF int
+cstr_printf(cstr* self, const char* fmt, ...) {
+    cstr ret = cstr_null;
+    va_list args;
+    va_start(args, fmt);
+    int n = cstr_vfmt(&ret, fmt, args);
+    va_end(args);
+    cstr_drop(self);
+    *self = ret;
+    return n;
+}
+
+STC_DEF cstr*
+cstr_assign_n(cstr* self, const char* str, const size_t n) {
+    if (n || _cstr_p(self)->cap) {
+        cstr_reserve(self, n);
+        memmove(self->str, str, n);
+        self->str[_cstr_p(self)->size = n] = '\0';
+    }
+    return self;
+}
+
+STC_DEF cstr*
+cstr_append_n(cstr* self, const char* str, const size_t n) {
+    if (n == 0) return self;
+    const size_t oldlen = _cstr_p(self)->size, newlen = oldlen + n;
+    if (newlen > _cstr_p(self)->cap) {
+        const size_t off = (size_t) (str - self->str); /* handle self append */
+        cstr_reserve(self, (oldlen*3 >> 1) + n);
+        if (off <= oldlen) str = self->str + off;
+    }
+    memcpy(&self->str[oldlen], str, n);
+    self->str[_cstr_p(self)->size = newlen] = '\0';
+    return self;
+}
+
+STC_INLINE void _cstr_internal_move(cstr* self, const size_t pos1, const size_t pos2) {
+    if (pos1 == pos2)
         return;
-    if (r.size > cstr_s_cap) {
-        self->lon.data = (char *)c_realloc(self->lon.data, r.size + 1);
-        cstr_l_set_cap(self, r.size);
-    } else if (r.cap > cstr_s_cap) {
-        memcpy(self->sml.data, r.data, r.size + 1);
-        cstr_s_set_size(self, r.size);
-        c_free(r.data);
-    }
+    const size_t len = _cstr_p(self)->size, newlen = len + pos2 - pos1;
+    if (newlen > _cstr_p(self)->cap)
+        cstr_reserve(self, (len*3 >> 1) + pos2 - pos1);
+    memmove(&self->str[pos2], &self->str[pos1], len - pos1);
+    self->str[_cstr_p(self)->size = newlen] = '\0';
 }
 
-STC_DEF char* cstr_reserve(cstr* self, const size_t cap) {
-    if (cstr_is_long(self)) {
-        if (cap > cstr_l_cap(self)) {
-            self->lon.data = (char *)c_realloc(self->lon.data, cap + 1);
-            cstr_l_set_cap(self, cap);
-        }
-        return self->lon.data;
-    }
-    /* from short to long: */
-    if (cap > cstr_s_cap) {
-        char* data = (char *)c_malloc(cap + 1);
-        const size_t len = cstr_s_size(self);
-        memcpy(data, self->sml.data, len);
-        self->lon.data = data;
-        cstr_l_set_size(self, len);
-        cstr_l_set_cap(self, cap);
-        return data;
-    }
-    return self->sml.data;
-}
-
-STC_DEF void cstr_resize(cstr* self, const size_t size, const char value) {
-    cstr_rep_t r = cstr_rep(self);
-    if (size > r.size) {
-        if (size > r.cap) r.data = cstr_reserve(self, size);
-        memset(r.data + r.size, value, size - r.size);
-    }
-    _cstr_set_size(self, size);
-}
-
-STC_DEF size_t cstr_find_n(cstr s, const char* needle, const size_t pos, const size_t nmax) {
-    cstr_rep_t r = cstr_rep(&s);
-    const size_t nlen = (size_t) strlen(needle);
-    if (pos > r.size) return cstr_npos;
-    char* res = c_strnstrn(r.data + pos, needle, r.size, nmax < nlen ? nmax : nlen);
-    return res ? res - r.data : cstr_npos;
-}
-
-STC_DEF cstr* cstr_assign_n(cstr* self, const char* str, const size_t n) {
-    cstr_rep_t r = cstr_rep(self);
-    if (n > r.cap) {
-        r.data = (char *)c_realloc(cstr_is_long(self) ? r.data : NULL, n + 1);
-        cstr_l_set_cap(self, n);
-    }
-    memmove(r.data, str, n);
-    _cstr_set_size(self, n);
-    return self;
-}
-
-STC_DEF cstr* cstr_append_n(cstr* self, const char* str, const size_t n) {
-    cstr_rep_t r = cstr_rep(self);
-    if (r.size + n > r.cap) {
-        const size_t off = (size_t)(str - r.data);
-        r.data = cstr_reserve(self, (r.size*3 >> 1) + n);
-        if (off <= r.size) str = r.data + off; /* handle self append */
-    }
-    memcpy(r.data + r.size, str, n);
-    _cstr_set_size(self, r.size + n);
-    return self;
-}
-
-STC_DEF bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
-    int c = fgetc(fp);
-    if (c == EOF)
-        return false;
-    size_t pos = 0;
-    cstr_rep_t r = cstr_rep(self);
-    for (;;) {
-        if (c == delim || c == EOF) {
-            _cstr_set_size(self, pos);
-            return true;
-        }
-        if (pos == r.cap) {
-            _cstr_set_size(self, pos);
-            r.data = cstr_reserve(self, (r.cap = (r.cap*3 >> 1) + 16));
-        }
-        r.data[pos++] = (char) c;
-        c = fgetc(fp);
+STC_DEF void
+cstr_replace_n(cstr* self, const size_t pos, size_t len, const char* str, const size_t n) {
+    const size_t sz = cstr_size(*self);
+    if (len > sz - pos) len = sz - pos;
+    c_autobuf (xstr, char, n) {
+        memcpy(xstr, str, n);
+        _cstr_internal_move(self, pos + len, pos + n);
+        memcpy(&self->str[pos], xstr, n);
     }
 }
 
@@ -398,62 +319,55 @@ cstr_from_replace_all(const char* str, const size_t str_len,
 
 STC_DEF void
 cstr_replace_all(cstr* self, const char* find, const char* repl) {
-    cstr_rep_t r = cstr_rep(self);
-    cstr_take(self, cstr_from_replace_all(r.data, r.size, find, strlen(find),
-                                                          repl, strlen(repl)));
+    cstr_take(self, cstr_from_replace_all(self->str, _cstr_p(self)->size,
+                                          find, strlen(find), repl, strlen(repl)));
 }
 
-STC_DEF void cstr_erase_n(cstr* self, const size_t pos, size_t n) {
-    cstr_rep_t r = cstr_rep(self);
-    if (n > r.size - pos) n = r.size - pos;
-    memmove(&r.data[pos], &r.data[pos + n], r.size - (pos + n));
-    _cstr_set_size(self, r.size - n);
+STC_DEF void
+cstr_erase_n(cstr* self, const size_t pos, size_t n) {
+    const size_t len = _cstr_p(self)->size;
+    if (n > len - pos) n = len - pos;
+    if (len) {
+        memmove(&self->str[pos], &self->str[pos + n], len - (pos + n));
+        self->str[_cstr_p(self)->size -= n] = '\0';
+    }
 }
 
-#if defined(__clang__)
-#  pragma clang diagnostic push
-#  pragma clang diagnostic ignored "-Wdeprecated-declarations"
-#elif defined(_MSC_VER)
-#  pragma warning(push)
-#  pragma warning(disable: 4996)
+STC_DEF bool
+cstr_getdelim(cstr *self, const int delim, FILE *fp) {
+    size_t pos = 0, cap = _cstr_p(self)->cap;
+    char* d = self->str;
+    int c = fgetc(fp);
+    if (c == EOF)
+        return false;
+    for (;;) {
+        if (c == delim || c == EOF) {
+            if (cap) d[_cstr_p(self)->size = pos] = '\0';
+            return true;
+        }
+        if (pos == cap) {
+            d = cstr_reserve(self, (cap*3 >> 1) + 16);
+            cap = cstr_capacity(*self);
+        }
+        d[pos++] = (char) c;
+        c = fgetc(fp);
+    }
+}
+
+STC_DEF size_t
+cstr_find(cstr s, const char* needle) {
+    char* res = strstr(s.str, needle);
+    return res ? res - s.str : cstr_npos;
+}
+
+STC_DEF size_t
+cstr_find_n(cstr s, const char* needle, const size_t pos, const size_t nmax) {
+    if (pos > _cstr_p(&s)->size) return cstr_npos;
+    const size_t nlen = strlen(needle);
+    char* res = c_strnstrn(s.str + pos, needle, _cstr_p(&s)->size - pos, nmax < nlen ? nmax : nlen);
+    return res ? res - s.str : cstr_npos;
+}
+
 #endif
-
-STC_DEF int cstr_vfmt(cstr* self, const char* fmt, va_list args) {
-    va_list args2;
-    va_copy(args2, args);
-    const int n = vsnprintf(NULL, (size_t)0, fmt, args);
-    cstr_reserve(self, n);
-    vsprintf(cstr_data(self), fmt, args2);
-    va_end(args2);
-    _cstr_set_size(self, n);
-    return n;
-}
-#if defined(__clang__)
-#  pragma clang diagnostic pop
-#elif defined(_MSC_VER)
-#  pragma warning(pop)
 #endif
-
-STC_DEF cstr cstr_from_fmt(const char* fmt, ...) {
-    cstr s = cstr_null;
-    va_list args; va_start(args, fmt);
-    cstr_vfmt(&s, fmt, args);
-    va_end(args);
-    return s;
-}
-
-STC_DEF int cstr_printf(cstr* self, const char* fmt, ...) {
-    cstr s = cstr_null;
-    va_list args; va_start(args, fmt);
-    const int n = cstr_vfmt(&s, fmt, args);
-    va_end(args);
-    cstr_drop(self); *self = s;
-    return n;
-}
-
-#endif // _i_implement
-#if defined __GNUC__ && !defined __clang__
-#  pragma GCC diagnostic pop
-#endif
-#endif // CSTR_H_INCLUDED
 #undef i_opt

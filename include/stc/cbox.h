@@ -39,7 +39,7 @@ void Person_drop(Person* p) {
     c_drop(cstr, &p->name, &p->email);
 }
 
-#define i_val_bind Person // bind Person clone+drop fn's
+#define i_key_bind Person // bind Person clone+drop fn's
 #define i_opt c_no_cmp // compare by .get addresses only
 #define i_type PBox
 #include <stc/cbox.h>
@@ -71,32 +71,35 @@ int main() {
 #define _i_prefix cbox_
 #endif
 #include "template.h"
-typedef i_valraw _cx_raw;
+typedef i_keyraw _cx_raw;
 
 #if !c_option(c_is_fwd)
-_cx_deftypes(_c_cbox_types, _cx_self, i_val);
+_cx_deftypes(_c_cbox_types, _cx_self, i_key);
 #endif
 
 // constructors (takes ownsership)
 STC_INLINE _cx_self
 _cx_memb(_init)(void) { return c_make(_cx_self){NULL}; }
 
-STC_INLINE _cx_self
-_cx_memb(_from_ptr)(i_val* p) { return c_make(_cx_self){p}; }
+STC_INLINE long
+_cx_memb(_use_count)(_cx_self box) { return (long)(box.get != NULL); }
 
 STC_INLINE _cx_self
-_cx_memb(_from)(i_val val) { // c++: std::make_unique<i_val>(val)
-    _cx_self ptr = {c_alloc(i_val)};
+_cx_memb(_from_ptr)(i_key* p) { return c_make(_cx_self){p}; }
+
+STC_INLINE _cx_self
+_cx_memb(_from)(i_key val) { // c++: std::make_unique<i_key>(val)
+    _cx_self ptr = {c_alloc(i_key)};
     *ptr.get = val; return ptr;
 }
 
-STC_INLINE i_val
+STC_INLINE i_key
 _cx_memb(_toraw)(const _cx_self* self) { return *self->get; }
 
 // destructor
 STC_INLINE void
 _cx_memb(_drop)(_cx_self* self) {
-    if (self->get) { i_valdrop(self->get); c_free(self->get); }
+    if (self->get) { i_keydrop(self->get); c_free(self->get); }
 }
 
 STC_INLINE _cx_self
@@ -112,20 +115,20 @@ _cx_memb(_reset)(_cx_self* self) {
 
 // take ownership of val
 STC_INLINE void
-_cx_memb(_reset_from)(_cx_self* self, i_val val) {
-    if (self->get) { i_valdrop(self->get); *self->get = val; }
-    else self->get = c_new(i_val, val);
+_cx_memb(_reset_from)(_cx_self* self, i_key val) {
+    if (self->get) { i_keydrop(self->get); *self->get = val; }
+    else self->get = c_new(i_key, val);
 }
 
 #if !defined _i_no_clone
     STC_INLINE _cx_self
-    _cx_memb(_make)(_cx_raw raw) { return _cx_memb(_from)(i_valfrom(raw)); }
+    _cx_memb(_make)(_cx_raw raw) { return _cx_memb(_from)(i_keyfrom(raw)); }
 
     STC_INLINE _cx_self
     _cx_memb(_clone)(_cx_self other) {
         if (!other.get) return other;
-        i_valraw r = i_valto(other.get);
-        return c_make(_cx_self){c_new(i_val, i_valfrom(r))};
+        i_keyraw r = i_keyto(other.get);
+        return c_make(_cx_self){c_new(i_key, i_keyfrom(r))};
     }
 
     STC_INLINE void
@@ -144,12 +147,10 @@ _cx_memb(_take)(_cx_self* self, _cx_self other) {
 
 STC_INLINE uint64_t
 _cx_memb(_value_hash)(const _cx_value* x, size_t n) {
-    #if c_option(c_no_cmp) && UINTPTR_MAX == UINT64_MAX
-        return c_hash64(&x, 8);
-    #elif c_option(c_no_cmp)
-        return c_hash32(&x, 4);
+    #if c_option(c_no_cmp)
+        return c_default_hash(&x, sizeof x);
     #else
-        _cx_raw rx = i_valto(x);
+        _cx_raw rx = i_keyto(x);
         return i_hash((&rx), (sizeof rx));
     #endif
 }
@@ -159,7 +160,7 @@ _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     #if c_option(c_no_cmp)
         return c_default_cmp(&x, &y);
     #else
-        _cx_raw rx = i_valto(x), ry = i_valto(y);
+        _cx_raw rx = i_keyto(x), ry = i_keyto(y);
         return i_cmp((&rx), (&ry));
     #endif
 }
@@ -169,7 +170,7 @@ _cx_memb(_value_eq)(const _cx_value* x, const _cx_value* y) {
     #if c_option(c_no_cmp)
         return x == y;
     #else
-        _cx_raw rx = i_valto(x), ry = i_valto(y);
+        _cx_raw rx = i_keyto(x), ry = i_keyto(y);
         return i_eq((&rx), (&ry));
     #endif
 }

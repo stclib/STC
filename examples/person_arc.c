@@ -12,6 +12,10 @@ int Person_cmp(const Person* a, const Person* b) {
     return c ? c : cstr_cmp(&a->last, &b->last);
 }
 
+uint64_t Person_hash(const Person* a, size_t n) {
+    return cstr_hash(&a->name, 0) ^ cstr_hash(&a->last, 0);
+}
+
 Person Person_clone(Person p) {
     p.name = cstr_clone(p.name);
     p.last = cstr_clone(p.last);

@@ -8,8 +8,8 @@ struct { double x, y; } typedef Point;
 #define i_key Point*
 #define i_keydrop(x) c_free(*(x))
 #define i_keyfrom(x) c_new(Point, *(x))
-#define i_hash(x, n) c_default_hash(*(x), sizeof *(x))
-#define i_eq(x, y) c_memcmp_eq(*(x), *(y))
+#define i_hash(x, n) c_default_hash(*(x), sizeof **(x))
+#define i_cmp(x, y)  memcmp(*(x), *(y), sizeof **(x)) // not good!
 #define i_tag pnt
 #include <stc/cset.h>
 

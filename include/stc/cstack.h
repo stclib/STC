@@ -34,19 +34,19 @@
 #include "template.h"
 
 #if !c_option(c_is_fwd)
-_cx_deftypes(_c_cstack_types, _cx_self, i_val);
+_cx_deftypes(_c_cstack_types, _cx_self, i_key);
 #endif
-typedef i_valraw _cx_raw;
+typedef i_keyraw _cx_raw;
 
 STC_INLINE _cx_self _cx_memb(_init)(void)
     { return c_make(_cx_self){0, 0, 0}; }
 
 STC_INLINE _cx_self _cx_memb(_with_capacity)(size_t cap) {
-    _cx_self out = {(_cx_value *) c_malloc(cap*sizeof(i_val)), 0, cap};
+    _cx_self out = {(_cx_value *) c_malloc(cap*sizeof(i_key)), 0, cap};
     return out;
 }
 
-STC_INLINE _cx_self _cx_memb(_with_size)(size_t size, i_val null) {
+STC_INLINE _cx_self _cx_memb(_with_size)(size_t size, i_key null) {
     _cx_self out = {(_cx_value *) c_malloc(size*sizeof null), size, size};
     while (size) out.data[--size] = null;
     return out;
@@ -54,7 +54,7 @@ STC_INLINE _cx_self _cx_memb(_with_size)(size_t size, i_val null) {
 
 STC_INLINE void _cx_memb(_clear)(_cx_self* self) {
     _cx_value *p = self->data + self->size;
-    while (p-- != self->data) { i_valdrop(p); }
+    while (p-- != self->data) { i_keydrop(p); }
     self->size = 0;
 }
 
@@ -92,7 +92,7 @@ STC_INLINE _cx_value* _cx_memb(_push_back)(_cx_self* self, _cx_value val)
     { return _cx_memb(_push)(self, val); }
 
 STC_INLINE void _cx_memb(_pop)(_cx_self* self)
-    { _cx_value* p = &self->data[--self->size]; i_valdrop(p); }
+    { _cx_value* p = &self->data[--self->size]; i_keydrop(p); }
 STC_INLINE void _cx_memb(_pop_back)(_cx_self* self)
     { _cx_memb(_pop)(self); }
 
@@ -104,15 +104,15 @@ STC_INLINE _cx_value* _cx_memb(_at_mut)(_cx_self* self, size_t idx)
 #if !defined _i_no_clone
 #if !defined _i_no_emplace
 STC_INLINE _cx_value* _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
-    { return _cx_memb(_push)(self, i_valfrom(raw)); }
+    { return _cx_memb(_push)(self, i_keyfrom(raw)); }
 STC_INLINE _cx_value* _cx_memb(_emplace_back)(_cx_self* self, _cx_raw raw)
-    { return _cx_memb(_push)(self,  i_valfrom(raw)); }
+    { return _cx_memb(_push)(self,  i_keyfrom(raw)); }
 #endif // !_i_no_emplace
 
 STC_INLINE _cx_self _cx_memb(_clone)(_cx_self v) {
     _cx_self out = {(_cx_value *) c_malloc(v.size*sizeof(_cx_value)), v.size, v.size};
     for (size_t i = 0; i < v.size; ++v.data)
-        out.data[i++] = i_valclone((*v.data));
+        out.data[i++] = i_keyclone((*v.data));
     return out;
 }
 
@@ -121,11 +121,11 @@ STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
 }
 
-STC_INLINE i_val _cx_memb(_value_clone)(_cx_value val)
-    { return i_valclone(val); }
+STC_INLINE i_key _cx_memb(_value_clone)(_cx_value val)
+    { return i_keyclone(val); }
 
-STC_INLINE i_valraw _cx_memb(_value_toraw)(_cx_value* val)
-    { return i_valto(val); }
+STC_INLINE i_keyraw _cx_memb(_value_toraw)(_cx_value* val)
+    { return i_keyto(val); }
 #endif // !_i_no_clone
 
 STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self)

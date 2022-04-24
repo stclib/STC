@@ -25,7 +25,7 @@
 #include <stc/crandom.h>
 #include <stdio.h>
 
-#define i_val int
+#define i_key int
 #include <stc/cqueue.h>
 
 int main() {
@@ -57,13 +57,9 @@ int main() {
 #define _i_prefix cqueue_
 #endif
 #define _i_queue
-#define _push_back _push
-#define _emplace_back _emplace
 #define _pop_front _pop
 
 #include "cdeq.h"
 
-#undef _push_back
-#undef _emplace_back
 #undef _pop_front
 #undef _i_queue

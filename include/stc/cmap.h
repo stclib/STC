@@ -65,16 +65,13 @@ typedef struct      { size_t idx; uint8_t hx; } chash_bucket_t;
   #define _i_SET_ONLY c_true
   #define _i_keyref(vp) (vp)
 #else
+  #define _i_ismap
   #define _i_MAP_ONLY c_true
   #define _i_SET_ONLY c_false
   #define _i_keyref(vp) (&(vp)->first)
 #endif
+#define _i_ishash
 #include "template.h"
-#if _i_no_hash == 1
-  #error "i_hash must be defined if i_cmp, i_eq or i_keyfrom is defined for cmap/cset. For basic types c_default_hash may be used."
-#elif _i_no_hash == 2
-  #error "i_cmp or i_eq must be defined if i_hash is defined. For basic types c_default_cmp may be used."
-#endif
 #if !c_option(c_is_fwd)
   _cx_deftypes(_c_chash_types, _cx_self, i_key, i_val, i_size, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
@@ -118,13 +115,7 @@ STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, i_keyraw rkey)
     STC_API _cx_result  _cx_memb(_insert_or_assign)(_cx_self* self, i_key _key, i_val _mapped);
     #if !defined _i_no_clone && !defined _i_no_emplace
     STC_API _cx_result  _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped);
-    STC_INLINE _cx_result  _cx_memb(_put_raw)(_cx_self* self, i_keyraw rkey, i_valraw rmapped)
-        { return _cx_memb(_emplace_or_assign)(self, rkey, rmapped); } // alias
     #endif
-
-    STC_INLINE _cx_result
-    _cx_memb(_put)(_cx_self* self, i_key _key, i_val _mapped)
-        { return _cx_memb(_insert_or_assign)(self, _key, _mapped); }
 
     STC_INLINE const _cx_mapped*
     _cx_memb(_at)(const _cx_self* self, i_keyraw rkey) {
@@ -180,6 +171,13 @@ _cx_memb(_insert)(_cx_self* self, i_key _key _i_MAP_ONLY(, i_val _mapped)) {
     _cx_result _res = _cx_memb(_insert_entry_)(self, i_keyto((&_key)));
     if (_res.inserted) { *_i_keyref(_res.ref) = _key; _i_MAP_ONLY( _res.ref->second = _mapped; )}
     else               { i_keydrop((&_key)); _i_MAP_ONLY( i_valdrop((&_mapped)); )}
+    return _res;
+}
+
+STC_INLINE _cx_result
+_cx_memb(_push)(_cx_self* self, _cx_value _val) {
+    _cx_result _res = _cx_memb(_insert_entry_)(self, i_keyto(_i_keyref(&_val)));
+    if (_res.inserted) *_res.ref = _val; else _cx_memb(_value_drop)(&_val);
     return _res;
 }
 
@@ -392,6 +390,8 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
 
 #endif // _i_implement
 #undef _i_isset
+#undef _i_ismap
+#undef _i_ishash
 #undef _i_keyref
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY

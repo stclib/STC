@@ -34,9 +34,9 @@
 #include "template.h"
 
 #if !c_option(c_is_fwd)
-   _cx_deftypes(_c_cpque_types, _cx_self, i_val);
+   _cx_deftypes(_c_cpque_types, _cx_self, i_key);
 #endif
-typedef i_valraw _cx_raw;
+typedef i_keyraw _cx_raw;
 
 STC_API void _cx_memb(_make_heap)(_cx_self* self);
 STC_API void _cx_memb(_erase_at)(_cx_self* self, size_t idx);
@@ -59,7 +59,7 @@ STC_INLINE _cx_self _cx_memb(_with_capacity)(const size_t cap) {
     return out;
 }
 
-STC_INLINE _cx_self _cx_memb(_with_size)(const size_t size, i_val null) {
+STC_INLINE _cx_self _cx_memb(_with_size)(const size_t size, i_key null) {
     _cx_self out = {NULL}; _cx_memb(_reserve)(&out, size);
     while (out.size < size) out.data[out.size++] = null;
     return out;
@@ -67,7 +67,7 @@ STC_INLINE _cx_self _cx_memb(_with_size)(const size_t size, i_val null) {
 
 STC_INLINE void _cx_memb(_clear)(_cx_self* self) {
     size_t i = self->size; self->size = 0;
-    while (i--) { i_valdrop((self->data + i)); }
+    while (i--) { i_keydrop((self->data + i)); }
 }
 
 STC_INLINE void _cx_memb(_drop)(_cx_self* self)
@@ -95,12 +95,12 @@ STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
     if (self->data == other.data) return;
     _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
 }
-STC_INLINE i_val _cx_memb(_value_clone)(_cx_value val)
-    { return i_valclone(val); }
+STC_INLINE i_key _cx_memb(_value_clone)(_cx_value val)
+    { return i_keyclone(val); }
 
 #if !defined _i_no_emplace
 STC_INLINE void _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
-    { _cx_memb(_push)(self, i_valfrom(raw)); }
+    { _cx_memb(_push)(self, i_keyfrom(raw)); }
 #endif // !_i_no_emplace
 #endif // !_i_no_clone
 
@@ -128,14 +128,14 @@ _cx_memb(_make_heap)(_cx_self* self) {
 STC_DEF _cx_self _cx_memb(_clone)(_cx_self q) {
     _cx_self out = _cx_memb(_with_capacity)(q.size);
     for (; out.size < out.capacity; ++q.data)
-        out.data[out.size++] = i_valclone((*q.data));
+        out.data[out.size++] = i_keyclone((*q.data));
     return out;
 }
 #endif
 
 STC_DEF void
 _cx_memb(_erase_at)(_cx_self* self, const size_t idx) {
-    i_valdrop((self->data + idx));
+    i_keydrop((self->data + idx));
     const size_t n = --self->size;
     self->data[idx] = self->data[n];
     _cx_memb(_sift_down_)(self->data - 1, idx + 1, n);

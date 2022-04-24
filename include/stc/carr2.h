@@ -29,7 +29,7 @@
 #endif
 /*
 // carr2- 2D dynamic array in one memory block with easy indexing.
-#define i_val int
+#define i_key int
 #include <stc/carr2.h>
 #include <stdio.h>
 
@@ -58,10 +58,10 @@ int main() {
 #endif
 #include "template.h"
 #if !c_option(c_is_fwd)
-_cx_deftypes(_c_carr2_types, _cx_self, i_val);
+_cx_deftypes(_c_carr2_types, _cx_self, i_key);
 #endif
 
-STC_API _cx_self   _cx_memb(_with_values)(size_t xdim, size_t ydim, i_val value);
+STC_API _cx_self   _cx_memb(_with_values)(size_t xdim, size_t ydim, i_key value);
 STC_API _cx_self   _cx_memb(_with_storage)(size_t xdim, size_t ydim, _cx_value* storage);
 STC_API _cx_value* _cx_memb(_release)(_cx_self* self);
 STC_API void       _cx_memb(_drop)(_cx_self* self);
@@ -107,7 +107,7 @@ STC_DEF _cx_self _cx_memb(_with_storage)(size_t xdim, size_t ydim, _cx_value* bl
     return _arr;
 }
 
-STC_DEF _cx_self _cx_memb(_with_values)(size_t xdim, size_t ydim, i_val value) {
+STC_DEF _cx_self _cx_memb(_with_values)(size_t xdim, size_t ydim, i_key value) {
     _cx_self _arr = _cx_memb(_init)(xdim, ydim);
     for (_cx_value* p = _arr.data[0], *e = p + xdim*ydim; p != e; ++p)
         *p = value;
@@ -119,7 +119,7 @@ STC_DEF _cx_self _cx_memb(_with_values)(size_t xdim, size_t ydim, i_val value) {
 STC_DEF _cx_self _cx_memb(_clone)(_cx_self src) {
     _cx_self _arr = _cx_memb(_init)(src.xdim, src.ydim);
     for (_cx_value* p = _arr.data[0], *q = src.data[0], *e = p + _cx_memb(_size)(src); p != e; ++p, ++q)
-        *p = i_valclone((*q));
+        *p = i_keyclone((*q));
     return _arr;
 }
 
@@ -139,7 +139,7 @@ STC_DEF _cx_value *_cx_memb(_release)(_cx_self* self) {
 STC_DEF void _cx_memb(_drop)(_cx_self* self) {
     if (!self->data) return;
     for (_cx_value* p = self->data[0], *q = p + _cx_memb(_size)(*self); p != q; ) {
-        --q; i_valdrop(q);
+        --q; i_keydrop(q);
     }
     c_free(self->data[0]); /* values */
     c_free(self->data);    /* pointers */
