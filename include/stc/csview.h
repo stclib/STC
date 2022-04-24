@@ -94,11 +94,6 @@ STC_INLINE csview       csview_from_s(const cstr* self)
 
 STC_INLINE cstr         cstr_from_sv(csview sv)
                             { return cstr_from_n(sv.str, sv.size); }
-/*STC_INLINE cstr         cstr_from_replace_all_sv(csview sv, csview find, csview repl)
-                            { return cstr_from_replace_all(sv.str, sv.size, find.str, find.size,
-                                                           repl.str, repl.size); }*/
-STC_INLINE csview       cstr_to_sv(const cstr* self)
-                            { return c_make(csview){cstr_str(self), cstr_size(*self)}; }
 STC_INLINE csview       cstr_substr(const cstr* self, intptr_t pos, size_t n)
                             { return csview_substr(csview_from_s(self), pos, n); }
 STC_INLINE csview       cstr_slice(const cstr* self, intptr_t p1, intptr_t p2)
@@ -127,12 +122,12 @@ STC_INLINE bool         cstr_ends_with_sv(cstr s, csview sub)
 #endif
 /* ---- Container helper functions ---- */
 
-STC_INLINE int      csview_cmp(const csview* x, const csview* y) { 
-                        const size_t m = x->size < y->size ? x->size : y->size; 
-                        const int c = memcmp(x->str, y->str, m);
-                        return c ? c : x->size - y->size;
-                    }
-#define             csview_eq(xp, yp) (!csview_cmp(xp, yp))
+STC_INLINE int csview_cmp(const csview* x, const csview* y) 
+    { return strcmp(x->str, y->str); }
+
+STC_INLINE bool csview_eq(const csview* x, const csview* y)
+    { return x->size == y->size && !memcmp(x->str, y->str, x->size); }
+
 STC_INLINE uint64_t csview_hash(const csview *self, size_t sz)
     { return c_default_hash(self->str, self->size); }
 

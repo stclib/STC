@@ -106,7 +106,8 @@
   #define i_key_bind cstr
   #define i_keyraw csview
   #define i_keyfrom cstr_from_sv
-  #define i_keyto cstr_to_sv
+  #define i_keyto cstr_sv
+  #define i_eq csview_eq
   #ifndef i_tag
     #define i_tag ssv
   #endif
@@ -197,7 +198,7 @@
   #define i_val cstr
   #define i_valraw csview
   #define i_valfrom cstr_from_sv
-  #define i_valto cstr_to_sv
+  #define i_valto cstr_sv
   #define i_valdrop cstr_drop
 #elif defined i_val_arcbox
   #define i_val_bind i_val_arcbox

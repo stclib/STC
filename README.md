@@ -3,12 +3,13 @@
 STC - Smart Template Containers for C
 =====================================
 
-News: Version 3 released (Jan 2022)
------------------------------------
-This version introduces lots of enhancements, bugfixes and additions. There are also
-a number of [breaking changes](#brief-summary-of-changes) and [a migration guide from version 2 to 3](#migration-guide-from-version-2-to-3).
-With version 3, the API is freezed as far as possible. Any changes will be handled with long 
-lasting deprecations, so you may develop production code using it.
+News: Version 3.5 released (Mar 2022)
+-------------------------------------
+- Swapped to new **cstr** (*short string optimized*, aka SSO). Note that `cstr_str(&s)` must be used, `s.str` is no longer usable.
+- Added general `i_clone` template parameter: containers with smart pointers (**carc**, **cbox**) can now be correctly cloned.
+- Optimized *c_default_hash()*. Therefore *c_hash32()* and *c_hash64()* are removed (same speed).
+- Added *.._push()* and *.._emplace()* function to all containers to allow for more generic coding.
+- Added some examples and benchmarks for SSO and heterogenous lookup comparison with c++20 (string_bench_*.cpp).
 
 Introduction
 ------------
