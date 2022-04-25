@@ -6,8 +6,8 @@ STC - Smart Template Containers for C
 News: Version 3.6 released (Mar 2022)
 -------------------------------------
 - Swapped to new **cstr** (*short string optimized*, aka SSO). Note that `cstr_str(&s)` must be used, `s.str` is no longer usable.
-- Removed size argument to `i_hash` template parameter and `c_default_hash`. This was a "design error". Please update your code.
-- Added general `i_clone` template parameter: containers with smart pointers (**carc**, **cbox**) can now be correctly cloned.
+- Removed *redundant* size argument to `i_hash` template parameter and `c_default_hash`. Please update your code.
+- Added general `i_keyclone/i_valclone` template parameter: containers of smart pointers (**carc**, **cbox**) now correctly cloned.
 - Allows for `i_key*` template parameters instead of `i_val*` for all containers, not only for **cset** and **csset**.
 - Optimized *c_default_hash()*. Therefore *c_hash32()* and *c_hash64()* are removed (same speed).
 - Added *.._push()* and *.._emplace()* function to all containers to allow for more generic coding.
@@ -68,9 +68,10 @@ Highlights
 Performance
 -----------
 ![Benchmark](benchmarks/pics/benchmark.gif)
+
 Benchmark notes:
 - The barchart shows average test times over three platforms: Mingw64 10.30, Win-Clang 12, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
-- Containers uses value types `uint64_t` and pairs of `uint64_t`for the maps.
+- Containers uses value types `uint64_t` and pairs of `uint64_t` for the maps.
 - Black bars indicates performance variation between various platforms/compilers.
 - Iterations are repeated 4 times over n elements.
 - **find()**: not executed for *forward_list*, *deque*, and *vector* because these c++ containers does not have native *find()*.
@@ -101,7 +102,7 @@ int main(void) {
 A "better" way to write the same code is:
 ```c
 int main(void) {
-    c_auto (FVec, vec) // RAII - create and destroy vec
+    c_auto (FVec, vec) // RAII - specify create and destruct in one place.
     {
         c_apply(v, FVec_push_back(&vec, v), float, {10.f, 20.f, 30.f});
 
@@ -286,24 +287,29 @@ Key:
 - `i_keyraw`  - Convertion "raw" type - defaults to `i_key` type.
 - `i_keyfrom` - Convertion func `i_key` <= `i_keyraw`. **[required]** if `i_keydrop` is defined. Works as *clone* when `i_keyraw` not specified. 
 - `i_keyto`   - Convertion func `i_key *` => `i_keyraw`.
+- `i_keyclone` - Defaults to `i_keyfrom(i_keyto(&key))`.
 
 Val:
 - `i_valdrop` - Destroy mapped or value func - defaults to empty destruct.
 - `i_valraw`  - Convertion "raw" type - defaults to `i_val` type.
 - `i_valfrom` - Convertion func `i_val` <= `i_valraw`. **[required]** if `i_valdrop` is defined.  Works as *clone* when `i_valraw` not specified. 
 - `i_valto`   - Convertion func `i_val *` => `i_valraw`.
+- `i_valclone` - Defaults to `i_valfrom(i_valto(&val))`.
 
 Special:
 - `i_key_str` - Define key type `cstr` and container i_tag = `str`. It binds type convertion from/to `const char*`, and the ***cmp***, ***eq***, ***hash***, and ***keydrop*** functions.
+- `i_key_ssv` - Define key type `cstr` and container i_tag = `ssv`. It binds type convertion from/to `csview`, and its ***cmp***, ***eq***, ***hash***, and ***keydrop*** functions.
 - `i_key_arcbox TYPE` - Define container key type where TYPE is a smart pointer **carc** or **cbox**. NB: not to be used when defining carc/cbox types themselves.
 - `i_key_bind TYPE` - General version of the two above - will auto-bind to standard named functions: *TYPE_clone*, *TYPE_drop*, *TYPE_cmp*, *TYPE_eq*, *TYPE_hash*. Only functions required by the particular container need to be defined (*TYPE_drop* is always used). E.g., only **cmap** and **cset** uses *TYPE_hash* and *TYPE_eq*. And **cstack** does not use *TYPE_cmp*. *TYPE_clone* is not used if `#define i_opt c_no_clone` is specified. Likewise, *TYPE_cmp* is not used if `#define i_opt c_no_cmp` is specified.
-- `i_keyraw RAWTYPE` - If defined along with `i_key_bind`, the two functions `TYPE TYPE_from(i_valraw)` and `RAWTYPE TYPE_toraw(TYPE*)` are expected instead of `TYPE TYPE_clone(TYPE)`.  Cloning is done by `TYPE_from(TYPE_toraw(&val))`.  Functions ***cmp***, ***eq*** and ***hash*** to be bound must have name/signature: `int RAWTYPE_cmp(const RAWTYPE*, const RAWTYPE*)`, and similar for *RAWTYPE_eq* and *RAWTYPE_hash*.
-- `i_val_str`, `i_val_bind`, `i_val_arcbox` - Similar rules as for *key*.
+- `i_val_str`, `i_val_bind`, `i_val_arcbox` - Similar rules as for ***key***.
 
-Notes:
+**Notes**:
 - Instead of defining `i_cmp`, you may define `i_opt c_no_cmp` to disable searching and sorting functions.
 - Instead of defining `i_*from`, you may define `i_opt c_no_clone` to disable emplace and clone-functions.
 - If a destructor `i_*drop` is defined, then either `i_*from` or `i_opt c_no_clone` must be defined.
+- `i_keyraw RAWTYPE` - If defined along with `i_key_bind`, the two functions `TYPE TYPE_from(i_valraw)` and `RAWTYPE TYPE_toraw(TYPE*)` are expected instead of `TYPE TYPE_clone(TYPE)`.  Cloning is done by `TYPE_from(TYPE_toraw(&val))`, unless `i_keyclone/i_valclone` is defined. 
+- Functions ***cmp***, ***eq*** and ***hash*** to be bound have signature:
+`int RAWTYPE_cmp(const RAWTYPE*, const RAWTYPE*)`, and similar for `RAWTYPE_eq` and `RAWTYPE_hash`.
 
 The *emplace* versus non-emplace container methods
 --------------------------------------------------
@@ -322,8 +328,8 @@ can easier lead to mistakes.
 
 | non-emplace: Move          | emplace: Embedded copy         | Container                                   |
 |:---------------------------|:-------------------------------|:--------------------------------------------|
-| insert()                   | emplace()                      | cmap, csmap, cset, csset                    |
-| insert_or_assign(), put()  | emplace_or_assign(), put_raw() | cmap, csmap                                 |
+| insert(), push()           | emplace()                      | cmap, csmap, cset, csset                    |
+| insert_or_assign()         | emplace_or_assign()            | cmap, csmap                                 |
 | push()                     | emplace()                      | cqueue, cpque, cstack                       |
 | push_back(), push()        | emplace_back()                 | cdeq, clist, cvec                           |
 | push_front()               | emplace_front()                | cdeq, clist                                 |
