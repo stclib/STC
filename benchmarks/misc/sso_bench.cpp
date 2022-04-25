@@ -1,113 +1,103 @@
 #include <string>
 #include <iostream>
 #include <vector>
+#include <unordered_set>
 #include <chrono>
-#define i_type svec
+#include <stc/crandom.h>
+
+#define i_type stccon
 #define i_val_str
-#include <stc/cstack.h>
+#include <stc/cvec.h>
 
-#define ROTL_(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
-
-static uint64_t g_romutrio[3] = {
-    0x26aa069ea2fb1a4dULL, 0x70c72c95cd592d04ULL,
-    0x504f333d3aa0b359ULL,
-};
-
-static inline uint64_t romutrio(void) {
-   uint64_t *s = g_romutrio, xp = s[0], yp = s[1], zp = s[2];
-   s[0] = 15241094284759029579u * zp;
-   s[1] = yp - xp; s[1] = ROTL_(s[1], 12);
-   s[2] = zp - yp; s[2] = ROTL_(s[2], 44);
-   return xp;
-}
-
-static void sromutrio(uint64_t seed) {
-   uint64_t *s = g_romutrio;
-   s[0] = 0x26aa069ea2fb1a4dULL + seed;
-   s[1] = 0x70c72c95cd592d04ULL + seed;
-   s[2] = 0x504f333d3aa0b359ULL + seed;
-}
-
-
-static const char CHARS[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=+-";
+using stdcon = std::vector<std::string>;
 
 static const int BENCHMARK_SIZE = 5000000;
-static const int MAX_STRING_LENGTH = 30;
-
+static const int MAX_STRING_LENGTH = 60;
+static const char CHARS[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=+-";
 using time_point = std::chrono::high_resolution_clock::time_point;
 
-void addRandomString_STD(std::vector<std::string>& vec, const int length) {
+
+void addRandomString_STD(stdcon& con, int length) {
     std::string s(length, 0);
     char* p = &s[0];
+    union { uint64_t u8; uint8_t b[8]; } r;
     for (int i = 0; i < length; ++i) {
-        p[i] = CHARS[romutrio() & 63];
+        if ((i & 7) == 0) r.u8 = crandom() & 0x3f3f3f3f3f3f3f3f;
+        p[i] = CHARS[r.b[i & 7]];
     }
-    s.append(s);
-    vec.push_back(std::move(s));
+    con.push_back(std::move(s));
 }
 
-void addRandomString_STC(svec& vec, const int length) {
+void addRandomString_STC(stccon& con, int length) {
     cstr s = cstr_with_size(length, 0);
     char* p = cstr_data(&s);
+    union { uint64_t u8; uint8_t b[8]; } r;
     for (int i = 0; i < length; ++i) {
-        p[i] = CHARS[romutrio() & 63];
+        if ((i & 7) == 0) r.u8 = crandom() & 0x3f3f3f3f3f3f3f3f;
+        p[i] = CHARS[r.b[i & 7]];
     }
-    cstr_append_s(&s, s);
-    svec_push_back(&vec, s);
+    stccon_push_back(&con, s);
 }
 
 template <class L, typename R>
-void benchmark(L& vec, const int length, R addRandomString) {
+int benchmark(L& con, const int length, R addRandomString) {
     time_point t1 = std::chrono::high_resolution_clock::now();
 
     if (length == 0)
         for (int i = 0; i < BENCHMARK_SIZE; i++)
-            addRandomString(vec, (i*13 & 31) + 1);
+            addRandomString(con, (crandom() & 31) + 1);
     else
         for (int i = 0; i < BENCHMARK_SIZE; i++)
-            addRandomString(vec, length);
+            addRandomString(con, length);
 
     time_point t2 = std::chrono::high_resolution_clock::now();
     const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-    std::cerr << length*2 << "\t" << duration;
+    std::cerr << (length ? length : 16) << "\t" << duration;
+    return (int)duration;
 }
 
 
 int main() {
     uint64_t seed = 4321;
-    sromutrio(seed);
+    csrandom(seed);
+    int sum, n;
     std::cerr << "length\ttime\tstd::string\n";
     for (int k = 0; k < 4; k++) {
-        std::vector<std::string> vec; vec.reserve(BENCHMARK_SIZE);
-        benchmark(vec, 0, addRandomString_STD);
-        std::cout << '\t' << vec[0] << '\n';
+        stdcon con; con.reserve(BENCHMARK_SIZE);
+        benchmark(con, 0, addRandomString_STD);
+        std::cout << '\t' << *con.begin() << '\n';
     }
 
-    sromutrio(seed);
+    csrandom(seed);
     std::cerr << "\nlength\ttime\tSTC string\n";
     for (int k = 0; k < 4; k++) {
-        svec vec = svec_with_capacity(BENCHMARK_SIZE);
-        benchmark(vec, 0, addRandomString_STC);
-        std::cout << '\t' << cstr_str(&vec.data[0]) << '\n';
-        svec_drop(&vec);
+        stccon con = stccon_with_capacity(BENCHMARK_SIZE);
+        benchmark(con, 0, addRandomString_STC);
+        std::cout << '\t' << cstr_str(stccon_begin(&con).ref) << '\n';
+        stccon_drop(&con);
     }
 
-    sromutrio(seed);
-    std::cerr << "length\ttime\tstd::string\n";
-    for (int length = 1; length <= MAX_STRING_LENGTH; length++) {
-        std::vector<std::string> vec; vec.reserve(BENCHMARK_SIZE);
-        benchmark(vec, length, addRandomString_STD);
-        std::cout << '\t' << vec[0] << '\n';
+    csrandom(seed);
+    sum = 0, n = 0;
+    std::cerr << "\nlength\ttime\tstd::string\n";
+    for (int length = 1; length <= MAX_STRING_LENGTH; length += 2) {
+        stdcon con; con.reserve(BENCHMARK_SIZE);
+        sum += benchmark(con, length, addRandomString_STD), ++n;
+        std::cout << '\t' << *con.begin() << '\n';
     }
+    std::cout << "Avg:\t" << sum/n << '\n';
+    
 
-    sromutrio(seed);
+    csrandom(seed);
+    sum = 0, n = 0;
     std::cerr << "\nlength\ttime\tSTC string\n";
-    for (int length = 1; length <= MAX_STRING_LENGTH; length++) {
-        svec vec = svec_with_capacity(BENCHMARK_SIZE);
-        benchmark(vec, length, addRandomString_STC);
-        std::cout << '\t' << cstr_str(&vec.data[0]) << '\n';
-        svec_drop(&vec);
+    for (int length = 1; length <= MAX_STRING_LENGTH; length += 2) {
+        stccon con = stccon_with_capacity(BENCHMARK_SIZE);
+        sum += benchmark(con, length, addRandomString_STC), ++n;
+        std::cout << '\t' << cstr_str(stccon_begin(&con).ref) << '\n';
+        stccon_drop(&con);
     }
+    std::cout << "Avg:\t" << sum/n << '\n';
 
     std::cerr << "sizeof std::string : " << sizeof(std::string) << std::endl
               << "sizeof STC string  : " << sizeof(cstr) << std::endl;

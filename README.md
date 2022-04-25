@@ -7,8 +7,10 @@ News: Version 3.5 released (Mar 2022)
 -------------------------------------
 - Swapped to new **cstr** (*short string optimized*, aka SSO). Note that `cstr_str(&s)` must be used, `s.str` is no longer usable.
 - Added general `i_clone` template parameter: containers with smart pointers (**carc**, **cbox**) can now be correctly cloned.
+- Allows for `i_key*` template parameters instead of `i_val*` for all containers, not only for **cset** and **csset**.
 - Optimized *c_default_hash()*. Therefore *c_hash32()* and *c_hash64()* are removed (same speed).
 - Added *.._push()* and *.._emplace()* function to all containers to allow for more generic coding.
+- Renamed global PRNGs *stc64_random()* and *stc64_srandom()* to *crandom()* and *csrandom()*.
 - Added some examples and benchmarks for SSO and heterogenous lookup comparison with c++20 (string_bench_*.cpp).
 
 Introduction
@@ -18,11 +20,11 @@ with a uniform API across the containers, and is similar to the c++ standard lib
 inspirations from Rust and Python too.
 
 It is a compact, header-only library which includes the all the major "standard" data containers except for the
-multimap/set variants. However, there are examples on how to create multimaps in the examples folder.
+multimap variants. However, there are examples on how to create multimaps in the examples folder.
 
 For an introduction to templated containers, please read the blog by Ian Fisher on
 [type-safe generic data structures in C](https://iafisher.com/blog/2020/06/type-safe-generics-in-c).
-Note that STC does not use long macro expansions anymore, but relies on one or more inclusions of the same file,
+Note that STC does not use long macro expansions anymore, but relies on one or more inclusion of the same file,
 which by the compiler is seen as different code because of macro name substitutions.
 
 - [***ccommon*** - RAII and iterator macros](docs/ccommon_api.md)

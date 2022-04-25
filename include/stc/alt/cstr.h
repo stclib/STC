@@ -65,12 +65,14 @@ STC_API bool            cstr_getdelim(cstr *self, int delim, FILE *stream);
 STC_API void            cstr_replace_all(cstr* self, const char* find, const char* repl);
 
 STC_INLINE cstr         cstr_init() { return cstr_null; }
+STC_INLINE const char*  cstr_str(const cstr* self) { return self->str; }
 #define                 cstr_toraw(self) (self)->str
+STC_INLINE csview       cstr_sv(const cstr* self) 
+                            { return c_make(csview){self->str, _cstr_p(self)->size}; }
 #define                 cstr_new(literal) \
                             cstr_from_n(literal, c_strlen_lit(literal))
 STC_INLINE cstr         cstr_from(const char* str)
                             { return cstr_from_n(str, strlen(str)); }
-STC_INLINE const char*  cstr_str(const cstr* self) { return self->str; }
 STC_INLINE char*        cstr_data(cstr* self) { return self->str; }
 STC_INLINE size_t       cstr_size(cstr s) { return _cstr_p(&s)->size; }
 STC_INLINE size_t       cstr_length(cstr s) { return _cstr_p(&s)->size; }
