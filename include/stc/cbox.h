@@ -146,12 +146,12 @@ _cx_memb(_take)(_cx_self* self, _cx_self other) {
 }
 
 STC_INLINE uint64_t
-_cx_memb(_value_hash)(const _cx_value* x, size_t n) {
+_cx_memb(_value_hash)(const _cx_value* x) {
     #if c_option(c_no_cmp)
-        return c_default_hash(&x, sizeof x);
+        return c_default_hash(&x);
     #else
         _cx_raw rx = i_keyto(x);
-        return i_hash((&rx), (sizeof rx));
+        return i_hash((&rx));
     #endif
 }
 

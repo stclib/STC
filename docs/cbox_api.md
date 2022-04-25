@@ -44,7 +44,7 @@ void        cbox_X_drop(cbox_X* self);                         // destruct the c
 void        cbox_X_reset(cbox_X* self);   
 void        cbox_X_reset_from(cbox_X* self, i_val val);       // assign new cbox with value. Takes ownership of val.
 
-uint64_t    cbox_X_value_hash(const i_val* x, size_t n);      // hash value
+uint64_t    cbox_X_value_hash(const i_val* x);                // hash value
 int         cbox_X_value_cmp(const i_val* x, const i_val* y); // compares pointer addresses if 'i_opt c_no_cmp'
                                                               // is defined. Otherwise uses 'i_cmp' or default compare.
 bool        cbox_X_value_eq(const i_val* x, const i_val* y);  // cbox_X_value_cmp == 0

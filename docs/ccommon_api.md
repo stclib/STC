@@ -214,7 +214,7 @@ void        c_default_drop(Type* val);           // does nothing
 typedef     const char* crawstr;
 int         crawstr_cmp(const crawstr* x, const crawstr* y);
 bool        crawstr_eq(const crawstr* x, const crawstr* y);
-uint64_t    crawstr_hash(const crawstr* x, size_t dummy);
+uint64_t    crawstr_hash(const crawstr* x);
 ```
 
 ### c_malloc, c_calloc, c_realloc, c_free

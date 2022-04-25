@@ -18,7 +18,7 @@ typedef struct RViking {
     const char* country;
 } RViking;
 
-uint64_t RViking_hash(const RViking* raw, size_t ignore) {
+uint64_t RViking_hash(const RViking* raw) {
     uint64_t hash = c_strhash(raw->name) ^ (c_strhash(raw->country) >> 15);
     return hash;
 }

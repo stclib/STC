@@ -84,7 +84,7 @@ Note that all methods with arguments `(..., const char* str, size_t n)`, `n` mus
 ```c
 int          cstr_cmp(const cstr *s1, const cstr *s2);
 bool         cstr_eq(const cstr *s1, const cstr *s2);
-bool         cstr_hash(const cstr *s, ...);
+bool         cstr_hash(const cstr *s);
 
 char*        c_strnstrn(const char* str, const char* needle, size_t slen, size_t nlen);
 int          c_strncasecmp(const char* str1, const char* str2, size_t n);

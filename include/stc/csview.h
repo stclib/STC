@@ -128,8 +128,8 @@ STC_INLINE int csview_cmp(const csview* x, const csview* y)
 STC_INLINE bool csview_eq(const csview* x, const csview* y)
     { return x->size == y->size && !memcmp(x->str, y->str, x->size); }
 
-STC_INLINE uint64_t csview_hash(const csview *self, size_t sz)
-    { return c_default_hash(self->str, self->size); }
+STC_INLINE uint64_t csview_hash(const csview *self)
+    { return c_fasthash(self->str, self->size); }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(_i_implement)

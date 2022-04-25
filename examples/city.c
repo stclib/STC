@@ -12,8 +12,8 @@ static inline int City_cmp(const City* a, const City* b) {
     return c ? c : cstr_cmp(&a->country, &b->country);
 }
 
-static inline uint64_t City_hash(const City* a, size_t n) {
-    return cstr_hash(&a->name, 0) ^ cstr_hash(&a->country, 0);
+static inline uint64_t City_hash(const City* a) {
+    return cstr_hash(&a->name) ^ cstr_hash(&a->country);
 }
 
 static inline City City_clone(City c) {

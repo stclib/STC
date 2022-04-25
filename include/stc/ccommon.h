@@ -92,27 +92,27 @@
 #define c_default_toraw(ptr)    (*(ptr))
 #define c_default_drop(ptr)     ((void) (ptr))
 
+#define c_default_hash(p)       c_fasthash(p, sizeof *(p))
+
 #define c_option(flag)          ((i_opt) & (flag))
 #define c_is_fwd                (1<<0)
 #define c_no_atomic             (1<<1)
 #define c_no_clone              (1<<2)
 #define c_no_cmp                (1<<3)
-#define c_hash                  (1<<4)
-#define c_eq                    (1<<5)
-#define c_static                (1<<6)
-#define c_header                (1<<7)
-#define c_implement             (1<<8)
+#define c_static                (1<<4)
+#define c_header                (1<<5)
+#define c_implement             (1<<6)
 
 /* Generic algorithms */
 
 typedef const char* crawstr;
 #define crawstr_cmp(xp, yp) strcmp(*(xp), *(yp))
 #define crawstr_eq(xp, yp) (!strcmp(*(xp), *(yp)))
-#define crawstr_hash(p, dummy) c_strhash(*(p))
+#define crawstr_hash(p) c_strhash(*(p))
 
 #define _c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
-STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
+STC_INLINE uint64_t c_fasthash(const void* key, size_t len) {
     uint64_t u8, h = 1; size_t n = len >> 3;
     uint32_t u4;
     const uint8_t *x = (const uint8_t*) key; 
@@ -127,8 +127,8 @@ STC_INLINE uint64_t c_default_hash(const void* key, size_t len) {
     return _c_ROTL(h, 26) ^ h;
 }
 
-STC_INLINE uint64_t c_strhash(const char *s) 
-    { return c_default_hash(s, strlen(s)); }
+STC_INLINE uint64_t c_strhash(const char *str) 
+    { return c_fasthash(str, strlen(str)); }
 
 STC_INLINE char* c_strnstrn(const char *s, const char *needle, size_t slen, const size_t nlen) {
     if (!nlen) return (char *)s;

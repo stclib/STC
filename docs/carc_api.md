@@ -47,7 +47,7 @@ long        carc_X_use_count(carc_X ptr);
 void        carc_X_reset(carc_X* self);    
 void        carc_X_reset_from(carc_X* self, i_val val);        // assign new carc with value. Takes ownership of val.
 
-uint64_t    carc_X_value_hash(const i_val* x, size_t n);       // hash value
+uint64_t    carc_X_value_hash(const i_val* x);                 // hash value
 int         carc_X_value_cmp(const i_val* x, const i_val* y);  // compares pointer addresses if 'i_opt c_no_cmp'
                                                                // is defined. Otherwise uses 'i_cmp' or default compare.
 bool        carc_X_value_eq(const i_val* x, const i_val* y);   // cbox_X_value_cmp == 0

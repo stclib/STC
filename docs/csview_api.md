@@ -98,7 +98,7 @@ bool            cstr_ends_with_sv(cstr s, csview sub);
 ```c
 int             csview_cmp(const csview* x, const csview* y);
 bool            csview_eq(const csview* x, const csview* y);
-uint64_t        csview_hash(const csview* x, size_t dummy);
+uint64_t        csview_hash(const csview* x);
 ```
 
 ## Types

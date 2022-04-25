@@ -85,10 +85,9 @@ cmap_X_raw            cmap_X_value_toraw(cmap_X_value* pval);
 ```
 Helpers:
 ```c
-uint64_t              c_strhash(const char *str);                              // utility function
-
-// hash template parameter functions:
-uint64_t              c_default_hash(const void *data, size_t len);            // key is any integral type
+uint64_t              c_default_hash(const X *obj);                            // macro, calls c_fasthash(obj, sizeof *obj)
+uint64_t              c_strhash(const char *str);                              // string hash funcion, uses strlen()
+uint64_t              c_fasthash(const void *data, size_t len);                // base hash function
 
 // equalto template parameter functions:
 bool                  c_default_eq(const i_keyraw* a, const i_keyraw* b);      // *a == *b
@@ -278,7 +277,7 @@ static inline int Viking_cmp(const Viking* a, const Viking* b) {
     return c ? c : cstr_cmp(&a->country, &b->country);
 }
 
-static inline uint32_t Viking_hash(const Viking* a, int ignored) {
+static inline uint32_t Viking_hash(const Viking* a) {
     return c_strhash(cstr_str(&a->name)) ^ (c_strhash(cstr_str(&a->country)) >> 15);
 }
 
@@ -355,7 +354,7 @@ typedef struct RViking {
     const char* country;
 } RViking;
 
-static inline uint64_t RViking_hash(const RViking* raw, size_t ignore) {
+static inline uint64_t RViking_hash(const RViking* raw) {
     uint64_t hash = c_strhash(raw->name) ^ (c_strhash(raw->country) >> 15);
     return hash;
 }

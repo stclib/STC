@@ -168,9 +168,16 @@ STC_INLINE int c_strncasecmp(const char* s1, const char* s2, size_t nmax) {
 }
 
 /* container adaptor functions: */
-#define  cstr_cmp(xp, yp)     strcmp((xp)->str, (yp)->str)
-#define  cstr_eq(xp, yp)      (!cstr_cmp(xp, yp))
-#define  cstr_hash(xp, dummy) c_strhash((xp)->str)
+#define  cstr_cmp(xp, yp) strcmp((xp)->str, (yp)->str)
+
+STC_INLINE bool cstr_eq(const cstr* x, const cstr* y) {
+    size_t xs = _cstr_p(x)->size, ys = _cstr_p(y)->size;
+    return xs == ys && !memcmp(x->str, y->str, xs);
+}
+STC_INLINE uint64_t cstr_hash(const cstr *self) {
+    return c_fasthash(self->str, _cstr_p(self)->size);
+}
+
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(_i_implement)

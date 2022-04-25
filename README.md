@@ -3,9 +3,10 @@
 STC - Smart Template Containers for C
 =====================================
 
-News: Version 3.5 released (Mar 2022)
+News: Version 3.6 released (Mar 2022)
 -------------------------------------
 - Swapped to new **cstr** (*short string optimized*, aka SSO). Note that `cstr_str(&s)` must be used, `s.str` is no longer usable.
+- Removed size argument to `i_hash` template parameter and `c_default_hash`. This was a "design error". Please update your code.
 - Added general `i_clone` template parameter: containers with smart pointers (**carc**, **cbox**) can now be correctly cloned.
 - Allows for `i_key*` template parameters instead of `i_val*` for all containers, not only for **cset** and **csset**.
 - Optimized *c_default_hash()*. Therefore *c_hash32()* and *c_hash64()* are removed (same speed).
@@ -272,7 +273,7 @@ The list of template parameters:
 - `i_key`     - Element key type for map/set only. **[required]**.
 - `i_val`     - Element value type. **[required]**. For cmap/csmap, it is the mapped value type.
 - `i_cmp`     - Three-way comparison of two `i_keyraw or i_valraw` pointers - **[required]** for non-integral valraw types unless `i_opt c_no_cmp` is defined.
-- `i_hash`    - Hash function taking `i_keyraw *` and a size - defaults to `!i_cmp`. **[required]** for non-POD valraw type.
+- `i_hash`    - Hash function taking `i_keyraw *` - defaults to `c_default_hash`. **[required]** for non-POD valraw type.
 - `i_eq`      - Equality comparison of two `i_keyraw *` - defaults to `!i_cmp`. Companion with `i_hash`.
 
 Properties:
