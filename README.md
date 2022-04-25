@@ -102,7 +102,7 @@ int main(void) {
 A "better" way to write the same code is:
 ```c
 int main(void) {
-    c_auto (FVec, vec) // RAII - specify create and destruct in one place.
+    c_auto (FVec, vec) // RAII - specify create and destruct at one place.
     {
         c_apply(v, FVec_push_back(&vec, v), float, {10.f, 20.f, 30.f});
 
@@ -272,44 +272,42 @@ The template parameters are given by a `#define i_xxxx` statement, where *xxxx* 
 The list of template parameters:
 
 - `i_key`     - Element key type for map/set only. **[required]**.
-- `i_val`     - Element value type. **[required]**. For cmap/csmap, it is the mapped value type.
-- `i_cmp`     - Three-way comparison of two `i_keyraw or i_valraw` pointers - **[required]** for non-integral valraw types unless `i_opt c_no_cmp` is defined.
-- `i_hash`    - Hash function taking `i_keyraw *` - defaults to `c_default_hash`. **[required]** for non-POD valraw type.
-- `i_eq`      - Equality comparison of two `i_keyraw *` - defaults to `!i_cmp`. Companion with `i_hash`.
+- `i_val`     - Element value type. **[required for]** cmap/csmap, it is the mapped value type.
+- `i_cmp`     - Three-way comparison of two *i_keyraw*\* or *i_valraw*\* - **[required for]** non-integral *i_valraw* types unless *i_opt* is defined with *c_no_cmp*.
+- `i_hash`    - Hash function taking *i_keyraw*\* - defaults to *c_default_hash*. **[required for]** non-POD valraw type.
+- `i_eq`      - Equality comparison of two *i_keyraw*\* - defaults to *!i_cmp*. Companion with *i_hash*.
 
 Properties:
-- `i_tag`     - Container type name tag. Defaults to same as `i_key`
-- `i_type`    - Full container type name. Alternative to `i_tag`.
-- `i_opt`     - Boolean properties: may combine `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`, `c_static`, `c_header`, `c_implement` with `|` separator.
+- `i_tag`     - Container type name tag. Defaults to *i_key* name.
+- `i_type`    - Full container type name. Alternative to *i_tag*.
+- `i_opt`     - Boolean properties: may combine *c_no_cmp*, *c_no_clone*, *c_no_atomic*, *c_is_fwd*, *c_static*, *c_header*, *c_implement* with the *|* separator.
 
 Key:
 - `i_keydrop` - Destroy map/set key func - defaults to empty destructor.
-- `i_keyraw`  - Convertion "raw" type - defaults to `i_key` type.
-- `i_keyfrom` - Convertion func `i_key` <= `i_keyraw`. **[required]** if `i_keydrop` is defined. Works as *clone* when `i_keyraw` not specified. 
-- `i_keyto`   - Convertion func `i_key *` => `i_keyraw`.
-- `i_keyclone` - Defaults to `i_keyfrom(i_keyto(&key))`.
+- `i_keyraw`  - Convertion "raw" type - defaults to *i_key*.
+- `i_keyfrom` - Convertion func *i_key* <- *i_keyraw*. **[required if]** *i_keyraw* is defined, else works as ***clone***. 
+- `i_keyto`   - Convertion func *i_key*\* -> *i_keyraw*.
+- `i_keyclone` - Defaults to *i_keyfrom(i_keyto(&key))*, but is defined for smart pointers.
 
 Val:
 - `i_valdrop` - Destroy mapped or value func - defaults to empty destruct.
-- `i_valraw`  - Convertion "raw" type - defaults to `i_val` type.
-- `i_valfrom` - Convertion func `i_val` <= `i_valraw`. **[required]** if `i_valdrop` is defined.  Works as *clone* when `i_valraw` not specified. 
-- `i_valto`   - Convertion func `i_val *` => `i_valraw`.
-- `i_valclone` - Defaults to `i_valfrom(i_valto(&val))`.
+- `i_valraw`  - Convertion "raw" type - defaults to *i_val*.
+- `i_valfrom` - Convertion func *i_val* <- *i_valraw*. **[required if]** *i_valdrop* is defined. Works as ***clone*** when *i_valraw* is not specified. 
+- `i_valto`   - Convertion func *i_val*\* -> *i_valraw*.
+- `i_valclone` - Defaults to *i_valfrom(i_valto(&val))*.
 
 Special:
-- `i_key_str` - Define key type `cstr` and container i_tag = `str`. It binds type convertion from/to `const char*`, and the ***cmp***, ***eq***, ***hash***, and ***keydrop*** functions.
-- `i_key_ssv` - Define key type `cstr` and container i_tag = `ssv`. It binds type convertion from/to `csview`, and its ***cmp***, ***eq***, ***hash***, and ***keydrop*** functions.
+- `i_key_str` - Define key type *cstr* and container i_tag = *str*. It binds type convertion from/to *const char*\*, and the ***cmp***, ***eq***, ***hash***, and ***keydrop*** functions.
+- `i_key_ssv` - Define key type *cstr* and container i_tag = *ssv*. It binds type convertion from/to *csview*, and its ***cmp***, ***eq***, ***hash***, and ***keydrop*** functions.
 - `i_key_arcbox TYPE` - Define container key type where TYPE is a smart pointer **carc** or **cbox**. NB: not to be used when defining carc/cbox types themselves.
-- `i_key_bind TYPE` - General version of the two above - will auto-bind to standard named functions: *TYPE_clone*, *TYPE_drop*, *TYPE_cmp*, *TYPE_eq*, *TYPE_hash*. Only functions required by the particular container need to be defined (*TYPE_drop* is always used). E.g., only **cmap** and **cset** uses *TYPE_hash* and *TYPE_eq*. And **cstack** does not use *TYPE_cmp*. *TYPE_clone* is not used if `#define i_opt c_no_clone` is specified. Likewise, *TYPE_cmp* is not used if `#define i_opt c_no_cmp` is specified.
+- `i_key_bind TYPE` - General version of the two above - will auto-bind to standard named functions: *TYPE_clone*, *TYPE_drop*, *TYPE_cmp*, *TYPE_eq*, *TYPE_hash*. Only functions required by the particular container need to be defined (*TYPE_drop* is always used). E.g., only **cmap** and **cset** and smart pointers uses *TYPE_hash* and *TYPE_eq*. **cstack** does not use *TYPE_cmp*. *TYPE_clone* is not used if *#define i_opt c_no_clone* is specified. Likewise, *TYPE_cmp* is not used if *#define i_opt c_no_cmp* is specified.
 - `i_val_str`, `i_val_bind`, `i_val_arcbox` - Similar rules as for ***key***.
 
 **Notes**:
-- Instead of defining `i_cmp`, you may define `i_opt c_no_cmp` to disable searching and sorting functions.
-- Instead of defining `i_*from`, you may define `i_opt c_no_clone` to disable emplace and clone-functions.
-- If a destructor `i_*drop` is defined, then either `i_*from` or `i_opt c_no_clone` must be defined.
-- `i_keyraw RAWTYPE` - If defined along with `i_key_bind`, the two functions `TYPE TYPE_from(i_valraw)` and `RAWTYPE TYPE_toraw(TYPE*)` are expected instead of `TYPE TYPE_clone(TYPE)`.  Cloning is done by `TYPE_from(TYPE_toraw(&val))`, unless `i_keyclone/i_valclone` is defined. 
-- Functions ***cmp***, ***eq*** and ***hash*** to be bound have signature:
-`int RAWTYPE_cmp(const RAWTYPE*, const RAWTYPE*)`, and similar for `RAWTYPE_eq` and `RAWTYPE_hash`.
+- Instead of defining `i_cmp`, you may define *i_opt c_no_cmp* to disable searching and sorting functions.
+- Instead of defining `i_*from`, you may define *i_opt c_no_clone* to disable emplace and clone-functions.
+- `i_keyraw RAWTYPE` - If defined along with *i_key_bind*, the two functions *TYPE TYPE_from(RAWTYPE)* and *RAWTYPE TYPE_toraw(TYPE\*)* are expected instead of *TYPE TYPE_clone(TYPE)*.  Cloning is done by ***TYPE_from(TYPE_toraw(&val))***, unless *i_keyclone/i_valclone* is defined. 
+- Function to bind, *RAWTYPE_cmp* has signature ***int RAWTYPE_cmp(const RAWTYPE\*, const RAWTYPE\*)***, and similar for *RAWTYPE_eq* and *RAWTYPE_hash*.
 
 The *emplace* versus non-emplace container methods
 --------------------------------------------------
@@ -322,9 +320,8 @@ The **emplace** methods ***constructs*** or ***clones*** the given elements when
 to the container. In contrast, the *non-emplace* methods ***moves*** the given elements into the
 container. 
 
-***Note***: For containers with integral/trivial element types, or when neither `i_keyraw/i_valraw` nor 
-`i_valfrom/i_valfrom` are defined, the **emplace** functions are *not* available (or needed), as it
-can easier lead to mistakes.
+**Note**: For containers with integral/trivial element types, or when neither `i_keyraw/i_valraw` is defined,
+the **emplace** functions are ***not*** available (or needed), as it can easier lead to mistakes.
 
 | non-emplace: Move          | emplace: Embedded copy         | Container                                   |
 |:---------------------------|:-------------------------------|:--------------------------------------------|
