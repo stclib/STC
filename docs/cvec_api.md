@@ -37,6 +37,7 @@ void                cvec_X_clear(cvec_X* self);
 void                cvec_X_copy(cvec_X* self, cvec_X other);
 bool                cvec_X_reserve(cvec_X* self, size_t cap);
 bool                cvec_X_resize(cvec_X* self, size_t size, i_val null);
+cvec_X_value*       cvec_X_expand_uninitialized(cvec_X* self, size_t n);                     // return uninited data ptr
 void                cvec_X_shrink_to_fit(cvec_X* self);
 void                cvec_X_swap(cvec_X* a, cvec_X* b);
 void                cvec_X_drop(cvec_X* self);                                               // destructor
@@ -51,9 +52,10 @@ cvec_X_value*       cvec_X_get_mut(cvec_X* self, i_valraw raw);                 
 cvec_X_iter         cvec_X_find(const cvec_X* self, i_valraw raw);
 cvec_X_iter         cvec_X_find_in(cvec_X_iter i1, cvec_X_iter i2, i_valraw raw);
                     // On sorted vectors:
-cvec_X_iter         cvec_X_bsearch(const cvec_X* self, i_valraw raw);                        // at elem == raw, else end
+cvec_X_iter         cvec_X_binary_search(const cvec_X* self, i_valraw raw);                  // at elem == raw, else end
 cvec_X_iter         cvec_X_lower_bound(const cvec_X* self, i_valraw raw);                    // at first elem >= raw, else end
-cvec_X_iter         cvec_X_bsearch_in(cvec_X_iter i1, cvec_X_iter i2, i_valraw raw, cvec_X_iter* lower_bound);
+cvec_X_iter         cvec_X_binary_search_in(cvec_X_iter i1, cvec_X_iter i2,
+                                            i_valraw raw, cvec_X_iter* lower_bound);
 
 cvec_X_value*       cvec_X_front(const cvec_X* self);
 cvec_X_value*       cvec_X_back(const cvec_X* self);

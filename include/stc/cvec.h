@@ -89,7 +89,7 @@ STC_API _cx_iter        _cx_memb(_insert_range_p)(_cx_self* self, _cx_value* pos
 #if !c_option(c_no_cmp)
 STC_API int             _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y);
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_keyraw raw);
-STC_API _cx_iter        _cx_memb(_bsearch_in)(_cx_iter it1, _cx_iter it2, i_keyraw raw, _cx_iter* lower_bound);
+STC_API _cx_iter        _cx_memb(_binary_search_in)(_cx_iter it1, _cx_iter it2, i_keyraw raw, _cx_iter* lower_bound);
 #endif
 
 #if !defined _i_no_clone
@@ -167,6 +167,14 @@ _cx_memb(_shrink_to_fit)(_cx_self *self) {
     _cx_memb(_reserve)(self, _cx_memb(_size)(*self));
 }
 
+STC_INLINE _cx_value*
+_cx_memb(_expand_uninitialized)(_cx_self *self, size_t n) {
+    size_t len = _cx_memb(_size)(*self);
+    if (!_cx_memb(_reserve)(self, len + n)) return NULL;
+    cvec_rep_(self)->size += n;
+    return self->data + len;
+}
+
 STC_INLINE _cx_iter
 _cx_memb(_insert)(_cx_self* self, const size_t idx, i_key value) {
     return _cx_memb(_insert_range_p)(self, self->data + idx, &value, &value + 1);
@@ -221,15 +229,15 @@ _cx_memb(_get_mut)(const _cx_self* self, i_keyraw raw)
     { return (_cx_value*) _cx_memb(_get)(self, raw); }
 
 STC_INLINE _cx_iter
-_cx_memb(_bsearch)(const _cx_self* self, i_keyraw raw) {
+_cx_memb(_binary_search)(const _cx_self* self, i_keyraw raw) {
     _cx_iter lower;
-    return _cx_memb(_bsearch_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), raw, &lower);
+    return _cx_memb(_binary_search_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), raw, &lower);
 }
 
 STC_INLINE _cx_iter
 _cx_memb(_lower_bound)(const _cx_self* self, i_keyraw raw) {
     _cx_iter lower;
-    _cx_memb(_bsearch_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), raw, &lower);
+    _cx_memb(_binary_search_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), raw, &lower);
     return lower;
 }
 
@@ -391,7 +399,7 @@ _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, i_keyraw raw) {
 }
 
 STC_DEF _cx_iter
-_cx_memb(_bsearch_in)(_cx_iter i1, _cx_iter i2, i_keyraw raw, _cx_iter* lower_bound) {
+_cx_memb(_binary_search_in)(_cx_iter i1, _cx_iter i2, i_keyraw raw, _cx_iter* lower_bound) {
     _cx_iter mid, last = i2;
     while (i1.ref != i2.ref) {
         mid.ref = i1.ref + ((i2.ref - i1.ref) >> 1);
