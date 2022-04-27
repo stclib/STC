@@ -48,7 +48,7 @@ void Person_drop(Person* p) {
 int main() {
     c_auto (PBox, p, q)
     {
-        p = PBox_from(Person_from("John Smiths", "josmiths@gmail.com"));
+        p = PBox_make(Person_from("John Smiths", "josmiths@gmail.com"));
         q = PBox_clone(p);
         cstr_assign(&q.get->name, "Joe Smiths");
 

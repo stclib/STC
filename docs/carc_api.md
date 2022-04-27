@@ -70,7 +70,7 @@ bool        carc_X_value_eq(const i_val* x, const i_val* y);   // cbox_X_value_c
 #define i_type Map
 #define i_key_str // strings
 #define i_val int
-#define i_keydrop(p) (printf("  drop name: %s\n", (p)->str), cstr_drop(p))
+#define i_keydrop(p) (printf("  drop name: %s\n", cstr_str(p)), cstr_drop(p))
 #include <stc/csmap.h>
 
 #define i_type Arc // (atomic) ref. counted type
@@ -97,13 +97,13 @@ int main()
     {
         // POPULATE the stack with shared pointers to Map:
         Map *map;
-        map = Stack_push(&stack, Arc_from(Map_init()))->get;
+        map = Stack_push(&stack, Arc_make(Map_init()))->get;
         c_apply(v, Map_emplace(map, c_pair(v)), Map_raw, {
             {"Joey", 1990},
             {"Mary", 1995},
             {"Joanna", 1992}
         });
-        map = Stack_push(&stack, Arc_from(Map_init()))->get;
+        map = Stack_push(&stack, Arc_make(Map_init()))->get;
         c_apply(v, Map_emplace(map, c_pair(v)), Map_raw, {
             {"Rosanna", 2001},
             {"Brad", 1999},
@@ -111,7 +111,7 @@ int main()
         });
 
         // POPULATE the list:
-        map = List_push_back(&list, Arc_from(Map_init()))->get;
+        map = List_push_back(&list, Arc_make(Map_init()))->get;
         c_apply(v, Map_emplace(map, c_pair(v)), Map_raw, {
             {"Steve", 1979},
             {"Rick", 1974},
@@ -124,7 +124,7 @@ int main()
         
         // Deep-copy (not share) a Map from the stack to the list
         // List will contain two shared and two unshared maps.
-        map = List_push_back(&list, Arc_from(Map_clone(*stack.data[1].get)))->get;
+        map = List_push_back(&list, Arc_make(Map_clone(*stack.data[1].get)))->get;
         
         // Add one more element to the cloned map:
         Map_emplace_or_assign(map, "Cloned", 2022);

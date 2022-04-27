@@ -37,10 +37,11 @@ void Person_drop(Person* p) {
 #define i_tag person
 #define i_key Person
 #define i_keydrop Person_drop
+#define i_opt c_no_cmp
 #include <stc/carc.h>
 
 int main() {
-    carc_person p = carc_person_from(Person_new("John", "Smiths"));
+    carc_person p = carc_person_make(Person_new("John", "Smiths"));
     carc_person q = carc_person_clone(p); // share the pointer
 
     printf("%s %s. uses: %" PRIuMAX "\n", cstr_str(&q.get->name), cstr_str(&q.get->last), *q.use_count);
