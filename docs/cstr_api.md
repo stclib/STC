@@ -38,6 +38,8 @@ bool         cstr_empty(cstr s);
 
 size_t       cstr_reserve(cstr* self, size_t capacity);
 void         cstr_resize(cstr* self, size_t len, char fill);
+void         cstr_shrink_to_fit(cstr* self);
+char*        cstr_expand_uninitialized(cstr* self, size_t n);         // return ptr to uninit data
 void         cstr_clear(cstr* self);
 
 cstr*        cstr_assign(cstr* self, const char* str);

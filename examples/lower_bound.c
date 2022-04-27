@@ -6,10 +6,6 @@
 #define i_val int
 #include <stc/csset.h>
 
-
-#define i_val char
-#include <stc/cvec.h>
- 
 int main()
 {
     // TEST SORTED VECTOR

@@ -137,6 +137,13 @@ STC_INLINE cstr cstr_with_size(const size_t len, const char fill) {
     return s;
 }
 
+STC_INLINE char* cstr_expand_uninitialized(cstr *self, size_t n) {
+    size_t len = cstr_size(*self); char* d;
+    if (!(d = cstr_reserve(self, len + n))) return NULL;
+    _cstr_p(self)->size += n;
+    return d + len;
+}
+
 STC_INLINE cstr* cstr_take(cstr* self, cstr s) {
     if (self->str != s.str && _cstr_p(self)->cap)
         c_free(_cstr_p(self));
@@ -189,10 +196,11 @@ const cstr cstr_null = {_cstr_nullrep.chr};
 
 STC_DEF char*
 cstr_reserve(cstr* self, const size_t cap) {
-    cstr_priv* p = _cstr_p(self);
+    cstr_priv *p = _cstr_p(self);
     const size_t oldcap = p->cap;
     if (cap > oldcap) {
         p = (cstr_priv*) c_realloc(((oldcap != 0) & (p != &_cstr_nullrep)) ? p : NULL, _cstr_opt_mem(cap));
+        if (!p) return NULL;
         self->str = p->chr;
         if (oldcap == 0) self->str[p->size = 0] = '\0';
         p->cap = _cstr_opt_cap(cap);

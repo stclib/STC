@@ -174,6 +174,13 @@ STC_INLINE size_t cstr_length(cstr s)
 STC_INLINE size_t cstr_capacity(cstr s)
     { return cstr_is_long(&s) ? cstr_l_cap(&s) : cstr_s_cap; }
 
+STC_INLINE char* cstr_expand_uninitialized(cstr *self, size_t n) {
+    size_t len = cstr_size(*self); char* d;
+    if (!(d = cstr_reserve(self, len + n))) return NULL;
+    _cstr_set_size(self, len + n);
+    return d + len;
+}
+
 STC_INLINE int cstr_cmp(const cstr* s1, const cstr* s2) 
     { return strcmp(cstr_str(s1), cstr_str(s2)); }
 
