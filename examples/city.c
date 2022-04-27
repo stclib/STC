@@ -13,6 +13,7 @@ static inline int City_cmp(const City* a, const City* b) {
 }
 
 static inline uint64_t City_hash(const City* a) {
+    printf("hash %s\n", cstr_str(&a->name));
     return cstr_hash(&a->name) ^ cstr_hash(&a->country);
 }
 
@@ -51,7 +52,7 @@ int main(void)
     {
         struct City_s { const char *name, *country; float lat, lon; int pop; };
 
-        c_apply(c, Cities_push(&cities, CityArc_from((City){cstr_from(c.name), cstr_from(c.country),
+        c_apply(c, Cities_push(&cities, CityArc_make((City){cstr_from(c.name), cstr_from(c.country),
                                                             c.lat, c.lon, c.pop})), struct City_s, {
             {"New York", "US", 4.3, 23.2, 9000000},
             {"Paris", "France", 4.3, 23.2, 9000000},

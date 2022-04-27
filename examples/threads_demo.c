@@ -37,7 +37,7 @@ void* thr(BaseArc* p)
 
 int main()
 {
-    BaseArc p = BaseArc_from((Base){0});
+    BaseArc p = BaseArc_make((Base){0});
 
     mtx_init(&mtx, mtx_plain);
     printf("Created a shared Base\n"

@@ -40,7 +40,7 @@ int main()
     c_auto (Persons, vec)
     c_auto (PBox, p, q)
     {
-        p = PBox_from(Person_new("Laura", "Palmer"));
+        p = PBox_make(Person_new("Laura", "Palmer"));
 
         q = PBox_clone(p);
         cstr_assign(&q.get->name, "Leland");
@@ -48,8 +48,8 @@ int main()
         printf("orig: %s %s\n", cstr_str(&p.get->name), cstr_str(&p.get->last));
         printf("copy: %s %s\n", cstr_str(&q.get->name), cstr_str(&q.get->last));
 
-        Persons_push_back(&vec, PBox_from(Person_new("Dale", "Cooper")));
-        Persons_push_back(&vec, PBox_from(Person_new("Audrey", "Home")));
+        Persons_push_back(&vec, PBox_make(Person_new("Dale", "Cooper")));
+        Persons_push_back(&vec, PBox_make(Person_new("Audrey", "Home")));
         
         // NB! Clone p and q to the vector using emplace_back()
         c_apply(v, Persons_push_back(&vec, PBox_clone(v)), PBox, {p, q});

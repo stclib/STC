@@ -103,14 +103,18 @@ _cx_memb(_from_ptr)(_cx_value* p) {
 }
 
 STC_INLINE _cx_self
-_cx_memb(_from)(i_key val) { // c++: std::make_shared<i_key>(val)
+_cx_memb(_make)(_cx_value val) { // c++: std::make_shared<_cx_value>(val)
     _cx_self ptr; _cx_carc_rep *rep = c_alloc(_cx_carc_rep);
     *(ptr.use_count = &rep->counter) = 1;
     *(ptr.get = &rep->value) = val;
     return ptr;
 }
 
-STC_INLINE i_key _cx_memb(_toraw)(const _cx_self* self) { 
+STC_INLINE _cx_raw _cx_memb(_toraw)(const _cx_self* self) { 
+    return i_keyto(self->get);
+}
+
+STC_INLINE _cx_value _cx_memb(_get)(const _cx_self* self) {
     return *self->get;
 }
 
@@ -138,14 +142,16 @@ _cx_memb(_reset)(_cx_self* self) {
 }
 
 STC_INLINE void
-_cx_memb(_reset_from)(_cx_self* self, i_key val) {
+_cx_memb(_reset_to)(_cx_self* self, _cx_value* p) {
     _cx_memb(_drop)(self);
-    *self = _cx_memb(_from)(val);
+    *self = _cx_memb(_from_ptr)(p);
 }
 
 #if !defined _i_no_clone && !defined _i_no_emplace
     STC_INLINE _cx_self
-    _cx_memb(_make)(_cx_raw raw) { return _cx_memb(_from)(i_keyfrom(raw)); }
+    _cx_memb(_from)(_cx_raw raw) {
+        return _cx_memb(_make)(i_keyfrom(raw));
+    }
 #endif // !_i_no_clone
 
 // does not use i_keyclone, so OK to always define.

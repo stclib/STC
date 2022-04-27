@@ -32,9 +32,9 @@ void example3()
     c_auto (SongVec, vec, vec2)
     {
         c_apply(v, SongVec_push_back(&vec, v), SongPtr, {
-            SongPtr_from(Song_new("Bob Dylan", "The Times They Are A Changing")),
-            SongPtr_from(Song_new("Aretha Franklin", "Bridge Over Troubled Water")),
-            SongPtr_from(Song_new("Thalia", "Entre El Mar y Una Estrella"))
+            SongPtr_make(Song_new("Bob Dylan", "The Times They Are A Changing")),
+            SongPtr_make(Song_new("Aretha Franklin", "Bridge Over Troubled Water")),
+            SongPtr_make(Song_new("Thalia", "Entre El Mar y Una Estrella"))
         });
 
         c_foreach (s, SongVec, vec)
@@ -42,8 +42,8 @@ void example3()
                 SongVec_push_back(&vec2, SongPtr_clone(*s.ref));
 
         c_apply(v, SongVec_push_back(&vec2, v), SongPtr, {
-            SongPtr_from(Song_new("Michael Jackson", "Billie Jean")),
-            SongPtr_from(Song_new("Rihanna", "Stay")),
+            SongPtr_make(Song_new("Michael Jackson", "Billie Jean")),
+            SongPtr_make(Song_new("Rihanna", "Stay")),
         });
 
         c_foreach (s, SongVec, vec2)

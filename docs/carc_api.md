@@ -32,8 +32,8 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ## Methods
 ```c
 carc_X      carc_X_init();                                     // empty shared pointer
-carc_X      carc_X_make(i_valraw raw);                         // create owned value from raw type, if defined.
-carc_X      carc_X_from(i_val val);                            // create new heap allocated object. Take ownership of val.
+carc_X      carc_X_from(i_valraw raw);                         // construct a new value in an carc from raw type.
+carc_X      carc_X_make(i_val val);                            // make a carc from constructed val object. Faster than from_ptr().
 carc_X      carc_X_from_ptr(i_val* p);                         // create a carc from raw pointer. Takes ownership of p.
 
 carc_X      carc_X_clone(carc_X other);                        // return other with increased use count
@@ -45,7 +45,7 @@ void        carc_X_drop(carc_X* self);                         // destruct (decr
 long        carc_X_use_count(carc_X ptr);    
 
 void        carc_X_reset(carc_X* self);    
-void        carc_X_reset_from(carc_X* self, i_val val);        // assign new carc with value. Takes ownership of val.
+void        carc_X_reset_to(carc_X* self, i_val* p);           // assign new carc from ptr. Takes ownership of p.
 
 uint64_t    carc_X_value_hash(const i_val* x);                 // hash value
 int         carc_X_value_cmp(const i_val* x, const i_val* y);  // compares pointer addresses if 'i_opt c_no_cmp'

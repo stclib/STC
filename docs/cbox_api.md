@@ -31,23 +31,23 @@ compare the pointer addresses when used. Additionally, `c_no_clone` or `i_is_fwd
 ## Methods
 ```c
 cbox_X      cbox_X_init();                                    // return an empty cbox
-cbox_X      cbox_X_make(i_valraw raw);                        // create owned value from raw type, if defined.
-cbox_X      cbox_X_from(i_val val);                           // allocate new heap object with val. Take ownership of val.
+cbox_X      cbox_X_from(i_valraw raw);                        // construct a new boxed object from raw type, if defined.
+cbox_X      cbox_X_make(i_val val);                           // make a cbox from constructed val object.
 cbox_X      cbox_X_from_ptr(i_val* p);                        // create a cbox from a pointer. Takes ownership of p.
 
 cbox_X      cbox_X_clone(cbox_X other);                       // return deep copied clone
 cbox_X      cbox_X_move(cbox_X* self);                        // transfer ownership to another cbox.
 void        cbox_X_take(cbox_X* self, cbox_X other);          // take ownership of other.
 void        cbox_X_copy(cbox_X* self, cbox_X other);          // deep copy to self
-void        cbox_X_drop(cbox_X* self);                         // destruct the contained object and free's it.
+void        cbox_X_drop(cbox_X* self);                        // destruct the contained object and free's it.
 
 void        cbox_X_reset(cbox_X* self);   
-void        cbox_X_reset_from(cbox_X* self, i_val val);       // assign new cbox with value. Takes ownership of val.
+void        cbox_X_reset_to(cbox_X* self, i_val* p);          // assign new cbox from ptr. Takes ownership of p.
 
-uint64_t    cbox_X_value_hash(const i_val* x);                // hash value
-int         cbox_X_value_cmp(const i_val* x, const i_val* y); // compares pointer addresses if 'i_opt c_no_cmp'
+uint64_t    cbox_X_value_hash(const i_val* p);                // hash value
+int         cbox_X_value_cmp(const i_val* p, const i_val* y); // compares pointer addresses if 'i_opt c_no_cmp'
                                                               // is defined. Otherwise uses 'i_cmp' or default compare.
-bool        cbox_X_value_eq(const i_val* x, const i_val* y);  // cbox_X_value_cmp == 0
+bool        cbox_X_value_eq(const i_val* p, const i_val* y);  // cbox_X_value_cmp == 0
 ```
 ## Types and constants
 

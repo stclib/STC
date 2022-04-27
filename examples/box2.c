@@ -38,7 +38,7 @@ Point origin(void) {
 
 cbox_Point boxed_origin(void) {
     // Allocate this point on the heap, and return a pointer to it
-    return cbox_Point_from((Point){ .x=0.0, .y=0.0 });
+    return cbox_Point_make((Point){ .x=0.0, .y=0.0 });
 }
 
 
@@ -56,16 +56,16 @@ int main(void) {
     c_auto (cbox_Point, boxed_point)
     c_auto (cbox_BoxPoint, box_in_a_box)
     {
-        boxed_rectangle = cbox_Rectangle_from((Rectangle){
+        boxed_rectangle = cbox_Rectangle_make((Rectangle){
             .top_left = origin(),
             .bottom_right = (Point){ .x=3.0, .y=-4.0 }
         });
 
         // The output of functions can be boxed
-        boxed_point = cbox_Point_from(origin());
+        boxed_point = cbox_Point_make(origin());
 
         // Double indirection
-        box_in_a_box = cbox_BoxPoint_from(boxed_origin());
+        box_in_a_box = cbox_BoxPoint_make(boxed_origin());
 
         printf("Point occupies %" PRIuMAX " bytes on the stack\n",
                 sizeof(point));

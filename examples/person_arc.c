@@ -41,17 +41,17 @@ int main()
     c_auto (Persons, vec)
     c_auto (PSPtr, p, q)
     {
-        p = PSPtr_from(Person_new("Laura", "Palmer"));
+        p = PSPtr_make(Person_new("Laura", "Palmer"));
 
         // We want a deep copy -- PSPtr_clone(p) only shares!
-        q = PSPtr_from(Person_clone(*p.get));
+        q = PSPtr_make(Person_clone(*p.get));
         cstr_assign(&q.get->name, "Leland");
 
         printf("orig: %s %s\n", cstr_str(&p.get->name), cstr_str(&p.get->last));
         printf("copy: %s %s\n", cstr_str(&q.get->name), cstr_str(&q.get->last));
 
-        Persons_push_back(&vec, PSPtr_from(Person_new("Dale", "Cooper")));
-        Persons_push_back(&vec, PSPtr_from(Person_new("Audrey", "Home")));
+        Persons_push_back(&vec, PSPtr_make(Person_new("Dale", "Cooper")));
+        Persons_push_back(&vec, PSPtr_make(Person_new("Audrey", "Home")));
 
         // Clone/share p and q to the vector
         c_apply(v, Persons_push_back(&vec, PSPtr_clone(v)), PSPtr, {p, q});

@@ -86,16 +86,23 @@ STC_INLINE long
 _cx_memb(_use_count)(_cx_self box) { return (long)(box.get != NULL); }
 
 STC_INLINE _cx_self
-_cx_memb(_from_ptr)(i_key* p) { return c_make(_cx_self){p}; }
+_cx_memb(_from_ptr)(_cx_value* p) { return c_make(_cx_self){p}; }
 
 STC_INLINE _cx_self
-_cx_memb(_from)(i_key val) { // c++: std::make_unique<i_key>(val)
-    _cx_self ptr = {c_alloc(i_key)};
+_cx_memb(_make)(_cx_value val) { // c++: std::make_unique<i_key>(val)
+    _cx_self ptr = {c_alloc(_cx_value)};
     *ptr.get = val; return ptr;
 }
 
-STC_INLINE i_key
-_cx_memb(_toraw)(const _cx_self* self) { return *self->get; }
+STC_INLINE _cx_raw
+_cx_memb(_toraw)(const _cx_self* self) {
+    return i_keyto(self->get);
+}
+
+STC_INLINE _cx_value
+_cx_memb(_get)(const _cx_self* self) {
+    return *self->get;
+}
 
 // destructor
 STC_INLINE void
@@ -114,17 +121,19 @@ _cx_memb(_reset)(_cx_self* self) {
     _cx_memb(_drop)(self); self->get = NULL;
 }
 
-// take ownership of val
+// take ownership of p
 STC_INLINE void
-_cx_memb(_reset_from)(_cx_self* self, i_key val) {
-    if (self->get) { i_keydrop(self->get); *self->get = val; }
-    else self->get = c_new(i_key, val);
+_cx_memb(_reset_to)(_cx_self* self, _cx_value* p) {
+    if (self->get) i_keydrop(self->get);
+    self->get = p;
 }
 
 #if !defined _i_no_clone
 #if !defined _i_no_emplace
     STC_INLINE _cx_self
-    _cx_memb(_make)(_cx_raw raw) { return _cx_memb(_from)(i_keyfrom(raw)); }
+    _cx_memb(_from)(_cx_raw raw) { 
+        return _cx_memb(_make)(i_keyfrom(raw));
+    }
 #endif
     STC_INLINE _cx_self
     _cx_memb(_clone)(_cx_self other) {

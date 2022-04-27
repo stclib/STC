@@ -22,7 +22,7 @@ int main()
     {
         const int v[] = {2012, 1990, 2012, 2019, 2015};
         c_forrange (i, c_arraylen(v))
-            Vec_push_back(&vec, Arc_from(v[i]));
+            Vec_push_back(&vec, Arc_make(v[i]));
         
         // clone the second 2012 and push it back.
         // note: cloning make sure that vec.data[2] has ref count 2.
