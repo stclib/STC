@@ -87,12 +87,11 @@
 #define c_default_cmp(x, y)     c_less_cmp(c_default_less, x, y)
 #define c_default_eq(x, y)      (*(x) == *(y))
 #define c_memcmp_eq(x, y)       (memcmp(x, y, sizeof *(x)) == 0)
+#define c_default_hash(p)       c_fasthash(p, sizeof *(p))
 
 #define c_default_from(x)       (x)
 #define c_default_toraw(ptr)    (*(ptr))
 #define c_default_drop(ptr)     ((void) (ptr))
-
-#define c_default_hash(p)       c_fasthash(p, sizeof *(p))
 
 #define c_option(flag)          ((i_opt) & (flag))
 #define c_is_fwd                (1<<0)
@@ -107,7 +106,6 @@
 
 typedef const char* crawstr;
 #define crawstr_cmp(xp, yp) strcmp(*(xp), *(yp))
-#define crawstr_eq(xp, yp) (!strcmp(*(xp), *(yp)))
 #define crawstr_hash(p) c_strhash(*(p))
 
 #define _c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
