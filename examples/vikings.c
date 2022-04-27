@@ -11,17 +11,13 @@ void Viking_drop(Viking* vk) {
     cstr_drop(&vk->country);
 }
 
-// Define Viking raw struct with hash, equals, and convertion functions between Viking and RViking structs:
+// Define Viking lookup struct with hash, cmp, and convertion functions between Viking and RViking structs:
 
 typedef struct RViking {
     const char* name;
     const char* country;
 } RViking;
 
-uint64_t RViking_hash(const RViking* raw) {
-    uint64_t hash = c_strhash(raw->name) ^ (c_strhash(raw->country) >> 15);
-    return hash;
-}
 static inline int RViking_cmp(const RViking* rx, const RViking* ry) {
     int c = strcmp(rx->name, ry->name);
     return c ? c : strcmp(rx->country, ry->country);
@@ -30,20 +26,26 @@ static inline int RViking_cmp(const RViking* rx, const RViking* ry) {
 static inline Viking Viking_from(RViking raw) { // note: parameter is by value
     return c_make(Viking){cstr_from(raw.name), cstr_from(raw.country)};
 }
-static inline RViking Viking_toraw(const Viking* vk) {
-    return c_make(RViking){cstr_str(&vk->name), cstr_str(&vk->country)};
+static inline Viking Viking_clone(Viking vk) { // note: parameter is by value
+    vk.name = cstr_clone(vk.name), vk.country = cstr_clone(vk.country);
+    return vk;
+}
+static inline RViking Viking_toraw(const Viking* vp) {
+    return c_make(RViking){cstr_str(&vp->name), cstr_str(&vp->country)};
 }
 
 // With this in place, we define the Viking => int hash map type:
 #define i_type      Vikings
-#define i_key_bind  Viking
-#define i_keyraw    RViking
-#define i_val       int
-// i_key_bind auto-binds these functions:
-//   i_hash     => Viking_hash
-//   i_cmp      => Viking_cmp
-//   i_keyfrom  => Viking_from // not _clone because i_keyraw is defined
-//   i_keyto    => Viking_toraw
+#define i_key_bind  Viking      // key type
+#define i_val       int         // mapped type
+#define i_keyraw    RViking     // lookup type
+#define i_hash(rp)  c_strhash(rp->name) ^ c_strhash(rp->country)
+// i_key_bind auto-binds these functions (unless they are defined by i_...):
+//   i_cmp      => RViking_cmp
+//   i_hash     => RViking_hash
+//   i_keyclone => Viking_clone
+//   i_keyfrom  => Viking_from  // because i_keyraw is defined
+//   i_keyto    => Viking_toraw // because i_keyraw is defined
 //   i_keydrop  => Viking_drop
 #include <stc/cmap.h>
 

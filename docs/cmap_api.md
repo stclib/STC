@@ -278,12 +278,13 @@ static inline int Viking_cmp(const Viking* a, const Viking* b) {
 }
 
 static inline uint32_t Viking_hash(const Viking* a) {
-    return c_strhash(cstr_str(&a->name)) ^ (c_strhash(cstr_str(&a->country)) >> 15);
+    return cstr_hash(&a->name) ^ cstr_hash(&a->country);
 }
 
 static inline Viking Viking_clone(Viking v) {
     v.name = cstr_clone(v.name); 
     v.country = cstr_clone(v.country);
+    return v;
 }
 
 static inline void Viking_drop(Viking* vk) {
@@ -294,11 +295,13 @@ static inline void Viking_drop(Viking* vk) {
 #define i_type Vikings
 #define i_key_bind Viking
 #define i_val int
-// i_key_bind auto-binds:
-//  #define i_cmp Viking_cmp
-//  #define i_hash Viking_hash
-//  #define i_keyfrom Viking_clone
-//  #define i_keydrop Viking_drop
+/*
+ i_key_bind auto-binds:
+   #define i_cmp Viking_cmp
+   #define i_hash Viking_hash
+   #define i_keyfrom Viking_clone
+   #define i_keydrop Viking_drop
+*/
 #include <stc/cmap.h>
 
 int main()
@@ -354,34 +357,38 @@ typedef struct RViking {
     const char* country;
 } RViking;
 
-static inline uint64_t RViking_hash(const RViking* raw) {
-    uint64_t hash = c_strhash(raw->name) ^ (c_strhash(raw->country) >> 15);
-    return hash;
-}
-
 static inline int RViking_cmp(const RViking* rx, const RViking* ry) {
     int c = strcmp(rx->name, ry->name);
     return c ? c : strcmp(rx->country, ry->country);
 }
 
+static inline Viking Viking_clone(RViking v) {
+    v.name = cstr_clone(v.name), v.country = cstr_clone(v.country);
+    return vk;
+}
+
 static inline Viking Viking_from(RViking raw) {
     return (Viking){cstr_from(raw.name), cstr_from(raw.country)};
 }
-static inline RViking Viking_toraw(const Viking* vk) {
-    return (RViking){cstr_str(&vk->name), cstr_str(&vk->country)};
+static inline RViking Viking_toraw(const Viking* vp) {
+    return (RViking){cstr_str(&vp->name), cstr_str(&vp->country)};
 }
 
 // With this in place, we define the Viking => int hash map type:
 #define i_type      Vikings
+#define i_keyraw    RViking
+#define i_hash(rp)  (c_strhash(rp->name) ^ c_strhash(rp->country))
 #define i_key_bind  Viking
 #define i_val       int
-#define i_keyraw    RViking
-// i_key_bind macro will make these functions auto-bind:
-//  #define i_hash     RViking_hash
-//  #define i_cmp      RViking_cmp
-//  #define i_keyfrom  Viking_from // uses _from because i_keyraw is defined
-//  #define i_keyto    Viking_toraw
-//  #define i_keydrop  Viking_drop
+/*
+ i_key_bind macro auto-binds these functions:
+   #define i_hash     RViking_hash
+   #define i_cmp      RViking_cmp
+   #define i_keyclone Viking_clone
+   #define i_keyfrom  Viking_from  // because i_keyraw type is defined
+   #define i_keyto    Viking_toraw // because i_keyraw type is defined
+   #define i_keydrop  Viking_drop
+*/
 #include <stc/cmap.h>
 
 int main()

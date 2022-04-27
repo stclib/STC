@@ -122,11 +122,10 @@
 
 #ifdef i_key_bind
   #define i_key i_key_bind
-  #ifndef i_keyraw
-    #ifndef i_keyfrom
-      #define i_keyfrom c_paste(i_key, _clone)
-    #endif
-  #else
+  #ifndef i_keyclone
+    #define i_keyclone c_paste(i_key, _clone)
+  #endif
+  #ifdef i_keyraw
     #ifndef i_keyfrom
       #define i_keyfrom c_paste(i_key, _from)
     #endif
@@ -156,7 +155,7 @@
 #ifndef i_tag
   #define i_tag i_key  
 #endif
-#if (!defined i_keyfrom && defined i_keydrop) || c_option(c_no_clone)
+#if c_option(c_no_clone)
   #define _i_no_clone
 #endif
 #ifndef i_keyfrom
@@ -210,11 +209,10 @@
 
 #ifdef i_val_bind
   #define i_val i_val_bind
-  #ifndef i_valraw
-    #ifndef i_valfrom
-      #define i_valfrom c_paste(i_val, _clone)
-    #endif
-  #else
+  #ifndef i_valclone
+    #define i_valclone c_paste(i_val, _clone)
+  #endif
+  #ifdef i_valraw
     #ifndef i_valfrom
       #define i_valfrom c_paste(i_val, _from)
     #endif

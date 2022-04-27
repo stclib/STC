@@ -45,14 +45,14 @@ int benchmark(L& con, const int length, R addRandomString) {
 
     if (length == 0)
         for (int i = 0; i < BENCHMARK_SIZE; i++)
-            addRandomString(con, (crandom() & 31) + 1);
+            addRandomString(con, (crandom() & 63) + 1);
     else
         for (int i = 0; i < BENCHMARK_SIZE; i++)
             addRandomString(con, length);
 
     time_point t2 = std::chrono::high_resolution_clock::now();
     const auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(t2 - t1).count();
-    std::cerr << (length ? length : 16) << "\t" << duration;
+    std::cerr << (length ? length : 32) << "\t" << duration;
     return (int)duration;
 }
 

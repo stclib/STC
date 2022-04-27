@@ -30,6 +30,7 @@ cstack_X            cstack_X_clone(cstack_X st);
 void                cstack_X_clear(cstack_X* self);
 bool                cstack_X_reserve(cstack_X* self, size_t n);
 void                cstack_X_shrink_to_fit(cstack_X* self);
+i_val*              cstack_X_expand_uninitialized(cstack_X* self, size_t n);
 void                cstack_X_copy(cstack_X* self, cstack_X other);
 void                cstack_X_drop(cstack_X* self);                       // destructor
 
@@ -39,6 +40,7 @@ bool                cstack_X_empty(cstack_X st);
 
 i_val*              cstack_X_top(const cstack_X* self);
 const i_val*        cstack_X_at(const cstack_X* self, size_t idx);
+i_val*              cstack_X_at_mut(cstack_X* self, size_t idx);
 
 i_val*              cstack_X_push(cstack_X* self, i_val value);
 i_val*              cstack_X_emplace(cstack_X* self, i_valraw raw);

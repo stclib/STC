@@ -37,7 +37,7 @@ void                cvec_X_clear(cvec_X* self);
 void                cvec_X_copy(cvec_X* self, cvec_X other);
 bool                cvec_X_reserve(cvec_X* self, size_t cap);
 bool                cvec_X_resize(cvec_X* self, size_t size, i_val null);
-cvec_X_value*       cvec_X_expand_uninitialized(cvec_X* self, size_t n);                     // return uninited data ptr
+cvec_X_value*       cvec_X_expand_uninitialized(cvec_X* self, size_t n);                     // return start of uninit 
 void                cvec_X_shrink_to_fit(cvec_X* self);
 void                cvec_X_swap(cvec_X* a, cvec_X* b);
 void                cvec_X_drop(cvec_X* self);                                               // destructor
@@ -48,6 +48,7 @@ size_t              cvec_X_capacity(cvec_X vec);
 
 const cvec_X_value* cvec_X_at(const cvec_X* self, size_t idx);
 const cvec_X_value* cvec_X_get(const cvec_X* self, i_valraw raw);                            // return NULL if not found
+cvec_X_value*       cvec_X_at_mut(cvec_X* self, size_t idx);
 cvec_X_value*       cvec_X_get_mut(cvec_X* self, i_valraw raw);                              // get mutable value
 cvec_X_iter         cvec_X_find(const cvec_X* self, i_valraw raw);
 cvec_X_iter         cvec_X_find_in(cvec_X_iter i1, cvec_X_iter i2, i_valraw raw);
