@@ -17,6 +17,7 @@ static inline uint64_t City_hash(const City* a) {
 }
 
 static inline City City_clone(City c) {
+    printf("clone %s\n", cstr_str(&c.name));
     c.name = cstr_clone(c.name);
     c.country = cstr_clone(c.country);
     return c;
@@ -27,13 +28,14 @@ static inline void City_drop(City* c) {
     c_drop(cstr, &c->name, &c->country);
 }
 
+
 #define i_type CityArc
-#define i_val_bind City
-//#include <stc/cbox.h>
-#include <stc/carc.h>
+#define i_key_bind City
+#include <stc/cbox.h>
+//#include <stc/carc.h> // try instead of cbox.h
 
 #define i_type Cities
-#define i_val_arcbox CityArc
+#define i_key_arcbox CityArc
 #include <stc/cvec.h>
 
 #define i_type CityMap

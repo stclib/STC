@@ -1,3 +1,4 @@
+
 /* MIT License
  *
  * Copyright (c) 2022 Tyge Løvset, NORCE, www.norceresearch.no
@@ -127,8 +128,9 @@ _cx_memb(_reset_from)(_cx_self* self, i_key val) {
     STC_INLINE _cx_self
     _cx_memb(_clone)(_cx_self other) {
         if (!other.get) return other;
-        i_keyraw r = i_keyto(other.get);
-        return c_make(_cx_self){c_new(i_key, i_keyfrom(r))};
+        _cx_self out = {c_alloc(i_key)};
+        *out.get = i_keyclone(*other.get);
+        return out;
     }
 
     STC_INLINE void
