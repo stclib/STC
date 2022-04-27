@@ -122,9 +122,10 @@ _cx_memb(_reset_from)(_cx_self* self, i_key val) {
 }
 
 #if !defined _i_no_clone
+#if !defined _i_no_emplace
     STC_INLINE _cx_self
     _cx_memb(_make)(_cx_raw raw) { return _cx_memb(_from)(i_keyfrom(raw)); }
-
+#endif
     STC_INLINE _cx_self
     _cx_memb(_clone)(_cx_self other) {
         if (!other.get) return other;

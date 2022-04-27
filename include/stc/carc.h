@@ -143,12 +143,12 @@ _cx_memb(_reset_from)(_cx_self* self, i_key val) {
     *self = _cx_memb(_from)(val);
 }
 
-#if !defined _i_no_clone
+#if !defined _i_no_clone && !defined _i_no_emplace
     STC_INLINE _cx_self
     _cx_memb(_make)(_cx_raw raw) { return _cx_memb(_from)(i_keyfrom(raw)); }
 #endif // !_i_no_clone
 
-// does not use i_keyfrom, so we can bypass c_no_clone
+// does not use i_keyclone, so OK to always define.
 STC_INLINE _cx_self 
 _cx_memb(_clone)(_cx_self ptr) {
     if (ptr.use_count) _i_atomic_inc(ptr.use_count);
