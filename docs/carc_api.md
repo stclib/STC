@@ -75,11 +75,11 @@ bool        carc_X_value_eq(const i_val* x, const i_val* y);   // cbox_X_value_c
 
 #define i_type Arc // (atomic) ref. counted type
 #define i_val Map
-#define i_valfrom Map_clone
+#define i_valclone Map_clone
 #define i_valdrop(p) (printf("drop Arc:\n"), Map_drop(p))
 // no comparison of Maps needed (or available), and
 // no need for atomic ref. count in single thread:
-#define i_opt c_no_cmp|c_no_atomic 
+#define i_opt c_no_cmp|c_no_atomic
 #include <stc/carc.h>
 
 #define i_type Stack
