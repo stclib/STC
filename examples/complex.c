@@ -5,6 +5,8 @@ void check_drop(float* v) {printf("destroy %g\n", *v);}
 #define i_type FloatStack
 #define i_val float
 #define i_valdrop check_drop
+#define i_valclone(x) x  // required to allow cloning when i_valdrop is defined
+                         // (not for carc as it does not use i_valclone to clone).
 #include <stc/cstack.h>
 
 #define i_type StackList

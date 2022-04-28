@@ -10,7 +10,7 @@ void int_drop(int* x) {
 
 #define i_type Arc          // set type name to be defined (instead of 'carc_int')
 #define i_val int
-//#define i_valdrop int_drop  // optional, just to display the elements destroyed
+#define i_valdrop int_drop  // optional, just to display the elements destroyed
 #include <stc/carc.h>       // Arc
 
 #define i_key_arcbox Arc    // note: use i_key_bind instead of i_key for carc/cbox elements

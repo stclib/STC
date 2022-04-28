@@ -15,7 +15,7 @@ void Person_drop(Person* p) {
 }
 
 #define i_val_bind Person
-#define i_opt c_no_cmp
+#define i_opt c_no_cmp   // makes cmp and hash not required when using _bind
 #define i_tag person
 #include <stc/carc.h>
 
@@ -23,7 +23,6 @@ void Person_drop(Person* p) {
 #define i_type SPtr
 #define i_val int
 #define i_valdrop(x) printf("drop: %d\n", *x)
-#define i_valfrom(i) i
 #include <stc/carc.h>
 
 #define i_val_arcbox SPtr

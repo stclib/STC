@@ -1,6 +1,6 @@
 #!/bin/bash
-cc='clang -s -O2 -Wall -std=c99 -pedantic'
-#cc='gcc -s -O2 -Wall -std=c99 -pedantic'
+cc='gcc -s -O2 -Wall -std=c99 -pedantic'
+#cc='clang -s -O2 -Wall -std=c99 -pedantic'
 #cc='gcc -x c++ -s -O2 -Wall -std=c++20'
 #cc='g++ -x c++ -s -O2 -Wall'
 #cc='clang -s -O2 -Wall -std=c99 -pedantic -DSTC_OLD_CSTR'

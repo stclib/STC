@@ -10,19 +10,19 @@
 #define i_key_str
 #define i_val_bind People
 // Shorthand for:
-//#define i_val People
-//#define i_cmp People_cmp
-//#define i_valfrom People_clone
-//#define i_valdrop People_drop
+//  #define i_val People
+//  #define i_cmp People_cmp
+//  #define i_valclone People_clone
+//  #define i_valdrop People_drop
 #include <stc/csmap.h>
 
 #define i_type Stack
 #define i_val_bind People_value
 // Shorthand for:
-//#define i_val People_value
-//#define i_cmp People_value_cmp
-//#define i_valfrom People_value_clone
-//#define i_valdrop People_value_drop
+//  #define i_val People_value (pair of cstr)
+//  #define i_cmp People_value_cmp
+//  #define i_valclone People_value_clone
+//  #define i_valdrop People_value_drop
 #include <stc/cvec.h>
 
 void add(Departments* deps, const char* name, const char* email, const char* dep)

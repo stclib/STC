@@ -7,20 +7,21 @@ struct { double x, y; } typedef Point;
 // Note it may be simpler to use a cbox for this.
 #define i_key Point*
 #define i_keydrop(x) c_free(*(x))
-#define i_keyfrom(x) c_new(Point, *(x))
+#define i_keyclone(x) c_new(Point, *(x))
 #define i_hash(x) c_default_hash(*(x))
 #define i_cmp(x, y)  memcmp(*(x), *(y), sizeof **(x)) // not good!
 #define i_tag pnt
 #include <stc/cset.h>
 
-// Map of int64 pointers: For fun, define valraw as int64_t for easy emplace call!
+// Map of int64 pointers: Define i_valraw as int64_t for easy emplace calls!
 typedef int64_t inttype;
 #define i_key_str
 #define i_val inttype*
 #define i_valraw inttype
+#define i_valfrom(raw) (puts("from"), c_new(inttype, raw))
+#define i_valto(x) (puts("to"), **(x))
+#define i_valclone c_derived_valclone // enables clone via valto+valfrom
 #define i_valdrop(x) c_free(*(x))
-#define i_valfrom(raw) c_new(inttype, raw)
-#define i_valto(x) **(x)
 #include <stc/cmap.h>
 
 int main()
@@ -46,7 +47,7 @@ int main()
         puts("");
     }
 
-    c_auto (cmap_str, map)
+    c_auto (cmap_str, map, m2)
     {
         printf("\nMap with pointer elements:\n");
         cmap_str_insert(&map, cstr_new("testing"), c_new(inttype, 999));
@@ -56,7 +57,10 @@ int main()
         cmap_str_emplace(&map, "hello", 200);
         cmap_str_emplace(&map, "goodbye", 400);
 
-        c_forpair (name, number, cmap_str, map)
+        // default uses i_valfrom+i_valto when no i_valclone defined:
+        m2 = cmap_str_clone(map);
+
+        c_forpair (name, number, cmap_str, m2)
             printf("%s: %" PRIdMAX "\n", cstr_str(&_.name), *_.number);
     }
 }

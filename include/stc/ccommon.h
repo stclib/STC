@@ -92,6 +92,8 @@
 #define c_default_from(x)       (x)
 #define c_default_toraw(ptr)    (*(ptr))
 #define c_default_drop(ptr)     ((void) (ptr))
+#define c_derived_keyclone(x)   i_keyfrom((i_keyto((&(x)))))
+#define c_derived_valclone(x)   i_valfrom((i_valto((&(x)))))
 
 #define c_option(flag)          ((i_opt) & (flag))
 #define c_is_fwd                (1<<0)
