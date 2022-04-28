@@ -200,7 +200,7 @@ _cx_memb(_sort)(_cx_self* self) {
 #endif // _i_queue
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(_i_implement)
+#if defined(i_implement)
 
 #ifndef CDEQ_H_INCLUDED
 static struct cdeq_rep _cdeq_sentinel = {0, 0};

@@ -197,7 +197,7 @@ int main(void) {
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 
-#if defined(_i_implement)
+#if defined(i_implement)
 
 _c_aatree_types(csmap_SENTINEL, csmap_, int, int, i_size);
 _c_aatree_complete_types(csmap_SENTINEL, csmap_);

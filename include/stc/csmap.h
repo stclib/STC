@@ -199,7 +199,7 @@ _cx_memb(_advance)(_cx_iter it, size_t n) {
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(_i_implement)
+#if defined(i_implement)
 
 #ifndef CSMAP_H_INCLUDED
 static struct csmap_rep _csmap_sentinel = {0, 0, 0, 0, 0};
@@ -533,7 +533,7 @@ _cx_memb(_drop)(_cx_self* self) {
     }
 }
 
-#endif // _i_implement
+#endif // i_implement
 #undef _i_isset
 #undef _i_ismap
 #undef _i_keyref

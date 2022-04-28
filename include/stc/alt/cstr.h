@@ -187,7 +187,7 @@ STC_INLINE uint64_t cstr_hash(const cstr *self) {
 
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(_i_implement)
+#if defined(i_implement)
 
 #ifndef _i_static
 static cstr_priv _cstr_nullrep = {0, 0, {0}};

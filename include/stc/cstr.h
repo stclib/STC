@@ -275,7 +275,7 @@ STC_INLINE uint64_t cstr_hash(const cstr *self) {
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(_i_implement)
+#if defined(i_implement)
 
 STC_DEF char* _cstr_internal_move(cstr* self, const size_t pos1, const size_t pos2) {
     cstr_rep_t r = cstr_rep(self);
@@ -473,7 +473,7 @@ STC_DEF int cstr_printf(cstr* self, const char* fmt, ...) {
     return n;
 }
 
-#endif // _i_implement
+#endif // i_implement
 #if defined __GNUC__ && !defined __clang__
 #  pragma GCC diagnostic pop
 #endif

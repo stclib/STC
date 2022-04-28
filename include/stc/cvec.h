@@ -252,7 +252,7 @@ _cx_memb(_sort)(_cx_self* self) {
 }
 #endif // !c_no_cmp
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(_i_implement)
+#if defined(i_implement)
 
 #ifndef CVEC_H_INCLUDED
 static struct cvec_rep _cvec_sentinel = {0, 0};
@@ -419,6 +419,6 @@ _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     return i_cmp((&rx), (&ry));
 }
 #endif // !c_no_cmp
-#endif // _i_implement
+#endif // i_implement
 #define CVEC_H_INCLUDED
 #include "template.h"

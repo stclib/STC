@@ -244,7 +244,7 @@ specify **-DSTC_HEADER** as a compiler option in your build environment and plac
 of containers used in a single C-source file, e.g.:
 ```c
 // stc_libs.c
-#define STC_IMPLEMENTATION
+#define STC_IMPLEMENT
 #include <stc/cstr.h>
 #include "Point.h"
 
@@ -280,7 +280,7 @@ The list of template parameters:
 Properties:
 - `i_tag`     - Container type name tag. Defaults to *i_key* name.
 - `i_type`    - Full container type name. Alternative to *i_tag*.
-- `i_opt`     - Boolean properties: may combine *c_no_cmp*, *c_no_clone*, *c_no_atomic*, *c_is_fwd*, *c_static*, *c_header*, *c_implement* with the *|* separator.
+- `i_opt`     - Boolean properties: may combine *c_no_cmp*, *c_no_clone*, *c_no_atomic*, *c_is_fwd*, *c_static*, *c_header* with the *|* separator.
 
 Key:
 - `i_keydrop` - Destroy map/set key func - defaults to empty destructor.

@@ -105,7 +105,7 @@ STC_INLINE void _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
 #endif // !_i_no_clone
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(_i_implement)
+#if defined(i_implement)
 
 STC_DEF void
 _cx_memb(_sift_down_)(_cx_value* arr, const size_t idx, const size_t n) {

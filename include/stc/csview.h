@@ -132,7 +132,7 @@ STC_INLINE uint64_t csview_hash(const csview *self)
     { return c_fasthash(self->str, self->size); }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(_i_implement)
+#if defined(i_implement)
 
 STC_DEF csview
 csview_substr(csview sv, intptr_t pos, size_t n) {

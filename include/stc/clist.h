@@ -188,7 +188,7 @@ _cx_memb(_get_mut)(_cx_self* self, i_keyraw val) {
 #endif
 
 // -------------------------- IMPLEMENTATION -------------------------
-#if defined(_i_implement)
+#if defined(i_implement)
 
 #if !defined _i_no_clone
 STC_DEF _cx_self
@@ -397,6 +397,6 @@ _clist_mergesort(clist_VOID_node *list, int (*cmp)(const clist_VOID_node*, const
 }
 #endif // !c_no_cmp
 #endif // !CLIST_H_INCLUDED
-#endif // _i_implement
+#endif // i_implement
 #define CLIST_H_INCLUDED
 #include "template.h"

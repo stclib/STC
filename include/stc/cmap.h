@@ -237,7 +237,7 @@ _cx_memb(_erase_at)(_cx_self* self, _cx_iter it) {
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(_i_implement)
+#if defined(i_implement)
 
 #ifndef CMAP_H_INCLUDED
 STC_INLINE size_t fastrange_size_t(uint64_t x, uint64_t n)
@@ -336,6 +336,14 @@ _cx_memb(_clone)(_cx_self m) {
         if (*hx) *dst = _cx_memb(_value_clone)(*e);
     return clone;
 }
+
+STC_DEF _cx_self
+_cx_memb(_clone2)(_cx_self m) {
+    _cx_self clone = _cx_memb(_with_capacity)(m.size);
+    c_foreach (i, _cx_self, m)
+        _cx_memb(_push)(&clone, _cx_memb(_value_clone)(*i.ref));
+    return clone;
+}
 #endif
 
 STC_DEF bool
@@ -388,7 +396,7 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
     --self->size;
 }
 
-#endif // _i_implement
+#endif // i_implement
 #undef _i_isset
 #undef _i_ismap
 #undef _i_ishash

@@ -165,7 +165,7 @@ STC_INLINE void cbits_xor(cbits *self, cbits other) {
     }
 #endif
 
-#if defined(_i_implement)
+#if defined(i_implement)
 
 STC_DEF cbits* cbits_copy(cbits* self, cbits other) {
     if (self->data64 == other.data64) return self;

@@ -57,7 +57,7 @@ STC_INLINE size_t utf8_codep_size(const char *s) {
 }
 
 // --------------------------- IMPLEMENTATION ---------------------------------
-#ifdef _i_implement
+#ifdef i_implement
 // https://news.ycombinator.com/item?id=15423674
 // https://gist.github.com/s4y/344a355f8c1f99c6a4cb2347ec4323cc
 
