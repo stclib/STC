@@ -24,6 +24,9 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 
 ```c
 csset_X              csset_X_init(void);
+csset_X              csset_X_with_capacity(size_t cap);
+bool                 csset_X_reserve(csset_X* self, size_t cap);
+void                 csset_X_shrink_to_fit(csset_X* self);
 csset_X              csset_X_clone(csset_x set);
 
 void                 csset_X_clear(csset_X* self);

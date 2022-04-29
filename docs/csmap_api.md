@@ -39,6 +39,9 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 
 ```c
 csmap_X               csmap_X_init(void);
+csset_X               csmap_X_with_capacity(size_t cap);
+bool                  csmap_X_reserve(csmap_X* self, size_t cap);
+void                  csmap_X_shrink_to_fit(csmap_X* self);
 csmap_X               csmap_X_clone(csmap_x map);
 
 void                  csmap_X_clear(csmap_X* self);

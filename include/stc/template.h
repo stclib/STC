@@ -37,7 +37,6 @@
   #define _cx_iter _cx_memb(_iter)
   #define _cx_result _cx_memb(_result)
   #define _cx_node _cx_memb(_node)
-  #define _cx_size _cx_memb(_size_t)
 #endif
 
 #ifdef i_type
