@@ -11,7 +11,8 @@ Introduction
 ------------
 STC is a *modern*, *templated*, *user-friendly*, *type-safe*, *very fast* and *compact* container library for C99.
 The API is fairly similar to c++ STL, but a bit more uniform across the containers and takes
-inspiration from Rust and Python too.
+inspiration from Rust and Python too. It is an advantage to know how these containers work in other languages, like
+Java, C# or C++, but it's not required.
 
 This library allows you to manage both trivial to very complex data in a wide variety of containers
 without the need for boilerplate code. You may specify element-cloning, -comparison, -destruction and
@@ -20,24 +21,25 @@ Usage with trivial data types is simple to use compared to most generic containe
 of its type safety with an intuitive and consistent API.
 
 Three standout features of STC are
-1. Its centalized analysis of template arguments, which assigns sensible defaults to non-specified templates.
+1. the centralized analysis of template arguments: It assigns good defaults to non-specified templates.
 You may specify a number of "standard" template arguments for each container, but as minimum only one is
 required (two for maps). In the latter case, STC assumes the elements are basic types. For more complex types,
 additional template arguments must be defined.
-2. The general "heterogeneous lookup"-like feature, which allows specification of an alternative type to use
+2. the general "heterogeneous lookup"-like feature: Allows specification of an alternative type to use
 for lookup in containers. E.g. for containers with string type (**cstr**) elements, `const char*` may be used
 as lookup type. It will then use the input `const char*` directly when comparing with the string data in the
-container. This avoids the construction of a new `cstr` (which possible allocates memory) for the look up. 
-Finally, destruction of the lookup key (e.g string literal) after usage is not needed (or allowed), which 
+container. This avoids the construction of a new `cstr` (which possible allocates memory) for the lookup. 
+Finally, destruction of the lookup key (i.e. string literal) after usage is not needed (or allowed), which 
 is convenient in C. The alternative lookup type may also be used for adding entries into containers by using 
-the *emplace*-functions, e.g. `MyCStrVec_emplace_back(&vec, "Hello")`, which further simplifies usage of STC.
-3. The design of iterators. All container can be iterated the same way, and uses the
-same element access syntax. E.g. `c_foreach (it, IntContainer, container) printf(" %d", *i.ref);` will work for
+the *emplace*-functions. E.g. `MyCStrVec_emplace_back(&vec, "Hello")`, which further simplifies usage of STC.
+3. the design of iterators: All container can be iterated the same way, and uses the
+same element access syntax. E.g. `c_foreach (it, IntContainer, container) printf(" %d", *it.ref);` will work for
 every type of container defined as `IntContainer` with `int` elements. Also the form `c_foreach (it, IntContainer, it1, it2)`
 may be used to iterate from `it1` up to `it2`.
 
-It is an advantage to know how these containers work in other languages, like Java, C# or C++, but not required.
-The library is mature and well tested, so please try it out and report any issue.
+The library is mature and well tested, so you may use it in projects. However, minor breaking API changes may
+still happen. The main development of this project is finished, but I will handle PRs with bugs and improvements
+in the future, and do minor modifications.
 
 Contents
 --------
