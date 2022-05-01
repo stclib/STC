@@ -39,6 +39,8 @@ may be used to iterate from `it1` up to `it2`.
 It is an advantage to know how these containers work in other languages, like Java, C# or C++, but not required.
 The library is mature and well tested, so please try it out and report any issue.
 
+Contents
+--------
 - [***ccommon*** - RAII and iterator macros](docs/ccommon_api.md)
 - [***carc*** - **std::shared_ptr** alike support](docs/carc_api.md)
 - [***carr2/3*** - **2d** and **3d** dynamic **array** type](docs/carray_api.md)
