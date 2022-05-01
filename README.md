@@ -3,30 +3,41 @@
 STC - Smart Template Containers for C
 =====================================
 
-News: Version 3.6 released (Mar 2022)
--------------------------------------
-- Swapped to new **cstr** (*short string optimized*, aka SSO). Note that `cstr_str(&s)` must be used, `s.str` is no longer usable.
-- Removed *redundant* size argument to `i_hash` template parameter and `c_default_hash`. Please update your code.
-- Added general `i_keyclone/i_valclone` template parameter: containers of smart pointers (**carc**, **cbox**) now correctly cloned.
-- Allows for `i_key*` template parameters instead of `i_val*` for all containers, not only for **cset** and **csset**.
-- Optimized *c_default_hash()*. Therefore *c_hash32()* and *c_hash64()* are removed (same speed).
-- Added *.._push()* and *.._emplace()* function to all containers to allow for more generic coding.
-- Renamed global PRNGs *stc64_random()* and *stc64_srandom()* to *crandom()* and *csrandom()*.
-- Added some examples and benchmarks for SSO and heterogenous lookup comparison with c++20 (string_bench_*.cpp).
+News: Version 3.6 released (April 2022)
+---------------------------------------
+- See [Changes version 3.6](#changes-version-36)
 
 Introduction
 ------------
-STC is a modern, templated, user-friendly, fast, fully type-safe, and customizable container library for C99,
-with a uniform API across the containers, and is similar to the c++ standard library containers API. It takes some
-inspirations from Rust and Python too.
+STC is a *modern*, *templated*, *user-friendly*, *type-safe*, *very fast* and *compact* container library for C99.
+The API is fairly similar to c++ STL, but a bit more uniform across the containers and takes
+inspiration from Rust and Python too.
 
-It is a compact, header-only library which includes the all the major "standard" data containers except for the
-multimap variants. However, there are examples on how to create multimaps in the examples folder.
+This library allows you to manage both trivial to very complex data in a wide variety of containers
+without the need for boilerplate code. You may specify element-cloning, -comparison, -destruction and
+more on complex container hierarchies without resorting to cumbersome function pointers with type casting.
+Usage with trivial data types is simple to use compared to most generic container libraries for C because
+of its type safety with an intuitive and consistent API.
 
-For an introduction to templated containers, please read the blog by Ian Fisher on
-[type-safe generic data structures in C](https://iafisher.com/blog/2020/06/type-safe-generics-in-c).
-Note that STC does not use long macro expansions anymore, but relies on one or more inclusion of the same file,
-which by the compiler is seen as different code because of macro name substitutions.
+Three standout features of STC are
+1. Its centalized analysis of template arguments, which assigns sensible defaults to non-specified templates.
+You may specify a number of "standard" template arguments for each container, but as minimum only one is
+required (two for maps). In the latter case, STC assumes the elements are basic types. For more complex types,
+additional template arguments must be defined.
+2. The general "heterogeneous lookup"-like feature, which allows specification of an alternative type to use
+for lookup in containers. E.g. for containers with string type (**cstr**) elements, `const char*` may be used
+as lookup type. It will then use the input `const char*` directly when comparing with the string data in the
+container. This avoids the construction of a new `cstr` (which possible allocates memory) for the look up. 
+Finally, destruction of the lookup key (e.g string literal) after usage is not needed (or allowed), which 
+is convenient in C. The alternative lookup type may also be used for adding entries into containers by using 
+the *emplace*-functions, e.g. `MyCStrVec_emplace_back(&vec, "Hello")`, which further simplifies usage of STC.
+3. The design of iterators. All container can be iterated the same way, and uses the
+same element access syntax. E.g. `c_foreach (it, IntContainer, container) printf(" %d", *i.ref);` will work for
+every type of container defined as `IntContainer` with `int` elements. Also the form `c_foreach (it, IntContainer, it1, it2)`
+may be used to iterate from `it1` up to `it2`.
+
+It is an advantage to know how these containers work in other languages, like Java, C# or C++, but not required.
+The library is mature and well tested, so please try it out and report any issue.
 
 - [***ccommon*** - RAII and iterator macros](docs/ccommon_api.md)
 - [***carc*** - **std::shared_ptr** alike support](docs/carc_api.md)
@@ -99,7 +110,7 @@ int main(void) {
     FVec_drop(&vec); // free memory
 }
 ```
-A "better" way to write the same code is:
+An alternative and often preferred way to write this code with STL is:
 ```c
 int main(void) {
     c_auto (FVec, vec) // RAII - specify create and destruct at one place.
@@ -437,7 +448,17 @@ Memory efficiency
 
 # Version 3
 
-## Brief summary of changes
+## Changes version 3.6
+- Swapped to new **cstr** (*short string optimized*, aka SSO). Note that `cstr_str(&s)` must be used, `s.str` is no longer usable.
+- Removed *redundant* size argument to `i_hash` template parameter and `c_default_hash`. Please update your code.
+- Added general `i_keyclone/i_valclone` template parameter: containers of smart pointers (**carc**, **cbox**) now correctly cloned.
+- Allows for `i_key*` template parameters instead of `i_val*` for all containers, not only for **cset** and **csset**.
+- Optimized *c_default_hash()*. Therefore *c_hash32()* and *c_hash64()* are removed (same speed).
+- Added *.._push()* and *.._emplace()* function to all containers to allow for more generic coding.
+- Renamed global PRNGs *stc64_random()* and *stc64_srandom()* to *crandom()* and *csrandom()*.
+- Added some examples and benchmarks for SSO and heterogenous lookup comparison with c++20 (string_bench_*.cpp).
+
+## Brief summary of changes from version 2.x to 3.0
 - Renamed: all ***_del*** to `_drop` (like destructors in Rust).
 - Renamed: all ***_compare*** to `_cmp`
 - Renamed: ***i_equ*** to `i_eq`, and ***_equalto*** to `_eq`.
