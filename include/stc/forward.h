@@ -113,7 +113,7 @@ typedef char csview_value;
 \
     typedef struct { \
         SELF##_value *ref; \
-        bool inserted; \
+        bool inserted, nomem_error; \
     } SELF##_result; \
 \
     typedef struct { \
@@ -140,7 +140,7 @@ typedef char csview_value;
 \
     typedef struct { \
         SELF##_value *ref; \
-        bool inserted; \
+        bool inserted, nomem_error; \
     } SELF##_result; \
 \
     typedef struct { \

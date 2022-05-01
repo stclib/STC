@@ -253,8 +253,8 @@ _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
     if (cap >= rep->size) {
         // second test is bogus, but supresses gcc warning:
         oldrep = rep->cap && rep != &_csmap_sentinel ? rep : NULL;
-        rep = (struct csmap_rep*) c_realloc(oldrep, 
-                                            sizeof(struct csmap_rep) + (cap + 1)*sizeof(_cx_node));
+        rep = (struct csmap_rep*) c_realloc(oldrep, sizeof(struct csmap_rep) + 
+                                                    (cap + 1)*sizeof(_cx_node));
         if (!rep) return false;
         if (oldrep == NULL)
             memset(rep, 0, sizeof(struct csmap_rep) + sizeof(_cx_node));
@@ -265,18 +265,20 @@ _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
 }
 
 static i_size
-_cx_memb(_node_new_)(_cx_self* self, int level) {
-    size_t tn; struct csmap_rep *rep = _csmap_rep(self);
+_cx_memb(_new_node_)(_cx_self* self, int level) {
+    i_size tn; struct csmap_rep *rep = _csmap_rep(self);
     if (rep->disp) {
         tn = rep->disp;
         rep->disp = self->nodes[tn].link[1];
     } else {
-        if ((tn = rep->head + 1) > rep->cap) _cx_memb(_reserve)(self, 4 + (tn*3 >> 1));
-        ++_csmap_rep(self)->head; /* do after reserve */
+        if (rep->head == rep->cap)
+            if (!_cx_memb(_reserve)(self, rep->head*3/2 + 4))
+                return 0;
+        tn = ++_csmap_rep(self)->head; /* start with 1, 0 is nullnode. */
     }
     _cx_node* dn = &self->nodes[tn];
     dn->link[0] = dn->link[1] = 0; dn->level = level;
-    return (i_size) tn;
+    return tn;
 }
 
 static _cx_result _cx_memb(_insert_entry_)(_cx_self* self, i_keyraw rkey);
@@ -292,7 +294,8 @@ _cx_memb(_insert)(_cx_self* self, i_key key _i_MAP_ONLY(, i_val mapped)) {
 STC_DEF _cx_result
 _cx_memb(_push)(_cx_self* self, _cx_value _val) {
     _cx_result _res = _cx_memb(_insert_entry_)(self, i_keyto(_i_keyref(&_val)));
-    if (_res.inserted) *_res.ref = _val; else _cx_memb(_value_drop)(&_val);
+    if (_res.inserted) *_res.ref = _val; 
+    else _cx_memb(_value_drop)(&_val);
     return _res;
 }
 
@@ -300,18 +303,24 @@ _cx_memb(_push)(_cx_self* self, _cx_value _val) {
     STC_DEF _cx_result
     _cx_memb(_insert_or_assign)(_cx_self* self, i_key key, i_val mapped) {
         _cx_result res = _cx_memb(_insert_entry_)(self, i_keyto((&key)));
-        if (res.inserted) res.ref->first = key;
-        else { i_keydrop((&key)); i_valdrop((&res.ref->second)); }
-        res.ref->second = mapped; return res;
+        if (!res.nomem_error) {
+            if (res.inserted) res.ref->first = key;
+            else { i_keydrop((&key)); i_valdrop((&res.ref->second)); }
+            res.ref->second = mapped;
+        }
+        return res;
     }
 
     #if !defined _i_no_clone && !defined _i_no_emplace
     STC_DEF _cx_result
     _cx_memb(_emplace_or_assign)(_cx_self* self, i_keyraw rkey, i_valraw rmapped) {
         _cx_result res = _cx_memb(_insert_entry_)(self, rkey);
-        if (res.inserted) res.ref->first = i_keyfrom(rkey);
-        else { i_valdrop((&res.ref->second)); }
-        res.ref->second = i_valfrom(rmapped); return res;
+        if (!res.nomem_error) {
+            if (res.inserted) res.ref->first = i_keyfrom(rkey);
+            else { i_valdrop((&res.ref->second)); }
+            res.ref->second = i_valfrom(rmapped);
+        }
+        return res;
     }
     #endif // !_i_no_clone && !_i_no_emplace
 #endif // !_i_isset
@@ -391,11 +400,14 @@ _cx_memb(_insert_entry_i_)(_cx_self* self, i_size tn, const _cx_rawkey* rkey, _c
     while (tx) {
         up[top++] = tx;
         i_keyraw raw = i_keyto(_i_keyref(&d[tx].value));
-        if (!(c = i_cmp((&raw), rkey))) { res->ref = &d[tx].value; return tn; }
+        if (!(c = i_cmp((&raw), rkey)))
+            { res->ref = &d[tx].value; return tn; }
         dir = (c < 0);
         tx = d[tx].link[dir];
     }
-    tx = _cx_memb(_node_new_)(self, 1); d = self->nodes;
+    if ((tx = _cx_memb(_new_node_)(self, 1)) == 0)
+        { res->nomem_error = true; return 0; }
+    d = self->nodes;
     res->ref = &d[tx].value, res->inserted = true;
     if (top == 0) return tx;
     d[up[top - 1]].link[dir] = tx;
@@ -410,7 +422,7 @@ _cx_memb(_insert_entry_i_)(_cx_self* self, i_size tn, const _cx_rawkey* rkey, _c
 
 static _cx_result
 _cx_memb(_insert_entry_)(_cx_self* self, i_keyraw rkey) {
-    _cx_result res = {NULL, false};
+    _cx_result res = {NULL};
     i_size tn = _cx_memb(_insert_entry_i_)(self, (i_size) _csmap_rep(self)->root, &rkey, &res);
     _csmap_rep(self)->root = tn;
     _csmap_rep(self)->size += res.inserted;
@@ -492,7 +504,7 @@ _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
 static i_size
 _cx_memb(_clone_r_)(_cx_self* self, _cx_node* src, i_size sn) {
     if (sn == 0) return 0;
-    i_size tx, tn = _cx_memb(_node_new_)(self, src[sn].level);
+    i_size tx, tn = _cx_memb(_new_node_)(self, src[sn].level);
     self->nodes[tn].value = _cx_memb(_value_clone)(src[sn].value);
     tx = _cx_memb(_clone_r_)(self, src, src[sn].link[0]); self->nodes[tn].link[0] = tx;
     tx = _cx_memb(_clone_r_)(self, src, src[sn].link[1]); self->nodes[tn].link[1] = tx;

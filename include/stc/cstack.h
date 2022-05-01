@@ -73,7 +73,8 @@ STC_INLINE size_t _cx_memb(_capacity)(_cx_self v)
 STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, size_t n) {
     if (n < self->size) return true;
     _cx_value *t = (_cx_value *)c_realloc(self->data, n*sizeof *t);
-    return t ? (self->data = t, self->capacity = n) : 0;
+    if (t) { self->capacity = n, self->data = t; return true; }
+    return false;
 }
 
 STC_INLINE _cx_value*
@@ -92,8 +93,9 @@ STC_INLINE _cx_value* _cx_memb(_top)(const _cx_self* self)
 
 STC_INLINE _cx_value* _cx_memb(_push)(_cx_self* self, _cx_value val) {
     if (self->size == self->capacity)
-        _cx_memb(_reserve)(self, self->size*3/2 + 4);
-    _cx_value* vp = self->data + self->size++; 
+        if (!_cx_memb(_reserve)(self, self->size*3/2 + 4))
+            return NULL;
+    _cx_value* vp = self->data + self->size++;
     *vp = val; return vp;
 }
 STC_INLINE _cx_value* _cx_memb(_push_back)(_cx_self* self, _cx_value val)
@@ -119,7 +121,8 @@ STC_INLINE _cx_value* _cx_memb(_emplace_back)(_cx_self* self, _cx_raw raw)
 
 STC_INLINE _cx_self _cx_memb(_clone)(_cx_self v) {
     _cx_self out = {(_cx_value *) c_malloc(v.size*sizeof(_cx_value)), v.size, v.size};
-    for (size_t i = 0; i < v.size; ++v.data)
+    if (!out.data) out.capacity = 0;
+    else for (size_t i = 0; i < v.size; ++v.data)
         out.data[i++] = i_keyclone((*v.data));
     return out;
 }

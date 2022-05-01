@@ -69,17 +69,17 @@ cvec_X_value*       cvec_X_emplace_back(cvec_X* self, i_valraw raw);            
 void                cvec_X_pop(cvec_X* self);
 void                cvec_X_pop_back(cvec_X* self);                                           // alias for pop
 
-cvec_X_iter         cvec_X_insert(cvec_X* self, size_t idx, i_val value);                    // move value 
-cvec_X_iter         cvec_X_insert_n(cvec_X* self, size_t idx, const i_val[] arr, size_t n);  // move n values
-cvec_X_iter         cvec_X_insert_at(cvec_X* self, cvec_X_iter it, i_val value);             // move value 
-cvec_X_iter         cvec_X_insert_range_p(cvec_X* self, i_val* pos,
+cvec_X_value*       cvec_X_insert(cvec_X* self, size_t idx, i_val value);                    // move value 
+cvec_X_value*       cvec_X_insert_n(cvec_X* self, size_t idx, const i_val[] arr, size_t n);  // move n values
+cvec_X_value*       cvec_X_insert_at(cvec_X* self, cvec_X_iter it, i_val value);             // move value 
+cvec_X_value*       cvec_X_insert_range_p(cvec_X* self, i_val* pos,
                                           const i_val* p1, const i_val* p2);
 
-cvec_X_iter         cvec_X_emplace_n(cvec_X* self, size_t idx, const i_valraw[] arr, size_t n);
-cvec_X_iter         cvec_X_emplace_at(cvec_X* self, cvec_X_iter it, i_valraw raw);
-cvec_X_iter         cvec_X_emplace_range(cvec_X* self, cvec_X_iter it,                       // will clone
+cvec_X_value*       cvec_X_emplace_n(cvec_X* self, size_t idx, const i_valraw[] arr, size_t n);
+cvec_X_value*       cvec_X_emplace_at(cvec_X* self, cvec_X_iter it, i_valraw raw);
+cvec_X_value*       cvec_X_emplace_range(cvec_X* self, cvec_X_iter it,                       // will clone
                                          cvec_X_iter it1, cvec_X_iter it2);
-cvec_X_iter         cvec_X_emplace_range_p(cvec_X* self, i_val* pos, 
+cvec_X_value*       cvec_X_emplace_range_p(cvec_X* self, i_val* pos, 
                                            const i_val* p1, const i_val* p2);
 
 cvec_X_iter         cvec_X_erase_n(cvec_X* self, size_t idx, size_t n);
