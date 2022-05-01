@@ -23,8 +23,6 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
 
-`i_valdrop` may be defined instead of `i_valdrop` (or `i_keydrop`) for all non-map containers.
-
 ## Methods
 
 ```c

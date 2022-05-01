@@ -10,7 +10,7 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 ```c
 #define i_key       // key: REQUIRED
 #define i_cmp       // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
-#define i_valdrop   // destroy key func - defaults to empty destruct
+#define i_keydrop   // destroy key func - defaults to empty destruct
 #define i_keyraw    // convertion "raw" type - defaults to i_key
 #define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
 #define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy

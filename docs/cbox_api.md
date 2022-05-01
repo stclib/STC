@@ -1,6 +1,6 @@
 # STC [cbox](../include/stc/cbox.h): Smart Pointer (Boxed object)
 
-**cbox** is a A box is a smart pointer to a heap allocated value of type X. A **cbox** can
+**cbox** is a smart pointer to a heap allocated value of type X. A **cbox** can
 be empty. The *cbox_X_cmp()*, *cbox_X_drop()* methods are defined based on the `i_cmp`
 and `i_valdrop` macros specified. Use *cbox_X_clone(p)* to make a deep copy, which uses the
 `i_valfrom` macro if defined.
