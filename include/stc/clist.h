@@ -88,8 +88,6 @@ _c_clist_complete_types(clist_VOID, dummy);
 _cx_deftypes(_c_clist_complete_types, _cx_self, dummy);
 typedef i_keyraw _cx_raw;
 
-STC_API size_t _clist_count(const clist_VOID* self);
-
 STC_API void            _cx_memb(_drop)(_cx_self* self);
 STC_API _cx_value*      _cx_memb(_push_back)(_cx_self* self, i_key value);
 STC_API _cx_value*      _cx_memb(_push_front)(_cx_self* self, i_key value);
@@ -130,8 +128,6 @@ STC_INLINE _cx_value*   _cx_memb(_emplace)(_cx_self* self, i_keyraw raw)
 STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_make(_cx_self){NULL}; }
 STC_INLINE bool         _cx_memb(_reserve)(_cx_self* self, size_t n) { return true; }
 STC_INLINE bool         _cx_memb(_empty)(_cx_self cx) { return cx.last == NULL; }
-STC_INLINE size_t       _cx_memb(_count)(_cx_self cx)
-                            { return _clist_count((const clist_VOID*) &cx); }
 STC_INLINE void         _cx_memb(_clear)(_cx_self* self) { _cx_memb(_drop)(self); }
 STC_INLINE _cx_value*   _cx_memb(_push)(_cx_self* self, i_key value)
                             { return _cx_memb(_push_back)(self, value); }
@@ -139,6 +135,14 @@ STC_INLINE void         _cx_memb(_pop_front)(_cx_self* self)
                             { _cx_memb(_erase_after_)(self, self->last); }
 STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return &self->last->next->value; }
 STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self) { return &self->last->value; }
+
+STC_INLINE size_t
+_cx_memb(_count)(_cx_self cx) {
+    size_t n = 1; const _cx_node *node = cx.last;
+    if (!node) return 0;
+    while ((node = node->next) != cx.last) ++n;
+    return n;
+}
 
 STC_INLINE _cx_iter
 _cx_memb(_begin)(const _cx_self* self) {
@@ -335,15 +339,6 @@ _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
 #endif // !c_no_cmp
 
 #ifndef CLIST_H_INCLUDED
-
-STC_DEF size_t
-_clist_count(const clist_VOID* self) {
-    const clist_VOID_node *node = self->last;
-    if (!node) return 0;
-    size_t n = 1;
-    while ((node = node->next) != self->last) ++n;
-    return n;
-}
 
 #if !c_option(c_no_cmp)
 // Singly linked list Mergesort implementation by Simon Tatham. O(n*log n).
