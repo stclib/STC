@@ -288,8 +288,8 @@ The list of template parameters:
 
 - `i_key`     - Element key type for map/set only. **[required]**.
 - `i_val`     - Element value type. **[required for]** cmap/csmap, it is the mapped value type.
-- `i_cmp`     - Three-way comparison of two *i_keyraw*\* or *i_valraw*\* - **[required for]** non-integral *i_valraw* types unless *i_opt* is defined with *c_no_cmp*.
-- `i_hash`    - Hash function taking *i_keyraw*\* - defaults to *c_default_hash*. **[required for]** non-POD valraw type.
+- `i_cmp`     - Three-way comparison of two *i_keyraw*\* or *i_valraw*\* - **[required for]** non-integral *i_keyraw* types unless *i_opt* is defined with *c_no_cmp*.
+- `i_hash`    - Hash function taking *i_keyraw*\* - defaults to *c_default_hash*. **[required for]** non-POD keyraw types.
 - `i_eq`      - Equality comparison of two *i_keyraw*\* - defaults to *!i_cmp*. Companion with *i_hash*.
 
 Properties:
@@ -299,9 +299,9 @@ Properties:
 
 Key:
 - `i_keydrop` - Destroy map/set key func - defaults to empty destructor.
-- `i_keyclone` - **[required if]** *i_valdrop* is defined (not required for **carc**). 
+- `i_keyclone` - **[required if]** *i_keydrop* is defined (not required for **carc**). 
 - `i_keyraw`  - Convertion "raw" type - defaults to *i_key*.
-- `i_keyfrom` - Convertion func *i_key* <- *i_keyraw*. **[required if]** *i_keyraw* is defined, else works as ***clone***. 
+- `i_keyfrom` - Convertion func *i_key* <- *i_keyraw*. **[required if]** *i_keyraw* is defined
 - `i_keyto`   - Convertion func *i_key*\* -> *i_keyraw*.
 
 Val:
