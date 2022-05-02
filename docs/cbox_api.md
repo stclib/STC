@@ -3,10 +3,10 @@
 **cbox** is a smart pointer to a heap allocated value of type X. A **cbox** can
 be empty. The *cbox_X_cmp()*, *cbox_X_drop()* methods are defined based on the `i_cmp`
 and `i_valdrop` macros specified. Use *cbox_X_clone(p)* to make a deep copy, which uses the
-`i_valfrom` macro if defined.
+`i_valclone` macro if defined.
 
 When declaring a container of **cbox** values, define `i_val_arcbox` with the
-cbox type instead of defining `i_val`. This will auto-set `i_valdrop`, `i_valfrom`, and `i_cmp` using 
+cbox type instead of defining `i_val`. This will auto-set `i_valdrop`, `i_valclone`, and `i_cmp` using 
 functions defined by the specified **cbox**.
 
 See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr) for a functional reference, or Rust [std::boxed::Box](https://doc.rust-lang.org/std/boxed/struct.Box.html)
@@ -17,9 +17,9 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 #define i_val           // value: REQUIRED
 #define i_cmp           // three-way compare two i_val* : REQUIRED IF i_val is a non-integral type
 #define i_valdrop       // destroy value func - defaults to empty destruct
-#define i_valraw        // convertion type
-#define i_valfrom          // create from raw/clone func - REQUIRED if i_valdrop is defined,
-                        // unless 'i_opt c_no_clone' is defined.
+#define i_valclone      // REQUIRED if i_valdrop is defined, unless 'i_opt c_no_clone' is defined.
+#define i_valraw        // convertion type (lookup)
+#define i_valfrom       // from-raw func.
 #define i_valto         // to-raw func.
 #define i_tag           // type name tag, defaults to i_val
 #include <stc/cbox.h>    
@@ -68,7 +68,7 @@ void int_drop(int* x) {
 #define i_type IBox
 #define i_val int
 #define i_valdrop int_drop    // optional func, just to display elements destroyed
-#define i_valfrom(x) x        // must specify because i_valdrop was defined.
+#define i_valclone(x) x       // must specify because i_valdrop was defined.
 #include <stc/cbox.h>
 
 #define i_type ISet

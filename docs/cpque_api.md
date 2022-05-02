@@ -3,8 +3,6 @@
 A priority queue is a container adaptor that provides constant time lookup of the largest (by default) element, at the expense of logarithmic insertion and extraction.
 A user-provided ***i_cmp*** may be defined to set the ordering, e.g. using ***-c_default_cmp*** would cause the smallest element to appear as the top() value.
 
-Note that **cpque** does not support `i_valraw` and `i_valto`, so only cloning via `i_valfrom` is available.
-
 See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/container/priority_queue) for a functional reference.
 
 ## Header file and declaration
@@ -13,8 +11,9 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_val* : REQUIRED IF i_val/i_valraw is a non-integral type
 #define i_valdrop   // destroy value func - defaults to empty destruct
+#define i_valclone  // REQUIRED IF i_valdrop defined
 #define i_valraw    // convertion type
-#define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
+#define i_valfrom   // convertion func i_valraw => i_val
 #define i_valto     // convertion func i_val* => i_valraw.
 #define i_tag       // defaults to i_val
 #define i_type      // container type name

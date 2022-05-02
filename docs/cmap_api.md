@@ -23,14 +23,16 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_eq        // equality comparison two i_keyraw*: REQUIRED IF i_keyraw is a
                     // non-integral type. Three-way i_cmp may be specified alternatively.
 #define i_keydrop   // destroy key func - defaults to empty destruct
+#define i_keyclone  // REQUIRED IF i_valdrop defined
 #define i_keyraw    // convertion "raw" type - defaults to i_key
-#define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
-#define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
+#define i_keyfrom   // convertion func i_keyraw => i_key
+#define i_keyto     // convertion func i_key* => i_keyraw
 
 #define i_valdrop   // destroy value func - defaults to empty destruct
+#define i_valclone  // REQUIRED IF i_valdrop defined
 #define i_valraw    // convertion "raw" type - defaults to i_val
-#define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
-#define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
+#define i_valfrom   // convertion func i_valraw => i_val
+#define i_valto     // convertion func i_val* => i_valraw
 
 #define i_tag       // typename tag. defaults to i_key
 #define i_type      // full typename of the container

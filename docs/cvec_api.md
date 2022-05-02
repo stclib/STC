@@ -15,9 +15,10 @@ See the c++ class [std::vector](https://en.cppreference.com/w/cpp/container/vect
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_valraw* : REQUIRED IF i_valraw is a non-integral type
 #define i_valdrop   // destroy value func - defaults to empty destruct
+#define i_valclone  // REQUIRED IF i_valdrop defined
 #define i_valraw    // convertion "raw" type - defaults to i_val
-#define i_valfrom   // convertion func i_valraw => i_val - defaults to plain copy
-#define i_valto     // convertion func i_val* => i_valraw - defaults to plain copy
+#define i_valfrom   // convertion func i_valraw => i_val
+#define i_valto     // convertion func i_val* => i_valraw
 #define i_tag       // defaults to i_val
 #include <stc/cvec.h>
 ```
@@ -204,7 +205,7 @@ User User_clone(User user) {
 #define i_val User
 #define i_cmp User_cmp
 #define i_valdrop User_drop
-#define i_valfrom User_clone
+#define i_valclone User_clone
 #define i_tag u
 #include <stc/cvec.h>
 

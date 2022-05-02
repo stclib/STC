@@ -130,7 +130,7 @@ In order to include two **cvec**s with different element types, include cvec.h t
 compare function is required to enable sorting and searching (`<` and `==` operators is default and works
 for integral types only). Alternatively, `#define i_opt c_no_cmp` to disable methods using comparison.
 
-Similarly, if a destructor `i_valdrop` is defined, either define a `i_valfrom` construct/clone function
+Similarly, if a destructor `i_valdrop` is defined, either define a `i_valclone` clone function
 or `#define i_opt c_no_clone` to disable cloning and emplace methods. Unless these requirements are met,
 compile errors are generated.
 ```c
@@ -299,17 +299,17 @@ Properties:
 
 Key:
 - `i_keydrop` - Destroy map/set key func - defaults to empty destructor.
+- `i_keyclone` - **[required if]** *i_valdrop* is defined (not required for **carc**). 
 - `i_keyraw`  - Convertion "raw" type - defaults to *i_key*.
 - `i_keyfrom` - Convertion func *i_key* <- *i_keyraw*. **[required if]** *i_keyraw* is defined, else works as ***clone***. 
 - `i_keyto`   - Convertion func *i_key*\* -> *i_keyraw*.
-- `i_keyclone` - Defaults to *i_keyfrom(i_keyto(&key))*, but is defined for smart pointers.
 
 Val:
 - `i_valdrop` - Destroy mapped or value func - defaults to empty destruct.
+- `i_valclone` - **[required if]** *i_valdrop* is defined. 
 - `i_valraw`  - Convertion "raw" type - defaults to *i_val*.
-- `i_valfrom` - Convertion func *i_val* <- *i_valraw*. **[required if]** *i_valdrop* is defined. Works as ***clone*** when *i_valraw* is not specified. 
+- `i_valfrom` - Convertion func *i_val* <- *i_valraw*.
 - `i_valto`   - Convertion func *i_val*\* -> *i_valraw*.
-- `i_valclone` - Defaults to *i_valfrom(i_valto(&val))*.
 
 Special:
 - `i_key_str` - Define key type *cstr* and container i_tag = *str*. It binds type convertion from/to *const char*\*, and the ***cmp***, ***eq***, ***hash***, and ***keydrop*** functions.
@@ -369,12 +369,8 @@ This is made possible because the type configuration may be given an optional
 conversion/"rawvalue"-type as template parameter, along with a back and forth conversion
 methods to the container value type.
 
-Hence, `i_val x = ..., y = i_valfrom(i_valto(&x))` works as a *clone* function, where the output of 
-`i_valto()` is type `i_valraw`. Function `i_valfrom()` is a *clone* function when `i_valraw/i_valto` is
-undefined (i_valraw defaults to `i_val`). Same for `i_key`.
-
-Rawvalues are also beneficial for **lookup** and **map insertions**. The **emplace** methods constructs
-`cstr`-objects from the rawvalues, but only when required:
+Rawvalues are primarily beneficial for **lookup** and **map insertions**, however the
+**emplace** methods constructs `cstr`-objects from the rawvalues, but only when required:
 ```c
 cmap_str_emplace(&map, "Hello", "world");
 // Two cstr-objects were constructed by emplace

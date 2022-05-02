@@ -6,7 +6,7 @@ void int_drop(int* x) {
 }
 
 // carc implements its own clone method using reference counting,
-// so 'i_valfrom' need not be defined (will be ignored).
+// so 'i_valclone' is not required to be defined (ignored).
 
 #define i_type Arc          // set type name to be defined (instead of 'carc_int')
 #define i_val int

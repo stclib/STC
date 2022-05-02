@@ -11,8 +11,7 @@ See the c++ class [boost::multi_array](https://www.boost.org/doc/libs/release/li
 ```c
 #define i_val       // value: REQUIRED
 #define i_valdrop   // destroy value func - defaults to empty destruct
-#define i_valfrom   // func Raw => i_val - defaults to plain copy
-#define i_valto     // func i_val => Raw - defaults to plain copy
+#define i_valclone  // REQUIRED IF valdrop is defined.
 #define i_tag       // defaults to i_val
 
 #include <stc/carr2.h> // or <stc/carr3.h>
