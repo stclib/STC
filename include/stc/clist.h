@@ -75,6 +75,11 @@ _c_clist_complete_types(clist_VOID, dummy);
     else      entry->next = entry; \
     entry->value = val
     // +: set self->last based on node 
+
+#define _c_clist_insert_node_after(self, _cx_self, node, entry) \
+    if (node) entry->next = node->next, node->next = entry; \
+    else      entry->next = entry
+
 #endif // CLIST_H_INCLUDED
 
 #ifndef _i_prefix
@@ -217,10 +222,24 @@ _cx_memb(_push_back)(_cx_self* self, i_key value) {
 }
 
 STC_DEF _cx_value*
+_cx_memb(_push_back_node)(_cx_self* self, _cx_node* node) {
+    _c_clist_insert_node_after(self, _cx_self, self->last, node);
+    self->last = node;
+    return &node->value;
+}
+
+STC_DEF _cx_value*
 _cx_memb(_push_front)(_cx_self* self, i_key value) {
     _c_clist_insert_after(self, _cx_self, self->last, value);
     if (!self->last) self->last = entry;
     return &entry->value;
+}
+
+STC_DEF _cx_value*
+_cx_memb(_push_front_node)(_cx_self* self, _cx_node* node) {
+    _c_clist_insert_node_after(self, _cx_self, self->last, node);
+    if (!self->last) self->last = node;
+    return &node->value;
 }
 
 STC_DEF _cx_iter
