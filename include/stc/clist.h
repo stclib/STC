@@ -96,6 +96,8 @@ typedef i_keyraw _cx_raw;
 STC_API void            _cx_memb(_drop)(_cx_self* self);
 STC_API _cx_value*      _cx_memb(_push_back)(_cx_self* self, i_key value);
 STC_API _cx_value*      _cx_memb(_push_front)(_cx_self* self, i_key value);
+STC_API _cx_value*      _cx_memb(_push_node_back)(_cx_self* self, _cx_node* node);
+STC_API _cx_value*      _cx_memb(_push_node_front)(_cx_self* self, _cx_node* node);
 STC_API _cx_iter        _cx_memb(_insert_at)(_cx_self* self, _cx_iter it, i_key value);
 STC_API _cx_iter        _cx_memb(_erase_at)(_cx_self* self, _cx_iter it);
 STC_API _cx_iter        _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2);
@@ -222,10 +224,10 @@ _cx_memb(_push_back)(_cx_self* self, i_key value) {
 }
 
 STC_DEF _cx_value*
-_cx_memb(_push_back_node)(_cx_self* self, _cx_node* node) {
-    _c_clist_insert_node_after(self, _cx_self, self->last, node);
-    self->last = node;
-    return &node->value;
+_cx_memb(_push_node_back)(_cx_self* self, _cx_node* entry) {
+    _c_clist_insert_node_after(self, _cx_self, self->last, entry);
+    self->last = entry;
+    return &entry->value;
 }
 
 STC_DEF _cx_value*
@@ -236,10 +238,10 @@ _cx_memb(_push_front)(_cx_self* self, i_key value) {
 }
 
 STC_DEF _cx_value*
-_cx_memb(_push_front_node)(_cx_self* self, _cx_node* node) {
-    _c_clist_insert_node_after(self, _cx_self, self->last, node);
-    if (!self->last) self->last = node;
-    return &node->value;
+_cx_memb(_push_node_front)(_cx_self* self, _cx_node* entry) {
+    _c_clist_insert_node_after(self, _cx_self, self->last, entry);
+    if (!self->last) self->last = entry;
+    return &entry->value;
 }
 
 STC_DEF _cx_iter
