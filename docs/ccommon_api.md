@@ -183,6 +183,9 @@ int* v;
 c_find_if (v, cvec_i, vec, *v == 2);
 if (v) printf("%d\n", *v);
 
+c_find_if (v, cvec_i, vec, index == 2); // index is internal in find_if.
+if (v) printf("%d\n", *v);  // 3
+
 cvec_i_iter it;
 c_find_it (it, cvec_i, vec, *it.ref == 2);
 cvec_i_erase_at(&vec, it); // assume found

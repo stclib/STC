@@ -168,7 +168,7 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle, size_t slen, cons
 
 #define c_autovar(...) c_MACRO_OVERLOAD(c_autovar, __VA_ARGS__)
 #define c_autovar2(declvar, drop) for (declvar, **_c_ii = NULL; !_c_ii; ++_c_ii, drop)
-#define c_autovar3(declvar, cond, drop) for (declvar, **_c_ii = NULL; !_c_ii && (cond); ++_c_ii, drop)
+#define c_autovar3(declvar, pred, drop) for (declvar, **_c_ii = NULL; !_c_ii && (pred); ++_c_ii, drop)
 #define c_autoscope(init, drop) for (int _c_ii = (init, 0); !_c_ii; ++_c_ii, drop)
 #define c_autodefer(...) for (int _c_ii = 0; !_c_ii; ++_c_ii, __VA_ARGS__)
 #define c_breakauto continue
@@ -209,15 +209,15 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle, size_t slen, cons
 #define c_find_it(it, C, cnt, pred) do { \
     size_t index = 0; \
     C##_iter _end = C##_end(&cnt); \
-    for (it = C##_begin(&cnt); it.ref != _end.ref; C##_next(&it)) \
-        if (pred) break; else ++index; \
+    for (it = C##_begin(&cnt); it.ref != _end.ref && !(pred); C##_next(&it)) \
+        ++index; \
 } while (0)
 
 #define c_find_if(vp, C, cnt, pred) do { \
     size_t index = 0; \
-    C##_iter _it, _end = C##_end(&cnt); \
-    for (_it = C##_begin(&cnt); _it.ref != _end.ref; C##_next(&_it)) \
-        if (vp = _it.ref, pred) break; else ++index; \
+    C##_iter _it = C##_begin(&cnt), _end = C##_end(&cnt); \
+    for (; vp = _it.ref, _it.ref != _end.ref && !(pred); C##_next(&_it)) \
+        ++index; \
     if (_it.ref == _end.ref) vp = NULL; \
 } while (0)
 
