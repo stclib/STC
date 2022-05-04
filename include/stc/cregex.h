@@ -31,7 +31,7 @@ THE SOFTWARE.
  * This is a extended version of regexp9, supporting UTF8 input, common 
  * shorthand character classes, ++.
  */
-#include "csview.h"
+#include "forward.h" // csview 
 
 typedef enum {
     creg_nomatch = -1,

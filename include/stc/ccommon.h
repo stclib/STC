@@ -204,12 +204,22 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle, size_t slen, cons
     for (size_t index = 0, _c_n = n; index < _c_n; ++index) \
         { _c_T *v = _c_arr + index; action; } \
 } while (0)
-#define c_apply_cnt(v, action, C, ...) do { \
-    size_t index = 0; \
-    c_foreach (_it, C, __VA_ARGS__) \
-        { C##_value* v = _it.ref; action; ++index; } \
-} while (0)
 #define c_pair(v) (v).first, (v).second
+
+#define c_find_it(it, C, cnt, pred) do { \
+    size_t index = 0; \
+    C##_iter _end = C##_end(&cnt); \
+    for (it = C##_begin(&cnt); it.ref != _end.ref; C##_next(&it)) \
+        if (pred) break; else ++index; \
+} while (0)
+
+#define c_find_if(vp, C, cnt, pred) do { \
+    size_t index = 0; \
+    C##_iter _it, _end = C##_end(&cnt); \
+    for (_it = C##_begin(&cnt); _it.ref != _end.ref; C##_next(&_it)) \
+        if (vp = _it.ref, pred) break; else ++index; \
+    if (_it.ref == _end.ref) vp = NULL; \
+} while (0)
 
 #define c_drop(C, ...) do { \
     C* _c_arr[] = {__VA_ARGS__}; \

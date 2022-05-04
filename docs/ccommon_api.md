@@ -167,7 +167,7 @@ c_forrange (i, int, 30, 0, -5) printf(" %d", i);
 // 30 25 20 15 10 5
 ```
 
-### c_apply, c_apply_arr, c_apply_cnt, c_pair
+### c_apply, c_apply_arr, c_pair, c_find_if, c_find_it
 **c_apply** applies an expression on a container with each of the elements in the given array:
 ```c
 // apply multiple push_backs
@@ -178,8 +178,14 @@ c_apply(v, cmap_i_insert(&map, c_pair(v)), cmap_i_raw, { {4, 5}, {6, 7} });
 int arr[] = {1, 2, 3};
 c_apply_arr(v, cvec_i_push_back(&vec, v), int, arr, c_arraylen(arr));
 
-// add keys from a map to a vec.
-c_apply_cnt(v, cvec_i_push_back(&vec, v.first), cmap_i, map);
+// find_if, find_it: linear search
+int* v;
+c_find_if (v, cvec_i, vec, *v == 2);
+if (v) printf("%d\n", *v);
+
+cvec_i_iter it;
+c_find_it (it, cvec_i, vec, *it.ref == 2);
+cvec_i_erase_at(&vec, it); // assume found
 ```
 
 ### c_new, c_alloc, c_alloc_n, c_drop, c_make
