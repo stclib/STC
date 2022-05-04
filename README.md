@@ -311,7 +311,7 @@ Val:
 - `i_valfrom` - Convertion func *i_val* <- *i_valraw*.
 - `i_valto`   - Convertion func *i_val*\* -> *i_valraw*.
 
-Special:
+Specials:
 - `i_key_str` - Define key type *cstr* and container i_tag = *str*. It binds type convertion from/to *const char*\*, and the ***cmp***, ***eq***, ***hash***, and ***keydrop*** functions.
 - `i_key_ssv` - Define key type *cstr* and container i_tag = *ssv*. It binds type convertion from/to *csview*, and its ***cmp***, ***eq***, ***hash***, and ***keydrop*** functions.
 - `i_key_arcbox TYPE` - Define container key type where TYPE is a smart pointer **carc** or **cbox**. NB: not to be used when defining carc/cbox types themselves.
@@ -320,9 +320,8 @@ Special:
 
 **Notes**:
 - Instead of defining `i_cmp`, you may define *i_opt c_no_cmp* to disable searching and sorting functions.
-- Instead of defining `i_*from`, you may define *i_opt c_no_clone* to disable emplace and clone-functions.
-- `i_keyraw RAWTYPE` - If defined along with *i_key_bind*, the two functions *TYPE TYPE_from(RAWTYPE)* and *RAWTYPE TYPE_toraw(TYPE\*)* are expected instead of *TYPE TYPE_clone(TYPE)*.  Cloning is done by ***TYPE_from(TYPE_toraw(&val))***, unless *i_keyclone/i_valclone* is defined. 
-- Function to bind, *RAWTYPE_cmp* has signature ***int RAWTYPE_cmp(const RAWTYPE\*, const RAWTYPE\*)***, and similar for *RAWTYPE_eq* and *RAWTYPE_hash*.
+- Instead of defining `i_*clone`, you may define *i_opt c_no_clone* to disable emplace and clone-functions.
+- `i_keyraw RAWTYPE` - If defined along with *i_key_bind*, the two functions *TYPE TYPE_from(RAWTYPE)* and *RAWTYPE TYPE_toraw(TYPE\*)* are expected in addition to *TYPE TYPE_clone(TYPE)*. Note the signature for ***cmp***, ***eq***, ***hash*** now: *int RAWTYPE_cmp(const RAWTYPE\*, const RAWTYPE\*)*, and similar for the two others.
 
 The *emplace* versus non-emplace container methods
 --------------------------------------------------
