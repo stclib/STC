@@ -1,4 +1,5 @@
 #include <stc/cregex.h>
+#include <stc/csview.h>
 #include <stc/cstr.h>
 
 int main()

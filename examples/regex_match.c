@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stc/cregex.h>
 #include <stc/crandom.h>
+#include <stc/csview.h>
 #define i_val double
 #include <time.h>
 
