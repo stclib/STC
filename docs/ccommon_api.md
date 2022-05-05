@@ -177,17 +177,19 @@ c_apply(v, cmap_i_insert(&map, c_pair(v)), cmap_i_raw, { {4, 5}, {6, 7} });
 
 int arr[] = {1, 2, 3};
 c_apply_arr(v, cvec_i_push_back(&vec, v), int, arr, c_arraylen(arr));
-
-// find_if, find_it: linear search
+```
+**c_find_if**, **c_find_it** searches linearily in containers using a predicate
+```
 int* v;
-c_find_if (v, cvec_i, vec, *v == 2);
+c_find_if (cvec_i, vec, v, *v == 2);
 if (v) printf("%d\n", *v);
 
-c_find_if (v, cvec_i, vec, index == 2); // index is internal in find_if.
+c_find_if (cvec_i, vec, v, index == 2); // index is internal in find_if.
 if (v) printf("%d\n", *v);  // 3
 
+// use iterator:
 cvec_i_iter it;
-c_find_it (it, cvec_i, vec, *it.ref == 2);
+c_find_it (cvec_i, vec, it, *it.ref == 2);
 cvec_i_erase_at(&vec, it); // assume found
 ```
 

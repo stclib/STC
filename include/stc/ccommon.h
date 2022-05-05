@@ -57,12 +57,12 @@
     typedef char c_paste(_static_assert_line_, __LINE__)[(cond) ? 1 : -1]
 #define c_unchecked_container_of(ptr, type, member) \
     ((type *)((char *)(ptr) - offsetof(type, member)))
-#if defined _MSC_VER && __STDC_VERSION__ < 202300L
-#  define c_container_of(p,t,m) c_unchecked_container_of(p,t,m)
-#else
+#if __STDC_VERSION__ >= 202300L || defined STC_CHECKED_CONTAINER_OF
 #  define c_container_of(ptr, type, member) \
-    ((typeof(ptr))0 == (typeof(&((type *)0)->member))0, \
-    ((type *)((char *)(ptr) - offsetof(type, member))))
+    (((type *)((char *)(ptr) - offsetof(type, member))) + \
+     ((typeof(ptr))0 != (typeof(&((type *)0)->member))0))
+#else
+#  define c_container_of(p,t,m) c_unchecked_container_of(p,t,m)
 #endif
 #ifndef __cplusplus
 #  define c_alloc(T)            c_malloc(sizeof(T))
@@ -212,14 +212,14 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle, size_t slen, cons
 } while (0)
 #define c_pair(v) (v).first, (v).second
 
-#define c_find_it(it, C, cnt, pred) do { \
+#define c_find_it(C, cnt, it, pred) do { \
     size_t index = 0; \
     C##_iter _end = C##_end(&cnt); \
     for (it = C##_begin(&cnt); it.ref != _end.ref && !(pred); C##_next(&it)) \
         ++index; \
 } while (0)
 
-#define c_find_if(vp, C, cnt, pred) do { \
+#define c_find_if(C, cnt, vp, pred) do { \
     size_t index = 0; \
     C##_iter _it = C##_begin(&cnt), _end = C##_end(&cnt); \
     for (; vp = _it.ref, vp != _end.ref && !(pred); C##_next(&_it)) \
