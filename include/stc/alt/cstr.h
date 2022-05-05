@@ -34,7 +34,7 @@
 
 #define cstr_npos (SIZE_MAX >> 1)
 typedef struct { size_t size, cap; char chr[1]; } cstr_priv;
-#define _cstr_p(self) c_container_of((self)->str, cstr_priv, chr)
+#define _cstr_p(self) c_unchecked_container_of((self)->str, cstr_priv, chr)
 #ifdef _i_static 
     static cstr_priv _cstr_nullrep = {0, 0, {0}};
     static const cstr cstr_null = {_cstr_nullrep.chr};

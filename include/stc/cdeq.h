@@ -27,8 +27,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-struct cdeq_rep { size_t size, cap; void* base[]; };
-#define cdeq_rep_(self) c_container_of((self)->_base, struct cdeq_rep, base)
+struct cdeq_rep { size_t size, cap; unsigned base[1]; };
+#define cdeq_rep_(self) c_unchecked_container_of((self)->_base, struct cdeq_rep, base)
 #endif // CDEQ_H_INCLUDED
 
 #ifndef _i_prefix

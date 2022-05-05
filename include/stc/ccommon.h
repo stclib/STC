@@ -55,9 +55,15 @@
 
 #define c_static_assert(cond) \
     typedef char c_paste(_static_assert_line_, __LINE__)[(cond) ? 1 : -1]
-#define c_container_of(ptr, type, member) \
+#define c_unchecked_container_of(ptr, type, member) \
     ((type *)((char *)(ptr) - offsetof(type, member)))
-
+#if defined _MSC_VER && __STDC_VERSION__ < 202300L
+#  define c_container_of(p,t,m) c_unchecked_container_of(p,t,m)
+#else
+#  define c_container_of(ptr, type, member) \
+    ((typeof(ptr))0 == (typeof(&((type *)0)->member))0, \
+    ((type *)((char *)(ptr) - offsetof(type, member))))
+#endif
 #ifndef __cplusplus
 #  define c_alloc(T)            c_malloc(sizeof(T))
 #  define c_alloc_n(T, n)       c_malloc(sizeof(T)*(n))
@@ -216,9 +222,9 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle, size_t slen, cons
 #define c_find_if(vp, C, cnt, pred) do { \
     size_t index = 0; \
     C##_iter _it = C##_begin(&cnt), _end = C##_end(&cnt); \
-    for (; vp = _it.ref, _it.ref != _end.ref && !(pred); C##_next(&_it)) \
+    for (; vp = _it.ref, vp != _end.ref && !(pred); C##_next(&_it)) \
         ++index; \
-    if (_it.ref == _end.ref) vp = NULL; \
+    if (vp == _end.ref) vp = NULL; \
 } while (0)
 
 #define c_drop(C, ...) do { \

@@ -64,8 +64,8 @@ int main() {
 #include <stdlib.h>
 #include <string.h>
 
-struct cvec_rep { size_t size, cap; void* data[]; };
-#define cvec_rep_(self) c_container_of((self)->data, struct cvec_rep, data)
+struct cvec_rep { size_t size, cap; unsigned data[1]; };
+#define cvec_rep_(self) c_unchecked_container_of((self)->data, struct cvec_rep, data)
 #endif // CVEC_H_INCLUDED
 
 #ifndef _i_prefix

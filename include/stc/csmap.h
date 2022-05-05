@@ -55,8 +55,8 @@ int main(void) {
 #include <stdlib.h>
 #include <string.h>
 
-struct csmap_rep { size_t root, disp, head, size, cap; void* nodes[]; };
-#define _csmap_rep(self) c_container_of((self)->nodes, struct csmap_rep, nodes)
+struct csmap_rep { size_t root, disp, head, size, cap; unsigned nodes[1]; };
+#define _csmap_rep(self) c_unchecked_container_of((self)->nodes, struct csmap_rep, nodes)
 #endif // CSMAP_H_INCLUDED
 
 #ifndef _i_prefix
@@ -253,11 +253,11 @@ _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
     if (cap >= rep->size) {
         // second test is bogus, but supresses gcc warning:
         oldrep = rep->cap && rep != &_csmap_sentinel ? rep : NULL;
-        rep = (struct csmap_rep*) c_realloc(oldrep, sizeof(struct csmap_rep) + 
+        rep = (struct csmap_rep*) c_realloc(oldrep, offsetof(struct csmap_rep, nodes) + 
                                                     (cap + 1)*sizeof(_cx_node));
         if (!rep) return false;
         if (oldrep == NULL)
-            memset(rep, 0, sizeof(struct csmap_rep) + sizeof(_cx_node));
+            memset(rep, 0, offsetof(struct csmap_rep, nodes) + sizeof(_cx_node));
         rep->cap = cap;
         self->nodes = (_cx_node *) rep->nodes;
     }
@@ -451,7 +451,7 @@ _cx_memb(_erase_r_)(_cx_node *d, i_size tn, const _cx_rawkey* rkey, int *erased)
             tx = tn;
             tn = d[tn].link[ d[tn].link[0] == 0 ];
             /* move it to disposed nodes list */
-            struct csmap_rep *rep = c_container_of(d, struct csmap_rep, nodes);
+            struct csmap_rep *rep = c_unchecked_container_of(d, struct csmap_rep, nodes);
             d[tx].link[1] = (i_size) rep->disp;
             rep->disp = tx;
         }

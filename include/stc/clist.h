@@ -64,7 +64,7 @@
         SELF##_value value; \
     }
 
-#define clist_node_(vp) c_container_of(vp, _cx_node, value)
+#define clist_node_(vp) c_unchecked_container_of(vp, _cx_node, value)
     
 _c_clist_types(clist_VOID, int);
 _c_clist_complete_types(clist_VOID, dummy);
