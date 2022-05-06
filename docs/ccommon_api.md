@@ -172,25 +172,30 @@ c_forrange (i, int, 30, 0, -5) printf(" %d", i);
 ```c
 // apply multiple push_backs
 c_apply(v, cvec_i_push_back(&vec, v), int, {1, 2, 3});
+
 // inserts to existing map
 c_apply(v, cmap_i_insert(&map, c_pair(v)), cmap_i_raw, { {4, 5}, {6, 7} });
 
 int arr[] = {1, 2, 3};
 c_apply_arr(v, cvec_i_push_back(&vec, v), int, arr, c_arraylen(arr));
 ```
-**c_find_if**, **c_find_it** searches linearily in containers using a predicate
+**c_find_if**, **c_find_in** searches linearily in containers using a predicate
 ```
-int* v;
-c_find_if (cvec_i, vec, v, *v == 2);
-if (v) printf("%d\n", *v);
-
-c_find_if (cvec_i, vec, v, index == 2); // index is internal in find_if.
-if (v) printf("%d\n", *v);  // 3
-
-// use iterator:
+// NOTE: it.ref is NULL if not found, not cvec_i_end(&vec).ref
+// This makes it easier to test.
 cvec_i_iter it;
-c_find_it (cvec_i, vec, it, *it.ref == 2);
-cvec_i_erase_at(&vec, it); // assume found
+
+// Search the the whole vec
+c_find_if(cvec_i, vec, it, *it.ref == 2);
+if (it.ref) printf("%d\n", *it.ref);
+
+// Search from iter's current position
+c_find_from(cvec_i, vec, it, index == 2); // index is internal in find_if.
+if (it.ref) printf("%d\n", *it.ref);  // 3
+
+// Search in the range
+c_find_in(csmap_str, it1, it2, it, cstr_contains(*it.ref, "hello"));
+cmap_str_erase_at(&map, it); // assume found
 ```
 
 ### c_new, c_alloc, c_alloc_n, c_drop, c_make

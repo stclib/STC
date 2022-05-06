@@ -149,11 +149,9 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle, size_t slen, cons
 }
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
-
 #define c_foreach3(it, C, cnt) \
     for (C##_iter it = C##_begin(&cnt), it##_end_ = C##_end(&cnt) \
          ; it.ref != it##_end_.ref; C##_next(&it))
-
 #define c_foreach4(it, C, start, finish) \
     for (C##_iter it = start, it##_end_ = finish \
          ; it.ref != it##_end_.ref; C##_next(&it))
@@ -213,19 +211,17 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle, size_t slen, cons
 } while (0)
 #define c_pair(v) (v).first, (v).second
 
-#define c_find_it(C, cnt, it, pred) do { \
+#define c_find_if(C, cnt, it, pred) \
+    c_find_in(C, C##_begin(&cnt), C##_end(&cnt), it, pred)
+#define c_find_from(C, cnt, it, pred) \
+    c_find_in(C, it, C##_end(&cnt), it, pred)
+// NB: it.ref == NULL when not found, not end.ref:
+#define c_find_in(C, start, end, it, pred) do { \
     size_t index = 0; \
-    C##_iter _end = C##_end(&cnt); \
-    for (it = C##_begin(&cnt); it.ref != _end.ref && !(pred); C##_next(&it)) \
+    C##_iter _end = end; \
+    for (it = start; it.ref != _end.ref && !(pred); C##_next(&it)) \
         ++index; \
-} while (0)
-
-#define c_find_if(C, cnt, vp, pred) do { \
-    size_t index = 0; \
-    C##_iter _it = C##_begin(&cnt), _end = C##_end(&cnt); \
-    for (; vp = _it.ref, vp != _end.ref && !(pred); C##_next(&_it)) \
-        ++index; \
-    if (vp == _end.ref) vp = NULL; \
+    if (it.ref == _end.ref) it.ref = NULL; \
 } while (0)
 
 #define c_drop(C, ...) do { \
