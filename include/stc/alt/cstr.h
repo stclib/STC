@@ -120,9 +120,9 @@ STC_INLINE bool         cstr_contains(cstr s, const char* needle)
 STC_INLINE bool         cstr_getline(cstr *self, FILE *stream)
                             { return cstr_getdelim(self, '\n', stream); }
 
-STC_INLINE cstr_rep_t cstr_rep(cstr* s) { 
+STC_INLINE cstr_buf cstr_buffer(cstr* s) { 
     cstr_priv* p = _cstr_p(s);
-    return c_make(cstr_rep_t){s->str, p->size, p->cap};
+    return c_make(cstr_buf){s->str, p->size, p->cap};
 }
 
 STC_INLINE cstr cstr_with_capacity(const size_t cap) {

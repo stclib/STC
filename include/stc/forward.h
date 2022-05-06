@@ -42,11 +42,11 @@
 #define forward_cqueue(CX, VAL) _c_cdeq_types(CX, VAL)
 #define forward_cvec(CX, VAL) _c_cvec_types(CX, VAL)
 
-typedef struct { char* data; size_t size, cap; } cstr_rep_t;
+typedef struct { char* data; size_t size, cap; } cstr_buf;
 typedef char cstr_value;
 #ifndef STC_OLD_CSTR
     typedef union {
-        struct { char data[sizeof(cstr_rep_t) - 1]; unsigned char last; } sml;
+        struct { char data[sizeof(cstr_buf) - 1]; unsigned char last; } sml;
         struct { char* data; size_t size, ncap; } lon;
     } cstr;
 #else

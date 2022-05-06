@@ -45,7 +45,7 @@
 #  pragma GCC diagnostic ignored "-Wstringop-overflow="
 #endif
 
-enum  { cstr_s_cap =            sizeof(cstr_rep_t) - 1 };
+enum  { cstr_s_cap =            sizeof(cstr_buf) - 1 };
 #define cstr_s_size(s)          ((size_t)(cstr_s_cap - (s)->sml.last))
 #define cstr_s_set_size(s, len) ((s)->sml.last = cstr_s_cap - (len), (s)->sml.data[len] = 0)
 #define cstr_s_data(s)          (s)->sml.data
@@ -89,10 +89,10 @@ STC_API int     cstr_printf(cstr* self, const char* fmt, ...);
 STC_API void    cstr_replace_all(cstr* self, const char* find, const char* repl);
 STC_API cstr    cstr_from_replace_all_sv(csview sv, csview find, csview repl);
 
-STC_INLINE cstr_rep_t cstr_rep(cstr* s) {
+STC_INLINE cstr_buf cstr_buffer(cstr* s) {
     return cstr_is_long(s)
-        ? c_make(cstr_rep_t){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
-        : c_make(cstr_rep_t){s->sml.data, cstr_s_size(s), cstr_s_cap};
+        ? c_make(cstr_buf){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
+        : c_make(cstr_buf){s->sml.data, cstr_s_size(s), cstr_s_cap};
 }
 STC_INLINE csview cstr_sv(const cstr* s) {
     return cstr_is_long(s) ? c_make(csview){s->lon.data, cstr_l_size(s)}
@@ -278,7 +278,7 @@ STC_INLINE uint64_t cstr_hash(const cstr *self) {
 #if defined(i_implement)
 
 STC_DEF char* _cstr_internal_move(cstr* self, const size_t pos1, const size_t pos2) {
-    cstr_rep_t r = cstr_rep(self);
+    cstr_buf r = cstr_buffer(self);
     if (pos1 != pos2) {
         const size_t newlen = r.size + pos2 - pos1;
         if (newlen > r.cap)
@@ -301,7 +301,7 @@ STC_DEF char* _cstr_init(cstr* self, const size_t len, const size_t cap) {
 }
 
 STC_DEF void cstr_shrink_to_fit(cstr* self) {
-    cstr_rep_t r = cstr_rep(self);
+    cstr_buf r = cstr_buffer(self);
     if (r.size == r.cap)
         return;
     if (r.size > cstr_s_cap) {
@@ -336,7 +336,7 @@ STC_DEF char* cstr_reserve(cstr* self, const size_t cap) {
 }
 
 STC_DEF void cstr_resize(cstr* self, const size_t size, const char value) {
-    cstr_rep_t r = cstr_rep(self);
+    cstr_buf r = cstr_buffer(self);
     if (size > r.size) {
         if (size > r.cap) r.data = cstr_reserve(self, size);
         memset(r.data + r.size, value, size - r.size);
@@ -353,7 +353,7 @@ STC_DEF size_t cstr_find_n(cstr s, const char* needle, const size_t pos, const s
 }
 
 STC_DEF cstr* cstr_assign_n(cstr* self, const char* str, const size_t n) {
-    cstr_rep_t r = cstr_rep(self);
+    cstr_buf r = cstr_buffer(self);
     if (n > r.cap) {
         r.data = (char *)c_realloc(cstr_is_long(self) ? r.data : NULL, n + 1);
         cstr_l_set_cap(self, n);
@@ -364,7 +364,7 @@ STC_DEF cstr* cstr_assign_n(cstr* self, const char* str, const size_t n) {
 }
 
 STC_DEF cstr* cstr_append_n(cstr* self, const char* str, const size_t n) {
-    cstr_rep_t r = cstr_rep(self);
+    cstr_buf r = cstr_buffer(self);
     if (r.size + n > r.cap) {
         const size_t off = (size_t)(str - r.data);
         r.data = cstr_reserve(self, (r.size*3 >> 1) + n);
@@ -380,7 +380,7 @@ STC_DEF bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
     if (c == EOF)
         return false;
     size_t pos = 0;
-    cstr_rep_t r = cstr_rep(self);
+    cstr_buf r = cstr_buffer(self);
     for (;;) {
         if (c == delim || c == EOF) {
             _cstr_set_size(self, pos);
@@ -426,7 +426,7 @@ cstr_from_replace_all_sv(csview sv, csview find, csview repl) {
 }
 
 STC_DEF void cstr_erase_n(cstr* self, const size_t pos, size_t n) {
-    cstr_rep_t r = cstr_rep(self);
+    cstr_buf r = cstr_buffer(self);
     if (n > r.size - pos) n = r.size - pos;
     memmove(&r.data[pos], &r.data[pos + n], r.size - (pos + n));
     _cstr_set_size(self, r.size - n);

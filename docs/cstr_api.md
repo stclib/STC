@@ -31,6 +31,9 @@ void         cstr_drop(cstr *self);                                   // destruc
 
 const char*  cstr_str(const cstr* self);                              // access to const char*
 char*        cstr_data(cstr* self);                                   // access to char*
+csview       cstr_sv(const cstr* self);                               // access to string view
+cstr_buf     cstr_buffer(cstr* self);                                 // access to mutable buffer (with capacity)
+
 size_t       cstr_size(cstr s);
 size_t       cstr_length(cstr s);
 size_t       cstr_capacity(cstr s);
@@ -94,10 +97,12 @@ int          c_strncasecmp(const char* str1, const char* str2, size_t n);
 
 ## Types
 
-| Type name       | Type definition                | Used to represent...     |
-|:----------------|:-------------------------------|:-------------------------|
-| `cstr`          | `struct { char *str; }`        | The string type          |
-| `cstr_value`    | `char`                         | The string element type  |
+| Type name       | Type definition                            | Used to represent... |
+|:----------------|:-------------------------------------------|:---------------------|
+| `cstr`          | `struct { ... }`                           | The string type      |
+| `cstr_value`    | `char`                                     | String element type  |
+| `csview`        | `struct { const char *str; size_t size; }` | String view type     |
+| `cstr_buf`      | `struct { char *data; size_t size, cap; }` | String buffer type   |
 
 ## Constants and macros
 
