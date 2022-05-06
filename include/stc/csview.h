@@ -27,18 +27,16 @@
 #include "forward.h"
 #include "utf8.h"
 
-#define                 csview_null  c_make(csview){"", 0}
+#define                 csview_null  c_sv("")
+#define                 csview_new(literal) c_sv(literal)
 #define                 csview_npos  (SIZE_MAX >> 1)
 #define                 c_PRIsv      "%.*s"
 #define                 c_ARGsv(sv)  (int)(sv).size, (sv).str
-#define                 c_sv(literal) csview_new(literal)
 
 STC_API csview          csview_substr(csview sv, intptr_t pos, size_t n);
 STC_API csview          csview_slice(csview sv, intptr_t p1, intptr_t p2);
 STC_API csview          csview_token(csview sv, csview sep, size_t* start);
 
-#define                 csview_new(literal) \
-                            c_make(csview){literal, c_strlen_lit(literal)}
 STC_INLINE csview       csview_init() { return csview_null; }
 STC_INLINE csview       csview_from(const char* str)
                             { return c_make(csview){str, strlen(str)}; }

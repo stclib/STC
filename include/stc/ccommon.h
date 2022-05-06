@@ -83,7 +83,6 @@
 #  define c_free(p)             free(p)
 #endif
 
-#define c_strlen_lit(literal)   (sizeof "" literal - 1U)
 #define c_delete(T, ptr)        do { T *_c_p = ptr; T##_drop(_c_p); c_free(_c_p); } while (0)
 #define c_swap(T, x, y)         do { T _c_t = x; x = y; y = _c_t; } while (0)
 #define c_arraylen(a)           (sizeof (a)/sizeof (a)[0])
@@ -114,6 +113,8 @@
 typedef const char* crawstr;
 #define crawstr_cmp(xp, yp) strcmp(*(xp), *(yp))
 #define crawstr_hash(p) c_strhash(*(p))
+#define c_strlen_lit(literal) (sizeof "" literal - 1U)
+#define c_sv(lit) c_make(csview){lit, c_strlen_lit(lit)}
 
 #define _c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
