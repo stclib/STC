@@ -22,7 +22,7 @@
  */
 #ifndef CSTR_H_INCLUDED
 #define CSTR_H_INCLUDED
-#define STC_OLD_CSTR 1
+#define STC_CSTR_V1 1
 
 #include <stc/ccommon.h>
 #include <stc/forward.h>
@@ -386,5 +386,5 @@ cstr_find_n(cstr s, const char* needle, const size_t pos, const size_t nmax) {
 }
 
 #endif
-#endif
+#endif // CSTR_H_INCLUDED
 #undef i_opt

@@ -44,13 +44,13 @@
 
 typedef struct { char* data; size_t size, cap; } cstr_buf;
 typedef char cstr_value;
-#ifndef STC_OLD_CSTR
+#if defined STC_CSTR_V1
+    typedef struct cstr { char* str; } cstr;
+#else
     typedef union {
         struct { char data[sizeof(cstr_buf) - 1]; unsigned char last; } sml;
         struct { char* data; size_t size, ncap; } lon;
     } cstr;
-#else
-    typedef struct cstr { char* str; } cstr;
 #endif
 
 typedef struct csview { const char* str; size_t size; } csview;
@@ -128,6 +128,33 @@ typedef char csview_value;
         float max_load_factor; \
     } SELF
 
+#if defined STC_CSMAP_V1
+#define _c_aatree_types(SELF, KEY, VAL, SZ, MAP_ONLY, SET_ONLY) \
+    typedef KEY SELF##_key; \
+    typedef VAL SELF##_mapped; \
+    typedef SZ SELF##_size_t; \
+    typedef struct SELF##_node SELF##_node; \
+\
+    typedef SET_ONLY( SELF##_key ) \
+            MAP_ONLY( struct SELF##_value ) \
+    SELF##_value; \
+\
+    typedef struct { \
+        SELF##_value *ref; \
+        bool inserted, nomem_error; \
+    } SELF##_result; \
+\
+    typedef struct { \
+        SELF##_value *ref; \
+        int _top; \
+        SELF##_node *_tn, *_st[36]; \
+    } SELF##_iter; \
+\
+    typedef struct { \
+        SELF##_node *root; \
+        SELF##_size_t size; \
+    } SELF
+#else
 #define _c_aatree_types(SELF, KEY, VAL, SZ, MAP_ONLY, SET_ONLY) \
     typedef KEY SELF##_key; \
     typedef VAL SELF##_mapped; \
@@ -153,7 +180,7 @@ typedef char csview_value;
     typedef struct { \
         SELF##_node *nodes; \
     } SELF
-
+#endif
 #define _c_cstack_types(SELF, VAL) \
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref; } SELF##_iter; \

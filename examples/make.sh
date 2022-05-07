@@ -1,9 +1,9 @@
 #!/bin/bash
 cc='gcc -s -O2 -Wall -std=c99 -pedantic'
 #cc='clang -s -O2 -Wall -std=c99 -pedantic'
+#cc='clang -s -O2 -Wall -std=c99 -pedantic -DSTC_CSTR_V1 -DSTC_CSMAP_V1'
 #cc='gcc -x c++ -s -O2 -Wall -std=c++20'
 #cc='g++ -x c++ -s -O2 -Wall'
-#cc='clang -s -O2 -Wall -std=c99 -pedantic -DSTC_OLD_CSTR'
 #cc='clang'
 #cc='clang -c -DSTC_HEADER'
 #cc='cl -O2 -nologo -W2 -MD'
