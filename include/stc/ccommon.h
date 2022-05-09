@@ -122,11 +122,14 @@ STC_INLINE uint64_t c_fasthash(const void* key, size_t len) {
     uint64_t u8, h = 1; size_t n = len >> 3;
     uint32_t u4;
     const uint8_t *x = (const uint8_t*) key; 
-    while (n--)
-        memcpy(&u8, x, 8), x += 8, h += (_c_ROTL(u8, 26) ^ u8)*0xc6a4a7935bd1e99d;
+    while (n--) {
+        memcpy(&u8, x, 8), x += 8;
+        h += (_c_ROTL(u8, 26) ^ u8)*0xc6a4a7935bd1e99d;
+    }
     switch (len &= 7) {
         case 0: return h;
-        case 4: memcpy(&u4, x, 4); return h + u4*0xc6a4a7935bd1e99d;
+        case 4: memcpy(&u4, x, 4);
+                return h + u4*0xc6a4a7935bd1e99d;
     }
     h += *x++;
     while (--len) h = (h << 10) - h + *x++;
@@ -136,7 +139,8 @@ STC_INLINE uint64_t c_fasthash(const void* key, size_t len) {
 STC_INLINE uint64_t c_strhash(const char *str) 
     { return c_fasthash(str, strlen(str)); }
 
-STC_INLINE char* c_strnstrn(const char *s, const char *needle, size_t slen, const size_t nlen) {
+STC_INLINE char* c_strnstrn(const char *s, const char *needle, 
+                            size_t slen, const size_t nlen) {
     if (!nlen) return (char *)s;
     if (nlen > slen) return NULL;
     slen -= nlen;
