@@ -123,7 +123,7 @@ STC_INLINE uint64_t c_fasthash(const void* key, size_t len) {
     uint32_t u4;
     const uint8_t *x = (const uint8_t*) key; 
     while (n--)
-        memcpy(&u8, x, 8), x += 8, h += (h << 10) ^ (u8*0xc6a4a7935bd1e99d);
+        memcpy(&u8, x, 8), x += 8, h += (_c_ROTL(u8, 26) ^ u8)*0xc6a4a7935bd1e99d;
     switch (len &= 7) {
         case 0: return h;
         case 4: memcpy(&u4, x, 4); return h + u4*0xc6a4a7935bd1e99d;

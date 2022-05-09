@@ -134,7 +134,7 @@ size_t seed;
 #define PMAP_DTOR(X)              UMAP_DTOR(X)
 
 
-#define MAP_TEST0(M, X, n) \
+#define MAP_TEST1(M, X, n) \
 {   /* Insert, update */ \
     M##_SETUP(X, int64_t, int64_t); \
     uint64_t sum = 0; \
@@ -146,22 +146,6 @@ size_t seed;
     difference = clock() - before; \
     printf(#M ": time: %5.02f, size: %" PRIuMAX ", buckets: %8zu, sum: %" PRIuMAX "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), sum); \
-    M##_DTOR(X); \
-}
-
-#define MAP_TEST1(M, X, n) \
-{   /* Insert, update and erase another */ \
-    M##_SETUP(X, int64_t, int64_t); \
-    uint64_t sum = 0, erased = 0; \
-    SEED(seed); \
-    clock_t difference, before = clock(); \
-    for (size_t i = 0; i < n; ++i) { \
-        sum += ++ M##_EMPLACE(X, RAND(keybits), i); \
-        erased += M##_ERASE(X, RAND(keybits)); \
-    } \
-    difference = clock() - before; \
-    printf(#M ": time: %5.02f, size: %" PRIuMAX ", buckets: %8zu, erased %" PRIuMAX ", sum: %" PRIuMAX "\n", \
-           (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), erased, sum); \
     M##_DTOR(X); \
 }
 
@@ -240,12 +224,12 @@ size_t seed;
 
 
 #ifdef __cplusplus
-#define RUN_TEST(n) MAP_TEST##n(CMAP, ii, N##n) MAP_TEST##n(KMAP, ii, N##n) \
+#define RUN_TEST(n) MAP_TEST##n(KMAP, ii, N##n) MAP_TEST##n(CMAP, ii, N##n) \
                     MAP_TEST##n(PMAP, ii, N##n) MAP_TEST##n(FMAP, ii, N##n) \
                     MAP_TEST##n(RMAP, ii, N##n) MAP_TEST##n(HMAP, ii, N##n) \
                     MAP_TEST##n(TMAP, ii, N##n) MAP_TEST##n(UMAP, ii, N##n)
 #else
-#define RUN_TEST(n) MAP_TEST##n(CMAP, ii, N##n) MAP_TEST##n(KMAP, ii, N##n)
+#define RUN_TEST(n) MAP_TEST##n(KMAP, ii, N##n) MAP_TEST##n(CMAP, ii, N##n)
 #endif
 
 enum {
@@ -274,10 +258,7 @@ int main(int argc, char* argv[])
     printf("Usage %s [n-million=%d key-bits=%d]\n", argv[0], DEFAULT_N_MILL, DEFAULT_KEYBITS);
     printf("N-base = %d. Random keys are in range [0, 2^%d). Seed = %" PRIuMAX ":\n", n_mill, keybits, seed);
 
-    printf("\nT0: Insert/update random keys:\n");
-    RUN_TEST(0)
-
-    printf("\nT1: Insert/update random key + try to remove another random key:\n");
+    printf("\nT1: Insert/update random keys:\n");
     RUN_TEST(1)
 
     printf("\nT2: Insert sequential keys, then remove them in same order:\n");
