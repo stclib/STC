@@ -522,9 +522,11 @@ _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
     for (;;) {
         if (memcmp(&k1, &k2, sizeof k1) == 0)
             return it1;
-        _cx_memb(_next)(&it1); k1 = *_i_keyref(it1.ref);
+        _cx_memb(_next)(&it1);
+        k1 = *_i_keyref(it1.ref);
         _cx_memb(_erase)(self, r1);
-        _cx_memb(_find_it)(self, (r1 = i_keyto((&k1))), &it1);
+        r1 = i_keyto((&k1));
+        _cx_memb(_find_it)(self, r1, &it1);
     }
 }
 

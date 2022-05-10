@@ -12,7 +12,7 @@
 using stdcon = std::vector<std::string>;
 
 static const int BENCHMARK_SIZE = 5000000;
-static const int MAX_STRING_LENGTH = 60;
+static const int MAX_STRING_LENGTH = 40;
 static const char CHARS[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=+-";
 using time_point = std::chrono::high_resolution_clock::time_point;
 
@@ -86,7 +86,6 @@ int main() {
         std::cout << '\t' << *con.begin() << '\n';
     }
     std::cout << "Avg:\t" << sum/n << '\n';
-    
 
     csrandom(seed);
     sum = 0, n = 0;

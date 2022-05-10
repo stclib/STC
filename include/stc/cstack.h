@@ -78,7 +78,7 @@ STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, size_t n) {
 }
 
 STC_INLINE _cx_value*
-_cx_memb(_expand_uninitialized)(_cx_self *self, size_t n) {
+_cx_memb(_expand_uninit)(_cx_self *self, size_t n) {
     size_t len = self->size;
     if (!_cx_memb(_reserve)(self, len + n)) return NULL;
     self->size += n;

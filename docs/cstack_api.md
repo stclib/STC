@@ -31,7 +31,7 @@ cstack_X            cstack_X_clone(cstack_X st);
 void                cstack_X_clear(cstack_X* self);
 bool                cstack_X_reserve(cstack_X* self, size_t n);
 void                cstack_X_shrink_to_fit(cstack_X* self);
-i_val*              cstack_X_expand_uninitialized(cstack_X* self, size_t n);
+i_val*              cstack_X_expand_uninit(cstack_X* self, size_t n);
 void                cstack_X_copy(cstack_X* self, cstack_X other);
 void                cstack_X_drop(cstack_X* self);                       // destructor
 

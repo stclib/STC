@@ -41,6 +41,22 @@ static inline uint64_t sfc64(uint64_t s[4]) {
   return result;
 }
 
+uint32_t sfc32(uint32_t s[4]) {
+    uint32_t t = s[0] + s[1] + s[3]++;
+    s[0] = s[1] ^ (s[1] >> 9);
+    s[1] = s[2] + (s[2] << 3);
+    s[2] = (s[2] << 21) | (s[2] >> 11) + t;
+    return t;
+}
+
+uint32_t stc32(uint32_t s[5]) {
+    uint32_t t = (s[0] ^ (s[3] += s[4])) + s[1];
+    s[0] = s[1] ^ (s[1] >> 9);
+    s[1] = s[2] + (s[2] << 3);
+    s[2] = (s[2] << 21) | (s[2] >> 11) + t;
+    return t;
+}
+
 /* xoshiro128+  */
 
 uint64_t xoroshiro128plus(uint64_t s[2]) {
@@ -130,6 +146,22 @@ int main(void)
 
     beg = clock();
     for (size_t i = 0; i < N; i++)
+      recipient[i] = sfc32((uint32_t *)rng.state);
+    end = clock();
+    cout << "sfc32:\t\t"
+         << (float(end - beg) / CLOCKS_PER_SEC)
+         << "s: " << recipient[312] << endl;
+
+    beg = clock();
+    for (size_t i = 0; i < N; i++)
+      recipient[i] = stc32((uint32_t *)rng.state);
+    end = clock();
+    cout << "stc32:\t\t"
+         << (float(end - beg) / CLOCKS_PER_SEC)
+         << "s: " << recipient[312] << endl;
+
+    beg = clock();
+    for (size_t i = 0; i < N; i++)
       recipient[i] = sfc64(rng.state);
     end = clock();
     cout << "sfc64:\t\t"
@@ -143,6 +175,7 @@ int main(void)
     cout << "stc64:\t\t"
          << (float(end - beg) / CLOCKS_PER_SEC)
          << "s: " << recipient[312] << endl;
+
 
     beg = clock();
     for (size_t i = 0; i < N; i++)
