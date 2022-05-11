@@ -316,11 +316,11 @@ STC_DEF void _cx_memb(_clear)(_cx_self* self) {
 STC_DEF chash_bucket_t
 _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr) {
     const uint64_t _hash = i_hash(rkeyptr);
-    uint8_t _hx; i_size _cap = self->bucket_count;
+    i_size _cap = self->bucket_count;
     chash_bucket_t b = {c_paste(fastrange_,i_size)(_hash, _cap), (uint8_t)(_hash | 0x80)};
-    const uint8_t* _hashx = self->_hashx;
-    while ((_hx = _hashx[b.idx])) {
-        if (_hx == b.hx) {
+    const uint8_t* _hx = self->_hashx;
+    while (_hx[b.idx]) {
+        if (_hx[b.idx] == b.hx) {
             _cx_rawkey _raw = i_keyto(_i_keyref(self->table + b.idx));
             if (i_eq((&_raw), rkeyptr))
                 break;
