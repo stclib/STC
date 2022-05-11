@@ -86,12 +86,11 @@
 #define c_delete(T, ptr)        do { T *_c_p = ptr; T##_drop(_c_p); c_free(_c_p); } while (0)
 #define c_swap(T, x, y)         do { T _c_t = x; x = y; y = _c_t; } while (0)
 #define c_arraylen(a)           (sizeof (a)/sizeof (a)[0])
-#define c_less_cmp(less, x, y)  (less(y, x) - less(x, y))
-#define c_default_less(x, y)    (*(x) < *(y))
 
-#define c_default_cmp(x, y)     c_less_cmp(c_default_less, x, y)
+#define c_default_less(x, y)    (*(x) < *(y))
 #define c_default_eq(x, y)      (*(x) == *(y))
 #define c_memcmp_eq(x, y)       (memcmp(x, y, sizeof *(x)) == 0)
+#define c_default_cmp(x, y)     (c_default_less(y, x) - c_default_less(x, y))
 #define c_default_hash(p)       c_fasthash(p, sizeof *(p))
 
 #define c_default_from(x)       (x)
@@ -119,9 +118,9 @@ typedef const char* crawstr;
 #define _c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
 STC_INLINE uint64_t c_fasthash(const void* key, size_t len) {
+    const uint8_t *x = (const uint8_t*) key; 
     uint64_t u8, h = 1; size_t n = len >> 3;
     uint32_t u4;
-    const uint8_t *x = (const uint8_t*) key; 
     while (n--) {
         memcpy(&u8, x, 8), x += 8;
         h += (_c_ROTL(u8, 26) ^ u8)*0xc6a4a7935bd1e99d;
