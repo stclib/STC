@@ -321,7 +321,7 @@ _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr) {
     const uint8_t* _hx = self->_hashx;
     while (_hx[b.idx]) {
         if (_hx[b.idx] == b.hx) {
-            _cx_rawkey _raw = i_keyto(_i_keyref(self->table + b.idx));
+            const _cx_rawkey _raw = i_keyto(_i_keyref(self->table + b.idx));
             if (i_eq((&_raw), rkeyptr))
                 break;
         }
@@ -403,7 +403,7 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
             j = 0;
         if (! _hashx[j])
             break;
-        _cx_rawkey _raw = i_keyto(_i_keyref(_slot + j));
+        const _cx_rawkey _raw = i_keyto(_i_keyref(_slot + j));
         k = c_paste(fastrange_,i_size)(i_hash((&_raw)), _cap);
         if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */
             _slot[i] = _slot[j], _hashx[i] = _hashx[j], i = j;

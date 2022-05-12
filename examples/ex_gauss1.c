@@ -11,13 +11,10 @@
 #include <stc/cmap.h>
 
 // Declare int vector with map entries that can be sorted by map keys.
-struct {int first; size_t second;} typedef mapval;
-static int compare(mapval *a, mapval *b) {
-    return c_default_cmp(&a->first, &b->first);
-}
+struct { int first; size_t second; } typedef mapval;
 
 #define i_val mapval
-#define i_cmp compare
+#define i_less(x, y) x->first < y->first
 #define i_tag pair
 #include <stc/cvec.h>
 

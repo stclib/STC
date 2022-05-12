@@ -276,7 +276,8 @@ STC_DEF void
 _cx_memb(_drop)(_cx_self* self) {
     struct cvec_rep* rep = cvec_rep_(self);
     // second test to supress gcc -O2 warn: -Wfree-nonheap-object
-    if (rep->cap == 0 || rep == &_cvec_sentinel) return;
+    if (rep->cap == 0 || rep == &_cvec_sentinel)
+        return;
     _cx_memb(_clear)(self);
     c_free(rep);
 }
@@ -288,7 +289,8 @@ _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
     if (cap > rep->cap || (cap && cap == len)) {
         rep = (struct cvec_rep*) c_realloc(rep->cap ? rep : NULL,
                                            offsetof(struct cvec_rep, data) + cap*sizeof(i_key));
-        if (!rep) return false;
+        if (!rep)
+            return false;
         self->data = (_cx_value*) rep->data;
         rep->size = len;
         rep->cap = cap;
@@ -301,9 +303,12 @@ _cx_memb(_resize)(_cx_self* self, const size_t len, i_key null) {
     if (!_cx_memb(_reserve)(self, len)) return false;
     struct cvec_rep *rep = cvec_rep_(self);
     const size_t n = rep->size;
-    for (size_t i = len; i < n; ++i) { i_keydrop((self->data + i)); }
-    for (size_t i = n; i < len; ++i) self->data[i] = null;
-    if (rep->cap) rep->size = len;
+    for (size_t i = len; i < n; ++i)
+        { i_keydrop((self->data + i)); }
+    for (size_t i = n; i < len; ++i)
+        self->data[i] = null;
+    if (rep->cap)
+        rep->size = len;
     return true;
 }
 
@@ -323,7 +328,8 @@ STC_DEF _cx_value*
 _cx_memb(_expand_uninit_p)(_cx_self* self, _cx_value* pos, const size_t n) {
     const size_t idx = pos - self->data;
     struct cvec_rep* r = cvec_rep_(self);
-    if (!n) return pos;
+    if (!n)
+        return pos;
     if (r->size + n > r->cap) {
         if (!_cx_memb(_reserve)(self, r->size*3/2 + n))
             return NULL;
@@ -339,7 +345,8 @@ STC_DEF _cx_value*
 _cx_memb(_insert_range_p)(_cx_self* self, _cx_value* pos,
                           const _cx_value* p1, const _cx_value* p2) {
     pos = _cx_memb(_expand_uninit_p)(self, pos, p2 - p1);
-    if (pos) memcpy(pos, p1, (p2 - p1)*sizeof *p1);
+    if (pos)
+        memcpy(pos, p1, (p2 - p1)*sizeof *p1);
     return pos;
 }
 
@@ -348,7 +355,8 @@ _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
     intptr_t len = p2 - p1;
     if (len > 0) {
         _cx_value* p = p1, *end = self->data + cvec_rep_(self)->size;
-        for (; p != p2; ++p) { i_keydrop(p); }
+        for (; p != p2; ++p)
+            { i_keydrop(p); }
         memmove(p1, p2, (end - p2) * sizeof(i_key));
         cvec_rep_(self)->size -= len;
     }
@@ -393,20 +401,24 @@ STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, i_keyraw raw) {
     for (; i1.ref != i2.ref; ++i1.ref) {
         i_keyraw r = i_keyto(i1.ref);
-        if (i_eq((&raw), (&r))) return i1;
+        if (i_eq((&raw), (&r)))
+            return i1;
     }
     return i2;
 }
 
 STC_DEF _cx_iter
-_cx_memb(_binary_search_in)(_cx_iter i1, _cx_iter i2, i_keyraw raw, _cx_iter* lower_bound) {
+_cx_memb(_binary_search_in)(_cx_iter i1, _cx_iter i2, const i_keyraw raw, _cx_iter* lower_bound) {
     _cx_iter mid, last = i2;
     while (i1.ref != i2.ref) {
         mid.ref = i1.ref + ((i2.ref - i1.ref) >> 1);
-        int c; i_keyraw m = i_keyto(mid.ref);
-        if (!(c = i_cmp((&raw), (&m)))) return *lower_bound = mid;
-        else if (c < 0) i2.ref = mid.ref;
-        else i1.ref = mid.ref + 1;
+        int c; const i_keyraw m = i_keyto(mid.ref);
+        if (!(c = i_cmp((&raw), (&m))))
+            return *lower_bound = mid;
+        else if (c < 0)
+            i2.ref = mid.ref;
+        else
+            i1.ref = mid.ref + 1;
     }
     *lower_bound = i1;
     return last;
@@ -414,8 +426,8 @@ _cx_memb(_binary_search_in)(_cx_iter i1, _cx_iter i2, i_keyraw raw, _cx_iter* lo
 
 STC_DEF int
 _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
-    i_keyraw rx = i_keyto(x);
-    i_keyraw ry = i_keyto(y);
+    const i_keyraw rx = i_keyto(x);
+    const i_keyraw ry = i_keyto(y);
     return i_cmp((&rx), (&ry));
 }
 #endif // !c_no_cmp

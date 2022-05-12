@@ -230,7 +230,10 @@ _cx_memb(_shrink_to_fit)(_cx_self *self) {
         const size_t sz = rep->size;
         memmove(self->_base, self->data, sz*sizeof(i_key));
         rep = (struct cdeq_rep*) c_realloc(rep, offsetof(struct cdeq_rep, base) + sz*sizeof(i_key));
-        if (rep) { self->_base = self->data = (_cx_value*) rep->base; rep->cap = sz; }
+        if (rep) {
+            self->_base = self->data = (_cx_value*)rep->base;
+            rep->cap = sz;
+        }
     }
 }
 
@@ -238,7 +241,8 @@ STC_DEF void
 _cx_memb(_drop)(_cx_self* self) {
     struct cdeq_rep* rep = cdeq_rep_(self);
     // second test to supress gcc -O2 warn: -Wfree-nonheap-object
-    if (rep->cap == 0 || rep == &_cdeq_sentinel) return;
+    if (rep->cap == 0 || rep == &_cdeq_sentinel)
+        return;
     _cx_memb(_clear)(self);
     c_free(rep);
 }
@@ -250,7 +254,8 @@ _cx_memb(_realloc_)(_cx_self* self, const size_t n) {
     const size_t nfront = _cdeq_nfront(self);
     rep = (struct cdeq_rep*) c_realloc(rep->cap ? rep : NULL,
                                        offsetof(struct cdeq_rep, base) + cap*sizeof(i_key));
-    if (!rep) return 0; 
+    if (!rep)
+        return 0; 
     rep->size = sz, rep->cap = cap;
     self->_base = (_cx_value *) rep->base;
     self->data = self->_base + nfront;
@@ -263,7 +268,8 @@ _cx_memb(_expand_right_half_)(_cx_self* self, const size_t idx, const size_t n) 
     const size_t sz = rep->size, cap = rep->cap;
     const size_t nfront = _cdeq_nfront(self), nback = cap - sz - nfront;
     if (nback >= n || sz*1.3 + n > cap) {
-        if (!_cx_memb(_realloc_)(self, n)) return false;
+        if (!_cx_memb(_realloc_)(self, n))
+            return false;
         memmove(self->data + idx + n, self->data + idx, (sz - idx)*sizeof(i_key));
     } else {
 #if !defined _i_queue
@@ -326,22 +332,26 @@ _cx_memb(_expand_left_half_)(_cx_self* self, const size_t idx, const size_t n) {
     const size_t sz = rep->size;
     const size_t nfront = _cdeq_nfront(self), nback = cap - sz - nfront;
     if (nfront >= n) {
-        self->data = (_cx_value *) memmove(self->data - n, self->data, idx*sizeof(i_key));
+        self->data = (_cx_value *)memmove(self->data - n, self->data, idx*sizeof(i_key));
     } else {
-        if (sz*1.3 + n > cap) cap = _cx_memb(_realloc_)(self, n);
+        if (sz*1.3 + n > cap)
+            cap = _cx_memb(_realloc_)(self, n);
         const size_t unused = cap - (sz + n);
         const size_t pos = (nback*2 < unused) ? unused - nback : unused/2;
         memmove(self->_base + pos + idx + n, self->data + idx, (sz - idx)*sizeof(i_key));
-        self->data = (_cx_value *) memmove(self->_base + pos, self->data, idx*sizeof(i_key));
+        self->data = (_cx_value *)memmove(self->_base + pos, self->data, idx*sizeof(i_key));
     }
 }
 
 static _cx_value*
-_cx_memb(_insert_space_)(_cx_self* self, const _cx_value* pos, const size_t n) {
+_cx_memb(_expand_uninit_p)(_cx_self* self, const _cx_value* pos, const size_t n) {
     const size_t idx = pos - self->data;
-    if (idx*2 < cdeq_rep_(self)->size) _cx_memb(_expand_left_half_)(self, idx, n);
-    else                               _cx_memb(_expand_right_half_)(self, idx, n);
-    if (n) cdeq_rep_(self)->size += n; /* do only if size > 0 */
+    if (idx*2 < cdeq_rep_(self)->size)
+        _cx_memb(_expand_left_half_)(self, idx, n);
+    else
+        _cx_memb(_expand_right_half_)(self, idx, n);
+    if (n)
+        cdeq_rep_(self)->size += n; /* do only if size > 0 */
     return self->data + idx;
 }
 
@@ -359,8 +369,9 @@ _cx_memb(_push_front)(_cx_self* self, i_key value) {
 STC_DEF _cx_value*
 _cx_memb(_insert_range_p)(_cx_self* self, _cx_value* pos,
                           const _cx_value* p1, const _cx_value* p2) {
-    pos = _cx_memb(_insert_space_)(self, pos, p2 - p1);
-    if (pos) memcpy(pos, p1, (p2 - p1)*sizeof *p1);
+    pos = _cx_memb(_expand_uninit_p)(self, pos, p2 - p1);
+    if (pos)
+        memcpy(pos, p1, (p2 - p1)*sizeof *p1);
     return pos;
 }
 
@@ -370,7 +381,8 @@ _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
     if (n > 0) {
         _cx_value* p = p1, *end = self->data + cdeq_rep_(self)->size;
         for (; p != p2; ++p) { i_keydrop(p); }
-        if (p1 == self->data) self->data += n;
+        if (p1 == self->data)
+            self->data += n;
         else memmove(p1, p2, (end - p2) * sizeof(i_key));
         cdeq_rep_(self)->size -= n;
     }
@@ -381,7 +393,7 @@ _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
 #if !defined _i_no_emplace
 STC_DEF _cx_value*
 _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos, const _cx_raw* p1, const _cx_raw* p2) {
-    pos = _cx_memb(_insert_space_)(self, pos, p2 - p1);
+    pos = _cx_memb(_expand_uninit_p)(self, pos, p2 - p1);
     _cx_value* it = pos;
     if (pos) for (; p1 != p2; ++p1)
         *pos++ = i_keyfrom((*p1));
@@ -392,7 +404,7 @@ _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos, const _cx_raw* p1, co
 STC_DEF _cx_value*
 _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
                           const _cx_value* p1, const _cx_value* p2) {
-    pos = _cx_memb(_insert_space_)(self, pos, p2 - p1);
+    pos = _cx_memb(_expand_uninit_p)(self, pos, p2 - p1);
     _cx_value* it = pos;
     if (pos) for (; p1 != p2; ++p1)
         *pos++ = i_keyclone((*p1));
@@ -406,15 +418,16 @@ STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, i_keyraw raw) {
     for (; i1.ref != i2.ref; ++i1.ref) {
         i_keyraw r = i_keyto(i1.ref);
-        if (i_eq((&raw), (&r))) return i1;
+        if (i_eq((&raw), (&r)))
+            return i1;
     }
     return i2;
 }
 
 STC_DEF int
 _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
-    i_keyraw rx = i_keyto(x);
-    i_keyraw ry = i_keyto(y);
+    const i_keyraw rx = i_keyto(x);
+    const i_keyraw ry = i_keyto(y);
     return i_cmp((&rx), (&ry));
 }
 #endif // !c_no_cmp

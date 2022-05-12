@@ -233,14 +233,16 @@ _cx_memb(_push_node_back)(_cx_self* self, _cx_node* entry) {
 STC_DEF _cx_value*
 _cx_memb(_push_front)(_cx_self* self, i_key value) {
     _c_clist_insert_after(self, _cx_self, self->last, value);
-    if (!self->last) self->last = entry;
+    if (!self->last)
+        self->last = entry;
     return &entry->value;
 }
 
 STC_DEF _cx_value*
 _cx_memb(_push_node_front)(_cx_self* self, _cx_node* entry) {
     _c_clist_insert_node_after(self, _cx_self, self->last, entry);
-    if (!self->last) self->last = entry;
+    if (!self->last)
+        self->last = entry;
     return &entry->value;
 }
 
@@ -277,8 +279,10 @@ STC_DEF _cx_node*
 _cx_memb(_erase_after_)(_cx_self* self, _cx_node* node) {
     _cx_node* del = node->next, *next = del->next;
     node->next = next;
-    if (del == next) self->last = node = NULL;
-    else if (self->last == del) self->last = node, node = NULL;
+    if (del == next)
+        self->last = node = NULL;
+    else if (self->last == del)
+        self->last = node, node = NULL;
     i_keydrop((&del->value)); c_free(del);
     return node;
 }
@@ -300,11 +304,14 @@ _cx_memb(_splice)(_cx_self* self, _cx_iter it, _cx_self* other) {
 STC_DEF _cx_self
 _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
     _cx_self cx = {NULL};
-    if (it1.ref == it2.ref) return cx;
+    if (it1.ref == it2.ref)
+        return cx;
     _cx_node *p1 = it1.prev,
              *p2 = it2.ref ? it2.prev : self->last;
-    p1->next = p2->next, p2->next = clist_node_(it1.ref);
-    if (self->last == p2) self->last = (p1 == p2) ? NULL : p1;
+    p1->next = p2->next;
+    p2->next = clist_node_(it1.ref);
+    if (self->last == p2)
+        self->last = (p1 == p2) ? NULL : p1;
     cx.last = p2;
     return cx;
 }
@@ -315,7 +322,8 @@ STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, i_keyraw val) {
     c_foreach (it, _cx_self, it1, it2) {
         i_keyraw r = i_keyto(it.ref);
-        if (i_eq((&r), (&val))) return it;
+        if (i_eq((&r), (&val)))
+            return it;
     }
     it2.ref = NULL; return it2;
 }
@@ -348,7 +356,7 @@ _clist_mergesort(clist_VOID_node *list, int (*cmp)(const clist_VOID_node*, const
 STC_DEF void
 _cx_memb(_sort)(_cx_self* self) {
     if (self->last)
-        self->last = (_cx_node *) _clist_mergesort((clist_VOID_node *) self->last->next, _cx_memb(_sort_cmp_));
+        self->last = (_cx_node *)_clist_mergesort((clist_VOID_node *)self->last->next, _cx_memb(_sort_cmp_));
 }
 
 STC_DEF int
