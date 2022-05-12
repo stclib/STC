@@ -175,7 +175,7 @@
   #define i_keydrop c_default_drop
 #endif
 #ifdef i_less
-  #define i_cmp(x, y) (i_less(y, x)) - (i_less(x, y))
+  #define i_cmp(x, y) c_less_cmp(i_less, x, y)
 #endif
 #if !defined i_eq && defined i_cmp
   #define i_eq(x, y) !(i_cmp(x, y))
