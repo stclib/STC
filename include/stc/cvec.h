@@ -99,7 +99,6 @@ STC_API _cx_value*      _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
                                                  const _cx_value* p1, const _cx_value* p2);
 STC_INLINE i_key        _cx_memb(_value_clone)(_cx_value val)
                             { return i_keyclone(val); }
-STC_INLINE i_key        _cx_memb(_value_fromraw)(i_keyraw raw) { return i_keyfrom(raw); }
 STC_INLINE void         _cx_memb(_copy)(_cx_self *self, _cx_self other) {
                             if (self->data == other.data) return;
                             _cx_memb(_drop)(self);

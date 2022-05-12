@@ -81,18 +81,16 @@ STC_INLINE void         _cx_memb(_copy)(_cx_self *self, _cx_self other) {
                             _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
                         }
 #endif // !_i_no_clone
-STC_INLINE bool         _cx_memb(_empty)(_cx_self cx) { return !cdeq_rep_(&cx)->size; }
 STC_INLINE size_t       _cx_memb(_size)(_cx_self cx) { return cdeq_rep_(&cx)->size; }
 STC_INLINE size_t       _cx_memb(_capacity)(_cx_self cx) { return cdeq_rep_(&cx)->cap; }
-STC_INLINE void         _cx_memb(_swap)(_cx_self* a, _cx_self* b) {c_swap(_cx_self, *a, *b); }
-STC_INLINE i_key        _cx_memb(_value_fromraw)(i_keyraw raw) { return i_keyfrom(raw); }
+STC_INLINE bool         _cx_memb(_empty)(_cx_self cx) { return !cdeq_rep_(&cx)->size; }
 STC_INLINE i_keyraw     _cx_memb(_value_toraw)(_cx_value* pval) { return i_keyto(pval); }
-
-STC_INLINE void         _cx_memb(_pop_front)(_cx_self* self) // == _pop() when _i_queue
-                            { i_keydrop(self->data); ++self->data; --cdeq_rep_(self)->size; }
+STC_INLINE void         _cx_memb(_swap)(_cx_self* a, _cx_self* b) { c_swap(_cx_self, *a, *b); }
+STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return self->data; }
 STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self)
                             { return self->data + cdeq_rep_(self)->size - 1; }
-STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return self->data; }
+STC_INLINE void         _cx_memb(_pop_front)(_cx_self* self) // == _pop() when _i_queue
+                            { i_keydrop(self->data); ++self->data; --cdeq_rep_(self)->size; }
 STC_INLINE _cx_iter     _cx_memb(_begin)(const _cx_self* self)
                             { return c_make(_cx_iter){self->data}; }
 STC_INLINE _cx_iter     _cx_memb(_end)(const _cx_self* self)
