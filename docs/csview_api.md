@@ -82,8 +82,8 @@ cstr            cstr_from_replace_all_sv(csview sv, csview find, csview replace)
 csview          cstr_substr(const cstr* s, intptr_t pos, size_t n); // negative pos count from end
 csview          cstr_slice(const cstr* s, intptr_t p, intptr_t q);  // negative p or q count from end
 
-cstr*           cstr_assign_sv(cstr* self, csview sv);
-cstr*           cstr_append_sv(cstr* self, csview sv);
+csview          cstr_assign_sv(cstr* self, csview sv);              // return csview of assigned cstr
+void            cstr_append_sv(cstr* self, csview sv);
 void            cstr_insert_sv(cstr* self, size_t pos, csview sv);
 void            cstr_replace_sv(cstr* self, size_t pos, size_t len, csview sv);
 

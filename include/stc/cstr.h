@@ -80,8 +80,8 @@ STC_API char*   cstr_reserve(cstr* self, size_t cap);
 STC_API void    cstr_shrink_to_fit(cstr* self);
 STC_API void    cstr_resize(cstr* self, size_t size, char value);
 STC_API size_t  cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax);
-STC_API cstr*   cstr_assign_n(cstr* self, const char* str, size_t n);
-STC_API cstr*   cstr_append_n(cstr* self, const char* str, size_t n);
+STC_API char*   cstr_assign_n(cstr* self, const char* str, size_t n);
+STC_API char*   cstr_append_n(cstr* self, const char* str, size_t n);
 STC_API bool    cstr_getdelim(cstr *self, int delim, FILE *fp);
 STC_API void    cstr_erase_n(cstr* self, size_t pos, size_t n);
 STC_API cstr    cstr_from_fmt(const char* fmt, ...);
@@ -226,20 +226,23 @@ STC_INLINE bool cstr_ends_with(cstr s, const char* sub) {
 STC_INLINE bool cstr_ends_with_s(cstr s, cstr sub)
     { return cstr_ends_with(s, cstr_str(&sub)); }
 
-STC_INLINE void cstr_assign(cstr* self, const char* str)
-    { cstr_assign_n(self, str, strlen(str)); }
+STC_INLINE char* cstr_assign(cstr* self, const char* str)
+    { return cstr_assign_n(self, str, strlen(str)); }
 
-STC_INLINE void cstr_copy(cstr* self, cstr s) {
+STC_INLINE char* cstr_assign_s(cstr* self, cstr s) {
     csview sv = cstr_sv(&s);
-    cstr_assign_n(self, sv.str, sv.size);
+    return cstr_assign_n(self, sv.str, sv.size);
 }
 
-STC_INLINE void cstr_append(cstr* self, const char* str)
-    { cstr_append_n(self, str, strlen(str)); }
+STC_INLINE void cstr_copy(cstr* self, cstr s)
+    { cstr_assign_s(self, s); }
 
-STC_INLINE void cstr_append_s(cstr* self, cstr s) {
+STC_INLINE char* cstr_append(cstr* self, const char* str)
+    { return cstr_append_n(self, str, strlen(str)); }
+
+STC_INLINE char* cstr_append_s(cstr* self, cstr s) {
     csview sv = cstr_sv(&s);
-    cstr_append_n(self, sv.str, sv.size);
+    return cstr_append_n(self, sv.str, sv.size);
 }
 
 STC_INLINE void cstr_replace_n(cstr* self, size_t pos, size_t len, const char* str, size_t n) {
@@ -352,14 +355,14 @@ STC_DEF size_t cstr_find_n(cstr s, const char* needle, const size_t pos, const s
     return res ? res - sv.str : cstr_npos;
 }
 
-STC_DEF cstr* cstr_assign_n(cstr* self, const char* str, const size_t n) {
+STC_DEF char* cstr_assign_n(cstr* self, const char* str, const size_t n) {
     char* d = cstr_reserve(self, n);
     memmove(d, str, n);
     _cstr_set_size(self, n);
-    return self;
+    return d;
 }
 
-STC_DEF cstr* cstr_append_n(cstr* self, const char* str, const size_t n) {
+STC_DEF char* cstr_append_n(cstr* self, const char* str, const size_t n) {
     cstr_buf r = cstr_buffer(self);
     if (r.size + n > r.cap) {
         const size_t off = (size_t)(str - r.data);
@@ -368,7 +371,7 @@ STC_DEF cstr* cstr_append_n(cstr* self, const char* str, const size_t n) {
     }
     memcpy(r.data + r.size, str, n);
     _cstr_set_size(self, r.size + n);
-    return self;
+    return r.data;
 }
 
 STC_DEF bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {

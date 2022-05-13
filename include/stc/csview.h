@@ -96,10 +96,10 @@ STC_INLINE csview       cstr_substr(const cstr* self, intptr_t pos, size_t n)
                             { return csview_substr(csview_from_s(self), pos, n); }
 STC_INLINE csview       cstr_slice(const cstr* self, intptr_t p1, intptr_t p2)
                             { return csview_slice(csview_from_s(self), p1, p2); }
-STC_INLINE cstr*        cstr_assign_sv(cstr* self, csview sv)
-                            { return cstr_assign_n(self, sv.str, sv.size); }
-STC_INLINE cstr*        cstr_append_sv(cstr* self, csview sv)
-                            { return cstr_append_n(self, sv.str, sv.size); }
+STC_INLINE csview       cstr_assign_sv(cstr* self, csview sv)
+                            { return c_make(csview){cstr_assign_n(self, sv.str, sv.size), sv.size}; }
+STC_INLINE void         cstr_append_sv(cstr* self, csview sv)
+                            { cstr_append_n(self, sv.str, sv.size); }
 STC_INLINE void         cstr_insert_sv(cstr* self, size_t pos, csview sv)
                             { cstr_replace_n(self, pos, 0, sv.str, sv.size); }
 STC_INLINE void         cstr_replace_sv(cstr* self, csview sub, csview with)

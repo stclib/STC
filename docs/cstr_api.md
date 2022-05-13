@@ -45,14 +45,15 @@ void         cstr_shrink_to_fit(cstr* self);
 char*        cstr_expand_uninit(cstr* self, size_t n);         // return ptr to uninit data
 void         cstr_clear(cstr* self);
 
-cstr*        cstr_assign(cstr* self, const char* str);
-cstr*        cstr_assign_n(cstr* self, const char* str, size_t n);    // assign n first chars of str
-cstr*        cstr_copy(cstr* self, cstr s);                           // cstr_take(self, cstr_clone(s))
+char*        cstr_assign(cstr* self, const char* str);
+char*        cstr_assign_s(cstr* self, cstr s);
+char*        cstr_assign_n(cstr* self, const char* str, size_t n);    // assign n first chars of str
+void         cstr_copy(cstr* self, cstr s);                           // like cstr_assign_s()
 int          cstr_printf(cstr* self, const char* fmt, ...);           // printf() formatting
 
-cstr*        cstr_append(cstr* self, const char* str);
-cstr*        cstr_append_s(cstr* self, cstr s);
-cstr*        cstr_append_n(cstr* self, const char* str, size_t n);
+char*        cstr_append(cstr* self, const char* str);
+char*        cstr_append_s(cstr* self, cstr s);
+char*        cstr_append_n(cstr* self, const char* str, size_t n);
 
 void         cstr_insert(cstr* self, size_t pos, const char* str);
 void         cstr_insert_s(cstr* self, size_t pos, cstr s);
