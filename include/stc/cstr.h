@@ -353,12 +353,8 @@ STC_DEF size_t cstr_find_n(cstr s, const char* needle, const size_t pos, const s
 }
 
 STC_DEF cstr* cstr_assign_n(cstr* self, const char* str, const size_t n) {
-    cstr_buf r = cstr_buffer(self);
-    if (n > r.cap) {
-        r.data = (char *)c_realloc(cstr_is_long(self) ? r.data : NULL, n + 1);
-        cstr_l_set_cap(self, n);
-    }
-    memmove(r.data, str, n);
+    char* d = cstr_reserve(self, n);
+    memmove(d, str, n);
     _cstr_set_size(self, n);
     return self;
 }
