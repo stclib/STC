@@ -30,7 +30,7 @@
 #define                 csview_null  c_sv("")
 #define                 csview_new(literal) c_sv(literal)
 #define                 csview_npos  (SIZE_MAX >> 1)
-#define                 c_PRIsv      "%.*s"
+#define                 c_PRIsv      ".*s"
 #define                 c_ARGsv(sv)  (int)(sv).size, (sv).str
 
 STC_API csview          csview_substr(csview sv, intptr_t pos, size_t n);

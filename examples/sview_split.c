@@ -10,7 +10,7 @@ int  main()
     const csview month = csview_token(date, c_sv("/"), &pos);
     const csview day = csview_token(date, c_sv("/"), &pos);
 
-    printf(c_PRIsv ", " c_PRIsv ", " c_PRIsv "\n", 
+    printf("%" c_PRIsv ", %" c_PRIsv ", %" c_PRIsv "\n", 
            c_ARGsv(year), c_ARGsv(month), c_ARGsv(day));
 
     c_auto (cstr, y, m, d) {

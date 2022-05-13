@@ -26,7 +26,7 @@ int main()
         }
 
         while (cregex_find(&re, s, 10, m, creg_next) > 0) {
-            printf(c_PRIsv " ; ", c_ARGsv(m[0]));
+            printf("%" c_PRIsv " ; ", c_ARGsv(m[0]));
         }
         puts("");
     }

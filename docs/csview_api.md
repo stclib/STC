@@ -111,12 +111,12 @@ uint64_t        csview_hash(const csview* x);
 
 ## Constants and macros
 
-| Name           | Value                | Usage                                         |
-|:---------------|:---------------------|:----------------------------------------------|
-| `csview_null`  | same as `c_sv("")`   | `sview = csview_null;`                        |
-| `csview_npos`  | same as `cstr_npos`  |                                               |
-| `c_PRIsv`      | printf format csview |                                               |
-| `c_ARGsv(sv)`  | printf argument      | `printf("view: " c_PRIsv "\n", c_ARGsv(sv));` |
+| Name           | Value                | Usage                                        |
+|:---------------|:---------------------|:---------------------------------------------|
+| `csview_null`  | same as `c_sv("")`   | `sview = csview_null;`                       |
+| `csview_npos`  | same as `cstr_npos`  |                                              |
+| `c_PRIsv`      | printf format        |                                              |
+| `c_ARGsv(sv)`  | printf argument      | `printf("sv: %" c_PRIsv "\n", c_ARGsv(sv));` |
 
 ## Example
 ```c
@@ -132,8 +132,8 @@ int main ()
     size_t pos = cstr_find(str1, "live");               // position of "live" in str1
     csview sv2 = cstr_substr(&str1, pos, 4);            // get "live"
     csview sv3 = cstr_slice(&str1, -8, -1);             // get "details"
-    printf(c_PRIsv c_PRIsv c_PRIsv "\n", c_ARGsv(sv1), c_ARGsv(sv2), c_ARGsv(sv3));
-
+    printf("%" c_PRIsv "%" c_PRIsv "%" c_PRIsv "\n", 
+           c_ARGsv(sv1), c_ARGsv(sv2), c_ARGsv(sv3));
     cstr s1 = cstr_new("Apples are red");
     cstr s2 = cstr_from_sv(cstr_substr(&s1, -3, 3));    // "red"
     cstr s3 = cstr_from_sv(cstr_substr(&s1, 0, 6));     // "Apples"
@@ -162,7 +162,7 @@ int main()
 
         csview sv = csview_from_s(&s1);
         c_foreach (i, csview, sv)
-            printf(c_PRIsv ",", c_ARGsv(i.codep));
+            printf("%" c_PRIsv ",", c_ARGsv(i.codep));
     }
 }
 ```
@@ -184,7 +184,7 @@ void print_split(csview str, csview sep)
     while (pos != str.size) {
         csview tok = csview_token(str, sep, &pos);
         // print non-null-terminated csview
-        printf("[" c_PRIsv "]\n", c_ARGsv(tok));
+        printf("[%" c_PRIsv "]\n", c_ARGsv(tok));
     }
 }
 

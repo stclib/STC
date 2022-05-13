@@ -8,7 +8,7 @@ void print_split(csview str, csview sep)
     while (pos != str.size) {
         csview tok = csview_token(str, sep, &pos);
         // print non-null-terminated csview
-        printf("[" c_PRIsv "]\n", c_ARGsv(tok));
+        printf("[%" c_PRIsv "]\n", c_ARGsv(tok));
     }
 }
 

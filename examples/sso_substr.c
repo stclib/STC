@@ -8,7 +8,7 @@ int main ()
     size_t pos = cstr_find(str, "live");                // position of "live"
     csview sv2 = cstr_substr(&str, pos, 4);             // "live"
     csview sv3 = cstr_slice(&str, -8, -1);              // "details"
-    printf(c_PRIsv ", " c_PRIsv ", " c_PRIsv "\n", 
+    printf("%" c_PRIsv ", %" c_PRIsv ", %" c_PRIsv "\n", 
            c_ARGsv(sv1), c_ARGsv(sv2), c_ARGsv(sv3));
 
     cstr_assign(&str, "apples are green or red");
