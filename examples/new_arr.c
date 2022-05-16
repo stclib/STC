@@ -14,7 +14,7 @@ int main()
 {
     int w = 7, h = 5, d = 3;
 
-    c_autovar (carr2_int volume = carr2_int_init(w, h),
+    c_autovar (carr2_int volume = carr2_int_new_uninit(w, h),
                                   carr2_int_drop(&volume))
     {
         int *dat = carr2_int_data(&volume);
@@ -31,7 +31,7 @@ int main()
         puts("\n");
     }
 
-    c_autovar (carr3_int volume = carr3_int_init(w, h, d),
+    c_autovar (carr3_int volume = carr3_int_new_uninit(w, h, d),
                                   carr3_int_drop(&volume))
     {
         int *dat = carr3_int_data(&volume);
@@ -49,7 +49,7 @@ int main()
         puts("");
     }
 
-    c_autovar (carr2_str text2d = carr2_str_with_values(h, d, cstr_init()),
+    c_autovar (carr2_str text2d = carr2_str_with_size(h, d, cstr_init()),
                                   carr2_str_drop(&text2d))
     {
         cstr_assign(&text2d.data[2][1], "hello");

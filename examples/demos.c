@@ -191,7 +191,7 @@ void mapdemo3()
 void arraydemo1()
 {
     printf("\nARRAYDEMO1\n");
-    c_autovar (carr3_f arr3 = carr3_f_with_values(30, 20, 10, 0.0f), 
+    c_autovar (carr3_f arr3 = carr3_f_with_size(30, 20, 10, 0.0f), 
                              carr3_f_drop(&arr3))
     {
         arr3.data[5][4][3] = 10.2f;

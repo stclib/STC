@@ -35,7 +35,7 @@
 
 int main() {
     int w = 7, h = 5;
-    c_autovar (carr2_int image = carr2_int_init(w, h), carr2_int_drop(&image))
+    c_autovar (carr2_int image = carr2_int_new_uninit(w, h), carr2_int_drop(&image))
     {
         int *dat = carr2_int_data(&image);
         for (int i = 0; i < carr2_int_size(image); ++i)
@@ -61,8 +61,8 @@ int main() {
 _cx_deftypes(_c_carr2_types, _cx_self, i_key);
 #endif
 
-STC_API _cx_self   _cx_memb(_with_values)(size_t xdim, size_t ydim, i_key value);
-STC_API _cx_self   _cx_memb(_with_storage)(size_t xdim, size_t ydim, _cx_value* storage);
+STC_API _cx_self   _cx_memb(_with_size)(size_t xdim, size_t ydim, i_key null);
+STC_API _cx_self   _cx_memb(_with_data)(size_t xdim, size_t ydim, _cx_value* storage);
 STC_API _cx_value* _cx_memb(_release)(_cx_self* self);
 STC_API void       _cx_memb(_drop)(_cx_self* self);
 #if !defined _i_no_clone
@@ -70,8 +70,8 @@ STC_API _cx_self   _cx_memb(_clone)(_cx_self src);
 STC_API void       _cx_memb(_copy)(_cx_self *self, _cx_self other);
 #endif
 
-STC_INLINE _cx_self _cx_memb(_init)(size_t xdim, size_t ydim) {
-    return _cx_memb(_with_storage)(xdim, ydim, c_alloc_n(_cx_value, xdim*ydim));
+STC_INLINE _cx_self _cx_memb(_new_uninit)(size_t xdim, size_t ydim) {
+    return _cx_memb(_with_data)(xdim, ydim, c_alloc_n(_cx_value, xdim*ydim));
 }
 STC_INLINE size_t _cx_memb(_size)(_cx_self arr)
     { return arr.xdim*arr.ydim; }
@@ -100,24 +100,24 @@ STC_INLINE void _cx_memb(_next)(_cx_iter* it)
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement)
 
-STC_DEF _cx_self _cx_memb(_with_storage)(size_t xdim, size_t ydim, _cx_value* block) {
+STC_DEF _cx_self _cx_memb(_with_data)(size_t xdim, size_t ydim, _cx_value* block) {
     _cx_self _arr = {c_alloc_n(_cx_value*, xdim), xdim, ydim};
     for (size_t x = 0; x < xdim; ++x, block += ydim)
         _arr.data[x] = block;
     return _arr;
 }
 
-STC_DEF _cx_self _cx_memb(_with_values)(size_t xdim, size_t ydim, i_key value) {
-    _cx_self _arr = _cx_memb(_init)(xdim, ydim);
+STC_DEF _cx_self _cx_memb(_with_size)(size_t xdim, size_t ydim, i_key null) {
+    _cx_self _arr = _cx_memb(_new_uninit)(xdim, ydim);
     for (_cx_value* p = _arr.data[0], *e = p + xdim*ydim; p != e; ++p)
-        *p = value;
+        *p = null;
     return _arr;
 }
 
 #if !defined _i_no_clone
 
 STC_DEF _cx_self _cx_memb(_clone)(_cx_self src) {
-    _cx_self _arr = _cx_memb(_init)(src.xdim, src.ydim);
+    _cx_self _arr = _cx_memb(_new_uninit)(src.xdim, src.ydim);
     for (_cx_value* p = _arr.data[0], *q = src.data[0], *e = p + _cx_memb(_size)(src); p != e; ++p, ++q)
         *p = i_keyclone((*q));
     return _arr;

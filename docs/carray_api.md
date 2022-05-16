@@ -22,9 +22,9 @@ See the c++ class [boost::multi_array](https://www.boost.org/doc/libs/release/li
 
 carr2_X:
 ```c
-carr2_X             carr2_X_init(size_t xdim, size_t ydim);
-carr2_X             carr2_X_with_values(size_t xdim, size_t ydim, i_val val);
-carr2_X             carr2_X_with_storage(size_t xdim, size_t ydim, i_val* array);
+carr2_X             carr2_X_with_size(size_t xdim, size_t ydim, i_val val);
+carr2_X             carr2_X_with_data(size_t xdim, size_t ydim, i_val* array);
+carr2_X             carr2_X_new_uninit(size_t xdim, size_t ydim);
 carr2_X             carr2_X_clone(carr2_X arr);
 void                carr2_X_copy(carr2_X* self, carr2_X other);
 i_val*              carr2_X_release(carr2_X* self);       // release storage (not freed)
@@ -39,11 +39,13 @@ carr2_X_iter        carr2_X_begin(const carr2_X* self);
 carr2_X_iter        carr2_X_end(const carr2_X* self);
 void                carr2_X_next(carr2_X_iter* it);
 ```
+The **carr2** elements can be accessed with `arr.data[x][y];` or with `carr2_i_at(&arr, x, y)`.
+
 carr3:
 ```c
-carr3_X             carr3_X_init(size_t xdim, size_t ydim, size_t zdim);
-carr3_X             carr3_X_with_values(size_t xdim, size_t ydim, size_t zdim, i_val val);
-carr3_X             carr3_X_with_storage(size_t xdim, size_t ydim, size_t zdim, i_val* array);
+carr3_X             carr3_X_with_size(size_t xdim, size_t ydim, size_t zdim, i_val val);
+carr3_X             carr3_X_with_data(size_t xdim, size_t ydim, size_t zdim, i_val* array);
+carr3_X             carr3_X_new_uninit(size_t xdim, size_t ydim, size_t zdim);
 carr3_X             carr3_X_clone(carr3_X arr);
 void                carr3_X_copy(carr3_X* self, carr3_X other);
 i_val*              carr3_X_release(carr3_X* self);                               // release storage (not freed)
@@ -58,6 +60,8 @@ carr3_X_iter        carr3_X_begin(const carr3_X* self);
 carr3_X_iter        carr3_X_end(const carr3_X* self);
 void                carr3_X_next(carr3_X_iter* it);
 ```
+The **carr3** elements can be accessed with `arr.data[x][y][z];` or with `carr3_i_at(&arr, x, y, z)`.
+
 ## Types
 
 | Type name         | Type definition                                      | Used to represent... |
@@ -69,8 +73,6 @@ void                carr3_X_next(carr3_X_iter* it);
 | `carr3_X`         | `struct { i_val ***data; size_t xdim, ydim, zdim; }` | The array 3D type    |
 | `carr3_X_value`   | `i_val`                                              | The value type       |
 | `carr3_X_iter`    | `struct { i_val *ref; }`                             | Iterator type        |
-
-The **carr3** elements can be accessed like `carr3_i arr = ...; int val = arr.data[x][y][z];`, or with `carr3_i_at(&arr, x, y, z)`.
 
 ## Example
 ```c
@@ -89,7 +91,7 @@ int main()
     // Ex1
     int xd = 30, yd = 20, zd = 10;
     // define arr3[30][20][10], initialized with zeros.
-    c_autovar (carr3_f arr3 = carr3_f_with_values(xd, yd, zd, 0.0f), 
+    c_autovar (carr3_f arr3 = carr3_f_with_size(xd, yd, zd, 0.0f), 
                               carr3_f_drop(&arr3)) {
         arr3.data[5][4][3] = 3.14f;
 
@@ -103,7 +105,7 @@ int main()
 
     // Ex2
     int w = 256, h = 128;
-    c_autovar (carr2_i image = carr2_i_init(w, h), carr2_i_drop(&image)) {
+    c_autovar (carr2_i image = carr2_i_new_uninit(w, h), carr2_i_drop(&image)) {
         int n = 0;
         c_foreach (i, carr2_i, image) {
             uint32_t t = n++ % 256;
