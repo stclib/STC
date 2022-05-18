@@ -1,5 +1,5 @@
 #!/bin/bash
-cc='gcc -s -O2 -Wall -std=c99 -pedantic'
+cc='gcc -s -O2 -Wall -std=c99 -pedantic -Wfatal-errors'
 #cc='clang -s -O2 -Wall -std=c99 -pedantic'
 #cc='clang -s -O2 -Wall -std=c99 -pedantic -DSTC_CSTR_V1 -DSTC_CSMAP_V1'
 #cc='gcc -x c++ -s -O2 -Wall -std=c++20'

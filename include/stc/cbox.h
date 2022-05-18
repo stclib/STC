@@ -79,86 +79,78 @@ _cx_deftypes(_c_cbox_types, _cx_self, i_key);
 #endif
 
 // constructors (takes ownsership)
-STC_INLINE _cx_self
-_cx_memb(_init)(void) { return c_make(_cx_self){NULL}; }
+STC_INLINE _cx_self _cx_memb(_init)(void)
+    { return c_make(_cx_self){NULL}; }
 
-STC_INLINE long
-_cx_memb(_use_count)(_cx_self box) { return (long)(box.get != NULL); }
+STC_INLINE long _cx_memb(_use_count)(_cx_self box)
+    { return (long)(box.get != NULL); }
 
-STC_INLINE _cx_self
-_cx_memb(_from_ptr)(_cx_value* p) { return c_make(_cx_self){p}; }
+STC_INLINE _cx_self _cx_memb(_from_ptr)(_cx_value* p)
+    { return c_make(_cx_self){p}; }
 
-STC_INLINE _cx_self
-_cx_memb(_make)(_cx_value val) { // c++: std::make_unique<i_key>(val)
+// c++: std::make_unique<i_key>(val)
+STC_INLINE _cx_self _cx_memb(_make)(_cx_value val) {
     _cx_self ptr = {c_alloc(_cx_value)};
     *ptr.get = val; return ptr;
 }
 
-STC_INLINE _cx_raw
-_cx_memb(_toraw)(const _cx_self* self) {
-    return i_keyto(self->get);
-}
-
-STC_INLINE _cx_value
-_cx_memb(_get)(const _cx_self* self) {
-    return *self->get;
-}
+STC_INLINE _cx_raw _cx_memb(_toraw)(const _cx_self* self)
+    { return i_keyto(self->get); }
 
 // destructor
-STC_INLINE void
-_cx_memb(_drop)(_cx_self* self) {
-    if (self->get) { i_keydrop(self->get); c_free(self->get); }
+STC_INLINE void _cx_memb(_drop)(_cx_self* self) {
+    if (self->get) {
+        i_keydrop(self->get);
+        c_free(self->get);
+    }
 }
 
-STC_INLINE _cx_self
-_cx_memb(_move)(_cx_self* self) {
-    _cx_self ptr = *self; self->get = NULL;
+STC_INLINE _cx_self _cx_memb(_move)(_cx_self* self) {
+    _cx_self ptr = *self; 
+    self->get = NULL;
     return ptr;
 }
 
-STC_INLINE void
-_cx_memb(_reset)(_cx_self* self) {
-    _cx_memb(_drop)(self); self->get = NULL;
+STC_INLINE void _cx_memb(_reset)(_cx_self* self) {
+    _cx_memb(_drop)(self);
+    self->get = NULL;
 }
 
 // take ownership of p
-STC_INLINE void
-_cx_memb(_reset_to)(_cx_self* self, _cx_value* p) {
-    if (self->get) i_keydrop(self->get);
+STC_INLINE void _cx_memb(_reset_to)(_cx_self* self, _cx_value* p) {
+    if (self->get)
+        i_keydrop(self->get);
     self->get = p;
 }
 
 #if !defined _i_no_clone
 #if !defined _i_no_emplace
-    STC_INLINE _cx_self
-    _cx_memb(_from)(_cx_raw raw) { 
-        return _cx_memb(_make)(i_keyfrom(raw));
-    }
+    STC_INLINE _cx_self _cx_memb(_from)(_cx_raw raw)
+        { return _cx_memb(_make)(i_keyfrom(raw)); }
 #endif
-    STC_INLINE _cx_self
-    _cx_memb(_clone)(_cx_self other) {
-        if (!other.get) return other;
+    STC_INLINE _cx_self _cx_memb(_clone)(_cx_self other) {
+        if (!other.get)
+            return other;
         _cx_self out = {c_alloc(i_key)};
         *out.get = i_keyclone(*other.get);
         return out;
     }
 
-    STC_INLINE void
-    _cx_memb(_copy)(_cx_self* self, _cx_self other) {
-        if (self->get == other.get) return;
+    STC_INLINE void _cx_memb(_copy)(_cx_self* self, _cx_self other) {
+        if (self->get == other.get)
+            return;
         _cx_memb(_drop)(self);
         *self = _cx_memb(_clone)(other);
     }
 #endif // !_i_no_clone
 
-STC_INLINE void
-_cx_memb(_take)(_cx_self* self, _cx_self other) {
-    if (other.get != self->get) _cx_memb(_drop)(self);
+STC_INLINE void _cx_memb(_take)(_cx_self* self, _cx_self other) {
+    if (other.get != self->get)
+        _cx_memb(_drop)(self);
     *self = other;
 }
 
-STC_INLINE uint64_t
-_cx_memb(_value_hash)(const _cx_value* x) {
+STC_INLINE uint64_t _cx_memb(_value_hash)(const _cx_value* x) {
     #if c_option(c_no_cmp)
         return c_default_hash(&x);
     #else
@@ -167,8 +159,7 @@ _cx_memb(_value_hash)(const _cx_value* x) {
     #endif
 }
 
-STC_INLINE int
-_cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
+STC_INLINE int _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     #if c_option(c_no_cmp)
         return c_default_cmp(&x, &y);
     #else
@@ -177,8 +168,7 @@ _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     #endif
 }
 
-STC_INLINE bool
-_cx_memb(_value_eq)(const _cx_value* x, const _cx_value* y) {
+STC_INLINE bool _cx_memb(_value_eq)(const _cx_value* x, const _cx_value* y) {
     #if c_option(c_no_cmp)
         return x == y;
     #else
