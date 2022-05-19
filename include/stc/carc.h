@@ -115,6 +115,9 @@ STC_INLINE _cx_self _cx_memb(_make)(_cx_value val) {
 STC_INLINE _cx_raw _cx_memb(_toraw)(const _cx_self* self)
     { return i_keyto(self->get); }
 
+STC_INLINE _cx_value _cx_memb(_toval)(const _cx_self* self)
+    { return *self->get; }
+
 STC_INLINE _cx_self _cx_memb(_move)(_cx_self* self) {
     _cx_self ptr = *self;
     self->get = NULL, self->use_count = NULL;
