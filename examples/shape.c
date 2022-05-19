@@ -4,11 +4,17 @@
 #include <stdio.h>
 #include <stc/ccommon.h>
 
-#define c_self(s, T, vtable) \
-    T* self = c_container_of(s, T, vtable)
-#define c_is_first(T, memb) \
-    c_static_assert(offsetof(T, memb) == 0)
+#define c_self(s, T, api) \
+    T* self = (T *)s; \
+    assert(*s == &T##_##api)
 
+#define c_vtable(Interface, T, api) \
+    c_static_assert(offsetof(T, api) == 0); \
+    static Interface T##_##api
+
+
+// Shape definition
+// ============================================================
 
 typedef struct { float x, y; } Point;
 
@@ -22,7 +28,7 @@ void Shape_drop(Shape** shape)
 }
 
 void Shape_delete(Shape** shape)
-{ 
+{
     if (shape) {
         (*shape)->drop(shape);
         c_free(shape);
@@ -37,10 +43,10 @@ typedef struct {
     Point p[3];
 } Triangle;
 
-c_is_first(Triangle, api);
+c_vtable(Shape, Triangle, api);
 
 
-void Triangle_draw(Shape** shape)
+static void Triangle_draw(Shape** shape)
 {
     const c_self(shape, Triangle, api);
     printf("Triangle: (%g,%g), (%g,%g), (%g,%g)\n",
@@ -72,17 +78,17 @@ typedef struct {
     PVec points;
 } Polygon;
 
-c_is_first(Polygon, api);
+c_vtable(Shape, Polygon, api);
 
 
-void Polygon_drop(Shape** shape)
+static void Polygon_drop(Shape** shape)
 {
     puts("drop poly");
     c_self(shape, Polygon, api);
     PVec_drop(&self->points);
 }
 
-void Polygon_draw(Shape** shape)
+static void Polygon_draw(Shape** shape)
 {
     const c_self(shape, Polygon, api);
     printf("Polygon:");
