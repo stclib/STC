@@ -138,11 +138,13 @@
 #endif
 
 #if !defined i_key
-  #error "no i_key or i_val provided"
+  #error "no i_key or i_val defined"
 #elif defined i_keyraw ^ defined i_keyto
-  #error "if i_keyraw is defined, i_keyto must be defined, and vice versa"
+  #error "both i_keyraw and i_keyto must be defined, if any"
+#elif defined i_keyfrom && !defined i_keyraw
+  #error "i_keyfrom defined without i_keyraw"
 #elif defined i_from || defined i_drop
-  #error "i_from / i_drop are not supported. Define i_keyfrom/i_valfrom and-or i_keydrop/i_valdrop instead."
+  #error "i_from / i_drop not supported. Define i_keyfrom/i_valfrom and/or i_keydrop/i_valdrop instead"
 #endif
 
 #ifndef i_tag
@@ -155,7 +157,7 @@
   #define i_keyraw i_key
 #endif
 #ifndef i_keyfrom
-  #define i_keyfrom c_default_from
+  #define i_keyfrom c_default_clone
 #else
   #define _i_has_from
 #endif
@@ -163,7 +165,7 @@
   #define i_keyto c_default_toraw
 #endif
 #ifndef i_keyclone
-  #define i_keyclone(key) (key)
+  #define i_keyclone c_default_clone
 #endif
 #ifndef i_keydrop
   #define i_keydrop c_default_drop
@@ -214,7 +216,9 @@
 #endif
 
 #if defined i_valraw ^ defined i_valto
-  #error "if i_valraw is defined, i_valto must be defined, and vice versa"
+  #error "both i_valto and i_valraw must be defined, if any"
+#elif defined i_valfrom && !defined i_valraw
+  #error "i_valfrom defined without i_valraw"
 #endif
 
 #if !defined i_valclone && (defined i_valdrop || defined i_valraw)
@@ -224,7 +228,7 @@
   #define i_valraw i_val
 #endif
 #ifndef i_valfrom
-  #define i_valfrom c_default_from
+  #define i_valfrom c_default_clone
 #else
   #define _i_has_from
 #endif
@@ -232,7 +236,7 @@
   #define i_valto c_default_toraw
 #endif
 #ifndef i_valclone
-  #define i_valclone(val) (val)
+  #define i_valclone c_default_clone
 #endif
 #ifndef i_valdrop
   #define i_valdrop c_default_drop

@@ -223,7 +223,7 @@ c_drop(cstr, &a, &b);
 ### General predefined template parameter functions
 ```
 int         c_default_cmp(const Type*, const Type*);
-Type        c_default_from(Type val);            // simple copy
+Type        c_default_clone(Type val);           // simple copy
 Type        c_default_toraw(const Type* val);    // dereference val
 void        c_default_drop(Type* val);           // does nothing
 

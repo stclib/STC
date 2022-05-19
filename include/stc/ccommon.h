@@ -95,7 +95,7 @@
 #define c_memcmp_eq(x, y)       (memcmp(x, y, sizeof *(x)) == 0)
 #define c_default_hash(x)       c_fasthash(x, sizeof *(x))
 
-#define c_default_from(v)       (v)
+#define c_default_clone(v)      (v)
 #define c_default_toraw(vp)     (*(vp))
 #define c_default_drop(vp)      ((void) (vp))
 #define c_derived_keyclone(v)   i_keyfrom((i_keyto((&(v)))))

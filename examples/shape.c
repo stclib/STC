@@ -83,8 +83,8 @@ c_vtable(Shape, Polygon, api);
 
 static void Polygon_drop(Shape** shape)
 {
-    puts("drop poly");
     c_self(shape, Polygon, api);
+    puts("drop poly");
     PVec_drop(&self->points);
 }
 
@@ -123,18 +123,27 @@ void testShape(Shape** shape)
     (*shape)->draw(shape);
 }
 
+#define i_type Shapes
+#define i_val Shape**
+#define i_opt c_no_clone
+#define i_valdrop(x) Shape_delete(*x)
+#include <stc/cstack.h>
+
 int main(void)
 {
-    c_autovar (Shape** tria = NULL, Shape_delete(tria))
-    c_autovar (Shape** poly = Polygon_new(), Shape_delete(poly))
+    c_auto (Shapes, shapes)
     {
-        tria = Triangle_new((Point){5, 7}, (Point){12, 7}, (Point){12, 20});
+        Shape** tria = Triangle_new((Point){5, 7}, (Point){12, 7}, (Point){12, 20});
+        Shape** poly = Polygon_new();
 
         c_apply(p, Polygon_addPoint(poly, p), Point, {
             {5, 7}, {12, 7}, {12, 20}, {82, 33}, {17, 56},
         });
 
-        testShape(tria);
-        testShape(poly);
+        Shapes_push(&shapes, tria);
+        Shapes_push(&shapes, poly);
+
+        c_foreach (i, Shapes, shapes)
+            testShape(*i.ref);
     }
 }
