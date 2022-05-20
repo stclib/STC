@@ -5,8 +5,9 @@
 #include <stc/ccommon.h>
 
 #define c_self(s, T) \
-    T* self = (T *)s; \
-    assert(self->base.api == &T##_api)
+    T* self = (T *)(s); \
+    assert(&T##_api == (s)->api && \
+           &T##_api == self->base.api)
 
 #define c_vtable(Api, T) \
     c_static_assert(offsetof(T, base) == 0); \
@@ -33,6 +34,7 @@ struct ShapeAPI {
 
 void Shape_drop(Shape* shape)
 {
+    printf("base destructed\n");
 }
 
 void Shape_delete(Shape* shape)
@@ -41,6 +43,7 @@ void Shape_delete(Shape* shape)
         shape->api->drop(shape);
         c_free(shape);
     }
+    printf("shape deleted\n");
 }
 
 // Triangle implementation
@@ -57,7 +60,7 @@ c_vtable(struct ShapeAPI, Triangle);
 static void Triangle_draw(const Shape* shape)
 {
     const c_self(shape, Triangle);
-    printf("Triangle: (%g,%g), (%g,%g), (%g,%g)\n",
+    printf("Triangle : (%g,%g), (%g,%g), (%g,%g)\n",
            self->p[0].x, self->p[0].y,
            self->p[1].x, self->p[1].y,
            self->p[2].x, self->p[2].y);
@@ -68,22 +71,21 @@ static struct ShapeAPI Triangle_api = {
     .draw = Triangle_draw,
 };
 
-Shape* Triangle_new(Point a, Point b, Point c)
+Triangle* Triangle_new(Point a, Point b, Point c)
 {
-    Triangle* s = c_new(Triangle, {{.api=&Triangle_api}, .p={a, b, c}});
-    return &s->base;
+    return c_new(Triangle, {{.api=&Triangle_api}, .p={a, b, c}});
 }
 
 // Polygon implementation
 // ============================================================
 
-#define i_type PVec 
+#define i_type PntVec 
 #define i_val Point
 #include <stc/cstack.h>
 
 typedef struct {
     Shape base;
-    PVec points;
+    PntVec points;
 } Polygon;
 
 c_vtable(struct ShapeAPI, Polygon);
@@ -92,16 +94,16 @@ c_vtable(struct ShapeAPI, Polygon);
 static void Polygon_drop(Shape* shape)
 {
     c_self(shape, Polygon);
-    puts("drop poly");
-    PVec_drop(&self->points);
+    printf("poly destructed\n");
+    PntVec_drop(&self->points);
     Shape_drop(shape);
 }
 
 static void Polygon_draw(const Shape* shape)
 {
     const c_self(shape, Polygon);
-    printf("Polygon:");
-    c_foreach (i, PVec, self->points)
+    printf("Polygon  :");
+    c_foreach (i, PntVec, self->points)
         printf(" (%g,%g)", i.ref->x, i.ref->y);
     puts("");
 }
@@ -111,26 +113,19 @@ static struct ShapeAPI Polygon_api = {
     .draw = Polygon_draw,
 };
 
-Shape* Polygon_new(void)
+Polygon* Polygon_new(void)
 {
-    Polygon* s = c_new(Polygon, {{.api=&Polygon_api}, .points=PVec_init()});
-    return &s->base;
+    return c_new(Polygon, {{.api=&Polygon_api}, .points=PntVec_init()});
 }
 
-void Polygon_addPoint(Shape* shape, Point p)
+void Polygon_addPoint(Polygon* self, Point p)
 {
-    c_self(shape, Polygon);
-    PVec_push(&self->points, p);
+    PntVec_push(&self->points, p);
 }
 
 
 // Test
 // ============================================================
-
-void testShape(Shape* shape)
-{
-    shape->api->draw(shape);
-}
 
 #define i_type Shapes
 #define i_val Shape*
@@ -138,19 +133,31 @@ void testShape(Shape* shape)
 #define i_valdrop(x) Shape_delete(*x)
 #include <stc/cstack.h>
 
+void testShape(Shape* shape)
+{
+    shape->api->draw(shape);
+}
+
+
 int main(void)
 {
     c_auto (Shapes, shapes)
     {
-        Shape* tria = Triangle_new((Point){5, 7}, (Point){12, 7}, (Point){12, 20});
-        Shape* poly = Polygon_new();
+        Triangle* t1 = Triangle_new((Point){5, 7}, (Point){12, 7}, (Point){12, 20});
 
-        c_apply(p, Polygon_addPoint(poly, p), Point, {
-            {5, 7}, {12, 7}, {12, 20}, {82, 33}, {17, 56},
+        Polygon* p1 = Polygon_new();
+        c_apply(pnt, Polygon_addPoint(p1, pnt), Point, {
+            {50, 72}, {123, 73}, {127, 201}, {828, 333},
         });
 
-        Shapes_push(&shapes, tria);
-        Shapes_push(&shapes, poly);
+        Polygon* p2 = Polygon_new();
+        c_apply(pnt, Polygon_addPoint(p2, pnt), Point, {
+            {5, 7}, {12, 7}, {12, 20}, {82, 33}, {17, 56},
+        });
+        
+        Shapes_push(&shapes, &t1->base);
+        Shapes_push(&shapes, &p1->base);
+        Shapes_push(&shapes, &p2->base);
 
         c_foreach (i, Shapes, shapes)
             testShape(*i.ref);
