@@ -79,15 +79,14 @@ STC_API char* _cstr_internal_move(cstr* self, size_t pos1, size_t pos2);
 STC_API char*   cstr_reserve(cstr* self, size_t cap);
 STC_API void    cstr_shrink_to_fit(cstr* self);
 STC_API void    cstr_resize(cstr* self, size_t size, char value);
-STC_API size_t  cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax);
+STC_API size_t  cstr_find_n(cstr s, const char* search, size_t pos, size_t nmax);
 STC_API char*   cstr_assign_n(cstr* self, const char* str, size_t n);
 STC_API char*   cstr_append_n(cstr* self, const char* str, size_t n);
 STC_API bool    cstr_getdelim(cstr *self, int delim, FILE *fp);
 STC_API void    cstr_erase_n(cstr* self, size_t pos, size_t n);
 STC_API cstr    cstr_from_fmt(const char* fmt, ...);
 STC_API int     cstr_printf(cstr* self, const char* fmt, ...);
-STC_API void    cstr_replace_all(cstr* self, const char* find, const char* repl);
-STC_API cstr    cstr_from_replace_all_sv(csview sv, csview find, csview repl);
+STC_API void    cstr_replace_all(cstr* self, const char* search, const char* repl);
 
 STC_INLINE cstr_buf cstr_buffer(cstr* s) {
     return cstr_is_long(s)
@@ -195,19 +194,19 @@ STC_INLINE bool cstr_equals(cstr s1, const char* str)
 STC_INLINE bool cstr_equals_s(cstr s1, cstr s2)
     { return cstr_cmp(&s1, &s2) == 0; }
 
-STC_INLINE size_t cstr_find(cstr s, const char* needle) {
-    const char *str = cstr_str(&s), *res = strstr(str, needle);
+STC_INLINE size_t cstr_find(cstr s, const char* search) {
+    const char *str = cstr_str(&s), *res = strstr(str, search);
     return res ? res - str : cstr_npos;
 }
 
-STC_INLINE bool cstr_find_s(cstr s, cstr needle)
-    { return cstr_find(s, cstr_str(&needle)); }
+STC_INLINE bool cstr_find_s(cstr s, cstr search)
+    { return cstr_find(s, cstr_str(&search)); }
 
-STC_INLINE bool cstr_contains(cstr s, const char* needle)
-    { return strstr(cstr_str(&s), needle) != NULL; }
+STC_INLINE bool cstr_contains(cstr s, const char* search)
+    { return strstr(cstr_str(&s), search) != NULL; }
 
-STC_INLINE bool cstr_contains_s(cstr s, cstr needle)
-    { return strstr(cstr_str(&s), cstr_str(&needle)) != NULL; }
+STC_INLINE bool cstr_contains_s(cstr s, cstr search)
+    { return strstr(cstr_str(&s), cstr_str(&search)) != NULL; }
 
 STC_INLINE bool cstr_starts_with(cstr s, const char* sub) {
     const char* str = cstr_str(&s);
@@ -245,13 +244,21 @@ STC_INLINE char* cstr_append_s(cstr* self, cstr s) {
     return cstr_append_n(self, sv.str, sv.size);
 }
 
-STC_INLINE void cstr_replace_n(cstr* self, size_t pos, size_t len, const char* str, size_t n) {
+STC_INLINE void cstr_replace_n(cstr* self, size_t pos, size_t len, const char* repl, size_t n) {
     char* d = _cstr_internal_move(self, pos + len, pos + n);
-    memcpy(d + pos, str, n);
+    memcpy(d + pos, repl, n);
 }
 
-STC_INLINE void cstr_replace(cstr* self, size_t pos, size_t len, const char* str)
-    { cstr_replace_n(self, pos, len, str, strlen(str)); }
+STC_INLINE void cstr_replace(cstr* self, size_t pos, size_t len, const char* repl)
+    { cstr_replace_n(self, pos, len, repl, strlen(repl)); }
+
+STC_INLINE bool cstr_replace_first(cstr* self, const char* search, const char* repl) {
+    size_t pos = cstr_find(*self, search);
+    if (pos == cstr_npos)
+        return false;
+    cstr_replace_n(self, pos, strlen(search), repl, strlen(repl));
+    return true;
+}
 
 STC_INLINE void cstr_replace_s(cstr* self, size_t pos, size_t len, cstr s) {
     csview sv = cstr_sv(&s);
@@ -347,11 +354,11 @@ STC_DEF void cstr_resize(cstr* self, const size_t size, const char value) {
     _cstr_set_size(self, size);
 }
 
-STC_DEF size_t cstr_find_n(cstr s, const char* needle, const size_t pos, const size_t nmax) {
+STC_DEF size_t cstr_find_n(cstr s, const char* search, const size_t pos, const size_t nmax) {
     csview sv = cstr_sv(&s);
-    const size_t nlen = (size_t) strlen(needle);
+    const size_t nlen = (size_t) strlen(search);
     if (pos > sv.size) return cstr_npos;
-    char* res = c_strnstrn(sv.str + pos, needle, sv.size, nmax < nlen ? nmax : nlen);
+    char* res = c_strnstrn(sv.str + pos, search, sv.size, nmax < nlen ? nmax : nlen);
     return res ? res - sv.str : cstr_npos;
 }
 
@@ -396,32 +403,26 @@ STC_DEF bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
 
 STC_DEF cstr
 cstr_from_replace_all(const char* str, const size_t str_len,
-                      const char* find, const size_t find_len,
+                      const char* search, const size_t search_len,
                       const char* repl, const size_t repl_len) {
     cstr out = cstr_null;
     size_t from = 0; char* res;
-    if (find_len)
-        while ((res = c_strnstrn(str + from, find, str_len - from, find_len))) {
+    if (search_len)
+        while ((res = c_strnstrn(str + from, search, str_len - from, search_len))) {
             const size_t pos = res - str;
             cstr_append_n(&out, str + from, pos - from);
             cstr_append_n(&out, repl, repl_len);
-            from = pos + find_len;
+            from = pos + search_len;
         }
     cstr_append_n(&out, str + from, str_len - from);
     return out;
 }
 
 STC_DEF void
-cstr_replace_all(cstr* self, const char* find, const char* repl) {
+cstr_replace_all(cstr* self, const char* search, const char* repl) {
     csview sv = cstr_sv(self);
-    cstr_take(self, cstr_from_replace_all(sv.str, sv.size, find, strlen(find),
+    cstr_take(self, cstr_from_replace_all(sv.str, sv.size, search, strlen(search),
                                                            repl, strlen(repl)));
-}
-
-STC_DEF cstr
-cstr_from_replace_all_sv(csview sv, csview find, csview repl) {
-    return cstr_from_replace_all(sv.str, sv.size, find.str, find.size,
-                                                  repl.str, repl.size);
 }
 
 STC_DEF void cstr_erase_n(cstr* self, const size_t pos, size_t n) {

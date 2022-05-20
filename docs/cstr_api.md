@@ -22,7 +22,6 @@ cstr         cstr_from_n(const char* str, size_t n);                  // constru
 cstr         cstr_with_capacity(size_t cap);
 cstr         cstr_with_size(size_t len, char fill);                   // repeat fill len times
 cstr         cstr_from_fmt(const char* fmt, ...);                     // printf() formatting
-cstr         cstr_from_replace_all_sv(csview sv, csview find, csview repl);
 cstr         cstr_clone(cstr s);
 
 cstr*        cstr_take(cstr* self, cstr s);                           // take the constructed or moved string
@@ -59,19 +58,20 @@ void         cstr_insert(cstr* self, size_t pos, const char* str);
 void         cstr_insert_s(cstr* self, size_t pos, cstr s);
 void         cstr_insert_n(cstr* self, size_t pos, const char* str, size_t n);
 
-void         cstr_replace(cstr* self, size_t pos, size_t len, const char* str);
+void         cstr_replace(cstr* self, size_t pos, size_t len, const char* repl);
 void         cstr_replace_s(cstr* self, size_t pos, size_t len, cstr s);
-void         cstr_replace_n(cstr* self, size_t pos, size_t len, const char* str, size_t n);
-void         cstr_replace_all(cstr* self, const char* find, const char* replace);
+void         cstr_replace_n(cstr* self, size_t pos, size_t len, const char* repl, size_t n);
+void         cstr_replace_first(cstr* self, const char* search, const char* repl);
+void         cstr_replace_all(cstr* self, const char* search, const char* repl);
 
 void         cstr_erase(cstr* self, size_t pos);
 void         cstr_erase_n(cstr* self, size_t pos, size_t n);
 
 bool         cstr_equals(cstr s, const char* str);
 bool         cstr_equals_s(cstr s, cstr s2);
-size_t       cstr_find(cstr s, const char* needle);
-size_t       cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax);
-bool         cstr_contains(cstr s, const char* needle);
+size_t       cstr_find(cstr s, const char* search);
+size_t       cstr_find_n(cstr s, const char* search, size_t pos, size_t nmax);
+bool         cstr_contains(cstr s, const char* search);
 bool         cstr_starts_with(cstr s, const char* str);
 bool         cstr_ends_with(cstr s, const char* str);
 
@@ -92,7 +92,7 @@ int          cstr_cmp(const cstr *s1, const cstr *s2);
 bool         cstr_eq(const cstr *s1, const cstr *s2);
 bool         cstr_hash(const cstr *s);
 
-char*        c_strnstrn(const char* str, const char* needle, size_t slen, size_t nlen);
+char*        c_strnstrn(const char* str, const char* search, size_t slen, size_t nlen);
 int          c_strncasecmp(const char* str1, const char* str2, size_t n);
 ```
 

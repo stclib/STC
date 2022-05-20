@@ -77,7 +77,6 @@ uint32_t        utf8_decode(uint32_t *state, uint32_t *codep, const uint32_t byt
 ```c
 cstr            cstr_from_sv(csview sv);                            // construct cstr from csview
 csview          cstr_sv(const cstr* self);                          // convert to csview from const cstr*
-cstr            cstr_from_replace_all_sv(csview sv, csview find, csview replace);
 
 csview          cstr_substr(const cstr* s, intptr_t pos, size_t n); // negative pos count from end
 csview          cstr_slice(const cstr* s, intptr_t p, intptr_t q);  // negative p or q count from end
