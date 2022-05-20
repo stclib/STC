@@ -5,8 +5,8 @@
 #include <stc/ccommon.h>
 
 #define c_self(s, T) \
-    T* self = c_container_of(s, T, base); \
-    assert(s->api == &T##_api)
+    T* self = (T *)s; \
+    assert(self->base.api == &T##_api)
 
 #define c_vtable(Api, T) \
     c_static_assert(offsetof(T, base) == 0); \
@@ -94,7 +94,7 @@ static void Polygon_drop(Shape* shape)
     c_self(shape, Polygon);
     puts("drop poly");
     PVec_drop(&self->points);
-    Shape_drop(self);
+    Shape_drop(shape);
 }
 
 static void Polygon_draw(const Shape* shape)
