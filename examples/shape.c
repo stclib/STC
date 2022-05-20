@@ -94,6 +94,7 @@ static void Polygon_drop(Shape* shape)
     c_self(shape, Polygon);
     puts("drop poly");
     PVec_drop(&self->points);
+    Shape_drop(self);
 }
 
 static void Polygon_draw(const Shape* shape)
