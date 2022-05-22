@@ -39,7 +39,7 @@ int main()
         clist_i32_push_back(&lst, 123);
 
     c_auto (clist_pnt, plst) {
-        c_apply(v, clist_pnt_push_back(&plst, v), 
+        c_apply(v, clist_pnt_push_back(&plst, *v), 
             Point, {{42, 14}, {32, 94}, {62, 81}});
         clist_pnt_sort(&plst);
 
@@ -49,7 +49,7 @@ int main()
     }
 
     c_auto (clist_float, flst) {
-        c_apply(v, clist_float_push_back(&flst, v), 
+        c_apply(v, clist_float_push_back(&flst, *v), 
             float, {123.3f, 321.2f, -32.2f, 78.2f});
         c_foreach (i, clist_float, flst) printf(" %g", *i.ref);
     }

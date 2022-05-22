@@ -31,7 +31,7 @@ void example3()
 {
     c_auto (SongVec, vec, vec2)
     {
-        c_apply(v, SongVec_push_back(&vec, v), SongPtr, {
+        c_apply(v, SongVec_push_back(&vec, *v), SongPtr, {
             SongPtr_make(Song_new("Bob Dylan", "The Times They Are A Changing")),
             SongPtr_make(Song_new("Aretha Franklin", "Bridge Over Troubled Water")),
             SongPtr_make(Song_new("Thalia", "Entre El Mar y Una Estrella"))
@@ -41,7 +41,7 @@ void example3()
             if (!cstr_equals(s.ref->get->artist, "Bob Dylan"))
                 SongVec_push_back(&vec2, SongPtr_clone(*s.ref));
 
-        c_apply(v, SongVec_push_back(&vec2, v), SongPtr, {
+        c_apply(v, SongVec_push_back(&vec2, *v), SongPtr, {
             SongPtr_make(Song_new("Michael Jackson", "Billie Jean")),
             SongPtr_make(Song_new("Rihanna", "Stay")),
         });

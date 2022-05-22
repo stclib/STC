@@ -86,9 +86,9 @@ int main ()
         c_auto (cset_str, first, second)
         c_auto (cset_str, third, fourth)
         {
-            c_apply(v, cset_str_emplace(&second, v), const char*,
+            c_apply(v, cset_str_emplace(&second, *v), const char*,
                 {"red", "green", "blue"});
-            c_apply(v, cset_str_emplace(&third, v), const char*,
+            c_apply(v, cset_str_emplace(&third, *v), const char*,
                 {"orange", "pink", "yellow"});
 
             cset_str_emplace(&fourth, "potatoes");

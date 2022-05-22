@@ -84,7 +84,7 @@ int main()
     c_auto (IVec, vec)  // declare and init vec, call drop at scope exit
     c_auto (ISet, set)  // similar
     {
-        c_apply(v, IVec_push(&vec, v), IBox, {
+        c_apply(v, IVec_push(&vec, *v), IBox, {
             IBox_make(2021), IBox_make(2012), 
             IBox_make(2022), IBox_make(2015),
         });

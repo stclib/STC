@@ -54,7 +54,7 @@ int main()
         Persons_push_back(&vec, PSPtr_make(Person_new("Audrey", "Home")));
 
         // Clone/share p and q to the vector
-        c_apply(v, Persons_push_back(&vec, PSPtr_clone(v)), PSPtr, {p, q});
+        c_apply(v, Persons_push_back(&vec, PSPtr_clone(*v)), PSPtr, {p, q});
 
         c_foreach (i, Persons, vec)
             printf("%s %s\n", cstr_str(&i.ref->get->name), cstr_str(&i.ref->get->last));

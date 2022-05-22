@@ -62,7 +62,7 @@ int main()
         print_collection_cvec_istr(v);
 
         c_foreach (i, cvec_istr, cvec_istr_begin(&v), cvec_istr_end(&v))
-            csmap_istr_emplace(&m1, c_pair(*i.ref));
+            csmap_istr_emplace(&m1, c_pair(i.ref));
 
         puts("The modified map m1 is (key, value):");
         print_collection_csmap_istr(m1);

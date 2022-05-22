@@ -109,7 +109,7 @@ Interleave *push_front()* / *push_back()* then *sort()*:
 
 int main() {
     clist_d list = clist_d_init();
-    c_apply(v, clist_d_push_back(&list, v), double, {
+    c_apply(v, clist_d_push_back(&list, *v), double, {
         10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0
     });
 
@@ -150,7 +150,7 @@ Use of *erase_at()* and *erase_range()*:
 int main ()
 {
     clist_i L = clist_i_init();
-    c_apply(v, clist_i_push_back(&L, v), int, {10, 20, 30, 40, 50});
+    c_apply(v, clist_i_push_back(&L, *v), int, {10, 20, 30, 40, 50});
                                                 // 10 20 30 40 50
     clist_i_iter it = clist_i_begin(&L);        // ^
     clist_i_next(&it); 
@@ -185,8 +185,8 @@ Splice `[30, 40]` from *L2* into *L1* before `3`:
 int main() {
     c_auto (clist_i, L1, L2)
     {
-        c_apply(v, clist_i_push_back(&L1, v), int, {1, 2, 3, 4, 5});
-        c_apply(v, clist_i_push_back(&L2, v), int, {10, 20, 30, 40, 50});
+        c_apply(v, clist_i_push_back(&L1, *v), int, {1, 2, 3, 4, 5});
+        c_apply(v, clist_i_push_back(&L2, *v), int, {10, 20, 30, 40, 50});
 
         clist_i_iter i = clist_i_advance(clist_i_begin(&L1), 2);
         clist_i_iter j1 = clist_i_advance(clist_i_begin(&L2), 2), j2 = clist_i_advance(j1, 2);

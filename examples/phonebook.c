@@ -40,7 +40,7 @@ void print_phone_book(cmap_str phone_book)
 int main(int argc, char **argv)
 {
     c_auto (cset_str, names) {
-        c_apply(v, cset_str_emplace(&names, v), const char*, 
+        c_apply(v, cset_str_emplace(&names, *v), const char*, 
             {"Hello", "Cool", "True"});
         c_foreach (i, cset_str, names) printf("%s ", cstr_str(i.ref));
         puts("");

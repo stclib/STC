@@ -90,7 +90,7 @@ int main(void)
     // CVEC PAIR
 
     c_auto (cvec_ip, pairs1) {
-        c_apply(p, cvec_ip_push_back(&pairs1, p), ipair_t, 
+        c_apply(p, cvec_ip_push_back(&pairs1, *p), ipair_t, 
             {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
         cvec_ip_sort(&pairs1);
 
@@ -102,7 +102,7 @@ int main(void)
     // CLIST PAIR
 
     c_auto (clist_ip, pairs2) {
-        c_apply(p, clist_ip_push_back(&pairs2, p), ipair_t, 
+        c_apply(p, clist_ip_push_back(&pairs2, *p), ipair_t, 
             {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
         clist_ip_sort(&pairs2);
 

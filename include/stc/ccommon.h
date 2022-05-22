@@ -204,17 +204,18 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 
 #define c_apply(v, action, T, ...) do { \
     typedef T _c_T; \
-    const _c_T _c_arr[] = __VA_ARGS__; \
-    for (size_t index = 0; index < c_arraylen(_c_arr); ++index) \
-        { const _c_T v = _c_arr[index]; action; } \
+    const _c_T _c_arr[] = __VA_ARGS__, *v = _c_arr, \
+          *_c_end = v + c_arraylen(_c_arr); \
+    while (v != _c_end) { action; ++v; } \
 } while (0)
+
 #define c_apply_arr(v, action, T, arr, n) do { \
     typedef T _c_T; \
-    _c_T *_c_arr = arr; \
-    for (size_t index = 0, _c_n = n; index < _c_n; ++index) \
-        { _c_T *v = _c_arr + index; action; } \
+    _c_T *v = arr, *_c_end = v + (n); \
+    while (v != _c_end) { action; ++v; } \
 } while (0)
-#define c_pair(v) (v).first, (v).second
+
+#define c_pair(v) (v)->first, (v)->second
 
 #define c_find_if(C, cnt, it, pred) \
     c_find_in(C, C##_begin(&cnt), C##_end(&cnt), it, pred)

@@ -13,7 +13,7 @@ int main1()
     c_auto (cvec_str, words)
     c_auto (cmap_str, word_map)
     {
-        c_apply(v, cvec_str_emplace_back(&words, v), const char*, {
+        c_apply(v, cvec_str_emplace_back(&words, *v), const char*, {
             "this", "sentence", "is", "not", "a", "sentence",
             "this", "sentence", "is", "a", "hoax"
         });

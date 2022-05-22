@@ -13,7 +13,7 @@ int main()
     {
         int key, *res;
 
-        c_apply(t, cvec_int_push(&vec, t), int, { 
+        c_apply(t, cvec_int_push(&vec, *t), int, { 
             40, 600, 1, 7000, 2, 500, 30, 
         });
 
@@ -41,7 +41,7 @@ int main()
     {
         int key, *res;
 
-        c_apply(t, csset_int_push(&set, t), int, { 
+        c_apply(t, csset_int_push(&set, *t), int, { 
             40, 600, 1, 7000, 2, 500, 30,
         });
 

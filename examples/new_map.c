@@ -61,7 +61,7 @@ int main()
             {"So long, friend", "see you around"},
         });
 
-        c_apply(v, cset_str_emplace(&sset, v), const char*, {
+        c_apply(v, cset_str_emplace(&sset, *v), const char*, {
             "Hello, friend",
             "Nice to see you again",
             "So long, friend",

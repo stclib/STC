@@ -35,7 +35,7 @@ int main()
         // list-initialize
         struct { int first; const char* second; } vals[] =
             {{2, "foo"}, {2, "bar"}, {3, "baz"}, {1, "abc"}, {5, "def"}};
-        c_forrange (i, c_arraylen(vals)) insert(&mmap, c_pair(vals[i]));
+        c_forrange (i, c_arraylen(vals)) insert(&mmap, c_pair(&vals[i]));
         print("#1", mmap);
 
         // insert using value_type

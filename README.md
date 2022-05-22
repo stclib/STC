@@ -119,7 +119,7 @@ An alternative and often preferred way to write this code with STL is:
 int main(void) {
     c_auto (FVec, vec) // RAII - specify create and destruct at one place.
     {
-        c_apply(v, FVec_push_back(&vec, v), float, {10.f, 20.f, 30.f});
+        c_apply(v, FVec_push_back(&vec, *v), float, {10.f, 20.f, 30.f});
 
         c_foreach (i, FVec, vec) // generic iteration and element access
             printf(" %g", *i.ref);
@@ -191,11 +191,11 @@ int main(void) {
     c_auto (csmap_int, map)
     {
         // add some elements to each container
-        c_apply(v, cset_int_insert(&set, v), int, {10, 20, 30});
-        c_apply(v, cvec_pnt_push_back(&vec, v), struct Point, { {10, 1}, {20, 2}, {30, 3} });
-        c_apply(v, cdeq_int_push_back(&deq, v), int, {10, 20, 30});
-        c_apply(v, clist_int_push_back(&lst, v), int, {10, 20, 30});
-        c_apply(v, cstack_int_push(&stk, v), int, {10, 20, 30});
+        c_apply(v, cset_int_insert(&set, *v), int, {10, 20, 30});
+        c_apply(v, cvec_pnt_push_back(&vec, *v), struct Point, { {10, 1}, {20, 2}, {30, 3} });
+        c_apply(v, cdeq_int_push_back(&deq, *v), int, {10, 20, 30});
+        c_apply(v, clist_int_push_back(&lst, *v), int, {10, 20, 30});
+        c_apply(v, cstack_int_push(&stk, *v), int, {10, 20, 30});
         c_apply(v, csmap_int_insert(&map, c_pair(v)), 
             csmap_int_raw, { {20, 2}, {10, 1}, {30, 3} });
 

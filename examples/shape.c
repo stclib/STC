@@ -147,10 +147,10 @@ int main(void)
         Polygon* pol1 = Polygon_new();
         Polygon* pol2 = Polygon_new();
 
-        c_apply(p, Polygon_addPoint(pol1, p), Point,
+        c_apply(p, Polygon_addPoint(pol1, *p), Point,
             {{50, 72}, {123, 73}, {127, 201}, {828, 333}});
 
-        c_apply(p, Polygon_addPoint(pol2, p), Point,
+        c_apply(p, Polygon_addPoint(pol2, *p), Point,
             {{5, 7}, {12, 7}, {12, 20}, {82, 33}, {17, 56}});
         
         Shapes_push(&shapes, &tri1->base);
