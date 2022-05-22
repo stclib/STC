@@ -1,7 +1,7 @@
 # STC [cbits](../include/stc/cbits.h): Bitset
 ![Bitset](pics/bitset.jpg)
 
-A **cbits** represents a set of bits. It provides accesses to the value of individual bits via *cbits_test()* and provides the bitwise operators that one can apply to builtin integers. The number of bits in the set is specified at runtime via a parameter to the constructor *cbits_with_size()* or by *cbits_resize()*. A **cbits** bitset can be manipulated by standard logic operators and converted to and from strings.
+A **cbits** represents either a fixed or a dynamically sized sequence of bits. It provides accesses to the value of individual bits via *cbits_test()* and provides the bitwise operators that one can apply to builtin integers. The number of bits in the set is specified at runtime via a parameter to the constructor *cbits_with_size()* or by *cbits_resize()*. A **cbits** bitset can be manipulated by standard logic operators and converted to and from strings.
 
 See the c++ class [std::bitset](https://en.cppreference.com/w/cpp/utility/bitset) or
 [boost::dynamic_bitset](https://www.boost.org/doc/libs/release/libs/dynamic_bitset/dynamic_bitset.html)
@@ -12,21 +12,22 @@ for a functional description.
 All cbits definitions and prototypes are available by including a single header file.
 
 ```c
+#define i_len N        // if defined, the bitset will be fixed-size of N bits on the stack.
+#define i_type name    // optional, specifies the name of the bitset type. Default to cbits or cbitsN
 #include <stc/cbits.h>
 ```
 ## Methods
 
 ```c
 cbits            cbits_init(void);
-cbits            cbits_new(const char literal[]);
 cbits            cbits_from(const char* str);
-cbits            cbits_with_size(size_t size, bool value);
-cbits            cbits_with_values(size_t size, uint64_t pattern);
+cbits            cbits_with_size(size_t size, bool value);   // size must be <= N if N is defined
+cbits            cbits_with_pattern(size_t size, uint64_t pattern); 
 cbits            cbits_clone(cbits other);
 
 void             cbits_clear(cbits* self);
 cbits*           cbits_copy(cbits* self, cbits other);
-void             cbits_resize(cbits* self, size_t size, bool value);
+void             cbits_resize(cbits* self, size_t size, bool value); // only if i_len is not defined
 void             cbits_drop(cbits* self);
 
 cbits*           cbits_take(cbits* self, cbits other);       // give other to self
@@ -43,9 +44,9 @@ char*            cbits_to_str(cbits set, char* str, size_t start, intptr_t stop)
 
 void             cbits_set(cbits *self, size_t i);
 void             cbits_reset(cbits *self, size_t i);
-void             cbits_set_all(cbits *self, bool value);
 void             cbits_set_value(cbits *self, size_t i, bool value);
-void             cbits_set_values(cbits *self, uint64_t pattern);
+void             cbits_set_all(cbits *self, bool value);
+void             cbits_set_pattern(cbits *self, uint64_t pattern);
 void             cbits_flip_all(cbits *self);
 void             cbits_flip(cbits *self, size_t i);
 
