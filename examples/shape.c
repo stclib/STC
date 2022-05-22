@@ -4,10 +4,8 @@
 #include <stdio.h>
 #include <stc/ccommon.h>
 
-#define c_self(s, T) \
-    T* self = (T *)(s); \
-    assert(&T##_api == (s)->api && \
-           &T##_api == self->base.api)
+#define c_dyn_ptr(T, s) \
+    (&T##_api == (s)->api ? (T*)(s) : (T*)0)
 
 #define c_vtable(Api, T) \
     c_static_assert(offsetof(T, base) == 0); \
@@ -66,7 +64,7 @@ Triangle* Triangle_new(Point a, Point b, Point c)
 
 static void Triangle_draw(const Shape* shape)
 {
-    const c_self(shape, Triangle);
+    const Triangle* self = c_dyn_ptr(Triangle, shape);
     printf("Triangle : (%g,%g), (%g,%g), (%g,%g)\n",
            self->p[0].x, self->p[0].y,
            self->p[1].x, self->p[1].y,
@@ -105,7 +103,7 @@ void Polygon_addPoint(Polygon* self, Point p)
 
 static void Polygon_drop(Shape* shape)
 {
-    c_self(shape, Polygon);
+    Polygon* self = c_dyn_ptr(Polygon, shape);
     printf("poly destructed\n");
     PointVec_drop(&self->points);
     Shape_drop(shape);
@@ -113,7 +111,7 @@ static void Polygon_drop(Shape* shape)
 
 static void Polygon_draw(const Shape* shape)
 {
-    const c_self(shape, Polygon);
+    const Polygon* self = c_dyn_ptr(Polygon, shape);
     printf("Polygon  :");
     c_foreach (i, PointVec, self->points)
         printf(" (%g,%g)", i.ref->x, i.ref->y);
