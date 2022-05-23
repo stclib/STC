@@ -199,7 +199,7 @@ STC_INLINE size_t cstr_find(cstr s, const char* search) {
     return res ? res - str : cstr_npos;
 }
 
-STC_INLINE bool cstr_find_s(cstr s, cstr search)
+STC_INLINE size_t cstr_find_s(cstr s, cstr search)
     { return cstr_find(s, cstr_str(&search)); }
 
 STC_INLINE bool cstr_contains(cstr s, const char* search)
