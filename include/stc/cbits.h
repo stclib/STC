@@ -172,9 +172,8 @@ STC_INLINE void _i_memb(_set)(i_type *self, const size_t i)
 STC_INLINE void _i_memb(_reset)(i_type *self, const size_t i)
     { self->data64[i>>6] &= ~_cbits_bit(i); }
 
-STC_INLINE void _i_memb(_set_value)(i_type *self, const size_t i, const bool value) {
-    self->data64[i>>6] ^= ((uint64_t)-(int)value ^ self->data64[i>>6]) & _cbits_bit(i);
-}
+STC_INLINE void _i_memb(_set_value)(i_type *self, const size_t i, const bool value)
+    { value ? _i_memb(_set)(self, i) : _i_memb(_reset)(self, i); }
 
 STC_INLINE void _i_memb(_flip)(i_type *self, const size_t i)
     { self->data64[i>>6] ^= _cbits_bit(i); }
