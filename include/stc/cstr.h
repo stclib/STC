@@ -79,7 +79,7 @@ STC_API char* _cstr_internal_move(cstr* self, size_t pos1, size_t pos2);
 STC_API char*   cstr_reserve(cstr* self, size_t cap);
 STC_API void    cstr_shrink_to_fit(cstr* self);
 STC_API void    cstr_resize(cstr* self, size_t size, char value);
-STC_API size_t  cstr_find_n(cstr s, const char* search, size_t pos, size_t nmax);
+STC_API size_t  cstr_find_from(cstr s, size_t pos, const char* search);
 STC_API char*   cstr_assign_n(cstr* self, const char* str, size_t n);
 STC_API char*   cstr_append_n(cstr* self, const char* str, size_t n);
 STC_API bool    cstr_getdelim(cstr *self, int delim, FILE *fp);
@@ -252,12 +252,13 @@ STC_INLINE void cstr_replace_n(cstr* self, size_t pos, size_t len, const char* r
 STC_INLINE void cstr_replace(cstr* self, size_t pos, size_t len, const char* repl)
     { cstr_replace_n(self, pos, len, repl, strlen(repl)); }
 
-STC_INLINE bool cstr_replace_first(cstr* self, const char* search, const char* repl) {
-    size_t pos = cstr_find(*self, search);
+STC_INLINE size_t cstr_replace_first(cstr* self, size_t pos, const char* search, const char* repl) {
+    pos = cstr_find_from(*self, pos, search);
     if (pos == cstr_npos)
-        return false;
-    cstr_replace_n(self, pos, strlen(search), repl, strlen(repl));
-    return true;
+        return pos;
+    const size_t rlen = strlen(repl);
+    cstr_replace_n(self, pos, strlen(search), repl, rlen);
+    return pos + rlen;
 }
 
 STC_INLINE void cstr_replace_s(cstr* self, size_t pos, size_t len, cstr s) {
@@ -354,11 +355,10 @@ STC_DEF void cstr_resize(cstr* self, const size_t size, const char value) {
     _cstr_set_size(self, size);
 }
 
-STC_DEF size_t cstr_find_n(cstr s, const char* search, const size_t pos, const size_t nmax) {
+STC_DEF size_t cstr_find_from(cstr s, const size_t pos, const char* search) {
     csview sv = cstr_sv(&s);
-    const size_t nlen = (size_t) strlen(search);
     if (pos > sv.size) return cstr_npos;
-    char* res = c_strnstrn(sv.str + pos, search, sv.size, nmax < nlen ? nmax : nlen);
+    char* res = strstr(sv.str + pos, search);
     return res ? res - sv.str : cstr_npos;
 }
 

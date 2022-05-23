@@ -60,7 +60,7 @@ STC_API void            cstr_replace_n(cstr* self, size_t pos, size_t len, const
 STC_API void            cstr_replace_all(cstr* self, const char* find, const char* replace);
 STC_API void            cstr_erase_n(cstr* self, size_t pos, size_t n);
 STC_API size_t          cstr_find(cstr s, const char* needle);
-STC_API size_t          cstr_find_n(cstr s, const char* needle, size_t pos, size_t nmax);
+STC_API size_t          cstr_find_from(cstr s, size_t pos, const char* needle);
 STC_API bool            cstr_getdelim(cstr *self, int delim, FILE *stream);
 STC_API void            cstr_replace_all(cstr* self, const char* find, const char* repl);
 
@@ -378,10 +378,9 @@ cstr_find(cstr s, const char* needle) {
 }
 
 STC_DEF size_t
-cstr_find_n(cstr s, const char* needle, const size_t pos, const size_t nmax) {
+cstr_find_from(cstr s, const size_t pos, const char* needle) {
     if (pos > _cstr_p(&s)->size) return cstr_npos;
-    const size_t nlen = strlen(needle);
-    char* res = c_strnstrn(s.str + pos, needle, _cstr_p(&s)->size - pos, nmax < nlen ? nmax : nlen);
+    char* res = strstr(s.str + pos, needle);
     return res ? res - s.str : cstr_npos;
 }
 

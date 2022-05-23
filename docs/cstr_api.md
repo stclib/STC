@@ -61,7 +61,7 @@ void         cstr_insert_n(cstr* self, size_t pos, const char* str, size_t n);
 void         cstr_replace(cstr* self, size_t pos, size_t len, const char* repl);
 void         cstr_replace_s(cstr* self, size_t pos, size_t len, cstr s);
 void         cstr_replace_n(cstr* self, size_t pos, size_t len, const char* repl, size_t n);
-void         cstr_replace_first(cstr* self, const char* search, const char* repl);
+size_t       cstr_replace_first(cstr* self, size_t pos, const char* search, const char* repl);
 void         cstr_replace_all(cstr* self, const char* search, const char* repl);
 
 void         cstr_erase(cstr* self, size_t pos);
@@ -70,7 +70,7 @@ void         cstr_erase_n(cstr* self, size_t pos, size_t n);
 bool         cstr_equals(cstr s, const char* str);
 bool         cstr_equals_s(cstr s, cstr s2);
 size_t       cstr_find(cstr s, const char* search);
-size_t       cstr_find_n(cstr s, const char* search, size_t pos, size_t nmax);
+size_t       cstr_find_from(cstr s, size_t pos, const char* search);
 bool         cstr_contains(cstr s, const char* search);
 bool         cstr_starts_with(cstr s, const char* str);
 bool         cstr_ends_with(cstr s, const char* str);
