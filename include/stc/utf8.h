@@ -26,34 +26,66 @@ int main()
 #include "ccommon.h"
 #include <ctype.h>
 
-/* number of codepoints in the utf8 string s, or SIZE_MAX if invalid utf8: */
 enum { UTF8_OK = 0, UTF8_ERROR = 4 };
 typedef struct { uint32_t state, codep, size; } utf8_decode_t;
 
-/* decode next utf8 codepoint. */
-STC_API size_t          utf8_encode(char *out, uint32_t c);
-STC_API uint32_t        utf8_decode(utf8_decode_t *d, const uint8_t b);
-STC_API const uint8_t*  utf8_next(utf8_decode_t *d, const uint8_t* u);
-STC_API size_t          utf8_size(const char *s);
-STC_API size_t          utf8_size_n(const char *s, size_t n);
-STC_API const char*     utf8_at(const char *s, size_t index);
+/* encode/decode next utf8 codepoint. */
+STC_API unsigned utf8_encode(char *out, uint32_t c);
+STC_API uint32_t utf8_decode(utf8_decode_t *d, const uint8_t b);
 
-STC_INLINE size_t utf8_pos(const char* s, size_t index) 
+/* number of codepoints in the utf8 string s */
+STC_INLINE size_t utf8_size(const char *s) {
+    size_t size = 0;
+    while (*s) size += (*s++ & 0xC0) != 0x80;
+    return size;
+}
+
+STC_INLINE size_t utf8_size_n(const char *s, size_t n) {
+    size_t size = 0;
+    while ((n-- != 0) & (*s != 0))
+        size += (*s++ & 0xC0) != 0x80;
+    return size;
+}
+
+STC_INLINE const char* utf8_at(const char *s, size_t index) {
+    for (; (index > 0) & (*s != 0); ++s)
+        index -= (s[1] & 0xC0) != 0x80;
+    return s;
+}
+
+STC_INLINE const char* utf8_next(const char* s)
+    { return utf8_at(s, 1); }
+
+STC_INLINE size_t utf8_pos(const char* s, size_t index)
     { return utf8_at(s, index) - s; }
-
-STC_INLINE bool utf8_valid(const char* s)
-    { return utf8_size(s) != SIZE_MAX; }
 
 STC_INLINE uint32_t utf8_peek(const char *s) {
     utf8_decode_t d = {UTF8_OK, 0};
-    utf8_next(&d, (const uint8_t*)s);
+    const uint8_t* u = (const uint8_t*)s;
+    utf8_decode(&d, *u++);
+    switch (d.size) {
+        case 4: utf8_decode(&d, *u++);
+        case 3: utf8_decode(&d, *u++);
+        case 2: utf8_decode(&d, *u++);
+    }
     return d.codep;
 }
 
-STC_INLINE size_t utf8_codep_size(const char *s) {
+STC_INLINE unsigned utf8_codep_size(const char *s) {
+    const unsigned u = (uint8_t)*s;
+    unsigned ret = (u & 0xF0) == 0xE0;
+    ret += ret << 1;                       // 3
+    ret |= u < 0x80;                       // 1
+    ret |= ((0xC1 < u) & (u < 0xE0)) << 1; // 2
+    ret |= ((0xEF < u) & (u < 0xF5)) << 2; // 4
+    return ret;
+}
+
+STC_INLINE bool utf8_valid(const char* s) {
     utf8_decode_t d = {UTF8_OK, 0};
-    utf8_next(&d, (const uint8_t*)s);
-    return d.size;
+    const uint8_t* u = (const uint8_t *)s;
+    while (*u) utf8_decode(&d, *u++);
+    return d.state == UTF8_OK;
 }
 
 // --------------------------- IMPLEMENTATION ---------------------------------
@@ -82,63 +114,30 @@ STC_DEF uint32_t utf8_decode(utf8_decode_t *d, const uint8_t b)
     return d->state;
 }
 
-STC_DEF size_t utf8_encode(char *out, uint32_t c)
+STC_DEF unsigned utf8_encode(char *out, uint32_t c)
 {
-    char* p = out;
     if (c < 0x80U) {
-        *p++ = (char) c;
+        out[0] = (char) c;
+        return 1;
     } else if (c < 0x0800U) {
-        *p++ = (char) ((c>>6  & 0x1F) | 0xC0);
-        *p++ = (char) ((c     & 0x3F) | 0x80);
+        out[0] = (char) ((c>>6  & 0x1F) | 0xC0);
+        out[1] = (char) ((c     & 0x3F) | 0x80);
+        return 2;
     } else if (c < 0x010000U) {
         if (c < 0xD800U || c >= 0xE000U) {
-            *p++ = (char) ((c>>12 & 0x0F) | 0xE0);
-            *p++ = (char) ((c>>6  & 0x3F) | 0x80);
-            *p++ = (char) ((c     & 0x3F) | 0x80);
+            out[0] = (char) ((c>>12 & 0x0F) | 0xE0);
+            out[1] = (char) ((c>>6  & 0x3F) | 0x80);
+            out[2] = (char) ((c     & 0x3F) | 0x80);
+            return 3;
         }
     } else if (c < 0x110000U) {
-        *p++ = (char) ((c>>18 & 0x07) | 0xF0);
-        *p++ = (char) ((c>>12 & 0x3F) | 0x80);
-        *p++ = (char) ((c>>6  & 0x3F) | 0x80);
-        *p++ = (char) ((c     & 0x3F) | 0x80);
+        out[0] = (char) ((c>>18 & 0x07) | 0xF0);
+        out[1] = (char) ((c>>12 & 0x3F) | 0x80);
+        out[2] = (char) ((c>>6  & 0x3F) | 0x80);
+        out[3] = (char) ((c     & 0x3F) | 0x80);
+        return 4;
     }
-    return p - out;
-}
-
-STC_DEF const uint8_t* utf8_next(utf8_decode_t *d, const uint8_t* u) {
-    utf8_decode(d, *u++);
-    switch (d->size) {
-        case 4: utf8_decode(d, *u++);
-        case 3: utf8_decode(d, *u++);
-        case 2: utf8_decode(d, *u++);
-    }
-    return u;
-}
-
-STC_DEF size_t utf8_size(const char *s)
-{
-    utf8_decode_t d = {UTF8_OK, 0};
-    size_t size = 0;
-    while (*s)
-        size += !utf8_decode(&d, (uint8_t)*s++);
-    return d.state ? SIZE_MAX : size;
-}
-
-STC_DEF size_t utf8_size_n(const char *s, size_t n)
-{
-    utf8_decode_t d = {UTF8_OK, 0};
-    size_t size = 0;
-    while ((n-- != 0) & (*s != 0))
-        size += !utf8_decode(&d, (uint8_t)*s++);
-    return !d.state ? size : SIZE_MAX;
-}
-
-STC_DEF const char* utf8_at(const char *s, size_t index)
-{
-    utf8_decode_t d = {UTF8_OK, 0};
-    for (size_t i = 0; (i < index) & (*s != 0); ++s)
-        i += !utf8_decode(&d, (uint8_t)*s);
-    return s;
+    return 0;
 }
 
 #endif
