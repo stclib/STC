@@ -34,8 +34,8 @@ int main() {
         cbits_reset(&bset, 9);
         cbits_resize(&bset, 43, false);
 
-        printf("%4zu: ", cbits_size(bset));
-        c_forrange (i, cbits_size(bset))
+        printf("%4zu: ", cbits_size(&bset));
+        c_forrange (i, cbits_size(&bset))
             printf("%d", cbits_at(&bset, i));
         puts("");
         cbits_set(&bset, 28);
@@ -44,8 +44,8 @@ int main() {
         cbits_resize(&bset, 102, true);
         cbits_set_value(&bset, 99, false);
 
-        printf("%4zu: ", cbits_size(bset));
-        c_forrange (i, cbits_size(bset))
+        printf("%4zu: ", cbits_size(&bset));
+        c_forrange (i, cbits_size(&bset))
             printf("%d", cbits_at(&bset, i));
         puts("");
     }
@@ -73,7 +73,7 @@ int main() {
 
 #if !defined i_len
 STC_API void        cbits_resize(i_type* self, size_t size, bool value);
-STC_API i_type*     cbits_copy(i_type* self, i_type other);
+STC_API i_type*     cbits_copy(i_type* self, const i_type* other);
 #endif
 STC_API bool        _cbits_subset_of(const uint64_t* set, const uint64_t* other, size_t sz);
 STC_API bool        _cbits_disjoint(const uint64_t* set, const uint64_t* other, size_t sz);
@@ -81,13 +81,13 @@ STC_API size_t      _cbits_count(const uint64_t* set, const size_t sz);
 STC_API char*       _cbits_to_str(const uint64_t* set, const size_t sz,
                                   char* out, size_t start, intptr_t stop);
 
-STC_INLINE size_t   _i_memb(_size)(i_type set);
+STC_INLINE size_t   _i_memb(_size)(const i_type* self);
 
 STC_INLINE void _i_memb(_set_all)(i_type *self, const bool value)
-    { memset(self->data64, value? ~0 : 0, _cbits_bytes(_i_memb(_size)(*self))); }
+    { memset(self->data64, value? ~0 : 0, _cbits_bytes(_i_memb(_size)(self))); }
 
 STC_INLINE void _i_memb(_set_pattern)(i_type *self, const uint64_t pattern) {
-    size_t n = _cbits_words(_i_memb(_size)(*self));
+    size_t n = _cbits_words(_i_memb(_size)(self));
     while (n--) self->data64[n] = pattern;
 }
 
@@ -96,7 +96,7 @@ STC_INLINE void _i_memb(_set_pattern)(i_type *self, const uint64_t pattern) {
 #define _i_assert(x) (void)0
 STC_INLINE i_type   _i_memb(_init)(void) { return c_make(i_type){0}; }
 STC_INLINE void     _i_memb(_drop)(i_type* self) {}
-STC_INLINE size_t   _i_memb(_size)(i_type set) { return i_len; }
+STC_INLINE size_t   _i_memb(_size)(const i_type* self) { return i_len; }
 STC_INLINE i_type   _i_memb(_move)(i_type* self) { return *self; }
 
 STC_INLINE i_type*  _i_memb(_take)(i_type* self, i_type other)
@@ -125,7 +125,7 @@ STC_INLINE i_type _i_memb(_with_pattern)(const size_t size, const uint64_t patte
 #define _i_assert(x) assert(x)
 STC_INLINE i_type   cbits_init(void) { return c_make(i_type){NULL}; }
 STC_INLINE void     cbits_drop(i_type* self) { c_free(self->data64); }
-STC_INLINE size_t   cbits_size(i_type set) { return set._size; }
+STC_INLINE size_t   cbits_size(const i_type* self) { return self->_size; }
 
 STC_INLINE i_type cbits_move(i_type* self) {
     i_type tmp = *self;
@@ -160,11 +160,11 @@ STC_INLINE i_type cbits_with_pattern(const size_t size, const uint64_t pattern) 
 }
 #endif
 
-STC_INLINE bool _i_memb(_test)(i_type set, const size_t i) 
-    { return (set.data64[i>>6] & _cbits_bit(i)) != 0; }
+STC_INLINE bool _i_memb(_test)(const i_type* self, const size_t i) 
+    { return (self->data64[i>>6] & _cbits_bit(i)) != 0; }
 
-STC_INLINE bool _i_memb(_at)(i_type set, const size_t i)
-    { return (set.data64[i>>6] & _cbits_bit(i)) != 0; }
+STC_INLINE bool _i_memb(_at)(const i_type* self, const size_t i)
+    { return (self->data64[i>>6] & _cbits_bit(i)) != 0; }
 
 STC_INLINE void _i_memb(_set)(i_type *self, const size_t i)
     { self->data64[i>>6] |= _cbits_bit(i); }
@@ -172,14 +172,15 @@ STC_INLINE void _i_memb(_set)(i_type *self, const size_t i)
 STC_INLINE void _i_memb(_reset)(i_type *self, const size_t i)
     { self->data64[i>>6] &= ~_cbits_bit(i); }
 
-STC_INLINE void _i_memb(_set_value)(i_type *self, const size_t i, const bool value)
-    { value ? _i_memb(_set)(self, i) : _i_memb(_reset)(self, i); }
+STC_INLINE void _i_memb(_set_value)(i_type *self, const size_t i, const bool b) {
+    self->data64[i>>6] ^= ((uint64_t)-(int)b ^ self->data64[i>>6]) & _cbits_bit(i);
+}
 
 STC_INLINE void _i_memb(_flip)(i_type *self, const size_t i)
     { self->data64[i>>6] ^= _cbits_bit(i); }
 
 STC_INLINE void _i_memb(_flip_all)(i_type *self) {
-    size_t n = _cbits_words(_i_memb(_size)(*self));
+    size_t n = _cbits_words(_i_memb(_size)(self));
     while (n--) self->data64[n] ^= ~(uint64_t)0;
 }
 
@@ -191,22 +192,22 @@ STC_INLINE i_type _i_memb(_from)(const char* str) {
 }
 
 /* Intersection */
-STC_INLINE void _i_memb(_intersect)(i_type *self, i_type other) {
-    _i_assert(self->_size == other._size);
-    size_t n = _cbits_words(_i_memb(_size)(*self));
-    while (n--) self->data64[n] &= other.data64[n];
+STC_INLINE void _i_memb(_intersect)(i_type *self, const i_type* other) {
+    _i_assert(self->_size == other->_size);
+    size_t n = _cbits_words(_i_memb(_size)(self));
+    while (n--) self->data64[n] &= other->data64[n];
 }
 /* Union */
-STC_INLINE void _i_memb(_union)(i_type *self, i_type other) {
-    _i_assert(self->_size == other._size);
-    size_t n = _cbits_words(_i_memb(_size)(*self));
-    while (n--) self->data64[n] |= other.data64[n];
+STC_INLINE void _i_memb(_union)(i_type *self, const i_type* other) {
+    _i_assert(self->_size == other->_size);
+    size_t n = _cbits_words(_i_memb(_size)(self));
+    while (n--) self->data64[n] |= other->data64[n];
 }
 /* Exclusive disjunction */
-STC_INLINE void _i_memb(_xor)(i_type *self, i_type other) {
-    _i_assert(self->_size == other._size);
-    size_t n = _cbits_words(_i_memb(_size)(*self));
-    while (n--) self->data64[n] ^= other.data64[n];
+STC_INLINE void _i_memb(_xor)(i_type *self, const i_type* other) {
+    _i_assert(self->_size == other->_size);
+    size_t n = _cbits_words(_i_memb(_size)(self));
+    while (n--) self->data64[n] ^= other->data64[n];
 }
 
 #if defined(__GNUC__) || defined(__clang__)
@@ -223,31 +224,31 @@ STC_INLINE void _i_memb(_xor)(i_type *self, i_type other) {
     }
 #endif
 
-STC_INLINE size_t _i_memb(_count)(i_type set)
-    { return _cbits_count(set.data64, _i_memb(_size)(set)); }
+STC_INLINE size_t _i_memb(_count)(const i_type* self)
+    { return _cbits_count(self->data64, _i_memb(_size)(self)); }
 
-STC_INLINE char* _i_memb(_to_str)(i_type set, char* out, size_t start, intptr_t stop)
-    { return _cbits_to_str(set.data64, _i_memb(_size)(set), out, start, stop); }
+STC_INLINE char* _i_memb(_to_str)(const i_type* self, char* out, size_t start, intptr_t stop)
+    { return _cbits_to_str(self->data64, _i_memb(_size)(self), out, start, stop); }
 
-STC_INLINE bool _i_memb(_subset_of)(i_type set, i_type other) { 
-    _i_assert(set._size == other._size);
-    return _cbits_subset_of(set.data64, other.data64, _i_memb(_size)(set));
+STC_INLINE bool _i_memb(_subset_of)(const i_type* self, const i_type* other) { 
+    _i_assert(self->_size == other->_size);
+    return _cbits_subset_of(self->data64, other->data64, _i_memb(_size)(self));
 }
 
-STC_INLINE bool _i_memb(_disjoint)(i_type set, i_type other) {
-    _i_assert(set._size == other._size);
-    return _cbits_disjoint(set.data64, other.data64, _i_memb(_size)(set));
+STC_INLINE bool _i_memb(_disjoint)(const i_type* self, const i_type* other) {
+    _i_assert(self->_size == other->_size);
+    return _cbits_disjoint(self->data64, other->data64, _i_memb(_size)(self));
 }
 
 #if defined(i_implement)
 
 #if !defined i_len
-STC_DEF i_type* cbits_copy(i_type* self, i_type other) {
-    if (self->data64 == other.data64)
+STC_DEF i_type* cbits_copy(i_type* self, const i_type* other) {
+    if (self->data64 == other->data64)
         return self;
-    if (self->_size != other._size)
-        return _i_memb(_take)(self, _i_memb(_clone)(other));
-    memcpy(self->data64, other.data64, _cbits_bytes(other._size));
+    if (self->_size != other->_size)
+        return _i_memb(_take)(self, _i_memb(_clone)(*other));
+    memcpy(self->data64, other->data64, _cbits_bytes(other->_size));
     return self;
 }
 

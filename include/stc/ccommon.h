@@ -108,6 +108,7 @@
 #define c_no_cmp                (1<<3)
 #define c_static                (1<<4)
 #define c_header                (1<<5)
+#define c_implement             (1<<6)
 
 /* Generic algorithms */
 
@@ -254,7 +255,7 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #undef _i_static
 #undef i_implement
 
-#if !c_option(c_static) && (c_option(c_header) || defined(STC_HEADER) || \
+#if !c_option(c_static) && (c_option(c_header|c_implement) || defined(STC_HEADER) || \
                             defined(STC_IMPLEMENT) || defined(STC_IMPLEMENTATION))
 #  define STC_API extern
 #  define STC_DEF
@@ -263,6 +264,7 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #  define STC_API static inline
 #  define STC_DEF static inline
 #endif
-#if defined(_i_static) || defined(STC_IMPLEMENT) || defined(STC_IMPLEMENTATION)
+#if defined(_i_static) || c_option(c_implement) || defined(STC_IMPLEMENT) \
+                                                || defined(STC_IMPLEMENTATION)
 #  define i_implement
 #endif

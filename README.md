@@ -249,14 +249,16 @@ After erasing elements found:
 
 Installation
 ------------
-Because it is headers-only, headers can simply be included in your program. The methods are static
-by default (some inlined). You may add the *include* folder to the **CPATH** environment variable to
+Because it is headers-only, headers can simply be included in your program. By default, functions are static
+(some inlined). You may add the *include* folder to the **CPATH** environment variable to
 let GCC, Clang, and TinyC locate the headers.
 
-If containers are used across several translation units with common instantiated container types,
-it is recommended to build as a "library" to minimize the executable size. To enable this mode,
-specify **-DSTC_HEADER** as a compiler option in your build environment and place all the instantiations
-of containers used in a single C-source file, e.g.:
+If containers are used across several translation units with common instantiated container types, it is 
+recommended to build as a "library" with external linking to minimize executable size. To enable this,
+specify `-DSTC_HEADER` as compiler option in your build environment. Next, place all the instantiations
+of the containers used inside a single C-source file as in the example below, and `#define STC_IMPLEMENT` at top. 
+You may also cherry-pick external linking mode on individual containers by `#define i_opt c_header` and
+`#define i_opt c_implement`, or force static symbols by `#define i_opt c_static` before container includes.
 ```c
 // stc_libs.c
 #define STC_IMPLEMENT
