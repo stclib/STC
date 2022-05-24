@@ -41,7 +41,7 @@ int main(void) {
 
         puts("");
         c_forpair (contact, number, cmap_str, contacts) {
-            printf("Calling %s: %s\n", cstr_str(&_.contact), call(cstr_str(&_.number)));
+            printf("Calling %s: %s\n", cstr_str(_.contact), call(cstr_str(_.number)));
         }
         puts("");
     }

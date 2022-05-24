@@ -12,7 +12,7 @@ int main()
 
         c_forpair (k, v, cmap_str, m)
             printf("%s: '%s' Len=%" PRIuMAX ", Is long: %s\n", 
-                   cstr_str(&_.k), cstr_str(&_.v), cstr_size(_.v),
-                   cstr_is_long(&_.v)?"true":"false");
+                   cstr_str(_.k), cstr_str(_.v), cstr_size(*_.v),
+                   cstr_is_long(_.v)?"true":"false");
     }
 }

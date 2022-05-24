@@ -61,6 +61,6 @@ int main()
         m2 = cmap_str_clone(map);
 
         c_forpair (name, number, cmap_str, m2)
-            printf("%s: %" PRIdMAX "\n", cstr_str(&_.name), *_.number);
+            printf("%s: %" PRIdMAX "\n", cstr_str(_.name), **_.number);
     }
 }

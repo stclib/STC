@@ -141,7 +141,7 @@ c_foreach (i, csmap_ii, it, csmap_ii_end(&map))
 // out: 7 12 23
 
 c_forpair (id, count, csmap_ii, map)
-    printf(" (%d %d)", _.id, _.count);
+    printf(" (%d %d)", *_.id, *_.count);
 // out: (3 2) (5 4) (7 3) (12 5) (23 1)
 ```
 

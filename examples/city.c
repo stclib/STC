@@ -75,7 +75,8 @@ int main(void)
 
         printf("\nMap:\n");
         c_forpair (id, city, CityMap, map)
-            printf("id:%d, city:%s, %d, use:%ld\n", _.id, cstr_str(&_.city.get->name), _.city.get->population, CityArc_use_count(_.city));
+            printf("id:%d, city:%s, %d, use:%ld\n", *_.id, cstr_str(&_.city->get->name),
+                                                    _.city->get->population, CityArc_use_count(*_.city));
         puts("");
     }
 }

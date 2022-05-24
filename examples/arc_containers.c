@@ -62,13 +62,13 @@ int main()
         puts("STACKS");
         c_foreach (i, Stack, stack) {
             c_forpair (name, year, Map, *i.ref->get)
-                printf(" %s:%d", cstr_str(&_.name), _.year);
+                printf(" %s:%d", cstr_str(_.name), *_.year);
             puts("");
         }
         puts("LIST");
         c_foreach (i, List, list) {
             c_forpair (name, year, Map, *i.ref->get)
-                printf(" %s:%d", cstr_str(&_.name), _.year);
+                printf(" %s:%d", cstr_str(_.name), *_.year);
             puts("");
         }
     }

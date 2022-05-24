@@ -60,7 +60,7 @@ int main(void)
 
         c_foreach (i, Departments, map)
             c_forpair (name, email, People, i.ref->second)
-                printf("%s: %s - %s\n", cstr_str(&i.ref->first), cstr_str(&_.name), cstr_str(&_.email));
+                printf("%s: %s - %s\n", cstr_str(&i.ref->first), cstr_str(_.name), cstr_str(_.email));
         puts("");
 
         printf("found: %d\n", contains(&map, "Nick Denton"));

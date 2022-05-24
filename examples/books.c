@@ -54,7 +54,7 @@ int main()
 
         // Iterate over everything.
         c_forpair (book, review, cmap_str, book_reviews) {
-            printf("%s: \"%s\"\n", cstr_str(&_.book), cstr_str(&_.review));
+            printf("%s: \"%s\"\n", cstr_str(_.book), cstr_str(_.review));
         }
     }
 }

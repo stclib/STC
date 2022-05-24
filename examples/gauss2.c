@@ -31,10 +31,10 @@ int main()
         // Print the gaussian bar chart
         c_auto (cstr, bar)
         c_forpair (index, count, csmap_int, mhist) {
-            size_t n = (size_t) (_.count * StdDev * Scale * 2.5 / (float)N);
+            size_t n = (size_t) (*_.count * StdDev * Scale * 2.5 / (float)N);
             if (n > 0) {
                 cstr_resize(&bar, n, '*');
-                printf("%4d %s\n", _.index, cstr_str(&bar));
+                printf("%4d %s\n", *_.index, cstr_str(&bar));
             }
         }
     }

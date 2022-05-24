@@ -65,8 +65,8 @@ int main()
         v->second += 3; // add 3 hp points to Einar
         Vikings_emplace(&vikings, einar, 0).ref->second += 5; // add 5 more to Einar
 
-        c_forpair (viking, hp, Vikings, vikings) {
-            printf("%s of %s has %d hp\n", cstr_str(&_.viking.name), cstr_str(&_.viking.country), _.hp);
+        c_forpair (vik, hp, Vikings, vikings) {
+            printf("%s of %s has %d hp\n", cstr_str(&_.vik->name), cstr_str(&_.vik->country), *_.hp);
         }
     }
 }

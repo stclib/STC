@@ -53,7 +53,7 @@ int main()
             {{62, 81}, 3},
         });
         c_forpair (p, i, PMap, pmap)
-            printf(" (%d,%d: %d)", _.p.x, _.p.y, _.i);
+            printf(" (%d,%d: %d)", _.p->x, _.p->y, *_.i);
         puts("");
     }
 
@@ -64,7 +64,7 @@ int main()
             {"This is the time", "for all good things"},
         });
         c_forpair (i, j, SMap, smap)
-            printf(" (%s: %s)\n", cstr_str(&_.i), cstr_str(&_.j));
+            printf(" (%s: %s)\n", cstr_str(_.i), cstr_str(_.j));
     }
 
     c_auto (SSet, sset) {

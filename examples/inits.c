@@ -83,7 +83,7 @@ int main(void)
         cmap_cnt_emplace(&countries, "Finland", 0).ref->second += 20;
 
         c_forpair (country, health, cmap_cnt, countries)
-            printf("%s: %d\n", cstr_str(&_.country), _.health);
+            printf("%s: %d\n", cstr_str(_.country), *_.health);
         puts("");
     }
 

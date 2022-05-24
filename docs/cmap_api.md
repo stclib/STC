@@ -217,7 +217,7 @@ int main()
         cmap_vi_insert(&vecs, (Vec3i){100, 100, 100}, 4);
 
         c_forpair (vec, num, cmap_vi, vecs)
-            printf("{ %3d, %3d, %3d }: %d\n", _.vec.x,  _.vec.y,  _.vec.z,  _.num);
+            printf("{ %3d, %3d, %3d }: %d\n", _.vec->x, _.vec->y, _.vec->z, *_.num);
     }
 }
 ```
@@ -250,7 +250,7 @@ int main()
         cmap_iv_insert(&vecs, 4, (Vec3i){100, 100, 100});
 
         c_forpair (num, vec, cmap_iv, vecs)
-            printf("%d: { %3d, %3d, %3d }\n", _.num, _.vec.x,  _.vec.y,  _.vec.z);
+            printf("%d: { %3d, %3d, %3d }\n", *_.num, _.vec->x, _.vec->y, _.vec->z);
     }
 }
 ```
@@ -322,8 +322,8 @@ int main()
         }
 
         // Print the status of the vikings.
-        c_forpair (viking, hp, Vikings, vikings) {
-            printf("%s of %s has %d hp\n", cstr_str(&_.viking.name), cstr_str(&_.viking.country), _.hp);
+        c_forpair (vik, hp, Vikings, vikings) {
+            printf("%s of %s has %d hp\n", cstr_str(&_.vik->name), cstr_str(&_.vik->country), *_.hp);
         }
     }
 }
@@ -406,8 +406,8 @@ int main()
         Vikings_value *v = Vikings_get_mut(&vikings, (RViking){"Einar", "Norway"});
         if (v) v->second += 3; // add 3 hp points to Einar
 
-        c_forpair (viking, health, Vikings, vikings) {
-            printf("%s of %s has %d hp\n", cstr_str(&_.viking.name), cstr_str(&_.viking.country), _.health);
+        c_forpair (vik, health, Vikings, vikings) {
+            printf("%s of %s has %d hp\n", cstr_str(&_.vik->name), cstr_str(&_.vik->country), *_.health);
         }
     }
 }

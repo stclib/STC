@@ -162,9 +162,9 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
          ; it.ref != it##_end_.ref; C##_next(&it))
 
 #define c_forpair(key, val, C, cnt) /* structured binding */ \
-    for (struct {C##_iter _it; C##_value* _endref; C##_key key; C##_mapped val;} \
+    for (struct {C##_iter _it; C##_value* _endref; const C##_key* key; C##_mapped* val;} \
          _ = {C##_begin(&cnt), C##_end(&cnt).ref} \
-         ; _._it.ref != _._endref && (_.key = _._it.ref->first, _.val = _._it.ref->second, true) \
+         ; _._it.ref != _._endref && (_.key = &_._it.ref->first, _.val = &_._it.ref->second) \
          ; C##_next(&_._it))
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
