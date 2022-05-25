@@ -145,11 +145,6 @@ STC_INLINE void cstr_drop(cstr* self) {
         cstr_l_drop(self);
 }
 
-STC_INLINE void cstr_clear(cstr* self) {
-    cstr_drop(self);
-    cstr_s_set_size(self, 0);
-}
-
 #define SSO_CALL(s, call) (cstr_is_long(s) ? cstr_l_##call : cstr_s_##call)
 
 STC_INLINE void _cstr_set_size(cstr* self, size_t len)
@@ -172,6 +167,9 @@ STC_INLINE size_t cstr_length(cstr s)
 
 STC_INLINE size_t cstr_capacity(cstr s)
     { return cstr_is_long(&s) ? cstr_l_cap(&s) : cstr_s_cap; }
+
+STC_INLINE void cstr_clear(cstr* self)
+    { _cstr_set_size(self, 0); }
 
 STC_INLINE char* cstr_expand_uninit(cstr *self, size_t n) {
     size_t len = cstr_size(*self); char* d;
