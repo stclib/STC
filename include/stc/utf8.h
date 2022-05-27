@@ -60,7 +60,7 @@ STC_INLINE size_t utf8_pos(const char* s, size_t index)
     { return utf8_at(s, index) - s; }
 
 STC_INLINE uint32_t utf8_peek(const char *s) {
-    utf8_decode_t d = {UTF8_OK, 0};
+    utf8_decode_t d = {UTF8_OK};
     const uint8_t* u = (const uint8_t*)s;
     utf8_decode(&d, *u++);
     switch (d.size) {
@@ -72,17 +72,13 @@ STC_INLINE uint32_t utf8_peek(const char *s) {
 }
 
 STC_INLINE unsigned utf8_codep_size(const char *s) {
-    const unsigned u = (uint8_t)*s;
-    unsigned ret = (u & 0xF0) == 0xE0;
-    ret += ret << 1;                       // 3
-    ret |= u < 0x80;                       // 1
-    ret |= ((0xC1 < u) & (u < 0xE0)) << 1; // 2
-    ret |= ((0xEF < u) & (u < 0xF5)) << 2; // 4
-    return ret;
+    utf8_decode_t d = {UTF8_OK};
+    utf8_decode(&d, (uint8_t)*s);
+    return d.size;
 }
 
 STC_INLINE bool utf8_valid(const char* s) {
-    utf8_decode_t d = {UTF8_OK, 0};
+    utf8_decode_t d = {UTF8_OK};
     const uint8_t* u = (const uint8_t *)s;
     while (*u) utf8_decode(&d, *u++);
     return d.state == UTF8_OK;
@@ -124,7 +120,7 @@ STC_DEF unsigned utf8_encode(char *out, uint32_t c)
         out[1] = (char) ((c     & 0x3F) | 0x80);
         return 2;
     } else if (c < 0x010000U) {
-        if (c < 0xD800U || c >= 0xE000U) {
+        if ((c < 0xD800U) | (c >= 0xE000U)) {
             out[0] = (char) ((c>>12 & 0x0F) | 0xE0);
             out[1] = (char) ((c>>6  & 0x3F) | 0x80);
             out[2] = (char) ((c     & 0x3F) | 0x80);
