@@ -31,12 +31,13 @@ typedef struct { uint32_t state, codep, size; } utf8_decode_t;
 
 /* encode/decode next utf8 codepoint. */
 STC_API unsigned utf8_encode(char *out, uint32_t c);
-STC_API uint32_t utf8_decode(utf8_decode_t *d, const uint8_t b);
+STC_API void     utf8_decode(utf8_decode_t *d, const uint8_t b);
 
 /* number of codepoints in the utf8 string s */
 STC_INLINE size_t utf8_size(const char *s) {
     size_t size = 0;
-    while (*s) size += (*s++ & 0xC0) != 0x80;
+    while (*s)
+        size += (*s++ & 0xC0) != 0x80;
     return size;
 }
 
@@ -48,26 +49,23 @@ STC_INLINE size_t utf8_size_n(const char *s, size_t n) {
 }
 
 STC_INLINE const char* utf8_at(const char *s, size_t index) {
-    for (; (index > 0) & (*s != 0); ++s)
-        index -= (s[1] & 0xC0) != 0x80;
+    while ((index > 0) & (*s != 0))
+        index -= (*++s & 0xC0) != 0x80;
     return s;
 }
-
-STC_INLINE const char* utf8_next(const char* s)
-    { return utf8_at(s, 1); }
 
 STC_INLINE size_t utf8_pos(const char* s, size_t index)
     { return utf8_at(s, index) - s; }
 
-STC_INLINE uint32_t utf8_peek(const char *s) {
+STC_INLINE uint32_t utf8_peek(const char *s, unsigned* codep_size) {
     utf8_decode_t d = {UTF8_OK};
-    const uint8_t* u = (const uint8_t*)s;
-    utf8_decode(&d, *u++);
+    utf8_decode(&d, (uint8_t)*s++);
     switch (d.size) {
-        case 4: utf8_decode(&d, *u++);
-        case 3: utf8_decode(&d, *u++);
-        case 2: utf8_decode(&d, *u++);
+        case 4: utf8_decode(&d, (uint8_t)*s++);
+        case 3: utf8_decode(&d, (uint8_t)*s++);
+        case 2: utf8_decode(&d, (uint8_t)*s++);
     }
+    *codep_size = d.size;
     return d.codep;
 }
 
@@ -79,8 +77,8 @@ STC_INLINE unsigned utf8_codep_size(const char *s) {
 
 STC_INLINE bool utf8_valid(const char* s) {
     utf8_decode_t d = {UTF8_OK};
-    const uint8_t* u = (const uint8_t *)s;
-    while (*u) utf8_decode(&d, *u++);
+    while (*s)
+        utf8_decode(&d, (uint8_t)*s++);
     return d.state == UTF8_OK;
 }
 
@@ -89,7 +87,7 @@ STC_INLINE bool utf8_valid(const char* s) {
 // https://news.ycombinator.com/item?id=15423674
 // https://gist.github.com/s4y/344a355f8c1f99c6a4cb2347ec4323cc
 
-STC_DEF uint32_t utf8_decode(utf8_decode_t *d, const uint8_t b)
+STC_DEF void utf8_decode(utf8_decode_t *d, const uint8_t b)
 {
     switch (d->state) {
     case UTF8_OK:
@@ -107,7 +105,6 @@ STC_DEF uint32_t utf8_decode(utf8_decode_t *d, const uint8_t b)
         } else
             d->state = UTF8_ERROR, d->size = 0;
     }
-    return d->state;
 }
 
 STC_DEF unsigned utf8_encode(char *out, uint32_t c)
