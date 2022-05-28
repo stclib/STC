@@ -38,6 +38,15 @@ size_t       cstr_length(cstr s);
 size_t       cstr_capacity(cstr s);
 bool         cstr_empty(cstr s);
 
+// utf8:
+size_t       cstr_size_u8(cstr s);                                    // utf8 size
+size_t       cstr_size_n_u8(cstr s, size_t nbytes);                   // utf8 size within n bytes  
+csview       cstr_at(const cstr* self, size_t bytepos);               // utf8 character as a csview
+csview       cstr_at_u8(const cstr* self, size_t u8idx);              // utf8 character at utf8 pos
+size_t       cstr_pos_u8(const cstr* self, size_t u8idx);             // byte position at utf8 index
+bool         cstr_valid_u8(const cstr* self);                         // check if str is valid utf8
+utf8_decode_t cstr_peek(const cstr* self, size_t bytepos);
+
 size_t       cstr_reserve(cstr* self, size_t capacity);
 void         cstr_resize(cstr* self, size_t len, char fill);
 void         cstr_shrink_to_fit(cstr* self);

@@ -45,7 +45,7 @@
 typedef struct { char* data; size_t size, cap; } cstr_buf;
 typedef char cstr_value;
 #if defined STC_CSTR_V1
-    typedef struct cstr { char* str; } cstr;
+    typedef struct { char* str; } cstr;
 #else
     typedef union {
         struct { char data[sizeof(cstr_buf) - 1]; unsigned char last; } sml;
@@ -53,9 +53,12 @@ typedef char cstr_value;
     } cstr;
 #endif
 
-typedef struct csview { const char* str; size_t size; } csview;
-typedef union csview_iter { const char *ref; csview codep; } csview_iter;
+typedef struct { const char* str; size_t size; } csview;
 typedef char csview_value;
+typedef union { 
+    const char *ref; 
+    csview chr;
+} csview_iter, cstr_iter;
 
 #define c_true(...) __VA_ARGS__
 #define c_false(...)

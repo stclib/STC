@@ -32,6 +32,7 @@
 
 #include "ccommon.h"
 #include "forward.h"
+#include "utf8.h"
 #include <stdlib.h> /* malloc */
 #include <stdarg.h>
 #include <stdio.h> /* vsnprintf */
@@ -168,6 +169,53 @@ STC_INLINE size_t cstr_length(cstr s)
 STC_INLINE size_t cstr_capacity(cstr s)
     { return cstr_is_long(&s) ? cstr_l_cap(&s) : cstr_s_cap; }
 
+// utf8:
+
+STC_INLINE size_t cstr_size_u8(cstr s) 
+    { return utf8_size(cstr_str(&s)); }
+
+STC_INLINE size_t cstr_size_n_u8(cstr s, size_t nbytes) 
+    { return utf8_size_n(cstr_str(&s), nbytes); }
+
+STC_INLINE csview cstr_at(const cstr* self, size_t bytepos) {
+    csview sv = cstr_sv(self);
+    sv.str += bytepos;
+    sv.size = utf8_codep_size(sv.str);
+    return sv;
+}
+STC_INLINE csview cstr_at_u8(const cstr* self, size_t u8idx) {
+    csview sv = cstr_sv(self);
+    sv.str = utf8_at(sv.str, u8idx);
+    sv.size = utf8_codep_size(sv.str);
+    return sv;
+}
+
+STC_INLINE size_t cstr_pos_u8(const cstr* self, size_t u8idx) 
+    { return utf8_pos(cstr_str(self), u8idx); }
+
+STC_INLINE bool cstr_valid_u8(const cstr* self) 
+    { return utf8_valid(cstr_str(self)); }
+
+STC_INLINE utf8_decode_t cstr_peek(const cstr* self, size_t bytepos) {
+    utf8_decode_t d = {UTF8_OK};
+    utf8_peek(cstr_str(self) + bytepos, &d);
+    return d;
+}
+
+STC_INLINE cstr_iter cstr_begin(const cstr* self) { 
+    const char* str = cstr_str(self);
+    return c_make(cstr_iter){.chr = {str, utf8_codep_size(str)}};
+}
+STC_INLINE cstr_iter cstr_end(const cstr* self) {
+    csview sv = cstr_sv(self);
+    return c_make(cstr_iter){sv.str + sv.size};
+}
+STC_INLINE void cstr_next(cstr_iter* it) {
+    it->ref += it->chr.size;
+    it->chr.size = utf8_codep_size(it->ref);
+}
+
+
 STC_INLINE void cstr_clear(cstr* self)
     { _cstr_set_size(self, 0); }
 
@@ -250,7 +298,7 @@ STC_INLINE void cstr_replace_n(cstr* self, size_t pos, size_t len, const char* r
 STC_INLINE void cstr_replace(cstr* self, size_t pos, size_t len, const char* repl)
     { cstr_replace_n(self, pos, len, repl, strlen(repl)); }
 
-STC_INLINE size_t cstr_replace_first(cstr* self, size_t pos, const char* search, const char* repl) {
+STC_INLINE size_t cstr_replace_one(cstr* self, size_t pos, const char* search, const char* repl) {
     pos = cstr_find_from(*self, pos, search);
     if (pos == cstr_npos)
         return pos;

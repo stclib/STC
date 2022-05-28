@@ -13,9 +13,8 @@ int main()
         cstr_replace_sv(&s1, utf8_substr(cstr_str(&s1), 7, 1), c_sv("🐨"));
         printf("%s\n", cstr_str(&s1));
 
-        csview sv = csview_from_s(s1);
-        c_foreach (i, csview, sv)
-            printf("%" c_PRIsv ",", c_ARGsv(i.codep));
+        c_foreach (i, cstr, s1)
+            printf("%" c_PRIsv ",", c_ARGsv(i.chr));
     }
 }
 // Output:
@@ -54,19 +53,16 @@ STC_INLINE const char* utf8_at(const char *s, size_t index) {
     return s;
 }
 
-STC_INLINE size_t utf8_pos(const char* s, size_t index)
+STC_INLINE size_t utf8_pos(const char*   s, size_t index)
     { return utf8_at(s, index) - s; }
 
-STC_INLINE uint32_t utf8_peek(const char *s, unsigned* codep_size) {
-    utf8_decode_t d = {UTF8_OK};
-    utf8_decode(&d, (uint8_t)*s++);
-    switch (d.size) {
-        case 4: utf8_decode(&d, (uint8_t)*s++);
-        case 3: utf8_decode(&d, (uint8_t)*s++);
-        case 2: utf8_decode(&d, (uint8_t)*s++);
+STC_INLINE void utf8_peek(const char *s, utf8_decode_t* d) {
+    utf8_decode(d, (uint8_t)*s++);
+    switch (d->size) {
+        case 4: utf8_decode(d, (uint8_t)*s++);
+        case 3: utf8_decode(d, (uint8_t)*s++);
+        case 2: utf8_decode(d, (uint8_t)*s++);
     }
-    *codep_size = d.size;
-    return d.codep;
 }
 
 STC_INLINE unsigned utf8_codep_size(const char *s) {
@@ -78,6 +74,13 @@ STC_INLINE unsigned utf8_codep_size(const char *s) {
 STC_INLINE bool utf8_valid(const char* s) {
     utf8_decode_t d = {UTF8_OK};
     while (*s)
+        utf8_decode(&d, (uint8_t)*s++);
+    return d.state == UTF8_OK;
+}
+
+STC_INLINE bool utf8_valid_n(const char* s, size_t n) {
+    utf8_decode_t d = {UTF8_OK};
+    while ((n-- != 0) & (*s != 0))
         utf8_decode(&d, (uint8_t)*s++);
     return d.state == UTF8_OK;
 }

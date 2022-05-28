@@ -30,8 +30,6 @@
 #define                 csview_null  c_sv("")
 #define                 csview_new(literal) c_sv(literal)
 #define                 csview_npos  (SIZE_MAX >> 1)
-#define                 c_PRIsv      ".*s"
-#define                 c_ARGsv(sv)  (int)(sv).size, (sv).str
 
 STC_API csview          csview_substr(csview sv, intptr_t pos, size_t n);
 STC_API csview          csview_slice(csview sv, intptr_t p1, intptr_t p2);
@@ -64,23 +62,22 @@ STC_INLINE bool         csview_ends_with(csview sv, csview sub)
                             { if (sub.size > sv.size) return false;
                               return !memcmp(sv.str + sv.size - sub.size, sub.str, sub.size); }
 STC_INLINE csview_iter  csview_begin(const csview* self)
-                            { return c_make(csview_iter){.codep = {self->str, utf8_codep_size(self->str)}}; }
+                            { return c_make(csview_iter){.chr = {self->str, utf8_codep_size(self->str)}}; }
 STC_INLINE csview_iter  csview_end(const csview* self)
                             { return c_make(csview_iter){self->str + self->size}; }
 STC_INLINE void         csview_next(csview_iter* it)
-                            { it->ref += it->codep.size; it->codep.size = utf8_codep_size(it->ref); }
+                            { it->ref += it->chr.size; it->chr.size = utf8_codep_size(it->ref); }
 
 /* utf8 */
-STC_INLINE bool utf8_valid_sv(csview sv)
-    { return utf8_size_n(sv.str, sv.size) != SIZE_MAX; }
+STC_INLINE bool csview_valid_u8(csview sv)
+    { return utf8_valid_n(sv.str, sv.size); }
 
-STC_INLINE size_t utf8_size_sv(csview sv)
+STC_INLINE size_t csview_size_u8(csview sv)
     { return utf8_size_n(sv.str, sv.size); }
 
-STC_INLINE csview utf8_substr(const char* str, size_t pos, size_t n) {
-    csview sv;
-    sv.str = utf8_at(str, pos);
-    sv.size = utf8_pos(sv.str, n);
+STC_INLINE csview csview_substr_u8(csview sv, size_t u8pos, size_t u8len) {
+    sv.str = utf8_at(sv.str, u8pos);
+    sv.size = utf8_pos(sv.str, u8len);
     return sv;
 }
 

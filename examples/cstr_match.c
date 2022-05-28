@@ -1,4 +1,5 @@
 #include <stc/cstr.h>
+#include <stc/csview.h>
 #include <stdio.h>
 
 int main()
@@ -11,5 +12,11 @@ int main()
         printf("starts_with: %d\n", cstr_starts_with(ss, "The quick brown"));
         printf("ends_with: %d\n", cstr_ends_with(ss, ".jpg"));
         printf("ends_with: %d\n", cstr_ends_with(ss, ".JPG"));
+
+        cstr s1 = cstr_new("hell😀 w😀rl🐨");
+        csview ch1 = cstr_at(&s1, 10);
+        csview ch2 = cstr_at_u8(&s1, 10);
+        printf("ch1: %" c_PRIsv "\n", c_ARGsv(ch1));
+        printf("ch2: %" c_PRIsv "\n", c_ARGsv(ch2));
     }
 }

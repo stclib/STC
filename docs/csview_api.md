@@ -57,20 +57,21 @@ void            csview_next(csview_iter* it);                       // NB: UTF8 
 
 #### UTF8 methods
 ```
-bool            utf8_valid_sv(csview sv);
-size_t          utf8_size_sv(csview sv);
-csview          utf8_substr(const char* str, size_t pos, size_t n);
+bool            csview_valid_u8(csview sv);
+size_t          csview_size_u8(csview sv);
+csview          csview_substr_u8(csview sv, size_t u8pos, size_t u8len);
 
 bool            utf8_valid(const char* s);
+bool            utf8_valid_n(const char* s, size_t n);
 size_t          utf8_size(const char *s);
 size_t          utf8_size_n(const char *s, size_t n);               // number of UTF8 codepoints within n bytes
 const char*     utf8_at(const char *s, size_t index);               // from UTF8 index to char* position
 size_t          utf8_pos(const char* s, size_t index);              // from UTF8 index to byte index position
-const char*     utf8_next(const char *s);                           // next codepoint as char*; NULL if *s == 0
-uint32_t        utf8_peek(const char *s);                           // next codepoint as uint32_t
-
-size_t          utf8_codep_size(const char* s);                     // 1-4 (0 if s[0] is illegal first cp char)
-uint32_t        utf8_decode(uint32_t *state, uint32_t *codep, const uint32_t byte); // decode next utf8 codepoint.
+unsigned        utf8_codep_size(const char* s);                     // 0-4 (0 if s[0] is illegal utf8)
+void            utf8_peek(const char *s, utf8_decode_t* d);         // next codepoint as uint32_t
+uint32_t        utf8_decode(utf8_decode_t *d, uint8_t byte,         // d holds state, size and unicode point
+                            const uint32_t byte);                   // decode next utf8 codepoint.
+unsigned        utf8_encode(char *out, uint32_t cp);                // encode unicode cp into out
 ```
 
 #### Extended cstr methods
@@ -159,9 +160,8 @@ int main()
         cstr_replace_sv(&s1, utf8_substr(cstr_str(&s1), 7, 1), c_sv("x"));
         printf("%s\n", cstr_str(&s1));
 
-        csview sv = csview_from_s(&s1);
-        c_foreach (i, csview, sv)
-            printf("%" c_PRIsv ",", c_ARGsv(i.codep));
+        c_foreach (i, cstr, s1)
+            printf("%" c_PRIsv ",", c_ARGsv(i.chr));
     }
 }
 ```
