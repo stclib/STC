@@ -1,3 +1,4 @@
+#include <stc/cstr.h>
 #define i_val_str
 #include <stc/cvec.h>
 #include <stc/csview.h>

@@ -2,6 +2,7 @@
 // https://en.cppreference.com/w/cpp/container/multimap/insert
 
 // Multimap entries
+#include <stc/cstr.h>
 #define i_val_str
 #include <stc/clist.h>
 

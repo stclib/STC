@@ -13,6 +13,7 @@ struct { double x, y; } typedef Point;
 #define i_tag pnt
 #include <stc/cset.h>
 
+#include <stc/cstr.h>
 // Map of int64 pointers: Define i_valraw as int64_t for easy emplace calls!
 typedef int64_t inttype;
 #define i_key_str

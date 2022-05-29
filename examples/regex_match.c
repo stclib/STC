@@ -1,4 +1,6 @@
 #include <stdio.h>
+#define i_implement
+#include <stc/cstr.h>
 #include <stc/cregex.h>
 #include <stc/crandom.h>
 #include <stc/csview.h>
@@ -33,3 +35,4 @@ int main()
 }
 
 #include "../src/cregex.c"
+#include "../src/casefold.c"

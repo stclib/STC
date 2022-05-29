@@ -1,8 +1,6 @@
-#include <stdint.h>
-#include <stdio.h>
 #include <ctype.h>
-#include <stc/utf8.h>
-#include <stdbool.h>
+#define i_header
+#include <stc/cstr.h>
 
 static struct CaseFold { uint16_t c0, c1, m1; } casefold[] = {
     {65, 90, 122}, {181, 181, 956}, {192, 214, 246}, {216, 222, 254},
@@ -127,6 +125,52 @@ bool utf8_isalpha(uint32_t c) {
     return utf8_islower(c) || utf8_isupper(c);
 }
 
+static struct fnfold {
+    int (*conv_asc)(int);
+    uint32_t (*conv_u8)(uint32_t);
+}
+fn_tolower = {tolower, utf8_tolower},
+fn_toupper = {toupper, utf8_toupper};
+
+
+static cstr cstr_casefold(const cstr* self, struct fnfold fold) {
+    csview sv = cstr_sv(self);
+    cstr out = cstr_null;
+    char *buf = cstr_reserve(&out, sv.size*3/2);
+    uint32_t cp; size_t sz = 0;
+    utf8_decode_t d = {UTF8_OK};
+
+    for (; *sv.str; sv.str += d.size) {
+        utf8_peek(sv.str, &d);
+        switch (d.size) {
+        case 1:
+            buf[sz++] = (char)fold.conv_asc(*sv.str);
+            break;
+        default: 
+            cp = fold.conv_u8(d.codep);
+            sz += utf8_encode(buf + sz, cp);
+        }
+    }
+    _cstr_set_size(&out, sz);
+    cstr_shrink_to_fit(&out);
+    return out;
+}
+
+cstr cstr_tolower(const cstr* self) {
+    return cstr_casefold(self, fn_tolower);
+}
+
+cstr cstr_toupper(const cstr* self) {
+    return cstr_casefold(self, fn_toupper);
+}
+
+void cstr_lowercase(cstr* self) {
+    cstr_take(self, cstr_casefold(self, fn_tolower));
+}
+
+void cstr_uppercase(cstr* self) {
+    cstr_take(self, cstr_casefold(self, fn_toupper));
+}
 
 #ifdef TEST
 int main()
@@ -134,14 +178,29 @@ int main()
     for (size_t i=0; i < sizeof cfold_low/sizeof *cfold_low; ++i)
     {
         char x[3][5]={0};
+        unsigned s0, s1, s2;
         uint32_t a = casefold[i].c0;
         uint32_t b = utf8_tolower(a);
         uint32_t c = utf8_toupper(b);
 
-        utf8_encode(x[0], a);
-        utf8_encode(x[1], b);
-        utf8_encode(x[2], c);
-        printf("%s %s %s - %u %u %u\n", x[0], x[1], x[2], a, b, c);
+        s0 = utf8_encode(x[0], a);
+        s1 = utf8_encode(x[1], b);
+        s2 = utf8_encode(x[2], c);
+        printf("%s %s %s - %u %u %u (%u %u %u)\n", x[0], x[1], x[2], a, b, c, s0, s1, s2);
+    }
+    c_auto (cstr, t1)
+    {
+        t1 = cstr_new("Die preußischen Köstlichkeiten.");
+
+        cstr_buf b = cstr_buffer(&t1);
+        printf("%s, %llu %llu\n", b.data, b.size, b.cap);
+        cstr_lowercase(&t1);
+        b = cstr_buffer(&t1);
+        printf("%s, %llu %llu\n", b.data, b.size, b.cap);
+
+        cstr_uppercase(&t1);
+        b = cstr_buffer(&t1);
+        printf("%s, %llu %llu\n", b.data, b.size, b.cap);
     }
 }
 #endif
