@@ -35,7 +35,7 @@ struct OlympicsData { int year; const char *city, *country, *date; } ol_data[] =
 
 typedef struct { int year; cstr city, date; } OlympicLocation;
 
-int OlympicLocation_cmp(OlympicLocation* a, OlympicLocation* b);
+int OlympicLocation_cmp(const OlympicLocation* a, const OlympicLocation* b);
 OlympicLocation OlympicLocation_clone(OlympicLocation loc);
 void OlympicLocation_drop(OlympicLocation* self);
 
@@ -50,7 +50,7 @@ void OlympicLocation_drop(OlympicLocation* self);
 #define i_tag OL
 #include <stc/csmap.h>
 
-int OlympicLocation_cmp(OlympicLocation* a, OlympicLocation* b) {
+int OlympicLocation_cmp(const OlympicLocation* a, const OlympicLocation* b) {
     return a->year - b->year;
 }
 

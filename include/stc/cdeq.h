@@ -59,7 +59,7 @@ STC_API _cx_value*      _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* po
 #endif // !_i_no_clone
 
 #if !c_option(c_no_cmp)
-STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter p1, _cx_iter p2, i_keyraw raw);
+STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter p1, _cx_iter p2, _cx_raw raw);
 STC_API int             _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y);
 #endif
 STC_API _cx_value*      _cx_memb(_push_front)(_cx_self* self, i_key value);
@@ -71,7 +71,7 @@ STC_API _cx_value*      _cx_memb(_insert_range_p)(_cx_self* self, _cx_value* pos
 #if !defined _i_no_clone
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 #if !defined _i_no_emplace
-STC_INLINE _cx_value*   _cx_memb(_emplace)(_cx_self* self, i_keyraw raw)
+STC_INLINE _cx_value*   _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
                             { return _cx_memb(_push)(self, i_keyfrom(raw)); }
 #endif
 STC_INLINE i_key        _cx_memb(_value_clone)(i_key val)
@@ -84,7 +84,7 @@ STC_INLINE void         _cx_memb(_copy)(_cx_self *self, _cx_self other) {
 STC_INLINE size_t       _cx_memb(_size)(_cx_self cx) { return cdeq_rep_(&cx)->size; }
 STC_INLINE size_t       _cx_memb(_capacity)(_cx_self cx) { return cdeq_rep_(&cx)->cap; }
 STC_INLINE bool         _cx_memb(_empty)(_cx_self cx) { return !cdeq_rep_(&cx)->size; }
-STC_INLINE i_keyraw     _cx_memb(_value_toraw)(_cx_value* pval) { return i_keyto(pval); }
+STC_INLINE _cx_raw      _cx_memb(_value_toraw)(_cx_value* pval) { return i_keyto(pval); }
 STC_INLINE void         _cx_memb(_swap)(_cx_self* a, _cx_self* b) { c_swap(_cx_self, *a, *b); }
 STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return self->data; }
 STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self)
@@ -149,11 +149,11 @@ _cx_memb(_emplace_range)(_cx_self* self, _cx_iter it, _cx_iter it1, _cx_iter it2
 }
 
 STC_INLINE _cx_value*
-_cx_memb(_emplace_front)(_cx_self* self, i_keyraw raw) {
+_cx_memb(_emplace_front)(_cx_self* self, _cx_raw raw) {
     return _cx_memb(_push_front)(self, i_keyfrom(raw));
 }
 
-STC_INLINE _cx_value* _cx_memb(_emplace_back)(_cx_self* self, i_keyraw raw) {
+STC_INLINE _cx_value* _cx_memb(_emplace_back)(_cx_self* self, _cx_raw raw) {
     return _cx_memb(_push)(self, i_keyfrom(raw));
 }
 
@@ -162,7 +162,7 @@ _cx_memb(_emplace_n)(_cx_self* self, const size_t idx, const _cx_raw arr[], cons
     return _cx_memb(_emplace_range_p)(self, self->data + idx, arr, arr + n);
 }
 STC_INLINE _cx_value*
-_cx_memb(_emplace_at)(_cx_self* self, _cx_iter it, i_keyraw raw) {
+_cx_memb(_emplace_at)(_cx_self* self, _cx_iter it, _cx_raw raw) {
     return _cx_memb(_emplace_range_p)(self, it.ref, &raw, &raw + 1);
 }
 #endif // !_i_no_clone && !_i_no_emplace
@@ -170,19 +170,19 @@ _cx_memb(_emplace_at)(_cx_self* self, _cx_iter it, i_keyraw raw) {
 #if !c_option(c_no_cmp)
 
 STC_INLINE _cx_iter
-_cx_memb(_find)(const _cx_self* self, i_keyraw raw) {
+_cx_memb(_find)(const _cx_self* self, _cx_raw raw) {
     return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), raw);
 }
 
 STC_INLINE const _cx_value*
-_cx_memb(_get)(const _cx_self* self, i_keyraw raw) {
+_cx_memb(_get)(const _cx_self* self, _cx_raw raw) {
     _cx_iter end = _cx_memb(_end)(self);
     _cx_value* val = _cx_memb(_find_in)(_cx_memb(_begin)(self), end, raw).ref;
     return val == end.ref ? NULL : val;
 }
 
 STC_INLINE _cx_value*
-_cx_memb(_get_mut)(_cx_self* self, i_keyraw raw)
+_cx_memb(_get_mut)(_cx_self* self, _cx_raw raw)
     { return (_cx_value *) _cx_memb(_get)(self, raw); }
 
 STC_INLINE void
@@ -415,9 +415,9 @@ _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
 #if !c_option(c_no_cmp)
 
 STC_DEF _cx_iter
-_cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, i_keyraw raw) {
+_cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
     for (; i1.ref != i2.ref; ++i1.ref) {
-        i_keyraw r = i_keyto(i1.ref);
+        _cx_raw r = i_keyto(i1.ref);
         if (i_eq((&raw), (&r)))
             return i1;
     }
@@ -426,8 +426,8 @@ _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, i_keyraw raw) {
 
 STC_DEF int
 _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
-    const i_keyraw rx = i_keyto(x);
-    const i_keyraw ry = i_keyto(y);
+    const _cx_raw rx = i_keyto(x);
+    const _cx_raw ry = i_keyto(y);
     return i_cmp((&rx), (&ry));
 }
 #endif // !c_no_cmp
