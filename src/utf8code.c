@@ -100,6 +100,19 @@ uint32_t utf8_toupper(uint32_t c) {
     return c;
 }
 
+int utf8_icmp_n(const char* s1, const char* s2, size_t u8max) {
+    int ret = 0;
+    utf8_decode_t d1 = {UTF8_OK}, d2 = {UTF8_OK};
+    for (; u8max--; s1 += d1.size, s2 += d2.size) {
+        utf8_peek(&d1, s1);
+        utf8_peek(&d2, s2);
+        ret = utf8_tolower(d1.codep) - utf8_tolower(d2.codep);
+        if (ret || !*s2)
+            break;
+    }
+    return ret;
+}
+
 bool utf8_isupper(uint32_t c) {
     return utf8_tolower(c) != c;
 }
