@@ -30,6 +30,7 @@
 #ifndef CSTR_H_INCLUDED
 #define CSTR_H_INCLUDED
 
+#define i_header
 #include "ccommon.h"
 #include "forward.h"
 #include "utf8.h"
@@ -537,5 +538,4 @@ STC_DEF int cstr_printf(cstr* self, const char* fmt, ...) {
 #undef i_header
 #undef i_static
 #undef i_implement
-//#undef i_implement
 #endif // !STC_CSTR_V1

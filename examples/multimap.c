@@ -1,5 +1,5 @@
+#define i_implement
 #include <stc/cstr.h>
-#include <stdio.h>
 
 // Olympics multimap example
 

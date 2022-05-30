@@ -1,5 +1,5 @@
+#define i_implement
 #include <stc/cstr.h>
-#include <stdio.h>
 
 // This implements the std::map insert c++ example at:
 // https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-19

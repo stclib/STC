@@ -51,6 +51,7 @@ int main() {
 */
 
 #ifndef CBITS_H_INCLUDED
+#define i_header
 #include "ccommon.h"
 #include <stdlib.h>
 #include <string.h>

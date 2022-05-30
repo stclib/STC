@@ -23,6 +23,7 @@
 #ifndef CSVIEW_H_INCLUDED
 #define CSVIEW_H_INCLUDED
 
+#define i_header
 #include "ccommon.h"
 #include "forward.h"
 #include "utf8.h"
@@ -31,8 +32,8 @@
 #define             csview_new(literal) c_sv(literal)
 #define             csview_npos  (SIZE_MAX >> 1)
 
-STC_API csview      csview_substr(csview sv, intptr_t pos, size_t n);
-STC_API csview      csview_slice(csview sv, intptr_t p1, intptr_t p2);
+STC_API csview      csview_substr_ex(csview sv, intptr_t pos, size_t n);
+STC_API csview      csview_slice_ex(csview sv, intptr_t p1, intptr_t p2);
 STC_API csview      csview_token(csview sv, csview sep, size_t* start);
 
 STC_INLINE csview   csview_init() { return csview_null; }
@@ -69,6 +70,18 @@ STC_INLINE bool csview_ends_with(csview sv, csview sub) {
     return !memcmp(sv.str + sv.size - sub.size, sub.str, sub.size);
 }
 
+STC_INLINE csview csview_substr(csview sv, size_t pos, size_t n) {
+    if (pos + n > sv.size) n = sv.size - pos;
+    sv.str += pos, sv.size = n;
+    return sv;
+}
+
+STC_INLINE csview csview_slice(csview sv, size_t p1, size_t p2) {
+    if (p2 > sv.size) p2 = sv.size;
+    sv.str += p1, sv.size = p2 > p1 ? p2 - p1 : 0;
+    return sv;
+}
+
 /* iterator */
 STC_INLINE csview_iter csview_begin(const csview* self)
     { return c_make(csview_iter){.chr = {self->str, utf8_codep_size(self->str)}}; }
@@ -80,9 +93,6 @@ STC_INLINE void csview_next(csview_iter* it)
     { it->ref += it->chr.size; it->chr.size = utf8_codep_size(it->ref); }
 
 /* utf8 */
-STC_INLINE bool csview_valid_u8(csview sv) // depends on src/utf8utils.c
-    { return utf8_valid_n(sv.str, sv.size); }
-
 STC_INLINE size_t csview_size_u8(csview sv)
     { return utf8_size_n(sv.str, sv.size); }
 
@@ -91,6 +101,10 @@ STC_INLINE csview csview_substr_u8(csview sv, size_t u8pos, size_t u8len) {
     sv.size = utf8_pos(sv.str, u8len);
     return sv;
 }
+
+STC_INLINE bool csview_valid_u8(csview sv) // depends on src/utf8utils.c
+    { return utf8_valid_n(sv.str, sv.size); }
+
 
 /* csview interaction with cstr: */
 #ifdef CSTR_H_INCLUDED
@@ -101,11 +115,17 @@ STC_INLINE csview csview_from_s(const cstr* self)
 STC_INLINE cstr cstr_from_sv(csview sv)
     { return cstr_from_n(sv.str, sv.size); }
 
-STC_INLINE csview cstr_substr(const cstr* self, intptr_t pos, size_t n)
+STC_INLINE csview cstr_substr(const cstr* self, size_t pos, size_t n)
     { return csview_substr(csview_from_s(self), pos, n); }
 
-STC_INLINE csview cstr_slice(const cstr* self, intptr_t p1, intptr_t p2)
+STC_INLINE csview cstr_slice(const cstr* self, size_t p1, size_t p2)
     { return csview_slice(csview_from_s(self), p1, p2); }
+
+STC_INLINE csview cstr_substr_ex(const cstr* self, intptr_t pos, size_t n)
+    { return csview_substr_ex(csview_from_s(self), pos, n); }
+
+STC_INLINE csview cstr_slice_ex(const cstr* self, intptr_t p1, intptr_t p2)
+    { return csview_slice_ex(csview_from_s(self), p1, p2); }
 
 STC_INLINE csview cstr_assign_sv(cstr* self, csview sv)
     { return c_make(csview){cstr_assign_n(self, sv.str, sv.size), sv.size}; }
@@ -155,7 +175,7 @@ STC_INLINE uint64_t csview_hash(const csview *self)
 #if defined(i_implement)
 
 STC_DEF csview
-csview_substr(csview sv, intptr_t pos, size_t n) {
+csview_substr_ex(csview sv, intptr_t pos, size_t n) {
     if (pos < 0) { 
         pos += sv.size;
         if (pos < 0) pos = 0;
@@ -167,7 +187,7 @@ csview_substr(csview sv, intptr_t pos, size_t n) {
 }
 
 STC_DEF csview
-csview_slice(csview sv, intptr_t p1, intptr_t p2) {
+csview_slice_ex(csview sv, intptr_t p1, intptr_t p2) {
     if (p1 < 0) { 
         p1 += sv.size;
         if (p1 < 0) p1 = 0;

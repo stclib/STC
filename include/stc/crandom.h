@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#define i_header
 #include "ccommon.h"
 
 #ifndef CRANDOM_H_INCLUDED
@@ -73,6 +74,10 @@ STC_INLINE stc64_t stc64_new(uint64_t seed)
 STC_API stc64_uniform_t stc64_uniform_new(int64_t low, int64_t high);
 STC_API int64_t stc64_uniform(stc64_t* rng, stc64_uniform_t* dist);
 
+/* Normal distribution PRNG */
+STC_API double stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
+
+
 /* Main stc64 prng */
 STC_INLINE uint64_t stc64_rand(stc64_t* rng) {
     uint64_t *s = rng->state; enum {LR=24, RS=11, LS=3};
@@ -102,21 +107,6 @@ STC_INLINE stc64_uniformf_t stc64_uniformf_new(double low, double high) {
 /* Marsaglia polar method for gaussian/normal distribution, float64. */
 STC_INLINE stc64_normalf_t stc64_normalf_new(double mean, double stddev) {
     return c_make(stc64_normalf_t){mean, stddev, 0.0, 0};
-}
-
-/* Normal distribution PRNG */
-STC_INLINE double stc64_normalf(stc64_t* rng, stc64_normalf_t* dist) {
-    double u1, u2, s, m;
-    if (dist->has_next++ & 1)
-        return dist->next * dist->stddev + dist->mean;
-    do {
-        u1 = 2.0 * stc64_randf(rng) - 1.0;
-        u2 = 2.0 * stc64_randf(rng) - 1.0;
-        s = u1*u1 + u2*u2;
-    } while (s >= 1.0 || s == 0.0);
-    m = sqrt(-2.0 * log(s) / s);
-    dist->next = u2 * m;
-    return (u1 * m) * dist->stddev + dist->mean;
 }
 
 /* Following functions are deprecated (will be removed in the future): */
@@ -179,6 +169,21 @@ STC_DEF int64_t stc64_uniform(stc64_t* rng, stc64_uniform_t* d) {
     } while (x - r > -d->range);
     return d->lower + r;
 #endif
+}
+
+/* Normal distribution PRNG */
+STC_DEF double stc64_normalf(stc64_t* rng, stc64_normalf_t* dist) {
+    double u1, u2, s, m;
+    if (dist->has_next++ & 1)
+        return dist->next * dist->stddev + dist->mean;
+    do {
+        u1 = 2.0 * stc64_randf(rng) - 1.0;
+        u2 = 2.0 * stc64_randf(rng) - 1.0;
+        s = u1*u1 + u2*u2;
+    } while (s >= 1.0 || s == 0.0);
+    m = sqrt(-2.0 * log(s) / s);
+    dist->next = u2 * m;
+    return (u1 * m) * dist->stddev + dist->mean;
 }
 
 #endif

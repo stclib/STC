@@ -1,7 +1,9 @@
+#define i_implement
 #include <stc/cstr.h>
+#define i_implement
+#include <stc/csview.h>
 #define i_val_str
 #include <stc/cvec.h>
-#include <stc/csview.h>
 
 void print_split(csview str, csview sep)
 {

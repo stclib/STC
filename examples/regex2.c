@@ -1,6 +1,7 @@
+#define i_implement
+#include <stc/cstr.h>
 #include <stc/cregex.h>
 #include <stc/csview.h>
-#include <stc/cstr.h>
 
 int main()
 {

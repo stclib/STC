@@ -1,5 +1,5 @@
 // unordered_map<string, unordered_map<string, string>>:
-
+#define i_implement
 #include <stc/cstr.h>
 #define i_type People
 #define i_key_str

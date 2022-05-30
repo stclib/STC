@@ -31,7 +31,9 @@ THE SOFTWARE.
 #include <setjmp.h>
 #include <string.h>
 #include <ctype.h>
+#include <stdio.h>
 #include <stc/cregex.h>
+#include <stc/utf8.h>
 
 typedef uint32_t Rune; /* Utf8 code point */
 typedef int32_t Token;

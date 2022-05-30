@@ -1,6 +1,7 @@
 
 #include <stdio.h>
 #include <time.h>
+#define i_implement
 #include <stc/crandom.h>
 
 #define i_val int64_t

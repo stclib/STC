@@ -1,5 +1,5 @@
+#define i_implement
 #include <stc/cstr.h>
-#include <stc/forward.h>
 
 forward_clist(clist_i32, int);
 forward_clist(clist_pnt, struct Point);

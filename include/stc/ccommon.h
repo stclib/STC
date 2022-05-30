@@ -252,8 +252,8 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #undef STC_API
 #undef STC_DEF
 
-#if !defined i_static && (defined(i_header) || defined(i_implement) || \
-                          defined(STC_HEADER) || defined(STC_IMPLEMENT))
+#if !defined(i_static) && !defined(STC_STATIC) && (defined(i_header) || defined(STC_HEADER) || \
+                                                   defined(i_implement) || defined(STC_IMPLEMENT))
 #  define STC_API extern
 #  define STC_DEF
 #else

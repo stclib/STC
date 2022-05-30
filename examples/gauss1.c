@@ -1,7 +1,8 @@
-#include <stdio.h>
 #include <time.h>
 #include <math.h>
+#define i_implement
 #include <stc/crandom.h>
+#define i_implement
 #include <stc/cstr.h>
 
 // Declare int -> int hashmap. Uses typetag 'ii' for ints.

@@ -1,12 +1,6 @@
-#include <stdio.h>
 #define i_implement
 #include <stc/cstr.h>
 #include <stc/cregex.h>
-#include <stc/crandom.h>
-#include <stc/csview.h>
-#define i_val double
-#include <time.h>
-
 
 int main()
 {

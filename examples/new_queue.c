@@ -1,3 +1,4 @@
+#define i_implement
 #include <stc/crandom.h>
 #include <stc/forward.h>
 #include <stdio.h>
