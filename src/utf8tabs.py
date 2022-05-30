@@ -113,7 +113,7 @@ struct CaseFold casefold[] = {''')
             print('')
         count += 1
         n += 1
-    print('\n}; // %d' % (count))
+    print('\n}; // %d\n' % (count))
     return table
 
 
