@@ -171,10 +171,11 @@ STC_INLINE size_t cstr_capacity(cstr s)
     { return cstr_is_long(&s) ? cstr_l_cap(&s) : cstr_s_cap; }
 
 // utf8 methods defined in/depending on src/utf8code.c:
-cstr cstr_tolower(const cstr* self);
-cstr cstr_toupper(const cstr* self);
-void cstr_lowercase(cstr* self);
-void cstr_uppercase(cstr* self);
+
+extern cstr cstr_tolower(const cstr* self);
+extern cstr cstr_toupper(const cstr* self);
+extern void cstr_lowercase(cstr* self);
+extern void cstr_uppercase(cstr* self);
 
 STC_INLINE bool cstr_valid_u8(const cstr* self) 
     { return utf8_valid(cstr_str(self)); }

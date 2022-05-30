@@ -44,13 +44,19 @@ size_t       cstr_size_n_u8(cstr s, size_t nbytes);                   // utf8 si
 csview       cstr_at(const cstr* self, size_t bytepos);               // utf8 character as a csview
 csview       cstr_at_u8(const cstr* self, size_t u8idx);              // utf8 character at utf8 pos
 size_t       cstr_pos_u8(const cstr* self, size_t u8idx);             // byte position at utf8 index
+
+// utf8: requires linking with src/utf8code.c
+cstr         cstr_tolower(const cstr* self);                          // returns new lowercase utf8 cstr
+cstr         cstr_toupper(const cstr* self);                          // returns new uppercase utf8 cstr
+void         cstr_lowercase(cstr* self);                              // transform cstr to lowercase utf8
+void         cstr_uppercase(cstr* self);                              // transform cstr to uppercase utf8
 bool         cstr_valid_u8(const cstr* self);                         // check if str is valid utf8
-utf8_decode_t cstr_peek(const cstr* self, size_t bytepos);
+utf8_decode_t cstr_peek(const cstr* self, size_t bytepos);            // get next unicode point at string pos
 
 size_t       cstr_reserve(cstr* self, size_t capacity);
 void         cstr_resize(cstr* self, size_t len, char fill);
 void         cstr_shrink_to_fit(cstr* self);
-char*        cstr_expand_uninit(cstr* self, size_t n);         // return ptr to uninit data
+char*        cstr_expand_uninit(cstr* self, size_t n);                // return ptr to uninit data
 void         cstr_clear(cstr* self);
 
 char*        cstr_assign(cstr* self, const char* str);
@@ -59,18 +65,18 @@ char*        cstr_assign_n(cstr* self, const char* str, size_t n);    // assign 
 void         cstr_copy(cstr* self, cstr s);                           // like cstr_assign_s()
 int          cstr_printf(cstr* self, const char* fmt, ...);           // printf() formatting
 
-char*        cstr_append(cstr* self, const char* str);
-char*        cstr_append_s(cstr* self, cstr s);
-char*        cstr_append_n(cstr* self, const char* str, size_t n);
+char*        cstr_append(cstr* self, const char* app);
+char*        cstr_append_s(cstr* self, cstr app);
+char*        cstr_append_n(cstr* self, const char* app, size_t n);
 
-void         cstr_insert(cstr* self, size_t pos, const char* str);
-void         cstr_insert_s(cstr* self, size_t pos, cstr s);
-void         cstr_insert_n(cstr* self, size_t pos, const char* str, size_t n);
+void         cstr_insert(cstr* self, size_t pos, const char* ins);
+void         cstr_insert_s(cstr* self, size_t pos, cstr ins);
+void         cstr_insert_n(cstr* self, size_t pos, const char* ins, size_t n);
 
 void         cstr_replace(cstr* self, size_t pos, size_t len, const char* repl);
-void         cstr_replace_s(cstr* self, size_t pos, size_t len, cstr s);
+void         cstr_replace_s(cstr* self, size_t pos, size_t len, cstr repl);
 void         cstr_replace_n(cstr* self, size_t pos, size_t len, const char* repl, size_t n);
-size_t       cstr_replace_first(cstr* self, size_t pos, const char* search, const char* repl);
+size_t       cstr_replace_one(cstr* self, size_t startpos, const char* search, const char* repl);
 void         cstr_replace_all(cstr* self, const char* search, const char* repl);
 
 void         cstr_erase(cstr* self, size_t pos);
