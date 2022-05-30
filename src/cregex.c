@@ -32,7 +32,6 @@ THE SOFTWARE.
 #include <string.h>
 #include <ctype.h>
 #include <stc/cregex.h>
-#include "cregex_utf8.c"
 
 typedef uint32_t Rune; /* Utf8 code point */
 typedef int32_t Token;
@@ -594,7 +593,7 @@ nextc(Parser *par, Rune *rp)
                 return 2;
             case 'p': case 'P': { /* https://www.regular-expressions.info/unicode.html */
                 static struct { const char* c; int n, r; } cls[] = {
-                    {"{Alpha}", 7, U8_LC}, {"{LC}", 4, U8_LC}, 
+                    {"{Alpha}", 7, U8_LC}, {"{LC}", 4, U8_LC},
                     {"{Alnum}", 7, U8_Xan},
                     {"{Digit}", 7, U8_Nd}, {"{Nd}", 4, U8_Nd},
                     {"{Lower}", 7, U8_Ll}, {"{Ll}", 4, U8_Ll},

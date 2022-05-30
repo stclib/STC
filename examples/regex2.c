@@ -33,4 +33,4 @@ int main()
 }
 
 #include "../src/cregex.c"
-#include "../src/casefold.c"
+#include "../src/utf8utils.c"

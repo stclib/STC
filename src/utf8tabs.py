@@ -8,7 +8,7 @@ def read_unidata(catfilter='Lu', casefilter='lowcase', big=False):
                              'decdig', 'digval', 'numval', 'mirrored', 'uc1name', 'comment',
                              'upcase', 'lowcase', 'titlecase'],
                       usecols=['code', 'name', 'category', 'bidircat', 'upcase', 'lowcase', 'titlecase'])
-    if big: 
+    if big:
         ud = ud[ud['code'] >= (1<<16)]
     else:
         ud = ud[ud['code'] < (1<<16)]
@@ -84,7 +84,7 @@ def make_casefold(letters):
 
 def print_casefold(cfold):
     print('''
-static struct CaseFold { uint16_t c0, c1, m1; } casefold[] = {''')
+struct CaseFold casefold[] = {''')
     n = 1
     s = 5
     count = 0
@@ -99,7 +99,7 @@ static struct CaseFold { uint16_t c0, c1, m1; } casefold[] = {''')
             break
         #print(' {%d, %d, %d}, // %s %s, %s\n   ' % (a, b, c, chr(a), chr(a + x[2]), x[3]), end='')
         if True: # compact
-            if n == s: 
+            if n == s:
                 n = 0
                 if a > 1000:
                     s = 4
@@ -129,7 +129,7 @@ def print_casefold_low(table):
     cfold_low = [i for i in range(len(table))]
     cfold_low.sort(key=lambda i: table[i][2] - (table[i][1] - table[i][0]))
 
-    print('static uint8_t cfold_low[] = {\n   ', end='')
+    print('uint8_t cfold_low[] = {\n   ', end='')
     for i in range(len(cfold_low)):
         print(" %d," % (cfold_low[i]), end='\n   ' if (i+1) % 20 == 0 else '')
     print('\n};')
@@ -138,98 +138,7 @@ def print_casefold_low(table):
 ########### main:
 
 if __name__ == "__main__":
-    print('''#include <stdint.h>
-#include <stdio.h>
-#include <ctype.h>
-#include <stc/utf8.h>
-#include <stdbool.h>''')
-
+    print('#include "utf8tabs.h"')
     cfold = make_casetable()
     table = print_casefold(cfold)
     print_casefold_low(table)
-
-    print(r'''
-uint32_t utf8_tolower(uint32_t c) {
-    for (size_t i=0; i < sizeof casefold/sizeof *casefold; ++i) {
-        if (c <= casefold[i].c1) {
-            if (c < casefold[i].c0) return c;
-            int d = casefold[i].m1 - casefold[i].c1;
-            if (d == 1) return c + ((casefold[i].c1 & 1) == (c & 1));
-            return c + d;
-        }
-    }
-    return c;
-}
-
-uint32_t utf8_toupper(uint32_t c) {
-    for (size_t i=0; i < sizeof cfold_low/sizeof *cfold_low; ++i) {
-        struct CaseFold cfold = casefold[cfold_low[i]];
-        if (c <= cfold.m1) {
-            int d = cfold.m1 - cfold.c1;
-            if (c < (uint32_t)(cfold.c0 + d)) return c;
-            if (d == 1) return c - ((cfold.m1 & 1) == (c & 1));
-            return c - d;
-        }
-    }
-    return c;
-}
-
-bool utf8_isupper(uint32_t c) {
-    return utf8_tolower(c) != c;
-}
-
-bool utf8_islower(uint32_t c) {
-    return utf8_toupper(c) != c;
-}
-
-bool utf8_isspace(uint32_t c) {
-    static uint16_t t[] = {0x20, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x85, 0xA0,
-                           0x1680, 0x2028, 0x2029, 0x202F, 0x205F, 0x3000};
-    for (size_t i=0; i<sizeof t/sizeof *t; ++i)
-        if (c == t[i]) return true;
-    return (c >= 0x2000) & (c <= 0x200A);
-}
-
-bool utf8_isdigit(uint32_t c) {
-    return ((c >= '0') & (c <= '9')) || 
-           ((c >= 0xFF10) & (c <= 0xFF19));
-}
-
-bool utf8_isxdigit(uint32_t c) {
-    static uint16_t t[] = {0x30, 0x39, 0x41, 0x46, 0x61, 0x66, 0xFF10, 
-                           0xFF19, 0xFF21, 0xFF26, 0xFF41, 0xFF46};
-    for (size_t i=1; i<sizeof t/sizeof *t; i += 2)
-        if (c <= t[i]) return c >= t[i - 1];
-    return false;
-}
-
-bool utf8_isalnum(uint32_t c) {
-    if (c < 128) return isalnum(c) != 0;
-    if ((c >= 0xFF10) & (c <= 0xFF19)) return true;
-    return utf8_islower(c) || utf8_isupper(c);
-}
-
-bool utf8_isalpha(uint32_t c) {
-    if (c < 128) return isalpha(c) != 0;
-    return utf8_islower(c) || utf8_isupper(c);
-}
-
-
-#ifdef TEST
-int main()
-{
-    for (size_t i=0; i < sizeof cfold_low/sizeof *cfold_low; ++i)
-    {
-        char x[3][5]={0};
-        uint32_t a = casefold[i].c0;
-        uint32_t b = utf8_tolower(a);
-        uint32_t c = utf8_toupper(b);
-
-        utf8_encode(x[0], a);
-        utf8_encode(x[1], b);
-        utf8_encode(x[2], c);
-        printf("%s %s %s - %u %u %u\n", x[0], x[1], x[2], a, b, c);
-    }
-}
-#endif
-''')

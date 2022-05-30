@@ -169,7 +169,22 @@ STC_INLINE size_t cstr_length(cstr s)
 STC_INLINE size_t cstr_capacity(cstr s)
     { return cstr_is_long(&s) ? cstr_l_cap(&s) : cstr_s_cap; }
 
-// utf8:
+// utf8 methods defined in/depending on src/utf8utils.c:
+cstr cstr_tolower(const cstr* self);
+cstr cstr_toupper(const cstr* self);
+void cstr_lowercase(cstr* self);
+void cstr_uppercase(cstr* self);
+
+STC_INLINE bool cstr_valid_u8(const cstr* self) 
+    { return utf8_valid(cstr_str(self)); }
+
+STC_INLINE utf8_decode_t cstr_peek(const cstr* self, size_t bytepos) {
+    utf8_decode_t d = {UTF8_OK};
+    utf8_peek(&d, cstr_str(self) + bytepos);
+    return d;
+}
+
+// other utf8 
 
 STC_INLINE size_t cstr_size_u8(cstr s) 
     { return utf8_size(cstr_str(&s)); }
@@ -183,6 +198,7 @@ STC_INLINE csview cstr_at(const cstr* self, size_t bytepos) {
     sv.size = utf8_codep_size(sv.str);
     return sv;
 }
+
 STC_INLINE csview cstr_at_u8(const cstr* self, size_t u8idx) {
     csview sv = cstr_sv(self);
     sv.str = utf8_at(sv.str, u8idx);
@@ -193,14 +209,7 @@ STC_INLINE csview cstr_at_u8(const cstr* self, size_t u8idx) {
 STC_INLINE size_t cstr_pos_u8(const cstr* self, size_t u8idx) 
     { return utf8_pos(cstr_str(self), u8idx); }
 
-STC_INLINE bool cstr_valid_u8(const cstr* self) 
-    { return utf8_valid(cstr_str(self)); }
-
-STC_INLINE utf8_decode_t cstr_peek(const cstr* self, size_t bytepos) {
-    utf8_decode_t d = {UTF8_OK};
-    utf8_peek(cstr_str(self) + bytepos, &d);
-    return d;
-}
+// utf8 iterator
 
 STC_INLINE cstr_iter cstr_begin(const cstr* self) { 
     const char* str = cstr_str(self);
@@ -525,4 +534,8 @@ STC_DEF int cstr_printf(cstr* self, const char* fmt, ...) {
 #endif
 #endif // CSTR_H_INCLUDED
 #undef i_opt
+#undef i_header
+#undef i_static
+#undef i_implement
+//#undef i_implement
 #endif // !STC_CSTR_V1

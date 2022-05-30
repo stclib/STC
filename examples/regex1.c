@@ -20,7 +20,7 @@ int main(int argc, char* argv[])
             // Exit when the user inputs q
             if (cstr_equals(input, "q"))
                 break;
-            
+
             if (cregex_find(&float_expr, cstr_str(&input), 0, NULL, 0) > 0)
                 printf("Input is a float\n");
             else
@@ -30,4 +30,4 @@ int main(int argc, char* argv[])
 }
 
 #include "../src/cregex.c"
-#include "../src/casefold.c"
+#include "../src/utf8utils.c"

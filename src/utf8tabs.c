@@ -1,8 +1,6 @@
-#include <ctype.h>
-#define i_header
-#include <stc/cstr.h>
+#include "utf8tabs.h"
 
-static struct CaseFold { uint16_t c0, c1, m1; } casefold[] = {
+struct CaseFold casefold[] = {
     {65, 90, 122}, {181, 181, 956}, {192, 214, 246}, {216, 222, 254},
     {256, 302, 303}, {306, 310, 311}, {313, 327, 328}, {330, 374, 375}, {376, 376, 255},
     {377, 381, 382}, {383, 383, 115}, {385, 385, 595}, {386, 388, 389}, {390, 390, 596},
@@ -47,7 +45,7 @@ static struct CaseFold { uint16_t c0, c1, m1; } casefold[] = {
     {42948, 42948, 42900}, {42949, 42949, 642}, {42950, 42950, 7566}, {42951, 42953, 42954},
     {42960, 42962, 42963}, {42968, 42970, 42971}, {43888, 43913, 5049}, {65313, 65338, 65370},
 }; // 188
-static uint8_t cfold_low[] = {
+uint8_t cfold_low[] = {
     0, 138, 10, 111, 2, 139, 3, 8, 4, 5, 6, 7, 9, 59, 12, 14, 16, 20, 49, 25,
     56, 52, 29, 31, 33, 35, 37, 39, 50, 40, 41, 42, 43, 44, 45, 17, 46, 47, 48, 51,
     53, 55, 155, 58, 62, 152, 150, 153, 11, 13, 15, 18, 19, 171, 21, 172, 22, 167, 170, 24,
@@ -59,149 +57,3 @@ static uint8_t cfold_low[] = {
     144, 145, 54, 57, 149, 154, 156, 157, 158, 96, 97, 159, 106, 160, 161, 162, 163, 165, 166, 168,
     180, 169, 179, 183, 184, 185, 178, 187,
 };
-
-uint32_t utf8_tolower(uint32_t c) {
-    for (size_t i=0; i < sizeof casefold/sizeof *casefold; ++i) {
-        if (c <= casefold[i].c1) {
-            if (c < casefold[i].c0) return c;
-            int d = casefold[i].m1 - casefold[i].c1;
-            if (d == 1) return c + ((casefold[i].c1 & 1) == (c & 1));
-            return c + d;
-        }
-    }
-    return c;
-}
-
-uint32_t utf8_toupper(uint32_t c) {
-    for (size_t i=0; i < sizeof cfold_low/sizeof *cfold_low; ++i) {
-        struct CaseFold cfold = casefold[cfold_low[i]];
-        if (c <= cfold.m1) {
-            int d = cfold.m1 - cfold.c1;
-            if (c < (uint32_t)(cfold.c0 + d)) return c;
-            if (d == 1) return c - ((cfold.m1 & 1) == (c & 1));
-            return c - d;
-        }
-    }
-    return c;
-}
-
-bool utf8_isupper(uint32_t c) {
-    return utf8_tolower(c) != c;
-}
-
-bool utf8_islower(uint32_t c) {
-    return utf8_toupper(c) != c;
-}
-
-bool utf8_isspace(uint32_t c) {
-    static uint16_t t[] = {0x20, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x85, 0xA0,
-                           0x1680, 0x2028, 0x2029, 0x202F, 0x205F, 0x3000};
-    for (size_t i=0; i<sizeof t/sizeof *t; ++i)
-        if (c == t[i]) return true;
-    return (c >= 0x2000) & (c <= 0x200A);
-}
-
-bool utf8_isdigit(uint32_t c) {
-    return ((c >= '0') & (c <= '9')) || 
-           ((c >= 0xFF10) & (c <= 0xFF19));
-}
-
-bool utf8_isxdigit(uint32_t c) {
-    static uint16_t t[] = {0x30, 0x39, 0x41, 0x46, 0x61, 0x66, 0xFF10, 
-                           0xFF19, 0xFF21, 0xFF26, 0xFF41, 0xFF46};
-    for (size_t i=1; i<sizeof t/sizeof *t; i += 2)
-        if (c <= t[i]) return c >= t[i - 1];
-    return false;
-}
-
-bool utf8_isalnum(uint32_t c) {
-    if (c < 128) return isalnum(c) != 0;
-    if ((c >= 0xFF10) & (c <= 0xFF19)) return true;
-    return utf8_islower(c) || utf8_isupper(c);
-}
-
-bool utf8_isalpha(uint32_t c) {
-    if (c < 128) return isalpha(c) != 0;
-    return utf8_islower(c) || utf8_isupper(c);
-}
-
-static struct fnfold {
-    int (*conv_asc)(int);
-    uint32_t (*conv_u8)(uint32_t);
-}
-fn_tolower = {tolower, utf8_tolower},
-fn_toupper = {toupper, utf8_toupper};
-
-
-static cstr cstr_casefold(const cstr* self, struct fnfold fold) {
-    csview sv = cstr_sv(self);
-    cstr out = cstr_null;
-    char *buf = cstr_reserve(&out, sv.size*3/2);
-    uint32_t cp; size_t sz = 0;
-    utf8_decode_t d = {UTF8_OK};
-
-    for (; *sv.str; sv.str += d.size) {
-        utf8_peek(sv.str, &d);
-        switch (d.size) {
-        case 1:
-            buf[sz++] = (char)fold.conv_asc(*sv.str);
-            break;
-        default: 
-            cp = fold.conv_u8(d.codep);
-            sz += utf8_encode(buf + sz, cp);
-        }
-    }
-    _cstr_set_size(&out, sz);
-    cstr_shrink_to_fit(&out);
-    return out;
-}
-
-cstr cstr_tolower(const cstr* self) {
-    return cstr_casefold(self, fn_tolower);
-}
-
-cstr cstr_toupper(const cstr* self) {
-    return cstr_casefold(self, fn_toupper);
-}
-
-void cstr_lowercase(cstr* self) {
-    cstr_take(self, cstr_casefold(self, fn_tolower));
-}
-
-void cstr_uppercase(cstr* self) {
-    cstr_take(self, cstr_casefold(self, fn_toupper));
-}
-
-#ifdef TEST
-int main()
-{
-    for (size_t i=0; i < sizeof cfold_low/sizeof *cfold_low; ++i)
-    {
-        char x[3][5]={0};
-        unsigned s0, s1, s2;
-        uint32_t a = casefold[i].c0;
-        uint32_t b = utf8_tolower(a);
-        uint32_t c = utf8_toupper(b);
-
-        s0 = utf8_encode(x[0], a);
-        s1 = utf8_encode(x[1], b);
-        s2 = utf8_encode(x[2], c);
-        printf("%s %s %s - %u %u %u (%u %u %u)\n", x[0], x[1], x[2], a, b, c, s0, s1, s2);
-    }
-    c_auto (cstr, t1)
-    {
-        t1 = cstr_new("Die preußischen Köstlichkeiten.");
-
-        cstr_buf b = cstr_buffer(&t1);
-        printf("%s, %llu %llu\n", b.data, b.size, b.cap);
-        cstr_lowercase(&t1);
-        b = cstr_buffer(&t1);
-        printf("%s, %llu %llu\n", b.data, b.size, b.cap);
-
-        cstr_uppercase(&t1);
-        b = cstr_buffer(&t1);
-        printf("%s, %llu %llu\n", b.data, b.size, b.cap);
-    }
-}
-#endif
-

@@ -49,13 +49,6 @@
   #define i_size uint32_t
 #endif
 
-#if defined i_key_str || defined i_val_str || defined i_key_ssv || defined i_val_ssv
-  #include "cstr.h"
-  #if defined i_key_ssv || defined i_val_ssv
-  #include "csview.h"
-  #endif
-#endif
-
 #if !(defined i_key || defined i_key_str || defined i_key_ssv || \
       defined i_key_bind || defined i_key_arcbox)
   #define _i_key_from_val
@@ -287,6 +280,10 @@
 #undef i_keyfrom
 #undef i_keyto
 #undef i_keydrop
+
+#undef i_header
+#undef i_implement
+#undef i_static
 
 #undef _i_prefix
 #undef _i_has_from
