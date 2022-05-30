@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <time.h>
+#define i_static
 #include <stc/crandom.h>
 #include <stc/cstr.h>
 #include "external/khash.h"

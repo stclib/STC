@@ -10,6 +10,7 @@
 #include <vector>
 #include <map>
 #include <unordered_map>
+#define i_static
 #include <stc/cstr.h>
 
 std::vector<std::string> read_file(const char* name)

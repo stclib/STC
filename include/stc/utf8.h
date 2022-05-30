@@ -25,7 +25,7 @@ int main()
 #include "ccommon.h"
 #include <ctype.h>
 
-// utf8 methods defined in src/utf8utils.c:
+// utf8 methods defined in src/utf8code.c:
 bool        utf8_islower(uint32_t c);
 bool        utf8_isupper(uint32_t c);
 bool        utf8_isspace(uint32_t c);

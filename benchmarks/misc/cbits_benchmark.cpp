@@ -4,7 +4,7 @@
 #include <ctime> // timer
 
 enum{ N=1<<22 }; // 4.2 mill.
-
+#define i_static
 #include <stc/crandom.h>
 #define i_type cbits
 #define i_len N

@@ -1,5 +1,7 @@
 #include <iostream>
+#define i_static
 #include <stc/crandom.h>
+#define i_static
 #include <stc/cstr.h>
 #include <cmath>
 #include <string>

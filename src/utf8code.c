@@ -1,9 +1,7 @@
 #include <ctype.h>
 #define i_header
 #include <stc/cstr.h>
-
-#include "utf8tabs.h"
-#include "utf8tabs.c"
+#include "utf8tabs.inc"
 
 // https://news.ycombinator.com/item?id=15423674
 // https://gist.github.com/s4y/344a355f8c1f99c6a4cb2347ec4323cc

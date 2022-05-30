@@ -170,7 +170,7 @@ STC_INLINE size_t cstr_length(cstr s)
 STC_INLINE size_t cstr_capacity(cstr s)
     { return cstr_is_long(&s) ? cstr_l_cap(&s) : cstr_s_cap; }
 
-// utf8 methods defined in/depending on src/utf8utils.c:
+// utf8 methods defined in/depending on src/utf8code.c:
 cstr cstr_tolower(const cstr* self);
 cstr cstr_toupper(const cstr* self);
 void cstr_lowercase(cstr* self);
@@ -251,7 +251,7 @@ STC_INLINE bool cstr_equals_s(cstr s1, cstr s2)
     { return cstr_cmp(&s1, &s2) == 0; }
 
 STC_INLINE size_t cstr_find(cstr s, const char* search) {
-    const char *str = cstr_str(&s), *res = strstr(str, search);
+    const char *str = cstr_str(&s), *res = strstr((char*)str, search);
     return res ? res - str : cstr_npos;
 }
 
@@ -259,10 +259,10 @@ STC_INLINE size_t cstr_find_s(cstr s, cstr search)
     { return cstr_find(s, cstr_str(&search)); }
 
 STC_INLINE bool cstr_contains(cstr s, const char* search)
-    { return strstr(cstr_str(&s), search) != NULL; }
+    { return strstr(cstr_data(&s), search) != NULL; }
 
 STC_INLINE bool cstr_contains_s(cstr s, cstr search)
-    { return strstr(cstr_str(&s), cstr_str(&search)) != NULL; }
+    { return strstr(cstr_data(&s), cstr_str(&search)) != NULL; }
 
 STC_INLINE bool cstr_starts_with(cstr s, const char* sub) {
     const char* str = cstr_str(&s);
@@ -414,7 +414,7 @@ STC_DEF void cstr_resize(cstr* self, const size_t size, const char value) {
 STC_DEF size_t cstr_find_from(cstr s, const size_t pos, const char* search) {
     csview sv = cstr_sv(&s);
     if (pos > sv.size) return cstr_npos;
-    char* res = strstr(sv.str + pos, search);
+    const char* res = strstr((char*)sv.str + pos, search);
     return res ? res - sv.str : cstr_npos;
 }
 

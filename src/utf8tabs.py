@@ -83,13 +83,13 @@ def make_casefold(letters):
 
 
 def print_casefold(cfold):
-    print('''
-struct CaseFold casefold[] = {''')
+    print('#include <stdint.h>\n')
+    print('struct CaseFold { uint16_t c0, c1, m1; };\n')
+    print('static struct CaseFold casefold[] = {\n   ', end='')
     n = 1
     s = 5
     count = 0
     table = []
-    print('   ', end='')
     for x in cfold:
         d = 2 if abs(x[2]) == 1 else 1
         a = x[0]
@@ -113,7 +113,7 @@ struct CaseFold casefold[] = {''')
             print('')
         count += 1
         n += 1
-    print('\n}; // %d' % (count))
+    print('\n}; // %d\n' % (count))
     return table
 
 
@@ -129,7 +129,7 @@ def print_casefold_low(table):
     cfold_low = [i for i in range(len(table))]
     cfold_low.sort(key=lambda i: table[i][2] - (table[i][1] - table[i][0]))
 
-    print('uint8_t cfold_low[] = {\n   ', end='')
+    print('static uint8_t cfold_low[] = {\n   ', end='')
     for i in range(len(cfold_low)):
         print(" %d," % (cfold_low[i]), end='\n   ' if (i+1) % 20 == 0 else '')
     print('\n};')
@@ -138,7 +138,6 @@ def print_casefold_low(table):
 ########### main:
 
 if __name__ == "__main__":
-    print('#include "utf8tabs.h"')
     cfold = make_casetable()
     table = print_casefold(cfold)
     print_casefold_low(table)

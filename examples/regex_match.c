@@ -29,4 +29,4 @@ int main()
 }
 
 #include "../src/cregex.c"
-#include "../src/utf8utils.c"
+#include "../src/utf8code.c"

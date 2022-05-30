@@ -102,7 +102,7 @@ STC_INLINE csview csview_substr_u8(csview sv, size_t u8pos, size_t u8len) {
     return sv;
 }
 
-STC_INLINE bool csview_valid_u8(csview sv) // depends on src/utf8utils.c
+STC_INLINE bool csview_valid_u8(csview sv) // depends on src/utf8code.c
     { return utf8_valid_n(sv.str, sv.size); }
 
 

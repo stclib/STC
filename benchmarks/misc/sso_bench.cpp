@@ -3,7 +3,10 @@
 #include <vector>
 #include <unordered_set>
 #include <chrono>
+#define i_static
 #include <stc/crandom.h>
+#define i_static
+#include <stc/cstr.h>
 
 #define i_type stccon
 #define i_val_str

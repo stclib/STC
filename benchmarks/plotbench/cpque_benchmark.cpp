@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <time.h>
+#define i_static
 #include <stc/crandom.h>
 
 #define i_val float

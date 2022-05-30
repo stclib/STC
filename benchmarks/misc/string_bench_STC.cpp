@@ -4,7 +4,9 @@
 #include <iostream>
 #include <iomanip>
 #include <chrono>
+#define i_static
 #include <stc/cstr.h>   // string
+#define i_static
 #include <stc/csview.h> // string_view
 
 #define i_key_str
