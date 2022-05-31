@@ -53,6 +53,7 @@ Contents
 - [***cmap*** - **std::unordered_map** alike type](docs/cmap_api.md)
 - [***cpque*** - **std::priority_queue** alike type](docs/cpque_api.md)
 - [***cqueue*** - **std::queue** alike type](docs/cqueue_api.md)
+- [***crandom*** - A novel very fast *PRNG* named **stc64**](docs/crandom_api.md)
 - [***cset*** - **std::unordered_set** alike type](docs/cset_api.md)
 - [***csmap*** - **std::map** sorted map alike type](docs/csmap_api.md)
 - [***csset*** - **std::set** sorted set alike type](docs/csset_api.md)
@@ -60,11 +61,6 @@ Contents
 - [***cstr*** - **std::string** alike type](docs/cstr_api.md)
 - [***csview*** - **std::string_view** alike type](docs/csview_api.md)
 - [***cvec*** - **std::vector** alike type](docs/cvec_api.md)
-
-Others:
-- [***crandom*** - A novel very fast *PRNG* named **stc64**](docs/crandom_api.md)
-- [***coption*** - Command line options scanner](docs/coption_api.md)
-- [***threads*** - Mimic **C11-threads** (by Marcus Geelnard)](include/threads.h)
 
 Highlights
 ----------
@@ -257,8 +253,8 @@ If containers are used across several translation units with common instantiated
 recommended to build as a "library" with external linking to minimize executable size. To enable this,
 specify `-DSTC_HEADER` as compiler option in your build environment. Next, place all the instantiations
 of the containers used inside a single C-source file as in the example below, and `#define STC_IMPLEMENT` at top. 
-You may also cherry-pick external linking mode on individual containers by `#define i_opt c_header` and
-`#define i_opt c_implement`, or force static symbols by `#define i_opt c_static` before container includes.
+You may also cherry-pick external linking mode on individual containers by `#define i_header` and
+`#define i_implement`, or force static symbols by `#define i_static` before container includes.
 ```c
 // stc_libs.c
 #define STC_IMPLEMENT

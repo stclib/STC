@@ -35,19 +35,22 @@ bool        utf8_isalpha(uint32_t c);
 bool        utf8_isalnum(uint32_t c);
 uint32_t    utf8_tolower(uint32_t c);
 uint32_t    utf8_toupper(uint32_t c);
-
 bool        utf8_valid(const char* s);
 bool        utf8_valid_n(const char* s, size_t n);
-
 int         utf8_icmp_n(size_t u8max, const char* s1, size_t n1,
                                       const char* s2, size_t n2);
-/* encode/decode next utf8 codepoint. */
-enum { UTF8_OK = 0, UTF8_ERROR = 4 };
-typedef struct { uint32_t state, codep, size; } utf8_decode_t;
-
-void        utf8_peek(utf8_decode_t* d, const char *s);
 unsigned    utf8_encode(char *out, uint32_t c);
-void        utf8_decode(utf8_decode_t *d, const uint8_t b);
+
+/* encode/decode next utf8 codepoint. */
+typedef struct { uint32_t state, codep; } utf8_decode_t;
+
+STC_INLINE uint32_t utf8_decode(utf8_decode_t* d, const uint32_t byte) {
+    extern const uint8_t utf8_dtab[];
+    const uint32_t type = utf8_dtab[byte];
+    d->codep = d->state ? (byte & 0x3fu) | (d->codep << 6)
+                        : (0xff >> type) & byte;
+    return d->state = utf8_dtab[256 + d->state + type];
+}
 
 /* case-insensitive utf8 string comparison */
 STC_INLINE int utf8_icmp(const char* s1, const char* s2) {

@@ -180,12 +180,6 @@ extern void cstr_uppercase(cstr* self);
 STC_INLINE bool cstr_valid_u8(const cstr* self) 
     { return utf8_valid(cstr_str(self)); }
 
-STC_INLINE utf8_decode_t cstr_peek(const cstr* self, size_t bytepos) {
-    utf8_decode_t d = {UTF8_OK};
-    utf8_peek(&d, cstr_str(self) + bytepos);
-    return d;
-}
-
 // other utf8 
 
 STC_INLINE size_t cstr_size_u8(cstr s) 

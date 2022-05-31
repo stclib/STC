@@ -3,28 +3,21 @@
 #include <stc/cstr.h>
 #include "utf8tabs.inc"
 
-// https://news.ycombinator.com/item?id=15423674
-// https://gist.github.com/s4y/344a355f8c1f99c6a4cb2347ec4323cc
-
-void utf8_decode(utf8_decode_t *d, const uint8_t b)
-{
-    switch (d->state) {
-    case UTF8_OK:
-        if      (b < 0x80) d->codep = b, d->size = 1;
-        else if (b < 0xC2) d->state = UTF8_ERROR, d->size = 0;
-        else if (b < 0xE0) d->state = 1, d->codep = b & 0x1F, d->size = 2;
-        else if (b < 0xF0) d->state = 2, d->codep = b & 0x0F, d->size = 3;
-        else if (b < 0xF5) d->state = 3, d->codep = b & 0x07, d->size = 4;
-        else d->state = UTF8_ERROR, d->size = 0;
-        break;
-    case 1: case 2: case 3:
-        if ((b & 0xC0) == 0x80) {
-            d->state -= 1;
-            d->codep = (d->codep << 6) | (b & 0x3F);
-        } else
-            d->state = UTF8_ERROR, d->size = 0;
-    }
-}
+const uint8_t utf8_dtab[] = {
+   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+   0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,  0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,  9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,9,
+   7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,  7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,7,
+   8,8,2,2,2,2,2,2,2,2,2,2,2,2,2,2,  2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,
+  10,3,3,3,3,3,3,3,3,3,3,3,3,4,3,3, 11,6,6,6,5,8,8,8,8,8,8,8,8,8,8,8,
+   0,12,24,36,60,96,84,12,12,12,48,72, 12,12,12,12,12,12,12,12,12,12,12,12,
+  12, 0,12,12,12,12,12, 0,12, 0,12,12, 12,24,12,12,12,12,12,24,12,24,12,12,
+  12,12,12,12,12,12,12,24,12,12,12,12, 12,24,12,12,12,12,12,12,12,24,12,12,
+  12,12,12,12,12,12,12,36,12,36,12,12, 12,36,12,12,12,12,12,36,12,36,12,12,
+  12,36,12,12,12,12,12,12,12,12,12,12, 
+};
 
 unsigned utf8_encode(char *out, uint32_t c)
 {
@@ -52,27 +45,18 @@ unsigned utf8_encode(char *out, uint32_t c)
     return 0;
 }
 
-void utf8_peek(utf8_decode_t* d, const char *s) {
-    utf8_decode(d, (uint8_t)*s++);
-    switch (d->size) {
-        case 4: utf8_decode(d, (uint8_t)*s++);
-        case 3: utf8_decode(d, (uint8_t)*s++);
-        case 2: utf8_decode(d, (uint8_t)*s++);
-    }
-}
-
 bool utf8_valid(const char* s) {
-    utf8_decode_t d = {UTF8_OK};
+    utf8_decode_t d = {.state=0};
     while (*s)
         utf8_decode(&d, (uint8_t)*s++);
-    return d.state == UTF8_OK;
+    return d.state == 0;
 }
 
 bool utf8_valid_n(const char* s, size_t n) {
-    utf8_decode_t d = {UTF8_OK};
+    utf8_decode_t d = {.state=0};
     while ((n-- != 0) & (*s != 0))
         utf8_decode(&d, (uint8_t)*s++);
-    return d.state == UTF8_OK;
+    return d.state == 0;
 }
 
 uint32_t utf8_tolower(uint32_t c) {
@@ -101,10 +85,10 @@ uint32_t utf8_toupper(uint32_t c) {
 }
 /*
 int utf8_icmp(const char* s1, const char* s2) {
-    utf8_decode_t d1 = {UTF8_OK}, d2 = {UTF8_OK};
-    for (;; s1 += d1.size, s2 += d2.size) {
-        utf8_peek(&d1, s1);
-        utf8_peek(&d2, s2);
+    utf8_decode_t d1 = {.state=0}, d2 = {.state=0};
+    for (;;) {
+        do { utf8_decode(&d1, (uint8_t)s1[j1++]); } while (d1.state);
+        do { utf8_decode(&d2, (uint8_t)s2[j2++]); } while (d2.state);
         int c = utf8_tolower(d1.codep) - utf8_tolower(d2.codep);
         if (c || !*s2)
             return c;
@@ -113,14 +97,14 @@ int utf8_icmp(const char* s1, const char* s2) {
 */
 int utf8_icmp_n(size_t u8max, const char* s1, const size_t n1,
                               const char* s2, const size_t n2) {
-    utf8_decode_t d1 = {UTF8_OK}, d2 = {UTF8_OK};
+    utf8_decode_t d1 = {.state=0}, d2 = {.state=0};
     size_t j1 = 0, j2 = 0;
-    for (; u8max-- && ((j1 < n1) & (j2 < n2)); j1 += d1.size, j2 += d2.size) {
-        utf8_peek(&d1, s1 + j1);
-        utf8_peek(&d2, s2 + j2);
+    while (u8max-- && ((j1 < n1) & (j2 < n2))) {
+        do { utf8_decode(&d1, (uint8_t)s1[j1++]); } while (d1.state);
+        do { utf8_decode(&d2, (uint8_t)s2[j2++]); } while (d2.state);
         int c = utf8_tolower(d1.codep) - utf8_tolower(d2.codep);
         if (c || !s2[j2])
-            return c;
+            return c;        
     }
     return (j2 < n2) - (j1 < n1);
 }
@@ -178,15 +162,13 @@ static cstr cstr_casefold(const cstr* self, struct fnfold fold) {
     cstr out = cstr_null;
     char *buf = cstr_reserve(&out, sv.size*3/2);
     uint32_t cp; size_t sz = 0;
-    utf8_decode_t d = {UTF8_OK};
+    utf8_decode_t d = {.state=0};
 
-    for (; *sv.str; sv.str += d.size) {
-        utf8_peek(&d, sv.str);
-        switch (d.size) {
-        case 1:
-            buf[sz++] = (char)fold.conv_asc(*sv.str);
-            break;
-        default:
+    while (*sv.str) {
+        do { utf8_decode(&d, (uint8_t)*sv.str++); } while (d.state);
+        if (d.codep < 128)
+            buf[sz++] = (char)fold.conv_asc(d.codep);
+        else {
             cp = fold.conv_u8(d.codep);
             sz += utf8_encode(buf + sz, cp);
         }
