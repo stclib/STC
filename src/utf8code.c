@@ -87,8 +87,8 @@ uint32_t utf8_toupper(uint32_t c) {
 int utf8_icmp(const char* s1, const char* s2) {
     utf8_decode_t d1 = {.state=0}, d2 = {.state=0};
     for (;;) {
-        do { utf8_decode(&d1, (uint8_t)s1[j1++]); } while (d1.state);
-        do { utf8_decode(&d2, (uint8_t)s2[j2++]); } while (d2.state);
+        do { utf8_decode(&d1, (uint8_t)*s1++); } while (d1.state);
+        do { utf8_decode(&d2, (uint8_t)*s2++); } while (d2.state);
         int c = utf8_tolower(d1.codep) - utf8_tolower(d2.codep);
         if (c || !*s2)
             return c;

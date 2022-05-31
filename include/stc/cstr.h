@@ -243,10 +243,13 @@ STC_INLINE bool cstr_eq(const cstr* s1, const cstr* s2) {
 }
 
 STC_INLINE bool cstr_equals(cstr s1, const char* str)
-    { return strcmp(cstr_str(&s1), str) == 0; }
+    { return !strcmp(cstr_str(&s1), str); }
+
+STC_INLINE bool cstr_iequals(cstr s1, const char* str)
+    { return !utf8_icmp(cstr_str(&s1), str); }
 
 STC_INLINE bool cstr_equals_s(cstr s1, cstr s2)
-    { return cstr_cmp(&s1, &s2) == 0; }
+    { return !cstr_cmp(&s1, &s2); }
 
 STC_INLINE size_t cstr_find(cstr s, const char* search) {
     const char *str = cstr_str(&s), *res = strstr((char*)str, search);
@@ -265,15 +268,27 @@ STC_INLINE bool cstr_contains_s(cstr s, cstr search)
 STC_INLINE bool cstr_starts_with(cstr s, const char* sub) {
     const char* str = cstr_str(&s);
     while (*sub && *str == *sub) ++str, ++sub;
-    return *sub == 0;
+    return !*sub;
+}
+STC_INLINE bool cstr_istarts_with(cstr s, const char* sub) {
+    csview sv = cstr_sv(&s); 
+    size_t n = strlen(sub);
+    return n <= sv.size && !utf8_icmp_n(cstr_npos, sv.str, sv.size, sub, n);
 }
 
 STC_INLINE bool cstr_starts_with_s(cstr s, cstr sub)
     { return cstr_starts_with(s, cstr_str(&sub)); }
 
 STC_INLINE bool cstr_ends_with(cstr s, const char* sub) {
-    csview sv = cstr_sv(&s); size_t n = strlen(sub);
-    return n <= sv.size && memcmp(sv.str + sv.size - n, sub, n) == 0;
+    csview sv = cstr_sv(&s);
+    size_t n = strlen(sub);
+    return n <= sv.size && !memcmp(sv.str + sv.size - n, sub, n);
+}
+
+STC_INLINE bool cstr_iends_with(cstr s, const char* sub) {
+    csview sv = cstr_sv(&s); 
+    size_t n = strlen(sub);
+    return n <= sv.size && !utf8_icmp(sv.str + sv.size - n, sub);
 }
 
 STC_INLINE bool cstr_ends_with_s(cstr s, cstr sub)
