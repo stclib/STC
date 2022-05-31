@@ -175,16 +175,11 @@ typedef struct Reljunk
 static int
 chartorune(Rune *rune, const char *s)
 {
-    utf8_decode_t ctx = {UTF8_OK};
+    utf8_decode_t ctx = {.state=0};
     const uint8_t *b = (const uint8_t*)s;
-    utf8_decode(&ctx, *b++);
-    switch (ctx.size) {
-    case 4: utf8_decode(&ctx, *b++);
-    case 3: utf8_decode(&ctx, *b++);
-    case 2: utf8_decode(&ctx, *b++);
-    }
+    do { utf8_decode(&ctx, *b++); } while (ctx.state);
     *rune = ctx.codep;
-    return ctx.size;
+    return (const char*)b - s;
 }
 
 static const char*
