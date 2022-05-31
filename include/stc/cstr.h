@@ -240,6 +240,11 @@ STC_INLINE char* cstr_expand_uninit(cstr *self, size_t n) {
 STC_INLINE int cstr_cmp(const cstr* s1, const cstr* s2) 
     { return strcmp(cstr_str(s1), cstr_str(s2)); }
 
+STC_INLINE int cstr_icmp(const cstr* s1, const cstr* s2) {
+    csview x = cstr_sv(s1), y = cstr_sv(s2);
+    return utf8_icmp_n(~(size_t)0, x.str, x.size, y.str, y.size);
+}
+
 STC_INLINE bool cstr_eq(const cstr* s1, const cstr* s2) {
     csview x = cstr_sv(s1), y = cstr_sv(s2);
     return x.size == y.size && !memcmp(x.str, y.str, x.size);

@@ -38,7 +38,8 @@ uint32_t    utf8_toupper(uint32_t c);
 
 bool        utf8_valid(const char* s);
 bool        utf8_valid_n(const char* s, size_t n);
-int         utf8_icmp_n(const char* s1, const char* s2, size_t u8max);
+int         utf8_icmp_n(size_t u8max, const char* s1, size_t n1,
+                                      const char* s2, size_t n2);
 
 /* encode/decode next utf8 codepoint. */
 enum { UTF8_OK = 0, UTF8_ERROR = 4 };
@@ -50,7 +51,7 @@ void        utf8_decode(utf8_decode_t *d, const uint8_t b);
 
 /* case-insensitive utf8 string comparison */
 STC_INLINE int utf8_icmp(const char* s1, const char* s2)
-    { return utf8_icmp_n(s1, s2, (size_t)(-1)); }
+    { return utf8_icmp_n(~(size_t)0, s1, ~(size_t)0, s2, ~(size_t)0); }
 
 /* number of characters in the utf8 codepoint from s */
 STC_INLINE unsigned utf8_codep_size(const char *s) {

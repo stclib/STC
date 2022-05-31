@@ -100,17 +100,19 @@ uint32_t utf8_toupper(uint32_t c) {
     return c;
 }
 
-int utf8_icmp_n(const char* s1, const char* s2, size_t u8max) {
+int utf8_icmp_n(size_t u8max, const char* s1, const size_t n1,
+                              const char* s2, const size_t n2) {
     int ret = 0;
     utf8_decode_t d1 = {UTF8_OK}, d2 = {UTF8_OK};
-    for (; u8max--; s1 += d1.size, s2 += d2.size) {
-        utf8_peek(&d1, s1);
-        utf8_peek(&d2, s2);
+    size_t j1 = 0, j2 = 0;
+    for (; u8max-- && ((j1 < n1) & (j2 < n2)); j1 += d1.size, j2 += d2.size) {
+        utf8_peek(&d1, s1+j1);
+        utf8_peek(&d2, s2+j2);
         ret = utf8_tolower(d1.codep) - utf8_tolower(d2.codep);
-        if (ret || !*s2)
-            break;
+        if (ret || !s2[j2])
+            return ret;
     }
-    return ret;
+    return (j2 < n2) - (j1 < n1);
 }
 
 bool utf8_isupper(uint32_t c) {
