@@ -21,8 +21,6 @@ All csview definitions and prototypes are available by including a single header
 
 ```c
 #include <stc/cstr.h> // optional, include cstr+csview functionality
-
-#define i_implement   // define in one file only if needed
 #include <stc/csview.h>
 ```
 ## Methods
@@ -125,7 +123,6 @@ uint64_t        csview_hash(const csview* x);
 
 ## Example
 ```c
-#define i_implement
 #include <stc/cstr.h>
 #include <stc/csview.h>
 
@@ -156,7 +153,6 @@ red Apples
 
 ### Example 2: UTF8 handling
 ```c
-#define i_implement
 #include <stc/cstr.h>
 #include <stc/csview.h>
 
@@ -195,7 +191,6 @@ void print_split(csview str, csview sep)
     }
 }
 
-#define i_implement
 #include <stc/cstr.h>
 
 #define i_val_str

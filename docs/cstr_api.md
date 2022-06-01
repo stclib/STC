@@ -134,7 +134,6 @@ int          c_strncasecmp(const char* str1, const char* str2, size_t n);
 
 ## Example
 ```c
-#define i_implement
 #include <stc/cstr.h>
 
 int main() {

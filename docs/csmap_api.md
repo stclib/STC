@@ -101,7 +101,6 @@ csmap_X_raw           csmap_X_value_toraw(csmap_X_value* pval);
 
 ## Examples
 ```c
-#define i_implement
 #include <stc/cstr.h>
 
 #define i_key_str // special macro for i_key = cstr, i_tag = str
@@ -146,7 +145,6 @@ The HEX of color BLACK is:[#000000]
 ### Example 2
 This example uses a csmap with cstr as mapped value.
 ```c
-#define i_implement
 #include <stc/cstr.h>
 
 #define i_key int

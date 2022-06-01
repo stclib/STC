@@ -1,6 +1,5 @@
 // https://iq.opengenus.org/containers-cpp-stl/
 // C program to demonstrate various function of stc cset
-#define i_implement
 #include <stc/cstr.h>
 #define i_key_str
 #include <stc/cset.h>

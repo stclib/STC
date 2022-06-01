@@ -64,7 +64,7 @@ void             cbits_xor(cbits* self, const cbits* other);             // set 
 
 ## Example
 ```c
-#define i_implement // implementation of cbits_count() only once.
+#define i_implement // force shared implementation of some cbits functionn.
 #include <stc/cbits.h>
 #include <stdio.h>
 #include <math.h>
