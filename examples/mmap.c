@@ -5,6 +5,7 @@
 #define i_implement
 #include <stc/cstr.h>
 #define i_val_str
+#define i_extern // define _clist_mergesort() once
 #include <stc/clist.h>
 
 // Map of int => clist_str.

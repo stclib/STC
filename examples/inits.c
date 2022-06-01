@@ -26,6 +26,7 @@ inline static int ipair_cmp(const ipair_t* a, const ipair_t* b) {
 #define i_val ipair_t
 #define i_cmp ipair_cmp
 #define i_tag ip
+#define i_extern // define _clist_mergesort() once
 #include <stc/clist.h>
 
 #define i_val float

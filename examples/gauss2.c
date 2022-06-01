@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <time.h>
-#define i_implement
+
+#define STC_IMPLEMENT
 #include <stc/crandom.h>
-#define i_implement
 #include <stc/cstr.h>
 
 // Declare int -> int sorted map.

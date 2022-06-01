@@ -2,6 +2,7 @@
 
 #define i_val int
 #define i_tag i
+#define i_extern // define _clist_mergesort() once
 #include <stc/clist.h>
 
 void print_ilist(const char* s, clist_i list)

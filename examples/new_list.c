@@ -12,6 +12,7 @@ struct MyStruct {
 #define i_val int
 #define i_opt c_is_fwd
 #define i_tag i32
+#define i_extern // define _clist_mergesort() 
 #include <stc/clist.h>
 
 struct Point { int x, y; } typedef Point;
