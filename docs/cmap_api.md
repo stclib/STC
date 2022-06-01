@@ -113,6 +113,7 @@ bool                  c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);       /
 ## Examples
 
 ```c
+#define i_implement
 #include <stc/cstr.h>
 
 #define i_key_str
@@ -157,6 +158,7 @@ The HEX of color BLACK is:[#000000]
 ### Example 2
 This example uses a cmap with cstr as mapped value.
 ```c
+#define i_implement
 #include <stc/cstr.h>
 
 #define i_key int
@@ -265,6 +267,7 @@ Output:
 ### Example 5
 Advanced 1: Key type is struct.
 ```c
+#define i_implement
 #include <stc/cstr.h>
 
 typedef struct {
@@ -341,6 +344,7 @@ Advanced 2: In example 5 we needed to construct a lookup key which allocated str
 In this example we use rawtype feature to make it even simpler to use. Note that we must use the emplace() methods
 to add "raw" type entries (otherwise compile error):
 ```c
+#define i_implement
 #include <stc/cstr.h>
 
 typedef struct Viking {

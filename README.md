@@ -257,6 +257,7 @@ You may also cherry-pick external linking mode on individual containers by `#def
 ```c
 // stc_libs.c
 #define STC_IMPLEMENT
+
 #include <stc/cstr.h>
 #include "Point.h"
 
@@ -346,6 +347,9 @@ Strings are the most commonly used non-trivial data type. STC containers have pr
 definitions for cstr container elements, so they are fail-safe to use both with the **emplace**
 and non-emplace methods:
 ```c
+#define i_implement     // define in ONE file to implement longer functions in cstr
+#include <stc/cstr.h>
+
 #define i_val_str       // special macro to enable container of cstr
 #include <stc/cvec.h>   // vector of string (cstr)
 ...

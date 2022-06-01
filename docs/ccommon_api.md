@@ -60,6 +60,7 @@ c_autodefer (cstr_drop(&s1), cstr_drop(&s2))
 **Example**: Load each line of a text file into a vector of strings:
 ```c
 #include <errno.h>
+#define i_implement
 #include <stc/cstr.h>
 
 #define i_val_str

@@ -21,6 +21,8 @@ All csview definitions and prototypes are available by including a single header
 
 ```c
 #include <stc/cstr.h> // optional, include cstr+csview functionality
+
+#define i_implement   // define in one file only if needed
 #include <stc/csview.h>
 ```
 ## Methods
@@ -40,6 +42,7 @@ char            csview_back(csview sv);
 
 void            csview_clear(csview* self);
 
+// requires i_implement defined before one include of csview.h
 csview          csview_substr_ex(csview sv, intptr_t pos, size_t n);   // negative pos count from end
 csview          csview_slice_ex(csview sv, intptr_t p1, intptr_t p2);  // negative p1, p2 count from end
 csview          csview_token(csview sv, csview sep, size_t* start); // see split example below.
@@ -122,6 +125,7 @@ uint64_t        csview_hash(const csview* x);
 
 ## Example
 ```c
+#define i_implement
 #include <stc/cstr.h>
 #include <stc/csview.h>
 
@@ -152,6 +156,7 @@ red Apples
 
 ### Example 2: UTF8 handling
 ```c
+#define i_implement
 #include <stc/cstr.h>
 #include <stc/csview.h>
 
@@ -177,6 +182,7 @@ h,e,l,l,😀, ,w,x,r,l,d,
 Splits strings into tokens. *print_split()* makes **no** memory allocations or *strlen()* calls,
 and does not depend on null-terminated strings. *string_split()* function returns a vector of cstr.
 ```c
+#define i_implement // implement csview_token() function, define once.
 #include <stc/csview.h>
 
 void print_split(csview str, csview sep)
@@ -189,9 +195,11 @@ void print_split(csview str, csview sep)
     }
 }
 
+#define i_implement
+#include <stc/cstr.h>
+
 #define i_val_str
 #include <stc/cvec.h>
-#include <stc/csview.h>
 
 cvec_str string_split(csview str, csview sep)
 {

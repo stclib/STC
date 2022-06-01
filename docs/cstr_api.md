@@ -10,6 +10,7 @@ See the c++ class [std::basic_string](https://en.cppreference.com/w/cpp/string/b
 All cstr definitions and prototypes are available by including a single header file.
 
 ```c
+#define i_implement // define this (or use global STC_IMPLEMENT) in one source file only!
 #include <stc/cstr.h>
 ```
 ## Methods
@@ -131,6 +132,7 @@ int          c_strncasecmp(const char* str1, const char* str2, size_t n);
 
 ## Example
 ```c
+#define i_implement
 #include <stc/cstr.h>
 
 int main() {

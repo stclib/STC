@@ -72,6 +72,7 @@ double              stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
 ```c
 #include <time.h>
 #include <stc/crandom.h>
+#define i_implement
 #include <stc/cstr.h>
 
 // Declare int -> int sorted map. Uses typetag 'i' for ints.
