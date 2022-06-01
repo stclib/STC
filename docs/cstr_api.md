@@ -3,6 +3,8 @@
 
 A **cstr** object represent sequences of characters. It supports an interface similar to that of a standard container of bytes, but adding features specifically designed to operate with strings of single-byte characters, terminated by the null character.
 
+**cstr** has basic support for *UTF8* encoded strings, and has a set of compact and efficient functions for handling case-foldings and comparisons of UTF strings. The **cstr** type uses short strings optimization (sso), which eliminates heap memory allocation for strings shorter than 24 bytes (sizeof(cstr) is also 24).
+
 See the c++ class [std::basic_string](https://en.cppreference.com/w/cpp/string/basic_string) for a functional description.
 
 ## Header file
@@ -50,7 +52,7 @@ cstr         cstr_tolower(const cstr* self);                          // returns
 cstr         cstr_toupper(const cstr* self);                          // returns new uppercase utf8 cstr
 void         cstr_lowercase(cstr* self);                              // transform cstr to lowercase utf8
 void         cstr_uppercase(cstr* self);                              // transform cstr to uppercase utf8
-bool         cstr_iequals(cstr s, const char* str);                   // case-insensitive comparison
+bool         cstr_iequals(cstr s, const char* str);                   // utf8 case-insensitive comparison
 bool         cstr_istarts_with(cstr s, const char* str);              //   "
 bool         cstr_iends_with(cstr s, const char* str);                //   "
 int          cstr_icmp(const cstr* s1, const cstr* s2);               //   "
