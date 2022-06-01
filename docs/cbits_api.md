@@ -64,6 +64,7 @@ void             cbits_xor(cbits* self, const cbits* other);             // set 
 
 ## Example
 ```c
+#define i_implement // implementation of cbits_count() only once.
 #include <stc/cbits.h>
 #include <stdio.h>
 #include <math.h>
@@ -76,7 +77,7 @@ cbits sieveOfEratosthenes(size_t n)
 
     for (size_t i = 3; i <= q; i += 2) {
         for (size_t j = i; j < n; j += 2) {
-            if (cbits_test(bits, j>>1)) {
+            if (cbits_test(&bits, j>>1)) {
                 i = j;
                 break;
             }
@@ -94,14 +95,14 @@ int main(void)
 
     clock_t t1 = clock();
     cbits primes = sieveOfEratosthenes(n + 1);
-    size_t nprimes = cbits_count(primes);
+    size_t nprimes = cbits_count(&primes);
     clock_t t2 = clock();
 
     printf("number of primes: %" PRIuMAX ", time: %f\n", nprimes, (float)(t2 - t1)/CLOCKS_PER_SEC);
 
     printf(" 2");
     for (size_t i = 3; i < 1000; i += 2)
-       if (cbits_test(primes, i>>1)) printf(" %" PRIuMAX "", i);
+       if (cbits_test(&primes, i>>1)) printf(" %" PRIuMAX "", i);
     puts("");
 
     cbits_drop(&primes);
