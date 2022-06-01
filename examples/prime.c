@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <math.h>
 #include <time.h>
-#define i_implement
 #include <stc/cbits.h>
 
 cbits sieveOfEratosthenes(size_t n)

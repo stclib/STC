@@ -1,6 +1,4 @@
-#define i_implement
 #include <stc/cstr.h>
-#define i_implement
 #include <stc/csview.h>
 #define i_val_str
 #include <stc/cvec.h>

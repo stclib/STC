@@ -1,6 +1,5 @@
 // shared_ptr-examples.cpp
 // based on https://docs.microsoft.com/en-us/cpp/cpp/how-to-create-and-use-shared-ptr-instances?view=msvc-160
-#define i_implement
 #include <stc/cstr.h>
 
 struct Song

@@ -1,4 +1,3 @@
-#define i_implement
 #include <stc/cstr.h>
 
 struct Person { cstr name, last; } typedef Person;

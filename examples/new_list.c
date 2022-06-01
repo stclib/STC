@@ -1,4 +1,3 @@
-#define i_implement
 #include <stc/cstr.h>
 
 forward_clist(clist_i32, int);

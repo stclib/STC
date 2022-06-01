@@ -252,8 +252,16 @@ If containers are used across several translation units with common instantiated
 recommended to build as a "library" with external linking to minimize executable size. To enable this,
 specify `-DSTC_HEADER` as compiler option in your build environment. Next, place all the instantiations
 of the containers used inside a single C-source file as in the example below, and `#define STC_IMPLEMENT` at top. 
-You may also cherry-pick external linking mode on individual containers by `#define i_header` and
+You may also cherry-pick shared linking mode on individual containers by `#define i_header` and
 `#define i_implement`, or force static symbols by `#define i_static` before container includes.
+
+As a special case, there may be non-templated functions in templated containers that should be implemented only
+once if needed. Currently, for **clist**, define `i_extern` before including `clist.h` for sorting functionality
+(global `STC_EXTERN` may alternatively be defined).
+
+Conveniently, `src\libstc.c` implements non-templated functions as shared symbols for **cstr**, **csview**,
+**cbits** and **crandom**. When building in shared mode (-DSTC_HEADER), you may include this file in your project,
+or define your own as descibed above.
 ```c
 // stc_libs.c
 #define STC_IMPLEMENT

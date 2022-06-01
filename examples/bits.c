@@ -1,5 +1,4 @@
 #include <stdio.h>
-#define i_implement
 #include <stc/cbits.h>
 
 int main() 

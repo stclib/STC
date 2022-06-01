@@ -1,7 +1,6 @@
 #include <math.h>
 #include <stdio.h>
 #include <time.h>
-#define i_implement
 #include <stc/crandom.h>
 
 #define i_tag ic

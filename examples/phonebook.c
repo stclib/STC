@@ -21,7 +21,6 @@
 
 // Program to emulates the phone book.
 
-#define i_implement
 #include <stc/cstr.h>
 
 #define i_key_str

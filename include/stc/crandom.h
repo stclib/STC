@@ -20,7 +20,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#define i_header
 #include "ccommon.h"
 
 #ifndef CRANDOM_H_INCLUDED
@@ -119,7 +118,7 @@ STC_INLINE stc64_normalf_t stc64_normalf_init(double mean, double stddev)
     { return stc64_normalf_new(mean, stddev); }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement)
+#if defined(i_implement) || defined(i_extern)
 
 /* Global random() */
 static stc64_t stc64_global = {{

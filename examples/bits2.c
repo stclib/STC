@@ -3,7 +3,6 @@
 
 #define i_type Bits
 #define i_len 80 // enable fixed bitset on the stack
-#define i_implement
 #include <stc/cbits.h>
 
 int main() 

@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <time.h>
-#define i_implement
 #include <stc/crandom.h>
 
 int main()

@@ -1,4 +1,3 @@
-#define i_implement
 #include <stc/cstr.h>
 
 void check_drop(float* v) {printf("destroy %g\n", *v);}

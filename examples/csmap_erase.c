@@ -1,6 +1,5 @@
 // map_erase.c
 // From C++ example: https://docs.microsoft.com/en-us/cpp/standard-library/map-class?view=msvc-160#example-16
-#define i_implement
 #include <stc/cstr.h>
 #include <stdio.h>
 

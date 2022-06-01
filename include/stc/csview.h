@@ -23,7 +23,6 @@
 #ifndef CSVIEW_H_INCLUDED
 #define CSVIEW_H_INCLUDED
 
-#define i_header
 #include "ccommon.h"
 #include "forward.h"
 #include "utf8.h"
@@ -175,7 +174,7 @@ STC_INLINE uint64_t csview_hash(const csview *self)
     { return c_fasthash(self->str, self->size); }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement)
+#if defined(i_implement) || defined(i_extern)
 
 STC_DEF csview
 csview_substr_ex(csview sv, intptr_t pos, size_t n) {

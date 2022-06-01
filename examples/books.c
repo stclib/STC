@@ -1,5 +1,4 @@
 // https://doc.rust-lang.org/std/collections/struct.HashMap.html
-#define i_implement
 #include <stc/cstr.h>
 #define i_key_str
 #define i_val_str

@@ -1,4 +1,3 @@
-#define i_implement
 #include <stc/cstr.h>
 
 // This implements the std::map insert c++ example at:

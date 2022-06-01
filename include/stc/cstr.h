@@ -30,7 +30,6 @@
 #ifndef CSTR_H_INCLUDED
 #define CSTR_H_INCLUDED
 
-#define i_header
 #include "ccommon.h"
 #include "forward.h"
 #include "utf8.h"
@@ -355,7 +354,7 @@ STC_INLINE uint64_t cstr_hash(const cstr *self) {
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement)
+#if defined(i_implement) || defined(i_extern)
 
 STC_DEF char* _cstr_internal_move(cstr* self, const size_t pos1, const size_t pos2) {
     cstr_buf r = cstr_buffer(self);

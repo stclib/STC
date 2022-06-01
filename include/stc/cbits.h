@@ -51,7 +51,6 @@ int main() {
 */
 
 #ifndef CBITS_H_INCLUDED
-#define i_header
 #include "ccommon.h"
 #include <stdlib.h>
 #include <string.h>
@@ -246,8 +245,8 @@ STC_INLINE bool _i_memb(_disjoint)(const i_type* self, const i_type* other) {
     return _cbits_disjoint(self->data64, other->data64, _i_memb(_size)(self));
 }
 
-
-#if defined(i_implement)
+/* -------------------------- IMPLEMENTATION ------------------------- */
+#if defined(i_implement) || defined(i_extern)
 
 #if !defined i_len
 STC_DEF cbits* cbits_copy(cbits* self, const cbits* other) {
