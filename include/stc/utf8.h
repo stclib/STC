@@ -41,11 +41,11 @@ int         utf8_icmp_n(size_t u8max, const char* s1, size_t n1,
                                       const char* s2, size_t n2);
 unsigned    utf8_encode(char *out, uint32_t c);
 
-/* encode/decode next utf8 codepoint. */
+/* decode next utf8 codepoint. https://bjoern.hoehrmann.de/utf-8/decoder/dfa */
 typedef struct { uint32_t state, codep; } utf8_decode_t;
 
 STC_INLINE uint32_t utf8_decode(utf8_decode_t* d, const uint32_t byte) {
-    extern const uint8_t utf8_dtab[];
+    extern const uint8_t utf8_dtab[]; /* utf8code.c */
     const uint32_t type = utf8_dtab[byte];
     d->codep = d->state ? (byte & 0x3fu) | (d->codep << 6)
                         : (0xff >> type) & byte;

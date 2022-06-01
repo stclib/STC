@@ -38,20 +38,22 @@ size_t       cstr_length(cstr s);
 size_t       cstr_capacity(cstr s);
 bool         cstr_empty(cstr s);
 
-// utf8:
-size_t       cstr_size_u8(cstr s);                                    // utf8 size
+// utf8 encoded strings: 
+size_t       cstr_size_u8(cstr s);                                    // number of utf8 codepoints
 size_t       cstr_size_n_u8(cstr s, size_t nbytes);                   // utf8 size within n bytes  
-csview       cstr_at(const cstr* self, size_t bytepos);               // utf8 character as a csview
-csview       cstr_at_u8(const cstr* self, size_t u8idx);              // utf8 character at utf8 pos
+csview       cstr_at(const cstr* self, size_t bytepos);               // utf8 codepoints as a csview
+csview       cstr_at_u8(const cstr* self, size_t u8idx);              // utf8 codepoints at utf8 pos
 size_t       cstr_pos_u8(const cstr* self, size_t u8idx);             // byte position at utf8 index
-
-// utf8: requires linking with src/utf8code.c
+// utf8 functions requires linking with src/utf8code.c:
+bool         cstr_valid_u8(const cstr* self);                         // check if str is valid utf8
 cstr         cstr_tolower(const cstr* self);                          // returns new lowercase utf8 cstr
 cstr         cstr_toupper(const cstr* self);                          // returns new uppercase utf8 cstr
 void         cstr_lowercase(cstr* self);                              // transform cstr to lowercase utf8
 void         cstr_uppercase(cstr* self);                              // transform cstr to uppercase utf8
-bool         cstr_valid_u8(const cstr* self);                         // check if str is valid utf8
-utf8_decode_t cstr_peek(const cstr* self, size_t bytepos);            // get next unicode point at string pos
+bool         cstr_iequals(cstr s, const char* str);                   // case-insensitive comparison
+bool         cstr_istarts_with(cstr s, const char* str);              //   "
+bool         cstr_iends_with(cstr s, const char* str);                //   "
+int          cstr_icmp(const cstr* s1, const cstr* s2);               //   "
 
 size_t       cstr_reserve(cstr* self, size_t capacity);
 void         cstr_resize(cstr* self, size_t len, char fill);
