@@ -320,7 +320,7 @@ STC_INLINE void cstr_replace_n(cstr* self, size_t pos, size_t len, const char* r
 STC_INLINE void cstr_replace_at(cstr* self, size_t pos, size_t len, const char* repl)
     { cstr_replace_n(self, pos, len, repl, strlen(repl)); }
 
-STC_INLINE size_t cstr_replace(cstr* self, size_t pos, const char* search, const char* repl) {
+STC_INLINE size_t cstr_replace_from(cstr* self, size_t pos, const char* search, const char* repl) {
     pos = cstr_find_from(*self, pos, search);
     if (pos == cstr_npos)
         return pos;
@@ -328,6 +328,9 @@ STC_INLINE size_t cstr_replace(cstr* self, size_t pos, const char* search, const
     cstr_replace_n(self, pos, strlen(search), repl, rlen);
     return pos + rlen;
 }
+
+STC_INLINE size_t cstr_replace(cstr* self, const char* search, const char* repl)
+    { return cstr_replace_from(self, 0, search, repl); }
 
 STC_INLINE void cstr_replace_s(cstr* self, size_t pos, size_t len, cstr s) {
     csview sv = cstr_sv(&s);
