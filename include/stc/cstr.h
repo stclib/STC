@@ -551,4 +551,5 @@ STC_DEF int cstr_printf(cstr* self, const char* fmt, ...) {
 #undef i_header
 #undef i_static
 #undef i_implement
+#undef i_extern
 #endif // !STC_CSTR_V1

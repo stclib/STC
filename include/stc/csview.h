@@ -216,3 +216,4 @@ csview_token(csview sv, csview sep, size_t* start) {
 #undef i_header
 #undef i_implement
 #undef i_static
+#undef i_extern

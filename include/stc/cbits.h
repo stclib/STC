@@ -325,3 +325,4 @@ STC_DEF bool _cbits_disjoint(const uint64_t* set, const uint64_t* other, const s
 #undef i_header
 #undef i_implement
 #undef i_static
+#undef i_exterm

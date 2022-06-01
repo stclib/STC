@@ -105,7 +105,7 @@ STC_API _cx_iter        _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx
 STC_API size_t          _cx_memb(_remove)(_cx_self* self, _cx_raw val);
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw val);
 STC_API int             _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y);
-STC_API void            _cx_memb(_sort)(_cx_self* self);
+STC_API int             _cx_memb(_sort_cmp_)(const clist_VOID_node* x, const clist_VOID_node* y);
 #endif
 STC_API _cx_iter        _cx_memb(_splice)(_cx_self* self, _cx_iter it, _cx_self* other);
 STC_API _cx_self        _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2);
@@ -196,7 +196,69 @@ STC_INLINE _cx_value*
 _cx_memb(_get_mut)(_cx_self* self, _cx_raw val) {
     return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), val).ref;
 }
+
+STC_INLINE void
+_cx_memb(_sort)(_cx_self* self) {
+    extern clist_VOID_node*
+    _clist_mergesort(clist_VOID_node *list, int (*cmp)(const clist_VOID_node*, const clist_VOID_node*));
+
+    if (self->last)
+        self->last = (_cx_node *)_clist_mergesort((clist_VOID_node *)self->last->next, _cx_memb(_sort_cmp_));
+}
 #endif
+
+#if defined(i_extern)
+/* Implement non-templated extern functions */
+// Singly linked list Mergesort implementation by Simon Tatham. O(n*log n).
+// https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
+clist_VOID_node *
+_clist_mergesort(clist_VOID_node *list, int (*cmp)(const clist_VOID_node*, const clist_VOID_node*)) {
+    clist_VOID_node *p, *q, *e, *tail, *oldhead;
+    int insize = 1, nmerges, psize, qsize, i;
+
+    while (1) {
+        p = oldhead = list;
+        list = tail = NULL;
+        nmerges = 0;
+
+        while (p) {
+            ++nmerges;
+            q = p, psize = 0;
+            for (i = 0; i < insize; ++i) {
+                ++psize;
+                q = (q->next == oldhead ? NULL : q->next);
+                if (!q) break;
+            }
+            qsize = insize;
+
+            while (psize > 0 || (qsize > 0 && q)) {
+                if (psize == 0) {
+                    e = q, q = q->next, --qsize;
+                    if (q == oldhead) q = NULL;
+                } else if (qsize == 0 || !q) {
+                    e = p, p = p->next, --psize;
+                    if (p == oldhead) p = NULL;
+                } else if (cmp(p, q) <= 0) {
+                    e = p, p = p->next, --psize;
+                    if (p == oldhead) p = NULL;
+                } else {
+                    e = q, q = q->next, --qsize;
+                    if (q == oldhead) q = NULL;
+                }
+                if (tail) tail->next = e; else list = e;
+                tail = e;
+            }
+            p = q;
+        }
+        tail->next = list;
+
+        if (nmerges <= 1)
+            return tail;
+
+        insize *= 2;
+    }
+}
+#endif // i_extern
 
 // -------------------------- IMPLEMENTATION -------------------------
 #if defined(i_implement)
@@ -343,20 +405,11 @@ _cx_memb(_remove)(_cx_self* self, _cx_raw val) {
     return n;
 }
 
-static int
+STC_DEF int
 _cx_memb(_sort_cmp_)(const clist_VOID_node* x, const clist_VOID_node* y) {
     const _cx_raw a = i_keyto((&((const _cx_node *) x)->value));
     const _cx_raw b = i_keyto((&((const _cx_node *) y)->value));
     return i_cmp((&a), (&b));
-}
-
-static clist_VOID_node*
-_clist_mergesort(clist_VOID_node *list, int (*cmp)(const clist_VOID_node*, const clist_VOID_node*));
-
-STC_DEF void
-_cx_memb(_sort)(_cx_self* self) {
-    if (self->last)
-        self->last = (_cx_node *)_clist_mergesort((clist_VOID_node *)self->last->next, _cx_memb(_sort_cmp_));
 }
 
 STC_DEF int
@@ -366,61 +419,6 @@ _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     return i_cmp((&rx), (&ry));
 }
 #endif // !c_no_cmp
-
-#ifndef CLIST_H_INCLUDED
-
-#if !c_option(c_no_cmp)
-// Singly linked list Mergesort implementation by Simon Tatham. O(n*log n).
-// https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
-static clist_VOID_node *
-_clist_mergesort(clist_VOID_node *list, int (*cmp)(const clist_VOID_node*, const clist_VOID_node*)) {
-    clist_VOID_node *p, *q, *e, *tail, *oldhead;
-    int insize = 1, nmerges, psize, qsize, i;
-
-    while (1) {
-        p = oldhead = list;
-        list = tail = NULL;
-        nmerges = 0;
-
-        while (p) {
-            ++nmerges;
-            q = p, psize = 0;
-            for (i = 0; i < insize; ++i) {
-                ++psize;
-                q = (q->next == oldhead ? NULL : q->next);
-                if (!q) break;
-            }
-            qsize = insize;
-
-            while (psize > 0 || (qsize > 0 && q)) {
-                if (psize == 0) {
-                    e = q, q = q->next, --qsize;
-                    if (q == oldhead) q = NULL;
-                } else if (qsize == 0 || !q) {
-                    e = p, p = p->next, --psize;
-                    if (p == oldhead) p = NULL;
-                } else if (cmp(p, q) <= 0) {
-                    e = p, p = p->next, --psize;
-                    if (p == oldhead) p = NULL;
-                } else {
-                    e = q, q = q->next, --qsize;
-                    if (q == oldhead) q = NULL;
-                }
-                if (tail) tail->next = e; else list = e;
-                tail = e;
-            }
-            p = q;
-        }
-        tail->next = list;
-
-        if (nmerges <= 1)
-            return tail;
-
-        insize *= 2;
-    }
-}
-#endif // !c_no_cmp
-#endif // !CLIST_H_INCLUDED
 #endif // i_implement
 #define CLIST_H_INCLUDED
 #include "template.h"

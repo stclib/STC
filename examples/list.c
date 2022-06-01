@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <time.h>
-#define i_implement
-#include <stc/crandom.h>
+
+#define STC_IMPLEMENT
+#define STC_EXTERN
 
 #define i_val double
 #define i_tag fx
 #include <stc/clist.h>
+#include <stc/crandom.h>
 
 int main() {
     int k;

@@ -284,6 +284,7 @@
 #undef i_header
 #undef i_implement
 #undef i_static
+#undef i_extern
 
 #undef _i_prefix
 #undef _i_has_from

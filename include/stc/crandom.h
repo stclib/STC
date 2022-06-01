@@ -189,3 +189,7 @@ STC_DEF double stc64_normalf(stc64_t* rng, stc64_normalf_t* dist) {
 #endif
 #endif
 #undef i_opt
+#undef i_static
+#undef i_header
+#undef i_implement
+#undef i_extern
