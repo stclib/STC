@@ -47,6 +47,7 @@ Contents
 - [***carc*** - **std::shared_ptr** alike support](docs/carc_api.md)
 - [***carr2***, ***carr3*** - 2D and 3D **array** types](docs/carray_api.md)
 - [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
+- [***cbox*** - **std::unique_ptr** alike type](docs/cbox_api.md)
 - [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)
 - [***clist*** - **std::forward_list** alike type](docs/clist_api.md)
 - [***cmap*** - **std::unordered_map** alike type](docs/cmap_api.md)
