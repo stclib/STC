@@ -13,7 +13,7 @@ int main() {
         );
         printf("%s\n", cstr_str(&hello));
 
-        cstr_replace_one(&hello, 0, "🐨", "ø");
+        cstr_replace(&hello, 0, "🐨", "ø");
         printf("%s\n", cstr_str(&hello));
 
         c_foreach (c, cstr, hello)

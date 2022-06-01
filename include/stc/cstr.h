@@ -317,10 +317,10 @@ STC_INLINE void cstr_replace_n(cstr* self, size_t pos, size_t len, const char* r
     memcpy(d + pos, repl, n);
 }
 
-STC_INLINE void cstr_replace(cstr* self, size_t pos, size_t len, const char* repl)
+STC_INLINE void cstr_replace_at(cstr* self, size_t pos, size_t len, const char* repl)
     { cstr_replace_n(self, pos, len, repl, strlen(repl)); }
 
-STC_INLINE size_t cstr_replace_one(cstr* self, size_t pos, const char* search, const char* repl) {
+STC_INLINE size_t cstr_replace(cstr* self, size_t pos, const char* search, const char* repl) {
     pos = cstr_find_from(*self, pos, search);
     if (pos == cstr_npos)
         return pos;

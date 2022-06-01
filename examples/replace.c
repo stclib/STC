@@ -16,15 +16,15 @@ int main ()
         cstr_append(&m, cstr_str(&m));
         printf("%s\n", cstr_str(&m));
 
-        cstr_replace(&s, 9, 5, s2);              // "this is an example string." (1)
+        cstr_replace_at(&s, 9, 5, s2);           // "this is an example string." (1)
         printf("(1) %s\n", cstr_str(&s));
         cstr_replace_n(&s, 19, 6, s3+7, 6);      // "this is an example phrase." (2)
         printf("(2) %s\n", cstr_str(&s));
-        cstr_replace(&s, 8, 10, "just a");       // "this is just a phrase."     (3)
+        cstr_replace_at(&s, 8, 10, "just a");    // "this is just a phrase."     (3)
         printf("(3) %s\n", cstr_str(&s));
         cstr_replace_n(&s, 8, 6,"a shorty", 7);  // "this is a short phrase."    (4)
         printf("(4) %s\n", cstr_str(&s));
-        cstr_replace(&s, 22, 1, "!!!");          // "this is a short phrase!!!"  (5)
+        cstr_replace_at(&s, 22, 1, "!!!");       // "this is a short phrase!!!"  (5)
         printf("(5) %s\n", cstr_str(&s));
     }
 }

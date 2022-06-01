@@ -102,7 +102,7 @@ STC_INLINE void         cstr_insert(cstr* self, const size_t pos, const char* st
                             { cstr_replace_n(self, pos, 0, str, strlen(str)); }
 STC_INLINE void         cstr_insert_s(cstr* self, const size_t pos, cstr s)
                             { cstr_replace_n(self, pos, 0, s.str, _cstr_p(&s)->size); }
-STC_INLINE void         cstr_replace(cstr* self, const size_t pos, const size_t len, const char* str)
+STC_INLINE void         cstr_replace_at(cstr* self, const size_t pos, const size_t len, const char* str)
                             { cstr_replace_n(self, pos, len, str, strlen(str)); }
 STC_INLINE void         cstr_replace_s(cstr* self, const size_t pos, const size_t len, cstr s)
                             { cstr_replace_n(self, pos, len, s.str, _cstr_p(&s)->size); }

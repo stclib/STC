@@ -78,11 +78,11 @@ void         cstr_insert(cstr* self, size_t pos, const char* ins);
 void         cstr_insert_s(cstr* self, size_t pos, cstr ins);
 void         cstr_insert_n(cstr* self, size_t pos, const char* ins, size_t n);
 
-void         cstr_replace(cstr* self, size_t pos, size_t len, const char* repl);
+size_t       cstr_replace(cstr* self, size_t start, const char* search, const char* repl);
+void         cstr_replace_all(cstr* self, const char* search, const char* repl);
+void         cstr_replace_at(cstr* self, size_t pos, size_t len, const char* repl);
 void         cstr_replace_s(cstr* self, size_t pos, size_t len, cstr repl);
 void         cstr_replace_n(cstr* self, size_t pos, size_t len, const char* repl, size_t n);
-size_t       cstr_replace_one(cstr* self, size_t startpos, const char* search, const char* repl);
-void         cstr_replace_all(cstr* self, const char* search, const char* repl);
 
 void         cstr_erase(cstr* self, size_t pos);
 void         cstr_erase_n(cstr* self, size_t pos, size_t n);
@@ -149,7 +149,7 @@ int main() {
     cstr_erase_n(&s1, 7, 5); // -nine
     printf("%s\n", cstr_str(&s1));
 
-    cstr_replace(&s1, cstr_find(s1, "seven"), 5, "four");
+    cstr_replace_at(&s1, cstr_find(s1, "seven"), 5, "four");
     printf("%s\n", cstr_str(&s1));
 
     // reassign:
