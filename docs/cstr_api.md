@@ -84,7 +84,7 @@ bool         cstr_getdelim(cstr *self, int delim, FILE *stream);      // does no
 ```
 
 #### UTF8 methods
-```
+```c
 size_t       cstr_size_u8(cstr s);                                    // number of utf8 codepoints
 size_t       cstr_size_n_u8(cstr s, size_t nbytes);                   // utf8 size within n bytes  
 csview       cstr_at(const cstr* self, size_t bytepos);               // utf8 codepoints as a csview
