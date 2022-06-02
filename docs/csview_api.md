@@ -31,19 +31,11 @@ csview          csview_new(const char literal_only[]);              // make csvi
 csview          csview_from_s(const cstr* s);                       // convert to csview from cstr
 csview          csview_from(const char* str);                       // make csview from const char*
 csview          csview_from_n(const char* str, size_t n);           // construct 
+void            csview_clear(csview* self);
 
 size_t          csview_size(csview sv);
 size_t          csview_length(csview sv);
 bool            csview_empty(csview sv);
-char            csview_front(csview sv);
-char            csview_back(csview sv);
-
-void            csview_clear(csview* self);
-
-// requires i_implement defined before one include of csview.h
-csview          csview_substr_ex(csview sv, intptr_t pos, size_t n);   // negative pos count from end
-csview          csview_slice_ex(csview sv, intptr_t p1, intptr_t p2);  // negative p1, p2 count from end
-csview          csview_token(csview sv, csview sep, size_t* start); // see split example below.
 
 bool            csview_equals(csview sv, csview sv2);
 size_t          csview_find(csview sv, csview needle);
@@ -51,9 +43,10 @@ bool            csview_contains(csview sv, csview needle);
 bool            csview_starts_with(csview sv, csview sub);
 bool            csview_ends_with(csview sv, csview sub);
 
-csview_iter     csview_begin(const csview* self);
-csview_iter     csview_end(const csview* self);
-void            csview_next(csview_iter* it);                       // NB: UTF8 codepoint step, not byte!
+// requires i_implement defined before one include of csview.h
+csview          csview_substr_ex(csview sv, intptr_t pos, size_t n);   // negative pos count from end
+csview          csview_slice_ex(csview sv, intptr_t p1, intptr_t p2);  // negative p1, p2 count from end
+csview          csview_token(csview sv, csview sep, size_t* start);    // see split example below.
 ```
 
 #### UTF8 methods
@@ -61,7 +54,11 @@ void            csview_next(csview_iter* it);                       // NB: UTF8 
 size_t          csview_size_u8(csview sv);
 csview          csview_substr_u8(csview sv, size_t u8pos, size_t u8len);
 
-// require linking with src/utf8code.c:
+csview_iter     csview_begin(const csview* self);
+csview_iter     csview_end(const csview* self);
+void            csview_next(csview_iter* it);                          // utf8 codepoint step, not byte!
+
+// requires linking with src/utf8code.c:
 bool            csview_valid_u8(csview sv);
 int             csview_icmp(const csview* x, const csview* y);
 

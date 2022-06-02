@@ -12,11 +12,11 @@ See the c++ class [std::basic_string](https://en.cppreference.com/w/cpp/string/b
 All cstr definitions and prototypes are available by including a single header file.
 
 ```c
-#define i_implement // define this (or use global STC_IMPLEMENT) in one source file only!
+#define i_implement // optional: define in one source file only for shared symbols linking!
 #include <stc/cstr.h>
 ```
-## Methods
 
+## Methods
 ```c
 cstr         cstr_init(void);                                         // constructor; same as cstr_null.
 cstr         cstr_new(const char literal_only[]);                     // cstr from literal; no strlen() call.
@@ -41,23 +41,6 @@ size_t       cstr_length(cstr s);
 size_t       cstr_capacity(cstr s);
 bool         cstr_empty(cstr s);
 
-// utf8 encoded strings: 
-size_t       cstr_size_u8(cstr s);                                    // number of utf8 codepoints
-size_t       cstr_size_n_u8(cstr s, size_t nbytes);                   // utf8 size within n bytes  
-csview       cstr_at(const cstr* self, size_t bytepos);               // utf8 codepoints as a csview
-csview       cstr_at_u8(const cstr* self, size_t u8idx);              // utf8 codepoints at utf8 pos
-size_t       cstr_pos_u8(const cstr* self, size_t u8idx);             // byte position at utf8 index
-// utf8 functions requires linking with src/utf8code.c:
-bool         cstr_valid_u8(const cstr* self);                         // check if str is valid utf8
-cstr         cstr_tolower(const cstr* self);                          // returns new lowercase utf8 cstr
-cstr         cstr_toupper(const cstr* self);                          // returns new uppercase utf8 cstr
-void         cstr_lowercase(cstr* self);                              // transform cstr to lowercase utf8
-void         cstr_uppercase(cstr* self);                              // transform cstr to uppercase utf8
-bool         cstr_iequals(cstr s, const char* str);                   // utf8 case-insensitive comparison
-bool         cstr_istarts_with(cstr s, const char* str);              //   "
-bool         cstr_iends_with(cstr s, const char* str);                //   "
-int          cstr_icmp(const cstr* s1, const cstr* s2);               //   "
-
 size_t       cstr_reserve(cstr* self, size_t capacity);
 void         cstr_resize(cstr* self, size_t len, char fill);
 void         cstr_shrink_to_fit(cstr* self);
@@ -78,15 +61,15 @@ void         cstr_insert(cstr* self, size_t pos, const char* ins);
 void         cstr_insert_s(cstr* self, size_t pos, cstr ins);
 void         cstr_insert_n(cstr* self, size_t pos, const char* ins, size_t n);
 
-void         cstr_replace_all(cstr* self, const char* search, const char* repl);
+void         cstr_erase(cstr* self, size_t pos);
+void         cstr_erase_n(cstr* self, size_t pos, size_t n);
+
 size_t       cstr_replace(cstr* self, const char* search, const char* repl);
 size_t       cstr_replace_from(cstr* self, size_t pos, const char* search, const char* repl);
 void         cstr_replace_at(cstr* self, size_t pos, size_t len, const char* repl);
 void         cstr_replace_s(cstr* self, size_t pos, size_t len, cstr repl);
 void         cstr_replace_n(cstr* self, size_t pos, size_t len, const char* repl, size_t n);
-
-void         cstr_erase(cstr* self, size_t pos);
-void         cstr_erase_n(cstr* self, size_t pos, size_t n);
+void         cstr_replace_all(cstr* self, const char* search, const char* repl);
 
 bool         cstr_equals(cstr s, const char* str);
 bool         cstr_equals_s(cstr s, cstr s2);
@@ -96,13 +79,32 @@ bool         cstr_contains(cstr s, const char* search);
 bool         cstr_starts_with(cstr s, const char* str);
 bool         cstr_ends_with(cstr s, const char* str);
 
-void         cstr_push_back(cstr* self, char ch);
-void         cstr_pop_back(cstr* self);
-char*        cstr_front(cstr* self);
-char*        cstr_back(cstr* self);
-
 bool         cstr_getline(cstr *self, FILE *stream);                  // cstr_getdelim(self, '\n', stream)
 bool         cstr_getdelim(cstr *self, int delim, FILE *stream);      // does not append delim to result
+```
+
+#### UTF8 methods
+```
+size_t       cstr_size_u8(cstr s);                                    // number of utf8 codepoints
+size_t       cstr_size_n_u8(cstr s, size_t nbytes);                   // utf8 size within n bytes  
+csview       cstr_at(const cstr* self, size_t bytepos);               // utf8 codepoints as a csview
+csview       cstr_at_u8(const cstr* self, size_t u8idx);              // utf8 codepoints at utf8 pos
+size_t       cstr_pos_u8(const cstr* self, size_t u8idx);             // byte position at utf8 index
+
+// iterate utf8 codepoints
+cstr_iter    cstr_begin(const cstr* self);
+cstr_iter    cstr_end(const cstr* self);
+void         cstr_next(cstr_iter* it);
+
+// utf8 functions requires linking with src/utf8code.c symbols:
+bool         cstr_valid_u8(const cstr* self);                         // check if str is valid utf8
+cstr         cstr_tolower(const cstr* self);                          // returns new lowercase utf8 cstr
+cstr         cstr_toupper(const cstr* self);                          // returns new uppercase utf8 cstr
+void         cstr_lowercase(cstr* self);                              // transform cstr to lowercase utf8
+void         cstr_uppercase(cstr* self);                              // transform cstr to uppercase utf8
+bool         cstr_iequals(cstr s, const char* str);                   // utf8 case-insensitive comparison
+bool         cstr_istarts_with(cstr s, const char* str);              //   "
+bool         cstr_iends_with(cstr s, const char* str);                //   "
 ```
 
 Note that all methods with arguments `(..., const char* str, size_t n)`, `n` must be within the range of `str` length.
@@ -110,11 +112,11 @@ Note that all methods with arguments `(..., const char* str, size_t n)`, `n` mus
 #### Helper methods:
 ```c
 int          cstr_cmp(const cstr *s1, const cstr *s2);
+int          cstr_icmp(const cstr* s1, const cstr* s2);               //  utf8 case-insensitive comparison
 bool         cstr_eq(const cstr *s1, const cstr *s2);
 bool         cstr_hash(const cstr *s);
 
 char*        c_strnstrn(const char* str, const char* search, size_t slen, size_t nlen);
-int          c_strncasecmp(const char* str1, const char* str2, size_t n);
 ```
 
 ## Types

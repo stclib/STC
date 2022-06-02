@@ -45,8 +45,6 @@ STC_INLINE void     csview_clear(csview* self) { *self = csview_null; }
 STC_INLINE size_t   csview_size(csview sv) { return sv.size; }
 STC_INLINE size_t   csview_length(csview sv) { return sv.size; }
 STC_INLINE bool     csview_empty(csview sv) { return sv.size == 0; }
-STC_INLINE char     csview_front(csview sv) { return sv.str[0]; }
-STC_INLINE char     csview_back(csview sv) { return sv.str[sv.size - 1]; }
 
 STC_INLINE bool csview_equals(csview sv, csview sv2)
     { return sv.size == sv2.size && !memcmp(sv.str, sv2.str, sv.size); }
