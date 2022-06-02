@@ -191,7 +191,7 @@ size_t seed;
     SEED(seed); \
     for (size_t i = 0; i < m; ++i) \
         M##_PUT(X, RAND(keybits), i); \
-    size_t x = 300000000/M##_SIZE(X); \
+    size_t x = 200000000/M##_SIZE(X); \
     clock_t difference, before = clock(); \
     for (size_t k=0; k < x; k++) M##_FOR (X, it) \
         sum += M##_ITEM(X, it); \

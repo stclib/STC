@@ -51,15 +51,15 @@
 #define TSL_RH_THROW_OR_TERMINATE(ex, msg) throw ex(msg)
 #else
 #define TSL_RH_NO_EXCEPTIONS
-#ifdef NDEBUG
-#define TSL_RH_THROW_OR_TERMINATE(ex, msg) std::terminate()
-#else
+#ifdef TSL_DEBUG
 #include <iostream>
 #define TSL_RH_THROW_OR_TERMINATE(ex, msg) \
   do {                                     \
     std::cerr << msg << std::endl;         \
     std::terminate();                      \
   } while (0)
+#else
+#define TSL_RH_THROW_OR_TERMINATE(ex, msg) std::terminate()
 #endif
 #endif
 

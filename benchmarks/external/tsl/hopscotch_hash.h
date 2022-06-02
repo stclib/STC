@@ -35,6 +35,7 @@
 #include <iterator>
 #include <limits>
 #include <memory>
+#include <new>
 #include <stdexcept>
 #include <tuple>
 #include <type_traits>
@@ -309,12 +310,22 @@ class hopscotch_bucket : public hopscotch_bucket_hash<StoreHash> {
 
   value_type& value() noexcept {
     tsl_hh_assert(!empty());
+#if defined(__cplusplus) && __cplusplus >= 201703L
+    return *std::launder(
+        reinterpret_cast<value_type*>(std::addressof(m_value)));
+#else
     return *reinterpret_cast<value_type*>(std::addressof(m_value));
+#endif
   }
 
   const value_type& value() const noexcept {
     tsl_hh_assert(!empty());
+#if defined(__cplusplus) && __cplusplus >= 201703L
+    return *std::launder(
+        reinterpret_cast<const value_type*>(std::addressof(m_value)));
+#else
     return *reinterpret_cast<const value_type*>(std::addressof(m_value));
+#endif
   }
 
   template <typename... Args>

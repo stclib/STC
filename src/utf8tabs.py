@@ -2,38 +2,42 @@
 import pandas as pd
 import numpy as np
 
-def read_unidata(catfilter='Lu', casefilter='lowcase', big=False):
-    ud = pd.read_csv("ucd/UnicodeData.txt", sep=';', converters={0: lambda x: int(x, base=16)},
+_UNICODE_DIR = "https://www.unicode.org/Public/14.0.0/ucd"
+
+def read_unidata(category='Lu', casetype='lowcase', big=False):
+    df = pd.read_csv(_UNICODE_DIR+'/UnicodeData.txt', sep=';', converters={0: lambda x: int(x, base=16)},
                       names=['code', 'name', 'category', 'canclass', 'bidircat', 'chrdecomp',
                              'decdig', 'digval', 'numval', 'mirrored', 'uc1name', 'comment',
                              'upcase', 'lowcase', 'titlecase'],
                       usecols=['code', 'name', 'category', 'bidircat', 'upcase', 'lowcase', 'titlecase'])
     if big:
-        ud = ud[ud['code'] >= (1<<16)]
+        df = df[df['code'] >= (1<<16)]
     else:
-        ud = ud[ud['code'] < (1<<16)]
-    ud = ud[ud['category'] ==  catfilter]
-    ud = ud.replace(np.nan, '0')
+        df = df[df['code'] < (1<<16)]
+    
+    if category:
+        df = df[df['category'] == category]
+    df = df.replace(np.nan, '0')
     for k in ['upcase', 'lowcase', 'titlecase']:
-        ud[k] = ud[k].apply(int, base=16)
-    if casefilter: # 'lowcase', 'upcase', 'titlecase'
-        ud = ud[ud[casefilter] != 0]
-    return ud
+        df[k] = df[k].apply(int, base=16)
+
+    if casetype:                   # 'lowcase', 'upcase', 'titlecase'
+        df = df[df[casetype] != 0] # remove mappings to 0
+    return df
 
 
 def read_casefold(big=False):
-    cf = pd.read_csv("ucd/CaseFolding.txt", engine='python', sep='; #? ?', comment='#',
+    df = pd.read_csv(_UNICODE_DIR+'/CaseFolding.txt', engine='python', sep='; #? ?', comment='#',
                      converters={0: lambda x: int(x, base=16)},
-                     names=['code', 'status', 'lowcase', 'name'])
+                     names=['code', 'status', 'lowcase', 'name']) # comment => 'name'
     if big:
-        cf = cf[cf['code'] >= (1<<16)]
+        df = df[df['code'] >= (1<<16)]
     else:
-        cf = cf[cf['code'] < (1<<16)]
-    cf = cf[cf.status.isin(['S', 'C'])]
-    cf['lowcase'] = cf['lowcase'].apply(int, base=16)
-    #print(cf['name'].values)
-    #print(cf)
-    return cf
+        df = df[df['code'] < (1<<16)]
+
+    df = df[df.status.isin(['S', 'C'])]
+    df['lowcase'] = df['lowcase'].apply(int, base=16)
+    return df
 
 
 def make_caselist(df):
@@ -125,7 +129,7 @@ def make_casetable():
     return cfold
 
 
-def print_casefold_low(table):
+def print_casefold_inverse(table):
     cfold_low = [i for i in range(len(table))]
     cfold_low.sort(key=lambda i: table[i][2] - (table[i][1] - table[i][0]))
 
@@ -140,4 +144,4 @@ def print_casefold_low(table):
 if __name__ == "__main__":
     cfold = make_casetable()
     table = print_casefold(cfold)
-    print_casefold_low(table)
+    print_casefold_inverse(table)
