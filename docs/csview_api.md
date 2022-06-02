@@ -27,9 +27,9 @@ All csview definitions and prototypes are available by including a single header
 
 ```c
 csview          c_sv(const char literal_only[]);                    // alias for csview_new
-csview          csview_new(const char literal_only[]);              // make csview from literal, no strlen()
-csview          csview_from_s(const cstr* s);                       // convert to csview from cstr
-csview          csview_from(const char* str);                       // make csview from const char*
+csview          csview_new(const char literal_only[]);              // construct from literal, no strlen()
+csview          csview_from(const char* str);                       // construct from const char*
+csview          csview_from_s(const cstr* s);                       // construct from cstr
 csview          csview_from_n(const char* str, size_t n);           // construct 
 void            csview_clear(csview* self);
 
@@ -50,7 +50,7 @@ csview          csview_token(csview sv, csview sep, size_t* start);    // see sp
 ```
 
 #### UTF8 methods
-```
+```c
 size_t          csview_size_u8(csview sv);
 csview          csview_substr_u8(csview sv, size_t u8pos, size_t u8len);
 
@@ -60,7 +60,6 @@ void            csview_next(csview_iter* it);                          // utf8 c
 
 // requires linking with src/utf8code.c:
 bool            csview_valid_u8(csview sv);
-int             csview_icmp(const csview* x, const csview* y);
 
 // from utf8.h/utf8code.c:
 bool            utf8_valid(const char* s);
@@ -97,6 +96,7 @@ bool            cstr_ends_with_sv(cstr s, csview sub);
 #### Helper methods
 ```c
 int             csview_cmp(const csview* x, const csview* y);
+int             csview_icmp(const csview* x, const csview* y);
 bool            csview_eq(const csview* x, const csview* y);
 uint64_t        csview_hash(const csview* x);
 ```
