@@ -121,19 +121,27 @@ enum {
     QUEST       ,           /* a? == a|nothing, i.e. 0 or 1 a's */
     RUNE        = 0x8100000,
     IRUNE,
+    ASC_an      , ASC_AN,   /* alphanum */
+    ASC_al      , ASC_AL,   /* alpha */
     ASC_bl      , ASC_BL,   /* blank */
     ASC_ct      , ASC_CT,   /* ctrl */
+    ASC_d       , ASC_D,    /* digit */
+    ASC_s       , ASC_S,    /* space */
+    ASC_w       , ASC_W,    /* word */
     ASC_gr      , ASC_GR,   /* graphic */
     ASC_pr      , ASC_PR,   /* print */
     ASC_pt      , ASC_PT,   /* punct */
-    U8_Nd       , U8N_Nd,    /* dec digit, non-digit */
-    U8_LC       , U8N_LC,   /* utf8 letter cased */
-    U8_Ll       , U8N_Ll,   /* utf8 letter lower */
-    U8_Lu       , U8N_Lu,   /* utf8 letter upper */
-    U8_Zs       , U8N_Zs,   /* utf8 white space */
-    U8_Xnx      , U8N_Xnx,  /* utf8 hex digit */
-    U8_Xan      , U8N_Xan,  /* utf8 alphanumeric */
-    U8_Xw       , U8N_Xw,   /* utf8 word */
+    ASC_lo      , ASC_LO,   /* lower */
+    ASC_up      , ASC_UP,   /* upper */
+    ASC_xd      , ASC_XD,   /* hex */
+    UTF_d       , UTF_D,    /* utf dec digit, non-digit */
+    UTF_s       , UTF_S,    /* utf8 white space */
+    UTF_w       , UTF_W,    /* utf8 word */
+    UTF_al      , UTF_AL,   /* utf8 letter cased */
+    UTF_lo      , UTF_LO,   /* utf8 letter lower */
+    UTF_up      , UTF_UP,   /* utf8 letter upper */
+    UTF_xd      , UTF_XD,   /* utf8 hex digit */
+    UTF_an      , UTF_AN,   /* utf8 alphanumeric */
     ANY         = 0x8200000, /* Any character except newline, . */
     ANYNL       ,           /* Any character including newline, . */
     NOP         ,           /* No operation, internal use only */
@@ -576,12 +584,12 @@ nextc(Parser *par, Rune *rp)
             case 'r': *rp = '\r'; break;
             case 'v': *rp = '\v'; break;
             case 'f': *rp = '\f'; break;
-            case 'd': *rp = U8_Nd; break;
-            case 'D': *rp = U8N_Nd; break;
-            case 's': *rp = U8_Zs; break;
-            case 'S': *rp = U8N_Zs; break;
-            case 'w': *rp = U8_Xw; break;
-            case 'W': *rp = U8N_Xw; break;
+            case 'd': *rp = UTF_d; break;
+            case 'D': *rp = UTF_D; break;
+            case 's': *rp = UTF_s; break;
+            case 'S': *rp = UTF_S; break;
+            case 'w': *rp = UTF_w; break;
+            case 'W': *rp = UTF_W; break;
             case 'x': if (*par->exprp != '{') break;
                 *rp = 0; sscanf(++par->exprp, "%x", rp);
                 while (*par->exprp) if (*(par->exprp++) == '}') break;
@@ -590,13 +598,13 @@ nextc(Parser *par, Rune *rp)
                 return 2;
             case 'p': case 'P': { /* https://www.regular-expressions.info/unicode.html */
                 static struct { const char* c; int n, r; } cls[] = {
-                    {"{Alpha}", 7, U8_LC}, {"{LC}", 4, U8_LC},
-                    {"{Alnum}", 7, U8_Xan},
-                    {"{Digit}", 7, U8_Nd}, {"{Nd}", 4, U8_Nd},
-                    {"{Lower}", 7, U8_Ll}, {"{Ll}", 4, U8_Ll},
-                    {"{Space}", 7, U8_Zs}, {"{Zs}", 4, U8_Zs},
-                    {"{Upper}", 7, U8_Lu}, {"{Lu}", 4, U8_Lu},
-                    {"{XDigit}", 8, U8_Xnx},
+                    {"{Space}", 7, UTF_s}, {"{Zs}", 4, UTF_s},
+                    {"{Digit}", 7, UTF_d}, {"{Nd}", 4, UTF_d},
+                    {"{Alpha}", 7, UTF_al}, {"{LC}", 4, UTF_al},
+                    {"{Lower}", 7, UTF_lo}, {"{Ll}", 4, UTF_lo},
+                    {"{Upper}", 7, UTF_up}, {"{Lu}", 4, UTF_up},
+                    {"{Alnum}", 7, UTF_an},
+                    {"{XDigit}", 8, UTF_xd},
                     {"{Blank}", 7, ASC_bl},
                     {"{Graph}", 7, ASC_gr},
                     {"{Print}", 7, ASC_pr},
@@ -605,8 +613,8 @@ nextc(Parser *par, Rune *rp)
                 int inv = *rp == 'P';
                 for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
                     if (!strncmp(par->exprp, cls[i].c, cls[i].n)) {
-                        if (par->rune_type == IRUNE && (cls[i].r == U8_Ll || cls[i].r == U8_Lu))
-                            *rp = U8_LC + inv;
+                        if (par->rune_type == IRUNE && (cls[i].r == UTF_lo || cls[i].r == UTF_up))
+                            *rp = UTF_al + inv;
                         else
                             *rp = cls[i].r + inv;
                         par->exprp += cls[i].n;
@@ -723,6 +731,25 @@ bldcclass(Parser *par)
                     ep[-1] = rune;
                     continue;
                 }
+            }
+            if (rune == '[' && *par->exprp == ':') {
+                static struct { const char* c; int n, r; } cls[] = {
+                    {"alnum:]", 7, ASC_an}, {"alpha:]", 7, ASC_al}, {"blank:]", 7, ASC_bl},
+                    {"cntrl:]", 7, ASC_ct}, {"digit:]", 7, ASC_d}, {"graph:]", 7, ASC_gr},
+                    {"lower:]", 7, ASC_lo}, {"print:]", 7, ASC_pr}, {"punct:]", 7, ASC_pt},
+                    {"space:]", 7, ASC_s}, {"upper:]", 7, ASC_up}, {"xdigit:]", 8, ASC_xd},
+                    {"word:]", 6, ASC_w},
+                };
+                int inv = par->exprp[1] == '^', off = 1 + inv;
+                for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
+                    if (!strncmp(par->exprp + off, cls[i].c, cls[i].n)) {
+                        if (par->rune_type == IRUNE && (cls[i].r == ASC_lo || cls[i].r == ASC_up))
+                            rune = ASC_al + inv;
+                        else
+                            rune = cls[i].r + inv;
+                        par->exprp += off + cls[i].n;
+                        break;
+                    }
             }
         }
         *ep++ = rune;
@@ -847,7 +874,17 @@ runematch(Rune s, Rune r, bool icase)
 {
     int inv = 0;
     switch (s) {
-    case ASC_BL: inv = 1; /* fallthrough */
+    case ASC_D: inv = 1; /* fallthrough */
+    case ASC_d: return inv ^ (isdigit(r) != 0);
+    case ASC_S: inv = 1;
+    case ASC_s: return inv ^ (isspace(r) != 0);
+    case ASC_W: inv = 1;
+    case ASC_w: return inv ^ ((isalnum(r) != 0) | (r == '_'));
+    case ASC_AL: inv = 1;
+    case ASC_al: return inv ^ (isalpha(r) != 0);
+    case ASC_AN: inv = 1;
+    case ASC_an: return inv ^ (isalnum(r) != 0);
+    case ASC_BL: inv = 1;
     case ASC_bl: return inv ^ ((r == ' ') | (r == '\t'));
     case ASC_CT: inv = 1;
     case ASC_ct: return inv ^ (iscntrl(r) != 0);
@@ -857,22 +894,29 @@ runematch(Rune s, Rune r, bool icase)
     case ASC_pr: return inv ^ (isprint(r) != 0);
     case ASC_PT: inv = 1;
     case ASC_pt: return inv ^ (ispunct(r) != 0);
-    case U8N_Nd: inv = 1;
-    case U8_Nd: return inv ^ (utf8_isdigit(r));
-    case U8N_LC: inv = 1;
-    case U8_LC: return inv ^ utf8_isalpha(r);
-    case U8N_Ll: inv = 1;
-    case U8_Ll: return inv ^ utf8_islower(r);
-    case U8N_Lu: inv = 1;
-    case U8_Lu: return inv ^ utf8_isupper(r);
-    case U8N_Zs: inv = 1;
-    case U8_Zs: return inv ^ utf8_isspace(r);
-    case U8N_Xan: inv = 1;
-    case U8_Xan: return inv ^ utf8_isalnum(r);
-    case U8N_Xnx: inv = 1;
-    case U8_Xnx: return inv ^ utf8_isxdigit(r);
-    case U8N_Xw: inv = 1;
-    case U8_Xw: return inv ^ (utf8_isalnum(r) | (r == '_'));
+    case ASC_LO: inv = 1;
+    case ASC_lo: return inv ^ (islower(r) != 0);
+    case ASC_UP: inv = 1;
+    case ASC_up: return inv ^ (isupper(r) != 0);
+    case ASC_XD: inv = 1;
+    case ASC_xd: return inv ^ (isxdigit(r) != 0);
+
+    case UTF_D: inv = 1;
+    case UTF_d: return inv ^ (utf8_isdigit(r));
+    case UTF_S: inv = 1;
+    case UTF_s: return inv ^ utf8_isspace(r);
+    case UTF_W: inv = 1;
+    case UTF_w: return inv ^ (utf8_isalnum(r) | (r == '_'));
+    case UTF_AL: inv = 1;
+    case UTF_al: return inv ^ utf8_isalpha(r);
+    case UTF_AN: inv = 1;
+    case UTF_an: return inv ^ utf8_isalnum(r);
+    case UTF_LO: inv = 1;
+    case UTF_lo: return inv ^ utf8_islower(r);
+    case UTF_UP: inv = 1;
+    case UTF_up: return inv ^ utf8_isupper(r);
+    case UTF_XD: inv = 1;
+    case UTF_xd: return inv ^ utf8_isxdigit(r);
     }
     return icase ? utf8_tolower(s) == utf8_tolower(r) : s == r;
 }
