@@ -60,11 +60,12 @@ bool utf8_valid_n(const char* s, size_t n) {
 }
 
 uint32_t utf8_tolower(uint32_t c) {
-    for (size_t i=0; i < sizeof casefold/sizeof *casefold; ++i) {
-        if (c <= casefold[i].c1) {
-            if (c < casefold[i].c0) return c;
-            int d = casefold[i].m1 - casefold[i].c1;
-            if (d == 1) return c + ((casefold[i].c1 & 1) == (c & 1));
+    for (size_t i=0; i < casefold_len; ++i) {
+        const struct CaseMapping entry = casemappings[i];
+        if (c <= entry.c1) {
+            if (c < entry.c0) return c;
+            int d = entry.m1 - entry.c1;
+            if (d == 1) return c + ((entry.c1 & 1) == (c & 1));
             return c + d;
         }
     }
@@ -72,12 +73,12 @@ uint32_t utf8_tolower(uint32_t c) {
 }
 
 uint32_t utf8_toupper(uint32_t c) {
-    for (size_t i=0; i < sizeof cfold_low/sizeof *cfold_low; ++i) {
-        struct CaseFold cfold = casefold[cfold_low[i]];
-        if (c <= cfold.m1) {
-            int d = cfold.m1 - cfold.c1;
-            if (c < (uint32_t)(cfold.c0 + d)) return c;
-            if (d == 1) return c - ((cfold.m1 & 1) == (c & 1));
+    for (size_t i=0; i < sizeof upcase_ind/sizeof *upcase_ind; ++i) {
+        struct CaseMapping entry = casemappings[upcase_ind[i]];
+        if (c <= entry.m1) {
+            int d = entry.m1 - entry.c1;
+            if (c < (uint32_t)(entry.c0 + d)) return c;
+            if (d == 1) return c - ((entry.m1 & 1) == (c & 1));
             return c - d;
         }
     }

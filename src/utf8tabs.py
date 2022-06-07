@@ -43,110 +43,98 @@ def read_casefold(big=False):
 def make_caselist(df, casetype):
     caselist=[]
     for idx, row in df.iterrows():
-        caselist.append([idx+1, row['code'], row[casetype], row['name']])
+        caselist.append([row['code'], row[casetype], row['name']])
     return caselist
 
 
 def make_table(caselist):
-    prevoffset = 0
-    prev = [-1, 0, 0]
-    diff = [-1, 0, 0]
-    n = 1
-
-    ranges = []
-    for x in caselist:
-        offset = x[2] - x[1]
-        if (diff[1] and x[1] - prev[1] != diff[1]) or (diff[2] and x[2] - prev[2] != diff[2]) or prevoffset != offset:
-            ranges.append([x[1], x[2], n, x[3]])
-            diff[1] = 0
-            diff[2] = 0
-            n = 1
-        else:
-            n += 1
-            if diff[1] == 0:
-                diff[1] = x[1] - prev[1]
-                diff[2] = x[2] - prev[2]
-            diff[1] = x[1] - prev[1]
-            diff[2] = x[2] - prev[2]
-        prev[2] = x[2]
-        prev[1] = x[1]
-        prevoffset = offset
-
-    ranges.append(ranges[-1])
-    ranges[-1][2] = 26
-
-    #for r in ranges:
-    #    print("%04X, %04X, %d" % (r[0], r[1], r[2]))
-    #exit()
-
-    # next two for loops could be combined to eliminate rangelist
-    rangelist = []
-    for i in range(0, len(ranges)-1):
-        d = ranges[i][1] - ranges[i][0]
-        rangelist.append([ranges[i][0], ranges[i+1][2], d, ranges[i][3]])
+    prev_a, prev_b = 0, 0
+    diff_a, diff_b = 0, 0
+    prev_offs = 0
+    n_1 = len(caselist) - 1
 
     table = []
-    for x in rangelist:
-        if x[2] == -1:
-            print("ohoh:", x[0])
-        delta = 2 if x[2] == 1 else 1
-        a = x[0]
-        b = x[0] + (x[1] - 1)*delta
-        c = b + x[2]
-        if b >= 1<<16 or c >= 1<<16: # only to make sure...
-            break
-        table.append((a, b, c, x[3]))
+    for j in range(0, len(caselist)):
+        a, b, name = caselist[j]
+        offset = b - a
+
+        if abs(diff_a) > 2 or a - prev_a != diff_a or b - prev_b != diff_b or prev_offs != offset:
+            if  j > 0:
+                table.append([start_a, prev_a, prev_b, prev_name])
+            if j < n_1:
+                diff_a = caselist[j+1][0] - a
+                diff_b = caselist[j+1][1] - b
+                start_a = a
+
+        prev_a, prev_b, prev_name = a, b, name
+        prev_offs = offset
+
+    table.append([start_a, a, b, name])
     return table
 
 
 def print_table(name, table, style=1):
-    print('static struct CaseFold %s[] = {' % (name))
+    print('static struct CaseMapping %s[] = {' % (name))
     for a,b,c,t in table:
         if style == 1:   # first char with name
-            print('    {%3d, %3d, %3d},    \t// %s %s, %s' % (a, b, c, chr(a), chr(a + c - b), t))
+            d = b - a + 1 if c - b > 1 else (b - a)/2 + 1
+            print('    {0x%04X, 0x%04X, 0x%04X}, // %s %s (%2d) %s' % (a, b, c, chr(a), chr(a + c - b), d, t))
         elif style == 2: # all chars
-            #print('    {%3d, %3d, %3d},    \t// ' % (a, b, c), end='')
-            print('    {0x%04X, 0x%04X, 0x%04X},\t// ' % (a, b, c), end='')
+            print('    {0x%04X, 0x%04X, 0x%04X}, // ' % (a, b, c), end='')
             n = 0
             for k in range(a, b+1, 2 if c - b == 1 else 1):
                 n += 1
                 if n % 17 == 0:
-                    print('\n                          \t// ', end='')
+                    print('\n                              // ', end='')
                 print('%s %s, ' % (chr(k), chr(k + c - b)), end='')
             print('')
     print('}; // %d\n' % (len(table)))
 
 
-def print_table_inv(name, table):
-    lowcase = [i for i in range(len(table))]
-    # sort by mapped value table[:][2] (= lowcase) of the first element in each range entry
-    lowcase.sort(key=lambda i: table[i][2] - (table[i][1] - table[i][0]))
-
-    print('static uint8_t %s[%d] = {\n   ' % (name, len(table)), end='')
-    for i in range(len(lowcase)):
-        print(" %d," % (lowcase[i]), end='\n   ' if (i+1) % 20 == 0 else '')
+def print_index_table(name, indtab):
+    print('\nstatic uint8_t %s[%d] = {\n   ' % (name, len(indtab)), end='')
+    for i in range(len(indtab)):
+        print(" %d," % (indtab[i]), end='\n   ' if (i+1) % 20 == 0 else '')
     print('\n};')
 
 
-def compile_table(name, casetype='lowcase', category=None):
+def make_inverse_ind(table):
+    inv = [i for i in range(len(table))]
+    # sort by mapped value table[:][2] (= inv) of the first element in each range entry
+    inv.sort(key=lambda i: table[i][2] - (table[i][1] - table[i][0]))
+    return inv
+
+
+def compile_table(casetype='lowcase', category=None):
     if category:
         df = read_unidata(casetype, category)
     else:
         df = read_casefold()
     caselist = make_caselist(df, casetype)
     table = make_table(caselist)
-    print_table(name, table, 2)
     return table
 
 
 def main():
     print('#include <stdint.h>\n')
-    print('struct CaseFold { uint16_t c0, c1, m1; };\n')
+    print('struct CaseMapping { uint16_t c0, c1, m1; };\n')
 
-    table = compile_table('casefold') # casefold
-    #table = compile_table('tolower_tab', 'lowcase', 'Lu') # unicode
-    print_table_inv('cfold_low', table)
-
+    casemappings = compile_table('lowcase') # casefold
+    casefold_len = len(casemappings)
+    """
+    lowcase      = compile_table('lowcase', 'Lu') # unicode lowercase
+    lowcase_ind = []
+    for v in lowcase:
+        try:
+            lowcase_ind.append(casemappings.index(v))
+        except:
+            lowcase_ind.append(len(casemappings))
+            casemappings.append(v)
+    """
+    print_table('casemappings', casemappings, 1)
+    upcase_ind = make_inverse_ind(casemappings)
+    print('enum { casefold_len = %d };' % casefold_len)
+    print_index_table('upcase_ind', upcase_ind)
 
 ########### main:
 
