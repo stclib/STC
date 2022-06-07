@@ -4,6 +4,7 @@ import numpy as np
 
 _UNICODE_DIR = "https://www.unicode.org/Public/14.0.0/ucd"
 
+
 def read_unidata(casetype='lowcase', category='Lu', big=False):
     df = pd.read_csv(_UNICODE_DIR+'/UnicodeData.txt', sep=';', converters={0: lambda x: int(x, base=16)},
                       names=['code', 'name', 'category', 'canclass', 'bidircat', 'chrdecomp',
@@ -59,17 +60,18 @@ def make_table(caselist):
         offset = b - a
 
         if abs(diff_a) > 2 or a - prev_a != diff_a or b - prev_b != diff_b or prev_offs != offset:
-            if  j > 0:
-                table.append([start_a, prev_a, prev_b, prev_name])
+            if  j > 0 and start_a not in [0xAB70, 0x13F8]:
+                table.append([start_a, prev_a, prev_b, start_name])
             if j < n_1:
                 diff_a = caselist[j+1][0] - a
                 diff_b = caselist[j+1][1] - b
                 start_a = a
+                start_name = name
 
-        prev_a, prev_b, prev_name = a, b, name
+        prev_a, prev_b = a, b
         prev_offs = offset
 
-    table.append([start_a, a, b, name])
+    table.append([start_a, a, b, start_name])
     return table
 
 
@@ -77,7 +79,7 @@ def print_table(name, table, style=1):
     print('static struct CaseMapping %s[] = {' % (name))
     for a,b,c,t in table:
         if style == 1:   # first char with name
-            d = b - a + 1 if c - b > 1 else (b - a)/2 + 1
+            d = b - a + 1 if abs(c - b) != 1 else (b - a)/2 + 1
             print('    {0x%04X, 0x%04X, 0x%04X}, // %s %s (%2d) %s' % (a, b, c, chr(a), chr(a + c - b), d, t))
         elif style == 2: # all chars
             print('    {0x%04X, 0x%04X, 0x%04X}, // ' % (a, b, c), end='')
@@ -99,7 +101,10 @@ def print_index_table(name, indtab):
 
 
 def make_inverse_ind(table):
-    inv = [i for i in range(len(table))]
+    inv = []
+    for i in range(len(table)):
+        if table[i][2] not in [ord('i'), ord('s')]: # remove 'i'. 's' upcase mappings.
+            inv.append(i)
     # sort by mapped value table[:][2] (= inv) of the first element in each range entry
     inv.sort(key=lambda i: table[i][2] - (table[i][1] - table[i][0]))
     return inv
@@ -120,9 +125,8 @@ def main():
     print('struct CaseMapping { uint16_t c0, c1, m1; };\n')
 
     casemappings = compile_table('lowcase') # casefold
-    casefold_len = len(casemappings)
-    """
     lowcase      = compile_table('lowcase', 'Lu') # unicode lowercase
+
     lowcase_ind = []
     for v in lowcase:
         try:
@@ -130,8 +134,11 @@ def main():
         except:
             lowcase_ind.append(len(casemappings))
             casemappings.append(v)
-    """
-    print_table('casemappings', casemappings, 1)
+
+    casefold_len = len(casemappings)
+    casemappings.sort(key=lambda x: x[0])
+
+    print_table('casemappings', casemappings, style=1)
     upcase_ind = make_inverse_ind(casemappings)
     print('enum { casefold_len = %d };' % casefold_len)
     print_index_table('upcase_ind', upcase_ind)
