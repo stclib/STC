@@ -8,7 +8,6 @@ static struct CaseMapping casemappings[] = {
     {0x00C0, 0x00D6, 0x00F6}, // À à (23) LATIN CAPITAL LETTER A WITH GRAVE
     {0x00D8, 0x00DE, 0x00FE}, // Ø ø ( 7) LATIN CAPITAL LETTER O WITH STROKE
     {0x0100, 0x012E, 0x012F}, // Ā ā (24) LATIN CAPITAL LETTER A WITH MACRON
-    {0x0130, 0x0130, 0x0069}, // İ i ( 1) LATIN CAPITAL LETTER I WITH DOT ABOVE
     {0x0132, 0x0136, 0x0137}, // Ĳ ĳ ( 3) LATIN CAPITAL LIGATURE IJ
     {0x0139, 0x0147, 0x0148}, // Ĺ ĺ ( 8) LATIN CAPITAL LETTER L WITH ACUTE
     {0x014A, 0x0176, 0x0177}, // Ŋ ŋ (23) LATIN CAPITAL LETTER ENG
@@ -51,11 +50,9 @@ static struct CaseMapping casemappings[] = {
     {0x01C8, 0x01C8, 0x01C9}, // ǈ ǉ ( 1) LATIN CAPITAL LETTER L WITH SMALL LETTER J
     {0x01CA, 0x01CA, 0x01CC}, // Ǌ ǌ ( 1) LATIN CAPITAL LETTER NJ
     {0x01CB, 0x01DB, 0x01DC}, // ǋ ǌ ( 9) LATIN CAPITAL LETTER N WITH SMALL LETTER J
-    {0x01CD, 0x01DB, 0x01DC}, // Ǎ ǎ ( 8) LATIN CAPITAL LETTER A WITH CARON
     {0x01DE, 0x01EE, 0x01EF}, // Ǟ ǟ ( 9) LATIN CAPITAL LETTER A WITH DIAERESIS AND MACRON
     {0x01F1, 0x01F1, 0x01F3}, // Ǳ ǳ ( 1) LATIN CAPITAL LETTER DZ
     {0x01F2, 0x01F4, 0x01F5}, // ǲ ǳ ( 2) LATIN CAPITAL LETTER D WITH SMALL LETTER Z
-    {0x01F4, 0x01F4, 0x01F5}, // Ǵ ǵ ( 1) LATIN CAPITAL LETTER G WITH ACUTE
     {0x01F6, 0x01F6, 0x0195}, // Ƕ ƕ ( 1) LATIN CAPITAL LETTER HWAIR
     {0x01F7, 0x01F7, 0x01BF}, // Ƿ ƿ ( 1) LATIN CAPITAL LETTER WYNN
     {0x01F8, 0x021E, 0x021F}, // Ǹ ǹ (20) LATIN CAPITAL LETTER N WITH GRAVE
@@ -106,8 +103,7 @@ static struct CaseMapping casemappings[] = {
     {0x10A0, 0x10C5, 0x2D25}, // Ⴀ ⴀ (38) GEORGIAN CAPITAL LETTER AN
     {0x10C7, 0x10C7, 0x2D27}, // Ⴧ ⴧ ( 1) GEORGIAN CAPITAL LETTER YN
     {0x10CD, 0x10CD, 0x2D2D}, // Ⴭ ⴭ ( 1) GEORGIAN CAPITAL LETTER AEN
-    {0x13A0, 0x13EF, 0xABBF}, // Ꭰ ꭰ (80) CHEROKEE LETTER A
-    {0x13F0, 0x13F5, 0x13FD}, // Ᏸ ᏸ ( 6) CHEROKEE LETTER YE
+    {0x13F8, 0x13FD, 0x13F5}, // ᏸ Ᏸ ( 6) CHEROKEE SMALL LETTER YE
     {0x1C80, 0x1C80, 0x0432}, // ᲀ в ( 1) CYRILLIC SMALL LETTER ROUNDED VE
     {0x1C81, 0x1C81, 0x0434}, // ᲁ д ( 1) CYRILLIC SMALL LETTER LONG-LEGGED DE
     {0x1C82, 0x1C82, 0x043E}, // ᲂ о ( 1) CYRILLIC SMALL LETTER NARROW O
@@ -197,20 +193,59 @@ static struct CaseMapping casemappings[] = {
     {0xA7D0, 0xA7D0, 0xA7D1}, // Ꟑ ꟑ ( 1) LATIN CAPITAL LETTER CLOSED INSULAR G
     {0xA7D6, 0xA7D8, 0xA7D9}, // Ꟗ ꟗ ( 2) LATIN CAPITAL LETTER MIDDLE SCOTS S
     {0xA7F5, 0xA7F5, 0xA7F6}, // Ꟶ ꟶ ( 1) LATIN CAPITAL LETTER REVERSED HALF H
+    {0xAB70, 0xABBF, 0x13EF}, // ꭰ Ꭰ (80) CHEROKEE SMALL LETTER A
     {0xFF21, 0xFF3A, 0xFF5A}, // Ａ ａ (26) FULLWIDTH LATIN CAPITAL LETTER A
-}; // 195
+    {0x0130, 0x0130, 0x0069}, // İ i ( 1) LATIN CAPITAL LETTER I WITH DOT ABOVE
+    {0x01CD, 0x01DB, 0x01DC}, // Ǎ ǎ ( 8) LATIN CAPITAL LETTER A WITH CARON
+    {0x01F4, 0x01F4, 0x01F5}, // Ǵ ǵ ( 1) LATIN CAPITAL LETTER G WITH ACUTE
+    {0x13A0, 0x13EF, 0xABBF}, // Ꭰ ꭰ (80) CHEROKEE LETTER A
+    {0x13F0, 0x13F5, 0x13FD}, // Ᏸ ᏸ ( 6) CHEROKEE LETTER YE
+    {0x039C, 0x039C, 0x00B5}, // Μ µ ( 1) 
+    {0x0049, 0x0049, 0x0131}, // I ı ( 1) 
+    {0x0053, 0x0053, 0x017F}, // S ſ ( 1) 
+    {0x03A3, 0x03A3, 0x03C2}, // Σ ς ( 1) 
+    {0x0392, 0x0392, 0x03D0}, // Β ϐ ( 1) 
+    {0x0398, 0x0398, 0x03D1}, // Θ ϑ ( 1) 
+    {0x03A6, 0x03A6, 0x03D5}, // Φ ϕ ( 1) 
+    {0x03A0, 0x03A0, 0x03D6}, // Π ϖ ( 1) 
+    {0x039A, 0x039A, 0x03F0}, // Κ ϰ ( 1) 
+    {0x03A1, 0x03A1, 0x03F1}, // Ρ ϱ ( 1) 
+    {0x0395, 0x0395, 0x03F5}, // Ε ϵ ( 1) 
+    {0x0412, 0x0412, 0x1C80}, // В ᲀ ( 1) 
+    {0x0414, 0x0414, 0x1C81}, // Д ᲁ ( 1) 
+    {0x041E, 0x041E, 0x1C82}, // О ᲂ ( 1) 
+    {0x0421, 0x0422, 0x1C84}, // С ᲃ ( 2) 
+    {0x0422, 0x0422, 0x1C85}, // Т ᲅ ( 1) 
+    {0x042A, 0x042A, 0x1C86}, // Ъ ᲆ ( 1) 
+    {0x0462, 0x0462, 0x1C87}, // Ѣ ᲇ ( 1) 
+    {0xA64A, 0xA64A, 0x1C88}, // Ꙋ ᲈ ( 1) 
+    {0x1E60, 0x1E60, 0x1E9B}, // Ṡ ẛ ( 1) 
+    {0x0399, 0x0399, 0x1FBE}, // Ι ι ( 1) 
+}; // 218
 
-enum { casefold_len = 195 };
+enum { casefold_len = 192 };
 
-static uint8_t upcase_ind[193] = {
-    0, 144, 117, 2, 145, 3, 9, 4, 6, 7, 8, 10, 63, 13, 15, 17, 21, 53, 26, 60,
-    56, 30, 32, 34, 36, 38, 40, 41, 54, 42, 43, 44, 45, 46, 47, 48, 18, 49, 50, 51,
-    52, 55, 57, 59, 162, 62, 66, 158, 156, 159, 12, 14, 16, 19, 20, 178, 22, 179, 23, 174,
-    177, 25, 24, 181, 152, 180, 27, 157, 28, 29, 154, 31, 188, 33, 183, 35, 64, 37, 65, 39,
-    184, 182, 68, 69, 91, 71, 72, 75, 79, 87, 80, 86, 67, 132, 84, 1, 82, 85, 76, 77,
-    81, 143, 73, 74, 78, 83, 89, 70, 88, 90, 93, 105, 106, 107, 108, 109, 110, 92, 94, 111,
-    95, 97, 96, 98, 99, 113, 114, 104, 171, 153, 189, 115, 116, 118, 119, 120, 121, 122, 123, 124,
-    125, 130, 133, 136, 140, 138, 141, 126, 127, 128, 129, 131, 134, 135, 137, 139, 142, 146, 147, 148,
-    149, 150, 151, 58, 61, 155, 160, 161, 163, 164, 165, 100, 101, 102, 166, 112, 167, 168, 169, 170,
-    172, 173, 175, 187, 176, 186, 190, 191, 192, 193, 185, 103, 194,
+static uint8_t upcase_ind[162] = {
+    0, 2, 3, 4, 192, 5, 6, 7, 8, 9, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20,
+    21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
+    41, 43, 45, 193, 47, 48, 194, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62,
+    63, 65, 66, 67, 68, 69, 70, 71, 72, 73, 75, 80, 83, 85, 86, 87, 88, 89, 90, 91,
+    92, 93, 94, 95, 96, 97, 98, 99, 195, 196, 109, 110, 111, 113, 114, 115, 116, 117, 118, 119,
+    120, 121, 125, 126, 129, 131, 132, 133, 134, 135, 136, 137, 139, 140, 141, 142, 144, 146, 147, 148,
+    149, 150, 151, 152, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168,
+    169, 170, 171, 172, 173, 174, 175, 176, 177, 178, 179, 180, 181, 182, 183, 184, 185, 186, 187, 188,
+    189, 191,
+};
+
+static uint8_t lowcase_ind[183] = {
+    0, 197, 2, 3, 8, 4, 198, 5, 6, 7, 9, 199, 60, 12, 14, 16, 20, 50, 25, 57,
+    53, 29, 31, 33, 35, 37, 39, 40, 51, 41, 43, 45, 193, 17, 47, 48, 194, 52, 54, 56,
+    158, 59, 63, 154, 152, 155, 11, 13, 15, 18, 19, 174, 21, 175, 22, 170, 173, 24, 23, 177,
+    148, 176, 26, 153, 27, 28, 150, 30, 184, 32, 179, 34, 61, 36, 62, 38, 180, 178, 65, 66,
+    88, 68, 69, 72, 200, 73, 70, 71, 201, 202, 203, 204, 75, 80, 205, 206, 86, 67, 207, 85,
+    87, 90, 89, 91, 92, 94, 93, 95, 96, 109, 110, 196, 208, 209, 210, 211, 212, 213, 214, 215,
+    167, 149, 185, 111, 216, 114, 115, 116, 117, 118, 119, 120, 121, 126, 129, 132, 136, 134, 137, 122,
+    123, 124, 125, 127, 217, 130, 131, 133, 135, 138, 142, 144, 146, 147, 55, 58, 151, 156, 157, 159,
+    160, 161, 97, 98, 99, 162, 163, 164, 165, 166, 168, 169, 171, 183, 172, 182, 186, 187, 188, 189,
+    181, 195, 191,
 };

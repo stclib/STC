@@ -44,7 +44,7 @@ def read_casefold(big=False):
 def make_caselist(df, casetype):
     caselist=[]
     for idx, row in df.iterrows():
-        caselist.append([row['code'], row[casetype], row['name']])
+        caselist.append((row['code'], row[casetype], row['name']))
     return caselist
 
 
@@ -60,7 +60,7 @@ def make_table(caselist):
         offset = b - a
 
         if abs(diff_a) > 2 or a - prev_a != diff_a or b - prev_b != diff_b or prev_offs != offset:
-            if  j > 0 and start_a not in [0xAB70, 0x13F8]: # BUG in CaseFolding.txt V14
+            if  j > 0: # and start_a not in [0xAB70, 0x13F8]: # BUG in CaseFolding.txt V14
                 table.append([start_a, prev_a, prev_b, start_name])
             if j < n_1:
                 diff_a = caselist[j+1][0] - a
@@ -71,7 +71,7 @@ def make_table(caselist):
         prev_a, prev_b = a, b
         prev_offs = offset
 
-    table.append([start_a, a, b, start_name])
+    table.append((start_a, a, b, start_name))
     return table
 
 
@@ -100,16 +100,6 @@ def print_index_table(name, indtab):
     print('\n};')
 
 
-def make_inverse_ind(table):
-    inv = []
-    for i in range(len(table)):
-        if table[i][2] not in [ord('i'), ord('s')]: # ignore 'i'. 's' upcase mappings.
-            inv.append(i)
-    # sort by mapped value table[:][2] (= inv) of the first element in each range entry
-    inv.sort(key=lambda i: table[i][2] - (table[i][1] - table[i][0]))
-    return inv
-
-
 def compile_table(casetype='lowcase', category=None):
     if category:
         df = read_unidata(casetype, category)
@@ -126,20 +116,43 @@ def main():
 
     casemappings = compile_table('lowcase') # Casefolding.txt
     upcase       = compile_table('lowcase', 'Lu') # UnicodeData.txt uppercase
+    lowcase      = compile_table('upcase', 'Ll') # UnicodeData.txt lowercase
+
+    casefolding_len = len(casemappings)
 
     # merge in additional Lu => Ll mappings from UnicodeData.txt
     for v in upcase:
         if v not in casemappings:
             casemappings.append(v)
 
-    # sort casemappings by uppercase values:
-    casemappings.sort(key=lambda x: x[0])
+    lowcase_rev = []
+    for u in lowcase:
+        v = (u[2] - (u[1] - u[0]), u[2], u[1], '')
+        j = next((i for i,x in enumerate(casemappings) if x[0]==v[0] and x[1]==v[1] and x[2]==v[2]), -1)
+        if j == -1:
+            lowcase_rev.append(v)
+            casemappings.append(v)
+        else:
+            lowcase_rev.append(casemappings[j])
+
+    upcase_ind = []
+    for v in upcase:
+        upcase_ind.append(casemappings.index(v))
+
+    lowcase_ind = []
+    for v in lowcase_rev:
+        lowcase_ind.append(casemappings.index(v))
+
     print_table('casemappings', casemappings, style=1)
-    
-    # index list sorted by mapped lowercase values:
-    upcase_ind = make_inverse_ind(casemappings)
-    print('enum { casefold_len = %d };' % len(casemappings))
+    print('enum { casefold_len = %d };' % casefolding_len)
+
+    # index list sorted by uppercase values:
+    upcase_ind.sort(key=lambda i: casemappings[i][0])
     print_index_table('upcase_ind', upcase_ind)
+
+    # index list sorted by mapped lowercase values:
+    lowcase_ind.sort(key=lambda i: casemappings[i][2] - (casemappings[i][1] - casemappings[i][0]))    
+    print_index_table('lowcase_ind', lowcase_ind)
 
 
 ########### main:
