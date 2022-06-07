@@ -60,7 +60,7 @@ def make_table(caselist):
         offset = b - a
 
         if abs(diff_a) > 2 or a - prev_a != diff_a or b - prev_b != diff_b or prev_offs != offset:
-            if  j > 0 and start_a not in [0xAB70, 0x13F8]:
+            if  j > 0 and start_a not in [0xAB70, 0x13F8]: # BUG in CaseFolding.txt V14
                 table.append([start_a, prev_a, prev_b, start_name])
             if j < n_1:
                 diff_a = caselist[j+1][0] - a
@@ -103,7 +103,7 @@ def print_index_table(name, indtab):
 def make_inverse_ind(table):
     inv = []
     for i in range(len(table)):
-        if table[i][2] not in [ord('i'), ord('s')]: # remove 'i'. 's' upcase mappings.
+        if table[i][2] not in [ord('i'), ord('s')]: # ignore 'i'. 's' upcase mappings.
             inv.append(i)
     # sort by mapped value table[:][2] (= inv) of the first element in each range entry
     inv.sort(key=lambda i: table[i][2] - (table[i][1] - table[i][0]))
@@ -124,24 +124,23 @@ def main():
     print('#include <stdint.h>\n')
     print('struct CaseMapping { uint16_t c0, c1, m1; };\n')
 
-    casemappings = compile_table('lowcase') # casefold
-    lowcase      = compile_table('lowcase', 'Lu') # unicode lowercase
+    casemappings = compile_table('lowcase') # Casefolding.txt
+    upcase       = compile_table('lowcase', 'Lu') # UnicodeData.txt uppercase
 
-    lowcase_ind = []
-    for v in lowcase:
-        try:
-            lowcase_ind.append(casemappings.index(v))
-        except:
-            lowcase_ind.append(len(casemappings))
+    # merge in additional Lu => Ll mappings from UnicodeData.txt
+    for v in upcase:
+        if v not in casemappings:
             casemappings.append(v)
 
-    casefold_len = len(casemappings)
+    # sort casemappings by uppercase values:
     casemappings.sort(key=lambda x: x[0])
-
     print_table('casemappings', casemappings, style=1)
+    
+    # index list sorted by mapped lowercase values:
     upcase_ind = make_inverse_ind(casemappings)
-    print('enum { casefold_len = %d };' % casefold_len)
+    print('enum { casefold_len = %d };' % len(casemappings))
     print_index_table('upcase_ind', upcase_ind)
+
 
 ########### main:
 

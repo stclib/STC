@@ -105,7 +105,7 @@ int utf8_icmp_n(size_t u8max, const char* s1, const size_t n1,
         do { utf8_decode(&d2, (uint8_t)s2[j2++]); } while (d2.state);
         int c = utf8_tolower(d1.codep) - utf8_tolower(d2.codep);
         if (c || !s2[j2])
-            return c;        
+            return c;
     }
     return (j2 < n2) - (j1 < n1);
 }

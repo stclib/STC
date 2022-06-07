@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stc/ccommon.h>
 
-#define c_dyn_ptr(T, s) \
+#define c_dyn_cast(T, s) \
     (&T##_api == (s)->api ? (T*)(s) : (T*)0)
 
 #define c_vtable(Api, T) \
@@ -64,7 +64,7 @@ Triangle* Triangle_new(Point a, Point b, Point c)
 
 static void Triangle_draw(const Shape* shape)
 {
-    const Triangle* self = c_dyn_ptr(Triangle, shape);
+    const Triangle* self = c_dyn_cast(Triangle, shape);
     printf("Triangle : (%g,%g), (%g,%g), (%g,%g)\n",
            self->p[0].x, self->p[0].y,
            self->p[1].x, self->p[1].y,
@@ -103,7 +103,7 @@ void Polygon_addPoint(Polygon* self, Point p)
 
 static void Polygon_drop(Shape* shape)
 {
-    Polygon* self = c_dyn_ptr(Polygon, shape);
+    Polygon* self = c_dyn_cast(Polygon, shape);
     printf("poly destructed\n");
     PointVec_drop(&self->points);
     Shape_drop(shape);
@@ -111,7 +111,7 @@ static void Polygon_drop(Shape* shape)
 
 static void Polygon_draw(const Shape* shape)
 {
-    const Polygon* self = c_dyn_ptr(Polygon, shape);
+    const Polygon* self = c_dyn_cast(Polygon, shape);
     printf("Polygon  :");
     c_foreach (i, PointVec, self->points)
         printf(" (%g,%g)", i.ref->x, i.ref->y);
