@@ -120,41 +120,41 @@ def main():
 
     casefolding_len = len(casemappings)
 
-    # additional Lu => Ll mappings from UnicodeData.txt
+    # add additional Lu => Ll mappings from UnicodeData.txt
+    # create upcase_ind: lower => upper index list sorted by mapped lowercase values:
+    upcase_ind = []
     for v in upcase:
-        if v not in casemappings:
+        try:
+            upcase_ind.append(casemappings.index(v))
+        except:
+            upcase_ind.append(len(casemappings))
             casemappings.append(v)
 
-    # additional Ll => Lu mappings from UnicodeData.txt
+    # add additional Ll => Lu mappings from UnicodeData.txt
+    # create lowcase_ind: upper => lower index list sorted by uppercase values:
+    lowcase_ind = []
     for u in lowcase:
         v = (u[2] - (u[1] - u[0]), u[2], u[1], '')
-        if not any(x[0]==v[0] and x[1]==v[1] and x[2]==v[2] for x in casemappings):
+        try:
+            j = next(i for i,x in enumerate(casemappings) if x[0]==v[0] and x[1]==v[1] and x[2]==v[2])
+            lowcase_ind.append(j)
+        except:
+            lowcase_ind.append(len(casemappings))
             casemappings.append(v)
 
     print_table('casemappings', casemappings, style=1)
     print('enum { casefold_len = %d };' % casefolding_len)
 
-    # upper => lower index list sorted by uppercase values:
-    upcase_ind = []
-    for v in upcase:
-        upcase_ind.append(casemappings.index(v))
+    # add "missing" mappings:
+    for c in ('Ⅰ', 'Ⓐ'):
+        upcase_ind.append(next(i for i,x in enumerate(casemappings) if x[0]==ord(c)))
+    for c in ('ẞ', 'Ⅰ', 'Ⓐ'):
+        lowcase_ind.append(next(i for i,x in enumerate(casemappings) if x[0]==ord(c)))
+
     upcase_ind.sort(key=lambda i: casemappings[i][0])
     print_index_table('upcase_ind', upcase_ind)
 
-    # lower => upper index list sorted by mapped lowercase values:
-    lowcase_ind = [i for i in range(len(casemappings))]
-    lowcase_ind.sort(key=lambda i: casemappings[i][2] - (casemappings[i][1] - casemappings[i][0])) 
-    # remove redundant mappings from lower to upper
-    for i in range(len(lowcase_ind) - 1, 0, -1):
-        c1 = casemappings[lowcase_ind[i]]
-        v = c1[2] - (c1[1] - c1[0])
-        for j in range(i):
-            c2 = casemappings[lowcase_ind[j]]
-            r1 = c2[2] - (c2[1] - c2[0])
-            r2 = c2[2]
-            if r1 <= v <= r2:
-                del lowcase_ind[i]
-                break
+    lowcase_ind.sort(key=lambda i: casemappings[i][2] - (casemappings[i][1] - casemappings[i][0]))         
     print_index_table('lowcase_ind', lowcase_ind)
 
 
