@@ -171,8 +171,10 @@ STC_INLINE size_t cstr_capacity(cstr s)
 
 // utf8 methods defined in/depending on src/utf8code.c:
 
+extern cstr cstr_tofold(const cstr* self);
 extern cstr cstr_tolower(const cstr* self);
 extern cstr cstr_toupper(const cstr* self);
+extern void cstr_foldcase(cstr* self);
 extern void cstr_lowercase(cstr* self);
 extern void cstr_uppercase(cstr* self);
 

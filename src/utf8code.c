@@ -103,7 +103,7 @@ int utf8_icmp(const char* s1, const char* s2) {
     for (;;) {
         do { utf8_decode(&d1, (uint8_t)*s1++); } while (d1.state);
         do { utf8_decode(&d2, (uint8_t)*s2++); } while (d2.state);
-        int c = utf8_tolower(d1.codep) - utf8_tolower(d2.codep);
+        int c = utf8_casefold(d1.codep) - utf8_casefold(d2.codep);
         if (c || !*s2)
             return c;
     }
@@ -116,7 +116,7 @@ int utf8_icmp_n(size_t u8max, const char* s1, const size_t n1,
     while (u8max-- && ((j1 < n1) & (j2 < n2))) {
         do { utf8_decode(&d1, (uint8_t)s1[j1++]); } while (d1.state);
         do { utf8_decode(&d2, (uint8_t)s2[j2++]); } while (d2.state);
-        int c = utf8_tolower(d1.codep) - utf8_tolower(d2.codep);
+        int c = utf8_casefold(d1.codep) - utf8_casefold(d2.codep);
         if (c || !s2[j2])
             return c;
     }
@@ -163,15 +163,16 @@ bool utf8_isalpha(uint32_t c) {
     return utf8_islower(c) || utf8_isupper(c);
 }
 
-static struct fnfold {
+static struct fncase {
     int (*conv_asc)(int);
     uint32_t (*conv_u8)(uint32_t);
 }
+fn_tofold = {tolower, utf8_casefold},
 fn_tolower = {tolower, utf8_tolower},
 fn_toupper = {toupper, utf8_toupper};
 
 
-static cstr cstr_casefold(const cstr* self, struct fnfold fold) {
+static cstr cstr_tocase(const cstr* self, struct fncase fn) {
     csview sv = cstr_sv(self);
     cstr out = cstr_null;
     char *buf = cstr_reserve(&out, sv.size*3/2);
@@ -181,9 +182,9 @@ static cstr cstr_casefold(const cstr* self, struct fnfold fold) {
     while (*sv.str) {
         do { utf8_decode(&d, (uint8_t)*sv.str++); } while (d.state);
         if (d.codep < 128)
-            buf[sz++] = (char)fold.conv_asc(d.codep);
+            buf[sz++] = (char)fn.conv_asc(d.codep);
         else {
-            cp = fold.conv_u8(d.codep);
+            cp = fn.conv_u8(d.codep);
             sz += utf8_encode(buf + sz, cp);
         }
     }
@@ -192,18 +193,26 @@ static cstr cstr_casefold(const cstr* self, struct fnfold fold) {
     return out;
 }
 
+cstr cstr_tofold(const cstr* self) {
+    return cstr_tocase(self, fn_tofold);
+}
+
 cstr cstr_tolower(const cstr* self) {
-    return cstr_casefold(self, fn_tolower);
+    return cstr_tocase(self, fn_tolower);
 }
 
 cstr cstr_toupper(const cstr* self) {
-    return cstr_casefold(self, fn_toupper);
+    return cstr_tocase(self, fn_toupper);
+}
+
+void cstr_foldcase(cstr* self) {
+    cstr_take(self, cstr_tocase(self, fn_tofold));
 }
 
 void cstr_lowercase(cstr* self) {
-    cstr_take(self, cstr_casefold(self, fn_tolower));
+    cstr_take(self, cstr_tocase(self, fn_tolower));
 }
 
 void cstr_uppercase(cstr* self) {
-    cstr_take(self, cstr_casefold(self, fn_toupper));
+    cstr_take(self, cstr_tocase(self, fn_toupper));
 }
