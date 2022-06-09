@@ -112,7 +112,7 @@ def compile_table(casetype='lowcase', category=None):
 
 def main():
     print('#include <stdint.h>\n')
-    print('struct CaseMapping { uint16_t c0, c1, m1; };\n')
+    print('struct CaseMapping { uint16_t c1, c2, m2; };\n')
 
     casemappings = compile_table('lowcase') # CaseFolding.txt
     upcase       = compile_table('lowcase', 'Lu') # UnicodeData.txt uppercase
@@ -145,15 +145,12 @@ def main():
     print_table('casemappings', casemappings, style=1)
     print('enum { casefold_len = %d };' % casefolding_len)
 
-    # add "missing" mappings:
-    for c in ('Ⅰ', 'Ⓐ'):
-        upcase_ind.append(next(i for i,x in enumerate(casemappings) if x[0]==ord(c)))
-    for c in ('ẞ', 'Ⅰ', 'Ⓐ'):
-        lowcase_ind.append(next(i for i,x in enumerate(casemappings) if x[0]==ord(c)))
-
+    # upcase => low
     upcase_ind.sort(key=lambda i: casemappings[i][0])
     print_index_table('upcase_ind', upcase_ind)
 
+    # lowcase => up. add "missing" SHARP S caused by https://www.unicode.org/policies/stability_policy.html#Case_Pair
+    lowcase_ind.append(next(i for i,x in enumerate(casemappings) if x[0]==ord('ẞ')))
     lowcase_ind.sort(key=lambda i: casemappings[i][2] - (casemappings[i][1] - casemappings[i][0]))         
     print_index_table('lowcase_ind', lowcase_ind)
 

@@ -62,10 +62,10 @@ bool utf8_valid_n(const char* s, size_t n) {
 uint32_t utf8_casefold(uint32_t c) {
     for (size_t i=0; i < casefold_len; ++i) {
         const struct CaseMapping entry = casemappings[i];
-        if (c <= entry.c1) {
-            if (c < entry.c0) return c;
-            int d = entry.m1 - entry.c1;
-            if (d == 1) return c + ((entry.c1 & 1) == (c & 1));
+        if (c <= entry.c2) {
+            if (c < entry.c1) return c;
+            int d = entry.m2 - entry.c2;
+            if (d == 1) return c + ((entry.c2 & 1) == (c & 1));
             return c + d;
         }
     }
@@ -75,10 +75,10 @@ uint32_t utf8_casefold(uint32_t c) {
 uint32_t utf8_tolower(uint32_t c) {
     for (size_t i=0; i < sizeof upcase_ind/sizeof *upcase_ind; ++i) {
         const struct CaseMapping entry = casemappings[upcase_ind[i]];
-        if (c <= entry.c1) {
-            if (c < entry.c0) return c;
-            int d = entry.m1 - entry.c1;
-            if (d == 1) return c + ((entry.c1 & 1) == (c & 1));
+        if (c <= entry.c2) {
+            if (c < entry.c1) return c;
+            int d = entry.m2 - entry.c2;
+            if (d == 1) return c + ((entry.c2 & 1) == (c & 1));
             return c + d;
         }
     }
@@ -88,10 +88,10 @@ uint32_t utf8_tolower(uint32_t c) {
 uint32_t utf8_toupper(uint32_t c) {
     for (size_t i=0; i < sizeof lowcase_ind/sizeof *lowcase_ind; ++i) {
         const struct CaseMapping entry = casemappings[lowcase_ind[i]];
-        if (c <= entry.m1) {
-            int d = entry.m1 - entry.c1;
-            if (c < (uint32_t)(entry.c0 + d)) return c;
-            if (d == 1) return c - ((entry.m1 & 1) == (c & 1));
+        if (c <= entry.m2) {
+            int d = entry.m2 - entry.c2;
+            if (c < (uint32_t)(entry.c1 + d)) return c;
+            if (d == 1) return c - ((entry.m2 & 1) == (c & 1));
             return c - d;
         }
     }
@@ -164,8 +164,8 @@ bool utf8_isalpha(uint32_t c) {
 }
 
 static struct fncase {
-    int (*conv_asc)(int);
-    uint32_t (*conv_u8)(uint32_t);
+    int      (*conv_asc)(int);
+    uint32_t (*conv_utf)(uint32_t);
 }
 fn_tofold = {tolower, utf8_casefold},
 fn_tolower = {tolower, utf8_tolower},
@@ -184,7 +184,7 @@ static cstr cstr_tocase(const cstr* self, struct fncase fn) {
         if (d.codep < 128)
             buf[sz++] = (char)fn.conv_asc(d.codep);
         else {
-            cp = fn.conv_u8(d.codep);
+            cp = fn.conv_utf(d.codep);
             sz += utf8_encode(buf + sz, cp);
         }
     }
