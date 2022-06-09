@@ -41,6 +41,7 @@ bool        utf8_valid_n(const char* s, size_t n);
 int         utf8_icmp_n(size_t u8max, const char* s1, size_t n1,
                                       const char* s2, size_t n2);
 unsigned    utf8_encode(char *out, uint32_t c);
+uint32_t    utf8_peek(const char *s, int pos);
 
 /* decode next utf8 codepoint. https://bjoern.hoehrmann.de/utf-8/decoder/dfa */
 typedef struct { uint32_t state, codep; } utf8_decode_t;
@@ -90,7 +91,7 @@ STC_INLINE const char* utf8_at(const char *s, size_t index) {
     return s;
 }
 
-STC_INLINE size_t utf8_pos(const char*   s, size_t index)
+STC_INLINE size_t utf8_pos(const char* s, size_t index)
     { return utf8_at(s, index) - s; }
 
 #endif
