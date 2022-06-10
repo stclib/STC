@@ -45,7 +45,7 @@ unsigned utf8_encode(char *out, uint32_t c)
     return 0;
 }
 
-uint32_t utf8_peek(const char* s, int pos) {
+uint32_t utf8_peek(const char* s, int u8pos) {
     int inc = -1;
     if (pos > 0)
         pos = -pos, inc = 1;

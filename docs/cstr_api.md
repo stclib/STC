@@ -37,7 +37,6 @@ csview       cstr_sv(const cstr* self);                               // access 
 cstr_buf     cstr_buffer(cstr* self);                                 // access to mutable buffer (with capacity)
 
 size_t       cstr_size(cstr s);
-size_t       cstr_length(cstr s);
 size_t       cstr_capacity(cstr s);
 bool         cstr_empty(cstr s);
 

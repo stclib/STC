@@ -8,7 +8,7 @@ int main() {
 
         cstr_replace_sv(
             &hello,
-            csview_u8substr(cstr_sv(&hello), 7, 1),
+            csview_substr_u8(cstr_sv(&hello), 7, 1),
             c_sv("🐨")
         );
         printf("%s\n", cstr_str(&hello));

@@ -43,7 +43,6 @@ STC_INLINE csview   csview_from_n(const char* str, size_t n)
 STC_INLINE void     csview_clear(csview* self) { *self = csview_null; }
 
 STC_INLINE size_t   csview_size(csview sv) { return sv.size; }
-STC_INLINE size_t   csview_length(csview sv) { return sv.size; }
 STC_INLINE bool     csview_empty(csview sv) { return sv.size == 0; }
 
 STC_INLINE bool csview_equals(csview sv, csview sv2)
@@ -93,7 +92,7 @@ STC_INLINE void csview_next(csview_iter* it)
 STC_INLINE size_t csview_u8size(csview sv)
     { return utf8_size_n(sv.str, sv.size); }
 
-STC_INLINE csview csview_u8substr(csview sv, size_t u8pos, size_t u8len) {
+STC_INLINE csview csview_substr_u8(csview sv, size_t u8pos, size_t u8len) {
     sv.str = utf8_at(sv.str, u8pos);
     sv.size = utf8_pos(sv.str, u8len);
     return sv;

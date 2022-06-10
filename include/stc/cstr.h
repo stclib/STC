@@ -163,9 +163,6 @@ STC_INLINE bool cstr_empty(cstr s)
 STC_INLINE size_t cstr_size(cstr s)
     { return SSO_CALL(&s, size(&s)); }
 
-STC_INLINE size_t cstr_length(cstr s)
-    { return SSO_CALL(&s, size(&s)); }
-
 STC_INLINE size_t cstr_capacity(cstr s)
     { return cstr_is_long(&s) ? cstr_l_cap(&s) : cstr_s_cap; }
 

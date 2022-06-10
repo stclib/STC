@@ -75,7 +75,6 @@ STC_INLINE cstr         cstr_from(const char* str)
                             { return cstr_from_n(str, strlen(str)); }
 STC_INLINE char*        cstr_data(cstr* self) { return self->str; }
 STC_INLINE size_t       cstr_size(cstr s) { return _cstr_p(&s)->size; }
-STC_INLINE size_t       cstr_length(cstr s) { return _cstr_p(&s)->size; }
 STC_INLINE size_t       cstr_capacity(cstr s) { return _cstr_p(&s)->cap; }
 STC_INLINE bool         cstr_empty(cstr s) { return _cstr_p(&s)->size == 0; }
 STC_INLINE void         cstr_drop(cstr* self)
