@@ -85,11 +85,10 @@ bool         cstr_getdelim(cstr *self, int delim, FILE *stream);      // does no
 
 #### UTF8 methods
 ```c
-size_t       cstr_size_u8(cstr s);                                    // number of utf8 codepoints
-size_t       cstr_size_n_u8(cstr s, size_t nbytes);                   // utf8 size within n bytes  
-csview       cstr_at(const cstr* self, size_t bytepos);               // utf8 codepoints as a csview
-csview       cstr_at_u8(const cstr* self, size_t u8idx);              // utf8 codepoints at utf8 pos
-size_t       cstr_pos_u8(const cstr* self, size_t u8idx);             // byte position at utf8 index
+size_t       cstr_u8size(cstr s);                                     // number of utf8 codepoints
+size_t       cstr_u8size_n(cstr s, size_t nbytes);                    // utf8 size within n bytes  
+const char*  cstr_at(const cstr* self, size_t u8idx);                 // byte position at utf8 index
+csview       cstr_view_at(const cstr* self, size_t u8idx);            // utf8 codepoint at utf8 pos as csview
 
 // iterate utf8 codepoints
 cstr_iter    cstr_begin(const cstr* self);
@@ -97,7 +96,7 @@ cstr_iter    cstr_end(const cstr* self);
 void         cstr_next(cstr_iter* it);
 
 // utf8 functions requires linking with src/utf8code.c symbols:
-bool         cstr_valid_u8(const cstr* self);                         // check if str is valid utf8
+bool         cstr_valid_utf8(const cstr* self);                       // check if str is valid utf8
 cstr         cstr_tolower(const cstr* self);                          // returns new lowercase utf8 cstr
 cstr         cstr_toupper(const cstr* self);                          // returns new uppercase utf8 cstr
 void         cstr_lowercase(cstr* self);                              // transform cstr to lowercase utf8
