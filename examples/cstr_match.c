@@ -14,8 +14,8 @@ int main()
         printf("ends_with: %d\n", cstr_ends_with(ss, ".JPG"));
 
         cstr s1 = cstr_new("hell😀 w😀rl🐨");
-        csview ch1 = cstr_chr(&s1, 7);
-        csview ch2 = cstr_chr(&s1, 10);
+        csview ch1 = cstr_chr_u8(&s1, 7);
+        csview ch2 = cstr_chr_u8(&s1, 10);
         printf("%s\nsize: %" PRIuMAX ", %" PRIuMAX "\n", cstr_str(&s1), cstr_u8size(s1), cstr_size(s1));
         printf("ch1: %" c_PRIsv "\n", c_ARGsv(ch1));
         printf("ch2: %" c_PRIsv "\n", c_ARGsv(ch2));

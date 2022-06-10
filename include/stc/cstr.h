@@ -189,13 +189,13 @@ STC_INLINE size_t cstr_u8size(cstr s)
 STC_INLINE size_t cstr_u8size_n(cstr s, size_t nbytes) 
     { return utf8_size_n(cstr_str(&s), nbytes); }
 
-STC_INLINE size_t cstr_bytepos(const cstr* self, size_t u8idx)
+STC_INLINE size_t cstr_pos_u8(const cstr* self, size_t u8idx)
     { return utf8_pos(cstr_str(self), u8idx); }
 
-STC_INLINE const char* cstr_at(const cstr* self, size_t u8idx) 
+STC_INLINE const char* cstr_at_u8(const cstr* self, size_t u8idx) 
     { return utf8_at(cstr_str(self), u8idx); }
 
-STC_INLINE csview cstr_chr(const cstr* self, size_t u8idx) {
+STC_INLINE csview cstr_chr_u8(const cstr* self, size_t u8idx) {
     csview sv = cstr_sv(self);
     sv.str = utf8_at(sv.str, u8idx);
     sv.size = utf8_chr_size(sv.str);
