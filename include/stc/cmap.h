@@ -334,8 +334,8 @@ _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr) {
 STC_DEF _cx_result
 _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey) {
     bool nomem = false;
-    if (self->size >= (i_size)(self->bucket_count*self->max_load_factor))
-        nomem = !_cx_memb(_reserve)(self, self->size*3/2);
+    if (self->size + 2 > (i_size)(self->bucket_count*self->max_load_factor))
+        nomem = !_cx_memb(_reserve)(self, self->size*3/2 + 4);
     chash_bucket_t b = _cx_memb(_bucket_)(self, &rkey);
     _cx_result res = {&self->table[b.idx], !self->_hashx[b.idx], nomem};
     if (res.inserted) {
