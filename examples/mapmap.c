@@ -1,11 +1,15 @@
-// unordered_map<string, unordered_map<string, string>>:
+// create a structure like: std::map<std::string, std::map<std::string, std::string>>:
+
 #include <stc/cstr.h>
+
+// People: std::map<std::string, std::string>
 #define i_type People
 #define i_key_str
 #define i_val_str
 #define i_keydrop(p) (printf("kdrop: %s\n", cstr_str(p)), cstr_drop(p)) // override
 #include <stc/csmap.h>
 
+// Departments: std::map<std::string, People>
 #define i_type Departments
 #define i_key_str
 #define i_val_bind People
@@ -16,14 +20,6 @@
 //  #define i_valdrop People_drop
 #include <stc/csmap.h>
 
-#define i_type Stack
-#define i_val_bind People_value
-// Shorthand for:
-//  #define i_val People_value (pair of cstr)
-//  #define i_cmp People_value_cmp
-//  #define i_valclone People_value_clone
-//  #define i_valdrop People_value_drop
-#include <stc/cvec.h>
 
 void add(Departments* deps, const char* name, const char* email, const char* dep)
 {
@@ -63,10 +59,10 @@ int main(void)
                 printf("%s: %s - %s\n", cstr_str(&i.ref->first), cstr_str(_.name), cstr_str(_.email));
         puts("");
 
-        printf("found: %d\n", contains(&map, "Nick Denton"));
-        printf("found: %d\n", contains(&map, "Patrick Dust"));
-        printf("found: %d\n", contains(&map, "Dennis Kay"));
-        printf("found: %d\n", contains(&map, "Serena Bath"));
+        printf("found Nick Denton: %d\n", contains(&map, "Nick Denton"));
+        printf("found Patrick Dust: %d\n", contains(&map, "Patrick Dust"));
+        printf("found Dennis Kay: %d\n", contains(&map, "Dennis Kay"));
+        printf("found Serena Bath: %d\n", contains(&map, "Serena Bath"));
         puts("Done");
     }
 }

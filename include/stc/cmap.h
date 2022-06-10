@@ -106,7 +106,7 @@ STC_INLINE bool         _cx_memb(_empty)(_cx_self m) { return m.size == 0; }
 STC_INLINE size_t       _cx_memb(_size)(_cx_self m) { return m.size; }
 STC_INLINE size_t       _cx_memb(_bucket_count)(_cx_self map) { return map.bucket_count; }
 STC_INLINE size_t       _cx_memb(_capacity)(_cx_self map)
-                            { return map.bucket_count ? (size_t)((map.bucket_count - 2)*map.max_load_factor) : 0u; }
+                            { return (size_t)(map.bucket_count*map.max_load_factor); }
 STC_INLINE void         _cx_memb(_swap)(_cx_self *map1, _cx_self *map2) {c_swap(_cx_self, *map1, *map2); }
 STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, _cx_rawkey rkey)
                             { return self->size && self->_hashx[_cx_memb(_bucket_)(self, &rkey).idx]; }
@@ -334,8 +334,8 @@ _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr) {
 STC_DEF _cx_result
 _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey) {
     bool nomem = false;
-    if (self->size + 1 >= (i_size)(self->bucket_count*self->max_load_factor))
-        nomem = !_cx_memb(_reserve)(self, ((size_t)self->size*3 >> 1) + 4);
+    if (self->size >= (i_size)(self->bucket_count*self->max_load_factor))
+        nomem = !_cx_memb(_reserve)(self, self->size*3/2);
     chash_bucket_t b = _cx_memb(_bucket_)(self, &rkey);
     _cx_result res = {&self->table[b.idx], !self->_hashx[b.idx], nomem};
     if (res.inserted) {
