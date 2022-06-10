@@ -37,7 +37,7 @@ uint32_t    utf8_casefold(uint32_t c);
 uint32_t    utf8_tolower(uint32_t c);
 uint32_t    utf8_toupper(uint32_t c);
 bool        utf8_valid(const char* s);
-bool        utf8_valid_n(const char* s, size_t n);
+bool        utf8_valid_n(const char* s, size_t nbytes);
 int         utf8_icmp_n(size_t u8max, const char* s1, size_t n1,
                                       const char* s2, size_t n2);
 unsigned    utf8_encode(char *out, uint32_t c);
@@ -60,7 +60,7 @@ STC_INLINE int utf8_icmp(const char* s1, const char* s2) {
 }
 
 /* number of characters in the utf8 codepoint from s */
-STC_INLINE unsigned utf8_codep_size(const char *s) {
+STC_INLINE unsigned utf8_chr_size(const char *s) {
     unsigned b = (uint8_t)*s;
     if (b < 0x80) return 1;
     if (b < 0xC2) return 0;
@@ -74,14 +74,15 @@ STC_INLINE unsigned utf8_codep_size(const char *s) {
 STC_INLINE size_t utf8_size(const char *s) {
     size_t size = 0;
     while (*s)
-        size += (*s++ & 0xC0) != 0x80;
+        size += (*++s & 0xC0) != 0x80;
     return size;
 }
 
-STC_INLINE size_t utf8_size_n(const char *s, size_t n) {
+STC_INLINE size_t utf8_size_n(const char *s, size_t nbytes) {
     size_t size = 0;
-    while ((n-- != 0) & (*s != 0))
-        size += (*s++ & 0xC0) != 0x80;
+    while ((nbytes-- != 0) & (*s != 0)) {
+        size += (*++s & 0xC0) != 0x80;
+    }
     return size;
 }
 

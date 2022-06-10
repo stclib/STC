@@ -87,8 +87,9 @@ bool         cstr_getdelim(cstr *self, int delim, FILE *stream);      // does no
 ```c
 size_t       cstr_u8size(cstr s);                                     // number of utf8 codepoints
 size_t       cstr_u8size_n(cstr s, size_t nbytes);                    // utf8 size within n bytes  
-const char*  cstr_at(const cstr* self, size_t u8idx);                 // byte position at utf8 index
-csview       cstr_view_at(const cstr* self, size_t u8idx);            // utf8 codepoint at utf8 pos as csview
+size_t       cstr_bytepos(cstr s, size_t u8idx);                      // byte pos offset at utf8 index
+const char*  cstr_at(const cstr* self, size_t u8idx);                 // char* position at utf8 index
+csview       cstr_chr(const cstr* self, size_t u8idx);                // utf8 character at utf8 pos as csview
 
 // iterate utf8 codepoints
 cstr_iter    cstr_begin(const cstr* self);

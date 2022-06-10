@@ -189,21 +189,24 @@ STC_INLINE size_t cstr_u8size(cstr s)
 STC_INLINE size_t cstr_u8size_n(cstr s, size_t nbytes) 
     { return utf8_size_n(cstr_str(&s), nbytes); }
 
-STC_INLINE csview cstr_view_at(const cstr* self, size_t u8idx) {
-    csview sv = cstr_sv(self);
-    sv.str = utf8_at(sv.str, u8idx);
-    sv.size = utf8_codep_size(sv.str);
-    return sv;
-}
+STC_INLINE size_t cstr_bytepos(const cstr* self, size_t u8idx)
+    { return utf8_pos(cstr_str(self), u8idx); }
 
 STC_INLINE const char* cstr_at(const cstr* self, size_t u8idx) 
     { return utf8_at(cstr_str(self), u8idx); }
+
+STC_INLINE csview cstr_chr(const cstr* self, size_t u8idx) {
+    csview sv = cstr_sv(self);
+    sv.str = utf8_at(sv.str, u8idx);
+    sv.size = utf8_chr_size(sv.str);
+    return sv;
+}
 
 // utf8 iterator
 
 STC_INLINE cstr_iter cstr_begin(const cstr* self) { 
     const char* str = cstr_str(self);
-    return c_make(cstr_iter){.chr = {str, utf8_codep_size(str)}};
+    return c_make(cstr_iter){.chr = {str, utf8_chr_size(str)}};
 }
 STC_INLINE cstr_iter cstr_end(const cstr* self) {
     csview sv = cstr_sv(self);
@@ -211,7 +214,7 @@ STC_INLINE cstr_iter cstr_end(const cstr* self) {
 }
 STC_INLINE void cstr_next(cstr_iter* it) {
     it->ref += it->chr.size;
-    it->chr.size = utf8_codep_size(it->ref);
+    it->chr.size = utf8_chr_size(it->ref);
 }
 
 

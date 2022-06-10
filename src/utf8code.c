@@ -63,9 +63,9 @@ bool utf8_valid(const char* s) {
     return d.state == 0;
 }
 
-bool utf8_valid_n(const char* s, size_t n) {
+bool utf8_valid_n(const char* s, size_t nbytes) {
     utf8_decode_t d = {.state=0};
-    while ((n-- != 0) & (*s != 0))
+    while ((nbytes-- != 0) & (*s != 0))
         utf8_decode(&d, (uint8_t)*s++);
     return d.state == 0;
 }
