@@ -24,6 +24,14 @@ int main()
             printf("%" c_PRIsv " ; ", c_ARGsv(m[0]));
         }
         puts("");
+
+        res = cregex_compile(&re, "(.+)\\b(.+)", 0);
+        printf("groups: %d\n", res);
+        if ((res = cregex_find(&re, "hello@wørld", 10, m, 0)) > 0) {
+            c_forrange (i, res) 
+                printf("match: [%" c_PRIsv "]\n", c_ARGsv(m[i]));
+        } else
+            printf("err: %d\n", res);
     }
 }
 

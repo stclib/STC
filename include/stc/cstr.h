@@ -171,7 +171,7 @@ STC_INLINE size_t cstr_capacity(cstr s)
 extern cstr cstr_tofold(const cstr* self);
 extern cstr cstr_tolower(const cstr* self);
 extern cstr cstr_toupper(const cstr* self);
-extern void cstr_foldcase(cstr* self);
+extern void cstr_casefold(cstr* self);
 extern void cstr_lowercase(cstr* self);
 extern void cstr_uppercase(cstr* self);
 

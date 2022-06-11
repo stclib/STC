@@ -36,7 +36,6 @@ bool        utf8_isalnum(uint32_t c);
 uint32_t    utf8_casefold(uint32_t c);
 uint32_t    utf8_tolower(uint32_t c);
 uint32_t    utf8_toupper(uint32_t c);
-bool        utf8_valid(const char* s);
 bool        utf8_valid_n(const char* s, size_t nbytes);
 int         utf8_icmp_n(size_t u8max, const char* s1, size_t n1,
                                       const char* s2, size_t n2);
@@ -59,7 +58,11 @@ STC_INLINE int utf8_icmp(const char* s1, const char* s2) {
     return utf8_icmp_n(~(size_t)0, s1, ~(size_t)0, s2, ~(size_t)0);
 }
 
-/* number of characters in the utf8 codepoint from s */
+STC_INLINE bool utf8_valid(const char* s) {
+    return utf8_valid_n(s, ~(size_t)0);
+}
+
+/* number of bytes in the utf8 codepoint from s */
 STC_INLINE unsigned utf8_chr_size(const char *s) {
     unsigned b = (uint8_t)*s;
     if (b < 0x80) return 1;

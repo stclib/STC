@@ -210,10 +210,10 @@ static const char*
 utfruneicase(const char *s, Rune c)
 {
     Rune r;
-    c = utf8_tolower(c);
+    c = utf8_casefold(c);
     for (;;) {
         int n = chartorune(&r, s);
-        if (utf8_tolower(r) == c) return s;
+        if (utf8_casefold(r) == c) return s;
         if ((r == 0) | (n == 0)) return NULL;
         s += n;
     }
@@ -793,17 +793,17 @@ bldcclass(Parser *par)
 }
 
 static Reprog*
-regcomp1(Parser *par, const char *s, int cflags)
+regcomp1(Reprog *progp, Parser *par, const char *s, int cflags)
 {
     Token token;
     Reprog *volatile pp;
 
     /* get memory for the program. estimated max usage */
     const int instcap = 5 + 6*strlen(s);
-    pp = (Reprog *)malloc(sizeof(Reprog) + instcap*sizeof(Reinst));
+    pp = (Reprog *)realloc(progp, sizeof(Reprog) + instcap*sizeof(Reinst));
     if (pp == NULL) {
+        pp = progp;
         rcerror(par, creg_outofmemory);
-        return NULL;
     }
     pp->flags.caseless = (cflags & creg_caseless) != 0;
     pp->flags.dotall = (cflags & creg_dotall) != 0;
@@ -918,7 +918,7 @@ runematch(Rune s, Rune r, bool icase)
     case UTF_XD: inv = 1;
     case UTF_xd: return inv ^ utf8_isxdigit(r);
     }
-    return icase ? utf8_tolower(s) == utf8_tolower(r) : s == r;
+    return icase ? utf8_casefold(s) == utf8_casefold(r) : s == r;
 }
 
 /*
@@ -1033,8 +1033,8 @@ regexec1(const Reprog *progp,    /* program to run */
                 case NWBOUND:
                     ok = true;
                 case WBOUND: /* fallthrough */
-                    if (ok ^ (s == bol || s == j->eol || ((utf8_isalnum(s[-1]) || s[-1] == '_')
-                                                        ^ (utf8_isalnum(s[ 0]) || s[ 0] == '_'))))
+                    if (ok ^ (s == bol || s == j->eol || ((utf8_isalnum(utf8_peek(s, -1)) || s[-1] == '_')
+                                                        ^ (utf8_isalnum(utf8_peek(s, 0)) || s[0] == '_'))))
                         continue;
                     break;
                 case NCCLASS:
@@ -1205,7 +1205,7 @@ void cregex_replace(
 
 int cregex_compile(cregex *rx, const char* pattern, int cflags) {
     Parser par;
-    rx->prog = regcomp1(&par, pattern, cflags);
+    rx->prog = regcomp1(rx->prog, &par, pattern, cflags);
     if (rx->prog)
         return 1 + rx->prog->nsubids;
     return par.errors;

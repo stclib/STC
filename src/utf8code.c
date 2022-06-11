@@ -56,13 +56,6 @@ uint32_t utf8_peek(const char* s, int pos) {
     return d.codep;
 }
 
-bool utf8_valid(const char* s) {
-    utf8_decode_t d = {.state=0};
-    while (*s)
-        utf8_decode(&d, (uint8_t)*s++);
-    return d.state == 0;
-}
-
 bool utf8_valid_n(const char* s, size_t nbytes) {
     utf8_decode_t d = {.state=0};
     while ((nbytes-- != 0) & (*s != 0))
@@ -216,7 +209,7 @@ cstr cstr_toupper(const cstr* self) {
     return cstr_tocase(self, fn_toupper);
 }
 
-void cstr_foldcase(cstr* self) {
+void cstr_casefold(cstr* self) {
     cstr_take(self, cstr_tocase(self, fn_tofold));
 }
 
