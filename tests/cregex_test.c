@@ -23,15 +23,15 @@ START_TEST(compile_match_char)
     ck_assert_int_eq(cregex_error(), cregex_OK);
 
     cregex_match match;
-    ck_assert(cregex_find(&re, "äsdf", &match));
+    ck_assert(cregex_match(&re, "äsdf", &match));
     ck_assert_uint_eq(match.start, 0);
     ck_assert_uint_eq(match.end, 5); // ä is two bytes wide
 
-    ck_assert(cregex_find(&re, "zäsdf", &match));
+    ck_assert(cregex_match(&re, "zäsdf", &match));
     ck_assert_uint_eq(match.start, 1);
     ck_assert_uint_eq(match.end, 6);
 
-    ck_assert(cregex_find(&re, "äsdf", &match));
+    ck_assert(cregex_match(&re, "äsdf", &match));
     ck_assert_uint_eq(match.start, 0);
     ck_assert_uint_eq(match.end, 5);
 
@@ -45,12 +45,12 @@ START_TEST(compile_match_anchors)
     ck_assert_int_eq(cregex_error(), cregex_OK);
 
     cregex_match match;
-    ck_assert(cregex_find(re, "äsdf", &match));
+    ck_assert(cregex_match(re, "äsdf", &match));
     ck_assert_uint_eq(match.start, 0);
     ck_assert_uint_eq(match.end, 5);
 
-    ck_assert(cregex_find(re, "äs♥f", &match));
-    ck_assert(cregex_find(re, "äsöf", &match));
+    ck_assert(cregex_match(re, "äs♥f", &match));
+    ck_assert(cregex_match(re, "äsöf", &match));
 
     cregex_drop(re);
 }
@@ -63,30 +63,30 @@ START_TEST(compile_match_quantifiers)
         ck_assert_int_eq(cregex_error(), cregex_OK);
 
         cregex_match match;
-        ck_assert(cregex_find(&re, "ääb", &match));
+        ck_assert(cregex_match(&re, "ääb", &match));
         ck_assert_uint_eq(match.start, 0);
         ck_assert_uint_eq(match.end, 4);
 
-        ck_assert(cregex_find(&re, "bäbb", &match));
+        ck_assert(cregex_match(&re, "bäbb", &match));
         ck_assert_uint_eq(match.start, 1);
         ck_assert_uint_eq(match.end, 3);
 
-        ck_assert(!cregex_find(&re, "bbb", &match));
+        ck_assert(!cregex_match(&re, "bbb", &match));
     }
     c_auto (cregex, re) {
         re = cregex_new("bä*");
         ck_assert_int_eq(cregex_error(), cregex_OK);
 
         cregex_match match;
-        ck_assert(cregex_find(&re, "bääb", &match));
+        ck_assert(cregex_match(&re, "bääb", &match));
         ck_assert_uint_eq(match.start, 0);
         ck_assert_uint_eq(match.end, 5);
 
-        ck_assert(cregex_find(&re, "bäbb", &match));
+        ck_assert(cregex_match(&re, "bäbb", &match));
         ck_assert_uint_eq(match.start, 0);
         ck_assert_uint_eq(match.end, 3);
 
-        ck_assert(cregex_find(&re, "bbb", &match));
+        ck_assert(cregex_match(&re, "bbb", &match));
         ck_assert_uint_eq(match.start, 0);
         ck_assert_uint_eq(match.end, 1);
     }
@@ -110,27 +110,27 @@ START_TEST(compile_match_complex_quants)
         ck_assert_int_eq(cregex_error(), cregex_OK);
 
         cregex_match match;
-        ck_assert(cregex_find(&re1, "ääb", &match));
+        ck_assert(cregex_match(&re1, "ääb", &match));
         ck_assert_uint_eq(match.start, 0);
         ck_assert_uint_eq(match.end, 4);
-        ck_assert(cregex_find(&re1, "äääb", &match));
-        ck_assert(cregex_find(&re1, "äb", &match));
-        ck_assert(!cregex_find(&re1, "b", &match));
+        ck_assert(cregex_match(&re1, "äääb", &match));
+        ck_assert(cregex_match(&re1, "äb", &match));
+        ck_assert(!cregex_match(&re1, "b", &match));
 
-        ck_assert(cregex_find(&re2, "ää", &match));
+        ck_assert(cregex_match(&re2, "ää", &match));
         ck_assert_uint_eq(match.start, 0);
         ck_assert_uint_eq(match.end, 2);
-        ck_assert(cregex_find(&re2, "bbäb", &match));
-        ck_assert(!cregex_find(&re2, "bbbb", &match));
+        ck_assert(cregex_match(&re2, "bbäb", &match));
+        ck_assert(!cregex_match(&re2, "bbbb", &match));
 
-        ck_assert(cregex_find(&re3, "ääääääääääb", &match));
+        ck_assert(cregex_match(&re3, "ääääääääääb", &match));
         ck_assert_uint_eq(match.start, 0);
         ck_assert_uint_eq(match.end, 20);
-        ck_assert(cregex_find(&re3, "b", &match));
+        ck_assert(cregex_match(&re3, "b", &match));
 
-        ck_assert(cregex_find(&re4, "bä", &match));
-        ck_assert(cregex_find(&re4, "bää", &match));
-        ck_assert(cregex_find(&re4, "bäää", &match));
+        ck_assert(cregex_match(&re4, "bä", &match));
+        ck_assert(cregex_match(&re4, "bää", &match));
+        ck_assert(cregex_match(&re4, "bäää", &match));
     }
 }
 END_TEST
@@ -141,8 +141,8 @@ START_TEST(compile_match_escaped_chars)
     ck_assert_int_eq(cregex_error(), cregex_OK);
 
     cregex_match match;
-    ck_assert(cregex_find(&re, "\n\r\t{", &match));
-    ck_assert(!cregex_find(&re, "\n\r\t", &match));
+    ck_assert(cregex_match(&re, "\n\r\t{", &match));
+    ck_assert(!cregex_match(&re, "\n\r\t", &match));
 
     cregex_drop(&re);
 }
@@ -160,16 +160,16 @@ START_TEST(compile_match_class_simple)
         ck_assert_int_eq(cregex_error(), cregex_OK);
 
         cregex_match match;
-        ck_assert(cregex_find(&re1, " ", &match));
-        ck_assert(cregex_find(&re1, "\r", &match));
-        ck_assert(cregex_find(&re1, "\n", &match));
+        ck_assert(cregex_match(&re1, " ", &match));
+        ck_assert(cregex_match(&re1, "\r", &match));
+        ck_assert(cregex_match(&re1, "\n", &match));
 
-        ck_assert(cregex_find(&re2, "a", &match));
-        ck_assert(cregex_find(&re2, "0", &match));
-        ck_assert(cregex_find(&re2, "_", &match));
+        ck_assert(cregex_match(&re2, "a", &match));
+        ck_assert(cregex_match(&re2, "0", &match));
+        ck_assert(cregex_match(&re2, "_", &match));
 
-        ck_assert(cregex_find(&re3, "k", &match));
-        ck_assert(!cregex_find(&re3, "0", &match));
+        ck_assert(cregex_match(&re3, "k", &match));
+        ck_assert(!cregex_match(&re3, "0", &match));
     }
 }
 END_TEST
@@ -182,14 +182,14 @@ START_TEST(compile_match_or)
         ck_assert_int_eq(cregex_error(), cregex_OK);
 
         cregex_match match;
-        ck_assert(cregex_find(&re, "as", &match));
-        ck_assert(cregex_find(&re, "df", &match));
+        ck_assert(cregex_match(&re, "as", &match));
+        ck_assert(cregex_match(&re, "df", &match));
 
         re2 = cregex_new("(as|df)");
         ck_assert_int_eq(cregex_error(), cregex_OK);
 
-        ck_assert(cregex_find(&re2, "as", &match));
-        ck_assert(cregex_find(&re2, "df", &match));
+        ck_assert(cregex_match(&re2, "as", &match));
+        ck_assert(cregex_match(&re2, "df", &match));
     }
 }
 END_TEST
@@ -200,10 +200,10 @@ START_TEST(compile_match_class_complex_0)
     ck_assert_int_eq(cregex_error(), cregex_OK);
 
     cregex_match match;
-    ck_assert(cregex_find(&re, "a", &match));
-    ck_assert(cregex_find(&re, "s", &match));
-    ck_assert(cregex_find(&re, "d", &match));
-    ck_assert(cregex_find(&re, "f", &match));
+    ck_assert(cregex_match(&re, "a", &match));
+    ck_assert(cregex_match(&re, "s", &match));
+    ck_assert(cregex_match(&re, "d", &match));
+    ck_assert(cregex_match(&re, "f", &match));
 
     cregex_drop(&re);
 }
@@ -215,11 +215,11 @@ START_TEST(compile_match_class_complex_1)
     ck_assert_int_eq(cregex_error(), cregex_OK);
 
     cregex_match match;
-    ck_assert(cregex_find(&re, "a", &match));
-    ck_assert(cregex_find(&re, "5", &match));
-    ck_assert(cregex_find(&re, "A", &match));
-    ck_assert(cregex_find(&re, "ä", &match));
-    ck_assert(cregex_find(&re, "ö", &match));
+    ck_assert(cregex_match(&re, "a", &match));
+    ck_assert(cregex_match(&re, "5", &match));
+    ck_assert(cregex_match(&re, "A", &match));
+    ck_assert(cregex_match(&re, "ä", &match));
+    ck_assert(cregex_match(&re, "ö", &match));
 
     cregex_drop(&re);
 }
@@ -231,9 +231,9 @@ START_TEST(compile_match_cap)
     ck_assert_int_eq(cregex_error(), cregex_OK);
 
     cregex_match match;
-    ck_assert(cregex_find(&re, "abcd", &match));
-    ck_assert(cregex_find(&re, "llljabcdkk", &match));
-    ck_assert(!cregex_find(&re, "abc", &match));
+    ck_assert(cregex_match(&re, "abcd", &match));
+    ck_assert(cregex_match(&re, "llljabcdkk", &match));
+    ck_assert(!cregex_match(&re, "abc", &match));
 
     cregex_drop(&re);
 }
@@ -266,13 +266,13 @@ START_TEST(search_all)
         cregex_match m = {0};
         bool res;
         
-        res = cregex_find_next(&re, "ab,ab,ab", &m);
+        res = cregex_match_next(&re, "ab,ab,ab", &m);
         ck_assert(res && m.start == 0);
-        res = cregex_find_next(&re, "ab,ab,ab", &m);
+        res = cregex_match_next(&re, "ab,ab,ab", &m);
         ck_assert(res && m.start == 3);
-        res = cregex_find_next(&re, "ab,ab,ab", &m);
+        res = cregex_match_next(&re, "ab,ab,ab", &m);
         ck_assert(res && m.start == 6);
-        res = cregex_find_next(&re, "ab,ab,ab", &m);
+        res = cregex_match_next(&re, "ab,ab,ab", &m);
         ck_assert(!res);
     }
 }
@@ -294,7 +294,7 @@ START_TEST(captures_cap)
         ck_assert_uint_eq(cregex_capture_size(re), 3);
 
         cregex_match match;
-        ck_assert(cregex_find(&re, "xxabcdcde", &match));
+        ck_assert(cregex_match(&re, "xxabcdcde", &match));
 
         cregex_match cap0, cap1, cap2;
         cregex_capture(&re, 0, &cap0);

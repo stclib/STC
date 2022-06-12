@@ -1104,7 +1104,7 @@ regexec2(const Reprog *progp,    /* program to run */
 }
 
 static int
-regexec9(const Reprog *progp,    /* program to run */
+regexec(const Reprog *progp,    /* program to run */
     const char *bol,    /* string to run machine on */
     int ms,             /* number of elements at mp */
     Resub mp[],         /* subexpression elements */
@@ -1215,9 +1215,9 @@ int cregex_captures(cregex rx) {
     return rx.prog ? 1 + rx.prog->nsubids : 0;
 }
 
-int cregex_find(const cregex *rx, const char* string,
-                size_t nmatch, cregmatch match[], int mflags) {
-    int res = regexec9(rx->prog, string, nmatch, match, mflags);
+int cregex_match(const cregex *rx, const char* string,
+                 size_t nmatch, cregmatch match[], int mflags) {
+    int res = regexec(rx->prog, string, nmatch, match, mflags);
     switch (res) {
     case 1: return 1 + rx->prog->nsubids;
     case 0: return creg_nomatch;

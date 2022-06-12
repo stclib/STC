@@ -23,10 +23,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-#ifndef CREGEX9_H_
-#define CREGEX9_H_
+#ifndef CREGEX_H_
+#define CREGEX_H_
 /*
- * cregex9.h
+ * cregex.h
  * 
  * This is a extended version of regexp9, supporting UTF8 input, common 
  * shorthand character classes, ++.
@@ -79,8 +79,8 @@ int cregex_compile(cregex *self, const char* pattern, int cflags);
 int cregex_captures(cregex rx);
 
 /* return number of capture groups on success, or (negative) error code on failure. */
-int cregex_find(const cregex *self, const char* string, 
-                size_t nmatch, cregmatch match[], int mflags);
+int cregex_match(const cregex *self, const char* string, 
+                 size_t nmatch, cregmatch match[], int mflags);
 
 void cregex_replace(const char* src, char* dst, int dsize,
                     int nmatch, const cregmatch match[]);
