@@ -13,7 +13,7 @@ All **carc** functions can be called by multiple threads on different instances 
 additional synchronization even if these instances are copies and share ownership of the same object.
 **carc** uses thread-safe atomic reference counting, through the *carc_X_clone()* and *carc_X_drop()* methods.
 
-When declaring a container with shared pointers, define `i_val_bind` as the carc type, see example.
+When declaring a container with shared pointers, define `i_val_arcbox` with the carc type, see example.
 
 See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory/shared_ptr) for a functional reference, or Rust [std::sync::Arc](https://doc.rust-lang.org/std/sync/struct.Arc.html) / [std::rc::Rc](https://doc.rust-lang.org/std/rc/struct.Rc.html).
 
