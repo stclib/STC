@@ -41,7 +41,7 @@ int main(void)
 
         // PRIORITY QUEUE
 
-        c_apply_arr(v, cpque_f_push(&floats, *v), const float, nums, c_arraylen(nums));
+        c_apply_array(v, cpque_f_push(&floats, *v), const float, nums, c_arraylen(nums));
 
         puts("\npop and show high priorites first:");
         while (! cpque_f_empty(floats)) {

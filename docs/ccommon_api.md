@@ -167,7 +167,7 @@ c_forrange (i, int, 30, 0, -5) printf(" %d", i);
 // 30 25 20 15 10 5
 ```
 
-### c_apply, c_apply_arr, c_pair, c_find_if, c_find_it
+### c_apply, c_apply_array, c_pair, c_find_if, c_find_it
 **c_apply** applies an expression on a container with each of the elements in the given array:
 ```c
 // apply multiple push_backs
@@ -177,7 +177,7 @@ c_apply(v, cvec_i_push_back(&vec, v), int, {1, 2, 3});
 c_apply(v, cmap_i_insert(&map, c_pair(v)), cmap_i_raw, { {4, 5}, {6, 7} });
 
 int arr[] = {1, 2, 3};
-c_apply_arr(v, cvec_i_push_back(&vec, v), int, arr, c_arraylen(arr));
+c_apply_array(v, cvec_i_push_back(&vec, v), int, arr, c_arraylen(arr));
 ```
 **c_find_if**, **c_find_in** searches linearily in containers using a predicate
 ```

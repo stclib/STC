@@ -9,7 +9,7 @@ cvec_str read_file(const char* name)
     c_autovar (FILE* f = fopen(name, "r"), fclose(f))
         c_autovar (cstr line = cstr_init(), cstr_drop(&line))
             while (cstr_getline(&line, f))
-                cvec_str_emplace_back(&vec, cstr_str(&line));
+                cvec_str_push(&vec, cstr_clone(line));
     return vec;
 }
 

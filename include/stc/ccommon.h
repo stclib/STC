@@ -88,8 +88,7 @@
 #define c_arraylen(a)           (sizeof (a)/sizeof *(a))
 
 // x and y are i_keyraw* type, defaults to i_key*:
-#define c_less_cmp(less, x, y)  ((less((y), (x))) - (less((x), (y))))
-#define c_default_cmp(x, y)     c_less_cmp(c_default_less, x, y)
+#define c_default_cmp(x, y)     (c_default_less(y, x) - c_default_less(x, y))
 #define c_default_less(x, y)    (*(x) < *(y))
 #define c_default_eq(x, y)      (*(x) == *(y))
 #define c_memcmp_eq(x, y)       (memcmp(x, y, sizeof *(x)) == 0)
@@ -209,7 +208,7 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
     while (v != _c_end) { action; ++v; } \
 } while (0)
 
-#define c_apply_arr(v, action, T, arr, n) do { \
+#define c_apply_array(v, action, T, arr, n) do { \
     typedef T _c_T; \
     _c_T *v = arr, *_c_end = v + (n); \
     while (v != _c_end) { action; ++v; } \

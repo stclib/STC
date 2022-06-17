@@ -163,16 +163,18 @@
 #ifndef i_keydrop
   #define i_keydrop c_default_drop
 #endif
-#ifdef i_less
-  #define i_cmp(x, y) c_less_cmp(i_less, x, y)
-#endif
-#if !defined i_eq && defined i_cmp
+
+// i_eq, i_less, i_cmp, i_hash
+#if !defined i_eq && (defined i_cmp || defined i_less)
   #define i_eq(x, y) !(i_cmp(x, y))
 #elif !defined i_eq
   #define i_eq c_default_eq
 #endif
+#if !defined i_less && !defined i_cmp
+  #define i_less c_default_less
+#endif
 #ifndef i_cmp
-  #define i_cmp c_default_cmp
+  #define i_cmp(x, y) (i_less(y, x)) - (i_less(x, y))
 #endif
 #ifndef i_hash
   #define i_hash c_default_hash
