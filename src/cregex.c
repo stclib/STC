@@ -123,6 +123,7 @@ enum {
     IRUNE,
     ASC_an      , ASC_AN,   /* alphanum */
     ASC_al      , ASC_AL,   /* alpha */
+    ASC_as      , ASC_AS,   /* ascii */
     ASC_bl      , ASC_BL,   /* blank */
     ASC_ct      , ASC_CT,   /* ctrl */
     ASC_d       , ASC_D,    /* digit */
@@ -130,7 +131,7 @@ enum {
     ASC_w       , ASC_W,    /* word */
     ASC_gr      , ASC_GR,   /* graphic */
     ASC_pr      , ASC_PR,   /* print */
-    ASC_pt      , ASC_PT,   /* punct */
+    ASC_pu      , ASC_PU,   /* punct */
     ASC_lo      , ASC_LO,   /* lower */
     ASC_up      , ASC_UP,   /* upper */
     ASC_xd      , ASC_XD,   /* hex */
@@ -510,10 +511,7 @@ static Reprog*
 optimize(Parser *par, Reprog *pp)
 {
     Reinst *inst, *target;
-    size_t size;
-    Reprog *npp;
     Reclass *cl;
-    ptrdiff_t diff;
 
     /*
      *  get rid of NOOP chains
@@ -530,12 +528,15 @@ optimize(Parser *par, Reprog *pp)
      *  necessary.  Reallocate to the actual space used
      *  and then relocate the code.
      */
-    size = sizeof(Reprog) + (par->freep - pp->firstinst)*sizeof(Reinst);
-    npp = (Reprog *)realloc(pp, size);
-    if (npp==NULL || npp==pp)
-        return pp;
-    diff = (char *)npp - (char *)pp;
+    uintptr_t ipp = (uintptr_t)pp;
+    size_t size = sizeof(Reprog) + (par->freep - pp->firstinst)*sizeof(Reinst);
+    Reprog *npp = (Reprog *)realloc(pp, size);
+    ptrdiff_t diff = (uintptr_t)npp - ipp;
+
+    if ((npp == NULL) | (diff == 0))
+        return (Reprog *)ipp;
     par->freep = (Reinst *)((char *)par->freep + diff);
+
     for (inst = npp->firstinst; inst < par->freep; inst++) {
         switch (inst->type) {
         case OR:
@@ -608,7 +609,7 @@ nextc(Parser *par, Rune *rp)
                     {"{Blank}", 7, ASC_bl},
                     {"{Graph}", 7, ASC_gr},
                     {"{Print}", 7, ASC_pr},
-                    {"{Punct}", 7, ASC_pt},
+                    {"{Punct}", 7, ASC_pu},
                 };
                 int inv = *rp == 'P';
                 for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
@@ -734,11 +735,11 @@ bldcclass(Parser *par)
             }
             if (rune == '[' && *par->exprp == ':') {
                 static struct { const char* c; int n, r; } cls[] = {
-                    {"alnum:]", 7, ASC_an}, {"alpha:]", 7, ASC_al}, {"blank:]", 7, ASC_bl},
-                    {"cntrl:]", 7, ASC_ct}, {"digit:]", 7, ASC_d}, {"graph:]", 7, ASC_gr},
-                    {"lower:]", 7, ASC_lo}, {"print:]", 7, ASC_pr}, {"punct:]", 7, ASC_pt},
-                    {"space:]", 7, ASC_s}, {"upper:]", 7, ASC_up}, {"xdigit:]", 8, ASC_xd},
-                    {"word:]", 6, ASC_w},
+                    {"alnum:]", 7, ASC_an}, {"alpha:]", 7, ASC_al}, {"ascii:]", 7, ASC_as},
+                    {"blank:]", 7, ASC_bl}, {"cntrl:]", 7, ASC_ct}, {"digit:]", 7, ASC_d},
+                    {"graph:]", 7, ASC_gr}, {"lower:]", 7, ASC_lo}, {"print:]", 7, ASC_pr},
+                    {"punct:]", 7, ASC_pu}, {"space:]", 7, ASC_s}, {"upper:]", 7, ASC_up},
+                    {"xdigit:]", 8, ASC_xd}, {"word:]", 6, ASC_w},
                 };
                 int inv = par->exprp[1] == '^', off = 1 + inv;
                 for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
@@ -796,14 +797,14 @@ static Reprog*
 regcomp1(Reprog *progp, Parser *par, const char *s, int cflags)
 {
     Token token;
-    Reprog *volatile pp;
 
     /* get memory for the program. estimated max usage */
     const int instcap = 5 + 6*strlen(s);
-    pp = (Reprog *)realloc(progp, sizeof(Reprog) + instcap*sizeof(Reinst));
+    Reprog* pp = (Reprog *)realloc(progp, sizeof(Reprog) + instcap*sizeof(Reinst));
     if (pp == NULL) {
-        pp = progp;
-        rcerror(par, creg_outofmemory);
+        par->errors = creg_outofmemory;
+        free(progp);
+        return NULL;
     }
     pp->flags.caseless = (cflags & creg_caseless) != 0;
     pp->flags.dotall = (cflags & creg_dotall) != 0;
@@ -884,6 +885,8 @@ runematch(Rune s, Rune r, bool icase)
     case ASC_al: return inv ^ (isalpha(r) != 0);
     case ASC_AN: inv = 1;
     case ASC_an: return inv ^ (isalnum(r) != 0);
+    case ASC_AS: return (r >= 128);
+    case ASC_as: return (r < 128);
     case ASC_BL: inv = 1;
     case ASC_bl: return inv ^ ((r == ' ') | (r == '\t'));
     case ASC_CT: inv = 1;
@@ -892,8 +895,8 @@ runematch(Rune s, Rune r, bool icase)
     case ASC_gr: return inv ^ (isgraph(r) != 0);
     case ASC_PR: inv = 1;
     case ASC_pr: return inv ^ (isprint(r) != 0);
-    case ASC_PT: inv = 1;
-    case ASC_pt: return inv ^ (ispunct(r) != 0);
+    case ASC_PU: inv = 1;
+    case ASC_pu: return inv ^ (ispunct(r) != 0);
     case ASC_LO: inv = 1;
     case ASC_lo: return inv ^ (islower(r) != 0);
     case ASC_UP: inv = 1;

@@ -203,8 +203,8 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 
 #define c_apply(v, action, T, ...) do { \
     typedef T _c_T; \
-    const _c_T _c_arr[] = __VA_ARGS__, *v = _c_arr, \
-          *_c_end = v + c_arraylen(_c_arr); \
+    _c_T _c_arr[] = __VA_ARGS__, *v = _c_arr; \
+    const _c_T *_c_end = v + c_arraylen(_c_arr); \
     while (v != _c_end) { action; ++v; } \
 } while (0)
 
@@ -215,6 +215,7 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 } while (0)
 
 #define c_pair(v) (v)->first, (v)->second
+#define c_drop(C, ...) c_apply(_p, C##_drop(*_p), C*, {__VA_ARGS__})
 
 #define c_find_if(C, cnt, it, pred) \
     c_find_in(C, C##_begin(&cnt), C##_end(&cnt), it, pred)
@@ -227,12 +228,6 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
     for (it = start; it.ref != _end.ref && !(pred); C##_next(&it)) \
         ++index; \
     if (it.ref == _end.ref) it.ref = NULL; \
-} while (0)
-
-#define c_drop(C, ...) do { \
-    C* _c_arr[] = {__VA_ARGS__}; \
-    for (size_t _c_i = 0; _c_i < c_arraylen(_c_arr); ++_c_i) \
-        C##_drop(_c_arr[_c_i]); \
 } while (0)
 
 #if defined(__SIZEOF_INT128__)

@@ -7,14 +7,14 @@
 #define c_dyn_cast(T, s) \
     (&T##_api == (s)->api ? (T*)(s) : (T*)0)
 
-#define c_vtable(Api, T) \
+#define c_vtable(Api, T, base) \
     c_static_assert(offsetof(T, base) == 0); \
     static Api T##_api
 
 // Shape definition
 // ============================================================
 
-typedef struct { 
+typedef struct {
     float x, y;
 } Point;
 
@@ -35,7 +35,7 @@ struct Shape {
 
 void Shape_drop(Shape* shape)
 {
-    printf("base destructed\n");
+    printf("shape destructed\n");
 }
 
 void Shape_delete(Shape* shape)
@@ -50,11 +50,11 @@ void Shape_delete(Shape* shape)
 // ============================================================
 
 typedef struct {
-    Shape base;
+    Shape shape;
     Point p[3];
 } Triangle;
 
-c_vtable(struct ShapeAPI, Triangle);
+c_vtable(struct ShapeAPI, Triangle, shape);
 
 
 Triangle* Triangle_new(Point a, Point b, Point c)
@@ -84,11 +84,11 @@ static struct ShapeAPI Triangle_api = {
 #include <stc/cstack.h>
 
 typedef struct {
-    Shape base;
+    Shape shape;
     PointVec points;
 } Polygon;
 
-c_vtable(struct ShapeAPI, Polygon);
+c_vtable(struct ShapeAPI, Polygon, shape);
 
 
 Polygon* Polygon_new(void)
@@ -151,9 +151,9 @@ int main(void)
         c_apply(p, Polygon_addPoint(pol2, *p), Point,
             {{5, 7}, {12, 7}, {12, 20}, {82, 33}, {17, 56}});
         
-        Shapes_push(&shapes, &tri1->base);
-        Shapes_push(&shapes, &pol1->base);
-        Shapes_push(&shapes, &pol2->base);
+        Shapes_push(&shapes, &tri1->shape);
+        Shapes_push(&shapes, &pol1->shape);
+        Shapes_push(&shapes, &pol2->shape);
 
         c_foreach (i, Shapes, shapes)
             testShape(*i.ref);
