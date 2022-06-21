@@ -136,7 +136,7 @@ STC_INLINE cstr cstr_with_size(const size_t len, const char fill) {
     return s;
 }
 
-STC_INLINE char* cstr_expand_uninit(cstr *self, size_t n) {
+STC_INLINE char* cstr_append_uninit(cstr *self, size_t n) {
     size_t len = cstr_size(*self); char* d;
     if (!(d = cstr_reserve(self, len + n))) return NULL;
     _cstr_p(self)->size += n;

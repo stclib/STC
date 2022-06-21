@@ -218,11 +218,12 @@ STC_INLINE void cstr_next(cstr_iter* it) {
 STC_INLINE void cstr_clear(cstr* self)
     { _cstr_set_size(self, 0); }
 
-STC_INLINE char* cstr_expand_uninit(cstr *self, size_t n) {
-    size_t len = cstr_size(*self); char* d;
-    if (!(d = cstr_reserve(self, len + n))) return NULL;
-    _cstr_set_size(self, len + n);
-    return d + len;
+STC_INLINE char* cstr_append_uninit(cstr *self, size_t len) {
+    size_t sz = cstr_size(*self);
+    char* d = cstr_reserve(self, sz + len);
+    if (!d) return NULL;
+    _cstr_set_size(self, sz + len);
+    return d + sz;
 }
 
 STC_INLINE int cstr_cmp(const cstr* s1, const cstr* s2) 

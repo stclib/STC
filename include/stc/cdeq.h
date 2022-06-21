@@ -344,7 +344,7 @@ _cx_memb(_expand_left_half_)(_cx_self* self, const size_t idx, const size_t n) {
 }
 
 static _cx_value*
-_cx_memb(_expand_uninit_p)(_cx_self* self, const _cx_value* pos, const size_t n) {
+_cx_memb(_insert_uninit_p)(_cx_self* self, const _cx_value* pos, const size_t n) {
     const size_t idx = pos - self->data;
     if (idx*2 < cdeq_rep_(self)->size)
         _cx_memb(_expand_left_half_)(self, idx, n);
@@ -369,7 +369,7 @@ _cx_memb(_push_front)(_cx_self* self, i_key value) {
 STC_DEF _cx_value*
 _cx_memb(_insert_range_p)(_cx_self* self, _cx_value* pos,
                           const _cx_value* p1, const _cx_value* p2) {
-    pos = _cx_memb(_expand_uninit_p)(self, pos, p2 - p1);
+    pos = _cx_memb(_insert_uninit_p)(self, pos, p2 - p1);
     if (pos)
         memcpy(pos, p1, (p2 - p1)*sizeof *p1);
     return pos;
@@ -393,7 +393,7 @@ _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
 #if !defined _i_no_emplace
 STC_DEF _cx_value*
 _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos, const _cx_raw* p1, const _cx_raw* p2) {
-    pos = _cx_memb(_expand_uninit_p)(self, pos, p2 - p1);
+    pos = _cx_memb(_insert_uninit_p)(self, pos, p2 - p1);
     _cx_value* it = pos;
     if (pos) for (; p1 != p2; ++p1)
         *pos++ = i_keyfrom((*p1));
@@ -404,7 +404,7 @@ _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos, const _cx_raw* p1, co
 STC_DEF _cx_value*
 _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
                           const _cx_value* p1, const _cx_value* p2) {
-    pos = _cx_memb(_expand_uninit_p)(self, pos, p2 - p1);
+    pos = _cx_memb(_insert_uninit_p)(self, pos, p2 - p1);
     _cx_value* it = pos;
     if (pos) for (; p1 != p2; ++p1)
         *pos++ = i_keyclone((*p1));
