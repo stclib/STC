@@ -130,10 +130,10 @@ STC_INLINE void cstr_append_sv(cstr* self, csview sv)
     { cstr_append_n(self, sv.str, sv.size); }
 
 STC_INLINE void cstr_insert_sv(cstr* self, size_t pos, csview sv)
-    { cstr_replace_n(self, pos, 0, sv.str, sv.size); }
+    { cstr_replace_with_n(self, pos, 0, sv.str, sv.size); }
 
 STC_INLINE void cstr_replace_sv(cstr* self, csview sub, csview with)
-    { cstr_replace_n(self, sub.str - cstr_str(self), sub.size, with.str, with.size); }
+    { cstr_replace_with_n(self, sub.str - cstr_str(self), sub.size, with.str, with.size); }
 
 STC_INLINE bool cstr_equals_sv(cstr s, csview sv)
     { return sv.size == cstr_size(s) && !memcmp(cstr_str(&s), sv.str, sv.size); }

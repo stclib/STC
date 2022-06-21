@@ -81,10 +81,10 @@ STC_API char*   cstr_reserve(cstr* self, size_t cap);
 STC_API void    cstr_shrink_to_fit(cstr* self);
 STC_API void    cstr_resize(cstr* self, size_t size, char value);
 STC_API size_t  cstr_find_from(cstr s, size_t pos, const char* search);
-STC_API char*   cstr_assign_n(cstr* self, const char* str, size_t n);
-STC_API char*   cstr_append_n(cstr* self, const char* str, size_t n);
+STC_API char*   cstr_assign_n(cstr* self, const char* str, size_t len);
+STC_API char*   cstr_append_n(cstr* self, const char* str, size_t len);
 STC_API bool    cstr_getdelim(cstr *self, int delim, FILE *fp);
-STC_API void    cstr_erase_n(cstr* self, size_t pos, size_t n);
+STC_API void    cstr_erase_n(cstr* self, size_t pos, size_t len);
 STC_API cstr    cstr_from_fmt(const char* fmt, ...);
 STC_API int     cstr_printf(cstr* self, const char* fmt, ...);
 STC_API void    cstr_replace_all(cstr* self, const char* search, const char* repl);
@@ -102,9 +102,9 @@ STC_INLINE csview cstr_sv(const cstr* s) {
 STC_INLINE cstr cstr_init(void)
     { return cstr_null; }
 
-STC_INLINE cstr cstr_from_n(const char* str, const size_t n) {
+STC_INLINE cstr cstr_from_n(const char* str, const size_t len) {
     cstr s;
-    memcpy(_cstr_init(&s, n, n), str, n);
+    memcpy(_cstr_init(&s, len, len), str, len);
     return s;
 }
 
@@ -266,8 +266,8 @@ STC_INLINE bool cstr_starts_with(cstr s, const char* sub) {
 }
 STC_INLINE bool cstr_istarts_with(cstr s, const char* sub) {
     csview sv = cstr_sv(&s); 
-    size_t n = strlen(sub);
-    return n <= sv.size && !utf8_icmp_n(cstr_npos, sv.str, sv.size, sub, n);
+    size_t len = strlen(sub);
+    return len <= sv.size && !utf8_icmp_n(cstr_npos, sv.str, sv.size, sub, len);
 }
 
 STC_INLINE bool cstr_starts_with_s(cstr s, cstr sub)
@@ -307,20 +307,20 @@ STC_INLINE char* cstr_append_s(cstr* self, cstr s) {
     return cstr_append_n(self, sv.str, sv.size);
 }
 
-STC_INLINE void cstr_replace_n(cstr* self, size_t pos, size_t len, const char* repl, size_t n) {
-    char* d = _cstr_internal_move(self, pos + len, pos + n);
-    memcpy(d + pos, repl, n);
+STC_INLINE void cstr_replace_with_n(cstr* self, size_t pos, size_t len, const char* repl, size_t rlen) {
+    char* d = _cstr_internal_move(self, pos + len, pos + rlen);
+    memcpy(d + pos, repl, rlen);
 }
 
 STC_INLINE void cstr_replace_at(cstr* self, size_t pos, size_t len, const char* repl)
-    { cstr_replace_n(self, pos, len, repl, strlen(repl)); }
+    { cstr_replace_with_n(self, pos, len, repl, strlen(repl)); }
 
 STC_INLINE size_t cstr_replace_from(cstr* self, size_t pos, const char* search, const char* repl) {
     pos = cstr_find_from(*self, pos, search);
     if (pos == cstr_npos)
         return pos;
     const size_t rlen = strlen(repl);
-    cstr_replace_n(self, pos, strlen(search), repl, rlen);
+    cstr_replace_with_n(self, pos, strlen(search), repl, rlen);
     return pos + rlen;
 }
 
@@ -329,18 +329,18 @@ STC_INLINE size_t cstr_replace(cstr* self, const char* search, const char* repl)
 
 STC_INLINE void cstr_replace_s(cstr* self, size_t pos, size_t len, cstr s) {
     csview sv = cstr_sv(&s);
-    cstr_replace_n(self, pos, len, sv.str, sv.size);
+    cstr_replace_with_n(self, pos, len, sv.str, sv.size);
 }
 
-STC_INLINE void cstr_insert_n(cstr* self, size_t pos, const char* str, size_t n)
-    { cstr_replace_n(self, pos, 0, str, n); }
+STC_INLINE void cstr_insert_n(cstr* self, size_t pos, const char* str, size_t len)
+    { cstr_replace_with_n(self, pos, 0, str, len); }
 
 STC_INLINE void cstr_insert(cstr* self, size_t pos, const char* str)
-    { cstr_replace_n(self, pos, 0, str, strlen(str)); }
+    { cstr_replace_with_n(self, pos, 0, str, strlen(str)); }
 
 STC_INLINE void cstr_insert_s(cstr* self, size_t pos, cstr s) {
     csview sv = cstr_sv(&s);
-    cstr_replace_n(self, pos, 0, sv.str, sv.size);
+    cstr_replace_with_n(self, pos, 0, sv.str, sv.size);
 }
 
 STC_INLINE bool cstr_getline(cstr *self, FILE *fp)
@@ -428,22 +428,22 @@ STC_DEF size_t cstr_find_from(cstr s, const size_t pos, const char* search) {
     return res ? res - sv.str : cstr_npos;
 }
 
-STC_DEF char* cstr_assign_n(cstr* self, const char* str, const size_t n) {
-    char* d = cstr_reserve(self, n);
-    memmove(d, str, n);
-    _cstr_set_size(self, n);
+STC_DEF char* cstr_assign_n(cstr* self, const char* str, const size_t len) {
+    char* d = cstr_reserve(self, len);
+    memmove(d, str, len);
+    _cstr_set_size(self, len);
     return d;
 }
 
-STC_DEF char* cstr_append_n(cstr* self, const char* str, const size_t n) {
+STC_DEF char* cstr_append_n(cstr* self, const char* str, const size_t len) {
     cstr_buf r = cstr_buffer(self);
-    if (r.size + n > r.cap) {
+    if (r.size + len > r.cap) {
         const size_t off = (size_t)(str - r.data);
-        r.data = cstr_reserve(self, (r.size*3 >> 1) + n);
+        r.data = cstr_reserve(self, (r.size*3 >> 1) + len);
         if (off <= r.size) str = r.data + off; /* handle self append */
     }
-    memcpy(r.data + r.size, str, n);
-    _cstr_set_size(self, r.size + n);
+    memcpy(r.data + r.size, str, len);
+    _cstr_set_size(self, r.size + len);
     return r.data;
 }
 
@@ -491,11 +491,11 @@ cstr_replace_all(cstr* self, const char* search, const char* repl) {
                                                            repl, strlen(repl)));
 }
 
-STC_DEF void cstr_erase_n(cstr* self, const size_t pos, size_t n) {
+STC_DEF void cstr_erase_n(cstr* self, const size_t pos, size_t len) {
     cstr_buf r = cstr_buffer(self);
-    if (n > r.size - pos) n = r.size - pos;
-    memmove(&r.data[pos], &r.data[pos + n], r.size - (pos + n));
-    _cstr_set_size(self, r.size - n);
+    if (len > r.size - pos) len = r.size - pos;
+    memmove(&r.data[pos], &r.data[pos + len], r.size - (pos + len));
+    _cstr_set_size(self, r.size - len);
 }
 
 #if defined(__clang__)

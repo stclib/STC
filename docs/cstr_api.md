@@ -21,7 +21,7 @@ All cstr definitions and prototypes are available by including a single header f
 cstr         cstr_init(void);                                         // constructor; same as cstr_null.
 cstr         cstr_new(const char literal_only[]);                     // cstr from literal; no strlen() call.
 cstr         cstr_from(const char* str);                              // constructor using strlen()
-cstr         cstr_from_n(const char* str, size_t n);                  // constructor with specified length
+cstr         cstr_from_n(const char* str, size_t len);                // constructor with specified length
 cstr         cstr_with_capacity(size_t cap);
 cstr         cstr_with_size(size_t len, char fill);                   // repeat fill len times
 cstr         cstr_from_fmt(const char* fmt, ...);                     // printf() formatting
@@ -48,26 +48,26 @@ void         cstr_clear(cstr* self);
 
 char*        cstr_assign(cstr* self, const char* str);
 char*        cstr_assign_s(cstr* self, cstr s);
-char*        cstr_assign_n(cstr* self, const char* str, size_t n);    // assign n first chars of str
+char*        cstr_assign_n(cstr* self, const char* str, size_t len);  // assign n first chars of str
 void         cstr_copy(cstr* self, cstr s);                           // like cstr_assign_s()
 int          cstr_printf(cstr* self, const char* fmt, ...);           // printf() formatting
 
 char*        cstr_append(cstr* self, const char* app);
 char*        cstr_append_s(cstr* self, cstr app);
-char*        cstr_append_n(cstr* self, const char* app, size_t n);
+char*        cstr_append_n(cstr* self, const char* app, size_t len);
 
 void         cstr_insert(cstr* self, size_t pos, const char* ins);
 void         cstr_insert_s(cstr* self, size_t pos, cstr ins);
-void         cstr_insert_n(cstr* self, size_t pos, const char* ins, size_t n);
+void         cstr_insert_n(cstr* self, size_t pos, const char* ins, size_t len);
 
 void         cstr_erase(cstr* self, size_t pos);
-void         cstr_erase_n(cstr* self, size_t pos, size_t n);
+void         cstr_erase_n(cstr* self, size_t pos, size_t len);
 
 size_t       cstr_replace(cstr* self, const char* search, const char* repl);
 size_t       cstr_replace_from(cstr* self, size_t pos, const char* search, const char* repl);
 void         cstr_replace_at(cstr* self, size_t pos, size_t len, const char* repl);
 void         cstr_replace_s(cstr* self, size_t pos, size_t len, cstr repl);
-void         cstr_replace_n(cstr* self, size_t pos, size_t len, const char* repl, size_t n);
+void         cstr_replace_with_n(cstr* self, size_t pos, size_t len, const char* repl, size_t rlen);
 void         cstr_replace_all(cstr* self, const char* search, const char* repl);
 
 bool         cstr_equals(cstr s, const char* str);
@@ -86,9 +86,9 @@ bool         cstr_getdelim(cstr *self, int delim, FILE *stream);      // does no
 ```c
 size_t       cstr_u8size(cstr s);                                     // number of utf8 codepoints
 size_t       cstr_u8size_n(cstr s, size_t nbytes);                    // utf8 size within n bytes  
-size_t       cstr_pos_u8(cstr s, size_t u8idx);                      // byte pos offset at utf8 index
-const char*  cstr_at_u8(const cstr* self, size_t u8idx);                 // char* position at utf8 index
-csview       cstr_chr_u8(const cstr* self, size_t u8idx);                // utf8 character at utf8 pos as csview
+size_t       cstr_pos_u8(cstr s, size_t u8idx);                       // byte pos offset at utf8 index
+const char*  cstr_at_u8(const cstr* self, size_t u8idx);              // char* position at utf8 index
+csview       cstr_chr_u8(const cstr* self, size_t u8idx);             // utf8 character at utf8 pos as csview
 
 // iterate utf8 codepoints
 cstr_iter    cstr_begin(const cstr* self);
@@ -151,7 +151,8 @@ int main() {
     cstr_erase_n(&s1, 7, 5); // -nine
     printf("%s\n", cstr_str(&s1));
 
-    cstr_replace_at(&s1, cstr_find(s1, "seven"), 5, "four");
+    //cstr_replace_at(&s1, cstr_find(s1, "seven"), 5, "four");
+    cstr_replace(&s1, "seven", "four");
     printf("%s\n", cstr_str(&s1));
 
     // reassign:
