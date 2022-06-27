@@ -200,6 +200,7 @@ _cx_memb(_shrink_to_fit)(_cx_self *self) {
 STC_INLINE _cx_iter
 _cx_memb(_begin)(const _cx_self* self) {
     _cx_iter it;
+    it.ref = NULL;
     it._d = self->nodes, it._top = 0;
     it._tn = (i_size) _csmap_rep(self)->root;
     if (it._tn)

@@ -111,6 +111,9 @@ STC_INLINE cstr cstr_from_n(const char* str, const size_t len) {
 STC_INLINE cstr cstr_from(const char* str)
     { return cstr_from_n(str, strlen(str)); }
 
+STC_INLINE cstr cstr_from_sv(csview sv)
+    { return cstr_from_n(sv.str, sv.size); }
+
 STC_INLINE cstr cstr_with_size(const size_t size, const char value) {
     cstr s;
     memset(_cstr_init(&s, size, size), value, size);

@@ -108,9 +108,6 @@ STC_INLINE bool csview_valid_utf8(csview sv) // depends on src/utf8code.c
 STC_INLINE csview csview_from_s(const cstr* self)
     { return c_make(csview){cstr_str(self), cstr_size(*self)}; }
 
-STC_INLINE cstr cstr_from_sv(csview sv)
-    { return cstr_from_n(sv.str, sv.size); }
-
 STC_INLINE csview cstr_substr(const cstr* self, size_t pos, size_t n)
     { return csview_substr(csview_from_s(self), pos, n); }
 
