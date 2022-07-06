@@ -40,7 +40,7 @@ int main() {
             cqueue_int_push(&Q, stc64_uniform(&rng, &dist));
 
         // Push or pop on the queue ten million times
-        printf("before: size, capacity: %d, %d\n", n, cqueue_int_size(Q), cqueue_int_capacity(Q));
+        printf("before: size, capacity: %d, %d\n", n, cqueue_int_size(&Q), cqueue_int_capacity(&Q));
         for (int i=n; i>0; --i) {
             int r = stc64_uniform(&rng, &dist);
             if (r & 1)
@@ -48,7 +48,7 @@ int main() {
             else
                 --n, cqueue_int_pop(&Q);
         }
-        printf("after: size, capacity: %d, %d\n", n, cqueue_int_size(Q), cqueue_int_capacity(Q));
+        printf("after: size, capacity: %d, %d\n", n, cqueue_int_size(&Q), cqueue_int_capacity(&Q));
     }
 }
 */

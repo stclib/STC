@@ -102,18 +102,18 @@ STC_API void            _cx_memb(_erase_entry)(_cx_self* self, _cx_value* val);
 STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_make(_cx_self)_cmap_inits; }
 STC_INLINE void         _cx_memb(_shrink_to_fit)(_cx_self* self) { _cx_memb(_reserve)(self, self->size); }
 STC_INLINE void         _cx_memb(_max_load_factor)(_cx_self* self, float ml) {self->max_load_factor = ml; }
-STC_INLINE bool         _cx_memb(_empty)(_cx_self m) { return m.size == 0; }
-STC_INLINE size_t       _cx_memb(_size)(_cx_self m) { return m.size; }
-STC_INLINE size_t       _cx_memb(_bucket_count)(_cx_self map) { return map.bucket_count; }
-STC_INLINE size_t       _cx_memb(_capacity)(_cx_self map)
-                            { return (size_t)(map.bucket_count*map.max_load_factor); }
+STC_INLINE bool         _cx_memb(_empty)(const _cx_self* map) { return !map->size; }
+STC_INLINE size_t       _cx_memb(_size)(const _cx_self* map) { return map->size; }
+STC_INLINE size_t       _cx_memb(_bucket_count)(_cx_self* map) { return map->bucket_count; }
+STC_INLINE size_t       _cx_memb(_capacity)(const _cx_self* map)
+                            { return (size_t)(map->bucket_count*map->max_load_factor); }
 STC_INLINE void         _cx_memb(_swap)(_cx_self *map1, _cx_self *map2) {c_swap(_cx_self, *map1, *map2); }
 STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, _cx_rawkey rkey)
                             { return self->size && self->_hashx[_cx_memb(_bucket_)(self, &rkey).idx]; }
 
 #ifndef _i_isset
     STC_API _cx_result  _cx_memb(_insert_or_assign)(_cx_self* self, i_key _key, i_val _mapped);
-    #if !defined _i_no_clone && !defined _i_no_emplace
+    #if !defined _i_no_emplace
     STC_API _cx_result  _cx_memb(_emplace_or_assign)(_cx_self* self, _cx_rawkey rkey, i_valraw rmapped);
     #endif
 
@@ -129,11 +129,11 @@ STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, _cx_rawkey rke
 #endif // !_i_isset
 
 #if !defined _i_no_clone
-STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
-    if (self->table == other.table)
+STC_INLINE void _cx_memb(_copy)(_cx_self *self, const _cx_self* other) {
+    if (self->table == other->table)
         return;
     _cx_memb(_drop)(self);
-    *self = _cx_memb(_clone)(other);
+    *self = _cx_memb(_clone)(*other);
 }
 
 STC_INLINE _cx_value
@@ -142,6 +142,7 @@ _cx_memb(_value_clone)(_cx_value _val) {
     _i_MAP_ONLY( _val.second = i_valclone(_val.second); )
     return _val;
 }
+#endif // !_i_no_clone
 
 #if !defined _i_no_emplace
 STC_INLINE _cx_result
@@ -154,10 +155,9 @@ _cx_memb(_emplace)(_cx_self* self, _cx_rawkey rkey _i_MAP_ONLY(, i_valraw rmappe
     return _res;
 }
 #endif // !_i_no_emplace
-#endif // !_i_no_clone
 
 STC_INLINE _cx_raw
-_cx_memb(_value_toraw)(_cx_value* val) {
+_cx_memb(_value_toraw)(const _cx_value* val) {
     return _i_SET_ONLY( i_keyto(val) )
            _i_MAP_ONLY( c_make(_cx_raw){i_keyto((&val->first)), i_valto((&val->second))} );
 }
@@ -299,7 +299,7 @@ STC_DEF void _cx_memb(_clear)(_cx_self* self) {
         return _res;
     }
 
-    #if !defined _i_no_clone && !defined _i_no_emplace
+    #if !defined _i_no_emplace
     STC_DEF _cx_result
     _cx_memb(_emplace_or_assign)(_cx_self* self, _cx_rawkey rkey, i_valraw rmapped) {
         _cx_result _res = _cx_memb(_insert_entry_)(self, rkey);
@@ -310,7 +310,7 @@ STC_DEF void _cx_memb(_clear)(_cx_self* self) {
         _res.ref->second = i_valfrom(rmapped);
         return _res;
     }
-    #endif // !_i_no_clone && !_i_no_emplace
+    #endif // !_i_no_emplace
 #endif // !_i_isset
 
 STC_DEF chash_bucket_t

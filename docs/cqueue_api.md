@@ -27,7 +27,7 @@ cqueue_X            cqueue_X_init(void);
 cqueue_X            cqueue_X_clone(cqueue_X q);
 
 void                cqueue_X_clear(cqueue_X* self);
-void                cqueue_X_copy(cqueue_X* self, cqueue_X other);
+void                cqueue_X_copy(cqueue_X* self, const cqueue_X* other);
 void                cqueue_X_drop(cqueue_X* self);       // destructor
 
 size_t              cqueue_X_size(cqueue_X q);

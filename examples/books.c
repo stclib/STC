@@ -33,7 +33,7 @@ int main()
         // queried using references (&str).
         if (cmap_str_contains(&book_reviews, "Les Misérables")) {
             printf("We've got %" PRIuMAX " reviews, but Les Misérables ain't one.",
-                     cmap_str_size(book_reviews));
+                     cmap_str_size(&book_reviews));
         }
 
         // oops, this review has a lot of spelling mistakes, let's delete it.

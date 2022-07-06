@@ -82,7 +82,7 @@ STC_API char*       _cbits_to_str(const uint64_t* set, const size_t sz,
 
 #define _i_memb(name) c_paste(i_type, name)
 
-#if !defined i_len
+#if !defined i_cap
 
 #define _i_assert(x) assert(x)
 #define i_type cbits
@@ -90,6 +90,7 @@ STC_API char*       _cbits_to_str(const uint64_t* set, const size_t sz,
 struct { uint64_t *data64; size_t _size; } typedef i_type;
 
 STC_INLINE cbits    cbits_init(void) { return c_make(cbits){NULL}; }
+STC_INLINE void     cbits_inits(cbits* self) { self->data64 = NULL; self->_size = 0; }
 STC_INLINE void     cbits_drop(cbits* self) { c_free(self->data64); }
 STC_INLINE size_t   cbits_size(const cbits* self) { return self->_size; }
 STC_API void        cbits_resize(cbits* self, size_t size, bool value);
@@ -131,18 +132,19 @@ STC_INLINE cbits cbits_with_pattern(const size_t size, const uint64_t pattern) {
     return set;
 }
 
-#else // i_len
+#else // i_cap
 
 #define _i_assert(x) (void)0
 #if !defined i_type
-  #define i_type c_paste(cbits, i_len)
+  #define i_type c_paste(cbits, i_cap)
 #endif
 
-struct { uint64_t data64[(i_len - 1)/64 + 1]; } typedef i_type;
+struct { uint64_t data64[(i_cap - 1)/64 + 1]; } typedef i_type;
 
 STC_INLINE i_type   _i_memb(_init)(void) { return c_make(i_type){0}; }
+STC_INLINE void     _i_memb(_inits)(i_type* self) {}
 STC_INLINE void     _i_memb(_drop)(i_type* self) {}
-STC_INLINE size_t   _i_memb(_size)(const i_type* self) { return i_len; }
+STC_INLINE size_t   _i_memb(_size)(const i_type* self) { return i_cap; }
 STC_INLINE i_type   _i_memb(_move)(i_type* self) { return *self; }
 
 STC_INLINE i_type*  _i_memb(_take)(i_type* self, i_type other)
@@ -151,24 +153,24 @@ STC_INLINE i_type*  _i_memb(_take)(i_type* self, i_type other)
 STC_INLINE i_type _i_memb(_clone)(i_type other)
     { return other; }
 
-STC_INLINE i_type* _i_memb(_copy)(i_type* self, i_type other) 
-    { *self = other; return self; }
+STC_INLINE i_type* _i_memb(_copy)(i_type* self, const i_type* other) 
+    { *self = *other; return self; }
     
 STC_INLINE void _i_memb(_set_all)(i_type *self, const bool value);
 STC_INLINE void _i_memb(_set_pattern)(i_type *self, const uint64_t pattern);
 
 STC_INLINE i_type _i_memb(_with_size)(const size_t size, const bool value) {
-    assert(size <= i_len);
+    assert(size <= i_cap);
     i_type set; _i_memb(_set_all)(&set, value);
     return set;
 }
 
 STC_INLINE i_type _i_memb(_with_pattern)(const size_t size, const uint64_t pattern) {
-    assert(size <= i_len);
+    assert(size <= i_cap);
     i_type set; _i_memb(_set_pattern)(&set, pattern);
     return set;
 }
-#endif // i_len
+#endif // i_cap
 
 
 STC_INLINE void _i_memb(_set_all)(i_type *self, const bool value)
@@ -248,7 +250,7 @@ STC_INLINE bool _i_memb(_disjoint)(const i_type* self, const i_type* other) {
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement) || defined(i_extern)
 
-#if !defined i_len
+#if !defined i_cap
 STC_DEF cbits* cbits_copy(cbits* self, const cbits* other) {
     if (self->data64 == other->data64)
         return self;
@@ -318,7 +320,7 @@ STC_DEF bool _cbits_disjoint(const uint64_t* set, const uint64_t* other, const s
 #define CBITS_H_INCLUDED
 #undef _i_memb
 #undef _i_assert
-#undef i_len
+#undef i_cap
 #undef i_type
 #undef i_opt
 #undef i_header

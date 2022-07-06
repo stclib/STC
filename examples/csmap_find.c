@@ -17,10 +17,10 @@ void print_elem(csmap_istr_raw p) {
 }
 
 #define using_print_collection(CX) \
-    void print_collection_##CX(CX t) { \
+    void print_collection_##CX(const CX* t) { \
         printf("%" PRIuMAX " elements: ", CX##_size(t)); \
     \
-        c_foreach (p, CX, t) { \
+        c_foreach (p, CX, *t) { \
             print_elem(CX##_value_toraw(p.ref)); \
         } \
         puts(""); \
@@ -48,7 +48,7 @@ int main()
         c_apply(v, csmap_istr_emplace(&m1, c_pair(v)), csmap_istr_raw, 
             {{40, "Zr"}, {45, "Rh"}});
         puts("The starting map m1 is (key, value):");
-        print_collection_csmap_istr(m1);
+        print_collection_csmap_istr(&m1);
 
         typedef cvec_istr_value pair;
         cvec_istr_push_back(&v, (pair){43, "Tc"});
@@ -59,13 +59,13 @@ int main()
         cvec_istr_push_back(&v, (pair){44, "Ru"}); // attempt a duplicate
 
         puts("Inserting the following vector data into m1:");
-        print_collection_cvec_istr(v);
+        print_collection_cvec_istr(&v);
 
         c_foreach (i, cvec_istr, cvec_istr_begin(&v), cvec_istr_end(&v))
             csmap_istr_emplace(&m1, c_pair(i.ref));
 
         puts("The modified map m1 is (key, value):");
-        print_collection_csmap_istr(m1);
+        print_collection_csmap_istr(&m1);
         puts("");
         findit(m1, 45);
         findit(m1, 6);

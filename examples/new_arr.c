@@ -17,7 +17,7 @@ int main()
                                   carr2_int_drop(&volume))
     {
         int *dat = carr2_int_data(&volume);
-        for (size_t i = 0; i < carr2_int_size(volume); ++i)
+        for (size_t i = 0; i < carr2_int_size(&volume); ++i)
             dat[i] = i;
 
         for (size_t x = 0; x < volume.xdim; ++x)
@@ -34,7 +34,7 @@ int main()
                                   carr3_int_drop(&volume))
     {
         int *dat = carr3_int_data(&volume);
-        for (size_t i = 0; i < carr3_int_size(volume); ++i)
+        for (size_t i = 0; i < carr3_int_size(&volume); ++i)
             dat[i] = i;
 
         for (size_t x = 0; x < volume.xdim; ++x)

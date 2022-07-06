@@ -73,14 +73,14 @@ STC_INLINE void _cx_memb(_clear)(_cx_self* self) {
 STC_INLINE void _cx_memb(_drop)(_cx_self* self)
     { _cx_memb(_clear)(self); c_free(self->data); }
 
-STC_INLINE size_t _cx_memb(_size)(_cx_self q)
-    { return q.size; }
+STC_INLINE size_t _cx_memb(_size)(const _cx_self* q)
+    { return q->size; }
 
-STC_INLINE bool _cx_memb(_empty)(_cx_self q)
-    { return !q.size; }
+STC_INLINE bool _cx_memb(_empty)(const _cx_self* q)
+    { return !q->size; }
 
-STC_INLINE size_t _cx_memb(_capacity)(_cx_self q)
-    { return q.capacity; }
+STC_INLINE size_t _cx_memb(_capacity)(const _cx_self* q)
+    { return q->capacity; }
 
 STC_INLINE _cx_value* _cx_memb(_top)(const _cx_self* self)
     { return &self->data[0]; }
@@ -91,18 +91,19 @@ STC_INLINE void _cx_memb(_pop)(_cx_self* self)
 #if !defined _i_no_clone
 STC_API _cx_self _cx_memb(_clone)(_cx_self q);
 
-STC_INLINE void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
-    if (self->data == other.data) return;
-    _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
+STC_INLINE void _cx_memb(_copy)(_cx_self *self, const _cx_self* other) {
+    if (self->data == other->data) return;
+    _cx_memb(_drop)(self);
+    *self = _cx_memb(_clone)(*other);
 }
 STC_INLINE i_key _cx_memb(_value_clone)(_cx_value val)
     { return i_keyclone(val); }
+#endif // !_i_no_clone
 
 #if !defined _i_no_emplace
 STC_INLINE void _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
     { _cx_memb(_push)(self, i_keyfrom(raw)); }
 #endif // !_i_no_emplace
-#endif // !_i_no_clone
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement)
@@ -118,7 +119,7 @@ _cx_memb(_sift_down_)(_cx_value* arr, const size_t idx, const size_t n) {
 
 STC_DEF void
 _cx_memb(_make_heap)(_cx_self* self) {
-    size_t n = _cx_memb(_size)(*self);
+    size_t n = self->size;
     _cx_value *arr = self->data - 1;
     for (size_t k = n >> 1; k != 0; --k)
         _cx_memb(_sift_down_)(arr, k, n);

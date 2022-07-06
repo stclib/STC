@@ -48,17 +48,17 @@ cmap_X                cmap_X_with_capacity(size_t cap);
 cmap_X                cmap_X_clone(cmap_x map);
 
 void                  cmap_X_clear(cmap_X* self);
-void                  cmap_X_copy(cmap_X* self, cmap_X other);
+void                  cmap_X_copy(cmap_X* self, const cmap_X* other);
 void                  cmap_X_max_load_factor(cmap_X* self, float max_load);                     // default: 0.85
 bool                  cmap_X_reserve(cmap_X* self, size_t size);
 void                  cmap_X_shrink_to_fit(cmap_X* self);
 void                  cmap_X_swap(cmap_X* a, cmap_X* b);
 void                  cmap_X_drop(cmap_X* self);                                                // destructor
 
-size_t                cmap_X_size(cmap_X map);
-size_t                cmap_X_capacity(cmap_X map);                                              // buckets * max_load_factor
-bool                  cmap_X_empty(cmap_X map);
-size_t                cmap_X_bucket_count(cmap_X map);                                          // num. of allocated buckets
+size_t                cmap_X_size(const cmap_X* self);
+size_t                cmap_X_capacity(const cmap_X self);                                       // buckets * max_load_factor
+bool                  cmap_X_empty(const cmap_X* self );
+size_t                cmap_X_bucket_count(const cmap_X* self);                                  // num. of allocated buckets
 
 const cmap_X_mapped*  cmap_X_at(const cmap_X* self, i_keyraw rkey);                             // rkey must be in map
 cmap_X_mapped*        cmap_X_at_mut(cmap_X* self, i_keyraw rkey);                               // mutable at

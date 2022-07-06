@@ -300,9 +300,6 @@ STC_INLINE char* cstr_assign_s(cstr* self, cstr s) {
     return cstr_assign_n(self, sv.str, sv.size);
 }
 
-STC_INLINE void cstr_copy(cstr* self, cstr s)
-    { cstr_assign_s(self, s); }
-
 STC_INLINE char* cstr_append(cstr* self, const char* str)
     { return cstr_append_n(self, str, strlen(str)); }
 

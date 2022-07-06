@@ -5,47 +5,47 @@
 #include <stc/cstr.h>
 #include "external/khash.h"
 
-enum {max_load_factor = 77};
+#define MAX_LOAD_FACTOR 77
 
 #ifdef __cplusplus
 #include <limits>
 #include <unordered_map>
-#include "external/robin_hood.h"
-#include "external/skarupke/bytell_hash_map.hpp"
-#include "external/parallel_hashmap/phmap.h"
-#include "external/tsl/hopscotch_map.h"
+#include "external/ankerl/robin_hood.h"
+#include "external/ankerl/unordered_dense.h"
+#include "external/skarupke/flat_hash_map.hpp"
+//#include "external/skarupke/bytell_hash_map.hpp"
+//#include "external/parallel_hashmap/phmap.h"
+//#include "external/tsl/hopscotch_map.h"
 #include "external/tsl/robin_map.h"
 
 template<typename C> inline void std_destroy(C& c) { C().swap(c); }
 
 template <class K, class V> using robin_hood_flat_map = robin_hood::unordered_flat_map<
-                                  K, V, robin_hood::hash<K>, std::equal_to<K>, max_load_factor>;
+                                  K, V, robin_hood::hash<K>, std::equal_to<K>, MAX_LOAD_FACTOR>;
 #endif
 
+// khash template expansion
 KHASH_MAP_INIT_INT64(ii, int64_t)
 
-// cmap and khash template expansion
+// cmap template expansion
 #define i_key int64_t
 #define i_val int64_t
 #define i_tag ii
 #include <stc/cmap.h>
 
-stc64_t rng;
-size_t seed;
-#define SEED(s) rng = stc64_new(seed)
+#define SEED(s) rng = stc64_new(s)
 #define RAND(N) (stc64_rand(&rng) & (((uint64_t)1 << N) - 1))
 
-
 #define CMAP_SETUP(X, Key, Value) cmap_##X map = cmap_##X##_init() \
-                                  ; cmap_##X##_max_load_factor(&map, max_load_factor/100.0f)
+                                  ; cmap_##X##_max_load_factor(&map, MAX_LOAD_FACTOR/100.0f)
 #define CMAP_PUT(X, key, val)     cmap_##X##_insert_or_assign(&map, key, val).ref->second
 #define CMAP_EMPLACE(X, key, val) cmap_##X##_insert(&map, key, val).ref->second
 #define CMAP_ERASE(X, key)        cmap_##X##_erase(&map, key)
 #define CMAP_FIND(X, key)         cmap_##X##_contains(&map, key)
 #define CMAP_FOR(X, i)            c_foreach (i, cmap_##X, map)
 #define CMAP_ITEM(X, i)           i.ref->second
-#define CMAP_SIZE(X)              cmap_##X##_size(map)
-#define CMAP_BUCKETS(X)           cmap_##X##_bucket_count(map)
+#define CMAP_SIZE(X)              cmap_##X##_size(&map)
+#define CMAP_BUCKETS(X)           cmap_##X##_bucket_count(&map)
 #define CMAP_CLEAR(X)             cmap_##X##_clear(&map)
 #define CMAP_DTOR(X)              cmap_##X##_drop(&map)
 
@@ -61,7 +61,7 @@ size_t seed;
 #define KMAP_CLEAR(X)             kh_clear(X, map)
 #define KMAP_DTOR(X)              kh_destroy(X, map)
 
-#define UMAP_SETUP(X, Key, Value) std::unordered_map<Key, Value> map; map.max_load_factor(max_load_factor/100.0f)
+#define UMAP_SETUP(X, Key, Value) std::unordered_map<Key, Value> map; map.max_load_factor(MAX_LOAD_FACTOR/100.0f)
 #define UMAP_PUT(X, key, val)     (map[key] = val)
 #define UMAP_EMPLACE(X, key, val) map.emplace(key, val).first->second
 #define UMAP_FIND(X, key)         int(map.find(key) != map.end())
@@ -73,7 +73,7 @@ size_t seed;
 #define UMAP_CLEAR(X)             map.clear()
 #define UMAP_DTOR(X)              std_destroy(map)
 
-#define FMAP_SETUP(X, Key, Value) ska::flat_hash_map<Key, Value> map; map.max_load_factor(max_load_factor/100.0f)
+#define FMAP_SETUP(X, Key, Value) ska::flat_hash_map<Key, Value> map; map.max_load_factor(MAX_LOAD_FACTOR/100.0f)
 #define FMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
 #define FMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
 #define FMAP_FIND(X, key)         UMAP_FIND(X, key)
@@ -85,7 +85,7 @@ size_t seed;
 #define FMAP_CLEAR(X)             UMAP_CLEAR(X)
 #define FMAP_DTOR(X)              UMAP_DTOR(X)
 
-#define HMAP_SETUP(X, Key, Value) tsl::hopscotch_map<Key, Value> map; map.max_load_factor(max_load_factor/100.0f)
+#define HMAP_SETUP(X, Key, Value) tsl::hopscotch_map<Key, Value> map; map.max_load_factor(MAX_LOAD_FACTOR/100.0f)
 #define HMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
 #define HMAP_EMPLACE(X, key, val) map.emplace(key, val).first.value()
 #define HMAP_FIND(X, key)         UMAP_FIND(X, key)
@@ -97,7 +97,7 @@ size_t seed;
 #define HMAP_CLEAR(X)             UMAP_CLEAR(X)
 #define HMAP_DTOR(X)              UMAP_DTOR(X)
 
-#define TMAP_SETUP(X, Key, Value) tsl::robin_map<Key, Value> map; map.max_load_factor(max_load_factor/100.0f)
+#define TMAP_SETUP(X, Key, Value) tsl::robin_map<Key, Value> map; map.max_load_factor(MAX_LOAD_FACTOR/100.0f)
 #define TMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
 #define TMAP_EMPLACE(X, key, val) map.emplace(key, val).first.value()
 #define TMAP_FIND(X, key)         UMAP_FIND(X, key)
@@ -122,7 +122,19 @@ size_t seed;
 #define RMAP_CLEAR(X)             UMAP_CLEAR(X)
 #define RMAP_DTOR(X)              UMAP_DTOR(X)
 
-#define PMAP_SETUP(X, Key, Value) phmap::flat_hash_map<Key, Value> map; map.max_load_factor(max_load_factor/100.0f)
+#define DMAP_SETUP(X, Key, Value) ankerl::unordered_dense::map<Key, Value> map; map.max_load_factor(MAX_LOAD_FACTOR/100.0f)
+#define DMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
+#define DMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
+#define DMAP_FIND(X, key)         UMAP_FIND(X, key)
+#define DMAP_ERASE(X, key)        UMAP_ERASE(X, key)
+#define DMAP_FOR(X, i)            UMAP_FOR(X, i)
+#define DMAP_ITEM(X, i)           UMAP_ITEM(X, i)
+#define DMAP_SIZE(X)              UMAP_SIZE(X)
+#define DMAP_BUCKETS(X)           UMAP_BUCKETS(X)
+#define DMAP_CLEAR(X)             UMAP_CLEAR(X)
+#define DMAP_DTOR(X)              UMAP_DTOR(X)
+
+#define PMAP_SETUP(X, Key, Value) phmap::flat_hash_map<Key, Value> map; map.max_load_factor(MAX_LOAD_FACTOR/100.0f)
 #define PMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
 #define PMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
 #define PMAP_FIND(X, key)         UMAP_FIND(X, key)
@@ -191,7 +203,7 @@ size_t seed;
     SEED(seed); \
     for (size_t i = 0; i < m; ++i) \
         M##_PUT(X, RAND(keybits), i); \
-    size_t x = 200000000/M##_SIZE(X); \
+    size_t x = 100000000/M##_SIZE(X); \
     clock_t difference, before = clock(); \
     for (size_t k=0; k < x; k++) M##_FOR (X, it) \
         sum += M##_ITEM(X, it); \
@@ -211,7 +223,7 @@ size_t seed;
     for (size_t i = 0; i < m; ++i) \
         M##_PUT(X, RAND(keybits), i); \
     before = clock(); \
-    size_t x = m * 10000000/M##_SIZE(X); \
+    size_t x = m * 8000000/M##_SIZE(X); \
     for (size_t i = 0; i < x; ++i) \
         found += M##_FIND(X, RAND(keybits)); \
     SEED(seed); \
@@ -226,16 +238,16 @@ size_t seed;
 
 #ifdef __cplusplus
 #define RUN_TEST(n) MAP_TEST##n(KMAP, ii, N##n) MAP_TEST##n(CMAP, ii, N##n) \
-                    MAP_TEST##n(PMAP, ii, N##n) MAP_TEST##n(FMAP, ii, N##n) \
-                    MAP_TEST##n(RMAP, ii, N##n) MAP_TEST##n(HMAP, ii, N##n) \
-                    MAP_TEST##n(TMAP, ii, N##n) MAP_TEST##n(UMAP, ii, N##n)
+                    MAP_TEST##n(FMAP, ii, N##n) MAP_TEST##n(TMAP, ii, N##n) \
+                    MAP_TEST##n(RMAP, ii, N##n) MAP_TEST##n(DMAP, ii, N##n) \
+                    MAP_TEST##n(UMAP, ii, N##n)
 #else
 #define RUN_TEST(n) MAP_TEST##n(KMAP, ii, N##n) MAP_TEST##n(CMAP, ii, N##n)
 #endif
 
 enum {
-    DEFAULT_N_MILL = 40,
-    DEFAULT_KEYBITS = 25,
+    DEFAULT_N_MILL = 10,
+    DEFAULT_KEYBITS = 22,
 };
 
 int main(int argc, char* argv[])
@@ -244,16 +256,18 @@ int main(int argc, char* argv[])
     unsigned keybits = argc >= 3 ? atoi(argv[2]) : DEFAULT_KEYBITS;
     unsigned n = n_mill * 1000000;
     unsigned N0 = n, N1 = n/2, N2 = n/2, N3 = n, N4 = n, N5 = n;
-    seed = time(NULL); // 1636306010;
+    stc64_t rng;
+    size_t seed = time(NULL);
 
     printf("\nUnordered hash map shootout\n");
-    printf("CMAP = https://github.com/tylov/STC\n"
-           "KMAP = https://github.com/attractivechaos/klib\n"
-           "PMAP = https://github.com/greg7mdp/parallel-hashmap\n"
+    printf("KMAP = https://github.com/attractivechaos/klib\n"
+           "CMAP = https://github.com/tylov/STC (**)\n"
+           //"PMAP = https://github.com/greg7mdp/parallel-hashmap\n"
            "FMAP = https://github.com/skarupke/flat_hash_map\n"
-           "RMAP = https://github.com/martinus/robin-hood-hashing\n"
-           "HMAP = https://github.com/Tessil/hopscotch-map\n"
            "TMAP = https://github.com/Tessil/robin-map\n"
+           //"HMAP = https://github.com/Tessil/hopscotch-map\n"
+           "RMAP = https://github.com/martinus/robin-hood-hashing\n"
+           "DMAP = https://github.com/martinus/unordered_dense\n"
            "UMAP = std::unordered_map\n\n");
            
     printf("Usage %s [n-million=%d key-bits=%d]\n", argv[0], DEFAULT_N_MILL, DEFAULT_KEYBITS);

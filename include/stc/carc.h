@@ -155,7 +155,7 @@ STC_INLINE _cx_self _cx_memb(_clone)(_cx_self ptr) {
     return ptr;
 }
 
-STC_INLINE void _cx_memb(_copy)(_cx_self* self, _cx_self ptr) {
+STC_INLINE void _cx_memb(_assign)(_cx_self* self, _cx_self ptr) {
     if (ptr.use_count)
         _i_atomic_inc(ptr.use_count);
     _cx_memb(_drop)(self);

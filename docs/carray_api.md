@@ -26,11 +26,11 @@ carr2_X             carr2_X_with_size(size_t xdim, size_t ydim, i_val val);
 carr2_X             carr2_X_with_data(size_t xdim, size_t ydim, i_val* array);
 carr2_X             carr2_X_new_uninit(size_t xdim, size_t ydim);
 carr2_X             carr2_X_clone(carr2_X arr);
-void                carr2_X_copy(carr2_X* self, carr2_X other);
+void                carr2_X_copy(carr2_X* self, const carr2_X* other);
 i_val*              carr2_X_release(carr2_X* self);       // release storage (not freed)
 void                carr2_X_drop(carr2_X* self);
 
-size_t              carr2_X_size(carr2_X arr);
+size_t              carr2_X_size(const carr2_X* self);
 i_val*              carr2_X_data(carr2_X* self);          // access storage data
 const i_val*        carr2_X_at(const carr2_X* self, size_t x, size_t y);
 size_t              carr2_X_idx(const carr2_X* self, size_t x, size_t y);
@@ -47,11 +47,11 @@ carr3_X             carr3_X_with_size(size_t xdim, size_t ydim, size_t zdim, i_v
 carr3_X             carr3_X_with_data(size_t xdim, size_t ydim, size_t zdim, i_val* array);
 carr3_X             carr3_X_new_uninit(size_t xdim, size_t ydim, size_t zdim);
 carr3_X             carr3_X_clone(carr3_X arr);
-void                carr3_X_copy(carr3_X* self, carr3_X other);
+void                carr3_X_copy(carr3_X* self, const carr3_X* other);
 i_val*              carr3_X_release(carr3_X* self);                               // release storage (not freed)
 void                carr3_X_drop(carr3_X* self);
 
-size_t              carr3_X_size(carr3_X arr);
+size_t              carr3_X_size(const carr3_X* self);
 i_val*              carr3_X_data(carr3_X* self);                                  // storage data
 const i_val*        carr3_X_at(const carr3_X* self, size_t x, size_t y, size_t z);
 size_t              carr3_X_idx(const carr3_X* self, size_t x, size_t y, size_t z);

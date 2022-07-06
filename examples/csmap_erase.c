@@ -12,7 +12,7 @@ void printmap(mymap m)
 {
     c_foreach (elem, mymap, m)
         printf(" [%d, %s]", elem.ref->first, cstr_str(&elem.ref->second));
-    printf("\nsize() == %" PRIuMAX "\n\n", mymap_size(m));
+    printf("\nsize() == %" PRIuMAX "\n\n", mymap_size(&m));
 }
 
 int main()

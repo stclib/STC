@@ -155,11 +155,11 @@ _cx_memb(_value_clone)(_cx_value _val) {
 }
 
 STC_INLINE void
-_cx_memb(_copy)(_cx_self *self, _cx_self other) {
-    if (self->root == other.root)
+_cx_memb(_copy)(_cx_self *self, const _cx_self* other) {
+    if (self->root == other->root)
         return;
     _cx_memb(_drop)(self);
-    *self = _cx_memb(_clone)(other);
+    *self = _cx_memb(_clone)(*other);
 }
 #endif // !_i_no_clone
 

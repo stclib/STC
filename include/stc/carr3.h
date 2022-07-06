@@ -38,7 +38,7 @@ int main() {
     c_autovar (carr3_int image = carr3_int_new_uninit(w, h, d), carr3_int_drop(&image))
     {
         int *dat = carr3_int_data(&image);
-        for (int i = 0; i < carr3_int_size(image); ++i)
+        for (int i = 0; i < carr3_int_size(&image); ++i)
             dat[i] = i;
 
         for (int x = 0; x < image.xdim; ++x)
@@ -69,15 +69,15 @@ STC_API _cx_value* _cx_memb(_release)(_cx_self* self);
 STC_API void       _cx_memb(_drop)(_cx_self* self);
 #if !defined _i_no_clone
 STC_API _cx_self   _cx_memb(_clone)(_cx_self src);
-STC_API void       _cx_memb(_copy)(_cx_self *self, _cx_self other);
+STC_API void       _cx_memb(_copy)(_cx_self *self, const _cx_self* other);
 #endif
 
 STC_INLINE _cx_self _cx_memb(_new_uninit)(size_t xdim, size_t ydim, size_t zdim) {
     return _cx_memb(_with_data)(xdim, ydim, zdim, c_alloc_n(_cx_value, xdim*ydim*zdim));
 }
 
-STC_INLINE size_t _cx_memb(_size)(_cx_self arr)
-    { return arr.xdim*arr.ydim*arr.zdim; }
+STC_INLINE size_t _cx_memb(_size)(const _cx_self* self)
+    { return self->xdim*self->ydim*self->zdim; }
 
 STC_INLINE _cx_value* _cx_memb(_data)(_cx_self* self)
     { return **self->data; }
@@ -95,7 +95,7 @@ STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self)
     { return c_make(_cx_iter){**self->data}; }
 
 STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self)
-    { return c_make(_cx_iter){**self->data + _cx_memb(_size)(*self)}; }
+    { return c_make(_cx_iter){**self->data + _cx_memb(_size)(self)}; }
 
 STC_INLINE void _cx_memb(_next)(_cx_iter* it)
     { ++it->ref; }
@@ -123,14 +123,14 @@ STC_DEF _cx_self _cx_memb(_with_size)(size_t xdim, size_t ydim, size_t zdim, i_k
 
 STC_DEF _cx_self _cx_memb(_clone)(_cx_self src) {
     _cx_self _arr = _cx_memb(_new_uninit)(src.xdim, src.ydim, src.zdim);
-    for (_cx_value* p = **_arr.data, *q = **src.data, *e = p + _cx_memb(_size)(src); p != e; ++p, ++q)
+    for (_cx_value* p = **_arr.data, *q = **src.data, *e = p + _cx_memb(_size)(&src); p != e; ++p, ++q)
         *p = i_keyclone((*q));
     return _arr;
 }
 
-STC_DEF void _cx_memb(_copy)(_cx_self *self, _cx_self other) {
-    if (self->data == other.data) return;
-    _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
+STC_DEF void _cx_memb(_copy)(_cx_self *self, const _cx_self* other) {
+    if (self->data == other->data) return;
+    _cx_memb(_drop)(self); *self = _cx_memb(_clone)(*other);
 }
 #endif
 
@@ -143,7 +143,7 @@ STC_DEF _cx_value* _cx_memb(_release)(_cx_self* self) {
 
 STC_DEF void _cx_memb(_drop)(_cx_self* self) {
     if (!self->data) return;
-    for (_cx_value* p = **self->data, *q = p + _cx_memb(_size)(*self);  p != q; ) {
+    for (_cx_value* p = **self->data, *q = p + _cx_memb(_size)(self);  p != q; ) {
         --q; i_keydrop(q);
     }
     c_free(self->data[0][0]); /* data */

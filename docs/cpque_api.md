@@ -32,11 +32,11 @@ cpque_X             cpque_X_clone(cpque_X pq);
 void                cpque_X_clear(cpque_X* self);
 bool                cpque_X_reserve(cpque_X* self, size_t n);
 void                cpque_X_shrink_to_fit(cpque_X* self);
-void                cpque_X_copy(cpque_X* self, cpque_X other);
+void                cpque_X_copy(cpque_X* self, const cpque_X* other);
 void                cpque_X_drop(cpque_X* self);        // destructor
 
-size_t              cpque_X_size(cpque_X pq);
-bool                cpque_X_empty(cpque_X pq);
+size_t              cpque_X_size(const cpque_X* self);
+bool                cpque_X_empty(const cpque_X* self);
 i_val*              cpque_X_top(const cpque_X* self);
 
 void                cpque_X_make_heap(cpque_X* self);  // heapify the vector.

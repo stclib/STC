@@ -77,11 +77,11 @@ Sample test_stc_deque() {
         c_forrange (N/3) {cdeq_x_push_back(&con, crandom() & mask1); cdeq_x_pop_front(&con);}
         c_forrange (N/3) cdeq_x_push_back(&con, crandom() & mask1);
         s.test[INSERT].t2 = clock();
-        s.test[INSERT].sum = cdeq_x_size(con);
+        s.test[INSERT].sum = cdeq_x_size(&con);
         s.test[ERASE].t1 = clock();
-        c_forrange (cdeq_x_size(con)/2) { cdeq_x_pop_front(&con); cdeq_x_pop_back(&con); }
+        c_forrange (cdeq_x_size(&con)/2) { cdeq_x_pop_front(&con); cdeq_x_pop_back(&con); }
         s.test[ERASE].t2 = clock();
-        s.test[ERASE].sum = cdeq_x_size(con);
+        s.test[ERASE].sum = cdeq_x_size(&con);
         cdeq_x_drop(&con);
      }{
         csrandom(seed);

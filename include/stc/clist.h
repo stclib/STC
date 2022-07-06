@@ -116,10 +116,12 @@ STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_INLINE i_key        _cx_memb(_value_clone)(i_key val)
                             { return i_keyclone(val); }
 STC_INLINE void
-_cx_memb(_copy)(_cx_self *self, _cx_self other) {
-    if (self->last == other.last) return;
-    _cx_memb(_drop)(self); *self = _cx_memb(_clone)(other);
+_cx_memb(_copy)(_cx_self *self, const _cx_self* other) {
+    if (self->last == other->last) return;
+    _cx_memb(_drop)(self); *self = _cx_memb(_clone)(*other);
 }
+#endif // !_i_no_clone
+
 #if !defined _i_no_emplace
 STC_INLINE _cx_value*   _cx_memb(_emplace_back)(_cx_self* self, _cx_raw raw)
                             { return _cx_memb(_push_back)(self, i_keyfrom(raw)); }
@@ -130,11 +132,10 @@ STC_INLINE _cx_iter     _cx_memb(_emplace_at)(_cx_self* self, _cx_iter it, _cx_r
 STC_INLINE _cx_value*   _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
                             { return _cx_memb(_push_back)(self, i_keyfrom(raw)); }
 #endif // !_i_no_emplace
-#endif // !_i_no_clone
 
 STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_make(_cx_self){NULL}; }
 STC_INLINE bool         _cx_memb(_reserve)(_cx_self* self, size_t n) { return true; }
-STC_INLINE bool         _cx_memb(_empty)(_cx_self cx) { return cx.last == NULL; }
+STC_INLINE bool         _cx_memb(_empty)(const _cx_self* self) { return self->last == NULL; }
 STC_INLINE void         _cx_memb(_clear)(_cx_self* self) { _cx_memb(_drop)(self); }
 STC_INLINE _cx_value*   _cx_memb(_push)(_cx_self* self, i_key value)
                             { return _cx_memb(_push_back)(self, value); }

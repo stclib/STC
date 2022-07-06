@@ -47,12 +47,13 @@ void                  csmap_X_shrink_to_fit(csmap_X* self);
 csmap_X               csmap_X_clone(csmap_x map);
 
 void                  csmap_X_clear(csmap_X* self);
-void                  csmap_X_copy(csmap_X* self, csmap_X other);
+void                  csmap_X_copy(csmap_X* self, const csmap_X* other);
 void                  csmap_X_swap(csmap_X* a, csmap_X* b);
 void                  csmap_X_drop(csmap_X* self);                                               // destructor
 
-size_t                csmap_X_size(csmap_X map);
-bool                  csmap_X_empty(csmap_X map);
+size_t                csmap_X_size(const csmap_X self);
+bool                  csmap_X_empty(const csmap_X* self);
+bool                  csmap_X_capacity(const csmap_X* self);
 
 const csmap_X_mapped* csmap_X_at(const csmap_X* self, i_keyraw rkey);                            // rkey must be in map
 csmap_X_mapped*       csmap_X_at_mut(csmap_X* self, i_keyraw rkey);                              // mutable at

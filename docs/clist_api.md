@@ -42,7 +42,7 @@ clist_X             clist_X_init(void);
 clist_X             clist_X_clone(clist_X list);
 
 void                clist_X_clear(clist_X* self);
-void                clist_X_copy(clist_X* self, clist_X other);
+void                clist_X_copy(clist_X* self, const clist_X* other);
 void                clist_X_drop(clist_X* self);                                          // destructor
 
 bool                clist_X_empty(clist_X list);

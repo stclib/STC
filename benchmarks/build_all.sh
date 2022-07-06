@@ -1,5 +1,5 @@
 #!/bin/bash
-cc='g++ -std=c++17'
+cc='g++ -std=c++20'
 #cc='clang'
 #cc='clang -c -DSTC_HEADER'
 #cc='cl -nologo'

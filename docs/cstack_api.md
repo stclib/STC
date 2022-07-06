@@ -32,12 +32,12 @@ void                cstack_X_clear(cstack_X* self);
 bool                cstack_X_reserve(cstack_X* self, size_t n);
 void                cstack_X_shrink_to_fit(cstack_X* self);
 i_val*              cstack_X_append_uninit(cstack_X* self, size_t n);
-void                cstack_X_copy(cstack_X* self, cstack_X other);
+void                cstack_X_copy(cstack_X* self, const cstack_X* other);
 void                cstack_X_drop(cstack_X* self);                       // destructor
 
-size_t              cstack_X_size(cstack_X st);
-size_t              cstack_X_capacity(cstack_X st);
-bool                cstack_X_empty(cstack_X st);
+size_t              cstack_X_size(const cstack_X* self);
+size_t              cstack_X_capacity(const cstack_X* self);
+bool                cstack_X_empty(const cstack_X* self);
 
 i_val*              cstack_X_top(const cstack_X* self);
 const i_val*        cstack_X_at(const cstack_X* self, size_t idx);

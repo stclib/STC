@@ -37,7 +37,7 @@ int main()
             uint64_t key = romu_trio(rng) & mask;
             cmap_u64_insert(&m, key, 0).ref->second += 1;
         }
-        printf("insert  : %zums  \tsize : %" PRIuMAX "\n", (clock() - now)/ms, cmap_u64_size(m));
+        printf("insert  : %zums  \tsize : %" PRIuMAX "\n", (clock() - now)/ms, cmap_u64_size(&m));
 
         now = clock();
         sum = 0;
@@ -55,7 +55,7 @@ int main()
             uint64_t key = romu_trio(rng2) & mask;
             cmap_u64_erase(&m, key);
         }
-        printf("remove  : %zums  \tsize : %" PRIuMAX "\n", (clock() - now)/ms, cmap_u64_size(m));
+        printf("remove  : %zums  \tsize : %" PRIuMAX "\n", (clock() - now)/ms, cmap_u64_size(&m));
         printf("press a key:\n"); getchar();
     }
 }

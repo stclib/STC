@@ -44,7 +44,7 @@ int main(void)
         c_apply_array(v, cpque_f_push(&floats, *v), const float, nums, c_arraylen(nums));
 
         puts("\npop and show high priorites first:");
-        while (! cpque_f_empty(floats)) {
+        while (! cpque_f_empty(&floats)) {
             printf("%.1f ", *cpque_f_top(&floats));
             cpque_f_pop(&floats);
         }

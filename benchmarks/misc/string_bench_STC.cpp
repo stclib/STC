@@ -68,10 +68,10 @@ private:
 
 void initShortStringVec(cvec_str* vs, cvec_sv* vsv)
 {
-    cvec_str_clear(vs);
+    cvec_str_drop(vs);
     cvec_sv_clear(vsv);
     
-    cvec_str_copy(vs, read_file("names.txt"));
+    *vs = read_file("names.txt");
 /*
     cvec_str_emplace_back(vs, "Susan");
     cvec_str_emplace_back(vs, "Jason");
@@ -103,16 +103,16 @@ void initShortStringVec(cvec_str* vs, cvec_sv* vsv)
         cvec_sv_push_back(vsv, csview_from_s(i.ref));
         num += cstr_size(*i.ref);
     }
-    std::cout << "num strings: " << cvec_sv_size(*vsv) << std::endl;
-    std::cout << "avg str len: " << num / (float)cvec_sv_size(*vsv) << std::endl;
+    std::cout << "num strings: " << cvec_sv_size(vsv) << std::endl;
+    std::cout << "avg str len: " << num / (float)cvec_sv_size(vsv) << std::endl;
 }
 
 void initLongStringVec(cvec_str* vs, cvec_sv* vsv)
 {
-    cvec_str_clear(vs);
+    cvec_str_drop(vs);
     cvec_sv_clear(vsv);
     
-    cvec_str_copy(vs, read_file("names.txt"));
+    *vs = read_file("names.txt");
     c_foreach (i, cvec_str, *vs) {
         cstr_append_s(i.ref, *i.ref);
         cstr_append_s(i.ref, *i.ref);
@@ -149,8 +149,8 @@ void initLongStringVec(cvec_str* vs, cvec_sv* vsv)
         cvec_sv_push_back(vsv, csview_from_s(i.ref));
         num += cstr_size(*i.ref);
     }
-    std::cout << "num strings: " << cvec_sv_size(*vsv) << std::endl;
-    std::cout << "avg str len: " << num / (float)cvec_sv_size(*vsv) << std::endl;
+    std::cout << "num strings: " << cvec_sv_size(vsv) << std::endl;
+    std::cout << "avg str len: " << num / (float)cvec_sv_size(vsv) << std::endl;
 }
 
 void initMaps(const cvec_str* vs, csmap_str* mapTrans, csmap_ssv* mapSview,

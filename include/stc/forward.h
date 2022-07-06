@@ -192,6 +192,14 @@ typedef union {
         size_t size, capacity; \
     } SELF
 
+#define _c_cstack_fixed(SELF, VAL, CAP) \
+    typedef VAL SELF##_value; \
+    typedef struct { SELF##_value *ref; } SELF##_iter; \
+    typedef struct SELF { \
+        SELF##_value data[CAP]; \
+        size_t size; \
+    } SELF
+
 #define _c_cpque_types(SELF, VAL) \
     typedef VAL SELF##_value; \
     typedef struct SELF { \

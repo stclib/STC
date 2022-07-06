@@ -2,6 +2,7 @@
 #include <stdio.h>
 
 #define i_tag i
+#define i_cap 100
 #define i_val int
 #include <stc/cstack.h>
 

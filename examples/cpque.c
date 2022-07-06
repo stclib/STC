@@ -13,7 +13,7 @@ static bool (*less_fn)(const int* x, const int* y);
 
 void print_queue(ipque q) {
     ipque copy = ipque_clone(q);
-    while (!ipque_empty(copy)) {
+    while (!ipque_empty(&copy)) {
         printf("%d ", *ipque_top(&copy));
         ipque_pop(&copy);
     }

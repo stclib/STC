@@ -53,7 +53,7 @@ static void ctor_and_ins_one_csmap_i(picobench::state& s)
     c_forrange (n, s.iterations()) {
         csmap_i map = csmap_i_init();
         csmap_i_insert(&map, n, 0);
-        result += csmap_i_size(map);
+        result += csmap_i_size(&map);
         csmap_i_drop(&map);
     }
     s.set_result(result);
@@ -87,7 +87,7 @@ static void insert_csmap_i(picobench::state& s)
     picobench::scope scope(s);
     c_forrange (n, s.iterations())
         csmap_i_insert(&map, crandom() & 0xfffffff, n);
-    s.set_result(csmap_i_size(map));
+    s.set_result(csmap_i_size(&map));
     csmap_i_drop(&map);
 }
 
@@ -133,7 +133,7 @@ static void ins_and_erase_csmap_i(picobench::state& s)
     picobench::scope scope(s);
     c_forrange (i, s.iterations())
         csmap_i_insert(&map, crandom() & mask, i);
-    result = csmap_i_size(map);
+    result = csmap_i_size(&map);
 
     csmap_i_clear(&map);
     csrandom(seed);
@@ -184,7 +184,7 @@ static void ins_and_access_csmap_i(picobench::state& s)
         const csmap_i_value* val = csmap_i_get(&map, crandom() & mask);
         if (val) csmap_i_erase(&map, val->first);
     }
-    s.set_result(result + csmap_i_size(map));
+    s.set_result(result + csmap_i_size(&map));
     csmap_i_drop(&map);
 }
 
@@ -245,7 +245,7 @@ static void ins_and_access_csmap_s(picobench::state& s)
             csmap_str_erase(&map, cstr_str(&it.ref->first));
         }*/
     }
-    s.set_result(result + csmap_str_size(map));
+    s.set_result(result + csmap_str_size(&map));
     cstr_drop(&str);
     csmap_str_drop(&map);
 }

@@ -1589,6 +1589,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
    */
   bucket_entry* static_empty_bucket_ptr() noexcept {
     static bucket_entry empty_bucket(true);
+    tsl_rh_assert(empty_bucket.empty());
     return &empty_bucket;
   }
 

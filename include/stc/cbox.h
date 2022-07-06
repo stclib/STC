@@ -139,11 +139,11 @@ STC_INLINE void _cx_memb(_reset_to)(_cx_self* self, _cx_value* p) {
         return out;
     }
 
-    STC_INLINE void _cx_memb(_copy)(_cx_self* self, _cx_self other) {
-        if (self->get == other.get)
+    STC_INLINE void _cx_memb(_assign)(_cx_self* self, const _cx_self ptr) {
+        if (self->get == ptr.get)
             return;
         _cx_memb(_drop)(self);
-        *self = _cx_memb(_clone)(other);
+        *self = _cx_memb(_clone)(ptr);
     }
 #endif // !_i_no_clone
 

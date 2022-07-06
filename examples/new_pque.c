@@ -46,7 +46,7 @@ int main()
         cpque_pnt_push(&pque, (Point){54, 74});
         cpque_pnt_push(&pque, (Point){12, 62});
         // print
-        while (!cpque_pnt_empty(pque)) {
+        while (!cpque_pnt_empty(&pque)) {
             cpque_pnt_value *v = cpque_pnt_top(&pque);
             printf(" (%d,%d)", v->x, v->y);
             cpque_pnt_pop(&pque);
@@ -58,7 +58,7 @@ int main()
         cpque_int_push(&ique, 123);
         cpque_int_push(&ique, 321);
         // print
-        for (size_t i=0; i<cpque_int_size(ique); ++i)
+        for (size_t i=0; i<cpque_int_size(&ique); ++i)
             printf(" %d", ique.data[i]);
         puts("");
     }

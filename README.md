@@ -3,9 +3,9 @@
 STC - Smart Template Containers for C
 =====================================
 
-News: Version 3.6 released (April 2022)
+News: Version 3.7 released (July 2022)
 ---------------------------------------
-- See [Changes version 3.6](#changes-version-36)
+- [See changes version 3](#version-3). Note some code-breaking API changes!
 
 Introduction
 ------------
@@ -456,6 +456,16 @@ Memory efficiency
 - **carc**: Type size: 2 pointers, one for the data and one for the reference counter.
 
 # Version 3
+
+## Changes version 3.7
+- NB! Changed self argument from value to const pointer on containers (does not apply to **cstr**):
+    - `CNT_size(const CNT *self)`
+    - `CNT_capacity(const CNT *self)`
+    - `CNT_empty(const CNT *self)`
+- Now both **cstack** and **cbits** can be used with template `i_cap` parameter: `#define i_cap <NUM>`. They then use fixed sized arrays, and no heap allocated memory.
+- Renamed *cstr_rename_n()* => *cstr_rename_with_n()* as it could be confused with replacing n instances instead of n bytes.
+- Renamed macro *c_apply_arr()* => *c_apply_array()*
+- Fixed bug in `csmap.h`: begin() on empty map was not fully initialized.
 
 ## Changes version 3.6
 - Swapped to new **cstr** (*short string optimized*, aka SSO). Note that `cstr_str(&s)` must be used, `s.str` is no longer usable.

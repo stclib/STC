@@ -38,7 +38,7 @@ cbox_X      cbox_X_from_ptr(i_val* p);                        // create a cbox f
 cbox_X      cbox_X_clone(cbox_X other);                       // return deep copied clone
 cbox_X      cbox_X_move(cbox_X* self);                        // transfer ownership to another cbox.
 void        cbox_X_take(cbox_X* self, cbox_X other);          // take ownership of other.
-void        cbox_X_copy(cbox_X* self, cbox_X other);          // deep copy to self
+void        cbox_X_assign(cbox_X* self, cbox_X other);        // deep copy to self
 void        cbox_X_drop(cbox_X* self);                        // destruct the contained object and free's it.
 
 void        cbox_X_reset(cbox_X* self);   

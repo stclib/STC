@@ -39,7 +39,7 @@ carc_X      carc_X_from_ptr(i_val* p);                         // create a carc 
 carc_X      carc_X_clone(carc_X other);                        // return other with increased use count
 carc_X      carc_X_move(carc_X* self);                         // transfer ownership to another carc.
 void        carc_X_take(carc_X* self, carc_X other);           // take ownership of other.
-void        carc_X_copy(carc_X* self, carc_X other);           // copy shared (increase use count)
+void        carc_X_assign(carc_X* self, carc_X other);         // copy shared (increase use count)
 
 void        carc_X_drop(carc_X* self);                         // destruct (decrease use count, free at 0)
 long        carc_X_use_count(carc_X ptr);    

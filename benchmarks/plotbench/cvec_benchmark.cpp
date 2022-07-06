@@ -73,11 +73,11 @@ Sample test_stc_vector() {
         csrandom(seed);
         c_forrange (N) cvec_x_push_back(&con, crandom() & mask1);
         s.test[INSERT].t2 = clock();
-        s.test[INSERT].sum = cvec_x_size(con);
+        s.test[INSERT].sum = cvec_x_size(&con);
         s.test[ERASE].t1 = clock();
         c_forrange (N) { cvec_x_pop_back(&con); }
         s.test[ERASE].t2 = clock();
-        s.test[ERASE].sum = cvec_x_size(con);
+        s.test[ERASE].sum = cvec_x_size(&con);
         cvec_x_drop(&con);
      }{
         csrandom(seed);

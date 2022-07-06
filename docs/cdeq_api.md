@@ -28,15 +28,15 @@ cdeq_X              cdeq_X_with_capacity(size_t size);
 cdeq_X              cdeq_X_clone(cdeq_X deq);
 
 void                cdeq_X_clear(cdeq_X* self);
-void                cdeq_X_copy(cdeq_X* self, cdeq_X other);
+void                cdeq_X_copy(cdeq_X* self, const cdeq_X* other);
 bool                cdeq_X_reserve(cdeq_X* self, size_t cap);
 void                cdeq_X_shrink_to_fit(cdeq_X* self);
 void                cdeq_X_swap(cdeq_X* a, cdeq_X* b);
 void                cdeq_X_drop(cdeq_X* self);                                                    // destructor
 
-bool                cdeq_X_empty(cdeq_X deq);
-size_t              cdeq_X_size(cdeq_X deq);
-size_t              cdeq_X_capacity(cdeq_X deq);
+bool                cdeq_X_empty(const cdeq_X* self);
+size_t              cdeq_X_size(const cdeq_X* self);
+size_t              cdeq_X_capacity(const cdeq_X* self);
 
 const cdeq_X_value* cdeq_X_at(const cdeq_X* self, size_t idx);
 const cdeq_X_value* cdeq_X_get(const cdeq_X* self, i_valraw raw);                                 // return NULL if not found
