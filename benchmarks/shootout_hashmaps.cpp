@@ -17,6 +17,7 @@
 //#include "external/parallel_hashmap/phmap.h"
 //#include "external/tsl/hopscotch_map.h"
 #include "external/tsl/robin_map.h"
+#include "external/emhash/hash_table7.hpp"
 
 template<typename C> inline void std_destroy(C& c) { C().swap(c); }
 
@@ -134,6 +135,18 @@ KHASH_MAP_INIT_INT64(ii, int64_t)
 #define DMAP_CLEAR(X)             UMAP_CLEAR(X)
 #define DMAP_DTOR(X)              UMAP_DTOR(X)
 
+#define EMAP_SETUP(X, Key, Value) emhash7::HashMap<Key, Value> map; map.max_load_factor(MAX_LOAD_FACTOR/100.0f)
+#define EMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
+#define EMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
+#define EMAP_FIND(X, key)         UMAP_FIND(X, key)
+#define EMAP_ERASE(X, key)        UMAP_ERASE(X, key)
+#define EMAP_FOR(X, i)            UMAP_FOR(X, i)
+#define EMAP_ITEM(X, i)           UMAP_ITEM(X, i)
+#define EMAP_SIZE(X)              UMAP_SIZE(X)
+#define EMAP_BUCKETS(X)           UMAP_BUCKETS(X)
+#define EMAP_CLEAR(X)             UMAP_CLEAR(X)
+#define EMAP_DTOR(X)              UMAP_DTOR(X)
+
 #define PMAP_SETUP(X, Key, Value) phmap::flat_hash_map<Key, Value> map; map.max_load_factor(MAX_LOAD_FACTOR/100.0f)
 #define PMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
 #define PMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
@@ -240,7 +253,7 @@ KHASH_MAP_INIT_INT64(ii, int64_t)
 #define RUN_TEST(n) MAP_TEST##n(KMAP, ii, N##n) MAP_TEST##n(CMAP, ii, N##n) \
                     MAP_TEST##n(FMAP, ii, N##n) MAP_TEST##n(TMAP, ii, N##n) \
                     MAP_TEST##n(RMAP, ii, N##n) MAP_TEST##n(DMAP, ii, N##n) \
-                    MAP_TEST##n(UMAP, ii, N##n)
+                    MAP_TEST##n(EMAP, ii, N##n) MAP_TEST##n(UMAP, ii, N##n)
 #else
 #define RUN_TEST(n) MAP_TEST##n(KMAP, ii, N##n) MAP_TEST##n(CMAP, ii, N##n)
 #endif
@@ -268,6 +281,7 @@ int main(int argc, char* argv[])
            //"HMAP = https://github.com/Tessil/hopscotch-map\n"
            "RMAP = https://github.com/martinus/robin-hood-hashing\n"
            "DMAP = https://github.com/martinus/unordered_dense\n"
+           "EMAP = https://github.com//ktprime/emhash\n"
            "UMAP = std::unordered_map\n\n");
            
     printf("Usage %s [n-million=%d key-bits=%d]\n", argv[0], DEFAULT_N_MILL, DEFAULT_KEYBITS);
