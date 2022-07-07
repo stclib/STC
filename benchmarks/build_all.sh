@@ -1,7 +1,7 @@
 #!/bin/bash
-cc='g++ -std=c++20'
-#cc='clang'
-#cc='clang -c -DSTC_HEADER'
+cc='g++ -Wall -pedantic -x c++ -std=c++20'
+#cc='clang++ -Wall -pedantic -x c++ -std=c++20'
+#cc='clang++ -Wall -pedantic -x c++ -std=c++20 -c -DSTC_HEADER'
 #cc='cl -nologo'
 #cc='cl -nologo -TP'
 #cc='cl -nologo -std:c11'

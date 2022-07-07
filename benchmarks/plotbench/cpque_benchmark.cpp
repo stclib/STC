@@ -15,7 +15,7 @@ static const uint32_t seed = 1234;
 void std_test()
 {
     stc64_t rng;
-    int N = 10000000, M = 10;
+    int N = 10000000;
 
     std::priority_queue<float, std::vector<float>, std::greater<float>> pq;
     rng = stc64_new(seed);

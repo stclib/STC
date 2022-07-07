@@ -42,7 +42,7 @@ Sample test_std_vector() {
         c_forrange (N) con.push_back(crandom() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
-        container::iterator it;
+        //container::iterator it;
         // Iteration - not inherent find - skipping
         //c_forrange (S) if ((it = std::find(con.begin(), con.end(), crandom() & mask2)) != con.end()) sum += *it;
         s.test[FIND].t2 = clock();
@@ -104,7 +104,7 @@ Sample test_stc_vector() {
 
 int main(int argc, char* argv[])
 {
-    Sample std_s[SAMPLES + 1] = {0}, stc_s[SAMPLES + 1] = {0};
+    Sample std_s[SAMPLES + 1] = {{NULL}}, stc_s[SAMPLES + 1] = {{NULL}};
     c_forrange (i, int, SAMPLES) {
         std_s[i] = test_std_vector();
         stc_s[i] = test_stc_vector();
@@ -117,10 +117,18 @@ int main(int argc, char* argv[])
     const char* comp = argc > 1 ? argv[1] : "test";
     bool header = (argc > 2 && argv[2][0] == '1');
     float std_sum = 0, stc_sum = 0;
-    c_forrange (j, N_TESTS) { std_sum += secs(std_s[0].test[j]); stc_sum += secs(stc_s[0].test[j]); }
+
+    c_forrange (j, N_TESTS) {
+        std_sum += secs(std_s[0].test[j]);
+        stc_sum += secs(stc_s[0].test[j]);
+    }
     if (header) printf("Compiler,Library,C,Method,Seconds,Ratio\n");
-    c_forrange (j, N_TESTS) printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, std_s[0].name, N, operations[j], secs(std_s[0].test[j]), 1.0f);
-                            printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, std_s[0].name, N, "total", std_sum, 1.0f);
-    c_forrange (j, N_TESTS) printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, stc_s[0].name, N, operations[j], secs(stc_s[0].test[j]), secs(std_s[0].test[j]) ? secs(stc_s[0].test[j])/secs(std_s[0].test[j]) : 1.0f);
-                            printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, stc_s[0].name, N, "total", stc_sum, stc_sum/std_sum);
+
+    c_forrange (j, N_TESTS)
+        printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, std_s[0].name, N, operations[j], secs(std_s[0].test[j]), 1.0f);
+    printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, std_s[0].name, N, "total", std_sum, 1.0f);
+
+    c_forrange (j, N_TESTS)
+        printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, stc_s[0].name, N, operations[j], secs(stc_s[0].test[j]), secs(std_s[0].test[j]) ? secs(stc_s[0].test[j])/secs(std_s[0].test[j]) : 1.0f);
+    printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, stc_s[0].name, N, "total", stc_sum, stc_sum/std_sum);
 }

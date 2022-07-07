@@ -49,7 +49,6 @@ PICOBENCH_SUITE("Map1");
 template <class MapInt>
 static void ins_and_erase_i(picobench::state& s)
 {
-    size_t result = 0;
     MapInt map;
     map.max_load_factor((int)MaxLoadFactor100 / 100.0);
     csrandom(seed);
@@ -66,7 +65,7 @@ static void ins_and_erase_i(picobench::state& s)
         map.erase(crandom());
     s.set_result(map.size());
 }
-
+/*
 static void ins_and_erase_cmap_i(picobench::state& s)
 {
     cmap_i map = cmap_i_init();
@@ -86,7 +85,7 @@ static void ins_and_erase_cmap_i(picobench::state& s)
     s.set_result(cmap_i_size(&map));
     cmap_i_drop(&map);
 }
-
+*/
 static void ins_and_erase_cmap_x(picobench::state& s)
 {
     cmap_x map = cmap_x_init();
@@ -158,9 +157,9 @@ PICOBENCH(ins_and_access_cmap_i).P;
 PICOBENCH_SUITE("Map3");
 
 static void randomize(char* str, size_t len) {
-    for (int k=0; k < len; ++k) {
+    for (size_t k=0; k < len; ++k) {
         union {uint64_t i; char c[8];} r = {.i = crandom()};
-        for (int i=0; i<8 && k<len; ++k, ++i)
+        for (unsigned i=0; i<8 && k<len; ++k, ++i)
             str[k] = (r.c[i] & 63) + 48;
     }
 }

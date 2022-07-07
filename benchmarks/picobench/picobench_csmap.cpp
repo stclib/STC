@@ -45,7 +45,7 @@ static void ctor_and_ins_one_i(picobench::state& s)
     }
     s.set_result(result);
 }
-
+/*
 static void ctor_and_ins_one_csmap_i(picobench::state& s)
 {
     size_t result = 0;
@@ -60,17 +60,16 @@ static void ctor_and_ins_one_csmap_i(picobench::state& s)
 }
 
 #define P samples(S1).iterations({N1})
-//PICOBENCH(ctor_and_ins_one_i<omap_i>).P;
-//PICOBENCH(ctor_and_ins_one_csmap_i).P;
+PICOBENCH(ctor_and_ins_one_i<omap_i>).P;
+PICOBENCH(ctor_and_ins_one_csmap_i).P;
 #undef P
-
+*/
 
 PICOBENCH_SUITE("Map_insert_only");
 
 template <class MapInt>
 static void insert_i(picobench::state& s)
 {
-    size_t result = 0;
     MapInt map;
     csrandom(seed);
     picobench::scope scope(s);
@@ -81,7 +80,6 @@ static void insert_i(picobench::state& s)
 
 static void insert_csmap_i(picobench::state& s)
 {
-    size_t result = 0;
     csmap_i map = csmap_i_init();
     csrandom(seed);
     picobench::scope scope(s);
@@ -195,7 +193,7 @@ PICOBENCH(ins_and_access_csmap_i).P;
 
 PICOBENCH_SUITE("Map4");
 
-static void randomize(char* str, size_t len) {
+static void randomize(char* str, int len) {
     union {uint64_t i; char c[8];} r = {.i = crandom()};
     for (int i = len - 7, j = 0; i < len; ++j, ++i)
         str[i] = (r.c[j] & 63) + 48;
@@ -285,7 +283,7 @@ static void iterate_x(picobench::state& s)
     }
     s.set_result(result);
 }
-
+/*
 static void iterate_csmap_x(picobench::state& s)
 {
     csmap_x map = csmap_x_init();
@@ -315,8 +313,8 @@ static void iterate_csmap_x(picobench::state& s)
     csmap_x_drop(&map);
 }
 
-
 #define P samples(S1).iterations({N1/20}).args({12})
-//PICOBENCH(iterate_x<omap_x>).P;
-//PICOBENCH(iterate_csmap_x).P;
+PICOBENCH(iterate_x<omap_x>).P;
+PICOBENCH(iterate_csmap_x).P;
 #undef P
+*/
