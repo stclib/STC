@@ -48,19 +48,19 @@ int main()
         printf("orig: %s %s\n", cstr_str(&p.get->name), cstr_str(&p.get->last));
         printf("copy: %s %s\n", cstr_str(&q.get->name), cstr_str(&q.get->last));
 
-        Persons_push_back(&vec, PBox_make(Person_new("Dale", "Cooper")));
-        Persons_push_back(&vec, PBox_make(Person_new("Audrey", "Home")));
-        
+        Persons_push(&vec, PBox_make(Person_new("Dale", "Cooper")));
+        Persons_push(&vec, PBox_make(Person_new("Audrey", "Home")));
+
         // NB! Clone p and q to the vector using emplace_back()
-        c_apply(v, Persons_push_back(&vec, PBox_clone(*v)), PBox, {p, q});
+        c_apply(v, Persons_push(&vec, PBox_clone(*v)), PBox, {p, q});
 
         c_foreach (i, Persons, vec)
             printf("%s %s\n", cstr_str(&i.ref->get->name), cstr_str(&i.ref->get->last));
         puts("");
-        
-        // Look-up Audrey! Use a (fake) temporary PBox for lookup.
+
+        // Look-up Audrey! Create a temporary Person for lookup.
         c_autovar (Person a = Person_new("Audrey", "Home"), Person_drop(&a)) {
-            const PBox *v = Persons_get(&vec, a);
+            const PBox *v = Persons_get(&vec, a); // lookup
             if (v) printf("found: %s %s\n", cstr_str(&v->get->name), cstr_str(&v->get->last));
         }
         puts("");

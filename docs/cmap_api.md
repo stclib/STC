@@ -56,7 +56,7 @@ void                  cmap_X_swap(cmap_X* a, cmap_X* b);
 void                  cmap_X_drop(cmap_X* self);                                                // destructor
 
 size_t                cmap_X_size(const cmap_X* self);
-size_t                cmap_X_capacity(const cmap_X self);                                       // buckets * max_load_factor
+size_t                cmap_X_capacity(const cmap_X* self);                                      // buckets * max_load_factor
 bool                  cmap_X_empty(const cmap_X* self );
 size_t                cmap_X_bucket_count(const cmap_X* self);                                  // num. of allocated buckets
 

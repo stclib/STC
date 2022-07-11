@@ -145,10 +145,10 @@ STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return &self->l
 STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self) { return &self->last->value; }
 
 STC_INLINE size_t
-_cx_memb(_count)(_cx_self cx) {
-    size_t n = 1; const _cx_node *node = cx.last;
+_cx_memb(_count)(const _cx_self* self) {
+    size_t n = 1; const _cx_node *node = self->last;
     if (!node) return 0;
-    while ((node = node->next) != cx.last) ++n;
+    while ((node = node->next) != self->last) ++n;
     return n;
 }
 

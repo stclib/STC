@@ -10,7 +10,7 @@ struct {
     double y;
 } typedef Point;
 
-// A Rectangle can be specified by where its top left and bottom right 
+// A Rectangle can be specified by where its top left and bottom right
 // corners are in space
 struct {
     Point top_left;
@@ -27,7 +27,7 @@ struct {
 
 // Box in box:
 #define i_val_arcbox cbox_Point  // NB: use i_val_arcbox when value is a cbox or carc!
-                                 // it will auto-set i_valdrop, i_valfrom, i_cmp for you.
+                                 // it will auto define i_valdrop, i_valfrom, and i_cmp.
 #define i_opt c_no_cmp
 #define i_tag BoxPoint
 #include <stc/cbox.h> // cbox_BoxPoint
@@ -43,7 +43,6 @@ cbox_Point boxed_origin(void) {
 
 
 int main(void) {
-    // (all the type annotations are superfluous)
     // Stack allocated variables
     Point point = origin();
     Rectangle rectangle = (Rectangle){
@@ -51,11 +50,12 @@ int main(void) {
         .bottom_right = (Point){ .x=3.0, .y=-4.0 }
     };
 
-    // Heap allocated rectangle
+    // Declare auto-deleted box objects
     c_auto (cbox_Rectangle, boxed_rectangle)
     c_auto (cbox_Point, boxed_point)
     c_auto (cbox_BoxPoint, box_in_a_box)
     {
+        // Heap allocated rectangle
         boxed_rectangle = cbox_Rectangle_make((Rectangle){
             .top_left = origin(),
             .bottom_right = (Point){ .x=3.0, .y=-4.0 }

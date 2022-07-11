@@ -32,6 +32,7 @@ KHASH_MAP_INIT_INT64(ii, int64_t)
 #define i_key int64_t
 #define i_val int64_t
 #define i_tag ii
+#define i_hash(x) (*x * 0xc6a4a7935bd1e99d) // optional
 #include <stc/cmap.h>
 
 #define SEED(s) rng = stc64_new(s)
@@ -67,7 +68,7 @@ KHASH_MAP_INIT_INT64(ii, int64_t)
 #define UMAP_EMPLACE(X, key, val) map.emplace(key, val).first->second
 #define UMAP_FIND(X, key)         int(map.find(key) != map.end())
 #define UMAP_ERASE(X, key)        map.erase(key)
-#define UMAP_FOR(X, i)            for (auto i: map)
+#define UMAP_FOR(X, i)            for (const auto& i: map)
 #define UMAP_ITEM(X, i)           i.second
 #define UMAP_SIZE(X)              map.size()
 #define UMAP_BUCKETS(X)           map.bucket_count()
@@ -268,7 +269,7 @@ int main(int argc, char* argv[])
     unsigned n_mill = argc >= 2 ? atoi(argv[1]) : DEFAULT_N_MILL;
     unsigned keybits = argc >= 3 ? atoi(argv[2]) : DEFAULT_KEYBITS;
     unsigned n = n_mill * 1000000;
-    unsigned N0 = n, N1 = n/2, N2 = n/2, N3 = n, N4 = n, N5 = n;
+    unsigned N0 = n, N1 = n/2, N2 = n/2, N3 = n, N4 = n, N5 = n/2;
     stc64_t rng;
     size_t seed = time(NULL);
 
@@ -283,7 +284,7 @@ int main(int argc, char* argv[])
            "DMAP = https://github.com/martinus/unordered_dense\n"
            "EMAP = https://github.com//ktprime/emhash\n"
            "UMAP = std::unordered_map\n\n");
-           
+
     printf("Usage %s [n-million=%d key-bits=%d]\n", argv[0], DEFAULT_N_MILL, DEFAULT_KEYBITS);
     printf("N-base = %d. Random keys are in range [0, 2^%d). Seed = %" PRIuMAX ":\n", n_mill, keybits, seed);
 

@@ -30,8 +30,8 @@ void                cqueue_X_clear(cqueue_X* self);
 void                cqueue_X_copy(cqueue_X* self, const cqueue_X* other);
 void                cqueue_X_drop(cqueue_X* self);       // destructor
 
-size_t              cqueue_X_size(cqueue_X q);
-bool                cqueue_X_empty(cqueue_X q);
+size_t              cqueue_X_size(const cqueue_X* self);
+bool                cqueue_X_empty(const cqueue_X* self);
 cqueue_X_value*     cqueue_X_front(const cqueue_X* self);
 cqueue_X_value*     cqueue_X_back(const cqueue_X* self);
 

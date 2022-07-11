@@ -51,7 +51,7 @@ void                  csmap_X_copy(csmap_X* self, const csmap_X* other);
 void                  csmap_X_swap(csmap_X* a, csmap_X* b);
 void                  csmap_X_drop(csmap_X* self);                                               // destructor
 
-size_t                csmap_X_size(const csmap_X self);
+size_t                csmap_X_size(const csmap_X* self);
 bool                  csmap_X_empty(const csmap_X* self);
 bool                  csmap_X_capacity(const csmap_X* self);
 

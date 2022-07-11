@@ -45,8 +45,8 @@ void                clist_X_clear(clist_X* self);
 void                clist_X_copy(clist_X* self, const clist_X* other);
 void                clist_X_drop(clist_X* self);                                          // destructor
 
-bool                clist_X_empty(clist_X list);
-size_t              clist_X_count(clist_X list);                                          // size() in O(n) time
+bool                clist_X_empty(const clist_X* list);
+size_t              clist_X_count(const clist_X* list);                                   // size() in O(n) time
 
 clist_X_value*      clist_X_front(const clist_X* self);
 clist_X_value*      clist_X_back(const clist_X* self);
