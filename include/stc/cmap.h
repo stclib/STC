@@ -252,10 +252,19 @@ _cx_memb(_erase_at)(_cx_self* self, _cx_iter it) {
 #if defined(i_implement)
 
 #ifndef CMAP_H_INCLUDED
-STC_INLINE size_t fastrange_size_t(uint64_t x, uint64_t n)
-    { uint64_t lo, hi; c_umul128(x, n, &lo, &hi); return (size_t)hi; }
-STC_INLINE size_t fastrange_uint32_t(uint64_t x, uint64_t n)
-    { return (size_t)((uint32_t)x*n >> 32); }
+STC_INLINE size_t fastrange_1(uint64_t x, uint64_t n)
+    { return (size_t)((uint32_t)x*n >> 32); } // n < 2^32
+
+STC_INLINE size_t fastrange_2(uint64_t x, uint64_t n) 
+    { return x & (n - 1); } // n power of 2.
+
+STC_INLINE uint64_t next_power_of_2(uint64_t n) {
+    n--;
+    n |= n >>  1, n |= n >>  2;
+    n |= n >>  4, n |= n >>  8;
+    n |= n >> 16, n |= n >> 32;
+    return n + 1;
+}
 #endif // CMAP_H_INCLUDED
 
 STC_DEF _cx_self
@@ -317,7 +326,7 @@ STC_DEF chash_bucket_t
 _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr) {
     const uint64_t _hash = i_hash(rkeyptr);
     i_size _cap = self->bucket_count;
-    chash_bucket_t b = {c_paste(fastrange_,i_size)(_hash, _cap), (uint8_t)(_hash | 0x80)};
+    chash_bucket_t b = {c_paste(fastrange_,_i_expandby)(_hash, _cap), (uint8_t)(_hash | 0x80)};
     const uint8_t* _hx = self->_hashx;
     while (_hx[b.idx]) {
         if (_hx[b.idx] == b.hx) {
@@ -335,7 +344,7 @@ STC_DEF _cx_result
 _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey) {
     bool nomem = false;
     if (self->size + 2 > (i_size)(self->bucket_count*self->max_load_factor))
-        nomem = !_cx_memb(_reserve)(self, self->size*3/2 + 4);
+        nomem = !_cx_memb(_reserve)(self, self->size*3/2);
     chash_bucket_t b = _cx_memb(_bucket_)(self, &rkey);
     _cx_result res = {&self->table[b.idx], !self->_hashx[b.idx], nomem};
     if (res.inserted) {
@@ -364,9 +373,14 @@ _cx_memb(_clone)(_cx_self m) {
 STC_DEF bool
 _cx_memb(_reserve)(_cx_self* self, const size_t _newcap) {
     const i_size _oldbuckets = self->bucket_count;
-    const i_size _nbuckets = ((i_size)(_newcap/self->max_load_factor) + 2) | 1;
     if (_newcap != self->size && _newcap <= _oldbuckets)
         return true;
+    i_size _nbuckets = (i_size)(_newcap / self->max_load_factor) + 4;
+    #if _i_expandby == 2
+    _nbuckets = (i_size)next_power_of_2(_nbuckets);
+    #else
+    _nbuckets |= 1;
+    #endif
     _cx_self m = {
         c_alloc_n(_cx_value, _nbuckets),
         (uint8_t *) c_calloc(_nbuckets + 1, 1),
@@ -404,7 +418,7 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
         if (! _hashx[j])
             break;
         const _cx_rawkey _raw = i_keyto(_i_keyref(_slot + j));
-        k = c_paste(fastrange_,i_size)(i_hash((&_raw)), _cap);
+        k = c_paste(fastrange_,_i_expandby)(i_hash((&_raw)), _cap);
         if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */
             _slot[i] = _slot[j], _hashx[i] = _hashx[j], i = j;
     }

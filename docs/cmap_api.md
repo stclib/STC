@@ -22,6 +22,8 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_hash      // hash func i_keyraw*: REQUIRED IF i_keyraw is non-pod type
 #define i_eq        // equality comparison two i_keyraw*: REQUIRED IF i_keyraw is a
                     // non-integral type. Three-way i_cmp may be specified alternatively.
+#define i_size      // size_t or uint32_t(default). If defined, table expand 2x (else 1.5x)  
+
 #define i_keydrop   // destroy key func - defaults to empty destruct
 #define i_keyclone  // REQUIRED IF i_valdrop defined
 #define i_keyraw    // convertion "raw" type - defaults to i_key

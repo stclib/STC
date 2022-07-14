@@ -45,8 +45,11 @@
   #define _i_prefix
 #endif
 
-#ifndef i_size
+#ifdef i_size
+  #define _i_expandby 2
+#else
   #define i_size uint32_t
+  #define _i_expandby 1
 #endif
 
 #if !(defined i_key || defined i_key_str || defined i_key_ssv || \
@@ -289,6 +292,7 @@
 #undef i_static
 #undef i_extern
 
+#undef _i_expandby
 #undef _i_prefix
 #undef _i_has_from
 #undef _i_key_from_val

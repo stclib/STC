@@ -150,7 +150,7 @@ STC_DEF stc64_t stc64_with_seq(uint64_t seed, uint64_t seq) {
 /* Init unbiased uniform uint RNG with bounds [low, high] */
 STC_DEF stc64_uniform_t stc64_uniform_new(int64_t low, int64_t high) {
     stc64_uniform_t dist = {low, (uint64_t) (high - low + 1)};
-    dist.threshold = (uint64_t)-(int64_t)dist.range % dist.range;
+    dist.threshold = (uint64_t)(0 - dist.range) % dist.range;
     return dist;
 }
 

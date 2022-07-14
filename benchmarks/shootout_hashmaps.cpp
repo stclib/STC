@@ -31,8 +31,9 @@ KHASH_MAP_INIT_INT64(ii, int64_t)
 // cmap template expansion
 #define i_key int64_t
 #define i_val int64_t
-#define i_tag ii
+#define i_size uint32_t // optional, enables 2x expand
 #define i_hash(x) (*x * 0xc6a4a7935bd1e99d) // optional
+#define i_tag ii
 #include <stc/cmap.h>
 
 #define SEED(s) rng = stc64_new(s)
