@@ -53,8 +53,8 @@ KHASH_MAP_INIT_INT64(ii, int64_t)
 #define CMAP_DTOR(X)              cmap_##X##_drop(&map)
 
 #define KMAP_SETUP(X, Key, Value) khash_t(X)* map = kh_init(X); khiter_t ki; int ret
-#define KMAP_PUT(X, key, val)     (*(ki = kh_put(X, map, key, &ret), map->vals[ki] = val, map->vals+ki))
-#define KMAP_EMPLACE(X, key, val) (*(ki = kh_put(X, map, key, &ret), ret ? (map->vals[ki] = val, 0) : 1, map->vals+ki))
+#define KMAP_PUT(X, key, val)     (ki = kh_put(X, map, key, &ret), map->vals[ki] = val, map->vals[ki])
+#define KMAP_EMPLACE(X, key, val) (ki = kh_put(X, map, key, &ret), ret ? (map->vals[ki] = val, 0) : 1, map->vals[ki])
 #define KMAP_ERASE(X, key)        ((ki = kh_get(X, map, key)) != kh_end(map) ? kh_del(X, map, ki), 1 : 0)
 #define KMAP_FOR(X, i)            for (khint_t i = kh_begin(map); i != kh_end(map); ++i) if (kh_exist(map, i))
 #define KMAP_ITEM(X, i)           map->vals[i]
@@ -112,7 +112,6 @@ KHASH_MAP_INIT_INT64(ii, int64_t)
 #define TMAP_CLEAR(X)             UMAP_CLEAR(X)
 #define TMAP_DTOR(X)              UMAP_DTOR(X)
 
-//#define RMAP_SETUP(X, Key, Value) robin_hood::unordered_map<Key, Value> map
 #define RMAP_SETUP(X, Key, Value) robin_hood_flat_map<Key, Value> map
 #define RMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
 #define RMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
@@ -121,7 +120,7 @@ KHASH_MAP_INIT_INT64(ii, int64_t)
 #define RMAP_FOR(X, i)            UMAP_FOR(X, i)
 #define RMAP_ITEM(X, i)           UMAP_ITEM(X, i)
 #define RMAP_SIZE(X)              UMAP_SIZE(X)
-#define RMAP_BUCKETS(X)           map.mask()
+#define RMAP_BUCKETS(X)           (map.mask() + 1)
 #define RMAP_CLEAR(X)             UMAP_CLEAR(X)
 #define RMAP_DTOR(X)              UMAP_DTOR(X)
 
@@ -172,7 +171,7 @@ KHASH_MAP_INIT_INT64(ii, int64_t)
         sum += ++ M##_EMPLACE(X, RAND(keybits), i); \
     } \
     difference = clock() - before; \
-    printf(#M ": time: %5.03f, size: %" PRIuMAX ", buckets: %8zu, sum: %" PRIuMAX "\n", \
+    printf(#M ": time: %5.03f, size: %" PRIuMAX ", buckets: %8" PRIuMAX ", sum: %" PRIuMAX "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), sum); \
     M##_DTOR(X); \
 }
@@ -187,7 +186,7 @@ KHASH_MAP_INIT_INT64(ii, int64_t)
     for (size_t i = 0; i < n; ++i) \
         erased += M##_ERASE(X, i); \
     difference = clock() - before; \
-    printf(#M ": time: %5.03f, size: %" PRIuMAX ", buckets: %8zu, erased %" PRIuMAX "\n", \
+    printf(#M ": time: %5.03f, size: %" PRIuMAX ", buckets: %8" PRIuMAX ", erased %" PRIuMAX "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), erased); \
     M##_DTOR(X); \
 }
@@ -205,7 +204,7 @@ KHASH_MAP_INIT_INT64(ii, int64_t)
     for (size_t i = 0; i < n; ++i) \
         erased += M##_ERASE(X, RAND(keybits)); \
     difference = clock() - before; \
-    printf(#M ": time: %5.03f, size: %" PRIuMAX ", buckets: %8zu, erased %" PRIuMAX "\n", \
+    printf(#M ": time: %5.03f, size: %" PRIuMAX ", buckets: %8" PRIuMAX ", erased %" PRIuMAX "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), erased); \
     M##_DTOR(X); \
 }
@@ -223,7 +222,7 @@ KHASH_MAP_INIT_INT64(ii, int64_t)
     for (size_t k=0; k < x; k++) M##_FOR (X, it) \
         sum += M##_ITEM(X, it); \
     difference = clock() - before; \
-    printf(#M ": time: %5.03f, size: %" PRIuMAX ", buckets: %8zu, repeats: %" PRIuMAX ", sum: %" PRIuMAX "\n", \
+    printf(#M ": time: %5.03f, size: %" PRIuMAX ", buckets: %8" PRIuMAX ", repeats: %" PRIuMAX ", sum: %" PRIuMAX "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), x, sum); \
     M##_DTOR(X); \
 }
@@ -245,7 +244,7 @@ KHASH_MAP_INIT_INT64(ii, int64_t)
     for (size_t i = 0; i < x; ++i) \
         found += M##_FIND(X, RAND(keybits)); \
     difference = clock() - before; \
-    printf(#M ": time: %5.03f, size: %" PRIuMAX ", buckets: %8zu, lookups: %" PRIuMAX ", found: %" PRIuMAX "\n", \
+    printf(#M ": time: %5.03f, size: %" PRIuMAX ", buckets: %8" PRIuMAX ", lookups: %" PRIuMAX ", found: %" PRIuMAX "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), x*2, found); \
     M##_DTOR(X); \
 }
@@ -270,7 +269,7 @@ int main(int argc, char* argv[])
     unsigned n_mill = argc >= 2 ? atoi(argv[1]) : DEFAULT_N_MILL;
     unsigned keybits = argc >= 3 ? atoi(argv[2]) : DEFAULT_KEYBITS;
     unsigned n = n_mill * 1000000;
-    unsigned N0 = n, N1 = n/2, N2 = n/2, N3 = n, N4 = n, N5 = n/2;
+    unsigned N1 = n/2, N2 = n/2, N3 = n, N4 = n, N5 = n/2;
     stc64_t rng;
     size_t seed = time(NULL);
 

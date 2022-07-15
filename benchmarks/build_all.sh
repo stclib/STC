@@ -18,7 +18,7 @@ if [ ! -z "$1" ] ; then
     cc=$@
 fi
 if [ $run = 0 ] ; then
-    for i in misc/*.c* picobench/*.cpp plotbench/*.cpp ; do
+    for i in *.cpp misc/*.c* picobench/*.cpp plotbench/*.cpp ; do
         echo $cc -I../include $i
         $cc -I../include $i
     done
