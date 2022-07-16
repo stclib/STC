@@ -1,7 +1,7 @@
 ///////////////////////// ankerl::unordered_dense::{map, set} /////////////////////////
 
 // A fast & densely stored hashmap and hashset based on robin-hood backward shift deletion.
-// Version 1.0.0
+// Version 1.0.2
 // https://github.com/martinus/unordered_dense
 //
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
@@ -32,44 +32,48 @@
 // see https://semver.org/spec/v2.0.0.html
 #define ANKERL_UNORDERED_DENSE_VERSION_MAJOR 1 // incompatible API changes
 #define ANKERL_UNORDERED_DENSE_VERSION_MINOR 0 // add functionality in a backwards compatible manner
-#define ANKERL_UNORDERED_DENSE_VERSION_PATCH 0 // backwards compatible bug fixes
+#define ANKERL_UNORDERED_DENSE_VERSION_PATCH 2 // backwards compatible bug fixes
 
-#include <algorithm>
-#include <array>
-#include <cstdint>
-#include <cstring>
-#include <functional>
-#include <initializer_list>
-#include <limits>
-#include <memory>
-#include <stdexcept>
-#include <string>
-#include <string_view>
-#include <type_traits>
-#include <utility>
-#include <vector>
-
-#define ANKERL_UNORDERED_DENSE_PMR 0
-#if defined(__has_include)
-#    if __has_include(<memory_resource>)
-#        undef ANKERL_UNORDERED_DENSE_PMR
-#        define ANKERL_UNORDERED_DENSE_PMR 1
-#        include <memory_resource>
-#    endif
-#endif
-
-#if defined(_MSC_VER) && defined(_M_X64)
-#    include <intrin.h>
-#    pragma intrinsic(_umul128)
-#endif
-
-#if defined(__GNUC__) || defined(__INTEL_COMPILER) || defined(__clang__)
-#    define ANKERL_UNORDERED_DENSE_LIKELY(x) __builtin_expect(x, 1)
-#    define ANKERL_UNORDERED_DENSE_UNLIKELY(x) __builtin_expect(x, 0)
+#if 0 // __cplusplus < 201703L
+#    error ankerl::unordered_dense requires C++17 or higher
 #else
-#    define ANKERL_UNORDERED_DENSE_LIKELY(x) (x)
-#    define ANKERL_UNORDERED_DENSE_UNLIKELY(x) (x)
-#endif
+
+#    include <algorithm>
+#    include <array>
+#    include <cstdint>
+#    include <cstring>
+#    include <functional>
+#    include <initializer_list>
+#    include <limits>
+#    include <memory>
+#    include <stdexcept>
+#    include <string>
+#    include <string_view>
+#    include <type_traits>
+#    include <utility>
+#    include <vector>
+
+#    define ANKERL_UNORDERED_DENSE_PMR 0
+#    if defined(__has_include)
+#        if __has_include(<memory_resource>)
+#            undef ANKERL_UNORDERED_DENSE_PMR
+#            define ANKERL_UNORDERED_DENSE_PMR 1
+#            include <memory_resource>
+#        endif
+#    endif
+
+#    if defined(_MSC_VER) && defined(_M_X64)
+#        include <intrin.h>
+#        pragma intrinsic(_umul128)
+#    endif
+
+#    if defined(__GNUC__) || defined(__INTEL_COMPILER) || defined(__clang__)
+#        define ANKERL_UNORDERED_DENSE_LIKELY(x) __builtin_expect(x, 1)
+#        define ANKERL_UNORDERED_DENSE_UNLIKELY(x) __builtin_expect(x, 0)
+#    else
+#        define ANKERL_UNORDERED_DENSE_LIKELY(x) (x)
+#        define ANKERL_UNORDERED_DENSE_UNLIKELY(x) (x)
+#    endif
 
 namespace ankerl::unordered_dense {
 
@@ -81,14 +85,14 @@ namespace ankerl::unordered_dense {
 namespace detail::wyhash {
 
 static inline void mum(uint64_t* a, uint64_t* b) {
-#if defined(__SIZEOF_INT128__)
+#    if defined(__SIZEOF_INT128__)
     __uint128_t r = *a;
     r *= *b;
     *a = static_cast<uint64_t>(r);
     *b = static_cast<uint64_t>(r >> 64U);
-#elif defined(_MSC_VER) && defined(_M_X64)
+#    elif defined(_MSC_VER) && defined(_M_X64)
     *a = _umul128(*a, *b, b);
-#else
+#    else
     uint64_t ha = *a >> 32U;
     uint64_t hb = *b >> 32U;
     uint64_t la = static_cast<uint32_t>(*a);
@@ -106,7 +110,7 @@ static inline void mum(uint64_t* a, uint64_t* b) {
     hi = rh + (rm0 >> 32U) + (rm1 >> 32U) + c;
     *a = lo;
     *b = hi;
-#endif
+#    endif
 }
 
 // multiply and xor mix function, aka MUM
@@ -133,7 +137,7 @@ static inline void mum(uint64_t* a, uint64_t* b) {
     return (static_cast<uint64_t>(p[0]) << 16U) | (static_cast<uint64_t>(p[k >> 1U]) << 8U) | p[k - 1];
 }
 
-[[nodiscard]] inline auto hash(void const* key, size_t len) -> uint64_t {
+[[nodiscard]] static inline auto hash(void const* key, size_t len) -> uint64_t {
     static constexpr auto secret = std::array{UINT64_C(0xa0761d6478bd642f),
                                               UINT64_C(0xe7037ed1a0b428db),
                                               UINT64_C(0x8ebc6af09c88c6e3),
@@ -180,6 +184,10 @@ static inline void mum(uint64_t* a, uint64_t* b) {
     return mix(secret[1] ^ len, mix(a ^ secret[1], b ^ seed));
 }
 
+[[nodiscard]] static inline auto hash(uint64_t x) -> uint64_t {
+    return detail::wyhash::mix(x, UINT64_C(0x9E3779B97F4A7C15));
+}
+
 } // namespace detail::wyhash
 
 template <typename T, typename Enable = void>
@@ -187,7 +195,7 @@ struct hash : public std::hash<T> {
     using is_avalanching = void;
     auto operator()(T const& obj) const noexcept(noexcept(std::declval<std::hash<T>>().operator()(std::declval<T const&>())))
         -> size_t {
-        return detail::wyhash::mix(std::hash<T>::operator()(obj), UINT64_C(0x9E3779B97F4A7C15));
+        return static_cast<size_t>(detail::wyhash::hash(std::hash<T>::operator()(obj)));
     }
 };
 
@@ -195,7 +203,7 @@ template <typename CharT>
 struct hash<std::basic_string<CharT>> {
     using is_avalanching = void;
     auto operator()(std::basic_string<CharT> const& str) const noexcept -> size_t {
-        return detail::wyhash::hash(str.data(), sizeof(CharT) * str.size());
+        return static_cast<size_t>(detail::wyhash::hash(str.data(), sizeof(CharT) * str.size()));
     }
 };
 
@@ -203,9 +211,79 @@ template <typename CharT>
 struct hash<std::basic_string_view<CharT>> {
     using is_avalanching = void;
     auto operator()(std::basic_string_view<CharT> const& sv) const noexcept -> size_t {
-        return detail::wyhash::hash(sv.data(), sizeof(CharT) * sv.size());
+        return static_cast<size_t>(detail::wyhash::hash(sv.data(), sizeof(CharT) * sv.size()));
     }
 };
+
+template <class T>
+struct hash<T*> {
+    using is_avalanching = void;
+    auto operator()(T* ptr) const noexcept -> size_t {
+        return static_cast<size_t>(detail::wyhash::hash(reinterpret_cast<uintptr_t>(ptr)));
+    }
+};
+
+template <class T>
+struct hash<std::unique_ptr<T>> {
+    using is_avalanching = void;
+    auto operator()(std::unique_ptr<T> const& ptr) const noexcept -> size_t {
+        return static_cast<size_t>(detail::wyhash::hash(reinterpret_cast<uintptr_t>(ptr.get())));
+    }
+};
+
+template <class T>
+struct hash<std::shared_ptr<T>> {
+    using is_avalanching = void;
+    auto operator()(std::shared_ptr<T> const& ptr) const noexcept -> size_t {
+        return static_cast<size_t>(detail::wyhash::hash(reinterpret_cast<uintptr_t>(ptr.get())));
+    }
+};
+
+template <typename Enum>
+struct hash<Enum, typename std::enable_if<std::is_enum<Enum>::value>::type> {
+    using is_avalanching = void;
+    auto operator()(Enum e) const noexcept -> size_t {
+        using Underlying = typename std::underlying_type_t<Enum>;
+        return static_cast<size_t>(detail::wyhash::hash(static_cast<Underlying>(e)));
+    }
+};
+
+#    define ANKERL_UNORDERED_DENSE_HASH_STATICCAST(T)                                         \
+        template <>                                                                           \
+        struct hash<T> {                                                                      \
+            using is_avalanching = void;                                                      \
+            auto operator()(T const& obj) const noexcept -> size_t {                          \
+                return static_cast<size_t>(detail::wyhash::hash(static_cast<uint64_t>(obj))); \
+            }                                                                                 \
+        }
+
+#    if defined(__GNUC__) && !defined(__clang__)
+#        pragma GCC diagnostic push
+#        pragma GCC diagnostic ignored "-Wuseless-cast"
+#    endif
+// see https://en.cppreference.com/w/cpp/utility/hash
+ANKERL_UNORDERED_DENSE_HASH_STATICCAST(bool);
+ANKERL_UNORDERED_DENSE_HASH_STATICCAST(char);
+ANKERL_UNORDERED_DENSE_HASH_STATICCAST(signed char);
+ANKERL_UNORDERED_DENSE_HASH_STATICCAST(unsigned char);
+#    if __cplusplus >= 202002L
+ANKERL_UNORDERED_DENSE_HASH_STATICCAST(char8_t);
+#    endif
+ANKERL_UNORDERED_DENSE_HASH_STATICCAST(char16_t);
+ANKERL_UNORDERED_DENSE_HASH_STATICCAST(char32_t);
+ANKERL_UNORDERED_DENSE_HASH_STATICCAST(wchar_t);
+ANKERL_UNORDERED_DENSE_HASH_STATICCAST(short);
+ANKERL_UNORDERED_DENSE_HASH_STATICCAST(unsigned short);
+ANKERL_UNORDERED_DENSE_HASH_STATICCAST(int);
+ANKERL_UNORDERED_DENSE_HASH_STATICCAST(unsigned int);
+ANKERL_UNORDERED_DENSE_HASH_STATICCAST(long);
+ANKERL_UNORDERED_DENSE_HASH_STATICCAST(long long);
+ANKERL_UNORDERED_DENSE_HASH_STATICCAST(unsigned long);
+ANKERL_UNORDERED_DENSE_HASH_STATICCAST(unsigned long long);
+
+#    if defined(__GNUC__) && !defined(__clang__)
+#        pragma GCC diagnostic pop
+#    endif
 
 namespace detail {
 
@@ -255,7 +333,7 @@ class table {
     static constexpr uint32_t BUCKET_DIST_INC = 1U << 8U;                    // skip 1 byte fingerprint
     static constexpr uint32_t BUCKET_FINGERPRINT_MASK = BUCKET_DIST_INC - 1; // mask for 1 byte of fingerprint
     static constexpr uint8_t INITIAL_SHIFTS = 64 - 3;                        // 2^(64-m_shift) number of buckets
-    static constexpr float DEFAULT_MAX_LOAD_FACTOR = 0.8;
+    static constexpr float DEFAULT_MAX_LOAD_FACTOR = 0.8F;
 
 public:
     using key_type = Key;
@@ -303,7 +381,7 @@ private:
         if constexpr (is_detected_v<detect_avalanching, Hash>) {
             return m_hash(key);
         } else {
-            return wyhash::mix(m_hash(key), UINT64_C(0x9E3779B97F4A7C15));
+            return wyhash::hash(m_hash(key));
         }
     }
 
@@ -400,12 +478,14 @@ private:
     }
 
     void clear_buckets() {
-        std::memset(m_buckets_start, 0, sizeof(Bucket) * bucket_count());
+        if (m_buckets_start != nullptr) {
+            std::memset(m_buckets_start, 0, sizeof(Bucket) * bucket_count());
+        }
     }
 
     void clear_and_fill_buckets_from_values() {
         clear_buckets();
-        for (uint32_t value_idx = 0, end_idx = m_values.size(); value_idx < end_idx; ++value_idx) {
+        for (uint32_t value_idx = 0, end_idx = static_cast<uint32_t>(m_values.size()); value_idx < end_idx; ++value_idx) {
             auto const& key = get_key(m_values[value_idx]);
             auto [dist_and_fingerprint, bucket] = next_while_less(key);
 
@@ -453,6 +533,10 @@ private:
 
     template <typename K>
     auto do_erase_key(K&& key) -> size_t {
+        if (empty()) {
+            return 0;
+        }
+
         auto [dist_and_fingerprint, bucket] = next_while_less(key);
 
         while (dist_and_fingerprint == bucket->dist_and_fingerprint && !m_equal(key, get_key(m_values[bucket->value_idx]))) {
@@ -839,7 +923,7 @@ public:
         }
 
         do_erase(bucket);
-        return it;
+        return begin() + value_idx_to_remove;
     }
 
     auto erase(const_iterator it) -> iterator {
@@ -847,24 +931,27 @@ public:
     }
 
     auto erase(const_iterator first, const_iterator last) -> iterator {
-        auto const it_ret = begin() + (first - cbegin());
-
-        auto first_to_last = std::distance(first, last);
-        auto last_to_end = std::distance(last, cend());
+        auto const idx_first = first - cbegin();
+        auto const idx_last = last - cbegin();
+        auto const first_to_last = std::distance(first, last);
+        auto const last_to_end = std::distance(last, cend());
 
         // remove elements from left to right which moves elements from the end back
-        auto const mid = first + std::min(first_to_last, last_to_end);
-        while (first != mid) {
-            erase(first);
-            ++first;
+        auto const mid = idx_first + std::min(first_to_last, last_to_end);
+        auto idx = idx_first;
+        while (idx != mid) {
+            erase(begin() + idx);
+            ++idx;
         }
 
         // all elements from the right are moved, now remove the last element until all done
-        while (last != mid) {
-            erase(--last);
+        idx = idx_last;
+        while (idx != mid) {
+            --idx;
+            erase(begin() + idx);
         }
 
-        return it_ret;
+        return begin() + idx_first;
     }
 
     auto erase(Key const& key) -> size_t {
@@ -1064,7 +1151,7 @@ using map = detail::table<Key, T, Hash, KeyEqual, Allocator>;
 template <class Key, class Hash = hash<Key>, class KeyEqual = std::equal_to<Key>, class Allocator = std::allocator<Key>>
 using set = detail::table<Key, void, Hash, KeyEqual, Allocator>;
 
-#if ANKERL_UNORDERED_DENSE_PMR
+#    if ANKERL_UNORDERED_DENSE_PMR
 
 namespace pmr {
 
@@ -1076,7 +1163,7 @@ using set = detail::table<Key, void, Hash, KeyEqual, std::pmr::polymorphic_alloc
 
 } // namespace pmr
 
-#endif
+#    endif
 
 // deduction guides ///////////////////////////////////////////////////////////
 
@@ -1091,13 +1178,13 @@ namespace std { // NOLINT(cert-dcl58-cpp)
 template <class Key, class T, class Hash, class KeyEqual, class Allocator, class Pred>
 auto erase_if(ankerl::unordered_dense::detail::table<Key, T, Hash, KeyEqual, Allocator>& map, Pred pred) -> size_t {
     // going back to front because erase() invalidates the end iterator
-    auto old_size = map.size();
-
-    auto back_it = map.end();
-    while (map.begin() != back_it) {
-        --back_it;
-        if (pred(*back_it)) {
-            map.erase(back_it);
+    auto const old_size = map.size();
+    auto idx = old_size;
+    while (idx) {
+        --idx;
+        auto it = map.begin() + idx;
+        if (pred(*it)) {
+            map.erase(it);
         }
     }
 
@@ -1106,4 +1193,5 @@ auto erase_if(ankerl::unordered_dense::detail::table<Key, T, Hash, KeyEqual, All
 
 } // namespace std
 
+#endif
 #endif

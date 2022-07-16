@@ -1,10 +1,7 @@
 #!/bin/bash
-cc='g++ -Wall -pedantic -x c++ -std=c++20'
-#cc='clang++ -Wall -pedantic -x c++ -std=c++20'
-#cc='clang++ -Wall -pedantic -x c++ -std=c++20 -c -DSTC_HEADER'
-#cc='cl -nologo'
-#cc='cl -nologo -TP'
-#cc='cl -nologo -std:c11'
+cc='g++ -I../include -s -O3 -Wall -pedantic -x c++ -std=c++20'
+#cc='clang++ -I../include -s -O3 -Wall -pedantic -x c++ -std=c++20'
+#cc='cl -nologo -I../include -O2 -TP -EHsc -std:c++20'
 run=0
 if [ "$1" == '-h' -o "$1" == '--help' ]; then
   echo usage: runall.sh [-run] [compiler + options]
@@ -19,8 +16,8 @@ if [ ! -z "$1" ] ; then
 fi
 if [ $run = 0 ] ; then
     for i in *.cpp misc/*.c* picobench/*.cpp plotbench/*.cpp ; do
-        echo $cc -I../include $i
-        $cc -I../include $i
+        echo $cc -I../include $i -o $(basename -s .cpp $i).exe
+        $cc -I../include $i -o $(basename -s .cpp $i).exe
     done
 else
     for i in misc/*.c* picobench/*.cpp ; do
@@ -32,4 +29,4 @@ else
     done
 fi
 
-rm -f a.out *.o *.obj *.exe
+rm -f a.out *.o *.obj # *.exe

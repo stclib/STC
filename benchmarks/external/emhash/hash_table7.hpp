@@ -119,10 +119,6 @@ of resizing granularity. Ignoring variance, the expected occurrences of list siz
     #define EMH_BUCKET_INDEX 1
 #endif
 
-#ifndef EMH_DEFAULT_LOAD_FACTOR
-#define EMH_DEFAULT_LOAD_FACTOR 0.80f
-#endif
-
 #if EMH_BUCKET_INDEX == 0
     #define EMH_KEY(p,n)     p[n].second.first
     #define EMH_VAL(p,n)     p[n].second.second
@@ -163,6 +159,7 @@ of resizing granularity. Ignoring variance, the expected occurrences of list siz
 
 namespace emhash7 {
 
+    constexpr static float EMH_DEFAULT_LOAD_FACTOR =  0.80f;
 #ifdef EMH_SIZE_TYPE_16BIT
     typedef uint16_t size_type;
     static constexpr size_type INACTIVE = 0xFFFE;
@@ -522,7 +519,7 @@ public:
         _bitmask = nullptr;
         _num_buckets = _num_filled = 0;
         max_load_factor(mlf);
-        reserve(bucket);
+        rehash(bucket);
     }
 
     HashMap(size_type bucket = 2, float mlf = EMH_DEFAULT_LOAD_FACTOR)

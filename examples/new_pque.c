@@ -1,15 +1,7 @@
-#include <stc/forward.h>
-
-forward_cpque(cpque_pnt, struct Point);
-
-struct MyStruct {
-    cpque_pnt priority_queue;
-    int id;
-};
+#include <stdio.h>
 
 #define i_val int
 #include <stc/cstack.h>
-
 #define i_val int
 #include <stc/cpque.h>
 
@@ -22,11 +14,9 @@ int Point_cmp(const Point* a, const Point* b) {
 
 #define i_val Point
 #define i_cmp Point_cmp
-#define i_opt c_is_fwd
 #define i_tag pnt
 #include <stc/cpque.h>
 
-#include <stdio.h>
 
 int main()
 {
