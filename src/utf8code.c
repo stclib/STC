@@ -283,12 +283,12 @@ cstr cregex_replace_re(const char* input, const cregex* re, const char* repl,
 }
 
 
-cstr cregex_replace_fn(const char* input, const char* pattern, const char* repl,
+cstr cregex_replace_ex(const char* input, const char* pattern, const char* repl,
                        cstr (*mfun)(int i, csview match), int cflags, unsigned count) {
     cregex re = cregex_init();
     int res = cregex_compile(&re, pattern, cflags);
     if (res < 0)
-        return cstr_new("[[cregex_replace_fn]]: invalid pattern");
+        return cstr_new("[[cregex_replace_ex]]: invalid pattern");
     cstr out = cregex_replace_re(input, &re, repl, mfun, cflags, count);
     cregex_drop(&re);
     return out;

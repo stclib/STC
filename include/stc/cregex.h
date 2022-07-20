@@ -84,17 +84,14 @@ int cregex_match(const cregex *self, const char* string,
                  unsigned nmatch, csview match[], int mflags);
 
 /* replace regular expression */ 
-void cregex_build_replace(const char* repl, unsigned nmatch, const csview match[],
-                          cstr (*mfun)(int i, csview match), cstr* out);
-
 cstr cregex_replace_re(const char* input, const cregex* re, const char* repl,
                        cstr (*mfun)(int i, csview match), int cflags, unsigned count);
 
-cstr cregex_replace_fn(const char* input, const char* pattern, const char* replace,
+cstr cregex_replace_ex(const char* input, const char* pattern, const char* replace,
                        cstr (*mfun)(int i, csview match), int cflags, unsigned count);
 static inline
 cstr cregex_replace(const char* input, const char* pattern, const char* replace)
-    { return cregex_replace_fn(input, pattern, replace, NULL, 0, 0); }
+    { return cregex_replace_ex(input, pattern, replace, NULL, 0, 0); }
 
 /* destroy regex */
 void cregex_drop(cregex* self);
