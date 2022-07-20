@@ -79,7 +79,7 @@ int cregex_compile(cregex *self, const char* pattern, int cflags);
 /* number of capture groups in a regex pattern */
 int cregex_captures(const cregex* self);
 
-/* return number of capture groups on success, or (negative) error code on failure. */
+/* return 1 on match, 0 on nomatch, and -1 on failure. */
 int cregex_match(const cregex *self, const char* string, 
                  unsigned nmatch, csview match[], int mflags);
 
