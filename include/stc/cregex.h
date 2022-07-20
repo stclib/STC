@@ -34,32 +34,33 @@ THE SOFTWARE.
 #include "forward.h" // csview 
 
 typedef enum {
-    creg_nomatch = -1,
-    creg_matcherror = -2,
-    creg_outofmemory = -3,
-    creg_unmatchedleftparenthesis = -4,
-    creg_unmatchedrightparenthesis = -5,
-    creg_toomanysubexpressions = -6,
-    creg_toomanycharacterclasses = -7,
-    creg_malformedcharacterclass = -8,
-    creg_missingoperand = -9,
-    creg_unknownoperator = -10,
-    creg_operandstackoverflow = -11,
-    creg_operatorstackoverflow = -12,
-    creg_operatorstackunderflow = -13,
+    creg_success = 1,
+    creg_nomatch = 0,
+    creg_matcherror = -1,
+    creg_outofmemory = -2,
+    creg_unmatchedleftparenthesis = -3,
+    creg_unmatchedrightparenthesis = -4,
+    creg_toomanysubexpressions = -5,
+    creg_toomanycharacterclasses = -6,
+    creg_malformedcharacterclass = -7,
+    creg_missingoperand = -8,
+    creg_unknownoperator = -9,
+    creg_operandstackoverflow = -10,
+    creg_operatorstackoverflow = -11,
+    creg_operatorstackunderflow = -12,
 } cregex_error_t;
 
 enum {
     /* compile flags */
-    creg_dotall = 1<<0,
-    creg_caseless = 1<<1,
+    cregex_DOTALL = 1<<0,
+    cregex_CASELESS = 1<<1,
     /* execution flags */
-    creg_fullmatch = 1<<2,
-    creg_next = 1<<3,
-    creg_startend = 1<<4,
+    cregex_FULLMATCH = 1<<2,
+    cregex_NEXT = 1<<3,
+    cregex_STARTEND = 1<<4,
     /* limits */
-    creg_max_classes = 16,
-    creg_max_captures = 32,
+    cregex_MAXCLASSES = 16,
+    cregex_MAXCAPTURES = 32,
 };
 
 typedef struct {
@@ -76,15 +77,26 @@ static inline cregex cregex_init(void) {
 int cregex_compile(cregex *self, const char* pattern, int cflags);
 
 /* number of capture groups in a regex pattern */
-int cregex_captures(cregex rx);
+int cregex_captures(const cregex* self);
 
 /* return number of capture groups on success, or (negative) error code on failure. */
 int cregex_match(const cregex *self, const char* string, 
-                 size_t nmatch, cregmatch match[], int mflags);
+                 unsigned nmatch, csview match[], int mflags);
 
-void cregex_replace(const char* src, char* dst, int dsize,
-                    int nmatch, const cregmatch match[]);
+/* replace regular expression */ 
+void cregex_build_replace(const char* repl, unsigned nmatch, const csview match[],
+                          cstr (*mfun)(int i, csview match), cstr* out);
 
+cstr cregex_replace_re(const char* input, const cregex* re, const char* repl,
+                       cstr (*mfun)(int i, csview match), int cflags, unsigned count);
+
+cstr cregex_replace_fn(const char* input, const char* pattern, const char* replace,
+                       cstr (*mfun)(int i, csview match), int cflags, unsigned count);
+static inline
+cstr cregex_replace(const char* input, const char* pattern, const char* replace)
+    { return cregex_replace_fn(input, pattern, replace, NULL, 0, 0); }
+
+/* destroy regex */
 void cregex_drop(cregex* self);
 
 #endif

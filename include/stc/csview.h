@@ -120,8 +120,8 @@ STC_INLINE csview cstr_substr_ex(const cstr* self, intptr_t pos, size_t n)
 STC_INLINE csview cstr_slice_ex(const cstr* self, intptr_t p1, intptr_t p2)
     { return csview_slice_ex(csview_from_s(self), p1, p2); }
 
-STC_INLINE csview cstr_assign_sv(cstr* self, csview sv)
-    { return c_make(csview){cstr_assign_n(self, sv.str, sv.size), sv.size}; }
+STC_INLINE char* cstr_assign_sv(cstr* self, csview sv)
+    { return cstr_assign_n(self, sv.str, sv.size); }
 
 STC_INLINE void cstr_append_sv(cstr* self, csview sv)
     { cstr_append_n(self, sv.str, sv.size); }

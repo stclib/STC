@@ -22,7 +22,7 @@ int main()
             printf("input: %s\n", inputs[i]);
             if (cregex_match(&re, inputs[i], 20, m, 0) > 0)
             {
-                c_forrange (j, cregex_captures(re))
+                c_forrange (j, cregex_captures(&re))
                 {
                     printf("  submatch %" PRIuMAX ": %" c_PRIsv "\n", j, c_ARGsv(m[j]));
                 }

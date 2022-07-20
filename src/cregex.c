@@ -38,9 +38,9 @@ THE SOFTWARE.
 typedef uint32_t Rune; /* Utf8 code point */
 typedef int32_t Token;
 /* max character classes per program */
-#define NCLASS creg_max_classes
+#define NCLASS cregex_MAXCLASSES
 /* max subexpressions */
-#define NSUBEXP creg_max_captures
+#define NSUBEXP cregex_MAXCAPTURES
 /* max rune ranges per character class */
 #define NCCRUNE (NSUBEXP * 2)
 
@@ -91,7 +91,7 @@ typedef struct Reprog
 /*
  *    Sub expression matches
  */
-typedef cregmatch Resub;
+typedef csview Resub;
 
 /*
  *  substitution list
@@ -228,11 +228,11 @@ utfruneicase(const char *s, Rune c)
  *  save a new match in mp
  */
 static void
-_renewmatch(Resub *mp, int ms, Resublist *sp, int nsubids)
+_renewmatch(Resub *mp, unsigned ms, Resublist *sp, int nsubids)
 {
     int i;
 
-    if (mp==NULL || ms<=0)
+    if (mp==NULL || ms==0)
         return;
     if (mp[0].str == NULL || sp->m[0].str < mp[0].str ||
        (sp->m[0].str == mp[0].str && sp->m[0].size > mp[0].size)) {
@@ -249,7 +249,7 @@ _renewmatch(Resub *mp, int ms, Resublist *sp, int nsubids)
 static Relist*
 _renewthread(Relist *lp,  /* _relist to add to */
     Reinst *ip,           /* instruction to add */
-    int ms,
+    unsigned ms,
     Resublist *sep)       /* pointers to subexpressions */
 {
     Relist *p;
@@ -281,7 +281,7 @@ _renewthread(Relist *lp,  /* _relist to add to */
 static Relist*
 _renewemptythread(Relist *lp,   /* _relist to add to */
     Reinst *ip,                 /* instruction to add */
-    int ms,
+    unsigned ms,
     const char *sp)             /* pointers to subexpressions */
 {
     Relist *p;
@@ -806,8 +806,8 @@ regcomp1(Reprog *progp, Parser *par, const char *s, int cflags)
         free(progp);
         return NULL;
     }
-    pp->flags.caseless = (cflags & creg_caseless) != 0;
-    pp->flags.dotall = (cflags & creg_dotall) != 0;
+    pp->flags.caseless = (cflags & cregex_CASELESS) != 0;
+    pp->flags.dotall = (cflags & cregex_DOTALL) != 0;
     par->freep = pp->firstinst;
     par->classp = pp->cclass;
     par->errors = 0;
@@ -930,10 +930,10 @@ runematch(Rune s, Rune r, bool icase)
  *        <0 if we ran out of _relist space
  */
 static int
-regexec1(const Reprog *progp,    /* program to run */
+regexec1(const Reprog *progp,  /* program to run */
     const char *bol,    /* string to run machine on */
-    Resub *mp,    /* subexpression elements */
-    int ms,        /* number of elements at mp */
+    Resub *mp,          /* subexpression elements */
+    unsigned ms,        /* number of elements at mp */
     Reljunk *j,
     int mflags
 )
@@ -1057,7 +1057,7 @@ regexec1(const Reprog *progp,    /* program to run */
                     /* efficiency: advance and re-evaluate */
                     continue;
                 case END:    /* Match! */
-                    match = !(mflags & creg_fullmatch) ||
+                    match = !(mflags & cregex_FULLMATCH) ||
                             ((s == j->eol || r == 0 || r == '\n') &&
                             (tlp->se.m[0].str == bol || tlp->se.m[0].str[-1] == '\n'));
                     tlp->se.m[0].size = s - tlp->se.m[0].str;
@@ -1082,8 +1082,8 @@ regexec1(const Reprog *progp,    /* program to run */
 static int
 regexec2(const Reprog *progp,    /* program to run */
     const char *bol,    /* string to run machine on */
-    Resub *mp,    /* subexpression elements */
-    int ms,        /* number of elements at mp */
+    Resub *mp,          /* subexpression elements */
+    unsigned ms,        /* number of elements at mp */
     Reljunk *j,
     int mflags
 )
@@ -1109,7 +1109,7 @@ regexec2(const Reprog *progp,    /* program to run */
 static int
 regexec(const Reprog *progp,    /* program to run */
     const char *bol,    /* string to run machine on */
-    int ms,             /* number of elements at mp */
+    unsigned ms,        /* number of elements at mp */
     Resub mp[],         /* subexpression elements */
     int mflags)
 {
@@ -1123,10 +1123,10 @@ regexec(const Reprog *progp,    /* program to run */
     j.starts = bol;
     j.eol = NULL;
 
-    if (mp && mp->str && ms>0) {
-        if (mflags & creg_startend)
+    if (ms && mp->size) {
+        if (mflags & cregex_STARTEND)
             j.starts = mp->str, j.eol = mp->str + mp->size;
-        else if (mflags & creg_next)
+        else if (mflags & cregex_NEXT)
             j.starts = mp->str + mp->size;
     }
 
@@ -1157,55 +1157,6 @@ regexec(const Reprog *progp,    /* program to run */
  * API functions
  */
 
-/* substitute into one string using the matches from the last regexec() */
-void cregex_replace(
-    const char *sp,     /* source string */
-    char *dp,           /* destination string */
-    int dlen,
-    int ms,             /* number of elements pointed to by mp */
-    const cregmatch mp[])   /* subexpression elements */
-{
-    const char *ssp, *ep;
-    int i;
-
-    ep = dp+dlen-1;
-    while (*sp != '\0') {
-        if (*sp == '\\') {
-            switch (*++sp) {
-            case '0': case '1': case '2': case '3': case '4':
-            case '5': case '6': case '7': case '8': case '9':
-                i = *sp - '0';
-                if (mp[i].str != NULL && mp != NULL && ms > i)
-                    for (ssp = mp[i].str; ssp < (mp[i].str + mp[i].size); ssp++)
-                        if (dp < ep)
-                            *dp++ = *ssp;
-                break;
-            case '\\':
-                if (dp < ep)
-                    *dp++ = '\\';
-                break;
-            case '\0':
-                sp--;
-                break;
-            default:
-                if (dp < ep)
-                    *dp++ = *sp;
-                break;
-            }
-        } else if (*sp == '&') {
-            if (mp[0].str != NULL && mp != NULL && ms > 0)
-                for (ssp = mp[0].str; ssp < (mp[0].str + mp[0].size); ssp++)
-                    if (dp < ep)
-                        *dp++ = *ssp;
-        } else {
-            if (dp < ep)
-                *dp++ = *sp;
-        }
-        sp++;
-    }
-    *dp = '\0';
-}
-
 int cregex_compile(cregex *rx, const char* pattern, int cflags) {
     Parser par;
     rx->prog = regcomp1(rx->prog, &par, pattern, cflags);
@@ -1214,15 +1165,15 @@ int cregex_compile(cregex *rx, const char* pattern, int cflags) {
     return par.errors;
 }
 
-int cregex_captures(cregex rx) {
-    return rx.prog ? 1 + rx.prog->nsubids : 0;
+int cregex_captures(const cregex* self) {
+    return self->prog ? 1 + self->prog->nsubids : 0;
 }
 
 int cregex_match(const cregex *rx, const char* string,
-                 size_t nmatch, cregmatch match[], int mflags) {
+                 unsigned nmatch, csview match[], int mflags) {
     int res = regexec(rx->prog, string, nmatch, match, mflags);
     switch (res) {
-    case 1: return 1 + rx->prog->nsubids;
+    case 1: return creg_success;
     case 0: return creg_nomatch;
     default: return creg_matcherror;
     }

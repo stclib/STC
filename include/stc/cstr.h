@@ -404,9 +404,9 @@ STC_DEF char* cstr_reserve(cstr* self, const size_t cap) {
     if (cap > cstr_s_cap) {
         char* data = (char *)c_malloc(cap + 1);
         const size_t len = cstr_s_size(self);
-        memcpy(data, self->sml.data, len);
+        memcpy(data, self->sml.data, cstr_s_cap + 1);
         self->lon.data = data;
-        cstr_l_set_size(self, len);
+        self->lon.size = len;
         cstr_l_set_cap(self, cap);
         return data;
     }
@@ -525,7 +525,8 @@ STC_DEF int cstr_vfmt(cstr* self, const char* fmt, va_list args) {
 
 STC_DEF cstr cstr_from_fmt(const char* fmt, ...) {
     cstr s = cstr_null;
-    va_list args; va_start(args, fmt);
+    va_list args;
+    va_start(args, fmt);
     cstr_vfmt(&s, fmt, args);
     va_end(args);
     return s;
@@ -533,7 +534,8 @@ STC_DEF cstr cstr_from_fmt(const char* fmt, ...) {
 
 STC_DEF int cstr_printf(cstr* self, const char* fmt, ...) {
     cstr s = cstr_null;
-    va_list args; va_start(args, fmt);
+    va_list args;
+    va_start(args, fmt);
     const int n = cstr_vfmt(&s, fmt, args);
     va_end(args);
     cstr_drop(self); *self = s;
