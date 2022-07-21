@@ -14,20 +14,20 @@ int main()
         int res = cregex_compile(&re, "[+-]?([0-9]*\\.)?\\d+([Ee][+-]?\\d+)?", 0);
         printf("%d\n", res);
         csview m[10];
-        if (cregex_match(&re, s, 10, m, 0) > 0) {
+        if (cregex_match_re(s, &re, 10, m, 0) > 0) {
             printf("Found digits at position %" PRIuMAX "-%" PRIuMAX "\n", m[0].str - s, m[0].str - s + m[0].size);
         } else {
             printf("Could not find any digits\n");
         }
 
-        while (cregex_match(&re, s, 10, m, cregex_NEXT) > 0) {
+        while (cregex_match_re(s, &re, 10, m, cre_NEXT) > 0) {
             printf("%" c_PRIsv " ; ", c_ARGsv(m[0]));
         }
         puts("");
 
         res = cregex_compile(&re, "(.+)\\b(.+)", 0);
         printf("groups: %d\n", res);
-        if ((res = cregex_match(&re, "hello@wørld", 10, m, 0)) > 0) {
+        if ((res = cregex_match_re("hello@wørld", &re, 10, m, 0)) > 0) {
             c_forrange (i, res)
                 printf("match: [%" c_PRIsv "]\n", c_ARGsv(m[i]));
         } else

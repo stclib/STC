@@ -1,3 +1,4 @@
+#define i_implement
 #include <stc/cstr.h>
 #include <stc/cregex.h>
 
@@ -21,7 +22,7 @@ int main(int argc, char* argv[])
             if (cstr_equals(input, "q"))
                 break;
 
-            if (cregex_match(&float_expr, cstr_str(&input), 0, NULL, 0) > 0)
+            if (cregex_match_re(cstr_str(&input), &float_expr, 0, NULL, 0) > 0)
                 printf("Input is a float\n");
             else
                 printf("Invalid input : Not a float\n");
