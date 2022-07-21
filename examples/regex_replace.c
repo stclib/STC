@@ -17,24 +17,28 @@ int main()
     const char* pattern = "\\b(\\d\\d\\d\\d)-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])\\b";
     const char* input = "start date: 2015-12-31, end date: 2022-02-28";
 
-    c_auto (cstr, str1, str2, str3, str4)
+    c_auto (cstr, str)
     {
         printf("input: %s\n", input);
         /* European date format */
-        str1 = cregex_replace(input, pattern, "\\3.\\2.\\1");
-        printf("euros: %s\n", cstr_str(&str1));
+        cstr_take(&str, cregex_replace(input, pattern, "\\3.\\2.\\1"));
+        printf("euros: %s\n", cstr_str(&str));
 
         /* US date format, and subtract 20 years: */
-        str2 = cregex_replace_ex(input, pattern, "\\1/\\3/\\2", sub_20y, 0, 0);
-        printf("us-20: %s\n", cstr_str(&str2));
-
-        /* Wrap first date only inside []: */
-        str3 = cregex_replace_ex(input, pattern, "[\\0]", NULL, 0, 1);
-        printf("brack: %s\n", cstr_str(&str3));
+        cstr_take(&str, cregex_replace_ex(input, pattern, "\\1/\\3/\\2", sub_20y, 0, 0));
+        printf("us-20: %s\n", cstr_str(&str));
 
         /* replace with a fixed string: */
-        str4 = cregex_replace(input, pattern, "YYYY-MM-DD");
-        printf("brack: %s\n", cstr_str(&str4));
+        cstr_take(&str, cregex_replace(input, pattern, "YYYY-MM-DD"));
+        printf("fixed: %s\n", cstr_str(&str));
+
+        /* Wrap first date inside []: */
+        cstr_take(&str, cregex_replace_ex(input, pattern, "[\\0]", NULL, 0, 1));
+        printf("brack: %s\n", cstr_str(&str));
+
+        /* Wrap all words in {} */
+        cstr_take(&str, cregex_replace("[52] apples and [31] mangoes", "[a-z]+", "{\\0}"));
+        printf("curly: %s\n", cstr_str(&str));
     }
 }
 

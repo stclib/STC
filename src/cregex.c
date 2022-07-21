@@ -34,6 +34,8 @@ THE SOFTWARE.
 #include <stdio.h>
 #include <stc/cregex.h>
 #include <stc/utf8.h>
+#define i_header
+#include <stc/cstr.h>
 
 typedef uint32_t Rune; /* Utf8 code point */
 typedef int32_t Token;
@@ -1153,7 +1155,46 @@ regexec(const Reprog *progp,    /* program to run */
     return rv;
 }
 
-/*
+
+void cregex_build_replace(const char* repl, unsigned nmatch, const csview match[],
+                          cstr (*mfun)(int i, csview match), cstr* sub) {
+    cstr_clear(sub);
+    unsigned len = 0, cap = cstr_capacity(*sub);
+    char* dst = cstr_data(sub);
+
+    while (*repl != '\0') {
+        if (*repl == '\\') {
+            const char num = *++repl;
+            int i;
+            switch (num) {
+            case '0': case '1': case '2': case '3': case '4':
+            case '5': case '6': case '7': case '8': case '9':
+                i = num - '0';
+                if (i < nmatch) {
+                    csview m;
+                    cstr s = cstr_null;
+                    if (mfun) { s = mfun(i, match[i]); m = cstr_sv(&s); }
+                    else m = match[i];
+                    if (len + m.size >= cap)
+                        dst = cstr_reserve(sub, cap = cap*3/2 + m.size);
+                    for (const char* rp = m.str; rp != (m.str + m.size); ++rp)
+                        dst[len++] = *rp;
+                    cstr_drop(&s);
+                }
+                ++repl;
+            case '\0':
+                continue;
+            }
+        }
+        if (len == cap)
+            dst = cstr_reserve(sub, cap = cap*3/2 + 4);
+        dst[len++] = *repl++;
+    }
+    _cstr_set_size(sub, len);
+}
+
+
+/* ---------------------------------------------------------------
  * API functions
  */
 
@@ -1178,6 +1219,40 @@ int cregex_match(const cregex *rx, const char* string,
     default: return creg_matcherror;
     }
 }
+
+
+cstr cregex_replace_re(const char* input, const cregex* re, const char* repl,
+                       cstr (*mfun)(int i, csview match), int cflags, unsigned count) {
+    cstr out = cstr_null;
+    cstr sub = cstr_null;
+    size_t from = 0;
+    csview match[cregex_MAXCAPTURES];
+    unsigned nmatch = cregex_captures(re);
+    if (!count) count = ~0;
+
+    while (count-- && cregex_match(re, input + from, nmatch, match, 0) > 0) {
+        cregex_build_replace(repl, nmatch, match, mfun, &sub);
+        const size_t pos = match[0].str - input;
+        cstr_append_n(&out, input + from, pos - from);
+        cstr_append_s(&out, sub);
+        from = pos + match[0].size;
+    }
+    cstr_append(&out, input + from);
+    cstr_drop(&sub);
+    return out;
+}
+
+cstr cregex_replace_ex(const char* input, const char* pattern, const char* repl,
+                       cstr (*mfun)(int i, csview match), int cflags, unsigned count) {
+    cregex re = cregex_init();
+    int res = cregex_compile(&re, pattern, cflags);
+    if (res < 0)
+        return cstr_new("[[cregex_replace_ex]]: invalid pattern");
+    cstr out = cregex_replace_re(input, &re, repl, mfun, cflags, count);
+    cregex_drop(&re);
+    return out;
+}
+
 
 void cregex_drop(cregex* self) {
     free(self->prog);
