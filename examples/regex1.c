@@ -22,7 +22,7 @@ int main(int argc, char* argv[])
             if (cstr_equals(input, "q"))
                 break;
 
-            if (cregex_match_re(cstr_str(&input), &float_expr, 0, NULL, 0) > 0)
+            if (cregex_match(cstr_str(&input), &float_expr, NULL, 0) == 1)
                 printf("Input is a float\n");
             else
                 printf("Invalid input : Not a float\n");

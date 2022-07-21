@@ -69,35 +69,43 @@ typedef struct {
 
 typedef csview cregmatch;
 
-static inline cregex cregex_init(void) {
-    cregex rx = {NULL}; return rx;
+static inline
+cregex cregex_init(void) {
+    cregex rx = {0};
+    return rx;
 }
 
 /* return number of capture groups on success, or (negative) error code on failure. */
 int cregex_compile(cregex *self, const char* pattern, int cflags);
 
+static inline
+cregex cregex_from(const char* pattern, int cflags, int* res) {
+    cregex rx = {0};
+    int ret = cregex_compile(&rx, pattern, cflags);
+    if (res) *res = ret;
+    return rx;
+}
+
 /* number of capture groups in a regex pattern */
 int cregex_captures(const cregex* self);
 
 /* return 1 on match, 0 on nomatch, and -1 on failure. */
-int cregex_match_re(const char* input, const cregex* re,
-                    unsigned nmatch, csview match[], int mflags);
+int cregex_match(const char* input, const cregex* re,
+                 csview match[], int mflags);
 
-int cregex_match_ex(const char* input, const char* pattern, int cflags,
-                    unsigned nmatch, csview match[], int mflags);
-static inline
-int cregex_match(const char* input, const char* pattern, unsigned nmatch, csview match[])
-    { return cregex_match_ex(input, pattern, 0, nmatch, match, 0); }
+int cregex_match_pat(const char* input, const char* pattern,
+                     csview match[], int cmflags);
 
 /* replace regular expression */ 
-cstr cregex_replace_re(const char* input, const cregex* re, const char* replace,
-                       cstr (*mfun)(int i, csview match), int cflags, unsigned count);
+cstr cregex_replace(const char* input, const cregex* re, const char* replace,
+                    cstr (*mfun)(int i, csview match), unsigned count);
 
-cstr cregex_replace_ex(const char* input, const char* pattern, const char* replace,
-                       cstr (*mfun)(int i, csview match), int cflags, unsigned count);
+cstr cregex_replace_patx(const char* input, const char* pattern, 
+                         const char* replace, cstr (*mfun)(int i, csview match),
+                         unsigned count, int cflags);
 static inline
-cstr cregex_replace(const char* input, const char* pattern, const char* replace)
-    { return cregex_replace_ex(input, pattern, replace, NULL, 0, 0); }
+cstr cregex_replace_pat(const char* input, const char* pattern, const char* replace)
+    { return cregex_replace_patx(input, pattern, replace, NULL, 0, 0); }
 
 /* destroy regex */
 void cregex_drop(cregex* self);
