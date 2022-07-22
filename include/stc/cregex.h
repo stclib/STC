@@ -97,8 +97,11 @@ int cregex_match_p(const char* input, const char* pattern,
                    csview match[], int cmflags);
 
 /* replace regular expression */ 
-cstr cregex_replace(const char* input, const cregex* re, const char* replace,
-                    bool (*mfun)(int i, csview match, cstr* mstr), unsigned count);
+cstr cregex_replace_re(const char* input, const cregex* re, const char* replace,
+                       bool (*mfun)(int i, csview match, cstr* mstr), unsigned count);
+static inline
+cstr cregex_replace(const char* input, const cregex* re, const char* replace)
+    { return cregex_replace_re(input, re, replace, NULL, 0); }
 
 /* replace + compile RE pattern, and extra arguments */
 cstr cregex_replace_pe(const char* input, const char* pattern, const char* replace,

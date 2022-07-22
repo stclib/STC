@@ -1164,7 +1164,7 @@ build_subst_string(const char* replace, unsigned nmatch, const csview match[],
     cstr mstr = cstr_null;
 
     while (*replace != '\0') {
-        if (*replace == '\\') {
+        if (*replace == '$') {
             const char num = *++replace;
             int i;
             switch (num) {
@@ -1230,8 +1230,8 @@ int cregex_match_p(const char* input, const char* pattern,
 }
 
 cstr
-cregex_replace(const char* input, const cregex* re, const char* replace,
-               bool (*mfun)(int i, csview match, cstr* mstr), unsigned count) {
+cregex_replace_re(const char* input, const cregex* re, const char* replace,
+                  bool (*mfun)(int i, csview match, cstr* mstr), unsigned count) {
     cstr out = cstr_null;
     cstr subst = cstr_null;
     size_t from = 0;
@@ -1258,7 +1258,7 @@ cregex_replace_pe(const char* input, const char* pattern, const char* replace,
     int res = cregex_compile(&re, pattern, cflags);
     if (res < 0)
         return cstr_new("[[error: invalid regex pattern]]");
-    cstr out = cregex_replace(input, &re, replace, mfun, count);
+    cstr out = cregex_replace_re(input, &re, replace, mfun, count);
     cregex_drop(&re);
     return out;
 }
