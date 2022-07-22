@@ -1221,8 +1221,8 @@ cregex_match(const char* input, const cregex* re,
     }
 }
 
-int cregex_match_pat(const char* input, const char* pattern,
-                     csview match[], int cmflags) {
+int cregex_match_p(const char* input, const char* pattern,
+                   csview match[], int cmflags) {
     cregex re = cregex_init();
     int res = cregex_compile(&re, pattern, cmflags);
     if (res < 0) return res;
@@ -1254,9 +1254,8 @@ cregex_replace(const char* input, const cregex* re, const char* replace,
 }
 
 cstr
-cregex_replace_patx(const char* input, const char* pattern,
-                    const char* replace, cstr (*mfun)(int i, csview match), 
-                    unsigned count, int cflags) {
+cregex_replace_pe(const char* input, const char* pattern, const char* replace,
+                  cstr (*mfun)(int i, csview match), unsigned count, int cflags) {
     cregex re = cregex_init();
     int res = cregex_compile(&re, pattern, cflags);
     if (res < 0)

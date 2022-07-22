@@ -75,37 +75,37 @@ cregex cregex_init(void) {
     return rx;
 }
 
-/* return number of capture groups on success, or (negative) error code on failure. */
+/* return 1 on success, or negative error code on failure. */
 int cregex_compile(cregex *self, const char* pattern, int cflags);
 
 static inline
-cregex cregex_from(const char* pattern, int cflags, int* res) {
+cregex cregex_from(const char* pattern, int cflags) {
     cregex rx = {0};
-    int ret = cregex_compile(&rx, pattern, cflags);
-    if (res) *res = ret;
+    cregex_compile(&rx, pattern, cflags);
     return rx;
 }
 
-/* number of capture groups in a regex pattern */
+/* number of capture groups in a regex pattern, 0 if regex is invalid */
 int cregex_captures(const cregex* self);
 
 /* return 1 on match, 0 on nomatch, and -1 on failure. */
 int cregex_match(const char* input, const cregex* re,
                  csview match[], int mflags);
 
-int cregex_match_pat(const char* input, const char* pattern,
-                     csview match[], int cmflags);
+/* match + compile RE pattern */
+int cregex_match_p(const char* input, const char* pattern,
+                   csview match[], int cmflags);
 
 /* replace regular expression */ 
 cstr cregex_replace(const char* input, const cregex* re, const char* replace,
                     cstr (*mfun)(int i, csview match), unsigned count);
 
-cstr cregex_replace_patx(const char* input, const char* pattern, 
-                         const char* replace, cstr (*mfun)(int i, csview match),
-                         unsigned count, int cflags);
+/* replace + compile RE pattern and extra arguments */
+cstr cregex_replace_pe(const char* input, const char* pattern, const char* replace,
+                       cstr (*mfun)(int i, csview match), unsigned count, int cflags);
 static inline
-cstr cregex_replace_pat(const char* input, const char* pattern, const char* replace)
-    { return cregex_replace_patx(input, pattern, replace, NULL, 0, 0); }
+cstr cregex_replace_p(const char* input, const char* pattern, const char* replace)
+    { return cregex_replace_pe(input, pattern, replace, NULL, 0, 0); }
 
 /* destroy regex */
 void cregex_drop(cregex* self);

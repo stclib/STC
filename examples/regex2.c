@@ -1,6 +1,6 @@
+#define i_implement
 #include <stc/cstr.h>
 #include <stc/cregex.h>
-#include <stc/csview.h>
 
 int main()
 {
@@ -18,7 +18,7 @@ int main()
                 printf("error in regex pattern: %d\n", res);
                 continue;
             }
-            cregmatch m[20];
+            csview m[20];
             printf("input: %s\n", inputs[i]);
             if (cregex_match(inputs[i], &re, m, 0) == 1)
             {
