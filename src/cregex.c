@@ -1157,10 +1157,11 @@ regexec(const Reprog *progp,    /* program to run */
 
 static void
 build_subst_string(const char* replace, unsigned nmatch, const csview match[],
-                   cstr (*mfun)(int i, csview match), cstr* subst) {
+                   bool (*mfun)(int i, csview match, cstr* mstr), cstr* subst) {
     cstr_clear(subst);
     unsigned len = 0, cap = cstr_capacity(*subst);
     char* dst = cstr_data(subst);
+    cstr mstr = cstr_null;
 
     while (*replace != '\0') {
         if (*replace == '\\') {
@@ -1171,15 +1172,11 @@ build_subst_string(const char* replace, unsigned nmatch, const csview match[],
             case '5': case '6': case '7': case '8': case '9':
                 i = num - '0';
                 if (i < nmatch) {
-                    csview m;
-                    cstr mstr = cstr_null;
-                    if (mfun) { mstr = mfun(i, match[i]); m = cstr_sv(&mstr); }
-                    else m = match[i];
+                    csview m = mfun && mfun(i, match[i], &mstr) ? cstr_sv(&mstr) : match[i];
                     if (len + m.size >= cap)
                         dst = cstr_reserve(subst, cap = cap*3/2 + m.size);
                     for (const char* rp = m.str; rp != (m.str + m.size); ++rp)
                         dst[len++] = *rp;
-                    cstr_drop(&mstr);
                 }
                 ++replace;
             case '\0':
@@ -1190,6 +1187,7 @@ build_subst_string(const char* replace, unsigned nmatch, const csview match[],
             dst = cstr_reserve(subst, cap = cap*3/2 + 4);
         dst[len++] = *replace++;
     }
+    cstr_drop(&mstr);
     _cstr_set_size(subst, len);
 }
 
@@ -1233,7 +1231,7 @@ int cregex_match_p(const char* input, const char* pattern,
 
 cstr
 cregex_replace(const char* input, const cregex* re, const char* replace,
-               cstr (*mfun)(int i, csview match), unsigned count) {
+               bool (*mfun)(int i, csview match, cstr* mstr), unsigned count) {
     cstr out = cstr_null;
     cstr subst = cstr_null;
     size_t from = 0;
@@ -1255,7 +1253,7 @@ cregex_replace(const char* input, const cregex* re, const char* replace,
 
 cstr
 cregex_replace_pe(const char* input, const char* pattern, const char* replace,
-                  cstr (*mfun)(int i, csview match), unsigned count, int cflags) {
+                  bool (*mfun)(int i, csview match, cstr* mstr), unsigned count, int cflags) {
     cregex re = cregex_init();
     int res = cregex_compile(&re, pattern, cflags);
     if (res < 0)

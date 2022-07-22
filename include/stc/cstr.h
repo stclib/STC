@@ -511,8 +511,7 @@ STC_DEF int cstr_vfmt(cstr* self, const char* fmt, va_list args) {
     va_list args2;
     va_copy(args2, args);
     const int n = vsnprintf(NULL, (size_t)0, fmt, args);
-    cstr_reserve(self, n);
-    vsprintf(cstr_data(self), fmt, args2);
+    vsprintf(cstr_reserve(self, n), fmt, args2);
     va_end(args2);
     _cstr_set_size(self, n);
     return n;
@@ -532,13 +531,12 @@ STC_DEF cstr cstr_from_fmt(const char* fmt, ...) {
     return s;
 }
 
+/* NB! self-data in args is UB */
 STC_DEF int cstr_printf(cstr* self, const char* fmt, ...) {
-    cstr s = cstr_null;
     va_list args;
     va_start(args, fmt);
-    const int n = cstr_vfmt(&s, fmt, args);
+    const int n = cstr_vfmt(self, fmt, args);
     va_end(args);
-    cstr_drop(self); *self = s;
     return n;
 }
 

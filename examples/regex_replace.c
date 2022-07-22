@@ -2,13 +2,14 @@
 #include <stc/cstr.h>
 #include <stc/cregex.h>
 
-cstr sub_20y(int i, csview m) {
-    if (i == 1) { // year
+bool add_10_years(int i, csview m, cstr* mstr) {
+    if (i == 1) { // group 1 matches year
         int year;
         sscanf(m.str, "%4d", &year);
-        return cstr_from_fmt("%04d", year - 20);
+        cstr_printf(mstr, "%04d", year + 10);
+        return true;
     }
-    return cstr_from_sv(m);
+    return false;
 }
 
 int main()
@@ -18,31 +19,31 @@ int main()
 
     c_auto (cstr, str)
     {
-        printf("input: %s\n\n", input);
+        printf("INPUT: %s\n", input);
 
         /* replace with a fixed string, extended all-in-one call: */
         cstr_take(&str, cregex_replace_p(input, pattern, "YYYY-MM-DD"));
         printf("fixed: %s\n", cstr_str(&str));
 
-        /* US date format, and subtract 20 years: */
-        cstr_take(&str, cregex_replace_pe(input, pattern, "\\1/\\3/\\2", sub_20y, 0, 0));
-        printf("us-20: %s\n", cstr_str(&str));
+        /* US date format, and add 10 years to dates: */
+        cstr_take(&str, cregex_replace_pe(input, pattern, "\\1/\\3/\\2", add_10_years, 0, 0));
+        printf("us+10: %s\n", cstr_str(&str));
 
         /* Wrap first date inside []: */
         cstr_take(&str, cregex_replace_pe(input, pattern, "[\\0]", NULL, 1, 0));
         printf("brack: %s\n", cstr_str(&str));
 
-        /* Wrap all words in {} */
-        cstr_take(&str, cregex_replace_p("[52] apples and [31] mangoes", "[a-z]+", "{\\0}"));
-        printf("curly: %s\n", cstr_str(&str));
-
-        /* European date format, compile RE separately */
+        /* European date format. Show how to compile RE separately */
         cregex re = cregex_from(pattern, 0);
         if (cregex_captures(&re) == 0)
               continue;
         cstr_take(&str, cregex_replace(input, &re, "\\3.\\2.\\1", NULL, 0));
         cregex_drop(&re);
         printf("euros: %s\n", cstr_str(&str));
+
+        /* Wrap all words in {} */
+        cstr_take(&str, cregex_replace_p("[52] apples and [31] mangoes", "[a-z]+", "{\\0}"));
+        printf("curly: %s\n", cstr_str(&str));
     }
 }
 
