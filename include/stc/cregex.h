@@ -52,12 +52,12 @@ typedef enum {
 
 enum {
     /* compile-flags */
-    cre_DOTALL = 1<<0,
-    cre_CASELESS = 1<<1,
+    cre_c_dotall = 1<<0,
+    cre_c_caseless = 1<<1,
     /* match-flags */
-    cre_FULLMATCH = 1<<2,
-    cre_NEXT = 1<<3,
-    cre_STARTEND = 1<<4,
+    cre_m_fullmatch = 1<<2,
+    cre_m_next = 1<<3,
+    cre_m_startend = 1<<4,
     /* limits */
     cre_MAXCLASSES = 16,
     cre_MAXCAPTURES = 32,
@@ -65,6 +65,7 @@ enum {
 
 typedef struct {
     struct Reprog* prog;
+    int error;
 } cregex;
 
 typedef csview cregmatch;
@@ -89,12 +90,16 @@ cregex cregex_from(const char* pattern, int cflags) {
 int cregex_captures(const cregex* self);
 
 /* return 1 on match, 0 on nomatch, and -1 on failure. */
-int cregex_match(const char* input, const cregex* re,
-                 csview match[], int mflags);
+int cregex_find(const char* input, const cregex* re,
+                csview match[], int mflags);
 
 /* match + compile RE pattern */
-int cregex_match_p(const char* input, const char* pattern,
-                   csview match[], int cmflags);
+int cregex_find_p(const char* input, const char* pattern,
+                  csview match[], int cmflags);
+
+static inline
+bool cregex_is_match(const char* input, const cregex* re, int mflags)
+    { return cregex_find(input, re, NULL, mflags) == 1; }
 
 /* replace regular expression */ 
 cstr cregex_replace_re(const char* input, const cregex* re, const char* replace,

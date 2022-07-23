@@ -20,7 +20,7 @@ int main()
             }
             csview m[20];
             printf("input: %s\n", inputs[i]);
-            if (cregex_match(inputs[i], &re, m, 0) == 1)
+            if (cregex_find(inputs[i], &re, m, 0) == 1)
             {
                 c_forrange (j, cregex_captures(&re))
                 {
