@@ -108,15 +108,6 @@ STC_INLINE stc64_normalf_t stc64_normalf_new(double mean, double stddev) {
     return c_make(stc64_normalf_t){mean, stddev, 0.0, 0};
 }
 
-/* Following functions are deprecated (will be removed in the future): */
-STC_INLINE void stc64_srandom(uint64_t seed) { csrandom(seed); }
-STC_INLINE uint64_t stc64_random() { return crandom(); }
-STC_INLINE stc64_t stc64_init(uint64_t seed) { return stc64_new(seed); }
-STC_INLINE stc64_uniformf_t stc64_uniformf_init(double low, double high)
-    { return stc64_uniformf_new(low, high); }
-STC_INLINE stc64_normalf_t stc64_normalf_init(double mean, double stddev)
-    { return stc64_normalf_new(mean, stddev); }
-
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement) || defined(i_extern)
 
@@ -142,7 +133,7 @@ STC_DEF double crandomf(void) {
 /* rng.state[4] must be odd */
 STC_DEF stc64_t stc64_with_seq(uint64_t seed, uint64_t seq) {
     stc64_t rng = {{seed+0x26aa069ea2fb1a4d, seed+0x70c72c95cd592d04,
-                    seed+0x504f333d3aa0b359, seed, seed<<1 | 1}};
+                    seed+0x504f333d3aa0b359, seed, seq<<1 | 1}};
     for (int i = 0; i < 6; ++i) stc64_rand(&rng);
     return rng;
 }

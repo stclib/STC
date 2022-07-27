@@ -33,13 +33,18 @@ int main()
         cstr_take(&str, cregex_replace_pe(input, pattern, "[$0]", NULL, 1, 0));
         printf("brack: %s\n", cstr_str(&str));
 
-        /* European date format. Show how to compile RE separately */
-        cregex re = cregex_from(pattern, 0);
-        if (cregex_captures(&re) == 0)
-              continue;
-        cstr_take(&str, cregex_replace(input, &re, "$3.$2.$1"));
-        cregex_drop(&re);
-        printf("euros: %s\n", cstr_str(&str));
+        /* Shows how to compile RE separately */
+        c_autovar (cregex re = cregex_from(pattern, 0), cregex_drop(&re)) {
+            if (cregex_captures(&re) == 0)
+                  continue;
+            /* European date format. */
+            cstr_take(&str, cregex_replace(input, &re, "$3.$2.$1"));
+            printf("euros: %s\n", cstr_str(&str));
+
+            /* Strip out everything but the matches */
+            cstr_take(&str, cregex_replace_re(input, &re, "$3.$2.$1;", NULL, 0, cre_r_strip));
+            printf("strip: %s\n", cstr_str(&str));
+        }
 
         /* Wrap all words in ${} */
         cstr_take(&str, cregex_replace_p("[52] apples and [31] mangoes", "[a-z]+", "$${$0}"));

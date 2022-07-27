@@ -1,6 +1,5 @@
 /*
 This is a Unix port of the Plan 9 regular expression library, by Rob Pike.
-Please send comments about the packaging to Russ Cox <rsc@swtch.com>.
 
 Copyright © 2021 Plan 9 Foundation
 Copyright © 2022 Tyge Løvset, for additions made in 2022.
@@ -31,6 +30,7 @@ THE SOFTWARE.
  * This is a extended version of regexp9, supporting UTF8 input, common 
  * shorthand character classes, ++.
  */
+#include <stdbool.h>
 #include "forward.h" // csview 
 
 typedef enum {
@@ -52,12 +52,14 @@ typedef enum {
 
 enum {
     /* compile-flags */
-    cre_c_dotall = 1<<0,
-    cre_c_caseless = 1<<1,
+    cre_c_dotall = 1<<0,    /* dot matches newline too */
+    cre_c_caseless = 1<<1,  /* ignore case */
     /* match-flags */
-    cre_m_fullmatch = 1<<2,
-    cre_m_next = 1<<3,
-    cre_m_startend = 1<<4,
+    cre_m_fullmatch = 1<<2, /* like start-, end-of-line anchors were in pattern: "^ ... $" */
+    cre_m_next = 1<<3,      /* use end of previous match[0] as start of input */
+    cre_m_startend = 1<<4,  /* use match[0] as start+end of input */
+    /* replace-flags */
+    cre_r_strip = 1<<5,     /* only keep the matched strings, strip rest */
     /* limits */
     cre_MAXCLASSES = 16,
     cre_MAXCAPTURES = 32,
@@ -103,14 +105,14 @@ bool cregex_is_match(const char* input, const cregex* re, int mflags)
 
 /* replace regular expression */ 
 cstr cregex_replace_re(const char* input, const cregex* re, const char* replace,
-                       bool (*mfun)(int i, csview match, cstr* mstr), unsigned count);
+                       bool (*mfun)(int i, csview match, cstr* mstr), unsigned count, int rflags);
 static inline
 cstr cregex_replace(const char* input, const cregex* re, const char* replace)
-    { return cregex_replace_re(input, re, replace, NULL, 0); }
+    { return cregex_replace_re(input, re, replace, NULL, 0, 0); }
 
 /* replace + compile RE pattern, and extra arguments */
 cstr cregex_replace_pe(const char* input, const char* pattern, const char* replace,
-                       bool (*mfun)(int i, csview match, cstr* mstr), unsigned count, int cflags);
+                       bool (*mfun)(int i, csview match, cstr* mstr), unsigned count, int crflags);
 static inline
 cstr cregex_replace_p(const char* input, const char* pattern, const char* replace)
     { return cregex_replace_pe(input, pattern, replace, NULL, 0, 0); }

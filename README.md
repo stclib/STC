@@ -5,7 +5,10 @@ STC - Smart Template Containers for C
 
 News: Version 3.8 released (July 2022)
 ---------------------------------------
-- [See changes version 3](#version-3). Note some code-breaking API changes!
+- "Officially" added **cregex** - powerful regular expressions.
+- Added back **coption** - command line argument parsing.
+- Some changes in **cstr** and **csview** API.
+- [See detailed changes for version 3](#version-3).
 
 Introduction
 ------------
@@ -41,10 +44,9 @@ The library is mature and well tested, so you may use it in projects. However, m
 still happen. The main development of this project is finished, but I will handle PRs with bugs and improvements
 in the future, and do minor modifications.
 
-Contents
---------
-- [***ccommon*** - RAII and iterator macros](docs/ccommon_api.md)
-- [***carc*** - **std::shared_ptr** alike support](docs/carc_api.md)
+Containers
+----------
+- [***carc*** - **std::shared_ptr** alike type](docs/carc_api.md)
 - [***carr2***, ***carr3*** - 2D and 3D **array** types](docs/carray_api.md)
 - [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
 - [***cbox*** - **std::unique_ptr** alike type](docs/cbox_api.md)
@@ -53,7 +55,6 @@ Contents
 - [***cmap*** - **std::unordered_map** alike type](docs/cmap_api.md)
 - [***cpque*** - **std::priority_queue** alike type](docs/cpque_api.md)
 - [***cqueue*** - **std::queue** alike type](docs/cqueue_api.md)
-- [***crandom*** - A novel very fast *PRNG* named **stc64**](docs/crandom_api.md)
 - [***cset*** - **std::unordered_set** alike type](docs/cset_api.md)
 - [***csmap*** - **std::map** sorted map alike type](docs/csmap_api.md)
 - [***csset*** - **std::set** sorted set alike type](docs/csset_api.md)
@@ -61,6 +62,13 @@ Contents
 - [***cstr*** - **std::string** alike type](docs/cstr_api.md)
 - [***csview*** - **std::string_view** alike type](docs/csview_api.md)
 - [***cvec*** - **std::vector** alike type](docs/cvec_api.md)
+
+Others
+------
+- [***ccommon*** - RAII and iterator macros](docs/ccommon_api.md)
+- [***coption*** - getopt() alike command line args parser](docs/coption_api.md)
+- [***crandom*** - A novel very fast *PRNG* named **stc64**](docs/crandom_api.md)
+- [***cregex*** - Regular expression parser (extended from Rob Pike's regexp9)](docs/cregex_api.md)
 
 Highlights
 ----------
@@ -467,7 +475,9 @@ Memory efficiency
     - Added cstr_u8_slice() and csview_u8_slice().
     - Removed `csview_from_s()`: Use `cstr_sv(s)` instead.
     - Removed `csview_from_n()`: Use `c_sv(str, n)` instead.
-    - Updated cstr and csview docs.
+    - Added back file coption.h
+    - Simplified **cbits** usage: all inlined.
+    - Updated docs.
 
 ## Changes version 3.7
 - NB! Changed self argument from value to const pointer on containers (does not apply to **cstr**):
