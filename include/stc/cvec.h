@@ -409,17 +409,16 @@ _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
 }
 
 STC_DEF _cx_iter
-_cx_memb(_binary_search_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw, _cx_iter* lower_bound) {
+_cx_memb(_binary_search_in)(_cx_iter i1, _cx_iter i2, const _cx_raw raw, _cx_iter* lower_bound) {
     _cx_iter mid, last = i2;
     while (i1.ref != i2.ref) {
-        mid.ref = i1.ref + ((i2.ref - i1.ref) >> 1);
-        int c; const _cx_raw m = i_keyto(mid.ref);
-        if (!(c = i_cmp((&raw), (&m))))
-            return *lower_bound = mid;
-        else if (c < 0)
-            i2.ref = mid.ref;
-        else
-            i1.ref = mid.ref + 1;
+        mid.ref = i1.ref + (i2.ref - i1.ref)/2;
+        const _cx_raw m = i_keyto(mid.ref);
+        const int c = i_cmp((&raw), (&m));
+
+        if (!c) return *lower_bound = mid;
+        else if (c < 0) i2.ref = mid.ref;
+        else i1.ref = mid.ref + 1;
     }
     *lower_bound = i1;
     return last;
