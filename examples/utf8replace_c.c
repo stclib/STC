@@ -1,3 +1,4 @@
+#define i_implement
 #include <stc/cstr.h>
 #include <stc/csview.h>
 
@@ -6,14 +7,12 @@ int main() {
         hello = cstr_new("hell😀 w😀rld");
         printf("%s\n", cstr_str(&hello));
 
-        cstr_replace_sv(
-            &hello,
-            csview_substr_u8(cstr_sv(&hello), 7, 1),
-            c_sv("🐨")
-        );
+        /* replace second smiley at utf8 codepoint pos 7 */
+        cstr_u8_replace_at(&hello, 7, 1, c_sv("🐨"));
+
         printf("%s\n", cstr_str(&hello));
 
-        cstr_replace(&hello, "🐨", "ø");
+        cstr_replace(&hello, "🐨", "ø", 1);
         printf("%s\n", cstr_str(&hello));
 
         c_foreach (c, cstr, hello)

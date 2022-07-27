@@ -111,8 +111,11 @@
 typedef const char* crawstr;
 #define crawstr_cmp(xp, yp) strcmp(*(xp), *(yp))
 #define crawstr_hash(p) c_strhash(*(p))
+
 #define c_strlen_lit(literal) (sizeof "" literal - 1U)
-#define c_sv(lit) (c_make(csview){lit, c_strlen_lit(lit)})
+#define c_sv(...) c_MACRO_OVERLOAD(c_sv, __VA_ARGS__)
+#define c_sv1(lit) (c_make(csview){lit, c_strlen_lit(lit)})
+#define c_sv2(str, n) (c_make(csview){str, n})
 #define c_PRIsv ".*s"
 #define c_ARGsv(sv) (int)(sv).size, (sv).str
 

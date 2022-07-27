@@ -41,7 +41,7 @@ int main()
         cregex_drop(&re);
         printf("euros: %s\n", cstr_str(&str));
 
-        /* Wrap all words in {} */
+        /* Wrap all words in ${} */
         cstr_take(&str, cregex_replace_p("[52] apples and [31] mangoes", "[a-z]+", "$${$0}"));
         printf("curly: %s\n", cstr_str(&str));
     }

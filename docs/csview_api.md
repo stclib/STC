@@ -27,22 +27,21 @@ All csview definitions and prototypes are available by including a single header
 
 ```c
 csview          c_sv(const char literal_only[]);                    // alias for csview_new
+csview          c_sv(const char* str, size_t n);                    // overloaded csview constructor.
 csview          csview_new(const char literal_only[]);              // construct from literal, no strlen()
 csview          csview_from(const char* str);                       // construct from const char*
-csview          csview_from_s(const cstr* s);                       // construct from cstr
-csview          csview_from_n(const char* str, size_t n);           // construct 
 void            csview_clear(csview* self);
 
 size_t          csview_size(csview sv);
 bool            csview_empty(csview sv);
 
 bool            csview_equals(csview sv, csview sv2);
-size_t          csview_find(csview sv, csview needle);
-bool            csview_contains(csview sv, csview needle);
+size_t          csview_find(csview sv, csview search);
+bool            csview_contains(csview sv, csview search);
 bool            csview_starts_with(csview sv, csview sub);
 bool            csview_ends_with(csview sv, csview sub);
 
-// requires i_implement defined before one include of csview.h
+// requires i_implement defined before inclusion of csview.h
 csview          csview_substr_ex(csview sv, intptr_t pos, size_t n);   // negative pos count from end
 csview          csview_slice_ex(csview sv, intptr_t p1, intptr_t p2);  // negative p1, p2 count from end
 csview          csview_token(csview sv, csview sep, size_t* start);    // see split example below.
@@ -50,8 +49,9 @@ csview          csview_token(csview sv, csview sep, size_t* start);    // see sp
 
 #### UTF8 methods
 ```c
-size_t          csview_u8size(csview sv);
-csview          csview_substr_u8(csview sv, size_t u8pos, size_t u8len);
+size_t          csview_u8_size(csview sv);
+csview          csview_u8_substr(csview sv, size_t u8pos, size_t u8len);
+csview          csview_u8_slice(csview sv, size_t u8p1, size_t u8p2);
 
 csview_iter     csview_begin(const csview* self);
 csview_iter     csview_end(const csview* self);
@@ -60,14 +60,14 @@ void            csview_next(csview_iter* it);                          // utf8 c
 // requires linking with src/utf8code.c:
 bool            csview_valid_utf8(csview sv);
 
-// from utf8.h/utf8code.c:
+// from utf8.h, linking src/utf8code.c:
 bool            utf8_valid(const char* s);
 bool            utf8_valid_n(const char* s, size_t nbytes);
 size_t          utf8_size(const char *s);
 size_t          utf8_size_n(const char *s, size_t nbytes);          // number of UTF8 codepoints within n bytes
 const char*     utf8_at(const char *s, size_t index);               // from UTF8 index to char* position
 size_t          utf8_pos(const char* s, size_t index);              // from UTF8 index to byte index position
-unsigned        utf8_chr_size(const char* s);                       // 0-4 (0 if s[0] is illegal utf8)
+unsigned        utf8_chr_size(const char* s);                       // 0-4 (0 if s[0] means illegal utf8)
 uint32_t        utf8_decode(utf8_decode_t *d, uint8_t byte);        // decode next byte to utf8, return state.
 unsigned        utf8_encode(char *out, uint32_t codepoint);         // encode unicode cp into out buffer
 uint32_t        utf8_peek(const char* s, int pos);                  // codepoint value at utf8 pos (may be negative)
@@ -75,22 +75,13 @@ uint32_t        utf8_peek(const char* s, int pos);                  // codepoint
 
 #### Extended cstr methods
 ```c
-cstr            cstr_from_sv(csview sv);                            // construct cstr from csview
-csview          cstr_sv(const cstr* self);                          // convert to csview from const cstr*
+csview          cstr_substr(const cstr* self, size_t pos, size_t n);
+csview          cstr_substr_ex(const cstr* s, intptr_t pos, size_t n); // negative pos count from end
+csview          cstr_u8_substr(const cstr* self, size_t u8pos, size_t u8len);
 
-csview          cstr_substr(const cstr* s, intptr_t pos, size_t n); // negative pos count from end
-csview          cstr_slice(const cstr* s, intptr_t p, intptr_t q);  // negative p or q count from end
-
-csview          cstr_assign_sv(cstr* self, csview sv);              // return csview of assigned cstr
-void            cstr_append_sv(cstr* self, csview sv);
-void            cstr_insert_sv(cstr* self, size_t pos, csview sv);
-void            cstr_replace_sv(cstr* self, size_t pos, size_t len, csview sv);
-
-bool            cstr_equals_sv(cstr s, csview sv);
-size_t          cstr_find_sv(cstr s, csview needle);
-bool            cstr_contains_sv(cstr s, csview needle);
-bool            cstr_starts_with_sv(cstr s, csview sub);
-bool            cstr_ends_with_sv(cstr s, csview sub);
+csview          cstr_slice(const cstr* self, size_t p1, size_t p2);
+csview          cstr_slice_ex(const cstr* s, intptr_t p, intptr_t q);  // negative p or q count from end
+csview          cstr_u8_slice(const cstr* self, size_t u8p1, size_t u8p2);
 ```
 
 #### Helper methods
@@ -115,8 +106,8 @@ uint64_t        csview_hash(const csview* x);
 |:---------------|:---------------------|:---------------------------------------------|
 | `csview_null`  | same as `c_sv("")`   | `sview = csview_null;`                       |
 | `csview_npos`  | same as `cstr_npos`  |                                              |
-| `c_PRIsv`      | printf format        |                                              |
-| `c_ARGsv(sv)`  | printf argument      | `printf("sv: %" c_PRIsv "\n", c_ARGsv(sv));` |
+| `c_PRIsv`      | `".*s"`              | `printf("sv: %" c_PRIsv "\n", c_ARGsv(sv));` |
+| `c_ARGsv(sv)`  | printf argument      | `printf("sv: %.*s\n", c_ARGsv(sv));`         |
 
 ## Example
 ```c
@@ -157,18 +148,18 @@ int main()
 {
     c_auto (cstr, s1) {
         s1 = cstr_new("hell😀 w😀rld");
-        cstr_replace_sv(&s1, utf8_substr(cstr_str(&s1), 7, 1), c_sv("x"));
+        cstr_u8_replace_at(&s1, 7, 1, c_sv("ø"));
         printf("%s\n", cstr_str(&s1));
 
         c_foreach (i, cstr, s1)
-            printf("%" c_PRIsv ",", c_ARGsv(i.chr));
+            printf("%.*s,", c_ARGsv(i.chr));
     }
 }
 ```
 Output:
 ```
-hell😀 wxrld
-h,e,l,l,😀, ,w,x,r,l,d,
+hell😀 wørld
+h,e,l,l,😀, ,w,ø,r,l,d,
 ```
 
 ### Example 3: csview tokenizer (string split)

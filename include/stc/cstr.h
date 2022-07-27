@@ -80,14 +80,15 @@ STC_API char* _cstr_internal_move(cstr* self, size_t pos1, size_t pos2);
 STC_API char*   cstr_reserve(cstr* self, size_t cap);
 STC_API void    cstr_shrink_to_fit(cstr* self);
 STC_API void    cstr_resize(cstr* self, size_t size, char value);
-STC_API size_t  cstr_find_from(cstr s, size_t pos, const char* search);
+STC_API size_t  cstr_find_at(cstr s, size_t pos, const char* search);
 STC_API char*   cstr_assign_n(cstr* self, const char* str, size_t len);
 STC_API char*   cstr_append_n(cstr* self, const char* str, size_t len);
 STC_API bool    cstr_getdelim(cstr *self, int delim, FILE *fp);
 STC_API void    cstr_erase_n(cstr* self, size_t pos, size_t len);
 STC_API cstr    cstr_from_fmt(const char* fmt, ...);
 STC_API int     cstr_printf(cstr* self, const char* fmt, ...);
-STC_API void    cstr_replace_all(cstr* self, const char* search, const char* repl);
+STC_API void    cstr_replace(cstr* self, const char* search, const char* repl, unsigned count);
+STC_API cstr    cstr_replace_sv(csview sv, csview search, csview repl, unsigned count);
 
 STC_INLINE cstr_buf cstr_buffer(cstr* s) {
     return cstr_is_long(s)
@@ -183,21 +184,22 @@ STC_INLINE bool cstr_valid_utf8(const cstr* self)
 
 // other utf8 
 
-STC_INLINE size_t cstr_u8size(cstr s) 
+STC_INLINE size_t cstr_u8_size(cstr s) 
     { return utf8_size(cstr_str(&s)); }
 
-STC_INLINE size_t cstr_u8size_n(cstr s, size_t nbytes) 
+STC_INLINE size_t cstr_u8_size_n(cstr s, size_t nbytes) 
     { return utf8_size_n(cstr_str(&s), nbytes); }
 
-STC_INLINE size_t cstr_pos_u8(const cstr* self, size_t u8idx)
+STC_INLINE size_t cstr_u8_to_pos(const cstr* self, size_t u8idx)
     { return utf8_pos(cstr_str(self), u8idx); }
 
-STC_INLINE const char* cstr_at_u8(const cstr* self, size_t u8idx) 
+STC_INLINE const char* cstr_u8_at(const cstr* self, size_t u8idx) 
     { return utf8_at(cstr_str(self), u8idx); }
 
-STC_INLINE csview cstr_chr_u8(const cstr* self, size_t u8idx) {
-    csview sv = cstr_sv(self);
-    sv.str = utf8_at(sv.str, u8idx);
+STC_INLINE csview cstr_u8_chr(const cstr* self, size_t u8idx) {
+    const char* str = cstr_str(self);
+    csview sv;
+    sv.str = utf8_at(str, u8idx);
     sv.size = utf8_chr_size(sv.str);
     return sv;
 }
@@ -240,48 +242,76 @@ STC_INLINE bool cstr_eq(const cstr* s1, const cstr* s2) {
     return x.size == y.size && !memcmp(x.str, y.str, x.size);
 }
 
+
 STC_INLINE bool cstr_equals(cstr s1, const char* str)
     { return !strcmp(cstr_str(&s1), str); }
+
+STC_INLINE bool cstr_equals_sv(cstr s, csview sv)
+    { return sv.size == cstr_size(s) && !memcmp(cstr_str(&s), sv.str, sv.size); }
+
+STC_INLINE bool cstr_equals_s(cstr s1, cstr s2)
+    { return !cstr_cmp(&s1, &s2); }
 
 STC_INLINE bool cstr_iequals(cstr s1, const char* str)
     { return !utf8_icmp(cstr_str(&s1), str); }
 
-STC_INLINE bool cstr_equals_s(cstr s1, cstr s2)
-    { return !cstr_cmp(&s1, &s2); }
 
 STC_INLINE size_t cstr_find(cstr s, const char* search) {
     const char *str = cstr_str(&s), *res = strstr((char*)str, search);
     return res ? res - str : cstr_npos;
 }
 
+STC_INLINE size_t cstr_find_sv(cstr s, csview search) { 
+    char* res = c_strnstrn(cstr_str(&s), search.str, cstr_size(s), search.size);
+    return res ? res - cstr_str(&s) : cstr_npos;
+}
+
 STC_INLINE size_t cstr_find_s(cstr s, cstr search)
     { return cstr_find(s, cstr_str(&search)); }
+
 
 STC_INLINE bool cstr_contains(cstr s, const char* search)
     { return strstr(cstr_data(&s), search) != NULL; }
 
+STC_INLINE bool cstr_contains_sv(cstr s, csview search)
+    { return c_strnstrn(cstr_str(&s), search.str, cstr_size(s), search.size) != NULL; }
+
 STC_INLINE bool cstr_contains_s(cstr s, cstr search)
     { return strstr(cstr_data(&s), cstr_str(&search)) != NULL; }
+
+
+STC_INLINE bool cstr_starts_with_sv(cstr s, csview sub) {
+    if (sub.size > cstr_size(s)) return false;
+    return !memcmp(cstr_str(&s), sub.str, sub.size);
+}
 
 STC_INLINE bool cstr_starts_with(cstr s, const char* sub) {
     const char* str = cstr_str(&s);
     while (*sub && *str == *sub) ++str, ++sub;
     return !*sub;
 }
+
+STC_INLINE bool cstr_starts_with_s(cstr s, cstr sub)
+    { return cstr_starts_with_sv(s, cstr_sv(&sub)); }
+
 STC_INLINE bool cstr_istarts_with(cstr s, const char* sub) {
     csview sv = cstr_sv(&s); 
     size_t len = strlen(sub);
     return len <= sv.size && !utf8_icmp_n(cstr_npos, sv.str, sv.size, sub, len);
 }
 
-STC_INLINE bool cstr_starts_with_s(cstr s, cstr sub)
-    { return cstr_starts_with(s, cstr_str(&sub)); }
 
-STC_INLINE bool cstr_ends_with(cstr s, const char* sub) {
+STC_INLINE bool cstr_ends_with_sv(cstr s, csview sub) {
     csview sv = cstr_sv(&s);
-    size_t n = strlen(sub);
-    return n <= sv.size && !memcmp(sv.str + sv.size - n, sub, n);
+    if (sub.size > sv.size) return false;
+    return !memcmp(sv.str + sv.size - sub.size, sub.str, sub.size);
 }
+
+STC_INLINE bool cstr_ends_with_s(cstr s, cstr sub)
+    { return cstr_ends_with_sv(s, cstr_sv(&sub)); }
+
+STC_INLINE bool cstr_ends_with(cstr s, const char* sub)
+    { return cstr_ends_with_sv(s, c_sv(sub, strlen(sub))); }
 
 STC_INLINE bool cstr_iends_with(cstr s, const char* sub) {
     csview sv = cstr_sv(&s); 
@@ -289,60 +319,60 @@ STC_INLINE bool cstr_iends_with(cstr s, const char* sub) {
     return n <= sv.size && !utf8_icmp(sv.str + sv.size - n, sub);
 }
 
-STC_INLINE bool cstr_ends_with_s(cstr s, cstr sub)
-    { return cstr_ends_with(s, cstr_str(&sub)); }
 
 STC_INLINE char* cstr_assign(cstr* self, const char* str)
     { return cstr_assign_n(self, str, strlen(str)); }
 
-STC_INLINE char* cstr_assign_s(cstr* self, cstr s) {
+STC_INLINE char* cstr_assign_sv(cstr* self, csview sv)
+    { return cstr_assign_n(self, sv.str, sv.size); }
+
+STC_INLINE char* cstr_copy(cstr* self, cstr s) {
     csview sv = cstr_sv(&s);
     return cstr_assign_n(self, sv.str, sv.size);
 }
 
+
 STC_INLINE char* cstr_append(cstr* self, const char* str)
     { return cstr_append_n(self, str, strlen(str)); }
+
+STC_INLINE void cstr_append_sv(cstr* self, csview sv)
+    { cstr_append_n(self, sv.str, sv.size); }
 
 STC_INLINE char* cstr_append_s(cstr* self, cstr s) {
     csview sv = cstr_sv(&s);
     return cstr_append_n(self, sv.str, sv.size);
 }
 
-STC_INLINE void cstr_replace_with_n(cstr* self, size_t pos, size_t len, const char* repl, size_t rlen) {
-    char* d = _cstr_internal_move(self, pos + len, pos + rlen);
-    memcpy(d + pos, repl, rlen);
+
+STC_INLINE void cstr_replace_at_sv(cstr* self, size_t pos, size_t len, const csview repl) {
+    char* d = _cstr_internal_move(self, pos + len, pos + repl.size);
+    memcpy(d + pos, repl.str, repl.size);
 }
 
 STC_INLINE void cstr_replace_at(cstr* self, size_t pos, size_t len, const char* repl)
-    { cstr_replace_with_n(self, pos, len, repl, strlen(repl)); }
+    { cstr_replace_at_sv(self, pos, len, c_sv(repl, strlen(repl))); }
 
-STC_INLINE size_t cstr_replace_from(cstr* self, size_t pos, const char* search, const char* repl) {
-    pos = cstr_find_from(*self, pos, search);
-    if (pos == cstr_npos)
-        return pos;
-    const size_t rlen = strlen(repl);
-    cstr_replace_with_n(self, pos, strlen(search), repl, rlen);
-    return pos + rlen;
+STC_INLINE void cstr_replace_at_s(cstr* self, size_t pos, size_t len, cstr repl)
+    { cstr_replace_at_sv(self, pos, len, cstr_sv(&repl)); }
+
+STC_INLINE void cstr_u8_replace_at(cstr* self, size_t u8pos, size_t u8len, csview repl) {
+    csview sv = cstr_sv(self);
+    const char* p = utf8_at(sv.str, u8pos);
+    cstr_replace_at_sv(self, p - sv.str, utf8_pos(p, u8len), repl);
 }
 
-STC_INLINE size_t cstr_replace(cstr* self, const char* search, const char* repl)
-    { return cstr_replace_from(self, 0, search, repl); }
-
-STC_INLINE void cstr_replace_s(cstr* self, size_t pos, size_t len, cstr s) {
-    csview sv = cstr_sv(&s);
-    cstr_replace_with_n(self, pos, len, sv.str, sv.size);
-}
-
-STC_INLINE void cstr_insert_n(cstr* self, size_t pos, const char* str, size_t len)
-    { cstr_replace_with_n(self, pos, 0, str, len); }
 
 STC_INLINE void cstr_insert(cstr* self, size_t pos, const char* str)
-    { cstr_replace_with_n(self, pos, 0, str, strlen(str)); }
+    { cstr_replace_at_sv(self, pos, 0, c_sv(str, strlen(str))); }
+
+STC_INLINE void cstr_insert_sv(cstr* self, size_t pos, csview sv)
+    { cstr_replace_at_sv(self, pos, 0, sv); }
 
 STC_INLINE void cstr_insert_s(cstr* self, size_t pos, cstr s) {
     csview sv = cstr_sv(&s);
-    cstr_replace_with_n(self, pos, 0, sv.str, sv.size);
+    cstr_replace_at_sv(self, pos, 0, sv);
 }
+
 
 STC_INLINE bool cstr_getline(cstr *self, FILE *fp)
     { return cstr_getdelim(self, '\n', fp); }
@@ -360,7 +390,7 @@ STC_DEF char* _cstr_internal_move(cstr* self, const size_t pos1, const size_t po
     if (pos1 != pos2) {
         const size_t newlen = r.size + pos2 - pos1;
         if (newlen > r.cap)
-            r.data = cstr_reserve(self, (r.size*3 >> 1) + pos2 - pos1);
+            r.data = cstr_reserve(self, r.size*3/2 + pos2 - pos1);
         memmove(&r.data[pos2], &r.data[pos1], r.size - pos1);
         _cstr_set_size(self, newlen);
     }
@@ -422,7 +452,7 @@ STC_DEF void cstr_resize(cstr* self, const size_t size, const char value) {
     _cstr_set_size(self, size);
 }
 
-STC_DEF size_t cstr_find_from(cstr s, const size_t pos, const char* search) {
+STC_DEF size_t cstr_find_at(cstr s, const size_t pos, const char* search) {
     csview sv = cstr_sv(&s);
     if (pos > sv.size) return cstr_npos;
     const char* res = strstr((char*)sv.str + pos, search);
@@ -440,7 +470,7 @@ STC_DEF char* cstr_append_n(cstr* self, const char* str, const size_t len) {
     cstr_buf r = cstr_buffer(self);
     if (r.size + len > r.cap) {
         const size_t off = (size_t)(str - r.data);
-        r.data = cstr_reserve(self, (r.size*3 >> 1) + len);
+        r.data = cstr_reserve(self, r.size*3/2 + len);
         if (off <= r.size) str = r.data + off; /* handle self append */
     }
     memcpy(r.data + r.size, str, len);
@@ -461,7 +491,7 @@ STC_DEF bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
         }
         if (pos == r.cap) {
             _cstr_set_size(self, pos);
-            r.data = cstr_reserve(self, (r.cap = (r.cap*3 >> 1) + 16));
+            r.data = cstr_reserve(self, (r.cap = r.cap*3/2 + 16));
         }
         r.data[pos++] = (char) c;
         c = fgetc(fp);
@@ -469,27 +499,26 @@ STC_DEF bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
 }
 
 STC_DEF cstr
-cstr_from_replace_all(const char* str, const size_t str_len,
-                      const char* search, const size_t search_len,
-                      const char* repl, const size_t repl_len) {
+cstr_replace_sv(csview in, csview search, csview repl, unsigned count) {
     cstr out = cstr_null;
     size_t from = 0; char* res;
-    if (search_len)
-        while ((res = c_strnstrn(str + from, search, str_len - from, search_len))) {
-            const size_t pos = res - str;
-            cstr_append_n(&out, str + from, pos - from);
-            cstr_append_n(&out, repl, repl_len);
-            from = pos + search_len;
+    if (!count) count = ~0;
+    if (search.size)
+        while (count-- && (res = c_strnstrn(in.str + from, search.str, in.size - from, search.size))) {
+            const size_t pos = res - in.str;
+            cstr_append_n(&out, in.str + from, pos - from);
+            cstr_append_n(&out, repl.str, repl.size);
+            from = pos + search.size;
         }
-    cstr_append_n(&out, str + from, str_len - from);
+    cstr_append_n(&out, in.str + from, in.size - from);
     return out;
 }
 
 STC_DEF void
-cstr_replace_all(cstr* self, const char* search, const char* repl) {
-    csview sv = cstr_sv(self);
-    cstr_take(self, cstr_from_replace_all(sv.str, sv.size, search, strlen(search),
-                                                           repl, strlen(repl)));
+cstr_replace(cstr* self, const char* search, const char* repl, unsigned count) {
+    csview in = cstr_sv(self);
+    cstr_take(self, cstr_replace_sv(in, c_sv(search, strlen(search)),
+                                        c_sv(repl, strlen(repl)), count));
 }
 
 STC_DEF void cstr_erase_n(cstr* self, const size_t pos, size_t len) {

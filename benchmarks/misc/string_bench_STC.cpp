@@ -100,7 +100,7 @@ void initShortStringVec(cvec_str* vs, cvec_sv* vsv)
     size_t num = 0;
     c_foreach (i, cvec_str, *vs)
     {
-        cvec_sv_push_back(vsv, csview_from_s(i.ref));
+        cvec_sv_push_back(vsv, cstr_sv(i.ref));
         num += cstr_size(*i.ref);
     }
     std::cout << "num strings: " << cvec_sv_size(vsv) << std::endl;
@@ -146,7 +146,7 @@ void initLongStringVec(cvec_str* vs, cvec_sv* vsv)
     size_t num = 0;
     c_foreach (i, cvec_str, *vs)
     {
-        cvec_sv_push_back(vsv, csview_from_s(i.ref));
+        cvec_sv_push_back(vsv, cstr_sv(i.ref));
         num += cstr_size(*i.ref);
     }
     std::cout << "num strings: " << cvec_sv_size(vsv) << std::endl;

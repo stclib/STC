@@ -3,7 +3,7 @@
 STC - Smart Template Containers for C
 =====================================
 
-News: Version 3.7 released (July 2022)
+News: Version 3.8 released (July 2022)
 ---------------------------------------
 - [See changes version 3](#version-3). Note some code-breaking API changes!
 
@@ -456,6 +456,18 @@ Memory efficiency
 - **carc**: Type size: 2 pointers, one for the data and one for the reference counter.
 
 # Version 3
+
+## Changes version 3.8
+- Overhauled some **cstr** and **csview** API:
+    - Changed cstr_replace*() => `cstr_replace_at*(self, pos, len, repl)`: Replace at specific position.
+    - Changed `cstr_replace_all() cstr_replace*(self, search, repl, count)`: Replace count occurences.
+    - Renamed `cstr_find_from()` => `cstr_find_at()`
+    - Renamed `cstr_*_u8()` => `cstr_u8_*()`
+    - Renamed `csview_*_u8()` => `csview_u8_*()`
+    - Added cstr_u8_slice() and csview_u8_slice().
+    - Removed `csview_from_s()`: Use `cstr_sv(s)` instead.
+    - Removed `csview_from_n()`: Use `c_sv(str, n)` instead.
+    - Updated cstr and csview docs.
 
 ## Changes version 3.7
 - NB! Changed self argument from value to const pointer on containers (does not apply to **cstr**):
