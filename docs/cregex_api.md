@@ -19,7 +19,7 @@ enum {
     cre_m_next = 1<<3,      // use end of previous match[0] as start of input
     cre_m_startend = 1<<4,  // use match[0] as start+end of input
     // replace-flags
-    cre_r_strip = 1<<5,     // only keep the matched strings, strip the rest
+    cre_r_strip = 1<<5,     // only keep the replaced matches, strip the rest
 };
 
 cregex      cregex_init(void);
@@ -50,7 +50,6 @@ void        cregex_drop(cregex* self); // destroy
 ```
 
 ### Error codes
-
 - cre_success = 1
 - cre_nomatch = 0
 - cre_matcherror = -1
@@ -115,14 +114,18 @@ int main() {
     cregex_drop(&re);
 }
 ```
-To compile, use: `gcc first_match.c src/cregex.c src/utf8code.c`.
+
 For a single match you may use the all-in-one function:
 ```c
 if (cregex_find_p(input, pattern, match, 0))
     printf("Found date: %.*s\n", c_ARGsv(match[0]));
 ```
 
+To compile, use: `gcc first_match.c src/cregex.c src/utf8code.c`.
+In order to use a callback function in the replace call, see `examples/regex_replace.c`.
+
 ## Using cregex in a project
+
 **cregex** uses the following files: 
 - `stc/cregex.h`, `stc/utf8.h`, `stc/csview.h`, `stc/cstr.h`, `stc/ccommon.h`, `stc/forward.h`
 - `src/cregex.c`, `src/utf8code.c`.
@@ -141,7 +144,7 @@ if (cregex_find_p(input, pattern, match, 0))
 | (c) | Match the expression inside the parentheses. This adds a capture group | |
 | [c] | Match all characters inside the brackets. Ranges like a-z may also be used | |
 | [^c] | Do not match the characters inside the bracket. | |
-| \x{***hex***} | Match character given as hex number | * |
+| \x{***hex***} | Match UTF8 character/codepoint given as a hex number | * |
 | ^ | Start of line anchor | |
 | $ | End of line anchor | |
 | \A | Start of input anchor | * |
@@ -163,13 +166,13 @@ if (cregex_find_p(input, pattern, match, 0))
 | \p{Upper} or \p{Lu} | Match UTF8 upper case | * |
 | \p{Alpha} or \p{LC} | Match UTF8 cased letter | * |
 | \p{Alnum} | Match UTF8 alpha numeric | * |
-| \P{*class*} | Do not match the classes described above | * |
+| \P{***class***} | Do not match the classes described above | * |
 | [[:alnum:]] [[:alpha:]] [[:ascii:]] | Match ASCII character class | * |
 | [[:blank:]] [[:cntrl:]] [[:digit:]] | Match ASCII character class | * |
 | [[:graph:]] [[:lower:]] [[:print:]] | Match ASCII character class | * |
 | [[:punct:]] [[:space:]] [[:upper:]] | Match ASCII character class | * |
 | [[:xdigit:]] [[:word:]] | Match ASCII character class | * |
-| [[:^\<class\>:]] | Do not match ASCII character class | * |
+| [[:^***class***:]] | Do not match ASCII character class | * |
 | $***n*** | *n*-th substitution backreference to capture group. *n* in 0-9. $0 is the entire match. 
 
 ## Limitations
