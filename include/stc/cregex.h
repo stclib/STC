@@ -94,6 +94,11 @@ int cregex_captures(const cregex* self);
 /* return 1 on match, 0 on nomatch, and -1 on failure. */
 int cregex_find(const char* input, const cregex* re,
                 csview match[], int mflags);
+static inline
+int cregex_find_sv(csview input, const cregex* re, csview match[]) {
+    match[0] = input;
+    return cregex_find(input.str, re, match, cre_m_startend);
+}
 
 /* match + compile RE pattern */
 int cregex_find_p(const char* input, const char* pattern,

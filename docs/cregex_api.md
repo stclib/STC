@@ -33,6 +33,7 @@ int         cregex_captures(const cregex* self);
 
             // return 1=match, 0=nomatch, -1=error. match array size: at least num groups in RE (1+).
 int         cregex_find(const char* input, const cregex* re, csview match[], int mflags);
+int         cregex_find_sv(csview input, const cregex* re, csview match[]);
             // takes string pattern instead of re. (for one-time matches)
 int         cregex_find_p(const char* input, const char* pattern, csview match[], int cmflags);
 
@@ -173,7 +174,8 @@ In order to use a callback function in the replace call, see `examples/regex_rep
 | [[:punct:]] [[:space:]] [[:upper:]] | Match ASCII character class | * |
 | [[:xdigit:]] [[:word:]] | Match ASCII character class | * |
 | [[:^***class***:]] | Do not match ASCII character class | * |
-| $***n*** | *n*-th substitution backreference to capture group. *n* in 0-9. $0 is the entire match. 
+| $***n*** | *n*-th substitution backreference to capture group. ***n*** in 0-9. $0 is the entire match. | * |
+| $***nn***; | As above, but can handle ***nn*** < cre_MAXCAPTURES. | * |
 
 ## Limitations
 
