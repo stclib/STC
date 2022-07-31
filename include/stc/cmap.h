@@ -53,7 +53,7 @@ int main(void) {
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>
-#define _cmap_inits {NULL, NULL, 0, 0, 0.85f}
+#define _cmap_inits {0.85f}
 typedef struct      { size_t idx; uint8_t hx; } chash_bucket_t;
 #endif // CMAP_H_INCLUDED
 
@@ -382,10 +382,10 @@ _cx_memb(_reserve)(_cx_self* self, const size_t _newcap) {
     _nbuckets |= 1;
     #endif
     _cx_self m = {
+        self->max_load_factor,
         c_alloc_n(_cx_value, _nbuckets),
         (uint8_t *) c_calloc(_nbuckets + 1, 1),
         self->size, (i_size)_nbuckets,
-        self->max_load_factor
     };
     bool ok = m.table && m._hashx;
     if (ok) {  /* Rehash: */
