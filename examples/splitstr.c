@@ -1,27 +1,29 @@
-#include <stc/cstr.h>
+#include <stdio.h>
 #include <stc/csview.h>
-#define i_val_str
-#include <stc/cvec.h>
 
-void print_split(csview str, csview sep)
+void print_split(csview input, csview sep)
 {
     size_t pos = 0;
-    while (pos != str.size) {
-        csview tok = csview_token(str, sep, &pos);
+    while (pos <= input.size) {
+        csview tok = csview_token(input, sep, &pos);
         // print non-null-terminated csview
-        printf("[%" c_PRIsv "]\n", c_ARGsv(tok));
+        printf("[%.*s]\n", c_ARGsv(tok));
     }
 }
 
-cvec_str string_split(csview str, csview sep)
+#include <stc/cstr.h>
+#define i_val_str
+#include <stc/cstack.h>
+
+cstack_str string_split(csview input, csview sep)
 {
-    cvec_str vec = cvec_str_init();
+    cstack_str out = cstack_str_init();
     size_t pos = 0;
-    while (pos != str.size) {
-        csview tok = csview_token(str, sep, &pos);
-        cvec_str_push_back(&vec, cstr_from_sv(tok));
+    while (pos <= input.size) {
+        csview tok = csview_token(input, sep, &pos);
+        cstack_str_push(&out, cstr_from_sv(tok));
     }
-    return vec;
+    return out;
 }
 
 int main()
@@ -31,7 +33,7 @@ int main()
     print_split(c_sv("This has no matching separator"), c_sv("xx"));
     puts("");
 
-    c_autovar (cvec_str v = string_split(c_sv("Split,this,,string,now,"), c_sv(",")), cvec_str_drop(&v))
-        c_foreach (i, cvec_str, v)
+    c_autovar (cstack_str s = string_split(c_sv("Split,this,,string,now,"), c_sv(",")), cstack_str_drop(&s))
+        c_foreach (i, cstack_str, s)
             printf("[%s]\n", cstr_str(i.ref));
 }

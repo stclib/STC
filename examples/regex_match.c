@@ -22,7 +22,7 @@ int main()
         }
 
         while (cregex_find(s, &re, m, cre_m_next) == 1) {
-            printf("%" c_PRIsv " ; ", c_ARGsv(m[0]));
+            printf("%.*s ; ", c_ARGsv(m[0]));
         }
         puts("");
 
@@ -30,7 +30,7 @@ int main()
         printf("groups: %d\n", res);
         if ((res = cregex_find("hello@wørld", &re, m, 0)) == 1) {
             c_forrange (i, res)
-                printf("match: [%" c_PRIsv "]\n", c_ARGsv(m[i]));
+                printf("match: [%.*s]\n", c_ARGsv(m[i]));
         } else
             printf("err: %d\n", res);
     }

@@ -41,10 +41,9 @@ bool            csview_contains(csview sv, csview search);
 bool            csview_starts_with(csview sv, csview sub);
 bool            csview_ends_with(csview sv, csview sub);
 
-// requires i_implement defined before inclusion of csview.h
 csview          csview_substr_ex(csview sv, intptr_t pos, size_t n);   // negative pos count from end
 csview          csview_slice_ex(csview sv, intptr_t p1, intptr_t p2);  // negative p1, p2 count from end
-csview          csview_token(csview sv, csview sep, size_t* start);    // see split example below.
+csview          csview_token(csview sv, csview sep, size_t* start);    // *start > sv.size after last token
 ```
 
 #### UTF8 methods
@@ -55,11 +54,10 @@ csview          csview_u8_slice(csview sv, size_t u8p1, size_t u8p2);
 
 csview_iter     csview_begin(const csview* self);
 csview_iter     csview_end(const csview* self);
-void            csview_next(csview_iter* it);                          // utf8 codepoint step, not byte!
+void            csview_next(csview_iter* it);                       // utf8 codepoint step, not byte!
 
 // requires linking with src/utf8code.c:
 bool            csview_valid_utf8(csview sv);
-
 // from utf8.h, linking src/utf8code.c:
 bool            utf8_valid(const char* s);
 bool            utf8_valid_n(const char* s, size_t nbytes);
@@ -166,33 +164,32 @@ h,e,l,l,😀, ,w,ø,r,l,d,
 Splits strings into tokens. *print_split()* makes **no** memory allocations or *strlen()* calls,
 and does not depend on null-terminated strings. *string_split()* function returns a vector of cstr.
 ```c
-#define i_implement // implement csview_token() function, define once.
+#include <stdio.h>
 #include <stc/csview.h>
 
-void print_split(csview str, csview sep)
+void print_split(csview input, csview sep)
 {
     size_t pos = 0;
-    while (pos != str.size) {
-        csview tok = csview_token(str, sep, &pos);
+    while (pos <= input.size) {
+        csview tok = csview_token(input, sep, &pos);
         // print non-null-terminated csview
-        printf("[%" c_PRIsv "]\n", c_ARGsv(tok));
+        printf("[%.*s]\n", c_ARGsv(tok));
     }
 }
 
 #include <stc/cstr.h>
-
 #define i_val_str
-#include <stc/cvec.h>
+#include <stc/cstack.h>
 
-cvec_str string_split(csview str, csview sep)
+cstack_str string_split(csview input, csview sep)
 {
-    cvec_str vec = cvec_str_init();
+    cstack_str out = cstack_str_init();
     size_t pos = 0;
-    while (pos != str.size) {
-        csview tok = csview_token(str, sep, &pos);
-        cvec_str_push_back(&vec, cstr_from_sv(tok));
+    while (pos <= input.size) {
+        csview tok = csview_token(input, sep, &pos);
+        cstack_str_push(&out, cstr_from_sv(tok));
     }
-    return vec;
+    return out;
 }
 
 int main()
@@ -202,24 +199,25 @@ int main()
     print_split(c_sv("This has no matching separator"), c_sv("xx"));
     puts("");
 
-    c_autovar (cvec_str v = string_split(c_sv("Split,this,,string,now,"), c_sv(",")), cvec_str_drop(&v))
-        c_foreach (i, cvec_str, v)
+    c_autovar (cstack_str s = string_split(c_sv("Split,this,,string,now,"), c_sv(",")), cstack_str_drop(&s))
+        c_foreach (i, cstack_str, s)
             printf("[%s]\n", cstr_str(i.ref));
 }
 ```
 Output:
 ```
-""
-"This is a"
-"double-slash"
-"separated"
-"string"
+[]
+[This is a]
+[double-slash]
+[separated]
+[string]
 
-"This has no matching separator"
+[This has no matching separator]
 
-"Split"
-"this"
-""
-"string"
-"now"
-""
+[Split]
+[this]
+[]
+[string]
+[now]
+[]
+```

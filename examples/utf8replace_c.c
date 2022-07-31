@@ -16,7 +16,7 @@ int main() {
         printf("%s\n", cstr_str(&hello));
 
         c_foreach (c, cstr, hello)
-            printf("%" c_PRIsv ",", c_ARGsv(c.chr));
+            printf("%.*s,", c_ARGsv(c.chr));
         puts("");
     }
 }

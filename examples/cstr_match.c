@@ -17,7 +17,7 @@ int main()
         csview ch1 = cstr_u8_chr(&s1, 7);
         csview ch2 = cstr_u8_chr(&s1, 10);
         printf("%s\nsize: %" PRIuMAX ", %" PRIuMAX "\n", cstr_str(&s1), cstr_u8_size(s1), cstr_size(s1));
-        printf("ch1: %" c_PRIsv "\n", c_ARGsv(ch1));
-        printf("ch2: %" c_PRIsv "\n", c_ARGsv(ch2));
+        printf("ch1: %.*s\n", c_ARGsv(ch1));
+        printf("ch2: %.*s\n", c_ARGsv(ch2));
     }
 }

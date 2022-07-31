@@ -24,7 +24,7 @@ int main()
             {
                 c_forrange (j, cregex_captures(&re))
                 {
-                    printf("  submatch %" PRIuMAX ": %" c_PRIsv "\n", j, c_ARGsv(m[j]));
+                    printf("  submatch %" PRIuMAX ": %.*s\n", j, c_ARGsv(m[j]));
                 }
                 puts("");
             }
