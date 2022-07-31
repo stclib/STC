@@ -151,19 +151,19 @@ Declare an iterator and specify a range to iterate with a for loop. Like python'
 | Usage                                         | Python equivalent                    |
 |:----------------------------------------------|:-------------------------------------|
 | `c_forrange (stop)`                           | `for _ in range(stop):`              |
-| `c_forrange (i, stop) // IterType = size_t`   | `for i in range(stop):`              |
-| `c_forrange (i, IterType, stop)`              | `for i in range(stop):`              |
-| `c_forrange (i, IterType, start, stop)`       | `for i in range(start, stop):`       |
-| `c_forrange (i, IterType, start, stop, step)` | `for i in range(start, stop, step):` |
+| `c_forrange (i, stop) // IntType = size_t`    | `for i in range(stop):`              |
+| `c_forrange (IntType, i, stop)`               | `for i in range(stop):`              |
+| `c_forrange (IntType, i, start, stop)`        | `for i in range(start, stop):`       |
+| `c_forrange (IntType, i, start, stop, step)`  | `for i in range(start, stop, step):` |
 
 ```c
 c_forrange (5) printf("x");
 // xxxxx
 c_forrange (i, 5) printf(" %" PRIuMAX "", i);
 // 0 1 2 3 4
-c_forrange (i, int, -3, 3) printf(" %d", i);
+c_forrange (int, i, -3, 3) printf(" %d", i);
 // -3 -2 -1 0 1 2
-c_forrange (i, int, 30, 0, -5) printf(" %d", i);
+c_forrange (int, i, 30, 0, -5) printf(" %d", i);
 // 30 25 20 15 10 5
 ```
 

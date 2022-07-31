@@ -3,11 +3,14 @@
 STC - Smart Template Containers for C
 =====================================
 
-News: Version 3.8 released (July 2022)
+News: Version 3.9 released (July 2022)
 ---------------------------------------
-- "Officially" added **cregex** - powerful regular expressions.
-- Added back **coption** - command line argument parsing.
-- Some changes in **cstr** and **csview** API.
+- "ccommon API: `c_forrange` with 3 to 5 args swapped 1st <-> 2nd.
+- **csview** fully inlined and tokenizer fix
+- Version 3.8:
+    - "Officially" added **cregex** - powerful regular expressions.
+    - Added back **coption** - command line argument parsing.
+    - Some changes in **cstr** and **csview** API.
 - [See detailed changes for version 3](#version-3).
 
 Introduction

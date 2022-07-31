@@ -113,7 +113,7 @@ int main() {
         10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0
     });
 
-    c_forrange (i, int, 1, 10) {
+    c_forrange (int, i, 1, 10) {
         if (i & 1) clist_d_push_front(&list, (float) i);
         else       clist_d_push_back(&list, (float) i);
     }

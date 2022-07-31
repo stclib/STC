@@ -18,7 +18,7 @@ int main() {
         stc64_t rng = stc64_new(1234);
         stc64_uniformf_t dist = stc64_uniformf_new(100.0f, n);
         int m = 0;
-        c_forrange (i, int, n)
+        c_forrange (int, i, n)
             clist_fx_push_back(&list, stc64_uniformf(&rng, &dist)), ++m;
         double sum = 0.0;
         printf("sumarize %d:\n", m);

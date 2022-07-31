@@ -170,19 +170,19 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
          ; C##_next(&_._it))
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
-#define c_forrange1(stop) for (size_t _c_ii=0, _c_end=stop; _c_ii < _c_end; ++_c_ii)
-#define c_forrange2(i, stop) for (size_t i=0, _c_end=stop; i < _c_end; ++i)
-#define c_forrange3(i, type, stop) for (type i=0, _c_end=stop; i < _c_end; ++i)
-#define c_forrange4(i, type, start, stop) for (type i=start, _c_end=stop; i < _c_end; ++i)
-#define c_forrange5(i, type, start, stop, step) \
-    for (type i=start, _c_inc=step, _c_end=(stop) - (0 < _c_inc) \
+#define c_forrange1(stop) c_forrange4(size_t, _c_i, 0, stop)
+#define c_forrange2(i, stop) c_forrange4(size_t, i, 0, stop)
+#define c_forrange3(itype, i, stop) c_forrange4(itype, i, 0, stop)
+#define c_forrange4(itype, i, start, stop) for (itype i=start, _c_end=stop; i < _c_end; ++i)
+#define c_forrange5(itype, i, start, stop, step) \
+    for (itype i=start, _c_inc=step, _c_end=(stop) - (0 < _c_inc) \
          ; (i <= _c_end) == (0 < _c_inc); i += _c_inc)
 
 #define c_autovar(...) c_MACRO_OVERLOAD(c_autovar, __VA_ARGS__)
-#define c_autovar2(declvar, drop) for (declvar, **_c_ii = NULL; !_c_ii; ++_c_ii, drop)
-#define c_autovar3(declvar, pred, drop) for (declvar, **_c_ii = NULL; !_c_ii && (pred); ++_c_ii, drop)
-#define c_autoscope(init, drop) for (int _c_ii = (init, 0); !_c_ii; ++_c_ii, drop)
-#define c_autodefer(...) for (int _c_ii = 0; !_c_ii; ++_c_ii, __VA_ARGS__)
+#define c_autovar2(declvar, drop) for (declvar, **_c_i = NULL; !_c_i; ++_c_i, drop)
+#define c_autovar3(declvar, pred, drop) for (declvar, **_c_i = NULL; !_c_i && (pred); ++_c_i, drop)
+#define c_autoscope(init, drop) for (int _c_i = (init, 0); !_c_i; ++_c_i, drop)
+#define c_autodefer(...) for (int _c_i = 0; !_c_i; ++_c_i, __VA_ARGS__)
 #define c_breakauto continue
 
 #define c_auto(...) c_MACRO_OVERLOAD(c_auto, __VA_ARGS__)
