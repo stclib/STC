@@ -4,7 +4,7 @@
 
 int main()
 {
-    const char* inputs[] = {"date: 2024-02-29 leapyear day", "https://en.cppreference.com/w/cpp/regex/regex_search", "!123abcabc!"};
+    const char* inputs[] = {"date: 2024-02-29 leapyear day, christmas eve is on 2022-12-24.", "https://en.cppreference.com/w/cpp/regex/regex_search", "!123abcabc!"};
     const char* patterns[] = {"(\\d\\d\\d\\d)[-_](1[0-2]|0[1-9])[-_](3[01]|[12][0-9]|0[1-9])",
                               "(https?://|ftp://|www\\.)([0-9A-Za-z@:%_+~#=-]+\\.)+([a-z][a-z][a-z]?)(/[/0-9A-Za-z\\.@:%_+~#=\\?&-]*)?",
                               "!((abc|123)+)!",
@@ -18,14 +18,11 @@ int main()
                 printf("error in regex pattern: %d\n", res);
                 continue;
             }
-            csview m[20];
             printf("input: %s\n", inputs[i]);
-            if (cregex_find(inputs[i], &re, m, 0) == 1)
-            {
-                c_forrange (j, cregex_captures(&re))
-                {
-                    printf("  submatch %" PRIuMAX ": %.*s\n", j, c_ARGsv(m[j]));
-                }
+
+            c_foreach_match (m, re, inputs[i]) {
+                c_forrange (int, j, cregex_captures(&re))
+                    printf("  submatch %d: %.*s\n", j, c_ARGsv(m[j]));
                 puts("");
             }
         }
