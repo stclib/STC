@@ -30,7 +30,7 @@ int main()
         printf("us+10: %s\n", cstr_str(&str));
 
         /* Wrap first date inside []: */
-        cstr_take(&str, cregex_replace(input, pattern, "[$0]", 1));
+        cstr_take(&str, cregex_replace_p(input, pattern, "[$0]", 1));
         printf("brack: %s\n", cstr_str(&str));
 
         /* Shows how to compile RE separately */
