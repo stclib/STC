@@ -112,8 +112,8 @@ int cregex_find_p(const char* input, const char* pattern,
                   csview match[], int cmflags);
 
 static inline
-bool cregex_is_match(const char* input, const cregex* re, int mflags)
-    { return cregex_find(input, re, NULL, mflags) == 1; }
+bool cregex_is_match(const char* input, const cregex* re)
+    { return cregex_find(input, re, NULL, 0) == cre_success; }
 
 /* replace regular expression */ 
 cstr cregex_replace_ex(const char* input, const cregex* re, const char* replace, unsigned count,

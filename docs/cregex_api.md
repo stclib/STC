@@ -37,7 +37,7 @@ int         cregex_find_sv(csview input, const cregex* re, csview match[]);
             // takes string pattern instead of re. (for one-time matches)
 int         cregex_find_p(const char* input, const char* pattern, csview match[], int cmflags);
 
-bool        cregex_is_match(const char* input, const cregex* re, int mflags);
+bool        cregex_is_match(const char* input, const cregex* re);
 
 cstr        cregex_replace(const char* input, const cregex* re, const char* replace, unsigned count);
 cstr        cregex_replace_ex(const char* input, const cregex* re, const char* replace, unsigned count,
