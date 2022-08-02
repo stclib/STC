@@ -70,16 +70,19 @@ typedef struct {
     int error;
 } cregex;
 
-#define c_foreach_match(m, re, input) \
-    for (csview m[cre_MAXCAPTURES] = {{0}}, _c_in = csview_from(input); \
-         cregex_find(_c_in.str, re, m, cre_m_next) == cre_success; )
-        
-//typedef csview cregmatch;
+typedef struct {
+    const cregex* re;
+    const char* input;
+    csview ref[cre_MAXCAPTURES];
+} cregex_iter;
+
+#define c_foreach_match(i, _re, _input) \
+    for (cregex_iter i = {_re, _input}; cregex_find(i.input, i.re, i.ref, cre_m_next) == cre_success;)
 
 static inline
 cregex cregex_init(void) {
-    cregex rx = {0};
-    return rx;
+    cregex re = {0};
+    return re;
 }
 
 /* return 1 on success, or negative error code on failure. */
@@ -87,9 +90,9 @@ int cregex_compile(cregex *self, const char* pattern, int cflags);
 
 static inline
 cregex cregex_from(const char* pattern, int cflags) {
-    cregex rx = {0};
-    cregex_compile(&rx, pattern, cflags);
-    return rx;
+    cregex re = {0};
+    cregex_compile(&re, pattern, cflags);
+    return re;
 }
 
 /* number of capture groups in a regex pattern, 0 if regex is invalid */
