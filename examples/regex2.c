@@ -26,7 +26,7 @@ int main()
 
         c_foreach_match (j, &re, s[i].input) {
             c_forrange (k, cregex_captures(&re))
-                printf("  submatch %d: %.*s\n", k, c_ARGsv(j.ref[k]));
+                printf("  submatch %d: %.*s\n", (int)k, c_ARGsv(j.ref[k]));
             puts("");
         }
     }

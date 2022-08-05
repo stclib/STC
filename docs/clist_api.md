@@ -103,15 +103,17 @@ Interleave *push_front()* / *push_back()* then *sort()*:
 ```c
 #define i_val double
 #define i_tag d
+#define i_extern // link with sort() fn.
 #include <stc/clist.h>
 
 #include <stdio.h>
 
 int main() {
+    double dv[] = { 10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0 };
+
     clist_d list = clist_d_init();
-    c_apply(v, clist_d_push_back(&list, *v), double, {
-        10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0
-    });
+    c_forrange (i, c_arraylen(dv); ++i)
+        clist_d_push_back(&list, dv[i]);
 
     c_forrange (int, i, 1, 10) {
         if (i & 1) clist_d_push_front(&list, (float) i);

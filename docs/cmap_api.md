@@ -398,11 +398,14 @@ static inline RViking Viking_toraw(const Viking* vp) {
 int main()
 {
     c_auto (Vikings, vikings) {
-        c_apply(v, Vikings_emplace(&vikings, c_pair(v)), Vikings_raw, {
+        Vikings_raw arr[] = {
             { {"Einar", "Norway"}, 20 },
             { {"Olaf", "Denmark"}, 24 },
             { {"Harald", "Iceland"}, 12 },
-        });
+        };
+        c_forrange (i, c_arraylen(arr))
+            Vikings_emplace(&vikings, arr[i].first, arr[i].second);
+            
         Vikings_emplace_or_assign(&vikings, (RViking){"Bjorn", "Sweden"}, 10);
 
         Vikings_value *v = Vikings_get_mut(&vikings, (RViking){"Einar", "Norway"});
