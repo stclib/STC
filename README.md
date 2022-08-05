@@ -121,12 +121,15 @@ int main(void) {
     FVec_drop(&vec); // free memory
 }
 ```
-An alternative and often preferred way to write this code with STL is:
+An alternative way to write this code with STC is:
 ```c
 int main(void) {
-    c_auto (FVec, vec) // RAII - specify create and destruct at one place.
+    c_auto (FVec, vec) // RAII - specify create and free at one place.
     {
-        c_apply(v, FVec_push_back(&vec, *v), float, {10.f, 20.f, 30.f});
+        float arr[] = {10.f, 20.f, 30.f};
+
+        for (int i=0; i<3; ++i)
+            FVec_push_back(&vec, arr[i]);
 
         c_foreach (i, FVec, vec) // generic iteration and element access
             printf(" %g", *i.ref);
@@ -189,7 +192,7 @@ int Point_cmp(const struct Point* a, const struct Point* b) {
 #include <stc/csmap.h> // csmap_int: sorted map int => int
 
 int main(void) {
-    // define six containers with automatic call of init and drop (destruction after scope exit)
+    /* define six containers with automatic call of init and drop (destruction after scope exit) */
     c_auto (cset_int, set)
     c_auto (cvec_pnt, vec)
     c_auto (cdeq_int, deq)
@@ -197,24 +200,21 @@ int main(void) {
     c_auto (cstack_int, stk)
     c_auto (csmap_int, map)
     {
-        // add some elements to each container
-        c_apply(v, cset_int_insert(&set, *v), int, {10, 20, 30});
-        c_apply(v, cvec_pnt_push_back(&vec, *v), struct Point, { {10, 1}, {20, 2}, {30, 3} });
-        c_apply(v, cdeq_int_push_back(&deq, *v), int, {10, 20, 30});
-        c_apply(v, clist_int_push_back(&lst, *v), int, {10, 20, 30});
-        c_apply(v, cstack_int_push(&stk, *v), int, {10, 20, 30});
-        c_apply(v, csmap_int_insert(&map, c_pair(v)), 
-            csmap_int_raw, { {20, 2}, {10, 1}, {30, 3} });
+        int nums[4] = {10, 20, 30, 40};
+        struct Point pts[4] = { {10, 1}, {20, 2}, {30, 3}, {40, 4} };
+        int pairs[4][2] = { {20, 2}, {10, 1}, {30, 3}, {40, 4} };
+        
+        /* add some elements to each container */
+        for (int i = 0; i < 4; ++i) {
+            cset_int_insert(&set, nums[i]);
+            cvec_pnt_push(&vec, pts[i]);
+            cdeq_int_push_back(&deq, nums[i]);
+            clist_int_push_back(&lst, nums[i]);
+            cstack_int_push(&set, nums[i]);
+            csmap_int_insert(&map, pairs[i][0], pairs[i][1]);
+        }
 
-        // add one more element to each container
-        cset_int_insert(&set, 40);
-        cvec_pnt_push_back(&vec, (struct Point){40, 4});
-        cdeq_int_push_front(&deq, 5);
-        clist_int_push_front(&lst, 5);
-        cstack_int_push(&stk, 40);
-        csmap_int_insert(&map, 40, 4);
-
-        // find an element in each container
+        /* find an element in each container (except cstack) */
         cset_int_iter i1 = cset_int_find(&set, 20);
         cvec_pnt_iter i2 = cvec_pnt_find(&vec, (struct Point){20, 2});
         cdeq_int_iter i3 = cdeq_int_find(&deq, 20);
@@ -223,7 +223,7 @@ int main(void) {
         printf("\nFound: %d, (%g, %g), %d, %d, [%d: %d]\n", *i1.ref, i2.ref->x, i2.ref->y,
                                                             *i3.ref, *i4.ref,
                                                             i5.ref->first, i5.ref->second);
-        // erase the elements found
+        /* erase the elements found */
         cset_int_erase_at(&set, i1);
         cvec_pnt_erase_at(&vec, i2);
         cdeq_int_erase_at(&deq, i3);
