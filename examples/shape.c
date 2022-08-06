@@ -145,11 +145,11 @@ int main(void)
         Polygon* pol1 = Polygon_new();
         Polygon* pol2 = Polygon_new();
 
-        c_apply(p, Polygon_addPoint(pol1, *p), Point,
-            {{50, 72}, {123, 73}, {127, 201}, {828, 333}});
+        c_forarray (Point, p, {{50, 72}, {123, 73}, {127, 201}, {828, 333}})
+            Polygon_addPoint(pol1, *p);
 
-        c_apply(p, Polygon_addPoint(pol2, *p), Point,
-            {{5, 7}, {12, 7}, {12, 20}, {82, 33}, {17, 56}});
+        c_forarray (Point, p, {{5, 7}, {12, 7}, {12, 20}, {82, 33}, {17, 56}})
+            Polygon_addPoint(pol2, *p);
         
         Shapes_push(&shapes, &tri1->shape);
         Shapes_push(&shapes, &pol1->shape);

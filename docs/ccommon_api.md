@@ -13,7 +13,7 @@ The **checkauto** utility described below, ensures that the `c_auto*` macros are
 | `c_autovar (Type var=init, end...)`    | Declare `var`. Defer `end...` to end of block        |
 | `c_autoscope (init, end...)`           | Execute `init`. Defer `end...` to end of block       |
 | `c_autodefer (end...)`                 | Defer `end...` to end of block                       |
-| `c_breakauto;`                         | Break out of a `c_auto*`-block/scope without memleak |
+| `c_breakauto` or `continue`            | Break out of a `c_auto*`-block/scope without memleak |
 
 For multiple variables, use either multiple **c_autovar** in sequence, or declare variable outside
 scope and use **c_autoscope**. Also, **c_auto** support up to 4 variables.
@@ -84,44 +84,82 @@ int main()
             printf("%s\n", cstr_str(i.ref));
 }
 ```
-### The checkauto utility program (for RAII)
+### The **checkauto** utility program (for RAII)
 The **checkauto** program will check the source code for any misuses of the `c_auto*` macros which
 may lead to resource leakages. The `c_auto*`- macros are implemented as one-time executed **for-loops**,
 so any `return` or `break` appearing within such a block will lead to resource leaks, as it will disable
-the cleanup/drop method to be called. However, a `break` may (originally) been intended to break the immediate
-loop/switch outside the `c_auto` scope, so it would not work as intended in any case. The **checkauto**
-tool will report any such misusages. In general, one should therefore first break out of any inner loops
-with `break`, then use `c_breakauto` to break out of the `c_auto` scope(s). After this `return` may be used.
+the cleanup/drop method to be called. A `break` may originally be intended to break a loop or switch
+outside the `c_auto` scope.
 
-Note that this is not a particular issue with the `c_auto*`-macros, as one must always make sure to unwind
-temporary allocated resources before a `return` in C. However, by using `c_auto*`-macros,
+NOTE: One must always make sure to unwind temporary allocated resources before a `return` in C. However, by using `c_auto*`-macros,
 - it is much easier to automatically detect misplaced return/break between resource acquisition and destruction.
 - it prevents forgetting to call the destructor at the end.
+
+The **checkauto** utility will report any misusages. The following example shows how to correctly break/return
+from a `c_auto` scope: 
 ```c
-for (int i = 0; i<n; ++i) {
-    c_auto (List, list) {
-        List_push_back(&list, i);
-        if (cond1())
-            break; // checkauto: Error
-        for (j = 0; j<m; ++j) {
+    int flag = 0;
+    for (int i = 0; i<n; ++i) {
+        c_auto (cstr, text)
+        c_auto (List, list)
+        {
+            for (int j = 0; j<m; ++j) {
+                List_push_back(&list, i*j);
+                if (cond1())
+                    break;  // OK: breaks current for-loop only
+            }
+            // WRONG:
             if (cond2())
-                break;  // OK (breaks for-loop only)
+                break;      // checkauto ERROR! break inside c_auto.
+
+            if (cond3())
+                return -1;  // checkauto ERROR! return inside c_auto
+            
+            // CORRECT:
+            if (cond2()) {
+                flag = 1;   // flag to break outer for-loop
+                continue;   // cleanup and leave c_auto block
+            }
+            if (cond3()) {
+                flag = -1;  // return -1
+                continue;   // cleanup and leave c_auto block
+            }
+            ...
         }
-        if (cond3())
-            return; // checkauto: Error
-    }
-    if (cond4())
-        return; // OK (outside c_auto)
-}
+        // do the return/break outside of c_auto
+        if (flag < 0) return flag;
+        else if (flag > 0) break;
+        ...
+    } // for
+```
+
+### c_forarray, c_forarray_p 
+Iterate compound literal array elements
+```c
+// apply multiple push_backs
+c_forarray (int, v, {1, 2, 3})
+    cvec_i_push_back(&vec, *v);
+
+// insert in existing map
+c_forarray (cmap_ii_raw, v, {{4, 5}, {6, 7}})
+    cmap_ii_insert(&map, v->first, v->second);
+
+// even define an anonymous struct inside it (no commas allowed)
+c_forarray (struct { int a; int b; }, v, {{1, 2}, {3, 4}, {5, 6}})
+    printf("{%d %d} ", v->a, v->b);
+
+// `c_forarray_p` is required for pointer type elements
+c_forarray_p (const char*, v, {"Hello", "crazy", "world"})
+    cstack_s_push(&stk, *v);
 ```
 
 ### c_foreach, c_forpair
 
-| Usage                                      | Description                     |
-|:-------------------------------------------|:--------------------------------|
-| `c_foreach (it, ctype, container)`         | Iteratate all elements          |
-| `c_foreach (it, ctype, it1, it2)`          | Iterate the range [it1, it2)    |
-| `c_forpair (key, value, ctype, container)` | Iterate with structured binding |
+| Usage                                    | Description                     |
+|:-----------------------------------------|:--------------------------------|
+| `c_foreach (it, ctype, container)`       | Iteratate all elements          |
+| `c_foreach (it, ctype, it1, it2)`        | Iterate the range [it1, it2)    |
+| `c_forpair (key, val, ctype, container)` | Iterate with structured binding |
 
 ```c
 #define i_key int
@@ -129,8 +167,9 @@ for (int i = 0; i<n; ++i) {
 #define i_tag ii
 #include <stc/csmap.h>
 ...
-c_apply(v, csmap_ii_insert(&map, c_pair(v)), csmap_ii_value,
-    { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} });
+c_forarray (csmap_ii_value, v, {{23,1}, {3,2}, {7,3}, {5,4}, {12,5}})
+    csmap_ii_insert(&map, v->first, v->second);
+
 c_foreach (i, csmap_ii, map)
     printf(" %d", i.ref->first);
 // out: 3 5 7 12 23
@@ -167,35 +206,20 @@ c_forrange (int, i, 30, 0, -5) printf(" %d", i);
 // 30 25 20 15 10 5
 ```
 
-### c_apply, c_apply_array, c_pair, c_find_if, c_find_it
-**c_apply** applies an expression on a container with each of the elements in the given array:
-```c
-// apply multiple push_backs
-c_apply(v, cvec_i_push_back(&vec, v), int, {1, 2, 3});
-
-// inserts to existing map
-c_apply(v, cmap_i_insert(&map, c_pair(v)), cmap_i_raw, { {4, 5}, {6, 7} });
-
-int arr[] = {1, 2, 3};
-c_apply_array(v, cvec_i_push_back(&vec, v), int, arr, c_arraylen(arr));
-```
-**c_find_if**, **c_find_in** searches linearily in containers using a predicate
+### c_find_if, c_find_in
+Search linearily in containers using a predicate
 ```
 // NOTE: it.ref is NULL if not found, not cvec_i_end(&vec).ref
 // This makes it easier to test.
 cvec_i_iter it;
 
-// Search the the whole vec
-c_find_if(cvec_i, vec, it, *it.ref == 2);
+// Search vec for first value > 2:
+c_find_if(cvec_i, vec, it, *it.ref > 2);
 if (it.ref) printf("%d\n", *it.ref);
 
-// Search from iter's current position
-c_find_from(cvec_i, vec, it, index == 2); // index is internal in find_if.
-if (it.ref) printf("%d\n", *it.ref);  // 3
-
-// Search in the range
+// Search within a range:
 c_find_in(csmap_str, it1, it2, it, cstr_contains(*it.ref, "hello"));
-cmap_str_erase_at(&map, it); // assume found
+if (it.ref) cmap_str_erase_at(&map, it);
 ```
 
 ### c_new, c_alloc, c_alloc_n, c_drop, c_make

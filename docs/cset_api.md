@@ -86,10 +86,11 @@ int main ()
         c_auto (cset_str, first, second)
         c_auto (cset_str, third, fourth)
         {
-            c_apply(v, cset_str_emplace(&second, *v), const char*,
-                {"red", "green", "blue"});
-            c_apply(v, cset_str_emplace(&third, *v), const char*,
-                {"orange", "pink", "yellow"});
+            c_forarray_p (const char*, v, {"red", "green", "blue"})
+                cset_str_emplace(&second, *v);
+
+            c_forarray_p (const char*, v, {"orange", "pink", "yellow"})
+                cset_str_emplace(&third, *v);
 
             cset_str_emplace(&fourth, "potatoes");
             cset_str_emplace(&fourth, "milk");
@@ -98,6 +99,7 @@ int main ()
             fifth = cset_str_clone(second);
             c_foreach (i, cset_str, third)
                 cset_str_emplace(&fifth, cstr_str(i.ref));
+
             c_foreach (i, cset_str, fourth)
                 cset_str_emplace(&fifth, cstr_str(i.ref));
         }

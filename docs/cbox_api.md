@@ -84,10 +84,10 @@ int main()
     c_auto (IVec, vec)  // declare and init vec, call drop at scope exit
     c_auto (ISet, set)  // similar
     {
-        c_apply(v, IVec_push(&vec, *v), IBox, {
+        c_forarray (IBox, v, {
             IBox_make(2021), IBox_make(2012), 
             IBox_make(2022), IBox_make(2015),
-        });
+        }) IVec_push(&vec, *v);
 
         printf("vec:");
         c_foreach (i, IVec, vec)

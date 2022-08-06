@@ -39,19 +39,21 @@ void print_phone_book(cmap_str phone_book)
 int main(int argc, char **argv)
 {
     c_auto (cset_str, names) {
-        c_apply(v, cset_str_emplace(&names, *v), const char*, 
-            {"Hello", "Cool", "True"});
-        c_foreach (i, cset_str, names) printf("%s ", cstr_str(i.ref));
+        c_forarray_p (const char*, v, {"Hello", "Cool", "True"})
+            cset_str_emplace(&names, *v);
+        
+        c_foreach (i, cset_str, names)
+            printf("%s ", cstr_str(i.ref));
         puts("");
     }
 
     c_auto (cmap_str, phone_book) {
-        c_apply(v, cmap_str_emplace(&phone_book, c_pair(v)), cmap_str_raw, {
+        c_forarray (cmap_str_raw, v, {
             {"Lilia Friedman", "(892) 670-4739"},
             {"Tariq Beltran", "(489) 600-7575"},
             {"Laiba Juarez", "(303) 885-5692"},
             {"Elliott Mooney", "(945) 616-4482"},
-        });
+        }) cmap_str_emplace(&phone_book, c_pair(v));
 
         printf("Phone book:\n");
         print_phone_book(phone_book);

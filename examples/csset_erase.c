@@ -7,8 +7,9 @@ int main()
 {
     c_auto (csset_int, set)
     {
-        c_apply(v, csset_int_insert(&set, *v),
-            int, {30, 20, 80, 40, 60, 90, 10, 70, 50});
+        c_forarray (int, v, {30, 20, 80, 40, 60, 90, 10, 70, 50})
+            csset_int_insert(&set, *v);
+
         c_foreach (k, csset_int, set)
             printf(" %d", *k.ref);
         puts("");

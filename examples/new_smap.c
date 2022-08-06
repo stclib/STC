@@ -47,22 +47,24 @@ int main()
     }
 
     c_auto (PMap, pmap) {
-        c_apply(v, PMap_insert(&pmap, c_pair(v)), PMap_value, {
+        c_forarray (PMap_value, v, {
             {{42, 14}, 1},
             {{32, 94}, 2},
             {{62, 81}, 3},
-        });
+        }) PMap_insert(&pmap, c_pair(v));
+
         c_forpair (p, i, PMap, pmap)
             printf(" (%d,%d: %d)", _.p->x, _.p->y, *_.i);
         puts("");
     }
 
     c_auto (SMap, smap) {
-        c_apply(v, SMap_emplace(&smap, c_pair(v)), SMap_raw, {
+        c_forarray (SMap_raw, v, {
             {"Hello, friend", "this is the mapped value"},
             {"The brown fox", "jumped"},
             {"This is the time", "for all good things"},
-        });
+        }) SMap_emplace(&smap, c_pair(v));
+
         c_forpair (i, j, SMap, smap)
             printf(" (%s: %s)\n", cstr_str(_.i), cstr_str(_.j));
     }

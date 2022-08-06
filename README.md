@@ -107,7 +107,7 @@ are familiar with them. All containers are generic/templated, except for **cstr*
 No casting is used, so containers are type-safe like templates in c++. A basic usage example:
 ```c
 #define i_type FVec    // if not defined, vector type would be cvec_float
-#define i_val float    // element type
+#define i_val float    // container value type
 #include <stc/cvec.h>  // defines the FVec type
 
 int main(void) {
@@ -118,31 +118,34 @@ int main(void) {
 
     for (size_t i = 0; i < FVec_size(vec); ++i)
         printf(" %g", vec.data[i]);
+
     FVec_drop(&vec); // free memory
 }
 ```
-An alternative way to write this code with STC is:
+Below is an alternative way to write this code with STC. It uses three
+macros: `c_auto`, `c_forarray`, and `c_foreach`. These macro not only
+simplifies the code, but more importantly makes it less prone to errors,
+while maintaining readability:
 ```c
-int main(void) {
-    c_auto (FVec, vec) // RAII - specify create and free at one place.
+int main() {
+    c_auto (FVec, vec) // RAII: init + free at one location in the code.
     {
-        float arr[] = {10.f, 20.f, 30.f};
+        c_forarray (float, v, {10.f, 20.f, 30.f})   // use array literals.
+            FVec_push(&vec, *v);                    // alias for push_back.
 
-        for (int i=0; i<3; ++i)
-            FVec_push_back(&vec, arr[i]);
-
-        c_foreach (i, FVec, vec) // generic iteration and element access
+        c_foreach (i, FVec, vec)                    // works for all containers.
             printf(" %g", *i.ref);
     }
 }
 ```
-In order to include two **cvec**s with different element types, include cvec.h twice. For struct, a `i_cmp`
-compare function is required to enable sorting and searching (`<` and `==` operators is default and works
-for integral types only). Alternatively, `#define i_opt c_no_cmp` to disable methods using comparison.
+For struct element types, an `i_cmp` compare function is required (uses `<` and `==` by default,
+but works only for integral types). Alternatively, `#define i_opt c_no_cmp` to disable sorting
+and searching methods.
 
-Similarly, if a destructor `i_valdrop` is defined, either define a `i_valclone` clone function
-or `#define i_opt c_no_clone` to disable cloning and emplace methods. Unless these requirements are met,
-compile errors are generated.
+Similarily, if an element destructor `i_valdrop` is defined, a `i_valclone` function is required as well,
+or `#define i_opt c_no_clone` to disable container cloning methods.
+
+In order to include two **cvec**s with different element types, include <stc/cvec.h> twice:
 ```c
 #define i_val struct One
 #define i_opt c_no_cmp
@@ -489,7 +492,6 @@ Memory efficiency
     - `CNT_empty(const CNT *self)`
 - Now both **cstack** and **cbits** can be used with template `i_cap` parameter: `#define i_cap <NUM>`. They then use fixed sized arrays, and no heap allocated memory.
 - Renamed *cstr_rename_n()* => *cstr_rename_with_n()* as it could be confused with replacing n instances instead of n bytes.
-- Renamed macro *c_apply_arr()* => *c_apply_array()*
 - Fixed bug in `csmap.h`: begin() on empty map was not fully initialized.
 
 ## Changes version 3.6

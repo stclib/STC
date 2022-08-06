@@ -49,23 +49,24 @@ int main()
     {
         cmap_int_insert(&map, 123, 321);
 
-        c_apply(v, cmap_pnt_insert(&pmap, c_pair(v)), cmap_pnt_raw, {
-            {{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}
-        });
+        c_forarray (cmap_pnt_raw, v, {{{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}})
+            cmap_pnt_insert(&pmap, v->first, v->second);
+
         c_foreach (i, cmap_pnt, pmap)
             printf(" (%d, %d: %d)", i.ref->first.x, i.ref->first.y, i.ref->second);
         puts("");
 
-        c_apply(v, cmap_str_emplace(&smap, c_pair(v)), cmap_str_raw, {
+        c_forarray (cmap_str_raw, v, {
             {"Hello, friend", "long time no see"},
             {"So long, friend", "see you around"},
-        });
+        }) cmap_str_emplace(&smap, v->first, v->second);
 
-        c_apply(v, cset_str_emplace(&sset, *v), const char*, {
+        c_forarray_p (const char*, v, {
             "Hello, friend",
             "Nice to see you again",
             "So long, friend",
-        });
+        }) cset_str_emplace(&sset, *v);
+
         c_foreach (i, cset_str, sset)
             printf(" %s\n", cstr_str(i.ref));
     }

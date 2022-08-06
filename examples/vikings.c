@@ -51,11 +51,12 @@ static inline RViking Viking_toraw(const Viking* vp) {
 int main()
 {
     c_auto (Vikings, vikings) {
-        c_apply(v, Vikings_emplace(&vikings, c_pair(v)), Vikings_raw, {
+        c_forarray (Vikings_raw, v, {
             {{"Einar", "Norway"}, 20},
             {{"Olaf", "Denmark"}, 24},
             {{"Harald", "Iceland"}, 12},
-        });
+        }) Vikings_emplace(&vikings, c_pair(v));
+
         RViking bjorn = {"Bjorn", "Sweden"};
         Vikings_emplace_or_assign(&vikings, bjorn, 10);
 

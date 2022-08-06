@@ -13,10 +13,10 @@ int main1()
     c_auto (cvec_str, words)
     c_auto (cmap_str, word_map)
     {
-        c_apply(v, cvec_str_emplace_back(&words, *v), const char*, {
+        c_forarray_p (const char*, v, {
             "this", "sentence", "is", "not", "a", "sentence",
             "this", "sentence", "is", "a", "hoax"
-        });
+        }) cvec_str_emplace_back(&words, *v);
 
         c_foreach (w, cvec_str, words) {
             cmap_str_emplace(&word_map, cstr_str(w.ref), 0).ref->second += 1;

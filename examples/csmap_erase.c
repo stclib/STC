@@ -36,14 +36,14 @@ int main()
 
     c_auto (mymap, m2)
     {
-        // Fill in some data to test with, one at a time, using c_apply()
-        c_apply(v, mymap_emplace(&m2, c_pair(v)), mymap_raw, {
+        // Fill in some data to test with, one at a time
+        c_forarray (mymap_raw, v, {
             {10, "Bob"},
             {11, "Rob"},
             {12, "Robert"},
             {13, "Bert"},
-            {14, "Bobby"}
-        });
+            {14, "Bobby"},
+        }) mymap_emplace(&m2, v->first, v->second);
 
         puts("Starting data of map m2 is:");
         printmap(m2);

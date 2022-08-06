@@ -39,7 +39,9 @@ int main() {
         puts("");
 
         clist_fx_clear(&list);
-        c_apply(v, clist_fx_push_back(&list, *v), int, {10, 20, 30, 40, 30, 50});
+        c_forarray (int, v, {10, 20, 30, 40, 30, 50})
+            clist_fx_push_back(&list, *v);
+
         const double* v = clist_fx_get(&list, 30);
         printf("found: %f\n", *v);
         c_foreach (i, clist_fx, list) printf(" %g", *i.ref);
