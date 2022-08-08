@@ -207,8 +207,8 @@ int main(void) {
     c_auto (csmap_int, map)
     {
         int nums[4] = {10, 20, 30, 40};
-        struct Point pts[4] = {{10, 1}, {20, 2}, {30, 3}, {40, 4}};
-        int pairs[4][2] = {{20, 2}, {10, 1}, {30, 3}, {40, 4}};
+        struct Point pts[4] = { {10, 1}, {20, 2}, {30, 3}, {40, 4} };
+        int pairs[4][2] = { {20, 2}, {10, 1}, {30, 3}, {40, 4} };
         
         /* add some elements to each container */
         for (int i = 0; i < 4; ++i) {

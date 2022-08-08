@@ -159,7 +159,7 @@ int main()
     csmap_id idnames = csmap_id_init();
     c_autodefer (csmap_id_drop(&idnames)) 
     {
-        c_forarray (csmap_id_raw, v, {{100, "Red"}, {110, "Blue"}})
+        c_forarray (csmap_id_raw, v, { {100, "Red"}, {110, "Blue"} })
             csmap_id_emplace(&idnames, v->first, v->second);
 
         // put replaces existing mapped value:

@@ -172,7 +172,7 @@ int main()
 
     c_auto (cmap_id, idnames)
     {
-        c_forarray (cmap_id_raw, v, {{100, "Red"}, {110, "Blue"}})
+        c_forarray (cmap_id_raw, v, { {100, "Red"}, {110, "Blue"} })
             cmap_id_emplace(&idnames, v->first, v->second);
 
         // replace existing mapped value:
