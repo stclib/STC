@@ -48,14 +48,12 @@ typedef struct { size_t size, cap; char chr[1]; } cstr_priv;
 
 STC_API cstr            cstr_from_n(const char* str, size_t n);
 STC_API cstr            cstr_from_fmt(const char* fmt, ...);
-STC_API cstr            cstr_from_replace(csview str, csview find, csview repl, unsigned count);
 STC_API char*           cstr_reserve(cstr* self, size_t cap);
 STC_API void            cstr_resize(cstr* self, size_t len, char fill);
 STC_API cstr*           cstr_assign_n(cstr* self, const char* str, size_t n);
 STC_API int             cstr_printf(cstr* self, const char* fmt, ...);
 STC_API cstr*           cstr_append_n(cstr* self, const char* str, size_t n);
-STC_API void            MyExt(cstr* self, size_t pos, size_t len, const char* str, size_t n);
-STC_API void            cstr_replace(cstr* self, const char* find, const char* replace);
+STC_API cstr            cstr_replace_sv(csview str, csview find, csview repl, unsigned count);
 STC_DEF void            cstr_replace_at_sv(cstr* self, const size_t pos, size_t len, csview repl);
 STC_API void            cstr_erase_n(cstr* self, size_t pos, size_t n);
 STC_API size_t          cstr_find(cstr s, const char* needle);
@@ -183,15 +181,10 @@ STC_INLINE uint64_t cstr_hash(const cstr *self) {
 }
 
 STC_INLINE void
-cstr_replace_sv(cstr* self, csview find, csview repl, unsigned count) {
-    cstr_take(self, cstr_from_replace(c_sv(self->str, _cstr_p(self)->size),
-                                      find, repl, count);
-}
-
-STC_INLINE void
 cstr_replace(cstr* self, const char* find, const char* repl, unsigned count) {
-    cstr_replace_sv(self, c_sv(find, strlen(find)),
-                          c_sv(repl, strlen(repl)), count);
+    csview in = cstr_sv(self);
+    cstr_take(self, cstr_replace_sv(in, c_sv(find, strlen(find)),
+                                        c_sv(repl, strlen(repl)), count));
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
@@ -326,15 +319,15 @@ cstr_replace_at_sv(cstr* self, const size_t pos, size_t len, csview repl) {
 }
 
 STC_DEF cstr
-cstr_from_replace(csview str, csview find, csview repl, unsigned count) {
+cstr_replace_sv(csview str, csview find, csview repl, unsigned count) {
     cstr out = cstr_null;
     size_t from = 0; char* res;
     if (count == 0) count = ~0;
     if (find.size)
-        while (count-- && (res = c_strnstrn(str + from, find.str, str.size - from, find.size))) {
+        while (count-- && (res = c_strnstrn(str.str + from, find.str, str.size - from, find.size))) {
             const size_t pos = res - str.str;
             cstr_append_n(&out, str.str + from, pos - from);
-            cstr_append_n(&out, repl.str, repl_len);
+            cstr_append_n(&out, repl.str, repl.size);
             from = pos + find.size;
         }
     cstr_append_n(&out, str.str + from, str.size - from);
