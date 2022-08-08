@@ -303,7 +303,7 @@ STC_INLINE bool cstr_starts_with_s(cstr s, cstr sub)
 STC_INLINE bool cstr_istarts_with(cstr s, const char* sub) {
     csview sv = cstr_sv(&s); 
     size_t len = strlen(sub);
-    return len <= sv.size && !utf8_icmp_n(cstr_npos, sv.str, sv.size, sub, len);
+    return len <= sv.size && !utf8_icmp_sv(cstr_npos, sv, c_sv(sub, len));
 }
 
 

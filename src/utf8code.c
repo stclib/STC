@@ -108,24 +108,23 @@ int utf8_icmp(const char* s1, const char* s2) {
     for (;;) {
         do { utf8_decode(&d1, (uint8_t)*s1++); } while (d1.state);
         do { utf8_decode(&d2, (uint8_t)*s2++); } while (d2.state);
-        int c = utf8_casefold(d1.codep) - utf8_casefold(d2.codep);
-        if (c || !*s2)
+        int32_t c = utf8_casefold(d1.codep) - utf8_casefold(d2.codep);
+        if (c || !s2[-1])
             return c;
     }
 }
 */
-int utf8_icmp_n(size_t u8max, const char* s1, const size_t n1,
-                              const char* s2, const size_t n2) {
+int utf8_icmp_sv(size_t u8max, const csview s1, const csview s2) {
     utf8_decode_t d1 = {.state=0}, d2 = {.state=0};
     size_t j1 = 0, j2 = 0;
-    while (u8max-- && ((j1 < n1) & (j2 < n2))) {
-        do { utf8_decode(&d1, (uint8_t)s1[j1++]); } while (d1.state);
-        do { utf8_decode(&d2, (uint8_t)s2[j2++]); } while (d2.state);
-        int c = utf8_casefold(d1.codep) - utf8_casefold(d2.codep);
-        if (c || !s2[j2])
+    while (u8max-- && ((j1 < s1.size) & (j2 < s2.size))) {
+        do { utf8_decode(&d1, (uint8_t)s1.str[j1++]); } while (d1.state);
+        do { utf8_decode(&d2, (uint8_t)s2.str[j2++]); } while (d2.state);
+        int32_t c = utf8_casefold(d1.codep) - utf8_casefold(d2.codep);
+        if (c || !s2.str[j2 - 1]) // OK if s1.size / s2.size are npos
             return c;
     }
-    return (j2 < n2) - (j1 < n1);
+    return (j2 < s2.size) - (j1 < s1.size);
 }
 
 bool utf8_isupper(uint32_t c) {

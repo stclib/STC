@@ -127,7 +127,7 @@ STC_INLINE int csview_cmp(const csview* x, const csview* y)
     { return strcmp(x->str, y->str); }
 
 STC_INLINE int csview_icmp(const csview* x, const csview* y)
-    { return utf8_icmp_n(~(size_t)0, x->str, x->size, y->str, y->size); }
+    { return utf8_icmp_sv(csview_npos, *x, *y); }
 
 STC_INLINE bool csview_eq(const csview* x, const csview* y)
     { return x->size == y->size && !memcmp(x->str, y->str, x->size); }
