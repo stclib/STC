@@ -205,7 +205,7 @@ _cx_memb(_get)(const _cx_self* self, _cx_rawkey rkey) {
 }
 
 STC_INLINE _cx_value*
-_cx_memb(_get_mut)(const _cx_self* self, _cx_rawkey rkey)
+_cx_memb(_get_mut)(_cx_self* self, _cx_rawkey rkey)
     { return (_cx_value*)_cx_memb(_get)(self, rkey); }
 
 STC_INLINE _cx_iter
