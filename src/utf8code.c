@@ -177,8 +177,7 @@ fn_tolower = {tolower, utf8_tolower},
 fn_toupper = {toupper, utf8_toupper};
 
 
-static cstr cstr_tocase(const cstr* self, struct fncase fn) {
-    csview sv = cstr_sv(self);
+static cstr cstr_tocase(csview sv, struct fncase fn) {
     cstr out = cstr_null;
     char *buf = cstr_reserve(&out, sv.size*3/2);
     uint32_t cp; size_t sz = 0;
@@ -198,26 +197,14 @@ static cstr cstr_tocase(const cstr* self, struct fncase fn) {
     return out;
 }
 
-cstr cstr_tofold(const cstr* self) {
-    return cstr_tocase(self, fn_tofold);
+cstr cstr_casefold_sv(csview sv) {
+    return cstr_tocase(sv, fn_tofold);
 }
 
-cstr cstr_tolower(const cstr* self) {
-    return cstr_tocase(self, fn_tolower);
+cstr cstr_tolower_sv(csview sv) {
+    return cstr_tocase(sv, fn_tolower);
 }
 
-cstr cstr_toupper(const cstr* self) {
-    return cstr_tocase(self, fn_toupper);
-}
-
-void cstr_casefold(cstr* self) {
-    cstr_take(self, cstr_tocase(self, fn_tofold));
-}
-
-void cstr_lowercase(cstr* self) {
-    cstr_take(self, cstr_tocase(self, fn_tolower));
-}
-
-void cstr_uppercase(cstr* self) {
-    cstr_take(self, cstr_tocase(self, fn_toupper));
+cstr cstr_toupper_sv(csview sv) {
+    return cstr_tocase(sv, fn_toupper);
 }

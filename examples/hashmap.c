@@ -30,7 +30,7 @@ int main(void) {
         else
             printf("Don't have Daniel's number.");
 
-        cmap_str_emplace(&contacts, "Daniel", "164-6743");
+        cmap_str_emplace_or_assign(&contacts, "Daniel", "164-6743");
 
         if ((v = cmap_str_get(&contacts, "Ashley")))
             printf("Calling Ashley: %s\n", call(cstr_str(&v->second)));

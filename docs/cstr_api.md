@@ -106,8 +106,9 @@ void         cstr_next(cstr_iter* it);
 
 // utf8 functions requires linking with src/utf8code.c symbols:
 bool         cstr_valid_utf8(const cstr* self);                       // check if str is valid utf8
-cstr         cstr_tolower(const cstr* self);                          // returns new lowercase utf8 cstr
-cstr         cstr_toupper(const cstr* self);                          // returns new uppercase utf8 cstr
+cstr         cstr_tolower_sv(csview sv);                              // returns new lowercase utf8 cstr
+cstr         cstr_toupper_sv(csview sv);                              // returns new uppercase utf8 cstr
+cstr         cstr_casefold_sv(csview sv);                             // returns new casefolded utf8 cstr
 void         cstr_lowercase(cstr* self);                              // transform cstr to lowercase utf8
 void         cstr_uppercase(cstr* self);                              // transform cstr to uppercase utf8
 bool         cstr_iequals(cstr s, const char* str);                   // utf8 case-insensitive comparison
