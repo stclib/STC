@@ -101,9 +101,10 @@ int main()
 
     c_auto (csmap_ii, m4) {
         // Insert the elements from an initializer_list
-        c_apply(v, csmap_ii_insert(&m4, c_pair(v)), csmap_ii_raw, {
-            { 4, 44 }, { 2, 22 }, { 3, 33 }, { 1, 11 }, { 5, 55 }
-        });
+        c_forarray (csmap_ii_raw, v, {{ 4, 44 }, { 2, 22 }, { 3, 33 },
+                                      { 1, 11 }, { 5, 55 }})
+            csmap_ii_insert(&m4, v->first, v->second);
+
         puts("After initializer_list insertion, m4 contains:");
         print_ii(m4);
         puts("");

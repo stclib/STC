@@ -49,7 +49,7 @@ void         cstr_clear(cstr* self);
 
 char*        cstr_assign(cstr* self, const char* str);
 char*        cstr_assign_n(cstr* self, const char* str, size_t n);    // assign n first bytes of str
-char*        cstr_assign_sv(cstr* self, csview sv)
+char*        cstr_assign_sv(cstr* self, csview sv);
 char*        cstr_copy(cstr* self, cstr s);                           // copy-assign a cstr
 int          cstr_printf(cstr* self, const char* fmt, ...);           // source and target must not overlap.
 

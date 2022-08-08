@@ -1229,8 +1229,8 @@ int cregex_find_p(const char* input, const char* pattern,
 }
 
 cstr
-cregex_replace_re(const char* input, const cregex* re, const char* replace,
-                  bool (*mfun)(int i, csview match, cstr* mstr), unsigned count, int rflags) {
+cregex_replace_ex(const char* input, const cregex* re, const char* replace, unsigned count,
+                  int rflags, bool (*mfun)(int i, csview match, cstr* mstr)) {
     cstr out = cstr_null;
     cstr subst = cstr_null;
     size_t from = 0;
@@ -1252,13 +1252,13 @@ cregex_replace_re(const char* input, const cregex* re, const char* replace,
 }
 
 cstr
-cregex_replace_pe(const char* input, const char* pattern, const char* replace,
-                  bool (*mfun)(int i, csview match, cstr* mstr), unsigned count, int crflags) {
+cregex_replace_pe(const char* input, const char* pattern, const char* replace, unsigned count,
+                  int crflags, bool (*mfun)(int i, csview match, cstr* mstr)) {
     cregex re = cregex_init();
     int res = cregex_compile(&re, pattern, crflags);
     if (res != cre_success)
         return cstr_new("[[error: invalid regex pattern]]");
-    cstr out = cregex_replace_re(input, &re, replace, mfun, count, crflags);
+    cstr out = cregex_replace_ex(input, &re, replace, count, crflags, mfun);
     cregex_drop(&re);
     return out;
 }

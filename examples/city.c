@@ -52,13 +52,15 @@ int main(void)
     {
         struct City_s { const char *name, *country; float lat, lon; int pop; };
 
-        c_apply(c, Cities_push(&cities, CityArc_make((City){cstr_from(c->name), cstr_from(c->country),
-                                                            c->lat, c->lon, c->pop})), struct City_s, {
+        c_forarray (struct City_s, c, {
             {"New York", "US", 4.3, 23.2, 9000000},
             {"Paris", "France", 4.3, 23.2, 9000000},
             {"Berlin", "Germany", 4.3, 23.2, 9000000},
             {"London", "UK", 4.3, 23.2, 9000000},
-        });
+        }) {
+            Cities_push(&cities, CityArc_make((City){cstr_from(c->name), cstr_from(c->country),
+                                                     c->lat, c->lon, c->pop}));
+        }
 
         copy = Cities_clone(cities); // share each element!
 

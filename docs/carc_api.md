@@ -100,25 +100,26 @@ int main()
         // POPULATE the stack with shared pointers to Map:
         Map *map;
         map = Stack_push(&stack, Arc_make(Map_init()))->get;
-        c_apply(v, Map_emplace(map, c_pair(v)), Map_raw, {
+        c_forarray (Map_raw, v, {
             {"Joey", 1990},
             {"Mary", 1995},
-            {"Joanna", 1992}
-        });
+            {"Joanna", 1992},
+        }) Map_emplace(map, v->first, v->second);
+
         map = Stack_push(&stack, Arc_make(Map_init()))->get;
-        c_apply(v, Map_emplace(map, c_pair(v)), Map_raw, {
+        c_forarray (Map_raw, v, {
             {"Rosanna", 2001},
             {"Brad", 1999},
             {"Jack", 1980}
-        });
+        }) Map_emplace(map, v->first, v->second);
 
         // POPULATE the list:
         map = List_push_back(&list, Arc_make(Map_init()))->get;
-        c_apply(v, Map_emplace(map, c_pair(v)), Map_raw, {
+        c_forarray (Map_raw, v, {
             {"Steve", 1979},
             {"Rick", 1974},
             {"Tracy", 2003}
-        });
+        }) Map_emplace(map, v->first, v->second);
         
         // Share two Maps from the stack with the list by cloning(=sharing) the carc:
         List_push_back(&list, Arc_clone(stack.data[0]));

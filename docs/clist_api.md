@@ -101,34 +101,35 @@ clist_X_value       clist_X_value_clone(clist_X_value val);
 
 Interleave *push_front()* / *push_back()* then *sort()*:
 ```c
+#define i_type DList
 #define i_val double
-#define i_tag d
+#define i_extern // link with sort() fn.
 #include <stc/clist.h>
 
 #include <stdio.h>
 
 int main() {
-    clist_d list = clist_d_init();
-    c_apply(v, clist_d_push_back(&list, *v), double, {
-        10.0, 20.0, 30.0, 40.0, 50.0, 60.0, 70.0, 80.0, 90.0
-    });
+    DList list = DList_init();
+
+    c_forarray (double, v, {10., 20., 30., 40., 50., 60., 70., 80., 90.})
+        DList_push_back(&list, *v);
 
     c_forrange (int, i, 1, 10) {
-        if (i & 1) clist_d_push_front(&list, (float) i);
-        else       clist_d_push_back(&list, (float) i);
+        if (i & 1) DList_push_front(&list, (double) i);
+        else       DList_push_back(&list, (double) i);
     }
 
     printf("initial: ");
-    c_foreach (i, clist_d, list)
+    c_foreach (i, DList, list)
         printf(" %g", *i.ref);
 
-    clist_d_sort(&list); // mergesort O(n*log n)
+    DList_sort(&list); // mergesort O(n*log n)
 
     printf("\nsorted: ");
-    c_foreach (i, clist_d, list)
+    c_foreach (i, DList, list)
         printf(" %g", *i.ref);
 
-    clist_d_drop(&list);
+    DList_drop(&list);
 }
 ```
 Output:
@@ -150,7 +151,9 @@ Use of *erase_at()* and *erase_range()*:
 int main ()
 {
     clist_i L = clist_i_init();
-    c_apply(v, clist_i_push_back(&L, *v), int, {10, 20, 30, 40, 50});
+
+    c_forarray (int, v, {10, 20, 30, 40, 50})
+        clist_i_push_back(&L, *v);
                                                 // 10 20 30 40 50
     clist_i_iter it = clist_i_begin(&L);        // ^
     clist_i_next(&it); 
@@ -161,7 +164,8 @@ int main ()
     it = clist_i_erase_range(&L, it, end);      // 10 30
                                                 //       ^
     printf("mylist contains:");
-    c_foreach (x, clist_i, L) printf(" %d", *x.ref);
+    c_foreach (x, clist_i, L)
+        printf(" %d", *x.ref);
     puts("");
 
     clist_i_drop(&L);
@@ -185,16 +189,20 @@ Splice `[30, 40]` from *L2* into *L1* before `3`:
 int main() {
     c_auto (clist_i, L1, L2)
     {
-        c_apply(v, clist_i_push_back(&L1, *v), int, {1, 2, 3, 4, 5});
-        c_apply(v, clist_i_push_back(&L2, *v), int, {10, 20, 30, 40, 50});
+        c_forarray (int, v, {1, 2, 3, 4, 5})
+            clist_i_push_back(&L1, *v);
+        c_forarray (int, v, {10, 20, 30, 40, 50})
+            clist_i_push_back(&L2, *v);
 
         clist_i_iter i = clist_i_advance(clist_i_begin(&L1), 2);
         clist_i_iter j1 = clist_i_advance(clist_i_begin(&L2), 2), j2 = clist_i_advance(j1, 2);
 
         clist_i_splice_range(&L1, i, &L2, j1, j2);
 
-        c_foreach (i, clist_i, L1) printf(" %d", *i.ref); puts("");
-        c_foreach (i, clist_i, L2) printf(" %d", *i.ref); puts("");
+        c_foreach (i, clist_i, L1)
+            printf(" %d", *i.ref); puts("");
+        c_foreach (i, clist_i, L2)
+            printf(" %d", *i.ref); puts("");
     }
 }
 ```

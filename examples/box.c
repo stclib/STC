@@ -41,7 +41,6 @@ int main()
     c_auto (PBox, p, q)
     {
         p = PBox_make(Person_new("Laura", "Palmer"));
-
         q = PBox_clone(p);
         cstr_assign(&q.get->name, "Leland");
 
@@ -52,7 +51,8 @@ int main()
         Persons_push(&vec, PBox_make(Person_new("Audrey", "Home")));
 
         // NB! Clone p and q to the vector using emplace_back()
-        c_apply(v, Persons_push(&vec, PBox_clone(*v)), PBox, {p, q});
+        Persons_push(&vec, PBox_clone(p));
+        Persons_push(&vec, PBox_clone(q));
 
         c_foreach (i, Persons, vec)
             printf("%s %s\n", cstr_str(&i.ref->get->name), cstr_str(&i.ref->get->last));

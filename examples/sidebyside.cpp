@@ -47,8 +47,8 @@ int main() {
 
     c_auto (cmap_si, food)
     {
-        c_apply(v, cmap_si_emplace(&food, c_pair(v)), cmap_si_raw,
-            {{"burger", 5}, {"pizza", 12}, {"steak", 15}});
+        c_forarray (cmap_si_raw, v, {{"burger", 5}, {"pizza", 12}, {"steak", 15}})
+            cmap_si_emplace(&food, c_pair(v));
         
         c_foreach (i, cmap_si, food)
             printf("%s, %d\n", cstr_str(&i.ref->first), i.ref->second);

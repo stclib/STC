@@ -20,7 +20,8 @@ int main() {
             cpque_i_push(&heap, stc64_uniform(&rng, &dist));
 
         // push some negative numbers too.
-        c_apply(v, cpque_i_push(&heap, *v), int, {-231, -32, -873, -4, -343});
+        c_forarray (int, v, {-231, -32, -873, -4, -343})
+            cpque_i_push(&heap, *v);
 
         c_forrange (N)
             cpque_i_push(&heap, stc64_uniform(&rng, &dist));

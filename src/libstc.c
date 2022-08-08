@@ -8,5 +8,4 @@
 
 #include "../include/stc/cstr.h"
 #include "../include/stc/csview.h"
-#include "../include/stc/cbits.h"
 #include "../include/stc/crandom.h"

@@ -18,8 +18,12 @@ int main ()
 {
     c_auto (clist_i, list1, list2)
     {
-        c_apply(v, clist_i_push_back(&list1, *v), int, {1, 2, 3, 4, 5});
-        c_apply(v, clist_i_push_back(&list2, *v), int, {10, 20, 30, 40, 50});
+        c_forarray (int, v, {1, 2, 3, 4, 5})
+            clist_i_push_back(&list1, *v);
+
+        c_forarray (int, v, {10, 20, 30, 40, 50})
+            clist_i_push_back(&list2, *v);
+
         print_ilist("list1:", list1);
         print_ilist("list2:", list2);
 

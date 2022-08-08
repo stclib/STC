@@ -3,10 +3,13 @@
 STC - Smart Template Containers for C
 =====================================
 
-News: Version 3.9 released (July 2022)
+News: Version 4.0 BETA (Aug 2022)
 ---------------------------------------
-- "ccommon API: `c_forrange` with 3 to 5 args swapped 1st <-> 2nd.
-- **csview** fully inlined and tokenizer fix
+- Removed macro `c_apply` - usage was not intuitive.
+- `c_forarray` macro replaces usages of `c_apply`.
+- Minor changes in API of **cregex**, and improved documentation. 
+- Version 3.9:
+    - "ccommon API: `c_forrange` with 3 to 5 args swapped 1st <-> 2nd.
 - Version 3.8:
     - "Officially" added **cregex** - powerful regular expressions.
     - Added back **coption** - command line argument parsing.
@@ -107,7 +110,7 @@ are familiar with them. All containers are generic/templated, except for **cstr*
 No casting is used, so containers are type-safe like templates in c++. A basic usage example:
 ```c
 #define i_type FVec    // if not defined, vector type would be cvec_float
-#define i_val float    // element type
+#define i_val float    // container value type
 #include <stc/cvec.h>  // defines the FVec type
 
 int main(void) {
@@ -118,28 +121,34 @@ int main(void) {
 
     for (size_t i = 0; i < FVec_size(vec); ++i)
         printf(" %g", vec.data[i]);
+
     FVec_drop(&vec); // free memory
 }
 ```
-An alternative and often preferred way to write this code with STL is:
+Below is an alternative way to write this code with STC. It uses three
+macros: `c_auto`, `c_forarray`, and `c_foreach`. These macro not only
+simplifies the code, but more importantly makes it less prone to errors,
+while maintaining readability:
 ```c
-int main(void) {
-    c_auto (FVec, vec) // RAII - specify create and destruct at one place.
+int main() {
+    c_auto (FVec, vec) // RAII: init + free at one location in the code.
     {
-        c_apply(v, FVec_push_back(&vec, *v), float, {10.f, 20.f, 30.f});
+        c_forarray (float, v, {10.f, 20.f, 30.f})   // use array literals.
+            FVec_push(&vec, *v);                    // alias for push_back.
 
-        c_foreach (i, FVec, vec) // generic iteration and element access
+        c_foreach (i, FVec, vec)                    // works for all containers.
             printf(" %g", *i.ref);
     }
 }
 ```
-In order to include two **cvec**s with different element types, include cvec.h twice. For struct, a `i_cmp`
-compare function is required to enable sorting and searching (`<` and `==` operators is default and works
-for integral types only). Alternatively, `#define i_opt c_no_cmp` to disable methods using comparison.
+For struct element types, an `i_cmp` compare function is required (uses `<` and `==` by default,
+but works only for integral types). Alternatively, `#define i_opt c_no_cmp` to disable sorting
+and searching methods.
 
-Similarly, if a destructor `i_valdrop` is defined, either define a `i_valclone` clone function
-or `#define i_opt c_no_clone` to disable cloning and emplace methods. Unless these requirements are met,
-compile errors are generated.
+Similarily, if an element destructor `i_valdrop` is defined, a `i_valclone` function is required as well,
+or `#define i_opt c_no_clone` to disable container cloning methods.
+
+In order to include two **cvec**s with different element types, include <stc/cvec.h> twice:
 ```c
 #define i_val struct One
 #define i_opt c_no_cmp
@@ -189,7 +198,7 @@ int Point_cmp(const struct Point* a, const struct Point* b) {
 #include <stc/csmap.h> // csmap_int: sorted map int => int
 
 int main(void) {
-    // define six containers with automatic call of init and drop (destruction after scope exit)
+    /* define six containers with automatic call of init and drop (destruction after scope exit) */
     c_auto (cset_int, set)
     c_auto (cvec_pnt, vec)
     c_auto (cdeq_int, deq)
@@ -197,24 +206,21 @@ int main(void) {
     c_auto (cstack_int, stk)
     c_auto (csmap_int, map)
     {
-        // add some elements to each container
-        c_apply(v, cset_int_insert(&set, *v), int, {10, 20, 30});
-        c_apply(v, cvec_pnt_push_back(&vec, *v), struct Point, { {10, 1}, {20, 2}, {30, 3} });
-        c_apply(v, cdeq_int_push_back(&deq, *v), int, {10, 20, 30});
-        c_apply(v, clist_int_push_back(&lst, *v), int, {10, 20, 30});
-        c_apply(v, cstack_int_push(&stk, *v), int, {10, 20, 30});
-        c_apply(v, csmap_int_insert(&map, c_pair(v)), 
-            csmap_int_raw, { {20, 2}, {10, 1}, {30, 3} });
+        int nums[4] = {10, 20, 30, 40};
+        struct Point pts[4] = {{10, 1}, {20, 2}, {30, 3}, {40, 4}};
+        int pairs[4][2] = {{20, 2}, {10, 1}, {30, 3}, {40, 4}};
+        
+        /* add some elements to each container */
+        for (int i = 0; i < 4; ++i) {
+            cset_int_insert(&set, nums[i]);
+            cvec_pnt_push(&vec, pts[i]);
+            cdeq_int_push_back(&deq, nums[i]);
+            clist_int_push_back(&lst, nums[i]);
+            cstack_int_push(&set, nums[i]);
+            csmap_int_insert(&map, pairs[i][0], pairs[i][1]);
+        }
 
-        // add one more element to each container
-        cset_int_insert(&set, 40);
-        cvec_pnt_push_back(&vec, (struct Point){40, 4});
-        cdeq_int_push_front(&deq, 5);
-        clist_int_push_front(&lst, 5);
-        cstack_int_push(&stk, 40);
-        csmap_int_insert(&map, 40, 4);
-
-        // find an element in each container
+        /* find an element in each container (except cstack) */
         cset_int_iter i1 = cset_int_find(&set, 20);
         cvec_pnt_iter i2 = cvec_pnt_find(&vec, (struct Point){20, 2});
         cdeq_int_iter i3 = cdeq_int_find(&deq, 20);
@@ -223,7 +229,7 @@ int main(void) {
         printf("\nFound: %d, (%g, %g), %d, %d, [%d: %d]\n", *i1.ref, i2.ref->x, i2.ref->y,
                                                             *i3.ref, *i4.ref,
                                                             i5.ref->first, i5.ref->second);
-        // erase the elements found
+        /* erase the elements found */
         cset_int_erase_at(&set, i1);
         cvec_pnt_erase_at(&vec, i2);
         cdeq_int_erase_at(&deq, i3);
@@ -489,7 +495,6 @@ Memory efficiency
     - `CNT_empty(const CNT *self)`
 - Now both **cstack** and **cbits** can be used with template `i_cap` parameter: `#define i_cap <NUM>`. They then use fixed sized arrays, and no heap allocated memory.
 - Renamed *cstr_rename_n()* => *cstr_rename_with_n()* as it could be confused with replacing n instances instead of n bytes.
-- Renamed macro *c_apply_arr()* => *c_apply_array()*
 - Fixed bug in `csmap.h`: begin() on empty map was not fully initialized.
 
 ## Changes version 3.6

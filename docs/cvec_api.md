@@ -123,7 +123,8 @@ int main()
         cvec_int_push(&vec, 13);
 
         // Append a set of numbers
-        c_apply(v, cvec_int_push(&vec, *v), int, {7, 5, 16, 8});
+        c_forarray (int, v, {7, 5, 16, 8})
+            cvec_int_push(&vec, *v);
 
         printf("initial:");
         c_foreach (k, cvec_int, vec) {

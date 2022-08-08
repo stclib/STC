@@ -51,21 +51,21 @@ csview          csview_token(csview sv, csview sep, size_t* start);    // *start
 size_t          csview_u8_size(csview sv);
 csview          csview_u8_substr(csview sv, size_t u8pos, size_t u8len);
 csview          csview_u8_slice(csview sv, size_t u8p1, size_t u8p2);
+bool            csview_valid_utf8(csview sv);                       // requires linking with src/utf8code.c
 
 csview_iter     csview_begin(const csview* self);
 csview_iter     csview_end(const csview* self);
 void            csview_next(csview_iter* it);                       // utf8 codepoint step, not byte!
 
-// requires linking with src/utf8code.c:
-bool            csview_valid_utf8(csview sv);
-// from utf8.h, linking src/utf8code.c:
-bool            utf8_valid(const char* s);
-bool            utf8_valid_n(const char* s, size_t nbytes);
+// from utf8.h
 size_t          utf8_size(const char *s);
 size_t          utf8_size_n(const char *s, size_t nbytes);          // number of UTF8 codepoints within n bytes
 const char*     utf8_at(const char *s, size_t index);               // from UTF8 index to char* position
 size_t          utf8_pos(const char* s, size_t index);              // from UTF8 index to byte index position
-unsigned        utf8_chr_size(const char* s);                       // 0-4 (0 if s[0] means illegal utf8)
+unsigned        utf8_chr_size(const char* s);                       // UTF8 character size: 1-4
+// implemented in src/utf8code.c:
+bool            utf8_valid(const char* s);
+bool            utf8_valid_n(const char* s, size_t nbytes);
 uint32_t        utf8_decode(utf8_decode_t *d, uint8_t byte);        // decode next byte to utf8, return state.
 unsigned        utf8_encode(char *out, uint32_t codepoint);         // encode unicode cp into out buffer
 uint32_t        utf8_peek(const char* s, int pos);                  // codepoint value at utf8 pos (may be negative)

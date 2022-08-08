@@ -173,10 +173,10 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #define c_forrange1(stop) c_forrange4(size_t, _c_i, 0, stop)
 #define c_forrange2(i, stop) c_forrange4(size_t, i, 0, stop)
 #define c_forrange3(itype, i, stop) c_forrange4(itype, i, 0, stop)
-#define c_forrange4(itype, i, start, stop) for (itype i=start, _c_end=stop; i < _c_end; ++i)
+#define c_forrange4(itype, i, start, stop) for (itype i=start, _end=stop; i < _end; ++i)
 #define c_forrange5(itype, i, start, stop, step) \
-    for (itype i=start, _c_inc=step, _c_end=(stop) - (0 < _c_inc) \
-         ; (i <= _c_end) == (0 < _c_inc); i += _c_inc)
+    for (itype i=start, _inc=step, _end=(stop) - (0 < _inc) \
+         ; (i <= _end) == (0 < _inc); i += _inc)
 
 #define c_autovar(...) c_MACRO_OVERLOAD(c_autovar, __VA_ARGS__)
 #define c_autovar2(declvar, drop) for (declvar, **_c_i = NULL; !_c_i; ++_c_i, drop)
@@ -204,26 +204,26 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
          *b = (n)*sizeof *b > (BYTES) ? c_alloc_n(type, n) : _c_b \
          ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)
 
+// [deprecated] use c_forarray.
 #define c_apply(v, action, T, ...) do { \
-    typedef T _c_T; \
-    _c_T _c_arr[] = __VA_ARGS__, *v = _c_arr; \
-    const _c_T *_c_end = v + c_arraylen(_c_arr); \
-    while (v != _c_end) { action; ++v; } \
+    typedef T _T; \
+    _T _arr[] = __VA_ARGS__, *v = _arr; \
+    const _T *_end = v + c_arraylen(_arr); \
+    while (v != _end) { action; ++v; } \
 } while (0)
 
-#define c_apply_array(v, action, T, arr, n) do { \
-    typedef T _c_T; \
-    _c_T *v = arr, *_c_end = v + (n); \
-    while (v != _c_end) { action; ++v; } \
-} while (0)
+#define c_forarray(T, v, ...) \
+    for (T _a[] = __VA_ARGS__, *v = _a; v != _a + c_arraylen(_a); ++v)
+
+#define c_forarray_p(T, v, ...) \
+    for (T _a[] = __VA_ARGS__, **v = _a; v != _a + c_arraylen(_a); ++v)
 
 #define c_pair(v) (v)->first, (v)->second
-#define c_drop(C, ...) c_apply(_p, C##_drop(*_p), C*, {__VA_ARGS__})
+#define c_drop(C, ...) do { c_forarray_p(C*, _p, {__VA_ARGS__}) C##_drop(*_p); } while(0)
 
 #define c_find_if(C, cnt, it, pred) \
     c_find_in(C, C##_begin(&cnt), C##_end(&cnt), it, pred)
-#define c_find_from(C, cnt, it, pred) \
-    c_find_in(C, it, C##_end(&cnt), it, pred)
+
 // NB: it.ref == NULL when not found, not end.ref:
 #define c_find_in(C, start, end, it, pred) do { \
     size_t index = 0; \
@@ -232,18 +232,6 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
         ++index; \
     if (it.ref == _end.ref) it.ref = NULL; \
 } while (0)
-
-#if defined(__SIZEOF_INT128__)
-    #define c_umul128(a, b, lo, hi) \
-        do { __uint128_t _z = (__uint128_t)(a)*(b); \
-             *(lo) = (uint64_t)_z, *(hi) = _z >> 64; } while(0)
-#elif defined(_MSC_VER) && defined(_WIN64)
-    #include <intrin.h>
-    #define c_umul128(a, b, lo, hi) ((void)(*(lo) = _umul128(a, b, hi)))
-#elif defined(__x86_64__)
-    #define c_umul128(a, b, lo, hi) \
-        asm("mulq %3" : "=a"(*(lo)), "=d"(*(hi)) : "a"(a), "rm"(b))
-#endif
 #endif // CCOMMON_H_INCLUDED
 
 #undef STC_API

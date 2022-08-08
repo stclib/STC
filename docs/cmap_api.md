@@ -126,11 +126,11 @@ int main()
     // Create an unordered_map of three strings (that map to strings)
     c_auto (cmap_str, u)
     {
-        c_apply(v, cmap_str_emplace(&u, c_pair(v)), cmap_str_raw, {
+        c_forarray (cmap_str_raw, v, {
             {"RED", "#FF0000"},
             {"GREEN", "#00FF00"},
             {"BLUE", "#0000FF"}
-        });
+        }) cmap_str_emplace(&u, v->first, v->second);
 
         // Iterate and print keys and values of unordered map
         c_foreach (n, cmap_str, u) {
@@ -172,9 +172,9 @@ int main()
 
     c_auto (cmap_id, idnames)
     {
-        c_apply(v, cmap_id_emplace(&idnames, c_pair(v)), cmap_id_raw, {
-            {100, "Red"}, {110, "Blue"}
-        });
+        c_forarray (cmap_id_raw, v, {{100, "Red"}, {110, "Blue"}})
+            cmap_id_emplace(&idnames, v->first, v->second);
+
         // replace existing mapped value:
         cmap_id_emplace_or_assign(&idnames, 110, "White");
         
@@ -264,8 +264,8 @@ Output:
 1: { 100,   0,   0 }
 ```
 
-### Example 5
-Advanced 1: Key type is struct.
+### Example 5: Advanced
+Key type is struct.
 ```c
 #include <stc/cstr.h>
 
@@ -300,10 +300,10 @@ static inline void Viking_drop(Viking* vk) {
 #define i_key_bind Viking
 #define i_val int
 /*
- i_key_bind auto-binds:
+ i_key_bind makes these defines, unless they are already defined:
    #define i_cmp Viking_cmp
    #define i_hash Viking_hash
-   #define i_keyfrom Viking_clone
+   #define i_keyclone Viking_clone
    #define i_keydrop Viking_drop
 */
 #include <stc/cmap.h>
@@ -338,8 +338,8 @@ Einar of Norway has 25 hp
 Harald of Iceland has 12 hp
 ```
 
-### Example 6
-Advanced 2: In example 5 we needed to construct a lookup key which allocated strings, and then had to free it after.
+### Example 6: More advanced
+In example 5 we needed to construct a lookup key which allocated strings, and then had to free it after.
 In this example we use rawtype feature to make it even simpler to use. Note that we must use the emplace() methods
 to add "raw" type entries (otherwise compile error):
 ```c
@@ -354,7 +354,7 @@ static inline void Viking_drop(Viking* v) {
     c_drop(cstr, &v->name, &v->country);
 }
 
-// Define Viking raw struct with hash, equalto, and convertion functions between Viking and RViking structs:
+// Define Viking raw struct with cmp, hash, and convertion functions between Viking and RViking structs:
 
 typedef struct RViking {
     const char* name;
@@ -366,14 +366,10 @@ static inline int RViking_cmp(const RViking* rx, const RViking* ry) {
     return c ? c : strcmp(rx->country, ry->country);
 }
 
-static inline Viking Viking_clone(RViking v) {
-    v.name = cstr_clone(v.name), v.country = cstr_clone(v.country);
-    return vk;
-}
-
 static inline Viking Viking_from(RViking raw) {
     return (Viking){cstr_from(raw.name), cstr_from(raw.country)};
 }
+
 static inline RViking Viking_toraw(const Viking* vp) {
     return (RViking){cstr_str(&vp->name), cstr_str(&vp->country)};
 }
@@ -382,34 +378,33 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #define i_type      Vikings
 #define i_key_bind  Viking
 #define i_keyraw    RViking
-#define i_keyfrom   Viking_from  // optional to enable emplace funcs.
+#define i_keyfrom   Viking_from
 #define i_hash(rp)  (c_strhash(rp->name) ^ c_strhash(rp->country))
 #define i_val       int
 /*
- i_key_bind macro auto-binds these functions:
-   #define i_hash     RViking_hash
+ i_key_bind makes these defines, unless they are already defined:
    #define i_cmp      RViking_cmp
-   #define i_keyclone Viking_clone
-   #define i_keyto    Viking_toraw // because i_keyraw type is defined
+   //#define i_hash   RViking_hash       // already defined above.
+   #define i_keyclone c_derived_keyclone // because i_keyfrom is defined.
+   #define i_keyto    Viking_toraw       // because i_keyraw type is defined
    #define i_keydrop  Viking_drop
 */
 #include <stc/cmap.h>
 
 int main()
 {
-    c_auto (Vikings, vikings) {
-        c_apply(v, Vikings_emplace(&vikings, c_pair(v)), Vikings_raw, {
-            { {"Einar", "Norway"}, 20 },
-            { {"Olaf", "Denmark"}, 24 },
-            { {"Harald", "Iceland"}, 12 },
-        });
-        Vikings_emplace_or_assign(&vikings, (RViking){"Bjorn", "Sweden"}, 10);
+    c_auto (Vikings, vikings)
+    {
+        Vikings_emplace(&vikings, (RViking){"Einar", "Norway"}, 20);
+        Vikings_emplace(&vikings, (RViking){"Olaf", "Denmark"}, 24);
+        Vikings_emplace(&vikings, (RViking){"Harald", "Iceland"}, 12);
+        Vikings_emplace(&vikings, (RViking){"Björn", "Sweden"}, 10);
 
         Vikings_value *v = Vikings_get_mut(&vikings, (RViking){"Einar", "Norway"});
         if (v) v->second += 3; // add 3 hp points to Einar
 
-        c_forpair (vik, health, Vikings, vikings) {
-            printf("%s of %s has %d hp\n", cstr_str(&_.vik->name), cstr_str(&_.vik->country), *_.health);
+        c_forpair (vk, hp, Vikings, vikings) {
+            printf("%s of %s has %d hp\n", cstr_str(&_.vk->name), cstr_str(&_.vk->country), *_.hp);
         }
     }
 }

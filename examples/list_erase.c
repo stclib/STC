@@ -8,7 +8,9 @@ int main ()
 {
     c_auto (clist_int, L)
     {
-        c_apply(i, clist_int_push_back(&L, *i), int, {10, 20, 30, 40, 50});
+        c_forarray (int, i, {10, 20, 30, 40, 50})
+            clist_int_push_back(&L, *i);
+
         c_foreach (x, clist_int, L)
             printf("%d ", *x.ref);
         puts("");

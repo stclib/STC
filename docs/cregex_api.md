@@ -37,15 +37,15 @@ int         cregex_find_sv(csview input, const cregex* re, csview match[]);
             // takes string pattern instead of re. (for one-time matches)
 int         cregex_find_p(const char* input, const char* pattern, csview match[], int cmflags);
 
-bool        cregex_is_match(const char* input, const cregex* re, int mflags);
+bool        cregex_is_match(const char* input, const cregex* re);
 
-cstr        cregex_replace(const char* input, const cregex* re, const char* replace);
-cstr        cregex_replace_re(const char* input, const cregex* re, const char* replace,  // extended args:
-                              bool (*mfun)(int grp, csview match, cstr* mstr), unsigned count, int rflags);
+cstr        cregex_replace(const char* input, const cregex* re, const char* replace, unsigned count);
+cstr        cregex_replace_ex(const char* input, const cregex* re, const char* replace, unsigned count,
+                              int rflags, bool (*mfun)(int grp, csview match, cstr* mstr));
             // takes string pattern instead of re
-cstr        cregex_replace_p(const char* input, const char* pattern, const char* replace);
-cstr        cregex_replace_pe(const char* input, const char* pattern, const char* replace,
-                              bool (*mfun)(int grp, csview match, cstr* mstr), unsigned count, int crflags);
+cstr        cregex_replace_p(const char* input, const char* pattern, const char* replace, unsigned count);
+cstr        cregex_replace_pe(const char* input, const char* pattern, const char* replace, unsigned count,
+                              int crflags, bool (*mfun)(int grp, csview match, cstr* mstr));
 
 void        cregex_drop(cregex* self); // destroy
 ```
@@ -124,6 +124,26 @@ if (cregex_find_p(input, pattern, match, 0))
 
 To compile, use: `gcc first_match.c src/cregex.c src/utf8code.c`.
 In order to use a callback function in the replace call, see `examples/regex_replace.c`.
+
+### Iterate through matches, c_foreach_match
+
+To iterate multiple matches in an input string, you may use:
+```c
+csview match[5] = {0};
+while (cregex_find(input, &re, match, cre_m_next) == cre_success) {
+    c_forrange (int, i, cregex_captures(&re))
+        printf("submatch %d: %.*s\n", i, c_ARGsv(match[i]));
+    puts("");
+}
+```
+There is also a safe macro that simplifies it a bit:
+```c
+c_foreach_match (m, &re, input) {
+    c_forrange (int, i, cregex_captures(&re))
+        printf("submatch %d: %.*s\n", i, c_ARGsv(m.ref[i]));
+    puts("");
+}
+```
 
 ## Using cregex in a project
 

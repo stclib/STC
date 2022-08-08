@@ -75,10 +75,14 @@ int main()
     // Declare heap, with defered drop()
     c_auto (cpque_i, heap)
     {
-        // Push ten million random numbers to priority queue, plus some negative ones.
+        // Push ten million random numbers to priority queue.
         c_forrange (N)
             cpque_i_push(&heap, stc64_uniform(&rng, &dist));
-        c_apply(v, cpque_i_push(&heap, *v), int, {-231, -32, -873, -4, -343});
+
+        // Add some negative ones.
+        int nums[] = {-231, -32, -873, -4, -343};
+        c_forrange (i, c_arraylen(nums)) 
+            cpque_i_push(&heap, nums[i]);
 
         // Extract and display the fifty smallest.
         c_forrange (50) {

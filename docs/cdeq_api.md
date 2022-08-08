@@ -110,7 +110,9 @@ int main() {
         printf(" %d", *i.ref);
     puts("");
 
-    c_apply(v, cdeq_i_push_back(&q, *v), int, {1, 4, 5, 22, 33, 2});
+    c_forarray (int, v, {1, 4, 5, 22, 33, 2})
+        cdeq_i_push_back(&q, *v)
+
     c_foreach (i, cdeq_i, q)
         printf(" %d", *i.ref);
     puts("");

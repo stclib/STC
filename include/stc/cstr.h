@@ -261,10 +261,7 @@ STC_INLINE size_t cstr_find(cstr s, const char* search) {
     return res ? res - str : cstr_npos;
 }
 
-STC_INLINE size_t cstr_find_sv(cstr s, csview search) { 
-    char* res = c_strnstrn(cstr_str(&s), search.str, cstr_size(s), search.size);
-    return res ? res - cstr_str(&s) : cstr_npos;
-}
+STC_API size_t cstr_find_sv(cstr s, csview search);
 
 STC_INLINE size_t cstr_find_s(cstr s, cstr search)
     { return cstr_find(s, cstr_str(&search)); }
@@ -274,7 +271,7 @@ STC_INLINE bool cstr_contains(cstr s, const char* search)
     { return strstr(cstr_data(&s), search) != NULL; }
 
 STC_INLINE bool cstr_contains_sv(cstr s, csview search)
-    { return c_strnstrn(cstr_str(&s), search.str, cstr_size(s), search.size) != NULL; }
+    { return cstr_find_sv(s, search) != cstr_npos; }
 
 STC_INLINE bool cstr_contains_s(cstr s, cstr search)
     { return strstr(cstr_data(&s), cstr_str(&search)) != NULL; }
@@ -377,13 +374,20 @@ STC_INLINE void cstr_insert_s(cstr* self, size_t pos, cstr s) {
 STC_INLINE bool cstr_getline(cstr *self, FILE *fp)
     { return cstr_getdelim(self, '\n', fp); }
 
-STC_INLINE uint64_t cstr_hash(const cstr *self) {
+STC_API uint64_t cstr_hash(const cstr *self);
+
+/* -------------------------- IMPLEMENTATION ------------------------- */
+#if defined(i_implement) || defined(i_extern)
+
+STC_DEF uint64_t cstr_hash(const cstr *self) {
     csview sv = cstr_sv(self);
     return c_fasthash(sv.str, sv.size);
 }
 
-/* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement) || defined(i_extern)
+STC_DEF size_t cstr_find_sv(cstr s, csview search) {
+    char* res = c_strnstrn(cstr_str(&s), search.str, cstr_size(s), search.size);
+    return res ? res - cstr_str(&s) : cstr_npos;
+}
 
 STC_DEF char* _cstr_internal_move(cstr* self, const size_t pos1, const size_t pos2) {
     cstr_buf r = cstr_buffer(self);

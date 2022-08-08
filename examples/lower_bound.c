@@ -13,9 +13,8 @@ int main()
     {
         int key, *res;
 
-        c_apply(t, cvec_int_push(&vec, *t), int, { 
-            40, 600, 1, 7000, 2, 500, 30, 
-        });
+        c_forarray (int, t, {40, 600, 1, 7000, 2, 500, 30})
+            cvec_int_push(&vec, *t);
 
         cvec_int_sort(&vec);
 
@@ -41,9 +40,8 @@ int main()
     {
         int key, *res;
 
-        c_apply(t, csset_int_push(&set, *t), int, { 
-            40, 600, 1, 7000, 2, 500, 30,
-        });
+        c_forarray (int, t, {40, 600, 1, 7000, 2, 500, 30})
+            csset_int_push(&set, *t);
 
         key = 500;
         res = csset_int_lower_bound(&set, key).ref;
