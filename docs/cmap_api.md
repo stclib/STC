@@ -379,17 +379,18 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #define i_key_bind  Viking
 #define i_keyraw    RViking
 #define i_keyfrom   Viking_from
+#define i_opt       c_no_clone // disable map cloning
 #define i_hash(rp)  (c_strhash(rp->name) ^ c_strhash(rp->country))
 #define i_val       int
+#include <stc/cmap.h>
 /*
- i_key_bind makes these defines, unless they are already defined:
+ i_key_bind sets up these defines, unless they are already defined:
    #define i_cmp      RViking_cmp
    //#define i_hash   RViking_hash       // already defined above.
-   #define i_keyclone c_derived_keyclone // because i_keyfrom is defined.
+   //#define i_keyclone Viking_clone     // not used because c_no_clone
    #define i_keyto    Viking_toraw       // because i_keyraw type is defined
    #define i_keydrop  Viking_drop
 */
-#include <stc/cmap.h>
 
 int main()
 {

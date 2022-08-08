@@ -95,7 +95,6 @@
   #define i_key_bind cstr
   #define i_keyraw crawstr
   #define i_keyfrom cstr_from
-  #define i_keyclone cstr_clone
   #ifndef i_tag
     #define i_tag str
   #endif
@@ -104,7 +103,6 @@
   #define i_keyraw csview
   #define i_keyfrom cstr_from_sv
   #define i_keyto cstr_sv
-  #define i_keyclone cstr_clone
   #define i_eq csview_eq
   #ifndef i_tag
     #define i_tag ssv
@@ -112,15 +110,13 @@
 #elif defined i_key_arcbox
   #define i_key_bind i_key_arcbox
   #define i_keyraw c_paste(i_key_arcbox, _value)
-  #define i_keyto c_paste(i_key, _toval)
+  #define i_keyto c_paste(i_key_arcbox, _toval)
   #define i_eq c_paste(i_key_arcbox, _value_eq)
 #endif
 
 #ifdef i_key_bind
   #define i_key i_key_bind
-  #if !defined i_keyclone && defined i_keyfrom
-    #define i_keyclone c_derived_keyclone
-  #elif !defined i_keyclone
+  #ifndef i_keyclone
     #define i_keyclone c_paste(i_key, _clone)
   #endif
   #if !defined i_keyto && defined i_keyraw
@@ -193,24 +189,20 @@
   #define i_val_bind cstr
   #define i_valraw crawstr
   #define i_valfrom cstr_from
-  #define i_valclone cstr_clone
 #elif defined i_val_ssv
   #define i_val_bind cstr
   #define i_valraw csview
   #define i_valfrom cstr_from_sv
   #define i_valto cstr_sv
-  #define i_valclone cstr_clone
 #elif defined i_val_arcbox
   #define i_val_bind i_val_arcbox
   #define i_valraw c_paste(i_val_arcbox, _value)
-  #define i_valto c_paste(i_val, _toval)
+  #define i_valto c_paste(i_val_arcbox, _toval)
 #endif
 
 #ifdef i_val_bind
   #define i_val i_val_bind
-  #if !defined i_valclone && defined i_valfrom
-    #define i_valclone c_derived_valclone
-  #elif !defined i_valclone
+  #ifndef i_valclone
     #define i_valclone c_paste(i_val, _clone)
   #endif
   #if !defined i_valto && defined i_valraw
