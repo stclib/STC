@@ -106,12 +106,18 @@ void         cstr_next(cstr_iter* it);
 
 // utf8 functions requires linking with src/utf8code.c symbols:
 bool         cstr_valid_utf8(const cstr* self);                       // check if str is valid utf8
-cstr         cstr_tolower_sv(csview sv);                              // returns new lowercase utf8 cstr
-cstr         cstr_toupper_sv(csview sv);                              // returns new uppercase utf8 cstr
 cstr         cstr_casefold_sv(csview sv);                             // returns new casefolded utf8 cstr
+
+cstr         cstr_tolower(const char* str);                           // returns new lowercase utf8 cstr
+cstr         cstr_tolower_sv(csview sv);                              // returns new lowercase utf8 cstr
 void         cstr_lowercase(cstr* self);                              // transform cstr to lowercase utf8
+
+cstr         cstr_toupper(const char* str);                           // returns new uppercase utf8 cstr
+cstr         cstr_toupper_sv(csview sv);                              // returns new uppercase utf8 cstr
 void         cstr_uppercase(cstr* self);                              // transform cstr to uppercase utf8
-bool         cstr_iequals(cstr s, const char* str);                   // utf8 case-insensitive comparison
+
+int          cstr_icmp(const cstr* s1, const cstr* s2);               // utf8 case-insensitive comparison
+bool         cstr_iequals(cstr s, const char* str);                   //   "
 bool         cstr_istarts_with(cstr s, const char* str);              //   "
 bool         cstr_iends_with(cstr s, const char* str);                //   "
 ```
@@ -121,7 +127,6 @@ Note that all methods with arguments `(..., const char* str, size_t n)`, `n` mus
 #### Helper methods:
 ```c
 int          cstr_cmp(const cstr *s1, const cstr *s2);
-int          cstr_icmp(const cstr* s1, const cstr* s2);               //  utf8 case-insensitive comparison
 bool         cstr_eq(const cstr *s1, const cstr *s2);
 bool         cstr_hash(const cstr *s);
 

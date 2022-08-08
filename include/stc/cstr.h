@@ -176,6 +176,12 @@ extern cstr cstr_casefold_sv(csview sv);
 extern cstr cstr_tolower_sv(csview sv);
 extern cstr cstr_toupper_sv(csview sv);
 
+STC_INLINE cstr cstr_tolower(const char* str) 
+    { return cstr_tolower_sv(c_sv(str, strlen(str))); }
+
+STC_INLINE cstr cstr_toupper(const char* str) 
+    { return cstr_toupper_sv(c_sv(str, strlen(str))); }
+
 STC_INLINE void cstr_lowercase(cstr* self) 
     { cstr_take(self, cstr_tolower_sv(cstr_sv(self))); }
 
