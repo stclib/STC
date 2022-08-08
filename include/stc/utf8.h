@@ -16,7 +16,7 @@ extern uint32_t utf8_casefold(uint32_t c);
 extern uint32_t utf8_tolower(uint32_t c);
 extern uint32_t utf8_toupper(uint32_t c);
 extern bool     utf8_valid_n(const char* s, size_t nbytes);
-extern int      utf8_icmp_sv(size_t u8max, csview s1, csview s2);
+extern int      utf8_icmp_sv(csview s1, csview s2);
 extern unsigned utf8_encode(char *out, uint32_t c);
 extern uint32_t utf8_peek(const char *s, int u8pos);
 
@@ -35,7 +35,7 @@ STC_INLINE uint32_t utf8_decode(utf8_decode_t* d, const uint32_t byte) {
 
 /* case-insensitive utf8 string comparison */
 STC_INLINE int utf8_icmp(const char* s1, const char* s2) {
-    return utf8_icmp_sv(~(size_t)0, c_sv(s1, ~(size_t)0), c_sv(s2, ~(size_t)0));
+    return utf8_icmp_sv(c_sv(s1, ~(size_t)0), c_sv(s2, ~(size_t)0));
 }
 
 STC_INLINE bool utf8_valid(const char* s) {
