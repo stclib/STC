@@ -172,9 +172,16 @@ STC_INLINE size_t cstr_capacity(cstr s)
 
 // utf8 methods defined in/depending on src/utf8code.c:
 
-extern cstr cstr_casefold_sv(csview sv);
-extern cstr cstr_tolower_sv(csview sv);
-extern cstr cstr_toupper_sv(csview sv);
+extern cstr cstr_tocase(csview sv, int k);
+
+STC_INLINE cstr cstr_casefold_sv(csview sv)
+    { return cstr_tocase(sv, 0); }
+
+STC_INLINE cstr cstr_tolower_sv(csview sv)
+    { return cstr_tocase(sv, 1); }
+
+STC_INLINE cstr cstr_toupper_sv(csview sv)
+    { return cstr_tocase(sv, 2); }
 
 STC_INLINE cstr cstr_tolower(const char* str) 
     { return cstr_tolower_sv(c_sv(str, strlen(str))); }

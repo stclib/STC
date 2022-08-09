@@ -116,14 +116,6 @@ int utf8_icmp_sv(const csview s1, const csview s2) {
     return s1.size - s2.size;
 }
 
-bool utf8_isupper(uint32_t c) {
-    return utf8_tolower(c) != c;
-}
-
-bool utf8_islower(uint32_t c) {
-    return utf8_toupper(c) != c;
-}
-
 bool utf8_isspace(uint32_t c) {
     static uint16_t t[] = {0x20, 0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x85, 0xA0,
                            0x1680, 0x2028, 0x2029, 0x202F, 0x205F, 0x3000};
@@ -156,16 +148,15 @@ bool utf8_isalpha(uint32_t c) {
     return utf8_islower(c) || utf8_isupper(c);
 }
 
-static struct fncase {
+static struct {
     int      (*conv_asc)(int);
     uint32_t (*conv_utf)(uint32_t);
 }
-fn_tofold = {tolower, utf8_casefold},
-fn_tolower = {tolower, utf8_tolower},
-fn_toupper = {toupper, utf8_toupper};
+fn_tocase[] = {{tolower, utf8_casefold},
+               {tolower, utf8_tolower},
+               {toupper, utf8_toupper}};
 
-
-static cstr cstr_tocase(csview sv, struct fncase fn) {
+cstr cstr_tocase(csview sv, int k) {
     cstr out = cstr_null;
     char *buf = cstr_reserve(&out, sv.size*3/2);
     uint32_t cp; size_t sz = 0;
@@ -174,25 +165,13 @@ static cstr cstr_tocase(csview sv, struct fncase fn) {
     while (*sv.str) {
         do { utf8_decode(&d, (uint8_t)*sv.str++); } while (d.state);
         if (d.codep < 128)
-            buf[sz++] = (char)fn.conv_asc(d.codep);
+            buf[sz++] = (char)fn_tocase[k].conv_asc(d.codep);
         else {
-            cp = fn.conv_utf(d.codep);
+            cp = fn_tocase[k].conv_utf(d.codep);
             sz += utf8_encode(buf + sz, cp);
         }
     }
     _cstr_set_size(&out, sz);
     cstr_shrink_to_fit(&out);
     return out;
-}
-
-cstr cstr_casefold_sv(csview sv) {
-    return cstr_tocase(sv, fn_tofold);
-}
-
-cstr cstr_tolower_sv(csview sv) {
-    return cstr_tocase(sv, fn_tolower);
-}
-
-cstr cstr_toupper_sv(csview sv) {
-    return cstr_tocase(sv, fn_toupper);
 }

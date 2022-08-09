@@ -5,8 +5,7 @@
 #include <ctype.h>
 
 // utf8 methods defined in src/utf8code.c:
-extern bool     utf8_islower(uint32_t c);
-extern bool     utf8_isupper(uint32_t c);
+
 extern bool     utf8_isspace(uint32_t c);
 extern bool     utf8_isdigit(uint32_t c);
 extern bool     utf8_isxdigit(uint32_t c);
@@ -19,6 +18,9 @@ extern bool     utf8_valid_n(const char* s, size_t nbytes);
 extern int      utf8_icmp_sv(csview s1, csview s2);
 extern unsigned utf8_encode(char *out, uint32_t c);
 extern uint32_t utf8_peek(const char *s, int u8pos);
+
+STC_INLINE bool utf8_isupper(uint32_t c) { return utf8_tolower(c) != c; }
+STC_INLINE bool utf8_islower(uint32_t c) { return utf8_toupper(c) != c; }
 
 /* following functions uses src/utf8code.c */
 
