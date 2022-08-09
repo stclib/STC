@@ -57,7 +57,7 @@ typedef struct { const char* str; size_t size; } csview;
 typedef char csview_value;
 typedef union { 
     const char *ref; 
-    csview chr;
+    struct { csview chr; const char *_end; } u8;
 } csview_iter, cstr_iter;
 
 #define c_true(...) __VA_ARGS__
@@ -73,12 +73,12 @@ typedef union {
 
 #define _c_carr2_types(SELF, VAL) \
     typedef VAL SELF##_value; \
-    typedef struct { SELF##_value *ref; } SELF##_iter; \
+    typedef struct { SELF##_value *ref, *_end; } SELF##_iter; \
     typedef struct { SELF##_value **data; size_t xdim, ydim; } SELF
 
 #define _c_carr3_types(SELF, VAL) \
     typedef VAL SELF##_value; \
-    typedef struct { SELF##_value *ref; } SELF##_iter; \
+    typedef struct { SELF##_value *ref, *_end; } SELF##_iter; \
     typedef struct { SELF##_value ***data; size_t xdim, ydim, zdim; } SELF
 
 #define _c_cbox_types(SELF, VAL) \
@@ -89,7 +89,7 @@ typedef union {
 
 #define _c_cdeq_types(SELF, VAL) \
     typedef VAL SELF##_value; \
-    typedef struct {SELF##_value *ref; } SELF##_iter; \
+    typedef struct {SELF##_value *ref, *_end; } SELF##_iter; \
     typedef struct {SELF##_value *_base, *data;} SELF
 
 #define _c_clist_types(SELF, VAL) \
@@ -120,7 +120,7 @@ typedef union {
     } SELF##_result; \
 \
     typedef struct { \
-        SELF##_value *ref; \
+        SELF##_value *ref, *_end; \
         uint8_t* _hx; \
     } SELF##_iter; \
 \
@@ -186,7 +186,7 @@ typedef union {
 #endif
 #define _c_cstack_types(SELF, VAL) \
     typedef VAL SELF##_value; \
-    typedef struct { SELF##_value *ref; } SELF##_iter; \
+    typedef struct { SELF##_value *ref, *_end; } SELF##_iter; \
     typedef struct SELF { \
         SELF##_value* data; \
         size_t size, capacity; \
@@ -209,7 +209,7 @@ typedef union {
 
 #define _c_cvec_types(SELF, VAL) \
     typedef VAL SELF##_value; \
-    typedef struct { SELF##_value *ref; } SELF##_iter; \
+    typedef struct { SELF##_value *ref, *_end; } SELF##_iter; \
     typedef struct { SELF##_value *data; } SELF
 
 #endif // STC_FORWARD_H_INCLUDED

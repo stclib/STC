@@ -150,7 +150,7 @@ int main()
         printf("%s\n", cstr_str(&s1));
 
         c_foreach (i, cstr, s1)
-            printf("%.*s,", c_ARGsv(i.chr));
+            printf("%.*s,", c_ARGsv(i.u8.chr));
     }
 }
 ```

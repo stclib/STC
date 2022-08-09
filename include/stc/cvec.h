@@ -141,12 +141,11 @@ STC_INLINE _cx_value*   _cx_memb(_push_back)(_cx_self* self, i_key value)
                             { return _cx_memb(_push)(self, value); }
 STC_INLINE void         _cx_memb(_pop_back)(_cx_self* self) { _cx_memb(_pop)(self); }
 STC_INLINE _cx_iter     _cx_memb(_begin)(const _cx_self* self)
-                            { return c_make(_cx_iter){self->data}; }
-STC_INLINE _cx_iter     _cx_memb(_end)(const _cx_self* self)
-                            { return c_make(_cx_iter){self->data + cvec_rep_(self)->size}; }
-STC_INLINE void         _cx_memb(_next)(_cx_iter* it) { ++it->ref; }
-STC_INLINE _cx_iter     _cx_memb(_advance)(_cx_iter it, intptr_t offs)
-                            { it.ref += offs; return it; }
+                            { size_t n = cvec_rep_(self)->size; return c_make(_cx_iter){n ? self->data : NULL, self->data + n}; }
+STC_INLINE _cx_iter     _cx_memb(_end)(const _cx_self* self) { return c_make(_cx_iter){NULL}; }
+STC_INLINE void         _cx_memb(_next)(_cx_iter* it) { if (++it->ref == it->_end) it->ref = NULL; }
+STC_INLINE _cx_iter     _cx_memb(_advance)(_cx_iter it, size_t offs)
+                            { if ((it.ref += offs) >= it._end) it.ref = NULL; return it; }
 STC_INLINE size_t       _cx_memb(_index)(const _cx_self* cx, _cx_iter it) { return it.ref - cx->data; }
 
 STC_INLINE _cx_self
@@ -217,9 +216,7 @@ _cx_memb(_find)(const _cx_self* self, _cx_raw raw) {
 
 STC_INLINE const _cx_value*
 _cx_memb(_get)(const _cx_self* self, _cx_raw raw) {
-    _cx_iter end = _cx_memb(_end)(self);
-    _cx_value* val = _cx_memb(_find)(self, raw).ref;
-    return val == end.ref ? NULL : val;
+    return _cx_memb(_find)(self, raw).ref;
 }
 
 STC_INLINE _cx_value*
@@ -354,14 +351,12 @@ _cx_memb(_insert_range_p)(_cx_self* self, _cx_value* pos,
 STC_DEF _cx_iter
 _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
     intptr_t len = p2 - p1;
-    if (len > 0) {
-        _cx_value* p = p1, *end = self->data + cvec_rep_(self)->size;
-        for (; p != p2; ++p)
-            { i_keydrop(p); }
-        memmove(p1, p2, (end - p2) * sizeof(i_key));
-        cvec_rep_(self)->size -= len;
-    }
-    return c_make(_cx_iter){.ref = p1};
+    _cx_value* p = p1, *end = self->data + cvec_rep_(self)->size;
+    for (; p != p2; ++p)
+        { i_keydrop(p); }
+    memmove(p1, p2, (end - p2) * sizeof *p1);
+    cvec_rep_(self)->size -= len;
+    return c_make(_cx_iter){.ref = p2 == end ? NULL : p1, end - len};
 }
 
 #if !defined _i_no_clone

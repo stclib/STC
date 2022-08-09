@@ -192,8 +192,8 @@ STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, _cx_rawkey rkey) {
     i_size idx;
     if (!(self->size && self->_hashx[idx = _cx_memb(_bucket_)(self, &rkey).idx]))
-        idx = self->bucket_count;
-    return c_make(_cx_iter){self->table+idx, self->_hashx+idx};
+        return c_make(_cx_iter){NULL};
+    return c_make(_cx_iter){self->table+idx, self->table+self->bucket_count, self->_hashx+idx};
 }
 
 STC_INLINE const _cx_value*
@@ -210,25 +210,27 @@ _cx_memb(_get_mut)(_cx_self* self, _cx_rawkey rkey)
 
 STC_INLINE _cx_iter
 _cx_memb(_begin)(const _cx_self* self) {
-    _cx_iter it = {self->table, self->_hashx};
+    _cx_iter it = {self->table, self->table+self->bucket_count, self->_hashx};
     if (it._hx)
         while (*it._hx == 0)
             ++it.ref, ++it._hx;
+    if (it.ref == it._end) it.ref = NULL;
     return it;
 }
 
 STC_INLINE _cx_iter
 _cx_memb(_end)(const _cx_self* self)
-    { return c_make(_cx_iter){self->table + self->bucket_count}; }
+    { return c_make(_cx_iter){NULL}; }
 
 STC_INLINE void
-_cx_memb(_next)(_cx_iter* it)
-    { while ((++it->ref, *++it->_hx == 0)) ; }
+_cx_memb(_next)(_cx_iter* it) { 
+    while ((++it->ref, *++it->_hx == 0)) ;
+    if (it->ref == it->_end) it->ref = NULL;
+}
 
 STC_INLINE _cx_iter
 _cx_memb(_advance)(_cx_iter it, size_t n) {
-    // UB if n > elements left
-    while (n--) _cx_memb(_next)(&it);
+    while (n-- && it.ref) _cx_memb(_next)(&it);
     return it;
 }
 

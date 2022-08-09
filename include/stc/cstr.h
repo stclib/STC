@@ -224,15 +224,15 @@ STC_INLINE csview cstr_u8_chr(const cstr* self, size_t u8idx) {
 
 STC_INLINE cstr_iter cstr_begin(const cstr* self) { 
     const char* str = cstr_str(self);
-    return c_make(cstr_iter){.chr = {str, utf8_chr_size(str)}};
+    return c_make(cstr_iter){.u8 = {{str, utf8_chr_size(str)}}};
 }
 STC_INLINE cstr_iter cstr_end(const cstr* self) {
     csview sv = cstr_sv(self);
     return c_make(cstr_iter){sv.str + sv.size};
 }
 STC_INLINE void cstr_next(cstr_iter* it) {
-    it->ref += it->chr.size;
-    it->chr.size = utf8_chr_size(it->ref);
+    it->ref += it->u8.chr.size;
+    it->u8.chr.size = utf8_chr_size(it->ref);
 }
 
 
