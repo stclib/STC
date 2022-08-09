@@ -22,7 +22,7 @@ int main()
         printf("INPUT: %s\n", input);
 
         /* replace with a fixed string, extended all-in-one call: */
-        cstr_take(&str, cregex_replace_p(input, pattern, "YYYY-MM-DD", 0));
+        cstr_take(&str, cregex_replace_pt(input, pattern, "YYYY-MM-DD", 0));
         printf("fixed: %s\n", cstr_str(&str));
 
         /* US date format, and add 10 years to dates: */
@@ -30,7 +30,7 @@ int main()
         printf("us+10: %s\n", cstr_str(&str));
 
         /* Wrap first date inside []: */
-        cstr_take(&str, cregex_replace_p(input, pattern, "[$0]", 1));
+        cstr_take(&str, cregex_replace_pt(input, pattern, "[$0]", 1));
         printf("brack: %s\n", cstr_str(&str));
 
         /* Shows how to compile RE separately */
@@ -47,7 +47,7 @@ int main()
         }
 
         /* Wrap all words in ${} */
-        cstr_take(&str, cregex_replace_p("[52] apples and [31] mangoes", "[a-z]+", "$${$0}", 0));
+        cstr_take(&str, cregex_replace_pt("[52] apples and [31] mangoes", "[a-z]+", "$${$0}", 0));
         printf("curly: %s\n", cstr_str(&str));
     }
 }

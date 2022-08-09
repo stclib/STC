@@ -108,8 +108,8 @@ int cregex_find_sv(csview input, const cregex* re, csview match[]) {
 }
 
 /* match + compile RE pattern */
-int cregex_find_p(const char* input, const char* pattern,
-                  csview match[], int cmflags);
+int cregex_find_pt(const char* input, const char* pattern,
+                   csview match[], int cmflags);
 
 static inline
 bool cregex_is_match(const char* input, const cregex* re)
@@ -126,7 +126,7 @@ cstr cregex_replace(const char* input, const cregex* re, const char* replace, un
 cstr cregex_replace_pe(const char* input, const char* pattern, const char* replace, unsigned count,
                        int crflags, bool (*mfun)(int i, csview match, cstr* mstr));
 static inline
-cstr cregex_replace_p(const char* input, const char* pattern, const char* replace, unsigned count)
+cstr cregex_replace_pt(const char* input, const char* pattern, const char* replace, unsigned count)
     { return cregex_replace_pe(input, pattern, replace, count, 0, NULL); }
 
 /* destroy regex */

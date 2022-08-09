@@ -35,7 +35,7 @@ int         cregex_captures(const cregex* self);
 int         cregex_find(const char* input, const cregex* re, csview match[], int mflags);
 int         cregex_find_sv(csview input, const cregex* re, csview match[]);
             // takes string pattern instead of re. (for one-time matches)
-int         cregex_find_p(const char* input, const char* pattern, csview match[], int cmflags);
+int         cregex_find_pt(const char* input, const char* pattern, csview match[], int cmflags);
 
 bool        cregex_is_match(const char* input, const cregex* re);
 
@@ -43,7 +43,7 @@ cstr        cregex_replace(const char* input, const cregex* re, const char* repl
 cstr        cregex_replace_ex(const char* input, const cregex* re, const char* replace, unsigned count,
                               int rflags, bool (*mfun)(int grp, csview match, cstr* mstr));
             // takes string pattern instead of re
-cstr        cregex_replace_p(const char* input, const char* pattern, const char* replace, unsigned count);
+cstr        cregex_replace_pt(const char* input, const char* pattern, const char* replace, unsigned count);
 cstr        cregex_replace_pe(const char* input, const char* pattern, const char* replace, unsigned count,
                               int crflags, bool (*mfun)(int grp, csview match, cstr* mstr));
 
@@ -118,7 +118,7 @@ int main() {
 
 For a single match you may use the all-in-one function:
 ```c
-if (cregex_find_p(input, pattern, match, 0))
+if (cregex_find_pt(input, pattern, match, 0))
     printf("Found date: %.*s\n", c_ARGsv(match[0]));
 ```
 

@@ -1218,8 +1218,8 @@ cregex_find(const char* input, const cregex* re,
     }
 }
 
-int cregex_find_p(const char* input, const char* pattern,
-                  csview match[], int cmflags) {
+int cregex_find_pt(const char* input, const char* pattern,
+                   csview match[], int cmflags) {
     cregex re = cregex_init();
     int res = cregex_compile(&re, pattern, cmflags);
     if (res != cre_success) return res;
