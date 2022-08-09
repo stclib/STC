@@ -123,8 +123,11 @@ STC_INLINE csview cstr_u8_slice(const cstr* self , size_t u8p1, size_t u8p2)
 #endif
 /* ---- Container helper functions ---- */
 
-STC_INLINE int csview_cmp(const csview* x, const csview* y) 
-    { return strcmp(x->str, y->str); }
+STC_INLINE int csview_cmp(const csview* x, const csview* y) {
+    size_t n = x->size < y->size ? x->size : y->size;
+    int c = memcmp(x->str, y->str, n);
+    return c ? c : x->size - y->size;
+}
 
 STC_INLINE int csview_icmp(const csview* x, const csview* y)
     { return utf8_icmp_sv(*x, *y); }

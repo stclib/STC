@@ -110,10 +110,10 @@ int utf8_icmp_sv(const csview s1, const csview s2) {
         do { utf8_decode(&d1, (uint8_t)s1.str[j1++]); } while (d1.state);
         do { utf8_decode(&d2, (uint8_t)s2.str[j2++]); } while (d2.state);
         int32_t c = utf8_casefold(d1.codep) - utf8_casefold(d2.codep);
-        if (c || !s2.str[j2 - 1]) // OK if s1.size / s2.size are npos
+        if (c || !s2.str[j2 - 1]) // OK if s1.size and s2.size are npos
             return c;
     }
-    return 0;
+    return s1.size - s2.size;
 }
 
 bool utf8_isupper(uint32_t c) {
