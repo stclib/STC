@@ -29,23 +29,6 @@ more on complex container hierarchies without resorting to cumbersome function p
 Usage with trivial data types is simple to use compared to most generic container libraries for C because
 of its type safety with an intuitive and consistent API.
 
-Three standout features of STC are
-1. the centralized analysis of template arguments: It assigns good defaults to non-specified templates.
-You may specify a number of "standard" template arguments for each container, but as minimum only one is
-required (two for maps). In the latter case, STC assumes the elements are basic types. For more complex types,
-additional template arguments must be defined.
-2. the general "heterogeneous lookup"-like feature: Allows specification of an alternative type to use
-for lookup in containers. E.g. for containers with string type (**cstr**) elements, `const char*` may be used
-as lookup type. It will then use the input `const char*` directly when comparing with the string data in the
-container. This avoids the construction of a new `cstr` (which possible allocates memory) for the lookup. 
-Finally, destruction of the lookup key (i.e. string literal) after usage is not needed (or allowed), which 
-is convenient in C. The alternative lookup type may also be used for adding entries into containers by using 
-the *emplace*-functions. E.g. `MyCStrVec_emplace_back(&vec, "Hello")`, which further simplifies usage of STC.
-3. the design of iterators: All container can be iterated the same way, and uses the
-same element access syntax. E.g. `c_foreach (it, IntContainer, container) printf(" %d", *it.ref);` will work for
-every type of container defined as `IntContainer` with `int` elements. Also the form `c_foreach (it, IntContainer, it1, it2)`
-may be used to iterate from `it1` up to `it2`.
-
 The library is mature and well tested, so you may use it in projects. However, minor breaking API changes may
 still happen. The main development of this project is finished, but I will handle PRs with bugs and improvements
 in the future, and do minor modifications.
@@ -89,6 +72,23 @@ Highlights
 - **No callback functions** - All passed template argument functions/macros are directly called from the implementation, no slow callbacks which requires storage.
 - **Compiles with C++ and C99** - C code can be compiled with C++ (container element types must be POD).
 - **Container prefix and forward declaration** - Templated containers may have user defined prefix, e.g. myvec_push_back(). They may also be forward declared without including the full API/implementation. See documentation below.
+
+Three standout features of STC are
+1. the centralized analysis of template arguments: It assigns good defaults to non-specified templates.
+You may specify a number of "standard" template arguments for each container, but as minimum only one is
+required (two for maps). In the latter case, STC assumes the elements are basic types. For more complex types,
+additional template arguments must be defined.
+2. the general "heterogeneous lookup"-like feature: Allows specification of an alternative type to use
+for lookup in containers. E.g. for containers with string type (**cstr**) elements, `const char*` may be used
+as lookup type. It will then use the input `const char*` directly when comparing with the string data in the
+container. This avoids the construction of a new `cstr` (which possible allocates memory) for the lookup. 
+Finally, destruction of the lookup key (i.e. string literal) after usage is not needed (or allowed), which 
+is convenient in C. The alternative lookup type may also be used for adding entries into containers by using 
+the *emplace*-functions. E.g. `MyCStrVec_emplace_back(&vec, "Hello")`, which further simplifies usage of STC.
+3. the design of iterators: All container can be iterated the same way, and uses the
+same element access syntax. E.g. `c_foreach (it, IntContainer, container) printf(" %d", *it.ref);` will work for
+every type of container defined as `IntContainer` with `int` elements. Also the form `c_foreach (it, IntContainer, it1, it2)`
+may be used to iterate from `it1` up to `it2`.
 
 Performance
 -----------
