@@ -88,14 +88,17 @@ STC_INLINE size_t _cx_memb(_idx)(const _cx_self* self, size_t x, size_t y) {
     return self->ydim*x + y;
 }
 
-STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self)
-    { size_t n = self->xdim*self->ydim; return c_make(_cx_iter){n ? *self->data : NULL, *self->data + n}; }
+
+STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) { 
+    size_t n = self->xdim*self->ydim; 
+    return c_make(_cx_iter){n ? *self->data : NULL, *self->data + n};
+}
 
 STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self)
     { return c_make(_cx_iter){NULL, *self->data + self->xdim*self->ydim}; }
 
-STC_INLINE void _cx_memb(_next)(_cx_iter* it) { if (++it->ref == it->_end) it->ref = NULL; }
-
+STC_INLINE void _cx_memb(_next)(_cx_iter* it)
+    { if (++it->ref == it->_end) it->ref = NULL; }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement)

@@ -92,13 +92,6 @@ STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self)
                             { return self->data + cdeq_rep_(self)->size - 1; }
 STC_INLINE void         _cx_memb(_pop_front)(_cx_self* self) // == _pop() when _i_queue
                             { i_keydrop(self->data); ++self->data; --cdeq_rep_(self)->size; }
-STC_INLINE _cx_iter     _cx_memb(_begin)(const _cx_self* self)
-                            { size_t n = cdeq_rep_(self)->size; return c_make(_cx_iter){n ? self->data : NULL, self->data + n}; }
-STC_INLINE _cx_iter     _cx_memb(_end)(const _cx_self* self)
-                            { return c_make(_cx_iter){NULL, self->data + cdeq_rep_(self)->size}; }
-STC_INLINE void         _cx_memb(_next)(_cx_iter* it) { if (++it->ref == it->_end) it->ref = NULL; }
-STC_INLINE _cx_iter     _cx_memb(_advance)(_cx_iter it, size_t offs)
-                            { if ((it.ref += offs) >= it._end) it.ref = NULL; return it; }
 
 #if !defined _i_queue
 
@@ -142,6 +135,21 @@ STC_INLINE _cx_iter
 _cx_memb(_erase_range)(_cx_self* self, _cx_iter i1, _cx_iter i2) {
     return _cx_memb(_erase_range_p)(self, i1.ref, (i2.ref ? i2.ref : i2._end));
 }
+
+
+STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) {
+    size_t n = cdeq_rep_(self)->size;
+    return c_make(_cx_iter){n ? self->data : NULL, self->data + n};
+}
+
+STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self)
+    { return c_make(_cx_iter){NULL, self->data + cdeq_rep_(self)->size}; }
+
+STC_INLINE void _cx_memb(_next)(_cx_iter* it)
+    { if (++it->ref == it->_end) it->ref = NULL; }
+
+STC_INLINE _cx_iter _cx_memb(_advance)(_cx_iter it, size_t n)
+    { if ((it.ref += n) >= it._end) it.ref = NULL; return it; }
 
 #if !defined _i_no_emplace
 STC_INLINE _cx_value*

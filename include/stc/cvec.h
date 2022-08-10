@@ -136,14 +136,6 @@ STC_INLINE void         _cx_memb(_pop)(_cx_self* self)
 STC_INLINE _cx_value*   _cx_memb(_push_back)(_cx_self* self, i_key value)
                             { return _cx_memb(_push)(self, value); }
 STC_INLINE void         _cx_memb(_pop_back)(_cx_self* self) { _cx_memb(_pop)(self); }
-STC_INLINE _cx_iter     _cx_memb(_begin)(const _cx_self* self)
-                            { size_t n = cvec_rep_(self)->size; return c_make(_cx_iter){n ? self->data : NULL, self->data + n}; }
-STC_INLINE _cx_iter     _cx_memb(_end)(const _cx_self* self) 
-                            { return c_make(_cx_iter){NULL, self->data + cvec_rep_(self)->size}; }
-STC_INLINE void         _cx_memb(_next)(_cx_iter* it) { if (++it->ref == it->_end) it->ref = NULL; }
-STC_INLINE _cx_iter     _cx_memb(_advance)(_cx_iter it, size_t offs)
-                            { if ((it.ref += offs) >= it._end) it.ref = NULL; return it; }
-STC_INLINE size_t       _cx_memb(_index)(const _cx_self* cx, _cx_iter it) { return it.ref - cx->data; }
 
 STC_INLINE _cx_self
 _cx_memb(_with_size)(const size_t size, i_key null) {
@@ -203,6 +195,24 @@ STC_INLINE _cx_value*
 _cx_memb(_at_mut)(_cx_self* self, const size_t idx) {
     assert(idx < cvec_rep_(self)->size); return self->data + idx;
 }
+
+
+STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) { 
+    size_t n = cvec_rep_(self)->size; 
+    return c_make(_cx_iter){n ? self->data : NULL, self->data + n};
+}
+
+STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self) 
+    { return c_make(_cx_iter){NULL, self->data + cvec_rep_(self)->size}; }
+
+STC_INLINE void _cx_memb(_next)(_cx_iter* it) 
+    { if (++it->ref == it->_end) it->ref = NULL; }
+
+STC_INLINE _cx_iter _cx_memb(_advance)(_cx_iter it, size_t n)
+    { if ((it.ref += n) >= it._end) it.ref = NULL; return it; }
+
+STC_INLINE size_t _cx_memb(_index)(const _cx_self* cx, _cx_iter it) 
+    { return it.ref - cx->data; }
 
 #if !c_option(c_no_cmp)
 
