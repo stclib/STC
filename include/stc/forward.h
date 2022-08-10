@@ -194,7 +194,7 @@ typedef union {
 
 #define _c_cstack_fixed(SELF, VAL, CAP) \
     typedef VAL SELF##_value; \
-    typedef struct { SELF##_value *ref; } SELF##_iter; \
+    typedef struct { SELF##_value *ref, *_end; } SELF##_iter; \
     typedef struct SELF { \
         SELF##_value data[CAP]; \
         size_t size; \
