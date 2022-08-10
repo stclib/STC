@@ -93,7 +93,7 @@ STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self)
 STC_INLINE void         _cx_memb(_pop_front)(_cx_self* self) // == _pop() when _i_queue
                             { i_keydrop(self->data); ++self->data; --cdeq_rep_(self)->size; }
 STC_INLINE _cx_iter     _cx_memb(_begin)(const _cx_self* self)
-                            { return c_make(_cx_iter){self->data}; }
+                            { size_t n = cdeq_rep_(self)->size; return c_make(_cx_iter){n ? self->data : NULL, self->data + n}; }
 STC_INLINE _cx_iter     _cx_memb(_end)(const _cx_self* self)
                             { return c_make(_cx_iter){NULL, self->data + cdeq_rep_(self)->size}; }
 STC_INLINE void         _cx_memb(_next)(_cx_iter* it) { if (++it->ref == it->_end) it->ref = NULL; }
