@@ -159,13 +159,12 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #define c_foreach3(it, C, cnt) \
     for (C##_iter it = C##_begin(&cnt); it.ref; C##_next(&it))
 #define c_foreach4(it, C, start, finish) \
-    for (C##_iter it = start, *_end_ref = (C##_iter*)(finish).ref \
-         ; it.ref != (C##_value*)_end_ref; C##_next(&it))
+    for (C##_iter it = start, *_endref = (C##_iter*)(finish).ref \
+         ; it.ref != (C##_value*)_endref; C##_next(&it))
 
 #define c_forpair(key, val, C, cnt) /* structured binding */ \
-    for (struct {C##_iter _it; C##_value* _endref; const C##_key* key; C##_mapped* val;} \
-         _ = {C##_begin(&cnt), C##_end(&cnt).ref} \
-         ; _._it.ref != _._endref && (_.key = &_._it.ref->first, _.val = &_._it.ref->second) \
+    for (struct {C##_iter _it; const C##_key* key; C##_mapped* val;} _ = {C##_begin(&cnt)} \
+         ; _._it.ref && (_.key = &_._it.ref->first, _.val = &_._it.ref->second) \
          ; C##_next(&_._it))
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
