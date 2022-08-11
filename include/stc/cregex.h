@@ -76,8 +76,9 @@ typedef struct {
     csview ref[cre_MAXCAPTURES];
 } cregex_iter;
 
-#define c_foreach_match(i, _re, _input) \
-    for (cregex_iter i = {_re, _input}; cregex_find(i.input, i.re, i.ref, cre_m_next) == cre_success;)
+#define c_foreach_match(it, Re, Input) \
+    for (cregex_iter it = {Re, Input}; \
+         cregex_find(it.input, it.re, it.ref, cre_m_next) == cre_success;)
 
 static inline
 cregex cregex_init(void) {

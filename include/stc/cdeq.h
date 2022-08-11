@@ -231,7 +231,8 @@ _cx_memb(_shrink_to_fit)(_cx_self *self) {
         struct cdeq_rep* rep = cdeq_rep_(self);
         const size_t sz = rep->size;
         memmove(self->_base, self->data, sz*sizeof(i_key));
-        rep = (struct cdeq_rep*) c_realloc(rep, offsetof(struct cdeq_rep, base) + sz*sizeof(i_key));
+        rep = (struct cdeq_rep*) c_realloc(rep, offsetof(struct cdeq_rep, base) +
+                                                sz*sizeof(i_key));
         if (rep) {
             self->_base = self->data = (_cx_value*)rep->base;
             rep->cap = sz;
