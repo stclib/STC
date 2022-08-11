@@ -47,10 +47,16 @@ long        carc_X_use_count(carc_X ptr);
 void        carc_X_reset(carc_X* self);    
 void        carc_X_reset_to(carc_X* self, i_val* p);           // assign new carc from ptr. Takes ownership of p.
 
-uint64_t    carc_X_value_hash(const i_val* x);                 // hash value
-int         carc_X_value_cmp(const i_val* x, const i_val* y);  // compares pointer addresses if 'i_opt c_no_cmp'
-                                                               // is defined. Otherwise uses 'i_cmp' or default compare.
-bool        carc_X_value_eq(const i_val* x, const i_val* y);   // carc_X_value_cmp == 0
+uint64_t    carc_X_hash(const carc_X* x);                      // hash value
+int         carc_X_cmp(const carc_X* x, const carc_X* y);      // compares pointer addresses if 'i_opt c_no_cmp'
+                                                               // is defined. Otherwise uses 'i_cmp' or default cmp.
+bool        carc_X_eq(const carc_X* x, const carc_X* y);       // carc_X_cmp() == 0
+
+// functions on pointed to objects.
+
+uint64_t    carc_X_value_hash(const i_val* x);
+int         carc_X_value_cmp(const i_val* x, const i_val* y);
+bool        carc_X_value_eq(const i_val* x, const i_val* y);
 ```
 
 ## Types and constants

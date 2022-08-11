@@ -44,11 +44,18 @@ void        cbox_X_drop(cbox_X* self);                        // destruct the co
 void        cbox_X_reset(cbox_X* self);   
 void        cbox_X_reset_to(cbox_X* self, i_val* p);          // assign new cbox from ptr. Takes ownership of p.
 
-uint64_t    cbox_X_value_hash(const i_val* p);                // hash value
-int         cbox_X_value_cmp(const i_val* p, const i_val* y); // compares pointer addresses if 'i_opt c_no_cmp'
-                                                              // is defined. Otherwise uses 'i_cmp' or default compare.
-bool        cbox_X_value_eq(const i_val* p, const i_val* y);  // cbox_X_value_cmp == 0
+uint64_t    cbox_X_hash(const cbox_X* x);                      // hash value
+int         cbox_X_cmp(const cbox_X* x, const cbox_X* y);      // compares pointer addresses if 'i_opt c_no_cmp'
+                                                               // is defined. Otherwise uses 'i_cmp' or default cmp.
+bool        cbox_X_eq(const cbox_X* x, const cbox_X* y);       // cbox_X_cmp() == 0
+
+// functions on pointed to objects.
+
+uint64_t    cbox_X_value_hash(const i_val* x);
+int         cbox_X_value_cmp(const i_val* x, const i_val* y);
+bool        cbox_X_value_eq(const i_val* x, const i_val* y);
 ```
+
 ## Types and constants
 
 | Type name          | Type definition                                               | Used to represent...     |
