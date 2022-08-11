@@ -120,7 +120,7 @@ _cx_memb(_insert_n)(_cx_self* self, const size_t idx, const _cx_value arr[], con
 }
 STC_INLINE _cx_iter
 _cx_memb(_insert_at)(_cx_self* self, _cx_iter it, i_key value) {
-    return _cx_memb(_insert_range_p)(self, (it.ref ? it.ref : it.end), &value, &value + 1);
+    return _cx_memb(_insert_range_p)(self, it.ref, &value, &value + 1);
 }
 
 STC_INLINE _cx_iter
@@ -347,16 +347,20 @@ _cx_memb(_expand_left_half_)(_cx_self* self, const size_t idx, const size_t n) {
 }
 
 static _cx_iter
-_cx_memb(_insert_uninit_p)(_cx_self* self, const _cx_value* pos, const size_t n) {
-    const size_t idx = pos - self->data;
-    if (idx*2 < cdeq_rep_(self)->size)
-        _cx_memb(_expand_left_half_)(self, idx, n);
-    else
-        _cx_memb(_expand_right_half_)(self, idx, n);
-    struct cdeq_rep* rep = cdeq_rep_(self);
-    if (n)
-        rep->size += n; /* do only if size > 0 */
-    return c_make(_cx_iter){self->data + idx, self->data + rep->size};
+_cx_memb(_insert_uninit_p)(_cx_self* self, _cx_value* pos, const size_t n) {
+    struct cdeq_rep* r = cdeq_rep_(self);
+    if (n) {
+        if (!pos) pos = self->data + r->size;
+        const size_t idx = pos - self->data;
+        if (idx*2 < r->size)
+            _cx_memb(_expand_left_half_)(self, idx, n);
+        else
+            _cx_memb(_expand_right_half_)(self, idx, n);
+        r = cdeq_rep_(self);
+        r->size += n;
+        pos = self->data + idx;
+    }
+    return c_make(_cx_iter){pos, self->data + r->size};
 }
 
 STC_DEF _cx_value*
@@ -381,6 +385,7 @@ _cx_memb(_insert_range_p)(_cx_self* self, _cx_value* pos,
 
 STC_DEF _cx_iter
 _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
+    assert(p1 && p2);
     intptr_t len = p2 - p1;
     struct cdeq_rep* r = cdeq_rep_(self);
     _cx_value* p = p1, *end = self->data + r->size;

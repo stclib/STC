@@ -171,7 +171,7 @@ _cx_memb(_insert_n)(_cx_self* self, const size_t idx, const _cx_value arr[], con
 }
 STC_INLINE _cx_iter
 _cx_memb(_insert_at)(_cx_self* self, _cx_iter it, i_key value) {
-    return _cx_memb(_insert_range_p)(self, (it.ref ? it.ref : it.end), &value, &value + 1);
+    return _cx_memb(_insert_range_p)(self, it.ref, &value, &value + 1);
 }
 
 STC_INLINE _cx_iter
@@ -332,16 +332,19 @@ _cx_memb(_push)(_cx_self* self, i_key value) {
 
 STC_DEF _cx_iter
 _cx_memb(_insert_uninit_p)(_cx_self* self, _cx_value* pos, const size_t n) {
-    const size_t idx = pos - self->data;
     struct cvec_rep* r = cvec_rep_(self);
-    if (r->size + n > r->cap) {
-        if (!_cx_memb(_reserve)(self, r->size*3/2 + n))
-            return _cx_memb(_end)(self);
-        r = cvec_rep_(self);
-        pos = self->data + idx;
+    if (n) {
+        if (!pos) pos = self->data + r->size;
+        const size_t idx = pos - self->data;
+        if (r->size + n > r->cap) {
+            if (!_cx_memb(_reserve)(self, r->size*3/2 + n))
+                return _cx_memb(_end)(self);
+            r = cvec_rep_(self);
+            pos = self->data + idx;
+        }
+        memmove(pos + n, pos, (r->size - idx)*sizeof *pos);
+        r->size += n;
     }
-    memmove(pos + n, pos, (r->size - idx)*sizeof *pos);
-    r->size += n;
     return c_make(_cx_iter){pos, self->data + r->size};
 }
 
@@ -356,6 +359,7 @@ _cx_memb(_insert_range_p)(_cx_self* self, _cx_value* pos,
 
 STC_DEF _cx_iter
 _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
+    assert(p1 && p2);
     intptr_t len = p2 - p1;
     struct cvec_rep* r = cvec_rep_(self);
     _cx_value* p = p1, *end = self->data + r->size;
