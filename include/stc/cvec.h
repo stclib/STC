@@ -156,10 +156,6 @@ _cx_memb(_shrink_to_fit)(_cx_self* self) {
     _cx_memb(_reserve)(self, _cx_memb(_size)(self));
 }
 
-STC_INLINE _cx_iter
-_cx_memb(_append_uninit)(_cx_self* self, const size_t n) {
-    return _cx_memb(_insert_uninit_p)(self, self->data + _cx_memb(_size)(self), n);
-}
 
 STC_INLINE _cx_iter
 _cx_memb(_insert)(_cx_self* self, const size_t idx, i_key value) {
