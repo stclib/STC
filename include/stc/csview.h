@@ -81,7 +81,7 @@ STC_INLINE csview_iter csview_end(const csview* self)
 STC_INLINE void csview_next(csview_iter* it) {
     it->ref += it->u8.chr.size;
     it->u8.chr.size = utf8_chr_size(it->ref);
-    if (it->ref == it->u8._end) it->ref = NULL;
+    if (it->ref == it->u8.end) it->ref = NULL;
 }
 
 

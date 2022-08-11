@@ -234,7 +234,7 @@ STC_INLINE cstr_iter cstr_end(const cstr* self) {
 STC_INLINE void cstr_next(cstr_iter* it) {
     it->ref += it->u8.chr.size;
     it->u8.chr.size = utf8_chr_size(it->ref);
-    if (it->ref == it->u8._end) it->ref = NULL;
+    if (it->ref == it->u8.end) it->ref = NULL;
 }
 
 

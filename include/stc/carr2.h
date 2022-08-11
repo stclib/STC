@@ -98,7 +98,7 @@ STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self)
     { return c_make(_cx_iter){NULL, *self->data + self->xdim*self->ydim}; }
 
 STC_INLINE void _cx_memb(_next)(_cx_iter* it)
-    { if (++it->ref == it->_end) it->ref = NULL; }
+    { if (++it->ref == it->end) it->ref = NULL; }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement)

@@ -106,7 +106,7 @@ _cx_memb(_emplace_n)(_cx_self* self, const size_t idx, const _cx_raw arr[], cons
 }
 STC_INLINE _cx_iter
 _cx_memb(_emplace_at)(_cx_self* self, _cx_iter it, _cx_raw raw) {
-    return _cx_memb(_emplace_range_p)(self, (it.ref ? it.ref : it._end), &raw, &raw + 1);
+    return _cx_memb(_emplace_range_p)(self, (it.ref ? it.ref : it.end), &raw, &raw + 1);
 }
 #endif // !_i_no_emplace
 
@@ -171,7 +171,7 @@ _cx_memb(_insert_n)(_cx_self* self, const size_t idx, const _cx_value arr[], con
 }
 STC_INLINE _cx_iter
 _cx_memb(_insert_at)(_cx_self* self, _cx_iter it, i_key value) {
-    return _cx_memb(_insert_range_p)(self, (it.ref ? it.ref : it._end), &value, &value + 1);
+    return _cx_memb(_insert_range_p)(self, (it.ref ? it.ref : it.end), &value, &value + 1);
 }
 
 STC_INLINE _cx_iter
@@ -184,7 +184,7 @@ _cx_memb(_erase_at)(_cx_self* self, _cx_iter it) {
 }
 STC_INLINE _cx_iter
 _cx_memb(_erase_range)(_cx_self* self, _cx_iter i1, _cx_iter i2) {
-    return _cx_memb(_erase_range_p)(self, i1.ref, (i2.ref ? i2.ref : i2._end));
+    return _cx_memb(_erase_range_p)(self, i1.ref, (i2.ref ? i2.ref : i2.end));
 }
 
 STC_INLINE const _cx_value*
@@ -206,10 +206,10 @@ STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self)
     { return c_make(_cx_iter){NULL, self->data + cvec_rep_(self)->size}; }
 
 STC_INLINE void _cx_memb(_next)(_cx_iter* it) 
-    { if (++it->ref == it->_end) it->ref = NULL; }
+    { if (++it->ref == it->end) it->ref = NULL; }
 
 STC_INLINE _cx_iter _cx_memb(_advance)(_cx_iter it, size_t n)
-    { if ((it.ref += n) >= it._end) it.ref = NULL; return it; }
+    { if ((it.ref += n) >= it.end) it.ref = NULL; return it; }
 
 STC_INLINE size_t _cx_memb(_index)(const _cx_self* cx, _cx_iter it) 
     { return it.ref - cx->data; }
@@ -245,7 +245,7 @@ _cx_memb(_lower_bound)(const _cx_self* self, _cx_raw raw) {
 
 STC_INLINE void
 _cx_memb(_sort_range)(_cx_iter i1, _cx_iter i2, int(*cmp)(const _cx_value*, const _cx_value*)) {
-    qsort(i1.ref, (i2.ref ? i2.ref : i2._end) - i1.ref, sizeof(_cx_value),
+    qsort(i1.ref, (i2.ref ? i2.ref : i2.end) - i1.ref, sizeof(_cx_value),
           (int(*)(const void*, const void*)) cmp);
 }
 
@@ -402,7 +402,7 @@ _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos,
 #if !c_option(c_no_cmp)
 STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
-    const _cx_value* p2 = i2.ref ? i2.ref : i2._end;
+    const _cx_value* p2 = i2.ref ? i2.ref : i2.end;
     for (; i1.ref != p2; ++i1.ref) {
         const _cx_raw r = i_keyto(i1.ref);
         if (i_eq((&raw), (&r)))
@@ -413,7 +413,7 @@ _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
 
 STC_DEF _cx_iter
 _cx_memb(_binary_search_in)(_cx_iter i1, _cx_iter i2, const _cx_raw raw, _cx_iter* lower_bound) {
-    const _cx_value* p2 = i2.ref ? i2.ref : i2._end;
+    const _cx_value* p2 = i2.ref ? i2.ref : i2.end;
     _cx_iter mid = i1;
     while (i1.ref != p2) {
         mid.ref = i1.ref + (p2 - i1.ref)/2;
@@ -424,7 +424,7 @@ _cx_memb(_binary_search_in)(_cx_iter i1, _cx_iter i2, const _cx_raw raw, _cx_ite
         else if (c < 0) p2 = mid.ref;
         else i1.ref = mid.ref + 1;
     }
-    *lower_bound = i1.ref == i2._end ? i2 : i1;
+    *lower_bound = i1.ref == i2.end ? i2 : i1;
     return i2;
 }
 
