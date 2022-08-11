@@ -57,17 +57,17 @@ cdeq_X_value*       cdeq_X_emplace_back(cdeq_X* self, i_valraw raw);
 cdeq_X_value*       cdeq_X_emplace(cdeq_X* self, i_valraw raw);                                  // alias for emplace_back()
 void                cdeq_X_pop_back(cdeq_X* self);
 
-cdeq_X_value*       cdeq_X_insert(cdeq_X* self, size_t idx, i_val value);                        // move value 
-cdeq_X_value*       cdeq_X_insert_n(cdeq_X* self, size_t idx, const i_val[] arr, size_t n);      // move arr values
-cdeq_X_value*       cdeq_X_insert_at(cdeq_X* self, cdeq_X_iter it, i_val value);                 // move value 
-cdeq_X_value*       cdeq_X_insert_range_p(cdeq_X* self, i_val* pos, 
+cdeq_X_iter         cdeq_X_insert(cdeq_X* self, size_t idx, i_val value);                        // move value 
+cdeq_X_iter         cdeq_X_insert_n(cdeq_X* self, size_t idx, const i_val[] arr, size_t n);      // move arr values
+cdeq_X_iter         cdeq_X_insert_at(cdeq_X* self, cdeq_X_iter it, i_val value);                 // move value 
+cdeq_X_iter         cdeq_X_insert_range_p(cdeq_X* self, i_val* pos, 
                                           const i_val* p1, const i_val* p2);
 
-cdeq_X_value*       cdeq_X_emplace_n(cdeq_X* self, size_t idx, const i_valraw[] arr, size_t n);
-cdeq_X_value*       cdeq_X_emplace_at(cdeq_X* self, cdeq_X_iter it, i_valraw raw);
-cdeq_X_value*       cdeq_X_emplace_range(cdeq_X* self, cdeq_X_iter it,                           // will clone
+cdeq_X_iter         cdeq_X_emplace_n(cdeq_X* self, size_t idx, const i_valraw[] arr, size_t n);
+cdeq_X_iter         cdeq_X_emplace_at(cdeq_X* self, cdeq_X_iter it, i_valraw raw);
+cdeq_X_iter         cdeq_X_emplace_range(cdeq_X* self, cdeq_X_iter it,                           // will clone
                                          cdeq_X_iter it1, cdeq_X_iter it2);
-cdeq_X_value*       cdeq_X_emplace_range_p(cdeq_X* self, i_val* pos, 
+cdeq_X_iter         cdeq_X_emplace_range_p(cdeq_X* self, i_val* pos, 
                                            const i_val* p1, const i_val* p2);
 
 cdeq_X_iter         cdeq_X_erase_n(cdeq_X* self, size_t idx, size_t n);
