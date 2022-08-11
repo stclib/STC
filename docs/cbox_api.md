@@ -68,7 +68,7 @@ void int_drop(int* x) {
 #define i_type IBox
 #define i_val int
 #define i_valdrop int_drop    // optional func, just to display elements destroyed
-#define i_valclone(x) x       // must specify because i_valdrop was defined.
+#define i_valclone(x) x       // must specified when i_valdrop is defined.
 #include <stc/cbox.h>
 
 #define i_type ISet
@@ -84,10 +84,8 @@ int main()
     c_auto (IVec, vec)  // declare and init vec, call drop at scope exit
     c_auto (ISet, set)  // similar
     {
-        c_forarray (IBox, v, {
-            IBox_make(2021), IBox_make(2012), 
-            IBox_make(2022), IBox_make(2015),
-        }) IVec_push(&vec, *v);
+        c_forarray (int, v, {2021, 2012, 2022, 2015})
+            IVec_emplace(&vec, *v); // same as: IVec_push(&vec, IBox_from(*v));
 
         printf("vec:");
         c_foreach (i, IVec, vec)

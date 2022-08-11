@@ -109,6 +109,7 @@
   #endif
 #elif defined i_key_arcbox
   #define i_key_bind i_key_arcbox
+  #define i_keyfrom c_paste(i_key_arcbox, _from)
   #define i_keyraw c_paste(i_key_arcbox, _value)
   #define i_keyto c_paste(i_key_arcbox, _toval)
   #define i_eq c_paste(i_key_arcbox, _value_eq)
@@ -199,6 +200,7 @@
   #define i_valto cstr_sv
 #elif defined i_val_arcbox
   #define i_val_bind i_val_arcbox
+  #define i_valfrom c_paste(i_val_arcbox, _from)
   #define i_valraw c_paste(i_val_arcbox, _value)
   #define i_valto c_paste(i_val_arcbox, _toval)
 #endif
@@ -216,6 +218,9 @@
   #endif
 #endif
 
+#ifndef i_val
+  #error "i_val* must be defined for maps"
+#endif
 #if defined i_valraw ^ defined i_valto
   #error "both i_valto and i_valraw must be defined, if any"
 #elif defined i_valfrom && !defined i_valraw

@@ -48,7 +48,7 @@ void Person_drop(Person* p) {
 int main() {
     c_auto (PBox, p, q)
     {
-        p = PBox_make(Person_from("John Smiths", "josmiths@gmail.com"));
+        p = PBox_from(Person_from("John Smiths", "josmiths@gmail.com"));
         q = PBox_clone(p);
         cstr_assign(&q.get->name, "Joe Smiths");
 
@@ -89,10 +89,13 @@ STC_INLINE _cx_self _cx_memb(_from_ptr)(_cx_value* p)
     { return c_make(_cx_self){p}; }
 
 // c++: std::make_unique<i_key>(val)
-STC_INLINE _cx_self _cx_memb(_make)(_cx_value val) {
+STC_INLINE _cx_self _cx_memb(_from)(_cx_value val) {
     _cx_self ptr = {c_alloc(_cx_value)};
     *ptr.get = val; return ptr;
 }
+// [deprecated]
+STC_INLINE _cx_self _cx_memb(_make)(_cx_value val)
+    { return _cx_memb(_from)(val); }
 
 STC_INLINE _cx_raw _cx_memb(_toraw)(const _cx_self* self)
     { return i_keyto(self->get); }
@@ -128,8 +131,8 @@ STC_INLINE void _cx_memb(_reset_to)(_cx_self* self, _cx_value* p) {
 
 #if !defined _i_no_clone
 #if !defined _i_no_emplace
-    STC_INLINE _cx_self _cx_memb(_from)(_cx_raw raw)
-        { return _cx_memb(_make)(i_keyfrom(raw)); }
+    STC_INLINE _cx_self _cx_memb(_new)(_cx_raw raw)
+        { return _cx_memb(_from)(i_keyfrom(raw)); }
 #endif
     STC_INLINE _cx_self _cx_memb(_clone)(_cx_self other) {
         if (!other.get)

@@ -37,5 +37,12 @@ int main(void)
         for (size_t i = 3; i < 1000; i += 2)
             if (cbits_test(&primes, i>>1)) printf(" %" PRIuMAX "", i);
         puts("");
+
+        int k = 20;
+        c_forrange (intptr_t, i, n-1, 1, -2) {
+            if (k == 0) break;
+            else if (cbits_test(&primes, i>>1)) printf("%" PRIdMAX "\n", i), k--;
+        }
+        puts("");
     }
 }

@@ -34,18 +34,18 @@ void Person_drop(Person* p) {
     c_drop(cstr, &p->name, &p->last);
 }
 
-#define i_tag person
+#define i_type ArcPers
 #define i_key Person
 #define i_keydrop Person_drop
 #define i_opt c_no_cmp
 #include <stc/carc.h>
 
 int main() {
-    carc_person p = carc_person_make(Person_new("John", "Smiths"));
-    carc_person q = carc_person_clone(p); // share the pointer
+    ArcPers p = ArcPers_from(Person_new("John", "Smiths"));
+    ArcPers q = ArcPers_clone(p); // share the pointer
 
     printf("%s %s. uses: %" PRIuMAX "\n", cstr_str(&q.get->name), cstr_str(&q.get->last), *q.use_count);
-    c_drop(carc_person, &p, &q);
+    c_drop(ArcPers, &p, &q);
 }
 */
 #include "ccommon.h"
@@ -104,13 +104,16 @@ STC_INLINE _cx_self _cx_memb(_from_ptr)(_cx_value* p) {
 }
 
 // c++: std::make_shared<_cx_value>(val)
-STC_INLINE _cx_self _cx_memb(_make)(_cx_value val) {
+STC_INLINE _cx_self _cx_memb(_from)(_cx_value val) {
     _cx_self ptr;
     _cx_carc_rep *rep = c_alloc(_cx_carc_rep);
     *(ptr.use_count = &rep->counter) = 1;
     *(ptr.get = &rep->value) = val;
     return ptr;
 }
+// [deprecated]
+STC_INLINE _cx_self _cx_memb(_make)(_cx_value val)
+    { return _cx_memb(_from)(val); }
 
 STC_INLINE _cx_raw _cx_memb(_toraw)(const _cx_self* self)
     { return i_keyto(self->get); }
@@ -144,8 +147,8 @@ STC_INLINE void _cx_memb(_reset_to)(_cx_self* self, _cx_value* p) {
 }
 
 #if !defined _i_no_clone && !defined _i_no_emplace
-    STC_INLINE _cx_self _cx_memb(_from)(_cx_raw raw)
-        { return _cx_memb(_make)(i_keyfrom(raw)); }
+    STC_INLINE _cx_self _cx_memb(_new)(_cx_raw raw)
+        { return _cx_memb(_from)(i_keyfrom(raw)); }
 #endif // !_i_no_clone
 
 // does not use i_keyclone, so OK to always define.
