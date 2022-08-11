@@ -167,7 +167,7 @@
   #define i_keydrop c_default_drop
 #endif
 
-// i_eq, i_less, i_cmp, i_hash
+// i_eq, i_less, i_cmp
 #if !defined i_eq && (defined i_cmp || defined i_less)
   #define i_eq(x, y) !(i_cmp(x, y))
 #elif !defined i_eq
@@ -175,10 +175,13 @@
 #endif
 #if !defined i_less && !defined i_cmp
   #define i_less c_default_less
+#elif !defined i_less
+  #define i_less(x, y) (i_cmp(x, y)) < 0
 #endif
 #ifndef i_cmp
   #define i_cmp(x, y) (i_less(y, x)) - (i_less(x, y))
 #endif
+
 #ifndef i_hash
   #define i_hash c_default_hash
 #endif

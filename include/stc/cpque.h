@@ -110,9 +110,9 @@ STC_INLINE void _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
 
 STC_DEF void
 _cx_memb(_sift_down_)(_cx_value* arr, const size_t idx, const size_t n) {
-    for (size_t r = idx, c = idx << 1; c <= n; c <<= 1) {
-        c += (c < n && (i_cmp((&arr[c]), (&arr[c + 1]))) < 0);
-        if ((i_cmp((&arr[r]), (&arr[c]))) >= 0) return;
+    for (size_t r = idx, c = idx*2; c <= n; c *= 2) {
+        c += (c < n && (i_less((&arr[c]), (&arr[c + 1]))));
+        if (!(i_less((&arr[r]), (&arr[c])))) return;
         _cx_value t = arr[r]; arr[r] = arr[c]; arr[r = c] = t;
     }
 }
@@ -121,7 +121,7 @@ STC_DEF void
 _cx_memb(_make_heap)(_cx_self* self) {
     size_t n = self->size;
     _cx_value *arr = self->data - 1;
-    for (size_t k = n >> 1; k != 0; --k)
+    for (size_t k = n/2; k != 0; --k)
         _cx_memb(_sift_down_)(arr, k, n);
 }
 
@@ -148,8 +148,8 @@ _cx_memb(_push)(_cx_self* self, _cx_value value) {
         _cx_memb(_reserve)(self, self->size*3/2 + 4);
     _cx_value *arr = self->data - 1; /* base 1 */
     size_t c = ++self->size;
-    for (; c > 1 && (i_cmp((&arr[c >> 1]), (&value))) < 0; c >>= 1)
-        arr[c] = arr[c >> 1];
+    for (; c > 1 && (i_less((&arr[c/2]), (&value))); c /= 2)
+        arr[c] = arr[c/2];
     arr[c] = value;
 }
 
