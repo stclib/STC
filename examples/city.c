@@ -58,8 +58,9 @@ int main(void)
             {"Berlin", "Germany", 4.3, 23.2, 9000000},
             {"London", "UK", 4.3, 23.2, 9000000},
         }) {
-            Cities_push(&cities, CityArc_make((City){cstr_from(c->name), cstr_from(c->country),
-                                                     c->lat, c->lon, c->pop}));
+            Cities_emplace(&cities, (City){cstr_from(c->name), 
+                                           cstr_from(c->country),
+                                           c->lat, c->lon, c->pop});
         }
 
         copy = Cities_clone(cities); // share each element!
@@ -73,7 +74,9 @@ int main(void)
 
         printf("Vec:\n");
         c_foreach (c, Cities, cities)
-            printf("city:%s, %d, use:%ld\n", cstr_str(&c.ref->get->name), c.ref->get->population, CityArc_use_count(*c.ref));
+            printf("city:%s, %d, use:%ld\n", cstr_str(&c.ref->get->name),
+                                             c.ref->get->population,
+                                             CityArc_use_count(*c.ref));
 
         printf("\nMap:\n");
         c_forpair (id, city, CityMap, map)

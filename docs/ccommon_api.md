@@ -209,16 +209,15 @@ c_forrange (int, i, 30, 0, -5) printf(" %d", i);
 ### c_find_if, c_find_in
 Search linearily in containers using a predicate
 ```
-// NOTE: it.ref is NULL if not found, not cvec_i_end(&vec).ref
-// This makes it easier to test.
-cvec_i_iter it;
+cvec_i_iter it, it1, it2;
 
 // Search vec for first value > 2:
-c_find_if(cvec_i, vec, it, *it.ref > 2);
+// NOTE: it.ref is NULL if not found
+c_find_if(it, cvec_i, vec, *it.ref > 2);
 if (it.ref) printf("%d\n", *it.ref);
 
 // Search within a range:
-c_find_in(csmap_str, it1, it2, it, cstr_contains(*it.ref, "hello"));
+c_find_in(it, csmap_str, it1, it2, cstr_contains(*it.ref, "hello"));
 if (it.ref) cmap_str_erase_at(&map, it);
 ```
 

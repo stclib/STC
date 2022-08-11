@@ -219,16 +219,19 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #define c_pair(v) (v)->first, (v)->second
 #define c_drop(C, ...) do { c_forarray_p(C*, _p, {__VA_ARGS__}) C##_drop(*_p); } while(0)
 
-#define c_find_if(C, cnt, it, pred) \
-    c_find_in(C, C##_begin(&cnt), C##_end(&cnt), it, pred)
-
-// NB: it.ref == NULL when not found, not end.ref:
-#define c_find_in(C, start, end, it, pred) do { \
+// it.ref == NULL when not found:
+#define c_find_if(it, C, cnt, pred) do { \
     size_t index = 0; \
-    C##_iter _end = end; \
-    for (it = start; it.ref != _end.ref && !(pred); C##_next(&it)) \
+    for (it = C##_begin(&cnt); it.ref && !(pred); C##_next(&it)) \
         ++index; \
-    if (it.ref == _end.ref) it.ref = NULL; \
+} while (0)
+
+#define c_find_in(it, C, start, end, pred) do { \
+    size_t index = 0; \
+    const C##_value* _endref = (end).ref; \
+    for (it = start; it.ref != _endref && !(pred); C##_next(&it)) \
+        ++index; \
+    if (it.ref == _endref) it.ref = NULL; \
 } while (0)
 #endif // CCOMMON_H_INCLUDED
 
