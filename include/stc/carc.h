@@ -197,6 +197,16 @@ STC_INLINE bool _cx_memb(_value_eq)(const _cx_value* x, const _cx_value* y) {
         return i_eq((&rx), (&ry));
     #endif
 }
+
+STC_INLINE uint64_t _cx_memb(_hash)(const _cx_self* x)
+    { return _cx_memb(_value_hash)(x->get); }
+
+STC_INLINE int _cx_memb(_cmp)(const _cx_self* x, const _cx_self* y)
+    { return _cx_memb(_value_cmp)(x->get, y->get); }
+
+STC_INLINE bool _cx_memb(_eq)(const _cx_self* x, const _cx_self* y)
+    { return _cx_memb(_value_eq)(x->get, y->get); }
+
 #undef _i_atomic_inc
 #undef _i_atomic_dec_and_test
 #include "template.h"
