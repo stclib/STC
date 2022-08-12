@@ -112,14 +112,15 @@ _cx_memb(_emplace_at)(_cx_self* self, _cx_iter it, _cx_raw raw) {
 
 #if !defined _i_no_clone
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
-STC_API _cx_iter        _cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
-                                                 const _cx_value* p1, const _cx_value* p2);
+STC_API _cx_iter        _cx_memb(_copy_range_p)(_cx_self* self, _cx_value* pos,
+                                                const _cx_value* p1, const _cx_value* p2);
 STC_INLINE i_key        _cx_memb(_value_clone)(_cx_value val)
                             { return i_keyclone(val); }
 STC_INLINE void         _cx_memb(_copy)(_cx_self* self, const _cx_self* other) {
                             if (self->data == other->data) return;
-                            _cx_memb(_drop)(self);
-                            *self = _cx_memb(_clone)(*other);
+                            _cx_memb(_clear)(self);
+                            _cx_memb(_copy_range_p)(self, self->data, other->data, 
+                                                    other->data + cvec_rep_(other)->size);
                         }
 #endif // !_i_no_clone
 
@@ -372,19 +373,20 @@ _cx_memb(_clone)(_cx_self cx) {
     const size_t len = cvec_rep_(&cx)->size;
     _cx_self out = _cx_memb(_with_capacity)(len);
     if (cvec_rep_(&out)->cap)
-        _cx_memb(_clone_range_p)(&out, out.data, cx.data, cx.data + len);
+        _cx_memb(_copy_range_p)(&out, out.data, cx.data, cx.data + len);
     return out;
 }
 
 STC_DEF _cx_iter
-_cx_memb(_clone_range_p)(_cx_self* self, _cx_value* pos,
-                         const _cx_value* p1, const _cx_value* p2) {
+_cx_memb(_copy_range_p)(_cx_self* self, _cx_value* pos,
+                       const _cx_value* p1, const _cx_value* p2) {
     _cx_iter it = _cx_memb(_insert_uninit_p)(self, pos, p2 - p1);
     if (it.ref)
         for (_cx_iter j = it; p1 != p2; ++p1)
             *j.ref++ = i_keyclone((*p1));
     return it;
 }
+#endif // !_i_no_clone
 
 #if !defined _i_no_emplace
 STC_DEF _cx_iter
@@ -397,7 +399,6 @@ _cx_memb(_emplace_range_p)(_cx_self* self, _cx_value* pos,
     return it;
 }
 #endif // !_i_no_emplace
-#endif // !_i_no_clone
 
 #if !c_option(c_no_cmp)
 STC_DEF _cx_iter

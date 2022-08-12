@@ -68,7 +68,7 @@ typedef union {
 \
     typedef struct { \
         SELF##_value* get; \
-        long* use_count; \
+        catomic_long* use_count; \
     } SELF
 
 #define _c_carr2_types(SELF, VAL) \

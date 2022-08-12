@@ -32,17 +32,17 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ## Methods
 ```c
 carc_X      carc_X_init();                                     // empty shared pointer
-carc_X      carc_X_new(i_valraw raw);                          // construct a new value in an carc from raw type.
-carc_X      carc_X_from(i_val val);                            // create a carc from constructed val object. Faster than from_ptr().
-carc_X      carc_X_from_ptr(i_val* p);                         // create a carc from raw pointer. Takes ownership of p.
+carc_X      carc_X_new(i_valraw raw);                          // create an carc from raw type (available if i_valraw defined by user).
+carc_X      carc_X_from(i_val val);                            // create an carc from constructed val object. Faster than from_ptr().
+carc_X      carc_X_from_ptr(i_val* p);                         // create an carc from raw pointer. Takes ownership of p.
 
 carc_X      carc_X_clone(carc_X other);                        // return other with increased use count
 carc_X      carc_X_move(carc_X* self);                         // transfer ownership to another carc.
 void        carc_X_take(carc_X* self, carc_X other);           // take ownership of other.
-void        carc_X_assign(carc_X* self, carc_X other);         // copy shared (increase use count)
+void        carc_X_copy(carc_X* self, carc_X other);           // shared assign (increase use count)
 
 void        carc_X_drop(carc_X* self);                         // destruct (decrease use count, free at 0)
-long        carc_X_use_count(carc_X ptr);    
+long        carc_X_use_count(const carc_X* self);    
 
 void        carc_X_reset(carc_X* self);    
 void        carc_X_reset_to(carc_X* self, i_val* p);           // assign new carc from ptr. Takes ownership of p.

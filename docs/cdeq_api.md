@@ -29,6 +29,7 @@ cdeq_X              cdeq_X_clone(cdeq_X deq);
 
 void                cdeq_X_clear(cdeq_X* self);
 void                cdeq_X_copy(cdeq_X* self, const cdeq_X* other);
+cdeq_X_iter         cdeq_X_copy_range_p(cdeq_X* self, i_val* pos, const i_val* p1, const i_val* p2);
 bool                cdeq_X_reserve(cdeq_X* self, size_t cap);
 void                cdeq_X_shrink_to_fit(cdeq_X* self);
 void                cdeq_X_swap(cdeq_X* a, cdeq_X* b);
@@ -63,16 +64,15 @@ cdeq_X_iter         cdeq_X_insert_at(cdeq_X* self, cdeq_X_iter it, i_val value);
 cdeq_X_iter         cdeq_X_insert_range_p(cdeq_X* self, i_val* pos, 
                                           const i_val* p1, const i_val* p2);
 
-cdeq_X_iter         cdeq_X_emplace_n(cdeq_X* self, size_t idx, const i_valraw[] arr, size_t n);
+cdeq_X_iter         cdeq_X_emplace_n(cdeq_X* self, size_t idx, const i_valraw[] arr, size_t n);  // clone values
 cdeq_X_iter         cdeq_X_emplace_at(cdeq_X* self, cdeq_X_iter it, i_valraw raw);
-cdeq_X_iter         cdeq_X_emplace_range(cdeq_X* self, cdeq_X_iter it,                           // will clone
-                                         cdeq_X_iter it1, cdeq_X_iter it2);
 cdeq_X_iter         cdeq_X_emplace_range_p(cdeq_X* self, i_val* pos, 
-                                           const i_val* p1, const i_val* p2);
+                                           const i_valraw* p1, const i_valraw* p2);
 
 cdeq_X_iter         cdeq_X_erase_n(cdeq_X* self, size_t idx, size_t n);
 cdeq_X_iter         cdeq_X_erase_at(cdeq_X* self, cdeq_X_iter it);
 cdeq_X_iter         cdeq_X_erase_range(cdeq_X* self, cdeq_X_iter it1, cdeq_X_iter it2);
+cdeq_X_iter         cdeq_X_erase_range_p(cdeq_X* self, i_val* p1, i_val* p2);
 
 void                cdeq_X_sort(cdeq_X* self);
 void                cdeq_X_sort_range(cdeq_X_iter i1, cdeq_X_iter i2,

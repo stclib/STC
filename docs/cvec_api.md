@@ -34,6 +34,7 @@ cvec_X              cvec_X_clone(cvec_X vec);
 
 void                cvec_X_clear(cvec_X* self);
 void                cvec_X_copy(cvec_X* self, const cvec_X* other);
+cvec_X_iter         cvec_X_copy_range_p(cvec_X* self, i_val* pos, const i_val* p1, const i_val* p2);
 bool                cvec_X_reserve(cvec_X* self, size_t cap);
 bool                cvec_X_resize(cvec_X* self, size_t size, i_val null);
 cvec_X_iter         cvec_X_insert_uninit_p(cvec_X* self, i_val* pos, size_t n);              // return pos iter 
@@ -74,16 +75,15 @@ cvec_X_iter         cvec_X_insert_at(cvec_X* self, cvec_X_iter it, i_val value);
 cvec_X_iter         cvec_X_insert_range_p(cvec_X* self, i_val* pos,
                                           const i_val* p1, const i_val* p2);
 
-cvec_X_iter         cvec_X_emplace_n(cvec_X* self, size_t idx, const i_valraw[] arr, size_t n);
+cvec_X_iter         cvec_X_emplace_n(cvec_X* self, size_t idx, const i_valraw[] arr, size_t n); // clone values
 cvec_X_iter         cvec_X_emplace_at(cvec_X* self, cvec_X_iter it, i_valraw raw);
-cvec_X_iter         cvec_X_emplace_range(cvec_X* self, cvec_X_iter it,                       // will clone
-                                         cvec_X_iter it1, cvec_X_iter it2);
-cvec_X_iter         cvec_X_emplace_range_p(cvec_X* self, i_val* pos, 
-                                           const i_val* p1, const i_val* p2);
+cvec_X_iter         cvec_X_emplace_range_p(cvec_X* self, i_val* pos,
+                                           const i_valraw* p1, const i_valraw* p2);
 
 cvec_X_iter         cvec_X_erase_n(cvec_X* self, size_t idx, size_t n);
 cvec_X_iter         cvec_X_erase_at(cvec_X* self, cvec_X_iter it);
 cvec_X_iter         cvec_X_erase_range(cvec_X* self, cvec_X_iter it1, cvec_X_iter it2);
+cvec_X_iter         cvec_X_erase_range_p(cvec_X* self, i_val* p1, i_val* p2);
 
 void                cvec_X_sort(cvec_X* self);
 void                cvec_X_sort_range(cvec_X_iter i1, cvec_X_iter i2,

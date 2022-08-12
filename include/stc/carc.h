@@ -56,14 +56,17 @@ int main() {
 #include <stdlib.h>
 
 #if defined(__GNUC__) || defined(__clang__)
+    typedef long catomic_long;
     #define c_atomic_inc(v) (void)__atomic_add_fetch(v, 1, __ATOMIC_SEQ_CST)
     #define c_atomic_dec_and_test(v) !__atomic_sub_fetch(v, 1, __ATOMIC_SEQ_CST)
 #elif defined(_MSC_VER)
     #include <intrin.h>
+    typedef long catomic_long;
     #define c_atomic_inc(v) (void)_InterlockedIncrement(v)
     #define c_atomic_dec_and_test(v) !_InterlockedDecrement(v)
 #else
     #include <stdatomic.h>
+    typedef _Atomic long catomic_long;
     #define c_atomic_inc(v) (void)atomic_fetch_add(v, 1)
     #define c_atomic_dec_and_test(v) (atomic_fetch_sub(v, 1) == 1)
 #endif
@@ -88,18 +91,18 @@ typedef i_keyraw _cx_raw;
 #if !c_option(c_is_fwd)
 _cx_deftypes(_c_carc_types, _cx_self, i_key);
 #endif
-_cx_carc_rep { long counter; i_key value; };
+_cx_carc_rep { catomic_long counter; i_key value; };
 
 STC_INLINE _cx_self _cx_memb(_init)(void) 
     { return c_make(_cx_self){NULL, NULL}; }
 
-STC_INLINE long _cx_memb(_use_count)(_cx_self ptr)
-    { return ptr.use_count ? *ptr.use_count : 0; }
+STC_INLINE long _cx_memb(_use_count)(const _cx_self* self)
+    { return self->use_count ? *self->use_count : 0; }
 
 STC_INLINE _cx_self _cx_memb(_from_ptr)(_cx_value* p) {
     _cx_self ptr = {p};
     if (p) 
-        *(ptr.use_count = c_alloc(long)) = 1;
+        *(ptr.use_count = c_alloc(catomic_long)) = 1;
     return ptr;
 }
 
@@ -111,15 +114,12 @@ STC_INLINE _cx_self _cx_memb(_from)(_cx_value val) {
     *(ptr.get = &rep->value) = val;
     return ptr;
 }
-// [deprecated]
-STC_INLINE _cx_self _cx_memb(_make)(_cx_value val)
+
+STC_INLINE _cx_self _cx_memb(_make)(_cx_value val) // [deprecated]
     { return _cx_memb(_from)(val); }
 
 STC_INLINE _cx_raw _cx_memb(_toraw)(const _cx_self* self)
     { return i_keyto(self->get); }
-
-STC_INLINE _cx_value _cx_memb(_toval)(const _cx_self* self)
-    { return *self->get; }
 
 STC_INLINE _cx_self _cx_memb(_move)(_cx_self* self) {
     _cx_self ptr = *self;
@@ -132,7 +132,7 @@ STC_INLINE void _cx_memb(_drop)(_cx_self* self) {
         i_keydrop(self->get);
         if ((char *)self->get != (char *)self->use_count + offsetof(_cx_carc_rep, value))
             c_free(self->get);
-        c_free(self->use_count);
+        c_free((long*)self->use_count);
     }
 }
 
@@ -158,7 +158,7 @@ STC_INLINE _cx_self _cx_memb(_clone)(_cx_self ptr) {
     return ptr;
 }
 
-STC_INLINE void _cx_memb(_assign)(_cx_self* self, _cx_self ptr) {
+STC_INLINE void _cx_memb(_copy)(_cx_self* self, _cx_self ptr) {
     if (ptr.use_count)
         _i_atomic_inc(ptr.use_count);
     _cx_memb(_drop)(self);

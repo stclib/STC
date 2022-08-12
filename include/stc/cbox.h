@@ -82,8 +82,8 @@ _cx_deftypes(_c_cbox_types, _cx_self, i_key);
 STC_INLINE _cx_self _cx_memb(_init)(void)
     { return c_make(_cx_self){NULL}; }
 
-STC_INLINE long _cx_memb(_use_count)(_cx_self box)
-    { return (long)(box.get != NULL); }
+STC_INLINE long _cx_memb(_use_count)(const _cx_self* self)
+    { return (long)(self->get != NULL); }
 
 STC_INLINE _cx_self _cx_memb(_from_ptr)(_cx_value* p)
     { return c_make(_cx_self){p}; }
@@ -99,9 +99,6 @@ STC_INLINE _cx_self _cx_memb(_make)(_cx_value val)
 
 STC_INLINE _cx_raw _cx_memb(_toraw)(const _cx_self* self)
     { return i_keyto(self->get); }
-
-STC_INLINE _cx_value _cx_memb(_toval)(const _cx_self* self)
-    { return *self->get; }
 
 // destructor
 STC_INLINE void _cx_memb(_drop)(_cx_self* self) {
@@ -129,24 +126,17 @@ STC_INLINE void _cx_memb(_reset_to)(_cx_self* self, _cx_value* p) {
     self->get = p;
 }
 
-#if !defined _i_no_clone
 #if !defined _i_no_emplace
     STC_INLINE _cx_self _cx_memb(_new)(_cx_raw raw)
         { return _cx_memb(_from)(i_keyfrom(raw)); }
 #endif
+#if !defined _i_no_clone
     STC_INLINE _cx_self _cx_memb(_clone)(_cx_self other) {
         if (!other.get)
             return other;
         _cx_self out = {c_alloc(i_key)};
         *out.get = i_keyclone(*other.get);
         return out;
-    }
-
-    STC_INLINE void _cx_memb(_assign)(_cx_self* self, const _cx_self ptr) {
-        if (self->get == ptr.get)
-            return;
-        _cx_memb(_drop)(self);
-        *self = _cx_memb(_clone)(ptr);
     }
 #endif // !_i_no_clone
 
