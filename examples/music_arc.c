@@ -40,7 +40,7 @@ void example3()
         }) SongVec_emplace(&vec, *v);
 
         c_foreach (s, SongVec, vec)
-            if (!cstr_equals(s.ref->get->artist, "Bob Dylan"))
+            if (!cstr_equals(&s.ref->get->artist, "Bob Dylan"))
                 SongVec_push_back(&vec2, SongArc_clone(*s.ref));
 
         SongVec_emplace(&vec2, Song_from("Michael Jackson", "Billie Jean"));

@@ -217,7 +217,7 @@ c_find_if(it, cvec_i, vec, *it.ref > 2);
 if (it.ref) printf("%d\n", *it.ref);
 
 // Search within a range:
-c_find_in(it, csmap_str, it1, it2, cstr_contains(*it.ref, "hello"));
+c_find_in(it, csmap_str, it1, it2, cstr_contains(it.ref, "hello"));
 if (it.ref) cmap_str_erase_at(&map, it);
 ```
 

@@ -37,7 +37,7 @@ point_equal(const point* a, const point* b)
 point
 point_from(const cstr* maze, const char* c, int width)
 {
-    int index = cstr_find(*maze, c);
+    int index = cstr_find(maze, c);
     return point_init(index % width, index / width, width);
 }
 
@@ -156,7 +156,7 @@ main(void)
         "#   #                   #           #               #               #   #\n"
         "#########################################################################\n"), cstr_drop(&maze))
     {
-        int width = cstr_find(maze, "\n") + 1;
+        int width = cstr_find(&maze, "\n") + 1;
         c_autovar (cdeq_point path = astar(&maze, width), cdeq_point_drop(&path))
         {
             c_foreach (it, cdeq_point, path) cstr_data(&maze)[point_index(it.ref)] = 'x';

@@ -92,11 +92,11 @@ uint64_t        csview_hash(const csview* x);
 
 ## Types
 
-| Type name       | Type definition                           | Used to represent...     |
-|:----------------|:------------------------------------------|:-------------------------|
-| `csview`        | `struct { const char *str; size_t size }` | The string view type     |
-| `csview_value`  | `char`                                    | The string element type  |
-| `csview_iter`   | `struct { csview_value *ref; }`           | UTF8 iterator            |
+| Type name       | Type definition                            | Used to represent...     |
+|:----------------|:-------------------------------------------|:-------------------------|
+| `csview`        | `struct { const char *str; size_t size; }` | The string view type     |
+| `csview_value`  | `char`                                     | The string element type  |
+| `csview_iter`   | `struct { csview_value *ref; }`            | UTF8 iterator            |
 
 ## Constants and macros
 
@@ -118,7 +118,7 @@ int main ()
                                                         // (quoting Alfred N. Whitehead)
 
     csview sv1 = cstr_substr(&str1, 3, 5);              // "think"
-    size_t pos = cstr_find(str1, "live");               // position of "live" in str1
+    size_t pos = cstr_find(&str1, "live");              // position of "live" in str1
     csview sv2 = cstr_substr(&str1, pos, 4);            // get "live"
     csview sv3 = cstr_slice(&str1, -8, -1);             // get "details"
     printf("%" c_PRIsv "%" c_PRIsv "%" c_PRIsv "\n", 

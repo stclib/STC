@@ -19,7 +19,7 @@ void stringdemo1()
         cstr_take(&cs, cstr_from_fmt("%s *** %s", cstr_str(&cs), cstr_str(&cs)));
         printf("%s.\n", cstr_str(&cs));
 
-        printf("find \"four\": %s\n", cstr_str(&cs) + cstr_find(cs, "four"));
+        printf("find \"four\": %s\n", cstr_str(&cs) + cstr_find(&cs, "four"));
 
         // reassign:
         cstr_assign(&cs, "one two three four five six seven");
