@@ -532,7 +532,7 @@ optimize(Parser *par, Reprog *pp)
      */
     uintptr_t ipp = (uintptr_t)pp;
     size_t size = sizeof(Reprog) + (par->freep - pp->firstinst)*sizeof(Reinst);
-    Reprog *npp = (Reprog *)realloc(pp, size);
+    Reprog *npp = (Reprog *)c_realloc(pp, size);
     ptrdiff_t diff = (uintptr_t)npp - ipp;
 
     if ((npp == NULL) | (diff == 0))
@@ -798,10 +798,10 @@ regcomp1(Reprog *progp, Parser *par, const char *s, int cflags)
 
     /* get memory for the program. estimated max usage */
     const int instcap = 5 + 6*strlen(s);
-    Reprog* pp = (Reprog *)realloc(progp, sizeof(Reprog) + instcap*sizeof(Reinst));
+    Reprog* pp = (Reprog *)c_realloc(progp, sizeof(Reprog) + instcap*sizeof(Reinst));
     if (pp == NULL) {
         par->error = cre_outofmemory;
-        free(progp);
+        c_free(progp);
         return NULL;
     }
     pp->flags.caseless = (cflags & cre_c_caseless) != 0;
@@ -861,7 +861,7 @@ regcomp1(Reprog *progp, Parser *par, const char *s, int cflags)
 #endif
 out:
     if (par->error) {
-        free(pp);
+        c_free(pp);
         pp = NULL;
     }
     return pp;
@@ -1090,7 +1090,7 @@ regexec2(const Reprog *progp,    /* program to run */
     Relist *relists;
 
     /* mark space */
-    relists = (Relist *)malloc(2 * BIGLISTSIZE*sizeof(Relist));
+    relists = (Relist *)c_malloc(2 * BIGLISTSIZE*sizeof(Relist));
     if (relists == NULL)
         return -1;
 
@@ -1100,7 +1100,7 @@ regexec2(const Reprog *progp,    /* program to run */
     j->reliste[1] = relists + 2*BIGLISTSIZE - 2;
 
     rv = regexec1(progp, bol, mp, ms, j, mflags);
-    free(relists);
+    c_free(relists);
     return rv;
 }
 
@@ -1265,5 +1265,5 @@ cregex_replace_pe(const char* input, const char* pattern, const char* replace, u
 
 void
 cregex_drop(cregex* self) {
-    free(self->prog);
+    c_free(self->prog);
 }
