@@ -3,7 +3,7 @@
 void stringdemo1()
 {
     printf("\nSTRINGDEMO1\n");
-    c_autovar (cstr cs = cstr_new("one-nine-three-seven-five"), cstr_drop(&cs))
+    c_with (cstr cs = cstr_new("one-nine-three-seven-five"), cstr_drop(&cs))
     {
         printf("%s.\n", cstr_str(&cs));
 
@@ -35,7 +35,7 @@ void stringdemo1()
 void vectordemo1()
 {
     printf("\nVECTORDEMO1\n");
-    c_autovar (cvec_ix bignums = cvec_ix_with_capacity(100), cvec_ix_drop(&bignums))
+    c_with (cvec_ix bignums = cvec_ix_with_capacity(100), cvec_ix_drop(&bignums))
     {
         cvec_ix_reserve(&bignums, 100);
         for (size_t i = 10; i <= 100; i += 10)
@@ -192,8 +192,8 @@ void mapdemo3()
 void arraydemo1()
 {
     printf("\nARRAYDEMO1\n");
-    c_autovar (carr3_f arr3 = carr3_f_with_size(30, 20, 10, 0.0f), 
-                             carr3_f_drop(&arr3))
+    c_with (carr3_f arr3 = carr3_f_with_size(30, 20, 10, 0.0f), 
+                           carr3_f_drop(&arr3))
     {
         arr3.data[5][4][3] = 10.2f;
         float **arr2 = arr3.data[5];

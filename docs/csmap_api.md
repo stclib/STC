@@ -157,7 +157,7 @@ int main()
 {
     uint32_t col = 0xcc7744ff;
     csmap_id idnames = csmap_id_init();
-    c_autodefer (csmap_id_drop(&idnames)) 
+    c_defer (csmap_id_drop(&idnames)) 
     {
         c_forarray (csmap_id_raw, v, { {100, "Red"}, {110, "Blue"} })
             csmap_id_emplace(&idnames, v->first, v->second);
@@ -238,7 +238,7 @@ typedef struct { int x, y, z; } Vec3i;
 int main()
 {
     // equivalent to: c_auto (csmap_iv, vecs)
-    c_autovar (csmap_iv vecs = csmap_iv_init(), csmap_iv_drop(&vecs))
+    c_with (csmap_iv vecs = csmap_iv_init(), csmap_iv_drop(&vecs))
     {
         csmap_iv_insert(&vecs, 1, (Vec3i){100, 0, 0});
         csmap_iv_insert(&vecs, 2, (Vec3i){0, 100, 0});

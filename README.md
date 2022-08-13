@@ -380,7 +380,7 @@ and non-emplace methods:
 #include <stc/cvec.h>   // vector of string (cstr)
 ...
 c_auto (cvec_str, vec)  // declare and call cvec_str_init() and defer cvec_str_drop(&vec)
-c_autovar (cstr s = cstr_new("a string literal"), cstr_drop(&s))  // c_autovar is a more general c_auto.
+c_with (cstr s = cstr_new("a string literal"), cstr_drop(&s))  // c_with is a more general c_auto.
 {
     const char* hello = "Hello";
     cvec_str_push_back(&vec, cstr_from(hello);    // construct and add string from const char*

@@ -176,24 +176,28 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
     for (itype i=start, _inc=step, _end=(stop) - (0 < _inc) \
          ; (i <= _end) == (0 < _inc); i += _inc)
 
-#define c_autovar(...) c_MACRO_OVERLOAD(c_autovar, __VA_ARGS__)
-#define c_autovar2(declvar, drop) for (declvar, **_c_i = NULL; !_c_i; ++_c_i, drop)
-#define c_autovar3(declvar, pred, drop) for (declvar, **_c_i = NULL; !_c_i && (pred); ++_c_i, drop)
-#define c_autoscope(init, drop) for (int _c_i = (init, 0); !_c_i; ++_c_i, drop)
-#define c_autodefer(...) for (int _c_i = 0; !_c_i; ++_c_i, __VA_ARGS__)
+#define c_autovar c_with    // [deprecated]
+#define c_autoscope c_scope // [deprecated]
+#define c_autodefer c_defer // [deprecated]
+
+#define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
+#define c_with2(declvar, drop) for (declvar, **_c_i = NULL; !_c_i; ++_c_i, drop)
+#define c_with3(declvar, pred, drop) for (declvar, **_c_i = NULL; !_c_i && (pred); ++_c_i, drop)
+#define c_scope(init, drop) for (int _c_i = (init, 0); !_c_i; ++_c_i, drop)
+#define c_defer(...) for (int _c_i = 0; !_c_i; ++_c_i, __VA_ARGS__)
 #define c_breakauto continue
 
 #define c_auto(...) c_MACRO_OVERLOAD(c_auto, __VA_ARGS__)
 #define c_auto2(C, a) \
-    c_autovar2(C a = C##_init(), C##_drop(&a))
+    c_with2(C a = C##_init(), C##_drop(&a))
 #define c_auto3(C, a, b) \
-    c_autovar2(c_expand(C a = C##_init(), b = C##_init()), \
+    c_with2(c_expand(C a = C##_init(), b = C##_init()), \
                (C##_drop(&b), C##_drop(&a)))
 #define c_auto4(C, a, b, c) \
-    c_autovar2(c_expand(C a = C##_init(), b = C##_init(), c = C##_init()), \
+    c_with2(c_expand(C a = C##_init(), b = C##_init(), c = C##_init()), \
                (C##_drop(&c), C##_drop(&b), C##_drop(&a)))
 #define c_auto5(C, a, b, c, d) \
-    c_autovar2(c_expand(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
+    c_with2(c_expand(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
                (C##_drop(&d), C##_drop(&c), C##_drop(&b), C##_drop(&a)))
 
 #define c_autobuf(b, type, n) c_autobuf_N(b, type, n, 256)

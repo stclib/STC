@@ -11,7 +11,7 @@ int main ()
     // Ustring positions:                                      0123456789*123456789*12345
     cstr s = cstr_from(base);                              // "this is a test string."
     cstr m = cstr_clone(s);
-    c_autodefer (cstr_drop(&s), cstr_drop(&m)) {
+    c_defer (cstr_drop(&s), cstr_drop(&m)) {
         cstr_append(&m, cstr_str(&m));
         cstr_append(&m, cstr_str(&m));
         printf("%s\n", cstr_str(&m));

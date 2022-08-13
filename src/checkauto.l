@@ -38,6 +38,9 @@ for             |
 while           |
 switch          { block_type |= LOOP; state = BRACES; }
 do              { block_type |= LOOP; state = BRACESDONE; }
+c_with          |
+c_scope         |
+c_defer         |
 c_autovar       |
 c_autoscope     |
 c_autodefer     |

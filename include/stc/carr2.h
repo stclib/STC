@@ -35,7 +35,7 @@
 
 int main() {
     int w = 7, h = 5;
-    c_autovar (carr2_int image = carr2_int_new_uninit(w, h), carr2_int_drop(&image))
+    c_with (carr2_int image = carr2_int_new_uninit(w, h), carr2_int_drop(&image))
     {
         int *dat = carr2_int_data(&image);
         for (int i = 0; i < carr2_int_size(&image); ++i)

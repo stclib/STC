@@ -131,7 +131,7 @@ astar(cstr* maze, int width)
 int
 main(void)
 {
-    c_autovar (cstr maze = cstr_new(
+    c_with (cstr maze = cstr_new(
         "#########################################################################\n"
         "#   #               #               #           #                   #   #\n"
         "#   #   #########   #   #####   #########   #####   #####   #####   # ! #\n"
@@ -157,7 +157,7 @@ main(void)
         "#########################################################################\n"), cstr_drop(&maze))
     {
         int width = cstr_find(&maze, "\n") + 1;
-        c_autovar (cdeq_point path = astar(&maze, width), cdeq_point_drop(&path))
+        c_with (cdeq_point path = astar(&maze, width), cdeq_point_drop(&path))
         {
             c_foreach (it, cdeq_point, path) cstr_data(&maze)[point_index(it.ref)] = 'x';
             printf("%s", cstr_str(&maze));

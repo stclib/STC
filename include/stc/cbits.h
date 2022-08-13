@@ -27,7 +27,7 @@ Similar to boost::dynamic_bitset / std::bitset
 #include "cbits.h"
 
 int main() {
-    c_autovar (cbits bset = cbits_with_size(23, true), cbits_drop(&bset))
+    c_with (cbits bset = cbits_with_size(23, true), cbits_drop(&bset))
     {
         cbits_reset(&bset, 9);
         cbits_resize(&bset, 43, false);

@@ -199,7 +199,7 @@ int main()
     print_split(c_sv("This has no matching separator"), c_sv("xx"));
     puts("");
 
-    c_autovar (cstack_str s = string_split(c_sv("Split,this,,string,now,"), c_sv(",")), cstack_str_drop(&s))
+    c_with (cstack_str s = string_split(c_sv("Split,this,,string,now,"), c_sv(",")), cstack_str_drop(&s))
         c_foreach (i, cstack_str, s)
             printf("[%s]\n", cstr_str(i.ref));
 }

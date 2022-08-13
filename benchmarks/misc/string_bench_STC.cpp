@@ -38,7 +38,7 @@ cvec_str read_file(const char* name)
 {
     cvec_str data = cvec_str_init();
     c_auto (cstr, line)
-    c_autovar (FILE* f = fopen(name, "r"), fclose(f))
+    c_with (FILE* f = fopen(name, "r"), fclose(f))
         while (cstr_getline(&line, f))
             cvec_str_emplace_back(&data, cstr_str(&line));
     return data;
