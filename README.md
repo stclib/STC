@@ -3,17 +3,18 @@
 STC - Smart Template Containers for C
 =====================================
 
-News: Version 4.0 BETA (Aug 2022)
+News: Version 4.0 (Aug 2022)
 ---------------------------------------
-- Removed macro `c_apply` - usage was not intuitive.
-- `c_forarray` macro replaces usages of `c_apply`.
-- Minor changes in API of **cregex**, and improved documentation. 
-- Version 3.9:
-    - "ccommon API: `c_forrange` with 3 to 5 args swapped 1st <-> 2nd.
-- Version 3.8:
-    - "Officially" added **cregex** - powerful regular expressions.
-    - Added back **coption** - command line argument parsing.
-    - Some changes in **cstr** and **csview** API.
+API changes summary V3.8 - V4.0:
+- Added **cregex** with documentation - powerful regular expressions.
+- Updated **cstr**, now always takes self as pointer, like all containers except csview.
+- Updated **cvec**, **cdeq**, changed `*_range*` function names.
+- `c_with`: macro renamed from `c_autovar`, which is deprecated. Like Python **with** statement.
+- `c_scope`: macro renamed from `c_autoscope`, which is deprecated.
+- `c_defer`: macro renamed from `c_autodefer`, which is deprecated. Like Go's, Zig's **defer**.
+- `c_forrange` with 3 to 5 args swapped 1st <-> 2nd arg.
+- New `c_forarray` macro to replace usages of `c_apply`, which is removed. 
+- Added back **coption** - command line argument parsing.
 - [See detailed changes for version 3](#version-3).
 
 Introduction
