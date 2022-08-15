@@ -99,7 +99,7 @@ size_t       cstr_u8_size_n(const cstr self, size_t nbytes);          // utf8 si
 size_t       cstr_u8_to_pos(const cstr* self, size_t u8idx);          // byte pos offset at utf8 codepoint index
 const char*  cstr_u8_at(const cstr* self, size_t u8idx);              // char* position at utf8 codepoint index
 csview       cstr_u8_chr(const cstr* self, size_t u8idx);             // get utf8 character as a csview
-void         cstr_u8_replace_at(cstr* self, size_t u8pos, size_t u8len, csview repl); // replace at utf8 indices
+void         cstr_u8_replace(cstr* self, size_t pos, size_t u8len, csview repl); // replace u8len utf8 chars
 
 // iterate utf8 codepoints
 cstr_iter    cstr_begin(const cstr* self);

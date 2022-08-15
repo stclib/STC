@@ -36,7 +36,7 @@ int main()
         /* Shows how to compile RE separately */
         c_with (cregex re = cregex_from(pattern, 0), cregex_drop(&re)) {
             if (cregex_captures(&re) == 0)
-                  c_breakauto;
+                  continue; // break c_with
             /* European date format. */
             cstr_take(&str, cregex_replace(input, &re, "$3.$2.$1", 0));
             printf("euros: %s\n", cstr_str(&str));

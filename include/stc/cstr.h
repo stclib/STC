@@ -370,11 +370,8 @@ STC_INLINE void cstr_replace_at(cstr* self, size_t pos, size_t len, const char* 
 STC_INLINE void cstr_replace_at_s(cstr* self, size_t pos, size_t len, cstr repl)
     { cstr_replace_at_sv(self, pos, len, cstr_sv(&repl)); }
 
-STC_INLINE void cstr_u8_replace_at(cstr* self, size_t u8pos, size_t u8len, csview repl) {
-    csview sv = cstr_sv(self);
-    const char* p = utf8_at(sv.str, u8pos);
-    cstr_replace_at_sv(self, p - sv.str, utf8_pos(p, u8len), repl);
-}
+STC_INLINE void cstr_u8_replace(cstr* self, size_t pos, size_t u8len, csview repl)
+    { cstr_replace_at_sv(self, pos, utf8_pos(cstr_str(self) + pos, u8len), repl); }
 
 
 STC_INLINE void cstr_insert(cstr* self, size_t pos, const char* str)

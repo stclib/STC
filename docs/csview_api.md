@@ -146,7 +146,7 @@ int main()
 {
     c_auto (cstr, s1) {
         s1 = cstr_new("hell😀 w😀rld");
-        cstr_u8_replace_at(&s1, 7, 1, c_sv("ø"));
+        cstr_u8_replace(&s1, cstr_find(&s1, "😀rld"), 1, c_sv("ø"));
         printf("%s\n", cstr_str(&s1));
 
         c_foreach (i, cstr, s1)

@@ -43,7 +43,7 @@ const cdeq_X_value* cdeq_X_at(const cdeq_X* self, size_t idx);
 const cdeq_X_value* cdeq_X_get(const cdeq_X* self, i_valraw raw);                                 // return NULL if not found
 cdeq_X_value*       cdeq_X_get_mut(cdeq_X* self, i_valraw raw);                                   // mutable get
 cdeq_X_iter         cdeq_X_find(const cdeq_X* self, i_valraw raw);
-cdeq_X_iter         cdeq_X_find_in(cdeq_X_iter i1, cdeq_X_iter i2, i_valraw raw);
+cdeq_X_iter         cdeq_X_find_in(cdeq_X_iter i1, cdeq_X_iter i2, i_valraw raw);                 // return cvec_X_end() if not found
 
 cdeq_X_value*       cdeq_X_front(const cdeq_X* self);
 cdeq_X_value*       cdeq_X_back(const cdeq_X* self);
