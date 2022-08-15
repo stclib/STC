@@ -29,6 +29,7 @@
 
 struct cdeq_rep { size_t size, cap; unsigned base[1]; };
 #define cdeq_rep_(self) c_unchecked_container_of((self)->_base, struct cdeq_rep, base)
+#define it2_ref_(it1, it2) (it1.ref && !it2.ref ? it2.end : it2.ref)
 #endif // CDEQ_H_INCLUDED
 
 #ifndef _i_prefix
@@ -137,7 +138,7 @@ _cx_memb(_erase_at)(_cx_self* self, _cx_iter it) {
 }
 STC_INLINE _cx_iter
 _cx_memb(_erase_range)(_cx_self* self, _cx_iter i1, _cx_iter i2) {
-    return _cx_memb(_erase_range_p)(self, i1.ref, (i2.ref ? i2.ref : i2.end));
+    return _cx_memb(_erase_range_p)(self, i1.ref, it2_ref_(i1, i2));
 }
 
 
@@ -193,7 +194,7 @@ _cx_memb(_get_mut)(_cx_self* self, _cx_raw raw)
 
 STC_INLINE void
 _cx_memb(_sort_range)(_cx_iter i1, _cx_iter i2, int(*cmp)(const _cx_value*, const _cx_value*)) {
-    qsort(i1.ref, (i2.ref ? i2.ref : i2.end) - i1.ref, sizeof *i1.ref,
+    qsort(i1.ref, it2_ref_(i1, i2) - i1.ref, sizeof *i1.ref,
           (int(*)(const void*, const void*)) cmp);
 }
 
@@ -427,7 +428,7 @@ _cx_memb(_copy_range)(_cx_self* self, _cx_value* pos,
 
 STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
-    const _cx_value* p2 = i2.ref ? i2.ref : i2.end;
+    const _cx_value* p2 = it2_ref_(i1, i2);
     for (; i1.ref != p2; ++i1.ref) {
         const _cx_raw r = i_keyto(i1.ref);
         if (i_eq((&raw), (&r)))

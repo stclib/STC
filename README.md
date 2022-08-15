@@ -3,16 +3,16 @@
 STC - Smart Template Containers for C
 =====================================
 
-News: Version 4.0 (Aug 2022)
+News: Version 4.0 Release Candidate (Aug 2022)
 ---------------------------------------
 API changes summary V3.8 - V4.0:
 - Added **cregex** with documentation - powerful regular expressions.
 - Updated **cstr**, now always takes self as pointer, like all containers except csview.
 - Updated **cvec**, **cdeq**, changed `*_range*` function names.
-- `c_with`: macro renamed from `c_autovar`, which is deprecated. Like Python **with** statement.
+- `c_with`: macro renamed from `c_autovar`, which is deprecated. Like Python's **with** statement.
 - `c_scope`: macro renamed from `c_autoscope`, which is deprecated.
-- `c_defer`: macro renamed from `c_autodefer`, which is deprecated. Like Go's, Zig's **defer**.
-- `c_forrange` with 3 to 5 args swapped 1st <-> 2nd arg.
+- `c_defer`: macro renamed from `c_autodefer`, which is deprecated. Like Go's and Zig's **defer**.
+- `c_forrange` with 3 to 5 args: swapped 1st <-> 2nd arg.
 - New `c_forarray` macro to replace usages of `c_apply`, which is removed. 
 - Added back **coption** - command line argument parsing.
 - [See detailed changes for version 3](#version-3).
@@ -21,7 +21,7 @@ Introduction
 ------------
 STC is a *modern*, *templated*, *user-friendly*, *type-safe*, *very fast* and *compact* container library for C99.
 The API is fairly similar to c++ STL, but a bit more uniform across the containers and takes
-inspiration from Rust and Python too. It is an advantage to know how these containers work in other languages, like
+inspiration from Rust and Python as well. It is an advantage to know how these containers work in other languages, like
 Java, C# or C++, but it's not required.
 
 This library allows you to manage both trivial to very complex data in a wide variety of containers
@@ -68,7 +68,7 @@ Highlights
 - **Fully memory managed** - All containers will destruct keys/values via destructor defined as macro parameters before including the container header. Also, shared pointers are supported and can be stored in containers, see ***carc***.
 - **Fully type safe** - Because of templating, it avoids error-prone casting of container types and elements back and forth from the containers.
 - **Uniform, easy-to-learn API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have uniform and intuitive usage across the various containers.
-- **Small footprint** - Small source code and generated executables. The executable from the example below with six different containers is *22 kb in size* compiled with gcc -Os on linux.
+- **Small footprint** - Small source code and generated executables. The executable from the example below with six different containers is *22 kb in size* compiled with gcc -Os -s on linux.
 - **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See the Installation section.
 - **No callback functions** - All passed template argument functions/macros are directly called from the implementation, no slow callbacks which requires storage.
 - **Compiles with C++ and C99** - C code can be compiled with C++ (container element types must be POD).
@@ -80,7 +80,7 @@ You may specify a number of "standard" template arguments for each container, bu
 required (two for maps). In the latter case, STC assumes the elements are basic types. For more complex types,
 additional template arguments must be defined.
 2. the general "heterogeneous lookup"-like feature: Allows specification of an alternative type to use
-for lookup in containers. E.g. for containers with string type (**cstr**) elements, `const char*` may be used
+for lookup in containers. E.g. for containers with string type (**cstr**) elements, `const char*` is used
 as lookup type. It will then use the input `const char*` directly when comparing with the string data in the
 container. This avoids the construction of a new `cstr` (which possible allocates memory) for the lookup. 
 Finally, destruction of the lookup key (i.e. string literal) after usage is not needed (or allowed), which 
@@ -340,13 +340,13 @@ Specials:
 - `i_key_str` - Define key type *cstr* and container i_tag = *str*. It binds type convertion from/to *const char*\*, and the ***cmp***, ***eq***, ***hash***, and ***keydrop*** functions.
 - `i_key_ssv` - Define key type *cstr* and container i_tag = *ssv*. It binds type convertion from/to *csview*, and its ***cmp***, ***eq***, ***hash***, and ***keydrop*** functions.
 - `i_key_arcbox TYPE` - Define container key type where TYPE is a smart pointer **carc** or **cbox**. NB: not to be used when defining carc/cbox types themselves.
-- `i_key_bind TYPE` - General version of the two above - will auto-bind to standard named functions: *TYPE_clone*, *TYPE_drop*, *TYPE_cmp*, *TYPE_eq*, *TYPE_hash*. If `i_keyraw` is defined, *TYPE_toraw* func. is bound to `i_keyto`. Only functions required by the particular container need to be defined. E.g., only **cmap** and **cset** and smart pointers uses *TYPE_hash* and *TYPE_eq*. **cstack** does not use *TYPE_cmp*. *TYPE_clone* is not used if *#define i_opt c_no_clone* is specified. Likewise, *TYPE_cmp* is not used if *#define i_opt c_no_cmp* is specified.
+- `i_key_bind TYPE` - General version of the three above - will auto-bind to standard named functions: *TYPE_clone*, *TYPE_drop*, *TYPE_cmp*, *TYPE_eq*, *TYPE_hash*. If `i_keyraw` is defined, *TYPE_toraw* function is bound to `i_keyto`. Only functions required by the particular container need to be defined. E.g., only **cmap** and **cset** and smart pointers uses *TYPE_hash* and *TYPE_eq*. **cstack** does not use *TYPE_cmp*. *TYPE_clone* is not used if *#define i_opt c_no_clone* is specified. Likewise, *TYPE_cmp* is not used if *#define i_opt c_no_cmp* is specified.
 - `i_val_str`, `i_val_bind`, `i_val_arcbox` - Similar rules as for ***key***.
 
 **Notes**:
-- Instead of defining `i_cmp`, you may define *i_opt c_no_cmp* to disable searching and sorting functions.
-- Instead of defining `i_*clone`, you may define *i_opt c_no_clone* to disable emplace and clone-functions.
-- `i_keyraw RAWTYPE` - If defined along with *i_key_bind*, the two functions *TYPE TYPE_from(RAWTYPE)* and *RAWTYPE TYPE_toraw(TYPE\*)* are expected in addition to *TYPE TYPE_clone(TYPE)*. Note the signature for ***cmp***, ***eq***, ***hash*** now: *int RAWTYPE_cmp(const RAWTYPE\*, const RAWTYPE\*)*, and similar for the two others.
+- Instead of defining `i_cmp`, you may define *i_opt c_no_cmp* to disable *searching and sorting* functions.
+- Instead of defining `i_*clone`, you may define *i_opt c_no_clone* to disable *clone* functionality.
+- For `i_key_bind`, if *i_keyraw RAWTYPE* is defined along with it, *i_keyfrom* may also be defined to enable the *emplace*-functions. Note: the signature for ***cmp***, ***eq***, and ***hash*** uses *RAWTYPE* as input.
 
 The *emplace* versus non-emplace container methods
 --------------------------------------------------
