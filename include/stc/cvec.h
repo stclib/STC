@@ -169,7 +169,7 @@ _cx_memb(_insert_n)(_cx_self* self, const size_t idx, const _cx_value arr[], con
 }
 STC_INLINE _cx_iter
 _cx_memb(_insert_at)(_cx_self* self, _cx_iter it, i_key value) {
-    return _cx_memb(_insert_range)(self, it.ref, &value, &value + 1);
+    return _cx_memb(_insert_range)(self, (it.ref ? it.ref : it.end), &value, &value + 1);
 }
 
 STC_INLINE _cx_iter
