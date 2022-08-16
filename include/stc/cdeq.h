@@ -324,10 +324,10 @@ STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self cx) {
     const size_t sz = cdeq_rep_(&cx)->size;
     _cx_self out = _cx_memb(_with_capacity)(sz);
-    if (cdeq_rep_(&out)->cap) {
-        cdeq_rep_(&out)->size = sz;
-        for (size_t i = 0; i < sz; ++i)
-            out.data[i] = i_keyclone(cx.data[i]);
+    struct cdeq_rep* r = cdeq_rep_(&out);
+    if (r->cap) {
+        for (size_t i = 0; i < sz; ++i) out.data[i] = i_keyclone(cx.data[i]);
+        r->size = sz;
     }
     return out;
 }
@@ -403,21 +403,10 @@ _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
     return c_make(_cx_iter){p2 == end ? NULL : p1, end - len};
 }
 
-#if !defined _i_no_emplace
-STC_DEF _cx_iter
-_cx_memb(_emplace_range)(_cx_self* self, _cx_value* pos, const _cx_raw* p1, const _cx_raw* p2) {
-    _cx_iter it = _cx_memb(_insert_uninit)(self, pos, p2 - p1);
-    if (it.ref)
-        for (_cx_value* p = it.ref; p1 != p2; ++p1)
-            *p++ = i_keyfrom((*p1));
-    return it;
-}
-#endif // !_i_no_emplace
-
 #if !defined _i_no_clone
 STC_DEF _cx_iter
 _cx_memb(_copy_range)(_cx_self* self, _cx_value* pos,
-                        const _cx_value* p1, const _cx_value* p2) {
+                      const _cx_value* p1, const _cx_value* p2) {
     _cx_iter it = _cx_memb(_insert_uninit)(self, pos, p2 - p1);
     if (it.ref)
         for (_cx_value* p = it.ref; p1 != p2; ++p1)
@@ -425,6 +414,18 @@ _cx_memb(_copy_range)(_cx_self* self, _cx_value* pos,
     return it;
 }
 #endif // !_i_no_clone
+
+#if !defined _i_no_emplace
+STC_DEF _cx_iter
+_cx_memb(_emplace_range)(_cx_self* self, _cx_value* pos,
+                         const _cx_raw* p1, const _cx_raw* p2) {
+    _cx_iter it = _cx_memb(_insert_uninit)(self, pos, p2 - p1);
+    if (it.ref)
+        for (_cx_value* p = it.ref; p1 != p2; ++p1)
+            *p++ = i_keyfrom((*p1));
+    return it;
+}
+#endif // !_i_no_emplace
 
 #if !c_option(c_no_cmp)
 
