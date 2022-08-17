@@ -62,7 +62,7 @@ int main()
         puts("");
 
         // Look-up Audrey!
-        c_autovar (Person a = Person_new("Audrey", "Home"), Person_drop(&a)) {
+        c_with (Person a = Person_new("Audrey", "Home"), Person_drop(&a)) {
             const PSPtr *v = Persons_get(&vec, a);
             if (v) printf("found: %s %s\n", cstr_str(&v->get->name), cstr_str(&v->get->last));
         }

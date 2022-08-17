@@ -2,38 +2,41 @@
 
 The following macros are recommended to use, and they safe/have no side-effects.
 
-### c_auto, c_autovar, c_autoscope, c_autodefer
+### c_auto, c_with, c_scope, c_defer
 General ***defer*** mechanics for resource acquisition. These macros allows you to specify the
 freeing of the resources at the point where the acquisition takes place.
 The **checkauto** utility described below, ensures that the `c_auto*` macros are used correctly.
 
-| Usage                                  | Description                                          |
-|:---------------------------------------|:-----------------------------------------------------|
-| `c_auto (Type, var...)`                | `c_autovar (Type var=Type_init(), Type_drop(&var))`  |
-| `c_autovar (Type var=init, end...)`    | Declare `var`. Defer `end...` to end of block        |
-| `c_autoscope (init, end...)`           | Execute `init`. Defer `end...` to end of block       |
-| `c_autodefer (end...)`                 | Defer `end...` to end of block                       |
-| `c_breakauto` or `continue`            | Break out of a `c_auto*`-block/scope without memleak |
+| Usage                                  | Description                                               |
+|:---------------------------------------|:----------------------------------------------------------|
+| `c_auto (Type, var...)`                | Same as `c_with (Type var=Type_init(), Type_drop(&var))`  |
+| `c_with (Type var=init, drop)`         | Declare `var`. Defer `drop...` to end of scope            |
+| `c_with (Type var=init, pred, drop)`   | Adds a predicate in order to exit early if init failed    |
+| `c_scope (init, drop...)`              | Execute `init` and defer `drop...` to end of scope        |
+| `c_defer (drop...)`                    | Defer `drop...` to end of scope                           |
+| `continue`                             | Exit a `c_auto/c_with/c_scope...` without memory leaks    |
 
-For multiple variables, use either multiple **c_autovar** in sequence, or declare variable outside
-scope and use **c_autoscope**. Also, **c_auto** support up to 4 variables.
+For multiple variables, use either multiple **c_with** in sequence, or declare variable outside
+scope and use **c_scope**. For convenience, **c_auto** support up to 4 variables.
 ```c
-c_autovar (uint8_t* buf = malloc(BUF_SIZE), free(buf))
-c_autovar (FILE* f = fopen(fname, "rb"), fclose(f))
+// `c_with` is similar to python `with`: it declares and can drop a variable after going out of scope.
+c_with (uint8_t* buf = malloc(BUF_SIZE), free(buf))
+c_with (FILE* fp = fopen(fname, "rb"), fclose(fp))
 {
     int n = 0;
-    if (f && buf) {
-        n = fread(buf, 1, BUF_SIZE, f);
+    if (fp && buf) {
+        n = fread(buf, 1, BUF_SIZE, fp);
         doSomething(buf, n);
     }
 }
 
-c_autovar (cstr s = cstr_new("Hello"), cstr_drop(&s))
+c_with (cstr str = cstr_new("Hello"), cstr_drop(&str))
 {
-    cstr_append(&s, " world");
-    printf("%s\n", cstr_str(&s));
+    cstr_append(&str, " world");
+    printf("%s\n", cstr_str(&str));
 }
 
+// `c_auto` automatically initialize and destruct up to 4 variables, like `c_with`.
 c_auto (cstr, s1, s2)
 {
     cstr_append(&s1, "Hello");
@@ -45,14 +48,16 @@ c_auto (cstr, s1, s2)
     printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
 }
 
-MyData data;
-c_autoscope (mydata_init(&data), mydata_destroy(&data))
+// `c_scope` is like `c_with` but works with an already declared variable.
+static pthread_mutex_t mut;
+c_scope (pthread_mutex_lock(&mut), pthread_mutex_unlock(&mut))
 {
-    printf("%s\n", cstr_str(&mydata.name));
+    /* Do syncronized work. */
 }
 
+// `c_defer` executes the expressions when leaving scope.
 cstr s1 = cstr_new("Hello"), s2 = cstr_new("world");
-c_autodefer (cstr_drop(&s1), cstr_drop(&s2))
+c_defer (cstr_drop(&s1), cstr_drop(&s2))
 {
     printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
 }
@@ -70,16 +75,16 @@ cvec_str readFile(const char* name)
 {
     cvec_str vec = cvec_str_init(); // returned
 
-    c_autovar (FILE* fp = fopen(name, "r"), fclose(fp))
-    c_autovar (cstr line = cstr_null, cstr_drop(&line))
-        while (cstr_getline(&line, fp))
-            cvec_str_emplace_back(&vec, cstr_str(&line));
+    c_with (FILE* fp = fopen(name, "r"), fclose(fp))
+        c_with (cstr line = cstr_null, cstr_drop(&line))
+            while (cstr_getline(&line, fp))
+                cvec_str_emplace_back(&vec, cstr_str(&line));
     return vec;
 }
 
 int main()
 {
-    c_autovar (cvec_str x = readFile(__FILE__), cvec_str_drop(&x))
+    c_with (cvec_str x = readFile(__FILE__), cvec_str_drop(&x))
         c_foreach (i, cvec_str, x)
             printf("%s\n", cstr_str(i.ref));
 }
@@ -209,16 +214,15 @@ c_forrange (int, i, 30, 0, -5) printf(" %d", i);
 ### c_find_if, c_find_in
 Search linearily in containers using a predicate
 ```
-// NOTE: it.ref is NULL if not found, not cvec_i_end(&vec).ref
-// This makes it easier to test.
-cvec_i_iter it;
+cvec_i_iter it, it1, it2;
 
 // Search vec for first value > 2:
-c_find_if(cvec_i, vec, it, *it.ref > 2);
+// NOTE: it.ref is NULL if not found
+c_find_if(it, cvec_i, vec, *it.ref > 2);
 if (it.ref) printf("%d\n", *it.ref);
 
 // Search within a range:
-c_find_in(csmap_str, it1, it2, it, cstr_contains(*it.ref, "hello"));
+c_find_in(it, csmap_str, it1, it2, cstr_contains(it.ref, "hello"));
 if (it.ref) cmap_str_erase_at(&map, it);
 ```
 

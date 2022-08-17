@@ -169,15 +169,18 @@ STC_INLINE i_keyraw _cx_memb(_value_toraw)(const _cx_value* val)
     { return i_keyto(val); }
 #endif // !_i_no_clone
 
-STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self)
-    { return c_make(_cx_iter){(_cx_value*)self->data}; }
+STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) {
+    return c_make(_cx_iter){self->size ? (_cx_value*)self->data : NULL,
+                            (_cx_value*)self->data + self->size};
+}
 
 STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self)
-    { return c_make(_cx_iter){(_cx_value*)self->data + self->size}; }
+    { return c_make(_cx_iter){NULL, (_cx_value*)self->data + self->size}; }
 
-STC_INLINE void _cx_memb(_next)(_cx_iter* it) { ++it->ref; }
+STC_INLINE void _cx_memb(_next)(_cx_iter* it)
+    { if (++it->ref == it->end) it->ref = NULL; }
 
-STC_INLINE _cx_iter _cx_memb(_advance)(_cx_iter it, intptr_t offs)
-    { it.ref += offs; return it; }
+STC_INLINE _cx_iter _cx_memb(_advance)(_cx_iter it, size_t n)
+    { if ((it.ref += n) >= it.end) it.ref = NULL ; return it; }
 
 #include "template.h"

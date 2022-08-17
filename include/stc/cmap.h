@@ -31,7 +31,7 @@
 #include <stc/cmap.h>
 
 int main(void) {
-    c_autovar (cmap_ichar m = cmap_ichar_init(), cmap_ichar_drop(&m))
+    c_with (cmap_ichar m = cmap_ichar_init(), cmap_ichar_drop(&m))
     {
         cmap_ichar_emplace(&m, 5, 'a');
         cmap_ichar_emplace(&m, 8, 'b');
@@ -188,12 +188,29 @@ _cx_memb(_push)(_cx_self* self, _cx_value _val) {
     return _res;
 }
 
+
+STC_INLINE _cx_iter
+_cx_memb(_end)(const _cx_self* self)
+    { return c_make(_cx_iter){NULL}; }
+
+STC_INLINE void
+_cx_memb(_next)(_cx_iter* it) { 
+    while ((++it->ref, *++it->_hx == 0)) ;
+    if (it->ref == it->end) it->ref = NULL;
+}
+
+STC_INLINE _cx_iter
+_cx_memb(_advance)(_cx_iter it, size_t n) {
+    while (n-- && it.ref) _cx_memb(_next)(&it);
+    return it;
+}
+
 STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, _cx_rawkey rkey) {
     i_size idx;
     if (!(self->size && self->_hashx[idx = _cx_memb(_bucket_)(self, &rkey).idx]))
-        idx = self->bucket_count;
-    return c_make(_cx_iter){self->table+idx, self->_hashx+idx};
+        return _cx_memb(_end)(self);
+    return c_make(_cx_iter){self->table+idx, self->table+self->bucket_count, self->_hashx+idx};
 }
 
 STC_INLINE const _cx_value*
@@ -210,25 +227,11 @@ _cx_memb(_get_mut)(_cx_self* self, _cx_rawkey rkey)
 
 STC_INLINE _cx_iter
 _cx_memb(_begin)(const _cx_self* self) {
-    _cx_iter it = {self->table, self->_hashx};
+    _cx_iter it = {self->table, self->table+self->bucket_count, self->_hashx};
     if (it._hx)
         while (*it._hx == 0)
             ++it.ref, ++it._hx;
-    return it;
-}
-
-STC_INLINE _cx_iter
-_cx_memb(_end)(const _cx_self* self)
-    { return c_make(_cx_iter){self->table + self->bucket_count}; }
-
-STC_INLINE void
-_cx_memb(_next)(_cx_iter* it)
-    { while ((++it->ref, *++it->_hx == 0)) ; }
-
-STC_INLINE _cx_iter
-_cx_memb(_advance)(_cx_iter it, size_t n) {
-    // UB if n > elements left
-    while (n--) _cx_memb(_next)(&it);
+    if (it.ref == it.end) it.ref = NULL;
     return it;
 }
 

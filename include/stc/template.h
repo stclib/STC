@@ -110,7 +110,8 @@
 #elif defined i_key_arcbox
   #define i_key_bind i_key_arcbox
   #define i_keyraw c_paste(i_key_arcbox, _value)
-  #define i_keyto c_paste(i_key_arcbox, _toval)
+  #define i_keyfrom c_paste(i_key_arcbox, _from)
+  #define i_keyto(x) *(x)->get
   #define i_eq c_paste(i_key_arcbox, _value_eq)
 #endif
 
@@ -167,7 +168,7 @@
   #define i_keydrop c_default_drop
 #endif
 
-// i_eq, i_less, i_cmp, i_hash
+// i_eq, i_less, i_cmp
 #if !defined i_eq && (defined i_cmp || defined i_less)
   #define i_eq(x, y) !(i_cmp(x, y))
 #elif !defined i_eq
@@ -175,10 +176,13 @@
 #endif
 #if !defined i_less && !defined i_cmp
   #define i_less c_default_less
+#elif !defined i_less
+  #define i_less(x, y) (i_cmp(x, y)) < 0
 #endif
 #ifndef i_cmp
   #define i_cmp(x, y) (i_less(y, x)) - (i_less(x, y))
 #endif
+
 #ifndef i_hash
   #define i_hash c_default_hash
 #endif
@@ -197,7 +201,8 @@
 #elif defined i_val_arcbox
   #define i_val_bind i_val_arcbox
   #define i_valraw c_paste(i_val_arcbox, _value)
-  #define i_valto c_paste(i_val_arcbox, _toval)
+  #define i_valfrom c_paste(i_val_arcbox, _from)
+  #define i_valto(x) *(x)->get
 #endif
 
 #ifdef i_val_bind
@@ -213,6 +218,9 @@
   #endif
 #endif
 
+#ifndef i_val
+  #error "i_val* must be defined for maps"
+#endif
 #if defined i_valraw ^ defined i_valto
   #error "both i_valto and i_valraw must be defined, if any"
 #elif defined i_valfrom && !defined i_valraw

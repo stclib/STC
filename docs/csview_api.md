@@ -92,11 +92,11 @@ uint64_t        csview_hash(const csview* x);
 
 ## Types
 
-| Type name       | Type definition                           | Used to represent...     |
-|:----------------|:------------------------------------------|:-------------------------|
-| `csview`        | `struct { const char *str; size_t size }` | The string view type     |
-| `csview_value`  | `char`                                    | The string element type  |
-| `csview_iter`   | `struct { csview_value *ref; }`           | UTF8 iterator            |
+| Type name       | Type definition                            | Used to represent...     |
+|:----------------|:-------------------------------------------|:-------------------------|
+| `csview`        | `struct { const char *str; size_t size; }` | The string view type     |
+| `csview_value`  | `char`                                     | The string element type  |
+| `csview_iter`   | `struct { csview_value *ref; }`            | UTF8 iterator            |
 
 ## Constants and macros
 
@@ -118,7 +118,7 @@ int main ()
                                                         // (quoting Alfred N. Whitehead)
 
     csview sv1 = cstr_substr(&str1, 3, 5);              // "think"
-    size_t pos = cstr_find(str1, "live");               // position of "live" in str1
+    size_t pos = cstr_find(&str1, "live");              // position of "live" in str1
     csview sv2 = cstr_substr(&str1, pos, 4);            // get "live"
     csview sv3 = cstr_slice(&str1, -8, -1);             // get "details"
     printf("%" c_PRIsv "%" c_PRIsv "%" c_PRIsv "\n", 
@@ -146,11 +146,11 @@ int main()
 {
     c_auto (cstr, s1) {
         s1 = cstr_new("hell😀 w😀rld");
-        cstr_u8_replace_at(&s1, 7, 1, c_sv("ø"));
+        cstr_u8_replace(&s1, cstr_find(&s1, "😀rld"), 1, c_sv("ø"));
         printf("%s\n", cstr_str(&s1));
 
         c_foreach (i, cstr, s1)
-            printf("%.*s,", c_ARGsv(i.chr));
+            printf("%.*s,", c_ARGsv(i.u8.chr));
     }
 }
 ```
@@ -199,7 +199,7 @@ int main()
     print_split(c_sv("This has no matching separator"), c_sv("xx"));
     puts("");
 
-    c_autovar (cstack_str s = string_split(c_sv("Split,this,,string,now,"), c_sv(",")), cstack_str_drop(&s))
+    c_with (cstack_str s = string_split(c_sv("Split,this,,string,now,"), c_sv(",")), cstack_str_drop(&s))
         c_foreach (i, cstack_str, s)
             printf("[%s]\n", cstr_str(i.ref));
 }

@@ -20,13 +20,12 @@ int main()
 {
     c_auto (Vec, vec)
     {
-        const int v[] = {2012, 1990, 2012, 2019, 2015};
-        c_forrange (i, c_arraylen(v))
-            Vec_push_back(&vec, Arc_make(v[i]));
+        c_forarray (int, v, {2012, 1990, 2012, 2019, 2015})
+            Vec_emplace(&vec, *v);
         
         // clone the second 2012 and push it back.
         // note: cloning make sure that vec.data[2] has ref count 2.
-        Vec_push_back(&vec, Arc_clone(vec.data[2]));
+        Vec_push(&vec, Arc_clone(vec.data[2]));
         
         printf("vec before erase :");
         c_foreach (i, Vec, vec)

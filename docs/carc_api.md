@@ -32,25 +32,31 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ## Methods
 ```c
 carc_X      carc_X_init();                                     // empty shared pointer
-carc_X      carc_X_from(i_valraw raw);                         // construct a new value in an carc from raw type.
-carc_X      carc_X_make(i_val val);                            // make a carc from constructed val object. Faster than from_ptr().
-carc_X      carc_X_from_ptr(i_val* p);                         // create a carc from raw pointer. Takes ownership of p.
+carc_X      carc_X_new(i_valraw raw);                          // create an carc from raw type (available if i_valraw defined by user).
+carc_X      carc_X_from(i_val val);                            // create an carc from constructed val object. Faster than from_ptr().
+carc_X      carc_X_from_ptr(i_val* p);                         // create an carc from raw pointer. Takes ownership of p.
 
 carc_X      carc_X_clone(carc_X other);                        // return other with increased use count
 carc_X      carc_X_move(carc_X* self);                         // transfer ownership to another carc.
 void        carc_X_take(carc_X* self, carc_X other);           // take ownership of other.
-void        carc_X_assign(carc_X* self, carc_X other);         // copy shared (increase use count)
+void        carc_X_copy(carc_X* self, carc_X other);           // shared assign (increase use count)
 
 void        carc_X_drop(carc_X* self);                         // destruct (decrease use count, free at 0)
-long        carc_X_use_count(carc_X ptr);    
+long        carc_X_use_count(const carc_X* self);    
 
 void        carc_X_reset(carc_X* self);    
 void        carc_X_reset_to(carc_X* self, i_val* p);           // assign new carc from ptr. Takes ownership of p.
 
-uint64_t    carc_X_value_hash(const i_val* x);                 // hash value
-int         carc_X_value_cmp(const i_val* x, const i_val* y);  // compares pointer addresses if 'i_opt c_no_cmp'
-                                                               // is defined. Otherwise uses 'i_cmp' or default compare.
-bool        carc_X_value_eq(const i_val* x, const i_val* y);   // carc_X_value_cmp == 0
+uint64_t    carc_X_hash(const carc_X* x);                      // hash value
+int         carc_X_cmp(const carc_X* x, const carc_X* y);      // compares pointer addresses if 'i_opt c_no_cmp'
+                                                               // is defined. Otherwise uses 'i_cmp' or default cmp.
+bool        carc_X_eq(const carc_X* x, const carc_X* y);       // carc_X_cmp() == 0
+
+// functions on pointed to objects.
+
+uint64_t    carc_X_value_hash(const i_val* x);
+int         carc_X_value_cmp(const i_val* x, const i_val* y);
+bool        carc_X_value_eq(const i_val* x, const i_val* y);
 ```
 
 ## Types and constants
@@ -96,18 +102,18 @@ int main()
         // POPULATE s1 with shared pointers to Map:
         Map *map;
 
-        map = Stack_push(&s1, Arc_make(Map_init()))->get; // push empty map to s1.
+        map = Stack_push(&s1, Arc_from(Map_init()))->get; // push empty map to s1.
         c_forarray (Map_raw, v, { {"Joey", 1990}, {"Mary", 1995}, {"Joanna", 1992}}) {
             Map_emplace(map, v->first, v->second); // populate it.
         }
 
-        map = Stack_push(&s1, Arc_make(Map_init()))->get;
+        map = Stack_push(&s1, Arc_from(Map_init()))->get;
         c_forarray (Map_raw, v, { {"Rosanna", 2001}, {"Brad", 1999}, {"Jack", 1980} }) {
             Map_emplace(map, v->first, v->second);
         }
 
         // POPULATE s2:
-        map = Stack_push(&s2, Arc_make(Map_init()))->get;
+        map = Stack_push(&s2, Arc_from(Map_init()))->get;
         c_forarray (Map_raw, v, { {"Steve", 1979}, {"Rick", 1974}, {"Tracy", 2003} }) {
             Map_emplace(map, v->first, v->second);
         }
@@ -118,7 +124,7 @@ int main()
         
         // Deep-copy (does not share) a Map from s1 to s2.
         // s2 will contain two shared and two unshared maps.
-        map = Stack_push(&s2, Arc_make(Map_clone(*s1.data[1].get)))->get;
+        map = Stack_push(&s2, Arc_from(Map_clone(*s1.data[1].get)))->get;
         
         // Add one more element to the cloned map:
         Map_emplace_or_assign(map, "Cloned", 2022);

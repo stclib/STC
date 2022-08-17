@@ -27,7 +27,7 @@ int main(void)
     printf("computing prime numbers up to %" PRIuMAX "\n", n);
 
     clock_t t1 = clock();
-    c_autovar (cbits primes = sieveOfEratosthenes(n + 1), cbits_drop(&primes)) {
+    c_with (cbits primes = sieveOfEratosthenes(n + 1), cbits_drop(&primes)) {
         puts("done");
         size_t np = cbits_count(&primes);
         clock_t t2 = clock();
@@ -36,6 +36,13 @@ int main(void)
         printf("2");
         for (size_t i = 3; i < 1000; i += 2)
             if (cbits_test(&primes, i>>1)) printf(" %" PRIuMAX "", i);
+        puts("");
+
+        int k = 20;
+        c_forrange (intptr_t, i, n-1, 1, -2) {
+            if (k == 0) break;
+            else if (cbits_test(&primes, i>>1)) printf("%" PRIdMAX "\n", i), k--;
+        }
         puts("");
     }
 }

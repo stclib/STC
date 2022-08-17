@@ -56,8 +56,8 @@ STC_API cstr*           cstr_append_n(cstr* self, const char* str, size_t n);
 STC_API cstr            cstr_replace_sv(csview str, csview find, csview repl, unsigned count);
 STC_DEF void            cstr_replace_at_sv(cstr* self, const size_t pos, size_t len, csview repl);
 STC_API void            cstr_erase_n(cstr* self, size_t pos, size_t n);
-STC_API size_t          cstr_find(cstr s, const char* needle);
-STC_API size_t          cstr_find_at(cstr s, size_t pos, const char* needle);
+STC_API size_t          cstr_find(const cstr* self, const char* needle);
+STC_API size_t          cstr_find_at(const cstr* self, size_t pos, const char* needle);
 STC_API bool            cstr_getdelim(cstr *self, int delim, FILE *stream);
 
 STC_INLINE cstr         cstr_init() { return cstr_null; }
@@ -70,7 +70,7 @@ STC_INLINE csview       cstr_sv(const cstr* self)
 STC_INLINE cstr         cstr_from(const char* str)
                             { return cstr_from_n(str, strlen(str)); }
 STC_INLINE char*        cstr_data(cstr* self) { return self->str; }
-STC_INLINE size_t       cstr_size(cstr s) { return _cstr_p(&s)->size; }
+STC_INLINE size_t       cstr_size(const cstr* self) { return _cstr_p(self)->size; }
 STC_INLINE size_t       cstr_capacity(cstr s) { return _cstr_p(&s)->cap; }
 STC_INLINE bool         cstr_empty(cstr s) { return _cstr_p(&s)->size == 0; }
 STC_INLINE void         cstr_drop(cstr* self)
@@ -106,12 +106,12 @@ STC_INLINE void         cstr_erase(cstr* self, const size_t pos)
 STC_INLINE char*        cstr_front(cstr* self) { return self->str; }
 STC_INLINE char*        cstr_back(cstr* self)
                             { return self->str + _cstr_p(self)->size - 1; }
-STC_INLINE bool         cstr_equals(cstr s, const char* str)
-                            { return strcmp(s.str, str) == 0; }
-STC_INLINE bool         cstr_equals_s(cstr s1, cstr s2)
-                            { return strcmp(s1.str, s2.str) == 0; }
-STC_INLINE bool         cstr_contains(cstr s, const char* needle)
-                            { return strstr(s.str, needle) != NULL; }
+STC_INLINE bool         cstr_equals(const cstr* self, const char* str)
+                            { return strcmp(self->str, str) == 0; }
+STC_INLINE bool         cstr_equals_s(const cstr* self, cstr s)
+                            { return strcmp(self->str, s.str) == 0; }
+STC_INLINE bool         cstr_contains(const cstr* self, const char* needle)
+                            { return strstr(self->str, needle) != NULL; }
 STC_INLINE bool         cstr_getline(cstr *self, FILE *stream)
                             { return cstr_getdelim(self, '\n', stream); }
 
@@ -133,7 +133,7 @@ STC_INLINE cstr cstr_with_size(const size_t len, const char fill) {
 }
 
 STC_INLINE char* cstr_append_uninit(cstr *self, size_t n) {
-    size_t len = cstr_size(*self); char* d;
+    size_t len = cstr_size(self); char* d;
     if (!(d = cstr_reserve(self, len + n))) return NULL;
     _cstr_p(self)->size += n;
     return d + len;
@@ -152,14 +152,15 @@ STC_INLINE cstr cstr_move(cstr* self) {
     return tmp;
 }
 
-STC_INLINE bool cstr_starts_with(cstr s, const char* sub) {
-    while (*sub && *s.str == *sub) ++s.str, ++sub;
+STC_INLINE bool cstr_starts_with(const cstr* self, const char* sub) {
+    const char* p = self->str;
+    while (*sub && *p == *sub) ++p, ++sub;
     return *sub == 0;
 }
 
-STC_INLINE bool cstr_ends_with(cstr s, const char* sub) {
-    const size_t n = strlen(sub), sz = _cstr_p(&s)->size;
-    return n <= sz && !memcmp(s.str + sz - n, sub, n);
+STC_INLINE bool cstr_ends_with(const cstr* self, const char* sub) {
+    const size_t n = strlen(sub), sz = _cstr_p(self)->size;
+    return n <= sz && !memcmp(self->str + sz - n, sub, n);
 }
 
 STC_INLINE int c_strncasecmp(const char* s1, const char* s2, size_t nmax) {
@@ -309,7 +310,7 @@ STC_INLINE void _cstr_internal_move(cstr* self, const size_t pos1, const size_t 
 
 STC_DEF void
 cstr_replace_at_sv(cstr* self, const size_t pos, size_t len, csview repl) {
-    const size_t sz = cstr_size(*self);
+    const size_t sz = cstr_size(self);
     if (len > sz - pos) len = sz - pos;
     c_autobuf (xstr, char, repl.size) {
         memcpy(xstr, repl.str, repl.size);
@@ -366,16 +367,16 @@ cstr_getdelim(cstr *self, const int delim, FILE *fp) {
 }
 
 STC_DEF size_t
-cstr_find(cstr s, const char* needle) {
-    char* res = strstr(s.str, needle);
-    return res ? res - s.str : cstr_npos;
+cstr_find(const cstr* self, const char* needle) {
+    char* res = strstr(self->str, needle);
+    return res ? res - self->str : cstr_npos;
 }
 
 STC_DEF size_t
-cstr_find_at(cstr s, const size_t pos, const char* needle) {
-    if (pos > _cstr_p(&s)->size) return cstr_npos;
-    char* res = strstr(s.str + pos, needle);
-    return res ? res - s.str : cstr_npos;
+cstr_find_at(const cstr* self, const size_t pos, const char* needle) {
+    if (pos > _cstr_p(self)->size) return cstr_npos;
+    char* res = strstr(self->str + pos, needle);
+    return res ? res - self->str : cstr_npos;
 }
 
 #endif

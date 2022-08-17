@@ -47,7 +47,7 @@ int main()
         printf("\nset:");
         c_foreach (i, csset_Arc, set) printf(" %d", *i.ref->get);
 
-        c_autovar (Arc p = Arc_clone(vec.data[0]), Arc_drop(&p)) {
+        c_with (Arc p = Arc_clone(vec.data[0]), Arc_drop(&p)) {
             printf("\n%d is now owned by %ld objects\n", *p.get, *p.use_count);
         }
 

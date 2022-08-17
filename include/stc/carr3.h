@@ -35,7 +35,7 @@
 
 int main() {
     int w = 7, h = 5, d = 3;
-    c_autovar (carr3_int image = carr3_int_new_uninit(w, h, d), carr3_int_drop(&image))
+    c_with (carr3_int image = carr3_int_new_uninit(w, h, d), carr3_int_drop(&image))
     {
         int *dat = carr3_int_data(&image);
         for (int i = 0; i < carr3_int_size(&image); ++i)
@@ -91,14 +91,17 @@ STC_INLINE size_t _cx_memb(_idx)(const _cx_self* self, size_t x, size_t y, size_
     return self->zdim*(self->ydim*x + y) + z;
 }
 
-STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self)
-    { return c_make(_cx_iter){**self->data}; }
+
+STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) {
+    size_t n = _cx_memb(_size)(self);
+    return c_make(_cx_iter){n ? **self->data : NULL, **self->data + n};
+}
 
 STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self)
-    { return c_make(_cx_iter){**self->data + _cx_memb(_size)(self)}; }
+    { return c_make(_cx_iter){NULL, **self->data + _cx_memb(_size)(self)}; }
 
 STC_INLINE void _cx_memb(_next)(_cx_iter* it)
-    { ++it->ref; }
+    { if (++it->ref == it->end) it->ref = NULL; }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement)

@@ -4,6 +4,7 @@
 // Multimap entries
 #include <stc/cstr.h>
 #define i_val_str
+//#define i_valdrop(x) (printf("drop %s\n", cstr_str(x)), cstr_drop(x))
 #define i_extern // define _clist_mergesort() once
 #include <stc/clist.h>
 
@@ -34,10 +35,11 @@ int main()
 {
     c_auto (Multimap, mmap)
     {
+        typedef struct {int a; const char* b;} pair;
+
         // list-initialize
-        struct { int first; const char* second; } vals[] =
-            {{2, "foo"}, {2, "bar"}, {3, "baz"}, {1, "abc"}, {5, "def"}};
-        c_forrange (i, c_arraylen(vals)) insert(&mmap, c_pair(&vals[i]));
+        c_forarray (pair, v, {{2, "foo"}, {2, "bar"}, {3, "baz"}, {1, "abc"}, {5, "def"}})
+            insert(&mmap, v->a, v->b);
         print("#1", mmap);
 
         // insert using value_type
@@ -52,24 +54,19 @@ int main()
         print("#4", mmap);
 
         // insert using initialization_list
-        insert(&mmap, 5, "one");
-        insert(&mmap, 5, "two");
+        c_forarray (pair, v, {{5, "one"}, {5, "two"}})
+            insert(&mmap, v->a, v->b);
         print("#5", mmap);
 
         // FOLLOWING NOT IN ORIGINAL EXAMPLE:
-        
         // erase all entries with key 5
         Multimap_erase(&mmap, 5);
-        print("+6", mmap);
+        print("+5", mmap);
+        
 
-        // find and erase first entry containing "bar"
-        clist_str_iter pos;
-        c_foreach (e, Multimap, mmap) {
-            if ((pos = clist_str_find(&e.ref->second, "bar")).ref != clist_str_end(&e.ref->second).ref) {
-                clist_str_erase_at(&e.ref->second, pos);
-                break;
-            }
-        }
-        print("+7", mmap);
+        Multimap_clear(&mmap);
+        c_forarray (pair, v, {{1, "ä"}, {2, "ё"}, {2, "ö"}, {3, "ü"}})
+            insert(&mmap, v->a, v->b);
+        print("#6", mmap);
     }
 }

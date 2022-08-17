@@ -19,7 +19,7 @@ int main(int argc, char* argv[])
             cstr_getline(&input, stdin);
 
             // Exit when the user inputs q
-            if (cstr_equals(input, "q"))
+            if (cstr_equals(&input, "q"))
                 break;
 
             if (cregex_is_match(cstr_str(&input), &float_expr))

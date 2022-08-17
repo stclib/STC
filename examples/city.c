@@ -32,8 +32,9 @@ static inline void City_drop(City* c) {
 
 #define i_type CityArc
 #define i_key_bind City
-#include <stc/cbox.h>
-//#include <stc/carc.h> // try instead of cbox.h
+#define i_opt c_no_atomic
+//#include <stc/cbox.h>
+#include <stc/carc.h> // try instead of cbox.h
 
 #define i_type Cities
 #define i_key_arcbox CityArc
@@ -50,16 +51,13 @@ int main(void)
     c_auto (Cities, cities, copy)
     c_auto (CityMap, map)
     {
-        struct City_s { const char *name, *country; float lat, lon; int pop; };
-
-        c_forarray (struct City_s, c, {
-            {"New York", "US", 4.3, 23.2, 9000000},
-            {"Paris", "France", 4.3, 23.2, 9000000},
-            {"Berlin", "Germany", 4.3, 23.2, 9000000},
-            {"London", "UK", 4.3, 23.2, 9000000},
+        c_forarray (City, c, {
+            {cstr_new("New York"), cstr_new("US"), 4.3, 23.2, 9000000},
+            {cstr_new("Paris"), cstr_new("France"), 4.3, 23.2, 9000000},
+            {cstr_new("Berlin"), cstr_new("Germany"), 4.3, 23.2, 9000000},
+            {cstr_new("London"), cstr_new("UK"), 4.3, 23.2, 9000000},
         }) {
-            Cities_push(&cities, CityArc_make((City){cstr_from(c->name), cstr_from(c->country),
-                                                     c->lat, c->lon, c->pop}));
+            Cities_emplace(&cities, *c);
         }
 
         copy = Cities_clone(cities); // share each element!
@@ -73,12 +71,14 @@ int main(void)
 
         printf("Vec:\n");
         c_foreach (c, Cities, cities)
-            printf("city:%s, %d, use:%ld\n", cstr_str(&c.ref->get->name), c.ref->get->population, CityArc_use_count(*c.ref));
+            printf("city:%s, %d, use:%ld\n", cstr_str(&c.ref->get->name),
+                                             c.ref->get->population,
+                                             CityArc_use_count(c.ref));
 
         printf("\nMap:\n");
         c_forpair (id, city, CityMap, map)
             printf("id:%d, city:%s, %d, use:%ld\n", *_.id, cstr_str(&_.city->get->name),
-                                                    _.city->get->population, CityArc_use_count(*_.city));
+                                                    _.city->get->population, CityArc_use_count(_.city));
         puts("");
     }
 }

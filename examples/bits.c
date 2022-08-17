@@ -3,7 +3,7 @@
 
 int main() 
 {
-    c_autovar (cbits set = cbits_with_size(23, true), cbits_drop(&set)) {
+    c_with (cbits set = cbits_with_size(23, true), cbits_drop(&set)) {
         printf("count %" PRIuMAX ", %" PRIuMAX "\n", cbits_count(&set), cbits_size(&set));
         cbits s1 = cbits_from("1110100110111");
         char buf[256];
@@ -36,7 +36,7 @@ int main()
             printf("%d", cbits_test(&set, i));
         puts("");
 
-        c_autovar (cbits s2 = cbits_clone(set), cbits_drop(&s2)) {
+        c_with (cbits s2 = cbits_clone(set), cbits_drop(&s2)) {
             cbits_flip_all(&s2);
             cbits_set(&s2, 16);
             cbits_set(&s2, 17);

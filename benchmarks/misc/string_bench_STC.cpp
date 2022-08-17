@@ -38,7 +38,7 @@ cvec_str read_file(const char* name)
 {
     cvec_str data = cvec_str_init();
     c_auto (cstr, line)
-    c_autovar (FILE* f = fopen(name, "r"), fclose(f))
+    c_with (FILE* f = fopen(name, "r"), fclose(f))
         while (cstr_getline(&line, f))
             cvec_str_emplace_back(&data, cstr_str(&line));
     return data;
@@ -101,7 +101,7 @@ void initShortStringVec(cvec_str* vs, cvec_sv* vsv)
     c_foreach (i, cvec_str, *vs)
     {
         cvec_sv_push_back(vsv, cstr_sv(i.ref));
-        num += cstr_size(*i.ref);
+        num += cstr_size(i.ref);
     }
     std::cout << "num strings: " << cvec_sv_size(vsv) << std::endl;
     std::cout << "avg str len: " << num / (float)cvec_sv_size(vsv) << std::endl;
@@ -147,7 +147,7 @@ void initLongStringVec(cvec_str* vs, cvec_sv* vsv)
     c_foreach (i, cvec_str, *vs)
     {
         cvec_sv_push_back(vsv, cstr_sv(i.ref));
-        num += cstr_size(*i.ref);
+        num += cstr_size(i.ref);
     }
     std::cout << "num strings: " << cvec_sv_size(vsv) << std::endl;
     std::cout << "avg str len: " << num / (float)cvec_sv_size(vsv) << std::endl;

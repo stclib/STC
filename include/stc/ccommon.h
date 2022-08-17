@@ -157,16 +157,14 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
 #define c_foreach3(it, C, cnt) \
-    for (C##_iter it = C##_begin(&cnt), it##_end_ = C##_end(&cnt) \
-         ; it.ref != it##_end_.ref; C##_next(&it))
+    for (C##_iter it = C##_begin(&cnt); it.ref; C##_next(&it))
 #define c_foreach4(it, C, start, finish) \
-    for (C##_iter it = start, it##_end_ = finish \
-         ; it.ref != it##_end_.ref; C##_next(&it))
+    for (C##_iter it = start, *_endref = (C##_iter*)(finish).ref \
+         ; it.ref != (C##_value*)_endref; C##_next(&it))
 
 #define c_forpair(key, val, C, cnt) /* structured binding */ \
-    for (struct {C##_iter _it; C##_value* _endref; const C##_key* key; C##_mapped* val;} \
-         _ = {C##_begin(&cnt), C##_end(&cnt).ref} \
-         ; _._it.ref != _._endref && (_.key = &_._it.ref->first, _.val = &_._it.ref->second) \
+    for (struct {C##_iter _it; const C##_key* key; C##_mapped* val;} _ = {C##_begin(&cnt)} \
+         ; _._it.ref && (_.key = &_._it.ref->first, _.val = &_._it.ref->second) \
          ; C##_next(&_._it))
 
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
@@ -178,24 +176,28 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
     for (itype i=start, _inc=step, _end=(stop) - (0 < _inc) \
          ; (i <= _end) == (0 < _inc); i += _inc)
 
-#define c_autovar(...) c_MACRO_OVERLOAD(c_autovar, __VA_ARGS__)
-#define c_autovar2(declvar, drop) for (declvar, **_c_i = NULL; !_c_i; ++_c_i, drop)
-#define c_autovar3(declvar, pred, drop) for (declvar, **_c_i = NULL; !_c_i && (pred); ++_c_i, drop)
-#define c_autoscope(init, drop) for (int _c_i = (init, 0); !_c_i; ++_c_i, drop)
-#define c_autodefer(...) for (int _c_i = 0; !_c_i; ++_c_i, __VA_ARGS__)
+#define c_autovar c_with    // [deprecated]
+#define c_autoscope c_scope // [deprecated]
+#define c_autodefer c_defer // [deprecated]
+
+#define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
+#define c_with2(declvar, drop) for (declvar, **_c_i = NULL; !_c_i; ++_c_i, drop)
+#define c_with3(declvar, pred, drop) for (declvar, **_c_i = NULL; !_c_i && (pred); ++_c_i, drop)
+#define c_scope(init, drop) for (int _c_i = (init, 0); !_c_i; ++_c_i, drop)
+#define c_defer(...) for (int _c_i = 0; !_c_i; ++_c_i, __VA_ARGS__)
 #define c_breakauto continue
 
 #define c_auto(...) c_MACRO_OVERLOAD(c_auto, __VA_ARGS__)
 #define c_auto2(C, a) \
-    c_autovar2(C a = C##_init(), C##_drop(&a))
+    c_with2(C a = C##_init(), C##_drop(&a))
 #define c_auto3(C, a, b) \
-    c_autovar2(c_expand(C a = C##_init(), b = C##_init()), \
+    c_with2(c_expand(C a = C##_init(), b = C##_init()), \
                (C##_drop(&b), C##_drop(&a)))
 #define c_auto4(C, a, b, c) \
-    c_autovar2(c_expand(C a = C##_init(), b = C##_init(), c = C##_init()), \
+    c_with2(c_expand(C a = C##_init(), b = C##_init(), c = C##_init()), \
                (C##_drop(&c), C##_drop(&b), C##_drop(&a)))
 #define c_auto5(C, a, b, c, d) \
-    c_autovar2(c_expand(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
+    c_with2(c_expand(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
                (C##_drop(&d), C##_drop(&c), C##_drop(&b), C##_drop(&a)))
 
 #define c_autobuf(b, type, n) c_autobuf_N(b, type, n, 256)
@@ -221,16 +223,19 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #define c_pair(v) (v)->first, (v)->second
 #define c_drop(C, ...) do { c_forarray_p(C*, _p, {__VA_ARGS__}) C##_drop(*_p); } while(0)
 
-#define c_find_if(C, cnt, it, pred) \
-    c_find_in(C, C##_begin(&cnt), C##_end(&cnt), it, pred)
-
-// NB: it.ref == NULL when not found, not end.ref:
-#define c_find_in(C, start, end, it, pred) do { \
+// it.ref == NULL when not found:
+#define c_find_if(it, C, cnt, pred) do { \
     size_t index = 0; \
-    C##_iter _end = end; \
-    for (it = start; it.ref != _end.ref && !(pred); C##_next(&it)) \
+    for (it = C##_begin(&cnt); it.ref && !(pred); C##_next(&it)) \
         ++index; \
-    if (it.ref == _end.ref) it.ref = NULL; \
+} while (0)
+
+#define c_find_in(it, C, start, end, pred) do { \
+    size_t index = 0; \
+    const C##_value* _endref = (end).ref; \
+    for (it = start; it.ref != _endref && !(pred); C##_next(&it)) \
+        ++index; \
+    if (it.ref == _endref) it.ref = NULL; \
 } while (0)
 #endif // CCOMMON_H_INCLUDED
 

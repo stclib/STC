@@ -31,24 +31,31 @@ compare the pointer addresses when used. Additionally, `c_no_clone` or `i_is_fwd
 ## Methods
 ```c
 cbox_X      cbox_X_init();                                    // return an empty cbox
-cbox_X      cbox_X_from(i_valraw raw);                        // construct a new boxed object from raw type, if defined.
-cbox_X      cbox_X_make(i_val val);                           // make a cbox from constructed val object.
+cbox_X      cbox_X_new(i_valraw raw);                         // create a cbox from raw type. Avail if i_valraw user defined.
+cbox_X      cbox_X_from(i_val val);                           // create a cbox from constructed val object.
 cbox_X      cbox_X_from_ptr(i_val* p);                        // create a cbox from a pointer. Takes ownership of p.
 
 cbox_X      cbox_X_clone(cbox_X other);                       // return deep copied clone
 cbox_X      cbox_X_move(cbox_X* self);                        // transfer ownership to another cbox.
 void        cbox_X_take(cbox_X* self, cbox_X other);          // take ownership of other.
-void        cbox_X_assign(cbox_X* self, cbox_X other);        // deep copy to self
+void        cbox_X_copy(cbox_X* self, cbox_X other);          // deep copy to self
 void        cbox_X_drop(cbox_X* self);                        // destruct the contained object and free's it.
 
 void        cbox_X_reset(cbox_X* self);   
 void        cbox_X_reset_to(cbox_X* self, i_val* p);          // assign new cbox from ptr. Takes ownership of p.
 
-uint64_t    cbox_X_value_hash(const i_val* p);                // hash value
-int         cbox_X_value_cmp(const i_val* p, const i_val* y); // compares pointer addresses if 'i_opt c_no_cmp'
-                                                              // is defined. Otherwise uses 'i_cmp' or default compare.
-bool        cbox_X_value_eq(const i_val* p, const i_val* y);  // cbox_X_value_cmp == 0
+uint64_t    cbox_X_hash(const cbox_X* x);                      // hash value
+int         cbox_X_cmp(const cbox_X* x, const cbox_X* y);      // compares pointer addresses if 'i_opt c_no_cmp'
+                                                               // is defined. Otherwise uses 'i_cmp' or default cmp.
+bool        cbox_X_eq(const cbox_X* x, const cbox_X* y);       // cbox_X_cmp() == 0
+
+// functions on pointed to objects.
+
+uint64_t    cbox_X_value_hash(const i_val* x);
+int         cbox_X_value_cmp(const i_val* x, const i_val* y);
+bool        cbox_X_value_eq(const i_val* x, const i_val* y);
 ```
+
 ## Types and constants
 
 | Type name          | Type definition                                               | Used to represent...     |
@@ -68,7 +75,7 @@ void int_drop(int* x) {
 #define i_type IBox
 #define i_val int
 #define i_valdrop int_drop    // optional func, just to display elements destroyed
-#define i_valclone(x) x       // must specify because i_valdrop was defined.
+#define i_valclone(x) x       // must specified when i_valdrop is defined.
 #include <stc/cbox.h>
 
 #define i_type ISet
@@ -84,10 +91,8 @@ int main()
     c_auto (IVec, vec)  // declare and init vec, call drop at scope exit
     c_auto (ISet, set)  // similar
     {
-        c_forarray (IBox, v, {
-            IBox_make(2021), IBox_make(2012), 
-            IBox_make(2022), IBox_make(2015),
-        }) IVec_push(&vec, *v);
+        c_forarray (int, v, {2021, 2012, 2022, 2015})
+            IVec_emplace(&vec, *v); // same as: IVec_push(&vec, IBox_from(*v));
 
         printf("vec:");
         c_foreach (i, IVec, vec)
