@@ -200,7 +200,7 @@ _cx_memb(_begin)(const _cx_self* self) {
 
 STC_INLINE _cx_iter
 _cx_memb(_end)(const _cx_self* self)
-    { return c_make(_cx_iter){NULL, self->table + self->bucket_count}; }
+    { return c_make(_cx_iter){NULL}; }
 
 STC_INLINE void
 _cx_memb(_next)(_cx_iter* it) { 
@@ -217,10 +217,11 @@ _cx_memb(_advance)(_cx_iter it, size_t n) {
 STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, _cx_rawkey rkey) {
     i_size idx;
-    _cx_value* end = self->table + self->bucket_count;
     if (self->size && self->_hashx[idx = _cx_memb(_bucket_)(self, &rkey).idx])
-        return c_make(_cx_iter){self->table + idx, end, self->_hashx + idx};
-    return c_make(_cx_iter){NULL, end};
+        return c_make(_cx_iter){self->table + idx, 
+                                self->table + self->bucket_count,
+                                self->_hashx + idx};
+    return _cx_memb(_end)(self);
 }
 
 STC_INLINE const _cx_value*
