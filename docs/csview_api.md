@@ -49,8 +49,7 @@ csview          csview_token(csview sv, csview sep, size_t* start);    // *start
 #### UTF8 methods
 ```c
 size_t          csview_u8_size(csview sv);
-csview          csview_u8_substr(csview sv, size_t u8pos, size_t u8len);
-csview          csview_u8_slice(csview sv, size_t u8p1, size_t u8p2);
+csview          csview_u8_substr(csview sv, size_t bytepos, size_t u8len);
 bool            csview_valid_utf8(csview sv);                       // requires linking with src/utf8code.c
 
 csview_iter     csview_begin(const csview* self);
@@ -75,11 +74,10 @@ uint32_t        utf8_peek(const char* s, int pos);                  // codepoint
 ```c
 csview          cstr_substr(const cstr* self, size_t pos, size_t n);
 csview          cstr_substr_ex(const cstr* s, intptr_t pos, size_t n); // negative pos count from end
-csview          cstr_u8_substr(const cstr* self, size_t u8pos, size_t u8len);
+csview          cstr_u8_substr(const cstr* self, size_t bytepos, size_t u8len);
 
 csview          cstr_slice(const cstr* self, size_t p1, size_t p2);
 csview          cstr_slice_ex(const cstr* s, intptr_t p, intptr_t q);  // negative p or q count from end
-csview          cstr_u8_slice(const cstr* self, size_t u8p1, size_t u8p2);
 ```
 
 #### Helper methods

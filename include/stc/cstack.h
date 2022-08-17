@@ -120,6 +120,12 @@ STC_INLINE void _cx_memb(_shrink_to_fit)(_cx_self* self)
 STC_INLINE const _cx_value* _cx_memb(_top)(const _cx_self* self)
     { return &self->data[self->size - 1]; }
 
+STC_INLINE _cx_value* _cx_memb(_back)(const _cx_self* self)
+    { return (_cx_value*) &self->data[self->size - 1]; }
+
+STC_INLINE _cx_value* _cx_memb(_front)(const _cx_self* self)
+    { return (_cx_value*) &self->data[0]; }
+
 STC_INLINE _cx_value* _cx_memb(_push)(_cx_self* self, _cx_value val) {
     if (self->size == _cx_memb(_capacity)(self))
         if (!_cx_memb(_reserve)(self, self->size*3/2 + 4))

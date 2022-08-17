@@ -37,7 +37,7 @@ int main()
         cpque_pnt_push(&pque, (Point){12, 62});
         // print
         while (!cpque_pnt_empty(&pque)) {
-            cpque_pnt_value *v = cpque_pnt_top(&pque);
+            const cpque_pnt_value *v = cpque_pnt_top(&pque);
             printf(" (%d,%d)", v->x, v->y);
             cpque_pnt_pop(&pque);
         }

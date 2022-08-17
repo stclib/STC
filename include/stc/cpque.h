@@ -82,7 +82,7 @@ STC_INLINE bool _cx_memb(_empty)(const _cx_self* q)
 STC_INLINE size_t _cx_memb(_capacity)(const _cx_self* q)
     { return q->capacity; }
 
-STC_INLINE _cx_value* _cx_memb(_top)(const _cx_self* self)
+STC_INLINE const _cx_value* _cx_memb(_top)(const _cx_self* self)
     { return &self->data[0]; }
 
 STC_INLINE void _cx_memb(_pop)(_cx_self* self)
