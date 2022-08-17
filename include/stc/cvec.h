@@ -411,7 +411,8 @@ _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
         if (i_eq((&raw), (&r)))
             return i1;
     }
-    i2.ref = NULL; return i2; // NB!
+    i2.ref = NULL; // NB!
+    return i2;
 }
 
 STC_DEF _cx_iter
@@ -428,8 +429,9 @@ _cx_memb(_binary_search_in)(_cx_iter i1, _cx_iter i2, const _cx_raw raw,
         else if (c < 0) p2 = mid.ref;
         else i1.ref = mid.ref + 1;
     }
+    i2.ref = NULL; // NB!
     *lower_bound = i1.ref == i2.end ? i2 : i1;
-    i2.ref = NULL; return i2; // NB!
+    return i2;
 }
 
 STC_DEF int
