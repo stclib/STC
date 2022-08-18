@@ -62,7 +62,6 @@
 #include <time.h>
 #include <string.h>
 #include <stdarg.h>
-#include <math.h>
 #include <inttypes.h>
 
 #define STCTEST_FLOAT_LIMIT 0.00000001
@@ -122,7 +121,7 @@
     char*: "`%s`", const char*: "`%s`", \
     default: "{%p}")
 
-static inline int _stctest_strcmp(int res, const char* OP, ...) { 
+static int _stctest_strcmp(int res, const char* OP, ...) { 
     va_list ap;
     va_start(ap, OP);
     const char* a = va_arg(ap, const char *);
@@ -138,23 +137,23 @@ static inline int _stctest_strcmp(int res, const char* OP, ...) {
     return c;
 }
 
-static inline int _stctest_dblcmp(int res, const char* OP, ...) { 
+static int _stctest_dblcmp(int res, const char* OP, ...) { 
     va_list ap;
     va_start(ap, OP);
     double a = va_arg(ap, double);
     double b = va_arg(ap, double);
-    double c = a - b;
+    double c = a - b, abs = c < 0 ? -c : c;
     va_end(ap);
     switch (OP[0]) {
-        case '=': return fabs(c) < STCTEST_FLOAT_LIMIT;
-        case '!': return fabs(c) > STCTEST_FLOAT_LIMIT;
+        case '=': return abs < STCTEST_FLOAT_LIMIT;
+        case '!': return abs > STCTEST_FLOAT_LIMIT;
         case '<': return OP[1] == '=' ? c <= 0 : c < 0;
         case '>': return OP[1] == '=' ? c >= 0 : c > 0;
     }    
     return res;
 }
 
-static inline int _stctest_valcmp(int res, const char* OP, ...)
+static int _stctest_valcmp(int res, const char* OP, ...)
     { return res; }
 
 #define _stctest_COLOR_CODE 0x1B
