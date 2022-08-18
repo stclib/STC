@@ -75,12 +75,12 @@
     do { if (!_stctest_assert(__FILE__, __LINE__, #expression, (expression) == 0)) puts(""); } while(0)
 
 /* NB! (char*) are compared as strings. Cast to (void*) to compare pointers only */
-#define EXPECT_EQ(a, b) _stctest_COMPARE(a, ==, b)
-#define EXPECT_NE(a, b) _stctest_COMPARE(a, !=, b)
-#define EXPECT_GT(a, b) _stctest_COMPARE(a, >, b)
-#define EXPECT_LT(a, b) _stctest_COMPARE(a, <, b)
-#define EXPECT_LE(a, b) _stctest_COMPARE(a, <=, b)
-#define EXPECT_GE(a, b) _stctest_COMPARE(a, >=, b)
+#define EXPECT_EQ(a, b) _stctest_CHECK(a, ==, b)
+#define EXPECT_NE(a, b) _stctest_CHECK(a, !=, b)
+#define EXPECT_GT(a, b) _stctest_CHECK(a, >, b)
+#define EXPECT_LT(a, b) _stctest_CHECK(a, <, b)
+#define EXPECT_LE(a, b) _stctest_CHECK(a, <=, b)
+#define EXPECT_GE(a, b) _stctest_CHECK(a, >=, b)
 
 /* Run a test() function */
 #define RUN_TEST(test, ...) do { \
@@ -98,7 +98,7 @@
 
 /* ----------------------------------------------------------------------------- */
 
-#define _stctest_COMPARE(a, OP, b) \
+#define _stctest_CHECK(a, OP, b) \
     do { if (!_stctest_assert(__FILE__, __LINE__, #a " " #OP " " #b, _stctest_CMP(a, OP, b))) { \
         char _fmt[32]; sprintf(_fmt, ": %s %s %s\n", _stctest_FMT(a), #OP, _stctest_FMT(b)); \
         printf(_fmt, a, b); \
