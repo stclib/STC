@@ -10,7 +10,7 @@ void stringdemo1()
         cstr_insert(&cs, 3, "-two");
         printf("%s.\n", cstr_str(&cs));
 
-        cstr_erase_n(&cs, 7, 5); // -nine
+        cstr_erase(&cs, 7, 5); // -nine
         printf("%s.\n", cstr_str(&cs));
 
         cstr_replace(&cs, "seven", "four", 1);

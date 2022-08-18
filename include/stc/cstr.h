@@ -84,7 +84,8 @@ STC_API size_t  cstr_find_at(const cstr* self, size_t pos, const char* search);
 STC_API char*   cstr_assign_n(cstr* self, const char* str, size_t len);
 STC_API char*   cstr_append_n(cstr* self, const char* str, size_t len);
 STC_API bool    cstr_getdelim(cstr *self, int delim, FILE *fp);
-STC_API void    cstr_erase_n(cstr* self, size_t pos, size_t len);
+STC_API void    cstr_erase(cstr* self, size_t pos, size_t len);
+STC_API void    cstr_u8_erase(cstr* self, size_t bytepos, size_t u8len);
 STC_API cstr    cstr_from_fmt(const char* fmt, ...);
 STC_API int     cstr_printf(cstr* self, const char* fmt, ...);
 STC_API void    cstr_replace(cstr* self, const char* search, const char* repl, unsigned count);
@@ -540,10 +541,17 @@ cstr_replace(cstr* self, const char* search, const char* repl, unsigned count) {
                                         c_sv(repl, strlen(repl)), count));
 }
 
-STC_DEF void cstr_erase_n(cstr* self, const size_t pos, size_t len) {
+STC_DEF void cstr_erase(cstr* self, const size_t pos, size_t len) {
     cstr_buf r = cstr_buffer(self);
     if (len > r.size - pos) len = r.size - pos;
     memmove(&r.data[pos], &r.data[pos + len], r.size - (pos + len));
+    _cstr_set_size(self, r.size - len);
+}
+
+STC_DEF void cstr_u8_erase(cstr* self, const size_t bytepos, const size_t u8len) {
+    cstr_buf r = cstr_buffer(self);
+    size_t len = utf8_pos(r.data + bytepos, u8len);
+    memmove(&r.data[bytepos], &r.data[bytepos + len], r.size - (bytepos + len));
     _cstr_set_size(self, r.size - len);
 }
 

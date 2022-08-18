@@ -63,8 +63,7 @@ void         cstr_insert(cstr* self, size_t pos, const char* ins);
 void         cstr_insert_sv(cstr* self, size_t pos, csview ins);
 void         cstr_insert_s(cstr* self, size_t pos, cstr ins);
 
-void         cstr_erase(cstr* self, size_t pos);
-void         cstr_erase_n(cstr* self, size_t pos, size_t n);         // erase n bytes from pos
+void         cstr_erase(cstr* self, size_t pos, size_t len);         // erase len bytes from pos
 
 void         cstr_replace(cstr* self, const char* search, const char* repl, unsigned count); // count==0: replace all.
 cstr         cstr_replace_sv(csview in, csview search, csview repl, unsigned count);
@@ -100,6 +99,7 @@ size_t       cstr_u8_to_pos(const cstr* self, size_t u8idx);          // byte po
 const char*  cstr_u8_at(const cstr* self, size_t u8idx);              // char* position at utf8 codepoint index
 csview       cstr_u8_chr(const cstr* self, size_t u8idx);             // get utf8 character as a csview
 void         cstr_u8_replace(cstr* self, size_t bytepos, size_t u8len, csview repl); // replace u8len utf8 chars
+void         cstr_u8_erase(cstr* self, size_t bytepos, size_t u8len); // erase u8len codepoints from pos
 
 // iterate utf8 codepoints
 cstr_iter    cstr_begin(const cstr* self);
@@ -165,7 +165,7 @@ int main() {
     cstr_insert(&s1, 3, "-two");
     printf("%s\n", cstr_str(&s1));
 
-    cstr_erase_n(&s1, 7, 5); // -nine
+    cstr_erase(&s1, 7, 5); // -nine
     printf("%s\n", cstr_str(&s1));
 
     cstr_replace(&s1, "seven", "four", 1);
