@@ -74,6 +74,7 @@
 #define EXPECT_FALSE(expression) \
     do { if (!_c11ut_assert(__FILE__, __LINE__, #expression, (expression) == 0)) puts(""); } while(0)
 
+/* NB! Char pointers are compared as strings. Cast to (void*) to compare pointers only */
 #define EXPECT_EQ(a, b) _c11ut_COMPARE(a, ==, b)
 #define EXPECT_NE(a, b) _c11ut_COMPARE(a, !=, b)
 #define EXPECT_GT(a, b) _c11ut_COMPARE(a, >, b)
@@ -109,9 +110,9 @@
     default: _c11ut_valcmp)((a) OP (b), #OP, a, b)
 
 #define _c11ut_FMT(a) _Generic((a), \
-    float: "%.8g`f32", double: "%.14g`f64", \
-    int64_t: "%" PRId64 "`i64", int32_t: "%" PRId32 "`i32", int16_t: "%" PRId16 "`i64", int8_t: "%" PRId8 "`i8", \
-    uint64_t: "%" PRIu64 "`u64", uint32_t: "%" PRIu32 "`u32", uint16_t: "%" PRIu16 "`u16", uint8_t: "%" PRIu8 "`u8", \
+    float: "%.8gf", double: "%.14g", \
+    int64_t: "%" PRId64 "'i64", int32_t: "%" PRId32 "'i32", int16_t: "%" PRId16 "'i64", int8_t: "%" PRId8 "'i8", \
+    uint64_t: "%" PRIu64 "'u64", uint32_t: "%" PRIu32 "'u32", uint16_t: "%" PRIu16 "'u16", uint8_t: "%" PRIu8 "'u8", \
     char*: "`%s`", const char*: "`%s`", \
     default: "{%p}")
 
