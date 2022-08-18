@@ -90,14 +90,11 @@ STC_INLINE void csview_next(csview_iter* it) {
 STC_INLINE size_t csview_u8_size(csview sv)
     { return utf8_size_n(sv.str, sv.size); }
 
-STC_INLINE csview csview_u8_substr(csview sv, size_t u8pos, size_t u8len) {
-    sv.str = utf8_at(sv.str, u8pos);
+STC_INLINE csview csview_u8_substr(csview sv, size_t bytepos, size_t u8len) {
+    sv.str += bytepos;
     sv.size = utf8_pos(sv.str, u8len);
     return sv;
 }
-
-STC_INLINE csview csview_u8_slice(csview sv, size_t u8p1, size_t u8p2)
-    { return csview_u8_substr(sv, u8p1, u8p2 - u8p1); }
 
 STC_INLINE bool csview_valid_utf8(csview sv) // depends on src/utf8code.c
     { return utf8_valid_n(sv.str, sv.size); }
@@ -121,11 +118,8 @@ STC_INLINE csview cstr_substr_ex(const cstr* self, intptr_t pos, size_t n)
 STC_INLINE csview cstr_slice_ex(const cstr* self, intptr_t p1, intptr_t p2)
     { return csview_slice_ex(cstr_sv(self), p1, p2); }
 
-STC_INLINE csview cstr_u8_substr(const cstr* self , size_t u8pos, size_t u8len)
-    { return csview_u8_substr(cstr_sv(self), u8pos, u8len); }
-
-STC_INLINE csview cstr_u8_slice(const cstr* self , size_t u8p1, size_t u8p2)
-    { return csview_u8_substr(cstr_sv(self), u8p1, u8p2 - u8p1); }
+STC_INLINE csview cstr_u8_substr(const cstr* self , size_t bytepos, size_t u8len)
+    { return csview_u8_substr(cstr_sv(self), bytepos, u8len); }
 
 #endif
 /* ---- Container helper functions ---- */
