@@ -68,11 +68,17 @@
 #define STCTEST_FLOAT_LIMIT 0.00000001
 
 
-#define EXPECT_TRUE(expression) \
-    do { if (!_stctest_assert(__FILE__, __LINE__, #expression, (expression) != 0)) puts(""); } while(0)
+#define EXPECT_TRUE(expr) \
+    do { if (!_stctest_assert(__FILE__, __LINE__, #expr, (expr) != 0)) puts(""); } while(0)
 
-#define EXPECT_FALSE(expression) \
-    do { if (!_stctest_assert(__FILE__, __LINE__, #expression, (expression) == 0)) puts(""); } while(0)
+#define EXPECT_TRUE1(expr, v) \
+    do { if (!_stctest_assert(__FILE__, __LINE__, #expr, (expr) != 0)) { \
+        char _fmt[32]; sprintf(_fmt, ": %%s = %s\n", _stctest_FMT(v)); \
+        printf(_fmt, #v, v); \
+    }} while (0)
+
+#define EXPECT_FALSE(expr) EXPECT_TRUE(!(expr))
+#define EXPECT_FALSE1(expr, v) EXPECT_TRUE1(!(expr), v)
 
 /* NB! (char*) are compared as strings. Cast to (void*) to compare pointers only */
 #define EXPECT_EQ(a, b) _stctest_CHECK(a, ==, b)
