@@ -32,27 +32,26 @@
  
   Example:
  
-    #include "ctest11.h"
+    #include "c11ut.h"
     #include "mylib.h"
  
     void test_sheep()
     {
-        c11ut_EQUAL("Sheep are cool", are_sheep_cool());
-        c11ut_CMP("Sheep are cool", ==, are_sheep_cool());
-        c11ut_EQUAL(4, sheep.legs);
+        EXPECT_EQ("Sheep are cool", are_sheep_cool());
+        EXPECT_EQ(4, sheep.legs);
     }
  
     void test_cheese()
     {
-        c11ut_CMP(cheese.tanginess, >, 0);
-        c11ut_EQUAL("Wensleydale", cheese.name);
+        EXPECT_GT(cheese.tanginess, 0);
+        EXPECT_EQ("Wensleydale", cheese.name);
     }
  
     int main()
     {
-        c11ut_RUN(test_sheep);
-        c11ut_RUN(test_cheese);
-        return c11ut_REPORT();
+        RUN_TEST(test_sheep);
+        RUN_TEST(test_cheese);
+        return REPORT_TESTS();
     }
  */
 
@@ -62,54 +61,66 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <stdarg.h>
+#include <math.h>
 #include <inttypes.h>
 
-/* Main assertion method */
-#define c11ut_ASSERT(expression) \
+#define C11UT_FLOAT_LIMIT 0.00000001
+
+
+#define EXPECT_TRUE(expression) \
     do { if (!_c11ut_assert(__FILE__, __LINE__, #expression, (expression) != 0)) puts(""); } while(0)
 
-/* Use comparison operators */
-#define c11ut_CMP(a, OP, b) \
-    do { if (!_c11ut_assert(__FILE__, __LINE__, #a " " #OP " " #b, _c11ut_COMPARE(a, OP, b))) { \
-        char _fmt[32]; sprintf(_fmt, ": '%s' %s '%s'\n", _c11ut_FMT(a), #OP, _c11ut_FMT(b)); \
-        printf(_fmt, a, b); \
-    }} while (0)
+#define EXPECT_FALSE(expression) \
+    do { if (!_c11ut_assert(__FILE__, __LINE__, #expression, (expression) == 0)) puts(""); } while(0)
 
-#define c11ut_EQUAL(a, b) c11ut_CMP(a, ==, b)
-#define c11ut_UNEQUAL(a, b) c11ut_CMP(a, !=, b)
-#define c11ut_GT(a, b) c11ut_CMP(a, >, b)
-#define c11ut_LT(a, b) c11ut_CMP(a, <, b)
-#define c11ut_LE(a, b) c11ut_CMP(a, <=, b)
-#define c11ut_GE(a, b) c11ut_CMP(a, >=, b)
+#define EXPECT_EQ(a, b) _c11ut_COMPARE(a, ==, b)
+#define EXPECT_NE(a, b) _c11ut_COMPARE(a, !=, b)
+#define EXPECT_GT(a, b) _c11ut_COMPARE(a, >, b)
+#define EXPECT_LT(a, b) _c11ut_COMPARE(a, <, b)
+#define EXPECT_LE(a, b) _c11ut_COMPARE(a, <=, b)
+#define EXPECT_GE(a, b) _c11ut_COMPARE(a, >=, b)
 
 /* Run a test() function */
-#define c11ut_RUN(test) do {\
-    const int ps = _c11ut_s.passes;\
-    const int fs = _c11ut_s.fails;\
-    const clock_t start = clock();\
-    printf("%s():\n", #test);\
-    test();\
-    printf("    summary: %d/%d passed, duration: %dms\n",\
-            _c11ut_s.passes - ps, _c11ut_s.passes + _c11ut_s.fails - (ps + fs),\
-            (int)((clock() - start) * 1000 / CLOCKS_PER_SEC));\
+#define RUN_TEST(test) do { \
+    const int ps = _c11ut_s.passes; \
+    const int fs = _c11ut_s.fails; \
+    const clock_t start = clock(); \
+    printf("%s():\n", #test); \
+    test(); \
+    printf("    summary: %d/%d passed, duration: %dms\n", \
+            _c11ut_s.passes - ps, _c11ut_s.passes + _c11ut_s.fails - (ps + fs), \
+            (int)((clock() - start) * 1000 / CLOCKS_PER_SEC)); \
 } while (0)
 
-#define c11ut_REPORT() c11ut_report()
+#define REPORT_TESTS() c11ut_report()
 
 /* ----------------------------------------------------------------------------- */
 
-#define _c11ut_COMPARE(a, OP, b) _Generic((a), \
-    const char*: _c11ut_strcmp, char*: _c11ut_strcmp, default: _c11ut_valcmp) \
-    ((a) OP (b), (const char*)(uintptr_t)(a), #OP, (const char*)(uintptr_t)(b))
+#define _c11ut_COMPARE(a, OP, b) \
+    do { if (!_c11ut_assert(__FILE__, __LINE__, #a " " #OP " " #b, _c11ut_CMP(a, OP, b))) { \
+        char _fmt[32]; sprintf(_fmt, ": %s %s %s\n", _c11ut_FMT(a), #OP, _c11ut_FMT(b)); \
+        printf(_fmt, a, b); \
+    }} while (0)
+
+#define _c11ut_CMP(a, OP, b) _Generic((a), \
+    const char*: _c11ut_strcmp, char*: _c11ut_strcmp, \
+    double: _c11ut_dblcmp, float: _c11ut_dblcmp, \
+    default: _c11ut_valcmp)((a) OP (b), #OP, a, b)
 
 #define _c11ut_FMT(a) _Generic((a), \
-    float: "%g", double: "%g", \
-    int64_t: "%" PRId64, int32_t: "%" PRId32, int16_t: "%" PRId16, int8_t: "%" PRId8, \
-    uint64_t: "%" PRIu64, uint32_t: "%" PRIu32, uint16_t: "%" PRIu16, uint8_t: "%" PRIu8, \
-    char*: "%s", const char*: "%s", \
-    void*: "%p")
+    float: "%.8g`f32", double: "%.14g`f64", \
+    int64_t: "%" PRId64 "`i64", int32_t: "%" PRId32 "`i32", int16_t: "%" PRId16 "`i64", int8_t: "%" PRId8 "`i8", \
+    uint64_t: "%" PRIu64 "`u64", uint32_t: "%" PRIu32 "`u32", uint16_t: "%" PRIu16 "`u16", uint8_t: "%" PRIu8 "`u8", \
+    char*: "`%s`", const char*: "`%s`", \
+    default: "{%p}")
 
-static inline int _c11ut_strcmp(int res, const char* a, const char* OP, const char* b) { 
+static inline int _c11ut_strcmp(int res, const char* OP, ...) { 
+    va_list ap;
+    va_start(ap, OP);
+    const char* a = va_arg(ap, const char *);
+    const char* b = va_arg(ap, const char *);
+    va_end(ap);
     int c = strcmp(a, b);
     switch (OP[0]) {
         case '=': return c == 0;
@@ -119,7 +130,24 @@ static inline int _c11ut_strcmp(int res, const char* a, const char* OP, const ch
     }
     return c;
 }
-static inline int _c11ut_valcmp(int res, const char* a, const char* OP, const char* b)
+
+static inline int _c11ut_dblcmp(int res, const char* OP, ...) { 
+    va_list ap;
+    va_start(ap, OP);
+    double a = va_arg(ap, double);
+    double b = va_arg(ap, double);
+    double c = a - b;
+    va_end(ap);
+    switch (OP[0]) {
+        case '=': return fabs(c) < C11UT_FLOAT_LIMIT;
+        case '!': return fabs(c) > C11UT_FLOAT_LIMIT;
+        case '<': return OP[1] == '=' ? c <= 0 : c < 0;
+        case '>': return OP[1] == '=' ? c >= 0 : c > 0;
+    }    
+    return res;
+}
+
+static inline int _c11ut_valcmp(int res, const char* OP, ...)
     { return res; }
 
 #define _c11ut_COLOR_CODE 0x1B
@@ -149,7 +177,7 @@ static int c11ut_report(void) {
         printf("%c%sFAILED%c%s [%s] (passed:%d, failed:%d, total:%d)\n",
                _c11ut_COLOR_CODE, _c11ut_COLOR_RED, _c11ut_COLOR_CODE, _c11ut_COLOR_RESET,
                _c11ut_s.current_file, _c11ut_s.passes, _c11ut_s.fails, _c11ut_s.passes + _c11ut_s.fails);
-        return -1;
+        return -_c11ut_s.fails;
     } else {
         printf("%c%sPASSED%c%s [%s] (total:%d)\n", 
                _c11ut_COLOR_CODE, _c11ut_COLOR_GREEN, _c11ut_COLOR_CODE, _c11ut_COLOR_RESET,
