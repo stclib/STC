@@ -74,7 +74,7 @@
 
 #define EXPECT_TRUE1(expr, v) \
     do { if (!_stctest_assert(__FILE__, __LINE__, #expr, (expr) != 0)) { \
-        char _fmt[32]; sprintf(_fmt, ": %%s = %s\n", _stctest_FMT(v)); \
+        char _fmt[32]; sprintf(_fmt, " :: %%s => %s\n", _stctest_FMT(v)); \
         printf(_fmt, #v, v); \
     }} while (0)
 
@@ -97,11 +97,12 @@
     puts(#test "(" #__VA_ARGS__ "):"); \
     const int ps = _stctest_s.passes; \
     const int fs = _stctest_s.fails; \
-    const clock_t start = clock(); \
+    const clock_t _start = clock(); \
     test(__VA_ARGS__); \
-    printf("    summary: %d/%d passed, duration: %dms\n", \
-            _stctest_s.passes - ps, _stctest_s.passes + _stctest_s.fails - (ps + fs), \
-            (int)((clock() - start) * 1000 / CLOCKS_PER_SEC)); \
+    const int _sum = (clock() - _start)*1000 / CLOCKS_PER_SEC; \
+    _stctest_s.total_ms += _sum; \
+    printf("    passed: %d/%d. duration: %d ms\n", \
+            _stctest_s.passes - ps, _stctest_s.passes + _stctest_s.fails - (ps + fs), _sum); \
 } while (0)
 
 #define REPORT_TESTS() stctest_report()
@@ -110,7 +111,7 @@
 
 #define _stctest_CHECK(a, OP, b, e) \
     do { if (!_stctest_assert(__FILE__, __LINE__, #a " " #OP " " #b, _stctest_CMP(a, OP, b, e))) { \
-        char _fmt[32]; sprintf(_fmt, ": %s %s %s\n", _stctest_FMT(a), #OP, _stctest_FMT(b)); \
+        char _fmt[32]; sprintf(_fmt, " :: %s %s %s\n", _stctest_FMT(a), #OP, _stctest_FMT(b)); \
         printf(_fmt, a, b); \
     }} while (0)
 
@@ -125,7 +126,7 @@
     int64_t: "%" PRId64, int32_t: "%" PRId32, int16_t: "%" PRId16, int8_t: "%" PRId8, \
     uint64_t: "%" PRIu64 "u", uint32_t: "%" PRIu32 "u", uint16_t: "%" PRIu16 "u", uint8_t: "%" PRIu8 "u", \
     char*: "`%s`", const char*: "`%s`", \
-    default: "{%p}")
+    default: "%p")
 
 static int _stctest_strcmp(int res, const char* OP, ...) { 
     va_list ap;
@@ -156,7 +157,7 @@ static int _stctest_dblcmp(int res, const char* OP, ...) {
     va_end(ap);
     if     (OP[0] == '<') return OP[1] == '=' ? c <= 0 : c < 0;
     if     (OP[0] == '>') return OP[1] == '=' ? c >= 0 : c > 0;
-    return (OP[0] == '!') ^ (e < 0 ? approximately_equal(a, b, -e) : (c < 0 ? -c : c) < e);
+    return (OP[0] == '!') ^ (e < 0 ? approximately_equal(a, b, -e) : (c < 0 ? -c : c) <= e);
 }
 
 static int _stctest_valcmp(int res, const char* OP, ...)
@@ -171,6 +172,7 @@ static struct stctest_s {
     int passes;
     int fails;
     const char* current_file;
+    int total_ms;
 } _stctest_s = {0};
 
 static int _stctest_assert(const char* file, int line, const char* expression, int pass) {
@@ -178,7 +180,7 @@ static int _stctest_assert(const char* file, int line, const char* expression, i
         _stctest_s.passes++;
     else {
         _stctest_s.fails++;
-        printf("    failed: %s:%d, In test (%s)", file, line, expression);
+        printf("    failed \"%s:%d\": (%s)", file, line, expression);
     }
     _stctest_s.current_file = file;
     return pass;
@@ -186,16 +188,16 @@ static int _stctest_assert(const char* file, int line, const char* expression, i
 
 static int stctest_report(void) {
     if (_stctest_s.fails) {
-        printf("%c%sFAILED%c%s [%s] (passed:%d, failed:%d, total:%d)\n",
+        printf("%c%sFAILED%c%s: \"%s\": (failed %d, passed %d, total %d)\n",
                _stctest_COLOR_CODE, _stctest_COLOR_RED, _stctest_COLOR_CODE, _stctest_COLOR_RESET,
-               _stctest_s.current_file, _stctest_s.passes, _stctest_s.fails, _stctest_s.passes + _stctest_s.fails);
-        return -_stctest_s.fails;
+               _stctest_s.current_file, _stctest_s.fails, _stctest_s.passes, _stctest_s.passes + _stctest_s.fails);
     } else {
-        printf("%c%sPASSED%c%s [%s] (total:%d)\n", 
+        printf("%c%sPASSED%c%s: \"%s\": (total %d)\n", 
                _stctest_COLOR_CODE, _stctest_COLOR_GREEN, _stctest_COLOR_CODE, _stctest_COLOR_RESET,
                _stctest_s.current_file, _stctest_s.passes);
-        return 0;
     }
+    printf("    duration: %d ms\n", _stctest_s.total_ms); \
+    return -_stctest_s.fails;
 }
 
 #endif
