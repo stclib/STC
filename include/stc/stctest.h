@@ -61,10 +61,11 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <float.h>
 #include <stdarg.h>
 #include <inttypes.h>
 
-#define STCTEST_FLOAT_LIMIT 0.00000001
+#define STCTEST_EPSILON 0.0000001
 
 
 #define EXPECT_TRUE(expr) \
@@ -79,13 +80,15 @@
 #define EXPECT_FALSE(expr) EXPECT_TRUE(!(expr))
 #define EXPECT_FALSE1(expr, v) EXPECT_TRUE1(!(expr), v)
 
+
 /* NB! (char*) are compared as strings. Cast to (void*) to compare pointers only */
-#define EXPECT_EQ(a, b) _stctest_CHECK(a, ==, b)
-#define EXPECT_NE(a, b) _stctest_CHECK(a, !=, b)
-#define EXPECT_GT(a, b) _stctest_CHECK(a, >, b)
-#define EXPECT_LT(a, b) _stctest_CHECK(a, <, b)
-#define EXPECT_LE(a, b) _stctest_CHECK(a, <=, b)
-#define EXPECT_GE(a, b) _stctest_CHECK(a, >=, b)
+#define EXPECT_EQ(a, b) _stctest_CHECK(a, ==, b, 0)
+#define EXPECT_NE(a, b) _stctest_CHECK(a, !=, b, 0)
+#define EXPECT_GT(a, b) _stctest_CHECK(a, >, b, 0)
+#define EXPECT_LT(a, b) _stctest_CHECK(a, <, b, 0)
+#define EXPECT_LE(a, b) _stctest_CHECK(a, <=, b, 0)
+#define EXPECT_GE(a, b) _stctest_CHECK(a, >=, b, 0)
+#define EXPECT_NEAR(a, b, epsilon) _stctest_CHECK(a, ==, b, epsilon)
 
 /* Run a test() function */
 #define RUN_TEST(test, ...) do { \
@@ -103,21 +106,22 @@
 
 /* ----------------------------------------------------------------------------- */
 
-#define _stctest_CHECK(a, OP, b) \
-    do { if (!_stctest_assert(__FILE__, __LINE__, #a " " #OP " " #b, _stctest_CMP(a, OP, b))) { \
+#define _stctest_CHECK(a, OP, b, e) \
+    do { if (!_stctest_assert(__FILE__, __LINE__, #a " " #OP " " #b, _stctest_CMP(a, OP, b, e))) { \
         char _fmt[32]; sprintf(_fmt, ": %s %s %s\n", _stctest_FMT(a), #OP, _stctest_FMT(b)); \
         printf(_fmt, a, b); \
     }} while (0)
 
-#define _stctest_CMP(a, OP, b) _Generic((a), \
+#define _stctest_CMP(a, OP, b, e) _Generic((a), \
     const char*: _stctest_strcmp, char*: _stctest_strcmp, \
-    double: _stctest_dblcmp, float: _stctest_dblcmp, \
-    default: _stctest_valcmp)((a) OP (b), #OP, a, b)
+    double: _Generic((b), double: _stctest_dblcmp, float: _stctest_dblcmp, default: _stctest_valcmp), \
+    float: _Generic((b), double: _stctest_dblcmp, float: _stctest_dblcmp, default: _stctest_valcmp), \
+    default: _stctest_valcmp)((a) OP (b), #OP, a, b, (double)e)
 
 #define _stctest_FMT(a) _Generic((a), \
-    float: "%.8gf", double: "%.14g", \
-    int64_t: "%" PRId64 "'i64", int32_t: "%" PRId32 "'i32", int16_t: "%" PRId16 "'i64", int8_t: "%" PRId8 "'i8", \
-    uint64_t: "%" PRIu64 "'u64", uint32_t: "%" PRIu32 "'u32", uint16_t: "%" PRIu16 "'u16", uint8_t: "%" PRIu8 "'u8", \
+    float: "%.7gf", double: "%.14g", \
+    int64_t: "%" PRId64, int32_t: "%" PRId32, int16_t: "%" PRId16, int8_t: "%" PRId8, \
+    uint64_t: "%" PRIu64 "u", uint32_t: "%" PRIu32 "u", uint16_t: "%" PRIu16 "u", uint8_t: "%" PRIu8 "u", \
     char*: "`%s`", const char*: "`%s`", \
     default: "{%p}")
 
@@ -128,13 +132,16 @@ static int _stctest_strcmp(int res, const char* OP, ...) {
     const char* b = va_arg(ap, const char *);
     va_end(ap);
     int c = strcmp(a, b);
-    switch (OP[0]) {
-        case '=': return c == 0;
-        case '!': return c != 0;
-        case '<': return OP[1] == '=' ? c <= 0 : c < 0;
-        case '>': return OP[1] == '=' ? c >= 0 : c > 0;
-    }
-    return c;
+    if      (OP[0] == '<') return OP[1] == '=' ? c <= 0 : c < 0;
+    else if (OP[0] == '>') return OP[1] == '=' ? c >= 0 : c > 0;
+    return  (OP[0] == '!') ^ (c == 0);
+}
+
+// Knuth:
+static int approximately_equal(double a, double b, double epsilon) {
+    double d = a - b; if (d < 0) d = -d;
+    if (a < 0) a = -a; if (b < 0) b = -b;
+    return d <= ((a < b ? b : a) * epsilon); // (a > b ? b : a) => essentially_equal:
 }
 
 static int _stctest_dblcmp(int res, const char* OP, ...) { 
@@ -142,15 +149,13 @@ static int _stctest_dblcmp(int res, const char* OP, ...) {
     va_start(ap, OP);
     double a = va_arg(ap, double);
     double b = va_arg(ap, double);
-    double c = a - b, abs = c < 0 ? -c : c;
+    double e = va_arg(ap, double);
+    double c = a - b;
     va_end(ap);
-    switch (OP[0]) {
-        case '=': return abs < STCTEST_FLOAT_LIMIT;
-        case '!': return abs > STCTEST_FLOAT_LIMIT;
-        case '<': return OP[1] == '=' ? c <= 0 : c < 0;
-        case '>': return OP[1] == '=' ? c >= 0 : c > 0;
-    }    
-    return res;
+    if      (OP[0] == '<') return OP[1] == '=' ? c <= 0 : c < 0;
+    else if (OP[0] == '>') return OP[1] == '=' ? c >= 0 : c > 0;
+    return  (OP[0] == '!') ^ (e == 0 ? approximately_equal(a, b, STCTEST_EPSILON)
+                                     : (c < 0 ? -c : c) < e);
 }
 
 static int _stctest_valcmp(int res, const char* OP, ...)
