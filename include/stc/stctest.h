@@ -65,7 +65,8 @@
 #include <stdarg.h>
 #include <inttypes.h>
 
-#define STCTEST_EPSILON 0.0000001
+#define STC_FLOAT_EPSILON 1e-7
+#define STC_DOUBLE_EPSILON 1e-13
 
 
 #define EXPECT_TRUE(expr) \
@@ -80,15 +81,16 @@
 #define EXPECT_FALSE(expr) EXPECT_TRUE(!(expr))
 #define EXPECT_FALSE1(expr, v) EXPECT_TRUE1(!(expr), v)
 
-
 /* NB! (char*) are compared as strings. Cast to (void*) to compare pointers only */
-#define EXPECT_EQ(a, b) _stctest_CHECK(a, ==, b, 0)
-#define EXPECT_NE(a, b) _stctest_CHECK(a, !=, b, 0)
-#define EXPECT_GT(a, b) _stctest_CHECK(a, >, b, 0)
-#define EXPECT_LT(a, b) _stctest_CHECK(a, <, b, 0)
-#define EXPECT_LE(a, b) _stctest_CHECK(a, <=, b, 0)
-#define EXPECT_GE(a, b) _stctest_CHECK(a, >=, b, 0)
-#define EXPECT_NEAR(a, b, epsilon) _stctest_CHECK(a, ==, b, epsilon)
+#define EXPECT_EQ(a, b) _stctest_CHECK(a, ==, b, -STC_DOUBLE_EPSILON)
+#define EXPECT_NE(a, b) _stctest_CHECK(a, !=, b, -STC_DOUBLE_EPSILON)
+#define EXPECT_GT(a, b) _stctest_CHECK(a, >, b, -STC_DOUBLE_EPSILON)
+#define EXPECT_LT(a, b) _stctest_CHECK(a, <, b, -STC_DOUBLE_EPSILON)
+#define EXPECT_LE(a, b) _stctest_CHECK(a, <=, b, -STC_DOUBLE_EPSILON)
+#define EXPECT_GE(a, b) _stctest_CHECK(a, >=, b, -STC_DOUBLE_EPSILON)
+#define EXPECT_FLOAT_EQ(a, b) _stctest_CHECK((double)(a), ==, (double)(b), -STC_FLOAT_EPSILON)
+#define EXPECT_DOUBLE_EQ(a, b) _stctest_CHECK((double)(a), ==, (double)(b), -STC_DOUBLE_EPSILON)
+#define EXPECT_NEAR(a, b, abs_error) _stctest_CHECK((double)(a), ==, (double)(b), abs_error)
 
 /* Run a test() function */
 #define RUN_TEST(test, ...) do { \
@@ -116,7 +118,7 @@
     const char*: _stctest_strcmp, char*: _stctest_strcmp, \
     double: _Generic((b), double: _stctest_dblcmp, float: _stctest_dblcmp, default: _stctest_valcmp), \
     float: _Generic((b), double: _stctest_dblcmp, float: _stctest_dblcmp, default: _stctest_valcmp), \
-    default: _stctest_valcmp)((a) OP (b), #OP, a, b, (double)e)
+    default: _stctest_valcmp)((a) OP (b), #OP, a, b, (double)(e))
 
 #define _stctest_FMT(a) _Generic((a), \
     float: "%.7gf", double: "%.14g", \
@@ -154,8 +156,7 @@ static int _stctest_dblcmp(int res, const char* OP, ...) {
     va_end(ap);
     if     (OP[0] == '<') return OP[1] == '=' ? c <= 0 : c < 0;
     if     (OP[0] == '>') return OP[1] == '=' ? c >= 0 : c > 0;
-    return (OP[0] == '!') ^ (e > 0 ? (c < 0 ? -c : c) < e
-                                   : approximately_equal(a, b, STCTEST_EPSILON));
+    return (OP[0] == '!') ^ (e < 0 ? approximately_equal(a, b, -e) : (c < 0 ? -c : c) < e);
 }
 
 static int _stctest_valcmp(int res, const char* OP, ...)
