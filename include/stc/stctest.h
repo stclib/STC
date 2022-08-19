@@ -132,9 +132,9 @@ static int _stctest_strcmp(int res, const char* OP, ...) {
     const char* b = va_arg(ap, const char *);
     va_end(ap);
     int c = strcmp(a, b);
-    if      (OP[0] == '<') return OP[1] == '=' ? c <= 0 : c < 0;
-    else if (OP[0] == '>') return OP[1] == '=' ? c >= 0 : c > 0;
-    return  (OP[0] == '!') ^ (c == 0);
+    if     (OP[0] == '<') return OP[1] == '=' ? c <= 0 : c < 0;
+    if     (OP[0] == '>') return OP[1] == '=' ? c >= 0 : c > 0;
+    return (OP[0] == '!') ^ (c == 0);
 }
 
 // Knuth:
@@ -152,10 +152,10 @@ static int _stctest_dblcmp(int res, const char* OP, ...) {
     double e = va_arg(ap, double);
     double c = a - b;
     va_end(ap);
-    if      (OP[0] == '<') return OP[1] == '=' ? c <= 0 : c < 0;
-    else if (OP[0] == '>') return OP[1] == '=' ? c >= 0 : c > 0;
-    return  (OP[0] == '!') ^ (e == 0 ? approximately_equal(a, b, STCTEST_EPSILON)
-                                     : (c < 0 ? -c : c) < e);
+    if     (OP[0] == '<') return OP[1] == '=' ? c <= 0 : c < 0;
+    if     (OP[0] == '>') return OP[1] == '=' ? c >= 0 : c > 0;
+    return (OP[0] == '!') ^ (e > 0 ? (c < 0 ? -c : c) < e
+                                   : approximately_equal(a, b, STCTEST_EPSILON));
 }
 
 static int _stctest_valcmp(int res, const char* OP, ...)
