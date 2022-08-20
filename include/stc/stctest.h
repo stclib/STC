@@ -65,7 +65,7 @@
 #include <stdarg.h>
 #include <inttypes.h>
 
-#define STC_FLOAT_EPSILON 1e-7
+#define STC_FLOAT_EPSILON 1e-6
 #define STC_DOUBLE_EPSILON 1e-13
 
 
@@ -74,7 +74,7 @@
 
 #define EXPECT_TRUE1(expr, v) \
     do { if (!_stctest_assert(__FILE__, __LINE__, #expr, (expr) != 0)) { \
-        char _fmt[32]; sprintf(_fmt, " :: %%s => %s\n", _stctest_FMT(v)); \
+        char _fmt[32]; sprintf(_fmt, " ; %%s => %s\n", _stctest_FMT(v)); \
         printf(_fmt, #v, v); \
     }} while (0)
 
@@ -111,7 +111,7 @@
 
 #define _stctest_CHECK(a, OP, b, e) \
     do { if (!_stctest_assert(__FILE__, __LINE__, #a " " #OP " " #b, _stctest_CMP(a, OP, b, e))) { \
-        char _fmt[32]; sprintf(_fmt, " :: %s %s %s\n", _stctest_FMT(a), #OP, _stctest_FMT(b)); \
+        char _fmt[32]; sprintf(_fmt, " ; %s %s %s\n", _stctest_FMT(a), #OP, _stctest_FMT(b)); \
         printf(_fmt, a, b); \
     }} while (0)
 
