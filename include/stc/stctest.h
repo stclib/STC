@@ -70,11 +70,11 @@
 
 
 #define EXPECT_TRUE(expr) \
-    do { if (!_stctest_assert(__FILE__, __LINE__, #expr, (expr) != 0)) puts(""); } while(0)
+    do { if (!_stctest_assert(__FILE__, __LINE__, #expr, (expr) != 0)) puts(""); } while (0)
 
 #define EXPECT_TRUE1(expr, v) \
     do { if (!_stctest_assert(__FILE__, __LINE__, #expr, (expr) != 0)) { \
-        char _fmt[32]; sprintf(_fmt, " ; %%s => %s\n", _stctest_FMT(v)); \
+        char _fmt[32]; sprintf(_fmt, " ; %%s --> %s\n", _stctest_FMT(v)); \
         printf(_fmt, #v, v); \
     }} while (0)
 
@@ -88,7 +88,7 @@
 #define EXPECT_LT(a, b) _stctest_CHECK(a, <, b, -STC_DOUBLE_EPSILON)
 #define EXPECT_LE(a, b) _stctest_CHECK(a, <=, b, -STC_DOUBLE_EPSILON)
 #define EXPECT_GE(a, b) _stctest_CHECK(a, >=, b, -STC_DOUBLE_EPSILON)
-#define EXPECT_FLOAT_EQ(a, b) _stctest_CHECK((double)(a), ==, (double)(b), -STC_FLOAT_EPSILON)
+#define EXPECT_FLOAT_EQ(a, b) _stctest_CHECK((float)(a), ==, (float)(b), -STC_FLOAT_EPSILON)
 #define EXPECT_DOUBLE_EQ(a, b) _stctest_CHECK((double)(a), ==, (double)(b), -STC_DOUBLE_EPSILON)
 #define EXPECT_NEAR(a, b, abs_error) _stctest_CHECK((double)(a), ==, (double)(b), abs_error)
 
@@ -122,7 +122,7 @@
     default: _stctest_valcmp)((a) OP (b), #OP, a, b, (double)(e))
 
 #define _stctest_FMT(a) _Generic((a), \
-    float: "%.7gf", double: "%.14g", \
+    float: "%.8gf", double: "%.15g", \
     int64_t: "%" PRId64, int32_t: "%" PRId32, int16_t: "%" PRId16, int8_t: "%" PRId8, \
     uint64_t: "%" PRIu64 "u", uint32_t: "%" PRIu32 "u", uint16_t: "%" PRIu16 "u", uint8_t: "%" PRIu8 "u", \
     char*: "`%s`", const char*: "`%s`", \
