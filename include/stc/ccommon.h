@@ -206,14 +206,6 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
          *b = (n)*sizeof *b > (BYTES) ? c_alloc_n(type, n) : _c_b \
          ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)
 
-// [deprecated] use c_forarray.
-#define c_apply(v, action, T, ...) do { \
-    typedef T _T; \
-    _T _arr[] = __VA_ARGS__, *v = _arr; \
-    const _T *_end = v + c_arraylen(_arr); \
-    while (v != _end) { action; ++v; } \
-} while (0)
-
 #define c_forarray(T, v, ...) \
     for (T _a[] = __VA_ARGS__, *v = _a; v != _a + c_arraylen(_a); ++v)
 
@@ -223,7 +215,6 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #define c_pair(v) (v)->first, (v)->second
 #define c_drop(C, ...) do { c_forarray_p(C*, _p, {__VA_ARGS__}) C##_drop(*_p); } while(0)
 
-// it.ref == NULL when not found:
 #define c_find_if(it, C, cnt, pred) do { \
     size_t index = 0; \
     for (it = C##_begin(&cnt); it.ref && !(pred); C##_next(&it)) \
@@ -237,6 +228,14 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
         ++index; \
     if (it.ref == _endref) it.ref = NULL; \
 } while (0)
+
+#define c_erase_if(it, C, cnt, pred) do { \
+    C##_iter it = C##_begin(&cnt); \
+    while (it.ref) \
+        if (pred) it = C##_erase_at(&cnt, it); \
+        else C##_next(&it); \
+} while (0)
+
 #endif // CCOMMON_H_INCLUDED
 
 #undef STC_API

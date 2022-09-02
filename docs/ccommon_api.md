@@ -211,19 +211,21 @@ c_forrange (int, i, 30, 0, -5) printf(" %d", i);
 // 30 25 20 15 10 5
 ```
 
-### c_find_if, c_find_in
-Search linearily in containers using a predicate
-```
-cvec_i_iter it, it1, it2;
-
+### c_find_if, c_find_in, c_erase_if
+Find or erase linearily in containers using a predicate
+```c
 // Search vec for first value > 2:
-// NOTE: it.ref is NULL if not found
-c_find_if(it, cvec_i, vec, *it.ref > 2);
-if (it.ref) printf("%d\n", *it.ref);
+cvec_i_iter i;
+c_find_if(i, cvec_i, vec, *i.ref > 2);
+if (i.ref) printf("%d\n", *i.ref);
 
-// Search within a range:
+// Search map for a string containing "hello" and erase it:
+cmap_str_iter it, it1 = ..., it2 = ...;
 c_find_in(it, csmap_str, it1, it2, cstr_contains(it.ref, "hello"));
 if (it.ref) cmap_str_erase_at(&map, it);
+
+// Erase all numbers less than 100:
+c_erase_if(k, cvec_i, *k.ref < 100);
 ```
 
 ### c_new, c_alloc, c_alloc_n, c_drop, c_make

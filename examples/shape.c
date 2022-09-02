@@ -7,10 +7,6 @@
 #define c_dyn_cast(T, s) \
     (&T##_api == (s)->api ? (T*)(s) : (T*)0)
 
-#define c_vtable(Api, T, base) \
-    c_static_assert(offsetof(T, base) == 0); \
-    static Api T##_api
-
 // Shape definition
 // ============================================================
 
@@ -54,12 +50,13 @@ typedef struct {
     Point p[3];
 } Triangle;
 
-c_vtable(struct ShapeAPI, Triangle, shape);
+static struct ShapeAPI Triangle_api;
 
 
-Triangle* Triangle_new(Point a, Point b, Point c)
+Triangle Triangle_from(Point a, Point b, Point c)
 {
-    return c_new(Triangle, {{.api=&Triangle_api}, .p={a, b, c}});
+    Triangle t = {{.api=&Triangle_api}, .p={a, b, c}};
+    return t;
 }
 
 static void Triangle_draw(const Shape* shape)
@@ -88,12 +85,13 @@ typedef struct {
     PointVec points;
 } Polygon;
 
-c_vtable(struct ShapeAPI, Polygon, shape);
+static struct ShapeAPI Polygon_api;
 
 
-Polygon* Polygon_new(void)
+Polygon Polygon_init(void)
 {
-    return c_new(Polygon, {{.api=&Polygon_api}, .points=PointVec_init()});
+    Polygon p = {{.api=&Polygon_api}, .points=PointVec_init()};
+    return p;
 }
 
 void Polygon_addPoint(Polygon* self, Point p)
@@ -141,9 +139,9 @@ int main(void)
 {
     c_auto (Shapes, shapes)
     {
-        Triangle* tri1 = Triangle_new((Point){5, 7}, (Point){12, 7}, (Point){12, 20});
-        Polygon* pol1 = Polygon_new();
-        Polygon* pol2 = Polygon_new();
+        Triangle* tri1 = c_new(Triangle, Triangle_from((Point){5, 7}, (Point){12, 7}, (Point){12, 20}));
+        Polygon* pol1 = c_new(Polygon, Polygon_init());
+        Polygon* pol2 = c_new(Polygon, Polygon_init());
 
         c_forarray (Point, p, {{50, 72}, {123, 73}, {127, 201}, {828, 333}})
             Polygon_addPoint(pol1, *p);

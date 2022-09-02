@@ -45,11 +45,8 @@ i_val*              cstack_X_at_mut(cstack_X* self, size_t idx);
 
 i_val*              cstack_X_push(cstack_X* self, i_val value);
 i_val*              cstack_X_emplace(cstack_X* self, i_valraw raw);
-i_val*              cstack_X_push_back(cstack_X* self, i_val value);    // alias for push()
-i_val*              cstack_X_emplace_back(cstack_X* self, i_valraw r);  // alias for emplace()
 
 void                cstack_X_pop(cstack_X* self);
-void                cstack_X_pop_back(cstack_X* self);                  // alias for pop()
 
 cstack_X_iter       cstack_X_begin(const cstack_X* self);
 cstack_X_iter       cstack_X_end(const cstack_X* self);
