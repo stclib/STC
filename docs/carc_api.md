@@ -48,7 +48,7 @@ void        carc_X_reset(carc_X* self);
 void        carc_X_reset_to(carc_X* self, i_val* p);           // assign new carc from ptr. Takes ownership of p.
 
 uint64_t    carc_X_hash(const carc_X* x);                      // hash value
-int         carc_X_cmp(const carc_X* x, const carc_X* y);      // compares pointer addresses if 'i_opt c_no_cmp'
+int         carc_X_cmp(const carc_X* x, const carc_X* y);      // compares pointer addresses if no `i_cmp` is specified.
                                                                // is defined. Otherwise uses 'i_cmp' or default cmp.
 bool        carc_X_eq(const carc_X* x, const carc_X* y);       // carc_X_cmp() == 0
 
@@ -88,7 +88,7 @@ bool        carc_X_value_eq(const i_val* x, const i_val* y);
 #define i_valclone Map_clone
 // override Map_drop(p):
 #define i_valdrop(p) (printf("drop Arc:\n"), Map_drop(p))
-#define i_opt c_no_cmp|c_no_atomic // make it non-atomic sharing.
+#define i_opt c_no_atomic // make it non-atomic sharing.
 #include <stc/carc.h>
 
 #define i_type Stack

@@ -37,7 +37,6 @@ void Person_drop(Person* p) {
 #define i_type ArcPers
 #define i_key Person
 #define i_keydrop Person_drop
-#define i_opt c_no_cmp
 #include <stc/carc.h>
 
 int main() {
@@ -77,6 +76,9 @@ int main() {
 
 #ifndef _i_prefix
 #define _i_prefix carc_
+#endif
+#if !(defined i_cmp || defined i_less || defined i_eq || defined i_hash)
+  #define _i_no_cmp
 #endif
 #include "template.h"
 typedef i_keyraw _cx_raw;
@@ -146,10 +148,10 @@ STC_INLINE void _cx_memb(_reset_to)(_cx_self* self, _cx_value* p) {
     *self = _cx_memb(_from_ptr)(p);
 }
 
-#if !defined _i_no_clone && !defined _i_no_emplace
+#if !defined _i_no_emplace
     STC_INLINE _cx_self _cx_memb(_new)(_cx_raw raw)
         { return _cx_memb(_from)(i_keyfrom(raw)); }
-#endif // !_i_no_clone
+#endif // !_i_no_emplace
 
 // does not use i_keyclone, so OK to always define.
 STC_INLINE _cx_self _cx_memb(_clone)(_cx_self ptr) {
@@ -172,7 +174,7 @@ STC_INLINE void _cx_memb(_take)(_cx_self* self, _cx_self ptr) {
 }
 
 STC_INLINE uint64_t _cx_memb(_value_hash)(const _cx_value* x) {
-    #if c_option(c_no_cmp)
+    #if defined _i_no_cmp
         return c_default_hash(&x);
     #else
         _cx_raw rx = i_keyto(x);
@@ -181,7 +183,7 @@ STC_INLINE uint64_t _cx_memb(_value_hash)(const _cx_value* x) {
 }
 
 STC_INLINE int _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
-    #if c_option(c_no_cmp)
+    #if defined _i_no_cmp
         return c_default_cmp(&x, &y);
     #else
         _cx_raw rx = i_keyto(x), ry = i_keyto(y);
@@ -190,7 +192,7 @@ STC_INLINE int _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
 }
 
 STC_INLINE bool _cx_memb(_value_eq)(const _cx_value* x, const _cx_value* y) {
-    #if c_option(c_no_cmp)
+    #if defined _i_no_cmp
         return x == y;
     #else
         _cx_raw rx = i_keyto(x), ry = i_keyto(y);

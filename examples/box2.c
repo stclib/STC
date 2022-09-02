@@ -18,17 +18,14 @@ struct {
 } typedef Rectangle;
 
 #define i_val Point
-#define i_opt c_no_cmp
 #include <stc/cbox.h> // cbox_Point
 
 #define i_val Rectangle
-#define i_opt c_no_cmp
 #include <stc/cbox.h> // cbox_Rectangle
 
 // Box in box:
 #define i_val_arcbox cbox_Point  // NB: use i_val_arcbox when value is a cbox or carc!
                                  // it will auto define i_valdrop, i_valfrom, and i_cmp.
-#define i_opt c_no_cmp
 #define i_tag BoxPoint
 #include <stc/cbox.h> // cbox_BoxPoint
 

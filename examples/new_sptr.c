@@ -15,7 +15,6 @@ void Person_drop(Person* p) {
 }
 
 #define i_val_bind Person
-#define i_opt c_no_cmp   // makes cmp and hash not required when using _bind
 #define i_tag person
 #include <stc/carc.h>
 

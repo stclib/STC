@@ -101,7 +101,7 @@ STC_API _cx_value*      _cx_memb(_push_node_front)(_cx_self* self, _cx_node* nod
 STC_API _cx_iter        _cx_memb(_insert_at)(_cx_self* self, _cx_iter it, i_key value);
 STC_API _cx_iter        _cx_memb(_erase_at)(_cx_self* self, _cx_iter it);
 STC_API _cx_iter        _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2);
-#if !c_option(c_no_cmp)
+#if !defined _i_no_cmp
 STC_API size_t          _cx_memb(_remove)(_cx_self* self, _cx_raw val);
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw val);
 STC_API int             _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y);
@@ -181,7 +181,7 @@ _cx_memb(_splice_range)(_cx_self* self, _cx_iter it,
     return _cx_memb(_splice)(self, it, &tmp);
 }
 
-#if !c_option(c_no_cmp)
+#if !defined _i_no_cmp
 STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, _cx_raw val) {
     return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), val);
@@ -378,7 +378,7 @@ _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
     return cx;
 }
 
-#if !c_option(c_no_cmp)
+#if !defined _i_no_cmp
 
 STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw val) {

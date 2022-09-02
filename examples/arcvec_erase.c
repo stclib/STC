@@ -6,9 +6,8 @@ void show_drop(int* x) { printf("drop: %d\n", *x); }
 #define i_val int
 #define i_valdrop show_drop
 // carc/cbox will use pointer address comparison of i_val
-// if 'i_opt c_no_cmp' is defined, otherwise i_cmp is used
-// to compare object values. See the two differences by
-// commenting out the next line.
+// if no 'i_cmp' is defined, otherwise 'i_cmp' is used
+// to compare object values.
 #include <stc/carc.h>       // Shared pointer to int
 
 #define i_type Vec

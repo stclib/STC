@@ -147,6 +147,9 @@
 #ifndef i_tag
   #define i_tag i_key
 #endif
+#if c_option(c_no_cmp)
+  #define _i_no_cmp
+#endif
 #if c_option(c_no_clone) || (!defined i_keyclone && (defined i_keydrop || defined i_keyraw))
   #define _i_no_clone
 #endif
@@ -304,6 +307,7 @@
 #undef _i_prefix
 #undef _i_has_from
 #undef _i_key_from_val
+#undef _i_no_cmp
 #undef _i_no_clone
 #undef _i_no_emplace
 #undef _i_no_hash

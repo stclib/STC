@@ -41,7 +41,6 @@ void Person_drop(Person* p) {
 }
 
 #define i_key_bind Person // bind Person clone+drop fn's
-#define i_opt c_no_cmp // compare by .get addresses only
 #define i_type PBox
 #include <stc/cbox.h>
 
@@ -70,6 +69,9 @@ int main() {
 
 #ifndef _i_prefix
 #define _i_prefix cbox_
+#endif
+#if !(defined i_cmp || defined i_less || defined i_eq || defined i_hash)
+  #define _i_no_cmp
 #endif
 #include "template.h"
 typedef i_keyraw _cx_raw;
@@ -147,7 +149,7 @@ STC_INLINE void _cx_memb(_take)(_cx_self* self, _cx_self other) {
 }
 
 STC_INLINE uint64_t _cx_memb(_value_hash)(const _cx_value* x) {
-    #if c_option(c_no_cmp)
+    #if defined _i_no_cmp
         return c_default_hash(&x);
     #else
         _cx_raw rx = i_keyto(x);
@@ -156,7 +158,7 @@ STC_INLINE uint64_t _cx_memb(_value_hash)(const _cx_value* x) {
 }
 
 STC_INLINE int _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
-    #if c_option(c_no_cmp)
+    #if defined _i_no_cmp
         return c_default_cmp(&x, &y);
     #else
         _cx_raw rx = i_keyto(x), ry = i_keyto(y);
@@ -165,7 +167,7 @@ STC_INLINE int _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
 }
 
 STC_INLINE bool _cx_memb(_value_eq)(const _cx_value* x, const _cx_value* y) {
-    #if c_option(c_no_cmp)
+    #if defined _i_no_cmp
         return x == y;
     #else
         _cx_raw rx = i_keyto(x), ry = i_keyto(y);
