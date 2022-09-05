@@ -44,7 +44,6 @@ bool         cstr_empty(const cstr* self);
 char*        cstr_reserve(cstr* self, size_t capacity);               // return pointer to buffer
 void         cstr_resize(cstr* self, size_t len, char fill);
 void         cstr_shrink_to_fit(cstr* self);
-char*        cstr_append_uninit(cstr* self, size_t len);              // return ptr to uninit data
 void         cstr_clear(cstr* self);
 
 char*        cstr_assign(cstr* self, const char* str);
@@ -57,8 +56,8 @@ char*        cstr_append(cstr* self, const char* str);
 char*        cstr_append_n(cstr* self, const char* str, size_t n);    // append n first bytes of str
 char*        cstr_append_sv(cstr* self, csview str);
 char*        cstr_append_s(cstr* self, cstr str);
-int          cstr_append_fmt(const char* fmt, ...);                   // printf() formatting
-char*        cstr_append_uninit(cstr* self, size_t len);              // append len uninitialized bytes
+int          cstr_append_fmt(cstr* self, const char* fmt, ...);       // printf() formatting
+char*        cstr_append_uninit(cstr* self, size_t len);              // return ptr to start of uninited data
 
 void         cstr_insert(cstr* self, size_t pos, const char* ins);
 void         cstr_insert_sv(cstr* self, size_t pos, csview ins);
