@@ -87,6 +87,7 @@ STC_API bool    cstr_getdelim(cstr *self, int delim, FILE *fp);
 STC_API void    cstr_erase(cstr* self, size_t pos, size_t len);
 STC_API void    cstr_u8_erase(cstr* self, size_t bytepos, size_t u8len);
 STC_API cstr    cstr_from_fmt(const char* fmt, ...);
+STC_API int     cstr_append_fmt(cstr* self, const char* fmt, ...);
 STC_API int     cstr_printf(cstr* self, const char* fmt, ...);
 STC_API void    cstr_replace(cstr* self, const char* search, const char* repl, unsigned count);
 STC_API cstr    cstr_replace_sv(csview sv, csview search, csview repl, unsigned count);
@@ -563,13 +564,13 @@ STC_DEF void cstr_u8_erase(cstr* self, const size_t bytepos, const size_t u8len)
 #  pragma warning(disable: 4996)
 #endif
 
-STC_DEF int cstr_vfmt(cstr* self, const char* fmt, va_list args) {
+STC_DEF int cstr_vfmt(cstr* self, size_t start, const char* fmt, va_list args) {
     va_list args2;
     va_copy(args2, args);
     const int n = vsnprintf(NULL, (size_t)0, fmt, args);
-    vsprintf(cstr_reserve(self, n), fmt, args2);
+    vsprintf(cstr_reserve(self, start + n) + start, fmt, args2);
     va_end(args2);
-    _cstr_set_size(self, n);
+    _cstr_set_size(self, start + n);
     return n;
 }
 #if defined(__clang__)
@@ -582,16 +583,24 @@ STC_DEF cstr cstr_from_fmt(const char* fmt, ...) {
     cstr s = cstr_null;
     va_list args;
     va_start(args, fmt);
-    cstr_vfmt(&s, fmt, args);
+    cstr_vfmt(&s, 0, fmt, args);
     va_end(args);
     return s;
+}
+
+STC_DEF int cstr_append_fmt(cstr* self, const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    const int n = cstr_vfmt(self, cstr_size(self), fmt, args);
+    va_end(args);
+    return n;
 }
 
 /* NB! self-data in args is UB */
 STC_DEF int cstr_printf(cstr* self, const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
-    const int n = cstr_vfmt(self, fmt, args);
+    const int n = cstr_vfmt(self, 0, fmt, args);
     va_end(args);
     return n;
 }

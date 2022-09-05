@@ -57,6 +57,7 @@ char*        cstr_append(cstr* self, const char* str);
 char*        cstr_append_n(cstr* self, const char* str, size_t n);    // append n first bytes of str
 char*        cstr_append_sv(cstr* self, csview str);
 char*        cstr_append_s(cstr* self, cstr str);
+int          cstr_append_fmt(const char* fmt, ...);                   // printf() formatting
 char*        cstr_append_uninit(cstr* self, size_t len);              // append len uninitialized bytes
 
 void         cstr_insert(cstr* self, size_t pos, const char* ins);
