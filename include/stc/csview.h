@@ -103,6 +103,11 @@ STC_API csview csview_substr_ex(csview sv, intptr_t pos, size_t n);
 STC_API csview csview_slice_ex(csview sv, intptr_t p1, intptr_t p2);
 STC_API csview csview_token(csview sv, csview sep, size_t* start);
 
+#define c_foreach_token(it, input, sep) \
+    for (struct { csview token, _sep, _inp; size_t start; } \
+          it = {.token=csview_from(input), ._sep=csview_from(sep), ._inp=it.token, .start=0} \
+        ; it.start <= it._inp.size && (it.token = csview_token(it._inp, it._sep, &it.start)).str ; )
+
 /* csview interaction with cstr: */
 #ifdef CSTR_H_INCLUDED
 

@@ -8,8 +8,7 @@ int main() {
         printf("%s\n", cstr_str(&hello));
 
         /* replace second smiley at utf8 codepoint pos 7 */
-        cstr_u8_replace(&hello, cstr_find(&hello, "😀rld"), 1, c_sv("🐨"));
-
+        cstr_u8_replace(&hello, cstr_u8_to_pos(&hello, 7), 1, c_sv("🐨"));
         printf("%s\n", cstr_str(&hello));
 
         cstr_replace(&hello, "🐨", "ø", 1);

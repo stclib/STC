@@ -1,39 +1,23 @@
 #include <stdio.h>
-#include <stc/csview.h>
-
-void print_split(csview input, csview sep)
-{
-    size_t pos = 0;
-    while (pos <= input.size) {
-        csview tok = csview_token(input, sep, &pos);
-        // print non-null-terminated csview
-        printf("[%.*s]\n", c_ARGsv(tok));
-    }
-}
-
+#define i_implement // cstr functions
 #include <stc/cstr.h>
-#define i_val_str
-#include <stc/cstack.h>
-
-cstack_str string_split(csview input, csview sep)
-{
-    cstack_str out = cstack_str_init();
-    size_t pos = 0;
-    while (pos <= input.size) {
-        csview tok = csview_token(input, sep, &pos);
-        cstack_str_push(&out, cstr_from_sv(tok));
-    }
-    return out;
-}
+#include <stc/csview.h>
+#include <stc/cregex.h>
 
 int main()
 {
-    print_split(c_sv("//This is a//double-slash//separated//string"), c_sv("//"));
-    puts("");
-    print_split(c_sv("This has no matching separator"), c_sv("xx"));
-    puts("");
+    puts("Split with c_foreach_token (csview):");
 
-    c_with (cstack_str s = string_split(c_sv("Split,this,,string,now,"), c_sv(",")), cstack_str_drop(&s))
-        c_foreach (i, cstack_str, s)
-            printf("[%s]\n", cstr_str(i.ref));
+    c_foreach_token (i, "Hello World C99!", " ")
+        printf("'%.*s'\n", c_ARGsv(i.token));
+
+
+    puts("\nSplit with c_foreach_match (regex):");
+
+    c_with (cregex re = cregex_from("[^ ]+", 0), cregex_drop(&re))
+        c_foreach_match (i, &re, "  Hello   World      C99! ")
+            printf("'%.*s'\n", c_ARGsv(i.match[0]));
 }
+
+#include "../src/cregex.c"
+#include "../src/utf8code.c"

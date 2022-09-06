@@ -22,7 +22,7 @@ int main()
 
         // extract and convert all numbers in str to floats
         c_foreach_match (i, &re, str)
-            cstack_float_push(&vec, atof(i.ref->str));
+            cstack_float_push(&vec, atof(i.match[0].str));
 
         c_foreach (i, cstack_float, vec)
             printf("  %g\n", *i.ref);

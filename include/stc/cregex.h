@@ -73,12 +73,12 @@ typedef struct {
 typedef struct {
     const cregex* re;
     const char* input;
-    csview ref[cre_MAXCAPTURES];
+    csview match[cre_MAXCAPTURES];
 } cregex_iter;
 
 #define c_foreach_match(it, Re, Input) \
     for (cregex_iter it = {Re, Input}; \
-         cregex_find(it.input, it.re, it.ref, cre_m_next) == cre_success;)
+         cregex_find(it.input, it.re, it.match, cre_m_next) == cre_success;)
 
 static inline
 cregex cregex_init(void) {
