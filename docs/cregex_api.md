@@ -130,19 +130,15 @@ In order to use a callback function in the replace call, see `examples/regex_rep
 To iterate multiple matches in an input string, you may use:
 ```c
 csview match[5] = {0};
-while (cregex_find(input, &re, match, cre_m_next) == cre_success) {
-    c_forrange (int, i, cregex_captures(&re))
-        printf("submatch %d: %.*s\n", i, c_ARGsv(match[i]));
-    puts("");
-}
+while (cregex_find(input, &re, match, cre_m_next) == cre_success)
+    c_forrange (int, k, cregex_captures(&re))
+        printf("submatch %d: %.*s\n", k, c_ARGsv(match[k]));
 ```
-There is also a safe macro that simplifies it a bit:
+There is also a safe macro which simplifies this:
 ```c
-c_foreach_match (m, &re, input) {
-    c_forrange (int, i, cregex_captures(&re))
-        printf("submatch %d: %.*s\n", i, c_ARGsv(m.ref[i]));
-    puts("");
-}
+c_foreach_match (it, &re, input)
+    c_forrange (int, k, cregex_captures(&re))
+        printf("submatch %d: %.*s\n", k, c_ARGsv(it.match[k]));
 ```
 
 ## Using cregex in a project

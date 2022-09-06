@@ -79,6 +79,13 @@ csview          cstr_u8_substr(const cstr* self, size_t bytepos, size_t u8len);
 csview          cstr_slice(const cstr* self, size_t p1, size_t p2);
 csview          cstr_slice_ex(const cstr* s, intptr_t p, intptr_t q);  // negative p or q count from end
 ```
+### Iterate tokens: c_foreach_token, c_foreach_token_sv
+
+To iterate tokens in an input string separated by a string:
+```c
+c_foreach_token (i, "hello, one, two, three", ", ")
+    printf("token: %.*s\n", c_ARGsv(i.token));
+```
 
 #### Helper methods
 ```c
