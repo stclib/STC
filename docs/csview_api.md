@@ -174,12 +174,8 @@ and does not depend on null-terminated strings. *string_split()* function return
 
 void print_split(csview input, csview sep)
 {
-    size_t pos = 0;
-    while (pos <= input.size) {
-        csview tok = csview_token(input, sep, &pos);
-        // print non-null-terminated csview
-        printf("[%.*s]\n", c_ARGsv(tok));
-    }
+    c_foreach_token_sv (i, input, sep)
+        printf("[%.*s]\n", c_ARGsv(i.token));
 }
 
 #include <stc/cstr.h>
@@ -189,11 +185,10 @@ void print_split(csview input, csview sep)
 cstack_str string_split(csview input, csview sep)
 {
     cstack_str out = cstack_str_init();
-    size_t pos = 0;
-    while (pos <= input.size) {
-        csview tok = csview_token(input, sep, &pos);
-        cstack_str_push(&out, cstr_from_sv(tok));
-    }
+    
+    c_foreach_token_sv (i, input, sep)
+        cstack_str_push(&out, cstr_from_sv(i.token));
+
     return out;
 }
 
