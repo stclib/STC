@@ -104,9 +104,9 @@ STC_API csview csview_slice_ex(csview sv, intptr_t p1, intptr_t p2);
 STC_API csview csview_token(csview sv, csview sep, size_t* start);
 
 #define c_foreach_token_sv(it, input, sep) \
-    for (struct { csview token, _sep, _inp; size_t start; } \
-          it = {.token=input, ._sep=sep, ._inp=it.token, .start=0} \
-        ; it.start <= it._inp.size && (it.token = csview_token(it._inp, it._sep, &it.start)).str ; )
+    for (struct { csview _inp, _sep, token; size_t pos; } \
+          it = {._inp=input, ._sep=sep, .token=it._inp, .pos=0} \
+        ; it.pos <= it._inp.size && (it.token = csview_token(it._inp, it._sep, &it.pos)).str ; )
 
 #define c_foreach_token(it, input, sep) \
     c_foreach_token_sv(it, csview_from(input), csview_from(sep))
