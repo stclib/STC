@@ -46,13 +46,13 @@ STC_INLINE _cx_self _cx_memb(_init)(void)
     { return c_make(_cx_self){NULL}; }
 
 STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
-    if (cap != self->size && cap <= self->capacity) return true;
+    if (cap != self->_len && cap <= self->_cap) return true;
     _cx_value *d = (_cx_value *)c_realloc(self->data, cap*sizeof *d);
-    return d ? (self->data = d, self->capacity = cap, true) : false;
+    return d ? (self->data = d, self->_cap = cap, true) : false;
 }
 
 STC_INLINE void _cx_memb(_shrink_to_fit)(_cx_self* self)
-    { _cx_memb(_reserve)(self, self->size); }
+    { _cx_memb(_reserve)(self, self->_len); }
 
 STC_INLINE _cx_self _cx_memb(_with_capacity)(const size_t cap) {
     _cx_self out = {NULL}; _cx_memb(_reserve)(&out, cap);
@@ -61,12 +61,12 @@ STC_INLINE _cx_self _cx_memb(_with_capacity)(const size_t cap) {
 
 STC_INLINE _cx_self _cx_memb(_with_size)(const size_t size, i_key null) {
     _cx_self out = {NULL}; _cx_memb(_reserve)(&out, size);
-    while (out.size < size) out.data[out.size++] = null;
+    while (out._len < size) out.data[out._len++] = null;
     return out;
 }
 
 STC_INLINE void _cx_memb(_clear)(_cx_self* self) {
-    size_t i = self->size; self->size = 0;
+    size_t i = self->_len; self->_len = 0;
     while (i--) { i_keydrop((self->data + i)); }
 }
 
@@ -74,13 +74,13 @@ STC_INLINE void _cx_memb(_drop)(_cx_self* self)
     { _cx_memb(_clear)(self); c_free(self->data); }
 
 STC_INLINE size_t _cx_memb(_size)(const _cx_self* q)
-    { return q->size; }
+    { return q->_len; }
 
 STC_INLINE bool _cx_memb(_empty)(const _cx_self* q)
-    { return !q->size; }
+    { return !q->_len; }
 
 STC_INLINE size_t _cx_memb(_capacity)(const _cx_self* q)
-    { return q->capacity; }
+    { return q->_cap; }
 
 STC_INLINE const _cx_value* _cx_memb(_top)(const _cx_self* self)
     { return &self->data[0]; }
@@ -119,7 +119,7 @@ _cx_memb(_sift_down_)(_cx_value* arr, const size_t idx, const size_t n) {
 
 STC_DEF void
 _cx_memb(_make_heap)(_cx_self* self) {
-    size_t n = self->size;
+    size_t n = self->_len;
     _cx_value *arr = self->data - 1;
     for (size_t k = n/2; k != 0; --k)
         _cx_memb(_sift_down_)(arr, k, n);
@@ -127,9 +127,9 @@ _cx_memb(_make_heap)(_cx_self* self) {
 
 #if !defined _i_no_clone
 STC_DEF _cx_self _cx_memb(_clone)(_cx_self q) {
-    _cx_self out = _cx_memb(_with_capacity)(q.size);
-    for (; out.size < out.capacity; ++q.data)
-        out.data[out.size++] = i_keyclone((*q.data));
+    _cx_self out = _cx_memb(_with_capacity)(q._len);
+    for (; out._len < out._cap; ++q.data)
+        out.data[out._len++] = i_keyclone((*q.data));
     return out;
 }
 #endif
@@ -137,17 +137,17 @@ STC_DEF _cx_self _cx_memb(_clone)(_cx_self q) {
 STC_DEF void
 _cx_memb(_erase_at)(_cx_self* self, const size_t idx) {
     i_keydrop((self->data + idx));
-    const size_t n = --self->size;
+    const size_t n = --self->_len;
     self->data[idx] = self->data[n];
     _cx_memb(_sift_down_)(self->data - 1, idx + 1, n);
 }
 
 STC_DEF void
 _cx_memb(_push)(_cx_self* self, _cx_value value) {
-    if (self->size == self->capacity)
-        _cx_memb(_reserve)(self, self->size*3/2 + 4);
+    if (self->_len == self->_cap)
+        _cx_memb(_reserve)(self, self->_len*3/2 + 4);
     _cx_value *arr = self->data - 1; /* base 1 */
-    size_t c = ++self->size;
+    size_t c = ++self->_len;
     for (; c > 1 && (i_less((&arr[c/2]), (&value))); c /= 2)
         arr[c] = arr[c/2];
     arr[c] = value;

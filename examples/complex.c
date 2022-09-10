@@ -36,9 +36,7 @@ int main() {
 
     c_auto (MapMap, mmap)
     {
-        FloatStack stack = FloatStack_with_capacity(xdim * ydim);
-        memset(stack.data, 0, xdim*ydim*sizeof *stack.data);
-        stack.size = stack.capacity;
+        FloatStack stack = FloatStack_with_size(xdim * ydim, 0);
 
         // Put in some data in stack array
         stack.data[x] = 3.1415927f;
