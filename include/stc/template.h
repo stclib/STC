@@ -273,7 +273,7 @@
 #undef i_cmp
 #undef i_eq
 #undef i_hash
-#undef i_cap
+#undef i_capacity
 #undef i_size
 
 #undef i_val

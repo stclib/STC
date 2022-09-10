@@ -494,7 +494,7 @@ Memory efficiency
     - `CNT_size(const CNT *self)`
     - `CNT_capacity(const CNT *self)`
     - `CNT_empty(const CNT *self)`
-- Now both **cstack** and **cbits** can be used with template `i_cap` parameter: `#define i_cap <NUM>`. They then use fixed sized arrays, and no heap allocated memory.
+- Now both **cstack** and **cbits** can be used with template `i_capacity` parameter: `#define i_capacity <NUM>`. They then use fixed sized arrays, and no heap allocated memory.
 - Renamed *cstr_rename_n()* => *cstr_rename_with_n()* as it could be confused with replacing n instances instead of n bytes.
 - Fixed bug in `csmap.h`: begin() on empty map was not fully initialized.
 

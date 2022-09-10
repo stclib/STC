@@ -34,9 +34,9 @@
 #include "template.h"
 
 #if !c_option(c_is_fwd)
-#ifdef i_cap
+#ifdef i_capacity
   #define _i_no_clone
-  _cx_deftypes(_c_cstack_fixed, _cx_self, i_key, i_cap);
+  _cx_deftypes(_c_cstack_fixed, _cx_self, i_key, i_capacity);
 #else
   _cx_deftypes(_c_cstack_types, _cx_self, i_key);
 #endif
@@ -45,13 +45,13 @@ typedef i_keyraw _cx_raw;
 
 STC_INLINE _cx_self _cx_memb(_init)(void) { 
     _cx_self s; s._len = 0;
-#ifndef i_cap
+#ifndef i_capacity
     s._cap = 0; s.data = NULL;
 #endif
     return s;
 }
 
-#ifdef i_cap
+#ifdef i_capacity
 STC_INLINE void _cx_memb(_inits)(_cx_self* self)
     { self->_len = 0; }
 #else
@@ -78,7 +78,7 @@ STC_INLINE void _cx_memb(_clear)(_cx_self* self) {
 
 STC_INLINE void _cx_memb(_drop)(_cx_self* self) {
     _cx_memb(_clear)(self);
-#ifndef i_cap
+#ifndef i_capacity
     c_free(self->data);
 #endif
 }
@@ -90,16 +90,16 @@ STC_INLINE bool _cx_memb(_empty)(const _cx_self* self)
     { return !self->_len; }
 
 STC_INLINE size_t _cx_memb(_capacity)(const _cx_self* self) { 
-#ifndef i_cap
+#ifndef i_capacity
     return self->_cap; 
 #else
-    return i_cap;
+    return i_capacity;
 #endif
 }
 
 STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, size_t n) {
     if (n < self->_len) return true;
-#ifndef i_cap
+#ifndef i_capacity
     _cx_value *t = (_cx_value *)c_realloc(self->data, n*sizeof *t);
     if (t) { self->_cap = n, self->data = t; return true; }
 #endif

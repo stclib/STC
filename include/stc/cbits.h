@@ -115,7 +115,7 @@ STC_INLINE bool _cbits_disjoint(const uint64_t* set, const uint64_t* other, cons
 
 #define _i_memb(name) c_paste(i_type, name)
 
-#if !defined i_cap // DYNAMIC SIZE BITARRAY
+#if !defined i_capacity // DYNAMIC SIZE BITARRAY
 
 #define _i_assert(x) assert(x)
 #define i_type cbits
@@ -185,19 +185,19 @@ STC_INLINE cbits cbits_with_pattern(const size_t size, const uint64_t pattern) {
     return set;
 }
 
-#else // i_cap: FIXED SIZE BITARRAY
+#else // i_capacity: FIXED SIZE BITARRAY
 
 #define _i_assert(x) (void)0
 #ifndef i_type
-#define i_type c_paste(cbits, i_cap)
+#define i_type c_paste(cbits, i_capacity)
 #endif
 
-struct { uint64_t data64[(i_cap - 1)/64 + 1]; } typedef i_type;
+struct { uint64_t data64[(i_capacity - 1)/64 + 1]; } typedef i_type;
 
 STC_INLINE i_type   _i_memb(_init)(void) { return c_make(i_type){0}; }
 STC_INLINE void     _i_memb(_inits)(i_type* self) {}
 STC_INLINE void     _i_memb(_drop)(i_type* self) {}
-STC_INLINE size_t   _i_memb(_size)(const i_type* self) { return i_cap; }
+STC_INLINE size_t   _i_memb(_size)(const i_type* self) { return i_capacity; }
 STC_INLINE i_type   _i_memb(_move)(i_type* self) { return *self; }
 
 STC_INLINE i_type*  _i_memb(_take)(i_type* self, i_type other)
@@ -213,17 +213,17 @@ STC_INLINE void _i_memb(_set_all)(i_type *self, const bool value);
 STC_INLINE void _i_memb(_set_pattern)(i_type *self, const uint64_t pattern);
 
 STC_INLINE i_type _i_memb(_with_size)(const size_t size, const bool value) {
-    assert(size <= i_cap);
+    assert(size <= i_capacity);
     i_type set; _i_memb(_set_all)(&set, value);
     return set;
 }
 
 STC_INLINE i_type _i_memb(_with_pattern)(const size_t size, const uint64_t pattern) {
-    assert(size <= i_cap);
+    assert(size <= i_capacity);
     i_type set; _i_memb(_set_pattern)(&set, pattern);
     return set;
 }
-#endif // i_cap
+#endif // i_capacity
 
 // COMMON:
 
@@ -304,7 +304,7 @@ STC_INLINE bool _i_memb(_disjoint)(const i_type* self, const i_type* other) {
 #define CBITS_H_INCLUDED
 #undef _i_memb
 #undef _i_assert
-#undef i_cap
+#undef i_capacity
 #undef i_type
 #undef i_opt
 #undef i_header
