@@ -1,5 +1,6 @@
 #define i_implement
 #include <stc/cstr.h>
+#include <stc/csview.h>
 #include <stc/cregex.h>
 #define i_val float
 #include <stc/cstack.h>
@@ -28,7 +29,7 @@ int main()
             printf("  %g\n", *i.ref);
 
         // extracts the numbers only to a comma separated string.
-        nums = cregex_replace_ex(str, &re, " $0,", 0, cre_r_strip, NULL);
+        nums = cregex_replace_sv(&re, csview_from(str), " $0,", 0, cre_r_strip, NULL);
         printf("\n%s\n", cstr_str(&nums));
     }
 }

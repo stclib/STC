@@ -1153,7 +1153,7 @@ regexec(const Reprog *progp,    /* program to run */
 
 static void
 build_subst_string(const char* replace, unsigned nmatch, const csview match[],
-                   bool (*mfun)(int i, csview match, cstr* mstr), cstr* subst) {
+                   bool (*mfun)(int, csview, cstr*), cstr* subst) {
     cstr_buf buf = cstr_buffer(subst);
     unsigned len = 0, cap = buf.cap;
     char* dst = buf.data;
@@ -1208,7 +1208,7 @@ cregex_captures(const cregex* self) {
 }
 
 int
-cregex_find(const char* input, const cregex* re,
+cregex_find(const cregex* re, const char* input,
             csview match[], int mflags) {
     int res = regexec(re->prog, input, cregex_captures(re), match, mflags);
     switch (res) {
@@ -1218,47 +1218,48 @@ cregex_find(const char* input, const cregex* re,
     }
 }
 
-int cregex_find_pt(const char* input, const char* pattern,
-                   csview match[], int cmflags) {
+int
+cregex_find_pattern(const char* pattern, const char* input,
+                    csview match[], int cmflags) {
     cregex re = cregex_init();
     int res = cregex_compile(&re, pattern, cmflags);
     if (res != cre_success) return res;
-    res = cregex_find(input, &re, match, cmflags);
+    res = cregex_find(&re, input, match, cmflags);
     cregex_drop(&re);
     return res;
 }
 
 cstr
-cregex_replace_ex(const char* input, const cregex* re, const char* replace, unsigned count,
-                  int rflags, bool (*mfun)(int i, csview match, cstr* mstr)) {
+cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned count,
+                  int rflags, bool (*mfun)(int, csview, cstr*)) {
     cstr out = cstr_null;
     cstr subst = cstr_null;
-    size_t from = 0;
     csview match[cre_MAXCAPTURES];
     unsigned nmatch = cregex_captures(re);
     if (!count) count = ~0;
     bool copy = !(rflags & cre_r_strip);
 
-    while (count-- && cregex_find(input + from, re, match, 0) == cre_success) {
+    while (count-- && cregex_find_sv(re, input, match) == cre_success) {
         build_subst_string(replace, nmatch, match, mfun, &subst);
-        const size_t pos = match[0].str - input;
-        if (copy) cstr_append_n(&out, input + from, pos - from);
+        const size_t mpos = match[0].str - input.str;
+        if (copy & (mpos > 0)) cstr_append_n(&out, input.str, mpos);
         cstr_append_s(&out, subst);
-        from = pos + match[0].size;
+        input.str = match[0].str + match[0].size;
+        input.size -= mpos + match[0].size;
     }
-    if (copy) cstr_append(&out, input + from);
+    if (copy) cstr_append_sv(&out, input);
     cstr_drop(&subst);
     return out;
 }
 
 cstr
-cregex_replace_pe(const char* input, const char* pattern, const char* replace, unsigned count,
-                  int crflags, bool (*mfun)(int i, csview match, cstr* mstr)) {
+cregex_replace_pattern(const char* pattern, const char* input, const char* replace, unsigned count,
+                       int crflags, bool (*mfun)(int, csview, cstr*)) {
     cregex re = cregex_init();
-    int res = cregex_compile(&re, pattern, crflags);
-    if (res != cre_success)
+    if (cregex_compile(&re, pattern, crflags) != cre_success)
         return cstr_new("[[error: invalid regex pattern]]");
-    cstr out = cregex_replace_ex(input, &re, replace, count, crflags, mfun);
+    csview sv = {input, strlen(input)};
+    cstr out = cregex_replace_sv(&re, sv, replace, count, crflags, mfun);
     cregex_drop(&re);
     return out;
 }
