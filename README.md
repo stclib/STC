@@ -3,18 +3,8 @@
 STC - Smart Template Containers for C
 =====================================
 
-News: Version 4.0 Release Candidate (Aug 2022)
----------------------------------------
-API changes summary V3.8 - V4.0:
-- Added **cregex** with documentation - powerful regular expressions.
-- Updated **cstr**, now always takes self as pointer, like all containers except csview.
-- Updated **cvec**, **cdeq**, changed `*_range*` function names.
-- `c_with`: macro renamed from `c_autovar`, which is deprecated. Like Python's **with** statement.
-- `c_scope`: macro renamed from `c_autoscope`, which is deprecated.
-- `c_defer`: macro renamed from `c_autodefer`, which is deprecated. Like Go's and Zig's **defer**.
-- `c_forrange` with 3 to 5 args: swapped 1st <-> 2nd arg.
-- New `c_forarray` macro to replace usages of `c_apply`, which is removed. 
-- Added back **coption** - command line argument parsing.
+News: Version 4.0 Release Candidate 2 (Sep 2022)
+------------------------------------------------
 - [See detailed changes for version 3](#version-3).
 
 Introduction
@@ -474,6 +464,18 @@ Memory efficiency
 - **carc**: Type size: 2 pointers, one for the data and one for the reference counter.
 
 # Version 3
+
+## API changes summary V3.8 - V4.0
+- Added **cregex** with documentation - powerful regular expressions.
+- Updated **cstr**, now always takes self as pointer, like all containers except csview.
+- Updated **cvec**, **cdeq**, changed `*_range*` function names.
+- `c_with`: macro renamed from `c_autovar`, which is deprecated. Like Python's **with** statement.
+- `c_scope`: macro renamed from `c_autoscope`, which is deprecated.
+- `c_defer`: macro renamed from `c_autodefer`, which is deprecated. Like Go's and Zig's **defer**.
+- `c_forrange` with 3 to 5 args: swapped 1st <-> 2nd arg.
+- New `c_forarray` macro to replace usages of `c_apply`, which is removed. 
+- Added back **coption** - command line argument parsing.
+- [See detailed changes for version 3](#version-3).
 
 ## Changes version 3.8
 - Overhauled some **cstr** and **csview** API:
