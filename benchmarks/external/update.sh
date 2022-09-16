@@ -18,7 +18,7 @@ wget "$tsl_r/robin_growth_policy.h" -O "tsl/robin_growth_policy.h"
 wget "$tsl_r/robin_hash.h"          -O "tsl/robin_hash.h"
 wget "$tsl_r/robin_map.h"           -O "tsl/robin_map.h"
 
-wget "$ktprime/thirdparty/wyhash.h" -O "emhash/wyhash.h"
+#wget "$ktprime/thirdparty/wyhash.h" -O "emhash/wyhash.h"
 wget "$ktprime/hash_table7.hpp" -O "emhash/hash_table7.hpp"
 
 #wget "$tsl_h/hopscotch_growth_policy.h" -O "tsl/hopscotch_growth_policy.h"
