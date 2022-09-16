@@ -29,20 +29,20 @@ void Song_drop(Song* s) {
 // ... and a vector of it
 #define i_type SongVec
 #define i_val_arcbox SongArc
-#include <stc/cvec.h>
+#include <stc/cstack.h>
 
 void example3()
 {
-    c_auto (SongVec, vec, vec2)
+    c_auto (SongVec, vec1, vec2)
     {
         c_forarray (Song, v, {
             Song_from("Bob Dylan", "The Times They Are A Changing"),
             Song_from("Aretha Franklin", "Bridge Over Troubled Water"),
             Song_from("Thalia", "Entre El Mar y Una Estrella")
-        }) SongVec_emplace(&vec, *v);
+        }) SongVec_emplace(&vec1, *v);
 
         // Share all entries in vec with vec2, except Bob Dylan.
-        c_foreach (s, SongVec, vec)
+        c_foreach (s, SongVec, vec1)
             if (!cstr_equals(&s.ref->get->artist, "Bob Dylan"))
                 SongVec_push(&vec2, SongArc_clone(*s.ref));
 
@@ -53,10 +53,10 @@ void example3()
         // SongVec_push(&vec2, SongArc_from(Song_from("Rihanna", "Stay")));
 
         // We now have two vectors with some shared, some unique entries.
-        c_forarray (SongVec, v, {vec, vec2}) {
+        c_forarray (SongVec, v, {vec1, vec2}) {
             puts("VEC:");
             c_foreach (s, SongVec, *v)
-                printf("  %s - %s, REFS: %lu\n", cstr_str(&s.ref->get->artist),
+                printf("  %s - %s, REFS: %ld\n", cstr_str(&s.ref->get->artist),
                                                  cstr_str(&s.ref->get->title),
                                                  *s.ref->use_count);
         }

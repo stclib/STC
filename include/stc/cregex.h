@@ -31,6 +31,7 @@ THE SOFTWARE.
  * shorthand character classes, ++.
  */
 #include <stdbool.h>
+#include <string.h>
 #include "forward.h" // csview 
 
 typedef enum {

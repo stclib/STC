@@ -24,18 +24,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#include <stdlib.h>
-#include <stdint.h>
-#include <stddef.h>
-#include <stdbool.h>
-#include <setjmp.h>
-#include <string.h>
-#include <ctype.h>
-#include <stdio.h>
 #include <stc/cregex.h>
 #include <stc/utf8.h>
 #define i_header
 #include <stc/cstr.h>
+#include <setjmp.h>
+#include <ctype.h>
 
 typedef uint32_t Rune; /* Utf8 code point */
 typedef int32_t Token;
