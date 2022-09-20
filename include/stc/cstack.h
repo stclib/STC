@@ -52,10 +52,10 @@ STC_INLINE _cx_self _cx_memb(_init)(void) {
 }
 
 #ifdef i_capacity
-STC_INLINE void _cx_memb(_inits)(_cx_self* self)
+STC_INLINE void _cx_memb(_create)(_cx_self* self)
     { self->_len = 0; }
 #else
-STC_INLINE void _cx_memb(_inits)(_cx_self* self)
+STC_INLINE void _cx_memb(_create)(_cx_self* self)
     { self->_len = 0; self->_cap = 0; self->data = NULL; }
 
 STC_INLINE _cx_self _cx_memb(_with_capacity)(size_t cap) {
