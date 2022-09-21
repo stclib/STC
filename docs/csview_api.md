@@ -79,11 +79,11 @@ csview          cstr_u8_substr(const cstr* self, size_t bytepos, size_t u8len);
 csview          cstr_slice(const cstr* self, size_t p1, size_t p2);
 csview          cstr_slice_ex(const cstr* s, intptr_t p, intptr_t q);  // negative p or q count from end
 ```
-#### Iterate tokens with *c_foreach_token*, *c_foreach_token_sv*
+#### Iterate tokens with *c_fortoken*, *c_fortoken_sv*
 
 To iterate tokens in an input string separated by a string:
 ```c
-c_foreach_token (i, "hello, one, two, three", ", ")
+c_fortoken (i, "hello, one, two, three", ", ")
     printf("token: %.*s\n", c_ARGsv(i.token));
 ```
 
@@ -174,7 +174,7 @@ and does not depend on null-terminated strings. *string_split()* function return
 
 void print_split(csview input, csview sep)
 {
-    c_foreach_token_sv (i, input, sep)
+    c_fortoken_sv (i, input, sep)
         printf("[%.*s]\n", c_ARGsv(i.token));
 }
 
@@ -186,7 +186,7 @@ cstack_str string_split(csview input, csview sep)
 {
     cstack_str out = cstack_str_init();
     
-    c_foreach_token_sv (i, input, sep)
+    c_fortoken_sv (i, input, sep)
         cstack_str_push(&out, cstr_from_sv(i.token));
 
     return out;

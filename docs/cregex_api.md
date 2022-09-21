@@ -122,9 +122,9 @@ if (cregex_find_pattern(pattern, input, match, 0))
 To compile, use: `gcc first_match.c src/cregex.c src/utf8code.c`.
 In order to use a callback function in the replace call, see `examples/regex_replace.c`.
 
-### Iterate through matches, c_foreach_match
+### Iterate through regex matches, *c_formatch*
 
-To iterate multiple matches in an input string, you may use:
+To iterate multiple matches in an input string, you may use
 ```c
 csview match[5] = {0};
 while (cregex_find(&re, input, match, cre_m_next) == cre_success)
@@ -133,7 +133,7 @@ while (cregex_find(&re, input, match, cre_m_next) == cre_success)
 ```
 There is also a safe macro which simplifies this:
 ```c
-c_foreach_match (it, &re, input)
+c_formatch (it, &re, input)
     c_forrange (int, k, cregex_captures(&re))
         printf("submatch %d: %.*s\n", k, c_ARGsv(it.match[k]));
 ```

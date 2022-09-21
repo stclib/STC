@@ -24,7 +24,7 @@ int main()
         }
         printf("input: %s\n", s[i].input);
 
-        c_foreach_match (j, &re, s[i].input) {
+        c_formatch (j, &re, s[i].input) {
             c_forrange (k, cregex_captures(&re))
                 printf("  submatch %d: %.*s\n", (int)k, c_ARGsv(j.match[k]));
             puts("");

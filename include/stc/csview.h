@@ -31,7 +31,10 @@
 #define             csview_new(literal) c_sv(literal)
 #define             csview_npos  (SIZE_MAX >> 1)
 
-STC_INLINE csview   csview_init() { return csview_null; }
+#define             csview_init() csview_null
+#define             csview_drop(p) (p)
+#define             csview_clone(sv) (sv)
+
 STC_INLINE csview   csview_from(const char* str)
                         { return c_make(csview){str, strlen(str)}; }
 STC_INLINE void     csview_clear(csview* self) { *self = csview_null; }
@@ -103,13 +106,13 @@ STC_API csview csview_substr_ex(csview sv, intptr_t pos, size_t n);
 STC_API csview csview_slice_ex(csview sv, intptr_t p1, intptr_t p2);
 STC_API csview csview_token(csview sv, csview sep, size_t* start);
 
-#define c_foreach_token_sv(it, input, sep) \
-    for (struct { csview _inp, _sep, token; size_t pos; } \
-          it = {._inp=input, ._sep=sep, .token=it._inp, .pos=0} \
+#define c_fortoken_sv(it, input, sep) \
+    for (struct { csview _inp, _sep, token, *ref; size_t pos; } \
+          it = {._inp=input, ._sep=sep, .token=it._inp, .ref=&it.token, .pos=0} \
         ; it.pos <= it._inp.size && (it.token = csview_token(it._inp, it._sep, &it.pos)).str ; )
 
-#define c_foreach_token(it, input, sep) \
-    c_foreach_token_sv(it, csview_from(input), csview_from(sep))
+#define c_fortoken(it, input, sep) \
+    c_fortoken_sv(it, csview_from(input), csview_from(sep))
 
 /* csview interaction with cstr: */
 #ifdef CSTR_H_INCLUDED
