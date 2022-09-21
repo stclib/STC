@@ -162,6 +162,17 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
     for (C##_iter it = start, *_endref = (C##_iter*)(finish).ref \
          ; it.ref != (C##_value*)_endref; C##_next(&it))
 
+#define c_forpred(i, C, cnt, pred) \
+    for (struct {C##_iter it; const C##_value *ref; size_t idx, count;} \
+         i = {.it=C##_begin(&cnt), .ref=i.it.ref, .idx=0, .count=1} \
+         ; i.ref && (pred); C##_next(&i.it), i.ref = i.it.ref, ++i.idx)
+
+#define c_forfilter(...) c_MACRO_OVERLOAD(c_forfilter, __VA_ARGS__)
+#define c_forfilter4(it, C, cnt, filter) \
+    c_forpred(it, C, cnt, true) if (!(filter)) ; else
+#define c_forfilter5(it, C, cnt, filter, pred) \
+    c_forpred(it, C, cnt, pred) if (!((filter) && ++it.count)) ; else
+
 #define c_forpair(key, val, C, cnt) /* structured binding */ \
     for (struct {C##_iter _it; const C##_key* key; C##_mapped* val;} _ = {C##_begin(&cnt)} \
          ; _._it.ref && (_.key = &_._it.ref->first, _.val = &_._it.ref->second) \

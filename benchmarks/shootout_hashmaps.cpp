@@ -35,7 +35,6 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 #define i_key IKey
 #define i_val IValue
 #define i_size uint32_t // optional, enables 2x expand
-#define i_hash(x) (*x * 0xc6a4a7935bd1e99d) // optional
 #define i_tag ii
 #include <stc/cmap.h>
 
