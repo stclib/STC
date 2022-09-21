@@ -59,6 +59,9 @@ char*        cstr_append_s(cstr* self, cstr str);
 int          cstr_append_fmt(cstr* self, const char* fmt, ...);       // printf() formatting
 char*        cstr_append_uninit(cstr* self, size_t len);              // return ptr to start of uninited data
 
+void         cstr_push(cstr* self, const char* chr);                  // append one utf8 char
+void         cstr_pop(cstr* self);                                    // pop one utf8 char
+
 void         cstr_insert(cstr* self, size_t pos, const char* ins);
 void         cstr_insert_sv(cstr* self, size_t pos, csview ins);
 void         cstr_insert_s(cstr* self, size_t pos, cstr ins);

@@ -349,6 +349,16 @@ STC_INLINE char* cstr_copy(cstr* self, cstr s) {
 }
 
 
+STC_INLINE char* cstr_push(cstr* self, const char* chr)
+    { return cstr_append_n(self, chr, utf8_chr_size(chr)); }
+
+STC_INLINE void cstr_pop(cstr* self) {
+    csview sv = cstr_sv(self);
+    const char* s = sv.str + sv.size;
+    while ((*--s & 0xC0) == 0x80) ;
+    _cstr_set_size(self, s - sv.str);
+}
+
 STC_INLINE char* cstr_append(cstr* self, const char* str)
     { return cstr_append_n(self, str, strlen(str)); }
 

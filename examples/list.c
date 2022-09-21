@@ -10,7 +10,6 @@
 #include <stc/crandom.h>
 
 int main() {
-    int k;
     const int n = 2000000;
 
     c_auto (clist_fx, list)
@@ -26,16 +25,15 @@ int main() {
             sum += *i.ref;
         printf("sum %f\n\n", sum);
 
-        k = 0;
-        c_foreach (i, clist_fx, list)
-            if (++k <= 10) printf("%8d: %10f\n", k, *i.ref); else break;
+        c_forloop (i, clist_fx, list, i.idx < 10)
+            printf("%8d: %10f\n", (int)i.idx, *i.ref);
+
         puts("sort");
         clist_fx_sort(&list); // mergesort O(n*log n)
         puts("sorted");
 
-        k = 0;
-        c_foreach (i, clist_fx, list)
-            if (++k <= 10) printf("%8d: %10f\n", k, *i.ref); else break;
+        c_forloop (i, clist_fx, list, i.idx < 10)
+            printf("%8d: %10f\n", (int)i.idx, *i.ref);
         puts("");
 
         clist_fx_clear(&list);

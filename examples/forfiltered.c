@@ -16,7 +16,7 @@ void demo1(void)
             IVec_push(&vec, *v);
 
         c_forfiltered (i, IVec, vec, *i.ref != 80)
-            printf(" %d", *i.ref);            
+            printf(" %d", *i.ref);
 
         puts("");
         c_forfiltered (i, IVec, vec, i.idx >= 3 // drop(3)
@@ -42,13 +42,13 @@ fn main() {
 
 void demo2(void)
 {
-    c_auto (IVec, vec) {
+    c_auto (IVec, vector) {
         int n = 0;
         for (size_t x=1;; ++x)
             if (n == 5) break;
-            else if (x & 1) ++n, IVec_push(&vec, x*x);
+            else if (x & 1) ++n, IVec_push(&vector, x*x);
 
-        c_foreach (i, IVec, vec) printf(" %d", *i.ref);
+        c_foreach (i, IVec, vector) printf(" %d", *i.ref);
         puts("");
     }
 }
@@ -61,7 +61,6 @@ fn main() {
         .collect();
     let words_containing_i: Vec<&str> = words
         .into_iter()
-        .take(2)
         .filter(|word| word.contains("i"))
         .collect();
     println!("{:?}", words_containing_i);
@@ -70,12 +69,12 @@ fn main() {
 void demo3(void)
 {
     c_auto (SVec, words, words_containing_i) {
-        const char* sentence = "This is a sentence in Rust.";
-        c_fortoken(w, sentence, " ")
+        const char* sentence = "This is a sentence in C99.";
+        c_fortoken (w, sentence, " ")
             SVec_push(&words, *w.ref);
 
-        c_forfiltered (w, SVec, words, csview_contains(*w.ref, c_sv("i")),
-                                       w.count < 2) // take(2)
+        c_forfiltered (w, SVec, words, 
+                       csview_contains(*w.ref, c_sv("i")))
             SVec_push(&words_containing_i, *w.ref);
 
         c_foreach (w, SVec, words_containing_i)

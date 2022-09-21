@@ -32,8 +32,8 @@
 #define             csview_npos  (SIZE_MAX >> 1)
 
 #define             csview_init() csview_null
-#define             csview_drop(p) (p)
-#define             csview_clone(sv) (sv)
+#define             csview_drop   c_default_drop
+#define             csview_clone  c_default_clone
 
 STC_INLINE csview   csview_from(const char* str)
                         { return c_make(csview){str, strlen(str)}; }
