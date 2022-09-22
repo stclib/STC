@@ -166,11 +166,15 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #define c_forfilter4(it, C, cnt, filter) \
     c_forfilter5(it, C, cnt, filter, true)
 #define c_forfilter5(it, C, cnt, filter, cond) \
-    c_forloop(it, C, cnt, cond) if (!((filter) && ++it.taken)) ; else
+    c_forfilter_s(it, C, C##_begin(&cnt), filter, cond)
+#define c_forfilter_s(it, C, start, filter, cond) \
+    c_forloop_s(it, C, start, cond) if (!((filter) && ++it.taken)) ; else
 
 #define c_forloop(i, C, cnt, cond) \
+    c_forloop_s(i, C, C##_begin(&cnt), cond)
+#define c_forloop_s(i, C, start, cond) \
     for (struct {C##_iter it; const C##_value *ref; size_t idx, taken;} \
-         i = {.it=C##_begin(&cnt), .ref=i.it.ref, .idx=0, .taken=0} \
+         i = {.it=start, .ref=i.it.ref, .idx=0, .taken=0} \
          ; i.ref && (cond); C##_next(&i.it), i.ref = i.it.ref, ++i.idx)
 
 #define c_forpair(key, val, C, cnt) /* structured binding */ \
