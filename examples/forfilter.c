@@ -19,12 +19,17 @@ void demo1(void)
 
         c_forfilter (i, IVec, vec, *i.ref != 80)
             printf(" %d", *i.ref);
-
         puts("");
-        c_forfilter (i, IVec, vec, i.idx >= 3 // drop(3)
-                                && i.idx != 5
-                                && *i.ref != 7,
-                                   i.taken < 5) // take(5)
+
+        #define flt_drop(i, n) (i.index >= (n))
+        #define flt_remove(i, x) (*i.ref != (x))
+        #define flt_take(i, n) (i.taken < (n))
+        #define flt_even(i) ((*i.ref & 1) == 0)
+
+        c_forfilter (i, IVec, vec, flt_drop(i, 3)
+                                && flt_even(i)
+                                && flt_remove(i, 80)
+                                 , flt_take(i, 5))
             printf(" %d", *i.ref);
         puts("");
     }
@@ -93,7 +98,7 @@ void demo4(void)
         cstr_push(&out, i.ref);
         //cstr_append_sv(&out, i.it.u8.chr);
 
-    printf("%s", cstr_str(&out));
+    printf("%s\n", cstr_str(&out));
 }
 
 
