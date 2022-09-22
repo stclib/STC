@@ -48,10 +48,9 @@ unsigned utf8_encode(char *out, uint32_t c)
 
 uint32_t utf8_peek(const char* s, int pos) {
     int inc = -1;
-    if (pos > 0)
-        pos = -pos, inc = 1;
-    while (pos)
-        pos += (*(s += inc) & 0xC0) != 0x80;
+    if (pos > 0) pos = -pos, inc = 1;
+    while (pos) pos += (*(s += inc) & 0xC0) != 0x80;
+
     utf8_decode_t d = {.state=0};
     do { utf8_decode(&d, (uint8_t)*s++); } while (d.state);
     return d.codep;

@@ -162,15 +162,15 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
     for (C##_iter it = start, *_endref = (C##_iter*)(finish).ref \
          ; it.ref != (C##_value*)_endref; C##_next(&it))
 
-#define c_forfiltered(...) c_MACRO_OVERLOAD(c_forfiltered, __VA_ARGS__)
-#define c_forfiltered4(it, C, cnt, filter) \
-    c_forloop(it, C, cnt, true) if (!(filter)) ; else
-#define c_forfiltered5(it, C, cnt, filter, cond) \
-    c_forloop(it, C, cnt, cond) if (!((filter) && ++it.count)) ; else
+#define c_forfilter(...) c_MACRO_OVERLOAD(c_forfilter, __VA_ARGS__)
+#define c_forfilter4(it, C, cnt, filter) \
+    c_forfilter5(it, C, cnt, filter, true)
+#define c_forfilter5(it, C, cnt, filter, cond) \
+    c_forloop(it, C, cnt, cond) if (!((filter) && ++it.taken)) ; else
 
 #define c_forloop(i, C, cnt, cond) \
-    for (struct {C##_iter it; const C##_value *ref; size_t idx, count;} \
-         i = {.it=C##_begin(&cnt), .ref=i.it.ref, .idx=0, .count=0} \
+    for (struct {C##_iter it; const C##_value *ref; size_t idx, taken;} \
+         i = {.it=C##_begin(&cnt), .ref=i.it.ref, .idx=0, .taken=0} \
          ; i.ref && (cond); C##_next(&i.it), i.ref = i.it.ref, ++i.idx)
 
 #define c_forpair(key, val, C, cnt) /* structured binding */ \
