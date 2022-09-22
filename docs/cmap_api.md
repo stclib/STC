@@ -83,6 +83,7 @@ void                  cmap_X_erase_entry(cmap_X* self, cmap_X_value* entry);
 cmap_X_iter           cmap_X_begin(const cmap_X* self);
 cmap_X_iter           cmap_X_end(const cmap_X* self);
 void                  cmap_X_next(cmap_X_iter* it);
+cmap_X_iter           cmap_X_advance(cmap_X_iter it, size_t n);
 
 cmap_X_value          cmap_X_value_clone(cmap_X_value val);
 cmap_X_raw            cmap_X_value_toraw(cmap_X_value* pval);

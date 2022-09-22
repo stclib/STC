@@ -30,6 +30,14 @@
 #include <string.h>
 #include <assert.h>
 
+#if SIZE_MAX == UINT32_MAX
+   typedef int32_t isize_t;
+#  define ISIZE_MAX INT32_MAX
+#elif SIZE_MAX == UINT64_MAX
+   typedef int64_t isize_t;
+#  define ISIZE_MAX INT64_MAX
+#endif
+
 #if defined(_MSC_VER)
 #  pragma warning(disable: 4116 4996) // unnamed type definition in parentheses
 #  define STC_FORCE_INLINE static __forceinline

@@ -89,7 +89,7 @@ void demo4(void)
 {
     csview s = c_sv("ab123cReAghNGnΩoEp");
     cstr out = cstr_null;
-    c_forfilter (i, csview, s, utf8_isupper(utf8_peek(i.ref, 0)))
+    c_forfilter (i, csview, s, utf8_isupper(utf8_peek(i.ref)))
         cstr_push(&out, i.ref);
         //cstr_append_sv(&out, i.it.u8.chr);
 

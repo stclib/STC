@@ -108,6 +108,7 @@ void         cstr_u8_erase(cstr* self, size_t bytepos, size_t u8len); // erase u
 cstr_iter    cstr_begin(const cstr* self);
 cstr_iter    cstr_end(const cstr* self);
 void         cstr_next(cstr_iter* it);
+cstr_iter    cstr_advance(cstr_iter it, isize_t n);
 
 // utf8 functions requires linking with src/utf8code.c symbols:
 bool         cstr_valid_utf8(const cstr* self);                       // check if str is valid utf8

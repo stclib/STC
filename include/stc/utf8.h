@@ -17,12 +17,12 @@ extern uint32_t utf8_toupper(uint32_t c);
 extern bool     utf8_valid_n(const char* s, size_t nbytes);
 extern int      utf8_icmp_sv(csview s1, csview s2);
 extern unsigned utf8_encode(char *out, uint32_t c);
-extern uint32_t utf8_peek(const char *s, int u8pos);
+extern uint32_t utf8_peek_off(const char *s, int offset);
+
+/* following functions uses src/utf8code.c */
 
 STC_INLINE bool utf8_isupper(uint32_t c) { return utf8_tolower(c) != c; }
 STC_INLINE bool utf8_islower(uint32_t c) { return utf8_toupper(c) != c; }
-
-/* following functions uses src/utf8code.c */
 
 /* decode next utf8 codepoint. https://bjoern.hoehrmann.de/utf-8/decoder/dfa */
 typedef struct { uint32_t state, codep; } utf8_decode_t;
@@ -33,6 +33,12 @@ STC_INLINE uint32_t utf8_decode(utf8_decode_t* d, const uint32_t byte) {
     d->codep = d->state ? (byte & 0x3fu) | (d->codep << 6)
                         : (0xff >> type) & byte;
     return d->state = utf8_dtab[256 + d->state + type];
+}
+
+STC_INLINE uint32_t utf8_peek(const char* s) {
+    utf8_decode_t d = {.state=0};
+    do { utf8_decode(&d, (uint8_t)*s++); } while (d.state);
+    return d.codep;
 }
 
 /* case-insensitive utf8 string comparison */

@@ -1028,8 +1028,8 @@ regexec1(const Reprog *progp,  /* program to run */
                 case NWBOUND:
                     ok = true;
                 case WBOUND: /* fallthrough */
-                    if (ok ^ (s == bol || s == j->eol || ((utf8_isalnum(utf8_peek(s, -1)) || s[-1] == '_')
-                                                        ^ (utf8_isalnum(utf8_peek(s, 0)) || s[0] == '_'))))
+                    if (ok ^ (s == bol || s == j->eol || ((utf8_isalnum(utf8_peek_off(s, -1)) || s[-1] == '_')
+                                                        ^ (utf8_isalnum(utf8_peek(s)) || s[0] == '_'))))
                         continue;
                     break;
                 case NCCLASS:

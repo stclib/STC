@@ -55,6 +55,7 @@ bool            csview_valid_utf8(csview sv);                       // requires 
 csview_iter     csview_begin(const csview* self);
 csview_iter     csview_end(const csview* self);
 void            csview_next(csview_iter* it);                       // utf8 codepoint step, not byte!
+csview_iter     csview_advance(csview_iter it, isize_t n);
 
 // from utf8.h
 size_t          utf8_size(const char *s);
@@ -67,7 +68,8 @@ bool            utf8_valid(const char* s);
 bool            utf8_valid_n(const char* s, size_t nbytes);
 uint32_t        utf8_decode(utf8_decode_t *d, uint8_t byte);        // decode next byte to utf8, return state.
 unsigned        utf8_encode(char *out, uint32_t codepoint);         // encode unicode cp into out buffer
-uint32_t        utf8_peek(const char* s, int pos);                  // codepoint value at utf8 pos (may be negative)
+uint32_t        utf8_peek(const char* s);                           // codepoint value of character at s
+uint32_t        utf8_peek_off(const char* s, int offset);             // codepoint value at utf8 pos (may be negative)
 ```
 
 #### Extended cstr methods

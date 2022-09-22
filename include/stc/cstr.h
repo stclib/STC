@@ -238,6 +238,13 @@ STC_INLINE void cstr_next(cstr_iter* it) {
     it->u8.chr.size = utf8_chr_size(it->ref);
     if (it->ref == it->u8.end) it->ref = NULL;
 }
+STC_INLINE cstr_iter cstr_advance(cstr_iter it, isize_t pos) {
+    int inc = -1;
+    if (pos > 0) pos = -pos, inc = 1;
+    while (pos && it.ref != it.u8.end) pos += (*(it.ref += inc) & 0xC0) != 0x80;
+    it.u8.chr.size = utf8_chr_size(it.ref);
+    return it;
+}
 
 
 STC_INLINE void cstr_clear(cstr* self)
