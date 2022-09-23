@@ -135,7 +135,7 @@ STC_INLINE _cx_value* _cx_memb(_push)(_cx_self* self, _cx_value val) {
 }
 
 STC_INLINE void _cx_memb(_pop)(_cx_self* self)
-    { _cx_value* p = &self->data[--self->_len]; i_keydrop(p); }
+    { assert(!_cx_memb(_empty)(self)); _cx_value* p = &self->data[--self->_len]; i_keydrop(p); }
 
 STC_INLINE const _cx_value* _cx_memb(_at)(const _cx_self* self, size_t idx)
     { assert(idx < self->_len); return self->data + idx; }
