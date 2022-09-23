@@ -39,7 +39,7 @@ int main(void)
         puts("");
 
         int k = 20;
-        c_forrange (intptr_t, i, n-1, 1, -2) {
+        c_forrange (i, intptr_t, n-1, 1, -2) {
             if (k == 0) break;
             else if (cbits_test(&primes, i>>1)) printf("%" PRIdMAX "\n", i), k--;
         }

@@ -50,12 +50,12 @@ void stc_test()
         printf("Built priority queue: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
         printf("%g ", *cpque_f_top(&pq));
  
-        c_forrange (int, i, M) {
+        c_forrange (i, int, M) {
             cpque_f_pop(&pq);
         }
 
         start = clock();
-        c_forrange (int, i, M, N)
+        c_forrange (i, int, M, N)
             cpque_f_pop(&pq);
         printf("\npopped PQ: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
     }

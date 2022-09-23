@@ -106,10 +106,10 @@ Sample test_stc_forward_list() {
 int main(int argc, char* argv[])
 {
     Sample std_s[SAMPLES + 1], stc_s[SAMPLES + 1];
-    c_forrange (int, i, SAMPLES) {
+    c_forrange (i, int, SAMPLES) {
         std_s[i] = test_std_forward_list();
         stc_s[i] = test_stc_forward_list();
-        if (i > 0) c_forrange (int, j, N_TESTS) {
+        if (i > 0) c_forrange (j, int, N_TESTS) {
             if (secs(std_s[i].test[j]) < secs(std_s[0].test[j])) std_s[0].test[j] = std_s[i].test[j];
             if (secs(stc_s[i].test[j]) < secs(stc_s[0].test[j])) stc_s[0].test[j] = stc_s[i].test[j];
             if (stc_s[i].test[j].sum != stc_s[0].test[j].sum) printf("Error in sum: test %d, sample %d\n", i, j);
