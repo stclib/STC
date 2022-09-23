@@ -12,9 +12,7 @@
 #include <stc/cstack.h>
 
 // filters and transforms:
-#define flt_drop(i, n) (i.index >= (n))
 #define flt_remove(i, x) (*i.ref != (x))
-#define flt_take(i, n) (i.count < (n))
 #define flt_even(i) ((*i.ref & 1) == 0)
 #define trf_square(i) (*i.ref * *i.ref)
 
@@ -24,15 +22,16 @@ void demo1(void)
         c_forlist (i, int, {0, 1, 2, 3, 4, 5, 80, 6, 7, 80, 8, 9, 80, 10, 11, 12, 13, 14, 15, 80, 16, 17})
             IVec_push(&vec, *i.ref);
 
-        c_forfilter (i, IVec, vec, *i.ref != 80)
+        c_forfilter (i, IVec, vec, flt_remove(i, 80))
             printf(" %d", *i.ref);
         puts("");
 
         int res, sum = 0;
-        c_forfilter (i, IVec, vec, flt_drop(i, 3)
-                                && flt_even(i)
-                                && flt_remove(i, 80)
-                                 , flt_take(i, 5)) {
+        c_forfilter (i, IVec, vec, c_flt_drop(i, 3)
+                                &&   flt_even(i)
+                                &&   flt_remove(i, 80)
+                              //&& c_flt_take(i, 5)
+                                , c_flt_taketotal(i, 5)) {
             sum += res = trf_square(i);
             printf(" %d", res);
         }

@@ -170,20 +170,29 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
     for (C##_iter it = start, *_endref = (C##_iter*)(finish).ref \
          ; it.ref != (C##_value*)_endref; C##_next(&it))
 
+#define c_FLT_STACK 5
+
+#define c_flt_drop(i, n) (++(i).dropped[(i).dn++] > (n))
+#define c_flt_dropwhile(i, pred) ((i).dropwhile |= !(pred))
+#define c_flt_take(i, n) (++(i).taken[(i).tn++] <= (n))
+#define c_flt_taketotal(i, n) ((i).total < (n))
+
 #define c_forfilter(...) c_MACRO_OVERLOAD(c_forfilter, __VA_ARGS__)
 #define c_forfilter4(it, C, cnt, filter) \
     c_forfilter5(it, C, cnt, filter, true)
 #define c_forfilter5(it, C, cnt, filter, cond) \
     c_forfilter_s(it, C, C##_begin(&cnt), filter, cond)
 #define c_forfilter_s(it, C, start, filter, cond) \
-    c_forwhile_s(it, C, start, cond) if (!((filter) && ++it.count)) ; else
+    c_forwhile_s(it, C, start, cond) if (!((filter) && ++it.total)) ; else
 
 #define c_forwhile(i, C, cnt, cond) \
     c_forwhile_s(i, C, C##_begin(&cnt), cond)
 #define c_forwhile_s(i, C, start, cond) \
-    for (struct {C##_iter it; const C##_value *ref; size_t index, count;} \
+    for (struct {C##_iter it; const C##_value *ref; \
+                 uint32_t index, total, taken[c_FLT_STACK], dropped[c_FLT_STACK]; \
+                 int8_t dn, tn; bool dropwhile;} \
          i = {.it=start, .ref=i.it.ref}; i.ref && (cond) \
-         ; C##_next(&i.it), i.ref = i.it.ref, ++i.index)
+         ; C##_next(&i.it), i.ref = i.it.ref, ++i.index, i.dn=0, i.tn=0)
 
 #define c_forpair(key, val, C, cnt) /* structured binding */ \
     for (struct {C##_iter _it; const C##_key* key; C##_mapped* val;} _ = {C##_begin(&cnt)} \
@@ -199,6 +208,19 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #define c_forrange5(i, itype, start, stop, step) \
     for (itype i=start, _inc=step, _end=(stop) - (0 < _inc) \
          ; (i <= _end) == (0 < _inc); i += _inc)
+
+#define c_forloop(...) c_MACRO_OVERLOAD(c_forloop, __VA_ARGS__)
+#define c_forloop1(stop) c_forloop4(_c_i, size_t, 0, stop)
+#define c_forloop2(i, stop) c_forloop4(i, size_t, 0, stop)
+#define c_forloop3(i, itype, stop) c_forloop4(i, itype, 0, stop)
+#define c_forloop4(i, itype, start, stop) \
+    for (struct {itype val, _end, *ref;} \
+         i = {.val=start, ._end=stop, .ref=&i.val} \
+         ; i.val < i._end; ++i.val)
+#define c_forloop5(i, itype, start, stop, step) \
+    for (struct {itype val, _inc, _end, *ref;} \
+         i = {.val=start, ._inc=step, ._end=(stop) - (0 < i._inc), .ref=&i.val} \
+         ; (i.val > i._end) ^ (i._inc > 0); i.val += i._inc)
 
 #define c_forlist(it, T, ...) \
     for (struct {T* data; T* ref; size_t index;} \
