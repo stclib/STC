@@ -25,14 +25,14 @@ int main() {
             sum += *i.ref;
         printf("sum %f\n\n", sum);
 
-        c_forloop (i, clist_fx, list, i.index < 10)
+        c_forwhile (i, clist_fx, list, i.index < 10)
             printf("%8d: %10f\n", (int)i.index, *i.ref);
 
         puts("sort");
         clist_fx_sort(&list); // mergesort O(n*log n)
         puts("sorted");
 
-        c_forloop (i, clist_fx, list, i.index < 10)
+        c_forwhile (i, clist_fx, list, i.index < 10)
             printf("%8d: %10f\n", (int)i.index, *i.ref);
         puts("");
 
