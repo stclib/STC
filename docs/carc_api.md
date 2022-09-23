@@ -102,20 +102,20 @@ int main()
         // POPULATE s1 with shared pointers to Map:
         Map *map;
 
-        map = Stack_push(&s1, Arc_from(Map_init()))->get; // push empty map to s1.
-        c_forarray (Map_raw, v, { {"Joey", 1990}, {"Mary", 1995}, {"Joanna", 1992}}) {
-            Map_emplace(map, v->first, v->second); // populate it.
+        map = Stack_push(&s1, Arc_make(Map_init()))->get; // push empty map to s1.
+        c_forlist (i, Map_raw, {{"Joey", 1990}, {"Mary", 1995}, {"Joanna", 1992}}) {
+            Map_emplace(map, c_pair(i.ref)); // populate it.
         }
 
-        map = Stack_push(&s1, Arc_from(Map_init()))->get;
-        c_forarray (Map_raw, v, { {"Rosanna", 2001}, {"Brad", 1999}, {"Jack", 1980} }) {
-            Map_emplace(map, v->first, v->second);
+        map = Stack_push(&s1, Arc_make(Map_init()))->get;
+        c_forlist (i, Map_raw, {{"Rosanna", 2001}, {"Brad", 1999}, {"Jack", 1980}}) {
+            Map_emplace(map, c_pair(i.ref));
         }
 
         // POPULATE s2:
-        map = Stack_push(&s2, Arc_from(Map_init()))->get;
-        c_forarray (Map_raw, v, { {"Steve", 1979}, {"Rick", 1974}, {"Tracy", 2003} }) {
-            Map_emplace(map, v->first, v->second);
+        map = Stack_push(&s2, Arc_make(Map_init()))->get;
+        c_forlist (i, Map_raw, {{"Steve", 1979}, {"Rick", 1974}, {"Tracy", 2003}}) {
+            Map_emplace(map, c_pair(i.ref));
         }
         
         // Share two Maps from s1 with s2 by cloning(=sharing) the carcs:

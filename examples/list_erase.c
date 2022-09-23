@@ -9,8 +9,8 @@ int main ()
 {
     c_with (IList L = IList_init(), IList_drop(&L))
     {
-        c_forarray (int, i, {10, 20, 30, 40, 50})
-            IList_push(&L, *i);
+        c_forlist (i, int, {10, 20, 30, 40, 50})
+            IList_push(&L, *i.ref);
 
         c_foreach (x, IList, L)
             printf("%d ", *x.ref);

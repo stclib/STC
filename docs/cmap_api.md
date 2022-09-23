@@ -127,11 +127,11 @@ int main()
     // Create an unordered_map of three strings (that map to strings)
     c_auto (cmap_str, u)
     {
-        c_forarray (cmap_str_raw, v, {
+        c_forlist (i, cmap_str_raw, {
             {"RED", "#FF0000"},
             {"GREEN", "#00FF00"},
             {"BLUE", "#0000FF"}
-        }) cmap_str_emplace(&u, v->first, v->second);
+        }) cmap_str_emplace(&u, c_pair(i.ref));
 
         // Iterate and print keys and values of unordered map
         c_foreach (n, cmap_str, u) {
@@ -173,8 +173,8 @@ int main()
 
     c_auto (cmap_id, idnames)
     {
-        c_forarray (cmap_id_raw, v, { {100, "Red"}, {110, "Blue"} })
-            cmap_id_emplace(&idnames, v->first, v->second);
+        c_forlist (i, cmap_id_raw, { {100, "Red"}, {110, "Blue"} })
+            cmap_id_emplace(&idnames, c_pair(i.ref));
 
         // replace existing mapped value:
         cmap_id_emplace_or_assign(&idnames, 110, "White");

@@ -19,8 +19,8 @@ int main()
 {
     c_auto (Vec, vec)
     {
-        c_forarray (int, v, {2012, 1990, 2012, 2019, 2015})
-            Vec_emplace(&vec, *v);
+        c_forlist (i, int, {2012, 1990, 2012, 2019, 2015})
+            Vec_emplace(&vec, *i.ref);
         
         // clone the second 2012 and push it back.
         // note: cloning make sure that vec.data[2] has ref count 2.

@@ -113,11 +113,11 @@ int main()
     // Create a sorted map of three strings (maps to string)
     c_auto (csmap_str, colors) // RAII
     {
-        c_forarray (csmap_str_raw, v, {
+        c_forlist (i, csmap_str_raw, {
             {"RED", "#FF0000"},
             {"GREEN", "#00FF00"},
             {"BLUE", "#0000FF"}
-        }) csmap_str_emplace(&colors, v->first, v->second);
+        }) csmap_str_emplace(&colors, c_pair(i.ref));
 
         // Iterate and print keys and values of sorted map
         c_foreach (i, csmap_str, colors) {
@@ -159,8 +159,8 @@ int main()
     csmap_id idnames = csmap_id_init();
     c_defer (csmap_id_drop(&idnames)) 
     {
-        c_forarray (csmap_id_raw, v, { {100, "Red"}, {110, "Blue"} })
-            csmap_id_emplace(&idnames, v->first, v->second);
+        c_forlist (i, csmap_id_raw, { {100, "Red"}, {110, "Blue"} })
+            csmap_id_emplace(&idnames, c_pair(i.ref));
 
         // put replaces existing mapped value:
         csmap_id_emplace_or_assign(&idnames, 110, "White");

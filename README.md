@@ -117,17 +117,17 @@ int main(void) {
 }
 ```
 Below is an alternative way to write this code with STC. It uses three
-macros: `c_auto`, `c_forarray`, and `c_foreach`. These macro not only
+macros: `c_auto`, `c_forlist`, and `c_foreach`. These macro not only
 simplifies the code, but more importantly makes it less prone to errors,
 while maintaining readability:
 ```c
 int main() {
     c_auto (FVec, vec) // RAII: init + free at one location in the code.
     {
-        c_forarray (float, v, {10.f, 20.f, 30.f})   // use array literals.
-            FVec_push(&vec, *v);                    // alias for push_back.
+        c_forlist (i, float, {10.f, 20.f, 30.f})   // use array literals.
+            FVec_push(&vec, *i.ref);               // alias for push_back.
 
-        c_foreach (i, FVec, vec)                    // works for all containers.
+        c_foreach (i, FVec, vec)                   // works for all containers.
             printf(" %g", *i.ref);
     }
 }
@@ -473,7 +473,7 @@ Memory efficiency
 - `c_scope`: macro renamed from `c_autoscope`, which is deprecated.
 - `c_defer`: macro renamed from `c_autodefer`, which is deprecated. Like Go's and Zig's **defer**.
 - `c_forrange` with 3 to 5 args: swapped 1st <-> 2nd arg.
-- New `c_forarray` macro to replace usages of `c_apply`, which is removed. 
+- New `c_forlist` macro to replace usages of `c_forarray`/`c_apply`, which is removed. 
 - Added back **coption** - command line argument parsing.
 - [See detailed changes for version 3](#version-3).
 

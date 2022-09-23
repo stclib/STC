@@ -45,8 +45,8 @@ int main()
     c_auto (csmap_istr, m1)
     c_auto (cvec_istr, v)
     {
-        c_forarray (csmap_istr_raw, v, {{40, "Zr"}, {45, "Rh"}})
-            csmap_istr_emplace(&m1, c_pair(v));
+        c_forlist (i, csmap_istr_raw, {{40, "Zr"}, {45, "Rh"}})
+            csmap_istr_emplace(&m1, c_pair(i.ref));
 
         puts("The starting map m1 is (key, value):");
         print_collection_csmap_istr(&m1);

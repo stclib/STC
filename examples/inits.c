@@ -67,7 +67,7 @@ int main(void)
     // CMAP CNT
 
     c_auto (cmap_cnt, countries) {
-        c_forarray (cmap_cnt_raw, v, {
+        c_forlist (i, cmap_cnt_raw, {
             {"Norway", 100},
             {"Denmark", 50},
             {"Iceland", 10},
@@ -76,7 +76,7 @@ int main(void)
             {"Germany", 10},
             {"Spain", 10},
             {"France", 10},
-        }) cmap_cnt_emplace(&countries, v->first, v->second);
+        }) cmap_cnt_emplace(&countries, c_pair(i.ref));
 
         cmap_cnt_emplace(&countries, "Greenland", 0).ref->second += 20;
         cmap_cnt_emplace(&countries, "Sweden", 0).ref->second += 20;
@@ -91,8 +91,8 @@ int main(void)
     // CVEC PAIR
 
     c_auto (cvec_ip, pairs1) {
-        c_forarray (ipair_t, p, {{5, 6}, {3, 4}, {1, 2}, {7, 8}})
-            cvec_ip_push_back(&pairs1, *p);
+        c_forlist (i, ipair_t, {{5, 6}, {3, 4}, {1, 2}, {7, 8}})
+            cvec_ip_push_back(&pairs1, *i.ref);
 
         cvec_ip_sort(&pairs1);
 
@@ -104,8 +104,8 @@ int main(void)
     // CLIST PAIR
 
     c_auto (clist_ip, pairs2) {
-        c_forarray (ipair_t, p, {{5, 6}, {3, 4}, {1, 2}, {7, 8}})
-            clist_ip_push_back(&pairs2, *p);
+        c_forlist (i, ipair_t, {{5, 6}, {3, 4}, {1, 2}, {7, 8}})
+            clist_ip_push_back(&pairs2, *i.ref);
 
         clist_ip_sort(&pairs2);
 

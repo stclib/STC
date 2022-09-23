@@ -11,27 +11,32 @@
 #define i_val_bind csview
 #include <stc/cstack.h>
 
+// filters and transforms:
+#define flt_drop(i, n) (i.index >= (n))
+#define flt_remove(i, x) (*i.ref != (x))
+#define flt_take(i, n) (i.count < (n))
+#define flt_even(i) ((*i.ref & 1) == 0)
+#define trf_square(i) (*i.ref * *i.ref)
+
 void demo1(void)
 {
     c_auto (IVec, vec) {
-        c_forarray (int, v, {0, 1, 2, 3, 4, 5, 80, 6, 7, 80, 8, 9, 80, 10, 11, 12, 13})
-            IVec_push(&vec, *v);
+        c_forlist (i, int, {0, 1, 2, 3, 4, 5, 80, 6, 7, 80, 8, 9, 80, 10, 11, 12, 13, 14, 15, 80, 16, 17})
+            IVec_push(&vec, *i.ref);
 
         c_forfilter (i, IVec, vec, *i.ref != 80)
             printf(" %d", *i.ref);
         puts("");
 
-        #define flt_drop(i, n) (i.index >= (n))
-        #define flt_remove(i, x) (*i.ref != (x))
-        #define flt_take(i, n) (i.taken < (n))
-        #define flt_even(i) ((*i.ref & 1) == 0)
-
+        int res, sum = 0;
         c_forfilter (i, IVec, vec, flt_drop(i, 3)
                                 && flt_even(i)
                                 && flt_remove(i, 80)
-                                 , flt_take(i, 5))
-            printf(" %d", *i.ref);
-        puts("");
+                                 , flt_take(i, 5)) {
+            sum += res = trf_square(i);
+            printf(" %d", res);
+        }
+        printf("\nsum: %d\n", sum);
     }
 }
 
@@ -94,9 +99,12 @@ void demo4(void)
 {
     csview s = c_sv("ab123cReAghNGnΩoEp");
     cstr out = cstr_null;
-    c_forfilter (i, csview, s, utf8_isupper(utf8_peek(i.ref)))
-        cstr_push(&out, i.ref);
-        //cstr_append_sv(&out, i.it.u8.chr);
+
+    c_forfilter (i, csview, s, utf8_isupper(utf8_peek(i.ref))) {
+        char buf[4];
+        utf8_encode(buf, utf8_tolower(utf8_peek(i.ref)));
+        cstr_push(&out, buf);
+    }
 
     printf("%s\n", cstr_str(&out));
 }

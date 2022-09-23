@@ -91,8 +91,8 @@ int main()
     c_auto (IVec, vec)  // declare and init vec, call drop at scope exit
     c_auto (ISet, set)  // similar
     {
-        c_forarray (int, v, {2021, 2012, 2022, 2015})
-            IVec_emplace(&vec, *v); // same as: IVec_push(&vec, IBox_from(*v));
+        c_forlist (i, int, {2021, 2012, 2022, 2015})
+            IVec_emplace(&vec, *i.ref); // same as: IVec_push(&vec, IBox_from(*i.ref));
 
         printf("vec:");
         c_foreach (i, IVec, vec)

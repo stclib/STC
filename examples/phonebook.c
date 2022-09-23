@@ -39,8 +39,8 @@ void print_phone_book(cmap_str phone_book)
 int main(int argc, char **argv)
 {
     c_auto (cset_str, names) {
-        c_forarray_p (const char*, v, {"Hello", "Cool", "True"})
-            cset_str_emplace(&names, *v);
+        c_forlist (i, const char*, {"Hello", "Cool", "True"})
+            cset_str_emplace(&names, *i.ref);
         
         c_foreach (i, cset_str, names)
             printf("%s ", cstr_str(i.ref));
@@ -48,12 +48,12 @@ int main(int argc, char **argv)
     }
 
     c_auto (cmap_str, phone_book) {
-        c_forarray (cmap_str_raw, v, {
+        c_forlist (i, cmap_str_raw, {
             {"Lilia Friedman", "(892) 670-4739"},
             {"Tariq Beltran", "(489) 600-7575"},
             {"Laiba Juarez", "(303) 885-5692"},
             {"Elliott Mooney", "(945) 616-4482"},
-        }) cmap_str_emplace(&phone_book, c_pair(v));
+        }) cmap_str_emplace(&phone_book, c_pair(i.ref));
 
         printf("Phone book:\n");
         print_phone_book(phone_book);

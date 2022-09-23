@@ -35,11 +35,11 @@ void example3()
 {
     c_auto (SongVec, vec1, vec2)
     {
-        c_forarray (Song, v, {
+        c_forlist (i, Song, {
             Song_from("Bob Dylan", "The Times They Are A Changing"),
             Song_from("Aretha Franklin", "Bridge Over Troubled Water"),
             Song_from("Thalia", "Entre El Mar y Una Estrella")
-        }) SongVec_emplace(&vec1, *v);
+        }) SongVec_emplace(&vec1, *i.ref);
 
         // Share all entries in vec with vec2, except Bob Dylan.
         c_foreach (s, SongVec, vec1)
@@ -53,9 +53,9 @@ void example3()
         // SongVec_push(&vec2, SongArc_from(Song_from("Rihanna", "Stay")));
 
         // We now have two vectors with some shared, some unique entries.
-        c_forarray (SongVec, v, {vec1, vec2}) {
+        c_forlist (i, SongVec, {vec1, vec2}) {
             puts("VEC:");
-            c_foreach (s, SongVec, *v)
+            c_foreach (s, SongVec, *i.ref)
                 printf("  %s - %s, REFS: %ld\n", cstr_str(&s.ref->get->artist),
                                                  cstr_str(&s.ref->get->title),
                                                  *s.ref->use_count);

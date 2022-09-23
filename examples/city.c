@@ -51,14 +51,12 @@ int main(void)
     c_auto (Cities, cities, copy)
     c_auto (CityMap, map)
     {
-        c_forarray (City, c, {
+        c_forlist (i, City, {
             {cstr_new("New York"), cstr_new("US"), 4.3, 23.2, 9000000},
             {cstr_new("Paris"), cstr_new("France"), 4.3, 23.2, 9000000},
             {cstr_new("Berlin"), cstr_new("Germany"), 4.3, 23.2, 9000000},
             {cstr_new("London"), cstr_new("UK"), 4.3, 23.2, 9000000},
-        }) {
-            Cities_emplace(&cities, *c);
-        }
+        }) Cities_emplace(&cities, *i.ref);
 
         copy = Cities_clone(cities); // share each element!
 

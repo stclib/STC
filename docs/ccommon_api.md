@@ -138,24 +138,20 @@ from a `c_auto` scope:
     } // for
 ```
 
-### c_forarray, c_forarray_p 
+### c_forlist
 Iterate compound literal array elements
 ```c
 // apply multiple push_backs
-c_forarray (int, v, {1, 2, 3})
-    cvec_i_push_back(&vec, *v);
+c_forlist (i, int, {1, 2, 3})
+    cvec_i_push_back(&vec, *i.ref);
 
 // insert in existing map
-c_forarray (cmap_ii_raw, v, { {4, 5}, {6, 7} })
-    cmap_ii_insert(&map, v->first, v->second);
+c_forlist (i, cmap_ii_raw, { {4, 5}, {6, 7} })
+    cmap_ii_insert(&map, i.ref->first, i.ref->second);
 
-// even define an anonymous struct inside it (no commas allowed)
-c_forarray (struct { int a; int b; }, v, { {1, 2}, {3, 4}, {5, 6} })
-    printf("(%d %d) ", v->a, v->b);
-
-// `c_forarray_p` is required for pointer type elements
-c_forarray_p (const char*, v, {"Hello", "crazy", "world"})
-    cstack_s_push(&stk, *v);
+// even string literals
+c_forlist (i, const char*, {"Hello", "crazy", "world"})
+    cstack_s_push(&stk, *i.ref);
 ```
 
 ### c_foreach, c_forpair
@@ -172,8 +168,8 @@ c_forarray_p (const char*, v, {"Hello", "crazy", "world"})
 #define i_tag ii
 #include <stc/csmap.h>
 ...
-c_forarray (csmap_ii_value, v, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} })
-    csmap_ii_insert(&map, v->first, v->second);
+c_forlist (i, csmap_ii_value, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} })
+    csmap_ii_insert(&map, i.ref->first, i.ref->second);
 
 c_foreach (i, csmap_ii, map)
     printf(" %d", i.ref->first);

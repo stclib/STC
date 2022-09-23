@@ -38,8 +38,8 @@ int main()
         typedef struct {int a; const char* b;} pair;
 
         // list-initialize
-        c_forarray (pair, v, {{2, "foo"}, {2, "bar"}, {3, "baz"}, {1, "abc"}, {5, "def"}})
-            insert(&mmap, v->a, v->b);
+        c_forlist (i, pair, {{2, "foo"}, {2, "bar"}, {3, "baz"}, {1, "abc"}, {5, "def"}})
+            insert(&mmap, i.ref->a, i.ref->b);
         print("#1", mmap);
 
         // insert using value_type
@@ -54,8 +54,8 @@ int main()
         print("#4", mmap);
 
         // insert using initialization_list
-        c_forarray (pair, v, {{5, "one"}, {5, "two"}})
-            insert(&mmap, v->a, v->b);
+        c_forlist (i, pair, {{5, "one"}, {5, "two"}})
+            insert(&mmap, i.ref->a, i.ref->b);
         print("#5", mmap);
 
         // FOLLOWING NOT IN ORIGINAL EXAMPLE:
@@ -65,8 +65,8 @@ int main()
         
 
         Multimap_clear(&mmap);
-        c_forarray (pair, v, {{1, "ä"}, {2, "ё"}, {2, "ö"}, {3, "ü"}})
-            insert(&mmap, v->a, v->b);
+        c_forlist (i, pair, {{1, "ä"}, {2, "ё"}, {2, "ö"}, {3, "ü"}})
+            insert(&mmap, i.ref->a, i.ref->b);
         print("#6", mmap);
     }
 }

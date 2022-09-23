@@ -85,11 +85,11 @@ c_auto (csset_str, fifth)
         c_auto (csset_str, first, second)
         c_auto (csset_str, third, fourth)
         {
-            c_forarray_p (const char*, v, {"red", "green", "blue"})
-                csset_str_emplace(&second, *v);
+            c_forlist (i, const char*, {"red", "green", "blue"})
+                csset_str_emplace(&second, *i.ref);
 
-            c_forarray_p (const char*, v, {"orange", "pink", "yellow"})
-                csset_str_emplace(&third, *v);
+            c_forlist (i, const char*, {"orange", "pink", "yellow"})
+                csset_str_emplace(&third, *i.ref);
 
             csset_str_emplace(&fourth, "potatoes");
             csset_str_emplace(&fourth, "milk");

@@ -37,13 +37,13 @@ int main()
     c_auto (mymap, m2)
     {
         // Fill in some data to test with, one at a time
-        c_forarray (mymap_raw, v, {
+        c_forlist (i, mymap_raw, {
             {10, "Bob"},
             {11, "Rob"},
             {12, "Robert"},
             {13, "Bert"},
             {14, "Bobby"},
-        }) mymap_emplace(&m2, v->first, v->second);
+        }) mymap_emplace(&m2, c_pair(i.ref));
 
         puts("Starting data of map m2 is:");
         printmap(m2);

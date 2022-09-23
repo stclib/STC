@@ -111,8 +111,8 @@ Interleave *push_front()* / *push_back()* then *sort()*:
 int main() {
     DList list = DList_init();
 
-    c_forarray (double, v, {10., 20., 30., 40., 50., 60., 70., 80., 90.})
-        DList_push_back(&list, *v);
+    c_forlist (i, double, {10., 20., 30., 40., 50., 60., 70., 80., 90.})
+        DList_push_back(&list, *i.ref);
 
     c_forrange (int, i, 1, 10) {
         if (i & 1) DList_push_front(&list, (double) i);
@@ -152,8 +152,8 @@ int main ()
 {
     clist_i L = clist_i_init();
 
-    c_forarray (int, v, {10, 20, 30, 40, 50})
-        clist_i_push_back(&L, *v);
+    c_forlist (i, int, {10, 20, 30, 40, 50})
+        clist_i_push_back(&L, *i.ref);
                                                 // 10 20 30 40 50
     clist_i_iter it = clist_i_begin(&L);        // ^
     clist_i_next(&it); 
@@ -189,10 +189,10 @@ Splice `[30, 40]` from *L2* into *L1* before `3`:
 int main() {
     c_auto (clist_i, L1, L2)
     {
-        c_forarray (int, v, {1, 2, 3, 4, 5})
-            clist_i_push_back(&L1, *v);
-        c_forarray (int, v, {10, 20, 30, 40, 50})
-            clist_i_push_back(&L2, *v);
+        c_forlist (i, int, {1, 2, 3, 4, 5})
+            clist_i_push_back(&L1, *i.ref);
+        c_forlist (i, int, {10, 20, 30, 40, 50})
+            clist_i_push_back(&L2, *i.ref);
 
         clist_i_iter i = clist_i_advance(clist_i_begin(&L1), 2);
         clist_i_iter j1 = clist_i_advance(clist_i_begin(&L2), 2), j2 = clist_i_advance(j1, 2);

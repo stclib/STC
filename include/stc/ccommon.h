@@ -176,12 +176,12 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #define c_forfilter5(it, C, cnt, filter, cond) \
     c_forfilter_s(it, C, C##_begin(&cnt), filter, cond)
 #define c_forfilter_s(it, C, start, filter, cond) \
-    c_forloop_s(it, C, start, cond) if (!((filter) && ++it.taken)) ; else
+    c_forloop_s(it, C, start, cond) if (!((filter) && ++it.count)) ; else
 
 #define c_forloop(i, C, cnt, cond) \
     c_forloop_s(i, C, C##_begin(&cnt), cond)
 #define c_forloop_s(i, C, start, cond) \
-    for (struct {C##_iter it; const C##_value *ref; size_t index, taken;} \
+    for (struct {C##_iter it; const C##_value *ref; size_t index, count;} \
          i = {.it=start, .ref=i.it.ref}; i.ref && (cond) \
          ; C##_next(&i.it), i.ref = i.it.ref, ++i.index)
 
@@ -199,6 +199,17 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
     for (itype i=start, _inc=step, _end=(stop) - (0 < _inc) \
          ; (i <= _end) == (0 < _inc); i += _inc)
 
+#define c_forlist(it, T, ...) \
+    for (struct {T* data; T* ref; size_t index;} \
+         it = {.data=(T[])__VA_ARGS__, .ref=it.data} \
+         ; it.ref != &it.data[c_arraylen(((T[])__VA_ARGS__))] \
+         ; ++it.ref, ++it.index)
+
+// [deprecated] - replaced by c_forlist():
+#define c_forarray(T, v, ...) \
+    for (T _a[] = __VA_ARGS__, *v = _a; v != _a + c_arraylen(_a); ++v)
+#define c_forarray_p(T, v, ...) \
+    for (T _a[] = __VA_ARGS__, **v = _a; v != _a + c_arraylen(_a); ++v)
 #define c_autovar c_with    // [deprecated]
 #define c_autoscope c_scope // [deprecated]
 #define c_autodefer c_defer // [deprecated]
@@ -229,14 +240,8 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
          *b = (n)*sizeof *b > (BYTES) ? c_alloc_n(type, n) : _c_b \
          ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)
 
-#define c_forarray(T, v, ...) \
-    for (T _a[] = __VA_ARGS__, *v = _a; v != _a + c_arraylen(_a); ++v)
-
-#define c_forarray_p(T, v, ...) \
-    for (T _a[] = __VA_ARGS__, **v = _a; v != _a + c_arraylen(_a); ++v)
-
 #define c_pair(v) (v)->first, (v)->second
-#define c_drop(C, ...) do { c_forarray_p(C*, _p, {__VA_ARGS__}) C##_drop(*_p); } while(0)
+#define c_drop(C, ...) do { c_forlist (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
 
 #define c_find_if(it, C, cnt, pred) do { \
     size_t index = 0; \

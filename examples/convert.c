@@ -17,11 +17,11 @@ int main()
     c_auto (cvec_str, keys, values)
     c_auto (clist_str, list)
     {
-        c_forarray (cmap_str_raw, v, {
+        c_forlist (i, cmap_str_raw, {
             {"green", "#00ff00"},
             {"blue", "#0000ff"},
             {"yellow", "#ffff00"},
-        }) cmap_str_emplace(&map, c_pair(v));
+        }) cmap_str_emplace(&map, c_pair(i.ref));
 
         puts("MAP:");
         c_foreach (i, cmap_str, map)

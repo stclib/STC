@@ -111,8 +111,8 @@ int main() {
         printf(" %d", *i.ref);
     puts("");
 
-    c_forarray (int, v, {1, 4, 5, 22, 33, 2})
-        cdeq_i_push_back(&q, *v)
+    c_forlist (i, int, {1, 4, 5, 22, 33, 2})
+        cdeq_i_push_back(&q, *i.ref)
 
     c_foreach (i, cdeq_i, q)
         printf(" %d", *i.ref);
