@@ -53,7 +53,7 @@ int main(void) {
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>
-#define _cmap_inits {0.85f}
+#define _cmap_inits {.max_load_factor=0.85f}
 typedef struct      { size_t idx; uint8_t hx; } chash_bucket_t;
 #endif // CMAP_H_INCLUDED
 

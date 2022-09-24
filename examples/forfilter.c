@@ -31,9 +31,10 @@ void demo1(void)
                                 &&   flt_even(i)
                                 &&   flt_remove(i, 80)
                               //&& c_flt_take(i, 5)
-                                , c_flt_taketotal(i, 5)) {
+                                 , c_flt_take(i, 5)
+        ){
             sum += res = trf_square(i);
-            printf(" %d", res);
+            printf(" %d:%d", *i.ref, res);
         }
         printf("\nsum: %d\n", sum);
     }

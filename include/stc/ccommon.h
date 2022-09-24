@@ -170,29 +170,33 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
     for (C##_iter it = start, *_endref = (C##_iter*)(finish).ref \
          ; it.ref != (C##_value*)_endref; C##_next(&it))
 
-#define c_FLT_STACK 5
+#ifndef c_FLT_STACK
+#define c_FLT_STACK 4
+#endif
 
 #define c_flt_drop(i, n) (++(i).dropped[(i).dn++] > (n))
 #define c_flt_dropwhile(i, pred) ((i).dropwhile |= !(pred))
 #define c_flt_take(i, n) (++(i).taken[(i).tn++] <= (n))
-#define c_flt_taketotal(i, n) ((i).total < (n))
 
 #define c_forfilter(...) c_MACRO_OVERLOAD(c_forfilter, __VA_ARGS__)
 #define c_forfilter4(it, C, cnt, filter) \
-    c_forfilter5(it, C, cnt, filter, true)
-#define c_forfilter5(it, C, cnt, filter, cond) \
-    c_forfilter_s(it, C, C##_begin(&cnt), filter, cond)
-#define c_forfilter_s(it, C, start, filter, cond) \
-    c_forwhile_s(it, C, start, cond) if (!((filter) && ++it.total)) ; else
+    c_forfilter_s(it, C, C##_begin(&cnt), filter)
+#define c_forfilter5(it, C, cnt, filter, loopwhile) \
+    c_forfilter_s(it, C, C##_begin(&cnt), filter) if (!(loopwhile)) break; else
+#define c_forfilter_s(it, C, start, filter) \
+    c_foreach_s(it, C, start) if (!(filter)) ; else
+
+#define c_foreach_s(i, C, start) \
+    for (struct {C##_iter it; const C##_value *ref; \
+                 uint32_t index, taken[c_FLT_STACK+1], dropped[c_FLT_STACK]; \
+                 int8_t dn, tn; bool dropwhile;} \
+         i = {.it=start, .ref=i.it.ref}; i.ref \
+         ; C##_next(&i.it), i.ref = i.it.ref, ++i.index, i.dn=0, i.tn=0)
 
 #define c_forwhile(i, C, cnt, cond) \
-    c_forwhile_s(i, C, C##_begin(&cnt), cond)
-#define c_forwhile_s(i, C, start, cond) \
-    for (struct {C##_iter it; const C##_value *ref; \
-                 uint32_t index, total, taken[c_FLT_STACK], dropped[c_FLT_STACK]; \
-                 int8_t dn, tn; bool dropwhile;} \
-         i = {.it=start, .ref=i.it.ref}; i.ref && (cond) \
-         ; C##_next(&i.it), i.ref = i.it.ref, ++i.index, i.dn=0, i.tn=0)
+    for (struct {C##_iter it; const C##_value *ref; size_t index;} \
+         i = {.it=C##_begin(&cnt), .ref=i.it.ref}; i.ref && (cond) \
+         ; C##_next(&i.it), i.ref = i.it.ref, ++i.index)
 
 #define c_forpair(key, val, C, cnt) /* structured binding */ \
     for (struct {C##_iter _it; const C##_key* key; C##_mapped* val;} _ = {C##_begin(&cnt)} \
@@ -209,33 +213,11 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
     for (itype i=start, _inc=step, _end=(stop) - (0 < _inc) \
          ; (i <= _end) == (0 < _inc); i += _inc)
 
-#define c_forloop(...) c_MACRO_OVERLOAD(c_forloop, __VA_ARGS__)
-#define c_forloop1(stop) c_forloop4(_c_i, size_t, 0, stop)
-#define c_forloop2(i, stop) c_forloop4(i, size_t, 0, stop)
-#define c_forloop3(i, itype, stop) c_forloop4(i, itype, 0, stop)
-#define c_forloop4(i, itype, start, stop) \
-    for (struct {itype val, _end, *ref;} \
-         i = {.val=start, ._end=stop, .ref=&i.val} \
-         ; i.val < i._end; ++i.val)
-#define c_forloop5(i, itype, start, stop, step) \
-    for (struct {itype val, _inc, _end, *ref;} \
-         i = {.val=start, ._inc=step, ._end=(stop) - (0 < i._inc), .ref=&i.val} \
-         ; (i.val > i._end) ^ (i._inc > 0); i.val += i._inc)
-
 #define c_forlist(it, T, ...) \
     for (struct {T* data; T* ref; size_t index;} \
          it = {.data=(T[])__VA_ARGS__, .ref=it.data} \
          ; it.ref != &it.data[c_arraylen(((T[])__VA_ARGS__))] \
          ; ++it.ref, ++it.index)
-
-// [deprecated] - replaced by c_forlist():
-#define c_forarray(T, v, ...) \
-    for (T _a[] = __VA_ARGS__, *v = _a; v != _a + c_arraylen(_a); ++v)
-#define c_forarray_p(T, v, ...) \
-    for (T _a[] = __VA_ARGS__, **v = _a; v != _a + c_arraylen(_a); ++v)
-#define c_autovar c_with    // [deprecated]
-#define c_autoscope c_scope // [deprecated]
-#define c_autodefer c_defer // [deprecated]
 
 #define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
 #define c_with2(declvar, drop) for (declvar, **_c_i = NULL; !_c_i; ++_c_i, drop)
