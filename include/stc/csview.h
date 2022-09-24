@@ -91,6 +91,7 @@ STC_INLINE csview_iter csview_advance(csview_iter it, isize_t pos) {
     if (pos > 0) pos = -pos, inc = 1;
     while (pos && it.ref != it.u8.end) pos += (*(it.ref += inc) & 0xC0) != 0x80;
     it.u8.chr.size = utf8_chr_size(it.ref);
+    if (it.ref == it.u8.end) it.ref = NULL;
     return it;
 }
 

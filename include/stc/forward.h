@@ -42,23 +42,27 @@
 #define forward_cqueue(CX, VAL) _c_cdeq_types(CX, VAL)
 #define forward_cvec(CX, VAL) _c_cvec_types(CX, VAL)
 
-typedef struct { char* data; size_t size, cap; } cstr_buf;
+typedef const char csview_value;
+typedef struct { csview_value* str; size_t size; } csview;
+typedef union { 
+    csview_value* ref; 
+    struct { csview chr; csview_value* end; } u8;
+} csview_iter;
+
 typedef char cstr_value;
+typedef struct { cstr_value* data; size_t size, cap; } cstr_buf;
 #if defined STC_CSTR_V1
-    typedef struct { char* str; } cstr;
+    typedef struct { cstr_value* str; } cstr;
 #else
     typedef union {
-        struct { char data[sizeof(cstr_buf) - 1]; unsigned char last; } sml;
-        struct { char* data; size_t size, ncap; } lon;
+        struct { cstr_value data[sizeof(cstr_buf) - 1]; unsigned char last; } sml;
+        struct { cstr_value* data; size_t size, ncap; } lon;
     } cstr;
 #endif
-
-typedef struct { const char* str; size_t size; } csview;
-typedef char csview_value;
 typedef union { 
-    const char *ref; 
-    struct { csview chr; const char *end; } u8;
-} csview_iter, cstr_iter;
+    cstr_value* ref; 
+    struct { csview chr; } u8;
+} cstr_iter;
 
 #define c_true(...) __VA_ARGS__
 #define c_false(...)

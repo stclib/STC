@@ -227,22 +227,22 @@ STC_INLINE csview cstr_u8_chr(const cstr* self, size_t u8idx) {
 STC_INLINE cstr_iter cstr_begin(const cstr* self) { 
     csview sv = cstr_sv(self);
     if (!sv.size) return c_make(cstr_iter){NULL};
-    return c_make(cstr_iter){.u8 = {{sv.str, utf8_chr_size(sv.str)}, sv.str + sv.size}};
+    return c_make(cstr_iter){.u8 = {{sv.str, utf8_chr_size(sv.str)}}};
 }
 STC_INLINE cstr_iter cstr_end(const cstr* self) {
-    csview sv = cstr_sv(self);
-    return c_make(cstr_iter){.u8 = {{NULL}, sv.str + sv.size}};
+    return c_make(cstr_iter){NULL};
 }
 STC_INLINE void cstr_next(cstr_iter* it) {
     it->ref += it->u8.chr.size;
     it->u8.chr.size = utf8_chr_size(it->ref);
-    if (it->ref == it->u8.end) it->ref = NULL;
+    if (!*it->ref) it->ref = NULL;
 }
 STC_INLINE cstr_iter cstr_advance(cstr_iter it, isize_t pos) {
     int inc = -1;
     if (pos > 0) pos = -pos, inc = 1;
-    while (pos && it.ref != it.u8.end) pos += (*(it.ref += inc) & 0xC0) != 0x80;
+    while (pos && *it.ref) pos += (*(it.ref += inc) & 0xC0) != 0x80;
     it.u8.chr.size = utf8_chr_size(it.ref);
+    if (!*it.ref) it.ref = NULL;
     return it;
 }
 

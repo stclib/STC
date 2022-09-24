@@ -187,14 +187,14 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
     c_foreach_s(it, C, start) if (!(filter)) ; else
 
 #define c_foreach_s(i, C, start) \
-    for (struct {C##_iter it; const C##_value *ref; \
+    for (struct {C##_iter it; C##_value *ref; \
                  uint32_t index, taken[c_FLT_STACK+1], dropped[c_FLT_STACK]; \
                  int8_t dn, tn; bool dropwhile;} \
          i = {.it=start, .ref=i.it.ref}; i.ref \
          ; C##_next(&i.it), i.ref = i.it.ref, ++i.index, i.dn=0, i.tn=0)
 
 #define c_forwhile(i, C, cnt, cond) \
-    for (struct {C##_iter it; const C##_value *ref; size_t index;} \
+    for (struct {C##_iter it; C##_value *ref; size_t index;} \
          i = {.it=C##_begin(&cnt), .ref=i.it.ref}; i.ref && (cond) \
          ; C##_next(&i.it), i.ref = i.it.ref, ++i.index)
 
@@ -210,8 +210,8 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #define c_forrange4(i, itype, start, stop) \
     for (itype i=start, _end=stop; i < _end; ++i)
 #define c_forrange5(i, itype, start, stop, step) \
-    for (itype i=start, _inc=step, _end=(stop) - (0 < _inc) \
-         ; (i <= _end) == (0 < _inc); i += _inc)
+    for (itype i=start, _inc=step, _end=(stop) - (_inc > 0) \
+         ; (_inc > 0) ^ (i > _end); i += _inc)
 
 #define c_forlist(it, T, ...) \
     for (struct {T* data; T* ref; size_t index;} \
