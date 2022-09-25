@@ -86,7 +86,7 @@ STC_INLINE void csview_next(csview_iter* it) {
     it->u8.chr.size = utf8_chr_size(it->ref);
     if (it->ref == it->u8.end) it->ref = NULL;
 }
-STC_INLINE csview_iter csview_advance(csview_iter it, isize_t pos) {
+STC_INLINE csview_iter csview_advance(csview_iter it, intptr_t pos) {
     int inc = -1;
     if (pos > 0) pos = -pos, inc = 1;
     while (pos && it.ref != it.u8.end) pos += (*(it.ref += inc) & 0xC0) != 0x80;
@@ -145,7 +145,7 @@ STC_INLINE csview cstr_u8_substr(const cstr* self , size_t bytepos, size_t u8len
 STC_INLINE int csview_cmp(const csview* x, const csview* y) {
     size_t n = x->size < y->size ? x->size : y->size;
     int c = memcmp(x->str, y->str, n);
-    return c ? c : x->size - y->size;
+    return c ? c : (int)(x->size - y->size);
 }
 
 STC_INLINE int csview_icmp(const csview* x, const csview* y)

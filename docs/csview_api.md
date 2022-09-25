@@ -55,7 +55,7 @@ bool            csview_valid_utf8(csview sv);                       // requires 
 csview_iter     csview_begin(const csview* self);
 csview_iter     csview_end(const csview* self);
 void            csview_next(csview_iter* it);                       // utf8 codepoint step, not byte!
-csview_iter     csview_advance(csview_iter it, isize_t n);
+csview_iter     csview_advance(csview_iter it, intptr_t n);
 
 // from utf8.h
 size_t          utf8_size(const char *s);

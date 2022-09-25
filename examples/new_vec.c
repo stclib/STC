@@ -41,7 +41,7 @@ int main()
     c_auto (cvec_str, svec)
     {
         cvec_i32_push_back(&vec, 123);
-        cvec_float_push_back(&fvec, 123.3);
+        cvec_float_push_back(&fvec, 123.3f);
 
         cvec_pnt_push_back(&pvec, (Point){42, 14});
         cvec_pnt_push_back(&pvec, (Point){32, 94});

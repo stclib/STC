@@ -48,7 +48,7 @@
 
 enum  { cstr_s_cap =            sizeof(cstr_buf) - 1 };
 #define cstr_s_size(s)          ((size_t)(cstr_s_cap - (s)->sml.last))
-#define cstr_s_set_size(s, len) ((s)->sml.last = cstr_s_cap - (len), (s)->sml.data[len] = 0)
+#define cstr_s_set_size(s, len) ((s)->sml.last = (uint8_t)(cstr_s_cap - (len)), (s)->sml.data[len] = 0)
 #define cstr_s_data(s)          (s)->sml.data
 #define cstr_s_end(s)           ((s)->sml.data + cstr_s_size(s))
 
@@ -237,7 +237,7 @@ STC_INLINE void cstr_next(cstr_iter* it) {
     it->u8.chr.size = utf8_chr_size(it->ref);
     if (!*it->ref) it->ref = NULL;
 }
-STC_INLINE cstr_iter cstr_advance(cstr_iter it, isize_t pos) {
+STC_INLINE cstr_iter cstr_advance(cstr_iter it, intptr_t pos) {
     int inc = -1;
     if (pos > 0) pos = -pos, inc = 1;
     while (pos && *it.ref) pos += (*(it.ref += inc) & 0xC0) != 0x80;

@@ -42,7 +42,7 @@ int main()
     }
     c_auto (cdeq_float, fvec)
     {
-        cdeq_float_push_back(&fvec, 123.3);
+        cdeq_float_push_back(&fvec, 123.3f);
     }
     c_auto (cdeq_pnt, pvec)
     {

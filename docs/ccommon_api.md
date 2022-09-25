@@ -149,9 +149,9 @@ c_forlist (i, int, {1, 2, 3})
 c_forlist (i, cmap_ii_raw, { {4, 5}, {6, 7} })
     cmap_ii_insert(&map, i.ref->first, i.ref->second);
 
-// even string literals
+// even string literals pushed to a stack of cstr:
 c_forlist (i, const char*, {"Hello", "crazy", "world"})
-    cstack_s_push(&stk, *i.ref);
+    cstack_str_emplace(&stk, *i.ref);
 ```
 
 ### c_foreach, c_forpair
@@ -168,7 +168,7 @@ c_forlist (i, const char*, {"Hello", "crazy", "world"})
 #define i_tag ii
 #include <stc/csmap.h>
 ...
-c_forlist (i, csmap_ii_value, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} })
+c_forlist (i, csmap_ii_raw, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} })
     csmap_ii_insert(&map, i.ref->first, i.ref->second);
 
 c_foreach (i, csmap_ii, map)
@@ -186,7 +186,7 @@ c_forpair (id, count, csmap_ii, map)
 ```
 
 ### c_forrange
-Declare an iterator and specify a range to iterate with a for loop. Like python's ***for i in range()*** loop:
+Abstaction for iterating sequence of numbers. Like python's ***for i in range()*** loop.
 
 | Usage                                         | Python equivalent                    |
 |:----------------------------------------------|:-------------------------------------|
@@ -207,6 +207,88 @@ c_forrange (i, int, 30, 0, -5) printf(" %d", i);
 // 30 25 20 15 10 5
 ```
 
+### c_forwhile, c_forfilter
+Iterate containers with stop-criteria and chained range filtering.
+
+| Usage                                                      | Description                          |
+|:-----------------------------------------------------------|:-------------------------------------|
+| `c_forwhile (it, ctype, container, whilepred)`             | Iterate as long as whilepred is true |
+| `c_forfilter (it, ctype, container, filter(s))`            | Filter out items in chain            |
+| `c_forfilter (it, ctype, container, filter(s), whilepred)` | Adds a "takewhile" filter argument   |
+
+| Built-in filter                   | Description                          |
+|:----------------------------------|:-------------------------------------|
+| `c_flt_drop(it, numItems)`        | Drop numItems                        |
+| `c_flt_dropwhile(it, predicate)`  | Drop items until predicate is false  |
+| `c_flt_take(it, numItems)`        | Take numItems                        |
+
+`it.index` holds the current item index.
+```c
+#define i_type IVec
+#define i_val int
+#include <stc/cstack.h>
+#include <stdio.h>
+
+bool flt_prime(int i) {
+    for (int j=2; j*j <= i; ++j){
+        if (i % j == 0) return false;
+    }
+    return true;
+}
+#define flt_odd(i) ((i) & 1)
+
+int main() {
+    c_auto (IVec, vec) {
+        c_forrange (i, 1000) IVec_push(&vec, 1000000 + i);
+
+        c_forfilter (i, IVec, vec,
+                          flt_odd(*i.ref)
+                     && c_flt_drop(i, 100) // built-in
+                     &&   flt_prime(*i.ref)
+                      , c_flt_take(i, 10)) { // breaks loop on false.
+            printf(" %d", *i.ref);  
+        }
+        puts("");
+    }
+}
+// Out: 1000211 1000213 1000231 1000249 1000253 1000273 1000289 1000291 1000303 1000313 
+```
+Note that `c_flt_take()` is given as an optional argument, which makes the loop stop when it becomes false (for efficiency). Chaining it after `flt_prime()` instead will give same result, but the full input is processed.
+
+### crange
+**crange** is a number sequence generator type. The **crange_value** type is `intmax_t`. Below, *start*, *end*, *step* are of *crange_type*.
+```c
+crange      crange_init(void);              // will generate 0, 1, 2, ...
+crange      crange_from(start);             // will generate start, start+1, ...
+crange      crange_from(start, end);        // will generate start, start+1, ... end-1
+crange      crange_from(start, end, step);  // will generate start, start+step, ... upto-not-including end
+                                            // note that step may be negative.
+crange_iter crange_begin(crange* self);
+crange_iter crange_end(crange* self);
+void        crange_next(crange_iter* it);
+
+// Example usage:
+
+bool isPrime(int i) {
+    for (int j=2; j*j <= i; ++j) if (i % j == 0) return false;
+    return true;
+}
+
+crange r1 = crange_from(3, 32, 2);
+printf("1 2");
+c_forfilter (i, crange, r1, 
+                isPrime(*i.ref))
+    printf(" %lld", *i.ref);
+// 1 2 3 5 7 11 13 17 19 23 29 31
+
+crange r2 = crange_from(3, INTMAX_MAX, 2);
+printf("1 2");
+c_forfilter (i, crange, r2, 
+                isPrime(*i.ref)
+              , c_flt_take(10))
+    printf(" %lld", *i.ref);
+// 1 2 3 5 7 11 13 17 19 23 29 31
+```
 ### c_find_if, c_find_in, c_erase_if
 Find or erase linearily in containers using a predicate
 ```c

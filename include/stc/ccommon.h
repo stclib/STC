@@ -30,14 +30,6 @@
 #include <string.h>
 #include <assert.h>
 
-#if SIZE_MAX == UINT32_MAX
-   typedef int32_t isize_t;
-#  define ISIZE_MAX INT32_MAX
-#elif SIZE_MAX == UINT64_MAX
-   typedef int64_t isize_t;
-#  define ISIZE_MAX INT64_MAX
-#endif
-
 #if defined(_MSC_VER)
 #  pragma warning(disable: 4116 4996) // unnamed type definition in parentheses
 #  define STC_FORCE_INLINE static __forceinline
@@ -171,27 +163,25 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
          ; it.ref != (C##_value*)_endref; C##_next(&it))
 
 #ifndef c_FLT_STACK
-#define c_FLT_STACK 4
+#define c_FLT_STACK 20
 #endif
-
-#define c_flt_drop(i, n) (++(i).dropped[(i).dn++] > (n))
-#define c_flt_dropwhile(i, pred) ((i).dropwhile |= !(pred))
-#define c_flt_take(i, n) (++(i).taken[(i).tn++] <= (n))
+#define c_flt_take(i, n) (++(i).stack[(i).top++] <= (n))
+#define c_flt_drop(i, n) (++(i).stack[(i).top++] > (n))
+#define c_flt_dropwhile(i, pred) ((i).stack[(i).top++] |= !(pred))
 
 #define c_forfilter(...) c_MACRO_OVERLOAD(c_forfilter, __VA_ARGS__)
 #define c_forfilter4(it, C, cnt, filter) \
     c_forfilter_s(it, C, C##_begin(&cnt), filter)
-#define c_forfilter5(it, C, cnt, filter, loopwhile) \
-    c_forfilter_s(it, C, C##_begin(&cnt), filter) if (!(loopwhile)) break; else
+#define c_forfilter5(it, C, cnt, filter, takewhile) \
+    c_forfilter_s(it, C, C##_begin(&cnt), filter) if (!(takewhile)) break; else
 #define c_forfilter_s(it, C, start, filter) \
     c_foreach_s(it, C, start) if (!(filter)) ; else
 
 #define c_foreach_s(i, C, start) \
     for (struct {C##_iter it; C##_value *ref; \
-                 uint32_t index, taken[c_FLT_STACK+1], dropped[c_FLT_STACK]; \
-                 int8_t dn, tn; bool dropwhile;} \
+                 uint32_t index, top, stack[c_FLT_STACK];} \
          i = {.it=start, .ref=i.it.ref}; i.ref \
-         ; C##_next(&i.it), i.ref = i.it.ref, ++i.index, i.dn=0, i.tn=0)
+         ; C##_next(&i.it), i.ref = i.it.ref, ++i.index, i.top=0)
 
 #define c_forwhile(i, C, cnt, cond) \
     for (struct {C##_iter it; C##_value *ref; size_t index;} \
@@ -212,6 +202,22 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #define c_forrange5(i, itype, start, stop, step) \
     for (itype i=start, _inc=step, _end=(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)
+
+typedef intmax_t crange_value;
+struct {crange_value val, end, step; } typedef crange;
+struct {crange_value *ref, end, step; } typedef crange_iter;
+#define crange_from(...) c_MACRO_OVERLOAD(crange_from, __VA_ARGS__)
+#define crange_init() crange_from3(0, INTMAX_MAX, 1)
+#define crange_from1(start) crange_from3(start, INTMAX_MAX, 1)
+#define crange_from2(start, end) crange_from3(start, end, 1)
+STC_INLINE crange crange_from3(crange_value start, crange_value finish, crange_value step)
+    { crange r = {start, finish - (step > 0), step}; return r; }
+STC_INLINE crange_iter crange_begin(crange* self) 
+    { crange_iter it = {&self->val, self->end, self->step}; return it; }
+STC_INLINE crange_iter crange_end(crange* self) 
+    { crange_iter it = {NULL}; return it; }
+STC_INLINE void crange_next(crange_iter* it) 
+    { *it->ref += it->step; if ((it->step > 0) == (*it->ref > it->end)) it->ref = NULL; }
 
 #define c_forlist(it, T, ...) \
     for (struct {T* data; T* ref; size_t index;} \

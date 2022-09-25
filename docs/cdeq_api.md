@@ -81,7 +81,7 @@ void                cdeq_X_sort_range(cdeq_X_iter i1, cdeq_X_iter i2,
 cdeq_X_iter         cdeq_X_begin(const cdeq_X* self);
 cdeq_X_iter         cdeq_X_end(const cdeq_X* self);
 void                cdeq_X_next(cdeq_X_iter* it);
-cdeq_X_iter         cdeq_X_advance(cdeq_X_iter it, isize_t n);
+cdeq_X_iter         cdeq_X_advance(cdeq_X_iter it, intptr_t n);
 
 cdeq_X_raw          cdeq_X_value_toraw(cdeq_X_value* pval);
 cdeq_X_value        cdeq_X_value_clone(cdeq_X_value val);
