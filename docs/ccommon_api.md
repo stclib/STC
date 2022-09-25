@@ -229,22 +229,20 @@ Iterate containers with stop-criteria and chained range filtering.
 #include <stc/cstack.h>
 #include <stdio.h>
 
-bool flt_prime(int i) {
-    for (int j=2; j*j <= i; ++j){
-        if (i % j == 0) return false;
-    }
+bool isPrime(int i) {
+    for (int j=2; j*j <= i; ++j) if (i % j == 0) return false;
     return true;
 }
-#define flt_odd(i) ((i) & 1)
+#define isOdd(i) ((i) & 1)
 
 int main() {
     c_auto (IVec, vec) {
         c_forrange (i, 1000) IVec_push(&vec, 1000000 + i);
 
         c_forfilter (i, IVec, vec,
-                          flt_odd(*i.ref)
+                        isOdd(*i.ref)
                      && c_flt_drop(i, 100) // built-in
-                     &&   flt_prime(*i.ref)
+                     && isPrime(*i.ref)
                       , c_flt_take(i, 10)) { // breaks loop on false.
             printf(" %d", *i.ref);  
         }
@@ -253,7 +251,7 @@ int main() {
 }
 // Out: 1000211 1000213 1000231 1000249 1000253 1000273 1000289 1000291 1000303 1000313 
 ```
-Note that `c_flt_take()` is given as an optional argument, which makes the loop stop when it becomes false (for efficiency). Chaining it after `flt_prime()` instead will give same result, but the full input is processed.
+Note that `c_flt_take()` is given as an optional argument, which makes the loop stop when it becomes false (for efficiency). Chaining it after `isPrime()` instead will give same result, but the full input is processed.
 
 ### crange
 **crange** is a number sequence generator type. The **crange_value** type is `long long`. Below, *start*, *end*, *step* are type *crange_value*:
@@ -267,27 +265,22 @@ crange_iter crange_begin(crange* self);
 crange_iter crange_end(crange* self);
 void        crange_next(crange_iter* it);
 
-// Example usage:
-
-bool isPrime(int i) {
-    for (int j=2; j*j <= i; ++j) if (i % j == 0) return false;
-    return true;
-}
-
+// 1. All primes less than 32:
 crange r1 = crange_from(3, 32, 2);
-printf("1 2");
+printf("2"); // first prime
 c_forfilter (i, crange, r1, 
                 isPrime(*i.ref))
     printf(" %lld", *i.ref);
-// 1 2 3 5 7 11 13 17 19 23 29 31
+// 2 3 5 7 11 13 17 19 23 29 31
 
+// 2. The 11 first primes:
 crange r2 = crange_from(3, INTMAX_MAX, 2);
-printf("1 2");
+printf("2");
 c_forfilter (i, crange, r2, 
                 isPrime(*i.ref)
               , c_flt_take(10))
     printf(" %lld", *i.ref);
-// 1 2 3 5 7 11 13 17 19 23 29 31
+// 2 3 5 7 11 13 17 19 23 29 31
 ```
 ### c_find_if, c_find_in, c_erase_if
 Find or erase linearily in containers using a predicate
