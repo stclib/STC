@@ -203,7 +203,7 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
     for (itype i=start, _inc=step, _end=(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)
 
-typedef intmax_t crange_value;
+typedef long long crange_value;
 struct {crange_value val, end, step; } typedef crange;
 struct {crange_value *ref, end, step; } typedef crange_iter;
 #define crange_from(...) c_MACRO_OVERLOAD(crange_from, __VA_ARGS__)

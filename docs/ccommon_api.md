@@ -256,7 +256,7 @@ int main() {
 Note that `c_flt_take()` is given as an optional argument, which makes the loop stop when it becomes false (for efficiency). Chaining it after `flt_prime()` instead will give same result, but the full input is processed.
 
 ### crange
-**crange** is a number sequence generator type. The **crange_value** type is `intmax_t`. Below, *start*, *end*, *step* are of *crange_type*.
+**crange** is a number sequence generator type. The **crange_value** type is `long long`. Below, *start*, *end*, *step* are type *crange_value*:
 ```c
 crange      crange_init(void);              // will generate 0, 1, 2, ...
 crange      crange_from(start);             // will generate start, start+1, ...
