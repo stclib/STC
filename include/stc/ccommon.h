@@ -180,12 +180,12 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #define c_foreach_s(i, C, start) \
     for (struct {C##_iter it; C##_value *ref; \
                  uint32_t index, top, stack[c_FLT_STACK];} \
-         i = {.it=start, .ref=i.it.ref}; i.ref \
+         i = {.it=start, .ref=i.it.ref}; i.it.ref \
          ; C##_next(&i.it), i.ref = i.it.ref, ++i.index, i.top=0)
 
 #define c_forwhile(i, C, cnt, cond) \
     for (struct {C##_iter it; C##_value *ref; size_t index;} \
-         i = {.it=C##_begin(&cnt), .ref=i.it.ref}; i.ref && (cond) \
+         i = {.it=C##_begin(&cnt), .ref=i.it.ref}; i.it.ref && (cond) \
          ; C##_next(&i.it), i.ref = i.it.ref, ++i.index)
 
 #define c_forpair(key, val, C, cnt) /* structured binding */ \
