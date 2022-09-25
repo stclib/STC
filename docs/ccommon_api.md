@@ -2,6 +2,7 @@
 
 The following macros are recommended to use, and they safe/have no side-effects.
 
+## Scope macros (RAII)
 ### c_auto, c_with, c_scope, c_defer
 General ***defer*** mechanics for resource acquisition. These macros allows you to specify the
 freeing of the resources at the point where the acquisition takes place.
@@ -89,6 +90,7 @@ int main()
             printf("%s\n", cstr_str(i.ref));
 }
 ```
+
 ### The **checkauto** utility program (for RAII)
 The **checkauto** program will check the source code for any misuses of the `c_auto*` macros which
 may lead to resource leakages. The `c_auto*`- macros are implemented as one-time executed **for-loops**,
@@ -137,9 +139,10 @@ from a `c_auto` scope:
         ...
     } // for
 ```
+## Loop abstaction macros
 
 ### c_forlist
-Iterate compound literal array elements
+Iterate compound literal array elements. Additional to `i.ref`, you can access `i.data`, `i.size`, and `i.index` of the input list/element.
 ```c
 // apply multiple push_backs
 c_forlist (i, int, {1, 2, 3})
@@ -149,9 +152,13 @@ c_forlist (i, int, {1, 2, 3})
 c_forlist (i, cmap_ii_raw, { {4, 5}, {6, 7} })
     cmap_ii_insert(&map, i.ref->first, i.ref->second);
 
-// even string literals pushed to a stack of cstr:
+// string literals pushed to a stack of cstr:
 c_forlist (i, const char*, {"Hello", "crazy", "world"})
     cstack_str_emplace(&stk, *i.ref);
+
+// reverse the list:
+c_forlist (i, int, {1, 2, 3})
+    cvec_i_push_back(&vec, i.data[i.size - 1 - i.index]);
 ```
 
 ### c_foreach, c_forpair

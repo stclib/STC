@@ -163,7 +163,7 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
          ; it.ref != (C##_value*)_endref; C##_next(&it))
 
 #ifndef c_FLT_STACK
-#define c_FLT_STACK 20
+#define c_FLT_STACK 16
 #endif
 #define c_flt_take(i, n) (++(i).stack[(i).top++] <= (n))
 #define c_flt_drop(i, n) (++(i).stack[(i).top++] > (n))
@@ -206,8 +206,8 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 typedef long long crange_value;
 struct {crange_value val, end, step; } typedef crange;
 struct {crange_value *ref, end, step; } typedef crange_iter;
-#define crange_from(...) c_MACRO_OVERLOAD(crange_from, __VA_ARGS__)
 #define crange_init() crange_from3(0, INTMAX_MAX, 1)
+#define crange_from(...) c_MACRO_OVERLOAD(crange_from, __VA_ARGS__)
 #define crange_from1(start) crange_from3(start, INTMAX_MAX, 1)
 #define crange_from2(start, end) crange_from3(start, end, 1)
 STC_INLINE crange crange_from3(crange_value start, crange_value finish, crange_value step)
@@ -220,10 +220,9 @@ STC_INLINE void crange_next(crange_iter* it)
     { *it->ref += it->step; if ((it->step > 0) == (*it->ref > it->end)) it->ref = NULL; }
 
 #define c_forlist(it, T, ...) \
-    for (struct {T* data; T* ref; size_t index;} \
-         it = {.data=(T[])__VA_ARGS__, .ref=it.data} \
-         ; it.ref != &it.data[c_arraylen(((T[])__VA_ARGS__))] \
-         ; ++it.ref, ++it.index)
+    for (struct {T* data; T* ref; int size, index;} \
+         it = {.data=(T[])__VA_ARGS__, .ref=it.data, .size=c_arraylen(((T[])__VA_ARGS__))} \
+         ; it.index < it.size; ++it.ref, ++it.index)
 
 #define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
 #define c_with2(declvar, drop) for (declvar, **_c_i = NULL; !_c_i; ++_c_i, drop)
