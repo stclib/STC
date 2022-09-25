@@ -103,18 +103,18 @@ int main()
         Map *map;
 
         map = Stack_push(&s1, Arc_make(Map_init()))->get; // push empty map to s1.
-        c_forlist (i, Map_raw, {{"Joey", 1990}, {"Mary", 1995}, {"Joanna", 1992}}) {
+        c_forlist (i, Map_raw, { {"Joey", 1990}, {"Mary", 1995}, {"Joanna", 1992} }) {
             Map_emplace(map, c_pair(i.ref)); // populate it.
         }
 
         map = Stack_push(&s1, Arc_make(Map_init()))->get;
-        c_forlist (i, Map_raw, {{"Rosanna", 2001}, {"Brad", 1999}, {"Jack", 1980}}) {
+        c_forlist (i, Map_raw, { {"Rosanna", 2001}, {"Brad", 1999}, {"Jack", 1980} }) {
             Map_emplace(map, c_pair(i.ref));
         }
 
         // POPULATE s2:
         map = Stack_push(&s2, Arc_make(Map_init()))->get;
-        c_forlist (i, Map_raw, {{"Steve", 1979}, {"Rick", 1974}, {"Tracy", 2003}}) {
+        c_forlist (i, Map_raw, { {"Steve", 1979}, {"Rick", 1974}, {"Tracy", 2003} }) {
             Map_emplace(map, c_pair(i.ref));
         }
         
