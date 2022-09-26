@@ -163,11 +163,11 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
          ; it.ref != (C##_value*)_endref; C##_next(&it))
 
 #ifndef c_FLT_STACK
-#define c_FLT_STACK 16
+#define c_FLT_STACK 14 // 22, 30, ..
 #endif
-#define c_flt_take(i, n) (++(i).stack[(i).top++] <= (n))
-#define c_flt_drop(i, n) (++(i).stack[(i).top++] > (n))
-#define c_flt_dropwhile(i, pred) ((i).stack[(i).top++] |= !(pred))
+#define c_flt_take(i, n) (++(i).s1[(i).s1top++] <= (n))
+#define c_flt_drop(i, n) (++(i).s1[(i).s1top++] > (n))
+#define c_flt_dropwhile(i, pred) ((i).s2[(i).s2top++] |= !(pred))
 
 #define c_forfilter(...) c_MACRO_OVERLOAD(c_forfilter, __VA_ARGS__)
 #define c_forfilter4(it, C, cnt, filter) \
@@ -179,9 +179,10 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 
 #define c_foreach_s(i, C, start) \
     for (struct {C##_iter it; C##_value *ref; \
-                 uint32_t index, top, stack[c_FLT_STACK];} \
+                 uint32_t s1[c_FLT_STACK+1], index; \
+                 uint8_t s2[c_FLT_STACK], s1top, s2top;} \
          i = {.it=start, .ref=i.it.ref}; i.it.ref \
-         ; C##_next(&i.it), i.ref = i.it.ref, ++i.index, i.top=0)
+         ; C##_next(&i.it), i.ref = i.it.ref, ++i.index, i.s1top=0, i.s2top=0)
 
 #define c_forwhile(i, C, cnt, cond) \
     for (struct {C##_iter it; C##_value *ref; size_t index;} \
