@@ -53,7 +53,7 @@ int main(int argc, char **argv)
             {"Tariq Beltran", "(489) 600-7575"},
             {"Laiba Juarez", "(303) 885-5692"},
             {"Elliott Mooney", "(945) 616-4482"},
-        }) cmap_str_emplace(&phone_book, c_pair(i.ref));
+        }) cmap_str_emplace(&phone_book, c_PAIR(i.ref));
 
         printf("Phone book:\n");
         print_phone_book(phone_book);

@@ -16,29 +16,30 @@ int point_cmp(const Point* a, const Point* b) {
 #define i_tag pnt
 #include <stc/cqueue.h>
 
+#define i_type IQ
 #define i_val int
 #include <stc/cqueue.h>
 
 int main() {
-    int n = 60000000;
+    int n = 50000000;
     stc64_t rng = stc64_new(time(NULL));
     stc64_uniform_t dist = stc64_uniform_new(0, n);
 
-    c_auto (cqueue_int, Q)
+    c_auto (IQ, Q)
     {
         // Push eight million random numbers onto the queue.
-        for (int i=0; i<n; ++i)
-            cqueue_int_push(&Q, stc64_uniform(&rng, &dist));
+        c_forloop (n)
+            IQ_push(&Q, stc64_uniform(&rng, &dist));
 
-        // Push or pop on the queue ten million times
-        printf("befor: size %" PRIuMAX ", capacity %" PRIuMAX "\n", cqueue_int_size(&Q), cqueue_int_capacity(&Q));
-        for (int i=n; i>0; --i) {
+        // Push or pop on the queue 50 million times
+        printf("befor: size %" PRIuMAX ", capacity %" PRIuMAX "\n", IQ_size(&Q), IQ_capacity(&Q));
+        c_forloop (n) {
             int r = stc64_uniform(&rng, &dist);
-            if (r & 1)
-                cqueue_int_push(&Q, r);
+            if (r & 3)
+                IQ_push(&Q, r);
             else
-                cqueue_int_pop(&Q);
+                IQ_pop(&Q);
         }
-        printf("after: size %" PRIuMAX ", capacity %" PRIuMAX "\n", cqueue_int_size(&Q), cqueue_int_capacity(&Q));
+        printf("after: size %" PRIuMAX ", capacity %" PRIuMAX "\n", IQ_size(&Q), IQ_capacity(&Q));
     }
 }

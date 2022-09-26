@@ -103,7 +103,7 @@ int main()
         // Insert the elements from an initializer_list
         c_forlist (i, csmap_ii_raw, {{ 4, 44 }, { 2, 22 }, { 3, 33 },
                                      { 1, 11 }, { 5, 55 }})
-            csmap_ii_insert(&m4, c_pair(i.ref));
+            csmap_ii_insert(&m4, c_PAIR(i.ref));
 
         puts("After initializer_list insertion, m4 contains:");
         print_ii(m4);

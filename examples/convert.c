@@ -21,7 +21,7 @@ int main()
             {"green", "#00ff00"},
             {"blue", "#0000ff"},
             {"yellow", "#ffff00"},
-        }) cmap_str_emplace(&map, c_pair(i.ref));
+        }) cmap_str_emplace(&map, c_PAIR(i.ref));
 
         puts("MAP:");
         c_foreach (i, cmap_str, map)

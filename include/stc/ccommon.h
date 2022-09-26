@@ -118,6 +118,8 @@ typedef const char* crawstr;
 #define c_sv2(str, n) (c_make(csview){str, n})
 #define c_PRIsv ".*s"
 #define c_ARGsv(sv) (int)(sv).size, (sv).str
+#define c_PAIR(ref) (ref)->first, (ref)->second
+#define c_pair(ref) c_PAIR(ref) // [deprecated]
 
 #define _c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
@@ -261,7 +263,6 @@ STC_INLINE void crange_next(crange_iter* it)
          *b = (n)*sizeof *b > (BYTES) ? c_alloc_n(type, n) : _c_b \
          ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)
 
-#define c_pair(v) (v)->first, (v)->second
 #define c_drop(C, ...) do { c_forlist (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
 
 #define c_find_if(it, C, cnt, pred) do { \

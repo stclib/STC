@@ -43,7 +43,7 @@ int main()
             {12, "Robert"},
             {13, "Bert"},
             {14, "Bobby"},
-        }) mymap_emplace(&m2, c_pair(i.ref));
+        }) mymap_emplace(&m2, c_PAIR(i.ref));
 
         puts("Starting data of map m2 is:");
         printmap(m2);

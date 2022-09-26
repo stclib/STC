@@ -51,7 +51,7 @@ int main()
             {{42, 14}, 1},
             {{32, 94}, 2},
             {{62, 81}, 3},
-        }) PMap_insert(&pmap, c_pair(i.ref));
+        }) PMap_insert(&pmap, c_PAIR(i.ref));
 
         c_forpair (p, i, PMap, pmap)
             printf(" (%d,%d: %d)", _.p->x, _.p->y, *_.i);
@@ -63,7 +63,7 @@ int main()
             {"Hello, friend", "this is the mapped value"},
             {"The brown fox", "jumped"},
             {"This is the time", "for all good things"},
-        }) SMap_emplace(&smap, c_pair(i.ref));
+        }) SMap_emplace(&smap, c_PAIR(i.ref));
 
         c_forpair (i, j, SMap, smap)
             printf(" (%s: %s)\n", cstr_str(_.i), cstr_str(_.j));

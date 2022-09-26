@@ -117,7 +117,7 @@ int main()
             {"RED", "#FF0000"},
             {"GREEN", "#00FF00"},
             {"BLUE", "#0000FF"}
-        }) csmap_str_emplace(&colors, c_pair(i.ref));
+        }) csmap_str_emplace(&colors, c_PAIR(i.ref));
 
         // Iterate and print keys and values of sorted map
         c_foreach (i, csmap_str, colors) {
@@ -160,7 +160,7 @@ int main()
     c_defer (csmap_id_drop(&idnames)) 
     {
         c_forlist (i, csmap_id_raw, { {100, "Red"}, {110, "Blue"} })
-            csmap_id_emplace(&idnames, c_pair(i.ref));
+            csmap_id_emplace(&idnames, c_PAIR(i.ref));
 
         // put replaces existing mapped value:
         csmap_id_emplace_or_assign(&idnames, 110, "White");

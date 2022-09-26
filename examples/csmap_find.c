@@ -46,7 +46,7 @@ int main()
     c_auto (cvec_istr, v)
     {
         c_forlist (i, csmap_istr_raw, {{40, "Zr"}, {45, "Rh"}})
-            csmap_istr_emplace(&m1, c_pair(i.ref));
+            csmap_istr_emplace(&m1, c_PAIR(i.ref));
 
         puts("The starting map m1 is (key, value):");
         print_collection_csmap_istr(&m1);
@@ -63,7 +63,7 @@ int main()
         print_collection_cvec_istr(&v);
 
         c_foreach (i, cvec_istr, cvec_istr_begin(&v), cvec_istr_end(&v))
-            csmap_istr_emplace(&m1, c_pair(i.ref));
+            csmap_istr_emplace(&m1, c_PAIR(i.ref));
 
         puts("The modified map m1 is (key, value):");
         print_collection_csmap_istr(&m1);

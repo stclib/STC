@@ -76,7 +76,7 @@ int main(void)
             {"Germany", 10},
             {"Spain", 10},
             {"France", 10},
-        }) cmap_cnt_emplace(&countries, c_pair(i.ref));
+        }) cmap_cnt_emplace(&countries, c_PAIR(i.ref));
 
         cmap_cnt_emplace(&countries, "Greenland", 0).ref->second += 20;
         cmap_cnt_emplace(&countries, "Sweden", 0).ref->second += 20;
