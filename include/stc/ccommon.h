@@ -168,12 +168,13 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #define c_flt_take(i, n) (++(i).s1[(i).s1top++] <= (n))
 #define c_flt_drop(i, n) (++(i).s1[(i).s1top++] > (n))
 #define c_flt_dropwhile(i, pred) ((i).s2[(i).s2top++] |= !(pred))
+#define c_flt_takewhile(i, pred) !c_flt_dropwhile(i, pred)
 
 #define c_forfilter(...) c_MACRO_OVERLOAD(c_forfilter, __VA_ARGS__)
 #define c_forfilter4(it, C, cnt, filter) \
     c_forfilter_s(it, C, C##_begin(&cnt), filter)
-#define c_forfilter5(it, C, cnt, filter, takewhile) \
-    c_forfilter_s(it, C, C##_begin(&cnt), filter) if (!(takewhile)) break; else
+#define c_forfilter5(it, C, cnt, filter, whilepred) \
+    c_forfilter_s(it, C, C##_begin(&cnt), filter) if (!(whilepred)) break; else
 #define c_forfilter_s(it, C, start, filter) \
     c_foreach_s(it, C, start) if (!(filter)) ; else
 

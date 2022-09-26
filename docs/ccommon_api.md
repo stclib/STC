@@ -216,19 +216,20 @@ c_forloop (i, 30, 0, -5) printf(" %lld", i);
 ### c_forwhile, c_forfilter
 Iterate containers with stop-criteria and chained range filtering.
 
-| Usage                                                      | Description                          |
-|:-----------------------------------------------------------|:-------------------------------------|
-| `c_forwhile (it, ctype, container, whilepred)`             | Iterate as long as whilepred is true |
-| `c_forfilter (it, ctype, container, filter(s))`            | Filter out items in chain            |
-| `c_forfilter (it, ctype, container, filter(s), whilepred)` | Adds a "takewhile" filter argument   |
+| Usage                                                         | Description                          |
+|:--------------------------------------------------------------|:-------------------------------------|
+| `c_forwhile (it, ctype, container, shortcircuit)`             | Iterate until shortcircuit is false  |
+| `c_forfilter (it, ctype, container, filter(s))`               | Filter out items in chain            |
+| `c_forfilter (it, ctype, container, filter(s), shortcircuit)` | Add a "short-circuit" pred/filter    |
 
 | Built-in filter                   | Description                          |
 |:----------------------------------|:-------------------------------------|
 | `c_flt_drop(it, numItems)`        | Drop numItems                        |
-| `c_flt_dropwhile(it, predicate)`  | Drop items until predicate is false  |
 | `c_flt_take(it, numItems)`        | Take numItems                        |
+| `c_flt_dropwhile(it, predicate)`  | Drop items until predicate is false  |
+| `c_flt_takewhile(it, predicate)`  | Take items until predicate is false  |
 
-`it.index` holds the current item index.
+`it.index` holds the index of the source item.
 ```c
 #define i_type IVec
 #define i_val int

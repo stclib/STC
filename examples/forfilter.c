@@ -35,7 +35,7 @@ void demo1(void)
                      && c_flt_dropwhile(i, *i.ref != 80)
                      &&   flt_even(i)
                      &&   flt_remove(i, 80)
-                      , c_flt_take(i, 5) // takewhile
+                      , c_flt_take(i, 5) // short-circuit
         ){
             sum += res = trf_square(i);
             printf(" %d", res);
