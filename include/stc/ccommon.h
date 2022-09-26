@@ -176,11 +176,11 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #define c_forfilter5(it, C, cnt, filter, whilepred) \
     c_forfilter_s(it, C, C##_begin(&cnt), filter) if (!(whilepred)) break; else
 #define c_forfilter_s(it, C, start, filter) \
-    c_foreach_s(it, C, start) if (!(filter)) ; else
+    c_foreach_s(it, C, start) if (!((filter) && ++it.count)) ; else
 
 #define c_foreach_s(i, C, start) \
     for (struct {C##_iter it; C##_value *ref; \
-                 uint32_t s1[c_FLT_STACK+1], index; \
+                 uint32_t s1[c_FLT_STACK], index, count; \
                  uint8_t s2[c_FLT_STACK], s1top, s2top;} \
          i = {.it=start, .ref=i.it.ref}; i.it.ref \
          ; C##_next(&i.it), i.ref = i.it.ref, ++i.index, i.s1top=0, i.s2top=0)

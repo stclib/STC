@@ -33,16 +33,18 @@ int main(void)
         clock_t t2 = clock();
 
         printf("number of primes: %" PRIuMAX ", time: %f\n", np, (t2 - t1) / (float)CLOCKS_PER_SEC);
+        puts("Show all the primes in the range [2, 1000):");
         printf("2");
-        for (size_t i = 3; i < 1000; i += 2)
-            if (cbits_test(&primes, i>>1)) printf(" %" PRIuMAX "", i);
+        c_forloop (i, 3, 1000, 2)
+            if (cbits_test(&primes, i>>1)) printf(" %lld", i);
         puts("");
 
-        int k = 20;
-        c_forloop (i, n-1, 1, -2) {
-            if (k == 0) break;
-            else if (cbits_test(&primes, i>>1)) printf("%lld\n", i), k--;
+        puts("Show the last 50 primes using a temporary crange generator:");
+        c_forfilter (i, crange, *(crange[]){crange_make(n - 1, 0, -2)}
+                      , cbits_test(&primes, *i.ref>>1)
+                      , c_flt_take(i, 50)) {
+            printf("%lld ", *i.ref);
+            if (i.count % 10 == 0) puts("");
         }
-        puts("");
     }
 }

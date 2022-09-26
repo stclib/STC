@@ -139,7 +139,7 @@ from a `c_auto` scope:
         ...
     } // for
 ```
-## Loop abstaction macros
+## Loop abstraction macros
 
 ### c_forlist
 Iterate compound literal array elements. Additional to `i.ref`, you can access `i.data`, `i.size`, and `i.index` of the input list/element.
@@ -193,7 +193,7 @@ c_forpair (id, count, csmap_ii, map)
 ```
 
 ### c_forloop
-Abstaction for iterating sequence of numbers. Like python's **for** *i* **in** *range()* loop.
+Abstraction for iterating sequence of numbers. Like python's **for** *i* **in** *range()* loop.
 
 | Usage                                       | Python equivalent                    |
 |:--------------------------------------------|:-------------------------------------|
@@ -229,7 +229,7 @@ Iterate containers with stop-criteria and chained range filtering.
 | `c_flt_dropwhile(it, predicate)`  | Drop items until predicate is false  |
 | `c_flt_takewhile(it, predicate)`  | Take items until predicate is false  |
 
-`it.index` holds the index of the source item.
+`it.index` holds the index of the source item, and `it.count` the current number of items taken.
 ```c
 #define i_type IVec
 #define i_val int
@@ -275,16 +275,16 @@ void        crange_next(crange_iter* it);
 // 1. All primes less than 32:
 crange r1 = crange_from(3, 32, 2);
 printf("2"); // first prime
-c_forfilter (i, crange, r1, 
-                isPrime(*i.ref))
+c_forfilter (i, crange, r1 
+              , isPrime(*i.ref))
     printf(" %lld", *i.ref);
 // 2 3 5 7 11 13 17 19 23 29 31
 
 // 2. The 11 first primes:
 crange r2 = crange_make(3, INTMAX_MAX, 2);
 printf("2");
-c_forfilter (i, crange, r2, 
-                isPrime(*i.ref)
+c_forfilter (i, crange, r2 
+              , isPrime(*i.ref)
               , c_flt_take(10))
     printf(" %lld", *i.ref);
 // 2 3 5 7 11 13 17 19 23 29 31
@@ -313,7 +313,7 @@ c_erase_if(k, cvec_i, *k.ref < 100);
 | `c_new (type, value)`          | Move value to a new object on the heap  |
 | `c_alloc (type)`               | `(type *) c_malloc(sizeof(type))`       |
 | `c_alloc_n (type, N)`          | `(type *) c_malloc((N)*sizeof(type))`   |
-| `c_drop (ctype, &c1, ..., &cN)` | `ctype_drop(&c1); ... ctype_drop(&cN)`    |
+| `c_drop (ctype, &c1, ..., &cN)` | `ctype_drop(&c1); ... ctype_drop(&cN)` |
 | `c_make(type){value...}`       | `(type){value...}` // c++ compatability |
 
 ```c
@@ -329,7 +329,7 @@ c_drop(cstr, &a, &b);
 ```
 
 ### General predefined template parameter functions
-```
+```c
 int         c_default_cmp(const Type*, const Type*);
 Type        c_default_clone(Type val);           // simple copy
 Type        c_default_toraw(const Type* val);    // dereference val
