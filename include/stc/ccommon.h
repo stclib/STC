@@ -189,9 +189,9 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
          ; C##_next(&i.it), i.ref = i.it.ref, ++i.index)
 
 #define c_forpair(key, val, C, cnt) /* structured binding */ \
-    for (struct {C##_iter _it; const C##_key* key; C##_mapped* val;} _ = {C##_begin(&cnt)} \
-         ; _._it.ref && (_.key = &_._it.ref->first, _.val = &_._it.ref->second) \
-         ; C##_next(&_._it))
+    for (struct {C##_iter it; const C##_key* key; C##_mapped* val;} _ = {.it=C##_begin(&cnt)} \
+         ; _.it.ref && (_.key = &_.it.ref->first, _.val = &_.it.ref->second) \
+         ; C##_next(&_.it))
 
 // [deprecated]:
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
