@@ -40,7 +40,7 @@ int main(void)
         const float nums[] = {4.0f, 2.0f, 5.0f, 3.0f, 1.0f};
 
         // PRIORITY QUEUE
-        c_forrange (i, c_arraylen(nums))
+        c_forloop (i, c_arraylen(nums))
             cpque_f_push(&floats, nums[i]);
 
         puts("\npop and show high priorites first:");

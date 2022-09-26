@@ -1,7 +1,7 @@
 ///////////////////////// ankerl::unordered_dense::{map, set} /////////////////////////
 
 // A fast & densely stored hashmap and hashset based on robin-hood backward shift deletion.
-// Version 1.3.1
+// Version 1.3.3
 // https://github.com/martinus/unordered_dense
 //
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
@@ -32,7 +32,7 @@
 // see https://semver.org/spec/v2.0.0.html
 #define ANKERL_UNORDERED_DENSE_VERSION_MAJOR 1 // NOLINT(cppcoreguidelines-macro-usage) incompatible API changes
 #define ANKERL_UNORDERED_DENSE_VERSION_MINOR 3 // NOLINT(cppcoreguidelines-macro-usage) backwards compatible functionality
-#define ANKERL_UNORDERED_DENSE_VERSION_PATCH 1 // NOLINT(cppcoreguidelines-macro-usage) backwards compatible bug fixes
+#define ANKERL_UNORDERED_DENSE_VERSION_PATCH 3 // NOLINT(cppcoreguidelines-macro-usage) backwards compatible bug fixes
 
 // API versioning with inline namespace, see https://www.foonathan.net/2018/11/inline-namespaces/
 #define ANKERL_UNORDERED_DENSE_VERSION_CONCAT1(major, minor, patch) v##major##_##minor##_##patch
@@ -214,10 +214,9 @@ static inline void mum(uint64_t* a, uint64_t* b) {
 
 template <typename T, typename Enable = void>
 struct hash {
-    using is_avalanching = void;
     auto operator()(T const& obj) const noexcept(noexcept(std::declval<std::hash<T>>().operator()(std::declval<T const&>())))
         -> uint64_t {
-        return detail::wyhash::hash(std::hash<T>{}(obj));
+        return std::hash<T>{}(obj);
     }
 };
 
@@ -1189,12 +1188,12 @@ public:
         return do_find(key);
     }
 
-    auto contains(Key const& key) const -> size_t {
+    auto contains(Key const& key) const -> bool {
         return find(key) != end();
     }
 
     template <class K, class H = Hash, class KE = KeyEqual, is_transparent<H, KE> = true>
-    auto contains(K const& key) const -> size_t {
+    auto contains(K const& key) const -> bool {
         return find(key) != end();
     }
 

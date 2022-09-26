@@ -180,37 +180,36 @@ c_forlist (i, csmap_ii_raw, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} })
 
 c_foreach (i, csmap_ii, map)
     printf(" %d", i.ref->first);
-// out: 3 5 7 12 23
+// 3 5 7 12 23
 
 csmap_ii_iter it = csmap_ii_find(&map, 7);
 c_foreach (i, csmap_ii, it, csmap_ii_end(&map))
     printf(" %d", i.ref->first);
-// out: 7 12 23
+// 7 12 23
 
 c_forpair (id, count, csmap_ii, map)
     printf(" (%d %d)", *_.id, *_.count);
-// out: (3 2) (5 4) (7 3) (12 5) (23 1)
+// (3 2) (5 4) (7 3) (12 5) (23 1)
 ```
 
-### c_forrange
-Abstaction for iterating sequence of numbers. Like python's ***for i in range()*** loop.
+### c_forloop
+Abstaction for iterating sequence of numbers. Like python's **for** *i* **in** *range()* loop.
 
-| Usage                                         | Python equivalent                    |
-|:----------------------------------------------|:-------------------------------------|
-| `c_forrange (stop)`                           | `for _ in range(stop):`              |
-| `c_forrange (i, stop) // IntType = size_t`    | `for i in range(stop):`              |
-| `c_forrange (i, IntType, stop)`               | `for i in range(stop):`              |
-| `c_forrange (i, IntType, start, stop)`        | `for i in range(start, stop):`       |
-| `c_forrange (i, IntType, start, stop, step)`  | `for i in range(start, stop, step):` |
+| Usage                                       | Python equivalent                    |
+|:--------------------------------------------|:-------------------------------------|
+| `c_forloop (stop)`                          | `for _ in range(stop):`              |
+| `c_forloop (i, stop) // i type = long long` | `for i in range(stop):`              |
+| `c_forloop (i, start, stop)`                | `for i in range(start, stop):`       |
+| `c_forloop (i, start, stop, step)`          | `for i in range(start, stop, step):` |
 
 ```c
-c_forrange (5) printf("x");
+c_forloop (5) printf("x");
 // xxxxx
-c_forrange (i, 5) printf(" %" PRIuMAX "", i);
+c_forloop (i, 5) printf(" %lld", i);
 // 0 1 2 3 4
-c_forrange (i, int, -3, 3) printf(" %d", i);
+c_forloop (i, -3, 3) printf(" %lld", i);
 // -3 -2 -1 0 1 2
-c_forrange (i, int, 30, 0, -5) printf(" %d", i);
+c_forloop (i, 30, 0, -5) printf(" %lld", i);
 // 30 25 20 15 10 5
 ```
 
@@ -244,7 +243,7 @@ bool isPrime(int i) {
 
 int main() {
     c_auto (IVec, vec) {
-        c_forrange (i, 1000) IVec_push(&vec, 1000000 + i);
+        c_forloop (i, 1000) IVec_push(&vec, 1000000 + i);
 
         c_forfilter (i, IVec, vec,
                         isOdd(*i.ref)
@@ -261,12 +260,12 @@ int main() {
 Note that `c_flt_take()` is given as an optional argument, which makes the loop stop when it becomes false (for efficiency). Chaining it after `isPrime()` instead will give same result, but the full input is processed.
 
 ### crange
-**crange** is a number sequence generator type. The **crange_value** type is `long long`. Below, *start*, *end*, *step* are type *crange_value*:
+**crange** is a number sequence generator type. The **crange_value** type is `long long`. Below, *start*, *stop*, *step* are type *crange_value*:
 ```c
 crange      crange_init(void);              // will generate 0, 1, 2, ...
-crange      crange_from(start);             // will generate start, start+1, ...
-crange      crange_from(start, end);        // will generate start, start+1, ... end-1
-crange      crange_from(start, end, step);  // will generate start, start+step, ... upto-not-including end
+crange      crange_make(stop);              // will generate 0, 1, ..., stop-1
+crange      crange_make(start, stop);       // will generate start, start+1, ... stop-1
+crange      crange_make(start, stop, step); // will generate start, start+step, ... upto-not-including stop
                                             // note that step may be negative.
 crange_iter crange_begin(crange* self);
 crange_iter crange_end(crange* self);
@@ -281,7 +280,7 @@ c_forfilter (i, crange, r1,
 // 2 3 5 7 11 13 17 19 23 29 31
 
 // 2. The 11 first primes:
-crange r2 = crange_from(3, INTMAX_MAX, 2);
+crange r2 = crange_make(3, INTMAX_MAX, 2);
 printf("2");
 c_forfilter (i, crange, r2, 
                 isPrime(*i.ref)

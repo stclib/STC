@@ -15,7 +15,7 @@ int main()
     };
 
     c_with (cregex re = cregex_init(), cregex_drop(&re))
-    c_forrange (i, c_arraylen(s))
+    c_forloop (i, c_arraylen(s))
     {
         int res = cregex_compile(&re, s[i].pattern, 0);
         if (res < 0) {
@@ -25,8 +25,8 @@ int main()
         printf("input: %s\n", s[i].input);
 
         c_formatch (j, &re, s[i].input) {
-            c_forrange (k, cregex_captures(&re))
-                printf("  submatch %d: %.*s\n", (int)k, c_ARGsv(j.match[k]));
+            c_forloop (k, cregex_captures(&re))
+                printf("  submatch %lld: %.*s\n", k, c_ARGsv(j.match[k]));
             puts("");
         }
     }

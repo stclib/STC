@@ -25,7 +25,7 @@ int main()
     // Create and init histogram map with defered destruct
     c_auto (csmap_int, mhist)
     {
-        c_forrange (N) {
+        c_forloop (N) {
             int index = (int) round( stc64_normalf(&rng, &dist) );
             csmap_int_insert(&mhist, index, 0).ref->second += 1;
         }

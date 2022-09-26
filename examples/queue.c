@@ -14,12 +14,12 @@ int main() {
     c_auto (cqueue_i, queue)
     {
         // Push ten million random numbers onto the queue.
-        c_forrange (n)
+        c_forloop (n)
             cqueue_i_push(&queue, stc64_uniform(&rng, &dist));
 
         // Push or pop on the queue ten million times
         printf("%d\n", n);
-        c_forrange (n) { // forrange uses initial n only.
+        c_forloop (n) { // forrange uses initial n only.
             int r = stc64_uniform(&rng, &dist);
             if (r & 1)
                 ++n, cqueue_i_push(&queue, r);

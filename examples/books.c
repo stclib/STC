@@ -41,7 +41,7 @@ int main()
 
         // Look up the values associated with some keys.
         const char* to_find[] = {"Pride and Prejudice", "Alice's Adventure in Wonderland"};
-        c_forrange (i, c_arraylen(to_find)) {
+        c_forloop (i, c_arraylen(to_find)) {
             const cmap_str_value* b;
             if ((b = cmap_str_get(&book_reviews, to_find[i])))
                 printf("%s: %s\n", cstr_str(&b->first), cstr_str(&b->second));

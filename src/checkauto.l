@@ -34,6 +34,9 @@ STR \"([^"\\]|\\.)*\"
 c_foreach       |
 c_forpair       |
 c_forrange      |
+c_forloop       |
+c_forfilter     |
+c_forwhile      |
 for             |
 while           |
 switch          { block_type |= LOOP; state = BRACES; }

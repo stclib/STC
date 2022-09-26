@@ -59,7 +59,7 @@ fn main() {
 void demo2(void)
 {
     c_auto (IVec, vector) {
-        crange rv = crange_from(1);
+        crange rv = crange_make(1, INTMAX_MAX);
         c_forfilter (x, crange, rv, 
                           flt_odd(x)
                       , c_flt_take(x, 5))
@@ -121,7 +121,7 @@ void demo5(void)
     #define flt_even(i) ((*i.ref & 1) == 0)
     #define flt_mid_decade(i) ((*i.ref % 10) != 0)
     puts("demo5:");
-    crange r1 = crange_from(1963);
+    crange r1 = crange_make(1963, INTMAX_MAX);
     c_forfilter (i, crange, r1, 
                     c_flt_drop(i,15)
                  && c_flt_dropwhile(i, flt_mid_decade(i))

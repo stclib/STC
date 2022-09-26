@@ -21,7 +21,7 @@ static void test_repeats(void)
     c_auto (cmap_ic, m)
     {
         cmap_ic_reserve(&m, N);
-        c_forrange (i, N) {
+        c_forloop (i, N) {
             uint64_t k = stc64_rand(&rng) & mask;
             int v = cmap_ic_insert(&m, k, 0).ref->second += 1;
             if (v > 1) printf("repeated value %" PRIuMAX " (%d) at 2^%d\n", k, v, (int) log2((double) i));
@@ -42,7 +42,7 @@ void test_distribution(void)
     const size_t N = 1ull << BITS ;
 
     c_auto (cmap_x, map) {
-        c_forrange (N) {
+        c_forloop (N) {
             uint64_t k = stc64_rand(&rng);
             cmap_x_insert(&map, k & 0xf, 0).ref->second += 1;
         }

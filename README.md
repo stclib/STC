@@ -469,12 +469,13 @@ Memory efficiency
 - Added **cregex** with documentation - powerful regular expressions.
 - Updated **cstr**, now always takes self as pointer, like all containers except csview.
 - Updated **cvec**, **cdeq**, changed `*_range*` function names.
-- `c_with`: macro renamed from `c_autovar`, which is deprecated. Like Python's **with** statement.
-- `c_scope`: macro renamed from `c_autoscope`, which is deprecated.
-- `c_defer`: macro renamed from `c_autodefer`, which is deprecated. Like Go's and Zig's **defer**.
-- `c_forrange` with 3 to 5 args: swapped 1st <-> 2nd arg.
-- New `c_forlist` macro to replace usages of `c_forarray`/`c_apply`, which is removed. 
 - Added back **coption** - command line argument parsing.
+- NEW / DEPRECATED:
+    - `c_forlist`: macro replacing `c_forarray` and `c_apply` which is deprecated. More user friendly.
+    - `c_forloop`: macro replacing `c_forrange` which is deprecated. Uses 'long long' as iterator type.
+    - `c_with`: macro renamed from `c_autovar`, which is deprecated. Like Python's **with** statement.
+    - `c_scope`: macro renamed from `c_autoscope`, which is deprecated.
+    - `c_defer`: macro renamed from `c_autodefer`, which is deprecated. Resembles Go's and Zig's **defer**.
 - [See detailed changes for version 3](#version-3).
 
 ## Changes version 3.8

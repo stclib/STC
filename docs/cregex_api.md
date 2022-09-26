@@ -128,14 +128,14 @@ To iterate multiple matches in an input string, you may use
 ```c
 csview match[5] = {0};
 while (cregex_find(&re, input, match, cre_m_next) == cre_success)
-    c_forrange (k, int, cregex_captures(&re))
-        printf("submatch %d: %.*s\n", k, c_ARGsv(match[k]));
+    c_forloop (k, cregex_captures(&re))
+        printf("submatch %lld: %.*s\n", k, c_ARGsv(match[k]));
 ```
 There is also a safe macro which simplifies this:
 ```c
 c_formatch (it, &re, input)
-    c_forrange (k, int, cregex_captures(&re))
-        printf("submatch %d: %.*s\n", k, c_ARGsv(it.match[k]));
+    c_forloop (k, cregex_captures(&re))
+        printf("submatch %lld: %.*s\n", k, c_ARGsv(it.match[k]));
 ```
 
 ## Using cregex in a project

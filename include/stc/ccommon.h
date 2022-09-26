@@ -193,6 +193,7 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
          ; _._it.ref && (_.key = &_._it.ref->first, _.val = &_._it.ref->second) \
          ; C##_next(&_._it))
 
+// [deprecated]:
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
 #define c_forrange1(stop) c_forrange4(_c_i, size_t, 0, stop)
 #define c_forrange2(i, stop) c_forrange4(i, size_t, 0, stop)
@@ -202,16 +203,24 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #define c_forrange5(i, itype, start, stop, step) \
     for (itype i=start, _inc=step, _end=(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)
+// [new]:
+#define c_forloop(...) c_MACRO_OVERLOAD(c_forloop, __VA_ARGS__)
+#define c_forloop1(stop) for (crange_value _i=0, _end=stop; _i<_end; ++_i)
+#define c_forloop2(i, stop) c_forloop4(i, 0, stop, 1)
+#define c_forloop3(i, start, stop) c_forloop4(i, start, stop, 1)
+#define c_forloop4(i, start, stop, step) \
+    for (crange_value i=start, _inc=step, _end=(stop) - (_inc > 0) \
+         ; (_inc > 0) ^ (i > _end); i += _inc)
 
 typedef long long crange_value;
 struct {crange_value val, end, step; } typedef crange;
 struct {crange_value *ref, end, step; } typedef crange_iter;
-#define crange_init() crange_from3(0, INTMAX_MAX, 1)
-#define crange_from(...) c_MACRO_OVERLOAD(crange_from, __VA_ARGS__)
-#define crange_from1(start) crange_from3(start, INTMAX_MAX, 1)
-#define crange_from2(start, end) crange_from3(start, end, 1)
-STC_INLINE crange crange_from3(crange_value start, crange_value finish, crange_value step)
-    { crange r = {start, finish - (step > 0), step}; return r; }
+#define crange_init() crange_make3(0, INTMAX_MAX, 1)
+#define crange_make(...) c_MACRO_OVERLOAD(crange_make, __VA_ARGS__)
+#define crange_make1(stop) crange_make3(0, stop, 1)
+#define crange_make2(start, stop) crange_make3(start, stop, 1)
+STC_INLINE crange crange_make3(crange_value start, crange_value stop, crange_value step)
+    { crange r = {start, stop - (step > 0), step}; return r; }
 STC_INLINE crange_iter crange_begin(crange* self) 
     { crange_iter it = {&self->val, self->end, self->step}; return it; }
 STC_INLINE crange_iter crange_end(crange* self) 

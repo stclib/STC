@@ -32,7 +32,7 @@ int main()
     c_auto (cvec_ii, histvec)
     c_auto (cmap_ii, histmap)
     {
-        c_forrange (N) {
+        c_forloop (N) {
             int index = (int) round( stc64_normalf(&rng, &dist) );
             cmap_ii_insert(&histmap, index, 0).ref->second += 1;
         }
