@@ -203,13 +203,13 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #define c_forrange5(i, itype, start, stop, step) \
     for (itype i=start, _inc=step, _end=(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)
-// [new]:
+// [replacement]:
 #define c_forloop(...) c_MACRO_OVERLOAD(c_forloop, __VA_ARGS__)
-#define c_forloop1(stop) for (crange_value _i=0, _end=stop; _i<_end; ++_i)
+#define c_forloop1(stop) for (long long _i=0, _end=stop; _i < _end; ++_i)
 #define c_forloop2(i, stop) c_forloop4(i, 0, stop, 1)
 #define c_forloop3(i, start, stop) c_forloop4(i, start, stop, 1)
 #define c_forloop4(i, start, stop, step) \
-    for (crange_value i=start, _inc=step, _end=(stop) - (_inc > 0) \
+    for (long long i=start, _inc=step, _end=(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)
 
 typedef long long crange_value;
@@ -230,7 +230,7 @@ STC_INLINE void crange_next(crange_iter* it)
 
 #define c_forlist(it, T, ...) \
     for (struct {T* data; T* ref; int size, index;} \
-         it = {.data=(T[])__VA_ARGS__, .ref=it.data, .size=c_arraylen(((T[])__VA_ARGS__))} \
+         it = {.data=(T[])__VA_ARGS__, .ref=it.data, .size=sizeof((T[])__VA_ARGS__)/sizeof(T)} \
          ; it.index < it.size; ++it.ref, ++it.index)
 
 #define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
