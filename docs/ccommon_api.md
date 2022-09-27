@@ -273,7 +273,7 @@ crange_iter crange_end(crange* self);
 void        crange_next(crange_iter* it);
 
 // 1. All primes less than 32:
-crange r1 = crange_from(3, 32, 2);
+crange r1 = crange_make(3, 32, 2);
 printf("2"); // first prime
 c_forfilter (i, crange, r1 
               , isPrime(*i.ref))
