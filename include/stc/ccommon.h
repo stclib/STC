@@ -68,7 +68,7 @@
 #  define c_alloc(T)            c_malloc(sizeof(T))
 #  define c_alloc_n(T, n)       c_malloc(sizeof(T)*(n))
 #  define c_make(T)             (T)
-#  define c_new(T, ...)         (T*)memcpy(c_alloc(T), (T[]){__VA_ARGS__}, sizeof(T))
+#  define c_new(T, ...)         ((T*)memcpy(c_alloc(T), (T[]){__VA_ARGS__}, sizeof(T)))
 #else
 #  include <new>
 #  define c_alloc(T)            static_cast<T*>(c_malloc(sizeof(T)))

@@ -66,8 +66,8 @@ int main()
         #define isOdd(i) (*i.ref & 1)
 
         puts("\n\nc_forfilter:");
-        c_forfilter (i, IVec, vec, 
-                        c_flt_skipwhile(i, *i.ref != 65)
+        c_forfilter (i, IVec, vec
+                      , c_flt_skipwhile(i, *i.ref != 65)
                      && c_flt_takewhile(i, *i.ref != 280)
                      && c_flt_skipwhile(i, isOdd(i))
                      && isOdd(i)
