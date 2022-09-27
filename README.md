@@ -471,12 +471,12 @@ Memory efficiency
 - Added: `c_forwhile`: *c_foreach* iteration with extra predicate.
 - Added: **crange**: Number generator type, which can be iterated (e.g. with *c_forfilter*).
 - Added back **coption** - command line argument parsing.
-- Added / Deprecated:
-    - `c_forlist`: macro replacing `c_forarray` and `c_apply` which is deprecated. More user friendly.
-    - `c_forloop`: macro replacing `c_forrange` which is deprecated. Uses 'long long' as iterator type.
-    - `c_with`: macro renamed from `c_autovar`, which is deprecated. Like Python's **with** statement.
-    - `c_scope`: macro renamed from `c_autoscope`, which is deprecated.
-    - `c_defer`: macro renamed from `c_autodefer`, which is deprecated. Resembles Go's and Zig's **defer**.
+- New + renamed loop iteration/scope macros:
+    - `c_forlist`: macro replacing `c_forarray` and `c_apply`. More user friendly.
+    - `c_forloop`: macro replacing `c_forrange`. Uses 'long long' as iterator type.
+    - `c_with`: macro renamed from `c_autovar`. Like Python's **with** statement.
+    - `c_scope`: macro renamed from `c_autoscope`.
+    - `c_defer`: macro renamed from `c_autodefer`. Resembles Go's and Zig's **defer**.
 - Updated **cstr**, now always takes self as pointer, like all containers except csview.
 - Updated **cvec**, **cdeq**, changed `*_range*` function names.
 [See detailed changes for version 3](#version-3).
