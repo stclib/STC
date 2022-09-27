@@ -280,10 +280,13 @@ STC_INLINE void crange_next(crange_iter* it)
 } while (0)
 
 #define c_erase_if(it, C, cnt, pred) do { \
+    size_t index = 0, count = 0; \
     C##_iter it = C##_begin(&cnt); \
-    while (it.ref) \
-        if (pred) it = C##_erase_at(&cnt, it); \
+    while (it.ref) { \
+        if (pred) it = C##_erase_at(&cnt, it), ++count; \
         else C##_next(&it); \
+        ++index; \
+    } \
 } while (0)
 
 #endif // CCOMMON_H_INCLUDED

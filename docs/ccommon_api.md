@@ -302,8 +302,10 @@ cmap_str_iter it, it1 = ..., it2 = ...;
 c_find_in(it, csmap_str, it1, it2, cstr_contains(it.ref, "hello"));
 if (it.ref) cmap_str_erase_at(&map, it);
 
-// Erase all numbers less than 100:
-c_erase_if(k, cvec_i, *k.ref < 100);
+// Erase all strings containing "hello":
+// Note 1: iter i need not be declared.
+// Note 2: variables index and count can be accessed in predicate.
+c_erase_if(i, csmap_str, map, cstr_contains(i.ref, "hello"));
 ```
 
 ### c_new, c_alloc, c_alloc_n, c_drop, c_make
