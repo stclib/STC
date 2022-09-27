@@ -5,7 +5,7 @@ STC - Smart Template Containers for C
 
 News: Version 4.0 Release Candidate 3 (Sep 2022)
 ------------------------------------------------
-- [See detailed changes for version 3](#version-3).
+- [See detailed changes for version 4](#version-4).
 
 Introduction
 ------------
@@ -463,9 +463,9 @@ Memory efficiency
 - **carr2**, **carr3**: Type size: 1 pointer plus dimension variables. Arrays are allocated as one contiguous block of heap memory, and one allocation for pointers of indices to the array.
 - **carc**: Type size: 2 pointers, one for the data and one for the reference counter.
 
-# Version 3
+# Version 4
 
-## API changes summary V3.8 - V4.0
+## API changes summary V4.0
 - Added **cregex** with documentation - powerful regular expressions.
 - Added: `c_forfilter`: Iteration with "piped" filtering using && operator. 4 built-in filters.
 - Added: `c_forwhile`: *c_foreach* iteration with extra predicate.
