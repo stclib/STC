@@ -3,7 +3,7 @@
 STC - Smart Template Containers for C
 =====================================
 
-News: Version 4.0 Release Candidate 2 (Sep 2022)
+News: Version 4.0 Release Candidate 3 (Sep 2022)
 ------------------------------------------------
 - [See detailed changes for version 3](#version-3).
 
@@ -26,6 +26,7 @@ in the future, and do minor modifications.
 
 Containers
 ----------
+- [***ccommon*** - **High-level algorithms on containers**](docs/ccommon_api.md)
 - [***carc*** - **std::shared_ptr** alike type](docs/carc_api.md)
 - [***carr2***, ***carr3*** - 2D and 3D **array** types](docs/carray_api.md)
 - [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
@@ -45,10 +46,9 @@ Containers
 
 Others
 ------
-- [***ccommon*** - RAII and iterator macros](docs/ccommon_api.md)
-- [***coption*** - getopt() alike command line args parser](docs/coption_api.md)
-- [***crandom*** - A novel very fast *PRNG* named **stc64**](docs/crandom_api.md)
 - [***cregex*** - Regular expression parser (extended from Rob Pike's regexp9)](docs/cregex_api.md)
+- [***crandom*** - A novel very fast *PRNG* named **stc64**](docs/crandom_api.md)
+- [***coption*** - getopt() alike command line args parser](docs/coption_api.md)
 
 Highlights
 ----------
@@ -467,16 +467,19 @@ Memory efficiency
 
 ## API changes summary V3.8 - V4.0
 - Added **cregex** with documentation - powerful regular expressions.
-- Updated **cstr**, now always takes self as pointer, like all containers except csview.
-- Updated **cvec**, **cdeq**, changed `*_range*` function names.
+- Added: `c_forfilter`: Iteration with "piped" filtering using && operator. 4 built-in filters.
+- Added: `c_forwhile`: *c_foreach* iteration with extra predicate.
+- Added: **crange**: Number generator type, which can be iterated (e.g. with *c_forfilter*).
 - Added back **coption** - command line argument parsing.
-- NEW / DEPRECATED:
+- Added / Deprecated:
     - `c_forlist`: macro replacing `c_forarray` and `c_apply` which is deprecated. More user friendly.
     - `c_forloop`: macro replacing `c_forrange` which is deprecated. Uses 'long long' as iterator type.
     - `c_with`: macro renamed from `c_autovar`, which is deprecated. Like Python's **with** statement.
     - `c_scope`: macro renamed from `c_autoscope`, which is deprecated.
     - `c_defer`: macro renamed from `c_autodefer`, which is deprecated. Resembles Go's and Zig's **defer**.
-- [See detailed changes for version 3](#version-3).
+- Updated **cstr**, now always takes self as pointer, like all containers except csview.
+- Updated **cvec**, **cdeq**, changed `*_range*` function names.
+[See detailed changes for version 3](#version-3).
 
 ## Changes version 3.8
 - Overhauled some **cstr** and **csview** API:
