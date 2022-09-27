@@ -224,9 +224,9 @@ Iterate containers with stop-criteria and chained range filtering.
 
 | Built-in filter                   | Description                          |
 |:----------------------------------|:-------------------------------------|
-| `c_flt_drop(it, numItems)`        | Drop numItems                        |
+| `c_flt_skip(it, numItems)`        | Skip numItems                        |
 | `c_flt_take(it, numItems)`        | Take numItems                        |
-| `c_flt_dropwhile(it, predicate)`  | Drop items until predicate is false  |
+| `c_flt_skipwhile(it, predicate)`  | Skip items until predicate is false  |
 | `c_flt_takewhile(it, predicate)`  | Take items until predicate is false  |
 
 `it.index` holds the index of the source item, and `it.count` the current number of items taken.
@@ -248,7 +248,7 @@ int main() {
 
         c_forfilter (i, IVec, vec,
                         isOdd(*i.ref)
-                     && c_flt_drop(i, 100) // built-in
+                     && c_flt_skip(i, 100) // built-in
                      && isPrime(*i.ref)
                       , c_flt_take(i, 10)) { // breaks loop on false.
             printf(" %d", *i.ref);  

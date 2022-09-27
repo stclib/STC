@@ -67,11 +67,11 @@ int main()
 
         puts("\n\nc_forfilter:");
         c_forfilter (i, IVec, vec, 
-                        c_flt_dropwhile(i, *i.ref != 65)
+                        c_flt_skipwhile(i, *i.ref != 65)
                      && c_flt_takewhile(i, *i.ref != 280)
-                     && c_flt_dropwhile(i, isOdd(i))
+                     && c_flt_skipwhile(i, isOdd(i))
                      && isOdd(i)
-                     && c_flt_drop(i, 2)
+                     && c_flt_skip(i, 2)
                       , c_flt_take(i, 1))
             printf(" %d", *i.ref);
         puts("");

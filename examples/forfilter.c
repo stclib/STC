@@ -12,10 +12,10 @@
 #include <stc/cstack.h>
 
 // filters and transforms:
-#define flt_remove(i, x) (*i.ref != (x))
-#define flt_even(i) ((*i.ref & 1) == 0)
-#define flt_odd(i) (*i.ref & 1)
-#define trf_square(i) (*i.ref * *i.ref)
+#define flt_skipValue(i, x) (*i.ref != (x))
+#define flt_isEven(i) ((*i.ref & 1) == 0)
+#define flt_isOdd(i) (*i.ref & 1)
+#define flt_square(i) (*i.ref * *i.ref)
 
 void demo1(void)
 {
@@ -24,20 +24,20 @@ void demo1(void)
             IVec_push(&vec, *i.ref);
 
         puts("demo1:");
-        c_forfilter (i, IVec, vec, flt_remove(i, 80))
+        c_forfilter (i, IVec, vec, flt_skipValue(i, 80))
             printf(" %d", *i.ref);
         puts("");
 
         int res, sum = 0;
         c_forfilter (i, IVec, vec,
-                        c_flt_dropwhile(i, *i.ref != 80)
-                     && c_flt_drop(i, 1)
-                     && c_flt_dropwhile(i, *i.ref != 80)
-                     &&   flt_even(i)
-                     &&   flt_remove(i, 80)
+                        c_flt_skipwhile(i, *i.ref != 80)
+                     && c_flt_skip(i, 1)
+                     && c_flt_skipwhile(i, *i.ref != 80)
+                     &&   flt_isEven(i)
+                     &&   flt_skipValue(i, 80)
                       , c_flt_take(i, 5) // short-circuit
         ){
-            sum += res = trf_square(i);
+            sum += res = flt_square(i);
             printf(" %d", res);
         }
         printf("\n sum: %d\n", sum);
@@ -61,9 +61,9 @@ void demo2(void)
     c_auto (IVec, vector) {
         crange rv = crange_make(1, INTMAX_MAX);
         c_forfilter (x, crange, rv, 
-                          flt_odd(x)
+                          flt_isOdd(x)
                       , c_flt_take(x, 5))
-            IVec_push(&vector, trf_square(x));
+            IVec_push(&vector, flt_square(x));
 
         puts("demo2:");
         c_foreach (i, IVec, vector) printf(" %d", *i.ref);
@@ -123,10 +123,10 @@ void demo5(void)
     puts("demo5:");
     crange r1 = crange_make(1963, INTMAX_MAX);
     c_forfilter (i, crange, r1, 
-                    c_flt_drop(i,15)
-                 && c_flt_dropwhile(i, flt_mid_decade(i))
-                 && c_flt_drop(i,30)
-                 &&   flt_even(i)
+                    c_flt_skip(i,15)
+                 && c_flt_skipwhile(i, flt_mid_decade(i))
+                 && c_flt_skip(i,30)
+                 &&   flt_isEven(i)
                   , c_flt_take(i,10))
         printf(" %lld", *i.ref);
     puts("");
