@@ -217,7 +217,7 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
          ; (_inc > 0) ^ (i > _end); i += _inc)
 
 typedef long long crange_value;
-struct {crange_value val, end, step; } typedef crange;
+struct {crange_value start, end, step, val; } typedef crange;
 struct {crange_value *ref, end, step; } typedef crange_iter;
 #define crange_init() crange_make3(0, INTMAX_MAX, 1)
 #define crange_make(...) c_MACRO_OVERLOAD(crange_make, __VA_ARGS__)
@@ -225,8 +225,8 @@ struct {crange_value *ref, end, step; } typedef crange_iter;
 #define crange_make2(start, stop) crange_make3(start, stop, 1)
 STC_INLINE crange crange_make3(crange_value start, crange_value stop, crange_value step)
     { crange r = {start, stop - (step > 0), step}; return r; }
-STC_INLINE crange_iter crange_begin(crange* self) 
-    { crange_iter it = {&self->val, self->end, self->step}; return it; }
+STC_INLINE crange_iter crange_begin(crange* self)
+    { self->val = self->start; crange_iter it = {&self->val, self->end, self->step}; return it; }
 STC_INLINE crange_iter crange_end(crange* self) 
     { crange_iter it = {NULL}; return it; }
 STC_INLINE void crange_next(crange_iter* it) 
