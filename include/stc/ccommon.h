@@ -119,7 +119,6 @@ typedef const char* crawstr;
 #define c_PRIsv ".*s"
 #define c_ARGsv(sv) (int)(sv).size, (sv).str
 #define c_PAIR(ref) (ref)->first, (ref)->second
-#define c_pair(ref) c_PAIR(ref) // [deprecated]
 
 #define _c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
@@ -222,7 +221,7 @@ struct {crange_value *ref, end, step; } typedef crange_iter;
 #define crange_make(...) c_MACRO_OVERLOAD(crange_make, __VA_ARGS__)
 #define crange_make1(stop) crange_make3(0, stop, 1)
 #define crange_make2(start, stop) crange_make3(start, stop, 1)
-#define c_RANGE(...) crange, *(crange[]){crange_make(__VA_ARGS__)}
+#define c_range(...) (*(crange[]){crange_make(__VA_ARGS__)})
 STC_INLINE crange crange_make3(crange_value start, crange_value stop, crange_value step)
     { crange r = {start, stop - (step > 0), step}; return r; }
 STC_INLINE crange_iter crange_begin(crange* self)
