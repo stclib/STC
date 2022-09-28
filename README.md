@@ -26,7 +26,7 @@ in the future, and do minor modifications.
 
 Containers
 ----------
-- [***ccommon*** - **High-level algorithms on containers**](docs/ccommon_api.md)
+- [***ccommon*** - Generic algorithms and macros](docs/ccommon_api.md)
 - [***carc*** - **std::shared_ptr** alike type](docs/carc_api.md)
 - [***carr2***, ***carr3*** - 2D and 3D **array** types](docs/carray_api.md)
 - [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
@@ -467,19 +467,18 @@ Memory efficiency
 
 ## API changes summary V4.0
 - Added **cregex** with documentation - powerful regular expressions.
-- Added: `c_forfilter`: Iteration with "piped" filtering using && operator. 4 built-in filters.
-- Added: `c_forwhile`: *c_foreach* iteration with extra predicate.
-- Added: **crange**: Number generator type, which can be iterated (e.g. with *c_forfilter*).
+- Added: `c_forfilter`: container iteration with "piped" filtering using && operator. 4 built-in filters.
+- Added: `c_forwhile`: *c_foreach* container iteration with extra predicate.
+- Added: **crange**: number generator type, which can be iterated (e.g. with *c_forfilter*).
 - Added back **coption** - command line argument parsing.
 - New + renamed loop iteration/scope macros:
-    - `c_forlist`: macro replacing `c_forarray` and `c_apply`. More user friendly.
-    - `c_forloop`: macro replacing `c_forrange`. Uses 'long long' as iterator type.
+    - `c_forlist`: macro replacing `c_forarray` and `c_apply`. Iterate a compound literal list.
+    - `c_forloop`: macro replacing `c_forrange`. Iterate a `long long` type number sequence.
     - `c_with`: macro renamed from `c_autovar`. Like Python's **with** statement.
     - `c_scope`: macro renamed from `c_autoscope`.
     - `c_defer`: macro renamed from `c_autodefer`. Resembles Go's and Zig's **defer**.
 - Updated **cstr**, now always takes self as pointer, like all containers except csview.
 - Updated **cvec**, **cdeq**, changed `*_range*` function names.
-[See detailed changes for version 3](#version-3).
 
 ## Changes version 3.8
 - Overhauled some **cstr** and **csview** API:

@@ -1,4 +1,4 @@
-# STC [ccommon](../include/stc/ccommon.h): RAII and iterator macros
+# STC [ccommon](../include/stc/ccommon.h): Generic algorithms and macros
 
 The following macros are recommended to use, and they safe/have no side-effects.
 
