@@ -2,6 +2,7 @@
 #define i_implement
 #include <stc/cstr.h>
 #include <stc/csview.h>
+#include <stc/views.h>
 
 #define i_type IVec
 #define i_val int
@@ -29,8 +30,8 @@ void demo1(void)
         puts("");
 
         int res, sum = 0;
-        c_forfilter (i, IVec, vec,
-                        c_flt_skipwhile(i, *i.ref != 80)
+        c_forfilter (i, IVec, vec
+                      , c_flt_skipwhile(i, *i.ref != 80)
                      && c_flt_skip(i, 1)
                      && c_flt_skipwhile(i, *i.ref != 80)
                      &&   flt_isEven(i)
@@ -59,9 +60,10 @@ fn main() {
 void demo2(void)
 {
     c_auto (IVec, vector) {
-        crange rv = crange_make(1, INTMAX_MAX);
-        c_forfilter (x, crange, rv, 
-                          flt_isOdd(x)
+        crange rv = crange_init(crange_MAX);
+        c_forfilter (x, crange, rv
+                      , flt_isOdd(x)
+                     && c_flt_skipwhile(x, *x.ref != 11)
                       , c_flt_take(x, 5))
             IVec_push(&vector, flt_square(x));
 
@@ -121,12 +123,12 @@ void demo5(void)
     #define flt_even(i) ((*i.ref & 1) == 0)
     #define flt_mid_decade(i) ((*i.ref % 10) != 0)
     puts("demo5:");
-    crange r1 = crange_make(1963, INTMAX_MAX);
-    c_forfilter (i, crange, r1, 
-                    c_flt_skip(i,15)
+    crange r1 = crange_init(1963, crange_MAX);
+    c_forfilter (i, crange, r1
+                  , c_flt_skip(i,15)
                  && c_flt_skipwhile(i, flt_mid_decade(i))
                  && c_flt_skip(i,30)
-                 &&   flt_isEven(i)
+                 &&   flt_even(i)
                   , c_flt_take(i,10))
         printf(" %lld", *i.ref);
     puts("");

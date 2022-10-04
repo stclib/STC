@@ -263,17 +263,16 @@ Note that `c_flt_take()` is given as an optional argument, which makes the loop 
 ### crange
 **crange** is a number sequence generator type. The **crange_value** type is `long long`. Below, *start*, *stop*, *step* are type *crange_value*:
 ```c
-crange      crange_init(void);              // will generate 0, 1, 2, ...
-crange      crange_make(stop);              // will generate 0, 1, ..., stop-1
-crange      crange_make(start, stop);       // will generate start, start+1, ... stop-1
-crange      crange_make(start, stop, step); // will generate start, start+step, ... upto-not-including stop
+crange      crange_init(stop);              // will generate 0, 1, ..., stop-1
+crange      crange_init(start, stop);       // will generate start, start+1, ... stop-1
+crange      crange_init(start, stop, step); // will generate start, start+step, ... upto-not-including stop
                                             // note that step may be negative.
 crange_iter crange_begin(crange* self);
 crange_iter crange_end(crange* self);
 void        crange_next(crange_iter* it);
 
 // 1. All primes less than 32:
-crange r1 = crange_make(3, 32, 2);
+crange r1 = crange_init(3, 32, 2);
 printf("2"); // first prime
 c_forfilter (i, crange, r1 
               , isPrime(*i.ref))
@@ -281,7 +280,7 @@ c_forfilter (i, crange, r1
 // 2 3 5 7 11 13 17 19 23 29 31
 
 // 2. The 11 first primes:
-crange r2 = crange_make(3, INTMAX_MAX, 2);
+crange r2 = crange_init(3, crange_MAX, 2);
 printf("2");
 c_forfilter (i, crange, r2 
               , isPrime(*i.ref)

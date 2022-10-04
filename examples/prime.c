@@ -2,6 +2,7 @@
 #include <math.h>
 #include <time.h>
 #include <stc/cbits.h>
+#include <stc/views.h>
 
 cbits sieveOfEratosthenes(size_t n)
 {
@@ -40,7 +41,7 @@ int main(void)
         puts("");
 
         puts("Show the last 50 primes using a temporary crange generator:");
-        c_forfilter (i, crange, *(crange[]){crange_make(n - 1, 0, -2)}
+        c_forfilter (i, crange, c_range(n - 1, 0, -2)
                       , cbits_test(&primes, *i.ref>>1)
                       , c_flt_take(i, 50)) {
             printf("%lld ", *i.ref);

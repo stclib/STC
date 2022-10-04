@@ -26,9 +26,8 @@ All csview definitions and prototypes are available by including a single header
 ## Methods
 
 ```c
-csview          c_sv(const char literal_only[]);                    // alias for csview_new
+csview          c_sv(const char literal_only[]);                    // construct from literal, no strlen()
 csview          c_sv(const char* str, size_t n);                    // overloaded csview constructor.
-csview          csview_new(const char literal_only[]);              // construct from literal, no strlen()
 csview          csview_from(const char* str);                       // construct from const char*
 void            csview_clear(csview* self);
 

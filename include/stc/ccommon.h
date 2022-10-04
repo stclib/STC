@@ -196,17 +196,6 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
          ; _.it.ref && (_.key = &_.it.ref->first, _.val = &_.it.ref->second) \
          ; C##_next(&_.it))
 
-// [deprecated]:
-#define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
-#define c_forrange1(stop) c_forrange4(_c_i, size_t, 0, stop)
-#define c_forrange2(i, stop) c_forrange4(i, size_t, 0, stop)
-#define c_forrange3(i, itype, stop) c_forrange4(i, itype, 0, stop)
-#define c_forrange4(i, itype, start, stop) \
-    for (itype i=start, _end=stop; i < _end; ++i)
-#define c_forrange5(i, itype, start, stop, step) \
-    for (itype i=start, _inc=step, _end=(stop) - (_inc > 0) \
-         ; (_inc > 0) ^ (i > _end); i += _inc)
-// [replacement]:
 #define c_forloop(...) c_MACRO_OVERLOAD(c_forloop, __VA_ARGS__)
 #define c_forloop1(stop) for (long long _i=0, _end=stop; _i < _end; ++_i)
 #define c_forloop2(i, stop) c_forloop4(i, 0, stop, 1)
@@ -214,22 +203,6 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 #define c_forloop4(i, start, stop, step) \
     for (long long i=start, _inc=step, _end=(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)
-
-typedef long long crange_value;
-struct {crange_value start, end, step, val; } typedef crange;
-struct {crange_value *ref, end, step; } typedef crange_iter;
-#define crange_make(...) c_MACRO_OVERLOAD(crange_make, __VA_ARGS__)
-#define crange_make1(stop) crange_make3(0, stop, 1)
-#define crange_make2(start, stop) crange_make3(start, stop, 1)
-#define c_range(...) (*(crange[]){crange_make(__VA_ARGS__)})
-STC_INLINE crange crange_make3(crange_value start, crange_value stop, crange_value step)
-    { crange r = {start, stop - (step > 0), step}; return r; }
-STC_INLINE crange_iter crange_begin(crange* self)
-    { self->val = self->start; crange_iter it = {&self->val, self->end, self->step}; return it; }
-STC_INLINE crange_iter crange_end(crange* self) 
-    { crange_iter it = {NULL}; return it; }
-STC_INLINE void crange_next(crange_iter* it) 
-    { *it->ref += it->step; if ((it->step > 0) == (*it->ref > it->end)) it->ref = NULL; }
 
 #define c_forlist(it, T, ...) \
     for (struct {T* data; T* ref; int size, index;} \

@@ -28,12 +28,12 @@
 #include "utf8.h"
 
 #define             csview_null  c_sv("")
-#define             csview_new(literal) c_sv(literal)
 #define             csview_npos  (SIZE_MAX >> 1)
 
 #define             csview_init() csview_null
 #define             csview_drop   c_default_drop
 #define             csview_clone  c_default_clone
+#define             csview_from_n c_sv
 
 STC_INLINE csview   csview_from(const char* str)
                         { return c_make(csview){str, strlen(str)}; }
