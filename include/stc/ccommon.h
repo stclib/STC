@@ -197,9 +197,10 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
          ; C##_next(&_.it))
 
 #define c_forloop(...) c_MACRO_OVERLOAD(c_forloop, __VA_ARGS__)
-#define c_forloop1(stop) for (long long _i=0, _end=stop; _i < _end; ++_i)
-#define c_forloop2(i, stop) c_forloop4(i, 0, stop, 1)
-#define c_forloop3(i, start, stop) c_forloop4(i, start, stop, 1)
+#define c_forloop1(stop) c_forloop3(_i, 0, stop)
+#define c_forloop2(i, stop) c_forloop3(i, 0, stop)
+#define c_forloop3(i, start, stop) \
+    for (long long i=start, _end=stop; i < _end; ++i)
 #define c_forloop4(i, start, stop, step) \
     for (long long i=start, _inc=step, _end=(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)

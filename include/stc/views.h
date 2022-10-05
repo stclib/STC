@@ -87,7 +87,7 @@ struct stc_nostruct
 #define crange_MAX INT64_MAX
 
 typedef long long crange_value;
-typedef struct { crange_value start, end, step, val; } crange;
+typedef struct { crange_value start, end, step, value; } crange;
 typedef struct { crange_value *ref, end, step; } crange_iter;
 
 #define crange_init(...) c_MACRO_OVERLOAD(crange_init, __VA_ARGS__)
@@ -98,7 +98,7 @@ STC_INLINE crange crange_init3(crange_value start, crange_value stop, crange_val
     { crange r = {start, stop - (step > 0), step}; return r; }
 
 STC_INLINE crange_iter crange_begin(crange* self)
-    { self->val = self->start; crange_iter it = {&self->val, self->end, self->step}; return it; }
+    { self->value = self->start; crange_iter it = {&self->value, self->end, self->step}; return it; }
 
 STC_INLINE crange_iter crange_end(crange* self) 
     { crange_iter it = {NULL}; return it; }
