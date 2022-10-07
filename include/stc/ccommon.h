@@ -238,13 +238,13 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 
 #define c_drop(C, ...) do { c_forlist (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
 
-#define c_find_if(it, C, cnt, pred) do { \
+#define c_find_if(...) c_MACRO_OVERLOAD(c_find_if, __VA_ARGS__)
+#define c_find_if4(it, C, cnt, pred) do { \
     size_t index = 0; \
     for (it = C##_begin(&cnt); it.ref && !(pred); C##_next(&it)) \
         ++index; \
 } while (0)
-
-#define c_find_in(it, C, start, end, pred) do { \
+#define c_find_if5(it, C, start, end, pred) do { \
     size_t index = 0; \
     const C##_value* _endref = (end).ref; \
     for (it = start; it.ref != _endref && !(pred); C##_next(&it)) \
@@ -253,12 +253,10 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
 } while (0)
 
 #define c_erase_if(it, C, cnt, pred) do { \
-    size_t index = 0, count = 0; \
     C##_iter it = C##_begin(&cnt); \
-    while (it.ref) { \
-        if (pred) it = C##_erase_at(&cnt, it), ++count; \
+    for (size_t index = 0; it.ref; ++index) { \
+        if (pred) it = C##_erase_at(&cnt, it); \
         else C##_next(&it); \
-        ++index; \
     } \
 } while (0)
 
