@@ -298,7 +298,7 @@ if (i.ref) printf("%d\n", *i.ref);
 
 // Search map for a string containing "hello" and erase it:
 cmap_str_iter it, it1 = ..., it2 = ...;
-c_find_in(it, csmap_str, it1, it2, cstr_contains(it.ref, "hello"));
+c_find_if(it, csmap_str, it1, it2, cstr_contains(it.ref, "hello"));
 if (it.ref) cmap_str_erase_at(&map, it);
 
 // Erase all strings containing "hello":
