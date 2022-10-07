@@ -1294,7 +1294,7 @@ public:
 
     void shrink_to_fit()
     {
-        rehash(_num_filled);
+        rehash(_num_filled + 1);
     }
 
     /// Make room for this many elements
