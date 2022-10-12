@@ -40,7 +40,7 @@ bool             cbits_test(const cbits* self, size_t i);
 bool             cbits_at(const cbits* self, size_t i);                  // same as cbits_test()
 bool             cbits_subset_of(const cbits* self, const cbits* other); // is set a subset of other?
 bool             cbits_disjoint(const cbits* self, const cbits* other);  // no common bits
-char*            cbits_to_str(const cbits* self, char* str, size_t start, intptr_t stop);
+char*            cbits_to_str(const cbits* self, char* str, size_t start, size_t stop);
 
 void             cbits_set(cbits* self, size_t i);
 void             cbits_reset(cbits* self, size_t i);

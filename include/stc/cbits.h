@@ -84,11 +84,12 @@ STC_INLINE size_t _cbits_count(const uint64_t* set, const size_t sz) {
 }
 
 STC_INLINE char* _cbits_to_str(const uint64_t* set, const size_t sz, 
-                            char* out, size_t start, intptr_t stop) {
-    if (stop < 0)
-        stop = sz;
+                               char* out, size_t start, size_t stop) {
+    if (stop > sz) stop = sz;
+    assert(start <= stop);
+
     memset(out, '0', stop - start);
-    for (intptr_t i = start; i < stop; ++i) 
+    for (size_t i = start; i < stop; ++i) 
         if ((set[i>>6] & _cbits_bit(i)) != 0)
             out[i - start] = '1';
     out[stop - start] = '\0';
@@ -288,7 +289,7 @@ STC_INLINE void _i_memb(_xor)(i_type *self, const i_type* other) {
 STC_INLINE size_t _i_memb(_count)(const i_type* self)
     { return _cbits_count(self->data64, _i_memb(_size)(self)); }
 
-STC_INLINE char* _i_memb(_to_str)(const i_type* self, char* out, size_t start, intptr_t stop)
+STC_INLINE char* _i_memb(_to_str)(const i_type* self, char* out, size_t start, size_t stop)
     { return _cbits_to_str(self->data64, _i_memb(_size)(self), out, start, stop); }
 
 STC_INLINE bool _i_memb(_subset_of)(const i_type* self, const i_type* other) { 
