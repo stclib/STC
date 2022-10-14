@@ -184,7 +184,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
         sum += ++ M##_PUT(X, RAND(keybits), i); \
     } \
     difference = clock() - before; \
-    printf(#M ": time: %5.03f, size: %" PRIuMAX ", buckets: %8" PRIuMAX ", sum: %" PRIuMAX "\n", \
+    printf(#M ": time: %5.03f, size: %" c_zu ", buckets: %8" c_zu ", sum: %" c_zu "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), sum); \
     M##_DTOR(X); \
 }
@@ -199,7 +199,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
     for (size_t i = 0; i < n; ++i) \
         erased += M##_ERASE(X, i); \
     difference = clock() - before; \
-    printf(#M ": time: %5.03f, size: %" PRIuMAX ", buckets: %8" PRIuMAX ", erased %" PRIuMAX "\n", \
+    printf(#M ": time: %5.03f, size: %" c_zu ", buckets: %8" c_zu ", erased %" c_zu "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), erased); \
     M##_DTOR(X); \
 }
@@ -217,7 +217,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
     for (size_t i = 0; i < n; ++i) \
         erased += M##_ERASE(X, RAND(keybits)); \
     difference = clock() - before; \
-    printf(#M ": time: %5.03f, size: %" PRIuMAX ", buckets: %8" PRIuMAX ", erased %" PRIuMAX "\n", \
+    printf(#M ": time: %5.03f, size: %" c_zu ", buckets: %8" c_zu ", erased %" c_zu "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), erased); \
     M##_DTOR(X); \
 }
@@ -235,7 +235,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
     for (size_t k=0; k < rep; k++) M##_FOR (X, it) \
         sum += M##_ITEM(X, it); \
     difference = clock() - before; \
-    printf(#M ": time: %5.03f, size: %" PRIuMAX ", buckets: %8" PRIuMAX ", repeats: %" PRIuMAX ", sum: %" PRIuMAX "\n", \
+    printf(#M ": time: %5.03f, size: %" c_zu ", buckets: %8" c_zu ", repeats: %" c_zu ", sum: %" c_zu "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), rep, sum); \
     M##_DTOR(X); \
 }
@@ -257,7 +257,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
     for (size_t i = 0; i < x; ++i) \
         found += M##_FIND(X, RAND(keybits)); \
     difference = clock() - before; \
-    printf(#M ": time: %5.03f, size: %" PRIuMAX ", buckets: %8" PRIuMAX ", lookups: %" PRIuMAX ", found: %" PRIuMAX "\n", \
+    printf(#M ": time: %5.03f, size: %" c_zu ", buckets: %8" c_zu ", lookups: %" c_zu ", found: %" c_zu "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), x*2, found); \
     M##_DTOR(X); \
 }
@@ -299,7 +299,7 @@ int main(int argc, char* argv[])
            "UMAP = std::unordered_map\n\n");
 
     printf("Usage %s [n-million=%d key-bits=%d]\n", argv[0], DEFAULT_N_MILL, DEFAULT_KEYBITS);
-    printf("N-base = %d. Random keys are in range [0, 2^%d). Seed = %" PRIuMAX ":\n", n_mill, keybits, seed);
+    printf("N-base = %d. Random keys are in range [0, 2^%d). Seed = %" c_zu ":\n", n_mill, keybits, seed);
 
     printf("\nT1: Insert/update random keys:\n");
     RUN_TEST(1)

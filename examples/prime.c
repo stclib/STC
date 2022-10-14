@@ -25,7 +25,7 @@ cbits sieveOfEratosthenes(size_t n)
 int main(void)
 {
     size_t n = 1000000000;
-    printf("computing prime numbers up to %" PRIuMAX "\n", n);
+    printf("computing prime numbers up to %" c_zu "\n", n);
 
     clock_t t1 = clock();
     c_with (cbits primes = sieveOfEratosthenes(n + 1), cbits_drop(&primes)) {
@@ -33,7 +33,7 @@ int main(void)
         size_t np = cbits_count(&primes);
         clock_t t2 = clock();
 
-        printf("number of primes: %" PRIuMAX ", time: %f\n", np, (t2 - t1) / (float)CLOCKS_PER_SEC);
+        printf("number of primes: %" c_zu ", time: %f\n", np, (t2 - t1) / (float)CLOCKS_PER_SEC);
         puts("Show all the primes in the range [2, 1000):");
         printf("2");
         c_forloop (i, 3, 1000, 2)

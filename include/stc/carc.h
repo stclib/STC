@@ -43,7 +43,7 @@ int main() {
     ArcPers p = ArcPers_from(Person_new("John", "Smiths"));
     ArcPers q = ArcPers_clone(p); // share the pointer
 
-    printf("%s %s. uses: %" PRIuMAX "\n", cstr_str(&q.get->name), cstr_str(&q.get->last), *q.use_count);
+    printf("%s %s. uses: %" c_zu "\n", cstr_str(&q.get->name), cstr_str(&q.get->last), *q.use_count);
     c_drop(ArcPers, &p, &q);
 }
 */

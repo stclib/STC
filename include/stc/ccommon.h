@@ -30,6 +30,12 @@
 #include <string.h>
 #include <assert.h>
 
+#if SIZE_MAX == UINT32_MAX
+#  define c_zu PRIu32
+#elif SIZE_MAX == UINT64_MAX
+#  define c_zu PRIu64
+#endif
+
 #if defined(_MSC_VER)
 #  pragma warning(disable: 4116 4996) // unnamed type definition in parentheses
 #  define STC_FORCE_INLINE static __forceinline
