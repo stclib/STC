@@ -344,7 +344,7 @@ static void evaluntil(Parser *par, Token type);
 static int  bldcclass(Parser *par);
 
 static void
-rcerror(Parser *par, cregex_error_t err)
+rcerror(Parser *par, cregex_result err)
 {
     par->error = err;
     longjmp(par->regkaboom, 1);
@@ -736,13 +736,14 @@ bldcclass(Parser *par)
                 int inv = par->exprp[1] == '^', off = 1 + inv;
                 for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
                     if (!strncmp(par->exprp + off, cls[i].c, cls[i].n)) {
-                        if (par->rune_type == IRUNE && (cls[i].r == ASC_lo || cls[i].r == ASC_up))
-                            rune = ASC_al + inv;
-                        else
-                            rune = cls[i].r + inv;
+                        rune = cls[i].r;
                         par->exprp += off + cls[i].n;
                         break;
                     }
+                if (par->rune_type == IRUNE && (rune == ASC_lo || rune == ASC_up))
+                    rune = ASC_al;
+                if (inv && rune != '[')
+                    rune += 1;
             }
         }
         *ep++ = rune;
@@ -1192,8 +1193,7 @@ int
 cregex_compile(cregex *self, const char* pattern, int cflags) {
     Parser par;
     self->prog = regcomp1(self->prog, &par, pattern, cflags);
-    self->error = par.error;
-    return self->prog ? cre_success : par.error;
+    return self->error = par.error;
 }
 
 int

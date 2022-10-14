@@ -35,21 +35,21 @@ THE SOFTWARE.
 #include "forward.h" // csview 
 
 typedef enum {
-    cre_success = 1,
-    cre_nomatch = 0,
-    cre_matcherror = -1,
-    cre_outofmemory = -2,
-    cre_unmatchedleftparenthesis = -3,
-    cre_unmatchedrightparenthesis = -4,
-    cre_toomanysubexpressions = -5,
-    cre_toomanycharacterclasses = -6,
-    cre_malformedcharacterclass = -7,
-    cre_missingoperand = -8,
-    cre_unknownoperator = -9,
-    cre_operandstackoverflow = -10,
-    cre_operatorstackoverflow = -11,
-    cre_operatorstackunderflow = -12,
-} cregex_error_t;
+    cre_success = 0,
+    cre_nomatch = -1,
+    cre_matcherror = -2,
+    cre_outofmemory = -3,
+    cre_unmatchedleftparenthesis = -4,
+    cre_unmatchedrightparenthesis = -5,
+    cre_toomanysubexpressions = -6,
+    cre_toomanycharacterclasses = -7,
+    cre_malformedcharacterclass = -8,
+    cre_missingoperand = -9,
+    cre_unknownoperator = -10,
+    cre_operandstackoverflow = -11,
+    cre_operatorstackoverflow = -12,
+    cre_operatorstackunderflow = -13,
+} cregex_result;
 
 enum {
     /* compile-flags */
@@ -87,7 +87,7 @@ cregex cregex_init(void) {
     return re;
 }
 
-/* return 1 on success, or negative error code on failure. */
+/* return cre_success, or negative error code on failure. */
 int cregex_compile(cregex *self, const char* pattern, int cflags);
 
 static inline
@@ -100,7 +100,7 @@ cregex cregex_from(const char* pattern, int cflags) {
 /* number of capture groups in a regex pattern, 0 if regex is invalid */
 int cregex_captures(const cregex* self);
 
-/* return 1 on match, 0 on nomatch, and -1 on failure. */
+/* return cre_success, cre_nomatch or cre_matcherror. */
 int cregex_find(const cregex* re, const char* input,
                 csview match[], int mflags);
 static inline

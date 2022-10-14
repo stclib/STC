@@ -473,6 +473,7 @@ STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self cx) { 
     return c_make(_cx_self){_cx_memb(_clone_r_)(cx.root), cx.size};
 }
+#endif // !_i_no_clone
 
 #if !defined _i_no_emplace
 STC_DEF _cx_result
@@ -485,7 +486,6 @@ _cx_memb(_emplace)(_cx_self* self, i_keyraw rkey _i_MAP_ONLY(, i_valraw rmapped)
     return res;
 }
 #endif // _i_no_emplace
-#endif // !_i_no_clone
 
 static void
 _cx_memb(_drop_r_)(_cx_node* tn) {

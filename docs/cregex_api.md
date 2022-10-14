@@ -25,13 +25,13 @@ enum {
 cregex      cregex_init(void);
 
 cregex      cregex_from(const char* pattern, int cflags);
-            // return 1 = success, negative = error.
+            // return cre_success, or negative error code on failure.
 int         cregex_compile(cregex *self, const char* pattern, int cflags);
 
             // num. of capture groups in regex. 0 if RE is invalid. First group is the full match.
 int         cregex_captures(const cregex* self); 
 
-            // return 1=match, 0=nomatch, -1=error. match array size: at least num groups in RE (1+).
+            // return cre_success, cre_nomatch, or cre_matcherror.
 int         cregex_find(const cregex* re, const char* input, csview match[], int mflags);
 int         cregex_find_sv(const cregex* re, csview input, csview match[]);
 int         cregex_find_pattern(const char* pattern, const char* input, csview match[], int cmflags);
@@ -48,20 +48,20 @@ void        cregex_drop(cregex* self); // destroy
 ```
 
 ### Error codes
-- cre_success = 1
-- cre_nomatch = 0
-- cre_matcherror = -1
-- cre_outofmemory = -2
-- cre_unmatchedleftparenthesis = -3
-- cre_unmatchedrightparenthesis = -4
-- cre_toomanysubexpressions = -5
-- cre_toomanycharacterclasses = -6
-- cre_malformedcharacterclass = -7
-- cre_missingoperand = -8
-- cre_unknownoperator = -9
-- cre_operandstackoverflow = -10
-- cre_operatorstackoverflow = -11
-- cre_operatorstackunderflow = -12
+- cre_success = 0
+- cre_nomatch = -1
+- cre_matcherror = -2
+- cre_outofmemory = -3
+- cre_unmatchedleftparenthesis = -4
+- cre_unmatchedrightparenthesis = -5
+- cre_toomanysubexpressions = -6
+- cre_toomanycharacterclasses = -7
+- cre_malformedcharacterclass = -8
+- cre_missingoperand = -9
+- cre_unknownoperator = -10
+- cre_operandstackoverflow = -11
+- cre_operatorstackoverflow = -12
+- cre_operatorstackunderflow = -13
 
 ### Limits
 - cre_MAXCLASSES
