@@ -67,7 +67,7 @@ enum {
 };
 
 typedef struct {
-    struct Reprog* prog;
+    struct _Reprog* prog;
     int error;
 } cregex;
 
