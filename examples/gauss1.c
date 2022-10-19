@@ -11,7 +11,7 @@
 #include <stc/cmap.h>
 
 // Declare int vector with entries from the cmap.
-#define i_val cmap_ii_raw
+#define i_val cmap_ii_value
 #define i_less(x, y) x->first < y->first
 #define i_tag ii
 #include <stc/cvec.h>
@@ -39,7 +39,7 @@ int main()
 
         // Transfer map to vec and sort it by map keys.
         c_foreach (i, cmap_ii, histmap)
-            cvec_ii_push_back(&histvec, (cmap_ii_raw){i.ref->first, i.ref->second});
+            cvec_ii_push(&histvec, (cmap_ii_value){i.ref->first, i.ref->second});
 
         cvec_ii_sort(&histvec);
 

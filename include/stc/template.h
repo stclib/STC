@@ -52,6 +52,12 @@
   #define _i_expandby 1
 #endif
 
+#if (defined i_valraw) ^ (defined i_valto)
+  #error "both i_valto and i_valraw must be defined, if any"
+#elif defined i_valfrom && !defined i_valraw
+  #error "i_valfrom defined without i_valraw"
+#endif
+
 #if !(defined i_key || defined i_key_str || defined i_key_ssv || \
       defined i_key_bind || defined i_key_arcbox)
   #define _i_key_from_val
@@ -177,7 +183,9 @@
 #elif !defined i_eq
   #define i_eq c_default_eq
 #endif
-#if !defined i_less && !defined i_cmp
+#if defined i_less && defined i_cmp
+  #error "Only one of i_less and i_cmp may be defined"
+#elif !defined i_less && !defined i_cmp
   #define i_less c_default_less
 #elif !defined i_less
   #define i_less(x, y) (i_cmp(x, y)) < 0
@@ -223,11 +231,6 @@
 
 #ifndef i_val
   #error "i_val* must be defined for maps"
-#endif
-#if defined i_valraw ^ defined i_valto
-  #error "both i_valto and i_valraw must be defined, if any"
-#elif defined i_valfrom && !defined i_valraw
-  #error "i_valfrom defined without i_valraw"
 #endif
 
 #if !defined i_valclone && (defined i_valdrop || defined i_valraw)

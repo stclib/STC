@@ -1,9 +1,40 @@
 #include <stc/cstr.h>
 
-struct Person { cstr name, last; } typedef Person;
+typedef struct { cstr name, last; } Person;
+Person Person_make(const char* name, const char* last);
+Person Person_clone(Person p);
+void Person_drop(Person* p);
+int Person_cmp(const Person* a, const Person* b);
+uint64_t Person_hash(const Person* p);
 
-Person Person_from(const char* name, const char* last) {
+#define i_type PersonArc
+#define i_val_bind Person // "class" ensure Person_drop will be called
+#define i_cmp Person_cmp   // enable carc object comparisons (not ptr to obj)
+#define i_hash Person_hash // enable carc object hash (not ptr to obj)
+#include <stc/carc.h>
+
+#define i_type IPtr
+#define i_val int
+#define i_valdrop(x) printf("drop: %d\n", *x)
+#include <stc/carc.h>
+
+#define i_type IPStack
+#define i_val_arcbox IPtr
+#include <stc/cstack.h>
+
+#define i_type PASet
+#define i_val_arcbox PersonArc
+#include <stc/cset.h>
+
+
+Person Person_make(const char* name, const char* last) {
     return (Person){.name = cstr_from(name), .last = cstr_from(last)};
+}
+int Person_cmp(const Person* a, const Person* b) {
+    return cstr_cmp(&a->name, &b->name);
+}
+uint64_t Person_hash(const Person* p) {
+    return cstr_hash(&p->name);
 }
 Person Person_clone(Person p) {
     p.name = cstr_clone(p.name), p.last = cstr_clone(p.last);
@@ -14,41 +45,28 @@ void Person_drop(Person* p) {
     c_drop(cstr, &p->name, &p->last);
 }
 
-#define i_val_bind Person
-#define i_tag person
-#include <stc/carc.h>
-
-// ...
-#define i_type SPtr
-#define i_val int
-#define i_valdrop(x) printf("drop: %d\n", *x)
-#include <stc/carc.h>
-
-#define i_val_arcbox SPtr
-#define i_tag iptr
-#include <stc/cstack.h>
 
 int main(void) {
-    c_auto (carc_person, p, q, r, s)
+    c_auto (PersonArc, p, q, r, s)
     {
         puts("Ex1");
-        p = carc_person_from(Person_from("John", "Smiths"));
-        q = carc_person_clone(p);
-        r = carc_person_clone(p);
-        s = carc_person_from(Person_clone(*p.get)); // deep copy
-        printf("%s %s. uses: %lu\n", cstr_str(&r.get->name), cstr_str(&s.get->last), *p.use_count);
+        p = PersonArc_from(Person_make("John", "Smiths"));
+        q = PersonArc_clone(p); // share
+        r = PersonArc_clone(p);
+        s = PersonArc_from(Person_clone(*p.get)); // deep copy
+        printf("%s %s: refs %ld\n", cstr_str(&p.get->name), cstr_str(&p.get->last), *p.use_count);
     }
-
-    c_auto (cstack_iptr, stk) {
+    c_auto (IPStack, vec)
+    {
         puts("Ex2");
-        cstack_iptr_push(&stk, SPtr_from(10));
-        cstack_iptr_push(&stk, SPtr_from(20));
-        cstack_iptr_push(&stk, SPtr_from(30));
-        cstack_iptr_push(&stk, SPtr_clone(*cstack_iptr_top(&stk)));
-        cstack_iptr_push(&stk, SPtr_clone(*cstack_iptr_begin(&stk).ref));
+        IPStack_push(&vec, IPtr_from(10));
+        IPStack_push(&vec, IPtr_from(20));
+        IPStack_emplace(&vec, 30); // same as IPStack_push(&vec, IPtr_from(30));
+        IPStack_push(&vec, IPtr_clone(*IPStack_back(&vec)));
+        IPStack_push(&vec, IPtr_clone(*IPStack_front(&vec)));
 
-        c_foreach (i, cstack_iptr, stk)
-            printf(" (%d, uses %ld)", *i.ref->get, *i.ref->use_count);
+        c_foreach (i, IPStack, vec)
+            printf(" (%d: refs %ld)", *i.ref->get, *i.ref->use_count);
         puts("");
     }
 }

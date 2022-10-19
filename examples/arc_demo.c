@@ -13,7 +13,7 @@ void int_drop(int* x) {
 #define i_valdrop int_drop  // optional, just to display the elements destroyed
 #include <stc/carc.h>       // Arc
 
-#define i_key_arcbox Arc    // note: use i_key_bind instead of i_key for carc/cbox elements
+#define i_key_arcbox Arc    // note: use i_key_arcbox instead of i_key for carc/cbox elements
 #include <stc/csset.h>      // csset_Arc (like: std::set<std::shared_ptr<int>>)
 
 #define i_val_arcbox Arc    // note: as above.
@@ -26,7 +26,7 @@ int main()
     {
         const int years[] = {2021, 2012, 2022, 2015};
         c_forloop (i, c_arraylen(years))
-            cvec_Arc_push_back(&vec, Arc_make(years[i]));
+            cvec_Arc_push(&vec, Arc_from(years[i]));
 
         printf("vec:");
         c_foreach (i, cvec_Arc, vec) printf(" %d", *i.ref->get);

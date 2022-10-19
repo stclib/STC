@@ -40,7 +40,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #define i_val       int         // mapped type
 #include <stc/cmap.h>
 /*
- i_key_bind set up these defines, unless they are already defined:
+ i_key_bind implies these defines, unless they are already defined:
    i_cmp        => RViking_cmp
    //i_hash     => RViking_hash     // already defined.
    //i_keyclone => Viking_clone     // not used, because of c_no_clone

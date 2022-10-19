@@ -3,7 +3,7 @@
 
 typedef struct { cstr name, last; } Person;
 
-Person Person_new(const char* name, const char* last) {
+Person Person_make(const char* name, const char* last) {
     return (Person){.name = cstr_from(name), .last = cstr_from(last)};
 }
 
@@ -28,11 +28,12 @@ void Person_drop(Person* p) {
 }
 
 #define i_type PSPtr
-#define i_val_bind Person // binds Person_cmp, ...
+#define i_val_bind Person // ensure Person_drop
+#define i_cmp Person_cmp   // specify object cmp, instead of ptr cmp for arc.
 #include <stc/carc.h>
 
 #define i_type Persons
-#define i_val_arcbox PSPtr // binds PSPtr_cmp, ...
+#define i_val_arcbox PSPtr // binds PSPtr_cmp, PSPtr_drop...
 #include <stc/cvec.h>
 
 
@@ -41,32 +42,33 @@ int main()
     c_auto (Persons, vec)
     c_auto (PSPtr, p, q)
     {
-        p = PSPtr_make(Person_new("Laura", "Palmer"));
+        p = PSPtr_from(Person_make("Laura", "Palmer"));
 
         // We want a deep copy -- PSPtr_clone(p) only shares!
-        q = PSPtr_make(Person_clone(*p.get));
+        q = PSPtr_from(Person_clone(*p.get));
         cstr_assign(&q.get->name, "Leland");
 
         printf("orig: %s %s\n", cstr_str(&p.get->name), cstr_str(&p.get->last));
         printf("copy: %s %s\n", cstr_str(&q.get->name), cstr_str(&q.get->last));
 
-        Persons_push_back(&vec, PSPtr_make(Person_new("Dale", "Cooper")));
-        Persons_push_back(&vec, PSPtr_make(Person_new("Audrey", "Home")));
+        // Use Persons_emplace to implicitly call PSPtr_make on the argument.
+        // No need to do: Persons_push(&vec, PSPtr_make(Person_make("Audrey", "Home")));
+        Persons_emplace(&vec, Person_make("Audrey", "Home"));
+        Persons_emplace(&vec, Person_make("Dale", "Cooper"));
 
         // Clone/share p and q to the vector
         c_forlist (i, PSPtr, {p, q})
-            Persons_push_back(&vec, PSPtr_clone(*i.ref));
+            Persons_push(&vec, PSPtr_clone(*i.ref));
 
         c_foreach (i, Persons, vec)
             printf("%s %s\n", cstr_str(&i.ref->get->name), cstr_str(&i.ref->get->last));
         puts("");
 
         // Look-up Audrey!
-        c_with (Person a = Person_new("Audrey", "Home"), Person_drop(&a)) {
+        c_with (Person a = Person_make("Audrey", "Home"), Person_drop(&a)) {
             const PSPtr *v = Persons_get(&vec, a);
             if (v) printf("found: %s %s\n", cstr_str(&v->get->name), cstr_str(&v->get->last));
         }
-
         puts("");
     }
 }

@@ -84,15 +84,12 @@ bool        carc_X_value_eq(const i_val* x, const i_val* y);
 #include <stc/csmap.h>
 
 #define i_type Arc // (atomic) ref. counted pointer
-#define i_val Map
-#define i_valclone Map_clone
-// override Map_drop(p):
-#define i_valdrop(p) (printf("drop Arc:\n"), Map_drop(p))
-#define i_opt c_no_atomic // make it non-atomic sharing.
+#define i_val_bind Map // Note i_val_bind: Map is a "class", i.e. has clone, drop functions.
+#define i_valdrop(p) (printf("drop Arc:\n"), Map_drop(p)) // override Map_drop(p):
 #include <stc/carc.h>
 
 #define i_type Stack
-#define i_val_arcbox Arc // NB: define i_val_arcbox for carc or cbox value-type
+#define i_val_arcbox Arc // Note: use i_val_arcbox for carc or cbox value types
 #include <stc/cstack.h>
 
 int main()

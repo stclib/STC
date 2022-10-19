@@ -5,9 +5,7 @@ void show_drop(int* x) { printf("drop: %d\n", *x); }
 #define i_type Arc
 #define i_val int
 #define i_valdrop show_drop
-// carc/cbox will use pointer address comparison of i_val
-// if no 'i_cmp' is defined, otherwise 'i_cmp' is used
-// to compare object values.
+#define i_cmp c_default_cmp // enable object comparisons (default ptr compare)
 #include <stc/carc.h>       // Shared pointer to int
 
 #define i_type Vec
@@ -29,9 +27,8 @@ int main()
         printf("vec before erase :");
         c_foreach (i, Vec, vec)
             printf(" %d", *i.ref->get);
-        puts("");
 
-        printf("erase vec.data[2]; or first matching value depending on compare.\n");
+        printf("\nerase vec.data[2]; or first matching value depending on compare.\n");
         Vec_iter it;
         it = Vec_find(&vec, *vec.data[2].get);
         if (it.ref != Vec_end(&vec).ref)
@@ -43,6 +40,11 @@ int main()
             Vec_erase_at(&vec, it);
 
         printf("vec after erase  :");
+        c_foreach (i, Vec, vec)
+            printf(" %d", *i.ref->get);
+
+        Vec_sort(&vec);
+        printf("\nvec after sort   :");
         c_foreach (i, Vec, vec)
             printf(" %d", *i.ref->get);
         

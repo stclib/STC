@@ -9,14 +9,14 @@
 #include <stc/csmap.h>
 
 #define i_type Arc // (atomic) ref. counted type
-#define i_val Map
+#define i_val_bind Map
 #define i_valdrop(p) (printf("drop Arc:\n"), Map_drop(p))
 // no need for atomic ref. count in single thread:
 #define i_opt c_no_atomic
 #include <stc/carc.h>
 
 #define i_type Stack
-#define i_val_arcbox Arc // define i_val_bind for carc/cbox value (not i_val)
+#define i_val_arcbox Arc // define i_val_arcbox for carc/cbox value (not i_val)
 #include <stc/cstack.h>
 
 #define i_type List
@@ -30,18 +30,18 @@ int main()
     {
         // POPULATE stack with shared pointers to Maps:
         Map *map;
-        map = Stack_push(&stack, Arc_make(Map_init()))->get;
+        map = Stack_push(&stack, Arc_from(Map_init()))->get;
         Map_emplace(map, "Joey", 1990);
         Map_emplace(map, "Mary", 1995);
         Map_emplace(map, "Joanna", 1992);
 
-        map = Stack_push(&stack, Arc_make(Map_init()))->get;
+        map = Stack_push(&stack, Arc_from(Map_init()))->get;
         Map_emplace(map, "Rosanna", 2001);
         Map_emplace(map, "Brad", 1999);
         Map_emplace(map, "Jack", 1980);
 
         // POPULATE list:
-        map = List_push_back(&list, Arc_make(Map_init()))->get;
+        map = List_push_back(&list, Arc_from(Map_init()))->get;
         Map_emplace(map, "Steve", 1979);
         Map_emplace(map, "Rick", 1974);
         Map_emplace(map, "Tracy", 2003);

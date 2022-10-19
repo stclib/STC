@@ -70,8 +70,11 @@ int main() {
 #ifndef _i_prefix
 #define _i_prefix cbox_
 #endif
-#if !(defined i_cmp || defined i_less || defined i_eq || defined i_hash)
+#if !(defined i_cmp || defined i_less)
   #define _i_no_cmp
+#endif
+#if !(defined i_eq || defined i_hash)
+  #define _i_no_hash
 #endif
 #include "template.h"
 typedef i_keyraw _cx_raw;
@@ -95,9 +98,6 @@ STC_INLINE _cx_self _cx_memb(_from)(_cx_value val) {
     _cx_self ptr = {c_alloc(_cx_value)};
     *ptr.get = val; return ptr;
 }
-// [deprecated]
-STC_INLINE _cx_self _cx_memb(_make)(_cx_value val)
-    { return _cx_memb(_from)(val); }
 
 STC_INLINE _cx_raw _cx_memb(_toraw)(const _cx_self* self)
     { return i_keyto(self->get); }
@@ -149,8 +149,8 @@ STC_INLINE void _cx_memb(_take)(_cx_self* self, _cx_self other) {
 }
 
 STC_INLINE uint64_t _cx_memb(_value_hash)(const _cx_value* x) {
-    #if defined _i_no_cmp
-        return c_default_hash(&x);
+    #if defined _i_no_hash
+        return (uint64_t)x;
     #else
         _cx_raw rx = i_keyto(x);
         return i_hash((&rx));
@@ -167,7 +167,7 @@ STC_INLINE int _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
 }
 
 STC_INLINE bool _cx_memb(_value_eq)(const _cx_value* x, const _cx_value* y) {
-    #if defined _i_no_cmp
+    #if defined _i_no_hash
         return x == y;
     #else
         _cx_raw rx = i_keyto(x), ry = i_keyto(y);
@@ -184,4 +184,5 @@ STC_INLINE int _cx_memb(_cmp)(const _cx_self* x, const _cx_self* y)
 STC_INLINE bool _cx_memb(_eq)(const _cx_self* x, const _cx_self* y)
     { return _cx_memb(_value_eq)(x->get, y->get); }
 
+#undef _i_no_hash
 #include "template.h"

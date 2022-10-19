@@ -26,12 +26,13 @@
 
 typedef struct { cstr name, last; } Person;
 
-Person Person_new(const char* name, const char* last) {
+Person Person_make(const char* name, const char* last) {
     return (Person){.name = cstr_from(name), .last = cstr_from(last)};
 }
 void Person_drop(Person* p) {
     printf("drop: %s %s\n", cstr_str(&p->name), cstr_str(&p->last));
-    c_drop(cstr, &p->name, &p->last);
+    cstr_drop(&p->name);
+    cstr_drop(&p->last);
 }
 
 #define i_type ArcPers
@@ -40,10 +41,10 @@ void Person_drop(Person* p) {
 #include <stc/carc.h>
 
 int main() {
-    ArcPers p = ArcPers_from(Person_new("John", "Smiths"));
+    ArcPers p = ArcPers_from(Person_make("John", "Smiths"));
     ArcPers q = ArcPers_clone(p); // share the pointer
 
-    printf("%s %s. uses: %" c_zu "\n", cstr_str(&q.get->name), cstr_str(&q.get->last), *q.use_count);
+    printf("%s %s. uses: %ld\n", cstr_str(&q.get->name), cstr_str(&q.get->last), *q.use_count);
     c_drop(ArcPers, &p, &q);
 }
 */
@@ -77,8 +78,11 @@ int main() {
 #ifndef _i_prefix
 #define _i_prefix carc_
 #endif
-#if !(defined i_cmp || defined i_less || defined i_eq || defined i_hash)
+#if !(defined i_cmp || defined i_less)
   #define _i_no_cmp
+#endif
+#if !(defined i_eq || defined i_hash)
+  #define _i_no_hash
 #endif
 #include "template.h"
 typedef i_keyraw _cx_raw;
@@ -116,9 +120,6 @@ STC_INLINE _cx_self _cx_memb(_from)(_cx_value val) {
     *(ptr.get = &rep->value) = val;
     return ptr;
 }
-
-STC_INLINE _cx_self _cx_memb(_make)(_cx_value val) // [deprecated]
-    { return _cx_memb(_from)(val); }
 
 STC_INLINE _cx_raw _cx_memb(_toraw)(const _cx_self* self)
     { return i_keyto(self->get); }
@@ -174,8 +175,8 @@ STC_INLINE void _cx_memb(_take)(_cx_self* self, _cx_self ptr) {
 }
 
 STC_INLINE uint64_t _cx_memb(_value_hash)(const _cx_value* x) {
-    #if defined _i_no_cmp
-        return c_default_hash(&x);
+    #if defined _i_no_hash
+        return (uint64_t)x;
     #else
         _cx_raw rx = i_keyto(x);
         return i_hash((&rx));
@@ -192,7 +193,7 @@ STC_INLINE int _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
 }
 
 STC_INLINE bool _cx_memb(_value_eq)(const _cx_value* x, const _cx_value* y) {
-    #if defined _i_no_cmp
+    #if defined _i_no_hash
         return x == y;
     #else
         _cx_raw rx = i_keyto(x), ry = i_keyto(y);
@@ -211,4 +212,5 @@ STC_INLINE bool _cx_memb(_eq)(const _cx_self* x, const _cx_self* y)
 
 #undef _i_atomic_inc
 #undef _i_atomic_dec_and_test
+#undef _i_no_hash
 #include "template.h"

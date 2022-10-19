@@ -3,7 +3,7 @@
 
 typedef struct { cstr name, last; } Person;
 
-Person Person_new(const char* name, const char* last) {
+Person Person_make(const char* name, const char* last) {
     return (Person){.name = cstr_from(name), .last = cstr_from(last)};
 }
 
@@ -33,24 +33,24 @@ void Person_drop(Person* p) {
 
 #define i_type Persons
 #define i_val_arcbox PBox // informs that PBox is a smart pointer.
-#include <stc/cvec.h>
+#include <stc/csset.h>
 
 int main()
 {
     c_auto (Persons, vec)
     c_auto (PBox, p, q)
     {
-        p = PBox_make(Person_new("Laura", "Palmer"));
+        p = PBox_from(Person_make("Laura", "Palmer"));
         q = PBox_clone(p);
         cstr_assign(&q.get->name, "Leland");
 
         printf("orig: %s %s\n", cstr_str(&p.get->name), cstr_str(&p.get->last));
         printf("copy: %s %s\n", cstr_str(&q.get->name), cstr_str(&q.get->last));
 
-        Persons_push(&vec, PBox_make(Person_new("Dale", "Cooper")));
-        Persons_push(&vec, PBox_make(Person_new("Audrey", "Home")));
+        Persons_emplace(&vec, Person_make("Dale", "Cooper"));
+        Persons_emplace(&vec, Person_make("Audrey", "Home"));
 
-        // NB! Clone p and q to the vector using emplace_back()
+        // NB! Clone/share p and q in the Persons container.
         Persons_push(&vec, PBox_clone(p));
         Persons_push(&vec, PBox_clone(q));
 
@@ -59,16 +59,10 @@ int main()
         puts("");
 
         // Look-up Audrey! Create a temporary Person for lookup.
-        c_with (Person a = Person_new("Audrey", "Home"), Person_drop(&a)) {
+        c_with (Person a = Person_make("Audrey", "Home"), Person_drop(&a)) {
             const PBox *v = Persons_get(&vec, a); // lookup
             if (v) printf("found: %s %s\n", cstr_str(&v->get->name), cstr_str(&v->get->last));
         }
-        puts("");
-
-        // Alternative to use cbox (when not placed in container).
-        Person *she = c_new(Person, Person_new("Shelly", "Johnson"));
-        printf("%s %s\n", cstr_str(&she->name), cstr_str(&she->last));
-        c_delete(Person, she); // drop and free
         puts("");
     }
 }
