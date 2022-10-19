@@ -173,13 +173,13 @@ c_formatch (it, &re, input)
 | \n \t \r | Match UTF8 newline, tab, carriage return | |
 | \d \s \w | Match UTF8 digit, whitespace, alphanumeric character | |
 | \D \S \W | Do not match the groups described above | |
-| \p{Space} or \p{Sz} | Match UTF8 whitespace | * |
-| \p{Digit} or \p{Nd} | Match UTF8 numeric | * |
+| \p{Alnum} | Match UTF8 alpha numeric | * |
 | \p{XDigit} | Match UTF8 hex number | * |
+| \p{Alpha} or \p{LC} | Match UTF8 cased letter | * |
+| \p{Digit} or \p{Nd} | Match UTF8 numeric | * |
 | \p{Lower} or \p{Ll} | Match UTF8 lower case | * |
 | \p{Upper} or \p{Lu} | Match UTF8 upper case | * |
-| \p{Alpha} or \p{LC} | Match UTF8 cased letter | * |
-| \p{Alnum} | Match UTF8 alpha numeric | * |
+| \p{Space} or \p{Sz} | Match UTF8 whitespace | * |
 | \P{***Class***} | Do not match the classes described above | * |
 | [[:alnum:]] [[:alpha:]] [[:ascii:]] | Match ASCII character class | * |
 | [[:blank:]] [[:cntrl:]] [[:digit:]] | Match ASCII character class | * |
