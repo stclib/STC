@@ -156,8 +156,8 @@ c_formatch (it, &re, input)
 | + | Match the preceding token at least once and as often as possible | |
 | \| | Match either the expression before the \| or the expression after it | |
 | (***expr***) | Match the expression inside the parentheses. This adds a capture group | |
-| [***chars***] | Match all characters inside the brackets. Ranges like a-z may also be used | |
-| [\^***chars***] | Do not match the characters inside the bracket. | |
+| [***chars***] | Match any character inside the brackets. Ranges like a-z may also be used | |
+| \[^***chars***\] | Match any character not inside the bracket. | |
 | \x{***hex***} | Match UTF8 character/codepoint given as a hex number | * |
 | ^ | Start of line anchor | |
 | $ | End of line anchor | |
@@ -180,13 +180,13 @@ c_formatch (it, &re, input)
 | \p{Upper} or \p{Lu} | Match UTF8 upper case | * |
 | \p{Alpha} or \p{LC} | Match UTF8 cased letter | * |
 | \p{Alnum} | Match UTF8 alpha numeric | * |
-| \P{***class***} | Do not match the classes described above | * |
+| \P{***Class***} | Do not match the classes described above | * |
 | [[:alnum:]] [[:alpha:]] [[:ascii:]] | Match ASCII character class | * |
 | [[:blank:]] [[:cntrl:]] [[:digit:]] | Match ASCII character class | * |
 | [[:graph:]] [[:lower:]] [[:print:]] | Match ASCII character class | * |
 | [[:punct:]] [[:space:]] [[:upper:]] | Match ASCII character class | * |
 | [[:xdigit:]] [[:word:]] | Match ASCII character class | * |
-| [[:^***class***:]] | Do not match ASCII character class | * |
+| [[:^***class***:]] | Match character not in the ASCII class | * |
 | $***n*** | *n*-th substitution backreference to capture group. ***n*** in 0-9. $0 is the entire match. | * |
 | $***nn***; | As above, but can handle ***nn*** < cre_MAXCAPTURES. | * |
 
