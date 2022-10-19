@@ -149,7 +149,7 @@ c_formatch (it, &re, input)
 | Metacharacter | Description | STC addition |
 |:--:|:--:|:--:|
 | ***c*** | Most characters (like c) match themselve literally | |
-| \***c*** | Some characters are used as metacharacters. To use them literally escape them | |
+| \\***c*** | Some characters are used as metacharacters. To use them literally escape them | |
 | . | Match any character, except newline unless in (?s) mode | |
 | ? | Match the preceding token zero or one time | |
 | * | Match the preceding token as often as possible | |
@@ -157,7 +157,7 @@ c_formatch (it, &re, input)
 | \| | Match either the expression before the \| or the expression after it | |
 | (***expr***) | Match the expression inside the parentheses. This adds a capture group | |
 | [***chars***] | Match all characters inside the brackets. Ranges like a-z may also be used | |
-| [^***chars***] | Do not match the characters inside the bracket. | |
+| [\^***chars***] | Do not match the characters inside the bracket. | |
 | \x{***hex***} | Match UTF8 character/codepoint given as a hex number | * |
 | ^ | Start of line anchor | |
 | $ | End of line anchor | |
