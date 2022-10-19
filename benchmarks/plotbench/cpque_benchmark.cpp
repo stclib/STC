@@ -20,14 +20,14 @@ void std_test()
     std::priority_queue<float, std::vector<float>, std::greater<float>> pq;
     rng = stc64_new(seed);
     clock_t start = clock();
-    c_forloop (i, N)
+    c_forrange (i, N)
         pq.push((float) stc64_randf(&rng)*100000);
 
     printf("Built priority queue: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
     printf("%g ", pq.top());
 
     start = clock();
-    c_forloop (i, N) {
+    c_forrange (i, N) {
         pq.pop();
     }
 
@@ -44,18 +44,18 @@ void stc_test()
     {
         rng = stc64_new(seed);
         clock_t start = clock();
-        c_forloop (i, N)
+        c_forrange (i, N)
             cpque_f_push(&pq, (float) stc64_randf(&rng)*100000);
 
         printf("Built priority queue: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
         printf("%g ", *cpque_f_top(&pq));
  
-        c_forloop (i, M) {
+        c_forrange (i, M) {
             cpque_f_pop(&pq);
         }
 
         start = clock();
-        c_forloop (i, M, N)
+        c_forrange (i, M, N)
             cpque_f_pop(&pq);
         printf("\npopped PQ: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
     }

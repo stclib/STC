@@ -31,15 +31,15 @@ int main()
     c_auto (ipque, q, q2, q3)  // init() and defered drop()
     {
         less_fn = int_less;
-        c_forloop (i, n) ipque_push(&q, data[i]);
+        c_forrange (i, n) ipque_push(&q, data[i]);
         print_queue(q);
 
         less_fn = int_greater;
-        c_forloop (i, n) ipque_push(&q2, data[i]);
+        c_forrange (i, n) ipque_push(&q2, data[i]);
         print_queue(q2);
 
         less_fn = int_lambda;
-        c_forloop (i, n) ipque_push(&q3, data[i]);
+        c_forrange (i, n) ipque_push(&q3, data[i]);
         print_queue(q3);
     }
 }

@@ -25,7 +25,7 @@ int main()
     c_auto (csset_Arc, set)  // declare and init set, call csset_Arc_drop() at scope exit
     {
         const int years[] = {2021, 2012, 2022, 2015};
-        c_forloop (i, c_arraylen(years))
+        c_forrange (i, c_arraylen(years))
             cvec_Arc_push(&vec, Arc_from(years[i]));
 
         printf("vec:");

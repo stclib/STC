@@ -33,7 +33,7 @@ int main()
 
         uint64_t rng[3] = {1872361123, 123879177, 87739234}, sum;
         clock_t now = clock();
-        c_forloop (n) {
+        c_forrange (n) {
             uint64_t key = romu_trio(rng) & mask;
             cmap_u64_insert(&m, key, 0).ref->second += 1;
         }
@@ -41,7 +41,7 @@ int main()
 
         now = clock();
         sum = 0;
-        c_forloop (key, mask + 1) { sum += cmap_u64_contains(&m, key); }
+        c_forrange (key, mask + 1) { sum += cmap_u64_contains(&m, key); }
         printf("lookup  : %" c_zu "ms  \tsum  : %" c_zu "\n", (clock() - now)/ms, sum);
 
         now = clock();
@@ -51,7 +51,7 @@ int main()
 
         uint64_t rng2[3] = {1872361123, 123879177, 87739234};
         now = clock();
-        c_forloop (n) {
+        c_forrange (n) {
             uint64_t key = romu_trio(rng2) & mask;
             cmap_u64_erase(&m, key);
         }

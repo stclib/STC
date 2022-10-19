@@ -33,7 +33,7 @@ int main() {
         cbits_resize(&bset, 43, false);
 
         printf("%4zu: ", cbits_size(&bset));
-        c_forloop (i, cbits_size(&bset))
+        c_forrange (i, cbits_size(&bset))
             printf("%d", cbits_at(&bset, i));
         puts("");
         cbits_set(&bset, 28);
@@ -43,7 +43,7 @@ int main() {
         cbits_set_value(&bset, 99, false);
 
         printf("%4zu: ", cbits_size(&bset));
-        c_forloop (i, cbits_size(&bset))
+        c_forrange (i, cbits_size(&bset))
             printf("%d", cbits_at(&bset, i));
         puts("");
     }

@@ -36,7 +36,7 @@ int main(void)
         printf("number of primes: %" c_zu ", time: %f\n", np, (t2 - t1) / (float)CLOCKS_PER_SEC);
         puts("Show all the primes in the range [2, 1000):");
         printf("2");
-        c_forloop (i, 3, 1000, 2)
+        c_forrange (i, 3, 1000, 2)
             if (cbits_test(&primes, i>>1)) printf(" %lld", i);
         puts("");
 

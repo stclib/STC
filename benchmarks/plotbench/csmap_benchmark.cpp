@@ -29,30 +29,30 @@ Sample test_std_map() {
         csrandom(seed);
         s.test[INSERT].t1 = clock();
         container con;
-        c_forloop (i, N/2) con.emplace(crandom() & mask1, i);
-        c_forloop (i, N/2) con.emplace(i, i);
+        c_forrange (i, N/2) con.emplace(crandom() & mask1, i);
+        c_forrange (i, N/2) con.emplace(i, i);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = con.size();
         csrandom(seed);
         s.test[ERASE].t1 = clock();
-        c_forloop (N) con.erase(crandom() & mask1);
+        c_forrange (N) con.erase(crandom() & mask1);
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = con.size();
      }{
         container con;
         csrandom(seed);
-        c_forloop (i, N/2) con.emplace(crandom() & mask1, i);
-        c_forloop (i, N/2) con.emplace(i, i);
+        c_forrange (i, N/2) con.emplace(crandom() & mask1, i);
+        c_forrange (i, N/2) con.emplace(i, i);
         csrandom(seed);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         container::iterator it;
-        c_forloop (N) if ((it = con.find(crandom() & mask1)) != con.end()) sum += it->second;
+        c_forrange (N) if ((it = con.find(crandom() & mask1)) != con.end()) sum += it->second;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
         sum = 0;
-        c_forloop (R) for (auto i: con) sum += i.second;
+        c_forrange (R) for (auto i: con) sum += i.second;
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();
@@ -74,33 +74,33 @@ Sample test_stc_map() {
         csrandom(seed);
         s.test[INSERT].t1 = clock();
         container con = csmap_x_init();
-        c_forloop (i, N/2) csmap_x_insert(&con, crandom() & mask1, i);
-        c_forloop (i, N/2) csmap_x_insert(&con, i, i);
+        c_forrange (i, N/2) csmap_x_insert(&con, crandom() & mask1, i);
+        c_forrange (i, N/2) csmap_x_insert(&con, i, i);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = csmap_x_size(&con);
         csrandom(seed);
         s.test[ERASE].t1 = clock();
-        c_forloop (N) csmap_x_erase(&con, crandom() & mask1);
+        c_forrange (N) csmap_x_erase(&con, crandom() & mask1);
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = csmap_x_size(&con);
         csmap_x_drop(&con);
      }{
         container con = csmap_x_init();
         csrandom(seed);
-        c_forloop (i, N/2) csmap_x_insert(&con, crandom() & mask1, i);
-        c_forloop (i, N/2) csmap_x_insert(&con, i, i);
+        c_forrange (i, N/2) csmap_x_insert(&con, crandom() & mask1, i);
+        c_forrange (i, N/2) csmap_x_insert(&con, i, i);
         csrandom(seed);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         const csmap_x_value* val;
-        c_forloop (N) 
+        c_forrange (N) 
             if ((val = csmap_x_get(&con, crandom() & mask1)))
                 sum += val->second;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
         sum = 0;
-        c_forloop (R) c_foreach (i, csmap_x, con) sum += i.ref->second;
+        c_forrange (R) c_foreach (i, csmap_x, con) sum += i.ref->second;
         s.test[ITER].t2 = clock();
         s.test[ITER].sum = sum;
         s.test[DESTRUCT].t1 = clock();
@@ -114,10 +114,10 @@ Sample test_stc_map() {
 int main(int argc, char* argv[])
 {
     Sample std_s[SAMPLES + 1], stc_s[SAMPLES + 1];
-    c_forloop (i, SAMPLES) {
+    c_forrange (i, SAMPLES) {
         std_s[i] = test_std_map();
         stc_s[i] = test_stc_map();
-        if (i > 0) c_forloop (j, N_TESTS) {
+        if (i > 0) c_forrange (j, N_TESTS) {
             if (secs(std_s[i].test[j]) < secs(std_s[0].test[j])) std_s[0].test[j] = std_s[i].test[j];
             if (secs(stc_s[i].test[j]) < secs(stc_s[0].test[j])) stc_s[0].test[j] = stc_s[i].test[j];
             if (stc_s[i].test[j].sum != stc_s[0].test[j].sum) printf("Error in sum: test %lld, sample %lld\n", i, j);
@@ -127,17 +127,17 @@ int main(int argc, char* argv[])
     bool header = (argc > 2 && argv[2][0] == '1');
     float std_sum = 0, stc_sum = 0;
 
-    c_forloop (j, N_TESTS) {
+    c_forrange (j, N_TESTS) {
         std_sum += secs(std_s[0].test[j]);
         stc_sum += secs(stc_s[0].test[j]);
     }
     if (header) printf("Compiler,Library,C,Method,Seconds,Ratio\n");
 
-    c_forloop (j, N_TESTS)
+    c_forrange (j, N_TESTS)
         printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, std_s[0].name, N, operations[j], secs(std_s[0].test[j]), 1.0f);
     printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, std_s[0].name, N, "total", std_sum, 1.0f);
 
-    c_forloop (j, N_TESTS)
+    c_forrange (j, N_TESTS)
         printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, stc_s[0].name, N, operations[j], secs(stc_s[0].test[j]), secs(std_s[0].test[j]) ? secs(stc_s[0].test[j])/secs(std_s[0].test[j]) : 1.0f);
     printf("%s,%s n:%d,%s,%.3f,%.3f\n", comp, stc_s[0].name, N, "total", stc_sum, stc_sum/std_sum);
 }

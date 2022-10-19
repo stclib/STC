@@ -42,7 +42,7 @@ int main(int argc, char **argv)
     csrandom(seed);
     current_time = get_time_in_ms();
 
-    c_forloop (40 * N)
+    c_forrange (40 * N)
     {
         uint64_t r = crandom();
         bools[r & (N-1)] = r & 1<<29;
@@ -51,7 +51,7 @@ int main(int argc, char **argv)
     difference1 = get_time_in_ms() - current_time;
     current_time = get_time_in_ms();
 
-    c_forloop (100) c_forloop (num, N) 
+    c_forrange (100) c_forrange (num, N) 
     {
         total += bools[num];
     }
@@ -70,7 +70,7 @@ int main(int argc, char **argv)
     current_time = get_time_in_ms();
     bitset<N> bits;
 
-    c_forloop (40 * N)
+    c_forrange (40 * N)
     {
         uint64_t r = crandom();
         bits[r & (N-1)] = r & 1<<29;
@@ -79,7 +79,7 @@ int main(int argc, char **argv)
     difference1 = get_time_in_ms() - current_time;
     current_time = get_time_in_ms();
 
-    c_forloop (100) c_forloop (num, N)
+    c_forrange (100) c_forrange (num, N)
     {
         total += bits[num];
     }   
@@ -96,7 +96,7 @@ int main(int argc, char **argv)
     current_time = get_time_in_ms();
     cbits bits2 = cbits_with_size(N, false);
 
-    c_forloop (40 * N)
+    c_forrange (40 * N)
     {
         uint64_t r = crandom();
         cbits_set_value(&bits2, r & (N-1), r & 1<<29);
@@ -105,7 +105,7 @@ int main(int argc, char **argv)
     difference1 = get_time_in_ms() - current_time;
     current_time = get_time_in_ms();
 
-    c_forloop (100) c_forloop (num, N)
+    c_forrange (100) c_forrange (num, N)
     {
         total += cbits_at(&bits2, num);
     }

@@ -68,10 +68,10 @@ int main() {
     cqueue_i Q = cqueue_i_init();
 
     // push() and pop() a few.
-    c_forloop (i, 20)
+    c_forrange (i, 20)
         cqueue_i_push(&Q, i);
 
-    c_forloop (5)
+    c_forrange (5)
         cqueue_i_pop(&Q);
 
     c_foreach (i, cqueue_i, Q)

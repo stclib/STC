@@ -28,12 +28,12 @@ int main() {
     c_auto (IQ, Q)
     {
         // Push eight million random numbers onto the queue.
-        c_forloop (n)
+        c_forrange (n)
             IQ_push(&Q, stc64_uniform(&rng, &dist));
 
         // Push or pop on the queue 50 million times
         printf("befor: size %" c_zu ", capacity %" c_zu "\n", IQ_size(&Q), IQ_capacity(&Q));
-        c_forloop (n) {
+        c_forrange (n) {
             int r = stc64_uniform(&rng, &dist);
             if (r & 3)
                 IQ_push(&Q, r);

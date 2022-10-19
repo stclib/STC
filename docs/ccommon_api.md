@@ -192,24 +192,24 @@ c_forpair (id, count, csmap_ii, map)
 // (3 2) (5 4) (7 3) (12 5) (23 1)
 ```
 
-### c_forloop
+### c_forrange
 Abstraction for iterating sequence of numbers. Like python's **for** *i* **in** *range()* loop.
 
 | Usage                                       | Python equivalent                    |
 |:--------------------------------------------|:-------------------------------------|
-| `c_forloop (stop)`                          | `for _ in range(stop):`              |
-| `c_forloop (i, stop) // i type = long long` | `for i in range(stop):`              |
-| `c_forloop (i, start, stop)`                | `for i in range(start, stop):`       |
-| `c_forloop (i, start, stop, step)`          | `for i in range(start, stop, step):` |
+| `c_forrange (stop)`                          | `for _ in range(stop):`              |
+| `c_forrange (i, stop) // i type = long long` | `for i in range(stop):`              |
+| `c_forrange (i, start, stop)`                | `for i in range(start, stop):`       |
+| `c_forrange (i, start, stop, step)`          | `for i in range(start, stop, step):` |
 
 ```c
-c_forloop (5) printf("x");
+c_forrange (5) printf("x");
 // xxxxx
-c_forloop (i, 5) printf(" %lld", i);
+c_forrange (i, 5) printf(" %lld", i);
 // 0 1 2 3 4
-c_forloop (i, -3, 3) printf(" %lld", i);
+c_forrange (i, -3, 3) printf(" %lld", i);
 // -3 -2 -1 0 1 2
-c_forloop (i, 30, 0, -5) printf(" %lld", i);
+c_forrange (i, 30, 0, -5) printf(" %lld", i);
 // 30 25 20 15 10 5
 ```
 
@@ -244,7 +244,7 @@ bool isPrime(int i) {
 
 int main() {
     c_auto (IVec, vec) {
-        c_forloop (i, 1000) IVec_push(&vec, 1000000 + i);
+        c_forrange (i, 1000) IVec_push(&vec, 1000000 + i);
 
         c_forfilter (i, IVec, vec,
                         isOdd(*i.ref)

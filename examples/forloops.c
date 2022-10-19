@@ -12,17 +12,17 @@
 
 int main()
 {
-    puts("c_forloop:");
-    c_forloop (30) printf(" xx");
+    puts("c_forrange:");
+    c_forrange (30) printf(" xx");
     puts("");
 
-    c_forloop (i, 30) printf(" %lld", i);
+    c_forrange (i, 30) printf(" %lld", i);
     puts("");
 
-    c_forloop (i, 30, 60) printf(" %lld", i);
+    c_forrange (i, 30, 60) printf(" %lld", i);
     puts("");
 
-    c_forloop (i, 30, 90, 2) printf(" %lld", i);
+    c_forrange (i, 30, 90, 2) printf(" %lld", i);
 
 
     puts("\n\nc_forlist:");

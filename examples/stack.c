@@ -14,12 +14,12 @@ int main() {
     c_auto (cstack_i, stack)
     c_auto (cstack_c, chars)
     {
-        c_forloop (i, 101)
+        c_forrange (i, 101)
             cstack_i_push(&stack, i*i);
 
         printf("%d\n", *cstack_i_top(&stack));
 
-        c_forloop (i, 90)
+        c_forrange (i, 90)
             cstack_i_pop(&stack);
 
         c_foreach (i, cstack_i, stack)

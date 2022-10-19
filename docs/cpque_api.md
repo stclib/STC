@@ -76,16 +76,16 @@ int main()
     c_auto (cpque_i, heap)
     {
         // Push ten million random numbers to priority queue.
-        c_forloop (N)
+        c_forrange (N)
             cpque_i_push(&heap, stc64_uniform(&rng, &dist));
 
         // Add some negative ones.
         int nums[] = {-231, -32, -873, -4, -343};
-        c_forloop (i, c_arraylen(nums)) 
+        c_forrange (i, c_arraylen(nums)) 
             cpque_i_push(&heap, nums[i]);
 
         // Extract and display the fifty smallest.
-        c_forloop (50) {
+        c_forrange (50) {
             printf("%" PRIdMAX " ", *cpque_i_top(&heap));
             cpque_i_pop(&heap);
         }

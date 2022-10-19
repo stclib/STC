@@ -34,7 +34,6 @@ STR \"([^"\\]|\\.)*\"
 c_foreach       |
 c_forpair       |
 c_forrange      |
-c_forloop       |
 c_forfilter     |
 c_forwhile      |
 for             |

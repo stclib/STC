@@ -202,12 +202,13 @@ STC_INLINE char* c_strnstrn(const char *s, const char *needle,
          ; _.it.ref && (_.key = &_.it.ref->first, _.val = &_.it.ref->second) \
          ; C##_next(&_.it))
 
-#define c_forloop(...) c_MACRO_OVERLOAD(c_forloop, __VA_ARGS__)
-#define c_forloop1(stop) c_forloop3(_i, 0, stop)
-#define c_forloop2(i, stop) c_forloop3(i, 0, stop)
-#define c_forloop3(i, start, stop) \
+#define c_forloop c_forrange // [deprecated]
+#define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
+#define c_forrange1(stop) c_forrange3(_i, 0, stop)
+#define c_forrange2(i, stop) c_forrange3(i, 0, stop)
+#define c_forrange3(i, start, stop) \
     for (long long i=start, _end=stop; i < _end; ++i)
-#define c_forloop4(i, start, stop, step) \
+#define c_forrange4(i, start, stop, step) \
     for (long long i=start, _inc=step, _end=(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)
 

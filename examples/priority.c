@@ -16,18 +16,18 @@ int main() {
     {
         // Push ten million random numbers to priority queue
         printf("Push %" c_zu " numbers\n", N);
-        c_forloop (N)
+        c_forrange (N)
             cpque_i_push(&heap, stc64_uniform(&rng, &dist));
 
         // push some negative numbers too.
         c_forlist (i, int, {-231, -32, -873, -4, -343})
             cpque_i_push(&heap, *i.ref);
 
-        c_forloop (N)
+        c_forrange (N)
             cpque_i_push(&heap, stc64_uniform(&rng, &dist));
 
         puts("Extract the hundred smallest.");
-        c_forloop (100) {
+        c_forrange (100) {
             printf("%" PRIdMAX " ", *cpque_i_top(&heap));
             cpque_i_pop(&heap);
         }

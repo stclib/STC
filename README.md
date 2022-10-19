@@ -473,7 +473,7 @@ Memory efficiency
 - Added back **coption** - command line argument parsing.
 - New + renamed loop iteration/scope macros:
     - `c_forlist`: macro replacing `c_forarray` and `c_apply`. Iterate a compound literal list.
-    - `c_forloop`: macro replacing `c_forrange`. Iterate a `long long` type number sequence.
+    - `c_forrange`: macro replacing `c_forrange`. Iterate a `long long` type number sequence.
     - `c_with`: macro renamed from `c_autovar`. Like Python's **with** statement.
     - `c_scope`: macro renamed from `c_autoscope`.
     - `c_defer`: macro renamed from `c_autodefer`. Resembles Go's and Zig's **defer**.

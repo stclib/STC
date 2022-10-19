@@ -37,7 +37,7 @@ int main()
             cvec_str_emplace_back(&keys, cstr_str(&i.ref->first));
             cvec_str_emplace_back(&values, cstr_str(&i.ref->second));
         }
-        c_forloop (i, cvec_str_size(&keys))
+        c_forrange (i, cvec_str_size(&keys))
             printf("  %s: %s\n", cstr_str(keys.data + i), cstr_str(values.data + i));
 
         puts("\nCOPY VEC TO LIST:");

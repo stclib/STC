@@ -94,7 +94,7 @@ int main()
 
     // Create histogram map
     csmap_i mhist = csmap_i_init();
-    c_forloop (N) {
+    c_forrange (N) {
         int index = (int) round( stc64_normalf(&rng, &dist) );
         csmap_i_emplace(&mhist, index, 0).ref->second += 1;
     }

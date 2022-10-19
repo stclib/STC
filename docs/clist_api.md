@@ -114,7 +114,7 @@ int main() {
     c_forlist (i, double, {10., 20., 30., 40., 50., 60., 70., 80., 90.})
         DList_push_back(&list, *i.ref);
 
-    c_forloop (i, 1, 10) {
+    c_forrange (i, 1, 10) {
         if (i & 1) DList_push_front(&list, (double) i);
         else       DList_push_back(&list, (double) i);
     }
