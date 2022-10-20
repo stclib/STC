@@ -163,6 +163,9 @@
 #if c_option(c_no_cmp)
   #define _i_no_cmp
 #endif
+#if c_option(c_no_hash)
+  #define _i_no_hash
+#endif
 #if c_option(c_no_clone) || (!defined i_keyclone && (defined i_keydrop || defined i_keyraw))
   #define _i_no_clone
 #endif

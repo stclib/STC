@@ -361,15 +361,17 @@ _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey) {
 #if !defined _i_no_clone
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self m) {
-    _cx_value *t = c_alloc_n(_cx_value, m.bucket_count), *dst = t, *m_end = m.table + m.bucket_count;
-    uint8_t *h = (uint8_t *)memcpy(c_malloc(m.bucket_count + 1), m._hashx, m.bucket_count + 1);
-    if (!(t && h)) 
-        { c_free(t), c_free(h), t = 0, h = 0, m.bucket_count = 0; }
-    else
-        for (; m.table != m_end; ++m.table, ++m._hashx, ++dst)
-            if (*m._hashx)
-                *dst = _cx_memb(_value_clone)(*m.table);
-    m.table = t, m._hashx = h;
+    if (m.table) {
+        _cx_value *t = c_alloc_n(_cx_value, m.bucket_count), *dst = t, *m_end = m.table + m.bucket_count;
+        uint8_t *h = (uint8_t *)memcpy(c_malloc(m.bucket_count + 1), m._hashx, m.bucket_count + 1);
+        if (!(t && h)) 
+            { c_free(t), c_free(h), t = 0, h = 0, m.bucket_count = 0; }
+        else
+            for (; m.table != m_end; ++m.table, ++m._hashx, ++dst)
+                if (*m._hashx)
+                    *dst = _cx_memb(_value_clone)(*m.table);
+        m.table = t, m._hashx = h;
+    }
     return m;
 }
 #endif

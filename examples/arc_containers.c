@@ -9,7 +9,7 @@
 #include <stc/csmap.h>
 
 #define i_type Arc // (atomic) ref. counted type
-#define i_val_class Map
+#define i_val Map
 #define i_valdrop(p) (printf("drop Arc:\n"), Map_drop(p))
 // no need for atomic ref. count in single thread:
 #define i_opt c_no_atomic
