@@ -142,7 +142,7 @@
   #ifndef i_cmp
     #define i_cmp c_paste(i_keyraw, _cmp)
   #endif
-  #if !defined i_hash
+  #ifndef i_hash
     #define i_hash c_paste(i_keyraw, _hash)
   #endif
 #endif

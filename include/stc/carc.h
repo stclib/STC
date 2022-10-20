@@ -78,10 +78,10 @@ int main() {
 #ifndef _i_prefix
 #define _i_prefix carc_
 #endif
-#if !(defined i_cmp || defined i_less || defined i_val_class)
+#if !(defined i_cmp || defined i_less || defined i_key_class || defined i_val_class)
   #define _i_no_cmp
 #endif
-#if !(defined i_eq || defined i_hash || defined i_val_class)
+#if !(defined i_eq || defined i_hash || defined i_key_class || defined i_val_class)
   #define _i_no_hash
 #endif
 #include "template.h"
