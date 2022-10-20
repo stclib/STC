@@ -8,7 +8,7 @@ int Person_cmp(const Person* a, const Person* b);
 uint64_t Person_hash(const Person* p);
 
 #define i_type PersonArc
-#define i_val_bind Person // "class" ensure Person_drop will be called
+#define i_val_class Person // "class" ensure Person_drop will be called
 #define i_cmp Person_cmp   // enable carc object comparisons (not ptr to obj)
 #define i_hash Person_hash // enable carc object hash (not ptr to obj)
 #include <stc/carc.h>

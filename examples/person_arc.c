@@ -28,7 +28,7 @@ void Person_drop(Person* p) {
 }
 
 #define i_type PSPtr
-#define i_val_bind Person // ensure Person_drop
+#define i_val_class Person // ensure Person_drop
 #define i_cmp Person_cmp   // specify object cmp, instead of ptr cmp for arc.
 #include <stc/carc.h>
 

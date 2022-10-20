@@ -39,14 +39,14 @@ OlympicLocation OlympicLocation_clone(OlympicLocation loc);
 void OlympicLocation_drop(OlympicLocation* self);
 
 // Create a clist<OlympicLocation>, can be sorted by year.
-#define i_val_bind OlympicLocation // binds _cmp, _clone and _drop.
+#define i_val_class OlympicLocation // binds _cmp, _clone and _drop.
 #define i_tag OL
 #define i_extern // define _clist_mergesort() 
 #include <stc/clist.h>
 
 // Create a csmap<cstr, clist_OL> where key is country name
 #define i_key_str           // binds cstr_equ, cstr_hash, cstr_clone, ++
-#define i_val_bind clist_OL // binds clist_OL_clone, clist_OL_drop
+#define i_val_class clist_OL // binds clist_OL_clone, clist_OL_drop
 #define i_tag OL
 #include <stc/csmap.h>
 

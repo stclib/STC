@@ -31,7 +31,7 @@ static inline void City_drop(City* c) {
 
 
 #define i_type CityArc
-#define i_key_bind City
+#define i_key_class City
 #define i_opt c_no_atomic
 //#include <stc/cbox.h>
 #include <stc/carc.h> // try instead of cbox.h

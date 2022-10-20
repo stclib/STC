@@ -156,19 +156,21 @@ sorted: 5 7 8 13 16 25
 
 int main() {
     cvec_str names = cvec_str_init();
+
     cvec_str_emplace(&names, "Mary");
     cvec_str_emplace(&names, "Joe");
     cstr_assign(&names.data[1], "Jake"); // replace "Joe".
 
     cstr tmp = cstr_from_fmt("%d elements so far", cvec_str_size(names));
 
-    // emplace() will not compile if adding a new cstr type. Use push_back():
-    cvec_str_push(&names, tmp); // tmp is moved to names, do not drop() it.
+    // cvec_str_emplace() only accept const char*, so use push():
+    cvec_str_push(&names, tmp); // tmp is "moved" to names (must not be dropped).
 
-    printf("%s\n", cstr_str(&names.data[1])); // Access the second element
+    printf("%s\n", cstr_str(&names.data[1])); // Access second element
 
     c_foreach (i, cvec_str, names)
         printf("item: %s\n", cstr_str(i.ref));
+
     cvec_str_drop(&names);
 }
 ```
@@ -192,7 +194,7 @@ typedef struct {
 
 int User_cmp(const User* a, const User* b) {
     int c = strcmp(cstr_str(&a->name), cstr_str(&b->name));
-    return c != 0 ? c : a->id - b->id;
+    return c ? c : a->id - b->id;
 }
 void User_drop(User* self) {
     cstr_drop(&self->name);
@@ -202,24 +204,22 @@ User User_clone(User user) {
     return user;
 }
 
-// Declare a memory managed, clonable vector of users.
-// Note that cvec_u_emplace_back() will clone input:
-#define i_val User
-#define i_cmp User_cmp
-#define i_valdrop User_drop
-#define i_valclone User_clone
-#define i_tag u
+// Declare a managed, clonable vector of users.
+#define i_type UVec
+#define i_val_class User // User is a "class" as it has _cmp, _clone and _drop functions.
 #include <stc/cvec.h>
 
 int main(void) {
-    cvec_u vec = cvec_u_init();
-    cvec_u_push(&vec, (User) {cstr_new("admin"), 0});
-    cvec_u_push(&vec, (User) {cstr_new("joe"), 1});
+    UVec vec = UVec_init();
+    UVec_push(&vec, (User){cstr_new("mary"), 0});
+    UVec_push(&vec, (User){cstr_new("joe"), 1});
+    UVec_push(&vec, (User){cstr_new("admin"), 2});
 
-    cvec_u vec2 = cvec_u_clone(vec);
-    c_foreach (i, cvec_u, vec2)
+    UVec vec2 = UVec_clone(vec);
+
+    c_foreach (i, UVec, vec2)
         printf("%s: %d\n", cstr_str(&i.ref->name), i.ref->id);
 
-    c_drop(cvec_u, &vec, &vec2); // cleanup
+    c_drop(UVec, &vec, &vec2); // cleanup
 }
 ```

@@ -40,7 +40,7 @@ void Person_drop(Person* p) {
     c_drop(cstr, &p->name, &p->email);
 }
 
-#define i_key_bind Person // bind Person clone+drop fn's
+#define i_key_class Person // bind Person clone+drop fn's
 #define i_type PBox
 #include <stc/cbox.h>
 

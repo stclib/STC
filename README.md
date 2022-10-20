@@ -330,13 +330,13 @@ Specials:
 - `i_key_str` - Define key type *cstr* and container i_tag = *str*. It binds type convertion from/to *const char*\*, and the ***cmp***, ***eq***, ***hash***, and ***keydrop*** functions.
 - `i_key_ssv` - Define key type *cstr* and container i_tag = *ssv*. It binds type convertion from/to *csview*, and its ***cmp***, ***eq***, ***hash***, and ***keydrop*** functions.
 - `i_key_arcbox TYPE` - Define container key type where TYPE is a smart pointer **carc** or **cbox**. NB: not to be used when defining carc/cbox types themselves.
-- `i_key_bind TYPE` - General version of the three above - will auto-bind to standard named functions: *TYPE_clone*, *TYPE_drop*, *TYPE_cmp*, *TYPE_eq*, *TYPE_hash*. If `i_keyraw` is defined, *TYPE_toraw* function is bound to `i_keyto`. Only functions required by the particular container need to be defined. E.g., only **cmap** and **cset** and smart pointers uses *TYPE_hash* and *TYPE_eq*. **cstack** does not use *TYPE_cmp*. *TYPE_clone* is not used if *#define i_opt c_no_clone* is specified. Likewise, *TYPE_cmp* is not used if *#define i_opt c_no_cmp* is specified.
-- `i_val_str`, `i_val_ssv`, `i_val_arcbox`, `i_val_bind` - Similar rules as for ***key***.
+- `i_key_class TYPE` - General version of the three above - will auto-bind to standard named functions: *TYPE_clone*, *TYPE_drop*, *TYPE_cmp*, *TYPE_eq*, *TYPE_hash*. If `i_keyraw` is defined, *TYPE_toraw* function is bound to `i_keyto`. Only functions required by the particular container need to be defined. E.g., only **cmap** and **cset** and smart pointers uses *TYPE_hash* and *TYPE_eq*. **cstack** does not use *TYPE_cmp*. *TYPE_clone* is not used if *#define i_opt c_no_clone* is specified. Likewise, *TYPE_cmp* is not used if *#define i_opt c_no_cmp* is specified.
+- `i_val_str`, `i_val_ssv`, `i_val_arcbox`, `i_val_class` - Similar rules as for ***key***.
 
 **Notes**:
 - Instead of defining `i_cmp`, you may define *i_opt c_no_cmp* to disable *searching and sorting* functions.
 - Instead of defining `i_*clone`, you may define *i_opt c_no_clone* to disable *clone* functionality.
-- For `i_key_bind`, if *i_keyraw RAWTYPE* is defined along with it, *i_keyfrom* may also be defined to enable the *emplace*-functions. Note: the signature for ***cmp***, ***eq***, and ***hash*** uses *RAWTYPE* as input.
+- For `i_key_class`, if *i_keyraw RAWTYPE* is defined along with it, *i_keyfrom* may also be defined to enable the *emplace*-functions. Note: the signature for ***cmp***, ***eq***, and ***hash*** uses *RAWTYPE* as input.
 
 The *emplace* versus non-emplace container methods
 --------------------------------------------------
@@ -526,7 +526,7 @@ Memory efficiency
 - Changed: the [**c_apply**](docs/ccommon_api.md) macros API.
 - Replaced: *csview_first_token()* and *csview_next_token()* with one function: `csview_token()`.
 - Added: **checkauto** tool for checking that c-source files uses `c_auto*` macros correctly.
-- Added: general `i_key_bind` / `i_val_bind` template parameters which auto-binds template functions.
+- Added: general `i_key_class` / `i_val_class` template parameters which auto-binds template functions.
 - Added: `i_opt` template parameter: compile-time options: `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`; may be combined with `|`
 - Added: [**cbox**](docs/cbox_api.md) type: smart pointer, similar to [Rust Box](https://doc.rust-lang.org/rust-by-example/std/box.html) and [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr).
 - Added: [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding"

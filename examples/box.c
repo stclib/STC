@@ -28,11 +28,11 @@ void Person_drop(Person* p) {
 }
 
 #define i_type PBox
-#define i_val_bind Person // binds Person_cmp, ...
+#define i_val_class Person // "class" binds _cmp, _clone, _drop functions.
 #include <stc/cbox.h>
 
 #define i_type Persons
-#define i_val_arcbox PBox // informs that PBox is a smart pointer.
+#define i_val_arcbox PBox // "arcbox" informs that PBox is a smart pointer.
 #include <stc/csset.h>
 
 int main()

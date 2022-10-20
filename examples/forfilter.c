@@ -9,7 +9,7 @@
 #include <stc/cstack.h>
 
 #define i_type SVec
-#define i_val_bind csview
+#define i_val_class csview
 #include <stc/cstack.h>
 
 // filters and transforms:
