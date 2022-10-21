@@ -48,7 +48,7 @@ void vectordemo1()
         cvec_ix_erase_n(&bignums, 0, 1); // erase the first
 
         for (size_t i = 0; i < cvec_ix_size(&bignums); ++i) {
-            printf("%" c_zu ": %" PRIu64 "\n", i, bignums.data[i]);
+            printf("%" c_ZU ": %" PRIu64 "\n", i, bignums.data[i]);
         }
     }
 }
@@ -175,11 +175,11 @@ void mapdemo3()
     cmap_str_iter it = cmap_str_find(&table, "Make");
     c_foreach (i, cmap_str, table)
         printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
-    printf("size %" c_zu ": remove: Make: %s\n", cmap_str_size(&table), cstr_str(&it.ref->second));
+    printf("size %" c_ZU ": remove: Make: %s\n", cmap_str_size(&table), cstr_str(&it.ref->second));
     //cmap_str_erase(&table, "Make");
     cmap_str_erase_at(&table, it);
 
-    printf("size %" c_zu "\n", cmap_str_size(&table));
+    printf("size %" c_ZU "\n", cmap_str_size(&table));
     c_foreach (i, cmap_str, table)
         printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
     cmap_str_drop(&table); // frees key and value cstrs, and hash table.
@@ -199,7 +199,7 @@ void arraydemo1()
         float **arr2 = arr3.data[5];
         float *arr1 = arr3.data[5][4];
 
-        printf("arr3: %" c_zu ": (%" c_zu ", %" c_zu ", %" c_zu ") = %" c_zu "\n", sizeof(arr3), 
+        printf("arr3: %" c_ZU ": (%" c_ZU ", %" c_ZU ", %" c_ZU ") = %" c_ZU "\n", sizeof(arr3), 
                arr3.xdim, arr3.ydim, arr3.zdim, carr3_f_size(&arr3));
 
         printf("%g\n", arr1[3]); // = 10.2

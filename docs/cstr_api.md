@@ -161,7 +161,7 @@ char*        c_strnstrn(const char* str, const char* search, size_t slen, size_t
 
 int main() {
     cstr s0 = cstr_new("Initialization without using strlen().");
-    printf("%s\nLength: %" c_zu "\n\n", cstr_str(&s0), cstr_size(&s0));
+    printf("%s\nLength: %" c_ZU "\n\n", cstr_str(&s0), cstr_size(&s0));
 
     cstr s1 = cstr_new("one-nine-three-seven-five.");
     printf("%s\n", cstr_str(&s1));

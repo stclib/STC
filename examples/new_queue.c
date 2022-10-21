@@ -32,7 +32,7 @@ int main() {
             IQ_push(&Q, stc64_uniform(&rng, &dist));
 
         // Push or pop on the queue 50 million times
-        printf("befor: size %" c_zu ", capacity %" c_zu "\n", IQ_size(&Q), IQ_capacity(&Q));
+        printf("befor: size %" c_ZU ", capacity %" c_ZU "\n", IQ_size(&Q), IQ_capacity(&Q));
         c_forrange (n) {
             int r = stc64_uniform(&rng, &dist);
             if (r & 3)
@@ -40,6 +40,6 @@ int main() {
             else
                 IQ_pop(&Q);
         }
-        printf("after: size %" c_zu ", capacity %" c_zu "\n", IQ_size(&Q), IQ_capacity(&Q));
+        printf("after: size %" c_ZU ", capacity %" c_ZU "\n", IQ_size(&Q), IQ_capacity(&Q));
     }
 }

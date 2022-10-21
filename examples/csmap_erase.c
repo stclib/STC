@@ -12,7 +12,7 @@ void printmap(mymap m)
 {
     c_foreach (elem, mymap, m)
         printf(" [%d, %s]", elem.ref->first, cstr_str(&elem.ref->second));
-    printf("\nsize() == %" c_zu "\n\n", mymap_size(&m));
+    printf("\nsize() == %" c_ZU "\n\n", mymap_size(&m));
 }
 
 int main()
@@ -77,7 +77,7 @@ int main()
         // The 3rd member function removes elements with a given Key
         size_t count = mymap_erase(&m3, 2);
         // The 3rd member function also returns the number of elements removed
-        printf("The number of elements removed from m3 is: %" c_zu "\n", count);
+        printf("The number of elements removed from m3 is: %" c_ZU "\n", count);
         puts("After the element with a key of 2 is deleted, the map m3 is:");
         printmap(m3);
     }

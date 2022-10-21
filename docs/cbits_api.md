@@ -91,18 +91,18 @@ cbits sieveOfEratosthenes(size_t n)
 int main(void)
 {
     size_t n = 100000000;
-    printf("computing prime numbers up to %" c_zu "\n", n);
+    printf("computing prime numbers up to %" c_ZU "\n", n);
 
     clock_t t1 = clock();
     cbits primes = sieveOfEratosthenes(n + 1);
     size_t nprimes = cbits_count(&primes);
     clock_t t2 = clock();
 
-    printf("number of primes: %" c_zu ", time: %f\n", nprimes, (float)(t2 - t1)/CLOCKS_PER_SEC);
+    printf("number of primes: %" c_ZU ", time: %f\n", nprimes, (float)(t2 - t1)/CLOCKS_PER_SEC);
 
     printf(" 2");
     for (size_t i = 3; i < 1000; i += 2)
-       if (cbits_test(&primes, i>>1)) printf(" %" c_zu, i);
+       if (cbits_test(&primes, i>>1)) printf(" %" c_ZU, i);
     puts("");
 
     cbits_drop(&primes);

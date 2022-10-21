@@ -31,9 +31,9 @@
 #include <assert.h>
 
 #if SIZE_MAX == UINT32_MAX
-#  define c_zu PRIu32
+#  define c_ZU PRIu32
 #elif SIZE_MAX == UINT64_MAX
-#  define c_zu PRIu64
+#  define c_ZU PRIu64
 #endif
 
 #if defined(_MSC_VER)

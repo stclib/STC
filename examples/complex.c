@@ -37,7 +37,7 @@ int main()
 
         // Put in some data in the structures
         stack.data[3] = 3.1415927f;
-        printf("stack size: %" c_zu "\n", FloatStack_size(&stack));
+        printf("stack size: %" c_ZU "\n", FloatStack_size(&stack));
 
         StackList list = StackList_init();
         StackList_push_back(&list, stack);

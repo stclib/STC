@@ -9,10 +9,10 @@ int main()
 {
     Bits s1 = Bits_from("1110100110111");
     
-    printf("size %" c_zu "\n", Bits_size(&s1));
+    printf("size %" c_ZU "\n", Bits_size(&s1));
     char buf[256];
     Bits_to_str(&s1, buf, 0, -1);
-    printf("buf: %s: count=%" c_zu "\n", buf, Bits_count(&s1));
+    printf("buf: %s: count=%" c_ZU "\n", buf, Bits_count(&s1));
 
     Bits_reset(&s1, 8);
     c_autobuf (str, char, Bits_size(&s1) + 1)

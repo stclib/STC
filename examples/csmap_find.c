@@ -18,7 +18,7 @@ void print_elem(csmap_istr_raw p) {
 
 #define using_print_collection(CX) \
     void print_collection_##CX(const CX* t) { \
-        printf("%" c_zu " elements: ", CX##_size(t)); \
+        printf("%" c_ZU " elements: ", CX##_size(t)); \
     \
         c_foreach (p, CX, *t) { \
             print_elem(CX##_value_toraw(p.ref)); \

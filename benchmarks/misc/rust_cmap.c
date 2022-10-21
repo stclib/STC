@@ -29,7 +29,7 @@ int main()
                      ms = CLOCKS_PER_SEC/1000; 
         cmap_u64_max_load_factor(&m, 0.8);
         cmap_u64_reserve(&m, n);
-        printf("STC cmap  n = %" c_zu ", mask = 0x%" PRIxMAX "\n", n, mask);
+        printf("STC cmap  n = %" c_ZU ", mask = 0x%" PRIxMAX "\n", n, mask);
 
         uint64_t rng[3] = {1872361123, 123879177, 87739234}, sum;
         clock_t now = clock();
@@ -37,17 +37,17 @@ int main()
             uint64_t key = romu_trio(rng) & mask;
             cmap_u64_insert(&m, key, 0).ref->second += 1;
         }
-        printf("insert  : %" c_zu "ms  \tsize : %" c_zu "\n", (clock() - now)/ms, cmap_u64_size(&m));
+        printf("insert  : %" c_ZU "ms  \tsize : %" c_ZU "\n", (clock() - now)/ms, cmap_u64_size(&m));
 
         now = clock();
         sum = 0;
         c_forrange (key, mask + 1) { sum += cmap_u64_contains(&m, key); }
-        printf("lookup  : %" c_zu "ms  \tsum  : %" c_zu "\n", (clock() - now)/ms, sum);
+        printf("lookup  : %" c_ZU "ms  \tsum  : %" c_ZU "\n", (clock() - now)/ms, sum);
 
         now = clock();
         sum = 0;
         c_foreach (i, cmap_u64, m) { sum += i.ref->second; }
-        printf("iterate : %" c_zu "ms  \tsum  : %" c_zu "\n", (clock() - now)/ms, sum);
+        printf("iterate : %" c_ZU "ms  \tsum  : %" c_ZU "\n", (clock() - now)/ms, sum);
 
         uint64_t rng2[3] = {1872361123, 123879177, 87739234};
         now = clock();
@@ -55,7 +55,7 @@ int main()
             uint64_t key = romu_trio(rng2) & mask;
             cmap_u64_erase(&m, key);
         }
-        printf("remove  : %" c_zu "ms  \tsize : %" c_zu "\n", (clock() - now)/ms, cmap_u64_size(&m));
+        printf("remove  : %" c_ZU "ms  \tsize : %" c_ZU "\n", (clock() - now)/ms, cmap_u64_size(&m));
         printf("press a key:\n"); getchar();
     }
 }

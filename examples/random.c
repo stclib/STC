@@ -18,7 +18,7 @@ int main()
         sum += (uint32_t)stc64_rand(&rng);
     }
     diff = clock() - before;
-    printf("full range\t\t: %f secs, %" c_zu ", avg: %f\n",
+    printf("full range\t\t: %f secs, %" c_ZU ", avg: %f\n",
            (float)diff / CLOCKS_PER_SEC, N, (double)sum / N);
 
     stc64_uniform_t dist1 = stc64_uniform_new(0, range);
@@ -29,7 +29,7 @@ int main()
         sum += stc64_uniform(&rng, &dist1); // unbiased
     }
     diff = clock() - before;
-    printf("unbiased 0-%" PRIu64 "\t: %f secs, %" c_zu ", avg: %f\n",
+    printf("unbiased 0-%" PRIu64 "\t: %f secs, %" c_ZU ", avg: %f\n",
             range, (float)diff/CLOCKS_PER_SEC, N, (double)sum / N);
 
     sum = 0;
@@ -39,7 +39,7 @@ int main()
         sum += stc64_rand(&rng) % (range + 1); // biased
     }
     diff = clock() - before;
-    printf("biased 0-%" PRIu64 "  \t: %f secs, %" c_zu ", avg: %f\n",
+    printf("biased 0-%" PRIu64 "  \t: %f secs, %" c_ZU ", avg: %f\n",
             range, (float)diff / CLOCKS_PER_SEC, N, (double)sum / N);
 
 }

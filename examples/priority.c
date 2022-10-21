@@ -15,7 +15,7 @@ int main() {
     c_auto (cpque_i, heap)
     {
         // Push ten million random numbers to priority queue
-        printf("Push %" c_zu " numbers\n", N);
+        printf("Push %" c_ZU " numbers\n", N);
         c_forrange (N)
             cpque_i_push(&heap, stc64_uniform(&rng, &dist));
 
