@@ -23,19 +23,19 @@ int main()
         printf("INPUT: %s\n", input);
 
         /* replace with a fixed string, extended all-in-one call: */
-        cstr_take(&str, cregex_replace_pattern(pattern, input, "YYYY-MM-DD", 0, 0, NULL));
+        cstr_take(&str, cregex_replace_pattern(pattern, input, "YYYY-MM-DD", 0, NULL, cre_default));
         printf("fixed: %s\n", cstr_str(&str));
 
         /* US date format, and add 10 years to dates: */
-        cstr_take(&str, cregex_replace_pattern(pattern, input, "$1/$3/$2", 0, 0, add_10_years));
+        cstr_take(&str, cregex_replace_pattern(pattern, input, "$1/$3/$2", 0, add_10_years, cre_default));
         printf("us+10: %s\n", cstr_str(&str));
 
         /* Wrap first date inside []: */
-        cstr_take(&str, cregex_replace_pattern(pattern, input, "[$0]", 1, 0, NULL));
+        cstr_take(&str, cregex_replace_pattern(pattern, input, "[$0]", 1, NULL, cre_default));
         printf("brack: %s\n", cstr_str(&str));
 
         /* Shows how to compile RE separately */
-        c_with (cregex re = cregex_from(pattern, 0), cregex_drop(&re)) {
+        c_with (cregex re = cregex_from(pattern, cre_default), cregex_drop(&re)) {
             if (cregex_captures(&re) == 0)
                   continue; // break c_with
             /* European date format. */
@@ -43,12 +43,12 @@ int main()
             printf("euros: %s\n", cstr_str(&str));
 
             /* Strip out everything but the matches */
-            cstr_take(&str, cregex_replace_sv(&re, csview_from(input), "$3.$2.$1;", 0, cre_r_strip, NULL));
+            cstr_take(&str, cregex_replace_sv(&re, csview_from(input), "$3.$2.$1;", 0, NULL, cre_r_strip));
             printf("strip: %s\n", cstr_str(&str));
         }
 
         /* Wrap all words in ${} */
-        cstr_take(&str, cregex_replace_pattern("[a-z]+", "52 apples and 31 mangoes", "$${$0}", 0, 0, NULL));
+        cstr_take(&str, cregex_replace_pattern("[a-z]+", "52 apples and 31 mangoes", "$${$0}", 0, NULL, cre_default));
         printf("curly: %s\n", cstr_str(&str));
     }
 }

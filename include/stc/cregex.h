@@ -52,6 +52,7 @@ typedef enum {
 } cregex_result;
 
 enum {
+    cre_default = 0,
     /* compile-flags */
     cre_c_dotall = 1<<0,    /* dot matches newline too */
     cre_c_caseless = 1<<1,  /* ignore case */
@@ -105,8 +106,9 @@ int cregex_find(const cregex* re, const char* input,
                 csview match[], int mflags);
 static inline
 int cregex_find_sv(const cregex* re, csview input, csview match[]) {
-    match[0] = input;
-    return cregex_find(re, input.str, match, cre_m_startend);
+    csview *mp = NULL;
+    if (match) { match[0] = input; mp = match; }
+    return cregex_find(re, input.str, mp, cre_m_startend);
 }
 
 /* match + compile RE pattern */
@@ -115,21 +117,21 @@ int cregex_find_pattern(const char* pattern, const char* input,
 
 static inline
 bool cregex_is_match(const cregex* re, const char* input)
-    { return cregex_find(re, input, NULL, 0) == cre_success; }
+    { return cregex_find(re, input, NULL, cre_default) == cre_success; }
 
 /* replace regular expression */ 
 cstr cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned count,
-                      int rflags, bool (*mfun)(int i, csview match, cstr* mstr));
+                       bool (*mfun)(int i, csview match, cstr* mstr), int rflags);
 
 static inline
 cstr cregex_replace(const cregex* re, const char* input, const char* replace, unsigned count) { 
     csview sv = {input, strlen(input)};
-    return cregex_replace_sv(re, sv, replace, count, 0, NULL);
+    return cregex_replace_sv(re, sv, replace, count, NULL, cre_default);
 }
 
 /* replace + compile RE pattern, and extra arguments */
 cstr cregex_replace_pattern(const char* pattern, const char* input, const char* replace, unsigned count,
-                            int crflags, bool (*mfun)(int i, csview match, cstr* mstr));
+                            bool (*mfun)(int i, csview match, cstr* mstr), int crflags);
 /* destroy regex */
 void cregex_drop(cregex* self);
 

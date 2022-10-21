@@ -40,9 +40,9 @@ bool        cregex_is_match(const cregex* re, const char* input);
 
 cstr        cregex_replace(const cregex* re, const char* input, const char* replace, unsigned count);
 cstr        cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned count,
-                              int rflags, bool(*mfun)(int capgrp, csview match, cstr* mstr));
+                              bool(*mfun)(int capgrp, csview match, cstr* mstr), int rflags);
 cstr        cregex_replace_pattern(const char* pattern, const char* input, const char* replace, unsigned count,
-                                   int rflags, bool(*mfun)(int capgrp, csview match, cstr* mstr));
+                                   bool(*mfun)(int capgrp, csview match, cstr* mstr), int rflags);
 
 void        cregex_drop(cregex* self); // destroy
 ```
@@ -72,11 +72,11 @@ void        cregex_drop(cregex* self); // destroy
 ### Compiling a regular expression
 ```c
 cregex re1 = cregex_init();
-int result = cregex_compile(&re1, "[0-9]+", 0);
+int result = cregex_compile(&re1, "[0-9]+", cre_default);
 if (result < 0) return result;
 
 const char* url = "(https?://|ftp://|www\\.)([0-9A-Za-z@:%_+~#=-]+\\.)+([a-z][a-z][a-z]?)(/[/0-9A-Za-z\\.@:%_+~#=\\?&-]*)?";
-cregex re2 = cregex_from(url, 0);
+cregex re2 = cregex_from(url, cre_default);
 if (re2.error) return re2.error;
 ...
 cregex_drop(&re2);
@@ -94,11 +94,11 @@ int main() {
     const char* input = "start date is 2023-03-01, and end date is 2025-12-31.";
     const char* pattern = "\\b(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)\\b";
 
-    cregex re = cregex_from(pattern, 0);
+    cregex re = cregex_from(pattern, cre_default);
 
     // Lets find the first date in the string:
     csview match[4]; // full-match, year, month, date.
-    if (cregex_find(&re, input, match, 0) == cre_success)
+    if (cregex_find(&re, input, match, cre_default) == cre_success)
         printf("Found date: %.*s\n", c_ARGsv(match[0]));
     else
         printf("Could not find any date\n");
@@ -115,7 +115,7 @@ int main() {
 
 For a single match you may use the all-in-one function:
 ```c
-if (cregex_find_pattern(pattern, input, match, 0))
+if (cregex_find_pattern(pattern, input, match, cre_default))
     printf("Found date: %.*s\n", c_ARGsv(match[0]));
 ```
 

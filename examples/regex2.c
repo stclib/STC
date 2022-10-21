@@ -17,7 +17,7 @@ int main()
     c_with (cregex re = cregex_init(), cregex_drop(&re))
     c_forrange (i, c_arraylen(s))
     {
-        int res = cregex_compile(&re, s[i].pattern, 0);
+        int res = cregex_compile(&re, s[i].pattern, cre_default);
         if (res < 0) {
             printf("error in regex pattern: %d\n", res);
             continue;

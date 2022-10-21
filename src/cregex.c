@@ -1225,7 +1225,7 @@ cregex_find_pattern(const char* pattern, const char* input,
 
 cstr
 cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned count,
-                  int rflags, bool (*mfun)(int, csview, cstr*)) {
+                  bool (*mfun)(int, csview, cstr*), int rflags) {
     cstr out = cstr_null;
     cstr subst = cstr_null;
     csview match[cre_MAXCAPTURES];
@@ -1248,12 +1248,12 @@ cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned 
 
 cstr
 cregex_replace_pattern(const char* pattern, const char* input, const char* replace, unsigned count,
-                       int crflags, bool (*mfun)(int, csview, cstr*)) {
+                       bool (*mfun)(int, csview, cstr*), int crflags) {
     cregex re = cregex_init();
     if (cregex_compile(&re, pattern, crflags) != cre_success)
         return cstr_new("[[error: invalid regex pattern]]");
     csview sv = {input, strlen(input)};
-    cstr out = cregex_replace_sv(&re, sv, replace, count, crflags, mfun);
+    cstr out = cregex_replace_sv(&re, sv, replace, count, mfun, crflags);
     cregex_drop(&re);
     return out;
 }

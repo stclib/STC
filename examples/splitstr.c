@@ -14,7 +14,7 @@ int main()
 
     puts("\nSplit with c_formatch (regex):");
 
-    c_with (cregex re = cregex_from("[^ ]+", 0), cregex_drop(&re))
+    c_with (cregex re = cregex_from("[^ ]+", cre_default), cregex_drop(&re))
         c_formatch (i, &re, "  Hello   World      C99! ")
             printf("'%.*s'\n", c_ARGsv(i.match[0]));
 }

@@ -18,7 +18,7 @@ int main()
     c_auto (cstr, nums)
     {
         const char* pattern = "[+-]?([0-9]*\\.)?\\d+([Ee][+-]?\\d+)?";
-        int res = cregex_compile(&re, pattern, 0);
+        int res = cregex_compile(&re, pattern, cre_default);
         printf("%d: %s\n", res, pattern);
 
         // extract and convert all numbers in str to floats
@@ -29,7 +29,7 @@ int main()
             printf("  %g\n", *i.ref);
 
         // extracts the numbers only to a comma separated string.
-        nums = cregex_replace_sv(&re, csview_from(str), " $0,", 0, cre_r_strip, NULL);
+        nums = cregex_replace_sv(&re, csview_from(str), " $0,", 0, NULL, cre_r_strip);
         printf("\n%s\n", cstr_str(&nums));
     }
 }
