@@ -41,14 +41,14 @@ void vectordemo1()
         for (size_t i = 10; i <= 100; i += 10)
             cvec_ix_push(&bignums, i * i);
 
-        printf("erase - %d: %" c_zu "\n", 3, bignums.data[3]);
+        printf("erase - %d: %" PRIu64 "\n", 3, bignums.data[3]);
         cvec_ix_erase_n(&bignums, 3, 1); // erase index 3
 
         cvec_ix_pop(&bignums);           // erase the last
         cvec_ix_erase_n(&bignums, 0, 1); // erase the first
 
         for (size_t i = 0; i < cvec_ix_size(&bignums); ++i) {
-            printf("%" c_zu ": %" c_zu "\n", i, bignums.data[i]);
+            printf("%" c_zu ": %" PRIu64 "\n", i, bignums.data[i]);
         }
     }
 }

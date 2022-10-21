@@ -163,6 +163,9 @@
 #if c_option(c_no_cmp)
   #define _i_no_cmp
 #endif
+#if c_option(c_no_hash)
+  #define _i_no_hash
+#endif
 #if c_option(c_no_clone) || (!defined i_keyclone && (defined i_keydrop || defined i_keyraw))
   #define _i_no_clone
 #endif
@@ -291,6 +294,7 @@
 #undef i_val_ssv
 #undef i_val_arcbox
 #undef i_val_class
+#undef i_val_bind // [deprecated]
 #undef i_valraw
 #undef i_valclone
 #undef i_valfrom
@@ -302,6 +306,7 @@
 #undef i_key_ssv
 #undef i_key_arcbox
 #undef i_key_class
+#undef i_key_bind // [deprecated]
 #undef i_keyraw
 #undef i_keyclone
 #undef i_keyfrom
@@ -320,6 +325,5 @@
 #undef _i_no_cmp
 #undef _i_no_clone
 #undef _i_no_emplace
-#undef _i_no_hash
 #undef _i_template
 #endif

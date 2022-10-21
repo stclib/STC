@@ -111,6 +111,7 @@
 #define c_no_atomic             (1<<1)
 #define c_no_clone              (1<<2)
 #define c_no_cmp                (1<<3)
+#define c_no_hash               (1<<4)
 
 /* Generic algorithms */
 

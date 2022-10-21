@@ -81,7 +81,7 @@ int main() {
 #if !(defined i_cmp || defined i_less || defined i_key_class || defined i_val_class)
   #define _i_no_cmp
 #endif
-#if !(defined i_eq || defined i_hash)
+#if !(defined i_eq || defined i_hash || defined i_key_class || defined i_val_class)
   #define _i_no_hash
 #endif
 #include "template.h"
@@ -174,21 +174,21 @@ STC_INLINE void _cx_memb(_take)(_cx_self* self, _cx_self ptr) {
     *self = ptr;
 }
 
-STC_INLINE uint64_t _cx_memb(_value_hash)(const _cx_value* x) {
-    #if defined _i_no_hash
-        return (uint64_t)x;
-    #else
-        _cx_raw rx = i_keyto(x);
-        return i_hash((&rx));
-    #endif
-}
-
 STC_INLINE int _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     #if defined _i_no_cmp
         return c_default_cmp(&x, &y);
     #else
         _cx_raw rx = i_keyto(x), ry = i_keyto(y);
         return i_cmp((&rx), (&ry));
+    #endif
+}
+
+STC_INLINE uint64_t _cx_memb(_value_hash)(const _cx_value* x) {
+    #if defined _i_no_hash
+        return (uintptr_t)x;
+    #else
+        _cx_raw rx = i_keyto(x);
+        return i_hash((&rx));
     #endif
 }
 
