@@ -33,7 +33,6 @@
   #define _cx_mapped _cx_memb(_mapped)
   #define _cx_raw _cx_memb(_raw)
   #define _cx_rawkey _cx_memb(_rawkey)
-  #define _cx_rawmapped _cx_memb(_rawmapped)
   #define _cx_iter _cx_memb(_iter)
   #define _cx_result _cx_memb(_result)
   #define _cx_node _cx_memb(_node)
@@ -52,7 +51,7 @@
   #define _i_expandby 1
 #endif
 
-#if (defined i_valraw) ^ (defined i_valto)
+#if defined i_valraw ^ defined i_valto
   #error "both i_valto and i_valraw must be defined, if any"
 #elif defined i_valfrom && !defined i_valraw
   #error "i_valfrom defined without i_valraw"
@@ -67,7 +66,6 @@
 
 #if !(defined i_key || defined i_key_str || defined i_key_ssv || \
       defined i_key_class || defined i_key_arcbox)
-  #define _i_key_from_val
   #if defined _i_ismap
     #error "i_key* must be defined for maps."
   #endif
@@ -104,6 +102,13 @@
   #endif
 #endif
 
+#if c_option(c_no_cmp)
+  #define _i_no_cmp
+#endif
+#if c_option(c_no_hash)
+  #define _i_no_hash
+#endif
+
 #if defined i_key_str
   #define i_key_class cstr
   #define i_keyraw crawstr
@@ -122,10 +127,11 @@
   #endif
 #elif defined i_key_arcbox
   #define i_key_class i_key_arcbox
-  #define i_keyraw c_paste(i_key_arcbox, _value)
-  #define i_keyfrom c_paste(i_key_arcbox, _from)
-  #define i_keyto(x) *(x)->get
-  #define i_eq c_paste(i_key_arcbox, _value_eq)
+  #define i_keyraw c_paste(i_key_arcbox, _raw)
+  #define i_keyfrom c_paste(i_key_arcbox, _new)
+  #if !defined _i_no_hash
+    #define i_eq c_paste(i_key_arcbox, _raw_eq)
+  #endif
 #endif
 
 #ifdef i_key_class
@@ -139,10 +145,10 @@
   #ifndef i_keydrop
     #define i_keydrop c_paste(i_key, _drop)
   #endif
-  #ifndef i_cmp
+  #if !defined i_cmp && !defined _i_no_cmp
     #define i_cmp c_paste(i_keyraw, _cmp)
   #endif
-  #ifndef i_hash
+  #if !defined i_hash && !defined _i_no_hash
     #define i_hash c_paste(i_keyraw, _hash)
   #endif
 #endif
@@ -159,12 +165,6 @@
 
 #ifndef i_tag
   #define i_tag i_key
-#endif
-#if c_option(c_no_cmp)
-  #define _i_no_cmp
-#endif
-#if c_option(c_no_hash)
-  #define _i_no_hash
 #endif
 #if c_option(c_no_clone) || (!defined i_keyclone && (defined i_keydrop || defined i_keyraw))
   #define _i_no_clone
@@ -221,9 +221,8 @@
   #define i_valto cstr_sv
 #elif defined i_val_arcbox
   #define i_val_class i_val_arcbox
-  #define i_valraw c_paste(i_val_arcbox, _value)
-  #define i_valfrom c_paste(i_val_arcbox, _from)
-  #define i_valto(x) *(x)->get
+  #define i_valraw c_paste(i_val_arcbox, _raw)
+  #define i_valfrom c_paste(i_val_arcbox, _new)
 #endif
 
 #ifdef i_val_class
@@ -321,7 +320,6 @@
 #undef _i_expandby
 #undef _i_prefix
 #undef _i_has_from
-#undef _i_key_from_val
 #undef _i_no_cmp
 #undef _i_no_clone
 #undef _i_no_emplace
