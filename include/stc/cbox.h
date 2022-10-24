@@ -128,8 +128,13 @@ STC_INLINE void _cx_memb(_reset_to)(_cx_self* self, _cx_value* p) {
     self->get = p;
 }
 
+#ifndef _i_no_emplace
 STC_INLINE _cx_self _cx_memb(_new)(_cx_raw raw)
     { return _cx_memb(_from)(i_keyfrom(raw)); }
+#else
+STC_INLINE _cx_self _cx_memb(_new)(_cx_value val)
+    { return _cx_memb(_from)(val); }
+#endif
 
 #if !defined _i_no_clone
     STC_INLINE _cx_self _cx_memb(_clone)(_cx_self other) {

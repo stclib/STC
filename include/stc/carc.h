@@ -149,8 +149,13 @@ STC_INLINE void _cx_memb(_reset_to)(_cx_self* self, _cx_value* p) {
     *self = _cx_memb(_from_ptr)(p);
 }
 
+#ifndef _i_no_emplace
 STC_INLINE _cx_self _cx_memb(_new)(_cx_raw raw)
     { return _cx_memb(_from)(i_keyfrom(raw)); }
+#else
+STC_INLINE _cx_self _cx_memb(_new)(_cx_value val)
+    { return _cx_memb(_from)(val); }
+#endif    
 
 // does not use i_keyclone, so OK to always define.
 STC_INLINE _cx_self _cx_memb(_clone)(_cx_self ptr) {
