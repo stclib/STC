@@ -40,7 +40,7 @@ void Person_drop(Person* p) {
     c_drop(cstr, &p->name, &p->email);
 }
 
-#define i_key_class Person // bind Person clone+drop fn's
+#define i_keyclass Person // bind Person clone+drop fn's
 #define i_type PBox
 #include <stc/cbox.h>
 
@@ -70,10 +70,10 @@ int main() {
 #ifndef _i_prefix
 #define _i_prefix cbox_
 #endif
-#if !(defined i_cmp || defined i_less || defined i_key_class || defined i_val_class)
+#if !(defined i_cmp || defined i_less || defined i_keyclass || defined i_valclass)
   #define _i_no_cmp
 #endif
-#if !(defined i_eq || defined i_hash || defined i_key_class || defined i_val_class)
+#if !(defined i_eq || defined i_hash || defined i_keyclass || defined i_valclass)
   #define _i_no_hash
 #endif
 #include "template.h"

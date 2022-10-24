@@ -16,11 +16,11 @@
 #include <stc/carc.h>
 
 #define i_type Stack
-#define i_val_arcbox Arc // define i_val_arcbox for carc/cbox value (not i_val)
+#define i_valboxed Arc // define i_valboxed for carc/cbox value (not i_val)
 #include <stc/cstack.h>
 
 #define i_type List
-#define i_val_arcbox Arc // as above
+#define i_valboxed Arc // as above
 #include <stc/clist.h>
 
 int main()

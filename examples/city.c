@@ -13,17 +13,17 @@ City City_clone(City c);
 void City_drop(City* c);
 
 #define i_type CityArc
-#define i_val_class City
+#define i_valclass City
 #include <stc/cbox.h>
 //#include <stc/carc.h> // try instead of cbox.h
 
 #define i_type Cities
-#define i_key_arcbox CityArc
+#define i_keyboxed CityArc
 #include <stc/cvec.h>
 
 #define i_type CityMap
 #define i_key int
-#define i_val_arcbox CityArc
+#define i_valboxed CityArc
 #include <stc/csmap.h>
 
 

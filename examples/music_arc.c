@@ -21,13 +21,13 @@ void Song_drop(Song* s) {
 
 // Define the reference counted type
 #define i_type SongArc
-#define i_val_class Song
+#define i_valclass Song
 #define i_opt c_no_hash
 #include <stc/carc.h>
 
 // ... and a vector of it
 #define i_type SongVec
-#define i_val_arcbox SongArc
+#define i_valboxed SongArc
 #include <stc/cstack.h>
 
 void example3()

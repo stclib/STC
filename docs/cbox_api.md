@@ -5,7 +5,7 @@ be empty. The *cbox_X_cmp()*, *cbox_X_drop()* methods are defined based on the `
 and `i_valdrop` macros specified. Use *cbox_X_clone(p)* to make a deep copy, which uses the
 `i_valclone` macro if defined.
 
-When declaring a container of **cbox** values, define `i_val_arcbox` with the
+When declaring a container of **cbox** values, define `i_valboxed` with the
 cbox type instead of defining `i_val`. This will auto-set `i_valdrop`, `i_valclone`, and `i_cmp` using 
 functions defined by the specified **cbox**.
 
@@ -79,11 +79,11 @@ void int_drop(int* x) {
 #include <stc/cbox.h>
 
 #define i_type ISet
-#define i_key_arcbox IBox     // NB: use i_key_arcbox instead of i_key
+#define i_keyboxed IBox       // NB: use i_keyboxed instead of i_key
 #include <stc/csset.h>        // ISet : std::set<std::unique_ptr<int>>
 
 #define i_type IVec
-#define i_val_arcbox IBox     // NB: use i_val_arcbox instead of i_val
+#define i_valboxed IBox       // NB: use i_valboxed instead of i_val
 #include <stc/cvec.h>         // IVec : std::vector<std::unique_ptr<int>>
 
 int main()

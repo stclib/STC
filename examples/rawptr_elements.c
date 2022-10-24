@@ -23,7 +23,7 @@ typedef int64_t inttype;
 
 #define i_type SIBoxMap
 #define i_key_str
-#define i_val_arcbox IBox
+#define i_valboxed IBox
 #include <stc/cmap.h>
 
 int main()

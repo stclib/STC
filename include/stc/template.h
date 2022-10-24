@@ -57,15 +57,8 @@
   #error "i_valfrom defined without i_valraw"
 #endif
 
-#ifdef i_key_bind // [deprecated]
-  #define i_key_class i_key_bind
-#endif
-#ifdef i_val_bind // [deprecated]
-  #define i_val_class i_val_bind
-#endif
-
 #if !(defined i_key || defined i_key_str || defined i_key_ssv || \
-      defined i_key_class || defined i_key_arcbox)
+      defined i_keyclass || defined i_keyboxed)
   #if defined _i_ismap
     #error "i_key* must be defined for maps."
   #endif
@@ -76,11 +69,11 @@
   #if defined i_val_ssv
     #define i_key_ssv i_val_ssv
   #endif  
-  #if defined i_val_arcbox
-    #define i_key_arcbox i_val_arcbox
+  #if defined i_valboxed
+    #define i_keyboxed i_valboxed
   #endif
-  #if defined i_val_class
-    #define i_key_class i_val_class
+  #if defined i_valclass
+    #define i_keyclass i_valclass
   #endif
   #if defined i_val
     #define i_key i_val
@@ -110,14 +103,14 @@
 #endif
 
 #if defined i_key_str
-  #define i_key_class cstr
+  #define i_keyclass cstr
   #define i_keyraw crawstr
   #define i_keyfrom cstr_from
   #ifndef i_tag
     #define i_tag str
   #endif
 #elif defined i_key_ssv
-  #define i_key_class cstr
+  #define i_keyclass cstr
   #define i_keyraw csview
   #define i_keyfrom cstr_from_sv
   #define i_keyto cstr_sv
@@ -125,17 +118,17 @@
   #ifndef i_tag
     #define i_tag ssv
   #endif
-#elif defined i_key_arcbox
-  #define i_key_class i_key_arcbox
-  #define i_keyraw c_paste(i_key_arcbox, _raw)
-  #define i_keyfrom c_paste(i_key_arcbox, _new)
+#elif defined i_keyboxed
+  #define i_keyclass i_keyboxed
+  #define i_keyraw c_paste(i_keyboxed, _raw)
+  #define i_keyfrom c_paste(i_keyboxed, _new)
   #if !defined _i_no_hash
-    #define i_eq c_paste(i_key_arcbox, _raw_eq)
+    #define i_eq c_paste(i_keyboxed, _raw_eq)
   #endif
 #endif
 
-#ifdef i_key_class
-  #define i_key i_key_class
+#ifdef i_keyclass
+  #define i_key i_keyclass
   #ifndef i_keyclone
     #define i_keyclone c_paste(i_key, _clone)
   #endif
@@ -211,22 +204,22 @@
 #if defined _i_ismap // ---- process cmap/csmap value i_val, ... ----
 
 #ifdef i_val_str
-  #define i_val_class cstr
+  #define i_valclass cstr
   #define i_valraw crawstr
   #define i_valfrom cstr_from
 #elif defined i_val_ssv
-  #define i_val_class cstr
+  #define i_valclass cstr
   #define i_valraw csview
   #define i_valfrom cstr_from_sv
   #define i_valto cstr_sv
-#elif defined i_val_arcbox
-  #define i_val_class i_val_arcbox
-  #define i_valraw c_paste(i_val_arcbox, _raw)
-  #define i_valfrom c_paste(i_val_arcbox, _new)
+#elif defined i_valboxed
+  #define i_valclass i_valboxed
+  #define i_valraw c_paste(i_valboxed, _raw)
+  #define i_valfrom c_paste(i_valboxed, _new)
 #endif
 
-#ifdef i_val_class
-  #define i_val i_val_class
+#ifdef i_valclass
+  #define i_val i_valclass
   #ifndef i_valclone
     #define i_valclone c_paste(i_val, _clone)
   #endif
@@ -291,9 +284,8 @@
 #undef i_val
 #undef i_val_str
 #undef i_val_ssv
-#undef i_val_arcbox
-#undef i_val_class
-#undef i_val_bind // [deprecated]
+#undef i_valboxed
+#undef i_valclass
 #undef i_valraw
 #undef i_valclone
 #undef i_valfrom
@@ -303,9 +295,8 @@
 #undef i_key
 #undef i_key_str
 #undef i_key_ssv
-#undef i_key_arcbox
-#undef i_key_class
-#undef i_key_bind // [deprecated]
+#undef i_keyboxed
+#undef i_keyclass
 #undef i_keyraw
 #undef i_keyclone
 #undef i_keyfrom

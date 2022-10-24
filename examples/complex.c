@@ -14,18 +14,18 @@
 #include <stc/cstack.h>
 
 #define i_type StackList
-#define i_val_class FloatStack // "class" picks up _clone, _drop
+#define i_valclass FloatStack  // "class" picks up _clone, _drop
 #define i_opt c_no_cmp         // no FloatStack_cmp()
 #include <stc/clist.h>
 
 #define i_type ListMap
 #define i_key int
-#define i_val_class StackList // "class" picks up _clone, _drop
+#define i_valclass StackList   // "class" picks up _clone, _drop
 #include <stc/cmap.h>
 
 #define i_type MapMap
 #define i_key_str
-#define i_val_class ListMap
+#define i_valclass ListMap
 #include <stc/cmap.h>
 
 

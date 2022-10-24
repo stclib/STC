@@ -13,10 +13,10 @@ void int_drop(int* x) {
 #define i_valdrop int_drop  // optional, just to display the elements destroyed
 #include <stc/carc.h>       // Arc
 
-#define i_key_arcbox Arc    // note: use i_key_arcbox instead of i_key for carc/cbox elements
+#define i_keyboxed Arc    // note: use i_keyboxed instead of i_key for carc/cbox elements
 #include <stc/csset.h>      // csset_Arc (like: std::set<std::shared_ptr<int>>)
 
-#define i_val_arcbox Arc    // note: as above.
+#define i_valboxed Arc    // note: as above.
 #include <stc/cvec.h>       // cvec_Arc (like: std::vector<std::shared_ptr<int>>)
 
 int main()
