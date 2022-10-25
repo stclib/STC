@@ -94,7 +94,7 @@ STC_INLINE _cx_self _cx_memb(_from_ptr)(_cx_value* p)
     { return c_make(_cx_self){p}; }
 
 // c++: std::make_unique<i_key>(val)
-STC_INLINE _cx_self _cx_memb(_from)(_cx_value val) {
+STC_INLINE _cx_self _cx_memb(_make)(_cx_value val) {
     _cx_self ptr = {c_alloc(_cx_value)};
     *ptr.get = val; return ptr;
 }
@@ -129,11 +129,11 @@ STC_INLINE void _cx_memb(_reset_to)(_cx_self* self, _cx_value* p) {
 }
 
 #ifndef _i_no_emplace
-STC_INLINE _cx_self _cx_memb(_new)(_cx_raw raw)
-    { return _cx_memb(_from)(i_keyfrom(raw)); }
+STC_INLINE _cx_self _cx_memb(_from)(_cx_raw raw)
+    { return _cx_memb(_make)(i_keyfrom(raw)); }
 #else
-STC_INLINE _cx_self _cx_memb(_new)(_cx_value val)
-    { return _cx_memb(_from)(val); }
+STC_INLINE _cx_self _cx_memb(_from)(_cx_value val)
+    { return _cx_memb(_make)(val); }
 #endif
 
 #if !defined _i_no_clone

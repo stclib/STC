@@ -121,7 +121,9 @@
 #elif defined i_keyboxed
   #define i_keyclass i_keyboxed
   #define i_keyraw c_paste(i_keyboxed, _raw)
-  #define i_keyfrom c_paste(i_keyboxed, _new)
+  #if !c_option(c_no_from)
+    #define i_keyfrom c_paste(i_keyboxed, _from)
+  #endif
   #if !defined _i_no_hash
     #define i_eq c_paste(i_keyboxed, _raw_eq)
   #endif
@@ -215,7 +217,9 @@
 #elif defined i_valboxed
   #define i_valclass i_valboxed
   #define i_valraw c_paste(i_valboxed, _raw)
-  #define i_valfrom c_paste(i_valboxed, _new)
+  #if !c_option(c_no_from)
+    #define i_valfrom c_paste(i_valboxed, _from)
+  #endif
 #endif
 
 #ifdef i_valclass
