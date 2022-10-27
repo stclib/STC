@@ -46,7 +46,7 @@ int main()
 
 
         puts("\nIBox map:");
-        SIBoxMap_insert(&m2, cstr_from("Hello"), IBox_from(123));
+        SIBoxMap_insert(&m2, cstr_from("Hello"), IBox_make(123));
         SIBoxMap_emplace(&m2, "World", 999);
         c_forpair (name, number, SIBoxMap, m2)
             printf("%s: %d\n", cstr_str(_.name), *_.number->get);

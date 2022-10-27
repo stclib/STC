@@ -30,12 +30,12 @@ struct {
 #include <stc/cbox.h> // cbox_BoxPoint
 
 Point origin(void) {
-    return (Point){ .x=0.0, .y=0.0 };
+    return (Point){ .x=1.0, .y=2.0 };
 }
 
 cbox_Point boxed_origin(void) {
     // Allocate this point on the heap, and return a pointer to it
-    return cbox_Point_from((Point){ .x=0.0, .y=0.0 });
+    return cbox_Point_make((Point){ .x=2.0, .y=3.0 });
 }
 
 
@@ -50,10 +50,10 @@ int main(void) {
     // Declare auto-deleted box objects
     c_auto (cbox_Rectangle, boxed_rectangle)
     c_auto (cbox_Point, boxed_point)
-    c_auto (cbox_BoxPoint, box_in_a_box)
+    c_auto (cbox_BoxPoint, box_in_a_box, boxbox2)
     {
         // Heap allocated rectangle
-        boxed_rectangle = cbox_Rectangle_from((Rectangle){
+        boxed_rectangle = cbox_Rectangle_make((Rectangle){
             .top_left = origin(),
             .bottom_right = (Point){ .x=3.0, .y=-4.0 }
         });
@@ -62,7 +62,9 @@ int main(void) {
         boxed_point = cbox_Point_from(origin());
 
         // Double indirection
-        box_in_a_box = cbox_BoxPoint_from(boxed_origin());
+        box_in_a_box = cbox_BoxPoint_make(boxed_origin());
+        boxbox2 = cbox_BoxPoint_from(point); // !!
+        printf("boxbox2: x=%f\n", boxbox2.get->get->x);
 
         printf("Point occupies %" c_ZU " bytes on the stack\n",
                 sizeof(point));
