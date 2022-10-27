@@ -51,12 +51,6 @@
   #define _i_expandby 1
 #endif
 
-#if defined i_valraw ^ defined i_valto
-  #error "both i_valto and i_valraw must be defined, if any"
-#elif defined i_valfrom && !defined i_valraw
-  #error "i_valfrom defined without i_valraw"
-#endif
-
 #if !(defined i_key || defined i_key_str || defined i_key_ssv || \
       defined i_keyclass || defined i_keyboxed)
   #if defined _i_ismap
@@ -104,14 +98,14 @@
 
 #if defined i_key_str
   #define i_keyclass cstr
-  #define i_keyraw crawstr
+  #define i_rawclass crawstr
   #define i_keyfrom cstr_from
   #ifndef i_tag
     #define i_tag str
   #endif
 #elif defined i_key_ssv
   #define i_keyclass cstr
-  #define i_keyraw csview
+  #define i_rawclass csview
   #define i_keyfrom cstr_from_sv
   #define i_keyto cstr_sv
   #define i_eq csview_eq
@@ -120,11 +114,17 @@
   #endif
 #elif defined i_keyboxed
   #define i_keyclass i_keyboxed
-  #define i_keyraw c_paste(i_keyboxed, _raw)
+  #define i_rawclass c_paste(i_keyboxed, _raw)
   #define i_keyfrom c_paste(i_keyboxed, _new)
   #if !defined _i_no_hash
     #define i_eq c_paste(i_keyboxed, _raw_eq)
   #endif
+#endif
+
+#if defined i_rawclass
+  #define i_keyraw i_rawclass
+#elif defined i_keyclass && !defined i_keyraw
+  #define i_rawclass i_key
 #endif
 
 #ifdef i_keyclass
@@ -138,10 +138,10 @@
   #ifndef i_keydrop
     #define i_keydrop c_paste(i_key, _drop)
   #endif
-  #if !defined i_cmp && !defined _i_no_cmp
+  #if defined i_rawclass && !defined i_cmp && !defined _i_no_cmp
     #define i_cmp c_paste(i_keyraw, _cmp)
   #endif
-  #if !defined i_hash && !defined _i_no_hash
+  #if defined i_rawclass && !defined i_hash && !defined _i_no_hash
     #define i_hash c_paste(i_keyraw, _hash)
   #endif
 #endif
@@ -149,9 +149,9 @@
 #if !defined i_key
   #error "no i_key or i_val defined"
 #elif defined i_keyraw ^ defined i_keyto
-  #error "both i_keyraw and i_keyto must be defined, if any"
+  #error "both i_***raw and i_***to must be defined, if any"
 #elif defined i_keyfrom && !defined i_keyraw
-  #error "i_keyfrom defined without i_keyraw"
+  #error "i_***from defined without i_***raw"
 #elif defined i_from || defined i_drop
   #error "i_from / i_drop not supported. Define i_keyfrom/i_valfrom and/or i_keydrop/i_valdrop instead"
 #endif
@@ -278,6 +278,7 @@
 #undef i_cmp
 #undef i_eq
 #undef i_hash
+#undef i_rawclass
 #undef i_capacity
 #undef i_size
 

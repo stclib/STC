@@ -33,7 +33,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
 // With this in place, we define the Viking => int hash map type:
 #define i_type      Vikings
 #define i_keyclass  Viking      // key type
-#define i_keyraw    RViking     // lookup type
+#define i_rawclass  RViking     // lookup type
 #define i_keyfrom   Viking_from
 #define i_opt       c_no_clone
 #define i_hash(rp)  c_strhash(rp->name) ^ c_strhash(rp->country)
@@ -44,7 +44,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
    i_cmp        => RViking_cmp
    //i_hash     => RViking_hash     // already defined.
    //i_keyclone => Viking_clone     // not used, because of c_no_clone
-   i_keyto      => Viking_toraw     // because i_keyraw is defined
+   i_keyto      => Viking_toraw     // because i_rawclass is defined
    i_keydrop    => Viking_drop
 */
 
