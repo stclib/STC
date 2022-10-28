@@ -21,8 +21,8 @@
  * SOFTWARE.
  */
 
-/* A string type with short string optimization in C99 with optimal short string
- * utilization (23 characters with 24 bytes string representation).
+/* A string type with short string optimization in C99 with good small-string
+ * optimization (22 characters with 24 bytes string).
  */
 #ifdef STC_CSTR_V1
 #include "alt/cstr.h"
@@ -46,11 +46,10 @@
 #  pragma GCC diagnostic ignored "-Wstringop-overflow="
 #endif
 
-enum  { cstr_s_cap =            sizeof(cstr_buf) - 1 };
-#define cstr_s_size(s)          ((size_t)(cstr_s_cap - (s)->sml.last))
-#define cstr_s_set_size(s, len) ((s)->sml.last = (uint8_t)(cstr_s_cap - (len)), (s)->sml.data[len] = 0)
+enum  { cstr_s_cap =            sizeof(cstr_buf) - 2 };
+#define cstr_s_size(s)          ((size_t)(s)->sml.size)
+#define cstr_s_set_size(s, len) ((s)->sml.size = (uint8_t)(len), (s)->sml.data[len] = 0)
 #define cstr_s_data(s)          (s)->sml.data
-#define cstr_s_end(s)           ((s)->sml.data + cstr_s_size(s))
 
 #if defined(__BYTE_ORDER__) && __BYTE_ORDER__ == __ORDER_BIG_ENDIAN__
     #define byte_rotl_(x, b)       ((x) << (b)*8 | (x) >> (sizeof(x) - (b))*8)
@@ -63,10 +62,9 @@ enum  { cstr_s_cap =            sizeof(cstr_buf) - 1 };
 #define cstr_l_size(s)          ((s)->lon.size)
 #define cstr_l_set_size(s, len) ((s)->lon.data[(s)->lon.size = (len)] = 0)
 #define cstr_l_data(s)          (s)->lon.data
-#define cstr_l_end(s)           ((s)->lon.data + cstr_l_size(s))
 #define cstr_l_drop(s)          c_free((s)->lon.data)
 
-#define cstr_is_long(s)         ((s)->sml.last > 127)
+#define cstr_is_long(s)         ((s)->sml.size > 127)
 STC_API char* _cstr_init(cstr* self, size_t len, size_t cap);
 STC_API char* _cstr_internal_move(cstr* self, size_t pos1, size_t pos2);
 
@@ -74,7 +72,7 @@ STC_API char* _cstr_internal_move(cstr* self, size_t pos1, size_t pos2);
 
 #define cstr_new(literal) cstr_from_n(literal, c_strlen_lit(literal))
 #define cstr_npos (SIZE_MAX >> 1)
-#define cstr_null (c_make(cstr){.sml = {.last = cstr_s_cap}})
+#define cstr_null (c_make(cstr){{{0}}})
 #define cstr_toraw(self) cstr_str(self)
 
 STC_API char*   cstr_reserve(cstr* self, size_t cap);
@@ -164,7 +162,7 @@ STC_INLINE const char* cstr_str(const cstr* self)
     { return SSO_CALL(self, data(self)); }
 
 STC_INLINE bool cstr_empty(const cstr* self) 
-    { return self->sml.last == cstr_s_cap; }
+    { return self->sml.size == 0; }
 
 STC_INLINE size_t cstr_size(const cstr* self)
     { return SSO_CALL(self, size(self)); }

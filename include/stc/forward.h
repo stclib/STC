@@ -55,7 +55,7 @@ typedef struct { cstr_value* data; size_t size, cap; } cstr_buf;
     typedef struct { cstr_value* str; } cstr;
 #else
     typedef union {
-        struct { cstr_value data[sizeof(cstr_buf) - 1]; unsigned char last; } sml;
+        struct { cstr_value data[sizeof(cstr_buf) - 1]; unsigned char size; } sml;
         struct { cstr_value* data; size_t size, ncap; } lon;
     } cstr;
 #endif
