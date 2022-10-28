@@ -99,7 +99,7 @@ STC_API chash_bucket_t  _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawke
 STC_API _cx_result      _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey);
 STC_API void            _cx_memb(_erase_entry)(_cx_self* self, _cx_value* val);
 
-STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_make(_cx_self)_cmap_inits; }
+STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_init(_cx_self)_cmap_inits; }
 STC_INLINE void         _cx_memb(_shrink_to_fit)(_cx_self* self) { _cx_memb(_reserve)(self, self->size); }
 STC_INLINE void         _cx_memb(_max_load_factor)(_cx_self* self, float ml) {self->max_load_factor = ml; }
 STC_INLINE bool         _cx_memb(_empty)(const _cx_self* map) { return !map->size; }
@@ -159,7 +159,7 @@ _cx_memb(_emplace)(_cx_self* self, _cx_rawkey rkey _i_MAP_ONLY(, i_valraw rmappe
 STC_INLINE _cx_raw
 _cx_memb(_value_toraw)(const _cx_value* val) {
     return _i_SET_ONLY( i_keyto(val) )
-           _i_MAP_ONLY( c_make(_cx_raw){i_keyto((&val->first)), i_valto((&val->second))} );
+           _i_MAP_ONLY( c_init(_cx_raw){i_keyto((&val->first)), i_valto((&val->second))} );
 }
 
 STC_INLINE void
@@ -200,7 +200,7 @@ _cx_memb(_begin)(const _cx_self* self) {
 
 STC_INLINE _cx_iter
 _cx_memb(_end)(const _cx_self* self)
-    { return c_make(_cx_iter){NULL}; }
+    { return c_init(_cx_iter){NULL}; }
 
 STC_INLINE void
 _cx_memb(_next)(_cx_iter* it) { 
@@ -218,7 +218,7 @@ STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, _cx_rawkey rkey) {
     i_size idx;
     if (self->size && self->_hashx[idx = _cx_memb(_bucket_)(self, &rkey).idx])
-        return c_make(_cx_iter){self->table + idx, 
+        return c_init(_cx_iter){self->table + idx, 
                                 self->table + self->bucket_count,
                                 self->_hashx + idx};
     return _cx_memb(_end)(self);

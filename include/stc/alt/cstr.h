@@ -64,7 +64,7 @@ STC_INLINE cstr         cstr_init() { return cstr_null; }
 STC_INLINE const char*  cstr_str(const cstr* self) { return self->str; }
 #define                 cstr_toraw(self) (self)->str
 STC_INLINE csview       cstr_sv(const cstr* self) 
-                            { return c_make(csview){self->str, _cstr_p(self)->size}; }
+                            { return c_init(csview){self->str, _cstr_p(self)->size}; }
 #define                 cstr_new(literal) \
                             cstr_from_n(literal, c_strlen_lit(literal))
 STC_INLINE cstr         cstr_from(const char* str)
@@ -115,7 +115,7 @@ STC_INLINE bool         cstr_getline(cstr *self, FILE *stream)
 
 STC_INLINE cstr_buf cstr_buffer(cstr* s) { 
     cstr_priv* p = _cstr_p(s);
-    return c_make(cstr_buf){s->str, p->size, p->cap};
+    return c_init(cstr_buf){s->str, p->size, p->cap};
 }
 
 STC_INLINE cstr cstr_with_capacity(const size_t cap) {

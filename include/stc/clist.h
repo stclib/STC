@@ -133,7 +133,7 @@ STC_INLINE _cx_value*   _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
                             { return _cx_memb(_push_back)(self, i_keyfrom(raw)); }
 #endif // !_i_no_emplace
 
-STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_make(_cx_self){NULL}; }
+STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_init(_cx_self){NULL}; }
 STC_INLINE bool         _cx_memb(_reserve)(_cx_self* self, size_t n) { return true; }
 STC_INLINE bool         _cx_memb(_empty)(const _cx_self* self) { return self->last == NULL; }
 STC_INLINE void         _cx_memb(_clear)(_cx_self* self) { _cx_memb(_drop)(self); }
@@ -155,12 +155,12 @@ _cx_memb(_count)(const _cx_self* self) {
 STC_INLINE _cx_iter
 _cx_memb(_begin)(const _cx_self* self) {
     _cx_value* head = self->last ? &self->last->next->value : NULL;
-    return c_make(_cx_iter){head, &self->last, self->last};
+    return c_init(_cx_iter){head, &self->last, self->last};
 }
 
 STC_INLINE _cx_iter
 _cx_memb(_end)(const _cx_self* self)
-    { return c_make(_cx_iter){NULL}; }
+    { return c_init(_cx_iter){NULL}; }
 
 STC_INLINE void
 _cx_memb(_next)(_cx_iter* it) {

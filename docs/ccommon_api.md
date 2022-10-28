@@ -307,7 +307,7 @@ if (it.ref) cmap_str_erase_at(&map, it);
 c_erase_if(i, csmap_str, map, cstr_contains(i.ref, "hello"));
 ```
 
-### c_new, c_alloc, c_alloc_n, c_drop, c_make
+### c_new, c_alloc, c_alloc_n, c_drop, c_init
 
 | Usage                          | Meaning                                 |
 |:-------------------------------|:----------------------------------------|
@@ -315,7 +315,7 @@ c_erase_if(i, csmap_str, map, cstr_contains(i.ref, "hello"));
 | `c_alloc (type)`               | `(type *) c_malloc(sizeof(type))`       |
 | `c_alloc_n (type, N)`          | `(type *) c_malloc((N)*sizeof(type))`   |
 | `c_drop (ctype, &c1, ..., &cN)` | `ctype_drop(&c1); ... ctype_drop(&cN)` |
-| `c_make(type){value...}`       | `(type){value...}` // c++ compatability |
+| `c_init(type){value...}`       | `(type){value...}` // c++ compatability |
 
 ```c
 struct Pnt { double x, y, z; };

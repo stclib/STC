@@ -72,7 +72,7 @@ STC_API char* _cstr_internal_move(cstr* self, size_t pos1, size_t pos2);
 
 #define cstr_new(literal) cstr_from_n(literal, c_strlen_lit(literal))
 #define cstr_npos (SIZE_MAX >> 1)
-#define cstr_null (c_make(cstr){{{0}}})
+#define cstr_null (c_init(cstr){{{0}}})
 #define cstr_toraw(self) cstr_str(self)
 
 STC_API char*   cstr_reserve(cstr* self, size_t cap);
@@ -92,12 +92,12 @@ STC_API cstr    cstr_replace_sv(csview sv, csview search, csview repl, unsigned 
 
 STC_INLINE cstr_buf cstr_buffer(cstr* s) {
     return cstr_is_long(s)
-        ? c_make(cstr_buf){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
-        : c_make(cstr_buf){s->sml.data, cstr_s_size(s), cstr_s_cap};
+        ? c_init(cstr_buf){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
+        : c_init(cstr_buf){s->sml.data, cstr_s_size(s), cstr_s_cap};
 }
 STC_INLINE csview cstr_sv(const cstr* s) {
-    return cstr_is_long(s) ? c_make(csview){s->lon.data, cstr_l_size(s)}
-                           : c_make(csview){s->sml.data, cstr_s_size(s)};
+    return cstr_is_long(s) ? c_init(csview){s->lon.data, cstr_l_size(s)}
+                           : c_init(csview){s->sml.data, cstr_s_size(s)};
 }
 
 STC_INLINE cstr cstr_init(void)
@@ -224,11 +224,11 @@ STC_INLINE csview cstr_u8_chr(const cstr* self, size_t u8idx) {
 
 STC_INLINE cstr_iter cstr_begin(const cstr* self) { 
     csview sv = cstr_sv(self);
-    if (!sv.size) return c_make(cstr_iter){NULL};
-    return c_make(cstr_iter){.u8 = {{sv.str, utf8_chr_size(sv.str)}}};
+    if (!sv.size) return c_init(cstr_iter){NULL};
+    return c_init(cstr_iter){.u8 = {{sv.str, utf8_chr_size(sv.str)}}};
 }
 STC_INLINE cstr_iter cstr_end(const cstr* self) {
-    return c_make(cstr_iter){NULL};
+    return c_init(cstr_iter){NULL};
 }
 STC_INLINE void cstr_next(cstr_iter* it) {
     it->ref += it->u8.chr.size;

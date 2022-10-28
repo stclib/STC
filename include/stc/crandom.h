@@ -100,12 +100,12 @@ STC_INLINE double stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist) {
 
 /* Init uniform distributed float64 RNG, range [low, high). */
 STC_INLINE stc64_uniformf_t stc64_uniformf_new(double low, double high) {
-    return c_make(stc64_uniformf_t){low, high - low};
+    return c_init(stc64_uniformf_t){low, high - low};
 }
 
 /* Marsaglia polar method for gaussian/normal distribution, float64. */
 STC_INLINE stc64_normalf_t stc64_normalf_new(double mean, double stddev) {
-    return c_make(stc64_normalf_t){mean, stddev, 0.0, 0};
+    return c_init(stc64_normalf_t){mean, stddev, 0.0, 0};
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */

@@ -85,13 +85,13 @@ _cx_deftypes(_c_cbox_types, _cx_self, i_key);
 
 // constructors (takes ownsership)
 STC_INLINE _cx_self _cx_memb(_init)(void)
-    { return c_make(_cx_self){NULL}; }
+    { return c_init(_cx_self){NULL}; }
 
 STC_INLINE long _cx_memb(_use_count)(const _cx_self* self)
     { return (long)(self->get != NULL); }
 
 STC_INLINE _cx_self _cx_memb(_from_ptr)(_cx_value* p)
-    { return c_make(_cx_self){p}; }
+    { return c_init(_cx_self){p}; }
 
 // c++: std::make_unique<i_key>(val)
 STC_INLINE _cx_self _cx_memb(_make)(_cx_value val) {

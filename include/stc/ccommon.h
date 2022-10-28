@@ -73,13 +73,13 @@
 #ifndef __cplusplus
 #  define c_alloc(T)            c_malloc(sizeof(T))
 #  define c_alloc_n(T, n)       c_malloc(sizeof(T)*(n))
-#  define c_make(T)             (T)
+#  define c_init(T)             (T)
 #  define c_new(T, ...)         ((T*)memcpy(c_alloc(T), (T[]){__VA_ARGS__}, sizeof(T)))
 #else
 #  include <new>
 #  define c_alloc(T)            static_cast<T*>(c_malloc(sizeof(T)))
 #  define c_alloc_n(T, n)       static_cast<T*>(c_malloc(sizeof(T)*(n)))
-#  define c_make(T)             T
+#  define c_init(T)             T
 #  define c_new(T, ...)         new (c_alloc(T)) T(__VA_ARGS__)
 #endif
 #ifndef c_malloc
@@ -122,8 +122,8 @@ typedef const char* crawstr;
 
 #define c_strlen_lit(literal) (sizeof "" literal - 1U)
 #define c_sv(...) c_MACRO_OVERLOAD(c_sv, __VA_ARGS__)
-#define c_sv1(lit) (c_make(csview){lit, c_strlen_lit(lit)})
-#define c_sv2(str, n) (c_make(csview){str, n})
+#define c_sv1(lit) (c_init(csview){lit, c_strlen_lit(lit)})
+#define c_sv2(str, n) (c_init(csview){str, n})
 #define c_PRIsv ".*s"
 #define c_ARGsv(sv) (int)(sv).size, (sv).str
 #define c_PAIR(ref) (ref)->first, (ref)->second

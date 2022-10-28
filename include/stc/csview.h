@@ -36,7 +36,7 @@
 #define             csview_from_n c_sv
 
 STC_INLINE csview   csview_from(const char* str)
-                        { return c_make(csview){str, strlen(str)}; }
+                        { return c_init(csview){str, strlen(str)}; }
 STC_INLINE void     csview_clear(csview* self) { *self = csview_null; }
 
 STC_INLINE size_t   csview_size(csview sv) { return sv.size; }
@@ -74,12 +74,12 @@ STC_INLINE csview csview_slice(csview sv, size_t p1, size_t p2) {
 
 /* utf8 iterator */
 STC_INLINE csview_iter csview_begin(const csview* self) { 
-    if (!self->size) return c_make(csview_iter){NULL};
-    return c_make(csview_iter){.u8 = {{self->str, utf8_chr_size(self->str)},
+    if (!self->size) return c_init(csview_iter){NULL};
+    return c_init(csview_iter){.u8 = {{self->str, utf8_chr_size(self->str)},
                                       self->str + self->size}};
 }
 STC_INLINE csview_iter csview_end(const csview* self) {
-    return c_make(csview_iter){.u8 = {{NULL}, self->str + self->size}};
+    return c_init(csview_iter){.u8 = {{NULL}, self->str + self->size}};
 }
 STC_INLINE void csview_next(csview_iter* it) {
     it->ref += it->u8.chr.size;

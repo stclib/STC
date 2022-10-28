@@ -144,7 +144,7 @@ _cx_memb(_clear)(_cx_self* self)
 STC_INLINE _cx_raw
 _cx_memb(_value_toraw)(const _cx_value* val) {
     return _i_SET_ONLY( i_keyto(val) )
-           _i_MAP_ONLY( c_make(_cx_raw){i_keyto((&val->first)), 
+           _i_MAP_ONLY( c_init(_cx_raw){i_keyto((&val->first)), 
                                         i_valto((&val->second))} );
 }
 

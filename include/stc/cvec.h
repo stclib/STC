@@ -198,11 +198,11 @@ _cx_memb(_at_mut)(_cx_self* self, const size_t idx) {
 
 STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) { 
     size_t n = cvec_rep_(self)->size; 
-    return c_make(_cx_iter){n ? self->data : NULL, self->data + n};
+    return c_init(_cx_iter){n ? self->data : NULL, self->data + n};
 }
 
 STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self) 
-    { return c_make(_cx_iter){NULL, self->data + cvec_rep_(self)->size}; }
+    { return c_init(_cx_iter){NULL, self->data + cvec_rep_(self)->size}; }
 
 STC_INLINE void _cx_memb(_next)(_cx_iter* it) 
     { if (++it->ref == it->end) it->ref = NULL; }
@@ -345,7 +345,7 @@ _cx_memb(_insert_uninit)(_cx_self* self, _cx_value* pos, const size_t n) {
         memmove(pos + n, pos, (r->size - idx)*sizeof *pos);
         r->size += n;
     }
-    return c_make(_cx_iter){pos, self->data + r->size};
+    return c_init(_cx_iter){pos, self->data + r->size};
 }
 
 STC_DEF _cx_iter
@@ -367,7 +367,7 @@ _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
         { i_keydrop(p); }
     memmove(p1, p2, (end - p2) * sizeof *p1);
     r->size -= len;
-    return c_make(_cx_iter){p2 == end ? NULL : p1, end - len};
+    return c_init(_cx_iter){p2 == end ? NULL : p1, end - len};
 }
 
 #if !defined _i_no_clone

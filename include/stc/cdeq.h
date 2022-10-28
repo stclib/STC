@@ -101,11 +101,11 @@ STC_INLINE void         _cx_memb(_pop_front)(_cx_self* self) // == _pop() when _
 
 STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) {
     size_t n = cdeq_rep_(self)->size;
-    return c_make(_cx_iter){n ? self->data : NULL, self->data + n};
+    return c_init(_cx_iter){n ? self->data : NULL, self->data + n};
 }
 
 STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self)
-    { return c_make(_cx_iter){NULL, self->data + cdeq_rep_(self)->size}; }
+    { return c_init(_cx_iter){NULL, self->data + cdeq_rep_(self)->size}; }
 
 STC_INLINE void _cx_memb(_next)(_cx_iter* it)
     { if (++it->ref == it->end) it->ref = NULL; }
@@ -216,7 +216,7 @@ static struct cdeq_rep _cdeq_sentinel = {0, 0};
 STC_DEF _cx_self
 _cx_memb(_init)(void) {
     _cx_value *b = (_cx_value *) _cdeq_sentinel.base;
-    return c_make(_cx_self){b, b};
+    return c_init(_cx_self){b, b};
 }
 
 STC_DEF void
@@ -366,7 +366,7 @@ _cx_memb(_insert_uninit)(_cx_self* self, _cx_value* pos, const size_t n) {
         r->size += n;
         pos = self->data + idx;
     }
-    return c_make(_cx_iter){pos, self->data + r->size};
+    return c_init(_cx_iter){pos, self->data + r->size};
 }
 
 STC_DEF _cx_value*
@@ -399,7 +399,7 @@ _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
         { i_keydrop(p); }
     memmove(p1, p2, (end - p2) * sizeof *p1);
     r->size -= len;
-    return c_make(_cx_iter){p2 == end ? NULL : p1, end - len};
+    return c_init(_cx_iter){p2 == end ? NULL : p1, end - len};
 }
 
 #if !defined _i_no_clone

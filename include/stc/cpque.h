@@ -43,7 +43,7 @@ STC_API void _cx_memb(_erase_at)(_cx_self* self, size_t idx);
 STC_API void _cx_memb(_push)(_cx_self* self, _cx_value value);
 
 STC_INLINE _cx_self _cx_memb(_init)(void)
-    { return c_make(_cx_self){NULL}; }
+    { return c_init(_cx_self){NULL}; }
 
 STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
     if (cap != self->_len && cap <= self->_cap) return true;
