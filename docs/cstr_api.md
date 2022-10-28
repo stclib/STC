@@ -136,7 +136,7 @@ int          cstr_cmp(const cstr* s1, const cstr* s2);
 bool         cstr_eq(const cstr* s1, const cstr* s2);
 bool         cstr_hash(const cstr* self);
 
-char*        c_strnstrn(const char* str, const char* search, size_t slen, size_t nlen);
+char*        cstrnstrn(const char* str, const char* search, size_t slen, size_t nlen);
 ```
 
 ## Types

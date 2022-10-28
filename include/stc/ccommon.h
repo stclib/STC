@@ -98,7 +98,7 @@
 #define c_default_less(x, y)    (*(x) < *(y))
 #define c_default_eq(x, y)      (*(x) == *(y))
 #define c_memcmp_eq(x, y)       (memcmp(x, y, sizeof *(x)) == 0)
-#define c_default_hash(x)       c_fasthash(x, sizeof *(x))
+#define c_default_hash(x)       cfasthash(x, sizeof *(x))
 
 #define c_default_clone(v)      (v)
 #define c_default_toraw(vp)     (*(vp))
@@ -118,7 +118,7 @@
 
 typedef const char* crawstr;
 #define crawstr_cmp(xp, yp) strcmp(*(xp), *(yp))
-#define crawstr_hash(p) c_strhash(*(p))
+#define crawstr_hash(p) cstrhash(*(p))
 
 #define c_strlen_lit(literal) (sizeof "" literal - 1U)
 #define c_sv(...) c_MACRO_OVERLOAD(c_sv, __VA_ARGS__)
@@ -130,7 +130,7 @@ typedef const char* crawstr;
 
 #define _c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
-STC_INLINE uint64_t c_fasthash(const void* key, size_t len) {
+STC_INLINE uint64_t cfasthash(const void* key, size_t len) {
     const uint8_t *x = (const uint8_t*) key;
     uint64_t u8, h = 1; size_t n = len >> 3;
     uint32_t u4;
@@ -148,18 +148,18 @@ STC_INLINE uint64_t c_fasthash(const void* key, size_t len) {
     return _c_ROTL(h, 26) ^ h;
 }
 
-STC_INLINE uint64_t c_strhash(const char *str)
-    { return c_fasthash(str, strlen(str)); }
+STC_INLINE uint64_t cstrhash(const char *str)
+    { return cfasthash(str, strlen(str)); }
 
-STC_INLINE char* c_strnstrn(const char *s, const char *needle,
-                            size_t slen, const size_t nlen) {
-    if (!nlen) return (char *)s;
+STC_INLINE char* cstrnstrn(const char *str, const char *needle,
+                           size_t slen, const size_t nlen) {
+    if (!nlen) return (char *)str;
     if (nlen > slen) return NULL;
     slen -= nlen;
     do {
-        if (*s == *needle && !memcmp(s, needle, nlen))
-            return (char *)s;
-        ++s;
+        if (*str == *needle && !memcmp(str, needle, nlen))
+            return (char *)str;
+        ++str;
     } while (slen--);
     return NULL;
 }

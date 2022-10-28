@@ -176,7 +176,7 @@ STC_INLINE bool cstr_eq(const cstr* x, const cstr* y) {
     return xs == ys && !memcmp(x->str, y->str, xs);
 }
 STC_INLINE uint64_t cstr_hash(const cstr *self) {
-    return c_fasthash(self->str, _cstr_p(self)->size);
+    return cfasthash(self->str, _cstr_p(self)->size);
 }
 
 STC_INLINE void
@@ -323,7 +323,7 @@ cstr_replace_sv(csview str, csview find, csview repl, unsigned count) {
     size_t from = 0; char* res;
     if (count == 0) count = ~0;
     if (find.size)
-        while (count-- && (res = c_strnstrn(str.str + from, find.str, str.size - from, find.size))) {
+        while (count-- && (res = cstrnstrn(str.str + from, find.str, str.size - from, find.size))) {
             const size_t pos = res - str.str;
             cstr_append_n(&out, str.str + from, pos - from);
             cstr_append_n(&out, repl.str, repl.size);

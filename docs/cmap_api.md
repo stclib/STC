@@ -90,9 +90,9 @@ cmap_X_raw            cmap_X_value_toraw(cmap_X_value* pval);
 ```
 Helpers:
 ```c
-uint64_t              c_default_hash(const X *obj);                            // macro, calls c_fasthash(obj, sizeof *obj)
-uint64_t              c_strhash(const char *str);                              // string hash funcion, uses strlen()
-uint64_t              c_fasthash(const void *data, size_t len);                // base hash function
+uint64_t              c_default_hash(const X *obj);                            // macro, calls cfasthash(obj, sizeof *obj)
+uint64_t              cstrhash(const char *str);                               // string hash funcion, uses strlen()
+uint64_t              cfasthash(const void *data, size_t len);                 // base hash function
 
 // equalto template parameter functions:
 bool                  c_default_eq(const i_keyraw* a, const i_keyraw* b);      // *a == *b
@@ -381,7 +381,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #define i_keyraw    RViking
 #define i_keyfrom   Viking_from
 #define i_opt       c_no_clone // disable map cloning
-#define i_hash(rp)  (c_strhash(rp->name) ^ c_strhash(rp->country))
+#define i_hash(rp)  (cstrhash(rp->name) ^ cstrhash(rp->country))
 #define i_val       int
 #include <stc/cmap.h>
 /*

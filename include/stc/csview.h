@@ -160,12 +160,12 @@ STC_API uint64_t csview_hash(const csview *self);
 #if defined(i_implement) || defined(i_extern)
 
 STC_DEF size_t csview_find(csview sv, csview search) {
-    char* res = c_strnstrn(sv.str, search.str, sv.size, search.size);
+    char* res = cstrnstrn(sv.str, search.str, sv.size, search.size);
     return res ? res - sv.str : csview_npos;
 }
 
 STC_DEF uint64_t csview_hash(const csview *self)
-    { return c_fasthash(self->str, self->size); }
+    { return cfasthash(self->str, self->size); }
 
 STC_DEF csview csview_substr_ex(csview sv, intptr_t pos, size_t n) {
     if (pos < 0) { 
@@ -191,7 +191,7 @@ STC_DEF csview csview_slice_ex(csview sv, intptr_t p1, intptr_t p2) {
 
 STC_DEF csview csview_token(csview sv, csview sep, size_t* start) {
     csview slice = {sv.str + *start, sv.size - *start};
-    const char* res = c_strnstrn(slice.str, sep.str, slice.size, sep.size);
+    const char* res = cstrnstrn(slice.str, sep.str, slice.size, sep.size);
     csview tok = {slice.str, res ? res - slice.str : slice.size};
     *start += tok.size + sep.size;
     return tok;

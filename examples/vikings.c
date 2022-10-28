@@ -36,7 +36,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #define i_rawclass  RViking     // lookup type
 #define i_keyfrom   Viking_from
 #define i_opt       c_no_clone
-#define i_hash(rp)  c_strhash(rp->name) ^ c_strhash(rp->country)
+#define i_hash(rp)  cstrhash(rp->name) ^ cstrhash(rp->country)
 #define i_val       int         // mapped type
 #include <stc/cmap.h>
 /*

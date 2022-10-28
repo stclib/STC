@@ -413,11 +413,11 @@ STC_API uint64_t cstr_hash(const cstr *self);
 
 STC_DEF uint64_t cstr_hash(const cstr *self) {
     csview sv = cstr_sv(self);
-    return c_fasthash(sv.str, sv.size);
+    return cfasthash(sv.str, sv.size);
 }
 
 STC_DEF size_t cstr_find_sv(const cstr* self, csview search) {
-    char* res = c_strnstrn(cstr_str(self), search.str, cstr_size(self), search.size);
+    char* res = cstrnstrn(cstr_str(self), search.str, cstr_size(self), search.size);
     return res ? res - cstr_str(self) : cstr_npos;
 }
 
@@ -540,7 +540,7 @@ cstr_replace_sv(csview in, csview search, csview repl, unsigned count) {
     size_t from = 0; char* res;
     if (!count) count = ~0;
     if (search.size)
-        while (count-- && (res = c_strnstrn(in.str + from, search.str, in.size - from, search.size))) {
+        while (count-- && (res = cstrnstrn(in.str + from, search.str, in.size - from, search.size))) {
             const size_t pos = res - in.str;
             cstr_append_n(&out, in.str + from, pos - from);
             cstr_append_n(&out, repl.str, repl.size);
