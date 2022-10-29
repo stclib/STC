@@ -188,5 +188,4 @@ STC_INLINE bool _cx_memb(_eq)(const _cx_self* x, const _cx_self* y) {
     _cx_raw rx = i_keyto(x->get), ry = i_keyto(y->get);
     return _cx_memb(_raw_eq)(&rx, &ry);
 }
-#undef _i_no_hash
 #include "template.h"

@@ -140,10 +140,13 @@
   #ifndef i_keydrop
     #define i_keydrop c_paste(i_key, _drop)
   #endif
-  #if defined i_rawclass && !defined i_cmp && !defined _i_no_cmp
+#endif
+
+#ifdef i_rawclass
+  #if !defined i_cmp && !defined _i_no_cmp
     #define i_cmp c_paste(i_keyraw, _cmp)
   #endif
-  #if defined i_rawclass && !defined i_hash && !defined _i_no_hash
+  #if !defined i_hash && !defined _i_no_hash
     #define i_hash c_paste(i_keyraw, _hash)
   #endif
 #endif
@@ -317,6 +320,7 @@
 #undef _i_prefix
 #undef _i_has_from
 #undef _i_no_cmp
+#undef _i_no_hash
 #undef _i_no_clone
 #undef _i_no_emplace
 #undef _i_template

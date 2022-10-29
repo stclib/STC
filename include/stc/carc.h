@@ -215,5 +215,4 @@ STC_INLINE bool _cx_memb(_eq)(const _cx_self* x, const _cx_self* y) {
 }
 #undef _i_atomic_inc
 #undef _i_atomic_dec_and_test
-#undef _i_no_hash
 #include "template.h"
