@@ -332,20 +332,19 @@ _cx_memb(_erase_at)(_cx_self* self, _cx_iter it) {
 
 STC_DEF _cx_iter
 _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
-    if (!it1.ref) return it2;
-    _cx_node *node = it1.prev, *end = it2.ref ? _clist_tonode(it2.ref) : NULL,
-             *done = end ? end : self->last->next;
-    if (node != end) do {
-        _cx_memb(_erase_node_after)(self, node);
-    } while (self->last && node->next != done);
+    _cx_node *end = it2.ref ? _clist_tonode(it2.ref) : self->last->next;
+    if (it1.ref) while (it1.prev->next != end) {
+        _cx_memb(_erase_node_after)(self, it1.prev);
+        if (!self->last) break;
+    }
     return it2;
 }
 
 STC_DEF void
 _cx_memb(_erase_node_after)(_cx_self* self, _cx_node* ref) {
-    _cx_node* del = _cx_memb(_unlink_node_after)(self, ref);
-    i_keydrop((&del->value));
-    c_free(del);
+    _cx_node* node = _cx_memb(_unlink_node_after)(self, ref);
+    i_keydrop((&node->value));
+    c_free(node);
 }
 
 STC_DEF _cx_node*
