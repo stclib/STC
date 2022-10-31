@@ -333,10 +333,10 @@ _cx_memb(_erase_at)(_cx_self* self, _cx_iter it) {
 STC_DEF _cx_iter
 _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
     _cx_node *end = it2.ref ? _clist_tonode(it2.ref) : self->last->next;
-    if (it1.ref) while (it1.prev->next != end) {
+    if (it1.ref != it2.ref) do {
         _cx_memb(_erase_node_after)(self, it1.prev);
         if (!self->last) break;
-    }
+    } while (it1.prev->next != end);
     return it2;
 }
 
