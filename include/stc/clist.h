@@ -350,22 +350,21 @@ _cx_memb(_erase_node_after)(_cx_self* self, _cx_node* ref) {
 
 STC_DEF _cx_node*
 _cx_memb(_unlink_node_after)(_cx_self* self, _cx_node* ref) {
-    _cx_node* del = ref->next, *next = del->next;
+    _cx_node* node = ref->next, *next = node->next;
     ref->next = next;
-    if (del == next)
+    if (node == next)
         self->last = NULL;
-    else if (del == self->last)
+    else if (node == self->last)
         self->last = ref;
-    return del;
+    return node;
 }
 
 STC_DEF void
 _cx_memb(_reverse)(_cx_self* self) {
-    _cx_node *del;
-    _cx_self rev = _cx_memb(_init)();
+    _cx_self rev = {NULL};
     while (self->last) {
-        del = _cx_memb(_unlink_node_after)(self, self->last);
-        _cx_memb(_insert_node_after)(&rev, rev.last, del);
+        _cx_node* node = _cx_memb(_unlink_node_after)(self, self->last);
+        _cx_memb(_insert_node_after)(&rev, rev.last, node);
     }
     *self = rev;
 }
@@ -381,22 +380,23 @@ _cx_memb(_splice)(_cx_self* self, _cx_iter it, _cx_self* other) {
         it.prev->next = next;
         if (!it.ref) self->last = it.prev;
     }
-    other->last = NULL; return it;
+    other->last = NULL;
+    return it;
 }
 
 STC_DEF _cx_self
 _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
-    _cx_self cx = {NULL};
+    _cx_self lst = {NULL};
     if (it1.ref == it2.ref)
-        return cx;
+        return lst;
     _cx_node *p1 = it1.prev,
              *p2 = it2.ref ? it2.prev : self->last;
     p1->next = p2->next;
     p2->next = _clist_tonode(it1.ref);
     if (self->last == p2)
         self->last = (p1 == p2) ? NULL : p1;
-    cx.last = p2;
-    return cx;
+    lst.last = p2;
+    return lst;
 }
 
 #if !defined _i_no_cmp
