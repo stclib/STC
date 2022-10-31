@@ -62,14 +62,10 @@
 #define c_static_assert(cond) \
     typedef char c_paste(_static_assert_line_, __LINE__)[(cond) ? 1 : -1]
 #define c_unchecked_container_of(ptr, type, member) \
-    ((type *)((char *)(ptr) - offsetof(type, member)))
-#if __STDC_VERSION__ >= 202300L || defined STC_CHECKED_CONTAINER_OF
-#  define c_container_of(ptr, type, member) \
-    (((type *)((char *)(ptr) - offsetof(type, member))) + \
-     ((typeof(ptr))0 != (typeof(&((type *)0)->member))0))
-#else
-#  define c_container_of(p,t,m) c_unchecked_container_of(p,t,m)
-#endif
+    ((type*)((char*)(ptr) - offsetof(type, member)))
+#define c_container_of(p, T, m) \
+    c_unchecked_container_of((p) + sizeof((p)==&((T*)0)->m) - sizeof(1==1), T, m)
+
 #ifndef __cplusplus
 #  define c_alloc(T)            c_malloc(sizeof(T))
 #  define c_alloc_n(T, n)       c_malloc(sizeof(T)*(n))

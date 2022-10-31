@@ -64,7 +64,7 @@
         SELF##_value value; \
     }
 
-#define clist_node_(vp) c_unchecked_container_of(vp, _cx_node, value)
+#define _clist_tonode(vp) c_container_of(vp, _cx_node, value)
     
 _c_clist_types(clist_VOID, int);
 _c_clist_complete_types(clist_VOID, dummy);
@@ -166,7 +166,7 @@ _cx_memb(_end)(const _cx_self* self)
 
 STC_INLINE void
 _cx_memb(_next)(_cx_iter* it) {
-    _cx_node* node = it->prev = clist_node_(it->ref);
+    _cx_node* node = it->prev = _clist_tonode(it->ref);
     it->ref = (node == *it->_last ? NULL : &node->next->value);
 }
 
@@ -324,7 +324,7 @@ _cx_memb(_insert_at)(_cx_self* self, _cx_iter it, i_key value) {
 
 STC_DEF _cx_iter
 _cx_memb(_erase_at)(_cx_self* self, _cx_iter it) {
-    _cx_node *node = clist_node_(it.ref);
+    _cx_node *node = _clist_tonode(it.ref);
     it.ref = (node == self->last) ? NULL : &node->next->value;
     _cx_memb(_erase_node_after)(self, it.prev);
     return it;
@@ -333,7 +333,7 @@ _cx_memb(_erase_at)(_cx_self* self, _cx_iter it) {
 STC_DEF _cx_iter
 _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
     if (!it1.ref) return it2;
-    _cx_node *node = it1.prev, *end = it2.ref ? clist_node_(it2.ref) : NULL,
+    _cx_node *node = it1.prev, *end = it2.ref ? _clist_tonode(it2.ref) : NULL,
              *done = end ? end : self->last->next;
     if (node != end) do {
         _cx_memb(_erase_node_after)(self, node);
@@ -392,7 +392,7 @@ _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
     _cx_node *p1 = it1.prev,
              *p2 = it2.ref ? it2.prev : self->last;
     p1->next = p2->next;
-    p2->next = clist_node_(it1.ref);
+    p2->next = _clist_tonode(it1.ref);
     if (self->last == p2)
         self->last = (p1 == p2) ? NULL : p1;
     cx.last = p2;

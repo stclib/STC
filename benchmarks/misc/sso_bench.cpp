@@ -19,7 +19,7 @@ using StdVec = std::vector<std::string>;
 using StdSet = std::set<std::string>;
 
 
-static const int BENCHMARK_SIZE = 4000000;
+static const int BENCHMARK_SIZE = 2000000;
 static const int MAX_STRING_SIZE = 50;
 static const char CHARS[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz=+-";
 using time_point = std::chrono::high_resolution_clock::time_point;
@@ -120,7 +120,7 @@ int main() {
 
     csrandom(seed);
     sum = 0, n = 0;
-    std::cerr << "\nstrsize\tmsecs\tcset<cstr>, size=" << BENCHMARK_SIZE/16 << "\n";
+    std::cerr << "\nstrsize\tmsecs\tcsset<cstr>, size=" << BENCHMARK_SIZE/16 << "\n";
     for (int strsize = 1; strsize <= MAX_STRING_SIZE; strsize += 2) {
         StcSet set = StcSet_with_capacity(BENCHMARK_SIZE/16);
         sum += benchmark(set, BENCHMARK_SIZE/16, strsize), ++n;
