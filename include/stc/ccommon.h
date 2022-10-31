@@ -64,7 +64,7 @@
 #define c_unchecked_container_of(ptr, type, member) \
     ((type*)((char*)(ptr) - offsetof(type, member)))
 #define c_container_of(p, T, m) \
-    c_unchecked_container_of((p) + sizeof((p)==&((T*)0)->m) - sizeof(1==1), T, m)
+    c_unchecked_container_of((p) + 0*sizeof((p) == &((T*)0)->m), T, m)
 
 #ifndef __cplusplus
 #  define c_alloc(T)            c_malloc(sizeof(T))
