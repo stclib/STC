@@ -23,27 +23,38 @@
 /* 
 #include <stdio.h>
 #include <stc/views.h>
-using_listview(IView, int);
+using_clview(IView, int);
 
 int main()
 {
     int array[] = {1, 2, 3, 4, 5};
-    IView iv = IView_init(array, c_arraylen(array));
+    IView iv = {array, c_arraylen(array)};
     
-    c_foreach (i, IView, iv) printf(" %d", *i.ref);
+    c_foreach (i, IView, iv)
+        printf(" %d", *i.ref);
     puts("");
-
-    c_forfilter (i, IView, c_listview(IView, {10, 20, 30, 22, 23})
+    
+    // use a temporary IView object.
+    c_forfilter (i, IView, clview_literal(IView, {10, 20, 30, 23, 22, 21})
                   , c_flt_skipwhile(i, *i.ref < 25)
-                  , c_flt_take(i, 2))
+                 && (*i.ref & 1) == 0 // even only
+                  , c_flt_take(i, 2)) // break after 2
         printf(" %d", *i.ref);
     puts("");
 
-    crange r1 = crange_init(80, 90);
-    c_foreach (i, crange, r1) printf(" %lld", *i.ref);
+    // crange:
+
+    crange r1 = crange_make(80, 90);
+    c_foreach (i, crange, r1)
+        printf(" %lld", *i.ref);
     puts("");
 
-    c_foreach (i, crange, c_range(0, 100, 8)) printf(" %lld", *i.ref);
+    // use a temporary crange object.
+    int a = 100, b = INT32_MAX;
+    c_forfilter (i, crange, crange_literal(a, b, 8)
+                  , i.index > 10
+                  , c_flt_take(i, 3))
+        printf(" %lld", *i.ref);
     puts("");
 }
 */
@@ -52,17 +63,16 @@ int main()
 
 #include <stc/ccommon.h>
 
-#define c_listview(C, ...) \
+// clview type
+
+#define clview_literal(C, ...) \
     ((C){.data = (C##_value[])__VA_ARGS__, \
          .size = sizeof((C##_value[])__VA_ARGS__)/sizeof(C##_value)})
 
-#define using_listview(Self, T) \
+#define using_clview(Self, T) \
 typedef T Self##_raw; typedef const Self##_raw Self##_value; \
 typedef struct { Self##_value *data; size_t size; } Self; \
 typedef struct { Self##_value *ref, *end; } Self##_iter; \
- \
-STC_INLINE Self Self##_init(Self##_value* data, size_t size) \
-    { Self me = {.data=data, .size=size}; return me; } \
  \
 STC_INLINE Self##_value* Self##_at(const Self* self, size_t idx) \
     { assert(idx < self->size); return self->data + idx; } \
@@ -82,19 +92,21 @@ STC_INLINE void Self##_next(Self##_iter* it) \
 struct stc_nostruct
 
 
-#define c_range(...) \
-    (*(crange[]){crange_init(__VA_ARGS__)})
+// crange type
+
+#define crange_literal(...) \
+    (*(crange[]){crange_make(__VA_ARGS__)})
 #define crange_MAX INT64_MAX
 
 typedef long long crange_value;
 typedef struct { crange_value start, end, step, value; } crange;
 typedef struct { crange_value *ref, end, step; } crange_iter;
 
-#define crange_init(...) c_MACRO_OVERLOAD(crange_init, __VA_ARGS__)
-#define crange_init1(stop) crange_init3(0, stop, 1)
-#define crange_init2(start, stop) crange_init3(start, stop, 1)
+#define crange_make(...) c_MACRO_OVERLOAD(crange_make, __VA_ARGS__)
+#define crange_make1(stop) crange_make3(0, stop, 1)
+#define crange_make2(start, stop) crange_make3(start, stop, 1)
 
-STC_INLINE crange crange_init3(crange_value start, crange_value stop, crange_value step)
+STC_INLINE crange crange_make3(crange_value start, crange_value stop, crange_value step)
     { crange r = {start, stop - (step > 0), step}; return r; }
 
 STC_INLINE crange_iter crange_begin(crange* self)
