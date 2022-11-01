@@ -1,7 +1,7 @@
 ///////////////////////// ankerl::unordered_dense::{map, set} /////////////////////////
 
 // A fast & densely stored hashmap and hashset based on robin-hood backward shift deletion.
-// Version 1.4.0
+// Version 2.0.0
 // https://github.com/martinus/unordered_dense
 //
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
@@ -30,8 +30,8 @@
 #define ANKERL_UNORDERED_DENSE_H
 
 // see https://semver.org/spec/v2.0.0.html
-#define ANKERL_UNORDERED_DENSE_VERSION_MAJOR 1 // NOLINT(cppcoreguidelines-macro-usage) incompatible API changes
-#define ANKERL_UNORDERED_DENSE_VERSION_MINOR 4 // NOLINT(cppcoreguidelines-macro-usage) backwards compatible functionality
+#define ANKERL_UNORDERED_DENSE_VERSION_MAJOR 2 // NOLINT(cppcoreguidelines-macro-usage) incompatible API changes
+#define ANKERL_UNORDERED_DENSE_VERSION_MINOR 0 // NOLINT(cppcoreguidelines-macro-usage) backwards compatible functionality
 #define ANKERL_UNORDERED_DENSE_VERSION_PATCH 0 // NOLINT(cppcoreguidelines-macro-usage) backwards compatible bug fixes
 
 // API versioning with inline namespace, see https://www.foonathan.net/2018/11/inline-namespaces/
@@ -749,22 +749,19 @@ public:
     explicit table(size_t /*bucket_count*/,
                    Hash const& hash = Hash(),
                    KeyEqual const& equal = KeyEqual(),
-                   AllocatorOrContainer const& alloc_or_container = AllocatorOrContainer())
+                   allocator_type const& alloc_or_container = allocator_type())
         : m_values(alloc_or_container)
         , m_hash(hash)
-        , m_equal(equal) {
-        // If alloc_or_container is a container with elements, we don't want the data that was in it
-        m_values.clear();
-    }
+        , m_equal(equal) {}
 
-    table(size_t bucket_count, AllocatorOrContainer const& alloc_or_container)
-        : table(bucket_count, Hash(), KeyEqual(), alloc_or_container) {}
+    table(size_t bucket_count, allocator_type const& alloc)
+        : table(bucket_count, Hash(), KeyEqual(), alloc) {}
 
-    table(size_t bucket_count, Hash const& hash, AllocatorOrContainer const& alloc_or_container)
-        : table(bucket_count, hash, KeyEqual(), alloc_or_container) {}
+    table(size_t bucket_count, Hash const& hash, allocator_type const& alloc)
+        : table(bucket_count, hash, KeyEqual(), alloc) {}
 
-    explicit table(AllocatorOrContainer const& alloc_or_container)
-        : table(0, Hash(), KeyEqual(), alloc_or_container) {}
+    explicit table(allocator_type const& alloc)
+        : table(0, Hash(), KeyEqual(), alloc) {}
 
     template <class InputIt>
     table(InputIt first,
@@ -772,25 +769,24 @@ public:
           size_type bucket_count = 0,
           Hash const& hash = Hash(),
           KeyEqual const& equal = KeyEqual(),
-          AllocatorOrContainer const& alloc_or_container = AllocatorOrContainer())
-        : table(bucket_count, hash, equal, alloc_or_container) {
+          allocator_type const& alloc = allocator_type())
+        : table(bucket_count, hash, equal, alloc) {
         insert(first, last);
     }
 
     template <class InputIt>
-    table(InputIt first, InputIt last, size_type bucket_count, AllocatorOrContainer const& alloc_or_container)
-        : table(first, last, bucket_count, Hash(), KeyEqual(), alloc_or_container) {}
+    table(InputIt first, InputIt last, size_type bucket_count, allocator_type const& alloc)
+        : table(first, last, bucket_count, Hash(), KeyEqual(), alloc) {}
 
     template <class InputIt>
-    table(
-        InputIt first, InputIt last, size_type bucket_count, Hash const& hash, AllocatorOrContainer const& alloc_or_container)
-        : table(first, last, bucket_count, hash, KeyEqual(), alloc_or_container) {}
+    table(InputIt first, InputIt last, size_type bucket_count, Hash const& hash, allocator_type const& alloc)
+        : table(first, last, bucket_count, hash, KeyEqual(), alloc) {}
 
     table(table const& other)
         : table(other, other.m_values.get_allocator()) {}
 
-    table(table const& other, AllocatorOrContainer const& alloc_or_container)
-        : m_values(other.m_values, alloc_or_container)
+    table(table const& other, allocator_type const& alloc)
+        : m_values(other.m_values, alloc)
         , m_max_load_factor(other.m_max_load_factor)
         , m_hash(other.m_hash)
         , m_equal(other.m_equal) {
@@ -800,8 +796,8 @@ public:
     table(table&& other) noexcept
         : table(std::move(other), other.m_values.get_allocator()) {}
 
-    table(table&& other, AllocatorOrContainer const& alloc_or_container) noexcept
-        : m_values(std::move(other.m_values), alloc_or_container)
+    table(table&& other, allocator_type const& alloc) noexcept
+        : m_values(std::move(other.m_values), alloc)
         , m_buckets(std::exchange(other.m_buckets, nullptr))
         , m_num_buckets(std::exchange(other.m_num_buckets, 0))
         , m_max_bucket_capacity(std::exchange(other.m_max_bucket_capacity, 0))
@@ -816,19 +812,16 @@ public:
           size_t bucket_count = 0,
           Hash const& hash = Hash(),
           KeyEqual const& equal = KeyEqual(),
-          AllocatorOrContainer const& alloc_or_container = AllocatorOrContainer())
-        : table(bucket_count, hash, equal, alloc_or_container) {
+          allocator_type const& alloc = allocator_type())
+        : table(bucket_count, hash, equal, alloc) {
         insert(ilist);
     }
 
-    table(std::initializer_list<value_type> ilist, size_type bucket_count, AllocatorOrContainer const& alloc_or_container)
-        : table(ilist, bucket_count, Hash(), KeyEqual(), alloc_or_container) {}
+    table(std::initializer_list<value_type> ilist, size_type bucket_count, allocator_type const& alloc)
+        : table(ilist, bucket_count, Hash(), KeyEqual(), alloc) {}
 
-    table(std::initializer_list<value_type> init,
-          size_type bucket_count,
-          Hash const& hash,
-          AllocatorOrContainer const& alloc_or_container)
-        : table(init, bucket_count, hash, KeyEqual(), alloc_or_container) {}
+    table(std::initializer_list<value_type> init, size_type bucket_count, Hash const& hash, allocator_type const& alloc)
+        : table(init, bucket_count, hash, KeyEqual(), alloc) {}
 
     ~table() {
         auto ba = bucket_alloc(m_values.get_allocator());

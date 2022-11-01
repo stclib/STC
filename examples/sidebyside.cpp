@@ -3,14 +3,14 @@
 #include <string>
 #include <stc/cstr.h>
 
+#define i_type IIMap
 #define i_key int
 #define i_val int
-#define i_tag ii
 #include <stc/csmap.h>
 
+#define i_type SIMap
 #define i_key_str
 #define i_val int
-#define i_tag si
 #include <stc/cmap.h>
 
 int main() {
@@ -25,13 +25,13 @@ int main() {
         std::cout << std::endl;
     }
     
-    c_auto (csmap_ii, hist)
+    c_auto (IIMap, hist)
     {
-        csmap_ii_insert(&hist, 12, 100).ref->second += 1;
-        csmap_ii_insert(&hist, 13, 100).ref->second += 1;
-        csmap_ii_insert(&hist, 12, 100).ref->second += 1;
+        IIMap_insert(&hist, 12, 100).ref->second += 1;
+        IIMap_insert(&hist, 13, 100).ref->second += 1;
+        IIMap_insert(&hist, 12, 100).ref->second += 1;
         
-        c_foreach (i, csmap_ii, hist)
+        c_foreach (i, IIMap, hist)
             printf("%d, %d\n", i.ref->first, i.ref->second);
         puts("");
     }
@@ -45,12 +45,12 @@ int main() {
         std::cout << std::endl;
     }
 
-    c_auto (cmap_si, food)
+    c_auto (SIMap, food)
     {
-        c_forlist (i, cmap_si_raw, {{"burger", 5}, {"pizza", 12}, {"steak", 15}})
-            cmap_si_emplace(&food, c_PAIR(i.ref));
+        c_forlist (i, SIMap_raw, {{"burger", 5}, {"pizza", 12}, {"steak", 15}})
+            SIMap_emplace(&food, c_PAIR(i.ref));
         
-        c_foreach (i, cmap_si, food)
+        c_foreach (i, SIMap, food)
             printf("%s, %d\n", cstr_str(&i.ref->first), i.ref->second);
         puts("");
     }

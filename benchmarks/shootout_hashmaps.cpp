@@ -230,7 +230,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
     SEED(seed); \
     for (size_t i = 0; i < m; ++i) \
         M##_EMPLACE(X, RAND(keybits), i); \
-    size_t rep = 70000000/M##_SIZE(X); \
+    size_t rep = 70000000ull/M##_SIZE(X); \
     clock_t difference, before = clock(); \
     for (size_t k=0; k < rep; k++) M##_FOR (X, it) \
         sum += M##_ITEM(X, it); \
@@ -250,7 +250,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
     for (size_t i = 0; i < m; ++i) \
         M##_EMPLACE(X, RAND(keybits), i); \
     before = clock(); \
-    size_t x = m * 3000000/M##_SIZE(X); \
+    size_t x = m * 3000000ull/M##_SIZE(X); \
     for (size_t i = 0; i < x; ++i) \
         found += M##_FIND(X, RAND(keybits)); \
     SEED(seed); \

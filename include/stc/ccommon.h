@@ -209,18 +209,23 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
 #define c_forrange4(i, start, stop, step) \
     for (long long i=start, _inc=step, _end=(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)
-
-#define c_forlist(it, T, ...) \
+#ifndef __cplusplus
+#  define c_forlist(it, T, ...) \
     for (struct {T* data; T* ref; int size, index;} \
          it = {.data=(T[])__VA_ARGS__, .ref=it.data, .size=sizeof((T[])__VA_ARGS__)/sizeof(T)} \
          ; it.index < it.size; ++it.ref, ++it.index)
-
+#else
+#  include <initializer_list>
+#  define c_forlist(it, T, ...) \
+    for (struct {std::initializer_list<T> list; std::initializer_list<T>::iterator ref; size_t size, index;} \
+         it = {.list=__VA_ARGS__, .ref=it.list.begin(), .size=it.list.size()} \
+         ; it.index < it.size; ++it.ref, ++it.index)
+#endif
 #define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
 #define c_with2(declvar, drop) for (declvar, **_c_i = NULL; !_c_i; ++_c_i, drop)
 #define c_with3(declvar, pred, drop) for (declvar, **_c_i = NULL; !_c_i && (pred); ++_c_i, drop)
 #define c_scope(init, drop) for (int _c_i = (init, 0); !_c_i; ++_c_i, drop)
 #define c_defer(...) for (int _c_i = 0; !_c_i; ++_c_i, __VA_ARGS__)
-#define c_breakauto continue
 
 #define c_auto(...) c_MACRO_OVERLOAD(c_auto, __VA_ARGS__)
 #define c_auto2(C, a) \

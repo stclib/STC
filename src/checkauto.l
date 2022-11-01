@@ -72,36 +72,38 @@ if              { if (state == BRACESDONE) {
 \}              { if (state != BRACES) block_type = block[--block_lev]; }
 return          { if (block_type == AUTO) {
                     printf("%s:%d: error: 'return' used inside a c_auto* scope.\n"
-                           "    Use 'c_breakauto' to exit the current c_auto* scope.\n",
-                           fname, yylineno);
+                           //"    Use 'c_breakauto' to exit the current c_auto* scope.\n"
+                           , fname, yylineno);
                     ++errors;
                   } else if (block_type & AUTO) {
                     printf("%s:%d: error: 'return' used in a loop inside a c_auto* scope.\n"
-                           "    Use 'break' to exit loops, then 'c_breakauto' to exit c_auto*.\n",
-                           fname, yylineno);
+                           //"    Use 'break' to exit loops, then 'c_breakauto' to exit c_auto*.\n"
+                           , fname, yylineno);
                     ++errors;
                   }
                 }
 break           { if (block_type == AUTO) {
                     printf("%s:%d: error: 'break' used inside a c_auto* scope.\n"
-                           "    Use 'c_breakauto' to exit the current c_auto* scope.\n",
-                           fname, yylineno);
+                           //"    Use 'c_breakauto' to exit the current c_auto* scope.\n"
+                           , fname, yylineno);
                     ++errors;
                   }
                 }
 continue        { if (block_type == AUTO) {
                     printf("%s:%d: warning: 'continue' used inside a c_auto* scope.\n"
                            "    It will only break out of the current c_auto* scope.\n"
-                           "    Use 'c_breakauto' instead to make it explicit.\n",
-                           fname, yylineno);
+                           //"    Use 'c_breakauto' instead to make it explicit.\n"
+                           , fname, yylineno);
                     ++warnings;
                   }
                 }
 c_breakauto     { if (block_type != AUTO) {
+                  /*
                     printf("%s:%d: warning: 'c_breakauto' used outside a c_auto* scope.\n"
-                           "    Did you mean 'continue' instead?",
-                           fname, yylineno);
+                           "    Did you mean 'continue' instead?"
+                           , fname, yylineno);
                     ++warnings;
+                  */
                   }
                 }
 {ID}            ;

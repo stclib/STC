@@ -88,11 +88,7 @@ of resizing granularity. Ignoring variance, the expected occurrences of list siz
 #include <iterator>
 #include <algorithm>
 
-#ifdef __has_include
-    #if __has_include("wyhash.h")
-    #include "wyhash.h"
-    #endif
-#elif EMH_WY_HASH
+#if EMH_WY_HASH
     #include "wyhash.h"
 #endif
 
@@ -175,7 +171,7 @@ static_assert((int)INACTIVE < 0, "INACTIVE must negative (to int)");
 #endif
 
 //count the leading zero bit
-inline static size_type CTZ(size_t n)
+inline static int CTZ(size_t n)
 {
 #if defined(__x86_64__) || defined(_WIN32) || (__BYTE_ORDER__ && __BYTE_ORDER__ == __ORDER_LITTLE_ENDIAN__)
 
@@ -209,7 +205,7 @@ inline static size_type CTZ(size_t n)
     #endif
 #endif
 
-    return (size_type)index;
+    return (int)index;
 }
 
 template <typename First, typename Second>
@@ -217,7 +213,7 @@ struct entry {
     using first_type =  First;
     using second_type = Second;
     entry(const First& key, const Second& val, size_type ibucket)
-        :second(val),first(key)
+        :second(val), first(key)
     {
         bucket = ibucket;
     }
@@ -235,8 +231,8 @@ struct entry {
         bucket = ibucket;
     }
 
-    entry(const std::pair<First,Second>& pair)
-        :second(pair.second),first(pair.first)
+    entry(const std::pair<First, Second>& pair)
+        :second(pair.second), first(pair.first)
     {
         bucket = INACTIVE;
     }
@@ -254,22 +250,22 @@ struct entry {
     }
 
     entry(const entry& rhs)
-        :second(rhs.second),first(rhs.first)
+        :second(rhs.second), first(rhs.first)
     {
         bucket = rhs.bucket;
     }
 
     entry(entry&& rhs) noexcept
-        :second(std::move(rhs.second)),first(std::move(rhs.first))
+        :second(std::move(rhs.second)), first(std::move(rhs.first))
     {
         bucket = rhs.bucket;
     }
 
-    entry& operator = (entry&& rhs)
+    entry& operator = (entry&& rhs) noexcept
     {
         second = std::move(rhs.second);
         bucket = rhs.bucket;
-        first = std::move(rhs.first);
+        first  = std::move(rhs.first);
         return *this;
     }
 
@@ -298,13 +294,13 @@ struct entry {
     }
 
 #if EMH_ORDER_KV || EMH_SIZE_TYPE_64BIT
-    Second second;
-    size_type bucket;
     First first;
+    size_type bucket;
+    Second second;
 #else
-    First first;
-    size_type bucket;
     Second second;
+    size_type bucket;
+    First first;
 #endif
 };
 
@@ -314,11 +310,12 @@ class HashMap
 {
 #ifndef EMH_DEFAULT_LOAD_FACTOR
     constexpr static float EMH_DEFAULT_LOAD_FACTOR = 0.80f;
+    constexpr static float EMH_MIN_LOAD_FACTOR     = 0.25f; //< 0.5
 #endif
 
 public:
     typedef HashMap<KeyT, ValueT, HashT, EqT> htype;
-    typedef std::pair<KeyT,ValueT>            value_type;
+    typedef std::pair<KeyT, ValueT>           value_type;
 
 #if EMH_BUCKET_INDEX == 0
     typedef value_type                        value_pair;
@@ -350,7 +347,7 @@ public:
         typedef value_pair*               pointer;
         typedef value_pair&               reference;
 
-        iterator() : _map(nullptr) { }
+        iterator() = default;
         iterator(const const_iterator& it) : _map(it._map), _bucket(it._bucket), _from(it._from), _bmask(it._bmask) { }
         iterator(const htype* hash_map, size_type bucket, bool) : _map(hash_map), _bucket(bucket) { init(); }
 #if EMH_ITER_SAFE
@@ -371,7 +368,7 @@ public:
             }
         }
 
-        size_t bucket() const
+        size_type bucket() const
         {
             return _bucket;
         }
@@ -470,7 +467,7 @@ public:
             }
         }
 
-        size_t bucket() const
+        size_type bucket() const
         {
             return _bucket;
         }
@@ -545,8 +542,14 @@ public:
 
     HashMap(const HashMap& rhs) noexcept
     {
-        _pairs = (PairT*)malloc(AllocSize(rhs._num_buckets));
-        clone(rhs);
+        if (rhs.load_factor() > EMH_MIN_LOAD_FACTOR) {
+            _pairs = (PairT*)malloc(AllocSize(rhs._num_buckets));
+            clone(rhs);
+        } else {
+            init(rhs._num_filled + 2, EMH_DEFAULT_LOAD_FACTOR);
+            for (auto it = rhs.begin(); it != rhs.end(); ++it)
+                insert_unique(it->first, it->second);
+        }
     }
 
     HashMap(HashMap&& rhs) noexcept
@@ -579,6 +582,14 @@ public:
     {
         if (this == &rhs)
             return *this;
+
+        if (rhs.load_factor() < EMH_MIN_LOAD_FACTOR) {
+            clear(); free(_pairs); _pairs = nullptr;
+            rehash(rhs._num_filled + 2);
+            for (auto it = rhs.begin(); it != rhs.end(); ++it)
+                insert_unique(it->first, it->second);
+            return *this;
+        }
 
         if (_num_filled)
             clearkv();
@@ -618,7 +629,7 @@ public:
     template<typename Con>
     bool operator != (const Con& rhs) const { return !(*this == rhs); }
 
-    ~HashMap()
+    ~HashMap() noexcept
     {
         if (is_triviall_destructable() && _num_filled) {
             for (auto it = cbegin(); _num_filled; ++it) {
@@ -629,7 +640,7 @@ public:
         free(_pairs);
     }
 
-    void clone(const HashMap& rhs)
+    void clone(const HashMap& rhs) noexcept
     {
         _hasher      = rhs._hasher;
         //_eq          = rhs._eq;
@@ -676,7 +687,7 @@ public:
 
         const auto bmask = ~(*(size_t*)_bitmask);
         if (bmask != 0)
-            return {this, CTZ(bmask), true};
+            return {this, (size_type)CTZ(bmask), true};
 
         iterator it(this, sizeof(bmask) * 8 - 1);
         return it.next();
@@ -691,7 +702,7 @@ public:
 
         const auto bmask = ~(*(size_t*)_bitmask);
         if (bmask != 0)
-            return {this, CTZ(bmask), true};
+            return {this, (size_type)CTZ(bmask), true};
 
         iterator it(this, sizeof(bmask) * 8 - 1);
         return it.next();
@@ -724,7 +735,7 @@ public:
 
     void max_load_factor(float mlf)
     {
-        if (mlf < 0.9999f && mlf > 0.2f)
+        if (mlf < 0.999f && mlf > EMH_MIN_LOAD_FACTOR)
             _mlf = (uint32_t)((1 << 27) / mlf);
     }
 
@@ -882,7 +893,7 @@ public:
         bsize += sprintf(buff + bsize, "  _num_filled aver_size k.v size_kv = %u, %.2lf, %s.%s %zd\n",
                 _num_filled, _num_filled * 1.0 / sumb, typeid(KeyT).name(), typeid(ValueT).name(), sizeof(PairT));
 
-        bsize += sprintf(buff + bsize, "  collision,poisson,cache_miss hit_find|hit_miss, load_factor = %.2lf%%,%.2lf%%,%.2lf%% %.2lf|%.2lf, %.2lf\n",
+        bsize += sprintf(buff + bsize, "  collision, poisson, cache_miss hit_find|hit_miss, load_factor = %.2lf%%,%.2lf%%,%.2lf%% %.2lf|%.2lf, %.2lf\n",
                 (bucket_coll * 100.0 / _num_filled), sum_poisson, (bucket_coll - steps[0]) * 100.0 / _num_filled,
                 finds * 1.0 / _num_filled, miss * 1.0 / _num_buckets, _num_filled * 1.0 / _num_buckets);
 
@@ -1055,7 +1066,7 @@ public:
         bool isempty;
         const auto bucket = find_or_allocate(value.first, isempty);
         if (isempty) {
-            EMH_NEW(std::forward<KeyT>(value.first), std::forward<ValueT>(value.second), bucket);
+            EMH_NEW(std::move(value.first), std::move(value.second), bucket);
         }
         return { {this, bucket}, isempty };
     }
@@ -1098,6 +1109,7 @@ public:
             do_insert(it->first, it->second);
     }
 
+#if 0
     template <typename Iter>
     void insert_unique(Iter begin, Iter end)
     {
@@ -1105,6 +1117,7 @@ public:
         for (; begin != end; ++begin)
             do_insert_unqiue(*begin);
     }
+#endif
 
     template<typename K, typename V>
     size_type insert_unique(K&& key, V&& val)
@@ -1153,14 +1166,14 @@ public:
     std::pair<iterator, bool> try_emplace(const KeyT& key, Args&&... args)
     {
         check_expand_need();
-        return do_insert(key, std::forward<Args>(args)...).first;
+        return do_insert(key, std::forward<Args>(args)...);
     }
 
     template<class... Args>
     std::pair<iterator, bool> try_emplace(KeyT&& key, Args&&... args)
     {
         check_expand_need();
-        return do_insert(std::forward<KeyT>(key), std::forward<Args>(args)...).first;
+        return do_insert(std::forward<KeyT>(key), std::forward<Args>(args)...);
     }
 
     template <class... Args>
@@ -1323,6 +1336,12 @@ public:
 
         uint64_t buckets = _num_filled > (1u << 16) ? (1u << 16) : 2u;
         while (buckets < required_buckets) { buckets *= 2; }
+
+        // no need alloc large bucket for small key sizeof(KeyT) < sizeof(int).
+        // set small a max_load_factor, insert/reserve() will fail and introduce rehash issiue TODO: dothing ?
+        if (sizeof(KeyT) < sizeof(size_type) && buckets >= (1ul << (2 * 8)))
+            buckets = 2ul << (sizeof(KeyT) * 8);
+
         assert(buckets < max_size() && buckets > _num_filled);
         //TODO: throwOverflowError
 
@@ -1389,9 +1408,9 @@ private:
     void clear_bucket(size_type bucket)
     {
         EMH_CLS(bucket);
+        _num_filled--;
         if (is_triviall_destructable())
             _pairs[bucket].~PairT();
-        _num_filled--;
     }
 
 #if 1
@@ -1578,8 +1597,8 @@ private:
 ** put new key in its main position; otherwise (colliding bucket is in its main
 ** position), new key goes to an empty position. ***/
 
-//    template<typename Key=KeyT>
-    size_type find_or_allocate(const KeyT& key, bool& isempty)
+    template<typename K=KeyT>
+    size_type find_or_allocate(const K& key, bool& isempty)
     {
         const auto bucket = hash_key(key) & _mask;
         const auto& bucket_key = EMH_KEY(_pairs, bucket);
@@ -1632,7 +1651,7 @@ private:
     }
 
     // key is not in this map. Find a place to put it.
-    size_type find_empty_bucket(const size_type bucket_from, const size_t main_bucket)
+    size_type find_empty_bucket(const size_type bucket_from, const size_type main_bucket)
     {
 #ifdef EMH_ALIGN64 // only works 64bit
         const auto boset  = bucket_from % MASK_BIT;
@@ -1648,7 +1667,7 @@ private:
             return bucket_from + CTZ(bmask);
 #else
         const auto boset  = main_bucket % 8;
-        auto* const align = (uint8_t*)_bitmask + main_bucket / 8;
+        auto* const align = (uint8_t*)_bitmask + main_bucket / 8; (void)bucket_from;
         const size_t bmask  = (*(size_t*)(align) >> boset);// & 0xF0F0F0F0FF0FF0FFull;//
         if (EMH_LIKELY(bmask != 0))
             return main_bucket + CTZ(bmask);
@@ -1656,14 +1675,14 @@ private:
 
         const auto qmask = _mask / SIZE_BIT;
         if (1) {
-            const auto step = (main_bucket - SIZE_BIT / 4) & qmask;
+            const size_type step = (main_bucket - SIZE_BIT / 4) & qmask;
             const auto bmask3 = *((size_t*)_bitmask + step);
             if (bmask3 != 0)
                 return step * SIZE_BIT + CTZ(bmask3);
         }
 
-        auto& _last = EMH_BUCKET(_pairs, _num_buckets);
         for (; ;) {
+           auto& _last = EMH_BUCKET(_pairs, _num_buckets);
             const auto bmask2 = *((size_t*)_bitmask + _last);
             if (bmask2 != 0)
                 return _last * SIZE_BIT + CTZ(bmask2);
@@ -1693,7 +1712,7 @@ private:
         auto* const start = (uint8_t*)_bitmask + bucket_from / 8;
         size_t bmask; memcpy(&bmask, start + 0, sizeof(bmask)); bmask >>= boset;
 #else
-        const auto boset  = bucket_from % 8;
+        const auto boset  = bucket_from % 8; (void)main_bucket;
         auto* const align = (uint8_t*)_bitmask + bucket_from / 8;
         const auto bmask  = (*(size_t*)(align) >> boset); //maybe not aligned and warning
 #endif
@@ -1804,7 +1823,7 @@ private:
 #if EMH_INT_HASH
         return hash64(key);
 #elif EMH_IDENTITY_HASH
-        return key + (key >> (sizeof(UType) * 4));
+        return key + (key >> 24);
 #else
         return (size_type)_hasher(key);
 #endif
@@ -1813,8 +1832,8 @@ private:
     template<typename UType, typename std::enable_if<std::is_same<UType, std::string>::value, size_type>::type = 0>
     inline size_type hash_key(const UType& key) const
     {
-#if WYHASH_LITTLE_ENDIAN
-        return wyhash(key.data(), key.size(), key.size());
+#if EMH_WY_HASH
+        return wyhash(key.data(), key.size(), 0);
 #else
         return (size_type)_hasher(key);
 #endif
