@@ -60,7 +60,7 @@ int main()
             printf(" (%d %d)", *_.key, *_.val);
 
         puts("\n\nc_forwhile:");
-        c_forwhile (i, IVec, vec, i.index < 3)
+        c_forwhile (i, IVec, IVec_begin(&vec), i.index < 3)
             printf(" %d", *i.ref);
 
         #define isOdd(i) (*i.ref & 1)

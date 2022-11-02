@@ -31,18 +31,18 @@
 #include <assert.h>
 
 #if SIZE_MAX == UINT32_MAX
-#  define c_ZU PRIu32
+  #define c_ZU PRIu32
 #elif SIZE_MAX == UINT64_MAX
-#  define c_ZU PRIu64
+  #define c_ZU PRIu64
 #endif
 
 #if defined(_MSC_VER)
-#  pragma warning(disable: 4116 4996) // unnamed type definition in parentheses
-#  define STC_FORCE_INLINE static __forceinline
+  #pragma warning(disable: 4116 4996) // unnamed type definition in parentheses
+  #define STC_FORCE_INLINE static __forceinline
 #elif defined(__GNUC__) || defined(__clang__)
-#  define STC_FORCE_INLINE static inline __attribute((always_inline))
+  #define STC_FORCE_INLINE static inline __attribute((always_inline))
 #else
-#  define STC_FORCE_INLINE static inline
+  #define STC_FORCE_INLINE static inline
 #endif
 #define STC_INLINE static inline
 
@@ -67,22 +67,22 @@
     ((T*)((char*)(p) + 0*sizeof((p) == &((T*)0)->m) - offsetof(T, m)))
 
 #ifndef __cplusplus
-#  define c_alloc(T)            c_malloc(sizeof(T))
-#  define c_alloc_n(T, n)       c_malloc(sizeof(T)*(n))
-#  define c_init(T)             (T)
-#  define c_new(T, ...)         ((T*)memcpy(c_alloc(T), (T[]){__VA_ARGS__}, sizeof(T)))
+  #define c_alloc(T)            c_malloc(sizeof(T))
+  #define c_alloc_n(T, n)       c_malloc(sizeof(T)*(n))
+  #define c_init(T)             (T)
+  #define c_new(T, ...)         ((T*)memcpy(c_alloc(T), (T[]){__VA_ARGS__}, sizeof(T)))
 #else
-#  include <new>
-#  define c_alloc(T)            static_cast<T*>(c_malloc(sizeof(T)))
-#  define c_alloc_n(T, n)       static_cast<T*>(c_malloc(sizeof(T)*(n)))
-#  define c_init(T)             T
-#  define c_new(T, ...)         new (c_alloc(T)) T(__VA_ARGS__)
+  #include <new>
+  #define c_alloc(T)            static_cast<T*>(c_malloc(sizeof(T)))
+  #define c_alloc_n(T, n)       static_cast<T*>(c_malloc(sizeof(T)*(n)))
+  #define c_init(T)             T
+  #define c_new(T, ...)         new (c_alloc(T)) T(__VA_ARGS__)
 #endif
 #ifndef c_malloc
-#  define c_malloc(sz)          malloc(sz)
-#  define c_calloc(n, sz)       calloc(n, sz)
-#  define c_realloc(p, sz)      realloc(p, sz)
-#  define c_free(p)             free(p)
+  #define c_malloc(sz)          malloc(sz)
+  #define c_calloc(n, sz)       calloc(n, sz)
+  #define c_realloc(p, sz)      realloc(p, sz)
+  #define c_free(p)             free(p)
 #endif
 
 #define c_delete(T, ptr)        do { T *_c_p = ptr; T##_drop(_c_p); c_free(_c_p); } while (0)
@@ -168,7 +168,7 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
          ; it.ref != (C##_value*)_endref; C##_next(&it))
 
 #ifndef c_FLT_STACK
-#define c_FLT_STACK 14 // 22, 30, ..
+  #define c_FLT_STACK 14 /* 22, 30, .. */
 #endif
 #define c_flt_take(i, n) (++(i).s1[(i).s1top++] <= (n))
 #define c_flt_skip(i, n) (++(i).s1[(i).s1top++] > (n))
@@ -176,23 +176,21 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
 #define c_flt_takewhile(i, pred) !c_flt_skipwhile(i, pred)
 
 #define c_forfilter(...) c_MACRO_OVERLOAD(c_forfilter, __VA_ARGS__)
-#define c_forfilter4(it, C, cnt, filter) \
-    c_forfilter_s(it, C, C##_begin(&cnt), filter)
-#define c_forfilter5(it, C, cnt, filter, whilepred) \
-    c_forfilter_s(it, C, C##_begin(&cnt), filter) if (!(whilepred)) break; else
-#define c_forfilter_s(it, C, start, filter) \
-    c_foreach_s(it, C, start) if (!((filter) && ++it.count)) ; else
-
-#define c_foreach_s(i, C, start) \
+#define c_forfilter4(i, C, cnt, filter) \
+    c_forfilter_s(i, C, C##_begin(&cnt), filter)
+#define c_forfilter5(i, C, cnt, filter, cond) \
+    c_forfilter_s(i, C, C##_begin(&cnt), filter) if (!(cond)) break; else
+#define c_forfilter_s(i, C, start, filter) \
     for (struct {C##_iter it; C##_value *ref; \
                  uint32_t s1[c_FLT_STACK], index, count; \
                  uint8_t s2[c_FLT_STACK], s1top, s2top;} \
          i = {.it=start, .ref=i.it.ref}; i.it.ref \
-         ; C##_next(&i.it), i.ref = i.it.ref, ++i.index, i.s1top=0, i.s2top=0)
+         ; C##_next(&i.it), i.ref = i.it.ref, ++i.index, i.s1top=0, i.s2top=0) \
+      if (!((filter) && ++i.count)) ; else
 
-#define c_forwhile(i, C, cnt, cond) \
+#define c_forwhile(i, C, start, cond) \
     for (struct {C##_iter it; C##_value *ref; size_t index;} \
-         i = {.it=C##_begin(&cnt), .ref=i.it.ref}; i.it.ref && (cond) \
+         i = {.it=start, .ref=i.it.ref}; i.it.ref && (cond) \
          ; C##_next(&i.it), i.ref = i.it.ref, ++i.index)
 
 #define c_forpair(key, val, C, cnt) /* structured binding */ \
@@ -202,7 +200,7 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
 
 #define c_forloop c_forrange // [deprecated]
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
-#define c_forrange1(stop) c_forrange3(_i, 0, stop)
+#define c_forrange1(stop) c_forrange3(_c_i, 0, stop)
 #define c_forrange2(i, stop) c_forrange3(i, 0, stop)
 #define c_forrange3(i, start, stop) \
     for (long long i=start, _end=stop; i < _end; ++i)
@@ -210,15 +208,15 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
     for (long long i=start, _inc=step, _end=(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)
 #ifndef __cplusplus
-#  define c_forlist(it, T, ...) \
+  #define c_forlist(it, T, ...) \
     for (struct {T* data; T* ref; int size, index;} \
          it = {.data=(T[])__VA_ARGS__, .ref=it.data, .size=sizeof((T[])__VA_ARGS__)/sizeof(T)} \
          ; it.index < it.size; ++it.ref, ++it.index)
 #else
-#  include <initializer_list>
-#  define c_forlist(it, T, ...) \
-    for (struct {std::initializer_list<T> list; std::initializer_list<T>::iterator ref; size_t size, index;} \
-         it = {.list=__VA_ARGS__, .ref=it.list.begin(), .size=it.list.size()} \
+  #include <initializer_list>
+  #define c_forlist(it, T, ...) \
+    for (struct {std::initializer_list<T> _il; std::initializer_list<T>::iterator data, ref; size_t size, index;} \
+         it = {._il=__VA_ARGS__, .data=it._il.begin(), .ref=it.data, .size=it._il.size()} \
          ; it.index < it.size; ++it.ref, ++it.index)
 #endif
 #define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
@@ -277,16 +275,16 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
 
 #if !defined(i_static) && !defined(STC_STATIC) && (defined(i_header) || defined(STC_HEADER) || \
                                                    defined(i_implement) || defined(STC_IMPLEMENT))
-#  define STC_API extern
-#  define STC_DEF
+  #define STC_API extern
+  #define STC_DEF
 #else
-#  define i_static
-#  define STC_API static inline
-#  define STC_DEF static inline
+  #define i_static
+  #define STC_API static inline
+  #define STC_DEF static inline
 #endif
 #if defined(STC_EXTERN)
-#  define i_extern
+  #define i_extern
 #endif
 #if defined(i_static) || defined(STC_IMPLEMENT)
-#  define i_implement
+  #define i_implement
 #endif

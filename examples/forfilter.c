@@ -49,6 +49,7 @@ void demo1(void)
 /* Rust:
 fn main() {
     let vector = (1..)            // Infinite range of integers
+        .skip_while(|x| *x != 11) // Skip initial numbers unequal 11
         .filter(|x| x % 2 != 0)   // Collect odd numbers
         .take(5)                  // Only take five numbers
         .map(|x| x * x)           // Square each number
@@ -60,15 +61,14 @@ fn main() {
 void demo2(void)
 {
     c_auto (IVec, vector) {
-        crange rv = crange_make(crange_MAX);
-        c_forfilter (x, crange, rv
-                      , flt_isOdd(x)
-                     && c_flt_skipwhile(x, *x.ref != 11)
-                      , c_flt_take(x, 5))
-            IVec_push(&vector, flt_square(x));
-
         puts("demo2:");
-        c_foreach (i, IVec, vector) printf(" %d", *i.ref);
+
+        c_forfilter (x, crange, crange_literal(INT64_MAX)
+                      , c_flt_skipwhile(x, *x.ref != 11)
+                     && *x.ref % 2 != 0
+                      , c_flt_take(x, 5))
+            IVec_push(&vector, *x.ref * *x.ref);
+        c_foreach (x, IVec, vector) printf(" %d", *x.ref);
         puts("");
     }
 }
@@ -123,7 +123,7 @@ void demo5(void)
     #define flt_even(i) ((*i.ref & 1) == 0)
     #define flt_mid_decade(i) ((*i.ref % 10) != 0)
     puts("demo5:");
-    crange r1 = crange_make(1963, crange_MAX);
+    crange r1 = crange_make(1963, INT32_MAX);
     c_forfilter (i, crange, r1
                   , c_flt_skip(i,15)
                  && c_flt_skipwhile(i, flt_mid_decade(i))

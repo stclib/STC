@@ -216,11 +216,11 @@ c_forrange (i, 30, 0, -5) printf(" %lld", i);
 ### c_forwhile, c_forfilter
 Iterate containers with stop-criteria and chained range filtering.
 
-| Usage                                                         | Description                          |
-|:--------------------------------------------------------------|:-------------------------------------|
-| `c_forwhile (it, ctype, container, shortcircuit)`             | Iterate until shortcircuit is false  |
-| `c_forfilter (it, ctype, container, filter(s))`               | Filter out items in chain            |
-| `c_forfilter (it, ctype, container, filter(s), shortcircuit)` | Add a "short-circuit" pred/filter    |
+| Usage                                               | Description                            |
+|:----------------------------------------------------|:---------------------------------------|
+| `c_forwhile (it, ctype, start, pred)`               | Iterate until pred is false            |
+| `c_forfilter (it, ctype, container, filter)`        | Filter out items in chain with &&      |
+| `c_forfilter (it, ctype, container, filter, pred)`  | Filter and iterate until pred is false |
 
 | Built-in filter                   | Description                          |
 |:----------------------------------|:-------------------------------------|

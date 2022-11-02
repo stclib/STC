@@ -96,7 +96,6 @@ struct stc_nostruct
 
 #define crange_literal(...) \
     (*(crange[]){crange_make(__VA_ARGS__)})
-#define crange_MAX INT64_MAX
 
 typedef long long crange_value;
 typedef struct { crange_value start, end, step, value; } crange;
