@@ -36,13 +36,13 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 #define i_val IValue
 #define i_size uint32_t // optional, enables 2x expand
 #define i_tag ii
+#define i_max_load_factor MAX_LOAD_FACTOR / 100.0f
 #include <stc/cmap.h>
 
 #define SEED(s) rng = stc64_new(s)
 #define RAND(N) (stc64_rand(&rng) & (((uint64_t)1 << N) - 1))
 
-#define CMAP_SETUP(X, Key, Value) cmap_##X map = cmap_##X##_init(); \
-                                  cmap_##X##_max_load_factor(&map, MAX_LOAD_FACTOR/100.0f)
+#define CMAP_SETUP(X, Key, Value) cmap_##X map = cmap_##X##_init()
 #define CMAP_PUT(X, key, val)     cmap_##X##_insert_or_assign(&map, key, val).ref->second
 #define CMAP_EMPLACE(X, key, val) cmap_##X##_insert(&map, key, val).ref->second
 #define CMAP_ERASE(X, key)        cmap_##X##_erase(&map, key)

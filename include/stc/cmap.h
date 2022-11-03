@@ -53,7 +53,6 @@ int main(void) {
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>
-#define _cmap_inits {.max_load_factor=0.85f}
 typedef struct      { size_t idx; uint8_t hx; } chash_bucket_t;
 #endif // CMAP_H_INCLUDED
 
@@ -71,6 +70,9 @@ typedef struct      { size_t idx; uint8_t hx; } chash_bucket_t;
   #define _i_keyref(vp) (&(vp)->first)
 #endif
 #define _i_ishash
+#ifndef i_max_load_factor
+  #define i_max_load_factor 0.85f
+#endif
 #include "template.h"
 #if !c_option(c_declared)
   _cx_deftypes(_c_chash_types, _cx_self, i_key, i_val, i_size, _i_MAP_ONLY, _i_SET_ONLY);
@@ -99,14 +101,14 @@ STC_API chash_bucket_t  _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawke
 STC_API _cx_result      _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey);
 STC_API void            _cx_memb(_erase_entry)(_cx_self* self, _cx_value* val);
 
-STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_init(_cx_self)_cmap_inits; }
+STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_init(_cx_self){0}; }
 STC_INLINE void         _cx_memb(_shrink_to_fit)(_cx_self* self) { _cx_memb(_reserve)(self, self->size); }
-STC_INLINE void         _cx_memb(_max_load_factor)(_cx_self* self, float ml) {self->max_load_factor = ml; }
+STC_INLINE float        _cx_memb(_max_load_factor)(const _cx_self* self) { return i_max_load_factor; }
 STC_INLINE bool         _cx_memb(_empty)(const _cx_self* map) { return !map->size; }
 STC_INLINE size_t       _cx_memb(_size)(const _cx_self* map) { return map->size; }
 STC_INLINE size_t       _cx_memb(_bucket_count)(_cx_self* map) { return map->bucket_count; }
 STC_INLINE size_t       _cx_memb(_capacity)(const _cx_self* map)
-                            { return (size_t)(map->bucket_count*map->max_load_factor); }
+                            { return (size_t)(map->bucket_count * (i_max_load_factor)); }
 STC_INLINE void         _cx_memb(_swap)(_cx_self *map1, _cx_self *map2) {c_swap(_cx_self, *map1, *map2); }
 STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, _cx_rawkey rkey)
                             { return self->size && self->_hashx[_cx_memb(_bucket_)(self, &rkey).idx]; }
@@ -273,7 +275,7 @@ STC_INLINE uint64_t next_power_of_2(uint64_t n) {
 
 STC_DEF _cx_self
 _cx_memb(_with_capacity)(const size_t cap) {
-    _cx_self h = _cmap_inits;
+    _cx_self h = {0};
     _cx_memb(_reserve)(&h, cap);
     return h;
 }
@@ -347,7 +349,7 @@ _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr) {
 STC_DEF _cx_result
 _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey) {
     bool nomem = false;
-    if (self->size + 2 > (i_size)(self->bucket_count*self->max_load_factor))
+    if (self->size + 2 > (i_size)(self->bucket_count * (i_max_load_factor)))
         nomem = !_cx_memb(_reserve)(self, self->size*3/2);
     chash_bucket_t b = _cx_memb(_bucket_)(self, &rkey);
     _cx_result res = {&self->table[b.idx], !self->_hashx[b.idx], nomem};
@@ -381,14 +383,13 @@ _cx_memb(_reserve)(_cx_self* self, const size_t _newcap) {
     const i_size _oldbuckets = self->bucket_count;
     if (_newcap != self->size && _newcap <= _oldbuckets)
         return true;
-    i_size _nbuckets = (i_size)(_newcap / self->max_load_factor) + 4;
+    i_size _nbuckets = (i_size)(_newcap / (i_max_load_factor)) + 4;
     #if _i_expandby == 2
     _nbuckets = (i_size)next_power_of_2(_nbuckets);
     #else
     _nbuckets |= 1;
     #endif
     _cx_self m = {
-        self->max_load_factor,
         c_alloc_n(_cx_value, _nbuckets),
         (uint8_t *) c_calloc(_nbuckets + 1, 1),
         self->size, (i_size)_nbuckets,
@@ -433,6 +434,7 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
 }
 
 #endif // i_implement
+#undef i_max_load_factor
 #undef _i_isset
 #undef _i_ismap
 #undef _i_ishash

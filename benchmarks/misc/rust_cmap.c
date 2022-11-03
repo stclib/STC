@@ -3,6 +3,7 @@
 #define i_key uint64_t
 #define i_val uint64_t
 #define i_tag u64
+#define i_max_load_factor 0.8f
 #include <stc/cmap.h>
 
 uint64_t romu_rotl(uint64_t val, uint32_t r) {
@@ -27,7 +28,6 @@ int main()
         const size_t n = 50000000, 
                      mask = (1 << 25) - 1,
                      ms = CLOCKS_PER_SEC/1000; 
-        cmap_u64_max_load_factor(&m, 0.8);
         cmap_u64_reserve(&m, n);
         printf("STC cmap  n = %" c_ZU ", mask = 0x%" PRIxMAX "\n", n, mask);
 

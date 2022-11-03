@@ -29,7 +29,7 @@ cset_X              cset_X_clone(cset_x set);
 
 void                cset_X_clear(cset_X* self);
 void                cset_X_copy(cset_X* self, const cset_X* other);
-void                cset_X_max_load_factor(cset_X* self, float max_load);            // default: 0.85
+float               cset_X_max_load_factor(const cset_X* self);                      // default: 0.85
 bool                cset_X_reserve(cset_X* self, size_t size);
 void                cset_X_shrink_to_fit(cset_X* self);
 void                cset_X_swap(cset_X* a, cset_X* b);

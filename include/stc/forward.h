@@ -129,7 +129,6 @@ typedef union {
     } SELF##_iter; \
 \
     typedef struct { \
-        float max_load_factor; \
         SELF##_value* table; \
         uint8_t* _hashx; \
         SELF##_size_t size, bucket_count; \
