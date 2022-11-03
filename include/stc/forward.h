@@ -185,6 +185,7 @@ typedef union {
 \
     typedef struct { \
         SELF##_node *nodes; \
+        SELF##_size_t root, disp, head, size, cap; \
     } SELF
 #endif
 #define _c_cstack_types(SELF, VAL) \

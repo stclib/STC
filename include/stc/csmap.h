@@ -58,8 +58,6 @@ int main(void) {
 #include <stdlib.h>
 #include <string.h>
 
-struct csmap_rep { size_t root, disp, head, size, cap; unsigned nodes[1]; };
-#define _csmap_rep(self) c_unchecked_container_of((self)->nodes, struct csmap_rep, nodes)
 #endif // CSMAP_H_INCLUDED
 
 #ifndef _i_prefix
@@ -117,9 +115,9 @@ STC_API _cx_iter        _cx_memb(_erase_at)(_cx_self* self, _cx_iter it);
 STC_API _cx_iter        _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2);
 STC_API void            _cx_memb(_next)(_cx_iter* it);
 
-STC_INLINE bool         _cx_memb(_empty)(const _cx_self* cx) { return _csmap_rep(cx)->size == 0; }
-STC_INLINE size_t       _cx_memb(_size)(const _cx_self* cx) { return _csmap_rep(cx)->size; }
-STC_INLINE size_t       _cx_memb(_capacity)(const _cx_self* cx) { return _csmap_rep(cx)->cap; }
+STC_INLINE bool         _cx_memb(_empty)(const _cx_self* cx) { return cx->size == 0; }
+STC_INLINE size_t       _cx_memb(_size)(const _cx_self* cx) { return cx->size; }
+STC_INLINE size_t       _cx_memb(_capacity)(const _cx_self* cx) { return cx->cap; }
 STC_INLINE void         _cx_memb(_swap)(_cx_self* a, _cx_self* b) { c_swap(_cx_self, *a, *b); }
 STC_INLINE _cx_iter     _cx_memb(_find)(const _cx_self* self, _cx_rawkey rkey)
                             { _cx_iter it; _cx_memb(_find_it)(self, rkey, &it); return it; }
@@ -203,7 +201,7 @@ _cx_memb(_begin)(const _cx_self* self) {
     _cx_iter it;
     it.ref = NULL;
     it._d = self->nodes, it._top = 0;
-    it._tn = (i_size) _csmap_rep(self)->root;
+    it._tn = self->root;
     if (it._tn)
         _cx_memb(_next)(&it);
     return it;
@@ -226,38 +224,28 @@ _cx_memb(_advance)(_cx_iter it, size_t n) {
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement)
 
-#ifndef CSMAP_H_INCLUDED
-static struct csmap_rep _csmap_sentinel = {0, 0, 0, 0, 0};
-#endif
-
 STC_DEF _cx_self
 _cx_memb(_init)(void) {
-    _cx_self tree = {(_cx_node *)_csmap_sentinel.nodes};
+    _cx_self tree = {0};
     return tree;
 }
 
 STC_DEF bool
 _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
-    struct csmap_rep* rep = _csmap_rep(self), *oldrep;
-    if (cap >= rep->size) {
-        // second test is bogus, but supresses gcc warning:
-        oldrep = rep->cap && rep != &_csmap_sentinel ? rep : NULL;
-        rep = (struct csmap_rep*) c_realloc(oldrep, offsetof(struct csmap_rep, nodes) + 
-                                                    (cap + 1)*sizeof(_cx_node));
-        if (!rep)
-            return false;
-        if (oldrep == NULL)
-            memset(rep, 0, offsetof(struct csmap_rep, nodes) + sizeof(_cx_node));
-        rep->cap = cap;
-        self->nodes = (_cx_node *) rep->nodes;
-    }
+    if (cap <= self->cap)
+        return false;
+    _cx_node* nodes = (_cx_node*)c_realloc(self->nodes, (cap + 1)*sizeof(_cx_node));
+    if (!nodes)
+        return false;
+    self->cap = cap;
+    self->nodes = nodes;
     return true;
 }
 
 STC_DEF _cx_value*
 _cx_memb(_front)(const _cx_self* self) {
     _cx_node *d = self->nodes;
-    i_size tn = (i_size) _csmap_rep(self)->root;
+    i_size tn = self->root;
     while (d[tn].link[0])
         tn = d[tn].link[0];
     return &d[tn].value;
@@ -266,7 +254,7 @@ _cx_memb(_front)(const _cx_self* self) {
 STC_DEF _cx_value*
 _cx_memb(_back)(const _cx_self* self) {
     _cx_node *d = self->nodes;
-    i_size tn = (i_size) _csmap_rep(self)->root;
+    i_size tn = self->root;
     while (d[tn].link[1])
         tn = d[tn].link[1];
     return &d[tn].value;
@@ -274,15 +262,15 @@ _cx_memb(_back)(const _cx_self* self) {
 
 static i_size
 _cx_memb(_new_node_)(_cx_self* self, int level) {
-    i_size tn; struct csmap_rep *rep = _csmap_rep(self);
-    if (rep->disp) {
-        tn = (i_size)rep->disp;
-        rep->disp = self->nodes[tn].link[1];
+    i_size tn;
+    if (self->disp) {
+        tn = self->disp;
+        self->disp = self->nodes[tn].link[1];
     } else {
-        if (rep->head == rep->cap)
-            if (!_cx_memb(_reserve)(self, rep->head*3/2 + 4))
+        if (self->head == self->cap)
+            if (!_cx_memb(_reserve)(self, self->head*3/2 + 4))
                 return 0;
-        tn = ++_csmap_rep(self)->head; /* start with 1, 0 is nullnode. */
+        tn = ++self->head; /* start with 1, 0 is nullnode. */
     }
     _cx_node* dn = &self->nodes[tn];
     dn->link[0] = dn->link[1] = 0; dn->level = level;
@@ -343,7 +331,7 @@ _cx_memb(_push)(_cx_self* self, _cx_value _val) {
 
 STC_DEF _cx_value*
 _cx_memb(_find_it)(const _cx_self* self, _cx_rawkey rkey, _cx_iter* out) {
-    i_size tn = _csmap_rep(self)->root;
+    i_size tn = self->root;
     _cx_node *d = out->_d = self->nodes;
     out->_top = 0;
     while (tn) {
@@ -442,20 +430,21 @@ _cx_memb(_insert_entry_i_)(_cx_self* self, i_size tn, const _cx_rawkey* rkey, _c
 static _cx_result
 _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey) {
     _cx_result res = {NULL};
-    i_size tn = _cx_memb(_insert_entry_i_)(self, (i_size) _csmap_rep(self)->root, &rkey, &res);
-    _csmap_rep(self)->root = tn;
-    _csmap_rep(self)->size += res.inserted;
+    i_size tn = _cx_memb(_insert_entry_i_)(self, self->root, &rkey, &res);
+    self->root = tn;
+    self->size += res.inserted;
     return res;
 }
 
 static i_size
-_cx_memb(_erase_r_)(_cx_node *d, i_size tn, const _cx_rawkey* rkey, int *erased) {
+_cx_memb(_erase_r_)(_cx_self *self, i_size tn, const _cx_rawkey* rkey, int *erased) {
+    _cx_node *d = self->nodes;
     if (tn == 0)
         return 0;
     _cx_rawkey raw = i_keyto(_i_keyref(&d[tn].value));
     i_size tx; int c = i_cmp((&raw), rkey);
     if (c != 0)
-        d[tn].link[c < 0] = _cx_memb(_erase_r_)(d, d[tn].link[c < 0], rkey, erased);
+        d[tn].link[c < 0] = _cx_memb(_erase_r_)(self, d[tn].link[c < 0], rkey, erased);
     else {
         if (!(*erased)++)
             _cx_memb(_value_drop)(&d[tn].value);
@@ -465,14 +454,13 @@ _cx_memb(_erase_r_)(_cx_node *d, i_size tn, const _cx_rawkey* rkey, int *erased)
                 tx = d[tx].link[1];
             d[tn].value = d[tx].value; /* move */
             raw = i_keyto(_i_keyref(&d[tn].value));
-            d[tn].link[0] = _cx_memb(_erase_r_)(d, d[tn].link[0], &raw, erased);
+            d[tn].link[0] = _cx_memb(_erase_r_)(self, d[tn].link[0], &raw, erased);
         } else { /* unlink node */
             tx = tn;
             tn = d[tn].link[ d[tn].link[0] == 0 ];
             /* move it to disposed nodes list */
-            struct csmap_rep *rep = c_unchecked_container_of(d, struct csmap_rep, nodes);
-            d[tx].link[1] = (i_size) rep->disp;
-            rep->disp = tx;
+            d[tx].link[1] = self->disp;
+            self->disp = tx;
         }
     }
     tx = d[tn].link[1];
@@ -491,24 +479,24 @@ _cx_memb(_erase_r_)(_cx_node *d, i_size tn, const _cx_rawkey* rkey, int *erased)
 STC_DEF int
 _cx_memb(_erase)(_cx_self* self, _cx_rawkey rkey) {
     int erased = 0;
-    i_size root = _cx_memb(_erase_r_)(self->nodes, (i_size) _csmap_rep(self)->root, &rkey, &erased);
-    if (erased) {
-        _csmap_rep(self)->root = root;
-        --_csmap_rep(self)->size;
-        return 1;
-    }
-    return 0;
+    i_size root = _cx_memb(_erase_r_)(self, self->root, &rkey, &erased);
+    if (!erased)
+        return 0;
+    self->root = root;
+    --self->size;
+    return 1;
 }
 
 STC_DEF _cx_iter
 _cx_memb(_erase_at)(_cx_self* self, _cx_iter it) {
-    _cx_rawkey raw = i_keyto(_i_keyref(it.ref)), nxt;
+    _cx_rawkey raw = i_keyto(_i_keyref(it.ref));
     _cx_memb(_next)(&it);
-    if (it.ref)
-        nxt = i_keyto(_i_keyref(it.ref));
-    _cx_memb(_erase)(self, raw);
-    if (it.ref)
+    if (it.ref) {
+        _cx_rawkey nxt = i_keyto(_i_keyref(it.ref));
+        _cx_memb(_erase)(self, raw);
         _cx_memb(_find_it)(self, nxt, &it);
+    } else
+        _cx_memb(_erase)(self, raw);
     return it;
 }
 
@@ -546,10 +534,10 @@ _cx_memb(_clone_r_)(_cx_self* self, _cx_node* src, i_size sn) {
 
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self tree) {
-    _cx_self clone = _cx_memb(_with_capacity)(_csmap_rep(&tree)->size);
-    i_size root = _cx_memb(_clone_r_)(&clone, tree.nodes, (i_size) _csmap_rep(&tree)->root);
-    _csmap_rep(&clone)->root = root;
-    _csmap_rep(&clone)->size = _csmap_rep(&tree)->size;
+    _cx_self clone = _cx_memb(_with_capacity)(tree.size);
+    i_size root = _cx_memb(_clone_r_)(&clone, tree.nodes, tree.root);
+    clone.root = root;
+    clone.size = tree.size;
     return clone;
 }
 #endif // !_i_no_clone
@@ -577,11 +565,9 @@ _cx_memb(_drop_r_)(_cx_node* d, i_size tn) {
 
 STC_DEF void
 _cx_memb(_drop)(_cx_self* self) {
-    struct csmap_rep* rep = _csmap_rep(self);
-    // second test is bogus, but supresses gcc warning:
-    if (rep->cap && rep != &_csmap_sentinel) {
-        _cx_memb(_drop_r_)(self->nodes, (i_size) rep->root);
-        c_free(rep);  // correct, but may give warning
+    if (self->cap) {
+        _cx_memb(_drop_r_)(self->nodes, self->root);
+        c_free(self->nodes);
     }
 }
 
