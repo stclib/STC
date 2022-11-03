@@ -85,7 +85,7 @@ _c_clist_complete_types(clist_VOID, dummy);
 #endif
 #include "template.h"
 
-#if !c_option(c_is_fwd)
+#if !c_option(c_declared)
   _cx_deftypes(_c_clist_types, _cx_self, i_key);
 #endif
 _cx_deftypes(_c_clist_complete_types, _cx_self, dummy);

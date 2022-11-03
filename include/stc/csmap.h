@@ -77,7 +77,7 @@ struct csmap_rep { size_t root, disp, head, size, cap; unsigned nodes[1]; };
 #endif
 #include "template.h"
 
-#if !c_option(c_is_fwd)
+#if !c_option(c_declared)
 _cx_deftypes(_c_aatree_types, _cx_self, i_key, i_val, i_size, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
 

@@ -72,7 +72,7 @@ typedef struct      { size_t idx; uint8_t hx; } chash_bucket_t;
 #endif
 #define _i_ishash
 #include "template.h"
-#if !c_option(c_is_fwd)
+#if !c_option(c_declared)
   _cx_deftypes(_c_chash_types, _cx_self, i_key, i_val, i_size, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
 

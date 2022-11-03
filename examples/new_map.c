@@ -1,7 +1,7 @@
 #include <stc/cstr.h>
 #include <stc/forward.h>
 
-forward_cmap(cmap_pnt, struct Point, int);
+declare_cmap(cmap_pnt, struct Point, int);
 
 struct MyStruct {
     cmap_pnt pntmap;
@@ -26,7 +26,7 @@ int point_cmp(const Point* a, const Point* b) {
 #define i_val int
 #define i_cmp point_cmp
 #define i_hash c_default_hash
-#define i_opt c_is_fwd
+#define i_opt c_declared
 #define i_tag pnt
 #include <stc/cmap.h>
 

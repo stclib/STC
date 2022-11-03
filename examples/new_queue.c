@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <time.h>
 
-forward_cqueue(cqueue_pnt, struct Point);
+declare_cqueue(cqueue_pnt, struct Point);
 
 struct Point { int x, y; } typedef Point;
 int point_cmp(const Point* a, const Point* b) {
@@ -12,7 +12,7 @@ int point_cmp(const Point* a, const Point* b) {
 }
 #define i_val Point
 #define i_cmp point_cmp
-#define i_opt c_is_fwd
+#define i_opt c_declared
 #define i_tag pnt
 #include <stc/cqueue.h>
 

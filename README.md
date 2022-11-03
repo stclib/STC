@@ -310,7 +310,7 @@ The list of template parameters:
 Properties:
 - `i_tag`     - Container type name tag. Defaults to *i_key* name.
 - `i_type`    - Full container type name. Alternative to *i_tag*.
-- `i_opt`     - Boolean properties: may combine *c_no_cmp*, *c_no_clone*, *c_no_atomic*, *c_is_fwd*, *c_static*, *c_header* with the *|* separator.
+- `i_opt`     - Boolean properties: may combine *c_no_cmp*, *c_no_clone*, *c_no_atomic*, *c_declared*, *c_static*, *c_header* with the *|* separator.
 
 Key:
 - `i_keydrop` - Destroy map/set key func - defaults to empty destructor.
@@ -425,7 +425,7 @@ but still not expose or include the full implementation / API of the container.
 ```c
 // Header file
 #include <stc/forward.h> // only include data structures
-forward_cstack(cstack_pnt, struct Point); // declare cstack_pnt and cstack_pnt_value, cstack_pnt_iter;
+declare_cstack(cstack_pnt, struct Point); // declare cstack_pnt and cstack_pnt_value, cstack_pnt_iter;
                                           // the element may be forward declared type as well
 typedef struct Dataset {
     cstack_pnt vertices;
@@ -434,7 +434,7 @@ typedef struct Dataset {
 
 ...
 // Implementation
-#define c_opt c_is_fwd                    // flag that the container was forward declared.
+#define c_opt c_declared                    // flag that the container was forward declared.
 #define i_val struct Point
 #define i_tag pnt
 #include <stc/cstack.h>
@@ -527,7 +527,7 @@ Memory efficiency
 - Replaced: *csview_first_token()* and *csview_next_token()* with one function: `csview_token()`.
 - Added: **checkauto** tool for checking that c-source files uses `c_auto*` macros correctly.
 - Added: general `i_keyclass` / `i_valclass` template parameters which auto-binds template functions.
-- Added: `i_opt` template parameter: compile-time options: `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_fwd`; may be combined with `|`
+- Added: `i_opt` template parameter: compile-time options: `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_declared`; may be combined with `|`
 - Added: [**cbox**](docs/cbox_api.md) type: smart pointer, similar to [Rust Box](https://doc.rust-lang.org/rust-by-example/std/box.html) and [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr).
 - Added: [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding"
 

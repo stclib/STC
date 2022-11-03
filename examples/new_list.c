@@ -1,7 +1,7 @@
 #include <stc/cstr.h>
 
-forward_clist(clist_i32, int);
-forward_clist(clist_pnt, struct Point);
+declare_clist(clist_i32, int);
+declare_clist(clist_pnt, struct Point);
 
 struct MyStruct {
     clist_i32 intlst;
@@ -9,7 +9,7 @@ struct MyStruct {
 } typedef MyStruct;
 
 #define i_val int
-#define i_opt c_is_fwd
+#define i_opt c_declared
 #define i_tag i32
 #define i_extern // define _clist_mergesort() 
 #include <stc/clist.h>
@@ -22,7 +22,7 @@ int point_cmp(const Point* a, const Point* b) {
 
 #define i_val Point
 #define i_cmp point_cmp
-#define i_opt c_is_fwd
+#define i_opt c_declared
 #define i_tag pnt
 #include <stc/clist.h>
 

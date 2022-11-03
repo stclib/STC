@@ -1,8 +1,8 @@
 #include <stc/cstr.h>
 #include <stc/forward.h>
 
-forward_cvec(cvec_i32, int);
-forward_cvec(cvec_pnt, struct Point);
+declare_cvec(cvec_i32, int);
+declare_cvec(cvec_pnt, struct Point);
 
 struct MyStruct {
     cvec_i32 intvec;
@@ -10,7 +10,7 @@ struct MyStruct {
 } typedef MyStruct;
 
 #define i_val int
-#define i_opt c_is_fwd
+#define i_opt c_declared
 #define i_tag i32
 #include <stc/cvec.h>
 
@@ -23,7 +23,7 @@ int point_cmp(const Point* a, const Point* b) {
 #define i_val Point
 //#define i_cmp point_cmp
 #define i_less(a, b) a->x < b->x || (a->x == b->x && a->y < b->y)
-#define i_opt c_is_fwd
+#define i_opt c_declared
 #define i_tag pnt
 #include <stc/cvec.h>
 

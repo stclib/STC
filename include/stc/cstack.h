@@ -33,7 +33,7 @@
 #endif
 #include "template.h"
 
-#if !c_option(c_is_fwd)
+#if !c_option(c_declared)
 #ifdef i_capacity
   #define _i_no_clone
   _cx_deftypes(_c_cstack_fixed, _cx_self, i_key, i_capacity);

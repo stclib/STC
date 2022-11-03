@@ -25,7 +25,7 @@
 #include <stc/cstr.h>
 #include <stc/forward.h>
 
-forward_cvec(cvec_i32, int);
+declare_cvec(cvec_i32, int);
 
 struct MyStruct {
     cvec_i32 int_vec;
@@ -39,7 +39,7 @@ struct MyStruct {
 #include <stc/cvec.h>
 
 #define i_key int
-#define i_opt c_is_fwd // forward declared
+#define i_opt c_declared // forward declared
 #define i_tag i32
 #include <stc/cvec.h>
 
@@ -75,7 +75,7 @@ struct cvec_rep { size_t size, cap; unsigned data[1]; };
 #endif
 #include "template.h"
 
-#if !c_option(c_is_fwd)
+#if !c_option(c_declared)
    _cx_deftypes(_c_cvec_types, _cx_self, i_key);
 #endif
 typedef i_keyraw _cx_raw;

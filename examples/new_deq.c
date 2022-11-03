@@ -1,8 +1,8 @@
 #include <stc/cstr.h>
 #include <stc/forward.h>
 
-forward_cdeq(cdeq_i32, int);
-forward_cdeq(cdeq_pnt, struct Point);
+declare_cdeq(cdeq_i32, int);
+declare_cdeq(cdeq_pnt, struct Point);
 
 struct MyStruct {
     cdeq_i32 intvec;
@@ -11,7 +11,7 @@ struct MyStruct {
 
 
 #define i_val int
-#define i_opt c_is_fwd
+#define i_opt c_declared
 #define i_tag i32
 #include <stc/cdeq.h>
 
@@ -23,7 +23,7 @@ int point_cmp(const Point* a, const Point* b) {
 
 #define i_val Point
 #define i_cmp point_cmp
-#define i_opt c_is_fwd
+#define i_opt c_declared
 #define i_tag pnt
 #include <stc/cdeq.h>
 

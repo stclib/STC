@@ -25,22 +25,22 @@
 
 #include <stddef.h>
 
-#define forward_carc(CX, VAL) _c_carc_types(CX, VAL)
-#define forward_carr2(CX, VAL) _c_carr2_types(CX, VAL)
-#define forward_carr3(CX, VAL) _c_carr3_types(CX, VAL)
-#define forward_cbox(CX, VAL) _c_cbox_types(CX, VAL)
-#define forward_cdeq(CX, VAL) _c_cdeq_types(CX, VAL)
-#define forward_clist(CX, VAL) _c_clist_types(CX, VAL)
-#define forward_cmap(CX, KEY, VAL) _c_chash_types(CX, KEY, VAL, uint32_t, c_true, c_false)
-#define forward_cmap_huge(CX, KEY, VAL) _c_chash_types(CX, KEY, VAL, size_t, c_true, c_false)
-#define forward_cset(CX, KEY) _c_chash_types(CX, cset, KEY, KEY, uint32_t, c_false, c_true)
-#define forward_cset_huge(CX, KEY) _c_chash_types(CX, cset, KEY, KEY, size_t, c_false, c_true)
-#define forward_csmap(CX, KEY, VAL) _c_aatree_types(CX, KEY, VAL, uint32_t, c_true, c_false)
-#define forward_csset(CX, KEY) _c_aatree_types(CX, KEY, KEY, uint32_t, c_false, c_true)
-#define forward_cstack(CX, VAL) _c_cstack_types(CX, VAL)
-#define forward_cpque(CX, VAL) _c_cpque_types(CX, VAL)
-#define forward_cqueue(CX, VAL) _c_cdeq_types(CX, VAL)
-#define forward_cvec(CX, VAL) _c_cvec_types(CX, VAL)
+#define declare_carc(CX, VAL) _c_carc_types(CX, VAL)
+#define declare_carr2(CX, VAL) _c_carr2_types(CX, VAL)
+#define declare_carr3(CX, VAL) _c_carr3_types(CX, VAL)
+#define declare_cbox(CX, VAL) _c_cbox_types(CX, VAL)
+#define declare_cdeq(CX, VAL) _c_cdeq_types(CX, VAL)
+#define declare_clist(CX, VAL) _c_clist_types(CX, VAL)
+#define declare_cmap(CX, KEY, VAL) _c_chash_types(CX, KEY, VAL, uint32_t, c_true, c_false)
+#define declare_cmap_huge(CX, KEY, VAL) _c_chash_types(CX, KEY, VAL, size_t, c_true, c_false)
+#define declare_cset(CX, KEY) _c_chash_types(CX, cset, KEY, KEY, uint32_t, c_false, c_true)
+#define declare_cset_huge(CX, KEY) _c_chash_types(CX, cset, KEY, KEY, size_t, c_false, c_true)
+#define declare_csmap(CX, KEY, VAL) _c_aatree_types(CX, KEY, VAL, uint32_t, c_true, c_false)
+#define declare_csset(CX, KEY) _c_aatree_types(CX, KEY, KEY, uint32_t, c_false, c_true)
+#define declare_cstack(CX, VAL) _c_cstack_types(CX, VAL)
+#define declare_cpque(CX, VAL) _c_cpque_types(CX, VAL)
+#define declare_cqueue(CX, VAL) _c_cdeq_types(CX, VAL)
+#define declare_cvec(CX, VAL) _c_cvec_types(CX, VAL)
 
 typedef const char csview_value;
 typedef struct { csview_value* str; size_t size; } csview;
