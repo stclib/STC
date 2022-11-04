@@ -1,5 +1,5 @@
 #!/bin/bash
-cc='gcc -s -O2 -Wall -std=c99 -pedantic -Wfatal-errors'
+cc='gcc -s -O2 -Wall -std=c99 -pedantic -Wfatal-errors -fsanitize=address'
 #cc='tcc -s -O2 -Wall -std=c99 -pedantic -Wfatal-errors'
 #cc='clang -s -O2 -Wall -std=c99 -pedantic -Wfatal-errors'
 #cc='clang -s -O2 -Wall -std=c99 -pedantic -Wfatal-errors -DSTC_CSTR_V1 -DSTC_CSMAP_V1'

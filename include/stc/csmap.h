@@ -238,6 +238,7 @@ _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
     if (!nodes)
         return false;
     self->cap = cap;
+    nodes[0] = (_cx_node){{0, 0}, 0};
     self->nodes = nodes;
     return true;
 }
