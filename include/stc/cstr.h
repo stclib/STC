@@ -72,7 +72,7 @@ STC_API char* _cstr_internal_move(cstr* self, size_t pos1, size_t pos2);
 
 #define cstr_new(literal) cstr_from_n(literal, c_strlen_lit(literal))
 #define cstr_npos (SIZE_MAX >> 1)
-#define cstr_null (c_init(cstr){{{0}}})
+#define cstr_null (c_init(cstr){{{0}, 0}})
 #define cstr_toraw(self) cstr_str(self)
 
 STC_API char*   cstr_reserve(cstr* self, size_t cap);
@@ -228,7 +228,7 @@ STC_INLINE cstr_iter cstr_begin(const cstr* self) {
     return c_init(cstr_iter){.u8 = {{sv.str, utf8_chr_size(sv.str)}}};
 }
 STC_INLINE cstr_iter cstr_end(const cstr* self) {
-    return c_init(cstr_iter){NULL};
+    (void)self; return c_init(cstr_iter){NULL};
 }
 STC_INLINE void cstr_next(cstr_iter* it) {
     it->ref += it->u8.chr.size;
@@ -283,7 +283,7 @@ STC_INLINE bool cstr_iequals(const cstr* self, const char* str)
 
 STC_INLINE size_t cstr_find(const cstr* self, const char* search) {
     const char *str = cstr_str(self), *res = strstr((char*)str, search);
-    return res ? res - str : cstr_npos;
+    return res ? (size_t)(res - str) : cstr_npos;
 }
 
 STC_API size_t cstr_find_sv(const cstr* self, csview search);
@@ -417,15 +417,16 @@ STC_DEF uint64_t cstr_hash(const cstr *self) {
 }
 
 STC_DEF size_t cstr_find_sv(const cstr* self, csview search) {
-    char* res = cstrnstrn(cstr_str(self), search.str, cstr_size(self), search.size);
-    return res ? res - cstr_str(self) : cstr_npos;
+    csview sv = cstr_sv(self);
+    char* res = cstrnstrn(sv.str, search.str, sv.size, search.size);
+    return res ? (size_t)(res - sv.str) : cstr_npos;
 }
 
 STC_DEF char* _cstr_internal_move(cstr* self, const size_t pos1, const size_t pos2) {
     cstr_buf r = cstr_buffer(self);
     if (pos1 != pos2) {
-        const size_t newlen = r.size + pos2 - pos1;
-        if (newlen > r.cap)
+        const intptr_t newlen = r.size + pos2 - pos1;
+        if (newlen > (intptr_t)r.cap)
             r.data = cstr_reserve(self, r.size*3/2 + pos2 - pos1);
         memmove(&r.data[pos2], &r.data[pos1], r.size - pos1);
         _cstr_set_size(self, newlen);
@@ -492,7 +493,7 @@ STC_DEF size_t cstr_find_at(const cstr* self, const size_t pos, const char* sear
     csview sv = cstr_sv(self);
     if (pos > sv.size) return cstr_npos;
     const char* res = strstr((char*)sv.str + pos, search);
-    return res ? res - sv.str : cstr_npos;
+    return res ? (size_t)(res - sv.str) : cstr_npos;
 }
 
 STC_DEF char* cstr_assign_n(cstr* self, const char* str, const size_t len) {
