@@ -32,9 +32,11 @@
 #endif
 
 #include "template.h"
-
+#ifndef i_less_functor
+  #define i_less_functor(self, x, y) i_less(x, y)
+#endif
 #if !c_option(c_declared)
-   _cx_deftypes(_c_cpque_types, _cx_self, i_key);
+  _cx_deftypes(_c_cpque_types, _cx_self, i_key);
 #endif
 typedef i_keyraw _cx_raw;
 
@@ -109,10 +111,11 @@ STC_INLINE void _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
 #if defined(i_implement)
 
 STC_DEF void
-_cx_memb(_sift_down_)(_cx_value* arr, const size_t idx, const size_t n) {
+_cx_memb(_sift_down_)(_cx_self* self, const size_t idx, const size_t n) {
+    _cx_value* arr = self->data - 1; 
     for (size_t r = idx, c = idx*2; c <= n; c *= 2) {
-        c += (c < n && (i_less((&arr[c]), (&arr[c + 1]))));
-        if (!(i_less((&arr[r]), (&arr[c])))) return;
+        c += (c < n && (i_less_functor(self, (&arr[c]), (&arr[c + 1]))));
+        if (!(i_less_functor(self, (&arr[r]), (&arr[c])))) return;
         _cx_value t = arr[r]; arr[r] = arr[c]; arr[r = c] = t;
     }
 }
@@ -120,9 +123,8 @@ _cx_memb(_sift_down_)(_cx_value* arr, const size_t idx, const size_t n) {
 STC_DEF void
 _cx_memb(_make_heap)(_cx_self* self) {
     size_t n = self->_len;
-    _cx_value *arr = self->data - 1;
     for (size_t k = n/2; k != 0; --k)
-        _cx_memb(_sift_down_)(arr, k, n);
+        _cx_memb(_sift_down_)(self, k, n);
 }
 
 #if !defined _i_no_clone
@@ -139,7 +141,7 @@ _cx_memb(_erase_at)(_cx_self* self, const size_t idx) {
     i_keydrop((self->data + idx));
     const size_t n = --self->_len;
     self->data[idx] = self->data[n];
-    _cx_memb(_sift_down_)(self->data - 1, idx + 1, n);
+    _cx_memb(_sift_down_)(self, idx + 1, n);
 }
 
 STC_DEF void
@@ -148,11 +150,12 @@ _cx_memb(_push)(_cx_self* self, _cx_value value) {
         _cx_memb(_reserve)(self, self->_len*3/2 + 4);
     _cx_value *arr = self->data - 1; /* base 1 */
     size_t c = ++self->_len;
-    for (; c > 1 && (i_less((&arr[c/2]), (&value))); c /= 2)
+    for (; c > 1 && (i_less_functor(self, (&arr[c/2]), (&value))); c /= 2)
         arr[c] = arr[c/2];
     arr[c] = value;
 }
 
 #endif
 #define CPQUE_H_INCLUDED
+#undef i_less_functor
 #include "template.h"

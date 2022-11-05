@@ -74,9 +74,11 @@ int main(void) {
   #define _i_keyref(vp) (&(vp)->first)
 #endif
 #include "template.h"
-
+#ifndef i_cmp_functor
+  #define i_cmp_functor(self, x, y) i_cmp(x, y)
+#endif
 #if !c_option(c_declared)
-_cx_deftypes(_c_aatree_types, _cx_self, i_key, i_val, i_size, _i_MAP_ONLY, _i_SET_ONLY);
+  _cx_deftypes(_c_aatree_types, _cx_self, i_key, i_val, i_size, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
 
 _i_MAP_ONLY( struct _cx_value {
@@ -150,7 +152,7 @@ STC_INLINE int
 _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     const _cx_rawkey rx = i_keyto(_i_keyref(x));
     const _cx_rawkey ry = i_keyto(_i_keyref(y));
-    return i_cmp((&rx), (&ry));
+    return i_cmp_functor(self, (&rx), (&ry));
 }
 
 STC_INLINE void
@@ -337,7 +339,7 @@ _cx_memb(_find_it)(const _cx_self* self, _cx_rawkey rkey, _cx_iter* out) {
     out->_top = 0;
     while (tn) {
         int c; const _cx_rawkey raw = i_keyto(_i_keyref(&d[tn].value));
-        if ((c = i_cmp((&raw), (&rkey))) < 0)
+        if ((c = i_cmp_functor(self, (&raw), (&rkey))) < 0)
             tn = d[tn].link[1];
         else if (c > 0)
             { out->_st[out->_top++] = tn; tn = d[tn].link[0]; }
@@ -405,7 +407,7 @@ _cx_memb(_insert_entry_i_)(_cx_self* self, i_size tn, const _cx_rawkey* rkey, _c
     while (tx) {
         up[top++] = tx;
         const _cx_rawkey raw = i_keyto(_i_keyref(&d[tx].value));
-        if (!(c = i_cmp((&raw), rkey)))
+        if (!(c = i_cmp_functor(self, (&raw), rkey)))
             { res->ref = &d[tx].value; return tn; }
         dir = (c < 0);
         tx = d[tx].link[dir];
@@ -443,7 +445,7 @@ _cx_memb(_erase_r_)(_cx_self *self, i_size tn, const _cx_rawkey* rkey, int *eras
     if (tn == 0)
         return 0;
     _cx_rawkey raw = i_keyto(_i_keyref(&d[tn].value));
-    i_size tx; int c = i_cmp((&raw), rkey);
+    i_size tx; int c = i_cmp_functor(self, (&raw), rkey);
     if (c != 0)
         d[tn].link[c < 0] = _cx_memb(_erase_r_)(self, d[tn].link[c < 0], rkey, erased);
     else {
@@ -573,6 +575,7 @@ _cx_memb(_drop)(_cx_self* self) {
 }
 
 #endif // i_implement
+#undef i_cmp_functor
 #undef _i_isset
 #undef _i_ismap
 #undef _i_keyref
