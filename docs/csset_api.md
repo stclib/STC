@@ -8,14 +8,18 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 ## Header file and declaration
 
 ```c
+#define i_type      // full typename of the container
 #define i_key       // key: REQUIRED
 #define i_cmp       // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
 #define i_keydrop   // destroy key func - defaults to empty destruct
+#define i_keyclone  // REQUIRED IF i_keydrop defined
+
 #define i_keyraw    // convertion "raw" type - defaults to i_key
 #define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
 #define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
-#define i_tag       // typename tag. defaults to i_key
-#define i_type      // full typename of the container
+
+#define i_cmp_functor // advanced, see examples/cpque.c for similar usage.
+#define i_tag       // alternative typename: csset_{i_tag}. i_tag defaults to i_val
 #include <stc/csset.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.

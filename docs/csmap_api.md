@@ -15,6 +15,7 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 ## Header file and declaration
 
 ```c
+#define i_type      // container type name (default: cmap_{i_key})
 #define i_key       // key: REQUIRED
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_keyraw* : REQUIRED IF i_keyraw is a non-integral type
@@ -31,8 +32,8 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 #define i_valfrom   // convertion func i_valraw => i_val
 #define i_valto     // convertion func i_val* => i_valraw
 
-#define i_tag       // typename tag. defaults to i_key
-#define i_type      // full typename of the container
+#define i_cmp_functor // advanced, see examples/cpque.c for similar usage.
+#define i_tag       // alternative typename: csmap_{i_tag}. i_tag defaults to i_val
 #include <stc/csmap.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.

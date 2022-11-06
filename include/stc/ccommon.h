@@ -99,8 +99,6 @@
 #define c_default_clone(v)      (v)
 #define c_default_toraw(vp)     (*(vp))
 #define c_default_drop(vp)      ((void) (vp))
-#define c_derived_keyclone(v)   i_keyfrom((i_keyto((&(v)))))
-#define c_derived_valclone(v)   i_valfrom((i_valto((&(v)))))
 
 #define c_option(flag)          ((i_opt) & (flag))
 #define c_declared              (1<<0)

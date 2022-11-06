@@ -20,11 +20,15 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ## Header file and declaration
 
 ```c
+#define i_type            // full typename of the carc
 #define i_val             // value: REQUIRED
-#define i_cmp             // three-way compare two i_val* : REQUIRED IF i_val is a non-integral type
-#define i_valdrop         // destroy value func - defaults to empty destruct
-#define i_tag             // defaults to i_val
+
+#define i_valraw          // convertion "raw" type - defaults to i_val
+#define i_valto           // convertion func i_val* => i_valraw: REQUIRED IF i_valraw defined.
+#define i_valfrom         // convertion func i_valraw => i_val
+      
 #define i_opt c_no_atomic // Non-atomic reference counting, like Rust Rc.
+#define i_tag             // alternative typename: carc_{i_tag}. i_tag defaults to i_val
 #include <stc/carc.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.

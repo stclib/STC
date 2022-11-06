@@ -22,14 +22,16 @@ See the c++ class [std::list](https://en.cppreference.com/w/cpp/container/list) 
 ## Header file and declaration
 
 ```c
+#define i_type      // container type name (default: clist_{i_val})
 #define i_val       // value: REQUIRED
 #define i_cmp       // three-way compare two i_valraw* : REQUIRED IF i_valraw is a non-integral type
 #define i_valdrop   // destroy value func - defaults to empty destruct
 #define i_valclone  // REQUIRED IF i_valdrop defined
-#define i_valraw    // convertion "raw" type - defaults to i_val
+
+#define i_valraw    // convertion "raw" type (default: {i_val})
 #define i_valto     // convertion func i_val* => i_valraw
 #define i_valfrom   // convertion func i_valraw => i_val
-#define i_tag       // defaults to i_val
+#define i_tag       // alternative typename: cpque_{i_tag}. i_tag defaults to i_val
 #include <stc/clist.h>
 ```
 

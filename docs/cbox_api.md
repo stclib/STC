@@ -14,14 +14,18 @@ See similar c++ class [std::unique_ptr](https://en.cppreference.com/w/cpp/memory
 ## Header file and declaration
 
 ```c
+#define i_type          // full typename of the cbox
 #define i_val           // value: REQUIRED
 #define i_cmp           // three-way compare two i_val* : REQUIRED IF i_val is a non-integral type
 #define i_valdrop       // destroy value func - defaults to empty destruct
 #define i_valclone      // REQUIRED if i_valdrop is defined, unless 'i_opt c_no_clone' is defined.
-#define i_valraw        // convertion type (lookup)
+
+#define i_valraw        // convertion type (lookup): default to {i_val}
+#define i_valto         // convertion func i_val* => i_valraw: REQUIRED IF i_valraw defined.
 #define i_valfrom       // from-raw func.
-#define i_valto         // to-raw func.
-#define i_tag           // type name tag, defaults to i_val
+
+#define i_valclass      // alt. to i_val: REQUIRES that {i_val}_clone, {i_val}_drop, {i_valraw}_cmp exist.
+#define i_tag           // alternative typename: cbox_{i_tag}. i_tag defaults to i_val
 #include <stc/cbox.h>    
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.

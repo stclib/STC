@@ -8,15 +8,18 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 ## Header file and declaration
 
 ```c
+#define i_type      // define type name of the container (default cpque_{i_val})
 #define i_val       // value: REQUIRED
-#define i_cmp       // three-way compare two i_val* : REQUIRED IF i_val/i_valraw is a non-integral type
+#define i_less      // compare two i_val* : REQUIRED IF i_val/i_valraw is a non-integral type
 #define i_valdrop   // destroy value func - defaults to empty destruct
 #define i_valclone  // REQUIRED IF i_valdrop defined
+
 #define i_valraw    // convertion type
 #define i_valfrom   // convertion func i_valraw => i_val
 #define i_valto     // convertion func i_val* => i_valraw.
-#define i_tag       // defaults to i_val
-#define i_type      // container type name
+
+#define i_less_functor // takes self as first argument. See examples/cpque.c for usage.
+#define i_tag       // alternative typename: cpque_{i_tag}. i_tag defaults to i_val
 #include <stc/cpque.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.

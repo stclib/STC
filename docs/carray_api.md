@@ -9,11 +9,10 @@ See the c++ class [boost::multi_array](https://www.boost.org/doc/libs/release/li
 ## Header file and declaration
 
 ```c
+#define i_type      // full typename of the container
 #define i_val       // value: REQUIRED
 #define i_valdrop   // destroy value func - defaults to empty destruct
 #define i_valclone  // REQUIRED IF valdrop is defined.
-#define i_tag       // defaults to i_val
-
 #include <stc/carr2.h> // or <stc/carr3.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.

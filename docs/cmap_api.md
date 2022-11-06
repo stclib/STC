@@ -17,15 +17,15 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 ## Header file and declaration
 
 ```c
+#define i_type      // container type name (default: cmap_{i_key})
 #define i_key       // hash key: REQUIRED
 #define i_val       // map value: REQUIRED
 #define i_hash      // hash func i_keyraw*: REQUIRED IF i_keyraw is non-pod type
 #define i_eq        // equality comparison two i_keyraw*: REQUIRED IF i_keyraw is a
-                    // non-integral type. Three-way i_cmp may be specified alternatively.
-#define i_size      // size_t or uint32_t(default). If defined, table expand 2x (else 1.5x)  
+                    // non-integral type. Three-way i_cmp may alternatively be specified.
 
 #define i_keydrop   // destroy key func - defaults to empty destruct
-#define i_keyclone  // REQUIRED IF i_valdrop defined
+#define i_keyclone  // REQUIRED IF i_keydrop defined
 #define i_keyraw    // convertion "raw" type - defaults to i_key
 #define i_keyfrom   // convertion func i_keyraw => i_key
 #define i_keyto     // convertion func i_key* => i_keyraw
@@ -36,8 +36,10 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_valfrom   // convertion func i_valraw => i_val
 #define i_valto     // convertion func i_val* => i_valraw
 
-#define i_tag       // typename tag. defaults to i_key
-#define i_type      // full typename of the container
+#define i_size      // default: uint32_t. If defined, table expand 2x (else 1.5x)
+#define i_hash_functor // advanced, see examples/cpque.c for similar usage.
+#define i_eq_functor // advanced, see examples/cpque.c for similar usage.
+#define i_tag       // alternative typename: cmap_{i_tag}. i_tag defaults to i_val
 #include <stc/cmap.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
