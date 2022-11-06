@@ -7,15 +7,14 @@ int main()
         printf("count %" c_ZU ", %" c_ZU "\n", cbits_count(&set), cbits_size(&set));
         cbits s1 = cbits_from("1110100110111");
         char buf[256];
-        cbits_to_str(&s1, buf, 0, -1);
+        cbits_to_str(&s1, buf, 0, 255);
         printf("buf: %s: %" c_ZU "\n", buf, cbits_count(&s1));
         cbits_drop(&s1);
 
         cbits_reset(&set, 9);
         cbits_resize(&set, 43, false);
-        {   char str[128];
-            printf(" str: %s\n", cbits_to_str(&set, str, 0, 128));
-        }
+        printf(" str: %s\n", cbits_to_str(&set, buf, 0, 255));
+
         printf("%4" c_ZU ": ", cbits_size(&set));
         c_forrange (i, cbits_size(&set))
             printf("%d", cbits_test(&set, i));
