@@ -3,19 +3,20 @@
 The following macros are recommended to use, and they safe/have no side-effects.
 
 ## Scope macros (RAII)
-### c_auto, c_with, c_scope, c_defer
+### c_auto, c_autodrop, c_with, c_scope, c_defer
 General ***defer*** mechanics for resource acquisition. These macros allows you to specify the
 freeing of the resources at the point where the acquisition takes place.
 The **checkauto** utility described below, ensures that the `c_auto*` macros are used correctly.
 
 | Usage                                  | Description                                               |
 |:---------------------------------------|:----------------------------------------------------------|
-| `c_auto (Type, var...)`                | Same as `c_with (Type var=Type_init(), Type_drop(&var))`  |
 | `c_with (Type var=init, drop)`         | Declare `var`. Defer `drop...` to end of scope            |
 | `c_with (Type var=init, pred, drop)`   | Adds a predicate in order to exit early if init failed    |
-| `c_scope (init, drop...)`              | Execute `init` and defer `drop...` to end of scope        |
+| `c_auto (Type, var1,...,var4)`         | `c_with (Type var1=Type_init(), Type_drop(&var1))` ...    |
+| `c_autodrop (Type, var, init...)`      | Like `c_with (Type var=init..., Type_drop(&var))`         |
+| `c_scope (init, drop)`                 | Execute `init` and defer `drop` to end of scope           |
 | `c_defer (drop...)`                    | Defer `drop...` to end of scope                           |
-| `continue`                             | Exit a `c_auto/c_with/c_scope...` without memory leaks    |
+| `continue`                             | Exit a block above without memory leaks                   |
 
 For multiple variables, use either multiple **c_with** in sequence, or declare variable outside
 scope and use **c_scope**. For convenience, **c_auto** support up to 4 variables.
@@ -47,6 +48,12 @@ c_auto (cstr, s1, s2)
     cstr_append(&s2, " stuff");
 
     printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
+}
+
+c_autodrop (cstr, str, cstr_new("Hello"))
+{
+    cstr_append(&str, " world");
+    printf("%s\n", cstr_str(&str));
 }
 
 // `c_scope` is like `c_with` but works with an already declared variable.

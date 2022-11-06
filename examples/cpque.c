@@ -9,6 +9,7 @@
 #include <stdbool.h>
 #include <stc/forward.h>
 #include <stc/views.h>
+#include <stc/cstr.h>
 
 // predeclare
 declare_cpque(ipque, int);
@@ -18,7 +19,7 @@ struct {
     bool (*less)(const int*, const int*);
 } typedef IPQueue;
 
-#define IPQueue_obj(less) ((IPQueue){ipque_init(), less})
+#define IPQueue_drop(q) ipque_drop(&(q)->Q)
 
 #define i_type ipque
 #define i_val int
@@ -52,9 +53,9 @@ int main()
     const int data[] = {1,8,5,6,3,4,0,9,7,2}, n = c_arraylen(data);
     print("data", data, n);
 
-    c_with (IPQueue q1 = IPQueue_obj(int_less), ipque_drop(&q1.Q))   // Max priority queue
-    c_with (IPQueue minq1 = IPQueue_obj(int_greater), ipque_drop(&minq1.Q)) // Min priority queue
-    c_with (IPQueue q5 = IPQueue_obj(int_lambda), ipque_drop(&q5.Q)) // Using lambda to compare elements.
+    c_autodrop (IPQueue, q1, {ipque_init(), int_less})   // Max priority queue
+    c_autodrop (IPQueue, minq1, {ipque_init(), int_greater}) // Min priority queue
+    c_autodrop (IPQueue, q5, {ipque_init(), int_lambda}) // Using lambda to compare elements.
     {
         c_forrange (i, n)
             ipque_push(&q1.Q, data[i]);

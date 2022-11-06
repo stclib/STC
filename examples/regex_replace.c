@@ -35,7 +35,7 @@ int main()
         printf("brack: %s\n", cstr_str(&str));
 
         /* Shows how to compile RE separately */
-        c_with (cregex re = cregex_from(pattern, cre_default), cregex_drop(&re)) {
+        c_autodrop (cregex, re, cregex_from(pattern, cre_default)) {
             if (cregex_captures(&re) == 0)
                   continue; // break c_with
             /* European date format. */

@@ -13,9 +13,9 @@ int main()
 
         cbits_reset(&set, 9);
         cbits_resize(&set, 43, false);
-        c_autobuf (str, char, cbits_size(&set) + 1)
-            printf(" str: %s\n", cbits_to_str(&set, str, 0, -1));
-
+        {   char str[128];
+            printf(" str: %s\n", cbits_to_str(&set, str, 0, 128));
+        }
         printf("%4" c_ZU ": ", cbits_size(&set));
         c_forrange (i, cbits_size(&set))
             printf("%d", cbits_test(&set, i));

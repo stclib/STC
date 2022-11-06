@@ -222,6 +222,7 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
 #define c_with3(declvar, pred, drop) for (declvar, **_c_i = NULL; !_c_i && (pred); ++_c_i, drop)
 #define c_scope(init, drop) for (int _c_i = (init, 0); !_c_i; ++_c_i, drop)
 #define c_defer(...) for (int _c_i = 0; !_c_i; ++_c_i, __VA_ARGS__)
+#define c_autodrop(C, a, ...) for (C a = __VA_ARGS__, **_c_i = NULL; !_c_i; ++_c_i, C##_drop(&a))
 
 #define c_auto(...) c_MACRO_OVERLOAD(c_auto, __VA_ARGS__)
 #define c_auto2(C, a) \
@@ -235,12 +236,6 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
 #define c_auto5(C, a, b, c, d) \
     c_with2(c_expand(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
                (C##_drop(&d), C##_drop(&c), C##_drop(&b), C##_drop(&a)))
-
-#define c_autobuf(b, type, n) c_autobuf_N(b, type, n, 256)
-#define c_autobuf_N(b, type, n, BYTES) \
-    for (type _c_b[((BYTES) - 1) / sizeof(type) + 1], \
-         *b = (n)*sizeof *b > (BYTES) ? c_alloc_n(type, n) : _c_b \
-         ; b; b != _c_b ? c_free(b) : (void)0, b = NULL)
 
 #define c_drop(C, ...) do { c_forlist (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
 

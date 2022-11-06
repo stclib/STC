@@ -90,8 +90,7 @@ int main()
     // Ex1
     int xd = 30, yd = 20, zd = 10;
     // define arr3[30][20][10], initialized with zeros.
-    c_with (carr3_f arr3 = carr3_f_with_size(xd, yd, zd, 0.0f), 
-                           carr3_f_drop(&arr3)) {
+    c_autodrop (carr3_f, arr3, carr3_f_with_size(xd, yd, zd, 0.0f)) {
         arr3.data[5][4][3] = 3.14f;
 
         float *arr1 = arr3.data[5][4];

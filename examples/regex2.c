@@ -14,7 +14,7 @@ int main()
         {"!((abc|123)+)!", "!123abcabc!"}
     };
 
-    c_with (cregex re = cregex_init(), cregex_drop(&re))
+    c_auto (cregex, re)
     c_forrange (i, c_arraylen(s))
     {
         int res = cregex_compile(&re, s[i].pattern, cre_default);

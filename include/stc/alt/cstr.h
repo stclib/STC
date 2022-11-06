@@ -310,11 +310,11 @@ STC_DEF void
 cstr_replace_at_sv(cstr* self, const size_t pos, size_t len, csview repl) {
     const size_t sz = cstr_size(self);
     if (len > sz - pos) len = sz - pos;
-    c_autobuf (xstr, char, repl.size) {
-        memcpy(xstr, repl.str, repl.size);
-        _cstr_internal_move(self, pos + len, pos + repl.size);
-        memcpy(&self->str[pos], xstr, repl.size);
-    }
+    char buf[256], *xstr = repl.size > 256 ? c_malloc(repl.size) : buf;
+    memcpy(xstr, repl.str, repl.size);
+    _cstr_internal_move(self, pos + len, pos + repl.size);
+    memcpy(&self->str[pos], xstr, repl.size);
+    if (repl.size > 256) c_free(xstr);
 }
 
 STC_DEF cstr
