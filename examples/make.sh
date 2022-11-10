@@ -32,18 +32,20 @@ if [ "$1" = '-run' ]; then
   shift
 fi
 if [ ! -z "$1" ] ; then
-    comp=$@
+    comp="$@"
+else
+    comp="$cc $cflags"
 fi
 
 if [ $run = 0 ] ; then
     for i in *.c ; do
-        echo $cc $cflags -I../include $i $clibs $oflag$(basename $i .c).exe
-        $cc $cflags -I../include $i $clibs $oflag$(basename $i .c).exe
+        echo $comp -I../include $i $clibs $oflag$(basename $i .c).exe
+        $comp -I../include $i $clibs $oflag$(basename $i .c).exe
     done
 else
     for i in *.c ; do
-        echo $cc $cflags -I../include $i $clibs
-        $cc $cflags -I../include $i $clibs
+        echo $comp -I../include $i $clibs
+        $comp -I../include $i $clibs
         if [ -f $(basename -s .c $i).exe ]; then ./$(basename -s .c $i).exe; fi
         if [ -f ./a.exe ]; then ./a.exe; fi
         if [ -f ./a.out ]; then ./a.out; fi
