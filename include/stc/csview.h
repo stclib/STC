@@ -35,6 +35,8 @@
 #define             csview_clone  c_default_clone
 #define             csview_from_n c_sv
 
+STC_API size_t csview_find_sv(csview sv, csview search);
+
 STC_INLINE csview   csview_from(const char* str)
                         { return c_init(csview){str, strlen(str)}; }
 STC_INLINE void     csview_clear(csview* self) { *self = csview_null; }
@@ -42,22 +44,23 @@ STC_INLINE void     csview_clear(csview* self) { *self = csview_null; }
 STC_INLINE size_t   csview_size(csview sv) { return sv.size; }
 STC_INLINE bool     csview_empty(csview sv) { return sv.size == 0; }
 
-STC_INLINE bool csview_equals(csview sv, csview sv2)
-    { return sv.size == sv2.size && !memcmp(sv.str, sv2.str, sv.size); }
+STC_INLINE bool csview_equals(csview sv, const char* str)
+    { size_t n = strlen(str); return sv.size == n && !memcmp(sv.str, str, n); }
 
-STC_API size_t csview_find(csview sv, csview search);
+STC_INLINE size_t csview_find(csview sv, const char* str)
+    { return csview_find_sv(sv, c_sv(str, strlen(str))); }
 
-STC_INLINE bool csview_contains(csview sv, csview search)
-    { return csview_find(sv, search) != csview_npos; }
+STC_INLINE bool csview_contains(csview sv, const char* str)
+    { return csview_find(sv, str) != csview_npos; }
 
-STC_INLINE bool csview_starts_with(csview sv, csview sub) {
-    if (sub.size > sv.size) return false;
-    return !memcmp(sv.str, sub.str, sub.size);
+STC_INLINE bool csview_starts_with(csview sv, const char* str) {
+    size_t n = strlen(str);
+    return n > sv.size ? false : !memcmp(sv.str, str, n);
 }
 
-STC_INLINE bool csview_ends_with(csview sv, csview sub) {
-    if (sub.size > sv.size) return false;
-    return !memcmp(sv.str + sv.size - sub.size, sub.str, sub.size);
+STC_INLINE bool csview_ends_with(csview sv, const char* str) {
+    size_t n = strlen(str);
+    return n > sv.size ? false : !memcmp(sv.str + sv.size - n, str, n);
 }
 
 STC_INLINE csview csview_substr(csview sv, size_t pos, size_t n) {
@@ -111,15 +114,15 @@ STC_INLINE bool csview_valid_utf8(csview sv) // depends on src/utf8code.c
 
 STC_API csview csview_substr_ex(csview sv, intptr_t pos, size_t n);
 STC_API csview csview_slice_ex(csview sv, intptr_t p1, intptr_t p2);
-STC_API csview csview_token(csview sv, csview sep, size_t* start);
+STC_API csview csview_token(csview sv, const char* sep, size_t* start);
 
-#define c_fortoken_sv(it, input, sep) \
-    for (struct { csview _inp, _sep, token, *ref; size_t pos; } \
-          it = {._inp=input, ._sep=sep, .token=it._inp, .ref=&it.token, .pos=0} \
+#define c_fortoken_sv(it, inputsv, sep) \
+    for (struct { csview _inp, token, *ref; const char *_sep; size_t pos; } \
+          it = {._inp=inputsv, .token=it._inp, .ref=&it.token, ._sep=sep} \
         ; it.pos <= it._inp.size && (it.token = csview_token(it._inp, it._sep, &it.pos)).str ; )
 
 #define c_fortoken(it, input, sep) \
-    c_fortoken_sv(it, csview_from(input), csview_from(sep))
+    c_fortoken_sv(it, csview_from(input), sep)
 
 /* csview interaction with cstr: */
 #ifdef CSTR_H_INCLUDED
@@ -159,7 +162,7 @@ STC_API uint64_t csview_hash(const csview *self);
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement) || defined(i_extern)
 
-STC_DEF size_t csview_find(csview sv, csview search) {
+STC_DEF size_t csview_find_sv(csview sv, csview search) {
     char* res = cstrnstrn(sv.str, search.str, sv.size, search.size);
     return res ? res - sv.str : csview_npos;
 }
@@ -189,11 +192,12 @@ STC_DEF csview csview_slice_ex(csview sv, intptr_t p1, intptr_t p2) {
     return sv;
 }
 
-STC_DEF csview csview_token(csview sv, csview sep, size_t* start) {
+STC_DEF csview csview_token(csview sv, const char* sep, size_t* start) {
+    size_t sep_size = strlen(sep);
     csview slice = {sv.str + *start, sv.size - *start};
-    const char* res = cstrnstrn(slice.str, sep.str, slice.size, sep.size);
+    const char* res = cstrnstrn(slice.str, sep, slice.size, sep_size);
     csview tok = {slice.str, res ? res - slice.str : slice.size};
-    *start += tok.size + sep.size;
+    *start += tok.size + sep_size;
     return tok;
 }
 

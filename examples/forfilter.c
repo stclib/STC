@@ -94,7 +94,7 @@ void demo3(void)
             SVec_push(&words, *w.ref);
 
         c_forfilter (w, SVec, words, 
-                     csview_contains(*w.ref, c_sv("i")))
+                     csview_contains(*w.ref, "i"))
             SVec_push(&words_containing_i, *w.ref);
 
         puts("demo3:");

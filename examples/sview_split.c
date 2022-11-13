@@ -7,9 +7,9 @@ int  main()
     // No memory allocations or string length calculations!
     const csview date = c_sv("2021/03/12");
     size_t pos = 0;
-    const csview year = csview_token(date, c_sv("/"), &pos);
-    const csview month = csview_token(date, c_sv("/"), &pos);
-    const csview day = csview_token(date, c_sv("/"), &pos);
+    const csview year = csview_token(date, "/", &pos);
+    const csview month = csview_token(date, "/", &pos);
+    const csview day = csview_token(date, "/", &pos);
 
     printf("%.*s, %.*s, %.*s\n", c_ARGsv(year), c_ARGsv(month), c_ARGsv(day));
 
