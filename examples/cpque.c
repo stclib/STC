@@ -12,7 +12,7 @@
 #include <stc/cstr.h>
 
 // predeclare
-declare_cpque(ipque, int);
+forward_cpque(ipque, int);
 
 struct {
     ipque Q;
@@ -23,7 +23,7 @@ struct {
 
 #define i_type ipque
 #define i_val int
-#define i_opt c_declared // needed to avoid re-type-define container type
+#define i_opt c_is_forward // needed to avoid re-type-define container type
 #define i_less_functor(self, x, y) c_container_of(self, IPQueue, Q)->less(x, y) // <== This.
 #include <stc/cpque.h>
 

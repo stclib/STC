@@ -80,7 +80,7 @@ typedef struct      { size_t idx; uint8_t hx; } chash_bucket_t;
 #ifndef i_eq_functor
   #define i_eq_functor(self, x, y) i_eq(x, y)
 #endif
-#if !c_option(c_declared)
+#if !c_option(c_is_forward)
   _cx_deftypes(_c_chash_types, _cx_self, i_key, i_val, i_size, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
 

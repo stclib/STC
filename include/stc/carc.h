@@ -94,7 +94,7 @@ typedef i_keyraw _cx_raw;
   #define _i_atomic_inc(v)          (void)(++*(v))
   #define _i_atomic_dec_and_test(v) !(--*(v))
 #endif
-#if !c_option(c_declared)
+#if !c_option(c_is_forward)
 _cx_deftypes(_c_carc_types, _cx_self, i_key);
 #endif
 _cx_carc_rep { catomic_long counter; i_key value; };

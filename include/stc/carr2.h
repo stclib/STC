@@ -57,7 +57,7 @@ int main() {
 #define _i_prefix carr2_
 #endif
 #include "template.h"
-#if !c_option(c_declared)
+#if !c_option(c_is_forward)
 _cx_deftypes(_c_carr2_types, _cx_self, i_key);
 #endif
 

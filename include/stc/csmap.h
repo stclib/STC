@@ -77,7 +77,7 @@ int main(void) {
 #ifndef i_cmp_functor
   #define i_cmp_functor(self, x, y) i_cmp(x, y)
 #endif
-#if !c_option(c_declared)
+#if !c_option(c_is_forward)
   _cx_deftypes(_c_aatree_types, _cx_self, i_key, i_val, i_size, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
 

@@ -59,7 +59,7 @@ int main() {
 #endif
 #include "template.h"
 
-#if !c_option(c_declared)
+#if !c_option(c_is_forward)
 _cx_deftypes(_c_carr3_types, _cx_self, i_key);
 #endif
 

@@ -79,7 +79,7 @@ int main() {
 #include "template.h"
 typedef i_keyraw _cx_raw;
 
-#if !c_option(c_declared)
+#if !c_option(c_is_forward)
 _cx_deftypes(_c_cbox_types, _cx_self, i_key);
 #endif
 

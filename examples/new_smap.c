@@ -1,7 +1,7 @@
 #include <stc/cstr.h>
 #include <stc/forward.h>
 
-declare_csmap(PMap, struct Point, int);
+forward_csmap(PMap, struct Point, int);
 
 // Use forward declared PMap in struct
 struct MyStruct {
@@ -25,7 +25,7 @@ int point_cmp(const Point* a, const Point* b) {
 #define i_key Point
 #define i_val int
 #define i_cmp point_cmp
-#define i_opt c_declared
+#define i_opt c_is_forward
 #include <stc/csmap.h>
 
 // cstr => cstr map
