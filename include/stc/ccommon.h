@@ -101,7 +101,7 @@
 #define c_default_drop(vp)      ((void) (vp))
 
 #define c_option(flag)          ((i_opt) & (flag))
-#define c_is_forward              (1<<0)
+#define c_is_forward            (1<<0)
 #define c_no_atomic             (1<<1)
 #define c_no_clone              (1<<2)
 #define c_no_cmp                (1<<3)

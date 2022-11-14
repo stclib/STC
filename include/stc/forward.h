@@ -188,32 +188,24 @@ typedef union {
         SELF##_size_t root, disp, head, size, cap; \
     } SELF
 #endif
-#define _c_cstack_types(SELF, VAL) \
-    typedef VAL SELF##_value; \
-    typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
-    typedef struct SELF { \
-        SELF##_value* data; \
-        size_t _len, _cap; \
-    } SELF
 
 #define _c_cstack_fixed(SELF, VAL, CAP) \
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
-    typedef struct SELF { \
-        SELF##_value data[CAP]; \
-        size_t _len; \
-    } SELF
+    typedef struct { SELF##_value data[CAP]; size_t _len; } SELF
 
-#define _c_cpque_types(SELF, VAL) \
+#define _c_cstack_types(SELF, VAL) \
     typedef VAL SELF##_value; \
-    typedef struct SELF { \
-        SELF##_value* data; \
-        size_t _len, _cap; \
-    } SELF
+    typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
+    typedef struct { SELF##_value* data; size_t _len, _cap; } SELF
 
 #define _c_cvec_types(SELF, VAL) \
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
-    typedef struct { SELF##_value *data; } SELF
+    typedef struct { SELF##_value *data; size_t _len, _cap; } SELF
+
+#define _c_cpque_types(SELF, VAL) \
+    typedef VAL SELF##_value; \
+    typedef struct { SELF##_value* data; size_t _len, _cap; } SELF
 
 #endif // STC_FORWARD_H_INCLUDED
