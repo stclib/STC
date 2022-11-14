@@ -97,12 +97,12 @@ typedef _i_SET_ONLY( i_keyraw )
         _i_MAP_ONLY( struct { i_keyraw first; i_valraw second; } )
         _cx_raw;
 
-#if !defined _i_no_emplace
+#if !defined i_no_emplace
 STC_API _cx_result      _cx_memb(_emplace)(_cx_self* self, _cx_rawkey rkey _i_MAP_ONLY(, i_valraw rmapped));
-#endif // !_i_no_emplace
-#if !defined _i_no_clone
+#endif // !i_no_emplace
+#if !defined i_no_clone
 STC_API _cx_self        _cx_memb(_clone)(_cx_self tree);
-#endif // !_i_no_clone
+#endif // !i_no_clone
 STC_API _cx_self        _cx_memb(_init)(void);
 STC_API _cx_result      _cx_memb(_insert)(_cx_self* self, i_key key _i_MAP_ONLY(, i_val mapped));
 STC_API _cx_result      _cx_memb(_push)(_cx_self* self, _cx_value _val);
@@ -161,7 +161,7 @@ _cx_memb(_value_drop)(_cx_value* val) {
     _i_MAP_ONLY( i_valdrop((&val->second)); )
 }
 
-#if !defined _i_no_clone
+#if !defined i_no_clone
 STC_INLINE _cx_value
 _cx_memb(_value_clone)(_cx_value _val) {
     *_i_keyref(&_val) = i_keyclone((*_i_keyref(&_val)));
@@ -182,10 +182,10 @@ _cx_memb(_shrink_to_fit)(_cx_self *self) {
     _cx_self tmp = _cx_memb(_clone)(*self);
     _cx_memb(_drop)(self); *self = tmp;
 }
-#endif // !_i_no_clone
+#endif // !i_no_clone
 
 #ifndef _i_isset
-    #if !defined _i_no_emplace
+    #if !defined i_no_emplace
     STC_API _cx_result _cx_memb(_emplace_or_assign)(_cx_self* self, _cx_rawkey rkey, i_valraw rmapped);
     #endif
     STC_API _cx_result _cx_memb(_insert_or_assign)(_cx_self* self, i_key key, i_val mapped);
@@ -316,7 +316,7 @@ _cx_memb(_push)(_cx_self* self, _cx_value _val) {
         return res;
     }
 
-    #if !defined _i_no_emplace
+    #if !defined i_no_emplace
     STC_DEF _cx_result
     _cx_memb(_emplace_or_assign)(_cx_self* self, _cx_rawkey rkey, i_valraw rmapped) {
         _cx_result res = _cx_memb(_insert_entry_)(self, rkey);
@@ -329,7 +329,7 @@ _cx_memb(_push)(_cx_self* self, _cx_value _val) {
         }
         return res;
     }
-    #endif // !_i_no_emplace
+    #endif // !i_no_emplace
 #endif // !_i_isset
 
 STC_DEF _cx_value*
@@ -523,7 +523,7 @@ _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
     }
 }
 
-#if !defined _i_no_clone
+#if !defined i_no_clone
 static i_size
 _cx_memb(_clone_r_)(_cx_self* self, _cx_node* src, i_size sn) {
     if (sn == 0)
@@ -543,9 +543,9 @@ _cx_memb(_clone)(_cx_self tree) {
     clone.size = tree.size;
     return clone;
 }
-#endif // !_i_no_clone
+#endif // !i_no_clone
 
-#if !defined _i_no_emplace
+#if !defined i_no_emplace
 STC_DEF _cx_result
 _cx_memb(_emplace)(_cx_self* self, _cx_rawkey rkey _i_MAP_ONLY(, i_valraw rmapped)) {
     _cx_result res = _cx_memb(_insert_entry_)(self, rkey);
@@ -555,7 +555,7 @@ _cx_memb(_emplace)(_cx_self* self, _cx_rawkey rkey _i_MAP_ONLY(, i_valraw rmappe
     }
     return res;
 }
-#endif // _i_no_emplace
+#endif // i_no_emplace
 
 static void
 _cx_memb(_drop_r_)(_cx_node* d, i_size tn) {

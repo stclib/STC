@@ -67,7 +67,7 @@ STC_API _cx_self   _cx_memb(_with_size)(size_t xdim, size_t ydim, size_t zdim, i
 STC_API _cx_self   _cx_memb(_with_data)(size_t xdim, size_t ydim, size_t zdim, _cx_value* storage);
 STC_API _cx_value* _cx_memb(_release)(_cx_self* self);
 STC_API void       _cx_memb(_drop)(_cx_self* self);
-#if !defined _i_no_clone
+#if !defined i_no_clone
 STC_API _cx_self   _cx_memb(_clone)(_cx_self src);
 STC_API void       _cx_memb(_copy)(_cx_self *self, const _cx_self* other);
 #endif
@@ -122,7 +122,7 @@ STC_DEF _cx_self _cx_memb(_with_size)(size_t xdim, size_t ydim, size_t zdim, i_k
     return _arr;
 }
 
-#if !defined _i_no_clone
+#if !defined i_no_clone
 
 STC_DEF _cx_self _cx_memb(_clone)(_cx_self src) {
     _cx_self _arr = _cx_memb(_new_uninit)(src.xdim, src.ydim, src.zdim);

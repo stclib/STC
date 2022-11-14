@@ -35,7 +35,7 @@
 
 #if !c_option(c_is_forward)
 #ifdef i_capacity
-  #define _i_no_clone
+  #define i_no_clone
   _cx_deftypes(_c_cstack_fixed, _cx_self, i_key, i_capacity);
 #else
   _cx_deftypes(_c_cstack_types, _cx_self, i_key);
@@ -142,12 +142,12 @@ STC_INLINE const _cx_value* _cx_memb(_at)(const _cx_self* self, size_t idx)
 STC_INLINE _cx_value* _cx_memb(_at_mut)(_cx_self* self, size_t idx)
     { assert(idx < self->_len); return self->data + idx; }
 
-#if !defined _i_no_emplace
+#if !defined i_no_emplace
 STC_INLINE _cx_value* _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
     { return _cx_memb(_push)(self, i_keyfrom(raw)); }
-#endif // !_i_no_emplace
+#endif // !i_no_emplace
 
-#if !defined _i_no_clone
+#if !defined i_no_clone
 STC_INLINE _cx_self _cx_memb(_clone)(_cx_self v) {
     _cx_self out = {(_cx_value *)c_malloc(v._len*sizeof(_cx_value)), v._len, v._len};
     if (!out.data) out._cap = 0;
@@ -167,7 +167,7 @@ STC_INLINE i_key _cx_memb(_value_clone)(_cx_value val)
 
 STC_INLINE i_keyraw _cx_memb(_value_toraw)(const _cx_value* val)
     { return i_keyto(val); }
-#endif // !_i_no_clone
+#endif // !i_no_clone
 
 STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) {
     return c_init(_cx_iter){self->_len ? (_cx_value*)self->data : NULL,

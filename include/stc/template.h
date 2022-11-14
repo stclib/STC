@@ -90,10 +90,13 @@
 #endif
 
 #if c_option(c_no_cmp)
-  #define _i_no_cmp
+  #define i_no_cmp
 #endif
 #if c_option(c_no_hash)
-  #define _i_no_hash
+  #define i_no_hash
+#endif
+#if c_option(c_no_emplace)
+  #define i_no_emplace
 #endif
 
 #if defined i_key_str
@@ -115,10 +118,8 @@
 #elif defined i_keyboxed
   #define i_keyclass i_keyboxed
   #define i_rawclass c_paste(i_keyboxed, _raw)
-  #if !c_option(c_no_from)
-    #define i_keyfrom c_paste(i_keyboxed, _from)
-  #endif
-  #if !defined _i_no_hash
+  #define i_keyfrom c_paste(i_keyboxed, _from)
+  #if !defined i_no_hash
     #define i_eq c_paste(i_keyboxed, _raw_eq)
   #endif
 #endif
@@ -143,10 +144,10 @@
 #endif
 
 #ifdef i_rawclass
-  #if !defined i_cmp && !defined _i_no_cmp
+  #if !defined i_cmp && !defined i_no_cmp
     #define i_cmp c_paste(i_keyraw, _cmp)
   #endif
-  #if !defined i_hash && !defined _i_no_hash
+  #if !defined i_hash && !defined i_no_hash
     #define i_hash c_paste(i_keyraw, _hash)
   #endif
 #endif
@@ -165,7 +166,7 @@
   #define i_tag i_key
 #endif
 #if c_option(c_no_clone) || (!defined i_keyclone && (defined i_keydrop || defined i_keyraw))
-  #define _i_no_clone
+  #define i_no_clone
 #endif
 #ifndef i_keyraw
   #define i_keyraw i_key
@@ -220,9 +221,7 @@
 #elif defined i_valboxed
   #define i_valclass i_valboxed
   #define i_valraw c_paste(i_valboxed, _raw)
-  #if !c_option(c_no_from)
-    #define i_valfrom c_paste(i_valboxed, _from)
-  #endif
+  #define i_valfrom c_paste(i_valboxed, _from)
 #endif
 
 #ifdef i_valclass
@@ -243,7 +242,7 @@
 #endif
 
 #if !defined i_valclone && (defined i_valdrop || defined i_valraw)
-  #define _i_no_clone
+  #define i_no_clone
 #endif
 #ifndef i_valraw
   #define i_valraw i_val
@@ -272,7 +271,7 @@
   #define i_valraw i_keyraw
 #endif
 #ifndef _i_has_from
-  #define _i_no_emplace
+  #define i_no_emplace
 #endif
 
 #else // ============================================================
@@ -316,12 +315,13 @@
 #undef i_static
 #undef i_extern
 
-#undef _i_expandby
+#undef i_no_cmp
+#undef i_no_hash
+#undef i_no_clone
+#undef i_no_emplace
+
 #undef _i_prefix
+#undef _i_expandby
 #undef _i_has_from
-#undef _i_no_cmp
-#undef _i_no_hash
-#undef _i_no_clone
-#undef _i_no_emplace
 #undef _i_template
 #endif

@@ -106,7 +106,7 @@
 #define c_no_clone              (1<<2)
 #define c_no_cmp                (1<<3)
 #define c_no_hash               (1<<4)
-#define c_no_from               (1<<5)
+#define c_no_emplace            (1<<5)
 
 /* Generic algorithms */
 

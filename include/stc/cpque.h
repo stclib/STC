@@ -90,7 +90,7 @@ STC_INLINE const _cx_value* _cx_memb(_top)(const _cx_self* self)
 STC_INLINE void _cx_memb(_pop)(_cx_self* self)
     { assert(!_cx_memb(_empty)(self)); _cx_memb(_erase_at)(self, 0); }
 
-#if !defined _i_no_clone
+#if !defined i_no_clone
 STC_API _cx_self _cx_memb(_clone)(_cx_self q);
 
 STC_INLINE void _cx_memb(_copy)(_cx_self *self, const _cx_self* other) {
@@ -100,12 +100,12 @@ STC_INLINE void _cx_memb(_copy)(_cx_self *self, const _cx_self* other) {
 }
 STC_INLINE i_key _cx_memb(_value_clone)(_cx_value val)
     { return i_keyclone(val); }
-#endif // !_i_no_clone
+#endif // !i_no_clone
 
-#if !defined _i_no_emplace
+#if !defined i_no_emplace
 STC_INLINE void _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
     { _cx_memb(_push)(self, i_keyfrom(raw)); }
-#endif // !_i_no_emplace
+#endif // !i_no_emplace
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement)
@@ -127,7 +127,7 @@ _cx_memb(_make_heap)(_cx_self* self) {
         _cx_memb(_sift_down_)(self, k, n);
 }
 
-#if !defined _i_no_clone
+#if !defined i_no_clone
 STC_DEF _cx_self _cx_memb(_clone)(_cx_self q) {
     _cx_self out = _cx_memb(_with_capacity)(q._len);
     for (; out._len < out._cap; ++q.data)

@@ -97,7 +97,7 @@ typedef _i_SET_ONLY( i_keyraw )
 _cx_raw;
 
 STC_API _cx_self        _cx_memb(_with_capacity)(size_t cap);
-#if !defined _i_no_clone
+#if !defined i_no_clone
 STC_API _cx_self        _cx_memb(_clone)(_cx_self map);
 #endif
 STC_API void            _cx_memb(_drop)(_cx_self* self);
@@ -121,7 +121,7 @@ STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, _cx_rawkey rke
 
 #ifndef _i_isset
     STC_API _cx_result  _cx_memb(_insert_or_assign)(_cx_self* self, i_key _key, i_val _mapped);
-    #if !defined _i_no_emplace
+    #if !defined i_no_emplace
     STC_API _cx_result  _cx_memb(_emplace_or_assign)(_cx_self* self, _cx_rawkey rkey, i_valraw rmapped);
     #endif
 
@@ -136,7 +136,7 @@ STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, _cx_rawkey rke
         { return (_cx_mapped*)_cx_memb(_at)(self, rkey); }
 #endif // !_i_isset
 
-#if !defined _i_no_clone
+#if !defined i_no_clone
 STC_INLINE void _cx_memb(_copy)(_cx_self *self, const _cx_self* other) {
     if (self->table == other->table)
         return;
@@ -150,9 +150,9 @@ _cx_memb(_value_clone)(_cx_value _val) {
     _i_MAP_ONLY( _val.second = i_valclone(_val.second); )
     return _val;
 }
-#endif // !_i_no_clone
+#endif // !i_no_clone
 
-#if !defined _i_no_emplace
+#if !defined i_no_emplace
 STC_INLINE _cx_result
 _cx_memb(_emplace)(_cx_self* self, _cx_rawkey rkey _i_MAP_ONLY(, i_valraw rmapped)) {
     _cx_result _res = _cx_memb(_insert_entry_)(self, rkey);
@@ -162,7 +162,7 @@ _cx_memb(_emplace)(_cx_self* self, _cx_rawkey rkey _i_MAP_ONLY(, i_valraw rmappe
     }
     return _res;
 }
-#endif // !_i_no_emplace
+#endif // !i_no_emplace
 
 STC_INLINE _cx_raw
 _cx_memb(_value_toraw)(const _cx_value* val) {
@@ -320,7 +320,7 @@ STC_DEF void _cx_memb(_clear)(_cx_self* self) {
         return _res;
     }
 
-    #if !defined _i_no_emplace
+    #if !defined i_no_emplace
     STC_DEF _cx_result
     _cx_memb(_emplace_or_assign)(_cx_self* self, _cx_rawkey rkey, i_valraw rmapped) {
         _cx_result _res = _cx_memb(_insert_entry_)(self, rkey);
@@ -331,7 +331,7 @@ STC_DEF void _cx_memb(_clear)(_cx_self* self) {
         _res.ref->second = i_valfrom(rmapped);
         return _res;
     }
-    #endif // !_i_no_emplace
+    #endif // !i_no_emplace
 #endif // !_i_isset
 
 STC_DEF chash_bucket_t
@@ -366,7 +366,7 @@ _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey) {
     return res;
 }
 
-#if !defined _i_no_clone
+#if !defined i_no_clone
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self m) {
     if (m.table) {

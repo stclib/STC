@@ -52,12 +52,12 @@ STC_API _cx_value*      _cx_memb(_push)(_cx_self* self, i_key value);
 STC_API void            _cx_memb(_shrink_to_fit)(_cx_self *self);
 
 #if !defined _i_queue
-#if !defined _i_no_emplace
+#if !defined i_no_emplace
 STC_API _cx_iter        _cx_memb(_emplace_range)(_cx_self* self, _cx_value* pos,
                                                  const _cx_raw* p1, const _cx_raw* p2);
-#endif // _i_no_emplace
+#endif // i_no_emplace
 
-#if !defined _i_no_cmp
+#if !defined i_no_cmp
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter p1, _cx_iter p2, _cx_raw raw);
 STC_API int             _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y);
 #endif
@@ -67,12 +67,12 @@ STC_API _cx_iter        _cx_memb(_insert_range)(_cx_self* self, _cx_value* pos,
                                                 const _cx_value* p1, const _cx_value* p2);
 #endif // !_i_queue
 
-#if !defined _i_no_emplace
+#if !defined i_no_emplace
 STC_INLINE _cx_value*   _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
                             { return _cx_memb(_push)(self, i_keyfrom(raw)); }
 #endif
 
-#if !defined _i_no_clone
+#if !defined i_no_clone
 #if !defined _i_queue
 STC_API _cx_iter        _cx_memb(_copy_range)(_cx_self* self, _cx_value* pos,
                                                 const _cx_value* p1, const _cx_value* p2);
@@ -87,7 +87,7 @@ STC_INLINE void         _cx_memb(_copy)(_cx_self *self, const _cx_self* other) {
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_INLINE i_key        _cx_memb(_value_clone)(i_key val)
                             { return i_keyclone(val); }
-#endif // !_i_no_clone
+#endif // !i_no_clone
 STC_INLINE size_t       _cx_memb(_size)(const _cx_self* cx) { return cdeq_rep_(cx)->size; }
 STC_INLINE size_t       _cx_memb(_capacity)(const _cx_self* cx) { return cdeq_rep_(cx)->cap; }
 STC_INLINE bool         _cx_memb(_empty)(const _cx_self* cx) { return !cdeq_rep_(cx)->size; }
@@ -156,7 +156,7 @@ _cx_memb(_erase_range)(_cx_self* self, _cx_iter i1, _cx_iter i2) {
     return _cx_memb(_erase_range_p)(self, i1.ref, _it2_ptr(i1, i2));
 }
 
-#if !defined _i_no_emplace
+#if !defined i_no_emplace
 STC_INLINE _cx_value*
 _cx_memb(_emplace_front)(_cx_self* self, _cx_raw raw) {
     return _cx_memb(_push_front)(self, i_keyfrom(raw));
@@ -174,9 +174,9 @@ STC_INLINE _cx_iter
 _cx_memb(_emplace_at)(_cx_self* self, _cx_iter it, _cx_raw raw) {
     return _cx_memb(_emplace_range)(self, _it_ptr(it), &raw, &raw + 1);
 }
-#endif // !_i_no_emplace
+#endif // !i_no_emplace
 
-#if !defined _i_no_cmp
+#if !defined i_no_cmp
 
 STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, _cx_raw raw) {
@@ -402,7 +402,7 @@ _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
     return c_init(_cx_iter){p2 == end ? NULL : p1, end - len};
 }
 
-#if !defined _i_no_clone
+#if !defined i_no_clone
 STC_DEF _cx_iter
 _cx_memb(_copy_range)(_cx_self* self, _cx_value* pos,
                       const _cx_value* p1, const _cx_value* p2) {
@@ -412,9 +412,9 @@ _cx_memb(_copy_range)(_cx_self* self, _cx_value* pos,
             *p++ = i_keyclone((*p1));
     return it;
 }
-#endif // !_i_no_clone
+#endif // !i_no_clone
 
-#if !defined _i_no_emplace
+#if !defined i_no_emplace
 STC_DEF _cx_iter
 _cx_memb(_emplace_range)(_cx_self* self, _cx_value* pos,
                          const _cx_raw* p1, const _cx_raw* p2) {
@@ -424,9 +424,9 @@ _cx_memb(_emplace_range)(_cx_self* self, _cx_value* pos,
             *p++ = i_keyfrom((*p1));
     return it;
 }
-#endif // !_i_no_emplace
+#endif // !i_no_emplace
 
-#if !defined _i_no_cmp
+#if !defined i_no_cmp
 
 STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {

@@ -71,10 +71,10 @@ int main() {
 #define _i_prefix cbox_
 #endif
 #if !(defined i_cmp || defined i_less || defined i_keyclass || defined i_valclass)
-  #define _i_no_cmp
+  #define i_no_cmp
 #endif
 #if !(defined i_eq || defined i_hash || defined i_keyclass || defined i_valclass)
-  #define _i_no_hash
+  #define i_no_hash
 #endif
 #include "template.h"
 typedef i_keyraw _cx_raw;
@@ -128,7 +128,7 @@ STC_INLINE void _cx_memb(_reset_to)(_cx_self* self, _cx_value* p) {
     self->get = p;
 }
 
-#ifndef _i_no_emplace
+#ifndef i_no_emplace
 STC_INLINE _cx_self _cx_memb(_from)(_cx_raw raw)
     { return _cx_memb(_make)(i_keyfrom(raw)); }
 #else
@@ -136,7 +136,7 @@ STC_INLINE _cx_self _cx_memb(_from)(_cx_value val)
     { return _cx_memb(_make)(val); }
 #endif
 
-#if !defined _i_no_clone
+#if !defined i_no_clone
     STC_INLINE _cx_self _cx_memb(_clone)(_cx_self other) {
         if (!other.get)
             return other;
@@ -144,7 +144,7 @@ STC_INLINE _cx_self _cx_memb(_from)(_cx_value val)
         *out.get = i_keyclone(*other.get);
         return out;
     }
-#endif // !_i_no_clone
+#endif // !i_no_clone
 
 STC_INLINE void _cx_memb(_take)(_cx_self* self, _cx_self other) {
     if (other.get != self->get)
@@ -153,7 +153,7 @@ STC_INLINE void _cx_memb(_take)(_cx_self* self, _cx_self other) {
 }
 
 STC_INLINE int _cx_memb(_raw_cmp)(const _cx_raw* rx, const _cx_raw* ry) {
-    #if defined _i_no_cmp
+    #if defined i_no_cmp
         return memcmp(rx, ry, sizeof *rx);
     #else
         return i_cmp(rx, ry);
@@ -161,7 +161,7 @@ STC_INLINE int _cx_memb(_raw_cmp)(const _cx_raw* rx, const _cx_raw* ry) {
 }
 
 STC_INLINE uint64_t _cx_memb(_raw_hash)(const _cx_raw* rx) {
-    #if defined _i_no_hash
+    #if defined i_no_hash
         return c_default_hash(rx);
     #else
         return i_hash(rx);
@@ -169,7 +169,7 @@ STC_INLINE uint64_t _cx_memb(_raw_hash)(const _cx_raw* rx) {
 }
 
 STC_INLINE bool _cx_memb(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry) {
-    #if defined _i_no_hash
+    #if defined i_no_hash
         return memcmp(rx, ry, sizeof *rx) == 0;
     #else
         return i_eq(rx, ry);
