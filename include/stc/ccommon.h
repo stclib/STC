@@ -104,9 +104,11 @@
 #define c_is_forward            (1<<0)
 #define c_no_atomic             (1<<1)
 #define c_no_clone              (1<<2)
-#define c_no_cmp                (1<<3)
-#define c_no_hash               (1<<4)
-#define c_no_emplace            (1<<5)
+#define c_no_emplace            (1<<3)
+#define c_no_cmp                (1<<4)
+#define c_no_eq                 (1<<5)
+#define c_no_hash               (1<<6)
+#define c_no_lookup             (c_no_cmp|c_no_eq|c_no_hash)
 
 /* Generic algorithms */
 

@@ -92,6 +92,9 @@
 #if c_option(c_no_cmp)
   #define i_no_cmp
 #endif
+#if c_option(c_no_eq)
+  #define i_no_eq
+#endif
 #if c_option(c_no_hash)
   #define i_no_hash
 #endif
@@ -119,7 +122,7 @@
   #define i_keyclass i_keyboxed
   #define i_rawclass c_paste(i_keyboxed, _raw)
   #define i_keyfrom c_paste(i_keyboxed, _from)
-  #if !defined i_no_hash
+  #ifndef i_no_eq
     #define i_eq c_paste(i_keyboxed, _raw_eq)
   #endif
 #endif
@@ -316,6 +319,7 @@
 #undef i_extern
 
 #undef i_no_cmp
+#undef i_no_eq
 #undef i_no_hash
 #undef i_no_clone
 #undef i_no_emplace

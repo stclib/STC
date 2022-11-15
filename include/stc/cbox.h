@@ -70,12 +70,6 @@ int main() {
 #ifndef _i_prefix
 #define _i_prefix cbox_
 #endif
-#if !(defined i_cmp || defined i_less || defined i_keyclass || defined i_valclass)
-  #define i_no_cmp
-#endif
-#if !(defined i_eq || defined i_hash || defined i_keyclass || defined i_valclass)
-  #define i_no_hash
-#endif
 #include "template.h"
 typedef i_keyraw _cx_raw;
 
@@ -152,40 +146,32 @@ STC_INLINE void _cx_memb(_take)(_cx_self* self, _cx_self other) {
     *self = other;
 }
 
-STC_INLINE int _cx_memb(_raw_cmp)(const _cx_raw* rx, const _cx_raw* ry) {
-    #if defined i_no_cmp
-        return memcmp(rx, ry, sizeof *rx);
-    #else
-        return i_cmp(rx, ry);
-    #endif
-}
-
-STC_INLINE uint64_t _cx_memb(_raw_hash)(const _cx_raw* rx) {
-    #if defined i_no_hash
-        return c_default_hash(rx);
-    #else
-        return i_hash(rx);
-    #endif
-}
-
-STC_INLINE bool _cx_memb(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry) {
-    #if defined i_no_hash
-        return memcmp(rx, ry, sizeof *rx) == 0;
-    #else
-        return i_eq(rx, ry);
-    #endif
-}
-
-STC_INLINE uint64_t _cx_memb(_hash)(const _cx_self* x)
-    { _cx_raw rx = i_keyto(x->get); return _cx_memb(_raw_hash)(&rx); }
+#ifndef i_no_cmp
+STC_INLINE int _cx_memb(_raw_cmp)(const _cx_raw* rx, const _cx_raw* ry)
+    { return i_cmp(rx, ry); }
 
 STC_INLINE int _cx_memb(_cmp)(const _cx_self* x, const _cx_self* y) {
     _cx_raw rx = i_keyto(x->get), ry = i_keyto(y->get);
-    return _cx_memb(_raw_cmp)(&rx, &ry);
+    return i_cmp(&rx, &ry);
 }
+#endif
+
+#ifndef i_no_eq
+STC_INLINE bool _cx_memb(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
+    { return i_eq(rx, ry); }
 
 STC_INLINE bool _cx_memb(_eq)(const _cx_self* x, const _cx_self* y) {
     _cx_raw rx = i_keyto(x->get), ry = i_keyto(y->get);
-    return _cx_memb(_raw_eq)(&rx, &ry);
+    return i_eq(&rx, &ry);
 }
+#endif
+
+#ifndef i_no_hash
+STC_INLINE uint64_t _cx_memb(_raw_hash)(const _cx_raw* rx)
+    { return i_hash(rx); }
+
+STC_INLINE uint64_t _cx_memb(_hash)(const _cx_self* x)
+    { _cx_raw rx = i_keyto(x->get); return i_hash(&rx); }
+#endif
+
 #include "template.h"
