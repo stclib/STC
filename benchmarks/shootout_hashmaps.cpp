@@ -315,7 +315,7 @@ int main(int argc, char* argv[])
     unsigned n_mill = argc >= 2 ? atoi(argv[1]) : DEFAULT_N_MILL;
     unsigned keybits = argc >= 3 ? atoi(argv[2]) : DEFAULT_KEYBITS;
     unsigned n = n_mill * 1000000;
-    unsigned N1 = n/2, N2 = n/2, N3 = n, N4 = n, N5 = n;
+    unsigned N1 = n, N2 = n, N3 = n*2, N4 = n*2, N5 = n*2;
     stc64_t rng;
     size_t seed = time(NULL);
 
@@ -334,18 +334,18 @@ int main(int argc, char* argv[])
 
     printf("Seed = %" c_ZU ":\n", seed);
 
-    printf("\nT1: Insert %d mill. random keys range [0, 2^%d): map[rnd] = i;\n", n_mill, keybits);
+    printf("\nT1: Insert %g mill. random keys range [0, 2^%u): map[rnd] = i;\n", N1/1000000.0, keybits);
     RUN_TEST(1)
 
-    printf("\nT2: Insert %d mill. SEQUENTIAL keys, erase them in same order:\n", n_mill);
+    printf("\nT2: Insert %g mill. SEQUENTIAL keys, erase them in same order:\n", N2/1000000.0);
     RUN_TEST(2)
 
-    printf("\nT3: Erase the same elements that was inserted in T1, key range [0, 2^%d)\n", keybits);
+    printf("\nT3: Erase all elements (%u mill. random inserts), key range [0, 2^%u)\n", n_mill*2, keybits);
     RUN_TEST(3)
 
-    printf("\nT4: Iterate the elements inserted in T1 repeated times:\n");
+    printf("\nT4: Iterate map repeated times:\n");
     RUN_TEST(4)
 
-    printf("\nT5: Lookup half-half random/existing keys in range [0, 2^%d). Num lookups depends on size.\n", keybits);
+    printf("\nT5: Lookup half-half random/existing keys in range [0, 2^%u). Num lookups depends on size.\n", keybits);
     RUN_TEST(5)
 }
