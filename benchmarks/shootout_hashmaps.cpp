@@ -15,6 +15,9 @@
 #include "external/skarupke/flat_hash_map.hpp"
 #include "external/tsl/robin_map.h"
 #include "external/emhash/hash_table7.hpp"
+#ifdef HAVE_BOOST
+#include <boost/unordered/unordered_flat_map.hpp>
+#endif
 //#include "external/skarupke/bytell_hash_map.hpp"
 //#include "external/parallel_hashmap/phmap.h"
 //#include "external/tsl/hopscotch_map.h"
@@ -95,6 +98,19 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 #define FMAP_BUCKETS(X)           UMAP_BUCKETS(X)
 #define FMAP_CLEAR(X)             UMAP_CLEAR(X)
 #define FMAP_DTOR(X)              UMAP_DTOR(X)
+
+#define BMAP_SETUP(X, Key, Value) boost::unordered_flat_map<Key, Value> map; \
+                                  map.max_load_factor(MAX_LOAD_FACTOR/100.0f)
+#define BMAP_PUT(X, key, val)     UMAP_PUT(X, key, val)
+#define BMAP_EMPLACE(X, key, val) UMAP_EMPLACE(X, key, val)
+#define BMAP_FIND(X, key)         UMAP_FIND(X, key)
+#define BMAP_ERASE(X, key)        UMAP_ERASE(X, key)
+#define BMAP_FOR(X, i)            UMAP_FOR(X, i)
+#define BMAP_ITEM(X, i)           UMAP_ITEM(X, i)
+#define BMAP_SIZE(X)              UMAP_SIZE(X)
+#define BMAP_BUCKETS(X)           UMAP_BUCKETS(X)
+#define BMAP_CLEAR(X)             UMAP_CLEAR(X)
+#define BMAP_DTOR(X)              UMAP_DTOR(X)
 
 #define HMAP_SETUP(X, Key, Value) tsl::hopscotch_map<Key, Value> map; \
                                   map.max_load_factor(MAX_LOAD_FACTOR/100.0f)
@@ -181,10 +197,10 @@ KHASH_MAP_INIT_INT64(ii, IValue)
     SEED(seed); \
     clock_t difference, before = clock(); \
     for (size_t i = 0; i < n; ++i) { \
-        sum += ++ M##_PUT(X, RAND(keybits), i); \
+        sum += M##_PUT(X, RAND(keybits), i); \
     } \
     difference = clock() - before; \
-    printf(#M ": time: %5.03f, size: %" c_ZU ", buckets: %8" c_ZU ", sum: %" c_ZU "\n", \
+    printf(#M ": %5.03f s, size: %" c_ZU ", buckets: %8" c_ZU ", sum: %" c_ZU "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), sum); \
     M##_DTOR(X); \
 }
@@ -199,7 +215,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
     for (size_t i = 0; i < n; ++i) \
         erased += M##_ERASE(X, i); \
     difference = clock() - before; \
-    printf(#M ": time: %5.03f, size: %" c_ZU ", buckets: %8" c_ZU ", erased %" c_ZU "\n", \
+    printf(#M ": %5.03f s, size: %" c_ZU ", buckets: %8" c_ZU ", erased %" c_ZU "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), erased); \
     M##_DTOR(X); \
 }
@@ -217,7 +233,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
     for (size_t i = 0; i < n; ++i) \
         erased += M##_ERASE(X, RAND(keybits)); \
     difference = clock() - before; \
-    printf(#M ": time: %5.03f, size: %" c_ZU ", buckets: %8" c_ZU ", erased %" c_ZU "\n", \
+    printf(#M ": %5.03f s, size: %" c_ZU ", buckets: %8" c_ZU ", erased %" c_ZU "\n", \
            (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), erased); \
     M##_DTOR(X); \
 }
@@ -225,51 +241,64 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 #define MAP_TEST4(M, X, n) \
 {   /* Iterate */ \
     M##_SETUP(X, IKey, IValue); \
-    size_t sum = 0, m = 1ull << (keybits + 1), nn = n; \
-    if (nn < m) m = nn; \
+    size_t sum = 0, m = 1ull << (keybits + 1), _n = n; \
+    if (_n < m) m = _n; \
     SEED(seed); \
     for (size_t i = 0; i < m; ++i) \
         M##_EMPLACE(X, RAND(keybits), i); \
-    size_t rep = 70000000ull/M##_SIZE(X); \
+    size_t rep = 30000000ull/M##_SIZE(X); \
     clock_t difference, before = clock(); \
     for (size_t k=0; k < rep; k++) M##_FOR (X, it) \
         sum += M##_ITEM(X, it); \
     difference = clock() - before; \
-    printf(#M ": time: %5.03f, size: %" c_ZU ", buckets: %8" c_ZU ", repeats: %" c_ZU ", sum: %" c_ZU "\n", \
-           (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), rep, sum); \
+    printf(#M ": %5.03f s, size: %" c_ZU ", buckets: %8" c_ZU ", repeats: %" c_ZU ", check: %" c_ZU "\n", \
+           (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), rep, sum & 0xffff); \
     M##_DTOR(X); \
 }
 
 #define MAP_TEST5(M, X, n) \
 {   /* Lookup */ \
     M##_SETUP(X, IKey, IValue); \
-    size_t found = 0, m = 1ull << (keybits + 1), nn = n; \
+    size_t found = 0, m = 1ull << (keybits + 1), _n = n; \
     clock_t difference, before; \
-    if (nn < m) m = nn; \
+    if (_n < m) m = _n; \
     SEED(seed); \
     for (size_t i = 0; i < m; ++i) \
         M##_EMPLACE(X, RAND(keybits), i); \
     before = clock(); \
+    /* Lookup x random keys */ \
     size_t x = m * 3000000ull/M##_SIZE(X); \
     for (size_t i = 0; i < x; ++i) \
         found += M##_FIND(X, RAND(keybits)); \
+    /* Lookup x existing keys by resetting seed */ \
     SEED(seed); \
     for (size_t i = 0; i < x; ++i) \
         found += M##_FIND(X, RAND(keybits)); \
     difference = clock() - before; \
-    printf(#M ": time: %5.03f, size: %" c_ZU ", buckets: %8" c_ZU ", lookups: %" c_ZU ", found: %" c_ZU "\n", \
-           (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), (size_t) M##_BUCKETS(X), x*2, found); \
+    printf(#M ": %5.03f s, size: %" c_ZU ", lookups: %" c_ZU ", found: %" c_ZU "\n", \
+           (float) difference / CLOCKS_PER_SEC, (size_t) M##_SIZE(X), x*2, found); \
     M##_DTOR(X); \
 }
 
 
 #ifdef __cplusplus
-#define RUN_TEST(n) MAP_TEST##n(KMAP, ii, N##n) MAP_TEST##n(CMAP, ii, N##n) \
-                    MAP_TEST##n(FMAP, ii, N##n) MAP_TEST##n(TMAP, ii, N##n) \
-                    MAP_TEST##n(RMAP, ii, N##n) MAP_TEST##n(DMAP, ii, N##n) \
-                    MAP_TEST##n(EMAP, ii, N##n) MAP_TEST##n(UMAP, ii, N##n)
+#ifdef HAVE_BOOST
+#define MAP_TEST_BOOST(n, X) MAP_TEST##n(BMAP, X, N##n)
 #else
-#define RUN_TEST(n) MAP_TEST##n(KMAP, ii, N##n) MAP_TEST##n(CMAP, ii, N##n)
+#define MAP_TEST_BOOST(n, X)
+#endif
+#define RUN_TEST(n) MAP_TEST##n(KMAP, ii, N##n) \
+                    MAP_TEST_BOOST(n, ii) \
+                    MAP_TEST##n(CMAP, ii, N##n) \
+                    MAP_TEST##n(FMAP, ii, N##n) \
+                    MAP_TEST##n(TMAP, ii, N##n) \
+                    MAP_TEST##n(RMAP, ii, N##n) \
+                    MAP_TEST##n(DMAP, ii, N##n) \
+                    MAP_TEST##n(EMAP, ii, N##n) \
+                    MAP_TEST##n(UMAP, ii, N##n)
+#else
+#define RUN_TEST(n) MAP_TEST##n(KMAP, ii, N##n) \
+                    MAP_TEST##n(CMAP, ii, N##n)
 #endif
 
 enum {
@@ -279,6 +308,10 @@ enum {
 
 int main(int argc, char* argv[])
 {
+    if (argc < 2) {
+      printf("Usage %s n-million [key-bits (default %d)]\n\n", argv[0], DEFAULT_KEYBITS);
+      return 0;
+    }
     unsigned n_mill = argc >= 2 ? atoi(argv[1]) : DEFAULT_N_MILL;
     unsigned keybits = argc >= 3 ? atoi(argv[2]) : DEFAULT_KEYBITS;
     unsigned n = n_mill * 1000000;
@@ -288,6 +321,7 @@ int main(int argc, char* argv[])
 
     printf("\nUnordered hash map shootout\n");
     printf("KMAP = https://github.com/attractivechaos/klib\n"
+           "BMAP = https://www.boost.org (unordered_flat_map)\n"
            "CMAP = https://github.com/tylov/STC (**)\n"
            //"PMAP = https://github.com/greg7mdp/parallel-hashmap\n"
            "FMAP = https://github.com/skarupke/flat_hash_map\n"
@@ -298,21 +332,20 @@ int main(int argc, char* argv[])
            "EMAP = https://github.com//ktprime/emhash\n"
            "UMAP = std::unordered_map\n\n");
 
-    printf("Usage %s [n-million=%d key-bits=%d]\n", argv[0], DEFAULT_N_MILL, DEFAULT_KEYBITS);
-    printf("N-base = %d. Random keys are in range [0, 2^%d). Seed = %" c_ZU ":\n", n_mill, keybits, seed);
+    printf("Seed = %" c_ZU ":\n", seed);
 
-    printf("\nT1: Insert/update random keys:\n");
+    printf("\nT1: Insert %d mill. random keys range [0, 2^%d): map[rnd] = i;\n", n_mill, keybits);
     RUN_TEST(1)
 
-    printf("\nT2: Insert sequential keys, then remove them in same order:\n");
+    printf("\nT2: Insert %d mill. SEQUENTIAL keys, erase them in same order:\n", n_mill);
     RUN_TEST(2)
 
-    printf("\nT3: Remove random keys:\n");
+    printf("\nT3: Erase the same elements that was inserted in T1, key range [0, 2^%d)\n", keybits);
     RUN_TEST(3)
 
-    printf("\nT4: Iterate random keys:\n");
+    printf("\nT4: Iterate the elements inserted in T1 repeated times:\n");
     RUN_TEST(4)
 
-    printf("\nT5: Lookup random keys:\n");
+    printf("\nT5: Lookup half-half random/existing keys in range [0, 2^%d). Num lookups depends on size.\n", keybits);
     RUN_TEST(5)
 }
