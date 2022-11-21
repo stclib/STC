@@ -6,7 +6,8 @@ if [ "$(uname)" = 'Linux' ]; then
     oflag='-o '
 fi
 
-cc=gcc; cflags="-s -O2 -Wall -std=c99 -pedantic -Wfatal-errors $sanitize"
+#cc=gcc; cflags="-s -O2 -Wall -std=c99 -pedantic -Wfatal-errors $sanitize"
+cc=gcc; cflags="-s -O2 -Werror -Wfatal-errors -Wall -Wpedantic -Wsign-compare -Wwrite-strings" # -Wconversion 
 #cc=tcc; cflags="-Wall -std=c99"
 #cc=clang; cflags="-s -O2 -Wall -std=c99 -pedantic -Wfatal-errors"
 #cc=clang; cflags="-s -O2 -Wall -std=c99 -pedantic -Wfatal-errors -DSTC_CSTR_V1 -DSTC_CSMAP_V1"

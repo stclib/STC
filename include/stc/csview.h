@@ -164,7 +164,7 @@ STC_API uint64_t csview_hash(const csview *self);
 
 STC_DEF size_t csview_find_sv(csview sv, csview search) {
     char* res = cstrnstrn(sv.str, search.str, sv.size, search.size);
-    return res ? res - sv.str : csview_npos;
+    return res ? (size_t)(res - sv.str) : csview_npos;
 }
 
 STC_DEF uint64_t csview_hash(const csview *self)
@@ -196,7 +196,7 @@ STC_DEF csview csview_token(csview sv, const char* sep, size_t* start) {
     size_t sep_size = strlen(sep);
     csview slice = {sv.str + *start, sv.size - *start};
     const char* res = cstrnstrn(slice.str, sep, slice.size, sep_size);
-    csview tok = {slice.str, res ? res - slice.str : slice.size};
+    csview tok = {slice.str, res ? (size_t)(res - slice.str) : slice.size};
     *start += tok.size + sep_size;
     return tok;
 }

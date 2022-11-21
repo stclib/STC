@@ -1,9 +1,6 @@
 #include <stdio.h>
 #include <time.h>
-#define i_static
 #include <stc/crandom.h>
-#include <stc/cstr.h>
-#include "external/khash.h"
 
 #define MAX_LOAD_FACTOR 77
 
@@ -32,6 +29,7 @@ typedef int64_t IKey;
 typedef int64_t IValue;
 
 // khash template expansion
+#include "external/khash.h"
 KHASH_MAP_INIT_INT64(ii, IValue)
 
 // cmap template expansion
@@ -223,14 +221,14 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 #define MAP_TEST3(M, X, n) \
 {   /* Erase elements */ \
     M##_SETUP(X, IKey, IValue); \
-    size_t erased = 0; \
+    size_t erased = 0, _n = (n)*2; \
     clock_t difference, before; \
     SEED(seed); \
-    for (size_t i = 0; i < n; ++i) \
+    for (size_t i = 0; i < _n; ++i) \
         M##_EMPLACE(X, RAND(keybits), i); \
     SEED(seed); \
     before = clock(); \
-    for (size_t i = 0; i < n; ++i) \
+    for (size_t i = 0; i < _n; ++i) \
         erased += M##_ERASE(X, RAND(keybits)); \
     difference = clock() - before; \
     printf(#M ": %5.03f s, size: %" c_ZU ", buckets: %8" c_ZU ", erased %" c_ZU "\n", \
@@ -246,7 +244,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
     SEED(seed); \
     for (size_t i = 0; i < m; ++i) \
         M##_EMPLACE(X, RAND(keybits), i); \
-    size_t rep = 30000000ull/M##_SIZE(X); \
+    size_t rep = 60000000ull/M##_SIZE(X); \
     clock_t difference, before = clock(); \
     for (size_t k=0; k < rep; k++) M##_FOR (X, it) \
         sum += M##_ITEM(X, it); \
@@ -267,7 +265,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
         M##_EMPLACE(X, RAND(keybits), i); \
     before = clock(); \
     /* Lookup x random keys */ \
-    size_t x = m * 3000000ull/M##_SIZE(X); \
+    size_t x = m * 8000000ull/M##_SIZE(X); \
     for (size_t i = 0; i < x; ++i) \
         found += M##_FIND(X, RAND(keybits)); \
     /* Lookup x existing keys by resetting seed */ \
@@ -315,7 +313,7 @@ int main(int argc, char* argv[])
     unsigned n_mill = argc >= 2 ? atoi(argv[1]) : DEFAULT_N_MILL;
     unsigned keybits = argc >= 3 ? atoi(argv[2]) : DEFAULT_KEYBITS;
     unsigned n = n_mill * 1000000;
-    unsigned N1 = n, N2 = n, N3 = n*2, N4 = n*2, N5 = n*2;
+    unsigned N1 = n, N2 = n, N3 = n, N4 = n, N5 = n;
     stc64_t rng;
     size_t seed = time(NULL);
 
@@ -340,12 +338,12 @@ int main(int argc, char* argv[])
     printf("\nT2: Insert %g mill. SEQUENTIAL keys, erase them in same order:\n", N2/1000000.0);
     RUN_TEST(2)
 
-    printf("\nT3: Erase all elements (%u mill. random inserts), key range [0, 2^%u)\n", n_mill*2, keybits);
+    printf("\nT3: Erase all elements by lookup (%u mill. random inserts), key range [0, 2^%u)\n", n_mill*2, keybits);
     RUN_TEST(3)
 
-    printf("\nT4: Iterate map repeated times:\n");
+    printf("\nT4: Iterate map with Min(%u mill, 2^%u) inserts repeated times:\n", n_mill, keybits+1);
     RUN_TEST(4)
 
-    printf("\nT5: Lookup half-half random/existing keys in range [0, 2^%u). Num lookups depends on size.\n", keybits);
+    printf("\nT5: Lookup mix of random/existing keys in range [0, 2^%u). Num lookups depends on size.\n", keybits);
     RUN_TEST(5)
 }

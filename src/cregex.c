@@ -79,7 +79,7 @@ typedef struct _Reprog
 {
     _Reinst  *startinst;     /* start pc */
     _Reflags flags;
-    int nsubids;
+    unsigned nsubids;
     _Reclass cclass[_NCLASS]; /* .data */
     _Reinst  firstinst[];    /* .text : originally 5 elements? */
 } _Reprog;
@@ -224,15 +224,13 @@ utfruneicase(const char *s, _Rune c)
  *  save a new match in mp
  */
 static void
-_renewmatch(_Resub *mp, unsigned ms, _Resublist *sp, int nsubids)
+_renewmatch(_Resub *mp, unsigned ms, _Resublist *sp, unsigned nsubids)
 {
-    int i;
-
     if (mp==NULL || ms==0)
         return;
     if (mp[0].str == NULL || sp->m[0].str < mp[0].str ||
        (sp->m[0].str == mp[0].str && sp->m[0].size > mp[0].size)) {
-        for (i=0; i<ms && i<=nsubids; i++)
+        for (unsigned i=0; i<ms && i<=nsubids; i++)
             mp[i] = sp->m[i];
     }
 }
@@ -937,9 +935,9 @@ _regexec1(const _Reprog *progp,  /* program to run */
     _Relist *tl, *nl;    /* This list, next list */
     _Relist *tle, *nle;  /* Ends of this and next list */
     const char *s, *p;
-    int i, n, checkstart;
     _Rune r, *rp, *ep;
-    int match = 0;
+    int n, checkstart, match = 0;
+    unsigned i;
 
     bool icase = progp->flags.caseless;
     checkstart = j->starttype;
@@ -1157,7 +1155,7 @@ _build_subst(const char* replace, unsigned nmatch, const csview match[],
     while (*replace != '\0') {
         if (*replace == '$') {
             const int arg = *++replace;
-            int g;
+            unsigned g;
             switch (arg) {
             case '0': case '1': case '2': case '3': case '4':
             case '5': case '6': case '7': case '8': case '9':
