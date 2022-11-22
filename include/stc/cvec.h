@@ -44,16 +44,16 @@ struct MyStruct {
 #include <stc/cvec.h>
 
 int main() {
-    cvec_i32 vec = cvec_i32_init();
-    cvec_i32_push_back(&vec, 123);
+    cvec_i32 vec = {0};
+    cvec_i32_push(&vec, 123);
     cvec_i32_drop(&vec);
 
-    cvec_float fvec = cvec_float_init();
-    cvec_float_push_back(&fvec, 123.3);
+    cvec_float fvec = {0};
+    cvec_float_push(&fvec, 123.3);
     cvec_float_drop(&fvec);
 
-    cvec_str svec = cvec_str_init();
-    cvec_str_emplace_back(&svec, "Hello, friend");
+    cvec_str svec = {0};
+    cvec_str_emplace(&svec, "Hello, friend");
     cvec_str_drop(&svec);
 }
 */
@@ -209,7 +209,7 @@ STC_INLINE _cx_iter _cx_memb(_advance)(_cx_iter it, intptr_t n)
     { if ((it.ref += n) >= it.end) it.ref = NULL; return it; }
 
 STC_INLINE size_t _cx_memb(_index)(const _cx_self* self, _cx_iter it) 
-    { return it.ref - self->data; }
+    { return (size_t)(it.ref - self->data); }
 
 #if !defined i_no_cmp
 
@@ -242,7 +242,7 @@ _cx_memb(_lower_bound)(const _cx_self* self, _cx_raw raw) {
 
 STC_INLINE void
 _cx_memb(_sort_range)(_cx_iter i1, _cx_iter i2, int(*cmp)(const _cx_value*, const _cx_value*)) {
-    qsort(i1.ref, _it2_ptr(i1, i2) - i1.ref, sizeof(_cx_value),
+    qsort(i1.ref, (size_t)(_it2_ptr(i1, i2) - i1.ref), sizeof(_cx_value),
           (int(*)(const void*, const void*)) cmp);
 }
 
@@ -316,7 +316,7 @@ STC_DEF _cx_iter
 _cx_memb(_insert_uninit)(_cx_self* self, _cx_value* pos, const size_t n) {
     if (n) {
         if (!pos) pos = self->data + self->_len;
-        const size_t idx = pos - self->data;
+        const size_t idx = (size_t)(pos - self->data);
         if (self->_len + n > self->_cap) {
             if (!_cx_memb(_reserve)(self, self->_len*3/2 + n))
                 return _cx_memb(_end)(self);
@@ -331,20 +331,19 @@ _cx_memb(_insert_uninit)(_cx_self* self, _cx_value* pos, const size_t n) {
 STC_DEF _cx_iter
 _cx_memb(_insert_range)(_cx_self* self, _cx_value* pos,
                         const _cx_value* p1, const _cx_value* p2) {
-    _cx_iter it = _cx_memb(_insert_uninit)(self, pos, p2 - p1);
+    _cx_iter it = _cx_memb(_insert_uninit)(self, pos, (size_t)(p2 - p1));
     if (it.ref)
-        memcpy(it.ref, p1, (p2 - p1)*sizeof *p1);
+        memcpy(it.ref, p1, (size_t)(p2 - p1)*sizeof *p1);
     return it;
 }
 
 STC_DEF _cx_iter
 _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
-    assert(p1 && p2);
-    intptr_t len = p2 - p1;
+    size_t len = (size_t)(p2 - p1);
     _cx_value* p = p1, *end = self->data + self->_len;
     for (; p != p2; ++p)
         { i_keydrop(p); }
-    memmove(p1, p2, (end - p2) * sizeof *p1);
+    memmove(p1, p2, (size_t)(end - p2)*sizeof *p1);
     self->_len -= len;
     return c_init(_cx_iter){p2 == end ? NULL : p1, end - len};
 }
@@ -360,7 +359,7 @@ _cx_memb(_clone)(_cx_self cx) {
 STC_DEF _cx_iter
 _cx_memb(_copy_range)(_cx_self* self, _cx_value* pos,
                       const _cx_value* p1, const _cx_value* p2) {
-    _cx_iter it = _cx_memb(_insert_uninit)(self, pos, p2 - p1);
+    _cx_iter it = _cx_memb(_insert_uninit)(self, pos, (size_t)(p2 - p1));
     if (it.ref)
         for (_cx_value* p = it.ref; p1 != p2; ++p1)
             *p++ = i_keyclone((*p1));
@@ -372,7 +371,7 @@ _cx_memb(_copy_range)(_cx_self* self, _cx_value* pos,
 STC_DEF _cx_iter
 _cx_memb(_emplace_range)(_cx_self* self, _cx_value* pos,
                          const _cx_raw* p1, const _cx_raw* p2) {
-    _cx_iter it = _cx_memb(_insert_uninit)(self, pos, p2 - p1);
+    _cx_iter it = _cx_memb(_insert_uninit)(self, pos, (size_t)(p2 - p1));
     if (it.ref)
         for (_cx_value* p = it.ref; p1 != p2; ++p1)
             *p++ = i_keyfrom((*p1));

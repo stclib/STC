@@ -31,7 +31,7 @@ STC_INLINE uint32_t utf8_decode(utf8_decode_t* d, const uint32_t byte) {
     extern const uint8_t utf8_dtab[]; /* utf8code.c */
     const uint32_t type = utf8_dtab[byte];
     d->codep = d->state ? (byte & 0x3fu) | (d->codep << 6)
-                        : (0xff >> type) & byte;
+                        : (0xffU >> type) & byte;
     return d->state = utf8_dtab[256 + d->state + type];
 }
 
@@ -86,6 +86,6 @@ STC_INLINE const char* utf8_at(const char *s, size_t index) {
 }
 
 STC_INLINE size_t utf8_pos(const char* s, size_t index)
-    { return utf8_at(s, index) - s; }
+    { return (size_t)(utf8_at(s, index) - s); }
 
 #endif

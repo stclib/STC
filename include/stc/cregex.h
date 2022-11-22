@@ -99,7 +99,7 @@ cregex cregex_from(const char* pattern, int cflags) {
 }
 
 /* number of capture groups in a regex pattern, 0 if regex is invalid */
-int cregex_captures(const cregex* self);
+unsigned cregex_captures(const cregex* self);
 
 /* return cre_success, cre_nomatch or cre_matcherror. */
 int cregex_find(const cregex* re, const char* input,

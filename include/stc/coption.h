@@ -129,7 +129,7 @@ static int coption_get(coption *opt, int argc, char *argv[],
             const coption_long *o = 0, *o_exact = 0, *o_partial = 0;
             for (j = 2; argv[opt->_i][j] != '\0' && argv[opt->_i][j] != '='; ++j) {} /* find the end of the option name */
             for (k = 0; longopts[k].name != 0; ++k)
-                if (strncmp(&argv[opt->_i][2], longopts[k].name, j - 2) == 0) {
+                if (strncmp(&argv[opt->_i][2], longopts[k].name, (size_t)(j - 2)) == 0) {
                     if (longopts[k].name[j - 2] == 0) ++n_exact, o_exact = &longopts[k];
                     else ++n_partial, o_partial = &longopts[k];
                 }

@@ -67,7 +67,7 @@ uint32_t utf8_casefold(uint32_t c) {
             if (c < entry.c1) return c;
             int d = entry.m2 - entry.c2;
             if (d == 1) return c + ((entry.c2 & 1) == (c & 1));
-            return c + d;
+            return (uint32_t)((int)c + d);
         }
     }
     return c;
@@ -80,7 +80,7 @@ uint32_t utf8_tolower(uint32_t c) {
             if (c < entry.c1) return c;
             int d = entry.m2 - entry.c2;
             if (d == 1) return c + ((entry.c2 & 1) == (c & 1));
-            return c + d;
+            return (uint32_t)((int)c + d);
         }
     }
     return c;
@@ -93,7 +93,7 @@ uint32_t utf8_toupper(uint32_t c) {
             int d = entry.m2 - entry.c2;
             if (c < (uint32_t)(entry.c1 + d)) return c;
             if (d == 1) return c - ((entry.m2 & 1) == (c & 1));
-            return c - d;
+            return (uint32_t)((int)c - d);
         }
     }
     return c;
@@ -105,11 +105,11 @@ int utf8_icmp_sv(const csview s1, const csview s2) {
     while ((j1 < s1.size) & (j2 < s2.size)) {
         do { utf8_decode(&d1, (uint8_t)s1.str[j1++]); } while (d1.state);
         do { utf8_decode(&d2, (uint8_t)s2.str[j2++]); } while (d2.state);
-        int32_t c = utf8_casefold(d1.codep) - utf8_casefold(d2.codep);
+        int32_t c = (int32_t)utf8_casefold(d1.codep) - (int32_t)utf8_casefold(d2.codep);
         if (c || !s2.str[j2 - 1]) // OK if s1.size and s2.size are npos
-            return c;
+            return (int)c;
     }
-    return s1.size - s2.size;
+    return (int)(s1.size - s2.size);
 }
 
 bool utf8_isspace(uint32_t c) {
@@ -161,7 +161,7 @@ cstr cstr_tocase(csview sv, int k) {
     while (*sv.str) {
         do { utf8_decode(&d, (uint8_t)*sv.str++); } while (d.state);
         if (d.codep < 128)
-            buf[sz++] = (char)fn_tocase[k].conv_asc(d.codep);
+            buf[sz++] = (char)fn_tocase[k].conv_asc((int)d.codep);
         else {
             cp = fn_tocase[k].conv_utf(d.codep);
             sz += utf8_encode(buf + sz, cp);

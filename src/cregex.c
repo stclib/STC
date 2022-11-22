@@ -58,7 +58,7 @@ typedef struct _Reinst
     union {
         _Reclass *classp;        /* class pointer */
         _Rune    rune;           /* character */
-        int     subid;          /* sub-expression id for RE_RBRA and RE_LBRA */
+        int     subid;           /* sub-expression id for RE_RBRA and RE_LBRA */
         struct _Reinst *right;   /* right child of RE_OR */
     } r;
     union {    /* regexp relies on these two being in the same union */
@@ -184,7 +184,7 @@ chartorune(_Rune *rune, const char *s)
     const uint8_t *b = (const uint8_t*)s;
     do { utf8_decode(&ctx, *b++); } while (ctx.state);
     *rune = ctx.codep;
-    return (const char*)b - s;
+    return (int)((const char*)b - s);
 }
 
 static const char*
@@ -193,7 +193,7 @@ utfrune(const char *s, _Rune c)
     _Rune r;
 
     if (c < 128)        /* ascii */
-        return strchr((char *)s, c);
+        return strchr((char *)s, (int)c);
 
     for (;;) {
         int n = chartorune(&r, s);
@@ -522,10 +522,10 @@ _optimize(_Parser *par, _Reprog *pp)
      *  necessary.  Reallocate to the actual space used
      *  and then relocate the code.
      */
-    uintptr_t ipp = (uintptr_t)pp;
-    size_t size = sizeof(_Reprog) + (par->freep - pp->firstinst)*sizeof(_Reinst);
+    intptr_t ipp = (intptr_t)pp;
+    size_t size = sizeof(_Reprog) + (size_t)(par->freep - pp->firstinst)*sizeof(_Reinst);
     _Reprog *npp = (_Reprog *)c_realloc(pp, size);
-    ptrdiff_t diff = (uintptr_t)npp - ipp;
+    ptrdiff_t diff = (intptr_t)npp - ipp;
 
     if ((npp == NULL) | (diff == 0))
         return (_Reprog *)ipp;
@@ -603,11 +603,11 @@ _nextc(_Parser *par, _Rune *rp)
                 };
                 int inv = *rp == 'P';
                 for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
-                    if (!strncmp(par->exprp, cls[i].c, cls[i].n)) {
+                    if (!strncmp(par->exprp, cls[i].c, (size_t)cls[i].n)) {
                         if (par->rune_type == RE_IRUNE && (cls[i].r == UTF_lo || cls[i].r == UTF_up))
-                            *rp = UTF_al + inv;
+                            *rp = (_Rune)(UTF_al + inv);
                         else
-                            *rp = cls[i].r + inv;
+                            *rp = (_Rune)(cls[i].r + inv);
                         par->exprp += cls[i].n;
                         break;
                     }
@@ -733,13 +733,13 @@ _bldcclass(_Parser *par)
                 };
                 int inv = par->exprp[1] == '^', off = 1 + inv;
                 for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
-                    if (!strncmp(par->exprp + off, cls[i].c, cls[i].n)) {
-                        rune = cls[i].r;
+                    if (!strncmp(par->exprp + off, cls[i].c, (size_t)cls[i].n)) {
+                        rune = (_Rune)cls[i].r;
                         par->exprp += off + cls[i].n;
                         break;
                     }
                 if (par->rune_type == RE_IRUNE && (rune == ASC_lo || rune == ASC_up))
-                    rune = ASC_al;
+                    rune = (_Rune)ASC_al;
                 if (inv && rune != '[')
                     rune += 1;
             }
@@ -790,7 +790,7 @@ _regcomp1(_Reprog *progp, _Parser *par, const char *s, int cflags)
     _Token token;
 
     /* get memory for the program. estimated max usage */
-    const int instcap = 5 + 6*strlen(s);
+    const size_t instcap = 5 + 6*strlen(s);
     _Reprog* pp = (_Reprog *)c_realloc(progp, sizeof(_Reprog) + instcap*sizeof(_Reinst));
     if (pp == NULL) {
         par->error = cre_outofmemory;
@@ -847,7 +847,7 @@ _regcomp1(_Reprog *progp, _Parser *par, const char *s, int cflags)
     dump(pp);
 #endif
     pp = _optimize(par, pp);
-    pp->nsubids = par->cursubid;
+    pp->nsubids = (unsigned)par->cursubid;
 #ifdef DEBUG
     print("start: %d\n", par->andp->first-pp->firstinst);
     dump(pp);
@@ -1002,7 +1002,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
                     tlp->se.m[inst->r.subid].str = s;
                     continue;
                 case RE_RBRA:
-                    tlp->se.m[inst->r.subid].size = s - tlp->se.m[inst->r.subid].str;
+                    tlp->se.m[inst->r.subid].size = (size_t)(s - tlp->se.m[inst->r.subid].str);
                     continue;
                 case RE_ANY:
                     ok = (r != '\n');
@@ -1051,7 +1051,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
                     match = !(mflags & cre_m_fullmatch) ||
                             ((s == j->eol || r == 0 || r == '\n') &&
                             (tlp->se.m[0].str == bol || tlp->se.m[0].str[-1] == '\n'));
-                    tlp->se.m[0].size = s - tlp->se.m[0].str;
+                    tlp->se.m[0].size = (size_t)(s - tlp->se.m[0].str);
                     if (mp != NULL)
                         _renewmatch(mp, ms, &tlp->se, progp->nsubids);
                     break;
@@ -1148,21 +1148,21 @@ static void
 _build_subst(const char* replace, unsigned nmatch, const csview match[],
              bool (*mfun)(int, csview, cstr*), cstr* subst) {
     cstr_buf buf = cstr_buffer(subst);
-    unsigned len = 0, cap = buf.cap;
+    size_t len = 0, cap = buf.cap;
     char* dst = buf.data;
     cstr mstr = cstr_null;
 
     while (*replace != '\0') {
         if (*replace == '$') {
             const int arg = *++replace;
-            unsigned g;
+            int g;
             switch (arg) {
             case '0': case '1': case '2': case '3': case '4':
             case '5': case '6': case '7': case '8': case '9':
                 g = arg - '0';
                 if (replace[1] >= '0' && replace[1] <= '9' && replace[2] == ';')
                     { g = g*10 + (replace[1] - '0'); replace += 2; }
-                if (g < nmatch) {
+                if (g < (int)nmatch) {
                     csview m = mfun && mfun(g, match[g], &mstr) ? cstr_sv(&mstr) : match[g];
                     if (len + m.size > cap)
                         dst = cstr_reserve(subst, cap = cap*3/2 + m.size);
@@ -1194,9 +1194,9 @@ cregex_compile(cregex *self, const char* pattern, int cflags) {
     return self->error = par.error;
 }
 
-int
+unsigned
 cregex_captures(const cregex* self) {
-    return self->prog ? 1 + self->prog->nsubids : 0;
+    return self->prog ? 1U + self->prog->nsubids : 0U;
 }
 
 int
@@ -1228,12 +1228,12 @@ cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned 
     cstr subst = cstr_null;
     csview match[cre_MAXCAPTURES];
     unsigned nmatch = cregex_captures(re);
-    if (!count) count = ~0;
+    if (!count) count = ~0U;
     bool copy = !(rflags & cre_r_strip);
 
     while (count-- && cregex_find_sv(re, input, match) == cre_success) {
         _build_subst(replace, nmatch, match, mfun, &subst);
-        const size_t mpos = match[0].str - input.str;
+        const size_t mpos = (size_t)(match[0].str - input.str);
         if (copy & (mpos > 0)) cstr_append_n(&out, input.str, mpos);
         cstr_append_s(&out, subst);
         input.str = match[0].str + match[0].size;

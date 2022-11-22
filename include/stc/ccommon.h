@@ -183,7 +183,7 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
 #define c_forfilter_s(i, C, start, filter) \
     for (struct {C##_iter it; C##_value *ref; \
                  uint32_t s1[c_FLT_STACK], index, count; \
-                 uint8_t s2[c_FLT_STACK], s1top, s2top;} \
+                 bool s2[c_FLT_STACK]; uint8_t s1top, s2top;} \
          i = {.it=start, .ref=i.it.ref}; i.it.ref \
          ; C##_next(&i.it), i.ref = i.it.ref, ++i.index, i.s1top=0, i.s2top=0) \
       if (!((filter) && ++i.count)) ; else
@@ -203,9 +203,9 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
 #define c_forrange1(stop) c_forrange3(_c_i, 0, stop)
 #define c_forrange2(i, stop) c_forrange3(i, 0, stop)
 #define c_forrange3(i, start, stop) \
-    for (long long i=start, _end=stop; i < _end; ++i)
+    for (long long i=start, _end=(long long)(stop); i < _end; ++i)
 #define c_forrange4(i, start, stop, step) \
-    for (long long i=start, _inc=step, _end=(stop) - (_inc > 0) \
+    for (long long i=start, _inc=step, _end=(long long)(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)
 #ifndef __cplusplus
   #define c_forlist(it, T, ...) \

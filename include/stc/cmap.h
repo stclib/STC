@@ -109,12 +109,12 @@ STC_API void            _cx_memb(_erase_entry)(_cx_self* self, _cx_value* val);
 
 STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_init(_cx_self){0}; }
 STC_INLINE void         _cx_memb(_shrink_to_fit)(_cx_self* self) { _cx_memb(_reserve)(self, self->size); }
-STC_INLINE float        _cx_memb(_max_load_factor)(const _cx_self* self) { return i_max_load_factor; }
+STC_INLINE float        _cx_memb(_max_load_factor)(const _cx_self* self) { return (float)(i_max_load_factor); }
 STC_INLINE bool         _cx_memb(_empty)(const _cx_self* map) { return !map->size; }
 STC_INLINE size_t       _cx_memb(_size)(const _cx_self* map) { return map->size; }
 STC_INLINE size_t       _cx_memb(_bucket_count)(_cx_self* map) { return map->bucket_count; }
 STC_INLINE size_t       _cx_memb(_capacity)(const _cx_self* map)
-                            { return (size_t)(map->bucket_count * (i_max_load_factor)); }
+                            { return (size_t)((float)map->bucket_count * (i_max_load_factor)); }
 STC_INLINE void         _cx_memb(_swap)(_cx_self *map1, _cx_self *map2) {c_swap(_cx_self, *map1, *map2); }
 STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, _cx_rawkey rkey)
                             { return self->size && self->_hashx[_cx_memb(_bucket_)(self, &rkey).idx]; }
@@ -224,7 +224,7 @@ _cx_memb(_advance)(_cx_iter it, size_t n) {
 
 STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, _cx_rawkey rkey) {
-    i_size idx;
+    size_t idx;
     if (self->size && self->_hashx[idx = _cx_memb(_bucket_)(self, &rkey).idx])
         return c_init(_cx_iter){self->table + idx, 
                                 self->table + self->bucket_count,
@@ -234,7 +234,7 @@ _cx_memb(_find)(const _cx_self* self, _cx_rawkey rkey) {
 
 STC_INLINE const _cx_value*
 _cx_memb(_get)(const _cx_self* self, _cx_rawkey rkey) {
-    i_size idx;
+    size_t idx;
     if (self->size && self->_hashx[idx = _cx_memb(_bucket_)(self, &rkey).idx])
         return self->table + idx;
     return NULL;
@@ -249,7 +249,7 @@ _cx_memb(_erase)(_cx_self* self, _cx_rawkey rkey) {
     if (self->size == 0)
         return 0;
     chash_bucket_t b = _cx_memb(_bucket_)(self, &rkey);
-    return self->_hashx[b.idx] ? _cx_memb(_erase_entry)(self, self->table + b.idx), 1 : 0;
+    return self->_hashx[b.idx] ? _cx_memb(_erase_entry)(self, self->table + b.idx), 1U : 0U;
 }
 
 STC_INLINE _cx_iter
@@ -355,7 +355,7 @@ _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr) {
 STC_DEF _cx_result
 _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey) {
     bool nomem = false;
-    if (self->size + 2 > (i_size)(self->bucket_count * (i_max_load_factor)))
+    if (self->size + 2 > (i_size)((float)self->bucket_count * (i_max_load_factor)))
         nomem = !_cx_memb(_reserve)(self, self->size*3/2);
     chash_bucket_t b = _cx_memb(_bucket_)(self, &rkey);
     _cx_result res = {&self->table[b.idx], !self->_hashx[b.idx], nomem};
@@ -389,7 +389,7 @@ _cx_memb(_reserve)(_cx_self* self, const size_t _newcap) {
     const i_size _oldbuckets = self->bucket_count;
     if (_newcap != self->size && _newcap <= _oldbuckets)
         return true;
-    i_size _nbuckets = (i_size)(_newcap / (i_max_load_factor)) + 4;
+    i_size _nbuckets = (i_size)((float)_newcap / (i_max_load_factor)) + 4;
     #if _i_expandby == 2
     _nbuckets = (i_size)next_power_of_2(_nbuckets);
     #else
@@ -420,7 +420,7 @@ _cx_memb(_reserve)(_cx_self* self, const size_t _newcap) {
 
 STC_DEF void
 _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
-    i_size i = _val - self->table, j = i, k;
+    i_size i = (i_size)(_val - self->table), j = i, k;
     const i_size _cap = self->bucket_count;
     _cx_value* _slot = self->table;
     uint8_t* _hashx = self->_hashx;
@@ -431,7 +431,7 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
         if (! _hashx[j])
             break;
         const _cx_rawkey _raw = i_keyto(_i_keyref(_slot + j));
-        k = c_paste(fastrange_,_i_expandby)(i_hash_functor(self, (&_raw)), _cap);
+        k = (i_size)c_paste(fastrange_,_i_expandby)(i_hash_functor(self, (&_raw)), _cap);
         if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */
             _slot[i] = _slot[j], _hashx[i] = _hashx[j], i = j;
     }

@@ -241,7 +241,7 @@ _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
         return false;
     nodes[0] = c_init(_cx_node){{0, 0}, 0};
     self->nodes = nodes;
-    self->cap = cap;
+    self->cap = (i_size)cap;
     return true;
 }
 
@@ -276,7 +276,7 @@ _cx_memb(_new_node_)(_cx_self* self, int level) {
         tn = ++self->head; /* start with 1, 0 is nullnode. */
     }
     _cx_node* dn = &self->nodes[tn];
-    dn->link[0] = dn->link[1] = 0; dn->level = level;
+    dn->link[0] = dn->link[1] = 0; dn->level = (int8_t)level;
     return tn;
 }
 

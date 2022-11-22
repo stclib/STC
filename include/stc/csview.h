@@ -172,23 +172,23 @@ STC_DEF uint64_t csview_hash(const csview *self)
 
 STC_DEF csview csview_substr_ex(csview sv, intptr_t pos, size_t n) {
     if (pos < 0) { 
-        pos += sv.size;
+        pos += (intptr_t)sv.size;
         if (pos < 0) pos = 0;
     }
-    if (pos > (intptr_t)sv.size) pos = sv.size; 
-    if (pos + n > sv.size) n = sv.size - pos;
+    if ((size_t)pos > sv.size) pos = (intptr_t)sv.size;
+    if ((size_t)pos + n > sv.size) n = sv.size - (size_t)pos;
     sv.str += pos, sv.size = n;
     return sv;
 }
 
 STC_DEF csview csview_slice_ex(csview sv, intptr_t p1, intptr_t p2) {
     if (p1 < 0) { 
-        p1 += sv.size;
+        p1 += (intptr_t)sv.size;
         if (p1 < 0) p1 = 0;
     }
-    if (p2 < 0) p2 += sv.size;
-    if (p2 > (intptr_t)sv.size) p2 = sv.size;
-    sv.str += p1, sv.size = p2 > p1 ? p2 - p1 : 0;
+    if (p2 < 0) p2 += (intptr_t)sv.size;
+    if (p2 > (intptr_t)sv.size) p2 = (intptr_t)sv.size;
+    sv.str += p1, sv.size = (size_t)(p2 > p1 ? p2 - p1 : 0);
     return sv;
 }
 
