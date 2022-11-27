@@ -63,6 +63,28 @@ int main()
 
 #include <stc/ccommon.h>
 
+#ifndef c_FLT_STACK
+  #define c_FLT_STACK 14 /* 22, 30, .. */
+#endif
+#define c_flt_take(i, n) (++(i).s1[(i).s1top++] <= (n))
+#define c_flt_skip(i, n) (++(i).s1[(i).s1top++] > (n))
+#define c_flt_skipwhile(i, pred) ((i).s2[(i).s2top++] |= !(pred))
+#define c_flt_takewhile(i, pred) !c_flt_skipwhile(i, pred)
+
+#define c_forfilter(...) c_MACRO_OVERLOAD(c_forfilter, __VA_ARGS__)
+#define c_forfilter4(i, C, cnt, filter) \
+    c_forfilter_s(i, C, C##_begin(&cnt), filter)
+#define c_forfilter5(i, C, cnt, filter, cond) \
+    c_forfilter_s(i, C, C##_begin(&cnt), filter) if (!(cond)) break; else
+#define c_forfilter_s(i, C, start, filter) \
+    for (struct {C##_iter it; C##_value *ref; \
+                 uint32_t s1[c_FLT_STACK], index, count; \
+                 bool s2[c_FLT_STACK]; uint8_t s1top, s2top;} \
+         i = {.it=start, .ref=i.it.ref}; i.it.ref \
+         ; C##_next(&i.it), i.ref = i.it.ref, ++i.index, i.s1top=0, i.s2top=0) \
+      if (!((filter) && ++i.count)) ; else
+
+
 // clview type
 
 #define clview_literal(C, ...) \
