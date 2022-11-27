@@ -148,13 +148,6 @@ _cx_memb(_value_toraw)(const _cx_value* val) {
                                         i_valto((&val->second))} );
 }
 
-STC_INLINE int
-_cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
-    const _cx_rawkey rx = i_keyto(_i_keyref(x));
-    const _cx_rawkey ry = i_keyto(_i_keyref(y));
-    return i_cmp_functor(self, (&rx), (&ry));
-}
-
 STC_INLINE void
 _cx_memb(_value_drop)(_cx_value* val) {
     i_keydrop(_i_keyref(val));
