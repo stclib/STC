@@ -51,14 +51,10 @@ typedef union {
 
 typedef char cstr_value;
 typedef struct { cstr_value* data; size_t size, cap; } cstr_buf;
-#if defined STC_CSTR_V1
-    typedef struct { cstr_value* str; } cstr;
-#else
-    typedef union {
-        struct { cstr_value data[sizeof(cstr_buf) - 1]; unsigned char size; } sml;
-        struct { cstr_value* data; size_t size, ncap; } lon;
-    } cstr;
-#endif
+typedef union {
+    struct { cstr_value data[sizeof(cstr_buf) - 1]; unsigned char size; } sml;
+    struct { cstr_value* data; size_t size, ncap; } lon;
+} cstr;
 typedef union { 
     cstr_value* ref; 
     struct { csview chr; } u8;

@@ -14,9 +14,7 @@ int main ()
     cstr_assign(&str, "apples are green or red");
     cstr s2 = cstr_from_sv(cstr_substr_ex(&str, -3, 3));   // "red"
     cstr s3 = cstr_from_sv(cstr_substr_ex(&str, 0, 6));    // "apples"
-    #ifndef STC_CSTR_V1
     printf("%s %s: %d, %d\n", cstr_str(&s2), cstr_str(&s3), 
                               cstr_is_long(&str), cstr_is_long(&s2));
-    #endif
     c_drop (cstr, &str, &s2, &s3);
 }

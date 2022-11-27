@@ -22,7 +22,6 @@
  */
 #ifndef CSTR_H_INCLUDED
 #define CSTR_H_INCLUDED
-#define STC_CSTR_V1 1
 
 #include <stc/ccommon.h>
 #include <stc/forward.h>
@@ -32,6 +31,8 @@
 #include <stdio.h> /* vsnprintf */
 #include <ctype.h>
 
+typedef char cstr_value;
+typedef struct { cstr_value* str; } cstr;
 #define cstr_npos (SIZE_MAX >> 1)
 typedef struct { size_t size, cap; char chr[1]; } cstr_priv;
 #define _cstr_p(self) c_unchecked_container_of((self)->str, cstr_priv, chr)

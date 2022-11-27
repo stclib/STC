@@ -24,9 +24,6 @@
 /* A string type with short string optimization in C99 with good small-string
  * optimization (22 characters with 24 bytes string).
  */
-#ifdef STC_CSTR_V1
-#include "alt/cstr.h"
-#else
 #ifndef CSTR_H_INCLUDED
 #define CSTR_H_INCLUDED
 
@@ -631,4 +628,3 @@ STC_DEF size_t cstr_printf(cstr* self, const char* fmt, ...) {
 #undef i_static
 #undef i_implement
 #undef i_extern
-#endif // !STC_CSTR_V1
