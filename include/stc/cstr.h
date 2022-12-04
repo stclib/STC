@@ -420,10 +420,11 @@ fn_tocase[] = {{tolower, utf8_casefold},
 cstr cstr_tocase(csview sv, int k) {
     cstr out = cstr_init();
     char *buf = cstr_reserve(&out, sv.size*3/2);
+    const char *end = sv.str + sv.size;
     uint32_t cp; size_t sz = 0;
     utf8_decode_t d = {.state=0};
 
-    while (*sv.str) {
+    while (sv.str < end) {
         do { utf8_decode(&d, (uint8_t)*sv.str++); } while (d.state);
         if (d.codep < 128)
             buf[sz++] = (char)fn_tocase[k].conv_asc((int)d.codep);
