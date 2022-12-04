@@ -1,7 +1,6 @@
-#define i_implement
-#include <stc/cstr.h>
-#include <stc/csview.h>
+#define i_extern
 #include <stc/cregex.h>
+#include <stc/csview.h>
 
 bool add_10_years(int i, csview m, cstr* mstr) {
     if (i == 1) { // group 1 matches year
@@ -52,6 +51,3 @@ int main()
         printf("curly: %s\n", cstr_str(&str));
     }
 }
-
-#include "../src/cregex.c"
-#include "../src/utf8code.c"

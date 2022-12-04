@@ -1,8 +1,7 @@
 #include <stdio.h>
-#define i_implement // cstr functions
-#include <stc/cstr.h>
-#include <stc/csview.h>
+#define i_extern // cstr + utf8 functions
 #include <stc/cregex.h>
+#include <stc/csview.h>
 
 int main()
 {
@@ -18,6 +17,3 @@ int main()
         c_formatch (i, &re, "  Hello   World      C99! ")
             printf("'%.*s'\n", c_ARGsv(i.match[0]));
 }
-
-#include "../src/cregex.c"
-#include "../src/utf8code.c"

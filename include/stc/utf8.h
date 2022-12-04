@@ -1,8 +1,8 @@
 #ifndef UTF8_H_INCLUDED
 #define UTF8_H_INCLUDED
 
+#include "forward.h"
 #include "ccommon.h"
-#include <ctype.h>
 
 // utf8 methods defined in src/utf8code.c:
 
@@ -88,4 +88,8 @@ STC_INLINE const char* utf8_at(const char *s, size_t index) {
 STC_INLINE size_t utf8_pos(const char* s, size_t index)
     { return (size_t)(utf8_at(s, index) - s); }
 
+#endif // UTF8_H_INCLUDED
+#if defined i_extern || defined STC_EXTERN
+#  include "../src/utf8code.c"
+#  undef i_extern
 #endif

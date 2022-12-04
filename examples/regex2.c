@@ -1,5 +1,4 @@
-#define i_implement
-#include <stc/cstr.h>
+#define i_extern
 #include <stc/cregex.h>
 
 int main()
@@ -31,6 +30,3 @@ int main()
         }
     }
 }
-
-#include "../src/cregex.c"
-#include "../src/utf8code.c"

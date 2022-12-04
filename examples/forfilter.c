@@ -1,5 +1,5 @@
 #include <stdio.h>
-#define i_implement
+#define i_extern
 #include <stc/cstr.h>
 #include <stc/csview.h>
 #include <stc/views.h>
@@ -142,5 +142,3 @@ int main(void)
     demo4();
     demo5();
 }
-
-#include "../src/utf8code.c"

@@ -1,7 +1,6 @@
-#define i_implement
-#include <stc/cstr.h>
-#include <stc/csview.h>
+#define i_extern
 #include <stc/cregex.h>
+#include <stc/csview.h>
 #define i_val float
 #include <stc/cstack.h>
 
@@ -33,6 +32,3 @@ int main()
         printf("\n%s\n", cstr_str(&nums));
     }
 }
-
-#include "../src/cregex.c"
-#include "../src/utf8code.c"

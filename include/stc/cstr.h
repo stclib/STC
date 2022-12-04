@@ -27,6 +27,9 @@
 #ifndef CSTR_H_INCLUDED
 #define CSTR_H_INCLUDED
 
+#if defined i_extern || defined STC_EXTERN
+#  define _i_extern
+#endif
 #include "ccommon.h"
 #include "forward.h"
 #include "utf8.h"
@@ -405,8 +408,38 @@ STC_INLINE bool cstr_getline(cstr *self, FILE *fp)
 
 STC_API uint64_t cstr_hash(const cstr *self);
 
+#ifdef _i_extern
+static struct {
+    int      (*conv_asc)(int);
+    uint32_t (*conv_utf)(uint32_t);
+}
+fn_tocase[] = {{tolower, utf8_casefold},
+               {tolower, utf8_tolower},
+               {toupper, utf8_toupper}};
+
+cstr cstr_tocase(csview sv, int k) {
+    cstr out = cstr_init();
+    char *buf = cstr_reserve(&out, sv.size*3/2);
+    uint32_t cp; size_t sz = 0;
+    utf8_decode_t d = {.state=0};
+
+    while (*sv.str) {
+        do { utf8_decode(&d, (uint8_t)*sv.str++); } while (d.state);
+        if (d.codep < 128)
+            buf[sz++] = (char)fn_tocase[k].conv_asc((int)d.codep);
+        else {
+            cp = fn_tocase[k].conv_utf(d.codep);
+            sz += utf8_encode(buf + sz, cp);
+        }
+    }
+    _cstr_set_size(&out, sz);
+    cstr_shrink_to_fit(&out);
+    return out;
+}
+#endif
+
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement) || defined(i_extern)
+#if defined(i_implement)
 
 STC_DEF uint64_t cstr_hash(const cstr *self) {
     csview sv = cstr_sv(self);
@@ -627,4 +660,4 @@ STC_DEF size_t cstr_printf(cstr* self, const char* fmt, ...) {
 #undef i_header
 #undef i_static
 #undef i_implement
-#undef i_extern
+#undef _i_extern

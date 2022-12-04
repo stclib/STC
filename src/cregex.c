@@ -23,11 +23,10 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
-
-#include <stc/cregex.h>
-#include <stc/utf8.h>
-#define i_header
+#ifndef CREGEX_C_INCLUDED
+#define CREGEX_C_INCLUDED
 #include <stc/cstr.h>
+#include <stc/cregex.h> // header only
 #include <setjmp.h>
 #include <ctype.h>
 
@@ -1260,3 +1259,4 @@ void
 cregex_drop(cregex* self) {
     c_free(self->prog);
 }
+#endif

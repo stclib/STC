@@ -1,7 +1,7 @@
+#ifndef UTF8_C_INCLUDED
+#define UTF8_C_INCLUDED
 #include <ctype.h>
-#define i_header
-#include <stc/cstr.h>
-#include <stc/cregex.h>
+#include <stc/utf8.h> // header only
 #include "utf8tabs.inc"
 
 const uint8_t utf8_dtab[] = {
@@ -143,31 +143,4 @@ bool utf8_isalpha(uint32_t c) {
     if (c < 128) return isalpha(c) != 0;
     return utf8_islower(c) || utf8_isupper(c);
 }
-
-static struct {
-    int      (*conv_asc)(int);
-    uint32_t (*conv_utf)(uint32_t);
-}
-fn_tocase[] = {{tolower, utf8_casefold},
-               {tolower, utf8_tolower},
-               {toupper, utf8_toupper}};
-
-cstr cstr_tocase(csview sv, int k) {
-    cstr out = cstr_null;
-    char *buf = cstr_reserve(&out, sv.size*3/2);
-    uint32_t cp; size_t sz = 0;
-    utf8_decode_t d = {.state=0};
-
-    while (*sv.str) {
-        do { utf8_decode(&d, (uint8_t)*sv.str++); } while (d.state);
-        if (d.codep < 128)
-            buf[sz++] = (char)fn_tocase[k].conv_asc((int)d.codep);
-        else {
-            cp = fn_tocase[k].conv_utf(d.codep);
-            sz += utf8_encode(buf + sz, cp);
-        }
-    }
-    _cstr_set_size(&out, sz);
-    cstr_shrink_to_fit(&out);
-    return out;
-}
+#endif
