@@ -28,7 +28,7 @@ int main(void)
     printf("computing prime numbers up to %" c_ZU "\n", n);
 
     clock_t t1 = clock();
-    c_autodrop (cbits, primes, sieveOfEratosthenes(n + 1)) {
+    c_with (cbits primes = sieveOfEratosthenes(n + 1), cbits_drop(&primes)) {
         puts("done");
         size_t np = cbits_count(&primes);
         clock_t t2 = clock();

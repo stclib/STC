@@ -86,9 +86,9 @@ If an error occurs ```cregex_compile``` returns a negative value, see error code
 
 ### Getting the first match
 ```c
-#define i_implement
-#include <stc/cstr.h>
+#define i_extern // include external utf8 and cregex functions implementation.
 #include <stc/cregex.h>
+#include <stc/cstr.h>
 
 int main() {
     const char* input = "start date is 2023-03-01, and end date is 2025-12-31.";
@@ -104,7 +104,7 @@ int main() {
         printf("Could not find any date\n");
 
     // Lets change all dates into US date format MM/DD/YYYY:
-    cstr us_input = cregex_replace(&re, input, "$2/$3/$1");
+    cstr us_input = cregex_replace(&re, input, "$2/$3/$1", 0);
     printf("US input: %s\n", cstr_str(&us_input));
 
     // Free allocated data
@@ -112,7 +112,6 @@ int main() {
     cregex_drop(&re);
 }
 ```
-
 For a single match you may use the all-in-one function:
 ```c
 if (cregex_find_pattern(pattern, input, match, cre_default))
