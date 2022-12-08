@@ -38,11 +38,13 @@ int         cregex_find_pattern(const char* pattern, const char* input, csview m
 
 bool        cregex_is_match(const cregex* re, const char* input);
 
-cstr        cregex_replace(const cregex* re, const char* input, const char* replace, unsigned count);
+cstr        cregex_replace(const cregex* re, const char* input, const char* replace);
 cstr        cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned count,
                               bool(*mfun)(int capgrp, csview match, cstr* mstr), int rflags);
-cstr        cregex_replace_pattern(const char* pattern, const char* input, const char* replace, unsigned count,
-                                   bool(*mfun)(int capgrp, csview match, cstr* mstr), int rflags);
+
+cstr        cregex_replace_pattern(const char* pattern, const char* input, const char* replace);
+cstr        cregex_replace_pattern_n(const char* pattern, const char* input, const char* replace, unsigned count,
+                                     bool(*mfun)(int capgrp, csview match, cstr* mstr), int rflags);
 
 void        cregex_drop(cregex* self); // destroy
 ```
@@ -104,7 +106,7 @@ int main() {
         printf("Could not find any date\n");
 
     // Lets change all dates into US date format MM/DD/YYYY:
-    cstr us_input = cregex_replace(&re, input, "$2/$3/$1", 0);
+    cstr us_input = cregex_replace(&re, input, "$2/$3/$1");
     printf("US input: %s\n", cstr_str(&us_input));
 
     // Free allocated data

@@ -1244,11 +1244,11 @@ cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned 
 }
 
 cstr
-cregex_replace_pattern(const char* pattern, const char* input, const char* replace, unsigned count,
-                       bool (*mfun)(int, csview, cstr*), int crflags) {
+cregex_replace_pattern_n(const char* pattern, const char* input, const char* replace, unsigned count,
+                         bool (*mfun)(int, csview, cstr*), int crflags) {
     cregex re = cregex_init();
     if (cregex_compile(&re, pattern, crflags) != cre_success)
-        return cstr_new("[[error: invalid regex pattern]]");
+        assert(0);
     csview sv = {input, strlen(input)};
     cstr out = cregex_replace_sv(&re, sv, replace, count, mfun, crflags);
     cregex_drop(&re);

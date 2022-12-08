@@ -124,14 +124,18 @@ cstr cregex_replace_sv(const cregex* re, csview input, const char* replace, unsi
                        bool (*mfun)(int i, csview match, cstr* mstr), int rflags);
 
 static inline
-cstr cregex_replace(const cregex* re, const char* input, const char* replace, unsigned count) { 
+cstr cregex_replace(const cregex* re, const char* input, const char* replace) { 
     csview sv = {input, strlen(input)};
-    return cregex_replace_sv(re, sv, replace, count, NULL, cre_default);
+    return cregex_replace_sv(re, sv, replace, 0, NULL, cre_default);
 }
 
 /* replace + compile RE pattern, and extra arguments */
-cstr cregex_replace_pattern(const char* pattern, const char* input, const char* replace, unsigned count,
-                            bool (*mfun)(int i, csview match, cstr* mstr), int crflags);
+cstr cregex_replace_pattern_n(const char* pattern, const char* input, const char* replace, unsigned count,
+                              bool (*mfun)(int i, csview match, cstr* mstr), int crflags);
+static inline
+cstr cregex_replace_pattern(const char* pattern, const char* input, const char* replace)
+    { return cregex_replace_pattern_n(pattern, input, replace, 0, NULL, cre_default); }
+
 /* destroy regex */
 void cregex_drop(cregex* self);
 
