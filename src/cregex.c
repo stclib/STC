@@ -67,7 +67,7 @@ typedef struct _Reinst
 } _Reinst;
 
 typedef struct {
-    bool caseless;
+    bool icase;
     bool dotall;
 } _Reflags;
 
@@ -147,6 +147,8 @@ enum {
     RE_NCCLASS     ,           /* Negated character class, [] */
     RE_WBOUND      ,           /* Non-word boundary, not consuming meta char */
     RE_NWBOUND     ,           /* Word boundary, not consuming meta char */
+    RE_CASED       ,           /* (?-i) */
+    RE_ICASE       ,           /* (?i) */
     RE_END         = 0x82FFFFF, /* Terminate: match found */
 };
 
@@ -364,12 +366,14 @@ _operand(_Parser *par, _Token t)
     if (par->lastwasand)
         _operator(par, RE_CAT);    /* catenate is implicit */
     i = _newinst(par, t);
-
-    if ((t == RE_CCLASS) | (t == RE_NCCLASS))
-        i->r.classp = par->yyclassp;
-    if ((t == RE_RUNE) | (t == RE_IRUNE))
-        i->r.rune = par->yyrune;
-
+    switch (t) {
+    case RE_CCLASS: case RE_NCCLASS:
+        i->r.classp = par->yyclassp; break;
+    case RE_RUNE:
+        i->r.rune = par->yyrune; break;
+    case RE_IRUNE:
+        i->r.rune = utf8_casefold(par->yyrune);
+    }
     _pushand(par, i, i);
     par->lastwasand = true;
 }
@@ -662,7 +666,8 @@ _lex(_Parser *par)
         if (par->exprp[0] == '?') { /* override global flags */
             for (int k = 1, enable = 1; ; ++k) switch (par->exprp[k]) {
                 case  0 : par->exprp += k; return RE_END;
-                case ')': par->exprp += k + 1; goto start;
+                case ')': par->exprp += k + 1; 
+                          return RE_CASED + (par->rune_type == RE_IRUNE);
                 case '-': enable = 0; break;
                 case 's': par->dot_type = RE_ANY + enable; break;
                 case 'i': par->rune_type = RE_RUNE + enable; break;
@@ -718,7 +723,7 @@ _bldcclass(_Parser *par)
                         _rcerror(par, cre_malformedcharacterclass);
                         return 0;
                     }
-                    ep[-1] = rune;
+                    ep[-1] = par->rune_type == RE_IRUNE ? utf8_casefold(rune) : rune;
                     continue;
                 }
             }
@@ -743,8 +748,8 @@ _bldcclass(_Parser *par)
                     rune += 1;
             }
         }
-        *ep++ = rune;
-        *ep++ = rune;
+        ep[0] = ep[1] = par->rune_type == RE_IRUNE ? utf8_casefold(rune) : rune;
+        ep += 2;
     }
 
     /* sort on span start */
@@ -796,7 +801,7 @@ _regcomp1(_Reprog *progp, _Parser *par, const char *s, int cflags)
         c_free(progp);
         return NULL;
     }
-    pp->flags.caseless = (cflags & cre_c_caseless) != 0;
+    pp->flags.icase = (cflags & cre_c_caseless) != 0;
     pp->flags.dotall = (cflags & cre_c_dotall) != 0;
     par->freep = pp->firstinst;
     par->classp = pp->cclass;
@@ -808,7 +813,7 @@ _regcomp1(_Reprog *progp, _Parser *par, const char *s, int cflags)
     /* go compile the sucker */
     par->lexdone = false;
     par->flags = pp->flags;
-    par->rune_type = pp->flags.caseless ? RE_IRUNE : RE_RUNE;
+    par->rune_type = pp->flags.icase ? RE_IRUNE : RE_RUNE;
     par->dot_type = pp->flags.dotall ? RE_ANYNL : RE_ANY;
     par->litmode = false;
     par->exprp = s;
@@ -861,7 +866,7 @@ out:
 
 
 static int
-_runematch(_Rune s, _Rune r, bool icase)
+_runematch(_Rune s, _Rune r)
 {
     int inv = 0;
     switch (s) {
@@ -911,7 +916,7 @@ _runematch(_Rune s, _Rune r, bool icase)
     case UTF_XD: inv = 1;
     case UTF_xd: return inv ^ utf8_isxdigit(r);
     }
-    return icase ? utf8_casefold(s) == utf8_casefold(r) : s == r;
+    return s == r;
 }
 
 /*
@@ -938,7 +943,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
     int n, checkstart, match = 0;
     unsigned i;
 
-    bool icase = progp->flags.caseless;
+    bool icase = progp->flags.icase;
     checkstart = j->starttype;
     if (mp)
         for (i=0; i<ms; i++) {
@@ -993,10 +998,14 @@ _regexec1(const _Reprog *progp,  /* program to run */
                 int ok = false;
 
                 switch (inst->type) {
+                case RE_IRUNE:
+                    r = utf8_casefold(r); /* nobreak */
                 case RE_RUNE:
-                case RE_IRUNE:    /* regular character */
-                    ok = _runematch(inst->r.rune, r, (icase = inst->type==RE_IRUNE));
+                    ok = _runematch(inst->r.rune, r);
                     break;
+                case RE_CASED: case RE_ICASE:
+                    icase = inst->type == RE_ICASE;
+                    continue;
                 case RE_LBRA:
                     tlp->se.m[inst->r.subid].str = s;
                     continue;
@@ -1034,8 +1043,9 @@ _regexec1(const _Reprog *progp,  /* program to run */
                     ok = true;
                 case RE_CCLASS: /* fallthrough */
                     ep = inst->r.classp->end;
+                    if (icase) r = utf8_casefold(r);
                     for (rp = inst->r.classp->spans; rp < ep; rp += 2) {
-                        if ((r >= rp[0] && r <= rp[1]) || (rp[0] == rp[1] && _runematch(rp[0], r, icase)))
+                        if ((r >= rp[0] && r <= rp[1]) || (rp[0] == rp[1] && _runematch(rp[0], r)))
                             break;
                     }
                     ok ^= (rp < ep);
@@ -1122,7 +1132,7 @@ _regexec(const _Reprog *progp,    /* program to run */
 
     j.starttype = 0;
     j.startchar = 0;
-    int rune_type = progp->flags.caseless ? RE_IRUNE : RE_RUNE;
+    int rune_type = progp->flags.icase ? RE_IRUNE : RE_RUNE;
     if (progp->startinst->type == rune_type && progp->startinst->r.rune < 128) {
         j.starttype = rune_type;
         j.startchar = progp->startinst->r.rune;
