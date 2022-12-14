@@ -191,30 +191,31 @@ chartorune(_Rune *rune, const char *s)
 static const char*
 utfrune(const char *s, _Rune c)
 {
-    _Rune r;
-
     if (c < 128)        /* ascii */
         return strchr((char *)s, (int)c);
-
-    for (;;) {
-        int n = chartorune(&r, s);
+    int n;
+    for (_Rune r = *s; r; s += n, r = *(unsigned char*)s) {
+        if (r < 128) { n = 1; continue; }
+        n = chartorune(&r, s);
         if (r == c) return s;
-        if ((r == 0) | (n == 0)) return NULL;
-        s += n;
     }
+    return NULL;
 }
 
 static const char*
 utfruneicase(const char *s, _Rune c)
 {
-    _Rune r;
-    c = utf8_casefold(c);
-    for (;;) {
-        int n = chartorune(&r, s);
-        if (utf8_casefold(r) == c) return s;
-        if ((r == 0) | (n == 0)) return NULL;
-        s += n;
+    _Rune r = *s;
+    int n;
+    if (c < 128) for (c = tolower(c); r; ++s, r = *(unsigned char*)s) {
+        if (r < 128 && tolower(r) == c) return s;
     }
+    else for (c = utf8_casefold(c); r; s += n, r = *(unsigned char*)s) {
+        if (r < 128) { n = 1; continue; }
+        n = chartorune(&r, s);
+        if (utf8_casefold(r) == c) return s;
+    }
+    return NULL;
 }
 
 /************
@@ -979,7 +980,8 @@ _regexec1(const _Reprog *progp,  /* program to run */
                 break;
             }
         }
-        n = chartorune(&r, s);
+        r = *(unsigned char*)s;
+        n = r < 128 ? 1 : chartorune(&r, s);
 
         /* switch run lists */
         tl = j->relist[flag];
