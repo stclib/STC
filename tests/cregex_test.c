@@ -196,13 +196,13 @@ START_TEST(search_all)
         csview m = {0};
         int res;
         
-        res = cregex_find("ab,ab,ab", &m, cre_m_next);
+        res = cregex_find("ab,ab,ab", &m, CREG_M_NEXT);
         EXPECT_TRUE(res==1 && M_START(re, m) == 0);
-        res = cregex_find("ab,ab,ab", &m, cre_m_next);
+        res = cregex_find("ab,ab,ab", &m, CREG_M_NEXT);
         EXPECT_TRUE(res==1 && M_START(re, m) == 3);
-        res = cregex_find("ab,ab,ab", &m, cre_m_next);
+        res = cregex_find("ab,ab,ab", &m, CREG_M_NEXT);
         EXPECT_TRUE(res==1 && M_START(re, m) == 6);
-        res = cregex_find("ab,ab,ab", &m, cre_m_next);
+        res = cregex_find("ab,ab,ab", &m, CREG_M_NEXT);
         EXPECT_NE(res, 1);
     }
 }

@@ -26,15 +26,15 @@ int main()
         printf("fixed: %s\n", cstr_str(&str));
 
         /* US date format, and add 10 years to dates: */
-        cstr_take(&str, cregex_replace_pattern_n(pattern, input, "$1/$3/$2", 0, add_10_years, cre_default));
+        cstr_take(&str, cregex_replace_pattern_n(pattern, input, "$1/$3/$2", 0, add_10_years, CREG_DEFAULT));
         printf("us+10: %s\n", cstr_str(&str));
 
         /* Wrap first date inside []: */
-        cstr_take(&str, cregex_replace_pattern_n(pattern, input, "[$0]", 1, NULL, cre_default));
+        cstr_take(&str, cregex_replace_pattern_n(pattern, input, "[$0]", 1, NULL, CREG_DEFAULT));
         printf("brack: %s\n", cstr_str(&str));
 
         /* Shows how to compile RE separately */
-        c_with (cregex re = cregex_from(pattern, cre_default), cregex_drop(&re)) {
+        c_with (cregex re = cregex_from(pattern, CREG_DEFAULT), cregex_drop(&re)) {
             if (cregex_captures(&re) == 0)
                 continue; /* break c_with */
             /* European date format. */
@@ -42,7 +42,7 @@ int main()
             printf("euros: %s\n", cstr_str(&str));
 
             /* Strip out everything but the matches */
-            cstr_take(&str, cregex_replace_sv(&re, csview_from(input), "$3.$2.$1;", 0, NULL, cre_r_strip));
+            cstr_take(&str, cregex_replace_sv(&re, csview_from(input), "$3.$2.$1;", 0, NULL, CREG_R_STRIP));
             printf("strip: %s\n", cstr_str(&str));
         }
 

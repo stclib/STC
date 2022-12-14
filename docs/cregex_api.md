@@ -12,26 +12,26 @@ The API is simple and includes powerful string pattern matches and replace funct
 ```c
 enum {
     // compile-flags
-    cre_c_dotall = 1<<0,    // dot matches newline too
-    cre_c_caseless = 1<<1,  // ignore case
+    CREG_C_DOTALL = 1<<0,    // dot matches newline too
+    CREG_C_ICASE = 1<<1,     // ignore case
     // match-flags
-    cre_m_fullmatch = 1<<2, // like start-, end-of-line anchors were in pattern: "^ ... $"
-    cre_m_next = 1<<3,      // use end of previous match[0] as start of input
-    cre_m_startend = 1<<4,  // use match[0] as start+end of input
+    CREG_M_FULLMATCH = 1<<2, // like start-, end-of-line anchors were in pattern: "^ ... $"
+    CREG_M_NEXT = 1<<3,      // use end of previous match[0] as start of input
+    CREG_M_STARTEND = 1<<4,  // use match[0] as start+end of input
     // replace-flags
-    cre_r_strip = 1<<5,     // only keep the replaced matches, strip the rest
+    CREG_R_STRIP = 1<<5,     // only keep the replaced matches, strip the rest
 };
 
 cregex      cregex_init(void);
 
 cregex      cregex_from(const char* pattern, int cflags);
-            // return cre_success, or negative error code on failure.
+            // return CREG_SUCCESS, or negative error code on failure.
 int         cregex_compile(cregex *self, const char* pattern, int cflags);
 
             // num. of capture groups in regex. 0 if RE is invalid. First group is the full match.
 int         cregex_captures(const cregex* self); 
 
-            // return cre_success, cre_nomatch, or cre_matcherror.
+            // return CREG_SUCCESS, CREG_NOMATCH, or CREG_MATCHERROR.
 int         cregex_find(const cregex* re, const char* input, csview match[], int mflags);
 int         cregex_find_sv(const cregex* re, csview input, csview match[]);
 int         cregex_find_pattern(const char* pattern, const char* input, csview match[], int cmflags);
@@ -50,35 +50,35 @@ void        cregex_drop(cregex* self); // destroy
 ```
 
 ### Error codes
-- cre_success = 0
-- cre_nomatch = -1
-- cre_matcherror = -2
-- cre_outofmemory = -3
-- cre_unmatchedleftparenthesis = -4
-- cre_unmatchedrightparenthesis = -5
-- cre_toomanysubexpressions = -6
-- cre_toomanycharacterclasses = -7
-- cre_malformedcharacterclass = -8
-- cre_missingoperand = -9
-- cre_unknownoperator = -10
-- cre_operandstackoverflow = -11
-- cre_operatorstackoverflow = -12
-- cre_operatorstackunderflow = -13
+- CREG_SUCCESS = 0
+- CREG_NOMATCH = -1
+- CREG_MATCHERROR = -2
+- CREG_OUTOFMEMORY = -3
+- CREG_UNMATCHEDLEFTPARENTHESIS = -4
+- CREG_UNMATCHEDRIGHTPARENTHESIS = -5
+- CREG_TOOMANYSUBEXPRESSIONS = -6
+- CREG_TOOMANYCHARACTERCLASSES = -7
+- CREG_MALFORMEDCHARACTERCLASS = -8
+- CREG_MISSINGOPERAND = -9
+- CREG_UNKNOWNOPERATOR = -10
+- CREG_OPERANDSTACKOVERFLOW = -11
+- CREG_OPERATORSTACKOVERFLOW = -12
+- CREG_OPERATORSTACKUNDERFLOW = -13
 
 ### Limits
-- cre_MAXCLASSES
-- cre_MAXCAPTURES
+- CREG_MAX_CLASSES
+- CREG_MAX_CAPTURES
 
 ## Usage
 
 ### Compiling a regular expression
 ```c
 cregex re1 = cregex_init();
-int result = cregex_compile(&re1, "[0-9]+", cre_default);
+int result = cregex_compile(&re1, "[0-9]+", CREG_DEFAULT);
 if (result < 0) return result;
 
 const char* url = "(https?://|ftp://|www\\.)([0-9A-Za-z@:%_+~#=-]+\\.)+([a-z][a-z][a-z]?)(/[/0-9A-Za-z\\.@:%_+~#=\\?&-]*)?";
-cregex re2 = cregex_from(url, cre_default);
+cregex re2 = cregex_from(url, CREG_DEFAULT);
 if (re2.error) return re2.error;
 ...
 cregex_drop(&re2);
@@ -96,11 +96,11 @@ int main() {
     const char* input = "start date is 2023-03-01, and end date is 2025-12-31.";
     const char* pattern = "\\b(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)\\b";
 
-    cregex re = cregex_from(pattern, cre_default);
+    cregex re = cregex_from(pattern, CREG_DEFAULT);
 
     // Lets find the first date in the string:
     csview match[4]; // full-match, year, month, date.
-    if (cregex_find(&re, input, match, cre_default) == cre_success)
+    if (cregex_find(&re, input, match, CREG_DEFAULT) == CREG_SUCCESS)
         printf("Found date: %.*s\n", c_ARGsv(match[0]));
     else
         printf("Could not find any date\n");
@@ -116,7 +116,7 @@ int main() {
 ```
 For a single match you may use the all-in-one function:
 ```c
-if (cregex_find_pattern(pattern, input, match, cre_default))
+if (cregex_find_pattern(pattern, input, match, CREG_DEFAULT))
     printf("Found date: %.*s\n", c_ARGsv(match[0]));
 ```
 
@@ -128,7 +128,7 @@ In order to use a callback function in the replace call, see `examples/regex_rep
 To iterate multiple matches in an input string, you may use
 ```c
 csview match[5] = {0};
-while (cregex_find(&re, input, match, cre_m_next) == cre_success)
+while (cregex_find(&re, input, match, CREG_M_NEXT) == CREG_SUCCESS)
     c_forrange (k, cregex_captures(&re))
         printf("submatch %lld: %.*s\n", k, c_ARGsv(match[k]));
 ```
@@ -189,7 +189,7 @@ c_formatch (it, &re, input)
 | [[:xdigit:]] [[:word:]] | Match ASCII character class | * |
 | [[:^***class***:]] | Match character not in the ASCII class | * |
 | $***n*** | *n*-th substitution backreference to capture group. ***n*** in 0-9. $0 is the entire match. | * |
-| $***nn***; | As above, but can handle ***nn*** < cre_MAXCAPTURES. | * |
+| $***nn***; | As above, but can handle ***nn*** < CREG_MAX_CAPTURES. | * |
 
 ## Limitations
 
