@@ -572,12 +572,13 @@ _newclass(_Parser *par)
 static int /* quoted */
 _nextc(_Parser *par, _Rune *rp)
 {
-    start:
+    int ret;
     if (par->lexdone) {
         *rp = 0;
         return 1;
     }
-    int ret = par->litmode;
+start:
+    ret = par->litmode;
     par->exprp += chartorune(rp, par->exprp);
 
     if (*rp == '\\') {
