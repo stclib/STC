@@ -57,12 +57,12 @@ typedef struct _Reinst
     union {
         _Reclass *classp;        /* class pointer */
         _Rune    rune;           /* character */
-        int     subid;           /* sub-expression id for RE_RBRA and RE_LBRA */
-        struct _Reinst *right;   /* right child of RE_OR */
+        int     subid;           /* sub-expression id for TOK_RBRA and TOK_LBRA */
+        struct _Reinst *right;   /* right child of TOK_OR */
     } r;
     union {    /* regexp relies on these two being in the same union */
-        struct _Reinst *left;    /* left child of RE_OR */
-        struct _Reinst *next;    /* next instruction for RE_CAT & RE_LBRA */
+        struct _Reinst *left;    /* left child of TOK_OR */
+        struct _Reinst *next;    /* next instruction for TOK_CAT & TOK_LBRA */
     } l;
 } _Reinst;
 
@@ -100,56 +100,57 @@ typedef struct _Resublist
  * Actions and Tokens (_Reinst types)
  *
  *  0x800000-0x80FFFF: operators, value => precedence
- *  0x810000-0x81FFFF: RE_RUNE and char classes.
+ *  0x810000-0x81FFFF: TOK_RUNE and char classes.
  *  0x820000-0x82FFFF: tokens, i.e. operands for operators
  */
 enum {
-    RE_MASK        = 0xFF00000,
-    RE_OPERATOR    = 0x8000000, /* Bitmask of all operators */
-    RE_START       = 0x8000001, /* Start, used for marker on stack */
-    RE_RBRA        ,           /* Right bracket, ) */
-    RE_LBRA        ,           /* Left bracket, ( */
-    RE_OR          ,           /* Alternation, | */
-    RE_CAT         ,           /* Concatentation, implicit operator */
-    RE_STAR        ,           /* Closure, * */
-    RE_PLUS        ,           /* a+ == aa* */
-    RE_QUEST       ,           /* a? == a|nothing, i.e. 0 or 1 a's */
-    RE_RUNE        = 0x8100000,
-    RE_IRUNE,
-    ASC_an      , ASC_AN,   /* alphanum */
-    ASC_al      , ASC_AL,   /* alpha */
-    ASC_as      , ASC_AS,   /* ascii */
-    ASC_bl      , ASC_BL,   /* blank */
-    ASC_ct      , ASC_CT,   /* ctrl */
-    ASC_d       , ASC_D,    /* digit */
-    ASC_s       , ASC_S,    /* space */
-    ASC_w       , ASC_W,    /* word */
-    ASC_gr      , ASC_GR,   /* graphic */
-    ASC_pr      , ASC_PR,   /* print */
-    ASC_pu      , ASC_PU,   /* punct */
-    ASC_lo      , ASC_LO,   /* lower */
-    ASC_up      , ASC_UP,   /* upper */
-    ASC_xd      , ASC_XD,   /* hex */
-    UTF_d       , UTF_D,    /* utf dec digit, non-digit */
-    UTF_s       , UTF_S,    /* utf8 white space */
-    UTF_w       , UTF_W,    /* utf8 word */
-    UTF_al      , UTF_AL,   /* utf8 letter cased */
-    UTF_lo      , UTF_LO,   /* utf8 letter lower */
-    UTF_up      , UTF_UP,   /* utf8 letter upper */
-    UTF_xd      , UTF_XD,   /* utf8 hex digit */
-    UTF_an      , UTF_AN,   /* utf8 alphanumeric */
-    RE_ANY         = 0x8200000, /* Any character except newline, . */
-    RE_ANYNL       ,           /* Any character including newline, . */
-    RE_NOP         ,           /* No operation, internal use only */
-    RE_BOL         , RE_BOS,      /* Beginning of line, string, ^ */
-    RE_EOL         , RE_EOS, RE_EOZ, /* End of line, string, $ */
-    RE_CCLASS      ,           /* Character class, [] */
-    RE_NCCLASS     ,           /* Negated character class, [] */
-    RE_WBOUND      ,           /* Non-word boundary, not consuming meta char */
-    RE_NWBOUND     ,           /* Word boundary, not consuming meta char */
-    RE_CASED       ,           /* (?-i) */
-    RE_ICASE       ,           /* (?i) */
-    RE_END         = 0x82FFFFF, /* Terminate: match found */
+    TOK_MASK    = 0xFF00000,
+    TOK_OPERATOR = 0x8000000,   /* Bitmask of all operators */
+    TOK_START   = 0x8000001,    /* Start, used for marker on stack */
+    TOK_RBRA    ,               /* Right bracket, ) */
+    TOK_LBRA    ,               /* Left bracket, ( */
+    TOK_OR      ,               /* Alternation, | */
+    TOK_CAT     ,               /* Concatentation, implicit operator */
+    TOK_STAR    ,               /* Closure, * */
+    TOK_PLUS    ,               /* a+ == aa* */
+    TOK_QUEST   ,               /* a? == a|nothing, i.e. 0 or 1 a's */
+    TOK_RUNE    = 0x8100000,
+    TOK_IRUNE   ,
+    ASC_an      , ASC_AN,       /* alphanum */
+    ASC_al      , ASC_AL,       /* alpha */
+    ASC_as      , ASC_AS,       /* ascii */
+    ASC_bl      , ASC_BL,       /* blank */
+    ASC_ct      , ASC_CT,       /* ctrl */
+    ASC_d       , ASC_D,        /* digit */
+    ASC_s       , ASC_S,        /* space */
+    ASC_w       , ASC_W,        /* word */
+    ASC_gr      , ASC_GR,       /* graphic */
+    ASC_pr      , ASC_PR,       /* print */
+    ASC_pu      , ASC_PU,       /* punct */
+    ASC_lo      , ASC_LO,       /* lower */
+    ASC_up      , ASC_UP,       /* upper */
+    ASC_xd      , ASC_XD,       /* hex */
+    UTF_d       , UTF_D,        /* utf dec digit, non-digit */
+    UTF_s       , UTF_S,        /* utf8 white space */
+    UTF_w       , UTF_W,        /* utf8 word */
+    UTF_al      , UTF_AL,       /* utf8 letter cased */
+    UTF_lo      , UTF_LO,       /* utf8 letter lower */
+    UTF_up      , UTF_UP,       /* utf8 letter upper */
+    UTF_xd      , UTF_XD,       /* utf8 hex digit */
+    UTF_an      , UTF_AN,       /* utf8 alphanumeric */
+    TOK_ANY     = 0x8200000,    /* Any character except newline, . */
+    TOK_ANYNL   ,               /* Any character including newline, . */
+    TOK_NOP     ,               /* No operation, internal use only */
+    TOK_BOL     , TOK_BOS,      /* Beginning of line / string, ^ */
+    TOK_EOL     , TOK_EOS,      /* End of line / string, $ */
+    TOK_EOZ     ,               /* End of line with optional NL */
+    TOK_CCLASS  ,               /* Character class, [] */
+    TOK_NCCLASS ,               /* Negated character class, [] */
+    TOK_WBOUND  ,               /* Non-word boundary, not consuming meta char */
+    TOK_NWBOUND ,               /* Word boundary, not consuming meta char */
+    TOK_CASED   ,               /* (?-i) */
+    TOK_ICASE   ,               /* (?i) */
+    TOK_END     = 0x82FFFFF,    /* Terminate: match found */
 };
 
 /*
@@ -365,14 +366,14 @@ _operand(_Parser *par, _Token t)
     _Reinst *i;
 
     if (par->lastwasand)
-        _operator(par, RE_CAT);    /* catenate is implicit */
+        _operator(par, TOK_CAT);    /* catenate is implicit */
     i = _newinst(par, t);
     switch (t) {
-    case RE_CCLASS: case RE_NCCLASS:
+    case TOK_CCLASS: case TOK_NCCLASS:
         i->r.classp = par->yyclassp; break;
-    case RE_RUNE:
+    case TOK_RUNE:
         i->r.rune = par->yyrune; break;
-    case RE_IRUNE:
+    case TOK_IRUNE:
         i->r.rune = utf8_casefold(par->yyrune);
     }
     _pushand(par, i, i);
@@ -382,20 +383,20 @@ _operand(_Parser *par, _Token t)
 static void
 _operator(_Parser *par, _Token t)
 {
-    if (t==RE_RBRA && --par->nbra<0)
+    if (t==TOK_RBRA && --par->nbra<0)
         _rcerror(par, CREG_UNMATCHEDRIGHTPARENTHESIS);
-    if (t==RE_LBRA) {
+    if (t==TOK_LBRA) {
         if (++par->cursubid >= _NSUBEXP)
             _rcerror(par, CREG_TOOMANYSUBEXPRESSIONS);
         par->nbra++;
         if (par->lastwasand)
-            _operator(par, RE_CAT);
+            _operator(par, TOK_CAT);
     } else
         _evaluntil(par, t);
-    if (t != RE_RBRA)
+    if (t != TOK_RBRA)
         _pushator(par, t);
     par->lastwasand = 0;
-    if (t==RE_STAR || t==RE_QUEST || t==RE_PLUS || t==RE_RBRA)
+    if (t==TOK_STAR || t==TOK_QUEST || t==TOK_PLUS || t==TOK_RBRA)
         par->lastwasand = true;    /* these look like operands */
 }
 
@@ -425,7 +426,7 @@ _popand(_Parser *par, _Token op)
 
     if (par->andp <= &par->andstack[0]) {
         _rcerror(par, CREG_MISSINGOPERAND);
-        inst = _newinst(par, RE_NOP);
+        inst = _newinst(par, TOK_NOP);
         _pushand(par, inst, inst);
     }
     return --par->andp;
@@ -446,56 +447,56 @@ _evaluntil(_Parser *par, _Token pri)
     _Node *op1, *op2;
     _Reinst *inst1, *inst2;
 
-    while (pri==RE_RBRA || par->atorp[-1]>=pri) {
+    while (pri==TOK_RBRA || par->atorp[-1]>=pri) {
         switch (_popator(par)) {
         default:
             _rcerror(par, CREG_UNKNOWNOPERATOR);
             break;
-        case RE_LBRA:        /* must have been RE_RBRA */
+        case TOK_LBRA:        /* must have been TOK_RBRA */
             op1 = _popand(par, '(');
-            inst2 = _newinst(par, RE_RBRA);
+            inst2 = _newinst(par, TOK_RBRA);
             inst2->r.subid = *par->subidp;
             op1->last->l.next = inst2;
-            inst1 = _newinst(par, RE_LBRA);
+            inst1 = _newinst(par, TOK_LBRA);
             inst1->r.subid = *par->subidp;
             inst1->l.next = op1->first;
             _pushand(par, inst1, inst2);
             return;
-        case RE_OR:
+        case TOK_OR:
             op2 = _popand(par, '|');
             op1 = _popand(par, '|');
-            inst2 = _newinst(par, RE_NOP);
+            inst2 = _newinst(par, TOK_NOP);
             op2->last->l.next = inst2;
             op1->last->l.next = inst2;
-            inst1 = _newinst(par, RE_OR);
+            inst1 = _newinst(par, TOK_OR);
             inst1->r.right = op1->first;
             inst1->l.left = op2->first;
             _pushand(par, inst1, inst2);
             break;
-        case RE_CAT:
+        case TOK_CAT:
             op2 = _popand(par, 0);
             op1 = _popand(par, 0);
             op1->last->l.next = op2->first;
             _pushand(par, op1->first, op2->last);
             break;
-        case RE_STAR:
+        case TOK_STAR:
             op2 = _popand(par, '*');
-            inst1 = _newinst(par, RE_OR);
+            inst1 = _newinst(par, TOK_OR);
             op2->last->l.next = inst1;
             inst1->r.right = op2->first;
             _pushand(par, inst1, inst1);
             break;
-        case RE_PLUS:
+        case TOK_PLUS:
             op2 = _popand(par, '+');
-            inst1 = _newinst(par, RE_OR);
+            inst1 = _newinst(par, TOK_OR);
             op2->last->l.next = inst1;
             inst1->r.right = op2->first;
             _pushand(par, op2->first, inst1);
             break;
-        case RE_QUEST:
+        case TOK_QUEST:
             op2 = _popand(par, '?');
-            inst1 = _newinst(par, RE_OR);
-            inst2 = _newinst(par, RE_NOP);
+            inst1 = _newinst(par, TOK_OR);
+            inst2 = _newinst(par, TOK_NOP);
             inst1->l.left = inst2;
             inst1->r.right = op2->first;
             op2->last->l.next = inst2;
@@ -514,9 +515,9 @@ _optimize(_Parser *par, _Reprog *pp)
     /*
      *  get rid of NOOP chains
      */
-    for (inst = pp->firstinst; inst->type != RE_END; inst++) {
+    for (inst = pp->firstinst; inst->type != TOK_END; inst++) {
         target = inst->l.next;
-        while (target->type == RE_NOP)
+        while (target->type == TOK_NOP)
             target = target->l.next;
         inst->l.next = target;
     }
@@ -537,14 +538,14 @@ _optimize(_Parser *par, _Reprog *pp)
 
     for (inst = npp->firstinst; inst < par->freep; inst++) {
         switch (inst->type) {
-        case RE_OR:
-        case RE_STAR:
-        case RE_PLUS:
-        case RE_QUEST:
+        case TOK_OR:
+        case TOK_STAR:
+        case TOK_PLUS:
+        case TOK_QUEST:
             inst->r.right = (_Reinst *)((char*)inst->r.right + diff);
             break;
-        case RE_CCLASS:
-        case RE_NCCLASS:
+        case TOK_CCLASS:
+        case TOK_NCCLASS:
             inst->r.right = (_Reinst *)((char*)inst->r.right + diff);
             cl = inst->r.classp;
             cl->end = (_Rune *)((char*)cl->end + diff);
@@ -574,54 +575,54 @@ _nextc(_Parser *par, _Rune *rp)
     par->exprp += chartorune(rp, par->exprp);
     if (*rp == '\\') {
         if (par->litmode && *par->exprp != 'E')
-            return 1;
+            return 1; /* quoted */
         par->exprp += chartorune(rp, par->exprp);
         switch (*rp) {
-            case 'E': return par->litmode + 1;
-            case 't': *rp = '\t'; break;
-            case 'n': *rp = '\n'; break;
-            case 'r': *rp = '\r'; break;
-            case 'v': *rp = '\v'; break;
-            case 'f': *rp = '\f'; break;
-            case 'd': *rp = UTF_d; break;
-            case 'D': *rp = UTF_D; break;
-            case 's': *rp = UTF_s; break;
-            case 'S': *rp = UTF_S; break;
-            case 'w': *rp = UTF_w; break;
-            case 'W': *rp = UTF_W; break;
-            case 'x': if (*par->exprp != '{') break;
-                *rp = 0; sscanf(++par->exprp, "%x", rp);
-                while (*par->exprp) if (*(par->exprp++) == '}') break;
-                if (par->exprp[-1] != '}')
-                    _rcerror(par, CREG_UNMATCHEDRIGHTPARENTHESIS);
-                return 2;
-            case 'p': case 'P': { /* https://www.regular-expressions.info/unicode.html */
-                static struct { const char* c; int n, r; } cls[] = {
-                    {"{Space}", 7, UTF_s}, {"{Zs}", 4, UTF_s},
-                    {"{Digit}", 7, UTF_d}, {"{Nd}", 4, UTF_d},
-                    {"{Alpha}", 7, UTF_al}, {"{LC}", 4, UTF_al},
-                    {"{Lower}", 7, UTF_lo}, {"{Ll}", 4, UTF_lo},
-                    {"{Upper}", 7, UTF_up}, {"{Lu}", 4, UTF_up},
-                    {"{Alnum}", 7, UTF_an},
-                    {"{XDigit}", 8, UTF_xd},
-                };
-                int inv = *rp == 'P';
-                for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
-                    if (!strncmp(par->exprp, cls[i].c, (size_t)cls[i].n)) {
-                        if (par->rune_type == RE_IRUNE && (cls[i].r == UTF_lo || cls[i].r == UTF_up))
-                            *rp = (_Rune)(UTF_al + inv);
-                        else
-                            *rp = (_Rune)(cls[i].r + inv);
-                        par->exprp += cls[i].n;
-                        break;
-                    }
-                if (*rp < RE_OPERATOR) {
-                    _rcerror(par, CREG_UNKNOWNOPERATOR);
-                    *rp = 0;
+        case 'E': return 1 + par->litmode; /* 1 or 2 */
+        case 't': *rp = '\t'; break;
+        case 'n': *rp = '\n'; break;
+        case 'r': *rp = '\r'; break;
+        case 'v': *rp = '\v'; break;
+        case 'f': *rp = '\f'; break;
+        case 'd': *rp = UTF_d; break;
+        case 'D': *rp = UTF_D; break;
+        case 's': *rp = UTF_s; break;
+        case 'S': *rp = UTF_S; break;
+        case 'w': *rp = UTF_w; break;
+        case 'W': *rp = UTF_W; break;
+        case 'x': if (*par->exprp != '{') break;
+            *rp = 0; sscanf(++par->exprp, "%x", rp);
+            while (*par->exprp) if (*(par->exprp++) == '}') break;
+            if (par->exprp[-1] != '}')
+                _rcerror(par, CREG_UNMATCHEDRIGHTPARENTHESIS);
+            return 3; /* hex rune */
+        case 'p': case 'P': { /* https://www.regular-expressions.info/unicode.html */
+            static struct { const char* c; int n, r; } cls[] = {
+                {"{Space}", 7, UTF_s}, {"{Zs}", 4, UTF_s},
+                {"{Digit}", 7, UTF_d}, {"{Nd}", 4, UTF_d},
+                {"{Alpha}", 7, UTF_al}, {"{LC}", 4, UTF_al},
+                {"{Lower}", 7, UTF_lo}, {"{Ll}", 4, UTF_lo},
+                {"{Upper}", 7, UTF_up}, {"{Lu}", 4, UTF_up},
+                {"{Alnum}", 7, UTF_an},
+                {"{XDigit}", 8, UTF_xd},
+            };
+            int inv = *rp == 'P';
+            for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i) {
+                if (!strncmp(par->exprp, cls[i].c, (size_t)cls[i].n)) {
+                    if (par->rune_type == TOK_IRUNE && (cls[i].r == UTF_lo || cls[i].r == UTF_up))
+                        *rp = (_Rune)(UTF_al + inv);
+                    else
+                        *rp = (_Rune)(cls[i].r + inv);
+                    par->exprp += cls[i].n;
+                    break;
                 }
-                break;
             }
-        }
+            if (*rp < TOK_OPERATOR) {
+                _rcerror(par, CREG_UNKNOWNOPERATOR);
+                *rp = 0;
+            }
+            break;
+        }}
         return 1;
     }
     if (*rp == 0)
@@ -633,52 +634,51 @@ static _Token
 _lex(_Parser *par)
 {
     int quoted;
-    start:
-    quoted = _nextc(par, &par->yyrune);
-    if (quoted) {
-        if (quoted == 2) {
-            if (par->litmode && par->yyrune == 'E') {
-                par->litmode = false;
-                goto start;
-            }
-            return par->yyrune == 0 ? RE_END : par->rune_type;
-        }
+    start: quoted = _nextc(par, &par->yyrune);
+
+    switch (quoted) {
+    case 1:
         switch (par->yyrune) {
-        case  0 : return RE_END;
-        case 'b': return RE_WBOUND;
-        case 'B': return RE_NWBOUND;
-        case 'A': return RE_BOS;
-        case 'z': return RE_EOS;
-        case 'Z': return RE_EOZ;
+        case  0 : return TOK_END;
+        case 'b': return TOK_WBOUND;
+        case 'B': return TOK_NWBOUND;
+        case 'A': return TOK_BOS;
+        case 'z': return TOK_EOS;
+        case 'Z': return TOK_EOZ;
         case 'Q': par->litmode = true;
                   goto start;
-        default : return par->rune_type;
         }
+        return par->rune_type;
+    case 2: /* 'E' */
+        par->litmode = false;
+        goto start;
+    case 3: /* 'x' */
+        return par->yyrune == 0 ? TOK_END : par->rune_type;
     }
 
     switch (par->yyrune) {
-    case  0 : return RE_END;
-    case '*': return RE_STAR;
-    case '?': return RE_QUEST;
-    case '+': return RE_PLUS;
-    case '|': return RE_OR;
+    case  0 : return TOK_END;
+    case '*': return TOK_STAR;
+    case '?': return TOK_QUEST;
+    case '+': return TOK_PLUS;
+    case '|': return TOK_OR;
     case '.': return par->dot_type;
     case '(':
         if (par->exprp[0] == '?') { /* override global flags */
             for (int k = 1, enable = 1; ; ++k) switch (par->exprp[k]) {
-                case  0 : par->exprp += k; return RE_END;
+                case  0 : par->exprp += k; return TOK_END;
                 case ')': par->exprp += k + 1; 
-                          return RE_CASED + (par->rune_type == RE_IRUNE);
+                          return TOK_CASED + (par->rune_type == TOK_IRUNE);
                 case '-': enable = 0; break;
-                case 's': par->dot_type = RE_ANY + enable; break;
-                case 'i': par->rune_type = RE_RUNE + enable; break;
+                case 's': par->dot_type = TOK_ANY + enable; break;
+                case 'i': par->rune_type = TOK_RUNE + enable; break;
                 default: _rcerror(par, CREG_UNKNOWNOPERATOR); return 0;
             }
         }
-        return RE_LBRA;
-    case ')': return RE_RBRA;
-    case '^': return RE_BOL;
-    case '$': return RE_EOL;
+        return TOK_LBRA;
+    case ')': return TOK_RBRA;
+    case '^': return TOK_BOL;
+    case '$': return TOK_EOL;
     case '[': return _bldcclass(par);
     }
     return par->rune_type;
@@ -694,7 +694,7 @@ _bldcclass(_Parser *par)
     int quoted;
 
     /* we have already seen the '[' */
-    type = RE_CCLASS;
+    type = TOK_CCLASS;
     par->yyclassp = _newclass(par);
 
     /* look ahead for negation */
@@ -702,10 +702,10 @@ _bldcclass(_Parser *par)
     ep = r;
     quoted = _nextc(par, &rune);
     if (!quoted && rune == '^') {
-        type = RE_NCCLASS;
+        type = TOK_NCCLASS;
         quoted = _nextc(par, &rune);
-        *ep++ = '\n';
-        *ep++ = '\n';
+        ep[0] = ep[1] = '\n';
+        ep += 2;
     }
 
     /* parse class into a set of spans */
@@ -724,7 +724,7 @@ _bldcclass(_Parser *par)
                         _rcerror(par, CREG_MALFORMEDCHARACTERCLASS);
                         return 0;
                     }
-                    ep[-1] = par->rune_type == RE_IRUNE ? utf8_casefold(rune) : rune;
+                    ep[-1] = par->rune_type == TOK_IRUNE ? utf8_casefold(rune) : rune;
                     continue;
                 }
             }
@@ -743,13 +743,13 @@ _bldcclass(_Parser *par)
                         par->exprp += off + cls[i].n;
                         break;
                     }
-                if (par->rune_type == RE_IRUNE && (rune == ASC_lo || rune == ASC_up))
+                if (par->rune_type == TOK_IRUNE && (rune == ASC_lo || rune == ASC_up))
                     rune = (_Rune)ASC_al;
                 if (inv && rune != '[')
                     rune += 1;
             }
         }
-        ep[0] = ep[1] = par->rune_type == RE_IRUNE ? utf8_casefold(rune) : rune;
+        ep[0] = ep[1] = par->rune_type == TOK_IRUNE ? utf8_casefold(rune) : rune;
         ep += 2;
     }
 
@@ -814,8 +814,8 @@ _regcomp1(_Reprog *progp, _Parser *par, const char *s, int cflags)
     /* go compile the sucker */
     par->lexdone = false;
     par->flags = pp->flags;
-    par->rune_type = pp->flags.icase ? RE_IRUNE : RE_RUNE;
-    par->dot_type = pp->flags.dotall ? RE_ANYNL : RE_ANY;
+    par->rune_type = pp->flags.icase ? TOK_IRUNE : TOK_RUNE;
+    par->dot_type = pp->flags.dotall ? TOK_ANYNL : TOK_ANY;
     par->litmode = false;
     par->exprp = s;
     par->nclass = 0;
@@ -827,20 +827,20 @@ _regcomp1(_Reprog *progp, _Parser *par, const char *s, int cflags)
     par->cursubid = 0;
 
     /* Start with a low priority operator to prime parser */
-    _pushator(par, RE_START-1);
-    while ((token = _lex(par)) != RE_END) {
-        if ((token & RE_MASK) == RE_OPERATOR)
+    _pushator(par, TOK_START-1);
+    while ((token = _lex(par)) != TOK_END) {
+        if ((token & TOK_MASK) == TOK_OPERATOR)
             _operator(par, token);
         else
             _operand(par, token);
     }
 
     /* Close with a low priority operator */
-    _evaluntil(par, RE_START);
+    _evaluntil(par, TOK_START);
 
-    /* Force RE_END */
-    _operand(par, RE_END);
-    _evaluntil(par, RE_START);
+    /* Force TOK_END */
+    _operand(par, TOK_END);
+    _evaluntil(par, TOK_START);
 #ifdef DEBUG
     dumpstack(par);
 #endif
@@ -960,17 +960,17 @@ _regexec1(const _Reprog *progp,  /* program to run */
         /* fast check for first char */
         if (checkstart) {
             switch (j->starttype) {
-            case RE_IRUNE:
+            case TOK_IRUNE:
                 p = utfruneicase(s, j->startchar);
                 goto next1;
-            case RE_RUNE:
+            case TOK_RUNE:
                 p = utfrune(s, j->startchar);
                 next1:
                 if (p == NULL || s == j->eol)
                     return match;
                 s = p;
                 break;
-            case RE_BOL:
+            case TOK_BOL:
                 if (s == bol)
                     break;
                 p = utfrune(s, '\n');
@@ -1000,50 +1000,50 @@ _regexec1(const _Reprog *progp,  /* program to run */
                 int ok = false;
 
                 switch (inst->type) {
-                case RE_IRUNE:
+                case TOK_IRUNE:
                     r = utf8_casefold(r); /* nobreak */
-                case RE_RUNE:
+                case TOK_RUNE:
                     ok = _runematch(inst->r.rune, r);
                     break;
-                case RE_CASED: case RE_ICASE:
-                    icase = inst->type == RE_ICASE;
+                case TOK_CASED: case TOK_ICASE:
+                    icase = inst->type == TOK_ICASE;
                     continue;
-                case RE_LBRA:
+                case TOK_LBRA:
                     tlp->se.m[inst->r.subid].str = s;
                     continue;
-                case RE_RBRA:
+                case TOK_RBRA:
                     tlp->se.m[inst->r.subid].size = (size_t)(s - tlp->se.m[inst->r.subid].str);
                     continue;
-                case RE_ANY:
+                case TOK_ANY:
                     ok = (r != '\n');
                     break;
-                case RE_ANYNL:
+                case TOK_ANYNL:
                     ok = true;
                     break;
-                case RE_BOL:
+                case TOK_BOL:
                     if (s == bol || s[-1] == '\n') continue;
                     break;
-                case RE_BOS:
+                case TOK_BOS:
                     if (s == bol) continue;
                     break;
-                case RE_EOL:
+                case TOK_EOL:
                     if (r == '\n') continue;
-                case RE_EOS: /* fallthrough */
+                case TOK_EOS: /* fallthrough */
                     if (s == j->eol || r == 0) continue;
                     break;
-                case RE_EOZ:
+                case TOK_EOZ:
                     if (s == j->eol || r == 0 || (r == '\n' && s[1] == 0)) continue;
                     break;
-                case RE_NWBOUND:
+                case TOK_NWBOUND:
                     ok = true;
-                case RE_WBOUND: /* fallthrough */
+                case TOK_WBOUND: /* fallthrough */
                     if (ok ^ (s == bol || s == j->eol || ((utf8_isalnum(utf8_peek_off(s, -1)) || s[-1] == '_')
                                                         ^ (utf8_isalnum(utf8_peek(s)) || s[0] == '_'))))
                         continue;
                     break;
-                case RE_NCCLASS:
+                case TOK_NCCLASS:
                     ok = true;
-                case RE_CCLASS: /* fallthrough */
+                case TOK_CCLASS: /* fallthrough */
                     ep = inst->r.classp->end;
                     if (icase) r = utf8_casefold(r);
                     for (rp = inst->r.classp->spans; rp < ep; rp += 2) {
@@ -1052,13 +1052,13 @@ _regexec1(const _Reprog *progp,  /* program to run */
                     }
                     ok ^= (rp < ep);
                     break;
-                case RE_OR:
+                case TOK_OR:
                     /* evaluate right choice later */
                     if (_renewthread(tlp, inst->r.right, ms, &tlp->se) == tle)
                         return -1;
                     /* efficiency: advance and re-evaluate */
                     continue;
-                case RE_END:    /* Match! */
+                case TOK_END:    /* Match! */
                     match = !(mflags & CREG_M_FULLMATCH) ||
                             ((s == j->eol || r == 0 || r == '\n') &&
                             (tlp->se.m[0].str == bol || tlp->se.m[0].str[-1] == '\n'));
@@ -1134,13 +1134,13 @@ _regexec(const _Reprog *progp,    /* program to run */
 
     j.starttype = 0;
     j.startchar = 0;
-    int rune_type = progp->flags.icase ? RE_IRUNE : RE_RUNE;
+    int rune_type = progp->flags.icase ? TOK_IRUNE : TOK_RUNE;
     if (progp->startinst->type == rune_type && progp->startinst->r.rune < 128) {
         j.starttype = rune_type;
         j.startchar = progp->startinst->r.rune;
     }
-    if (progp->startinst->type == RE_BOL)
-        j.starttype = RE_BOL;
+    if (progp->startinst->type == TOK_BOL)
+        j.starttype = TOK_BOL;
 
     /* mark space */
     j.relist[0] = relist0;
