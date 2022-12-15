@@ -441,6 +441,7 @@ _popator(_Parser *par)
     return *--par->atorp;
 }
 
+
 static void
 _evaluntil(_Parser *par, _Token pri)
 {
@@ -506,6 +507,7 @@ _evaluntil(_Parser *par, _Token pri)
     }
 }
 
+
 static _Reprog*
 _optimize(_Parser *par, _Reprog *pp)
 {
@@ -557,6 +559,7 @@ _optimize(_Parser *par, _Reprog *pp)
     return npp;
 }
 
+
 static _Reclass*
 _newclass(_Parser *par)
 {
@@ -565,37 +568,74 @@ _newclass(_Parser *par)
     return &(par->classp[par->nclass++]);
 }
 
-static int
+
+static int /* quoted */
 _nextc(_Parser *par, _Rune *rp)
 {
+    start:
     if (par->lexdone) {
         *rp = 0;
         return 1;
     }
+    int ret = par->litmode;
     par->exprp += chartorune(rp, par->exprp);
+
     if (*rp == '\\') {
         if (par->litmode && *par->exprp != 'E')
-            return 1; /* quoted */
+            return 1; /* litmode */
         par->exprp += chartorune(rp, par->exprp);
+
         switch (*rp) {
-        case 'E': return 1 + par->litmode; /* 1 or 2 */
-        case 't': *rp = '\t'; break;
-        case 'n': *rp = '\n'; break;
-        case 'r': *rp = '\r'; break;
-        case 'v': *rp = '\v'; break;
-        case 'f': *rp = '\f'; break;
-        case 'd': *rp = UTF_d; break;
-        case 'D': *rp = UTF_D; break;
-        case 's': *rp = UTF_s; break;
-        case 'S': *rp = UTF_S; break;
-        case 'w': *rp = UTF_w; break;
-        case 'W': *rp = UTF_W; break;
-        case 'x': if (*par->exprp != '{') break;
-            *rp = 0; sscanf(++par->exprp, "%x", rp);
+        case 'Q':
+            par->litmode = true;
+            goto start;
+        case 'E':
+            if (!par->litmode) break;
+            par->litmode = false;
+            goto start;
+        }
+        ret = 1;
+    }
+    if (*rp == 0)
+        par->lexdone = true;
+    return ret;
+}
+
+
+static _Token
+_lex(_Parser *par)
+{
+    bool quoted = _nextc(par, &par->yyrune);
+
+    if (quoted) {
+        if (par->litmode)
+            return par->rune_type;
+
+        switch (par->yyrune) {
+        case 't': return '\t';
+        case 'n': return '\n';
+        case 'r': return '\r';
+        case 'v': return '\v';
+        case 'f': return '\f';
+        case 'd': return UTF_d;
+        case 'D': return UTF_D;
+        case 's': return UTF_s;
+        case 'S': return UTF_S;
+        case 'w': return UTF_w;
+        case 'W': return UTF_W;
+        case 'b': return TOK_WBOUND;
+        case 'B': return TOK_NWBOUND;
+        case 'A': return TOK_BOS;
+        case 'z': return TOK_EOS;
+        case 'Z': return TOK_EOZ;
+        case 'x': /* hex number */
+            if (*par->exprp != '{') break;
+            sscanf(++par->exprp, "%x", &par->yyrune);
             while (*par->exprp) if (*(par->exprp++) == '}') break;
             if (par->exprp[-1] != '}')
                 _rcerror(par, CREG_UNMATCHEDRIGHTPARENTHESIS);
-            return 3; /* hex rune */
+            if (par->yyrune == 0) return TOK_END;
+            break; 
         case 'p': case 'P': { /* https://www.regular-expressions.info/unicode.html */
             static struct { const char* c; int n, r; } cls[] = {
                 {"{Space}", 7, UTF_s}, {"{Zs}", 4, UTF_s},
@@ -606,54 +646,24 @@ _nextc(_Parser *par, _Rune *rp)
                 {"{Alnum}", 7, UTF_an},
                 {"{XDigit}", 8, UTF_xd},
             };
-            int inv = *rp == 'P';
+            int inv = par->yyrune == 'P';
             for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i) {
                 if (!strncmp(par->exprp, cls[i].c, (size_t)cls[i].n)) {
                     if (par->rune_type == TOK_IRUNE && (cls[i].r == UTF_lo || cls[i].r == UTF_up))
-                        *rp = (_Rune)(UTF_al + inv);
+                        par->yyrune = (_Rune)(UTF_al + inv);
                     else
-                        *rp = (_Rune)(cls[i].r + inv);
+                        par->yyrune = (_Rune)(cls[i].r + inv);
                     par->exprp += cls[i].n;
                     break;
                 }
             }
-            if (*rp < TOK_OPERATOR) {
+            if (par->yyrune < TOK_OPERATOR) {
                 _rcerror(par, CREG_UNKNOWNOPERATOR);
-                *rp = 0;
+                par->yyrune = 0;
             }
             break;
         }}
-        return 1;
-    }
-    if (*rp == 0)
-        par->lexdone = true;
-    return par->litmode;
-}
-
-static _Token
-_lex(_Parser *par)
-{
-    int quoted;
-    start: quoted = _nextc(par, &par->yyrune);
-
-    switch (quoted) {
-    case 1:
-        switch (par->yyrune) {
-        case  0 : return TOK_END;
-        case 'b': return TOK_WBOUND;
-        case 'B': return TOK_NWBOUND;
-        case 'A': return TOK_BOS;
-        case 'z': return TOK_EOS;
-        case 'Z': return TOK_EOZ;
-        case 'Q': par->litmode = true;
-                  goto start;
-        }
         return par->rune_type;
-    case 2: /* 'E' */
-        par->litmode = false;
-        goto start;
-    case 3: /* 'x' */
-        return par->yyrune == 0 ? TOK_END : par->rune_type;
     }
 
     switch (par->yyrune) {
@@ -662,7 +672,10 @@ _lex(_Parser *par)
     case '?': return TOK_QUEST;
     case '+': return TOK_PLUS;
     case '|': return TOK_OR;
+    case '^': return TOK_BOL;
+    case '$': return TOK_EOL;
     case '.': return par->dot_type;
+    case '[': return _bldcclass(par);
     case '(':
         if (par->exprp[0] == '?') { /* override global flags */
             for (int k = 1, enable = 1; ; ++k) switch (par->exprp[k]) {
@@ -677,12 +690,10 @@ _lex(_Parser *par)
         }
         return TOK_LBRA;
     case ')': return TOK_RBRA;
-    case '^': return TOK_BOL;
-    case '$': return TOK_EOL;
-    case '[': return _bldcclass(par);
     }
     return par->rune_type;
 }
+
 
 static _Token
 _bldcclass(_Parser *par)
@@ -788,6 +799,7 @@ _bldcclass(_Parser *par)
 
     return type;
 }
+
 
 static _Reprog*
 _regcomp1(_Reprog *progp, _Parser *par, const char *s, int cflags)
@@ -1081,6 +1093,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
     return match;
 }
 
+
 static int
 _regexec2(const _Reprog *progp,    /* program to run */
     const char *bol,    /* string to run machine on */
@@ -1154,6 +1167,7 @@ _regexec(const _Reprog *progp,    /* program to run */
     rv = _regexec2(progp, bol, mp, ms, &j, mflags);
     return rv;
 }
+
 
 static void
 _build_subst(const char* replace, unsigned nmatch, const csview match[],
