@@ -577,25 +577,26 @@ _nextc(_Parser *par, _Rune *rp)
         *rp = 0;
         return 1;
     }
-start:
-    ret = par->litmode;
-    par->exprp += chartorune(rp, par->exprp);
-
-    if (*rp == '\\') {
-        if (par->litmode && *par->exprp != 'E')
-            return 1; /* litmode */
+    for (;;) {
+        ret = par->litmode;
         par->exprp += chartorune(rp, par->exprp);
 
-        switch (*rp) {
-        case 'Q':
-            par->litmode = true;
-            goto start;
-        case 'E':
-            if (!par->litmode) break;
-            par->litmode = false;
-            goto start;
+        if (*rp == '\\') {
+            if (par->litmode) {
+                if (*par->exprp != 'E')
+                    break;
+                par->litmode = false;
+                par->exprp += 1;
+                continue;
+            }
+            par->exprp += chartorune(rp, par->exprp);
+            if (*rp == 'Q') {
+                par->litmode = true;
+                continue;
+            }
+            ret = 1;
         }
-        ret = 1;
+        break;
     }
     if (*rp == 0)
         par->lexdone = true;
@@ -1126,7 +1127,7 @@ static int
 _regexec(const _Reprog *progp,    /* program to run */
     const char *bol,    /* string to run machine on */
     unsigned ms,        /* number of elements at mp */
-    _Resub mp[],         /* subexpression elements */
+    _Resub mp[],        /* subexpression elements */
     int mflags)
 {
     _Reljunk j;
@@ -1134,7 +1135,7 @@ _regexec(const _Reprog *progp,    /* program to run */
     int rv;
 
     /*
-      *  use user-specified starting/ending location if specified
+     *  use user-specified starting/ending location if specified
      */
     j.starts = bol;
     j.eol = NULL;
