@@ -597,6 +597,71 @@ _nextc(_Parser *par, _Rune *rp)
 }
 
 
+static void
+_lexasciiclass(_Parser *par, _Rune *rp) /* assume *rp == '[' and *par->exprp == ':' */
+{
+    static struct { const char* c; int n, r; } cls[] = {
+        {"alnum:]", 7, ASC_an}, {"alpha:]", 7, ASC_al}, {"ascii:]", 7, ASC_as},
+        {"blank:]", 7, ASC_bl}, {"cntrl:]", 7, ASC_ct}, {"digit:]", 7, ASC_d},
+        {"graph:]", 7, ASC_gr}, {"lower:]", 7, ASC_lo}, {"print:]", 7, ASC_pr},
+        {"punct:]", 7, ASC_pu}, {"space:]", 7, ASC_s}, {"upper:]", 7, ASC_up},
+        {"xdigit:]", 8, ASC_xd}, {"word:]", 6, ASC_w},
+    };
+    int inv = par->exprp[1] == '^', off = 1 + inv;
+    for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
+        if (!strncmp(par->exprp + off, cls[i].c, (size_t)cls[i].n)) {
+            *rp = (_Rune)cls[i].r;
+            par->exprp += off + cls[i].n;
+            break;
+        }
+    if (par->rune_type == TOK_IRUNE && (*rp == ASC_lo || *rp == ASC_up))
+        *rp = (_Rune)ASC_al;
+    if (inv && *rp != '[')
+        *rp += 1;
+}
+
+
+static void
+_lexutfclass(_Parser *par, _Rune *rp)
+{
+    static struct { const char* c; int n, r; } cls[] = {
+        {"{Space}", 7, UTF_s}, {"{Zs}", 4, UTF_s},
+        {"{Digit}", 7, UTF_d}, {"{Nd}", 4, UTF_d},
+        {"{Alpha}", 7, UTF_al}, {"{LC}", 4, UTF_al},
+        {"{Lower}", 7, UTF_lo}, {"{Ll}", 4, UTF_lo},
+        {"{Upper}", 7, UTF_up}, {"{Lu}", 4, UTF_up},
+        {"{Alnum}", 7, UTF_an},
+        {"{XDigit}", 8, UTF_xd},
+    };
+    int inv = (*rp == 'P');
+    for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i) {
+        if (!strncmp(par->exprp, cls[i].c, (size_t)cls[i].n)) {
+            if (par->rune_type == TOK_IRUNE && (cls[i].r == UTF_lo || cls[i].r == UTF_up))
+                *rp = (_Rune)(UTF_al + inv);
+            else
+                *rp = (_Rune)(cls[i].r + inv);
+            par->exprp += cls[i].n;
+            break;
+        }
+    }
+}
+
+#define CASE_RUNE_MAPPINGS(rune) \
+    case 't': rune = '\t'; break; \
+    case 'n': rune = '\n'; break; \
+    case 'r': rune = '\r'; break; \
+    case 'v': rune = '\v'; break; \
+    case 'f': rune = '\f'; break; \
+    case 'a': rune = '\a'; break; \
+    case 'e': rune = '\e'; break; \
+    case 'd': rune = UTF_d; break; \
+    case 'D': rune = UTF_D; break; \
+    case 's': rune = UTF_s; break; \
+    case 'S': rune = UTF_S; break; \
+    case 'w': rune = UTF_w; break; \
+    case 'W': rune = UTF_W; break
+
+
 static _Token
 _lex(_Parser *par)
 {
@@ -607,17 +672,7 @@ _lex(_Parser *par)
             return par->rune_type;
 
         switch (par->yyrune) {
-        case 't': par->yyrune = '\t'; break;
-        case 'n': par->yyrune = '\n'; break;
-        case 'r': par->yyrune = '\r'; break;
-        case 'v': par->yyrune = '\v'; break;
-        case 'f': par->yyrune = '\f'; break;
-        case 'd': par->yyrune = UTF_d; break;
-        case 'D': par->yyrune = UTF_D; break;
-        case 's': par->yyrune = UTF_s; break;
-        case 'S': par->yyrune = UTF_S; break;
-        case 'w': par->yyrune = UTF_w; break;
-        case 'W': par->yyrune = UTF_W; break;
+        CASE_RUNE_MAPPINGS(par->yyrune);
         case 'b': return TOK_WBOUND;
         case 'B': return TOK_NWBOUND;
         case 'A': return TOK_BOS;
@@ -631,33 +686,10 @@ _lex(_Parser *par)
                 _rcerror(par, CREG_UNMATCHEDRIGHTPARENTHESIS);
             if (par->yyrune == 0) return TOK_END;
             break; 
-        case 'p': case 'P': { /* https://www.regular-expressions.info/unicode.html */
-            static struct { const char* c; int n, r; } cls[] = {
-                {"{Space}", 7, UTF_s}, {"{Zs}", 4, UTF_s},
-                {"{Digit}", 7, UTF_d}, {"{Nd}", 4, UTF_d},
-                {"{Alpha}", 7, UTF_al}, {"{LC}", 4, UTF_al},
-                {"{Lower}", 7, UTF_lo}, {"{Ll}", 4, UTF_lo},
-                {"{Upper}", 7, UTF_up}, {"{Lu}", 4, UTF_up},
-                {"{Alnum}", 7, UTF_an},
-                {"{XDigit}", 8, UTF_xd},
-            };
-            int inv = par->yyrune == 'P';
-            for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i) {
-                if (!strncmp(par->exprp, cls[i].c, (size_t)cls[i].n)) {
-                    if (par->rune_type == TOK_IRUNE && (cls[i].r == UTF_lo || cls[i].r == UTF_up))
-                        par->yyrune = (_Rune)(UTF_al + inv);
-                    else
-                        par->yyrune = (_Rune)(cls[i].r + inv);
-                    par->exprp += cls[i].n;
-                    break;
-                }
-            }
-            if (par->yyrune < TOK_OPERATOR) {
-                _rcerror(par, CREG_UNKNOWNOPERATOR);
-                par->yyrune = 0;
-            }
+        case 'p': case 'P': 
+            _lexutfclass(par, &par->yyrune);
             break;
-        }}
+        }
         return par->rune_type;
     }
 
@@ -734,43 +766,25 @@ _bldcclass(_Parser *par)
                     continue;
                 }
             }
-            if (rune == '[' && *par->exprp == ':') {
-                static struct { const char* c; int n, r; } cls[] = {
-                    {"alnum:]", 7, ASC_an}, {"alpha:]", 7, ASC_al}, {"ascii:]", 7, ASC_as},
-                    {"blank:]", 7, ASC_bl}, {"cntrl:]", 7, ASC_ct}, {"digit:]", 7, ASC_d},
-                    {"graph:]", 7, ASC_gr}, {"lower:]", 7, ASC_lo}, {"print:]", 7, ASC_pr},
-                    {"punct:]", 7, ASC_pu}, {"space:]", 7, ASC_s}, {"upper:]", 7, ASC_up},
-                    {"xdigit:]", 8, ASC_xd}, {"word:]", 6, ASC_w},
-                };
-                int inv = par->exprp[1] == '^', off = 1 + inv;
-                for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i)
-                    if (!strncmp(par->exprp + off, cls[i].c, (size_t)cls[i].n)) {
-                        rune = (_Rune)cls[i].r;
-                        par->exprp += off + cls[i].n;
-                        break;
-                    }
-                if (par->rune_type == TOK_IRUNE && (rune == ASC_lo || rune == ASC_up))
-                    rune = (_Rune)ASC_al;
-                if (inv && rune != '[')
-                    rune += 1;
-            }
+            if (rune == '[' && *par->exprp == ':')
+                _lexasciiclass(par, &rune);
+        } else switch (rune) {
+            CASE_RUNE_MAPPINGS(rune);
+            case 'p': case 'P':
+                _lexutfclass(par, &rune);
+                break;
         }
         ep[0] = ep[1] = par->rune_type == TOK_IRUNE ? utf8_casefold(rune) : rune;
         ep += 2;
     }
 
     /* sort on span start */
-    for (p = r; p < ep; p += 2) {
+    for (p = r; p < ep; p += 2)
         for (np = p; np < ep; np += 2)
             if (*np < *p) {
-                rune = np[0];
-                np[0] = p[0];
-                p[0] = rune;
-                rune = np[1];
-                np[1] = p[1];
-                p[1] = rune;
+                rune = np[0]; np[0] = p[0]; p[0] = rune;
+                rune = np[1]; np[1] = p[1]; p[1] = rune;
             }
-    }
 
     /* merge spans */
     np = par->yyclassp->spans;
@@ -905,7 +919,6 @@ _runematch(_Rune s, _Rune r)
     case ASC_up: return inv ^ (isupper(r) != 0);
     case ASC_XD: inv = 1;
     case ASC_xd: return inv ^ (isxdigit(r) != 0);
-
     case UTF_D: inv = 1;
     case UTF_d: return inv ^ (utf8_isdigit(r));
     case UTF_S: inv = 1;
