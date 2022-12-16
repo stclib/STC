@@ -327,7 +327,6 @@ typedef struct _Parser
     int rune_type;
     bool litmode;
     bool lastwasand;     /* Last token was _operand */
-    bool lexdone;
     short nbra;
     short nclass;
     _Rune yyrune;         /* last lex'd rune */
@@ -573,10 +572,6 @@ static int /* quoted */
 _nextc(_Parser *par, _Rune *rp)
 {
     int ret;
-    if (par->lexdone) {
-        *rp = 0;
-        return 1;
-    }
     for (;;) {
         ret = par->litmode;
         par->exprp += chartorune(rp, par->exprp);
@@ -585,27 +580,19 @@ _nextc(_Parser *par, _Rune *rp)
             if (par->litmode) {
                 if (*par->exprp != 'E')
                     break;
-                par->litmode = false;
                 par->exprp += 1;
+                par->litmode = false;
                 continue;
             }
             par->exprp += chartorune(rp, par->exprp);
-            switch (*rp) {
-            case 'Q':
+            if (*rp == 'Q') {
                 par->litmode = true;
                 continue;
-            case 't': *rp = '\t'; break;
-            case 'n': *rp = '\n'; break;
-            case 'r': *rp = '\r'; break;
-            case 'v': *rp = '\v'; break;
-            case 'f': *rp = '\f'; break;
             }
             ret = 1;
         }
         break;
     }
-    if (*rp == 0)
-        par->lexdone = true;
     return ret;
 }
 
@@ -620,18 +607,23 @@ _lex(_Parser *par)
             return par->rune_type;
 
         switch (par->yyrune) {
-        case 'd': return UTF_d;
-        case 'D': return UTF_D;
-        case 's': return UTF_s;
-        case 'S': return UTF_S;
-        case 'w': return UTF_w;
-        case 'W': return UTF_W;
+        case 't': par->yyrune = '\t'; break;
+        case 'n': par->yyrune = '\n'; break;
+        case 'r': par->yyrune = '\r'; break;
+        case 'v': par->yyrune = '\v'; break;
+        case 'f': par->yyrune = '\f'; break;
+        case 'd': par->yyrune = UTF_d; break;
+        case 'D': par->yyrune = UTF_D; break;
+        case 's': par->yyrune = UTF_s; break;
+        case 'S': par->yyrune = UTF_S; break;
+        case 'w': par->yyrune = UTF_w; break;
+        case 'W': par->yyrune = UTF_W; break;
         case 'b': return TOK_WBOUND;
         case 'B': return TOK_NWBOUND;
         case 'A': return TOK_BOS;
         case 'z': return TOK_EOS;
         case 'Z': return TOK_EOZ;
-        case 'x': /* hex number */
+        case 'x': /* hex number rune */
             if (*par->exprp != '{') break;
             sscanf(++par->exprp, "%x", &par->yyrune);
             while (*par->exprp) if (*(par->exprp++) == '}') break;
@@ -827,7 +819,6 @@ _regcomp1(_Reprog *progp, _Parser *par, const char *s, int cflags)
         goto out;
 
     /* go compile the sucker */
-    par->lexdone = false;
     par->flags = pp->flags;
     par->rune_type = pp->flags.icase ? TOK_IRUNE : TOK_RUNE;
     par->dot_type = pp->flags.dotall ? TOK_ANYNL : TOK_ANY;
