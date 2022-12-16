@@ -590,9 +590,15 @@ _nextc(_Parser *par, _Rune *rp)
                 continue;
             }
             par->exprp += chartorune(rp, par->exprp);
-            if (*rp == 'Q') {
+            switch (*rp) {
+            case 'Q':
                 par->litmode = true;
                 continue;
+            case 't': *rp = '\t'; break;
+            case 'n': *rp = '\n'; break;
+            case 'r': *rp = '\r'; break;
+            case 'v': *rp = '\v'; break;
+            case 'f': *rp = '\f'; break;
             }
             ret = 1;
         }
@@ -614,11 +620,6 @@ _lex(_Parser *par)
             return par->rune_type;
 
         switch (par->yyrune) {
-        case 't': return '\t';
-        case 'n': return '\n';
-        case 'r': return '\r';
-        case 'v': return '\v';
-        case 'f': return '\f';
         case 'd': return UTF_d;
         case 'D': return UTF_D;
         case 's': return UTF_s;
