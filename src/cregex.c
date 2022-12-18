@@ -861,22 +861,14 @@ _regcomp1(_Reprog *progp, _Parser *par, const char *s, int cflags)
     /* Force TOK_END */
     _operand(par, TOK_END);
     _evaluntil(par, TOK_START);
-#ifdef DEBUG
-    dumpstack(par);
-#endif
+
     if (par->nbra)
         _rcerror(par, CREG_UNMATCHEDLEFTPARENTHESIS);
     --par->andp;    /* points to first and only _operand */
     pp->startinst = par->andp->first;
-#ifdef DEBUG
-    dump(pp);
-#endif
+
     pp = _optimize(par, pp);
     pp->nsubids = (unsigned)par->cursubid;
-#ifdef DEBUG
-    print("start: %d\n", par->andp->first-pp->firstinst);
-    dump(pp);
-#endif
 out:
     if (par->error) {
         c_free(pp);
@@ -1236,7 +1228,7 @@ cregex_find(const cregex* re, const char* input,
             csview match[], int mflags) {
     int res = _regexec(re->prog, input, cregex_captures(re), match, mflags);
     switch (res) {
-    case 1: return CREG_SUCCESS;
+    case 1: return CREG_OK;
     case 0: return CREG_NOMATCH;
     default: return CREG_MATCHERROR;
     }
@@ -1247,7 +1239,7 @@ cregex_find_pattern(const char* pattern, const char* input,
                     csview match[], int cmflags) {
     cregex re = cregex_init();
     int res = cregex_compile(&re, pattern, cmflags);
-    if (res != CREG_SUCCESS) return res;
+    if (res != CREG_OK) return res;
     res = cregex_find(&re, input, match, cmflags);
     cregex_drop(&re);
     return res;
@@ -1263,7 +1255,7 @@ cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned 
     if (!count) count = ~0U;
     bool copy = !(rflags & CREG_R_STRIP);
 
-    while (count-- && cregex_find_sv(re, input, match) == CREG_SUCCESS) {
+    while (count-- && cregex_find_sv(re, input, match) == CREG_OK) {
         _build_subst(replace, nmatch, match, mfun, &subst);
         const size_t mpos = (size_t)(match[0].str - input.str);
         if (copy & (mpos > 0)) cstr_append_n(&out, input.str, mpos);
@@ -1280,7 +1272,7 @@ cstr
 cregex_replace_pattern_n(const char* pattern, const char* input, const char* replace, unsigned count,
                          bool (*mfun)(int, csview, cstr*), int crflags) {
     cregex re = cregex_init();
-    if (cregex_compile(&re, pattern, crflags) != CREG_SUCCESS)
+    if (cregex_compile(&re, pattern, crflags) != CREG_OK)
         assert(0);
     csview sv = {input, strlen(input)};
     cstr out = cregex_replace_sv(&re, sv, replace, count, mfun, crflags);

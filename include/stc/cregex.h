@@ -51,7 +51,8 @@ enum {
 };
 
 typedef enum {
-    CREG_SUCCESS = 0,
+    CREG_OK = 0,
+    CREG_SUCCESS = 0, /* [deprecated] */
     CREG_NOMATCH = -1,
     CREG_MATCHERROR = -2,
     CREG_OUTOFMEMORY = -3,
@@ -80,7 +81,7 @@ typedef struct {
 
 #define c_formatch(it, Re, Input) \
     for (cregex_iter it = {Re, Input}; \
-         cregex_find(it.re, it.input, it.match, CREG_M_NEXT) == CREG_SUCCESS;)
+         cregex_find(it.re, it.input, it.match, CREG_M_NEXT) == CREG_OK; )
 
 static inline
 cregex cregex_init(void) {
@@ -88,7 +89,7 @@ cregex cregex_init(void) {
     return re;
 }
 
-/* return CREG_SUCCESS, or negative error code on failure. */
+/* return CREG_OK, or negative error code on failure. */
 int cregex_compile(cregex *self, const char* pattern, int cflags);
 
 static inline
@@ -101,7 +102,7 @@ cregex cregex_from(const char* pattern, int cflags) {
 /* number of capture groups in a regex pattern, 0 if regex is invalid */
 unsigned cregex_captures(const cregex* self);
 
-/* return CREG_SUCCESS, CREG_NOMATCH or CREG_MATCHERROR. */
+/* return CREG_OK, CREG_NOMATCH or CREG_MATCHERROR. */
 int cregex_find(const cregex* re, const char* input,
                 csview match[], int mflags);
 static inline
@@ -117,7 +118,7 @@ int cregex_find_pattern(const char* pattern, const char* input,
 
 static inline
 bool cregex_is_match(const cregex* re, const char* input)
-    { return cregex_find(re, input, NULL, CREG_DEFAULT) == CREG_SUCCESS; }
+    { return cregex_find(re, input, NULL, CREG_DEFAULT) == CREG_OK; }
 
 /* replace regular expression */ 
 cstr cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned count,

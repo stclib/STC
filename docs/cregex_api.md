@@ -11,46 +11,51 @@ The API is simple and includes powerful string pattern matches and replace funct
 
 ```c
 enum {
-    // compile-flags
-    CREG_C_DOTALL = 1<<0,    // dot matches newline too
-    CREG_C_ICASE = 1<<1,     // ignore case
-    // match-flags
-    CREG_M_FULLMATCH = 1<<2, // like start-, end-of-line anchors were in pattern: "^ ... $"
-    CREG_M_NEXT = 1<<3,      // use end of previous match[0] as start of input
-    CREG_M_STARTEND = 1<<4,  // use match[0] as start+end of input
-    // replace-flags
-    CREG_R_STRIP = 1<<5,     // only keep the replaced matches, strip the rest
+    /* compile-flags */
+    CREG_C_DOTALL = 1<<0,    /* dot matches newline too: can be set/overridden by (?s) and (?-s) in RE */
+    CREG_C_ICASE = 1<<1,     /* ignore case mode: can be set/overridden by (?i) and (?-i) in RE */
+    /* match-flags */
+    CREG_M_FULLMATCH = 1<<2, /* like start-, end-of-line anchors were in pattern: "^ ... $" */
+    CREG_M_NEXT = 1<<3,      /* use end of previous match[0] as start of input */
+    CREG_M_STARTEND = 1<<4,  /* use match[0] as start+end of input */
+    /* replace-flags */
+    CREG_R_STRIP = 1<<5,     /* only keep the replaced matches, strip the rest */
 };
 
 cregex      cregex_init(void);
-
 cregex      cregex_from(const char* pattern, int cflags);
-            // return CREG_SUCCESS, or negative error code on failure.
+            /* return CREG_OK, or negative error code on failure */
 int         cregex_compile(cregex *self, const char* pattern, int cflags);
 
-            // num. of capture groups in regex. 0 if RE is invalid. First group is the full match.
+            /* num. of capture groups in regex. 0 if RE is invalid. First group is the full match */
 int         cregex_captures(const cregex* self); 
 
-            // return CREG_SUCCESS, CREG_NOMATCH, or CREG_MATCHERROR.
+            /* return CREG_OK, CREG_NOMATCH, or CREG_MATCHERROR */
 int         cregex_find(const cregex* re, const char* input, csview match[], int mflags);
+            /* Search inside input string-view only */
 int         cregex_find_sv(const cregex* re, csview input, csview match[]);
+            /* All-in-one search (compile + find + drop) */
 int         cregex_find_pattern(const char* pattern, const char* input, csview match[], int cmflags);
 
+            /* Check if there are matches in input */
 bool        cregex_is_match(const cregex* re, const char* input);
 
+            /* Replace all matches in input */
 cstr        cregex_replace(const cregex* re, const char* input, const char* replace);
+            /* Replace count matches in input string-view. Optionally transform replacement with mfun. */
 cstr        cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned count,
                               bool(*mfun)(int capgrp, csview match, cstr* mstr), int rflags);
 
+            /* All-in-one replacement (compile + find/replace + drop) */
 cstr        cregex_replace_pattern(const char* pattern, const char* input, const char* replace);
 cstr        cregex_replace_pattern_n(const char* pattern, const char* input, const char* replace, unsigned count,
                                      bool(*mfun)(int capgrp, csview match, cstr* mstr), int rflags);
 
-void        cregex_drop(cregex* self); // destroy
+void        cregex_drop(cregex* self); /* destroy */
 ```
 
 ### Error codes
-- CREG_SUCCESS = 0
+- CREG_OK = 0
 - CREG_NOMATCH = -1
 - CREG_MATCHERROR = -2
 - CREG_OUTOFMEMORY = -3
@@ -79,14 +84,15 @@ if (result < 0) return result;
 
 const char* url = "(https?://|ftp://|www\\.)([0-9A-Za-z@:%_+~#=-]+\\.)+([a-z][a-z][a-z]?)(/[/0-9A-Za-z\\.@:%_+~#=\\?&-]*)?";
 cregex re2 = cregex_from(url, CREG_DEFAULT);
-if (re2.error) return re2.error;
+if (re2.error != CREG_OK)
+    return re2.error;
 ...
 cregex_drop(&re2);
 cregex_drop(&re1);
 ```
-If an error occurs ```cregex_compile``` returns a negative value, see error codes.
+If an error occurs ```cregex_compile``` returns a negative error code stored in re2.error.
 
-### Getting the first match
+### Getting the first match and making text replacements
 ```c
 #define i_extern // include external utf8 and cregex functions implementation.
 #include <stc/cregex.h>
@@ -100,7 +106,7 @@ int main() {
 
     // Lets find the first date in the string:
     csview match[4]; // full-match, year, month, date.
-    if (cregex_find(&re, input, match, CREG_DEFAULT) == CREG_SUCCESS)
+    if (cregex_find(&re, input, match, CREG_DEFAULT) == CREG_OK)
         printf("Found date: %.*s\n", c_ARGsv(match[0]));
     else
         printf("Could not find any date\n");
@@ -128,7 +134,7 @@ In order to use a callback function in the replace call, see `examples/regex_rep
 To iterate multiple matches in an input string, you may use
 ```c
 csview match[5] = {0};
-while (cregex_find(&re, input, match, CREG_M_NEXT) == CREG_SUCCESS)
+while (cregex_find(&re, input, match, CREG_M_NEXT) == CREG_OK)
     c_forrange (k, cregex_captures(&re))
         printf("submatch %lld: %.*s\n", k, c_ARGsv(match[k]));
 ```
@@ -141,7 +147,9 @@ c_formatch (it, &re, input)
 
 ## Using cregex in a project
 
-**cregex** uses the following files: 
+The easiest is to `#define i_extern` before `#include <stc/cregex.h>`. Make sure to do that in one translation unit only.
+
+For reference, **cregex** uses the following files: 
 - `stc/cregex.h`, `stc/utf8.h`, `stc/csview.h`, `stc/cstr.h`, `stc/ccommon.h`, `stc/forward.h`
 - `src/cregex.c`, `src/utf8code.c`.
 
@@ -156,7 +164,7 @@ c_formatch (it, &re, input)
 | * | Match the preceding token as often as possible | |
 | + | Match the preceding token at least once and as often as possible | |
 | \| | Match either the expression before the \| or the expression after it | |
-| (***expr***) | Match the expression inside the parentheses. This adds a capture group | |
+| (***expr***) | Match the expression inside the parentheses. ***This adds a capture group*** | |
 | [***chars***] | Match any character inside the brackets. Ranges like a-z may also be used | |
 | \[^***chars***\] | Match any character not inside the bracket. | |
 | \x{***hex***} | Match UTF8 character/codepoint given as a hex number | * |
@@ -182,14 +190,14 @@ c_formatch (it, &re, input)
 | \p{Upper} or \p{Lu} | Match UTF8 upper case | * |
 | \p{Space} or \p{Sz} | Match UTF8 whitespace | * |
 | \P{***Class***} | Do not match the classes described above | * |
-| [[:alnum:]] [[:alpha:]] [[:ascii:]] | Match ASCII character class | * |
-| [[:blank:]] [[:cntrl:]] [[:digit:]] | Match ASCII character class | * |
-| [[:graph:]] [[:lower:]] [[:print:]] | Match ASCII character class | * |
-| [[:punct:]] [[:space:]] [[:upper:]] | Match ASCII character class | * |
-| [[:xdigit:]] [[:word:]] | Match ASCII character class | * |
-| [[:^***class***:]] | Match character not in the ASCII class | * |
+| [:alnum:] [:alpha:] [:ascii:] | Match ASCII character class. NB: only to be used inside [] brackets | * |
+| [:blank:] [:cntrl:] [:digit:] | " | * |
+| [:graph:] [:lower:] [:print:] | " | * |
+| [:punct:] [:space:] [:upper:] | " | * |
+| [:xdigit:] [:word:] | " | * |
+| [:^***class***:] | Match character not in the ASCII class | * |
 | $***n*** | *n*-th substitution backreference to capture group. ***n*** in 0-9. $0 is the entire match. | * |
-| $***nn***; | As above, but can handle ***nn*** < CREG_MAX_CAPTURES. | * |
+| $***nn;*** | As above, but can handle ***nn*** < CREG_MAX_CAPTURES. | * |
 
 ## Limitations
 
