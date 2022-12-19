@@ -50,19 +50,19 @@
 
 /* Macro overloading feature support based on: https://rextester.com/ONP80107 */
 #define c_MACRO_OVERLOAD(name, ...) \
-    c_paste(name, c_numargs(__VA_ARGS__))(__VA_ARGS__)
-#define c_concat(a, b) a ## b
-#define c_paste(a, b) c_concat(a, b)
-#define c_expand(...) __VA_ARGS__
-#define c_numargs(...) _c_APPLY_ARG_N((__VA_ARGS__, _c_RSEQ_N))
+    c_PASTE(name, c_NUMARGS(__VA_ARGS__))(__VA_ARGS__)
+#define c_CONCAT(a, b) a ## b
+#define c_PASTE(a, b) c_CONCAT(a, b)
+#define c_EXPAND(...) __VA_ARGS__
+#define c_NUMARGS(...) _c_APPLY_ARG_N((__VA_ARGS__, _c_RSEQ_N))
 
-#define _c_APPLY_ARG_N(args) c_expand(_c_ARG_N args)
+#define _c_APPLY_ARG_N(args) c_EXPAND(_c_ARG_N args)
 #define _c_RSEQ_N 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 #define _c_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, \
                  _14, _15, _16, N, ...) N
 
 #define c_static_assert(cond) \
-    typedef char c_paste(_static_assert_line_, __LINE__)[(cond) ? 1 : -1]
+    typedef char c_PASTE(_static_assert_line_, __LINE__)[(cond) ? 1 : -1]
 #define c_container_of(p, T, m) \
     ((T*)((char*)(p) + 0*sizeof((p) == &((T*)0)->m) - offsetof(T, m)))
 
@@ -209,13 +209,13 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
 #define c_auto2(C, a) \
     c_with2(C a = C##_init(), C##_drop(&a))
 #define c_auto3(C, a, b) \
-    c_with2(c_expand(C a = C##_init(), b = C##_init()), \
+    c_with2(c_EXPAND(C a = C##_init(), b = C##_init()), \
                (C##_drop(&b), C##_drop(&a)))
 #define c_auto4(C, a, b, c) \
-    c_with2(c_expand(C a = C##_init(), b = C##_init(), c = C##_init()), \
+    c_with2(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init()), \
                (C##_drop(&c), C##_drop(&b), C##_drop(&a)))
 #define c_auto5(C, a, b, c, d) \
-    c_with2(c_expand(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
+    c_with2(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
                (C##_drop(&d), C##_drop(&c), C##_drop(&b), C##_drop(&a)))
 
 #define c_drop(C, ...) do { c_forlist (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)

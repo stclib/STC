@@ -42,7 +42,7 @@ int main()
         m1 = SIPtrMap_clone(map);
 
         c_forpair (name, number, SIPtrMap, m1)
-            printf("%s: %" PRIdMAX "\n", cstr_str(_.name), **_.number);
+            printf("%s: %" PRId64 "\n", cstr_str(_.name), **_.number);
 
 
         puts("\nIBox map:");

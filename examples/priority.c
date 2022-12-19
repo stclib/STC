@@ -28,7 +28,7 @@ int main() {
 
         puts("Extract the hundred smallest.");
         c_forrange (100) {
-            printf("%" PRIdMAX " ", *cpque_i_top(&heap));
+            printf("%" PRId64 " ", *cpque_i_top(&heap));
             cpque_i_pop(&heap);
         }
     }

@@ -25,9 +25,9 @@
 
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
-  #define _cx_self c_paste(_i_prefix, i_tag)
-  #define _cx_memb(name) c_paste(_cx_self, name)
-  #define _cx_deftypes(macro, SELF, ...) c_expand(macro(SELF, __VA_ARGS__))
+  #define _cx_self c_PASTE(_i_prefix, i_tag)
+  #define _cx_memb(name) c_PASTE(_cx_self, name)
+  #define _cx_deftypes(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
   #define _cx_value _cx_memb(_value)
   #define _cx_key _cx_memb(_key)
   #define _cx_mapped _cx_memb(_mapped)
@@ -120,10 +120,10 @@
   #endif
 #elif defined i_keyboxed
   #define i_keyclass i_keyboxed
-  #define i_rawclass c_paste(i_keyboxed, _raw)
-  #define i_keyfrom c_paste(i_keyboxed, _from)
+  #define i_rawclass c_PASTE(i_keyboxed, _raw)
+  #define i_keyfrom c_PASTE(i_keyboxed, _from)
   #ifndef i_no_eq
-    #define i_eq c_paste(i_keyboxed, _raw_eq)
+    #define i_eq c_PASTE(i_keyboxed, _raw_eq)
   #endif
 #endif
 
@@ -136,22 +136,22 @@
 #ifdef i_keyclass
   #define i_key i_keyclass
   #ifndef i_keyclone
-    #define i_keyclone c_paste(i_key, _clone)
+    #define i_keyclone c_PASTE(i_key, _clone)
   #endif
   #if !defined i_keyto && defined i_keyraw
-    #define i_keyto c_paste(i_key, _toraw)
+    #define i_keyto c_PASTE(i_key, _toraw)
   #endif
   #ifndef i_keydrop
-    #define i_keydrop c_paste(i_key, _drop)
+    #define i_keydrop c_PASTE(i_key, _drop)
   #endif
 #endif
 
 #ifdef i_rawclass
   #if !defined i_cmp && !defined i_no_cmp
-    #define i_cmp c_paste(i_keyraw, _cmp)
+    #define i_cmp c_PASTE(i_keyraw, _cmp)
   #endif
   #if !defined i_hash && !defined i_no_hash
-    #define i_hash c_paste(i_keyraw, _hash)
+    #define i_hash c_PASTE(i_keyraw, _hash)
   #endif
 #endif
 
@@ -223,20 +223,20 @@
   #define i_valto cstr_sv
 #elif defined i_valboxed
   #define i_valclass i_valboxed
-  #define i_valraw c_paste(i_valboxed, _raw)
-  #define i_valfrom c_paste(i_valboxed, _from)
+  #define i_valraw c_PASTE(i_valboxed, _raw)
+  #define i_valfrom c_PASTE(i_valboxed, _from)
 #endif
 
 #ifdef i_valclass
   #define i_val i_valclass
   #ifndef i_valclone
-    #define i_valclone c_paste(i_val, _clone)
+    #define i_valclone c_PASTE(i_val, _clone)
   #endif
   #if !defined i_valto && defined i_valraw
-    #define i_valto c_paste(i_val, _toraw)
+    #define i_valto c_PASTE(i_val, _toraw)
   #endif
   #ifndef i_valdrop
-    #define i_valdrop c_paste(i_val, _drop)
+    #define i_valdrop c_PASTE(i_val, _drop)
   #endif
 #endif
 

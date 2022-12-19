@@ -114,7 +114,7 @@ STC_INLINE bool _cbits_disjoint(const uint64_t* set, const uint64_t* other, cons
 
 #endif // CBITS_H_INCLUDED
 
-#define _i_memb(name) c_paste(i_type, name)
+#define _i_memb(name) c_PASTE(i_type, name)
 
 #if !defined i_capacity // DYNAMIC SIZE BITARRAY
 
@@ -190,7 +190,7 @@ STC_INLINE cbits cbits_with_pattern(const size_t size, const uint64_t pattern) {
 
 #define _i_assert(x) (void)0
 #ifndef i_type
-#define i_type c_paste(cbits, i_capacity)
+#define i_type c_PASTE(cbits, i_capacity)
 #endif
 
 struct { uint64_t data64[(i_capacity - 1)/64 + 1]; } typedef i_type;
