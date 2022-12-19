@@ -32,8 +32,10 @@
 
 #if SIZE_MAX == UINT32_MAX
   #define c_ZU PRIu32
+  #define c_NPOS INT32_MAX
 #elif SIZE_MAX == UINT64_MAX
   #define c_ZU PRIu64
+  #define c_NPOS INT64_MAX
 #endif
 
 #if defined(_MSC_VER)
@@ -61,22 +63,20 @@
 
 #define c_static_assert(cond) \
     typedef char c_paste(_static_assert_line_, __LINE__)[(cond) ? 1 : -1]
-#define c_unchecked_container_of(ptr, type, member) \
-    ((type*)((char*)(ptr) - offsetof(type, member)))
 #define c_container_of(p, T, m) \
     ((T*)((char*)(p) + 0*sizeof((p) == &((T*)0)->m) - offsetof(T, m)))
 
 #ifndef __cplusplus
   #define c_alloc(T)            c_malloc(sizeof(T))
   #define c_alloc_n(T, n)       c_malloc(sizeof(T)*(n))
-  #define c_init(T)             (T)
   #define c_new(T, ...)         ((T*)memcpy(c_alloc(T), (T[]){__VA_ARGS__}, sizeof(T)))
+  #define c_INIT(T)             (T)
 #else
   #include <new>
   #define c_alloc(T)            static_cast<T*>(c_malloc(sizeof(T)))
   #define c_alloc_n(T, n)       static_cast<T*>(c_malloc(sizeof(T)*(n)))
-  #define c_init(T)             T
   #define c_new(T, ...)         new (c_alloc(T)) T(__VA_ARGS__)
+  #define c_INIT(T)             T
 #endif
 #ifndef c_malloc
   #define c_malloc(sz)          malloc(sz)
@@ -116,12 +116,12 @@ typedef const char* crawstr;
 #define crawstr_cmp(xp, yp) strcmp(*(xp), *(yp))
 #define crawstr_hash(p) cstrhash(*(p))
 
-#define c_strlen_lit(literal) (sizeof "" literal - 1U)
+#define c_strlen_lit(literal) (sizeof("" literal) - 1U)
 #define c_sv(...) c_MACRO_OVERLOAD(c_sv, __VA_ARGS__)
-#define c_sv1(lit) (c_init(csview){lit, c_strlen_lit(lit)})
-#define c_sv2(str, n) (c_init(csview){str, n})
-#define c_PRIsv ".*s"
-#define c_ARGsv(sv) (int)(sv).size, (sv).str
+#define c_sv1(lit) c_sv2(lit, c_strlen_lit(lit))
+#define c_sv2(str, n) (c_INIT(csview){str, n})
+#define c_ARGsv(sv) c_ARGSV(sv)  /* [deprecated] */
+#define c_ARGSV(sv) (int)(sv).size, (sv).str  /* use with "%.*s" */
 #define c_PAIR(ref) (ref)->first, (ref)->second
 
 #define _c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))

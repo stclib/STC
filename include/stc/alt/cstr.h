@@ -31,16 +31,18 @@
 #include <stdio.h> /* vsnprintf */
 #include <ctype.h>
 
+#define c_unchecked_container_of(ptr, type, member) \
+    ((type*)((char*)(ptr) - offsetof(type, member)))
+
 typedef char cstr_value;
 typedef struct { cstr_value* str; } cstr;
-#define cstr_npos (SIZE_MAX >> 1)
 typedef struct { size_t size, cap; char chr[1]; } cstr_priv;
 #define _cstr_p(self) c_unchecked_container_of((self)->str, cstr_priv, chr)
 #ifdef i_static 
     static cstr_priv _cstr_nullrep = {0, 0, {0}};
-    static const cstr cstr_null = {_cstr_nullrep.chr};
+    static const cstr cstr_NULL = {_cstr_nullrep.chr};
 #else
-    extern const cstr cstr_null;
+    extern const cstr cstr_NULL;
 #endif
 /* optimal memory: based on malloc_usable_size() sequence: 24, 40, 56, ... */
 #define _cstr_opt_mem(cap)  ((((offsetof(cstr_priv, chr) + (cap) + 8)>>4)<<4) + 8)
@@ -61,11 +63,11 @@ STC_API size_t          cstr_find(const cstr* self, const char* needle);
 STC_API size_t          cstr_find_at(const cstr* self, size_t pos, const char* needle);
 STC_API bool            cstr_getdelim(cstr *self, int delim, FILE *stream);
 
-STC_INLINE cstr         cstr_init() { return cstr_null; }
+STC_INLINE cstr         cstr_init() { return cstr_NULL; }
 STC_INLINE const char*  cstr_str(const cstr* self) { return self->str; }
 #define                 cstr_toraw(self) (self)->str
 STC_INLINE csview       cstr_sv(const cstr* self) 
-                            { return c_init(csview){self->str, _cstr_p(self)->size}; }
+                            { return c_INIT(csview){self->str, _cstr_p(self)->size}; }
 #define                 cstr_new(literal) \
                             cstr_from_n(literal, c_strlen_lit(literal))
 STC_INLINE cstr         cstr_from(const char* str)
@@ -116,17 +118,17 @@ STC_INLINE bool         cstr_getline(cstr *self, FILE *stream)
 
 STC_INLINE cstr_buf cstr_buffer(cstr* s) { 
     cstr_priv* p = _cstr_p(s);
-    return c_init(cstr_buf){s->str, p->size, p->cap};
+    return c_INIT(cstr_buf){s->str, p->size, p->cap};
 }
 
 STC_INLINE cstr cstr_with_capacity(const size_t cap) {
-    cstr s = cstr_null;
+    cstr s = cstr_NULL;
     cstr_reserve(&s, cap);
     return s;
 }
 
 STC_INLINE cstr cstr_with_size(const size_t len, const char fill) {
-    cstr s = cstr_null;
+    cstr s = cstr_NULL;
     cstr_resize(&s, len, fill);
     return s;
 }
@@ -147,7 +149,7 @@ STC_INLINE cstr* cstr_take(cstr* self, cstr s) {
 
 STC_INLINE cstr cstr_move(cstr* self) {
     cstr tmp = *self;
-    *self = cstr_null;
+    *self = cstr_NULL;
     return tmp;
 }
 
@@ -192,7 +194,7 @@ cstr_replace(cstr* self, const char* find, const char* repl, unsigned count) {
 
 #ifndef i_static
 static cstr_priv _cstr_nullrep = {0, 0, {0}};
-const cstr cstr_null = {_cstr_nullrep.chr};
+const cstr cstr_NULL = {_cstr_nullrep.chr};
 #endif
 
 STC_DEF char*
@@ -219,7 +221,7 @@ cstr_resize(cstr* self, const size_t len, const char fill) {
 
 STC_DEF cstr
 cstr_from_n(const char* str, const size_t n) {
-    if (n == 0) return cstr_null;
+    if (n == 0) return cstr_NULL;
     cstr_priv* prv = (cstr_priv*) c_malloc(_cstr_opt_mem(n));
     cstr s = {(char *) memcpy(prv->chr, str, n)};
     s.str[prv->size = n] = '\0';
@@ -254,7 +256,7 @@ cstr_vfmt(cstr* self, const char* fmt, va_list args) {
 
 STC_DEF cstr
 cstr_from_fmt(const char* fmt, ...) {
-    cstr ret = cstr_null;
+    cstr ret = cstr_NULL;
     va_list args; va_start(args, fmt);
     cstr_vfmt(&ret, fmt, args);
     va_end(args);
@@ -263,7 +265,7 @@ cstr_from_fmt(const char* fmt, ...) {
 
 STC_DEF int
 cstr_printf(cstr* self, const char* fmt, ...) {
-    cstr ret = cstr_null;
+    cstr ret = cstr_NULL;
     va_list args;
     va_start(args, fmt);
     int n = cstr_vfmt(&ret, fmt, args);
@@ -320,7 +322,7 @@ cstr_replace_at_sv(cstr* self, const size_t pos, size_t len, csview repl) {
 
 STC_DEF cstr
 cstr_replace_sv(csview str, csview find, csview repl, unsigned count) {
-    cstr out = cstr_null;
+    cstr out = cstr_NULL;
     size_t from = 0; char* res;
     if (count == 0) count = ~0;
     if (find.size)
@@ -368,14 +370,14 @@ cstr_getdelim(cstr *self, const int delim, FILE *fp) {
 STC_DEF size_t
 cstr_find(const cstr* self, const char* needle) {
     char* res = strstr(self->str, needle);
-    return res ? res - self->str : cstr_npos;
+    return res ? res - self->str : c_NPOS;
 }
 
 STC_DEF size_t
 cstr_find_at(const cstr* self, const size_t pos, const char* needle) {
-    if (pos > _cstr_p(self)->size) return cstr_npos;
+    if (pos > _cstr_p(self)->size) return c_NPOS;
     char* res = strstr(self->str + pos, needle);
-    return res ? res - self->str : cstr_npos;
+    return res ? res - self->str : c_NPOS;
 }
 
 #endif

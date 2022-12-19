@@ -46,7 +46,7 @@ int main()
         puts("");
     }
 
-    c_with (carr2_str text2d = carr2_str_with_size(h, d, cstr_null), carr2_str_drop(&text2d))
+    c_with (carr2_str text2d = carr2_str_with_size(h, d, cstr_NULL), carr2_str_drop(&text2d))
     {
         cstr_assign(&text2d.data[2][1], "hello");
         cstr_assign(&text2d.data[4][0], "world");

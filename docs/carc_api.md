@@ -67,7 +67,7 @@ bool        carc_X_value_eq(const i_val* x, const i_val* y);
 
 | Type name         | Type definition                                   | Used to represent...   |
 |:------------------|:--------------------------------------------------|:-----------------------|
-| `carc_null`       | `{NULL, NULL}`                                    | Init nullptr const     |
+| `carc_NULL`       | `{NULL, NULL}`                                    | Init nullptr const     |
 | `carc_X`          | `struct { carc_X_value* get; long* use_count; }`  | The carc type          |
 | `carc_X_value`    | `i_val`                                           | The carc element type  |
 | `carc_X_raw`      | `i_valraw`                                        | Convertion type        |

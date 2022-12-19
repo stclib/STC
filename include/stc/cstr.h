@@ -71,8 +71,7 @@ STC_API char* _cstr_internal_move(cstr* self, size_t pos1, size_t pos2);
 /**************************** PUBLIC API **********************************/
 
 #define cstr_new(literal) cstr_from_n(literal, c_strlen_lit(literal))
-#define cstr_npos (SIZE_MAX >> 1)
-#define cstr_null (c_init(cstr){{{0}, 0}})
+#define cstr_NULL (c_INIT(cstr){{{0}, 0}})
 #define cstr_toraw(self) cstr_str(self)
 
 STC_API char*   cstr_reserve(cstr* self, size_t cap);
@@ -92,16 +91,16 @@ STC_API cstr    cstr_replace_sv(csview sv, csview search, csview repl, unsigned 
 
 STC_INLINE cstr_buf cstr_buffer(cstr* s) {
     return cstr_is_long(s)
-        ? c_init(cstr_buf){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
-        : c_init(cstr_buf){s->sml.data, cstr_s_size(s), cstr_s_cap};
+        ? c_INIT(cstr_buf){s->lon.data, cstr_l_size(s), cstr_l_cap(s)}
+        : c_INIT(cstr_buf){s->sml.data, cstr_s_size(s), cstr_s_cap};
 }
 STC_INLINE csview cstr_sv(const cstr* s) {
-    return cstr_is_long(s) ? c_init(csview){s->lon.data, cstr_l_size(s)}
-                           : c_init(csview){s->sml.data, cstr_s_size(s)};
+    return cstr_is_long(s) ? c_INIT(csview){s->lon.data, cstr_l_size(s)}
+                           : c_INIT(csview){s->sml.data, cstr_s_size(s)};
 }
 
 STC_INLINE cstr cstr_init(void)
-    { return cstr_null; }
+    { return cstr_NULL; }
 
 STC_INLINE cstr cstr_from_n(const char* str, const size_t len) {
     cstr s;
@@ -136,7 +135,7 @@ STC_INLINE cstr* cstr_take(cstr* self, const cstr s) {
 
 STC_INLINE cstr cstr_move(cstr* self) {
     cstr tmp = *self;
-    *self = cstr_null;
+    *self = cstr_NULL;
     return tmp;
 }
 
@@ -224,11 +223,11 @@ STC_INLINE csview cstr_u8_chr(const cstr* self, size_t u8idx) {
 
 STC_INLINE cstr_iter cstr_begin(const cstr* self) { 
     csview sv = cstr_sv(self);
-    if (!sv.size) return c_init(cstr_iter){NULL};
-    return c_init(cstr_iter){.u8 = {{sv.str, utf8_chr_size(sv.str)}}};
+    if (!sv.size) return c_INIT(cstr_iter){NULL};
+    return c_INIT(cstr_iter){.u8 = {{sv.str, utf8_chr_size(sv.str)}}};
 }
 STC_INLINE cstr_iter cstr_end(const cstr* self) {
-    (void)self; return c_init(cstr_iter){NULL};
+    (void)self; return c_INIT(cstr_iter){NULL};
 }
 STC_INLINE void cstr_next(cstr_iter* it) {
     it->ref += it->u8.chr.size;
@@ -283,7 +282,7 @@ STC_INLINE bool cstr_iequals(const cstr* self, const char* str)
 
 STC_INLINE size_t cstr_find(const cstr* self, const char* search) {
     const char *str = cstr_str(self), *res = strstr((char*)str, search);
-    return res ? (size_t)(res - str) : cstr_npos;
+    return res ? (size_t)(res - str) : c_NPOS;
 }
 
 STC_API size_t cstr_find_sv(const cstr* self, csview search);
@@ -296,7 +295,7 @@ STC_INLINE bool cstr_contains(const cstr* self, const char* search)
     { return strstr((char*)cstr_str(self), search) != NULL; }
 
 STC_INLINE bool cstr_contains_sv(const cstr* self, csview search)
-    { return cstr_find_sv(self, search) != cstr_npos; }
+    { return cstr_find_sv(self, search) != c_NPOS; }
 
 STC_INLINE bool cstr_contains_s(const cstr* self, cstr search)
     { return strstr((char*)cstr_str(self), cstr_str(&search)) != NULL; }
@@ -450,7 +449,7 @@ STC_DEF uint64_t cstr_hash(const cstr *self) {
 STC_DEF size_t cstr_find_sv(const cstr* self, csview search) {
     csview sv = cstr_sv(self);
     char* res = cstrnstrn(sv.str, search.str, sv.size, search.size);
-    return res ? (size_t)(res - sv.str) : cstr_npos;
+    return res ? (size_t)(res - sv.str) : c_NPOS;
 }
 
 STC_DEF char* _cstr_internal_move(cstr* self, const size_t pos1, const size_t pos2) {
@@ -522,9 +521,9 @@ STC_DEF void cstr_resize(cstr* self, const size_t size, const char value) {
 
 STC_DEF size_t cstr_find_at(const cstr* self, const size_t pos, const char* search) {
     csview sv = cstr_sv(self);
-    if (pos > sv.size) return cstr_npos;
+    if (pos > sv.size) return c_NPOS;
     const char* res = strstr((char*)sv.str + pos, search);
-    return res ? (size_t)(res - sv.str) : cstr_npos;
+    return res ? (size_t)(res - sv.str) : c_NPOS;
 }
 
 STC_DEF char* cstr_assign_n(cstr* self, const char* str, const size_t len) {
@@ -568,7 +567,7 @@ STC_DEF bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
 
 STC_DEF cstr
 cstr_replace_sv(csview in, csview search, csview repl, unsigned count) {
-    cstr out = cstr_null;
+    cstr out = cstr_NULL;
     size_t from = 0; char* res;
     if (!count) count = ~0U;
     if (search.size)
@@ -627,7 +626,7 @@ STC_DEF size_t cstr_vfmt(cstr* self, size_t start, const char* fmt, va_list args
 #endif
 
 STC_DEF cstr cstr_from_fmt(const char* fmt, ...) {
-    cstr s = cstr_null;
+    cstr s = cstr_NULL;
     va_list args;
     va_start(args, fmt);
     cstr_vfmt(&s, 0, fmt, args);

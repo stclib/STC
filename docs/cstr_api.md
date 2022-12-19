@@ -18,7 +18,7 @@ All cstr definitions and prototypes are available by including a single header f
 
 ## Methods
 ```c
-cstr         cstr_init(void);                                         // constructor; same as cstr_null.
+cstr         cstr_init(void);                                         // constructor; same as cstr_NULL.
 cstr         cstr_new(const char literal_only[]);                     // cstr from literal; no strlen() call.
 cstr         cstr_from(const char* str);                              // constructor using strlen()
 cstr         cstr_from_n(const char* str, size_t n);                  // constructor with n first bytes of str
@@ -152,8 +152,8 @@ char*        cstrnstrn(const char* str, const char* search, size_t slen, size_t 
 
 | Name              | Value             |
 |:------------------|:------------------|
-|  `cstr_npos`      | `INTPTR_MAX`      |
-|  `cstr_null`      | cstr null value   |
+|  `c_NPOS`         | `INTPTR_MAX`      |
+|  `cstr_NULL`      | cstr null value   |
 
 ## Example
 ```c

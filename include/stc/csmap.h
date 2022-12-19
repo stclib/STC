@@ -144,7 +144,7 @@ _cx_memb(_clear)(_cx_self* self)
 STC_INLINE _cx_raw
 _cx_memb(_value_toraw)(const _cx_value* val) {
     return _i_SET_ONLY( i_keyto(val) )
-           _i_MAP_ONLY( c_init(_cx_raw){i_keyto((&val->first)), 
+           _i_MAP_ONLY( c_INIT(_cx_raw){i_keyto((&val->first)), 
                                         i_valto((&val->second))} );
 }
 
@@ -232,7 +232,7 @@ _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
     _cx_node* nodes = (_cx_node*)c_realloc(self->nodes, (cap + 1)*sizeof(_cx_node));
     if (!nodes)
         return false;
-    nodes[0] = c_init(_cx_node){{0, 0}, 0};
+    nodes[0] = c_INIT(_cx_node){{0, 0}, 0};
     self->nodes = nodes;
     self->cap = (i_size)cap;
     return true;

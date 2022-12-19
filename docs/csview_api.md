@@ -86,7 +86,7 @@ csview          cstr_slice_ex(const cstr* s, intptr_t p, intptr_t q);    // nega
 To iterate tokens in an input string separated by a string:
 ```c
 c_fortoken (i, "hello, one, two, three", ", ")
-    printf("token: %.*s\n", c_ARGsv(i.token));
+    printf("token: %.*s\n", c_ARGSV(i.token));
 ```
 
 #### Helper methods
@@ -109,10 +109,8 @@ uint64_t        csview_hash(const csview* x);
 
 | Name           | Value                | Usage                                        |
 |:---------------|:---------------------|:---------------------------------------------|
-| `csview_null`  | same as `c_sv("")`   | `sview = csview_null;`                       |
-| `csview_npos`  | same as `cstr_npos`  |                                              |
-| `c_PRIsv`      | `".*s"`              | `printf("sv: %" c_PRIsv "\n", c_ARGsv(sv));` |
-| `c_ARGsv(sv)`  | printf argument      | `printf("sv: %.*s\n", c_ARGsv(sv));`         |
+| `csview_NULL`  | same as `c_sv("")`   | `sview = csview_NULL;`                       |
+| `c_ARGSV(sv)`  | printf argument      | `printf("sv: %.*s\n", c_ARGSV(sv));`         |
 
 ## Example
 ```c
@@ -129,7 +127,7 @@ int main ()
     csview sv2 = cstr_substr(&str1, pos, 4);            // get "live"
     csview sv3 = cstr_slice(&str1, -8, -1);             // get "details"
     printf("%.*s %.*s %.*s\n",
-        c_ARGsv(sv1), c_ARGsv(sv2), c_ARGsv(sv3));
+        c_ARGSV(sv1), c_ARGSV(sv2), c_ARGSV(sv3));
     cstr s1 = cstr_new("Apples are red");
     cstr s2 = cstr_from_sv(cstr_substr(&s1, -3, 3));    // "red"
     cstr s3 = cstr_from_sv(cstr_substr(&s1, 0, 6));     // "Apples"
@@ -157,7 +155,7 @@ int main()
         printf("%s\n", cstr_str(&s1));
 
         c_foreach (i, cstr, s1)
-            printf("%.*s,", c_ARGsv(i.u8.chr));
+            printf("%.*s,", c_ARGSV(i.u8.chr));
     }
 }
 ```
@@ -177,7 +175,7 @@ and does not depend on null-terminated strings. *string_split()* function return
 void print_split(csview input, const char* sep)
 {
     c_fortoken_sv (i, input, sep)
-        printf("[%.*s]\n", c_ARGsv(i.token));
+        printf("[%.*s]\n", c_ARGSV(i.token));
 }
 
 #include <stc/cstr.h>

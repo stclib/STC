@@ -71,7 +71,7 @@ int main() {
     #define c_atomic_dec_and_test(v) (atomic_fetch_sub(v, 1) == 1)
 #endif
 
-#define carc_null {NULL, NULL}
+#define carc_NULL {NULL, NULL}
 #define _cx_carc_rep struct _cx_memb(_rep_)
 #endif // CARC_H_INCLUDED
 
@@ -94,7 +94,7 @@ _cx_deftypes(_c_carc_types, _cx_self, i_key);
 _cx_carc_rep { catomic_long counter; i_key value; };
 
 STC_INLINE _cx_self _cx_memb(_init)(void) 
-    { return c_init(_cx_self){NULL, NULL}; }
+    { return c_INIT(_cx_self){NULL, NULL}; }
 
 STC_INLINE long _cx_memb(_use_count)(const _cx_self* self)
     { return self->use_count ? *self->use_count : 0; }

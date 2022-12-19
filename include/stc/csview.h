@@ -27,19 +27,17 @@
 #include "forward.h"
 #include "utf8.h"
 
-#define             csview_null  c_sv("")
-#define             csview_npos  (SIZE_MAX >> 1)
-
-#define             csview_init() csview_null
-#define             csview_drop   c_default_drop
-#define             csview_clone  c_default_clone
-#define             csview_from_n c_sv
+#define             csview_NULL c_sv1("")
+#define             csview_init() csview_NULL
+#define             csview_drop(p) c_default_drop(p)
+#define             csview_clone(sv) c_default_clone(sv)
+#define             csview_from_n(str, n) c_sv2(str, n)
 
 STC_API size_t csview_find_sv(csview sv, csview search);
 
 STC_INLINE csview   csview_from(const char* str)
-                        { return c_init(csview){str, strlen(str)}; }
-STC_INLINE void     csview_clear(csview* self) { *self = csview_null; }
+                        { return c_INIT(csview){str, strlen(str)}; }
+STC_INLINE void     csview_clear(csview* self) { *self = csview_NULL; }
 
 STC_INLINE size_t   csview_size(csview sv) { return sv.size; }
 STC_INLINE bool     csview_empty(csview sv) { return sv.size == 0; }
@@ -51,7 +49,7 @@ STC_INLINE size_t csview_find(csview sv, const char* str)
     { return csview_find_sv(sv, c_sv(str, strlen(str))); }
 
 STC_INLINE bool csview_contains(csview sv, const char* str)
-    { return csview_find(sv, str) != csview_npos; }
+    { return csview_find(sv, str) != c_NPOS; }
 
 STC_INLINE bool csview_starts_with(csview sv, const char* str) {
     size_t n = strlen(str);
@@ -77,12 +75,12 @@ STC_INLINE csview csview_slice(csview sv, size_t p1, size_t p2) {
 
 /* utf8 iterator */
 STC_INLINE csview_iter csview_begin(const csview* self) { 
-    if (!self->size) return c_init(csview_iter){NULL};
-    return c_init(csview_iter){.u8 = {{self->str, utf8_chr_size(self->str)},
+    if (!self->size) return c_INIT(csview_iter){NULL};
+    return c_INIT(csview_iter){.u8 = {{self->str, utf8_chr_size(self->str)},
                                       self->str + self->size}};
 }
 STC_INLINE csview_iter csview_end(const csview* self) {
-    return c_init(csview_iter){.u8 = {{NULL}, self->str + self->size}};
+    return c_INIT(csview_iter){.u8 = {{NULL}, self->str + self->size}};
 }
 STC_INLINE void csview_next(csview_iter* it) {
     it->ref += it->u8.chr.size;
@@ -164,7 +162,7 @@ STC_API uint64_t csview_hash(const csview *self);
 
 STC_DEF size_t csview_find_sv(csview sv, csview search) {
     char* res = cstrnstrn(sv.str, search.str, sv.size, search.size);
-    return res ? (size_t)(res - sv.str) : csview_npos;
+    return res ? (size_t)(res - sv.str) : c_NPOS;
 }
 
 STC_DEF uint64_t csview_hash(const csview *self)

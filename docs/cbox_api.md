@@ -64,7 +64,7 @@ bool        cbox_X_value_eq(const i_val* x, const i_val* y);
 
 | Type name          | Type definition                                               | Used to represent...     |
 |:-------------------|:--------------------------------|:------------------------|
-| `cbox_null`        | `{NULL}`                        | Init nullptr const      |
+| `cbox_NULL`        | `{NULL}`                        | Init nullptr const      |
 | `cbox_X`           | `struct { cbox_X_value* get; }` | The cbox type           |
 | `cbox_X_value`     | `i_val`                         | The cbox element type   |
 

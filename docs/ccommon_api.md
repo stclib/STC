@@ -84,7 +84,7 @@ cvec_str readFile(const char* name)
     cvec_str vec = cvec_str_init(); // returned
 
     c_with (FILE* fp = fopen(name, "r"), fclose(fp))
-        c_with (cstr line = cstr_null, cstr_drop(&line))
+        c_with (cstr line = cstr_NULL, cstr_drop(&line))
             while (cstr_getline(&line, fp))
                 cvec_str_emplace_back(&vec, cstr_str(&line));
     return vec;
@@ -313,7 +313,7 @@ if (it.ref) cmap_str_erase_at(&map, it);
 c_erase_if(i, csmap_str, map, cstr_contains(i.ref, "hello"));
 ```
 
-### c_new, c_alloc, c_alloc_n, c_drop, c_init
+### c_new, c_alloc, c_alloc_n, c_drop
 
 | Usage                          | Meaning                                 |
 |:-------------------------------|:----------------------------------------|
@@ -321,7 +321,6 @@ c_erase_if(i, csmap_str, map, cstr_contains(i.ref, "hello"));
 | `c_alloc (type)`               | `(type *) c_malloc(sizeof(type))`       |
 | `c_alloc_n (type, N)`          | `(type *) c_malloc((N)*sizeof(type))`   |
 | `c_drop (ctype, &c1, ..., &cN)` | `ctype_drop(&c1); ... ctype_drop(&cN)` |
-| `c_init(type){value...}`       | `(type){value...}` // c++ compatability |
 
 ```c
 struct Pnt { double x, y, z; };

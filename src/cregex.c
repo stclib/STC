@@ -1174,7 +1174,7 @@ _build_subst(const char* replace, unsigned nmatch, const csview match[],
     cstr_buf buf = cstr_buffer(subst);
     size_t len = 0, cap = buf.cap;
     char* dst = buf.data;
-    cstr mstr = cstr_null;
+    cstr mstr = cstr_NULL;
 
     while (*replace != '\0') {
         if (*replace == '$') {
@@ -1248,8 +1248,8 @@ cregex_find_pattern(const char* pattern, const char* input,
 cstr
 cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned count,
                   bool (*mfun)(int, csview, cstr*), int rflags) {
-    cstr out = cstr_null;
-    cstr subst = cstr_null;
+    cstr out = cstr_NULL;
+    cstr subst = cstr_NULL;
     csview match[CREG_MAX_CAPTURES];
     unsigned nmatch = cregex_captures(re);
     if (!count) count = ~0U;

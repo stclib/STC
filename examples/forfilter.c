@@ -99,7 +99,7 @@ void demo3(void)
 
         puts("demo3:");
         c_foreach (w, SVec, words_containing_i)
-            printf(" %.*s", c_ARGsv(*w.ref));
+            printf(" %.*s", c_ARGSV(*w.ref));
         puts("");
     }
 }

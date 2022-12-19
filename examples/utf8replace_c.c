@@ -17,7 +17,7 @@ int main() {
         upper = cstr_toupper_sv(cstr_sv(&hello));
 
         c_foreach (c, cstr, hello)
-            printf("%.*s,", c_ARGsv(c.u8.chr));
+            printf("%.*s,", c_ARGSV(c.u8.chr));
         puts("");
     }
 }

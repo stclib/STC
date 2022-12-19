@@ -23,11 +23,11 @@ static inline int RViking_cmp(const RViking* rx, const RViking* ry) {
 }
 
 static inline Viking Viking_from(RViking raw) { // note: parameter is by value
-    return c_init(Viking){cstr_from(raw.name), cstr_from(raw.country)};
+    return c_INIT(Viking){cstr_from(raw.name), cstr_from(raw.country)};
 }
 
 static inline RViking Viking_toraw(const Viking* vp) {
-    return c_init(RViking){cstr_str(&vp->name), cstr_str(&vp->country)};
+    return c_INIT(RViking){cstr_str(&vp->name), cstr_str(&vp->country)};
 }
 
 // With this in place, we define the Viking => int hash map type:

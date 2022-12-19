@@ -94,11 +94,11 @@ STC_INLINE size_t _cx_memb(_idx)(const _cx_self* self, size_t x, size_t y, size_
 
 STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) {
     size_t n = _cx_memb(_size)(self);
-    return c_init(_cx_iter){n ? **self->data : NULL, **self->data + n};
+    return c_INIT(_cx_iter){n ? **self->data : NULL, **self->data + n};
 }
 
 STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self)
-    { return c_init(_cx_iter){NULL, **self->data + _cx_memb(_size)(self)}; }
+    { return c_INIT(_cx_iter){NULL, **self->data + _cx_memb(_size)(self)}; }
 
 STC_INLINE void _cx_memb(_next)(_cx_iter* it)
     { if (++it->ref == it->end) it->ref = NULL; }
