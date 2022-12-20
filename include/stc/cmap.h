@@ -73,7 +73,7 @@ typedef struct      { size_t idx; uint8_t hx; } chash_bucket_t;
 #ifndef i_max_load_factor
   #define i_max_load_factor 0.85f
 #endif
-#include "template.h"
+#include "priv/template.h"
 #ifndef i_hash_functor
   #define i_hash_functor(self, x) i_hash(x)
 #endif
@@ -450,4 +450,4 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY
 #define CMAP_H_INCLUDED
-#include "template.h"
+#include "priv/template.h"

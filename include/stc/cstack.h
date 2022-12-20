@@ -31,7 +31,7 @@
 #ifndef _i_prefix
 #define _i_prefix cstack_
 #endif
-#include "template.h"
+#include "priv/template.h"
 
 #if !c_option(c_is_forward)
 #ifdef i_capacity
@@ -183,4 +183,4 @@ STC_INLINE void _cx_memb(_next)(_cx_iter* it)
 STC_INLINE _cx_iter _cx_memb(_advance)(_cx_iter it, intptr_t n)
     { if ((it.ref += n) >= it.end) it.ref = NULL ; return it; }
 
-#include "template.h"
+#include "priv/template.h"

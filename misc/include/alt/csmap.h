@@ -70,7 +70,7 @@ int main(void) {
   #define _i_SET_ONLY c_false
   #define _i_keyref(vp) (&(vp)->first)
 #endif
-#include <stc/template.h>
+#include <stc/priv/template.h>
 
 #if !c_option(c_is_forward)
 _cx_deftypes(_c_aatree_types, _cx_self, i_key, i_val, i_size, _i_MAP_ONLY, _i_SET_ONLY);
@@ -509,4 +509,4 @@ _cx_memb(_drop)(_cx_self* self) {
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY
 #define CSMAP_H_INCLUDED
-#include <stc/template.h>
+#include <stc/priv/template.h>

@@ -34,7 +34,7 @@
 #ifndef _i_prefix
 #define _i_prefix cdeq_
 #endif
-#include "template.h"
+#include "priv/template.h"
 
 #if !c_option(c_is_forward)
 _cx_deftypes(_c_cdeq_types, _cx_self, i_key);
@@ -425,5 +425,5 @@ _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
 #endif // !c_no_cmp
 #endif // !_i_queue
 #endif // IMPLEMENTATION
-#include "template.h"
+#include "priv/template.h"
 #define CDEQ_H_INCLUDED

@@ -70,7 +70,7 @@ int main() {
 #ifndef _i_prefix
 #define _i_prefix cbox_
 #endif
-#include "template.h"
+#include "priv/template.h"
 typedef i_keyraw _cx_raw;
 
 #if !c_option(c_is_forward)
@@ -174,4 +174,4 @@ STC_INLINE uint64_t _cx_memb(_hash)(const _cx_self* x)
     { _cx_raw rx = i_keyto(x->get); return i_hash(&rx); }
 #endif
 
-#include "template.h"
+#include "priv/template.h"

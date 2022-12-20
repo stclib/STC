@@ -31,7 +31,7 @@
 #define _i_prefix cpque_
 #endif
 
-#include "template.h"
+#include "priv/template.h"
 #ifndef i_less_functor
   #define i_less_functor(self, x, y) i_less(x, y)
 #endif
@@ -158,4 +158,4 @@ _cx_memb(_push)(_cx_self* self, _cx_value value) {
 #endif
 #define CPQUE_H_INCLUDED
 #undef i_less_functor
-#include "template.h"
+#include "priv/template.h"

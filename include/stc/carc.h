@@ -78,7 +78,7 @@ int main() {
 #ifndef _i_prefix
 #define _i_prefix carc_
 #endif
-#include "template.h"
+#include "priv/template.h"
 typedef i_keyraw _cx_raw;
 
 #if !c_option(c_no_atomic)
@@ -201,4 +201,4 @@ STC_INLINE uint64_t _cx_memb(_hash)(const _cx_self* x)
 
 #undef _i_atomic_inc
 #undef _i_atomic_dec_and_test
-#include "template.h"
+#include "priv/template.h"

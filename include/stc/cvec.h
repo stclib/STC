@@ -71,7 +71,7 @@ int main() {
 #ifndef _i_prefix
 #define _i_prefix cvec_
 #endif
-#include "template.h"
+#include "priv/template.h"
 
 #if !c_option(c_is_forward)
    _cx_deftypes(_c_cvec_types, _cx_self, i_key);
@@ -256,7 +256,7 @@ _cx_memb(_sort)(_cx_self* self) {
 
 STC_DEF _cx_self
 _cx_memb(_init)(void) {
-    return (_cx_self){NULL};
+    return c_INIT(_cx_self){NULL};
 }
 
 STC_DEF void
@@ -420,4 +420,4 @@ _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
 #endif // !c_no_cmp
 #endif // i_implement
 #define CVEC_H_INCLUDED
-#include "template.h"
+#include "priv/template.h"

@@ -83,7 +83,7 @@ _c_clist_complete_types(clist_VOID, dummy);
 #ifndef _i_prefix
 #define _i_prefix clist_
 #endif
-#include "template.h"
+#include "priv/template.h"
 
 #if !c_option(c_is_forward)
   _cx_deftypes(_c_clist_types, _cx_self, i_key);
@@ -442,4 +442,4 @@ _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
 #endif // !c_no_cmp
 #endif // i_implement
 #define CLIST_H_INCLUDED
-#include "template.h"
+#include "priv/template.h"

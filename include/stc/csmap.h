@@ -73,7 +73,7 @@ int main(void) {
   #define _i_SET_ONLY c_false
   #define _i_keyref(vp) (&(vp)->first)
 #endif
-#include "template.h"
+#include "priv/template.h"
 #ifndef i_cmp_functor
   #define i_cmp_functor(self, x, y) i_cmp(x, y)
 #endif
@@ -575,5 +575,5 @@ _cx_memb(_drop)(_cx_self* self) {
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY
 #define CSMAP_H_INCLUDED
-#include "template.h"
+#include "priv/template.h"
 #endif // !STC_CSMAP_V1
