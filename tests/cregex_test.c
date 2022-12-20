@@ -225,7 +225,7 @@ START_TEST(captures_cap)
 
         csview cap[5];
         EXPECT_EQ(cregex_find("xxabcdcde", &re, cap, 0), 1);
-        EXPECT_TRUE(csview_equals(cap.match[0], c_sv("abcdcd")));
+        EXPECT_TRUE(csview_equals(cap.match[0], c_SV("abcdcd")));
         /*
         EXPECT_EQ(cap0.end, 8);
         EXPECT_EQ(cap1.start, 2);

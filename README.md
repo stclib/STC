@@ -489,7 +489,6 @@ Memory efficiency
     - Renamed `csview_*_u8()` => `csview_u8_*()`
     - Added cstr_u8_slice() and csview_u8_slice().
     - Removed `csview_from_s()`: Use `cstr_sv(s)` instead.
-    - Removed `csview_from_n()`: Use `c_sv(str, n)` instead.
     - Added back file coption.h
     - Simplified **cbits** usage: all inlined.
     - Updated docs.

@@ -209,7 +209,7 @@ utfruneicase(const char *s, _Rune c)
     _Rune r = *s;
     int n;
     if (c < 128) for (c = tolower(c); r; ++s, r = *(unsigned char*)s) {
-        if (r < 128 && tolower(r) == c) return s;
+        if (r < 128 && (unsigned)tolower(r) == c) return s;
     }
     else for (c = utf8_casefold(c); r; s += n, r = *(unsigned char*)s) {
         if (r < 128) { n = 1; continue; }
@@ -653,7 +653,6 @@ _lexutfclass(_Parser *par, _Rune *rp)
     case 'v': rune = '\v'; break; \
     case 'f': rune = '\f'; break; \
     case 'a': rune = '\a'; break; \
-    case 'e': rune = '\e'; break; \
     case 'd': rune = UTF_d; break; \
     case 'D': rune = UTF_D; break; \
     case 's': rune = UTF_s; break; \

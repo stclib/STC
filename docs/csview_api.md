@@ -26,9 +26,10 @@ All csview definitions and prototypes are available by including a single header
 ## Methods
 
 ```c
-csview          c_sv(const char literal_only[]);                         // construct from literal, no strlen()
-csview          c_sv(const char* str, size_t n);                         // overloaded csview constructor.
+csview          c_SV(const char literal_only[]);                         // construct from literal, no strlen()
+csview          c_SV(const char* str, size_t n);                         // shorthand for csview_from_n()
 csview          csview_from(const char* str);                            // construct from const char*
+csview          csview_from_n(const char* str);                          // construct from const char* and len
 void            csview_clear(csview* self);
 
 size_t          csview_size(csview sv);
@@ -109,7 +110,7 @@ uint64_t        csview_hash(const csview* x);
 
 | Name           | Value                | Usage                                        |
 |:---------------|:---------------------|:---------------------------------------------|
-| `csview_NULL`  | same as `c_sv("")`   | `sview = csview_NULL;`                       |
+| `csview_NULL`  | same as `c_SV("")`   | `sview = csview_NULL;`                       |
 | `c_ARGSV(sv)`  | printf argument      | `printf("sv: %.*s\n", c_ARGSV(sv));`         |
 
 ## Example
@@ -151,7 +152,7 @@ int main()
 {
     c_auto (cstr, s1) {
         s1 = cstr_new("hell😀 w😀rld");
-        cstr_u8_replace(&s1, cstr_find(&s1, "😀rld"), 1, c_sv("ø"));
+        cstr_u8_replace(&s1, cstr_find(&s1, "😀rld"), 1, c_SV("ø"));
         printf("%s\n", cstr_str(&s1));
 
         c_foreach (i, cstr, s1)
@@ -194,12 +195,12 @@ cstack_str string_split(csview input, const char* sep)
 
 int main()
 {
-    print_split(c_sv("//This is a//double-slash//separated//string"), "//");
+    print_split(c_SV("//This is a//double-slash//separated//string"), "//");
     puts("");
-    print_split(c_sv("This has no matching separator"), "xx");
+    print_split(c_SV("This has no matching separator"), "xx");
     puts("");
 
-    c_with (cstack_str s = string_split(c_sv("Split,this,,string,now,"), ","), cstack_str_drop(&s))
+    c_with (cstack_str s = string_split(c_SV("Split,this,,string,now,"), ","), cstack_str_drop(&s))
         c_foreach (i, cstack_str, s)
             printf("[%s]\n", cstr_str(i.ref));
 }

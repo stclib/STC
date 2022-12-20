@@ -95,15 +95,15 @@ STC_INLINE void         cstr_push_back(cstr* self, char value)
 STC_INLINE void         cstr_pop_back(cstr* self)
                             { self->str[ --_cstr_p(self)->size ] = '\0'; }
 STC_INLINE void         cstr_insert_n(cstr* self, const size_t pos, const char* str, const size_t n)
-                            { cstr_replace_at_sv(self, pos, 0, c_sv(str, n)); }
+                            { cstr_replace_at_sv(self, pos, 0, c_SV(str, n)); }
 STC_INLINE void         cstr_insert(cstr* self, const size_t pos, const char* str)
-                            { cstr_replace_at_sv(self, pos, 0, c_sv(str, strlen(str))); }
+                            { cstr_replace_at_sv(self, pos, 0, c_SV(str, strlen(str))); }
 STC_INLINE void         cstr_insert_s(cstr* self, const size_t pos, cstr s)
-                            { cstr_replace_at_sv(self, pos, 0, c_sv(s.str, _cstr_p(&s)->size)); }
+                            { cstr_replace_at_sv(self, pos, 0, c_SV(s.str, _cstr_p(&s)->size)); }
 STC_INLINE void         cstr_replace_at(cstr* self, const size_t pos, const size_t len, const char* str)
-                            { cstr_replace_at_sv(self, pos, len, c_sv(str, strlen(str))); }
+                            { cstr_replace_at_sv(self, pos, len, c_SV(str, strlen(str))); }
 STC_INLINE void         cstr_replace_s(cstr* self, const size_t pos, const size_t len, cstr s)
-                            { cstr_replace_at_sv(self, pos, len, c_sv(s.str, _cstr_p(&s)->size)); }
+                            { cstr_replace_at_sv(self, pos, len, c_SV(s.str, _cstr_p(&s)->size)); }
 STC_INLINE char*        cstr_front(cstr* self) { return self->str; }
 STC_INLINE char*        cstr_back(cstr* self)
                             { return self->str + _cstr_p(self)->size - 1; }
@@ -185,8 +185,8 @@ STC_INLINE uint64_t cstr_hash(const cstr *self) {
 STC_INLINE void
 cstr_replace(cstr* self, const char* find, const char* repl, unsigned count) {
     csview in = cstr_sv(self);
-    cstr_take(self, cstr_replace_sv(in, c_sv(find, strlen(find)),
-                                        c_sv(repl, strlen(repl)), count));
+    cstr_take(self, cstr_replace_sv(in, c_SV(find, strlen(find)),
+                                        c_SV(repl, strlen(repl)), count));
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */

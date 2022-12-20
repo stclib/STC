@@ -183,10 +183,10 @@ STC_INLINE cstr cstr_toupper_sv(csview sv)
     { return cstr_tocase(sv, 2); }
 
 STC_INLINE cstr cstr_tolower(const char* str) 
-    { return cstr_tolower_sv(c_sv(str, strlen(str))); }
+    { return cstr_tolower_sv(c_SV(str, strlen(str))); }
 
 STC_INLINE cstr cstr_toupper(const char* str) 
-    { return cstr_toupper_sv(c_sv(str, strlen(str))); }
+    { return cstr_toupper_sv(c_SV(str, strlen(str))); }
 
 STC_INLINE void cstr_lowercase(cstr* self) 
     { cstr_take(self, cstr_tolower_sv(cstr_sv(self))); }
@@ -318,7 +318,7 @@ STC_INLINE bool cstr_starts_with_s(const cstr* self, cstr sub)
 STC_INLINE bool cstr_istarts_with(const cstr* self, const char* sub) {
     csview sv = cstr_sv(self);
     size_t len = strlen(sub);
-    return len <= sv.size && !utf8_icmp_sv(sv, c_sv(sub, len));
+    return len <= sv.size && !utf8_icmp_sv(sv, c_SV(sub, len));
 }
 
 
@@ -332,7 +332,7 @@ STC_INLINE bool cstr_ends_with_s(const cstr* self, cstr sub)
     { return cstr_ends_with_sv(self, cstr_sv(&sub)); }
 
 STC_INLINE bool cstr_ends_with(const cstr* self, const char* sub)
-    { return cstr_ends_with_sv(self, c_sv(sub, strlen(sub))); }
+    { return cstr_ends_with_sv(self, c_SV(sub, strlen(sub))); }
 
 STC_INLINE bool cstr_iends_with(const cstr* self, const char* sub) {
     csview sv = cstr_sv(self); 
@@ -381,7 +381,7 @@ STC_INLINE void cstr_replace_at_sv(cstr* self, size_t pos, size_t len, const csv
 }
 
 STC_INLINE void cstr_replace_at(cstr* self, size_t pos, size_t len, const char* repl)
-    { cstr_replace_at_sv(self, pos, len, c_sv(repl, strlen(repl))); }
+    { cstr_replace_at_sv(self, pos, len, c_SV(repl, strlen(repl))); }
 
 STC_INLINE void cstr_replace_at_s(cstr* self, size_t pos, size_t len, cstr repl)
     { cstr_replace_at_sv(self, pos, len, cstr_sv(&repl)); }
@@ -391,7 +391,7 @@ STC_INLINE void cstr_u8_replace(cstr* self, size_t bytepos, size_t u8len, csview
 
 
 STC_INLINE void cstr_insert(cstr* self, size_t pos, const char* str)
-    { cstr_replace_at_sv(self, pos, 0, c_sv(str, strlen(str))); }
+    { cstr_replace_at_sv(self, pos, 0, c_SV(str, strlen(str))); }
 
 STC_INLINE void cstr_insert_sv(cstr* self, size_t pos, csview sv)
     { cstr_replace_at_sv(self, pos, 0, sv); }
@@ -584,8 +584,8 @@ cstr_replace_sv(csview in, csview search, csview repl, unsigned count) {
 STC_DEF void
 cstr_replace(cstr* self, const char* search, const char* repl, unsigned count) {
     csview in = cstr_sv(self);
-    cstr_take(self, cstr_replace_sv(in, c_sv(search, strlen(search)),
-                                        c_sv(repl, strlen(repl)), count));
+    cstr_take(self, cstr_replace_sv(in, c_SV(search, strlen(search)),
+                                        c_SV(repl, strlen(repl)), count));
 }
 
 STC_DEF void cstr_erase(cstr* self, const size_t pos, size_t len) {

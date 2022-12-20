@@ -117,12 +117,13 @@ typedef const char* crawstr;
 #define crawstr_hash(p) cstrhash(*(p))
 
 #define c_strlen_lit(literal) (sizeof("" literal) - 1U)
-#define c_sv(...) c_MACRO_OVERLOAD(c_sv, __VA_ARGS__)
-#define c_sv1(lit) c_sv2(lit, c_strlen_lit(lit))
-#define c_sv2(str, n) (c_INIT(csview){str, n})
-#define c_ARGsv(sv) c_ARGSV(sv)  /* [deprecated] */
+#define c_SV(...) c_MACRO_OVERLOAD(c_SV, __VA_ARGS__)
+#define c_SV1(lit) c_SV2(lit, c_strlen_lit(lit))
+#define c_SV2(str, n) (c_INIT(csview){str, n})
 #define c_ARGSV(sv) (int)(sv).size, (sv).str  /* use with "%.*s" */
 #define c_PAIR(ref) (ref)->first, (ref)->second
+#define c_sv c_SV                /* [deprecated] */
+#define c_ARGsv(sv) c_ARGSV(sv)  /* [deprecated] */
 
 #define _c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
@@ -177,7 +178,6 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
          ; _.it.ref && (_.key = &_.it.ref->first, _.val = &_.it.ref->second) \
          ; C##_next(&_.it))
 
-#define c_forloop c_forrange // [deprecated]
 #define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
 #define c_forrange1(stop) c_forrange3(_c_i, 0, stop)
 #define c_forrange2(i, stop) c_forrange3(i, 0, stop)

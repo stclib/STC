@@ -43,7 +43,7 @@ STC_INLINE uint32_t utf8_peek(const char* s) {
 
 /* case-insensitive utf8 string comparison */
 STC_INLINE int utf8_icmp(const char* s1, const char* s2) {
-    return utf8_icmp_sv(c_sv(s1, ~(size_t)0), c_sv(s2, ~(size_t)0));
+    return utf8_icmp_sv(c_SV(s1, ~(size_t)0), c_SV(s2, ~(size_t)0));
 }
 
 STC_INLINE bool utf8_valid(const char* s) {
