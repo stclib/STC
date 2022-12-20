@@ -316,13 +316,13 @@ int main()
     // Use a HashMap to store the vikings' health points.
     c_auto (Vikings, vikings) // uses Vikings_init(), Vikings_drop()
     {
-        Vikings_insert(&vikings, (Viking){cstr_new("Einar"), cstr_new("Norway")}, 25);
-        Vikings_insert(&vikings, (Viking){cstr_new("Olaf"), cstr_new("Denmark")}, 24);
-        Vikings_insert(&vikings, (Viking){cstr_new("Harald"), cstr_new("Iceland")}, 12);
-        Vikings_insert(&vikings, (Viking){cstr_new("Einar"), cstr_new("Denmark")}, 21);
+        Vikings_insert(&vikings, (Viking){cstr_lit("Einar"), cstr_lit("Norway")}, 25);
+        Vikings_insert(&vikings, (Viking){cstr_lit("Olaf"), cstr_lit("Denmark")}, 24);
+        Vikings_insert(&vikings, (Viking){cstr_lit("Harald"), cstr_lit("Iceland")}, 12);
+        Vikings_insert(&vikings, (Viking){cstr_lit("Einar"), cstr_lit("Denmark")}, 21);
         
         c_auto (Viking, lookup) {
-            lookup = (Viking){cstr_new("Einar"), cstr_new("Norway")};
+            lookup = (Viking){cstr_lit("Einar"), cstr_lit("Norway")};
             printf("Lookup: Einar of Norway has %d hp\n\n", *Vikings_at(&vikings, lookup));
         }
 

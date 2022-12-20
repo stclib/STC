@@ -27,13 +27,14 @@ All csview definitions and prototypes are available by including a single header
 
 ```c
 csview          c_SV(const char literal_only[]);                         // construct from literal, no strlen()
-csview          c_SV(const char* str, size_t n);                         // shorthand for csview_from_n()
+csview          c_SV(const char* str, size_t n);                         // construct from str and length n
+csview          csview_lit(const char literal_only[]);                   // alias for c_SV(lit)
 csview          csview_from(const char* str);                            // construct from const char*
-csview          csview_from_n(const char* str);                          // construct from const char* and len
-void            csview_clear(csview* self);
+csview          csview_from_n(const char* str, size_t n);                // alias for c_SV(str, n)
 
 size_t          csview_size(csview sv);
 bool            csview_empty(csview sv);
+void            csview_clear(csview* self);
 
 bool            csview_equals(csview sv, csview sv2);
 size_t          csview_find(csview sv, const char* str);
@@ -120,7 +121,7 @@ uint64_t        csview_hash(const csview* x);
 
 int main ()
 {
-    cstr str1 = cstr_new("We think in generalities, but we live in details.");
+    cstr str1 = cstr_lit("We think in generalities, but we live in details.");
                                                         // (quoting Alfred N. Whitehead)
 
     csview sv1 = cstr_substr(&str1, 3, 5);              // "think"
@@ -129,7 +130,7 @@ int main ()
     csview sv3 = cstr_slice(&str1, -8, -1);             // get "details"
     printf("%.*s %.*s %.*s\n",
         c_ARGSV(sv1), c_ARGSV(sv2), c_ARGSV(sv3));
-    cstr s1 = cstr_new("Apples are red");
+    cstr s1 = cstr_lit("Apples are red");
     cstr s2 = cstr_from_sv(cstr_substr(&s1, -3, 3));    // "red"
     cstr s3 = cstr_from_sv(cstr_substr(&s1, 0, 6));     // "Apples"
     printf("%s %s\n", cstr_str(&s2), cstr_str(&s3));
@@ -151,7 +152,7 @@ red Apples
 int main()
 {
     c_auto (cstr, s1) {
-        s1 = cstr_new("hell😀 w😀rld");
+        s1 = cstr_lit("hell😀 w😀rld");
         cstr_u8_replace(&s1, cstr_find(&s1, "😀rld"), 1, c_SV("ø"));
         printf("%s\n", cstr_str(&s1));
 

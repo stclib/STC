@@ -131,7 +131,7 @@ astar(cstr* maze, int width)
 int
 main(void)
 {
-    c_with (cstr maze = cstr_new(
+    c_with (cstr maze = cstr_lit(
         "#########################################################################\n"
         "#   #               #               #           #                   #   #\n"
         "#   #   #########   #   #####   #########   #####   #####   #####   # ! #\n"

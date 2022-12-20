@@ -68,7 +68,7 @@ STC_INLINE const char*  cstr_str(const cstr* self) { return self->str; }
 #define                 cstr_toraw(self) (self)->str
 STC_INLINE csview       cstr_sv(const cstr* self) 
                             { return c_INIT(csview){self->str, _cstr_p(self)->size}; }
-#define                 cstr_new(literal) \
+#define                 cstr_lit(literal) \
                             cstr_from_n(literal, c_strlen_lit(literal))
 STC_INLINE cstr         cstr_from(const char* str)
                             { return cstr_from_n(str, strlen(str)); }

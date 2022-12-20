@@ -4,7 +4,7 @@
 
 int main() {
     c_auto (cstr, hello, upper) {
-        hello = cstr_new("hell😀 w😀rld");
+        hello = cstr_lit("hell😀 w😀rld");
         printf("%s\n", cstr_str(&hello));
 
         /* replace second smiley at utf8 codepoint pos 7 */

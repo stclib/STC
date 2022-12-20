@@ -70,9 +70,11 @@ STC_API char* _cstr_internal_move(cstr* self, size_t pos1, size_t pos2);
 
 /**************************** PUBLIC API **********************************/
 
-#define cstr_new(literal) cstr_from_n(literal, c_strlen_lit(literal))
+#define cstr_lit(literal) cstr_from_n(literal, c_strlen_lit(literal))
 #define cstr_NULL (c_INIT(cstr){{{0}, 0}})
 #define cstr_toraw(self) cstr_str(self)
+#define cstr_new(lit) cstr_lit(lit) /* [deprecated] */
+#define cstr_null cstr_NULL         /* [deprecated] */
 
 STC_API char*   cstr_reserve(cstr* self, size_t cap);
 STC_API void    cstr_shrink_to_fit(cstr* self);

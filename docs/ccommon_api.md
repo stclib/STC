@@ -32,7 +32,7 @@ c_with (FILE* fp = fopen(fname, "rb"), fclose(fp))
     }
 }
 
-c_with (cstr str = cstr_new("Hello"), cstr_drop(&str))
+c_with (cstr str = cstr_lit("Hello"), cstr_drop(&str))
 {
     cstr_append(&str, " world");
     printf("%s\n", cstr_str(&str));
@@ -50,7 +50,7 @@ c_auto (cstr, s1, s2)
     printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
 }
 
-c_autodrop (cstr, str, cstr_new("Hello"))
+c_autodrop (cstr, str, cstr_lit("Hello"))
 {
     cstr_append(&str, " world");
     printf("%s\n", cstr_str(&str));
@@ -64,7 +64,7 @@ c_scope (pthread_mutex_lock(&mut), pthread_mutex_unlock(&mut))
 }
 
 // `c_defer` executes the expressions when leaving scope.
-cstr s1 = cstr_new("Hello"), s2 = cstr_new("world");
+cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
 c_defer (cstr_drop(&s1), cstr_drop(&s2))
 {
     printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
@@ -330,7 +330,7 @@ c_free(pnt);
 int* array = c_alloc_n (int, 100);
 c_free(array);
 
-cstr a = cstr_new("Hello"), b = cstr_new("World");
+cstr a = cstr_lit("Hello"), b = cstr_lit("World");
 c_drop(cstr, &a, &b);
 ```
 

@@ -24,8 +24,8 @@ int main()
             "Very enjoyable"
         );
         cmap_str_insert(&book_reviews,
-            cstr_new("The Adventures of Sherlock Holmes"),
-            cstr_new("Eye lyked it alot.")
+            cstr_lit("The Adventures of Sherlock Holmes"),
+            cstr_lit("Eye lyked it alot.")
         );
 
         // Check for a specific one.

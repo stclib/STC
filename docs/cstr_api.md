@@ -19,7 +19,7 @@ All cstr definitions and prototypes are available by including a single header f
 ## Methods
 ```c
 cstr         cstr_init(void);                                         // constructor; same as cstr_NULL.
-cstr         cstr_new(const char literal_only[]);                     // cstr from literal; no strlen() call.
+cstr         cstr_lit(const char literal_only[]);                     // cstr from literal; no strlen() call.
 cstr         cstr_from(const char* str);                              // constructor using strlen()
 cstr         cstr_from_n(const char* str, size_t n);                  // constructor with n first bytes of str
 cstr         cstr_from_sv(csview sv);                                 // construct cstr from csview
@@ -160,10 +160,10 @@ char*        cstrnstrn(const char* str, const char* search, size_t slen, size_t 
 #include <stc/cstr.h>
 
 int main() {
-    cstr s0 = cstr_new("Initialization without using strlen().");
+    cstr s0 = cstr_lit("Initialization without using strlen().");
     printf("%s\nLength: %" c_ZU "\n\n", cstr_str(&s0), cstr_size(&s0));
 
-    cstr s1 = cstr_new("one-nine-three-seven-five.");
+    cstr s1 = cstr_lit("one-nine-three-seven-five.");
     printf("%s\n", cstr_str(&s1));
 
     cstr_insert(&s1, 3, "-two");

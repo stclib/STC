@@ -3,7 +3,7 @@
 void stringdemo1()
 {
     printf("\nSTRINGDEMO1\n");
-    c_with (cstr cs = cstr_new("one-nine-three-seven-five"), cstr_drop(&cs))
+    c_with (cstr cs = cstr_lit("one-nine-three-seven-five"), cstr_drop(&cs))
     {
         printf("%s.\n", cstr_str(&cs));
 

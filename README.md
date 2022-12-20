@@ -371,7 +371,7 @@ and non-emplace methods:
 #include <stc/cvec.h>   // vector of string (cstr)
 ...
 c_auto (cvec_str, vec)  // declare and call cvec_str_init() and defer cvec_str_drop(&vec)
-c_autodrop (cstr, s, cstr_new("a string literal"))  // like c_auto without auto default init.
+c_autodrop (cstr, s, cstr_lit("a string literal"))  // like c_auto without auto default init.
 {
     const char* hello = "Hello";
     cvec_str_push_back(&vec, cstr_from(hello);    // construct and add string from const char*
@@ -396,9 +396,9 @@ cmap_str_emplace(&map, "Hello", "again");
 // No cstr was constructed because "Hello" was already in the map.
 
 cmap_str_emplace_or_assign(&map, "Hello", "there");
-// Only cstr_new("there") constructed. "world" was destructed and replaced.
+// Only cstr_lit("there") constructed. "world" was destructed and replaced.
 
-cmap_str_insert(&map, cstr_new("Hello"), cstr_new("you"));
+cmap_str_insert(&map, cstr_lit("Hello"), cstr_lit("you"));
 // Two cstr's constructed outside call, but both destructed by insert
 // because "Hello" existed. No mem-leak but less efficient.
 
@@ -520,7 +520,7 @@ Memory efficiency
 - Renamed: type **csptr** to [**carc**](docs/carc_api.md) (atomic reference counted) smart pointer.
 - Renamed: ***i_key_csptr*** / ***i_val_csptr*** to `i_keyboxed` / `i_valboxed` for specifying **carc** and **cbox** values in containers.
 - Renamed: *csptr_X_make()* to `carc_X_from()`.
-- Renamed: *cstr_lit()* to `cstr_new(literal)`, and *cstr_assign_fmt()* to `cstr_printf()`.
+- Renamed: *cstr_lit()* to `cstr_lit(literal)`, and *cstr_assign_fmt()* to `cstr_printf()`.
 - Renamed: *c_default_fromraw()* to `c_default_from()`.
 - Changed: the [**c_apply**](docs/ccommon_api.md) macros API.
 - Replaced: *csview_first_token()* and *csview_next_token()* with one function: `csview_token()`.
@@ -541,7 +541,7 @@ Replace (whole word + match case):
 - `i_keydel` ⟶ `i_keydrop`
 - `i_valdel` ⟶ `i_valdrop`
 - `i_cnt` ⟶ `i_type`
-- `cstr_lit` ⟶ `cstr_new`
+- `cstr_lit` ⟶ `cstr_lit`
 - `i_key_sptr` ⟶ `i_keyboxed`
 - `i_val_sptr` ⟶ `i_valboxed`
 

@@ -214,9 +214,9 @@ User User_clone(User user) {
 
 int main(void) {
     UVec vec = UVec_init();
-    UVec_push(&vec, (User){cstr_new("mary"), 0});
-    UVec_push(&vec, (User){cstr_new("joe"), 1});
-    UVec_push(&vec, (User){cstr_new("admin"), 2});
+    UVec_push(&vec, (User){cstr_lit("mary"), 0});
+    UVec_push(&vec, (User){cstr_lit("joe"), 1});
+    UVec_push(&vec, (User){cstr_lit("admin"), 2});
 
     UVec vec2 = UVec_clone(vec);
 

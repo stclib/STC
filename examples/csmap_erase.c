@@ -20,11 +20,11 @@ int main()
     c_auto (mymap, m1)
     {
         // Fill in some data to test with, one at a time
-        mymap_insert(&m1, 1, cstr_new("A"));
-        mymap_insert(&m1, 2, cstr_new("B"));
-        mymap_insert(&m1, 3, cstr_new("C"));
-        mymap_insert(&m1, 4, cstr_new("D"));
-        mymap_insert(&m1, 5, cstr_new("E"));
+        mymap_insert(&m1, 1, cstr_lit("A"));
+        mymap_insert(&m1, 2, cstr_lit("B"));
+        mymap_insert(&m1, 3, cstr_lit("C"));
+        mymap_insert(&m1, 4, cstr_lit("D"));
+        mymap_insert(&m1, 5, cstr_lit("E"));
 
         puts("Starting data of map m1 is:");
         printmap(m1);
