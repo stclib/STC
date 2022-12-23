@@ -42,32 +42,32 @@ int point_cmp(const Point* a, const Point* b) {
 
 int main()
 {
-    c_auto (cmap_int, map)
-    c_auto (cmap_pnt, pmap)
-    c_auto (cmap_str, smap)
-    c_auto (cset_str, sset)
+    c_AUTO (cmap_int, map)
+    c_AUTO (cmap_pnt, pmap)
+    c_AUTO (cmap_str, smap)
+    c_AUTO (cset_str, sset)
     {
         cmap_int_insert(&map, 123, 321);
 
-        c_forlist (i, cmap_pnt_raw, {{{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}})
+        c_FORLIST (i, cmap_pnt_raw, {{{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}})
             cmap_pnt_insert(&pmap, c_PAIR(i.ref));
 
-        c_foreach (i, cmap_pnt, pmap)
+        c_FOREACH (i, cmap_pnt, pmap)
             printf(" (%d, %d: %d)", i.ref->first.x, i.ref->first.y, i.ref->second);
         puts("");
 
-        c_forlist (i, cmap_str_raw, {
+        c_FORLIST (i, cmap_str_raw, {
             {"Hello, friend", "long time no see"},
             {"So long, friend", "see you around"},
         }) cmap_str_emplace(&smap, c_PAIR(i.ref));
 
-        c_forlist (i, const char*, {
+        c_FORLIST (i, const char*, {
             "Hello, friend",
             "Nice to see you again",
             "So long, friend",
         }) cset_str_emplace(&sset, *i.ref);
 
-        c_foreach (i, cset_str, sset)
+        c_FOREACH (i, cset_str, sset)
             printf(" %s\n", cstr_str(i.ref));
     }
 }

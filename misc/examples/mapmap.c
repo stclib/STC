@@ -30,7 +30,7 @@ void add(Departments* deps, const char* name, const char* email, const char* dep
 int contains(Departments* map, const char* name)
 {
     int count = 0;
-    c_foreach (i, Departments, *map)
+    c_FOREACH (i, Departments, *map)
         if (People_contains(&i.ref->second, name))
             ++count;
     return count;
@@ -38,7 +38,7 @@ int contains(Departments* map, const char* name)
 
 int main(void)
 {
-    c_auto (Departments, map)
+    c_AUTO (Departments, map)
     {
         add(&map, "Anna Kendro", "Anna@myplace.com", "Support");
         add(&map, "Terry Dane", "Terry@myplace.com", "Development");
@@ -54,8 +54,8 @@ int main(void)
         add(&map, "Dennis Kay", "Dennis@mail.com", "Marketing");
         add(&map, "Anne Dickens", "Anne@myplace.com", "Development");
 
-        c_foreach (i, Departments, map)
-            c_forpair (name, email, People, i.ref->second)
+        c_FOREACH (i, Departments, map)
+            c_FORPAIR (name, email, People, i.ref->second)
                 printf("%s: %s - %s\n", cstr_str(&i.ref->first), cstr_str(_.name), cstr_str(_.email));
         puts("");
 

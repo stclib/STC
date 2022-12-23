@@ -13,7 +13,7 @@ int main()
 {
     int w = 7, h = 5, d = 3;
 
-    c_with (carr2_int volume = carr2_int_new_uninit(w, h), carr2_int_drop(&volume))
+    c_WITH (carr2_int volume = carr2_int_new_uninit(w, h), carr2_int_drop(&volume))
     {
         int *dat = carr2_int_data(&volume);
         for (size_t i = 0; i < carr2_int_size(&volume); ++i)
@@ -24,12 +24,12 @@ int main()
                 printf(" %d", volume.data[x][y]);
         puts("");
 
-        c_foreach (i, carr2_int, volume)
+        c_FOREACH (i, carr2_int, volume)
             printf(" %d", *i.ref);
         puts("\n");
     }
 
-    c_with (carr3_int volume = carr3_int_new_uninit(w, h, d), carr3_int_drop(&volume))
+    c_WITH (carr3_int volume = carr3_int_new_uninit(w, h, d), carr3_int_drop(&volume))
     {
         int *dat = carr3_int_data(&volume);
         for (size_t i = 0; i < carr3_int_size(&volume); ++i)
@@ -41,17 +41,17 @@ int main()
                     printf(" %d", volume.data[x][y][z]);
         puts("");
 
-        c_foreach (i, carr3_int, volume)
+        c_FOREACH (i, carr3_int, volume)
             printf(" %d", *i.ref);
         puts("");
     }
 
-    c_with (carr2_str text2d = carr2_str_with_size(h, d, cstr_NULL), carr2_str_drop(&text2d))
+    c_WITH (carr2_str text2d = carr2_str_with_size(h, d, cstr_NULL), carr2_str_drop(&text2d))
     {
         cstr_assign(&text2d.data[2][1], "hello");
         cstr_assign(&text2d.data[4][0], "world");
 
-        c_foreach (i, carr2_str, text2d)
+        c_FOREACH (i, carr2_str, text2d)
             printf("line: %s\n", cstr_str(i.ref));
     }
 }

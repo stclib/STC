@@ -17,7 +17,7 @@ const char* call(const char* number) {
 }
 
 int main(void) {
-    c_auto (cmap_str, contacts)
+    c_AUTO (cmap_str, contacts)
     {
         cmap_str_emplace(&contacts, "Daniel", "798-1364");
         cmap_str_emplace(&contacts, "Ashley", "645-7689");
@@ -40,7 +40,7 @@ int main(void) {
         cmap_str_erase(&contacts, "Ashley");
 
         puts("");
-        c_forpair (contact, number, cmap_str, contacts) {
+        c_FORPAIR (contact, number, cmap_str, contacts) {
             printf("Calling %s: %s\n", cstr_str(_.contact), call(cstr_str(_.number)));
         }
         puts("");

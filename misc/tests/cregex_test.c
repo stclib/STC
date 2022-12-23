@@ -49,7 +49,7 @@ END_TEST
 
 START_TEST(compile_match_quantifiers)
 {
-    c_auto (cregex, re) {
+    c_AUTO (cregex, re) {
         re = cregex_from("ä+", 0);
         EXPECT_EQ(re.error, 0);
 
@@ -64,7 +64,7 @@ START_TEST(compile_match_quantifiers)
 
         EXPECT_FALSE(cregex_find("bbb", &re, &match, 0));
     }
-    c_auto (cregex, re) {
+    c_AUTO (cregex, re) {
         re = cregex_from("bä*", 0);
         EXPECT_EQ(re.error, 0);
 
@@ -99,7 +99,7 @@ END_TEST
 
 START_TEST(compile_match_class_simple)
 {
-    c_auto (cregex, re1, re2, re3)
+    c_AUTO (cregex, re1, re2, re3)
     {
         re1 = cregex_from("\\s", 0);
         EXPECT_EQ(re1.error, 0);
@@ -125,7 +125,7 @@ END_TEST
 
 START_TEST(compile_match_or)
 {
-    c_auto (cregex, re, re2)
+    c_AUTO (cregex, re, re2)
     {
         re = cregex_from("as|df", 0);
         EXPECT_EQ(re.error, 0);
@@ -190,7 +190,7 @@ END_TEST
 
 START_TEST(search_all)
 {
-    c_auto (cregex, re)
+    c_AUTO (cregex, re)
     {
         re = cregex_from("ab", 0);
         csview m = {0};
@@ -210,7 +210,7 @@ END_TEST
 
 START_TEST(captures_len)
 {
-    c_auto (cregex, re) {
+    c_AUTO (cregex, re) {
        cregex re = cregex_from("(ab(cd))(ef)", 0);
        EXPECT_EQ(cregex_captures(&re), 3);
     }
@@ -219,7 +219,7 @@ END_TEST
 
 START_TEST(captures_cap)
 {
-    c_auto (cregex, re) {
+    c_AUTO (cregex, re) {
         re = cregex_from("(ab)((cd)+)", 0);
         EXPECT_EQ(cregex_captures(&re), 3);
 

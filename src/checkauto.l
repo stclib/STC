@@ -36,6 +36,15 @@ c_forpair       |
 c_forrange      |
 c_forfilter     |
 c_forwhile      |
+c_formatch      |
+c_fortoken      |
+c_FOREACH       |
+c_FORPAIR       |
+c_FORRANGE      |
+c_FORFILTER     |
+c_FORWHILE      |
+c_FORMATCH      |
+c_FORTOKEN      |
 for             |
 while           |
 switch          { block_type |= LOOP; state = BRACES; }

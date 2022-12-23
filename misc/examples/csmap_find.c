@@ -20,7 +20,7 @@ void print_elem(csmap_istr_raw p) {
     void print_collection_##CX(const CX* t) { \
         printf("%" c_ZU " elements: ", CX##_size(t)); \
     \
-        c_foreach (p, CX, *t) { \
+        c_FOREACH (p, CX, *t) { \
             print_elem(CX##_value_toraw(p.ref)); \
         } \
         puts(""); \
@@ -42,10 +42,10 @@ void findit(csmap_istr c, csmap_istr_key val)
 
 int main()
 {
-    c_auto (csmap_istr, m1)
-    c_auto (cvec_istr, v)
+    c_AUTO (csmap_istr, m1)
+    c_AUTO (cvec_istr, v)
     {
-        c_forlist (i, csmap_istr_raw, {{40, "Zr"}, {45, "Rh"}})
+        c_FORLIST (i, csmap_istr_raw, {{40, "Zr"}, {45, "Rh"}})
             csmap_istr_emplace(&m1, c_PAIR(i.ref));
 
         puts("The starting map m1 is (key, value):");
@@ -62,7 +62,7 @@ int main()
         puts("Inserting the following vector data into m1:");
         print_collection_cvec_istr(&v);
 
-        c_foreach (i, cvec_istr, cvec_istr_begin(&v), cvec_istr_end(&v))
+        c_FOREACH (i, cvec_istr, cvec_istr_begin(&v), cvec_istr_end(&v))
             csmap_istr_emplace(&m1, c_PAIR(i.ref));
 
         puts("The modified map m1 is (key, value):");

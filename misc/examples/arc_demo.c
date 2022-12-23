@@ -21,19 +21,19 @@ void int_drop(int* x) {
 
 int main()
 {
-    c_auto (cvec_Arc, vec)   // declare and init vec, call cvec_Arc_drop() at scope exit
-    c_auto (csset_Arc, set)  // declare and init set, call csset_Arc_drop() at scope exit
+    c_AUTO (cvec_Arc, vec)   // declare and init vec, call cvec_Arc_drop() at scope exit
+    c_AUTO (csset_Arc, set)  // declare and init set, call csset_Arc_drop() at scope exit
     {
         const int years[] = {2021, 2012, 2022, 2015};
-        c_forrange (i, c_arraylen(years))
+        c_FORRANGE (i, c_ARRAYLEN(years))
             cvec_Arc_push(&vec, Arc_from(years[i]));
 
         printf("vec:");
-        c_foreach (i, cvec_Arc, vec) printf(" %d", *i.ref->get);
+        c_FOREACH (i, cvec_Arc, vec) printf(" %d", *i.ref->get);
         puts("");
 
         // add odd numbers from vec to set
-        c_foreach (i, cvec_Arc, vec)
+        c_FOREACH (i, cvec_Arc, vec)
             if (*i.ref->get & 1)
                 csset_Arc_insert(&set, Arc_clone(*i.ref)); // copy shared pointer => increments counter.
 
@@ -42,12 +42,12 @@ int main()
         cvec_Arc_pop_back(&vec);
 
         printf("vec:");
-        c_foreach (i, cvec_Arc, vec) printf(" %d", *i.ref->get);
+        c_FOREACH (i, cvec_Arc, vec) printf(" %d", *i.ref->get);
 
         printf("\nset:");
-        c_foreach (i, csset_Arc, set) printf(" %d", *i.ref->get);
+        c_FOREACH (i, csset_Arc, set) printf(" %d", *i.ref->get);
 
-        c_with (Arc p = Arc_clone(vec.data[0]), Arc_drop(&p)) {
+        c_WITH (Arc p = Arc_clone(vec.data[0]), Arc_drop(&p)) {
             printf("\n%d is now owned by %ld objects\n", *p.get, *p.use_count);
         }
 

@@ -94,14 +94,14 @@ int main()
 
     // Create histogram map
     csmap_i mhist = csmap_i_init();
-    c_forrange (N) {
+    c_FORRANGE (N) {
         int index = (int) round( stc64_normalf(&rng, &dist) );
         csmap_i_emplace(&mhist, index, 0).ref->second += 1;
     }
 
     // Print the gaussian bar chart
     cstr bar = cstr_init();
-    c_foreach (i, csmap_i, mhist) {
+    c_FOREACH (i, csmap_i, mhist) {
         size_t n = (size_t) (i.ref->second * StdDev * Scale * 2.5 / N);
         if (n > 0) {
             cstr_resize(&bar, n, '*');

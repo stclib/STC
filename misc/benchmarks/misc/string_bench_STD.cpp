@@ -16,8 +16,8 @@
 std::vector<std::string> read_file(const char* name)
 {
     std::vector<std::string> data;
-    c_auto (cstr, line)
-    c_with (FILE* f = fopen(name, "r"), fclose(f))
+    c_AUTO (cstr, line)
+    c_WITH (FILE* f = fopen(name, "r"), fclose(f))
         while (cstr_getline(&line, f))
             data.emplace_back(cstr_str(&line));
     return data;

@@ -92,18 +92,18 @@ void int_drop(int* x) {
 
 int main()
 {
-    c_auto (IVec, vec)  // declare and init vec, call drop at scope exit
-    c_auto (ISet, set)  // similar
+    c_AUTO (IVec, vec)  // declare and init vec, call drop at scope exit
+    c_AUTO (ISet, set)  // similar
     {
-        c_forlist (i, int, {2021, 2012, 2022, 2015})
+        c_FORLIST (i, int, {2021, 2012, 2022, 2015})
             IVec_emplace(&vec, *i.ref); // same as: IVec_push(&vec, IBox_from(*i.ref));
 
         printf("vec:");
-        c_foreach (i, IVec, vec)
+        c_FOREACH (i, IVec, vec)
             printf(" %d", *i.ref->get);
 
         // add odd numbers from vec to set
-        c_foreach (i, IVec, vec)
+        c_FOREACH (i, IVec, vec)
             if (*i.ref->get & 1)
                 ISet_insert(&set, IBox_clone(*i.ref));
 
@@ -112,11 +112,11 @@ int main()
         IVec_pop(&vec);
 
         printf("\nvec:");
-        c_foreach (i, IVec, vec)
+        c_FOREACH (i, IVec, vec)
             printf(" %d", *i.ref->get);
 
         printf("\nset:");
-        c_foreach (i, ISet, set)
+        c_FOREACH (i, ISet, set)
             printf(" %d", *i.ref->get);
     }
 }

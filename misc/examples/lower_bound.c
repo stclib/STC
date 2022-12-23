@@ -9,11 +9,11 @@
 int main()
 {
     // TEST SORTED VECTOR
-    c_auto (cvec_int, vec)
+    c_AUTO (cvec_int, vec)
     {
         int key, *res;
 
-        c_forlist (i, int, {40, 600, 1, 7000, 2, 500, 30})
+        c_FORLIST (i, int, {40, 600, 1, 7000, 2, 500, 30})
             cvec_int_push(&vec, *i.ref);
 
         cvec_int_sort(&vec);
@@ -36,11 +36,11 @@ int main()
     }
 
     // TEST SORTED SET
-    c_auto (csset_int, set)
+    c_AUTO (csset_int, set)
     {
         int key, *res;
 
-        c_forlist (i, int, {40, 600, 1, 7000, 2, 500, 30})
+        c_FORLIST (i, int, {40, 600, 1, 7000, 2, 500, 30})
             csset_int_push(&set, *i.ref);
 
         key = 500;

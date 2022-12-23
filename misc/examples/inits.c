@@ -36,11 +36,11 @@ int main(void)
 {
     // CVEC FLOAT / PRIORITY QUEUE
 
-    c_auto (cpque_f, floats) {
+    c_AUTO (cpque_f, floats) {
         const float nums[] = {4.0f, 2.0f, 5.0f, 3.0f, 1.0f};
 
         // PRIORITY QUEUE
-        c_forrange (i, c_arraylen(nums))
+        c_FORRANGE (i, c_ARRAYLEN(nums))
             cpque_f_push(&floats, nums[i]);
 
         puts("\npop and show high priorites first:");
@@ -54,20 +54,20 @@ int main(void)
     // CMAP ID
 
     int year = 2020;
-    c_auto (cmap_id, idnames) {
+    c_AUTO (cmap_id, idnames) {
         cmap_id_emplace(&idnames, 100, "Hello");
         cmap_id_insert(&idnames, 110, cstr_lit("World"));
         cmap_id_insert(&idnames, 120, cstr_from_fmt("Howdy, -%d-", year));
 
-        c_foreach (i, cmap_id, idnames)
+        c_FOREACH (i, cmap_id, idnames)
             printf("%d: %s\n", i.ref->first, cstr_str(&i.ref->second));
         puts("");
     }
 
     // CMAP CNT
 
-    c_auto (cmap_cnt, countries) {
-        c_forlist (i, cmap_cnt_raw, {
+    c_AUTO (cmap_cnt, countries) {
+        c_FORLIST (i, cmap_cnt_raw, {
             {"Norway", 100},
             {"Denmark", 50},
             {"Iceland", 10},
@@ -83,33 +83,33 @@ int main(void)
         cmap_cnt_emplace(&countries, "Norway", 0).ref->second += 20;
         cmap_cnt_emplace(&countries, "Finland", 0).ref->second += 20;
 
-        c_forpair (country, health, cmap_cnt, countries)
+        c_FORPAIR (country, health, cmap_cnt, countries)
             printf("%s: %d\n", cstr_str(_.country), *_.health);
         puts("");
     }
 
     // CVEC PAIR
 
-    c_auto (cvec_ip, pairs1) {
-        c_forlist (i, ipair_t, {{5, 6}, {3, 4}, {1, 2}, {7, 8}})
+    c_AUTO (cvec_ip, pairs1) {
+        c_FORLIST (i, ipair_t, {{5, 6}, {3, 4}, {1, 2}, {7, 8}})
             cvec_ip_push_back(&pairs1, *i.ref);
 
         cvec_ip_sort(&pairs1);
 
-        c_foreach (i, cvec_ip, pairs1)
+        c_FOREACH (i, cvec_ip, pairs1)
             printf("(%d %d) ", i.ref->x, i.ref->y);
         puts("");
     }
 
     // CLIST PAIR
 
-    c_auto (clist_ip, pairs2) {
-        c_forlist (i, ipair_t, {{5, 6}, {3, 4}, {1, 2}, {7, 8}})
+    c_AUTO (clist_ip, pairs2) {
+        c_FORLIST (i, ipair_t, {{5, 6}, {3, 4}, {1, 2}, {7, 8}})
             clist_ip_push_back(&pairs2, *i.ref);
 
         clist_ip_sort(&pairs2);
 
-        c_foreach (i, clist_ip, pairs2)
+        c_FOREACH (i, clist_ip, pairs2)
             printf("(%d %d) ", i.ref->x, i.ref->y);
         puts("");
     }

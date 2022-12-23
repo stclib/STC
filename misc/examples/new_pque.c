@@ -20,16 +20,16 @@ int Point_cmp(const Point* a, const Point* b) {
 
 int main()
 {
-    c_auto (cstack_int, istk)
+    c_AUTO (cstack_int, istk)
     {
         cstack_int_push(&istk, 123);
         cstack_int_push(&istk, 321);
         // print
-        c_foreach (i, cstack_int, istk)
+        c_FOREACH (i, cstack_int, istk)
             printf(" %d", *i.ref);
         puts("");
     }
-    c_auto (cpque_pnt, pque)
+    c_AUTO (cpque_pnt, pque)
     {
         cpque_pnt_push(&pque, (Point){23, 80});
         cpque_pnt_push(&pque, (Point){12, 32});
@@ -43,7 +43,7 @@ int main()
         }
         puts("");
     }
-    c_auto (cpque_int, ique)
+    c_AUTO (cpque_int, ique)
     {
         cpque_int_push(&ique, 123);
         cpque_int_push(&ique, 321);

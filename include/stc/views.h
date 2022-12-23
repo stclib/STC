@@ -63,8 +63,8 @@ int main()
 
 #include <stc/ccommon.h>
 
-#ifndef c_FLT_STACK
-  #define c_FLT_STACK 14 /* 22, 30, .. */
+#ifndef c_NFILTERS
+  #define c_NFILTERS 14 /* 22, 30, .. */
 #endif
 #define c_flt_take(i, n) (++(i).s1[(i).s1top++] <= (n))
 #define c_flt_skip(i, n) (++(i).s1[(i).s1top++] > (n))
@@ -78,8 +78,8 @@ int main()
     c_forfilter_s(i, C, C##_begin(&cnt), filter) if (!(cond)) break; else
 #define c_forfilter_s(i, C, start, filter) \
     for (struct {C##_iter it; C##_value *ref; \
-                 uint32_t s1[c_FLT_STACK], index, count; \
-                 bool s2[c_FLT_STACK]; uint8_t s1top, s2top;} \
+                 uint32_t s1[c_NFILTERS], index, count; \
+                 bool s2[c_NFILTERS]; uint8_t s1top, s2top;} \
          i = {.it=start, .ref=i.it.ref}; i.it.ref \
          ; C##_next(&i.it), i.ref = i.it.ref, ++i.index, i.s1top=0, i.s2top=0) \
       if (!((filter) && ++i.count)) ; else

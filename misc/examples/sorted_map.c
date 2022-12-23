@@ -9,7 +9,7 @@ int main()
 { 
   
     // empty map containers
-    c_auto (csmap_int, gquiz1, gquiz2)
+    c_AUTO (csmap_int, gquiz1, gquiz2)
     { 
         // insert elements in random order 
         csmap_int_insert(&gquiz1, 2, 30); 
@@ -22,17 +22,17 @@ int main()
       
         // printing map gquiz1 
         printf("\nThe map gquiz1 is :\n\tKEY\tELEMENT\n"); 
-        c_foreach (itr, csmap_int, gquiz1)
+        c_FOREACH (itr, csmap_int, gquiz1)
             printf("\t%d\t%d\n", itr.ref->first, itr.ref->second);
         printf("\n");
       
         // assigning the elements from gquiz1 to gquiz2 
-        c_foreach (i, csmap_int, gquiz1) 
+        c_FOREACH (i, csmap_int, gquiz1) 
             csmap_int_insert(&gquiz2, i.ref->first, i.ref->second);
       
         // print all elements of the map gquiz2 
         printf("\nThe map gquiz2 is :\n\tKEY\tELEMENT\n"); 
-        c_foreach (itr, csmap_int, gquiz2)
+        c_FOREACH (itr, csmap_int, gquiz2)
             printf("\t%d\t%d\n", itr.ref->first, itr.ref->second);
         printf("\n");
       
@@ -41,7 +41,7 @@ int main()
         printf("\tKEY\tELEMENT\n");
         csmap_int_erase_range(&gquiz2, csmap_int_begin(&gquiz2), 
                                        csmap_int_find(&gquiz2, 3)); 
-        c_foreach (itr, csmap_int, gquiz2)
+        c_FOREACH (itr, csmap_int, gquiz2)
             printf("\t%d\t%d\n", itr.ref->first, itr.ref->second);
         printf("\n");
       
@@ -49,7 +49,7 @@ int main()
         int num = csmap_int_erase(&gquiz2, 4); 
         printf("\ngquiz2.erase(4) : %d removed\n", num); 
         printf("\tKEY\tELEMENT\n");
-        c_foreach (itr, csmap_int, gquiz2)
+        c_FOREACH (itr, csmap_int, gquiz2)
             printf("\t%d\t%d\n", itr.ref->first, itr.ref->second);
         printf("\n");
 

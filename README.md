@@ -77,8 +77,8 @@ Finally, destruction of the lookup key (i.e. string literal) after usage is not 
 is convenient in C. The alternative lookup type may also be used for adding entries into containers by using 
 the *emplace*-functions. E.g. `MyCStrVec_emplace_back(&vec, "Hello")`, which further simplifies usage of STC.
 3. the design of iterators: All container can be iterated the same way, and uses the
-same element access syntax. E.g. `c_foreach (it, IntContainer, container) printf(" %d", *it.ref);` will work for
-every type of container defined as `IntContainer` with `int` elements. Also the form `c_foreach (it, IntContainer, it1, it2)`
+same element access syntax. E.g. `c_FOREACH (it, IntContainer, container) printf(" %d", *it.ref);` will work for
+every type of container defined as `IntContainer` with `int` elements. Also the form `c_FOREACH (it, IntContainer, it1, it2)`
 may be used to iterate from `it1` up to `it2`.
 
 Performance
@@ -117,17 +117,17 @@ int main(void) {
 }
 ```
 Below is an alternative way to write this code with STC. It uses three
-macros: `c_auto`, `c_forlist`, and `c_foreach`. These macro not only
+macros: `c_AUTO`, `c_FORLIST`, and `c_FOREACH`. These macro not only
 simplifies the code, but more importantly makes it less prone to errors,
 while maintaining readability:
 ```c
 int main() {
-    c_auto (FVec, vec) // RAII: init + free at one location in the code.
+    c_AUTO (FVec, vec) // RAII: init + free at one location in the code.
     {
-        c_forlist (i, float, {10.f, 20.f, 30.f})   // use array literals.
+        c_FORLIST (i, float, {10.f, 20.f, 30.f})   // use array literals.
             FVec_push(&vec, *i.ref);               // alias for push_back.
 
-        c_foreach (i, FVec, vec)                   // works for all containers.
+        c_FOREACH (i, FVec, vec)                   // works for all containers.
             printf(" %g", *i.ref);
     }
 }
@@ -190,12 +190,12 @@ int Point_cmp(const struct Point* a, const struct Point* b) {
 
 int main(void) {
     /* define six containers with automatic call of init and drop (destruction after scope exit) */
-    c_auto (cset_int, set)
-    c_auto (cvec_pnt, vec)
-    c_auto (cdeq_int, deq)
-    c_auto (clist_int, lst)
-    c_auto (cstack_int, stk)
-    c_auto (csmap_int, map)
+    c_AUTO (cset_int, set)
+    c_AUTO (cvec_pnt, vec)
+    c_AUTO (cdeq_int, deq)
+    c_AUTO (clist_int, lst)
+    c_AUTO (cstack_int, stk)
+    c_AUTO (csmap_int, map)
     {
         int nums[4] = {10, 20, 30, 40};
         struct Point pts[4] = { {10, 1}, {20, 2}, {30, 3}, {40, 4} };
@@ -228,12 +228,12 @@ int main(void) {
         csmap_int_erase_at(&map, i5);
 
         printf("After erasing elements found:");
-        printf("\n set:"); c_foreach (i, cset_int, set) printf(" %d", *i.ref);
-        printf("\n vec:"); c_foreach (i, cvec_pnt, vec) printf(" (%g, %g)", i.ref->x, i.ref->y);
-        printf("\n deq:"); c_foreach (i, cdeq_int, deq) printf(" %d", *i.ref);
-        printf("\n lst:"); c_foreach (i, clist_int, lst) printf(" %d", *i.ref);
-        printf("\n stk:"); c_foreach (i, cstack_int, stk) printf(" %d", *i.ref);
-        printf("\n map:"); c_foreach (i, csmap_int, map) printf(" [%d: %d]", i.ref->first,
+        printf("\n set:"); c_FOREACH (i, cset_int, set) printf(" %d", *i.ref);
+        printf("\n vec:"); c_FOREACH (i, cvec_pnt, vec) printf(" (%g, %g)", i.ref->x, i.ref->y);
+        printf("\n deq:"); c_FOREACH (i, cdeq_int, deq) printf(" %d", *i.ref);
+        printf("\n lst:"); c_FOREACH (i, clist_int, lst) printf(" %d", *i.ref);
+        printf("\n stk:"); c_FOREACH (i, cstack_int, stk) printf(" %d", *i.ref);
+        printf("\n map:"); c_FOREACH (i, csmap_int, map) printf(" [%d: %d]", i.ref->first,
                                                                              i.ref->second);
     }
 }
@@ -370,8 +370,8 @@ and non-emplace methods:
 #define i_val_str       // special macro to enable container of cstr
 #include <stc/cvec.h>   // vector of string (cstr)
 ...
-c_auto (cvec_str, vec)  // declare and call cvec_str_init() and defer cvec_str_drop(&vec)
-c_autodrop (cstr, s, cstr_lit("a string literal"))  // like c_auto without auto default init.
+c_AUTO (cvec_str, vec)  // declare and call cvec_str_init() and defer cvec_str_drop(&vec)
+c_AUTODROP (cstr, s, cstr_lit("a string literal"))  // like c_AUTO without auto default init.
 {
     const char* hello = "Hello";
     cvec_str_push_back(&vec, cstr_from(hello);    // construct and add string from const char*
@@ -467,16 +467,16 @@ Memory efficiency
 
 ## API changes summary V4.0
 - Added **cregex** with documentation - powerful regular expressions.
-- Added: `c_forfilter`: container iteration with "piped" filtering using && operator. 4 built-in filters.
-- Added: `c_forwhile`: *c_foreach* container iteration with extra predicate.
-- Added: **crange**: number generator type, which can be iterated (e.g. with *c_forfilter*).
+- Added: `c_FORFILTER`: container iteration with "piped" filtering using && operator. 4 built-in filters.
+- Added: `c_FORWHILE`: *c_FOREACH* container iteration with extra predicate.
+- Added: **crange**: number generator type, which can be iterated (e.g. with *c_FORFILTER*).
 - Added back **coption** - command line argument parsing.
 - New + renamed loop iteration/scope macros:
-    - `c_forlist`: macro replacing `c_forarray` and `c_apply`. Iterate a compound literal list.
-    - `c_forrange`: macro replacing `c_forrange`. Iterate a `long long` type number sequence.
-    - `c_with`: macro renamed from `c_autovar`. Like Python's **with** statement.
-    - `c_scope`: macro renamed from `c_autoscope`.
-    - `c_defer`: macro renamed from `c_autodefer`. Resembles Go's and Zig's **defer**.
+    - `c_FORLIST`: macro replacing `c_forarray` and `c_apply`. Iterate a compound literal list.
+    - `c_FORRANGE`: macro replacing `c_FORRANGE`. Iterate a `long long` type number sequence.
+    - `c_WITH`: macro renamed from `c_autovar`. Like Python's **with** statement.
+    - `c_SCOPE`: macro renamed from `c_autoscope`.
+    - `c_DEFER`: macro renamed from `c_autodefer`. Resembles Go's and Zig's **defer**.
 - Updated **cstr**, now always takes self as pointer, like all containers except csview.
 - Updated **cvec**, **cdeq**, changed `*_range*` function names.
 
@@ -524,8 +524,8 @@ Memory efficiency
 - Renamed: *c_default_fromraw()* to `c_default_from()`.
 - Changed: the [**c_apply**](docs/ccommon_api.md) macros API.
 - Replaced: *csview_first_token()* and *csview_next_token()* with one function: `csview_token()`.
-- Added: **checkauto** tool for checking that c-source files uses `c_auto*` macros correctly.
+- Added: **checkauto** tool for checking that c-source files uses `c_AUTO*` macros correctly.
 - Added: general `i_keyclass` / `i_valclass` template parameters which auto-binds template functions.
 - Added: `i_opt` template parameter: compile-time options: `c_no_cmp`, `c_no_clone`, `c_no_atomic`, `c_is_forward`; may be combined with `|`
 - Added: [**cbox**](docs/cbox_api.md) type: smart pointer, similar to [Rust Box](https://doc.rust-lang.org/rust-by-example/std/box.html) and [std::unique_ptr](https://en.cppreference.com/w/cpp/memory/unique_ptr).
-- Added: [**c_forpair**](docs/ccommon_api.md) macro: for-loop with "structured binding"
+- Added: [**c_FORPAIR**](docs/ccommon_api.md) macro: for-loop with "structured binding"

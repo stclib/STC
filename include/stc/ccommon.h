@@ -29,6 +29,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <assert.h>
+#include "priv/allcaps.h"
 
 #if SIZE_MAX == UINT32_MAX
   #define c_ZU PRIu32

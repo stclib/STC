@@ -17,7 +17,7 @@ int main()
     const char* pattern = "\\b(\\d\\d\\d\\d)-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])\\b";
     const char* input = "start date: 2015-12-31, end date: 2022-02-28";
 
-    c_auto (cstr, str)
+    c_AUTO (cstr, str)
     {
         printf("INPUT: %s\n", input);
 
@@ -34,9 +34,9 @@ int main()
         printf("brack: %s\n", cstr_str(&str));
 
         /* Shows how to compile RE separately */
-        c_with (cregex re = cregex_from(pattern, CREG_DEFAULT), cregex_drop(&re)) {
+        c_WITH (cregex re = cregex_from(pattern, CREG_DEFAULT), cregex_drop(&re)) {
             if (cregex_captures(&re) == 0)
-                continue; /* break c_with */
+                continue; /* break c_WITH */
             /* European date format. */
             cstr_take(&str, cregex_replace(&re, input, "$3.$2.$1"));
             printf("euros: %s\n", cstr_str(&str));

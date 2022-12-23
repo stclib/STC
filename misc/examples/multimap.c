@@ -60,17 +60,17 @@ OlympicLocation OlympicLocation_clone(OlympicLocation loc) {
     return loc;
 }
 void OlympicLocation_drop(OlympicLocation* self) {
-    c_drop(cstr, &self->city, &self->date);
+    c_DROP(cstr, &self->city, &self->date);
 }
 
 int main()
 {
     // Define the multimap with destructor defered to when block is completed.
-    c_auto (csmap_OL, multimap)
+    c_AUTO (csmap_OL, multimap)
     {
         const clist_OL empty = clist_OL_init();
 
-        for (size_t i = 0; i < c_arraylen(ol_data); ++i)
+        for (size_t i = 0; i < c_ARRAYLEN(ol_data); ++i)
         {
             struct OlympicsData* d = &ol_data[i];
             OlympicLocation loc = {.year = d->year,
@@ -82,14 +82,14 @@ int main()
             clist_OL_push_back(list, loc);
         }
         // Sort locations by year for each country.
-        c_foreach (country, csmap_OL, multimap)
+        c_FOREACH (country, csmap_OL, multimap)
             clist_OL_sort(&country.ref->second);
 
         // Print the multimap:
-        c_foreach (country, csmap_OL, multimap)
+        c_FOREACH (country, csmap_OL, multimap)
         {
             // Loop the locations for a country sorted by year
-            c_foreach (loc, clist_OL, country.ref->second)
+            c_FOREACH (loc, clist_OL, country.ref->second)
                 printf("%s: %d, %s, %s\n", cstr_str(&country.ref->first),
                                                      loc.ref->year,
                                            cstr_str(&loc.ref->city),

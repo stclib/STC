@@ -18,8 +18,8 @@
 void print(const char* lbl, const Multimap mmap)
 {
     printf("%s ", lbl);
-    c_foreach (e, Multimap, mmap) {
-        c_foreach (s, clist_str, e.ref->second)
+    c_FOREACH (e, Multimap, mmap) {
+        c_FOREACH (s, clist_str, e.ref->second)
             printf("{%d,%s} ", e.ref->first, cstr_str(s.ref));
     }
     puts("");
@@ -33,12 +33,12 @@ void insert(Multimap* mmap, int key, const char* str)
 
 int main()
 {
-    c_auto (Multimap, mmap)
+    c_AUTO (Multimap, mmap)
     {
         typedef struct {int a; const char* b;} pair;
 
         // list-initialize
-        c_forlist (i, pair, {{2, "foo"}, {2, "bar"}, {3, "baz"}, {1, "abc"}, {5, "def"}})
+        c_FORLIST (i, pair, {{2, "foo"}, {2, "bar"}, {3, "baz"}, {1, "abc"}, {5, "def"}})
             insert(&mmap, i.ref->a, i.ref->b);
         print("#1", mmap);
 
@@ -54,7 +54,7 @@ int main()
         print("#4", mmap);
 
         // insert using initialization_list
-        c_forlist (i, pair, {{5, "one"}, {5, "two"}})
+        c_FORLIST (i, pair, {{5, "one"}, {5, "two"}})
             insert(&mmap, i.ref->a, i.ref->b);
         print("#5", mmap);
 
@@ -65,7 +65,7 @@ int main()
         
 
         Multimap_clear(&mmap);
-        c_forlist (i, pair, {{1, "ä"}, {2, "ё"}, {2, "ö"}, {3, "ü"}})
+        c_FORLIST (i, pair, {{1, "ä"}, {2, "ё"}, {2, "ö"}, {3, "ü"}})
             insert(&mmap, i.ref->a, i.ref->b);
         print("#6", mmap);
     }

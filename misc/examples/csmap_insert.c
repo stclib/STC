@@ -19,13 +19,13 @@
 #include <stc/cvec.h>
 
 void print_ii(csmap_ii map) {
-    c_foreach (e, csmap_ii, map)
+    c_FOREACH (e, csmap_ii, map)
         printf("(%d, %d) ", e.ref->first, e.ref->second);
     puts("");
 }
 
 void print_istr(csmap_istr map) {
-    c_foreach (e, csmap_istr, map)
+    c_FOREACH (e, csmap_istr, map)
         printf("(%d, %s) ", e.ref->first, cstr_str(&e.ref->second));
     puts("");
 }
@@ -33,7 +33,7 @@ void print_istr(csmap_istr map) {
 int main()
 {
     // insert single values
-    c_auto (csmap_ii, m1) {
+    c_AUTO (csmap_ii, m1) {
         csmap_ii_insert(&m1, 1, 10);
         csmap_ii_insert(&m1, 2, 20);
 
@@ -60,8 +60,8 @@ int main()
     }
 
     // The templatized version inserting a jumbled range
-    c_auto (csmap_ii, m2)
-    c_auto (cvec_ii, v) {
+    c_AUTO (csmap_ii, m2)
+    c_AUTO (cvec_ii, v) {
         typedef cvec_ii_value ipair;
         cvec_ii_push(&v, (ipair){43, 294});
         cvec_ii_push(&v, (ipair){41, 262});
@@ -70,21 +70,21 @@ int main()
         cvec_ii_push(&v, (ipair){44, 311});
 
         puts("Inserting the following vector data into m2:");
-        c_foreach (e, cvec_ii, v)
+        c_FOREACH (e, cvec_ii, v)
             printf("(%d, %d) ", e.ref->first, e.ref->second);
         puts("");
 
-        c_foreach (e, cvec_ii, v) 
+        c_FOREACH (e, cvec_ii, v) 
             csmap_ii_insert_or_assign(&m2, e.ref->first, e.ref->second);
 
         puts("The modified key and mapped values of m2 are:");
-        c_foreach (e, csmap_ii, m2)
+        c_FOREACH (e, csmap_ii, m2)
             printf("(%d, %d) ", e.ref->first, e.ref->second);
         puts("\n");
     }
 
     // The templatized versions move-constructing elements
-    c_auto (csmap_istr, m3) {
+    c_AUTO (csmap_istr, m3) {
         csmap_istr_value ip1 = {475, cstr_lit("blue")}, ip2 = {510, cstr_lit("green")};
 
         // single element
@@ -99,9 +99,9 @@ int main()
         puts("");
     }
 
-    c_auto (csmap_ii, m4) {
+    c_AUTO (csmap_ii, m4) {
         // Insert the elements from an initializer_list
-        c_forlist (i, csmap_ii_raw, {{ 4, 44 }, { 2, 22 }, { 3, 33 },
+        c_FORLIST (i, csmap_ii_raw, {{ 4, 44 }, { 2, 22 }, { 3, 33 },
                                      { 1, 11 }, { 5, 55 }})
             csmap_ii_insert(&m4, c_PAIR(i.ref));
 

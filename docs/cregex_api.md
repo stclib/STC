@@ -129,19 +129,19 @@ if (cregex_find_pattern(pattern, input, match, CREG_DEFAULT))
 To compile, use: `gcc first_match.c src/cregex.c src/utf8code.c`.
 In order to use a callback function in the replace call, see `examples/regex_replace.c`.
 
-### Iterate through regex matches, *c_formatch*
+### Iterate through regex matches, *c_FORMATCH*
 
 To iterate multiple matches in an input string, you may use
 ```c
 csview match[5] = {0};
 while (cregex_find(&re, input, match, CREG_M_NEXT) == CREG_OK)
-    c_forrange (k, cregex_captures(&re))
+    c_FORRANGE (k, cregex_captures(&re))
         printf("submatch %lld: %.*s\n", k, c_ARGSV(match[k]));
 ```
 There is also a safe macro which simplifies this:
 ```c
-c_formatch (it, &re, input)
-    c_forrange (k, cregex_captures(&re))
+c_FORMATCH (it, &re, input)
+    c_FORRANGE (k, cregex_captures(&re))
         printf("submatch %lld: %.*s\n", k, c_ARGSV(it.match[k]));
 ```
 

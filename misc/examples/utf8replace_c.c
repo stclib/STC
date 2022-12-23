@@ -3,7 +3,7 @@
 #include <stc/csview.h>
 
 int main() {
-    c_auto (cstr, hello, upper) {
+    c_AUTO (cstr, hello, upper) {
         hello = cstr_lit("hell😀 w😀rld");
         printf("%s\n", cstr_str(&hello));
 
@@ -16,7 +16,7 @@ int main() {
 
         upper = cstr_toupper_sv(cstr_sv(&hello));
 
-        c_foreach (c, cstr, hello)
+        c_FOREACH (c, cstr, hello)
             printf("%.*s,", c_ARGSV(c.u8.chr));
         puts("");
     }
