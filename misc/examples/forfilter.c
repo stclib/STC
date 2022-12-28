@@ -2,7 +2,8 @@
 #define i_extern
 #include <stc/cstr.h>
 #include <stc/csview.h>
-#include <stc/views.h>
+#include <stc/algo/filter.h>
+#include <stc/algo/crange.h>
 
 #define i_type IVec
 #define i_val int
@@ -63,12 +64,13 @@ void demo2(void)
     c_AUTO (IVec, vector) {
         puts("demo2:");
 
-        c_FORFILTER (x, crange, crange_literal(INT64_MAX)
+        c_FORFILTER (x, crange, crange_LITERAL(INT64_MAX)
                       , c_FLT_SKIPWHILE(x, *x.ref != 11)
                      && *x.ref % 2 != 0
                       , c_FLT_TAKE(x, 5))
             IVec_push(&vector, *x.ref * *x.ref);
-        c_FOREACH (x, IVec, vector) printf(" %d", *x.ref);
+        c_FOREACH (x, IVec, vector)
+            printf(" %d", *x.ref);
         puts("");
     }
 }

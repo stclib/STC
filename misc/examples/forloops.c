@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stc/views.h>
+#include <stc/algo/filter.h>
 
 #define i_type IVec
 #define i_val int

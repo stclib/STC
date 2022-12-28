@@ -48,8 +48,8 @@ cstr        cregex_replace_sv(const cregex* re, csview input, const char* replac
 
             /* All-in-one replacement (compile + find/replace + drop) */
 cstr        cregex_replace_pattern(const char* pattern, const char* input, const char* replace);
-cstr        cregex_replace_pattern_n(const char* pattern, const char* input, const char* replace, unsigned count,
-                                     bool(*mfun)(int capgrp, csview match, cstr* mstr), int rflags);
+cstr        cregex_replace_pattern_ex(const char* pattern, const char* input, const char* replace, unsigned count,
+                                      bool(*mfun)(int capgrp, csview match, cstr* mstr), int rflags);
 
 void        cregex_drop(cregex* self); /* destroy */
 ```

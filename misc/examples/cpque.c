@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stc/forward.h>
-#include <stc/views.h>
+#include <stc/algo/crange.h>
 #include <stc/cstr.h>
 
 // predeclare

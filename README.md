@@ -26,26 +26,25 @@ in the future, and do minor modifications.
 
 Containers
 ----------
-- [***ccommon*** - Generic algorithms and macros](docs/ccommon_api.md)
 - [***carc*** - **std::shared_ptr** alike type](docs/carc_api.md)
-- [***carr2***, ***carr3*** - 2D and 3D **array** types](docs/carray_api.md)
-- [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
 - [***cbox*** - **std::unique_ptr** alike type](docs/cbox_api.md)
-- [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)
+- [***cbits*** - **std::bitset** alike type](docs/cbits_api.md)
 - [***clist*** - **std::forward_list** alike type](docs/clist_api.md)
-- [***cmap*** - **std::unordered_map** alike type](docs/cmap_api.md)
-- [***cpque*** - **std::priority_queue** alike type](docs/cpque_api.md)
 - [***cqueue*** - **std::queue** alike type](docs/cqueue_api.md)
+- [***cpque*** - **std::priority_queue** alike type](docs/cpque_api.md)
+- [***cmap*** - **std::unordered_map** alike type](docs/cmap_api.md)
 - [***cset*** - **std::unordered_set** alike type](docs/cset_api.md)
 - [***csmap*** - **std::map** sorted map alike type](docs/csmap_api.md)
 - [***csset*** - **std::set** sorted set alike type](docs/csset_api.md)
 - [***cstack*** - **std::stack** alike type](docs/cstack_api.md)
 - [***cstr*** - **std::string** alike type](docs/cstr_api.md)
 - [***csview*** - **std::string_view** alike type](docs/csview_api.md)
+- [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)
 - [***cvec*** - **std::vector** alike type](docs/cvec_api.md)
 
 Others
 ------
+- [***ccommon*** - Generic algorithms and macros](docs/ccommon_api.md)
 - [***cregex*** - Regular expression parser (extended from Rob Pike's regexp9)](docs/cregex_api.md)
 - [***crandom*** - A novel very fast *PRNG* named **stc64**](docs/crandom_api.md)
 - [***coption*** - getopt() alike command line args parser](docs/coption_api.md)

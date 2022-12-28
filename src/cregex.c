@@ -1268,8 +1268,8 @@ cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned 
 }
 
 cstr
-cregex_replace_pattern_n(const char* pattern, const char* input, const char* replace, unsigned count,
-                         bool (*mfun)(int, csview, cstr*), int crflags) {
+cregex_replace_pattern_ex(const char* pattern, const char* input, const char* replace, unsigned count,
+                          bool (*mfun)(int, csview, cstr*), int crflags) {
     cregex re = cregex_init();
     if (cregex_compile(&re, pattern, crflags) != CREG_OK)
         assert(0);

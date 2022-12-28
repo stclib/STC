@@ -72,7 +72,6 @@ int main() {
 #endif
 
 #define carc_NULL {NULL, NULL}
-#define _cx_carc_rep struct _cx_memb(_rep_)
 #endif // CARC_H_INCLUDED
 
 #ifndef _i_prefix
@@ -91,7 +90,7 @@ typedef i_keyraw _cx_raw;
 #if !c_option(c_is_forward)
 _cx_deftypes(_c_carc_types, _cx_self, i_key);
 #endif
-_cx_carc_rep { catomic_long counter; i_key value; };
+struct _cx_memb(_rep_) { catomic_long counter; i_key value; };
 
 STC_INLINE _cx_self _cx_memb(_init)(void) 
     { return c_INIT(_cx_self){NULL, NULL}; }
@@ -109,7 +108,7 @@ STC_INLINE _cx_self _cx_memb(_from_ptr)(_cx_value* p) {
 // c++: std::make_shared<_cx_value>(val)
 STC_INLINE _cx_self _cx_memb(_make)(_cx_value val) {
     _cx_self ptr;
-    _cx_carc_rep *rep = c_alloc(_cx_carc_rep);
+    struct _cx_memb(_rep_)* rep = c_alloc(struct _cx_memb(_rep_));
     *(ptr.use_count = &rep->counter) = 1;
     *(ptr.get = &rep->value) = val;
     return ptr;
@@ -127,7 +126,7 @@ STC_INLINE _cx_self _cx_memb(_move)(_cx_self* self) {
 STC_INLINE void _cx_memb(_drop)(_cx_self* self) {
     if (self->use_count && _i_atomic_dec_and_test(self->use_count)) {
         i_keydrop(self->get);
-        if ((char *)self->get != (char *)self->use_count + offsetof(_cx_carc_rep, value))
+        if ((char *)self->get != (char *)self->use_count + offsetof(struct _cx_memb(_rep_), value))
             c_free(self->get);
         c_free((long*)self->use_count);
     }

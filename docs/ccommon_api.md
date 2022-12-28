@@ -288,13 +288,13 @@ c_FORFILTER (i, crange, r1
 
 // 2. The 11 first primes:
 printf("2");
-c_FORFILTER (i, crange, crange_literal(3, crange_MAX, 2) 
+c_FORFILTER (i, crange, crange_LITERAL(3, INT64_MAX, 2) 
               , isPrime(*i.ref)
               , c_FLT_TAKE(10))
     printf(" %lld", *i.ref);
 // 2 3 5 7 11 13 17 19 23 29 31
 ```
-### c_FIND_IF, c_find_in, c_ERASE_IF
+### c_FIND_IF, c_ERASE_IF
 Find or erase linearily in containers using a predicate
 ```c
 // Search vec for first value > 2:
