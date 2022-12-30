@@ -23,24 +23,26 @@
 /* 
 #include <stdio.h>
 #define i_val int
-#define i_capacity 10
 #include <stc/cstack.h>
 #include <stc/algo/filter.h>
 
 int main()
 {
-    cstack_int stk = cstack_INITIALIZER(int, {1, 2, 3, 4, 5, 6, 7, 8, 9});
-    
-    c_foreach (i, cstack_int, stk)
-        printf(" %d", *i.ref);
-    puts("");
-    
-    c_forfilter (i, cstack_int, stk
-                  , c_flt_skipwhile(i, *i.ref < 3)
-                 && (*i.ref & 1) == 0 // even only
-                  , c_flt_take(i, 2)) // break after 2
-        printf(" %d", *i.ref);
-    puts("");
+    c_WITH (cstack_int stk = {0}, cstack_int_drop(&stk)) {
+        c_FORLIST (i, int, {1, 2, 3, 4, 5, 6, 7, 8, 9})
+            cstack_int_push(&stk, i);
+        
+        c_FOREACH (i, cstack_int, stk)
+            printf(" %d", *i.ref);
+        puts("");
+        
+        c_FORFILTER (i, cstack_int, stk
+                    , c_flt_skipwhile(i, *i.ref < 3)
+                    && (*i.ref & 1) == 0 // even only
+                    , c_flt_take(i, 2)) // break after 2
+            printf(" %d", *i.ref);
+        puts("");
+    }
 }
 */
 #ifndef STC_FILTER_H_INCLUDED

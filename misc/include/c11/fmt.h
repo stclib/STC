@@ -30,12 +30,14 @@ int main() {
     const double pi = 3.141592653589793;
     const size_t x = 1234567890;
     const char* string = "Hello world";
+    const wchar_t* wstr = L"The whole";
     const char z = 'z';
     _Bool flag = 1;
     unsigned char r = 123, g = 214, b = 90, w = 110;
     char buffer[64];
 
     fmt_print(1, "Color: ({} {} {}), {}\n", r, g, b, flag);
+    fmt_print(1, "Wide: {}, {}\n", wstr, L"wide world");
     fmt_print(1, "{:10} {:10} {:10.2f}\n", 42ull, 43, pi);
     fmt_print(stdout, "{:>10} {:>10} {:>10}\n", z, z, w);
     fmt_print(stdout, "{:10} {:10} {:10}\n", "Hello", "Mad", "World");
@@ -72,6 +74,11 @@ int main() {
 #else
 #  define FMT_API static inline
 #endif
+#if defined FMT_NDEBUG || defined NDEBUG
+#  define fmt_OK(exp) (void)(exp)
+#else
+#  define fmt_OK(exp) assert(exp)
+#endif
 
 typedef struct { 
     char* data; 
@@ -92,48 +99,48 @@ FMT_API void _fmt_bprint(fmt_buffer*, const char* fmt, ...);
 #define fmt_print(...) fmt_OVERLOAD(fmt_print, __VA_ARGS__)
 #define fmt_print2(to, fmt) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 0, fmt); \
-        assert(_n == 0); _fmt_fn(to)(to, fmt); } while (0)
+        fmt_OK(_n == 0); _fmt_fn(to)(to, fmt); } while (0)
 #define fmt_print3(to, fmt, c) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 1, fmt, _fc(c)); \
-        assert(_n == 1); _fmt_fn(to)(to, _fs, c); } while (0)
+        fmt_OK(_n == 1); _fmt_fn(to)(to, _fs, c); } while (0)
 #define fmt_print4(to, fmt, c, d) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 2, fmt, _fc(c), _fc(d)); \
-        assert(_n == 2); _fmt_fn(to)(to, _fs, c, d); } while (0)
+        fmt_OK(_n == 2); _fmt_fn(to)(to, _fs, c, d); } while (0)
 #define fmt_print5(to, fmt, c, d, e) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 3, fmt, _fc(c), _fc(d), _fc(e)); \
-        assert(_n == 3); _fmt_fn(to)(to, _fs, c, d, e); } while (0)
+        fmt_OK(_n == 3); _fmt_fn(to)(to, _fs, c, d, e); } while (0)
 #define fmt_print6(to, fmt, c, d, e, f) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 4, fmt, _fc(c), _fc(d), _fc(e), _fc(f)); \
-        assert(_n == 4); _fmt_fn(to)(to, _fs, c, d, e, f); } while (0)
+        fmt_OK(_n == 4); _fmt_fn(to)(to, _fs, c, d, e, f); } while (0)
 #define fmt_print7(to, fmt, c, d, e, f, g) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 5, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g)); \
-        assert(_n == 5); _fmt_fn(to)(to, _fs, c, d, e, f, g); } while (0)
+        fmt_OK(_n == 5); _fmt_fn(to)(to, _fs, c, d, e, f, g); } while (0)
 #define fmt_print8(to, fmt, c, d, e, f, g, h) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 6, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h)); \
-        assert(_n == 6); _fmt_fn(to)(to, _fs, c, d, e, f, g, h); } while (0)
+        fmt_OK(_n == 6); _fmt_fn(to)(to, _fs, c, d, e, f, g, h); } while (0)
 #define fmt_print9(to, fmt, c, d, e, f, g, h, i) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 7, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), _fc(i)); \
-        assert(_n == 7); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i); } while (0)
+        fmt_OK(_n == 7); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i); } while (0)
 #define fmt_print10(to, fmt, c, d, e, f, g, h, i, j) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 8, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                      _fc(i), _fc(j)); \
-        assert(_n == 8); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j); } while (0)
+        fmt_OK(_n == 8); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j); } while (0)
 #define fmt_print11(to, fmt, c, d, e, f, g, h, i, j, k) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 9, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                      _fc(i), _fc(j), _fc(k)); \
-        assert(_n == 9); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k); } while (0)
+        fmt_OK(_n == 9); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k); } while (0)
 #define fmt_print12(to, fmt, c, d, e, f, g, h, i, j, k, m) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 10, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                       _fc(i), _fc(j), _fc(k), _fc(m)); \
-        assert(_n == 10); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m); } while (0)
+        fmt_OK(_n == 10); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m); } while (0)
 #define fmt_print13(to, fmt, c, d, e, f, g, h, i, j, k, m, n) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 11, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                       _fc(i), _fc(j), _fc(k), _fc(m), _fc(n)); \
-        assert(_n == 11); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m, n); } while (0)
+        fmt_OK(_n == 11); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m, n); } while (0)
 #define fmt_print14(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 12, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                       _fc(i), _fc(j), _fc(k), _fc(m), _fc(n), _fc(o)); \
-        assert(_n == 12); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m, n, o); } while (0)
+        fmt_OK(_n == 12); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m, n, o); } while (0)
 
 #define _fmt_fn(x) _Generic ((x), \
     FILE*: fprintf, \
@@ -164,8 +171,10 @@ FMT_API void _fmt_bprint(fmt_buffer*, const char* fmt, ...);
     double: "@g", \
     long double: "@Lg", \
     char*: "s", \
+    wchar_t*: "ls", \
     void*: "p", \
     const char*: "s", \
+    const wchar_t*: "ls", \
     const void*: "p")
 
 #if defined FMT_IMPLEMENT || !(defined FMT_HEADER || defined FMT_IMPLEMENT)

@@ -185,35 +185,6 @@ void mapdemo3()
     cmap_str_drop(&table); // frees key and value cstrs, and hash table.
 }
 
-#define i_val float
-#define i_tag f
-#include <stc/carr3.h>
-
-void arraydemo1()
-{
-    printf("\nARRAYDEMO1\n");
-    c_WITH (carr3_f arr3 = carr3_f_with_size(30, 20, 10, 0.0f), 
-                           carr3_f_drop(&arr3))
-    {
-        arr3.data[5][4][3] = 10.2f;
-        float **arr2 = arr3.data[5];
-        float *arr1 = arr3.data[5][4];
-
-        printf("arr3: %" c_ZU ": (%" c_ZU ", %" c_ZU ", %" c_ZU ") = %" c_ZU "\n", sizeof(arr3), 
-               arr3.xdim, arr3.ydim, arr3.zdim, carr3_f_size(&arr3));
-
-        printf("%g\n", arr1[3]); // = 10.2
-        printf("%g\n", arr2[4][3]); // = 10.2
-        printf("%g\n", arr3.data[5][4][3]); // = 10.2
-
-        float x = 0.0;
-        c_FOREACH (i, carr3_f, arr3)
-            *i.ref = ++x;
-        printf("%g\n", arr3.data[29][19][9]); // = 6000
-    }
-}
-
-
 int main()
 {
     stringdemo1();
@@ -224,5 +195,4 @@ int main()
     mapdemo1();
     mapdemo2();
     mapdemo3();
-    arraydemo1();
 }

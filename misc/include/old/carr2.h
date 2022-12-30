@@ -20,11 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "ccommon.h"
+#include <stc/ccommon.h>
 
 #ifndef CARR2_H_INCLUDED
 #define CARR2_H_INCLUDED
-#include "forward.h"
+#include <stc/forward.h>
 #include <stdlib.h>
 #endif
 /*
@@ -56,7 +56,7 @@ int main() {
 #ifndef _i_prefix
 #define _i_prefix carr2_
 #endif
-#include "priv/template.h"
+#include <stc/priv/template.h>
 #if !c_option(c_is_forward)
 _cx_deftypes(_c_carr2_types, _cx_self, i_key);
 #endif
@@ -149,4 +149,4 @@ STC_DEF void _cx_memb(_drop)(_cx_self* self) {
 }
 
 #endif
-#include "priv/template.h"
+#include <stc/priv/template.h>

@@ -52,9 +52,6 @@ STC_INLINE _cx_self _cx_memb(_init)(void) {
 }
 
 #ifdef i_capacity
-#define cstack_INITIALIZER(T, ...) \
-    {.data=__VA_ARGS__, ._len=sizeof((T[])__VA_ARGS__)/sizeof(T)}
-
 STC_INLINE void _cx_memb(_create)(_cx_self* self)
     { self->_len = 0; }
 #else
@@ -71,7 +68,7 @@ STC_INLINE _cx_self _cx_memb(_with_size)(size_t size, i_key null) {
     while (size) out.data[--size] = null;
     return out;
 }
-#endif
+#endif // i_capacity
 
 STC_INLINE void _cx_memb(_clear)(_cx_self* self) {
     _cx_value *p = self->data + self->_len;

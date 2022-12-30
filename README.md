@@ -3,7 +3,7 @@
 STC - Smart Template Containers for C
 =====================================
 
-News: Version 4.0 Release Candidate 3 (Sep 2022)
+News: Version 4.1 Beta (Dec 2022)
 ------------------------------------------------
 - [See detailed changes for version 4](#version-4).
 
@@ -44,8 +44,8 @@ Containers
 
 Others
 ------
-- [***ccommon*** - Generic algorithms and macros](docs/ccommon_api.md)
-- [***cregex*** - Regular expression parser (extended from Rob Pike's regexp9)](docs/cregex_api.md)
+- [***ccommon*** - Generic safe macros and algorithms](docs/ccommon_api.md)
+- [***cregex*** - Regular expressions (extended from Rob Pike's regexp9)](docs/cregex_api.md)
 - [***crandom*** - A novel very fast *PRNG* named **stc64**](docs/crandom_api.md)
 - [***coption*** - getopt() alike command line args parser](docs/coption_api.md)
 
@@ -63,26 +63,26 @@ Highlights
 - **Compiles with C++ and C99** - C code can be compiled with C++ (container element types must be POD).
 - **Container prefix and forward declaration** - Templated containers may have user defined prefix, e.g. myvec_push_back(). They may also be forward declared without including the full API/implementation. See documentation below.
 
-Three standout features of STC are
-1. the centralized analysis of template arguments: It assigns good defaults to non-specified templates.
+Three standout features of STC
+1. ***Centralized analysis of template arguments***. Assigns good defaults to non-specified templates.
 You may specify a number of "standard" template arguments for each container, but as minimum only one is
 required (two for maps). In the latter case, STC assumes the elements are basic types. For more complex types,
 additional template arguments must be defined.
-2. the general "heterogeneous lookup"-like feature: Allows specification of an alternative type to use
+2. ***General "heterogeneous lookup"-like feature***. Allows specification of an alternative type to use
 for lookup in containers. E.g. for containers with string type (**cstr**) elements, `const char*` is used
 as lookup type. It will then use the input `const char*` directly when comparing with the string data in the
 container. This avoids the construction of a new `cstr` (which possible allocates memory) for the lookup. 
 Finally, destruction of the lookup key (i.e. string literal) after usage is not needed (or allowed), which 
 is convenient in C. The alternative lookup type may also be used for adding entries into containers by using 
 the *emplace*-functions. E.g. `MyCStrVec_emplace_back(&vec, "Hello")`, which further simplifies usage of STC.
-3. the design of iterators: All container can be iterated the same way, and uses the
+3. ***Standardized container iterators***. All container can be iterated the same way, and uses the
 same element access syntax. E.g. `c_FOREACH (it, IntContainer, container) printf(" %d", *it.ref);` will work for
 every type of container defined as `IntContainer` with `int` elements. Also the form `c_FOREACH (it, IntContainer, it1, it2)`
 may be used to iterate from `it1` up to `it2`.
 
 Performance
 -----------
-![Benchmark](benchmarks/pics/benchmark.gif)
+![Benchmark](misc/benchmarks/pics/benchmark.gif)
 
 Benchmark notes:
 - The barchart shows average test times over three platforms: Mingw64 10.30, Win-Clang 12, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
@@ -99,11 +99,12 @@ The usage of the containers is similar to the c++ standard containers in STL, so
 are familiar with them. All containers are generic/templated, except for **cstr** and **cbits**.
 No casting is used, so containers are type-safe like templates in c++. A basic usage example:
 ```c
-#define i_type FVec    // if not defined, vector type would be cvec_float
-#define i_val float    // container value type
-#include <stc/cvec.h>  // defines the FVec type
+#define i_type FVec    // Container type name; if not defined, it would be cvec_float
+#define i_val float    // Container element type
+#include <stc/cvec.h>
 
-int main(void) {
+int main(void)
+{
     FVec vec = FVec_init();
     FVec_push_back(&vec, 10.f);
     FVec_push_back(&vec, 20.f);
@@ -112,7 +113,7 @@ int main(void) {
     for (size_t i = 0; i < FVec_size(vec); ++i)
         printf(" %g", vec.data[i]);
 
-    FVec_drop(&vec); // free memory
+    FVec_drop(&vec); // cleanup memory
 }
 ```
 Below is an alternative way to write this code with STC. It uses three
@@ -120,15 +121,17 @@ macros: `c_AUTO`, `c_FORLIST`, and `c_FOREACH`. These macro not only
 simplifies the code, but more importantly makes it less prone to errors,
 while maintaining readability:
 ```c
-int main() {
-    c_AUTO (FVec, vec) // RAII: init + free at one location in the code.
+int main()
+{
+    c_AUTO (FVec, vec) // RAII: define vec, init() and drop() all-in-one syntax.
     {
-        c_FORLIST (i, float, {10.f, 20.f, 30.f})   // use array literals.
-            FVec_push(&vec, *i.ref);               // alias for push_back.
+        c_FORLIST (i, float, {10.f, 20.f, 30.f}) // Iterate a list of floats.
+            FVec_push(&vec, *i.ref);             // All containers have push() method.
 
-        c_FOREACH (i, FVec, vec)                   // works for all containers.
-            printf(" %g", *i.ref);
-    }
+        c_FOREACH (i, FVec, vec)                 // Iterate elements of the container.
+            printf(" %g", *i.ref);               // i.ref is a pointer to the current element.
+    
+    } // vec is auto cleaned up at end of scope
 }
 ```
 For struct element types, an `i_cmp` compare function is required (uses `<` and `==` by default,
@@ -160,11 +163,7 @@ With six different containers:
 #include <stc/ccommon.h>
 
 struct Point { float x, y; };
-
-int Point_cmp(const struct Point* a, const struct Point* b) {
-    int cmp = c_default_cmp(&a->x, &b->x);
-    return cmp ? cmp : c_default_cmp(&a->y, &b->y);
-}
+int Point_cmp(const struct Point* a, const struct Point* b);
 
 #define i_key int
 #include <stc/cset.h>  // cset_int: unordered set
@@ -187,8 +186,14 @@ int Point_cmp(const struct Point* a, const struct Point* b) {
 #define i_val int
 #include <stc/csmap.h> // csmap_int: sorted map int => int
 
-int main(void) {
-    /* define six containers with automatic call of init and drop (destruction after scope exit) */
+int Point_cmp(const struct Point* a, const struct Point* b) {
+    int cmp = c_default_cmp(&a->x, &b->x);
+    return cmp ? cmp : c_default_cmp(&a->y, &b->y);
+}
+
+int main(void)
+{
+    /* Define six containers with automatic call of init and drop (destruction after scope exit) */
     c_AUTO (cset_int, set)
     c_AUTO (cvec_pnt, vec)
     c_AUTO (cdeq_int, deq)
@@ -200,40 +205,58 @@ int main(void) {
         struct Point pts[4] = { {10, 1}, {20, 2}, {30, 3}, {40, 4} };
         int pairs[4][2] = { {20, 2}, {10, 1}, {30, 3}, {40, 4} };
         
-        /* add some elements to each container */
+        /* Add some elements to each container */
         for (int i = 0; i < 4; ++i) {
             cset_int_insert(&set, nums[i]);
             cvec_pnt_push(&vec, pts[i]);
             cdeq_int_push_back(&deq, nums[i]);
             clist_int_push_back(&lst, nums[i]);
-            cstack_int_push(&set, nums[i]);
+            cstack_int_push(&stk, nums[i]);
             csmap_int_insert(&map, pairs[i][0], pairs[i][1]);
         }
 
-        /* find an element in each container (except cstack) */
+        /* Find an element in each container (except cstack) */
         cset_int_iter i1 = cset_int_find(&set, 20);
         cvec_pnt_iter i2 = cvec_pnt_find(&vec, (struct Point){20, 2});
         cdeq_int_iter i3 = cdeq_int_find(&deq, 20);
         clist_int_iter i4 = clist_int_find(&lst, 20);
         csmap_int_iter i5 = csmap_int_find(&map, 20);
-        printf("\nFound: %d, (%g, %g), %d, %d, [%d: %d]\n", *i1.ref, i2.ref->x, i2.ref->y,
-                                                            *i3.ref, *i4.ref,
-                                                            i5.ref->first, i5.ref->second);
-        /* erase the elements found */
+
+        printf("\nFound: %d, (%g, %g), %d, %d, [%d: %d]\n",
+                *i1.ref, i2.ref->x, i2.ref->y, *i3.ref,
+                *i4.ref, i5.ref->first, i5.ref->second);
+        
+        /* Erase the elements found */
         cset_int_erase_at(&set, i1);
         cvec_pnt_erase_at(&vec, i2);
         cdeq_int_erase_at(&deq, i3);
         clist_int_erase_at(&lst, i4);
         csmap_int_erase_at(&map, i5);
 
-        printf("After erasing elements found:");
-        printf("\n set:"); c_FOREACH (i, cset_int, set) printf(" %d", *i.ref);
-        printf("\n vec:"); c_FOREACH (i, cvec_pnt, vec) printf(" (%g, %g)", i.ref->x, i.ref->y);
-        printf("\n deq:"); c_FOREACH (i, cdeq_int, deq) printf(" %d", *i.ref);
-        printf("\n lst:"); c_FOREACH (i, clist_int, lst) printf(" %d", *i.ref);
-        printf("\n stk:"); c_FOREACH (i, cstack_int, stk) printf(" %d", *i.ref);
-        printf("\n map:"); c_FOREACH (i, csmap_int, map) printf(" [%d: %d]", i.ref->first,
-                                                                             i.ref->second);
+        printf("After erasing the elements found:");
+        printf("\n set:");
+        c_FOREACH (i, cset_int, set)
+            printf(" %d", *i.ref);
+        
+        printf("\n vec:");
+        c_FOREACH (i, cvec_pnt, vec)
+            printf(" (%g, %g)", i.ref->x, i.ref->y);
+        
+        printf("\n deq:");
+        c_FOREACH (i, cdeq_int, deq)
+            printf(" %d", *i.ref);
+        
+        printf("\n lst:");
+        c_FOREACH (i, clist_int, lst)
+            printf(" %d", *i.ref);
+        
+        printf("\n stk:");
+        c_FOREACH (i, cstack_int, stk)
+            printf(" %d", *i.ref);
+        
+        printf("\n map:");
+        c_FOREACH (i, csmap_int, map)
+            printf(" [%d: %d]", i.ref->first, i.ref->second);
     }
 }
 ```

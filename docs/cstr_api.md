@@ -76,8 +76,8 @@ void         cstr_replace_at_sv(cstr* self, size_t pos, size_t len, const csview
 void         cstr_replace_at_s(cstr* self, size_t pos, size_t len, cstr repl);
 
 bool         cstr_equals(const cstr* self, const char* str);
-bool         cstr_equals_s(const cstr* self, cstr s);
 bool         cstr_equals_sv(const cstr* self, csview sv);
+bool         cstr_equals_s(const cstr* self, cstr s);
 
 size_t       cstr_find(const cstr* self, const char* search);
 size_t       cstr_find_at(const cstr* self, size_t pos, const char* search);                 // search from pos

@@ -1,13 +1,13 @@
 #include <stc/cstr.h>
 
 #define i_val int
-#include <stc/carr2.h>
+#include "carr2.h"
 
 #define i_val int
-#include <stc/carr3.h>
+#include "carr3.h"
 
 #define i_val_str
-#include <stc/carr2.h>
+#include "carr2.h"
 
 int main()
 {

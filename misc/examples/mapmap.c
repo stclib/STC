@@ -4,18 +4,24 @@
 
 // People: std::map<std::string, std::string>
 #define i_type People
-#define i_key_str
-#define i_val_str
+#define i_key_str // name
+#define i_val_str // email
 #define i_keydrop(p) (printf("kdrop: %s\n", cstr_str(p)), cstr_drop(p)) // override
 #include <stc/csmap.h>
 
 // Departments: std::map<std::string, People>
 #define i_type Departments
-#define i_key_str
+#define i_key_str // dep. name
 #define i_valclass People
-// Shorthand for:
+// i_key_str implies:
+//  #define i_tag str
+//  #define i_key cstr
+//  #define i_keyclone cstr_clone
+//  #define i_keydrop cstr_drop
+//  #define i_cmp cstr_cmp
+//  #define i_hash cstr_hash
+// i_valclass implies:
 //  #define i_val People
-//  #define i_cmp People_cmp
 //  #define i_valclone People_clone
 //  #define i_valdrop People_drop
 #include <stc/csmap.h>
@@ -23,7 +29,7 @@
 
 void add(Departments* deps, const char* name, const char* email, const char* dep)
 {
-    People *people = &Departments_insert(deps, cstr_from(dep), People_init()).ref->second;
+    People *people = &Departments_emplace(deps, dep, People_init()).ref->second;
     People_emplace_or_assign(people, name, email);
 }
 
