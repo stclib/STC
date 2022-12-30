@@ -28,17 +28,17 @@ using_cspan(IntSpan, int);
 int main()
 {
     int array[] = {1, 2, 3, 4, 5};
-    IntSpan iv = {array, c_arraylen(array)};
+    IntSpan span = {array, c_ARRAYLEN(array)};
     
-    c_foreach (i, IntSpan, iv)
+    c_FOREACH (i, IntSpan, span)
         printf(" %d", *i.ref);
     puts("");
     
     // use a temporary IntSpan object.
-    c_forfilter (i, IntSpan, cspan_LITERAL(IntSpan, {10, 20, 30, 23, 22, 21})
-                  , c_flt_skipwhile(i, *i.ref < 25)
+    c_FORFILTER (i, IntSpan, cspan_LITERAL(IntSpan, {10, 20, 30, 23, 22, 21})
+                  , c_FLT_SKIPWHILE(i, *i.ref < 25)
                  && (*i.ref & 1) == 0 // even only
-                  , c_flt_take(i, 2)) // break after 2
+                  , c_FLT_TAKE(i, 2)) // break after 2
         printf(" %d", *i.ref);
     puts("");
 }

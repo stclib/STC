@@ -28,15 +28,15 @@
 int main()
 {
     crange r1 = crange_make(80, 90);
-    c_foreach (i, crange, r1)
+    c_FOREACH (i, crange, r1)
         printf(" %lld", *i.ref);
     puts("");
 
     // use a temporary crange object.
     int a = 100, b = INT32_MAX;
-    c_forfilter (i, crange, crange_LITERAL(a, b, 8)
+    c_FORFILTER (i, crange, crange_LITERAL(a, b, 8)
                   , i.index > 10
-                  , c_flt_take(i, 3))
+                  , c_FLT_TAKE(i, 3))
         printf(" %lld", *i.ref);
     puts("");
 }

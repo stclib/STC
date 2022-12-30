@@ -1,15 +1,16 @@
-#ifndef FMT_INCLUDED
-#define FMT_INCLUDED
+#ifndef FMT_H_INCLUDED
+#define FMT_H_INCLUDED
 /*
 void        fmt_print(dst, fmt, ...);
-void        fmt_destroy(fmt_buffer* buf);
+void        fmt_drop_buffer(fmt_buffer* buf);
 
-  dst - destination 
-    int             1=stdout, 2=stderr
-    FILE* file      Write to a file
+  dst - destination, one of:
+    int fd          1=stdout, 2=stderr
+    FILE* fp        Write to a file
     char* strbuf    Write to a pre-allocated string buffer
-    fmt_buffer* b   Auto realloc the needed memory. Set b->stream=1 for stream-mode.
-                    b->data must be freed after usage.
+    fmt_buffer* buf Auto realloc the needed memory (safe).
+                    Set buf->stream=1 for stream-mode.
+                    Call fmt_drop_buffer(buf) after usage.
 
   fmt - format string
     {}              Auto-detected format. If :MOD is not specified,
@@ -51,7 +52,7 @@ int main() {
     fmt_print(1,   "{}, len={}, cap={}\n", out->data, out->len, out->cap);
     fmt_print(out, "{} {}", ", Pi squared is:", pi*pi);
     fmt_print(1,   "{}, len={}, cap={}\n", out->data, out->len, out->cap);
-    fmt_destroy(out);
+    fmt_drop_buffer(out);
 }
 */
 #include <stdio.h>
@@ -86,7 +87,7 @@ typedef struct {
     _Bool stream;
 } fmt_buffer;
 
-FMT_API void fmt_destroy(fmt_buffer* buf);
+FMT_API void fmt_drop_buffer(fmt_buffer* buf);
 FMT_API int  _fmt_parse(char* p, int nargs, const char *fmt, ...);
 FMT_API void _fmt_iprint(int fd, const char* fmt, ...);
 FMT_API void _fmt_bprint(fmt_buffer*, const char* fmt, ...);
@@ -183,7 +184,7 @@ FMT_API void _fmt_bprint(fmt_buffer*, const char* fmt, ...);
 #include <stdarg.h>
 #include <string.h>
 
-FMT_API void fmt_destroy(fmt_buffer* buf) {
+FMT_API void fmt_drop_buffer(fmt_buffer* buf) {
     free(buf->data);
 }
 

@@ -27,7 +27,7 @@
 #define c_PASTE(a, b) c_CONCAT(a, b)
 #endif
 
-/* Generic Quicksort in C
+/* Generic Quicksort in C, performs as fast as c++ std::sort().
 template params:
 #define i_val           - value type [required]
 #define i_less          - less function. default: *x < *y
@@ -38,8 +38,8 @@ template params:
 #include <time.h>
 #include <stdlib.h>
 #define i_val int
-#include <stc/crandom.h>
 #include <stc/algo/csort.h>
+#include <stc/crandom.h>
 #ifdef __cplusplus
 #include <algorithm>
 #endif
@@ -47,10 +47,10 @@ template params:
 int testsort(csortval_int *a, size_t size, const char *desc) {
     clock_t t = clock();
 #ifdef __cplusplus
-    puts("std::sort");
+    printf("std::sort: ");
     std::sort(a, a + size);
 #else
-    puts("csort");
+    printf("csort: ");
     csort_int(a, size);
 #endif
     t = clock() - t;
