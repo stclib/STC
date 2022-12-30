@@ -13,8 +13,8 @@ int main()
         {"!((abc|123)+)!", "!123abcabc!"}
     };
 
-    c_auto (cregex, re)
-    c_forrange (i, c_arraylen(s))
+    c_AUTO (cregex, re)
+    c_FORRANGE (i, c_ARRAYLEN(s))
     {
         int res = cregex_compile(&re, s[i].pattern, CREG_DEFAULT);
         if (res < 0) {
@@ -23,8 +23,8 @@ int main()
         }
         printf("input: %s\n", s[i].input);
 
-        c_formatch (j, &re, s[i].input) {
-            c_forrange (k, cregex_captures(&re))
+        c_FORMATCH (j, &re, s[i].input) {
+            c_FORRANGE (k, cregex_captures(&re))
                 printf("  submatch %lld: %.*s\n", k, c_ARGSV(j.match[k]));
             puts("");
         }

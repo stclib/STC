@@ -25,15 +25,15 @@ int main() {
     stc64_t rng = stc64_new(time(NULL));
     stc64_uniform_t dist = stc64_uniform_new(0, n);
 
-    c_auto (IQ, Q)
+    c_AUTO (IQ, Q)
     {
         // Push eight million random numbers onto the queue.
-        c_forrange (n)
+        c_FORRANGE (n)
             IQ_push(&Q, stc64_uniform(&rng, &dist));
 
         // Push or pop on the queue 50 million times
         printf("befor: size %" c_ZU ", capacity %" c_ZU "\n", IQ_size(&Q), IQ_capacity(&Q));
-        c_forrange (n) {
+        c_FORRANGE (n) {
             int r = stc64_uniform(&rng, &dist);
             if (r & 3)
                 IQ_push(&Q, r);

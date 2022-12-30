@@ -36,10 +36,10 @@ int point_cmp(const Point* a, const Point* b) {
 
 int main()
 {
-    c_auto (cvec_i32, vec)
-    c_auto (cvec_float, fvec)
-    c_auto (cvec_pnt, pvec)
-    c_auto (cvec_str, svec)
+    c_AUTO (cvec_i32, vec)
+    c_AUTO (cvec_float, fvec)
+    c_AUTO (cvec_pnt, pvec)
+    c_AUTO (cvec_str, svec)
     {
         cvec_i32_push(&vec, 123);
         cvec_float_push(&fvec, 123.3f);
@@ -49,7 +49,7 @@ int main()
         cvec_pnt_push(&pvec, (Point){62, 81});
         cvec_pnt_push(&pvec, (Point){32, 91});
         cvec_pnt_sort(&pvec);
-        c_foreach (i, cvec_pnt, pvec)
+        c_FOREACH (i, cvec_pnt, pvec)
             printf(" (%d %d)", i.ref->x, i.ref->y);
         puts("");
 

@@ -37,8 +37,8 @@
 cvec_str read_file(const char* name)
 {
     cvec_str data = cvec_str_init();
-    c_auto (cstr, line)
-    c_with (FILE* f = fopen(name, "r"), fclose(f))
+    c_AUTO (cstr, line)
+    c_WITH (FILE* f = fopen(name, "r"), fclose(f))
         while (cstr_getline(&line, f))
             cvec_str_emplace_back(&data, cstr_str(&line));
     return data;
@@ -185,12 +185,12 @@ const size_t MAX_LOOP = 2000;
 
 int main()
 {
-    c_auto (cvec_str, vec_string)
-    c_auto (cvec_sv, vec_stringview)
-    c_auto (csmap_str, mapTrans)
-    c_auto (csmap_ssv, mapSview)
-    c_auto (cmap_str, unordmapTrans)
-    c_auto (cmap_ssv, unordmapSview)
+    c_AUTO (cvec_str, vec_string)
+    c_AUTO (cvec_sv, vec_stringview)
+    c_AUTO (csmap_str, mapTrans)
+    c_AUTO (csmap_ssv, mapSview)
+    c_AUTO (cmap_str, unordmapTrans)
+    c_AUTO (cmap_ssv, unordmapSview)
     {
         std::cout << "Short String Benchmark" << std::endl;
         std::cout << "======================" << std::endl;

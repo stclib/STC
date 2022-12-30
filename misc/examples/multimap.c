@@ -32,14 +32,14 @@ struct OlympicsData { int year; const char *city, *country, *date; } ol_data[] =
     {1924, "Chamonix", "France", "January 25 - February 5"},
 };
 
-typedef struct { int year; cstr city, date; } OlympicLocation;
+typedef struct { int year; cstr city, date; } OlympicLoc;
 
-int OlympicLocation_cmp(const OlympicLocation* a, const OlympicLocation* b);
-OlympicLocation OlympicLocation_clone(OlympicLocation loc);
-void OlympicLocation_drop(OlympicLocation* self);
+int OlympicLoc_cmp(const OlympicLoc* a, const OlympicLoc* b);
+OlympicLoc OlympicLoc_clone(OlympicLoc loc);
+void OlympicLoc_drop(OlympicLoc* self);
 
-// Create a clist<OlympicLocation>, can be sorted by year.
-#define i_valclass OlympicLocation // binds _cmp, _clone and _drop.
+// Create a clist<OlympicLoc>, can be sorted by year.
+#define i_valclass OlympicLoc // binds _cmp, _clone and _drop.
 #define i_tag OL
 #define i_extern // define _clist_mergesort() 
 #include <stc/clist.h>
@@ -50,46 +50,49 @@ void OlympicLocation_drop(OlympicLocation* self);
 #define i_tag OL
 #include <stc/csmap.h>
 
-int OlympicLocation_cmp(const OlympicLocation* a, const OlympicLocation* b) {
+int OlympicLoc_cmp(const OlympicLoc* a, const OlympicLoc* b) {
     return a->year - b->year;
 }
 
-OlympicLocation OlympicLocation_clone(OlympicLocation loc) {
+OlympicLoc OlympicLoc_clone(OlympicLoc loc) {
     loc.city = cstr_clone(loc.city);
     loc.date = cstr_clone(loc.date);
     return loc;
 }
-void OlympicLocation_drop(OlympicLocation* self) {
-    c_drop(cstr, &self->city, &self->date);
+
+void OlympicLoc_drop(OlympicLoc* self) {
+    cstr_drop(&self->city);
+    cstr_drop(&self->date);
 }
+
 
 int main()
 {
     // Define the multimap with destructor defered to when block is completed.
-    c_auto (csmap_OL, multimap)
+    c_AUTO (csmap_OL, multimap)
     {
         const clist_OL empty = clist_OL_init();
 
-        for (size_t i = 0; i < c_arraylen(ol_data); ++i)
+        for (size_t i = 0; i < c_ARRAYLEN(ol_data); ++i)
         {
             struct OlympicsData* d = &ol_data[i];
-            OlympicLocation loc = {.year = d->year,
-                                   .city = cstr_from(d->city),
-                                   .date = cstr_from(d->date)};
+            OlympicLoc loc = {.year = d->year,
+                              .city = cstr_from(d->city),
+                              .date = cstr_from(d->date)};
             // Insert an empty list for each new country, and append the entry to the list.
             // If country already exist in map, its list is returned from the insert function.
-            clist_OL* list = &csmap_OL_insert(&multimap, cstr_from(d->country), empty).ref->second;
+            clist_OL* list = &csmap_OL_emplace(&multimap, d->country, empty).ref->second;
             clist_OL_push_back(list, loc);
         }
         // Sort locations by year for each country.
-        c_foreach (country, csmap_OL, multimap)
+        c_FOREACH (country, csmap_OL, multimap)
             clist_OL_sort(&country.ref->second);
 
         // Print the multimap:
-        c_foreach (country, csmap_OL, multimap)
+        c_FOREACH (country, csmap_OL, multimap)
         {
             // Loop the locations for a country sorted by year
-            c_foreach (loc, clist_OL, country.ref->second)
+            c_FOREACH (loc, clist_OL, country.ref->second)
                 printf("%s: %d, %s, %s\n", cstr_str(&country.ref->first),
                                                      loc.ref->year,
                                            cstr_str(&loc.ref->city),

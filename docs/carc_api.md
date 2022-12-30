@@ -36,14 +36,14 @@ See similar c++ class [std::shared_ptr](https://en.cppreference.com/w/cpp/memory
 ## Methods
 ```c
 carc_X      carc_X_init();                                     // empty shared pointer
-carc_X      carc_X_new(i_valraw raw);                          // create an carc from raw type (available if i_valraw defined by user).
-carc_X      carc_X_from(i_val val);                            // create an carc from constructed val object. Faster than from_ptr().
+carc_X      carc_X_from(i_valraw raw);                         // create an carc from raw type (available if i_valraw defined by user).
 carc_X      carc_X_from_ptr(i_val* p);                         // create an carc from raw pointer. Takes ownership of p.
+carc_X      carc_X_make(i_val val);                            // create an carc from constructed val object. Faster than from_ptr().
 
 carc_X      carc_X_clone(carc_X other);                        // return other with increased use count
-carc_X      carc_X_move(carc_X* self);                         // transfer ownership to another carc.
-void        carc_X_take(carc_X* self, carc_X other);           // take ownership of other.
-void        carc_X_copy(carc_X* self, carc_X other);           // shared assign (increase use count)
+carc_X      carc_X_move(carc_X* self);                         // transfer ownership to receiver; self becomes NULL
+void        carc_X_take(carc_X* self, carc_X unowned);         // take ownership of unowned.
+void        carc_X_assign(carc_X* self, carc_X other);         // shared assign (increases use count)
 
 void        carc_X_drop(carc_X* self);                         // destruct (decrease use count, free at 0)
 long        carc_X_use_count(const carc_X* self);    
@@ -98,24 +98,24 @@ bool        carc_X_value_eq(const i_val* x, const i_val* y);
 
 int main()
 {
-    c_auto (Stack, s1, s2) // RAII
+    c_AUTO (Stack, s1, s2) // RAII
     {
         // POPULATE s1 with shared pointers to Map:
         Map *map;
 
         map = Stack_push(&s1, Arc_make(Map_init()))->get; // push empty map to s1.
-        c_forlist (i, Map_raw, { {"Joey", 1990}, {"Mary", 1995}, {"Joanna", 1992} }) {
+        c_FORLIST (i, Map_raw, { {"Joey", 1990}, {"Mary", 1995}, {"Joanna", 1992} }) {
             Map_emplace(map, c_PAIR(i.ref)); // populate it.
         }
 
         map = Stack_push(&s1, Arc_make(Map_init()))->get;
-        c_forlist (i, Map_raw, { {"Rosanna", 2001}, {"Brad", 1999}, {"Jack", 1980} }) {
+        c_FORLIST (i, Map_raw, { {"Rosanna", 2001}, {"Brad", 1999}, {"Jack", 1980} }) {
             Map_emplace(map, c_PAIR(i.ref));
         }
 
         // POPULATE s2:
         map = Stack_push(&s2, Arc_make(Map_init()))->get;
-        c_forlist (i, Map_raw, { {"Steve", 1979}, {"Rick", 1974}, {"Tracy", 2003} }) {
+        c_FORLIST (i, Map_raw, { {"Steve", 1979}, {"Rick", 1974}, {"Tracy", 2003} }) {
             Map_emplace(map, c_PAIR(i.ref));
         }
         
@@ -134,15 +134,15 @@ int main()
         Map_emplace_or_assign(s1.data[1].get, "Shared", 2022);
 
         puts("S1");
-        c_foreach (i, Stack, s1) {
-            c_forpair (name, year, Map, *i.ref->get)
+        c_FOREACH (i, Stack, s1) {
+            c_FORPAIR (name, year, Map, *i.ref->get)
                 printf("  %s:%d", cstr_str(_.name), *_.year);
             puts("");
         }
 
         puts("S2");
-        c_foreach (i, Stack, s2) {
-            c_forpair (name, year, Map, *i.ref->get)
+        c_FOREACH (i, Stack, s2) {
+            c_FORPAIR (name, year, Map, *i.ref->get)
                 printf("  %s:%d", cstr_str(_.name), *_.year);
             puts("");
         }

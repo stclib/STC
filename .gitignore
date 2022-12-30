@@ -1,6 +1,6 @@
 # Folders
 stuff/*
-benchmarks/external/*
+misc/benchmarks/external/*
 
 # Prerequisites
 *.d

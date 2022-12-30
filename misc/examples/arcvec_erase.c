@@ -15,9 +15,9 @@ void show_drop(int* x) { printf("drop: %d\n", *x); }
 
 int main()
 {
-    c_auto (Vec, vec)
+    c_AUTO (Vec, vec)
     {
-        c_forlist (i, int, {2012, 1990, 2012, 2019, 2015})
+        c_FORLIST (i, int, {2012, 1990, 2012, 2019, 2015})
             Vec_emplace(&vec, *i.ref);
         
         // clone the second 2012 and push it back.
@@ -25,7 +25,7 @@ int main()
         Vec_push(&vec, Arc_clone(vec.data[2]));
         
         printf("vec before erase :");
-        c_foreach (i, Vec, vec)
+        c_FOREACH (i, Vec, vec)
             printf(" %d", *i.ref->get);
 
         printf("\nerase vec.data[2]; or first matching value depending on compare.\n");
@@ -40,12 +40,12 @@ int main()
             Vec_erase_at(&vec, it);
 
         printf("vec after erase  :");
-        c_foreach (i, Vec, vec)
+        c_FOREACH (i, Vec, vec)
             printf(" %d", *i.ref->get);
 
         Vec_sort(&vec);
         printf("\nvec after sort   :");
-        c_foreach (i, Vec, vec)
+        c_FOREACH (i, Vec, vec)
             printf(" %d", *i.ref->get);
         
         puts("\nDone");

@@ -119,22 +119,22 @@ Interleave *push_front()* / *push_back()* then *sort()*:
 int main() {
     DList list = DList_init();
 
-    c_forlist (i, double, {10., 20., 30., 40., 50., 60., 70., 80., 90.})
+    c_FORLIST (i, double, {10., 20., 30., 40., 50., 60., 70., 80., 90.})
         DList_push_back(&list, *i.ref);
 
-    c_forrange (i, 1, 10) {
+    c_FORRANGE (i, 1, 10) {
         if (i & 1) DList_push_front(&list, (double) i);
         else       DList_push_back(&list, (double) i);
     }
 
     printf("initial: ");
-    c_foreach (i, DList, list)
+    c_FOREACH (i, DList, list)
         printf(" %g", *i.ref);
 
     DList_sort(&list); // mergesort O(n*log n)
 
     printf("\nsorted: ");
-    c_foreach (i, DList, list)
+    c_FOREACH (i, DList, list)
         printf(" %g", *i.ref);
 
     DList_drop(&list);
@@ -160,7 +160,7 @@ int main ()
 {
     clist_i L = clist_i_init();
 
-    c_forlist (i, int, {10, 20, 30, 40, 50})
+    c_FORLIST (i, int, {10, 20, 30, 40, 50})
         clist_i_push_back(&L, *i.ref);
                                                 // 10 20 30 40 50
     clist_i_iter it = clist_i_begin(&L);        // ^
@@ -172,7 +172,7 @@ int main ()
     it = clist_i_erase_range(&L, it, end);      // 10 30
                                                 //       ^
     printf("mylist contains:");
-    c_foreach (x, clist_i, L)
+    c_FOREACH (x, clist_i, L)
         printf(" %d", *x.ref);
     puts("");
 
@@ -195,11 +195,11 @@ Splice `[30, 40]` from *L2* into *L1* before `3`:
 #include <stdio.h>
 
 int main() {
-    c_auto (clist_i, L1, L2)
+    c_AUTO (clist_i, L1, L2)
     {
-        c_forlist (i, int, {1, 2, 3, 4, 5})
+        c_FORLIST (i, int, {1, 2, 3, 4, 5})
             clist_i_push_back(&L1, *i.ref);
-        c_forlist (i, int, {10, 20, 30, 40, 50})
+        c_FORLIST (i, int, {10, 20, 30, 40, 50})
             clist_i_push_back(&L2, *i.ref);
 
         clist_i_iter i = clist_i_advance(clist_i_begin(&L1), 2);
@@ -207,9 +207,9 @@ int main() {
 
         clist_i_splice_range(&L1, i, &L2, j1, j2);
 
-        c_foreach (i, clist_i, L1)
+        c_FOREACH (i, clist_i, L1)
             printf(" %d", *i.ref); puts("");
-        c_foreach (i, clist_i, L2)
+        c_FOREACH (i, clist_i, L2)
             printf(" %d", *i.ref); puts("");
     }
 }

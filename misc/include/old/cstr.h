@@ -182,12 +182,12 @@ STC_INLINE uint64_t cstr_hash(const cstr *self) {
     return cfasthash(self->str, _cstr_p(self)->size);
 }
 
-STC_INLINE void
-cstr_replace(cstr* self, const char* find, const char* repl, unsigned count) {
-    csview in = cstr_sv(self);
-    cstr_take(self, cstr_replace_sv(in, c_SV(find, strlen(find)),
-                                        c_SV(repl, strlen(repl)), count));
+STC_INLINE void cstr_replace_ex(cstr* self, const char* find, const char* repl, unsigned count) {
+    cstr_take(self, cstr_replace_sv(cstr_sv(self), c_SV(find, strlen(find)),
+                                                   c_SV(repl, strlen(repl)), count));
 }
+STC_INLINE void cstr_replace(cstr* self, const char* search, const char* repl)
+    { cstr_replace_ex(self, search, repl, ~0U); }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement)
@@ -324,7 +324,6 @@ STC_DEF cstr
 cstr_replace_sv(csview str, csview find, csview repl, unsigned count) {
     cstr out = cstr_NULL;
     size_t from = 0; char* res;
-    if (count == 0) count = ~0;
     if (find.size)
         while (count-- && (res = cstrnstrn(str.str + from, find.str, str.size - from, find.size))) {
             const size_t pos = res - str.str;

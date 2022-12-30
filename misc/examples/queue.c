@@ -11,15 +11,15 @@ int main() {
     stc64_t rng = stc64_new(1234);
     dist = stc64_uniform_new(0, n);
 
-    c_auto (cqueue_i, queue)
+    c_AUTO (cqueue_i, queue)
     {
         // Push ten million random numbers onto the queue.
-        c_forrange (n)
+        c_FORRANGE (n)
             cqueue_i_push(&queue, stc64_uniform(&rng, &dist));
 
         // Push or pop on the queue ten million times
         printf("%d\n", n);
-        c_forrange (n) { // forrange uses initial n only.
+        c_FORRANGE (n) { // forrange uses initial n only.
             int r = stc64_uniform(&rng, &dist);
             if (r & 1)
                 ++n, cqueue_i_push(&queue, r);

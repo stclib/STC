@@ -32,23 +32,23 @@
 
 void print_phone_book(cmap_str phone_book)
 {
-    c_foreach (i, cmap_str, phone_book)
+    c_FOREACH (i, cmap_str, phone_book)
         printf("%s\t- %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
 }
 
 int main(int argc, char **argv)
 {
-    c_auto (cset_str, names) {
-        c_forlist (i, const char*, {"Hello", "Cool", "True"})
+    c_AUTO (cset_str, names) {
+        c_FORLIST (i, const char*, {"Hello", "Cool", "True"})
             cset_str_emplace(&names, *i.ref);
         
-        c_foreach (i, cset_str, names)
+        c_FOREACH (i, cset_str, names)
             printf("%s ", cstr_str(i.ref));
         puts("");
     }
 
-    c_auto (cmap_str, phone_book) {
-        c_forlist (i, cmap_str_raw, {
+    c_AUTO (cmap_str, phone_book) {
+        c_FORLIST (i, cmap_str_raw, {
             {"Lilia Friedman", "(892) 670-4739"},
             {"Tariq Beltran", "(489) 600-7575"},
             {"Laiba Juarez", "(303) 885-5692"},

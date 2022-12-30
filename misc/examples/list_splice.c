@@ -8,7 +8,7 @@
 void print_ilist(const char* s, clist_i list)
 {
     printf("%s", s);
-    c_foreach (i, clist_i, list) {
+    c_FOREACH (i, clist_i, list) {
         printf(" %d", *i.ref);
     }
     puts("");
@@ -16,12 +16,12 @@ void print_ilist(const char* s, clist_i list)
 
 int main ()
 {
-    c_auto (clist_i, list1, list2)
+    c_AUTO (clist_i, list1, list2)
     {
-        c_forlist (i, int, {1, 2, 3, 4, 5})
+        c_FORLIST (i, int, {1, 2, 3, 4, 5})
             clist_i_push_back(&list1, *i.ref);
 
-        c_forlist (i, int, {10, 20, 30, 40, 50})
+        c_FORLIST (i, int, {10, 20, 30, 40, 50})
             clist_i_push_back(&list2, *i.ref);
 
         print_ilist("list1:", list1);

@@ -8,7 +8,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stc/forward.h>
-#include <stc/views.h>
+#include <stc/algo/crange.h>
 #include <stc/cstr.h>
 
 // predeclare
@@ -24,12 +24,12 @@ struct {
 #define i_type ipque
 #define i_val int
 #define i_opt c_is_forward // needed to avoid re-type-define container type
-#define i_less_functor(self, x, y) c_container_of(self, IPQueue, Q)->less(x, y) // <== This.
+#define i_less_functor(self, x, y) c_CONTAINER_OF(self, IPQueue, Q)->less(x, y) // <== This.
 #include <stc/cpque.h>
 
 #define print(name, q, n) do { \
     printf("%s: \t", name); \
-    c_forrange (i, n) printf("%d ", q[i]); \
+    c_FORRANGE (i, n) printf("%d ", q[i]); \
     puts(""); \
 } while(0)
 
@@ -50,22 +50,22 @@ static bool int_lambda(const int* x, const int* y) { return (*x ^ 1) < (*y ^ 1);
 
 int main()
 {
-    const int data[] = {1,8,5,6,3,4,0,9,7,2}, n = c_arraylen(data);
+    const int data[] = {1,8,5,6,3,4,0,9,7,2}, n = c_ARRAYLEN(data);
     print("data", data, n);
 
-    c_autodrop (IPQueue, q1, {ipque_init(), int_less})   // Max priority queue
-    c_autodrop (IPQueue, minq1, {ipque_init(), int_greater}) // Min priority queue
-    c_autodrop (IPQueue, q5, {ipque_init(), int_lambda}) // Using lambda to compare elements.
+    c_AUTODROP (IPQueue, q1, {ipque_init(), int_less})   // Max priority queue
+    c_AUTODROP (IPQueue, minq1, {ipque_init(), int_greater}) // Min priority queue
+    c_AUTODROP (IPQueue, q5, {ipque_init(), int_lambda}) // Using lambda to compare elements.
     {
-        c_forrange (i, n)
+        c_FORRANGE (i, n)
             ipque_push(&q1.Q, data[i]);
         print_queue("q1", q1);
 
-        c_forrange (i, n)
+        c_FORRANGE (i, n)
             ipque_push(&minq1.Q, data[i]);
         print_queue("minq1", minq1);
 
-        c_forrange (i, n)
+        c_FORRANGE (i, n)
             ipque_push(&q5.Q, data[i]);
         print_queue("q5", q5);
     }

@@ -68,7 +68,7 @@ STC_INLINE _cx_self _cx_memb(_with_size)(size_t size, i_key null) {
     while (size) out.data[--size] = null;
     return out;
 }
-#endif
+#endif // i_capacity
 
 STC_INLINE void _cx_memb(_clear)(_cx_self* self) {
     _cx_value *p = self->data + self->_len;

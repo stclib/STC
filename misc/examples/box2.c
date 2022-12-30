@@ -51,9 +51,9 @@ int main(void) {
     };
 
     // Declare auto-deleted box objects
-    c_auto (cbox_Rectangle, boxed_rectangle)
-    c_auto (cbox_Point, boxed_point)
-    c_auto (cbox_BoxPoint, box_in_a_box, boxbox2)
+    c_AUTO (cbox_Rectangle, boxed_rectangle)
+    c_AUTO (cbox_Point, boxed_point)
+    c_AUTO (cbox_BoxPoint, box_in_a_box, boxbox2)
     {
         // Heap allocated rectangle
         boxed_rectangle = cbox_Rectangle_make((Rectangle){

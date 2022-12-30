@@ -7,7 +7,7 @@
 int main()
 {
     // declaring set for storing string data-type
-    c_auto (cset_str, stringSet)
+    c_AUTO (cset_str, stringSet)
     {
         // inserting various string, same string will be stored
         // once in set
@@ -36,7 +36,7 @@ int main()
         // now iterating over whole set and printing its
         // content
         printf("All elements :\n");
-        c_foreach (itr, cset_str, stringSet)
+        c_FOREACH (itr, cset_str, stringSet)
             printf("%s\n", cstr_str(itr.ref));
     }
 }

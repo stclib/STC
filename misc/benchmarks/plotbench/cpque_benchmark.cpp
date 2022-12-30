@@ -40,7 +40,7 @@ void stc_test()
     stc64_t rng;
     int N = 10000000, M = 10;
 
-    c_auto (cpque_f, pq)
+    c_AUTO (cpque_f, pq)
     {
         rng = stc64_new(seed);
         clock_t start = clock();

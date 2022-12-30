@@ -84,29 +84,27 @@ csset_X_value        csset_X_value_clone(csset_X_value val);
 
 int main ()
 {
-c_auto (csset_str, fifth)
+    c_AUTO (csset_str, first, second, third)
+    c_AUTO (csset_str, fourth, fifth)
     {
-        c_auto (csset_str, first, second)
-        c_auto (csset_str, third, fourth)
-        {
-            c_forlist (i, const char*, {"red", "green", "blue"})
-                csset_str_emplace(&second, *i.ref);
+        c_FORLIST (i, const char*, {"red", "green", "blue"})
+            csset_str_emplace(&second, *i.ref);
 
-            c_forlist (i, const char*, {"orange", "pink", "yellow"})
-                csset_str_emplace(&third, *i.ref);
+        c_FORLIST (i, const char*, {"orange", "pink", "yellow"})
+            csset_str_emplace(&third, *i.ref);
 
-            csset_str_emplace(&fourth, "potatoes");
-            csset_str_emplace(&fourth, "milk");
-            csset_str_emplace(&fourth, "flour");
+        csset_str_emplace(&fourth, "potatoes");
+        csset_str_emplace(&fourth, "milk");
+        csset_str_emplace(&fourth, "flour");
 
-            fifth = csset_str_clone(second);
-            c_foreach (i, csset_str, third)
-                csset_str_emplace(&fifth, cstr_str(i.ref));
-            c_foreach (i, csset_str, fourth)
-                csset_str_emplace(&fifth, cstr_str(i.ref));
-        }
+        fifth = csset_str_clone(second);
+        c_FOREACH (i, csset_str, third)
+            csset_str_emplace(&fifth, cstr_str(i.ref));
+        c_FOREACH (i, csset_str, fourth)
+            csset_str_emplace(&fifth, cstr_str(i.ref));
+
         printf("fifth contains:\n\n");
-        c_foreach (i, csset_str, fifth)
+        c_FOREACH (i, csset_str, fifth)
             printf("%s\n", cstr_str(i.ref));
     }
 }

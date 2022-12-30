@@ -88,7 +88,6 @@ STC_API void    cstr_u8_erase(cstr* self, size_t bytepos, size_t u8len);
 STC_API cstr    cstr_from_fmt(const char* fmt, ...);
 STC_API size_t  cstr_append_fmt(cstr* self, const char* fmt, ...);
 STC_API size_t  cstr_printf(cstr* self, const char* fmt, ...);
-STC_API void    cstr_replace(cstr* self, const char* search, const char* repl, unsigned count);
 STC_API cstr    cstr_replace_sv(csview sv, csview search, csview repl, unsigned count);
 
 STC_INLINE cstr_buf cstr_buffer(cstr* s) {
@@ -376,6 +375,12 @@ STC_INLINE char* cstr_append_s(cstr* self, cstr s) {
     return cstr_append_n(self, sv.str, sv.size);
 }
 
+STC_INLINE void cstr_replace_ex(cstr* self, const char* search, const char* repl, unsigned count) {
+    cstr_take(self, cstr_replace_sv(cstr_sv(self), c_SV(search, strlen(search)),
+                                                   c_SV(repl, strlen(repl)), count));
+}
+STC_INLINE void cstr_replace(cstr* self, const char* search, const char* repl)
+    { cstr_replace_ex(self, search, repl, ~0U); }
 
 STC_INLINE void cstr_replace_at_sv(cstr* self, size_t pos, size_t len, const csview repl) {
     char* d = _cstr_internal_move(self, pos + len, pos + repl.size);
@@ -388,7 +393,7 @@ STC_INLINE void cstr_replace_at(cstr* self, size_t pos, size_t len, const char* 
 STC_INLINE void cstr_replace_at_s(cstr* self, size_t pos, size_t len, cstr repl)
     { cstr_replace_at_sv(self, pos, len, cstr_sv(&repl)); }
 
-STC_INLINE void cstr_u8_replace(cstr* self, size_t bytepos, size_t u8len, csview repl)
+STC_INLINE void cstr_u8_replace_at(cstr* self, size_t bytepos, size_t u8len, csview repl)
     { cstr_replace_at_sv(self, bytepos, utf8_pos(cstr_str(self) + bytepos, u8len), repl); }
 
 
@@ -581,13 +586,6 @@ cstr_replace_sv(csview in, csview search, csview repl, unsigned count) {
         }
     cstr_append_n(&out, in.str + from, in.size - from);
     return out;
-}
-
-STC_DEF void
-cstr_replace(cstr* self, const char* search, const char* repl, unsigned count) {
-    csview in = cstr_sv(self);
-    cstr_take(self, cstr_replace_sv(in, c_SV(search, strlen(search)),
-                                        c_SV(repl, strlen(repl)), count));
 }
 
 STC_DEF void cstr_erase(cstr* self, const size_t pos, size_t len) {

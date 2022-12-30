@@ -77,7 +77,7 @@ typedef i_keyraw _cx_raw;
 _cx_deftypes(_c_cbox_types, _cx_self, i_key);
 #endif
 
-// constructors (takes ownsership)
+// constructors (take ownership)
 STC_INLINE _cx_self _cx_memb(_init)(void)
     { return c_INIT(_cx_self){NULL}; }
 
@@ -110,6 +110,9 @@ STC_INLINE _cx_self _cx_memb(_move)(_cx_self* self) {
     return ptr;
 }
 
+STC_INLINE _cx_value* _cx_memb(_release)(_cx_self* self)
+    { return _cx_memb(_move)(self).get; }
+
 STC_INLINE void _cx_memb(_reset)(_cx_self* self) {
     _cx_memb(_drop)(self);
     self->get = NULL;
@@ -117,8 +120,7 @@ STC_INLINE void _cx_memb(_reset)(_cx_self* self) {
 
 // take ownership of p
 STC_INLINE void _cx_memb(_reset_to)(_cx_self* self, _cx_value* p) {
-    if (self->get)
-        i_keydrop(self->get);
+    _cx_memb(_drop)(self);
     self->get = p;
 }
 
@@ -140,10 +142,18 @@ STC_INLINE _cx_self _cx_memb(_from)(_cx_value val)
     }
 #endif // !i_no_clone
 
-STC_INLINE void _cx_memb(_take)(_cx_self* self, _cx_self other) {
-    if (other.get != self->get)
+STC_INLINE void _cx_memb(_take)(_cx_self* self, _cx_self unowned) {
+    if (unowned.get != self->get)
         _cx_memb(_drop)(self);
-    *self = other;
+    *self = unowned;
+}
+/* transfer ownership; set dying to NULL */
+STC_INLINE void _cx_memb(_assign)(_cx_self* self, _cx_self* dying) {
+    if (dying->get == self->get)
+        return;
+    _cx_memb(_drop)(self);
+    *self = *dying;
+    dying->get = NULL;
 }
 
 #ifndef i_no_cmp

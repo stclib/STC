@@ -24,7 +24,7 @@ Person Person_clone(Person p) {
 
 void Person_drop(Person* p) {
     printf("drop: %s %s\n", cstr_str(&p->name), cstr_str(&p->last));
-    c_drop(cstr, &p->name, &p->last);
+    c_DROP(cstr, &p->name, &p->last);
 }
 
 #define i_type PSPtr
@@ -39,8 +39,8 @@ void Person_drop(Person* p) {
 
 int main()
 {
-    c_auto (Persons, vec)
-    c_auto (PSPtr, p, q)
+    c_AUTO (Persons, vec)
+    c_AUTO (PSPtr, p, q)
     {
         p = PSPtr_from(Person_make("Laura", "Palmer"));
 
@@ -57,15 +57,15 @@ int main()
         Persons_emplace(&vec, Person_make("Dale", "Cooper"));
 
         // Clone/share p and q to the vector
-        c_forlist (i, PSPtr, {p, q})
+        c_FORLIST (i, PSPtr, {p, q})
             Persons_push(&vec, PSPtr_clone(*i.ref));
 
-        c_foreach (i, Persons, vec)
+        c_FOREACH (i, Persons, vec)
             printf("%s %s\n", cstr_str(&i.ref->get->name), cstr_str(&i.ref->get->last));
         puts("");
 
         // Look-up Audrey!
-        c_with (Person a = Person_make("Audrey", "Home"), Person_drop(&a)) {
+        c_WITH (Person a = Person_make("Audrey", "Home"), Person_drop(&a)) {
             const PSPtr *v = Persons_get(&vec, a);
             if (v) printf("found: %s %s\n", cstr_str(&v->get->name), cstr_str(&v->get->last));
         }

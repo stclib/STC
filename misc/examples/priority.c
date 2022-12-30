@@ -12,22 +12,22 @@ int main() {
     size_t N = 10000000;
     stc64_t rng = stc64_new(time(NULL));
     stc64_uniform_t dist = stc64_uniform_new(0, N * 10);
-    c_auto (cpque_i, heap)
+    c_AUTO (cpque_i, heap)
     {
         // Push ten million random numbers to priority queue
         printf("Push %" c_ZU " numbers\n", N);
-        c_forrange (N)
+        c_FORRANGE (N)
             cpque_i_push(&heap, stc64_uniform(&rng, &dist));
 
         // push some negative numbers too.
-        c_forlist (i, int, {-231, -32, -873, -4, -343})
+        c_FORLIST (i, int, {-231, -32, -873, -4, -343})
             cpque_i_push(&heap, *i.ref);
 
-        c_forrange (N)
+        c_FORRANGE (N)
             cpque_i_push(&heap, stc64_uniform(&rng, &dist));
 
         puts("Extract the hundred smallest.");
-        c_forrange (100) {
+        c_FORRANGE (100) {
             printf("%" PRId64 " ", *cpque_i_top(&heap));
             cpque_i_pop(&heap);
         }

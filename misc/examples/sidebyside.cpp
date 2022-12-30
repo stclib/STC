@@ -25,7 +25,7 @@ int main() {
         std::cout << std::endl;
     }
     
-    c_auto (IIMap, hist)
+    c_AUTO (IIMap, hist)
     {
         IIMap_insert(&hist, 12, 100).ref->second += 1;
         IIMap_insert(&hist, 13, 100).ref->second += 1;
@@ -45,9 +45,9 @@ int main() {
         std::cout << std::endl;
     }
 
-    c_auto (SIMap, food)
+    c_AUTO (SIMap, food)
     {
-        c_forlist (i, SIMap_raw, {{"burger", 5}, {"pizza", 12}, {"steak", 15}})
+        c_FORLIST (i, SIMap_raw, {{"burger", 5}, {"pizza", 12}, {"steak", 15}})
             SIMap_emplace(&food, c_PAIR(i.ref));
         
         c_foreach (i, SIMap, food)

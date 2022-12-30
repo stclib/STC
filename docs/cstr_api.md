@@ -68,15 +68,16 @@ void         cstr_insert_s(cstr* self, size_t pos, cstr ins);
 
 void         cstr_erase(cstr* self, size_t pos, size_t len);         // erase len bytes from pos
 
-void         cstr_replace(cstr* self, const char* search, const char* repl, unsigned count); // count==0: replace all.
+void         cstr_replace(cstr* self, const char* search, const char* repl);
+void         cstr_replace_ex(cstr* self, const char* search, const char* repl, unsigned count);
 cstr         cstr_replace_sv(csview in, csview search, csview repl, unsigned count);
 void         cstr_replace_at(cstr* self, size_t pos, size_t len, const char* repl);          // replace at a position
 void         cstr_replace_at_sv(cstr* self, size_t pos, size_t len, const csview repl);
 void         cstr_replace_at_s(cstr* self, size_t pos, size_t len, cstr repl);
 
 bool         cstr_equals(const cstr* self, const char* str);
-bool         cstr_equals_s(const cstr* self, cstr s);
 bool         cstr_equals_sv(const cstr* self, csview sv);
+bool         cstr_equals_s(const cstr* self, cstr s);
 
 size_t       cstr_find(const cstr* self, const char* search);
 size_t       cstr_find_at(const cstr* self, size_t pos, const char* search);                 // search from pos
@@ -101,7 +102,7 @@ size_t       cstr_u8_size_n(const cstr self, size_t nbytes);          // utf8 si
 size_t       cstr_u8_to_pos(const cstr* self, size_t u8idx);          // byte pos offset at utf8 codepoint index
 const char*  cstr_u8_at(const cstr* self, size_t u8idx);              // char* position at utf8 codepoint index
 csview       cstr_u8_chr(const cstr* self, size_t u8idx);             // get utf8 character as a csview
-void         cstr_u8_replace(cstr* self, size_t bytepos, size_t u8len, csview repl); // replace u8len utf8 chars
+void         cstr_u8_replace_at(cstr* self, size_t bytepos, size_t u8len, csview repl); // replace u8len utf8 chars
 void         cstr_u8_erase(cstr* self, size_t bytepos, size_t u8len); // erase u8len codepoints from pos
 
 // iterate utf8 codepoints
@@ -160,30 +161,30 @@ char*        cstrnstrn(const char* str, const char* search, size_t slen, size_t 
 #include <stc/cstr.h>
 
 int main() {
-    cstr s0 = cstr_lit("Initialization without using strlen().");
-    printf("%s\nLength: %" c_ZU "\n\n", cstr_str(&s0), cstr_size(&s0));
+    c_AUTO (cstr, s0, s1, full_path) {
+        s0 = cstr_lit("Initialization without using strlen().");
+        printf("%s\nLength: %" c_ZU "\n\n", cstr_str(&s0), cstr_size(&s0));
 
-    cstr s1 = cstr_lit("one-nine-three-seven-five.");
-    printf("%s\n", cstr_str(&s1));
+        s1 = cstr_lit("one-nine-three-seven-five.");
+        printf("%s\n", cstr_str(&s1));
 
-    cstr_insert(&s1, 3, "-two");
-    printf("%s\n", cstr_str(&s1));
+        cstr_insert(&s1, 3, "-two");
+        printf("%s\n", cstr_str(&s1));
 
-    cstr_erase(&s1, 7, 5); // -nine
-    printf("%s\n", cstr_str(&s1));
+        cstr_erase(&s1, 7, 5); // -nine
+        printf("%s\n", cstr_str(&s1));
 
-    cstr_replace(&s1, "seven", "four", 1);
-    printf("%s\n", cstr_str(&s1));
+        cstr_replace_ex(&s1, "seven", "four", 1);
+        printf("%s\n", cstr_str(&s1));
 
-    // reassign:
-    cstr_assign(&s1, "one two three four five six seven");
-    cstr_append(&s1, " eight");
-    printf("append: %s\n", cstr_str(&s1));
+        // reassign:
+        cstr_assign(&s1, "one two three four five six seven");
+        cstr_append(&s1, " eight");
+        printf("append: %s\n", cstr_str(&s1));
 
-    cstr full_path = cstr_from_fmt("%s/%s.%s", "directory", "filename", "ext");
-    printf("%s\n", cstr_str(&full_path));
-
-    c_drop(cstr, &s0, &s1, &full_path);
+        full_path = cstr_from_fmt("%s/%s.%s", "directory", "filename", "ext");
+        printf("%s\n", cstr_str(&full_path));
+    }
 }
 ```
 Output:
