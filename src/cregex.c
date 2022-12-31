@@ -530,7 +530,7 @@ _optimize(_Parser *par, _Reprog *pp)
      */
     intptr_t ipp = (intptr_t)pp;
     size_t size = sizeof(_Reprog) + (size_t)(par->freep - pp->firstinst)*sizeof(_Reinst);
-    _Reprog *npp = (_Reprog *)c_realloc(pp, size);
+    _Reprog *npp = (_Reprog *)c_REALLOC(pp, size);
     ptrdiff_t diff = (intptr_t)npp - ipp;
 
     if ((npp == NULL) | (diff == 0))
@@ -816,10 +816,10 @@ _regcomp1(_Reprog *progp, _Parser *par, const char *s, int cflags)
 
     /* get memory for the program. estimated max usage */
     const size_t instcap = 5 + 6*strlen(s);
-    _Reprog* pp = (_Reprog *)c_realloc(progp, sizeof(_Reprog) + instcap*sizeof(_Reinst));
+    _Reprog* pp = (_Reprog *)c_REALLOC(progp, sizeof(_Reprog) + instcap*sizeof(_Reinst));
     if (pp == NULL) {
         par->error = CREG_OUTOFMEMORY;
-        c_free(progp);
+        c_FREE(progp);
         return NULL;
     }
     pp->flags.icase = (cflags & CREG_C_ICASE) != 0;
@@ -870,7 +870,7 @@ _regcomp1(_Reprog *progp, _Parser *par, const char *s, int cflags)
     pp->nsubids = (unsigned)par->cursubid;
 out:
     if (par->error) {
-        c_free(pp);
+        c_FREE(pp);
         pp = NULL;
     }
     return pp;
@@ -1105,7 +1105,7 @@ _regexec2(const _Reprog *progp,    /* program to run */
     _Relist *relists;
 
     /* mark space */
-    relists = (_Relist *)c_malloc(2 * _BIGLISTSIZE*sizeof(_Relist));
+    relists = (_Relist *)c_MALLOC(2 * _BIGLISTSIZE*sizeof(_Relist));
     if (relists == NULL)
         return -1;
 
@@ -1115,7 +1115,7 @@ _regexec2(const _Reprog *progp,    /* program to run */
     j->reliste[1] = relists + 2*_BIGLISTSIZE - 2;
 
     rv = _regexec1(progp, bol, mp, ms, j, mflags);
-    c_free(relists);
+    c_FREE(relists);
     return rv;
 }
 
@@ -1281,6 +1281,6 @@ cregex_replace_pattern_ex(const char* pattern, const char* input, const char* re
 
 void
 cregex_drop(cregex* self) {
-    c_free(self->prog);
+    c_FREE(self->prog);
 }
 #endif

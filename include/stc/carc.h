@@ -45,7 +45,7 @@ int main() {
     ArcPers q = ArcPers_clone(p); // share the pointer
 
     printf("%s %s. uses: %ld\n", cstr_str(&q.get->name), cstr_str(&q.get->last), *q.use_count);
-    c_drop(ArcPers, &p, &q);
+    c_DROP(ArcPers, &p, &q);
 }
 */
 #include "ccommon.h"
@@ -101,14 +101,14 @@ STC_INLINE long _cx_memb(_use_count)(const _cx_self* self)
 STC_INLINE _cx_self _cx_memb(_from_ptr)(_cx_value* p) {
     _cx_self ptr = {p};
     if (p) 
-        *(ptr.use_count = c_alloc(catomic_long)) = 1;
+        *(ptr.use_count = c_ALLOC(catomic_long)) = 1;
     return ptr;
 }
 
 // c++: std::make_shared<_cx_value>(val)
 STC_INLINE _cx_self _cx_memb(_make)(_cx_value val) {
     _cx_self ptr;
-    struct _cx_memb(_rep_)* rep = c_alloc(struct _cx_memb(_rep_));
+    struct _cx_memb(_rep_)* rep = c_ALLOC(struct _cx_memb(_rep_));
     *(ptr.use_count = &rep->counter) = 1;
     *(ptr.get = &rep->value) = val;
     return ptr;
@@ -127,8 +127,8 @@ STC_INLINE void _cx_memb(_drop)(_cx_self* self) {
     if (self->use_count && _i_atomic_dec_and_test(self->use_count)) {
         i_keydrop(self->get);
         if ((char *)self->get != (char *)self->use_count + offsetof(struct _cx_memb(_rep_), value))
-            c_free(self->get);
-        c_free((long*)self->use_count);
+            c_FREE(self->get);
+        c_FREE((long*)self->use_count);
     }
 }
 

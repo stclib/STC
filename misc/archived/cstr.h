@@ -77,7 +77,7 @@ STC_INLINE size_t       cstr_size(const cstr* self) { return _cstr_p(self)->size
 STC_INLINE size_t       cstr_capacity(cstr s) { return _cstr_p(&s)->cap; }
 STC_INLINE bool         cstr_empty(cstr s) { return _cstr_p(&s)->size == 0; }
 STC_INLINE void         cstr_drop(cstr* self)
-                            { if (_cstr_p(self)->cap) c_free(_cstr_p(self)); }
+                            { if (_cstr_p(self)->cap) c_FREE(_cstr_p(self)); }
 STC_INLINE cstr         cstr_clone(cstr s)
                             { return cstr_from_n(s.str, _cstr_p(&s)->size); }
 STC_INLINE void         cstr_clear(cstr* self)
@@ -142,7 +142,7 @@ STC_INLINE char* cstr_append_uninit(cstr *self, size_t n) {
 
 STC_INLINE cstr* cstr_take(cstr* self, cstr s) {
     if (self->str != s.str && _cstr_p(self)->cap)
-        c_free(_cstr_p(self));
+        c_FREE(_cstr_p(self));
     self->str = s.str;
     return self;
 }
@@ -202,7 +202,7 @@ cstr_reserve(cstr* self, const size_t cap) {
     cstr_priv *p = _cstr_p(self);
     const size_t oldcap = p->cap;
     if (cap > oldcap) {
-        p = (cstr_priv*) c_realloc(((oldcap != 0) & (p != &_cstr_nullrep)) ? p : NULL, _cstr_opt_mem(cap));
+        p = (cstr_priv*) c_REALLOC(((oldcap != 0) & (p != &_cstr_nullrep)) ? p : NULL, _cstr_opt_mem(cap));
         if (!p) return NULL;
         self->str = p->chr;
         if (oldcap == 0) self->str[p->size = 0] = '\0';
@@ -222,7 +222,7 @@ cstr_resize(cstr* self, const size_t len, const char fill) {
 STC_DEF cstr
 cstr_from_n(const char* str, const size_t n) {
     if (n == 0) return cstr_NULL;
-    cstr_priv* prv = (cstr_priv*) c_malloc(_cstr_opt_mem(n));
+    cstr_priv* prv = (cstr_priv*) c_MALLOC(_cstr_opt_mem(n));
     cstr s = {(char *) memcpy(prv->chr, str, n)};
     s.str[prv->size = n] = '\0';
     prv->cap = _cstr_opt_cap(n);
@@ -313,11 +313,11 @@ STC_DEF void
 cstr_replace_at_sv(cstr* self, const size_t pos, size_t len, csview repl) {
     const size_t sz = cstr_size(self);
     if (len > sz - pos) len = sz - pos;
-    char buf[256], *xstr = repl.size > 256 ? c_malloc(repl.size) : buf;
+    char buf[256], *xstr = repl.size > 256 ? c_MALLOC(repl.size) : buf;
     memcpy(xstr, repl.str, repl.size);
     _cstr_internal_move(self, pos + len, pos + repl.size);
     memcpy(&self->str[pos], xstr, repl.size);
-    if (repl.size > 256) c_free(xstr);
+    if (repl.size > 256) c_FREE(xstr);
 }
 
 STC_DEF cstr

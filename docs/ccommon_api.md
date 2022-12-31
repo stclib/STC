@@ -350,6 +350,6 @@ uint64_t    crawstr_hash(const crawstr* x);
 ### c_MALLOC, c_CALLOC, c_REALLOC, c_FREE
 Memory allocator for the entire library. Macros can be overloaded by the user.
 
-### c_swap, c_ARRAYLEN
-- **c_swap(type, x, y)**: Simple macro for swapping internals of two objects.
+### c_SWAP, c_ARRAYLEN
+- **c_SWAP(type, x, y)**: Simple macro for swapping internals of two objects.
 - **c_ARRAYLEN(array)**: Return number of elements in an array, e.g. `int array[] = {1, 2, 3, 4};`

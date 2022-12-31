@@ -29,7 +29,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <assert.h>
-#include "priv/allcaps.h"
+#include "priv/lowcase.h"
 
 #if SIZE_MAX == UINT32_MAX
   #define c_ZU PRIu32
@@ -62,33 +62,33 @@
 #define _c_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, \
                  _14, _15, _16, N, ...) N
 
-#define c_static_assert(cond) \
+#define c_STATIC_ASSERT(cond) \
     typedef char c_PASTE(_static_assert_line_, __LINE__)[(cond) ? 1 : -1]
-#define c_container_of(p, T, m) \
+#define c_CONTAINER_OF(p, T, m) \
     ((T*)((char*)(p) + 0*sizeof((p) == &((T*)0)->m) - offsetof(T, m)))
 
 #ifndef __cplusplus
-  #define c_alloc(T)            c_malloc(sizeof(T))
-  #define c_alloc_n(T, n)       c_malloc(sizeof(T)*(n))
-  #define c_new(T, ...)         ((T*)memcpy(c_alloc(T), (T[]){__VA_ARGS__}, sizeof(T)))
+  #define c_ALLOC(T)            c_MALLOC(sizeof(T))
+  #define c_ALLOC_N(T, n)       c_MALLOC(sizeof(T)*(n))
+  #define c_NEW(T, ...)         ((T*)memcpy(c_ALLOC(T), (T[]){__VA_ARGS__}, sizeof(T)))
   #define c_INIT(T)             (T)
 #else
   #include <new>
-  #define c_alloc(T)            static_cast<T*>(c_malloc(sizeof(T)))
-  #define c_alloc_n(T, n)       static_cast<T*>(c_malloc(sizeof(T)*(n)))
-  #define c_new(T, ...)         new (c_alloc(T)) T(__VA_ARGS__)
+  #define c_ALLOC(T)            static_cast<T*>(c_MALLOC(sizeof(T)))
+  #define c_ALLOC_N(T, n)       static_cast<T*>(c_MALLOC(sizeof(T)*(n)))
+  #define c_NEW(T, ...)         new (c_ALLOC(T)) T(__VA_ARGS__)
   #define c_INIT(T)             T
 #endif
-#ifndef c_malloc
-  #define c_malloc(sz)          malloc(sz)
-  #define c_calloc(n, sz)       calloc(n, sz)
-  #define c_realloc(p, sz)      realloc(p, sz)
-  #define c_free(p)             free(p)
+#ifndef c_MALLOC
+  #define c_MALLOC(sz)          malloc(sz)
+  #define c_CALLOC(n, sz)       calloc(n, sz)
+  #define c_REALLOC(p, sz)      realloc(p, sz)
+  #define c_FREE(p)             free(p)
 #endif
 
-#define c_delete(T, ptr)        do { T *_c_p = ptr; T##_drop(_c_p); c_free(_c_p); } while (0)
-#define c_swap(T, x, y)         do { T _c_t = x; x = y; y = _c_t; } while (0)
-#define c_arraylen(a)           (sizeof (a)/sizeof *(a))
+#define c_DELETE(T, ptr)        do { T *_c_p = ptr; T##_drop(_c_p); c_FREE(_c_p); } while (0)
+#define c_SWAP(T, x, y)         do { T _c_t = x; x = y; y = _c_t; } while (0)
+#define c_ARRAYLEN(a)           (sizeof (a)/sizeof *(a))
 
 // x and y are i_keyraw* type, defaults to i_key*:
 #define c_default_cmp(x, y)     (c_default_less(y, x) - c_default_less(x, y))
@@ -162,72 +162,72 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
     return NULL;
 }
 
-#define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)
-#define c_foreach3(it, C, cnt) \
+#define c_FOREACH(...) c_MACRO_OVERLOAD(c_FOREACH, __VA_ARGS__)
+#define c_FOREACH3(it, C, cnt) \
     for (C##_iter it = C##_begin(&cnt); it.ref; C##_next(&it))
-#define c_foreach4(it, C, start, finish) \
+#define c_FOREACH4(it, C, start, finish) \
     for (C##_iter it = start, *_endref = (C##_iter*)(finish).ref \
          ; it.ref != (C##_value*)_endref; C##_next(&it))
 
-#define c_forwhile(i, C, start, cond) \
+#define c_FORWHILE(i, C, start, cond) \
     for (struct {C##_iter it; C##_value *ref; size_t index;} \
          i = {.it=start, .ref=i.it.ref}; i.it.ref && (cond) \
          ; C##_next(&i.it), i.ref = i.it.ref, ++i.index)
 
-#define c_forpair(key, val, C, cnt) /* structured binding */ \
+#define c_FORPAIR(key, val, C, cnt) /* structured binding */ \
     for (struct {C##_iter it; const C##_key* key; C##_mapped* val;} _ = {.it=C##_begin(&cnt)} \
          ; _.it.ref && (_.key = &_.it.ref->first, _.val = &_.it.ref->second) \
          ; C##_next(&_.it))
 
-#define c_forrange(...) c_MACRO_OVERLOAD(c_forrange, __VA_ARGS__)
-#define c_forrange1(stop) c_forrange3(_c_i, 0, stop)
-#define c_forrange2(i, stop) c_forrange3(i, 0, stop)
-#define c_forrange3(i, start, stop) \
+#define c_FORRANGE(...) c_MACRO_OVERLOAD(c_FORRANGE, __VA_ARGS__)
+#define c_FORRANGE1(stop) c_FORRANGE3(_c_i, 0, stop)
+#define c_FORRANGE2(i, stop) c_FORRANGE3(i, 0, stop)
+#define c_FORRANGE3(i, start, stop) \
     for (long long i=start, _end=(long long)(stop); i < _end; ++i)
-#define c_forrange4(i, start, stop, step) \
+#define c_FORRANGE4(i, start, stop, step) \
     for (long long i=start, _inc=step, _end=(long long)(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)
 #ifndef __cplusplus
-  #define c_forlist(it, T, ...) \
+  #define c_FORLIST(it, T, ...) \
     for (struct {T* data; T* ref; int size, index;} \
          it = {.data=(T[])__VA_ARGS__, .ref=it.data, .size=sizeof((T[])__VA_ARGS__)/sizeof(T)} \
          ; it.index < it.size; ++it.ref, ++it.index)
 #else
   #include <initializer_list>
-  #define c_forlist(it, T, ...) \
+  #define c_FORLIST(it, T, ...) \
     for (struct {std::initializer_list<T> _il; std::initializer_list<T>::iterator data, ref; size_t size, index;} \
          it = {._il=__VA_ARGS__, .data=it._il.begin(), .ref=it.data, .size=it._il.size()} \
          ; it.index < it.size; ++it.ref, ++it.index)
 #endif
-#define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
-#define c_with2(declvar, drop) for (declvar, **_c_i = NULL; !_c_i; ++_c_i, drop)
-#define c_with3(declvar, pred, drop) for (declvar, **_c_i = NULL; !_c_i && (pred); ++_c_i, drop)
-#define c_scope(init, drop) for (int _c_i = (init, 0); !_c_i; ++_c_i, drop)
-#define c_defer(...) for (int _c_i = 0; !_c_i; ++_c_i, __VA_ARGS__)
-#define c_autodrop(C, a, ...) for (C a = __VA_ARGS__, **_c_i = NULL; !_c_i; ++_c_i, C##_drop(&a))
+#define c_WITH(...) c_MACRO_OVERLOAD(c_WITH, __VA_ARGS__)
+#define c_WITH2(declvar, drop) for (declvar, **_c_i = NULL; !_c_i; ++_c_i, drop)
+#define c_WITH3(declvar, pred, drop) for (declvar, **_c_i = NULL; !_c_i && (pred); ++_c_i, drop)
+#define c_SCOPE(init, drop) for (int _c_i = (init, 0); !_c_i; ++_c_i, drop)
+#define c_DEFER(...) for (int _c_i = 0; !_c_i; ++_c_i, __VA_ARGS__)
+#define c_AUTODROP(C, a, ...) for (C a = __VA_ARGS__, **_c_i = NULL; !_c_i; ++_c_i, C##_drop(&a))
 
-#define c_auto(...) c_MACRO_OVERLOAD(c_auto, __VA_ARGS__)
-#define c_auto2(C, a) \
-    c_with2(C a = C##_init(), C##_drop(&a))
-#define c_auto3(C, a, b) \
-    c_with2(c_EXPAND(C a = C##_init(), b = C##_init()), \
-               (C##_drop(&b), C##_drop(&a)))
-#define c_auto4(C, a, b, c) \
-    c_with2(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init()), \
-               (C##_drop(&c), C##_drop(&b), C##_drop(&a)))
-#define c_auto5(C, a, b, c, d) \
-    c_with2(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
-               (C##_drop(&d), C##_drop(&c), C##_drop(&b), C##_drop(&a)))
+#define c_AUTO(...) c_MACRO_OVERLOAD(c_AUTO, __VA_ARGS__)
+#define c_AUTO2(C, a) \
+    c_WITH2(C a = C##_init(), C##_drop(&a))
+#define c_AUTO3(C, a, b) \
+    c_WITH2(c_EXPAND(C a = C##_init(), b = C##_init()), \
+            (C##_drop(&b), C##_drop(&a)))
+#define c_AUTO4(C, a, b, c) \
+    c_WITH2(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init()), \
+            (C##_drop(&c), C##_drop(&b), C##_drop(&a)))
+#define c_AUTO5(C, a, b, c, d) \
+    c_WITH2(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
+            (C##_drop(&d), C##_drop(&c), C##_drop(&b), C##_drop(&a)))
 
-#define c_drop(C, ...) do { c_forlist (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
+#define c_DROP(C, ...) do { c_FORLIST (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
 
-#define c_find_if(...) c_MACRO_OVERLOAD(c_find_if, __VA_ARGS__)
-#define c_find_if4(it, C, cnt, pred) do { \
+#define c_FIND_IF(...) c_MACRO_OVERLOAD(c_FIND_IF, __VA_ARGS__)
+#define c_FIND_IF4(it, C, cnt, pred) do { \
     size_t index = 0; \
     for (it = C##_begin(&cnt); it.ref && !(pred); C##_next(&it)) \
         ++index; \
 } while (0)
-#define c_find_if5(it, C, start, end, pred) do { \
+#define c_FIND_IF5(it, C, start, end, pred) do { \
     size_t index = 0; \
     const C##_value* _endref = (end).ref; \
     for (it = start; it.ref != _endref && !(pred); C##_next(&it)) \
@@ -235,7 +235,7 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
     if (it.ref == _endref) it.ref = NULL; \
 } while (0)
 
-#define c_erase_if(it, C, cnt, pred) do { \
+#define c_ERASE_IF(it, C, cnt, pred) do { \
     C##_iter it = C##_begin(&cnt); \
     for (size_t index = 0; it.ref; ++index) { \
         if (pred) it = C##_erase_at(&cnt, it); \

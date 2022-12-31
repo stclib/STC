@@ -35,7 +35,7 @@
 
 int main() {
     int w = 7, h = 5, d = 3;
-    c_with (carr3_int image = carr3_int_new_uninit(w, h, d), carr3_int_drop(&image))
+    c_WITH (carr3_int image = carr3_int_new_uninit(w, h, d), carr3_int_drop(&image))
     {
         int *dat = carr3_int_data(&image);
         for (int i = 0; i < carr3_int_size(&image); ++i)
@@ -47,7 +47,7 @@ int main() {
                     printf(" %d", image.data[x][y][z]);
         puts("\n");
 
-        c_foreach (i, carr3_int, image)
+        c_FOREACH (i, carr3_int, image)
             printf(" %d", *i.ref);
         puts("");
     }
@@ -73,7 +73,7 @@ STC_API void       _cx_memb(_copy)(_cx_self *self, const _cx_self* other);
 #endif
 
 STC_INLINE _cx_self _cx_memb(_new_uninit)(size_t xdim, size_t ydim, size_t zdim) {
-    return _cx_memb(_with_data)(xdim, ydim, zdim, c_alloc_n(_cx_value, xdim*ydim*zdim));
+    return _cx_memb(_with_data)(xdim, ydim, zdim, c_ALLOC_N(_cx_value, xdim*ydim*zdim));
 }
 
 STC_INLINE size_t _cx_memb(_size)(const _cx_self* self)
@@ -107,7 +107,7 @@ STC_INLINE void _cx_memb(_next)(_cx_iter* it)
 #if defined(i_implement)
 
 STC_DEF _cx_self _cx_memb(_with_data)(size_t xdim, size_t ydim, size_t zdim, _cx_value* block) {
-    _cx_self _arr = {c_alloc_n(_cx_value**, xdim*(ydim + 1)), xdim, ydim, zdim};
+    _cx_self _arr = {c_ALLOC_N(_cx_value**, xdim*(ydim + 1)), xdim, ydim, zdim};
     _cx_value** p = (_cx_value**) &_arr.data[xdim];
     for (size_t x = 0, y; x < xdim; ++x, p += ydim)
         for (y = 0, _arr.data[x] = p; y < ydim; ++y, block += zdim)
@@ -139,7 +139,7 @@ STC_DEF void _cx_memb(_copy)(_cx_self *self, const _cx_self* other) {
 
 STC_DEF _cx_value* _cx_memb(_release)(_cx_self* self) {
     _cx_value *values = self->data[0][0];
-    c_free(self->data);
+    c_FREE(self->data);
     self->data = NULL;
     return values;
 }
@@ -149,8 +149,8 @@ STC_DEF void _cx_memb(_drop)(_cx_self* self) {
     for (_cx_value* p = **self->data, *q = p + _cx_memb(_size)(self);  p != q; ) {
         --q; i_keydrop(q);
     }
-    c_free(self->data[0][0]); /* data */
-    c_free(self->data);       /* pointers */
+    c_FREE(self->data[0][0]); /* data */
+    c_FREE(self->data);       /* pointers */
 }
 
 #endif

@@ -5,6 +5,7 @@ STC - Smart Template Containers for C
 
 News: Version 4.1 Beta (Dec 2022)
 ------------------------------------------------
+- Major change is uppercase macros in ccommon.h. Lowercase macros are [still supported](include/stc/priv/lowcase.h).
 - [See detailed changes for version 4](#version-4).
 
 Introduction

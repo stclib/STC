@@ -33,7 +33,7 @@ int main(void) {
     cset_sx_insert(&s, 5);
     cset_sx_insert(&s, 8);
 
-    c_foreach (i, cset_sx, s)
+    c_FOREACH (i, cset_sx, s)
         printf("set %d\n", *i.ref);
     cset_sx_drop(&s);
 }

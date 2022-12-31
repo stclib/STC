@@ -32,7 +32,7 @@
 #include <stc/csmap.h>
 
 int main(void) {
-    c_with (csmap_sx m = csmap_sx_init(), csmap_sx_drop(&m))
+    c_WITH (csmap_sx m = csmap_sx_init(), csmap_sx_drop(&m))
     {
         csmap_sx_emplace(&m, "Testing one", 1.234);
         csmap_sx_emplace(&m, "Testing two", 12.34);
@@ -43,7 +43,7 @@ int main(void) {
         csmap_sx_emplace_or_assign(&m, "Testing three", 1000.0); // update
         csmap_sx_erase(&m, "Testing two");
 
-        c_foreach (i, csmap_sx, m)
+        c_FOREACH (i, csmap_sx, m)
             printf("map %s: %g\n", cstr_str(&i.ref->first), i.ref->second);
     }
 }
@@ -120,7 +120,7 @@ STC_API void            _cx_memb(_next)(_cx_iter* it);
 STC_INLINE bool         _cx_memb(_empty)(const _cx_self* cx) { return cx->size == 0; }
 STC_INLINE size_t       _cx_memb(_size)(const _cx_self* cx) { return cx->size; }
 STC_INLINE size_t       _cx_memb(_capacity)(const _cx_self* cx) { return cx->cap; }
-STC_INLINE void         _cx_memb(_swap)(_cx_self* a, _cx_self* b) { c_swap(_cx_self, *a, *b); }
+STC_INLINE void         _cx_memb(_swap)(_cx_self* a, _cx_self* b) { c_SWAP(_cx_self, *a, *b); }
 STC_INLINE _cx_iter     _cx_memb(_find)(const _cx_self* self, _cx_rawkey rkey)
                             { _cx_iter it; _cx_memb(_find_it)(self, rkey, &it); return it; }
 STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, _cx_rawkey rkey)
@@ -229,7 +229,7 @@ STC_DEF bool
 _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
     if (cap <= self->cap)
         return false;
-    _cx_node* nodes = (_cx_node*)c_realloc(self->nodes, (cap + 1)*sizeof(_cx_node));
+    _cx_node* nodes = (_cx_node*)c_REALLOC(self->nodes, (cap + 1)*sizeof(_cx_node));
     if (!nodes)
         return false;
     nodes[0] = c_INIT(_cx_node){{0, 0}, 0};
@@ -563,7 +563,7 @@ STC_DEF void
 _cx_memb(_drop)(_cx_self* self) {
     if (self->cap) {
         _cx_memb(_drop_r_)(self->nodes, self->root);
-        c_free(self->nodes);
+        c_FREE(self->nodes);
     }
 }
 

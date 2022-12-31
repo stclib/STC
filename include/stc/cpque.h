@@ -49,7 +49,7 @@ STC_INLINE _cx_self _cx_memb(_init)(void)
 
 STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
     if (cap != self->_len && cap <= self->_cap) return true;
-    _cx_value *d = (_cx_value *)c_realloc(self->data, cap*sizeof *d);
+    _cx_value *d = (_cx_value *)c_REALLOC(self->data, cap*sizeof *d);
     return d ? (self->data = d, self->_cap = cap, true) : false;
 }
 
@@ -73,7 +73,7 @@ STC_INLINE void _cx_memb(_clear)(_cx_self* self) {
 }
 
 STC_INLINE void _cx_memb(_drop)(_cx_self* self)
-    { _cx_memb(_clear)(self); c_free(self->data); }
+    { _cx_memb(_clear)(self); c_FREE(self->data); }
 
 STC_INLINE size_t _cx_memb(_size)(const _cx_self* q)
     { return q->_len; }

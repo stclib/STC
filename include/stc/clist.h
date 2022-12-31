@@ -34,19 +34,19 @@
 
     int main()
     {
-        c_auto (clist_ix, list)
+        c_AUTO (clist_ix, list)
         {
             int n;
             for (int i = 0; i < 1000000; ++i) // one million
                 clist_ix_push_back(&list, crandom() >> 32);
             n = 0;
-            c_foreach (i, clist_ix, list)
+            c_FOREACH (i, clist_ix, list)
                 if (++n % 10000 == 0) printf("%8d: %10zu\n", n, *i.ref);
             // Sort them...
             clist_ix_sort(&list); // mergesort O(n*log n)
             n = 0;
             puts("sorted");
-            c_foreach (i, clist_ix, list)
+            c_FOREACH (i, clist_ix, list)
                 if (++n % 10000 == 0) printf("%8d: %10zu\n", n, *i.ref);
         }
     }
@@ -64,13 +64,13 @@
         SELF##_value value; \
     }
 
-#define _clist_tonode(vp) c_container_of(vp, _cx_node, value)
+#define _clist_tonode(vp) c_CONTAINER_OF(vp, _cx_node, value)
     
 _c_clist_types(clist_VOID, int);
 _c_clist_complete_types(clist_VOID, dummy);
 
 #define _c_clist_insert_entry_after(ref, val) \
-    _cx_node *entry = c_alloc(_cx_node); entry->value = val; \
+    _cx_node *entry = c_ALLOC(_cx_node); entry->value = val; \
     _c_clist_insert_node_after(ref, entry)
 
 #define _c_clist_insert_node_after(ref, entry) \
@@ -269,7 +269,7 @@ _clist_mergesort(clist_VOID_node *list, int (*cmp)(const clist_VOID_node*, const
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self cx) {
     _cx_self out = _cx_memb(_init)();
-    c_foreach (it, _cx_self, cx)
+    c_FOREACH (it, _cx_self, cx)
         _cx_memb(_push_back)(&out, i_keyclone((*it.ref)));
     return out;
 }
@@ -344,7 +344,7 @@ STC_DEF void
 _cx_memb(_erase_node_after)(_cx_self* self, _cx_node* ref) {
     _cx_node* node = _cx_memb(_unlink_node_after)(self, ref);
     i_keydrop((&node->value));
-    c_free(node);
+    c_FREE(node);
 }
 
 STC_DEF _cx_node*
@@ -402,7 +402,7 @@ _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
 
 STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw val) {
-    c_foreach (it, _cx_self, it1, it2) {
+    c_FOREACH (it, _cx_self, it1, it2) {
         _cx_raw r = i_keyto(it.ref);
         if (i_eq((&r), (&val)))
             return it;

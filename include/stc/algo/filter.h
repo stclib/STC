@@ -37,9 +37,9 @@ int main()
         puts("");
         
         c_FORFILTER (i, cstack_int, stk
-                    , c_flt_skipwhile(i, *i.ref < 3)
+                    , c_FLT_SKIPWHILE(i, *i.ref < 3)
                     && (*i.ref & 1) == 0 // even only
-                    , c_flt_take(i, 2)) // break after 2
+                    , c_FLT_TAKE(i, 2)) // break after 2
             printf(" %d", *i.ref);
         puts("");
     }
@@ -54,20 +54,20 @@ int main()
   #define c_NFILTERS 14 /* 22, 30, .. */
 #endif
 
-#define c_flt_take(i, n) (++(i).s1[(i).s1top++] <= (n))
-#define c_flt_skip(i, n) (++(i).s1[(i).s1top++] > (n))
-#define c_flt_skipwhile(i, pred) ((i).s2[(i).s2top++] |= !(pred))
-#define c_flt_takewhile(i, pred) !c_flt_skipwhile(i, pred)
+#define c_FLT_TAKE(i, n) (++(i).s1[(i).s1top++] <= (n))
+#define c_FLT_SKIP(i, n) (++(i).s1[(i).s1top++] > (n))
+#define c_FLT_SKIPWHILE(i, pred) ((i).s2[(i).s2top++] |= !(pred))
+#define c_FLT_TAKEWHILE(i, pred) !c_FLT_SKIPWHILE(i, pred)
 
-#define c_forfilter(...) c_MACRO_OVERLOAD(c_forfilter, __VA_ARGS__)
+#define c_FORFILTER(...) c_MACRO_OVERLOAD(c_FORFILTER, __VA_ARGS__)
 
-#define c_forfilter4(i, C, cnt, filter) \
-    c_forfilter_b(i, C, C##_begin(&cnt), filter)
+#define c_FORFILTER4(i, C, cnt, filter) \
+    c_FORFILTER_B(i, C, C##_begin(&cnt), filter)
 
-#define c_forfilter5(i, C, cnt, filter, cond) \
-    c_forfilter_b(i, C, C##_begin(&cnt), filter) if (!(cond)) break; else
+#define c_FORFILTER5(i, C, cnt, filter, cond) \
+    c_FORFILTER_B(i, C, C##_begin(&cnt), filter) if (!(cond)) break; else
 
-#define c_forfilter_b(i, C, start, filter) \
+#define c_FORFILTER_B(i, C, start, filter) \
     for (struct {C##_iter it; C##_value *ref; \
                  uint32_t s1[c_NFILTERS], index, count; \
                  bool s2[c_NFILTERS]; uint8_t s1top, s2top;} \

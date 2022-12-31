@@ -35,7 +35,7 @@
 
 int main() {
     int w = 7, h = 5;
-    c_with (carr2_int image = carr2_int_new_uninit(w, h), carr2_int_drop(&image))
+    c_WITH (carr2_int image = carr2_int_new_uninit(w, h), carr2_int_drop(&image))
     {
         int *dat = carr2_int_data(&image);
         for (int i = 0; i < carr2_int_size(&image); ++i)
@@ -46,7 +46,7 @@ int main() {
                 printf(" %d", image.data[x][y]);
         puts("\n");
 
-        c_foreach (i, carr2_int, image)
+        c_FOREACH (i, carr2_int, image)
             printf(" %d", *i.ref);
         puts("");
     }
@@ -71,7 +71,7 @@ STC_API void       _cx_memb(_copy)(_cx_self *self, const _cx_self* other);
 #endif
 
 STC_INLINE _cx_self _cx_memb(_new_uninit)(size_t xdim, size_t ydim) {
-    return _cx_memb(_with_data)(xdim, ydim, c_alloc_n(_cx_value, xdim*ydim));
+    return _cx_memb(_with_data)(xdim, ydim, c_ALLOC_N(_cx_value, xdim*ydim));
 }
 STC_INLINE size_t _cx_memb(_size)(const _cx_self* self)
     { return self->xdim*self->ydim; }
@@ -104,7 +104,7 @@ STC_INLINE void _cx_memb(_next)(_cx_iter* it)
 #if defined(i_implement)
 
 STC_DEF _cx_self _cx_memb(_with_data)(size_t xdim, size_t ydim, _cx_value* block) {
-    _cx_self _arr = {c_alloc_n(_cx_value*, xdim), xdim, ydim};
+    _cx_self _arr = {c_ALLOC_N(_cx_value*, xdim), xdim, ydim};
     for (size_t x = 0; x < xdim; ++x, block += ydim)
         _arr.data[x] = block;
     return _arr;
@@ -134,7 +134,7 @@ STC_DEF void _cx_memb(_copy)(_cx_self *self, const _cx_self* other) {
 
 STC_DEF _cx_value *_cx_memb(_release)(_cx_self* self) {
     _cx_value *values = self->data[0];
-    c_free(self->data);
+    c_FREE(self->data);
     self->data = NULL;
     return values;
 }
@@ -144,8 +144,8 @@ STC_DEF void _cx_memb(_drop)(_cx_self* self) {
     for (_cx_value* p = self->data[0], *q = p + _cx_memb(_size)(self); p != q; ) {
         --q; i_keydrop(q);
     }
-    c_free(self->data[0]); /* values */
-    c_free(self->data);    /* pointers */
+    c_FREE(self->data[0]); /* values */
+    c_FREE(self->data);    /* pointers */
 }
 
 #endif

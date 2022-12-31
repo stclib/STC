@@ -31,7 +31,7 @@
 #include <stc/cmap.h>
 
 int main(void) {
-    c_with (cmap_ichar m = cmap_ichar_init(), cmap_ichar_drop(&m))
+    c_WITH (cmap_ichar m = cmap_ichar_init(), cmap_ichar_drop(&m))
     {
         cmap_ichar_emplace(&m, 5, 'a');
         cmap_ichar_emplace(&m, 8, 'b');
@@ -42,7 +42,7 @@ int main(void) {
         cmap_ichar_emplace_or_assign(&m, 5, 'd');       // update
         cmap_ichar_erase(&m, 8);
 
-        c_foreach (i, cmap_ichar, m)
+        c_FOREACH (i, cmap_ichar, m)
             printf("map %d: %c\n", i.ref->first, i.ref->second);
     }
 }
@@ -115,7 +115,7 @@ STC_INLINE size_t       _cx_memb(_size)(const _cx_self* map) { return map->size;
 STC_INLINE size_t       _cx_memb(_bucket_count)(_cx_self* map) { return map->bucket_count; }
 STC_INLINE size_t       _cx_memb(_capacity)(const _cx_self* map)
                             { return (size_t)((float)map->bucket_count * (i_max_load_factor)); }
-STC_INLINE void         _cx_memb(_swap)(_cx_self *map1, _cx_self *map2) {c_swap(_cx_self, *map1, *map2); }
+STC_INLINE void         _cx_memb(_swap)(_cx_self *map1, _cx_self *map2) {c_SWAP(_cx_self, *map1, *map2); }
 STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, _cx_rawkey rkey)
                             { return self->size && self->_hashx[_cx_memb(_bucket_)(self, &rkey).idx]; }
 
@@ -298,8 +298,8 @@ STC_INLINE void _cx_memb(_wipe_)(_cx_self* self) {
 
 STC_DEF void _cx_memb(_drop)(_cx_self* self) {
     _cx_memb(_wipe_)(self);
-    c_free(self->_hashx);
-    c_free((void *) self->table);
+    c_FREE(self->_hashx);
+    c_FREE((void *) self->table);
 }
 
 STC_DEF void _cx_memb(_clear)(_cx_self* self) {
@@ -370,10 +370,10 @@ _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey) {
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self m) {
     if (m.table) {
-        _cx_value *t = c_alloc_n(_cx_value, m.bucket_count), *dst = t, *m_end = m.table + m.bucket_count;
-        uint8_t *h = (uint8_t *)memcpy(c_malloc(m.bucket_count + 1), m._hashx, m.bucket_count + 1);
+        _cx_value *t = c_ALLOC_N(_cx_value, m.bucket_count), *dst = t, *m_end = m.table + m.bucket_count;
+        uint8_t *h = (uint8_t *)memcpy(c_MALLOC(m.bucket_count + 1), m._hashx, m.bucket_count + 1);
         if (!(t && h)) 
-            { c_free(t), c_free(h), t = 0, h = 0, m.bucket_count = 0; }
+            { c_FREE(t), c_FREE(h), t = 0, h = 0, m.bucket_count = 0; }
         else
             for (; m.table != m_end; ++m.table, ++m._hashx, ++dst)
                 if (*m._hashx)
@@ -396,8 +396,8 @@ _cx_memb(_reserve)(_cx_self* self, const size_t _newcap) {
     _nbuckets |= 1;
     #endif
     _cx_self m = {
-        c_alloc_n(_cx_value, _nbuckets),
-        (uint8_t *) c_calloc(_nbuckets + 1, 1),
+        c_ALLOC_N(_cx_value, _nbuckets),
+        (uint8_t *) c_CALLOC(_nbuckets + 1, 1),
         self->size, (i_size)_nbuckets,
     };
     bool ok = m.table && m._hashx;
@@ -411,10 +411,10 @@ _cx_memb(_reserve)(_cx_self* self, const size_t _newcap) {
             m.table[b.idx] = *e;
             m._hashx[b.idx] = (uint8_t)b.hx;
         }
-        c_swap(_cx_self, *self, m);
+        c_SWAP(_cx_self, *self, m);
     }
-    c_free(m._hashx);
-    c_free(m.table);
+    c_FREE(m._hashx);
+    c_FREE(m.table);
     return ok;
 }
 

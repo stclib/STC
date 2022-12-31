@@ -90,7 +90,7 @@ STC_INLINE size_t       _cx_memb(_size)(const _cx_self* self) { return self->_le
 STC_INLINE size_t       _cx_memb(_capacity)(const _cx_self* self) { return self->_cap; }
 STC_INLINE bool         _cx_memb(_empty)(const _cx_self* self) { return !self->_len; }
 STC_INLINE _cx_raw      _cx_memb(_value_toraw)(const _cx_value* pval) { return i_keyto(pval); }
-STC_INLINE void         _cx_memb(_swap)(_cx_self* a, _cx_self* b) { c_swap(_cx_self, *a, *b); }
+STC_INLINE void         _cx_memb(_swap)(_cx_self* a, _cx_self* b) { c_SWAP(_cx_self, *a, *b); }
 STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return self->data; }
 STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self)
                             { return self->data + self->_len - 1; }
@@ -227,7 +227,7 @@ STC_DEF void
 _cx_memb(_shrink_to_fit)(_cx_self *self) {
     if (self->_len != self->_cap) {
         memmove(self->_base, self->data, self->_len*sizeof(i_key));
-        _cx_value* d = (_cx_value*)c_realloc(self->_base, self->_len*sizeof(i_key));
+        _cx_value* d = (_cx_value*)c_REALLOC(self->_base, self->_len*sizeof(i_key));
         if (d) {
             self->_base = d;
             self->_cap = self->_len;
@@ -240,7 +240,7 @@ STC_DEF void
 _cx_memb(_drop)(_cx_self* self) {
     if (self->_base) {
         _cx_memb(_clear)(self);
-        c_free(self->_base);
+        c_FREE(self->_base);
     }
 }
 
@@ -248,7 +248,7 @@ static size_t
 _cx_memb(_realloc_)(_cx_self* self, const size_t n) {
     const size_t cap = (size_t)((float)self->_len*1.7f) + n + 7U;
     const size_t nfront = _cdeq_nfront(self);
-    _cx_value* d = (_cx_value*)c_realloc(self->_base, cap*sizeof(i_key));
+    _cx_value* d = (_cx_value*)c_REALLOC(self->_base, cap*sizeof(i_key));
     if (!d)
         return 0; 
     self->_cap = cap;

@@ -62,7 +62,7 @@ enum  { cstr_s_cap =            sizeof(cstr_buf) - 2 };
 #define cstr_l_size(s)          ((s)->lon.size)
 #define cstr_l_set_size(s, len) ((s)->lon.data[(s)->lon.size = (len)] = 0)
 #define cstr_l_data(s)          (s)->lon.data
-#define cstr_l_drop(s)          c_free((s)->lon.data)
+#define cstr_l_drop(s)          c_FREE((s)->lon.data)
 
 #define cstr_is_long(s)         ((s)->sml.size > 127)
 STC_API char* _cstr_init(cstr* self, size_t len, size_t cap);
@@ -473,7 +473,7 @@ STC_DEF char* _cstr_internal_move(cstr* self, const size_t pos1, const size_t po
 
 STC_DEF char* _cstr_init(cstr* self, const size_t len, const size_t cap) {
     if (cap > cstr_s_cap) { 
-        self->lon.data = (char *)c_malloc(cap + 1);
+        self->lon.data = (char *)c_MALLOC(cap + 1);
         cstr_l_set_size(self, len);
         cstr_l_set_cap(self, cap);
         return self->lon.data;
@@ -487,26 +487,26 @@ STC_DEF void cstr_shrink_to_fit(cstr* self) {
     if (r.size == r.cap)
         return;
     if (r.size > cstr_s_cap) {
-        self->lon.data = (char *)c_realloc(self->lon.data, r.size + 1);
+        self->lon.data = (char *)c_REALLOC(self->lon.data, r.size + 1);
         cstr_l_set_cap(self, r.size);
     } else if (r.cap > cstr_s_cap) {
         memcpy(self->sml.data, r.data, r.size + 1);
         cstr_s_set_size(self, r.size);
-        c_free(r.data);
+        c_FREE(r.data);
     }
 }
 
 STC_DEF char* cstr_reserve(cstr* self, const size_t cap) {
     if (cstr_is_long(self)) {
         if (cap > cstr_l_cap(self)) {
-            self->lon.data = (char *)c_realloc(self->lon.data, cap + 1);
+            self->lon.data = (char *)c_REALLOC(self->lon.data, cap + 1);
             cstr_l_set_cap(self, cap);
         }
         return self->lon.data;
     }
     /* from short to long: */
     if (cap > cstr_s_cap) {
-        char* data = (char *)c_malloc(cap + 1);
+        char* data = (char *)c_MALLOC(cap + 1);
         const size_t len = cstr_s_size(self);
         memcpy(data, self->sml.data, cstr_s_cap + 1);
         self->lon.data = data;
