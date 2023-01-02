@@ -125,7 +125,6 @@ typedef struct {
 
 static const UGroup unicode_groups[];
 static const int num_unicode_groups;
-static const int Lt_group;
 
 bool utf8_isgroup(int group, uint32_t c) {
     for (int j=0; j<unicode_groups[group].nr16; ++j) {
@@ -153,7 +152,7 @@ bool utf8_isalnum(uint32_t c) {
 
 bool utf8_isalpha(uint32_t c) {
     if (c < 128) return isalpha(c) != 0;
-    return utf8_islower(c) || utf8_isupper(c) || utf8_isgroup(Lt_group, c);
+    return utf8_islower(c) || utf8_isupper(c) || utf8_isgroup(U8G_Lt, c);
 }
 
 static const URange16 Cc_range16[] = { // Control
@@ -321,24 +320,23 @@ static const URange16 Zs_range16[] = { // Space separator
 };
 
 #define UNI_ENTRY(Code) \
-    { #Code, Code##_range16, sizeof(Code##_range16)/2 }
+    { #Code, Code##_range16, sizeof(Code##_range16)/(2*2) }
 
 static const UGroup unicode_groups[] = {
-    UNI_ENTRY(Cc),
-    UNI_ENTRY(Lt),
-    UNI_ENTRY(Nd),
-    UNI_ENTRY(Nl),
-    UNI_ENTRY(Pc),
-    UNI_ENTRY(Pd),
-    UNI_ENTRY(Pf),
-    UNI_ENTRY(Pi),
-    UNI_ENTRY(Sc),
-    UNI_ENTRY(Zl),
-    UNI_ENTRY(Zp),
-    UNI_ENTRY(Zs),
+    [U8G_Cc] = UNI_ENTRY(Cc),
+    [U8G_Lt] = UNI_ENTRY(Lt),
+    [U8G_Nd] = UNI_ENTRY(Nd),
+    [U8G_Nl] = UNI_ENTRY(Nl),
+    [U8G_Pc] = UNI_ENTRY(Pc),
+    [U8G_Pd] = UNI_ENTRY(Pd),
+    [U8G_Pf] = UNI_ENTRY(Pf),
+    [U8G_Pi] = UNI_ENTRY(Pi),
+    [U8G_Sc] = UNI_ENTRY(Sc),
+    [U8G_Zl] = UNI_ENTRY(Zl),
+    [U8G_Zp] = UNI_ENTRY(Zp),
+    [U8G_Zs] = UNI_ENTRY(Zs),
 };
 
-static const int Lt_group = 1;
 static const int num_unicode_groups = sizeof unicode_groups / sizeof unicode_groups[0];
 
 #endif

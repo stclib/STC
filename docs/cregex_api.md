@@ -186,17 +186,16 @@ For reference, **cregex** uses the following files:
 | \p{XDigit} | Match UTF8 hex number | * |
 | \p{Nd} or \p{Digit} | Match UTF8 decimal number | * |
 | \p{Nl} | Match UTF8 numeric letter | * |
-| \p{Ll} or \p{Lower} | Match UTF8 lower case letter | * |
-| \p{Lu} or \p{Upper} | Match UTF8 upper case letter | * |
+| \p{Ll} or \p{Lower} | Match UTF8 lowercase letter | * |
+| \p{Lu} or \p{Upper} | Match UTF8 uppercase letter | * |
 | \p{Lt} | Match UTF8 titlecase letter | * |
 | \p{L&} or \p{Alpha} | Match UTF8 cased letter | * |
 | \p{Cc} | Match UTF8 control char | * |
 | \p{Pc} | Match UTF8 connector punctuation | * |
 | \p{Pd} | Match UTF8 dash punctuation | * |
-| \p{Pf} | Match UTF8 final punctuation | * |
 | \p{Pi} | Match UTF8 initial punctuation | * |
+| \p{Pf} | Match UTF8 final punctuation | * |
 | \p{Sc} | Match UTF8 currency symbol | * |
-| \p{Sk} | Match UTF8 modifier symbol | * |
 | \p{Zl} | Match UTF8 line separator | * |
 | \p{Zp} | Match UTF8 paragraph separator | * |
 | \p{Sz} or \p{Space} | Match UTF8 whitespace separator | * |

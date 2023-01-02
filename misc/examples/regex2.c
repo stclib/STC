@@ -10,7 +10,8 @@ int main()
         {"(https?://|ftp://|www\\.)([0-9A-Za-z@:%_+~#=-]+\\.)+([a-z][a-z][a-z]?)(/[/0-9A-Za-z\\.@:%_+~#=\\?&-]*)?",
          "https://en.cppreference.com/w/cpp/regex/regex_search"
         },
-        {"!((abc|123)+)!", "!123abcabc!"}
+        {"!((abc|123)+)!", "!123abcabc!"},
+        {"(\\p{L&}+ )+(\\p{Nd}+)", "Großpackung süßigkeiten 199"},
     };
 
     c_AUTO (cregex, re)
@@ -21,12 +22,11 @@ int main()
             printf("error in regex pattern: %d\n", res);
             continue;
         }
-        printf("input: %s\n", s[i].input);
+        printf("\ninput: %s\n", s[i].input);
 
         c_FORMATCH (j, &re, s[i].input) {
             c_FORRANGE (k, cregex_captures(&re))
                 printf("  submatch %lld: %.*s\n", k, c_ARGSV(j.match[k]));
-            puts("");
         }
     }
 }

@@ -133,22 +133,22 @@ enum {
     UTF_an      , UTF_AN,       /* utf8 alphanumeric */
     UTF_wr      , UTF_WR,       /* utf8 word */
     UTF_xd      , UTF_XD,       /* utf8 hex digit */
-    U8G_tmp     , U8G = U8G_tmp + (U8G_tmp & 1), /* force even */
-    UTF_cc = U8G, UTF_CC,       /* utf8 control char */
     UTF_lc      , UTF_LC,       /* utf8 letter cased */
     UTF_ll      , UTF_LL,       /* utf8 letter lowercase */
-    UTF_lt      , UTF_LT,       /* utf8 letter titlecase */
     UTF_lu      , UTF_LU,       /* utf8 letter uppercase */
-    UTF_nd      , UTF_ND,       /* utf8 number decimal */
-    UTF_nl      , UTF_NL,       /* utf8 number letter */
-    UTF_pc      , UTF_PC,       /* utf8 punct connector */
-    UTF_pd      , UTF_PD,       /* utf8 punct dash */
-    UTF_pf      , UTF_PF,       /* utf8 punct final */
-    UTF_pi      , UTF_PI,       /* utf8 punct initial */
-    UTF_sc      , UTF_SC,       /* utf8 symbol currency */
-    UTF_zl      , UTF_ZL,       /* utf8 separator line */
-    UTF_zp      , UTF_ZP,       /* utf8 separator paragraph */
-    UTF_zs      , UTF_ZS,       /* utf8 separator space */
+    UTF_GRP = 0x8150000,
+    UTF_cc = UTF_GRP+2*U8G_Cc, UTF_CC, /* utf8 control char */
+    UTF_lt = UTF_GRP+2*U8G_Lt, UTF_LT, /* utf8 letter titlecase */
+    UTF_nd = UTF_GRP+2*U8G_Nd, UTF_ND, /* utf8 number decimal */
+    UTF_nl = UTF_GRP+2*U8G_Nl, UTF_NL, /* utf8 number letter */
+    UTF_pc = UTF_GRP+2*U8G_Pc, UTF_PC, /* utf8 punct connector */
+    UTF_pd = UTF_GRP+2*U8G_Pd, UTF_PD, /* utf8 punct dash */
+    UTF_pf = UTF_GRP+2*U8G_Pf, UTF_PF, /* utf8 punct final */
+    UTF_pi = UTF_GRP+2*U8G_Pi, UTF_PI, /* utf8 punct initial */
+    UTF_sc = UTF_GRP+2*U8G_Sc, UTF_SC, /* utf8 symbol currency */
+    UTF_zl = UTF_GRP+2*U8G_Zl, UTF_ZL, /* utf8 separator line */
+    UTF_zp = UTF_GRP+2*U8G_Zp, UTF_ZP, /* utf8 separator paragraph */
+    UTF_zs = UTF_GRP+2*U8G_Zs, UTF_ZS, /* utf8 separator space */
     TOK_ANY     = 0x8200000,    /* Any character except newline, . */
     TOK_ANYNL   ,               /* Any character including newline, . */
     TOK_NOP     ,               /* No operation, internal use only */
@@ -896,7 +896,8 @@ out:
 static int
 _runematch(_Rune s, _Rune r)
 {
-    int inv = 0, n;
+    int inv = 0;
+    uint32_t n;
     switch (s) {
     case ASC_D: inv = 1; case ASC_d: return inv ^ (isdigit(r) != 0);
     case ASC_S: inv = 1; case ASC_s: return inv ^ (isspace(r) != 0);
@@ -915,11 +916,11 @@ _runematch(_Rune s, _Rune r)
     case UTF_AN: inv = 1; case UTF_an: return inv ^ utf8_isalnum(r);
     case UTF_WR: inv = 1; case UTF_wr: return inv ^ (utf8_isalnum(r) | (r == '_'));
     case UTF_XD: inv = 1; case UTF_xd: return inv ^ utf8_isxdigit(r);
+    case UTF_LL: inv = 1; case UTF_ll: return inv ^ utf8_islower(r);
+    case UTF_LU: inv = 1; case UTF_lu: return inv ^ utf8_isupper(r);
     case UTF_LC: inv = 1; case UTF_lc: return inv ^ utf8_isalpha(r); 
     case UTF_CC: case UTF_cc:
-    case UTF_LL: case UTF_ll:
     case UTF_LT: case UTF_lt:
-    case UTF_LU: case UTF_lu:
     case UTF_ND: case UTF_nd:
     case UTF_NL: case UTF_nl:
     case UTF_PC: case UTF_pc:
@@ -930,7 +931,7 @@ _runematch(_Rune s, _Rune r)
     case UTF_ZL: case UTF_zl:
     case UTF_ZP: case UTF_zp:
     case UTF_ZS: case UTF_zs:
-        n = s - U8G;
+        n = s - UTF_GRP;
         inv = n & 1;
         return inv ^ utf8_isgroup(n / 2, r);
     }

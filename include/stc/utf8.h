@@ -5,7 +5,11 @@
 #include "ccommon.h"
 
 // utf8 methods defined in src/utf8code.c:
-
+enum {
+    U8G_Cc, U8G_Lt, U8G_Nd, U8G_Nl,
+    U8G_Pc, U8G_Pd, U8G_Pf, U8G_Pi,
+    U8G_Sc, U8G_Zl, U8G_Zp, U8G_Zs,
+};
 extern bool     utf8_isspace(uint32_t c);
 extern bool     utf8_isdigit(uint32_t c);
 extern bool     utf8_isxdigit(uint32_t c);
