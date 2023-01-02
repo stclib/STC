@@ -177,17 +177,11 @@ For reference, **cregex** uses the following files:
 | \B | Not UTF8 word boundary | * |
 | \Q | Start literal input mode | * |
 | \E | End literal input mode | * |
-| (?i) (?-i)  | Ignore case on/off (override global) | * |
-| (?s) (?-s)  | Dot matches newline on/off (override global) | * |
+| (?i) (?-i)  | Ignore case on/off (override CREG_C_ICASE) | * |
+| (?s) (?-s)  | Dot matches newline on/off (override CREG_C_DOTALL) | * |
 | \n \t \r | Match UTF8 newline, tab, carriage return | |
 | \d \s \w | Match UTF8 digit, whitespace, alphanumeric character | |
 | \D \S \W | Do not match the groups described above | |
-| \p{Alpha} | Match UTF8 alpha (L& Ll) | * |
-| \p{Alnum} | Match UTF8 alphanumeric (Lu Ll Nd Nl) | * |
-| \p{Blank} | Match UTF8 blank (Zs \t) | * |
-| \p{Space} | Match UTF8 whitespace: (Zs \t\r\n\v\f] | * |
-| \p{Word} | Match UTF8 word character: (Alnum Pc) | * |
-| \p{XDigit} | Match hex number | * |
 | \p{Cc} or \p{Cntrl} | Match UTF8 control char | * |
 | \p{Ll} or \p{Lower} | Match UTF8 lowercase letter | * |
 | \p{Lu} or \p{Upper} | Match UTF8 uppercase letter | * |
@@ -203,6 +197,12 @@ For reference, **cregex** uses the following files:
 | \p{Zl} | Match UTF8 line separator | * |
 | \p{Zp} | Match UTF8 paragraph separator | * |
 | \p{Zs} | Match UTF8 space separator | * |
+| \p{Alpha} | Match UTF8 alphabetic letter (L& Nl) | * |
+| \p{Alnum} | Match UTF8 alpha-numeric letter (L& Nl Nd) | * |
+| \p{Blank} | Match UTF8 blank (Zs \t) | * |
+| \p{Space} | Match UTF8 whitespace: (Zs \t\r\n\v\f] | * |
+| \p{Word} | Match UTF8 word character: (Alnum Pc) | * |
+| \p{XDigit} | Match hex number | * |
 | \P{***Class***} | Do not match the classes described above | * |
 | [:alnum:] [:alpha:] [:ascii:] | Match ASCII character class. NB: only to be used inside [] brackets | * |
 | [:blank:] [:cntrl:] [:digit:] | " | * |
@@ -210,7 +210,7 @@ For reference, **cregex** uses the following files:
 | [:punct:] [:space:] [:upper:] | " | * |
 | [:xdigit:] [:word:] | " | * |
 | [:^***class***:] | Match character not in the ASCII class | * |
-| $***n*** | *n*-th substitution backreference to capture group. ***n*** in 0-9. $0 is the entire match. | * |
+| $***n*** | *n*-th replace backreference to capture group. ***n*** in 0-9. $0 is the entire match. | * |
 | $***nn;*** | As above, but can handle ***nn*** < CREG_MAX_CAPTURES. | * |
 
 ## Limitations
@@ -219,6 +219,6 @@ The main goal of **cregex** is to be small and fast with limited but useful unic
 - In order to limit table sizes, most general UTF8 character classes are missing, like \p{L}, \p{S}, and all specific scripts like \p{Greek} etc. Some/all of these may be added in the future as an alternative source file with unicode tables to link with.
 - {n, m} syntax for repeating previous token min-max times.
 - Non-capturing groups
-- Lookaround and backreferences
+- Lookaround and backreferences (cannot be implemented efficiently).
 
 If you need a more feature complete, but bigger library, use [RE2 with C-wrapper](https://github.com/google/re2) which uses the same type of regex engine as **cregex**, or use [PCRE2](https://www.pcre.org/).

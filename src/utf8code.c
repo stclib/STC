@@ -148,7 +148,7 @@ bool utf8_isalnum(uint32_t c) {
 }
 
 bool utf8_isblank(uint32_t c) {
-    if (c < 128) return isblank(c) != 0;
+    if (c < 128) return (c == ' ') | (c == '\t');
     return utf8_isgroup(U8G_Zs, c);
 }
 

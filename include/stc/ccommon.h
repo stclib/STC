@@ -56,14 +56,13 @@
 #define c_PASTE(a, b) c_CONCAT(a, b)
 #define c_EXPAND(...) __VA_ARGS__
 #define c_NUMARGS(...) _c_APPLY_ARG_N((__VA_ARGS__, _c_RSEQ_N))
-
 #define _c_APPLY_ARG_N(args) c_EXPAND(_c_ARG_N args)
 #define _c_RSEQ_N 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 #define _c_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, \
                  _14, _15, _16, N, ...) N
 
-#define c_STATIC_ASSERT(cond) \
-    typedef char c_PASTE(_static_assert_line_, __LINE__)[(cond) ? 1 : -1]
+#define c_STATIC_ASSERT(cond, msg) \
+    ((void)sizeof(int[(cond) ? 1 : -1]))
 #define c_CONTAINER_OF(p, T, m) \
     ((T*)((char*)(p) + 0*sizeof((p) == &((T*)0)->m) - offsetof(T, m)))
 
