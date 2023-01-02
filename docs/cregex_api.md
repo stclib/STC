@@ -184,11 +184,22 @@ For reference, **cregex** uses the following files:
 | \D \S \W | Do not match the groups described above | |
 | \p{Alnum} | Match UTF8 alpha numeric | * |
 | \p{XDigit} | Match UTF8 hex number | * |
-| \p{Alpha} or \p{LC} | Match UTF8 cased letter | * |
-| \p{Digit} or \p{Nd} | Match UTF8 numeric | * |
-| \p{Lower} or \p{Ll} | Match UTF8 lower case | * |
-| \p{Upper} or \p{Lu} | Match UTF8 upper case | * |
-| \p{Space} or \p{Sz} | Match UTF8 whitespace | * |
+| \p{Nd} or \p{Digit} | Match UTF8 decimal number | * |
+| \p{Nl} | Match UTF8 numeric letter | * |
+| \p{Ll} or \p{Lower} | Match UTF8 lower case letter | * |
+| \p{Lu} or \p{Upper} | Match UTF8 upper case letter | * |
+| \p{Lt} | Match UTF8 titlecase letter | * |
+| \p{L&} or \p{Alpha} | Match UTF8 cased letter | * |
+| \p{Cc} | Match UTF8 control char | * |
+| \p{Pc} | Match UTF8 connector punctuation | * |
+| \p{Pd} | Match UTF8 dash punctuation | * |
+| \p{Pf} | Match UTF8 final punctuation | * |
+| \p{Pi} | Match UTF8 initial punctuation | * |
+| \p{Sc} | Match UTF8 currency symbol | * |
+| \p{Sk} | Match UTF8 modifier symbol | * |
+| \p{Zl} | Match UTF8 line separator | * |
+| \p{Zp} | Match UTF8 paragraph separator | * |
+| \p{Sz} or \p{Space} | Match UTF8 whitespace separator | * |
 | \P{***Class***} | Do not match the classes described above | * |
 | [:alnum:] [:alpha:] [:ascii:] | Match ASCII character class. NB: only to be used inside [] brackets | * |
 | [:blank:] [:cntrl:] [:digit:] | " | * |

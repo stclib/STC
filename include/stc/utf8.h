@@ -11,6 +11,7 @@ extern bool     utf8_isdigit(uint32_t c);
 extern bool     utf8_isxdigit(uint32_t c);
 extern bool     utf8_isalpha(uint32_t c);
 extern bool     utf8_isalnum(uint32_t c);
+extern bool     utf8_isgroup(int group, uint32_t c); 
 extern uint32_t utf8_casefold(uint32_t c);
 extern uint32_t utf8_tolower(uint32_t c);
 extern uint32_t utf8_toupper(uint32_t c);

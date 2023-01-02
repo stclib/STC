@@ -27,12 +27,13 @@ int main() {
 
     c_AUTO (IQ, Q)
     {
-        // Push eight million random numbers onto the queue.
+        // Push 50'000'000 random numbers onto the queue.
         c_FORRANGE (n)
             IQ_push(&Q, stc64_uniform(&rng, &dist));
 
         // Push or pop on the queue 50 million times
         printf("befor: size %" c_ZU ", capacity %" c_ZU "\n", IQ_size(&Q), IQ_capacity(&Q));
+        
         c_FORRANGE (n) {
             int r = stc64_uniform(&rng, &dist);
             if (r & 3)
