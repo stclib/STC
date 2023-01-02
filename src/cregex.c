@@ -130,12 +130,14 @@ enum {
     ASC_lo      , ASC_LO,       /* lower */
     ASC_up      , ASC_UP,       /* upper */
     ASC_xd      , ASC_XD,       /* hex */
+    UTF_al      , UTF_AL,       /* utf8 alpha */
     UTF_an      , UTF_AN,       /* utf8 alphanumeric */
-    UTF_wr      , UTF_WR,       /* utf8 word */
-    UTF_xd      , UTF_XD,       /* utf8 hex digit */
+    UTF_bl      , UTF_BL,       /* utf8 blank */
     UTF_lc      , UTF_LC,       /* utf8 letter cased */
     UTF_ll      , UTF_LL,       /* utf8 letter lowercase */
     UTF_lu      , UTF_LU,       /* utf8 letter uppercase */
+    UTF_sp      , UTF_SP,       /* utf8 space */
+    UTF_wr      , UTF_WR,       /* utf8 word */
     UTF_GRP = 0x8150000,
     UTF_cc = UTF_GRP+2*U8G_Cc, UTF_CC, /* utf8 control char */
     UTF_lt = UTF_GRP+2*U8G_Lt, UTF_LT, /* utf8 letter titlecase */
@@ -636,18 +638,19 @@ static void
 _lexutfclass(_Parser *par, _Rune *rp)
 {
     static struct { const char* c; int n, r; } cls[] = {
-        {"{Alpha}", 7, UTF_lc}, {"{L&}", 4, UTF_lc},
+        {"{Alpha}", 7, UTF_al}, {"{L&}", 4, UTF_lc},
         {"{Digit}", 7, UTF_nd}, {"{Nd}", 4, UTF_nd},
         {"{Lower}", 7, UTF_ll}, {"{Ll}", 4, UTF_ll},
         {"{Upper}", 7, UTF_lu}, {"{Lu}", 4, UTF_lu},
-        {"{Space}", 7, UTF_zs}, {"{Zs}", 4, UTF_zs},
-        {"{Alnum}", 7, UTF_an},
-        {"{XDigit}", 8, UTF_xd},
-        {"{Cc}", 4, UTF_cc}, {"{Sc}", 4, UTF_sc},
+        {"{Cntrl}", 7, UTF_cc}, {"{Cc}", 4, UTF_cc}, 
+        {"{Alnum}", 7, UTF_an}, {"{Blank}", 7, UTF_bl}, 
+        {"{Space}", 7, UTF_sp}, {"{Word}", 6, UTF_wr},
+        {"{XDigit}", 8, ASC_xd},
         {"{Lt}", 4, UTF_lt}, {"{Nl}", 4, UTF_nl},
         {"{Pc}", 4, UTF_pc}, {"{Pd}", 4, UTF_pd},
         {"{Pf}", 4, UTF_pf}, {"{Pi}", 4, UTF_pi},
         {"{Zl}", 4, UTF_zl}, {"{Zp}", 4, UTF_zp},
+        {"{Zs}", 4, UTF_zs}, {"{Sc}", 4, UTF_sc},
     };
     int inv = (*rp == 'P');
     for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i) {
@@ -671,8 +674,8 @@ _lexutfclass(_Parser *par, _Rune *rp)
     case 'a': rune = '\a'; break; \
     case 'd': rune = UTF_nd; break; \
     case 'D': rune = UTF_ND; break; \
-    case 's': rune = UTF_zs; break; \
-    case 'S': rune = UTF_ZS; break; \
+    case 's': rune = UTF_sp; break; \
+    case 'S': rune = UTF_SP; break; \
     case 'w': rune = UTF_wr; break; \
     case 'W': rune = UTF_WR; break
 
@@ -914,11 +917,13 @@ _runematch(_Rune s, _Rune r)
     case ASC_UP: inv = 1; case ASC_up: return inv ^ (isupper(r) != 0);
     case ASC_XD: inv = 1; case ASC_xd: return inv ^ (isxdigit(r) != 0);
     case UTF_AN: inv = 1; case UTF_an: return inv ^ utf8_isalnum(r);
-    case UTF_WR: inv = 1; case UTF_wr: return inv ^ (utf8_isalnum(r) | (r == '_'));
-    case UTF_XD: inv = 1; case UTF_xd: return inv ^ utf8_isxdigit(r);
+    case UTF_BL: inv = 1; case UTF_bl: return inv ^ utf8_isblank(r);
+    case UTF_SP: inv = 1; case UTF_sp: return inv ^ utf8_isspace(r);
     case UTF_LL: inv = 1; case UTF_ll: return inv ^ utf8_islower(r);
     case UTF_LU: inv = 1; case UTF_lu: return inv ^ utf8_isupper(r);
-    case UTF_LC: inv = 1; case UTF_lc: return inv ^ utf8_isalpha(r); 
+    case UTF_LC: inv = 1; case UTF_lc: return inv ^ utf8_iscased(r); 
+    case UTF_AL: inv = 1; case UTF_al: return inv ^ utf8_isalpha(r);
+    case UTF_WR: inv = 1; case UTF_wr: return inv ^ utf8_isword(r);
     case UTF_CC: case UTF_cc:
     case UTF_LT: case UTF_lt:
     case UTF_ND: case UTF_nd:

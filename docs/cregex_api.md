@@ -182,15 +182,19 @@ For reference, **cregex** uses the following files:
 | \n \t \r | Match UTF8 newline, tab, carriage return | |
 | \d \s \w | Match UTF8 digit, whitespace, alphanumeric character | |
 | \D \S \W | Do not match the groups described above | |
-| \p{Alnum} | Match UTF8 alpha numeric | * |
-| \p{XDigit} | Match UTF8 hex number | * |
-| \p{Nd} or \p{Digit} | Match UTF8 decimal number | * |
-| \p{Nl} | Match UTF8 numeric letter | * |
+| \p{Alpha} | Match UTF8 alpha (L& Ll) | * |
+| \p{Alnum} | Match UTF8 alphanumeric (Lu Ll Nd Nl) | * |
+| \p{Blank} | Match UTF8 blank (Zs \t) | * |
+| \p{Space} | Match UTF8 whitespace: (Zs \t\r\n\v\f] | * |
+| \p{Word} | Match UTF8 word character: (Alnum Pc) | * |
+| \p{XDigit} | Match hex number | * |
+| \p{Cc} or \p{Cntrl} | Match UTF8 control char | * |
 | \p{Ll} or \p{Lower} | Match UTF8 lowercase letter | * |
 | \p{Lu} or \p{Upper} | Match UTF8 uppercase letter | * |
 | \p{Lt} | Match UTF8 titlecase letter | * |
-| \p{L&} or \p{Alpha} | Match UTF8 cased letter | * |
-| \p{Cc} | Match UTF8 control char | * |
+| \p{L&} | Match UTF8 cased letter (Ll Lu Lt) | * |
+| \p{Nd} or \p{Digit} | Match UTF8 decimal number | * |
+| \p{Nl} | Match UTF8 numeric letter | * |
 | \p{Pc} | Match UTF8 connector punctuation | * |
 | \p{Pd} | Match UTF8 dash punctuation | * |
 | \p{Pi} | Match UTF8 initial punctuation | * |
@@ -198,7 +202,7 @@ For reference, **cregex** uses the following files:
 | \p{Sc} | Match UTF8 currency symbol | * |
 | \p{Zl} | Match UTF8 line separator | * |
 | \p{Zp} | Match UTF8 paragraph separator | * |
-| \p{Sz} or \p{Space} | Match UTF8 whitespace separator | * |
+| \p{Zs} | Match UTF8 space separator | * |
 | \P{***Class***} | Do not match the classes described above | * |
 | [:alnum:] [:alpha:] [:ascii:] | Match ASCII character class. NB: only to be used inside [] brackets | * |
 | [:blank:] [:cntrl:] [:digit:] | " | * |

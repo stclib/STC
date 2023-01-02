@@ -136,23 +136,31 @@ bool utf8_isgroup(int group, uint32_t c) {
     return false;
 }
 
-bool utf8_isxdigit(uint32_t c) {
-    static uint16_t t[] = {0x30, 0x39, 0x41, 0x46, 0x61, 0x66, 0xFF10,
-                           0xFF19, 0xFF21, 0xFF26, 0xFF41, 0xFF46};
-    for (size_t i=1; i<sizeof t/sizeof *t; i += 2)
-        if (c <= t[i]) return c >= t[i - 1];
-    return false;
+bool utf8_iscased(uint32_t c) {
+    if (c < 128) return isalpha(c) != 0;
+    return utf8_islower(c) || utf8_isupper(c) || utf8_isgroup(U8G_Lt, c);
 }
 
 bool utf8_isalnum(uint32_t c) {
     if (c < 128) return isalnum(c) != 0;
-    if ((c >= 0xFF10) & (c <= 0xFF19)) return true;
-    return utf8_islower(c) || utf8_isupper(c);
+    return utf8_islower(c) || utf8_isupper(c) || utf8_isgroup(U8G_Lt, c) ||
+           utf8_isgroup(U8G_Nd, c) || utf8_isgroup(U8G_Nl, c);
 }
 
-bool utf8_isalpha(uint32_t c) {
-    if (c < 128) return isalpha(c) != 0;
-    return utf8_islower(c) || utf8_isupper(c) || utf8_isgroup(U8G_Lt, c);
+bool utf8_isblank(uint32_t c) {
+    if (c < 128) return isblank(c) != 0;
+    return utf8_isgroup(U8G_Zs, c);
+}
+
+bool utf8_isspace(uint32_t c) {
+    if (c < 128) return isspace(c) != 0;
+    return ((c == 8232) | (c == 8233)) || utf8_isgroup(U8G_Zs, c);
+}
+
+bool utf8_isword(uint32_t c) {
+    if (c < 128) return (isalnum(c) != 0) | (c == '_');
+    return utf8_islower(c) || utf8_isupper(c) || utf8_isgroup(U8G_Lt, c) ||
+           utf8_isgroup(U8G_Nd, c) || utf8_isgroup(U8G_Pc, c) || utf8_isgroup(U8G_Nl, c);
 }
 
 static const URange16 Cc_range16[] = { // Control

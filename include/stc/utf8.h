@@ -10,12 +10,13 @@ enum {
     U8G_Pc, U8G_Pd, U8G_Pf, U8G_Pi,
     U8G_Sc, U8G_Zl, U8G_Zp, U8G_Zs,
 };
-extern bool     utf8_isspace(uint32_t c);
-extern bool     utf8_isdigit(uint32_t c);
-extern bool     utf8_isxdigit(uint32_t c);
-extern bool     utf8_isalpha(uint32_t c);
-extern bool     utf8_isalnum(uint32_t c);
 extern bool     utf8_isgroup(int group, uint32_t c); 
+extern bool     utf8_isblank(uint32_t c);
+extern bool     utf8_iscased(uint32_t c);
+extern bool     utf8_isalnum(uint32_t c);
+extern bool     utf8_isdigit(uint32_t c);
+extern bool     utf8_isspace(uint32_t c);
+extern bool     utf8_isword(uint32_t c);
 extern uint32_t utf8_casefold(uint32_t c);
 extern uint32_t utf8_tolower(uint32_t c);
 extern uint32_t utf8_toupper(uint32_t c);
@@ -23,6 +24,11 @@ extern bool     utf8_valid_n(const char* s, size_t nbytes);
 extern int      utf8_icmp_sv(csview s1, csview s2);
 extern unsigned utf8_encode(char *out, uint32_t c);
 extern uint32_t utf8_peek_off(const char *s, int offset);
+
+STC_INLINE bool utf8_isalpha(uint32_t c) {
+    return utf8_iscased(c) || utf8_isgroup(U8G_Nl, c);
+}
+
 
 /* following functions uses src/utf8code.c */
 
