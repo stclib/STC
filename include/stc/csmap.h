@@ -276,13 +276,13 @@ _cx_memb(_new_node_)(_cx_self* self, int level) {
 static _cx_result _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey);
 
 STC_DEF _cx_result
-_cx_memb(_insert)(_cx_self* self, i_key key _i_MAP_ONLY(, i_val mapped)) {
-    _cx_result res = _cx_memb(_insert_entry_)(self, i_keyto((&key)));
-    if (res.inserted)
-        { *_i_keyref(res.ref) = key; _i_MAP_ONLY( res.ref->second = mapped; )}
+_cx_memb(_insert)(_cx_self* self, i_key _key _i_MAP_ONLY(, i_val _mapped)) {
+    _cx_result _res = _cx_memb(_insert_entry_)(self, i_keyto((&_key)));
+    if (_res.inserted)
+        { *_i_keyref(_res.ref) = _key; _i_MAP_ONLY( _res.ref->second = _mapped; )}
     else 
-        { i_keydrop((&key)); _i_MAP_ONLY( i_valdrop((&mapped)); )}
-    return res;
+        { i_keydrop((&_key)); _i_MAP_ONLY( i_valdrop((&_mapped)); )}
+    return _res;
 }
 
 STC_DEF _cx_result
@@ -297,30 +297,29 @@ _cx_memb(_push)(_cx_self* self, _cx_value _val) {
 
 #ifndef _i_isset
     STC_DEF _cx_result
-    _cx_memb(_insert_or_assign)(_cx_self* self, i_key key, i_val mapped) {
-        _cx_result res = _cx_memb(_insert_entry_)(self, i_keyto((&key)));
-        if (!res.nomem_error) {
-            if (res.inserted)
-                res.ref->first = key;
-            else
-                { i_keydrop((&key)); i_valdrop((&res.ref->second)); }
-            res.ref->second = mapped;
-        }
-        return res;
+    _cx_memb(_insert_or_assign)(_cx_self* self, i_key _key, i_val _mapped) {
+        _cx_result _res = _cx_memb(_insert_entry_)(self, i_keyto((&_key)));
+        _cx_mapped* _mp = _res.ref ? &_res.ref->second : &_mapped;
+        if (_res.inserted)
+            _res.ref->first = _key;
+        else
+            { i_keydrop((&_key)); i_valdrop(_mp); }
+        *_mp = _mapped;
+        return _res;
     }
 
     #if !defined i_no_emplace
     STC_DEF _cx_result
     _cx_memb(_emplace_or_assign)(_cx_self* self, _cx_rawkey rkey, i_valraw rmapped) {
-        _cx_result res = _cx_memb(_insert_entry_)(self, rkey);
-        if (!res.nomem_error) {
-            if (res.inserted)
-                res.ref->first = i_keyfrom(rkey);
-            else
-                { i_valdrop((&res.ref->second)); }
-            res.ref->second = i_valfrom(rmapped);
+        _cx_result _res = _cx_memb(_insert_entry_)(self, rkey);
+        if (_res.inserted)
+            _res.ref->first = i_keyfrom(rkey);
+        else {
+            if (!_res.ref) return _res;
+            i_valdrop((&_res.ref->second));
         }
-        return res;
+        _res.ref->second = i_valfrom(rmapped);
+        return _res;
     }
     #endif // !i_no_emplace
 #endif // !_i_isset
@@ -331,8 +330,8 @@ _cx_memb(_find_it)(const _cx_self* self, _cx_rawkey rkey, _cx_iter* out) {
     _cx_node *d = out->_d = self->nodes;
     out->_top = 0;
     while (tn) {
-        int c; const _cx_rawkey raw = i_keyto(_i_keyref(&d[tn].value));
-        if ((c = i_cmp_functor(self, (&raw), (&rkey))) < 0)
+        int c; const _cx_rawkey _raw = i_keyto(_i_keyref(&d[tn].value));
+        if ((c = i_cmp_functor(self, (&_raw), (&rkey))) < 0)
             tn = d[tn].link[1];
         else if (c > 0)
             { out->_st[out->_top++] = tn; tn = d[tn].link[0]; }
@@ -393,22 +392,23 @@ _cx_memb(_split_)(_cx_node *d, i_size tn) {
 }
 
 static i_size
-_cx_memb(_insert_entry_i_)(_cx_self* self, i_size tn, const _cx_rawkey* rkey, _cx_result* res) {
+_cx_memb(_insert_entry_i_)(_cx_self* self, i_size tn, const _cx_rawkey* rkey, _cx_result* _res) {
     i_size up[64], tx = tn;
     _cx_node* d = self->nodes;
     int c, top = 0, dir = 0;
     while (tx) {
         up[top++] = tx;
-        const _cx_rawkey raw = i_keyto(_i_keyref(&d[tx].value));
-        if (!(c = i_cmp_functor(self, (&raw), rkey)))
-            { res->ref = &d[tx].value; return tn; }
+        const _cx_rawkey _raw = i_keyto(_i_keyref(&d[tx].value));
+        if (!(c = i_cmp_functor(self, (&_raw), rkey)))
+            { _res->ref = &d[tx].value; return tn; }
         dir = (c < 0);
         tx = d[tx].link[dir];
     }
     if ((tx = _cx_memb(_new_node_)(self, 1)) == 0)
-        { res->nomem_error = true; return 0; }
+        return 0;
     d = self->nodes;
-    res->ref = &d[tx].value, res->inserted = true;
+    _res->ref = &d[tx].value;
+    _res->inserted = true;
     if (top == 0)
         return tx;
     d[up[top - 1]].link[dir] = tx;

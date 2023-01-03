@@ -116,7 +116,7 @@ typedef union {
 \
     typedef struct { \
         SELF##_value *ref; \
-        bool inserted, nomem_error; \
+        bool inserted; \
     } SELF##_result; \
 \
     typedef struct { \
@@ -169,7 +169,7 @@ typedef union {
 \
     typedef struct { \
         SELF##_value *ref; \
-        bool inserted, nomem_error; \
+        bool inserted; \
     } SELF##_result; \
 \
     typedef struct { \

@@ -312,11 +312,12 @@ STC_DEF void _cx_memb(_clear)(_cx_self* self) {
     STC_DEF _cx_result
     _cx_memb(_insert_or_assign)(_cx_self* self, i_key _key, i_val _mapped) {
         _cx_result _res = _cx_memb(_insert_entry_)(self, i_keyto((&_key)));
+        _cx_mapped* _mp = _res.ref ? &_res.ref->second : &_mapped;
         if (_res.inserted)
             _res.ref->first = _key;
-        else
-            { i_keydrop((&_key)); i_valdrop((&_res.ref->second)); }
-        _res.ref->second = _mapped;
+        else 
+            { i_keydrop((&_key)); i_valdrop(_mp); }
+        *_mp = _mapped;
         return _res;
     }
 
@@ -326,8 +327,10 @@ STC_DEF void _cx_memb(_clear)(_cx_self* self) {
         _cx_result _res = _cx_memb(_insert_entry_)(self, rkey);
         if (_res.inserted)
             _res.ref->first = i_keyfrom(rkey);
-        else
-            { i_valdrop((&_res.ref->second)); }
+        else {
+            if (!_res.ref) return _res;
+            i_valdrop((&_res.ref->second));
+        }
         _res.ref->second = i_valfrom(rmapped);
         return _res;
     }
@@ -354,12 +357,14 @@ _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr) {
 
 STC_DEF _cx_result
 _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey) {
-    bool nomem = false;
+    _cx_result res = {NULL};
     if (self->size + 2 > (i_size)((float)self->bucket_count * (i_max_load_factor)))
-        nomem = !_cx_memb(_reserve)(self, self->size*3/2);
+        if (!_cx_memb(_reserve)(self, self->size*3/2))
+            return res;
+
     chash_bucket_t b = _cx_memb(_bucket_)(self, &rkey);
-    _cx_result res = {&self->table[b.idx], !self->_hashx[b.idx], nomem};
-    if (res.inserted) {
+    res.ref = &self->table[b.idx];
+    if ((res.inserted = !self->_hashx[b.idx])) {
         self->_hashx[b.idx] = b.hx;
         ++self->size;
     }
