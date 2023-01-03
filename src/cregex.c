@@ -1060,8 +1060,8 @@ _regexec1(const _Reprog *progp,  /* program to run */
                 case TOK_NWBOUND:
                     ok = true;
                 case TOK_WBOUND: /* fallthrough */
-                    if (ok ^ (s == bol || s == j->eol || ((utf8_isalnum(utf8_peek_off(s, -1)) || s[-1] == '_')
-                                                        ^ (utf8_isalnum(utf8_peek(s)) || s[0] == '_'))))
+                    if (ok ^ (s == bol || s == j->eol || (utf8_isword(utf8_peek_off(s, -1))
+                                                        ^ utf8_isword(utf8_peek(s)))))
                         continue;
                     break;
                 case TOK_NCCLASS:
