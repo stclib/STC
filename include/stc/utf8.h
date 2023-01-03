@@ -9,6 +9,7 @@ enum {
     U8G_Cc, U8G_Lt, U8G_Nd, U8G_Nl,
     U8G_Pc, U8G_Pd, U8G_Pf, U8G_Pi,
     U8G_Sc, U8G_Zl, U8G_Zp, U8G_Zs,
+    U8G_SIZE
 };
 extern bool     utf8_isgroup(int group, uint32_t c); 
 extern bool     utf8_isblank(uint32_t c);

@@ -118,13 +118,11 @@ typedef struct {
 } URange16;
 
 typedef struct {
-  const char *name;
   const URange16 *r16;
   int nr16;
 } UGroup;
 
-static const UGroup unicode_groups[];
-static const int num_unicode_groups;
+static const UGroup unicode_groups[U8G_SIZE];
 
 bool utf8_isgroup(int group, uint32_t c) {
     for (int j=0; j<unicode_groups[group].nr16; ++j) {
@@ -162,6 +160,8 @@ bool utf8_isword(uint32_t c) {
     return utf8_islower(c) || utf8_isupper(c) || utf8_isgroup(U8G_Lt, c) ||
            utf8_isgroup(U8G_Nd, c) || utf8_isgroup(U8G_Pc, c) || utf8_isgroup(U8G_Nl, c);
 }
+
+/* The tables below are extracted from the RE2 library */
 
 static const URange16 Cc_range16[] = { // Control
     { 0, 31 },
@@ -328,9 +328,9 @@ static const URange16 Zs_range16[] = { // Space separator
 };
 
 #define UNI_ENTRY(Code) \
-    { #Code, Code##_range16, sizeof(Code##_range16)/(2*2) }
+    { Code##_range16, sizeof(Code##_range16)/sizeof(URange16) }
 
-static const UGroup unicode_groups[] = {
+static const UGroup unicode_groups[U8G_SIZE] = {
     [U8G_Cc] = UNI_ENTRY(Cc),
     [U8G_Lt] = UNI_ENTRY(Lt),
     [U8G_Nd] = UNI_ENTRY(Nd),
@@ -344,7 +344,5 @@ static const UGroup unicode_groups[] = {
     [U8G_Zp] = UNI_ENTRY(Zp),
     [U8G_Zs] = UNI_ENTRY(Zs),
 };
-
-static const int num_unicode_groups = sizeof unicode_groups / sizeof unicode_groups[0];
 
 #endif
