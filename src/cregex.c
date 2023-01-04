@@ -3,7 +3,7 @@ This is a Unix port of the Plan 9 regular expression library, by Rob Pike.
 Please send comments about the packaging to Russ Cox <rsc@swtch.com>.
 
 Copyright © 2021 Plan 9 Foundation
-Copyright © 2022 Tyge Løvset, for additions made in 2022.
+Copyright © 2023 Tyge Løvset, for additions.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
