@@ -37,8 +37,8 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_valto     // convertion func i_val* => i_valraw
 
 #define i_size      // default: uint32_t. If defined, table expand 2x (else 1.5x)
-#define i_hash_functor // advanced, see examples/cpque.c for similar usage.
-#define i_eq_functor // advanced, see examples/cpque.c for similar usage.
+#define i_hash_functor // advanced, see examples/functor.c for similar usage.
+#define i_eq_functor // advanced, see examples/functor.c for similar usage.
 #define i_tag       // alternative typename: cmap_{i_tag}. i_tag defaults to i_val
 #include <stc/cmap.h>
 ```

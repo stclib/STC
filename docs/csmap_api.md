@@ -32,7 +32,7 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 #define i_valfrom   // convertion func i_valraw => i_val
 #define i_valto     // convertion func i_val* => i_valraw
 
-#define i_cmp_functor // advanced, see examples/cpque.c for similar usage.
+#define i_cmp_functor // advanced, see examples/functor.c for similar usage.
 #define i_tag       // alternative typename: csmap_{i_tag}. i_tag defaults to i_val
 #include <stc/csmap.h>
 ```

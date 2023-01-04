@@ -60,23 +60,23 @@
 #define _c_RSEQ_N 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 #define _c_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, \
                  _14, _15, _16, N, ...) N
-
-#define c_STATIC_ASSERT(cond, msg) \
-    ((void)sizeof(int[(cond) ? 1 : -1]))
+/* Cast result to (void) to depress -Wall warning: */
+#define c_STATIC_ASSERT(cond, ...) \
+    ((int)(0*sizeof(int[(cond) ? 1 : -1])))
 #define c_CONTAINER_OF(p, T, m) \
     ((T*)((char*)(p) + 0*sizeof((p) == &((T*)0)->m) - offsetof(T, m)))
 
-#ifndef __cplusplus
-  #define c_ALLOC(T)            c_MALLOC(sizeof(T))
-  #define c_ALLOC_N(T, n)       c_MALLOC(sizeof(T)*(n))
-  #define c_NEW(T, ...)         ((T*)memcpy(c_ALLOC(T), (T[]){__VA_ARGS__}, sizeof(T)))
-  #define c_INIT(T)             (T)
-#else
+#ifdef __cplusplus
   #include <new>
   #define c_ALLOC(T)            static_cast<T*>(c_MALLOC(sizeof(T)))
   #define c_ALLOC_N(T, n)       static_cast<T*>(c_MALLOC(sizeof(T)*(n)))
   #define c_NEW(T, ...)         new (c_ALLOC(T)) T(__VA_ARGS__)
   #define c_INIT(T)             T
+#else
+  #define c_ALLOC(T)            ((T*)c_MALLOC(sizeof(T)))
+  #define c_ALLOC_N(T, n)       ((T*)c_MALLOC(sizeof(T)*(n)))
+  #define c_NEW(T, ...)         ((T*)memcpy(c_ALLOC(T), (T[]){__VA_ARGS__}, sizeof(T)))
+  #define c_INIT(T)             (T)
 #endif
 #ifndef c_MALLOC
   #define c_MALLOC(sz)          malloc(sz)

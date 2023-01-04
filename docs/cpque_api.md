@@ -18,7 +18,7 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 #define i_valfrom   // convertion func i_valraw => i_val
 #define i_valto     // convertion func i_val* => i_valraw.
 
-#define i_less_functor // takes self as first argument. See examples/cpque.c for usage.
+#define i_less_functor // takes self as first argument. See examples/functor.c for usage.
 #define i_tag       // alternative typename: cpque_{i_tag}. i_tag defaults to i_val
 #include <stc/cpque.h>
 ```
