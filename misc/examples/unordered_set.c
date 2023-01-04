@@ -22,7 +22,7 @@ int main()
         //     find returns end iterator if key is not found,
         //  else it returns iterator to that key
 
-        if (cset_str_find(&stringSet, key).ref == cset_str_end(&stringSet).ref)
+        if (cset_str_find(&stringSet, key).ref == NULL)
             printf("\"%s\" not found\n", key);
         else
             printf("Found \"%s\"\n", key);
