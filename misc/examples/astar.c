@@ -159,7 +159,9 @@ main(void)
         int width = cstr_find(&maze, "\n") + 1;
         c_WITH (cdeq_point path = astar(&maze, width), cdeq_point_drop(&path))
         {
-            c_FOREACH (it, cdeq_point, path) cstr_data(&maze)[point_index(it.ref)] = 'x';
+            c_FOREACH (it, cdeq_point, path)
+                cstr_data(&maze)[point_index(it.ref)] = 'x';
+            
             printf("%s", cstr_str(&maze));
         }
     }

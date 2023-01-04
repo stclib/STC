@@ -122,8 +122,6 @@ typedef const char* crawstr;
 #define c_SV2(str, n) (c_INIT(csview){str, n})
 #define c_ARGSV(sv) (int)(sv).size, (sv).str  /* use with "%.*s" */
 #define c_PAIR(ref) (ref)->first, (ref)->second
-#define c_sv c_SV                /* [deprecated] */
-#define c_ARGsv(sv) c_ARGSV(sv)  /* [deprecated] */
 
 #define _c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
@@ -203,7 +201,7 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
 #define c_WITH3(declvar, pred, drop) for (declvar, **_c_i = NULL; !_c_i && (pred); ++_c_i, drop)
 #define c_SCOPE(init, drop) for (int _c_i = (init, 0); !_c_i; ++_c_i, drop)
 #define c_DEFER(...) for (int _c_i = 0; !_c_i; ++_c_i, __VA_ARGS__)
-#define c_AUTODROP(C, a, ...) for (C a = __VA_ARGS__, **_c_i = NULL; !_c_i; ++_c_i, C##_drop(&a))
+#define c_DROP(C, ...) do { c_FORLIST (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
 
 #define c_AUTO(...) c_MACRO_OVERLOAD(c_AUTO, __VA_ARGS__)
 #define c_AUTO2(C, a) \
@@ -217,8 +215,6 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
 #define c_AUTO5(C, a, b, c, d) \
     c_WITH2(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
             (C##_drop(&d), C##_drop(&c), C##_drop(&b), C##_drop(&a)))
-
-#define c_DROP(C, ...) do { c_FORLIST (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
 
 #define c_FIND_IF(...) c_MACRO_OVERLOAD(c_FIND_IF, __VA_ARGS__)
 #define c_FIND_IF4(it, C, cnt, pred) do { \

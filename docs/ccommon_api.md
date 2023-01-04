@@ -3,7 +3,7 @@
 The following macros are recommended to use, and they safe/have no side-effects.
 
 ## Scope macros (RAII)
-### c_AUTO, c_AUTODROP, c_WITH, c_SCOPE, c_DEFER
+### c_AUTO, c_WITH, c_SCOPE, c_DEFER
 General ***defer*** mechanics for resource acquisition. These macros allows you to specify the
 freeing of the resources at the point where the acquisition takes place.
 The **checkauto** utility described below, ensures that the `c_AUTO*` macros are used correctly.
@@ -13,7 +13,6 @@ The **checkauto** utility described below, ensures that the `c_AUTO*` macros are
 | `c_WITH (Type var=init, drop)`         | Declare `var`. Defer `drop...` to end of scope            |
 | `c_WITH (Type var=init, pred, drop)`   | Adds a predicate in order to exit early if init failed    |
 | `c_AUTO (Type, var1,...,var4)`         | `c_WITH (Type var1=Type_init(), Type_drop(&var1))` ...    |
-| `c_AUTODROP (Type, var, init...)`      | Like `c_WITH (Type var=init..., Type_drop(&var))`         |
 | `c_SCOPE (init, drop)`                 | Execute `init` and defer `drop` to end of scope           |
 | `c_DEFER (drop...)`                    | Defer `drop...` to end of scope                           |
 | `continue`                             | Exit a block above without memory leaks                   |
@@ -50,7 +49,7 @@ c_AUTO (cstr, s1, s2)
     printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
 }
 
-c_AUTODROP (cstr, str, cstr_lit("Hello"))
+c_WITH (cstr str = cstr_lit("Hello"), cstr_drop(&str))
 {
     cstr_append(&str, " world");
     printf("%s\n", cstr_str(&str));

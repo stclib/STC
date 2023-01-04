@@ -42,11 +42,12 @@
 #define c_fortoken c_FORTOKEN
 #define c_fortoken_sv c_FORTOKEN_SV
 #define c_auto c_AUTO
-#define c_autodrop c_AUTODROP
 #define c_with c_WITH
 #define c_scope c_SCOPE
 #define c_defer c_DEFER
 #define c_drop c_DROP
+#define c_sv c_SV
+#define c_ARGsv c_ARGSV
 #define c_find_if c_FIND_IF
 #define c_erase_if c_ERASE_IF
 #define c_flt_take c_FLT_TAKE

@@ -52,12 +52,10 @@ do              { block_type |= LOOP; state = BRACESDONE; }
 c_with          |
 c_scope         |
 c_defer         |
-c_autodrop      |
 c_auto          |
 c_WITH          |
 c_SCOPE         |
 c_DEFER         |
-c_AUTODROP      |
 c_AUTO          { block_type = AUTO; state = BRACES; }
 \(              { if (state == BRACES) ++braces_lev; }
 \)              { if (state == BRACES && --braces_lev == 0) {
