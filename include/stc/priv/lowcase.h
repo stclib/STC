@@ -54,3 +54,5 @@
 #define c_flt_skip c_FLT_SKIP
 #define c_flt_skipwhile c_FLT_SKIPWHILE
 #define c_flt_takewhile c_FLT_TAKEWHILE
+#define cstr_new(lit) cstr_lit(lit)
+#define cstr_null cstr_NULL
