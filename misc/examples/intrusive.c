@@ -1,4 +1,4 @@
-// Example of intrusive list by using the node API.
+// Example of intrusive/shared list-nodes by using the node API.
 
 #include <stdio.h> 
 
@@ -13,11 +13,11 @@
 #include <stc/clist.h>
 
 void printLists(Inner inner, Outer outer) {
-        printf("inner:");
+        printf("  inner:");
         c_FOREACH (i, Inner, inner)
             printf(" %d", *i.ref);
 
-        printf("\nouter:");
+        printf("\n  outer:");
         c_FOREACH (i, Outer, outer)
             printf(" %d", i.ref->value);
         puts("");
@@ -29,26 +29,26 @@ int main()
     {
         Inner inner = Inner_init(); // do not destroy, outer will destroy the shared nodes.
 
-        c_FORLIST (i, int, {6, 9, 3, 1, 7, 4, 5, 2, 8})
-            Outer_push_back(&outer, (Inner_node){NULL, *i.ref});
+        c_FORLIST (i, int, {6, 9, 3, 1, 7, 4, 5, 2, 8}) {
+            Inner_node* node = Outer_push_back(&outer, (Inner_node){0});
+            node->value = *i.ref;
+        }
 
         c_FOREACH (i, Outer, outer)
-            Inner_push_node_back(&inner, Inner_get_node(&i.ref->value));
+            Inner_push_node_back(&inner, i.ref);
 
         printLists(inner, outer);
 
-        puts("sort inner");
+        puts("Sort inner");
         Inner_sort(&inner);
 
         printLists(inner, outer);
 
-        puts("remove 5 from both lists in O(1) time");
-        Inner_iter it1 = Inner_find(&inner, 5);
+        puts("Remove odd numbers from inner list");
 
-        if (it1.ref) {
-            Inner_unlink_node_after(&inner, it1.prev);
-            free(Outer_unlink_node_after(&outer, Outer_get_node(it1.prev)));
-        }
+        c_FOREACH (i, Inner, inner)
+            if (*i.ref & 1)
+                Inner_unlink_node_after(&inner, i.prev);
 
         printLists(inner, outer);
     }
