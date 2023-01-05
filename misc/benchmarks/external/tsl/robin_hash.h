@@ -324,19 +324,16 @@ class bucket_entry : public bucket_entry_hash<StoreHash> {
 
  public:
   static const distance_type EMPTY_MARKER_DIST_FROM_IDEAL_BUCKET = -1;
-  static const distance_type DIST_FROM_IDEAL_BUCKET_LIMIT = 4096;
+  static const distance_type DIST_FROM_IDEAL_BUCKET_LIMIT = 8192;
   static_assert(DIST_FROM_IDEAL_BUCKET_LIMIT <=
                     std::numeric_limits<distance_type>::max() - 1,
                 "DIST_FROM_IDEAL_BUCKET_LIMIT must be <= "
                 "std::numeric_limits<distance_type>::max() - 1.");
 
  private:
-  using storage = typename std::aligned_storage<sizeof(value_type),
-                                                alignof(value_type)>::type;
-
   distance_type m_dist_from_ideal_bucket;
   bool m_last_bucket;
-  storage m_value;
+  alignas(value_type) unsigned char m_value[sizeof(value_type)];
 };
 
 /**
@@ -1234,7 +1231,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
       dist_from_ideal_bucket++;
     }
 
-    if (rehash_on_extreme_load()) {
+    while (rehash_on_extreme_load(dist_from_ideal_bucket)) {
       ibucket = bucket_for_hash(hash);
       dist_from_ideal_bucket = 0;
 
@@ -1296,7 +1293,7 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
     while (!m_buckets[ibucket].empty()) {
       if (dist_from_ideal_bucket >
           m_buckets[ibucket].dist_from_ideal_bucket()) {
-        if (dist_from_ideal_bucket >=
+        if (dist_from_ideal_bucket >
             bucket_entry::DIST_FROM_IDEAL_BUCKET_LIMIT) {
           /**
            * The number of probes is really high, rehash the map on the next
@@ -1382,8 +1379,11 @@ class robin_hash : private Hash, private KeyEqual, private GrowthPolicy {
    *
    * Return true if the table has been rehashed.
    */
-  bool rehash_on_extreme_load() {
-    if (m_grow_on_next_insert || size() >= m_load_threshold) {
+  bool rehash_on_extreme_load(distance_type curr_dist_from_ideal_bucket) {
+    if (m_grow_on_next_insert ||
+        curr_dist_from_ideal_bucket >
+            bucket_entry::DIST_FROM_IDEAL_BUCKET_LIMIT ||
+        size() >= m_load_threshold) {
       rehash_impl(GrowthPolicy::next_bucket_count());
       m_grow_on_next_insert = false;
 

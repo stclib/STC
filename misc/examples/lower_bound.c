@@ -18,20 +18,24 @@ int main()
 
         cvec_int_sort(&vec);
 
-        key = 500;
+        key = 100;
         res = cvec_int_lower_bound(&vec, key).ref;
-        if (res != cvec_int_end(&vec).ref)
-            printf("Sorted Vec %d: lower bound: %d\n", key, *res); // 600
+        if (res)
+            printf("Sorted Vec %d: lower bound: %d\n", key, *res); // 500
 
-        key = 550;
-        res = cvec_int_lower_bound(&vec, key).ref;
-        if (res != cvec_int_end(&vec).ref)
-            printf("Sorted Vec %d: lower_bound: %d\n", key, *res); // 500
+        key = 10;
+        cvec_int_iter it1 = cvec_int_lower_bound(&vec, key);
+        if (res)
+            printf("Sorted Vec %3d: lower_bound: %d\n", key, *it1.ref); // 30
 
-        key = 500;
-        res = cvec_int_binary_search(&vec, key).ref;
-        if (res != cvec_int_end(&vec).ref)
-            printf("Sorted Vec %d: bin. search: %d\n", key, *res); // 500
+        key = 600;
+        cvec_int_iter it2 = cvec_int_binary_search(&vec, key);
+        if (res)
+            printf("Sorted Vec %d: bin. search: %d\n", key, *it2.ref); // 600
+
+        c_FOREACH (i, cvec_int, it1, it2)
+            printf("  %d\n", *i.ref);
+
         puts("");
     }
 
@@ -43,20 +47,22 @@ int main()
         c_FORLIST (i, int, {40, 600, 1, 7000, 2, 500, 30})
             csset_int_push(&set, *i.ref);
 
-        key = 500;
+        key = 100;
         res = csset_int_lower_bound(&set, key).ref;
-        if (res != csset_int_end(&set).ref)
-            printf("Sorted Set %d: lower bound: %d\n", key, *res); // 600
+        if (res)
+            printf("Sorted Set %d: lower bound: %d\n", key, *res); // 500
 
-        key = 550;
-        res = csset_int_lower_bound(&set, key).ref;
-        if (res != csset_int_end(&set).ref)
-            printf("Sorted Set %d: lower bound: %d\n", key, *res); // 600
+        key = 10;
+        csset_int_iter it1 = csset_int_lower_bound(&set, key);
+        if (res)
+            printf("Sorted Set %3d: lower bound: %d\n", key, *it1.ref); // 30
 
-        key = 500;
-        res = csset_int_find(&set, key).ref;
-        if (res != csset_int_end(&set).ref)
-            printf("Sorted Set %d: find       : %d\n", key, *res); // 600
+        key = 600;
+        csset_int_iter it2 = csset_int_find(&set, key);
+        if (res)
+            printf("Sorted Set %d: find       : %d\n", key, *it2.ref); // 600
+
+        c_FOREACH (i, csset_int, it1, it2)
+            printf("  %d\n", *i.ref);
     }
-    return 0;
 }
