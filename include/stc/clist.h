@@ -110,11 +110,11 @@ STC_API _cx_value*      _cx_memb(_push_node_back)(_cx_self* self, _cx_node* node
 STC_API _cx_value*      _cx_memb(_insert_node_after)(_cx_self* self, _cx_node* ref, _cx_node* node);
 STC_API _cx_node*       _cx_memb(_unlink_node_after)(_cx_self* self, _cx_node* ref);
 STC_API void            _cx_memb(_erase_node_after)(_cx_self* self, _cx_node* ref);
+STC_INLINE _cx_node*    _cx_memb(_get_node)(_cx_value* vp) { return _clist_tonode(vp); }
 
 #if !defined i_no_clone
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
-STC_INLINE i_key        _cx_memb(_value_clone)(i_key val)
-                            { return i_keyclone(val); }
+STC_INLINE i_key        _cx_memb(_value_clone)(i_key val) { return i_keyclone(val); }
 STC_INLINE void
 _cx_memb(_copy)(_cx_self *self, const _cx_self* other) {
     if (self->last == other->last) return;

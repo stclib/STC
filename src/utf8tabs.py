@@ -2,16 +2,16 @@
 import pandas as pd
 import numpy as np
 
-_UNICODE_DIR = "https://www.unicode.org/Public/14.0.0/ucd"
+_UNICODE_DIR = "https://www.unicode.org/Public/15.0.0/ucd"
 
 
-def read_unidata(casetype='lowcase', category='Lu', big=False):
+def read_unidata(casetype='lowcase', category='Lu', range32=False):
     df = pd.read_csv(_UNICODE_DIR+'/UnicodeData.txt', sep=';', converters={0: lambda x: int(x, base=16)},
                       names=['code', 'name', 'category', 'canclass', 'bidircat', 'chrdecomp',
                              'decdig', 'digval', 'numval', 'mirrored', 'uc1name', 'comment',
                              'upcase', 'lowcase', 'titlecase'],
                       usecols=['code', 'name', 'category', 'bidircat', 'upcase', 'lowcase', 'titlecase'])
-    if big:
+    if range32:
         df = df[df['code'] >= (1<<16)]
     else:
         df = df[df['code'] < (1<<16)]
@@ -27,11 +27,11 @@ def read_unidata(casetype='lowcase', category='Lu', big=False):
     return df
 
 
-def read_casefold(big=False):
+def read_casefold(range32=False):
     df = pd.read_csv(_UNICODE_DIR+'/CaseFolding.txt', engine='python', sep='; #? ?', comment='#',
                      converters={0: lambda x: int(x, base=16)},
                      names=['code', 'status', 'lowcase', 'name']) # comment => 'name'
-    if big:
+    if range32:
         df = df[df['code'] >= (1<<16)]
     else:
         df = df[df['code'] < (1<<16)]
@@ -100,11 +100,11 @@ def print_index_table(name, indtab):
     print('\n};')
 
 
-def compile_table(casetype='lowcase', category=None):
+def compile_table(casetype='lowcase', category=None, range32=False):
     if category:
-        df = read_unidata(casetype, category)
+        df = read_unidata(casetype, category, range32)
     else:
-        df = read_casefold()
+        df = read_casefold(range32)
     caselist = make_caselist(df, casetype)
     table = make_table(caselist)
     return table
@@ -113,10 +113,11 @@ def compile_table(casetype='lowcase', category=None):
 def main():
     print('#include <stdint.h>\n')
     print('struct CaseMapping { uint16_t c1, c2, m2; };\n')
+    range32 = False
 
-    casemappings = compile_table('lowcase') # CaseFolding.txt
-    upcase       = compile_table('lowcase', 'Lu') # UnicodeData.txt uppercase
-    lowcase      = compile_table('upcase', 'Ll') # UnicodeData.txt lowercase
+    casemappings = compile_table('lowcase', None, range32) # CaseFolding.txt
+    upcase       = compile_table('lowcase', 'Lu', range32) # UnicodeData.txt uppercase
+    lowcase      = compile_table('upcase', 'Ll', range32) # UnicodeData.txt lowercase
 
     casefolding_len = len(casemappings)
 
@@ -150,7 +151,8 @@ def main():
     print_index_table('upcase_ind', upcase_ind)
 
     # lowcase => up. add "missing" SHARP S caused by https://www.unicode.org/policies/stability_policy.html#Case_Pair
-    lowcase_ind.append(next(i for i,x in enumerate(casemappings) if x[0]==ord('ẞ')))
+    if not range32:
+        lowcase_ind.append(next(i for i,x in enumerate(casemappings) if x[0]==ord('ẞ')))
     lowcase_ind.sort(key=lambda i: casemappings[i][2] - (casemappings[i][1] - casemappings[i][0]))         
     print_index_table('lowcase_ind', lowcase_ind)
 

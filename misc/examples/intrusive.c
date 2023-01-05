@@ -1,4 +1,4 @@
-// Example of intrusive list by using the node API and typesafe c_CONTAINER_OF().
+// Example of intrusive list by using the node API.
 
 #include <stdio.h> 
 
@@ -33,7 +33,7 @@ int main()
             Outer_push_back(&outer, (Inner_node){NULL, *i.ref});
 
         c_FOREACH (i, Outer, outer)
-            Inner_push_node_back(&inner, c_CONTAINER_OF(&i.ref->value, Inner_node, value));
+            Inner_push_node_back(&inner, Inner_get_node(&i.ref->value));
 
         printLists(inner, outer);
 
@@ -47,7 +47,7 @@ int main()
 
         if (it1.ref) {
             Inner_unlink_node_after(&inner, it1.prev);
-            free(Outer_unlink_node_after(&outer, c_CONTAINER_OF(it1.prev, Outer_node, value)));
+            free(Outer_unlink_node_after(&outer, Outer_get_node(it1.prev)));
         }
 
         printLists(inner, outer);
