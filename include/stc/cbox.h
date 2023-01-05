@@ -137,7 +137,7 @@ STC_INLINE _cx_self _cx_memb(_from)(_cx_value val)
         if (!other.get)
             return other;
         _cx_self out = {c_ALLOC(i_key)};
-        *out.get = i_keyclone(*other.get);
+        *out.get = i_keyclone((*other.get));
         return out;
     }
 #endif // !i_no_clone
@@ -162,7 +162,7 @@ STC_INLINE int _cx_memb(_raw_cmp)(const _cx_raw* rx, const _cx_raw* ry)
 
 STC_INLINE int _cx_memb(_cmp)(const _cx_self* x, const _cx_self* y) {
     _cx_raw rx = i_keyto(x->get), ry = i_keyto(y->get);
-    return i_cmp(&rx, &ry);
+    return i_cmp((&rx), (&ry));
 }
 #endif
 
@@ -172,7 +172,7 @@ STC_INLINE bool _cx_memb(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
 
 STC_INLINE bool _cx_memb(_eq)(const _cx_self* x, const _cx_self* y) {
     _cx_raw rx = i_keyto(x->get), ry = i_keyto(y->get);
-    return i_eq(&rx, &ry);
+    return i_eq((&rx), (&ry));
 }
 #endif
 
@@ -181,7 +181,7 @@ STC_INLINE uint64_t _cx_memb(_raw_hash)(const _cx_raw* rx)
     { return i_hash(rx); }
 
 STC_INLINE uint64_t _cx_memb(_hash)(const _cx_self* x)
-    { _cx_raw rx = i_keyto(x->get); return i_hash(&rx); }
+    { _cx_raw rx = i_keyto(x->get); return i_hash((&rx)); }
 #endif
 
 #include "priv/template.h"
