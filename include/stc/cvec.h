@@ -128,7 +128,6 @@ STC_INLINE size_t       _cx_memb(_size)(const _cx_self* self) { return self->_le
 STC_INLINE size_t       _cx_memb(_capacity)(const _cx_self* self) { return self->_cap; }
 STC_INLINE bool         _cx_memb(_empty)(const _cx_self* self) { return !self->_len; }
 STC_INLINE _cx_raw      _cx_memb(_value_toraw)(const _cx_value* val) { return i_keyto(val); }
-STC_INLINE void         _cx_memb(_swap)(_cx_self* a, _cx_self* b) { c_SWAP(_cx_self, *a, *b); }
 STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return self->data; }
 STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self)
                             { return self->data + self->_len - 1; }

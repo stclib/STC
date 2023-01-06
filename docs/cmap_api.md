@@ -56,7 +56,6 @@ void                  cmap_X_copy(cmap_X* self, const cmap_X* other);
 float                 cmap_X_max_load_factor(const cmap_X* self);                                     // default: 0.85f
 bool                  cmap_X_reserve(cmap_X* self, size_t size);
 void                  cmap_X_shrink_to_fit(cmap_X* self);
-void                  cmap_X_swap(cmap_X* a, cmap_X* b);
 void                  cmap_X_drop(cmap_X* self);                                                // destructor
 
 size_t                cmap_X_size(const cmap_X* self);

@@ -35,7 +35,6 @@ void                cdeq_X_copy(cdeq_X* self, const cdeq_X* other);
 cdeq_X_iter         cdeq_X_copy_range(cdeq_X* self, i_val* pos, const i_val* p1, const i_val* p2);
 bool                cdeq_X_reserve(cdeq_X* self, size_t cap);
 void                cdeq_X_shrink_to_fit(cdeq_X* self);
-void                cdeq_X_swap(cdeq_X* a, cdeq_X* b);
 void                cdeq_X_drop(cdeq_X* self);                                                    // destructor
 
 bool                cdeq_X_empty(const cdeq_X* self);

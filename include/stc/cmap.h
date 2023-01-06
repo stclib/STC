@@ -115,7 +115,6 @@ STC_INLINE size_t       _cx_memb(_size)(const _cx_self* map) { return map->size;
 STC_INLINE size_t       _cx_memb(_bucket_count)(_cx_self* map) { return map->bucket_count; }
 STC_INLINE size_t       _cx_memb(_capacity)(const _cx_self* map)
                             { return (size_t)((float)map->bucket_count * (i_max_load_factor)); }
-STC_INLINE void         _cx_memb(_swap)(_cx_self *map1, _cx_self *map2) {c_SWAP(_cx_self, *map1, *map2); }
 STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, _cx_rawkey rkey)
                             { return self->size && self->_hashx[_cx_memb(_bucket_)(self, &rkey).idx]; }
 
@@ -416,7 +415,7 @@ _cx_memb(_reserve)(_cx_self* self, const size_t _newcap) {
             m.table[b.idx] = *e;
             m._hashx[b.idx] = (uint8_t)b.hx;
         }
-        c_SWAP(_cx_self, *self, m);
+        c_SWAP(_cx_self, self, &m);
     }
     c_FREE(m._hashx);
     c_FREE(m.table);

@@ -25,12 +25,12 @@ int main()
 
         key = 10;
         cvec_int_iter it1 = cvec_int_lower_bound(&vec, key);
-        if (res)
+        if (it1.ref)
             printf("Sorted Vec %3d: lower_bound: %d\n", key, *it1.ref); // 30
 
         key = 600;
         cvec_int_iter it2 = cvec_int_binary_search(&vec, key);
-        if (res)
+        if (it2.ref)
             printf("Sorted Vec %d: bin. search: %d\n", key, *it2.ref); // 600
 
         c_FOREACH (i, cvec_int, it1, it2)
@@ -54,12 +54,12 @@ int main()
 
         key = 10;
         csset_int_iter it1 = csset_int_lower_bound(&set, key);
-        if (res)
+        if (it1.ref)
             printf("Sorted Set %3d: lower bound: %d\n", key, *it1.ref); // 30
 
         key = 600;
         csset_int_iter it2 = csset_int_find(&set, key);
-        if (res)
+        if (it2.ref)
             printf("Sorted Set %d: find       : %d\n", key, *it2.ref); // 600
 
         c_FOREACH (i, csset_int, it1, it2)

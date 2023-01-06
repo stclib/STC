@@ -120,7 +120,6 @@ STC_API void            _cx_memb(_next)(_cx_iter* it);
 STC_INLINE bool         _cx_memb(_empty)(const _cx_self* cx) { return cx->size == 0; }
 STC_INLINE size_t       _cx_memb(_size)(const _cx_self* cx) { return cx->size; }
 STC_INLINE size_t       _cx_memb(_capacity)(const _cx_self* cx) { return cx->cap; }
-STC_INLINE void         _cx_memb(_swap)(_cx_self* a, _cx_self* b) { c_SWAP(_cx_self, *a, *b); }
 STC_INLINE _cx_iter     _cx_memb(_find)(const _cx_self* self, _cx_rawkey rkey)
                             { _cx_iter it; _cx_memb(_find_it)(self, rkey, &it); return it; }
 STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, _cx_rawkey rkey)

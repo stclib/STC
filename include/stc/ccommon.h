@@ -85,8 +85,9 @@
   #define c_FREE(p)             free(p)
 #endif
 
-#define c_DELETE(T, ptr)        do { T *_c_p = ptr; T##_drop(_c_p); c_FREE(_c_p); } while (0)
-#define c_SWAP(T, x, y)         do { T _c_t = x; x = y; y = _c_t; } while (0)
+#define c_DELETE(T, ptr)        do { T *_tp = ptr; T##_drop(_tp); c_FREE(_tp); } while (0)
+#define c_SWAP(T, xp, yp)       do { T *_xp = xp, *_yp = yp, \
+                                    _tv = *_xp; *_xp = *_yp; *_yp = _tv; } while (0)
 #define c_ARRAYLEN(a)           (sizeof (a)/sizeof *(a))
 
 // x and y are i_keyraw* type, defaults to i_key*:

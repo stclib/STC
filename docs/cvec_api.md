@@ -42,7 +42,6 @@ bool                cvec_X_reserve(cvec_X* self, size_t cap);
 bool                cvec_X_resize(cvec_X* self, size_t size, i_val null);
 cvec_X_iter         cvec_X_insert_uninit(cvec_X* self, i_val* pos, size_t n);              // return pos iter 
 void                cvec_X_shrink_to_fit(cvec_X* self);
-void                cvec_X_swap(cvec_X* a, cvec_X* b);
 void                cvec_X_drop(cvec_X* self);                                               // destructor
 
 bool                cvec_X_empty(const cvec_X* self);

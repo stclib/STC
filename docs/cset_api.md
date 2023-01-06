@@ -38,7 +38,6 @@ void                cset_X_copy(cset_X* self, const cset_X* other);
 float               cset_X_max_load_factor(const cset_X* self);                      // default: 0.85
 bool                cset_X_reserve(cset_X* self, size_t size);
 void                cset_X_shrink_to_fit(cset_X* self);
-void                cset_X_swap(cset_X* a, cset_X* b);
 void                cset_X_drop(cset_X* self);                                       // destructor
 
 size_t              cset_X_size(const cset_X* self);                                 // num. of allocated buckets
