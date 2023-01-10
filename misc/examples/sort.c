@@ -3,24 +3,25 @@
 #include <stdio.h>
 #include <stc/crandom.h>
 
-typedef long long Elem;
-#define fmt_Elem "%lld"
 #ifdef __cplusplus
   #include <algorithm>
+  typedef long long csort_elm_value;
 #else
-  #define i_val Elem
+  #define i_tag elm
+  #define i_val long long
   #include <stc/algo/csort.h>
 #endif
+#define fmt_Elem "%lld"
 
 
-int testsort(Elem *a, size_t size, const char *desc) {
+int testsort(csort_elm_value *a, size_t size, const char *desc) {
     clock_t t = clock();
 #ifdef __cplusplus
     printf("std::sort: ");
     std::sort(a, a + size);
 #else
     printf("csort: ");
-    csort_Elem(a, size);
+    csort_elm(a, size);
 #endif
     t = clock() - t;
 
@@ -31,7 +32,7 @@ int testsort(Elem *a, size_t size, const char *desc) {
 
 int main(int argc, char *argv[]) {
     size_t i, size = argc > 1 ? strtoull(argv[1], NULL, 0) : 10000000;
-    Elem *a = (Elem*)malloc(sizeof(*a) * size);
+    csort_elm_value *a = (csort_elm_value*)malloc(sizeof(*a) * size);
     if (a == NULL) return -1;
 
     for (i = 0; i < size; i++)

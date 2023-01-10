@@ -40,7 +40,7 @@ template params:
 #include <algorithm>
 #endif
 
-void testsort(csortval_int *a, size_t size, const char *desc) {
+void testsort(csort_int_value *a, size_t size, const char *desc) {
     clock_t t = clock();
     csort_int(a, size);
     t = clock() - t;
@@ -51,7 +51,7 @@ void testsort(csortval_int *a, size_t size, const char *desc) {
 
 int main() {
     size_t i, size = 10000000;
-    csortval_int *a = (csortval_int*)malloc(sizeof(*a) * size);
+    csort_int_value *a = (csort_int_value*)malloc(sizeof(*a) * size);
     if (a != NULL) {
         for (i = 0; i < size; i++)
             a[i] = crandom() & (1U << 28) - 1;
@@ -61,7 +61,7 @@ int main() {
         free(a);
     }
 }*/
-typedef i_val c_PASTE(csortval_, i_tag);
+typedef i_val c_PASTE(c_PASTE(csort_, i_tag), _value);
 
 static inline void c_PASTE(cisort_, i_tag)(i_val arr[], intptr_t lo, intptr_t hi) {
     for (intptr_t j = lo, i = lo + 1; i <= hi; j = i, ++i) {
