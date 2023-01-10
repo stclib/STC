@@ -3,8 +3,8 @@
 #include <stdio.h>
 #include <stc/crandom.h>
 
-typedef float Elem;
-#define fmt_Elem "%g"
+typedef long long Elem;
+#define fmt_Elem "%lld"
 #ifdef __cplusplus
   #include <algorithm>
 #else
@@ -49,6 +49,13 @@ int main(int argc, char *argv[]) {
 
     for (i = 0; i < size; i++) a[i] = 126735;
     testsort(a, size, "constant");
+
+    for (i = 0; i < size; i++) a[i] = i + 1;
+    a[size - 1] = 0;
+    testsort(a, size, "rotated");
+
+    for (i = 0; i < size; i++) a[i] = i % (size / 2);
+    testsort(a, size, "repeated");
 
     free(a);
 }
