@@ -60,11 +60,6 @@
 #define _c_RSEQ_N 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1, 0
 #define _c_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, \
                  _14, _15, _16, N, ...) N
-/* Cast result to (void) to depress -Wall warning: */
-#define c_STATIC_ASSERT(cond, ...) \
-    ((int)(0*sizeof(int[(cond) ? 1 : -1])))
-#define c_CONTAINER_OF(p, T, m) \
-    ((T*)((char*)(p) + 0*sizeof((p) == &((T*)0)->m) - offsetof(T, m)))
 
 #ifdef __cplusplus
   #include <new>
@@ -85,10 +80,12 @@
   #define c_FREE(p)             free(p)
 #endif
 
+#define c_STATIC_ASSERT(b, ...) ((int)(0*sizeof(int[(b) ? 1 : -1])))
+#define c_CONTAINER_OF(p, T, m) ((T*)((char*)(p) + 0*sizeof((p) == &((T*)0)->m) - offsetof(T, m)))
 #define c_DELETE(T, ptr)        do { T *_tp = ptr; T##_drop(_tp); c_FREE(_tp); } while (0)
 #define c_SWAP(T, xp, yp)       do { T *_xp = xp, *_yp = yp, \
                                     _tv = *_xp; *_xp = *_yp; *_yp = _tv; } while (0)
-#define c_ARRAYLEN(a)           (sizeof (a)/sizeof *(a))
+#define c_ARRAYLEN(a)           (sizeof(a)/sizeof 0[a])
 
 // x and y are i_keyraw* type, defaults to i_key*:
 #define c_default_cmp(x, y)     (c_default_less(y, x) - c_default_less(x, y))
@@ -200,8 +197,8 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
 #define c_WITH(...) c_MACRO_OVERLOAD(c_WITH, __VA_ARGS__)
 #define c_WITH2(declvar, drop) for (declvar, **_c_i = NULL; !_c_i; ++_c_i, drop)
 #define c_WITH3(declvar, pred, drop) for (declvar, **_c_i = NULL; !_c_i && (pred); ++_c_i, drop)
-#define c_SCOPE(init, drop) for (int _c_i = (init, 0); !_c_i; ++_c_i, drop)
-#define c_DEFER(...) for (int _c_i = 0; !_c_i; ++_c_i, __VA_ARGS__)
+#define c_SCOPE(init, drop) for (int _c_i = (init, 1); _c_i; --_c_i, drop)
+#define c_DEFER(...) for (int _c_i = 1; _c_i; --_c_i, __VA_ARGS__)
 #define c_DROP(C, ...) do { c_FORLIST (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
 
 #define c_AUTO(...) c_MACRO_OVERLOAD(c_AUTO, __VA_ARGS__)
