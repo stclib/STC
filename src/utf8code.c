@@ -134,31 +134,19 @@ bool utf8_isgroup(int group, uint32_t c) {
     return false;
 }
 
+bool utf8_isalpha(uint32_t c) {
+    static int16_t groups[] = {U8G_Latin, U8G_Nl, U8G_Greek, U8G_Cyrillic,
+                               U8G_Han, U8G_Arabic, U8G_Devanaga};
+    for (unsigned j=0; j < c_ARRAYLEN(groups); ++j)
+        if (utf8_isgroup(groups[j], c))
+            return true;
+    return false;
+}
+
 bool utf8_iscased(uint32_t c) {
     if (c < 128) return isalpha(c) != 0;
-    return utf8_islower(c) || utf8_isupper(c) || utf8_isgroup(U8G_Lt, c);
-}
-
-bool utf8_isalnum(uint32_t c) {
-    if (c < 128) return isalnum(c) != 0;
-    return utf8_islower(c) || utf8_isupper(c) || utf8_isgroup(U8G_Lt, c) ||
-           utf8_isgroup(U8G_Nd, c) || utf8_isgroup(U8G_Nl, c);
-}
-
-bool utf8_isblank(uint32_t c) {
-    if (c < 128) return (c == ' ') | (c == '\t');
-    return utf8_isgroup(U8G_Zs, c);
-}
-
-bool utf8_isspace(uint32_t c) {
-    if (c < 128) return isspace(c) != 0;
-    return ((c == 8232) | (c == 8233)) || utf8_isgroup(U8G_Zs, c);
-}
-
-bool utf8_isword(uint32_t c) {
-    if (c < 128) return (isalnum(c) != 0) | (c == '_');
-    return utf8_islower(c) || utf8_isupper(c) || utf8_isgroup(U8G_Lt, c) ||
-           utf8_isgroup(U8G_Nd, c) || utf8_isgroup(U8G_Pc, c) || utf8_isgroup(U8G_Nl, c);
+    return utf8_islower(c) || utf8_isupper(c) || 
+           utf8_isgroup(U8G_Lt, c);
 }
 
 /* The tables below are extracted from the RE2 library */
@@ -327,6 +315,136 @@ static const URange16 Zs_range16[] = { // Space separator
     { 12288, 12288 },
 };
 
+static const URange16 Arabic_range16[] = {
+	{ 1536, 1540 },
+	{ 1542, 1547 },
+	{ 1549, 1562 },
+	{ 1564, 1566 },
+	{ 1568, 1599 },
+	{ 1601, 1610 },
+	{ 1622, 1647 },
+	{ 1649, 1756 },
+	{ 1758, 1791 },
+	{ 1872, 1919 },
+	{ 2160, 2190 },
+	{ 2192, 2193 },
+	{ 2200, 2273 },
+	{ 2275, 2303 },
+	{ 64336, 64450 },
+	{ 64467, 64829 },
+	{ 64832, 64911 },
+	{ 64914, 64967 },
+	{ 64975, 64975 },
+	{ 65008, 65023 },
+	{ 65136, 65140 },
+	{ 65142, 65276 },
+};
+
+static const URange16 Cyrillic_range16[] = {
+	{ 1024, 1156 },
+	{ 1159, 1327 },
+	{ 7296, 7304 },
+	{ 7467, 7467 },
+	{ 7544, 7544 },
+	{ 11744, 11775 },
+	{ 42560, 42655 },
+	{ 65070, 65071 },
+};
+
+static const URange16 Devanagari_range16[] = {
+	{ 2304, 2384 },
+	{ 2389, 2403 },
+	{ 2406, 2431 },
+	{ 43232, 43263 },
+};
+
+static const URange16 Greek_range16[] = {
+	{ 880, 883 },
+	{ 885, 887 },
+	{ 890, 893 },
+	{ 895, 895 },
+	{ 900, 900 },
+	{ 902, 902 },
+	{ 904, 906 },
+	{ 908, 908 },
+	{ 910, 929 },
+	{ 931, 993 },
+	{ 1008, 1023 },
+	{ 7462, 7466 },
+	{ 7517, 7521 },
+	{ 7526, 7530 },
+	{ 7615, 7615 },
+	{ 7936, 7957 },
+	{ 7960, 7965 },
+	{ 7968, 8005 },
+	{ 8008, 8013 },
+	{ 8016, 8023 },
+	{ 8025, 8025 },
+	{ 8027, 8027 },
+	{ 8029, 8029 },
+	{ 8031, 8061 },
+	{ 8064, 8116 },
+	{ 8118, 8132 },
+	{ 8134, 8147 },
+	{ 8150, 8155 },
+	{ 8157, 8175 },
+	{ 8178, 8180 },
+	{ 8182, 8190 },
+	{ 8486, 8486 },
+	{ 43877, 43877 },
+};
+
+static const URange16 Han_range16[] = {
+	{ 11904, 11929 },
+	{ 11931, 12019 },
+	{ 12032, 12245 },
+	{ 12293, 12293 },
+	{ 12295, 12295 },
+	{ 12321, 12329 },
+	{ 12344, 12347 },
+	{ 13312, 19903 },
+	{ 19968, 40959 },
+	{ 63744, 64109 },
+	{ 64112, 64217 },
+};
+
+static const URange16 Latin_range16[] = {
+	{ 65, 90 },
+	{ 97, 122 },
+	{ 170, 170 },
+	{ 186, 186 },
+	{ 192, 214 },
+	{ 216, 246 },
+	{ 248, 696 },
+	{ 736, 740 },
+	{ 7424, 7461 },
+	{ 7468, 7516 },
+	{ 7522, 7525 },
+	{ 7531, 7543 },
+	{ 7545, 7614 },
+	{ 7680, 7935 },
+	{ 8305, 8305 },
+	{ 8319, 8319 },
+	{ 8336, 8348 },
+	{ 8490, 8491 },
+	{ 8498, 8498 },
+	{ 8526, 8526 },
+	{ 8544, 8584 },
+	{ 11360, 11391 },
+	{ 42786, 42887 },
+	{ 42891, 42954 },
+	{ 42960, 42961 },
+	{ 42963, 42963 },
+	{ 42965, 42969 },
+	{ 42994, 43007 },
+	{ 43824, 43866 },
+	{ 43868, 43876 },
+	{ 43878, 43881 },
+	{ 64256, 64262 },
+	{ 65313, 65338 },
+	{ 65345, 65370 },
+};
+
 #define UNI_ENTRY(Code) \
     { Code##_range16, sizeof(Code##_range16)/sizeof(URange16) }
 
@@ -343,6 +461,12 @@ static const UGroup unicode_groups[U8G_SIZE] = {
     [U8G_Zl] = UNI_ENTRY(Zl),
     [U8G_Zp] = UNI_ENTRY(Zp),
     [U8G_Zs] = UNI_ENTRY(Zs),
+    [U8G_Arabic] = UNI_ENTRY(Arabic),
+    [U8G_Cyrillic] = UNI_ENTRY(Cyrillic),
+    [U8G_Devanaga] = UNI_ENTRY(Devanagari),
+    [U8G_Greek] = UNI_ENTRY(Greek),
+    [U8G_Han] = UNI_ENTRY(Han),
+    [U8G_Latin] = UNI_ENTRY(Latin),
 };
 
 #endif

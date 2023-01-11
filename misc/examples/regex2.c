@@ -12,6 +12,7 @@ int main()
         },
         {"!((abc|123)+)!", "!123abcabc!"},
         {"(\\p{L&}+ )+(\\p{Nd}+)", "Großpackung süßigkeiten 199"},
+        {"\\p{Han}+", "This is Han: 王明：那是杂志吗？"},
     };
 
     c_AUTO (cregex, re)

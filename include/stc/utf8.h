@@ -1,6 +1,7 @@
 #ifndef UTF8_H_INCLUDED
 #define UTF8_H_INCLUDED
 
+#include <ctype.h>
 #include "forward.h"
 #include "ccommon.h"
 
@@ -9,32 +10,46 @@ enum {
     U8G_Cc, U8G_Lt, U8G_Nd, U8G_Nl,
     U8G_Pc, U8G_Pd, U8G_Pf, U8G_Pi,
     U8G_Sc, U8G_Zl, U8G_Zp, U8G_Zs,
+    U8G_Arabic, U8G_Cyrillic,
+    U8G_Devanaga, U8G_Greek,
+    U8G_Han, U8G_Latin,
     U8G_SIZE
 };
+
 extern bool     utf8_isgroup(int group, uint32_t c); 
-extern bool     utf8_isblank(uint32_t c);
-extern bool     utf8_iscased(uint32_t c);
-extern bool     utf8_isalnum(uint32_t c);
-extern bool     utf8_isdigit(uint32_t c);
-extern bool     utf8_isspace(uint32_t c);
-extern bool     utf8_isword(uint32_t c);
+extern bool     utf8_isalpha(uint32_t c);
 extern uint32_t utf8_casefold(uint32_t c);
 extern uint32_t utf8_tolower(uint32_t c);
 extern uint32_t utf8_toupper(uint32_t c);
+extern bool     utf8_iscased(uint32_t c);
 extern bool     utf8_valid_n(const char* s, size_t nbytes);
 extern int      utf8_icmp_sv(csview s1, csview s2);
 extern unsigned utf8_encode(char *out, uint32_t c);
 extern uint32_t utf8_peek_off(const char *s, int offset);
 
-STC_INLINE bool utf8_isalpha(uint32_t c) {
-    return utf8_iscased(c) || utf8_isgroup(U8G_Nl, c);
+STC_INLINE bool utf8_isupper(uint32_t c) 
+    { return utf8_tolower(c) != c; }
+
+STC_INLINE bool utf8_islower(uint32_t c) 
+    { return utf8_toupper(c) != c; }
+
+STC_INLINE bool utf8_isalnum(uint32_t c) {
+    if (c < 128) return isalnum(c) != 0;
+    return utf8_isalpha(c) || utf8_isgroup(U8G_Nd, c);
 }
 
+STC_INLINE bool utf8_isword(uint32_t c)
+    { return utf8_isalnum(c) || utf8_isgroup(U8G_Pc, c); }
 
-/* following functions uses src/utf8code.c */
+STC_INLINE bool utf8_isblank(uint32_t c) {
+    if (c < 128) return (c == ' ') | (c == '\t');
+    return utf8_isgroup(U8G_Zs, c);
+}
 
-STC_INLINE bool utf8_isupper(uint32_t c) { return utf8_tolower(c) != c; }
-STC_INLINE bool utf8_islower(uint32_t c) { return utf8_toupper(c) != c; }
+STC_INLINE bool utf8_isspace(uint32_t c) {
+    if (c < 128) return isspace(c) != 0;
+    return ((c == 8232) | (c == 8233)) || utf8_isgroup(U8G_Zs, c);
+}
 
 /* decode next utf8 codepoint. https://bjoern.hoehrmann.de/utf-8/decoder/dfa */
 typedef struct { uint32_t state, codep; } utf8_decode_t;

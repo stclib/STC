@@ -151,6 +151,12 @@ enum {
     UTF_zl = UTF_GRP+2*U8G_Zl, UTF_ZL, /* utf8 separator line */
     UTF_zp = UTF_GRP+2*U8G_Zp, UTF_ZP, /* utf8 separator paragraph */
     UTF_zs = UTF_GRP+2*U8G_Zs, UTF_ZS, /* utf8 separator space */
+    UTF_arabic = UTF_GRP+2*U8G_Arabic, UTF_ARABIC,
+    UTF_cyrillic = UTF_GRP+2*U8G_Cyrillic, UTF_CYRILLIC,
+    UTF_devanaga = UTF_GRP+2*U8G_Devanaga, UTF_DEVANAGA,
+    UTF_greek = UTF_GRP+2*U8G_Greek, UTF_GREEK,
+    UTF_han = UTF_GRP+2*U8G_Han, UTF_HAN,
+    UTF_latin = UTF_GRP+2*U8G_Latin, UTF_LATIN,
     TOK_ANY     = 0x8200000,    /* Any character except newline, . */
     TOK_ANYNL   ,               /* Any character including newline, . */
     TOK_NOP     ,               /* No operation, internal use only */
@@ -637,7 +643,7 @@ _lexasciiclass(_Parser *par, _Rune *rp) /* assume *rp == '[' and *par->exprp == 
 static void
 _lexutfclass(_Parser *par, _Rune *rp)
 {
-    static struct { const char* c; int n, r; } cls[] = {
+    static struct { const char* c; uint32_t n, r; } cls[] = {
         {"{Alpha}", 7, UTF_al}, {"{L&}", 4, UTF_lc},
         {"{Digit}", 7, UTF_nd}, {"{Nd}", 4, UTF_nd},
         {"{Lower}", 7, UTF_ll}, {"{Ll}", 4, UTF_ll},
@@ -651,6 +657,9 @@ _lexutfclass(_Parser *par, _Rune *rp)
         {"{Pf}", 4, UTF_pf}, {"{Pi}", 4, UTF_pi},
         {"{Zl}", 4, UTF_zl}, {"{Zp}", 4, UTF_zp},
         {"{Zs}", 4, UTF_zs}, {"{Sc}", 4, UTF_sc},
+        {"{Arabic}", 8, UTF_arabic}, {"{Cyrillic}", 10, UTF_cyrillic},
+        {"{Devanaga}", 10, UTF_devanaga}, {"{Greek}", 7, UTF_greek},
+        {"{Han}", 5, UTF_han}, {"{Latin}", 7, UTF_latin},
     };
     int inv = (*rp == 'P');
     for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i) {
@@ -924,18 +933,24 @@ _runematch(_Rune s, _Rune r)
     case UTF_LC: inv = 1; case UTF_lc: return inv ^ utf8_iscased(r); 
     case UTF_AL: inv = 1; case UTF_al: return inv ^ utf8_isalpha(r);
     case UTF_WR: inv = 1; case UTF_wr: return inv ^ utf8_isword(r);
-    case UTF_CC: case UTF_cc:
-    case UTF_LT: case UTF_lt:
-    case UTF_ND: case UTF_nd:
-    case UTF_NL: case UTF_nl:
-    case UTF_PC: case UTF_pc:
-    case UTF_PD: case UTF_pd:
-    case UTF_PF: case UTF_pf:
-    case UTF_PI: case UTF_pi:
-    case UTF_SC: case UTF_sc:
-    case UTF_ZL: case UTF_zl:
-    case UTF_ZP: case UTF_zp:
-    case UTF_ZS: case UTF_zs:
+    case UTF_cc: case UTF_CC:
+    case UTF_lt: case UTF_LT:
+    case UTF_nd: case UTF_ND:
+    case UTF_nl: case UTF_NL:
+    case UTF_pc: case UTF_PC:
+    case UTF_pd: case UTF_PD:
+    case UTF_pf: case UTF_PF:
+    case UTF_pi: case UTF_PI:
+    case UTF_sc: case UTF_SC:
+    case UTF_zl: case UTF_ZL:
+    case UTF_zp: case UTF_ZP:
+    case UTF_zs: case UTF_ZS:
+    case UTF_arabic: case UTF_ARABIC:
+    case UTF_cyrillic: case UTF_CYRILLIC:
+    case UTF_devanaga: case UTF_DEVANAGA:
+    case UTF_greek: case UTF_GREEK:
+    case UTF_han: case UTF_HAN:
+    case UTF_latin: case UTF_LATIN:
         n = s - UTF_GRP;
         inv = n & 1;
         return inv ^ utf8_isgroup(n / 2, r);

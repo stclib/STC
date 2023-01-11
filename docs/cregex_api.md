@@ -203,6 +203,12 @@ For reference, **cregex** uses the following files:
 | \p{Space} | Match UTF8 whitespace: (Zs \t\r\n\v\f] | * |
 | \p{Word} | Match UTF8 word character: (Alnum Pc) | * |
 | \p{XDigit} | Match hex number | * |
+| \p{Arabic} | Language class | * |
+| \p{Cyrillic} | Language class | * |
+| \p{Devanaga} | Language class | * |
+| \p{Greek} | Language class | * |
+| \p{Han} | Language class | * |
+| \p{Latin} | Language class | * |
 | \P{***Class***} | Do not match the classes described above | * |
 | [:alnum:] [:alpha:] [:ascii:] | Match ASCII character class. NB: only to be used inside [] brackets | * |
 | [:blank:] [:cntrl:] [:digit:] | " | * |
