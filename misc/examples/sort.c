@@ -42,6 +42,8 @@ int main(int argc, char *argv[]) {
     for (i = 0; i < 20; i++)
         printf(" " fmt_Elem, a[i]);
     puts("");
+    for (i = 1; i < size; i++)
+        if (a[i - 1] > a[i]) return -1;
 
     testsort(a, size, "sorted");
 
@@ -55,7 +57,7 @@ int main(int argc, char *argv[]) {
     a[size - 1] = 0;
     testsort(a, size, "rotated");
 
-    for (i = 0; i < size; i++) a[i] = i % (size / 2);
+    for (i = 0; i < size; i++) a[i] = i % (size / 8);
     testsort(a, size, "repeated");
 
     free(a);

@@ -74,32 +74,32 @@ static inline void c_PASTE(cisort_, i_tag)(i_val arr[], intptr_t lo, intptr_t hi
     }
 }
 
-static inline void c_PASTE(cqsort_, i_tag)(i_val arr[], intptr_t lo, intptr_t hi)
-{
-    intptr_t i = lo, j = hi;
-    i_val pivot = arr[lo + (hi - lo)*7/16];
+static inline void c_PASTE(cqsort_, i_tag)(i_val arr[], intptr_t lo, intptr_t hi) {
+    intptr_t i = lo, j;
+    while (lo < hi) {
+        i_val pivot = arr[lo + (hi - lo)*7/16];
+        j = hi;
 
-    while (i <= j) {
-        while (i_less((&arr[i]), (&pivot))) ++i;
-        while (i_less((&pivot), (&arr[j]))) --j;
-        if (i <= j) {
-            c_SWAP(i_val, arr+i, arr+j);
-            ++i; --j;
+        while (i <= j) {
+            while (i_less((&arr[i]), (&pivot))) ++i;
+            while (i_less((&pivot), (&arr[j]))) --j;
+            if (i <= j) {
+                c_SWAP(i_val, arr+i, arr+j);
+                ++i; --j;
+            }
         }
+        if (j - lo > hi - i) {
+            c_SWAP(intptr_t, &lo, &i);
+            c_SWAP(intptr_t, &hi, &j);
+        }
+
+        if (j - lo > 64) c_PASTE(cqsort_, i_tag)(arr, lo, j);
+        else if (j > lo) c_PASTE(cisort_, i_tag)(arr, lo, j);
+        lo = i;
     }
-    if (j - lo > hi - i) {
-        c_SWAP(intptr_t, &lo, &i);
-        c_SWAP(intptr_t, &hi, &j);
-    }
-    if (j - lo > 64) c_PASTE(cqsort_, i_tag)(arr, lo, j);
-    else if (j > lo) c_PASTE(cisort_, i_tag)(arr, lo, j);
-    if (hi - i > 64) c_PASTE(cqsort_, i_tag)(arr, i, hi);
-    else if (hi > i) c_PASTE(cisort_, i_tag)(arr, i, hi);
 }
 
 static inline void c_PASTE(csort_, i_tag)(i_val arr[], size_t n)
-{
-    if (n > 64) c_PASTE(cqsort_, i_tag)(arr, 0, (intptr_t)n - 1);
-    else        c_PASTE(cisort_, i_tag)(arr, 0, (intptr_t)n - 1);
-}
+    { c_PASTE(cqsort_, i_tag)(arr, 0, (intptr_t)n - 1); }
+
 #include <stc/priv/template.h>
