@@ -11,7 +11,7 @@ int main()
          "https://en.cppreference.com/w/cpp/regex/regex_search"
         },
         {"!((abc|123)+)!", "!123abcabc!"},
-        {"(\\p{L&}+ )+(\\p{Nd}+)", "Großpackung süßigkeiten 199"},
+        {"(\\p{Alpha}+ )+(\\p{Nd}+)", "Großpackung süßigkeiten 199"},
         {"\\p{Han}+", "This is Han: 王明：那是杂志吗？"},
     };
 

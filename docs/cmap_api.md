@@ -220,8 +220,8 @@ int main()
         cmap_vi_insert(&vecs, (Vec3i){  0,   0, 100}, 3);
         cmap_vi_insert(&vecs, (Vec3i){100, 100, 100}, 4);
 
-        c_FORPAIR (vec, num, cmap_vi, vecs)
-            printf("{ %3d, %3d, %3d }: %d\n", _.vec->x, _.vec->y, _.vec->z, *_.num);
+        c_FORPAIR (v3, num, cmap_vi, vecs)
+            printf("{ %3d, %3d, %3d }: %d\n", _.v3->x, _.v3->y, _.v3->z, *_.num);
     }
 }
 ```
@@ -253,8 +253,8 @@ int main()
         cmap_iv_insert(&vecs, 3, (Vec3i){  0,   0, 100});
         cmap_iv_insert(&vecs, 4, (Vec3i){100, 100, 100});
 
-        c_FORPAIR (num, vec, cmap_iv, vecs)
-            printf("%d: { %3d, %3d, %3d }\n", *_.num, _.vec->x, _.vec->y, _.vec->z);
+        c_FORPAIR (num, v3, cmap_iv, vecs)
+            printf("%d: { %3d, %3d, %3d }\n", *_.num, _.v3->x, _.v3->y, _.v3->z);
     }
 }
 ```
@@ -378,7 +378,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
 
 // With this in place, we define the Viking => int hash map type:
 #define i_type      Vikings
-#define i_keyclass Viking
+#define i_keyclass  Viking
 #define i_keyraw    RViking
 #define i_keyfrom   Viking_from
 #define i_opt       c_no_clone // disable map cloning

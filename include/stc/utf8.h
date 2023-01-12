@@ -22,6 +22,7 @@ extern uint32_t utf8_casefold(uint32_t c);
 extern uint32_t utf8_tolower(uint32_t c);
 extern uint32_t utf8_toupper(uint32_t c);
 extern bool     utf8_iscased(uint32_t c);
+extern bool     utf8_isword(uint32_t c);
 extern bool     utf8_valid_n(const char* s, size_t nbytes);
 extern int      utf8_icmp_sv(csview s1, csview s2);
 extern unsigned utf8_encode(char *out, uint32_t c);
@@ -37,9 +38,6 @@ STC_INLINE bool utf8_isalnum(uint32_t c) {
     if (c < 128) return isalnum(c) != 0;
     return utf8_isalpha(c) || utf8_isgroup(U8G_Nd, c);
 }
-
-STC_INLINE bool utf8_isword(uint32_t c)
-    { return utf8_isalnum(c) || utf8_isgroup(U8G_Pc, c); }
 
 STC_INLINE bool utf8_isblank(uint32_t c) {
     if (c < 128) return (c == ' ') | (c == '\t');

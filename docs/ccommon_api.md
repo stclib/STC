@@ -21,23 +21,18 @@ For multiple variables, use either multiple **c_WITH** in sequence, or declare v
 scope and use **c_SCOPE**. For convenience, **c_AUTO** support up to 4 variables.
 ```c
 // `c_WITH` is similar to python `with`: it declares and can drop a variable after going out of scope.
-c_WITH (uint8_t* buf = malloc(BUF_SIZE), free(buf))
-c_WITH (FILE* fp = fopen(fname, "rb"), fclose(fp))
+bool ok = false;
+c_WITH (uint8_t* buf = malloc(BUF_SIZE), buf != NULL, free(buf))
+c_WITH (FILE* fp = fopen(fname, "rb"), fp != NULL, fclose(fp))
 {
-    int n = 0;
-    if (fp && buf) {
-        n = fread(buf, 1, BUF_SIZE, fp);
-        doSomething(buf, n);
-    }
+    int n = fread(buf, 1, BUF_SIZE, fp);
+    if (n <= 0) continue; // auto cleanup! NB do not break or return here.
+    ...
+    ok = true;
 }
+return ok;
 
-c_WITH (cstr str = cstr_lit("Hello"), cstr_drop(&str))
-{
-    cstr_append(&str, " world");
-    printf("%s\n", cstr_str(&str));
-}
-
-// `c_AUTO` automatically initialize and destruct up to 4 variables, like `c_WITH`.
+// `c_AUTO` automatically initialize and destruct up to 4 variables, like c_WITH.
 c_AUTO (cstr, s1, s2)
 {
     cstr_append(&s1, "Hello");
@@ -62,7 +57,7 @@ c_SCOPE (pthread_mutex_lock(&mut), pthread_mutex_unlock(&mut))
     /* Do syncronized work. */
 }
 
-// `c_DEFER` executes the expressions when leaving scope.
+// `c_DEFER` executes the expressions when leaving scope. Prefer c_WITH or c_SCOPE.
 cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
 c_DEFER (cstr_drop(&s1), cstr_drop(&s2))
 {
@@ -82,10 +77,10 @@ cvec_str readFile(const char* name)
 {
     cvec_str vec = cvec_str_init(); // returned
 
-    c_WITH (FILE* fp = fopen(name, "r"), fclose(fp))
-        c_WITH (cstr line = cstr_NULL, cstr_drop(&line))
-            while (cstr_getline(&line, fp))
-                cvec_str_emplace_back(&vec, cstr_str(&line));
+    c_WITH (FILE* fp = fopen(name, "r"), fp != NULL, fclose(fp))
+    c_WITH (cstr line = cstr_NULL, cstr_drop(&line))
+        while (cstr_getline(&line, fp))
+            cvec_str_emplace_back(&vec, cstr_str(&line));
     return vec;
 }
 

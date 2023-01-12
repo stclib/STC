@@ -136,7 +136,8 @@ bool utf8_isgroup(int group, uint32_t c) {
 
 bool utf8_isalpha(uint32_t c) {
     static int16_t groups[] = {U8G_Latin, U8G_Nl, U8G_Greek, U8G_Cyrillic,
-                               U8G_Han, U8G_Arabic, U8G_Devanagari};
+                               U8G_Han, U8G_Devanagari, U8G_Arabic};
+    if (c < 128) return isalpha(c) != 0;
     for (unsigned j=0; j < c_ARRAYLEN(groups); ++j)
         if (utf8_isgroup(groups[j], c))
             return true;
@@ -147,6 +148,12 @@ bool utf8_iscased(uint32_t c) {
     if (c < 128) return isalpha(c) != 0;
     return utf8_islower(c) || utf8_isupper(c) || 
            utf8_isgroup(U8G_Lt, c);
+}
+
+bool utf8_isword(uint32_t c) {
+    if (c < 128) return (isalnum(c) != 0) | (c == '_');
+    return utf8_isalpha(c) || utf8_isgroup(U8G_Nd, c) ||
+           utf8_isgroup(U8G_Pc, c);
 }
 
 /* The tables below are extracted from the RE2 library */
