@@ -153,7 +153,7 @@ enum {
     UTF_zs = UTF_GRP+2*U8G_Zs, UTF_ZS, /* utf8 separator space */
     UTF_arabic = UTF_GRP+2*U8G_Arabic, UTF_ARABIC,
     UTF_cyrillic = UTF_GRP+2*U8G_Cyrillic, UTF_CYRILLIC,
-    UTF_devanaga = UTF_GRP+2*U8G_Devanaga, UTF_DEVANAGA,
+    UTF_devanagari = UTF_GRP+2*U8G_Devanagari, UTF_DEVANAGARI,
     UTF_greek = UTF_GRP+2*U8G_Greek, UTF_GREEK,
     UTF_han = UTF_GRP+2*U8G_Han, UTF_HAN,
     UTF_latin = UTF_GRP+2*U8G_Latin, UTF_LATIN,
@@ -658,7 +658,7 @@ _lexutfclass(_Parser *par, _Rune *rp)
         {"{Zl}", 4, UTF_zl}, {"{Zp}", 4, UTF_zp},
         {"{Zs}", 4, UTF_zs}, {"{Sc}", 4, UTF_sc},
         {"{Arabic}", 8, UTF_arabic}, {"{Cyrillic}", 10, UTF_cyrillic},
-        {"{Devanaga}", 10, UTF_devanaga}, {"{Greek}", 7, UTF_greek},
+        {"{Devanagari}", 10, UTF_devanagari}, {"{Greek}", 7, UTF_greek},
         {"{Han}", 5, UTF_han}, {"{Latin}", 7, UTF_latin},
     };
     int inv = (*rp == 'P');
@@ -947,7 +947,7 @@ _runematch(_Rune s, _Rune r)
     case UTF_zs: case UTF_ZS:
     case UTF_arabic: case UTF_ARABIC:
     case UTF_cyrillic: case UTF_CYRILLIC:
-    case UTF_devanaga: case UTF_DEVANAGA:
+    case UTF_devanagari: case UTF_DEVANAGARI:
     case UTF_greek: case UTF_GREEK:
     case UTF_han: case UTF_HAN:
     case UTF_latin: case UTF_LATIN:

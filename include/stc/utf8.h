@@ -11,7 +11,7 @@ enum {
     U8G_Pc, U8G_Pd, U8G_Pf, U8G_Pi,
     U8G_Sc, U8G_Zl, U8G_Zp, U8G_Zs,
     U8G_Arabic, U8G_Cyrillic,
-    U8G_Devanaga, U8G_Greek,
+    U8G_Devanagari, U8G_Greek,
     U8G_Han, U8G_Latin,
     U8G_SIZE
 };

@@ -205,7 +205,7 @@ For reference, **cregex** uses the following files:
 | \p{XDigit} | Match hex number | * |
 | \p{Arabic} | Language class | * |
 | \p{Cyrillic} | Language class | * |
-| \p{Devanaga} | Language class | * |
+| \p{Devanagari} | Language class | * |
 | \p{Greek} | Language class | * |
 | \p{Han} | Language class | * |
 | \p{Latin} | Language class | * |

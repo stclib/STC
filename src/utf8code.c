@@ -136,7 +136,7 @@ bool utf8_isgroup(int group, uint32_t c) {
 
 bool utf8_isalpha(uint32_t c) {
     static int16_t groups[] = {U8G_Latin, U8G_Nl, U8G_Greek, U8G_Cyrillic,
-                               U8G_Han, U8G_Arabic, U8G_Devanaga};
+                               U8G_Han, U8G_Arabic, U8G_Devanagari};
     for (unsigned j=0; j < c_ARRAYLEN(groups); ++j)
         if (utf8_isgroup(groups[j], c))
             return true;
@@ -463,7 +463,7 @@ static const UGroup unicode_groups[U8G_SIZE] = {
     [U8G_Zs] = UNI_ENTRY(Zs),
     [U8G_Arabic] = UNI_ENTRY(Arabic),
     [U8G_Cyrillic] = UNI_ENTRY(Cyrillic),
-    [U8G_Devanaga] = UNI_ENTRY(Devanagari),
+    [U8G_Devanagari] = UNI_ENTRY(Devanagari),
     [U8G_Greek] = UNI_ENTRY(Greek),
     [U8G_Han] = UNI_ENTRY(Han),
     [U8G_Latin] = UNI_ENTRY(Latin),
