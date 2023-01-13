@@ -28,14 +28,14 @@ using_cspan(IntSpan, int);
 int main()
 {
     int array[] = {1, 2, 3, 4, 5};
-    IntSpan span = {array, c_ARRAYLEN(array)};
+    IntSpan span = cspan_from(array);
     
     c_FOREACH (i, IntSpan, span)
         printf(" %d", *i.ref);
     puts("");
     
     // use a temporary IntSpan object.
-    c_FORFILTER (i, IntSpan, cspan_LITERAL(IntSpan, {10, 20, 30, 23, 22, 21})
+    c_FORFILTER (i, IntSpan, cspan_object(IntSpan, {10, 20, 30, 23, 22, 21})
                   , c_FLT_SKIPWHILE(i, *i.ref < 25)
                  && (*i.ref & 1) == 0 // even only
                   , c_FLT_TAKE(i, 2)) // break after 2
@@ -48,30 +48,33 @@ int main()
 
 #include <stc/ccommon.h>
 
-#define cspan_LITERAL(C, ...) \
+#define cspan_object(C, ...) \
     ((C){.data = (C##_value[])__VA_ARGS__, \
          .size = sizeof((C##_value[])__VA_ARGS__)/sizeof(C##_value)})
 
+#define cspan_from(data) \
+    {data + c_STATIC_ASSERT(sizeof(data) != sizeof(void*)), c_ARRAYLEN(data)}
+#define cspan_make(data, size) \
+    {data + c_STATIC_ASSERT(c_ARRAYLEN(data) >= size || sizeof(data) == sizeof(void*)), size}
+#define cspan_size(self) ((size_t)(self)->size)
+
 #define using_cspan(Self, T) \
-typedef T Self##_raw; typedef const Self##_raw Self##_value; \
-typedef struct { Self##_value *data; size_t size; } Self; \
-typedef struct { Self##_value *ref, *end; } Self##_iter; \
- \
-STC_INLINE Self##_value* Self##_at(const Self* self, size_t idx) \
-    { assert(idx < self->size); return self->data + idx; } \
- \
-STC_INLINE Self##_iter Self##_begin(const Self* self) { \
-    Self##_iter it = {self->data, self->data + self->size}; \
-    return it; \
-} \
- \
-STC_INLINE Self##_iter Self##_end(const Self* self) { \
-    Self##_iter it = {NULL, self->data + self->size}; \
-    return it; \
-} \
- \
-STC_INLINE void Self##_next(Self##_iter* it) \
-    { if (++it->ref == it->end) it->ref = NULL; } \
-struct stc_nostruct
+    typedef T Self##_raw, Self##_value; \
+    typedef struct { Self##_value *data; size_t size; } Self; \
+    typedef struct { Self##_value *ref, *end; } Self##_iter; \
+    \
+    STC_INLINE Self##_value* Self##_at(const Self* self, size_t idx) \
+        { assert(idx < self->size); return self->data + idx; } \
+    STC_INLINE Self##_iter Self##_begin(const Self* self) { \
+        Self##_iter it = {self->data, self->data + self->size}; \
+        return it; \
+    } \
+    STC_INLINE Self##_iter Self##_end(const Self* self) { \
+        Self##_iter it = {NULL, self->data + self->size}; \
+        return it; \
+    } \
+    STC_INLINE void Self##_next(Self##_iter* it) \
+        { if (++it->ref == it->end) it->ref = NULL; } \
+    struct stc_nostruct
 
 #endif

@@ -282,7 +282,7 @@ c_FORFILTER (i, crange, r1
 
 // 2. The 11 first primes:
 printf("2");
-c_FORFILTER (i, crange, crange_LITERAL(3, INT64_MAX, 2) 
+c_FORFILTER (i, crange, crange_object(3, INT64_MAX, 2) 
               , isPrime(*i.ref)
               , c_FLT_TAKE(10))
     printf(" %lld", *i.ref);
