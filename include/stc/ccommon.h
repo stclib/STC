@@ -80,7 +80,7 @@
   #define c_FREE(p)             free(p)
 #endif
 
-#define c_STATIC_ASSERT(b, ...) ((int)(0*sizeof(int[(b) ? 1 : -1])))
+#define c_STATIC_ASSERT(b)      ((int)(0*sizeof(int[(b) ? 1 : -1])))
 #define c_CONTAINER_OF(p, T, m) ((T*)((char*)(p) + 0*sizeof((p) == &((T*)0)->m) - offsetof(T, m)))
 #define c_DELETE(T, ptr)        do { T *_tp = ptr; T##_drop(_tp); c_FREE(_tp); } while (0)
 #define c_SWAP(T, xp, yp)       do { T *_xp = xp, *_yp = yp, \

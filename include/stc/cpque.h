@@ -112,11 +112,11 @@ STC_INLINE void _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
 
 STC_DEF void
 _cx_memb(_sift_down_)(_cx_self* self, const size_t idx, const size_t n) {
-    _cx_value* arr = self->data - 1; 
+    _cx_value t, *arr = self->data - 1;
     for (size_t r = idx, c = idx*2; c <= n; c *= 2) {
-        c += (c < n && (i_less_functor(self, (&arr[c]), (&arr[c + 1]))));
+        c += i_less_functor(self, (&arr[c]), (&arr[c + (c < n)]));
         if (!(i_less_functor(self, (&arr[r]), (&arr[c])))) return;
-        _cx_value t = arr[r]; arr[r] = arr[c]; arr[r = c] = t;
+        t = arr[r], arr[r] = arr[c], arr[r = c] = t;
     }
 }
 
