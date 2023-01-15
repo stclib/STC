@@ -1,16 +1,19 @@
 #ifndef FMT_H_INCLUDED
 #define FMT_H_INCLUDED
-/*
-void        fmt_print(dst, fmt, ...);
-void        fmt_drop_buffer(fmt_buffer* buf);
+/* 
+VER 2.0: NEW API:
 
-  dst - destination, one of:
-    int fd          1=stdout, 2=stderr
+void        fmt_print(fmt, ...);
+void        fmt_println(fmt, ...); // see remark below
+void        fmt_printd(dest, fmt, ...);
+void        fmt_freebuffer(fmt_buffer* buf);
+
+  dest - destination, one of:
     FILE* fp        Write to a file
     char* strbuf    Write to a pre-allocated string buffer
     fmt_buffer* buf Auto realloc the needed memory (safe).
                     Set buf->stream=1 for stream-mode.
-                    Call fmt_drop_buffer(buf) after usage.
+                    Call fmt_freebuffer(buf) after usage.
 
   fmt - format string
     {}              Auto-detected format. If :MOD is not specified,
@@ -22,10 +25,11 @@ void        fmt_drop_buffer(fmt_buffer* buf);
 
 * C11 or higher required.
 * MAX 255 chars fmt string by default. MAX 12 arguments after fmt string.
+* fmt_println(): a) fmt must be a const char* literal. b) at least one argument after fmt required by ISO C99.
 * Static linking by default, shared symbols by defining FMT_HEADER / FMT_IMPLEMENT.
 * (c) operamint, 2022, MIT License.
 -----------------------------------------------------------------------------------
-#include "fmt.h"
+#include "c11/fmt.h"
 
 int main() {
     const double pi = 3.141592653589793;
@@ -37,22 +41,22 @@ int main() {
     unsigned char r = 123, g = 214, b = 90, w = 110;
     char buffer[64];
 
-    fmt_print(1, "Color: ({} {} {}), {}\n", r, g, b, flag);
-    fmt_print(1, "Wide: {}, {}\n", wstr, L"wide world");
-    fmt_print(1, "{:10} {:10} {:10.2f}\n", 42ull, 43, pi);
-    fmt_print(stdout, "{:>10} {:>10} {:>10}\n", z, z, w);
-    fmt_print(stdout, "{:10} {:10} {:10}\n", "Hello", "Mad", "World");
-    fmt_print(stderr, "100%: {:<20} {:.*} {}\n", string, 4, pi, x);
-    fmt_print(buffer, "Precision: {} {:.10} {}", string, pi, x);
-    fmt_print(1, "{}\n", buffer);
-    fmt_print(1, "Vector: ({}, {}, {})\n", 3.2, 3.3, pi);
+    fmt_print("Color: ({} {} {}), {}\n", r, g, b, flag);
+    fmt_println("Wide: {}, {}", wstr, L"wide world");
+    fmt_println("{:10} {:10} {:10.2f}", 42ull, 43, pi);
+    fmt_println("{:>10} {:>10} {:>10}", z, z, w);
+    fmt_printd(stdout, "{:10} {:10} {:10}\n", "Hello", "Mad", "World");
+    fmt_printd(stderr, "100%: {:<20} {:.*} {}\n", string, 4, pi, x);
+    fmt_printd(buffer, "Precision: {} {:.10} {}", string, pi, x);
+    fmt_println("{}", buffer);
+    fmt_println("Vector: ({}, {}, {})", 3.2, 3.3, pi);
 
     fmt_buffer out[1] = {{.stream=1}};
-    fmt_print(out, "{} {}", "Pi is:", pi);
-    fmt_print(1,   "{}, len={}, cap={}\n", out->data, out->len, out->cap);
-    fmt_print(out, "{} {}", ", Pi squared is:", pi*pi);
-    fmt_print(1,   "{}, len={}, cap={}\n", out->data, out->len, out->cap);
-    fmt_drop_buffer(out);
+    fmt_printd(out, "{} {}", "Pi is:", pi);
+    fmt_print("{}, len={}, cap={}\n", out->data, out->len, out->cap);
+    fmt_printd(out, "{} {}", ", Pi squared is:", pi*pi);
+    fmt_print("{}, len={}, cap={}\n", out->data, out->len, out->cap);
+    fmt_freebuffer(out);
 }
 */
 #include <stdio.h>
@@ -87,58 +91,60 @@ typedef struct {
     _Bool stream;
 } fmt_buffer;
 
-FMT_API void fmt_drop_buffer(fmt_buffer* buf);
+FMT_API void fmt_freebuffer(fmt_buffer* buf);
 FMT_API int  _fmt_parse(char* p, int nargs, const char *fmt, ...);
-FMT_API void _fmt_iprint(int fd, const char* fmt, ...);
 FMT_API void _fmt_bprint(fmt_buffer*, const char* fmt, ...);
 
 #ifndef FMT_MAX
 #define FMT_MAX 256
 #endif
 
+#define fmt_print(...) fmt_printd(stdout, __VA_ARGS__)
+#define fmt_println(fmt, ...) fmt_printd(stdout, fmt "\n", __VA_ARGS__)
+
 /* Primary function. */
-#define fmt_print(...) fmt_OVERLOAD(fmt_print, __VA_ARGS__)
-#define fmt_print2(to, fmt) \
+#define fmt_printd(...) fmt_OVERLOAD(fmt_printd, __VA_ARGS__)
+#define fmt_printd2(to, fmt) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 0, fmt); \
         fmt_OK(_n == 0); _fmt_fn(to)(to, fmt); } while (0)
-#define fmt_print3(to, fmt, c) \
+#define fmt_printd3(to, fmt, c) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 1, fmt, _fc(c)); \
         fmt_OK(_n == 1); _fmt_fn(to)(to, _fs, c); } while (0)
-#define fmt_print4(to, fmt, c, d) \
+#define fmt_printd4(to, fmt, c, d) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 2, fmt, _fc(c), _fc(d)); \
         fmt_OK(_n == 2); _fmt_fn(to)(to, _fs, c, d); } while (0)
-#define fmt_print5(to, fmt, c, d, e) \
+#define fmt_printd5(to, fmt, c, d, e) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 3, fmt, _fc(c), _fc(d), _fc(e)); \
         fmt_OK(_n == 3); _fmt_fn(to)(to, _fs, c, d, e); } while (0)
-#define fmt_print6(to, fmt, c, d, e, f) \
+#define fmt_printd6(to, fmt, c, d, e, f) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 4, fmt, _fc(c), _fc(d), _fc(e), _fc(f)); \
         fmt_OK(_n == 4); _fmt_fn(to)(to, _fs, c, d, e, f); } while (0)
-#define fmt_print7(to, fmt, c, d, e, f, g) \
+#define fmt_printd7(to, fmt, c, d, e, f, g) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 5, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g)); \
         fmt_OK(_n == 5); _fmt_fn(to)(to, _fs, c, d, e, f, g); } while (0)
-#define fmt_print8(to, fmt, c, d, e, f, g, h) \
+#define fmt_printd8(to, fmt, c, d, e, f, g, h) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 6, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h)); \
         fmt_OK(_n == 6); _fmt_fn(to)(to, _fs, c, d, e, f, g, h); } while (0)
-#define fmt_print9(to, fmt, c, d, e, f, g, h, i) \
+#define fmt_printd9(to, fmt, c, d, e, f, g, h, i) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 7, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), _fc(i)); \
         fmt_OK(_n == 7); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i); } while (0)
-#define fmt_print10(to, fmt, c, d, e, f, g, h, i, j) \
+#define fmt_printd10(to, fmt, c, d, e, f, g, h, i, j) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 8, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                      _fc(i), _fc(j)); \
         fmt_OK(_n == 8); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j); } while (0)
-#define fmt_print11(to, fmt, c, d, e, f, g, h, i, j, k) \
+#define fmt_printd11(to, fmt, c, d, e, f, g, h, i, j, k) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 9, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                      _fc(i), _fc(j), _fc(k)); \
         fmt_OK(_n == 9); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k); } while (0)
-#define fmt_print12(to, fmt, c, d, e, f, g, h, i, j, k, m) \
+#define fmt_printd12(to, fmt, c, d, e, f, g, h, i, j, k, m) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 10, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                       _fc(i), _fc(j), _fc(k), _fc(m)); \
         fmt_OK(_n == 10); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m); } while (0)
-#define fmt_print13(to, fmt, c, d, e, f, g, h, i, j, k, m, n) \
+#define fmt_printd13(to, fmt, c, d, e, f, g, h, i, j, k, m, n) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 11, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                       _fc(i), _fc(j), _fc(k), _fc(m), _fc(n)); \
         fmt_OK(_n == 11); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m, n); } while (0)
-#define fmt_print14(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o) \
+#define fmt_printd14(to, fmt, c, d, e, f, g, h, i, j, k, m, n, o) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 12, fmt, _fc(c), _fc(d), _fc(e), _fc(f), _fc(g), _fc(h), \
                                                                       _fc(i), _fc(j), _fc(k), _fc(m), _fc(n), _fc(o)); \
         fmt_OK(_n == 12); _fmt_fn(to)(to, _fs, c, d, e, f, g, h, i, j, k, m, n, o); } while (0)
@@ -146,7 +152,6 @@ FMT_API void _fmt_bprint(fmt_buffer*, const char* fmt, ...);
 #define _fmt_fn(x) _Generic ((x), \
     FILE*: fprintf, \
     char*: sprintf, \
-    int: _fmt_iprint, \
     fmt_buffer*: _fmt_bprint)
 
 #if defined(_MSC_VER) && !defined(__clang__)
@@ -184,15 +189,8 @@ FMT_API void _fmt_bprint(fmt_buffer*, const char* fmt, ...);
 #include <stdarg.h>
 #include <string.h>
 
-FMT_API void fmt_drop_buffer(fmt_buffer* buf) {
+FMT_API void fmt_freebuffer(fmt_buffer* buf) {
     free(buf->data);
-}
-
-FMT_API void _fmt_iprint(int fd, const char* fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    vfprintf(fd == 1 ? stdout : stderr, fmt, args);
-    va_end(args);
 }
 
 FMT_API void _fmt_bprint(fmt_buffer* buf, const char* fmt, ...) {

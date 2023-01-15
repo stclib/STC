@@ -40,6 +40,7 @@ Containers
 - [***cstack*** - **std::stack** alike type](docs/cstack_api.md)
 - [***cstr*** - **std::string** alike type](docs/cstr_api.md)
 - [***csview*** - **std::string_view** alike type](docs/csview_api.md)
+- [***cspan*** - **std::mdspan** alike type](docs/cspan_api.md)
 - [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)
 - [***cvec*** - **std::vector** alike type](docs/cvec_api.md)
 

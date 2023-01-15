@@ -38,6 +38,11 @@
   #define c_ZU PRIu64
   #define c_NPOS INT64_MAX
 #endif
+#if defined STC_NDEBUG || defined NDEBUG
+  #define c_ASSERT(expr) (void)(expr)
+#else
+  #define c_ASSERT(expr) assert(expr)
+#endif
 
 #if defined(_MSC_VER)
   #pragma warning(disable: 4116 4996) // unnamed type definition in parentheses

@@ -65,7 +65,7 @@ void demo2(void)
     c_AUTO (IVec, vector) {
         puts("demo2:");
 
-        c_FORFILTER (x, crange, crange_object(INT64_MAX)
+        c_FORFILTER (x, crange, crange_literal(INT64_MAX)
                       , c_FLT_SKIPWHILE(x, *x.ref != 11)
                      && *x.ref % 2 != 0
                       , c_FLT_TAKE(x, 5))
