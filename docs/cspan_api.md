@@ -31,10 +31,10 @@ unsigned            cspan_rank(const SpanType* self);                       // r
 ValueType*          cspan_at(SpanType* self, size_t x, ...);                // access element
 size_t              cspan_index(const SpanType* self, size_t x, ...);       // index of element
 
-SpanType            cspan_slice1(SpanType1* self, size_t x0, size_t width); // get a slice of a 1D cspan
-SpanType            cspan_slice2(SpanType2* self, size_t x0, size_t width); // get a slice of a 2D cspan
-SpanType            cspan_slice3(SpanType3* self, size_t x0, size_t width); // get a slice of a 3D cspan
-SpanType            cspan_slice4(SpanType4* self, size_t x0, size_t width); // get a slice of a 4D cspan
+SpanType1           cspan_slice1(SpanType1* self, size_t x0, size_t width); // get a slice of a 1D cspan
+SpanType2           cspan_slice2(SpanType2* self, size_t x0, size_t width); // get a slice of a 2D cspan
+SpanType3           cspan_slice3(SpanType3* self, size_t x0, size_t width); // get a slice of a 3D cspan
+SpanType4           cspan_slice4(SpanType4* self, size_t x0, size_t width); // get a slice of a 4D cspan
 
 // Ex usage 1: MySpan2 ms2 = cspan_3to2(&ms3, ms3.dim[0]-1); // last x slice
 // Ex usage 2: ms2 = (MySpan2)cspan_3to2(&ms3, 0); // first x slice
