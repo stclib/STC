@@ -35,12 +35,12 @@ int demo1() {
         for (size_t j=0; j<ms.dim[1]; j++)
             *cspan_at(&ms, i, j) = i*1000 + j;
 
-    printf("%f\n", *cspan_at(&span, 3, 4));
+    printf("%f\n", *cspan_at(&ms, 3, 4));
 }
 
 int demo2() {
     int array[] = {1, 2, 3, 4, 5};
-    Intspan span = cspan_from(array);
+    Intspan span = cspan_from_array(array);
     
     c_FOREACH (i, Intspan, span)
         printf(" %d", *i.ref);
