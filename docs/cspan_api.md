@@ -22,9 +22,9 @@ using_cspan4(S, ValueType);                                                 // d
 SpanType            cspan_make(ValueType* data,  size_t xdim, ...);         // make N-dimensional cspan
 SpanType            cspan_from(STCContainer* cnt);                          // create a 1D cspan from a compatible STC container
 SpanType            cspan_from_array(ValueType array[]);                    // create a 1D cspan from a C array.
-SpanType&           cspan_literal(SpanType, {val1, val2, ...});             // create a 1D cspan compound literal
+SpanType&           cspan_literal(T SpanType, {val1, val2, ...});           // create a 1D cspan compound literal
 
-void                cspan_reshape(const SpanType* self, size_t xdim, ...);  // change the extent of each dimension
+void                cspan_resize(const SpanType* self, size_t xdim, ...);   // change the extent of each dimension
 
 size_t              cspan_size(const SpanType* self);                       // return number of elements
 unsigned            cspan_rank(const SpanType* self);                       // return number of dimensions
@@ -38,15 +38,15 @@ SpanType4           cspan_slice4(SpanType4* self, size_t x0, size_t width); // g
 
                     // Ex usage 1: MySpan2 ms2 = cspan_3to2(&ms3, ms3.dim[0]-1);
                     // Ex usage 2: ms2 = (MySpan2)cspan_3to2(&ms3, 0);
-SpanType3           cspan_4to3(SpanType4* self, size_t x);                  // return a 3D subspan
-SpanType2           cspan_4to2(SpanType4* self, size_t x, size_t y);        // return a 2D subspan
-SpanType1           cspan_4to1(SpanType4* self, size_t x, size_t y, size_t z); // return a 1D subspan
-SpanType2           cspan_3to2(SpanType3* self, size_t x);                  // return a 2D subspan
-SpanType1           cspan_3to1(SpanType3* self, size_t x, size_t y);        // return a 1D subspan
 SpanType1           cspan_2to1(SpanType2* self, size_t x);                  // return a 1D subspan
+SpanType1           cspan_3to1(SpanType3* self, size_t x, size_t y);        // return a 1D subspan
+SpanType2           cspan_3to2(SpanType3* self, size_t x);                  // return a 2D subspan
+SpanType1           cspan_4to1(SpanType4* self, size_t x, size_t y, size_t z); // return a 1D subspan
+SpanType2           cspan_4to2(SpanType4* self, size_t x, size_t y);        // return a 2D subspan
+SpanType3           cspan_4to3(SpanType4* self, size_t x);                  // return a 3D subspan
 
 SpanType_iter       SpanType_begin(const SpanType* self);
-SpanTyåe_iter       SpanType_end(const SpanType* self);
+SpanType_iter       SpanType_end(const SpanType* self);
 void                SpanType_next(SpanType_iter* it);
 ```
 ## Types
