@@ -33,9 +33,9 @@ int demo1() {
     
     for (size_t i=0; i<ms.dim[0]; i++)
         for (size_t j=0; j<ms.dim[1]; j++)
-            *cspan_at(&ms, i, j) = i*1000 + j;
+            *cspan_at(ms, i, j) = i*1000 + j;
 
-    printf("%f\n", *cspan_at(&ms, 3, 4));
+    printf("%f\n", *cspan_at(ms, 3, 4));
 }
 
 int demo2() {
@@ -66,11 +66,11 @@ int demo2() {
     typedef struct { Self##_value *data; uint32_t dim[RANK]; } Self; \
     \
     STC_INLINE Self##_iter Self##_begin(const Self* self) { \
-        Self##_iter it = {self->data, self->data + cspan_size(self)}; \
+        Self##_iter it = {self->data, self->data + cspan_size(*self)}; \
         return it; \
     } \
     STC_INLINE Self##_iter Self##_end(const Self* self) { \
-        Self##_iter it = {NULL, self->data + cspan_size(self)}; \
+        Self##_iter it = {NULL, self->data + cspan_size(*self)}; \
         return it; \
     } \
     STC_INLINE void Self##_next(Self##_iter* it) \
@@ -81,7 +81,7 @@ int demo2() {
 #define using_cspan3(Self, T) using_cspan2(Self, T); using_cspan(Self##3, T, 3)
 #define using_cspan4(Self, T) using_cspan3(Self, T); using_cspan(Self##4, T, 4)
 
-#define cspan_rank_ok(self, rank) c_STATIC_ASSERT(cspan_rank(self) == rank)
+#define cspan_rank_ok(spn, rank) c_STATIC_ASSERT(cspan_rank(spn) == rank)
 
 #define cspan_make(array, ...) \
     {.data=array, .dim={__VA_ARGS__}}
@@ -99,39 +99,39 @@ int demo2() {
 #define cspan_literal(SpanType, ...) \
     (c_INIT(SpanType)cspan_from_list(SpanType##_value, __VA_ARGS__))
 
-#define cspan_size(self) _cspan_size((self)->dim, cspan_rank(self))
-#define cspan_rank(self) c_ARRAYLEN((self)->dim)
-#define cspan_index(self, ...) \
-    c_PASTE(_cspan_i, c_NUMARGS(__VA_ARGS__))((self)->dim, __VA_ARGS__) + \
-                                              cspan_rank_ok(self, c_NUMARGS(__VA_ARGS__))
+#define cspan_size(spn) _cspan_size((spn).dim, cspan_rank(spn))
+#define cspan_rank(spn) c_ARRAYLEN((spn).dim)
+#define cspan_index(spn, ...) \
+    c_PASTE(_cspan_i, c_NUMARGS(__VA_ARGS__))((spn).dim, __VA_ARGS__) + \
+                                              cspan_rank_ok(spn, c_NUMARGS(__VA_ARGS__))
 
 #define cspan_resize(self, ...) \
     (void)memcpy((self)->dim, (uint32_t[]){__VA_ARGS__}, \
-                 sizeof((self)->dim) + cspan_rank_ok(self, c_NUMARGS(__VA_ARGS__)))
+                 sizeof((self)->dim) + cspan_rank_ok(*(self), c_NUMARGS(__VA_ARGS__)))
 
-#define cspan_at(self, ...) ((self)->data + cspan_index(self, __VA_ARGS__))
+#define cspan_at(spn, ...) ((spn).data + cspan_index((spn), __VA_ARGS__))
 
-#define cspan_slice1(self, x0, width) \
-    {.data=cspan_at(self, x0), .dim={width}}
-#define cspan_slice2(self, x0, width) \
-    {.data=cspan_at(self, x0, 0), .dim={width, (self)->dim[1]}}
-#define cspan_slice3(self, x0, width) \
-    {.data=cspan_at(self, x0, 0, 0), .dim={width, (self)->dim[1], (self)->dim[2]}}
-#define cspan_slice4(self, x0, width) \
-    {.data=cspan_at(self, x0, 0, 0, 0), .dim={width, (self)->dim[1], (self)->dim[2], (self)->dim[3]}}
+#define cspan_subspan1(spn, offset, count) \
+    {.data=cspan_at(spn, offset), .dim={count}}
+#define cspan_subspan2(spn, offset, count) \
+    {.data=cspan_at(spn, offset, 0), .dim={count, (spn).dim[1]}}
+#define cspan_subspan3(spn, offset, count) \
+    {.data=cspan_at(spn, offset, 0, 0), .dim={count, (spn).dim[1], (spn).dim[2]}}
+#define cspan_subspan4(spn, offset, count) \
+    {.data=cspan_at(spn, offset, 0, 0, 0), .dim={count, (spn).dim[1], (spn).dim[2], (spn).dim[3]}}
 
-#define cspan_2to1(self, x) \
-    {.data=cspan_at(self, x, 0), .dim={(self)->dim[1]}}
-#define cspan_3to1(self, x, y) \
-    {.data=cspan_at(self, x, y, 0), .dim={(self)->dim[2]}}
-#define cspan_3to2(self, x) \
-    {.data=cspan_at(self, x, 0, 0), .dim={(self)->dim[1], (self)->dim[2]}}
-#define cspan_4to1(self, x, y, z) \
-    {.data=cspan_at(self, x, y, z, 0), .dim={(self)->dim[3]}}
-#define cspan_4to2(self, x, y) \
-    {.data=cspan_at(self, x, y, 0, 0), .dim={(self)->dim[2], (self)->dim[3]}}
-#define cspan_4to3(self, x) \
-    {.data=cspan_at(self, x, 0, 0, 0), .dim={(self)->dim[1], (self)->dim[2], (self)->dim[3]}}
+#define cspan_2to1(spn, x) \
+    {.data=cspan_at(spn, x, 0), .dim={(spn).dim[1]}}
+#define cspan_3to1(spn, x, y) \
+    {.data=cspan_at(spn, x, y, 0), .dim={(spn).dim[2]}}
+#define cspan_3to2(spn, x) \
+    {.data=cspan_at(spn, x, 0, 0), .dim={(spn).dim[1], (spn).dim[2]}}
+#define cspan_4to1(spn, x, y, z) \
+    {.data=cspan_at(spn, x, y, z, 0), .dim={(spn).dim[3]}}
+#define cspan_4to2(spn, x, y) \
+    {.data=cspan_at(spn, x, y, 0, 0), .dim={(spn).dim[2], (spn).dim[3]}}
+#define cspan_4to3(spn, x) \
+    {.data=cspan_at(spn, x, 0, 0, 0), .dim={(spn).dim[1], (spn).dim[2], (spn).dim[3]}}
 
 STC_INLINE size_t _cspan_i1(const uint32_t dim[1], uint32_t x)
     { c_ASSERT(x < dim[0]); return x; }
@@ -149,7 +149,7 @@ STC_INLINE size_t _cspan_i4(const uint32_t dim[4], uint32_t x, uint32_t y, uint3
 }
 STC_INLINE size_t _cspan_size(const uint32_t dim[], unsigned rank) {
     size_t sz = dim[0];
-    while (rank --> 1) sz *= dim[rank];
+    while (rank-- > 1) sz *= dim[rank];
     return sz;
 }
 

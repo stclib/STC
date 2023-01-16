@@ -27,16 +27,16 @@ int main()
   // write data using 2D view
   for (unsigned i=0; i != ms2.dim[0]; i++)
     for (unsigned j=0; j != ms2.dim[1]; j++)
-      *cspan_at(&ms2, i, j) = i*1000 + j;
+      *cspan_at(ms2, i, j) = i*1000 + j;
 
   // print all items using 1D view
   printf("all: ");
   for (unsigned i=0; i != ms1.dim[0]; i++)
-    printf(" %d", *cspan_at(&ms1, i));
+    printf(" %d", *cspan_at(ms1, i));
   puts("");
 
   // or iterate a subspan...
-  ispan2 sub = cspan_3to2(&ms3, 1);
+  ispan2 sub = cspan_3to2(ms3, 1);
   printf("sub: ");
   c_FOREACH (i, ispan2, sub)
     printf(" %d", *i.ref);
@@ -49,7 +49,7 @@ int main()
     for (unsigned j=0; j != ms3.dim[1]; j++)
     {
       for (unsigned k=0; k != ms3.dim[2]; k++)
-        printf("%d ", *cspan_at(&ms3, i, j, k));
+        printf("%d ", *cspan_at(ms3, i, j, k));
       puts("");
     }
   }
