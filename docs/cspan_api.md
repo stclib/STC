@@ -22,8 +22,9 @@ on assignment, but not on initialization of a span variable.
 ```c
 SpanType        cspan_make(ValueType* data,  size_t xdim, ...);                 // make N-dimensional cspan
 SpanType        cspan_from(STCContainer* cnt);                                  // create a 1D cspan from a compatible STC container
-SpanType        cspan_from_array(ValueType array[]);                            // create a 1D cspan from a C array.
-SpanType&       cspan_literal(T SpanType, {val1, val2, ...});                   // create a 1D cspan compound literal
+SpanType        cspan_from_array(ValueType array[]);                            // create a 1D cspan from a C array
+SpanType        cspan_from_list(T ValueType, {val0, val1, ...});                // create a 1D cspan from an initializer list
+SpanType&       cspan_literal(T SpanType, {val0, val1, ...});                   // create a 1D cspan compound literal from init list 
 
 void            cspan_resize(SpanType* self, size_t xdim, ...);                 // change the extent of each dimension
 

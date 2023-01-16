@@ -83,19 +83,21 @@ int demo2() {
 
 #define cspan_rank_ok(self, rank) c_STATIC_ASSERT(cspan_rank(self) == rank)
 
-#define cspan_literal(S, ...) \
-    (c_INIT(S){.data = (S##_value[])__VA_ARGS__, \
-               .dim = {sizeof((S##_value[])__VA_ARGS__)/sizeof(S##_value)}})
-
-#define cspan_make(data, ...) \
-    {data, {__VA_ARGS__}}
+#define cspan_make(array, ...) \
+    {.data=array, .dim={__VA_ARGS__}}
 
 /* create a cspan from a cvec, cstack, cdeq, cqueue, or cpque (heap) */
 #define cspan_from(container) \
-    {(container)->data, {(container)->_len}}
+    {.data=(container)->data, .dim={(container)->_len}}
 
 #define cspan_from_array(array) \
-    {(array) + c_STATIC_ASSERT(sizeof(array) != sizeof(void*)), {c_ARRAYLEN(array)}}
+    {.data=(array) + c_STATIC_ASSERT(sizeof(array) != sizeof(void*)), .dim={c_ARRAYLEN(array)}}
+
+#define cspan_from_list(ValueType, ...) \
+    {.data=(ValueType[])__VA_ARGS__, .dim={sizeof((ValueType[])__VA_ARGS__)/sizeof(ValueType)}}
+
+#define cspan_literal(SpanType, ...) \
+    (c_INIT(SpanType)cspan_from_list(SpanType##_value, __VA_ARGS__))
 
 #define cspan_size(self) _cspan_size((self)->dim, cspan_rank(self))
 #define cspan_rank(self) c_ARRAYLEN((self)->dim)
@@ -110,26 +112,26 @@ int demo2() {
 #define cspan_at(self, ...) ((self)->data + cspan_index(self, __VA_ARGS__))
 
 #define cspan_slice1(self, x0, width) \
-    {cspan_at(self, x0), {width}}
+    {.data=cspan_at(self, x0), .dim={width}}
 #define cspan_slice2(self, x0, width) \
-    {cspan_at(self, x0, 0), {width, (self)->dim[1]}}
+    {.data=cspan_at(self, x0, 0), .dim={width, (self)->dim[1]}}
 #define cspan_slice3(self, x0, width) \
-    {cspan_at(self, x0, 0, 0), {width, (self)->dim[1], (self)->dim[2]}}
+    {.data=cspan_at(self, x0, 0, 0), .dim={width, (self)->dim[1], (self)->dim[2]}}
 #define cspan_slice4(self, x0, width) \
-    {cspan_at(self, x0, 0, 0, 0), {width, (self)->dim[1], (self)->dim[2], (self)->dim[3]}}
+    {.data=cspan_at(self, x0, 0, 0, 0), .dim={width, (self)->dim[1], (self)->dim[2], (self)->dim[3]}}
 
 #define cspan_2to1(self, x) \
-    {cspan_at(self, x, 0), {(self)->dim[1]}}
+    {.data=cspan_at(self, x, 0), .dim={(self)->dim[1]}}
 #define cspan_3to1(self, x, y) \
-    {cspan_at(self, x, y, 0), {(self)->dim[2]}}
+    {.data=cspan_at(self, x, y, 0), .dim={(self)->dim[2]}}
 #define cspan_3to2(self, x) \
-    {cspan_at(self, x, 0, 0), {(self)->dim[1], (self)->dim[2]}}
+    {.data=cspan_at(self, x, 0, 0), .dim={(self)->dim[1], (self)->dim[2]}}
 #define cspan_4to1(self, x, y, z) \
-    {cspan_at(self, x, y, z, 0), {(self)->dim[3]}}
+    {.data=cspan_at(self, x, y, z, 0), .dim={(self)->dim[3]}}
 #define cspan_4to2(self, x, y) \
-    {cspan_at(self, x, y, 0, 0), {(self)->dim[2], (self)->dim[3]}}
+    {.data=cspan_at(self, x, y, 0, 0), .dim={(self)->dim[2], (self)->dim[3]}}
 #define cspan_4to3(self, x) \
-    {cspan_at(self, x, 0, 0, 0), {(self)->dim[1], (self)->dim[2], (self)->dim[3]}}
+    {.data=cspan_at(self, x, 0, 0, 0), .dim={(self)->dim[1], (self)->dim[2], (self)->dim[3]}}
 
 STC_INLINE size_t _cspan_i1(const uint32_t dim[1], uint32_t x)
     { c_ASSERT(x < dim[0]); return x; }
