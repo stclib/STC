@@ -4,7 +4,7 @@
 VER 2.0: NEW API:
 
 void        fmt_print(fmt, ...);
-void        fmt_println(fmt, ...); // see remark below
+void        fmt_println(fmt, ...);
 void        fmt_printd(dest, fmt, ...);
 void        fmt_freebuffer(fmt_buffer* buf);
 
@@ -25,7 +25,6 @@ void        fmt_freebuffer(fmt_buffer* buf);
 
 * C11 or higher required.
 * MAX 255 chars fmt string by default. MAX 12 arguments after fmt string.
-* fmt_println(): a) fmt must be a const char* literal. b) at least one argument after fmt required by ISO C99.
 * Static linking by default, shared symbols by defining FMT_HEADER / FMT_IMPLEMENT.
 * (c) operamint, 2022, MIT License.
 -----------------------------------------------------------------------------------
@@ -85,9 +84,9 @@ int main() {
 #  define fmt_OK(exp) assert(exp)
 #endif
 
-typedef struct { 
-    char* data; 
-    size_t cap, len; 
+typedef struct {
+    char* data;
+    size_t cap, len;
     _Bool stream;
 } fmt_buffer;
 
@@ -100,7 +99,7 @@ FMT_API void _fmt_bprint(fmt_buffer*, const char* fmt, ...);
 #endif
 
 #define fmt_print(...) fmt_printd(stdout, __VA_ARGS__)
-#define fmt_println(fmt, ...) fmt_printd(stdout, fmt "\n", __VA_ARGS__)
+#define fmt_println(...) fmt_printd((fmt_buffer*)0, __VA_ARGS__)
 
 /* Primary function. */
 #define fmt_printd(...) fmt_OVERLOAD(fmt_printd, __VA_ARGS__)
@@ -196,17 +195,22 @@ FMT_API void fmt_freebuffer(fmt_buffer* buf) {
 FMT_API void _fmt_bprint(fmt_buffer* buf, const char* fmt, ...) {
     va_list args, args2;
     va_start(args, fmt);
+    if (buf == NULL) {
+        vprintf(fmt, args); putchar('\n');
+        goto done1;
+    }
     va_copy(args2, args);
     const int n = vsnprintf(NULL, 0U, fmt, args);
+    if (n < 0) goto done2;
     const size_t pos = buf->stream ? buf->len : 0U;
-    buf->len = pos + (size_t)n;
+    buf->len = pos + n;
     if (buf->len > buf->cap) {
         buf->cap = buf->len + buf->cap/2;
         buf->data = (char*)realloc(buf->data, buf->cap + 1);
     }
     vsprintf(buf->data + pos, fmt, args2);
-    va_end(args2);
-    va_end(args);
+    done2: va_end(args2);
+    done1: va_end(args);
 }
 
 FMT_API int _fmt_parse(char* p, int nargs, const char *fmt, ...) {
