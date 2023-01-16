@@ -111,6 +111,8 @@ int demo2() {
 
 #define cspan_at(spn, ...) ((spn).data + cspan_index((spn), __VA_ARGS__))
 
+#define cspan_subspan(spn, offset, count) \
+    cspan_subspan1(spn, offset, count)
 #define cspan_subspan1(spn, offset, count) \
     {.data=cspan_at(spn, offset), .dim={count}}
 #define cspan_subspan2(spn, offset, count) \
@@ -120,18 +122,20 @@ int demo2() {
 #define cspan_subspan4(spn, offset, count) \
     {.data=cspan_at(spn, offset, 0, 0, 0), .dim={count, (spn).dim[1], (spn).dim[2], (spn).dim[3]}}
 
-#define cspan_2to1(spn, x) \
+#define cspan_at4(...) c_MACRO_OVERLOAD(cspan_at4, __VA_ARGS__)
+#define cspan_at3(...) c_MACRO_OVERLOAD(cspan_at3, __VA_ARGS__)
+#define cspan_at2(spn, x) \
     {.data=cspan_at(spn, x, 0), .dim={(spn).dim[1]}}
-#define cspan_3to1(spn, x, y) \
-    {.data=cspan_at(spn, x, y, 0), .dim={(spn).dim[2]}}
-#define cspan_3to2(spn, x) \
+#define cspan_at32(spn, x) \
     {.data=cspan_at(spn, x, 0, 0), .dim={(spn).dim[1], (spn).dim[2]}}
-#define cspan_4to1(spn, x, y, z) \
-    {.data=cspan_at(spn, x, y, z, 0), .dim={(spn).dim[3]}}
-#define cspan_4to2(spn, x, y) \
-    {.data=cspan_at(spn, x, y, 0, 0), .dim={(spn).dim[2], (spn).dim[3]}}
-#define cspan_4to3(spn, x) \
+#define cspan_at33(spn, x, y) \
+    {.data=cspan_at(spn, x, y, 0), .dim={(spn).dim[2]}}
+#define cspan_at42(spn, x) \
     {.data=cspan_at(spn, x, 0, 0, 0), .dim={(spn).dim[1], (spn).dim[2], (spn).dim[3]}}
+#define cspan_at43(spn, x, y) \
+    {.data=cspan_at(spn, x, y, 0, 0), .dim={(spn).dim[2], (spn).dim[3]}}
+#define cspan_at44(spn, x, y, z) \
+    {.data=cspan_at(spn, x, y, z, 0), .dim={(spn).dim[3]}}
 
 STC_INLINE size_t _cspan_i1(const uint32_t dim[1], uint32_t x)
     { c_ASSERT(x < dim[0]); return x; }

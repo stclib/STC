@@ -36,7 +36,7 @@ int main()
   puts("");
 
   // or iterate a subspan...
-  ispan2 sub = cspan_3to2(ms3, 1);
+  ispan2 sub = cspan_at3(ms3, 1);
   printf("sub: ");
   c_FOREACH (i, ispan2, sub)
     printf(" %d", *i.ref);
