@@ -16,6 +16,7 @@ uint64_t Person_hash(const Person* p);
 #define i_type IPtr
 #define i_val int
 #define i_valdrop(x) printf("drop: %d\n", *x)
+#define i_no_clone
 #include <stc/carc.h>
 
 #define i_type IPStack

@@ -11,6 +11,7 @@ void int_drop(int* x) {
 #define i_type Arc          // set type name to be defined (instead of 'carc_int')
 #define i_val int
 #define i_valdrop int_drop  // optional, just to display the elements destroyed
+#define i_no_clone          // required because of valdrop
 #include <stc/carc.h>       // Arc
 
 #define i_keyboxed Arc    // note: use i_keyboxed instead of i_key for carc/cbox elements

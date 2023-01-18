@@ -127,6 +127,7 @@ static struct ShapeAPI Polygon_api = {
 #define i_type Shapes
 #define i_val Shape*
 #define i_valdrop(x) Shape_delete(*x)
+#define i_no_clone
 #include <stc/cstack.h>
 
 void testShape(const Shape* shape)

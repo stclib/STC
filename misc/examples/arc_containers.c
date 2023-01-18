@@ -12,7 +12,7 @@
 #define i_val Map
 #define i_valdrop(p) (printf("drop Arc:\n"), Map_drop(p))
 // no need for atomic ref. count in single thread:
-#define i_opt c_no_atomic|c_no_lookup
+#define i_opt c_no_atomic|c_no_lookup|c_no_clone
 #include <stc/carc.h>
 
 #define i_type Stack
