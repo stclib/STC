@@ -158,9 +158,9 @@
 #if !defined i_key
   #error "No i_key or i_val defined"
 #elif defined i_keyraw ^ defined i_keyto
-  #error "Both i_xxxraw and i_xxxto must be defined, if any"
+  #error "Both i_keyraw/valraw and i_keyto/valto must be defined, if any"
 #elif defined i_keyfrom && !defined i_keyraw
-  #error "i_xxxfrom defined without i_xxxraw"
+  #error "i_keyfrom/valfrom defined without i_keyraw/valraw"
 #elif defined i_from || defined i_drop
   #error "i_from / i_drop not supported. Define i_keyfrom/i_valfrom and/or i_keydrop/i_valdrop instead"
 #endif
@@ -171,7 +171,7 @@
 #if c_option(c_no_clone)
   #define i_no_clone
 #elif !(defined i_keyclone || defined i_no_clone) && (defined i_keydrop || defined i_keyraw)
-  #error i_xxxclone should be defined when i_xxxdrop or i_xxxraw is defined
+  #error i_keyclone/valclone should be defined when i_keydrop/valdrop or i_keyraw/valraw is defined
 #endif
 #ifndef i_keyraw
   #define i_keyraw i_key
