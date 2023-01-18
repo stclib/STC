@@ -77,7 +77,7 @@ int demo2() {
         { if (++it->ref == it->end) it->ref = NULL; } \
     struct stc_nostruct
 
-#define using_cspan2(Self, T) using_cspan(Self##1, T, 1); using_cspan(Self##2, T, 2)
+#define using_cspan2(Self, T) using_cspan(Self, T, 1); using_cspan(Self##2, T, 2)
 #define using_cspan3(Self, T) using_cspan2(Self, T); using_cspan(Self##3, T, 3)
 #define using_cspan4(Self, T) using_cspan3(Self, T); using_cspan(Self##4, T, 4)
 
@@ -109,12 +109,19 @@ int demo2() {
     (void)memcpy((self)->dim, (uint32_t[]){__VA_ARGS__}, \
                  sizeof((self)->dim) + cspan_rank_ok(*(self), c_NUMARGS(__VA_ARGS__)))
 
-#define cspan_at(spn, ...) ((spn).data + cspan_index((spn), __VA_ARGS__))
+#define cspan_at(spn, ...) ((spn).data + cspan_index(spn, __VA_ARGS__))
+#define cspan_front(spn) ((spn).data)
+#define cspan_back(spn) ((spn).data + cspan_size(spn) - 1)
 
 #define cspan_subspan(spn, offset, count) \
-    cspan_subspan1(spn, offset, count)
-#define cspan_subspan1(spn, offset, count) \
     {.data=cspan_at(spn, offset), .dim={count}}
+#define cspan_subspan2(spn, offset, count) \
+    {.data=cspan_at(spn, offset, 0), .dim={count, (spn).dim[1]}}
+#define cspan_subspan3(spn, offset, count) \
+    {.data=cspan_at(spn, offset, 0, 0), .dim={count, (spn).dim[1], (spn).dim[2]}}
+#define cspan_subspan4(spn, offset, count) \
+    {.data=cspan_at(spn, offset, 0, 0, 0), .dim={count, (spn).dim[1], (spn).dim[2], (spn).dim[3]}}
+
 #define cspan_subspan2(spn, offset, count) \
     {.data=cspan_at(spn, offset, 0), .dim={count, (spn).dim[1]}}
 #define cspan_subspan3(spn, offset, count) \

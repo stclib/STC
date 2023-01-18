@@ -6,7 +6,7 @@
 
 using_cspan3(ispan, int);
 /*
-using_cspan(ispan1, int, 1);
+using_cspan(ispan, int, 1);
 using_cspan(ispan2, int, 2);
 using_cspan(ispan3, int, 3);
 */
@@ -18,7 +18,7 @@ int main()
     cstack_int_push(&v, *i.ref);
 
   // View data as contiguous memory representing 12 ints
-  ispan1 ms1 = cspan_from(&v);
+  ispan ms1 = cspan_from(&v);
   // View data as contiguous memory representing 2 rows of 6 ints each
   ispan2 ms2 = cspan_make(v.data, 2, 6);
   // View the same data as a 3D array 2 x 3 x 2
@@ -31,7 +31,7 @@ int main()
 
   // print all items using 1D view
   printf("all: ");
-  for (unsigned i=0; i != ms1.dim[0]; i++)
+  for (unsigned i=0; i != cspan_size(ms1); i++)
     printf(" %d", *cspan_at(ms1, i));
   puts("");
 
