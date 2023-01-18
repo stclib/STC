@@ -67,7 +67,8 @@ int demo2() {
     typedef struct { Self##_value *data; uint32_t dim[RANK]; } Self; \
     \
     STC_INLINE Self##_iter Self##_begin(const Self* self) { \
-        Self##_iter it = {self->data, self->data + cspan_size(self)}; \
+        size_t n = cspan_size(self); \
+        Self##_iter it = {n ? self->data : NULL, self->data + n}; \
         return it; \
     } \
     STC_INLINE Self##_iter Self##_end(const Self* self) { \
