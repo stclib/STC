@@ -135,7 +135,7 @@ int main ()
     cstr s3 = cstr_from_sv(cstr_substr(&s1, 0, 6));     // "Apples"
     printf("%s %s\n", cstr_str(&s2), cstr_str(&s3));
 
-    c_DROP(cstr, &str1, &s1, &s2, &s3);
+    c_drop(cstr, &str1, &s1, &s2, &s3);
 }
 ```
 Output:

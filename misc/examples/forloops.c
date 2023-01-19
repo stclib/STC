@@ -68,12 +68,12 @@ int main()
 
         puts("\n\nc_forfilter:");
         c_FORFILTER (i, IVec, vec
-                      , c_FLT_SKIPWHILE(i, *i.ref != 65)
-                     && c_FLT_TAKEWHILE(i, *i.ref != 280)
-                     && c_FLT_SKIPWHILE(i, isOdd(i))
+                      , c_flt_skipwhile(i, *i.ref != 65)
+                     && c_flt_takewhile(i, *i.ref != 280)
+                     && c_flt_skipwhile(i, isOdd(i))
                      && isOdd(i)
-                     && c_FLT_SKIP(i, 2)
-                      , c_FLT_TAKE(i, 1))
+                     && c_flt_skip(i, 2)
+                      , c_flt_take(i, 1))
             printf(" %d", *i.ref);
         puts("");
         // 189

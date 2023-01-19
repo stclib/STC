@@ -222,6 +222,6 @@ int main(void) {
     c_FOREACH (i, UVec, vec2)
         printf("%s: %d\n", cstr_str(&i.ref->name), i.ref->id);
 
-    c_DROP(UVec, &vec, &vec2); // cleanup
+    c_drop(UVec, &vec, &vec2); // cleanup
 }
 ```

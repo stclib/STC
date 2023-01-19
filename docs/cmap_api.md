@@ -353,7 +353,7 @@ typedef struct Viking {
 } Viking;
 
 static inline void Viking_drop(Viking* v) {
-    c_DROP(cstr, &v->name, &v->country);
+    c_drop(cstr, &v->name, &v->country);
 }
 
 // Define Viking raw struct with cmp, hash, and convertion functions between Viking and RViking structs:

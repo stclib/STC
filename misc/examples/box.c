@@ -24,7 +24,7 @@ Person Person_clone(Person p) {
 
 void Person_drop(Person* p) {
     printf("drop: %s %s\n", cstr_str(&p->name), cstr_str(&p->last));
-    c_DROP(cstr, &p->name, &p->last);
+    c_drop(cstr, &p->name, &p->last);
 }
 
 #define i_type PBox

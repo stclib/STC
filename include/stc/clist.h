@@ -64,7 +64,7 @@
         SELF##_value value; \
     }
 
-#define _clist_tonode(vp) c_CONTAINER_OF(vp, _cx_node, value)
+#define _clist_tonode(vp) c_container_of(vp, _cx_node, value)
     
 _c_clist_types(clist_VOID, int);
 _c_clist_complete_types(clist_VOID, dummy);
@@ -133,7 +133,7 @@ STC_INLINE _cx_value*   _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
                             { return _cx_memb(_push_back)(self, i_keyfrom(raw)); }
 #endif // !i_no_emplace
 
-STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_INIT(_cx_self){NULL}; }
+STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_COMPOUND(_cx_self){NULL}; }
 STC_INLINE void         _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, size_t n)
                             { while (n--) _cx_memb(_push_back)(self, i_keyfrom(*raw++)); }
 STC_INLINE _cx_self     _cx_memb(_from_n)(const _cx_raw* raw, size_t n)
@@ -161,12 +161,12 @@ _cx_memb(_count)(const _cx_self* self) {
 STC_INLINE _cx_iter
 _cx_memb(_begin)(const _cx_self* self) {
     _cx_value* head = self->last ? &self->last->next->value : NULL;
-    return c_INIT(_cx_iter){head, &self->last, self->last};
+    return c_COMPOUND(_cx_iter){head, &self->last, self->last};
 }
 
 STC_INLINE _cx_iter
 _cx_memb(_end)(const _cx_self* self)
-    { return c_INIT(_cx_iter){NULL}; }
+    { return c_COMPOUND(_cx_iter){NULL}; }
 
 STC_INLINE void
 _cx_memb(_next)(_cx_iter* it) {

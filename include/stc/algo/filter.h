@@ -37,9 +37,9 @@ int main()
         puts("");
         
         c_FORFILTER (i, cstack_int, stk
-                    , c_FLT_SKIPWHILE(i, *i.ref < 3)
+                    , c_flt_skipwhile(i, *i.ref < 3)
                     && (*i.ref & 1) == 0 // even only
-                    , c_FLT_TAKE(i, 2)) // break after 2
+                    , c_flt_take(i, 2)) // break after 2
             printf(" %d", *i.ref);
         puts("");
     }
@@ -54,10 +54,10 @@ int main()
   #define c_NFILTERS 14 /* 22, 30, .. */
 #endif
 
-#define c_FLT_TAKE(i, n) (++(i).s1[(i).s1top++] <= (n))
-#define c_FLT_SKIP(i, n) (++(i).s1[(i).s1top++] > (n))
-#define c_FLT_SKIPWHILE(i, pred) ((i).s2[(i).s2top++] |= !(pred))
-#define c_FLT_TAKEWHILE(i, pred) !c_FLT_SKIPWHILE(i, pred)
+#define c_flt_take(i, n) (++(i).s1[(i).s1top++] <= (n))
+#define c_flt_skip(i, n) (++(i).s1[(i).s1top++] > (n))
+#define c_flt_skipwhile(i, pred) ((i).s2[(i).s2top++] |= !(pred))
+#define c_flt_takewhile(i, pred) !c_flt_skipwhile(i, pred)
 
 #define c_FORFILTER(...) c_MACRO_OVERLOAD(c_FORFILTER, __VA_ARGS__)
 

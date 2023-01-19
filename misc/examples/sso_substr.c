@@ -16,5 +16,5 @@ int main ()
     cstr s3 = cstr_from_sv(cstr_substr_ex(&str, 0, 6));    // "apples"
     printf("%s %s: %d, %d\n", cstr_str(&s2), cstr_str(&s3), 
                               cstr_is_long(&str), cstr_is_long(&s2));
-    c_DROP (cstr, &str, &s2, &s3);
+    c_drop (cstr, &str, &s2, &s3);
 }

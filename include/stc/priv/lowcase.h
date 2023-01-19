@@ -27,10 +27,6 @@
 #define c_calloc c_CALLOC
 #define c_realloc c_REALLOC
 #define c_free c_FREE
-#define c_delete c_DELETE
-#define c_swap c_SWAP
-#define c_container_of c_CONTAINER_OF
-#define c_static_assert c_STATIC_ASSERT
 #define c_arraylen c_ARRAYLEN
 #define c_forlist c_FORLIST
 #define c_forrange c_FORRANGE
@@ -45,14 +41,16 @@
 #define c_with c_WITH
 #define c_scope c_SCOPE
 #define c_defer c_DEFER
-#define c_drop c_DROP
 #define c_sv c_SV
-#define c_ARGsv c_ARGSV
-#define c_find_if c_FIND_IF
-#define c_erase_if c_ERASE_IF
-#define c_flt_take c_FLT_TAKE
-#define c_flt_skip c_FLT_SKIP
-#define c_flt_skipwhile c_FLT_SKIPWHILE
-#define c_flt_takewhile c_FLT_TAKEWHILE
-#define cstr_new(lit) cstr_lit(lit)
-#define cstr_null cstr_NULL
+
+#define c_DROP c_drop
+#define c_FIND_IF c_find_if
+#define c_ERASE_IF c_erase_if
+#define c_FLT_TAKE c_flt_take
+#define c_FLT_SKIP c_flt_skip
+#define c_FLT_SKIPWHILE c_flt_skipwhile
+#define c_FLT_TAKEWHILE c_flt_takewhile
+#define c_DELETE c_delete
+#define c_SWAP c_swap
+#define c_CONTAINER_OF c_container_of
+#define c_STATIC_ASSERT c_static_assert

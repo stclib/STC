@@ -107,7 +107,7 @@ STC_API chash_bucket_t  _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawke
 STC_API _cx_result      _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey);
 STC_API void            _cx_memb(_erase_entry)(_cx_self* self, _cx_value* val);
 
-STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_INIT(_cx_self){0}; }
+STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_COMPOUND(_cx_self){0}; }
 STC_INLINE void         _cx_memb(_shrink_to_fit)(_cx_self* self) { _cx_memb(_reserve)(self, self->size); }
 STC_INLINE float        _cx_memb(_max_load_factor)(const _cx_self* self) { return (float)(i_max_load_factor); }
 STC_INLINE bool         _cx_memb(_empty)(const _cx_self* map) { return !map->size; }
@@ -166,7 +166,7 @@ _cx_memb(_emplace)(_cx_self* self, _cx_rawkey rkey _i_MAP_ONLY(, i_valraw rmappe
 STC_INLINE _cx_raw
 _cx_memb(_value_toraw)(const _cx_value* val) {
     return _i_SET_ONLY( i_keyto(val) )
-           _i_MAP_ONLY( c_INIT(_cx_raw){i_keyto((&val->first)), i_valto((&val->second))} );
+           _i_MAP_ONLY( c_COMPOUND(_cx_raw){i_keyto((&val->first)), i_valto((&val->second))} );
 }
 
 STC_INLINE void
@@ -222,7 +222,7 @@ STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) {
 
 STC_INLINE _cx_iter
 _cx_memb(_end)(const _cx_self* self)
-    { return c_INIT(_cx_iter){NULL}; }
+    { return c_COMPOUND(_cx_iter){NULL}; }
 
 STC_INLINE void
 _cx_memb(_next)(_cx_iter* it) { 
@@ -240,7 +240,7 @@ STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, _cx_rawkey rkey) {
     size_t idx;
     if (self->size && self->_hashx[idx = _cx_memb(_bucket_)(self, &rkey).idx])
-        return c_INIT(_cx_iter){self->table + idx, 
+        return c_COMPOUND(_cx_iter){self->table + idx, 
                                 self->table + self->bucket_count,
                                 self->_hashx + idx};
     return _cx_memb(_end)(self);
@@ -430,7 +430,7 @@ _cx_memb(_reserve)(_cx_self* self, const size_t _newcap) {
             m.table[b.idx] = *e;
             m._hashx[b.idx] = (uint8_t)b.hx;
         }
-        c_SWAP(_cx_self, self, &m);
+        c_swap(_cx_self, self, &m);
     }
     c_FREE(m._hashx);
     c_FREE(m.table);

@@ -40,18 +40,17 @@ int demo1() {
 }
 
 int demo2() {
-    int array[] = {1, 2, 3, 4, 5};
+    int array[] = {10, 20, 30, 23, 22, 21};
     Intspan span = cspan_from_array(array);
     
     c_FOREACH (i, Intspan, span)
         printf(" %d", *i.ref);
     puts("");
     
-    // use a temporary Intspan object.
-    c_FORFILTER (i, Intspan, c_literal(Intspan, {10, 20, 30, 23, 22, 21})
-                  , c_FLT_SKIPWHILE(i, *i.ref < 25)
+    c_FORFILTER (i, Intspan, span,
+                  , c_flt_skipwhile(i, *i.ref < 25)
                  && (*i.ref & 1) == 0 // even only
-                  , c_FLT_TAKE(i, 2)) // break after 2
+                  , c_flt_take(i, 2)) // break after 2
         printf(" %d", *i.ref);
     puts("");
 }
@@ -86,7 +85,7 @@ int demo2() {
 #define using_cspan3(Self, T) using_cspan2(Self, T); using_cspan(Self##3, T, 3)
 #define using_cspan4(Self, T) using_cspan3(Self, T); using_cspan(Self##4, T, 4)
 
-#define cspan_rank_ok(self, rank) c_STATIC_ASSERT(cspan_rank(self) == rank)
+#define cspan_rank_ok(self, rank) c_static_assert(cspan_rank(self) == rank)
 
 #define cspan_make(array, ...) \
     {.data=array, .dim={__VA_ARGS__}}
@@ -96,7 +95,7 @@ int demo2() {
     {.data=(container)->data, .dim={(uint32_t)(container)->_len}}
 
 #define cspan_from_array(array) \
-    {.data=(array) + c_STATIC_ASSERT(sizeof(array) != sizeof(void*)), .dim={c_ARRAYLEN(array)}}
+    {.data=(array) + c_static_assert(sizeof(array) != sizeof(void*)), .dim={c_ARRAYLEN(array)}}
 
 #define cspan_size(self) _cspan_size((self)->dim, cspan_rank(self))
 #define cspan_rank(self) c_ARRAYLEN((self)->dim)

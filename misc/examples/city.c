@@ -44,7 +44,7 @@ City City_clone(City c) {
 
 void City_drop(City* c) {
     printf("drop %s\n", cstr_str(&c->name));
-    c_DROP(cstr, &c->name, &c->country);
+    c_drop(cstr, &c->name, &c->country);
 }
 
 

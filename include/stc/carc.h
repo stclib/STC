@@ -45,7 +45,7 @@ int main() {
     ArcPers q = ArcPers_clone(p); // share the pointer
 
     printf("%s %s. uses: %ld\n", cstr_str(&q.get->name), cstr_str(&q.get->last), *q.use_count);
-    c_DROP(ArcPers, &p, &q);
+    c_drop(ArcPers, &p, &q);
 }
 */
 #include "ccommon.h"
@@ -93,7 +93,7 @@ _cx_deftypes(_c_carc_types, _cx_self, i_key);
 struct _cx_memb(_rep_) { catomic_long counter; i_key value; };
 
 STC_INLINE _cx_self _cx_memb(_init)(void) 
-    { return c_INIT(_cx_self){NULL, NULL}; }
+    { return c_COMPOUND(_cx_self){NULL, NULL}; }
 
 STC_INLINE long _cx_memb(_use_count)(const _cx_self* self)
     { return self->use_count ? *self->use_count : 0; }

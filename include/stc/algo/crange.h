@@ -36,7 +36,7 @@ int main()
     int a = 100, b = INT32_MAX;
     c_FORFILTER (i, crange, crange_literal(a, b, 8)
                   , i.index > 10
-                  , c_FLT_TAKE(i, 3))
+                  , c_flt_take(i, 3))
         printf(" %lld", *i.ref);
     puts("");
 }
