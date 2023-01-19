@@ -134,6 +134,10 @@ STC_INLINE _cx_value*   _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
 #endif // !i_no_emplace
 
 STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_INIT(_cx_self){NULL}; }
+STC_INLINE void         _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, size_t n)
+                            { while (n--) _cx_memb(_push_back)(self, i_keyfrom(*raw++)); }
+STC_INLINE _cx_self     _cx_memb(_from_n)(const _cx_raw* raw, size_t n)
+                            { _cx_self cx = {0}; _cx_memb(_put_n)(&cx, raw, n); return cx; }
 STC_INLINE bool         _cx_memb(_reserve)(_cx_self* self, size_t n) { return true; }
 STC_INLINE bool         _cx_memb(_empty)(const _cx_self* self) { return self->last == NULL; }
 STC_INLINE void         _cx_memb(_clear)(_cx_self* self) { _cx_memb(_drop)(self); }

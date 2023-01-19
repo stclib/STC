@@ -47,6 +47,12 @@ STC_API void _cx_memb(_push)(_cx_self* self, _cx_value value);
 STC_INLINE _cx_self _cx_memb(_init)(void)
     { return c_INIT(_cx_self){NULL}; }
 
+STC_INLINE void _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, size_t n)
+    { while (n--) _cx_memb(_push)(self, i_keyfrom(*raw++)); }
+
+STC_INLINE _cx_self _cx_memb(_from_n)(const _cx_raw* raw, size_t n)
+    { _cx_self cx = {0}; _cx_memb(_put_n)(&cx, raw, n); return cx; }
+
 STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
     if (cap != self->_len && cap <= self->_cap) return true;
     _cx_value *d = (_cx_value *)c_REALLOC(self->data, cap*sizeof *d);

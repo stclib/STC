@@ -114,6 +114,10 @@ _cx_memb(_emplace_at)(_cx_self* self, _cx_iter it, _cx_raw raw) {
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_API _cx_iter        _cx_memb(_copy_range)(_cx_self* self, _cx_value* pos,
                                               const _cx_value* p1, const _cx_value* p2);
+STC_INLINE void         _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, size_t n)
+                            { while (n--) _cx_memb(_push)(self, i_keyfrom(*raw++)); }
+STC_INLINE _cx_self     _cx_memb(_from_n)(const _cx_raw* raw, size_t n)
+                            { _cx_self cx = {0}; _cx_memb(_put_n)(&cx, raw, n); return cx; }
 STC_INLINE i_key        _cx_memb(_value_clone)(_cx_value val)
                             { return i_keyclone(val); }
 STC_INLINE void         _cx_memb(_copy)(_cx_self* self, const _cx_self* other) {

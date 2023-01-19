@@ -48,7 +48,7 @@ int demo2() {
     puts("");
     
     // use a temporary Intspan object.
-    c_FORFILTER (i, Intspan, cspan_literal(Intspan, {10, 20, 30, 23, 22, 21})
+    c_FORFILTER (i, Intspan, c_literal(Intspan, {10, 20, 30, 23, 22, 21})
                   , c_FLT_SKIPWHILE(i, *i.ref < 25)
                  && (*i.ref & 1) == 0 // even only
                   , c_FLT_TAKE(i, 2)) // break after 2
@@ -66,6 +66,9 @@ int demo2() {
     typedef struct { Self##_value *ref, *end; } Self##_iter; \
     typedef struct { Self##_value *data; uint32_t dim[RANK]; } Self; \
     \
+    STC_INLINE Self Self##_from_n(Self##_raw* raw, const size_t n) { \
+        return (Self){.data=raw, .dim={(uint32_t)n}}; \
+    } \
     STC_INLINE Self##_iter Self##_begin(const Self* self) { \
         size_t n = cspan_size(self); \
         Self##_iter it = {n ? self->data : NULL, self->data + n}; \
@@ -90,16 +93,10 @@ int demo2() {
 
 /* create a cspan from a cvec, cstack, cdeq, cqueue, or cpque (heap) */
 #define cspan_from(container) \
-    {.data=(container)->data, .dim={(container)->_len}}
+    {.data=(container)->data, .dim={(uint32_t)(container)->_len}}
 
 #define cspan_from_array(array) \
     {.data=(array) + c_STATIC_ASSERT(sizeof(array) != sizeof(void*)), .dim={c_ARRAYLEN(array)}}
-
-#define cspan_from_list(ValueType, ...) \
-    {.data=(ValueType[])__VA_ARGS__, .dim={sizeof((ValueType[])__VA_ARGS__)/sizeof(ValueType)}}
-
-#define cspan_literal(SpanType, ...) \
-    (c_INIT(SpanType)cspan_from_list(SpanType##_value, __VA_ARGS__))
 
 #define cspan_size(self) _cspan_size((self)->dim, cspan_rank(self))
 #define cspan_rank(self) c_ARRAYLEN((self)->dim)

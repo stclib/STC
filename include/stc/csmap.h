@@ -294,6 +294,22 @@ _cx_memb(_push)(_cx_self* self, _cx_value _val) {
     return _res;
 }
 
+STC_INLINE void _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, size_t n) {
+    while (n--) 
+#if defined _i_isset && defined i_no_emplace
+        _cx_memb(_insert)(self, *raw++);
+#elif defined _i_isset
+        _cx_memb(_emplace)(self, *raw++);
+#elif defined i_no_emplace
+        _cx_memb(_insert_or_assign)(self, raw->first, raw->second), ++raw;
+#else
+        _cx_memb(_emplace_or_assign)(self, raw->first, raw->second), ++raw;
+#endif
+}
+
+STC_INLINE _cx_self _cx_memb(_from_n)(const _cx_raw* raw, size_t n)
+    { _cx_self cx = {0}; _cx_memb(_put_n)(&cx, raw, n); return cx; }
+
 #ifndef _i_isset
     STC_DEF _cx_result
     _cx_memb(_insert_or_assign)(_cx_self* self, i_key _key, i_val _mapped) {

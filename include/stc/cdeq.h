@@ -48,7 +48,10 @@ STC_API void            _cx_memb(_clear)(_cx_self* self);
 STC_API void            _cx_memb(_drop)(_cx_self* self);
 STC_API _cx_value*      _cx_memb(_push)(_cx_self* self, i_key value);
 STC_API void            _cx_memb(_shrink_to_fit)(_cx_self *self);
-
+STC_INLINE void         _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, size_t n)
+                            { while (n--) _cx_memb(_push)(self, i_keyfrom(*raw++)); }
+STC_INLINE _cx_self     _cx_memb(_from_n)(const _cx_raw* raw, size_t n)
+                            { _cx_self cx = {0}; _cx_memb(_put_n)(&cx, raw, n); return cx; }
 #if !defined _i_queue
 #if !defined i_no_emplace
 STC_API _cx_iter        _cx_memb(_emplace_range)(_cx_self* self, _cx_value* pos,

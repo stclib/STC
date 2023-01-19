@@ -44,11 +44,11 @@
 typedef i_keyraw _cx_raw;
 
 STC_INLINE _cx_self _cx_memb(_init)(void) { 
-    _cx_self s; s._len = 0;
+    _cx_self cx; cx._len = 0;
 #ifndef i_capacity
-    s._cap = 0; s.data = NULL;
+    cx._cap = 0; cx.data = NULL;
 #endif
-    return s;
+    return cx;
 }
 
 #ifdef i_capacity
@@ -106,8 +106,7 @@ STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, size_t n) {
     return false;
 }
 
-STC_INLINE _cx_value*
-_cx_memb(_append_uninit)(_cx_self *self, size_t n) {
+STC_INLINE _cx_value* _cx_memb(_append_uninit)(_cx_self *self, size_t n) {
     size_t len = self->_len;
     if (!_cx_memb(_reserve)(self, len + n)) return NULL;
     self->_len += n;
@@ -136,6 +135,12 @@ STC_INLINE _cx_value* _cx_memb(_push)(_cx_self* self, _cx_value val) {
 
 STC_INLINE void _cx_memb(_pop)(_cx_self* self)
     { assert(!_cx_memb(_empty)(self)); _cx_value* p = &self->data[--self->_len]; i_keydrop(p); }
+
+STC_INLINE void _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, size_t n)
+    { while (n--) _cx_memb(_push)(self, i_keyfrom(*raw++)); }
+
+STC_INLINE _cx_self _cx_memb(_from_n)(const _cx_raw* raw, size_t n)
+    { _cx_self cx = {0}; _cx_memb(_put_n)(&cx, raw, n); return cx; }
 
 STC_INLINE const _cx_value* _cx_memb(_at)(const _cx_self* self, size_t idx)
     { assert(idx < self->_len); return self->data + idx; }

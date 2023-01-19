@@ -113,6 +113,10 @@
 #define c_no_hash               (1<<6)
 #define c_no_lookup             (c_no_cmp|c_no_eq|c_no_hash)
 
+#define c_initialize(C, ...) \
+  C##_from_n((C##_raw[])__VA_ARGS__, sizeof((C##_raw[])__VA_ARGS__)/sizeof(C##_raw))
+#define c_literal(C, ...) (*(C[]){c_initialize(C, __VA_ARGS__)})
+
 /* Generic algorithms */
 
 typedef const char* crawstr;

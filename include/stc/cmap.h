@@ -195,8 +195,23 @@ _cx_memb(_push)(_cx_self* self, _cx_value _val) {
     return _res;
 }
 
-STC_INLINE _cx_iter
-_cx_memb(_begin)(const _cx_self* self) {
+STC_INLINE void _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, size_t n) {
+    while (n--) 
+#if defined _i_isset && defined i_no_emplace
+        _cx_memb(_insert)(self, *raw++);
+#elif defined _i_isset
+        _cx_memb(_emplace)(self, *raw++);
+#elif defined i_no_emplace
+        _cx_memb(_insert_or_assign)(self, raw->first, raw->second), ++raw;
+#else
+        _cx_memb(_emplace_or_assign)(self, raw->first, raw->second), ++raw;
+#endif
+}
+
+STC_INLINE _cx_self _cx_memb(_from_n)(const _cx_raw* raw, size_t n)
+    { _cx_self cx = {0}; _cx_memb(_put_n)(&cx, raw, n); return cx; }
+
+STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) {
     _cx_iter it = {self->table, self->table+self->bucket_count, self->_hashx};
     if (it._hx)
         while (*it._hx == 0)
