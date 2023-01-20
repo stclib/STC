@@ -29,7 +29,7 @@
 #include <stdbool.h>
 #include <string.h>
 #include <assert.h>
-#include "priv/lowcase.h"
+#include "priv/altnames.h"
 
 #if SIZE_MAX == UINT32_MAX
   #define c_ZU PRIu32
@@ -112,7 +112,7 @@
 #define c_no_hash               (1<<6)
 #define c_no_lookup             (c_no_cmp|c_no_eq|c_no_hash)
 
-#define c_initialize(C, ...) \
+#define c_init(C, ...) \
   C##_from_n((C##_raw[])__VA_ARGS__, sizeof((C##_raw[])__VA_ARGS__)/sizeof(C##_raw))
 
 /* Function macros and various others */

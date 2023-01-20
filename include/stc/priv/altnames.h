@@ -44,13 +44,13 @@
 #define c_sv c_SV
 
 #define c_DROP c_drop
+#define c_DELETE c_delete
+#define c_SWAP c_swap
 #define c_FIND_IF c_find_if
 #define c_ERASE_IF c_erase_if
 #define c_FLT_TAKE c_flt_take
 #define c_FLT_SKIP c_flt_skip
 #define c_FLT_SKIPWHILE c_flt_skipwhile
 #define c_FLT_TAKEWHILE c_flt_takewhile
-#define c_DELETE c_delete
-#define c_SWAP c_swap
 #define c_CONTAINER_OF c_container_of
 #define c_STATIC_ASSERT c_static_assert
