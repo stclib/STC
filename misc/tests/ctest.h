@@ -186,8 +186,8 @@ void assert_str(const char* cmp, const char* exp, const char* real, const char* 
 void assert_wstr(const char* cmp, const wchar_t *exp, const wchar_t *real, const char* caller, int line);
 #define ASSERT_WSTREQ(exp, real) assert_wstr("==", exp, real, __FILE__, __LINE__)
 #define ASSERT_WSTRNE(exp, real) assert_wstr("!=", exp, real, __FILE__, __LINE__)
-#define ASSERT_WSUBSTR(str, substr) assert_wstr("=~", str, substr, __FILE__, __LINE__)
-#define ASSERT_NOTWSUBSTR(str, substr) assert_wstr("!~", str, substr, __FILE__, __LINE__)
+#define ASSERT_SUBWSTR(str, substr) assert_wstr("=~", str, substr, __FILE__, __LINE__)
+#define ASSERT_NOTSUBWSTR(str, substr) assert_wstr("!~", str, substr, __FILE__, __LINE__)
 
 void assert_data(const unsigned char* exp, size_t expsize,
                  const unsigned char* real, size_t realsize,
