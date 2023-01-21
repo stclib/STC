@@ -197,18 +197,18 @@ CTEST(ctest, test_ctest_err) {
 
 CTEST(ctest, test_dbl_near) {
     double a = 0.000111;
-    ASSERT_DOUBLE_NEAR(0.0001, a);
+    ASSERT_DOUBLE_EQ(0.0001, a);
 }
 
 CTEST(ctest, test_dbl_near_tol) {
     double a = 0.000111;
-    ASSERT_DOUBLE_NEAR_TOL(0.0001, a, 1e-5); /* will fail */
+    ASSERT_NEAR(0.0001, a, 1e-5); /* will fail */
 }
 
 CTEST(ctest, test_dbl_far) {
     double a = 1.1;
-    ASSERT_DOUBLE_NOTNEAR(1., a);
-    ASSERT_DOUBLE_NOTNEAR_TOL(1., a, 0.01);
+    ASSERT_DOUBLE_NE(1., a);
+    ASSERT_NOTNEAR(1., a, 0.01);
 }
 
 CTEST(ctest, test_assert_compare) {
@@ -219,9 +219,9 @@ CTEST(ctest, test_assert_compare) {
 
 CTEST(ctest, test_dbl_near2) {
     float a = 0.000001000003f;
-    ASSERT_FLOAT_NEAR(0.000001f, a);  /* ok, uses float epsilon -1e-5 */
-    ASSERT_DOUBLE_NEAR_TOL(0.000001, a, -1e-5); /* ok, tol < 0 = relative err (epsilon) */
-    ASSERT_DOUBLE_NEAR(0.000001, a);  /* fail, tol = -1e-12 (epsilon) */
+    ASSERT_FLOAT_EQ(0.000001f, a);  /* ok, uses float epsilon -1e-5 */
+    ASSERT_NEAR(0.000001, a, -1e-5); /* ok, tol < 0 = relative err (epsilon) */
+    ASSERT_DOUBLE_EQ(0.000001, a);  /* fail, tol = -1e-12 (epsilon) */
 }
 
 CTEST(ctest, test_dbl_compare) {

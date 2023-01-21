@@ -225,15 +225,15 @@ void assert_fail(const char* caller, int line);
 #define ASSERT_FAIL() assert_fail(__FILE__, __LINE__)
 
 void assert_dbl_compare(const char* cmp, double exp, double real, double tol, const char* caller, int line);
-#define ASSERT_DOUBLE_NEAR(exp, real) assert_dbl_compare("==", exp, real, -CTEST_DBL_EPSILON, __FILE__, __LINE__)
-#define ASSERT_DOUBLE_NEAR_TOL(exp, real, tol) assert_dbl_compare("==", exp, real, tol, __FILE__, __LINE__)
-#define ASSERT_DOUBLE_NOTNEAR(exp, real) assert_dbl_compare("!=", exp, real, -CTEST_DBL_EPSILON, __FILE__, __LINE__)
-#define ASSERT_DOUBLE_NOTNEAR_TOL(exp, real, tol) assert_dbl_compare("!=", exp, real, tol, __FILE__, __LINE__)
+#define ASSERT_NEAR(exp, real, tol) assert_dbl_compare("==", exp, real, tol, __FILE__, __LINE__)
+#define ASSERT_NOTNEAR(exp, real, tol) assert_dbl_compare("!=", exp, real, tol, __FILE__, __LINE__)
+#define ASSERT_DOUBLE_EQ(exp, real) assert_dbl_compare("==", exp, real, -CTEST_DBL_EPSILON, __FILE__, __LINE__)
+#define ASSERT_DOUBLE_NE(exp, real) assert_dbl_compare("!=", exp, real, -CTEST_DBL_EPSILON, __FILE__, __LINE__)
 #define ASSERT_DOUBLE_LT(v1, v2) assert_dbl_compare("<", v1, v2, 0.0, __FILE__, __LINE__)
 #define ASSERT_DOUBLE_GT(v1, v2) assert_dbl_compare(">", v1, v2, 0.0, __FILE__, __LINE__)
 
-#define ASSERT_FLOAT_NEAR(v1, v2) assert_dbl_compare("==", v1, v2, -CTEST_FLT_EPSILON, __FILE__, __LINE__)
-#define ASSERT_FLOAT_NOTNEAR(v1, v2) assert_dbl_compare("!=", v1, v2, -CTEST_FLT_EPSILON, __FILE__, __LINE__)
+#define ASSERT_FLOAT_EQ(v1, v2) assert_dbl_compare("==", v1, v2, -CTEST_FLT_EPSILON, __FILE__, __LINE__)
+#define ASSERT_FLOAT_NE(v1, v2) assert_dbl_compare("!=", v1, v2, -CTEST_FLT_EPSILON, __FILE__, __LINE__)
 #define ASSERT_FLOAT_LT(v1, v2) assert_dbl_compare("<", (float)(v1), (float)(v2), 0.0, __FILE__, __LINE__)
 #define ASSERT_FLOAT_GT(v1, v2) assert_dbl_compare(">", (float)(v1), (float)(v2), 0.0, __FILE__, __LINE__)
 
