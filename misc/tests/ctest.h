@@ -178,16 +178,16 @@ void CTEST_ERR(const char* fmt, ...) CTEST_IMPL_FORMAT_PRINTF(1, 2);  // doesn't
 
 
 void assert_str(const char* cmp, const char* exp, const char* real, const char* caller, int line);
-#define ASSERT_STR(exp, real) assert_str("==", exp, real, __FILE__, __LINE__)
-#define ASSERT_NOT_STR(exp, real) assert_str("!=", exp, real, __FILE__, __LINE__)
-#define ASSERT_STRSTR(str, substr) assert_str("=~", str, substr, __FILE__, __LINE__)
-#define ASSERT_NOT_STRSTR(str, substr) assert_str("!~", str, substr, __FILE__, __LINE__)
+#define ASSERT_STREQ(exp, real) assert_str("==", exp, real, __FILE__, __LINE__)
+#define ASSERT_STRNE(exp, real) assert_str("!=", exp, real, __FILE__, __LINE__)
+#define ASSERT_SUBSTR(str, substr) assert_str("=~", str, substr, __FILE__, __LINE__)
+#define ASSERT_NOTSUBSTR(str, substr) assert_str("!~", str, substr, __FILE__, __LINE__)
 
 void assert_wstr(const char* cmp, const wchar_t *exp, const wchar_t *real, const char* caller, int line);
-#define ASSERT_WSTR(exp, real) assert_wstr("==", exp, real, __FILE__, __LINE__)
-#define ASSERT_NOT_WSTR(exp, real) assert_wstr("!=", exp, real, __FILE__, __LINE__)
-#define ASSERT_WSTRSTR(str, substr) assert_wstr("=~", str, substr, __FILE__, __LINE__)
-#define ASSERT_NOT_WSTRSTR(str, substr) assert_wstr("!~", str, substr, __FILE__, __LINE__)
+#define ASSERT_WSTREQ(exp, real) assert_wstr("==", exp, real, __FILE__, __LINE__)
+#define ASSERT_WSTRNE(exp, real) assert_wstr("!=", exp, real, __FILE__, __LINE__)
+#define ASSERT_WSUBSTR(str, substr) assert_wstr("=~", str, substr, __FILE__, __LINE__)
+#define ASSERT_NOTWSUBSTR(str, substr) assert_wstr("!~", str, substr, __FILE__, __LINE__)
 
 void assert_data(const unsigned char* exp, size_t expsize,
                  const unsigned char* real, size_t realsize,
@@ -199,28 +199,21 @@ void assert_data(const unsigned char* exp, size_t expsize,
 #define CTEST_DBL_EPSILON 1e-12
 
 void assert_compare(const char* cmp, intmax_t exp, intmax_t real, const char* caller, int line);
-#define ASSERT_EQUAL(exp, real) assert_compare("==", exp, real, __FILE__, __LINE__)
-#define ASSERT_NOT_EQUAL(exp, real) assert_compare("!=", exp, real, __FILE__, __LINE__)
-
-#define ASSERT_EQ ASSERT_EQUAL
-#define ASSERT_NE ASSERT_NOT_EQUAL
+#define ASSERT_EQ(v1, v2) assert_compare("==", v1, v2, __FILE__, __LINE__)
+#define ASSERT_NE(v1, v2) assert_compare("!=", v1, v2, __FILE__, __LINE__)
 #define ASSERT_LT(v1, v2) assert_compare("<", v1, v2, __FILE__, __LINE__)
 #define ASSERT_LE(v1, v2) assert_compare("<=", v1, v2, __FILE__, __LINE__)
 #define ASSERT_GT(v1, v2) assert_compare(">", v1, v2, __FILE__, __LINE__)
 #define ASSERT_GE(v1, v2) assert_compare(">=", v1, v2, __FILE__, __LINE__)
 
-void assert_compare_u(const char* cmp, uintmax_t exp, uintmax_t real, const char* caller, int line);
-#define ASSERT_EQUAL_U(exp, real) assert_compare_u("==", exp, real, __FILE__, __LINE__)
-#define ASSERT_NOT_EQUAL_U(exp, real) assert_compare_u("!=", exp, real, __FILE__, __LINE__)
-
 void assert_interval(intmax_t exp1, intmax_t exp2, intmax_t real, const char* caller, int line);
-#define ASSERT_INTERVAL(exp1, exp2, real) assert_interval(exp1, exp2, real, __FILE__, __LINE__)
+#define ASSERT_INRANGE(exp1, exp2, real) assert_interval(exp1, exp2, real, __FILE__, __LINE__)
 
 void assert_null(void* real, const char* caller, int line);
 #define ASSERT_NULL(real) assert_null((void*)real, __FILE__, __LINE__)
 
 void assert_not_null(const void* real, const char* caller, int line);
-#define ASSERT_NOT_NULL(real) assert_not_null(real, __FILE__, __LINE__)
+#define ASSERT_NOTNULL(real) assert_not_null(real, __FILE__, __LINE__)
 
 void assert_true(int real, const char* caller, int line);
 #define ASSERT_TRUE(real) assert_true(real, __FILE__, __LINE__)
@@ -232,15 +225,17 @@ void assert_fail(const char* caller, int line);
 #define ASSERT_FAIL() assert_fail(__FILE__, __LINE__)
 
 void assert_dbl_compare(const char* cmp, double exp, double real, double tol, const char* caller, int line);
-#define ASSERT_DBL_NEAR(exp, real) assert_dbl_compare("==", exp, real, -CTEST_DBL_EPSILON, __FILE__, __LINE__)
-#define ASSERT_DBL_NEAR_TOL(exp, real, tol) assert_dbl_compare("==", exp, real, tol, __FILE__, __LINE__)
-#define ASSERT_DBL_FAR(exp, real) assert_dbl_compare("!=", exp, real, -CTEST_DBL_EPSILON, __FILE__, __LINE__)
-#define ASSERT_DBL_FAR_TOL(exp, real, tol) assert_dbl_compare("!=", exp, real, tol, __FILE__, __LINE__)
+#define ASSERT_DOUBLE_NEAR(exp, real) assert_dbl_compare("==", exp, real, -CTEST_DBL_EPSILON, __FILE__, __LINE__)
+#define ASSERT_DOUBLE_NEAR_TOL(exp, real, tol) assert_dbl_compare("==", exp, real, tol, __FILE__, __LINE__)
+#define ASSERT_DOUBLE_NOTNEAR(exp, real) assert_dbl_compare("!=", exp, real, -CTEST_DBL_EPSILON, __FILE__, __LINE__)
+#define ASSERT_DOUBLE_NOTNEAR_TOL(exp, real, tol) assert_dbl_compare("!=", exp, real, tol, __FILE__, __LINE__)
+#define ASSERT_DOUBLE_LT(v1, v2) assert_dbl_compare("<", v1, v2, 0.0, __FILE__, __LINE__)
+#define ASSERT_DOUBLE_GT(v1, v2) assert_dbl_compare(">", v1, v2, 0.0, __FILE__, __LINE__)
 
-#define ASSERT_FLT_NEAR(v1, v2) assert_dbl_compare("==", v1, v2, -CTEST_FLT_EPSILON, __FILE__, __LINE__)
-#define ASSERT_FLT_FAR(v1, v2) assert_dbl_compare("!=", v1, v2, -CTEST_FLT_EPSILON, __FILE__, __LINE__)
-#define ASSERT_DBL_LT(v1, v2) assert_dbl_compare("<", v1, v2, 0.0, __FILE__, __LINE__)
-#define ASSERT_DBL_GT(v1, v2) assert_dbl_compare(">", v1, v2, 0.0, __FILE__, __LINE__)
+#define ASSERT_FLOAT_NEAR(v1, v2) assert_dbl_compare("==", v1, v2, -CTEST_FLT_EPSILON, __FILE__, __LINE__)
+#define ASSERT_FLOAT_NOTNEAR(v1, v2) assert_dbl_compare("!=", v1, v2, -CTEST_FLT_EPSILON, __FILE__, __LINE__)
+#define ASSERT_FLOAT_LT(v1, v2) assert_dbl_compare("<", (float)(v1), (float)(v2), 0.0, __FILE__, __LINE__)
+#define ASSERT_FLOAT_GT(v1, v2) assert_dbl_compare(">", (float)(v1), (float)(v2), 0.0, __FILE__, __LINE__)
 
 #ifdef CTEST_MAIN
 
@@ -401,14 +396,6 @@ void assert_compare(const char* cmp, intmax_t exp, intmax_t real, const char* ca
 
     if (!get_compare_result(cmp, c3, c3 == 0)) {
         CTEST_ERR("%s:%d  assertion failed, %" PRIdMAX " %s %" PRIdMAX "", caller, line, exp, cmp, real);
-    }
-}
-
-void assert_compare_u(const char* cmp, uintmax_t exp, uintmax_t real, const char* caller, int line) {
-    int c3 = (real < exp) - (exp < real);
-
-    if (!get_compare_result(cmp, c3, c3 == 0)) {
-        CTEST_ERR("%s:%d  assertion failed, %" PRIuMAX " %s %" PRIuMAX, caller, line, exp, cmp, real);
     }
 }
 
