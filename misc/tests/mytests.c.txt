@@ -35,81 +35,81 @@ CTEST(suite3, test3) {
 
 // A test suite with a setup/teardown function
 // This is converted into a struct that's automatically passed to all tests in the suite
-CTEST_DATA(memtest) {
+CTEST_FIXTURE(memtest) {
     unsigned char* buffer;
 };
 
 // Optional setup function for suite, called before every test in suite
 CTEST_SETUP(memtest) {
-    CTEST_LOG("%s() data=%p buffer=%p", __func__, (void*)data, (void*)data->buffer);
-    data->buffer = (unsigned char*)malloc(1024);
+    CTEST_LOG("%s() data=%p buffer=%p", __func__, (void*)self, (void*)self->buffer);
+    self->buffer = (unsigned char*)malloc(1024);
 }
 
 // Optional teardown function for suite, called after every test in suite
 CTEST_TEARDOWN(memtest) {
-    CTEST_LOG("%s() data=%p buffer=%p", __func__, (void*)data, (void*)data->buffer);
-    if (data->buffer) free(data->buffer);
+    CTEST_LOG("%s() data=%p buffer=%p", __func__, (void*)self, (void*)self->buffer);
+    if (self->buffer) free(self->buffer);
 }
 
-// These tests are called with the struct* (named data) as argument
-CTEST2(memtest, test1) {
-    CTEST_LOG("%s()  data=%p  buffer=%p", __func__, (void*)data, (void*)data->buffer);
+// These tests are called with the struct* (named self) as argument
+CTEST_F(memtest, test1) {
+    CTEST_LOG("%s()  data=%p  buffer=%p", __func__, (void*)self, (void*)self->buffer);
 }
 
-CTEST2_SKIP(memtest, test3) {
-    (void)data;
+CTEST_F_SKIP(memtest, test3) {
+    (void)self;
     ASSERT_FAIL();
 }
 
-CTEST2(memtest, test2) {
-    CTEST_LOG("%s()  data=%p  buffer=%p", __func__, (void*)data, (void*)data->buffer);
+CTEST_F(memtest, test2) {
+    CTEST_LOG("%s()  data=%p  buffer=%p", __func__, (void*)self, (void*)self->buffer);
     ASSERT_FAIL();
 }
 
 
-CTEST_DATA(fail) {
+CTEST_FIXTURE(fail) {
     int unused;
 };
 
 // Asserts can also be used in setup/teardown functions
 CTEST_SETUP(fail) {
-    (void)data;
+    (void)self;
     ASSERT_FAIL();
 }
 
-CTEST2(fail, test1) {
-    (void)data;
+CTEST_F(fail, test1) {
+    (void)self;
 }
 
 
 
-CTEST_DATA(weaklinkage) {
+CTEST_FIXTURE(weaklinkage) {
     int number;
 };
 
 // This suite has data, but no setup/teardown
-CTEST2(weaklinkage, test1) {
-    (void)data;
+CTEST_F(weaklinkage, test1) {
+    (void)self;
     CTEST_LOG("%s()", __func__);
 }
 
-CTEST2(weaklinkage, test2) {
-    (void)data;
+CTEST_F(weaklinkage, test2) {
+    (void)self;
     CTEST_LOG("%s()", __func__);
 }
 
 
-CTEST_DATA(nosetup) {
+CTEST_FIXTURE(nosetup) {
     int value;
 };
 
 CTEST_TEARDOWN(nosetup) {
-    (void)data;
+    (void)self;
     CTEST_LOG("%s()", __func__);
 }
 
-CTEST2(nosetup, test1) {
-    (void)data;
+CTEST_F(nosetup, test1) {
+    (void)self;
     CTEST_LOG("%s()", __func__);
 }
 
@@ -131,8 +131,8 @@ CTEST(ctest, test_assert_not_equal) {
 }
 
 CTEST(ctest, test_assert_interval) {
-    ASSERT_INRANGE(10, 20, 15);
-    ASSERT_INRANGE(1000, 2000, 3000);
+    ASSERT_INTERVAL(10, 20, 15);
+    ASSERT_INTERVAL(1000, 2000, 3000);
 }
 
 CTEST(ctest, test_assert_null) {
@@ -141,12 +141,8 @@ CTEST(ctest, test_assert_null) {
 }
 
 CTEST(ctest, test_assert_not_null_const) {
-    ASSERT_NOTNULL((const char*)"hallo");
-}
-
-CTEST(ctest, test_assert_not_null) {
-    ASSERT_NOTNULL((void*)0xdeadbeef);
-    ASSERT_NOTNULL(NULL);
+    char *p = NULL;
+    ASSERT_PTR_NE(p, (const char*)"hallo");
 }
 
 CTEST(ctest, test_assert_true) {
@@ -208,7 +204,7 @@ CTEST(ctest, test_dbl_near_tol) {
 CTEST(ctest, test_dbl_far) {
     double a = 1.1;
     ASSERT_DOUBLE_NE(1., a);
-    ASSERT_NOTNEAR(1., a, 0.01);
+    ASSERT_NOT_NEAR(1., a, 0.01);
 }
 
 CTEST(ctest, test_assert_compare) {
@@ -232,6 +228,6 @@ CTEST(ctest, test_dbl_compare) {
 
 CTEST(ctest, test_str_contains) {
     ASSERT_STRNE("Hello", "World");
-    ASSERT_SUBSTR("Hello", "ello");
-    ASSERT_NOTSUBSTR("Hello", "ello");
+    ASSERT_SUBSTR("ello", "Hello");
+    ASSERT_NOT_SUBSTR("Hell", "Hello");
 }
