@@ -61,7 +61,7 @@ int demo2() {
 #include "ccommon.h"
 
 #define using_cspan(Self, T, RANK) \
-    typedef T Self##_value, Self##_raw; \
+    typedef T Self##_value; typedef T Self##_raw; \
     typedef struct { Self##_value *ref, *end; } Self##_iter; \
     typedef struct { Self##_value *data; uint32_t dim[RANK]; } Self; \
     \
@@ -89,6 +89,10 @@ int demo2() {
 
 #define cspan_make(array, ...) \
     {.data=array, .dim={__VA_ARGS__}}
+
+/* For static initialization use , cspan_init(). c_init() only works for non-static. */
+#define cspan_init(SpanType, ...) \
+    {.data=(SpanType##_value[])__VA_ARGS__, .dim={sizeof((SpanType##_value[])__VA_ARGS__)/sizeof(SpanType##_value)}}
 
 /* create a cspan from a cvec, cstack, cdeq, cqueue, or cpque (heap) */
 #define cspan_from(container) \
