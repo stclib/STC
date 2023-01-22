@@ -90,7 +90,7 @@ int demo2() {
 #define cspan_make(array, ...) \
     {.data=array, .dim={__VA_ARGS__}}
 
-/* For static initialization use , cspan_init(). c_init() only works for non-static. */
+/* For static initialization use , cspan_init(). c_make() only works for non-static. */
 #define cspan_init(SpanType, ...) \
     {.data=(SpanType##_value[])__VA_ARGS__, .dim={sizeof((SpanType##_value[])__VA_ARGS__)/sizeof(SpanType##_value)}}
 
