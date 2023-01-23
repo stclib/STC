@@ -56,7 +56,7 @@
 
 /* Macro overloading feature support based on: https://rextester.com/ONP80107 */
 #define c_MACRO_OVERLOAD(name, ...) \
-    c_PASTE(name, c_NUMARGS(__VA_ARGS__))(__VA_ARGS__)
+    c_PASTE(c_CONCAT(name, _), c_NUMARGS(__VA_ARGS__))(__VA_ARGS__)
 #define c_CONCAT(a, b) a ## b
 #define c_PASTE(a, b) c_CONCAT(a, b)
 #define c_EXPAND(...) __VA_ARGS__
@@ -124,8 +124,8 @@ typedef const char* crawstr;
 
 #define c_ARRAYLEN(a) (sizeof(a)/sizeof 0[a])
 #define c_SV(...) c_MACRO_OVERLOAD(c_SV, __VA_ARGS__)
-#define c_SV1(lit) c_SV2(lit, crawstr_len(lit))
-#define c_SV2(str, n) (c_COMPOUND(csview){str, n})
+#define c_SV_1(lit) c_SV_2(lit, crawstr_len(lit))
+#define c_SV_2(str, n) (c_COMPOUND(csview){str, n})
 #define c_ARGSV(sv) (int)(sv).size, (sv).str  /* use with "%.*s" */
 #define c_PAIR(ref) (ref)->first, (ref)->second
 
@@ -168,9 +168,9 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
 /* Control block macros */
 
 #define c_FOREACH(...) c_MACRO_OVERLOAD(c_FOREACH, __VA_ARGS__)
-#define c_FOREACH3(it, C, cnt) \
+#define c_FOREACH_3(it, C, cnt) \
     for (C##_iter it = C##_begin(&cnt); it.ref; C##_next(&it))
-#define c_FOREACH4(it, C, start, finish) \
+#define c_FOREACH_4(it, C, start, finish) \
     for (C##_iter it = start, *_endref = (C##_iter*)(finish).ref \
          ; it.ref != (C##_value*)_endref; C##_next(&it))
 
@@ -185,11 +185,11 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
          ; C##_next(&_.it))
 
 #define c_FORRANGE(...) c_MACRO_OVERLOAD(c_FORRANGE, __VA_ARGS__)
-#define c_FORRANGE1(stop) c_FORRANGE3(_c_i, 0, stop)
-#define c_FORRANGE2(i, stop) c_FORRANGE3(i, 0, stop)
-#define c_FORRANGE3(i, start, stop) \
+#define c_FORRANGE_1(stop) c_FORRANGE_3(_c_i, 0, stop)
+#define c_FORRANGE_2(i, stop) c_FORRANGE_3(i, 0, stop)
+#define c_FORRANGE_3(i, start, stop) \
     for (long long i=start, _end=(long long)(stop); i < _end; ++i)
-#define c_FORRANGE4(i, start, stop, step) \
+#define c_FORRANGE_4(i, start, stop, step) \
     for (long long i=start, _inc=step, _end=(long long)(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)
 #ifndef __cplusplus
@@ -205,34 +205,34 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
          ; it.index < it.size; ++it.ref, ++it.index)
 #endif
 #define c_WITH(...) c_MACRO_OVERLOAD(c_WITH, __VA_ARGS__)
-#define c_WITH2(declvar, drop) for (declvar, **_c_i = NULL; !_c_i; ++_c_i, drop)
-#define c_WITH3(declvar, pred, drop) for (declvar, **_c_i = NULL; !_c_i && (pred); ++_c_i, drop)
+#define c_WITH_2(declvar, drop) for (declvar, **_c_i = NULL; !_c_i; ++_c_i, drop)
+#define c_WITH_3(declvar, pred, drop) for (declvar, **_c_i = NULL; !_c_i && (pred); ++_c_i, drop)
 #define c_SCOPE(init, drop) for (int _c_i = (init, 1); _c_i; --_c_i, drop)
 #define c_DEFER(...) for (int _c_i = 1; _c_i; --_c_i, __VA_ARGS__)
 
 #define c_AUTO(...) c_MACRO_OVERLOAD(c_AUTO, __VA_ARGS__)
-#define c_AUTO2(C, a) \
-    c_WITH2(C a = C##_init(), C##_drop(&a))
-#define c_AUTO3(C, a, b) \
-    c_WITH2(c_EXPAND(C a = C##_init(), b = C##_init()), \
+#define c_AUTO_2(C, a) \
+    c_WITH_2(C a = C##_init(), C##_drop(&a))
+#define c_AUTO_3(C, a, b) \
+    c_WITH_2(c_EXPAND(C a = C##_init(), b = C##_init()), \
             (C##_drop(&b), C##_drop(&a)))
-#define c_AUTO4(C, a, b, c) \
-    c_WITH2(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init()), \
+#define c_AUTO_4(C, a, b, c) \
+    c_WITH_2(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init()), \
             (C##_drop(&c), C##_drop(&b), C##_drop(&a)))
-#define c_AUTO5(C, a, b, c, d) \
-    c_WITH2(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
+#define c_AUTO_5(C, a, b, c, d) \
+    c_WITH_2(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
             (C##_drop(&d), C##_drop(&c), C##_drop(&b), C##_drop(&a)))
 
 /* Generic functions */
 
 #define c_drop(C, ...) do { c_FORLIST (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
 #define c_find_if(...) c_MACRO_OVERLOAD(c_find_if, __VA_ARGS__)
-#define c_find_if4(it, C, cnt, pred) do { \
+#define c_find_if_4(it, C, cnt, pred) do { \
     size_t index = 0; \
     for (it = C##_begin(&cnt); it.ref && !(pred); C##_next(&it)) \
         ++index; \
 } while (0)
-#define c_find_if5(it, C, start, end, pred) do { \
+#define c_find_if_5(it, C, start, end, pred) do { \
     size_t index = 0; \
     const C##_value* _endref = (end).ref; \
     for (it = start; it.ref != _endref && !(pred); C##_next(&it)) \

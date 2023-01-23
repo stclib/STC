@@ -54,10 +54,10 @@ typedef struct { crange_value start, end, step, value; } crange;
 typedef struct { crange_value *ref, end, step; } crange_iter;
 
 #define crange_make(...) c_MACRO_OVERLOAD(crange_make, __VA_ARGS__)
-#define crange_make1(stop) crange_make3(0, stop, 1)
-#define crange_make2(start, stop) crange_make3(start, stop, 1)
+#define crange_make_1(stop) crange_make_3(0, stop, 1)
+#define crange_make_2(start, stop) crange_make_3(start, stop, 1)
 
-STC_INLINE crange crange_make3(crange_value start, crange_value stop, crange_value step)
+STC_INLINE crange crange_make_3(crange_value start, crange_value stop, crange_value step)
     { crange r = {start, stop - (step > 0), step}; return r; }
 
 STC_INLINE crange_iter crange_begin(crange* self)

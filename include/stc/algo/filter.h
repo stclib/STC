@@ -61,10 +61,10 @@ int main()
 
 #define c_FORFILTER(...) c_MACRO_OVERLOAD(c_FORFILTER, __VA_ARGS__)
 
-#define c_FORFILTER4(i, C, cnt, filter) \
+#define c_FORFILTER_4(i, C, cnt, filter) \
     c_FORFILTER_B(i, C, C##_begin(&cnt), filter)
 
-#define c_FORFILTER5(i, C, cnt, filter, cond) \
+#define c_FORFILTER_5(i, C, cnt, filter, cond) \
     c_FORFILTER_B(i, C, C##_begin(&cnt), filter) if (!(cond)) break; else
 
 #define c_FORFILTER_B(i, C, start, filter) \
