@@ -210,16 +210,14 @@ void assert_interval(intmax_t low, intmax_t high, intmax_t real, const char* cal
 #define ASSERT_INTERVAL(low, high, real) assert_interval(low, high, real, __FILE__, __LINE__)
 
 void assert_pointers(const char* cmp, const void* exp, const void* real, const char* caller, int line);
-#define ASSERT_NULL(real) assert_pointers("==", NULL, real, __FILE__, __LINE__)
-#define ASSERT_NOT_NULL(real) assert_pointers("!=", NULL, real, __FILE__, __LINE__)
 #define ASSERT_PTR_EQ(exp, real) ((void)sizeof((exp) == (real)), assert_pointers("==", exp, real, __FILE__, __LINE__))
 #define ASSERT_PTR_NE(exp, real) ((void)sizeof((exp) != (real)), assert_pointers("!=", exp, real, __FILE__, __LINE__))
+#define ASSERT_NULL(real) ASSERT_PTR_EQ(NULL, real)
+#define ASSERT_NOT_NULL(real) ASSERT_PTR_NE(NULL, real)
 
-void assert_true(int real, const char* caller, int line);
-#define ASSERT_TRUE(real) assert_true(real, __FILE__, __LINE__)
-
-void assert_false(int real, const char* caller, int line);
-#define ASSERT_FALSE(real) assert_false(real, __FILE__, __LINE__)
+void assert_bool(bool exp, bool real, const char* caller, int line);
+#define ASSERT_TRUE(real) assert_bool(true, real, __FILE__, __LINE__)
+#define ASSERT_FALSE(real) assert_bool(false, real, __FILE__, __LINE__)
 
 void assert_fail(const char* caller, int line);
 #define ASSERT_FAIL() assert_fail(__FILE__, __LINE__)
@@ -432,19 +430,13 @@ void assert_dbl_compare(const char* cmp, double exp, double real, double tol, co
 
 void assert_pointers(const char* cmp, const void* exp, const void* real, const char* caller, int line) {
     if ((exp == real) != (cmp[0] == '=')) {
-        CTEST_ERR("%s:%d  pointer assertion failed %p %s %p", caller, line, exp, cmp, real);
+        CTEST_ERR("%s:%d  assertion failed (0x%02llx) %s (0x%02llx)", caller, line, (unsigned long long)exp , cmp, (unsigned long long)real);
     }
 }
 
-void assert_true(int real, const char* caller, int line) {
-    if ((real) == 0) {
-        CTEST_ERR("%s:%d  should be true", caller, line);
-    }
-}
-
-void assert_false(int real, const char* caller, int line) {
-    if ((real) != 0) {
-        CTEST_ERR("%s:%d  should be false", caller, line);
+void assert_bool(bool exp, bool real, const char* caller, int line) {
+    if (exp != real) {
+        CTEST_ERR("%s:%d  should be %s", caller, line, exp ? "true" : "false");
     }
 }
 
