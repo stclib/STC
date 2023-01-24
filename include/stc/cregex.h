@@ -142,8 +142,8 @@ void cregex_drop(cregex* self);
 
 #endif // CREGEX_H_INCLUDED
 #if defined i_extern || defined STC_EXTERN
-#  include "../src/cregex.c"
-#  include "../src/utf8code.c"
+#  include "../../src/cregex.c"
+#  include "../../src/utf8code.c"
 #endif
 #undef i_opt
 #undef i_header

@@ -115,6 +115,6 @@ STC_INLINE size_t utf8_pos(const char* s, size_t index)
 
 #endif // UTF8_H_INCLUDED
 #if defined i_extern || defined STC_EXTERN
-#  include "../src/utf8code.c"
+#  include "../../src/utf8code.c"
 #  undef i_extern
 #endif
