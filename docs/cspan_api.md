@@ -25,6 +25,7 @@ SpanTypeN       cspan_make(ValueType* data,  size_t xdim, ...);         // make 
 SpanType        cspan_from(STCContainer* cnt);                          // create a 1D cspan from a compatible STC container
 SpanType        cspan_from_array(ValueType array[]);                    // create a 1D cspan from a C array
 
+SpanType        cspan_flatten(SpanTypeN* span);                         // create a 1D cspan from a multidim span
 void            cspan_resize(SpanTypeN* self, size_t xdim, ...);        // change the extent of each dimension
 
 size_t          cspan_size(const SpanTypeN* self);                      // return number of elements
@@ -35,9 +36,9 @@ ValueType*      cspan_at(SpanTypeN* self, size_t x, ...);               // at():
 ValueType*      cspan_front(SpanTypeN* self);
 ValueType*      cspan_back(SpanTypeN* self);
 
-SpanType        cspan_subdim2(SpanType2* self, size_t x);               // return a cspan from a 2D SpanType.
-SpanTypeN       cspan_subdim3(SpanType3* self, size_t x, ...);          // subdimN(): N decides input SpanType,
-SpanTypeN       cspan_subdim4(SpanType4* self, size_t x, ...);          // and num of args decides returned SpanTypeN.
+SpanType        cspan_at2(SpanType2* self, size_t x);               // return a cspan from a 2D SpanType.
+SpanTypeN       cspan_at3(SpanType3* self, size_t x, ...);          // atN(): N decides input SpanType,
+SpanTypeN       cspan_at4(SpanType4* self, size_t x, ...);          // and num of args decides returned SpanTypeN.
 
                 // return a subspan of same rank:
 SpanType        cspan_subspan(const SpanType* self, size_t offset, size_t count);
@@ -79,12 +80,12 @@ int main()
         *cspan_at(&span3, 4, 3, 2) = 3.14159f;
         printf("index: %d", (int)cspan_index(&span3, 4, 3, 2));
 
-        Span span1 = cspan_subdim3(&span3, 4, 3);
+        Span span1 = cspan_at3(&span3, 4, 3);
         printf("\niterate span1: ");
         c_FOREACH (i, Span, span1)
             printf("%g ", *i.ref);
 
-        Span2 span2 = cspan_subdim3(&span3, 4);
+        Span2 span2 = cspan_at3(&span3, 4);
         printf("\niterate span2: ");
         c_FOREACH (i, Span2, span2)
             printf("%g ", *i.ref);
