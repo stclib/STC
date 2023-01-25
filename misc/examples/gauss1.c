@@ -45,7 +45,7 @@ int main()
 
         // Print the gaussian bar chart
         c_FOREACH (i, cvec_ii, histvec) {
-            int n = (int)(i.ref->second * StdDev * Scale * 2.5 / N);
+            int n = (int)(i.ref->second * StdDev * Scale * 2.5 / (double)N);
             if (n > 0) {
                 printf("%4d ", i.ref->first);
                 c_FORRANGE (n) printf("*");

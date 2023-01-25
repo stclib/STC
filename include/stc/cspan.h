@@ -30,7 +30,7 @@ using_cspan(Intspan, int, 1);
 
 int demo1() {
     float raw[4*5];
-    Span2f ms = cspan_make(raw, 4, 5);
+    Span2f ms = cspan_multidim(raw, 4, 5);
     
     for (size_t i=0; i<ms.dim[0]; i++)
         for (size_t j=0; j<ms.dim[1]; j++)
@@ -87,11 +87,11 @@ int demo2() {
 
 #define cspan_rank_ok(self, rank) c_static_assert(cspan_rank(self) == rank)
 
-#define cspan_make(array, ...) \
+#define cspan_multidim(array, ...) \
     {.data=array, .dim={__VA_ARGS__}}
 
-/* For static initialization use , cspan_init(). c_make() only works for non-static. */
-#define cspan_init(SpanType, ...) \
+/* For static initialization, use cspan_make(). c_make() for non-static only. */
+#define cspan_make(SpanType, ...) \
     {.data=(SpanType##_value[])__VA_ARGS__, .dim={sizeof((SpanType##_value[])__VA_ARGS__)/sizeof(SpanType##_value)}}
 
 #define cspan_flatten(span) \

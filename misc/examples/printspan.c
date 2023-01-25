@@ -27,7 +27,7 @@ int main()
     c_AUTO (cdeq_int, deq)
     c_AUTO (cset_str, set)
     {
-        intspan sp1 = cspan_init(intspan, {1, 2});
+        intspan sp1 = cspan_make(intspan, {1, 2});
         printMe( sp1 );
     
         printMe( c_make(intspan, {1, 2, 3}) );

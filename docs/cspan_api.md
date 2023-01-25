@@ -18,27 +18,28 @@ using_cspan3(S, ValueType);             // define span types S, S2, S3 with rank
 using_cspan4(S, ValueType);             // define span types S, S2, S3, S4 with ranks 1, 2, 3, 4.
 ```
 ## Methods
-Note that `cspan_make()`, `cmake_from*()`, `cspan_atN()`, `and cspan_subspanN()` require a (safe) cast to its span-type
+Note that `cspan_multidim()`, `cmake_from*()`, `cspan_atN()`, `and cspan_subspanN()` require a (safe) cast to its span-type
 on assignment, but not on initialization of a span variable. All functions are type-safe, and arguments are side-effect safe, except for SpanType arg. which must not have side-effects.
 ```c
-SpanTypeN       cspan_make(ValueType* data,  size_t xdim, ...);         // make N-dimensional cspan
-SpanType        cspan_from(STCContainer* cnt);                          // create a 1D cspan from a compatible STC container
-SpanType        cspan_from_array(ValueType array[]);                    // create a 1D cspan from a C array
+SpanType        cspan_make(T SpanType, {v1, v2, ...});                  // make a 1d-dimensional cspan from values
+SpanTypeN       cspan_multidim(ValueType* data,  size_t xdim, ...);     // create a multi-dimensional cspan
+SpanType        cspan_from(STCContainer* cnt);                          // create a 1d cspan from a compatible STC container
+SpanType        cspan_from_array(ValueType array[]);                    // create a 1d cspan from a C array
 
-SpanType        cspan_flatten(SpanTypeN* span);                         // create a 1D cspan from a multidim span
+SpanType        cspan_flatten(SpanTypeN* span);                         // create a 1d cspan from a multidim span
 void            cspan_resize(SpanTypeN* self, size_t xdim, ...);        // change the extent of each dimension
 
 size_t          cspan_size(const SpanTypeN* self);                      // return number of elements
 unsigned        cspan_rank(const SpanTypeN* self);                      // return number of dimensions
 size_t          cspan_index(const SpanTypeN* self, size_t x, ...);      // index of element
                 
-ValueType*      cspan_at(SpanTypeN* self, size_t x, ...);               // at(): num of args decides input SpanTypeN.
+ValueType*      cspan_at(SpanTypeN* self, size_t x, ...);               // at(): num of args specifies rank of input span.
 ValueType*      cspan_front(SpanTypeN* self);
 ValueType*      cspan_back(SpanTypeN* self);
 
-SpanType        cspan_at2(SpanType2* self, size_t x);               // return a cspan from a 2D SpanType.
-SpanTypeN       cspan_at3(SpanType3* self, size_t x, ...);          // atN(): N decides input SpanType,
-SpanTypeN       cspan_at4(SpanType4* self, size_t x, ...);          // and num of args decides returned SpanTypeN.
+SpanType        cspan_at2(SpanType2* self, size_t x);                   // return a 1d subspan from a 2d span.
+SpanTypeN       cspan_at3(SpanType3* self, size_t x, ...);              // return a 1 or 2d subspan from a 3d span.
+SpanTypeN       cspan_at4(SpanType4* self, size_t x, ...);              // number of args determines rank of output span.
 
                 // return a subspan of same rank:
 SpanType        cspan_subspan(const SpanType* self, size_t offset, size_t count);
@@ -76,7 +77,7 @@ int main()
             cstack_float_push(&vec, i);
 
         // define "span3[xd][yd][zd]"
-        Span3 span3 = cspan_make(vec.data, xd, yd, zd);
+        Span3 span3 = cspan_multidim(vec.data, xd, yd, zd);
         *cspan_at(&span3, 4, 3, 2) = 3.14159f;
         printf("index: %d", (int)cspan_index(&span3, 4, 3, 2));
 

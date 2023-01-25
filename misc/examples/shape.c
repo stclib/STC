@@ -50,12 +50,12 @@ typedef struct {
     Point p[3];
 } Triangle;
 
-static struct ShapeAPI Triangle_api;
+extern struct ShapeAPI Triangle_api;
 
 
 Triangle Triangle_from(Point a, Point b, Point c)
 {
-    Triangle t = {{.api=&Triangle_api}, .p={a, b, c}};
+    Triangle t = {.shape={.api=&Triangle_api}, .p={a, b, c}};
     return t;
 }
 
@@ -68,7 +68,7 @@ static void Triangle_draw(const Shape* shape)
            self->p[2].x, self->p[2].y);
 }
 
-static struct ShapeAPI Triangle_api = {
+struct ShapeAPI Triangle_api = {
     .drop = Shape_drop,
     .draw = Triangle_draw,
 };
@@ -85,12 +85,12 @@ typedef struct {
     PointVec points;
 } Polygon;
 
-static struct ShapeAPI Polygon_api;
+extern struct ShapeAPI Polygon_api;
 
 
 Polygon Polygon_init(void)
 {
-    Polygon p = {{.api=&Polygon_api}, .points=PointVec_init()};
+    Polygon p = {.shape={.api=&Polygon_api}, .points=PointVec_init()};
     return p;
 }
 
@@ -116,7 +116,7 @@ static void Polygon_draw(const Shape* shape)
     puts("");
 }
 
-static struct ShapeAPI Polygon_api = {
+struct ShapeAPI Polygon_api = {
     .drop = Polygon_drop,
     .draw = Polygon_draw,
 };

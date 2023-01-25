@@ -15,9 +15,9 @@ int main()
     // View data as contiguous memory representing 12 ints
     ispan ms1 = cspan_from(&v);
     // View data as contiguous memory representing 2 rows of 6 ints each
-    ispan2 ms2 = cspan_make(v.data, 2, 6);
+    ispan2 ms2 = cspan_multidim(v.data, 2, 6);
     // View the same data as a 3D array 2 x 3 x 2
-    ispan3 ms3 = cspan_make(v.data, 2, 3, 2);
+    ispan3 ms3 = cspan_multidim(v.data, 2, 3, 2);
 
     // write data using 2D view
     for (unsigned i=0; i != ms2.dim[0]; i++)
