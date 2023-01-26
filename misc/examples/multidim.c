@@ -4,7 +4,7 @@
 #include <stc/cspan.h>
 #include <stdio.h>
 
-using_cspan3(ispan, int);
+use_cspan3(ispan, int);
 
 int main()
 {

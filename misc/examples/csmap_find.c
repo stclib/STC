@@ -16,7 +16,7 @@ void print_elem(csmap_istr_raw p) {
     printf("(%d, %s) ", p.first, p.second);
 }
 
-#define using_print_collection(CX) \
+#define use_print_collection(CX) \
     void print_collection_##CX(const CX* t) { \
         printf("%" c_ZU " elements: ", CX##_size(t)); \
     \
@@ -26,8 +26,8 @@ void print_elem(csmap_istr_raw p) {
         puts(""); \
     }
 
-using_print_collection(csmap_istr)
-using_print_collection(cvec_istr)
+use_print_collection(csmap_istr)
+use_print_collection(cvec_istr)
 
 void findit(csmap_istr c, csmap_istr_key val)
 {

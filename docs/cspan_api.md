@@ -10,12 +10,12 @@ See the c++ classes [std::span](https://en.cppreference.com/w/cpp/container/span
 
 ```c
 #include <stc/cspan.h>
-using_cspan(SpanType, ValueType, Rank); // define SpanType with ValueType elements.
-                                        // Rank is number of dimensions (max 4)
+use_cspan(SpanType, ValueType, Rank); // define SpanType with ValueType elements.
+                                      // Rank is number of dimensions (max 4)
 // Shorthands:
-using_cspan2(S, ValueType);             // define span types S, S2 with ranks 1, 2.
-using_cspan3(S, ValueType);             // define span types S, S2, S3 with ranks 1, 2, 3.
-using_cspan4(S, ValueType);             // define span types S, S2, S3, S4 with ranks 1, 2, 3, 4.
+use_cspan2(S, ValueType);             // define span types S, S2 with ranks 1, 2.
+use_cspan3(S, ValueType);             // define span types S, S2, S3 with ranks 1, 2, 3.
+use_cspan4(S, ValueType);             // define span types S, S2, S3, S4 with ranks 1, 2, 3, 4.
 ```
 ## Methods
 Note that `cspan_multidim()`, `cmake_from*()`, `cspan_atN()`, `and cspan_subspanN()` require a (safe) cast to its span-type
@@ -66,7 +66,7 @@ void            SpanType_next(SpanTypeN_iter* it);
 #define i_val float
 #include <stc/cstack.h>
 
-using_cspan3(Span, float); // Shorthand to define span types Span, Span2, and Span3.
+use_cspan3(Span, float); // Shorthand to define span types Span, Span2, and Span3.
 
 int main()
 {

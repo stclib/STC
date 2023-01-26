@@ -12,7 +12,7 @@
 #include <stc/cset.h>
 #include <stc/cspan.h>
 
-using_cspan(intspan, int, 1);
+use_cspan(intspan, int, 1);
 
 void printMe(intspan container) {
     printf("%d:", (int)cspan_size(&container));

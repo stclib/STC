@@ -25,8 +25,8 @@
 #include <stdio.h>
 #include <stc/cspan.h>
 #include <stc/algo/filter.h>
-using_cspan(Span2f, float, 2);
-using_cspan(Intspan, int, 1);
+use_cspan(Span2f, float, 2);
+use_cspan(Intspan, int, 1);
 
 int demo1() {
     float raw[4*5];
@@ -60,7 +60,7 @@ int demo2() {
 
 #include "ccommon.h"
 
-#define using_cspan(Self, T, RANK) \
+#define use_cspan(Self, T, RANK) \
     typedef T Self##_value; typedef T Self##_raw; \
     typedef struct { Self##_value *ref, *end; } Self##_iter; \
     typedef struct { Self##_value *data; uint32_t dim[RANK]; } Self; \
@@ -81,9 +81,9 @@ int demo2() {
         { if (++it->ref == it->end) it->ref = NULL; } \
     struct stc_nostruct
 
-#define using_cspan2(Self, T) using_cspan(Self, T, 1); using_cspan(Self##2, T, 2)
-#define using_cspan3(Self, T) using_cspan2(Self, T); using_cspan(Self##3, T, 3)
-#define using_cspan4(Self, T) using_cspan3(Self, T); using_cspan(Self##4, T, 4)
+#define use_cspan2(Self, T) use_cspan(Self, T, 1); use_cspan(Self##2, T, 2)
+#define use_cspan3(Self, T) use_cspan2(Self, T); use_cspan(Self##3, T, 3)
+#define use_cspan4(Self, T) use_cspan3(Self, T); use_cspan(Self##4, T, 4)
 
 #define cspan_rank_ok(self, rank) c_static_assert(cspan_rank(self) == rank)
 
