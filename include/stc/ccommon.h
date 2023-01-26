@@ -56,7 +56,7 @@
 
 /* Macro overloading feature support based on: https://rextester.com/ONP80107 */
 #define c_MACRO_OVERLOAD(name, ...) \
-    c_PASTE(c_CONCAT(name, _), c_NUMARGS(__VA_ARGS__))(__VA_ARGS__)
+    c_PASTE(name##_, c_NUMARGS(__VA_ARGS__))(__VA_ARGS__)
 #define c_CONCAT(a, b) a ## b
 #define c_PASTE(a, b) c_CONCAT(a, b)
 #define c_EXPAND(...) __VA_ARGS__

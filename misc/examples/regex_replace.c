@@ -26,15 +26,15 @@ int main()
         printf("fixed: %s\n", cstr_str(&str));
 
         /* US date format, and add 10 years to dates: */
-        cstr_take(&str, cregex_replace_pattern_ex(pattern, input, "$1/$3/$2", 0, add_10_years, CREG_DEFAULT));
+        cstr_take(&str, cregex_replace_pattern(pattern, input, "$1/$3/$2", 0, add_10_years, CREG_DEFAULT));
         printf("us+10: %s\n", cstr_str(&str));
 
         /* Wrap first date inside []: */
-        cstr_take(&str, cregex_replace_pattern_ex(pattern, input, "[$0]", 1, NULL, CREG_DEFAULT));
+        cstr_take(&str, cregex_replace_pattern(pattern, input, "[$0]"));
         printf("brack: %s\n", cstr_str(&str));
 
         /* Shows how to compile RE separately */
-        c_WITH (cregex re = cregex_from(pattern, CREG_DEFAULT), cregex_drop(&re)) {
+        c_WITH (cregex re = cregex_from(pattern), cregex_drop(&re)) {
             if (cregex_captures(&re) == 0)
                 continue; /* break c_WITH */
             /* European date format. */

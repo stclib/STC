@@ -23,33 +23,34 @@ enum {
 };
 
 cregex      cregex_init(void);
-cregex      cregex_from(const char* pattern, int cflags);
+cregex      cregex_from(const char* pattern, int cflags = CREG_DEFAULT);
             /* return CREG_OK, or negative error code on failure */
-int         cregex_compile(cregex *self, const char* pattern, int cflags);
+int         cregex_compile(cregex *self, const char* pattern, int cflags = CREG_DEFAULT);
 
             /* num. of capture groups in regex. 0 if RE is invalid. First group is the full match */
 int         cregex_captures(const cregex* self); 
 
             /* return CREG_OK, CREG_NOMATCH, or CREG_MATCHERROR */
-int         cregex_find(const cregex* re, const char* input, csview match[], int mflags);
+int         cregex_find(const cregex* re, const char* input, csview match[], int mflags = CREG_DEFAULT);
             /* Search inside input string-view only */
 int         cregex_find_sv(const cregex* re, csview input, csview match[]);
             /* All-in-one search (compile + find + drop) */
-int         cregex_find_pattern(const char* pattern, const char* input, csview match[], int cmflags);
+int         cregex_find_pattern(const char* pattern, const char* input, csview match[], int cmflags = CREG_DEFAULT);
 
             /* Check if there are matches in input */
 bool        cregex_is_match(const cregex* re, const char* input);
 
             /* Replace all matches in input */
-cstr        cregex_replace(const cregex* re, const char* input, const char* replace);
+cstr        cregex_replace(const cregex* re, const char* input, const char* replace, count = MAX_INT);
             /* Replace count matches in input string-view. Optionally transform replacement with mfun. */
+cstr        cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned count = MAX_INT);
 cstr        cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned count,
                               bool(*mfun)(int capgrp, csview match, cstr* mstr), int rflags);
 
             /* All-in-one replacement (compile + find/replace + drop) */
-cstr        cregex_replace_pattern(const char* pattern, const char* input, const char* replace);
-cstr        cregex_replace_pattern_ex(const char* pattern, const char* input, const char* replace, unsigned count,
-                                      bool(*mfun)(int capgrp, csview match, cstr* mstr), int rflags);
+cstr        cregex_replace_pattern(const char* pattern, const char* input, const char* replace, count = MAX_INT);
+cstr        cregex_replace_pattern(const char* pattern, const char* input, const char* replace, unsigned count,
+                                   bool(*mfun)(int capgrp, csview match, cstr* mstr), int rflags);
 
 void        cregex_drop(cregex* self); /* destroy */
 ```

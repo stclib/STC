@@ -1239,7 +1239,7 @@ _build_subst(const char* replace, unsigned nmatch, const csview match[],
  */
 
 int 
-cregex_compile(cregex *self, const char* pattern, int cflags) {
+cregex_compile_3(cregex *self, const char* pattern, int cflags) {
     _Parser par;
     self->prog = _regcomp1(self->prog, &par, pattern, cflags);
     return self->error = par.error;
@@ -1251,8 +1251,7 @@ cregex_captures(const cregex* self) {
 }
 
 int
-cregex_find(const cregex* re, const char* input,
-            csview match[], int mflags) {
+cregex_find_4(const cregex* re, const char* input, csview match[], int mflags) {
     int res = _regexec(re->prog, input, cregex_captures(re), match, mflags);
     switch (res) {
     case 1: return CREG_OK;
@@ -1262,8 +1261,8 @@ cregex_find(const cregex* re, const char* input,
 }
 
 int
-cregex_find_pattern(const char* pattern, const char* input,
-                    csview match[], int cmflags) {
+cregex_find_pattern_4(const char* pattern, const char* input,
+                      csview match[], int cmflags) {
     cregex re = cregex_init();
     int res = cregex_compile(&re, pattern, cmflags);
     if (res != CREG_OK) return res;
@@ -1273,8 +1272,8 @@ cregex_find_pattern(const char* pattern, const char* input,
 }
 
 cstr
-cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned count,
-                  bool (*mfun)(int, csview, cstr*), int rflags) {
+cregex_replace_sv_6(const cregex* re, csview input, const char* replace, unsigned count,
+                    bool (*mfun)(int, csview, cstr*), int rflags) {
     cstr out = cstr_NULL;
     cstr subst = cstr_NULL;
     csview match[CREG_MAX_CAPTURES];
@@ -1296,8 +1295,8 @@ cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned 
 }
 
 cstr
-cregex_replace_pattern_ex(const char* pattern, const char* input, const char* replace, unsigned count,
-                          bool (*mfun)(int, csview, cstr*), int crflags) {
+cregex_replace_pattern_6(const char* pattern, const char* input, const char* replace, unsigned count,
+                         bool (*mfun)(int, csview, cstr*), int crflags) {
     cregex re = cregex_init();
     if (cregex_compile(&re, pattern, crflags) != CREG_OK)
         assert(0);
