@@ -17,7 +17,7 @@ int main()
     c_AUTO (cstr, nums)
     {
         const char* pattern = "[+-]?([0-9]*\\.)?\\d+([Ee][+-]?\\d+)?";
-        int res = cregex_compile(&re, pattern, CREG_DEFAULT);
+        int res = cregex_compile(&re, pattern);
         printf("%d: %s\n", res, pattern);
 
         // extract and convert all numbers in str to floats
