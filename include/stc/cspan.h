@@ -119,14 +119,20 @@ typedef struct { uint32_t d[4]; } cspan_idx4;
 #define cspan_front(self) ((self)->data)
 #define cspan_back(self) ((self)->data + cspan_size(self) - 1)
 
+// cspan_subspan:
+
 #define cspan_subspan(self, offset, count) \
     {.data=cspan_at(self, offset), .dim={count}}
 #define cspan_subspan2(self, offset, count) \
     {.data=cspan_at(self, offset, 0), .dim={count, (self)->dim[1]}, .stride={(self)->stride}}
 #define cspan_subspan3(self, offset, count) \
-    {.data=cspan_at(self, offset, 0, 0), .dim={count, (self)->dim[1], (self)->dim[2]}, .stride={(self)->stride}}
+    {.data=cspan_at(self, offset, 0, 0), .dim={count, (self)->dim[1], (self)->dim[2]}, \
+                                         .stride={(self)->stride}}
 #define cspan_subspan4(self, offset, count) \
-    {.data=cspan_at(self, offset, 0, 0, 0), .dim={count, (self)->dim[1], (self)->dim[2], (self)->dim[3]}, .stride={(self)->stride}}
+    {.data=cspan_at(self, offset, 0, 0, 0), .dim={count, (self)->dim[1], (self)->dim[2], (self)->dim[3]}, \
+                                            .stride={(self)->stride}}
+
+// cspan_atN:
 
 #define cspan_at4(...) c_MACRO_OVERLOAD(cspan_at4, __VA_ARGS__)
 #define cspan_at3(...) c_MACRO_OVERLOAD(cspan_at3, __VA_ARGS__)
@@ -146,6 +152,15 @@ typedef struct { uint32_t d[4]; } cspan_idx4;
 #define cspan_at4_4(self, x, y, z) \
     {.data=cspan_at(self, x, y, z, 0), .dim={(self)->dim[3]}}
 
+// cspan_slice:
+
+#define c_SLICE(...) ((const uint32_t[2]){__VA_ARGS__})
+
+#define cspan_slice(self, ...) \
+    ((void)((self)->data += c_PASTE(_cspan_slice, c_NUMARGS(__VA_ARGS__))((self)->dim, (self)->stride, __VA_ARGS__)))
+
+// FUNCTIONS
+
 STC_INLINE size_t _cspan_i1(const uint32_t dim[1], const cspan_idx1 stri, uint32_t x)
     { c_ASSERT(x < dim[0]); return x; }
 
@@ -156,14 +171,47 @@ STC_INLINE size_t _cspan_i3(const uint32_t dim[3], const cspan_idx3 stri, uint32
     c_ASSERT(x < dim[0] && y < dim[1] && z < dim[2]);
     return stri.d[2]*(stri.d[1]*x + y) + z;
 }
-STC_INLINE size_t _cspan_i4(const uint32_t dim[4], const cspan_idx4 stri, uint32_t x, uint32_t y, uint32_t z, uint32_t w) {
-    c_ASSERT(x < dim[0] && y < dim[1] && z < dim[3] && w < dim[3]);
+STC_INLINE size_t _cspan_i4(const uint32_t dim[4], const cspan_idx4 stri, uint32_t x, uint32_t y, \
+                                                                          uint32_t z, uint32_t w) {
+    c_ASSERT(x < dim[0] && y < dim[1] && z < dim[2] && w < dim[3]);
     return stri.d[3]*(stri.d[2]*(stri.d[1]*x + y) + z) + w;
 }
+
 STC_INLINE size_t _cspan_size(const uint32_t dim[], unsigned rank) {
     size_t sz = dim[0];
     while (rank-- > 1) sz *= dim[rank];
     return sz;
+}
+
+STC_INLINE size_t _cspan_slice2(uint32_t dim[2], const cspan_idx2 stri, const uint32_t x[2], const uint32_t y[2]) {
+    const uint32_t x1 = x[1] ? x[1] : dim[0], y1 = y[1] ? y[1] : dim[1];
+    const size_t ret = _cspan_i2(dim, stri, x[0], y[0]);
+
+    c_ASSERT(x1 <= dim[0] && y1 <= dim[1]);
+    dim[0] = x1 - x[0], dim[1] = y1 - y[0];
+    return ret;
+}
+
+STC_INLINE size_t _cspan_slice3(uint32_t dim[3], const cspan_idx3 stri, const uint32_t x[2], const uint32_t y[2],
+                                                                        const uint32_t z[2]) {
+    const uint32_t x1 = x[1] ? x[1] : dim[0], y1 = y[1] ? y[1] : dim[1], z1 = z[1] ? z[1] : dim[2];
+    const size_t ret = stri.d[2]*(stri.d[1]*x[0] + y[0]) + z[0];
+
+    c_ASSERT(x1 <= dim[0] && y1 <= dim[1] && z1 <= dim[2]);
+    dim[0] = x1 - x[0], dim[1] = y1 - y[0], dim[2] = z1 - z[0];
+    return ret;
+}
+
+STC_INLINE size_t _cspan_slice4(uint32_t dim[4], const cspan_idx4 stri, const uint32_t x[2], const uint32_t y[2], 
+                                                                        const uint32_t z[2], const uint32_t w[2]) {
+    const uint32_t x1 = x[1] ? x[1] : dim[0], y1 = y[1] ? y[1] : dim[1];
+    const uint32_t z1 = z[1] ? z[1] : dim[2], w1 = w[1] ? w[1] : dim[3];
+    const size_t ret = stri.d[3]*(stri.d[2]*(stri.d[1]*x[0] + y[0]) + z[0]) + w[0];
+
+    c_ASSERT(x1 <= dim[0] && y1 <= dim[1] && z1 <= dim[2] && w1 <= dim[3]);
+    dim[0] = x1 - x[0], dim[1] = y1 - y[0];
+    dim[2] = z1 - z[0], dim[3] = w1 - w[0];
+    return ret;
 }
 
 #endif
