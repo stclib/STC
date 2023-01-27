@@ -113,14 +113,14 @@ struct ctest {
 #ifdef __cplusplus
 
 #define CTEST_SETUP(sname) \
-    template <> void CTEST_IMPL_SETUP_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* data)
+    template <> void CTEST_IMPL_SETUP_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* self)
 
 #define CTEST_TEARDOWN(sname) \
-    template <> void CTEST_IMPL_TEARDOWN_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* data)
+    template <> void CTEST_IMPL_TEARDOWN_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* self)
 
 #define CTEST_FIXTURE(sname) \
-    template <typename T> void CTEST_IMPL_SETUP_FNAME(sname)(T* data) { } \
-    template <typename T> void CTEST_IMPL_TEARDOWN_FNAME(sname)(T* data) { } \
+    template <typename T> void CTEST_IMPL_SETUP_FNAME(sname)(T* self) { } \
+    template <typename T> void CTEST_IMPL_TEARDOWN_FNAME(sname)(T* self) { } \
     struct CTEST_IMPL_DATA_SNAME(sname)
 
 #define CTEST_IMPL_CTEST(sname, tname, tskip) \
@@ -176,7 +176,6 @@ void CTEST_ERR(const char* fmt, ...) CTEST_IMPL_FORMAT_PRINTF(1, 2);  // doesn't
 #define CTEST_F(sname, tname) CTEST_IMPL_CTEST_F(sname, tname, 0)
 #define CTEST_F_SKIP(sname, tname) CTEST_IMPL_CTEST_F(sname, tname, 1)
 
-
 void assert_str(const char* cmp, const char* exp, const char* real, const char* caller, int line);
 #define ASSERT_STREQ(exp, real) assert_str("==", exp, real, __FILE__, __LINE__)
 #define ASSERT_STRNE(exp, real) assert_str("!=", exp, real, __FILE__, __LINE__)
@@ -186,8 +185,6 @@ void assert_str(const char* cmp, const char* exp, const char* real, const char* 
 void assert_wstr(const char* cmp, const wchar_t *exp, const wchar_t *real, const char* caller, int line);
 #define ASSERT_WSTREQ(exp, real) assert_wstr("==", exp, real, __FILE__, __LINE__)
 #define ASSERT_WSTRNE(exp, real) assert_wstr("!=", exp, real, __FILE__, __LINE__)
-#define ASSERT_SUBWSTR(substr, real) assert_wstr("=~", substr, real, __FILE__, __LINE__)
-#define ASSERT_NOT_SUBWSTR(substr, real) assert_wstr("!~", substr, real, __FILE__, __LINE__)
 
 void assert_data(const unsigned char* exp, size_t expsize,
                  const unsigned char* real, size_t realsize,

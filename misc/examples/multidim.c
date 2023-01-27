@@ -9,15 +9,27 @@ using_cspan3(ispan, int);
 int main()
 {
     cstack_int v = {0};
-    c_FORLIST (i, unsigned, {1,2,3,4,5,6,7,8,9,10,11,12})
+    c_FORLIST (i, unsigned, {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24})
         cstack_int_push(&v, *i.ref);
 
-    // View data as contiguous memory representing 12 ints
+    // View data as contiguous memory representing 24 ints
     ispan ms1 = cspan_from(&v);
+
+    // View the same data as a 3D array 2 x 3 x 4
+    ispan3 ms3 = cspan_multidim(v.data, 2, 2, 6);
+
     // View data as contiguous memory representing 2 rows of 6 ints each
-    ispan2 ms2 = cspan_multidim(v.data, 2, 6);
-    // View the same data as a 3D array 2 x 3 x 2
-    ispan3 ms3 = cspan_multidim(v.data, 2, 3, 2);
+    ispan2 ms2 = cspan_at3(&ms3, 0);
+    ms2.data = cspan_at(&ms2, 1, 1);
+    ms2.dim[0] = 2;
+    ms2.dim[1] = 3;
+    for (unsigned i=0; i != ms2.dim[0]; i++) {
+        for (unsigned j=0; j != ms2.dim[1]; j++)
+            printf(" %2d", *cspan_at(&ms2, i, j));
+        puts("");
+    }
+
+    ms2 = (ispan2)cspan_at3(&ms3, 0);
 
     // write data using 2D view
     for (unsigned i=0; i != ms2.dim[0]; i++)

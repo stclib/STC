@@ -63,7 +63,11 @@ int demo2() {
 #define using_cspan(Self, T, RANK) \
     typedef T Self##_value; typedef T Self##_raw; \
     typedef struct { Self##_value *ref, *end; } Self##_iter; \
-    typedef struct { Self##_value *data; uint32_t dim[RANK]; } Self; \
+    typedef struct { \
+        Self##_value *data; \
+        uint32_t dim[RANK]; \
+        cspan_idx##RANK stride; \
+    } Self; \
     \
     STC_INLINE Self Self##_from_n(Self##_raw* raw, const size_t n) { \
         return (Self){.data=raw, .dim={(uint32_t)n}}; \
@@ -84,11 +88,13 @@ int demo2() {
 #define using_cspan2(Self, T) using_cspan(Self, T, 1); using_cspan(Self##2, T, 2)
 #define using_cspan3(Self, T) using_cspan2(Self, T); using_cspan(Self##3, T, 3)
 #define using_cspan4(Self, T) using_cspan3(Self, T); using_cspan(Self##4, T, 4)
-
-#define cspan_rank_ok(self, rank) c_static_assert(cspan_rank(self) == rank)
+typedef struct { uint32_t d[1]; } cspan_idx1;
+typedef struct { uint32_t d[2]; } cspan_idx2;
+typedef struct { uint32_t d[3]; } cspan_idx3;
+typedef struct { uint32_t d[4]; } cspan_idx4;
 
 #define cspan_multidim(array, ...) \
-    {.data=array, .dim={__VA_ARGS__}}
+    {.data=array, .dim={__VA_ARGS__}, .stride={.d={__VA_ARGS__}}}
 
 /* For static initialization, use cspan_make(). c_make() for non-static only. */
 #define cspan_make(SpanType, ...) \
@@ -107,12 +113,7 @@ int demo2() {
 #define cspan_size(self) _cspan_size((self)->dim, cspan_rank(self))
 #define cspan_rank(self) c_ARRAYLEN((self)->dim)
 #define cspan_index(self, ...) \
-    c_PASTE(_cspan_i, c_NUMARGS(__VA_ARGS__))((self)->dim, __VA_ARGS__) + \
-                                              cspan_rank_ok(self, c_NUMARGS(__VA_ARGS__))
-
-#define cspan_resize(self, ...) \
-    (void)memcpy((self)->dim, (uint32_t[]){__VA_ARGS__}, \
-                 sizeof((self)->dim) + cspan_rank_ok(self, c_NUMARGS(__VA_ARGS__)))
+    c_PASTE(_cspan_i, c_NUMARGS(__VA_ARGS__))((self)->dim, (self)->stride, __VA_ARGS__)
 
 #define cspan_at(self, ...) ((self)->data + cspan_index(self, __VA_ARGS__))
 #define cspan_front(self) ((self)->data)
@@ -121,40 +122,43 @@ int demo2() {
 #define cspan_subspan(self, offset, count) \
     {.data=cspan_at(self, offset), .dim={count}}
 #define cspan_subspan2(self, offset, count) \
-    {.data=cspan_at(self, offset, 0), .dim={count, (self)->dim[1]}}
+    {.data=cspan_at(self, offset, 0), .dim={count, (self)->dim[1]}, .stride={(self)->stride}}
 #define cspan_subspan3(self, offset, count) \
-    {.data=cspan_at(self, offset, 0, 0), .dim={count, (self)->dim[1], (self)->dim[2]}}
+    {.data=cspan_at(self, offset, 0, 0), .dim={count, (self)->dim[1], (self)->dim[2]}, .stride={(self)->stride}}
 #define cspan_subspan4(self, offset, count) \
-    {.data=cspan_at(self, offset, 0, 0, 0), .dim={count, (self)->dim[1], (self)->dim[2], (self)->dim[3]}}
+    {.data=cspan_at(self, offset, 0, 0, 0), .dim={count, (self)->dim[1], (self)->dim[2], (self)->dim[3]}, .stride={(self)->stride}}
 
 #define cspan_at4(...) c_MACRO_OVERLOAD(cspan_at4, __VA_ARGS__)
 #define cspan_at3(...) c_MACRO_OVERLOAD(cspan_at3, __VA_ARGS__)
 #define cspan_at2(self, x) \
     {.data=cspan_at(self, x, 0), .dim={(self)->dim[1]}}
 #define cspan_at3_2(self, x) \
-    {.data=cspan_at(self, x, 0, 0), .dim={(self)->dim[1], (self)->dim[2]}}
+    {.data=cspan_at(self, x, 0, 0), .dim={(self)->dim[1], (self)->dim[2]}, \
+                                    .stride={.d={0, (self)->stride.d[2]}}}
 #define cspan_at3_3(self, x, y) \
     {.data=cspan_at(self, x, y, 0), .dim={(self)->dim[2]}}
 #define cspan_at4_2(self, x) \
-    {.data=cspan_at(self, x, 0, 0, 0), .dim={(self)->dim[1], (self)->dim[2], (self)->dim[3]}}
+    {.data=cspan_at(self, x, 0, 0, 0), .dim={(self)->dim[1], (self)->dim[2], (self)->dim[3]}, \
+                                       .stride={.d={0, (self)->stride.d[2], (self)->stride.d[3]}}}
 #define cspan_at4_3(self, x, y) \
-    {.data=cspan_at(self, x, y, 0, 0), .dim={(self)->dim[2], (self)->dim[3]}}
+    {.data=cspan_at(self, x, y, 0, 0), .dim={(self)->dim[2], (self)->dim[3]}, \
+                                       .stride={.d={0, (self)->stride.d[3]}}}
 #define cspan_at4_4(self, x, y, z) \
     {.data=cspan_at(self, x, y, z, 0), .dim={(self)->dim[3]}}
 
-STC_INLINE size_t _cspan_i1(const uint32_t dim[1], uint32_t x)
+STC_INLINE size_t _cspan_i1(const uint32_t dim[1], const cspan_idx1 stri, uint32_t x)
     { c_ASSERT(x < dim[0]); return x; }
 
-STC_INLINE size_t _cspan_i2(const uint32_t dim[2], uint32_t x, uint32_t y)
-    { c_ASSERT(x < dim[0] && y < dim[1]); return dim[1]*x + y; }
+STC_INLINE size_t _cspan_i2(const uint32_t dim[2], const cspan_idx2 stri, uint32_t x, uint32_t y)
+    { c_ASSERT(x < dim[0] && y < dim[1]); return stri.d[1]*x + y; }
 
-STC_INLINE size_t _cspan_i3(const uint32_t dim[3], uint32_t x, uint32_t y, uint32_t z) {
+STC_INLINE size_t _cspan_i3(const uint32_t dim[3], const cspan_idx3 stri, uint32_t x, uint32_t y, uint32_t z) {
     c_ASSERT(x < dim[0] && y < dim[1] && z < dim[2]);
-    return dim[2]*(dim[1]*x + y) + z;
+    return stri.d[2]*(stri.d[1]*x + y) + z;
 }
-STC_INLINE size_t _cspan_i4(const uint32_t dim[4], uint32_t x, uint32_t y, uint32_t z, uint32_t w) {
+STC_INLINE size_t _cspan_i4(const uint32_t dim[4], const cspan_idx4 stri, uint32_t x, uint32_t y, uint32_t z, uint32_t w) {
     c_ASSERT(x < dim[0] && y < dim[1] && z < dim[3] && w < dim[3]);
-    return dim[3]*(dim[2]*(dim[1]*x + y) + z) + w;
+    return stri.d[3]*(stri.d[2]*(stri.d[1]*x + y) + z) + w;
 }
 STC_INLINE size_t _cspan_size(const uint32_t dim[], unsigned rank) {
     size_t sz = dim[0];
