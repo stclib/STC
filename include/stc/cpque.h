@@ -45,7 +45,7 @@ STC_API void _cx_memb(_erase_at)(_cx_self* self, size_t idx);
 STC_API void _cx_memb(_push)(_cx_self* self, _cx_value value);
 
 STC_INLINE _cx_self _cx_memb(_init)(void)
-    { return c_COMPOUND(_cx_self){NULL}; }
+    { return c_LITERAL(_cx_self){NULL}; }
 
 STC_INLINE void _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, size_t n)
     { while (n--) _cx_memb(_push)(self, i_keyfrom(*raw++)); }

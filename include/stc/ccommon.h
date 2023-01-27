@@ -71,12 +71,12 @@
   #define c_ALLOC(T)            static_cast<T*>(c_MALLOC(sizeof(T)))
   #define c_ALLOC_N(T, n)       static_cast<T*>(c_MALLOC(sizeof(T)*(n)))
   #define c_NEW(T, ...)         new (c_ALLOC(T)) T(__VA_ARGS__)
-  #define c_COMPOUND(T)         T
+  #define c_LITERAL(T)          T
 #else
   #define c_ALLOC(T)            ((T*)c_MALLOC(sizeof(T)))
   #define c_ALLOC_N(T, n)       ((T*)c_MALLOC(sizeof(T)*(n)))
   #define c_NEW(T, ...)         ((T*)memcpy(c_ALLOC(T), (T[]){__VA_ARGS__}, sizeof(T)))
-  #define c_COMPOUND(T)         (T)
+  #define c_LITERAL(T)          (T)
 #endif
 #ifndef c_MALLOC
   #define c_MALLOC(sz)          malloc(sz)
@@ -125,7 +125,7 @@ typedef const char* crawstr;
 #define c_ARRAYLEN(a) (sizeof(a)/sizeof 0[a])
 #define c_SV(...) c_MACRO_OVERLOAD(c_SV, __VA_ARGS__)
 #define c_SV_1(lit) c_SV_2(lit, crawstr_len(lit))
-#define c_SV_2(str, n) (c_COMPOUND(csview){str, n})
+#define c_SV_2(str, n) (c_LITERAL(csview){str, n})
 #define c_ARGSV(sv) (int)(sv).size, (sv).str  /* use with "%.*s" */
 #define c_PAIR(ref) (ref)->first, (ref)->second
 

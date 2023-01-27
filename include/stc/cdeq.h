@@ -101,11 +101,11 @@ STC_INLINE void         _cx_memb(_pop_front)(_cx_self* self) // == _pop() when _
 
 STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) {
     size_t n = self->_len;
-    return c_COMPOUND(_cx_iter){n ? self->data : NULL, self->data + n};
+    return c_LITERAL(_cx_iter){n ? self->data : NULL, self->data + n};
 }
 
 STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self)
-    { return c_COMPOUND(_cx_iter){NULL, self->data + self->_len}; }
+    { return c_LITERAL(_cx_iter){NULL, self->data + self->_len}; }
 
 STC_INLINE void _cx_memb(_next)(_cx_iter* it)
     { if (++it->ref == it->end) it->ref = NULL; }
@@ -345,7 +345,7 @@ _cx_memb(_insert_uninit)(_cx_self* self, _cx_value* pos, const size_t n) {
         self->_len += n;
         pos = self->data + idx;
     }
-    return c_COMPOUND(_cx_iter){pos, self->data + self->_len};
+    return c_LITERAL(_cx_iter){pos, self->data + self->_len};
 }
 
 STC_DEF _cx_value*
@@ -377,7 +377,7 @@ _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
         { i_keydrop(p); }
     memmove(p1, p2, (size_t)(end - p2)*sizeof *p1);
     self->_len -= (size_t)len;
-    return c_COMPOUND(_cx_iter){p2 == end ? NULL : p1, end - len};
+    return c_LITERAL(_cx_iter){p2 == end ? NULL : p1, end - len};
 }
 
 #if !defined i_no_clone

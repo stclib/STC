@@ -93,7 +93,7 @@ _cx_deftypes(_c_carc_types, _cx_self, i_key);
 struct _cx_memb(_rep_) { catomic_long counter; i_key value; };
 
 STC_INLINE _cx_self _cx_memb(_init)(void) 
-    { return c_COMPOUND(_cx_self){NULL, NULL}; }
+    { return c_LITERAL(_cx_self){NULL, NULL}; }
 
 STC_INLINE long _cx_memb(_use_count)(const _cx_self* self)
     { return self->use_count ? *self->use_count : 0; }
