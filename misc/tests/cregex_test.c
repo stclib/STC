@@ -10,7 +10,7 @@
 CTEST(cregex, compile_match_char)
 {
     const char* inp;
-    cregex re = cregex_from("äsdf", 0);
+    cregex re = cregex_from("äsdf");
     ASSERT_EQ(re.error, 0);
 
     csview match;
@@ -18,7 +18,7 @@ CTEST(cregex, compile_match_char)
     ASSERT_EQ(M_START(match), 0);
     ASSERT_EQ(M_END(match), 5); // ä is two bytes wide
 
-    ASSERT_EQ(cregex_find(&re, inp="zäsdf", &match, 0), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, inp="zäsdf", &match), CREG_OK);
     ASSERT_EQ(M_START(match), 1);
     ASSERT_EQ(M_END(match), 6);
 
@@ -28,11 +28,11 @@ CTEST(cregex, compile_match_char)
 CTEST(cregex, compile_match_anchors)
 {
     const char* inp;
-    cregex re = cregex_from(inp="^äs.f$", 0);
+    cregex re = cregex_from(inp="^äs.f$");
     ASSERT_EQ(re.error, 0);
 
     csview match;
-    ASSERT_EQ(cregex_find(&re, inp="äsdf", &match, 0), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, inp="äsdf", &match), CREG_OK);
     ASSERT_EQ(M_START(match), 0);
     ASSERT_EQ(M_END(match), 5);
 
@@ -46,19 +46,19 @@ CTEST(cregex, compile_match_quantifiers1)
 {
     const char* inp;
     c_AUTO (cregex, re) {
-        re = cregex_from("ä+", 0);
+        re = cregex_from("ä+");
         ASSERT_EQ(re.error, 0);
 
         csview match;
-        ASSERT_EQ(cregex_find(&re, inp="ääb", &match, 0), CREG_OK);
+        ASSERT_EQ(cregex_find(&re, inp="ääb", &match), CREG_OK);
         ASSERT_EQ(M_START(match), 0);
         ASSERT_EQ(M_END(match), 4);
 
-        ASSERT_EQ(cregex_find(&re, inp="bäbb", &match, 0), CREG_OK);
+        ASSERT_EQ(cregex_find(&re, inp="bäbb", &match), CREG_OK);
         ASSERT_EQ(M_START(match), 1);
         ASSERT_EQ(M_END(match), 3);
 
-        ASSERT_EQ(cregex_find(&re, "bbb", &match, 0), CREG_NOMATCH);
+        ASSERT_EQ(cregex_find(&re, "bbb", &match), CREG_NOMATCH);
     }
 }
 
@@ -66,19 +66,19 @@ CTEST(cregex, compile_match_quantifiers2)
 {   
     const char* inp; 
     c_AUTO (cregex, re) {
-        re = cregex_from("bä*", 0);
+        re = cregex_from("bä*");
         ASSERT_EQ(re.error, 0);
 
         csview match;
-        ASSERT_EQ(cregex_find(&re, inp="bääb", &match, 0), CREG_OK);
+        ASSERT_EQ(cregex_find(&re, inp="bääb", &match), CREG_OK);
         ASSERT_EQ(M_START(match), 0);
         ASSERT_EQ(M_END(match), 5);
 
-        ASSERT_EQ(cregex_find(&re, inp="bäbb", &match, 0), CREG_OK);
+        ASSERT_EQ(cregex_find(&re, inp="bäbb", &match), CREG_OK);
         ASSERT_EQ(M_START(match), 0);
         ASSERT_EQ(M_END(match), 3);
 
-        ASSERT_EQ(cregex_find(&re, inp="bbb", &match, 0), CREG_OK);
+        ASSERT_EQ(cregex_find(&re, inp="bbb", &match), CREG_OK);
         ASSERT_EQ(M_START(match), 0);
         ASSERT_EQ(M_END(match), 1);
     }
@@ -86,12 +86,12 @@ CTEST(cregex, compile_match_quantifiers2)
 
 CTEST(cregex, compile_match_escaped_chars)
 {
-    cregex re = cregex_from("\\n\\r\\t\\{", 0);
+    cregex re = cregex_from("\\n\\r\\t\\{");
     ASSERT_EQ(re.error, 0);
 
     csview match;
-    ASSERT_EQ(cregex_find(&re, "\n\r\t{", &match, 0), CREG_OK);
-    ASSERT_EQ(cregex_find(&re, "\n\r\t", &match, 0), CREG_NOMATCH);
+    ASSERT_EQ(cregex_find(&re, "\n\r\t{", &match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "\n\r\t", &match), CREG_NOMATCH);
 
     cregex_drop(&re);
 }
@@ -100,24 +100,24 @@ CTEST(cregex, compile_match_class_simple)
 {
     c_AUTO (cregex, re1, re2, re3)
     {
-        re1 = cregex_from("\\s", 0);
+        re1 = cregex_from("\\s");
         ASSERT_EQ(re1.error, 0);
-        re2 = cregex_from("\\w", 0);
+        re2 = cregex_from("\\w");
         ASSERT_EQ(re2.error, 0);
-        re3 = cregex_from("\\D", 0);
+        re3 = cregex_from("\\D");
         ASSERT_EQ(re3.error, 0);
 
         csview match;
-        ASSERT_EQ(cregex_find(&re1, " " , &match, 0), CREG_OK);
-        ASSERT_EQ(cregex_find(&re1, "\r", &match, 0), CREG_OK);
-        ASSERT_EQ(cregex_find(&re1, "\n", &match, 0), CREG_OK);
+        ASSERT_EQ(cregex_find(&re1, " " , &match), CREG_OK);
+        ASSERT_EQ(cregex_find(&re1, "\r", &match), CREG_OK);
+        ASSERT_EQ(cregex_find(&re1, "\n", &match), CREG_OK);
 
-        ASSERT_EQ(cregex_find(&re2, "a", &match, 0), CREG_OK);
-        ASSERT_EQ(cregex_find(&re2, "0", &match, 0), CREG_OK);
-        ASSERT_EQ(cregex_find(&re2, "_", &match, 0), CREG_OK);
+        ASSERT_EQ(cregex_find(&re2, "a", &match), CREG_OK);
+        ASSERT_EQ(cregex_find(&re2, "0", &match), CREG_OK);
+        ASSERT_EQ(cregex_find(&re2, "_", &match), CREG_OK);
 
-        ASSERT_EQ(cregex_find(&re3, "k", &match, 0), CREG_OK);
-        ASSERT_EQ(cregex_find(&re3, "0", &match, 0), CREG_NOMATCH);
+        ASSERT_EQ(cregex_find(&re3, "k", &match), CREG_OK);
+        ASSERT_EQ(cregex_find(&re3, "0", &match), CREG_NOMATCH);
     }
 }
 
@@ -125,59 +125,59 @@ CTEST(cregex, compile_match_or)
 {
     c_AUTO (cregex, re, re2)
     {
-        re = cregex_from("as|df", 0);
+        re = cregex_from("as|df");
         ASSERT_EQ(re.error, 0);
 
         csview match[4];
-        ASSERT_EQ(cregex_find(&re, "as", match, 0), CREG_OK);
-        ASSERT_EQ(cregex_find(&re, "df", match, 0), CREG_OK);
+        ASSERT_EQ(cregex_find(&re, "as", match), CREG_OK);
+        ASSERT_EQ(cregex_find(&re, "df", match), CREG_OK);
 
-        re2 = cregex_from("(as|df)", 0);
+        re2 = cregex_from("(as|df)");
         ASSERT_EQ(re2.error, 0);
 
-        ASSERT_EQ(cregex_find(&re2, "as", match, 0), CREG_OK);
-        ASSERT_EQ(cregex_find(&re2, "df", match, 0), CREG_OK);
+        ASSERT_EQ(cregex_find(&re2, "as", match), CREG_OK);
+        ASSERT_EQ(cregex_find(&re2, "df", match), CREG_OK);
     }
 }
 
 CTEST(cregex, compile_match_class_complex_0)
 {
-    cregex re = cregex_from("[asdf]", 0);
+    cregex re = cregex_from("[asdf]");
     ASSERT_EQ(re.error, 0);
 
     csview match;
-    ASSERT_EQ(cregex_find(&re, "a", &match, 0), CREG_OK);
-    ASSERT_EQ(cregex_find(&re, "s", &match, 0), CREG_OK);
-    ASSERT_EQ(cregex_find(&re, "d", &match, 0), CREG_OK);
-    ASSERT_EQ(cregex_find(&re, "f", &match, 0), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "a", &match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "s", &match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "d", &match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "f", &match), CREG_OK);
 
     cregex_drop(&re);
 }
 
 CTEST(cregex, compile_match_class_complex_1)
 {
-    cregex re = cregex_from("[a-zä0-9öA-Z]", 0);
+    cregex re = cregex_from("[a-zä0-9öA-Z]");
     ASSERT_EQ(re.error, 0);
 
     csview match;
-    ASSERT_EQ(cregex_find(&re, "a", &match, 0), CREG_OK);
-    ASSERT_EQ(cregex_find(&re, "5", &match, 0), CREG_OK);
-    ASSERT_EQ(cregex_find(&re, "A", &match, 0), CREG_OK);
-    ASSERT_EQ(cregex_find(&re, "ä", &match, 0), CREG_OK);
-    ASSERT_EQ(cregex_find(&re, "ö", &match, 0), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "a", &match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "5", &match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "A", &match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "ä", &match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "ö", &match), CREG_OK);
 
     cregex_drop(&re);
 }
 
 CTEST(cregex, compile_match_cap)
 {
-    cregex re = cregex_from("(abc)d", 0);
+    cregex re = cregex_from("(abc)d");
     ASSERT_EQ(re.error, 0);
 
     csview match[4];
-    ASSERT_EQ(cregex_find(&re, "abcd", match, 0), CREG_OK);
-    ASSERT_EQ(cregex_find(&re, "llljabcdkk", match, 0), CREG_OK);
-    ASSERT_EQ(cregex_find(&re, "abc", match, 0), CREG_NOMATCH);
+    ASSERT_EQ(cregex_find(&re, "abcd", match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "llljabcdkk", match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "abc", match), CREG_NOMATCH);
 
     cregex_drop(&re);
 }
@@ -187,7 +187,7 @@ CTEST(cregex, search_all)
     const char* inp;
     c_AUTO (cregex, re)
     {
-        re = cregex_from("ab", 0);
+        re = cregex_from("ab");
         csview m = {0};
         int res;
         ASSERT_EQ(re.error, CREG_OK);
@@ -207,7 +207,7 @@ CTEST(cregex, search_all)
 CTEST(cregex, captures_len)
 {
     c_AUTO (cregex, re) {
-       cregex re = cregex_from("(ab(cd))(ef)", 0);
+       cregex re = cregex_from("(ab(cd))(ef)");
        ASSERT_EQ(cregex_captures(&re), 4);
     }
 }
@@ -216,11 +216,11 @@ CTEST(cregex, captures_cap)
 {
     const char* inp;
     c_AUTO (cregex, re) {
-        re = cregex_from("(ab)((cd)+)", 0);
+        re = cregex_from("(ab)((cd)+)");
         ASSERT_EQ(cregex_captures(&re), 4);
 
         csview cap[5];
-        ASSERT_EQ(cregex_find(&re, inp="xxabcdcde", cap, 0), CREG_OK);
+        ASSERT_EQ(cregex_find(&re, inp="xxabcdcde", cap), CREG_OK);
         ASSERT_TRUE(csview_equals(cap[0], "abcdcd"));
 
         ASSERT_EQ(M_END(cap[0]), 8);
@@ -255,11 +255,11 @@ CTEST(cregex, replace)
         ASSERT_TRUE(cstr_equals(&str, "start date: YYYY-MM-DD, end date: YYYY-MM-DD"));
 
         /* US date format, and add 10 years to dates: */
-        cstr_take(&str, cregex_replace_pattern_ex(pattern, input, "$1/$3/$2", 0, add_10_years, CREG_DEFAULT));
+        cstr_take(&str, cregex_replace_pattern(pattern, input, "$1/$3/$2", 0, add_10_years, CREG_DEFAULT));
         ASSERT_TRUE(cstr_equals(&str, "start date: 2025/31/12, end date: 2032/28/02"));
 
         /* Wrap first date inside []: */
-        cstr_take(&str, cregex_replace_pattern_ex(pattern, input, "[$0]", 1, NULL, CREG_DEFAULT));
+        cstr_take(&str, cregex_replace_pattern(pattern, input, "[$0]", 1));
         ASSERT_TRUE(cstr_equals(&str, "start date: [2015-12-31], end date: 2022-02-28"));
 
         /* Wrap all words in ${} */
@@ -267,7 +267,7 @@ CTEST(cregex, replace)
         ASSERT_TRUE(cstr_equals(&str, "52 ${apples} ${and} 31 ${mangoes}"));
 
         /* Compile RE separately */
-        c_WITH (cregex re = cregex_from(pattern, CREG_DEFAULT), cregex_drop(&re)) {
+        c_WITH (cregex re = cregex_from(pattern), cregex_drop(&re)) {
             ASSERT_EQ(cregex_captures(&re), 4);
 
             /* European date format. */
