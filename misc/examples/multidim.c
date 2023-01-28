@@ -16,49 +16,54 @@ int main()
     ispan ms1 = cspan_from(&v);
 
     // View the same data as a 3D array 2 x 3 x 4
-    ispan3 ms3 = cspan_multidim(v.data, 2, 2, 6);
+    ispan3 ms3 = cspan_multidim(v.data, 2, 3, 4);
 
-    // View data as contiguous memory representing 2 rows of 6 ints each
-    ispan2 ms2 = cspan_at3(&ms3, 0);
-    ms2.data = cspan_at(&ms2, 1, 1);
-    ms2.dim[0] = 2;
-    ms2.dim[1] = 3;
-    for (unsigned i=0; i != ms2.dim[0]; i++) {
-        for (unsigned j=0; j != ms2.dim[1]; j++)
-            printf(" %2d", *cspan_at(&ms2, i, j));
+    puts("ms3:");
+    for (unsigned i=0; i != ms3.dim[0]; i++) {
+        for (unsigned j=0; j != ms3.dim[1]; j++) {
+            for (unsigned k=0; k != ms3.dim[2]; k++) {
+                printf(" %2d", *cspan_at(&ms3, i, j, k));
+            }
+            puts("");
+        }
+        puts("");
+    }
+    puts("ss3 = ms3[:, 1:3, 1:3]");
+    ispan3 ss3 = ms3;
+    cspan_slice(&ss3, c_SLICE(0), c_SLICE(1,3), c_SLICE(1,3));
+
+    for (unsigned i=0; i != ss3.dim[0]; i++) {
+        for (unsigned j=0; j != ss3.dim[1]; j++) {
+            for (unsigned k=0; k != ss3.dim[2]; k++) {
+                printf(" %2d", *cspan_at(&ss3, i, j, k));
+            }
+            puts("");
+        }
         puts("");
     }
 
-    ms2 = (ispan2)cspan_at3(&ms3, 0);
+    puts("Iterate ss3 flat:");
+    c_FOREACH (i, ispan3, ss3)
+        printf(" %d", *i.ref);
+    puts("");
+
+    ispan2 ms2 = cspan_at3(&ms3, 0);
 
     // write data using 2D view
     for (unsigned i=0; i != ms2.dim[0]; i++)
         for (unsigned j=0; j != ms2.dim[1]; j++)
             *cspan_at(&ms2, i, j) = i*1000 + j;
 
-    // print all items using 1D view
-    printf("all: ");
+    puts("\nview data as 1D view:");
     for (unsigned i=0; i != cspan_size(&ms1); i++)
         printf(" %d", *cspan_at(&ms1, i));
     puts("");
 
-    // or iterate a subspan...
+    puts("iterate subspan ms3[1]:");
     ispan2 sub = cspan_at3(&ms3, 1);
-    printf("sub: ");
     c_FOREACH (i, ispan2, sub)
         printf(" %d", *i.ref);
     puts("");
 
-    // read back using 3D view
-    for (unsigned i=0; i != ms3.dim[0]; i++)
-    {
-        printf("slice @ i = %u\n", i);
-        for (unsigned j=0; j != ms3.dim[1]; j++)
-        {
-            for (unsigned k=0; k != ms3.dim[2]; k++)
-                printf("%d ", *cspan_at(&ms3, i, j, k));
-            puts("");
-        }
-    }
     cstack_int_drop(&v);
 }

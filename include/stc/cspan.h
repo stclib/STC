@@ -62,27 +62,28 @@ int demo2() {
 
 #define using_cspan(Self, T, RANK) \
     typedef T Self##_value; typedef T Self##_raw; \
-    typedef struct { Self##_value *ref, *end; } Self##_iter; \
     typedef struct { \
         Self##_value *data; \
         uint32_t dim[RANK]; \
         cspan_idx##RANK stride; \
     } Self; \
+    typedef struct { Self##_value *ref; uint32_t pos[RANK]; const Self *_s; } Self##_iter; \
     \
     STC_INLINE Self Self##_from_n(Self##_raw* raw, const size_t n) { \
         return (Self){.data=raw, .dim={(uint32_t)n}}; \
     } \
     STC_INLINE Self##_iter Self##_begin(const Self* self) { \
-        size_t n = cspan_size(self); \
-        Self##_iter it = {n ? self->data : NULL, self->data + n}; \
+        Self##_iter it = {.ref=self->data, .pos={0}, ._s=self}; \
         return it; \
     } \
     STC_INLINE Self##_iter Self##_end(const Self* self) { \
-        Self##_iter it = {NULL, self->data + cspan_size(self)}; \
+        Self##_iter it = {.ref=NULL}; \
         return it; \
     } \
-    STC_INLINE void Self##_next(Self##_iter* it) \
-        { if (++it->ref == it->end) it->ref = NULL; } \
+    STC_INLINE void Self##_next(Self##_iter* it) { \
+        it->ref += _cspan_next_##RANK(RANK, it->pos, it->_s->dim, it->_s->stride.d); \
+        if (it->pos[0] == it->_s->dim[0]) it->ref = NULL; \
+    } \
     struct stc_nostruct
 
 #define using_cspan2(Self, T) using_cspan(Self, T, 1); using_cspan(Self##2, T, 2)
@@ -99,9 +100,6 @@ typedef struct { uint32_t d[4]; } cspan_idx4;
 /* For static initialization, use cspan_make(). c_make() for non-static only. */
 #define cspan_make(SpanType, ...) \
     {.data=(SpanType##_value[])__VA_ARGS__, .dim={sizeof((SpanType##_value[])__VA_ARGS__)/sizeof(SpanType##_value)}}
-
-#define cspan_flatten(span) \
-    {.data=(span)->data, .dim={(uint32_t)cspan_size(span)}}
 
 /* create a cspan from a cvec, cstack, cdeq, cqueue, or cpque (heap) */
 #define cspan_from(container) \
@@ -153,8 +151,9 @@ typedef struct { uint32_t d[4]; } cspan_idx4;
     {.data=cspan_at(self, x, y, z, 0), .dim={(self)->dim[3]}}
 
 // cspan_slice:
+//  e.g.: cspan_slice(&ms3, c_SLICE(1,3), c_SLICE(0), c_SLICE(1,4));
 
-#define c_SLICE(...) ((const uint32_t[2]){__VA_ARGS__})
+#define c_SLICE(...) ((const uint32_t[2]){__VA_ARGS__})z
 
 #define cspan_slice(self, ...) \
     ((void)((self)->data += c_PASTE(_cspan_slice, c_NUMARGS(__VA_ARGS__))((self)->dim, (self)->stride, __VA_ARGS__)))
@@ -181,6 +180,22 @@ STC_INLINE size_t _cspan_size(const uint32_t dim[], unsigned rank) {
     size_t sz = dim[0];
     while (rank-- > 1) sz *= dim[rank];
     return sz;
+}
+
+#define _cspan_next_1(r, pos, d, s) (++pos[0], 1)
+#define _cspan_next_3 _cspan_next_2
+#define _cspan_next_4 _cspan_next_2
+
+static size_t _cspan_next_2(int rank, uint32_t pos[], const uint32_t dim[], const uint32_t stride[]) {
+    size_t off = 1, rs = 1;
+    ++pos[rank - 1];
+    while (--rank && pos[rank] == dim[rank]) {
+        pos[rank] = 0, ++pos[rank - 1];
+        const size_t ds = rs*dim[rank];
+        rs *= stride[rank];
+        off += rs - ds;
+    }
+    return off;
 }
 
 STC_INLINE size_t _cspan_slice2(uint32_t dim[2], const cspan_idx2 stri, const uint32_t x[2], const uint32_t y[2]) {
