@@ -41,8 +41,7 @@ SpanType        cspan_at2(SpanType2* self, size_t x);                   // retur
 SpanTypeN       cspan_at3(SpanType3* self, size_t x, ...);              // return a 1d or 2d subspan from a 3d span.
 SpanTypeN       cspan_at4(SpanType4* self, size_t x, ...);              // number of args determines rank of output span.
 
-void            cspan_slice(SpanTypeN* self, uint32_t xslice[2], ...);  // slice multidim span into a md subspan.
-uint32_t[2]     c_SLICE(a, b)                                           // use to specify a:b xslice, ... b is optional.
+void            cspan_slice(SpanTypeN* self, {x0,x1}, {y0,y1},...);     // slice multidim span into a md subspan.
 
                 // return a subspan of same rank:
 SpanType        cspan_subspan(const SpanType* self, size_t offset, size_t count);

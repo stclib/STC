@@ -30,7 +30,7 @@ int main()
     }
     puts("ss3 = ms3[:, 1:3, 1:3]");
     ispan3 ss3 = ms3;
-    cspan_slice(&ss3, c_SLICE(0), c_SLICE(1,3), c_SLICE(1,3));
+    cspan_slice(&ss3, {0}, {1,3}, {1,3});
 
     for (unsigned i=0; i != ss3.dim[0]; i++) {
         for (unsigned j=0; j != ss3.dim[1]; j++) {

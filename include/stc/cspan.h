@@ -151,12 +151,13 @@ typedef struct { uint32_t d[4]; } cspan_idx4;
     {.data=cspan_at(self, x, y, z, 0), .dim={(self)->dim[3]}}
 
 // cspan_slice:
-//  e.g.: cspan_slice(&ms3, c_SLICE(1,3), c_SLICE(0), c_SLICE(1,4));
-
-#define c_SLICE(...) ((const uint32_t[2]){__VA_ARGS__})
+//  e.g.: cspan_slice(&ms3, {1,3}, {0}, {1,4});
 
 #define cspan_slice(self, ...) \
-    ((void)((self)->data += c_PASTE(_cspan_slice, c_NUMARGS(__VA_ARGS__))((self)->dim, (self)->stride, __VA_ARGS__)))
+    ((void)((self)->data += _cspan_slice(cspan_rank(self), (self)->dim, (self)->stride.d, \
+                                         (const uint32_t[][2]){__VA_ARGS__}) + \
+                            c_static_assert(cspan_rank(self) == \
+                            sizeof((const uint32_t[][2]){__VA_ARGS__})/8)))
 
 // FUNCTIONS
 
@@ -198,35 +199,20 @@ static inline size_t _cspan_next_2(int rank, uint32_t pos[], const uint32_t dim[
     return off;
 }
 
-STC_INLINE size_t _cspan_slice2(uint32_t dim[2], const cspan_idx2 stri, const uint32_t x[2], const uint32_t y[2]) {
-    const uint32_t x1 = x[1] ? x[1] : dim[0], y1 = y[1] ? y[1] : dim[1];
-    const size_t ret = _cspan_i2(dim, stri, x[0], y[0]);
+STC_INLINE size_t _cspan_slice(int rank, uint32_t dim[], const uint32_t stri[], const uint32_t a[][2]) {
+    uint32_t t = a[0][1] ? a[0][1] : dim[0];
+    c_ASSERT(t <= dim[0]);
+    dim[0] = t - a[0][0];
 
-    c_ASSERT(x1 <= dim[0] && y1 <= dim[1]);
-    dim[0] = x1 - x[0], dim[1] = y1 - y[0];
-    return ret;
-}
-
-STC_INLINE size_t _cspan_slice3(uint32_t dim[3], const cspan_idx3 stri, const uint32_t x[2], const uint32_t y[2],
-                                                                        const uint32_t z[2]) {
-    const uint32_t x1 = x[1] ? x[1] : dim[0], y1 = y[1] ? y[1] : dim[1], z1 = z[1] ? z[1] : dim[2];
-    const size_t ret = stri.d[2]*(stri.d[1]*x[0] + y[0]) + z[0];
-
-    c_ASSERT(x1 <= dim[0] && y1 <= dim[1] && z1 <= dim[2]);
-    dim[0] = x1 - x[0], dim[1] = y1 - y[0], dim[2] = z1 - z[0];
-    return ret;
-}
-
-STC_INLINE size_t _cspan_slice4(uint32_t dim[4], const cspan_idx4 stri, const uint32_t x[2], const uint32_t y[2], 
-                                                                        const uint32_t z[2], const uint32_t w[2]) {
-    const uint32_t x1 = x[1] ? x[1] : dim[0], y1 = y[1] ? y[1] : dim[1];
-    const uint32_t z1 = z[1] ? z[1] : dim[2], w1 = w[1] ? w[1] : dim[3];
-    const size_t ret = stri.d[3]*(stri.d[2]*(stri.d[1]*x[0] + y[0]) + z[0]) + w[0];
-
-    c_ASSERT(x1 <= dim[0] && y1 <= dim[1] && z1 <= dim[2] && w1 <= dim[3]);
-    dim[0] = x1 - x[0], dim[1] = y1 - y[0];
-    dim[2] = z1 - z[0], dim[3] = w1 - w[0];
-    return ret;
+    size_t off = a[0][0];
+    for (int i = 1; i < rank; ++i) {
+        off *= stri[i];
+        off += a[i][0];
+        t = a[i][1] ? a[i][1] : dim[i];
+        c_ASSERT(t <= dim[i]);
+        dim[i] = t - a[i][0];
+    }
+    return off;
 }
 
 #endif
