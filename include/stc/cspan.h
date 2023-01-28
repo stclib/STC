@@ -153,7 +153,7 @@ typedef struct { uint32_t d[4]; } cspan_idx4;
 // cspan_slice:
 //  e.g.: cspan_slice(&ms3, c_SLICE(1,3), c_SLICE(0), c_SLICE(1,4));
 
-#define c_SLICE(...) ((const uint32_t[2]){__VA_ARGS__})z
+#define c_SLICE(...) ((const uint32_t[2]){__VA_ARGS__})
 
 #define cspan_slice(self, ...) \
     ((void)((self)->data += c_PASTE(_cspan_slice, c_NUMARGS(__VA_ARGS__))((self)->dim, (self)->stride, __VA_ARGS__)))
@@ -186,7 +186,7 @@ STC_INLINE size_t _cspan_size(const uint32_t dim[], unsigned rank) {
 #define _cspan_next_3 _cspan_next_2
 #define _cspan_next_4 _cspan_next_2
 
-static size_t _cspan_next_2(int rank, uint32_t pos[], const uint32_t dim[], const uint32_t stride[]) {
+static inline size_t _cspan_next_2(int rank, uint32_t pos[], const uint32_t dim[], const uint32_t stride[]) {
     size_t off = 1, rs = 1;
     ++pos[rank - 1];
     while (--rank && pos[rank] == dim[rank]) {
