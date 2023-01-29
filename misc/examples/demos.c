@@ -13,7 +13,7 @@ void stringdemo1()
         cstr_erase(&cs, 7, 5); // -nine
         printf("%s.\n", cstr_str(&cs));
 
-        cstr_replace_ex(&cs, "seven", "four", 1);
+        cstr_replace(&cs, "seven", "four", 1);
         printf("%s.\n", cstr_str(&cs));
 
         cstr_take(&cs, cstr_from_fmt("%s *** %s", cstr_str(&cs), cstr_str(&cs)));

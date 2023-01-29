@@ -373,12 +373,12 @@ STC_INLINE char* cstr_append_s(cstr* self, cstr s) {
     return cstr_append_n(self, sv.str, sv.size);
 }
 
-STC_INLINE void cstr_replace_ex(cstr* self, const char* search, const char* repl, unsigned count) {
+#define cstr_replace(...) c_MACRO_OVERLOAD(cstr_replace, __VA_ARGS__)
+#define cstr_replace_3(self, search, repl) cstr_replace_4(self, search, repl, ~0U)
+STC_INLINE void cstr_replace_4(cstr* self, const char* search, const char* repl, unsigned count) {
     cstr_take(self, cstr_replace_sv(cstr_sv(self), c_SV(search, strlen(search)),
                                                    c_SV(repl, strlen(repl)), count));
 }
-STC_INLINE void cstr_replace(cstr* self, const char* search, const char* repl)
-    { cstr_replace_ex(self, search, repl, ~0U); }
 
 STC_INLINE void cstr_replace_at_sv(cstr* self, size_t pos, size_t len, const csview repl) {
     char* d = _cstr_internal_move(self, pos + len, pos + repl.size);

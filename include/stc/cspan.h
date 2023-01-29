@@ -30,7 +30,7 @@ using_cspan(Intspan, int, 1);
 
 int demo1() {
     float raw[4*5];
-    Span2f ms = cspan_multidim(raw, 4, 5);
+    Span2f ms = cspan_md(raw, 4, 5);
     
     for (size_t i=0; i<ms.dim[0]; i++)
         for (size_t j=0; j<ms.dim[1]; j++)
@@ -94,7 +94,7 @@ typedef struct { uint32_t d[2]; } cspan_idx2;
 typedef struct { uint32_t d[3]; } cspan_idx3;
 typedef struct { uint32_t d[4]; } cspan_idx4;
 
-#define cspan_multidim(array, ...) \
+#define cspan_md(array, ...) \
     {.data=array, .dim={__VA_ARGS__}, .stride={.d={__VA_ARGS__}}}
 
 /* For static initialization, use cspan_make(). c_make() for non-static only. */
@@ -117,7 +117,7 @@ typedef struct { uint32_t d[4]; } cspan_idx4;
 #define cspan_front(self) ((self)->data)
 #define cspan_back(self) ((self)->data + cspan_size(self) - 1)
 
-// cspan_subspan:
+// cspan_subspanN:
 
 #define cspan_subspan(self, offset, count) \
     {.data=cspan_at(self, offset), .dim={count}}
@@ -130,24 +130,24 @@ typedef struct { uint32_t d[4]; } cspan_idx4;
     {.data=cspan_at(self, offset, 0, 0, 0), .dim={count, (self)->dim[1], (self)->dim[2], (self)->dim[3]}, \
                                             .stride={(self)->stride}}
 
-// cspan_atN:
+// cspan_submdN:
 
-#define cspan_at4(...) c_MACRO_OVERLOAD(cspan_at4, __VA_ARGS__)
-#define cspan_at3(...) c_MACRO_OVERLOAD(cspan_at3, __VA_ARGS__)
-#define cspan_at2(self, x) \
+#define cspan_submd4(...) c_MACRO_OVERLOAD(cspan_submd4, __VA_ARGS__)
+#define cspan_submd3(...) c_MACRO_OVERLOAD(cspan_submd3, __VA_ARGS__)
+#define cspan_submd2(self, x) \
     {.data=cspan_at(self, x, 0), .dim={(self)->dim[1]}}
-#define cspan_at3_2(self, x) \
+#define cspan_submd3_2(self, x) \
     {.data=cspan_at(self, x, 0, 0), .dim={(self)->dim[1], (self)->dim[2]}, \
                                     .stride={.d={0, (self)->stride.d[2]}}}
-#define cspan_at3_3(self, x, y) \
+#define cspan_submd3_3(self, x, y) \
     {.data=cspan_at(self, x, y, 0), .dim={(self)->dim[2]}}
-#define cspan_at4_2(self, x) \
+#define cspan_submd4_2(self, x) \
     {.data=cspan_at(self, x, 0, 0, 0), .dim={(self)->dim[1], (self)->dim[2], (self)->dim[3]}, \
                                        .stride={.d={0, (self)->stride.d[2], (self)->stride.d[3]}}}
-#define cspan_at4_3(self, x, y) \
+#define cspan_submd4_3(self, x, y) \
     {.data=cspan_at(self, x, y, 0, 0), .dim={(self)->dim[2], (self)->dim[3]}, \
                                        .stride={.d={0, (self)->stride.d[3]}}}
-#define cspan_at4_4(self, x, y, z) \
+#define cspan_submd4_4(self, x, y, z) \
     {.data=cspan_at(self, x, y, z, 0), .dim={(self)->dim[3]}}
 
 // cspan_slice:

@@ -68,8 +68,7 @@ void         cstr_insert_s(cstr* self, size_t pos, cstr ins);
 
 void         cstr_erase(cstr* self, size_t pos, size_t len);         // erase len bytes from pos
 
-void         cstr_replace(cstr* self, const char* search, const char* repl);
-void         cstr_replace_ex(cstr* self, const char* search, const char* repl, unsigned count);
+void         cstr_replace(cstr* self, const char* search, const char* repl, unsigned count = MAX_INT);
 cstr         cstr_replace_sv(csview in, csview search, csview repl, unsigned count);
 void         cstr_replace_at(cstr* self, size_t pos, size_t len, const char* repl);          // replace at a position
 void         cstr_replace_at_sv(cstr* self, size_t pos, size_t len, const csview repl);
@@ -174,7 +173,7 @@ int main() {
         cstr_erase(&s1, 7, 5); // -nine
         printf("%s\n", cstr_str(&s1));
 
-        cstr_replace_ex(&s1, "seven", "four", 1);
+        cstr_replace(&s1, "seven", "four", 1);
         printf("%s\n", cstr_str(&s1));
 
         // reassign:

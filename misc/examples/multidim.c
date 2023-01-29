@@ -16,7 +16,7 @@ int main()
     ispan ms1 = cspan_from(&v);
 
     // View the same data as a 3D array 2 x 3 x 4
-    ispan3 ms3 = cspan_multidim(v.data, 2, 3, 4);
+    ispan3 ms3 = cspan_md(v.data, 2, 3, 4);
 
     puts("ms3:");
     for (unsigned i=0; i != ms3.dim[0]; i++) {
@@ -47,7 +47,7 @@ int main()
         printf(" %d", *i.ref);
     puts("");
 
-    ispan2 ms2 = cspan_at3(&ms3, 0);
+    ispan2 ms2 = cspan_submd3(&ms3, 0);
 
     // write data using 2D view
     for (unsigned i=0; i != ms2.dim[0]; i++)
@@ -60,7 +60,7 @@ int main()
     puts("");
 
     puts("iterate subspan ms3[1]:");
-    ispan2 sub = cspan_at3(&ms3, 1);
+    ispan2 sub = cspan_submd3(&ms3, 1);
     c_FOREACH (i, ispan2, sub)
         printf(" %d", *i.ref);
     puts("");
