@@ -53,7 +53,7 @@ uint32_t utf8_peek_off(const char* s, int pos) {
     return utf8_peek(s);
 }
 
-bool utf8_valid_n(const char* s, size_t nbytes) {
+bool utf8_valid_n(const char* s, intptr_t nbytes) {
     utf8_decode_t d = {.state=0};
     while ((nbytes-- != 0) & (*s != 0))
         utf8_decode(&d, (uint8_t)*s++);
@@ -61,7 +61,7 @@ bool utf8_valid_n(const char* s, size_t nbytes) {
 }
 
 uint32_t utf8_casefold(uint32_t c) {
-    for (size_t i=0; i < casefold_len; ++i) {
+    for (int i=0; i < casefold_len; ++i) {
         const struct CaseMapping entry = casemappings[i];
         if (c <= entry.c2) {
             if (c < entry.c1) return c;
@@ -74,7 +74,7 @@ uint32_t utf8_casefold(uint32_t c) {
 }
 
 uint32_t utf8_tolower(uint32_t c) {
-    for (size_t i=0; i < sizeof upcase_ind/sizeof *upcase_ind; ++i) {
+    for (int i=0; i < (int)(sizeof upcase_ind/sizeof *upcase_ind); ++i) {
         const struct CaseMapping entry = casemappings[upcase_ind[i]];
         if (c <= entry.c2) {
             if (c < entry.c1) return c;
@@ -87,7 +87,7 @@ uint32_t utf8_tolower(uint32_t c) {
 }
 
 uint32_t utf8_toupper(uint32_t c) {
-    for (size_t i=0; i < sizeof lowcase_ind/sizeof *lowcase_ind; ++i) {
+    for (int i=0; i < (int)(sizeof lowcase_ind/sizeof *lowcase_ind); ++i) {
         const struct CaseMapping entry = casemappings[lowcase_ind[i]];
         if (c <= entry.m2) {
             int d = entry.m2 - entry.c2;
@@ -101,7 +101,7 @@ uint32_t utf8_toupper(uint32_t c) {
 
 int utf8_icmp_sv(const csview s1, const csview s2) {
     utf8_decode_t d1 = {.state=0}, d2 = {.state=0};
-    size_t j1 = 0, j2 = 0;
+    intptr_t j1 = 0, j2 = 0;
     while ((j1 < s1.size) & (j2 < s2.size)) {
         do { utf8_decode(&d1, (uint8_t)s1.str[j1++]); } while (d1.state);
         do { utf8_decode(&d2, (uint8_t)s2.str[j2++]); } while (d2.state);
@@ -142,7 +142,7 @@ bool utf8_isgroup(int group, uint32_t c) {
 bool utf8_isalpha(uint32_t c) {
     static int16_t groups[] = {U8G_Latin, U8G_Nl, U8G_Greek, U8G_Cyrillic,
                                U8G_Han, U8G_Devanagari, U8G_Arabic};
-    if (c < 128) return isalpha(c) != 0;
+    if (c < 128) return isalpha((int)c) != 0;
     for (unsigned j=0; j < c_ARRAYLEN(groups); ++j)
         if (utf8_isgroup(groups[j], c))
             return true;
@@ -150,13 +150,13 @@ bool utf8_isalpha(uint32_t c) {
 }
 
 bool utf8_iscased(uint32_t c) {
-    if (c < 128) return isalpha(c) != 0;
+    if (c < 128) return isalpha((int)c) != 0;
     return utf8_islower(c) || utf8_isupper(c) || 
            utf8_isgroup(U8G_Lt, c);
 }
 
 bool utf8_isword(uint32_t c) {
-    if (c < 128) return (isalnum(c) != 0) | (c == '_');
+    if (c < 128) return (isalnum((int)c) != 0) | (c == '_');
     return utf8_isalpha(c) || utf8_isgroup(U8G_Nd, c) ||
            utf8_isgroup(U8G_Pc, c);
 }

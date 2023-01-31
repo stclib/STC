@@ -38,7 +38,7 @@ void vectordemo1()
     c_WITH (cvec_ix bignums = cvec_ix_with_capacity(100), cvec_ix_drop(&bignums))
     {
         cvec_ix_reserve(&bignums, 100);
-        for (size_t i = 10; i <= 100; i += 10)
+        for (int i = 10; i <= 100; i += 10)
             cvec_ix_push(&bignums, i * i);
 
         printf("erase - %d: %" PRIu64 "\n", 3, bignums.data[3]);
@@ -47,8 +47,8 @@ void vectordemo1()
         cvec_ix_pop(&bignums);           // erase the last
         cvec_ix_erase_n(&bignums, 0, 1); // erase the first
 
-        for (size_t i = 0; i < cvec_ix_size(&bignums); ++i) {
-            printf("%" c_ZU ": %" PRIu64 "\n", i, bignums.data[i]);
+        for (int i = 0; i < cvec_ix_size(&bignums); ++i) {
+            printf("%d: %" PRIu64 "\n", i, bignums.data[i]);
         }
     }
 }

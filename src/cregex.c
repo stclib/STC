@@ -214,7 +214,7 @@ utfrune(const char *s, _Rune c)
     if (c < 128)        /* ascii */
         return strchr((char *)s, (int)c);
     int n;
-    for (_Rune r = *s; r; s += n, r = *(unsigned char*)s) {
+    for (_Rune r = (uint32_t)*s; r; s += n, r = *(unsigned char*)s) {
         if (r < 128) { n = 1; continue; }
         n = chartorune(&r, s);
         if (r == c) return s;
@@ -225,10 +225,10 @@ utfrune(const char *s, _Rune c)
 static const char*
 utfruneicase(const char *s, _Rune c)
 {
-    _Rune r = *s;
+    _Rune r = (uint32_t)*s;
     int n;
-    if (c < 128) for (c = tolower(c); r; ++s, r = *(unsigned char*)s) {
-        if (r < 128 && (unsigned)tolower(r) == c) return s;
+    if (c < 128) for (c = (_Rune)tolower((int)c); r; ++s, r = *(unsigned char*)s) {
+        if (r < 128 && (_Rune)tolower((int)r) == c) return s;
     }
     else for (c = utf8_casefold(c); r; s += n, r = *(unsigned char*)s) {
         if (r < 128) { n = 1; continue; }
@@ -661,7 +661,7 @@ _lexutfclass(_Parser *par, _Rune *rp)
         {"{Devanagari}", 10, UTF_devanagari}, {"{Greek}", 7, UTF_greek},
         {"{Han}", 5, UTF_han}, {"{Latin}", 7, UTF_latin},
     };
-    int inv = (*rp == 'P');
+    unsigned inv = (*rp == 'P');
     for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i) {
         if (!strncmp(par->exprp, cls[i].c, (size_t)cls[i].n)) {
             if (par->rune_type == TOK_IRUNE && (cls[i].r == UTF_ll || cls[i].r == UTF_lu))
@@ -908,8 +908,7 @@ out:
 static int
 _runematch(_Rune s, _Rune r)
 {
-    int inv = 0;
-    uint32_t n;
+    int inv = 0, n;
     switch (s) {
     case ASC_D: inv = 1; case ASC_d: return inv ^ (isdigit(r) != 0);
     case ASC_S: inv = 1; case ASC_s: return inv ^ (isspace(r) != 0);
@@ -951,7 +950,7 @@ _runematch(_Rune s, _Rune r)
     case UTF_greek: case UTF_GREEK:
     case UTF_han: case UTF_HAN:
     case UTF_latin: case UTF_LATIN:
-        n = s - UTF_GRP;
+        n = (int)s - UTF_GRP;
         inv = n & 1;
         return inv ^ utf8_isgroup(n / 2, r);
     }
@@ -1050,7 +1049,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
                     tlp->se.m[inst->r.subid].str = s;
                     continue;
                 case TOK_RBRA:
-                    tlp->se.m[inst->r.subid].size = (size_t)(s - tlp->se.m[inst->r.subid].str);
+                    tlp->se.m[inst->r.subid].size = (s - tlp->se.m[inst->r.subid].str);
                     continue;
                 case TOK_ANY:
                     ok = (r != '\n');
@@ -1100,7 +1099,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
                     match = !(mflags & CREG_M_FULLMATCH) ||
                             ((s == j->eol || r == 0 || r == '\n') &&
                             (tlp->se.m[0].str == bol || tlp->se.m[0].str[-1] == '\n'));
-                    tlp->se.m[0].size = (size_t)(s - tlp->se.m[0].str);
+                    tlp->se.m[0].size = (s - tlp->se.m[0].str);
                     if (mp != NULL)
                         _renewmatch(mp, ms, &tlp->se, progp->nsubids);
                     break;
@@ -1199,7 +1198,7 @@ static void
 _build_subst(const char* replace, unsigned nmatch, const csview match[],
              bool (*mfun)(int, csview, cstr*), cstr* subst) {
     cstr_buf buf = cstr_buffer(subst);
-    size_t len = 0, cap = buf.cap;
+    intptr_t len = 0, cap = buf.cap;
     char* dst = buf.data;
     cstr mstr = cstr_NULL;
 
@@ -1283,7 +1282,7 @@ cregex_replace_sv_6(const cregex* re, csview input, const char* replace, unsigne
 
     while (count-- && cregex_find_sv(re, input, match) == CREG_OK) {
         _build_subst(replace, nmatch, match, mfun, &subst);
-        const size_t mpos = (size_t)(match[0].str - input.str);
+        const intptr_t mpos = (match[0].str - input.str);
         if (copy & (mpos > 0)) cstr_append_n(&out, input.str, mpos);
         cstr_append_s(&out, subst);
         input.str = match[0].str + match[0].size;
@@ -1300,7 +1299,7 @@ cregex_replace_pattern_6(const char* pattern, const char* input, const char* rep
     cregex re = cregex_init();
     if (cregex_compile(&re, pattern, crflags) != CREG_OK)
         assert(0);
-    csview sv = {input, strlen(input)};
+    csview sv = {input, c_strlen(input)};
     cstr out = cregex_replace_sv(&re, sv, replace, count, mfun, crflags);
     cregex_drop(&re);
     return out;

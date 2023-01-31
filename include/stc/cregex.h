@@ -143,7 +143,7 @@ cstr cregex_replace_sv_6(const cregex* re, csview input, const char* replace, un
 #define cregex_replace_3(re, input, replace) cregex_replace_4(re, input, replace, ~0U)
 
 STC_INLINE cstr cregex_replace_4(const cregex* re, const char* input, const char* replace, unsigned count) { 
-    csview sv = {input, strlen(input)};
+    csview sv = {input, c_strlen(input)};
     return cregex_replace_sv_4(re, sv, replace, count);
 }
 

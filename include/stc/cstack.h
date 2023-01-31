@@ -58,13 +58,13 @@ STC_INLINE void _cx_memb(_create)(_cx_self* self)
 STC_INLINE void _cx_memb(_create)(_cx_self* self)
     { self->_len = 0; self->_cap = 0; self->data = NULL; }
 
-STC_INLINE _cx_self _cx_memb(_with_capacity)(size_t cap) {
-    _cx_self out = {(_cx_value *) c_malloc(cap*sizeof(i_key)), 0, cap};
+STC_INLINE _cx_self _cx_memb(_with_capacity)(intptr_t cap) {
+    _cx_self out = {(_cx_value *) c_malloc(cap*c_sizeof(i_key)), 0, cap};
     return out;
 }
 
-STC_INLINE _cx_self _cx_memb(_with_size)(size_t size, i_key null) {
-    _cx_self out = {(_cx_value *) c_malloc(size*sizeof null), size, size};
+STC_INLINE _cx_self _cx_memb(_with_size)(intptr_t size, i_key null) {
+    _cx_self out = {(_cx_value *) c_malloc(size*c_sizeof null), size, size};
     while (size) out.data[--size] = null;
     return out;
 }
@@ -83,13 +83,13 @@ STC_INLINE void _cx_memb(_drop)(_cx_self* self) {
 #endif
 }
 
-STC_INLINE size_t _cx_memb(_size)(const _cx_self* self)
+STC_INLINE intptr_t _cx_memb(_size)(const _cx_self* self)
     { return self->_len; }
 
 STC_INLINE bool _cx_memb(_empty)(const _cx_self* self)
     { return !self->_len; }
 
-STC_INLINE size_t _cx_memb(_capacity)(const _cx_self* self) { 
+STC_INLINE intptr_t _cx_memb(_capacity)(const _cx_self* self) { 
 #ifndef i_capacity
     return self->_cap; 
 #else
@@ -97,17 +97,17 @@ STC_INLINE size_t _cx_memb(_capacity)(const _cx_self* self) {
 #endif
 }
 
-STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, size_t n) {
+STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, intptr_t n) {
     if (n < self->_len) return true;
 #ifndef i_capacity
-    _cx_value *t = (_cx_value *)c_realloc(self->data, n*sizeof *t);
+    _cx_value *t = (_cx_value *)c_realloc(self->data, n*c_sizeof *t);
     if (t) { self->_cap = n, self->data = t; return true; }
 #endif
     return false;
 }
 
-STC_INLINE _cx_value* _cx_memb(_append_uninit)(_cx_self *self, size_t n) {
-    size_t len = self->_len;
+STC_INLINE _cx_value* _cx_memb(_append_uninit)(_cx_self *self, intptr_t n) {
+    intptr_t len = self->_len;
     if (!_cx_memb(_reserve)(self, len + n)) return NULL;
     self->_len += n;
     return self->data + len;
@@ -136,15 +136,15 @@ STC_INLINE _cx_value* _cx_memb(_push)(_cx_self* self, _cx_value val) {
 STC_INLINE void _cx_memb(_pop)(_cx_self* self)
     { assert(!_cx_memb(_empty)(self)); _cx_value* p = &self->data[--self->_len]; i_keydrop(p); }
 
-STC_INLINE void _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, size_t n)
+STC_INLINE void _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, intptr_t n)
     { while (n--) _cx_memb(_push)(self, i_keyfrom(*raw++)); }
 
-STC_INLINE _cx_self _cx_memb(_from_n)(const _cx_raw* raw, size_t n)
+STC_INLINE _cx_self _cx_memb(_from_n)(const _cx_raw* raw, intptr_t n)
     { _cx_self cx = {0}; _cx_memb(_put_n)(&cx, raw, n); return cx; }
 
-STC_INLINE const _cx_value* _cx_memb(_at)(const _cx_self* self, size_t idx)
+STC_INLINE const _cx_value* _cx_memb(_at)(const _cx_self* self, intptr_t idx)
     { assert(idx < self->_len); return self->data + idx; }
-STC_INLINE _cx_value* _cx_memb(_at_mut)(_cx_self* self, size_t idx)
+STC_INLINE _cx_value* _cx_memb(_at_mut)(_cx_self* self, intptr_t idx)
     { assert(idx < self->_len); return self->data + idx; }
 
 #if !defined i_no_emplace
@@ -154,9 +154,9 @@ STC_INLINE _cx_value* _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
 
 #if !defined i_no_clone
 STC_INLINE _cx_self _cx_memb(_clone)(_cx_self v) {
-    _cx_self out = {(_cx_value *)c_malloc(v._len*sizeof(_cx_value)), v._len, v._len};
+    _cx_self out = {(_cx_value *)c_malloc(v._len*c_sizeof(_cx_value)), v._len, v._len};
     if (!out.data) out._cap = 0;
-    else for (size_t i = 0; i < v._len; ++v.data)
+    else for (intptr_t i = 0; i < v._len; ++v.data)
         out.data[i++] = i_keyclone((*v.data));
     return out;
 }

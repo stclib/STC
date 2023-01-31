@@ -31,12 +31,11 @@
 #include <assert.h>
 #include "priv/altnames.h"
 
+#define c_NPOS INTPTR_MAX
 #if SIZE_MAX == UINT32_MAX
   #define c_ZU PRIu32
-  #define c_NPOS INT32_MAX
 #elif SIZE_MAX == UINT64_MAX
   #define c_ZU PRIu64
-  #define c_NPOS INT64_MAX
 #endif
 #if defined STC_NDEBUG || defined NDEBUG
   #define c_ASSERT(expr) (void)(expr)
@@ -91,11 +90,13 @@
 #define c_swap(T, xp, yp)       do { T *_xp = xp, *_yp = yp, \
                                     _tv = *_xp; *_xp = *_yp; *_yp = _tv; } while (0)
 #define c_sizeof                (intptr_t)sizeof
-#define c_strlen(str)           (intptr_t)strlen(str)
-#define c_strncmp(d, s, ilen)   strncmp(d, s, c_i2u(ilen))
+#define c_strlen(s)             (intptr_t)strlen(s)
+#define c_strncmp(a, b, ilen)   strncmp(a, b, c_i2u(ilen))
 #define c_memcpy(d, s, ilen)    memcpy(d, s, c_i2u(ilen))
 #define c_memmove(d, s, ilen)   memmove(d, s, c_i2u(ilen))
-#define c_memcmp(d, s, ilen)    memcmp(d, s, c_i2u(ilen))
+#define c_memset(d, val, ilen)  memset(d, val, c_i2u(ilen))
+#define c_memcmp(a, b, ilen)    memcmp(a, b, c_i2u(ilen))
+
 #define c_u2i(u)                ((intptr_t)((u) + 0*sizeof((u) == 1U)))
 #define c_i2u(i)                ((size_t)(i) + 0*sizeof((i) == 1))
 #define c_LTu(a, b)             ((size_t)(a) < (size_t)(b))
