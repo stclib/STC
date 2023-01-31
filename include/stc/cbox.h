@@ -100,7 +100,7 @@ STC_INLINE _cx_raw _cx_memb(_toraw)(const _cx_self* self)
 STC_INLINE void _cx_memb(_drop)(_cx_self* self) {
     if (self->get) {
         i_keydrop(self->get);
-        c_FREE(self->get);
+        c_free(self->get);
     }
 }
 

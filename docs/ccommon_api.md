@@ -342,23 +342,23 @@ uint64_t    crawstr_hash(const crawstr* x);
 | Usage                       | Meaning                                    |
 |:----------------------------|:-------------------------------------------|
 | `c_NEW (type, value)`       | Allocate and init a new object on the heap |
-| `c_ALLOC (type)`            | `(type *) c_MALLOC(sizeof(type))`          |
-| `c_ALLOC_N (type, N)`       | `(type *) c_MALLOC((N)*sizeof(type))`      |
+| `c_ALLOC (type)`            | `(type *) c_malloc(c_sizeof(type))`        |
+| `c_ALLOC_N (type, N)`       | `(type *) c_malloc((N)*c_sizeof(type))`    |
 
 ```c
 struct Pnt { double x, y, z; };
 struct Pnt *pnt = c_NEW(struct Pnt, {1.2, 3.4, 5.6});
-c_FREE(pnt);
+c_free(pnt);
 
 int* array = c_ALLOC_N(int, 100);
-c_FREE(array);
+c_free(array);
 ```
 
-### c_MALLOC, c_CALLOC, c_REALLOC, c_FREE: customizable allocators
+### c_malloc, c_calloc, c_realloc, c_free: customizable allocators
 Memory allocator for the entire library. Macros can be overridden by the user.
 
 ### c_ARRAYLEN
-- **c_ARRAYLEN(array)**: Return number of elements in an array.
+- **c_ARRAYLEN(array)**: Return number of elements in an array. array must not be a pointer!
 ```c
 int array[] = {1, 2, 3, 4};
 size_t n = c_ARRAYLEN(array);

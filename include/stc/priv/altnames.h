@@ -23,10 +23,6 @@
 #define c_alloc c_ALLOC
 #define c_alloc_n c_ALLOC_N
 #define c_new c_NEW
-#define c_malloc c_MALLOC
-#define c_calloc c_CALLOC
-#define c_realloc c_REALLOC
-#define c_free c_FREE
 #define c_arraylen c_ARRAYLEN
 #define c_forlist c_FORLIST
 #define c_forrange c_FORRANGE

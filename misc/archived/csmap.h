@@ -400,7 +400,7 @@ _cx_memb(_erase_r_)(_cx_node *tn, const _cx_rawkey* rkey, int *erased) {
         } else { /* unlink node */
             tx = tn;
             tn = tn->link[tn->link[0]->level == 0];
-            c_FREE(tx);
+            c_free(tx);
         }
     }
     if (tn->link[0]->level < tn->level - 1 || tn->link[1]->level < tn->level - 1) {
@@ -492,7 +492,7 @@ _cx_memb(_drop_r_)(_cx_node* tn) {
         _cx_memb(_drop_r_)(tn->link[0]);
         _cx_memb(_drop_r_)(tn->link[1]);
         _cx_memb(_value_drop)(&tn->value);
-        c_FREE(tn);
+        c_free(tn);
     }
 }
 

@@ -277,13 +277,13 @@ _cx_memb(_drop)(_cx_self* self) {
     if (self->_cap == 0)
         return;
     _cx_memb(_clear)(self);
-    c_FREE(self->data);
+    c_free(self->data);
 }
 
 STC_DEF bool
 _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
     if (cap > self->_cap || (cap && cap == self->_len)) {
-        _cx_value* d = (_cx_value*)c_REALLOC(self->data, cap*sizeof(i_key));
+        _cx_value* d = (_cx_value*)c_realloc(self->data, cap*sizeof(i_key));
         if (!d)
             return false;
         self->data = d;

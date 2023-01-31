@@ -348,7 +348,7 @@ STC_DEF void
 _cx_memb(_erase_node_after)(_cx_self* self, _cx_node* ref) {
     _cx_node* node = _cx_memb(_unlink_node_after)(self, ref);
     i_keydrop((&node->value));
-    c_FREE(node);
+    c_free(node);
 }
 
 STC_DEF _cx_node*

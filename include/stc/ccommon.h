@@ -68,51 +68,44 @@
 
 #ifdef __cplusplus
   #include <new>
-  #define c_ALLOC(T)            static_cast<T*>(c_MALLOC(sizeof(T)))
-  #define c_ALLOC_N(T, n)       static_cast<T*>(c_MALLOC(sizeof(T)*(n)))
+  #define c_ALLOC(T)            static_cast<T*>(c_malloc(c_sizeof(T)))
+  #define c_ALLOC_N(T, n)       static_cast<T*>(c_malloc(c_sizeof(T)*(n)))
   #define c_NEW(T, ...)         new (c_ALLOC(T)) T(__VA_ARGS__)
   #define c_LITERAL(T)          T
 #else
-  #define c_ALLOC(T)            ((T*)c_MALLOC(sizeof(T)))
-  #define c_ALLOC_N(T, n)       ((T*)c_MALLOC(sizeof(T)*(n)))
+  #define c_ALLOC(T)            ((T*)c_malloc(c_sizeof(T)))
+  #define c_ALLOC_N(T, n)       ((T*)c_malloc(c_sizeof(T)*(n)))
   #define c_NEW(T, ...)         ((T*)memcpy(c_ALLOC(T), (T[]){__VA_ARGS__}, sizeof(T)))
   #define c_LITERAL(T)          (T)
 #endif
 
-#ifndef c_MALLOC
-  #define c_MALLOC(sz)          malloc(sz)
-  #define c_CALLOC(n, sz)       calloc(n, sz)
-  #define c_REALLOC(p, sz)      realloc(p, sz)
-  #define c_FREE(p)             free(p)
-#endif
 #ifndef c_malloc
   #define c_malloc(sz)          malloc(c_i2u(sz))
   #define c_calloc(n, sz)       calloc(c_i2u(n), c_i2u(sz))
   #define c_realloc(p, sz)      realloc(p, c_i2u(sz))
   #define c_free(p)             free(p)
 #endif
-
 #define c_static_assert(b)      ((int)(0*sizeof(int[(b) ? 1 : -1])))
 #define c_container_of(p, T, m) ((T*)((char*)(p) + 0*sizeof((p) == &((T*)0)->m) - offsetof(T, m)))
-#define c_delete(T, ptr)        do { T *_tp = ptr; T##_drop(_tp); c_FREE(_tp); } while (0)
+#define c_delete(T, ptr)        do { T *_tp = ptr; T##_drop(_tp); c_free(_tp); } while (0)
 #define c_swap(T, xp, yp)       do { T *_xp = xp, *_yp = yp, \
                                     _tv = *_xp; *_xp = *_yp; *_yp = _tv; } while (0)
-#define c_LTu(a, b)             ((size_t)(a) < (size_t)(b))
-#define c_u2i(u)                ((intptr_t)((u) + 0*sizeof((u) == 1U)))
-#define c_i2u(i)                ((size_t)(i) + 0*sizeof((i) == 1))
-#define c_sizeof(x)             (intptr_t)sizeof(x)
+#define c_sizeof                (intptr_t)sizeof
+#define c_strlen(str)           (intptr_t)strlen(str)
+#define c_strncmp(d, s, ilen)   strncmp(d, s, c_i2u(ilen))
 #define c_memcpy(d, s, ilen)    memcpy(d, s, c_i2u(ilen))
 #define c_memmove(d, s, ilen)   memmove(d, s, c_i2u(ilen))
 #define c_memcmp(d, s, ilen)    memcmp(d, s, c_i2u(ilen))
-#define c_strlen(str)           (intptr_t)strlen(str)
-#define c_strncmp(d, s, ilen)   strncmp(d, s, c_i2u(ilen))
+#define c_u2i(u)                ((intptr_t)((u) + 0*sizeof((u) == 1U)))
+#define c_i2u(i)                ((size_t)(i) + 0*sizeof((i) == 1))
+#define c_LTu(a, b)             ((size_t)(a) < (size_t)(b))
 
 // x and y are i_keyraw* type, defaults to i_key*:
 #define c_default_cmp(x, y)     (c_default_less(y, x) - c_default_less(x, y))
 #define c_default_less(x, y)    (*(x) < *(y))
 #define c_default_eq(x, y)      (*(x) == *(y))
 #define c_memcmp_eq(x, y)       (memcmp(x, y, sizeof *(x)) == 0)
-#define c_default_hash(x)       cfasthash(x, sizeof *(x))
+#define c_default_hash(x)       cfasthash(x, c_sizeof(*(x)))
 
 #define c_default_clone(v)      (v)
 #define c_default_toraw(vp)     (*(vp))
@@ -131,12 +124,12 @@
 /* Function macros and others */
 
 #define c_make(C, ...) \
-  C##_from_n((C##_raw[])__VA_ARGS__, sizeof((C##_raw[])__VA_ARGS__)/sizeof(C##_raw))
+  C##_from_n((C##_raw[])__VA_ARGS__, c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
 
 typedef const char* crawstr;
 #define crawstr_cmp(xp, yp) strcmp(*(xp), *(yp))
 #define crawstr_hash(p) cstrhash(*(p))
-#define crawstr_len(literal) (sizeof("" literal) - 1U)
+#define crawstr_len(literal) (c_sizeof("" literal) - 1)
 
 #define c_ARRAYLEN(a) (intptr_t)(sizeof(a)/sizeof 0[a])
 #define c_SV(...) c_MACRO_OVERLOAD(c_SV, __VA_ARGS__)
@@ -147,9 +140,9 @@ typedef const char* crawstr;
 
 #define _c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
-STC_INLINE uint64_t cfasthash(const void* key, size_t len) {
+STC_INLINE uint64_t cfasthash(const void* key, intptr_t len) {
     const uint8_t *x = (const uint8_t*) key;
-    uint64_t u8, h = 1; size_t n = len >> 3;
+    uint64_t u8, h = 1; intptr_t n = len >> 3;
     uint32_t u4;
     while (n--) {
         memcpy(&u8, x, 8), x += 8;
@@ -166,15 +159,15 @@ STC_INLINE uint64_t cfasthash(const void* key, size_t len) {
 }
 
 STC_INLINE uint64_t cstrhash(const char *str)
-    { return cfasthash(str, strlen(str)); }
+    { return cfasthash(str, c_strlen(str)); }
 
 STC_INLINE char* cstrnstrn(const char *str, const char *needle,
-                           size_t slen, const size_t nlen) {
+                           intptr_t slen, const intptr_t nlen) {
     if (!nlen) return (char *)str;
     if (nlen > slen) return NULL;
     slen -= nlen;
     do {
-        if (*str == *needle && !memcmp(str, needle, nlen))
+        if (*str == *needle && !c_memcmp(str, needle, nlen))
             return (char *)str;
         ++str;
     } while (slen--);
@@ -191,7 +184,7 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
          ; it.ref != (C##_value*)_endref; C##_next(&it))
 
 #define c_FORWHILE(i, C, start, cond) \
-    for (struct {C##_iter it; C##_value *ref; size_t index;} \
+    for (struct {C##_iter it; C##_value *ref; intptr_t index;} \
          i = {.it=start, .ref=i.it.ref}; i.it.ref && (cond) \
          ; C##_next(&i.it), i.ref = i.it.ref, ++i.index)
 
@@ -211,7 +204,7 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
 #ifndef __cplusplus
   #define c_FORLIST(it, T, ...) \
     for (struct {T* data; T* ref; int size, index;} \
-         it = {.data=(T[])__VA_ARGS__, .ref=it.data, .size=sizeof((T[])__VA_ARGS__)/sizeof(T)} \
+         it = {.data=(T[])__VA_ARGS__, .ref=it.data, .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
          ; it.index < it.size; ++it.ref, ++it.index)
 #else
   #include <initializer_list>
@@ -244,12 +237,12 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
 #define c_drop(C, ...) do { c_FORLIST (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
 #define c_find_if(...) c_MACRO_OVERLOAD(c_find_if, __VA_ARGS__)
 #define c_find_if_4(it, C, cnt, pred) do { \
-    size_t index = 0; \
+    intptr_t index = 0; \
     for (it = C##_begin(&cnt); it.ref && !(pred); C##_next(&it)) \
         ++index; \
 } while (0)
 #define c_find_if_5(it, C, start, end, pred) do { \
-    size_t index = 0; \
+    intptr_t index = 0; \
     const C##_value* _endref = (end).ref; \
     for (it = start; it.ref != _endref && !(pred); C##_next(&it)) \
         ++index; \
@@ -258,7 +251,7 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
 
 #define c_erase_if(it, C, cnt, pred) do { \
     C##_iter it = C##_begin(&cnt); \
-    for (size_t index = 0; it.ref; ++index) { \
+    for (intptr_t index = 0; it.ref; ++index) { \
         if (pred) it = C##_erase_at(&cnt, it); \
         else C##_next(&it); \
     } \

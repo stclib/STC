@@ -125,7 +125,7 @@ struct { uint64_t *data64; size_t _size; } typedef i_type;
 
 STC_INLINE cbits  cbits_init(void) { return c_LITERAL(cbits){NULL}; }
 STC_INLINE void   cbits_create(cbits* self) { self->data64 = NULL; self->_size = 0; }
-STC_INLINE void   cbits_drop(cbits* self) { c_FREE(self->data64); }
+STC_INLINE void   cbits_drop(cbits* self) { c_free(self->data64); }
 STC_INLINE size_t cbits_size(const cbits* self) { return self->_size; }
 
 STC_INLINE cbits* cbits_take(cbits* self, cbits other) {
@@ -138,7 +138,7 @@ STC_INLINE cbits* cbits_take(cbits* self, cbits other) {
 
 STC_INLINE cbits cbits_clone(cbits other) {
     const size_t bytes = _cbits_bytes(other._size);
-    cbits set = {(uint64_t *)memcpy(c_MALLOC(bytes), other.data64, bytes), other._size};
+    cbits set = {(uint64_t *)memcpy(c_malloc(bytes), other.data64, bytes), other._size};
     return set;
 }
 
@@ -153,7 +153,7 @@ STC_INLINE cbits* cbits_copy(cbits* self, const cbits* other) {
 
 STC_INLINE void cbits_resize(cbits* self, const size_t size, const bool value) {
     const size_t new_n = _cbits_words(size), osize = self->_size, old_n = _cbits_words(osize);
-    self->data64 = (uint64_t *)c_REALLOC(self->data64, new_n*8);
+    self->data64 = (uint64_t *)c_realloc(self->data64, new_n*8);
     self->_size = size;
     if (new_n >= old_n) {
         memset(self->data64 + old_n, -(int)value, (new_n - old_n)*8);
@@ -175,13 +175,13 @@ STC_INLINE cbits cbits_move(cbits* self) {
 }
 
 STC_INLINE cbits cbits_with_size(const size_t size, const bool value) {
-    cbits set = {(uint64_t *)c_MALLOC(_cbits_bytes(size)), size};
+    cbits set = {(uint64_t *)c_malloc(_cbits_bytes(size)), size};
     cbits_set_all(&set, value);
     return set;
 }
 
 STC_INLINE cbits cbits_with_pattern(const size_t size, const uint64_t pattern) {
-    cbits set = {(uint64_t *)c_MALLOC(_cbits_bytes(size)), size};
+    cbits set = {(uint64_t *)c_malloc(_cbits_bytes(size)), size};
     cbits_set_pattern(&set, pattern);
     return set;
 }

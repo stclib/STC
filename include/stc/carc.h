@@ -127,8 +127,8 @@ STC_INLINE void _cx_memb(_drop)(_cx_self* self) {
     if (self->use_count && _i_atomic_dec_and_test(self->use_count)) {
         i_keydrop(self->get);
         if ((char *)self->get != (char *)self->use_count + offsetof(struct _cx_memb(_rep_), value))
-            c_FREE(self->get);
-        c_FREE((long*)self->use_count);
+            c_free(self->get);
+        c_free((long*)self->use_count);
     }
 }
 
