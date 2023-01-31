@@ -48,24 +48,25 @@ int main()
     c_AUTO (cset_str, sset)
     {
         cmap_int_insert(&map, 123, 321);
+        cmap_int_insert(&map, 456, 654);
+        cmap_int_insert(&map, 789, 987);
 
-        c_FORLIST (i, cmap_pnt_raw, {{{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}})
-            cmap_pnt_insert(&pmap, c_PAIR(i.ref));
+        pmap = c_make(cmap_pnt, {{{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}});
 
         c_FOREACH (i, cmap_pnt, pmap)
             printf(" (%d, %d: %d)", i.ref->first.x, i.ref->first.y, i.ref->second);
         puts("");
 
-        c_FORLIST (i, cmap_str_raw, {
+        smap = c_make(cmap_str, {
             {"Hello, friend", "long time no see"},
-            {"So long, friend", "see you around"},
-        }) cmap_str_emplace(&smap, c_PAIR(i.ref));
+            {"So long", "see you around"},
+        });
 
-        c_FORLIST (i, const char*, {
+        sset = c_make(cset_str, {
             "Hello, friend",
             "Nice to see you again",
-            "So long, friend",
-        }) cset_str_emplace(&sset, *i.ref);
+            "So long",
+        });
 
         c_FOREACH (i, cset_str, sset)
             printf(" %s\n", cstr_str(i.ref));

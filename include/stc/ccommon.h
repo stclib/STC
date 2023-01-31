@@ -78,11 +78,18 @@
   #define c_NEW(T, ...)         ((T*)memcpy(c_ALLOC(T), (T[]){__VA_ARGS__}, sizeof(T)))
   #define c_LITERAL(T)          (T)
 #endif
+
 #ifndef c_MALLOC
   #define c_MALLOC(sz)          malloc(sz)
   #define c_CALLOC(n, sz)       calloc(n, sz)
   #define c_REALLOC(p, sz)      realloc(p, sz)
   #define c_FREE(p)             free(p)
+#endif
+#ifndef c_malloc
+  #define c_malloc(sz)          malloc(c_i2u(sz))
+  #define c_calloc(n, sz)       calloc(c_i2u(n), c_i2u(sz))
+  #define c_realloc(p, sz)      realloc(p, c_i2u(sz))
+  #define c_free(p)             free(p)
 #endif
 
 #define c_static_assert(b)      ((int)(0*sizeof(int[(b) ? 1 : -1])))
@@ -90,6 +97,15 @@
 #define c_delete(T, ptr)        do { T *_tp = ptr; T##_drop(_tp); c_FREE(_tp); } while (0)
 #define c_swap(T, xp, yp)       do { T *_xp = xp, *_yp = yp, \
                                     _tv = *_xp; *_xp = *_yp; *_yp = _tv; } while (0)
+#define c_LTu(a, b)             ((size_t)(a) < (size_t)(b))
+#define c_u2i(u)                ((intptr_t)((u) + 0*sizeof((u) == 1U)))
+#define c_i2u(i)                ((size_t)(i) + 0*sizeof((i) == 1))
+#define c_sizeof(x)             (intptr_t)sizeof(x)
+#define c_memcpy(d, s, ilen)    memcpy(d, s, c_i2u(ilen))
+#define c_memmove(d, s, ilen)   memmove(d, s, c_i2u(ilen))
+#define c_memcmp(d, s, ilen)    memcmp(d, s, c_i2u(ilen))
+#define c_strlen(str)           (intptr_t)strlen(str)
+#define c_strncmp(d, s, ilen)   strncmp(d, s, c_i2u(ilen))
 
 // x and y are i_keyraw* type, defaults to i_key*:
 #define c_default_cmp(x, y)     (c_default_less(y, x) - c_default_less(x, y))
@@ -122,7 +138,7 @@ typedef const char* crawstr;
 #define crawstr_hash(p) cstrhash(*(p))
 #define crawstr_len(literal) (sizeof("" literal) - 1U)
 
-#define c_ARRAYLEN(a) (sizeof(a)/sizeof 0[a])
+#define c_ARRAYLEN(a) (intptr_t)(sizeof(a)/sizeof 0[a])
 #define c_SV(...) c_MACRO_OVERLOAD(c_SV, __VA_ARGS__)
 #define c_SV_1(lit) c_SV_2(lit, crawstr_len(lit))
 #define c_SV_2(str, n) (c_LITERAL(csview){str, n})

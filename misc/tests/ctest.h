@@ -113,14 +113,14 @@ struct ctest {
 #ifdef __cplusplus
 
 #define CTEST_SETUP(sname) \
-    template <> void CTEST_IMPL_SETUP_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* self)
+    template <> void CTEST_IMPL_SETUP_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* fix)
 
 #define CTEST_TEARDOWN(sname) \
-    template <> void CTEST_IMPL_TEARDOWN_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* self)
+    template <> void CTEST_IMPL_TEARDOWN_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* fix)
 
 #define CTEST_FIXTURE(sname) \
-    template <typename T> void CTEST_IMPL_SETUP_FNAME(sname)(T* self) { } \
-    template <typename T> void CTEST_IMPL_TEARDOWN_FNAME(sname)(T* self) { } \
+    template <typename T> void CTEST_IMPL_SETUP_FNAME(sname)(T* fix) { } \
+    template <typename T> void CTEST_IMPL_TEARDOWN_FNAME(sname)(T* fix) { } \
     struct CTEST_IMPL_DATA_SNAME(sname)
 
 #define CTEST_IMPL_CTEST(sname, tname, tskip) \
@@ -130,23 +130,23 @@ struct ctest {
 
 #define CTEST_IMPL_CTEST_F(sname, tname, tskip) \
     static struct CTEST_IMPL_DATA_SNAME(sname) CTEST_IMPL_DATA_TNAME(sname, tname); \
-    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname)* self); \
+    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname)* fix); \
     static void (*CTEST_IMPL_SETUP_TPNAME(sname, tname))(struct CTEST_IMPL_DATA_SNAME(sname)*) = &CTEST_IMPL_SETUP_FNAME(sname)<struct CTEST_IMPL_DATA_SNAME(sname)>; \
     static void (*CTEST_IMPL_TEARDOWN_TPNAME(sname, tname))(struct CTEST_IMPL_DATA_SNAME(sname)*) = &CTEST_IMPL_TEARDOWN_FNAME(sname)<struct CTEST_IMPL_DATA_SNAME(sname)>; \
     CTEST_IMPL_STRUCT(sname, tname, tskip, &CTEST_IMPL_DATA_TNAME(sname, tname), &CTEST_IMPL_SETUP_TPNAME(sname, tname), &CTEST_IMPL_TEARDOWN_TPNAME(sname, tname)); \
-    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname)* self)
+    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname)* fix)
 
 #else
 
 #define CTEST_SETUP(sname) \
-    static void CTEST_IMPL_SETUP_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* self); \
+    static void CTEST_IMPL_SETUP_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* fix); \
     static void (*CTEST_IMPL_SETUP_FPNAME(sname))(struct CTEST_IMPL_DATA_SNAME(sname)*) = &CTEST_IMPL_SETUP_FNAME(sname); \
-    static void CTEST_IMPL_SETUP_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* self)
+    static void CTEST_IMPL_SETUP_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* fix)
 
 #define CTEST_TEARDOWN(sname) \
-    static void CTEST_IMPL_TEARDOWN_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* self); \
+    static void CTEST_IMPL_TEARDOWN_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* fix); \
     static void (*CTEST_IMPL_TEARDOWN_FPNAME(sname))(struct CTEST_IMPL_DATA_SNAME(sname)*) = &CTEST_IMPL_TEARDOWN_FNAME(sname); \
-    static void CTEST_IMPL_TEARDOWN_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* self)
+    static void CTEST_IMPL_TEARDOWN_FNAME(sname)(struct CTEST_IMPL_DATA_SNAME(sname)* fix)
 
 #define CTEST_FIXTURE(sname) \
     struct CTEST_IMPL_DATA_SNAME(sname); \
@@ -161,9 +161,9 @@ struct ctest {
 
 #define CTEST_IMPL_CTEST_F(sname, tname, tskip) \
     static struct CTEST_IMPL_DATA_SNAME(sname) CTEST_IMPL_DATA_TNAME(sname, tname); \
-    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname)* self); \
+    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname)* fix); \
     CTEST_IMPL_STRUCT(sname, tname, tskip, &CTEST_IMPL_DATA_TNAME(sname, tname), &CTEST_IMPL_SETUP_FPNAME(sname), &CTEST_IMPL_TEARDOWN_FPNAME(sname)); \
-    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname)* self)
+    static void CTEST_IMPL_FNAME(sname, tname)(struct CTEST_IMPL_DATA_SNAME(sname)* fix)
 
 #endif
 
@@ -185,12 +185,6 @@ void assert_str(const char* cmp, const char* exp, const char* real, const char* 
 void assert_wstr(const char* cmp, const wchar_t *exp, const wchar_t *real, const char* caller, int line);
 #define ASSERT_WSTREQ(exp, real) assert_wstr("==", exp, real, __FILE__, __LINE__)
 #define ASSERT_WSTRNE(exp, real) assert_wstr("!=", exp, real, __FILE__, __LINE__)
-
-void assert_data(const unsigned char* exp, size_t expsize,
-                 const unsigned char* real, size_t realsize,
-                 const char* caller, int line);
-#define ASSERT_DATA(exp, expsize, real, realsize) \
-    assert_data(exp, expsize, real, realsize, __FILE__, __LINE__)
 
 #define CTEST_FLT_EPSILON 1e-5
 #define CTEST_DBL_EPSILON 1e-12
@@ -363,21 +357,6 @@ void assert_wstr(const char* cmp, const wchar_t *exp, const wchar_t *real, const
     }
 }
 
-void assert_data(const unsigned char* exp, size_t expsize,
-                 const unsigned char* real, size_t realsize,
-                 const char* caller, int line) {
-    size_t i;
-    if (expsize != realsize) {
-        CTEST_ERR("%s:%d  expected %" PRIuMAX " bytes, got %" PRIuMAX, caller, line, (uintmax_t) expsize, (uintmax_t) realsize);
-    }
-    for (i=0; i<expsize; i++) {
-        if (exp[i] != real[i]) {
-            CTEST_ERR("%s:%d expected 0x%02x at offset %" PRIuMAX " got 0x%02x",
-                caller, line, exp[i], (uintmax_t) i, real[i]);
-        }
-    }
-}
-
 static bool get_compare_result(const char* cmp, int c3, bool eq) {
     if (cmp[0] == '<')
         return c3 < 0 || ((cmp[1] == '=') & eq);
@@ -443,7 +422,7 @@ void assert_fail(const char* caller, int line) {
 
 
 static int suite_all(struct ctest* t) {
-    (void) t; // fix unused parameter warning
+    (void) t; // avoid unused parameter warning
     return 1;
 }
 
@@ -466,8 +445,8 @@ static void sighandler(int signum)
     const char msg_nocolor[] = "[SIGSEGV: Segmentation fault]\n";
 
     const char* msg = color_output ? msg_color : msg_nocolor;
-    write(STDOUT_FILENO, msg, (unsigned int)strlen(msg));
-
+    intptr_t n = write(STDOUT_FILENO, msg, (unsigned int)strlen(msg));
+    (void)n;
     /* "Unregister" the signal handler and send the signal back to the process
      * so it can terminate as expected */
     signal(signum, SIG_DFL);
