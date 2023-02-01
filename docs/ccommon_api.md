@@ -104,7 +104,7 @@ NOTE: One must always make sure to unwind temporary allocated resources before a
 - it prevents forgetting to call the destructor at the end.
 
 The **checkauto** utility will report any misusages. The following example shows how to correctly break/return
-from a `c_AUTO` scope: 
+from a `c_AUTO` scope:
 ```c
     int flag = 0;
     for (int i = 0; i<n; ++i) {
@@ -122,7 +122,7 @@ from a `c_AUTO` scope:
 
             if (cond3())
                 return -1;  // checkauto ERROR! return inside c_AUTO
-            
+
             // CORRECT:
             if (cond2()) {
                 flag = 1;   // flag to break outer for-loop
@@ -252,28 +252,33 @@ int main() {
                      && c_flt_skip(i, 100) // built-in
                      && isPrime(*i.ref)
                       , c_flt_take(i, 10)) { // breaks loop on false.
-            printf(" %d", *i.ref);  
+            printf(" %d", *i.ref);
         }
         puts("");
     }
 }
-// Out: 1000211 1000213 1000231 1000249 1000253 1000273 1000289 1000291 1000303 1000313 
+// Out: 1000211 1000213 1000231 1000249 1000253 1000273 1000289 1000291 1000303 1000313
 ```
 Note that `c_flt_take()` is given as an optional argument, which makes the loop stop when it becomes false (for efficiency). Chaining it after `isPrime()` instead will give same result, but the full input is processed.
 
-### c_initialize
+### c_make
 
-Create a container from a literal initializer list.
-**c_initialize** a container or a cspan with an initializer list.
+Make a container from a literal initializer list. Example:
 ```c
-#define i_val_str
+#define i_val_str  // cstr value type
 #include <stc/cset.h>
+
+#define i_key int
+#define i_val int
+#include <stc/cmap.h>
 ...
-cset_str myset = c_initialize(cset_str, {"This", "is", "the", "story"});
+cset_str myset = c_make(cset_str, {"This", "is", "the", "story"}); // note: const char* values given!
+int x = 7, y = 8;
+cmap_int mymap = c_make(cmap_int, { {1, 2}, {3, 4}, {5, 6}, {x, y} });
 ```
 
 ### crange
-**crange** is a number sequence generator type. The **crange_value** type is `long long`. Below, *start*, *stop*, *step* are type *crange_value*:
+**crange** is a number sequence generator type. The **crange_value** type is `long long`. Below *start*, *stop*, and *step* are of type *crange_value*:
 ```c
 crange      crange_make(stop);              // will generate 0, 1, ..., stop-1
 crange      crange_make(start, stop);       // will generate start, start+1, ... stop-1
@@ -286,14 +291,14 @@ void        crange_next(crange_iter* it);
 // 1. All primes less than 32:
 crange r1 = crange_make(3, 32, 2);
 printf("2"); // first prime
-c_FORFILTER (i, crange, r1 
+c_FORFILTER (i, crange, r1
               , isPrime(*i.ref))
     printf(" %lld", *i.ref);
 // 2 3 5 7 11 13 17 19 23 29 31
 
 // 2. The 11 first primes:
 printf("2");
-c_FORFILTER (i, crange, crange_literal(3, INT64_MAX, 2) 
+c_FORFILTER (i, crange, crange_literal(3, INT64_MAX, 2)
               , isPrime(*i.ref)
               , c_flt_take(10))
     printf(" %lld", *i.ref);

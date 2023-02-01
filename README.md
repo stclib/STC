@@ -7,7 +7,7 @@ News: Version 4.1 RC (Feb 2023)
 ------------------------------------------------
 Major changes:
 - Signed sizes and indices for all containers (no more mixing unsigned/signed bugs).
-- A new exciting **cspan** single/multi-dimensional array view.
+- A new exciting [**cspan**](docs/cspan_api.md) single/multi-dimensional array view.
 - Updates on cregex with several new unicode character classes.
 - Uppercase flow-control macros (ccommon.h). Lowercase macros are [still supported](include/stc/priv/altnames.h).
 - [See detailed changes for version 4](#version-4).
