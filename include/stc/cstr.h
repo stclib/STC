@@ -374,7 +374,7 @@ STC_INLINE char* cstr_append_s(cstr* self, cstr s) {
 }
 
 #define cstr_replace(...) c_MACRO_OVERLOAD(cstr_replace, __VA_ARGS__)
-#define cstr_replace_3(self, search, repl) cstr_replace_4(self, search, repl, ~0U)
+#define cstr_replace_3(self, search, repl) cstr_replace_4(self, search, repl, INT32_MAX)
 STC_INLINE void cstr_replace_4(cstr* self, const char* search, const char* repl, int32_t count) {
     cstr_take(self, cstr_replace_sv(cstr_sv(self), c_SV(search, c_strlen(search)),
                                                    c_SV(repl, c_strlen(repl)), count));

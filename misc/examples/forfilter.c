@@ -69,7 +69,7 @@ void demo2(void)
                       , c_flt_skipwhile(x, *x.ref != 11)
                      && *x.ref % 2 != 0
                       , c_flt_take(x, 5))
-            IVec_push(&vector, *x.ref * *x.ref);
+            IVec_push(&vector, (int)(*x.ref * *x.ref));
         c_FOREACH (x, IVec, vector)
             printf(" %d", *x.ref);
         puts("");

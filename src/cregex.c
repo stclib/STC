@@ -78,7 +78,7 @@ typedef struct _Reprog
 {
     _Reinst  *startinst;     /* start pc */
     _Reflags flags;
-    unsigned nsubids;
+    int nsubids;
     _Reclass cclass[_NCLASS]; /* .data */
     _Reinst  firstinst[];    /* .text : originally 5 elements? */
 } _Reprog;
@@ -246,13 +246,13 @@ utfruneicase(const char *s, _Rune c)
  *  save a new match in mp
  */
 static void
-_renewmatch(_Resub *mp, unsigned ms, _Resublist *sp, unsigned nsubids)
+_renewmatch(_Resub *mp, int ms, _Resublist *sp, int nsubids)
 {
     if (mp==NULL || ms==0)
         return;
     if (mp[0].str == NULL || sp->m[0].str < mp[0].str ||
        (sp->m[0].str == mp[0].str && sp->m[0].size > mp[0].size)) {
-        for (unsigned i=0; i<ms && i<=nsubids; i++)
+        for (int i=0; i<ms && i<=nsubids; i++)
             mp[i] = sp->m[i];
     }
 }
@@ -265,7 +265,7 @@ _renewmatch(_Resub *mp, unsigned ms, _Resublist *sp, unsigned nsubids)
 static _Relist*
 _renewthread(_Relist *lp,  /* _relist to add to */
     _Reinst *ip,           /* instruction to add */
-    unsigned ms,
+    int ms,
     _Resublist *sep)       /* pointers to subexpressions */
 {
     _Relist *p;
@@ -297,7 +297,7 @@ _renewthread(_Relist *lp,  /* _relist to add to */
 static _Relist*
 _renewemptythread(_Relist *lp,   /* _relist to add to */
     _Reinst *ip,                 /* instruction to add */
-    unsigned ms,
+    int ms,
     const char *sp)             /* pointers to subexpressions */
 {
     _Relist *p;
@@ -895,7 +895,7 @@ _regcomp1(_Reprog *progp, _Parser *par, const char *s, int cflags)
     pp->startinst = par->andp->first;
 
     pp = _optimize(par, pp);
-    pp->nsubids = (unsigned)par->cursubid;
+    pp->nsubids = par->cursubid;
 out:
     if (par->error) {
         c_free(pp);
@@ -910,20 +910,20 @@ _runematch(_Rune s, _Rune r)
 {
     int inv = 0, n;
     switch (s) {
-    case ASC_D: inv = 1; case ASC_d: return inv ^ (isdigit(r) != 0);
-    case ASC_S: inv = 1; case ASC_s: return inv ^ (isspace(r) != 0);
-    case ASC_W: inv = 1; case ASC_w: return inv ^ ((isalnum(r) != 0) | (r == '_'));
-    case ASC_AL: inv = 1; case ASC_al: return inv ^ (isalpha(r) != 0);
-    case ASC_AN: inv = 1; case ASC_an: return inv ^ (isalnum(r) != 0);
+    case ASC_D: inv = 1; case ASC_d: return inv ^ (isdigit((int)r) != 0);
+    case ASC_S: inv = 1; case ASC_s: return inv ^ (isspace((int)r) != 0);
+    case ASC_W: inv = 1; case ASC_w: return inv ^ ((isalnum((int)r) != 0) | (r == '_'));
+    case ASC_AL: inv = 1; case ASC_al: return inv ^ (isalpha((int)r) != 0);
+    case ASC_AN: inv = 1; case ASC_an: return inv ^ (isalnum((int)r) != 0);
     case ASC_AS: return (r >= 128); case ASC_as: return (r < 128);
     case ASC_BL: inv = 1; case ASC_bl: return inv ^ ((r == ' ') | (r == '\t'));
-    case ASC_CT: inv = 1; case ASC_ct: return inv ^ (iscntrl(r) != 0);
-    case ASC_GR: inv = 1; case ASC_gr: return inv ^ (isgraph(r) != 0);
-    case ASC_PR: inv = 1; case ASC_pr: return inv ^ (isprint(r) != 0);
-    case ASC_PU: inv = 1; case ASC_pu: return inv ^ (ispunct(r) != 0);
-    case ASC_LO: inv = 1; case ASC_lo: return inv ^ (islower(r) != 0);
-    case ASC_UP: inv = 1; case ASC_up: return inv ^ (isupper(r) != 0);
-    case ASC_XD: inv = 1; case ASC_xd: return inv ^ (isxdigit(r) != 0);
+    case ASC_CT: inv = 1; case ASC_ct: return inv ^ (iscntrl((int)r) != 0);
+    case ASC_GR: inv = 1; case ASC_gr: return inv ^ (isgraph((int)r) != 0);
+    case ASC_PR: inv = 1; case ASC_pr: return inv ^ (isprint((int)r) != 0);
+    case ASC_PU: inv = 1; case ASC_pu: return inv ^ (ispunct((int)r) != 0);
+    case ASC_LO: inv = 1; case ASC_lo: return inv ^ (islower((int)r) != 0);
+    case ASC_UP: inv = 1; case ASC_up: return inv ^ (isupper((int)r) != 0);
+    case ASC_XD: inv = 1; case ASC_xd: return inv ^ (isxdigit((int)r) != 0);
     case UTF_AN: inv = 1; case UTF_an: return inv ^ utf8_isalnum(r);
     case UTF_BL: inv = 1; case UTF_bl: return inv ^ utf8_isblank(r);
     case UTF_SP: inv = 1; case UTF_sp: return inv ^ utf8_isspace(r);
@@ -966,7 +966,7 @@ static int
 _regexec1(const _Reprog *progp,  /* program to run */
     const char *bol,    /* string to run machine on */
     _Resub *mp,         /* subexpression elements */
-    unsigned ms,        /* number of elements at mp */
+    int ms,        /* number of elements at mp */
     _Reljunk *j,
     int mflags
 )
@@ -979,7 +979,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
     const char *s, *p;
     _Rune r, *rp, *ep;
     int n, checkstart, match = 0;
-    unsigned i;
+    int i;
 
     bool icase = progp->flags.icase;
     checkstart = j->starttype;
@@ -1123,7 +1123,7 @@ static int
 _regexec2(const _Reprog *progp,    /* program to run */
     const char *bol,    /* string to run machine on */
     _Resub *mp,         /* subexpression elements */
-    unsigned ms,        /* number of elements at mp */
+    int ms,             /* number of elements at mp */
     _Reljunk *j,
     int mflags
 )
@@ -1149,7 +1149,7 @@ _regexec2(const _Reprog *progp,    /* program to run */
 static int
 _regexec(const _Reprog *progp,    /* program to run */
     const char *bol,    /* string to run machine on */
-    unsigned ms,        /* number of elements at mp */
+    int ms,             /* number of elements at mp */
     _Resub mp[],        /* subexpression elements */
     int mflags)
 {
@@ -1195,7 +1195,7 @@ _regexec(const _Reprog *progp,    /* program to run */
 
 
 static void
-_build_subst(const char* replace, unsigned nmatch, const csview match[],
+_build_subst(const char* replace, int nmatch, const csview match[],
              bool (*mfun)(int, csview, cstr*), cstr* subst) {
     cstr_buf buf = cstr_buffer(subst);
     intptr_t len = 0, cap = buf.cap;
@@ -1216,7 +1216,7 @@ _build_subst(const char* replace, unsigned nmatch, const csview match[],
                     csview m = mfun && mfun(g, match[g], &mstr) ? cstr_sv(&mstr) : match[g];
                     if (len + m.size > cap)
                         dst = cstr_reserve(subst, cap = cap*3/2 + m.size);
-                    for (unsigned i = 0; i < m.size; ++i)
+                    for (int i = 0; i < (int)m.size; ++i)
                         dst[len++] = m.str[i];
                 }
                 ++replace;
@@ -1244,9 +1244,9 @@ cregex_compile_3(cregex *self, const char* pattern, int cflags) {
     return self->error = par.error;
 }
 
-unsigned
+int
 cregex_captures(const cregex* self) {
-    return self->prog ? 1U + self->prog->nsubids : 0U;
+    return self->prog ? 1 + self->prog->nsubids : 0;
 }
 
 int
@@ -1271,13 +1271,13 @@ cregex_find_pattern_4(const char* pattern, const char* input,
 }
 
 cstr
-cregex_replace_sv_6(const cregex* re, csview input, const char* replace, unsigned count,
+cregex_replace_sv_6(const cregex* re, csview input, const char* replace, int count,
                     bool (*mfun)(int, csview, cstr*), int rflags) {
     cstr out = cstr_NULL;
     cstr subst = cstr_NULL;
     csview match[CREG_MAX_CAPTURES];
-    unsigned nmatch = cregex_captures(re);
-    if (!count) count = ~0U;
+    int nmatch = cregex_captures(re);
+    if (!count) count = INT32_MAX;
     bool copy = !(rflags & CREG_R_STRIP);
 
     while (count-- && cregex_find_sv(re, input, match) == CREG_OK) {
@@ -1294,7 +1294,7 @@ cregex_replace_sv_6(const cregex* re, csview input, const char* replace, unsigne
 }
 
 cstr
-cregex_replace_pattern_6(const char* pattern, const char* input, const char* replace, unsigned count,
+cregex_replace_pattern_6(const char* pattern, const char* input, const char* replace, int count,
                          bool (*mfun)(int, csview, cstr*), int crflags) {
     cregex re = cregex_init();
     if (cregex_compile(&re, pattern, crflags) != CREG_OK)

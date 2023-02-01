@@ -24,7 +24,7 @@ int main()
     printf("Demo of gaussian / normal distribution of %d random samples\n", N);
 
     // Setup random engine with normal distribution.
-    uint64_t seed = time(NULL);
+    uint64_t seed = (uint64_t)time(NULL);
     stc64_t rng = stc64_new(seed);
     stc64_normalf_t dist = stc64_normalf_new(Mean, StdDev);
 

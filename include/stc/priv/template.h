@@ -47,7 +47,7 @@
 #ifdef i_size
   #define _i_expandby 2
 #else
-  #define i_size uint32_t
+  #define i_size int32_t
   #define _i_expandby 1
 #endif
 

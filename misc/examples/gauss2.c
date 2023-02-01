@@ -18,7 +18,7 @@ int main()
     printf("Demo of gaussian / normal distribution of %d random samples\n", N);
 
     // Setup random engine with normal distribution.
-    uint64_t seed = time(NULL);
+    uint64_t seed = (uint64_t)time(NULL);
     stc64_t rng = stc64_new(seed);
     stc64_normalf_t dist = stc64_normalf_new(Mean, StdDev);
 
@@ -33,7 +33,7 @@ int main()
         // Print the gaussian bar chart
         c_AUTO (cstr, bar)
         c_FORPAIR (index, count, csmap_int, mhist) {
-            size_t n = (size_t) (*_.count * StdDev * Scale * 2.5 / (float)N);
+            int n = (int)((float)*_.count * StdDev * Scale * 2.5f / (float)N);
             if (n > 0) {
                 cstr_resize(&bar, n, '*');
                 printf("%4d %s\n", *_.index, cstr_str(&bar));

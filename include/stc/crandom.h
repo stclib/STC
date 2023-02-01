@@ -46,7 +46,7 @@ int main() {
 typedef struct stc64 { uint64_t state[5]; } stc64_t;
 typedef struct stc64_uniform { int64_t lower; uint64_t range, threshold; } stc64_uniform_t;
 typedef struct stc64_uniformf { double lower, range; } stc64_uniformf_t;
-typedef struct stc64_normalf { double mean, stddev, next; unsigned has_next; } stc64_normalf_t;
+typedef struct stc64_normalf { double mean, stddev, next; int has_next; } stc64_normalf_t;
 
 /* PRNG stc64.
  * Very fast PRNG suited for parallel usage with Weyl-sequence parameter.

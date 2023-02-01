@@ -22,25 +22,25 @@ int point_cmp(const Point* a, const Point* b) {
 
 int main() {
     int n = 50000000;
-    stc64_t rng = stc64_new(time(NULL));
+    stc64_t rng = stc64_new((uint64_t)time(NULL));
     stc64_uniform_t dist = stc64_uniform_new(0, n);
 
     c_AUTO (IQ, Q)
     {
         // Push 50'000'000 random numbers onto the queue.
         c_FORRANGE (n)
-            IQ_push(&Q, stc64_uniform(&rng, &dist));
+            IQ_push(&Q, (int)stc64_uniform(&rng, &dist));
 
         // Push or pop on the queue 50 million times
-        printf("befor: size %" c_ZU ", capacity %" c_ZU "\n", IQ_size(&Q), IQ_capacity(&Q));
+        printf("befor: size %" c_ZI ", capacity %" c_ZI "\n", IQ_size(&Q), IQ_capacity(&Q));
         
         c_FORRANGE (n) {
-            int r = stc64_uniform(&rng, &dist);
+            int r = (int)stc64_uniform(&rng, &dist);
             if (r & 3)
                 IQ_push(&Q, r);
             else
                 IQ_pop(&Q);
         }
-        printf("after: size %" c_ZU ", capacity %" c_ZU "\n", IQ_size(&Q), IQ_capacity(&Q));
+        printf("after: size %" c_ZI ", capacity %" c_ZI "\n", IQ_size(&Q), IQ_capacity(&Q));
     }
 }

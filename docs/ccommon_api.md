@@ -361,5 +361,5 @@ Memory allocator for the entire library. Macros can be overridden by the user.
 - **c_ARRAYLEN(array)**: Return number of elements in an array. array must not be a pointer!
 ```c
 int array[] = {1, 2, 3, 4};
-size_t n = c_ARRAYLEN(array);
+intptr_t n = c_ARRAYLEN(array);
 ```

@@ -32,7 +32,7 @@ int main()
         // When collections store owned values (String), they can still be
         // queried using references (&str).
         if (cmap_str_contains(&book_reviews, "Les Misérables")) {
-            printf("We've got %" c_ZU " reviews, but Les Misérables ain't one.",
+            printf("We've got %" c_ZI " reviews, but Les Misérables ain't one.",
                      cmap_str_size(&book_reviews));
         }
 

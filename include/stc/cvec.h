@@ -208,7 +208,7 @@ STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self)
 STC_INLINE void _cx_memb(_next)(_cx_iter* it) 
     { if (++it->ref == it->end) it->ref = NULL; }
 
-STC_INLINE _cx_iter _cx_memb(_advance)(_cx_iter it, intptr_t n)
+STC_INLINE _cx_iter _cx_memb(_advance)(_cx_iter it, size_t n)
     { if ((it.ref += n) >= it.end) it.ref = NULL; return it; }
 
 STC_INLINE intptr_t _cx_memb(_index)(const _cx_self* self, _cx_iter it) 

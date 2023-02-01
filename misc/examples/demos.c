@@ -175,11 +175,11 @@ void mapdemo3()
     cmap_str_iter it = cmap_str_find(&table, "Make");
     c_FOREACH (i, cmap_str, table)
         printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
-    printf("size %" c_ZU ": remove: Make: %s\n", cmap_str_size(&table), cstr_str(&it.ref->second));
+    printf("size %" c_ZI ": remove: Make: %s\n", cmap_str_size(&table), cstr_str(&it.ref->second));
     //cmap_str_erase(&table, "Make");
     cmap_str_erase_at(&table, it);
 
-    printf("size %" c_ZU "\n", cmap_str_size(&table));
+    printf("size %" c_ZI "\n", cmap_str_size(&table));
     c_FOREACH (i, cmap_str, table)
         printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
     cmap_str_drop(&table); // frees key and value cstrs, and hash table.

@@ -4,18 +4,18 @@
 int main() 
 {
     c_WITH (cbits set = cbits_with_size(23, true), cbits_drop(&set)) {
-        printf("count %" c_ZU ", %" c_ZU "\n", cbits_count(&set), cbits_size(&set));
+        printf("count %" c_ZI ", %" c_ZI "\n", cbits_count(&set), cbits_size(&set));
         cbits s1 = cbits_from("1110100110111");
         char buf[256];
         cbits_to_str(&s1, buf, 0, 255);
-        printf("buf: %s: %" c_ZU "\n", buf, cbits_count(&s1));
+        printf("buf: %s: %" c_ZI "\n", buf, cbits_count(&s1));
         cbits_drop(&s1);
 
         cbits_reset(&set, 9);
         cbits_resize(&set, 43, false);
         printf(" str: %s\n", cbits_to_str(&set, buf, 0, 255));
 
-        printf("%4" c_ZU ": ", cbits_size(&set));
+        printf("%4" c_ZI ": ", cbits_size(&set));
         c_FORRANGE (i, cbits_size(&set))
             printf("%d", cbits_test(&set, i));
         puts("");
@@ -25,12 +25,12 @@ int main()
         cbits_resize(&set, 93, false);
         cbits_resize(&set, 102, true);
         cbits_set_value(&set, 99, false);
-        printf("%4" c_ZU ": ", cbits_size(&set));
+        printf("%4" c_ZI ": ", cbits_size(&set));
         c_FORRANGE (i, cbits_size(&set))
             printf("%d", cbits_test(&set, i));
 
         puts("\nIterate:");
-        printf("%4" c_ZU ": ", cbits_size(&set));
+        printf("%4" c_ZI ": ", cbits_size(&set));
         c_FORRANGE (i, cbits_size(&set))
             printf("%d", cbits_test(&set, i));
         puts("");
@@ -52,7 +52,7 @@ int main()
             puts("");
 
             cbits_set_all(&set, false);
-            printf("%4" c_ZU ": ", cbits_size(&set));
+            printf("%4" c_ZI ": ", cbits_size(&set));
             c_FORRANGE (i, cbits_size(&set))
                 printf("%d", cbits_test(&set, i));
             puts("");

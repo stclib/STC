@@ -42,8 +42,8 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 
 ```c
 csmap_X               csmap_X_init(void);
-csset_X               csmap_X_with_capacity(size_t cap);
-bool                  csmap_X_reserve(csmap_X* self, size_t cap);
+csset_X               csmap_X_with_capacity(intptr_t cap);
+bool                  csmap_X_reserve(csmap_X* self, intptr_t cap);
 void                  csmap_X_shrink_to_fit(csmap_X* self);
 csmap_X               csmap_X_clone(csmap_x map);
 
@@ -51,7 +51,7 @@ void                  csmap_X_clear(csmap_X* self);
 void                  csmap_X_copy(csmap_X* self, const csmap_X* other);
 void                  csmap_X_drop(csmap_X* self);                                               // destructor
 
-size_t                csmap_X_size(const csmap_X* self);
+intptr_t              csmap_X_size(const csmap_X* self);
 bool                  csmap_X_empty(const csmap_X* self);
 bool                  csmap_X_capacity(const csmap_X* self);
 
@@ -74,7 +74,7 @@ csmap_X_result        csmap_X_push(csmap_X* self, csmap_X_value entry);         
 csmap_X_result        csmap_X_emplace(csmap_X* self, i_keyraw rkey, i_valraw rmapped);           // no change if rkey in map
 csmap_X_result        csmap_X_emplace_or_assign(csmap_X* self, i_keyraw rkey, i_valraw rmapped); // always update rmapped
 
-size_t                csmap_X_erase(csmap_X* self, i_keyraw rkey);
+intptr_t              csmap_X_erase(csmap_X* self, i_keyraw rkey);
 csmap_X_iter          csmap_X_erase_at(csmap_X* self, csmap_X_iter it);                          // returns iter after it
 csmap_X_iter          csmap_X_erase_range(csmap_X* self, csmap_X_iter it1, csmap_X_iter it2);    // returns updated it2
 

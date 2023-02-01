@@ -56,7 +56,7 @@ STC_API void            cstr_resize(cstr* self, size_t len, char fill);
 STC_API cstr*           cstr_assign_n(cstr* self, const char* str, size_t n);
 STC_API int             cstr_printf(cstr* self, const char* fmt, ...);
 STC_API cstr*           cstr_append_n(cstr* self, const char* str, size_t n);
-STC_API cstr            cstr_replace_sv(csview str, csview find, csview repl, unsigned count);
+STC_API cstr            cstr_replace_sv(csview str, csview find, csview repl, int count);
 STC_DEF void            cstr_replace_at_sv(cstr* self, const size_t pos, size_t len, csview repl);
 STC_API void            cstr_erase(cstr* self, size_t pos, size_t n);
 STC_API size_t          cstr_find(const cstr* self, const char* needle);
@@ -182,7 +182,7 @@ STC_INLINE uint64_t cstr_hash(const cstr *self) {
     return cfasthash(self->str, _cstr_p(self)->size);
 }
 
-STC_INLINE void cstr_replace_ex(cstr* self, const char* find, const char* repl, unsigned count) {
+STC_INLINE void cstr_replace_ex(cstr* self, const char* find, const char* repl, int count) {
     cstr_take(self, cstr_replace_sv(cstr_sv(self), c_SV(find, strlen(find)),
                                                    c_SV(repl, strlen(repl)), count));
 }

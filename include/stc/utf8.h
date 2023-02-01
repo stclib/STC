@@ -25,7 +25,7 @@ extern bool     utf8_iscased(uint32_t c);
 extern bool     utf8_isword(uint32_t c);
 extern bool     utf8_valid_n(const char* s, intptr_t nbytes);
 extern int      utf8_icmp_sv(csview s1, csview s2);
-extern unsigned utf8_encode(char *out, uint32_t c);
+extern int      utf8_encode(char *out, uint32_t c);
 extern uint32_t utf8_peek_off(const char *s, int offset);
 
 STC_INLINE bool utf8_isupper(uint32_t c) 
@@ -45,7 +45,7 @@ STC_INLINE bool utf8_isblank(uint32_t c) {
 }
 
 STC_INLINE bool utf8_isspace(uint32_t c) {
-    if (c < 128) return isspace(c) != 0;
+    if (c < 128) return isspace((int)c) != 0;
     return ((c == 8232) | (c == 8233)) || utf8_isgroup(U8G_Zs, c);
 }
 

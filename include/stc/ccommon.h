@@ -32,13 +32,10 @@
 #include "priv/altnames.h"
 
 #define c_NPOS INTPTR_MAX
-#if SIZE_MAX == UINT32_MAX
-  #define c_ZU PRIu32
-#elif SIZE_MAX == UINT64_MAX
-  #define c_ZU PRIu64
-#endif
+#define c_ZI PRIiPTR
+#define c_ZU PRIuPTR
 #if defined STC_NDEBUG || defined NDEBUG
-  #define c_ASSERT(expr) (void)(expr)
+  #define c_ASSERT(expr) (void)(0)
 #else
   #define c_ASSERT(expr) assert(expr)
 #endif

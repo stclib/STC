@@ -7,7 +7,7 @@ if [ "$(uname)" = 'Linux' ]; then
 fi
 
 #cc=gcc; cflags="-s -O2 -std=c99 -Werror -Wfatal-errors -Wpedantic -Wall $sanitize"
-cc=gcc; cflags="-s -O2 -std=c99 -Werror -Wfatal-errors -Wpedantic -Wall -Wsign-compare -Wwrite-strings" # -Wconversion 
+cc=gcc; cflags="-s -O2 -std=c99 -Wconversion -Wpedantic -Wall -Wsign-compare -Wwrite-strings" # -Wconversion
 #cc=tcc; cflags="-Wall -std=c99"
 #cc=clang; cflags="-s -O2 -std=c99 -Werror -Wfatal-errors -Wpedantic -Wall -Wsign-compare -Wwrite-strings"
 #cc=clang; cflags="-s -O2 -std=c99 -Werror -Wfatal-errors -Wpedantic -Wall -DSTC_CSTR_V1 -DSTC_CSMAP_V1"

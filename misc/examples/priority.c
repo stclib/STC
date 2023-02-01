@@ -9,13 +9,13 @@
 #include <stc/cpque.h>
 
 int main() {
-    size_t N = 10000000;
-    stc64_t rng = stc64_new(time(NULL));
+    intptr_t N = 10000000;
+    stc64_t rng = stc64_new((uint64_t)time(NULL));
     stc64_uniform_t dist = stc64_uniform_new(0, N * 10);
     c_AUTO (cpque_i, heap)
     {
         // Push ten million random numbers to priority queue
-        printf("Push %" c_ZU " numbers\n", N);
+        printf("Push %" c_ZI " numbers\n", N);
         c_FORRANGE (N)
             cpque_i_push(&heap, stc64_uniform(&rng, &dist));
 

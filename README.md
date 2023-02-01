@@ -112,7 +112,7 @@ int main(void)
     FVec_push_back(&vec, 20.f);
     FVec_push_back(&vec, 30.f);
 
-    for (size_t i = 0; i < FVec_size(vec); ++i)
+    for (intptr_t i = 0; i < FVec_size(vec); ++i)
         printf(" %g", vec.data[i]);
 
     FVec_drop(&vec); // cleanup memory

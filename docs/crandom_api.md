@@ -76,7 +76,7 @@ double              stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
 
 // Declare int -> int sorted map. Uses typetag 'i' for ints.
 #define i_key int
-#define i_val size_t
+#define i_val intptr_t
 #define i_tag i
 #include <stc/csmap.h>
 
@@ -102,7 +102,7 @@ int main()
     // Print the gaussian bar chart
     cstr bar = cstr_init();
     c_FOREACH (i, csmap_i, mhist) {
-        size_t n = (size_t) (i.ref->second * StdDev * Scale * 2.5 / N);
+        int n = (int)(i.ref->second * StdDev * Scale * 2.5 / N);
         if (n > 0) {
             cstr_resize(&bar, n, '*');
             printf("%4d %s\n", i.ref->first, cstr_str(&bar));

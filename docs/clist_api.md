@@ -48,7 +48,7 @@ void                clist_X_copy(clist_X* self, const clist_X* other);
 void                clist_X_drop(clist_X* self);                                          // destructor
 
 bool                clist_X_empty(const clist_X* list);
-size_t              clist_X_count(const clist_X* list);                                   // size() in O(n) time
+intptr_t            clist_X_count(const clist_X* list);                                   // size() in O(n) time
 
 clist_X_value*      clist_X_back(const clist_X* self);
 clist_X_value*      clist_X_front(const clist_X* self);
@@ -67,7 +67,7 @@ clist_X_iter        clist_X_emplace_at(clist_X* self, clist_X_iter it, i_valraw 
 void                clist_X_pop_front(clist_X* self);
 clist_X_iter        clist_X_erase_at(clist_X* self, clist_X_iter it);                     // return iter after it
 clist_X_iter        clist_X_erase_range(clist_X* self, clist_X_iter it1, clist_X_iter it2);
-size_t              clist_X_remove(clist_X* self, i_valraw raw);                          // removes all matches
+intptr_t            clist_X_remove(clist_X* self, i_valraw raw);                          // removes all matches
 
 clist_X             clist_X_split_off(clist_X* self, clist_X_iter i1, clist_X_iter i2);   // split off [i1, i2)
 clist_X_iter        clist_X_splice(clist_X* self, clist_X_iter it, clist_X* other);       // return updated valid it

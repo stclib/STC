@@ -50,19 +50,19 @@ void test_distribution(void)
 
         uint64_t sum = 0;
         c_FOREACH (i, cmap_x, map) sum += i.ref->second;
-        sum /= map.size;
+        sum /= (uint64_t)map.size;
 
         c_FOREACH (i, cmap_x, map) {
             printf("%4" PRIu32 ": %" PRIu64 " - %" PRIu64 ": %11.8f\n",
                    i.ref->first, i.ref->second, sum,
-                   (1 - (double)i.ref->second / sum));
+                   (1.0 - (double)i.ref->second / (double)sum));
         }
     }
 }
 
 int main()
 {
-    seed = time(NULL);
+    seed = (uint64_t)time(NULL);
     test_distribution();
     test_repeats();
 }
