@@ -57,30 +57,32 @@ Others
 
 Highlights
 ----------
+- **No boilerplate** - With STC, no boilerplate code is needed to setup containers either with simple built-in types or containers with complex element types, which requires cleanup. Only specify what is needed, e.g. compare-, clone-, drop- functions, and leave the rest as defaults.
+- **Fully type safe** - Because of templating, it avoids error-prone casting of container types and elements back and forth from the containers.
 - **User friendly** - Just include the headers and you are good. The API and functionality is very close to c++ STL, and is fully listed in the docs. 
 - **Templates** - Use `#define i_{arg}` to specify container template arguments. There are templates for element-*type*, -*comparison*, -*destruction*, -*cloning*, -*conversion types*, and more.
 - **Unparalleled performance** - Some containers are much faster than the c++ STL containers, the rest are about equal in speed.
-- **Fully memory managed** - All containers will destruct keys/values via destructor defined as macro parameters before including the container header. Also, shared pointers are supported and can be stored in containers, see ***carc***.
-- **Fully type safe** - Because of templating, it avoids error-prone casting of container types and elements back and forth from the containers.
+- **Fully memory managed** - All containers will destruct keys/values via destructor defined as macro parameters before including the container header. Also, smart pointers are supported and can be stored in containers, see ***carc*** and ***cbox***.
 - **Uniform, easy-to-learn API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have uniform and intuitive usage across the various containers.
-- **Small footprint** - Small source code and generated executables. The executable from the example below with six different containers is *22 kb in size* compiled with gcc -Os -s on linux.
+- **No unsigned mess** - Unsigned sizes and indices mixed with signed calculations is asking for trouble. STC now uses only signed numbers in the API. (Small caveat on 32-bit platforms: containers no longer support 2.1 - 4.2 billion elements).
+- **Small footprint** - Small source code and generated executables. The executable from the example below using ***six different*** container types is only ***19 Kb in size*** compiled with gcc -O3 -s on Linux.
 - **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See the Installation section.
 - **No callback functions** - All passed template argument functions/macros are directly called from the implementation, no slow callbacks which requires storage.
 - **Compiles with C++ and C99** - C code can be compiled with C++ (container element types must be POD).
-- **Container prefix and forward declaration** - Templated containers may have user defined prefix, e.g. myvec_push_back(). They may also be forward declared without including the full API/implementation. See documentation below.
+- **Forward declaration** - Templated containers may be forward declared without including the full API/implementation. See documentation below.
 
 Three standout features of STC
 1. ***Centralized analysis of template arguments***. Assigns good defaults to non-specified templates.
 You may specify a number of "standard" template arguments for each container, but as minimum only one is
 required (two for maps). In the latter case, STC assumes the elements are basic types. For more complex types,
-additional template arguments must be defined.
+additional template arguments should be defined.
 2. ***General "heterogeneous lookup"-like feature***. Allows specification of an alternative type to use
 for lookup in containers. E.g. for containers with string type (**cstr**) elements, `const char*` is used
 as lookup type. It will then use the input `const char*` directly when comparing with the string data in the
 container. This avoids the construction of a new `cstr` (which possible allocates memory) for the lookup. 
 Finally, destruction of the lookup key (i.e. string literal) after usage is not needed (or allowed), which 
-is convenient in C. The alternative lookup type may also be used for adding entries into containers by using 
-the *emplace*-functions. E.g. `MyCStrVec_emplace_back(&vec, "Hello")`, which further simplifies usage of STC.
+is convenient in C. A great ergonomic feature is that the alternative lookup type can also be used for adding
+entries into containers through using the *emplace*-functions. E.g. `MyCStrVec_emplace_back(&vec, "Hello")`.
 3. ***Standardized container iterators***. All container can be iterated the same way, and uses the
 same element access syntax. E.g. `c_FOREACH (it, IntContainer, container) printf(" %d", *it.ref);` will work for
 every type of container defined as `IntContainer` with `int` elements. Also the form `c_FOREACH (it, IntContainer, it1, it2)`
