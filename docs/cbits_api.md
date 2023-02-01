@@ -21,25 +21,25 @@ All cbits definitions and prototypes are available by including a single header 
 ```c
 cbits            cbits_init(void);
 cbits            cbits_from(const char* str);
-cbits            cbits_with_size(intptr_t size, bool value);               // size must be <= N if N is defined
+cbits            cbits_with_size(intptr_t size, bool value);            // size must be <= N if N is defined
 cbits            cbits_with_pattern(intptr_t size, uint64_t pattern); 
 cbits            cbits_clone(cbits other);
 
 void             cbits_clear(cbits* self);
 cbits*           cbits_copy(cbits* self, const cbits* other);
-void             cbits_resize(cbits* self, intptr_t size, bool value);     // only if i_len is not defined
+void             cbits_resize(cbits* self, intptr_t size, bool value);  // only if i_len is not defined
 void             cbits_drop(cbits* self);
 
-cbits*           cbits_take(cbits* self, const cbits* other);            // give other to self
-cbits            cbits_move(cbits* self);                                // transfer self to caller
+cbits*           cbits_take(cbits* self, const cbits* other);           // give other to self
+cbits            cbits_move(cbits* self);                               // transfer self to caller
 
 intptr_t         cbits_size(const cbits* self);
-intptr_t         cbits_count(const cbits* self);                         // count number of bits set
+intptr_t         cbits_count(const cbits* self);                        // count number of bits set
 
 bool             cbits_test(const cbits* self, intptr_t i);
-bool             cbits_at(const cbits* self, intptr_t i);                  // same as cbits_test()
+bool             cbits_at(const cbits* self, intptr_t i);               // same as cbits_test()
 bool             cbits_subset_of(const cbits* self, const cbits* other); // is set a subset of other?
-bool             cbits_disjoint(const cbits* self, const cbits* other);  // no common bits
+bool             cbits_disjoint(const cbits* self, const cbits* other); // no common bits
 char*            cbits_to_str(const cbits* self, char* str, intptr_t start, intptr_t stop);
 
 void             cbits_set(cbits* self, intptr_t i);
@@ -52,7 +52,7 @@ void             cbits_flip(cbits* self, intptr_t i);
 
 void             cbits_intersect(cbits* self, const cbits* other);
 void             cbits_union(cbits* self, const cbits* other);
-void             cbits_xor(cbits* self, const cbits* other);             // set of disjoint bits
+void             cbits_xor(cbits* self, const cbits* other);            // set of disjoint bits
 ```
 
 ## Types

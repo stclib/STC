@@ -35,17 +35,17 @@ void                cdeq_X_copy(cdeq_X* self, const cdeq_X* other);
 cdeq_X_iter         cdeq_X_copy_range(cdeq_X* self, i_val* pos, const i_val* p1, const i_val* p2);
 bool                cdeq_X_reserve(cdeq_X* self, intptr_t cap);
 void                cdeq_X_shrink_to_fit(cdeq_X* self);
-void                cdeq_X_drop(cdeq_X* self);                                                    // destructor
+void                cdeq_X_drop(cdeq_X* self);                                          // destructor
 
 bool                cdeq_X_empty(const cdeq_X* self);
 intptr_t            cdeq_X_size(const cdeq_X* self);
 intptr_t            cdeq_X_capacity(const cdeq_X* self);
 
 const cdeq_X_value* cdeq_X_at(const cdeq_X* self, intptr_t idx);
-const cdeq_X_value* cdeq_X_get(const cdeq_X* self, i_valraw raw);                                 // return NULL if not found
-cdeq_X_value*       cdeq_X_get_mut(cdeq_X* self, i_valraw raw);                                   // mutable get
+const cdeq_X_value* cdeq_X_get(const cdeq_X* self, i_valraw raw);                       // return NULL if not found
+cdeq_X_value*       cdeq_X_get_mut(cdeq_X* self, i_valraw raw);                         // mutable get
 cdeq_X_iter         cdeq_X_find(const cdeq_X* self, i_valraw raw);
-cdeq_X_iter         cdeq_X_find_in(cdeq_X_iter i1, cdeq_X_iter i2, i_valraw raw);                 // return cvec_X_end() if not found
+cdeq_X_iter         cdeq_X_find_in(cdeq_X_iter i1, cdeq_X_iter i2, i_valraw raw);       // return cvec_X_end() if not found
 
 cdeq_X_value*       cdeq_X_front(const cdeq_X* self);
 cdeq_X_value*       cdeq_X_back(const cdeq_X* self);
@@ -55,14 +55,14 @@ cdeq_X_value*       cdeq_X_emplace_front(cdeq_X* self, i_valraw raw);
 void                cdeq_X_pop_front(cdeq_X* self);
 
 cdeq_X_value*       cdeq_X_push_back(cdeq_X* self, i_val value);
-cdeq_X_value*       cdeq_X_push(cdeq_X* self, i_val value);                                      // alias for push_back()
+cdeq_X_value*       cdeq_X_push(cdeq_X* self, i_val value);                             // alias for push_back()
 cdeq_X_value*       cdeq_X_emplace_back(cdeq_X* self, i_valraw raw);
-cdeq_X_value*       cdeq_X_emplace(cdeq_X* self, i_valraw raw);                                  // alias for emplace_back()
+cdeq_X_value*       cdeq_X_emplace(cdeq_X* self, i_valraw raw);                         // alias for emplace_back()
 void                cdeq_X_pop_back(cdeq_X* self);
 
-cdeq_X_iter         cdeq_X_insert(cdeq_X* self, intptr_t idx, i_val value);                      // move value 
+cdeq_X_iter         cdeq_X_insert(cdeq_X* self, intptr_t idx, i_val value);             // move value 
 cdeq_X_iter         cdeq_X_insert_n(cdeq_X* self, intptr_t idx, const i_val[] arr, intptr_t n);  // move arr values
-cdeq_X_iter         cdeq_X_insert_at(cdeq_X* self, cdeq_X_iter it, i_val value);                 // move value 
+cdeq_X_iter         cdeq_X_insert_at(cdeq_X* self, cdeq_X_iter it, i_val value);        // move value 
 cdeq_X_iter         cdeq_X_insert_range(cdeq_X* self, i_val* pos,
                                         const i_val* p1, const i_val* p2);
 

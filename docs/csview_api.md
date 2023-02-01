@@ -26,11 +26,11 @@ All csview definitions and prototypes are available by including a single header
 ## Methods
 
 ```c
-csview          c_SV(const char literal_only[]);                         // construct from literal, no strlen()
-csview          c_SV(const char* str, intptr_t n);                       // construct from str and length n
-csview          csview_lit(const char literal_only[]);                   // alias for c_SV(lit)
-csview          csview_from(const char* str);                            // construct from const char*
-csview          csview_from_n(const char* str, intptr_t n);              // alias for c_SV(str, n)
+csview          c_SV(const char literal_only[]);                        // construct from literal, no strlen()
+csview          c_SV(const char* str, intptr_t n);                      // construct from str and length n
+csview          csview_lit(const char literal_only[]);                  // alias for c_SV(lit)
+csview          csview_from(const char* str);                           // construct from const char*
+csview          csview_from_n(const char* str, intptr_t n);             // alias for c_SV(str, n)
 
 intptr_t        csview_size(csview sv);
 bool            csview_empty(csview sv);
@@ -43,8 +43,8 @@ bool            csview_contains(csview sv, const char* str);
 bool            csview_starts_with(csview sv, const char* str);
 bool            csview_ends_with(csview sv, const char* str);
 
-csview          csview_substr_ex(csview sv, intptr_t pos, intptr_t n);   // negative pos count from end
-csview          csview_slice_ex(csview sv, intptr_t p1, intptr_t p2);    // negative p1, p2 count from end
+csview          csview_substr_ex(csview sv, intptr_t pos, intptr_t n);  // negative pos count from end
+csview          csview_slice_ex(csview sv, intptr_t p1, intptr_t p2);   // negative p1, p2 count from end
 csview          csview_token(csview sv, const char* sep, intptr_t* start); // *start > sv.size after last token
 ```
 
@@ -52,32 +52,32 @@ csview          csview_token(csview sv, const char* sep, intptr_t* start); // *s
 ```c
 intptr_t        csview_u8_size(csview sv);
 csview          csview_u8_substr(csview sv, intptr_t bytepos, intptr_t u8len);
-bool            csview_valid_utf8(csview sv);                            // requires linking with src/utf8code.c
+bool            csview_valid_utf8(csview sv);                           // requires linking with src/utf8code.c
 
 csview_iter     csview_begin(const csview* self);
 csview_iter     csview_end(const csview* self);
-void            csview_next(csview_iter* it);                            // utf8 codepoint step, not byte!
+void            csview_next(csview_iter* it);                           // utf8 codepoint step, not byte!
 csview_iter     csview_advance(csview_iter it, intptr_t n);
 
-// from utf8.h
+                // from utf8.h
 intptr_t        utf8_size(const char *s);
-intptr_t        utf8_size_n(const char *s, intptr_t nbytes);             // number of UTF8 codepoints within n bytes
-const char*     utf8_at(const char *s, intptr_t index);                  // from UTF8 index to char* position
-intptr_t        utf8_pos(const char* s, intptr_t index);                 // from UTF8 index to byte index position
-unsigned        utf8_chr_size(const char* s);                            // UTF8 character size: 1-4
-// implemented in src/utf8code.c:
+intptr_t        utf8_size_n(const char *s, intptr_t nbytes);            // number of UTF8 codepoints within n bytes
+const char*     utf8_at(const char *s, intptr_t index);                 // from UTF8 index to char* position
+intptr_t        utf8_pos(const char* s, intptr_t index);                // from UTF8 index to byte index position
+unsigned        utf8_chr_size(const char* s);                           // UTF8 character size: 1-4
+                // implemented in src/utf8code.c:
 bool            utf8_valid(const char* s);
 bool            utf8_valid_n(const char* s, intptr_t nbytes);
-uint32_t        utf8_decode(utf8_decode_t *d, uint8_t byte);             // decode next byte to utf8, return state.
-unsigned        utf8_encode(char *out, uint32_t codepoint);              // encode unicode cp into out buffer
-uint32_t        utf8_peek(const char* s);                                // codepoint value of character at s
-uint32_t        utf8_peek_off(const char* s, int offset);                // codepoint value at utf8 pos (may be negative)
+uint32_t        utf8_decode(utf8_decode_t *d, uint8_t byte);            // decode next byte to utf8, return state.
+unsigned        utf8_encode(char *out, uint32_t codepoint);             // encode unicode cp into out buffer
+uint32_t        utf8_peek(const char* s);                               // codepoint value of character at s
+uint32_t        utf8_peek_off(const char* s, int offset);               // codepoint value at utf8 pos (may be negative)
 ```
 
 #### Extended cstr methods
 ```c
 csview          cstr_substr(const cstr* self, intptr_t pos, intptr_t n);
-csview          cstr_substr_ex(const cstr* s, intptr_t pos, intptr_t n);   // negative pos count from end
+csview          cstr_substr_ex(const cstr* s, intptr_t pos, intptr_t n); // negative pos count from end
 csview          cstr_u8_substr(const cstr* self, intptr_t bytepos, intptr_t u8len);
 
 csview          cstr_slice(const cstr* self, intptr_t p1, intptr_t p2);

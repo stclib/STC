@@ -45,33 +45,33 @@ clist_X             clist_X_clone(clist_X list);
 
 void                clist_X_clear(clist_X* self);
 void                clist_X_copy(clist_X* self, const clist_X* other);
-void                clist_X_drop(clist_X* self);                                          // destructor
+void                clist_X_drop(clist_X* self);                                        // destructor
 
 bool                clist_X_empty(const clist_X* list);
-intptr_t            clist_X_count(const clist_X* list);                                   // size() in O(n) time
+intptr_t            clist_X_count(const clist_X* list);                                 // size() in O(n) time
 
 clist_X_value*      clist_X_back(const clist_X* self);
 clist_X_value*      clist_X_front(const clist_X* self);
 
-void                clist_X_push_back(clist_X* self, i_val value);                        // note: no pop_back()
+void                clist_X_push_back(clist_X* self, i_val value);                      // note: no pop_back()
 void                clist_X_push_front(clist_X* self, i_val value);
-void                clist_X_push(clist_X* self, i_val value);                             // alias for push_back()
+void                clist_X_push(clist_X* self, i_val value);                           // alias for push_back()
 
 void                clist_X_emplace_back(clist_X* self, i_valraw raw);
 void                clist_X_emplace_front(clist_X* self, i_valraw raw);
-void                clist_X_emplace(clist_X* self, i_valraw raw);                         // alias for emplace_back()
+void                clist_X_emplace(clist_X* self, i_valraw raw);                       // alias for emplace_back()
 
-clist_X_iter        clist_X_insert_at(clist_X* self, clist_X_iter it, i_val value);       // return iter to new elem
+clist_X_iter        clist_X_insert_at(clist_X* self, clist_X_iter it, i_val value);     // return iter to new elem
 clist_X_iter        clist_X_emplace_at(clist_X* self, clist_X_iter it, i_valraw raw);
 
 void                clist_X_pop_front(clist_X* self);
-clist_X_iter        clist_X_erase_at(clist_X* self, clist_X_iter it);                     // return iter after it
+clist_X_iter        clist_X_erase_at(clist_X* self, clist_X_iter it);                   // return iter after it
 clist_X_iter        clist_X_erase_range(clist_X* self, clist_X_iter it1, clist_X_iter it2);
-intptr_t            clist_X_remove(clist_X* self, i_valraw raw);                          // removes all matches
+intptr_t            clist_X_remove(clist_X* self, i_valraw raw);                        // removes all matches
 
-clist_X             clist_X_split_off(clist_X* self, clist_X_iter i1, clist_X_iter i2);   // split off [i1, i2)
-clist_X_iter        clist_X_splice(clist_X* self, clist_X_iter it, clist_X* other);       // return updated valid it
-clist_X_iter        clist_X_splice_range(clist_X* self, clist_X_iter it,                  // return updated valid it
+clist_X             clist_X_split_off(clist_X* self, clist_X_iter i1, clist_X_iter i2); // split off [i1, i2)
+clist_X_iter        clist_X_splice(clist_X* self, clist_X_iter it, clist_X* other);     // return updated valid it
+clist_X_iter        clist_X_splice_range(clist_X* self, clist_X_iter it,                // return updated valid it
                                          clist_X* other, clist_X_iter it1, clist_X_iter it2);
 
 clist_X_iter        clist_X_find(const clist_X* self, i_valraw raw);
@@ -83,10 +83,10 @@ void                clist_X_sort(clist_X* self);
 void                clist_X_reverse(clist_X* self);
 
 // Node API
-clist_X_node*       clist_X_get_node(clist_X_value* val);                                 // get the enclosing node
+clist_X_node*       clist_X_get_node(clist_X_value* val);                               // get the enclosing node
 clist_X_value*      clist_X_push_node_back(clist_X* self, clist_X_node* node);
 clist_X_value*      clist_X_insert_node_after(clist_X* self, clist_X_node* ref, clist_X_node* node);
-clist_X_node*       clist_X_unlink_node_after(clist_X* self, clist_X_node* ref);          // return the unlinked node
+clist_X_node*       clist_X_unlink_node_after(clist_X* self, clist_X_node* ref);        // return the unlinked node
 void                clist_X_erase_node_after(clist_X* self, clist_X_node* node);
 
 clist_X_iter        clist_X_begin(const clist_X* self);

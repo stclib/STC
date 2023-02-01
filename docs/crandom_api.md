@@ -41,22 +41,22 @@ All crandom definitions and prototypes are available by including a single heade
 ## Methods
 
 ```c
-void                csrandom(uint64_t seed);                                 // seed global stc64 prng
-uint64_t            crandom(void);                                           // global stc64_rand(rng)
-double              crandomf(void);                                          // global stc64_randf(rng)
+void                csrandom(uint64_t seed);                                // seed global stc64 prng
+uint64_t            crandom(void);                                          // global stc64_rand(rng)
+double              crandomf(void);                                         // global stc64_randf(rng)
 
-stc64_t             stc64_new(uint64_t seed);                                // stc64_init(s) is deprecated
-stc64_t             stc64_with_seq(uint64_t seed, uint64_t seq);             // with unique stream
+stc64_t             stc64_new(uint64_t seed);                               // stc64_init(s) is deprecated
+stc64_t             stc64_with_seq(uint64_t seed, uint64_t seq);            // with unique stream
 
-uint64_t            stc64_rand(stc64_t* rng);                                // range [0, 2^64 - 1]
-double              stc64_randf(stc64_t* rng);                               // range [0.0, 1.0)
+uint64_t            stc64_rand(stc64_t* rng);                               // range [0, 2^64 - 1]
+double              stc64_randf(stc64_t* rng);                              // range [0.0, 1.0)
 
-stc64_uniform_t     stc64_uniform_new(int64_t low, int64_t high);            // uniform-distribution
-int64_t             stc64_uniform(stc64_t* rng, stc64_uniform_t* dist);      // range [low, high]
+stc64_uniform_t     stc64_uniform_new(int64_t low, int64_t high);           // uniform-distribution
+int64_t             stc64_uniform(stc64_t* rng, stc64_uniform_t* dist);     // range [low, high]
 stc64_uniformf_t    stc64_uniformf_new(double lowf, double highf);
-double              stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist);    // range [lowf, highf)
+double              stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist);   // range [lowf, highf)
 
-stc64_normalf_t     stc64_normalf_new(double mean, double stddev);           // normal-distribution
+stc64_normalf_t     stc64_normalf_new(double mean, double stddev);          // normal-distribution
 double              stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
 ```
 ## Types
