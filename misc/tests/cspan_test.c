@@ -86,21 +86,21 @@ CTEST_FIXTURE(cspan_cube) {
 CTEST_SETUP(cspan_cube) {
     enum {TSIZE=4, CUBE=64, N=CUBE*CUBE*CUBE};
 
-    fix->stack = cstack_int_init();
-    fix->tiles = Tiles_init();
+    _self->stack = cstack_int_init();
+    _self->tiles = Tiles_init();
 
-    cstack_int_reserve(&fix->stack, N);
+    cstack_int_reserve(&_self->stack, N);
     c_FORRANGE (i, N)
-        cstack_int_push(&fix->stack, i+1);
+        cstack_int_push(&_self->stack, i+1);
 
-    intspan3 ms3 = cspan_md(fix->stack.data, CUBE, CUBE, CUBE);
+    intspan3 ms3 = cspan_md(_self->stack.data, CUBE, CUBE, CUBE);
 
     c_FORRANGE (i, 0, ms3.dim[0], TSIZE) {
         c_FORRANGE (j, 0, ms3.dim[1], TSIZE) {
             c_FORRANGE (k, 0, ms3.dim[2], TSIZE) {
                 intspan3 tile = ms3;
                 cspan_slice(&tile, {i, i + TSIZE}, {j, j + TSIZE}, {k, k + TSIZE});
-                Tiles_push(&fix->tiles, tile);
+                Tiles_push(&_self->tiles, tile);
             }
         }
     }
@@ -108,18 +108,18 @@ CTEST_SETUP(cspan_cube) {
 
 // Optional teardown function for suite, called after every test in suite
 CTEST_TEARDOWN(cspan_cube) {
-    cstack_int_drop(&fix->stack);
-    Tiles_drop(&fix->tiles);
+    cstack_int_drop(&_self->stack);
+    Tiles_drop(&_self->tiles);
 }
 
 
 CTEST_F(cspan_cube, slice3) {
-    intptr_t n = cstack_int_size(&fix->stack);
-    //printf("\ntiles: %zi, cells: %zi\n", Tiles_size(&fix->tiles), n);
+    intptr_t n = cstack_int_size(&_self->stack);
+    //printf("\ntiles: %zi, cells: %zi\n", Tiles_size(&_self->tiles), n);
 
     int64_t sum = 0;
     // iterate each 3d tile in sequence
-    c_FOREACH (i, Tiles, fix->tiles)
+    c_FOREACH (i, Tiles, _self->tiles)
         c_FOREACH (t, intspan3, *i.ref)
             sum += *t.ref;
 
