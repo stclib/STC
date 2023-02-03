@@ -226,12 +226,12 @@ STC_INLINE intptr_t _cspan_next2(int rank, int32_t pos[], const int32_t shape[],
 STC_INLINE intptr_t _cspan_slice(int32_t odim[], int32_t ostri[], int* orank, 
                                  const int32_t shape[], const int32_t stri[], 
                                  int rank, const int32_t a[][2]) {
-    intptr_t off = 0, s = 1;
+    intptr_t off = 0;
     int i = 0, j = 0, ok = true;
+    int32_t t, s = 1;
     for (; i < rank; ++i) {
         off *= stri[i];
         off += a[i][0];
-        int32_t t;
         switch (a[i][1]) { 
             case 0: s *= stri[i]; continue;
             case -1: t = shape[i]; break;
