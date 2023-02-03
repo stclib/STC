@@ -134,10 +134,10 @@ typedef struct { int32_t d[6]; } cspan_idx6;
 #define cspan_idx_2 cspan_idx_4
 #define cspan_idx_3 cspan_idx_4
 #define cspan_idx_4(self, ...) \
-    c_PASTE(_cspan_idx, c_NUMARGS(__VA_ARGS__))((self)->shape, (self)->stride, __VA_ARGS__)
+    c_PASTE(_cspan_idx, c_NUMARGS(__VA_ARGS__))((self)->shape, (self)->stride, __VA_ARGS__) // small/fast
 #define cspan_idx_5(self, ...) \
     (_cspan_idxN(c_NUMARGS(__VA_ARGS__), (self)->shape, (self)->stride.d, (int32_t[]){__VA_ARGS__}) + \
-     c_static_assert(cspan_rank(self) == c_NUMARGS(__VA_ARGS__)))
+     c_static_assert(cspan_rank(self) == c_NUMARGS(__VA_ARGS__))) // general
 #define cspan_idx_6 cspan_idx_5
 
 #define cspan_at(self, ...) ((self)->data + cspan_index(self, __VA_ARGS__))
@@ -151,9 +151,6 @@ typedef struct { int32_t d[6]; } cspan_idx6;
     {.data=cspan_at(self, offset, 0), .shape={count, (self)->shape[1]}, .stride={(self)->stride}}
 #define cspan_subspan3(self, offset, count) \
     {.data=cspan_at(self, offset, 0, 0), .shape={count, (self)->shape[1], (self)->shape[2]}, .stride={(self)->stride}}
-#define cspan_subspan4(self, offset, count) \
-    {.data=cspan_at(self, offset, 0, 0, 0), .shape={count, (self)->shape[1], (self)->shape[2], (self)->shape[3]}, \
-                                            .stride={(self)->stride}}
 
 // cspan_submdN: return reduced rank
 #define cspan_submd4(...) c_MACRO_OVERLOAD(cspan_submd4, __VA_ARGS__)

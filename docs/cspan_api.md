@@ -16,7 +16,6 @@ using_cspan(SpanTypeN, ValueType, Rank); // define multi-dimensional span with R
 using_cspan2(S, ValueType);              // define span types S, S2 with ranks 1, 2.
 using_cspan3(S, ValueType);              // define span types S, S2, S3 with ranks 1, 2, 3.
 using_cspan4(S, ValueType);              // define span types S, S2, S3, S4 with ranks 1, 2, 3, 4.
-using_cspan5(S, ValueType);              // define span types S, S2, .., S5 with ranks 1, 2, 3, 4, 5.
 ```
 ## Methods
 Note that `cspan_md()`, `cmake_from*()`, `cspan_atN()`, `and cspan_subspanN()` require a (safe) cast to its span-type
@@ -35,15 +34,14 @@ ValueType*      cspan_at(const SpanTypeN* self, intptr_t x, ...);   // at(): num
 ValueType*      cspan_front(const SpanTypeN* self);
 ValueType*      cspan_back(const SpanTypeN* self);
 
-                // general slicing to create a subspan.
-                // {ind} reduces rank. {ind,c_END} slice to end. {c_ALL} take the full extent.
+                // general index slicing to create a subspan.
+                // {x} reduces rank. {x,c_END} slice to end. {c_ALL} take the full extent.
 SpanTypeN       cspan_slice(T SpanTypeN, const SpanTypeM* parent, {x0,x1}, {y0,y1}, ...);
                 
                 // create a subspan of lower rank. Like e.g. cspan_slice(Span2, &ms3, {x}, {c_ALL}, {c_ALL});
 SpanType        cspan_submd2(const SpanType2* self, intptr_t x);        // return a 1d subspan from a 2d span.
 SpanTypeN       cspan_submd3(const SpanType3* self, intptr_t x, ...);   // return a 1d or 2d subspan from a 3d span.
 SpanTypeN       cspan_submd4(const SpanType4* self, intptr_t x, ...);   // number of args determines rank of output span.
-SpanTypeN       cspan_submd5(const SpanType5* self, intptr_t x, ...);
 
                 // create a subspan of same rank. Like e.g. cspan_slice(Span3, &ms3, {off, off+count}, {c_ALL}, {c_ALL});
 SpanType        cspan_subspan(const SpanType* self, intptr_t offset, intptr_t count);
