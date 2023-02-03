@@ -114,10 +114,16 @@ typedef struct { int32_t d[5]; } cspan_idx5;
 
 #define cspan_size(self) _cspan_size((self)->dim, cspan_rank(self))
 #define cspan_rank(self) c_ARRAYLEN((self)->dim)
-#define cspan_index(self, ...) \
+
+#define cspan_idx(self, ...) \
     c_PASTE(_cspan_i, c_NUMARGS(__VA_ARGS__))((self)->dim, (self)->stride, __VA_ARGS__)
 
+#define cspan_index(self, ...) \
+    (_cspan_index(c_NUMARGS(__VA_ARGS__), (self)->dim, (self)->stride.d, (int32_t[]){__VA_ARGS__}) + \
+     c_static_assert(cspan_rank(self) == c_NUMARGS(__VA_ARGS__)))
+
 #define cspan_at(self, ...) ((self)->data + cspan_index(self, __VA_ARGS__))
+#define cspan_item(self, ...) ((self)->data + cspan_idx(self, __VA_ARGS__)) // same as cspan_at(), only for rank <= 5
 #define cspan_front(self) ((self)->data)
 #define cspan_back(self) ((self)->data + cspan_size(self) - 1)
 
@@ -161,7 +167,7 @@ typedef struct { int32_t d[5]; } cspan_idx5;
     {.data=cspan_at(self, x, y, z, w, 0), .dim={(self)->dim[4]}}
 
 // cspan_slice:
-//  e.g.: cspan_slice(&ms3, {1,3}, {0}, {1,4});
+//  e.g.: cspan_slice(&ms3, {1,3}, {0,-1}, {1,4});
 
 #define cspan_slice(self, ...) \
     ((void)((self)->data += _cspan_slice(cspan_rank(self), (self)->dim, (self)->stride.d, \
@@ -192,6 +198,18 @@ STC_INLINE intptr_t _cspan_i5(const int32_t dim[4], const cspan_idx4 stri, int32
     return (intptr_t)stri.d[4]*(stri.d[3]*(stri.d[2]*(stri.d[1]*x + y) + z) + w) + v;
 }
 
+STC_INLINE intptr_t _cspan_index(int rank, const int32_t dim[], const int32_t stri[], const int32_t a[]) {
+    intptr_t off = a[0];
+    bool ok = c_LTu(a[0], dim[0]);
+    for (int i = 1; i < rank; ++i) {
+        off *= stri[i];
+        off += a[i];
+        ok &= c_LTu(a[i], dim[i]);
+    }
+    c_ASSERT(ok);
+    return off;
+}
+
 STC_INLINE intptr_t _cspan_size(const int32_t dim[], int rank) {
     intptr_t sz = dim[0];
     while (rank-- > 1) sz *= dim[rank];
@@ -216,19 +234,46 @@ STC_INLINE intptr_t _cspan_next_2(int rank, int32_t pos[], const int32_t dim[], 
 }
 
 STC_INLINE intptr_t _cspan_slice(int rank, int32_t dim[], const int32_t stri[], const int32_t a[][2]) {
-    int32_t t = a[0][1] ? a[0][1] : dim[0];
-    c_ASSERT(!c_LTu(dim[0], t));
-    dim[0] = t - a[0][0];
-
-    intptr_t off = a[0][0];
-    for (int i = 1; i < rank; ++i) {
+    intptr_t off = 0;
+    bool ok = true;
+    for (int i = 0; i < rank; ++i) {
         off *= stri[i];
         off += a[i][0];
-        t = a[i][1] ? a[i][1] : dim[i];
-        c_ASSERT(!c_LTu(dim[i], t));
+        int32_t t;
+        switch (a[i][1]) { 
+            case 0: t = a[i][0] + 1; break;
+            case -1: t = dim[i]; break;
+            default: t = a[i][1];
+        }
         dim[i] = t - a[i][0];
+        ok &= c_LTu(0, dim[i]);
     }
+    c_ASSERT(ok);
     return off;
 }
 
+STC_INLINE intptr_t _cspan_subslice(int* orank, int32_t odim[], int32_t ostri[], 
+                                    const int32_t dim[], const int32_t stri[], 
+                                    int rank, const int32_t a[][2]) {
+    intptr_t off = a[0][0];
+    intptr_t s = 1;
+    int i = 0, j = 0, ok = true;
+    for (; i < rank; ++i) {
+        off *= stri[i];
+        off += a[i][0];
+        int32_t t;
+        switch (a[i][1]) { 
+            case 0: s *= stri[i]; continue;
+            case -1: t = dim[i]; break;
+            default: t = a[i][1]; break; 
+        }
+        odim[j] = t - a[i][0];
+        ostri[j] = s*stri[i];
+        s = 1; ++j;
+        ok &= c_LTu(0, odim[0]);
+    }
+    *orank = j;
+    c_ASSERT(ok);
+    return off;
+}
 #endif

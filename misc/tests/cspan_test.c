@@ -32,7 +32,7 @@ CTEST(cspan, slice) {
     }
 
     intspan2 m2 = m1;
-    cspan_slice(&m2, {0}, {2,4});
+    cspan_slice(&m2, {0,-1}, {2,4});
 
     size_t sum2 = 0;
     for (size_t i = 0; i < m2.dim[0]; ++i) {
