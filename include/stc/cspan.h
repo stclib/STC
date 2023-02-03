@@ -74,6 +74,13 @@ int demo2() {
     STC_INLINE Self Self##_from_n(Self##_raw* raw, const intptr_t n) { \
         return (Self){.data=raw, .dim={(int32_t)n}}; \
     } \
+    STC_INLINE Self Self##_subslice_(Self##_value* v, const int32_t dim[], const int32_t stri[], \
+                                     const int rank, const int32_t a[][2]) { \
+        Self s = {.data=v}; int outrank; \
+        s.data += _cspan_subslice(s.dim, s.stride.d, &outrank, dim, stri, rank, a); \
+        c_ASSERT(outrank == RANK); \
+        return s; \
+    } \
     STC_INLINE Self##_iter Self##_begin(const Self* self) { \
         Self##_iter it = {.ref=self->data, .pos={0}, ._s=self}; \
         return it; \
@@ -91,12 +98,14 @@ int demo2() {
 #define using_cspan2(Self, T) using_cspan_3(Self, T, 1); using_cspan_3(Self##2, T, 2)
 #define using_cspan3(Self, T) using_cspan2(Self, T); using_cspan_3(Self##3, T, 3)
 #define using_cspan4(Self, T) using_cspan3(Self, T); using_cspan_3(Self##4, T, 4)
-#define using_cspan5(Self, T) using_cspan4(Self, T); using_cspan_4(Self##4, T, 5)
 typedef struct { int32_t d[1]; } cspan_idx1;
 typedef struct { int32_t d[2]; } cspan_idx2;
 typedef struct { int32_t d[3]; } cspan_idx3;
 typedef struct { int32_t d[4]; } cspan_idx4;
 typedef struct { int32_t d[5]; } cspan_idx5;
+typedef struct { int32_t d[6]; } cspan_idx6;
+#define c_END -1
+#define c_ALL 0,c_END
 
 #define cspan_md(array, ...) \
     {.data=array, .dim={__VA_ARGS__}, .stride={.d={__VA_ARGS__}}}
@@ -105,6 +114,11 @@ typedef struct { int32_t d[5]; } cspan_idx5;
 #define cspan_make(SpanType, ...) \
     {.data=(SpanType##_value[])__VA_ARGS__, .dim={sizeof((SpanType##_value[])__VA_ARGS__)/sizeof(SpanType##_value)}}
 
+#define cspan_subslice(OutSpan, parent, ...) \
+    OutSpan##_subslice_((parent)->data, (parent)->dim, (parent)->stride.d, cspan_rank(parent) + \
+                        c_static_assert(cspan_rank(parent) == sizeof((int32_t[][2]){__VA_ARGS__})/sizeof(int32_t[2])), \
+                        (const int32_t[][2]){__VA_ARGS__})
+     
 /* create a cspan from a cvec, cstack, cdeq, cqueue, or cpque (heap) */
 #define cspan_from(container) \
     {.data=(container)->data, .dim={(int32_t)(container)->_len}}
@@ -170,10 +184,10 @@ typedef struct { int32_t d[5]; } cspan_idx5;
 //  e.g.: cspan_slice(&ms3, {1,3}, {0,-1}, {1,4});
 
 #define cspan_slice(self, ...) \
-    ((void)((self)->data += _cspan_slice(cspan_rank(self), (self)->dim, (self)->stride.d, \
-                                         (const int32_t[][2]){__VA_ARGS__}) + \
+    ((void)((self)->data += _cspan_slice((self)->dim, (self)->stride.d, \
+                                         cspan_rank(self), (const int32_t[][2]){__VA_ARGS__}) + \
                             c_static_assert(cspan_rank(self) == \
-                            sizeof((const int32_t[][2]){__VA_ARGS__})/8)))
+                            sizeof((const int32_t[][2]){__VA_ARGS__})/sizeof(int32_t[2]))))
 
 // FUNCTIONS
 
@@ -233,7 +247,7 @@ STC_INLINE intptr_t _cspan_next_2(int rank, int32_t pos[], const int32_t dim[], 
     return off;
 }
 
-STC_INLINE intptr_t _cspan_slice(int rank, int32_t dim[], const int32_t stri[], const int32_t a[][2]) {
+STC_INLINE intptr_t _cspan_slice(int32_t dim[], const int32_t stri[], const int rank, const int32_t a[][2]) {
     intptr_t off = 0;
     bool ok = true;
     for (int i = 0; i < rank; ++i) {
@@ -252,7 +266,7 @@ STC_INLINE intptr_t _cspan_slice(int rank, int32_t dim[], const int32_t stri[], 
     return off;
 }
 
-STC_INLINE intptr_t _cspan_subslice(int* orank, int32_t odim[], int32_t ostri[], 
+STC_INLINE intptr_t _cspan_subslice(int32_t odim[], int32_t ostri[], int* orank, 
                                     const int32_t dim[], const int32_t stri[], 
                                     int rank, const int32_t a[][2]) {
     intptr_t off = a[0][0];
@@ -270,10 +284,10 @@ STC_INLINE intptr_t _cspan_subslice(int* orank, int32_t odim[], int32_t ostri[],
         odim[j] = t - a[i][0];
         ostri[j] = s*stri[i];
         s = 1; ++j;
-        ok &= c_LTu(0, odim[0]);
+        ok &= c_LTu(0, odim[i]) & !c_LTu(dim[i], t);
     }
     *orank = j;
-    c_ASSERT(ok);
+    c_ASSERT(ok); /* input indices ok */
     return off;
 }
 #endif

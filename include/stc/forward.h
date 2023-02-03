@@ -120,33 +120,6 @@ typedef union {
         SELF##_sizet size, bucket_count; \
     } SELF
 
-#if defined STC_CSMAP_V1
-#define _c_aatree_types(SELF, KEY, VAL, SZ, MAP_ONLY, SET_ONLY) \
-    typedef KEY SELF##_key; \
-    typedef VAL SELF##_mapped; \
-    typedef SZ SELF##_sizet; \
-    typedef struct SELF##_node SELF##_node; \
-\
-    typedef SET_ONLY( SELF##_key ) \
-            MAP_ONLY( struct SELF##_value ) \
-    SELF##_value; \
-\
-    typedef struct { \
-        SELF##_value *ref; \
-        bool inserted, nomem_error; \
-    } SELF##_result; \
-\
-    typedef struct { \
-        SELF##_value *ref; \
-        int _top; \
-        SELF##_node *_tn, *_st[36]; \
-    } SELF##_iter; \
-\
-    typedef struct { \
-        SELF##_node *root; \
-        SELF##_sizet size; \
-    } SELF
-#else
 #define _c_aatree_types(SELF, KEY, VAL, SZ, MAP_ONLY, SET_ONLY) \
     typedef KEY SELF##_key; \
     typedef VAL SELF##_mapped; \
@@ -173,7 +146,6 @@ typedef union {
         SELF##_node *nodes; \
         SELF##_sizet root, disp, head, size, cap; \
     } SELF
-#endif
 
 #define _c_cstack_fixed(SELF, VAL, CAP) \
     typedef VAL SELF##_value; \

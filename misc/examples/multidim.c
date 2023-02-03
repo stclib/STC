@@ -5,6 +5,7 @@
 #include <stdio.h>
 
 using_cspan3(ispan, int);
+#define c_ALL 0,-1
 
 int main()
 {
@@ -30,7 +31,8 @@ int main()
     }
     puts("ss3 = ms3[:, 1:3, 1:3]");
     ispan3 ss3 = ms3;
-    cspan_slice(&ss3, {0,-1}, {1,3}, {1,3});
+    //cspan_slice(&ss3, {c_ALL}, {1,3}, {1,3});
+    ss3 = cspan_subslice(ispan3, &ms3, {c_ALL}, {1,3}, {1,3});
 
     for (int i=0; i != ss3.dim[0]; i++) {
         for (int j=0; j != ss3.dim[1]; j++) {
