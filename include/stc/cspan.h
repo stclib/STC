@@ -104,7 +104,8 @@ typedef struct { int32_t d[3]; } cspan_idx3;
 typedef struct { int32_t d[4]; } cspan_idx4;
 typedef struct { int32_t d[5]; } cspan_idx5;
 typedef struct { int32_t d[6]; } cspan_idx6;
-#define c_ALL 0,-1
+#define c_END -1
+#define c_ALL 0,c_END
 
 #define cspan_md(array, ...) \
     {.data=array, .dim={__VA_ARGS__}, .stride={.d={__VA_ARGS__}}}

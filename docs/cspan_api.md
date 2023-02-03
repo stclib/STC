@@ -31,23 +31,24 @@ intptr_t        cspan_size(const SpanTypeN* self);                  // return nu
 unsigned        cspan_rank(const SpanTypeN* self);                  // return number of dimensions
 intptr_t        cspan_index(const SpanTypeN* self, intptr_t x, ..); // index of element
                 
-ValueType*      cspan_at(SpanTypeN* self, intptr_t x, ...);         // at(): num of args specifies rank of input span.
-ValueType*      cspan_front(SpanTypeN* self);
-ValueType*      cspan_back(SpanTypeN* self);
+ValueType*      cspan_at(const SpanTypeN* self, intptr_t x, ...);   // at(): num of args specifies rank of input span.
+ValueType*      cspan_front(const SpanTypeN* self);
+ValueType*      cspan_back(const SpanTypeN* self);
 
-                // general slicing: create a subspan. can do the same as submd() and subspan().
-SpanTypeN       cspan_slice(T SpanTypeN, SpanTypeM* parent, {x0,x1}, {y0,y1}, ...); // {v} reduces rank. {v,-1} slice to end.
+                // general slicing to create a subspan.
+                // {ind} reduces rank. {ind,c_END} slice to end. {c_ALL} take the full extent.
+SpanTypeN       cspan_slice(T SpanTypeN, const SpanTypeM* parent, {x0,x1}, {y0,y1}, ...);
                 
-                // return a subspan of lower rank:
-SpanType        cspan_submd2(SpanType2* self, intptr_t x);        // return a 1d subspan from a 2d span.
-SpanTypeN       cspan_submd3(SpanType3* self, intptr_t x, ...);   // return a 1d or 2d subspan from a 3d span.
-SpanTypeN       cspan_submd4(SpanType4* self, intptr_t x, ...);   // number of args determines rank of output span.
-SpanTypeN       cspan_submd5(SpanType5* self, intptr_t x, ...);
+                // create a subspan of lower rank. Like e.g. cspan_slice(Span2, &ms3, {x}, {c_ALL}, {c_ALL});
+SpanType        cspan_submd2(const SpanType2* self, intptr_t x);        // return a 1d subspan from a 2d span.
+SpanTypeN       cspan_submd3(const SpanType3* self, intptr_t x, ...);   // return a 1d or 2d subspan from a 3d span.
+SpanTypeN       cspan_submd4(const SpanType4* self, intptr_t x, ...);   // number of args determines rank of output span.
+SpanTypeN       cspan_submd5(const SpanType5* self, intptr_t x, ...);
 
-                // return a subspan of same rank. Similar to e.g. cspan_slice(&ms3, {offset, offset+count}, {0}, {0});
-SpanType        cspan_subspan(SpanType* self, intptr_t offset, intptr_t count);
-SpanType2       cspan_subspan2(SpanType2 self, intptr_t offset, intptr_t count);
-SpanType3       cspan_subspan3(SpanType3 self, intptr_t offset, intptr_t count);
+                // create a subspan of same rank. Like e.g. cspan_slice(Span3, &ms3, {off, off+count}, {c_ALL}, {c_ALL});
+SpanType        cspan_subspan(const SpanType* self, intptr_t offset, intptr_t count);
+SpanType2       cspan_subspan2(const SpanType2 self, intptr_t offset, intptr_t count);
+SpanType3       cspan_subspan3(const SpanType3 self, intptr_t offset, intptr_t count);
 
 SpanTypeN_iter  SpanType_begin(const SpanTypeN* self);
 SpanTypeN_iter  SpanType_end(const SpanTypeN* self);
@@ -59,30 +60,34 @@ void            SpanType_next(SpanTypeN_iter* it);
 |:------------------|:-----------------------------------------------|:---------------------|
 | SpanTypeN         | `struct { ValueType *data; uint32_t dim[N]; }` | SpanType with rank N |
 | SpanTypeN`_value` | `ValueType`                                    | The ValueType        |
-| SpanTypeN`_iter`  | `struct { ValueType *ref; ... }`               | Iterator type        |
+| `c_ALL`           | `0,-1`                                         | Full extent          |
+| `c_END`           | `-1`                                           | End of extent        |
 
 ## Example 1
 
 The *cspan_slice()* function is similar to pythons numpy multi-dimensional arrays slicing, e.g.:
 ```py
 import numpy as np
-ms3 = np.array((1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24), int)
 
-ms3 = np.reshape(ms3, (2, 3, 4))
-ss3 = ms3[:, 1:3, 2:]
-ss2 = ss3[1]
+if __name__ == '__main__':
+    ms3 = np.array((1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24), int)
 
-for i in range(ss2.shape[0]):
-    for j in range(ss2.shape[1]):
-        print(" {}".format(ss2[i, j]), end='')
-print('')
+    ms3 = np.reshape(ms3, (2, 3, 4))
+    ss3 = ms3[:, 1:3, 2:]
+    ss2 = ss3[1]
 
-for i in ss2.flat:
-    print(" {}".format(i), end='')
+    for i in range(ss2.shape[0]):
+        for j in range(ss2.shape[1]):
+            print(" {}".format(ss2[i, j]), end='')
+    print('')
+
+    for i in ss2.flat:
+        print(" {}".format(i), end='')
+
 # 19 20 23 24
 # 19 20 23 24
 ```
-... can be done in C with STC:
+... can be done in C with cspan:
 ```c
 #include <c11/fmt.h>
 #include <stc/cspan.h>
@@ -91,8 +96,8 @@ using_cspan3(myspan, int); // define myspan, myspan2, myspan3.
 int main() {
     int arr[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24};
 
-    myspan3 ms3 = cspan_md(arr, 2, 3, 4), ss3 = ms3;
-    cspan_slice(&ss3, {0}, {1,3}, {2,});
+    myspan3 ms3 = cspan_md(arr, 2, 3, 4);
+    myspan3 ss3 = cspan_slice(myspan3, &ms3, {c_ALL}, {1,3}, {2,c_END});
     myspan2 ss2 = cspan_submd3(&ss3, 1);
 
     c_FORRANGE (i, ss2.dim[0])
@@ -104,7 +109,7 @@ int main() {
         fmt_print(" {}", *i.ref);
 }
 ```
-... or (mostly) in C++23:
+... and (almost) in C++23:
 ```c++
 #include <print>
 #include <mdspan>
@@ -122,7 +127,7 @@ int main() {
             std::print(" {}", ss2[i, j]);
     std::println();
 
-    // mdspan can't printed as a flat array, afaik.
+    // std::mdspan can't be iterated as a flat container!
 }
 ```
 ## Example 2
