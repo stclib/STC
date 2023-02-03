@@ -31,8 +31,7 @@ CTEST(cspan, slice) {
         }
     }
 
-    intspan2 m2 = m1;
-    cspan_slice(&m2, {c_ALL}, {2,4});
+    intspan2 m2 = cspan_slice(intspan2, &m1, {c_ALL}, {2,4});
 
     size_t sum2 = 0;
     for (size_t i = 0; i < m2.dim[0]; ++i) {
@@ -54,7 +53,7 @@ CTEST(cspan, slice2) {
             cstack_int_push(&stack, i);
 
         intspan3 ms3 = cspan_md(stack.data, 10, 20, 30);
-        cspan_slice(&ms3, {1,4}, {3,7}, {20,24});
+        ms3 = cspan_slice(intspan3, &ms3, {1,4}, {3,7}, {20,24});
 
         size_t sum = 0;
         for (size_t i = 0; i < ms3.dim[0]; ++i) {
@@ -98,8 +97,7 @@ CTEST_SETUP(cspan_cube) {
     c_FORRANGE (i, 0, ms3.dim[0], TSIZE) {
         c_FORRANGE (j, 0, ms3.dim[1], TSIZE) {
             c_FORRANGE (k, 0, ms3.dim[2], TSIZE) {
-                intspan3 tile = ms3;
-                cspan_slice(&tile, {i, i + TSIZE}, {j, j + TSIZE}, {k, k + TSIZE});
+                intspan3 tile = cspan_slice(intspan3, &ms3, {i, i + TSIZE}, {j, j + TSIZE}, {k, k + TSIZE});
                 Tiles_push(&_self->tiles, tile);
             }
         }

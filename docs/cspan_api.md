@@ -35,18 +35,19 @@ ValueType*      cspan_at(SpanTypeN* self, intptr_t x, ...);         // at(): num
 ValueType*      cspan_front(SpanTypeN* self);
 ValueType*      cspan_back(SpanTypeN* self);
 
+                // general slicing: create a subspan. can do the same as submd() and subspan().
+SpanTypeN       cspan_slice(T SpanTypeN, SpanTypeM* parent, {x0,x1}, {y0,y1}, ...); // {v} reduces rank. {v,-1} slice to end.
+                
                 // return a subspan of lower rank:
-SpanType        cspan_submd2(SpanType2* self, intptr_t x);          // return a 1d subspan from a 2d span.
-SpanTypeN       cspan_submd3(SpanType3* self, intptr_t x, ...);     // return a 1d or 2d subspan from a 3d span.
-SpanTypeN       cspan_submd4(SpanType4* self, intptr_t x, ...);     // number of args determines rank of output span.
+SpanType        cspan_submd2(SpanType2* self, intptr_t x);        // return a 1d subspan from a 2d span.
+SpanTypeN       cspan_submd3(SpanType3* self, intptr_t x, ...);   // return a 1d or 2d subspan from a 3d span.
+SpanTypeN       cspan_submd4(SpanType4* self, intptr_t x, ...);   // number of args determines rank of output span.
 SpanTypeN       cspan_submd5(SpanType5* self, intptr_t x, ...);
 
-void            cspan_slice(SpanTypeN* self, {x0,x1}, {y0,y1},...); // slice a span to make it a subspan of same rank
-
                 // return a subspan of same rank. Similar to e.g. cspan_slice(&ms3, {offset, offset+count}, {0}, {0});
-SpanType        cspan_subspan(const SpanType* self, intptr_t offset, intptr_t count);
-SpanType2       cspan_subspan2(const SpanType2 self, intptr_t offset, intptr_t count);
-SpanType3       cspan_subspan3(const SpanType3 self, intptr_t offset, intptr_t count);
+SpanType        cspan_subspan(SpanType* self, intptr_t offset, intptr_t count);
+SpanType2       cspan_subspan2(SpanType2 self, intptr_t offset, intptr_t count);
+SpanType3       cspan_subspan3(SpanType3 self, intptr_t offset, intptr_t count);
 
 SpanTypeN_iter  SpanType_begin(const SpanTypeN* self);
 SpanTypeN_iter  SpanType_end(const SpanTypeN* self);
