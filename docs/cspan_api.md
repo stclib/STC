@@ -58,7 +58,7 @@ void            SpanType_next(SpanTypeN_iter* it);
 
 | Type name         | Type definition                                | Used to represent... |
 |:------------------|:-----------------------------------------------|:---------------------|
-| SpanTypeN         | `struct { ValueType *data; uint32_t dim[N]; }` | SpanType with rank N |
+| SpanTypeN         | `struct { ValueType *data; uint32_t shape[N]; }` | SpanType with rank N |
 | SpanTypeN`_value` | `ValueType`                                    | The ValueType        |
 | `c_ALL`           | `0,-1`                                         | Full extent          |
 | `c_END`           | `-1`                                           | End of extent        |
@@ -100,8 +100,8 @@ int main() {
     myspan3 ss3 = cspan_slice(myspan3, &ms3, {c_ALL}, {1,3}, {2,c_END});
     myspan2 ss2 = cspan_submd3(&ss3, 1);
 
-    c_FORRANGE (i, ss2.dim[0])
-        c_FORRANGE (j, ss2.dim[1])
+    c_FORRANGE (i, ss2.shape[0])
+        c_FORRANGE (j, ss2.shape[1])
             fmt_print(" {}", *cspan_at(&ss2, i, j));
     puts("");
 
@@ -163,9 +163,9 @@ int main()
             fmt_print("{} ", *i.ref);
 
         puts("\niterate span3 by dimensions:");
-        c_FORRANGE (i, span3.dim[0]) {
-            c_FORRANGE (j, span3.dim[1]) {
-                c_FORRANGE (k, span3.dim[2])
+        c_FORRANGE (i, span3.shape[0]) {
+            c_FORRANGE (j, span3.shape[1]) {
+                c_FORRANGE (k, span3.shape[2])
                     fmt_printf(" {:2}", *cspan_at(&span3, i, j, k));
                 printf(" |");
             }

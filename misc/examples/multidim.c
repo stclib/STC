@@ -19,9 +19,9 @@ int main()
     ispan3 ms3 = cspan_md(v.data, 2, 3, 4);
 
     puts("ms3:");
-    for (int i=0; i != ms3.dim[0]; i++) {
-        for (int j=0; j != ms3.dim[1]; j++) {
-            for (int k=0; k != ms3.dim[2]; k++) {
+    for (int i=0; i != ms3.shape[0]; i++) {
+        for (int j=0; j != ms3.shape[1]; j++) {
+            for (int k=0; k != ms3.shape[2]; k++) {
                 printf(" %2d", *cspan_at(&ms3, i, j, k));
             }
             puts("");
@@ -33,9 +33,9 @@ int main()
     //cspan_slice(&ss3, {c_ALL}, {1,3}, {1,3});
     ss3 = cspan_slice(ispan3, &ms3, {c_ALL}, {1,3}, {1,3});
 
-    for (int i=0; i != ss3.dim[0]; i++) {
-        for (int j=0; j != ss3.dim[1]; j++) {
-            for (int k=0; k != ss3.dim[2]; k++) {
+    for (int i=0; i != ss3.shape[0]; i++) {
+        for (int j=0; j != ss3.shape[1]; j++) {
+            for (int k=0; k != ss3.shape[2]; k++) {
                 printf(" %2d", *cspan_at(&ss3, i, j, k));
             }
             puts("");
@@ -51,8 +51,8 @@ int main()
     ispan2 ms2 = cspan_submd3(&ms3, 0);
 
     // write data using 2D view
-    for (int i=0; i != ms2.dim[0]; i++)
-        for (int j=0; j != ms2.dim[1]; j++)
+    for (int i=0; i != ms2.shape[0]; i++)
+        for (int j=0; j != ms2.shape[1]; j++)
             *cspan_at(&ms2, i, j) = i*1000 + j;
 
     puts("\nview data as 1D view:");
