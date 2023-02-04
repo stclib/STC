@@ -38,12 +38,12 @@ ValueType*      cspan_back(const SpanTypeN* self);
                 // {x} reduces rank. {x,c_END} slice to end. {c_ALL} take the full extent.
 SpanTypeN       cspan_slice(T SpanTypeN, const SpanTypeM* parent, {x0,x1}, {y0,y1}, ...);
                 
-                // create a subspan of lower rank. Like e.g. cspan_slice(Span2, &ms3, {x}, {c_ALL}, {c_ALL});
+                // create a subspan of lower rank. Like e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
 SpanType        cspan_submd2(const SpanType2* self, intptr_t x);        // return a 1d subspan from a 2d span.
 SpanTypeN       cspan_submd3(const SpanType3* self, intptr_t x, ...);   // return a 1d or 2d subspan from a 3d span.
 SpanTypeN       cspan_submd4(const SpanType4* self, intptr_t x, ...);   // number of args determines rank of output span.
 
-                // create a subspan of same rank. Like e.g. cspan_slice(Span3, &ms3, {off, off+count}, {c_ALL}, {c_ALL});
+                // create a subspan of same rank. Like e.g. cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
 SpanType        cspan_subspan(const SpanType* self, intptr_t offset, intptr_t count);
 SpanType2       cspan_subspan2(const SpanType2 self, intptr_t offset, intptr_t count);
 SpanType3       cspan_subspan3(const SpanType3 self, intptr_t offset, intptr_t count);
@@ -132,63 +132,68 @@ int main() {
 ```c
 #include <c11/fmt.h>
 #include <stc/cspan.h>
-#define i_val float
-#include <stc/cstack.h>
 
-using_cspan3(Span, float); // Shorthand to define span types Span, Span2, and Span3.
+using_cspan3(Span, int); // Shorthand to define Span, Span2, and Span3
 
 int main()
 {
-    int xd = 6, yd = 4, zd = 3;
-    c_AUTO (cstack_float, vec)
-    {
-        c_FORRANGE (i, xd*yd*zd)
-            cstack_float_push(&vec, i);
+    // c_make() can create any STC container/span from an initializer list:
+    Span span = c_make(Span, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+                              14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24});
+    // create a 3d cspan:
+    Span3 span3 = cspan_md(span.data, 2, 4, 3);
 
-        // define "span3[xd][yd][zd]"
-        Span3 span3 = cspan_md(vec.data, xd, yd, zd);
-        *cspan_at(&span3, 4, 3, 2) = 3.14159f;
-        fmt_print("index: {}", cspan_index(&span3, 4, 3, 2));
+    // reduce rank: (i.e. span3[1])
+    Span2 span2 = cspan_submd3(&span3, 1);
 
-        Span span1 = cspan_submd3(&span3, 4, 3);
-        printf("\niterate span1: ");
-        c_FOREACH (i, Span, span1)
-            fmt_print("{} ", *i.ref);
+    puts("\niterate span2 flat:");
+    c_FOREACH (i, Span2, span2)
+        fmt_print(" {}", *i.ref);
+    puts("");
 
-        Span2 span2 = cspan_submd3(&span3, 4);
-        printf("\niterate span2: ");
-        c_FOREACH (i, Span2, span2)
-            fmt_print("{} ", *i.ref);
+    // slice without reducing rank:
+    Span3 ss3 = cspan_slice(Span3, &span3, {c_ALL}, {3,4}, {c_ALL});
 
-        puts("\niterate span3 by dimensions:");
-        c_FORRANGE (i, span3.shape[0]) {
-            c_FORRANGE (j, span3.shape[1]) {
-                c_FORRANGE (k, span3.shape[2])
-                    fmt_printf(" {:2}", *cspan_at(&span3, i, j, k));
-                printf(" |");
-            }
-            puts("");
+    puts("\niterate ss3 by dimensions:");
+    c_FORRANGE (i, ss3.shape[0]) {
+        c_FORRANGE (j, ss3.shape[1]) {
+            c_FORRANGE (k, ss3.shape[2])
+                fmt_print(" {:2}", *cspan_at(&ss3, i, j, k));
+            fmt_print(" |");
         }
-
-        fmt_println("{}", *cspan_at(&span3, 4, 3, 2));
-        fmt_println("{}", *cspan_at(&span2, 3, 2));
-        fmt_println("{}", *cspan_at(&span1, 2));
+        puts("");
     }
+    // slice and reduce rank:
+    Span2 ss2 = cspan_slice(Span2, &span3, {c_ALL}, {3}, {c_ALL});
+
+    puts("\niterate ss2 by dimensions:");
+    c_FORRANGE (i, ss2.shape[0]) {
+        c_FORRANGE (j, ss2.shape[1]) {
+                fmt_print(" {:2}", *cspan_at(&ss2, i, j));
+            fmt_print(" |");
+        }
+        puts("");
+    }
+
+    puts("\niterate ss2 flat:");
+    c_FOREACH (i, Span2, ss2)
+        fmt_print(" {:2}", *i.ref);
+    puts("");
 }
 ```
 Output:
 ```
-index: 59
-iterate span1: 57 58 3.14159 
-iterate span2: 48 49 50 51 52 53 54 55 56 57 58 3.14159 
-iterate span3 by dimensions:
-  0  1  2 |  3  4  5 |  6  7  8 |  9 10 11 |
- 12 13 14 | 15 16 17 | 18 19 20 | 21 22 23 |
- 24 25 26 | 27 28 29 | 30 31 32 | 33 34 35 |
- 36 37 38 | 39 40 41 | 42 43 44 | 45 46 47 |
- 48 49 50 | 51 52 53 | 54 55 56 | 57 58 3.14159 |
- 60 61 62 | 63 64 65 | 66 67 68 | 69 70 71 |
-3.14159
-3.14159
-3.14159
+iterate span2 flat:
+ 13 14 15 16 17 18 19 20 21 22 23 24
+
+iterate ss3 by dimensions:
+ 10 11 12 |
+ 22 23 24 |
+
+iterate ss2 by dimensions:
+ 10 | 11 | 12 |
+ 22 | 23 | 24 |
+
+iterate ss2 flat:
+ 10 11 12 22 23 24
 ```

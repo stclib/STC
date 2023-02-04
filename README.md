@@ -3,21 +3,22 @@
 STC - Smart Template Containers for C
 =====================================
 
-News: Version 4.1 RC (Feb 2023)
+News: Version 4.1 RC2 (Feb 2023)
 ------------------------------------------------
 Major changes:
 - Signed sizes and indices for all containers (no more mixing unsigned/signed bugs).
-- A new exciting [**cspan**](docs/cspan_api.md) single/multi-dimensional array view.
+- A new exciting [**cspan**](docs/cspan_api.md) single/multi-dimensional array view (with numpy-like slicing).
 - Updates on cregex with several new unicode character classes.
 - Uppercase flow-control macros (ccommon.h). Lowercase macros are [still supported](include/stc/priv/altnames.h).
+- Some API changes in cregex and cstr.
 - [See detailed changes for version 4](#version-4).
 
 Introduction
 ------------
 STC is a *modern*, *templated*, *user-friendly*, *type-safe*, *very fast* and *compact* container library for C99.
-The API is fairly similar to c++ STL, but a bit more uniform across the containers and takes
-inspiration from Rust and Python as well. It is an advantage to know how these containers work in other languages, like
-Java, C# or C++, but it's not required.
+The API has similarities with c++ STL, but is more uniform across the containers and takes inspiration from Rust
+and Python as well. It is an advantage to know how these containers work in other languages, like Java, C# or C++,
+but it's not required.
 
 This library allows you to manage both trivial to very complex data in a wide variety of containers
 without the need for boilerplate code. You may specify element-cloning, -comparison, -destruction and

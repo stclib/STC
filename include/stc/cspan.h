@@ -105,7 +105,7 @@ typedef struct { int32_t d[4]; } cspan_idx4;
 typedef struct { int32_t d[5]; } cspan_idx5;
 typedef struct { int32_t d[6]; } cspan_idx6;
 #define c_END -1
-#define c_ALL 0,c_END
+#define c_ALL 0,-1
 
 #define cspan_md(array, ...) \
     {.data=array, .shape={__VA_ARGS__}, .stride={.d={__VA_ARGS__}}}
@@ -144,7 +144,7 @@ typedef struct { int32_t d[6]; } cspan_idx6;
 #define cspan_front(self) ((self)->data)
 #define cspan_back(self) ((self)->data + cspan_size(self) - 1)
 
-// cspan_subspanN. (N<5) Optimized, but same as e.g. cspan_slice(Span2, &ms4, {offset, offset + count}, {c_ALL}, {c_ALL});
+// cspan_subspanN. (N<4) Optimized, same as e.g. cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
 #define cspan_subspan(self, offset, count) \
     {.data=cspan_at(self, offset), .shape={count}}
 #define cspan_subspan2(self, offset, count) \
@@ -152,7 +152,7 @@ typedef struct { int32_t d[6]; } cspan_idx6;
 #define cspan_subspan3(self, offset, count) \
     {.data=cspan_at(self, offset, 0, 0), .shape={count, (self)->shape[1], (self)->shape[2]}, .stride={(self)->stride}}
 
-// cspan_submdN: return reduced rank
+// cspan_submdN: reduce rank (N<5) Optimized, same as e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
 #define cspan_submd4(...) c_MACRO_OVERLOAD(cspan_submd4, __VA_ARGS__)
 #define cspan_submd3(...) c_MACRO_OVERLOAD(cspan_submd3, __VA_ARGS__)
 #define cspan_submd2(self, x) \
@@ -233,7 +233,7 @@ STC_INLINE intptr_t _cspan_slice(int32_t odim[], int32_t ostri[], int* orank,
         off *= stri[i];
         off += a[i][0];
         switch (a[i][1]) { 
-            case 0: s *= stri[i]; continue;
+            case 0: s *= stri[i]; ok &= c_LTu(a[i][0], shape[i]); continue;
             case -1: t = shape[i]; break;
             default: t = a[i][1]; break; 
         }
