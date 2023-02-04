@@ -104,7 +104,7 @@ NOTE: One must always make sure to unwind temporary allocated resources before a
 - it prevents forgetting to call the destructor at the end.
 
 The **checkauto** utility will report any misusages. The following example shows how to correctly break/return
-from a `c_AUTO` scope: 
+from a `c_AUTO` scope:
 ```c
     int flag = 0;
     for (int i = 0; i<n; ++i) {
@@ -122,7 +122,7 @@ from a `c_AUTO` scope:
 
             if (cond3())
                 return -1;  // checkauto ERROR! return inside c_AUTO
-            
+
             // CORRECT:
             if (cond2()) {
                 flag = 1;   // flag to break outer for-loop
@@ -225,10 +225,10 @@ Iterate containers with stop-criteria and chained range filtering.
 
 | Built-in filter                   | Description                          |
 |:----------------------------------|:-------------------------------------|
-| `c_FLT_SKIP(it, numItems)`        | Skip numItems                        |
-| `c_FLT_TAKE(it, numItems)`        | Take numItems                        |
-| `c_FLT_SKIPWHILE(it, predicate)`  | Skip items until predicate is false  |
-| `c_FLT_TAKEWHILE(it, predicate)`  | Take items until predicate is false  |
+| `c_flt_skip(it, numItems)`        | Skip numItems                        |
+| `c_flt_take(it, numItems)`        | Take numItems                        |
+| `c_flt_skipwhile(it, predicate)`  | Skip items until predicate is false  |
+| `c_flt_takewhile(it, predicate)`  | Take items until predicate is false  |
 
 `it.index` holds the index of the source item, and `it.count` the current number of items taken.
 ```c
@@ -249,20 +249,36 @@ int main() {
 
         c_FORFILTER (i, IVec, vec,
                         isOdd(*i.ref)
-                     && c_FLT_SKIP(i, 100) // built-in
+                     && c_flt_skip(i, 100) // built-in
                      && isPrime(*i.ref)
-                      , c_FLT_TAKE(i, 10)) { // breaks loop on false.
-            printf(" %d", *i.ref);  
+                      , c_flt_take(i, 10)) { // breaks loop on false.
+            printf(" %d", *i.ref);
         }
         puts("");
     }
 }
-// Out: 1000211 1000213 1000231 1000249 1000253 1000273 1000289 1000291 1000303 1000313 
+// Out: 1000211 1000213 1000231 1000249 1000253 1000273 1000289 1000291 1000303 1000313
 ```
-Note that `c_FLT_TAKE()` is given as an optional argument, which makes the loop stop when it becomes false (for efficiency). Chaining it after `isPrime()` instead will give same result, but the full input is processed.
+Note that `c_flt_take()` is given as an optional argument, which makes the loop stop when it becomes false (for efficiency). Chaining it after `isPrime()` instead will give same result, but the full input is processed.
+
+### c_make
+
+Make a container from a literal initializer list. Example:
+```c
+#define i_val_str  // cstr value type
+#include <stc/cset.h>
+
+#define i_key int
+#define i_val int
+#include <stc/cmap.h>
+...
+cset_str myset = c_make(cset_str, {"This", "is", "the", "story"}); // note: const char* values given!
+int x = 7, y = 8;
+cmap_int mymap = c_make(cmap_int, { {1, 2}, {3, 4}, {5, 6}, {x, y} });
+```
 
 ### crange
-**crange** is a number sequence generator type. The **crange_value** type is `long long`. Below, *start*, *stop*, *step* are type *crange_value*:
+**crange** is a number sequence generator type. The **crange_value** type is `long long`. Below *start*, *stop*, and *step* are of type *crange_value*:
 ```c
 crange      crange_make(stop);              // will generate 0, 1, ..., stop-1
 crange      crange_make(start, stop);       // will generate start, start+1, ... stop-1
@@ -275,57 +291,42 @@ void        crange_next(crange_iter* it);
 // 1. All primes less than 32:
 crange r1 = crange_make(3, 32, 2);
 printf("2"); // first prime
-c_FORFILTER (i, crange, r1 
+c_FORFILTER (i, crange, r1
               , isPrime(*i.ref))
     printf(" %lld", *i.ref);
 // 2 3 5 7 11 13 17 19 23 29 31
 
 // 2. The 11 first primes:
 printf("2");
-c_FORFILTER (i, crange, crange_literal(3, INT64_MAX, 2) 
+c_FORFILTER (i, crange, crange_literal(3, INT64_MAX, 2)
               , isPrime(*i.ref)
-              , c_FLT_TAKE(10))
+              , c_flt_take(10))
     printf(" %lld", *i.ref);
 // 2 3 5 7 11 13 17 19 23 29 31
 ```
-### c_FIND_IF, c_ERASE_IF
+### c_find_if, c_erase_if, c_swap, c_drop
 Find or erase linearily in containers using a predicate
 ```c
 // Search vec for first value > 2:
 cvec_i_iter i;
-c_FIND_IF(i, cvec_i, vec, *i.ref > 2);
+c_find_if(i, cvec_i, vec, *i.ref > 2);
 if (i.ref) printf("%d\n", *i.ref);
 
 // Search map for a string containing "hello" and erase it:
 cmap_str_iter it, it1 = ..., it2 = ...;
-c_FIND_IF(it, csmap_str, it1, it2, cstr_contains(it.ref, "hello"));
+c_find_if(it, csmap_str, it1, it2, cstr_contains(it.ref, "hello"));
 if (it.ref) cmap_str_erase_at(&map, it);
 
 // Erase all strings containing "hello":
 // Note 1: iter i need not be declared.
 // Note 2: variables index and count can be accessed in predicate.
-c_ERASE_IF(i, csmap_str, map, cstr_contains(i.ref, "hello"));
-```
+c_erase_if(i, csmap_str, map, cstr_contains(i.ref, "hello"));
 
-### c_NEW, c_ALLOC, c_ALLOC_N, c_DROP
+// Safe macro for swapping internals of two objects of same type:
+c_swap(cmap_int, &map1, &map2);
 
-| Usage                          | Meaning                                 |
-|:-------------------------------|:----------------------------------------|
-| `c_NEW (type, value)`          | Move value to a new object on the heap  |
-| `c_ALLOC (type)`               | `(type *) c_MALLOC(sizeof(type))`       |
-| `c_ALLOC_N (type, N)`          | `(type *) c_MALLOC((N)*sizeof(type))`   |
-| `c_DROP (ctype, &c1, ..., &cN)` | `ctype_drop(&c1); ... ctype_drop(&cN)` |
-
-```c
-struct Pnt { double x, y, z; };
-struct Pnt *pnt = c_NEW (struct Pnt, {1.2, 3.4, 5.6});
-c_FREE(pnt);
-
-int* array = c_ALLOC_N (int, 100);
-c_FREE(array);
-
-cstr a = cstr_lit("Hello"), b = cstr_lit("World");
-c_DROP(cstr, &a, &b);
+// Drop multiple containers of same type:
+c_drop(cvec_i, &vec1, &vec2, &vec3);
 ```
 
 ### General predefined template parameter functions
@@ -341,17 +342,29 @@ bool        crawstr_eq(const crawstr* x, const crawstr* y);
 uint64_t    crawstr_hash(const crawstr* x);
 ```
 
-### c_MALLOC, c_CALLOC, c_REALLOC, c_FREE
+### c_NEW, c_ALLOC, c_ALLOC_N
+
+| Usage                       | Meaning                                    |
+|:----------------------------|:-------------------------------------------|
+| `c_NEW (type, value)`       | Allocate and init a new object on the heap |
+| `c_ALLOC (type)`            | `(type *) c_malloc(c_sizeof(type))`        |
+| `c_ALLOC_N (type, N)`       | `(type *) c_malloc((N)*c_sizeof(type))`    |
+
+```c
+struct Pnt { double x, y, z; };
+struct Pnt *pnt = c_NEW(struct Pnt, {1.2, 3.4, 5.6});
+c_free(pnt);
+
+int* array = c_ALLOC_N(int, 100);
+c_free(array);
+```
+
+### c_malloc, c_calloc, c_realloc, c_free: customizable allocators
 Memory allocator for the entire library. Macros can be overridden by the user.
 
-### c_SWAP, c_ARRAYLEN
-- **c_SWAP(T, xp, yp)**: Safe macro for swapping internals of two objects of same type.
-- **c_ARRAYLEN(array)**: Return number of elements in an array.
+### c_ARRAYLEN
+- **c_ARRAYLEN(array)**: Return number of elements in an array. array must not be a pointer!
 ```c
-cmap_int map1 = {0}, map2 = {0};
-...
-c_SWAP(cmap_int, &map1, &map2);
-
 int array[] = {1, 2, 3, 4};
-size_t n = c_ARRAYLEN(array);
+intptr_t n = c_ARRAYLEN(array);
 ```

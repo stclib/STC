@@ -26,24 +26,24 @@ See the c++ class [std::stack](https://en.cppreference.com/w/cpp/container/stack
 
 ```c
 cstack_X            cstack_X_init(void);
-cstack_X            cstack_X_with_capacity(size_t cap);
-cstack_X            cstack_X_with_size(size_t size, i_val fill);
+cstack_X            cstack_X_with_capacity(intptr_t cap);
+cstack_X            cstack_X_with_size(intptr_t size, i_val fill);
 cstack_X            cstack_X_clone(cstack_X st);
 
 void                cstack_X_clear(cstack_X* self);
-bool                cstack_X_reserve(cstack_X* self, size_t n);
+bool                cstack_X_reserve(cstack_X* self, intptr_t n);
 void                cstack_X_shrink_to_fit(cstack_X* self);
-i_val*              cstack_X_append_uninit(cstack_X* self, size_t n);
+i_val*              cstack_X_append_uninit(cstack_X* self, intptr_t n);
 void                cstack_X_copy(cstack_X* self, const cstack_X* other);
 void                cstack_X_drop(cstack_X* self);                       // destructor
 
-size_t              cstack_X_size(const cstack_X* self);
-size_t              cstack_X_capacity(const cstack_X* self);
+intptr_t            cstack_X_size(const cstack_X* self);
+intptr_t            cstack_X_capacity(const cstack_X* self);
 bool                cstack_X_empty(const cstack_X* self);
 
 i_val*              cstack_X_top(const cstack_X* self);
-const i_val*        cstack_X_at(const cstack_X* self, size_t idx);
-i_val*              cstack_X_at_mut(cstack_X* self, size_t idx);
+const i_val*        cstack_X_at(const cstack_X* self, intptr_t idx);
+i_val*              cstack_X_at_mut(cstack_X* self, intptr_t idx);
 
 i_val*              cstack_X_push(cstack_X* self, i_val value);
 i_val*              cstack_X_emplace(cstack_X* self, i_valraw raw);

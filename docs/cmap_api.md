@@ -48,56 +48,56 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 
 ```c
 cmap_X                cmap_X_init(void);
-cmap_X                cmap_X_with_capacity(size_t cap);
+cmap_X                cmap_X_with_capacity(int64_t cap);
 cmap_X                cmap_X_clone(cmap_x map);
 
 void                  cmap_X_clear(cmap_X* self);
 void                  cmap_X_copy(cmap_X* self, const cmap_X* other);
-float                 cmap_X_max_load_factor(const cmap_X* self);                                     // default: 0.85f
-bool                  cmap_X_reserve(cmap_X* self, size_t size);
+float                 cmap_X_max_load_factor(const cmap_X* self);                       // default: 0.85f
+bool                  cmap_X_reserve(cmap_X* self, int64_t size);
 void                  cmap_X_shrink_to_fit(cmap_X* self);
-void                  cmap_X_drop(cmap_X* self);                                                // destructor
+void                  cmap_X_drop(cmap_X* self);                                        // destructor
 
-size_t                cmap_X_size(const cmap_X* self);
-size_t                cmap_X_capacity(const cmap_X* self);                                      // buckets * max_load_factor
 bool                  cmap_X_empty(const cmap_X* self );
-size_t                cmap_X_bucket_count(const cmap_X* self);                                  // num. of allocated buckets
+int64_t               cmap_X_size(const cmap_X* self);
+int64_t               cmap_X_capacity(const cmap_X* self);                              // buckets * max_load_factor
+int64_t               cmap_X_bucket_count(const cmap_X* self);                          // num. of allocated buckets
 
-const cmap_X_mapped*  cmap_X_at(const cmap_X* self, i_keyraw rkey);                             // rkey must be in map
-cmap_X_mapped*        cmap_X_at_mut(cmap_X* self, i_keyraw rkey);                               // mutable at
-const cmap_X_value*   cmap_X_get(const cmap_X* self, i_keyraw rkey);                            // const get
-cmap_X_value*         cmap_X_get_mut(cmap_X* self, i_keyraw rkey);                              // mutable get
+const cmap_X_mapped*  cmap_X_at(const cmap_X* self, i_keyraw rkey);                     // rkey must be in map
+cmap_X_mapped*        cmap_X_at_mut(cmap_X* self, i_keyraw rkey);                       // mutable at
+const cmap_X_value*   cmap_X_get(const cmap_X* self, i_keyraw rkey);                    // const get
+cmap_X_value*         cmap_X_get_mut(cmap_X* self, i_keyraw rkey);                      // mutable get
 bool                  cmap_X_contains(const cmap_X* self, i_keyraw rkey);
-cmap_X_iter           cmap_X_find(const cmap_X* self, i_keyraw rkey);                           // find element
+cmap_X_iter           cmap_X_find(const cmap_X* self, i_keyraw rkey);                   // find element
 
-cmap_X_result         cmap_X_insert(cmap_X* self, i_key key, i_val mapped);                     // no change if key in map
-cmap_X_result         cmap_X_insert_or_assign(cmap_X* self, i_key key, i_val mapped);           // always update mapped
-cmap_X_result         cmap_X_push(cmap_X* self, cmap_X_value entry);                            // similar to insert
+cmap_X_result         cmap_X_insert(cmap_X* self, i_key key, i_val mapped);             // no change if key in map
+cmap_X_result         cmap_X_insert_or_assign(cmap_X* self, i_key key, i_val mapped);   // always update mapped
+cmap_X_result         cmap_X_push(cmap_X* self, cmap_X_value entry);                    // similar to insert
 
-cmap_X_result         cmap_X_emplace(cmap_X* self, i_keyraw rkey, i_valraw rmapped);            // no change if rkey in map
+cmap_X_result         cmap_X_emplace(cmap_X* self, i_keyraw rkey, i_valraw rmapped);    // no change if rkey in map
 cmap_X_result         cmap_X_emplace_or_assign(cmap_X* self, i_keyraw rkey, i_valraw rmapped);  // always update rmapped
 
-size_t                cmap_X_erase(cmap_X* self, i_keyraw rkey);                                // return 0 or 1
-cmap_X_iter           cmap_X_erase_at(cmap_X* self, cmap_X_iter it);                            // return iter after it
+int                   cmap_X_erase(cmap_X* self, i_keyraw rkey);                        // return 0 or 1
+cmap_X_iter           cmap_X_erase_at(cmap_X* self, cmap_X_iter it);                    // return iter after it
 void                  cmap_X_erase_entry(cmap_X* self, cmap_X_value* entry);
 
 cmap_X_iter           cmap_X_begin(const cmap_X* self);
 cmap_X_iter           cmap_X_end(const cmap_X* self);
 void                  cmap_X_next(cmap_X_iter* it);
-cmap_X_iter           cmap_X_advance(cmap_X_iter it, size_t n);
+cmap_X_iter           cmap_X_advance(cmap_X_iter it, uint64_t n);
 
 cmap_X_value          cmap_X_value_clone(cmap_X_value val);
 cmap_X_raw            cmap_X_value_toraw(cmap_X_value* pval);
 ```
 Helpers:
 ```c
-uint64_t              c_default_hash(const X *obj);                            // macro, calls cfasthash(obj, sizeof *obj)
-uint64_t              cstrhash(const char *str);                               // string hash funcion, uses strlen()
-uint64_t              cfasthash(const void *data, size_t len);                 // base hash function
+uint64_t              c_default_hash(const X *obj);                         // macro, calls cfasthash(obj, sizeof *obj)
+uint64_t              cstrhash(const char *str);                            // string hash funcion, uses strlen()
+uint64_t              cfasthash(const void *data, intptr_t len);            // base hash function
 
 // equalto template parameter functions:
-bool                  c_default_eq(const i_keyraw* a, const i_keyraw* b);      // *a == *b
-bool                  c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);       // !memcmp(a, b, sizeof *a)
+bool                  c_default_eq(const i_keyraw* a, const i_keyraw* b);   // *a == *b
+bool                  c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !memcmp(a, b, sizeof *a)
 ```
 
 ## Types
@@ -353,7 +353,7 @@ typedef struct Viking {
 } Viking;
 
 static inline void Viking_drop(Viking* v) {
-    c_DROP(cstr, &v->name, &v->country);
+    c_drop(cstr, &v->name, &v->country);
 }
 
 // Define Viking raw struct with cmp, hash, and convertion functions between Viking and RViking structs:

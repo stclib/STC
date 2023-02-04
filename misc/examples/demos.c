@@ -13,7 +13,7 @@ void stringdemo1()
         cstr_erase(&cs, 7, 5); // -nine
         printf("%s.\n", cstr_str(&cs));
 
-        cstr_replace_ex(&cs, "seven", "four", 1);
+        cstr_replace(&cs, "seven", "four", 1);
         printf("%s.\n", cstr_str(&cs));
 
         cstr_take(&cs, cstr_from_fmt("%s *** %s", cstr_str(&cs), cstr_str(&cs)));
@@ -38,7 +38,7 @@ void vectordemo1()
     c_WITH (cvec_ix bignums = cvec_ix_with_capacity(100), cvec_ix_drop(&bignums))
     {
         cvec_ix_reserve(&bignums, 100);
-        for (size_t i = 10; i <= 100; i += 10)
+        for (int i = 10; i <= 100; i += 10)
             cvec_ix_push(&bignums, i * i);
 
         printf("erase - %d: %" PRIu64 "\n", 3, bignums.data[3]);
@@ -47,8 +47,8 @@ void vectordemo1()
         cvec_ix_pop(&bignums);           // erase the last
         cvec_ix_erase_n(&bignums, 0, 1); // erase the first
 
-        for (size_t i = 0; i < cvec_ix_size(&bignums); ++i) {
-            printf("%" c_ZU ": %" PRIu64 "\n", i, bignums.data[i]);
+        for (int i = 0; i < cvec_ix_size(&bignums); ++i) {
+            printf("%d: %" PRIu64 "\n", i, bignums.data[i]);
         }
     }
 }
@@ -175,11 +175,11 @@ void mapdemo3()
     cmap_str_iter it = cmap_str_find(&table, "Make");
     c_FOREACH (i, cmap_str, table)
         printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
-    printf("size %" c_ZU ": remove: Make: %s\n", cmap_str_size(&table), cstr_str(&it.ref->second));
+    printf("size %" c_ZI ": remove: Make: %s\n", cmap_str_size(&table), cstr_str(&it.ref->second));
     //cmap_str_erase(&table, "Make");
     cmap_str_erase_at(&table, it);
 
-    printf("size %" c_ZU "\n", cmap_str_size(&table));
+    printf("size %" c_ZI "\n", cmap_str_size(&table));
     c_FOREACH (i, cmap_str, table)
         printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
     cmap_str_drop(&table); // frees key and value cstrs, and hash table.

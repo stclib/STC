@@ -16,7 +16,7 @@ Song Song_make(const char* artist, const char* title)
 
 void Song_drop(Song* s) {
     printf("drop: %s\n", cstr_str(&s->title));
-    c_DROP(cstr, &s->artist, &s->title);
+    c_drop(cstr, &s->artist, &s->title);
 }
 
 // Define the reference counted type

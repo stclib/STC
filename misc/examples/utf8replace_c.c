@@ -16,11 +16,8 @@ int main() {
         c_FOREACH (c, cstr, hello)
             printf("%.*s,", c_ARGSV(c.u8.chr));
         
-        //csview sv = c_SV("If you find the time, you will find the winner");
-        //str = cstr_replace_sv(sv, c_SV("find"), c_SV("match"), 0);
-
-        str = cstr_lit("If you find the time, you will find the winner");
-        cstr_replace(&str, "find", "match");
+        str = cstr_lit("scooby, dooby doo");
+        cstr_replace(&str, "oo", "00");
         printf("\n%s\n", cstr_str(&str));
     }
 }

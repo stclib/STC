@@ -6,7 +6,7 @@ int  main()
 {
     // No memory allocations or string length calculations!
     const csview date = c_SV("2021/03/12");
-    size_t pos = 0;
+    intptr_t pos = 0;
     const csview year = csview_token(date, "/", &pos);
     const csview month = csview_token(date, "/", &pos);
     const csview day = csview_token(date, "/", &pos);

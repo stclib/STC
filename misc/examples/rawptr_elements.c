@@ -13,7 +13,7 @@ typedef int64_t inttype;
 #define i_valfrom(raw) c_NEW(inttype, raw)
 #define i_valto(x) **x
 #define i_valclone(x) c_NEW(inttype, *x)
-#define i_valdrop(x) c_FREE(*x)
+#define i_valdrop(x) c_free(*x)
 #include <stc/cmap.h>
 
 // With cbox:

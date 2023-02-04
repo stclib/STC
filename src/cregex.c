@@ -78,7 +78,7 @@ typedef struct _Reprog
 {
     _Reinst  *startinst;     /* start pc */
     _Reflags flags;
-    unsigned nsubids;
+    int nsubids;
     _Reclass cclass[_NCLASS]; /* .data */
     _Reinst  firstinst[];    /* .text : originally 5 elements? */
 } _Reprog;
@@ -214,7 +214,7 @@ utfrune(const char *s, _Rune c)
     if (c < 128)        /* ascii */
         return strchr((char *)s, (int)c);
     int n;
-    for (_Rune r = *s; r; s += n, r = *(unsigned char*)s) {
+    for (_Rune r = (uint32_t)*s; r; s += n, r = *(unsigned char*)s) {
         if (r < 128) { n = 1; continue; }
         n = chartorune(&r, s);
         if (r == c) return s;
@@ -225,10 +225,10 @@ utfrune(const char *s, _Rune c)
 static const char*
 utfruneicase(const char *s, _Rune c)
 {
-    _Rune r = *s;
+    _Rune r = (uint32_t)*s;
     int n;
-    if (c < 128) for (c = tolower(c); r; ++s, r = *(unsigned char*)s) {
-        if (r < 128 && (unsigned)tolower(r) == c) return s;
+    if (c < 128) for (c = (_Rune)tolower((int)c); r; ++s, r = *(unsigned char*)s) {
+        if (r < 128 && (_Rune)tolower((int)r) == c) return s;
     }
     else for (c = utf8_casefold(c); r; s += n, r = *(unsigned char*)s) {
         if (r < 128) { n = 1; continue; }
@@ -246,13 +246,13 @@ utfruneicase(const char *s, _Rune c)
  *  save a new match in mp
  */
 static void
-_renewmatch(_Resub *mp, unsigned ms, _Resublist *sp, unsigned nsubids)
+_renewmatch(_Resub *mp, int ms, _Resublist *sp, int nsubids)
 {
     if (mp==NULL || ms==0)
         return;
     if (mp[0].str == NULL || sp->m[0].str < mp[0].str ||
        (sp->m[0].str == mp[0].str && sp->m[0].size > mp[0].size)) {
-        for (unsigned i=0; i<ms && i<=nsubids; i++)
+        for (int i=0; i<ms && i<=nsubids; i++)
             mp[i] = sp->m[i];
     }
 }
@@ -265,7 +265,7 @@ _renewmatch(_Resub *mp, unsigned ms, _Resublist *sp, unsigned nsubids)
 static _Relist*
 _renewthread(_Relist *lp,  /* _relist to add to */
     _Reinst *ip,           /* instruction to add */
-    unsigned ms,
+    int ms,
     _Resublist *sep)       /* pointers to subexpressions */
 {
     _Relist *p;
@@ -297,7 +297,7 @@ _renewthread(_Relist *lp,  /* _relist to add to */
 static _Relist*
 _renewemptythread(_Relist *lp,   /* _relist to add to */
     _Reinst *ip,                 /* instruction to add */
-    unsigned ms,
+    int ms,
     const char *sp)             /* pointers to subexpressions */
 {
     _Relist *p;
@@ -549,7 +549,7 @@ _optimize(_Parser *par, _Reprog *pp)
      */
     intptr_t ipp = (intptr_t)pp;
     size_t size = sizeof(_Reprog) + (size_t)(par->freep - pp->firstinst)*sizeof(_Reinst);
-    _Reprog *npp = (_Reprog *)c_REALLOC(pp, size);
+    _Reprog *npp = (_Reprog *)c_realloc(pp, size);
     ptrdiff_t diff = (intptr_t)npp - ipp;
 
     if ((npp == NULL) | (diff == 0))
@@ -661,7 +661,7 @@ _lexutfclass(_Parser *par, _Rune *rp)
         {"{Devanagari}", 10, UTF_devanagari}, {"{Greek}", 7, UTF_greek},
         {"{Han}", 5, UTF_han}, {"{Latin}", 7, UTF_latin},
     };
-    int inv = (*rp == 'P');
+    unsigned inv = (*rp == 'P');
     for (unsigned i = 0; i < (sizeof cls/sizeof *cls); ++i) {
         if (!strncmp(par->exprp, cls[i].c, (size_t)cls[i].n)) {
             if (par->rune_type == TOK_IRUNE && (cls[i].r == UTF_ll || cls[i].r == UTF_lu))
@@ -844,10 +844,10 @@ _regcomp1(_Reprog *progp, _Parser *par, const char *s, int cflags)
 
     /* get memory for the program. estimated max usage */
     const size_t instcap = 5 + 6*strlen(s);
-    _Reprog* pp = (_Reprog *)c_REALLOC(progp, sizeof(_Reprog) + instcap*sizeof(_Reinst));
+    _Reprog* pp = (_Reprog *)c_realloc(progp, sizeof(_Reprog) + instcap*sizeof(_Reinst));
     if (pp == NULL) {
         par->error = CREG_OUTOFMEMORY;
-        c_FREE(progp);
+        c_free(progp);
         return NULL;
     }
     pp->flags.icase = (cflags & CREG_C_ICASE) != 0;
@@ -895,10 +895,10 @@ _regcomp1(_Reprog *progp, _Parser *par, const char *s, int cflags)
     pp->startinst = par->andp->first;
 
     pp = _optimize(par, pp);
-    pp->nsubids = (unsigned)par->cursubid;
+    pp->nsubids = par->cursubid;
 out:
     if (par->error) {
-        c_FREE(pp);
+        c_free(pp);
         pp = NULL;
     }
     return pp;
@@ -908,23 +908,22 @@ out:
 static int
 _runematch(_Rune s, _Rune r)
 {
-    int inv = 0;
-    uint32_t n;
+    int inv = 0, n;
     switch (s) {
-    case ASC_D: inv = 1; case ASC_d: return inv ^ (isdigit(r) != 0);
-    case ASC_S: inv = 1; case ASC_s: return inv ^ (isspace(r) != 0);
-    case ASC_W: inv = 1; case ASC_w: return inv ^ ((isalnum(r) != 0) | (r == '_'));
-    case ASC_AL: inv = 1; case ASC_al: return inv ^ (isalpha(r) != 0);
-    case ASC_AN: inv = 1; case ASC_an: return inv ^ (isalnum(r) != 0);
+    case ASC_D: inv = 1; case ASC_d: return inv ^ (isdigit((int)r) != 0);
+    case ASC_S: inv = 1; case ASC_s: return inv ^ (isspace((int)r) != 0);
+    case ASC_W: inv = 1; case ASC_w: return inv ^ ((isalnum((int)r) != 0) | (r == '_'));
+    case ASC_AL: inv = 1; case ASC_al: return inv ^ (isalpha((int)r) != 0);
+    case ASC_AN: inv = 1; case ASC_an: return inv ^ (isalnum((int)r) != 0);
     case ASC_AS: return (r >= 128); case ASC_as: return (r < 128);
     case ASC_BL: inv = 1; case ASC_bl: return inv ^ ((r == ' ') | (r == '\t'));
-    case ASC_CT: inv = 1; case ASC_ct: return inv ^ (iscntrl(r) != 0);
-    case ASC_GR: inv = 1; case ASC_gr: return inv ^ (isgraph(r) != 0);
-    case ASC_PR: inv = 1; case ASC_pr: return inv ^ (isprint(r) != 0);
-    case ASC_PU: inv = 1; case ASC_pu: return inv ^ (ispunct(r) != 0);
-    case ASC_LO: inv = 1; case ASC_lo: return inv ^ (islower(r) != 0);
-    case ASC_UP: inv = 1; case ASC_up: return inv ^ (isupper(r) != 0);
-    case ASC_XD: inv = 1; case ASC_xd: return inv ^ (isxdigit(r) != 0);
+    case ASC_CT: inv = 1; case ASC_ct: return inv ^ (iscntrl((int)r) != 0);
+    case ASC_GR: inv = 1; case ASC_gr: return inv ^ (isgraph((int)r) != 0);
+    case ASC_PR: inv = 1; case ASC_pr: return inv ^ (isprint((int)r) != 0);
+    case ASC_PU: inv = 1; case ASC_pu: return inv ^ (ispunct((int)r) != 0);
+    case ASC_LO: inv = 1; case ASC_lo: return inv ^ (islower((int)r) != 0);
+    case ASC_UP: inv = 1; case ASC_up: return inv ^ (isupper((int)r) != 0);
+    case ASC_XD: inv = 1; case ASC_xd: return inv ^ (isxdigit((int)r) != 0);
     case UTF_AN: inv = 1; case UTF_an: return inv ^ utf8_isalnum(r);
     case UTF_BL: inv = 1; case UTF_bl: return inv ^ utf8_isblank(r);
     case UTF_SP: inv = 1; case UTF_sp: return inv ^ utf8_isspace(r);
@@ -951,7 +950,7 @@ _runematch(_Rune s, _Rune r)
     case UTF_greek: case UTF_GREEK:
     case UTF_han: case UTF_HAN:
     case UTF_latin: case UTF_LATIN:
-        n = s - UTF_GRP;
+        n = (int)s - UTF_GRP;
         inv = n & 1;
         return inv ^ utf8_isgroup(n / 2, r);
     }
@@ -967,7 +966,7 @@ static int
 _regexec1(const _Reprog *progp,  /* program to run */
     const char *bol,    /* string to run machine on */
     _Resub *mp,         /* subexpression elements */
-    unsigned ms,        /* number of elements at mp */
+    int ms,        /* number of elements at mp */
     _Reljunk *j,
     int mflags
 )
@@ -980,7 +979,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
     const char *s, *p;
     _Rune r, *rp, *ep;
     int n, checkstart, match = 0;
-    unsigned i;
+    int i;
 
     bool icase = progp->flags.icase;
     checkstart = j->starttype;
@@ -1050,7 +1049,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
                     tlp->se.m[inst->r.subid].str = s;
                     continue;
                 case TOK_RBRA:
-                    tlp->se.m[inst->r.subid].size = (size_t)(s - tlp->se.m[inst->r.subid].str);
+                    tlp->se.m[inst->r.subid].size = (s - tlp->se.m[inst->r.subid].str);
                     continue;
                 case TOK_ANY:
                     ok = (r != '\n');
@@ -1100,7 +1099,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
                     match = !(mflags & CREG_M_FULLMATCH) ||
                             ((s == j->eol || r == 0 || r == '\n') &&
                             (tlp->se.m[0].str == bol || tlp->se.m[0].str[-1] == '\n'));
-                    tlp->se.m[0].size = (size_t)(s - tlp->se.m[0].str);
+                    tlp->se.m[0].size = (s - tlp->se.m[0].str);
                     if (mp != NULL)
                         _renewmatch(mp, ms, &tlp->se, progp->nsubids);
                     break;
@@ -1124,7 +1123,7 @@ static int
 _regexec2(const _Reprog *progp,    /* program to run */
     const char *bol,    /* string to run machine on */
     _Resub *mp,         /* subexpression elements */
-    unsigned ms,        /* number of elements at mp */
+    int ms,             /* number of elements at mp */
     _Reljunk *j,
     int mflags
 )
@@ -1133,7 +1132,7 @@ _regexec2(const _Reprog *progp,    /* program to run */
     _Relist *relists;
 
     /* mark space */
-    relists = (_Relist *)c_MALLOC(2 * _BIGLISTSIZE*sizeof(_Relist));
+    relists = (_Relist *)c_malloc(2 * _BIGLISTSIZE*sizeof(_Relist));
     if (relists == NULL)
         return -1;
 
@@ -1143,14 +1142,14 @@ _regexec2(const _Reprog *progp,    /* program to run */
     j->reliste[1] = relists + 2*_BIGLISTSIZE - 2;
 
     rv = _regexec1(progp, bol, mp, ms, j, mflags);
-    c_FREE(relists);
+    c_free(relists);
     return rv;
 }
 
 static int
 _regexec(const _Reprog *progp,    /* program to run */
     const char *bol,    /* string to run machine on */
-    unsigned ms,        /* number of elements at mp */
+    int ms,             /* number of elements at mp */
     _Resub mp[],        /* subexpression elements */
     int mflags)
 {
@@ -1196,10 +1195,10 @@ _regexec(const _Reprog *progp,    /* program to run */
 
 
 static void
-_build_subst(const char* replace, unsigned nmatch, const csview match[],
+_build_subst(const char* replace, int nmatch, const csview match[],
              bool (*mfun)(int, csview, cstr*), cstr* subst) {
     cstr_buf buf = cstr_buffer(subst);
-    size_t len = 0, cap = buf.cap;
+    intptr_t len = 0, cap = buf.cap;
     char* dst = buf.data;
     cstr mstr = cstr_NULL;
 
@@ -1217,7 +1216,7 @@ _build_subst(const char* replace, unsigned nmatch, const csview match[],
                     csview m = mfun && mfun(g, match[g], &mstr) ? cstr_sv(&mstr) : match[g];
                     if (len + m.size > cap)
                         dst = cstr_reserve(subst, cap = cap*3/2 + m.size);
-                    for (unsigned i = 0; i < m.size; ++i)
+                    for (int i = 0; i < (int)m.size; ++i)
                         dst[len++] = m.str[i];
                 }
                 ++replace;
@@ -1239,20 +1238,19 @@ _build_subst(const char* replace, unsigned nmatch, const csview match[],
  */
 
 int 
-cregex_compile(cregex *self, const char* pattern, int cflags) {
+cregex_compile_3(cregex *self, const char* pattern, int cflags) {
     _Parser par;
     self->prog = _regcomp1(self->prog, &par, pattern, cflags);
     return self->error = par.error;
 }
 
-unsigned
+int
 cregex_captures(const cregex* self) {
-    return self->prog ? 1U + self->prog->nsubids : 0U;
+    return self->prog ? 1 + self->prog->nsubids : 0;
 }
 
 int
-cregex_find(const cregex* re, const char* input,
-            csview match[], int mflags) {
+cregex_find_4(const cregex* re, const char* input, csview match[], int mflags) {
     int res = _regexec(re->prog, input, cregex_captures(re), match, mflags);
     switch (res) {
     case 1: return CREG_OK;
@@ -1262,8 +1260,8 @@ cregex_find(const cregex* re, const char* input,
 }
 
 int
-cregex_find_pattern(const char* pattern, const char* input,
-                    csview match[], int cmflags) {
+cregex_find_pattern_4(const char* pattern, const char* input,
+                      csview match[], int cmflags) {
     cregex re = cregex_init();
     int res = cregex_compile(&re, pattern, cmflags);
     if (res != CREG_OK) return res;
@@ -1273,18 +1271,18 @@ cregex_find_pattern(const char* pattern, const char* input,
 }
 
 cstr
-cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned count,
-                  bool (*mfun)(int, csview, cstr*), int rflags) {
+cregex_replace_sv_6(const cregex* re, csview input, const char* replace, int count,
+                    bool (*mfun)(int, csview, cstr*), int rflags) {
     cstr out = cstr_NULL;
     cstr subst = cstr_NULL;
     csview match[CREG_MAX_CAPTURES];
-    unsigned nmatch = cregex_captures(re);
-    if (!count) count = ~0U;
+    int nmatch = cregex_captures(re);
+    if (!count) count = INT32_MAX;
     bool copy = !(rflags & CREG_R_STRIP);
 
     while (count-- && cregex_find_sv(re, input, match) == CREG_OK) {
         _build_subst(replace, nmatch, match, mfun, &subst);
-        const size_t mpos = (size_t)(match[0].str - input.str);
+        const intptr_t mpos = (match[0].str - input.str);
         if (copy & (mpos > 0)) cstr_append_n(&out, input.str, mpos);
         cstr_append_s(&out, subst);
         input.str = match[0].str + match[0].size;
@@ -1296,12 +1294,12 @@ cregex_replace_sv(const cregex* re, csview input, const char* replace, unsigned 
 }
 
 cstr
-cregex_replace_pattern_ex(const char* pattern, const char* input, const char* replace, unsigned count,
-                          bool (*mfun)(int, csview, cstr*), int crflags) {
+cregex_replace_pattern_6(const char* pattern, const char* input, const char* replace, int count,
+                         bool (*mfun)(int, csview, cstr*), int crflags) {
     cregex re = cregex_init();
     if (cregex_compile(&re, pattern, crflags) != CREG_OK)
         assert(0);
-    csview sv = {input, strlen(input)};
+    csview sv = {input, c_strlen(input)};
     cstr out = cregex_replace_sv(&re, sv, replace, count, mfun, crflags);
     cregex_drop(&re);
     return out;
@@ -1309,6 +1307,6 @@ cregex_replace_pattern_ex(const char* pattern, const char* input, const char* re
 
 void
 cregex_drop(cregex* self) {
-    c_FREE(self->prog);
+    c_free(self->prog);
 }
 #endif

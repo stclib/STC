@@ -15,7 +15,7 @@ int main() {
     c_AUTO (cstack_c, chars)
     {
         c_FORRANGE (i, 101)
-            cstack_i_push(&stack, i*i);
+            cstack_i_push(&stack, (int)(i*i));
 
         printf("%d\n", *cstack_i_top(&stack));
 

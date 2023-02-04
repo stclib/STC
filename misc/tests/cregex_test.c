@@ -1,260 +1,282 @@
-#if 0
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <stc/csview.h>
-#include <stc/stctest.h>
+#define i_extern
 #include <stc/cregex.h>
+#include <stc/csview.h>
+#include "ctest.h"
 
-#define START_TEST(f) void f(void)
-#define END_TEST
+#define M_START(m) ((m).str - inp)
+#define M_END(m) (M_START(m) + (m).size)
 
-#define M_START(re, m) ((m).str - (re).input)
-#define M_END(re, m) (M_START(re, m) + (m).size)
 
-START_TEST(compile_match_char)
+CTEST(cregex, compile_match_char)
 {
-    cregex re = cregex_from("äsdf", 0);
-    EXPECT_EQ(re.error, 0);
+    const char* inp;
+    cregex re = cregex_from("äsdf");
+    ASSERT_EQ(re.error, 0);
 
     csview match;
-    EXPECT_TRUE(cregex_find("äsdf", &re, &match, 0));
-    EXPECT_EQ(M_START(re, match), 0);
-    EXPECT_EQ(M_END(re, match), 5); // ä is two bytes wide
+    ASSERT_EQ(cregex_find(&re, inp="äsdf", &match, CREG_M_FULLMATCH), CREG_OK);
+    ASSERT_EQ(M_START(match), 0);
+    ASSERT_EQ(M_END(match), 5); // ä is two bytes wide
 
-    EXPECT_EQ(cregex_find("zäsdf", &re, &match, 0), 1);
-    EXPECT_EQ(M_START(re, match), 1);
-    EXPECT_EQ(M_END(re, match), 6);
+    ASSERT_EQ(cregex_find(&re, inp="zäsdf", &match), CREG_OK);
+    ASSERT_EQ(M_START(match), 1);
+    ASSERT_EQ(M_END(match), 6);
 
     cregex_drop(&re);
 }
-END_TEST
 
-START_TEST(compile_match_anchors)
+CTEST(cregex, compile_match_anchors)
 {
-    cregex re = cregex_from("^äs.f$", 0);
-    EXPECT_EQ(re.error, 0);
+    const char* inp;
+    cregex re = cregex_from(inp="^äs.f$");
+    ASSERT_EQ(re.error, 0);
 
     csview match;
-    EXPECT_TRUE(cregex_find("äsdf", &re, &match, 0));
-    EXPECT_EQ(M_START(re, match), 0);
-    EXPECT_EQ(M_END(re, match), 5);
+    ASSERT_EQ(cregex_find(&re, inp="äsdf", &match), CREG_OK);
+    ASSERT_EQ(M_START(match), 0);
+    ASSERT_EQ(M_END(match), 5);
 
-    EXPECT_TRUE(cregex_is_match("äs♥f", &re));
-    EXPECT_TRUE(cregex_is_match("äsöf", &re));
-
-    cregex_drop(re);
-}
-END_TEST
-
-START_TEST(compile_match_quantifiers)
-{
-    c_AUTO (cregex, re) {
-        re = cregex_from("ä+", 0);
-        EXPECT_EQ(re.error, 0);
-
-        csview match;
-        EXPECT_EQ(cregex_find("ääb", &re, &match, 0), 1);
-        EXPECT_EQ(M_START(re, match), 0);
-        EXPECT_EQ(M_END(re, match), 4);
-
-        EXPECT_EQ(cregex_find("bäbb", &re, &match, 0), 1);
-        EXPECT_EQ(M_START(re, match), 1);
-        EXPECT_EQ(M_END(re, match), 3);
-
-        EXPECT_FALSE(cregex_find("bbb", &re, &match, 0));
-    }
-    c_AUTO (cregex, re) {
-        re = cregex_from("bä*", 0);
-        EXPECT_EQ(re.error, 0);
-
-        csview match;
-        EXPECT_EQ(cregex_find("bääb", &re, &match, 0), 1);
-        EXPECT_EQ(M_START(re, match), 0);
-        EXPECT_EQ(M_END(re, match), 5);
-
-        EXPECT_EQ(cregex_find("bäbb", &re, &match, 0), 1);
-        EXPECT_EQ(M_START(re, match), 0);
-        EXPECT_EQ(M_END(re, match), 3);
-
-        EXPECT_EQ(cregex_find("bbb", &re, &match, 0), 1);
-        EXPECT_EQ(M_START(re, match), 0);
-        EXPECT_EQ(M_END(re, match), 1);
-    }
-}
-END_TEST
-
-START_TEST(compile_match_escaped_chars)
-{
-    cregex re = cregex_from("\\n\\r\\t\\{", 0);
-    EXPECT_EQ(re.error, 0);
-
-    csview match;
-    EXPECT_EQ(cregex_find("\n\r\t{", &re, &match, 0), 1);
-    EXPECT_EQ(cregex_find("\n\r\t", &re, &match, 0), 0);
+    ASSERT_TRUE(cregex_is_match(&re, "äs♥f"));
+    ASSERT_TRUE(cregex_is_match(&re, "äsöf"));
 
     cregex_drop(&re);
 }
-END_TEST
 
-START_TEST(compile_match_class_simple)
+CTEST(cregex, compile_match_quantifiers1)
+{
+    const char* inp;
+    c_AUTO (cregex, re) {
+        re = cregex_from("ä+");
+        ASSERT_EQ(re.error, 0);
+
+        csview match;
+        ASSERT_EQ(cregex_find(&re, inp="ääb", &match), CREG_OK);
+        ASSERT_EQ(M_START(match), 0);
+        ASSERT_EQ(M_END(match), 4);
+
+        ASSERT_EQ(cregex_find(&re, inp="bäbb", &match), CREG_OK);
+        ASSERT_EQ(M_START(match), 1);
+        ASSERT_EQ(M_END(match), 3);
+
+        ASSERT_EQ(cregex_find(&re, "bbb", &match), CREG_NOMATCH);
+    }
+}
+
+CTEST(cregex, compile_match_quantifiers2)
+{   
+    const char* inp; 
+    c_AUTO (cregex, re) {
+        re = cregex_from("bä*");
+        ASSERT_EQ(re.error, 0);
+
+        csview match;
+        ASSERT_EQ(cregex_find(&re, inp="bääb", &match), CREG_OK);
+        ASSERT_EQ(M_START(match), 0);
+        ASSERT_EQ(M_END(match), 5);
+
+        ASSERT_EQ(cregex_find(&re, inp="bäbb", &match), CREG_OK);
+        ASSERT_EQ(M_START(match), 0);
+        ASSERT_EQ(M_END(match), 3);
+
+        ASSERT_EQ(cregex_find(&re, inp="bbb", &match), CREG_OK);
+        ASSERT_EQ(M_START(match), 0);
+        ASSERT_EQ(M_END(match), 1);
+    }
+}
+
+CTEST(cregex, compile_match_escaped_chars)
+{
+    cregex re = cregex_from("\\n\\r\\t\\{");
+    ASSERT_EQ(re.error, 0);
+
+    csview match;
+    ASSERT_EQ(cregex_find(&re, "\n\r\t{", &match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "\n\r\t", &match), CREG_NOMATCH);
+
+    cregex_drop(&re);
+}
+
+CTEST(cregex, compile_match_class_simple)
 {
     c_AUTO (cregex, re1, re2, re3)
     {
-        re1 = cregex_from("\\s", 0);
-        EXPECT_EQ(re1.error, 0);
-        re2 = cregex_from("\\w", 0);
-        EXPECT_EQ(re2.error, 0);
-        re3 = cregex_from("\\D", 0);
-        EXPECT_EQ(re3.error, 0);
+        re1 = cregex_from("\\s");
+        ASSERT_EQ(re1.error, 0);
+        re2 = cregex_from("\\w");
+        ASSERT_EQ(re2.error, 0);
+        re3 = cregex_from("\\D");
+        ASSERT_EQ(re3.error, 0);
 
         csview match;
-        EXPECT_EQ(cregex_find(" ", &re1, &match, 0), 1);
-        EXPECT_EQ(cregex_find("\r", &re1, &match, 0), 1);
-        EXPECT_EQ(cregex_find("\n", &re1, &match, 0), 1);
+        ASSERT_EQ(cregex_find(&re1, " " , &match), CREG_OK);
+        ASSERT_EQ(cregex_find(&re1, "\r", &match), CREG_OK);
+        ASSERT_EQ(cregex_find(&re1, "\n", &match), CREG_OK);
 
-        EXPECT_EQ(cregex_find("a", &re2, &match, 0), 1);
-        EXPECT_EQ(cregex_find("0", &re2, &match, 0), 1);
-        EXPECT_EQ(cregex_find("_", &re2, &match, 0), 1);
+        ASSERT_EQ(cregex_find(&re2, "a", &match), CREG_OK);
+        ASSERT_EQ(cregex_find(&re2, "0", &match), CREG_OK);
+        ASSERT_EQ(cregex_find(&re2, "_", &match), CREG_OK);
 
-        EXPECT_EQ( cregex_find("k", &re3, &match, 0), 1);
-        EXPECT_EQ(cregex_find("0", &re3, &match, 0), 0);
+        ASSERT_EQ(cregex_find(&re3, "k", &match), CREG_OK);
+        ASSERT_EQ(cregex_find(&re3, "0", &match), CREG_NOMATCH);
     }
 }
-END_TEST
 
-START_TEST(compile_match_or)
+CTEST(cregex, compile_match_or)
 {
     c_AUTO (cregex, re, re2)
     {
-        re = cregex_from("as|df", 0);
-        EXPECT_EQ(re.error, 0);
+        re = cregex_from("as|df");
+        ASSERT_EQ(re.error, 0);
 
-        csview match;
-        EXPECT_EQ(cregex_find("as", &re, &match, 0), 1);
-        EXPECT_EQ(cregex_find("df", &re, &match, 0), 1);
+        csview match[4];
+        ASSERT_EQ(cregex_find(&re, "as", match), CREG_OK);
+        ASSERT_EQ(cregex_find(&re, "df", match), CREG_OK);
 
-        re2 = cregex_from("(as|df)", 0);
-        EXPECT_EQ(re2.error, 0);
+        re2 = cregex_from("(as|df)");
+        ASSERT_EQ(re2.error, 0);
 
-        EXPECT_EQ(cregex_find(&re2, "as", &re, &match, 0), 1);
-        EXPECT_EQ(cregex_find(&re2, "df", &re, &match, 0), 1);
+        ASSERT_EQ(cregex_find(&re2, "as", match), CREG_OK);
+        ASSERT_EQ(cregex_find(&re2, "df", match), CREG_OK);
     }
 }
-END_TEST
 
-START_TEST(compile_match_class_complex_0)
+CTEST(cregex, compile_match_class_complex_0)
 {
-    cregex re = cregex_from("[asdf]", 0);
-    EXPECT_EQ(re.error, 0);
+    cregex re = cregex_from("[asdf]");
+    ASSERT_EQ(re.error, 0);
 
     csview match;
-    EXPECT_EQ(cregex_find("a", &re, &match, 0), 1);
-    EXPECT_EQ(cregex_find("s", &re, &match, 0), 1);
-    EXPECT_EQ(cregex_find("d", &re, &match, 0), 1);
-    EXPECT_EQ(cregex_find("f", &re, &match, 0), 1);
+    ASSERT_EQ(cregex_find(&re, "a", &match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "s", &match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "d", &match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "f", &match), CREG_OK);
 
     cregex_drop(&re);
 }
-END_TEST
 
-START_TEST(compile_match_class_complex_1)
+CTEST(cregex, compile_match_class_complex_1)
 {
-    cregex re = cregex_from("[a-zä0-9öA-Z]", 0);
-    EXPECT_EQ(re.error, 0);
+    cregex re = cregex_from("[a-zä0-9öA-Z]");
+    ASSERT_EQ(re.error, 0);
 
     csview match;
-    EXPECT_EQ(cregex_find("a", &re, &match, 0), 1);
-    EXPECT_EQ(cregex_find("5", &re, &match, 0), 1);
-    EXPECT_EQ(cregex_find("A", &re, &match, 0), 1);
-    EXPECT_EQ(cregex_find("ä", &re, &match, 0), 1);
-    EXPECT_EQ(cregex_find("ö", &re, &match, 0), 1);
+    ASSERT_EQ(cregex_find(&re, "a", &match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "5", &match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "A", &match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "ä", &match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "ö", &match), CREG_OK);
 
     cregex_drop(&re);
 }
-END_TEST
 
-START_TEST(compile_match_cap)
+CTEST(cregex, compile_match_cap)
 {
-    cregex re = cregex_from("(abc)d", 0);
-    EXPECT_EQ(re.error, 0);
+    cregex re = cregex_from("(abc)d");
+    ASSERT_EQ(re.error, 0);
 
-    csview match;
-    EXPECT_EQ(cregex_find("abcd", &re, &match, 0)), 1;
-    EXPECT_EQ(cregex_find("llljabcdkk", &re, &match, 0), 1);
-    EXPECT_EQ(cregex_find("abc", &re, &match, 0), 0);
+    csview match[4];
+    ASSERT_EQ(cregex_find(&re, "abcd", match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "llljabcdkk", match), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, "abc", match), CREG_NOMATCH);
 
     cregex_drop(&re);
 }
-END_TEST
 
-START_TEST(search_all)
+CTEST(cregex, search_all)
 {
+    const char* inp;
     c_AUTO (cregex, re)
     {
-        re = cregex_from("ab", 0);
+        re = cregex_from("ab");
         csview m = {0};
         int res;
-        
-        res = cregex_find("ab,ab,ab", &m, CREG_M_NEXT);
-        EXPECT_TRUE(res==1 && M_START(re, m) == 0);
-        res = cregex_find("ab,ab,ab", &m, CREG_M_NEXT);
-        EXPECT_TRUE(res==1 && M_START(re, m) == 3);
-        res = cregex_find("ab,ab,ab", &m, CREG_M_NEXT);
-        EXPECT_TRUE(res==1 && M_START(re, m) == 6);
-        res = cregex_find("ab,ab,ab", &m, CREG_M_NEXT);
-        EXPECT_NE(res, 1);
+        ASSERT_EQ(re.error, CREG_OK);
+        inp="ab,ab,ab";
+        res = cregex_find(&re, inp, &m, CREG_M_NEXT);
+        ASSERT_EQ(M_START(m), 0);
+        res = cregex_find(&re, inp, &m, CREG_M_NEXT);
+        ASSERT_EQ(res, CREG_OK);
+        ASSERT_EQ(M_START(m), 3);
+        res = cregex_find(&re, inp, &m, CREG_M_NEXT);
+        ASSERT_EQ(M_START(m), 6);
+        res = cregex_find(&re, inp, &m, CREG_M_NEXT);
+        ASSERT_NE(res, CREG_OK);
     }
 }
-END_TEST
 
-START_TEST(captures_len)
+CTEST(cregex, captures_len)
 {
     c_AUTO (cregex, re) {
-       cregex re = cregex_from("(ab(cd))(ef)", 0);
-       EXPECT_EQ(cregex_captures(&re), 3);
+       cregex re = cregex_from("(ab(cd))(ef)");
+       ASSERT_EQ(cregex_captures(&re), 4);
     }
 }
-END_TEST
 
-START_TEST(captures_cap)
+CTEST(cregex, captures_cap)
 {
+    const char* inp;
     c_AUTO (cregex, re) {
-        re = cregex_from("(ab)((cd)+)", 0);
-        EXPECT_EQ(cregex_captures(&re), 3);
+        re = cregex_from("(ab)((cd)+)");
+        ASSERT_EQ(cregex_captures(&re), 4);
 
         csview cap[5];
-        EXPECT_EQ(cregex_find("xxabcdcde", &re, cap, 0), 1);
-        EXPECT_TRUE(csview_equals(cap.match[0], c_SV("abcdcd")));
-        /*
-        EXPECT_EQ(cap0.end, 8);
-        EXPECT_EQ(cap1.start, 2);
-        EXPECT_EQ(cap1.end, 4);
-        EXPECT_EQ(cap2.start, 4);
-        EXPECT_EQ(cap2.end, 8);
-        */
-        EXPECT_FALSE(cregex_is_match("abcdcde", &re));
-        EXPECT_TRUE(cregex_is_match("abcdcdcd", &re));
+        ASSERT_EQ(cregex_find(&re, inp="xxabcdcde", cap), CREG_OK);
+        ASSERT_TRUE(csview_equals(cap[0], "abcdcd"));
+
+        ASSERT_EQ(M_END(cap[0]), 8);
+        ASSERT_EQ(M_START(cap[1]), 2);
+        ASSERT_EQ(M_END(cap[1]), 4);
+        ASSERT_EQ(M_START(cap[2]), 4);
+        ASSERT_EQ(M_END(cap[2]), 8);
+    
+        ASSERT_TRUE(cregex_is_match(&re, "abcdcde"));
+        ASSERT_TRUE(cregex_is_match(&re, "abcdcdcd"));
     }
 }
-END_TEST
 
-
-int main()
-{
-    RUN_TEST(compile_match_char);
-    RUN_TEST(compile_match_anchors);
-    RUN_TEST(compile_match_quantifiers);
-    RUN_TEST(compile_match_escaped_chars);
-    RUN_TEST(compile_match_class_simple);
-    RUN_TEST(compile_match_class_complex_0);
-    RUN_TEST(compile_match_class_complex_1);
-    RUN_TEST(compile_match_cap);
-    RUN_TEST(search_all);
-    RUN_TEST(captures_len);
-    RUN_TEST(captures_cap);
-    RUN_TEST(compile_match_or);    
-    return REPORT_TESTS();
+static bool add_10_years(int i, csview match, cstr* out) {
+    if (i == 1) { // group 1 matches year
+        int year;
+        sscanf(match.str, "%4d", &year); // scan 4 chars only
+        cstr_printf(out, "%04d", year + 10);
+        return true;
+    }
+    return false;
 }
-#endif
 
+CTEST(cregex, replace)
+{
+    const char* pattern = "\\b(\\d\\d\\d\\d)-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])\\b";
+    const char* input = "start date: 2015-12-31, end date: 2022-02-28";
+
+    c_AUTO (cstr, str) {
+        /* replace with a fixed string, extended all-in-one call: */
+        cstr_take(&str, cregex_replace_pattern(pattern, input, "YYYY-MM-DD"));
+        ASSERT_TRUE(cstr_equals(&str, "start date: YYYY-MM-DD, end date: YYYY-MM-DD"));
+
+        /* US date format, and add 10 years to dates: */
+        cstr_take(&str, cregex_replace_pattern(pattern, input, "$1/$3/$2", 0, add_10_years, CREG_DEFAULT));
+        ASSERT_TRUE(cstr_equals(&str, "start date: 2025/31/12, end date: 2032/28/02"));
+
+        /* Wrap first date inside []: */
+        cstr_take(&str, cregex_replace_pattern(pattern, input, "[$0]", 1));
+        ASSERT_TRUE(cstr_equals(&str, "start date: [2015-12-31], end date: 2022-02-28"));
+
+        /* Wrap all words in ${} */
+        cstr_take(&str, cregex_replace_pattern("[a-z]+", "52 apples and 31 mangoes", "$${$0}"));
+        ASSERT_TRUE(cstr_equals(&str, "52 ${apples} ${and} 31 ${mangoes}"));
+
+        /* Compile RE separately */
+        c_WITH (cregex re = cregex_from(pattern), cregex_drop(&re)) {
+            ASSERT_EQ(cregex_captures(&re), 4);
+
+            /* European date format. */
+            cstr_take(&str, cregex_replace(&re, input, "$3.$2.$1"));
+            ASSERT_TRUE(cstr_equals(&str, "start date: 31.12.2015, end date: 28.02.2022"));
+
+            /* Strip out everything but the matches */
+            cstr_take(&str, cregex_replace_sv(&re, csview_from(input), "$3.$2.$1;", 0, NULL, CREG_R_STRIP));
+            ASSERT_TRUE(cstr_equals(&str, "31.12.2015;28.02.2022;"));
+        }
+    }
+}

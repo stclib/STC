@@ -1,5 +1,5 @@
 #!/bin/bash
-cc='g++ -I../../include -s -O3 -Wall -pedantic -x c++ -std=c++20'
+cc='g++ -I../../include -s -O3 -Wall -pedantic -x c++ -std=c++2a'
 #cc='clang++ -I../include -s -O3 -Wall -pedantic -x c++ -std=c++20'
 #cc='cl -nologo -I../include -O2 -TP -EHsc -std:c++20'
 run=0

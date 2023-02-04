@@ -15,17 +15,17 @@ int main() {
     {
         // Push ten million random numbers onto the queue.
         c_FORRANGE (n)
-            cqueue_i_push(&queue, stc64_uniform(&rng, &dist));
+            cqueue_i_push(&queue, (int)stc64_uniform(&rng, &dist));
 
         // Push or pop on the queue ten million times
         printf("%d\n", n);
         c_FORRANGE (n) { // forrange uses initial n only.
-            int r = stc64_uniform(&rng, &dist);
+            int r = (int)stc64_uniform(&rng, &dist);
             if (r & 1)
                 ++n, cqueue_i_push(&queue, r);
             else
                 --n, cqueue_i_pop(&queue);
         }
-        printf("%d, %" c_ZU "\n", n, cqueue_i_size(&queue));
+        printf("%d, %" c_ZI "\n", n, cqueue_i_size(&queue));
     }
 }

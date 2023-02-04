@@ -44,11 +44,8 @@
   #define _i_prefix
 #endif
 
-#ifdef i_size
-  #define _i_expandby 2
-#else
-  #define i_size uint32_t
-  #define _i_expandby 1
+#ifndef i_size
+  #define i_size intptr_t
 #endif
 
 #if !(defined i_key || defined i_key_str || defined i_key_ssv || \

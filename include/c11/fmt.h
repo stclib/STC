@@ -59,6 +59,7 @@ int main() {
 }
 */
 #include <stdio.h>
+#include <stdint.h>
 #include <assert.h>
 
 #define fmt_OVERLOAD(name, ...) \
@@ -86,7 +87,7 @@ int main() {
 
 typedef struct {
     char* data;
-    size_t cap, len;
+    intptr_t cap, len;
     _Bool stream;
 } fmt_buffer;
 
@@ -202,11 +203,11 @@ FMT_API void _fmt_bprint(fmt_buffer* buf, const char* fmt, ...) {
     va_copy(args2, args);
     const int n = vsnprintf(NULL, 0U, fmt, args);
     if (n < 0) goto done2;
-    const size_t pos = buf->stream ? buf->len : 0U;
+    const intptr_t pos = buf->stream ? buf->len : 0;
     buf->len = pos + n;
     if (buf->len > buf->cap) {
         buf->cap = buf->len + buf->cap/2;
-        buf->data = (char*)realloc(buf->data, buf->cap + 1);
+        buf->data = (char*)realloc(buf->data, (size_t)buf->cap + 1U);
     }
     vsprintf(buf->data + pos, fmt, args2);
     done2: va_end(args2);
@@ -252,7 +253,7 @@ FMT_API int _fmt_parse(char* p, int nargs, const char *fmt, ...) {
             if (!strchr("csdioxXufFeEaAgGnp", fmt[-1]))
                 while (*arg) *p++ = *arg++;
             if (p0 && (p[-1] == 's' || p[-1] == 'c')) /* left-align str */
-                memmove(p0 + 1, p0, p++ - p0), *p0 = '-';
+                memmove(p0 + 1, p0, (size_t)(p++ - p0)), *p0 = '-';
             fmt += *fmt == '}';
             continue;
         }

@@ -20,7 +20,7 @@ const uint8_t utf8_dtab[] = {
   12,36,12,12,12,12,12,12,12,12,12,12,
 };
 
-unsigned utf8_encode(char *out, uint32_t c)
+int utf8_encode(char *out, uint32_t c)
 {
     if (c < 0x80U) {
         out[0] = (char) c;
@@ -53,7 +53,7 @@ uint32_t utf8_peek_off(const char* s, int pos) {
     return utf8_peek(s);
 }
 
-bool utf8_valid_n(const char* s, size_t nbytes) {
+bool utf8_valid_n(const char* s, intptr_t nbytes) {
     utf8_decode_t d = {.state=0};
     while ((nbytes-- != 0) & (*s != 0))
         utf8_decode(&d, (uint8_t)*s++);
@@ -61,7 +61,7 @@ bool utf8_valid_n(const char* s, size_t nbytes) {
 }
 
 uint32_t utf8_casefold(uint32_t c) {
-    for (size_t i=0; i < casefold_len; ++i) {
+    for (int i=0; i < casefold_len; ++i) {
         const struct CaseMapping entry = casemappings[i];
         if (c <= entry.c2) {
             if (c < entry.c1) return c;
@@ -74,7 +74,7 @@ uint32_t utf8_casefold(uint32_t c) {
 }
 
 uint32_t utf8_tolower(uint32_t c) {
-    for (size_t i=0; i < sizeof upcase_ind/sizeof *upcase_ind; ++i) {
+    for (int i=0; i < (int)(sizeof upcase_ind/sizeof *upcase_ind); ++i) {
         const struct CaseMapping entry = casemappings[upcase_ind[i]];
         if (c <= entry.c2) {
             if (c < entry.c1) return c;
@@ -87,7 +87,7 @@ uint32_t utf8_tolower(uint32_t c) {
 }
 
 uint32_t utf8_toupper(uint32_t c) {
-    for (size_t i=0; i < sizeof lowcase_ind/sizeof *lowcase_ind; ++i) {
+    for (int i=0; i < (int)(sizeof lowcase_ind/sizeof *lowcase_ind); ++i) {
         const struct CaseMapping entry = casemappings[lowcase_ind[i]];
         if (c <= entry.m2) {
             int d = entry.m2 - entry.c2;
@@ -101,7 +101,7 @@ uint32_t utf8_toupper(uint32_t c) {
 
 int utf8_icmp_sv(const csview s1, const csview s2) {
     utf8_decode_t d1 = {.state=0}, d2 = {.state=0};
-    size_t j1 = 0, j2 = 0;
+    intptr_t j1 = 0, j2 = 0;
     while ((j1 < s1.size) & (j2 < s2.size)) {
         do { utf8_decode(&d1, (uint8_t)s1.str[j1++]); } while (d1.state);
         do { utf8_decode(&d2, (uint8_t)s2.str[j2++]); } while (d2.state);
@@ -122,13 +122,18 @@ typedef struct {
   int nr16;
 } UGroup;
 
-static const UGroup unicode_groups[U8G_SIZE];
+#ifndef __cplusplus
+static
+#else
+extern
+#endif
+const UGroup _utf8_unicode_groups[U8G_SIZE];
 
 bool utf8_isgroup(int group, uint32_t c) {
-    for (int j=0; j<unicode_groups[group].nr16; ++j) {
-        if (c < unicode_groups[group].r16[j].lo)
+    for (int j=0; j<_utf8_unicode_groups[group].nr16; ++j) {
+        if (c < _utf8_unicode_groups[group].r16[j].lo)
             return false;
-        if (c <= unicode_groups[group].r16[j].hi)
+        if (c <= _utf8_unicode_groups[group].r16[j].hi)
             return true;
     }
     return false;
@@ -137,21 +142,21 @@ bool utf8_isgroup(int group, uint32_t c) {
 bool utf8_isalpha(uint32_t c) {
     static int16_t groups[] = {U8G_Latin, U8G_Nl, U8G_Greek, U8G_Cyrillic,
                                U8G_Han, U8G_Devanagari, U8G_Arabic};
-    if (c < 128) return isalpha(c) != 0;
-    for (unsigned j=0; j < c_ARRAYLEN(groups); ++j)
+    if (c < 128) return isalpha((int)c) != 0;
+    for (int j=0; j < c_ARRAYLEN(groups); ++j)
         if (utf8_isgroup(groups[j], c))
             return true;
     return false;
 }
 
 bool utf8_iscased(uint32_t c) {
-    if (c < 128) return isalpha(c) != 0;
+    if (c < 128) return isalpha((int)c) != 0;
     return utf8_islower(c) || utf8_isupper(c) || 
            utf8_isgroup(U8G_Lt, c);
 }
 
 bool utf8_isword(uint32_t c) {
-    if (c < 128) return (isalnum(c) != 0) | (c == '_');
+    if (c < 128) return (isalnum((int)c) != 0) | (c == '_');
     return utf8_isalpha(c) || utf8_isgroup(U8G_Nd, c) ||
            utf8_isgroup(U8G_Pc, c);
 }
@@ -323,139 +328,141 @@ static const URange16 Zs_range16[] = { // Space separator
 };
 
 static const URange16 Arabic_range16[] = {
-	{ 1536, 1540 },
-	{ 1542, 1547 },
-	{ 1549, 1562 },
-	{ 1564, 1566 },
-	{ 1568, 1599 },
-	{ 1601, 1610 },
-	{ 1622, 1647 },
-	{ 1649, 1756 },
-	{ 1758, 1791 },
-	{ 1872, 1919 },
-	{ 2160, 2190 },
-	{ 2192, 2193 },
-	{ 2200, 2273 },
-	{ 2275, 2303 },
-	{ 64336, 64450 },
-	{ 64467, 64829 },
-	{ 64832, 64911 },
-	{ 64914, 64967 },
-	{ 64975, 64975 },
-	{ 65008, 65023 },
-	{ 65136, 65140 },
-	{ 65142, 65276 },
+    { 1536, 1540 },
+    { 1542, 1547 },
+    { 1549, 1562 },
+    { 1564, 1566 },
+    { 1568, 1599 },
+    { 1601, 1610 },
+    { 1622, 1647 },
+    { 1649, 1756 },
+    { 1758, 1791 },
+    { 1872, 1919 },
+    { 2160, 2190 },
+    { 2192, 2193 },
+    { 2200, 2273 },
+    { 2275, 2303 },
+    { 64336, 64450 },
+    { 64467, 64829 },
+    { 64832, 64911 },
+    { 64914, 64967 },
+    { 64975, 64975 },
+    { 65008, 65023 },
+    { 65136, 65140 },
+    { 65142, 65276 },
 };
 
 static const URange16 Cyrillic_range16[] = {
-	{ 1024, 1156 },
-	{ 1159, 1327 },
-	{ 7296, 7304 },
-	{ 7467, 7467 },
-	{ 7544, 7544 },
-	{ 11744, 11775 },
-	{ 42560, 42655 },
-	{ 65070, 65071 },
+    { 1024, 1156 },
+    { 1159, 1327 },
+    { 7296, 7304 },
+    { 7467, 7467 },
+    { 7544, 7544 },
+    { 11744, 11775 },
+    { 42560, 42655 },
+    { 65070, 65071 },
 };
 
 static const URange16 Devanagari_range16[] = {
-	{ 2304, 2384 },
-	{ 2389, 2403 },
-	{ 2406, 2431 },
-	{ 43232, 43263 },
+    { 2304, 2384 },
+    { 2389, 2403 },
+    { 2406, 2431 },
+    { 43232, 43263 },
 };
 
 static const URange16 Greek_range16[] = {
-	{ 880, 883 },
-	{ 885, 887 },
-	{ 890, 893 },
-	{ 895, 895 },
-	{ 900, 900 },
-	{ 902, 902 },
-	{ 904, 906 },
-	{ 908, 908 },
-	{ 910, 929 },
-	{ 931, 993 },
-	{ 1008, 1023 },
-	{ 7462, 7466 },
-	{ 7517, 7521 },
-	{ 7526, 7530 },
-	{ 7615, 7615 },
-	{ 7936, 7957 },
-	{ 7960, 7965 },
-	{ 7968, 8005 },
-	{ 8008, 8013 },
-	{ 8016, 8023 },
-	{ 8025, 8025 },
-	{ 8027, 8027 },
-	{ 8029, 8029 },
-	{ 8031, 8061 },
-	{ 8064, 8116 },
-	{ 8118, 8132 },
-	{ 8134, 8147 },
-	{ 8150, 8155 },
-	{ 8157, 8175 },
-	{ 8178, 8180 },
-	{ 8182, 8190 },
-	{ 8486, 8486 },
-	{ 43877, 43877 },
+    { 880, 883 },
+    { 885, 887 },
+    { 890, 893 },
+    { 895, 895 },
+    { 900, 900 },
+    { 902, 902 },
+    { 904, 906 },
+    { 908, 908 },
+    { 910, 929 },
+    { 931, 993 },
+    { 1008, 1023 },
+    { 7462, 7466 },
+    { 7517, 7521 },
+    { 7526, 7530 },
+    { 7615, 7615 },
+    { 7936, 7957 },
+    { 7960, 7965 },
+    { 7968, 8005 },
+    { 8008, 8013 },
+    { 8016, 8023 },
+    { 8025, 8025 },
+    { 8027, 8027 },
+    { 8029, 8029 },
+    { 8031, 8061 },
+    { 8064, 8116 },
+    { 8118, 8132 },
+    { 8134, 8147 },
+    { 8150, 8155 },
+    { 8157, 8175 },
+    { 8178, 8180 },
+    { 8182, 8190 },
+    { 8486, 8486 },
+    { 43877, 43877 },
 };
 
 static const URange16 Han_range16[] = {
-	{ 11904, 11929 },
-	{ 11931, 12019 },
-	{ 12032, 12245 },
-	{ 12293, 12293 },
-	{ 12295, 12295 },
-	{ 12321, 12329 },
-	{ 12344, 12347 },
-	{ 13312, 19903 },
-	{ 19968, 40959 },
-	{ 63744, 64109 },
-	{ 64112, 64217 },
+    { 11904, 11929 },
+    { 11931, 12019 },
+    { 12032, 12245 },
+    { 12293, 12293 },
+    { 12295, 12295 },
+    { 12321, 12329 },
+    { 12344, 12347 },
+    { 13312, 19903 },
+    { 19968, 40959 },
+    { 63744, 64109 },
+    { 64112, 64217 },
 };
 
 static const URange16 Latin_range16[] = {
-	{ 65, 90 },
-	{ 97, 122 },
-	{ 170, 170 },
-	{ 186, 186 },
-	{ 192, 214 },
-	{ 216, 246 },
-	{ 248, 696 },
-	{ 736, 740 },
-	{ 7424, 7461 },
-	{ 7468, 7516 },
-	{ 7522, 7525 },
-	{ 7531, 7543 },
-	{ 7545, 7614 },
-	{ 7680, 7935 },
-	{ 8305, 8305 },
-	{ 8319, 8319 },
-	{ 8336, 8348 },
-	{ 8490, 8491 },
-	{ 8498, 8498 },
-	{ 8526, 8526 },
-	{ 8544, 8584 },
-	{ 11360, 11391 },
-	{ 42786, 42887 },
-	{ 42891, 42954 },
-	{ 42960, 42961 },
-	{ 42963, 42963 },
-	{ 42965, 42969 },
-	{ 42994, 43007 },
-	{ 43824, 43866 },
-	{ 43868, 43876 },
-	{ 43878, 43881 },
-	{ 64256, 64262 },
-	{ 65313, 65338 },
-	{ 65345, 65370 },
+    { 65, 90 },
+    { 97, 122 },
+    { 170, 170 },
+    { 186, 186 },
+    { 192, 214 },
+    { 216, 246 },
+    { 248, 696 },
+    { 736, 740 },
+    { 7424, 7461 },
+    { 7468, 7516 },
+    { 7522, 7525 },
+    { 7531, 7543 },
+    { 7545, 7614 },
+    { 7680, 7935 },
+    { 8305, 8305 },
+    { 8319, 8319 },
+    { 8336, 8348 },
+    { 8490, 8491 },
+    { 8498, 8498 },
+    { 8526, 8526 },
+    { 8544, 8584 },
+    { 11360, 11391 },
+    { 42786, 42887 },
+    { 42891, 42954 },
+    { 42960, 42961 },
+    { 42963, 42963 },
+    { 42965, 42969 },
+    { 42994, 43007 },
+    { 43824, 43866 },
+    { 43868, 43876 },
+    { 43878, 43881 },
+    { 64256, 64262 },
+    { 65313, 65338 },
+    { 65345, 65370 },
 };
 
 #define UNI_ENTRY(Code) \
     { Code##_range16, sizeof(Code##_range16)/sizeof(URange16) }
-
-static const UGroup unicode_groups[U8G_SIZE] = {
+#ifndef __cplusplus
+static
+#endif
+const UGroup _utf8_unicode_groups[U8G_SIZE] = {
     [U8G_Cc] = UNI_ENTRY(Cc),
     [U8G_Lt] = UNI_ENTRY(Lt),
     [U8G_Nd] = UNI_ENTRY(Nd),

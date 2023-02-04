@@ -1,0 +1,233 @@
+/* Copyright 2011-2023 Bas van den Berg
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+#include <stdlib.h>
+#include "ctest.h"
+
+// basic test without setup/teardown
+CTEST(suite1, test1) {
+}
+
+// there are many different ASSERT macro's (see ctest.h)
+CTEST(suite1, test2) {
+    ASSERT_EQ(1,2);
+}
+
+CTEST(suite2, test1) {
+    ASSERT_STREQ("foo", "bar");
+}
+
+CTEST(suite3, test3) {
+}
+
+
+// A test suite with a setup/teardown function
+// This is converted into a struct that's automatically passed to all tests in the suite
+CTEST_FIXTURE(memtest) {
+    unsigned char* buffer;
+};
+
+// Optional setup function for suite, called before every test in suite
+CTEST_SETUP(memtest) {
+    CTEST_LOG("%s() data=%p buffer=%p", __func__, (void*)self, (void*)self->buffer);
+    self->buffer = (unsigned char*)malloc(1024);
+}
+
+// Optional teardown function for suite, called after every test in suite
+CTEST_TEARDOWN(memtest) {
+    CTEST_LOG("%s() data=%p buffer=%p", __func__, (void*)self, (void*)self->buffer);
+    if (self->buffer) free(self->buffer);
+}
+
+// These tests are called with the struct* (named self) as argument
+CTEST_F(memtest, test1) {
+    CTEST_LOG("%s()  data=%p  buffer=%p", __func__, (void*)self, (void*)self->buffer);
+}
+
+CTEST_F_SKIP(memtest, test3) {
+    (void)self;
+    ASSERT_FAIL();
+}
+
+CTEST_F(memtest, test2) {
+    CTEST_LOG("%s()  data=%p  buffer=%p", __func__, (void*)self, (void*)self->buffer);
+    ASSERT_FAIL();
+}
+
+
+CTEST_FIXTURE(fail) {
+    int unused;
+};
+
+// Asserts can also be used in setup/teardown functions
+CTEST_SETUP(fail) {
+    (void)self;
+    ASSERT_FAIL();
+}
+
+CTEST_F(fail, test1) {
+    (void)self;
+}
+
+
+
+CTEST_FIXTURE(weaklinkage) {
+    int number;
+};
+
+// This suite has data, but no setup/teardown
+CTEST_F(weaklinkage, test1) {
+    (void)self;
+    CTEST_LOG("%s()", __func__);
+}
+
+CTEST_F(weaklinkage, test2) {
+    (void)self;
+    CTEST_LOG("%s()", __func__);
+}
+
+
+CTEST_FIXTURE(nosetup) {
+    int value;
+};
+
+CTEST_TEARDOWN(nosetup) {
+    (void)self;
+    CTEST_LOG("%s()", __func__);
+}
+
+CTEST_F(nosetup, test1) {
+    (void)self;
+    CTEST_LOG("%s()", __func__);
+}
+
+
+// more ASSERT examples
+CTEST(ctest, test_assert_str) {
+    ASSERT_STREQ("foo", "foo");
+    ASSERT_STREQ("foo", "bar");
+}
+
+CTEST(ctest, test_assert_equal) {
+    ASSERT_EQ(123, 123);
+    ASSERT_EQ(123, 456);
+}
+
+CTEST(ctest, test_assert_not_equal) {
+    ASSERT_NE(123, 456);
+    ASSERT_NE(123, 123);
+}
+
+CTEST(ctest, test_assert_interval) {
+    ASSERT_INTERVAL(10, 20, 15);
+    ASSERT_INTERVAL(1000, 2000, 3000);
+}
+
+CTEST(ctest, test_assert_null) {
+    ASSERT_NULL(NULL);
+    ASSERT_NULL((void*)0xdeadbeef);
+}
+
+CTEST(ctest, test_assert_not_null_const) {
+    char *p = NULL;
+    ASSERT_PTR_NE(p, (const char*)"hallo");
+}
+
+CTEST(ctest, test_assert_true) {
+    ASSERT_TRUE(1);
+    ASSERT_TRUE(0);
+}
+
+CTEST(ctest, test_assert_false) {
+    ASSERT_FALSE(0);
+    ASSERT_FALSE(1);
+}
+
+CTEST_SKIP(ctest, test_skip) {
+    ASSERT_FAIL();
+}
+
+CTEST(ctest, test_assert_fail) {
+    ASSERT_FAIL();
+}
+
+/* Test that NULL-strings won't result in segv */
+CTEST(ctest, test_null_null) {
+    ASSERT_STREQ(NULL, NULL);
+}
+
+CTEST(ctest, test_null_string) {
+    ASSERT_STREQ(NULL, "shouldfail");
+}
+
+CTEST(ctest, test_string_null) {
+    ASSERT_STREQ("shouldfail", NULL);
+}
+
+CTEST(ctest, test_string_diff_ptrs) {
+    const char *str = "abc\0abc";
+    ASSERT_STREQ(str, str+4);
+}
+
+CTEST(ctest, test_large_numbers) {
+    unsigned long exp = 4200000000u;
+    ASSERT_EQ(exp, 4200000000u);
+    ASSERT_NE(exp, 1200000000u);
+}
+
+CTEST(ctest, test_ctest_err) {
+    CTEST_ERR("error log");
+}
+
+CTEST(ctest, test_dbl_near) {
+    double a = 0.000111;
+    ASSERT_DOUBLE_EQ(0.0001, a);
+}
+
+CTEST(ctest, test_dbl_near_tol) {
+    double a = 0.000111;
+    ASSERT_NEAR(0.0001, a, 1e-5); /* will fail */
+}
+
+CTEST(ctest, test_dbl_far) {
+    double a = 1.1;
+    ASSERT_DOUBLE_NE(1., a);
+    ASSERT_NOT_NEAR(1., a, 0.01);
+}
+
+CTEST(ctest, test_assert_compare) {
+    ASSERT_LT(123, 456);
+    ASSERT_GE(123, 123);
+    ASSERT_GT(99, 100);
+}
+
+CTEST(ctest, test_dbl_near2) {
+    float a = 0.000001000003f;
+    ASSERT_FLOAT_EQ(0.000001f, a);  /* ok, uses float epsilon -1e-5 */
+    ASSERT_NEAR(0.000001, a, -1e-5); /* ok, tol < 0 = relative err (epsilon) */
+    ASSERT_DOUBLE_EQ(0.000001, a);  /* fail, tol = -1e-12 (epsilon) */
+}
+
+CTEST(ctest, test_dbl_compare) {
+    float a = 0.000001000003f;
+    ASSERT_DOUBLE_LT(0.000001, a);
+    ASSERT_DOUBLE_GT(0.000001, a);  /* fail */
+}
+
+CTEST(ctest, test_str_contains) {
+    ASSERT_STRNE("Hello", "World");
+    ASSERT_SUBSTR("ello", "Hello");
+    ASSERT_NOT_SUBSTR("Hell", "Hello");
+}

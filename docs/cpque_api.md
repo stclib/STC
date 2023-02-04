@@ -28,17 +28,17 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 
 ```c
 cpque_X             cpque_X_init(void);                    // create empty pri-queue.
-cpque_X             cpque_X_with_capacity(size_t cap);
-cpque_X             cpque_X_with_size(size_t size, i_val null);
+cpque_X             cpque_X_with_capacity(intptr_t cap);
+cpque_X             cpque_X_with_size(intptr_t size, i_val null);
 cpque_X             cpque_X_clone(cpque_X pq);
 
 void                cpque_X_clear(cpque_X* self);
-bool                cpque_X_reserve(cpque_X* self, size_t n);
+bool                cpque_X_reserve(cpque_X* self, intptr_t n);
 void                cpque_X_shrink_to_fit(cpque_X* self);
 void                cpque_X_copy(cpque_X* self, const cpque_X* other);
 void                cpque_X_drop(cpque_X* self);        // destructor
 
-size_t              cpque_X_size(const cpque_X* self);
+intptr_t            cpque_X_size(const cpque_X* self);
 bool                cpque_X_empty(const cpque_X* self);
 i_val*              cpque_X_top(const cpque_X* self);
 
@@ -47,7 +47,7 @@ void                cpque_X_push(cpque_X* self, i_val value);
 void                cpque_X_emplace(cpque_X* self, i_valraw raw); // converts from raw
 
 void                cpque_X_pop(cpque_X* self);
-void                cpque_X_erase_at(cpque_X* self, size_t idx);
+void                cpque_X_erase_at(cpque_X* self, intptr_t idx);
 
 i_val               cpque_X_value_clone(i_val value);
 ```
@@ -71,7 +71,7 @@ i_val               cpque_X_value_clone(i_val value);
 
 int main()
 {
-    size_t N = 10000000;
+    intptr_t N = 10000000;
     stc64_t rng = stc64_new(1234);
     stc64_uniform_t dist = stc64_uniform_new(0, N * 10);
 

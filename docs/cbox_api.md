@@ -48,10 +48,10 @@ void        cbox_X_drop(cbox_X* self);                        // destruct the co
 void        cbox_X_reset(cbox_X* self);   
 void        cbox_X_reset_to(cbox_X* self, i_val* p);          // assign new cbox from ptr. Takes ownership of p.
 
-uint64_t    cbox_X_hash(const cbox_X* x);                      // hash value
-int         cbox_X_cmp(const cbox_X* x, const cbox_X* y);      // compares pointer addresses if no `i_cmp` is specified.
-                                                               // is defined. Otherwise uses 'i_cmp' or default cmp.
-bool        cbox_X_eq(const cbox_X* x, const cbox_X* y);       // cbox_X_cmp() == 0
+uint64_t    cbox_X_hash(const cbox_X* x);                     // hash value
+int         cbox_X_cmp(const cbox_X* x, const cbox_X* y);     // compares pointer addresses if no `i_cmp` is specified.
+                                                              // is defined. Otherwise uses 'i_cmp' or default cmp.
+bool        cbox_X_eq(const cbox_X* x, const cbox_X* y);      // cbox_X_cmp() == 0
 
 // functions on pointed to objects.
 

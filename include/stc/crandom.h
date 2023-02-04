@@ -46,7 +46,7 @@ int main() {
 typedef struct stc64 { uint64_t state[5]; } stc64_t;
 typedef struct stc64_uniform { int64_t lower; uint64_t range, threshold; } stc64_uniform_t;
 typedef struct stc64_uniformf { double lower, range; } stc64_uniformf_t;
-typedef struct stc64_normalf { double mean, stddev, next; unsigned has_next; } stc64_normalf_t;
+typedef struct stc64_normalf { double mean, stddev, next; int has_next; } stc64_normalf_t;
 
 /* PRNG stc64.
  * Very fast PRNG suited for parallel usage with Weyl-sequence parameter.
@@ -100,12 +100,12 @@ STC_INLINE double stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist) {
 
 /* Init uniform distributed float64 RNG, range [low, high). */
 STC_INLINE stc64_uniformf_t stc64_uniformf_new(double low, double high) {
-    return c_INIT(stc64_uniformf_t){low, high - low};
+    return c_LITERAL(stc64_uniformf_t){low, high - low};
 }
 
 /* Marsaglia polar method for gaussian/normal distribution, float64. */
 STC_INLINE stc64_normalf_t stc64_normalf_new(double mean, double stddev) {
-    return c_INIT(stc64_normalf_t){mean, stddev, 0.0, 0};
+    return c_LITERAL(stc64_normalf_t){mean, stddev, 0.0, 0};
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */

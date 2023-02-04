@@ -80,13 +80,13 @@ typedef i_keyraw _cx_raw;
 STC_API _cx_self        _cx_memb(_init)(void);
 STC_API void            _cx_memb(_drop)(_cx_self* self);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
-STC_API bool            _cx_memb(_reserve)(_cx_self* self, size_t cap);
-STC_API bool            _cx_memb(_resize)(_cx_self* self, size_t size, i_key null);
+STC_API bool            _cx_memb(_reserve)(_cx_self* self, intptr_t cap);
+STC_API bool            _cx_memb(_resize)(_cx_self* self, intptr_t size, i_key null);
 STC_API _cx_value*      _cx_memb(_push)(_cx_self* self, i_key value);
 STC_API _cx_iter        _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2);
 STC_API _cx_iter        _cx_memb(_insert_range)(_cx_self* self, _cx_value* pos,
                                                 const _cx_value* p1, const _cx_value* p2);
-STC_API _cx_iter        _cx_memb(_insert_uninit)(_cx_self* self, _cx_value* pos, const size_t n);
+STC_API _cx_iter        _cx_memb(_insert_uninit)(_cx_self* self, _cx_value* pos, const intptr_t n);
 #if !defined i_no_cmp
 STC_API int             _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y);
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw raw);
@@ -101,7 +101,7 @@ STC_INLINE _cx_value*   _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
 STC_INLINE _cx_value*   _cx_memb(_emplace_back)(_cx_self* self, _cx_raw raw)
                             { return _cx_memb(_push)(self, i_keyfrom(raw)); }
 STC_INLINE _cx_iter
-_cx_memb(_emplace_n)(_cx_self* self, const size_t idx, const _cx_raw arr[], const size_t n) {
+_cx_memb(_emplace_n)(_cx_self* self, const intptr_t idx, const _cx_raw arr[], const intptr_t n) {
     return _cx_memb(_emplace_range)(self, self->data + idx, arr, arr + n);
 }
 STC_INLINE _cx_iter
@@ -114,6 +114,10 @@ _cx_memb(_emplace_at)(_cx_self* self, _cx_iter it, _cx_raw raw) {
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_API _cx_iter        _cx_memb(_copy_range)(_cx_self* self, _cx_value* pos,
                                               const _cx_value* p1, const _cx_value* p2);
+STC_INLINE void         _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, intptr_t n)
+                            { while (n--) _cx_memb(_push)(self, i_keyfrom(*raw++)); }
+STC_INLINE _cx_self     _cx_memb(_from_n)(const _cx_raw* raw, intptr_t n)
+                            { _cx_self cx = {0}; _cx_memb(_put_n)(&cx, raw, n); return cx; }
 STC_INLINE i_key        _cx_memb(_value_clone)(_cx_value val)
                             { return i_keyclone(val); }
 STC_INLINE void         _cx_memb(_copy)(_cx_self* self, const _cx_self* other) {
@@ -124,8 +128,8 @@ STC_INLINE void         _cx_memb(_copy)(_cx_self* self, const _cx_self* other) {
                         }
 #endif // !i_no_clone
 
-STC_INLINE size_t       _cx_memb(_size)(const _cx_self* self) { return self->_len; }
-STC_INLINE size_t       _cx_memb(_capacity)(const _cx_self* self) { return self->_cap; }
+STC_INLINE intptr_t     _cx_memb(_size)(const _cx_self* self) { return self->_len; }
+STC_INLINE intptr_t     _cx_memb(_capacity)(const _cx_self* self) { return self->_cap; }
 STC_INLINE bool         _cx_memb(_empty)(const _cx_self* self) { return !self->_len; }
 STC_INLINE _cx_raw      _cx_memb(_value_toraw)(const _cx_value* val) { return i_keyto(val); }
 STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return self->data; }
@@ -138,14 +142,14 @@ STC_INLINE _cx_value*   _cx_memb(_push_back)(_cx_self* self, i_key value)
 STC_INLINE void         _cx_memb(_pop_back)(_cx_self* self) { _cx_memb(_pop)(self); }
 
 STC_INLINE _cx_self
-_cx_memb(_with_size)(const size_t size, i_key null) {
+_cx_memb(_with_size)(const intptr_t size, i_key null) {
     _cx_self cx = _cx_memb(_init)();
     _cx_memb(_resize)(&cx, size, null);
     return cx;
 }
 
 STC_INLINE _cx_self
-_cx_memb(_with_capacity)(const size_t cap) {
+_cx_memb(_with_capacity)(const intptr_t cap) {
     _cx_self cx = _cx_memb(_init)();
     _cx_memb(_reserve)(&cx, cap);
     return cx;
@@ -158,11 +162,11 @@ _cx_memb(_shrink_to_fit)(_cx_self* self) {
 
 
 STC_INLINE _cx_iter
-_cx_memb(_insert)(_cx_self* self, const size_t idx, i_key value) {
+_cx_memb(_insert)(_cx_self* self, const intptr_t idx, i_key value) {
     return _cx_memb(_insert_range)(self, self->data + idx, &value, &value + 1);
 }
 STC_INLINE _cx_iter
-_cx_memb(_insert_n)(_cx_self* self, const size_t idx, const _cx_value arr[], const size_t n) {
+_cx_memb(_insert_n)(_cx_self* self, const intptr_t idx, const _cx_value arr[], const intptr_t n) {
     return _cx_memb(_insert_range)(self, self->data + idx, arr, arr + n);
 }
 STC_INLINE _cx_iter
@@ -171,7 +175,7 @@ _cx_memb(_insert_at)(_cx_self* self, _cx_iter it, i_key value) {
 }
 
 STC_INLINE _cx_iter
-_cx_memb(_erase_n)(_cx_self* self, const size_t idx, const size_t n) {
+_cx_memb(_erase_n)(_cx_self* self, const intptr_t idx, const intptr_t n) {
     return _cx_memb(_erase_range_p)(self, self->data + idx, self->data + idx + n);
 }
 STC_INLINE _cx_iter
@@ -184,31 +188,31 @@ _cx_memb(_erase_range)(_cx_self* self, _cx_iter i1, _cx_iter i2) {
 }
 
 STC_INLINE const _cx_value*
-_cx_memb(_at)(const _cx_self* self, const size_t idx) {
+_cx_memb(_at)(const _cx_self* self, const intptr_t idx) {
     assert(idx < self->_len); return self->data + idx;
 }
 STC_INLINE _cx_value*
-_cx_memb(_at_mut)(_cx_self* self, const size_t idx) {
+_cx_memb(_at_mut)(_cx_self* self, const intptr_t idx) {
     assert(idx < self->_len); return self->data + idx;
 }
 
 
 STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) { 
-    size_t n = self->_len; 
-    return c_INIT(_cx_iter){n ? self->data : NULL, self->data + n};
+    intptr_t n = self->_len; 
+    return c_LITERAL(_cx_iter){n ? self->data : NULL, self->data + n};
 }
 
 STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self) 
-    { return c_INIT(_cx_iter){NULL, self->data + self->_len}; }
+    { return c_LITERAL(_cx_iter){NULL, self->data + self->_len}; }
 
 STC_INLINE void _cx_memb(_next)(_cx_iter* it) 
     { if (++it->ref == it->end) it->ref = NULL; }
 
-STC_INLINE _cx_iter _cx_memb(_advance)(_cx_iter it, intptr_t n)
+STC_INLINE _cx_iter _cx_memb(_advance)(_cx_iter it, size_t n)
     { if ((it.ref += n) >= it.end) it.ref = NULL; return it; }
 
-STC_INLINE size_t _cx_memb(_index)(const _cx_self* self, _cx_iter it) 
-    { return (size_t)(it.ref - self->data); }
+STC_INLINE intptr_t _cx_memb(_index)(const _cx_self* self, _cx_iter it) 
+    { return (it.ref - self->data); }
 
 #if !defined i_no_cmp
 
@@ -255,7 +259,7 @@ _cx_memb(_sort)(_cx_self* self) {
 
 STC_DEF _cx_self
 _cx_memb(_init)(void) {
-    return c_INIT(_cx_self){NULL};
+    return c_LITERAL(_cx_self){NULL};
 }
 
 STC_DEF void
@@ -273,13 +277,13 @@ _cx_memb(_drop)(_cx_self* self) {
     if (self->_cap == 0)
         return;
     _cx_memb(_clear)(self);
-    c_FREE(self->data);
+    c_free(self->data);
 }
 
 STC_DEF bool
-_cx_memb(_reserve)(_cx_self* self, const size_t cap) {
+_cx_memb(_reserve)(_cx_self* self, const intptr_t cap) {
     if (cap > self->_cap || (cap && cap == self->_len)) {
-        _cx_value* d = (_cx_value*)c_REALLOC(self->data, cap*sizeof(i_key));
+        _cx_value* d = (_cx_value*)c_realloc(self->data, cap*c_sizeof(i_key));
         if (!d)
             return false;
         self->data = d;
@@ -289,13 +293,13 @@ _cx_memb(_reserve)(_cx_self* self, const size_t cap) {
 }
 
 STC_DEF bool
-_cx_memb(_resize)(_cx_self* self, const size_t len, i_key null) {
+_cx_memb(_resize)(_cx_self* self, const intptr_t len, i_key null) {
     if (!_cx_memb(_reserve)(self, len))
         return false;
-    const size_t n = self->_len;
-    for (size_t i = len; i < n; ++i)
+    const intptr_t n = self->_len;
+    for (intptr_t i = len; i < n; ++i)
         { i_keydrop((self->data + i)); }
-    for (size_t i = n; i < len; ++i)
+    for (intptr_t i = n; i < len; ++i)
         self->data[i] = null;
     self->_len = len;
     return true;
@@ -312,39 +316,39 @@ _cx_memb(_push)(_cx_self* self, i_key value) {
 }
 
 STC_DEF _cx_iter
-_cx_memb(_insert_uninit)(_cx_self* self, _cx_value* pos, const size_t n) {
+_cx_memb(_insert_uninit)(_cx_self* self, _cx_value* pos, const intptr_t n) {
     if (n) {
         if (!pos) pos = self->data + self->_len;
-        const size_t idx = (size_t)(pos - self->data);
+        const intptr_t idx = (pos - self->data);
         if (self->_len + n > self->_cap) {
             if (!_cx_memb(_reserve)(self, self->_len*3/2 + n))
                 return _cx_memb(_end)(self);
             pos = self->data + idx;
         }
-        memmove(pos + n, pos, (self->_len - idx)*sizeof *pos);
+        c_memmove(pos + n, pos, (self->_len - idx)*c_sizeof *pos);
         self->_len += n;
     }
-    return c_INIT(_cx_iter){pos, self->data + self->_len};
+    return c_LITERAL(_cx_iter){pos, self->data + self->_len};
 }
 
 STC_DEF _cx_iter
 _cx_memb(_insert_range)(_cx_self* self, _cx_value* pos,
                         const _cx_value* p1, const _cx_value* p2) {
-    _cx_iter it = _cx_memb(_insert_uninit)(self, pos, (size_t)(p2 - p1));
+    _cx_iter it = _cx_memb(_insert_uninit)(self, pos, (p2 - p1));
     if (it.ref)
-        memcpy(it.ref, p1, (size_t)(p2 - p1)*sizeof *p1);
+        c_memcpy(it.ref, p1, (p2 - p1)*c_sizeof *p1);
     return it;
 }
 
 STC_DEF _cx_iter
 _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
-    size_t len = (size_t)(p2 - p1);
+    intptr_t len = (p2 - p1);
     _cx_value* p = p1, *end = self->data + self->_len;
     for (; p != p2; ++p)
         { i_keydrop(p); }
-    memmove(p1, p2, (size_t)(end - p2)*sizeof *p1);
+    c_memmove(p1, p2, (end - p2)*c_sizeof *p1);
     self->_len -= len;
-    return c_INIT(_cx_iter){p2 == end ? NULL : p1, end - len};
+    return c_LITERAL(_cx_iter){p2 == end ? NULL : p1, end - len};
 }
 
 #if !defined i_no_clone
@@ -358,7 +362,7 @@ _cx_memb(_clone)(_cx_self cx) {
 STC_DEF _cx_iter
 _cx_memb(_copy_range)(_cx_self* self, _cx_value* pos,
                       const _cx_value* p1, const _cx_value* p2) {
-    _cx_iter it = _cx_memb(_insert_uninit)(self, pos, (size_t)(p2 - p1));
+    _cx_iter it = _cx_memb(_insert_uninit)(self, pos, (p2 - p1));
     if (it.ref)
         for (_cx_value* p = it.ref; p1 != p2; ++p1)
             *p++ = i_keyclone((*p1));
@@ -370,7 +374,7 @@ _cx_memb(_copy_range)(_cx_self* self, _cx_value* pos,
 STC_DEF _cx_iter
 _cx_memb(_emplace_range)(_cx_self* self, _cx_value* pos,
                          const _cx_raw* p1, const _cx_raw* p2) {
-    _cx_iter it = _cx_memb(_insert_uninit)(self, pos, (size_t)(p2 - p1));
+    _cx_iter it = _cx_memb(_insert_uninit)(self, pos, (p2 - p1));
     if (it.ref)
         for (_cx_value* p = it.ref; p1 != p2; ++p1)
             *p++ = i_keyfrom((*p1));
@@ -394,20 +398,19 @@ _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
 STC_DEF _cx_iter
 _cx_memb(_binary_search_in)(_cx_iter i1, _cx_iter i2, const _cx_raw raw,
                             _cx_iter* lower_bound) {
-    const _cx_value* p2 = _it2_ptr(i1, i2);
+    _cx_value* w[2] = {i1.ref, _it2_ptr(i1, i2)};
     _cx_iter mid = i1;
-    while (i1.ref != p2) {
-        mid.ref = i1.ref + (p2 - i1.ref)/2;
+    while (w[0] != w[1]) {
+        mid.ref = w[0] + (w[1] - w[0])/2;
         const _cx_raw m = i_keyto(mid.ref);
         const int c = i_cmp((&raw), (&m));
 
         if (!c) return *lower_bound = mid;
-        else if (c < 0) p2 = mid.ref;
-        else i1.ref = mid.ref + 1;
+        w[c < 0] = mid.ref + (c > 0);
     }
-    i2.ref = NULL;
-    *lower_bound = i1.ref == i2.end ? i2 : i1;
-    return i2;
+    i1.ref = w[0] == i2.end ? NULL : w[0];
+    *lower_bound = i1;
+    i1.ref = NULL; return i1;
 }
 
 STC_DEF int

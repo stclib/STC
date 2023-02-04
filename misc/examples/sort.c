@@ -14,7 +14,7 @@
 #define fmt_Elem "%lld"
 
 
-int testsort(csort_elm_value *a, size_t size, const char *desc) {
+int testsort(csort_elm_value *a, long size, const char *desc) {
     clock_t t = clock();
 #ifdef __cplusplus
     printf("std::sort: ");
@@ -26,13 +26,13 @@ int testsort(csort_elm_value *a, size_t size, const char *desc) {
     t = clock() - t;
 
     printf("%s: %d elements sorted in %.2f ms\n",
-           desc, (int)size, t*1000.0/CLOCKS_PER_SEC);
+           desc, (int)size, (float)t*1000.0f/CLOCKS_PER_SEC);
     return 0;
 }
 
 int main(int argc, char *argv[]) {
-    size_t i, size = argc > 1 ? strtoull(argv[1], NULL, 0) : 10000000;
-    csort_elm_value *a = (csort_elm_value*)malloc(sizeof(*a) * size);
+    long i, size = argc > 1 ? strtol(argv[1], NULL, 0) : 10000000;
+    csort_elm_value *a = (csort_elm_value*)c_malloc(c_sizeof(*a) * size);
     if (a == NULL) return -1;
 
     for (i = 0; i < size; i++)

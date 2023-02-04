@@ -1,6 +1,7 @@
 #define i_extern
 #include <stc/cregex.h>
 #include <stc/csview.h>
+
 #define i_val float
 #include <stc/cstack.h>
 
@@ -17,12 +18,12 @@ int main()
     c_AUTO (cstr, nums)
     {
         const char* pattern = "[+-]?([0-9]*\\.)?\\d+([Ee][+-]?\\d+)?";
-        int res = cregex_compile(&re, pattern, CREG_DEFAULT);
+        int res = cregex_compile(&re, pattern);
         printf("%d: %s\n", res, pattern);
 
         // extract and convert all numbers in str to floats
         c_FORMATCH (i, &re, str)
-            cstack_float_push(&vec, atof(i.match[0].str));
+            cstack_float_push(&vec, (float)atof(i.match[0].str));
 
         c_FOREACH (i, cstack_float, vec)
             printf("  %g\n", *i.ref);
