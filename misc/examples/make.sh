@@ -6,14 +6,14 @@ if [ "$(uname)" = 'Linux' ]; then
     oflag='-o '
 fi
 
+cc=gcc; cflags="-s -O2 -std=c99 -Wconversion -Wpedantic -Wall -Wsign-compare -Wwrite-strings"
 #cc=gcc; cflags="-s -O2 -std=c99 -Werror -Wfatal-errors -Wpedantic -Wall $sanitize"
-cc=gcc; cflags="-s -O2 -std=c99 -Wconversion -Wpedantic -Wall -Wsign-compare -Wwrite-strings" # -Wconversion
 #cc=tcc; cflags="-Wall -std=c99"
 #cc=clang; cflags="-s -O2 -std=c99 -Werror -Wfatal-errors -Wpedantic -Wall -Wsign-compare -Wwrite-strings"
 #cc=clang; cflags="-s -O2 -std=c99 -Werror -Wfatal-errors -Wpedantic -Wall -DSTC_CSTR_V1 -DSTC_CSMAP_V1"
 #cc=gcc; cflags="-x c++ -s -O2 -Wall -std=c++20"
 #cc=g++; cflags="-x c++ -s -O2 -Wall"
-#cc=cl; cflags="-O2 -nologo -W2 -MD"
+#cc=cl; cflags="-O2 -nologo -W3 -MD"
 #cc=cl; cflags="-nologo -TP"
 #cc=cl; cflags="-nologo -std:c11"
 
@@ -40,13 +40,13 @@ fi
 
 if [ $run = 0 ] ; then
     for i in *.c ; do
-        echo $comp -I../include $i $clibs $oflag$(basename $i .c).exe
-        $comp -I../include $i $clibs $oflag$(basename $i .c).exe
+        echo $comp -I../../include $i $clibs $oflag$(basename $i .c).exe
+        $comp -I../../include $i $clibs $oflag$(basename $i .c).exe
     done
 else
     for i in *.c ; do
-        echo $comp -I../include $i $clibs
-        $comp -I../include $i $clibs
+        echo $comp -I../../include $i $clibs
+        $comp -I../../include $i $clibs
         if [ -f $(basename -s .c $i).exe ]; then ./$(basename -s .c $i).exe; fi
         if [ -f ./a.exe ]; then ./a.exe; fi
         if [ -f ./a.out ]; then ./a.out; fi

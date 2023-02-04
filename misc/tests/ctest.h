@@ -93,8 +93,10 @@ struct ctest {
 
 #ifdef __APPLE__
 #define CTEST_IMPL_SECTION __attribute__ ((used, section ("__DATA, .ctest"), aligned(1)))
-#else
+#elif !defined _MSC_VER
 #define CTEST_IMPL_SECTION __attribute__ ((used, section (".ctest"), aligned(1)))
+#else
+#define CTEST_IMPL_SECTION
 #endif
 
 #define CTEST_IMPL_STRUCT(sname, tname, tskip, tdata, tsetup, tteardown) \
@@ -445,7 +447,7 @@ static void sighandler(int signum)
     const char msg_nocolor[] = "[SIGSEGV: Segmentation fault]\n";
 
     const char* msg = color_output ? msg_color : msg_nocolor;
-    intptr_t n = write(STDOUT_FILENO, msg, (unsigned int)strlen(msg));
+    intptr_t n = write(1, msg, (unsigned int)strlen(msg));
     (void)n;
     /* "Unregister" the signal handler and send the signal back to the process
      * so it can terminate as expected */
@@ -457,8 +459,10 @@ static void sighandler(int signum)
 #endif
 
 int ctest_main(int argc, const char *argv[]);
-
-__attribute__((no_sanitize_address)) int ctest_main(int argc, const char *argv[])
+#ifdef __GNUC__
+__attribute__((no_sanitize_address))
+#endif
+int ctest_main(int argc, const char *argv[])
 {
     static int total = 0;
     static int num_ok = 0;

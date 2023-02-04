@@ -60,10 +60,10 @@ int main() {
 #define _cbits_bytes(n) (_cbits_words(n) * c_sizeof(uint64_t))
 
 #if defined(__GNUC__) || defined(__clang__)
-    STC_INLINE int cpopcount64(uint64_t x) {return (int)__builtin_popcountll(x);}
+    STC_INLINE int cpopcount64(uint64_t x) {return __builtin_popcountll(x);}
 #elif defined(_MSC_VER) && defined(_WIN64)
     #include <intrin.h>
-    STC_INLINE int cpopcount64(uint64_t x) {return __popcnt64(x);}
+    STC_INLINE int cpopcount64(uint64_t x) {return (int)__popcnt64(x);}
 #else
     STC_INLINE int cpopcount64(uint64_t x) { /* http://en.wikipedia.org/wiki/Hamming_weight */
         x -= (x >> 1) & 0x5555555555555555;

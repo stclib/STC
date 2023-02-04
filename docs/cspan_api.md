@@ -18,8 +18,7 @@ using_cspan3(S, ValueType);              // define span types S, S2, S3 with ran
 using_cspan4(S, ValueType);              // define span types S, S2, S3, S4 with ranks 1, 2, 3, 4.
 ```
 ## Methods
-Note that `cspan_md()`, `cmake_from*()`, `cspan_atN()`, `and cspan_subspanN()` require a (safe) cast to its span-type
-on assignment, but not on initialization of a span variable. All functions are type-safe, and arguments are side-effect safe, except for SpanType arg. which must not have side-effects.
+All functions are type-safe, and index arguments are side-effect safe.
 ```c
 SpanTypeN       cspan_md(ValueType* data,  intptr_t xdim, ...);     // create a multi-dimensional cspan
 SpanType        cspan_make(T SpanType, {v1, v2, ...});              // make a 1d-dimensional cspan from values
@@ -129,6 +128,7 @@ int main() {
 }
 ```
 ## Example 2
+Slicing cspan without and with reducing the rank (like numpy array slicing):
 ```c
 #include <c11/fmt.h>
 #include <stc/cspan.h>
