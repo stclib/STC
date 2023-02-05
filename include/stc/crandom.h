@@ -109,7 +109,7 @@ STC_INLINE stc64_normalf_t stc64_normalf_new(double mean, double stddev) {
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement) || defined(i_extern)
+#if defined(i_static) || defined(i_extern)
 
 /* Global random() */
 static stc64_t stc64_global = {{

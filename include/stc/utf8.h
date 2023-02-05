@@ -114,7 +114,7 @@ STC_INLINE intptr_t utf8_pos(const char* s, intptr_t index)
     { return (intptr_t)(utf8_at(s, index) - s); }
 
 #endif // UTF8_H_INCLUDED
-#if defined i_extern || defined STC_EXTERN
+#if defined(i_extern)
 #  include "../../src/utf8code.c"
 #  undef i_extern
 #endif

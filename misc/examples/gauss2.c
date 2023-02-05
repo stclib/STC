@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <time.h>
 
-#define STC_IMPLEMENT
 #include <stc/crandom.h>
 #include <stc/cstr.h>
 

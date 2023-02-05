@@ -160,12 +160,12 @@ cstr cregex_replace_pattern_6(const char* pattern, const char* input, const char
 void cregex_drop(cregex* re);
 
 #endif // CREGEX_H_INCLUDED
-#if defined i_extern || defined STC_EXTERN
+#if defined(i_extern)
 #  include "../../src/cregex.c"
 #  include "../../src/utf8code.c"
+#  undef i_extern
 #endif
 #undef i_opt
 #undef i_header
 #undef i_static
 #undef i_implement
-#undef i_extern
