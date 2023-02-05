@@ -27,7 +27,7 @@ int main()
 
         c_FORMATCH (j, &re, s[i].input) {
             c_FORRANGE (k, cregex_captures(&re))
-                printf("  submatch %lld: %.*s\n", k, c_ARGSV(j.match[k]));
+                printf("  submatch %lld: %.*s\n", k, c_SVARG(j.match[k]));
         }
     }
 }

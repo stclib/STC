@@ -133,7 +133,7 @@ typedef const char* crawstr;
 #define c_SV(...) c_MACRO_OVERLOAD(c_SV, __VA_ARGS__)
 #define c_SV_1(lit) c_SV_2(lit, crawstr_len(lit))
 #define c_SV_2(str, n) (c_LITERAL(csview){str, n})
-#define c_ARGSV(sv) (int)(sv).size, (sv).str  /* use with "%.*s" */
+#define c_SVARG(sv) (int)(sv).size, (sv).str  /* use with "%.*s" */
 #define c_PAIR(ref) (ref)->first, (ref)->second
 
 #define _c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))

@@ -207,7 +207,7 @@ STC_API intptr_t _cspan_slice(int32_t odim[], int32_t ostri[], int* orank,
                               int rank, const int32_t a[][2]);
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_static) || defined(i_extern)
+#if defined(i_implement)
 
 STC_DEF intptr_t _cspan_idxN(int rank, const int32_t shape[], const int32_t stri[], const int32_t a[]) {
     intptr_t off = a[0];

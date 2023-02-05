@@ -10,7 +10,7 @@ int  main()
     const csview month = csview_token(date, "/", &pos);
     const csview day = csview_token(date, "/", &pos);
 
-    printf("%.*s, %.*s, %.*s\n", c_ARGSV(year), c_ARGSV(month), c_ARGSV(day));
+    printf("%.*s, %.*s, %.*s\n", c_SVARG(year), c_SVARG(month), c_SVARG(day));
 
     c_AUTO (cstr, y, m, d) {
         y = cstr_from_sv(year), m = cstr_from_sv(month), d = cstr_from_sv(day);

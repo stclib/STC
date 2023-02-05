@@ -38,3 +38,4 @@
 #define c_scope c_SCOPE
 #define c_defer c_DEFER
 #define c_sv c_SV
+#define c_ARGSV c_SVARG

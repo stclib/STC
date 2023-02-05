@@ -159,7 +159,7 @@ STC_INLINE bool csview_eq(const csview* x, const csview* y)
 STC_API uint64_t csview_hash(const csview *self);
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_static) || defined(i_extern)
+#if defined(i_implement)
 
 STC_DEF intptr_t csview_find_sv(csview sv, csview search) {
     char* res = cstrnstrn(sv.str, search.str, sv.size, search.size);
