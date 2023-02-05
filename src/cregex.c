@@ -570,7 +570,8 @@ _optimize(_Parser *par, _Reprog *pp)
             cl->end = (_Rune *)((char*)cl->end + diff);
             break;
         }
-        inst->l.left = (_Reinst *)((char*)inst->l.left + diff);
+        if (inst->l.left) 
+            inst->l.left = (_Reinst *)((char*)inst->l.left + diff);
     }
     npp->startinst = (_Reinst *)((char*)npp->startinst + diff);
     return npp;
