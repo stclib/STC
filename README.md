@@ -65,7 +65,7 @@ Highlights
 - **Unparalleled performance** - Some containers are much faster than the c++ STL containers, the rest are about equal in speed.
 - **Fully memory managed** - All containers will destruct keys/values via destructor defined as macro parameters before including the container header. Also, smart pointers are supported and can be stored in containers, see ***carc*** and ***cbox***.
 - **Uniform, easy-to-learn API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have uniform and intuitive usage across the various containers.
-- **No unsigned mess** - Unsigned sizes and indices mixed with signed calculations is asking for trouble. STC now uses only signed numbers in the API. (Small caveat on 32-bit platforms: containers no longer support 2.1 - 4.2 billion elements).
+- **No signed/unsigned mixing** - Unsigned sizes and indices mixed with signed in comparisons and calculations is asking for trouble. STC uses only signed numbers in the API.
 - **Small footprint** - Small source code and generated executables. The executable from the example below using ***six different*** container types is only ***19 Kb in size*** compiled with gcc -O3 -s on Linux.
 - **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See the Installation section.
 - **No callback functions** - All passed template argument functions/macros are directly called from the implementation, no slow callbacks which requires storage.
@@ -140,14 +140,13 @@ int main()
     // vec is "dropped" at end of c_AUTO scope
 }
 ```
-For struct element types, an `i_cmp` compare function is required (uses `<` and `==` by default,
-but works only for integral types). Alternatively, `#define i_opt c_no_cmp` to disable sorting
-and searching methods.
+For user defined struct elements, `i_cmp` compare function should be defined, as the default `<` and `==`
+only works for integral types. Alternatively, `#define i_opt c_no_cmp` to disable sorting and searching.
 
-Similarily, if an element destructor `i_valdrop` is defined, a `i_valclone` function is required as well,
-or `#define i_opt c_no_clone` to disable container cloning methods.
+Similarily, if an element destructor `i_valdrop` is defined, `i_valclone` function is required.
+Alternatively `#define i_opt c_no_clone` to disable container cloning.
 
-In order to include two **cvec**s with different element types, include <stc/cvec.h> twice:
+In order to include two **cvec**'s with different element types, include <stc/cvec.h> twice, e.g.:
 ```c
 #define i_val struct One
 #define i_opt c_no_cmp
