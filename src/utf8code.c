@@ -1,6 +1,5 @@
 #ifndef UTF8_C_INCLUDED
 #define UTF8_C_INCLUDED
-#include <ctype.h>
 #include <stc/utf8.h> // header only
 #include "utf8tabs.inc"
 

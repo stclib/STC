@@ -28,7 +28,6 @@ THE SOFTWARE.
 #include <stc/cstr.h>
 #include <stc/cregex.h> // header only
 #include <setjmp.h>
-#include <ctype.h>
 
 typedef uint32_t _Rune; /* Utf8 code point */
 typedef int32_t _Token;

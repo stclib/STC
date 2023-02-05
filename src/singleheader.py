@@ -5,15 +5,15 @@ import sys
 import os
 from os.path import dirname, join as path_join, abspath, basename, exists
 
-extra_paths = [path_join(dirname(abspath(__file__)), "include")]
-
+top_dir = dirname(abspath(__file__))
+extra_paths = [path_join(top_dir, 'include'), path_join(top_dir, '..', 'include')]
 
 def find_file(included_name, current_file):
     current_dir = dirname(abspath(current_file))
     for idir in [current_dir] + extra_paths:
         try_path = path_join(idir, included_name)
         if exists(try_path):
-            return try_path
+            return abspath(try_path)
     return None
 
 

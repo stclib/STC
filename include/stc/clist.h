@@ -138,7 +138,7 @@ STC_INLINE void         _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, int
                             { while (n--) _cx_memb(_push_back)(self, i_keyfrom(*raw++)); }
 STC_INLINE _cx_self     _cx_memb(_from_n)(const _cx_raw* raw, intptr_t n)
                             { _cx_self cx = {0}; _cx_memb(_put_n)(&cx, raw, n); return cx; }
-STC_INLINE bool         _cx_memb(_reserve)(_cx_self* self, intptr_t n) { return true; }
+STC_INLINE bool         _cx_memb(_reserve)(_cx_self* self, intptr_t n) { (void)(self + n); return true; }
 STC_INLINE bool         _cx_memb(_empty)(const _cx_self* self) { return self->last == NULL; }
 STC_INLINE void         _cx_memb(_clear)(_cx_self* self) { _cx_memb(_drop)(self); }
 STC_INLINE _cx_value*   _cx_memb(_push)(_cx_self* self, i_key value)

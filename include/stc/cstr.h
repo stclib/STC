@@ -36,7 +36,6 @@
 #include <stdlib.h> /* malloc */
 #include <stdarg.h>
 #include <stdio.h> /* vsnprintf */
-#include <ctype.h>
 
 /**************************** PRIVATE API **********************************/
 

@@ -170,7 +170,13 @@ typedef struct { int32_t d[6]; } cspan_idx6;
 #define cspan_submd4_4(self, x, y, z) \
     {.data=cspan_at(self, x, y, z, 0), .shape={(self)->shape[3]}}
 
-// FUNCTIONS
+// private definitions:
+
+STC_INLINE intptr_t _cspan_size(const int32_t shape[], int rank) {
+    intptr_t sz = shape[0];
+    while (rank-- > 1) sz *= shape[rank];
+    return sz;
+}
 
 STC_INLINE intptr_t _cspan_idx1(const int32_t shape[1], const cspan_idx1 stri, int32_t x)
     { c_ASSERT(c_LTu(x, shape[0])); return x; }
@@ -183,11 +189,27 @@ STC_INLINE intptr_t _cspan_idx3(const int32_t shape[3], const cspan_idx3 stri, i
     return (intptr_t)stri.d[2]*(stri.d[1]*x + y) + z;
 }
 STC_INLINE intptr_t _cspan_idx4(const int32_t shape[4], const cspan_idx4 stri, int32_t x, int32_t y,
-                                                                             int32_t z, int32_t w) {
+                                                                               int32_t z, int32_t w) {
     c_ASSERT(c_LTu(x, shape[0]) && c_LTu(y, shape[1]) && c_LTu(z, shape[2]) && c_LTu(w, shape[3]));
     return (intptr_t)stri.d[3]*(stri.d[2]*(stri.d[1]*x + y) + z) + w;
 }
-STC_INLINE intptr_t _cspan_idxN(int rank, const int32_t shape[], const int32_t stri[], const int32_t a[]) {
+
+STC_API intptr_t _cspan_idxN(int rank, const int32_t shape[], const int32_t stri[], const int32_t a[]);
+STC_API intptr_t _cspan_next2(int rank, int32_t pos[], const int32_t shape[], const int32_t stride[]);
+#define _cspan_next1(r, pos, d, s) (++pos[0], 1)
+#define _cspan_next3 _cspan_next2
+#define _cspan_next4 _cspan_next2
+#define _cspan_next5 _cspan_next2
+#define _cspan_next6 _cspan_next2
+
+STC_API intptr_t _cspan_slice(int32_t odim[], int32_t ostri[], int* orank, 
+                              const int32_t shape[], const int32_t stri[], 
+                              int rank, const int32_t a[][2]);
+
+/* -------------------------- IMPLEMENTATION ------------------------- */
+#if defined(i_implement)
+
+STC_DEF intptr_t _cspan_idxN(int rank, const int32_t shape[], const int32_t stri[], const int32_t a[]) {
     intptr_t off = a[0];
     bool ok = c_LTu(a[0], shape[0]);
     for (int i = 1; i < rank; ++i) {
@@ -199,19 +221,7 @@ STC_INLINE intptr_t _cspan_idxN(int rank, const int32_t shape[], const int32_t s
     return off;
 }
 
-STC_INLINE intptr_t _cspan_size(const int32_t shape[], int rank) {
-    intptr_t sz = shape[0];
-    while (rank-- > 1) sz *= shape[rank];
-    return sz;
-}
-
-#define _cspan_next1(r, pos, d, s) (++pos[0], 1)
-#define _cspan_next3 _cspan_next2
-#define _cspan_next4 _cspan_next2
-#define _cspan_next5 _cspan_next2
-#define _cspan_next6 _cspan_next2
-
-STC_INLINE intptr_t _cspan_next2(int rank, int32_t pos[], const int32_t shape[], const int32_t stride[]) {
+STC_DEF intptr_t _cspan_next2(int rank, int32_t pos[], const int32_t shape[], const int32_t stride[]) {
     intptr_t off = 1, rs = 1;
     ++pos[rank - 1];
     while (--rank && pos[rank] == shape[rank]) {
@@ -223,9 +233,9 @@ STC_INLINE intptr_t _cspan_next2(int rank, int32_t pos[], const int32_t shape[],
     return off;
 }
 
-STC_INLINE intptr_t _cspan_slice(int32_t odim[], int32_t ostri[], int* orank, 
-                                 const int32_t shape[], const int32_t stri[], 
-                                 int rank, const int32_t a[][2]) {
+STC_DEF intptr_t _cspan_slice(int32_t odim[], int32_t ostri[], int* orank, 
+                              const int32_t shape[], const int32_t stri[], 
+                              int rank, const int32_t a[][2]) {
     intptr_t off = 0;
     int i = 0, j = 0, ok = true;
     int32_t t, s = 1;
@@ -247,3 +257,9 @@ STC_INLINE intptr_t _cspan_slice(int32_t odim[], int32_t ostri[], int* orank,
     return off;
 }
 #endif
+#endif
+#undef i_opt
+#undef i_header
+#undef i_implement
+#undef i_static
+#undef i_extern
