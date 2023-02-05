@@ -6,12 +6,12 @@ STC - Smart Template Containers for C
 News: Version 4.1 RC2 (Feb 2023)
 ------------------------------------------------
 Major changes:
-- Signed sizes and indices for all containers (no more mixing unsigned/signed bugs).
+- Signed sizes and indices for all containers. See C++ Core Guidelines by Stroustrup/Sutter: [ES.100](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es100-dont-mix-signed-and-unsigned-arithmetic), [ES.102](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es102-use-signed-types-for-arithmetic), [ES.106](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es106-dont-try-to-avoid-negative-values-by-using-unsigned), and [ES.107](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es107-dont-use-unsigned-for-subscripts-prefer-gslindex).
 - A new exciting [**cspan**](docs/cspan_api.md) single/multi-dimensional array view (with numpy-like slicing).
 - Updates on cregex with several new unicode character classes.
 - Uppercase flow-control macros (ccommon.h). Lowercase macros are [still supported](include/stc/priv/altnames.h).
 - Some API changes in cregex and cstr.
-- [See detailed changes for version 4](#version-4).
+- [Previous changes for version 4](#version-4).
 
 Introduction
 ------------
