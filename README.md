@@ -15,7 +15,7 @@ Major changes:
 
 Introduction
 ------------
-STC is a *modern*, *templated*, *user-friendly*, *type-safe*, *very fast* and *compact* container library for C99.
+STC is a *modern*, *ergonomic*, *type-safe*, *very fast* and *compact* container library for C99.
 The API has similarities with c++ STL, but is more uniform across the containers and takes inspiration from Rust
 and Python as well. It is an advantage to know how these containers work in other languages, like Java, C# or C++,
 but it's not required.
@@ -125,22 +125,19 @@ int main(void)
     FVec_drop(&vec); // cleanup memory
 }
 ```
-Below is an alternative way to write this code with STC. It uses three
-macros: `c_AUTO`, `c_FORLIST`, and `c_FOREACH`. These macro not only
-simplifies the code, but more importantly makes it less prone to errors,
-while maintaining readability:
+Below is an alternative way to write this code with STC. It uses the generic flow control macros c_AUTO and c_FOREACH,
+and the function macro *c_make()*. This simplifies the code and makes it less prone to errors, while maintaining readability:
 ```c
 int main()
 {
     c_AUTO (FVec, vec) // RAII: define vec, init() and drop() all-in-one syntax.
     {
-        c_FORLIST (i, float, {10.f, 20.f, 30.f}) // Iterate a list of floats.
-            FVec_push(&vec, *i.ref);             // All containers have push() method.
+        vec = c_make(FVec, {10.f, 20.f, 30.f});  // Initialize with a list of floats.
 
         c_FOREACH (i, FVec, vec)                 // Iterate elements of the container.
             printf(" %g", *i.ref);               // i.ref is a pointer to the current element.
-    
-    } // vec is auto cleaned up at end of scope
+    }
+    // vec is "dropped" at end of c_AUTO scope
 }
 ```
 For struct element types, an `i_cmp` compare function is required (uses `<` and `==` by default,
