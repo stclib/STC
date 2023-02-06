@@ -347,6 +347,7 @@ typedef struct _Parser
     bool lastwasand;     /* Last token was _operand */
     short nbra;
     short nclass;
+    size_t instcap;
     _Rune yyrune;         /* last lex'd rune */
     _Reclass *yyclassp;   /* last lex'd class */
     _Reclass* classp;
@@ -546,6 +547,9 @@ _optimize(_Parser *par, _Reprog *pp)
      *  necessary.  Reallocate to the actual space used
      *  and then relocate the code.
      */
+    if ((par->freep - pp->firstinst)*2 > (ptrdiff_t)par->instcap)
+        return pp;
+
     intptr_t ipp = (intptr_t)pp;
     size_t size = sizeof(_Reprog) + (size_t)(par->freep - pp->firstinst)*sizeof(_Reinst);
     _Reprog *npp = (_Reprog *)c_realloc(pp, size);
@@ -843,8 +847,8 @@ _regcomp1(_Reprog *progp, _Parser *par, const char *s, int cflags)
     _Token token;
 
     /* get memory for the program. estimated max usage */
-    const size_t instcap = 5 + 6*strlen(s);
-    _Reprog* pp = (_Reprog *)c_realloc(progp, sizeof(_Reprog) + instcap*sizeof(_Reinst));
+    par->instcap = 5U + 6*strlen(s);
+    _Reprog* pp = (_Reprog *)c_realloc(progp, sizeof(_Reprog) + par->instcap*sizeof(_Reinst));
     if (pp == NULL) {
         par->error = CREG_OUTOFMEMORY;
         c_free(progp);

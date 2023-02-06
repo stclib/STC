@@ -203,11 +203,11 @@ CTEST(cregex, search_all)
         ASSERT_NE(res, CREG_OK);
     }
 }
-// TEST FAILS sanitize!!!
-CTEST_SKIP(cregex, captures_len)
+
+CTEST(cregex, captures_len)
 {
     c_AUTO (cregex, re) {
-       cregex re = cregex_from("(ab(cd))(ef)");
+       re = cregex_from("(ab(cd))(ef)");
        ASSERT_EQ(cregex_captures(&re), 4);
     }
 }
@@ -250,33 +250,33 @@ CTEST(cregex, replace)
     const char* input = "start date: 2015-12-31, end date: 2022-02-28";
 
     c_AUTO (cstr, str) {
-        /* replace with a fixed string, extended all-in-one call: */
+        // replace with a fixed string, extended all-in-one call:
         cstr_take(&str, cregex_replace_pattern(pattern, input, "YYYY-MM-DD"));
-        ASSERT_TRUE(cstr_equals(&str, "start date: YYYY-MM-DD, end date: YYYY-MM-DD"));
+        ASSERT_STREQ(cstr_str(&str), "start date: YYYY-MM-DD, end date: YYYY-MM-DD");
 
-        /* US date format, and add 10 years to dates: */
+        // US date format, and add 10 years to dates:
         cstr_take(&str, cregex_replace_pattern(pattern, input, "$1/$3/$2", 0, add_10_years, CREG_DEFAULT));
-        ASSERT_TRUE(cstr_equals(&str, "start date: 2025/31/12, end date: 2032/28/02"));
+        ASSERT_STREQ(cstr_str(&str), "start date: 2025/31/12, end date: 2032/28/02");
 
-        /* Wrap first date inside []: */
+        // Wrap first date inside []:
         cstr_take(&str, cregex_replace_pattern(pattern, input, "[$0]", 1));
-        ASSERT_TRUE(cstr_equals(&str, "start date: [2015-12-31], end date: 2022-02-28"));
+        ASSERT_STREQ(cstr_str(&str), "start date: [2015-12-31], end date: 2022-02-28");
 
-        /* Wrap all words in ${} */
+        // Wrap all words in ${}
         cstr_take(&str, cregex_replace_pattern("[a-z]+", "52 apples and 31 mangoes", "$${$0}"));
-        ASSERT_TRUE(cstr_equals(&str, "52 ${apples} ${and} 31 ${mangoes}"));
+        ASSERT_STREQ(cstr_str(&str), "52 ${apples} ${and} 31 ${mangoes}");
 
-        /* Compile RE separately */
+        // Compile RE separately
         c_WITH (cregex re = cregex_from(pattern), cregex_drop(&re)) {
             ASSERT_EQ(cregex_captures(&re), 4);
 
-            /* European date format. */
+            // European date format.
             cstr_take(&str, cregex_replace(&re, input, "$3.$2.$1"));
-            ASSERT_TRUE(cstr_equals(&str, "start date: 31.12.2015, end date: 28.02.2022"));
+            ASSERT_STREQ(cstr_str(&str), "start date: 31.12.2015, end date: 28.02.2022");
 
-            /* Strip out everything but the matches */
+            // Strip out everything but the matches
             cstr_take(&str, cregex_replace_sv(&re, csview_from(input), "$3.$2.$1;", 0, NULL, CREG_R_STRIP));
-            ASSERT_TRUE(cstr_equals(&str, "31.12.2015;28.02.2022;"));
+            ASSERT_STREQ(cstr_str(&str), "31.12.2015;28.02.2022;");
         }
     }
 }
