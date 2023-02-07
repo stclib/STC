@@ -49,13 +49,13 @@
 #endif
 
 #ifndef i_allocator
-  #define i_allocator c_
+  #define i_allocator c
 #endif
 #ifndef i_malloc
-  #define i_malloc c_PASTE(i_allocator, malloc)
-  #define i_calloc c_PASTE(i_allocator, calloc)
-  #define i_realloc c_PASTE(i_allocator, realloc)
-  #define i_free c_PASTE(i_allocator, free)
+  #define i_malloc c_PASTE(i_allocator, _malloc)
+  #define i_calloc c_PASTE(i_allocator, _calloc)
+  #define i_realloc c_PASTE(i_allocator, _realloc)
+  #define i_free c_PASTE(i_allocator, _free)
 #endif
 
 #if !(defined i_key || defined i_key_str || defined i_key_ssv || \
