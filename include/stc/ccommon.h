@@ -64,24 +64,24 @@
 
 #ifdef __cplusplus
   #include <new>
-  #define c_ALLOC(T)            static_cast<T*>(c_malloc(c_sizeof(T)))
-  #define c_NEW(T, ...)         new (c_ALLOC(T)) T(__VA_ARGS__)
+  #define _i_alloc(T)           static_cast<T*>(i_malloc(c_sizeof(T)))
+  #define _i_new(T, ...)        new (_i_alloc(T)) T(__VA_ARGS__)
+  #define c_new(T, ...)         new (malloc(sizeof(T))) T(__VA_ARGS__)
   #define c_LITERAL(T)          T
 #else
-  #define c_ALLOC(T)            ((T*)c_malloc(c_sizeof(T)))
-  #define c_NEW(T, ...)         ((T*)memcpy(c_ALLOC(T), (T[]){__VA_ARGS__}, sizeof(T)))
+  #define _i_alloc(T)           ((T*)i_malloc(c_sizeof(T)))
+  #define _i_new(T, ...)        ((T*)memcpy(_i_alloc(T), (T[]){__VA_ARGS__}, sizeof(T)))
+  #define c_new(T, ...)         ((T*)memcpy(malloc(sizeof(T)), (T[]){__VA_ARGS__}, sizeof(T)))
   #define c_LITERAL(T)          (T)
 #endif
+#define c_malloc(sz)            malloc(c_i2u(sz))
+#define c_calloc(n, sz)         calloc(c_i2u(n), c_i2u(sz))
+#define c_realloc(p, sz)        realloc(p, c_i2u(sz))
+#define c_free(p)               free(p)
 
-#ifndef c_malloc
-  #define c_malloc(sz)          malloc(c_i2u(sz))
-  #define c_calloc(n, sz)       calloc(c_i2u(n), c_i2u(sz))
-  #define c_realloc(p, sz)      realloc(p, c_i2u(sz))
-  #define c_free(p)             free(p)
-#endif
 #define c_static_assert(b)      ((int)(0*sizeof(int[(b) ? 1 : -1])))
 #define c_container_of(p, T, m) ((T*)((char*)(p) + 0*sizeof((p) == &((T*)0)->m) - offsetof(T, m)))
-#define c_delete(T, ptr)        do { T *_tp = ptr; T##_drop(_tp); c_free(_tp); } while (0)
+#define c_delete(T, ptr)        do { T *_tp = ptr; T##_drop(_tp); i_free(_tp); } while (0)
 #define c_swap(T, xp, yp)       do { T *_xp = xp, *_yp = yp, \
                                     _tv = *_xp; *_xp = *_yp; *_yp = _tv; } while (0)
 #define c_sizeof                (intptr_t)sizeof
@@ -121,13 +121,14 @@
 
 #define c_make(C, ...) \
   C##_from_n((C##_raw[])__VA_ARGS__, c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
+#define c_arraylen(a) \
+  (intptr_t)(sizeof(a)/sizeof 0[a])
 
 typedef const char* crawstr;
 #define crawstr_cmp(xp, yp) strcmp(*(xp), *(yp))
 #define crawstr_hash(p) cstrhash(*(p))
 #define crawstr_len(literal) (c_sizeof("" literal) - 1)
 
-#define c_ARRAYLEN(a) (intptr_t)(sizeof(a)/sizeof 0[a])
 #define c_SV(...) c_MACRO_OVERLOAD(c_SV, __VA_ARGS__)
 #define c_SV_1(lit) c_SV_2(lit, crawstr_len(lit))
 #define c_SV_2(str, n) (c_LITERAL(csview){str, n})

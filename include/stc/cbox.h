@@ -89,7 +89,7 @@ STC_INLINE _cx_self _cx_memb(_from_ptr)(_cx_value* p)
 
 // c++: std::make_unique<i_key>(val)
 STC_INLINE _cx_self _cx_memb(_make)(_cx_value val) {
-    _cx_self ptr = {c_ALLOC(_cx_value)};
+    _cx_self ptr = {_i_alloc(_cx_value)};
     *ptr.get = val; return ptr;
 }
 
@@ -100,7 +100,7 @@ STC_INLINE _cx_raw _cx_memb(_toraw)(const _cx_self* self)
 STC_INLINE void _cx_memb(_drop)(_cx_self* self) {
     if (self->get) {
         i_keydrop(self->get);
-        c_free(self->get);
+        i_free(self->get);
     }
 }
 
@@ -136,7 +136,7 @@ STC_INLINE _cx_self _cx_memb(_from)(_cx_value val)
     STC_INLINE _cx_self _cx_memb(_clone)(_cx_self other) {
         if (!other.get)
             return other;
-        _cx_self out = {c_ALLOC(i_key)};
+        _cx_self out = {_i_alloc(i_key)};
         *out.get = i_keyclone((*other.get));
         return out;
     }

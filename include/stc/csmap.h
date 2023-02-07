@@ -231,7 +231,7 @@ STC_DEF bool
 _cx_memb(_reserve)(_cx_self* self, const int64_t cap) {
     if ((i_size)cap <= self->cap)
         return false;
-    _cx_node* nodes = (_cx_node*)c_realloc(self->nodes, (cap + 1)*c_sizeof(_cx_node));
+    _cx_node* nodes = (_cx_node*)i_realloc(self->nodes, (cap + 1)*c_sizeof(_cx_node));
     if (!nodes)
         return false;
     nodes[0] = c_LITERAL(_cx_node){{0, 0}, 0};
@@ -581,7 +581,7 @@ STC_DEF void
 _cx_memb(_drop)(_cx_self* self) {
     if (self->cap) {
         _cx_memb(_drop_r_)(self->nodes, self->root);
-        c_free(self->nodes);
+        i_free(self->nodes);
     }
 }
 

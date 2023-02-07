@@ -48,6 +48,16 @@
   #define i_size intptr_t
 #endif
 
+#ifndef i_allocator
+  #define i_allocator c_
+#endif
+#ifndef i_malloc
+  #define i_malloc c_PASTE(i_allocator, malloc)
+  #define i_calloc c_PASTE(i_allocator, calloc)
+  #define i_realloc c_PASTE(i_allocator, realloc)
+  #define i_free c_PASTE(i_allocator, free)
+#endif
+
 #if !(defined i_key || defined i_key_str || defined i_key_ssv || \
       defined i_keyclass || defined i_keyboxed)
   #if defined _i_ismap
@@ -316,6 +326,12 @@
 #undef i_implement
 #undef i_static
 #undef i_extern
+
+#undef i_allocator
+#undef i_malloc
+#undef i_calloc
+#undef i_realloc
+#undef i_free
 
 #undef i_no_cmp
 #undef i_no_eq

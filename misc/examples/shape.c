@@ -140,9 +140,9 @@ int main(void)
 {
     c_AUTO (Shapes, shapes)
     {
-        Triangle* tri1 = c_NEW(Triangle, Triangle_from((Point){5, 7}, (Point){12, 7}, (Point){12, 20}));
-        Polygon* pol1 = c_NEW(Polygon, Polygon_init());
-        Polygon* pol2 = c_NEW(Polygon, Polygon_init());
+        Triangle* tri1 = c_new(Triangle, Triangle_from((Point){5, 7}, (Point){12, 7}, (Point){12, 20}));
+        Polygon* pol1 = c_new(Polygon, Polygon_init());
+        Polygon* pol2 = c_new(Polygon, Polygon_init());
 
         c_FORLIST (i, Point, {{50, 72}, {123, 73}, {127, 201}, {828, 333}})
             Polygon_addPoint(pol1, *i.ref);

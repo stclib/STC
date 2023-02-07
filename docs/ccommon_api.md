@@ -261,9 +261,9 @@ int main() {
 ```
 Note that `c_flt_take()` is given as an optional argument, which makes the loop stop when it becomes false (for efficiency). Chaining it after `isPrime()` instead will give same result, but the full input is processed.
 
-### c_make
+### c_make, c_new
 
-Make a container from a literal initializer list. Example:
+**c_make**: Make a container from a literal initializer list. Example:
 ```c
 #define i_val_str  // cstr value type
 #include <stc/cset.h>
@@ -275,6 +275,13 @@ Make a container from a literal initializer list. Example:
 cset_str myset = c_make(cset_str, {"This", "is", "the", "story"}); // note: const char* values given!
 int x = 7, y = 8;
 cmap_int mymap = c_make(cmap_int, { {1, 2}, {3, 4}, {5, 6}, {x, y} });
+```
+
+**c_new(Type)**: Allocate and init a new object on the heap
+```c
+struct Pnt { double x, y, z; };
+struct Pnt *pnt = c_new(struct Pnt, {1.2, 3.4, 5.6});
+c_free(pnt);
 ```
 
 ### crange
@@ -342,29 +349,12 @@ bool        crawstr_eq(const crawstr* x, const crawstr* y);
 uint64_t    crawstr_hash(const crawstr* x);
 ```
 
-### c_NEW, c_ALLOC, c_ALLOC_N
-
-| Usage                       | Meaning                                    |
-|:----------------------------|:-------------------------------------------|
-| `c_NEW (type, value)`       | Allocate and init a new object on the heap |
-| `c_ALLOC (type)`            | `(type *) c_malloc(c_sizeof(type))`        |
-| `c_ALLOC_N (type, N)`       | `(type *) c_malloc((N)*c_sizeof(type))`    |
-
-```c
-struct Pnt { double x, y, z; };
-struct Pnt *pnt = c_NEW(struct Pnt, {1.2, 3.4, 5.6});
-c_free(pnt);
-
-int* array = c_ALLOC_N(int, 100);
-c_free(array);
-```
-
 ### c_malloc, c_calloc, c_realloc, c_free: customizable allocators
-Memory allocator for the entire library. Macros can be overridden by the user.
+Memory allocator wrappers that uses signed sizes.
 
-### c_ARRAYLEN
-- **c_ARRAYLEN(array)**: Return number of elements in an array. array must not be a pointer!
+### c_arraylen
+Return number of elements in an array. array must not be a pointer!
 ```c
 int array[] = {1, 2, 3, 4};
-intptr_t n = c_ARRAYLEN(array);
+intptr_t n = c_arraylen(array);
 ```

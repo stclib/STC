@@ -124,10 +124,10 @@ typedef struct { int32_t d[6]; } cspan_idx6;
     {.data=(container)->data, .shape={(int32_t)(container)->_len}}
 
 #define cspan_from_array(array) \
-    {.data=(array) + c_static_assert(sizeof(array) != sizeof(void*)), .shape={c_ARRAYLEN(array)}}
+    {.data=(array) + c_static_assert(sizeof(array) != sizeof(void*)), .shape={c_arraylen(array)}}
 
 #define cspan_size(self) _cspan_size((self)->shape, cspan_rank(self))
-#define cspan_rank(self) c_ARRAYLEN((self)->shape)
+#define cspan_rank(self) c_arraylen((self)->shape)
 
 #define cspan_index(self, ...) c_PASTE(cspan_idx_, c_NUMARGS(__VA_ARGS__))(self, __VA_ARGS__)
 #define cspan_idx_1 cspan_idx_4

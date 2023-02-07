@@ -10,9 +10,9 @@ typedef int64_t inttype;
 #define i_key_str
 #define i_val inttype*
 #define i_valraw inttype
-#define i_valfrom(raw) c_NEW(inttype, raw)
+#define i_valfrom(raw) c_new(inttype, raw)
 #define i_valto(x) **x
-#define i_valclone(x) c_NEW(inttype, *x)
+#define i_valclone(x) c_new(inttype, *x)
 #define i_valdrop(x) c_free(*x)
 #include <stc/cmap.h>
 
@@ -32,8 +32,8 @@ int main()
     c_AUTO (SIBoxMap, m2)
     {
         printf("\nMap with pointer elements:\n");
-        SIPtrMap_insert(&map, cstr_from("testing"), c_NEW(inttype, 1));
-        SIPtrMap_insert(&map, cstr_from("done"), c_NEW(inttype, 2));
+        SIPtrMap_insert(&map, cstr_from("testing"), c_new(inttype, 1));
+        SIPtrMap_insert(&map, cstr_from("done"), c_new(inttype, 2));
 
         // Emplace: implicit key, val construction:
         SIPtrMap_emplace(&map, "hello", 3);

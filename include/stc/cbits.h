@@ -198,7 +198,7 @@ struct { uint64_t data64[(i_capacity - 1)/64 + 1]; } typedef i_type;
 STC_INLINE i_type   _i_memb(_init)(void) { return c_LITERAL(i_type){0}; }
 STC_INLINE void     _i_memb(_create)(i_type* self) {}
 STC_INLINE void     _i_memb(_drop)(i_type* self) {}
-STC_INLINE intptr_t   _i_memb(_size)(const i_type* self) { return i_capacity; }
+STC_INLINE intptr_t _i_memb(_size)(const i_type* self) { return i_capacity; }
 STC_INLINE i_type   _i_memb(_move)(i_type* self) { return *self; }
 
 STC_INLINE i_type*  _i_memb(_take)(i_type* self, i_type other)

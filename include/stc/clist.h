@@ -70,7 +70,7 @@ _c_clist_types(clist_VOID, int);
 _c_clist_complete_types(clist_VOID, dummy);
 
 #define _c_clist_insert_entry_after(ref, val) \
-    _cx_node *entry = (_cx_node *)c_malloc(c_sizeof *entry); entry->value = val; \
+    _cx_node *entry = (_cx_node *)i_malloc(c_sizeof *entry); entry->value = val; \
     _c_clist_insert_node_after(ref, entry)
 
 #define _c_clist_insert_node_after(ref, entry) \
@@ -348,7 +348,7 @@ STC_DEF void
 _cx_memb(_erase_node_after)(_cx_self* self, _cx_node* ref) {
     _cx_node* node = _cx_memb(_unlink_node_after)(self, ref);
     i_keydrop((&node->value));
-    c_free(node);
+    i_free(node);
 }
 
 STC_DEF _cx_node*

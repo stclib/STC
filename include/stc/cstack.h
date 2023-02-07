@@ -59,12 +59,12 @@ STC_INLINE void _cx_memb(_create)(_cx_self* self)
     { self->_len = 0; self->_cap = 0; self->data = NULL; }
 
 STC_INLINE _cx_self _cx_memb(_with_capacity)(intptr_t cap) {
-    _cx_self out = {(_cx_value *) c_malloc(cap*c_sizeof(i_key)), 0, cap};
+    _cx_self out = {(_cx_value *) i_malloc(cap*c_sizeof(i_key)), 0, cap};
     return out;
 }
 
 STC_INLINE _cx_self _cx_memb(_with_size)(intptr_t size, i_key null) {
-    _cx_self out = {(_cx_value *) c_malloc(size*c_sizeof null), size, size};
+    _cx_self out = {(_cx_value *) i_malloc(size*c_sizeof null), size, size};
     while (size) out.data[--size] = null;
     return out;
 }
@@ -79,7 +79,7 @@ STC_INLINE void _cx_memb(_clear)(_cx_self* self) {
 STC_INLINE void _cx_memb(_drop)(_cx_self* self) {
     _cx_memb(_clear)(self);
 #ifndef i_capacity
-    c_free(self->data);
+    i_free(self->data);
 #endif
 }
 
@@ -100,7 +100,7 @@ STC_INLINE intptr_t _cx_memb(_capacity)(const _cx_self* self) {
 STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, intptr_t n) {
     if (n < self->_len) return true;
 #ifndef i_capacity
-    _cx_value *t = (_cx_value *)c_realloc(self->data, n*c_sizeof *t);
+    _cx_value *t = (_cx_value *)i_realloc(self->data, n*c_sizeof *t);
     if (t) { self->_cap = n, self->data = t; return true; }
 #endif
     return false;
@@ -154,7 +154,7 @@ STC_INLINE _cx_value* _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
 
 #if !defined i_no_clone
 STC_INLINE _cx_self _cx_memb(_clone)(_cx_self v) {
-    _cx_self out = {(_cx_value *)c_malloc(v._len*c_sizeof(_cx_value)), v._len, v._len};
+    _cx_self out = {(_cx_value *)i_malloc(v._len*c_sizeof(_cx_value)), v._len, v._len};
     if (!out.data) out._cap = 0;
     else for (intptr_t i = 0; i < v._len; ++v.data)
         out.data[i++] = i_keyclone((*v.data));

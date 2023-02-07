@@ -229,7 +229,7 @@ STC_DEF void
 _cx_memb(_shrink_to_fit)(_cx_self *self) {
     if (self->_len != self->_cap) {
         c_memmove(self->_base, self->data, self->_len*c_sizeof(i_key));
-        _cx_value* d = (_cx_value*)c_realloc(self->_base, self->_len*c_sizeof(i_key));
+        _cx_value* d = (_cx_value*)i_realloc(self->_base, self->_len*c_sizeof(i_key));
         if (d) {
             self->_base = d;
             self->_cap = self->_len;
@@ -242,7 +242,7 @@ STC_DEF void
 _cx_memb(_drop)(_cx_self* self) {
     if (self->_base) {
         _cx_memb(_clear)(self);
-        c_free(self->_base);
+        i_free(self->_base);
     }
 }
 
@@ -250,7 +250,7 @@ static intptr_t
 _cx_memb(_realloc_)(_cx_self* self, const intptr_t n) {
     const intptr_t cap = (intptr_t)((float)self->_len*1.7f) + n + 7;
     const intptr_t nfront = _cdeq_nfront(self);
-    _cx_value* d = (_cx_value*)c_realloc(self->_base, cap*c_sizeof(i_key));
+    _cx_value* d = (_cx_value*)i_realloc(self->_base, cap*c_sizeof(i_key));
     if (!d)
         return 0; 
     self->_cap = cap;

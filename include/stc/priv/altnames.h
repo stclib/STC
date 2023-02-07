@@ -20,9 +20,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#define c_alloc c_ALLOC
-#define c_new c_NEW
-#define c_arraylen c_ARRAYLEN
 #define c_forlist c_FORLIST
 #define c_forrange c_FORRANGE
 #define c_foreach c_FOREACH
@@ -38,3 +35,5 @@
 #define c_defer c_DEFER
 #define c_sv c_SV
 #define c_ARGSV c_SVARG
+#define c_NEW c_new
+#define c_ARRAYLEN c_arraylen
