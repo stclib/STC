@@ -395,7 +395,8 @@ _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey) {
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self m) {
     if (m.table) {
-        _cx_value *t = c_ALLOC_N(_cx_value, m.bucket_count), *dst = t, *m_end = m.table + m.bucket_count;
+        _cx_value *t = (_cx_value *)c_malloc(c_sizeof(_cx_value)*m.bucket_count),
+                  *dst = t, *m_end = m.table + m.bucket_count;
         uint8_t *h = (uint8_t *)c_memcpy(c_malloc(m.bucket_count + 1), m._hashx, m.bucket_count + 1);
         if (!(t && h)) 
             { c_free(t), c_free(h), t = 0, h = 0, m.bucket_count = 0; }
@@ -421,8 +422,8 @@ _cx_memb(_reserve)(_cx_self* self, const int64_t newcap) {
     _nbuckets |= 1;
     #endif
     _cx_self m = {
-        c_ALLOC_N(_cx_value, _nbuckets),
-        (uint8_t *) c_calloc(_nbuckets + 1, 1),
+        (_cx_value *)c_malloc(c_sizeof(_cx_value)*_nbuckets),
+        (uint8_t *)c_calloc(_nbuckets + 1, 1),
         self->size, _nbuckets,
     };
     bool ok = m.table && m._hashx;

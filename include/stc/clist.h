@@ -70,7 +70,7 @@ _c_clist_types(clist_VOID, int);
 _c_clist_complete_types(clist_VOID, dummy);
 
 #define _c_clist_insert_entry_after(ref, val) \
-    _cx_node *entry = c_ALLOC(_cx_node); entry->value = val; \
+    _cx_node *entry = (_cx_node *)c_malloc(c_sizeof *entry); entry->value = val; \
     _c_clist_insert_node_after(ref, entry)
 
 #define _c_clist_insert_node_after(ref, entry) \

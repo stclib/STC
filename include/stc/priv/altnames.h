@@ -21,7 +21,6 @@
  * SOFTWARE.
  */
 #define c_alloc c_ALLOC
-#define c_alloc_n c_ALLOC_N
 #define c_new c_NEW
 #define c_arraylen c_ARRAYLEN
 #define c_forlist c_FORLIST

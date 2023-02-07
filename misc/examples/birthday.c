@@ -5,7 +5,7 @@
 
 #define i_tag ic
 #define i_key uint64_t
-#define i_val uint8_t
+#define i_val int
 #include <stc/cmap.h>
 
 static uint64_t seed = 12345;

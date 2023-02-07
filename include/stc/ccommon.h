@@ -65,12 +65,10 @@
 #ifdef __cplusplus
   #include <new>
   #define c_ALLOC(T)            static_cast<T*>(c_malloc(c_sizeof(T)))
-  #define c_ALLOC_N(T, n)       static_cast<T*>(c_malloc(c_sizeof(T)*(n)))
   #define c_NEW(T, ...)         new (c_ALLOC(T)) T(__VA_ARGS__)
   #define c_LITERAL(T)          T
 #else
   #define c_ALLOC(T)            ((T*)c_malloc(c_sizeof(T)))
-  #define c_ALLOC_N(T, n)       ((T*)c_malloc(c_sizeof(T)*(n)))
   #define c_NEW(T, ...)         ((T*)memcpy(c_ALLOC(T), (T[]){__VA_ARGS__}, sizeof(T)))
   #define c_LITERAL(T)          (T)
 #endif
