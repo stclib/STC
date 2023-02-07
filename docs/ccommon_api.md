@@ -261,9 +261,9 @@ int main() {
 ```
 Note that `c_flt_take()` is given as an optional argument, which makes the loop stop when it becomes false (for efficiency). Chaining it after `isPrime()` instead will give same result, but the full input is processed.
 
-### c_make, c_new
+### c_make, c_new, c_delete
 
-**c_make**: Make a container from a literal initializer list. Example:
+- **c_make**: Make a container from a literal initializer list. Example:
 ```c
 #define i_val_str  // cstr value type
 #include <stc/cset.h>
@@ -277,16 +277,20 @@ int x = 7, y = 8;
 cmap_int mymap = c_make(cmap_int, { {1, 2}, {3, 4}, {5, 6}, {x, y} });
 ```
 
-**c_new(Type)**: Allocate and init a new object on the heap
+- **c_new(Type)**: Allocate *and init* a new object on the heap
+- **c_delete(Type, ptr)**: Drop *and free* an object allocated on the heap
 ```c
-struct Pnt { double x, y, z; };
-struct Pnt *pnt = c_new(struct Pnt, {1.2, 3.4, 5.6});
-c_free(pnt);
+#include <stc/cstr.h>
+
+cstr *stringptr = c_new(cstr, cstr_from("Hello"));
+printf("%s\n", cstr_str(stringptr));
+c_delete(cstr, stringptr);
 ```
 
 ### crange
-**crange** is a number sequence generator type. The **crange_value** type is `long long`. Below *start*, *stop*, and *step* are of type *crange_value*:
+- **crange** is a number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html). The **crange_value** type is `long long`. Below *start*, *stop*, and *step* are of type *crange_value*:
 ```c
+crange&     crange_obj(...)                 // create a compound literal crange object
 crange      crange_make(stop);              // will generate 0, 1, ..., stop-1
 crange      crange_make(start, stop);       // will generate start, start+1, ... stop-1
 crange      crange_make(start, stop, step); // will generate start, start+step, ... upto-not-including stop
@@ -305,7 +309,7 @@ c_FORFILTER (i, crange, r1
 
 // 2. The 11 first primes:
 printf("2");
-c_FORFILTER (i, crange, crange_literal(3, INT64_MAX, 2)
+c_FORFILTER (i, crange, crange_obj(3, INT64_MAX, 2)
               , isPrime(*i.ref)
               , c_flt_take(10))
     printf(" %lld", *i.ref);

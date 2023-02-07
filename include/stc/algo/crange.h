@@ -34,7 +34,7 @@ int main()
 
     // use a temporary crange object.
     int a = 100, b = INT32_MAX;
-    c_FORFILTER (i, crange, crange_literal(a, b, 8)
+    c_FORFILTER (i, crange, crange_obj(a, b, 8)
                   , i.index > 10
                   , c_flt_take(i, 3))
         printf(" %lld", *i.ref);
@@ -46,7 +46,7 @@ int main()
 
 #include <stc/ccommon.h>
 
-#define crange_literal(...) \
+#define crange_obj(...) \
     (*(crange[]){crange_make(__VA_ARGS__)})
 
 typedef long long crange_value;
