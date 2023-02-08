@@ -38,13 +38,6 @@ c_forfilter     |
 c_forwhile      |
 c_formatch      |
 c_fortoken      |
-c_foreach       |
-c_forpair       |
-c_forrange      |
-c_forfilter     |
-c_forwhile      |
-c_formatch      |
-c_fortoken      |
 for             |
 while           |
 switch          { block_type |= LOOP; state = BRACES; }
