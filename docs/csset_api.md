@@ -83,13 +83,12 @@ csset_X_value        csset_X_value_clone(csset_X_value val);
 
 int main ()
 {
-    c_AUTO (csset_str, first, second, third)
-    c_AUTO (csset_str, fourth, fifth)
+    c_auto (csset_str, first, second, third)
+    c_auto (csset_str, fourth, fifth)
     {
-        c_FORLIST (i, const char*, {"red", "green", "blue"})
-            csset_str_emplace(&second, *i.ref);
+        second = c_make(csset_str, {"red", "green", "blue"});
 
-        c_FORLIST (i, const char*, {"orange", "pink", "yellow"})
+        c_forlist (i, const char*, {"orange", "pink", "yellow"})
             csset_str_emplace(&third, *i.ref);
 
         csset_str_emplace(&fourth, "potatoes");
@@ -97,13 +96,13 @@ int main ()
         csset_str_emplace(&fourth, "flour");
 
         fifth = csset_str_clone(second);
-        c_FOREACH (i, csset_str, third)
+        c_foreach (i, csset_str, third)
             csset_str_emplace(&fifth, cstr_str(i.ref));
-        c_FOREACH (i, csset_str, fourth)
+        c_foreach (i, csset_str, fourth)
             csset_str_emplace(&fifth, cstr_str(i.ref));
 
         printf("fifth contains:\n\n");
-        c_FOREACH (i, csset_str, fifth)
+        c_foreach (i, csset_str, fifth)
             printf("%s\n", cstr_str(i.ref));
     }
 }

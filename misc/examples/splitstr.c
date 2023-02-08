@@ -5,15 +5,15 @@
 
 int main()
 {
-    puts("Split with c_FORTOKEN (csview):");
+    puts("Split with c_fortoken (csview):");
 
-    c_FORTOKEN (i, "Hello World C99!", " ")
+    c_fortoken (i, "Hello World C99!", " ")
         printf("'%.*s'\n", c_SVARG(i.token));
 
 
-    puts("\nSplit with c_FORMATCH (regex):");
+    puts("\nSplit with c_formatch (regex):");
 
-    c_WITH (cregex re = cregex_from("[^ ]+"), cregex_drop(&re))
-        c_FORMATCH (i, &re, "  Hello   World      C99! ")
+    c_with (cregex re = cregex_from("[^ ]+"), cregex_drop(&re))
+        c_formatch (i, &re, "  Hello   World      C99! ")
             printf("'%.*s'\n", c_SVARG(i.match[0]));
 }

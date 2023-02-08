@@ -27,8 +27,8 @@
 
 int main()
 {
-    c_AUTO (Stack, stack)
-    c_AUTO (List, list)
+    c_auto (Stack, stack)
+    c_auto (List, list)
     {
         // POPULATE stack with shared pointers to Maps:
         Map *map;
@@ -64,14 +64,14 @@ int main()
 
 
         puts("STACKS");
-        c_FOREACH (i, Stack, stack) {
-            c_FORPAIR (name, year, Map, *i.ref->get)
+        c_foreach (i, Stack, stack) {
+            c_forpair (name, year, Map, *i.ref->get)
                 printf(" %s:%d", cstr_str(_.name), *_.year);
             puts("");
         }
         puts("LIST");
-        c_FOREACH (i, List, list) {
-            c_FORPAIR (name, year, Map, *i.ref->get)
+        c_foreach (i, List, list) {
+            c_forpair (name, year, Map, *i.ref->get)
                 printf(" %s:%d", cstr_str(_.name), *_.year);
             puts("");
         }

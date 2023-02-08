@@ -7,8 +7,8 @@ int main(int argc, char* argv[])
         printf("Usage: regex1 -i\n");
         return 0;
     }
-    c_AUTO (cstr, input)
-    c_AUTO (cregex, float_expr)
+    c_auto (cstr, input)
+    c_auto (cregex, float_expr)
     {
         int res = cregex_compile(&float_expr, "^[+-]?[0-9]+((\\.[0-9]*)?|\\.[0-9]+)$");
         // Until "q" is given, ask for another number

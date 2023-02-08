@@ -20,20 +20,20 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#define c_forlist c_FORLIST
-#define c_forrange c_FORRANGE
-#define c_foreach c_FOREACH
-#define c_forwhile c_FORWHILE
-#define c_forpair c_FORPAIR
-#define c_forfilter c_FORFILTER
-#define c_formatch c_FORMATCH
-#define c_fortoken c_FORTOKEN
-#define c_fortoken_sv c_FORTOKEN_SV
-#define c_auto c_AUTO
-#define c_with c_WITH
-#define c_scope c_SCOPE
-#define c_defer c_DEFER
-#define c_sv c_SV
-#define c_ARGSV c_SVARG
+#define c_FORLIST c_forlist
+#define c_FORRANGE c_forrange
+#define c_FOREACH c_foreach
+#define c_FORWHILE c_forwhile
+#define c_FORPAIR c_forpair
+#define c_FORFILTER c_forfilter
+#define c_FORMATCH c_formatch
+#define c_FORTOKEN c_fortoken
+#define c_FORTOKEN_SV c_fortoken_sv
+#define c_AUTO c_auto
+#define c_WITH c_with
+#define c_SCOPE c_scope
+#define c_DEFER c_defer
 #define c_NEW c_new
 #define c_ARRAYLEN c_arraylen
+#define c_ARGSV c_SVARG
+#define c_sv c_SV

@@ -50,42 +50,43 @@ void City_drop(City* c) {
 
 int main(void)
 {
-    c_AUTO (Cities, cities, copy)
-    c_AUTO (CityMap, map)
+    c_auto (Cities, cities, copy)
+    c_auto (CityMap, map)
     {
-        c_FORLIST (i, City, {
-            {cstr_lit("New York"), cstr_lit("US"), 4.3f, 23.2f, 9000000},
-            {cstr_lit("Paris"), cstr_lit("France"), 4.3f, 23.2f, 9000000},
-            {cstr_lit("Berlin"), cstr_lit("Germany"), 4.3f, 23.2f, 9000000},
-            {cstr_lit("London"), cstr_lit("UK"), 4.3f, 23.2f, 9000000},
-        }) Cities_emplace(&cities, *i.ref); // NB. creates smart pointers!
+        // Create a cvec with smart pointers to City objects!
+        cities = c_make(Cities, {
+            {cstr_lit("New York"), cstr_lit("US"), 40.71427f, -74.00597f, 8804190},
+            {cstr_lit("Paris"), cstr_lit("France"), 48.85341f, 2.3488f, 2138551},
+            {cstr_lit("Berlin"), cstr_lit("Germany"), 52.52437f, 13.41053f, 3426354},
+            {cstr_lit("London"), cstr_lit("UK"), 51.50853f, -0.12574f, 8961989},
+        });
 
         Cities_sort(&cities);
 
         printf("Vec:\n");
-        c_FOREACH (c, Cities, cities)
-            printf("city:%s, %d, use:%ld\n", cstr_str(&c.ref->get->name),
+        c_foreach (c, Cities, cities)
+            printf("city: %8s, %8d, use: %ld\n", cstr_str(&c.ref->get->name),
                                              c.ref->get->population,
                                              CityArc_use_count(c.ref));
         puts("");
-        copy = Cities_clone(cities); // share each element!
+        copy = Cities_clone(cities); // share each city!
 
         int k = 0, id[] = {8, 4, 3, 9, 2, 5};
-        c_FOREACH (i, Cities, cities)
+        c_foreach (i, Cities, cities)
             CityMap_insert(&map, id[k++], CityArc_clone(*i.ref));
 
         Cities_pop(&cities);
         Cities_pop(&cities);
 
         printf("Vec:\n");
-        c_FOREACH (c, Cities, cities)
-            printf("city:%s, %d, use:%ld\n", cstr_str(&c.ref->get->name),
-                                             c.ref->get->population,
-                                             CityArc_use_count(c.ref));
+        c_foreach (c, Cities, cities)
+            printf("city: %8s, %8d, use: %ld\n", cstr_str(&c.ref->get->name),
+                                                 c.ref->get->population,
+                                                 CityArc_use_count(c.ref));
         printf("\nMap:\n");
-        c_FORPAIR (id, city, CityMap, map)
-            printf("id:%d, city:%s, %d, use:%ld\n", *_.id, cstr_str(&_.city->get->name),
-                                                     _.city->get->population, CityArc_use_count(_.city));
+        c_forpair (id, city, CityMap, map)
+            printf("city: %8s, %8d, use: %ld, id:%d\n", cstr_str(&_.city->get->name),
+                    _.city->get->population, CityArc_use_count(_.city), *_.id);
         puts("");
     }
 }

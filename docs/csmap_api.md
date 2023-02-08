@@ -111,16 +111,16 @@ csmap_X_raw           csmap_X_value_toraw(csmap_X_value* pval);
 int main()
 {
     // Create a sorted map of three strings (maps to string)
-    c_AUTO (csmap_str, colors) // RAII
+    c_auto (csmap_str, colors) // RAII
     {
-        c_FORLIST (i, csmap_str_raw, {
+        colors = c_make(csmap_str, {
             {"RED", "#FF0000"},
             {"GREEN", "#00FF00"},
             {"BLUE", "#0000FF"}
-        }) csmap_str_emplace(&colors, c_PAIR(i.ref));
+        });
 
         // Iterate and print keys and values of sorted map
-        c_FOREACH (i, csmap_str, colors) {
+        c_foreach (i, csmap_str, colors) {
             printf("Key:[%s] Value:[%s]\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
         }
 
@@ -157,9 +157,9 @@ int main()
 {
     uint32_t col = 0xcc7744ff;
     csmap_id idnames = csmap_id_init();
-    c_DEFER (csmap_id_drop(&idnames)) 
+    c_defer (csmap_id_drop(&idnames)) 
     {
-        c_FORLIST (i, csmap_id_raw, { {100, "Red"}, {110, "Blue"} })
+        c_forlist (i, csmap_id_raw, { {100, "Red"}, {110, "Blue"} })
             csmap_id_emplace(&idnames, c_PAIR(i.ref));
 
         // put replaces existing mapped value:
@@ -171,7 +171,7 @@ int main()
         // emplace adds only when key does not exist:
         csmap_id_emplace(&idnames, 100, "Green");
 
-        c_FOREACH (i, csmap_id, idnames)
+        c_foreach (i, csmap_id, idnames)
             printf("%d: %s\n", i.ref->first, cstr_str(&i.ref->second));
     }
 }
@@ -204,14 +204,14 @@ static int Vec3i_cmp(const Vec3i* a, const Vec3i* b) {
 
 int main()
 {
-    c_AUTO (csmap_vi, vecs)
+    c_auto (csmap_vi, vecs)
     {
       csmap_vi_insert(&vecs, (Vec3i){100, 0, 0}, 1);
       csmap_vi_insert(&vecs, (Vec3i){0, 100, 0}, 2);
       csmap_vi_insert(&vecs, (Vec3i){0, 0, 100}, 3);
       csmap_vi_insert(&vecs, (Vec3i){100, 100, 100}, 4);
 
-      c_FOREACH (i, csmap_vi, vecs)
+      c_foreach (i, csmap_vi, vecs)
           printf("{ %3d, %3d, %3d }: %d\n", i.ref->first.x, i.ref->first.y, i.ref->first.z, i.ref->second);
     }
 }
@@ -237,15 +237,15 @@ typedef struct { int x, y, z; } Vec3i;
 
 int main()
 {
-    // equivalent to: c_AUTO (csmap_iv, vecs)
-    c_WITH (csmap_iv vecs = csmap_iv_init(), csmap_iv_drop(&vecs))
+    // equivalent to: c_auto (csmap_iv, vecs)
+    c_with (csmap_iv vecs = csmap_iv_init(), csmap_iv_drop(&vecs))
     {
         csmap_iv_insert(&vecs, 1, (Vec3i){100, 0, 0});
         csmap_iv_insert(&vecs, 2, (Vec3i){0, 100, 0});
         csmap_iv_insert(&vecs, 3, (Vec3i){0, 0, 100});
         csmap_iv_insert(&vecs, 4, (Vec3i){100, 100, 100});
 
-        c_FOREACH (i, csmap_iv, vecs)
+        c_foreach (i, csmap_iv, vecs)
             printf("%d: { %3d, %3d, %3d }\n", i.ref->first, i.ref->second.x, i.ref->second.y, i.ref->second.z);
     }
 }

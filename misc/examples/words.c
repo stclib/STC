@@ -10,19 +10,19 @@
 
 int main1()
 {
-    c_AUTO (cvec_str, words)
-    c_AUTO (cmap_str, word_map)
+    c_auto (cvec_str, words)
+    c_auto (cmap_str, word_map)
     {
-        c_FORLIST (i, const char*, {
+        words = c_make(cvec_str, {
             "this", "sentence", "is", "not", "a", "sentence",
             "this", "sentence", "is", "a", "hoax"
-        }) cvec_str_emplace_back(&words, *i.ref);
+        });
 
-        c_FOREACH (w, cvec_str, words) {
+        c_foreach (w, cvec_str, words) {
             cmap_str_emplace(&word_map, cstr_str(w.ref), 0).ref->second += 1;
         }
 
-        c_FOREACH (i, cmap_str, word_map) {
+        c_foreach (i, cmap_str, word_map) {
             printf("%d occurrences of word '%s'\n",
                    i.ref->second, cstr_str(&i.ref->first));
         }

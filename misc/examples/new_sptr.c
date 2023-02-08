@@ -48,7 +48,7 @@ void Person_drop(Person* p) {
 
 
 int main(void) {
-    c_AUTO (PersonArc, p, q, r, s)
+    c_auto (PersonArc, p, q, r, s)
     {
         puts("Ex1");
         p = PersonArc_from(Person_make("John", "Smiths"));
@@ -57,7 +57,7 @@ int main(void) {
         s = PersonArc_from(Person_clone(*p.get)); // deep copy
         printf("%s %s: refs %ld\n", cstr_str(&p.get->name), cstr_str(&p.get->last), *p.use_count);
     }
-    c_AUTO (IPStack, vec)
+    c_auto (IPStack, vec)
     {
         puts("Ex2");
         IPStack_push(&vec, IPtr_from(10));
@@ -66,7 +66,7 @@ int main(void) {
         IPStack_push(&vec, IPtr_clone(*IPStack_back(&vec)));
         IPStack_push(&vec, IPtr_clone(*IPStack_front(&vec)));
 
-        c_FOREACH (i, IPStack, vec)
+        c_foreach (i, IPStack, vec)
             printf(" (%d: refs %ld)", *i.ref->get, *i.ref->use_count);
         puts("");
     }

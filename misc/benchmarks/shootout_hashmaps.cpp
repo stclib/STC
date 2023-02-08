@@ -48,7 +48,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 #define CMAP_EMPLACE(X, key, val) cmap_##X##_insert(&map, key, val).ref->second
 #define CMAP_ERASE(X, key)        cmap_##X##_erase(&map, key)
 #define CMAP_FIND(X, key)         cmap_##X##_contains(&map, key)
-#define CMAP_FOR(X, i)            c_FOREACH (i, cmap_##X, map)
+#define CMAP_FOR(X, i)            c_foreach (i, cmap_##X, map)
 #define CMAP_ITEM(X, i)           i.ref->second
 #define CMAP_SIZE(X)              cmap_##X##_size(&map)
 #define CMAP_BUCKETS(X)           cmap_##X##_bucket_count(&map)

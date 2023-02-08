@@ -27,13 +27,13 @@ Similar to boost::dynamic_bitset / std::bitset
 #include "cbits.h"
 
 int main() {
-    c_WITH (cbits bset = cbits_with_size(23, true), cbits_drop(&bset))
+    c_with (cbits bset = cbits_with_size(23, true), cbits_drop(&bset))
     {
         cbits_reset(&bset, 9);
         cbits_resize(&bset, 43, false);
 
         printf("%4zu: ", cbits_size(&bset));
-        c_FORRANGE (i, cbits_size(&bset))
+        c_forrange (i, cbits_size(&bset))
             printf("%d", cbits_at(&bset, i));
         puts("");
         cbits_set(&bset, 28);
@@ -43,7 +43,7 @@ int main() {
         cbits_set_value(&bset, 99, false);
 
         printf("%4zu: ", cbits_size(&bset));
-        c_FORRANGE (i, cbits_size(&bset))
+        c_forrange (i, cbits_size(&bset))
             printf("%d", cbits_at(&bset, i));
         puts("");
     }

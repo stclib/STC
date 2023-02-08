@@ -21,18 +21,18 @@
 
 void demo1(void)
 {
-    c_AUTO (IVec, vec) {
-        c_FORLIST (i, int, {0, 1, 2, 3, 4, 5, 80, 6, 7, 80, 8, 9, 80,
+    c_auto (IVec, vec) {
+        c_forlist (i, int, {0, 1, 2, 3, 4, 5, 80, 6, 7, 80, 8, 9, 80,
                             10, 11, 12, 13, 14, 15, 80, 16, 17})
             IVec_push(&vec, *i.ref);
 
         puts("demo1:");
-        c_FORFILTER (i, IVec, vec, flt_skipValue(i, 80))
+        c_forfilter (i, IVec, vec, flt_skipValue(i, 80))
             printf(" %d", *i.ref);
         puts("");
 
         int res, sum = 0;
-        c_FORFILTER (i, IVec, vec
+        c_forfilter (i, IVec, vec
                       , c_flt_skipwhile(i, *i.ref != 80)
                      && c_flt_skip(i, 1)
                      && c_flt_skipwhile(i, *i.ref != 80)
@@ -62,15 +62,15 @@ fn main() {
 
 void demo2(void)
 {
-    c_AUTO (IVec, vector) {
+    c_auto (IVec, vector) {
         puts("demo2:");
         crange R = crange_make(INT64_MAX);
-        c_FORFILTER (x, crange, R
+        c_forfilter (x, crange, R
                       , c_flt_skipwhile(x, *x.ref != 11)
                      && *x.ref % 2 != 0
                       , c_flt_take(x, 5))
             IVec_push(&vector, (int)(*x.ref * *x.ref));
-        c_FOREACH (x, IVec, vector)
+        c_foreach (x, IVec, vector)
             printf(" %d", *x.ref);
         puts("");
     }
@@ -91,17 +91,17 @@ fn main() {
 */
 void demo3(void)
 {
-    c_AUTO (SVec, words, words_containing_i) {
+    c_auto (SVec, words, words_containing_i) {
         const char* sentence = "This is a sentence in C99.";
-        c_FORTOKEN (w, sentence, " ")
+        c_fortoken (w, sentence, " ")
             SVec_push(&words, *w.ref);
 
-        c_FORFILTER (w, SVec, words, 
+        c_forfilter (w, SVec, words, 
                      csview_contains(*w.ref, "i"))
             SVec_push(&words_containing_i, *w.ref);
 
         puts("demo3:");
-        c_FOREACH (w, SVec, words_containing_i)
+        c_foreach (w, SVec, words_containing_i)
             printf(" %.*s", c_SVARG(*w.ref));
         puts("");
     }
@@ -110,8 +110,8 @@ void demo3(void)
 void demo4(void)
 {
     csview s = c_SV("ab123cReAghNGnΩoEp"); // Ω = multi-byte
-    c_AUTO (cstr, out) {
-        c_FORFILTER (i, csview, s, utf8_isupper(utf8_peek(i.ref))) {
+    c_auto (cstr, out) {
+        c_forfilter (i, csview, s, utf8_isupper(utf8_peek(i.ref))) {
             char chr[4];
             utf8_encode(chr, utf8_tolower(utf8_peek(i.ref)));
             cstr_push(&out, chr);
@@ -127,7 +127,7 @@ void demo5(void)
     #define flt_mid_decade(i) ((*i.ref % 10) != 0)
     puts("demo5:");
     crange R = crange_make(1963, INT32_MAX);
-    c_FORFILTER (i, crange, R
+    c_forfilter (i, crange, R
                   , c_flt_skip(i,15)
                  && c_flt_skipwhile(i, flt_mid_decade(i))
                  && c_flt_skip(i,30)

@@ -37,8 +37,8 @@
 cvec_str read_file(const char* name)
 {
     cvec_str data = cvec_str_init();
-    c_AUTO (cstr, line)
-    c_WITH (FILE* f = fopen(name, "r"), fclose(f))
+    c_auto (cstr, line)
+    c_with (FILE* f = fopen(name, "r"), fclose(f))
         while (cstr_getline(&line, f))
             cvec_str_emplace_back(&data, cstr_str(&line));
     return data;
@@ -98,7 +98,7 @@ void initShortStringVec(cvec_str* vs, cvec_sv* vsv)
     cvec_str_emplace_back(vs, "David");
 */
     size_t num = 0;
-    c_FOREACH (i, cvec_str, *vs)
+    c_foreach (i, cvec_str, *vs)
     {
         cvec_sv_push_back(vsv, cstr_sv(i.ref));
         num += cstr_size(i.ref);
@@ -113,7 +113,7 @@ void initLongStringVec(cvec_str* vs, cvec_sv* vsv)
     cvec_sv_clear(vsv);
     
     *vs = read_file("names.txt");
-    c_FOREACH (i, cvec_str, *vs) {
+    c_foreach (i, cvec_str, *vs) {
         cstr_append_s(i.ref, *i.ref);
         cstr_append_s(i.ref, *i.ref);
         cstr_append_s(i.ref, *i.ref);
@@ -144,7 +144,7 @@ void initLongStringVec(cvec_str* vs, cvec_sv* vsv)
     cvec_str_emplace_back(vs, "David David David David David David");
 */
     size_t num = 0;
-    c_FOREACH (i, cvec_str, *vs)
+    c_foreach (i, cvec_str, *vs)
     {
         cvec_sv_push_back(vsv, cstr_sv(i.ref));
         num += cstr_size(i.ref);
@@ -162,7 +162,7 @@ void initMaps(const cvec_str* vs, csmap_str* mapTrans, csmap_ssv* mapSview,
     cmap_ssv_clear(unordmapSview);
 
     size_t n = 0;
-    c_FOREACH (i, cvec_str, *vs)
+    c_foreach (i, cvec_str, *vs)
     {
         csmap_str_insert(mapTrans, cstr_clone(*i.ref), n);
         csmap_ssv_insert(mapSview, cstr_clone(*i.ref), n);
@@ -185,12 +185,12 @@ const size_t MAX_LOOP = 2000;
 
 int main()
 {
-    c_AUTO (cvec_str, vec_string)
-    c_AUTO (cvec_sv, vec_stringview)
-    c_AUTO (csmap_str, mapTrans)
-    c_AUTO (csmap_ssv, mapSview)
-    c_AUTO (cmap_str, unordmapTrans)
-    c_AUTO (cmap_ssv, unordmapSview)
+    c_auto (cvec_str, vec_string)
+    c_auto (cvec_sv, vec_stringview)
+    c_auto (csmap_str, mapTrans)
+    c_auto (csmap_ssv, mapSview)
+    c_auto (cmap_str, unordmapTrans)
+    c_auto (cmap_ssv, unordmapSview)
     {
         std::cout << "Short String Benchmark" << std::endl;
         std::cout << "======================" << std::endl;
@@ -243,7 +243,7 @@ void benchmark(
     stopwatch.start("Trans Map with char*");
     for (size_t i = 0; i < MAX_LOOP; ++i)
     {
-        c_FOREACH (j, cvec_str, *vec_string)
+        c_foreach (j, cvec_str, *vec_string)
         {
             const csmap_str_value* v = csmap_str_get(mapTrans, cstr_str(j.ref));
             if (v)
@@ -257,7 +257,7 @@ void benchmark(
     stopwatch.start("Trans Map with string_view");
     for (size_t i = 0; i < MAX_LOOP; ++i)
     {
-        c_FOREACH (j, cvec_sv, *vec_stringview)
+        c_foreach (j, cvec_sv, *vec_stringview)
         {
             const csmap_ssv_value* v = csmap_ssv_get(mapSview, *j.ref);
             if (v)
@@ -271,7 +271,7 @@ void benchmark(
     stopwatch.start("Trans Unord Map with char*");
     for (size_t i = 0; i < MAX_LOOP; ++i)
     {
-        c_FOREACH (j, cvec_str, *vec_string)
+        c_foreach (j, cvec_str, *vec_string)
         {
             const cmap_str_value* v = cmap_str_get(unordmapTrans, cstr_str(j.ref));
             if (v)
@@ -285,7 +285,7 @@ void benchmark(
     stopwatch.start("Trans Unord Map with string_view");
     for (size_t i = 0; i < MAX_LOOP; ++i)
     {
-        c_FOREACH (j, cvec_sv, *vec_stringview)
+        c_foreach (j, cvec_sv, *vec_stringview)
         {
             const cmap_ssv_value* v = cmap_ssv_get(unordmapSview, *j.ref);
             if (v)

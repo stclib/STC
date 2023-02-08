@@ -160,7 +160,7 @@ char*        cstrnstrn(const char* str, const char* search, intptr_t slen, intpt
 #include <stc/cstr.h>
 
 int main() {
-    c_AUTO (cstr, s0, s1, full_path) {
+    c_auto (cstr, s0, s1, full_path) {
         s0 = cstr_lit("Initialization without using strlen().");
         printf("%s\nLength: %" c_ZI "\n\n", cstr_str(&s0), cstr_size(&s0));
 

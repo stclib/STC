@@ -18,10 +18,10 @@ static void test_repeats(void)
 
     printf("birthday paradox: value range: 2^%d, testing repeats of 2^%d values\n", BITS, BITS_TEST);
     stc64_t rng = stc64_new(seed);
-    c_AUTO (cmap_ic, m)
+    c_auto (cmap_ic, m)
     {
         cmap_ic_reserve(&m, N);
-        c_FORRANGE (i, N) {
+        c_forrange (i, N) {
             uint64_t k = stc64_rand(&rng) & mask;
             int v = cmap_ic_insert(&m, k, 0).ref->second += 1;
             if (v > 1) printf("repeated value %" PRIu64 " (%d) at 2^%d\n",
@@ -42,17 +42,17 @@ void test_distribution(void)
     stc64_t rng = stc64_new(seed);
     const size_t N = 1ull << BITS ;
 
-    c_AUTO (cmap_x, map) {
-        c_FORRANGE (N) {
+    c_auto (cmap_x, map) {
+        c_forrange (N) {
             uint64_t k = stc64_rand(&rng);
             cmap_x_insert(&map, k & 0xf, 0).ref->second += 1;
         }
 
         uint64_t sum = 0;
-        c_FOREACH (i, cmap_x, map) sum += i.ref->second;
+        c_foreach (i, cmap_x, map) sum += i.ref->second;
         sum /= (uint64_t)map.size;
 
-        c_FOREACH (i, cmap_x, map) {
+        c_foreach (i, cmap_x, map) {
             printf("%4" PRIu32 ": %" PRIu64 " - %" PRIu64 ": %11.8f\n",
                    i.ref->first, i.ref->second, sum,
                    (1.0 - (double)i.ref->second / (double)sum));

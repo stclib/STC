@@ -3,27 +3,27 @@
 The following macros are recommended to use, and they safe/have no side-effects.
 
 ## Scope macros (RAII)
-### c_AUTO, c_WITH, c_SCOPE, c_DEFER
+### c_auto, c_with, c_scope, c_defer
 General ***defer*** mechanics for resource acquisition. These macros allows you to specify the
 freeing of the resources at the point where the acquisition takes place.
-The **checkauto** utility described below, ensures that the `c_AUTO*` macros are used correctly.
+The **checkauto** utility described below, ensures that the `c_auto*` macros are used correctly.
 
 | Usage                                  | Description                                               |
 |:---------------------------------------|:----------------------------------------------------------|
-| `c_WITH (Type var=init, drop)`         | Declare `var`. Defer `drop...` to end of scope            |
-| `c_WITH (Type var=init, pred, drop)`   | Adds a predicate in order to exit early if init failed    |
-| `c_AUTO (Type, var1,...,var4)`         | `c_WITH (Type var1=Type_init(), Type_drop(&var1))` ...    |
-| `c_SCOPE (init, drop)`                 | Execute `init` and defer `drop` to end of scope           |
-| `c_DEFER (drop...)`                    | Defer `drop...` to end of scope                           |
+| `c_with (Type var=init, drop)`         | Declare `var`. Defer `drop...` to end of scope            |
+| `c_with (Type var=init, pred, drop)`   | Adds a predicate in order to exit early if init failed    |
+| `c_auto (Type, var1,...,var4)`         | `c_with (Type var1=Type_init(), Type_drop(&var1))` ...    |
+| `c_scope (init, drop)`                 | Execute `init` and defer `drop` to end of scope           |
+| `c_defer (drop...)`                    | Defer `drop...` to end of scope                           |
 | `continue`                             | Exit a block above without memory leaks                   |
 
-For multiple variables, use either multiple **c_WITH** in sequence, or declare variable outside
-scope and use **c_SCOPE**. For convenience, **c_AUTO** support up to 4 variables.
+For multiple variables, use either multiple **c_with** in sequence, or declare variable outside
+scope and use **c_scope**. For convenience, **c_auto** support up to 4 variables.
 ```c
-// `c_WITH` is similar to python `with`: it declares and can drop a variable after going out of scope.
+// `c_with` is similar to python `with`: it declares and can drop a variable after going out of scope.
 bool ok = false;
-c_WITH (uint8_t* buf = malloc(BUF_SIZE), buf != NULL, free(buf))
-c_WITH (FILE* fp = fopen(fname, "rb"), fp != NULL, fclose(fp))
+c_with (uint8_t* buf = malloc(BUF_SIZE), buf != NULL, free(buf))
+c_with (FILE* fp = fopen(fname, "rb"), fp != NULL, fclose(fp))
 {
     int n = fread(buf, 1, BUF_SIZE, fp);
     if (n <= 0) continue; // auto cleanup! NB do not break or return here.
@@ -32,8 +32,8 @@ c_WITH (FILE* fp = fopen(fname, "rb"), fp != NULL, fclose(fp))
 }
 return ok;
 
-// `c_AUTO` automatically initialize and destruct up to 4 variables, like c_WITH.
-c_AUTO (cstr, s1, s2)
+// `c_auto` automatically initialize and destruct up to 4 variables, like c_with.
+c_auto (cstr, s1, s2)
 {
     cstr_append(&s1, "Hello");
     cstr_append(&s1, " world");
@@ -44,22 +44,22 @@ c_AUTO (cstr, s1, s2)
     printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
 }
 
-c_WITH (cstr str = cstr_lit("Hello"), cstr_drop(&str))
+c_with (cstr str = cstr_lit("Hello"), cstr_drop(&str))
 {
     cstr_append(&str, " world");
     printf("%s\n", cstr_str(&str));
 }
 
-// `c_SCOPE` is like `c_WITH` but works with an already declared variable.
+// `c_scope` is like `c_with` but works with an already declared variable.
 static pthread_mutex_t mut;
-c_SCOPE (pthread_mutex_lock(&mut), pthread_mutex_unlock(&mut))
+c_scope (pthread_mutex_lock(&mut), pthread_mutex_unlock(&mut))
 {
     /* Do syncronized work. */
 }
 
-// `c_DEFER` executes the expressions when leaving scope. Prefer c_WITH or c_SCOPE.
+// `c_defer` executes the expressions when leaving scope. Prefer c_with or c_scope.
 cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
-c_DEFER (cstr_drop(&s1), cstr_drop(&s2))
+c_defer (cstr_drop(&s1), cstr_drop(&s2))
 {
     printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
 }
@@ -77,8 +77,8 @@ cvec_str readFile(const char* name)
 {
     cvec_str vec = cvec_str_init(); // returned
 
-    c_WITH (FILE* fp = fopen(name, "r"), fp != NULL, fclose(fp))
-    c_WITH (cstr line = cstr_NULL, cstr_drop(&line))
+    c_with (FILE* fp = fopen(name, "r"), fp != NULL, fclose(fp))
+    c_with (cstr line = cstr_NULL, cstr_drop(&line))
         while (cstr_getline(&line, fp))
             cvec_str_emplace_back(&vec, cstr_str(&line));
     return vec;
@@ -86,30 +86,30 @@ cvec_str readFile(const char* name)
 
 int main()
 {
-    c_WITH (cvec_str x = readFile(__FILE__), cvec_str_drop(&x))
-        c_FOREACH (i, cvec_str, x)
+    c_with (cvec_str x = readFile(__FILE__), cvec_str_drop(&x))
+        c_foreach (i, cvec_str, x)
             printf("%s\n", cstr_str(i.ref));
 }
 ```
 
 ### The **checkauto** utility program (for RAII)
-The **checkauto** program will check the source code for any misuses of the `c_AUTO*` macros which
-may lead to resource leakages. The `c_AUTO*`- macros are implemented as one-time executed **for-loops**,
+The **checkauto** program will check the source code for any misuses of the `c_auto*` macros which
+may lead to resource leakages. The `c_auto*`- macros are implemented as one-time executed **for-loops**,
 so any `return` or `break` appearing within such a block will lead to resource leaks, as it will disable
 the cleanup/drop method to be called. A `break` may originally be intended to break a loop or switch
-outside the `c_AUTO` scope.
+outside the `c_auto` scope.
 
-NOTE: One must always make sure to unwind temporary allocated resources before a `return` in C. However, by using `c_AUTO*`-macros,
+NOTE: One must always make sure to unwind temporary allocated resources before a `return` in C. However, by using `c_auto*`-macros,
 - it is much easier to automatically detect misplaced return/break between resource acquisition and destruction.
 - it prevents forgetting to call the destructor at the end.
 
 The **checkauto** utility will report any misusages. The following example shows how to correctly break/return
-from a `c_AUTO` scope:
+from a `c_auto` scope:
 ```c
     int flag = 0;
     for (int i = 0; i<n; ++i) {
-        c_AUTO (cstr, text)
-        c_AUTO (List, list)
+        c_auto (cstr, text)
+        c_auto (List, list)
         {
             for (int j = 0; j<m; ++j) {
                 List_push_back(&list, i*j);
@@ -118,23 +118,23 @@ from a `c_AUTO` scope:
             }
             // WRONG:
             if (cond2())
-                break;      // checkauto ERROR! break inside c_AUTO.
+                break;      // checkauto ERROR! break inside c_auto.
 
             if (cond3())
-                return -1;  // checkauto ERROR! return inside c_AUTO
+                return -1;  // checkauto ERROR! return inside c_auto
 
             // CORRECT:
             if (cond2()) {
                 flag = 1;   // flag to break outer for-loop
-                continue;   // cleanup and leave c_AUTO block
+                continue;   // cleanup and leave c_auto block
             }
             if (cond3()) {
                 flag = -1;  // return -1
-                continue;   // cleanup and leave c_AUTO block
+                continue;   // cleanup and leave c_auto block
             }
             ...
         }
-        // do the return/break outside of c_AUTO
+        // do the return/break outside of c_auto
         if (flag < 0) return flag;
         else if (flag > 0) break;
         ...
@@ -142,33 +142,33 @@ from a `c_AUTO` scope:
 ```
 ## Loop abstraction macros
 
-### c_FORLIST
+### c_forlist
 Iterate compound literal array elements. Additional to `i.ref`, you can access `i.data`, `i.size`, and `i.index` of the input list/element.
 ```c
 // apply multiple push_backs
-c_FORLIST (i, int, {1, 2, 3})
+c_forlist (i, int, {1, 2, 3})
     cvec_i_push_back(&vec, *i.ref);
 
 // insert in existing map
-c_FORLIST (i, cmap_ii_raw, { {4, 5}, {6, 7} })
+c_forlist (i, cmap_ii_raw, { {4, 5}, {6, 7} })
     cmap_ii_insert(&map, i.ref->first, i.ref->second);
 
 // string literals pushed to a stack of cstr:
-c_FORLIST (i, const char*, {"Hello", "crazy", "world"})
+c_forlist (i, const char*, {"Hello", "crazy", "world"})
     cstack_str_emplace(&stk, *i.ref);
 
 // reverse the list:
-c_FORLIST (i, int, {1, 2, 3})
+c_forlist (i, int, {1, 2, 3})
     cvec_i_push_back(&vec, i.data[i.size - 1 - i.index]);
 ```
 
-### c_FOREACH, c_FORPAIR
+### c_foreach, c_forpair
 
 | Usage                                    | Description                     |
 |:-----------------------------------------|:--------------------------------|
-| `c_FOREACH (it, ctype, container)`       | Iteratate all elements          |
-| `c_FOREACH (it, ctype, it1, it2)`        | Iterate the range [it1, it2)    |
-| `c_FORPAIR (key, val, ctype, container)` | Iterate with structured binding |
+| `c_foreach (it, ctype, container)`       | Iteratate all elements          |
+| `c_foreach (it, ctype, it1, it2)`        | Iterate the range [it1, it2)    |
+| `c_forpair (key, val, ctype, container)` | Iterate with structured binding |
 
 ```c
 #define i_key int
@@ -176,52 +176,52 @@ c_FORLIST (i, int, {1, 2, 3})
 #define i_tag ii
 #include <stc/csmap.h>
 ...
-c_FORLIST (i, csmap_ii_raw, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} })
+c_forlist (i, csmap_ii_raw, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} })
     csmap_ii_insert(&map, i.ref->first, i.ref->second);
 
-c_FOREACH (i, csmap_ii, map)
+c_foreach (i, csmap_ii, map)
     printf(" %d", i.ref->first);
 // 3 5 7 12 23
 
 csmap_ii_iter it = csmap_ii_find(&map, 7);
-c_FOREACH (i, csmap_ii, it, csmap_ii_end(&map))
+c_foreach (i, csmap_ii, it, csmap_ii_end(&map))
     printf(" %d", i.ref->first);
 // 7 12 23
 
-c_FORPAIR (id, count, csmap_ii, map)
+c_forpair (id, count, csmap_ii, map)
     printf(" (%d %d)", *_.id, *_.count);
 // (3 2) (5 4) (7 3) (12 5) (23 1)
 ```
 
-### c_FORRANGE
+### c_forrange
 Abstraction for iterating sequence of numbers. Like python's **for** *i* **in** *range()* loop.
 
 | Usage                                       | Python equivalent                    |
 |:--------------------------------------------|:-------------------------------------|
-| `c_FORRANGE (stop)`                          | `for _ in range(stop):`              |
-| `c_FORRANGE (i, stop) // i type = long long` | `for i in range(stop):`              |
-| `c_FORRANGE (i, start, stop)`                | `for i in range(start, stop):`       |
-| `c_FORRANGE (i, start, stop, step)`          | `for i in range(start, stop, step):` |
+| `c_forrange (stop)`                          | `for _ in range(stop):`              |
+| `c_forrange (i, stop) // i type = long long` | `for i in range(stop):`              |
+| `c_forrange (i, start, stop)`                | `for i in range(start, stop):`       |
+| `c_forrange (i, start, stop, step)`          | `for i in range(start, stop, step):` |
 
 ```c
-c_FORRANGE (5) printf("x");
+c_forrange (5) printf("x");
 // xxxxx
-c_FORRANGE (i, 5) printf(" %lld", i);
+c_forrange (i, 5) printf(" %lld", i);
 // 0 1 2 3 4
-c_FORRANGE (i, -3, 3) printf(" %lld", i);
+c_forrange (i, -3, 3) printf(" %lld", i);
 // -3 -2 -1 0 1 2
-c_FORRANGE (i, 30, 0, -5) printf(" %lld", i);
+c_forrange (i, 30, 0, -5) printf(" %lld", i);
 // 30 25 20 15 10 5
 ```
 
-### c_FORWHILE, c_FORFILTER
+### c_forwhile, c_forfilter
 Iterate containers with stop-criteria and chained range filtering.
 
 | Usage                                               | Description                            |
 |:----------------------------------------------------|:---------------------------------------|
-| `c_FORWHILE (it, ctype, start, pred)`               | Iterate until pred is false            |
-| `c_FORFILTER (it, ctype, container, filter)`        | Filter out items in chain with &&      |
-| `c_FORFILTER (it, ctype, container, filter, pred)`  | Filter and iterate until pred is false |
+| `c_forwhile (it, ctype, start, pred)`               | Iterate until pred is false            |
+| `c_forfilter (it, ctype, container, filter)`        | Filter out items in chain with &&      |
+| `c_forfilter (it, ctype, container, filter, pred)`  | Filter and iterate until pred is false |
 
 | Built-in filter                   | Description                          |
 |:----------------------------------|:-------------------------------------|
@@ -244,10 +244,10 @@ bool isPrime(int i) {
 #define isOdd(i) ((i) & 1)
 
 int main() {
-    c_AUTO (IVec, vec) {
-        c_FORRANGE (i, 1000) IVec_push(&vec, 1000000 + i);
+    c_auto (IVec, vec) {
+        c_forrange (i, 1000) IVec_push(&vec, 1000000 + i);
 
-        c_FORFILTER (i, IVec, vec,
+        c_forfilter (i, IVec, vec,
                         isOdd(*i.ref)
                      && c_flt_skip(i, 100) // built-in
                      && isPrime(*i.ref)
@@ -302,14 +302,14 @@ void        crange_next(crange_iter* it);
 // 1. All primes less than 32:
 crange r1 = crange_make(3, 32, 2);
 printf("2"); // first prime
-c_FORFILTER (i, crange, r1
+c_forfilter (i, crange, r1
               , isPrime(*i.ref))
     printf(" %lld", *i.ref);
 // 2 3 5 7 11 13 17 19 23 29 31
 
 // 2. The 11 first primes:
 printf("2");
-c_FORFILTER (i, crange, crange_obj(3, INT64_MAX, 2)
+c_forfilter (i, crange, crange_obj(3, INT64_MAX, 2)
               , isPrime(*i.ref)
               , c_flt_take(10))
     printf(" %lld", *i.ref);

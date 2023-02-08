@@ -1,55 +1,25 @@
 #include <stdio.h>
 
-#define i_val int
-#include <stc/cstack.h>
-#define i_val int
-#include <stc/cpque.h>
-
 struct Point { int x, y; } typedef Point;
 
-int Point_cmp(const Point* a, const Point* b) {
-    int c = a->x - b->x;
-    return c ? c : a->y - b->y;
-}
-
+#define i_type PointQ
 #define i_val Point
-#define i_cmp Point_cmp
-#define i_tag pnt
+#define i_less(a, b) a->x < b->x || a->x == b->x && a->y < b->y
 #include <stc/cpque.h>
 
 
 int main()
 {
-    c_AUTO (cstack_int, istk)
+    c_auto (PointQ, pque)
     {
-        cstack_int_push(&istk, 123);
-        cstack_int_push(&istk, 321);
+        pque = c_make(PointQ, {{23, 80}, {12, 32}, {54, 74}, {12, 62}});
+        
         // print
-        c_FOREACH (i, cstack_int, istk)
-            printf(" %d", *i.ref);
-        puts("");
-    }
-    c_AUTO (cpque_pnt, pque)
-    {
-        cpque_pnt_push(&pque, (Point){23, 80});
-        cpque_pnt_push(&pque, (Point){12, 32});
-        cpque_pnt_push(&pque, (Point){54, 74});
-        cpque_pnt_push(&pque, (Point){12, 62});
-        // print
-        while (!cpque_pnt_empty(&pque)) {
-            const cpque_pnt_value *v = cpque_pnt_top(&pque);
+        for (; !PointQ_empty(&pque); PointQ_pop(&pque))
+        {
+            const Point *v = PointQ_top(&pque);
             printf(" (%d,%d)", v->x, v->y);
-            cpque_pnt_pop(&pque);
         }
-        puts("");
-    }
-    c_AUTO (cpque_int, ique)
-    {
-        cpque_int_push(&ique, 123);
-        cpque_int_push(&ique, 321);
-        // print
-        for (int i=0; i<cpque_int_size(&ique); ++i)
-            printf(" %d", ique.data[i]);
         puts("");
     }
 }

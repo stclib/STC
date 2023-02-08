@@ -45,23 +45,23 @@ int main()
 {
     const int data[] = {1,8,5,6,3,4,0,9,7,2}, n = c_ARRAYLEN(data);
     printf("data: \t");
-    c_FORRANGE (i, n) printf("%d ", data[i]);
+    c_forrange (i, n) printf("%d ", data[i]);
     puts("");
 
     IPQueue q1 = {ipque_init(), int_less};       // Max priority queue
     IPQueue minq1 = {ipque_init(), int_greater}; // Min priority queue
     IPQueue q5 = {ipque_init(), int_lambda};     // Using lambda to compare elements.
-    c_DEFER (ipque_drop(&q1.Q), ipque_drop(&minq1.Q), ipque_drop(&q5.Q))
+    c_defer (ipque_drop(&q1.Q), ipque_drop(&minq1.Q), ipque_drop(&q5.Q))
     {
-        c_FORRANGE (i, n)
+        c_forrange (i, n)
             ipque_push(&q1.Q, data[i]);
         print_queue("q1", q1);
 
-        c_FORRANGE (i, n)
+        c_forrange (i, n)
             ipque_push(&minq1.Q, data[i]);
         print_queue("minq1", minq1);
 
-        c_FORRANGE (i, n)
+        c_forrange (i, n)
             ipque_push(&q5.Q, data[i]);
         print_queue("q5", q5);
     }

@@ -5,11 +5,11 @@
 
 int main()
 {
-    c_AUTO (cmap_str, m) {
+    c_auto (cmap_str, m) {
         cmap_str_emplace(&m, "Test short", "This is a short string");
         cmap_str_emplace(&m, "Test long ", "This is a longer string");
 
-        c_FORPAIR (k, v, cmap_str, m)
+        c_forpair (k, v, cmap_str, m)
             printf("%s: '%s' Len=%" c_ZI ", Is long: %s\n", 
                    cstr_str(_.k), cstr_str(_.v), cstr_size(_.v),
                    cstr_is_long(_.v) ? "true" : "false");

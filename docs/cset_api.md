@@ -86,15 +86,14 @@ cset_X_value        cset_X_value_clone(cset_X_value val);
 
 int main ()
 {
-    c_AUTO (cset_str, fifth)
+    c_auto (cset_str, fifth)
     {
-        c_AUTO (cset_str, first, second)
-        c_AUTO (cset_str, third, fourth)
+        c_auto (cset_str, first, second)
+        c_auto (cset_str, third, fourth)
         {
-            c_FORLIST (i, const char*, {"red", "green", "blue"})
-                cset_str_emplace(&second, *i.ref);
+            second = c_make(cset_str, {"red", "green", "blue"});
 
-            c_FORLIST (i, const char*, {"orange", "pink", "yellow"})
+            c_forlist (i, const char*, {"orange", "pink", "yellow"})
                 cset_str_emplace(&third, *i.ref);
 
             cset_str_emplace(&fourth, "potatoes");
@@ -102,14 +101,14 @@ int main ()
             cset_str_emplace(&fourth, "flour");
 
             fifth = cset_str_clone(second);
-            c_FOREACH (i, cset_str, third)
+            c_foreach (i, cset_str, third)
                 cset_str_emplace(&fifth, cstr_str(i.ref));
 
-            c_FOREACH (i, cset_str, fourth)
+            c_foreach (i, cset_str, fourth)
                 cset_str_emplace(&fifth, cstr_str(i.ref));
         }
         printf("fifth contains:\n\n");
-        c_FOREACH (i, cset_str, fifth)
+        c_foreach (i, cset_str, fifth)
             printf("%s\n", cstr_str(i.ref));
     }
 }

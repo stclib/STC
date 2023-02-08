@@ -43,11 +43,11 @@ int demo2() {
     int array[] = {10, 20, 30, 23, 22, 21};
     Intspan span = cspan_from_array(array);
     
-    c_FOREACH (i, Intspan, span)
+    c_foreach (i, Intspan, span)
         printf(" %d", *i.ref);
     puts("");
     
-    c_FORFILTER (i, Intspan, span,
+    c_forfilter (i, Intspan, span,
                   , c_flt_skipwhile(i, *i.ref < 25)
                  && (*i.ref & 1) == 0 // even only
                   , c_flt_take(i, 2)) // break after 2

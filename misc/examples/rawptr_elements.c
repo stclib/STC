@@ -28,8 +28,8 @@ typedef int64_t inttype;
 
 int main()
 {
-    c_AUTO (SIPtrMap, map, m1)
-    c_AUTO (SIBoxMap, m2)
+    c_auto (SIPtrMap, map, m1)
+    c_auto (SIBoxMap, m2)
     {
         printf("\nMap with pointer elements:\n");
         SIPtrMap_insert(&map, cstr_from("testing"), c_new(inttype, 1));
@@ -41,14 +41,14 @@ int main()
 
         m1 = SIPtrMap_clone(map);
 
-        c_FORPAIR (name, number, SIPtrMap, m1)
+        c_forpair (name, number, SIPtrMap, m1)
             printf("%s: %" PRId64 "\n", cstr_str(_.name), **_.number);
 
 
         puts("\nIBox map:");
         SIBoxMap_insert(&m2, cstr_from("Hello"), IBox_make(123));
         SIBoxMap_emplace(&m2, "World", 999);
-        c_FORPAIR (name, number, SIBoxMap, m2)
+        c_forpair (name, number, SIBoxMap, m2)
             printf("%s: %d\n", cstr_str(_.name), *_.number->get);
         puts("");
     }

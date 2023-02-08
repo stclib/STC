@@ -4,7 +4,7 @@
 
 int main()
 {
-    c_WITH (cstr ss = cstr_lit("The quick brown fox jumps over the lazy dog.JPG"), cstr_drop(&ss)) {
+    c_with (cstr ss = cstr_lit("The quick brown fox jumps over the lazy dog.JPG"), cstr_drop(&ss)) {
         intptr_t pos = cstr_find_at(&ss, 0, "brown");
         printf("%" c_ZI " [%s]\n", pos, pos == c_NPOS ? "<NULL>" : cstr_str(&ss) + pos);
         printf("equals: %d\n", cstr_equals(&ss, "The quick brown fox jumps over the lazy dog.JPG"));

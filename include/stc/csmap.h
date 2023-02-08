@@ -32,7 +32,7 @@
 #include <stc/csmap.h>
 
 int main(void) {
-    c_WITH (csmap_sx m = csmap_sx_init(), csmap_sx_drop(&m))
+    c_with (csmap_sx m = csmap_sx_init(), csmap_sx_drop(&m))
     {
         csmap_sx_emplace(&m, "Testing one", 1.234);
         csmap_sx_emplace(&m, "Testing two", 12.34);
@@ -43,7 +43,7 @@ int main(void) {
         csmap_sx_emplace_or_assign(&m, "Testing three", 1000.0); // update
         csmap_sx_erase(&m, "Testing two");
 
-        c_FOREACH (i, csmap_sx, m)
+        c_foreach (i, csmap_sx, m)
             printf("map %s: %g\n", cstr_str(&i.ref->first), i.ref->second);
     }
 }

@@ -115,13 +115,13 @@ STC_API csview csview_substr_ex(csview sv, intptr_t pos, intptr_t n);
 STC_API csview csview_slice_ex(csview sv, intptr_t p1, intptr_t p2);
 STC_API csview csview_token(csview sv, const char* sep, intptr_t* start);
 
-#define c_FORTOKEN_SV(it, inputsv, sep) \
+#define c_fortoken_sv(it, inputsv, sep) \
     for (struct { csview _inp, token, *ref; const char *_sep; intptr_t pos; } \
           it = {._inp=inputsv, .token=it._inp, .ref=&it.token, ._sep=sep} \
         ; it.pos <= it._inp.size && (it.token = csview_token(it._inp, it._sep, &it.pos)).str ; )
 
-#define c_FORTOKEN(it, input, sep) \
-    c_FORTOKEN_SV(it, csview_from(input), sep)
+#define c_fortoken(it, input, sep) \
+    c_fortoken_sv(it, csview_from(input), sep)
 
 /* csview interaction with cstr: */
 #ifdef CSTR_H_INCLUDED

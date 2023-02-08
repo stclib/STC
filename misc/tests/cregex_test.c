@@ -45,7 +45,7 @@ CTEST(cregex, compile_match_anchors)
 CTEST(cregex, compile_match_quantifiers1)
 {
     const char* inp;
-    c_AUTO (cregex, re) {
+    c_auto (cregex, re) {
         re = cregex_from("ä+");
         ASSERT_EQ(re.error, 0);
 
@@ -65,7 +65,7 @@ CTEST(cregex, compile_match_quantifiers1)
 CTEST(cregex, compile_match_quantifiers2)
 {   
     const char* inp; 
-    c_AUTO (cregex, re) {
+    c_auto (cregex, re) {
         re = cregex_from("bä*");
         ASSERT_EQ(re.error, 0);
 
@@ -98,7 +98,7 @@ CTEST(cregex, compile_match_escaped_chars)
 
 CTEST(cregex, compile_match_class_simple)
 {
-    c_AUTO (cregex, re1, re2, re3)
+    c_auto (cregex, re1, re2, re3)
     {
         re1 = cregex_from("\\s");
         ASSERT_EQ(re1.error, 0);
@@ -123,7 +123,7 @@ CTEST(cregex, compile_match_class_simple)
 
 CTEST(cregex, compile_match_or)
 {
-    c_AUTO (cregex, re, re2)
+    c_auto (cregex, re, re2)
     {
         re = cregex_from("as|df");
         ASSERT_EQ(re.error, 0);
@@ -185,7 +185,7 @@ CTEST(cregex, compile_match_cap)
 CTEST(cregex, search_all)
 {
     const char* inp;
-    c_AUTO (cregex, re)
+    c_auto (cregex, re)
     {
         re = cregex_from("ab");
         csview m = {0};
@@ -206,7 +206,7 @@ CTEST(cregex, search_all)
 
 CTEST(cregex, captures_len)
 {
-    c_AUTO (cregex, re) {
+    c_auto (cregex, re) {
        re = cregex_from("(ab(cd))(ef)");
        ASSERT_EQ(cregex_captures(&re), 4);
     }
@@ -215,7 +215,7 @@ CTEST(cregex, captures_len)
 CTEST(cregex, captures_cap)
 {
     const char* inp;
-    c_AUTO (cregex, re) {
+    c_auto (cregex, re) {
         re = cregex_from("(ab)((cd)+)");
         ASSERT_EQ(cregex_captures(&re), 4);
 
@@ -249,7 +249,7 @@ CTEST(cregex, replace)
     const char* pattern = "\\b(\\d\\d\\d\\d)-(1[0-2]|0[1-9])-(3[01]|[12][0-9]|0[1-9])\\b";
     const char* input = "start date: 2015-12-31, end date: 2022-02-28";
 
-    c_AUTO (cstr, str) {
+    c_auto (cstr, str) {
         // replace with a fixed string, extended all-in-one call:
         cstr_take(&str, cregex_replace_pattern(pattern, input, "YYYY-MM-DD"));
         ASSERT_STREQ(cstr_str(&str), "start date: YYYY-MM-DD, end date: YYYY-MM-DD");
@@ -267,7 +267,7 @@ CTEST(cregex, replace)
         ASSERT_STREQ(cstr_str(&str), "52 ${apples} ${and} 31 ${mangoes}");
 
         // Compile RE separately
-        c_WITH (cregex re = cregex_from(pattern), cregex_drop(&re)) {
+        c_with (cregex re = cregex_from(pattern), cregex_drop(&re)) {
             ASSERT_EQ(cregex_captures(&re), 4);
 
             // European date format.

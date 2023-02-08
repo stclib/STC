@@ -3,7 +3,7 @@
 void stringdemo1()
 {
     printf("\nSTRINGDEMO1\n");
-    c_WITH (cstr cs = cstr_lit("one-nine-three-seven-five"), cstr_drop(&cs))
+    c_with (cstr cs = cstr_lit("one-nine-three-seven-five"), cstr_drop(&cs))
     {
         printf("%s.\n", cstr_str(&cs));
 
@@ -35,7 +35,7 @@ void stringdemo1()
 void vectordemo1()
 {
     printf("\nVECTORDEMO1\n");
-    c_WITH (cvec_ix bignums = cvec_ix_with_capacity(100), cvec_ix_drop(&bignums))
+    c_with (cvec_ix bignums = cvec_ix_with_capacity(100), cvec_ix_drop(&bignums))
     {
         cvec_ix_reserve(&bignums, 100);
         for (int i = 10; i <= 100; i += 10)
@@ -59,7 +59,7 @@ void vectordemo1()
 void vectordemo2()
 {
     printf("\nVECTORDEMO2\n");
-    c_AUTO (cvec_str, names) {
+    c_auto (cvec_str, names) {
         cvec_str_emplace_back(&names, "Mary");
         cvec_str_emplace_back(&names, "Joe");
         cvec_str_emplace_back(&names, "Chris");
@@ -67,7 +67,7 @@ void vectordemo2()
         printf("names[1]: %s\n", cstr_str(&names.data[1]));
 
         cvec_str_sort(&names);                     // Sort the array
-        c_FOREACH (i, cvec_str, names)
+        c_foreach (i, cvec_str, names)
             printf("sorted: %s\n", cstr_str(i.ref));
     }
 }
@@ -80,7 +80,7 @@ void vectordemo2()
 void listdemo1()
 {
     printf("\nLISTDEMO1\n");
-    c_AUTO (clist_ix, nums, nums2)
+    c_auto (clist_ix, nums, nums2)
     {
         for (int i = 0; i < 10; ++i)
             clist_ix_push_back(&nums, i);
@@ -89,7 +89,7 @@ void listdemo1()
 
         /* splice nums2 to front of nums */
         clist_ix_splice(&nums, clist_ix_begin(&nums), &nums2);
-        c_FOREACH (i, clist_ix, nums)
+        c_foreach (i, clist_ix, nums)
             printf("spliced: %d\n", *i.ref);
         puts("");
 
@@ -101,7 +101,7 @@ void listdemo1()
         clist_ix_push_back(&nums, -99);
         clist_ix_sort(&nums);
 
-        c_FOREACH (i, clist_ix, nums)
+        c_foreach (i, clist_ix, nums)
             printf("sorted: %d\n", *i.ref);
     }
 }
@@ -117,7 +117,7 @@ void setdemo1()
     cset_i_insert(&nums, 8);
     cset_i_insert(&nums, 11);
 
-    c_FOREACH (i, cset_i, nums)
+    c_foreach (i, cset_i, nums)
         printf("set: %d\n", *i.ref);
     cset_i_drop(&nums);
 }
@@ -145,7 +145,7 @@ void mapdemo1()
 void mapdemo2()
 {
     printf("\nMAPDEMO2\n");
-    c_AUTO (cmap_si, nums)
+    c_auto (cmap_si, nums)
     {
         cmap_si_emplace_or_assign(&nums, "Hello", 64);
         cmap_si_emplace_or_assign(&nums, "Groovy", 121);
@@ -156,7 +156,7 @@ void mapdemo2()
             printf("long: %s: %d\n", cstr_str(&i.ref->first), i.ref->second);
 
         // or rather use the short form:
-        c_FOREACH (i, cmap_si, nums)
+        c_foreach (i, cmap_si, nums)
             printf("short: %s: %d\n", cstr_str(&i.ref->first), i.ref->second);
     }
 }
@@ -173,14 +173,14 @@ void mapdemo3()
     cmap_str_emplace(&table, "Make", "my");
     cmap_str_emplace(&table, "Sunny", "day");
     cmap_str_iter it = cmap_str_find(&table, "Make");
-    c_FOREACH (i, cmap_str, table)
+    c_foreach (i, cmap_str, table)
         printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
     printf("size %" c_ZI ": remove: Make: %s\n", cmap_str_size(&table), cstr_str(&it.ref->second));
     //cmap_str_erase(&table, "Make");
     cmap_str_erase_at(&table, it);
 
     printf("size %" c_ZI "\n", cmap_str_size(&table));
-    c_FOREACH (i, cmap_str, table)
+    c_foreach (i, cmap_str, table)
         printf("entry: %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
     cmap_str_drop(&table); // frees key and value cstrs, and hash table.
 }

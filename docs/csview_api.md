@@ -83,11 +83,11 @@ csview          cstr_u8_substr(const cstr* self, intptr_t bytepos, intptr_t u8le
 csview          cstr_slice(const cstr* self, intptr_t p1, intptr_t p2);
 csview          cstr_slice_ex(const cstr* s, intptr_t p, intptr_t q);    // negative p or q count from end
 ```
-#### Iterate tokens with *c_FORTOKEN*, *c_FORTOKEN_SV*
+#### Iterate tokens with *c_fortoken*, *c_fortoken_sv*
 
 To iterate tokens in an input string separated by a string:
 ```c
-c_FORTOKEN (i, "hello, one, two, three", ", ")
+c_fortoken (i, "hello, one, two, three", ", ")
     printf("token: %.*s\n", c_SVARG(i.token));
 ```
 
@@ -151,12 +151,12 @@ red Apples
 
 int main()
 {
-    c_AUTO (cstr, s1) {
+    c_auto (cstr, s1) {
         s1 = cstr_lit("hell😀 w😀rld");
         cstr_u8_replace_at(&s1, cstr_find(&s1, "😀rld"), 1, c_SV("ø"));
         printf("%s\n", cstr_str(&s1));
 
-        c_FOREACH (i, cstr, s1)
+        c_foreach (i, cstr, s1)
             printf("%.*s,", c_SVARG(i.u8.chr));
     }
 }
@@ -176,7 +176,7 @@ and does not depend on null-terminated strings. *string_split()* function return
 
 void print_split(csview input, const char* sep)
 {
-    c_FORTOKEN_SV (i, input, sep)
+    c_fortoken_sv (i, input, sep)
         printf("[%.*s]\n", c_SVARG(i.token));
 }
 
@@ -188,7 +188,7 @@ cstack_str string_split(csview input, const char* sep)
 {
     cstack_str out = cstack_str_init();
     
-    c_FORTOKEN_SV (i, input, sep)
+    c_fortoken_sv (i, input, sep)
         cstack_str_push(&out, cstr_from_sv(i.token));
 
     return out;
@@ -201,8 +201,8 @@ int main()
     print_split(c_SV("This has no matching separator"), "xx");
     puts("");
 
-    c_WITH (cstack_str s = string_split(c_SV("Split,this,,string,now,"), ","), cstack_str_drop(&s))
-        c_FOREACH (i, cstack_str, s)
+    c_with (cstack_str s = string_split(c_SV("Split,this,,string,now,"), ","), cstack_str_drop(&s))
+        c_foreach (i, cstack_str, s)
             printf("[%s]\n", cstr_str(i.ref));
 }
 ```

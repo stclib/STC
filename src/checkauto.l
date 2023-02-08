@@ -1,4 +1,4 @@
-/* Check for illegal return/break/continue usage inside a STC-lib c_AUTO* block (RAII).
+/* Check for illegal return/break/continue usage inside a STC-lib c_auto* block (RAII).
  * Copyright Tyge Løvset, (c) 2023.
  */
 %{
@@ -38,13 +38,13 @@ c_forfilter     |
 c_forwhile      |
 c_formatch      |
 c_fortoken      |
-c_FOREACH       |
-c_FORPAIR       |
-c_FORRANGE      |
-c_FORFILTER     |
-c_FORWHILE      |
-c_FORMATCH      |
-c_FORTOKEN      |
+c_foreach       |
+c_forpair       |
+c_forrange      |
+c_forfilter     |
+c_forwhile      |
+c_formatch      |
+c_fortoken      |
 for             |
 while           |
 switch          { block_type |= LOOP; state = BRACES; }
@@ -53,10 +53,10 @@ c_with          |
 c_scope         |
 c_defer         |
 c_auto          |
-c_WITH          |
-c_SCOPE         |
-c_DEFER         |
-c_AUTO          { block_type = AUTO; state = BRACES; }
+c_with          |
+c_scope         |
+c_defer         |
+c_auto          { block_type = AUTO; state = BRACES; }
 \(              { if (state == BRACES) ++braces_lev; }
 \)              { if (state == BRACES && --braces_lev == 0) {
                     state = BRACESDONE;
@@ -64,8 +64,8 @@ c_AUTO          { block_type = AUTO; state = BRACES; }
                 }
 if              { if (state == BRACESDONE) {
                     if (block_type == AUTO) {
-                      printf("%s:%d: warning: 'if' after c_AUTO* not enclosed in curly braces.\n"
-                             "    Make sure to enclose 'if - else' statement in { } after c_AUTO*.\n",
+                      printf("%s:%d: warning: 'if' after c_auto* not enclosed in curly braces.\n"
+                             "    Make sure to enclose 'if - else' statement in { } after c_auto*.\n",
                              fname, yylineno);
                       ++warnings;                    
                     }
@@ -81,20 +81,20 @@ if              { if (state == BRACESDONE) {
 \{              { if (state != BRACES) { block[++block_lev] = block_type; state = NORMAL; } }
 \}              { if (state != BRACES) block_type = block[--block_lev]; }
 return          { if (block_type == AUTO) {
-                    printf("%s:%d: error: 'return' used inside a c_AUTO* scope.\n"
-                           "    Use 'continue' to exit the current c_AUTO* scope before return.\n"
+                    printf("%s:%d: error: 'return' used inside a c_auto* scope.\n"
+                           "    Use 'continue' to exit the current c_auto* scope before return.\n"
                            , fname, yylineno);
                     ++errors;
                   } else if (block_type & AUTO) {
-                    printf("%s:%d: error: 'return' used in a loop inside a c_AUTO* scope.\n"
-                           "    Use 'break' to exit loop, then 'continue' to exit c_AUTO*.\n"
+                    printf("%s:%d: error: 'return' used in a loop inside a c_auto* scope.\n"
+                           "    Use 'break' to exit loop, then 'continue' to exit c_auto*.\n"
                            , fname, yylineno);
                     ++errors;
                   }
                 }
 break           { if (block_type == AUTO) {
-                    printf("%s:%d: error: 'break' used inside a c_AUTO* scope.\n"
-                           "    Use 'continue' to exit the current c_AUTO* scope.\n"
+                    printf("%s:%d: error: 'break' used inside a c_auto* scope.\n"
+                           "    Use 'continue' to exit the current c_auto* scope.\n"
                            , fname, yylineno);
                     ++errors;
                   }

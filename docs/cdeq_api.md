@@ -109,14 +109,14 @@ cdeq_X_value        cdeq_X_value_clone(cdeq_X_value val);
 int main() {
     cdeq_i q = cdeq_i_init();
     cdeq_i_push_front(&q, 10);
-    c_FOREACH (i, cdeq_i, q)
+    c_foreach (i, cdeq_i, q)
         printf(" %d", *i.ref);
     puts("");
 
-    c_FORLIST (i, int, {1, 4, 5, 22, 33, 2})
+    c_forlist (i, int, {1, 4, 5, 22, 33, 2})
         cdeq_i_push_back(&q, *i.ref)
 
-    c_FOREACH (i, cdeq_i, q)
+    c_foreach (i, cdeq_i, q)
         printf(" %d", *i.ref);
     puts("");
 
@@ -125,7 +125,7 @@ int main() {
     cdeq_i_push_back(&q, 11);
     cdeq_i_push_front(&q, 8);
 
-    c_FOREACH (i, cdeq_i, q)
+    c_foreach (i, cdeq_i, q)
         printf(" %d", *i.ref);
     puts("");
     cdeq_i_drop(&q);

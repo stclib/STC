@@ -45,7 +45,7 @@ void Person_drop(Person* p) {
 #include <stc/cbox.h>
 
 int main() {
-    c_AUTO (PBox, p, q)
+    c_auto (PBox, p, q)
     {
         p = PBox_from(Person_from("John Smiths", "josmiths@gmail.com"));
         q = PBox_clone(p);

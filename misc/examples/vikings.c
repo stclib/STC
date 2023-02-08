@@ -50,7 +50,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
 
 int main()
 {
-    c_AUTO (Vikings, vikings) {
+    c_auto (Vikings, vikings) {
         Vikings_emplace(&vikings, (RViking){"Einar", "Norway"}, 20);
         Vikings_emplace(&vikings, (RViking){"Olaf", "Denmark"}, 24);
         Vikings_emplace(&vikings, (RViking){"Harald", "Iceland"}, 12);
@@ -59,7 +59,7 @@ int main()
         Vikings_value* v = Vikings_get_mut(&vikings, (RViking){"Einar", "Norway"});
         v->second += 3; // add 3 hp points to Einar
 
-        c_FORPAIR (vk, hp, Vikings, vikings) {
+        c_forpair (vk, hp, Vikings, vikings) {
             printf("%s of %s has %d hp\n", cstr_str(&_.vk->name), cstr_str(&_.vk->country), *_.hp);
         }
     }

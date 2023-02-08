@@ -36,25 +36,25 @@ int point_cmp(const Point* a, const Point* b) {
 
 int main()
 {
-    c_AUTO (cdeq_i32, vec)
+    c_auto (cdeq_i32, vec)
     {
         cdeq_i32_push_back(&vec, 123);
     }
-    c_AUTO (cdeq_float, fvec)
+    c_auto (cdeq_float, fvec)
     {
         cdeq_float_push_back(&fvec, 123.3f);
     }
-    c_AUTO (cdeq_pnt, pvec)
+    c_auto (cdeq_pnt, pvec)
     {
         cdeq_pnt_push_back(&pvec, (Point){42, 14});
         cdeq_pnt_push_back(&pvec, (Point){32, 94});
         cdeq_pnt_push_front(&pvec, (Point){62, 81});
         cdeq_pnt_sort(&pvec);
-        c_FOREACH (i, cdeq_pnt, pvec)
+        c_foreach (i, cdeq_pnt, pvec)
             printf(" (%d %d)", i.ref->x, i.ref->y);
         puts("");
     }
-    c_AUTO (cdeq_str, svec)
+    c_auto (cdeq_str, svec)
     {
         cdeq_str_emplace_back(&svec, "Hello, friend");
     }

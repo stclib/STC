@@ -1,7 +1,9 @@
 #include <stc/cstr.h>
 
-int main() {
-    c_AUTO (cstr, hello, str) {
+int main()
+{
+    c_auto (cstr, hello, str)
+    {
         hello = cstr_lit("hell😀 w😀rld");
         printf("%s\n", cstr_str(&hello));
 
@@ -13,7 +15,7 @@ int main() {
         );
         printf("%s\n", cstr_str(&hello));
 
-        c_FOREACH (c, cstr, hello)
+        c_foreach (c, cstr, hello)
             printf("%.*s,", c_SVARG(c.u8.chr));
         
         str = cstr_lit("scooby, dooby doo");

@@ -57,14 +57,14 @@ static void ins_and_erase_i(picobench::state& s)
     csrandom(seed);
 
     picobench::scope scope(s);
-    c_FORRANGE (s.iterations())
+    c_forrange (s.iterations())
         map[crandom()];
     map.clear();
     csrandom(seed);
-    c_FORRANGE (s.iterations())
+    c_forrange (s.iterations())
         map[crandom()];
     csrandom(seed);
-    c_FORRANGE (s.iterations())
+    c_forrange (s.iterations())
         map.erase(crandom());
     s.set_result(map.size());
 }
@@ -75,14 +75,14 @@ static void ins_and_erase_cmap_i(picobench::state& s)
     csrandom(seed);
 
     picobench::scope scope(s);
-    c_FORRANGE (s.iterations())
+    c_forrange (s.iterations())
         cmap_i_insert(&map, crandom(), 0);
     cmap_i_clear(&map);
     csrandom(seed);
-    c_FORRANGE (s.iterations())
+    c_forrange (s.iterations())
         cmap_i_insert(&map, crandom(), 0);
     csrandom(seed);
-    c_FORRANGE (s.iterations())
+    c_forrange (s.iterations())
         cmap_i_erase(&map, crandom());
     s.set_result(cmap_i_size(&map));
     cmap_i_drop(&map);
@@ -94,14 +94,14 @@ static void ins_and_erase_cmap_x(picobench::state& s)
     csrandom(seed);
 
     picobench::scope scope(s);
-    c_FORRANGE (s.iterations())
+    c_forrange (s.iterations())
         cmap_x_insert(&map, crandom(), 0);
     cmap_x_clear(&map);
     csrandom(seed);
-    c_FORRANGE (s.iterations())
+    c_forrange (s.iterations())
         cmap_x_insert(&map, crandom(), 0);
     csrandom(seed);
-    c_FORRANGE (s.iterations())
+    c_forrange (s.iterations())
         cmap_x_erase(&map, crandom());
     s.set_result(cmap_x_size(&map));
     cmap_x_drop(&map);
@@ -127,7 +127,7 @@ static void ins_and_access_i(picobench::state& s)
     csrandom(seed);
 
     picobench::scope scope(s);
-    c_FORRANGE (N1)
+    c_forrange (N1)
         result += ++map[crandom() & mask];
     s.set_result(result);
 }
@@ -140,7 +140,7 @@ static void ins_and_access_cmap_i(picobench::state& s)
     csrandom(seed);
 
     picobench::scope scope(s);
-    c_FORRANGE (N1)
+    c_forrange (N1)
         result += ++cmap_i_insert(&map, crandom() & mask, 0).ref->second;
     s.set_result(result);
     cmap_i_drop(&map);
@@ -174,7 +174,7 @@ static void ins_and_access_s(picobench::state& s)
     csrandom(seed);
 
     picobench::scope scope(s);
-    c_FORRANGE (s.iterations()) {
+    c_forrange (s.iterations()) {
         randomize(&str[0], str.size());
         map.emplace(str, str);
         randomize(&str[0], str.size());
@@ -192,7 +192,7 @@ static void ins_and_access_cmap_s(picobench::state& s)
     csrandom(seed);
 
     picobench::scope scope(s);
-    c_FORRANGE (s.iterations()) {
+    c_forrange (s.iterations()) {
         randomize(buf, s.arg());
         //if (s.arg() > 30) { printf("%s\n", buf); exit(0); }
         cmap_str_emplace(&map, buf, buf);
@@ -227,7 +227,7 @@ static void iterate_x(picobench::state& s)
     size_t result = 0;
 
     // measure insert then iterate whole map
-    c_FORRANGE (n, s.iterations()) {
+    c_forrange (n, s.iterations()) {
         map[crandom()] = n;
         if (!(n & K)) for (auto const& keyVal : map)
             result += keyVal.second;
@@ -237,7 +237,7 @@ static void iterate_x(picobench::state& s)
     csrandom(seed);
 
     // measure erase then iterate whole map
-    c_FORRANGE (n, s.iterations()) {
+    c_forrange (n, s.iterations()) {
         map.erase(crandom());
         if (!(n & K)) for (auto const& keyVal : map)
             result += keyVal.second;
@@ -255,9 +255,9 @@ static void iterate_cmap_x(picobench::state& s)
     size_t result = 0;
 
     // measure insert then iterate whole map
-    c_FORRANGE (n, s.iterations()) {
+    c_forrange (n, s.iterations()) {
         cmap_x_insert_or_assign(&map, crandom(), n);
-        if (!(n & K)) c_FOREACH (i, cmap_x, map)
+        if (!(n & K)) c_foreach (i, cmap_x, map)
             result += i.ref->second;
     }
 
@@ -265,9 +265,9 @@ static void iterate_cmap_x(picobench::state& s)
     csrandom(seed);
 
     // measure erase then iterate whole map
-    c_FORRANGE (n, s.iterations()) {
+    c_forrange (n, s.iterations()) {
         cmap_x_erase(&map, crandom());
-        if (!(n & K)) c_FOREACH (i, cmap_x, map)
+        if (!(n & K)) c_foreach (i, cmap_x, map)
             result += i.ref->second;
     }
     s.set_result(result);

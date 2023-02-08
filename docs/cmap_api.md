@@ -126,16 +126,16 @@ bool                  c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !
 int main()
 {
     // Create an unordered_map of three strings (that map to strings)
-    c_AUTO (cmap_str, u)
+    c_auto (cmap_str, u)
     {
-        c_FORLIST (i, cmap_str_raw, {
+        u = c_make(cmap_str, {
             {"RED", "#FF0000"},
             {"GREEN", "#00FF00"},
             {"BLUE", "#0000FF"}
-        }) cmap_str_emplace(&u, c_PAIR(i.ref));
+        });
 
         // Iterate and print keys and values of unordered map
-        c_FOREACH (n, cmap_str, u) {
+        c_foreach (n, cmap_str, u) {
             printf("Key:[%s] Value:[%s]\n", cstr_str(&n.ref->first), cstr_str(&n.ref->second));
         }
 
@@ -172,9 +172,9 @@ int main()
 {
     uint32_t col = 0xcc7744ff;
 
-    c_AUTO (cmap_id, idnames)
+    c_auto (cmap_id, idnames)
     {
-        c_FORLIST (i, cmap_id_raw, { {100, "Red"}, {110, "Blue"} })
+        c_forlist (i, cmap_id_raw, { {100, "Red"}, {110, "Blue"} })
             cmap_id_emplace(&idnames, c_PAIR(i.ref));
 
         // replace existing mapped value:
@@ -186,7 +186,7 @@ int main()
         // emplace/insert does nothing if key already exist:
         cmap_id_emplace(&idnames, 100, "Green");
 
-        c_FOREACH (i, cmap_id, idnames)
+        c_foreach (i, cmap_id, idnames)
             printf("%d: %s\n", i.ref->first, cstr_str(&i.ref->second));
     }
 }
@@ -213,14 +213,14 @@ typedef struct { int x, y, z; } Vec3i;
 int main()
 {
     // Define map with defered destruct
-    c_WITH (cmap_vi vecs = cmap_vi_init(), cmap_vi_drop(&vecs))
+    c_with (cmap_vi vecs = cmap_vi_init(), cmap_vi_drop(&vecs))
     {
         cmap_vi_insert(&vecs, (Vec3i){100,   0,   0}, 1);
         cmap_vi_insert(&vecs, (Vec3i){  0, 100,   0}, 2);
         cmap_vi_insert(&vecs, (Vec3i){  0,   0, 100}, 3);
         cmap_vi_insert(&vecs, (Vec3i){100, 100, 100}, 4);
 
-        c_FORPAIR (v3, num, cmap_vi, vecs)
+        c_forpair (v3, num, cmap_vi, vecs)
             printf("{ %3d, %3d, %3d }: %d\n", _.v3->x, _.v3->y, _.v3->z, *_.num);
     }
 }
@@ -246,14 +246,14 @@ typedef struct { int x, y, z; } Vec3i;
 
 int main()
 {
-    c_AUTO (cmap_iv, vecs) // shorthand for c_WITH with _init(), _drop().
+    c_auto (cmap_iv, vecs) // shorthand for c_with with _init(), _drop().
     {
         cmap_iv_insert(&vecs, 1, (Vec3i){100,   0,   0});
         cmap_iv_insert(&vecs, 2, (Vec3i){  0, 100,   0});
         cmap_iv_insert(&vecs, 3, (Vec3i){  0,   0, 100});
         cmap_iv_insert(&vecs, 4, (Vec3i){100, 100, 100});
 
-        c_FORPAIR (num, v3, cmap_iv, vecs)
+        c_forpair (num, v3, cmap_iv, vecs)
             printf("%d: { %3d, %3d, %3d }\n", *_.num, _.v3->x, _.v3->y, _.v3->z);
     }
 }
@@ -313,20 +313,20 @@ static inline void Viking_drop(Viking* vk) {
 int main()
 {
     // Use a HashMap to store the vikings' health points.
-    c_AUTO (Vikings, vikings) // uses Vikings_init(), Vikings_drop()
+    c_auto (Vikings, vikings) // uses Vikings_init(), Vikings_drop()
     {
         Vikings_insert(&vikings, (Viking){cstr_lit("Einar"), cstr_lit("Norway")}, 25);
         Vikings_insert(&vikings, (Viking){cstr_lit("Olaf"), cstr_lit("Denmark")}, 24);
         Vikings_insert(&vikings, (Viking){cstr_lit("Harald"), cstr_lit("Iceland")}, 12);
         Vikings_insert(&vikings, (Viking){cstr_lit("Einar"), cstr_lit("Denmark")}, 21);
         
-        c_AUTO (Viking, lookup) {
+        c_auto (Viking, lookup) {
             lookup = (Viking){cstr_lit("Einar"), cstr_lit("Norway")};
             printf("Lookup: Einar of Norway has %d hp\n\n", *Vikings_at(&vikings, lookup));
         }
 
         // Print the status of the vikings.
-        c_FORPAIR (vik, hp, Vikings, vikings) {
+        c_forpair (vik, hp, Vikings, vikings) {
             printf("%s of %s has %d hp\n", cstr_str(&_.vik->name), cstr_str(&_.vik->country), *_.hp);
         }
     }
@@ -396,7 +396,7 @@ static inline RViking Viking_toraw(const Viking* vp) {
 
 int main()
 {
-    c_AUTO (Vikings, vikings)
+    c_auto (Vikings, vikings)
     {
         Vikings_emplace(&vikings, (RViking){"Einar", "Norway"}, 20);
         Vikings_emplace(&vikings, (RViking){"Olaf", "Denmark"}, 24);
@@ -406,7 +406,7 @@ int main()
         Vikings_value *v = Vikings_get_mut(&vikings, (RViking){"Einar", "Norway"});
         if (v) v->second += 3; // add 3 hp points to Einar
 
-        c_FORPAIR (vk, hp, Vikings, vikings) {
+        c_forpair (vk, hp, Vikings, vikings) {
             printf("%s of %s has %d hp\n", cstr_str(&_.vk->name), cstr_str(&_.vk->country), *_.hp);
         }
     }

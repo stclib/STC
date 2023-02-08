@@ -13,19 +13,19 @@ int main()
                       " Boltzmann const: 1.38064852E-23, is very small."
                       " Bohrradius is 5.29177210903e-11, and Avogadros number is 6.02214076e23.";
 
-    c_AUTO (cregex, re)
-    c_AUTO (cstack_float, vec)
-    c_AUTO (cstr, nums)
+    c_auto (cregex, re)
+    c_auto (cstack_float, vec)
+    c_auto (cstr, nums)
     {
         const char* pattern = "[+-]?([0-9]*\\.)?\\d+([Ee][+-]?\\d+)?";
         int res = cregex_compile(&re, pattern);
         printf("%d: %s\n", res, pattern);
 
         // extract and convert all numbers in str to floats
-        c_FORMATCH (i, &re, str)
+        c_formatch (i, &re, str)
             cstack_float_push(&vec, (float)atof(i.match[0].str));
 
-        c_FOREACH (i, cstack_float, vec)
+        c_foreach (i, cstack_float, vec)
             printf("  %g\n", *i.ref);
 
         // extracts the numbers only to a comma separated string.

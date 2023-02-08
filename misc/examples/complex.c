@@ -31,7 +31,7 @@
 
 int main()
 {
-    c_AUTO (MapMap, mmap)
+    c_auto (MapMap, mmap)
     {
         FloatStack stack = FloatStack_with_size(10, 0);
 

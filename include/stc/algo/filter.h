@@ -28,15 +28,14 @@
 
 int main()
 {
-    c_WITH (cstack_int stk = {0}, cstack_int_drop(&stk)) {
-        c_FORLIST (i, int, {1, 2, 3, 4, 5, 6, 7, 8, 9})
-            cstack_int_push(&stk, i);
-        
-        c_FOREACH (i, cstack_int, stk)
+    c_with (cstack_int stk = c_make(cstack_int, {1, 2, 3, 4, 5, 6, 7, 8, 9}),
+            cstack_int_drop(&stk))
+    {
+        c_foreach (i, cstack_int, stk)
             printf(" %d", *i.ref);
         puts("");
         
-        c_FORFILTER (i, cstack_int, stk
+        c_forfilter (i, cstack_int, stk
                     , c_flt_skipwhile(i, *i.ref < 3)
                     && (*i.ref & 1) == 0 // even only
                     , c_flt_take(i, 2)) // break after 2
@@ -59,15 +58,15 @@ int main()
 #define c_flt_skipwhile(i, pred) ((i).s2[(i).s2top++] |= !(pred))
 #define c_flt_takewhile(i, pred) !c_flt_skipwhile(i, pred)
 
-#define c_FORFILTER(...) c_MACRO_OVERLOAD(c_FORFILTER, __VA_ARGS__)
+#define c_forfilter(...) c_MACRO_OVERLOAD(c_forfilter, __VA_ARGS__)
 
-#define c_FORFILTER_4(i, C, cnt, filter) \
-    c_FORFILTER_B(i, C, C##_begin(&cnt), filter)
+#define c_forfilter_4(i, C, cnt, filter) \
+    c_forfilter_B(i, C, C##_begin(&cnt), filter)
 
-#define c_FORFILTER_5(i, C, cnt, filter, cond) \
-    c_FORFILTER_B(i, C, C##_begin(&cnt), filter) if (!(cond)) break; else
+#define c_forfilter_5(i, C, cnt, filter, cond) \
+    c_forfilter_B(i, C, C##_begin(&cnt), filter) if (!(cond)) break; else
 
-#define c_FORFILTER_B(i, C, start, filter) \
+#define c_forfilter_B(i, C, start, filter) \
     for (struct {C##_iter it; C##_value *ref; \
                  uint32_t s1[c_NFILTERS], index, count; \
                  bool s2[c_NFILTERS]; uint8_t s1top, s2top;} \

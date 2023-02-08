@@ -84,7 +84,7 @@ if __name__ == '__main__':
 # 19 20 23 24
 # 19 20 23 24
 ```
-... can be done in C with cspan:
+... can be written in C using cspan:
 ```c
 #include <c11/fmt.h>
 #include <stc/cspan.h>
@@ -97,12 +97,12 @@ int main() {
     myspan3 ss3 = cspan_slice(myspan3, &ms3, {c_ALL}, {1,3}, {2,c_END});
     myspan2 ss2 = cspan_submd3(&ss3, 1);
 
-    c_FORRANGE (i, ss2.shape[0])
-        c_FORRANGE (j, ss2.shape[1])
+    c_forrange (i, ss2.shape[0])
+        c_forrange (j, ss2.shape[1])
             fmt_print(" {}", *cspan_at(&ss2, i, j));
     puts("");
 
-    c_FOREACH (i, myspan2, ss2)
+    c_foreach (i, myspan2, ss2)
         fmt_print(" {}", *i.ref);
 }
 ```
@@ -147,7 +147,7 @@ int main()
     Span2 span2 = cspan_submd3(&span3, 1);
 
     puts("\niterate span2 flat:");
-    c_FOREACH (i, Span2, span2)
+    c_foreach (i, Span2, span2)
         fmt_print(" {}", *i.ref);
     puts("");
 
@@ -155,9 +155,9 @@ int main()
     Span3 ss3 = cspan_slice(Span3, &span3, {c_ALL}, {3,4}, {c_ALL});
 
     puts("\niterate ss3 by dimensions:");
-    c_FORRANGE (i, ss3.shape[0]) {
-        c_FORRANGE (j, ss3.shape[1]) {
-            c_FORRANGE (k, ss3.shape[2])
+    c_forrange (i, ss3.shape[0]) {
+        c_forrange (j, ss3.shape[1]) {
+            c_forrange (k, ss3.shape[2])
                 fmt_print(" {:2}", *cspan_at(&ss3, i, j, k));
             fmt_print(" |");
         }
@@ -167,8 +167,8 @@ int main()
     Span2 ss2 = cspan_slice(Span2, &span3, {c_ALL}, {3}, {c_ALL});
 
     puts("\niterate ss2 by dimensions:");
-    c_FORRANGE (i, ss2.shape[0]) {
-        c_FORRANGE (j, ss2.shape[1]) {
+    c_forrange (i, ss2.shape[0]) {
+        c_forrange (j, ss2.shape[1]) {
                 fmt_print(" {:2}", *cspan_at(&ss2, i, j));
             fmt_print(" |");
         }
@@ -176,7 +176,7 @@ int main()
     }
 
     puts("\niterate ss2 flat:");
-    c_FOREACH (i, Span2, ss2)
+    c_foreach (i, Span2, ss2)
         fmt_print(" {:2}", *i.ref);
     puts("");
 }

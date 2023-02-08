@@ -32,16 +32,16 @@ void Song_drop(Song* s) {
 
 void example3()
 {
-    c_AUTO (SongVec, vec1, vec2)
+    c_auto (SongVec, vec1, vec2)
     {
-        c_FORLIST (i, Song, {
+        vec1 = c_make(SongVec, {
             Song_make("Bob Dylan", "The Times They Are A Changing"),
             Song_make("Aretha Franklin", "Bridge Over Troubled Water"),
             Song_make("Thalia", "Entre El Mar y Una Estrella")
-        }) SongVec_emplace(&vec1, *i.ref);
+        });
 
         // Share all entries in vec with vec2, except Bob Dylan.
-        c_FOREACH (s, SongVec, vec1)
+        c_foreach (s, SongVec, vec1)
             if (!cstr_equals(&s.ref->get->artist, "Bob Dylan"))
                 SongVec_push(&vec2, SongArc_clone(*s.ref));
 
@@ -52,9 +52,9 @@ void example3()
         // SongVec_push(&vec2, SongArc_from(Song_make("Rihanna", "Stay")));
 
         // We now have two vectors with some shared, some unique entries.
-        c_FORLIST (i, SongVec, {vec1, vec2}) {
+        c_forlist (i, SongVec, {vec1, vec2}) {
             puts("VEC:");
-            c_FOREACH (s, SongVec, *i.ref)
+            c_foreach (s, SongVec, *i.ref)
                 printf("  %s - %s, REFS: %ld\n", cstr_str(&s.ref->get->artist),
                                                  cstr_str(&s.ref->get->title),
                                                  *s.ref->use_count);

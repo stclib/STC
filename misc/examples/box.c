@@ -37,8 +37,8 @@ void Person_drop(Person* p) {
 
 int main()
 {
-    c_AUTO (Persons, vec)
-    c_AUTO (PBox, p, q)
+    c_auto (Persons, vec)
+    c_auto (PBox, p, q)
     {
         p = PBox_from(Person_make("Laura", "Palmer"));
         q = PBox_clone(p);
@@ -54,12 +54,12 @@ int main()
         Persons_push(&vec, PBox_clone(p));
         Persons_push(&vec, PBox_clone(q));
 
-        c_FOREACH (i, Persons, vec)
+        c_foreach (i, Persons, vec)
             printf("%s %s\n", cstr_str(&i.ref->get->name), cstr_str(&i.ref->get->last));
         puts("");
 
         // Look-up Audrey! Create a temporary Person for lookup.
-        c_WITH (Person a = Person_make("Audrey", "Home"), Person_drop(&a)) {
+        c_with (Person a = Person_make("Audrey", "Home"), Person_drop(&a)) {
             const PBox *v = Persons_get(&vec, a); // lookup
             if (v) printf("found: %s %s\n", cstr_str(&v->get->name), cstr_str(&v->get->last));
         }

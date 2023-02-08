@@ -130,19 +130,19 @@ if (cregex_find_pattern(pattern, input, match, CREG_DEFAULT))
 To compile, use: `gcc first_match.c src/cregex.c src/utf8code.c`.
 In order to use a callback function in the replace call, see `examples/regex_replace.c`.
 
-### Iterate through regex matches, *c_FORMATCH*
+### Iterate through regex matches, *c_formatch*
 
 To iterate multiple matches in an input string, you may use
 ```c
 csview match[5] = {0};
 while (cregex_find(&re, input, match, CREG_M_NEXT) == CREG_OK)
-    c_FORRANGE (k, cregex_captures(&re))
+    c_forrange (k, cregex_captures(&re))
         printf("submatch %lld: %.*s\n", k, c_SVARG(match[k]));
 ```
 There is also a safe macro which simplifies this:
 ```c
-c_FORMATCH (it, &re, input)
-    c_FORRANGE (k, cregex_captures(&re))
+c_formatch (it, &re, input)
+    c_forrange (k, cregex_captures(&re))
         printf("submatch %lld: %.*s\n", k, c_SVARG(it.match[k]));
 ```
 
@@ -223,7 +223,7 @@ For reference, **cregex** uses the following files:
 ## Limitations
 
 The main goal of **cregex** is to be small and fast with limited but useful unicode support. In order to reach these goals, **cregex** currently does not support the following features (non-exhaustive list):
-- In order to limit table sizes, most general UTF8 character classes are missing, like \p{L}, \p{S}, and all specific scripts like \p{Greek} etc. Some/all of these may be added in the future as an alternative source file with unicode tables to link with.
+- In order to limit table sizes, most general UTF8 character classes are missing, like \p{L}, \p{S}, and most specific scripts like \p{Tibetan}. Some/all of these may be added in the future as an alternative source file with unicode tables to link with. Currently, only characters from from the Basic Multilingual Plane (BMP) are supported, which contains most commonly used characters (i.e. none of the "supplementary planes").
 - {n, m} syntax for repeating previous token min-max times.
 - Non-capturing groups
 - Lookaround and backreferences (cannot be implemented efficiently).

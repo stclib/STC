@@ -9,12 +9,10 @@
 int main()
 {
     // TEST SORTED VECTOR
-    c_AUTO (cvec_int, vec)
+    c_auto (cvec_int, vec)
     {
         int key, *res;
-
-        c_FORLIST (i, int, {40, 600, 1, 7000, 2, 500, 30})
-            cvec_int_push(&vec, *i.ref);
+        vec = c_make(cvec_int, {40, 600, 1, 7000, 2, 500, 30});
 
         cvec_int_sort(&vec);
 
@@ -33,19 +31,17 @@ int main()
         if (it2.ref)
             printf("Sorted Vec %d: bin. search: %d\n", key, *it2.ref); // 600
 
-        c_FOREACH (i, cvec_int, it1, it2)
+        c_foreach (i, cvec_int, it1, it2)
             printf("  %d\n", *i.ref);
 
         puts("");
     }
 
     // TEST SORTED SET
-    c_AUTO (csset_int, set)
+    c_auto (csset_int, set)
     {
         int key, *res;
-
-        c_FORLIST (i, int, {40, 600, 1, 7000, 2, 500, 30})
-            csset_int_push(&set, *i.ref);
+        set = c_make(csset_int, {40, 600, 1, 7000, 2, 500, 30});
 
         key = 100;
         res = csset_int_lower_bound(&set, key).ref;
@@ -62,7 +58,7 @@ int main()
         if (it2.ref)
             printf("Sorted Set %d: find       : %d\n", key, *it2.ref); // 600
 
-        c_FOREACH (i, csset_int, it1, it2)
+        c_foreach (i, csset_int, it1, it2)
             printf("  %d\n", *i.ref);
     }
 }

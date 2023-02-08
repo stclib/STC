@@ -5,12 +5,11 @@
 
 int main()
 {
-    c_AUTO (csset_int, set)
+    c_auto (csset_int, set)
     {
-        c_FORLIST (i, int, {30, 20, 80, 40, 60, 90, 10, 70, 50})
-            csset_int_insert(&set, *i.ref);
+        set = c_make(csset_int, {30, 20, 80, 40, 60, 90, 10, 70, 50});
 
-        c_FOREACH (k, csset_int, set)
+        c_foreach (k, csset_int, set)
             printf(" %d", *k.ref);
         puts("");
 
@@ -19,7 +18,7 @@ int main()
         printf("Show values >= %d:\n", val);
         it = csset_int_lower_bound(&set, val);
 
-        c_FOREACH (k, csset_int, it, csset_int_end(&set)) 
+        c_foreach (k, csset_int, it, csset_int_end(&set)) 
             printf(" %d", *k.ref);
         puts("");
 
@@ -27,7 +26,7 @@ int main()
         while (it.ref != csset_int_end(&set).ref)
             it = csset_int_erase_at(&set, it);
 
-        c_FOREACH (k, csset_int, set)
+        c_foreach (k, csset_int, set)
             printf(" %d", *k.ref);
         puts("");
 
@@ -36,7 +35,7 @@ int main()
         it = csset_int_lower_bound(&set, val);
         csset_int_erase_range(&set, csset_int_begin(&set), it);
 
-        c_FOREACH (k, csset_int, set)
+        c_foreach (k, csset_int, set)
             printf(" %d", *k.ref);
         puts("");
     }

@@ -7,12 +7,9 @@
 
 int main ()
 {
-    c_WITH (IList L = IList_init(), IList_drop(&L))
+    c_with (IList L = c_make(IList, {10, 20, 30, 40, 50}), IList_drop(&L))
     {
-        c_FORLIST (i, int, {10, 20, 30, 40, 50})
-            IList_push(&L, *i.ref);
-
-        c_FOREACH (x, IList, L)
+        c_foreach (x, IList, L)
             printf("%d ", *x.ref);
         puts("");
                                               // 10 20 30 40 50
@@ -25,7 +22,7 @@ int main ()
         it = IList_erase_range(&L, it, end);  // 10 30
                                               //       ^
         printf("list contains:");
-        c_FOREACH (x, IList, L)
+        c_foreach (x, IList, L)
             printf(" %d", *x.ref);
         puts("");
     }

@@ -47,9 +47,9 @@ CTEST(cspan, slice) {
 #include <stc/cstack.h>
 
 CTEST(cspan, slice2) {
-    c_AUTO (cstack_int, stack)
+    c_auto (cstack_int, stack)
     {
-        c_FORRANGE (i, 10*20*30)
+        c_forrange (i, 10*20*30)
             cstack_int_push(&stack, i);
 
         intspan3 ms3 = cspan_md(stack.data, 10, 20, 30);
@@ -66,7 +66,7 @@ CTEST(cspan, slice2) {
         ASSERT_EQ(65112, sum);
 
         sum = 0;
-        c_FOREACH (i, intspan3, ms3)
+        c_foreach (i, intspan3, ms3)
             sum += *i.ref;
         ASSERT_EQ(65112, sum);
     }
@@ -89,14 +89,14 @@ CTEST_SETUP(cspan_cube) {
     _self->tiles = Tiles_init();
 
     cstack_int_reserve(&_self->stack, N);
-    c_FORRANGE (i, N)
+    c_forrange (i, N)
         cstack_int_push(&_self->stack, i+1);
 
     intspan3 ms3 = cspan_md(_self->stack.data, CUBE, CUBE, CUBE);
 
-    c_FORRANGE (i, 0, ms3.shape[0], TSIZE) {
-        c_FORRANGE (j, 0, ms3.shape[1], TSIZE) {
-            c_FORRANGE (k, 0, ms3.shape[2], TSIZE) {
+    c_forrange (i, 0, ms3.shape[0], TSIZE) {
+        c_forrange (j, 0, ms3.shape[1], TSIZE) {
+            c_forrange (k, 0, ms3.shape[2], TSIZE) {
                 intspan3 tile = cspan_slice(intspan3, &ms3, {i, i + TSIZE}, {j, j + TSIZE}, {k, k + TSIZE});
                 Tiles_push(&_self->tiles, tile);
             }
@@ -117,8 +117,8 @@ CTEST_F(cspan_cube, slice3) {
 
     int64_t sum = 0;
     // iterate each 3d tile in sequence
-    c_FOREACH (i, Tiles, _self->tiles)
-        c_FOREACH (t, intspan3, *i.ref)
+    c_foreach (i, Tiles, _self->tiles)
+        c_foreach (t, intspan3, *i.ref)
             sum += *t.ref;
 
     ASSERT_EQ(n*(n + 1)/2, sum);

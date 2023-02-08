@@ -16,16 +16,16 @@ using_cspan(intspan, int, 1);
 
 void printMe(intspan container) {
     printf("%d:", (int)cspan_size(&container));
-    c_FOREACH (e, intspan, container) printf(" %d", *e.ref);
+    c_foreach (e, intspan, container) printf(" %d", *e.ref);
     puts("");
 }
 
 int main()
 {
-    c_AUTO (cvec_int, vec)
-    c_AUTO (cstack_int, stk)
-    c_AUTO (cdeq_int, deq)
-    c_AUTO (cset_str, set)
+    c_auto (cvec_int, vec)
+    c_auto (cstack_int, stk)
+    c_auto (cdeq_int, deq)
+    c_auto (cset_str, set)
     {
         intspan sp1 = cspan_make(intspan, {1, 2});
         printMe( sp1 );
@@ -36,7 +36,7 @@ int main()
         intspan sp2 = cspan_from_array(arr);
         printMe( (intspan)cspan_subspan(&sp2, 1, 4) );
 
-        c_FORLIST (i, int, {1, 2, 3, 4, 5})
+        c_forlist (i, int, {1, 2, 3, 4, 5})
             cvec_int_push(&vec, *i.ref);
         printMe( (intspan)cspan_from(&vec) );
 
@@ -50,7 +50,7 @@ int main()
 
         set = c_make(cset_str, {"1", "2", "3", "4", "5", "6", "7", "8", "9"});
         printf("%d:", (int)cset_str_size(&set));
-        c_FOREACH (e, cset_str, set)
+        c_foreach (e, cset_str, set)
             printf(" %s", cstr_str(e.ref));
         puts("");
     }

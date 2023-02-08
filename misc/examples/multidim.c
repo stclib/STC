@@ -8,9 +8,7 @@ using_cspan3(ispan, int);
 
 int main()
 {
-    cstack_int v = {0};
-    c_FORLIST (i, int, {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24})
-        cstack_int_push(&v, *i.ref);
+    cstack_int v = c_make(cstack_int, {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24});
 
     // View data as contiguous memory representing 24 ints
     ispan ms1 = cspan_from(&v);
@@ -44,7 +42,7 @@ int main()
     }
 
     puts("Iterate ss3 flat:");
-    c_FOREACH (i, ispan3, ss3)
+    c_foreach (i, ispan3, ss3)
         printf(" %d", *i.ref);
     puts("");
 
@@ -62,7 +60,7 @@ int main()
 
     puts("iterate subspan ms3[1]:");
     ispan2 sub = cspan_submd3(&ms3, 1);
-    c_FOREACH (i, ispan2, sub)
+    c_foreach (i, ispan2, sub)
         printf(" %d", *i.ref);
     puts("");
 

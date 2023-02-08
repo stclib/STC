@@ -13,38 +13,38 @@
 
 int main()
 {
-    c_AUTO (cmap_str, map, mclone)
-    c_AUTO (cvec_str, keys, values)
-    c_AUTO (clist_str, list)
+    c_auto (cmap_str, map, mclone)
+    c_auto (cvec_str, keys, values)
+    c_auto (clist_str, list)
     {
-        c_FORLIST (i, cmap_str_raw, {
+        map = c_make(cmap_str, {
             {"green", "#00ff00"},
             {"blue", "#0000ff"},
             {"yellow", "#ffff00"},
-        }) cmap_str_emplace(&map, c_PAIR(i.ref));
+        });
 
         puts("MAP:");
-        c_FOREACH (i, cmap_str, map)
+        c_foreach (i, cmap_str, map)
             printf("  %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
 
         puts("\nCLONE MAP:");
         mclone = cmap_str_clone(map);
-        c_FOREACH (i, cmap_str, mclone)
+        c_foreach (i, cmap_str, mclone)
             printf("  %s: %s\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
 
         puts("\nCOPY MAP TO VECS:");
-        c_FOREACH (i, cmap_str, mclone) {
+        c_foreach (i, cmap_str, mclone) {
             cvec_str_emplace_back(&keys, cstr_str(&i.ref->first));
             cvec_str_emplace_back(&values, cstr_str(&i.ref->second));
         }
-        c_FORRANGE (i, cvec_str_size(&keys))
+        c_forrange (i, cvec_str_size(&keys))
             printf("  %s: %s\n", cstr_str(keys.data + i), cstr_str(values.data + i));
 
         puts("\nCOPY VEC TO LIST:");
-        c_FOREACH (i, cvec_str, keys)
+        c_foreach (i, cvec_str, keys)
             clist_str_emplace_back(&list, cstr_str(i.ref));
 
-        c_FOREACH (i, clist_str, list)
+        c_foreach (i, clist_str, list)
             printf("  %s\n", cstr_str(i.ref));
     }
 }

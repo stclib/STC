@@ -42,34 +42,34 @@ int point_cmp(const Point* a, const Point* b) {
 
 int main()
 {
-    c_AUTO (csmap_int, imap) {
+    c_auto (csmap_int, imap) {
         csmap_int_insert(&imap, 123, 321);
     }
 
-    c_AUTO (PMap, pmap) {
-        c_FORLIST (i, PMap_value, {
+    c_auto (PMap, pmap) {
+        pmap = c_make(PMap, {
             {{42, 14}, 1},
             {{32, 94}, 2},
             {{62, 81}, 3},
-        }) PMap_insert(&pmap, c_PAIR(i.ref));
+        });
 
-        c_FORPAIR (p, i, PMap, pmap)
+        c_forpair (p, i, PMap, pmap)
             printf(" (%d,%d: %d)", _.p->x, _.p->y, *_.i);
         puts("");
     }
 
-    c_AUTO (SMap, smap) {
-        c_FORLIST (i, SMap_raw, {
+    c_auto (SMap, smap) {
+        smap = c_make(SMap, {
             {"Hello, friend", "this is the mapped value"},
             {"The brown fox", "jumped"},
             {"This is the time", "for all good things"},
-        }) SMap_emplace(&smap, c_PAIR(i.ref));
+        });
 
-        c_FORPAIR (i, j, SMap, smap)
+        c_forpair (i, j, SMap, smap)
             printf(" (%s: %s)\n", cstr_str(_.i), cstr_str(_.j));
     }
 
-    c_AUTO (SSet, sset) {
+    c_auto (SSet, sset) {
         SSet_emplace(&sset, "Hello, friend");
         SSet_emplace(&sset, "Goodbye, foe");
         printf("Found? %s\n", SSet_contains(&sset, "Hello, friend") ? "true" : "false");

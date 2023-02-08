@@ -119,18 +119,18 @@ cvec_X_value        cvec_X_value_clone(cvec_X_value val);
 int main()
 {
     // Create a vector containing integers
-    c_AUTO (cvec_int, vec)
+    c_auto (cvec_int, vec)
     {
         // Add two integers to vector
         cvec_int_push(&vec, 25);
         cvec_int_push(&vec, 13);
 
         // Append a set of numbers
-        c_FORLIST (i, int, {7, 5, 16, 8})
+        c_forlist (i, int, {7, 5, 16, 8})
             cvec_int_push(&vec, *i.ref);
 
         printf("initial:");
-        c_FOREACH (k, cvec_int, vec) {
+        c_foreach (k, cvec_int, vec) {
             printf(" %d", *k.ref);
         }
 
@@ -138,7 +138,7 @@ int main()
         cvec_int_sort(&vec);
 
         printf("\nsorted:");
-        c_FOREACH (k, cvec_int, vec) {
+        c_foreach (k, cvec_int, vec) {
             printf(" %d", *k.ref);
         }
     }
@@ -170,7 +170,7 @@ int main() {
 
     printf("%s\n", cstr_str(&names.data[1])); // Access second element
 
-    c_FOREACH (i, cvec_str, names)
+    c_foreach (i, cvec_str, names)
         printf("item: %s\n", cstr_str(i.ref));
 
     cvec_str_drop(&names);
@@ -219,7 +219,7 @@ int main(void) {
 
     UVec vec2 = UVec_clone(vec);
 
-    c_FOREACH (i, UVec, vec2)
+    c_foreach (i, UVec, vec2)
         printf("%s: %d\n", cstr_str(&i.ref->name), i.ref->id);
 
     c_drop(UVec, &vec, &vec2); // cleanup

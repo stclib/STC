@@ -69,7 +69,7 @@ void OlympicLoc_drop(OlympicLoc* self) {
 int main()
 {
     // Define the multimap with destructor defered to when block is completed.
-    c_AUTO (csmap_OL, multimap)
+    c_auto (csmap_OL, multimap)
     {
         const clist_OL empty = clist_OL_init();
 
@@ -85,14 +85,14 @@ int main()
             clist_OL_push_back(list, loc);
         }
         // Sort locations by year for each country.
-        c_FOREACH (country, csmap_OL, multimap)
+        c_foreach (country, csmap_OL, multimap)
             clist_OL_sort(&country.ref->second);
 
         // Print the multimap:
-        c_FOREACH (country, csmap_OL, multimap)
+        c_foreach (country, csmap_OL, multimap)
         {
             // Loop the locations for a country sorted by year
-            c_FOREACH (loc, clist_OL, country.ref->second)
+            c_foreach (loc, clist_OL, country.ref->second)
                 printf("%s: %d, %s, %s\n", cstr_str(&country.ref->first),
                                                      loc.ref->year,
                                            cstr_str(&loc.ref->city),
