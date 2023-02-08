@@ -211,13 +211,12 @@ STC_API intptr_t _cspan_slice(int32_t odim[], int32_t ostri[], int* orank,
 
 STC_DEF intptr_t _cspan_idxN(int rank, const int32_t shape[], const int32_t stri[], const int32_t a[]) {
     intptr_t off = a[0];
-    bool ok = c_LTu(a[0], shape[0]);
+    c_ASSERT(c_LTu(a[0], shape[0]));
     for (int i = 1; i < rank; ++i) {
         off *= stri[i];
         off += a[i];
-        ok &= c_LTu(a[i], shape[i]);
+        c_ASSERT(c_LTu(a[i], shape[i]));
     }
-    c_ASSERT(ok);
     return off;
 }
 
@@ -237,23 +236,22 @@ STC_DEF intptr_t _cspan_slice(int32_t odim[], int32_t ostri[], int* orank,
                               const int32_t shape[], const int32_t stri[], 
                               int rank, const int32_t a[][2]) {
     intptr_t off = 0;
-    int i = 0, j = 0, ok = true;
+    int i = 0, j = 0;
     int32_t t, s = 1;
     for (; i < rank; ++i) {
         off *= stri[i];
         off += a[i][0];
         switch (a[i][1]) { 
-            case 0: s *= stri[i]; ok &= c_LTu(a[i][0], shape[i]); continue;
+            case 0: s *= stri[i]; c_ASSERT(c_LTu(a[i][0], shape[i])); continue;
             case -1: t = shape[i]; break;
             default: t = a[i][1]; break; 
         }
         odim[j] = t - a[i][0];
         ostri[j] = s*stri[i];
-        ok &= c_LTu(0, odim[j]) & !c_LTu(shape[i], t);
+        c_ASSERT(c_LTu(0, odim[j]) & !c_LTu(shape[i], t));
         s = 1; ++j;
     }
     *orank = j;
-    c_ASSERT(ok);
     return off;
 }
 #endif

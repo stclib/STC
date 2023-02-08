@@ -1,11 +1,9 @@
 #include <stdio.h>
 #include <time.h>
 
-#define STC_IMPLEMENT
-#define STC_EXTERN
-
 #define i_val double
 #define i_tag fx
+#define i_extern // include sort function
 #include <stc/clist.h>
 #include <stc/crandom.h>
 
