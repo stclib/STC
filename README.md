@@ -73,7 +73,21 @@ Highlights
 - **Compiles with C++ and C99** - C code can be compiled with C++ (container element types must be POD).
 - **Forward declaration** - Templated containers may be forward declared without including the full API/implementation. See documentation below.
 
+Performance
+-----------
+![Benchmark](misc/benchmarks/pics/benchmark.gif)
+
+Benchmark notes:
+- The barchart shows average test times over three platforms: Mingw64 10.30, Win-Clang 12, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
+- Containers uses value types `uint64_t` and pairs of `uint64_t` for the maps.
+- Black bars indicates performance variation between various platforms/compilers.
+- Iterations are repeated 4 times over n elements.
+- **find()**: not executed for *forward_list*, *deque*, and *vector* because these c++ containers does not have native *find()*.
+- **deque**: *insert*: n/3 push_front(), n/3 push_back()+pop_front(), n/3 push_back().
+- **map and unordered map**: *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys in the map, n/2 random keys.
+
 Three standout features of STC
+------------------------------
 1. ***Centralized analysis of template arguments***. Assigns good defaults to non-specified templates.
 You may specify a number of "standard" template arguments for each container, but as minimum only one is
 required (two for maps). In the latter case, STC assumes the elements are basic types. For more complex types,
@@ -90,18 +104,31 @@ same element access syntax. E.g. `c_foreach (it, IntContainer, container) printf
 every type of container defined as `IntContainer` with `int` elements. Also the form `c_foreach (it, IntContainer, it1, it2)`
 may be used to iterate from `it1` up to `it2`.
 
-Performance
------------
-![Benchmark](misc/benchmarks/pics/benchmark.gif)
-
-Benchmark notes:
-- The barchart shows average test times over three platforms: Mingw64 10.30, Win-Clang 12, VC19. CPU: Ryzen 7 2700X CPU @4Ghz.
-- Containers uses value types `uint64_t` and pairs of `uint64_t` for the maps.
-- Black bars indicates performance variation between various platforms/compilers.
-- Iterations are repeated 4 times over n elements.
-- **find()**: not executed for *forward_list*, *deque*, and *vector* because these c++ containers does not have native *find()*.
-- **deque**: *insert*: n/3 push_front(), n/3 push_back()+pop_front(), n/3 push_back().
-- **map and unordered map**: *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys in the map, n/2 random keys.
+Naming conventions
+------------------
+- Container names are prefixed by `c`, e.g. `cvec`, `cstr`.
+- Public STC macros are prefixed by `c_`, e.g. `c_foreach`, `c_make`.
+- Template parameter macros are prefixed by `i_`, e.g. `i_val`, `i_type`.
+- Common types for container type Con:
+    - Con
+    - Con_value
+    - Con_raw
+    - Con_iter
+- Common function names for container type Con:
+    - Con_init()
+    - Con_reserve(&con, capacity)
+    - Con_drop(&con)
+    - Con_empty(&con)
+    - Con_size(&con)
+    - Con_push(&con, value)
+    - Con_put_n(&con, values, n)
+    - Con_clone(con)
+    - Con_erase_at(&con, iter)
+    - Con_front(&con)
+    - Con_back(&con)
+    - Con_begin(&con)
+    - Con_end(&con)
+    - Con_next(&iter)
 
 Usage
 -----
@@ -116,9 +143,9 @@ No casting is used, so containers are type-safe like templates in c++. A basic u
 int main(void)
 {
     FVec vec = FVec_init();
-    FVec_push_back(&vec, 10.f);
-    FVec_push_back(&vec, 20.f);
-    FVec_push_back(&vec, 30.f);
+    FVec_push(&vec, 10.f);
+    FVec_push(&vec, 20.f);
+    FVec_push(&vec, 30.f);
 
     for (intptr_t i = 0; i < FVec_size(vec); ++i)
         printf(" %g", vec.data[i]);
@@ -163,7 +190,7 @@ cvec_one v1 = cvec_one_init();
 cvec_two v2 = cvec_two_init();
 ```
 
-With six different containers:
+An example using six different container types:
 ```c
 #include <stdio.h>
 #include <stc/ccommon.h>

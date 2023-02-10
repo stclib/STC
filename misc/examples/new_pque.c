@@ -4,7 +4,7 @@ struct Point { int x, y; } typedef Point;
 
 #define i_type PointQ
 #define i_val Point
-#define i_less(a, b) a->x < b->x || a->x == b->x && a->y < b->y
+#define i_less(a, b) a->x < b->x || (a->x == b->x && a->y < b->y)
 #include <stc/cpque.h>
 
 

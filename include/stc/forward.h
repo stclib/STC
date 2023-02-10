@@ -42,7 +42,11 @@
 
 // csview
 typedef const char csview_value;
-typedef struct { csview_value* str; intptr_t size; } csview;
+typedef struct csview { 
+    csview_value* str; 
+    intptr_t size;
+} csview;
+
 typedef union { 
     csview_value* ref; 
     struct { csview chr; csview_value* end; } u8;
@@ -51,10 +55,11 @@ typedef union {
 // cstr
 typedef char cstr_value;
 typedef struct { cstr_value* data; intptr_t size, cap; } cstr_buf;
-typedef union {
+typedef union cstr {
     struct { cstr_value data[sizeof(cstr_buf) - 1]; unsigned char size; } sml;
     struct { cstr_value* data; size_t size, ncap; } lon;
 } cstr;
+
 typedef union { 
     cstr_value* ref; 
     struct { csview chr; } u8;
@@ -65,22 +70,25 @@ typedef union {
 
 #define _c_carc_types(SELF, VAL) \
     typedef VAL SELF##_value; \
-\
-    typedef struct { \
+    typedef struct SELF { \
         SELF##_value* get; \
         catomic_long* use_count; \
     } SELF
 
 #define _c_cbox_types(SELF, VAL) \
     typedef VAL SELF##_value; \
-    typedef struct { \
+    typedef struct SELF { \
         SELF##_value* get; \
     } SELF
 
 #define _c_cdeq_types(SELF, VAL) \
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
-    typedef struct { SELF##_value *_base, *data; intptr_t _len, _cap; } SELF
+\
+    typedef struct SELF { \
+        SELF##_value *_base, *data; \
+        intptr_t _len, _cap; \
+    } SELF
 
 #define _c_clist_types(SELF, VAL) \
     typedef VAL SELF##_value; \
@@ -91,7 +99,7 @@ typedef union {
         SELF##_node *const *_last, *prev; \
     } SELF##_iter; \
 \
-    typedef struct { \
+    typedef struct SELF { \
         SELF##_node *last; \
     } SELF
 
@@ -114,7 +122,7 @@ typedef union {
         uint8_t* _hx; \
     } SELF##_iter; \
 \
-    typedef struct { \
+    typedef struct SELF { \
         SELF##_value* table; \
         uint8_t* _hashx; \
         SELF##_sizet size, bucket_count; \
@@ -142,7 +150,7 @@ typedef union {
         SELF##_sizet _tn, _st[36]; \
     } SELF##_iter; \
 \
-    typedef struct { \
+    typedef struct SELF { \
         SELF##_node *nodes; \
         SELF##_sizet root, disp, head, size, cap; \
     } SELF
@@ -150,20 +158,20 @@ typedef union {
 #define _c_cstack_fixed(SELF, VAL, CAP) \
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
-    typedef struct { SELF##_value data[CAP]; intptr_t _len; } SELF
+    typedef struct SELF { SELF##_value data[CAP]; intptr_t _len; } SELF
 
 #define _c_cstack_types(SELF, VAL) \
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
-    typedef struct { SELF##_value* data; intptr_t _len, _cap; } SELF
+    typedef struct SELF { SELF##_value* data; intptr_t _len, _cap; } SELF
 
 #define _c_cvec_types(SELF, VAL) \
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
-    typedef struct { SELF##_value *data; intptr_t _len, _cap; } SELF
+    typedef struct SELF { SELF##_value *data; intptr_t _len, _cap; } SELF
 
 #define _c_cpque_types(SELF, VAL) \
     typedef VAL SELF##_value; \
-    typedef struct { SELF##_value* data; intptr_t _len, _cap; } SELF
+    typedef struct SELF { SELF##_value* data; intptr_t _len, _cap; } SELF
 
 #endif // STC_FORWARD_H_INCLUDED
