@@ -44,8 +44,8 @@
   #define _i_prefix
 #endif
 
-#ifndef i_size
-  #define i_size intptr_t
+#ifndef i_ssize
+  #define i_ssize intptr_t
 #endif
 
 #ifndef i_allocator
@@ -298,7 +298,7 @@
 #undef i_hash
 #undef i_rawclass
 #undef i_capacity
-#undef i_size
+#undef i_ssize
 
 #undef i_val
 #undef i_val_str

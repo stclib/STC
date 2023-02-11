@@ -20,7 +20,7 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 
 #define i_cmp_functor // advanced, see examples/functor.c for similar usage.
 #define i_tag       // alternative typename: csset_{i_tag}. i_tag defaults to i_val
-#define i_size      // defines csset_X_sizet type; defaults to int32_t
+#define i_ssize     // defaults to int32_t
 #include <stc/csset.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -29,8 +29,8 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 
 ```c
 csset_X              csset_X_init(void);
-csset_X              csset_X_with_capacity(csset_X_sizet cap);
-bool                 csset_X_reserve(csset_X* self, csset_X_sizet cap);
+csset_X              csset_X_with_capacity(i_ssize cap);
+bool                 csset_X_reserve(csset_X* self, i_ssize cap);
 void                 csset_X_shrink_to_fit(csset_X* self);
 csset_X              csset_X_clone(csset_x set);
 
@@ -38,7 +38,7 @@ void                 csset_X_clear(csset_X* self);
 void                 csset_X_copy(csset_X* self, const csset_X* other);
 void                 csset_X_drop(csset_X* self);                                             // destructor
 
-csset_X_sizet        csset_X_size(const csset_X* self);
+i_ssize              csset_X_size(const csset_X* self);
 bool                 csset_X_empty(const csset_X* self);
 
 const csset_X_value* csset_X_get(const csset_X* self, i_keyraw rkey);                         // const get

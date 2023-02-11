@@ -106,7 +106,7 @@ typedef union {
 #define _c_chash_types(SELF, KEY, VAL, SZ, MAP_ONLY, SET_ONLY) \
     typedef KEY SELF##_key; \
     typedef VAL SELF##_mapped; \
-    typedef SZ SELF##_sizet; \
+    typedef SZ SELF##_ssize; \
 \
     typedef SET_ONLY( SELF##_key ) \
             MAP_ONLY( struct SELF##_value ) \
@@ -125,13 +125,13 @@ typedef union {
     typedef struct SELF { \
         SELF##_value* table; \
         uint8_t* _hashx; \
-        SELF##_sizet size, bucket_count; \
+        SELF##_ssize size, bucket_count; \
     } SELF
 
 #define _c_aatree_types(SELF, KEY, VAL, SZ, MAP_ONLY, SET_ONLY) \
     typedef KEY SELF##_key; \
     typedef VAL SELF##_mapped; \
-    typedef SZ SELF##_sizet; \
+    typedef SZ SELF##_ssize; \
     typedef struct SELF##_node SELF##_node; \
 \
     typedef SET_ONLY( SELF##_key ) \
@@ -147,12 +147,12 @@ typedef union {
         SELF##_value *ref; \
         SELF##_node *_d; \
         int _top; \
-        SELF##_sizet _tn, _st[36]; \
+        SELF##_ssize _tn, _st[36]; \
     } SELF##_iter; \
 \
     typedef struct SELF { \
         SELF##_node *nodes; \
-        SELF##_sizet root, disp, head, size, cap; \
+        SELF##_ssize root, disp, head, size, cap; \
     } SELF
 
 #define _c_cstack_fixed(SELF, VAL, CAP) \

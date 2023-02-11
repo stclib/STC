@@ -320,8 +320,10 @@ You may also cherry-pick shared linking mode on individual containers by `#defin
 `#define i_implement`, or force static symbols by `#define i_static` before container includes.
 
 As a special case, there may be non-templated functions in templated containers that should be implemented only
-once if needed. Currently, for **clist**, define `i_extern` before including `clist.h` for sorting functionality
-(global `STC_EXTERN` may alternatively be defined).
+once and if needed. Currently, define `i_extern` before including **clist** for its sorting function, and before 
+**cregex** or **utf8** to implement them (global `STC_EXTERN` can alternatively be defined).
+
+It is possible to generate single headers by executing the python script in src/singleheader.py <header>.
 
 Conveniently, `src\libstc.c` implements non-templated functions as shared symbols for **cstr**, **csview**,
 **cbits** and **crandom**. When building in shared mode (-DSTC_HEADER), you may include this file in your project,

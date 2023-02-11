@@ -73,15 +73,15 @@ int main(void) {
   #define _i_SET_ONLY c_false
   #define _i_keyref(vp) (&(vp)->first)
 #endif
-#ifndef i_size
-  #define i_size int32_t
+#ifndef i_ssize
+  #define i_ssize int32_t
 #endif
 #include "priv/template.h"
 #ifndef i_cmp_functor
   #define i_cmp_functor(self, x, y) i_cmp(x, y)
 #endif
 #if !c_option(c_is_forward)
-  _cx_deftypes(_c_aatree_types, _cx_self, i_key, i_val, i_size, _i_MAP_ONLY, _i_SET_ONLY);
+  _cx_deftypes(_c_aatree_types, _cx_self, i_key, i_val, i_ssize, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
 
 _i_MAP_ONLY( struct _cx_value {
@@ -89,7 +89,7 @@ _i_MAP_ONLY( struct _cx_value {
     _cx_mapped second;
 }; )
 struct _cx_node {
-    i_size link[2];
+    i_ssize link[2];
     int8_t level;
     _cx_value value;
 };
@@ -229,21 +229,21 @@ _cx_memb(_init)(void) {
 
 STC_DEF bool
 _cx_memb(_reserve)(_cx_self* self, const int64_t cap) {
-    if ((i_size)cap <= self->cap)
+    if ((i_ssize)cap <= self->cap)
         return false;
     _cx_node* nodes = (_cx_node*)i_realloc(self->nodes, (cap + 1)*c_sizeof(_cx_node));
     if (!nodes)
         return false;
     nodes[0] = c_LITERAL(_cx_node){{0, 0}, 0};
     self->nodes = nodes;
-    self->cap = (i_size)cap;
+    self->cap = (i_ssize)cap;
     return true;
 }
 
 STC_DEF _cx_value*
 _cx_memb(_front)(const _cx_self* self) {
     _cx_node *d = self->nodes;
-    i_size tn = self->root;
+    i_ssize tn = self->root;
     while (d[tn].link[0])
         tn = d[tn].link[0];
     return &d[tn].value;
@@ -252,15 +252,15 @@ _cx_memb(_front)(const _cx_self* self) {
 STC_DEF _cx_value*
 _cx_memb(_back)(const _cx_self* self) {
     _cx_node *d = self->nodes;
-    i_size tn = self->root;
+    i_ssize tn = self->root;
     while (d[tn].link[1])
         tn = d[tn].link[1];
     return &d[tn].value;
 }
 
-static i_size
+static i_ssize
 _cx_memb(_new_node_)(_cx_self* self, int level) {
-    i_size tn;
+    i_ssize tn;
     if (self->disp) {
         tn = self->disp;
         self->disp = self->nodes[tn].link[1];
@@ -344,7 +344,7 @@ STC_INLINE _cx_self _cx_memb(_from_n)(const _cx_raw* raw, int64_t n)
 
 STC_DEF _cx_value*
 _cx_memb(_find_it)(const _cx_self* self, _cx_rawkey rkey, _cx_iter* out) {
-    i_size tn = self->root;
+    i_ssize tn = self->root;
     _cx_node *d = out->_d = self->nodes;
     out->_top = 0;
     while (tn) {
@@ -364,7 +364,7 @@ _cx_memb(_lower_bound)(const _cx_self* self, _cx_rawkey rkey) {
     _cx_iter it;
     _cx_memb(_find_it)(self, rkey, &it);
     if (!it.ref && it._top) {
-        i_size tn = it._st[--it._top];
+        i_ssize tn = it._st[--it._top];
         it._tn = it._d[tn].link[1];
         it.ref = &it._d[tn].value;
     }
@@ -373,7 +373,7 @@ _cx_memb(_lower_bound)(const _cx_self* self, _cx_rawkey rkey) {
 
 STC_DEF void
 _cx_memb(_next)(_cx_iter *it) {
-    i_size tn = it->_tn;
+    i_ssize tn = it->_tn;
     if (it->_top || tn) {
         while (tn) {
             it->_st[it->_top++] = tn;
@@ -386,10 +386,10 @@ _cx_memb(_next)(_cx_iter *it) {
         it->ref = NULL;
 }
 
-STC_DEF i_size
-_cx_memb(_skew_)(_cx_node *d, i_size tn) {
+STC_DEF i_ssize
+_cx_memb(_skew_)(_cx_node *d, i_ssize tn) {
     if (tn && d[d[tn].link[0]].level == d[tn].level) {
-        i_size tmp = d[tn].link[0];
+        i_ssize tmp = d[tn].link[0];
         d[tn].link[0] = d[tmp].link[1];
         d[tmp].link[1] = tn;
         tn = tmp;
@@ -397,10 +397,10 @@ _cx_memb(_skew_)(_cx_node *d, i_size tn) {
     return tn;
 }
 
-STC_DEF i_size
-_cx_memb(_split_)(_cx_node *d, i_size tn) {
+STC_DEF i_ssize
+_cx_memb(_split_)(_cx_node *d, i_ssize tn) {
     if (d[d[d[tn].link[1]].link[1]].level == d[tn].level) {
-        i_size tmp = d[tn].link[1];
+        i_ssize tmp = d[tn].link[1];
         d[tn].link[1] = d[tmp].link[0];
         d[tmp].link[0] = tn;
         tn = tmp;
@@ -409,9 +409,9 @@ _cx_memb(_split_)(_cx_node *d, i_size tn) {
     return tn;
 }
 
-static i_size
-_cx_memb(_insert_entry_i_)(_cx_self* self, i_size tn, const _cx_rawkey* rkey, _cx_result* _res) {
-    i_size up[64], tx = tn;
+static i_ssize
+_cx_memb(_insert_entry_i_)(_cx_self* self, i_ssize tn, const _cx_rawkey* rkey, _cx_result* _res) {
+    i_ssize up[64], tx = tn;
     _cx_node* d = self->nodes;
     int c, top = 0, dir = 0;
     while (tx) {
@@ -444,19 +444,19 @@ _cx_memb(_insert_entry_i_)(_cx_self* self, i_size tn, const _cx_rawkey* rkey, _c
 static _cx_result
 _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey) {
     _cx_result res = {NULL};
-    i_size tn = _cx_memb(_insert_entry_i_)(self, self->root, &rkey, &res);
+    i_ssize tn = _cx_memb(_insert_entry_i_)(self, self->root, &rkey, &res);
     self->root = tn;
     self->size += res.inserted;
     return res;
 }
 
-static i_size
-_cx_memb(_erase_r_)(_cx_self *self, i_size tn, const _cx_rawkey* rkey, int *erased) {
+static i_ssize
+_cx_memb(_erase_r_)(_cx_self *self, i_ssize tn, const _cx_rawkey* rkey, int *erased) {
     _cx_node *d = self->nodes;
     if (tn == 0)
         return 0;
     _cx_rawkey raw = i_keyto(_i_keyref(&d[tn].value));
-    i_size tx; int c = i_cmp_functor(self, (&raw), rkey);
+    i_ssize tx; int c = i_cmp_functor(self, (&raw), rkey);
     if (c != 0)
         d[tn].link[c < 0] = _cx_memb(_erase_r_)(self, d[tn].link[c < 0], rkey, erased);
     else {
@@ -493,7 +493,7 @@ _cx_memb(_erase_r_)(_cx_self *self, i_size tn, const _cx_rawkey* rkey, int *eras
 STC_DEF int
 _cx_memb(_erase)(_cx_self* self, _cx_rawkey rkey) {
     int erased = 0;
-    i_size root = _cx_memb(_erase_r_)(self, self->root, &rkey, &erased);
+    i_ssize root = _cx_memb(_erase_r_)(self, self->root, &rkey, &erased);
     if (!erased)
         return 0;
     self->root = root;
@@ -535,11 +535,11 @@ _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
 }
 
 #if !defined i_no_clone
-static i_size
-_cx_memb(_clone_r_)(_cx_self* self, _cx_node* src, i_size sn) {
+static i_ssize
+_cx_memb(_clone_r_)(_cx_self* self, _cx_node* src, i_ssize sn) {
     if (sn == 0)
         return 0;
-    i_size tx, tn = _cx_memb(_new_node_)(self, src[sn].level);
+    i_ssize tx, tn = _cx_memb(_new_node_)(self, src[sn].level);
     self->nodes[tn].value = _cx_memb(_value_clone)(src[sn].value);
     tx = _cx_memb(_clone_r_)(self, src, src[sn].link[0]); self->nodes[tn].link[0] = tx;
     tx = _cx_memb(_clone_r_)(self, src, src[sn].link[1]); self->nodes[tn].link[1] = tx;
@@ -549,7 +549,7 @@ _cx_memb(_clone_r_)(_cx_self* self, _cx_node* src, i_size sn) {
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self tree) {
     _cx_self clone = _cx_memb(_with_capacity)(tree.size);
-    i_size root = _cx_memb(_clone_r_)(&clone, tree.nodes, tree.root);
+    i_ssize root = _cx_memb(_clone_r_)(&clone, tree.nodes, tree.root);
     clone.root = root;
     clone.size = tree.size;
     return clone;
@@ -569,7 +569,7 @@ _cx_memb(_emplace)(_cx_self* self, _cx_rawkey rkey _i_MAP_ONLY(, i_valraw rmappe
 #endif // i_no_emplace
 
 static void
-_cx_memb(_drop_r_)(_cx_node* d, i_size tn) {
+_cx_memb(_drop_r_)(_cx_node* d, i_ssize tn) {
     if (tn) {
         _cx_memb(_drop_r_)(d, d[tn].link[0]);
         _cx_memb(_drop_r_)(d, d[tn].link[1]);

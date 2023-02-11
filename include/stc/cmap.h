@@ -73,8 +73,8 @@ typedef struct { int64_t idx; uint8_t hx; } chash_bucket_t;
 #ifndef i_max_load_factor
   #define i_max_load_factor 0.85f
 #endif
-#ifndef i_size
-  #define i_size int32_t
+#ifndef i_ssize
+  #define i_ssize int32_t
   #define _i_expandby 1
 #else
   #define _i_expandby 2
@@ -87,7 +87,7 @@ typedef struct { int64_t idx; uint8_t hx; } chash_bucket_t;
   #define i_eq_functor(self, x, y) i_eq(x, y)
 #endif
 #if !c_option(c_is_forward)
-  _cx_deftypes(_c_chash_types, _cx_self, i_key, i_val, i_size, _i_MAP_ONLY, _i_SET_ONLY);
+  _cx_deftypes(_c_chash_types, _cx_self, i_key, i_val, i_ssize, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
 
 _i_MAP_ONLY( struct _cx_value {
@@ -378,7 +378,7 @@ _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr) {
 STC_DEF _cx_result
 _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey) {
     _cx_result res = {NULL};
-    if (self->size + 2 > (i_size)((float)self->bucket_count * (i_max_load_factor)))
+    if (self->size + 2 > (i_ssize)((float)self->bucket_count * (i_max_load_factor)))
         if (!_cx_memb(_reserve)(self, self->size*3/2))
             return res;
 
@@ -412,12 +412,12 @@ _cx_memb(_clone)(_cx_self m) {
 
 STC_DEF bool
 _cx_memb(_reserve)(_cx_self* self, const int64_t newcap) {
-    const i_size _oldbuckets = self->bucket_count, _newcap = (i_size)newcap;
+    const i_ssize _oldbuckets = self->bucket_count, _newcap = (i_ssize)newcap;
     if (_newcap != self->size && _newcap <= _oldbuckets)
         return true;
-    i_size _nbuckets = (i_size)((float)_newcap / (i_max_load_factor)) + 4;
+    i_ssize _nbuckets = (i_ssize)((float)_newcap / (i_max_load_factor)) + 4;
     #if _i_expandby == 2
-    _nbuckets = (i_size)next_power_of_2(_nbuckets);
+    _nbuckets = (i_ssize)next_power_of_2(_nbuckets);
     #else
     _nbuckets |= 1;
     #endif
@@ -431,7 +431,7 @@ _cx_memb(_reserve)(_cx_self* self, const int64_t newcap) {
         m._hashx[_nbuckets] = 0xff;
         const _cx_value* e = self->table;
         const uint8_t* h = self->_hashx;
-        for (i_size i = 0; i < _oldbuckets; ++i, ++e) if (*h++) {
+        for (i_ssize i = 0; i < _oldbuckets; ++i, ++e) if (*h++) {
             _cx_rawkey r = i_keyto(_i_keyref(e));
             chash_bucket_t b = _cx_memb(_bucket_)(&m, &r);
             m.table[b.idx] = *e;
@@ -446,8 +446,8 @@ _cx_memb(_reserve)(_cx_self* self, const int64_t newcap) {
 
 STC_DEF void
 _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
-    i_size i = (i_size)(_val - self->table), j = i, k;
-    const i_size _cap = self->bucket_count;
+    i_ssize i = (i_ssize)(_val - self->table), j = i, k;
+    const i_ssize _cap = self->bucket_count;
     _cx_value* _slot = self->table;
     uint8_t* _hashx = self->_hashx;
     _cx_memb(_value_drop)(_val);
@@ -457,7 +457,7 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
         if (! _hashx[j])
             break;
         const _cx_rawkey _raw = i_keyto(_i_keyref(_slot + j));
-        k = (i_size)c_PASTE(fastrange_,_i_expandby)(i_hash_functor(self, (&_raw)), (uint64_t)_cap);
+        k = (i_ssize)c_PASTE(fastrange_,_i_expandby)(i_hash_functor(self, (&_raw)), (uint64_t)_cap);
         if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */
             _slot[i] = _slot[j], _hashx[i] = _hashx[j], i = j;
     }

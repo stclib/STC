@@ -1,10 +1,10 @@
 // emhash7::HashMap for C++11/14/17
-// version 2.2.3
+// version 2.2.4
 // https://github.com/ktprime/ktprime/blob/master/hash_table7.hpp
 //
 // Licensed under the MIT License <http://opensource.org/licenses/MIT>.
 // SPDX-License-Identifier: MIT
-// Copyright (c) 2019-2022 Huang Yuanbing & bailuzhou AT 163.com
+// Copyright (c) 2019-2023 Huang Yuanbing & bailuzhou AT 163.com
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -165,6 +165,11 @@ namespace emhash7 {
     typedef uint32_t size_type;
     static constexpr size_type INACTIVE = 0 - 0x1u;
 #endif
+
+#ifndef EMH_MALIGN
+    static constexpr uint32_t EMH_MALIGN = 16;
+#endif
+static_assert(EMH_MALIGN >= 16 && 0 == (EMH_MALIGN & (EMH_MALIGN - 1)));
 
 #ifndef EMH_SIZE_TYPE_16BIT
 static_assert((int)INACTIVE < 0, "INACTIVE must negative (to int)");
@@ -535,15 +540,25 @@ public:
         init(bucket, mlf);
     }
 
-    size_t AllocSize(uint64_t num_buckets) const
+    static size_t AllocSize(uint64_t num_buckets)
     {
         return (num_buckets + EPACK_SIZE) * sizeof(PairT) + (num_buckets + 7) / 8 + BIT_PACK;
+    }
+
+    static PairT* alloc_bucket(size_type num_buckets)
+    {
+#if _WIN32
+        auto* new_pairs = (PairT*)malloc(AllocSize(num_buckets));
+#else
+        auto* new_pairs = (PairT*)aligned_alloc(EMH_MALIGN, AllocSize(num_buckets));
+#endif
+        return new_pairs;
     }
 
     HashMap(const HashMap& rhs) noexcept
     {
         if (rhs.load_factor() > EMH_MIN_LOAD_FACTOR) {
-            _pairs = (PairT*)malloc(AllocSize(rhs._num_buckets));
+            _pairs = (PairT*)alloc_bucket(rhs._num_buckets);
             clone(rhs);
         } else {
             init(rhs._num_filled + 2, EMH_DEFAULT_LOAD_FACTOR);
@@ -596,7 +611,7 @@ public:
 
         if (_num_buckets != rhs._num_buckets) {
             free(_pairs);
-            _pairs = (PairT*)malloc(AllocSize(rhs._num_buckets));
+            _pairs = alloc_bucket(rhs._num_buckets);
         }
 
         clone(rhs);
@@ -1355,7 +1370,7 @@ public:
         _num_buckets = num_buckets;
         _mask        = num_buckets - 1;
 
-        _pairs = (PairT*)malloc(AllocSize(_num_buckets));
+        _pairs = alloc_bucket(_num_buckets);
         memset((char*)(_pairs + _num_buckets), 0, sizeof(PairT) * EPACK_SIZE);
 
         _bitmask     = decltype(_bitmask)(_pairs + EPACK_SIZE + num_buckets);

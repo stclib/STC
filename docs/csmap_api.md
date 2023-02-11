@@ -34,7 +34,7 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 
 #define i_tag       // alternative typename: csmap_{i_tag}. i_tag defaults to i_val
 #define i_cmp_functor // advanced, see examples/functor.c for similar usage.
-#define i_size      // defines csmap_X_sizet type; defaults to int32_t
+#define i_ssize     // defaults to int32_t
 #include <stc/csmap.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -43,8 +43,8 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 
 ```c
 csmap_X               csmap_X_init(void);
-csset_X               csmap_X_with_capacity(csmap_X_sizet cap);
-bool                  csmap_X_reserve(csmap_X* self, csmap_X_sizet cap);
+csset_X               csmap_X_with_capacity(i_ssize cap);
+bool                  csmap_X_reserve(csmap_X* self, i_ssize cap);
 void                  csmap_X_shrink_to_fit(csmap_X* self);
 csmap_X               csmap_X_clone(csmap_x map);
 
@@ -53,8 +53,8 @@ void                  csmap_X_copy(csmap_X* self, const csmap_X* other);
 void                  csmap_X_drop(csmap_X* self);                                               // destructor
 
 bool                  csmap_X_empty(const csmap_X* self);
-csmap_X_sizet         csmap_X_size(const csmap_X* self);
-csmap_X_sizet         csmap_X_capacity(const csmap_X* self);
+i_ssize               csmap_X_size(const csmap_X* self);
+i_ssize               csmap_X_capacity(const csmap_X* self);
 
 const csmap_X_mapped* csmap_X_at(const csmap_X* self, i_keyraw rkey);                            // rkey must be in map
 csmap_X_mapped*       csmap_X_at_mut(csmap_X* self, i_keyraw rkey);                              // mutable at
@@ -82,7 +82,7 @@ csmap_X_iter          csmap_X_erase_range(csmap_X* self, csmap_X_iter it1, csmap
 csmap_X_iter          csmap_X_begin(const csmap_X* self);
 csmap_X_iter          csmap_X_end(const csmap_X* self);
 void                  csmap_X_next(csmap_X_iter* iter);
-csmap_X_iter          csmap_X_advance(csmap_X_iter it, csmap_X_sizet n);
+csmap_X_iter          csmap_X_advance(csmap_X_iter it, i_ssize n);
 
 csmap_X_value         csmap_X_value_clone(csmap_X_value val);
 csmap_X_raw           csmap_X_value_toraw(csmap_X_value* pval);
