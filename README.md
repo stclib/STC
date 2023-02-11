@@ -111,8 +111,8 @@ Naming conventions
 - Template parameter macros are prefixed by `i_`, e.g. `i_val`, `i_type`.
 - Common types for container type Con:
     - Con
-    - Con_value
-    - Con_raw
+    - Con_value -- element type
+    - Con_raw -- same as Con_value by default
     - Con_iter
 - Common function names for container type Con:
     - Con_init()
@@ -358,8 +358,8 @@ The list of template parameters:
 
 - `i_key`     - Element key type for map/set only. **[required]**.
 - `i_val`     - Element value type. **[required for]** cmap/csmap, it is the mapped value type.
-- `i_cmp`     - Three-way comparison of two *i_keyraw*\* or *i_valraw*\* - **[required for]** non-integral *i_keyraw* types unless *i_opt* is defined with *c_no_cmp*.
-- `i_hash`    - Hash function taking *i_keyraw*\* - defaults to *c_default_hash*. **[required for]** non-POD keyraw types.
+- `i_cmp`     - Three-way comparison of two *i_keyraw*\* or *i_valraw*\* - **[required for]** non-integral *i_keyraw* elements unless *i_opt* is defined with *c_no_cmp*.
+- `i_hash`    - Hash function taking *i_keyraw*\* - defaults to *c_default_hash*. **[required for]** ***cmap/cset*** with non-POD *i_keyraw* elements.
 - `i_eq`      - Equality comparison of two *i_keyraw*\* - defaults to *!i_cmp*. Companion with *i_hash*.
 
 Properties:
@@ -369,10 +369,10 @@ Properties:
 
 Key:
 - `i_keydrop` - Destroy map/set key func - defaults to empty destructor.
-- `i_keyclone` - **[required if]** *i_keydrop* is defined (not required for **carc**). 
+- `i_keyclone` - **[required if]** *i_keydrop* is defined (exception for **carc**, as it shares).
 - `i_keyraw`  - Convertion "raw" type - defaults to *i_key*.
-- `i_keyfrom` - Convertion func *i_key* <- *i_keyraw*. **[required if]** *i_keyraw* is defined
-- `i_keyto`   - Convertion func *i_key*\* -> *i_keyraw*.
+- `i_keyfrom` - Convertion func *i_key* <- *i_keyraw*. 
+- `i_keyto`   - Convertion func *i_key*\* -> *i_keyraw*. **[required if]** *i_keyraw* is defined
 
 Val:
 - `i_valdrop` - Destroy mapped or value func - defaults to empty destruct.
@@ -382,26 +382,31 @@ Val:
 - `i_valto`   - Convertion func *i_val*\* -> *i_valraw*.
 
 Specials:
-- `i_key_str` - Define key type *cstr* and container i_tag = *str*. It binds type convertion from/to *const char*\*, and the ***cmp***, ***eq***, ***hash***, and ***keydrop*** functions.
-- `i_key_ssv` - Define key type *cstr* and container i_tag = *ssv*. It binds type convertion from/to *csview*, and its ***cmp***, ***eq***, ***hash***, and ***keydrop*** functions.
-- `i_keyboxed TYPE` - Define container key type where TYPE is a smart pointer **carc** or **cbox**. NB: not to be used when defining carc/cbox types themselves.
-- `i_keyclass TYPE` - General version of the three above - will auto-bind to standard named functions: *TYPE_clone*, *TYPE_drop*, *TYPE_cmp*, *TYPE_eq*, *TYPE_hash*. If `i_keyraw` is defined, *TYPE_toraw* function is bound to `i_keyto`. Only functions required by the particular container need to be defined. E.g., only **cmap** and **cset** and smart pointers uses *TYPE_hash* and *TYPE_eq*. **cstack** does not use *TYPE_cmp*. *TYPE_clone* is not used if *#define i_opt c_no_clone* is specified. Likewise, *TYPE_cmp* is not used if *#define i_opt c_no_cmp* is specified.
-- `i_val_str`, `i_val_ssv`, `i_valboxed`, `i_valclass` - Similar rules as for ***key***.
+- `i_keyclass TYPE` - Auto-binds to standard named functions: *TYPE_clone()*, *TYPE_drop()*, *TYPE_cmp()*, *TYPE_eq()*, *TYPE_hash()*. If `i_keyraw` is defined, function *TYPE_toraw()* is bound to `i_keyto`, and *TYPE_from()* binds to `i_keyfrom`. Only functions required by the container type needs to be defined. E.g.:
+    - *TYPE_hash()* and *TYPE_eq()* are only required by **cmap**, **cset** and smart pointers.
+    - *TYPE_cmp()* is not used by **cstack** and **cmap/cset**, or if *#define i_opt c_no_cmp* is specified.
+    - *TYPE_clone()* is not used by if *#define i_opt c_no_clone* is specified.
+- `i_key_str` - Defines *i_keyclass = cstr*, *i_tag = str*, and *i_keyraw = const char*\*. Defines type convertion 
+*i_keyfrom/i_keyto*, and *i_cmp*, *i_eq*, *i_hash*, *i_keydrop* functions using *const char*\* as input.
+- `i_key_ssv` - Defines *i_keyclass = cstr*, *i_tag = ssv*, and *i_keyraw = csview*. Defines type convertion 
+*i_keyfrom/i_keyto* and *i_cmp*, *i_eq*, *i_hash*, *i_keydrop* functions using *csview* as input.
+- `i_keyboxed TYPE` - Use when TYPE is a smart pointer **carc** or **cbox**. Defines *i_keyclass = TYPE*, and *i_keyraw = TYPE\**. NB: Do not use when defining carc/cbox types themselves.
+- `i_valclass`, `i_val_str`, `i_val_ssv`, `i_valboxed` - Similar rules as for ***key***.
 
 **Notes**:
 - Instead of defining `i_cmp`, you may define *i_opt c_no_cmp* to disable *searching and sorting* functions.
 - Instead of defining `i_*clone`, you may define *i_opt c_no_clone* to disable *clone* functionality.
-- For `i_keyclass`, if *i_keyraw RAWTYPE* is defined along with it, *i_keyfrom* may also be defined to enable the *emplace*-functions. Note: the signature for ***cmp***, ***eq***, and ***hash*** uses *RAWTYPE* as input.
+- For `i_keyclass`, if *i_keyraw RAWTYPE* is defined along with it, *i_keyfrom* may also be defined to enable the *emplace*-functions. NB: the signature for ***cmp***, ***eq***, and ***hash*** uses *RAWTYPE* as input.
 
 The *emplace* versus non-emplace container methods
 --------------------------------------------------
 STC, like c++ STL, has two sets of methods for adding elements to containers. One set begins
-with **emplace**, e.g. *cvec_X_emplace_back()*. This is a convenient alternative to
+with **emplace**, e.g. *cvec_X_emplace_back()*. This is an ergonimic alternative to
 *cvec_X_push_back()* when dealing non-trivial container elements, e.g. strings, shared pointers or
 other elements using dynamic memory or shared resources.
 
-The **emplace** methods ***constructs*** or ***clones*** the given elements when they are added
-to the container. In contrast, the *non-emplace* methods ***moves*** the given elements into the
+The **emplace** methods ***constructs*** / ***clones*** the given element when they are added
+to the container. In contrast, the *non-emplace* methods ***moves*** the element into the
 container. 
 
 **Note**: For containers with integral/trivial element types, or when neither `i_keyraw/i_valraw` is defined,
@@ -510,13 +515,16 @@ MyVec_push_back(&vec, 1);
 
 Memory efficiency
 -----------------
-- **cstr**, **cvec**: Type size: 1 pointer. The size and capacity is stored as part of the heap allocation that also holds the vector elements.
-- **clist**: Type size: 1 pointer. Each node allocates a struct which stores the value and next pointer.
-- **cdeq**:  Type size: 2 pointers. Otherwise like *cvec*.
-- **cmap**: Type size: 4 pointers. *cmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.6x when reaching that.
-- **csmap**: Type size: 1 pointer. *csmap* manages its own array of tree-nodes for allocation efficiency. Each node uses only two 32-bit ints for child nodes, and one byte for `level`.
-- **carr2**, **carr3**: Type size: 1 pointer plus dimension variables. Arrays are allocated as one contiguous block of heap memory, and one allocation for pointers of indices to the array.
-- **carc**: Type size: 2 pointers, one for the data and one for the reference counter.
+STC is generally very memory efficient. Type sizes:
+- **cstr**, **cvec**, **cstack**, **cpque**: 1 pointer, 2 intptr_t + memory for elements.
+- **csview**, 1 pointer, 1 intptr_t. Does not own data!
+- **cspan**, 1 pointer and 2 \* dimension \* int32_t. Does not own data!
+- **clist**: Type size: 1 pointer. Each node allocates a struct to store its value and a next pointer.
+- **cdeq**, **cqueue**:  Type size: 2 pointers, 2 intptr_t. Otherwise like *cvec*.
+- **cmap/cset**: Type size: 2 pointers, 2 int32_t (default). *cmap* uses one table of keys+value, and one table of precomputed hash-value/used bucket, which occupies only one byte per bucket. The closed hashing has a default max load factor of 85%, and hash table scales by 1.5x when reaching that.
+- **csmap/csset**: Type size: 1 pointer. *csmap* manages its own ***array of tree-nodes*** for allocation efficiency. Each node uses two 32-bit ints for child nodes, and one byte for `level`, but has ***no parent node***.
+- **carc**: Type size: 1 pointer, 1 long for the reference counter + memory for the shared element.
+- **cbox**: Type size: 1 pointer + memory for the pointed-to element.
 
 # Version 4
 
