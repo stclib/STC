@@ -358,8 +358,8 @@ The list of template parameters:
 
 - `i_key`     - Element key type for map/set only. **[required]**.
 - `i_val`     - Element value type. **[required for]** cmap/csmap, it is the mapped value type.
-- `i_cmp`     - Three-way comparison of two *i_keyraw*\* or *i_valraw*\* - **[required for]** non-integral *i_keyraw* types unless *i_opt* is defined with *c_no_cmp*.
-- `i_hash`    - Hash function taking *i_keyraw*\* - defaults to *c_default_hash*. **[required for]** non-POD keyraw types.
+- `i_cmp`     - Three-way comparison of two *i_keyraw*\* or *i_valraw*\* - **[required for]** non-integral *i_keyraw* elements unless *i_opt* is defined with *c_no_cmp*.
+- `i_hash`    - Hash function taking *i_keyraw*\* - defaults to *c_default_hash*. **[required for]** ***cmap/cset*** with non-POD *i_keyraw* elements.
 - `i_eq`      - Equality comparison of two *i_keyraw*\* - defaults to *!i_cmp*. Companion with *i_hash*.
 
 Properties:
@@ -369,10 +369,10 @@ Properties:
 
 Key:
 - `i_keydrop` - Destroy map/set key func - defaults to empty destructor.
-- `i_keyclone` - **[required if]** *i_keydrop* is defined (not required for **carc**). 
+- `i_keyclone` - **[required if]** *i_keydrop* is defined (exception for **carc**, as it shares).
 - `i_keyraw`  - Convertion "raw" type - defaults to *i_key*.
-- `i_keyfrom` - Convertion func *i_key* <- *i_keyraw*. **[required if]** *i_keyraw* is defined
-- `i_keyto`   - Convertion func *i_key*\* -> *i_keyraw*.
+- `i_keyfrom` - Convertion func *i_key* <- *i_keyraw*. 
+- `i_keyto`   - Convertion func *i_key*\* -> *i_keyraw*. **[required if]** *i_keyraw* is defined
 
 Val:
 - `i_valdrop` - Destroy mapped or value func - defaults to empty destruct.
@@ -384,11 +384,11 @@ Val:
 Specials:
 - `i_keyclass TYPE` - Auto-binds to standard named functions: *TYPE_clone()*, *TYPE_drop()*, *TYPE_cmp()*, *TYPE_eq()*, *TYPE_hash()*. If `i_keyraw` is defined, function *TYPE_toraw()* is bound to `i_keyto`, and *TYPE_from()* binds to `i_keyfrom`. Only functions required by the container type needs to be defined. E.g.:
     - *TYPE_hash()* and *TYPE_eq()* are only required by **cmap**, **cset** and smart pointers.
-    - *TYPE_cmp()* is not used by **cstack** or if *#define i_opt c_no_cmp* is specified.
-    - *TYPE_clone()* is not used if *#define i_opt c_no_clone* is specified.
+    - *TYPE_cmp()* is not used by **cstack** and **cmap/cset**, or if *#define i_opt c_no_cmp* is specified.
+    - *TYPE_clone()* is not used by if *#define i_opt c_no_clone* is specified.
 - `i_key_str` - Defines *i_keyclass = cstr*, *i_tag = str*, and *i_keyraw = const char*\*. Defines type convertion 
 *i_keyfrom/i_keyto*, and *i_cmp*, *i_eq*, *i_hash*, *i_keydrop* functions using *const char*\* as input.
-- `i_key_ssv` - Defines *i_keyclass = cstr*, *i_tag = ssv*, and *i_keyraw = csview. Defines type convertion 
+- `i_key_ssv` - Defines *i_keyclass = cstr*, *i_tag = ssv*, and *i_keyraw = csview*. Defines type convertion 
 *i_keyfrom/i_keyto* and *i_cmp*, *i_eq*, *i_hash*, *i_keydrop* functions using *csview* as input.
 - `i_keyboxed TYPE` - Use when TYPE is a smart pointer **carc** or **cbox**. Defines *i_keyclass = TYPE*, and *i_keyraw = TYPE\**. NB: Do not use when defining carc/cbox types themselves.
 - `i_valclass`, `i_val_str`, `i_val_ssv`, `i_valboxed` - Similar rules as for ***key***.
