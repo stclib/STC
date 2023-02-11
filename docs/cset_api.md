@@ -18,10 +18,10 @@ A **cset** is an associative container that contains a set of unique objects of 
 #define i_keyfrom   // convertion func i_keyraw => i_key - defaults to plain copy
 #define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
 
-#define i_size      // default: uint32_t. If defined, table expand 2x (else 1.5x)
+#define i_tag       // alternative typename: cmap_{i_tag}. i_tag defaults to i_val
 #define i_hash_functor // advanced, see examples/functor.c for similar usage.
 #define i_eq_functor // advanced, see examples/functor.c for similar usage.
-#define i_tag       // alternative typename: cmap_{i_tag}. i_tag defaults to i_val
+#define i_size      // defines cset_X_sizet. default int32_t. If defined, table expand 2x (else 1.5x)
 #include <stc/cset.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -36,14 +36,14 @@ cset_X              cset_X_clone(cset_x set);
 void                cset_X_clear(cset_X* self);
 void                cset_X_copy(cset_X* self, const cset_X* other);
 float               cset_X_max_load_factor(const cset_X* self);              // default: 0.85
-bool                cset_X_reserve(cset_X* self, intptr_t size);
+bool                cset_X_reserve(cset_X* self, cset_X_sizet size);
 void                cset_X_shrink_to_fit(cset_X* self);
 void                cset_X_drop(cset_X* self);                               // destructor
 
-intptr_t            cset_X_size(const cset_X* self);                         // num. of allocated buckets
-intptr_t            cset_X_capacity(const cset_X* self);                     // buckets * max_load_factor
+cset_X_sizet        cset_X_size(const cset_X* self);                         // num. of allocated buckets
+cset_X_sizet        cset_X_capacity(const cset_X* self);                     // buckets * max_load_factor
 bool                cset_X_empty(const cset_X* self);
-intptr_t            cset_X_bucket_count(const cset_X* self);
+cset_X_sizet        cset_X_bucket_count(const cset_X* self);
 
 bool                cset_X_contains(const cset_X* self, i_keyraw rkey);
 const cset_X_value* cset_X_get(const cset_X* self, i_keyraw rkey);          // return NULL if not found
@@ -54,7 +54,7 @@ cset_X_result       cset_X_insert(cset_X* self, i_key key);
 cset_X_result       cset_X_push(cset_X* self, i_key key);                    // alias for insert.
 cset_X_result       cset_X_emplace(cset_X* self, i_keyraw rkey);
 
-intptr_t            cset_X_erase(cset_X* self, i_keyraw rkey);               // return 0 or 1
+int                 cset_X_erase(cset_X* self, i_keyraw rkey);               // return 0 or 1
 cset_X_iter         cset_X_erase_at(cset_X* self, cset_X_iter it);           // return iter after it
 void                cset_X_erase_entry(cset_X* self, cset_X_value* entry);
 

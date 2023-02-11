@@ -23,7 +23,6 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_hash      // hash func i_keyraw*: REQUIRED IF i_keyraw is non-pod type
 #define i_eq        // equality comparison two i_keyraw*: REQUIRED IF i_keyraw is a
                     // non-integral type. Three-way i_cmp may alternatively be specified.
-
 #define i_keydrop   // destroy key func - defaults to empty destruct
 #define i_keyclone  // REQUIRED IF i_keydrop defined
 #define i_keyraw    // convertion "raw" type - defaults to i_key
@@ -36,10 +35,10 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_valfrom   // convertion func i_valraw => i_val
 #define i_valto     // convertion func i_val* => i_valraw
 
-#define i_size      // default: uint32_t. If defined, table expand 2x (else 1.5x)
+#define i_tag       // alternative typename: cmap_{i_tag}. i_tag defaults to i_val
 #define i_hash_functor // advanced, see examples/functor.c for similar usage.
 #define i_eq_functor // advanced, see examples/functor.c for similar usage.
-#define i_tag       // alternative typename: cmap_{i_tag}. i_tag defaults to i_val
+#define i_size      // define cmap_X_sizet. default int32_t. If defined, table expand 2x (else 1.5x)
 #include <stc/cmap.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.
@@ -48,20 +47,20 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 
 ```c
 cmap_X                cmap_X_init(void);
-cmap_X                cmap_X_with_capacity(int64_t cap);
+cmap_X                cmap_X_with_capacity(cmap_X_sizet cap);
 cmap_X                cmap_X_clone(cmap_x map);
 
 void                  cmap_X_clear(cmap_X* self);
 void                  cmap_X_copy(cmap_X* self, const cmap_X* other);
 float                 cmap_X_max_load_factor(const cmap_X* self);                       // default: 0.85f
-bool                  cmap_X_reserve(cmap_X* self, int64_t size);
+bool                  cmap_X_reserve(cmap_X* self, cmap_X_sizet size);
 void                  cmap_X_shrink_to_fit(cmap_X* self);
 void                  cmap_X_drop(cmap_X* self);                                        // destructor
 
 bool                  cmap_X_empty(const cmap_X* self );
-int64_t               cmap_X_size(const cmap_X* self);
-int64_t               cmap_X_capacity(const cmap_X* self);                              // buckets * max_load_factor
-int64_t               cmap_X_bucket_count(const cmap_X* self);                          // num. of allocated buckets
+cmap_X_sizet          cmap_X_size(const cmap_X* self);
+cmap_X_sizet          cmap_X_capacity(const cmap_X* self);                              // buckets * max_load_factor
+cmap_X_sizet          cmap_X_bucket_count(const cmap_X* self);                          // num. of allocated buckets
 
 const cmap_X_mapped*  cmap_X_at(const cmap_X* self, i_keyraw rkey);                     // rkey must be in map
 cmap_X_mapped*        cmap_X_at_mut(cmap_X* self, i_keyraw rkey);                       // mutable at
@@ -84,7 +83,7 @@ void                  cmap_X_erase_entry(cmap_X* self, cmap_X_value* entry);
 cmap_X_iter           cmap_X_begin(const cmap_X* self);
 cmap_X_iter           cmap_X_end(const cmap_X* self);
 void                  cmap_X_next(cmap_X_iter* it);
-cmap_X_iter           cmap_X_advance(cmap_X_iter it, uint64_t n);
+cmap_X_iter           cmap_X_advance(cmap_X_iter it, cmap_X_sizet n);
 
 cmap_X_value          cmap_X_value_clone(cmap_X_value val);
 cmap_X_raw            cmap_X_value_toraw(cmap_X_value* pval);

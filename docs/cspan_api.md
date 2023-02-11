@@ -1,9 +1,8 @@
 # STC [cspan](../include/stc/cspan.h): Multi-dimensional Array View
 ![Array](pics/array.jpg)
 
-The **cspan** is templated non-owning multi-dimensional view of an array. See the c++ classes 
-[std::span](https://en.cppreference.com/w/cpp/container/span) and 
-[std::mdspan](https://en.cppreference.com/w/cpp/container/mdspan) for similar functionality.
+The **cspan** is templated non-owning multi-dimensional view of an array. It is similar to Python's 
+numpy array slicing and C++ [std::span](https://en.cppreference.com/w/cpp/container/span) / [std::mdspan](https://en.cppreference.com/w/cpp/container/mdspan).
 
 ## Header file and declaration
 
@@ -18,7 +17,11 @@ using_cspan3(S, ValueType);              // define span types S, S2, S3 with ran
 using_cspan4(S, ValueType);              // define span types S, S2, S3, S4 with ranks 1, 2, 3, 4.
 ```
 ## Methods
-All functions are type-safe, and index arguments are side-effect safe.
+
+All functions are type-safe. Note that the span argument itself is generally not side-effect safe,
+i.e., it may be expanded multiple times. However, all integer arguments are safe, e.g.
+`cspan_at(&ms3, i++, j++, k++)` is fine. If the number of arguments does not match the span rank,
+a compile error is issued. Runtime bounds checks are enabled by default (define STC_NDEBUG or NDEBUG to disable).
 ```c
 SpanTypeN       cspan_md(ValueType* data,  intptr_t xdim, ...);     // create a multi-dimensional cspan
 SpanType        cspan_make(T SpanType, {v1, v2, ...});              // make a 1d-dimensional cspan from values

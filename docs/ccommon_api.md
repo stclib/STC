@@ -176,18 +176,22 @@ c_forlist (i, int, {1, 2, 3})
 #define i_tag ii
 #include <stc/csmap.h>
 ...
-c_forlist (i, csmap_ii_raw, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} })
-    csmap_ii_insert(&map, i.ref->first, i.ref->second);
+csmap_ii map = c_make(csmap_ii, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} });
 
 c_foreach (i, csmap_ii, map)
     printf(" %d", i.ref->first);
 // 3 5 7 12 23
+// same without using c_foreach:
+for (csmap_ii_iter i = csmap_ii_begin(&map); i.ref; csmap_ii_next(&i))
+    printf(" %d", i.ref->first);
 
 csmap_ii_iter it = csmap_ii_find(&map, 7);
+// iterate from it to end
 c_foreach (i, csmap_ii, it, csmap_ii_end(&map))
     printf(" %d", i.ref->first);
 // 7 12 23
 
+// structured binding:
 c_forpair (id, count, csmap_ii, map)
     printf(" (%d %d)", *_.id, *_.count);
 // (3 2) (5 4) (7 3) (12 5) (23 1)
@@ -235,6 +239,7 @@ Iterate containers with stop-criteria and chained range filtering.
 #define i_type IVec
 #define i_val int
 #include <stc/cstack.h>
+#include <stc/algo/filter.h>
 #include <stdio.h>
 
 bool isPrime(int i) {
