@@ -1,16 +1,19 @@
 # STC [cspan](../include/stc/cspan.h): Multi-dimensional Array View
 ![Array](pics/array.jpg)
 
-The **cspan** is templated non-owning multi-dimensional view of an array. It is similar to Python's 
-numpy array slicing and C++ [std::span](https://en.cppreference.com/w/cpp/container/span) / [std::mdspan](https://en.cppreference.com/w/cpp/container/mdspan).
+The **cspan** is templated non-owning *single* and *multi-dimensional* view of an array. It is similar
+to Python's numpy array slicing and C++ [std::span](https://en.cppreference.com/w/cpp/container/span) /
+[std::mdspan](https://en.cppreference.com/w/cpp/container/mdspan).
 
 ## Header file and declaration
-
+**cspan** types are defined by the *using_cspan()* macro after the header is included.
+This is different from other containers where template parameters are defined prior to
+including each container. This works well mainly because cspan is non-owning.
 ```c
 #include <stc/cspan.h>
 using_cspan(SpanType, ValueType);        // define a 1-d SpanType with ValueType elements.
-using_cspan(SpanTypeN, ValueType, Rank); // define multi-dimensional span with Rank.
-                                         // Rank is number of dimensions (max 5)
+using_cspan(SpanTypeN, ValueType, RANK); // define multi-dimensional span with RANK.
+                                         // RANK is the literal number of dimensions
 // Shorthands:
 using_cspan2(S, ValueType);              // define span types S, S2 with ranks 1, 2.
 using_cspan3(S, ValueType);              // define span types S, S2, S3 with ranks 1, 2, 3.
@@ -20,25 +23,25 @@ using_cspan4(S, ValueType);              // define span types S, S2, S3, S4 with
 
 All functions are type-safe. Note that the span argument itself is generally not side-effect safe,
 i.e., it may be expanded multiple times. However, all integer arguments are safe, e.g.
-`cspan_at(&ms3, i++, j++, k++)` is fine. If the number of arguments does not match the span rank,
-a compile error is issued. Runtime bounds checks are enabled by default (define STC_NDEBUG or NDEBUG to disable).
+`cspan_at(&ms3, i++, j++, k++)` is allowed. If the number of arguments does not match the span rank,
+a compile error is issued. Runtime bounds checks are enabled by default (define `STC_NDEBUG` or `NDEBUG` to disable).
 ```c
-SpanTypeN       cspan_md(ValueType* data,  intptr_t xdim, ...);     // create a multi-dimensional cspan
-SpanType        cspan_make(T SpanType, {v1, v2, ...});              // make a 1d-dimensional cspan from values
-SpanType        cspan_from(STCContainer* cnt);                      // create a 1d cspan from a compatible STC container
-SpanType        cspan_from_array(ValueType array[]);                // create a 1d cspan from a C array
+SpanType        cspan_make(T SpanType, {v1, v2, ...});              // make a 1-d cspan from values
+SpanType        cspan_from(STCContainer* cnt);                      // make a 1-d cspan from compatible STC container
+SpanType        cspan_from_array(ValueType array[]);                // make a 1-d cspan from C array
+SpanTypeN       cspan_md(ValueType* data,  intptr_t xdim, ...);     // make a multi-dimensional cspan
 
 intptr_t        cspan_size(const SpanTypeN* self);                  // return number of elements
-unsigned        cspan_rank(const SpanTypeN* self);                  // return number of dimensions
+intptr_t        cspan_rank(const SpanTypeN* self);                  // dimensions; compile time constant
 intptr_t        cspan_index(const SpanTypeN* self, intptr_t x, ..); // index of element
                 
-ValueType*      cspan_at(const SpanTypeN* self, intptr_t x, ...);   // at(): num of args specifies rank of input span.
+ValueType*      cspan_at(const SpanTypeN* self, intptr_t x, ...);   // #args must match input span rank
 ValueType*      cspan_front(const SpanTypeN* self);
 ValueType*      cspan_back(const SpanTypeN* self);
 
                 // general index slicing to create a subspan.
-                // {x} reduces rank. {x,c_END} slice to end. {c_ALL} take the full extent.
-SpanTypeN       cspan_slice(T SpanTypeN, const SpanTypeM* parent, {x0,x1}, {y0,y1}, ...);
+                // {i} reduces rank. {i,c_END} slice to end. {c_ALL} use the full extent.
+SpanTypeR       cspan_slice(T SpanTypeR, const SpanTypeN* self, {x0,x1}, {y0,y1}.., {N0,N1});
                 
                 // create a subspan of lower rank. Like e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
 SpanType        cspan_submd2(const SpanType2* self, intptr_t x);        // return a 1d subspan from a 2d span.
@@ -56,13 +59,13 @@ void            SpanType_next(SpanTypeN_iter* it);
 ```
 ## Types
 
-| Type name         | Type definition                                | Used to represent... |
-|:------------------|:-----------------------------------------------|:---------------------|
-| SpanTypeN         | `struct { ValueType *data; uint32_t shape[N]; }` | SpanType with rank N |
-| SpanTypeN`_value` | `ValueType`                                    | The ValueType        |
-| `c_ALL`           | `0,-1`                                         | Full extent          |
-| `c_END`           | `-1`                                           | End of extent        |
-
+| Type name         | Type definition                                     | Used to represent... |
+|:------------------|:----------------------------------------------------|:---------------------|
+| SpanTypeN         | `struct { ValueType *data; uint32_t shape[N]; .. }` | SpanType with rank N |
+| SpanTypeN`_value` | `ValueType`                                         | The ValueType        |
+| `c_ALL`           |                                                     | Full extent          |
+| `c_END`           |                                                     | End of extent        |
+     
 ## Example 1
 
 The *cspan_slice()* function is similar to pythons numpy multi-dimensional arrays slicing, e.g.:

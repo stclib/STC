@@ -3,14 +3,14 @@
 STC - Smart Template Containers for C
 =====================================
 
-News: Version 4.1 RC3 (Feb 2023)
+News: Version 4.1 Released (Feb 2023)
 ------------------------------------------------
 Major changes:
 - A new exciting [**cspan**](docs/cspan_api.md) single/multi-dimensional array view (with numpy-like slicing).
 - Signed sizes and indices for all containers. See C++ Core Guidelines by Stroustrup/Sutter: [ES.100](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es100-dont-mix-signed-and-unsigned-arithmetic), [ES.102](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es102-use-signed-types-for-arithmetic), [ES.106](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es106-dont-try-to-avoid-negative-values-by-using-unsigned), and [ES.107](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es107-dont-use-unsigned-for-subscripts-prefer-gslindex).
 - Customizable allocator [per templated container type](https://github.com/tylov/STC/discussions/44#discussioncomment-4891925).
 - Updates on cregex with several [new unicode character classes](docs/cregex_api.md#regex-cheatsheet).
-- Uppercase flow-control macro names in ccommon.h [supported as alternative](include/stc/priv/altnames.h).
+- Uppercase flow-control macro names in ccommon.h [supported as alternatives](include/stc/priv/altnames.h).
 - Some API changes in cregex and cstr.
 - [Previous changes for version 4](#version-4).
 
@@ -46,7 +46,7 @@ Containers
 - [***cstack*** - **std::stack** alike type](docs/cstack_api.md)
 - [***cstr*** - **std::string** alike type](docs/cstr_api.md)
 - [***csview*** - **std::string_view** alike type](docs/csview_api.md)
-- [***cspan*** - **std::mdspan** alike type](docs/cspan_api.md)
+- [***cspan*** - **std::span/std::mdspan** alike type](docs/cspan_api.md)
 - [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)
 - [***cvec*** - **std::vector** alike type](docs/cvec_api.md)
 
@@ -86,8 +86,38 @@ Benchmark notes:
 - **deque**: *insert*: n/3 push_front(), n/3 push_back()+pop_front(), n/3 push_back().
 - **map and unordered map**: *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys in the map, n/2 random keys.
 
-Three standout features of STC
-------------------------------
+STC conventions
+---------------
+- Container names are prefixed by `c`, e.g. `cvec`, `cstr`.
+- Public STC macros are prefixed by `c_`, e.g. `c_foreach`, `c_make`.
+- Template parameter macros are prefixed by `i_`, e.g. `i_val`, `i_type`.
+- All containers can be initialized with `{0}`, i.e. no heap allocation used for empty init.
+- Common types for container type Con:
+    - Con
+    - Con_value
+    - Con_raw
+    - Con_iter
+    - Con_ssize
+- Common function names for container type Con:
+    - Con_init()
+    - Con_reserve(&con, capacity)
+    - Con_drop(&con)
+    - Con_empty(&con)
+    - Con_size(&con)
+    - Con_clone(con)
+    - Con_push(&con, value)
+    - Con_emplace(&con, rawval)
+    - Con_put_n(&con, rawval[], n)
+    - Con_erase_at(&con, iter)
+    - Con_front(&con)
+    - Con_back(&con)
+    - Con_begin(&con)
+    - Con_end(&con)
+    - Con_next(&iter)
+    - Con_advance(iter, n)
+
+Standout features of STC
+------------------------
 1. ***Centralized analysis of template arguments***. Assigns good defaults to non-specified templates.
 You may specify a number of "standard" template arguments for each container, but as minimum only one is
 required (two for maps). In the latter case, STC assumes the elements are basic types. For more complex types,
@@ -103,32 +133,6 @@ entries into containers through using the *emplace*-functions. E.g. `MyCStrVec_e
 same element access syntax. E.g. `c_foreach (it, IntContainer, container) printf(" %d", *it.ref);` will work for
 every type of container defined as `IntContainer` with `int` elements. Also the form `c_foreach (it, IntContainer, it1, it2)`
 may be used to iterate from `it1` up to `it2`.
-
-Naming conventions
-------------------
-- Container names are prefixed by `c`, e.g. `cvec`, `cstr`.
-- Public STC macros are prefixed by `c_`, e.g. `c_foreach`, `c_make`.
-- Template parameter macros are prefixed by `i_`, e.g. `i_val`, `i_type`.
-- Common types for container type Con:
-    - Con
-    - Con_value -- element type
-    - Con_raw -- same as Con_value by default
-    - Con_iter
-- Common function names for container type Con:
-    - Con_init()
-    - Con_reserve(&con, capacity)
-    - Con_drop(&con)
-    - Con_empty(&con)
-    - Con_size(&con)
-    - Con_push(&con, value)
-    - Con_put_n(&con, values, n)
-    - Con_clone(con)
-    - Con_erase_at(&con, iter)
-    - Con_front(&con)
-    - Con_back(&con)
-    - Con_begin(&con)
-    - Con_end(&con)
-    - Con_next(&iter)
 
 Usage
 -----
@@ -153,17 +157,16 @@ int main(void)
     FVec_drop(&vec); // cleanup memory
 }
 ```
-Below is an alternative way to write this code with STC. It uses the generic flow control macros c_auto and c_foreach,
-and the function macro *c_make()*. This simplifies the code and makes it less prone to errors, while maintaining readability:
+Below is an alternative way to write this with STC. It uses the generic flow control macros `c_auto` and `c_foreach`, and the function macro *c_make()*. This simplifies the code and makes it less prone to errors:
 ```c
 int main()
 {
-    c_auto (FVec, vec) // RAII: define vec, init() and drop() all-in-one syntax.
+    c_auto (FVec, vec)                          // RAII: define, init() and drop() combined.
     {
-        vec = c_make(FVec, {10.f, 20.f, 30.f});  // Initialize with a list of floats.
+        vec = c_make(FVec, {10.f, 20.f, 30.f}); // Initialize with a list of floats.
 
-        c_foreach (i, FVec, vec)                 // Iterate elements of the container.
-            printf(" %g", *i.ref);               // i.ref is a pointer to the current element.
+        c_foreach (i, FVec, vec)                // Iterate elements of the container.
+            printf(" %g", *i.ref);              // i.ref is a pointer to the current element.
     }
     // vec is "dropped" at end of c_auto scope
 }
