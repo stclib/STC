@@ -107,7 +107,7 @@ static void coption_permute_(char *argv[], int j, int n) {
  */
 static int coption_get(coption *opt, int argc, char *argv[],
                        const char *shortopts, const coption_long *longopts) {
-    int optc = -1, i0, j, posixly_correct = (shortopts[0] == '+');
+    int optc = -1, i0, j, posixly_correct = (shortopts && shortopts[0] == '+');
     if (!posixly_correct) {
         while (opt->_i < argc && (argv[opt->_i][0] != '-' || argv[opt->_i][1] == '\0'))
             ++opt->_i, ++opt->_nargs;
@@ -149,12 +149,12 @@ static int coption_get(coption *opt, int argc, char *argv[],
                 }
             }
         }
-    } else { /* a short option */
+    } else if (shortopts) { /* a short option */
         const char *p;
         if (opt->_pos == 0) opt->_pos = 1;
         optc = opt->opt = argv[opt->_i][opt->_pos++];
         opt->_optstr[1] = optc, opt->optstr = opt->_optstr;
-        p = strchr((char *) shortopts, optc);
+        p = strchr(shortopts, optc);
         if (p == 0) {
             optc = '?'; /* unknown option */
         } else if (p[1] == ':') {

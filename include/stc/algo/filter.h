@@ -57,6 +57,8 @@ int main()
 #define c_flt_skip(i, n) (++(i).s1[(i).s1top++] > (n))
 #define c_flt_skipwhile(i, pred) ((i).s2[(i).s2top++] |= !(pred))
 #define c_flt_takewhile(i, pred) !c_flt_skipwhile(i, pred)
+#define c_flt_last(i) (i).s1[(i).s1top-1]
+#define c_flt_lastwhile(i) (i).s2[(i).s2top-1]
 
 #define c_forfilter(...) c_MACRO_OVERLOAD(c_forfilter, __VA_ARGS__)
 
@@ -68,10 +70,10 @@ int main()
 
 #define c_forfilter_B(i, C, start, filter) \
     for (struct {C##_iter it; C##_value *ref; \
-                 uint32_t s1[c_NFILTERS], index, count; \
+                 uint32_t s1[c_NFILTERS], index; \
                  bool s2[c_NFILTERS]; uint8_t s1top, s2top;} \
          i = {.it=start, .ref=i.it.ref}; i.it.ref \
          ; C##_next(&i.it), i.ref = i.it.ref, ++i.index, i.s1top=0, i.s2top=0) \
-      if (!((filter) && ++i.count)) ; else
+      if (!(filter)) ; else
 
 #endif

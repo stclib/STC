@@ -5,12 +5,17 @@ STC - Smart Template Containers for C
 
 News: Version 4.1 Released (Feb 2023)
 ------------------------------------------------
-Major changes:
+I am happy to finally announce a new release! Major changes:
 - A new exciting [**cspan**](docs/cspan_api.md) single/multi-dimensional array view (with numpy-like slicing).
 - Signed sizes and indices for all containers. See C++ Core Guidelines by Stroustrup/Sutter: [ES.100](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es100-dont-mix-signed-and-unsigned-arithmetic), [ES.102](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es102-use-signed-types-for-arithmetic), [ES.106](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es106-dont-try-to-avoid-negative-values-by-using-unsigned), and [ES.107](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es107-dont-use-unsigned-for-subscripts-prefer-gslindex).
 - Customizable allocator [per templated container type](https://github.com/tylov/STC/discussions/44#discussioncomment-4891925).
-- Updates on cregex with several [new unicode character classes](docs/cregex_api.md#regex-cheatsheet).
-- Uppercase flow-control macro names in ccommon.h [supported as alternatives](include/stc/priv/altnames.h).
+- Updates on **cregex** with several [new unicode character classes](docs/cregex_api.md#regex-cheatsheet).
+- Algorithms:
+    - [crange](docs/ccommon_api.md#crange) - similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html) integer range generator.
+    - [c_forfilter](docs/ccommon_api.md#c_forfilter) - ranges-like filtering.
+    - [csort](misc/benchmarks/various/csort_bench.c) - fast quicksort with custom inline comparison.
+- Support for [uppercase flow-control](include/stc/priv/altnames.h) macro names in ccommon.h.
+- Create single header container versions with python script.
 - Some API changes in cregex and cstr.
 - [Previous changes for version 4](#version-4).
 
@@ -91,14 +96,14 @@ STC conventions
 - Container names are prefixed by `c`, e.g. `cvec`, `cstr`.
 - Public STC macros are prefixed by `c_`, e.g. `c_foreach`, `c_make`.
 - Template parameter macros are prefixed by `i_`, e.g. `i_val`, `i_type`.
-- All containers can be initialized with `{0}`, i.e. no heap allocation used for empty init.
-- Common types for container type Con:
+- All containers can be initialized with `{0}`, i.e. no heap allocation used by default init.
+- Common types for a container type Con:
     - Con
     - Con_value
     - Con_raw
     - Con_iter
     - Con_ssize
-- Common function names for container type Con:
+- Common function names for a container type Con:
     - Con_init()
     - Con_reserve(&con, capacity)
     - Con_drop(&con)
@@ -116,8 +121,8 @@ STC conventions
     - Con_next(&iter)
     - Con_advance(iter, n)
 
-Standout features of STC
-------------------------
+Some standout features of STC
+-----------------------------
 1. ***Centralized analysis of template arguments***. Assigns good defaults to non-specified templates.
 You may specify a number of "standard" template arguments for each container, but as minimum only one is
 required (two for maps). In the latter case, STC assumes the elements are basic types. For more complex types,
@@ -130,8 +135,10 @@ Finally, destruction of the lookup key (i.e. string literal) after usage is not 
 is convenient in C. A great ergonomic feature is that the alternative lookup type can also be used for adding
 entries into containers through using the *emplace*-functions. E.g. `MyCStrVec_emplace_back(&vec, "Hello")`.
 3. ***Standardized container iterators***. All container can be iterated the same way, and uses the
-same element access syntax. E.g. `c_foreach (it, IntContainer, container) printf(" %d", *it.ref);` will work for
-every type of container defined as `IntContainer` with `int` elements. Also the form `c_foreach (it, IntContainer, it1, it2)`
+same element access syntax. E.g.:
+    - `c_foreach (it, IntContainer, container) printf(" %d", *it.ref);` will work for
+every type of container defined as `IntContainer` with `int` elements. Also the form:
+    - `c_foreach (it, IntContainer, it1, it2)`
 may be used to iterate from `it1` up to `it2`.
 
 Usage
@@ -172,12 +179,12 @@ int main()
 }
 ```
 For user defined struct elements, `i_cmp` compare function should be defined, as the default `<` and `==`
-only works for integral types. Alternatively, `#define i_opt c_no_cmp` to disable sorting and searching.
+only works for integral types. *Alternatively, `#define i_opt c_no_cmp` to disable sorting and searching*.
 
 Similarily, if an element destructor `i_valdrop` is defined, `i_valclone` function is required.
-Alternatively `#define i_opt c_no_clone` to disable container cloning.
+*Alternatively `#define i_opt c_no_clone` to disable container cloning.*
 
-In order to include two **cvec**'s with different element types, include <stc/cvec.h> twice, e.g.:
+In order to include two **cvec**'s with different element types, include <stc/cvec.h> twice:
 ```c
 #define i_val struct One
 #define i_opt c_no_cmp
@@ -326,7 +333,7 @@ As a special case, there may be non-templated functions in templated containers 
 once and if needed. Currently, define `i_extern` before including **clist** for its sorting function, and before 
 **cregex** or **utf8** to implement them (global `STC_EXTERN` can alternatively be defined).
 
-It is possible to generate single headers by executing the python script in src/singleheader.py <header>.
+It is possible to generate single headers by executing the python script `src/singleheader.py header-file > single`.
 
 Conveniently, `src\libstc.c` implements non-templated functions as shared symbols for **cstr**, **csview**,
 **cbits** and **crandom**. When building in shared mode (-DSTC_HEADER), you may include this file in your project,
@@ -386,7 +393,7 @@ Val:
 - `i_valfrom` - Convertion func *i_val* <- *i_valraw*.
 - `i_valto`   - Convertion func *i_val*\* -> *i_valraw*.
 
-Specials:
+Specials (meta-template parameters):
 - `i_keyclass TYPE` - Auto-binds to standard named functions: *TYPE_clone()*, *TYPE_drop()*, *TYPE_cmp()*, *TYPE_eq()*, *TYPE_hash()*. If `i_keyraw` is defined, function *TYPE_toraw()* is bound to `i_keyto`, and *TYPE_from()* binds to `i_keyfrom`. Only functions required by the container type needs to be defined. E.g.:
     - *TYPE_hash()* and *TYPE_eq()* are only required by **cmap**, **cset** and smart pointers.
     - *TYPE_cmp()* is not used by **cstack** and **cmap/cset**, or if *#define i_opt c_no_cmp* is specified.

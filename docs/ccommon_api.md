@@ -218,14 +218,14 @@ c_forrange (i, 30, 0, -5) printf(" %lld", i);
 // 30 25 20 15 10 5
 ```
 
-### c_forwhile, c_forfilter
+### c_forfilter
 Iterate containers with stop-criteria and chained range filtering.
 
 | Usage                                               | Description                            |
 |:----------------------------------------------------|:---------------------------------------|
-| `c_forwhile (it, ctype, start, pred)`               | Iterate until pred is false            |
 | `c_forfilter (it, ctype, container, filter)`        | Filter out items in chain with &&      |
 | `c_forfilter (it, ctype, container, filter, pred)`  | Filter and iterate until pred is false |
+| `c_forwhile (it, ctype, start, pred)`               | Iterate until pred is false            |
 
 | Built-in filter                   | Description                          |
 |:----------------------------------|:-------------------------------------|
@@ -233,12 +233,13 @@ Iterate containers with stop-criteria and chained range filtering.
 | `c_flt_take(it, numItems)`        | Take numItems                        |
 | `c_flt_skipwhile(it, predicate)`  | Skip items until predicate is false  |
 | `c_flt_takewhile(it, predicate)`  | Take items until predicate is false  |
+| `c_flt_last(it)`                  | Get count of last filter successes   |
+| `c_flt_lastwhile(it)`             | Get value of last while-filter       |
 
-`it.index` holds the index of the source item, and `it.count` the current number of items taken.
+`it.index` holds the index of the source item.
 ```c
-#define i_type IVec
-#define i_val int
-#include <stc/cstack.h>
+// Example:
+#include <stc/algo/crange.h>
 #include <stc/algo/filter.h>
 #include <stdio.h>
 
@@ -246,29 +247,28 @@ bool isPrime(int i) {
     for (int j=2; j*j <= i; ++j) if (i % j == 0) return false;
     return true;
 }
-#define isOdd(i) ((i) & 1)
+// Get 10 prime numbers after 1 million, but only every 25th of them.
 
 int main() {
-    c_auto (IVec, vec) {
-        c_forrange (i, 1000) IVec_push(&vec, 1000000 + i);
+    crange R = crange_make(1000001, INT32_MAX, 2);
 
-        c_forfilter (i, IVec, vec,
-                        isOdd(*i.ref)
-                     && c_flt_skip(i, 100) // built-in
-                     && isPrime(*i.ref)
-                      , c_flt_take(i, 10)) { // breaks loop on false.
-            printf(" %d", *i.ref);
-        }
-        puts("");
+    c_forfilter (i, crange, R,
+                    isPrime(*i.ref)
+                 && (c_flt_skip(i, INT32_MAX) || 
+                     c_flt_last(i) % 25 == 0)
+                  , c_flt_take(i, 10)) // breaks loop on false.
+    {
+        printf(" %d", *i.ref);
     }
 }
-// Out: 1000211 1000213 1000231 1000249 1000253 1000273 1000289 1000291 1000303 1000313
+// Out: 1000303 1000639 1000999 1001311 1001593 1001981 1002299 1002583 1002887 1003241
 ```
-Note that `c_flt_take()` is given as an optional argument, which makes the loop stop when it becomes false (for efficiency). Chaining it after `isPrime()` instead will give same result, but the full input is processed.
+Note that `c_flt_take()` is given as an optional argument, which breaks the loop on false
+(for efficiency). Without the comma, it will give same result, but the full input is processed first.
 
 ### c_make, c_new, c_delete
 
-- **c_make**: Make a container from a literal initializer list. Example:
+- **c_make**: Make any container from an initializer list. Example:
 ```c
 #define i_val_str  // cstr value type
 #include <stc/cset.h>
@@ -277,7 +277,9 @@ Note that `c_flt_take()` is given as an optional argument, which makes the loop 
 #define i_val int
 #include <stc/cmap.h>
 ...
-cset_str myset = c_make(cset_str, {"This", "is", "the", "story"}); // note: const char* values given!
+// Initializes with const char*, internally converted to cstr!
+cset_str myset = c_make(cset_str, {"This", "is", "the", "story"});
+
 int x = 7, y = 8;
 cmap_int mymap = c_make(cmap_int, { {1, 2}, {3, 4}, {5, 6}, {x, y} });
 ```
@@ -293,7 +295,7 @@ c_delete(cstr, stringptr);
 ```
 
 ### crange
-- **crange** is a number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html). The **crange_value** type is `long long`. Below *start*, *stop*, and *step* are of type *crange_value*:
+A number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html). The **crange_value** type is `long long`. Below *start*, *stop*, and *step* are of type *crange_value*:
 ```c
 crange&     crange_obj(...)                 // create a compound literal crange object
 crange      crange_make(stop);              // will generate 0, 1, ..., stop-1

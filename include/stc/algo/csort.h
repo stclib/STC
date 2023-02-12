@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include <stc/priv/template.h>
 #include <stc/ccommon.h>
+#include <stc/priv/template.h>
 
 /* Generic Quicksort in C, performs as fast as c++ std::sort().
 template params:
@@ -31,37 +31,21 @@ template params:
 
 // test:
 #include <stdio.h>
-#include <time.h>
-#include <stdlib.h>
 #define i_val int
 #include <stc/algo/csort.h>
-#include <stc/crandom.h>
-#ifdef __cplusplus
-#include <algorithm>
-#endif
-
-void testsort(csort_int_value *a, size_t size, const char *desc) {
-    clock_t t = clock();
-    csort_int(a, size);
-    t = clock() - t;
-
-    printf("%s: %zu elements sorted in %.3fms\n",
-           desc, size, t*1000.0/CLOCKS_PER_SEC);
-}
 
 int main() {
-    size_t i, size = 10000000;
-    csort_int_value *a = (csort_int_value*)malloc(sizeof(*a) * size);
-    if (a != NULL) {
-        for (i = 0; i < size; i++)
-            a[i] = crandom() & (1U << 28) - 1;
-        testsort(a, size, "random");
-        for (i = 0; i < 20; i++) printf(" %d", a[i]);
-        puts("");
-        free(a);
-    }
-}*/
-typedef i_val c_PASTE(c_PASTE(csort_, i_tag), _value);
+    int arr[] = {23, 321, 5434, 25, 245, 1, 654, 33, 543, 21};
+    
+    csort_int(arr, c_arraylen(arr));
+
+    for (int i = 0; i < c_arraylen(arr); i++)
+        printf(" %d", arr[i]);
+    puts("");
+}
+*/
+
+typedef i_val c_PASTE(c_CONCAT(csort_, i_tag), _value);
 
 static inline void c_PASTE(cisort_, i_tag)(i_val arr[], intptr_t lo, intptr_t hi) {
     for (intptr_t j = lo, i = lo + 1; i <= hi; j = i, ++i) {
