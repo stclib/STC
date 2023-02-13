@@ -27,12 +27,12 @@
 #include "forward.h"
 #include "utf8.h"
 
-#define             csview_NULL c_SV_1("")
+#define             csview_NULL c_sv_1("")
 #define             csview_init() csview_NULL
 #define             csview_drop(p) c_default_drop(p)
 #define             csview_clone(sv) c_default_clone(sv)
-#define             csview_lit(literal) c_SV_1(literal)
-#define             csview_from_n(str, n) c_SV_2(str, n)
+#define             csview_lit(literal) c_sv_1(literal)
+#define             csview_from_n(str, n) c_sv_2(str, n)
 
 STC_API intptr_t csview_find_sv(csview sv, csview search);
 
@@ -47,7 +47,7 @@ STC_INLINE bool csview_equals(csview sv, const char* str)
     { intptr_t n = c_strlen(str); return sv.size == n && !c_memcmp(sv.str, str, n); }
 
 STC_INLINE intptr_t csview_find(csview sv, const char* str)
-    { return csview_find_sv(sv, c_SV(str, c_strlen(str))); }
+    { return csview_find_sv(sv, c_sv(str, c_strlen(str))); }
 
 STC_INLINE bool csview_contains(csview sv, const char* str)
     { return csview_find(sv, str) != c_NPOS; }

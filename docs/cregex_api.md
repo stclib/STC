@@ -108,7 +108,7 @@ int main() {
     // Lets find the first date in the string:
     csview match[4]; // full-match, year, month, date.
     if (cregex_find(&re, input, match, CREG_DEFAULT) == CREG_OK)
-        printf("Found date: %.*s\n", c_SVARG(match[0]));
+        printf("Found date: %.*s\n", c_SV(match[0]));
     else
         printf("Could not find any date\n");
 
@@ -124,7 +124,7 @@ int main() {
 For a single match you may use the all-in-one function:
 ```c
 if (cregex_find_pattern(pattern, input, match, CREG_DEFAULT))
-    printf("Found date: %.*s\n", c_SVARG(match[0]));
+    printf("Found date: %.*s\n", c_SV(match[0]));
 ```
 
 To compile, use: `gcc first_match.c src/cregex.c src/utf8code.c`.
@@ -137,13 +137,13 @@ To iterate multiple matches in an input string, you may use
 csview match[5] = {0};
 while (cregex_find(&re, input, match, CREG_M_NEXT) == CREG_OK)
     c_forrange (k, cregex_captures(&re))
-        printf("submatch %lld: %.*s\n", k, c_SVARG(match[k]));
+        printf("submatch %lld: %.*s\n", k, c_SV(match[k]));
 ```
 There is also a safe macro which simplifies this:
 ```c
 c_formatch (it, &re, input)
     c_forrange (k, cregex_captures(&re))
-        printf("submatch %lld: %.*s\n", k, c_SVARG(it.match[k]));
+        printf("submatch %lld: %.*s\n", k, c_SV(it.match[k]));
 ```
 
 ## Using cregex in a project

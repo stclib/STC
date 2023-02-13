@@ -26,11 +26,11 @@ All csview definitions and prototypes are available by including a single header
 ## Methods
 
 ```c
-csview          c_SV(const char literal_only[]);                        // construct from literal, no strlen()
-csview          c_SV(const char* str, intptr_t n);                      // construct from str and length n
-csview          csview_lit(const char literal_only[]);                  // alias for c_SV(lit)
+csview          c_sv(const char literal_only[]);                        // construct from literal, no strlen()
+csview          c_sv(const char* str, intptr_t n);                      // construct from str and length n
+csview          csview_lit(const char literal_only[]);                  // alias for c_sv(lit)
 csview          csview_from(const char* str);                           // construct from const char*
-csview          csview_from_n(const char* str, intptr_t n);             // alias for c_SV(str, n)
+csview          csview_from_n(const char* str, intptr_t n);             // alias for c_sv(str, n)
 
 intptr_t        csview_size(csview sv);
 bool            csview_empty(csview sv);
@@ -88,7 +88,7 @@ csview          cstr_slice_ex(const cstr* s, intptr_t p, intptr_t q);    // nega
 To iterate tokens in an input string separated by a string:
 ```c
 c_fortoken (i, "hello, one, two, three", ", ")
-    printf("token: %.*s\n", c_SVARG(i.token));
+    printf("token: %.*s\n", c_SV(i.token));
 ```
 
 #### Helper methods
@@ -111,8 +111,8 @@ uint64_t        csview_hash(const csview* x);
 
 | Name           | Value                | Usage                                        |
 |:---------------|:---------------------|:---------------------------------------------|
-| `csview_NULL`  | same as `c_SV("")`   | `sview = csview_NULL;`                       |
-| `c_SVARG(sv)`  | printf argument      | `printf("sv: %.*s\n", c_SVARG(sv));`         |
+| `csview_NULL`  | same as `c_sv("")`   | `sview = csview_NULL;`                       |
+| `c_SV(sv)`     | printf argument      | `printf("sv: %.*s\n", c_SV(sv));`            |
 
 ## Example
 ```c
@@ -129,7 +129,7 @@ int main ()
     csview sv2 = cstr_substr(&str1, pos, 4);            // get "live"
     csview sv3 = cstr_slice(&str1, -8, -1);             // get "details"
     printf("%.*s %.*s %.*s\n",
-        c_SVARG(sv1), c_SVARG(sv2), c_SVARG(sv3));
+        c_SV(sv1), c_SV(sv2), c_SV(sv3));
     cstr s1 = cstr_lit("Apples are red");
     cstr s2 = cstr_from_sv(cstr_substr(&s1, -3, 3));    // "red"
     cstr s3 = cstr_from_sv(cstr_substr(&s1, 0, 6));     // "Apples"
@@ -153,11 +153,11 @@ int main()
 {
     c_auto (cstr, s1) {
         s1 = cstr_lit("hell😀 w😀rld");
-        cstr_u8_replace_at(&s1, cstr_find(&s1, "😀rld"), 1, c_SV("ø"));
+        cstr_u8_replace_at(&s1, cstr_find(&s1, "😀rld"), 1, c_sv("ø"));
         printf("%s\n", cstr_str(&s1));
 
         c_foreach (i, cstr, s1)
-            printf("%.*s,", c_SVARG(i.u8.chr));
+            printf("%.*s,", c_SV(i.u8.chr));
     }
 }
 ```
@@ -177,7 +177,7 @@ and does not depend on null-terminated strings. *string_split()* function return
 void print_split(csview input, const char* sep)
 {
     c_fortoken_sv (i, input, sep)
-        printf("[%.*s]\n", c_SVARG(i.token));
+        printf("[%.*s]\n", c_SV(i.token));
 }
 
 #include <stc/cstr.h>
@@ -196,12 +196,12 @@ cstack_str string_split(csview input, const char* sep)
 
 int main()
 {
-    print_split(c_SV("//This is a//double-slash//separated//string"), "//");
+    print_split(c_sv("//This is a//double-slash//separated//string"), "//");
     puts("");
-    print_split(c_SV("This has no matching separator"), "xx");
+    print_split(c_sv("This has no matching separator"), "xx");
     puts("");
 
-    c_with (cstack_str s = string_split(c_SV("Split,this,,string,now,"), ","), cstack_str_drop(&s))
+    c_with (cstack_str s = string_split(c_sv("Split,this,,string,now,"), ","), cstack_str_drop(&s))
         c_foreach (i, cstack_str, s)
             printf("[%s]\n", cstr_str(i.ref));
 }

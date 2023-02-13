@@ -14,9 +14,10 @@ I am happy to finally announce a new release! Major changes:
     - [crange](docs/ccommon_api.md#crange) - similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html) integer range generator.
     - [c_forfilter](docs/ccommon_api.md#c_forfilter) - ranges-like filtering.
     - [csort](misc/benchmarks/various/csort_bench.c) - fast quicksort with custom inline comparison.
+- Renamed `c_ARGSV()` => `c_SV()`: **csview** print arg. `c_sv()` is the shorthand **csview** constructor.
 - Support for [uppercase flow-control](include/stc/priv/altnames.h) macro names in ccommon.h.
+- Some API changes in **cregex** and **cstr**.
 - Create single header container versions with python script.
-- Some API changes in cregex and cstr.
 - [Previous changes for version 4](#version-4).
 
 Introduction
