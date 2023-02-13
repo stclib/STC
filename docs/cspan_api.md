@@ -1,9 +1,9 @@
 # STC [cspan](../include/stc/cspan.h): Multi-dimensional Array View
 ![Array](pics/array.jpg)
 
-The **cspan** is templated non-owning *single* and *multi-dimensional* view of an array. It is similar
-to Python's numpy array slicing and C++ [std::span](https://en.cppreference.com/w/cpp/container/span) /
-[std::mdspan](https://en.cppreference.com/w/cpp/container/mdspan).
+The **cspan** is templated non-owning *single* and *multi-dimensional* view of an array. It has similarities
+with Python's numpy array slicing and C++ [std::span](https://en.cppreference.com/w/cpp/container/span) /
+[std::mdspan](https://en.cppreference.com/w/cpp/container/mdspan), and others.
 
 ## Header file and declaration
 **cspan** types are defined by the *using_cspan()* macro after the header is included.
@@ -68,7 +68,7 @@ void            SpanType_next(SpanTypeN_iter* it);
      
 ## Example 1
 
-The *cspan_slice()* function is similar to pythons numpy multi-dimensional arrays slicing, e.g.:
+Dimension slicing in python, C, and C++:
 ```py
 import numpy as np
 
@@ -92,7 +92,7 @@ if __name__ == '__main__':
 ```
 ... can be written in C using cspan:
 ```c
-#include <c11/fmt.h>
+#include <stdio.h>
 #include <stc/cspan.h>
 using_cspan3(myspan, int); // define myspan, myspan2, myspan3.
 
@@ -105,11 +105,11 @@ int main() {
 
     c_forrange (i, ss2.shape[0])
         c_forrange (j, ss2.shape[1])
-            fmt_print(" {}", *cspan_at(&ss2, i, j));
+            printf(" %d", *cspan_at(&ss2, i, j));
     puts("");
 
     c_foreach (i, myspan2, ss2)
-        fmt_print(" {}", *i.ref);
+        printf(" %d", *i.ref);
 }
 ```
 ... and (almost) in C++23:
@@ -130,11 +130,11 @@ int main() {
             std::print(" {}", ss2[i, j]);
     std::println();
 
-    // std::mdspan can't be iterated as a flat container!
+    // std::mdspan can't be iterated joined/flat!
 }
 ```
 ## Example 2
-Slicing cspan without and with reducing the rank (like numpy array slicing):
+Slicing cspan without and with reducing the rank:
 ```c
 #include <c11/fmt.h>
 #include <stc/cspan.h>

@@ -12,9 +12,9 @@ I am happy to finally announce a new release! Major changes:
 - Updates on **cregex** with several [new unicode character classes](docs/cregex_api.md#regex-cheatsheet).
 - Algorithms:
     - [crange](docs/ccommon_api.md#crange) - similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html) integer range generator.
-    - [c_forfilter](docs/ccommon_api.md#c_forfilter) - ranges-like filtering.
+    - [c_forfilter](docs/ccommon_api.md#c_forfilter) - ranges-like view filtering.
     - [csort](misc/benchmarks/various/csort_bench.c) - fast quicksort with custom inline comparison.
-- Renamed `c_ARGSV()` => `c_SV()`: **csview** print arg. `c_sv()` is the shorthand **csview** constructor.
+- Renamed `c_ARGSV()` => `c_SV()`: **csview** print arg. `c_sv()` is a shorthand for *csview_from()* constructor.
 - Support for [uppercase flow-control](include/stc/priv/altnames.h) macro names in ccommon.h.
 - Some API changes in **cregex** and **cstr**.
 - Create single header container versions with python script.
@@ -133,9 +133,9 @@ for lookup in containers. E.g. for containers with string type (**cstr**) elemen
 as lookup type. It will then use the input `const char*` directly when comparing with the string data in the
 container. This avoids the construction of a new `cstr` (which possible allocates memory) for the lookup. 
 Finally, destruction of the lookup key (i.e. string literal) after usage is not needed (or allowed), which 
-is convenient in C. A great ergonomic feature is that the alternative lookup type can also be used for adding
+is convenient in C. A great ergonomic feature is that the alternative lookup type can also be used when adding
 entries into containers through using the *emplace*-functions. E.g. `cvec_str_emplace_back(&vec, "Hello")`.
-3. ***Standardized container iterators***. All container can be iterated the same way, and uses the
+3. ***Standardized container iterators***. All container can be iterated in similar manner, and uses the
 same element access syntax. E.g.:
     - `c_foreach (it, IntContainer, container) printf(" %d", *it.ref);` will work for
 every type of container defined as `IntContainer` with `int` elements. Also the form:
@@ -394,7 +394,7 @@ Val:
 - `i_valfrom` *Func* - Convertion func *i_val* <= *i_valraw*.
 - `i_valto` *Func* - Convertion func *i_val*\* => *i_valraw*.
 
-Specials: Meta-template parameters (use instead of `i_key` / `i_val`):
+Specials: Meta-template parameters. Use instead of `i_key` / `i_val`.
 - `i_keyclass` *Type* - Auto-set standard named functions: *Type_clone()*, *Type_drop()*, *Type_cmp()*, *Type_eq()*, *Type_hash()*.
 If `i_keyraw` is defined, it sets `i_keyto` = *Type_toraw()* and `i_keyfrom` = *Type_from()*.
 Only functions required by the container type is required to be defined. E.g.:
