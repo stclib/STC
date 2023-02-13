@@ -229,12 +229,12 @@ Iterate containers with stop-criteria and chained range filtering.
 
 | Built-in filter                   | Description                          |
 |:----------------------------------|:-------------------------------------|
-| `c_flt_skip(it, numItems)`        | Skip numItems                        |
-| `c_flt_take(it, numItems)`        | Take numItems                        |
+| `c_flt_skip(it, numItems)`        | Skip numItems (inc count)            |
+| `c_flt_take(it, numItems)`        | Take numItems (inc count)            |
 | `c_flt_skipwhile(it, predicate)`  | Skip items until predicate is false  |
 | `c_flt_takewhile(it, predicate)`  | Take items until predicate is false  |
-| `c_flt_last(it)`                  | Get count of last filter successes   |
-| `c_flt_inc(it)`                   | Increment and return on the stack    |
+| `c_flt_count(it)`                 | Increment current and return value   |
+| `c_flt_last(it)`                  | Get value of last count/skip/take    |
 
 `it.index` holds the index of the source item.
 ```c
@@ -254,8 +254,7 @@ int main() {
 
     c_forfilter (i, crange, R,
                     isPrime(*i.ref)
-                 && (c_flt_skip(i, INT32_MAX) || 
-                     c_flt_last(i) % 25 == 0)
+                 && c_flt_count(i) % 25 == 0
                   , c_flt_take(i, 10)) // breaks loop on false.
     {
         printf(" %d", *i.ref);
