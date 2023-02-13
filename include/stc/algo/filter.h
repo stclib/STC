@@ -53,12 +53,12 @@ int main()
   #define c_NFILTERS 14 /* 22, 30, .. */
 #endif
 
-#define c_flt_take(i, n) (++(i).s1[(i).s1top++] <= (n))
-#define c_flt_skip(i, n) (++(i).s1[(i).s1top++] > (n))
+#define c_flt_take(i, n) (c_flt_inc(i) <= (n))
+#define c_flt_skip(i, n) (c_flt_inc(i) > (n))
 #define c_flt_skipwhile(i, pred) ((i).s2[(i).s2top++] |= !(pred))
 #define c_flt_takewhile(i, pred) !c_flt_skipwhile(i, pred)
 #define c_flt_last(i) (i).s1[(i).s1top-1]
-#define c_flt_lastwhile(i) (i).s2[(i).s2top-1]
+#define c_flt_inc(i) ++(i).s1[(i).s1top++]
 
 #define c_forfilter(...) c_MACRO_OVERLOAD(c_forfilter, __VA_ARGS__)
 

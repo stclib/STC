@@ -6,19 +6,19 @@
 #include <stc/algo/crange.h>
 
 
-cbits sieveOfEratosthenes(intptr_t n)
+cbits sieveOfEratosthenes(int64_t n)
 {
     cbits bits = cbits_with_size(n/2 + 1, true);
-    intptr_t q = (intptr_t)sqrt((double) n) + 1;
-    for (intptr_t i = 3; i < q; i += 2) {
-        intptr_t j = i;
+    int64_t q = (int64_t)sqrt((double) n) + 1;
+    for (int64_t i = 3; i < q; i += 2) {
+        int64_t j = i;
         for (; j < n; j += 2) {
             if (cbits_test(&bits, j>>1)) {
                 i = j;
                 break;
             }
         }
-        for (intptr_t j = i*i; j < n; j += i*2)
+        for (int64_t j = i*i; j < n; j += i*2)
             cbits_reset(&bits, j>>1);
     }
     return bits;
@@ -26,12 +26,12 @@ cbits sieveOfEratosthenes(intptr_t n)
 
 int main(void)
 {
-    intptr_t n = 1000000000;
+    int64_t n = 1000000000;
     printf("Computing prime numbers up to %" c_ZI "\n", n);
 
     clock_t t1 = clock();
     c_with (cbits primes = sieveOfEratosthenes(n + 1), cbits_drop(&primes)) {
-        intptr_t np = cbits_count(&primes);
+        int64_t np = cbits_count(&primes);
         clock_t t2 = clock();
 
         printf("Number of primes: %" c_ZI ", time: %f\n\n", np, (float)(t2 - t1) / (float)CLOCKS_PER_SEC);

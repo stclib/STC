@@ -234,7 +234,7 @@ Iterate containers with stop-criteria and chained range filtering.
 | `c_flt_skipwhile(it, predicate)`  | Skip items until predicate is false  |
 | `c_flt_takewhile(it, predicate)`  | Take items until predicate is false  |
 | `c_flt_last(it)`                  | Get count of last filter successes   |
-| `c_flt_lastwhile(it)`             | Get value of last while-filter       |
+| `c_flt_inc(it)`                   | Increment and return on the stack    |
 
 `it.index` holds the index of the source item.
 ```c
