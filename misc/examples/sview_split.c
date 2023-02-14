@@ -4,13 +4,13 @@
 int  main()
 {
     // No memory allocations or string length calculations!
-    const csview date = c_SV("2021/03/12");
+    const csview date = c_sv("2021/03/12");
     intptr_t pos = 0;
     const csview year = csview_token(date, "/", &pos);
     const csview month = csview_token(date, "/", &pos);
     const csview day = csview_token(date, "/", &pos);
 
-    printf("%.*s, %.*s, %.*s\n", c_SVARG(year), c_SVARG(month), c_SVARG(day));
+    printf("%.*s, %.*s, %.*s\n", c_SV(year), c_SV(month), c_SV(day));
 
     c_auto (cstr, y, m, d) {
         y = cstr_from_sv(year), m = cstr_from_sv(month), d = cstr_from_sv(day);

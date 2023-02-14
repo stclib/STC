@@ -129,13 +129,13 @@ typedef const char* crawstr;
 #define crawstr_hash(p) cstrhash(*(p))
 #define crawstr_len(literal) (c_sizeof("" literal) - 1)
 
-#define c_SV(...) c_MACRO_OVERLOAD(c_SV, __VA_ARGS__)
-#define c_SV_1(lit) c_SV_2(lit, crawstr_len(lit))
-#define c_SV_2(str, n) (c_LITERAL(csview){str, n})
-#define c_SVARG(sv) (int)(sv).size, (sv).str  /* use with "%.*s" */
-#define c_PAIR(ref) (ref)->first, (ref)->second
+#define c_sv(...) c_MACRO_OVERLOAD(c_sv, __VA_ARGS__)
+#define c_sv_1(lit) c_sv_2(lit, crawstr_len(lit))
+#define c_sv_2(str, n) (c_LITERAL(csview){str, n})
 
-#define _c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
+#define c_SV(sv) (int)(sv).size, (sv).str // print csview: use format "%.*s"
+#define c_PAIR(ref) (ref)->first, (ref)->second
+#define c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
 STC_INLINE uint64_t cfasthash(const void* key, intptr_t len) {
     const uint8_t *x = (const uint8_t*) key;
@@ -143,7 +143,7 @@ STC_INLINE uint64_t cfasthash(const void* key, intptr_t len) {
     uint32_t u4;
     while (n--) {
         memcpy(&u8, x, 8), x += 8;
-        h += (_c_ROTL(u8, 26) ^ u8)*0xc6a4a7935bd1e99d;
+        h += (c_ROTL(u8, 26) ^ u8)*0xc6a4a7935bd1e99d;
     }
     switch (len &= 7) {
         case 0: return h;
@@ -152,7 +152,7 @@ STC_INLINE uint64_t cfasthash(const void* key, intptr_t len) {
     }
     h += *x++;
     while (--len) h = (h << 10) - h + *x++;
-    return _c_ROTL(h, 26) ^ h;
+    return c_ROTL(h, 26) ^ h;
 }
 
 STC_INLINE uint64_t cstrhash(const char *str)

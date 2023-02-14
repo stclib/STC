@@ -102,14 +102,14 @@ void demo3(void)
 
         puts("demo3:");
         c_foreach (w, SVec, words_containing_i)
-            printf(" %.*s", c_SVARG(*w.ref));
+            printf(" %.*s", c_SV(*w.ref));
         puts("");
     }
 }
 
 void demo4(void)
 {
-    csview s = c_SV("ab123cReAghNGnΩoEp"); // Ω = multi-byte
+    csview s = c_sv("ab123cReAghNGnΩoEp"); // Ω = multi-byte
     c_auto (cstr, out) {
         c_forfilter (i, csview, s, utf8_isupper(utf8_peek(i.ref))) {
             char chr[4];

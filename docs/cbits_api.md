@@ -21,34 +21,34 @@ All cbits definitions and prototypes are available by including a single header 
 ```c
 cbits       cbits_init(void);
 cbits       cbits_from(const char* str);
-cbits       cbits_with_size(intptr_t size, bool value);             // size must be <= N if N is defined
-cbits       cbits_with_pattern(intptr_t size, uint64_t pattern); 
+cbits       cbits_with_size(int64_t size, bool value);              // size must be <= N if N is defined
+cbits       cbits_with_pattern(int64_t size, uint64_t pattern); 
 cbits       cbits_clone(cbits other);
 
 void        cbits_clear(cbits* self);
 cbits*      cbits_copy(cbits* self, const cbits* other);
-void        cbits_resize(cbits* self, intptr_t size, bool value);   // only if i_len is not defined
+void        cbits_resize(cbits* self, int64_t size, bool value);    // only if i_len is not defined
 void        cbits_drop(cbits* self);
 
 cbits*      cbits_take(cbits* self, const cbits* other);            // give other to self
 cbits       cbits_move(cbits* self);                                // transfer self to caller
 
-intptr_t    cbits_size(const cbits* self);
-intptr_t    cbits_count(const cbits* self);                         // count number of bits set
+int64_t     cbits_size(const cbits* self);
+int64_t     cbits_count(const cbits* self);                         // count number of bits set
 
-bool        cbits_test(const cbits* self, intptr_t i);
-bool        cbits_at(const cbits* self, intptr_t i);                // same as cbits_test()
+bool        cbits_test(const cbits* self, int64_t i);
+bool        cbits_at(const cbits* self, int64_t i);                 // same as cbits_test()
 bool        cbits_subset_of(const cbits* self, const cbits* other); // is set a subset of other?
 bool        cbits_disjoint(const cbits* self, const cbits* other);  // no common bits
-char*       cbits_to_str(const cbits* self, char* str, intptr_t start, intptr_t stop);
+char*       cbits_to_str(const cbits* self, char* str, int64_t start, int64_t stop);
 
-void        cbits_set(cbits* self, intptr_t i);
-void        cbits_reset(cbits* self, intptr_t i);
-void        cbits_set_value(cbits* self, intptr_t i, bool value);
+void        cbits_set(cbits* self, int64_t i);
+void        cbits_reset(cbits* self, int64_t i);
+void        cbits_set_value(cbits* self, int64_t i, bool value);
 void        cbits_set_all(cbits* self, bool value);
 void        cbits_set_pattern(cbits* self, uint64_t pattern);
 void        cbits_flip_all(cbits* self);
-void        cbits_flip(cbits* self, intptr_t i);
+void        cbits_flip(cbits* self, int64_t i);
 
 void        cbits_intersect(cbits* self, const cbits* other);
 void        cbits_union(cbits* self, const cbits* other);
@@ -70,19 +70,19 @@ void        cbits_xor(cbits* self, const cbits* other);             // set of di
 #include <math.h>
 #include <time.h>
 
-cbits sieveOfEratosthenes(intptr_t n)
+cbits sieveOfEratosthenes(int64_t n)
 {
     cbits bits = cbits_with_size(n>>1, true);
-    intptr_t q = (intptr_t) sqrt(n);
+    int64_t q = (int64_t) sqrt(n);
 
-    for (intptr_t i = 3; i <= q; i += 2) {
-        for (intptr_t j = i; j < n; j += 2) {
+    for (int64_t i = 3; i <= q; i += 2) {
+        for (int64_t j = i; j < n; j += 2) {
             if (cbits_test(&bits, j>>1)) {
                 i = j;
                 break;
             }
         }
-        for (intptr_t j = i*i; j < n; j += i*2)
+        for (int64_t j = i*i; j < n; j += i*2)
             cbits_reset(&bits, j>>1);
     }
     return bits;
@@ -90,18 +90,18 @@ cbits sieveOfEratosthenes(intptr_t n)
 
 int main(void)
 {
-    intptr_t n = 100000000;
+    int64_t n = 100000000;
     printf("computing prime numbers up to %" c_ZI "\n", n);
 
     clock_t t1 = clock();
     cbits primes = sieveOfEratosthenes(n + 1);
-    intptr_t nprimes = cbits_count(&primes);
+    int64_t nprimes = cbits_count(&primes);
     clock_t t2 = clock();
 
     printf("number of primes: %" c_ZI ", time: %f\n", nprimes, (float)(t2 - t1)/CLOCKS_PER_SEC);
 
     printf(" 2");
-    for (intptr_t i = 3; i < 1000; i += 2)
+    for (int64_t i = 3; i < 1000; i += 2)
        if (cbits_test(&primes, i>>1)) printf(" %" c_ZI, i);
     puts("");
 

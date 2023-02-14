@@ -32,7 +32,7 @@ c_with (FILE* fp = fopen(fname, "rb"), fp != NULL, fclose(fp))
 }
 return ok;
 
-// `c_auto` automatically initialize and destruct up to 4 variables, like c_with.
+// `c_auto` automatically initialize and destruct up to 4 variables:
 c_auto (cstr, s1, s2)
 {
     cstr_append(&s1, "Hello");
@@ -44,6 +44,7 @@ c_auto (cstr, s1, s2)
     printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
 }
 
+// `c_with` is a general variant of `c_auto`:
 c_with (cstr str = cstr_lit("Hello"), cstr_drop(&str))
 {
     cstr_append(&str, " world");
@@ -90,55 +91,6 @@ int main()
         c_foreach (i, cvec_str, x)
             printf("%s\n", cstr_str(i.ref));
 }
-```
-
-### The **checkauto** utility program (for RAII)
-The **checkauto** program will check the source code for any misuses of the `c_auto*` macros which
-may lead to resource leakages. The `c_auto*`- macros are implemented as one-time executed **for-loops**,
-so any `return` or `break` appearing within such a block will lead to resource leaks, as it will disable
-the cleanup/drop method to be called. A `break` may originally be intended to break a loop or switch
-outside the `c_auto` scope.
-
-NOTE: One must always make sure to unwind temporary allocated resources before a `return` in C. However, by using `c_auto*`-macros,
-- it is much easier to automatically detect misplaced return/break between resource acquisition and destruction.
-- it prevents forgetting to call the destructor at the end.
-
-The **checkauto** utility will report any misusages. The following example shows how to correctly break/return
-from a `c_auto` scope:
-```c
-    int flag = 0;
-    for (int i = 0; i<n; ++i) {
-        c_auto (cstr, text)
-        c_auto (List, list)
-        {
-            for (int j = 0; j<m; ++j) {
-                List_push_back(&list, i*j);
-                if (cond1())
-                    break;  // OK: breaks current for-loop only
-            }
-            // WRONG:
-            if (cond2())
-                break;      // checkauto ERROR! break inside c_auto.
-
-            if (cond3())
-                return -1;  // checkauto ERROR! return inside c_auto
-
-            // CORRECT:
-            if (cond2()) {
-                flag = 1;   // flag to break outer for-loop
-                continue;   // cleanup and leave c_auto block
-            }
-            if (cond3()) {
-                flag = -1;  // return -1
-                continue;   // cleanup and leave c_auto block
-            }
-            ...
-        }
-        // do the return/break outside of c_auto
-        if (flag < 0) return flag;
-        else if (flag > 0) break;
-        ...
-    } // for
 ```
 ## Loop abstraction macros
 
@@ -229,12 +181,12 @@ Iterate containers with stop-criteria and chained range filtering.
 
 | Built-in filter                   | Description                          |
 |:----------------------------------|:-------------------------------------|
-| `c_flt_skip(it, numItems)`        | Skip numItems                        |
-| `c_flt_take(it, numItems)`        | Take numItems                        |
+| `c_flt_skip(it, numItems)`        | Skip numItems (inc count)            |
+| `c_flt_take(it, numItems)`        | Take numItems (inc count)            |
 | `c_flt_skipwhile(it, predicate)`  | Skip items until predicate is false  |
 | `c_flt_takewhile(it, predicate)`  | Take items until predicate is false  |
-| `c_flt_last(it)`                  | Get count of last filter successes   |
-| `c_flt_lastwhile(it)`             | Get value of last while-filter       |
+| `c_flt_count(it)`                 | Increment current and return value   |
+| `c_flt_last(it)`                  | Get value of last count/skip/take    |
 
 `it.index` holds the index of the source item.
 ```c
@@ -244,27 +196,27 @@ Iterate containers with stop-criteria and chained range filtering.
 #include <stdio.h>
 
 bool isPrime(int i) {
-    for (int j=2; j*j <= i; ++j) if (i % j == 0) return false;
+    for (int j=2; j*j <= i; ++j)
+        if (i % j == 0) return false;
     return true;
 }
-// Get 10 prime numbers after 1 million, but only every 25th of them.
-
 int main() {
-    crange R = crange_make(1000001, INT32_MAX, 2);
+    // Get 10 prime numbers starting from 1000.
+    // Skip the first 24 primes, then select every 15th prime.
+    crange R = crange_make(1001, INT32_MAX, 2);
 
     c_forfilter (i, crange, R,
                     isPrime(*i.ref)
-                 && (c_flt_skip(i, INT32_MAX) || 
-                     c_flt_last(i) % 25 == 0)
-                  , c_flt_take(i, 10)) // breaks loop on false.
-    {
+                 && c_flt_skip(i, 24)
+                 && c_flt_count(i) % 15 == 1
+                  , c_flt_take(i, 10)) // , = breaks loop on false.
         printf(" %d", *i.ref);
-    }
+    puts("");
 }
-// Out: 1000303 1000639 1000999 1001311 1001593 1001981 1002299 1002583 1002887 1003241
+// out: 1171 1283 1409 1493 1607 1721 1847 1973 2081 2203
 ```
-Note that `c_flt_take()` is given as an optional argument, which breaks the loop on false
-(for efficiency). Without the comma, it will give same result, but the full input is processed first.
+Note that `c_flt_take()` is given as an optional argument, which breaks the loop on false.
+With `&&` instead of the comma it will give same result, but the full input is processed first.
 
 ### c_make, c_new, c_delete
 
@@ -368,4 +320,53 @@ Return number of elements in an array. array must not be a pointer!
 ```c
 int array[] = {1, 2, 3, 4};
 intptr_t n = c_arraylen(array);
+```
+
+## The **checkauto** utility program (for RAII)
+The **checkauto** program will check the source code for any misuses of the `c_auto*` macros which
+may lead to resource leakages. The `c_auto*`- macros are implemented as one-time executed **for-loops**,
+so any `return` or `break` appearing within such a block will lead to resource leaks, as it will disable
+the cleanup/drop method to be called. A `break` may originally be intended to break a loop or switch
+outside the `c_auto` scope.
+
+NOTE: One must always make sure to unwind temporary allocated resources before a `return` in C. However, by using `c_auto*`-macros,
+- it is much easier to automatically detect misplaced return/break between resource acquisition and destruction.
+- it prevents forgetting to call the destructor at the end.
+
+The **checkauto** utility will report any misusages. The following example shows how to correctly break/return
+from a `c_auto` scope:
+```c
+int flag = 0;
+for (int i = 0; i<n; ++i) {
+    c_auto (cstr, text)
+    c_auto (List, list)
+    {
+        for (int j = 0; j<m; ++j) {
+            List_push_back(&list, i*j);
+            if (cond1())
+                break;  // OK: breaks current for-loop only
+        }
+        // WRONG:
+        if (cond2())
+            break;      // checkauto ERROR! break inside c_auto.
+
+        if (cond3())
+            return -1;  // checkauto ERROR! return inside c_auto
+
+        // CORRECT:
+        if (cond2()) {
+            flag = 1;   // flag to break outer for-loop
+            continue;   // cleanup and leave c_auto block
+        }
+        if (cond3()) {
+            flag = -1;  // return -1
+            continue;   // cleanup and leave c_auto block
+        }
+        ...
+    }
+    // do the return/break outside of c_auto
+    if (flag < 0) return flag;
+    else if (flag > 0) break;
+    ...
+}
 ```

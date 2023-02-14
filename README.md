@@ -3,7 +3,7 @@
 STC - Smart Template Containers for C
 =====================================
 
-News: Version 4.1 Released (Feb 2023)
+News: Version 4.1.1 Released (Feb 2023)
 ------------------------------------------------
 I am happy to finally announce a new release! Major changes:
 - A new exciting [**cspan**](docs/cspan_api.md) single/multi-dimensional array view (with numpy-like slicing).
@@ -12,11 +12,12 @@ I am happy to finally announce a new release! Major changes:
 - Updates on **cregex** with several [new unicode character classes](docs/cregex_api.md#regex-cheatsheet).
 - Algorithms:
     - [crange](docs/ccommon_api.md#crange) - similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html) integer range generator.
-    - [c_forfilter](docs/ccommon_api.md#c_forfilter) - ranges-like filtering.
-    - [csort](misc/benchmarks/various/csort_bench.c) - fast quicksort with custom inline comparison.
+    - [c_forfilter](docs/ccommon_api.md#c_forfilter) - ranges-like view filtering.
+    - [csort](include/stc/algo/csort.h) - [fast quicksort](misc/benchmarks/various/csort_bench.c) with custom inline comparison.
+- Renamed `c_ARGSV()` => `c_SV()`: **csview** print arg. Note `c_sv()` is shorthand for *csview_from()*.
 - Support for [uppercase flow-control](include/stc/priv/altnames.h) macro names in ccommon.h.
+- Some API changes in **cregex** and **cstr**.
 - Create single header container versions with python script.
-- Some API changes in cregex and cstr.
 - [Previous changes for version 4](#version-4).
 
 Introduction
@@ -132,9 +133,9 @@ for lookup in containers. E.g. for containers with string type (**cstr**) elemen
 as lookup type. It will then use the input `const char*` directly when comparing with the string data in the
 container. This avoids the construction of a new `cstr` (which possible allocates memory) for the lookup. 
 Finally, destruction of the lookup key (i.e. string literal) after usage is not needed (or allowed), which 
-is convenient in C. A great ergonomic feature is that the alternative lookup type can also be used for adding
-entries into containers through using the *emplace*-functions. E.g. `MyCStrVec_emplace_back(&vec, "Hello")`.
-3. ***Standardized container iterators***. All container can be iterated the same way, and uses the
+is convenient in C. A great ergonomic feature is that the alternative lookup type can also be used when adding
+entries into containers through using the *emplace*-functions. E.g. `cvec_str_emplace_back(&vec, "Hello")`.
+3. ***Standardized container iterators***. All container can be iterated in similar manner, and uses the
 same element access syntax. E.g.:
     - `c_foreach (it, IntContainer, container) printf(" %d", *it.ref);` will work for
 every type of container defined as `IntContainer` with `int` elements. Also the form:
@@ -368,47 +369,50 @@ Each templated type requires one `#include`, even if it's the same container bas
 The template parameters are given by a `#define i_xxxx` statement, where *xxxx* is the parameter name.
 The list of template parameters:
 
-- `i_key`     - Element key type for map/set only. **[required]**.
-- `i_val`     - Element value type. **[required for]** cmap/csmap, it is the mapped value type.
-- `i_cmp`     - Three-way comparison of two *i_keyraw*\* or *i_valraw*\* - **[required for]** non-integral *i_keyraw* elements unless *i_opt* is defined with *c_no_cmp*.
-- `i_hash`    - Hash function taking *i_keyraw*\* - defaults to *c_default_hash*. **[required for]** ***cmap/cset*** with non-POD *i_keyraw* elements.
-- `i_eq`      - Equality comparison of two *i_keyraw*\* - defaults to *!i_cmp*. Companion with *i_hash*.
+- `i_key` *Type* - Element key type for map/set only. **[required]**.
+- `i_val` *Type* - Element value type. **[required for]** cmap/csmap, it is the mapped value type.
+- `i_cmp` *Func* - Three-way comparison of two *i_keyraw*\* or *i_valraw*\* - **[required for]** non-integral *i_keyraw* elements unless *i_opt* is defined with *c_no_cmp*.
+- `i_hash` *Func* - Hash function taking *i_keyraw*\* - defaults to *c_default_hash*. **[required for]** ***cmap/cset*** with non-POD *i_keyraw* elements.
+- `i_eq` *Func* - Equality comparison of two *i_keyraw*\* - defaults to *!i_cmp*. Companion with *i_hash*.
 
 Properties:
-- `i_tag`     - Container type name tag. Defaults to *i_key* name.
-- `i_type`    - Full container type name. Alternative to *i_tag*.
-- `i_opt`     - Boolean properties: may combine *c_no_cmp*, *c_no_clone*, *c_no_atomic*, *c_is_forward*, *c_static*, *c_header* with the *|* separator.
+- `i_tag` *Name* - Container type name tag. Defaults to *i_key* name.
+- `i_type` *Name* - Full container type name. Alternative to *i_tag*.
+- `i_opt` *Flags* - Boolean properties: may combine *c_no_cmp*, *c_no_clone*, *c_no_atomic*, *c_is_forward*, *c_static*, *c_header* with the *|* separator.
 
 Key:
-- `i_keydrop` - Destroy map/set key func - defaults to empty destructor.
-- `i_keyclone` - **[required if]** *i_keydrop* is defined (exception for **carc**, as it shares).
-- `i_keyraw`  - Convertion "raw" type - defaults to *i_key*.
-- `i_keyfrom` - Convertion func *i_key* <- *i_keyraw*. 
-- `i_keyto`   - Convertion func *i_key*\* -> *i_keyraw*. **[required if]** *i_keyraw* is defined
+- `i_keydrop` *Func* - Destroy map/set key func - defaults to empty destructor.
+- `i_keyclone` *Func* - **[required if]** *i_keydrop* is defined (exception for **carc**, as it shares).
+- `i_keyraw` *Type* - Convertion "raw" type - defaults to *i_key*.
+- `i_keyfrom` *Func* - Convertion func *i_key* <= *i_keyraw*. 
+- `i_keyto` *Func*  - Convertion func *i_key*\* => *i_keyraw*. **[required if]** *i_keyraw* is defined
 
 Val:
-- `i_valdrop` - Destroy mapped or value func - defaults to empty destruct.
-- `i_valclone` - **[required if]** *i_valdrop* is defined. 
-- `i_valraw`  - Convertion "raw" type - defaults to *i_val*.
-- `i_valfrom` - Convertion func *i_val* <- *i_valraw*.
-- `i_valto`   - Convertion func *i_val*\* -> *i_valraw*.
+- `i_valdrop` *Func* - Destroy mapped or value func - defaults to empty destruct.
+- `i_valclone` *Func* - **[required if]** *i_valdrop* is defined. 
+- `i_valraw` *Type*  - Convertion "raw" type - defaults to *i_val*.
+- `i_valfrom` *Func* - Convertion func *i_val* <= *i_valraw*.
+- `i_valto` *Func* - Convertion func *i_val*\* => *i_valraw*.
 
-Specials (meta-template parameters):
-- `i_keyclass TYPE` - Auto-binds to standard named functions: *TYPE_clone()*, *TYPE_drop()*, *TYPE_cmp()*, *TYPE_eq()*, *TYPE_hash()*. If `i_keyraw` is defined, function *TYPE_toraw()* is bound to `i_keyto`, and *TYPE_from()* binds to `i_keyfrom`. Only functions required by the container type needs to be defined. E.g.:
-    - *TYPE_hash()* and *TYPE_eq()* are only required by **cmap**, **cset** and smart pointers.
-    - *TYPE_cmp()* is not used by **cstack** and **cmap/cset**, or if *#define i_opt c_no_cmp* is specified.
-    - *TYPE_clone()* is not used by if *#define i_opt c_no_clone* is specified.
-- `i_key_str` - Defines *i_keyclass = cstr*, *i_tag = str*, and *i_keyraw = const char*\*. Defines type convertion 
-*i_keyfrom/i_keyto*, and *i_cmp*, *i_eq*, *i_hash*, *i_keydrop* functions using *const char*\* as input.
-- `i_key_ssv` - Defines *i_keyclass = cstr*, *i_tag = ssv*, and *i_keyraw = csview*. Defines type convertion 
-*i_keyfrom/i_keyto* and *i_cmp*, *i_eq*, *i_hash*, *i_keydrop* functions using *csview* as input.
-- `i_keyboxed TYPE` - Use when TYPE is a smart pointer **carc** or **cbox**. Defines *i_keyclass = TYPE*, and *i_keyraw = TYPE\**. NB: Do not use when defining carc/cbox types themselves.
-- `i_valclass`, `i_val_str`, `i_val_ssv`, `i_valboxed` - Similar rules as for ***key***.
+Specials: Meta-template parameters. Use instead of `i_key` / `i_val`.
+- `i_keyclass` *Type* - Auto-set standard named functions: *Type_clone()*, *Type_drop()*, *Type_cmp()*, *Type_eq()*, *Type_hash()*.
+If `i_keyraw` is defined, it sets `i_keyto` = *Type_toraw()* and `i_keyfrom` = *Type_from()*.
+Only functions required by the container type is required to be defined. E.g.:
+    - *Type_hash()* and *Type_eq()* are only required by **cmap**, **cset** and smart pointers.
+    - *Type_cmp()* is not used by **cstack** and **cmap/cset**, or if *#define i_opt c_no_cmp* is specified.
+    - *Type_clone()* is not used if *#define i_opt c_no_clone* is specified.
+- `i_key_str` - Sets `i_keyclass` = *cstr*, `i_tag` = *str*, and `i_keyraw` = *const char*\*. Defines both type convertion 
+`i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *const char\*\** as argument.
+- `i_key_ssv` - Sets `i_keyclass` = *cstr*, `i_tag` = *ssv*, and `i_keyraw` = *csview\**. Defines both type convertion 
+`i_keyfrom`, `i_keyto`, and sets `i_cmp`, `i_eq`, `i_hash` functions with *csview\** as argument.
+- `i_keyboxed` *Type* - Use when *Type* is a smart pointer **carc** or **cbox**. Defines *i_keyclass = Type*, and *i_keyraw = Type\**.
+NB: Do not use when defining carc/cbox types themselves.
+- `i_valclass` *Type*, `i_val_str`, `i_val_ssv`, `i_valboxed` - Similar rules as for ***key***.
 
 **Notes**:
 - Instead of defining `i_cmp`, you may define *i_opt c_no_cmp* to disable *searching and sorting* functions.
 - Instead of defining `i_*clone`, you may define *i_opt c_no_clone* to disable *clone* functionality.
-- For `i_keyclass`, if *i_keyraw RAWTYPE* is defined along with it, *i_keyfrom* may also be defined to enable the *emplace*-functions. NB: the signature for ***cmp***, ***eq***, and ***hash*** uses *RAWTYPE* as input.
+- For `i_keyclass`, if *i_keyraw* is defined along with it, *i_keyfrom* may also be defined to enable the *emplace*-functions. NB: the signature for ***cmp***, ***eq***, and ***hash*** uses *i_keyraw* as input.
 
 The *emplace* versus non-emplace container methods
 --------------------------------------------------

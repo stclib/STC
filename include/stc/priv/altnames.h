@@ -35,5 +35,4 @@
 #define c_DEFER c_defer
 #define c_NEW c_new
 #define c_ARRAYLEN c_arraylen
-#define c_ARGSV c_SVARG
-#define c_sv c_SV
+#define c_ARGSV c_SV // [deprecated]

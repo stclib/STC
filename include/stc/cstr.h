@@ -181,10 +181,10 @@ STC_INLINE cstr cstr_toupper_sv(csview sv)
     { return cstr_tocase(sv, 2); }
 
 STC_INLINE cstr cstr_tolower(const char* str) 
-    { return cstr_tolower_sv(c_SV(str, c_strlen(str))); }
+    { return cstr_tolower_sv(c_sv(str, c_strlen(str))); }
 
 STC_INLINE cstr cstr_toupper(const char* str) 
-    { return cstr_toupper_sv(c_SV(str, c_strlen(str))); }
+    { return cstr_toupper_sv(c_sv(str, c_strlen(str))); }
 
 STC_INLINE void cstr_lowercase(cstr* self) 
     { cstr_take(self, cstr_tolower_sv(cstr_sv(self))); }
@@ -316,7 +316,7 @@ STC_INLINE bool cstr_starts_with_s(const cstr* self, cstr sub)
 STC_INLINE bool cstr_istarts_with(const cstr* self, const char* sub) {
     csview sv = cstr_sv(self);
     intptr_t len = c_strlen(sub);
-    return len <= sv.size && !utf8_icmp_sv(sv, c_SV(sub, len));
+    return len <= sv.size && !utf8_icmp_sv(sv, c_sv(sub, len));
 }
 
 
@@ -330,7 +330,7 @@ STC_INLINE bool cstr_ends_with_s(const cstr* self, cstr sub)
     { return cstr_ends_with_sv(self, cstr_sv(&sub)); }
 
 STC_INLINE bool cstr_ends_with(const cstr* self, const char* sub)
-    { return cstr_ends_with_sv(self, c_SV(sub, c_strlen(sub))); }
+    { return cstr_ends_with_sv(self, c_sv(sub, c_strlen(sub))); }
 
 STC_INLINE bool cstr_iends_with(const cstr* self, const char* sub) {
     csview sv = cstr_sv(self); 
@@ -375,8 +375,8 @@ STC_INLINE char* cstr_append_s(cstr* self, cstr s) {
 #define cstr_replace(...) c_MACRO_OVERLOAD(cstr_replace, __VA_ARGS__)
 #define cstr_replace_3(self, search, repl) cstr_replace_4(self, search, repl, INT32_MAX)
 STC_INLINE void cstr_replace_4(cstr* self, const char* search, const char* repl, int32_t count) {
-    cstr_take(self, cstr_replace_sv(cstr_sv(self), c_SV(search, c_strlen(search)),
-                                                   c_SV(repl, c_strlen(repl)), count));
+    cstr_take(self, cstr_replace_sv(cstr_sv(self), c_sv(search, c_strlen(search)),
+                                                   c_sv(repl, c_strlen(repl)), count));
 }
 
 STC_INLINE void cstr_replace_at_sv(cstr* self, intptr_t pos, intptr_t len, const csview repl) {
@@ -385,7 +385,7 @@ STC_INLINE void cstr_replace_at_sv(cstr* self, intptr_t pos, intptr_t len, const
 }
 
 STC_INLINE void cstr_replace_at(cstr* self, intptr_t pos, intptr_t len, const char* repl)
-    { cstr_replace_at_sv(self, pos, len, c_SV(repl, c_strlen(repl))); }
+    { cstr_replace_at_sv(self, pos, len, c_sv(repl, c_strlen(repl))); }
 
 STC_INLINE void cstr_replace_at_s(cstr* self, intptr_t pos, intptr_t len, cstr repl)
     { cstr_replace_at_sv(self, pos, len, cstr_sv(&repl)); }
@@ -395,7 +395,7 @@ STC_INLINE void cstr_u8_replace_at(cstr* self, intptr_t bytepos, intptr_t u8len,
 
 
 STC_INLINE void cstr_insert(cstr* self, intptr_t pos, const char* str)
-    { cstr_replace_at_sv(self, pos, 0, c_SV(str, c_strlen(str))); }
+    { cstr_replace_at_sv(self, pos, 0, c_sv(str, c_strlen(str))); }
 
 STC_INLINE void cstr_insert_sv(cstr* self, intptr_t pos, csview sv)
     { cstr_replace_at_sv(self, pos, 0, sv); }
