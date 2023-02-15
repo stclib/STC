@@ -75,9 +75,11 @@ typedef struct { int64_t idx; uint8_t hx; } chash_bucket_t;
 #endif
 #ifndef i_ssize
   #define i_ssize int32_t
+  #define _i_size intptr_t
   #define _i_expandby 1
 #else
   #define _i_expandby 2
+  #define _i_size i_ssize
 #endif
 #include "priv/template.h"
 #ifndef i_hash_functor
@@ -102,13 +104,13 @@ typedef _i_SET_ONLY( i_keyraw )
                               i_valraw second; } )
 _cx_raw;
 
-STC_API _cx_self        _cx_memb(_with_capacity)(int64_t cap);
+STC_API _cx_self        _cx_memb(_with_capacity)(_i_size cap);
 #if !defined i_no_clone
 STC_API _cx_self        _cx_memb(_clone)(_cx_self map);
 #endif
 STC_API void            _cx_memb(_drop)(_cx_self* self);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
-STC_API bool            _cx_memb(_reserve)(_cx_self* self, int64_t capacity);
+STC_API bool            _cx_memb(_reserve)(_cx_self* self, _i_size capacity);
 STC_API chash_bucket_t  _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr);
 STC_API _cx_result      _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey);
 STC_API void            _cx_memb(_erase_entry)(_cx_self* self, _cx_value* val);
@@ -117,17 +119,22 @@ STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_LITERAL(_cx_self){0}; }
 STC_INLINE void         _cx_memb(_shrink_to_fit)(_cx_self* self) { _cx_memb(_reserve)(self, self->size); }
 STC_INLINE float        _cx_memb(_max_load_factor)(const _cx_self* self) { return (float)(i_max_load_factor); }
 STC_INLINE bool         _cx_memb(_empty)(const _cx_self* map) { return !map->size; }
-STC_INLINE int64_t      _cx_memb(_size)(const _cx_self* map) { return map->size; }
-STC_INLINE int64_t      _cx_memb(_bucket_count)(_cx_self* map) { return map->bucket_count; }
-STC_INLINE int64_t      _cx_memb(_capacity)(const _cx_self* map)
-                            { return (int64_t)((float)map->bucket_count * (i_max_load_factor)); }
+STC_INLINE _i_size      _cx_memb(_size)(const _cx_self* map) { return map->size; }
+STC_INLINE _i_size      _cx_memb(_bucket_count)(_cx_self* map) { return map->bucket_count; }
+STC_INLINE _i_size      _cx_memb(_capacity)(const _cx_self* map)
+                            { return (_i_size)((float)map->bucket_count * (i_max_load_factor)); }
 STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, _cx_rawkey rkey)
                             { return self->size && self->_hashx[_cx_memb(_bucket_)(self, &rkey).idx]; }
 
 #ifndef _i_isset
-    STC_API _cx_result  _cx_memb(_insert_or_assign)(_cx_self* self, i_key _key, i_val _mapped);
+    STC_API _cx_result _cx_memb(_insert_or_assign)(_cx_self* self, i_key key, i_val mapped);
     #if !defined i_no_emplace
-    STC_API _cx_result  _cx_memb(_emplace_or_assign)(_cx_self* self, _cx_rawkey rkey, i_valraw rmapped);
+        STC_API _cx_result  _cx_memb(_emplace_or_assign)(_cx_self* self, _cx_rawkey rkey, i_valraw rmapped);
+        STC_INLINE _cx_result _cx_memb(_put)(_cx_self* self, _cx_rawkey rkey, i_valraw rmapped)
+            { return _cx_memb(_emplace_or_assign)(self, rkey, rmapped); }
+    #else
+        STC_INLINE _cx_result _cx_memb(_put)(_cx_self* self, i_key key, i_val mapped)
+            { return _cx_memb(_insert_or_assign)(self, key, mapped); }
     #endif
 
     STC_INLINE const _cx_mapped*
@@ -201,7 +208,7 @@ _cx_memb(_push)(_cx_self* self, _cx_value _val) {
     return _res;
 }
 
-STC_INLINE void _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, int64_t n) {
+STC_INLINE void _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, _i_size n) {
     while (n--) 
 #if defined _i_isset && defined i_no_emplace
         _cx_memb(_insert)(self, *raw++);
@@ -214,7 +221,7 @@ STC_INLINE void _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, int64_t n) 
 #endif
 }
 
-STC_INLINE _cx_self _cx_memb(_from_n)(const _cx_raw* raw, int64_t n)
+STC_INLINE _cx_self _cx_memb(_from_n)(const _cx_raw* raw, _i_size n)
     { _cx_self cx = {0}; _cx_memb(_put_n)(&cx, raw, n); return cx; }
 
 STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) {
@@ -237,7 +244,7 @@ _cx_memb(_next)(_cx_iter* it) {
 }
 
 STC_INLINE _cx_iter
-_cx_memb(_advance)(_cx_iter it, uint64_t n) {
+_cx_memb(_advance)(_cx_iter it, size_t n) {
     while (n-- && it.ref) _cx_memb(_next)(&it);
     return it;
 }
@@ -300,7 +307,7 @@ STC_INLINE uint64_t next_power_of_2(uint64_t n) {
 #endif // CMAP_H_INCLUDED
 
 STC_DEF _cx_self
-_cx_memb(_with_capacity)(const int64_t cap) {
+_cx_memb(_with_capacity)(const _i_size cap) {
     _cx_self h = {0};
     _cx_memb(_reserve)(&h, cap);
     return h;
@@ -411,7 +418,7 @@ _cx_memb(_clone)(_cx_self m) {
 #endif
 
 STC_DEF bool
-_cx_memb(_reserve)(_cx_self* self, const int64_t newcap) {
+_cx_memb(_reserve)(_cx_self* self, const _i_size newcap) {
     const i_ssize _oldbuckets = self->bucket_count, _newcap = (i_ssize)newcap;
     if (_newcap != self->size && _newcap <= _oldbuckets)
         return true;
@@ -469,6 +476,7 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
 #undef i_max_load_factor
 #undef i_hash_functor
 #undef i_eq_functor
+#undef _i_size
 #undef _i_isset
 #undef _i_ismap
 #undef _i_ishash

@@ -5,16 +5,16 @@ import numpy as np
 _UNICODE_DIR = "https://www.unicode.org/Public/15.0.0/ucd"
 
 
-def read_unidata(casetype='lowcase', category='Lu', range32=False):
+def read_unidata(casetype='lowcase', category='Lu', bitrange=16):
     df = pd.read_csv(_UNICODE_DIR+'/UnicodeData.txt', sep=';', converters={0: lambda x: int(x, base=16)},
                       names=['code', 'name', 'category', 'canclass', 'bidircat', 'chrdecomp',
                              'decdig', 'digval', 'numval', 'mirrored', 'uc1name', 'comment',
                              'upcase', 'lowcase', 'titlecase'],
                       usecols=['code', 'name', 'category', 'bidircat', 'upcase', 'lowcase', 'titlecase'])
-    if range32:
-        df = df[df['code'] >= (1<<16)]
-    else:
+    if bitrange == 16:
         df = df[df['code'] < (1<<16)]
+    else:
+        df = df[df['code'] >= (1<<16)]
     
     if category:
         df = df[df['category'] == category]
@@ -27,14 +27,14 @@ def read_unidata(casetype='lowcase', category='Lu', range32=False):
     return df
 
 
-def read_casefold(range32=False):
+def read_casefold(bitrange):
     df = pd.read_csv(_UNICODE_DIR+'/CaseFolding.txt', engine='python', sep='; #? ?', comment='#',
                      converters={0: lambda x: int(x, base=16)},
                      names=['code', 'status', 'lowcase', 'name']) # comment => 'name'
-    if range32:
-        df = df[df['code'] >= (1<<16)]
-    else:
+    if bitrange == 16:
         df = df[df['code'] < (1<<16)]
+    else:
+        df = df[df['code'] >= (1<<16)]
 
     df = df[df.status.isin(['S', 'C'])]
     df['lowcase'] = df['lowcase'].apply(int, base=16)
@@ -75,8 +75,11 @@ def make_table(caselist):
     return table
 
 
-def print_table(name, table, style=1):
-    print('static struct CaseMapping %s[] = {' % (name))
+def print_table(name, table, style=1, bitrange=16):
+    r32 = '32' if bitrange == 32 else ''
+    print('#include <stdint.h>\n')
+    print('struct CaseMapping%d { uint%d_t c1, c2, m2; };\n' % (bitrange, bitrange))
+    print('static struct CaseMapping%s %s%s[] = {' % (r32, name, r32))
     for a,b,c,t in table:
         if style == 1:   # first char with name
             d = b - a + 1 if abs(c - b) != 1 else (b - a)/2 + 1
@@ -100,24 +103,22 @@ def print_index_table(name, indtab):
     print('\n};')
 
 
-def compile_table(casetype='lowcase', category=None, range32=False):
+def compile_table(casetype='lowcase', category=None, bitrange=16):
     if category:
-        df = read_unidata(casetype, category, range32)
+        df = read_unidata(casetype, category, bitrange)
     else:
-        df = read_casefold(range32)
+        df = read_casefold(bitrange)
     caselist = make_caselist(df, casetype)
     table = make_table(caselist)
     return table
 
 
 def main():
-    print('#include <stdint.h>\n')
-    print('struct CaseMapping { uint16_t c1, c2, m2; };\n')
-    range32 = False
+    bitrange = 32
 
-    casemappings = compile_table('lowcase', None, range32) # CaseFolding.txt
-    upcase       = compile_table('lowcase', 'Lu', range32) # UnicodeData.txt uppercase
-    lowcase      = compile_table('upcase', 'Ll', range32) # UnicodeData.txt lowercase
+    casemappings = compile_table('lowcase', None, bitrange) # CaseFolding.txt
+    upcase       = compile_table('lowcase', 'Lu', bitrange) # UnicodeData.txt uppercase
+    lowcase      = compile_table('upcase', 'Ll', bitrange) # UnicodeData.txt lowercase
 
     casefolding_len = len(casemappings)
 
@@ -143,7 +144,7 @@ def main():
             lowcase_ind.append(len(casemappings))
             casemappings.append(v)
 
-    print_table('casemappings', casemappings, style=1)
+    print_table('casemappings', casemappings, style=1, bitrange=bitrange)
     print('enum { casefold_len = %d };' % casefolding_len)
 
     # upcase => low
@@ -151,7 +152,7 @@ def main():
     print_index_table('upcase_ind', upcase_ind)
 
     # lowcase => up. add "missing" SHARP S caused by https://www.unicode.org/policies/stability_policy.html#Case_Pair
-    if not range32:
+    if bitrange == 16:
         lowcase_ind.append(next(i for i,x in enumerate(casemappings) if x[0]==ord('ẞ')))
     lowcase_ind.sort(key=lambda i: casemappings[i][2] - (casemappings[i][1] - casemappings[i][0]))         
     print_index_table('lowcase_ind', lowcase_ind)
