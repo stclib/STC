@@ -128,7 +128,6 @@
 #elif defined i_keyboxed
   #define i_keyclass i_keyboxed
   #define i_rawclass c_PASTE(i_keyboxed, _raw)
-  #define i_keyfrom c_PASTE(i_keyboxed, _from)
   #ifndef i_no_eq
     #define i_eq c_PASTE(i_keyboxed, _raw_eq)
   #endif
@@ -147,6 +146,9 @@
   #endif
   #if !defined i_keyto && defined i_keyraw
     #define i_keyto c_PASTE(i_key, _toraw)
+  #endif
+  #if !defined i_keyfrom && defined i_keyraw
+    #define i_keyfrom c_PASTE(i_key, _from)
   #endif
   #ifndef i_keydrop
     #define i_keydrop c_PASTE(i_key, _drop)
@@ -233,7 +235,6 @@
 #elif defined i_valboxed
   #define i_valclass i_valboxed
   #define i_valraw c_PASTE(i_valboxed, _raw)
-  #define i_valfrom c_PASTE(i_valboxed, _from)
 #endif
 
 #ifdef i_valclass
@@ -243,6 +244,9 @@
   #endif
   #if !defined i_valto && defined i_valraw
     #define i_valto c_PASTE(i_val, _toraw)
+  #endif
+  #if !defined i_valfrom && defined i_valraw
+    #define i_valfrom c_PASTE(i_val, _from)
   #endif
   #ifndef i_valdrop
     #define i_valdrop c_PASTE(i_val, _drop)

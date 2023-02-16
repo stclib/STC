@@ -130,11 +130,6 @@ STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, _cx_rawkey rke
     STC_API _cx_result _cx_memb(_insert_or_assign)(_cx_self* self, i_key key, i_val mapped);
     #if !defined i_no_emplace
         STC_API _cx_result  _cx_memb(_emplace_or_assign)(_cx_self* self, _cx_rawkey rkey, i_valraw rmapped);
-        STC_INLINE _cx_result _cx_memb(_put)(_cx_self* self, _cx_rawkey rkey, i_valraw rmapped)
-            { return _cx_memb(_emplace_or_assign)(self, rkey, rmapped); }
-    #else
-        STC_INLINE _cx_result _cx_memb(_put)(_cx_self* self, i_key key, i_val mapped)
-            { return _cx_memb(_insert_or_assign)(self, key, mapped); }
     #endif
 
     STC_INLINE const _cx_mapped*

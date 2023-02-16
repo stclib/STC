@@ -69,13 +69,13 @@ STC_API char* _cstr_internal_move(cstr* self, intptr_t pos1, intptr_t pos2);
 
 /**************************** PUBLIC API **********************************/
 
-#define cstr_lit(literal) cstr_from_n(literal, crawstr_len(literal))
+#define cstr_lit(literal) cstr_from_n(literal, c_litstrlen(literal))
 #define cstr_NULL (c_LITERAL(cstr){{{0}, 0}})
 #define cstr_toraw(self) cstr_str(self)
 
 STC_API char*       cstr_reserve(cstr* self, intptr_t cap);
 STC_API void        cstr_shrink_to_fit(cstr* self);
-STC_API void        cstr_resize(cstr* self, intptr_t size, char value);
+STC_API char*       cstr_resize(cstr* self, intptr_t size, char value);
 STC_API intptr_t    cstr_find_at(const cstr* self, intptr_t pos, const char* search);
 STC_API char*       cstr_assign_n(cstr* self, const char* str, intptr_t len);
 STC_API char*       cstr_append_n(cstr* self, const char* str, intptr_t len);
@@ -514,13 +514,15 @@ STC_DEF char* cstr_reserve(cstr* self, const intptr_t cap) {
     return self->sml.data;
 }
 
-STC_DEF void cstr_resize(cstr* self, const intptr_t size, const char value) {
+STC_DEF char* cstr_resize(cstr* self, const intptr_t size, const char value) {
     cstr_buf r = cstr_buffer(self);
     if (size > r.size) {
-        if (size > r.cap) r.data = cstr_reserve(self, size);
+        if (size > r.cap && !(r.data = cstr_reserve(self, size)))
+            return NULL;
         c_memset(r.data + r.size, value, size - r.size);
     }
     _cstr_set_size(self, size);
+    return r.data;
 }
 
 STC_DEF intptr_t cstr_find_at(const cstr* self, const intptr_t pos, const char* search) {
@@ -532,8 +534,7 @@ STC_DEF intptr_t cstr_find_at(const cstr* self, const intptr_t pos, const char* 
 
 STC_DEF char* cstr_assign_n(cstr* self, const char* str, const intptr_t len) {
     char* d = cstr_reserve(self, len);
-    c_memmove(d, str, len);
-    _cstr_set_size(self, len);
+    if (d) { c_memmove(d, str, len); _cstr_set_size(self, len); }
     return d;
 }
 
@@ -542,6 +543,7 @@ STC_DEF char* cstr_append_n(cstr* self, const char* str, const intptr_t len) {
     if (r.size + len > r.cap) {
         const size_t off = (size_t)(str - r.data);
         r.data = cstr_reserve(self, r.size*3/2 + len);
+        if (!r.data) return NULL;
         if (off <= (size_t)r.size) str = r.data + off; /* handle self append */
     }
     c_memcpy(r.data + r.size, str, len);

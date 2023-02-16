@@ -121,16 +121,16 @@
 
 #define c_make(C, ...) \
   C##_from_n((C##_raw[])__VA_ARGS__, c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
-#define c_arraylen(a) \
-  (intptr_t)(sizeof(a)/sizeof 0[a])
+
+#define c_arraylen(a) (intptr_t)(sizeof(a)/sizeof 0[a])
+#define c_litstrlen(literal) (c_sizeof("" literal) - 1)
 
 typedef const char* crawstr;
 #define crawstr_cmp(xp, yp) strcmp(*(xp), *(yp))
 #define crawstr_hash(p) cstrhash(*(p))
-#define crawstr_len(literal) (c_sizeof("" literal) - 1)
 
 #define c_sv(...) c_MACRO_OVERLOAD(c_sv, __VA_ARGS__)
-#define c_sv_1(lit) c_sv_2(lit, crawstr_len(lit))
+#define c_sv_1(lit) c_sv_2(lit, c_litstrlen(lit))
 #define c_sv_2(str, n) (c_LITERAL(csview){str, n})
 
 #define c_SV(sv) (int)(sv).size, (sv).str // print csview: use format "%.*s"

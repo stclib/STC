@@ -35,7 +35,7 @@ int main()
         }
 
         c_foreach (i, Outer, outer)
-            Inner_push_node_back(&inner, i.ref);
+            Inner_push_back_node(&inner, i.ref);
 
         printLists(inner, outer);
 
@@ -48,7 +48,7 @@ int main()
 
         c_foreach (i, Inner, inner)
             if (*i.ref & 1)
-                Inner_unlink_node_after(&inner, i.prev);
+                Inner_unlink_after_node(&inner, i.prev);
 
         printLists(inner, outer);
     }
