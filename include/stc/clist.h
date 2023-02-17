@@ -68,6 +68,8 @@
     
 _c_clist_types(clist_VOID, int);
 _c_clist_complete_types(clist_VOID, dummy);
+typedef int clist_VOID_comp(const clist_VOID_node*, const clist_VOID_node*);
+extern clist_VOID_node* _clist_mergesort(clist_VOID_node*, clist_VOID_comp*);
 
 #define _c_clist_insert_entry_after(ref, val) \
     _cx_node *entry = (_cx_node *)i_malloc(c_sizeof *entry); entry->value = val; \
@@ -100,8 +102,7 @@ STC_API _cx_iter        _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx
 #if !defined i_no_cmp
 STC_API intptr_t        _cx_memb(_remove)(_cx_self* self, _cx_raw val);
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw val);
-STC_API int             _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y);
-STC_API int             _cx_memb(_sort_cmp_)(const clist_VOID_node* x, const clist_VOID_node* y);
+STC_API int             _cx_memb(_sort_cmp_)(const _cx_node* x, const _cx_node* y);
 #endif
 STC_API void            _cx_memb(_reverse)(_cx_self* self);
 STC_API _cx_iter        _cx_memb(_splice)(_cx_self* self, _cx_iter it, _cx_self* other);
@@ -205,11 +206,15 @@ _cx_memb(_get_mut)(_cx_self* self, _cx_raw val) {
 
 STC_INLINE void
 _cx_memb(_sort)(_cx_self* self) {
-    extern clist_VOID_node*
-    _clist_mergesort(clist_VOID_node *list, int (*cmp)(const clist_VOID_node*, const clist_VOID_node*));
-
     if (self->last)
-        self->last = (_cx_node *)_clist_mergesort((clist_VOID_node *)self->last->next, _cx_memb(_sort_cmp_));
+        self->last = (_cx_node *)_clist_mergesort((clist_VOID_node *)self->last->next, 
+                                                  (clist_VOID_comp *)_cx_memb(_sort_cmp_));
+}
+STC_INLINE void
+_cx_memb(_sort_with)(_cx_self* self, int(*cmp)(const _cx_node*, const _cx_node*)) {
+    if (self->last)
+        self->last = (_cx_node *)_clist_mergesort((clist_VOID_node *)self->last->next, 
+                                                  (clist_VOID_comp *)cmp);
 }
 #endif
 
@@ -218,7 +223,7 @@ _cx_memb(_sort)(_cx_self* self) {
 // Singly linked list Mergesort implementation by Simon Tatham. O(n*log n).
 // https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
 clist_VOID_node *
-_clist_mergesort(clist_VOID_node *list, int (*cmp)(const clist_VOID_node*, const clist_VOID_node*)) {
+_clist_mergesort(clist_VOID_node *list, clist_VOID_comp* cmp) {
     clist_VOID_node *p, *q, *e, *tail, *oldhead;
     int insize = 1, nmerges, psize, qsize, i;
 
@@ -237,14 +242,8 @@ _clist_mergesort(clist_VOID_node *list, int (*cmp)(const clist_VOID_node*, const
             }
             qsize = insize;
 
-            while (psize > 0 || (qsize > 0 && q)) {
-                if (psize == 0) {
-                    e = q, q = q->next, --qsize;
-                    if (q == oldhead) q = NULL;
-                } else if (qsize == 0 || !q) {
-                    e = p, p = p->next, --psize;
-                    if (p == oldhead) p = NULL;
-                } else if (cmp(p, q) <= 0) {
+            while (psize || (qsize && q)) {
+                if (psize && (!(qsize && q) || cmp(p, q) <= 0)) {
                     e = p, p = p->next, --psize;
                     if (p == oldhead) p = NULL;
                 } else {
@@ -431,17 +430,10 @@ _cx_memb(_remove)(_cx_self* self, _cx_raw val) {
 }
 
 STC_DEF int
-_cx_memb(_sort_cmp_)(const clist_VOID_node* x, const clist_VOID_node* y) {
-    const _cx_raw a = i_keyto((&((const _cx_node *) x)->value));
-    const _cx_raw b = i_keyto((&((const _cx_node *) y)->value));
+_cx_memb(_sort_cmp_)(const _cx_node* x, const _cx_node* y) {
+    const _cx_raw a = i_keyto((&x->value));
+    const _cx_raw b = i_keyto((&y->value));
     return i_cmp((&a), (&b));
-}
-
-STC_DEF int
-_cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
-    const _cx_raw rx = i_keyto(x);
-    const _cx_raw ry = i_keyto(y);
-    return i_cmp((&rx), (&ry));
 }
 #endif // !c_no_cmp
 #endif // i_implement

@@ -8,7 +8,7 @@
 #include <stc/crandom.h>
 
 int main() {
-    const int n = 2000000;
+    const int n = 1000000;
 
     c_auto (clist_fx, list)
     {
@@ -29,6 +29,12 @@ int main() {
         puts("sort");
         clist_fx_sort(&list); // mergesort O(n*log n)
         puts("sorted");
+
+        int last = 0;
+        c_foreach (i, clist_fx, list) {
+            if (*i.ref < last) {printf("ERROR"); exit(-1);}
+            last = *i.ref;
+        }
 
         c_forwhile (i, clist_fx, clist_fx_begin(&list), i.index < 10)
             printf("%8d: %10f\n", (int)i.index, *i.ref);
