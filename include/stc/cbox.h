@@ -70,6 +70,9 @@ int main() {
 #ifndef _i_prefix
 #define _i_prefix cbox_
 #endif
+#ifdef i_eq
+#define _i_eq
+#endif
 #include "priv/template.h"
 typedef i_keyraw _cx_raw;
 
@@ -166,7 +169,7 @@ STC_INLINE int _cx_memb(_cmp)(const _cx_self* x, const _cx_self* y) {
 }
 #endif
 
-#ifndef i_no_eq
+#ifdef _i_eq
 STC_INLINE bool _cx_memb(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
     { return i_eq(rx, ry); }
 
@@ -174,6 +177,12 @@ STC_INLINE bool _cx_memb(_eq)(const _cx_self* x, const _cx_self* y) {
     _cx_raw rx = i_keyto(x->get), ry = i_keyto(y->get);
     return i_eq((&rx), (&ry));
 }
+#elif !defined i_no_cmp
+STC_INLINE bool _cx_memb(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
+    { return i_cmp(rx, ry) == 0; }
+
+STC_INLINE bool _cx_memb(_eq)(const _cx_self* x, const _cx_self* y)
+    { return _cx_memb(_cmp)(x, y) == 0; }
 #endif
 
 #ifndef i_no_hash
@@ -184,4 +193,5 @@ STC_INLINE uint64_t _cx_memb(_hash)(const _cx_self* x)
     { _cx_raw rx = i_keyto(x->get); return i_hash((&rx)); }
 #endif
 
+#undef _i_eq
 #include "priv/template.h"

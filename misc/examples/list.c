@@ -30,7 +30,7 @@ int main() {
         clist_fx_sort(&list); // mergesort O(n*log n)
         puts("sorted");
 
-        int last = 0;
+        double last = 0;
         c_foreach (i, clist_fx, list) {
             if (*i.ref < last) {printf("ERROR"); exit(-1);}
             last = *i.ref;

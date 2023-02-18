@@ -11,6 +11,8 @@ typedef struct
 int Song_cmp(const Song* x, const Song* y)
     { return cstr_cmp(&x->title, &y->title); }
 
+uint64_t Song_hash(const Song* x) { return cstr_hash(&x->title); }
+
 Song Song_make(const char* artist, const char* title)
     { return (Song){cstr_from(artist), cstr_from(title)}; }
 
@@ -22,7 +24,7 @@ void Song_drop(Song* s) {
 // Define the reference counted type
 #define i_type SongArc
 #define i_valclass Song
-#define i_opt c_no_hash
+//#define i_opt c_no_hash
 #include <stc/carc.h>
 
 // ... and a vector of it
