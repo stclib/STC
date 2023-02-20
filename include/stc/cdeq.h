@@ -52,6 +52,7 @@ STC_INLINE void         _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, int
                             { while (n--) _cx_memb(_push)(self, i_keyfrom(*raw++)); }
 STC_INLINE _cx_self     _cx_memb(_from_n)(const _cx_raw* raw, intptr_t n)
                             { _cx_self cx = {0}; _cx_memb(_put_n)(&cx, raw, n); return cx; }
+STC_INLINE void         _cx_memb(_value_drop)(_cx_value* val) { i_keydrop(val); }
 #if !defined _i_queue
 #if !defined i_no_emplace
 STC_API _cx_iter        _cx_memb(_emplace_range)(_cx_self* self, _cx_value* pos,

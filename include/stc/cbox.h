@@ -145,18 +145,18 @@ STC_INLINE _cx_self _cx_memb(_from)(_cx_value val)
     }
 #endif // !i_no_clone
 
+// take ownership of unowned
 STC_INLINE void _cx_memb(_take)(_cx_self* self, _cx_self unowned) {
-    if (unowned.get != self->get)
-        _cx_memb(_drop)(self);
+    _cx_memb(_drop)(self);
     *self = unowned;
 }
-/* transfer ownership; set dying to NULL */
-STC_INLINE void _cx_memb(_assign)(_cx_self* self, _cx_self* dying) {
-    if (dying->get == self->get)
+// transfer ownership from moved; set moved to NULL
+STC_INLINE void _cx_memb(_assign)(_cx_self* self, _cx_self* moved) {
+    if (moved->get == self->get)
         return;
     _cx_memb(_drop)(self);
-    *self = *dying;
-    dying->get = NULL;
+    *self = *moved;
+    moved->get = NULL;
 }
 
 #ifndef i_no_cmp

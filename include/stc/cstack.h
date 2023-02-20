@@ -82,7 +82,6 @@ STC_INLINE void _cx_memb(_drop)(_cx_self* self) {
     i_free(self->data);
 #endif
 }
-
 STC_INLINE intptr_t _cx_memb(_size)(const _cx_self* self)
     { return self->_len; }
 
@@ -96,6 +95,8 @@ STC_INLINE intptr_t _cx_memb(_capacity)(const _cx_self* self) {
     return i_capacity;
 #endif
 }
+STC_INLINE void _cx_memb(_value_drop)(_cx_value* val)
+    { i_keydrop(val); }
 
 STC_INLINE bool _cx_memb(_reserve)(_cx_self* self, intptr_t n) {
     if (n < self->_len) return true;

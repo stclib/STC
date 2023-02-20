@@ -17,6 +17,7 @@ int main() {
         int m = 0;
         c_forrange (n)
             clist_fx_push_back(&list, stc64_uniformf(&rng, &dist)), ++m;
+
         double sum = 0.0;
         printf("sumarize %d:\n", m);
         c_foreach (i, clist_fx, list)
@@ -46,18 +47,21 @@ int main() {
 
         const double* v = clist_fx_get(&list, 30);
         printf("found: %f\n", *v);
-        c_foreach (i, clist_fx, list) printf(" %g", *i.ref);
+        c_foreach (i, clist_fx, list)
+            printf(" %g", *i.ref);
         puts("");
 
         clist_fx_remove(&list, 30);
         clist_fx_insert_at(&list, clist_fx_begin(&list), 5); // same as push_front()
         clist_fx_push_back(&list, 500);
         clist_fx_push_front(&list, 1964);
-        clist_fx_iter it = clist_fx_begin(&list);
+
         printf("Full: ");
         c_foreach (i, clist_fx, list)
             printf(" %g", *i.ref);
+
         printf("\nSubs: ");
+        clist_fx_iter it = clist_fx_begin(&list);
         c_foreach (i, clist_fx, clist_fx_advance(it, 4), clist_fx_end(&list))
             printf(" %g", *i.ref);
         puts("");

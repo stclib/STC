@@ -92,6 +92,7 @@ STC_API int             _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw raw);
 STC_API _cx_iter        _cx_memb(_binary_search_in)(_cx_iter it1, _cx_iter it2, _cx_raw raw, _cx_iter* lower_bound);
 #endif
+STC_INLINE void         _cx_memb(_value_drop)(_cx_value* val) { i_keydrop(val); }
 
 #if !defined i_no_emplace
 STC_API _cx_iter        _cx_memb(_emplace_range)(_cx_self* self, _cx_value* pos,
@@ -413,8 +414,7 @@ _cx_memb(_binary_search_in)(_cx_iter i1, _cx_iter i2, const _cx_raw raw,
     i1.ref = NULL; return i1;
 }
 
-STC_DEF int
-_cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
+STC_DEF int _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     const _cx_raw rx = i_keyto(x);
     const _cx_raw ry = i_keyto(y);
     return i_cmp((&rx), (&ry));

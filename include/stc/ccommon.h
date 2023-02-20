@@ -244,12 +244,24 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
     if (it.ref == _endref) it.ref = NULL; \
 } while (0)
 
+// use with: clist, cmap, cset, csmap, csset, cstr:
 #define c_erase_if(it, C, cnt, pred) do { \
-    C##_iter it = C##_begin(&cnt); \
-    for (intptr_t index = 0; it.ref; ++index) { \
-        if (pred) it = C##_erase_at(&cnt, it); \
+    C* _cnt = &cnt; \
+    for (C##_iter it = C##_begin(_cnt); it.ref;) { \
+        if (pred) it = C##_erase_at(_cnt, it); \
         else C##_next(&it); \
     } \
+} while (0)
+
+// use with: cstack, cvec, cdeq, cqueue:
+#define c_eraseremove_if(it, C, cnt, pred) do { \
+    C* _cnt = &cnt; \
+    intptr_t _n = 0; \
+    C##_iter _first = C##_begin(_cnt), it = _first; \
+    for (; it.ref; C##_next(&it)) \
+        if (pred) ++_n; \
+        else C##_value_drop(_first.ref), *_first.ref = *it.ref, C##_next(&_first); \
+    _cnt->_len -= _n; \
 } while (0)
 
 #endif // CCOMMON_H_INCLUDED

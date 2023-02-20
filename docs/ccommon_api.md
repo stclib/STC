@@ -94,26 +94,6 @@ int main()
 ```
 ## Loop abstraction macros
 
-### c_forlist
-Iterate compound literal array elements. Additional to `i.ref`, you can access `i.data`, `i.size`, and `i.index` of the input list/element.
-```c
-// apply multiple push_backs
-c_forlist (i, int, {1, 2, 3})
-    cvec_i_push_back(&vec, *i.ref);
-
-// insert in existing map
-c_forlist (i, cmap_ii_raw, { {4, 5}, {6, 7} })
-    cmap_ii_insert(&map, i.ref->first, i.ref->second);
-
-// string literals pushed to a stack of cstr:
-c_forlist (i, const char*, {"Hello", "crazy", "world"})
-    cstack_str_emplace(&stk, *i.ref);
-
-// reverse the list:
-c_forlist (i, int, {1, 2, 3})
-    cvec_i_push_back(&vec, i.data[i.size - 1 - i.index]);
-```
-
 ### c_foreach, c_forpair
 
 | Usage                                    | Description                     |
@@ -150,10 +130,10 @@ c_forpair (id, count, csmap_ii, map)
 ```
 
 ### c_forrange
-Abstraction for iterating sequence of numbers. Like python's **for** *i* **in** *range()* loop.
+Abstraction for iterating sequence of integers. Like python's **for** *i* **in** *range()* loop.
 
-| Usage                                       | Python equivalent                    |
-|:--------------------------------------------|:-------------------------------------|
+| Usage                                        | Python equivalent                    |
+|:---------------------------------------------|:-------------------------------------|
 | `c_forrange (stop)`                          | `for _ in range(stop):`              |
 | `c_forrange (i, stop) // i type = long long` | `for i in range(stop):`              |
 | `c_forrange (i, start, stop)`                | `for i in range(start, stop):`       |
@@ -168,6 +148,26 @@ c_forrange (i, -3, 3) printf(" %lld", i);
 // -3 -2 -1 0 1 2
 c_forrange (i, 30, 0, -5) printf(" %lld", i);
 // 30 25 20 15 10 5
+```
+
+### c_forlist
+Iterate compound literal array elements. Additional to `i.ref`, you can access `i.data`, `i.size`, and `i.index` of the input list/element.
+```c
+// apply multiple push_backs
+c_forlist (i, int, {1, 2, 3})
+    cvec_i_push_back(&vec, *i.ref);
+
+// insert in existing map
+c_forlist (i, cmap_ii_raw, { {4, 5}, {6, 7} })
+    cmap_ii_insert(&map, i.ref->first, i.ref->second);
+
+// string literals pushed to a stack of cstr:
+c_forlist (i, const char*, {"Hello", "crazy", "world"})
+    cstack_str_emplace(&stk, *i.ref);
+
+// reverse the list:
+c_forlist (i, int, {1, 2, 3})
+    cvec_i_push_back(&vec, i.data[i.size - 1 - i.index]);
 ```
 
 ### c_forfilter
@@ -218,33 +218,7 @@ int main() {
 Note that `c_flt_take()` is given as an optional argument, which breaks the loop on false.
 With `&&` instead of the comma it will give same result, but the full input is processed first.
 
-### c_make, c_new, c_delete
-
-- **c_make**: Make any container from an initializer list. Example:
-```c
-#define i_val_str  // cstr value type
-#include <stc/cset.h>
-
-#define i_key int
-#define i_val int
-#include <stc/cmap.h>
-...
-// Initializes with const char*, internally converted to cstr!
-cset_str myset = c_make(cset_str, {"This", "is", "the", "story"});
-
-int x = 7, y = 8;
-cmap_int mymap = c_make(cmap_int, { {1, 2}, {3, 4}, {5, 6}, {x, y} });
-```
-
-- **c_new(Type)**: Allocate *and init* a new object on the heap
-- **c_delete(Type, ptr)**: Drop *and free* an object allocated on the heap
-```c
-#include <stc/cstr.h>
-
-cstr *stringptr = c_new(cstr, cstr_from("Hello"));
-printf("%s\n", cstr_str(stringptr));
-c_delete(cstr, stringptr);
-```
+## Generators
 
 ### crange
 A number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html). The **crange_value** type is `long long`. Below *start*, *stop*, and *step* are of type *crange_value*:
@@ -274,24 +248,61 @@ c_forfilter (i, crange, crange_obj(3, INT64_MAX, 2)
     printf(" %lld", *i.ref);
 // 2 3 5 7 11 13 17 19 23 29 31
 ```
-### c_find_if, c_erase_if, c_swap, c_drop
+## Algorithms
+
+### c_make, c_new, c_delete
+
+- *c_make(C, {...})*: Make any container from an initializer list. Example:
+```c
+#define i_val_str  // cstr value type
+#include <stc/cset.h>
+
+#define i_key int
+#define i_val int
+#include <stc/cmap.h>
+...
+// Initializes with const char*, internally converted to cstr!
+cset_str myset = c_make(cset_str, {"This", "is", "the", "story"});
+
+int x = 7, y = 8;
+cmap_int mymap = c_make(cmap_int, { {1, 2}, {3, 4}, {5, 6}, {x, y} });
+```
+
+- ***c_new(Type)***: Allocate *and init* a new object on the heap
+- ***c_delete(Type, ptr)***: Drop *and free* an object allocated on the heap
+```c
+#include <stc/cstr.h>
+
+cstr *stringptr = c_new(cstr, cstr_from("Hello"));
+printf("%s\n", cstr_str(stringptr));
+c_delete(cstr, stringptr);
+```
+
+### c_find_if, c_erase_if, c_eraseremove_if
 Find or erase linearily in containers using a predicate
+- For *c_find_if (iter, C, c, pred)*, ***iter*** must be declared outside/prior to call.
+- Use *c_erase_if (iter, C, c, pred)* with **clist**, **cmap**, **cset**, **csmap**, and **csset**.
+- Use *c_eraseremove_if (iter, C, c, pred)* with **cstack**, **cvec**, **cdeq**, and **cqueue**.
 ```c
 // Search vec for first value > 2:
 cvec_i_iter i;
 c_find_if(i, cvec_i, vec, *i.ref > 2);
 if (i.ref) printf("%d\n", *i.ref);
 
+// Erase all values > 2 in vec:
+c_eraseremove_if(i, cvec_i, vec, *i.ref > 2);
+
 // Search map for a string containing "hello" and erase it:
 cmap_str_iter it, it1 = ..., it2 = ...;
 c_find_if(it, csmap_str, it1, it2, cstr_contains(it.ref, "hello"));
 if (it.ref) cmap_str_erase_at(&map, it);
 
-// Erase all strings containing "hello":
-// Note 1: iter i need not be declared.
-// Note 2: variables index and count can be accessed in predicate.
+// Erase all strings containing "hello" in a sorted map:
 c_erase_if(i, csmap_str, map, cstr_contains(i.ref, "hello"));
+```
 
+### c_swap, c_drop
+```c
 // Safe macro for swapping internals of two objects of same type:
 c_swap(cmap_int, &map1, &map2);
 

@@ -42,7 +42,7 @@ cbox_X      cbox_X_make(i_val val);                           // create a cbox f
 cbox_X      cbox_X_clone(cbox_X other);                       // return deep copied clone
 cbox_X      cbox_X_move(cbox_X* self);                        // transfer ownership to receiving cbox returned. self becomes NULL.
 void        cbox_X_take(cbox_X* self, cbox_X unowned);        // take ownership of unowned box object.
-void        cbox_X_assign(cbox_X* self, cbox_X* dying);       // transfer ownership from dying to self; dying becomes NULL.
+void        cbox_X_assign(cbox_X* self, cbox_X* moved);       // transfer ownership from moved to self; moved becomes NULL.
 void        cbox_X_drop(cbox_X* self);                        // destruct the contained object and free its heap memory.
 
 void        cbox_X_reset(cbox_X* self);   

@@ -160,17 +160,17 @@ STC_INLINE _cx_self _cx_memb(_clone)(_cx_self ptr) {
     return ptr;
 }
 
+// take ownership of unowned
+STC_INLINE void _cx_memb(_take)(_cx_self* self, _cx_self unowned) {
+    _cx_memb(_drop)(self);
+    *self = unowned;
+}
+// share ownership with ptr
 STC_INLINE void _cx_memb(_assign)(_cx_self* self, _cx_self ptr) {
     if (ptr.use_count)
         _i_atomic_inc(ptr.use_count);
     _cx_memb(_drop)(self);
     *self = ptr;
-}
-
-STC_INLINE void _cx_memb(_take)(_cx_self* self, _cx_self unowned) {
-    if (self->get != unowned.get)
-        _cx_memb(_drop)(self);
-    *self = unowned;
 }
 
 #ifndef i_no_cmp
