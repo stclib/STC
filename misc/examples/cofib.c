@@ -6,10 +6,10 @@
 
 typedef long long llong;
 
-llong fibonacci_sequence(ccontext* ctx, unsigned n) {
+llong fibonacci_sequence(cco_handle* z, unsigned n) {
     assert (n < 95);
 
-    cco_context(ctx, 
+    cco_context(z,
         llong a, b, idx;
     );
 
@@ -17,10 +17,10 @@ llong fibonacci_sequence(ccontext* ctx, unsigned n) {
         u->a = 0;
         u->b = 1;
         for (u->idx = 2; u->idx < n; u->idx++) {
-            llong sum = u->a + u->b;
-            cco_yield(sum);
+            llong sum = u->a + u->b; // NB! locals only lasts until a cco_yield!
             u->a = u->b;
             u->b = sum;
+            cco_yield (sum);
         }
         cco_finish:
     );
@@ -29,7 +29,7 @@ llong fibonacci_sequence(ccontext* ctx, unsigned n) {
 
 
 int main(void) {
-    ccontext z = 0;
+    cco_handle z = 0;
     printf("Fibonacci numbers:\n");
     for (;;) {
        llong x = fibonacci_sequence(&z, 30);

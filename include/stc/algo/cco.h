@@ -33,7 +33,7 @@
  * 
  * [Re-entrant version using an explicit context structure]
  * 
- * int ascending(ccontext* ctx) {
+ * int ascending(cco_handle* ctx) {
  *    cco_context(ctx,
  *      int idx;
  *    );
@@ -48,8 +48,8 @@
  * }
  * 
  * In the re-entrant version, you need to declare your persistent
- * variables by the `cco_context' macro. This macro takes the base
- * ccontext as first parameter.
+ * variables by the `cco_context' macro. This macro takes the
+ * cco_handle as first parameter.
  *
  * Note that the context variable is set back to zero when the
  * coroutine terminates (by cco_stop, or by control reaching
@@ -69,8 +69,8 @@
  * coroutine with `cco_stop(&ctx)' as parameter instead of &ctx alone.
  *
  * Ground rules:
- *  - never put `c_yield' within an explicit `switch'.
- *  - never put two `c_yield' statements on the same source line.
+ *  - never put `cco_yield' within an explicit `switch'.
+ *  - never put two `cco_yield' statements on the same source line.
  *  - add `cco_finish:' label at the end of the coroutine, before
  *    any cleanup code. Required to support cco_stop(ctx) argument.
  * 
@@ -78,7 +78,7 @@
  * variable:
  * 
  * void main(void) {
- *    ccontext z = 0;
+ *    cco_handle z = 0;
  *    for (;;) {
  *       int x = ascending(&z);
  *       if (!z) break;
@@ -100,7 +100,7 @@
  */
 typedef struct { 
     int _ccoline;
-} *ccontext;
+} *cco_handle;
 
 #define cco_context(cref, ...) \
     struct ccoContext { \

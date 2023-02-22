@@ -4,9 +4,9 @@
 
 // Read file line by line using coroutines:
 
-cstr file_nextline(ccontext* ccx, const char* name)
+cstr file_nextline(cco_handle* z, const char* name)
 {
-    cco_context(ccx,
+    cco_context(z,
         FILE* fp;
         cstr line;
     );
@@ -28,7 +28,7 @@ cstr file_nextline(ccontext* ccx, const char* name)
 
 
 int main(void) {
-    ccontext z = 0;
+    cco_handle z = 0;
     int n = 0;
     do {
         c_with (cstr line = file_nextline(&z, __FILE__), z, cstr_drop(&line)) {
