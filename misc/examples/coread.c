@@ -1,5 +1,5 @@
 #include <stc/cstr.h>
-#include <stc/algo/cco.h>
+#include <stc/algo/coroutine.h>
 #include <errno.h>
 
 // Read file line by line using coroutines:
@@ -10,7 +10,6 @@ cstr file_nextline(cco_handle* z, const char* name)
         FILE* fp;
         cstr line;
     );
-
     cco_routine(U,
         U->fp = fopen(name, "r");
         U->line = cstr_NULL;
@@ -23,6 +22,7 @@ cstr file_nextline(cco_handle* z, const char* name)
             cstr_drop(&U->line);
             fclose(U->fp);
     );
+
     return cstr_NULL;
 }
 
@@ -34,8 +34,8 @@ int main(void) {
         c_with (cstr line = file_nextline(&z, __FILE__), z, cstr_drop(&line)) {
             printf("%3d %s\n", ++n, cstr_str(&line));
 
-            // stop after 10 lines:
-            if (n == 10) file_nextline(cco_stop(&z), __FILE__);
+            // stop after 15 lines:
+            if (n == 15) file_nextline(cco_stop(&z), __FILE__);
         }
     } while (z);
 }

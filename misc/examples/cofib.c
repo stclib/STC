@@ -1,4 +1,4 @@
-#include <stc/algo/cco.h>
+#include <stc/algo/coroutine.h>
 #include <stdio.h>
 #include <stdint.h>
 
@@ -12,19 +12,19 @@ llong fibonacci_sequence(cco_handle* z, unsigned n) {
     cco_context(z,
         llong a, b, idx;
     );
-
-    cco_routine(u,
-        u->a = 0;
-        u->b = 1;
-        for (u->idx = 2; u->idx < n; u->idx++) {
-            llong sum = u->a + u->b; // NB! locals only lasts until a cco_yield!
-            u->a = u->b;
-            u->b = sum;
-            cco_yield (sum);
+    cco_routine(U,
+        U->a = 0;
+        U->b = 1;
+        for (U->idx = 0; U->idx < n; U->idx++) {
+            cco_yield (U->a);
+            llong sum = U->a + U->b; // NB! locals only lasts until next cco_yield!
+            U->a = U->b;
+            U->b = sum;
         }
         cco_finish:
     );
-    return 0;
+
+    return -1;
 }
 
 
@@ -32,7 +32,7 @@ int main(void) {
     cco_handle z = 0;
     printf("Fibonacci numbers:\n");
     for (;;) {
-       llong x = fibonacci_sequence(&z, 30);
+       llong x = fibonacci_sequence(&z, 14);
        if (!z) break;
        printf(" %lld", x);
     }
