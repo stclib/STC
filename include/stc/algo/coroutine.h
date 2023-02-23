@@ -115,7 +115,7 @@ typedef struct ccoHandle {
     } \
     struct ccoContext *ctx = *_ccoparam; \
     switch (ctx->cco_line) { \
-        case 0: __VA_ARGS__ break; \
+        case 0:; __VA_ARGS__ break; \
         default: assert(!"missing cco_finish:"); \
     } \
     free(ctx), *_ccoparam = NULL
