@@ -1,41 +1,43 @@
 #include <stc/cstr.h>
-#include <stc/algo/coroutine.h>
+#include <stc/algo/ccoro.h>
 #include <errno.h>
 
 // Read file line by line using coroutines:
 
-cstr file_nextline(cco_handle* z, const char* name)
+struct file_nextline {
+    const char* filename;
+    int ccoro_state;
+    FILE* fp;
+    cstr line;
+};
+
+cstr file_nextline(struct file_nextline* U)
 {
-    cco_context(z,
-        FILE* fp;
-        cstr line;
-    );
-    cco_routine(U,
-        U->fp = fopen(name, "r");
+    ccoro_execute(U,
+        U->fp = fopen(U->filename, "r");
         U->line = cstr_NULL;
 
         while (cstr_getline(&U->line, U->fp))
-            cco_yield (cstr_clone(U->line));
+            ccoro_yield (cstr_clone(U->line));
 
-        cco_finish: // cco_finish is needed to support cco_stop.
+        ccoro_final: // ccoro_final is needed to support ccoro_stop.
             printf("finish\n");
             cstr_drop(&U->line);
             fclose(U->fp);
     );
-
     return cstr_NULL;
 }
 
 
 int main(void) {
-    cco_handle z = 0;
+    struct file_nextline z = {__FILE__};
     int n = 0;
     do {
-        c_with (cstr line = file_nextline(&z, __FILE__), z, cstr_drop(&line)) {
+        c_with (cstr line = file_nextline(&z), ccoro_alive(&z), cstr_drop(&line)) {
             printf("%3d %s\n", ++n, cstr_str(&line));
 
             // stop after 15 lines:
-            if (n == 15) file_nextline(cco_stop(&z), __FILE__);
+            if (n == 15) file_nextline(ccoro_stop(&z));
         }
-    } while (z);
+    } while (ccoro_alive(&z));
 }

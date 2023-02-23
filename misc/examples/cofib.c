@@ -1,27 +1,29 @@
-#include <stc/algo/coroutine.h>
+#include <stc/algo/ccoro.h>
 #include <stdio.h>
 #include <stdint.h>
 
 // Use coroutine to create a fibonacci sequence generator:
 
 typedef long long llong;
+struct fibonacci {
+    int n; 
+    int ccoro_state;
+    llong a, b, idx;
+};
 
-llong fibonacci_sequence(cco_handle* z, unsigned n) {
-    assert (n < 95);
+llong fibonacci(struct fibonacci* U) {
+    assert (U->n < 95);
 
-    cco_context(z,
-        llong a, b, idx;
-    );
-    cco_routine(U,
+    ccoro_execute(U,
         U->a = 0;
         U->b = 1;
-        for (U->idx = 0; U->idx < n; U->idx++) {
-            cco_yield (U->a);
-            llong sum = U->a + U->b; // NB! locals only lasts until next cco_yield!
+        for (U->idx = 0; U->idx < U->n; U->idx++) {
+            ccoro_yield (U->a);
+            llong sum = U->a + U->b; // NB! locals only lasts until next ccoro_yield!
             U->a = U->b;
             U->b = sum;
         }
-        cco_finish:
+        ccoro_final:
     );
 
     return -1;
@@ -29,11 +31,12 @@ llong fibonacci_sequence(cco_handle* z, unsigned n) {
 
 
 int main(void) {
-    cco_handle z = 0;
     printf("Fibonacci numbers:\n");
+    struct fibonacci fib = {.n = 14};
+
     for (;;) {
-       llong x = fibonacci_sequence(&z, 14);
-       if (!z) break;
+       llong x = fibonacci(&fib);
+       if (!ccoro_alive(&fib)) break;
        printf(" %lld", x);
     }
     puts("");
