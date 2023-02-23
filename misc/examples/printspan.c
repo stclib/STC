@@ -9,7 +9,7 @@
 #define i_val int
 #include <stc/cdeq.h>
 #define i_val_str
-#include <stc/cset.h>
+#include <stc/csset.h>
 #include <stc/cspan.h>
 
 using_cspan(intspan, int, 1);
@@ -25,7 +25,7 @@ int main()
     c_auto (cvec_int, vec)
     c_auto (cstack_int, stk)
     c_auto (cdeq_int, deq)
-    c_auto (cset_str, set)
+    c_auto (csset_str, set)
     {
         intspan sp1 = cspan_make(intspan, {1, 2});
         printMe( sp1 );
@@ -48,9 +48,9 @@ int main()
         deq = c_make(cdeq_int, {1, 2, 3, 4, 5, 6, 7, 8});
         printMe( (intspan)cspan_from(&deq) );
 
-        set = c_make(cset_str, {"1", "2", "3", "4", "5", "6", "7", "8", "9"});
-        printf("%d:", (int)cset_str_size(&set));
-        c_foreach (e, cset_str, set)
+        set = c_make(csset_str, {"5", "7", "4", "3", "8", "2", "1", "9", "6"});
+        printf("%d:", (int)csset_str_size(&set));
+        c_foreach (e, csset_str, set)
             printf(" %s", cstr_str(e.ref));
         puts("");
     }

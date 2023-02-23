@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stc/cbits.h>
 
-int main() 
+int main(void)
 {
     c_with (cbits set = cbits_with_size(23, true), cbits_drop(&set)) {
         printf("count %" c_ZI ", %" c_ZI "\n", cbits_count(&set), cbits_size(&set));

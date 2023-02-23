@@ -61,8 +61,13 @@ int main() {
 #define _cbits_words(n) (i_ssize)(((n) + 63)>>6)
 #define _cbits_bytes(n) (_cbits_words(n) * c_sizeof(uint64_t))
 
-#if defined(__GNUC__) || defined(__clang__)
+#if defined(__GNUC__)
     STC_INLINE int cpopcount64(uint64_t x) {return __builtin_popcountll(x);}
+    #ifndef __clang__
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wstringop-overflow="
+    #pragma GCC diagnostic ignored "-Walloc-size-larger-than="
+    #endif
 #elif defined(_MSC_VER) && defined(_WIN64)
     #include <intrin.h>
     STC_INLINE int cpopcount64(uint64_t x) {return (int)__popcnt64(x);}
@@ -303,7 +308,9 @@ STC_INLINE bool _i_memb(_disjoint)(const i_type* self, const i_type* other) {
     _i_assert(self->_size == other->_size);
     return _cbits_disjoint(self->data64, other->data64, _i_memb(_size)(self));
 }
-
+#if defined __GNUC__ && !defined __clang__
+#pragma GCC diagnostic pop
+#endif
 #define CBITS_H_INCLUDED
 #undef _i_size
 #undef _i_memb

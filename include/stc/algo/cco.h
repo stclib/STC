@@ -99,38 +99,36 @@
  * `c_' macros for re-entrant coroutines.
  */
 typedef struct { 
-    int _ccoline;
+    int cco_line;
 } *cco_handle;
 
-#define cco_context(cref, ...) \
+#define cco_context(handle, ...) \
     struct ccoContext { \
-        int _ccoline; \
+        int cco_line; \
         __VA_ARGS__ \
-    } **_ccoparam = (struct ccoContext **)cref
+    } **_ccoparam = (struct ccoContext **)handle + 0*sizeof((*(handle))->cco_line)
 
 #define cco_routine(ctx, ...) \
-    do { \
-        if (!*_ccoparam) { \
-            *_ccoparam = malloc(sizeof **_ccoparam); \
-            (*_ccoparam)->_ccoline = 0; \
-        } \
-        struct ccoContext *ctx = *_ccoparam; \
-        switch (ctx->_ccoline) { \
-            case 0: __VA_ARGS__ break; \
-            default: assert(!"cco_finish: missing"); \
-        } \
-        free(ctx), *_ccoparam = 0; \
-    } while (0)
+    if (!*_ccoparam) { \
+        *_ccoparam = (struct ccoContext *)malloc(sizeof **_ccoparam); \
+        (*_ccoparam)->cco_line = 0; \
+    } \
+    struct ccoContext *ctx = *_ccoparam; \
+    switch (ctx->cco_line) { \
+        case 0: __VA_ARGS__ break; \
+        default: assert(!"cco_finish: missing"); \
+    } \
+    free(ctx), *_ccoparam = NULL
 
 #define cco_yield(ret) \
     do { \
-        (*_ccoparam)->_ccoline = __LINE__; return ret; \
+        (*_ccoparam)->cco_line = __LINE__; return ret; \
         case __LINE__:; \
     } while (0)
 
 #define cco_finish case -1
 
 #define cco_stop(ctx) \
-    ((*(ctx))->_ccoline = -1, (ctx))
+    ((*(ctx))->cco_line = -1, (ctx))
 
 #endif /* COROUTINE_H */
