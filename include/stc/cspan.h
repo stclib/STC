@@ -61,14 +61,20 @@ int demo2() {
 #include "ccommon.h"
 
 #define using_cspan(...) c_MACRO_OVERLOAD(using_cspan, __VA_ARGS__)
-#define using_cspan_2(Self, T) using_cspan_3(Self, T, 1)
+#define using_cspan_2(Self, T) \
+    using_cspan_3(Self, T, 1)
+
 #define using_cspan_3(Self, T, RANK) \
+    using_cspan_4(Self, T, RANK, c_default_eq)
+
+#define using_cspan_4(Self, T, RANK, i_eq) \
     typedef T Self##_value; typedef T Self##_raw; \
     typedef struct { \
         Self##_value *data; \
         int32_t shape[RANK]; \
         cspan_idx##RANK stride; \
     } Self; \
+    \
     typedef struct { Self##_value *ref; int32_t pos[RANK]; const Self *_s; } Self##_iter; \
     \
     STC_INLINE Self Self##_from_n(Self##_raw* raw, const intptr_t n) { \
@@ -92,6 +98,13 @@ int demo2() {
     STC_INLINE void Self##_next(Self##_iter* it) { \
         it->ref += _cspan_next##RANK(RANK, it->pos, it->_s->shape, it->_s->stride.d); \
         if (it->pos[0] == it->_s->shape[0]) it->ref = NULL; \
+    } \
+    STC_INLINE bool Self##_eq(const Self* x, const Self* y) { \
+        if (memcmp(x->shape, y->shape, sizeof x->shape)) return false; \
+        Self##_iter i = Self##_begin(x), j = Self##_begin(y); \
+        for (; i.ref; Self##_next(&i), Self##_next(&j)) \
+            if (!(i_eq(i.ref, j.ref))) return false; \
+        return true; \
     } \
     struct stc_nostruct
 

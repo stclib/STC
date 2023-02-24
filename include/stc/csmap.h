@@ -224,9 +224,9 @@ _cx_memb(_advance)(_cx_iter it, size_t n) {
 STC_INLINE bool
 _cx_memb(_eq)(const _cx_self* m1, const _cx_self* m2) {
     if (_cx_memb(_size)(m1) != _cx_memb(_size)(m2)) return false;
-    _cx_iter i1 = _cx_memb(_begin)(m1), i2 = _cx_memb(_begin)(m2);
-    for (; i1.ref && i2.ref; _cx_memb(_next)(&i1), _cx_memb(_next)(&i2)) {
-        const _cx_rawkey _rx = i_keyto(_i_keyref(i1.ref)), _ry = i_keyto(_i_keyref(i2.ref));
+    _cx_iter i = _cx_memb(_begin)(m1), j = _cx_memb(_begin)(m2);
+    for (; i.ref; _cx_memb(_next)(&i), _cx_memb(_next)(&j)) {
+        const _cx_rawkey _rx = i_keyto(_i_keyref(i.ref)), _ry = i_keyto(_i_keyref(j.ref));
         if ((i_cmp_functor(m1, (&_rx), (&_ry))) != 0) return false;
     }
     return true;

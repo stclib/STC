@@ -47,7 +47,7 @@ bool iterate(struct iterate* I, struct fibonacci* F) {
                     ccoro_yield_call (F, fibonacci(F), true);
                 else
                     ccoro_yield (true);
-        ccoro_finish:
+        ccoro_final:
     );
     return false;
 }
