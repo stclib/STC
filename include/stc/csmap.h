@@ -109,7 +109,6 @@ STC_API _cx_result      _cx_memb(_emplace)(_cx_self* self, _cx_rawkey rkey _i_MA
 #if !defined i_no_clone
 STC_API _cx_self        _cx_memb(_clone)(_cx_self tree);
 #endif // !i_no_clone
-STC_API _cx_self        _cx_memb(_init)(void);
 STC_API _cx_result      _cx_memb(_insert)(_cx_self* self, i_key key _i_MAP_ONLY(, i_val mapped));
 STC_API _cx_result      _cx_memb(_push)(_cx_self* self, _cx_value _val);
 STC_API void            _cx_memb(_drop)(_cx_self* self);
@@ -123,6 +122,7 @@ STC_API _cx_iter        _cx_memb(_erase_at)(_cx_self* self, _cx_iter it);
 STC_API _cx_iter        _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2);
 STC_API void            _cx_memb(_next)(_cx_iter* it);
 
+STC_INLINE _cx_self     _cx_memb(_init)(void) { _cx_self tree = {0}; return tree; }
 STC_INLINE bool         _cx_memb(_empty)(const _cx_self* cx) { return cx->size == 0; }
 STC_INLINE _i_size      _cx_memb(_size)(const _cx_self* cx) { return cx->size; }
 STC_INLINE _i_size      _cx_memb(_capacity)(const _cx_self* cx) { return cx->cap; }
@@ -221,14 +221,35 @@ _cx_memb(_advance)(_cx_iter it, size_t n) {
     return it;
 }
 
+STC_INLINE bool
+_cx_memb(_eq)(const _cx_self* m1, const _cx_self* m2) {
+    if (_cx_memb(_size)(m1) != _cx_memb(_size)(m2)) return false;
+    _cx_iter i1 = _cx_memb(_begin)(m1), i2 = _cx_memb(_begin)(m2);
+    for (; i1.ref && i2.ref; _cx_memb(_next)(&i1), _cx_memb(_next)(&i2)) {
+        const _cx_rawkey _rx = i_keyto(_i_keyref(i1.ref)), _ry = i_keyto(_i_keyref(i2.ref));
+        if ((i_cmp_functor(m1, (&_rx), (&_ry))) != 0) return false;
+    }
+    return true;
+}
+
+STC_INLINE void _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, _i_size n) {
+    while (n--) 
+#if defined _i_isset && defined i_no_emplace
+        _cx_memb(_insert)(self, *raw++);
+#elif defined _i_isset
+        _cx_memb(_emplace)(self, *raw++);
+#elif defined i_no_emplace
+        _cx_memb(_insert_or_assign)(self, raw->first, raw->second), ++raw;
+#else
+        _cx_memb(_emplace_or_assign)(self, raw->first, raw->second), ++raw;
+#endif
+}
+
+STC_INLINE _cx_self _cx_memb(_from_n)(const _cx_raw* raw, _i_size n)
+    { _cx_self cx = {0}; _cx_memb(_put_n)(&cx, raw, n); return cx; }
+
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement)
-
-STC_DEF _cx_self
-_cx_memb(_init)(void) {
-    _cx_self tree = {0};
-    return tree;
-}
 
 STC_DEF bool
 _cx_memb(_reserve)(_cx_self* self, const _i_size cap) {
@@ -299,22 +320,6 @@ _cx_memb(_push)(_cx_self* self, _cx_value _val) {
         _cx_memb(_value_drop)(&_val);
     return _res;
 }
-
-STC_INLINE void _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, _i_size n) {
-    while (n--) 
-#if defined _i_isset && defined i_no_emplace
-        _cx_memb(_insert)(self, *raw++);
-#elif defined _i_isset
-        _cx_memb(_emplace)(self, *raw++);
-#elif defined i_no_emplace
-        _cx_memb(_insert_or_assign)(self, raw->first, raw->second), ++raw;
-#else
-        _cx_memb(_emplace_or_assign)(self, raw->first, raw->second), ++raw;
-#endif
-}
-
-STC_INLINE _cx_self _cx_memb(_from_n)(const _cx_raw* raw, _i_size n)
-    { _cx_self cx = {0}; _cx_memb(_put_n)(&cx, raw, n); return cx; }
 
 #ifndef _i_isset
     STC_DEF _cx_result

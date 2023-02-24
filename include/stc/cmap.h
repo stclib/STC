@@ -115,7 +115,7 @@ STC_API chash_bucket_t  _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawke
 STC_API _cx_result      _cx_memb(_insert_entry_)(_cx_self* self, _cx_rawkey rkey);
 STC_API void            _cx_memb(_erase_entry)(_cx_self* self, _cx_value* val);
 
-STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_LITERAL(_cx_self){0}; }
+STC_INLINE _cx_self     _cx_memb(_init)(void) { _cx_self map = {0}; return map; }
 STC_INLINE void         _cx_memb(_shrink_to_fit)(_cx_self* self) { _cx_memb(_reserve)(self, self->size); }
 STC_INLINE float        _cx_memb(_max_load_factor)(const _cx_self* self) { return (float)(i_max_load_factor); }
 STC_INLINE bool         _cx_memb(_empty)(const _cx_self* map) { return !map->size; }
@@ -280,6 +280,16 @@ _cx_memb(_erase_at)(_cx_self* self, _cx_iter it) {
     if (*it._hx == 0)
         _cx_memb(_next)(&it);
     return it;
+}
+
+STC_INLINE bool
+_cx_memb(_eq)(const _cx_self* m1, const _cx_self* m2) {
+    if (_cx_memb(_size)(m1) != _cx_memb(_size)(m2)) return false;
+    for (_cx_iter i = _cx_memb(_begin)(m1); i.ref; _cx_memb(_next)(&i)) {
+        const _cx_rawkey _raw = i_keyto(_i_keyref(i.ref));
+        if (!_cx_memb(_contains)(m2, _raw)) return false;
+    }
+    return true;
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */

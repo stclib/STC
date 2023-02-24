@@ -235,10 +235,13 @@ _cx_memb(_get_mut)(const _cx_self* self, _cx_raw raw)
 
 STC_INLINE bool
 _cx_memb(_eq)(const _cx_self* v1, const _cx_self* v2) {
+    if (v1->_len != v2->_len) return false;
     _cx_iter i1 = _cx_memb(_begin)(v1), i2 = _cx_memb(_begin)(v2);
-    for (; i1.ref && i2.ref; _cx_memb(_next)(&i1), _cx_memb(_next)(&i2))
-        if (!i_eq(i1.ref, i2.ref)) return false;
-    return !(i1.ref || i2.ref);
+    for (; i1.ref && i2.ref; _cx_memb(_next)(&i1), _cx_memb(_next)(&i2)) {
+        const _cx_raw rx = i_keyto(i1.ref), ry = i_keyto(i2.ref);
+        if (!(i_eq((&rx), (&ry)))) return false;
+    }
+    return true;
 }
 #endif
 #ifndef i_no_cmp
