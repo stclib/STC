@@ -106,6 +106,11 @@ int demo2() {
             if (!(i_eq(i.ref, j.ref))) return false; \
         return true; \
     } \
+    STC_INLINE Self##_iter Self##_find(const Self* self, Self##_raw raw) { \
+        Self##_iter i = Self##_begin(self); \
+        for (; i.ref; Self##_next(&i)) if (i_eq(i.ref, &raw)) return i; \
+        return i; \
+    } \
     struct stc_nostruct
 
 #define using_cspan2(Self, T) using_cspan_3(Self, T, 1); using_cspan_3(Self##2, T, 2)
