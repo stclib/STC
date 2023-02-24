@@ -67,20 +67,21 @@ int main(void) {
      } \
      *_state = -2
 
-#define ccoro_yield(...)  c_MACRO_OVERLOAD(ccoro_yield, __VA_ARGS__)
-#define ccoro_yield_1(value) \
+#define ccoro_yield(ret) \
     do { \
-        *_state = __LINE__; return value; \
+        *_state = __LINE__; return ret; \
         case __LINE__:; \
     } while (0)
 
-#define ccoro_yield_2(subcoro, c) \
+#define ccoro_yield_call(...)  c_MACRO_OVERLOAD(ccoro_yield_call, __VA_ARGS__)
+#define ccoro_yield_call_2(c, subcoro) ccoro_yield_call_3(c, subcoro, )
+#define ccoro_yield_call_3(c, subcoro, ret) \
     do { \
         *_state = __LINE__; \
-        c_PASTE(coro, __LINE__): \
-        return subcoro; \
+        c_PASTE(co, __LINE__): \
+        subcoro; return ret; \
         case __LINE__:; \
-        if (ccoro_alive(c)) goto c_PASTE(coro, __LINE__); \
+        if (ccoro_alive(c)) goto c_PASTE(co, __LINE__); \
     } while (0)
 
 #define ccoro_final case -1
