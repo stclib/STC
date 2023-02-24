@@ -59,8 +59,10 @@ STC_API _cx_iter        _cx_memb(_emplace_range)(_cx_self* self, _cx_value* pos,
                                                  const _cx_raw* p1, const _cx_raw* p2);
 #endif // i_no_emplace
 
-#if !defined i_no_cmp
+#if !defined i_no_cmp || defined _i_has_eq
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter p1, _cx_iter p2, _cx_raw raw);
+#endif
+#ifndef i_no_cmp
 STC_API int             _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y);
 #endif
 STC_API _cx_value*      _cx_memb(_push_front)(_cx_self* self, i_key value);
@@ -177,7 +179,7 @@ _cx_memb(_emplace_at)(_cx_self* self, _cx_iter it, _cx_raw raw) {
 }
 #endif // !i_no_emplace
 
-#if !defined i_no_cmp
+#if !defined i_no_cmp || defined _i_has_eq
 
 STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, _cx_raw raw) {
@@ -192,6 +194,9 @@ _cx_memb(_get)(const _cx_self* self, _cx_raw raw) {
 STC_INLINE _cx_value*
 _cx_memb(_get_mut)(_cx_self* self, _cx_raw raw)
     { return (_cx_value *) _cx_memb(_get)(self, raw); }
+
+#endif
+#ifndef i_no_cmp
 
 STC_INLINE void
 _cx_memb(_sort_range)(_cx_iter i1, _cx_iter i2, int(*cmp)(const _cx_value*, const _cx_value*)) {
@@ -405,8 +410,7 @@ _cx_memb(_emplace_range)(_cx_self* self, _cx_value* pos,
 }
 #endif // !i_no_emplace
 
-#if !defined i_no_cmp
-
+#if !defined i_no_cmp || defined _i_has_eq
 STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
     const _cx_value* p2 = _it2_ptr(i1, i2);
@@ -418,7 +422,8 @@ _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
     i2.ref = NULL;
     return i2;
 }
-
+#endif
+#ifndef i_no_cmp
 STC_DEF int
 _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     const _cx_raw rx = i_keyto(x);

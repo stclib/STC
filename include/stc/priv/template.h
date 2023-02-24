@@ -105,6 +105,9 @@
 #if c_option(c_no_emplace)
   #define i_no_emplace
 #endif
+#ifdef i_eq
+  #define _i_has_eq
+#endif
 
 #if defined i_key_str
   #define i_keyclass cstr
@@ -342,5 +345,6 @@
 #undef _i_prefix
 #undef _i_expandby
 #undef _i_has_from
+#undef _i_has_eq
 #undef _i_template
 #endif

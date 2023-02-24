@@ -87,9 +87,11 @@ STC_API _cx_iter        _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, 
 STC_API _cx_iter        _cx_memb(_insert_range)(_cx_self* self, _cx_value* pos,
                                                 const _cx_value* p1, const _cx_value* p2);
 STC_API _cx_iter        _cx_memb(_insert_uninit)(_cx_self* self, _cx_value* pos, const intptr_t n);
-#if !defined i_no_cmp
-STC_API int             _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y);
+#if !defined i_no_cmp || defined _i_has_eq
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw raw);
+#endif
+#ifndef i_no_cmp
+STC_API int             _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y);
 STC_API _cx_iter        _cx_memb(_binary_search_in)(_cx_iter it1, _cx_iter it2, _cx_raw raw, _cx_iter* lower_bound);
 #endif
 STC_INLINE void         _cx_memb(_value_drop)(_cx_value* val) { i_keydrop(val); }
@@ -215,7 +217,7 @@ STC_INLINE _cx_iter _cx_memb(_advance)(_cx_iter it, size_t n)
 STC_INLINE intptr_t _cx_memb(_index)(const _cx_self* self, _cx_iter it) 
     { return (it.ref - self->data); }
 
-#if !defined i_no_cmp
+#if !defined i_no_cmp || defined _i_has_eq
 
 STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, _cx_raw raw) {
@@ -230,6 +232,9 @@ _cx_memb(_get)(const _cx_self* self, _cx_raw raw) {
 STC_INLINE _cx_value*
 _cx_memb(_get_mut)(const _cx_self* self, _cx_raw raw)
     { return (_cx_value*) _cx_memb(_get)(self, raw); }
+
+#endif
+#ifndef i_no_cmp
 
 STC_INLINE _cx_iter
 _cx_memb(_binary_search)(const _cx_self* self, _cx_raw raw) {
@@ -383,7 +388,7 @@ _cx_memb(_emplace_range)(_cx_self* self, _cx_value* pos,
 }
 #endif // !i_no_emplace
 
-#if !defined i_no_cmp
+#if !defined i_no_cmp || defined _i_has_eq
 STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
     const _cx_value* p2 = _it2_ptr(i1, i2);
@@ -395,6 +400,8 @@ _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
     i2.ref = NULL;
     return i2;
 }
+#endif
+#ifndef i_no_cmp
 
 STC_DEF _cx_iter
 _cx_memb(_binary_search_in)(_cx_iter i1, _cx_iter i2, const _cx_raw raw,

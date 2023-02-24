@@ -99,9 +99,11 @@ STC_API _cx_value*      _cx_memb(_push_front)(_cx_self* self, i_key value);
 STC_API _cx_iter        _cx_memb(_insert_at)(_cx_self* self, _cx_iter it, i_key value);
 STC_API _cx_iter        _cx_memb(_erase_at)(_cx_self* self, _cx_iter it);
 STC_API _cx_iter        _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2);
-#if !defined i_no_cmp
-STC_API intptr_t        _cx_memb(_remove)(_cx_self* self, _cx_raw val);
+#if !defined i_no_cmp || defined _i_has_eq
 STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw val);
+STC_API intptr_t        _cx_memb(_remove)(_cx_self* self, _cx_raw val);
+#endif
+#ifndef i_no_cmp
 STC_API int             _cx_memb(_sort_cmp_)(const _cx_node* x, const _cx_node* y);
 #endif
 STC_API void            _cx_memb(_reverse)(_cx_self* self);
@@ -188,7 +190,7 @@ _cx_memb(_splice_range)(_cx_self* self, _cx_iter it,
     return _cx_memb(_splice)(self, it, &tmp);
 }
 
-#if !defined i_no_cmp
+#if !defined i_no_cmp || defined _i_has_eq
 STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, _cx_raw val) {
     return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), val);
@@ -203,6 +205,8 @@ STC_INLINE _cx_value*
 _cx_memb(_get_mut)(_cx_self* self, _cx_raw val) {
     return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), val).ref;
 }
+#endif
+#ifndef i_no_cmp
 
 STC_INLINE void
 _cx_memb(_sort)(_cx_self* self) {
@@ -401,7 +405,7 @@ _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
     return lst;
 }
 
-#if !defined i_no_cmp
+#if !defined i_no_cmp || defined _i_has_eq
 
 STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw val) {
@@ -428,6 +432,8 @@ _cx_memb(_remove)(_cx_self* self, _cx_raw val) {
     } while (node != self->last);
     return n;
 }
+#endif
+#ifndef i_no_cmp
 
 STC_DEF int
 _cx_memb(_sort_cmp_)(const _cx_node* x, const _cx_node* y) {
