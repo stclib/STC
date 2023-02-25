@@ -37,4 +37,5 @@ int main(void) {
         // stop after 15 lines:
         if (n == 15) cco_stop(&z);
     }
+    printf("state %d\n", z.cco_state);
 }

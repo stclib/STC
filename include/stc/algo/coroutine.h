@@ -66,9 +66,9 @@ int main(void) {
         case 0:
 
 #define cco_end() \
-        break; \
+        *_state = 0; break; \
         default: assert(!"missing cco_final: or illegal state"); \
-    } *_state = -2
+    } *_state *= -1
 
 #define cco_yield(retval) \
     do { \
