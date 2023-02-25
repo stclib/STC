@@ -11,33 +11,30 @@ struct file_nextline {
     cstr line;
 };
 
-cstr file_nextline(struct file_nextline* U)
+bool file_nextline(struct file_nextline* U)
 {
     cco_begin(U)
         U->fp = fopen(U->filename, "r");
         U->line = cstr_NULL;
 
         while (cstr_getline(&U->line, U->fp))
-            cco_yield(cstr_clone(U->line));
+            cco_yield(true);
 
         cco_final: // cco_final is needed to support cco_stop.
             printf("finish\n");
             cstr_drop(&U->line);
             fclose(U->fp);
     cco_end();
-    return cstr_NULL;
+    return false;
 }
-
 
 int main(void) {
     struct file_nextline z = {__FILE__};
     int n = 0;
-    do {
-        c_with (cstr line = file_nextline(&z), cco_alive(&z), cstr_drop(&line)) {
-            printf("%3d %s\n", ++n, cstr_str(&line));
+    while (file_nextline(&z)) {
+        printf("%3d %s\n", ++n, cstr_str(&z.line));
 
-            // stop after 15 lines:
-            if (n == 15) file_nextline(cco_stop(&z));
-        }
-    } while (cco_alive(&z));
+        // stop after 15 lines:
+        if (n == 15) cco_stop(&z);
+    }
 }
