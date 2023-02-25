@@ -78,14 +78,13 @@ int main(void) {
 
 #define cco_yield_coroutine(c, corocall, retval) \
     do { \
-        *_state = __LINE__; cco_reset(c); \
+        *_state = __LINE__; \
         c_PASTE(cco, __LINE__): corocall; return retval; \
         case __LINE__:; if (cco_alive(c)) goto c_PASTE(cco, __LINE__); \
     } while (0)
 
 #define cco_final case -1
-#define cco_stop(c) ((c)->cco_state = (c)->cco_state > 0 ? -1 : -2, c)
-#define cco_alive(c) ((c)->cco_state >= 0)
-#define cco_reset(c) ((c)->cco_state = 0)
+#define cco_alive(c) ((c)->cco_state > 0)
+#define cco_stop(c) ((c)->cco_state = cco_alive(c) ? -1 : -2, c)
 
 #endif

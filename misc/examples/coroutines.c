@@ -62,6 +62,4 @@ int main(void) {
 
     while (iterate(&iter, &fib))
         printf("%d %d. Fib: %lld\n", iter.x, iter.y, fib.a);
-
-    puts("");
 }
