@@ -4,15 +4,13 @@
 
 // Use coroutine to create a fibonacci sequence generator:
 
-typedef long long intll_t;
-
 struct fibonacci {
     int n; 
     int cco_state;
-    intll_t a, b, idx;
+    int64_t a, b, idx;
 };
 
-intll_t fibonacci(struct fibonacci* F) {
+int64_t fibonacci(struct fibonacci* F) {
     assert (F->n < 95);
 
     cco_begin(F);
@@ -20,7 +18,7 @@ intll_t fibonacci(struct fibonacci* F) {
         F->b = 1;
         for (F->idx = 0; F->idx < F->n; F->idx++) {
             cco_yield(F->a);
-            intll_t sum = F->a + F->b; // NB! locals only lasts until next cco_yield!
+            int64_t sum = F->a + F->b; // NB! locals only lasts until next cco_yield!
             F->a = F->b;
             F->b = sum;
         }
@@ -50,16 +48,16 @@ bool iterate(struct iterate* I, struct fibonacci* F) {
             }
         }
         cco_final:
+            puts("final");
     cco_end();
     return false;
 }
 
 
 int main(void) {
-    printf("Fibonacci numbers:\n");
     struct fibonacci fib = {.n = 14};
-    struct iterate iter = {3, 3};
+    struct iterate it = {3, 3};
 
-    while (iterate(&iter, &fib))
-        printf("%d %d. Fib: %lld\n", iter.x, iter.y, fib.a);
+    while (iterate(&it, &fib))
+        printf("Iter=(%d, %d). Fib=%lld\n", it.x, it.y, (long long)fib.a);
 }

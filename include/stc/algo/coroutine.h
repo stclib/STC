@@ -61,14 +61,15 @@ int main(void) {
 #include <stc/ccommon.h>
 
 #define cco_begin(c) \
-     int* _state = &(c)->cco_state; \
-     switch (*_state) { \
+    int *_state = &(c)->cco_state, _nodyn; \
+    switch (*_state) { \
         case 0:
 
 #define cco_end() \
         *_state = 0; break; \
         default: assert(!"missing cco_final: or illegal state"); \
-    } *_state *= -1
+    } \
+    *_state *= -1; (void)_nodyn
 
 #define cco_yield(retval) \
     do { \
@@ -84,7 +85,22 @@ int main(void) {
     } while (0)
 
 #define cco_final case -1
-#define cco_alive(c) ((c)->cco_state > 0)
-#define cco_stop(c) ((c)->cco_state = cco_alive(c) ? -1 : -2, c)
+#define cco_alive(c) ((c) && (c)->cco_state > 0)
+#define cco_stop(c) ((c)->cco_state = (c)->cco_state ? -1 : -2, c)
+
+// ---------------------------------------------------------------
+
+#define cco_begin_dyn(cp) \
+    if (!*(cp)) *(cp) = malloc(sizeof **(cp)), (*(cp))->cco_state = 0; \
+    int* _state = &(*(cp))->cco_state, _dyn; \
+    switch (*_state) { \
+        case 0:
+
+#define cco_end_dyn(cp) \
+        *_state = 0; break; \
+        default: assert(!"missing cco_final: or illegal state"); \
+    } \
+    *_state *= -1; (void)_dyn; \
+    free(*(cp)); *(cp) = NULL
 
 #endif
