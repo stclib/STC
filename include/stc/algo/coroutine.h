@@ -35,40 +35,41 @@ struct iterate {
     int y;
 };
 
-bool iterate(struct iterate* U) {
-    cco_begin(U);
-        for (U->x = 0; U->x < U->max_x; U->x++)
-            for (U->y = 0; U->y < U->max_y; U->y++)
-                cco_yield (true);
+bool iterate(struct iterate* I) {
+    cco_begin(I);
+        for (I->x = 0; I->x < I->max_x; I->x++)
+            for (I->y = 0; I->y < I->max_y; I->y++)
+                cco_yield(true);
 
         cco_final:
             puts("final");
-    cco_end(U);
-    return false;
+    cco_end(false);
 }
 
 int main(void) {
-    struct iterate it = {3, 3};
+    struct iterate it = {.max_x=3, .max_y=3};
     int n = 0;
     while (iterate(&it))
     {
         printf("%d %d\n", it.x, it.y);
-        if (++n == 20) { iterate(cco_stop(&it)); break; }
+        // example of early stop:
+        if (++n == 20) (void)cco_stop(&it); // signal to stop at next
     }
     return 0;
 }
 */
 #include <stc/ccommon.h>
 
-#define cco_begin(c) \
-    int *_state = &(c)->cco_state; \
+#define cco_begin(ctx) \
+    int *_state = &(ctx)->cco_state; \
     switch (*_state) { \
         case 0:
 
-#define cco_end() \
+#define cco_end(retval) \
         *_state = 0; break; \
         default: assert(!"missing cco_final: or illegal state"); \
-    }
+    } \
+    return retval
 
 #define cco_yield(retval) \
     do { \
@@ -76,15 +77,15 @@ int main(void) {
         case __LINE__:; \
     } while (0)
 
-#define cco_yield_coroutine(c, corocall, retval) \
+#define cco_yield_coroutine(ctx, corocall, retval) \
     do { \
         *_state = __LINE__; \
         c_PASTE(cco, __LINE__): corocall; return retval; \
-        case __LINE__:; if (cco_alive(c)) goto c_PASTE(cco, __LINE__); \
+        case __LINE__:; if (cco_alive(ctx)) goto c_PASTE(cco, __LINE__); \
     } while (0)
 
 #define cco_final case -1
-#define cco_alive(c) ((c) && (c)->cco_state > 0)
-#define cco_stop(c) ((c)->cco_state = ((c)->cco_state > 0 ? -1 : -2), c)
+#define cco_alive(ctx) ((ctx)->cco_state > 0)
+#define cco_stop(ctx) ((ctx)->cco_state = cco_alive(ctx) ? -1 : -2), ctx)
 
 #endif

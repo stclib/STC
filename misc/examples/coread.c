@@ -24,8 +24,7 @@ bool file_nextline(struct file_nextline* U)
             printf("finish\n");
             cstr_drop(&U->line);
             fclose(U->fp);
-    cco_end();
-    return false;
+    cco_end(false);
 }
 
 int main(void) {
@@ -33,9 +32,6 @@ int main(void) {
     int n = 0;
     while (file_nextline(&z)) {
         printf("%3d %s\n", ++n, cstr_str(&z.line));
-
-        // stop after 15 lines:
-        if (n == 15) (void)cco_stop(&z);
     }
     printf("state %d\n", z.cco_state);
 }

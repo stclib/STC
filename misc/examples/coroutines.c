@@ -17,8 +17,7 @@ bool iterate(struct iterate* I) {
             for (I->y = 0; I->y < I->max_y; I->y++)
                 cco_yield(true);
         cco_final:
-    cco_end();
-    return false;
+    cco_end(false);
 }
 
 // Use coroutine to create a fibonacci sequence generator:
@@ -42,9 +41,7 @@ int64_t fibonacci(struct fibonacci* F) {
             F->b = sum;
         }
         cco_final:
-    cco_end();
-
-    return -1;
+    cco_end(-1);
 }
 
 // Combine
@@ -60,10 +57,10 @@ bool combine(struct combine* C) {
         cco_yield_coroutine(&C->it, iterate(&C->it), true);
         cco_yield_coroutine(&C->fib, fibonacci(&C->fib), true);
         // May reuse the C->it context; state has been reset to 0.
+        C->it.max_x = 2; C->it.max_y = 2;
         cco_yield_coroutine(&C->it, iterate(&C->it), true);
         cco_final: puts("final");
-    cco_end();
-    return false;
+    cco_end(false);
 }
 
 int main(void) {
