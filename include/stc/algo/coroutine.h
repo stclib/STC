@@ -85,6 +85,6 @@ int main(void) {
 
 #define cco_final case -1
 #define cco_alive(c) ((c) && (c)->cco_state > 0)
-#define cco_stop(c) ((c)->cco_state = (c)->cco_state ? -1 : -2, c)
+#define cco_stop(c) ((c)->cco_state = ((c)->cco_state > 0 ? -1 : -2), c)
 
 #endif
