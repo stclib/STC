@@ -2,6 +2,25 @@
 #include <stdio.h>
 #include <stdint.h>
 
+// Demonstrate to call another coroutine from a coroutine:
+// First create a 2D iterator, then call fibonacci sequence:
+
+struct iterate {
+    int max_x, max_y;
+    int cco_state;
+    int x, y;
+};
+
+bool iterate(struct iterate* I) {
+    cco_begin(I);
+        for (I->x = 0; I->x < I->max_x; I->x++)
+            for (I->y = 0; I->y < I->max_y; I->y++)
+                cco_yield(true);
+        cco_final:
+    cco_end();
+    return false;
+}
+
 // Use coroutine to create a fibonacci sequence generator:
 
 struct fibonacci {
@@ -28,36 +47,27 @@ int64_t fibonacci(struct fibonacci* F) {
     return -1;
 }
 
-// Demonstrate to call another coroutine from a coroutine:
-// Create a 2D iterator, and call fibonacci sequence when x,y = 1,1:
+// Combine
 
-struct iterate {
-    int max_x, max_y; 
-    int cco_state; 
-    int x, y;
+struct combine {
+    struct iterate it;
+    struct fibonacci fib;
+    int cco_state;
 };
 
-bool iterate(struct iterate* I, struct fibonacci* F) {
-    cco_begin(I);
-        for (I->x = 0; I->x < I->max_x; I->x++) {
-            for (I->y = 0; I->y < I->max_y; I->y++) {
-                if (I->x == 1 && I->y == 1)
-                    cco_yield_coroutine(F, fibonacci(F), true);
-                else
-                    cco_yield(true);
-            }
-        }
-        cco_final:
-            puts("final");
+bool combine(struct combine* C) {
+    cco_begin(C);
+        cco_yield_coroutine(&C->it, iterate(&C->it), true);
+        cco_yield_coroutine(&C->fib, fibonacci(&C->fib), true);
+        // May reuse the C->it context; state has been reset to 0.
+        cco_yield_coroutine(&C->it, iterate(&C->it), true);
+        cco_final: puts("final");
     cco_end();
     return false;
 }
 
-
 int main(void) {
-    struct fibonacci fib = {.n = 14};
-    struct iterate it = {3, 3};
-
-    while (iterate(&it, &fib))
-        printf("Iter=(%d, %d). Fib=%lld\n", it.x, it.y, (long long)fib.a);
+    struct combine comb = {.it={3, 3}, .fib={14}};
+    while (combine(&comb))
+        printf("Iter=(%d, %d). Fib=%lld\n", comb.it.x, comb.it.y, (long long)comb.fib.a);
 }
