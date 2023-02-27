@@ -60,13 +60,20 @@ int main(void) {
 */
 #include <stc/ccommon.h>
 
+enum {
+    cco_state_final = -1,
+    cco_state_done = -2,
+    cco_state_illegal = -3,
+};
+
 #define cco_begin(ctx) \
     int *_state = &(ctx)->cco_state; \
     switch (*_state) { \
-        case 0:
+        case 0: \
+        case cco_state_done:;
 
 #define cco_end(retval) \
-        *_state = 0; break; \
+        *_state = cco_state_done; break; \
         default: assert(!"missing cco_final: or illegal state"); \
     } \
     return retval
@@ -77,15 +84,18 @@ int main(void) {
         case __LINE__:; \
     } while (0)
 
-#define cco_yield_coroutine(ctx, corocall, retval) \
+#define cco_coroutine(corocall, ctx, retval) \
     do { \
         *_state = __LINE__; \
         c_PASTE(cco, __LINE__): corocall; return retval; \
-        case __LINE__:; if (cco_alive(ctx)) goto c_PASTE(cco, __LINE__); \
+        case __LINE__: if (cco_alive(ctx)) goto c_PASTE(cco, __LINE__); \
     } while (0)
 
-#define cco_final case -1
+#define cco_final case cco_state_final
+#define cco_stop(ctx) (((ctx)->cco_state = cco_alive(ctx) ? \
+                       cco_state_final : cco_state_illegal), ctx)
+#define cco_reset(ctx) ((ctx)->cco_state = 0)
+#define cco_done(ctx) ((ctx)->cco_state == cco_state_done)
 #define cco_alive(ctx) ((ctx)->cco_state > 0)
-#define cco_stop(ctx) ((ctx)->cco_state = cco_alive(ctx) ? -1 : -2), ctx)
 
 #endif

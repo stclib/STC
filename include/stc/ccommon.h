@@ -209,10 +209,12 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
          ; it.index < it.size; ++it.ref, ++it.index)
 #endif
 #define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
-#define c_with_2(declvar, drop) for (declvar, **_c_i = NULL; !_c_i; ++_c_i, drop)
-#define c_with_3(declvar, pred, drop) for (declvar, **_c_i = NULL; !_c_i && (pred); ++_c_i, drop)
-#define c_scope(init, drop) for (int _c_i = (init, 1); _c_i; --_c_i, drop)
-#define c_defer(...) for (int _c_i = 1; _c_i; --_c_i, __VA_ARGS__)
+#define c_with_2(declvar, drop) for (declvar, *_i, **_ip = &_i; _ip; _ip = 0, drop)
+#define c_with_3(declvar, pred, drop) for (declvar, *_i, **_ip = &_i; _ip && (pred); _ip = 0, drop)
+#define c_scope(...) c_MACRO_OVERLOAD(c_scope, __VA_ARGS__)
+#define c_scope_2(init, drop) for (int _i = (init, 1); _i; _i = 0, drop)
+#define c_scope_3(init, pred, drop) for (int _i = (init, 1); _i && (pred); _i = 0, drop)
+#define c_defer(...) for (int _i = 1; _i; _i = 0, __VA_ARGS__)
 
 #define c_auto(...) c_MACRO_OVERLOAD(c_auto, __VA_ARGS__)
 #define c_auto_2(C, a) \
