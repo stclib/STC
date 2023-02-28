@@ -77,12 +77,12 @@ struct combine {
 
 bool combine(struct combine* C) {
     cco_begin(C);
-        cco_coroutine(prime(&C->prm), &C->prm, true);
-        cco_coroutine(fibonacci(&C->fib), &C->fib, true);
+        cco_yield(prime(&C->prm), &C->prm, true);
+        cco_yield(fibonacci(&C->fib), &C->fib, true);
 
         // Reuse the C->prm context and extend the count:
         C->prm.count = 20;
-        cco_coroutine(prime(&C->prm), &C->prm, true);
+        cco_yield(prime(&C->prm), &C->prm, true);
 
         cco_final: puts("final");
     cco_end(false);

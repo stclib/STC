@@ -79,18 +79,19 @@ enum {
     } \
     return retval
 
-#define cco_yield(retval) \
-    do { \
-        *_state = __LINE__; return retval; \
-        case __LINE__:; \
-    } while (0)
-
 #define cco_return \
     do { \
         *_state = cco_state_final; goto cco_finish; \
     } while (0)
 
-#define cco_coroutine(corocall, ctx, retval) \
+#define cco_yield(...) c_MACRO_OVERLOAD(cco_yield, __VA_ARGS__)
+#define cco_yield_1(retval) \
+    do { \
+        *_state = __LINE__; return retval; \
+        case __LINE__:; \
+    } while (0)
+
+#define cco_yield_3(corocall, ctx, retval) \
     do { \
         *_state = __LINE__; \
         c_PASTE(cco, __LINE__): corocall; if (cco_alive(ctx)) return retval; \
