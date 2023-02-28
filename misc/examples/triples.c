@@ -23,8 +23,6 @@ struct tricoro {
     int x, y, z;
 };
 
-#include <stdlib.h>
-
 bool triples_coro(struct tricoro* t) {
     cco_begin(t);
         for (t->z = 1;; ++t->z) {
@@ -38,7 +36,6 @@ bool triples_coro(struct tricoro* t) {
             }
         }
         cco_final:
-            puts("final");
     cco_end(false);
 }
 

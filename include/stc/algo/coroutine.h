@@ -28,11 +28,9 @@
 #include <stc/algo/coroutine.h>
 
 struct iterate {
-    int max_x;
-    int max_y;
+    int max_x, max_y;
+    int x, y;
     int cco_state; // required member
-    int x;
-    int y;
 };
 
 bool iterate(struct iterate* I) {
@@ -66,6 +64,8 @@ enum {
     cco_state_illegal = -3,
 };
 
+#define cco_alive(ctx) ((ctx)->cco_state > 0)
+
 #define cco_begin(ctx) \
     int *_state = &(ctx)->cco_state; \
     switch (*_state) { \
@@ -74,15 +74,10 @@ enum {
 
 #define cco_end(retval) \
         *_state = cco_state_expired; break; \
-        default: assert(!"missing cco_final: or illegal state"); \
-                 goto cco_finish; /* avoid unused warning */ \
+        default: assert(!"illegal coroutine state"); \
+                 goto _cco_final_; /* avoid unused-warning */ \
     } \
     return retval
-
-#define cco_return \
-    do { \
-        *_state = cco_state_final; goto cco_finish; \
-    } while (0)
 
 #define cco_yield(...) c_MACRO_OVERLOAD(cco_yield, __VA_ARGS__)
 #define cco_yield_1(retval) \
@@ -98,9 +93,15 @@ enum {
         case __LINE__: if (cco_alive(ctx)) goto c_PASTE(cco, __LINE__); \
     } while (0)
 
-#define cco_final case cco_state_final: cco_finish
-#define cco_stop(ctx) (((ctx)->cco_state = cco_alive(ctx) ? \
-                       cco_state_final : cco_state_illegal), ctx)
-#define cco_alive(ctx) ((ctx)->cco_state > 0)
+#define cco_final \
+    case cco_state_final: \
+    _cco_final_
+
+#define cco_return \
+    goto _cco_final_
+
+#define cco_stop(ctx) \
+    (((ctx)->cco_state = cco_alive(ctx) ? \
+     cco_state_final : cco_state_illegal), ctx)
 
 #endif

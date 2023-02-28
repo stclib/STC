@@ -15,12 +15,12 @@ bool file_nextline(struct file_nextline* U)
 {
     cco_begin(U)
         U->fp = fopen(U->filename, "r");
-        U->line = cstr_NULL;
+        U->line = cstr_init();
 
         while (cstr_getline(&U->line, U->fp))
             cco_yield(true);
 
-        cco_final: // cco_final is needed to support cco_stop.
+        cco_final: // required label.
             printf("finish\n");
             cstr_drop(&U->line);
             fclose(U->fp);
@@ -33,5 +33,4 @@ int main(void) {
     while (file_nextline(&z)) {
         printf("%3d %s\n", ++n, cstr_str(&z.line));
     }
-    printf("state %d\n", z.cco_state);
 }
