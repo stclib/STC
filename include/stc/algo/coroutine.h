@@ -70,7 +70,7 @@ enum {
     int *_state = &(ctx)->cco_state; \
     switch (*_state) { \
         case cco_state_expired: \
-        case 0:; \
+        case 0:
 
 #define cco_end(retval) \
         *_state = cco_state_expired; break; \
@@ -90,7 +90,7 @@ enum {
     do { \
         *_state = __LINE__; \
         c_PASTE(cco, __LINE__): corocall; if (cco_alive(ctx)) return retval; \
-        case __LINE__: if (cco_alive(ctx)) goto c_PASTE(cco, __LINE__); \
+        case __LINE__: if ((ctx)->cco_state >= cco_state_final) goto c_PASTE(cco, __LINE__); \
     } while (0)
 
 #define cco_final \
@@ -102,6 +102,6 @@ enum {
 
 #define cco_stop(ctx) \
     (((ctx)->cco_state = cco_alive(ctx) ? \
-     cco_state_final : cco_state_illegal), ctx)
+     cco_state_final : cco_state_expired), ctx)
 
 #endif
