@@ -62,19 +62,20 @@ int main(void) {
 
 enum {
     cco_state_final = -1,
-    cco_state_done = -2,
+    cco_state_expired = -2,
     cco_state_illegal = -3,
 };
 
 #define cco_begin(ctx) \
     int *_state = &(ctx)->cco_state; \
     switch (*_state) { \
-        case 0: \
-        case cco_state_done:;
+        case cco_state_expired: \
+        case 0:; \
 
 #define cco_end(retval) \
-        *_state = cco_state_done; break; \
+        *_state = cco_state_expired; break; \
         default: assert(!"missing cco_final: or illegal state"); \
+                 goto cco_finish; /* avoid unused warning */ \
     } \
     return retval
 
@@ -84,18 +85,21 @@ enum {
         case __LINE__:; \
     } while (0)
 
+#define cco_return \
+    do { \
+        *_state = cco_state_final; goto cco_finish; \
+    } while (0)
+
 #define cco_coroutine(corocall, ctx, retval) \
     do { \
         *_state = __LINE__; \
-        c_PASTE(cco, __LINE__): corocall; return retval; \
+        c_PASTE(cco, __LINE__): corocall; if (cco_alive(ctx)) return retval; \
         case __LINE__: if (cco_alive(ctx)) goto c_PASTE(cco, __LINE__); \
     } while (0)
 
-#define cco_final case cco_state_final
+#define cco_final case cco_state_final: cco_finish
 #define cco_stop(ctx) (((ctx)->cco_state = cco_alive(ctx) ? \
                        cco_state_final : cco_state_illegal), ctx)
-#define cco_reset(ctx) ((ctx)->cco_state = 0)
-#define cco_done(ctx) ((ctx)->cco_state == cco_state_done)
 #define cco_alive(ctx) ((ctx)->cco_state > 0)
 
 #endif

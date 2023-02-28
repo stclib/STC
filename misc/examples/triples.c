@@ -18,9 +18,12 @@ void triples_vanilla(int n) {
 }
 
 struct tricoro {
+    int n;
     int cco_state;
     int x, y, z;
 };
+
+#include <stdlib.h>
 
 bool triples_coro(struct tricoro* t) {
     cco_begin(t);
@@ -28,12 +31,14 @@ bool triples_coro(struct tricoro* t) {
             for (t->x = 1; t->x < t->z; ++t->x) {
                 for (t->y = t->x; t->y < t->z; ++t->y) {
                     if (t->x*t->x + t->y*t->y == t->z*t->z) {
+                        if (t->n-- == 0) cco_return;
                         cco_yield(true);
                     }
                 }
             }
         }
         cco_final:
+            puts("final");
     cco_end(false);
 }
 
@@ -41,12 +46,10 @@ bool triples_coro(struct tricoro* t) {
 int main()
 {
     puts("Vanilla triples:");
-    triples_vanilla(20);
+    triples_vanilla(6);
 
     puts("\nCoroutine triples:");
-    struct tricoro t = {0};
-    int i = 0;
-    while (i++ < 20 && triples_coro(&t))
+    struct tricoro t = {6};
+    while (triples_coro(&t))
         printf("{%d, %d, %d},\n", t.x, t.y, t.z);
-    triples_coro(cco_stop(&t));
 }

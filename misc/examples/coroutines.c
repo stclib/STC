@@ -13,26 +13,29 @@ bool is_prime(int64_t i) {
 
 struct prime {
     int count, idx;
-    int64_t num, result;
+    int64_t result, pos;
     int cco_state;
 };
 
 bool prime(struct prime* U) {
     cco_begin(U);
-        if (U->num < 2) U->num = 2;
-        if (U->num == 2) {
+        if (U->result < 2) U->result = 2;
+        if (U->result == 2) {
+            if (U->count-- == 0) cco_return;
             ++U->idx;
-            U->result = U->num;
             cco_yield(true);
         }
-        U->num += !(U->num & 1);
-        for (; U->idx < U->count; U->num += 2)
-            if (is_prime(U->num)) {
+        U->result += !(U->result & 1);
+        for (U->pos = U->result; U->count > 0; U->pos += 2) {
+            if (is_prime(U->pos)) {
+                --U->count;
                 ++U->idx;
-                U->result = U->num;
+                U->result = U->pos;
                 cco_yield(true);
             }
+        }
         cco_final:
+            printf("final prm\n");
     cco_end(false);
 }
 
@@ -45,21 +48,23 @@ struct fibonacci {
     int cco_state;
 };
 
-int64_t fibonacci(struct fibonacci* F) {
-    assert (F->count < 94);
+bool fibonacci(struct fibonacci* F) {
+    assert(F->count < 94);
 
     cco_begin(F);
-        F->idx = 0;
+        F->idx = 1;
         F->result = 0;
         F->b = 1;
-        for (F->idx = 1; F->idx < F->count; F->idx++) {
-            cco_yield(F->result);
+        for (;; F->idx++) {
+            if (F->count-- == 0) cco_return;
+            cco_yield(true);
             int64_t sum = F->result + F->b; // NB! locals only lasts until next cco_yield!
             F->result = F->b;
             F->b = sum;
         }
         cco_final:
-    cco_end(-1);
+            printf("final fib\n");
+    cco_end(false);
 }
 
 // Combine
@@ -85,11 +90,13 @@ bool combine(struct combine* C) {
 
 int main(void) {
     struct combine comb = {.prm={.count=10}, .fib={14}};
-    while (combine(&comb))
-        if (cco_done(&comb.prm))
-            cco_reset(&comb.prm);
-        else
+    if (true)
+        while (combine(&comb))
             printf("Prime(%d)=%lld, Fib(%d)=%lld\n", 
                 comb.prm.idx, (long long)comb.prm.result, 
                 comb.fib.idx, (long long)comb.fib.result);
+    else
+        while (prime(&comb.prm))
+            printf("Prime(%d)=%lld\n", 
+                comb.prm.idx, (long long)comb.prm.result);
 }
