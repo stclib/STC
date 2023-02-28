@@ -101,7 +101,6 @@ enum {
     goto _cco_final_
 
 #define cco_stop(ctx) \
-    (((ctx)->cco_state = cco_alive(ctx) ? \
-     cco_state_final : cco_state_expired), ctx)
+    (cco_alive(ctx) ? ((ctx)->cco_state = cco_state_final) : 0, ctx)
 
 #endif
