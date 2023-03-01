@@ -50,7 +50,7 @@ int main(void) {
     {
         printf("%d %d\n", it.x, it.y);
         // example of early stop:
-        if (++n == 20) (void)cco_stop(&it); // signal to stop at next
+        if (++n == 20) cco_stop(&it); // signal to stop at next
     }
     return 0;
 }
@@ -98,6 +98,9 @@ enum {
     goto _cco_final_
 
 #define cco_stop(ctx) \
-    (cco_alive(ctx) ? ((ctx)->cco_state = cco_state_final) : 0, ctx)
+    do { \
+        int* _state = &(ctx)->cco_state; \
+        if (*_state > 0) *_state = cco_state_final; \
+    } while (0)
 
 #endif

@@ -13,7 +13,7 @@ endif()
 
 include(CTest)
 if(BUILD_TESTING)
-	file(GLOB_RECURSE examples misc/examples/*.c)
+	file(GLOB examples misc/examples/*.c)
 	foreach(file IN LISTS examples)
 		get_filename_component(name "${file}" NAME_WE)
 		add_executable(${name} ${file})

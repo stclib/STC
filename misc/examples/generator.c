@@ -48,6 +48,6 @@ int main()
         if (i.ref->c < 100)
             printf("%u: (%d, %d, %d)\n", INT32_MAX - i.ref->n + 1, i.ref->a, i.ref->b, i.ref->c);
         else
-            (void)cco_stop(&i);
+            cco_stop(&i);
     }
 }
