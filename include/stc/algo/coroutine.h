@@ -24,7 +24,6 @@
 #define STC_COROUTINE_INCLUDED
 /*
 #include <stdio.h>
-#include <stdbool.h>
 #include <stc/algo/coroutine.h>
 
 struct iterate {
@@ -61,7 +60,6 @@ int main(void) {
 enum {
     cco_state_final = -1,
     cco_state_expired = -2,
-    cco_state_illegal = -3,
 };
 
 #define cco_alive(ctx) ((ctx)->cco_state > 0)
@@ -74,8 +72,7 @@ enum {
 
 #define cco_end(retval) \
         *_state = cco_state_expired; break; \
-        default: assert(!"illegal coroutine state"); \
-                 goto _cco_final_; /* avoid unused-warning */ \
+        default: goto _cco_final_; /* avoid unused-warning */ \
     } \
     return retval
 

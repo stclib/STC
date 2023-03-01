@@ -17,13 +17,13 @@ void triples_vanilla(int n) {
     done:;
 }
 
-struct tricoro {
+struct triples {
     int n;
-    int cco_state;
     int x, y, z;
+    int cco_state;
 };
 
-bool triples_coro(struct tricoro* t) {
+bool triples_coro(struct triples* t) {
     cco_begin(t);
         for (t->z = 1;; ++t->z) {
             for (t->x = 1; t->x < t->z; ++t->x) {
@@ -46,7 +46,7 @@ int main()
     triples_vanilla(6);
 
     puts("\nCoroutine triples:");
-    struct tricoro t = {6};
+    struct triples t = {6};
     while (triples_coro(&t))
         printf("{%d, %d, %d},\n", t.x, t.y, t.z);
 }
