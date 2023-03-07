@@ -73,7 +73,7 @@ int main()
                      && c_flt_skipwhile(i, isOdd(i))
                      && isOdd(i)
                      && c_flt_skip(i, 2)
-                      , c_flt_take(i, 1))
+                     && c_flt_take(i, 2))
             printf(" %d", *i.ref);
         puts("");
         // 189

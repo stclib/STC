@@ -36,9 +36,9 @@ int main()
         puts("");
         
         c_forfilter (i, cstack_int, stk
-                    , c_flt_skipwhile(i, *i.ref < 3)
-                    && (*i.ref & 1) == 0 // even only
-                    , c_flt_take(i, 2)) // break after 2
+                      , c_flt_skipwhile(i, *i.ref < 3)
+                     && (*i.ref & 1) == 0 // even only
+                     && c_flt_take(i, 2)) // break after 2
             printf(" %d", *i.ref);
         puts("");
     }
@@ -53,27 +53,37 @@ int main()
 #define c_NFILTERS 32
 #endif
 
-#define c_flt_take(i, n) (c_flt_count(i) <= (n))
+#define c_flt_take(i, n) _flt_take(&(i).b, n)
 #define c_flt_skip(i, n) (c_flt_count(i) > (n))
-#define c_flt_skipwhile(i, pred) ((i).s2[(i).s2top++] |= !(pred))
-#define c_flt_takewhile(i, pred) !c_flt_skipwhile(i, pred)
-#define c_flt_last(i) (i).s1[(i).s1top-1]
-#define c_flt_count(i) ++(i).s1[(i).s1top++]
+#define c_flt_skipwhile(i, pred) ((i).b.s2[(i).b.s2top++] |= !(pred))
+#define c_flt_takewhile(i, pred) _flt_takewhile(&(i).b, pred)
+#define c_flt_last(i) (i).b.s1[(i).b.s1top-1]
+#define c_flt_count(i) ++(i).b.s1[(i).b.s1top++]
 
-#define c_forfilter(...) c_MACRO_OVERLOAD(c_forfilter, __VA_ARGS__)
-
-#define c_forfilter_4(i, C, cnt, filter) \
-    c_forfilter_B(i, C, C##_begin(&cnt), filter)
-
-#define c_forfilter_5(i, C, cnt, filter, cond) \
-    c_forfilter_B(i, C, C##_begin(&cnt), filter) if (!(cond)) break; else
-
-#define c_forfilter_B(i, C, start, filter) \
-    for (struct {C##_iter it; C##_value *ref; \
-                 uint32_t s1[c_NFILTERS], index; \
-                 bool s2[c_NFILTERS]; uint8_t s1top, s2top;} \
-         i = {.it=start, .ref=i.it.ref}; i.it.ref \
-         ; C##_next(&i.it), i.ref = i.it.ref, ++i.index, i.s1top=0, i.s2top=0) \
+#define c_forfilter(i, C, cnt, filter) \
+    for (struct {struct _flt_base b; C##_iter it; C##_value *ref;} \
+         i = {.it=C##_begin(&cnt), .ref=i.it.ref} ; !i.b.done & (i.ref != NULL) ; \
+         C##_next(&i.it), i.ref = i.it.ref, i.b.s1top=0, i.b.s2top=0) \
       if (!(filter)) ; else
+
+// -----
+
+struct _flt_base {
+    uint32_t s1[c_NFILTERS];
+    bool s2[c_NFILTERS], done;
+    uint8_t s1top, s2top;
+};
+
+static inline bool _flt_take(struct _flt_base* b, uint32_t n) {
+    uint32_t k = ++b->s1[b->s1top++];
+    b->done |= (k >= n);
+    return k <= n;
+}
+
+static inline bool _flt_takewhile(struct _flt_base* b, bool pred) {
+    bool skip = (b->s2[b->s2top++] |= !pred);
+    b->done |= skip;
+    return !skip;
+}
 
 #endif

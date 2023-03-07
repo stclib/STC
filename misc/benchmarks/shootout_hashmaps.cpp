@@ -2,7 +2,7 @@
 #include <time.h>
 #include <stc/crandom.h>
 
-#define MAX_LOAD_FACTOR 77
+#define MAX_LOAD_FACTOR 85
 
 #ifdef __cplusplus
 #include <limits>
@@ -314,7 +314,7 @@ int main(int argc, char* argv[])
     unsigned n = n_mill * 1000000;
     unsigned N1 = n, N2 = n, N3 = n, N4 = n, N5 = n;
     stc64_t rng;
-    size_t seed = time(NULL);
+    size_t seed = 123456; // time(NULL);
 
     printf("\nUnordered hash map shootout\n");
     printf("KMAP = https://github.com/attractivechaos/klib\n"
@@ -334,14 +334,14 @@ int main(int argc, char* argv[])
     printf("\nT1: Insert %g mill. random keys range [0, 2^%u): map[rnd] = i;\n", N1/1000000.0, keybits);
     RUN_TEST(1)
 
-    printf("\nT2: Insert %g mill. SEQUENTIAL keys, erase them in same order:\n", N2/1000000.0);
-    RUN_TEST(2)
+    //printf("\nT2: Insert %g mill. SEQUENTIAL keys, erase them in same order:\n", N2/1000000.0);
+    //RUN_TEST(2)
 
     printf("\nT3: Erase all elements by lookup (%u mill. random inserts), key range [0, 2^%u)\n", n_mill*2, keybits);
     RUN_TEST(3)
 
-    printf("\nT4: Iterate map with Min(%u mill, 2^%u) inserts repeated times:\n", n_mill, keybits+1);
-    RUN_TEST(4)
+    //printf("\nT4: Iterate map with Min(%u mill, 2^%u) inserts repeated times:\n", n_mill, keybits+1);
+    //RUN_TEST(4)
 
     printf("\nT5: Lookup mix of random/existing keys in range [0, 2^%u). Num lookups depends on size.\n", keybits);
     RUN_TEST(5)

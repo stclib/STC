@@ -176,7 +176,6 @@ Iterate containers with stop-criteria and chained range filtering.
 | Usage                                               | Description                            |
 |:----------------------------------------------------|:---------------------------------------|
 | `c_forfilter (it, ctype, container, filter)`        | Filter out items in chain with &&      |
-| `c_forfilter (it, ctype, container, filter, pred)`  | Filter and iterate until pred is false |
 | `c_forwhile (it, ctype, start, pred)`               | Iterate until pred is false            |
 
 | Built-in filter                   | Description                          |
@@ -187,16 +186,14 @@ Iterate containers with stop-criteria and chained range filtering.
 | `c_flt_takewhile(it, predicate)`  | Take items until predicate is false  |
 | `c_flt_count(it)`                 | Increment current and return value   |
 | `c_flt_last(it)`                  | Get value of last count/skip/take    |
-
-`it.index` holds the index of the source item.
 ```c
 // Example:
 #include <stc/algo/crange.h>
 #include <stc/algo/filter.h>
 #include <stdio.h>
 
-bool isPrime(int i) {
-    for (int j=2; j*j <= i; ++j)
+bool isPrime(long long i) {
+    for (long long j=2; j*j <= i; ++j)
         if (i % j == 0) return false;
     return true;
 }
@@ -209,14 +206,13 @@ int main() {
                     isPrime(*i.ref)
                  && c_flt_skip(i, 24)
                  && c_flt_count(i) % 15 == 1
-                  , c_flt_take(i, 10)) // , = breaks loop on false.
-        printf(" %d", *i.ref);
+                 && c_flt_take(i, 10))
+        printf(" %lld", *i.ref);
     puts("");
 }
 // out: 1171 1283 1409 1493 1607 1721 1847 1973 2081 2203
 ```
-Note that `c_flt_take()` is given as an optional argument, which breaks the loop on false.
-With `&&` instead of the comma it will give same result, but the full input is processed first.
+Note that `c_flt_take()` and `c_flt_takewhile()`breaks the loop on false.
 
 ## Generators
 
@@ -235,8 +231,7 @@ void        crange_next(crange_iter* it);
 // 1. All primes less than 32:
 crange r1 = crange_make(3, 32, 2);
 printf("2"); // first prime
-c_forfilter (i, crange, r1
-              , isPrime(*i.ref))
+c_forfilter (i, crange, r1, isPrime(*i.ref))
     printf(" %lld", *i.ref);
 // 2 3 5 7 11 13 17 19 23 29 31
 
@@ -244,7 +239,7 @@ c_forfilter (i, crange, r1
 printf("2");
 c_forfilter (i, crange, crange_obj(3, INT64_MAX, 2)
               , isPrime(*i.ref)
-              , c_flt_take(10))
+             && c_flt_take(10))
     printf(" %lld", *i.ref);
 // 2 3 5 7 11 13 17 19 23 29 31
 ```

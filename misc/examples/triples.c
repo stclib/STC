@@ -4,11 +4,11 @@
 #include <stdio.h>
 
 void triples_vanilla(int n) {
-    for (int i = 1, z = 1;; ++z) {
-        for (int x = 1; x < z; ++x) {
-            for (int y = x; y < z; ++y) {
-                if (x*x + y*y == z*z) {
-                    printf("{%d, %d, %d},\n", x, y, z);
+    for (int i = 1, c = 1;; ++c) {
+        for (int a = 1; a < c; ++a) {
+            for (int b = a; b < c; ++b) {
+                if (a*a + b*b == c*c) {
+                    printf("{%d, %d, %d},\n", a, b, c);
                     if (++i > n) goto done;
                 }
             }
@@ -19,17 +19,17 @@ void triples_vanilla(int n) {
 
 struct triples {
     int n;
-    int x, y, z;
+    int a, b, c;
     int cco_state;
 };
 
-bool triples_coro(struct triples* t) {
-    cco_begin(t);
-        for (t->z = 1;; ++t->z) {
-            for (t->x = 1; t->x < t->z; ++t->x) {
-                for (t->y = t->x; t->y < t->z; ++t->y) {
-                    if (t->x*t->x + t->y*t->y == t->z*t->z) {
-                        if (t->n-- == 0) cco_return;
+bool triples_next(struct triples* I) {
+    cco_begin(I);
+        for (I->c = 1;; ++I->c) {
+            for (I->a = 1; I->a < I->c; ++I->a) {
+                for (I->b = I->a; I->b < I->c; ++I->b) {
+                    if (I->a*I->a + I->b*I->b == I->c*I->c) {
+                        if (I->n-- == 0) cco_return;
                         cco_yield(true);
                     }
                 }
@@ -46,7 +46,9 @@ int main()
     triples_vanilla(6);
 
     puts("\nCoroutine triples:");
-    struct triples t = {6};
-    while (triples_coro(&t))
-        printf("{%d, %d, %d},\n", t.x, t.y, t.z);
+    struct triples t = {INT32_MAX};
+    while (triples_next(&t)) {
+        if (t.c < 100) printf("{%d, %d, %d},\n", t.a, t.b, t.c);
+        else cco_stop(&t);
+    }
 }

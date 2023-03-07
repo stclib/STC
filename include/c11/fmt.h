@@ -6,14 +6,14 @@ VER 2.0: NEW API:
 void        fmt_print(fmt, ...);
 void        fmt_println(fmt, ...);
 void        fmt_printd(dest, fmt, ...);
-void        fmt_freebuffer(fmt_buffer* buf);
+void        fmt_destroy(fmt_buffer* buf);
 
   dest - destination, one of:
     FILE* fp        Write to a file
     char* strbuf    Write to a pre-allocated string buffer
     fmt_buffer* buf Auto realloc the needed memory (safe).
                     Set buf->stream=1 for stream-mode.
-                    Call fmt_freebuffer(buf) after usage.
+                    Call fmt_destroy(buf) after usage.
 
   fmt - format string
     {}              Auto-detected format. If :MOD is not specified,
@@ -55,7 +55,7 @@ int main() {
     fmt_print("{}, len={}, cap={}\n", out->data, out->len, out->cap);
     fmt_printd(out, "{} {}", ", Pi squared is:", pi*pi);
     fmt_print("{}, len={}, cap={}\n", out->data, out->len, out->cap);
-    fmt_freebuffer(out);
+    fmt_destroy(out);
 }
 */
 #include <stdio.h>
@@ -91,7 +91,7 @@ typedef struct {
     _Bool stream;
 } fmt_buffer;
 
-FMT_API void fmt_freebuffer(fmt_buffer* buf);
+FMT_API void fmt_destroy(fmt_buffer* buf);
 FMT_API int  _fmt_parse(char* p, int nargs, const char *fmt, ...);
 FMT_API void _fmt_bprint(fmt_buffer*, const char* fmt, ...);
 
@@ -99,11 +99,17 @@ FMT_API void _fmt_bprint(fmt_buffer*, const char* fmt, ...);
 #define FMT_MAX 256
 #endif
 
+#ifdef FMT_SHORTS
+#define print(...) fmt_printd(stdout, __VA_ARGS__)
+#define println(...) fmt_printd((fmt_buffer*)0, __VA_ARGS__)
+#define printd fmt_printd
+#endif
+
 #define fmt_print(...) fmt_printd(stdout, __VA_ARGS__)
 #define fmt_println(...) fmt_printd((fmt_buffer*)0, __VA_ARGS__)
+#define fmt_printd(...) fmt_OVERLOAD(fmt_printd, __VA_ARGS__)
 
 /* Primary function. */
-#define fmt_printd(...) fmt_OVERLOAD(fmt_printd, __VA_ARGS__)
 #define fmt_printd2(to, fmt) \
     do { char _fs[FMT_MAX]; int _n = _fmt_parse(_fs, 0, fmt); \
         fmt_OK(_n == 0); _fmt_fn(to)(to, fmt); } while (0)
@@ -189,7 +195,7 @@ FMT_API void _fmt_bprint(fmt_buffer*, const char* fmt, ...);
 #include <stdarg.h>
 #include <string.h>
 
-FMT_API void fmt_freebuffer(fmt_buffer* buf) {
+FMT_API void fmt_destroy(fmt_buffer* buf) {
     free(buf->data);
 }
 

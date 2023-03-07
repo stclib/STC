@@ -36,9 +36,9 @@ void demo1(void)
                       , c_flt_skipwhile(i, *i.ref != 80)
                      && c_flt_skip(i, 1)
                      && c_flt_skipwhile(i, *i.ref != 80)
-                     &&   flt_isEven(i)
-                     &&   flt_skipValue(i, 80)
-                      , c_flt_take(i, 5) // short-circuit
+                     && flt_isEven(i)
+                     && flt_skipValue(i, 80)
+                     && c_flt_take(i, 5) // short-circuit
         ){
             sum += res = flt_square(i);
             printf(" %d", res);
@@ -68,7 +68,7 @@ void demo2(void)
         c_forfilter (x, crange, R
                       , c_flt_skipwhile(x, *x.ref != 11)
                      && *x.ref % 2 != 0
-                      , c_flt_take(x, 5))
+                     && c_flt_take(x, 5))
             IVec_push(&vector, (int)(*x.ref * *x.ref));
         c_foreach (x, IVec, vector)
             printf(" %d", *x.ref);
@@ -131,8 +131,8 @@ void demo5(void)
                   , c_flt_skip(i,15)
                  && c_flt_skipwhile(i, flt_mid_decade(i))
                  && c_flt_skip(i,30)
-                 &&   flt_even(i)
-                  , c_flt_take(i,10))
+                 && flt_even(i)
+                 && c_flt_take(i,5))
         printf(" %lld", *i.ref);
     puts("");
 }
