@@ -86,8 +86,10 @@ enum {
 #define cco_yield_3(corocall, ctx, retval) \
     do { \
         *_state = __LINE__; \
-        c_PASTE(cco, __LINE__): corocall; if (cco_alive(ctx)) return retval; \
-        case __LINE__: if ((ctx)->cco_state >= cco_state_final) goto c_PASTE(cco, __LINE__); \
+        do { \
+            corocall; if (cco_alive(ctx)) return retval; \
+            case __LINE__:; \
+        } while ((ctx)->cco_state >= cco_state_final); \
     } while (0)
 
 #define cco_final \
