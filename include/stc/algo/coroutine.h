@@ -59,20 +59,21 @@ int main(void) {
 
 enum {
     cco_state_final = -1,
-    cco_state_expired = -2,
+    cco_state_done = -2,
 };
 
 #define cco_alive(ctx) ((ctx)->cco_state > 0)
+#define cco_done(ctx) ((ctx)->cco_state == cco_state_done)
 
 #define cco_begin(ctx) \
     int *_state = &(ctx)->cco_state; \
     switch (*_state) { \
-        case cco_state_expired: \
+        case cco_state_done: \
         case 0:
 
 #define cco_end(retval) \
-        *_state = cco_state_expired; break; \
-        default: goto _cco_final_; /* avoid unused-warning */ \
+        *_state = cco_state_done; break; \
+        default: goto _cco_final_; /*  never happens */ \
     } \
     return retval
 
@@ -89,7 +90,7 @@ enum {
         do { \
             corocall; if (cco_alive(ctx)) return retval; \
             case __LINE__:; \
-        } while ((ctx)->cco_state >= cco_state_final); \
+        } while (!cco_done(ctx)); \
     } while (0)
 
 #define cco_final \
