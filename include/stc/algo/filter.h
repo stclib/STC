@@ -57,12 +57,13 @@ int main()
 #define c_flt_skip(i, n) (c_flt_count(i) > (n))
 #define c_flt_skipwhile(i, pred) ((i).b.s2[(i).b.s2top++] |= !(pred))
 #define c_flt_takewhile(i, pred) _flt_takewhile(&(i).b, pred)
+#define c_flt_transform(i, expr) (*((i).ref = &(i).val) = expr, true)
 #define c_flt_last(i) (i).b.s1[(i).b.s1top-1]
 #define c_flt_count(i) ++(i).b.s1[(i).b.s1top++]
 
 #define c_forfilter(i, C, cnt, filter) \
-    for (struct {struct _flt_base b; C##_iter it; C##_value *ref;} \
-         i = {.it=C##_begin(&cnt), .ref=i.it.ref} ; !i.b.done & (i.ref != NULL) ; \
+    for (struct {struct _flt_base b; C##_iter it; C##_value *ref, val;} \
+         i = {.it=C##_begin(&cnt), .ref=i.it.ref} ; !i.b.done & (i.it.ref != NULL) ; \
          C##_next(&i.it), i.ref = i.it.ref, i.b.s1top=0, i.b.s2top=0) \
       if (!(filter)) ; else
 

@@ -62,6 +62,10 @@ enum {
     cco_state_done = -2,
 };
 
+typedef struct {
+    int cco_state;
+} cco_state;
+
 #define cco_alive(ctx) ((ctx)->cco_state > 0)
 #define cco_done(ctx) ((ctx)->cco_state == cco_state_done)
 
@@ -83,6 +87,9 @@ enum {
         *_state = __LINE__; return retval; \
         case __LINE__:; \
     } while (0)
+
+#define cco_yield_2(corocall, ctx) \
+    cco_yield_3(corocall, ctx,)
 
 #define cco_yield_3(corocall, ctx, retval) \
     do { \
