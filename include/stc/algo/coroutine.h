@@ -62,10 +62,6 @@ enum {
     cco_state_done = -2,
 };
 
-typedef struct {
-    int cco_state;
-} cco_state;
-
 #define cco_alive(ctx) ((ctx)->cco_state > 0)
 #define cco_done(ctx) ((ctx)->cco_state == cco_state_done)
 
