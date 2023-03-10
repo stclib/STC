@@ -178,9 +178,9 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
     for (C##_iter it = start, *_endref = (C##_iter*)(finish).ref \
          ; it.ref != (C##_value*)_endref; C##_next(&it))
 
-#define c_forwhile(i, C, start, cond) \
+#define c_forwhile(i, C, cnt, cond) \
     for (struct {C##_iter it; C##_value *ref; intptr_t index;} \
-         i = {.it=start, .ref=i.it.ref}; i.it.ref && (cond) \
+         i = {.it=C##_begin(&cnt), .ref=i.it.ref}; i.it.ref && (cond) \
          ; C##_next(&i.it), i.ref = i.it.ref, ++i.index)
 
 #define c_forpair(key, val, C, cnt) /* structured binding */ \

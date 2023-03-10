@@ -99,7 +99,7 @@ FMT_API void _fmt_bprint(fmt_buffer*, const char* fmt, ...);
 #define FMT_MAX 256
 #endif
 
-#ifdef FMT_SHORTS
+#ifndef FMT_NOSHORTS
 #define print(...) fmt_printd(stdout, __VA_ARGS__)
 #define println(...) fmt_printd((fmt_buffer*)0, __VA_ARGS__)
 #define printd fmt_printd
