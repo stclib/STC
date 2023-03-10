@@ -20,8 +20,8 @@ bool Triple_next(Triple_iter* it) {
             for (t->a = 1; t->a < t->c; ++t->a) {
                 for (t->b = t->a; t->b < t->c; ++t->b) {
                     if (t->a*t->a + t->b*t->b == t->c*t->c) {
+                        if (t->n-- == 0) cco_return;
                         cco_yield(true);
-                        if (t->n-- == 1) cco_return;
                     }
                 }
             }

@@ -62,8 +62,8 @@ enum {
     cco_state_done = -2,
 };
 
-#define cco_alive(ctx) ((ctx)->cco_state > 0)
-#define cco_done(ctx) ((ctx)->cco_state == cco_state_done)
+#define cco_suspended(ctx) ((ctx)->cco_state > 0)
+#define cco_alive(ctx) ((ctx)->cco_state != cco_state_done)
 
 #define cco_begin(ctx) \
     int *_state = &(ctx)->cco_state; \
@@ -91,9 +91,9 @@ enum {
     do { \
         *_state = __LINE__; \
         do { \
-            corocall; if (cco_alive(ctx)) return retval; \
+            corocall; if (cco_suspended(ctx)) return retval; \
             case __LINE__:; \
-        } while (!cco_done(ctx)); \
+        } while (cco_alive(ctx)); \
     } while (0)
 
 #define cco_final \
