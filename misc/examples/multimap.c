@@ -41,7 +41,6 @@ void OlympicLoc_drop(OlympicLoc* self);
 // Create a clist<OlympicLoc>, can be sorted by year.
 #define i_valclass OlympicLoc // binds _cmp, _clone and _drop.
 #define i_tag OL
-#define i_extern // define _clist_mergesort() 
 #include <stc/clist.h>
 
 // Create a csmap<cstr, clist_OL> where key is country name

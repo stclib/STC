@@ -80,8 +80,8 @@ const i_val*        clist_X_get(const clist_X* self, i_valraw raw);
 i_val*              clist_X_get_mut(clist_X* self, i_valraw raw);
 
 void                clist_X_reverse(clist_X* self);
-void                clist_X_sort(clist_X* self);                                        // needs i_extern defined
-void                clist_X_sort_with(clist_X* self, int(*cmp)(const clist_X_node*, const clist_X_node*));
+void                clist_X_sort(clist_X* self);
+void                clist_X_sort_with(clist_X* self, int(*cmp)(const clist_X_value*, const clist_X_value*));
 
 // Node API
 clist_X_node*       clist_X_get_node(clist_X_value* val);                               // get the enclosing node

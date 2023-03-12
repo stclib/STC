@@ -5,15 +5,14 @@
 
 #define i_val double
 #define i_tag fx
-#define i_extern // include sort function
 #include <stc/clist.h>
 
 int main() {
-    const int n = 1000000;
+    const int n = 3000000;
 
     c_auto (clist_fx, list)
     {
-        stc64_t rng = stc64_new(1234);
+        stc64_t rng = stc64_new(1234567);
         stc64_uniformf_t dist = stc64_uniformf_new(100.0f, n);
         int m = 0;
         c_forrange (n)

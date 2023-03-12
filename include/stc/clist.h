@@ -43,7 +43,7 @@
             c_foreach (i, clist_ix, list)
                 if (++n % 10000 == 0) printf("%8d: %10zu\n", n, *i.ref);
             // Sort them...
-            clist_ix_sort(&list); // mergesort O(n*log n)
+            clist_ix_sort(&list); // qsort O(n*log n)
             n = 0;
             puts("sorted");
             c_foreach (i, clist_ix, list)
@@ -66,11 +66,6 @@
 
 #define _clist_tonode(vp) c_container_of(vp, _cx_node, value)
     
-_c_clist_types(clist_VOID, int);
-_c_clist_complete_types(clist_VOID, dummy);
-typedef int clist_VOID_comp(const clist_VOID_node*, const clist_VOID_node*);
-extern clist_VOID_node* _clist_mergesort(clist_VOID_node*, clist_VOID_comp*);
-
 #define _c_clist_insert_entry_after(ref, val) \
     _cx_node *entry = (_cx_node *)i_malloc(c_sizeof *entry); entry->value = val; \
     _c_clist_insert_after_node(ref, entry)
@@ -104,7 +99,10 @@ STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw v
 STC_API intptr_t        _cx_memb(_remove)(_cx_self* self, _cx_raw val);
 #endif
 #ifndef i_no_cmp
-STC_API int             _cx_memb(_sort_cmp_)(const _cx_node* x, const _cx_node* y);
+STC_API void            _cx_memb(_sort_with)(_cx_self* self, int(*cmp)(const _cx_value*, const _cx_value*));
+STC_API int             _cx_memb(_sort_cmp_)(const _cx_value*, const _cx_value*);
+STC_INLINE void         _cx_memb(_sort)(_cx_self* self)
+                            { _cx_memb(_sort_with)(self, _cx_memb(_sort_cmp_)); }
 #endif
 STC_API void            _cx_memb(_reverse)(_cx_self* self);
 STC_API _cx_iter        _cx_memb(_splice)(_cx_self* self, _cx_iter it, _cx_self* other);
@@ -206,8 +204,7 @@ _cx_memb(_get_mut)(_cx_self* self, _cx_raw val) {
     return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), val).ref;
 }
 
-STC_INLINE bool
-_cx_memb(_eq)(const _cx_self* x, const _cx_self* y) {
+STC_INLINE bool _cx_memb(_eq)(const _cx_self* x, const _cx_self* y) {
     _cx_iter i = _cx_memb(_begin)(x), j = _cx_memb(_begin)(y);
     for (; i.ref && j.ref; _cx_memb(_next)(&i), _cx_memb(_next)(&j)) {
         const _cx_raw _rx = i_keyto(i.ref), _ry = i_keyto(j.ref);
@@ -216,68 +213,6 @@ _cx_memb(_eq)(const _cx_self* x, const _cx_self* y) {
     return !(i.ref || j.ref);
 }
 #endif
-#ifndef i_no_cmp
-
-STC_INLINE void
-_cx_memb(_sort)(_cx_self* self) {
-    if (self->last)
-        self->last = (_cx_node *)_clist_mergesort((clist_VOID_node *)self->last->next, 
-                                                  (clist_VOID_comp *)_cx_memb(_sort_cmp_));
-}
-STC_INLINE void
-_cx_memb(_sort_with)(_cx_self* self, int(*cmp)(const _cx_node*, const _cx_node*)) {
-    if (self->last)
-        self->last = (_cx_node *)_clist_mergesort((clist_VOID_node *)self->last->next, 
-                                                  (clist_VOID_comp *)cmp);
-}
-#endif
-
-#if defined(i_extern)
-/* Implement non-templated extern functions */
-// Singly linked list Mergesort implementation by Simon Tatham. O(n*log n).
-// https://www.chiark.greenend.org.uk/~sgtatham/algorithms/listsort.html
-clist_VOID_node *
-_clist_mergesort(clist_VOID_node *list, clist_VOID_comp* cmp) {
-    clist_VOID_node *p, *q, *e, *tail, *oldhead;
-    int insize = 1, nmerges, psize, qsize, i;
-
-    while (1) {
-        p = oldhead = list;
-        list = tail = NULL;
-        nmerges = 0;
-
-        while (p) {
-            ++nmerges;
-            q = p, psize = 0;
-            for (i = 0; i < insize; ++i) {
-                ++psize;
-                q = (q->next == oldhead ? NULL : q->next);
-                if (!q) break;
-            }
-            qsize = insize;
-
-            while (psize || (qsize && q)) {
-                if (psize && (!(qsize && q) || cmp(p, q) <= 0)) {
-                    e = p, p = p->next, --psize;
-                    if (p == oldhead) p = NULL;
-                } else {
-                    e = q, q = q->next, --qsize;
-                    if (q == oldhead) q = NULL;
-                }
-                if (tail) tail->next = e; else list = e;
-                tail = e;
-            }
-            p = q;
-        }
-        tail->next = list;
-
-        if (nmerges <= 1)
-            return tail;
-
-        insize *= 2;
-    }
-}
-#endif // i_extern
 
 // -------------------------- IMPLEMENTATION -------------------------
 #if defined(i_implement)
@@ -443,13 +378,25 @@ _cx_memb(_remove)(_cx_self* self, _cx_raw val) {
     return n;
 }
 #endif
-#ifndef i_no_cmp
 
-STC_DEF int
-_cx_memb(_sort_cmp_)(const _cx_node* x, const _cx_node* y) {
-    const _cx_raw a = i_keyto((&x->value));
-    const _cx_raw b = i_keyto((&y->value));
+#ifndef i_no_cmp
+STC_DEF int _cx_memb(_sort_cmp_)(const _cx_value* x, const _cx_value* y) {
+    const _cx_raw a = i_keyto(x), b = i_keyto(y);
     return i_cmp((&a), (&b));
+}
+
+STC_DEF void _cx_memb(_sort_with)(_cx_self* self, int(*cmp)(const _cx_value*, const _cx_value*)) {
+    intptr_t len = 0, cap = 0;
+    _cx_value *a = NULL, *it;
+    _cx_iter i;
+    for (i = _cx_memb(_begin)(self); i.ref; _cx_memb(_next)(&i)) {
+        if (len == cap) a = (_cx_value *)i_realloc(a, (cap += cap/2 + 4)*sizeof *a);
+        a[len++] = *i.ref;
+    }
+    qsort(a, len, sizeof *a, (int(*)(const void*, const void*))cmp);
+    for (i = _cx_memb(_begin)(self), it = a; i.ref; _cx_memb(_next)(&i), ++it) 
+        *i.ref = *it;
+    i_free(a);
 }
 #endif // !c_no_cmp
 #endif // i_implement
