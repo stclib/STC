@@ -386,16 +386,16 @@ STC_DEF int _cx_memb(_sort_cmp_)(const _cx_value* x, const _cx_value* y) {
 }
 
 STC_DEF void _cx_memb(_sort_with)(_cx_self* self, int(*cmp)(const _cx_value*, const _cx_value*)) {
-    intptr_t len = 0, cap = 0;
-    _cx_value *a = NULL, *it;
+    size_t len = 0, cap = 0;
+    _cx_value *a = NULL, *p;
     _cx_iter i;
     for (i = _cx_memb(_begin)(self); i.ref; _cx_memb(_next)(&i)) {
         if (len == cap) a = (_cx_value *)i_realloc(a, (cap += cap/2 + 4)*sizeof *a);
         a[len++] = *i.ref;
     }
     qsort(a, len, sizeof *a, (int(*)(const void*, const void*))cmp);
-    for (i = _cx_memb(_begin)(self), it = a; i.ref; _cx_memb(_next)(&i), ++it) 
-        *i.ref = *it;
+    for (i = _cx_memb(_begin)(self), p = a; i.ref; _cx_memb(_next)(&i), ++p) 
+        *i.ref = *p;
     i_free(a);
 }
 #endif // !c_no_cmp

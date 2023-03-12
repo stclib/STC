@@ -11,7 +11,6 @@ struct MyStruct {
 #define i_val int
 #define i_opt c_is_forward
 #define i_tag i32
-#define i_extern // define _clist_mergesort() 
 #include <stc/clist.h>
 
 struct Point { int x, y; } typedef Point;
@@ -53,6 +52,7 @@ int main()
         c_forlist (i, float, {123.3f, 321.2f, -32.2f, 78.2f})
             clist_float_push_back(&flst, *i.ref);
         
+        clist_float_sort(&flst);
         c_foreach (i, clist_float, flst) printf(" %g", *i.ref);
     }
 
