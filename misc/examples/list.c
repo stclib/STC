@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <time.h>
+#include <stc/calgo.h>
+#include <stc/crandom.h>
 
 #define i_val double
 #define i_tag fx
 #define i_extern // include sort function
 #include <stc/clist.h>
-#include <stc/crandom.h>
 
 int main() {
     const int n = 1000000;
@@ -24,8 +25,8 @@ int main() {
             sum += *i.ref;
         printf("sum %f\n\n", sum);
 
-        c_forwhile (i, clist_fx, clist_fx_begin(&list), i.index < 10)
-            printf("%8d: %10f\n", (int)i.index, *i.ref);
+        c_forfilter (i, clist_fx, list, c_flt_take(i, 10))
+            printf("%8d: %10f\n", c_flt_last(i), *i.ref);
 
         puts("sort");
         clist_fx_sort(&list); // mergesort O(n*log n)
@@ -37,8 +38,8 @@ int main() {
             last = *i.ref;
         }
 
-        c_forwhile (i, clist_fx, clist_fx_begin(&list), i.index < 10)
-            printf("%8d: %10f\n", (int)i.index, *i.ref);
+        c_forfilter (i, clist_fx, list, c_flt_take(i, 10))
+            printf("%8d: %10f\n", c_flt_last(i), *i.ref);
         puts("");
 
         clist_fx_clear(&list);

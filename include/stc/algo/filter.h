@@ -35,10 +35,10 @@ int main()
             printf(" %d", *i.ref);
         puts("");
         
-        c_forfilter (i, cstack_int, stk
-                      , c_flt_skipwhile(i, *i.ref < 3)
-                     && (*i.ref & 1) == 0 // even only
-                     && c_flt_take(i, 2)) // break after 2
+        c_forfilter (i, cstack_int, stk,
+                        c_flt_skipwhile(i, *i.ref < 3) &&
+                        (*i.ref & 1) == 0              && // even only
+                        c_flt_take(i, 2))                 // break after 2
             printf(" %d", *i.ref);
         puts("");
     }
@@ -57,8 +57,11 @@ int main()
 #define c_flt_last(i) (i).b.s1[(i).b.s1top - 1]
 
 #define c_forfilter(i, C, cnt, filter) \
+    c_forfilter_it(i, C, C##_begin(&cnt), filter)
+
+#define c_forfilter_it(i, C, start, filter) \
     for (struct {struct _flt_base b; C##_iter it; C##_value *ref;} \
-         i = {.it=C##_begin(&cnt), .ref=i.it.ref} ; !i.b.done & (i.it.ref != NULL) ; \
+         i = {.it=start, .ref=i.it.ref} ; !i.b.done & (i.it.ref != NULL) ; \
          C##_next(&i.it), i.ref = i.it.ref, i.b.s1top=0, i.b.s2top=0) \
       if (!(filter)) ; else
 

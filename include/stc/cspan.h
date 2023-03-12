@@ -48,9 +48,9 @@ int demo2() {
     puts("");
     
     c_forfilter (i, Intspan, span,
-                  , c_flt_skipwhile(i, *i.ref < 25)
-                 && (*i.ref & 1) == 0 // even only
-                 && c_flt_take(i, 2)) // break after 2
+                    c_flt_skipwhile(i, *i.ref < 25) &&
+                    (*i.ref & 1) == 0               && // even only
+                    c_flt_take(i, 2))                  // break after 2
         printf(" %d", *i.ref);
     puts("");
 }
@@ -65,9 +65,6 @@ int demo2() {
     using_cspan_3(Self, T, 1)
 
 #define using_cspan_3(Self, T, RANK) \
-    using_cspan_4(Self, T, RANK, c_default_eq)
-
-#define using_cspan_4(Self, T, RANK, i_eq) \
     typedef T Self##_value; typedef T Self##_raw; \
     typedef struct { \
         Self##_value *data; \
@@ -98,18 +95,6 @@ int demo2() {
     STC_INLINE void Self##_next(Self##_iter* it) { \
         it->ref += _cspan_next##RANK(RANK, it->pos, it->_s->shape, it->_s->stride.d); \
         if (it->pos[0] == it->_s->shape[0]) it->ref = NULL; \
-    } \
-    STC_INLINE bool Self##_eq(const Self* x, const Self* y) { \
-        if (memcmp(x->shape, y->shape, sizeof x->shape)) return false; \
-        Self##_iter i = Self##_begin(x), j = Self##_begin(y); \
-        for (; i.ref; Self##_next(&i), Self##_next(&j)) \
-            if (!(i_eq(i.ref, j.ref))) return false; \
-        return true; \
-    } \
-    STC_INLINE Self##_iter Self##_find(const Self* self, Self##_raw raw) { \
-        Self##_iter i = Self##_begin(self); \
-        for (; i.ref; Self##_next(&i)) if (i_eq(i.ref, &raw)) return i; \
-        return i; \
     } \
     struct stc_nostruct
 

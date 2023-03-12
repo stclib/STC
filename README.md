@@ -547,7 +547,6 @@ STC is generally very memory efficient. Type sizes:
 ## API changes summary V4.0
 - Added **cregex** with documentation - powerful regular expressions.
 - Added: `c_forfilter`: container iteration with "piped" filtering using && operator. 4 built-in filters.
-- Added: `c_forwhile`: *c_foreach* container iteration with extra predicate.
 - Added: **crange**: number generator type, which can be iterated (e.g. with *c_forfilter*).
 - Added back **coption** - command line argument parsing.
 - New + renamed loop iteration/scope macros:

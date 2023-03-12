@@ -68,12 +68,11 @@ enum {
 #define cco_begin(ctx) \
     int *_state = &(ctx)->cco_state; \
     switch (*_state) { \
-        case cco_state_done: \
         case 0:
 
 #define cco_end(retval) \
         *_state = cco_state_done; break; \
-        default: goto _cco_final_; /*  never happens */ \
+        default: assert(0); goto _cco_final_; \
     } \
     return retval
 
@@ -107,6 +106,12 @@ enum {
     do { \
         int* _state = &(ctx)->cco_state; \
         if (*_state > 0) *_state = cco_state_final; \
+    } while (0)
+
+#define cco_reset(ctx) \
+    do { \
+        int* _state = &(ctx)->cco_state; \
+        if (*_state == cco_state_final) *_state = 0; \
     } while (0)
 
 #endif

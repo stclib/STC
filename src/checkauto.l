@@ -35,7 +35,6 @@ c_foreach       |
 c_forpair       |
 c_forrange      |
 c_forfilter     |
-c_forwhile      |
 c_formatch      |
 c_fortoken      |
 for             |

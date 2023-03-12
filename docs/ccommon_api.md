@@ -176,7 +176,7 @@ Iterate containers with stop-criteria and chained range filtering.
 | Usage                                               | Description                            |
 |:----------------------------------------------------|:---------------------------------------|
 | `c_forfilter (it, ctype, container, filter)`        | Filter out items in chain with &&      |
-| `c_forwhile (it, ctype, start, pred)`               | Iterate until pred is false            |
+| `c_forfilter_it (it, ctype, startit, filter)`       | Filter from startit position           |
 
 | Built-in filter                   | Description                          |
 |:----------------------------------|:-------------------------------------|
@@ -203,10 +203,10 @@ int main() {
     crange R = crange_make(1001, INT32_MAX, 2);
 
     c_forfilter (i, crange, R,
-                    isPrime(*i.ref)
-                 && c_flt_skip(i, 24)
-                 && c_flt_count(i) % 15 == 1
-                 && c_flt_take(i, 10))
+                    isPrime(*i.ref)          &&
+                    c_flt_skip(i, 24)        &&
+                    c_flt_count(i) % 15 == 1 &&
+                    c_flt_take(i, 10))
         printf(" %lld", *i.ref);
     puts("");
 }
@@ -237,9 +237,9 @@ c_forfilter (i, crange, r1, isPrime(*i.ref))
 
 // 2. The 11 first primes:
 printf("2");
-c_forfilter (i, crange, crange_obj(3, INT64_MAX, 2)
-              , isPrime(*i.ref)
-             && c_flt_take(10))
+c_forfilter (i, crange, crange_obj(3, INT64_MAX, 2),
+                isPrime(*i.ref) &&
+                c_flt_take(10))
     printf(" %lld", *i.ref);
 // 2 3 5 7 11 13 17 19 23 29 31
 ```
