@@ -254,10 +254,12 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
 #define c_eraseremove_if(it, C, cnt, pred) do { \
     C* _cnt = &cnt; \
     intptr_t _n = 0; \
-    C##_iter _first = C##_begin(_cnt), it = _first; \
-    for (; it.ref; C##_next(&it)) \
-        if (pred) ++_n; \
-        else C##_value_drop(_first.ref), *_first.ref = *it.ref, C##_next(&_first); \
+    C##_iter it = C##_begin(_cnt), _i; \
+    while (it.ref && !(pred)) \
+        C##_next(&it); \
+    for (_i = it; it.ref; C##_next(&it)) \
+        if (pred) C##_value_drop(it.ref), ++_n; \
+        else *_i.ref = *it.ref, C##_next(&_i); \
     _cnt->_len -= _n; \
 } while (0)
 
