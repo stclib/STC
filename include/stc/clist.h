@@ -99,10 +99,10 @@ STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw v
 STC_API intptr_t        _cx_memb(_remove)(_cx_self* self, _cx_raw val);
 #endif
 #ifndef i_no_cmp
-STC_API void            _cx_memb(_sort_with)(_cx_self* self, int(*cmp)(const _cx_value*, const _cx_value*));
+STC_API bool            _cx_memb(_sort_with)(_cx_self* self, int(*cmp)(const _cx_value*, const _cx_value*));
 STC_API int             _cx_memb(_sort_cmp_)(const _cx_value*, const _cx_value*);
-STC_INLINE void         _cx_memb(_sort)(_cx_self* self)
-                            { _cx_memb(_sort_with)(self, _cx_memb(_sort_cmp_)); }
+STC_INLINE bool         _cx_memb(_sort)(_cx_self* self)
+                            { return _cx_memb(_sort_with)(self, _cx_memb(_sort_cmp_)); }
 #endif
 STC_API void            _cx_memb(_reverse)(_cx_self* self);
 STC_API _cx_iter        _cx_memb(_splice)(_cx_self* self, _cx_iter it, _cx_self* other);
@@ -385,18 +385,21 @@ STC_DEF int _cx_memb(_sort_cmp_)(const _cx_value* x, const _cx_value* y) {
     return i_cmp((&a), (&b));
 }
 
-STC_DEF void _cx_memb(_sort_with)(_cx_self* self, int(*cmp)(const _cx_value*, const _cx_value*)) {
+STC_DEF bool _cx_memb(_sort_with)(_cx_self* self, int(*cmp)(const _cx_value*, const _cx_value*)) {
     size_t len = 0, cap = 0;
-    _cx_value *a = NULL, *p;
+    _cx_value *a = NULL, *p = NULL;
     _cx_iter i;
     for (i = _cx_memb(_begin)(self); i.ref; _cx_memb(_next)(&i)) {
-        if (len == cap) a = (_cx_value *)i_realloc(a, (cap += cap/2 + 4)*sizeof *a);
+        if (len == cap) {
+            if ((p = (_cx_value *)i_realloc(a, (cap += cap/2 + 4)*sizeof *a))) a = p; 
+            else { i_free(a); return false; }
+        }
         a[len++] = *i.ref;
     }
     qsort(a, len, sizeof *a, (int(*)(const void*, const void*))cmp);
-    for (i = _cx_memb(_begin)(self), p = a; i.ref; _cx_memb(_next)(&i), ++p) 
+    for (i = _cx_memb(_begin)(self); i.ref; _cx_memb(_next)(&i), ++p) 
         *i.ref = *p;
-    i_free(a);
+    i_free(a); return true;
 }
 #endif // !c_no_cmp
 #endif // i_implement
