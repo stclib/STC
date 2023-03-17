@@ -68,7 +68,7 @@ enum {
 #define cco_begin(ctx) \
     int *_state = &(ctx)->cco_state; \
     switch (*_state) { \
-        case 0: case cco_state_done:
+        case 0:
 
 #define cco_end(retval) \
         *_state = cco_state_done; break; \

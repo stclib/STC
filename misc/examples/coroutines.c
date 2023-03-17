@@ -85,6 +85,7 @@ bool combined(struct combined* C) {
 
         // Reuse the C->prm context and extend the count:
         C->prm.count = 8; C->prm.result += 2;
+        cco_reset(&C->prm);
         cco_yield(prime(&C->prm), &C->prm, true);
 
         cco_final: puts("final comb");
