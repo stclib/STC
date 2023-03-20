@@ -39,6 +39,7 @@
 #define forward_cpque(CX, VAL) _c_cpque_types(CX, VAL)
 #define forward_cqueue(CX, VAL) _c_cdeq_types(CX, VAL)
 #define forward_cvec(CX, VAL) _c_cvec_types(CX, VAL)
+#define forward_cvec_allocator_ctx(CX, VAL) _c_cvec_types_allocator_ctx(CX, VAL)
 
 // csview
 typedef const char csview_value;
@@ -169,6 +170,11 @@ typedef union {
     typedef VAL SELF##_value; \
     typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
     typedef struct SELF { SELF##_value *data; intptr_t _len, _cap; } SELF
+
+#define _c_cvec_types_allocator_ctx(SELF, VAL) \
+    typedef VAL SELF##_value; \
+    typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
+    typedef struct SELF { void *allocator_ctx; SELF##_value *data; intptr_t _len, _cap; } SELF
 
 #define _c_cpque_types(SELF, VAL) \
     typedef VAL SELF##_value; \

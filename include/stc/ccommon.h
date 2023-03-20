@@ -76,8 +76,8 @@
 #endif
 #define c_malloc(sz)            malloc(c_i2u(sz))
 #define c_calloc(n, sz)         calloc(c_i2u(n), c_i2u(sz))
-#define c_realloc(p, sz)        realloc(p, c_i2u(sz))
-#define c_free(p)               free(p)
+#define c_realloc(p, sz, ...)        realloc(p, c_i2u(sz))
+#define c_free(p, ...)               free(p)
 #define c_delete(T, ptr)        do { T *_tp = ptr; T##_drop(_tp); free(_tp); } while (0)
 
 #define c_static_assert(b)      ((int)(0*sizeof(int[(b) ? 1 : -1])))
@@ -114,6 +114,7 @@
 #define c_no_emplace            (1<<3)
 #define c_no_cmp                (1<<4)
 #define c_no_hash               (1<<5)
+#define c_allocator_ctx         (1<<6)
 
 /* Function macros and others */
 

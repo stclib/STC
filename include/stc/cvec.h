@@ -74,10 +74,18 @@ int main() {
 #include "priv/template.h"
 
 #if !c_option(c_is_forward)
+#if c_option(c_allocator_ctx)
+   _cx_deftypes(_c_cvec_types_allocator_ctx, _cx_self, i_key);
+#else
    _cx_deftypes(_c_cvec_types, _cx_self, i_key);
 #endif
+#endif
 typedef i_keyraw _cx_raw;
+#if c_option(c_allocator_ctx)
+STC_API _cx_self        _cx_memb(_init)(void *allocator_ctx);
+#else
 STC_API _cx_self        _cx_memb(_init)(void);
+#endif
 STC_API void            _cx_memb(_drop)(_cx_self* self);
 STC_API void            _cx_memb(_clear)(_cx_self* self);
 STC_API bool            _cx_memb(_reserve)(_cx_self* self, intptr_t cap);
@@ -144,19 +152,37 @@ STC_INLINE _cx_value*   _cx_memb(_push_back)(_cx_self* self, i_key value)
                             { return _cx_memb(_push)(self, value); }
 STC_INLINE void         _cx_memb(_pop_back)(_cx_self* self) { _cx_memb(_pop)(self); }
 
+#if c_option(c_allocator_ctx)
+STC_INLINE _cx_self
+_cx_memb(_with_size)(const intptr_t size, i_key null, void *allocator_ctx) {
+    _cx_self cx = _cx_memb(_init)(allocator_ctx);
+    _cx_memb(_resize)(&cx, size, null);
+    return cx;
+}
+#else
 STC_INLINE _cx_self
 _cx_memb(_with_size)(const intptr_t size, i_key null) {
     _cx_self cx = _cx_memb(_init)();
     _cx_memb(_resize)(&cx, size, null);
     return cx;
 }
+#endif
 
+#if c_option(c_allocator_ctx)
+STC_INLINE _cx_self
+_cx_memb(_with_capacity)(const intptr_t cap, void *allocator_ctx) {
+    _cx_self cx = _cx_memb(_init)(allocator_ctx);
+    _cx_memb(_reserve)(&cx, cap);
+    return cx;
+}
+#else
 STC_INLINE _cx_self
 _cx_memb(_with_capacity)(const intptr_t cap) {
     _cx_self cx = _cx_memb(_init)();
     _cx_memb(_reserve)(&cx, cap);
     return cx;
 }
+#endif
 
 STC_INLINE void
 _cx_memb(_shrink_to_fit)(_cx_self* self) {
@@ -273,10 +299,17 @@ _cx_memb(_sort)(_cx_self* self) {
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement)
 
+#if c_option(c_allocator_ctx)
+STC_DEF _cx_self
+_cx_memb(_init)(void *allocator_ctx) {
+    return c_LITERAL(_cx_self){.allocator_ctx = allocator_ctx, .data =NULL};
+}
+#else
 STC_DEF _cx_self
 _cx_memb(_init)(void) {
     return c_LITERAL(_cx_self){NULL};
 }
+#endif
 
 STC_DEF void
 _cx_memb(_clear)(_cx_self* self) {
@@ -293,13 +326,21 @@ _cx_memb(_drop)(_cx_self* self) {
     if (self->_cap == 0)
         return;
     _cx_memb(_clear)(self);
-    i_free(self->data);
+#if c_option(c_allocator_ctx)
+    i_free(self->data, self.allocator_ctx);
+#else
+    i_free(self->data, NULL);
+#endif
 }
 
 STC_DEF bool
 _cx_memb(_reserve)(_cx_self* self, const intptr_t cap) {
     if (cap > self->_cap || (cap && cap == self->_len)) {
-        _cx_value* d = (_cx_value*)i_realloc(self->data, cap*c_sizeof(i_key));
+#if c_option(c_allocator_ctx)
+        _cx_value* d = (_cx_value*)i_realloc(self->data, cap*c_sizeof(i_key), self->allocator_ctx);
+#else
+        _cx_value* d = (_cx_value*)i_realloc(self->data, cap*c_sizeof(i_key), NULL);
+#endif
         if (!d)
             return false;
         self->data = d;
@@ -370,7 +411,11 @@ _cx_memb(_erase_range_p)(_cx_self* self, _cx_value* p1, _cx_value* p2) {
 #if !defined i_no_clone
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self cx) {
+#if c_option(c_allocator_ctx)
+    _cx_self out = _cx_memb(_init)(cx.allocator_ctx);
+#else
     _cx_self out = _cx_memb(_init)();
+#endif
     _cx_memb(_copy_range)(&out, out.data, cx.data, cx.data + cx._len);
     return out;
 }
