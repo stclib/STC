@@ -23,7 +23,7 @@ int main()
         puts("");
 
         printf("Erase values >= %d:\n", val);
-        while (it.ref != csset_int_end(&set).ref)
+        while (it.ref)
             it = csset_int_erase_at(&set, it);
 
         c_foreach (k, csset_int, set)

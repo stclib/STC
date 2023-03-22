@@ -30,12 +30,12 @@ int main()
         printf("\nerase vec.data[2]; or first matching value depending on compare.\n");
         Vec_iter it;
         it = Vec_find(&vec, *vec.data[2].get);
-        if (it.ref != Vec_end(&vec).ref)
+        if (it.ref)
             Vec_erase_at(&vec, it);
 
         int year = 2015;
         it = Vec_find(&vec, year); // Ok as tmp only.
-        if (it.ref != Vec_end(&vec).ref)
+        if (it.ref)
             Vec_erase_at(&vec, it);
 
         printf("vec after erase  :");

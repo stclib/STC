@@ -35,11 +35,8 @@ int main()
         printf(" %s", *i.ref);
     puts("");
 
-    c_forlist (i, const char*, {"12", "23", "453", "65", "676"})
-        printf(" %s", i.data[i.size - 1 - i.index]);
 
-
-    c_auto (IVec, vec) 
+    c_auto (IVec, vec)
     c_auto (IMap, map)
     {
         c_forlist (i, int, {12, 23, 453, 65, 113, 215, 676, 34, 67, 20, 27, 66, 189, 45, 280, 199})
@@ -51,8 +48,12 @@ int main()
         puts("\n\nc_foreach:");
         c_foreach (i, IVec, vec)
             printf(" %d", *i.ref);
-        puts("");
 
+        puts("\n\nc_foreach_r: reverse");
+        c_foreach_r (i, IVec, vec)
+            printf(" %d", *i.ref);
+
+        puts("\n\nc_foreach in map:");
         c_foreach (i, IMap, map)
             printf(" (%d %d)", i.ref->first, i.ref->second);
 

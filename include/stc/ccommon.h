@@ -178,6 +178,10 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
     for (C##_iter it = start, *_endref = (C##_iter*)(finish).ref \
          ; it.ref != (C##_value*)_endref; C##_next(&it))
 
+#define c_foreach_r(it, C, cnt) \
+    for (C##_iter it = {.ref=C##_end(&cnt).end - 1, .end=(cnt).data - 1} \
+         ; it.ref != it.end; --it.ref)
+
 #define c_forpair(key, val, C, cnt) /* structured binding */ \
     for (struct {C##_iter it; const C##_key* key; C##_mapped* val;} _ = {.it=C##_begin(&cnt)} \
          ; _.it.ref && (_.key = &_.it.ref->first, _.val = &_.it.ref->second) \
@@ -193,8 +197,8 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
          ; (_inc > 0) ^ (i > _end); i += _inc)
 #ifndef __cplusplus
   #define c_forlist(it, T, ...) \
-    for (struct {T* data; T* ref; int size, index;} \
-         it = {.data=(T[])__VA_ARGS__, .ref=it.data, .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
+    for (struct {T* ref; int size, index;} \
+         it = {.ref=(T[])__VA_ARGS__, .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
          ; it.index < it.size; ++it.ref, ++it.index)
 #else
   #include <initializer_list>
@@ -224,44 +228,8 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
     c_with_2(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
             (C##_drop(&d), C##_drop(&c), C##_drop(&b), C##_drop(&a)))
 
-/* Generic functions */
-
-#define c_drop(C, ...) do { c_forlist (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
-#define c_find_if(...) c_MACRO_OVERLOAD(c_find_if, __VA_ARGS__)
-#define c_find_if_4(it, C, cnt, pred) do { \
-    intptr_t index = 0; \
-    for (it = C##_begin(&cnt); it.ref && !(pred); C##_next(&it)) \
-        ++index; \
-} while (0)
-#define c_find_if_5(it, C, start, end, pred) do { \
-    intptr_t index = 0; \
-    const C##_value* _endref = (end).ref; \
-    for (it = start; it.ref != _endref && !(pred); C##_next(&it)) \
-        ++index; \
-    if (it.ref == _endref) it.ref = NULL; \
-} while (0)
-
-// use with: clist, cmap, cset, csmap, csset, cstr:
-#define c_erase_if(it, C, cnt, pred) do { \
-    C* _cnt = &cnt; \
-    for (C##_iter it = C##_begin(_cnt); it.ref;) { \
-        if (pred) it = C##_erase_at(_cnt, it); \
-        else C##_next(&it); \
-    } \
-} while (0)
-
-// use with: cstack, cvec, cdeq, cqueue:
-#define c_eraseremove_if(it, C, cnt, pred) do { \
-    C* _cnt = &cnt; \
-    intptr_t _n = 0; \
-    C##_iter it = C##_begin(_cnt), _i; \
-    while (it.ref && !(pred)) \
-        C##_next(&it); \
-    for (_i = it; it.ref; C##_next(&it)) \
-        if (pred) C##_value_drop(it.ref), ++_n; \
-        else *_i.ref = *it.ref, C##_next(&_i); \
-    _cnt->_len -= _n; \
-} while (0)
+#define c_drop(C, ...) \
+    do { c_forlist (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)
 
 #endif // CCOMMON_H_INCLUDED
 

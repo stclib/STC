@@ -94,13 +94,14 @@ int main()
 ```
 ## Loop abstraction macros
 
-### c_foreach, c_forpair
+### c_foreach, c_foreach_r, c_forpair
 
-| Usage                                    | Description                     |
-|:-----------------------------------------|:--------------------------------|
-| `c_foreach (it, ctype, container)`       | Iteratate all elements          |
-| `c_foreach (it, ctype, it1, it2)`        | Iterate the range [it1, it2)    |
-| `c_forpair (key, val, ctype, container)` | Iterate with structured binding |
+| Usage                                    | Description                             |
+|:-----------------------------------------|:----------------------------------------|
+| `c_foreach (it, ctype, container)`       | Iteratate all elements                  |
+| `c_foreach (it, ctype, it1, it2)`        | Iterate the range [it1, it2)            |
+| `c_foreach_r (it, ctype, container)`     | Iteratate in reverse (cstack,cvec,cdeq) |
+| `c_forpair (key, val, ctype, container)` | Iterate with structured binding         |
 
 ```c
 #define i_key int

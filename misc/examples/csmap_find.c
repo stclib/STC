@@ -33,7 +33,7 @@ void findit(csmap_istr c, csmap_istr_key val)
 {
     printf("Trying find() on value %d\n", val);
     csmap_istr_iter result = csmap_istr_find(&c, val); // prefer contains() or get()
-    if (result.ref != csmap_istr_end(&c).ref) {
+    if (result.ref) {
         printf("Element found: "); print_elem(csmap_istr_value_toraw(result.ref)); puts("");
     } else {
         puts("Element not found.");

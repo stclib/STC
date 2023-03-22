@@ -118,7 +118,7 @@ typedef union {
     } SELF##_result; \
 \
     typedef struct { \
-        SELF##_value *ref, *end; \
+        SELF##_value *ref, *_end; \
         uint8_t* _hx; \
     } SELF##_iter; \
 \

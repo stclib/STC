@@ -224,7 +224,7 @@ STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) {
     if (it._hx)
         while (*it._hx == 0)
             ++it.ref, ++it._hx;
-    if (it.ref == it.end) it.ref = NULL;
+    if (it.ref == it._end) it.ref = NULL;
     return it;
 }
 
@@ -235,7 +235,7 @@ _cx_memb(_end)(const _cx_self* self)
 STC_INLINE void
 _cx_memb(_next)(_cx_iter* it) { 
     while ((++it->ref, *++it->_hx == 0)) ;
-    if (it->ref == it->end) it->ref = NULL;
+    if (it->ref == it->_end) it->ref = NULL;
 }
 
 STC_INLINE _cx_iter
