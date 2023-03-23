@@ -103,7 +103,7 @@ int main()
     intptr_t _n = 0, _index = 0; \
     C##_iter it = C##_begin(_cnt), _i; \
     while (it.ref && !(pred)) \
-        C##_next(&it); \
+        C##_next(&it), ++_index; \
     for (_i = it; it.ref; C##_next(&it), ++_index) \
         if (pred) C##_value_drop(it.ref), ++_n; \
         else *_i.ref = *it.ref, C##_next(&_i); \
