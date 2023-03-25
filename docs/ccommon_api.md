@@ -2,96 +2,6 @@
 
 The following macros are recommended to use, and they safe/have no side-effects.
 
-## Scope macros (RAII)
-### c_auto, c_with, c_scope, c_defer
-General ***defer*** mechanics for resource acquisition. These macros allows you to specify the
-freeing of the resources at the point where the acquisition takes place.
-The **checkauto** utility described below, ensures that the `c_auto*` macros are used correctly.
-
-| Usage                                  | Description                                               |
-|:---------------------------------------|:----------------------------------------------------------|
-| `c_with (Type var=init, drop)`         | Declare `var`. Defer `drop...` to end of scope            |
-| `c_with (Type var=init, pred, drop)`   | Adds a predicate in order to exit early if init failed    |
-| `c_auto (Type, var1,...,var4)`         | `c_with (Type var1=Type_init(), Type_drop(&var1))` ...    |
-| `c_scope (init, drop)`                 | Execute `init` and defer `drop` to end of scope           |
-| `c_defer (drop...)`                    | Defer `drop...` to end of scope                           |
-| `continue`                             | Exit a block above without memory leaks                   |
-
-For multiple variables, use either multiple **c_with** in sequence, or declare variable outside
-scope and use **c_scope**. For convenience, **c_auto** support up to 4 variables.
-```c
-// `c_with` is similar to python `with`: it declares and can drop a variable after going out of scope.
-bool ok = false;
-c_with (uint8_t* buf = malloc(BUF_SIZE), buf != NULL, free(buf))
-c_with (FILE* fp = fopen(fname, "rb"), fp != NULL, fclose(fp))
-{
-    int n = fread(buf, 1, BUF_SIZE, fp);
-    if (n <= 0) continue; // auto cleanup! NB do not break or return here.
-    ...
-    ok = true;
-}
-return ok;
-
-// `c_auto` automatically initialize and destruct up to 4 variables:
-c_auto (cstr, s1, s2)
-{
-    cstr_append(&s1, "Hello");
-    cstr_append(&s1, " world");
-
-    cstr_append(&s2, "Cool");
-    cstr_append(&s2, " stuff");
-
-    printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
-}
-
-// `c_with` is a general variant of `c_auto`:
-c_with (cstr str = cstr_lit("Hello"), cstr_drop(&str))
-{
-    cstr_append(&str, " world");
-    printf("%s\n", cstr_str(&str));
-}
-
-// `c_scope` is like `c_with` but works with an already declared variable.
-static pthread_mutex_t mut;
-c_scope (pthread_mutex_lock(&mut), pthread_mutex_unlock(&mut))
-{
-    /* Do syncronized work. */
-}
-
-// `c_defer` executes the expressions when leaving scope. Prefer c_with or c_scope.
-cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
-c_defer (cstr_drop(&s1), cstr_drop(&s2))
-{
-    printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
-}
-```
-**Example**: Load each line of a text file into a vector of strings:
-```c
-#include <errno.h>
-#include <stc/cstr.h>
-
-#define i_val_str
-#include <stc/cvec.h>
-
-// receiver should check errno variable
-cvec_str readFile(const char* name)
-{
-    cvec_str vec = cvec_str_init(); // returned
-
-    c_with (FILE* fp = fopen(name, "r"), fp != NULL, fclose(fp))
-    c_with (cstr line = cstr_NULL, cstr_drop(&line))
-        while (cstr_getline(&line, fp))
-            cvec_str_emplace_back(&vec, cstr_str(&line));
-    return vec;
-}
-
-int main()
-{
-    c_with (cvec_str x = readFile(__FILE__), cvec_str_drop(&x))
-        c_foreach (i, cvec_str, x)
-            printf("%s\n", cstr_str(i.ref));
-}
-```
 ## Loop abstraction macros
 
 ### c_foreach, c_foreach_r, c_forpair
@@ -165,10 +75,6 @@ c_forlist (i, cmap_ii_raw, { {4, 5}, {6, 7} })
 // string literals pushed to a stack of cstr:
 c_forlist (i, const char*, {"Hello", "crazy", "world"})
     cstack_str_emplace(&stk, *i.ref);
-
-// reverse the list:
-c_forlist (i, int, {1, 2, 3})
-    cvec_i_push_back(&vec, i.data[i.size - 1 - i.index]);
 ```
 
 ### c_forfilter
@@ -297,13 +203,18 @@ if (it.ref) cmap_str_erase_at(&map, it);
 c_erase_if(i, csmap_str, map, cstr_contains(i.ref, "hello"));
 ```
 
-### c_swap, c_drop
+### c_swap, c_drop, c_const_cast
 ```c
 // Safe macro for swapping internals of two objects of same type:
 c_swap(cmap_int, &map1, &map2);
 
 // Drop multiple containers of same type:
 c_drop(cvec_i, &vec1, &vec2, &vec3);
+
+// Type-safe casting a from const (pointer):
+const char* cs = "Hello";
+char* s = c_const_cast(char*, cs); // OK
+int* ip = c_const_cast(int*, cs);  // issues a warning!
 ```
 
 ### General predefined template parameter functions
@@ -329,7 +240,99 @@ int array[] = {1, 2, 3, 4};
 intptr_t n = c_arraylen(array);
 ```
 
-## The **checkauto** utility program (for RAII)
+## Scope macros (RAII)
+### c_auto, c_with, c_scope, c_defer
+General ***defer*** mechanics for resource acquisition. These macros allows you to specify the
+freeing of the resources at the point where the acquisition takes place.
+The **checkauto** utility described below, ensures that the `c_auto*` macros are used correctly.
+
+| Usage                                  | Description                                               |
+|:---------------------------------------|:----------------------------------------------------------|
+| `c_defer (drop...)`                    | Defer `drop...` to end of scope                           |
+| `c_scope (init, drop)`                 | Execute `init` and defer `drop` to end of scope           |
+| `c_scope (init, pred, drop)`           | Adds a predicate in order to exit early if init failed    |
+| `c_with (Type var=init, drop)`         | Declare `var`. Defer `drop...` to end of scope            |
+| `c_with (Type var=init, pred, drop)`   | Adds a predicate in order to exit early if init failed    |
+| `c_auto (Type, var1,...,var4)`         | `c_with (Type var1=Type_init(), Type_drop(&var1))` ...    |
+| `continue`                             | Exit a block above without memory leaks                   |
+
+For multiple variables, use either multiple **c_with** in sequence, or declare variable outside
+scope and use **c_scope**. For convenience, **c_auto** support up to 4 variables.
+```c
+// `c_with` is similar to python `with`: it declares and can drop a variable after going out of scope.
+bool ok = false;
+c_with (uint8_t* buf = malloc(BUF_SIZE), buf != NULL, free(buf))
+c_with (FILE* fp = fopen(fname, "rb"), fp != NULL, fclose(fp))
+{
+    int n = fread(buf, 1, BUF_SIZE, fp);
+    if (n <= 0) continue; // auto cleanup! NB do not break or return here.
+    ...
+    ok = true;
+}
+return ok;
+
+// `c_auto` automatically initialize and destruct up to 4 variables:
+c_auto (cstr, s1, s2)
+{
+    cstr_append(&s1, "Hello");
+    cstr_append(&s1, " world");
+
+    cstr_append(&s2, "Cool");
+    cstr_append(&s2, " stuff");
+
+    printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
+}
+
+// `c_with` is a general variant of `c_auto`:
+c_with (cstr str = cstr_lit("Hello"), cstr_drop(&str))
+{
+    cstr_append(&str, " world");
+    printf("%s\n", cstr_str(&str));
+}
+
+// `c_scope` is like `c_with` but works with an already declared variable.
+static pthread_mutex_t mut;
+c_scope (pthread_mutex_lock(&mut), pthread_mutex_unlock(&mut))
+{
+    /* Do syncronized work. */
+}
+
+// `c_defer` executes the expressions when leaving scope. Prefer c_with or c_scope.
+cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
+c_defer (cstr_drop(&s1), cstr_drop(&s2))
+{
+    printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
+}
+```
+**Example**: Load each line of a text file into a vector of strings:
+```c
+#include <errno.h>
+#include <stc/cstr.h>
+
+#define i_val_str
+#include <stc/cvec.h>
+
+// receiver should check errno variable
+cvec_str readFile(const char* name)
+{
+    cvec_str vec = cvec_str_init(); // returned
+
+    c_with (FILE* fp = fopen(name, "r"), fp != NULL, fclose(fp))
+    c_with (cstr line = cstr_NULL, cstr_drop(&line))
+        while (cstr_getline(&line, fp))
+            cvec_str_emplace_back(&vec, cstr_str(&line));
+    return vec;
+}
+
+int main()
+{
+    c_with (cvec_str x = readFile(__FILE__), cvec_str_drop(&x))
+        c_foreach (i, cvec_str, x)
+            printf("%s\n", cstr_str(i.ref));
+}
+```
+
+### The **checkauto** utility program (for RAII)
 The **checkauto** program will check the source code for any misuses of the `c_auto*` macros which
 may lead to resource leakages. The `c_auto*`- macros are implemented as one-time executed **for-loops**,
 so any `return` or `break` appearing within such a block will lead to resource leaks, as it will disable

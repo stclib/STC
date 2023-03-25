@@ -151,14 +151,15 @@ red Apples
 
 int main()
 {
-    c_auto (cstr, s1) {
-        s1 = cstr_lit("hell😀 w😀rld");
-        cstr_u8_replace_at(&s1, cstr_find(&s1, "😀rld"), 1, c_sv("ø"));
-        printf("%s\n", cstr_str(&s1));
+    cstr s1 = cstr_lit("hell😀 w😀rld");
 
-        c_foreach (i, cstr, s1)
-            printf("%.*s,", c_SV(i.u8.chr));
-    }
+    cstr_u8_replace_at(&s1, cstr_find(&s1, "😀rld"), 1, c_sv("ø"));
+    printf("%s\n", cstr_str(&s1));
+
+    c_foreach (i, cstr, s1)
+        printf("%.*s,", c_SV(i.u8.chr));
+
+    cstr_drop(&s1);
 }
 ```
 Output:
@@ -178,6 +179,7 @@ void print_split(csview input, const char* sep)
 {
     c_fortoken_sv (i, input, sep)
         printf("[%.*s]\n", c_SV(i.token));
+    puts("");
 }
 
 #include <stc/cstr.h>
@@ -197,13 +199,15 @@ cstack_str string_split(csview input, const char* sep)
 int main()
 {
     print_split(c_sv("//This is a//double-slash//separated//string"), "//");
-    puts("");
     print_split(c_sv("This has no matching separator"), "xx");
+
+    cstack_str s = string_split(c_sv("Split,this,,string,now,"), ",");
+
+    c_foreach (i, cstack_str, s)
+        printf("[%s]\n", cstr_str(i.ref));
     puts("");
 
-    c_with (cstack_str s = string_split(c_sv("Split,this,,string,now,"), ","), cstack_str_drop(&s))
-        c_foreach (i, cstack_str, s)
-            printf("[%s]\n", cstr_str(i.ref));
+    cstack_str_drop(&s);
 }
 ```
 Output:

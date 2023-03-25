@@ -28,7 +28,7 @@ void        fmt_destroy(fmt_buffer* buf);
 * Static linking by default, shared symbols by defining FMT_HEADER / FMT_IMPLEMENT.
 * (c) operamint, 2022, MIT License.
 -----------------------------------------------------------------------------------
-#include "c11/fmt.h"
+#include "c11/print.h"
 
 int main() {
     const double pi = 3.141592653589793;

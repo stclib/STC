@@ -13,10 +13,17 @@
 
 int main()
 {
-    c_auto (cmap_str, map, mclone)
-    c_auto (cvec_str, keys, values)
-    c_auto (clist_str, list)
-    {
+    cmap_str map, mclone;
+    cvec_str keys = {0}, values = {0};
+    clist_str list = {0};
+
+    c_defer(
+        cmap_str_drop(&map),
+        cmap_str_drop(&mclone),
+        cvec_str_drop(&keys),
+        cvec_str_drop(&values),
+        clist_str_drop(&list)
+    ){
         map = c_make(cmap_str, {
             {"green", "#00ff00"},
             {"blue", "#0000ff"},

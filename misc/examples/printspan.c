@@ -22,22 +22,26 @@ void printMe(intspan container) {
 
 int main()
 {
-    c_auto (cvec_int, vec)
-    c_auto (cstack_int, stk)
-    c_auto (cdeq_int, deq)
-    c_auto (csset_str, set)
-    {
-        intspan sp1 = cspan_make(intspan, {1, 2});
-        printMe( sp1 );
-    
-        printMe( c_make(intspan, {1, 2, 3}) );
+    intspan sp1 = cspan_make(intspan, {1, 2});
+    printMe( sp1 );
 
-        int arr[] = {1, 2, 3, 4, 5, 6};
-        intspan sp2 = cspan_from_array(arr);
-        printMe( (intspan)cspan_subspan(&sp2, 1, 4) );
+    printMe( c_make(intspan, {1, 2, 3}) );
 
-        c_forlist (i, int, {1, 2, 3, 4, 5})
-            cvec_int_push(&vec, *i.ref);
+    int arr[] = {1, 2, 3, 4, 5, 6};
+    intspan sp2 = cspan_from_array(arr);
+    printMe( (intspan)cspan_subspan(&sp2, 1, 4) );
+
+    cvec_int vec;
+    cstack_int stk;
+    cdeq_int deq;
+    csset_str set;
+    c_defer(
+        cvec_int_drop(&vec),
+        cstack_int_drop(&stk),
+        cdeq_int_drop(&deq),
+        csset_str_drop(&set)        
+    ) {
+        vec = c_make(cvec_int, {1, 2, 3, 4, 5});
         printMe( (intspan)cspan_from(&vec) );
 
         printMe( sp2 );

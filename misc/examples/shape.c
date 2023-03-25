@@ -138,7 +138,8 @@ void testShape(const Shape* shape)
 
 int main(void)
 {
-    c_auto (Shapes, shapes)
+    Shapes shapes = {0};
+    c_defer (Shapes_drop(&shapes))
     {
         Triangle* tri1 = c_new(Triangle, Triangle_from((Point){5, 7}, (Point){12, 7}, (Point){12, 20}));
         Polygon* pol1 = c_new(Polygon, Polygon_init());

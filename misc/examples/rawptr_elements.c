@@ -28,9 +28,13 @@ typedef int64_t inttype;
 
 int main()
 {
-    c_auto (SIPtrMap, map, m1)
-    c_auto (SIBoxMap, m2)
-    {
+    SIPtrMap map = {0}, m1;
+    SIBoxMap m2 = {0};
+    c_defer(
+        SIPtrMap_drop(&map),
+        SIPtrMap_drop(&m1),
+        SIBoxMap_drop(&m2)
+    ){
         printf("\nMap with pointer elements:\n");
         SIPtrMap_insert(&map, cstr_from("testing"), c_new(inttype, 1));
         SIPtrMap_insert(&map, cstr_from("done"), c_new(inttype, 2));

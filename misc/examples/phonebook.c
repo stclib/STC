@@ -38,37 +38,35 @@ void print_phone_book(cmap_str phone_book)
 
 int main(int argc, char **argv)
 {
-    c_auto (cmap_str, phone_book)
-    {
-        phone_book = c_make(cmap_str, {
-            {"Lilia Friedman", "(892) 670-4739"},
-            {"Tariq Beltran", "(489) 600-7575"},
-            {"Laiba Juarez", "(303) 885-5692"},
-            {"Elliott Mooney", "(945) 616-4482"},
-        });
+    cmap_str phone_book = c_make(cmap_str, {
+        {"Lilia Friedman", "(892) 670-4739"},
+        {"Tariq Beltran", "(489) 600-7575"},
+        {"Laiba Juarez", "(303) 885-5692"},
+        {"Elliott Mooney", "(945) 616-4482"},
+    });
 
-        printf("Phone book:\n");
-        print_phone_book(phone_book);
+    printf("Phone book:\n");
+    print_phone_book(phone_book);
 
-        cmap_str_emplace(&phone_book, "Zak Byers", "(551) 396-1880");
-        cmap_str_emplace(&phone_book, "Zak Byers", "(551) 396-1990");
+    cmap_str_emplace(&phone_book, "Zak Byers", "(551) 396-1880");
+    cmap_str_emplace(&phone_book, "Zak Byers", "(551) 396-1990");
 
-        printf("\nPhone book after adding Zak Byers:\n");
-        print_phone_book(phone_book);
+    printf("\nPhone book after adding Zak Byers:\n");
+    print_phone_book(phone_book);
 
-        if (cmap_str_contains(&phone_book, "Tariq Beltran"))
-            printf("\nTariq Beltran is in phone book\n");
+    if (cmap_str_contains(&phone_book, "Tariq Beltran"))
+        printf("\nTariq Beltran is in phone book\n");
 
-        cmap_str_erase(&phone_book, "Tariq Beltran");
-        cmap_str_erase(&phone_book, "Elliott Mooney");
+    cmap_str_erase(&phone_book, "Tariq Beltran");
+    cmap_str_erase(&phone_book, "Elliott Mooney");
 
-        printf("\nPhone book after erasing Tariq and Elliott:\n");
-        print_phone_book(phone_book);
+    printf("\nPhone book after erasing Tariq and Elliott:\n");
+    print_phone_book(phone_book);
 
-        cmap_str_emplace_or_assign(&phone_book, "Zak Byers", "(555) 396-188");
+    cmap_str_emplace_or_assign(&phone_book, "Zak Byers", "(555) 396-188");
 
-        printf("\nPhone book after update phone of Zak Byers:\n");
-        print_phone_book(phone_book);
-    }
-    puts("done");
+    printf("\nPhone book after update phone of Zak Byers:\n");
+    print_phone_book(phone_book);
+
+    cmap_str_drop(&phone_book);
 }

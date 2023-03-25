@@ -136,7 +136,7 @@ int main() {
 ## Example 2
 Slicing cspan without and with reducing the rank:
 ```c
-#include <c11/fmt.h>
+#include <c11/print.h>
 #include <stc/cspan.h>
 
 using_cspan3(Span, int); // Shorthand to define Span, Span2, and Span3
@@ -154,7 +154,7 @@ int main()
 
     puts("\niterate span2 flat:");
     c_foreach (i, Span2, span2)
-        fmt_print(" {}", *i.ref);
+        print(" {}", *i.ref);
     puts("");
 
     // slice without reducing rank:
@@ -164,26 +164,23 @@ int main()
     c_forrange (i, ss3.shape[0]) {
         c_forrange (j, ss3.shape[1]) {
             c_forrange (k, ss3.shape[2])
-                fmt_print(" {:2}", *cspan_at(&ss3, i, j, k));
-            fmt_print(" |");
+                print(" {:2}", *cspan_at(&ss3, i, j, k));
+            print(" |");
         }
-        puts("");
     }
     // slice and reduce rank:
     Span2 ss2 = cspan_slice(Span2, &span3, {c_ALL}, {3}, {c_ALL});
 
     puts("\niterate ss2 by dimensions:");
     c_forrange (i, ss2.shape[0]) {
-        c_forrange (j, ss2.shape[1]) {
-                fmt_print(" {:2}", *cspan_at(&ss2, i, j));
-            fmt_print(" |");
-        }
-        puts("");
+        c_forrange (j, ss2.shape[1])
+            print(" {:2}", *cspan_at(&ss2, i, j));
+        print(" |");
     }
 
     puts("\niterate ss2 flat:");
     c_foreach (i, Span2, ss2)
-        fmt_print(" {:2}", *i.ref);
+        print(" {:2}", *i.ref);
     puts("");
 }
 ```

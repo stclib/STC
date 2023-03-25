@@ -31,25 +31,20 @@
 
 int main()
 {
-    c_auto (MapMap, mmap)
-    {
-        FloatStack stack = FloatStack_with_size(10, 0);
+    MapMap mmap = {0};
 
-        // Put in some data in the structures
-        stack.data[3] = 3.1415927f;
-        printf("stack size: %" c_ZI "\n", FloatStack_size(&stack));
+    // Put in some data in the structures
+    ListMap* lmap = &MapMap_emplace(&mmap, "first", ListMap_init()).ref->second;
+    StackList* list = &ListMap_insert(lmap, 42, StackList_init()).ref->second;
+    FloatStack* stack = StackList_push_back(list, FloatStack_with_size(10, 0));
+    stack->data[3] = 3.1415927f;
+    printf("stack size: %" c_ZI "\n", FloatStack_size(stack));
 
-        StackList list = StackList_init();
-        StackList_push_back(&list, stack);
+    // Access the data entry
+    const ListMap* lmap_p = MapMap_at(&mmap, "first");
+    const StackList* list_p = ListMap_at(lmap_p, 42);
+    const FloatStack* stack_p = StackList_back(list_p);
+    printf("value is: %f\n", *FloatStack_at(stack_p, 3)); // pi
 
-        ListMap lmap = ListMap_init();
-        ListMap_insert(&lmap, 42, list);
-        MapMap_insert(&mmap, cstr_from("first"), lmap);
-
-        // Access the data entry
-        const ListMap* lmap_p = MapMap_at(&mmap, "first");
-        const StackList* list_p = ListMap_at(lmap_p, 42);
-        const FloatStack* stack_p = StackList_back(list_p);
-        printf("value is: %f\n", *FloatStack_at(stack_p, 3)); // pi
-    }
+    MapMap_drop(&mmap);
 }

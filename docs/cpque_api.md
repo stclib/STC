@@ -75,24 +75,24 @@ int main()
     stc64_t rng = stc64_new(1234);
     stc64_uniform_t dist = stc64_uniform_new(0, N * 10);
 
-    // Declare heap, with defered drop()
-    c_auto (cpque_i, heap)
-    {
-        // Push ten million random numbers to priority queue.
-        c_forrange (N)
-            cpque_i_push(&heap, stc64_uniform(&rng, &dist));
+    // Define heap
+    cpque_i heap = {0};
 
-        // Add some negative ones.
-        int nums[] = {-231, -32, -873, -4, -343};
-        c_forrange (i, c_ARRAYLEN(nums)) 
-            cpque_i_push(&heap, nums[i]);
+    // Push ten million random numbers to priority queue.
+    c_forrange (N)
+        cpque_i_push(&heap, stc64_uniform(&rng, &dist));
 
-        // Extract and display the fifty smallest.
-        c_forrange (50) {
-            printf("%" PRId64 " ", *cpque_i_top(&heap));
-            cpque_i_pop(&heap);
-        }
+    // Add some negative ones.
+    int nums[] = {-231, -32, -873, -4, -343};
+    c_forrange (i, c_ARRAYLEN(nums)) 
+        cpque_i_push(&heap, nums[i]);
+
+    // Extract and display the fifty smallest.
+    c_forrange (50) {
+        printf("%" PRId64 " ", *cpque_i_top(&heap));
+        cpque_i_pop(&heap);
     }
+    cpque_i_drop(&heap);
 }
 ```
 Output:

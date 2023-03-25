@@ -39,13 +39,15 @@ void Person_drop(Person* p) {
 
 int main()
 {
-    c_auto (Persons, vec)
-    c_auto (PSPtr, p, q)
-    {
-        p = PSPtr_from(Person_make("Laura", "Palmer"));
+    PSPtr p = PSPtr_from(Person_make("Laura", "Palmer"));
+    PSPtr q = PSPtr_from(Person_clone(*p.get)); // deep copy
+    Persons vec = {0};
 
-        // We want a deep copy -- PSPtr_clone(p) only shares!
-        q = PSPtr_from(Person_clone(*p.get));
+    c_defer(
+        PSPtr_drop(&p),
+        PSPtr_drop(&q),
+        Persons_drop(&vec)
+    ){
         cstr_assign(&q.get->name, "Leland");
 
         printf("orig: %s %s\n", cstr_str(&p.get->name), cstr_str(&p.get->last));
@@ -65,10 +67,9 @@ int main()
         puts("");
 
         // Look-up Audrey!
-        c_with (Person a = Person_make("Audrey", "Home"), Person_drop(&a)) {
-            const PSPtr *v = Persons_get(&vec, a);
-            if (v) printf("found: %s %s\n", cstr_str(&v->get->name), cstr_str(&v->get->last));
-        }
-        puts("");
+        Person a = Person_make("Audrey", "Home");
+        const PSPtr *v = Persons_get(&vec, a);
+        if (v) printf("found: %s %s\n", cstr_str(&v->get->name), cstr_str(&v->get->last));
+        Person_drop(&a);
     }
 }

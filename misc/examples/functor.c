@@ -51,18 +51,17 @@ int main()
     IPQueue q1 = {ipque_init(), int_less};       // Max priority queue
     IPQueue minq1 = {ipque_init(), int_greater}; // Min priority queue
     IPQueue q5 = {ipque_init(), int_lambda};     // Using lambda to compare elements.
-    c_defer (ipque_drop(&q1.Q), ipque_drop(&minq1.Q), ipque_drop(&q5.Q))
-    {
-        c_forrange (i, n)
-            ipque_push(&q1.Q, data[i]);
-        print_queue("q1", q1);
+    c_forrange (i, n)
+        ipque_push(&q1.Q, data[i]);
+    print_queue("q1", q1);
 
-        c_forrange (i, n)
-            ipque_push(&minq1.Q, data[i]);
-        print_queue("minq1", minq1);
+    c_forrange (i, n)
+        ipque_push(&minq1.Q, data[i]);
+    print_queue("minq1", minq1);
 
-        c_forrange (i, n)
-            ipque_push(&q5.Q, data[i]);
-        print_queue("q5", q5);
-    }
+    c_forrange (i, n)
+        ipque_push(&q5.Q, data[i]);
+    print_queue("q5", q5);
+
+    c_drop(ipque, &q1.Q, &minq1.Q, &q5.Q);
 }

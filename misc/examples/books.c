@@ -8,8 +8,10 @@
 // would be `HashMap<String, String>` in this example).
 int main()
 {
-    c_auto (cmap_str, book_reviews)
-    {
+    cmap_str book_reviews = {0};
+    c_defer(
+        cmap_str_drop(&book_reviews)
+    ){
         // Review some books.
         cmap_str_emplace(&book_reviews,
             "Adventures of Huckleberry Finn",

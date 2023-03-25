@@ -80,33 +80,38 @@ csset_X_value        csset_X_value_clone(csset_X_value val);
 ```c
 #include <stc/cstr.h>
 
+#define i_type SSet
 #define i_key_str
 #include <stc/csset.h>
 
 int main ()
 {
-    c_auto (csset_str, first, second, third)
-    c_auto (csset_str, fourth, fifth)
-    {
-        second = c_make(csset_str, {"red", "green", "blue"});
+    SSet second={0}, third={0}, fourth={0}, fifth={0};
 
-        c_forlist (i, const char*, {"orange", "pink", "yellow"})
-            csset_str_emplace(&third, *i.ref);
+    second = c_make(SSet, {"red", "green", "blue"});
 
-        csset_str_emplace(&fourth, "potatoes");
-        csset_str_emplace(&fourth, "milk");
-        csset_str_emplace(&fourth, "flour");
+    c_forlist (i, const char*, {"orange", "pink", "yellow"})
+        SSet_emplace(&third, *i.ref);
 
-        fifth = csset_str_clone(second);
-        c_foreach (i, csset_str, third)
-            csset_str_emplace(&fifth, cstr_str(i.ref));
-        c_foreach (i, csset_str, fourth)
-            csset_str_emplace(&fifth, cstr_str(i.ref));
+    SSet_emplace(&fourth, "potatoes");
+    SSet_emplace(&fourth, "milk");
+    SSet_emplace(&fourth, "flour");
 
-        printf("fifth contains:\n\n");
-        c_foreach (i, csset_str, fifth)
-            printf("%s\n", cstr_str(i.ref));
-    }
+    // Copy all to fifth:
+    
+    fifth = SSet_clone(second);
+
+    c_foreach (i, SSet, third)
+        SSet_emplace(&fifth, cstr_str(i.ref));
+
+    c_foreach (i, SSet, fourth)
+        SSet_emplace(&fifth, cstr_str(i.ref));
+
+    printf("fifth contains:\n\n");
+    c_foreach (i, SSet, fifth)
+        printf("%s\n", cstr_str(i.ref));
+
+    c_drop(SSet, &second, &third, &fourth, &fifth);
 }
 ```
 Output:

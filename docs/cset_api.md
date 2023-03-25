@@ -80,37 +80,35 @@ cset_X_value        cset_X_value_clone(cset_X_value val);
 ## Example
 ```c
 #include <stc/cstr.h>
-
+#define i_type Strset
 #define i_key_str
 #include <stc/cset.h>
 
 int main ()
 {
-    c_auto (cset_str, fifth)
-    {
-        c_auto (cset_str, first, second)
-        c_auto (cset_str, third, fourth)
-        {
-            second = c_make(cset_str, {"red", "green", "blue"});
+    Strset first, second={0}, third={0}, fourth={0}, fifth;
 
-            c_forlist (i, const char*, {"orange", "pink", "yellow"})
-                cset_str_emplace(&third, *i.ref);
+    first = c_make(Strset, {"red", "green", "blue"});
+    fifth = Strset_clone(second);
 
-            cset_str_emplace(&fourth, "potatoes");
-            cset_str_emplace(&fourth, "milk");
-            cset_str_emplace(&fourth, "flour");
+    c_forlist (i, const char*, {"orange", "pink", "yellow"})
+        Strset_emplace(&third, *i.ref);
 
-            fifth = cset_str_clone(second);
-            c_foreach (i, cset_str, third)
-                cset_str_emplace(&fifth, cstr_str(i.ref));
+    c_foreach (i, Strset, third)
+        Strset_insert(&fifth, cstr_clone(*i.ref));
 
-            c_foreach (i, cset_str, fourth)
-                cset_str_emplace(&fifth, cstr_str(i.ref));
-        }
-        printf("fifth contains:\n\n");
-        c_foreach (i, cset_str, fifth)
-            printf("%s\n", cstr_str(i.ref));
-    }
+    Strset_emplace(&fourth, "potatoes");
+    Strset_emplace(&fourth, "milk");
+    Strset_emplace(&fourth, "flour");
+
+    c_foreach (i, Strset, fourth)
+        Strset_emplace(&fifth, cstr_str(i.ref));
+
+    printf("fifth contains:\n\n");
+    c_foreach (i, Strset, fifth)
+        printf("%s\n", cstr_str(i.ref));
+
+    c_drop(Strset, &first, &second, &third, &fourth, &fifth);
 }
 ```
 Output:

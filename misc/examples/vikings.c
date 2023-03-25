@@ -39,28 +39,20 @@ static inline RViking Viking_toraw(const Viking* vp) {
 #define i_hash(rp)  cstrhash(rp->name) ^ cstrhash(rp->country)
 #define i_val       int         // mapped type
 #include <stc/cmap.h>
-/*
- i_keyclass implies these defines, unless they are already defined:
-   i_cmp        => RViking_cmp
-   //i_hash     => RViking_hash     // already defined.
-   //i_keyclone => Viking_clone     // not used, because of c_no_clone
-   i_keyto      => Viking_toraw     // because i_rawclass is defined
-   i_keydrop    => Viking_drop
-*/
 
 int main()
 {
-    c_auto (Vikings, vikings) {
-        Vikings_emplace(&vikings, (RViking){"Einar", "Norway"}, 20);
-        Vikings_emplace(&vikings, (RViking){"Olaf", "Denmark"}, 24);
-        Vikings_emplace(&vikings, (RViking){"Harald", "Iceland"}, 12);
-        Vikings_emplace(&vikings, (RViking){"Björn", "Sweden"}, 10);
+    Vikings vikings = {0};
+    Vikings_emplace(&vikings, (RViking){"Einar", "Norway"}, 20);
+    Vikings_emplace(&vikings, (RViking){"Olaf", "Denmark"}, 24);
+    Vikings_emplace(&vikings, (RViking){"Harald", "Iceland"}, 12);
+    Vikings_emplace(&vikings, (RViking){"Björn", "Sweden"}, 10);
 
-        Vikings_value* v = Vikings_get_mut(&vikings, (RViking){"Einar", "Norway"});
-        v->second += 3; // add 3 hp points to Einar
+    Vikings_value* v = Vikings_get_mut(&vikings, (RViking){"Einar", "Norway"});
+    v->second += 3; // add 3 hp points to Einar
 
-        c_forpair (vk, hp, Vikings, vikings) {
-            printf("%s of %s has %d hp\n", cstr_str(&_.vk->name), cstr_str(&_.vk->country), *_.hp);
-        }
+    c_forpair (vk, hp, Vikings, vikings) {
+        printf("%s of %s has %d hp\n", cstr_str(&_.vk->name), cstr_str(&_.vk->country), *_.hp);
     }
+    Vikings_drop(&vikings);
 }

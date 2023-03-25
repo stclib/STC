@@ -12,8 +12,7 @@ int  main()
 
     printf("%.*s, %.*s, %.*s\n", c_SV(year), c_SV(month), c_SV(day));
 
-    c_auto (cstr, y, m, d) {
-        y = cstr_from_sv(year), m = cstr_from_sv(month), d = cstr_from_sv(day);
-        printf("%s, %s, %s\n", cstr_str(&y), cstr_str(&m), cstr_str(&d));
-    }
+    cstr y = cstr_from_sv(year), m = cstr_from_sv(month), d = cstr_from_sv(day);
+    printf("%s, %s, %s\n", cstr_str(&y), cstr_str(&m), cstr_str(&d));
+    c_drop(cstr, &y, &m, &d);
 }

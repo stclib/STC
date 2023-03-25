@@ -193,21 +193,20 @@ Splice `[30, 40]` from *L2* into *L1* before `3`:
 #include <stdio.h>
 
 int main() {
-    c_auto (clist_i, L1, L2)
-    {
-        L1 = c_make(clist_i, {1, 2, 3, 4, 5});
-        L2 = c_make(clist_i, {10, 20, 30, 40, 50});
+    clist_i L1 = c_make(clist_i, {1, 2, 3, 4, 5});
+    clist_i L2 = c_make(clist_i, {10, 20, 30, 40, 50});
 
-        clist_i_iter i = clist_i_advance(clist_i_begin(&L1), 2);
-        clist_i_iter j1 = clist_i_advance(clist_i_begin(&L2), 2), j2 = clist_i_advance(j1, 2);
+    clist_i_iter i = clist_i_advance(clist_i_begin(&L1), 2);
+    clist_i_iter j1 = clist_i_advance(clist_i_begin(&L2), 2), j2 = clist_i_advance(j1, 2);
 
-        clist_i_splice_range(&L1, i, &L2, j1, j2);
+    clist_i_splice_range(&L1, i, &L2, j1, j2);
 
-        c_foreach (i, clist_i, L1)
-            printf(" %d", *i.ref); puts("");
-        c_foreach (i, clist_i, L2)
-            printf(" %d", *i.ref); puts("");
-    }
+    c_foreach (i, clist_i, L1)
+        printf(" %d", *i.ref); puts("");
+    c_foreach (i, clist_i, L2)
+        printf(" %d", *i.ref); puts("");
+
+    c_drop(clist_i, &L1, &L2);
 }
 ```
 Output:

@@ -3,7 +3,12 @@
 
 int main(void)
 {
-    c_with (cbits set = cbits_with_size(23, true), cbits_drop(&set)) {
+    cbits set = cbits_with_size(23, true);
+    cbits s2;
+    c_defer(
+        cbits_drop(&set),
+        cbits_drop(&s2)
+    ){
         printf("count %" c_ZI ", %" c_ZI "\n", cbits_count(&set), cbits_size(&set));
         cbits s1 = cbits_from("1110100110111");
         char buf[256];
@@ -35,27 +40,27 @@ int main(void)
             printf("%d", cbits_test(&set, i));
         puts("");
 
-        c_with (cbits s2 = cbits_clone(set), cbits_drop(&s2)) {
-            cbits_flip_all(&s2);
-            cbits_set(&s2, 16);
-            cbits_set(&s2, 17);
-            cbits_set(&s2, 18);
-            printf(" new: ");
-            c_forrange (i, cbits_size(&s2))
-                printf("%d", cbits_test(&s2, i));
-            puts("");
+        // Make a clone
+        s2 = cbits_clone(set);
+        cbits_flip_all(&s2);
+        cbits_set(&s2, 16);
+        cbits_set(&s2, 17);
+        cbits_set(&s2, 18);
+        printf(" new: ");
+        c_forrange (i, cbits_size(&s2))
+            printf("%d", cbits_test(&s2, i));
+        puts("");
 
-            printf(" xor: ");
-            cbits_xor(&set, &s2);
-            c_forrange (i, cbits_size(&set))
-                printf("%d", cbits_test(&set, i));
-            puts("");
+        printf(" xor: ");
+        cbits_xor(&set, &s2);
+        c_forrange (i, cbits_size(&set))
+            printf("%d", cbits_test(&set, i));
+        puts("");
 
-            cbits_set_all(&set, false);
-            printf("%4" c_ZI ": ", cbits_size(&set));
-            c_forrange (i, cbits_size(&set))
-                printf("%d", cbits_test(&set, i));
-            puts("");
-        }
+        cbits_set_all(&set, false);
+        printf("%4" c_ZI ": ", cbits_size(&set));
+        c_forrange (i, cbits_size(&set))
+            printf("%d", cbits_test(&set, i));
+        puts("");
     }
 }

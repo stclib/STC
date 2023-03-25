@@ -92,11 +92,12 @@ void int_drop(int* x) {
 
 int main()
 {
-    c_auto (IVec, vec)  // declare and init vec, call drop at scope exit
-    c_auto (ISet, set)  // similar
-    {
-        vec = c_make(Vec, {2021, 2012, 2022, 2015});
-
+    IVec vec = c_make(Vec, {2021, 2012, 2022, 2015});
+    ISet set = {0};
+    c_defer(
+      IVec_drop(&vec),
+      ISet_drop(&set)
+    ){
         printf("vec:");
         c_foreach (i, IVec, vec)
             printf(" %d", *i.ref->get);

@@ -10,16 +10,13 @@ struct Point { int x, y; } typedef Point;
 
 int main()
 {
-    c_auto (PointQ, pque)
+    PointQ pque = c_make(PointQ, {{23, 80}, {12, 32}, {54, 74}, {12, 62}});
+    // print
+    for (; !PointQ_empty(&pque); PointQ_pop(&pque))
     {
-        pque = c_make(PointQ, {{23, 80}, {12, 32}, {54, 74}, {12, 62}});
-        
-        // print
-        for (; !PointQ_empty(&pque); PointQ_pop(&pque))
-        {
-            const Point *v = PointQ_top(&pque);
-            printf(" (%d,%d)", v->x, v->y);
-        }
-        puts("");
+        const Point *v = PointQ_top(&pque);
+        printf(" (%d,%d)", v->x, v->y);
     }
+    puts("");
+    PointQ_drop(&pque);
 }

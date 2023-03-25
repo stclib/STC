@@ -27,35 +27,20 @@ int point_cmp(const Point* a, const Point* b) {
 #define i_tag pnt
 #include <stc/cdeq.h>
 
-#define i_val float
-#include <stc/cdeq.h>
-
-#define i_val_str
-#include <stc/cdeq.h>
-
 
 int main()
 {
-    c_auto (cdeq_i32, vec)
-    {
-        cdeq_i32_push_back(&vec, 123);
-    }
-    c_auto (cdeq_float, fvec)
-    {
-        cdeq_float_push_back(&fvec, 123.3f);
-    }
-    c_auto (cdeq_pnt, pvec)
-    {
-        cdeq_pnt_push_back(&pvec, (Point){42, 14});
-        cdeq_pnt_push_back(&pvec, (Point){32, 94});
-        cdeq_pnt_push_front(&pvec, (Point){62, 81});
-        cdeq_pnt_sort(&pvec);
-        c_foreach (i, cdeq_pnt, pvec)
-            printf(" (%d %d)", i.ref->x, i.ref->y);
-        puts("");
-    }
-    c_auto (cdeq_str, svec)
-    {
-        cdeq_str_emplace_back(&svec, "Hello, friend");
-    }
+    cdeq_pnt pvec = {0};
+
+    cdeq_pnt_push_back(&pvec, (Point){42, 14});
+    cdeq_pnt_push_back(&pvec, (Point){32, 94});
+    cdeq_pnt_push_front(&pvec, (Point){62, 81});
+
+    cdeq_pnt_sort(&pvec);
+    
+    c_foreach (i, cdeq_pnt, pvec)
+        printf(" (%d %d)", i.ref->x, i.ref->y);
+    puts("");
+    
+    cdeq_pnt_drop(&pvec);
 }

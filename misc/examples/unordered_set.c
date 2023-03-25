@@ -7,8 +7,10 @@
 int main()
 {
     // declaring set for storing string data-type
-    c_auto (cset_str, stringSet)
-    {
+    cset_str stringSet = {0};
+    c_defer(
+        cset_str_drop(&stringSet)
+    ){
         // inserting various string, same string will be stored
         // once in set
         cset_str_emplace(&stringSet, "code");

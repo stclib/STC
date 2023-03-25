@@ -15,38 +15,36 @@ void show_drop(int* x) { printf("drop: %d\n", *x); }
 
 int main()
 {
-    c_auto (Vec, vec)
-    {
-        vec = c_make(Vec, {2012, 1990, 2012, 2019, 2015});
-        
-        // clone the second 2012 and push it back.
-        // note: cloning make sure that vec.data[2] has ref count 2.
-        Vec_push(&vec, Arc_clone(vec.data[2]));
-        
-        printf("vec before erase :");
-        c_foreach (i, Vec, vec)
-            printf(" %d", *i.ref->get);
+    Vec vec = c_make(Vec, {2012, 1990, 2012, 2019, 2015});
+    
+    // clone the second 2012 and push it back.
+    // note: cloning make sure that vec.data[2] has ref count 2.
+    Vec_push(&vec, Arc_clone(vec.data[2]));
+    
+    printf("vec before erase :");
+    c_foreach (i, Vec, vec)
+        printf(" %d", *i.ref->get);
 
-        printf("\nerase vec.data[2]; or first matching value depending on compare.\n");
-        Vec_iter it;
-        it = Vec_find(&vec, *vec.data[2].get);
-        if (it.ref)
-            Vec_erase_at(&vec, it);
+    printf("\nerase vec.data[2]; or first matching value depending on compare.\n");
+    Vec_iter it;
+    it = Vec_find(&vec, *vec.data[2].get);
+    if (it.ref)
+        Vec_erase_at(&vec, it);
 
-        int year = 2015;
-        it = Vec_find(&vec, year); // Ok as tmp only.
-        if (it.ref)
-            Vec_erase_at(&vec, it);
+    int year = 2015;
+    it = Vec_find(&vec, year); // Ok as tmp only.
+    if (it.ref)
+        Vec_erase_at(&vec, it);
 
-        printf("vec after erase  :");
-        c_foreach (i, Vec, vec)
-            printf(" %d", *i.ref->get);
+    printf("vec after erase  :");
+    c_foreach (i, Vec, vec)
+        printf(" %d", *i.ref->get);
 
-        Vec_sort(&vec);
-        printf("\nvec after sort   :");
-        c_foreach (i, Vec, vec)
-            printf(" %d", *i.ref->get);
-        
-        puts("\nDone");
-    }
+    Vec_sort(&vec);
+    printf("\nvec after sort   :");
+    c_foreach (i, Vec, vec)
+        printf(" %d", *i.ref->get);
+    
+    puts("\nDone");
+    Vec_drop(&vec);
 }

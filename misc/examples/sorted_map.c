@@ -9,8 +9,11 @@ int main()
 { 
   
     // empty map containers
-    c_auto (csmap_int, gquiz1, gquiz2)
-    { 
+    csmap_int gquiz1 = {0}, gquiz2 = {0};
+    c_defer(
+        csmap_int_drop(&gquiz1),
+        csmap_int_drop(&gquiz2)
+    ){ 
         // insert elements in random order 
         csmap_int_insert(&gquiz1, 2, 30); 
         csmap_int_insert(&gquiz1, 4, 20); 
