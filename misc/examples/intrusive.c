@@ -24,11 +24,9 @@ int main() {
     List_sort(&list);
     printList(list);
 
-    puts("Remove odd numbers from list list");
-    c_foreach (i, List, list)
-        if (*i.ref & 1)
-            List_unlink_after_node(&list, i.prev);
-    printList(list);
+    puts("Remove nodes from list");
+    while (!List_empty(&list))
+        c_free(List_unlink_after_node(&list, list.last));
 
-    List_drop(&list);
+    printList(list);
 }
