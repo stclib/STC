@@ -32,20 +32,20 @@
 #include <stc/csmap.h>
 
 int main(void) {
-    c_with (csmap_sx m = csmap_sx_init(), csmap_sx_drop(&m))
-    {
-        csmap_sx_emplace(&m, "Testing one", 1.234);
-        csmap_sx_emplace(&m, "Testing two", 12.34);
-        csmap_sx_emplace(&m, "Testing three", 123.4);
+    csmap_sx m = {0};
+    csmap_sx_emplace(&m, "Testing one", 1.234);
+    csmap_sx_emplace(&m, "Testing two", 12.34);
+    csmap_sx_emplace(&m, "Testing three", 123.4);
 
-        csmap_sx_value *v = csmap_sx_get(&m, "Testing five"); // NULL
-        double num = *csmap_sx_at(&m, "Testing one");
-        csmap_sx_emplace_or_assign(&m, "Testing three", 1000.0); // update
-        csmap_sx_erase(&m, "Testing two");
+    csmap_sx_value *v = csmap_sx_get(&m, "Testing five"); // NULL
+    double num = *csmap_sx_at(&m, "Testing one");
+    csmap_sx_emplace_or_assign(&m, "Testing three", 1000.0); // update
+    csmap_sx_erase(&m, "Testing two");
 
-        c_foreach (i, csmap_sx, m)
-            printf("map %s: %g\n", cstr_str(&i.ref->first), i.ref->second);
-    }
+    c_foreach (i, csmap_sx, m)
+        printf("map %s: %g\n", cstr_str(&i.ref->first), i.ref->second);
+
+    csmap_sx_drop(&m);
 }
 */
 #ifdef STC_CSMAP_V1

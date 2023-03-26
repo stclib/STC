@@ -31,20 +31,20 @@
 #include <stc/cmap.h>
 
 int main(void) {
-    c_with (cmap_ichar m = cmap_ichar_init(), cmap_ichar_drop(&m))
-    {
-        cmap_ichar_emplace(&m, 5, 'a');
-        cmap_ichar_emplace(&m, 8, 'b');
-        cmap_ichar_emplace(&m, 12, 'c');
+    cmap_ichar m = {0};
+    cmap_ichar_emplace(&m, 5, 'a');
+    cmap_ichar_emplace(&m, 8, 'b');
+    cmap_ichar_emplace(&m, 12, 'c');
 
-        cmap_ichar_value* v = cmap_ichar_get(&m, 10); // NULL
-        char val = *cmap_ichar_at(&m, 5);               // 'a'
-        cmap_ichar_emplace_or_assign(&m, 5, 'd');       // update
-        cmap_ichar_erase(&m, 8);
+    cmap_ichar_value* v = cmap_ichar_get(&m, 10); // NULL
+    char val = *cmap_ichar_at(&m, 5);               // 'a'
+    cmap_ichar_emplace_or_assign(&m, 5, 'd');       // update
+    cmap_ichar_erase(&m, 8);
 
-        c_foreach (i, cmap_ichar, m)
-            printf("map %d: %c\n", i.ref->first, i.ref->second);
-    }
+    c_foreach (i, cmap_ichar, m)
+        printf("map %d: %c\n", i.ref->first, i.ref->second);
+
+    cmap_ichar_drop(&m);
 }
 */
 #include "ccommon.h"
