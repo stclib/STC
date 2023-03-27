@@ -165,13 +165,13 @@ int main(void)
     
     Floats_sort(&nums);
 
-    c_foreach (i, Floats, nums)         // Alternative way to iterate nums.
+    c_foreach (i, Floats, nums)         // Alternative and recommended way to iterate nums.
         printf(" %g", *i.ref);          // i.ref is a pointer to the current element.
 
     Floats_drop(&nums); // cleanup memory
 }
 ```
-To switch to a different container type is easy when using `c_foreach`:
+Switching to a different container type is easy:
 ```c
 #define i_type Floats
 #define i_val float
@@ -185,7 +185,7 @@ int main()
     Floats_push(&nums, 40.f);
 
     // print the sorted numbers
-    c_foreach (i, Floats, nums)
+    c_foreach (i, Floats, nums)         // c_foreach works with any container
         printf(" %g", *i.ref);
 
     Floats_drop(&nums);
@@ -197,21 +197,22 @@ only works for integral types. *Alternatively, `#define i_opt c_no_cmp` to disab
 
 Let's make a vector of vectors that can be cloned. All of its element vectors will be destroyed when destroying the Vec2D.
 ```c
+#include <stdio.h>
+
 #define i_type Vec
 #define i_val float
 #include <stc/cvec.h>
-#include <stdio.h>
 
 #define i_type Vec2D
-#define i_valclass Vec  // Use i_valclass when element type has "member" functions Vec_clone(), Vec_drop() and Vec_cmp().
-#define i_opt c_no_cmp  // Disable search/sort for Vec2D because Vec_cmp() is not defined.
+#define i_valclass Vec  // Use i_valclass when the element type has "member" functions _clone(), _drop() and _cmp().
+#define i_opt c_no_cmp  // However, disable search/sort for Vec2D because Vec_cmp() is not defined.
 #include <stc/cvec.h>
 
 int main(void)
 {
     Vec* v;
     Vec2D vec = {0};                  // All containers in STC can be initialized with {0}.
-    v = Vec2D_push(&vec, Vec_init()); // Returns a pointer to the new element in vec.
+    v = Vec2D_push(&vec, Vec_init()); // push() returns a pointer to the new element in vec.
     Vec_push(v, 10.f);
     Vec_push(v, 20.f);
 
@@ -228,30 +229,22 @@ int main(void)
     c_drop(Vec2D, &vec, &clone);      // Cleanup all (6) vectors.
 }
 ```
-Here is an example of using six different container types:
+Here is an example of using four different container types:
 ```c
 #include <stdio.h>
-#include <stc/ccommon.h>
-
-struct Point { float x, y; };
 
 #define i_key int
 #include <stc/cset.h>  // cset_int: unordered set
 
+struct Point { float x, y; };
+// Define cvec_pnt with a less-comparison function for Point.
 #define i_val struct Point
-// Define a i_less template parameter (alternative to i_cmp) for Point.
 #define i_less(a, b) a->x < b->x || (a->x == b->x && a->y < b->y)
 #define i_tag pnt
 #include <stc/cvec.h>   // cvec_pnt: vector of struct Point
 
 #define i_val int
-#include <stc/cdeq.h>   // cdeq_int: deque of int
-
-#define i_val int
 #include <stc/clist.h>  // clist_int: singly linked list
-
-#define i_val int
-#include <stc/cstack.h> // cstack_int
 
 #define i_key int
 #define i_val int
@@ -259,53 +252,46 @@ struct Point { float x, y; };
 
 int main(void)
 {
-    // Define six empty containers
+    // Define four empty containers
     cset_int set = {0};
     cvec_pnt vec = {0};
-    cdeq_int deq = {0};
     clist_int lst = {0};
-    cstack_int stk = {0};
     csmap_int map = {0};
 
-    c_defer( // Drop the containers after the scope is executed
+    c_defer( // Drop the containers at scope exit
         cset_int_drop(&set),
         cvec_pnt_drop(&vec),
-        cdeq_int_drop(&deq),
         clist_int_drop(&lst),
-        cstack_int_drop(&stk),
         csmap_int_drop(&map)
     ){
-        int nums[4] = {10, 20, 30, 40};
-        struct Point pts[4] = { {10, 1}, {20, 2}, {30, 3}, {40, 4} };
-        int pairs[4][2] = { {20, 2}, {10, 1}, {30, 3}, {40, 4} };
+        enum{N = 5};
+        int nums[N] = {10, 20, 30, 40, 50};
+        struct Point pts[N] = { {10, 1}, {20, 2}, {30, 3}, {40, 4}, {50, 5} };
+        int pairs[N][2] = { {20, 2}, {10, 1}, {30, 3}, {40, 4}, {50, 5} };
         
         // Add some elements to each container
-        for (int i = 0; i < 4; ++i) {
+        for (int i = 0; i < N; ++i) {
             cset_int_insert(&set, nums[i]);
             cvec_pnt_push(&vec, pts[i]);
-            cdeq_int_push_back(&deq, nums[i]);
             clist_int_push_back(&lst, nums[i]);
-            cstack_int_push(&stk, nums[i]);
             csmap_int_insert(&map, pairs[i][0], pairs[i][1]);
         }
 
-        // Find an element in each container (except cstack)
+        // Find an element in each container
         cset_int_iter i1 = cset_int_find(&set, 20);
         cvec_pnt_iter i2 = cvec_pnt_find(&vec, (struct Point){20, 2});
-        cdeq_int_iter i3 = cdeq_int_find(&deq, 20);
-        clist_int_iter i4 = clist_int_find(&lst, 20);
-        csmap_int_iter i5 = csmap_int_find(&map, 20);
+        clist_int_iter i3 = clist_int_find(&lst, 20);
+        csmap_int_iter i4 = csmap_int_find(&map, 20);
 
-        printf("\nFound: %d, (%g, %g), %d, %d, [%d: %d]\n",
-                *i1.ref, i2.ref->x, i2.ref->y, *i3.ref,
-                *i4.ref, i5.ref->first, i5.ref->second);
+        printf("\nFound: %d, (%g, %g), %d, [%d: %d]\n",
+                *i1.ref, i2.ref->x, i2.ref->y, *i3.ref, 
+                i4.ref->first, i4.ref->second);
         
         // Erase all the elements found
         cset_int_erase_at(&set, i1);
         cvec_pnt_erase_at(&vec, i2);
-        cdeq_int_erase_at(&deq, i3);
-        clist_int_erase_at(&lst, i4);
-        csmap_int_erase_at(&map, i5);
+        clist_int_erase_at(&lst, i3);
+        csmap_int_erase_at(&map, i4);
 
         printf("After erasing the elements found:");
         printf("\n set:");
@@ -316,16 +302,8 @@ int main(void)
         c_foreach (i, cvec_pnt, vec)
             printf(" (%g, %g)", i.ref->x, i.ref->y);
         
-        printf("\n deq:");
-        c_foreach (i, cdeq_int, deq)
-            printf(" %d", *i.ref);
-        
         printf("\n lst:");
         c_foreach (i, clist_int, lst)
-            printf(" %d", *i.ref);
-        
-        printf("\n stk:");
-        c_foreach (i, cstack_int, stk)
             printf(" %d", *i.ref);
         
         printf("\n map:");
@@ -337,14 +315,12 @@ int main(void)
 
 Output
 ```
-Found: 20, (20, 2), 20, 20, [20: 2]
-After erasing elements found:
- set: 10 30 40
- vec: (10, 1) (30, 3) (40, 4)
- deq: 5 10 30
- lst: 5 10 30
- stk: 10 20 30 40
- map: [10: 1] [30: 3] [40: 4]
+Found: 20, (20, 2), 20, [20: 2]
+After erasing the elements found:    
+ set: 40 10 30 50
+ vec: (10, 1) (30, 3) (40, 4) (50, 5)
+ lst: 10 30 40 50
+ map: [10: 1] [30: 3] [40: 4] [50: 5]
 ```
 
 Installation
@@ -480,12 +456,12 @@ cvec_str vec = {0};
 cstr s = cstr_lit("a string literal");
 const char* hello = "Hello";
 
-cvec_str_push_back(&vec, cstr_from(hello);    // construct and add string from const char*
-cvec_str_push_back(&vec, cstr_clone(s));      // clone and append a cstr
+cvec_str_push(&vec, cstr_from(hello);    // make a cstr from const char* and move it onto vec
+cvec_str_push(&vec, cstr_clone(s));      // make a cstr clone and move it onto vec
 
-cvec_str_emplace_back(&vec, "Yay, literal");  // internally constructs cstr from const char*
-cvec_str_emplace_back(&vec, cstr_clone(s));   // <-- COMPILE ERROR: expects const char*
-cvec_str_emplace_back(&vec, cstr_str(&s));    // Ok: const char* input type.
+cvec_str_emplace(&vec, "Yay, literal");  // internally make a cstr from const char*
+cvec_str_emplace(&vec, cstr_clone(s));   // <-- COMPILE ERROR: expects const char*
+cvec_str_emplace(&vec, cstr_str(&s));    // Ok: const char* input type.
 
 cstr_drop(&s)
 cvec_str_drop(&vec);

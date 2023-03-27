@@ -48,10 +48,12 @@ int demo2() {
     puts("");
     
     c_forfilter (i, Intspan, span,
-                    c_flt_skipwhile(i, *i.ref < 25) &&
-                    (*i.ref & 1) == 0               && // even only
-                    c_flt_take(i, 2))                  // break after 2
+        c_flt_skipwhile(i, *i.ref < 25) &&
+        (*i.ref & 1) == 0               && // even only
+        c_flt_take(i, 2)                   // break after 2
+    ){
         printf(" %d", *i.ref);
+    }
     puts("");
 }
 */

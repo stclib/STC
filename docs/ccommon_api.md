@@ -113,8 +113,10 @@ int main() {
                     isPrime(*i.ref)          &&
                     c_flt_skip(i, 24)        &&
                     c_flt_count(i) % 15 == 1 &&
-                    c_flt_take(i, 10))
+                    c_flt_take(i, 10)
+    ){
         printf(" %lld", *i.ref);
+    }
     puts("");
 }
 // out: 1171 1283 1409 1493 1607 1721 1847 1973 2081 2203
@@ -126,7 +128,7 @@ Note that `c_flt_take()` and `c_flt_takewhile()`breaks the loop on false.
 ### crange
 A number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html). The **crange_value** type is `long long`. Below *start*, *stop*, and *step* are of type *crange_value*:
 ```c
-crange&     crange_obj(...)                 // create a compound literal crange object
+crange&     crange_object(...)              // create a compound literal crange object
 crange      crange_make(stop);              // will generate 0, 1, ..., stop-1
 crange      crange_make(start, stop);       // will generate start, start+1, ... stop-1
 crange      crange_make(start, stop, step); // will generate start, start+step, ... upto-not-including stop
@@ -144,10 +146,12 @@ c_forfilter (i, crange, r1, isPrime(*i.ref))
 
 // 2. The 11 first primes:
 printf("2");
-c_forfilter (i, crange, crange_obj(3, INT64_MAX, 2),
-                isPrime(*i.ref) &&
-                c_flt_take(10))
+c_forfilter (i, crange, crange_object(3, INT64_MAX, 2),
+    isPrime(*i.ref) &&
+    c_flt_take(10)
+){
     printf(" %lld", *i.ref);
+}
 // 2 3 5 7 11 13 17 19 23 29 31
 ```
 ## Algorithms

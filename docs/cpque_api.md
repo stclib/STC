@@ -84,7 +84,7 @@ int main()
 
     // Add some negative ones.
     int nums[] = {-231, -32, -873, -4, -343};
-    c_forrange (i, c_ARRAYLEN(nums)) 
+    c_forrange (i, c_arraylen(nums)) 
         cpque_i_push(&heap, nums[i]);
 
     // Extract and display the fifty smallest.
