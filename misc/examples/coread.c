@@ -20,17 +20,20 @@ bool file_nextline(struct file_nextline* U)
         while (cstr_getline(&U->line, U->fp))
             cco_yield(true);
 
-        cco_final: // required label.
+        cco_final: // this label is required.
             printf("finish\n");
             cstr_drop(&U->line);
             fclose(U->fp);
     cco_end(false);
 }
 
-int main(void) {
-    struct file_nextline z = {__FILE__};
+int main(void)
+{
+    struct file_nextline it = {__FILE__};
     int n = 0;
-    while (file_nextline(&z)) {
-        printf("%3d %s\n", ++n, cstr_str(&z.line));
+    while (file_nextline(&it))
+    {
+        printf("%3d %s\n", ++n, cstr_str(&it.line));
+        //if (n == 10) cco_stop(&it);
     }
 }

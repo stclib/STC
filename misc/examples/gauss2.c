@@ -6,7 +6,7 @@
 
 // Declare int -> int sorted map.
 #define i_key int
-#define i_val size_t
+#define i_val int
 #include <stc/csmap.h>
 
 int main()
@@ -22,16 +22,16 @@ int main()
     stc64_normalf_t dist = stc64_normalf_new(Mean, StdDev);
 
     // Create and init histogram map with defered destruct
-    csmap_int mhist = {0};
+    csmap_int hist = {0};
     cstr bar = {0};
 
     c_forrange (N) {
-        int index = (int) round( stc64_normalf(&rng, &dist) );
-        csmap_int_insert(&mhist, index, 0).ref->second += 1;
+        int index = (int)round( stc64_normalf(&rng, &dist) );
+        csmap_int_insert(&hist, index, 0).ref->second += 1;
     }
 
     // Print the gaussian bar chart
-    c_forpair (index, count, csmap_int, mhist) {
+    c_forpair (index, count, csmap_int, hist) {
         int n = (int)((float)*_.count * StdDev * Scale * 2.5f / (float)N);
         if (n > 0) {
             cstr_resize(&bar, n, '*');
@@ -39,5 +39,5 @@ int main()
         }
     }
     cstr_drop(&bar);
-    csmap_int_drop(&mhist);
+    csmap_int_drop(&hist);
 }

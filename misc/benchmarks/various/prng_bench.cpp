@@ -122,7 +122,7 @@ using namespace std;
 
 int main(void)
 {
-    enum {N = 2000000000};
+    enum {N = 500000000};
     uint16_t* recipient = new uint16_t[N];
     static stc64_t rng;
     init_state(rng.state, 12345123);

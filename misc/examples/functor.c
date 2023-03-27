@@ -43,14 +43,16 @@ static bool int_lambda(const int* x, const int* y) { return (*x ^ 1) < (*y ^ 1);
 
 int main()
 {
-    const int data[] = {1,8,5,6,3,4,0,9,7,2}, n = c_ARRAYLEN(data);
+    const int data[] = {1,8,5,6,3,4,0,9,7,2}, n = c_arraylen(data);
     printf("data: \t");
-    c_forrange (i, n) printf("%d ", data[i]);
+    c_forrange (i, n)
+        printf("%d ", data[i]);
     puts("");
 
     IPQueue q1 = {ipque_init(), int_less};       // Max priority queue
     IPQueue minq1 = {ipque_init(), int_greater}; // Min priority queue
     IPQueue q5 = {ipque_init(), int_lambda};     // Using lambda to compare elements.
+
     c_forrange (i, n)
         ipque_push(&q1.Q, data[i]);
     print_queue("q1", q1);

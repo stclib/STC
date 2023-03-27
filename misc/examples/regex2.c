@@ -16,7 +16,7 @@ int main()
     };
 
     cregex re = {0};
-    c_forrange (i, c_ARRAYLEN(s))
+    c_forrange (i, c_arraylen(s))
     {
         int res = cregex_compile(&re, s[i].pattern);
         if (res < 0) {

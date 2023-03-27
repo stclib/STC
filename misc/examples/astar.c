@@ -103,7 +103,7 @@ astar(cstr* maze, int width)
                 { -1,  0, 0, width }, /* ~ ~ ~ ~ ~ ~ ~ */  { 1,  0, 0, width },
                 { -1, -1, 0, width }, { 0, -1, 0, width }, { 1, -1, 0, width },
             };
-            for (size_t i = 0; i < c_ARRAYLEN(deltas); i++)
+            for (size_t i = 0; i < c_arraylen(deltas); i++)
             {
                 point delta = deltas[i];
                 point next = point_init(current.x + delta.x, current.y + delta.y, width);

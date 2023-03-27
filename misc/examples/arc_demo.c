@@ -25,7 +25,7 @@ int main()
     const int years[] = {2021, 2012, 2022, 2015};
 
     cvec_Arc vec = {0};
-    c_forrange (i, c_ARRAYLEN(years))
+    c_forrange (i, c_arraylen(years))
         cvec_Arc_push(&vec, Arc_from(years[i]));
 
     printf("vec:");

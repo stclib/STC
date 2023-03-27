@@ -15,5 +15,6 @@ int main()
     cregex re = cregex_from("[^ ]+");
     c_formatch (i, &re, "  Hello   World      C99! ")
         printf("'%.*s'\n", c_SV(i.match[0]));
+
     cregex_drop(&re);
 }

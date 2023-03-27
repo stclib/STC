@@ -71,7 +71,7 @@ int main()
     csmap_OL multimap = {0};
     const clist_OL empty = clist_OL_init();
 
-    for (size_t i = 0; i < c_ARRAYLEN(ol_data); ++i)
+    for (size_t i = 0; i < c_arraylen(ol_data); ++i)
     {
         struct OlympicsData* d = &ol_data[i];
         OlympicLoc loc = {.year = d->year,
