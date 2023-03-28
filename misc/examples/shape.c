@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stc/ccommon.h>
 
-#define c_dyn_cast(T, s) \
+#define DYN_CAST(T, s) \
     (&T##_api == (s)->api ? (T*)(s) : (T*)0)
 
 // Shape definition
@@ -53,15 +53,14 @@ typedef struct {
 extern struct ShapeAPI Triangle_api;
 
 
-Triangle Triangle_from(Point a, Point b, Point c)
-{
-    Triangle t = {.shape={.api=&Triangle_api}, .p={a, b, c}};
+Triangle Triangle_from(Point a, Point b, Point c) {
+    Triangle t = {{&Triangle_api}, {a, b, c}};
     return t;
 }
 
 static void Triangle_draw(const Shape* shape)
 {
-    const Triangle* self = c_dyn_cast(Triangle, shape);
+    const Triangle* self = DYN_CAST(Triangle, shape);
     printf("Triangle : (%g,%g), (%g,%g), (%g,%g)\n",
            self->p[0].x, self->p[0].y,
            self->p[1].x, self->p[1].y,
@@ -88,9 +87,8 @@ typedef struct {
 extern struct ShapeAPI Polygon_api;
 
 
-Polygon Polygon_init(void)
-{
-    Polygon p = {.shape={.api=&Polygon_api}, .points=PointVec_init()};
+Polygon Polygon_init(void) {
+    Polygon p = {{&Polygon_api}, {0}};
     return p;
 }
 
@@ -101,15 +99,14 @@ void Polygon_addPoint(Polygon* self, Point p)
 
 static void Polygon_drop(Shape* shape)
 {
-    Polygon* self = c_dyn_cast(Polygon, shape);
+    Polygon* self = DYN_CAST(Polygon, shape);
     printf("poly destructed\n");
     PointVec_drop(&self->points);
-    Shape_drop(shape);
 }
 
 static void Polygon_draw(const Shape* shape)
 {
-    const Polygon* self = c_dyn_cast(Polygon, shape);
+    const Polygon* self = DYN_CAST(Polygon, shape);
     printf("Polygon  :");
     c_foreach (i, PointVec, self->points)
         printf(" (%g,%g)", i.ref->x, i.ref->y);

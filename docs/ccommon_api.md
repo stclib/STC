@@ -92,7 +92,7 @@ Iterate containers with stop-criteria and chained range filtering.
 | `c_flt_skipwhile(it, predicate)`  | Skip items until predicate is false  |
 | `c_flt_takewhile(it, predicate)`  | Take items until predicate is false  |
 | `c_flt_count(it)`                 | Increment current and return value   |
-| `c_flt_last(it)`                  | Get value of last count/skip/take    |
+| `c_flt_last(it)`                  | Get value of last count/skip*/take*  |
 ```c
 // Example:
 #include <stc/algo/crange.h>

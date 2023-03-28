@@ -11,14 +11,15 @@
 
 int main()
 {
-    enum {N = 10000000};
-    const double Mean = -12.0, StdDev = 6.0, Scale = 74;
-
-    printf("Demo of gaussian / normal distribution of %d random samples\n", N);
-
-    // Setup random engine with normal distribution.
+    enum {N = 5000000};
     uint64_t seed = (uint64_t)time(NULL);
     stc64_t rng = stc64_new(seed);
+    const float Mean = round(stc64_randf(&rng)*98.f - 49.f), StdDev = stc64_randf(&rng)*10.f + 1.f, Scale = 74.f;
+
+    printf("Demo of gaussian / normal distribution of %d random samples\n", N);
+    printf("Mean %f, StdDev %f\n", Mean, StdDev);
+
+    // Setup random engine with normal distribution.
     stc64_normalf_t dist = stc64_normalf_new(Mean, StdDev);
 
     // Create and init histogram map with defered destruct
@@ -32,7 +33,7 @@ int main()
 
     // Print the gaussian bar chart
     c_forpair (index, count, csmap_int, hist) {
-        int n = (int)((float)*_.count * StdDev * Scale * 2.5f / (float)N);
+        int n = (int)round((float)*_.count * StdDev * Scale * 2.5f / (float)N);
         if (n > 0) {
             cstr_resize(&bar, n, '*');
             printf("%4d %s\n", *_.index, cstr_str(&bar));

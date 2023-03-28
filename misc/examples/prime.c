@@ -42,9 +42,8 @@ int main(void)
     puts("\n");
 
     puts("Show the last 50 primes using a temporary crange generator:");
-    crange R = crange_make(n - 1, 0, -2);
-    c_forfilter (i, crange, R,
-        cbits_test(&primes, *i.ref>>1) &&
+    c_forfilter (i, crange, crange_object(n - 1, 0, -2),
+        cbits_test(&primes, *i.ref/2) &&
         c_flt_take(i, 50)
     ){
         printf("%lld ", *i.ref);
