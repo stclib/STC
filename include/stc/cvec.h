@@ -236,9 +236,8 @@ _cx_memb(_get_mut)(const _cx_self* self, _cx_raw raw)
 STC_INLINE bool
 _cx_memb(_eq)(const _cx_self* x, const _cx_self* y) {
     if (x->_len != y->_len) return false;
-    _cx_iter i = _cx_memb(_begin)(x), j = _cx_memb(_begin)(y);
-    for (; i.ref; _cx_memb(_next)(&i), _cx_memb(_next)(&j)) {
-        const _cx_raw _rx = i_keyto(i.ref), _ry = i_keyto(j.ref);
+    for (intptr_t i = 0; i < x->_len; ++i) {
+        const _cx_raw _rx = i_keyto(x->data+i), _ry = i_keyto(y->data+i);
         if (!(i_eq((&_rx), (&_ry)))) return false;
     }
     return true;

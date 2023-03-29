@@ -1,9 +1,9 @@
 // Implements c++ example: https://en.cppreference.com/w/cpp/container/priority_queue
 // Example of per-instance less-function on a single priority queue type
 //
-// Note: i_less_functor: available for cpque types only
-//       i_cmp_functor: available for csmap and csset types only
-//       i_hash_functor/i_eq_functor: available for cmap and cset types only
+// Note: i_less: has self for cpque types only
+//       i_cmp: has self for csmap and csset types only
+//       i_hash/i_eq: has self for cmap and cset types only
 
 #include <stdio.h>
 #include <stdbool.h>
@@ -23,7 +23,7 @@ struct {
 #define i_type ipque
 #define i_val int
 #define i_opt c_is_forward // needed to avoid re-type-define container type
-#define i_less_functor(self, x, y) c_container_of(self, IPQueue, Q)->less(x, y)
+#define i_less(x, y) c_container_of(self, IPQueue, Q)->less(x, y)
 #include <stc/cpque.h>
 
 void print_queue(const char* name, IPQueue q) {

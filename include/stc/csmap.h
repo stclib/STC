@@ -80,9 +80,6 @@ int main(void) {
   #define _i_size i_ssize
 #endif
 #include "priv/template.h"
-#ifndef i_cmp_functor
-  #define i_cmp_functor(self, x, y) i_cmp(x, y)
-#endif
 #if !c_option(c_is_forward)
   _cx_deftypes(_c_aatree_types, _cx_self, i_key, i_val, i_ssize, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
@@ -222,12 +219,12 @@ _cx_memb(_advance)(_cx_iter it, size_t n) {
 }
 
 STC_INLINE bool
-_cx_memb(_eq)(const _cx_self* m1, const _cx_self* m2) {
-    if (_cx_memb(_size)(m1) != _cx_memb(_size)(m2)) return false;
-    _cx_iter i = _cx_memb(_begin)(m1), j = _cx_memb(_begin)(m2);
+_cx_memb(_eq)(const _cx_self* self, const _cx_self* other) {
+    if (_cx_memb(_size)(self) != _cx_memb(_size)(other)) return false;
+    _cx_iter i = _cx_memb(_begin)(self), j = _cx_memb(_begin)(other);
     for (; i.ref; _cx_memb(_next)(&i), _cx_memb(_next)(&j)) {
         const _cx_rawkey _rx = i_keyto(_i_keyref(i.ref)), _ry = i_keyto(_i_keyref(j.ref));
-        if ((i_cmp_functor(m1, (&_rx), (&_ry))) != 0) return false;
+        if (!(i_eq((&_rx), (&_ry)))) return false;
     }
     return true;
 }
@@ -357,7 +354,7 @@ _cx_memb(_find_it)(const _cx_self* self, _cx_rawkey rkey, _cx_iter* out) {
     out->_top = 0;
     while (tn) {
         int c; const _cx_rawkey _raw = i_keyto(_i_keyref(&d[tn].value));
-        if ((c = i_cmp_functor(self, (&_raw), (&rkey))) < 0)
+        if ((c = i_cmp((&_raw), (&rkey))) < 0)
             tn = d[tn].link[1];
         else if (c > 0)
             { out->_st[out->_top++] = tn; tn = d[tn].link[0]; }
@@ -425,7 +422,7 @@ _cx_memb(_insert_entry_i_)(_cx_self* self, i_ssize tn, const _cx_rawkey* rkey, _
     while (tx) {
         up[top++] = tx;
         const _cx_rawkey _raw = i_keyto(_i_keyref(&d[tx].value));
-        if (!(c = i_cmp_functor(self, (&_raw), rkey)))
+        if (!(c = i_cmp((&_raw), rkey)))
             { _res->ref = &d[tx].value; return tn; }
         dir = (c < 0);
         tx = d[tx].link[dir];
@@ -464,7 +461,7 @@ _cx_memb(_erase_r_)(_cx_self *self, i_ssize tn, const _cx_rawkey* rkey, int *era
     if (tn == 0)
         return 0;
     _cx_rawkey raw = i_keyto(_i_keyref(&d[tn].value));
-    i_ssize tx; int c = i_cmp_functor(self, (&raw), rkey);
+    i_ssize tx; int c = i_cmp((&raw), rkey);
     if (c != 0)
         d[tn].link[c < 0] = _cx_memb(_erase_r_)(self, d[tn].link[c < 0], rkey, erased);
     else {
@@ -594,7 +591,6 @@ _cx_memb(_drop)(_cx_self* self) {
 }
 
 #endif // i_implement
-#undef i_cmp_functor
 #undef _i_size
 #undef _i_isset
 #undef _i_ismap
