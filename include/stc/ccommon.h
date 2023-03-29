@@ -140,20 +140,20 @@ typedef const char* crawstr;
 #define c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
 STC_INLINE uint64_t cfasthash(const void* key, intptr_t len) {
-    const uint8_t *x = (const uint8_t*) key;
-    uint64_t u8, h = 1; intptr_t n = len >> 3;
-    uint32_t u4;
+    uint32_t u4; uint64_t u8;
+    switch (len) {
+        case 8: memcpy(&u8, key, 8); return u8*0xc6a4a7935bd1e99d;
+        case 4: memcpy(&u4, key, 4); return u4*0xc6a4a7935bd1e99d;
+        case 0: return 1;
+    }
+    const uint8_t *x = (const uint8_t*)key;
+    uint64_t h = *x, n = (uint64_t)len >> 3;
+    len &= 7;
     while (n--) {
         memcpy(&u8, x, 8), x += 8;
-        h += (c_ROTL(u8, 26) ^ u8)*0xc6a4a7935bd1e99d;
+        h += u8*0xc6a4a7935bd1e99d;
     }
-    switch (len &= 7) {
-        case 0: return h;
-        case 4: memcpy(&u4, x, 4);
-                return h + u4*0xc6a4a7935bd1e99d;
-    }
-    h += *x++;
-    while (--len) h = (h << 10) - h + *x++;
+    while (len--) h = (h << 10) - h - *x++;
     return c_ROTL(h, 26) ^ h;
 }
 

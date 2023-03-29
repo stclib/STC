@@ -35,6 +35,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 // cmap template expansion
 #define i_key IKey
 #define i_val IValue
+#define i_ssize int32_t // enable 2^K buckets like the rest.
 #define i_tag ii
 #define i_max_load_factor MAX_LOAD_FACTOR / 100.0f
 #include <stc/cmap.h>
