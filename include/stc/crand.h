@@ -110,13 +110,6 @@ STC_DEF uint64_t crand(void)
 STC_DEF double crandf(void)
     { return crand_f64(&crand_global); }
 
-STC_INLINE uint64_t splitmix64(uint64_t s[1]) {
-    uint64_t z = (s[0] += 0x9e3779b97f4a7c15);
-    z = (z ^ (z >> 30)) * 0xbf58476d1ce4e5b9;
-    z = (z ^ (z >> 27)) * 0x94d049bb133111eb;
-    return z ^ (z >> 31);
-}
-
 STC_DEF crand_t crand_init(uint64_t seed) {
     /* rng.state[4] must be odd */
     crand_t rng = {{seed + 0x26aa069ea2fb1a4d,
