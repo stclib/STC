@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #define i_static
-#include <stc/crandom.h>
+#include <stc/crand.h>
 
 #ifdef __cplusplus
 #include <deque>
@@ -28,10 +28,10 @@ Sample test_std_deque() {
     {
         s.test[INSERT].t1 = clock();
         container con;
-        csrandom(seed);
-        c_forrange (N/3) con.push_front(crandom() & mask1);
-        c_forrange (N/3) {con.push_back(crandom() & mask1); con.pop_front();}
-        c_forrange (N/3) con.push_back(crandom() & mask1);
+        csrand(seed);
+        c_forrange (N/3) con.push_front(crand() & mask1);
+        c_forrange (N/3) {con.push_back(crand() & mask1); con.pop_front();}
+        c_forrange (N/3) con.push_back(crand() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = con.size();
         s.test[ERASE].t1 = clock();
@@ -40,13 +40,13 @@ Sample test_std_deque() {
         s.test[ERASE].sum = con.size();
      }{
         container con;
-        csrandom(seed);
-        c_forrange (N) con.push_back(crandom() & mask2);
+        csrand(seed);
+        c_forrange (N) con.push_back(crand() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         // Iteration - not inherent find - skipping
         //container::iterator it;
-        //c_forrange (S) if ((it = std::find(con.begin(), con.end(), crandom() & mask2)) != con.end()) sum += *it;
+        //c_forrange (S) if ((it = std::find(con.begin(), con.end(), crand() & mask2)) != con.end()) sum += *it;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
@@ -72,10 +72,10 @@ Sample test_stc_deque() {
         s.test[INSERT].t1 = clock();
         container con = cdeq_x_init();
         //cdeq_x_reserve(&con, N);
-        csrandom(seed);
-        c_forrange (N/3) cdeq_x_push_front(&con, crandom() & mask1);
-        c_forrange (N/3) {cdeq_x_push_back(&con, crandom() & mask1); cdeq_x_pop_front(&con);}
-        c_forrange (N/3) cdeq_x_push_back(&con, crandom() & mask1);
+        csrand(seed);
+        c_forrange (N/3) cdeq_x_push_front(&con, crand() & mask1);
+        c_forrange (N/3) {cdeq_x_push_back(&con, crand() & mask1); cdeq_x_pop_front(&con);}
+        c_forrange (N/3) cdeq_x_push_back(&con, crand() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = cdeq_x_size(&con);
         s.test[ERASE].t1 = clock();
@@ -84,13 +84,13 @@ Sample test_stc_deque() {
         s.test[ERASE].sum = cdeq_x_size(&con);
         cdeq_x_drop(&con);
      }{
-        csrandom(seed);
+        csrand(seed);
         container con = cdeq_x_init();
-        c_forrange (N) cdeq_x_push_back(&con, crandom() & mask2);
+        c_forrange (N) cdeq_x_push_back(&con, crand() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         //cdeq_x_iter it, end = cdeq_x_end(&con);
-        //c_forrange (S) if ((it = cdeq_x_find(&con, crandom() & mask2)).ref != end.ref) sum += *it.ref;
+        //c_forrange (S) if ((it = cdeq_x_find(&con, crand() & mask2)).ref != end.ref) sum += *it.ref;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();

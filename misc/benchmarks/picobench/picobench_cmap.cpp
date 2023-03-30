@@ -1,5 +1,5 @@
 #define i_static
-#include <stc/crandom.h>
+#include <stc/crand.h>
 #define i_static
 #include <stc/cstr.h>
 #include <cmath>
@@ -54,36 +54,36 @@ static void ins_and_erase_i(picobench::state& s)
 {
     MapInt map;
     map.max_load_factor((int)MaxLoadFactor100 / 100.0);
-    csrandom(seed);
+    csrand(seed);
 
     picobench::scope scope(s);
     c_forrange (s.iterations())
-        map[crandom()];
+        map[crand()];
     map.clear();
-    csrandom(seed);
+    csrand(seed);
     c_forrange (s.iterations())
-        map[crandom()];
-    csrandom(seed);
+        map[crand()];
+    csrand(seed);
     c_forrange (s.iterations())
-        map.erase(crandom());
+        map.erase(crand());
     s.set_result(map.size());
 }
 /*
 static void ins_and_erase_cmap_i(picobench::state& s)
 {
     cmap_i map = cmap_i_init();
-    csrandom(seed);
+    csrand(seed);
 
     picobench::scope scope(s);
     c_forrange (s.iterations())
-        cmap_i_insert(&map, crandom(), 0);
+        cmap_i_insert(&map, crand(), 0);
     cmap_i_clear(&map);
-    csrandom(seed);
+    csrand(seed);
     c_forrange (s.iterations())
-        cmap_i_insert(&map, crandom(), 0);
-    csrandom(seed);
+        cmap_i_insert(&map, crand(), 0);
+    csrand(seed);
     c_forrange (s.iterations())
-        cmap_i_erase(&map, crandom());
+        cmap_i_erase(&map, crand());
     s.set_result(cmap_i_size(&map));
     cmap_i_drop(&map);
 }
@@ -91,18 +91,18 @@ static void ins_and_erase_cmap_i(picobench::state& s)
 static void ins_and_erase_cmap_x(picobench::state& s)
 {
     cmap_x map = cmap_x_init();
-    csrandom(seed);
+    csrand(seed);
 
     picobench::scope scope(s);
     c_forrange (s.iterations())
-        cmap_x_insert(&map, crandom(), 0);
+        cmap_x_insert(&map, crand(), 0);
     cmap_x_clear(&map);
-    csrandom(seed);
+    csrand(seed);
     c_forrange (s.iterations())
-        cmap_x_insert(&map, crandom(), 0);
-    csrandom(seed);
+        cmap_x_insert(&map, crand(), 0);
+    csrand(seed);
     c_forrange (s.iterations())
-        cmap_x_erase(&map, crandom());
+        cmap_x_erase(&map, crand());
     s.set_result(cmap_x_size(&map));
     cmap_x_drop(&map);
 }
@@ -124,11 +124,11 @@ static void ins_and_access_i(picobench::state& s)
     size_t result = 0;
     MapInt map;
     map.max_load_factor((int)MaxLoadFactor100 / 100.0);
-    csrandom(seed);
+    csrand(seed);
 
     picobench::scope scope(s);
     c_forrange (N1)
-        result += ++map[crandom() & mask];
+        result += ++map[crand() & mask];
     s.set_result(result);
 }
 
@@ -137,11 +137,11 @@ static void ins_and_access_cmap_i(picobench::state& s)
     uint64_t mask = (1ull << s.arg()) - 1;
     size_t result = 0;
     cmap_i map = cmap_i_init();
-    csrandom(seed);
+    csrand(seed);
 
     picobench::scope scope(s);
     c_forrange (N1)
-        result += ++cmap_i_insert(&map, crandom() & mask, 0).ref->second;
+        result += ++cmap_i_insert(&map, crand() & mask, 0).ref->second;
     s.set_result(result);
     cmap_i_drop(&map);
 }
@@ -158,7 +158,7 @@ PICOBENCH_SUITE("Map3");
 
 static void randomize(char* str, size_t len) {
     for (size_t k=0; k < len; ++k) {
-        union {uint64_t i; char c[8];} r = {.i = crandom()};
+        union {uint64_t i; char c[8];} r = {.i = crand()};
         for (unsigned i=0; i<8 && k<len; ++k, ++i)
             str[k] = (r.c[i] & 63) + 48;
     }
@@ -171,7 +171,7 @@ static void ins_and_access_s(picobench::state& s)
     size_t result = 0;
     MapStr map;
     map.max_load_factor((int)MaxLoadFactor100 / 100.0);
-    csrandom(seed);
+    csrand(seed);
 
     picobench::scope scope(s);
     c_forrange (s.iterations()) {
@@ -189,7 +189,7 @@ static void ins_and_access_cmap_s(picobench::state& s)
     char* buf = cstr_data(&str);
     size_t result = 0;
     cmap_str map = cmap_str_init();
-    csrandom(seed);
+    csrand(seed);
 
     picobench::scope scope(s);
     c_forrange (s.iterations()) {
@@ -223,22 +223,22 @@ static void iterate_x(picobench::state& s)
     uint64_t K = (1ull << s.arg()) - 1;
 
     picobench::scope scope(s);
-    csrandom(seed);
+    csrand(seed);
     size_t result = 0;
 
     // measure insert then iterate whole map
     c_forrange (n, s.iterations()) {
-        map[crandom()] = n;
+        map[crand()] = n;
         if (!(n & K)) for (auto const& keyVal : map)
             result += keyVal.second;
     }
 
     // reset rng back to inital state
-    csrandom(seed);
+    csrand(seed);
 
     // measure erase then iterate whole map
     c_forrange (n, s.iterations()) {
-        map.erase(crandom());
+        map.erase(crand());
         if (!(n & K)) for (auto const& keyVal : map)
             result += keyVal.second;
     }
@@ -251,22 +251,22 @@ static void iterate_cmap_x(picobench::state& s)
     uint64_t K = (1ull << s.arg()) - 1;
 
     picobench::scope scope(s);
-    csrandom(seed);
+    csrand(seed);
     size_t result = 0;
 
     // measure insert then iterate whole map
     c_forrange (n, s.iterations()) {
-        cmap_x_insert_or_assign(&map, crandom(), n);
+        cmap_x_insert_or_assign(&map, crand(), n);
         if (!(n & K)) c_foreach (i, cmap_x, map)
             result += i.ref->second;
     }
 
     // reset rng back to inital state
-    csrandom(seed);
+    csrand(seed);
 
     // measure erase then iterate whole map
     c_forrange (n, s.iterations()) {
-        cmap_x_erase(&map, crandom());
+        cmap_x_erase(&map, crand());
         if (!(n & K)) c_foreach (i, cmap_x, map)
             result += i.ref->second;
     }

@@ -26,7 +26,7 @@
     it also support both push_back() and push_front(), unlike std::forward_list:
 
     #include <stdio.h>
-    #include <stc/crandom.h>
+    #include <stc/crand.h>
 
     #define i_key int64_t
     #define i_tag ix
@@ -38,7 +38,7 @@
         {
             int n;
             for (int i = 0; i < 1000000; ++i) // one million
-                clist_ix_push_back(&list, crandom() >> 32);
+                clist_ix_push_back(&list, crand() >> 32);
             n = 0;
             c_foreach (i, clist_ix, list)
                 if (++n % 10000 == 0) printf("%8d: %10zu\n", n, *i.ref);

@@ -60,7 +60,7 @@ i_val               cpque_X_value_clone(i_val value);
 
 ## Example
 ```c
-#include <stc/crandom.h>
+#include <stc/crand.h>
 #include <stdio.h>
 
 #define i_val int64_t
@@ -71,15 +71,15 @@ i_val               cpque_X_value_clone(i_val value);
 int main()
 {
     intptr_t N = 10000000;
-    stc64_t rng = stc64_new(1234);
-    stc64_uniform_t dist = stc64_uniform_new(0, N * 10);
+    crand_t rng = crand_init(1234);
+    crand_unif_t dist = crand_unif_init(0, N * 10);
 
     // Define heap
     cpque_i heap = {0};
 
     // Push ten million random numbers to priority queue.
     c_forrange (N)
-        cpque_i_push(&heap, stc64_uniform(&rng, &dist));
+        cpque_i_push(&heap, crand_unif(&rng, &dist));
 
     // Add some negative ones.
     int nums[] = {-231, -32, -873, -4, -343};

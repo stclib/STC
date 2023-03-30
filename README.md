@@ -60,7 +60,7 @@ Others
 ------
 - [***ccommon*** - Generic safe macros and algorithms](docs/ccommon_api.md)
 - [***cregex*** - Regular expressions (extended from Rob Pike's regexp9)](docs/cregex_api.md)
-- [***crandom*** - A novel very fast *PRNG* named **stc64**](docs/crandom_api.md)
+- [***crand*** - A novel very fast *PRNG* named **stc64**](docs/crandom_api.md)
 - [***coption*** - getopt() alike command line args parser](docs/coption_api.md)
 
 Highlights
@@ -343,7 +343,7 @@ once and if needed. Currently, define `i_extern` before including **clist** for 
 It is possible to generate single headers by executing the python script `src/singleheader.py header-file > single`.
 
 Conveniently, `src\libstc.c` implements non-templated functions as shared symbols for **cstr**, **csview**,
-**cbits** and **crandom**. When building in shared mode (-DSTC_HEADER), you may include this file in your project,
+**cbits** and **crand**. When building in shared mode (-DSTC_HEADER), you may include this file in your project,
 or define your own as descibed above.
 ```c
 // stc_libs.c
@@ -592,7 +592,7 @@ STC is generally very memory efficient. Type sizes:
 - Allows for `i_key*` template parameters instead of `i_val*` for all containers, not only for **cset** and **csset**.
 - Optimized *c_default_hash()*. Therefore *c_hash32()* and *c_hash64()* are removed (same speed).
 - Added *.._push()* and *.._emplace()* function to all containers to allow for more generic coding.
-- Renamed global PRNGs *stc64_random()* and *stc64_srandom()* to *crandom()* and *csrandom()*.
+- Renamed global PRNGs *stc64_random()* and *stc64_srandom()* to *crand()* and *csrand()*.
 - Added some examples and benchmarks for SSO and heterogenous lookup comparison with c++20 (string_bench_*.cpp).
 
 ## Brief summary of changes from version 2.x to 3.0

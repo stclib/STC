@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <stc/algo/filter.h>
-#include <stc/crandom.h>
+#include <stc/crand.h>
 
 #define i_type DList
 #define i_val double
@@ -11,11 +11,10 @@ int main() {
     const int n = 3000000;
     DList list = {0};
 
-    stc64_t rng = stc64_new(1234567);
-    stc64_uniformf_t dist = stc64_uniformf_new(100.0f, n);
+    crand_t rng = crand_init(1234567);
     int m = 0;
     c_forrange (n)
-        DList_push_back(&list, stc64_uniformf(&rng, &dist)), ++m;
+        DList_push_back(&list, crand_f64(&rng)*n + 100), ++m;
 
     double sum = 0.0;
     printf("sumarize %d:\n", m);

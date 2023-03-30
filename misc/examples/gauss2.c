@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <stc/crandom.h>
+#include <stc/crand.h>
 #include <stc/cstr.h>
 
 // Declare int -> int sorted map.
@@ -13,21 +13,21 @@ int main()
 {
     enum {N = 5000000};
     uint64_t seed = (uint64_t)time(NULL);
-    stc64_t rng = stc64_new(seed);
-    const double Mean = round(stc64_randf(&rng)*98.f - 49.f), StdDev = stc64_randf(&rng)*10.f + 1.f, Scale = 74.f;
+    crand_t rng = crand_init(seed);
+    const double Mean = round(crand_f64(&rng)*98.f - 49.f), StdDev = crand_f64(&rng)*10.f + 1.f, Scale = 74.f;
 
     printf("Demo of gaussian / normal distribution of %d random samples\n", N);
     printf("Mean %f, StdDev %f\n", Mean, StdDev);
 
     // Setup random engine with normal distribution.
-    stc64_normalf_t dist = stc64_normalf_new(Mean, StdDev);
+    crand_norm_t dist = crand_norm_init(Mean, StdDev);
 
     // Create and init histogram map with defered destruct
     csmap_int hist = {0};
     cstr bar = {0};
 
     c_forrange (N) {
-        int index = (int)round( stc64_normalf(&rng, &dist) );
+        int index = (int)round(crand_norm(&rng, &dist));
         csmap_int_insert(&hist, index, 0).ref->second += 1;
     }
 

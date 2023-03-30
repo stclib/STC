@@ -2,7 +2,7 @@
 #include <iostream>
 #include <chrono>
 
-#include <stc/crandom.h>
+#include <stc/crand.h>
 #include <stc/cstr.h>
 
 #define i_type StcVec
@@ -30,7 +30,7 @@ static inline std::string randomString_STD(int strsize) {
     char* p = &s[0];
     union { uint64_t u8; uint8_t b[8]; } r;
     for (int i = 0; i < strsize; ++i) {
-        if ((i & 7) == 0) r.u8 = crandom() & 0x3f3f3f3f3f3f3f3f;
+        if ((i & 7) == 0) r.u8 = crand() & 0x3f3f3f3f3f3f3f3f;
         p[i] = CHARS[r.b[i & 7]];
     }
     return s;
@@ -41,7 +41,7 @@ static inline cstr randomString_STC(int strsize) {
     char* p = cstr_data(&s);
     union { uint64_t u8; uint8_t b[8]; } r;
     for (int i = 0; i < strsize; ++i) {
-        if ((i & 7) == 0) r.u8 = crandom() & 0x3f3f3f3f3f3f3f3f;
+        if ((i & 7) == 0) r.u8 = crand() & 0x3f3f3f3f3f3f3f3f;
         p[i] = CHARS[r.b[i & 7]];
     }
     return s;
@@ -85,7 +85,7 @@ int main() {
 
     // VECTOR WITH STRINGS
 
-    csrandom(seed);
+    csrand(seed);
     sum = 0, n = 0;
     std::cerr << "\nstrsize\tmsecs\tstd::vector<std::string>, size=" << BENCHMARK_SIZE << "\n";
     for (int strsize = 1; strsize <= MAX_STRING_SIZE; strsize += 2) {
@@ -95,7 +95,7 @@ int main() {
     }
     std::cout << "Avg:\t" << sum/n << '\n';
 
-    csrandom(seed);
+    csrand(seed);
     sum = 0, n = 0;
     std::cerr << "\nstrsize\tmsecs\tcvec<cstr>, size=" << BENCHMARK_SIZE << "\n";
     for (int strsize = 1; strsize <= MAX_STRING_SIZE; strsize += 2) {
@@ -108,7 +108,7 @@ int main() {
 
     // SORTED SET WITH STRINGS
     
-    csrandom(seed);
+    csrand(seed);
     sum = 0, n = 0;
     std::cerr << "\nstrsize\tmsecs\tstd::set<std::string>, size=" << BENCHMARK_SIZE/16 << "\n";
     for (int strsize = 1; strsize <= MAX_STRING_SIZE; strsize += 2) {
@@ -118,7 +118,7 @@ int main() {
     }
     std::cout << "Avg:\t" << sum/n << '\n';
 
-    csrandom(seed);
+    csrand(seed);
     sum = 0, n = 0;
     std::cerr << "\nstrsize\tmsecs\tcsset<cstr>, size=" << BENCHMARK_SIZE/16 << "\n";
     for (int strsize = 1; strsize <= MAX_STRING_SIZE; strsize += 2) {
