@@ -82,7 +82,7 @@
 #endif
 #include "priv/template.h"
 
-#if !c_option(c_is_forward)
+#ifndef i_is_forward
   _cx_deftypes(_c_clist_types, _cx_self, i_key);
 #endif
 _cx_deftypes(_c_clist_complete_types, _cx_self, dummy);
@@ -204,8 +204,8 @@ _cx_memb(_get_mut)(_cx_self* self, _cx_raw val) {
     return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), val).ref;
 }
 
-STC_INLINE bool _cx_memb(_eq)(const _cx_self* x, const _cx_self* y) {
-    _cx_iter i = _cx_memb(_begin)(x), j = _cx_memb(_begin)(y);
+STC_INLINE bool _cx_memb(_eq)(const _cx_self* self, const _cx_self* other) {
+    _cx_iter i = _cx_memb(_begin)(self), j = _cx_memb(_begin)(other);
     for (; i.ref && j.ref; _cx_memb(_next)(&i), _cx_memb(_next)(&j)) {
         const _cx_raw _rx = i_keyto(i.ref), _ry = i_keyto(j.ref);
         if (!(i_eq((&_rx), (&_ry)))) return false;

@@ -6,35 +6,24 @@
 //       i_hash/i_eq: has self for cmap and cset types only
 
 #include <stdio.h>
-#include <stdbool.h>
-#include <stc/forward.h>
-#include <stc/algo/crange.h>
-#include <stc/cstr.h>
 
-// predeclare
-forward_cpque(ipque, int);
-
-struct {
-    ipque Q;
-    bool (*less)(const int*, const int*);
-} typedef IPQueue;
-
-
-#define i_type ipque
+#define i_type IPQue
 #define i_val int
-#define i_opt c_is_forward // needed to avoid re-type-define container type
-#define i_less(x, y) c_container_of(self, IPQueue, Q)->less(x, y)
-#include <stc/cpque.h>
+#define i_ext bool (*less)(const int*, const int*)
+#define i_less(x, y) c_getcon(self)->less(x, y)
+#define i_con cpque
+#include <stc/extend.h>
 
-void print_queue(const char* name, IPQueue q) {
+void print_queue(const char* name, IPQueExt q) {
     // NB: make a clone because there is no way to traverse
     // priority_queue's content without erasing the queue.
-    IPQueue copy = {ipque_clone(q.Q), q.less};
+    IPQueExt copy = {q.less, IPQue_clone(q.get)};
     
-    for (printf("%s: \t", name); !ipque_empty(&copy.Q); ipque_pop(&copy.Q))
-        printf("%d ", *ipque_top(&copy.Q));
+    for (printf("%s: \t", name); !IPQue_empty(&copy.get); IPQue_pop(&copy.get))
+        printf("%d ", *IPQue_top(&copy.get));
     puts("");
-    ipque_drop(&copy.Q);
+
+    IPQue_drop(&copy.get);
 }
 
 static bool int_less(const int* x, const int* y) { return *x < *y; }
@@ -49,21 +38,21 @@ int main()
         printf("%d ", data[i]);
     puts("");
 
-    IPQueue q1 = {ipque_init(), int_less};       // Max priority queue
-    IPQueue minq1 = {ipque_init(), int_greater}; // Min priority queue
-    IPQueue q5 = {ipque_init(), int_lambda};     // Using lambda to compare elements.
+    IPQueExt q1 = {int_less};       // Max priority queue
+    IPQueExt minq1 = {int_greater}; // Min priority queue
+    IPQueExt q5 = {int_lambda};     // Using lambda to compare elements.
 
     c_forrange (i, n)
-        ipque_push(&q1.Q, data[i]);
+        IPQue_push(&q1.get, data[i]);
     print_queue("q1", q1);
 
     c_forrange (i, n)
-        ipque_push(&minq1.Q, data[i]);
+        IPQue_push(&minq1.get, data[i]);
     print_queue("minq1", minq1);
 
     c_forrange (i, n)
-        ipque_push(&q5.Q, data[i]);
+        IPQue_push(&q5.get, data[i]);
     print_queue("q5", q5);
 
-    c_drop(ipque, &q1.Q, &minq1.Q, &q5.Q);
+    c_drop(IPQue, &q1.get, &minq1.get, &q5.get);
 }

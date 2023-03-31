@@ -518,7 +518,7 @@ typedef struct Dataset {
 
 ...
 // Implementation
-#define i_opt c_is_forward                  // flag that the container was forward declared.
+#define i_is_forward                  // flag that the container was forward declared.
 #define i_val struct Point
 #define i_tag pnt
 #include <stc/cstack.h>

@@ -80,7 +80,7 @@ int main(void) {
   #define _i_size i_ssize
 #endif
 #include "priv/template.h"
-#if !c_option(c_is_forward)
+#ifndef i_is_forward
   _cx_deftypes(_c_aatree_types, _cx_self, i_key, i_val, i_ssize, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
 

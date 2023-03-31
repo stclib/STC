@@ -20,7 +20,7 @@ int point_cmp(const Point* a, const Point* b) {
 #define i_key Point
 #define i_val int
 #define i_cmp point_cmp
-#define i_opt c_is_forward
+#define i_is_forward
 #include <stc/csmap.h>
 
 // cstr => cstr map

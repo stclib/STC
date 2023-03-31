@@ -82,7 +82,7 @@ typedef struct { int64_t idx; uint8_t hx; } chash_bucket_t;
   #define _i_size i_ssize
 #endif
 #include "priv/template.h"
-#if !c_option(c_is_forward)
+#ifndef i_is_forward
   _cx_deftypes(_c_chash_types, _cx_self, i_key, i_val, i_ssize, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
 
@@ -277,11 +277,11 @@ _cx_memb(_erase_at)(_cx_self* self, _cx_iter it) {
 }
 
 STC_INLINE bool
-_cx_memb(_eq)(const _cx_self* m1, const _cx_self* m2) {
-    if (_cx_memb(_size)(m1) != _cx_memb(_size)(m2)) return false;
-    for (_cx_iter i = _cx_memb(_begin)(m1); i.ref; _cx_memb(_next)(&i)) {
+_cx_memb(_eq)(const _cx_self* self, const _cx_self* other) {
+    if (_cx_memb(_size)(self) != _cx_memb(_size)(other)) return false;
+    for (_cx_iter i = _cx_memb(_begin)(self); i.ref; _cx_memb(_next)(&i)) {
         const _cx_rawkey _raw = i_keyto(_i_keyref(i.ref));
-        if (!_cx_memb(_contains)(m2, _raw)) return false;
+        if (!_cx_memb(_contains)(other, _raw)) return false;
     }
     return true;
 }

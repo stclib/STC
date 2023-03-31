@@ -12,7 +12,7 @@ int point_cmp(const Point* a, const Point* b) {
 }
 #define i_val Point
 #define i_cmp point_cmp
-#define i_opt c_is_forward
+#define i_is_forward
 #define i_tag pnt
 #include <stc/cqueue.h>
 

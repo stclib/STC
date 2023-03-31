@@ -96,6 +96,9 @@
   #endif
 #endif
 
+#if c_option(c_is_forward)
+  #define i_is_forward
+#endif
 #if c_option(c_no_cmp)
   #define i_no_cmp
 #endif
@@ -341,6 +344,7 @@
 #undef i_no_hash
 #undef i_no_clone
 #undef i_no_emplace
+#undef i_is_forward
 
 #undef _i_prefix
 #undef _i_expandby

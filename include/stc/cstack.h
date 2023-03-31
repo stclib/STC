@@ -33,7 +33,7 @@
 #endif
 #include "priv/template.h"
 
-#if !c_option(c_is_forward)
+#ifndef i_is_forward
 #ifdef i_capacity
   #define i_no_clone
   _cx_deftypes(_c_cstack_fixed, _cx_self, i_key, i_capacity);

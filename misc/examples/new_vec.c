@@ -10,7 +10,7 @@ struct MyStruct {
 } typedef MyStruct;
 
 #define i_val int
-#define i_opt c_is_forward
+#define i_is_forward
 #define i_tag i32
 #include <stc/cvec.h>
 
@@ -18,7 +18,7 @@ typedef struct Point { int x, y; } Point;
 
 #define i_val Point
 #define i_less(a, b) a->x < b->x || (a->x == b->x && a->y < b->y)
-#define i_opt c_is_forward
+#define i_is_forward
 #define i_tag pnt
 #include <stc/cvec.h>
 
