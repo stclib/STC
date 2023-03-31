@@ -78,7 +78,7 @@ STC_API double crand_norm(crand_t* rng, crand_norm_t* dist);
 /* Main crand_t prng */
 STC_INLINE uint64_t crand_u64(crand_t* rng) {
     uint64_t *s = rng->state;
-    const uint64_t result = s[0] + s[1] - (s[3] += s[4]);
+    const uint64_t result = (s[0] ^ (s[3] += s[4])) + s[1];
     s[0] = s[1] ^ (s[1] >> 11);
     s[1] = s[2] + (s[2] << 3);
     s[2] = ((s[2] << 24) | (s[2] >> (64 - 24))) + result;
@@ -111,12 +111,12 @@ STC_DEF double crandf(void)
     { return crand_f64(&crand_global); }
 
 STC_DEF crand_t crand_init(uint64_t seed) {
-    /* rng.state[4] must be odd */
-    crand_t rng = {{seed + 0x26aa069ea2fb1a4d,
-                    seed*0x9e3779b97f4a7c15 + 0x70c72c95cd592d04,
-                    seed + 0x504f333d3aa0b359,
-                    seed, seed<<1 | 1}};
-    crand_u64(&rng);
+    crand_t rng; uint64_t* s = rng.state;
+    s[0] = seed + 0x9e3779b97f4a7c15;
+    s[1] = (s[0] ^ (s[0] >> 30))*0xbf58476d1ce4e5b9;
+    s[2] = (s[1] ^ (s[1] >> 27))*0x94d049bb133111eb;
+    s[3] = (s[2] ^ (s[2] >> 31));
+    s[4] = ((seed + 0x6aa069ea2fb1a4d) << 1) | 1;
     return rng;
 }
 
