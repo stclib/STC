@@ -77,12 +77,12 @@ STC_API double crand_norm(crand_t* rng, crand_norm_t* dist);
 
 /* Main crand_t prng */
 STC_INLINE uint64_t crand_u64(crand_t* rng) {
-    enum {LR=24, RS=11, LS=3}; uint64_t *s = rng->state;
-    const uint64_t out = (s[0] ^ (s[3] += s[4])) + s[1];
-    s[0] = s[1] ^ (s[1] >> RS);
-    s[1] = s[2] + (s[2] << LS);
-    s[2] = ((s[2] << LR) | (s[2] >> (64 - LR))) + out;
-    return out;
+    uint64_t *s = rng->state;
+    const uint64_t result = s[0] + s[1] - (s[3] += s[4]);
+    s[0] = s[1] ^ (s[1] >> 11);
+    s[1] = s[2] + (s[2] << 3);
+    s[2] = ((s[2] << 24) | (s[2] >> (64 - 24))) + result;
+    return result;
 }
 
 /* Float64 random number in range [0.0, 1.0). */
