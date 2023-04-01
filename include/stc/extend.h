@@ -50,7 +50,7 @@
 #endif
 
 typedef struct {
-    i_ext;
+    i_extend;
     i_type get;
 } c_PASTE(i_type, Ext);
 
@@ -63,3 +63,4 @@ typedef struct {
 #undef _i_key
 #undef _i_val
 #undef i_con
+#undef i_extend

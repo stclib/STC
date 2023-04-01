@@ -25,7 +25,7 @@
 
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
-  #define _cx_self c_PASTE(_i_prefix, i_tag)
+  #define _cx_self i_type
   #define _cx_memb(name) c_PASTE(_cx_self, name)
   #define _cx_deftypes(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
   #define _cx_value _cx_memb(_value)
@@ -38,10 +38,8 @@
   #define _cx_node _cx_memb(_node)
 #endif
 
-#ifdef i_type
-  #define i_tag i_type
-  #undef _i_prefix
-  #define _i_prefix
+#ifndef i_type
+  #define i_type c_PASTE(_i_prefix, i_tag)
 #endif
 
 #ifndef i_ssize
