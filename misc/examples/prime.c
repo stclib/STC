@@ -47,7 +47,7 @@ int main(void)
         c_flt_take(i, 50)
     ){
         printf("%lld ", *i.ref);
-        if (c_flt_last(i) % 10 == 0) puts("");
+        if (c_flt_n(i) % 10 == 0) puts("");
     }
 
     cbits_drop(&primes);

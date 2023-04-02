@@ -85,14 +85,14 @@ Iterate containers with stop-criteria and chained range filtering.
 | `c_forfilter (it, ctype, container, filter)`        | Filter out items in chain with &&      |
 | `c_forfilter_it (it, ctype, startit, filter)`       | Filter from startit position           |
 
-| Built-in filter                   | Description                          |
-|:----------------------------------|:-------------------------------------|
-| `c_flt_skip(it, numItems)`        | Skip numItems (inc count)            |
-| `c_flt_take(it, numItems)`        | Take numItems (inc count)            |
-| `c_flt_skipwhile(it, predicate)`  | Skip items until predicate is false  |
-| `c_flt_takewhile(it, predicate)`  | Take items until predicate is false  |
-| `c_flt_count(it)`                 | Increment current and return value   |
-| `c_flt_last(it)`                  | Get value of last count/skip*/take*  |
+| Built-in filter                   | Description                             |
+|:----------------------------------|:----------------------------------------|
+| `c_flt_skip(it, numItems)`        | Skip numItems (inc count)               |
+| `c_flt_take(it, numItems)`        | Take numItems (inc count)               |
+| `c_flt_skipwhile(it, predicate)`  | Skip items until predicate is false     |
+| `c_flt_takewhile(it, predicate)`  | Take items until predicate is false     |
+| `c_flt_count(it)`                 | Increment current and return count      |
+| `c_flt_n(it)`                     | Return n items passed count/skip*/take* |
 ```c
 // Example:
 #include <stc/algo/crange.h>
