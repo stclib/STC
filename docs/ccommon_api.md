@@ -85,14 +85,14 @@ Iterate containers with stop-criteria and chained range filtering.
 | `c_forfilter (it, ctype, container, filter)`        | Filter out items in chain with &&      |
 | `c_forfilter_it (it, ctype, startit, filter)`       | Filter from startit position           |
 
-| Built-in filter                   | Description                             |
-|:----------------------------------|:----------------------------------------|
-| `c_flt_skip(it, numItems)`        | Skip numItems (inc count)               |
-| `c_flt_take(it, numItems)`        | Take numItems (inc count)               |
-| `c_flt_skipwhile(it, predicate)`  | Skip items until predicate is false     |
-| `c_flt_takewhile(it, predicate)`  | Take items until predicate is false     |
-| `c_flt_count(it)`                 | Increment current and return count      |
-| `c_flt_n(it)`                     | Return n items passed count/skip*/take* |
+| Built-in filter                   | Description                                |
+|:----------------------------------|:-------------------------------------------|
+| `c_flt_skip(it, numItems)`        | Skip numItems (inc count)                  |
+| `c_flt_take(it, numItems)`        | Take numItems (inc count)                  |
+| `c_flt_skipwhile(it, predicate)`  | Skip items until predicate is false        |
+| `c_flt_takewhile(it, predicate)`  | Take items until predicate is false        |
+| `c_flt_counter(it)`               | Increment current and return count         |
+| `c_flt_getcount(it)`              | Number of items passed skip*/take*/counter |
 ```c
 // Example:
 #include <stc/algo/crange.h>
@@ -110,9 +110,9 @@ int main() {
     crange R = crange_make(1001, INT32_MAX, 2);
 
     c_forfilter (i, crange, R,
-                    isPrime(*i.ref)          &&
-                    c_flt_skip(i, 24)        &&
-                    c_flt_count(i) % 15 == 1 &&
+                    isPrime(*i.ref)            &&
+                    c_flt_skip(i, 24)          &&
+                    c_flt_counter(i) % 15 == 1 &&
                     c_flt_take(i, 10)
     ){
         printf(" %lld", *i.ref);
@@ -121,7 +121,7 @@ int main() {
 }
 // out: 1171 1283 1409 1493 1607 1721 1847 1973 2081 2203
 ```
-Note that `c_flt_take()` and `c_flt_takewhile()`breaks the loop on false.
+Note that `c_flt_take()` and `c_flt_takewhile()` breaks the loop on false.
 
 ## Generators
 

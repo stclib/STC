@@ -23,14 +23,14 @@ int main() {
     printf("sum %f\n\n", sum);
 
     c_forfilter (i, DList, list, c_flt_take(i, 10))
-        printf("%8d: %10f\n", c_flt_n(i), *i.ref);
+        printf("%8d: %10f\n", c_flt_getcount(i), *i.ref);
 
     puts("sort");
     DList_sort(&list); // qsort O(n*log n)
     puts("sorted");
 
     c_forfilter (i, DList, list, c_flt_take(i, 10))
-        printf("%8d: %10f\n", c_flt_n(i), *i.ref);
+        printf("%8d: %10f\n", c_flt_getcount(i), *i.ref);
     puts("");
 
     DList_drop(&list);

@@ -51,12 +51,12 @@ int main()
 
 // c_forfilter:
 
-#define c_flt_skip(i, n) (c_flt_count(i) > (n))
+#define c_flt_skip(i, n) (c_flt_counter(i) > (n))
 #define c_flt_skipwhile(i, pred) ((i).b.s2[(i).b.s2top++] |= !(pred))
 #define c_flt_take(i, n) _flt_take(&(i).b, n)
 #define c_flt_takewhile(i, pred) _flt_takewhile(&(i).b, pred)
-#define c_flt_count(i) ++(i).b.s1[(i).b.s1top++]
-#define c_flt_n(i) (i).b.s1[(i).b.s1top - 1]
+#define c_flt_counter(i) ++(i).b.s1[(i).b.s1top++]
+#define c_flt_getcount(i) (i).b.s1[(i).b.s1top - 1]
 
 #define c_forfilter(i, C, cnt, filter) \
     c_forfilter_it(i, C, C##_begin(&cnt), filter)
