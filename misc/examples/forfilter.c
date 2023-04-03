@@ -9,10 +9,6 @@
 #define i_val int
 #include <stc/cstack.h>
 
-#define i_type SVec
-#define i_valclass csview
-#include <stc/cstack.h>
-
 // filters and transforms:
 #define flt_skipValue(i, x) (*i.ref != (x))
 #define flt_isEven(i) ((*i.ref & 1) == 0)
@@ -55,11 +51,9 @@ fn main() {
     println!("{:?}", vector);     // Print result
 }
 */
-
 void demo2(void)
 {
     IVec vector = {0};
-
     c_forfilter (x, crange, crange_object(INT64_MAX),
         c_flt_skipwhile(x, *x.ref != 11) &&
         (*x.ref % 2) != 0                &&
@@ -67,11 +61,9 @@ void demo2(void)
     ){
         IVec_push(&vector, (int)(*x.ref * *x.ref));
     }
+    c_foreach (x, IVec, vector) printf(" %d", *x.ref);
 
-    c_foreach (x, IVec, vector)
-        printf(" %d", *x.ref);
     puts("");
-
     IVec_drop(&vector);
 }
 
@@ -88,6 +80,10 @@ fn main() {
     println!("{:?}", words_containing_i);
 }
 */
+#define i_type SVec
+#define i_valclass csview
+#include <stc/cstack.h>
+
 void demo3(void)
 {
     const char* sentence = "This is a sentence in C99.";
@@ -102,8 +98,8 @@ void demo3(void)
 
     c_foreach (w, SVec, words_containing_i)
         printf(" %.*s", c_SV(*w.ref));
-    puts("");
 
+    puts("");
     c_drop(SVec, &words, &words_containing_i);
 }
 

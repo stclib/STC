@@ -48,9 +48,6 @@ int main(void) {
     csmap_sx_drop(&m);
 }
 */
-#ifdef STC_CSMAP_V1
-#include "alt/csmap.h"
-#else
 #include "ccommon.h"
 
 #ifndef CSMAP_H_INCLUDED
@@ -598,5 +595,4 @@ _cx_memb(_drop)(_cx_self* self) {
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY
 #define CSMAP_H_INCLUDED
-#include "priv/template.h"
-#endif // !STC_CSMAP_V1
+#include "priv/untemplate.h"

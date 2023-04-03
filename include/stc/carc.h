@@ -210,4 +210,4 @@ STC_INLINE uint64_t _cx_memb(_hash)(const _cx_self* self)
 #undef _i_eq
 #undef _i_atomic_inc
 #undef _i_atomic_dec_and_test
-#include "priv/template.h"
+#include "priv/untemplate.h"
