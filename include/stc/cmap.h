@@ -481,4 +481,4 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY
 #define CMAP_H_INCLUDED
-#include "priv/untemplate.h"
+#include "priv/template2.h"

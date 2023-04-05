@@ -443,4 +443,4 @@ _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
 #endif // !_i_queue
 #endif // IMPLEMENTATION
 #define CDEQ_H_INCLUDED
-#include "priv/untemplate.h"
+#include "priv/template2.h"

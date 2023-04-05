@@ -595,4 +595,4 @@ _cx_memb(_drop)(_cx_self* self) {
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY
 #define CSMAP_H_INCLUDED
-#include "priv/untemplate.h"
+#include "priv/template2.h"

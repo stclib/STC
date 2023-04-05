@@ -189,4 +189,4 @@ STC_INLINE void _cx_memb(_next)(_cx_iter* it)
 STC_INLINE _cx_iter _cx_memb(_advance)(_cx_iter it, size_t n)
     { if ((it.ref += n) >= it.end) it.ref = NULL ; return it; }
 
-#include "priv/untemplate.h"
+#include "priv/template2.h"

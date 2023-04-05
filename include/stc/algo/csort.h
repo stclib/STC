@@ -86,4 +86,4 @@ static inline void c_PASTE(cqsort_, i_tag)(i_val arr[], intptr_t lo, intptr_t hi
 static inline void c_PASTE(csort_, i_tag)(i_val arr[], intptr_t n)
     { c_PASTE(cqsort_, i_tag)(arr, 0, n - 1); }
 
-#include "../priv/untemplate.h"
+#include "../priv/template2.h"
