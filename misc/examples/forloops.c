@@ -42,7 +42,7 @@ int main()
         printf(" %d", *i.ref);
 
     puts("\n\nc_foreach_r: reverse");
-    c_foreach_r (i, IVec, vec)
+    c_foreach_rv (i, IVec, vec)
         printf(" %d", *i.ref);
 
     puts("\n\nc_foreach in map:");

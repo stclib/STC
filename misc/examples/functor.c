@@ -9,7 +9,7 @@
 
 #define i_type IPQue
 #define i_val int
-#define i_extend bool (*less)(const int*, const int*)
+#define i_extend bool (*less)(const int*, const int*);
 #define i_less(x, y) c_getcon(self)->less(x, y)
 #define i_con cpque
 #include <stc/extend.h>

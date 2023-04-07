@@ -182,7 +182,7 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
     for (C##_iter it = start, *_endref = (C##_iter*)(finish).ref \
          ; it.ref != (C##_value*)_endref; C##_next(&it))
 
-#define c_foreach_r(it, C, cnt) \
+#define c_foreach_rv(it, C, cnt) \
     for (C##_iter it = {.ref=C##_end(&cnt).end - 1, .end=(cnt).data - 1} \
          ; it.ref != it.end; --it.ref)
 

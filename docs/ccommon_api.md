@@ -2,16 +2,17 @@
 
 The following macros are recommended to use, and they safe/have no side-effects.
 
-## Loop abstraction macros
+---
+## Ranged for-loops
 
-### c_foreach, c_foreach_r, c_forpair
+### c_foreach, c_foreach_rv, c_forpair
 
-| Usage                                    | Description                             |
-|:-----------------------------------------|:----------------------------------------|
-| `c_foreach (it, ctype, container)`       | Iteratate all elements                  |
-| `c_foreach (it, ctype, it1, it2)`        | Iterate the range [it1, it2)            |
-| `c_foreach_r (it, ctype, container)`     | Iteratate in reverse (cstack,cvec,cdeq) |
-| `c_forpair (key, val, ctype, container)` | Iterate with structured binding         |
+| Usage                                    | Description                               |
+|:-----------------------------------------|:------------------------------------------|
+| `c_foreach (it, ctype, container)`       | Iteratate all elements                    |
+| `c_foreach (it, ctype, it1, it2)`        | Iterate the range [it1, it2)              |
+| `c_foreach_rv (it, ctype, container)`    | Iteratate in reverse (cstack, cvec, cdeq) |
+| `c_forpair (key, val, ctype, container)` | Iterate with structured binding           |
 
 ```c
 #define i_key int
@@ -40,6 +41,25 @@ c_forpair (id, count, csmap_ii, map)
 // (3 2) (5 4) (7 3) (12 5) (23 1)
 ```
 
+### c_forlist
+Iterate compound literal array elements. Additional to `i.ref`, you can access `i.data`, `i.size`, and `i.index` of the input list/element.
+```c
+// apply multiple push_backs
+c_forlist (i, int, {1, 2, 3})
+    cvec_i_push_back(&vec, *i.ref);
+
+// insert in existing map
+c_forlist (i, cmap_ii_raw, { {4, 5}, {6, 7} })
+    cmap_ii_insert(&map, i.ref->first, i.ref->second);
+
+// string literals pushed to a stack of cstr:
+c_forlist (i, const char*, {"Hello", "crazy", "world"})
+    cstack_str_emplace(&stk, *i.ref);
+```
+
+---
+## Range algorithms
+
 ### c_forrange
 Abstraction for iterating sequence of integers. Like python's **for** *i* **in** *range()* loop.
 
@@ -61,24 +81,38 @@ c_forrange (i, 30, 0, -5) printf(" %lld", i);
 // 30 25 20 15 10 5
 ```
 
-### c_forlist
-Iterate compound literal array elements. Additional to `i.ref`, you can access `i.data`, `i.size`, and `i.index` of the input list/element.
+### crange
+A number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html). The **crange_value** type is `long long`. Below *start*, *stop*, and *step* are of type *crange_value*:
 ```c
-// apply multiple push_backs
-c_forlist (i, int, {1, 2, 3})
-    cvec_i_push_back(&vec, *i.ref);
+crange&     crange_object(...)              // create a compound literal crange object
+crange      crange_make(stop);              // will generate 0, 1, ..., stop-1
+crange      crange_make(start, stop);       // will generate start, start+1, ... stop-1
+crange      crange_make(start, stop, step); // will generate start, start+step, ... upto-not-including stop
+                                            // note that step may be negative.
+crange_iter crange_begin(crange* self);
+crange_iter crange_end(crange* self);
+void        crange_next(crange_iter* it);
 
-// insert in existing map
-c_forlist (i, cmap_ii_raw, { {4, 5}, {6, 7} })
-    cmap_ii_insert(&map, i.ref->first, i.ref->second);
+// 1. All primes less than 32:
+crange r1 = crange_make(3, 32, 2);
+printf("2"); // first prime
+c_forfilter (i, crange, r1, isPrime(*i.ref))
+    printf(" %lld", *i.ref);
+// 2 3 5 7 11 13 17 19 23 29 31
 
-// string literals pushed to a stack of cstr:
-c_forlist (i, const char*, {"Hello", "crazy", "world"})
-    cstack_str_emplace(&stk, *i.ref);
+// 2. The first 11 primes:
+printf("2");
+c_forfilter (i, crange, crange_object(3, INT64_MAX, 2),
+    isPrime(*i.ref) &&
+    c_flt_take(10)
+){
+    printf(" %lld", *i.ref);
+}
+// 2 3 5 7 11 13 17 19 23 29 31
 ```
 
 ### c_forfilter
-Iterate containers with stop-criteria and chained range filtering.
+Iterate a container/range with chained range filtering.
 
 | Usage                                               | Description                            |
 |:----------------------------------------------------|:---------------------------------------|
@@ -122,46 +156,14 @@ int main() {
 ```
 Note that `c_flt_take()` and `c_flt_takewhile()` breaks the loop on false.
 
-## Generators
+---
+## Generic algorithms
 
-### crange
-A number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html). The **crange_value** type is `long long`. Below *start*, *stop*, and *step* are of type *crange_value*:
+### c_make, c_drop
+
+Make any container from an initializer list:
 ```c
-crange&     crange_object(...)              // create a compound literal crange object
-crange      crange_make(stop);              // will generate 0, 1, ..., stop-1
-crange      crange_make(start, stop);       // will generate start, start+1, ... stop-1
-crange      crange_make(start, stop, step); // will generate start, start+step, ... upto-not-including stop
-                                            // note that step may be negative.
-crange_iter crange_begin(crange* self);
-crange_iter crange_end(crange* self);
-void        crange_next(crange_iter* it);
-
-// 1. All primes less than 32:
-crange r1 = crange_make(3, 32, 2);
-printf("2"); // first prime
-c_forfilter (i, crange, r1, isPrime(*i.ref))
-    printf(" %lld", *i.ref);
-// 2 3 5 7 11 13 17 19 23 29 31
-
-// 2. The first 11 primes:
-printf("2");
-c_forfilter (i, crange, crange_object(3, INT64_MAX, 2),
-    isPrime(*i.ref) &&
-    c_flt_take(10)
-){
-    printf(" %lld", *i.ref);
-}
-// 2 3 5 7 11 13 17 19 23 29 31
-```
-## Algorithms
-
-### c_make, c_new, c_delete
-
-- *c_make(C, {...})*: Make any container from an initializer list. Example:
-```c
-#define i_val_str            // owned cstr string value type
-//#define i_valclass crawstr // non-owning const char* values with strcmp/cstrhash
-//#define i_val const char*  // non-owning const char* values with pointer cmp/hash.
+#define i_val_str // owned cstr string value type
 #include <stc/cset.h>
 
 #define i_key int
@@ -170,26 +172,21 @@ c_forfilter (i, crange, crange_object(3, INT64_MAX, 2),
 ...
 // Initializes with const char*, internally converted to cstr!
 cset_str myset = c_make(cset_str, {"This", "is", "the", "story"});
+cset_str myset2 = c_clone(myset); 
 
 int x = 7, y = 8;
 cmap_int mymap = c_make(cmap_int, { {1, 2}, {3, 4}, {5, 6}, {x, y} });
 ```
-
-- ***c_new(Type)***: Allocate *and init* a new object on the heap
-- ***c_delete(Type, ptr)***: Drop *and free* an object allocated on the heap
+Drop multiple containers of the same type:
 ```c
-#include <stc/cstr.h>
-
-cstr *stringptr = c_new(cstr, cstr_from("Hello"));
-printf("%s\n", cstr_str(stringptr));
-c_delete(cstr, stringptr);
+c_drop(cset_str, &myset, &myset2);
 ```
 
 ### c_find_if, c_erase_if, c_eraseremove_if
 Find or erase linearily in containers using a predicate
-- For *c_find_if (iter, C, c, pred)*, ***iter*** must be declared outside/prior to call.
-- Use *c_erase_if (iter, C, c, pred)* with **clist**, **cmap**, **cset**, **csmap**, and **csset**.
-- Use *c_eraseremove_if (iter, C, c, pred)* with **cstack**, **cvec**, **cdeq**, and **cqueue**.
+- For `c_find_if(iter, C, c, pred)`, ***iter*** is in/out and must be declared prior to call.
+- Use `c_erase_if(iter, C, c, pred)` with **clist**, **cmap**, **cset**, **csmap**, and **csset**.
+- Use `c_eraseremove_if(iter, C, c, pred)` with **cstack**, **cvec**, **cdeq**, and **cqueue**.
 ```c
 // Search vec for first value > 2:
 cvec_i_iter i;
@@ -208,35 +205,19 @@ if (it.ref) cmap_str_erase_at(&map, it);
 c_erase_if(i, csmap_str, map, cstr_contains(i.ref, "hello"));
 ```
 
-### c_swap, c_drop, c_const_cast
+### c_new, c_delete
+
+- `c_new(Type, val)` - Allocate *and init* a new object on the heap
+- `c_delete(Type, ptr)` - Drop *and free* an object allocated on the heap. NULL is OK.
 ```c
-// Safe macro for swapping internals of two objects of same type:
-c_swap(cmap_int, &map1, &map2);
+#include <stc/cstr.h>
 
-// Drop multiple containers of same type:
-c_drop(cvec_i, &vec1, &vec2, &vec3);
-
-// Type-safe casting a from const (pointer):
-const char cs[] = "Hello";
-char* s = c_const_cast(char*, cs); // OK
-int* ip = c_const_cast(int*, cs);  // issues a warning!
+cstr *str_p = c_new(cstr, cstr_from("Hello"));
+printf("%s\n", cstr_str(str_p));
+c_delete(cstr, str_p);
 ```
 
-### General predefined template parameter functions
-
-```c
-int         c_default_cmp(const Type*, const Type*);
-Type        c_default_clone(Type val);           // simple copy
-Type        c_default_toraw(const Type* val);    // dereference val
-void        c_default_drop(Type* val);           // does nothing
-
-typedef     const char* crawstr;
-int         crawstr_cmp(const crawstr* x, const crawstr* y);
-bool        crawstr_eq(const crawstr* x, const crawstr* y);
-uint64_t    crawstr_hash(const crawstr* x);
-```
-
-### c_malloc, c_calloc, c_realloc, c_free: customizable allocators
+### c_malloc, c_calloc, c_realloc, c_free
 Memory allocator wrappers that uses signed sizes.
 
 ### c_arraylen
@@ -246,13 +227,44 @@ int array[] = {1, 2, 3, 4};
 intptr_t n = c_arraylen(array);
 ```
 
+### c_swap, c_const_cast
+```c
+// Safe macro for swapping internals of two objects of same type:
+c_swap(cmap_int, &map1, &map2);
+
+// Type-safe casting a from const (pointer):
+const char cs[] = "Hello";
+char* s = c_const_cast(char*, cs); // OK
+int* ip = c_const_cast(int*, cs);  // issues a warning!
+```
+
+### Predefined template parameter functions
+
+**crawstr** - Non-owned `const char*` "class" element type: `#define i_valclass crawstr`
+```c
+typedef     const char* crawstr;
+int         crawstr_cmp(const crawstr* x, const crawstr* y);
+bool        crawstr_eq(const crawstr* x, const crawstr* y);
+uint64_t    crawstr_hash(const crawstr* x);
+```
+Default implementations
+```c
+int         c_default_cmp(const Type*, const Type*);    // <=>
+bool        c_default_less(const Type*, const Type*);   // <
+bool        c_default_eq(const Type*, const Type*);     // == 
+uint64_t    c_default_hash(const Type*);
+Type        c_default_clone(Type val);                  // return val
+Type        c_default_toraw(const Type* p);             // return *p
+void        c_default_drop(Type* p);                    // does nothing
+```
+
 ---
 ## Coroutines
 This is an improved implementation of Simon Tatham's classic C code, which utilizes
 the *Duff's device* trick. However, Tatham's implementation is not typesafe,
-and it always allocates the coroutine's internal state dynamically. Also,
-it does not let the coroutine do self-cleanup on early finish, i.e. it
-just frees the dynamically allocated memory.
+and it always allocates the coroutine's internal state dynamically. But most crucially,
+it does not let the coroutine do self-cleanup on early finish - i.e. it
+only frees the initial dynamically allocated memory.
 
 In this implementation a coroutine may have any signature, but it should
 take some struct pointer as parameter, which must contain the member `int cco_state;`
@@ -260,8 +272,8 @@ The struct should normally store all the *local* variables to be used in the
 coroutine. It can also store input and output data if desired.
 
 The coroutine example below generates Pythagorian triples, but the main user-loop
-skips the triples which are upscaled version of smaller ones, by checking 
-the gcd() function, and breaks when diagonal length >= 100:
+skips the triples which are upscaled version of smaller ones by checking 
+the gcd() function, and breaks when the diagonal size >= 100:
 ```c
 #include <stc/algo/coroutine.h>
 
@@ -271,14 +283,14 @@ struct triples {
     int cco_state; // required member
 };
 
-bool triples_next(struct triples* I) { // coroutine
-    cco_begin(I);
-        for (I->c = 5; I->n; ++I->c) {
-            for (I->a = 1; I->a < I->c; ++I->a) {
-                for (I->b = I->a + 1; I->b < I->c; ++I->b) {
-                    if ((int64_t)I->a*I->a + (int64_t)I->b*I->b == (int64_t)I->c*I->c) {
+bool triples_next(struct triples* i) { // coroutine
+    cco_begin(i);
+        for (i->c = 5; i->n; ++i->c) {
+            for (i->a = 1; i->a < i->c; ++i->a) {
+                for (i->b = i->a + 1; i->b < i->c; ++i->b) {
+                    if ((int64_t)i->a*i->a + (int64_t)i->b*i->b == (int64_t)i->c*i->c) {
                         cco_yield(true);
-                        if (--I->n == 0) cco_return;
+                        if (--i->n == 0) cco_return;
                     }
                 }
             }
