@@ -83,16 +83,16 @@ enum {
         case __LINE__:; \
     } while (0)
 
-#define cco_yield_2(corocall, ctx) \
-    cco_yield_3(corocall, ctx,)
+#define cco_yield_2(corocall2, ctx2) \
+    cco_yield_3(corocall2, ctx2, )
 
-#define cco_yield_3(corocall, ctx, retval) \
+#define cco_yield_3(corocall2, ctx2, retval) \
     do { \
         *_state = __LINE__; \
         do { \
-            corocall; if (cco_suspended(ctx)) return retval; \
+            corocall2; if (cco_suspended(ctx2)) return retval; \
             case __LINE__:; \
-        } while (cco_alive(ctx)); \
+        } while (cco_alive(ctx2)); \
     } while (0)
 
 #define cco_final \

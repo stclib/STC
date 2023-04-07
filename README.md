@@ -3,39 +3,16 @@
 STC - Smart Template Containers for C
 =====================================
 
-News: Version 4.2 Released (2023-03-26)
-------------------------------------------------
-I am happy to finally announce a new release! Major changes:
-- A new exciting [**cspan**](docs/cspan_api.md) single/multi-dimensional array view (with numpy-like slicing).
-- Signed sizes and indices for all containers. See C++ Core Guidelines by Stroustrup/Sutter: [ES.100](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es100-dont-mix-signed-and-unsigned-arithmetic), [ES.102](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es102-use-signed-types-for-arithmetic), [ES.106](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es106-dont-try-to-avoid-negative-values-by-using-unsigned), and [ES.107](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es107-dont-use-unsigned-for-subscripts-prefer-gslindex).
-- Customizable allocator [per templated container type](https://github.com/tylov/STC/discussions/44#discussioncomment-4891925).
-- Updates on **cregex** with several [new unicode character classes](docs/cregex_api.md#regex-cheatsheet).
-- Algorithms:
-    - [crange](docs/ccommon_api.md#crange) - similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html) integer range generator.
-    - [c_forfilter](docs/ccommon_api.md#c_forfilter) - ranges-like view filtering.
-    - [csort](include/stc/algo/csort.h) - [fast quicksort](misc/benchmarks/various/csort_bench.c) with custom inline comparison.
-- Renamed `c_ARGSV()` => `c_SV()`: **csview** print arg. Note `c_sv()` is shorthand for *csview_from()*.
-- Support for [uppercase flow-control](include/stc/priv/altnames.h) macro names in ccommon.h.
-- Some API changes in **cregex** and **cstr**.
-- Create single header container versions with python script.
-- [Previous changes for version 4](#version-4).
+### [Version 4.2](#version-history)
 
-Introduction
-------------
-STC is a *modern*, *ergonomic*, *type-safe*, *very fast* and *compact* container library for C99.
-The API has similarities with c++ STL, but is more uniform across the containers and takes inspiration from Rust
-and Python as well. It is an advantage to know how these containers work in other languages, like Java, C# or C++,
-but it's not required.
-
-This library allows you to manage both trivial to very complex data in a wide variety of containers
-without the need for boilerplate code. You may specify element-cloning, -comparison, -destruction and
-more on complex container hierarchies without resorting to cumbersome function pointers with type casting.
-Usage with trivial data types is simple to use compared to most generic container libraries for C because
-of its type safety with an intuitive and consistent API.
-
-The library is mature and well tested, so you may use it in projects. However, minor breaking API changes may
-still happen. The main development of this project is finished, but I will handle PRs with bugs and improvements
-in the future, and do minor modifications.
+---
+Description
+-----------
+STC is a *modern*, *fully typesafe*, *fast* and *compact* container and algorithm library for C99.
+The API naming is similar to C++ STL, but it takes inspiration from Rust and Python as well. 
+The library let you store and manage trivial and highly complex data in a variety of
+containers with ease. It is optimized for speed, usage ergonomics, consistency,
+and it creates small binaries.
 
 Containers
 ----------
@@ -56,31 +33,75 @@ Containers
 - [***cdeq*** - **std::deque** alike type](docs/cdeq_api.md)
 - [***cvec*** - **std::vector** alike type](docs/cvec_api.md)
 
-Others
-------
-- [***ccommon*** - Generic safe macros and algorithms](docs/ccommon_api.md)
-- [***cregex*** - Regular expressions (extended from Rob Pike's regexp9)](docs/cregex_api.md)
-- [***crand*** - A novel very fast *PRNG* named **stc64**](docs/crandom_api.md)
-- [***coption*** - getopt() alike command line args parser](docs/coption_api.md)
+Algorithms
+----------  
+- [***common*** Generic container algorithms](docs/ccommon_api.md#algorithms)
+- [***filter*** - Ranges-like filtering](docs/ccommon_api.md#c_forfilter)
+- [***coroutine*** - Tiny, fast and portable coroutine implementation](docs/ccommon_api.md#coroutines)
+- [***cregex*** - Regular expressions based on Rob Pike's regexp9](docs/cregex_api.md)
+- [***crange*** - Generalized iota integer generator](docs/ccommon_api.md#crange)
+- [***crand*** - A novel very fast *PRNG* based on ***sfc64***](docs/crandom_api.md)
+- [***coption*** - A ***getopt***-alike command line argument parser](docs/coption_api.md)
 
-Highlights
-----------
-- **No boilerplate** - With STC, no boilerplate code is needed to setup containers either with simple built-in types or containers with complex element types, which requires cleanup. Only specify what is needed, e.g. compare-, clone-, drop- functions, and leave the rest as defaults.
+---
+List of contents
+-----------------
+- [Highlights](#highlights)
+- [STC is unique!](#stc-is-unique)
+- [Performance](#performance)
+- [STC naming conventions](#stc-naming-conventions)
+- [Usage](#usage)
+- [Installation](#installation)
+- [Specifying template parameters](#specifying-template-parameters)
+- [The *emplace* methods](#the-emplace-methods)
+- [The *erase* methods](#the-erase-methods)
+- [User-defined container type name](#user-defined-container-type-name)
+- [Forward declarations](#forward-declarations)
+- [Per-container-instance customization](#per-container-instance-customization)
+- [Memory efficiency](#memory-efficiency)
+
+---
+## Highlights
+
+- **No boilerplate code** - Minimal code is needed to setup containers with any element type. Specify only what is needed, e.g. ***cmp***- and/or ***clone***-, ***drop***- functions, and leave the rest as defaults.
 - **Fully type safe** - Because of templating, it avoids error-prone casting of container types and elements back and forth from the containers.
 - **User friendly** - Just include the headers and you are good. The API and functionality is very close to c++ STL, and is fully listed in the docs. 
-- **Templates** - Use `#define i_{arg}` to specify container template arguments. There are templates for element-*type*, -*comparison*, -*destruction*, -*cloning*, -*conversion types*, and more.
-- **Unparalleled performance** - Some containers are much faster than the c++ STL containers, the rest are about equal in speed.
-- **Fully memory managed** - All containers will destruct keys/values via destructor defined as macro parameters before including the container header. Also, smart pointers are supported and can be stored in containers, see ***carc*** and ***cbox***.
-- **Uniform, easy-to-learn API** - Methods to ***construct***, ***initialize***, ***iterate*** and ***destruct*** have uniform and intuitive usage across the various containers.
-- **No signed/unsigned mixing** - Unsigned sizes and indices mixed with signed in comparisons and calculations is asking for trouble. STC uses only signed numbers in the API.
-- **Small footprint** - Small source code and generated executables. The executable from the example below using ***six different*** container types is only ***19 Kb in size*** compiled with gcc -O3 -s on Linux.
+- **Unparalleled performance** - Maps and sets are much faster than the C++ STL containers, the remaining are similar in speed.
+- **Fully memory managed** - All containers will destruct keys/values via destructor (defined as macro parameters before including the container header). Also, smart pointers are supported and can be stored in containers, see ***carc*** and ***cbox***.
+- **Uniform, easy-to-learn API** - Uniform and intuitive method/type names and usage across the various containers.
+- **No signed/unsigned mixing** - Unsigned sizes and indices mixed with signed in comparisons and calculations is asking for trouble. STC uses only signed numbers in the API for this reason.
+- **Small footprint** - Small source code and generated executables. The executable from the example below using *four different* container types is only ***19 Kb in size*** compiled with gcc -O3 -s on Linux.
 - **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See the Installation section.
 - **No callback functions** - All passed template argument functions/macros are directly called from the implementation, no slow callbacks which requires storage.
 - **Compiles with C++ and C99** - C code can be compiled with C++ (container element types must be POD).
 - **Forward declaration** - Templated containers may be forward declared without including the full API/implementation. See documentation below.
 
-Performance
------------
+---
+## STC is unique!
+
+1. ***Centralized analysis of template parameters***. The analyser assigns values to all
+non-specified template parameters (based on the specified ones) using meta-programming, 
+so that you don't have to! You may specify a set of "standard" template parameters for each container,
+but as a minimum *only one is required*: `i_val` (+ `i_key` for maps). In this case STC assumes
+that the elements are of basic types. For more complex types, additional template parameters must be given. 
+2. ***Alternative insert/lookup type***. You may specify an alternative type to use for lookup in
+containers. E.g., containers with STC string elements (**cstr**) uses `const char*` as lookup type,
+so construction of a `cstr` (which may allocate memory) for the lookup *is not needed*. Hence, the alt. lookup
+key does not need to be destroyed after use, as it is normally a POD type. Finally, the alternative
+lookup type may be passed to an ***emplace***-function. E.g. instead of calling 
+`cvec_str_push(&vec, cstr_from("Hello"))`, you may call `cvec_str_emplace(&vec, "Hello")`,
+which is functionally identical, but more convenient.
+3. ***Standardized container iterators***. All containers can be iterated in the same manner, and all use the
+same element access syntax. E.g.:
+    - `c_foreach (it, MyInts, myints) *it.ref += 42;` works for any container defined as 
+    `MyInts` with `int` elements.
+    - `c_foreach (it, MyInts, it1, it2)  *it.ref += 42;` iterates from `it1` up to `it2`.
+
+---
+## Performance
+
+STC is a fast and memory efficient library, and code compiles very fast:
+
 ![Benchmark](misc/benchmarks/pics/benchmark.gif)
 
 Benchmark notes:
@@ -92,8 +113,9 @@ Benchmark notes:
 - **deque**: *insert*: n/3 push_front(), n/3 push_back()+pop_front(), n/3 push_back().
 - **map and unordered map**: *insert*: n/2 random numbers, n/2 sequential numbers. *erase*: n/2 keys in the map, n/2 random keys.
 
-STC conventions
----------------
+---
+## STC naming conventions
+
 - Container names are prefixed by `c`, e.g. `cvec`, `cstr`.
 - Public STC macros are prefixed by `c_`, e.g. `c_foreach`, `c_make`.
 - Template parameter macros are prefixed by `i_`, e.g. `i_val`, `i_type`.
@@ -103,8 +125,7 @@ STC conventions
     - Con_value
     - Con_raw
     - Con_iter
-    - Con_ssize
-- Common function names for a container type Con:
+- Some common function names:
     - Con_init()
     - Con_reserve(&con, capacity)
     - Con_drop(&con)
@@ -113,7 +134,6 @@ STC conventions
     - Con_clone(con)
     - Con_push(&con, value)
     - Con_emplace(&con, rawval)
-    - Con_put_n(&con, rawval[], n)
     - Con_erase_at(&con, iter)
     - Con_front(&con)
     - Con_back(&con)
@@ -122,40 +142,21 @@ STC conventions
     - Con_next(&iter)
     - Con_advance(iter, n)
 
-Some standout features of STC
------------------------------
-1. ***Centralized analysis of template arguments***. Assigns good defaults to non-specified templates.
-You may specify a number of "standard" template arguments for each container, but as minimum only one is
-required (two for maps). In the latter case, STC assumes the elements are basic types. For more complex types,
-additional template arguments should be defined.
-2. ***General "heterogeneous lookup"-like feature***. Allows specification of an alternative type to use
-for lookup in containers. E.g. for containers with string type (**cstr**) elements, `const char*` is used
-as lookup type. It will then use the input `const char*` directly when comparing with the string data in the
-container. This avoids the construction of a new `cstr` (which possible allocates memory) for the lookup. 
-Finally, destruction of the lookup key (i.e. string literal) after usage is not needed (or allowed), which 
-is convenient in C. A great ergonomic feature is that the alternative lookup type can also be used when adding
-entries into containers through using the *emplace*-functions. E.g. `cvec_str_emplace_back(&vec, "Hello")`.
-3. ***Standardized container iterators***. All container can be iterated in similar manner, and uses the
-same element access syntax. E.g.:
-    - `c_foreach (it, IntContainer, container) printf(" %d", *it.ref);` will work for
-every type of container defined as `IntContainer` with `int` elements. Also the form:
-    - `c_foreach (it, IntContainer, it1, it2)`
-may be used to iterate from `it1` up to `it2`.
-
-Usage
------
-The usage of the containers is similar to the c++ standard containers in STL, so it should be easy if you
-are familiar with them. All containers are generic/templated, except for **cstr** and **cbits**.
-No casting is used, so containers are type-safe like templates in c++. A basic usage example:
+---
+## Usage
+The functionality of STC containers is similar to C++ STL standard containers. All containers except for a few, 
+like **cstr** and **cbits** are generic/templated. No type casting is done, so containers are type-safe like 
+templated types in C++. However, the specification of template parameters are naturally different. Here is 
+a basic usage example:
 ```c
-#define i_type Floats  // Container type name; if not defined, it would be cvec_float
+#define i_type Floats  // Container type name; unless defined name would be cvec_float
 #define i_val float    // Container element type
 #include <stc/cvec.h>  // "instantiate" the desired container type
 #include <stdio.h>
 
 int main(void)
 {
-    Floats nums = Floats_init();
+    Floats nums = {0};
     Floats_push(&nums, 30.f);
     Floats_push(&nums, 10.f);
     Floats_push(&nums, 20.f);
@@ -165,13 +166,13 @@ int main(void)
     
     Floats_sort(&nums);
 
-    c_foreach (i, Floats, nums)         // Alternative and recommended way to iterate nums.
-        printf(" %g", *i.ref);          // i.ref is a pointer to the current element.
+    c_foreach (i, Floats, nums)     // Alternative and recommended way to iterate nums.
+        printf(" %g", *i.ref);      // i.ref is a pointer to the current element.
 
     Floats_drop(&nums); // cleanup memory
 }
 ```
-Switching to a different container type is easy:
+You may switch to a different container type, e.g. a sorted set (csset):
 ```c
 #define i_type Floats
 #define i_val float
@@ -180,12 +181,12 @@ Switching to a different container type is easy:
 
 int main()
 {
-    Floats nums = c_make(Floats, {30.f, 10.f, 20.f}); // Initialize with a list of floats.
+    Floats nums = c_make(Floats, {30.f, 10.f, 20.f}); // Initialize nums with a list of floats.
     Floats_push(&nums, 50.f); 
     Floats_push(&nums, 40.f);
 
-    // print the sorted numbers
-    c_foreach (i, Floats, nums)         // c_foreach works with any container
+    // already sorted, print the numbers
+    c_foreach (i, Floats, nums)
         printf(" %g", *i.ref);
 
     Floats_drop(&nums);
@@ -204,7 +205,7 @@ Let's make a vector of vectors that can be cloned. All of its element vectors wi
 #include <stc/cvec.h>
 
 #define i_type Vec2D
-#define i_valclass Vec  // Use i_valclass when the element type has "member" functions _clone(), _drop() and _cmp().
+#define i_valclass Vec  // Use i_valclass when element type has "members" _clone(), _drop() and _cmp().
 #define i_opt c_no_cmp  // However, disable search/sort for Vec2D because Vec_cmp() is not defined.
 #include <stc/cvec.h>
 
@@ -229,7 +230,7 @@ int main(void)
     c_drop(Vec2D, &vec, &clone);      // Cleanup all (6) vectors.
 }
 ```
-Here is an example of using four different container types:
+This example uses four different container types:
 ```c
 #include <stdio.h>
 
@@ -322,9 +323,9 @@ After erasing the elements found:
  lst: 10 30 40 50
  map: [10: 1] [30: 3] [40: 4] [50: 5]
 ```
+---
+## Installation
 
-Installation
-------------
 Because it is headers-only, headers can simply be included in your program. By default, functions are static
 (some inlined). You may add the *include* folder to the **CPATH** environment variable to
 let GCC, Clang, and TinyC locate the headers.
@@ -368,9 +369,9 @@ or define your own as descibed above.
 #define i_tag pnt
 #include <stc/clist.h> // clist_pnt
 ```
+---
+## Specifying template parameters
 
-Specifying template parameters
-------------------------------
 Each templated type requires one `#include`, even if it's the same container base type, as described earlier.
 The template parameters are given by a `#define i_xxxx` statement, where *xxxx* is the parameter name.
 The list of template parameters:
@@ -420,8 +421,9 @@ NB: Do not use when defining carc/cbox types themselves.
 - Instead of defining `i_*clone`, you may define *i_opt c_no_clone* to disable *clone* functionality.
 - For `i_keyclass`, if *i_keyraw* is defined along with it, *i_keyfrom* may also be defined to enable the *emplace*-functions. NB: the signature for ***cmp***, ***eq***, and ***hash*** uses *i_keyraw* as input.
 
-The *emplace* versus non-emplace container methods
---------------------------------------------------
+---
+## The *emplace* methods
+
 STC, like c++ STL, has two sets of methods for adding elements to containers. One set begins
 with **emplace**, e.g. *cvec_X_emplace_back()*. This is an ergonimic alternative to
 *cvec_X_push_back()* when dealing non-trivial container elements, e.g. strings, shared pointers or
@@ -492,8 +494,9 @@ it = cmap_str_find(&map, "Hello");
 Apart from strings, maps and sets are normally used with trivial value types. However, the
 last example on the **cmap** page demonstrates how to specify a map with non-trivial keys.
 
-Erase methods
--------------
+---
+## The *erase* methods
+
 | Name                      | Description                  | Container                                   |
 |:--------------------------|:-----------------------------|:--------------------------------------------|
 | erase()                   | key based                    | csmap, csset, cmap, cset, cstr              |
@@ -502,8 +505,23 @@ Erase methods
 | erase_n()                 | index based                  | cvec, cdeq, cstr                            |
 | remove()                  | remove all matching values   | clist                                       |
 
-Forward declaring containers
-----------------------------
+---
+## User-defined container type name
+
+Define `i_type` instead of `i_tag`:
+```c
+#define i_type MyVec
+#define i_val int
+#include <stc/cvec.h>
+
+myvec vec = MyVec_init();
+MyVec_push_back(&vec, 1);
+...
+```
+
+---
+## Forward declarations
+
 It is possible to forward declare containers. This is useful when a container is part of a struct, 
 but still not expose or include the full implementation / API of the container.
 ```c
@@ -516,7 +534,6 @@ typedef struct Dataset {
     cstack_pnt colors;
 } Dataset;
 
-...
 // Implementation
 #define i_is_forward                  // flag that the container was forward declared.
 #define i_val struct Point
@@ -524,22 +541,57 @@ typedef struct Dataset {
 #include <stc/cstack.h>
 ```
 
-User-defined container type name
---------------------------------
-Define `i_type` instead of `i_tag`:
+---
+## Per-container-instance customization
+Sometimes it is useful to extend a container type to hold extra data, e.g. a comparison
+or allocator function pointer or some context that the function pointers can use. Most
+libraries solve this by adding an opaque pointer (void*) or some function pointer(s) into
+the data structure for the user to manage. This solution has a few disadvantages, e.g. the
+pointers are not typesafe, and they take up space when not needed. STC solves this by letting
+the user create a container wrapper struct where both the container and extra data fields can
+be stored. The template parameters may then access the extra data using the "container_of"
+technique.
+
+The example below shows how to customize containers to work with PostgreSQL memory management.
+It adds a MemoryContext to each container by defining the `i_extend` template parameter followed
+the by inclusion of `<stc/extend.h>`.
 ```c
-#define i_type MyVec
-#define i_val int
-#include <stc/cvec.h>
+// stcpgs.h
+#define pgs_malloc(sz) MemoryContextAlloc(c_getcon(self)->memctx, sz)
+#define pgs_calloc(n, sz) MemoryContextAllocZero(c_getcon(self)->memctx, (n)*(sz))
+#define pgs_realloc(p, sz) (p ? repalloc(p, sz) : pgs_malloc(sz))
+#define pgs_free(p) (p ? pfree(p) : (void)0) // pfree/repalloc does not accept NULL.
 
-myvec vec = MyVec_init();
-MyVec_push_back(&vec, 1);
-...
+#define i_allocator pgs
+#define i_no_clone
+#define i_extend MemoryContext memctx
+#include <stc/extend.h>
 ```
+Define both `i_type` and `i_con` (the container type) before including the custom header:
+```c
+#define i_type IMap
+#define i_key int
+#define i_val int
+#define i_con csmap
+#include "stcpgs.h"
 
-Memory efficiency
------------------
-STC is generally very memory efficient. Type sizes:
+// Note the wrapper struct type is IMapExt. IMap is accessed by .get
+void maptest()
+{
+    IMapExt map = {.memctx=CurrentMemoryContext};
+    c_forrange (i, 1, 16)
+        IMap_insert(&map.get, i*i, i);
+
+    c_foreach (i, IMap, map.get)
+        printf("%d:%d ", i.ref->first, i.ref->second);
+
+    IMap_drop(&map.get);
+}
+```
+---
+## Memory efficiency
+
+STC is generally very memory efficient. Memory usage for the different containers:
 - **cstr**, **cvec**, **cstack**, **cpque**: 1 pointer, 2 intptr_t + memory for elements.
 - **csview**, 1 pointer, 1 intptr_t. Does not own data!
 - **cspan**, 1 pointer and 2 \* dimension \* int32_t. Does not own data!
@@ -550,7 +602,24 @@ STC is generally very memory efficient. Type sizes:
 - **carc**: Type size: 1 pointer, 1 long for the reference counter + memory for the shared element.
 - **cbox**: Type size: 1 pointer + memory for the pointed-to element.
 
-# Version 4
+---
+# Version History
+
+## Version 4.1.1
+I am happy to finally announce a new release! Major changes:
+- A new exciting [**cspan**](docs/cspan_api.md) single/multi-dimensional array view (with numpy-like slicing).
+- Signed sizes and indices for all containers. See C++ Core Guidelines by Stroustrup/Sutter: [ES.100](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es100-dont-mix-signed-and-unsigned-arithmetic), [ES.102](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es102-use-signed-types-for-arithmetic), [ES.106](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es106-dont-try-to-avoid-negative-values-by-using-unsigned), and [ES.107](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es107-dont-use-unsigned-for-subscripts-prefer-gslindex).
+- Customizable allocator [per templated container type](https://github.com/tylov/STC/discussions/44#discussioncomment-4891925).
+- Updates on **cregex** with several [new unicode character classes](docs/cregex_api.md#regex-cheatsheet).
+- Algorithms:
+    - [crange](docs/ccommon_api.md#crange) - similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html) integer range generator.
+    - [c_forfilter](docs/ccommon_api.md#c_forfilter) - ranges-like view filtering.
+    - [csort](include/stc/algo/csort.h) - [fast quicksort](misc/benchmarks/various/csort_bench.c) with custom inline comparison.
+- Renamed `c_ARGSV()` => `c_SV()`: **csview** print arg. Note `c_sv()` is shorthand for *csview_from()*.
+- Support for [uppercase flow-control](include/stc/priv/altnames.h) macro names in ccommon.h.
+- Some API changes in **cregex** and **cstr**.
+- Create single header container versions with python script.
+
 
 ## API changes summary V4.0
 - Added **cregex** with documentation - powerful regular expressions.

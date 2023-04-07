@@ -12,7 +12,7 @@ enum {INSERT, ERASE, FIND, ITER, DESTRUCT, N_TESTS};
 const char* operations[] = {"insert", "erase", "find", "iter", "destruct"};
 typedef struct { time_t t1, t2; uint64_t sum; float fac; } Range;
 typedef struct { const char* name; Range test[N_TESTS]; } Sample;
-enum {SAMPLES = 2, N = 100000000, S = 0x3ffc, R = 4};
+enum {SAMPLES = 2, N = 50000000, S = 0x3ffc, R = 4};
 uint64_t seed = 1, mask1 = 0xfffffff, mask2 = 0xffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
@@ -122,7 +122,7 @@ int main(int argc, char* argv[])
     bool header = (argc > 2 && argv[2][0] == '1');
     float std_sum = 0, stc_sum = 0;
 
-    c_forrange (j, N_TESTS) { 
+    c_forrange (j, N_TESTS) {
         std_sum += secs(std_s[0].test[j]);
         stc_sum += secs(stc_s[0].test[j]);
     }

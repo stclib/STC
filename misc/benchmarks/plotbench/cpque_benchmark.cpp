@@ -11,7 +11,7 @@
 #include <queue>
 
 static const uint32_t seed = 1234;
-static const int N = 10000000;
+static const int N = 2500000;
 
 void std_test()
 {
@@ -47,7 +47,7 @@ void stc_test()
 
         printf("Built priority queue: %f secs\n", (float)(clock() - start)/(float)CLOCKS_PER_SEC);
         printf("%g ", *cpque_f_top(&pq));
- 
+
         start = clock();
         c_forrange (i, N) {
             cpque_f_pop(&pq);

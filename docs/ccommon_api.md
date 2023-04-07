@@ -95,8 +95,7 @@ Iterate containers with stop-criteria and chained range filtering.
 | `c_flt_getcount(it)`              | Number of items passed skip*/take*/counter |
 ```c
 // Example:
-#include <stc/algo/crange.h>
-#include <stc/algo/filter.h>
+#include <stc/calgo.h>
 #include <stdio.h>
 
 bool isPrime(long long i) {
@@ -105,21 +104,21 @@ bool isPrime(long long i) {
     return true;
 }
 int main() {
-    // Get 10 prime numbers starting from 1000.
-    // Skip the first 24 primes, then select every 15th prime.
-    crange R = crange_make(1001, INT32_MAX, 2);
+    // Get 10 prime numbers starting from 1000. Skip the first 15 primes,
+    // then select every 25th prime (including the initial).
+    crange R = crange_make(1001, INT64_MAX, 2); // 1001, 1003, ...
 
     c_forfilter (i, crange, R,
                     isPrime(*i.ref)            &&
-                    c_flt_skip(i, 24)          &&
-                    c_flt_counter(i) % 15 == 1 &&
+                    c_flt_skip(i, 15)          &&
+                    c_flt_counter(i) % 25 == 1 &&
                     c_flt_take(i, 10)
     ){
         printf(" %lld", *i.ref);
     }
     puts("");
 }
-// out: 1171 1283 1409 1493 1607 1721 1847 1973 2081 2203
+// out: 1097 1289 1481 1637 1861 2039 2243 2417 2657 2803
 ```
 Note that `c_flt_take()` and `c_flt_takewhile()` breaks the loop on false.
 
@@ -144,7 +143,7 @@ c_forfilter (i, crange, r1, isPrime(*i.ref))
     printf(" %lld", *i.ref);
 // 2 3 5 7 11 13 17 19 23 29 31
 
-// 2. The 11 first primes:
+// 2. The first 11 primes:
 printf("2");
 c_forfilter (i, crange, crange_object(3, INT64_MAX, 2),
     isPrime(*i.ref) &&
@@ -160,7 +159,9 @@ c_forfilter (i, crange, crange_object(3, INT64_MAX, 2),
 
 - *c_make(C, {...})*: Make any container from an initializer list. Example:
 ```c
-#define i_val_str  // cstr value type
+#define i_val_str            // owned cstr string value type
+//#define i_valclass crawstr // non-owning const char* values with strcmp/cstrhash
+//#define i_val const char*  // non-owning const char* values with pointer cmp/hash.
 #include <stc/cset.h>
 
 #define i_key int
@@ -216,12 +217,13 @@ c_swap(cmap_int, &map1, &map2);
 c_drop(cvec_i, &vec1, &vec2, &vec3);
 
 // Type-safe casting a from const (pointer):
-const char* cs = "Hello";
+const char cs[] = "Hello";
 char* s = c_const_cast(char*, cs); // OK
 int* ip = c_const_cast(int*, cs);  // issues a warning!
 ```
 
 ### General predefined template parameter functions
+
 ```c
 int         c_default_cmp(const Type*, const Type*);
 Type        c_default_clone(Type val);           // simple copy
@@ -244,8 +246,97 @@ int array[] = {1, 2, 3, 4};
 intptr_t n = c_arraylen(array);
 ```
 
-## Scope macros (RAII)
-### c_auto, c_with, c_scope, c_defer
+---
+## Coroutines
+This is an improved implementation of Simon Tatham's classic C code, which utilizes
+the *Duff's device* trick. However, Tatham's implementation is not typesafe,
+and it always allocates the coroutine's internal state dynamically. Also,
+it does not let the coroutine do self-cleanup on early finish, i.e. it
+just frees the dynamically allocated memory.
+
+In this implementation a coroutine may have any signature, but it should
+take some struct pointer as parameter, which must contain the member `int cco_state;`
+The struct should normally store all the *local* variables to be used in the
+coroutine. It can also store input and output data if desired.
+
+The coroutine example below generates Pythagorian triples, but the main user-loop
+skips the triples which are upscaled version of smaller ones, by checking 
+the gcd() function, and breaks when diagonal length >= 100:
+```c
+#include <stc/algo/coroutine.h>
+
+struct triples {
+    int n; // input: max number of triples to be generated.
+    int a, b, c;
+    int cco_state; // required member
+};
+
+bool triples_next(struct triples* I) { // coroutine
+    cco_begin(I);
+        for (I->c = 5; I->n; ++I->c) {
+            for (I->a = 1; I->a < I->c; ++I->a) {
+                for (I->b = I->a + 1; I->b < I->c; ++I->b) {
+                    if ((int64_t)I->a*I->a + (int64_t)I->b*I->b == (int64_t)I->c*I->c) {
+                        cco_yield(true);
+                        if (--I->n == 0) cco_return;
+                    }
+                }
+            }
+        }
+        cco_final: // required label
+        puts("done");
+    cco_end(false);
+}
+
+int gcd(int a, int b) { // greatest common denominator
+    while (b) {
+        int t = a % b;
+        a = b;
+        b = t;
+    }
+    return a;
+}
+
+int main()
+{
+    puts("\nCoroutine triples:");
+    struct triples t = {INT32_MAX};
+    int n = 0;
+
+    while (triples_next(&t)) {
+        // Skip triples with GCD(a,b) > 1
+        if (gcd(t.a, t.b) > 1)
+            continue;
+        
+        // Stop when c >= 100
+        if (t.c < 100)
+            printf("%d: {%d, %d, %d}\n", ++n, t.a, t.b, t.c);
+        else
+            cco_stop(&t); // make sure coroutine cleanup is done
+    }
+}
+```
+### Coroutine API
+**Note**: `cco_yield()` may not be called inside a `switch` statement. Use `if-else-if` constructs instead.
+
+|           |  Function / operator                 | Description                             |
+|:----------|:-------------------------------------|:----------------------------------------|
+|           | `cco_final:`                         | Obligatory label in coroutine           |
+|           | `cco_return;`                        | Early return from the coroutine         |
+| `bool`    | `cco_suspended(ctx)`                 | Is coroutine in suspended state?        |
+| `bool`    | `cco_alive(ctx)`                     | Is coroutine still alive?               |
+| `void`    | `cco_begin(ctx)`                     | Begin coroutine block                   |
+| `rettype` | `cco_end(retval)`                    | End coroutine block with return value   |
+| `rettype` | `cco_end()`                          | End coroutine block with (void)         |
+| `rettype` | `cco_yield(retval)`                  | Yield a value                           |
+| `rettype` | `cco_yield(corocall2, ctx2, retval)` | Yield from another coroutine and return val |
+| `rettype` | `cco_yield(corocall2, ctx2)`         | Yield from another coroutine (void)     |
+|           | From the caller side:                |                                         | 
+| `void`    | `cco_stop(ctx)`                      | Next call of coroutine returns `cco_end()` |                  
+| `void`    | `cco_reset(ctx)`                     | Reset state to initial (for reuse)      |
+
+---
+## RAII scope macros
 General ***defer*** mechanics for resource acquisition. These macros allows you to specify the
 freeing of the resources at the point where the acquisition takes place.
 The **checkauto** utility described below, ensures that the `c_auto*` macros are used correctly.
@@ -258,12 +349,42 @@ The **checkauto** utility described below, ensures that the `c_auto*` macros are
 | `c_with (Type var=init, drop)`         | Declare `var`. Defer `drop...` to end of scope            |
 | `c_with (Type var=init, pred, drop)`   | Adds a predicate in order to exit early if init failed    |
 | `c_auto (Type, var1,...,var4)`         | `c_with (Type var1=Type_init(), Type_drop(&var1))` ...    |
-| `continue`                             | Exit a block above without memory leaks                   |
+| `continue`                             | Exit a defer-block without resource leak                  |
 
-For multiple variables, use either multiple **c_with** in sequence, or declare variable outside
-scope and use **c_scope**. For convenience, **c_auto** support up to 4 variables.
 ```c
-// `c_with` is similar to python `with`: it declares and can drop a variable after going out of scope.
+// `c_defer` executes the expression(s) when leaving scope.
+cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
+c_defer (cstr_drop(&s1), cstr_drop(&s2))
+{
+    printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
+}
+
+// `c_scope` syntactically "binds" initialization and defer.
+static pthread_mutex_t mut;
+c_scope (pthread_mutex_lock(&mut), pthread_mutex_unlock(&mut))
+{
+    /* Do syncronized work. */
+}
+
+// `c_with` is similar to python `with`: declare a variable and defer the drop call.
+c_with (cstr str = cstr_lit("Hello"), cstr_drop(&str))
+{
+    cstr_append(&str, " world");
+    printf("%s\n", cstr_str(&str));
+}
+
+// `c_auto` automatically initialize and drops up to 4 variables:
+c_auto (cstr, s1, s2)
+{
+    cstr_append(&s1, "Hello");
+    cstr_append(&s1, " world");
+    cstr_append(&s2, "Cool");
+    cstr_append(&s2, " stuff");
+    printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
+}
+```
+**Example 1**: Use multiple **c_with** in sequence:
+```c
 bool ok = false;
 c_with (uint8_t* buf = malloc(BUF_SIZE), buf != NULL, free(buf))
 c_with (FILE* fp = fopen(fname, "rb"), fp != NULL, fclose(fp))
@@ -274,41 +395,8 @@ c_with (FILE* fp = fopen(fname, "rb"), fp != NULL, fclose(fp))
     ok = true;
 }
 return ok;
-
-// `c_auto` automatically initialize and destruct up to 4 variables:
-c_auto (cstr, s1, s2)
-{
-    cstr_append(&s1, "Hello");
-    cstr_append(&s1, " world");
-
-    cstr_append(&s2, "Cool");
-    cstr_append(&s2, " stuff");
-
-    printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
-}
-
-// `c_with` is a general variant of `c_auto`:
-c_with (cstr str = cstr_lit("Hello"), cstr_drop(&str))
-{
-    cstr_append(&str, " world");
-    printf("%s\n", cstr_str(&str));
-}
-
-// `c_scope` is like `c_with` but works with an already declared variable.
-static pthread_mutex_t mut;
-c_scope (pthread_mutex_lock(&mut), pthread_mutex_unlock(&mut))
-{
-    /* Do syncronized work. */
-}
-
-// `c_defer` executes the expressions when leaving scope. Prefer c_with or c_scope.
-cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
-c_defer (cstr_drop(&s1), cstr_drop(&s2))
-{
-    printf("%s %s\n", cstr_str(&s1), cstr_str(&s2));
-}
 ```
-**Example**: Load each line of a text file into a vector of strings:
+**Example 2**: Load each line of a text file into a vector of strings:
 ```c
 #include <errno.h>
 #include <stc/cstr.h>
@@ -319,20 +407,19 @@ c_defer (cstr_drop(&s1), cstr_drop(&s2))
 // receiver should check errno variable
 cvec_str readFile(const char* name)
 {
-    cvec_str vec = cvec_str_init(); // returned
-
+    cvec_str vec = {0}; // returned
     c_with (FILE* fp = fopen(name, "r"), fp != NULL, fclose(fp))
-    c_with (cstr line = cstr_NULL, cstr_drop(&line))
+    c_with (cstr line = {0}, cstr_drop(&line))
         while (cstr_getline(&line, fp))
-            cvec_str_emplace_back(&vec, cstr_str(&line));
+            cvec_str_emplace(&vec, cstr_str(&line));
     return vec;
 }
 
 int main()
 {
-    c_with (cvec_str x = readFile(__FILE__), cvec_str_drop(&x))
-        c_foreach (i, cvec_str, x)
-            printf("%s\n", cstr_str(i.ref));
+    c_with (cvec_str vec = readFile(__FILE__), cvec_str_drop(&vec))
+        c_foreach (i, cvec_str, vec)
+            printf("| %s\n", cstr_str(i.ref));
 }
 ```
 
