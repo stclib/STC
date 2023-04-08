@@ -12,24 +12,25 @@ int main()
                       " Around 365.25 days a year, and 52 weeks in a year."
                       " Boltzmann const: 1.38064852E-23, is very small."
                       " Bohrradius is 5.29177210903e-11, and Avogadros number is 6.02214076e23.";
+    cregex re = {0};
+    cstack_float vec = {0};
 
-    c_auto (cregex, re)
-    c_auto (cstack_float, vec)
-    c_auto (cstr, nums)
-    {
-        const char* pattern = "[+-]?([0-9]*\\.)?\\d+([Ee][+-]?\\d+)?";
-        int res = cregex_compile(&re, pattern);
-        printf("%d: %s\n", res, pattern);
+    const char* pattern = "[+-]?([0-9]*\\.)?\\d+([Ee][+-]?\\d+)?";
+    int res = cregex_compile(&re, pattern);
+    printf("%d: %s\n", res, pattern);
 
-        // extract and convert all numbers in str to floats
-        c_formatch (i, &re, str)
-            cstack_float_push(&vec, (float)atof(i.match[0].str));
+    // extract and convert all numbers in str to floats
+    c_formatch (i, &re, str)
+        cstack_float_push(&vec, (float)atof(i.match[0].str));
 
-        c_foreach (i, cstack_float, vec)
-            printf("  %g\n", *i.ref);
+    c_foreach (i, cstack_float, vec)
+        printf("  %g\n", *i.ref);
 
-        // extracts the numbers only to a comma separated string.
-        nums = cregex_replace_sv(&re, csview_from(str), " $0,", 0, NULL, CREG_R_STRIP);
-        printf("\n%s\n", cstr_str(&nums));
-    }
+    // extracts the numbers only to a comma separated string.
+    cstr nums = cregex_replace_sv(&re, csview_from(str), " $0,", 0, NULL, CREG_R_STRIP);
+    printf("\n%s\n", cstr_str(&nums));
+
+    cstr_drop(&nums);
+    cregex_drop(&re);
+    cstack_float_drop(&vec);
 }

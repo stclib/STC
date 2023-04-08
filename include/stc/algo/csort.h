@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include <stc/ccommon.h>
-#include <stc/priv/template.h>
+#include "../ccommon.h"
+#include "../priv/template.h"
 
 /* Generic Quicksort in C, performs as fast as c++ std::sort().
 template params:
@@ -86,4 +86,4 @@ static inline void c_PASTE(cqsort_, i_tag)(i_val arr[], intptr_t lo, intptr_t hi
 static inline void c_PASTE(csort_, i_tag)(i_val arr[], intptr_t n)
     { c_PASTE(cqsort_, i_tag)(arr, 0, n - 1); }
 
-#include <stc/priv/template.h>
+#include "../priv/template2.h"

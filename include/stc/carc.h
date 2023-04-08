@@ -90,7 +90,7 @@ typedef i_keyraw _cx_raw;
   #define _i_atomic_inc(v)          (void)(++*(v))
   #define _i_atomic_dec_and_test(v) !(--*(v))
 #endif
-#if !c_option(c_is_forward)
+#ifndef i_is_forward
 _cx_deftypes(_c_carc_types, _cx_self, i_key);
 #endif
 struct _cx_memb(_rep_) { catomic_long counter; i_key value; };
@@ -177,8 +177,8 @@ STC_INLINE void _cx_memb(_assign)(_cx_self* self, _cx_self ptr) {
 STC_INLINE int _cx_memb(_raw_cmp)(const _cx_raw* rx, const _cx_raw* ry)
     { return i_cmp(rx, ry); }
 
-STC_INLINE int _cx_memb(_cmp)(const _cx_self* x, const _cx_self* y) {
-    _cx_raw rx = i_keyto(x->get), ry = i_keyto(y->get);
+STC_INLINE int _cx_memb(_cmp)(const _cx_self* self, const _cx_self* other) {
+    _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
     return i_cmp((&rx), (&ry));
 }
 #endif
@@ -187,27 +187,27 @@ STC_INLINE int _cx_memb(_cmp)(const _cx_self* x, const _cx_self* y) {
 STC_INLINE bool _cx_memb(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
     { return i_eq(rx, ry); }
 
-STC_INLINE bool _cx_memb(_eq)(const _cx_self* x, const _cx_self* y) {
-    _cx_raw rx = i_keyto(x->get), ry = i_keyto(y->get);
+STC_INLINE bool _cx_memb(_eq)(const _cx_self* self, const _cx_self* other) {
+    _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
     return i_eq((&rx), (&ry));
 }
 #elif !defined i_no_cmp
 STC_INLINE bool _cx_memb(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
     { return i_cmp(rx, ry) == 0; }
 
-STC_INLINE bool _cx_memb(_eq)(const _cx_self* x, const _cx_self* y)
-    { return _cx_memb(_cmp)(x, y) == 0; }
+STC_INLINE bool _cx_memb(_eq)(const _cx_self* self, const _cx_self* other)
+    { return _cx_memb(_cmp)(self, other) == 0; }
 #endif
 
 #ifndef i_no_hash
 STC_INLINE uint64_t _cx_memb(_raw_hash)(const _cx_raw* rx)
     { return i_hash(rx); }
 
-STC_INLINE uint64_t _cx_memb(_hash)(const _cx_self* x)
-    { _cx_raw rx = i_keyto(x->get); return i_hash((&rx)); }
+STC_INLINE uint64_t _cx_memb(_hash)(const _cx_self* self)
+    { _cx_raw rx = i_keyto(self->get); return i_hash((&rx)); }
 #endif
 
 #undef _i_eq
 #undef _i_atomic_inc
 #undef _i_atomic_dec_and_test
-#include "priv/template.h"
+#include "priv/template2.h"

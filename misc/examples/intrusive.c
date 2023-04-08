@@ -1,55 +1,32 @@
-// Example of intrusive/shared list-nodes by using the node API.
+// Example of clist using the node API.
 
 #include <stdio.h> 
 
-#define i_type Inner
+#define i_type List
 #define i_val int
-#define i_extern // implement Inner_sort()
 #include <stc/clist.h> 
 
-#define i_type Outer
-#define i_val Inner_node
-#define i_opt c_no_cmp // no elem. comparison
-#include <stc/clist.h>
-
-void printLists(Inner inner, Outer outer) {
-        printf("  inner:");
-        c_foreach (i, Inner, inner)
-            printf(" %d", *i.ref);
-
-        printf("\n  outer:");
-        c_foreach (i, Outer, outer)
-            printf(" %d", i.ref->value);
-        puts("");
+void printList(List list) {
+    printf("list:");
+    c_foreach (i, List, list)
+        printf(" %d", *i.ref);
+    puts("");
 }
 
-int main()
-{
-    c_auto (Outer, outer)
-    {
-        Inner inner = Inner_init(); // do not destroy, outer will destroy the shared nodes.
+int main() {
+    List list = {0};
+    c_forlist (i, int, {6, 9, 3, 1, 7, 4, 5, 2, 8})
+        List_push_back_node(&list, c_new(List_node, {0, *i.ref}));
 
-        c_forlist (i, int, {6, 9, 3, 1, 7, 4, 5, 2, 8}) {
-            Inner_node* node = Outer_push_back(&outer, (Inner_node){0});
-            node->value = *i.ref;
-        }
+    printList(list);
 
-        c_foreach (i, Outer, outer)
-            Inner_push_back_node(&inner, i.ref);
+    puts("Sort list");
+    List_sort(&list);
+    printList(list);
 
-        printLists(inner, outer);
+    puts("Remove nodes from list");
+    while (!List_empty(&list))
+        c_free(List_unlink_after_node(&list, list.last));
 
-        puts("Sort inner");
-        Inner_sort(&inner);
-
-        printLists(inner, outer);
-
-        puts("Remove odd numbers from inner list");
-
-        c_foreach (i, Inner, inner)
-            if (*i.ref & 1)
-                Inner_unlink_after_node(&inner, i.prev);
-
-        printLists(inner, outer);
-    }
+    printList(list);
 }

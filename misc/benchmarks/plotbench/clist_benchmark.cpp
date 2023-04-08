@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #define i_static
-#include <stc/crandom.h>
+#include <stc/crand.h>
 
 #ifdef __cplusplus
 #include <forward_list>
@@ -12,7 +12,7 @@ enum {INSERT, ERASE, FIND, ITER, DESTRUCT, N_TESTS};
 const char* operations[] = {"insert", "erase", "find", "iter", "destruct"};
 typedef struct { time_t t1, t2; uint64_t sum; float fac; } Range;
 typedef struct { const char* name; Range test[N_TESTS]; } Sample;
-enum {SAMPLES = 2, N = 50000000, S = 0x3ffc, R = 4};
+enum {SAMPLES = 2, N = 10000000, S = 0x3ffc, R = 4};
 uint64_t seed = 1, mask1 = 0xfffffff, mask2 = 0xffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
@@ -28,9 +28,9 @@ Sample test_std_forward_list() {
     {
         s.test[INSERT].t1 = clock();
         container con;
-        csrandom(seed);
-        c_forrange (N/2) con.push_front(crandom() & mask1);
-        c_forrange (N/2) con.push_front(crandom() & mask1);
+        csrand(seed);
+        c_forrange (N/2) con.push_front(crand() & mask1);
+        c_forrange (N/2) con.push_front(crand() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = 0;
         s.test[ERASE].t1 = clock();
@@ -39,13 +39,13 @@ Sample test_std_forward_list() {
         s.test[ERASE].sum = 0;
      }{
         container con;
-        csrandom(seed);
-        c_forrange (N) con.push_front(crandom() & mask2);
+        csrand(seed);
+        c_forrange (N) con.push_front(crand() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         container::iterator it;
         // Iteration - not inherent find - skipping
-        //c_forrange (S) if ((it = std::find(con.begin(), con.end(), crandom() & mask2)) != con.end()) sum += *it;
+        //c_forrange (S) if ((it = std::find(con.begin(), con.end(), crand() & mask2)) != con.end()) sum += *it;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
@@ -70,9 +70,9 @@ Sample test_stc_forward_list() {
     {
         s.test[INSERT].t1 = clock();
         container con = clist_x_init();
-        csrandom(seed);
-        c_forrange (N/2) clist_x_push_front(&con, crandom() & mask1);
-        c_forrange (N/2) clist_x_push_back(&con, crandom() & mask1);
+        csrand(seed);
+        c_forrange (N/2) clist_x_push_front(&con, crand() & mask1);
+        c_forrange (N/2) clist_x_push_back(&con, crand() & mask1);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = 0;
         s.test[ERASE].t1 = clock();
@@ -81,13 +81,13 @@ Sample test_stc_forward_list() {
         s.test[ERASE].sum = 0;
         clist_x_drop(&con);
      }{
-        csrandom(seed);
+        csrand(seed);
         container con = clist_x_init();
-        c_forrange (N) clist_x_push_front(&con, crandom() & mask2);
+        c_forrange (N) clist_x_push_front(&con, crand() & mask2);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         //clist_x_iter it, end = clist_x_end(&con);
-        //c_forrange (S) if ((it = clist_x_find(&con, crandom() & mask2)).ref != end.ref) sum += *it.ref;
+        //c_forrange (S) if ((it = clist_x_find(&con, crand() & mask2)).ref != end.ref) sum += *it.ref;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();

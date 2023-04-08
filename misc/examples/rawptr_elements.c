@@ -2,54 +2,58 @@
 #include <stdio.h>
 
 #include <stc/cstr.h>
-// Map of cstr => int64 pointers
-typedef int64_t inttype;
 
-// Do it without cbox:
+// Create cmap of cstr => long*
 #define i_type SIPtrMap
 #define i_key_str
-#define i_val inttype*
-#define i_valraw inttype
-#define i_valfrom(raw) c_new(inttype, raw)
+#define i_val long*
+#define i_valraw long
+#define i_valfrom(raw) c_new(long, raw)
 #define i_valto(x) **x
-#define i_valclone(x) c_new(inttype, *x)
+#define i_valclone(x) c_new(long, *x)
 #define i_valdrop(x) c_free(*x)
 #include <stc/cmap.h>
 
-// With cbox:
+// Alternatively, using cbox:
 #define i_type IBox
-#define i_val int
-#include <stc/cbox.h> //<stc/carc.h>
+#define i_val long
+#include <stc/cbox.h> // unique_ptr<long> alike.
 
+// cmap of cstr => IBox
 #define i_type SIBoxMap
 #define i_key_str
-#define i_valboxed IBox
+#define i_valboxed IBox // i_valboxed: use properties from IBox automatically
 #include <stc/cmap.h>
 
 int main()
 {
-    c_auto (SIPtrMap, map, m1)
-    c_auto (SIBoxMap, m2)
-    {
-        printf("\nMap with pointer elements:\n");
-        SIPtrMap_insert(&map, cstr_from("testing"), c_new(inttype, 1));
-        SIPtrMap_insert(&map, cstr_from("done"), c_new(inttype, 2));
+    // These have the same behaviour, except IBox has a get member:
+    SIPtrMap map1 = {0};
+    SIBoxMap map2 = {0};
 
-        // Emplace: implicit key, val construction:
-        SIPtrMap_emplace(&map, "hello", 3);
-        SIPtrMap_emplace(&map, "goodbye", 4);
+    printf("\nMap cstr => long*:\n");
+    SIPtrMap_insert(&map1, cstr_from("Test1"), c_new(long, 1));
+    SIPtrMap_insert(&map1, cstr_from("Test2"), c_new(long, 2));
+    
+    // Emplace implicitly creates cstr from const char* and an owned long* from long!
+    SIPtrMap_emplace(&map1, "Test3", 3);
+    SIPtrMap_emplace(&map1, "Test4", 4);
 
-        m1 = SIPtrMap_clone(map);
+    c_forpair (name, number, SIPtrMap, map1)
+        printf("%s: %ld\n", cstr_str(_.name), **_.number);
 
-        c_forpair (name, number, SIPtrMap, m1)
-            printf("%s: %" PRId64 "\n", cstr_str(_.name), **_.number);
+    puts("\nMap cstr => IBox:");
+    SIBoxMap_insert(&map2, cstr_from("Test1"), IBox_make(1));
+    SIBoxMap_insert(&map2, cstr_from("Test2"), IBox_make(2));
+    
+    // Emplace implicitly creates cstr from const char* and IBox from long!
+    SIBoxMap_emplace(&map2, "Test3", 3);
+    SIBoxMap_emplace(&map2, "Test4", 4);
 
+    c_forpair (name, number, SIBoxMap, map2)
+        printf("%s: %ld\n", cstr_str(_.name), *_.number->get);
+    puts("");
 
-        puts("\nIBox map:");
-        SIBoxMap_insert(&m2, cstr_from("Hello"), IBox_make(123));
-        SIBoxMap_emplace(&m2, "World", 999);
-        c_forpair (name, number, SIBoxMap, m2)
-            printf("%s: %d\n", cstr_str(_.name), *_.number->get);
-        puts("");
-    }
+    SIPtrMap_drop(&map1);
+    SIBoxMap_drop(&map2);
 }

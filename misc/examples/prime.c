@@ -30,24 +30,25 @@ int main(void)
     printf("Computing prime numbers up to %" c_ZI "\n", n);
 
     clock_t t1 = clock();
-    c_with (cbits primes = sieveOfEratosthenes(n + 1), cbits_drop(&primes)) {
-        int64_t np = cbits_count(&primes);
-        clock_t t2 = clock();
+    cbits primes = sieveOfEratosthenes(n + 1);
+    int64_t np = cbits_count(&primes);
+    clock_t t2 = clock();
 
-        printf("Number of primes: %" c_ZI ", time: %f\n\n", np, (float)(t2 - t1) / (float)CLOCKS_PER_SEC);
-        puts("Show all the primes in the range [2, 1000):");
-        printf("2");
-        c_forrange (i, 3, 1000, 2)
-            if (cbits_test(&primes, i>>1)) printf(" %lld", i);
-        puts("\n");
+    printf("Number of primes: %" c_ZI ", time: %f\n\n", np, (float)(t2 - t1) / (float)CLOCKS_PER_SEC);
+    puts("Show all the primes in the range [2, 1000):");
+    printf("2");
+    c_forrange (i, 3, 1000, 2)
+        if (cbits_test(&primes, i>>1)) printf(" %lld", i);
+    puts("\n");
 
-        puts("Show the last 50 primes using a temporary crange generator:");
-        crange R = crange_make(n - 1, 0, -2);
-        c_forfilter (i, crange, R,
-                        cbits_test(&primes, *i.ref>>1) &&
-                        c_flt_take(i, 50)) {
-            printf("%lld ", *i.ref);
-            if (c_flt_last(i) % 10 == 0) puts("");
-        }
+    puts("Show the last 50 primes using a temporary crange generator:");
+    c_forfilter (i, crange, crange_obj(n - 1, 0, -2),
+        cbits_test(&primes, *i.ref/2) &&
+        c_flt_take(i, 50)
+    ){
+        printf("%lld ", *i.ref);
+        if (c_flt_getcount(i) % 10 == 0) puts("");
     }
+
+    cbits_drop(&primes);
 }

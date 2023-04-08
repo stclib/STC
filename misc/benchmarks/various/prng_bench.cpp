@@ -2,7 +2,7 @@
 #include <iostream>
 #include <ctime>
 #include <random>
-#include <stc/crandom.h>
+#include <stc/crand.h>
 
 static inline uint64_t rotl64(const uint64_t x, const int k)
   { return (x << k) | (x >> (64 - k)); }
@@ -122,9 +122,9 @@ using namespace std;
 
 int main(void)
 {
-    enum {N = 2000000000};
+    enum {N = 500000000};
     uint16_t* recipient = new uint16_t[N];
-    static stc64_t rng;
+    static crand_t rng;
     init_state(rng.state, 12345123);
     std::mt19937 mt(12345123);
 
@@ -187,7 +187,7 @@ int main(void)
 
         beg = clock();
         for (size_t i = 0; i < N; i++)
-            recipient[i] = stc64_rand(&rng);
+            recipient[i] = crand_u64(&rng);
         end = clock();
         cout << "stc64:\t\t"
              << (float(end - beg) / CLOCKS_PER_SEC)

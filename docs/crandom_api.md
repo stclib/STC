@@ -1,4 +1,4 @@
-# STC [crandom](../include/stc/crandom.h): Pseudo Random Number Generator
+# STC [crand](../include/stc/crand.h): Pseudo Random Number Generator
 ![Random](pics/random.jpg)
 
 This features a *64-bit PRNG* named **stc64**, and can generate bounded uniform and normal
@@ -33,45 +33,40 @@ xoshiro and pcg (Vigna/O'Neill) PRNGs: https://www.pcg-random.org/posts/on-vigna
 
 ## Header file
 
-All crandom definitions and prototypes are available by including a single header file.
+All crand definitions and prototypes are available by including a single header file.
 ```c
-#include <stc/crandom.h>
+#include <stc/crand.h>
 ```
 
 ## Methods
 
 ```c
-void                csrandom(uint64_t seed);                                // seed global stc64 prng
-uint64_t            crandom(void);                                          // global stc64_rand(rng)
-double              crandomf(void);                                         // global stc64_randf(rng)
+void                csrand(uint64_t seed);                                // seed global stc64 prng
+uint64_t            crand(void);                                          // global crand_u64(rng)
+double              crandf(void);                                         // global crand_f64(rng)
 
-stc64_t             stc64_new(uint64_t seed);                               // stc64_init(s) is deprecated
-stc64_t             stc64_with_seq(uint64_t seed, uint64_t seq);            // with unique stream
+crand_t             crand_init(uint64_t seed);                            // stc64_init(s) is deprecated
+uint64_t            crand_u64(crand_t* rng);                              // range [0, 2^64 - 1]
+double              crand_f64(crand_t* rng);                              // range [0.0, 1.0)
 
-uint64_t            stc64_rand(stc64_t* rng);                               // range [0, 2^64 - 1]
-double              stc64_randf(stc64_t* rng);                              // range [0.0, 1.0)
+crand_unif_t        crand_unif_init(int64_t low, int64_t high);           // uniform-distribution
+int64_t             crand_unif(crand_t* rng, crand_unif_t* dist);         // range [low, high]
 
-stc64_uniform_t     stc64_uniform_new(int64_t low, int64_t high);           // uniform-distribution
-int64_t             stc64_uniform(stc64_t* rng, stc64_uniform_t* dist);     // range [low, high]
-stc64_uniformf_t    stc64_uniformf_new(double lowf, double highf);
-double              stc64_uniformf(stc64_t* rng, stc64_uniformf_t* dist);   // range [lowf, highf)
-
-stc64_normalf_t     stc64_normalf_new(double mean, double stddev);          // normal-distribution
-double              stc64_normalf(stc64_t* rng, stc64_normalf_t* dist);
+crand_norm_t        crand_norm_init(double mean, double stddev);          // normal-distribution
+double              crand_norm(crand_t* rng, crand_norm_t* dist);
 ```
 ## Types
 
 | Name               | Type definition                           | Used to represent...         |
 |:-------------------|:------------------------------------------|:-----------------------------|
-| `stc64_t`          | `struct {uint64_t state[4];}`             | The PRNG engine type         |
-| `stc64_uniform_t`  | `struct {int64_t lower; uint64_t range;}` | Integer uniform distribution |
-| `stc64_uniformf_t` | `struct {double lower, range;}`           | Real number uniform distr.   |
-| `stc64_normalf_t`  | `struct {double mean, stddev;}`           | Normal distribution type     |
+| `crand_t`          | `struct {uint64_t state[4];}`             | The PRNG engine type         |
+| `crand_unif_t`     | `struct {int64_t lower; uint64_t range;}` | Integer uniform distribution |
+| `crand_norm_t`     | `struct {double mean, stddev;}`           | Normal distribution type     |
 
 ## Example
 ```c
 #include <time.h>
-#include <stc/crandom.h>
+#include <stc/crand.h>
 #include <stc/cstr.h>
 
 // Declare int -> int sorted map. Uses typetag 'i' for ints.
@@ -89,13 +84,13 @@ int main()
 
     // Setup random engine with normal distribution.
     uint64_t seed = time(NULL);
-    stc64_t rng = stc64_new(seed);
-    stc64_normalf_t dist = stc64_normalf_new(Mean, StdDev);
+    crand_t rng = crand_init(seed);
+    crand_norm_t dist = crand_norm_init(Mean, StdDev);
 
     // Create histogram map
     csmap_i mhist = csmap_i_init();
     c_forrange (N) {
-        int index = (int) round( stc64_normalf(&rng, &dist) );
+        int index = (int)round(crand_norm(&rng, &dist));
         csmap_i_emplace(&mhist, index, 0).ref->second += 1;
     }
 

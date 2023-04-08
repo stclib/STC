@@ -39,7 +39,7 @@ struct MyStruct {
 #include <stc/cvec.h>
 
 #define i_key int
-#define i_opt c_is_forward // forward declared
+#define i_is_forward // forward declared
 #define i_tag i32
 #include <stc/cvec.h>
 
@@ -73,7 +73,7 @@ int main() {
 #endif
 #include "priv/template.h"
 
-#if !c_option(c_is_forward)
+#ifndef i_is_forward
    _cx_deftypes(_c_cvec_types, _cx_self, i_key);
 #endif
 typedef i_keyraw _cx_raw;
@@ -234,11 +234,10 @@ _cx_memb(_get_mut)(const _cx_self* self, _cx_raw raw)
     { return (_cx_value*) _cx_memb(_get)(self, raw); }
 
 STC_INLINE bool
-_cx_memb(_eq)(const _cx_self* x, const _cx_self* y) {
-    if (x->_len != y->_len) return false;
-    _cx_iter i = _cx_memb(_begin)(x), j = _cx_memb(_begin)(y);
-    for (; i.ref; _cx_memb(_next)(&i), _cx_memb(_next)(&j)) {
-        const _cx_raw _rx = i_keyto(i.ref), _ry = i_keyto(j.ref);
+_cx_memb(_eq)(const _cx_self* self, const _cx_self* other) {
+    if (self->_len != other->_len) return false;
+    for (intptr_t i = 0; i < self->_len; ++i) {
+        const _cx_raw _rx = i_keyto(self->data+i), _ry = i_keyto(other->data+i);
         if (!(i_eq((&_rx), (&_ry)))) return false;
     }
     return true;
@@ -439,4 +438,4 @@ STC_DEF int _cx_memb(_value_cmp)(const _cx_value* x, const _cx_value* y) {
 #endif // !c_no_cmp
 #endif // i_implement
 #define CVEC_H_INCLUDED
-#include "priv/template.h"
+#include "priv/template2.h"

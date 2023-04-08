@@ -22,36 +22,37 @@ void int_drop(int* x) {
 
 int main()
 {
-    c_auto (cvec_Arc, vec)   // declare and init vec, call cvec_Arc_drop() at scope exit
-    c_auto (csset_Arc, set)  // declare and init set, call csset_Arc_drop() at scope exit
-    {
-        const int years[] = {2021, 2012, 2022, 2015};
-        c_forrange (i, c_ARRAYLEN(years))
-            cvec_Arc_push(&vec, Arc_from(years[i]));
+    const int years[] = {2021, 2012, 2022, 2015};
 
-        printf("vec:");
-        c_foreach (i, cvec_Arc, vec) printf(" %d", *i.ref->get);
-        puts("");
+    cvec_Arc vec = {0};
+    c_forrange (i, c_arraylen(years))
+        cvec_Arc_push(&vec, Arc_from(years[i]));
 
-        // add odd numbers from vec to set
-        c_foreach (i, cvec_Arc, vec)
-            if (*i.ref->get & 1)
-                csset_Arc_insert(&set, Arc_clone(*i.ref)); // copy shared pointer => increments counter.
+    printf("vec:");
+    c_foreach (i, cvec_Arc, vec)
+        printf(" %d", *i.ref->get);
+    puts("");
 
-        // erase the two last elements in vec
-        cvec_Arc_pop_back(&vec);
-        cvec_Arc_pop_back(&vec);
+    // add odd numbers from vec to set
+    csset_Arc set = {0};
+    c_foreach (i, cvec_Arc, vec)
+        if (*i.ref->get & 1)
+            csset_Arc_insert(&set, Arc_clone(*i.ref)); // copy shared pointer => increments counter.
 
-        printf("vec:");
-        c_foreach (i, cvec_Arc, vec) printf(" %d", *i.ref->get);
+    // erase the two last elements in vec
+    cvec_Arc_pop_back(&vec);
+    cvec_Arc_pop_back(&vec);
 
-        printf("\nset:");
-        c_foreach (i, csset_Arc, set) printf(" %d", *i.ref->get);
+    printf("vec:");
+    c_foreach (i, cvec_Arc, vec) printf(" %d", *i.ref->get);
 
-        c_with (Arc p = Arc_clone(vec.data[0]), Arc_drop(&p)) {
-            printf("\n%d is now owned by %ld objects\n", *p.get, *p.use_count);
-        }
+    printf("\nset:");
+    c_foreach (i, csset_Arc, set) printf(" %d", *i.ref->get);
 
-        puts("\nDone");
-    }
+    Arc p = Arc_clone(vec.data[0]);
+    printf("\n%d is now owned by %ld objects\n", *p.get, *p.use_count);
+
+    Arc_drop(&p);
+    cvec_Arc_drop(&vec);
+    csset_Arc_drop(&set);
 }

@@ -31,16 +31,20 @@ uint64_t Person_hash(const Person* p);
 Person Person_make(const char* name, const char* last) {
     return (Person){.name = cstr_from(name), .last = cstr_from(last)};
 }
+
 int Person_cmp(const Person* a, const Person* b) {
     return cstr_cmp(&a->name, &b->name);
 }
+
 uint64_t Person_hash(const Person* p) {
     return cstr_hash(&p->name);
 }
+
 Person Person_clone(Person p) {
     p.name = cstr_clone(p.name), p.last = cstr_clone(p.last);
     return p;
 }
+
 void Person_drop(Person* p) {
     printf("drop: %s %s\n", cstr_str(&p->name), cstr_str(&p->last));
     c_drop(cstr, &p->name, &p->last);
@@ -48,26 +52,24 @@ void Person_drop(Person* p) {
 
 
 int main(void) {
-    c_auto (PersonArc, p, q, r, s)
-    {
-        puts("Ex1");
-        p = PersonArc_from(Person_make("John", "Smiths"));
-        q = PersonArc_clone(p); // share
-        r = PersonArc_clone(p);
-        s = PersonArc_from(Person_clone(*p.get)); // deep copy
-        printf("%s %s: refs %ld\n", cstr_str(&p.get->name), cstr_str(&p.get->last), *p.use_count);
-    }
-    c_auto (IPStack, vec)
-    {
-        puts("Ex2");
-        IPStack_push(&vec, IPtr_from(10));
-        IPStack_push(&vec, IPtr_from(20));
-        IPStack_emplace(&vec, 30); // same as IPStack_push(&vec, IPtr_from(30));
-        IPStack_push(&vec, IPtr_clone(*IPStack_back(&vec)));
-        IPStack_push(&vec, IPtr_clone(*IPStack_front(&vec)));
+    puts("Ex1");
+    PersonArc p = PersonArc_from(Person_make("John", "Smiths"));
+    PersonArc q = PersonArc_clone(p); // share
+    PersonArc r = PersonArc_clone(p);
+    PersonArc s = PersonArc_from(Person_clone(*p.get)); // deep copy
+    printf("%s %s: refs %ld\n", cstr_str(&p.get->name), cstr_str(&p.get->last), *p.use_count);
+    c_drop(PersonArc, &p, &q, &r, &s);
 
-        c_foreach (i, IPStack, vec)
-            printf(" (%d: refs %ld)", *i.ref->get, *i.ref->use_count);
-        puts("");
-    }
+    puts("Ex2");
+    IPStack vec = {0};
+    IPStack_push(&vec, IPtr_from(10));
+    IPStack_push(&vec, IPtr_from(20));
+    IPStack_emplace(&vec, 30); // same as IPStack_push(&vec, IPtr_from(30));
+    IPStack_push(&vec, IPtr_clone(*IPStack_back(&vec)));
+    IPStack_push(&vec, IPtr_clone(*IPStack_front(&vec)));
+
+    c_foreach (i, IPStack, vec)
+        printf(" (%d: refs %ld)", *i.ref->get, *i.ref->use_count);
+    puts("");
+    IPStack_drop(&vec);
 }

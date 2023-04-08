@@ -26,7 +26,7 @@
     it also support both push_back() and push_front(), unlike std::forward_list:
 
     #include <stdio.h>
-    #include <stc/crandom.h>
+    #include <stc/crand.h>
 
     #define i_key int64_t
     #define i_tag ix
@@ -38,7 +38,7 @@
         {
             int n;
             for (int i = 0; i < 1000000; ++i) // one million
-                clist_ix_push_back(&list, crandom() >> 32);
+                clist_ix_push_back(&list, crand() >> 32);
             n = 0;
             c_foreach (i, clist_ix, list)
                 if (++n % 10000 == 0) printf("%8d: %10zu\n", n, *i.ref);
@@ -82,7 +82,7 @@
 #endif
 #include "priv/template.h"
 
-#if !c_option(c_is_forward)
+#ifndef i_is_forward
   _cx_deftypes(_c_clist_types, _cx_self, i_key);
 #endif
 _cx_deftypes(_c_clist_complete_types, _cx_self, dummy);
@@ -204,8 +204,8 @@ _cx_memb(_get_mut)(_cx_self* self, _cx_raw val) {
     return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), val).ref;
 }
 
-STC_INLINE bool _cx_memb(_eq)(const _cx_self* x, const _cx_self* y) {
-    _cx_iter i = _cx_memb(_begin)(x), j = _cx_memb(_begin)(y);
+STC_INLINE bool _cx_memb(_eq)(const _cx_self* self, const _cx_self* other) {
+    _cx_iter i = _cx_memb(_begin)(self), j = _cx_memb(_begin)(other);
     for (; i.ref && j.ref; _cx_memb(_next)(&i), _cx_memb(_next)(&j)) {
         const _cx_raw _rx = i_keyto(i.ref), _ry = i_keyto(j.ref);
         if (!(i_eq((&_rx), (&_ry)))) return false;
@@ -404,4 +404,4 @@ STC_DEF bool _cx_memb(_sort_with)(_cx_self* self, int(*cmp)(const _cx_value*, co
 #endif // !c_no_cmp
 #endif // i_implement
 #define CLIST_H_INCLUDED
-#include "priv/template.h"
+#include "priv/template2.h"

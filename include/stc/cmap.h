@@ -31,20 +31,20 @@
 #include <stc/cmap.h>
 
 int main(void) {
-    c_with (cmap_ichar m = cmap_ichar_init(), cmap_ichar_drop(&m))
-    {
-        cmap_ichar_emplace(&m, 5, 'a');
-        cmap_ichar_emplace(&m, 8, 'b');
-        cmap_ichar_emplace(&m, 12, 'c');
+    cmap_ichar m = {0};
+    cmap_ichar_emplace(&m, 5, 'a');
+    cmap_ichar_emplace(&m, 8, 'b');
+    cmap_ichar_emplace(&m, 12, 'c');
 
-        cmap_ichar_value* v = cmap_ichar_get(&m, 10); // NULL
-        char val = *cmap_ichar_at(&m, 5);               // 'a'
-        cmap_ichar_emplace_or_assign(&m, 5, 'd');       // update
-        cmap_ichar_erase(&m, 8);
+    cmap_ichar_value* v = cmap_ichar_get(&m, 10); // NULL
+    char val = *cmap_ichar_at(&m, 5);               // 'a'
+    cmap_ichar_emplace_or_assign(&m, 5, 'd');       // update
+    cmap_ichar_erase(&m, 8);
 
-        c_foreach (i, cmap_ichar, m)
-            printf("map %d: %c\n", i.ref->first, i.ref->second);
-    }
+    c_foreach (i, cmap_ichar, m)
+        printf("map %d: %c\n", i.ref->first, i.ref->second);
+
+    cmap_ichar_drop(&m);
 }
 */
 #include "ccommon.h"
@@ -82,13 +82,7 @@ typedef struct { int64_t idx; uint8_t hx; } chash_bucket_t;
   #define _i_size i_ssize
 #endif
 #include "priv/template.h"
-#ifndef i_hash_functor
-  #define i_hash_functor(self, x) i_hash(x)
-#endif
-#ifndef i_eq_functor
-  #define i_eq_functor(self, x, y) i_eq(x, y)
-#endif
-#if !c_option(c_is_forward)
+#ifndef i_is_forward
   _cx_deftypes(_c_chash_types, _cx_self, i_key, i_val, i_ssize, _i_MAP_ONLY, _i_SET_ONLY);
 #endif
 
@@ -283,11 +277,11 @@ _cx_memb(_erase_at)(_cx_self* self, _cx_iter it) {
 }
 
 STC_INLINE bool
-_cx_memb(_eq)(const _cx_self* m1, const _cx_self* m2) {
-    if (_cx_memb(_size)(m1) != _cx_memb(_size)(m2)) return false;
-    for (_cx_iter i = _cx_memb(_begin)(m1); i.ref; _cx_memb(_next)(&i)) {
+_cx_memb(_eq)(const _cx_self* self, const _cx_self* other) {
+    if (_cx_memb(_size)(self) != _cx_memb(_size)(other)) return false;
+    for (_cx_iter i = _cx_memb(_begin)(self); i.ref; _cx_memb(_next)(&i)) {
         const _cx_rawkey _raw = i_keyto(_i_keyref(i.ref));
-        if (!_cx_memb(_contains)(m2, _raw)) return false;
+        if (!_cx_memb(_contains)(other, _raw)) return false;
     }
     return true;
 }
@@ -371,14 +365,14 @@ STC_DEF void _cx_memb(_clear)(_cx_self* self) {
 
 STC_DEF chash_bucket_t
 _cx_memb(_bucket_)(const _cx_self* self, const _cx_rawkey* rkeyptr) {
-    const uint64_t _hash = i_hash_functor(self, rkeyptr);
+    const uint64_t _hash = i_hash(rkeyptr);
     int64_t _cap = self->bucket_count;
     chash_bucket_t b = {c_PASTE(fastrange_,_i_expandby)(_hash, (uint64_t)_cap), (uint8_t)(_hash | 0x80)};
     const uint8_t* _hx = self->_hashx;
     while (_hx[b.idx]) {
         if (_hx[b.idx] == b.hx) {
             const _cx_rawkey _raw = i_keyto(_i_keyref(self->table + b.idx));
-            if (i_eq_functor(self, (&_raw), rkeyptr))
+            if (i_eq((&_raw), rkeyptr))
                 break;
         }
         if (++b.idx == _cap)
@@ -469,7 +463,7 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
         if (! _hashx[j])
             break;
         const _cx_rawkey _raw = i_keyto(_i_keyref(_slot + j));
-        k = (i_ssize)c_PASTE(fastrange_,_i_expandby)(i_hash_functor(self, (&_raw)), (uint64_t)_cap);
+        k = (i_ssize)c_PASTE(fastrange_,_i_expandby)(i_hash((&_raw)), (uint64_t)_cap);
         if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */
             _slot[i] = _slot[j], _hashx[i] = _hashx[j], i = j;
     }
@@ -479,8 +473,6 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
 
 #endif // i_implement
 #undef i_max_load_factor
-#undef i_hash_functor
-#undef i_eq_functor
 #undef _i_size
 #undef _i_isset
 #undef _i_ismap
@@ -489,4 +481,4 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY
 #define CMAP_H_INCLUDED
-#include "priv/template.h"
+#include "priv/template2.h"

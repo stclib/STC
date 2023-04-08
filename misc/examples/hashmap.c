@@ -17,32 +17,33 @@ const char* call(const char* number) {
 }
 
 int main(void) {
-    c_auto (cmap_str, contacts)
-    {
-        cmap_str_emplace(&contacts, "Daniel", "798-1364");
-        cmap_str_emplace(&contacts, "Ashley", "645-7689");
-        cmap_str_emplace(&contacts, "Katie", "435-8291");
-        cmap_str_emplace(&contacts, "Robert", "956-1745");
+    cmap_str contacts = {0};
 
-        const cmap_str_value* v;
-        if ((v = cmap_str_get(&contacts, "Daniel")))
-            printf("Calling Daniel: %s\n", call(cstr_str(&v->second)));
-        else
-            printf("Don't have Daniel's number.");
+    cmap_str_emplace(&contacts, "Daniel", "798-1364");
+    cmap_str_emplace(&contacts, "Ashley", "645-7689");
+    cmap_str_emplace(&contacts, "Katie", "435-8291");
+    cmap_str_emplace(&contacts, "Robert", "956-1745");
 
-        cmap_str_emplace_or_assign(&contacts, "Daniel", "164-6743");
+    const cmap_str_value* v;
+    if ((v = cmap_str_get(&contacts, "Daniel")))
+        printf("Calling Daniel: %s\n", call(cstr_str(&v->second)));
+    else
+        printf("Don't have Daniel's number.");
 
-        if ((v = cmap_str_get(&contacts, "Ashley")))
-            printf("Calling Ashley: %s\n", call(cstr_str(&v->second)));
-        else
-            printf("Don't have Ashley's number.");
+    cmap_str_emplace_or_assign(&contacts, "Daniel", "164-6743");
 
-        cmap_str_erase(&contacts, "Ashley");
+    if ((v = cmap_str_get(&contacts, "Ashley")))
+        printf("Calling Ashley: %s\n", call(cstr_str(&v->second)));
+    else
+        printf("Don't have Ashley's number.");
 
-        puts("");
-        c_forpair (contact, number, cmap_str, contacts) {
-            printf("Calling %s: %s\n", cstr_str(_.contact), call(cstr_str(_.number)));
-        }
-        puts("");
+    cmap_str_erase(&contacts, "Ashley");
+
+    puts("");
+    c_forpair (contact, number, cmap_str, contacts) {
+        printf("Calling %s: %s\n", cstr_str(_.contact), call(cstr_str(_.number)));
     }
+    puts("");
+
+    cmap_str_drop(&contacts);
 }

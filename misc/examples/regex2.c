@@ -15,8 +15,8 @@ int main()
         {"\\p{Han}+", "This is Han: 王明：那是杂志吗？"},
     };
 
-    c_auto (cregex, re)
-    c_forrange (i, c_ARRAYLEN(s))
+    cregex re = {0};
+    c_forrange (i, c_arraylen(s))
     {
         int res = cregex_compile(&re, s[i].pattern);
         if (res < 0) {
@@ -30,4 +30,5 @@ int main()
                 printf("  submatch %lld: %.*s\n", k, c_SV(j.match[k]));
         }
     }
+    cregex_drop(&re);
 }

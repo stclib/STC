@@ -30,6 +30,7 @@
 #include <string.h>
 #include <assert.h>
 #include "priv/altnames.h"
+#include "priv/raii.h"
 
 #define c_NPOS INTPTR_MAX
 #define c_ZI PRIiPTR
@@ -81,7 +82,8 @@
 #define c_delete(T, ptr)        do { T *_tp = ptr; T##_drop(_tp); free(_tp); } while (0)
 
 #define c_static_assert(b)      ((int)(0*sizeof(int[(b) ? 1 : -1])))
-#define c_container_of(p, T, m) ((T*)((char*)(p) + 0*sizeof((p) == &((T*)0)->m) - offsetof(T, m)))
+#define c_container_of(p, C, m) ((C*)((char*)(1 ? (p) : &((C*)0)->m) - offsetof(C, m)))
+#define c_const_cast(T, p)      ((T)(p) + 0*sizeof((T)0 == (p)))
 #define c_swap(T, xp, yp)       do { T *_xp = xp, *_yp = yp, \
                                     _tv = *_xp; *_xp = *_yp; *_yp = _tv; } while (0)
 #define c_sizeof                (intptr_t)sizeof
@@ -120,10 +122,13 @@
 #define c_make(C, ...) \
   C##_from_n((C##_raw[])__VA_ARGS__, c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
 
-#define c_arraylen(a) (intptr_t)(sizeof(a)/sizeof 0[a])
 #define c_litstrlen(literal) (c_sizeof("" literal) - 1)
+#define c_arraylen(a) (intptr_t)(sizeof(a)/sizeof 0[a])
 
+// Non-owning c-string
 typedef const char* crawstr;
+#define crawstr_clone(s) (s)
+#define crawstr_drop(p) ((void)p)
 #define crawstr_cmp(xp, yp) strcmp(*(xp), *(yp))
 #define crawstr_hash(p) cstrhash(*(p))
 
@@ -132,24 +137,23 @@ typedef const char* crawstr;
 #define c_sv_2(str, n) (c_LITERAL(csview){str, n})
 
 #define c_SV(sv) (int)(sv).size, (sv).str // print csview: use format "%.*s"
-#define c_PAIR(ref) (ref)->first, (ref)->second
 #define c_ROTL(x, k) (x << (k) | x >> (8*sizeof(x) - (k)))
 
 STC_INLINE uint64_t cfasthash(const void* key, intptr_t len) {
-    const uint8_t *x = (const uint8_t*) key;
-    uint64_t u8, h = 1; intptr_t n = len >> 3;
-    uint32_t u4;
+    uint32_t u4; uint64_t u8;
+    switch (len) {
+        case 8: memcpy(&u8, key, 8); return u8*0xc6a4a7935bd1e99d;
+        case 4: memcpy(&u4, key, 4); return u4*0xc6a4a7935bd1e99d;
+        case 0: return 1;
+    }
+    const uint8_t *x = (const uint8_t*)key;
+    uint64_t h = *x, n = (uint64_t)len >> 3;
+    len &= 7;
     while (n--) {
         memcpy(&u8, x, 8), x += 8;
-        h += (c_ROTL(u8, 26) ^ u8)*0xc6a4a7935bd1e99d;
+        h += u8*0xc6a4a7935bd1e99d;
     }
-    switch (len &= 7) {
-        case 0: return h;
-        case 4: memcpy(&u4, x, 4);
-                return h + u4*0xc6a4a7935bd1e99d;
-    }
-    h += *x++;
-    while (--len) h = (h << 10) - h + *x++;
+    while (len--) h = (h << 10) - h - *x++;
     return c_ROTL(h, 26) ^ h;
 }
 
@@ -178,7 +182,7 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
     for (C##_iter it = start, *_endref = (C##_iter*)(finish).ref \
          ; it.ref != (C##_value*)_endref; C##_next(&it))
 
-#define c_foreach_r(it, C, cnt) \
+#define c_foreach_rv(it, C, cnt) \
     for (C##_iter it = {.ref=C##_end(&cnt).end - 1, .end=(cnt).data - 1} \
          ; it.ref != it.end; --it.ref)
 
@@ -195,6 +199,7 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
 #define c_forrange_4(i, start, stop, step) \
     for (long long i=start, _inc=step, _end=(long long)(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)
+
 #ifndef __cplusplus
   #define c_forlist(it, T, ...) \
     for (struct {T* ref; int size, index;} \
@@ -207,26 +212,6 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
          it = {._il=__VA_ARGS__, .data=it._il.begin(), .ref=it.data, .size=it._il.size()} \
          ; it.index < it.size; ++it.ref, ++it.index)
 #endif
-#define c_with(...) c_MACRO_OVERLOAD(c_with, __VA_ARGS__)
-#define c_with_2(declvar, drop) for (declvar, *_i, **_ip = &_i; _ip; _ip = 0, drop)
-#define c_with_3(declvar, pred, drop) for (declvar, *_i, **_ip = &_i; _ip && (pred); _ip = 0, drop)
-#define c_scope(...) c_MACRO_OVERLOAD(c_scope, __VA_ARGS__)
-#define c_scope_2(init, drop) for (int _i = (init, 1); _i; _i = 0, drop)
-#define c_scope_3(init, pred, drop) for (int _i = (init, 1); _i && (pred); _i = 0, drop)
-#define c_defer(...) for (int _i = 1; _i; _i = 0, __VA_ARGS__)
-
-#define c_auto(...) c_MACRO_OVERLOAD(c_auto, __VA_ARGS__)
-#define c_auto_2(C, a) \
-    c_with_2(C a = C##_init(), C##_drop(&a))
-#define c_auto_3(C, a, b) \
-    c_with_2(c_EXPAND(C a = C##_init(), b = C##_init()), \
-            (C##_drop(&b), C##_drop(&a)))
-#define c_auto_4(C, a, b, c) \
-    c_with_2(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init()), \
-            (C##_drop(&c), C##_drop(&b), C##_drop(&a)))
-#define c_auto_5(C, a, b, c, d) \
-    c_with_2(c_EXPAND(C a = C##_init(), b = C##_init(), c = C##_init(), d = C##_init()), \
-            (C##_drop(&d), C##_drop(&c), C##_drop(&b), C##_drop(&a)))
 
 #define c_drop(C, ...) \
     do { c_forlist (_i, C*, {__VA_ARGS__}) C##_drop(*_i.ref); } while(0)

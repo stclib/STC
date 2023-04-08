@@ -142,7 +142,7 @@ bool utf8_isalpha(uint32_t c) {
     static int16_t groups[] = {U8G_Latin, U8G_Nl, U8G_Greek, U8G_Cyrillic,
                                U8G_Han, U8G_Devanagari, U8G_Arabic};
     if (c < 128) return isalpha((int)c) != 0;
-    for (int j=0; j < c_ARRAYLEN(groups); ++j)
+    for (int j=0; j < c_arraylen(groups); ++j)
         if (utf8_isgroup(groups[j], c))
             return true;
     return false;

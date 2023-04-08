@@ -20,12 +20,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifndef _i_template
+#ifdef _i_template
+  #error template.h already included
+#endif
 #define _i_template
 
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
-  #define _cx_self c_PASTE(_i_prefix, i_tag)
+  #define _cx_self i_type
   #define _cx_memb(name) c_PASTE(_cx_self, name)
   #define _cx_deftypes(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
   #define _cx_value _cx_memb(_value)
@@ -38,10 +40,8 @@
   #define _cx_node _cx_memb(_node)
 #endif
 
-#ifdef i_type
-  #define i_tag i_type
-  #undef _i_prefix
-  #define _i_prefix
+#ifndef i_type
+  #define i_type c_PASTE(_i_prefix, i_tag)
 #endif
 
 #ifndef i_ssize
@@ -96,6 +96,9 @@
   #endif
 #endif
 
+#if c_option(c_is_forward)
+  #define i_is_forward
+#endif
 #if c_option(c_no_cmp)
   #define i_no_cmp
 #endif
@@ -288,63 +291,4 @@
 #endif
 #ifndef _i_has_from
   #define i_no_emplace
-#endif
-
-#else // ============================================================
-
-#undef i_type
-#undef i_tag
-#undef i_imp
-#undef i_opt
-#undef i_less
-#undef i_cmp
-#undef i_eq
-#undef i_hash
-#undef i_rawclass
-#undef i_capacity
-#undef i_ssize
-
-#undef i_val
-#undef i_val_str
-#undef i_val_ssv
-#undef i_valboxed
-#undef i_valclass
-#undef i_valraw
-#undef i_valclone
-#undef i_valfrom
-#undef i_valto
-#undef i_valdrop
-
-#undef i_key
-#undef i_key_str
-#undef i_key_ssv
-#undef i_keyboxed
-#undef i_keyclass
-#undef i_keyraw
-#undef i_keyclone
-#undef i_keyfrom
-#undef i_keyto
-#undef i_keydrop
-
-#undef i_header
-#undef i_implement
-#undef i_static
-#undef i_extern
-
-#undef i_allocator
-#undef i_malloc
-#undef i_calloc
-#undef i_realloc
-#undef i_free
-
-#undef i_no_cmp
-#undef i_no_hash
-#undef i_no_clone
-#undef i_no_emplace
-
-#undef _i_prefix
-#undef _i_expandby
-#undef _i_has_from
-#undef _i_has_eq
-#undef _i_template
 #endif

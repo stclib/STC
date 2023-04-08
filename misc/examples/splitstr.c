@@ -10,10 +10,11 @@ int main()
     c_fortoken (i, "Hello World C99!", " ")
         printf("'%.*s'\n", c_SV(i.token));
 
-
     puts("\nSplit with c_formatch (regex):");
 
-    c_with (cregex re = cregex_from("[^ ]+"), cregex_drop(&re))
-        c_formatch (i, &re, "  Hello   World      C99! ")
-            printf("'%.*s'\n", c_SV(i.match[0]));
+    cregex re = cregex_from("[^ ]+");
+    c_formatch (i, &re, "  Hello   World      C99! ")
+        printf("'%.*s'\n", c_SV(i.match[0]));
+
+    cregex_drop(&re);
 }

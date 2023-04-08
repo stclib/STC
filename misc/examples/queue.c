@@ -1,4 +1,4 @@
-#include <stc/crandom.h>
+#include <stc/crand.h>
 #include <stdio.h>
 
 #define i_val int
@@ -7,25 +7,26 @@
 
 int main() {
     int n = 100000000;
-    stc64_uniform_t dist;
-    stc64_t rng = stc64_new(1234);
-    dist = stc64_uniform_new(0, n);
+    crand_unif_t dist;
+    crand_t rng = crand_init(1234);
+    dist = crand_unif_init(0, n);
 
-    c_auto (cqueue_i, queue)
-    {
-        // Push ten million random numbers onto the queue.
-        c_forrange (n)
-            cqueue_i_push(&queue, (int)stc64_uniform(&rng, &dist));
+    cqueue_i queue = {0};
 
-        // Push or pop on the queue ten million times
-        printf("%d\n", n);
-        c_forrange (n) { // forrange uses initial n only.
-            int r = (int)stc64_uniform(&rng, &dist);
-            if (r & 1)
-                ++n, cqueue_i_push(&queue, r);
-            else
-                --n, cqueue_i_pop(&queue);
-        }
-        printf("%d, %" c_ZI "\n", n, cqueue_i_size(&queue));
+    // Push ten million random numbers onto the queue.
+    c_forrange (n)
+        cqueue_i_push(&queue, (int)crand_unif(&rng, &dist));
+
+    // Push or pop on the queue ten million times
+    printf("%d\n", n);
+    c_forrange (n) { // forrange uses initial n only.
+        int r = (int)crand_unif(&rng, &dist);
+        if (r & 1)
+            ++n, cqueue_i_push(&queue, r);
+        else
+            --n, cqueue_i_pop(&queue);
     }
+    printf("%d, %" c_ZI "\n", n, cqueue_i_size(&queue));
+
+    cqueue_i_drop(&queue);
 }

@@ -4,7 +4,7 @@
 #include <stdio.h>
 #include <stc/ccommon.h>
 
-#define c_dyn_cast(T, s) \
+#define DYN_CAST(T, s) \
     (&T##_api == (s)->api ? (T*)(s) : (T*)0)
 
 // Shape definition
@@ -53,15 +53,14 @@ typedef struct {
 extern struct ShapeAPI Triangle_api;
 
 
-Triangle Triangle_from(Point a, Point b, Point c)
-{
-    Triangle t = {.shape={.api=&Triangle_api}, .p={a, b, c}};
+Triangle Triangle_from(Point a, Point b, Point c) {
+    Triangle t = {{&Triangle_api}, {a, b, c}};
     return t;
 }
 
 static void Triangle_draw(const Shape* shape)
 {
-    const Triangle* self = c_dyn_cast(Triangle, shape);
+    const Triangle* self = DYN_CAST(Triangle, shape);
     printf("Triangle : (%g,%g), (%g,%g), (%g,%g)\n",
            self->p[0].x, self->p[0].y,
            self->p[1].x, self->p[1].y,
@@ -88,9 +87,8 @@ typedef struct {
 extern struct ShapeAPI Polygon_api;
 
 
-Polygon Polygon_init(void)
-{
-    Polygon p = {.shape={.api=&Polygon_api}, .points=PointVec_init()};
+Polygon Polygon_init(void) {
+    Polygon p = {{&Polygon_api}, {0}};
     return p;
 }
 
@@ -101,15 +99,14 @@ void Polygon_addPoint(Polygon* self, Point p)
 
 static void Polygon_drop(Shape* shape)
 {
-    Polygon* self = c_dyn_cast(Polygon, shape);
+    Polygon* self = DYN_CAST(Polygon, shape);
     printf("poly destructed\n");
     PointVec_drop(&self->points);
-    Shape_drop(shape);
 }
 
 static void Polygon_draw(const Shape* shape)
 {
-    const Polygon* self = c_dyn_cast(Polygon, shape);
+    const Polygon* self = DYN_CAST(Polygon, shape);
     printf("Polygon  :");
     c_foreach (i, PointVec, self->points)
         printf(" (%g,%g)", i.ref->x, i.ref->y);
@@ -138,23 +135,24 @@ void testShape(const Shape* shape)
 
 int main(void)
 {
-    c_auto (Shapes, shapes)
-    {
-        Triangle* tri1 = c_new(Triangle, Triangle_from((Point){5, 7}, (Point){12, 7}, (Point){12, 20}));
-        Polygon* pol1 = c_new(Polygon, Polygon_init());
-        Polygon* pol2 = c_new(Polygon, Polygon_init());
+    Shapes shapes = {0};
 
-        c_forlist (i, Point, {{50, 72}, {123, 73}, {127, 201}, {828, 333}})
-            Polygon_addPoint(pol1, *i.ref);
+    Triangle* tri1 = c_new(Triangle, Triangle_from((Point){5, 7}, (Point){12, 7}, (Point){12, 20}));
+    Polygon* pol1 = c_new(Polygon, Polygon_init());
+    Polygon* pol2 = c_new(Polygon, Polygon_init());
 
-        c_forlist (i, Point, {{5, 7}, {12, 7}, {12, 20}, {82, 33}, {17, 56}})
-            Polygon_addPoint(pol2, *i.ref);
-        
-        Shapes_push(&shapes, &tri1->shape);
-        Shapes_push(&shapes, &pol1->shape);
-        Shapes_push(&shapes, &pol2->shape);
+    c_forlist (i, Point, {{50, 72}, {123, 73}, {127, 201}, {828, 333}})
+        Polygon_addPoint(pol1, *i.ref);
 
-        c_foreach (i, Shapes, shapes)
-            testShape(*i.ref);
-    }
+    c_forlist (i, Point, {{5, 7}, {12, 7}, {12, 20}, {82, 33}, {17, 56}})
+        Polygon_addPoint(pol2, *i.ref);
+    
+    Shapes_push(&shapes, &tri1->shape);
+    Shapes_push(&shapes, &pol1->shape);
+    Shapes_push(&shapes, &pol2->shape);
+
+    c_foreach (i, Shapes, shapes)
+        testShape(*i.ref);
+
+    Shapes_drop(&shapes);
 }

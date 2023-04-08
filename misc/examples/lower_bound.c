@@ -9,10 +9,9 @@
 int main()
 {
     // TEST SORTED VECTOR
-    c_auto (cvec_int, vec)
     {
         int key, *res;
-        vec = c_make(cvec_int, {40, 600, 1, 7000, 2, 500, 30});
+        cvec_int vec = c_make(cvec_int, {40, 600, 1, 7000, 2, 500, 30});
 
         cvec_int_sort(&vec);
 
@@ -35,13 +34,13 @@ int main()
             printf("  %d\n", *i.ref);
 
         puts("");
+        cvec_int_drop(&vec);
     }
-
+    
     // TEST SORTED SET
-    c_auto (csset_int, set)
     {
         int key, *res;
-        set = c_make(csset_int, {40, 600, 1, 7000, 2, 500, 30});
+        csset_int set = c_make(csset_int, {40, 600, 1, 7000, 2, 500, 30});
 
         key = 100;
         res = csset_int_lower_bound(&set, key).ref;
@@ -60,5 +59,7 @@ int main()
 
         c_foreach (i, csset_int, it1, it2)
             printf("  %d\n", *i.ref);
+
+        csset_int_drop(&set);
     }
 }

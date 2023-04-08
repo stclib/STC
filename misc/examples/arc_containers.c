@@ -27,9 +27,12 @@
 
 int main()
 {
-    c_auto (Stack, stack)
-    c_auto (List, list)
-    {
+    Stack stack = {0};
+    List list = {0};
+    c_defer(
+        Stack_drop(&stack),
+        List_drop(&list)
+    ){
         // POPULATE stack with shared pointers to Maps:
         Map *map;
         map = Stack_push(&stack, Arc_from(Map_init()))->get;
@@ -62,13 +65,13 @@ int main()
         // Add one more element to the shared map:
         Map_emplace_or_assign(stack.data[1].get, "SHARED", 2021);
 
-
         puts("STACKS");
         c_foreach (i, Stack, stack) {
             c_forpair (name, year, Map, *i.ref->get)
                 printf(" %s:%d", cstr_str(_.name), *_.year);
             puts("");
         }
+
         puts("LIST");
         c_foreach (i, List, list) {
             c_forpair (name, year, Map, *i.ref->get)

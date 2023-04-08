@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #define i_static
-#include <stc/crandom.h>
+#include <stc/crand.h>
 
 #ifdef __cplusplus
 #include <map>
@@ -11,7 +11,7 @@ enum {INSERT, ERASE, FIND, ITER, DESTRUCT, N_TESTS};
 const char* operations[] = {"insert", "erase", "find", "iter", "destruct"};
 typedef struct { time_t t1, t2; uint64_t sum; float fac; } Range;
 typedef struct { const char* name; Range test[N_TESTS]; } Sample;
-enum {SAMPLES = 2, N = 4000000, R = 4};
+enum {SAMPLES = 2, N = 1000000, R = 4};
 uint64_t seed = 1, mask1 = 0xfffffff;
 
 static float secs(Range s) { return (float)(s.t2 - s.t1) / CLOCKS_PER_SEC; }
@@ -26,28 +26,28 @@ Sample test_std_map() {
     typedef std::map<size_t, size_t> container;
     Sample s = {"std,map"};
     {
-        csrandom(seed);
+        csrand(seed);
         s.test[INSERT].t1 = clock();
         container con;
-        c_forrange (i, N/2) con.emplace(crandom() & mask1, i);
+        c_forrange (i, N/2) con.emplace(crand() & mask1, i);
         c_forrange (i, N/2) con.emplace(i, i);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = con.size();
-        csrandom(seed);
+        csrand(seed);
         s.test[ERASE].t1 = clock();
-        c_forrange (N) con.erase(crandom() & mask1);
+        c_forrange (N) con.erase(crand() & mask1);
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = con.size();
      }{
         container con;
-        csrandom(seed);
-        c_forrange (i, N/2) con.emplace(crandom() & mask1, i);
+        csrand(seed);
+        c_forrange (i, N/2) con.emplace(crand() & mask1, i);
         c_forrange (i, N/2) con.emplace(i, i);
-        csrandom(seed);
+        csrand(seed);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         container::iterator it;
-        c_forrange (N) if ((it = con.find(crandom() & mask1)) != con.end()) sum += it->second;
+        c_forrange (N) if ((it = con.find(crand() & mask1)) != con.end()) sum += it->second;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;
         s.test[ITER].t1 = clock();
@@ -71,30 +71,30 @@ Sample test_stc_map() {
     typedef csmap_x container;
     Sample s = {"STC,map"};
     {
-        csrandom(seed);
+        csrand(seed);
         s.test[INSERT].t1 = clock();
         container con = csmap_x_init();
-        c_forrange (i, N/2) csmap_x_insert(&con, crandom() & mask1, i);
+        c_forrange (i, N/2) csmap_x_insert(&con, crand() & mask1, i);
         c_forrange (i, N/2) csmap_x_insert(&con, i, i);
         s.test[INSERT].t2 = clock();
         s.test[INSERT].sum = csmap_x_size(&con);
-        csrandom(seed);
+        csrand(seed);
         s.test[ERASE].t1 = clock();
-        c_forrange (N) csmap_x_erase(&con, crandom() & mask1);
+        c_forrange (N) csmap_x_erase(&con, crand() & mask1);
         s.test[ERASE].t2 = clock();
         s.test[ERASE].sum = csmap_x_size(&con);
         csmap_x_drop(&con);
      }{
         container con = csmap_x_init();
-        csrandom(seed);
-        c_forrange (i, N/2) csmap_x_insert(&con, crandom() & mask1, i);
+        csrand(seed);
+        c_forrange (i, N/2) csmap_x_insert(&con, crand() & mask1, i);
         c_forrange (i, N/2) csmap_x_insert(&con, i, i);
-        csrandom(seed);
+        csrand(seed);
         s.test[FIND].t1 = clock();
         size_t sum = 0;
         const csmap_x_value* val;
-        c_forrange (N) 
-            if ((val = csmap_x_get(&con, crandom() & mask1)))
+        c_forrange (N)
+            if ((val = csmap_x_get(&con, crand() & mask1)))
                 sum += val->second;
         s.test[FIND].t2 = clock();
         s.test[FIND].sum = sum;

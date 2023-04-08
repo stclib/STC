@@ -42,32 +42,32 @@ void findit(csmap_istr c, csmap_istr_key val)
 
 int main()
 {
-    c_auto (csmap_istr, m1)
-    c_auto (cvec_istr, v)
-    {
-        m1 = c_make(csmap_istr, {{40, "Zr"}, {45, "Rh"}});
+    csmap_istr m1 = c_make(csmap_istr, {{40, "Zr"}, {45, "Rh"}});
+    cvec_istr v = {0};
 
-        puts("The starting map m1 is (key, value):");
-        print_collection_csmap_istr(&m1);
+    puts("The starting map m1 is (key, value):");
+    print_collection_csmap_istr(&m1);
 
-        typedef cvec_istr_value pair;
-        cvec_istr_push(&v, (pair){43, "Tc"});
-        cvec_istr_push(&v, (pair){41, "Nb"});
-        cvec_istr_push(&v, (pair){46, "Pd"});
-        cvec_istr_push(&v, (pair){42, "Mo"});
-        cvec_istr_push(&v, (pair){44, "Ru"});
-        cvec_istr_push(&v, (pair){44, "Ru"}); // attempt a duplicate
+    typedef cvec_istr_value pair;
+    cvec_istr_push(&v, (pair){43, "Tc"});
+    cvec_istr_push(&v, (pair){41, "Nb"});
+    cvec_istr_push(&v, (pair){46, "Pd"});
+    cvec_istr_push(&v, (pair){42, "Mo"});
+    cvec_istr_push(&v, (pair){44, "Ru"});
+    cvec_istr_push(&v, (pair){44, "Ru"}); // attempt a duplicate
 
-        puts("Inserting the following vector data into m1:");
-        print_collection_cvec_istr(&v);
+    puts("Inserting the following vector data into m1:");
+    print_collection_cvec_istr(&v);
 
-        c_foreach (i, cvec_istr, cvec_istr_begin(&v), cvec_istr_end(&v))
-            csmap_istr_emplace(&m1, c_PAIR(i.ref));
+    c_foreach (i, cvec_istr, cvec_istr_begin(&v), cvec_istr_end(&v))
+        csmap_istr_emplace(&m1, i.ref->first, i.ref->second);
 
-        puts("The modified map m1 is (key, value):");
-        print_collection_csmap_istr(&m1);
-        puts("");
-        findit(m1, 45);
-        findit(m1, 6);
-    }
+    puts("The modified map m1 is (key, value):");
+    print_collection_csmap_istr(&m1);
+    puts("");
+    findit(m1, 45);
+    findit(m1, 6);
+
+    csmap_istr_drop(&m1);
+    cvec_istr_drop(&v);
 }

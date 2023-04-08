@@ -37,32 +37,32 @@ void Person_drop(Person* p) {
 
 int main()
 {
-    c_auto (Persons, vec)
-    c_auto (PBox, p, q)
-    {
-        p = PBox_from(Person_make("Laura", "Palmer"));
-        q = PBox_clone(p);
-        cstr_assign(&q.get->name, "Leland");
+    Persons vec = {0};
+    PBox p = PBox_from(Person_make("Laura", "Palmer"));
+    PBox q = PBox_clone(p);
+    cstr_assign(&q.get->name, "Leland");
 
-        printf("orig: %s %s\n", cstr_str(&p.get->name), cstr_str(&p.get->last));
-        printf("copy: %s %s\n", cstr_str(&q.get->name), cstr_str(&q.get->last));
+    printf("orig: %s %s\n", cstr_str(&p.get->name), cstr_str(&p.get->last));
+    printf("copy: %s %s\n", cstr_str(&q.get->name), cstr_str(&q.get->last));
 
-        Persons_emplace(&vec, Person_make("Dale", "Cooper"));
-        Persons_emplace(&vec, Person_make("Audrey", "Home"));
+    Persons_emplace(&vec, Person_make("Dale", "Cooper"));
+    Persons_emplace(&vec, Person_make("Audrey", "Home"));
 
-        // NB! Clone/share p and q in the Persons container.
-        Persons_push(&vec, PBox_clone(p));
-        Persons_push(&vec, PBox_clone(q));
+    // NB! Clone/share p and q in the Persons container.
+    Persons_push(&vec, PBox_clone(p));
+    Persons_push(&vec, PBox_clone(q));
 
-        c_foreach (i, Persons, vec)
-            printf("%s %s\n", cstr_str(&i.ref->get->name), cstr_str(&i.ref->get->last));
-        puts("");
+    c_foreach (i, Persons, vec)
+        printf("%s %s\n", cstr_str(&i.ref->get->name), cstr_str(&i.ref->get->last));
+    puts("");
 
-        // Look-up Audrey! Create a temporary Person for lookup.
-        c_with (Person a = Person_make("Audrey", "Home"), Person_drop(&a)) {
-            const PBox *v = Persons_get(&vec, a); // lookup
-            if (v) printf("found: %s %s\n", cstr_str(&v->get->name), cstr_str(&v->get->last));
-        }
-        puts("");
-    }
+    // Look-up Audrey! Create a temporary Person for lookup.
+    Person a = Person_make("Audrey", "Home");
+    const PBox *v = Persons_get(&vec, a); // lookup
+    if (v) printf("found: %s %s\n", cstr_str(&v->get->name), cstr_str(&v->get->last));
+
+    Person_drop(&a);
+    PBox_drop(&p);
+    PBox_drop(&q);
+    Persons_drop(&vec);
 }

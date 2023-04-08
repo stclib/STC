@@ -18,7 +18,6 @@ See the c++ class [std::priority_queue](https://en.cppreference.com/w/cpp/contai
 #define i_valfrom   // convertion func i_valraw => i_val
 #define i_valto     // convertion func i_val* => i_valraw.
 
-#define i_less_functor // takes self as first argument. See examples/functor.c for usage.
 #define i_tag       // alternative typename: cpque_{i_tag}. i_tag defaults to i_val
 #include <stc/cpque.h>
 ```
@@ -61,7 +60,7 @@ i_val               cpque_X_value_clone(i_val value);
 
 ## Example
 ```c
-#include <stc/crandom.h>
+#include <stc/crand.h>
 #include <stdio.h>
 
 #define i_val int64_t
@@ -72,27 +71,27 @@ i_val               cpque_X_value_clone(i_val value);
 int main()
 {
     intptr_t N = 10000000;
-    stc64_t rng = stc64_new(1234);
-    stc64_uniform_t dist = stc64_uniform_new(0, N * 10);
+    crand_t rng = crand_init(1234);
+    crand_unif_t dist = crand_unif_init(0, N * 10);
 
-    // Declare heap, with defered drop()
-    c_auto (cpque_i, heap)
-    {
-        // Push ten million random numbers to priority queue.
-        c_forrange (N)
-            cpque_i_push(&heap, stc64_uniform(&rng, &dist));
+    // Define heap
+    cpque_i heap = {0};
 
-        // Add some negative ones.
-        int nums[] = {-231, -32, -873, -4, -343};
-        c_forrange (i, c_ARRAYLEN(nums)) 
-            cpque_i_push(&heap, nums[i]);
+    // Push ten million random numbers to priority queue.
+    c_forrange (N)
+        cpque_i_push(&heap, crand_unif(&rng, &dist));
 
-        // Extract and display the fifty smallest.
-        c_forrange (50) {
-            printf("%" PRId64 " ", *cpque_i_top(&heap));
-            cpque_i_pop(&heap);
-        }
+    // Add some negative ones.
+    int nums[] = {-231, -32, -873, -4, -343};
+    c_forrange (i, c_arraylen(nums)) 
+        cpque_i_push(&heap, nums[i]);
+
+    // Extract and display the fifty smallest.
+    c_forrange (50) {
+        printf("%" PRId64 " ", *cpque_i_top(&heap));
+        cpque_i_pop(&heap);
     }
+    cpque_i_drop(&heap);
 }
 ```
 Output:

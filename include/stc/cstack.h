@@ -33,7 +33,7 @@
 #endif
 #include "priv/template.h"
 
-#if !c_option(c_is_forward)
+#ifndef i_is_forward
 #ifdef i_capacity
   #define i_no_clone
   _cx_deftypes(_c_cstack_fixed, _cx_self, i_key, i_capacity);
@@ -189,4 +189,4 @@ STC_INLINE void _cx_memb(_next)(_cx_iter* it)
 STC_INLINE _cx_iter _cx_memb(_advance)(_cx_iter it, size_t n)
     { if ((it.ref += n) >= it.end) it.ref = NULL ; return it; }
 
-#include "priv/template.h"
+#include "priv/template2.h"

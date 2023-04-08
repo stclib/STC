@@ -98,56 +98,56 @@ bool        carc_X_value_eq(const i_val* x, const i_val* y);
 
 int main()
 {
-    c_auto (Stack, s1, s2) // RAII
-    {
-        // POPULATE s1 with shared pointers to Map:
-        Map *map;
+    Stack s1 = {0}, s2 = {0};
+    Map *map;
 
-        map = Stack_push(&s1, Arc_make(Map_init()))->get; // push empty map to s1.
-        c_forlist (i, Map_raw, { {"Joey", 1990}, {"Mary", 1995}, {"Joanna", 1992} }) {
-            Map_emplace(map, c_PAIR(i.ref)); // populate it.
-        }
+    // POPULATE s1 with shared pointers to Map:
+    map = Stack_push(&s1, Arc_make(Map_init()))->get; // push empty map to s1.
+    Map_emplace(map, "Joey", 1990);
+    Map_emplace(map, "Mary", 1995);
+    Map_emplace(map, "Joanna", 1992);
 
-        map = Stack_push(&s1, Arc_make(Map_init()))->get;
-        c_forlist (i, Map_raw, { {"Rosanna", 2001}, {"Brad", 1999}, {"Jack", 1980} }) {
-            Map_emplace(map, c_PAIR(i.ref));
-        }
+    map = Stack_push(&s1, Arc_make(Map_init()))->get;
+    Map_emplace(map, "Rosanna", 2001);
+    Map_emplace(map, "Brad", 1999);
+    Map_emplace(map, "Jack", 1980);
 
-        // POPULATE s2:
-        map = Stack_push(&s2, Arc_make(Map_init()))->get;
-        c_forlist (i, Map_raw, { {"Steve", 1979}, {"Rick", 1974}, {"Tracy", 2003} }) {
-            Map_emplace(map, c_PAIR(i.ref));
-        }
-        
-        // Share two Maps from s1 with s2 by cloning(=sharing) the carcs:
-        Stack_push(&s2, Arc_clone(s1.data[0]));
-        Stack_push(&s2, Arc_clone(s1.data[1]));
-        
-        // Deep-copy (does not share) a Map from s1 to s2.
-        // s2 will contain two shared and two unshared maps.
-        map = Stack_push(&s2, Arc_from(Map_clone(*s1.data[1].get)))->get;
-        
-        // Add one more element to the cloned map:
-        Map_emplace_or_assign(map, "Cloned", 2022);
+    // POPULATE s2:
+    map = Stack_push(&s2, Arc_make(Map_init()))->get;
+    Map_emplace(map, "Steve", 1979);
+    Map_emplace(map, "Rick", 1974);
+    Map_emplace(map, "Tracy", 2003);
 
-        // Add one more element to the shared map:
-        Map_emplace_or_assign(s1.data[1].get, "Shared", 2022);
+    // Share two Maps from s1 with s2 by cloning(=sharing) the carcs:
+    Stack_push(&s2, Arc_clone(s1.data[0]));
+    Stack_push(&s2, Arc_clone(s1.data[1]));
+    
+    // Deep-copy (does not share) a Map from s1 to s2.
+    // s2 will contain two shared and two unshared maps.
+    map = Stack_push(&s2, Arc_from(Map_clone(*s1.data[1].get)))->get;
+    
+    // Add one more element to the cloned map:
+    Map_emplace_or_assign(map, "Cloned", 2022);
 
-        puts("S1");
-        c_foreach (i, Stack, s1) {
-            c_forpair (name, year, Map, *i.ref->get)
-                printf("  %s:%d", cstr_str(_.name), *_.year);
-            puts("");
-        }
+    // Add one more element to the shared map:
+    Map_emplace_or_assign(s1.data[1].get, "Shared", 2022);
 
-        puts("S2");
-        c_foreach (i, Stack, s2) {
-            c_forpair (name, year, Map, *i.ref->get)
-                printf("  %s:%d", cstr_str(_.name), *_.year);
-            puts("");
-        }
+    puts("S1");
+    c_foreach (i, Stack, s1) {
+        c_forpair (name, year, Map, *i.ref->get)
+            printf("  %s:%d", cstr_str(_.name), *_.year);
         puts("");
     }
+
+    puts("S2");
+    c_foreach (i, Stack, s2) {
+        c_forpair (name, year, Map, *i.ref->get)
+            printf("  %s:%d", cstr_str(_.name), *_.year);
+        puts("");
+    }
+    puts("");
+
+    c_drop(Stack, &s1, &s2);
 }
 ```
 Output:

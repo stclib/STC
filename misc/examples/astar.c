@@ -78,12 +78,16 @@ point_key_cmp(const point* a, const point* b)
 cdeq_point
 astar(cstr* maze, int width)
 {
-    cdeq_point path = cdeq_point_init();
+    cdeq_point ret_path = {0};
 
-    c_auto (cpque_point, front)
-    c_auto (csmap_pstep, from)
-    c_auto (csmap_pcost, costs)
-    {
+    cpque_point front = {0};
+    csmap_pstep from = {0};
+    csmap_pcost costs = {0};
+    c_defer(
+        cpque_point_drop(&front),
+        csmap_pstep_drop(&from),
+        csmap_pcost_drop(&costs)
+    ){
         point start = point_from(maze, "@", width);
         point goal = point_from(maze, "!", width);
         csmap_pcost_insert(&costs, start, 0);
@@ -99,7 +103,7 @@ astar(cstr* maze, int width)
                 { -1,  0, 0, width }, /* ~ ~ ~ ~ ~ ~ ~ */  { 1,  0, 0, width },
                 { -1, -1, 0, width }, { 0, -1, 0, width }, { 1, -1, 0, width },
             };
-            for (size_t i = 0; i < c_ARRAYLEN(deltas); i++)
+            for (size_t i = 0; i < c_arraylen(deltas); i++)
             {
                 point delta = deltas[i];
                 point next = point_init(current.x + delta.x, current.y + delta.y, width);
@@ -120,18 +124,18 @@ astar(cstr* maze, int width)
         point current = goal;
         while (!point_equal(&current, &start))
         {
-            cdeq_point_push_front(&path, current);
+            cdeq_point_push_front(&ret_path, current);
             current = *csmap_pstep_at(&from, current);
         }
-        cdeq_point_push_front(&path, start);
+        cdeq_point_push_front(&ret_path, start);
     }
-    return path;
+    return ret_path;
 }
 
 int
 main(void)
 {
-    c_with (cstr maze = cstr_lit(
+    cstr maze = cstr_lit(
         "#########################################################################\n"
         "#   #               #               #           #                   #   #\n"
         "#   #   #########   #   #####   #########   #####   #####   #####   # ! #\n"
@@ -154,15 +158,16 @@ main(void)
         "#   #       #   #   #           #           #   #       #               #\n"
         "# @ #   #####   #####   #####   #########   #####   #   #########   #   #\n"
         "#   #                   #           #               #               #   #\n"
-        "#########################################################################\n"), cstr_drop(&maze))
-    {
-        int width = (int)cstr_find(&maze, "\n") + 1;
-        c_with (cdeq_point path = astar(&maze, width), cdeq_point_drop(&path))
-        {
-            c_foreach (it, cdeq_point, path)
-                cstr_data(&maze)[point_index(it.ref)] = 'x';
-            
-            printf("%s", cstr_str(&maze));
-        }
-    }
+        "#########################################################################\n"
+    );
+    int width = (int)cstr_find(&maze, "\n") + 1;
+    cdeq_point ret_path = astar(&maze, width);
+
+    c_foreach (it, cdeq_point, ret_path)
+        cstr_data(&maze)[point_index(it.ref)] = 'x';
+    
+    printf("%s", cstr_str(&maze));
+
+    cdeq_point_drop(&ret_path);
+    cstr_drop(&maze);
 }

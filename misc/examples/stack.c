@@ -11,20 +11,22 @@
 #include <stc/cstack.h>
 
 int main() {
-    c_auto (cstack_i, stack)
-    c_auto (cstack_c, chars)
-    {
-        c_forrange (i, 101)
-            cstack_i_push(&stack, (int)(i*i));
+    cstack_i stack = {0};
+    cstack_c chars = {0};
 
-        printf("%d\n", *cstack_i_top(&stack));
+    c_forrange (i, 101)
+        cstack_i_push(&stack, (int)(i*i));
 
-        c_forrange (i, 90)
-            cstack_i_pop(&stack);
+    printf("%d\n", *cstack_i_top(&stack));
 
-        c_foreach (i, cstack_i, stack)
-            printf(" %d", *i.ref);
-        puts("");
-        printf("top: %d\n", *cstack_i_top(&stack));
-    }
+    c_forrange (i, 90)
+        cstack_i_pop(&stack);
+
+    c_foreach (i, cstack_i, stack)
+        printf(" %d", *i.ref);
+    puts("");
+    printf("top: %d\n", *cstack_i_top(&stack));
+
+    cstack_i_drop(&stack);
+    cstack_c_drop(&chars);
 }

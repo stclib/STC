@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #define i_static
-#include <stc/crandom.h>
+#include <stc/crand.h>
 
 #define i_val float
 #define i_cmp -c_default_cmp
@@ -11,19 +11,17 @@
 #include <queue>
 
 static const uint32_t seed = 1234;
+static const int N = 2500000;
 
 void std_test()
 {
-    stc64_t rng;
-    int N = 10000000;
-
     std::priority_queue<float, std::vector<float>, std::greater<float>> pq;
-    rng = stc64_new(seed);
+    csrand(seed);
     clock_t start = clock();
     c_forrange (i, N)
-        pq.push((float) stc64_randf(&rng)*100000);
+        pq.push((float) crandf()*100000.0);
 
-    printf("Built priority queue: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
+    printf("Built priority queue: %f secs\n", (float)(clock() - start)/(float)CLOCKS_PER_SEC);
     printf("%g ", pq.top());
 
     start = clock();
@@ -31,32 +29,30 @@ void std_test()
         pq.pop();
     }
 
-    printf("\npopped PQ: %f secs\n\n", (clock() - start) / (float) CLOCKS_PER_SEC);
+    printf("\npopped PQ: %f secs\n\n", (float)(clock() - start)/(float)CLOCKS_PER_SEC);
 }
 
 
 void stc_test()
 {
-    stc64_t rng;
-    int N = 10000000, M = 10;
+    int N = 10000000;
 
     c_auto (cpque_f, pq)
     {
-        rng = stc64_new(seed);
+        csrand(seed);
         clock_t start = clock();
-        c_forrange (i, N)
-            cpque_f_push(&pq, (float) stc64_randf(&rng)*100000);
+        c_forrange (i, N) {
+            cpque_f_push(&pq, (float) crandf()*100000);
+        }
 
-        printf("Built priority queue: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
+        printf("Built priority queue: %f secs\n", (float)(clock() - start)/(float)CLOCKS_PER_SEC);
         printf("%g ", *cpque_f_top(&pq));
- 
-        c_forrange (i, M) {
+
+        start = clock();
+        c_forrange (i, N) {
             cpque_f_pop(&pq);
         }
 
-        start = clock();
-        c_forrange (i, M, N)
-            cpque_f_pop(&pq);
         printf("\npopped PQ: %f secs\n", (clock() - start) / (float) CLOCKS_PER_SEC);
     }
 }

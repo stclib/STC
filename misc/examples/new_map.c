@@ -26,7 +26,7 @@ int point_cmp(const Point* a, const Point* b) {
 #define i_val int
 #define i_cmp point_cmp
 #define i_hash c_default_hash
-#define i_opt c_is_forward
+#define i_is_forward
 #define i_tag pnt
 #include <stc/cmap.h>
 
@@ -42,33 +42,33 @@ int point_cmp(const Point* a, const Point* b) {
 
 int main()
 {
-    c_auto (cmap_int, map)
-    c_auto (cmap_pnt, pmap)
-    c_auto (cmap_str, smap)
-    c_auto (cset_str, sset)
-    {
-        cmap_int_insert(&map, 123, 321);
-        cmap_int_insert(&map, 456, 654);
-        cmap_int_insert(&map, 789, 987);
+    cmap_pnt pmap = c_make(cmap_pnt, {{{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}});
 
-        pmap = c_make(cmap_pnt, {{{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}});
+    c_foreach (i, cmap_pnt, pmap)
+        printf(" (%d, %d: %d)", i.ref->first.x, i.ref->first.y, i.ref->second);
+    puts("");
 
-        c_foreach (i, cmap_pnt, pmap)
-            printf(" (%d, %d: %d)", i.ref->first.x, i.ref->first.y, i.ref->second);
-        puts("");
+    cmap_str smap = c_make(cmap_str, {
+        {"Hello, friend", "long time no see"},
+        {"So long", "see you around"},
+    });
 
-        smap = c_make(cmap_str, {
-            {"Hello, friend", "long time no see"},
-            {"So long", "see you around"},
-        });
+    cset_str sset = c_make(cset_str, {
+        "Hello, friend",
+        "Nice to see you again",
+        "So long",
+    });
 
-        sset = c_make(cset_str, {
-            "Hello, friend",
-            "Nice to see you again",
-            "So long",
-        });
+    cmap_int map = {0};
+    cmap_int_insert(&map, 123, 321);
+    cmap_int_insert(&map, 456, 654);
+    cmap_int_insert(&map, 789, 987);
 
-        c_foreach (i, cset_str, sset)
-            printf(" %s\n", cstr_str(i.ref));
-    }
+    c_foreach (i, cset_str, sset)
+        printf(" %s\n", cstr_str(i.ref));
+
+    cmap_int_drop(&map);
+    cset_str_drop(&sset);
+    cmap_str_drop(&smap);
+    cmap_pnt_drop(&pmap);
 }

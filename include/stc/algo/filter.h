@@ -24,24 +24,24 @@
 #include <stdio.h>
 #define i_val int
 #include <stc/cstack.h>
-#include <stc/algo/filter.h>
+#include <stc/calgo.h>
 
 int main()
 {
-    c_with (cstack_int stk = c_make(cstack_int, {1, 2, 3, 4, 5, 6, 7, 8, 9}),
-            cstack_int_drop(&stk))
-    {
-        c_foreach (i, cstack_int, stk)
-            printf(" %d", *i.ref);
-        puts("");
-        
-        c_forfilter (i, cstack_int, stk,
-                        c_flt_skipwhile(i, *i.ref < 3) &&
-                        (*i.ref & 1) == 0              && // even only
-                        c_flt_take(i, 2))                 // break after 2
-            printf(" %d", *i.ref);
-        puts("");
-    }
+    cstack_int stk = c_make(cstack_int, {1, 2, 3, 4, 5, 6, 7, 8, 9});
+
+    c_foreach (i, cstack_int, stk)
+        printf(" %d", *i.ref);
+    puts("");
+   
+    c_forfilter (i, cstack_int, stk,
+                    c_flt_skipwhile(i, *i.ref < 3) &&
+                    (*i.ref & 1) == 0              && // even only
+                    c_flt_take(i, 2))                 // break after 2
+        printf(" %d", *i.ref);
+    puts("");
+
+    cstack_int_drop(&stk);
 }
 */
 #ifndef STC_FILTER_H_INCLUDED
@@ -51,12 +51,12 @@ int main()
 
 // c_forfilter:
 
-#define c_flt_skip(i, n) (c_flt_count(i) > (n))
+#define c_flt_skip(i, n) (c_flt_counter(i) > (n))
 #define c_flt_skipwhile(i, pred) ((i).b.s2[(i).b.s2top++] |= !(pred))
 #define c_flt_take(i, n) _flt_take(&(i).b, n)
 #define c_flt_takewhile(i, pred) _flt_takewhile(&(i).b, pred)
-#define c_flt_count(i) ++(i).b.s1[(i).b.s1top++]
-#define c_flt_last(i) (i).b.s1[(i).b.s1top - 1]
+#define c_flt_counter(i) ++(i).b.s1[(i).b.s1top++]
+#define c_flt_getcount(i) (i).b.s1[(i).b.s1top - 1]
 
 #define c_forfilter(i, C, cnt, filter) \
     c_forfilter_it(i, C, C##_begin(&cnt), filter)

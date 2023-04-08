@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <time.h>
-#include <stc/crandom.h>
+#include <stc/crand.h>
 
 #define MAX_LOAD_FACTOR 85
 
@@ -35,12 +35,13 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 // cmap template expansion
 #define i_key IKey
 #define i_val IValue
+#define i_ssize int32_t // enable 2^K buckets like the rest.
 #define i_tag ii
 #define i_max_load_factor MAX_LOAD_FACTOR / 100.0f
 #include <stc/cmap.h>
 
-#define SEED(s) rng = stc64_new(s)
-#define RAND(N) (stc64_rand(&rng) & (((uint64_t)1 << N) - 1))
+#define SEED(s) rng = crand_init(s)
+#define RAND(N) (crand_u64(&rng) & (((uint64_t)1 << N) - 1))
 
 #define CMAP_SETUP(X, Key, Value) cmap_##X map = cmap_##X##_init()
 #define CMAP_PUT(X, key, val)     cmap_##X##_insert_or_assign(&map, key, val).ref->second
@@ -313,7 +314,7 @@ int main(int argc, char* argv[])
     unsigned keybits = argc >= 3 ? atoi(argv[2]) : DEFAULT_KEYBITS;
     unsigned n = n_mill * 1000000;
     unsigned N1 = n, N2 = n, N3 = n, N4 = n, N5 = n;
-    stc64_t rng;
+    crand_t rng;
     size_t seed = 123456; // time(NULL);
 
     printf("\nUnordered hash map shootout\n");

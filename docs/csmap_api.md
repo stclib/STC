@@ -33,7 +33,6 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 #define i_valto     // convertion func i_val* => i_valraw
 
 #define i_tag       // alternative typename: csmap_{i_tag}. i_tag defaults to i_val
-#define i_cmp_functor // advanced, see examples/functor.c for similar usage.
 #define i_ssize     // internal size rep. defaults to int32_t
 #include <stc/csmap.h>
 ```
@@ -112,27 +111,26 @@ csmap_X_raw           csmap_X_value_toraw(csmap_X_value* pval);
 int main()
 {
     // Create a sorted map of three strings (maps to string)
-    c_auto (csmap_str, colors) // RAII
-    {
-        colors = c_make(csmap_str, {
-            {"RED", "#FF0000"},
-            {"GREEN", "#00FF00"},
-            {"BLUE", "#0000FF"}
-        });
+    csmap_str colors = c_make(csmap_str, {
+        {"RED", "#FF0000"},
+        {"GREEN", "#00FF00"},
+        {"BLUE", "#0000FF"}
+    });
 
-        // Iterate and print keys and values of sorted map
-        c_foreach (i, csmap_str, colors) {
-            printf("Key:[%s] Value:[%s]\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
-        }
-
-        // Add two new entries to the sorted map
-        csmap_str_emplace(&colors, "BLACK", "#000000");
-        csmap_str_emplace(&colors, "WHITE", "#FFFFFF");
-
-        // Output values by key
-        printf("The HEX of color RED is:[%s]\n", cstr_str(csmap_str_at(&colors, "RED")));
-        printf("The HEX of color BLACK is:[%s]\n", cstr_str(csmap_str_at(&colors, "BLACK")));
+    // Iterate and print keys and values of sorted map
+    c_foreach (i, csmap_str, colors) {
+        printf("Key:[%s] Value:[%s]\n", cstr_str(&i.ref->first), cstr_str(&i.ref->second));
     }
+
+    // Add two new entries to the sorted map
+    csmap_str_emplace(&colors, "BLACK", "#000000");
+    csmap_str_emplace(&colors, "WHITE", "#FFFFFF");
+
+    // Output values by key
+    printf("The HEX of color RED is:[%s]\n", cstr_str(csmap_str_at(&colors, "RED")));
+    printf("The HEX of color BLACK is:[%s]\n", cstr_str(csmap_str_at(&colors, "BLACK")));
+
+    csmap_str_drop(&colors);
 }
 ```
 Output:
@@ -149,32 +147,29 @@ This example uses a csmap with cstr as mapped value.
 ```c
 #include <stc/cstr.h>
 
+#define i_type IDSMap
 #define i_key int
 #define i_val_str
-#define i_tag id
 #include <stc/csmap.h>
 
 int main()
 {
     uint32_t col = 0xcc7744ff;
-    csmap_id idnames = csmap_id_init();
-    c_defer (csmap_id_drop(&idnames)) 
-    {
-        c_forlist (i, csmap_id_raw, { {100, "Red"}, {110, "Blue"} })
-            csmap_id_emplace(&idnames, c_PAIR(i.ref));
+    IDSMap idnames = c_make(IDSMap, { {100, "Red"}, {110, "Blue"} });
 
-        // put replaces existing mapped value:
-        csmap_id_emplace_or_assign(&idnames, 110, "White");
+    // Assign/overwrite an existing mapped value with a const char*
+    IDSMap_emplace_or_assign(&idnames, 110, "White");
 
-        // put a constructed mapped value into map:
-        csmap_id_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
+    // Insert (or assign) a new cstr
+    IDSMap_insert_or_assign(&idnames, 120, cstr_from_fmt("#%08x", col));
 
-        // emplace adds only when key does not exist:
-        csmap_id_emplace(&idnames, 100, "Green");
+    // emplace() adds only when key does not already exist:
+    IDSMap_emplace(&idnames, 100, "Green"); // ignored
 
-        c_foreach (i, csmap_id, idnames)
-            printf("%d: %s\n", i.ref->first, cstr_str(&i.ref->second));
-    }
+    c_foreach (i, IDSMap, idnames)
+        printf("%d: %s\n", i.ref->first, cstr_str(&i.ref->second));
+
+    IDSMap_drop(&idnames);
 }
 ```
 Output:
@@ -205,16 +200,17 @@ static int Vec3i_cmp(const Vec3i* a, const Vec3i* b) {
 
 int main()
 {
-    c_auto (csmap_vi, vecs)
-    {
-      csmap_vi_insert(&vecs, (Vec3i){100, 0, 0}, 1);
-      csmap_vi_insert(&vecs, (Vec3i){0, 100, 0}, 2);
-      csmap_vi_insert(&vecs, (Vec3i){0, 0, 100}, 3);
-      csmap_vi_insert(&vecs, (Vec3i){100, 100, 100}, 4);
+    csmap_vi vmap = {0};
 
-      c_foreach (i, csmap_vi, vecs)
-          printf("{ %3d, %3d, %3d }: %d\n", i.ref->first.x, i.ref->first.y, i.ref->first.z, i.ref->second);
-    }
+    csmap_vi_insert(&vmap, (Vec3i){100, 0, 0}, 1);
+    csmap_vi_insert(&vmap, (Vec3i){0, 100, 0}, 2);
+    csmap_vi_insert(&vmap, (Vec3i){0, 0, 100}, 3);
+    csmap_vi_insert(&vmap, (Vec3i){100, 100, 100}, 4);
+
+    c_forpair (v, n, csmap_vi, vmap)
+        printf("{ %3d, %3d, %3d }: %d\n", _.v->x, _.v->y, _.v->z, *_.n);
+
+    csmap_vi_drop(&vmap)
 }
 ```
 Output:
@@ -238,17 +234,17 @@ typedef struct { int x, y, z; } Vec3i;
 
 int main()
 {
-    // equivalent to: c_auto (csmap_iv, vecs)
-    c_with (csmap_iv vecs = csmap_iv_init(), csmap_iv_drop(&vecs))
-    {
-        csmap_iv_insert(&vecs, 1, (Vec3i){100, 0, 0});
-        csmap_iv_insert(&vecs, 2, (Vec3i){0, 100, 0});
-        csmap_iv_insert(&vecs, 3, (Vec3i){0, 0, 100});
-        csmap_iv_insert(&vecs, 4, (Vec3i){100, 100, 100});
+    csmap_iv imap = {0};
 
-        c_foreach (i, csmap_iv, vecs)
-            printf("%d: { %3d, %3d, %3d }\n", i.ref->first, i.ref->second.x, i.ref->second.y, i.ref->second.z);
-    }
+    csmap_iv_insert(&imap, 1, (Vec3i){100, 0, 0});
+    csmap_iv_insert(&imap, 2, (Vec3i){0, 100, 0});
+    csmap_iv_insert(&imap, 3, (Vec3i){0, 0, 100});
+    csmap_iv_insert(&imap, 4, (Vec3i){100, 100, 100});
+
+    c_forpair (n, v, csmap_iv, imap)
+        printf("%d: { %3d, %3d, %3d }\n", *_.n, _.v->x, _.v->y, _.v->z);
+    
+    csmap_iv_drop(&imap);
 }
 ```
 Output:

@@ -1,4 +1,4 @@
-#include <stc/crandom.h>
+#include <stc/crand.h>
 #include <stc/forward.h>
 #include <stdio.h>
 #include <time.h>
@@ -12,7 +12,7 @@ int point_cmp(const Point* a, const Point* b) {
 }
 #define i_val Point
 #define i_cmp point_cmp
-#define i_opt c_is_forward
+#define i_is_forward
 #define i_tag pnt
 #include <stc/cqueue.h>
 
@@ -22,25 +22,26 @@ int point_cmp(const Point* a, const Point* b) {
 
 int main() {
     int n = 50000000;
-    stc64_t rng = stc64_new((uint64_t)time(NULL));
-    stc64_uniform_t dist = stc64_uniform_new(0, n);
+    crand_t rng = crand_init((uint64_t)time(NULL));
+    crand_unif_t dist = crand_unif_init(0, n);
 
-    c_auto (IQ, Q)
-    {
-        // Push 50'000'000 random numbers onto the queue.
-        c_forrange (n)
-            IQ_push(&Q, (int)stc64_uniform(&rng, &dist));
+    IQ Q = {0};
 
-        // Push or pop on the queue 50 million times
-        printf("befor: size %" c_ZI ", capacity %" c_ZI "\n", IQ_size(&Q), IQ_capacity(&Q));
-        
-        c_forrange (n) {
-            int r = (int)stc64_uniform(&rng, &dist);
-            if (r & 3)
-                IQ_push(&Q, r);
-            else
-                IQ_pop(&Q);
-        }
-        printf("after: size %" c_ZI ", capacity %" c_ZI "\n", IQ_size(&Q), IQ_capacity(&Q));
+    // Push 50'000'000 random numbers onto the queue.
+    c_forrange (n)
+        IQ_push(&Q, (int)crand_unif(&rng, &dist));
+
+    // Push or pop on the queue 50 million times
+    printf("befor: size %" c_ZI ", capacity %" c_ZI "\n", IQ_size(&Q), IQ_capacity(&Q));
+    
+    c_forrange (n) {
+        int r = (int)crand_unif(&rng, &dist);
+        if (r & 3)
+            IQ_push(&Q, r);
+        else
+            IQ_pop(&Q);
     }
+
+    printf("after: size %" c_ZI ", capacity %" c_ZI "\n", IQ_size(&Q), IQ_capacity(&Q));
+    IQ_drop(&Q);
 }

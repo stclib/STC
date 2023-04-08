@@ -20,46 +20,59 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-// STC queue
-/*
-#include <stc/crand.h>
-#include <stdio.h>
+#undef i_type
+#undef i_tag
+#undef i_imp
+#undef i_opt
+#undef i_less
+#undef i_cmp
+#undef i_eq
+#undef i_hash
+#undef i_rawclass
+#undef i_capacity
+#undef i_ssize
 
-#define i_key int
-#include <stc/cqueue.h>
+#undef i_val
+#undef i_val_str
+#undef i_val_ssv
+#undef i_valboxed
+#undef i_valclass
+#undef i_valraw
+#undef i_valclone
+#undef i_valfrom
+#undef i_valto
+#undef i_valdrop
 
-int main() {
-    int n = 10000000;
-    crand_t rng = crand_init(1234);
-    crand_unif_t dist = crand_unif_init(0, n);
+#undef i_key
+#undef i_key_str
+#undef i_key_ssv
+#undef i_keyboxed
+#undef i_keyclass
+#undef i_keyraw
+#undef i_keyclone
+#undef i_keyfrom
+#undef i_keyto
+#undef i_keydrop
 
-    c_auto (cqueue_int, Q)
-    {
-        // Push ten million random numbers onto the queue.
-        for (int i=0; i<n; ++i)
-            cqueue_int_push(&Q, crand_unif(&rng, &dist));
+#undef i_header
+#undef i_implement
+#undef i_static
+#undef i_extern
 
-        // Push or pop on the queue ten million times
-        printf("before: size, capacity: %d, %d\n", n, cqueue_int_size(&Q), cqueue_int_capacity(&Q));
-        for (int i=n; i>0; --i) {
-            int r = crand_unif(&rng, &dist);
-            if (r & 1)
-                ++n, cqueue_int_push(&Q, r);
-            else
-                --n, cqueue_int_pop(&Q);
-        }
-        printf("after: size, capacity: %d, %d\n", n, cqueue_int_size(&Q), cqueue_int_capacity(&Q));
-    }
-}
-*/
+#undef i_allocator
+#undef i_malloc
+#undef i_calloc
+#undef i_realloc
+#undef i_free
 
-#ifndef _i_prefix
-#define _i_prefix cqueue_
-#endif
-#define _i_queue
-#define _pop_front _pop
+#undef i_no_cmp
+#undef i_no_hash
+#undef i_no_clone
+#undef i_no_emplace
+#undef i_is_forward
 
-#include "cdeq.h"
-
-#undef _pop_front
-#undef _i_queue
+#undef _i_prefix
+#undef _i_expandby
+#undef _i_has_from
+#undef _i_has_eq
+#undef _i_template

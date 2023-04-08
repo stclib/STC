@@ -20,46 +20,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-// STC queue
-/*
-#include <stc/crand.h>
-#include <stdio.h>
+#include <stc/ccommon.h>
+#include <stc/forward.h>
 
-#define i_key int
-#include <stc/cqueue.h>
-
-int main() {
-    int n = 10000000;
-    crand_t rng = crand_init(1234);
-    crand_unif_t dist = crand_unif_init(0, n);
-
-    c_auto (cqueue_int, Q)
-    {
-        // Push ten million random numbers onto the queue.
-        for (int i=0; i<n; ++i)
-            cqueue_int_push(&Q, crand_unif(&rng, &dist));
-
-        // Push or pop on the queue ten million times
-        printf("before: size, capacity: %d, %d\n", n, cqueue_int_size(&Q), cqueue_int_capacity(&Q));
-        for (int i=n; i>0; --i) {
-            int r = crand_unif(&rng, &dist);
-            if (r & 1)
-                ++n, cqueue_int_push(&Q, r);
-            else
-                --n, cqueue_int_pop(&Q);
-        }
-        printf("after: size, capacity: %d, %d\n", n, cqueue_int_size(&Q), cqueue_int_capacity(&Q));
-    }
-}
-*/
-
-#ifndef _i_prefix
-#define _i_prefix cqueue_
+#ifdef i_key_str
+  #define _i_key cstr
+#elif defined i_keyclass
+  #define _i_key i_keyclass
+#elif defined i_keyboxed
+  #define _i_key i_keyboxed
+#elif defined i_key
+  #define _i_key i_key
 #endif
-#define _i_queue
-#define _pop_front _pop
 
-#include "cdeq.h"
+#ifdef i_val_str
+  #define _i_val cstr
+#elif defined i_valclass
+  #define _i_val i_valclass
+#elif defined i_valboxed
+  #define _i_val i_valboxed
+#elif defined i_val
+  #define _i_val i_val
+#endif
 
-#undef _pop_front
-#undef _i_queue
+#ifdef _i_key
+  c_PASTE(forward_, i_con)(i_type, _i_key, _i_val);
+#else
+  c_PASTE(forward_, i_con)(i_type, _i_val);
+#endif
+
+typedef struct {
+    i_extend
+    i_type get;
+} c_PASTE(i_type, _ext);
+
+#define c_getcon(cptr) c_container_of(cptr, _cx_memb(_ext), get)
+
+#define i_is_forward
+#define _i_inc <stc/i_con.h>
+#include _i_inc
+#undef _i_inc
+#undef _i_key
+#undef _i_val
+#undef i_con
+#undef i_extend

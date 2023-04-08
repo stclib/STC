@@ -1,7 +1,10 @@
 #ifndef FMT_H_INCLUDED
 #define FMT_H_INCLUDED
 /* 
-VER 2.0: NEW API:
+VER 2.1: NEW API:
+void        print(fmt, ...);
+void        println(fmt, ...);
+void        printd(dest, fmt, ...);
 
 void        fmt_print(fmt, ...);
 void        fmt_println(fmt, ...);
@@ -28,7 +31,7 @@ void        fmt_destroy(fmt_buffer* buf);
 * Static linking by default, shared symbols by defining FMT_HEADER / FMT_IMPLEMENT.
 * (c) operamint, 2022, MIT License.
 -----------------------------------------------------------------------------------
-#include "c11/fmt.h"
+#include "c11/print.h"
 
 int main() {
     const double pi = 3.141592653589793;
@@ -40,21 +43,21 @@ int main() {
     unsigned char r = 123, g = 214, b = 90, w = 110;
     char buffer[64];
 
-    fmt_print("Color: ({} {} {}), {}\n", r, g, b, flag);
-    fmt_println("Wide: {}, {}", wstr, L"wide world");
-    fmt_println("{:10} {:10} {:10.2f}", 42ull, 43, pi);
-    fmt_println("{:>10} {:>10} {:>10}", z, z, w);
-    fmt_printd(stdout, "{:10} {:10} {:10}\n", "Hello", "Mad", "World");
-    fmt_printd(stderr, "100%: {:<20} {:.*} {}\n", string, 4, pi, x);
-    fmt_printd(buffer, "Precision: {} {:.10} {}", string, pi, x);
-    fmt_println("{}", buffer);
-    fmt_println("Vector: ({}, {}, {})", 3.2, 3.3, pi);
+    print("Color: ({} {} {}), {}\n", r, g, b, flag);
+    println("Wide: {}, {}", wstr, L"wide world");
+    println("{:10} {:10} {:10.2f}", 42ull, 43, pi);
+    println("{:>10} {:>10} {:>10}", z, z, w);
+    printd(stdout, "{:10} {:10} {:10}\n", "Hello", "Mad", "World");
+    printd(stderr, "100%: {:<20} {:.*} {}\n", string, 4, pi, x);
+    printd(buffer, "Precision: {} {:.10} {}", string, pi, x);
+    println("{}", buffer);
+    println("Vector: ({}, {}, {})", 3.2, 3.3, pi);
 
     fmt_buffer out[1] = {{.stream=1}};
-    fmt_printd(out, "{} {}", "Pi is:", pi);
-    fmt_print("{}, len={}, cap={}\n", out->data, out->len, out->cap);
-    fmt_printd(out, "{} {}", ", Pi squared is:", pi*pi);
-    fmt_print("{}, len={}, cap={}\n", out->data, out->len, out->cap);
+    printd(out, "{} {}", "Pi is:", pi);
+    print("{}, len={}, cap={}\n", out->data, out->len, out->cap);
+    printd(out, "{} {}", ", Pi squared is:", pi*pi);
+    print("{}, len={}, cap={}\n", out->data, out->len, out->cap);
     fmt_destroy(out);
 }
 */

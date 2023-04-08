@@ -119,29 +119,29 @@ cvec_X_value        cvec_X_value_clone(cvec_X_value val);
 int main()
 {
     // Create a vector containing integers
-    c_auto (cvec_int, vec)
-    {
-        // Add two integers to vector
-        cvec_int_push(&vec, 25);
-        cvec_int_push(&vec, 13);
+    cvec_int vec = {0};
 
-        // Append a set of numbers
-        c_forlist (i, int, {7, 5, 16, 8})
-            cvec_int_push(&vec, *i.ref);
+    // Add two integers to vector
+    cvec_int_push(&vec, 25);
+    cvec_int_push(&vec, 13);
 
-        printf("initial:");
-        c_foreach (k, cvec_int, vec) {
-            printf(" %d", *k.ref);
-        }
+    // Append a set of numbers
+    c_forlist (i, int, {7, 5, 16, 8})
+        cvec_int_push(&vec, *i.ref);
 
-        // Sort the vector
-        cvec_int_sort(&vec);
-
-        printf("\nsorted:");
-        c_foreach (k, cvec_int, vec) {
-            printf(" %d", *k.ref);
-        }
+    printf("initial:");
+    c_foreach (k, cvec_int, vec) {
+        printf(" %d", *k.ref);
     }
+
+    // Sort the vector
+    cvec_int_sort(&vec);
+
+    printf("\nsorted:");
+    c_foreach (k, cvec_int, vec) {
+        printf(" %d", *k.ref);
+    }
+    cvec_int_drop(&vec);
 }
 ```
 Output:
@@ -212,7 +212,7 @@ User User_clone(User user) {
 #include <stc/cvec.h>
 
 int main(void) {
-    UVec vec = UVec_init();
+    UVec vec = {0};
     UVec_push(&vec, (User){cstr_lit("mary"), 0});
     UVec_push(&vec, (User){cstr_lit("joe"), 1});
     UVec_push(&vec, (User){cstr_lit("admin"), 2});

@@ -32,10 +32,7 @@
 #endif
 
 #include "priv/template.h"
-#ifndef i_less_functor
-  #define i_less_functor(self, x, y) i_less(x, y)
-#endif
-#if !c_option(c_is_forward)
+#ifndef i_is_forward
   _cx_deftypes(_c_cpque_types, _cx_self, i_key);
 #endif
 typedef i_keyraw _cx_raw;
@@ -120,8 +117,8 @@ STC_DEF void
 _cx_memb(_sift_down_)(_cx_self* self, const intptr_t idx, const intptr_t n) {
     _cx_value t, *arr = self->data - 1;
     for (intptr_t r = idx, c = idx*2; c <= n; c *= 2) {
-        c += i_less_functor(self, (&arr[c]), (&arr[c + (c < n)]));
-        if (!(i_less_functor(self, (&arr[r]), (&arr[c])))) return;
+        c += i_less((&arr[c]), (&arr[c + (c < n)]));
+        if (!(i_less((&arr[r]), (&arr[c])))) return;
         t = arr[r], arr[r] = arr[c], arr[r = c] = t;
     }
 }
@@ -156,12 +153,11 @@ _cx_memb(_push)(_cx_self* self, _cx_value value) {
         _cx_memb(_reserve)(self, self->_len*3/2 + 4);
     _cx_value *arr = self->data - 1; /* base 1 */
     intptr_t c = ++self->_len;
-    for (; c > 1 && (i_less_functor(self, (&arr[c/2]), (&value))); c /= 2)
+    for (; c > 1 && (i_less((&arr[c/2]), (&value))); c /= 2)
         arr[c] = arr[c/2];
     arr[c] = value;
 }
 
 #endif
 #define CPQUE_H_INCLUDED
-#undef i_less_functor
-#include "priv/template.h"
+#include "priv/template2.h"
