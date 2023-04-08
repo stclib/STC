@@ -122,8 +122,9 @@
 #define c_make(C, ...) \
   C##_from_n((C##_raw[])__VA_ARGS__, c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
 
-#define c_arraylen(a) (intptr_t)(sizeof(a)/sizeof 0[a])
 #define c_litstrlen(literal) (c_sizeof("" literal) - 1)
+#define c_arraylen(a) (c_ARRAYLEN(a) + c_static_assert(sizeof(a) != sizeof(uintptr_t)))
+#define c_ARRAYLEN(a) (intptr_t)(sizeof(a)/sizeof 0[a])
 
 // Non-owning c-string
 typedef const char* crawstr;

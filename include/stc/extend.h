@@ -52,9 +52,9 @@
 typedef struct {
     i_extend
     i_type get;
-} c_PASTE(i_type, Ext);
+} c_PASTE(i_type, _ext);
 
-#define c_getcon(cptr) c_container_of(cptr, _cx_memb(Ext), get)
+#define c_getcon(cptr) c_container_of(cptr, _cx_memb(_ext), get)
 
 #define i_is_forward
 #define _i_inc <stc/i_con.h>

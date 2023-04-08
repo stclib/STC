@@ -8,11 +8,10 @@ STC - Smart Template Containers for C
 ---
 Description
 -----------
-STC is a *modern*, *fully typesafe*, *fast* and *compact* container and algorithm library for C99.
+STC is a *modern*, *typesafe*, *fast* and *compact* container and algorithms library for C99.
 The API naming is similar to C++ STL, but it takes inspiration from Rust and Python as well. 
-The library let you store and manage trivial and highly complex data in a variety of
-containers with ease. It is optimized for speed, usage ergonomics, consistency,
-and it creates small binaries.
+The library handles everything from trivial to highly complex data using *templates*, and it
+supports a variety of containers.
 
 Containers
 ----------
@@ -80,18 +79,18 @@ List of contents
 ## STC is unique!
 
 1. ***Centralized analysis of template parameters***. The analyser assigns values to all
-non-specified template parameters (based on the specified ones) using meta-programming, 
-so that you don't have to! You may specify a set of "standard" template parameters for each container,
-but as a minimum *only one is required*: `i_val` (+ `i_key` for maps). In this case STC assumes
-that the elements are of basic types. For more complex types, additional template parameters must be given. 
-2. ***Alternative insert/lookup type***. You may specify an alternative type to use for lookup in
-containers. E.g., containers with STC string elements (**cstr**) uses `const char*` as lookup type,
-so construction of a `cstr` (which may allocate memory) for the lookup *is not needed*. Hence, the alt. lookup
-key does not need to be destroyed after use as it is normally a POD type. Finally, the alternative
-key does not need to be destroyed after use as it is normally a POD type. Finally, the alternative
-lookup type may be passed to an ***emplace***-function. E.g. instead of calling 
-`cvec_str_push(&vec, cstr_from("Hello"))`, you may call `cvec_str_emplace(&vec, "Hello")`,
-which is functionally identical, but more convenient.
+non-specified template parameters (based on the specified ones) using meta-programming, so
+that you don't have to! You may specify a set of "standard" template parameters for each
+container, but as a minimum *only one is required*: `i_val` (+ `i_key` for maps). In this
+case, STC assumes that the elements are of basic types. For non-trivial types, additional
+template parameters must be given. 
+2. ***Alternative insert/lookup type***. You may specify an alternative type to use for
+lookup in containers. E.g., containers with STC string elements (**cstr**) uses `const char*`
+as lookup type, so constructing a `cstr` (which may allocate memory) for the lookup
+*is not needed*. Hence, the alternative lookup key does not need to be destroyed after use,
+as it is normally a POD type. Finally, the key may be passed to an ***emplace***-function.
+So instead of calling e.g. `cvec_str_push(&vec, cstr_from("Hello"))`, you may call 
+`cvec_str_emplace(&vec, "Hello")`, which is functionally identical, but more convenient.
 3. ***Standardized container iterators***. All containers can be iterated in the same manner, and all use the
 same element access syntax. E.g.:
     - `c_foreach (it, MyInts, myints) *it.ref += 42;` works for any container defined as 
@@ -146,9 +145,9 @@ Benchmark notes:
 ---
 ## Usage
 STC containers have similar functionality to C++ STL standard containers. All containers except for a few, 
-like **cstr** and **cbits** are generic/templated. No type casting is done, so containers are type-safe like 
-templated types in C++. However, the specification of template parameters are naturally different. In STC,
-you specify template parameters by `#define` before including the container:
+like **cstr** and **cbits** are generic/templated. No type casting is used, so containers are type-safe like 
+templated types in C++. However, to specify template parameters with STC, you define them as macros prior to
+including the container:
 ```c
 #define i_type Floats  // Container type name; unless defined name would be cvec_float
 #define i_val float    // Container element type
@@ -576,10 +575,10 @@ To use it, define both `i_type` and `i_con` (the container type) before includin
 #define i_con csmap
 #include "stcpgs.h"
 
-// Note the wrapper struct type is IMapExt. IMap is accessed by .get
+// Note the wrapper struct type is IMap_ext. IMap is accessed by .get
 void maptest()
 {
-    IMapExt map = {.memctx=CurrentMemoryContext};
+    IMap_ext map = {.memctx=CurrentMemoryContext};
     c_forrange (i, 1, 16)
         IMap_insert(&map.get, i*i, i);
 
@@ -605,9 +604,17 @@ STC is generally very memory efficient. Memory usage for the different container
 
 ---
 # Version History
+## Version 4.2
+- Much improved documentation
+- Added Coroutines + documentation
+- Added `c_const_cast()` typesafe macro.
+- Renamed c_foreach_r => `c_foreach_rv`
+- Renamed c_flt_count(i) => `c_flt_counter(i)`
+- Renamed c_flt_last(i) => `c_flt_getcount(i)`
+- Removed c_PAIR
 
 ## Version 4.1.1
-I am happy to finally announce a new release! Major changes:
+Major changes:
 - A new exciting [**cspan**](docs/cspan_api.md) single/multi-dimensional array view (with numpy-like slicing).
 - Signed sizes and indices for all containers. See C++ Core Guidelines by Stroustrup/Sutter: [ES.100](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es100-dont-mix-signed-and-unsigned-arithmetic), [ES.102](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es102-use-signed-types-for-arithmetic), [ES.106](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es106-dont-try-to-avoid-negative-values-by-using-unsigned), and [ES.107](https://isocpp.github.io/CppCoreGuidelines/CppCoreGuidelines#es107-dont-use-unsigned-for-subscripts-prefer-gslindex).
 - Customizable allocator [per templated container type](https://github.com/tylov/STC/discussions/44#discussioncomment-4891925).

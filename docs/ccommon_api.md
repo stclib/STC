@@ -84,7 +84,7 @@ c_forrange (i, 30, 0, -5) printf(" %lld", i);
 ### crange
 A number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html). The **crange_value** type is `long long`. Below *start*, *stop*, and *step* are of type *crange_value*:
 ```c
-crange&     crange_object(...)              // create a compound literal crange object
+crange&     crange_obj(...)              // create a compound literal crange object
 crange      crange_make(stop);              // will generate 0, 1, ..., stop-1
 crange      crange_make(start, stop);       // will generate start, start+1, ... stop-1
 crange      crange_make(start, stop, step); // will generate start, start+step, ... upto-not-including stop
@@ -102,7 +102,7 @@ c_forfilter (i, crange, r1, isPrime(*i.ref))
 
 // 2. The first 11 primes:
 printf("2");
-c_forfilter (i, crange, crange_object(3, INT64_MAX, 2),
+c_forfilter (i, crange, crange_obj(3, INT64_MAX, 2),
     isPrime(*i.ref) &&
     c_flt_take(10)
 ){
@@ -260,22 +260,23 @@ void        c_default_drop(Type* p);                    // does nothing
 
 ---
 ## Coroutines
-This is an improved implementation of Simon Tatham's classic C code, which utilizes
-the *Duff's device* trick. However, Tatham's implementation is not typesafe,
-and it always allocates the coroutine's internal state dynamically. But most crucially,
+This is a much improved implementation of 
+[Simon Tatham's coroutines](https://www.chiark.greenend.org.uk/~sgtatham/coroutines.html),
+which utilizes the *Duff's device* trick. Tatham's implementation is not typesafe,
+and it always allocates the coroutine's internal state dynamically. But crucially,
 it does not let the coroutine do self-cleanup on early finish - i.e. it
 only frees the initial dynamically allocated memory.
 
-In this implementation a coroutine may have any signature, but it should
-take some struct pointer as parameter, which must contain the member `int cco_state;`
+In this implementation, a coroutine may have any signature, but it should
+take a struct pointer as parameter, which must contain the member `int cco_state;`
 The struct should normally store all the *local* variables to be used in the
 coroutine. It can also store input and output data if desired.
 
-The coroutine example below generates Pythagorian triples, but the main user-loop
-skips the triples which are upscaled version of smaller ones by checking 
-the gcd() function, and breaks when the diagonal size >= 100:
+The coroutine example below generates Pythagorian triples, but the calling loop
+skips the triples which are upscaled version of smaller ones, by checking 
+the gcd() function. It also ensures that it stops when the diagonal size >= 100:
 ```c
-#include <stc/algo/coroutine.h>
+#include <stc/calgo.h>
 
 struct triples {
     int n; // input: max number of triples to be generated.
@@ -311,8 +312,7 @@ int gcd(int a, int b) { // greatest common denominator
 
 int main()
 {
-    puts("\nCoroutine triples:");
-    struct triples t = {INT32_MAX};
+    struct triples t = {.n=INT32_MAX};
     int n = 0;
 
     while (triples_next(&t)) {
@@ -324,12 +324,13 @@ int main()
         if (t.c < 100)
             printf("%d: {%d, %d, %d}\n", ++n, t.a, t.b, t.c);
         else
-            cco_stop(&t); // make sure coroutine cleanup is done
+            cco_stop(&t); // cleanup in next coroutine call/resume
     }
 }
 ```
 ### Coroutine API
-**Note**: `cco_yield()` may not be called inside a `switch` statement. Use `if-else-if` constructs instead.
+**Note**: *cco_yield()* may not be called inside a `switch` statement. Use `if-else-if` constructs instead.
+To resume the coroutine from where it was suspended with *cco_yield()*, simply call the coroutine again.
 
 |           |  Function / operator                 | Description                             |
 |:----------|:-------------------------------------|:----------------------------------------|
@@ -340,7 +341,7 @@ int main()
 | `void`    | `cco_begin(ctx)`                     | Begin coroutine block                   |
 | `rettype` | `cco_end(retval)`                    | End coroutine block with return value   |
 | `rettype` | `cco_end()`                          | End coroutine block with (void)         |
-| `rettype` | `cco_yield(retval)`                  | Yield a value                           |
+| `rettype` | `cco_yield(retval)`                  | Return a value and suspend execution    |
 | `rettype` | `cco_yield(corocall2, ctx2, retval)` | Yield from another coroutine and return val |
 | `rettype` | `cco_yield(corocall2, ctx2)`         | Yield from another coroutine (void)     |
 |           | From the caller side:                |                                         | 

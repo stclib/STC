@@ -14,10 +14,10 @@
 #define i_con cpque
 #include <stc/extend.h>
 
-void print_queue(const char* name, IPQueExt q) {
+void print_queue(const char* name, IPQue_ext q) {
     // NB: make a clone because there is no way to traverse
     // priority_queue's content without erasing the queue.
-    IPQueExt copy = {q.less, IPQue_clone(q.get)};
+    IPQue_ext copy = {q.less, IPQue_clone(q.get)};
     
     for (printf("%s: \t", name); !IPQue_empty(&copy.get); IPQue_pop(&copy.get))
         printf("%d ", *IPQue_top(&copy.get));
@@ -38,9 +38,9 @@ int main()
         printf("%d ", data[i]);
     puts("");
 
-    IPQueExt q1 = {int_less};       // Max priority queue
-    IPQueExt minq1 = {int_greater}; // Min priority queue
-    IPQueExt q5 = {int_lambda};     // Using lambda to compare elements.
+    IPQue_ext q1 = {int_less};       // Max priority queue
+    IPQue_ext minq1 = {int_greater}; // Min priority queue
+    IPQue_ext q5 = {int_lambda};     // Using lambda to compare elements.
 
     c_forrange (i, n)
         IPQue_push(&q1.get, data[i]);

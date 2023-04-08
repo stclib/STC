@@ -54,7 +54,7 @@ fn main() {
 void demo2(void)
 {
     IVec vector = {0};
-    c_forfilter (x, crange, crange_object(INT64_MAX),
+    c_forfilter (x, crange, crange_obj(INT64_MAX),
         c_flt_skipwhile(x, *x.ref != 11) &&
         (*x.ref % 2) != 0                &&
         c_flt_take(x, 5)
