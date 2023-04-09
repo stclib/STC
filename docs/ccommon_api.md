@@ -1,6 +1,4 @@
-# STC [ccommon](../include/stc/ccommon.h): Generic algorithms and macros
-
-The following macros are recommended to use, and they safe/have no side-effects.
+# STC Algorithms
 
 ---
 ## Ranged for-loops
@@ -204,6 +202,23 @@ if (it.ref) cmap_str_erase_at(&map, it);
 // Erase all strings containing "hello" in a sorted map:
 c_erase_if(i, csmap_str, map, cstr_contains(i.ref, "hello"));
 ```
+
+### csort - two times faster qsort
+
+When very fast array sorting is required, **csort** is about twice as fast as *qsort()*, and often simpler to use.
+You may customize `i_tag` and the comparison function `i_cmp` or `i_less`.  
+
+There is a [benchmark/test file here](../misc/benchmarks/various/csort_bench.c).
+```c
+#define i_val int
+#include <stc/algo/csort.h>
+
+int main() {
+    int array[] = {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4};
+    csort_int(array, c_arraylen(array));
+}
+```
+
 
 ### c_new, c_delete
 

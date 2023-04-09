@@ -3,7 +3,7 @@
 STC - Smart Template Containers for C
 =====================================
 
-### [Version 4.2 RC](#version-history)
+### [Version 4.2](#version-history)
 
 ---
 Description
@@ -36,7 +36,7 @@ Algorithms
 ----------  
 - [***Ranged for-loops*** - c_foreach, c_forpair, c_forlist](docs/ccommon_api.md#ranged-for-loops)
 - [***Range algorithms*** - c_forrange, crange, c_forfilter](docs/ccommon_api.md#range-algorithms)
-- [***Generic algorithms*** - c_make, c_find_if, c_erase_if, etc.](docs/ccommon_api.md#generic-algorithms)
+- [***Generic algorithms*** - c_make, c_find_if, c_erase_if, csort, etc.](docs/ccommon_api.md#generic-algorithms)
 - [***Coroutines*** - Simon Tatham's coroutines done right](docs/ccommon_api.md#coroutines)
 - [***Regular expressions*** - modernized Rob Pike's Plan-9 regexp](docs/cregex_api.md)
 - [***Random numbers*** - a novel very fast *PRNG* based on *SFC64*](docs/crandom_api.md)
@@ -66,14 +66,15 @@ List of contents
 - **Fully type safe** - Because of templating, it avoids error-prone casting of container types and elements back and forth from the containers.
 - **User friendly** - Just include the headers and you are good. The API and functionality is very close to c++ STL and is fully listed in the docs. 
 - **Unparalleled performance** - Maps and sets are much faster than the C++ STL containers, the remaining are similar in speed.
-- **Fully memory managed** - Containers destructs keys/values via default or user supplied drop function. They may be cloned if element types are clonable. Also, smart pointers are supported and can be stored in containers. See ***carc*** and ***cbox***.
+- **Fully memory managed** - Containers destructs keys/values via default or user supplied drop function. They may be cloned if element types are clonable. Also, smart pointers are supported and can be stored in containers. See [***carc***](docs/carc_api.md) and [***cbox***](docs/cbox_api.md).
 - **Uniform, easy-to-learn API** - Intuitive method/type names and uniform usage across the various containers.
 - **No signed/unsigned mixing** - Unsigned sizes and indices mixed with signed for comparison and calculation is asking for trouble. STC only uses signed numbers in the API for this reason.
 - **Small footprint** - Small source code and generated executables. The executable from the example below using *four different* container types is only ***19 Kb in size*** compiled with gcc -O3 -s on Linux.
 - **Dual mode compilation** - By default it is a simple header-only library with inline and static methods only, but you can easily switch to create a traditional library with shared symbols, without changing existing source files. See the Installation section.
 - **No callback functions** - All passed template argument functions/macros are directly called from the implementation, no slow callbacks which requires storage.
 - **Compiles with C++ and C99** - C code can be compiled with C++ (container element types must be POD).
-- **Forward declaration** - Templated containers may be forward declared without including the full API/implementation. See documentation below.
+- **Forward declaration** - Templated containers may be [forward declared](#forward-declarations) without including the full API/implementation.
+- **Extendable containers** - STC provides a mechanism to wrap containers inside a struct with [custom data per instance](#per-container-instance-customization).    
 
 ---
 ## STC is unique!
@@ -609,6 +610,7 @@ STC is generally very memory efficient. Memory usage for the different container
 - Added Coroutines + documentation
 - Added `c_const_cast()` typesafe macro.
 - Added crand.h header: new API for crandom.h, which is deprecated.
+- Removed RAII macros usage from examples
 - Renamed c_foreach_r => `c_foreach_rv`
 - Renamed c_flt_count(i) => `c_flt_counter(i)`
 - Renamed c_flt_last(i) => `c_flt_getcount(i)`

@@ -17,12 +17,18 @@ uint64_t romutrio(uint64_t s[3]) {
     return xp;
 }
 
+static int cmp_int(const void* a, const void* b) {
+    return c_default_cmp((const int*)a, (const int*)b);
+}
+
 void testsort(int *a, int size, const char *desc) {
     clock_t t = clock();
 #ifdef __cplusplus
-        { printf("std::sort: "); std::sort(a, a + size); }
+    printf("std::sort: "); std::sort(a, a + size);
+#elif defined QSORT
+    printf("qsort: "); qsort(a, size, sizeof *a, cmp_int);
 #else
-        { printf("stc_sort: "); csort_int(a, size); }
+    printf("stc_sort: "); csort_int(a, size);
 #endif
     t = clock() - t;
 
