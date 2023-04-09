@@ -351,14 +351,15 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |:----------|:-------------------------------------|:----------------------------------------|
 |           | `cco_final:`                         | Obligatory label in coroutine           |
 |           | `cco_return;`                        | Early return from the coroutine         |
+| `bool`    | `cco_alive(ctx)`                     | Is coroutine in initial or suspended state? |
 | `bool`    | `cco_suspended(ctx)`                 | Is coroutine in suspended state?        |
-| `bool`    | `cco_alive(ctx)`                     | Is coroutine still alive?               |
 | `void`    | `cco_begin(ctx)`                     | Begin coroutine block                   |
 | `rettype` | `cco_end(retval)`                    | End coroutine block with return value   |
-| `rettype` | `cco_end()`                          | End coroutine block with (void)         |
-| `rettype` | `cco_yield(retval)`                  | Return a value and suspend execution    |
+| `void`    | `cco_end()`                          | End coroutine block                     |
+| `rettype` | `cco_yield(retval)`                  | Suspend execution and return a value    |
+| `void`    | `cco_yield()`                        | Suspend execution                       |
 | `rettype` | `cco_yield(corocall2, ctx2, retval)` | Yield from another coroutine and return val |
-| `rettype` | `cco_yield(corocall2, ctx2)`         | Yield from another coroutine (void)     |
+| `void`    | `cco_yield(corocall2, ctx2)`         | Yield from another coroutine            |
 |           | From the caller side:                |                                         | 
 | `void`    | `cco_stop(ctx)`                      | Next call of coroutine returns `cco_end()` |                  
 | `void`    | `cco_reset(ctx)`                     | Reset state to initial (for reuse)      |
