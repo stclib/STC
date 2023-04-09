@@ -1,7 +1,7 @@
 ![STC](docs/pics/containers.jpg)
 
-STC - Smart Template Containers for C
-=====================================
+STC - Smart Template Containers
+===============================
 
 ### [Version 4.2](#version-history)
 
@@ -10,8 +10,7 @@ Description
 -----------
 STC is a *modern*, *typesafe*, *fast* and *compact* container and algorithms library for C99.
 The API naming is similar to C++ STL, but it takes inspiration from Rust and Python as well. 
-The library handles everything from trivial to highly complex data using *templates*, and it
-supports a variety of containers.
+The library handles everything from trivial to highly complex data using *templates*.
 
 Containers
 ----------
@@ -197,7 +196,9 @@ For user-defined struct elements, `i_cmp` compare function should be defined as 
 only works for integral types. *Alternatively, `#define i_opt c_no_cmp` to disable sorting and searching*. Similarily, if an element destructor `i_valdrop` is defined, `i_valclone` function is required.
 *Alternatively `#define i_opt c_no_clone` to disable container cloning.*
 
-Let's make a vector of vectors, which can be cloned. All of its element vectors will be destroyed when destroying the Vec2D. [ [Run this code](https://godbolt.org/z/5EY56qnfM) ]
+Let's make a vector of vectors, which can be cloned. All of its element vectors will be destroyed when destroying the Vec2D.
+
+[ [Run this code](https://godbolt.org/z/5EY56qnfM) ]
 ```c
 #include <stdio.h>
 
@@ -231,7 +232,9 @@ int main(void)
     c_drop(Vec2D, &vec, &clone);      // Cleanup all (6) vectors.
 }
 ```
-This example uses four different container types: [ [Run this code](https://godbolt.org/z/x5YKeMrEh) ]
+This example uses four different container types:
+
+[ [Run this code](https://godbolt.org/z/x5YKeMrEh) ]
 ```c
 #include <stdio.h>
 
@@ -606,6 +609,9 @@ STC is generally very memory efficient. Memory usage for the different container
 ---
 # Version History
 ## Version 4.2
+- New home! And online single headers for https://godbolt.org
+    - Library: https://github.com/stclib/STC
+    - Headers, e.g. https://raw.githubusercontent.com/stclib/stcsingle/main/stc/cvec.h
 - Much improved documentation
 - Added Coroutines + documentation
 - Added new crand.h API & header. Old crandom.h is deprecated.
