@@ -337,7 +337,7 @@ int main()
         
         // Stop when c >= 100
         if (t.c < 100)
-            printf("%d: {%d, %d, %d}\n", ++n, t.a, t.b, t.c);
+            printf("%d: [%d, %d, %d]\n", ++n, t.a, t.b, t.c);
         else
             cco_stop(&t); // cleanup in next coroutine call/resume
     }
