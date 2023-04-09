@@ -197,7 +197,7 @@ For user-defined struct elements, `i_cmp` compare function should be defined as 
 only works for integral types. *Alternatively, `#define i_opt c_no_cmp` to disable sorting and searching*. Similarily, if an element destructor `i_valdrop` is defined, `i_valclone` function is required.
 *Alternatively `#define i_opt c_no_clone` to disable container cloning.*
 
-Let's make a vector of vectors, which can be cloned. All of its element vectors will be destroyed when destroying the Vec2D.
+Let's make a vector of vectors, which can be cloned. All of its element vectors will be destroyed when destroying the Vec2D. [ [Run this code](https://godbolt.org/z/5EY56qnfM) ]
 ```c
 #include <stdio.h>
 
@@ -231,7 +231,7 @@ int main(void)
     c_drop(Vec2D, &vec, &clone);      // Cleanup all (6) vectors.
 }
 ```
-This example uses four different container types:
+This example uses four different container types: [ [Run this code](https://godbolt.org/z/x5YKeMrEh) ]
 ```c
 #include <stdio.h>
 

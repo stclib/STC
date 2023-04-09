@@ -142,7 +142,42 @@ The HEX of color RED is:[#FF0000]
 The HEX of color BLACK is:[#000000]
 ```
 
+
 ### Example 2
+Translate a 
+[C++ example using *insert* and *emplace*](https://en.cppreference.com/w/cpp/container/map/try_emplace)
+ to STC: [ [Run this code](https://godbolt.org/z/9d1PP77Pa) ]
+```c
+#include <stc/cstr.h>
+#define i_type strmap
+#define i_key_str
+#define i_val_str
+#include <stc/csmap.h>
+ 
+static void print_node(const strmap_value* node) {
+    printf("[%s] = %s\n", cstr_str(&node->first), cstr_str(&node->second));
+}
+ 
+static void print_result(strmap_result result) {
+    printf("%s", result.inserted ? "inserted: " : "ignored:  ");
+    print_node(result.ref);
+}
+ 
+int main()
+{
+    strmap m = {0};
+ 
+    print_result( strmap_emplace(&m, "a", "a") );
+    print_result( strmap_emplace(&m, "b", "abcd") );
+    print_result( strmap_insert(&m, cstr_from("c"), cstr_with_size(10, 'c') ) );
+    print_result( strmap_emplace(&m, "c", "Won't be inserted") );
+ 
+    c_foreach (p, strmap, m) { print_node(p.ref); }
+    strmap_drop(&m);
+}
+```
+
+### Example 3
 This example uses a csmap with cstr as mapped value.
 ```c
 #include <stc/cstr.h>
@@ -179,7 +214,7 @@ Output:
 120: #cc7744ff
 ```
 
-### Example 3
+### Example 4
 Demonstrate csmap with plain-old-data key type Vec3i and int as mapped type: csmap<Vec3i, int>.
 ```c
 typedef struct { int x, y, z; } Vec3i;
@@ -219,38 +254,4 @@ Output:
 {   0, 100,   0 }: 2
 { 100,   0,   0 }: 1
 { 100, 100, 100 }: 4
-```
-
-### Example 4
-Inverse: demonstrate csmap with mapped POD type Vec3i: csmap<int, Vec3i>:
-```c
-typedef struct { int x, y, z; } Vec3i;
-
-#define i_key int
-#define i_val Vec3i
-#define i_tag iv
-#include <stc/csmap.h>
-#include <stdio.h>
-
-int main()
-{
-    csmap_iv imap = {0};
-
-    csmap_iv_insert(&imap, 1, (Vec3i){100, 0, 0});
-    csmap_iv_insert(&imap, 2, (Vec3i){0, 100, 0});
-    csmap_iv_insert(&imap, 3, (Vec3i){0, 0, 100});
-    csmap_iv_insert(&imap, 4, (Vec3i){100, 100, 100});
-
-    c_forpair (n, v, csmap_iv, imap)
-        printf("%d: { %3d, %3d, %3d }\n", *_.n, _.v->x, _.v->y, _.v->z);
-    
-    csmap_iv_drop(&imap);
-}
-```
-Output:
-```c
-1: { 100,   0,   0 }
-2: {   0, 100,   0 }
-3: {   0,   0, 100 }
-4: { 100, 100, 100 }
 ```
