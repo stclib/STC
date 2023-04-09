@@ -37,9 +37,9 @@ Algorithms
 - [***Ranged for-loops*** - c_foreach, c_forpair, c_forlist](docs/ccommon_api.md#ranged-for-loops)
 - [***Range algorithms*** - c_forrange, crange, c_forfilter](docs/ccommon_api.md#range-algorithms)
 - [***Generic algorithms*** - c_make, c_find_if, c_erase_if, csort, etc.](docs/ccommon_api.md#generic-algorithms)
-- [***Coroutines*** - Simon Tatham's coroutines done right](docs/ccommon_api.md#coroutines)
-- [***Regular expressions*** - modernized Rob Pike's Plan-9 regexp](docs/cregex_api.md)
-- [***Random numbers*** - a novel very fast *PRNG* based on *SFC64*](docs/crandom_api.md)
+- [***Coroutines*** - Simon Tatham's coroutines done right.](docs/ccommon_api.md#coroutines)
+- [***Regular expressions*** - Rob Pike's Plan 9 regexp modernized!](docs/cregex_api.md)
+- [***Random numbers*** - a very fast *PRNG* based on *SFC64*](docs/crandom_api.md)
 - [***Command line argument parser*** - similar to *getopt()*](docs/coption_api.md)
 
 ---
@@ -608,14 +608,14 @@ STC is generally very memory efficient. Memory usage for the different container
 ## Version 4.2
 - Much improved documentation
 - Added Coroutines + documentation
+- Added new crand.h API & header. Old crandom.h is deprecated.
 - Added `c_const_cast()` typesafe macro.
-- Added crand.h header: new API for crandom.h, which is deprecated.
 - Removed RAII macros usage from examples
 - Renamed c_foreach_r => `c_foreach_rv`
 - Renamed c_flt_count(i) => `c_flt_counter(i)`
 - Renamed c_flt_last(i) => `c_flt_getcount(i)`
 - Renamed c_ARRAYLEN() => c_arraylen()
-- Renamed deprecated c_ARGSV => c_SV
+- Removed deprecated c_ARGSV(). Use c_SV()
 - Removed c_PAIR
 
 ## Version 4.1.1
