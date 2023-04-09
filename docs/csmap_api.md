@@ -146,7 +146,9 @@ The HEX of color BLACK is:[#000000]
 ### Example 2
 Translate a 
 [C++ example using *insert* and *emplace*](https://en.cppreference.com/w/cpp/container/map/try_emplace)
- to STC: [ [Run this code](https://godbolt.org/z/9d1PP77Pa) ]
+ to STC:
+
+[ [Run this code](https://godbolt.org/z/9d1PP77Pa) ]
 ```c
 #include <stc/cstr.h>
 #define i_type strmap

@@ -173,6 +173,8 @@ int main(void)
 }
 ```
 You may switch to a different container type, e.g. a sorted set (csset):
+
+[ [Run this code](https://godbolt.org/z/qznfa65e1) ]
 ```c
 #define i_type Floats
 #define i_val float
@@ -181,9 +183,10 @@ You may switch to a different container type, e.g. a sorted set (csset):
 
 int main()
 {
-    Floats nums = c_make(Floats, {30.f, 10.f, 20.f}); // Initialize with a list of floats.
-    Floats_push(&nums, 50.f); 
-    Floats_push(&nums, 40.f);
+    Floats nums = {0};
+    Floats_push(&nums, 30.f);
+    Floats_push(&nums, 10.f);
+    Floats_push(&nums, 20.f);
 
     // already sorted, print the numbers
     c_foreach (i, Floats, nums)

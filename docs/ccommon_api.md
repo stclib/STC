@@ -125,8 +125,9 @@ Iterate a container/range with chained range filtering.
 | `c_flt_takewhile(it, predicate)`  | Take items until predicate is false        |
 | `c_flt_counter(it)`               | Increment current and return count         |
 | `c_flt_getcount(it)`              | Number of items passed skip*/take*/counter |
+
+[ [Run this example](https://godbolt.org/z/n9aYrYPv8) ]
 ```c
-// Example:
 #include <stc/calgo.h>
 #include <stdio.h>
 
@@ -135,6 +136,7 @@ bool isPrime(long long i) {
         if (i % j == 0) return false;
     return true;
 }
+
 int main() {
     // Get 10 prime numbers starting from 1000. Skip the first 15 primes,
     // then select every 25th prime (including the initial).
@@ -148,7 +150,6 @@ int main() {
     ){
         printf(" %lld", *i.ref);
     }
-    puts("");
 }
 // out: 1097 1289 1481 1637 1861 2039 2243 2417 2657 2803
 ```
@@ -290,6 +291,8 @@ coroutine. It can also store input and output data if desired.
 The coroutine example below generates Pythagorian triples, but the calling loop
 skips the triples which are upscaled version of smaller ones, by checking 
 the gcd() function. It also ensures that it stops when the diagonal size >= 100:
+
+[ [Run this code](https://godbolt.org/z/coqqrfbd5) ]
 ```c
 #include <stc/calgo.h>
 
