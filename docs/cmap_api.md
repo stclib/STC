@@ -102,12 +102,12 @@ bool                  c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !
 | Type name          | Type definition                                 | Used to represent...          |
 |:-------------------|:------------------------------------------------|:------------------------------|
 | `cmap_X`           | `struct { ... }`                                | The cmap type                 |
-| `cmap_X_rawkey`    | `i_keyraw`                                      | The raw key type              |
-| `cmap_X_rawmapped` | `i_valraw`                                      | The raw mapped type           |
-| `cmap_X_raw`       | `struct { i_keyraw first; i_valraw second; }`   | i_keyraw + i_valraw type      |
 | `cmap_X_key`       | `i_key`                                         | The key type                  |
 | `cmap_X_mapped`    | `i_val`                                         | The mapped type               |
 | `cmap_X_value`     | `struct { const i_key first; i_val second; }`   | The value: key is immutable   |
+| `cmap_X_keyraw`    | `i_keyraw`                                      | The raw key type              |
+| `cmap_X_rmapped`   | `i_valraw`                                      | The raw mapped type           |
+| `cmap_X_raw`       | `struct { i_keyraw first; i_valraw second; }`   | i_keyraw + i_valraw type      |
 | `cmap_X_result`    | `struct { cmap_X_value *ref; bool inserted; }`  | Result of insert/emplace      |
 | `cmap_X_iter`      | `struct { cmap_X_value *ref; ... }`             | Iterator type                 |
 

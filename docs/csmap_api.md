@@ -91,12 +91,12 @@ csmap_X_raw           csmap_X_value_toraw(csmap_X_value* pval);
 | Type name           | Type definition                                   | Used to represent...         |
 |:--------------------|:--------------------------------------------------|:-----------------------------|
 | `csmap_X`           | `struct { ... }`                                  | The csmap type               |
-| `csmap_X_rawkey`    | `i_keyraw`                                        | The raw key type             |
-| `csmap_X_rawmapped` | `i_valraw`                                        | The raw mapped type          |
-| `csmap_X_raw`       | `struct { i_keyraw first; i_valraw second; }`     | i_keyraw+i_valraw type       |
 | `csmap_X_key`       | `i_key`                                           | The key type                 |
 | `csmap_X_mapped`    | `i_val`                                           | The mapped type              |
-| `csmap_X_value`     | `struct { const i_key first; i_val second; }`     | The value: key is immutable  |
+| `csmap_X_value`     | `struct { i_key first; i_val second; }`           | The value: key is immutable  |
+| `csmap_X_keyraw`    | `i_keyraw`                                        | The raw key type             |
+| `csmap_X_rmapped`   | `i_valraw`                                        | The raw mapped type          |
+| `csmap_X_raw`       | `struct { i_keyraw first; i_valraw second; }`     | i_keyraw+i_valraw type       |
 | `csmap_X_result`    | `struct { csmap_X_value *ref; bool inserted; }`   | Result of insert/put/emplace |
 | `csmap_X_iter`      | `struct { csmap_X_value *ref; ... }`              | Iterator type                |
 
