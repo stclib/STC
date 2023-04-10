@@ -96,13 +96,14 @@ cregex_drop(&re1);
 If an error occurs ```cregex_compile``` returns a negative error code stored in re2.error.
 
 ### Getting the first match and making text replacements
+
+[ [Run this code](https://godbolt.org/z/z434TMKfo) ]
 ```c
-#define i_extern // include external utf8 and cregex functions implementation.
+#define i_extern // include external cstr, utf8, cregex functions implementation.
 #include <stc/cregex.h>
-#include <stc/cstr.h>
 
 int main() {
-    const char* input = "start date is 2023-03-01, and end date is 2025-12-31.";
+    const char* input = "start date is 2023-03-01, end date 2025-12-31.";
     const char* pattern = "\\b(\\d\\d\\d\\d)-(\\d\\d)-(\\d\\d)\\b";
 
     cregex re = cregex_from(pattern);
@@ -116,7 +117,7 @@ int main() {
 
     // Lets change all dates into US date format MM/DD/YYYY:
     cstr us_input = cregex_replace(&re, input, "$2/$3/$1");
-    printf("US input: %s\n", cstr_str(&us_input));
+    printf("%s\n", cstr_str(&us_input));
 
     // Free allocated data
     cstr_drop(&us_input);
