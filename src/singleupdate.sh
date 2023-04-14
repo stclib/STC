@@ -24,4 +24,4 @@ python singleheader.py $d/include/stc/csview.h  > $d/../stcsingle/stc/csview.h
 python singleheader.py $d/include/stc/cvec.h    > $d/../stcsingle/stc/cvec.h
 python singleheader.py $d/include/stc/extend.h  > $d/../stcsingle/stc/extend.h
 python singleheader.py $d/include/stc/forward.h > $d/../stcsingle/stc/forward.h
-echo "stcsingle headers updated"
+echo "$d/../stcsingle headers updated"

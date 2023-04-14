@@ -147,14 +147,14 @@ STC_INLINE uint64_t cfasthash(const void* key, intptr_t len) {
         case 0: return 1;
     }
     const uint8_t *x = (const uint8_t*)key;
-    uint64_t h = *x, n = (uint64_t)len >> 3;
+    uint64_t h = 0xcbf29ce484222325 + *x*0x811c9dc5UL, n = (uint64_t)len >> 3;
     len &= 7;
     while (n--) {
         memcpy(&u8, x, 8), x += 8;
-        h += u8*0xc6a4a7935bd1e99d;
+        h = (h ^ u8)*0x01000193UL;
     }
-    while (len--) h = (h << 10) - h - *x++;
-    return c_ROTL(h, 26) ^ h;
+    while (len--) h = (h ^ *x++)*0x01000193UL;
+    return h;
 }
 
 STC_INLINE uint64_t cstrhash(const char *str)
