@@ -30,7 +30,6 @@
 #undef i_hash
 #undef i_rawclass
 #undef i_capacity
-#undef i_ssize
 
 #undef i_val
 #undef i_val_str

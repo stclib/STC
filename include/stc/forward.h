@@ -29,12 +29,10 @@
 #define forward_cbox(CX, VAL) _c_cbox_types(CX, VAL)
 #define forward_cdeq(CX, VAL) _c_cdeq_types(CX, VAL)
 #define forward_clist(CX, VAL) _c_clist_types(CX, VAL)
-#define forward_cmap(CX, KEY, VAL) _c_chash_types(CX, KEY, VAL, int32_t, c_true, c_false)
-#define forward_cmap64(CX, KEY, VAL) _c_chash_types(CX, KEY, VAL, int64_t, c_true, c_false)
-#define forward_cset(CX, KEY) _c_chash_types(CX, cset, KEY, KEY, int32_t, c_false, c_true)
-#define forward_cset64(CX, KEY) _c_chash_types(CX, cset, KEY, KEY, int64_t, c_false, c_true)
-#define forward_csmap(CX, KEY, VAL) _c_aatree_types(CX, KEY, VAL, int32_t, c_true, c_false)
-#define forward_csset(CX, KEY) _c_aatree_types(CX, KEY, KEY, int32_t, c_false, c_true)
+#define forward_cmap(CX, KEY, VAL) _c_chash_types(CX, KEY, VAL, c_true, c_false)
+#define forward_cset(CX, KEY) _c_chash_types(CX, cset, KEY, KEY, c_false, c_true)
+#define forward_csmap(CX, KEY, VAL) _c_aatree_types(CX, KEY, VAL, c_true, c_false)
+#define forward_csset(CX, KEY) _c_aatree_types(CX, KEY, KEY, c_false, c_true)
 #define forward_cstack(CX, VAL) _c_cstack_types(CX, VAL)
 #define forward_cpque(CX, VAL) _c_cpque_types(CX, VAL)
 #define forward_cqueue(CX, VAL) _c_cdeq_types(CX, VAL)
@@ -103,10 +101,9 @@ typedef union {
         SELF##_node *last; \
     } SELF
 
-#define _c_chash_types(SELF, KEY, VAL, SZ, MAP_ONLY, SET_ONLY) \
+#define _c_chash_types(SELF, KEY, VAL, MAP_ONLY, SET_ONLY) \
     typedef KEY SELF##_key; \
     typedef VAL SELF##_mapped; \
-    typedef SZ SELF##_ssize; \
 \
     typedef SET_ONLY( SELF##_key ) \
             MAP_ONLY( struct SELF##_value ) \
@@ -125,13 +122,13 @@ typedef union {
     typedef struct SELF { \
         SELF##_value* table; \
         uint8_t* _hashx; \
-        SELF##_ssize size, bucket_count; \
+        intptr_t size; \
+        struct { uint64_t count: 48, maxdist: 16; } bucket; \
     } SELF
 
-#define _c_aatree_types(SELF, KEY, VAL, SZ, MAP_ONLY, SET_ONLY) \
+#define _c_aatree_types(SELF, KEY, VAL, MAP_ONLY, SET_ONLY) \
     typedef KEY SELF##_key; \
     typedef VAL SELF##_mapped; \
-    typedef SZ SELF##_ssize; \
     typedef struct SELF##_node SELF##_node; \
 \
     typedef SET_ONLY( SELF##_key ) \
@@ -147,12 +144,12 @@ typedef union {
         SELF##_value *ref; \
         SELF##_node *_d; \
         int _top; \
-        SELF##_ssize _tn, _st[36]; \
+        int32_t _tn, _st[36]; \
     } SELF##_iter; \
 \
     typedef struct SELF { \
         SELF##_node *nodes; \
-        SELF##_ssize root, disp, head, size, cap; \
+        int32_t root, disp, head, size, cap; \
     } SELF
 
 #define _c_cstack_fixed(SELF, VAL, CAP) \

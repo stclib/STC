@@ -19,7 +19,7 @@ A **cset** is an associative container that contains a set of unique objects of 
 #define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
 
 #define i_tag       // alternative typename: cmap_{i_tag}. i_tag defaults to i_val
-#define i_ssize      // default int32_t. If defined, table expand 2x (else 1.5x)
+#define i_expandby  // default 1. If 2, table expand 2x (else 1.5x)
 #include <stc/cset.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.

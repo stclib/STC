@@ -19,7 +19,6 @@ See the c++ class [std::set](https://en.cppreference.com/w/cpp/container/set) fo
 #define i_keyto     // convertion func i_key* => i_keyraw - defaults to plain copy
 
 #define i_tag       // alternative typename: csset_{i_tag}. i_tag defaults to i_val
-#define i_ssize     // defaults to int32_t
 #include <stc/csset.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.

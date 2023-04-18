@@ -36,7 +36,7 @@ See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/contain
 #define i_valto     // convertion func i_val* => i_valraw
 
 #define i_tag       // alternative typename: cmap_{i_tag}. i_tag defaults to i_val
-#define i_ssize     // internal; default int32_t. If defined, table expand 2x (else 1.5x)
+#define i_expandby  // default 1. If 2, table expand 2x (else 1.5x)
 #include <stc/cmap.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.

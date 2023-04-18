@@ -33,7 +33,6 @@ See the c++ class [std::map](https://en.cppreference.com/w/cpp/container/map) fo
 #define i_valto     // convertion func i_val* => i_valraw
 
 #define i_tag       // alternative typename: csmap_{i_tag}. i_tag defaults to i_val
-#define i_ssize     // internal size rep. defaults to int32_t
 #include <stc/csmap.h>
 ```
 `X` should be replaced by the value of `i_tag` in all of the following documentation.

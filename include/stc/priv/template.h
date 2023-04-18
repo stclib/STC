@@ -44,10 +44,6 @@
   #define i_type c_PASTE(_i_prefix, i_tag)
 #endif
 
-#ifndef i_ssize
-  #define i_ssize intptr_t
-#endif
-
 #ifndef i_allocator
   #define i_allocator c
 #endif
