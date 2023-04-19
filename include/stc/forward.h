@@ -116,12 +116,12 @@ typedef union {
 \
     typedef struct { \
         SELF##_value *ref, *_end; \
-        uint8_t* _hx; \
+        struct chash_slot* spos; \
     } SELF##_iter; \
 \
     typedef struct SELF { \
-        SELF##_value* table; \
-        uint8_t* _hashx; \
+        SELF##_value* data; \
+        struct chash_slot* slot; \
         intptr_t size; \
         struct { uint64_t count: 48, maxdist: 16; } bucket; \
     } SELF
