@@ -53,7 +53,7 @@ int main(void) {
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>
-typedef struct { int64_t idx; uint8_t hashx; } chash_bucket;
+typedef struct { intptr_t idx; uint8_t hashx; } chash_bucket;
 #endif // CMAP_H_INCLUDED
 
 #ifndef _i_prefix
@@ -109,9 +109,9 @@ STC_INLINE void         _cx_memb(_shrink_to_fit)(_cx_self* self) { _cx_memb(_res
 STC_INLINE float        _cx_memb(_max_load_factor)(const _cx_self* self) { return (float)(i_max_load_factor); }
 STC_INLINE bool         _cx_memb(_empty)(const _cx_self* map) { return !map->size; }
 STC_INLINE intptr_t     _cx_memb(_size)(const _cx_self* map) { return (intptr_t)map->size; }
-STC_INLINE intptr_t     _cx_memb(_bucket_count)(_cx_self* map) { return map->bucket.count; }
+STC_INLINE intptr_t     _cx_memb(_bucket_count)(_cx_self* map) { return map->bucket_count; }
 STC_INLINE intptr_t     _cx_memb(_capacity)(const _cx_self* map)
-                            { return (intptr_t)((float)map->bucket.count * (i_max_load_factor)); }
+                            { return (intptr_t)((float)map->bucket_count * (i_max_load_factor)); }
 STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, _cx_keyraw rkey)
                             { return self->size && self->slot[_cx_memb(_bucket_)(self, &rkey).idx].hashx; }
 
@@ -209,7 +209,7 @@ STC_INLINE _cx_self _cx_memb(_from_n)(const _cx_raw* raw, intptr_t n)
     { _cx_self cx = {0}; _cx_memb(_put_n)(&cx, raw, n); return cx; }
 
 STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) {
-    _cx_iter it = {self->data, self->data+self->bucket.count, self->slot};
+    _cx_iter it = {self->data, self->data+self->bucket_count, self->slot};
     if (it.sref)
         while (it.sref->hashx == 0)
             ++it.ref, ++it.sref;
@@ -235,17 +235,17 @@ _cx_memb(_advance)(_cx_iter it, size_t n) {
 
 STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, _cx_keyraw rkey) {
-    int64_t idx;
+    intptr_t idx;
     if (self->size && self->slot[idx = _cx_memb(_bucket_)(self, &rkey).idx].hashx)
         return c_LITERAL(_cx_iter){self->data + idx, 
-                                   self->data + self->bucket.count,
+                                   self->data + self->bucket_count,
                                    self->slot + idx};
     return _cx_memb(_end)(self);
 }
 
 STC_INLINE const _cx_value*
 _cx_memb(_get)(const _cx_self* self, _cx_keyraw rkey) {
-    int64_t idx;
+    intptr_t idx;
     if (self->size && self->slot[idx = _cx_memb(_bucket_)(self, &rkey).idx].hashx)
         return self->data + idx;
     return NULL;
@@ -310,7 +310,7 @@ _cx_memb(_with_capacity)(const intptr_t cap) {
 STC_INLINE void _cx_memb(_wipe_)(_cx_self* self) {
     if (self->size == 0)
         return;
-    _cx_value* d = self->data, *_end = d + self->bucket.count;
+    _cx_value* d = self->data, *_end = d + self->bucket_count;
     chash_slot* s = self->slot;
     for (; d != _end; ++d)
         if ((s++)->hashx)
@@ -326,7 +326,7 @@ STC_DEF void _cx_memb(_drop)(_cx_self* self) {
 STC_DEF void _cx_memb(_clear)(_cx_self* self) {
     _cx_memb(_wipe_)(self);
     self->size = 0;
-    c_memset(self->slot, 0, sizeof(chash_slot)*self->bucket.count);
+    c_memset(self->slot, 0, c_sizeof(chash_slot)*self->bucket_count);
 }
 
 #ifndef _i_isset
@@ -361,7 +361,7 @@ STC_DEF void _cx_memb(_clear)(_cx_self* self) {
 STC_DEF chash_bucket
 _cx_memb(_bucket_)(const _cx_self* self, const _cx_keyraw* rkeyptr) {
     const uint64_t _hash = i_hash(rkeyptr);
-    int64_t _cap = self->bucket.count;
+    intptr_t _cap = self->bucket_count;
     chash_bucket b = {c_PASTE(fastrange_,i_expandby)(_hash, (uint64_t)_cap), (uint8_t)(_hash | 0x80)};
     const chash_slot* s = self->slot;
     while (s[b.idx].hashx) {
@@ -379,7 +379,7 @@ _cx_memb(_bucket_)(const _cx_self* self, const _cx_keyraw* rkeyptr) {
 STC_DEF _cx_result
 _cx_memb(_insert_entry_)(_cx_self* self, _cx_keyraw rkey) {
     _cx_result res = {NULL};
-    if (self->size + 2 > (intptr_t)((float)self->bucket.count * (i_max_load_factor)))
+    if (self->size + 2 > (intptr_t)((float)self->bucket_count * (i_max_load_factor)))
         if (!_cx_memb(_reserve)(self, (intptr_t)(self->size*3/2)))
             return res;
 
@@ -396,12 +396,12 @@ _cx_memb(_insert_entry_)(_cx_self* self, _cx_keyraw rkey) {
 STC_DEF _cx_self
 _cx_memb(_clone)(_cx_self m) {
     if (m.data) {
-        _cx_value *d = (_cx_value *)i_malloc(c_sizeof(_cx_value)*m.bucket.count),
-                  *_dst = d, *_end = m.data + m.bucket.count;
-        const intptr_t _mem = c_sizeof(chash_slot)*(m.bucket.count + 1);
+        _cx_value *d = (_cx_value *)i_malloc(c_sizeof(_cx_value)*m.bucket_count),
+                  *_dst = d, *_end = m.data + m.bucket_count;
+        const intptr_t _mem = c_sizeof(chash_slot)*(m.bucket_count + 1);
         chash_slot *s = (chash_slot *)c_memcpy(i_malloc(_mem), m.slot, _mem);
         if (!(d && s)) 
-            { i_free(d), i_free(s), d = 0, s = 0, m.bucket.count = 0; }
+            { i_free(d), i_free(s), d = 0, s = 0, m.bucket_count = 0; }
         else
             for (; m.data != _end; ++m.data, ++m.slot, ++_dst)
                 if (m.slot->hashx)
@@ -414,10 +414,10 @@ _cx_memb(_clone)(_cx_self m) {
 
 STC_DEF bool
 _cx_memb(_reserve)(_cx_self* self, const intptr_t _newcap) {
-    const intptr_t _oldbucks = self->bucket.count;
+    const intptr_t _oldbucks = self->bucket_count;
     if (_newcap != self->size && _newcap <= _oldbucks)
         return true;
-    uintptr_t _newbucks = (uintptr_t)((float)_newcap / (i_max_load_factor)) + 4;
+    intptr_t _newbucks = (intptr_t)((float)_newcap / (i_max_load_factor)) + 4;
     #if i_expandby == 2
     _newbucks = (intptr_t)next_power_of_2(_newbucks);
     #else
@@ -426,7 +426,7 @@ _cx_memb(_reserve)(_cx_self* self, const intptr_t _newcap) {
     _cx_self m = {
         (_cx_value *)i_malloc(_newbucks*c_sizeof(_cx_value)),
         (chash_slot *)i_calloc(_newbucks + 1, sizeof(chash_slot)),
-        self->size, {_newbucks & ((1ULL << 48) - 1)}
+        self->size, _newbucks
     };
     bool ok = m.data && m.slot;
     if (ok) {  // Rehash:
@@ -451,7 +451,7 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
     _cx_value* d = self->data;
     chash_slot* s = self->slot;
     intptr_t i = (intptr_t)(_val - d), j = i, k;
-    const intptr_t _cap = self->bucket.count;
+    const intptr_t _cap = self->bucket_count;
     _cx_memb(_value_drop)(_val);
     for (;;) { /* delete without leaving tombstone */
         if (++j == _cap)

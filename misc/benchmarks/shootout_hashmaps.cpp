@@ -2,7 +2,7 @@
 #include <time.h>
 #include <stc/crand.h>
 
-#define MAX_LOAD_FACTOR 85
+#define MAX_LOAD_FACTOR 80
 
 #ifdef __cplusplus
 #include <limits>
@@ -335,8 +335,8 @@ int main(int argc, char* argv[])
     printf("\nT1: Insert %g mill. random keys range [0, 2^%u): map[rnd] = i;\n", N1/1000000.0, keybits);
     RUN_TEST(1)
 
-    //printf("\nT2: Insert %g mill. SEQUENTIAL keys, erase them in same order:\n", N2/1000000.0);
-    //RUN_TEST(2)
+    printf("\nT2: Insert %g mill. SEQUENTIAL keys, erase them in same order:\n", N2/1000000.0);
+    RUN_TEST(2)
 
     printf("\nT3: Erase all elements by lookup (%u mill. random inserts), key range [0, 2^%u)\n", n_mill*2, keybits);
     RUN_TEST(3)
