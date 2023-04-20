@@ -101,6 +101,8 @@ typedef union {
         SELF##_node *last; \
     } SELF
 
+typedef struct { uint8_t hashx/*, psl*/; } chash_slot;
+
 #define _c_chash_types(SELF, KEY, VAL, MAP_ONLY, SET_ONLY) \
     typedef KEY SELF##_key; \
     typedef VAL SELF##_mapped; \
@@ -116,14 +118,14 @@ typedef union {
 \
     typedef struct { \
         SELF##_value *ref, *_end; \
-        struct chash_slot* spos; \
+        chash_slot* sref; \
     } SELF##_iter; \
 \
     typedef struct SELF { \
         SELF##_value* data; \
-        struct chash_slot* slot; \
+        chash_slot* slot; \
         intptr_t size; \
-        struct { uint64_t count: 48, maxdist: 16; } bucket; \
+        struct { uint64_t count: 48, maxpsl: 16; } bucket; \
     } SELF
 
 #define _c_aatree_types(SELF, KEY, VAL, MAP_ONLY, SET_ONLY) \
