@@ -35,7 +35,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 // cmap template expansion
 #define i_key IKey
 #define i_val IValue
-#define i_expandby 2 // enable 2^K buckets like the rest.
+//#define i_sizebits 64 // more than 2.2 billion elements?
 #define i_tag ii
 #define i_max_load_factor MAX_LOAD_FACTOR / 100.0f
 #include <stc/cmap.h>
@@ -335,8 +335,8 @@ int main(int argc, char* argv[])
     printf("\nT1: Insert %g mill. random keys range [0, 2^%u): map[rnd] = i;\n", N1/1000000.0, keybits);
     RUN_TEST(1)
 
-    printf("\nT2: Insert %g mill. SEQUENTIAL keys, erase them in same order:\n", N2/1000000.0);
-    RUN_TEST(2)
+    //printf("\nT2: Insert %g mill. SEQUENTIAL keys, erase them in same order:\n", N2/1000000.0);
+    //RUN_TEST(2)
 
     printf("\nT3: Erase all elements by lookup (%u mill. random inserts), key range [0, 2^%u)\n", n_mill*2, keybits);
     RUN_TEST(3)

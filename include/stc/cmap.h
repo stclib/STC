@@ -53,7 +53,7 @@ int main(void) {
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>
-typedef struct { intptr_t idx; uint8_t hashx; } chash_bucket;
+typedef struct { intptr_t idx; uint8_t hashx, found; } chash_bucket;
 #endif // CMAP_H_INCLUDED
 
 #ifndef _i_prefix
@@ -71,10 +71,10 @@ typedef struct { intptr_t idx; uint8_t hashx; } chash_bucket;
 #endif
 #define _i_ishash
 #ifndef i_max_load_factor
-  #define i_max_load_factor 0.85f
+  #define i_max_load_factor 0.82f
 #endif
-#ifndef i_expandby
-  #define i_expandby 1
+#ifndef i_sizebits
+  #define i_sizebits 32
 #endif
 #include "priv/template.h"
 #ifndef i_is_forward
@@ -113,7 +113,7 @@ STC_INLINE intptr_t     _cx_memb(_bucket_count)(_cx_self* map) { return map->buc
 STC_INLINE intptr_t     _cx_memb(_capacity)(const _cx_self* map)
                             { return (intptr_t)((float)map->bucket_count * (i_max_load_factor)); }
 STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, _cx_keyraw rkey)
-                            { return self->size && self->slot[_cx_memb(_bucket_)(self, &rkey).idx].hashx; }
+                            { return _cx_memb(_bucket_)(self, &rkey).found; }
 
 #ifndef _i_isset
     STC_API _cx_result _cx_memb(_insert_or_assign)(_cx_self* self, i_key key, i_val mapped);
@@ -124,7 +124,7 @@ STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, _cx_keyraw rke
     STC_INLINE const _cx_mapped*
     _cx_memb(_at)(const _cx_self* self, _cx_keyraw rkey) {
         chash_bucket b = _cx_memb(_bucket_)(self, &rkey);
-        assert(self->slot[b.idx].hashx);
+        assert(b.found);
         return &self->data[b.idx].second;
     }
     STC_INLINE _cx_mapped*
@@ -235,19 +235,19 @@ _cx_memb(_advance)(_cx_iter it, size_t n) {
 
 STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, _cx_keyraw rkey) {
-    intptr_t idx;
-    if (self->size && self->slot[idx = _cx_memb(_bucket_)(self, &rkey).idx].hashx)
-        return c_LITERAL(_cx_iter){self->data + idx, 
+    chash_bucket b;
+    if (self->size && (b = _cx_memb(_bucket_)(self, &rkey)).found)
+        return c_LITERAL(_cx_iter){self->data + b.idx, 
                                    self->data + self->bucket_count,
-                                   self->slot + idx};
+                                   self->slot + b.idx};
     return _cx_memb(_end)(self);
 }
 
 STC_INLINE const _cx_value*
 _cx_memb(_get)(const _cx_self* self, _cx_keyraw rkey) {
-    intptr_t idx;
-    if (self->size && self->slot[idx = _cx_memb(_bucket_)(self, &rkey).idx].hashx)
-        return self->data + idx;
+    chash_bucket b;
+    if (self->size && (b = _cx_memb(_bucket_)(self, &rkey)).found)
+        return self->data + b.idx;
     return NULL;
 }
 
@@ -257,10 +257,10 @@ _cx_memb(_get_mut)(_cx_self* self, _cx_keyraw rkey)
 
 STC_INLINE int
 _cx_memb(_erase)(_cx_self* self, _cx_keyraw rkey) {
-    if (self->size == 0)
-        return 0;
-    chash_bucket b = _cx_memb(_bucket_)(self, &rkey);
-    return self->slot[b.idx].hashx ? _cx_memb(_erase_entry)(self, self->data + b.idx), 1 : 0;
+    chash_bucket b = {0};
+    if (self->size && (b = _cx_memb(_bucket_)(self, &rkey)).found)
+        _cx_memb(_erase_entry)(self, self->data + b.idx);
+    return b.found;
 }
 
 STC_INLINE _cx_iter
@@ -285,18 +285,12 @@ _cx_memb(_eq)(const _cx_self* self, const _cx_self* other) {
 #if defined(i_implement)
 
 #ifndef CMAP_H_INCLUDED
-STC_INLINE int64_t fastrange_1(uint64_t x, uint64_t n)
-    { return (int64_t)((uint32_t)x*n >> 32); } // n < 2^32
+STC_INLINE int64_t fastrange_32(uint64_t x, uint64_t n)
+    { return (int64_t)((uint32_t)x*n >> 32); } // n < 2^31
 
-STC_INLINE int64_t fastrange_2(uint64_t x, uint64_t n) 
-    { return (int64_t)(x & (n - 1)); } // n power of 2.
-
-STC_INLINE uint64_t next_power_of_2(uint64_t n) {
-    n--;
-    n |= n >>  1, n |= n >>  2;
-    n |= n >>  4, n |= n >>  8;
-    n |= n >> 16, n |= n >> 32;
-    return n + 1;
+STC_INLINE int64_t fastrange_64(uint64_t x, uint64_t n) {
+    uint64_t lo, hi; c_umul128(x, n, &lo, &hi);
+    return (int64_t)hi;
 }
 #endif // CMAP_H_INCLUDED
 
@@ -362,13 +356,13 @@ STC_DEF chash_bucket
 _cx_memb(_bucket_)(const _cx_self* self, const _cx_keyraw* rkeyptr) {
     const uint64_t _hash = i_hash(rkeyptr);
     intptr_t _cap = self->bucket_count;
-    chash_bucket b = {c_PASTE(fastrange_,i_expandby)(_hash, (uint64_t)_cap), (uint8_t)(_hash | 0x80)};
+    chash_bucket b = {c_PASTE(fastrange_,i_sizebits)(_hash, (uint64_t)_cap), (uint8_t)(_hash | 0x80)};
     const chash_slot* s = self->slot;
     while (s[b.idx].hashx) {
         if (s[b.idx].hashx == b.hashx) {
             const _cx_keyraw _raw = i_keyto(_i_keyref(self->data + b.idx));
             if (i_eq((&_raw), rkeyptr))
-                break;
+                {b.found = true; break;}
         }
         if (++b.idx == _cap)
             b.idx = 0;
@@ -385,7 +379,8 @@ _cx_memb(_insert_entry_)(_cx_self* self, _cx_keyraw rkey) {
 
     chash_bucket b = _cx_memb(_bucket_)(self, &rkey);
     res.ref = &self->data[b.idx];
-    if ((res.inserted = !self->slot[b.idx].hashx)) {
+    if (!b.found) {
+        res.inserted = true;
         self->slot[b.idx].hashx = b.hashx;
         ++self->size;
     }
@@ -418,11 +413,7 @@ _cx_memb(_reserve)(_cx_self* self, const intptr_t _newcap) {
     if (_newcap != self->size && _newcap <= _oldbucks)
         return true;
     intptr_t _newbucks = (intptr_t)((float)_newcap / (i_max_load_factor)) + 4;
-    #if i_expandby == 2
-    _newbucks = (intptr_t)next_power_of_2(_newbucks);
-    #else
     _newbucks |= 1;
-    #endif
     _cx_self m = {
         (_cx_value *)i_malloc(_newbucks*c_sizeof(_cx_value)),
         (chash_slot *)i_calloc(_newbucks + 1, sizeof(chash_slot)),
@@ -459,7 +450,7 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
         if (! s[j].hashx)
             break;
         const _cx_keyraw _raw = i_keyto(_i_keyref(d + j));
-        k = (intptr_t)c_PASTE(fastrange_,i_expandby)(i_hash((&_raw)), (uint64_t)_cap);
+        k = (intptr_t)c_PASTE(fastrange_,i_sizebits)(i_hash((&_raw)), (uint64_t)_cap);
         if ((j < i) ^ (k <= i) ^ (k > j)) /* is k outside (i, j]? */
             d[i] = d[j], s[i] = s[j], i = j;
     }
@@ -469,7 +460,7 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
 
 #endif // i_implement
 #undef i_max_load_factor
-#undef i_expandby
+#undef i_sizebits
 #undef _i_isset
 #undef _i_ismap
 #undef _i_ishash
