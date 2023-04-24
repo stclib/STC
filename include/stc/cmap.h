@@ -380,8 +380,8 @@ _cx_memb(_bucket_)(const _cx_self* self, const _cx_keyraw* rkeyptr) {
 STC_DEF _cx_result
 _cx_memb(_insert_entry_)(_cx_self* self, _cx_keyraw rkey) {
     _cx_result res = {NULL};
-    if (self->size + 2 > (intptr_t)((float)self->bucket_count * (i_max_load_factor)))
-        if (!_cx_memb(_reserve)(self, (intptr_t)(self->size*3/2)))
+    if (self->size >= (intptr_t)((float)self->bucket_count * (i_max_load_factor)))
+        if (!_cx_memb(_reserve)(self, (intptr_t)(self->size*3/2 + 2)))
             return res;
 
     chash_bucket b = _cx_memb(_bucket_)(self, &rkey);
