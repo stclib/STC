@@ -151,9 +151,9 @@ STC_INLINE uint64_t cfasthash(const void* key, intptr_t len) {
     len &= 7;
     while (n--) {
         memcpy(&u8, x, 8), x += 8;
-        h = (h ^ u8)*0x9e3779b97f4a7c15;
+        h = (h ^ u8)*0xc6a4a7935bd1e99d;
     }
-    while (len--) h = (h ^ *x++)*0xbf58476d1ce4e5b9;
+    while (len--) h = (h ^ *x++)*0x100000001b3;
     return h;
 }
 
