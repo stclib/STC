@@ -74,7 +74,7 @@ typedef struct { intptr_t idx; uint8_t hashx, found; } chash_bucket;
   #define i_max_load_factor 0.80f
 #endif
 #ifndef i_expandby
-  #define i_expandby 1
+  #define i_expandby 2
 #endif
 #include "priv/template.h"
 #ifndef i_is_forward
