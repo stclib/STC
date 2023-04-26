@@ -53,6 +53,7 @@ int main(void) {
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>
+struct chash_slot { uint8_t hashx; };
 typedef struct { intptr_t idx; uint8_t hashx, found; } chash_bucket;
 #endif // CMAP_H_INCLUDED
 
