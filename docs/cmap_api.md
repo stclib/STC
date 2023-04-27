@@ -9,8 +9,8 @@ hashing (aka open addressing) with linear probing, and without leaving tombstone
 
 ***Iterator invalidation***: References and iterators are invalidated after erase. No iterators are invalidated after insert,
 unless the hash-table need to be extended. The hash table size can be reserved prior to inserts if the total max size is known.
-The order of elements is preserved after erase and insert. This makes it possible to erase individual elements while iterating
-through the container by using the returned iterator from *erase_at()*, which references the next element.
+The order of elements may not be preserved after erase. It is still possible to erase elements when iterating through
+the container by setting the iterator to the value returned from *erase_at()*, which references the next element. Note that a small number of elements may be visited twice when doing this, but all elements will be visited.
 
 See the c++ class [std::unordered_map](https://en.cppreference.com/w/cpp/container/unordered_map) for a functional description.
 

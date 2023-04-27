@@ -422,7 +422,7 @@ _cx_memb(_reserve)(_cx_self* self, const intptr_t _newcap) {
         return true;
     intptr_t _newbucks = (intptr_t)((float)_newcap / (i_max_load_factor)) + 4;
     #if i_expandby == 2
-    _newbucks = (intptr_t)next_power_of_2(_newbucks);
+    _newbucks = (intptr_t)next_power_of_2((uint64_t)_newbucks);
     #else
     _newbucks |= 1;
     #endif

@@ -3,7 +3,7 @@
 STC - Smart Template Containers
 ===============================
 
-### [Version 4.2](#version-history)
+### [Version 4.3 beta](#version-history)
 
 ---
 Description
