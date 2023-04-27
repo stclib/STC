@@ -70,13 +70,6 @@ typedef struct { intptr_t idx; uint8_t hashx, found; } chash_bucket;
   #define _i_SET_ONLY c_false
   #define _i_keyref(vp) (&(vp)->first)
 #endif
-#define _i_ishash
-#ifndef i_max_load_factor
-  #define i_max_load_factor 0.80f
-#endif
-#ifndef i_expandby
-  #define i_expandby 2
-#endif
 #include "priv/template.h"
 #ifndef i_is_forward
   _cx_deftypes(_c_chash_types, _cx_self, i_key, i_val, _i_MAP_ONLY, _i_SET_ONLY);
@@ -104,15 +97,14 @@ STC_API bool            _cx_memb(_reserve)(_cx_self* self, intptr_t capacity);
 STC_API chash_bucket    _cx_memb(_bucket_)(const _cx_self* self, const _cx_keyraw* rkeyptr);
 STC_API _cx_result      _cx_memb(_insert_entry_)(_cx_self* self, _cx_keyraw rkey);
 STC_API void            _cx_memb(_erase_entry)(_cx_self* self, _cx_value* val);
+STC_API float           _cx_memb(_max_load_factor)(const _cx_self* self);
+STC_API intptr_t        _cx_memb(_capacity)(const _cx_self* map);
 
 STC_INLINE _cx_self     _cx_memb(_init)(void) { _cx_self map = {0}; return map; }
 STC_INLINE void         _cx_memb(_shrink_to_fit)(_cx_self* self) { _cx_memb(_reserve)(self, (intptr_t)self->size); }
-STC_INLINE float        _cx_memb(_max_load_factor)(const _cx_self* self) { return (float)(i_max_load_factor); }
 STC_INLINE bool         _cx_memb(_empty)(const _cx_self* map) { return !map->size; }
 STC_INLINE intptr_t     _cx_memb(_size)(const _cx_self* map) { return (intptr_t)map->size; }
 STC_INLINE intptr_t     _cx_memb(_bucket_count)(_cx_self* map) { return map->bucket_count; }
-STC_INLINE intptr_t     _cx_memb(_capacity)(const _cx_self* map)
-                            { return (intptr_t)((float)map->bucket_count * (i_max_load_factor)); }
 STC_INLINE bool         _cx_memb(_contains)(const _cx_self* self, _cx_keyraw rkey)
                             { return self->size && _cx_memb(_bucket_)(self, &rkey).found; }
 
@@ -161,14 +153,12 @@ _cx_memb(_emplace)(_cx_self* self, _cx_keyraw rkey _i_MAP_ONLY(, i_valraw rmappe
 }
 #endif // !i_no_emplace
 
-STC_INLINE _cx_raw
-_cx_memb(_value_toraw)(const _cx_value* val) {
+STC_INLINE _cx_raw _cx_memb(_value_toraw)(const _cx_value* val) {
     return _i_SET_ONLY( i_keyto(val) )
            _i_MAP_ONLY( c_LITERAL(_cx_raw){i_keyto((&val->first)), i_valto((&val->second))} );
 }
 
-STC_INLINE void
-_cx_memb(_value_drop)(_cx_value* _val) {
+STC_INLINE void _cx_memb(_value_drop)(_cx_value* _val) {
     i_keydrop(_i_keyref(_val));
     _i_MAP_ONLY( i_valdrop((&_val->second)); )
 }
@@ -183,14 +173,13 @@ _cx_memb(_insert)(_cx_self* self, i_key _key _i_MAP_ONLY(, i_val _mapped)) {
     return _res;
 }
 
-STC_INLINE _cx_result
-_cx_memb(_push)(_cx_self* self, _cx_value _val) {
+STC_INLINE _cx_value* _cx_memb(_push)(_cx_self* self, _cx_value _val) {
     _cx_result _res = _cx_memb(_insert_entry_)(self, i_keyto(_i_keyref(&_val)));
     if (_res.inserted)
         *_res.ref = _val;
     else
         _cx_memb(_value_drop)(&_val);
-    return _res;
+    return _res.ref;
 }
 
 STC_INLINE void _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, intptr_t n) {
@@ -209,27 +198,17 @@ STC_INLINE void _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, intptr_t n)
 STC_INLINE _cx_self _cx_memb(_from_n)(const _cx_raw* raw, intptr_t n)
     { _cx_self cx = {0}; _cx_memb(_put_n)(&cx, raw, n); return cx; }
 
-STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) {
-    _cx_iter it = {self->data, self->data+self->bucket_count, self->slot};
-    if (it.sref)
-        while (it.sref->hashx == 0)
-            ++it.ref, ++it.sref;
-    if (it.ref == it._end) it.ref = NULL;
-    return it;
-}
+STC_API _cx_iter _cx_memb(_begin)(const _cx_self* self);
 
-STC_INLINE _cx_iter
-_cx_memb(_end)(const _cx_self* self)
+STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self)
     { return c_LITERAL(_cx_iter){NULL}; }
 
-STC_INLINE void
-_cx_memb(_next)(_cx_iter* it) { 
+STC_INLINE void _cx_memb(_next)(_cx_iter* it) { 
     while ((++it->ref, (++it->sref)->hashx == 0)) ;
     if (it->ref == it->_end) it->ref = NULL;
 }
 
-STC_INLINE _cx_iter
-_cx_memb(_advance)(_cx_iter it, size_t n) {
+STC_INLINE _cx_iter _cx_memb(_advance)(_cx_iter it, size_t n) {
     while (n-- && it.ref) _cx_memb(_next)(&it);
     return it;
 }
@@ -284,13 +263,19 @@ _cx_memb(_eq)(const _cx_self* self, const _cx_self* other) {
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement)
+#ifndef i_max_load_factor
+  #define i_max_load_factor 0.80f
+#endif
+#ifndef i_expandby
+  #define i_expandby 2
+#endif
 
 #ifndef CMAP_H_INCLUDED
-STC_INLINE int64_t fastrange_1(uint64_t x, uint64_t n)
-    { return (int64_t)((uint32_t)x*n >> 32); } // n < 2^32
+STC_INLINE intptr_t fastrange_1(uint64_t x, uint64_t n)
+    { return (intptr_t)((uint32_t)x*n >> 32); } // n < 2^32
 
-STC_INLINE int64_t fastrange_2(uint64_t x, uint64_t n) 
-    { return (int64_t)(x & (n - 1)); } // n power of 2.
+STC_INLINE intptr_t fastrange_2(uint64_t x, uint64_t n) 
+    { return (intptr_t)(x & (n - 1)); } // n power of 2.
 
 STC_INLINE uint64_t next_power_of_2(uint64_t n) {
     n--;
@@ -301,8 +286,24 @@ STC_INLINE uint64_t next_power_of_2(uint64_t n) {
 }
 #endif // CMAP_H_INCLUDED
 
-STC_DEF _cx_self
-_cx_memb(_with_capacity)(const intptr_t cap) {
+STC_DEF _cx_iter _cx_memb(_begin)(const _cx_self* self) {
+    _cx_iter it = {self->data, self->data+self->bucket_count, self->slot};
+    if (it.sref)
+        while (it.sref->hashx == 0)
+            ++it.ref, ++it.sref;
+    if (it.ref == it._end) it.ref = NULL;
+    return it;
+}
+
+STC_DEF float _cx_memb(_max_load_factor)(const _cx_self* self) {
+    return (float)(i_max_load_factor);
+}
+
+STC_DEF intptr_t _cx_memb(_capacity)(const _cx_self* map) {
+    return (intptr_t)((float)map->bucket_count * (i_max_load_factor));
+}
+
+STC_DEF _cx_self _cx_memb(_with_capacity)(const intptr_t cap) {
     _cx_self map = {0};
     _cx_memb(_reserve)(&map, cap);
     return map;
@@ -471,13 +472,13 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
     s[i].hashx = 0;
     --self->size;
 }
-
-#endif // i_implement
 #undef i_max_load_factor
 #undef i_expandby
+#elif defined i_max_load_factor || defined i_expandby
+#error i_max_load_factor and i_expandby may only be defined for the implementation.
+#endif // i_implement
 #undef _i_isset
 #undef _i_ismap
-#undef _i_ishash
 #undef _i_keyref
 #undef _i_MAP_ONLY
 #undef _i_SET_ONLY
