@@ -29,7 +29,6 @@
 #include <stdbool.h>
 #include <string.h>
 #include <assert.h>
-#include "priv/altnames.h"
 #include "priv/raii.h"
 
 #define c_NPOS INTPTR_MAX

@@ -67,9 +67,7 @@ int main() {
 #define cbox_NULL {NULL}
 #endif // CBOX_H_INCLUDED
 
-#ifndef _i_prefix
 #define _i_prefix cbox_
-#endif
 #ifdef i_eq
 #define _i_eq
 #endif

@@ -58,17 +58,16 @@ int main(void) {
 #endif // CSMAP_H_INCLUDED
 
 #ifndef _i_prefix
-#define _i_prefix csmap_
-#endif
-#ifdef _i_isset
-  #define _i_MAP_ONLY c_false
-  #define _i_SET_ONLY c_true
-  #define _i_keyref(vp) (vp)
-#else
+  #define _i_prefix csmap_
   #define _i_ismap
   #define _i_MAP_ONLY c_true
   #define _i_SET_ONLY c_false
   #define _i_keyref(vp) (&(vp)->first)
+#else
+  #define _i_isset
+  #define _i_MAP_ONLY c_false
+  #define _i_SET_ONLY c_true
+  #define _i_keyref(vp) (vp)
 #endif
 #include "priv/template.h"
 #ifndef i_is_forward

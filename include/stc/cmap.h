@@ -58,17 +58,16 @@ typedef struct { intptr_t idx; uint8_t hashx, found; } chash_bucket;
 #endif // CMAP_H_INCLUDED
 
 #ifndef _i_prefix
-#define _i_prefix cmap_
-#endif
-#ifdef _i_isset
-  #define _i_MAP_ONLY c_false
-  #define _i_SET_ONLY c_true
-  #define _i_keyref(vp) (vp)
-#else
+  #define _i_prefix cmap_
   #define _i_ismap
   #define _i_MAP_ONLY c_true
   #define _i_SET_ONLY c_false
   #define _i_keyref(vp) (&(vp)->first)
+#else
+  #define _i_isset
+  #define _i_MAP_ONLY c_false
+  #define _i_SET_ONLY c_true
+  #define _i_keyref(vp) (vp)
 #endif
 #include "priv/template.h"
 #ifndef i_is_forward
@@ -421,11 +420,9 @@ _cx_memb(_reserve)(_cx_self* self, const intptr_t _newcap) {
     const intptr_t _oldbucks = self->bucket_count;
     if (_newcap != self->size && _newcap <= _oldbucks)
         return true;
-    intptr_t _newbucks = (intptr_t)((float)_newcap / (i_max_load_factor)) + 4;
+    intptr_t _newbucks = (intptr_t)((float)_newcap / (i_max_load_factor)) | 1;
     #if i_expandby == 2
     _newbucks = (intptr_t)next_power_of_2((uint64_t)_newbucks);
-    #else
-    _newbucks |= 1;
     #endif
     _cx_self m = {
         (_cx_value *)i_malloc(_newbucks*c_sizeof(_cx_value)),
@@ -472,11 +469,9 @@ _cx_memb(_erase_entry)(_cx_self* self, _cx_value* _val) {
     s[i].hashx = 0;
     --self->size;
 }
+#endif // i_implement
 #undef i_max_load_factor
 #undef i_expandby
-#elif defined i_max_load_factor || defined i_expandby
-#error i_max_load_factor and i_expandby may only be defined for the implementation.
-#endif // i_implement
 #undef _i_isset
 #undef _i_ismap
 #undef _i_keyref

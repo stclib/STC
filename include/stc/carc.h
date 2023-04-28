@@ -74,9 +74,7 @@ int main() {
 #define carc_NULL {NULL, NULL}
 #endif // CARC_H_INCLUDED
 
-#ifndef _i_prefix
 #define _i_prefix carc_
-#endif
 #ifdef i_eq
 #define _i_eq
 #endif

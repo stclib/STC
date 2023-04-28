@@ -42,8 +42,5 @@ int main(void) {
 }
 */
 
-#ifndef _i_prefix
 #define _i_prefix csset_
-#endif
-#define _i_isset
 #include "csmap.h"

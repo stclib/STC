@@ -20,9 +20,6 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "../ccommon.h"
-#include "../priv/template.h"
-
 /* Generic Quicksort in C, performs as fast as c++ std::sort().
 template params:
 #define i_val           - value type [required]
@@ -44,10 +41,13 @@ int main() {
     puts("");
 }
 */
+#include "../ccommon.h"
+#define _i_prefix csort_
+#include "../priv/template.h"
 
-typedef i_val c_PASTE(c_CONCAT(csort_, i_tag), _value);
+typedef i_val _cx_value;
 
-static inline void c_PASTE(cisort_, i_tag)(i_val arr[], intptr_t lo, intptr_t hi) {
+static inline void _cx_memb(_insertion)(i_val arr[], intptr_t lo, intptr_t hi) {
     for (intptr_t j = lo, i = lo + 1; i <= hi; j = i, ++i) {
         i_val key = arr[i];
         while (j >= 0 && (i_less((&key), (&arr[j])))) {
@@ -58,7 +58,7 @@ static inline void c_PASTE(cisort_, i_tag)(i_val arr[], intptr_t lo, intptr_t hi
     }
 }
 
-static inline void c_PASTE(cqsort_, i_tag)(i_val arr[], intptr_t lo, intptr_t hi) {
+static inline void _cx_memb(_quicksort)(i_val arr[], intptr_t lo, intptr_t hi) {
     intptr_t i = lo, j;
     while (lo < hi) {
         i_val pivot = arr[lo + (hi - lo)*7/16];
@@ -77,13 +77,13 @@ static inline void c_PASTE(cqsort_, i_tag)(i_val arr[], intptr_t lo, intptr_t hi
             c_swap(intptr_t, &hi, &j);
         }
 
-        if (j - lo > 64) c_PASTE(cqsort_, i_tag)(arr, lo, j);
-        else if (j > lo) c_PASTE(cisort_, i_tag)(arr, lo, j);
+        if (j - lo > 64) _cx_memb(_quicksort)(arr, lo, j);
+        else if (j > lo) _cx_memb(_insertion)(arr, lo, j);
         lo = i;
     }
 }
 
-static inline void c_PASTE(csort_, i_tag)(i_val arr[], intptr_t n)
-    { c_PASTE(cqsort_, i_tag)(arr, 0, n - 1); }
+static inline void _cx_self(i_val arr[], intptr_t n)
+    { _cx_memb(_quicksort)(arr, 0, n - 1); }
 
 #include "../priv/template2.h"

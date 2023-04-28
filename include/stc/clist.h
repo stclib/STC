@@ -77,9 +77,7 @@
 
 #endif // CLIST_H_INCLUDED
 
-#ifndef _i_prefix
 #define _i_prefix clist_
-#endif
 #include "priv/template.h"
 
 #ifndef i_is_forward

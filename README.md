@@ -3,7 +3,7 @@
 STC - Smart Template Containers
 ===============================
 
-### [Version 4.3 beta](#version-history)
+### [Version 4.3 RC](#version-history)
 
 ---
 Description
@@ -611,6 +611,12 @@ STC is generally very memory efficient. Memory usage for the different container
 
 ---
 # Version History
+
+## Version 4.3
+- Removed deprecated uppercase flow-control macro names.
+- Removed deprecated crandom.h. Use crand.h with new API.
+- Improved default string hash function.
+
 ## Version 4.2
 - New home! And online single headers for https://godbolt.org
     - Library: https://github.com/stclib/STC

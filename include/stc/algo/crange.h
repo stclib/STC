@@ -63,10 +63,10 @@ STC_INLINE crange crange_make_3(crange_value start, crange_value stop, crange_va
 STC_INLINE crange_iter crange_begin(crange* self)
     { self->value = self->start; crange_iter it = {&self->value, self->end, self->step}; return it; }
 
-STC_INLINE crange_iter crange_end(crange* self) 
+STC_INLINE crange_iter crange_end(crange* self)
     { crange_iter it = {NULL}; return it; }
 
-STC_INLINE void crange_next(crange_iter* it) 
+STC_INLINE void crange_next(crange_iter* it)
     { *it->ref += it->step; if ((it->step > 0) == (*it->ref > it->end)) it->ref = NULL; }
 
 #endif

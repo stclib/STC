@@ -27,10 +27,7 @@
 #include "forward.h"
 #endif
 
-#ifndef _i_prefix
 #define _i_prefix cpque_
-#endif
-
 #include "priv/template.h"
 #ifndef i_is_forward
   _cx_deftypes(_c_cpque_types, _cx_self, i_key);

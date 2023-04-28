@@ -39,8 +39,5 @@ int main(void) {
 }
 */
 
-#ifndef _i_prefix
 #define _i_prefix cset_
-#endif
-#define _i_isset
 #include "cmap.h"
