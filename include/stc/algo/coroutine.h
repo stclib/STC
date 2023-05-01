@@ -64,6 +64,7 @@ enum {
 
 #define cco_suspended(ctx) ((ctx)->cco_state > 0)
 #define cco_alive(ctx) ((ctx)->cco_state != cco_state_done)
+#define cco_done(ctx) ((ctx)->cco_state == cco_state_done)
 
 #define cco_begin(ctx) \
     int *_state = &(ctx)->cco_state; \
@@ -76,24 +77,19 @@ enum {
     } \
     return retval
 
-#define cco_yield(...) c_MACRO_OVERLOAD(cco_yield, __VA_ARGS__)
-#define cco_yield_1(retval) \
+#define cco_yield(retval) \
     do { \
         *_state = __LINE__; return retval; \
         case __LINE__:; \
     } while (0)
 
-#define cco_yield_2(corocall2, ctx2) \
-    cco_yield_3(corocall2, ctx2, )
-
-#define cco_yield_3(corocall2, ctx2, retval) \
+#define cco_await_while(cond, retval) \
     do { \
         *_state = __LINE__; \
-        do { \
-            corocall2; if (cco_suspended(ctx2)) return retval; \
-            case __LINE__:; \
-        } while (cco_alive(ctx2)); \
+        case __LINE__: if (cond) return retval; \
     } while (0)
+
+#define cco_await(cond) cco_await_while(!(cond), true)
 
 #define cco_final \
     case cco_state_final: \
