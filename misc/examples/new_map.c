@@ -3,10 +3,10 @@
 
 forward_cmap(cmap_pnt, struct Point, int);
 
-struct MyStruct {
+typedef struct MyStruct {
     cmap_pnt pntmap;
     cstr name;
-} typedef MyStruct;
+} MyStruct;
 
 // int => int map
 #define i_key int
@@ -14,7 +14,7 @@ struct MyStruct {
 #include <stc/cmap.h>
 
 // Point => int map
-struct Point { int x, y; } typedef Point;
+typedef struct Point { int x, y; } Point;
 
 int point_cmp(const Point* a, const Point* b) {
     int c = a->x - b->x;

@@ -283,7 +283,7 @@ _cx_memb(_reserve)(_cx_self* self, const intptr_t cap) {
     _cx_node* nodes = (_cx_node*)i_realloc(self->nodes, (cap + 1)*c_sizeof(_cx_node));
     if (!nodes)
         return false;
-    nodes[0] = c_LITERAL(_cx_node){{0, 0}, 0};
+    nodes[0] = c_LITERAL(_cx_node){0};
     self->nodes = nodes;
     self->cap = (int32_t)cap;
     return true;

@@ -24,7 +24,7 @@ int main()
         cstack_float_push(&vec, (float)atof(i.match[0].str));
 
     c_foreach (i, cstack_float, vec)
-        printf("  %g\n", *i.ref);
+        printf("  %g\n", (double)*i.ref);
 
     // extracts the numbers only to a comma separated string.
     cstr nums = cregex_replace_sv(&re, csview_from(str), " $0,", 0, NULL, CREG_R_STRIP);

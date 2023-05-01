@@ -4,10 +4,10 @@
 forward_cvec(cvec_i32, int);
 forward_cvec(cvec_pnt, struct Point);
 
-struct MyStruct {
+typedef struct MyStruct {
     cvec_i32 intvec;
     cvec_pnt pntvec;
-} typedef MyStruct;
+} MyStruct;
 
 #define i_val int
 #define i_is_forward

@@ -36,6 +36,7 @@ KHASH_MAP_INIT_INT64(ii, IValue)
 #define i_key IKey
 #define i_val IValue
 #define i_tag ii
+//#define i_expandby 1
 #define i_max_load_factor MAX_LOAD_FACTOR / 100.0f
 #include <stc/cmap.h>
 

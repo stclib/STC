@@ -5,7 +5,7 @@
 
 forward_cqueue(cqueue_pnt, struct Point);
 
-struct Point { int x, y; } typedef Point;
+typedef struct Point { int x, y; } Point;
 int point_cmp(const Point* a, const Point* b) {
     int c = c_default_cmp(&a->x, &b->x);
     return c ? c : c_default_cmp(&a->y, &b->y);

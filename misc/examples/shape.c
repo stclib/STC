@@ -62,9 +62,9 @@ static void Triangle_draw(const Shape* shape)
 {
     const Triangle* self = DYN_CAST(Triangle, shape);
     printf("Triangle : (%g,%g), (%g,%g), (%g,%g)\n",
-           self->p[0].x, self->p[0].y,
-           self->p[1].x, self->p[1].y,
-           self->p[2].x, self->p[2].y);
+           (double)self->p[0].x, (double)self->p[0].y,
+           (double)self->p[1].x, (double)self->p[1].y,
+           (double)self->p[2].x, (double)self->p[2].y);
 }
 
 struct ShapeAPI Triangle_api = {
@@ -109,7 +109,7 @@ static void Polygon_draw(const Shape* shape)
     const Polygon* self = DYN_CAST(Polygon, shape);
     printf("Polygon  :");
     c_foreach (i, PointVec, self->points)
-        printf(" (%g,%g)", i.ref->x, i.ref->y);
+        printf(" (%g,%g)", (double)i.ref->x, (double)i.ref->y);
     puts("");
 }
 

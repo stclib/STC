@@ -61,7 +61,7 @@ int main()
     clist_float_sort(&flst);
 
     c_foreach (i, clist_float, flst)
-        printf(" %g", *i.ref);
+        printf(" %g", (double)*i.ref);
 
     puts("");
     clist_float_drop(&flst);

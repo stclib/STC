@@ -842,16 +842,17 @@ _bldcclass(_Parser *par)
 
 
 static _Reprog*
-_regcomp1(_Reprog *progp, _Parser *par, const char *s, int cflags)
+_regcomp1(_Reprog *pp, _Parser *par, const char *s, int cflags)
 {
     _Token token;
 
     /* get memory for the program. estimated max usage */
     par->instcap = 5U + 6*strlen(s);
-    _Reprog* pp = (_Reprog *)c_realloc(progp, sizeof(_Reprog) + par->instcap*sizeof(_Reinst));
-    if (pp == NULL) {
+    _Reprog* old_pp = pp;
+    pp = (_Reprog *)c_realloc(pp, sizeof(_Reprog) + par->instcap*sizeof(_Reinst));
+    if (! pp) {
+        c_free(old_pp);
         par->error = CREG_OUTOFMEMORY;
-        c_free(progp);
         return NULL;
     }
     pp->flags.icase = (cflags & CREG_C_ICASE) != 0;

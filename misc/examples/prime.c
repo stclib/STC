@@ -26,15 +26,15 @@ cbits sieveOfEratosthenes(int64_t n)
 
 int main(void)
 {
-    int64_t n = 1000000000;
-    printf("Computing prime numbers up to %" c_ZI "\n", n);
+    int n = 1000000000;
+    printf("Computing prime numbers up to %d\n", n);
 
-    clock_t t1 = clock();
+    clock_t t = clock();
     cbits primes = sieveOfEratosthenes(n + 1);
-    int64_t np = cbits_count(&primes);
-    clock_t t2 = clock();
+    int np = (int)cbits_count(&primes);
+    t = t - clock();
 
-    printf("Number of primes: %" c_ZI ", time: %f\n\n", np, (float)(t2 - t1) / (float)CLOCKS_PER_SEC);
+    printf("Number of primes: %d, time: %f\n\n", np, (double)t/CLOCKS_PER_SEC);
     puts("Show all the primes in the range [2, 1000):");
     printf("2");
     c_forrange (i, 3, 1000, 2)

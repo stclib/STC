@@ -44,7 +44,7 @@ int main()
     const ListMap* lmap_p = MapMap_at(&mmap, "first");
     const StackList* list_p = ListMap_at(lmap_p, 42);
     const FloatStack* stack_p = StackList_back(list_p);
-    printf("value is: %f\n", *FloatStack_at(stack_p, 3)); // pi
+    printf("value is: %f\n", (double)*FloatStack_at(stack_p, 3)); // pi
 
     MapMap_drop(&mmap);
 }

@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-struct Point { int x, y; } typedef Point;
+typedef struct Point { int x, y; } Point;
 
 #define i_type PointQ
 #define i_val Point

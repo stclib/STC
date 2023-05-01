@@ -10,7 +10,7 @@ typedef struct {
 } MyStruct;
 
 // Point => int map
-struct Point { int x, y; } typedef Point;
+typedef struct Point { int x, y; } Point;
 int point_cmp(const Point* a, const Point* b) {
     int c = a->x - b->x;
     return c ? c : a->y - b->y;

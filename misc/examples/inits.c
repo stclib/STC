@@ -45,7 +45,7 @@ int main(void)
 
     puts("\npop and show high priorites first:");
     while (! cpque_f_empty(&floats)) {
-        printf("%.1f ", *cpque_f_top(&floats));
+        printf("%.1f ", (double)*cpque_f_top(&floats));
         cpque_f_pop(&floats);
     }
     puts("\n");
