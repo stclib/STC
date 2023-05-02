@@ -362,14 +362,15 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |           | `cco_yield(retval)`                  | Suspend execution and return retval     |
 |           | `cco_yield()`                        | Suspend execution (return void)         |
 |           | `cco_await(promise)`                 | Suspend and return false until promise is true |
+|           | `cco_await_void(promise)`            | Suspend until promise is true (return void) |
 |           | `cco_await_while(cond, retval)`      | Suspend and return retval while cond is true |
-|           | From caller side:                    |                                         | 
-| `void`    | `cco_stop(ctx)`                      | Next call of coroutine returns `cco_end()` |                  
-| `void`    | `cco_reset(ctx)`                     | Reset state to initial (for reuse)      |
 |           | Semaphores:                          |                                         | 
 |           | `cco_semaphore`                      | Semaphore type                          |                  
 |           | `cco_await_sem(sem)`                 | Await for the semaphore count > 0       |                  
 |           | `cco_signal_sem(sem)`                | Signal the semaphore by increasing count|
+|           | From caller side:                    |                                         | 
+| `void`    | `cco_stop(ctx)`                      | Next call of coroutine returns `cco_end()` |                  
+| `void`    | `cco_reset(ctx)`                     | Reset state to initial (for reuse)      |
 
 ---
 ## RAII scope macros

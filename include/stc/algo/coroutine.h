@@ -89,6 +89,7 @@ enum cco_states {
     } while (0)
 
 #define cco_await(promise) cco_await_while(!(promise), false)
+#define cco_await_void(promise) cco_await_while(!(promise), )
 
 #define cco_final \
     case cco_state_final: \
@@ -120,7 +121,7 @@ typedef struct {
  * This macro carries out the "wait" operation on the semaphore. The
  * wait operation causes the "thread" to block while the counter is
  * zero. When the counter reaches a value larger than zero, the
- * protothread will continue.
+ * "thread" will continue.
  */
 #define cco_await_sem(sem) \
   do { \
@@ -136,6 +137,6 @@ typedef struct {
  * eventually will cause waiting "threads" to continue executing.
  */
 #define cco_signal_sem(sem) ++(sem)->count
-#define cco_reset_sem(sem, value) ((sem)->count = value)
+#define cco_reset_sem(sem, value) ((sem)->count = (value))
 
 #endif
