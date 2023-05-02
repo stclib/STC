@@ -4,36 +4,36 @@
 
 // Read file line by line using coroutines:
 
-struct file_nextline {
+struct file_read {
     const char* filename;
     int cco_state;
     FILE* fp;
     cstr line;
 };
 
-bool file_nextline(struct file_nextline* U)
+bool file_read(struct file_read* U)
 {
     cco_begin(U)
         U->fp = fopen(U->filename, "r");
         U->line = cstr_init();
 
         while (cstr_getline(&U->line, U->fp))
-            cco_yield(true);
+            cco_yield(false);
 
         cco_final: // this label is required.
             printf("finish\n");
             cstr_drop(&U->line);
             fclose(U->fp);
-    cco_end(false);
+    cco_end(true);
 }
 
 int main(void)
 {
-    struct file_nextline it = {__FILE__};
+    struct file_read g = {__FILE__};
     int n = 0;
-    while (file_nextline(&it))
+    while (!file_read(&g))
     {
-        printf("%3d %s\n", ++n, cstr_str(&it.line));
+        printf("%3d %s\n", ++n, cstr_str(&g.line));
         //if (n == 10) cco_stop(&it);
     }
 }

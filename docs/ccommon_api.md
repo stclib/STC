@@ -302,13 +302,13 @@ struct triples {
     int cco_state; // required member
 };
 
-bool triples_next(struct triples* i) { // coroutine
+bool triples(struct triples* i) { // coroutine
     cco_begin(i);
         for (i->c = 5; i->n; ++i->c) {
             for (i->a = 1; i->a < i->c; ++i->a) {
                 for (i->b = i->a + 1; i->b < i->c; ++i->b) {
                     if ((int64_t)i->a*i->a + (int64_t)i->b*i->b == (int64_t)i->c*i->c) {
-                        cco_yield(true);
+                        cco_yield(false);
                         if (--i->n == 0) cco_return;
                     }
                 }
@@ -316,7 +316,7 @@ bool triples_next(struct triples* i) { // coroutine
         }
         cco_final: // required label
         puts("done");
-    cco_end(false);
+    cco_end(true);
 }
 
 int gcd(int a, int b) { // greatest common denominator
@@ -333,7 +333,7 @@ int main()
     struct triples t = {.n=INT32_MAX};
     int n = 0;
 
-    while (triples_next(&t)) {
+    while (!triples(&t)) {
         // Skip triples with GCD(a,b) > 1
         if (gcd(t.a, t.b) > 1)
             continue;
@@ -353,20 +353,24 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |           |  Function / operator                 | Description                             |
 |:----------|:-------------------------------------|:----------------------------------------|
 |           | `cco_final:`                         | Obligatory label in coroutine           |
-|           | `cco_return;`                        | Early return from the coroutine         |
+|           | `cco_return`                         | Early return from the coroutine (no arg) |
 | `bool`    | `cco_alive(ctx)`                     | Is coroutine in initial or suspended state? |
 | `bool`    | `cco_done(ctx)`                      | Is coroutine not alive?                 |
 | `bool`    | `cco_suspended(ctx)`                 | Is coroutine in suspended state?        |
-| `void`    | `cco_begin(ctx)`                     | Begin coroutine block                   |
-| `rettype` | `cco_end(retval)`                    | End coroutine block and return retval   |
-| `void`    | `cco_end()`                          | End coroutine block (return void)       |
-| `rettype` | `cco_yield(retval)`                  | Suspend execution and return retval     |
-| `void`    | `cco_yield()`                        | Suspend execution (return void)         |
-| `rettype` | `cco_await_while(cond, retval)`      | If cond, suspend execution and return retval |
-| `bool`    | `cco_await(cond)`                    | If not cond, suspend execution and return true |
+|           | `cco_begin(ctx)`                     | Begin coroutine block                   |
+|           | `cco_end(retval)`                    | End coroutine block and return retval   |
+|           | `cco_end()`                          | End coroutine block (return void)       |
+|           | `cco_yield(retval)`                  | Suspend execution and return retval     |
+|           | `cco_yield()`                        | Suspend execution (return void)         |
+|           | `cco_await(promise)`                 | Suspend and return false until promise is true |
+|           | `cco_await_while(cond, retval)`      | Suspend and return retval while cond is true |
 |           | From caller side:                    |                                         | 
 | `void`    | `cco_stop(ctx)`                      | Next call of coroutine returns `cco_end()` |                  
 | `void`    | `cco_reset(ctx)`                     | Reset state to initial (for reuse)      |
+|           | Semaphores:                          |                                         | 
+|           | `cco_semaphore`                      | Semaphore type                          |                  
+|           | `cco_await_sem(sem)`                 | Await for the semaphore count > 0       |                  
+|           | `cco_signal_sem(sem)`                | Signal the semaphore by increasing count|
 
 ---
 ## RAII scope macros

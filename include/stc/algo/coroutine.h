@@ -26,38 +26,38 @@
 #include <stdio.h>
 #include <stc/algo/coroutine.h>
 
-struct iterate {
+struct coroutine {
     int max_x, max_y;
     int x, y;
     int cco_state; // required member
 };
 
-bool iterate(struct iterate* I) {
+bool coroutine(struct coroutine* I) {
     cco_begin(I);
         for (I->x = 0; I->x < I->max_x; I->x++)
             for (I->y = 0; I->y < I->max_y; I->y++)
-                cco_yield(true);
+                cco_yield(false);
 
         cco_final:
-            puts("final");
-    cco_end(false);
+        puts("final");
+    cco_end(true);
 }
 
 int main(void) {
-    struct iterate it = {.max_x=3, .max_y=3};
+    struct coroutine it = {.max_x=3, .max_y=3};
     int n = 0;
-    while (iterate(&it))
+    while (!coroutine(&it))
     {
         printf("%d %d\n", it.x, it.y);
         // example of early stop:
-        if (++n == 20) cco_stop(&it); // signal to stop at next
+        if (++n == 7) cco_stop(&it); // signal to stop at next
     }
     return 0;
 }
 */
 #include <stc/ccommon.h>
 
-enum {
+enum cco_states {
     cco_state_final = -1,
     cco_state_done = -2,
 };
@@ -89,7 +89,7 @@ enum {
         case __LINE__: if (cond) return retval; \
     } while (0)
 
-#define cco_await(cond) cco_await_while(!(cond), true)
+#define cco_await(promise) cco_await_while(!(promise), false)
 
 #define cco_final \
     case cco_state_final: \
@@ -109,5 +109,34 @@ enum {
         int* _state = &(ctx)->cco_state; \
         if (*_state == cco_state_done) *_state = 0; \
     } while (0)
+
+
+typedef struct {
+    int count;
+} cco_semaphore;
+
+/**
+ * Wait for a semaphore
+ *
+ * This macro carries out the "wait" operation on the semaphore. The
+ * wait operation causes the "thread" to block while the counter is
+ * zero. When the counter reaches a value larger than zero, the
+ * protothread will continue.
+ */
+#define cco_await_sem(sem) \
+  do { \
+    cco_await((sem)->count > 0); \
+    --(sem)->count; \
+  } while (0)
+
+/**
+ * Signal a semaphore
+ *
+ * This macro carries out the "signal" operation on the semaphore. The
+ * signal operation increments the counter inside the semaphore, which
+ * eventually will cause waiting "threads" to continue executing.
+ */
+#define cco_signal_sem(sem) ++(sem)->count
+#define cco_reset_sem(sem, value) ((sem)->count = value)
 
 #endif

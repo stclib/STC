@@ -23,7 +23,7 @@ bool prime(struct prime* U) {
         if (U->result == 2) {
             if (U->count-- == 0) cco_return;
             ++U->idx;
-            cco_yield(true);
+            cco_yield(false);
         }
         U->result += !(U->result & 1);
         for (U->pos = U->result; U->count > 0; U->pos += 2) {
@@ -31,12 +31,12 @@ bool prime(struct prime* U) {
                 --U->count;
                 ++U->idx;
                 U->result = U->pos;
-                cco_yield(true);
+                cco_yield(false);
             }
         }
         cco_final:
             printf("final prm\n");
-    cco_end(false);
+    cco_end(true);
 }
 
 
@@ -63,11 +63,11 @@ bool fibonacci(struct fibonacci* F) {
                 F->result = F->b;
                 F->b = sum;
             }
-            cco_yield(true);
+            cco_yield(false);
         }
         cco_final:
             printf("final fib\n");
-    cco_end(false);
+    cco_end(true);
 }
 
 // Combine
@@ -81,23 +81,23 @@ struct combined {
 
 bool combined(struct combined* C) {
     cco_begin(C);
-        cco_await(prime(&C->prm) == false);
-        cco_await(fibonacci(&C->fib) == false);
+        cco_await(prime(&C->prm));
+        cco_await(fibonacci(&C->fib));
 
         // Reuse the C->prm context and extend the count:
         C->prm.count = 8; C->prm.result += 2;
         cco_reset(&C->prm);
-        cco_await(prime(&C->prm) == false);
+        cco_await(prime(&C->prm));
 
         cco_final: puts("final comb");
-    cco_end(false);
+    cco_end(true);
 }
 
 int main(void)
 {
     struct combined comb = {.prm={.count=8}, .fib={14}};
 
-    while (combined(&comb))
+    while (!combined(&comb))
         printf("Prime(%d)=%lld, Fib(%d)=%lld\n", 
             comb.prm.idx, (long long)comb.prm.result, 
             comb.fib.idx, (long long)comb.fib.result);
