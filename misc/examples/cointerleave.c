@@ -26,19 +26,19 @@ struct Generator {
     int value;
 };
 
-bool interleaved(struct Generator* g) 
+void interleaved(struct Generator* g) 
 {
     cco_begin(g);
         while (!cco_done(&g->x) || !cco_done(&g->y))
         {
             g->value = next_value(&g->x);
-            if (!cco_done(&g->x)) cco_yield(false);
+            if (!cco_done(&g->x)) cco_yield();
 
             g->value = next_value(&g->y);
-            if (!cco_done(&g->y)) cco_yield(false);
+            if (!cco_done(&g->y)) cco_yield();
         } 
         cco_final:
-    cco_end(true);
+    cco_end();
 }
 
 void Use(void)
@@ -48,9 +48,10 @@ void Use(void)
 
     struct Generator g = {{&a}, {&b}};
 
-    while (!interleaved(&g))
-        printf("%d\n", g.value);
+    while (interleaved(&g), !cco_done(&g))
+        printf("%d ", g.value);
 
+    puts("");
     c_drop(IVec, &a, &b);
 }
 

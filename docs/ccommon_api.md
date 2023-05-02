@@ -358,18 +358,18 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 | `bool`    | `cco_done(ctx)`                      | Is coroutine done?                      |
 |           | `cco_begin(ctx)`                     | Begin coroutine block                   |
 |           | `cco_end(retval)`                    | End coroutine block and return retval   |
-|           | `cco_end()`                          | End coroutine block (return void)       |
+|           | `cco_end()`                          | End coroutine block                     |
 |           | `cco_yield(retval)`                  | Suspend execution and return retval     |
-|           | `cco_yield()`                        | Suspend execution (return void)         |
-|           | `cco_await(promise)`                 | Suspend and return false until promise is true |
-|           | `cco_await_void(promise)`            | Suspend until promise is true (return void) |
-|           | `cco_await_while(cond, retval)`      | Suspend and return retval while cond is true |
+|           | `cco_yield()`                        | Suspend execution                       |
+|           | `cco_await(promise)`                 | Suspend until promise is true           |
+|           | `cco_await_with(promise, retval)`    | Suspend with retval until promise is true |
 |           | Semaphores:                          |                                         | 
-|           | `cco_semaphore`                      | Semaphore type                          |                  
-|           | `cco_await_sem(sem)`                 | Await for the semaphore count > 0       |                  
+|           | `cco_semaphore`                      | Semaphore type                          |
+|           | `cco_await_sem(sem)`                 | Await for the semaphore count > 0       |
+|           | `cco_await_sem_with(sem, retval)`    | Await with retval for the semaphore     |
 |           | `cco_signal_sem(sem)`                | Signal the semaphore by increasing count|
 |           | From caller side:                    |                                         | 
-| `void`    | `cco_stop(ctx)`                      | Next call of coroutine returns `cco_end()` |                  
+| `void`    | `cco_stop(ctx)`                      | Next call of coroutine returns `cco_end()` |
 | `void`    | `cco_reset(ctx)`                     | Reset state to initial (for reuse)      |
 
 ---

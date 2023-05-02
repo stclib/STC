@@ -4,16 +4,17 @@
 
 // Demonstrate to call another coroutine from a coroutine:
 // First create prime generator, then call fibonacci sequence:
+typedef long long llong;
 
 bool is_prime(int64_t i) {
-    for (int64_t j=2; j*j <= i; ++j)
+    for (llong j=2; j*j <= i; ++j)
         if (i % j == 0) return false;
     return true;
 }
 
 struct prime {
     int count, idx;
-    int64_t result, pos;
+    llong result, pos;
     int cco_state;
 };
 
@@ -44,7 +45,7 @@ bool prime(struct prime* g) {
 
 struct fibonacci {
     int count, idx;
-    int64_t result, b;
+    llong result, b;
     int cco_state;
 };
 
@@ -59,7 +60,7 @@ bool fibonacci(struct fibonacci* g) {
             if (g->count-- == 0)
                 cco_return;
             if (++g->idx > 1) {
-                int64_t sum = g->result + g->b; // NB! locals only lasts until next cco_yield!
+                llong sum = g->result + g->b; // NB! locals lasts only until next cco_yield/cco_await!
                 g->result = g->b;
                 g->b = sum;
             }
@@ -81,13 +82,13 @@ struct combined {
 
 bool combined(struct combined* C) {
     cco_begin(C);
-        cco_await(prime(&C->prm));
-        cco_await(fibonacci(&C->fib));
+        cco_await_with(prime(&C->prm), false);
+        cco_await_with(fibonacci(&C->fib), false);
 
         // Reuse the C->prm context and extend the count:
-        C->prm.count = 8; C->prm.result += 2;
+        C->prm.count = 8, C->prm.result += 2;
         cco_reset(&C->prm);
-        cco_await(prime(&C->prm));
+        cco_await_with(prime(&C->prm), false);
 
         cco_final: puts("final comb");
     cco_end(true);
@@ -95,10 +96,11 @@ bool combined(struct combined* C) {
 
 int main(void)
 {
-    struct combined comb = {.prm={.count=8}, .fib={14}};
+    struct combined c = {.prm={.count=8}, .fib={14}};
 
-    while (!combined(&comb))
+    while (!combined(&c)) {
         printf("Prime(%d)=%lld, Fib(%d)=%lld\n", 
-            comb.prm.idx, (long long)comb.prm.result, 
-            comb.fib.idx, (long long)comb.fib.result);
+            c.prm.idx, c.prm.result, 
+            c.fib.idx, c.fib.result);
+    }
 }

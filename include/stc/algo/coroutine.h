@@ -82,14 +82,12 @@ enum cco_states {
         case __LINE__:; \
     } while (0)
 
-#define cco_await_while(cond, retval) \
+#define cco_await(promise) cco_await_with(promise, )
+#define cco_await_with(promise, retval) \
     do { \
         *_state = __LINE__; \
-        case __LINE__: if (cond) return retval; \
+        case __LINE__: if (!(promise)) return retval; \
     } while (0)
-
-#define cco_await(promise) cco_await_while(!(promise), false)
-#define cco_await_void(promise) cco_await_while(!(promise), )
 
 #define cco_final \
     case cco_state_final: \
@@ -118,22 +116,21 @@ typedef struct {
 /**
  * Wait for a semaphore
  *
- * This macro carries out the "wait" operation on the semaphore. The
- * wait operation causes the "thread" to block while the counter is
- * zero. When the counter reaches a value larger than zero, the
- * "thread" will continue.
+ * This macro carries out the "wait" operation on the semaphore,
+ * and causes the "thread" to block while the counter is zero.
  */
-#define cco_await_sem(sem) \
-  do { \
-    cco_await((sem)->count > 0); \
-    --(sem)->count; \
-  } while (0)
+#define cco_await_sem(sem) cco_await_sem_with(sem, )
+#define cco_await_sem_with(sem, retval) \
+    do { \
+        cco_await_with((sem)->count > 0, retval); \
+        --(sem)->count; \
+    } while (0)
 
 /**
  * Signal a semaphore
  *
- * This macro carries out the "signal" operation on the semaphore. The
- * signal operation increments the counter inside the semaphore, which
+ * This macro carries out the "signal" operation on the semaphore,
+ * and increments the counter inside the semaphore, which
  * eventually will cause waiting "threads" to continue executing.
  */
 #define cco_signal_sem(sem) ++(sem)->count
