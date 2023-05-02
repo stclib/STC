@@ -354,9 +354,8 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |:----------|:-------------------------------------|:----------------------------------------|
 |           | `cco_final:`                         | Obligatory label in coroutine           |
 |           | `cco_return`                         | Early return from the coroutine (no arg) |
-| `bool`    | `cco_alive(ctx)`                     | Is coroutine in initial or suspended state? |
-| `bool`    | `cco_done(ctx)`                      | Is coroutine not alive?                 |
 | `bool`    | `cco_suspended(ctx)`                 | Is coroutine in suspended state?        |
+| `bool`    | `cco_done(ctx)`                      | Is coroutine done?                      |
 |           | `cco_begin(ctx)`                     | Begin coroutine block                   |
 |           | `cco_end(retval)`                    | End coroutine block and return retval   |
 |           | `cco_end()`                          | End coroutine block (return void)       |

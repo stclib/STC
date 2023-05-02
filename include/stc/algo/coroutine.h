@@ -63,7 +63,6 @@ enum cco_states {
 };
 
 #define cco_suspended(ctx) ((ctx)->cco_state > 0)
-#define cco_alive(ctx) ((ctx)->cco_state != cco_state_done)
 #define cco_done(ctx) ((ctx)->cco_state == cco_state_done)
 
 #define cco_begin(ctx) \

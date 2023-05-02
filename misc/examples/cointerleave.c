@@ -29,13 +29,13 @@ struct Generator {
 bool interleaved(struct Generator* g) 
 {
     cco_begin(g);
-        while (cco_alive(&g->x) || cco_alive(&g->y))
+        while (!cco_done(&g->x) || !cco_done(&g->y))
         {
             g->value = next_value(&g->x);
-            if (cco_alive(&g->x)) cco_yield(false);
+            if (!cco_done(&g->x)) cco_yield(false);
 
             g->value = next_value(&g->y);
-            if (cco_alive(&g->y)) cco_yield(false);
+            if (!cco_done(&g->y)) cco_yield(false);
         } 
         cco_final:
     cco_end(true);

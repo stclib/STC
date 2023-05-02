@@ -19,7 +19,7 @@ static bool schedule(Scheduler* sched)
     struct Task task = *Scheduler_front(sched);
     Scheduler_pop_front(sched);
     
-    if (cco_alive(&task))
+    if (!cco_done(&task))
         task.resume(&task);
     
     return !Scheduler_empty(sched);

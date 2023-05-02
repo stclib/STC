@@ -17,20 +17,20 @@ struct prime {
     int cco_state;
 };
 
-bool prime(struct prime* U) {
-    cco_begin(U);
-        if (U->result < 2) U->result = 2;
-        if (U->result == 2) {
-            if (U->count-- == 0) cco_return;
-            ++U->idx;
+bool prime(struct prime* g) {
+    cco_begin(g);
+        if (g->result < 2) g->result = 2;
+        if (g->result == 2) {
+            if (g->count-- == 0) cco_return;
+            ++g->idx;
             cco_yield(false);
         }
-        U->result += !(U->result & 1);
-        for (U->pos = U->result; U->count > 0; U->pos += 2) {
-            if (is_prime(U->pos)) {
-                --U->count;
-                ++U->idx;
-                U->result = U->pos;
+        g->result += !(g->result & 1);
+        for (g->pos = g->result; g->count > 0; g->pos += 2) {
+            if (is_prime(g->pos)) {
+                --g->count;
+                ++g->idx;
+                g->result = g->pos;
                 cco_yield(false);
             }
         }
@@ -48,20 +48,20 @@ struct fibonacci {
     int cco_state;
 };
 
-bool fibonacci(struct fibonacci* F) {
-    assert(F->count < 94);
+bool fibonacci(struct fibonacci* g) {
+    assert(g->count < 94);
 
-    cco_begin(F);
-        F->idx = 0;
-        F->result = 0;
-        F->b = 1;
+    cco_begin(g);
+        g->idx = 0;
+        g->result = 0;
+        g->b = 1;
         for (;;) {
-            if (F->count-- == 0)
+            if (g->count-- == 0)
                 cco_return;
-            if (++F->idx > 1) {
-                int64_t sum = F->result + F->b; // NB! locals only lasts until next cco_yield!
-                F->result = F->b;
-                F->b = sum;
+            if (++g->idx > 1) {
+                int64_t sum = g->result + g->b; // NB! locals only lasts until next cco_yield!
+                g->result = g->b;
+                g->b = sum;
             }
             cco_yield(false);
         }
