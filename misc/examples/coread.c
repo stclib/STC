@@ -11,19 +11,19 @@ struct file_read {
     cstr line;
 };
 
-bool file_read(struct file_read* U)
+bool file_read(struct file_read* g)
 {
-    cco_begin(U)
-        U->fp = fopen(U->filename, "r");
-        U->line = cstr_init();
+    cco_begin(g)
+        g->fp = fopen(g->filename, "r");
+        g->line = cstr_init();
 
-        while (cstr_getline(&U->line, U->fp))
+        while (cstr_getline(&g->line, g->fp))
             cco_yield(false);
 
         cco_final: // this label is required.
             printf("finish\n");
-            cstr_drop(&U->line);
-            fclose(U->fp);
+            cstr_drop(&g->line);
+            fclose(g->fp);
     cco_end(true);
 }
 

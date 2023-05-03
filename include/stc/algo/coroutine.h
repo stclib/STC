@@ -57,11 +57,12 @@ int main(void) {
 */
 #include <stc/ccommon.h>
 
-enum cco_states {
+enum {
     cco_state_final = -1,
     cco_state_done = -2,
 };
 
+#define cco_initial(ctx) ((ctx)->cco_state == 0)
 #define cco_suspended(ctx) ((ctx)->cco_state > 0)
 #define cco_done(ctx) ((ctx)->cco_state == cco_state_done)
 
@@ -82,8 +83,9 @@ enum cco_states {
         case __LINE__:; \
     } while (0)
 
-#define cco_await(promise) cco_await_with(promise, )
-#define cco_await_with(promise, retval) \
+#define cco_await(...) c_MACRO_OVERLOAD(cco_await, __VA_ARGS__)
+#define cco_await_1(promise) cco_await_2(promise, )
+#define cco_await_2(promise, retval) \
     do { \
         *_state = __LINE__; \
         case __LINE__: if (!(promise)) return retval; \
@@ -119,10 +121,11 @@ typedef struct {
  * This macro carries out the "wait" operation on the semaphore,
  * and causes the "thread" to block while the counter is zero.
  */
-#define cco_await_sem(sem) cco_await_sem_with(sem, )
-#define cco_await_sem_with(sem, retval) \
+#define cco_await_sem(...) c_MACRO_OVERLOAD(cco_await_sem, __VA_ARGS__)
+#define cco_await_sem_1(sem) cco_await_sem_2(sem, )
+#define cco_await_sem_2(sem, retval) \
     do { \
-        cco_await_with((sem)->count > 0, retval); \
+        cco_await_2((sem)->count > 0, retval); \
         --(sem)->count; \
     } while (0)
 

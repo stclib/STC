@@ -36,7 +36,7 @@ bool prime(struct prime* g) {
             }
         }
         cco_final:
-            printf("final prm\n");
+        printf("final prm\n");
     cco_end(true);
 }
 
@@ -60,14 +60,15 @@ bool fibonacci(struct fibonacci* g) {
             if (g->count-- == 0)
                 cco_return;
             if (++g->idx > 1) {
-                llong sum = g->result + g->b; // NB! locals lasts only until next cco_yield/cco_await!
+                // NB! locals lasts only until next cco_yield/cco_await!
+                llong sum = g->result + g->b;
                 g->result = g->b;
                 g->b = sum;
             }
             cco_yield(false);
         }
         cco_final:
-            printf("final fib\n");
+        printf("final fib\n");
     cco_end(true);
 }
 
@@ -80,17 +81,18 @@ struct combined {
 };
 
 
-bool combined(struct combined* C) {
-    cco_begin(C);
-        cco_await_with(prime(&C->prm), false);
-        cco_await_with(fibonacci(&C->fib), false);
+bool combined(struct combined* g) {
+    cco_begin(g);
+        cco_await(prime(&g->prm), false);
+        cco_await(fibonacci(&g->fib), false);
 
-        // Reuse the C->prm context and extend the count:
-        C->prm.count = 8, C->prm.result += 2;
-        cco_reset(&C->prm);
-        cco_await_with(prime(&C->prm), false);
+        // Reuse the g->prm context and extend the count:
+        g->prm.count = 8, g->prm.result += 2;
+        cco_reset(&g->prm);
+        cco_await(prime(&g->prm), false);
 
-        cco_final: puts("final comb");
+        cco_final:
+        puts("final combined");
     cco_end(true);
 }
 
