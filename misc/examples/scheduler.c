@@ -42,7 +42,6 @@ static bool taskA(struct Task* task)
         puts("A is back doing more work");
         cco_yield(resume_task(task));
         puts("A is back doing even more work");
-        cco_final:
     cco_end(true);
 }
 
@@ -54,7 +53,6 @@ static bool taskB(struct Task* task)
         puts("B is back doing work");
         cco_yield(resume_task(task));
         puts("B is back doing more work");
-        cco_final:
     cco_end(true);
 }
 

@@ -3,43 +3,6 @@
 #include <stc/algo/coroutine.h>
 #include <stdio.h>
 
-void triples_vanilla(int n) {
-    for (int c = 5; n; ++c) {
-        for (int a = 1; a < c; ++a) {
-            for (int b = a + 1; b < c; ++b) {
-                if ((int64_t)a*a + (int64_t)b*b == (int64_t)c*c) {
-                    printf("{%d, %d, %d}\n", a, b, c);
-                    if (--n == 0) goto done;
-                }
-            }
-        }
-    }
-    done:;
-}
-
-struct triples {
-    int n;
-    int a, b, c;
-    int cco_state;
-};
-
-bool triples_coro(struct triples* I) {
-    cco_begin(I);
-        for (I->c = 5; I->n; ++I->c) {
-            for (I->a = 1; I->a < I->c; ++I->a) {
-                for (I->b = I->a + 1; I->b < I->c; ++I->b) {
-                    if ((int64_t)I->a*I->a + (int64_t)I->b*I->b == (int64_t)I->c*I->c) {
-                        cco_yield(false);
-                        if (--I->n == 0) cco_return;
-                    }
-                }
-            }
-        }
-        cco_final:
-        puts("done");
-    cco_end(true);
-}
-
 int gcd(int a, int b) {
     while (b) {
         int t = a % b;
@@ -49,10 +12,49 @@ int gcd(int a, int b) {
     return a;
 }
 
+void triples_vanilla(int n) {
+    for (int c = 5, i = 0; n; ++c) {
+        for (int a = 1; a < c; ++a) {
+            for (int b = a + 1; b < c; ++b) {
+                if ((int64_t)a*a + (int64_t)b*b == (int64_t)c*c && gcd(a, b) == 1) {
+                    printf("%d: {%d, %d, %d}\n", ++i, a, b, c);
+                    if (--n == 0) goto done;
+                }
+            }
+        }
+    }
+    done:;
+}
+
+struct triples {
+    int size, count;
+    int a, b, c;
+    int cco_state;
+};
+
+bool triples_coro(struct triples* t) {
+    cco_begin(t);
+        t->count = 0;
+        for (t->c = 5; t->size; ++t->c) {
+            for (t->a = 1; t->a < t->c; ++t->a) {
+                for (t->b = t->a + 1; t->b < t->c; ++t->b) {
+                    if ((int64_t)t->a*t->a + (int64_t)t->b*t->b == (int64_t)t->c*t->c) {
+                        if (t->count++ == t->size)
+                            cco_return;
+                        cco_yield(false);
+                    }
+                }
+            }
+        }
+    cco_final:
+        puts("done");
+    cco_end(true);
+}
+
 int main()
 {
     puts("Vanilla triples:");
-    triples_vanilla(6);
+    triples_vanilla(5);
 
     puts("\nCoroutine triples:");
     struct triples t = {INT32_MAX};

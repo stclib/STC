@@ -35,7 +35,7 @@ bool prime(struct prime* g) {
                 cco_yield(false);
             }
         }
-        cco_final:
+    cco_final:
         printf("final prm\n");
     cco_end(true);
 }
@@ -67,7 +67,7 @@ bool fibonacci(struct fibonacci* g) {
             }
             cco_yield(false);
         }
-        cco_final:
+    cco_final:
         printf("final fib\n");
     cco_end(true);
 }
@@ -91,7 +91,7 @@ bool combined(struct combined* g) {
         cco_reset(&g->prm);
         cco_await(prime(&g->prm), false);
 
-        cco_final:
+    cco_final:
         puts("final combined");
     cco_end(true);
 }

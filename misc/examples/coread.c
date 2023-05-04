@@ -20,10 +20,10 @@ bool file_read(struct file_read* g)
         while (cstr_getline(&g->line, g->fp))
             cco_yield(false);
 
-        cco_final: // this label is required.
-            printf("finish\n");
-            cstr_drop(&g->line);
-            fclose(g->fp);
+    cco_final:
+        printf("finish\n");
+        cstr_drop(&g->line);
+        fclose(g->fp);
     cco_end(true);
 }
 

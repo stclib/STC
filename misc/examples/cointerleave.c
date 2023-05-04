@@ -16,7 +16,6 @@ static int next_value(struct GenValue* g)
     cco_begin(g);
         for (g->it = IVec_begin(g->v); g->it.ref; IVec_next(&g->it))
             cco_yield(*g->it.ref);
-        cco_final:
     cco_end(0);
 }
 
@@ -37,7 +36,6 @@ void interleaved(struct Generator* g)
             g->value = next_value(&g->y);
             if (!cco_done(&g->y)) cco_yield();
         } 
-        cco_final:
     cco_end();
 }
 
@@ -48,9 +46,11 @@ void Use(void)
 
     struct Generator g = {{&a}, {&b}};
 
-    while (interleaved(&g), !cco_done(&g))
+    while (1) {
+        interleaved(&g);
+        if (cco_done(&g)) break;
         printf("%d ", g.value);
-
+    }
     puts("");
     c_drop(IVec, &a, &b);
 }

@@ -38,7 +38,7 @@ bool coroutine(struct coroutine* I) {
             for (I->y = 0; I->y < I->max_y; I->y++)
                 cco_yield(false);
 
-        cco_final:
+    cco_final: // required if there is cleanup code
         puts("final");
     cco_end(true);
 }
@@ -68,13 +68,12 @@ enum {
 
 #define cco_begin(ctx) \
     int *_state = &(ctx)->cco_state; \
-    switch (*_state) { \
+    goto _begin; _begin: switch (*_state) { \
         case 0:
 
 #define cco_end(retval) \
-        *_state = cco_state_done; break; \
-        case -99: goto _cco_final_; \
     } \
+    *_state = cco_state_done; \
     return retval
 
 #define cco_yield(retval) \
@@ -92,11 +91,10 @@ enum {
     } while (0)
 
 #define cco_final \
-    case cco_state_final: \
-    _cco_final_
+    case cco_state_final
 
 #define cco_return \
-    goto _cco_final_
+    do { *_state = cco_state_final; goto _begin; } while (0)
 
 #define cco_stop(ctx) \
     do { \
@@ -112,7 +110,7 @@ enum {
 
 
 typedef struct {
-    int count;
+    intptr_t count;
 } cco_semaphore;
 
 /**

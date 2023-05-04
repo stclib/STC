@@ -314,7 +314,7 @@ bool triples(struct triples* i) { // coroutine
                 }
             }
         }
-        cco_final: // required label
+    cco_final: // required for cleanup
         puts("done");
     cco_end(true);
 }
@@ -352,15 +352,15 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 
 |           |  Function / operator                 | Description                             |
 |:----------|:-------------------------------------|:----------------------------------------|
-|           | `cco_final:`                         | Obligatory label in coroutine           |
+|           | `cco_final:`                         | Label for cleanup in coroutine          |
 |           | `cco_return`                         | Early return from the coroutine (no arg) |
 | `bool`    | `cco_suspended(ctx)`                 | Is coroutine in suspended state?        |
 | `bool`    | `cco_done(ctx)`                      | Is coroutine done?                      |
 |           | `cco_begin(ctx)`                     | Begin coroutine block                   |
-|           | `cco_end(retval)`                    | End coroutine block and return retval   |
 |           | `cco_end()`                          | End coroutine block                     |
-|           | `cco_yield(retval)`                  | Suspend execution and return retval     |
+|           | `cco_end(retval)`                    | End coroutine block and return retval   |
 |           | `cco_yield()`                        | Suspend execution                       |
+|           | `cco_yield(retval)`                  | Suspend execution and return retval     |
 |           | `cco_await(promise)`                 | Suspend until promise is true           |
 |           | `cco_await_with(promise, retval)`    | Suspend with retval until promise is true |
 |           | Semaphores:                          |                                         | 
