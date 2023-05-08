@@ -361,12 +361,12 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |           | `cco_end(ret)`                       | End coroutine block and return ret      |
 |           | `cco_yield()`                        | Yield/suspend execution                 |
 |           | `cco_yield(ret)`                     | Yield/suspend execution and return ret  |
-|           | `cco_yield_sub(subco, call)`         | Yield if subco not done after call      |
-|           | `cco_yield_sub(subco, call, ret)`    | Yield with ret if subco alive after call |
-|           | `cco_await(promise)`                 | Wait/suspend until promise is true      |
-|           | `cco_await(promise, ret)`            | Wait/suspend with ret value             |
-|           | `cco_await_sub(subco, call)`         | Wait/suspend until subco call is done   |
-|           | `cco_await_sub(subco, call, ret)`    | Wait/suspend with ret on subco call done |
+|           | `cco_yield_at(co, call)`             | Yield next in co call, if not done      |
+|           | `cco_yield_at(co, call, ret)`        | Yield next in co call with ret          |
+|           | `cco_await(promise)`                 | Await/suspend until promise is true     |
+|           | `cco_await(promise, ret)`            | Await/suspend with ret value            |
+|           | `cco_await_done(co, call)`           | Await for co call to finish             |
+|           | `cco_await_done(co, call, ret)`      | Await for co call to finish with ret    |
 |           | Semaphores:                          |                                         | 
 |           | `csem`                               | Semaphore type                          |
 |           | `cco_await_sem(sem)`                 | Await for the semaphore count > 0       |
