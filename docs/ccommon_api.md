@@ -354,35 +354,37 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |:----------|:-------------------------------------|:----------------------------------------|
 |           | `cco_final:`                         | Label for cleanup in coroutine          |
 |           | `cco_return`                         | Early return from the coroutine (no arg) |
-| `bool`    | `cco_suspended(ctx)`                 | Is coroutine in suspended state?        |
-| `bool`    | `cco_done(ctx)`                      | Is coroutine done?                      |
-|           | `cco_begin(ctx)`                     | Begin coroutine block                   |
+| `bool`    | `cco_suspended(co)`                  | Is coroutine in suspended state?        |
+| `bool`    | `cco_done(co)`                       | Is coroutine done?                      |
+|           | `cco_begin(co)`                      | Begin coroutine block                   |
 |           | `cco_end()`                          | End coroutine block                     |
-|           | `cco_end(retval)`                    | End coroutine block and return retval   |
-|           | `cco_yield()`                        | Suspend execution                       |
-|           | `cco_yield(retval)`                  | Suspend execution and return retval     |
-|           | `cco_await(promise)`                 | Suspend until promise is true           |
-|           | `cco_await(promise, retval)`         | Suspend with retval until promise is true |
-|           | `cco_call(ctx, corocall)`            | Call coro async, suspend while not done |
-|           | `cco_call(ctx, corocall, retval)`    | Call coro async, return retval on suspend |
+|           | `cco_end(ret)`                       | End coroutine block and return ret      |
+|           | `cco_yield()`                        | Yield/suspend execution                 |
+|           | `cco_yield(ret)`                     | Yield/suspend execution and return ret  |
+|           | `cco_yield_sub(subco, call)`         | Yield if subco not done after call      |
+|           | `cco_yield_sub(subco, call, ret)`    | Yield with ret if subco alive after call |
+|           | `cco_await(promise)`                 | Wait/suspend until promise is true      |
+|           | `cco_await(promise, ret)`            | Wait/suspend with ret value             |
+|           | `cco_await_sub(subco, call)`         | Wait/suspend until subco call is done   |
+|           | `cco_await_sub(subco, call, ret)`    | Wait/suspend with ret on subco call done |
 |           | Semaphores:                          |                                         | 
 |           | `csem`                               | Semaphore type                          |
 |           | `cco_await_sem(sem)`                 | Await for the semaphore count > 0       |
-|           | `cco_await_sem(sem, retval)`         | Await with retval for the semaphore     |
-|           | `csem_set(sem, long value)`          | Set semaphore                           |
+|           | `cco_await_sem(sem, ret)`            | Await with ret on the semaphore         |
+|           | `csem_set(sem, long value)`          | Set semaphore value                     |
 |           | `csem_signal(sem)`                   | Signal the semaphore                    |
 |           | Timers:                              |                                         | 
 |           | `ctimer`                             | Timer type                              |
 |           | `cco_await_timer(tm)`                | Await for timer to expire               |
-|           | `cco_await_timer(tm, retval)`        | Await with retval for timer to expire   |
+|           | `cco_await_timer(tm, ret)`           | Await with ret for timer to expire      |
 |           | `ctimer_start(tm, long msecs)`       | Start timer msecs milliseconds          |
 |           | `ctimer_restart(tm)`                 | Restart timer with same duration        |
 | `bool`    | `ctimer_expired(tm)`                 | Return true if timer is expired         |
 | `long`    | `ctimer_remaining(tm)`               | Return milliseconds remaining           |
 |           | From caller side:                    |                                         | 
-| `void`    | `cco_stop(ctx)`                      | Next call of coroutine returns `cco_end()` |
-| `void`    | `cco_reset(ctx)`                     | Reset state to initial (for reuse)      |
-| `void`    | `cco_run_blocked(ctx, corocall) { }` | Call coro blocked until done            |
+| `void`    | `cco_stop(co)`                       | Next call of coroutine returns `cco_end()` |
+| `void`    | `cco_reset(co)`                      | Reset state to initial (for reuse)      |
+| `void`    | `cco_run_blocked(co, corocall) { }`  | Call coro blocked until done            |
 
 ---
 ## RAII scope macros

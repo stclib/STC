@@ -71,28 +71,33 @@ enum {
     goto _begin; _begin: switch (*_state) { \
         case 0:
 
-#define cco_end(retval) \
+#define cco_end(ret) \
     } \
     *_state = cco_state_done; \
-    return retval
+    return ret
 
-#define cco_yield(retval) \
+#define cco_yield(ret) \
     do { \
-        *_state = __LINE__; return retval; \
+        *_state = __LINE__; return ret; \
         case __LINE__:; \
     } while (0)
 
+#define cco_yield_sub(...) c_MACRO_OVERLOAD(cco_yield_sub, __VA_ARGS__)
+#define cco_yield_sub_2(co, call) cco_yield_sub_3(co, call, )
+#define cco_yield_sub_3(co, call, ret) \
+    do { call; if (!cco_done(co)) cco_yield(ret); } while (0)
+
 #define cco_await(...) c_MACRO_OVERLOAD(cco_await, __VA_ARGS__)
 #define cco_await_1(promise) cco_await_2(promise, )
-#define cco_await_2(promise, retval) \
+#define cco_await_2(promise, ret) \
     do { \
         *_state = __LINE__; \
-        case __LINE__: if (!(promise)) return retval; \
+        case __LINE__: if (!(promise)) return ret; \
     } while (0)
 
-#define cco_call(...) c_MACRO_OVERLOAD(cco_call, __VA_ARGS__)
-#define cco_call_2(co, call) cco_call_3(co, call, )
-#define cco_call_3(co, call, retval) cco_await_2((call, cco_done(co)), retval)
+#define cco_await_sub(...) c_MACRO_OVERLOAD(cco_await_sub, __VA_ARGS__)
+#define cco_await_sub_2(co, call) cco_await_sub_3(co, call, )
+#define cco_await_sub_3(co, call, ret) cco_await_2((call, cco_done(co)), ret)
 
 #define cco_run_blocked(co, call) while (call, !cco_done(co))
 
@@ -127,9 +132,9 @@ typedef struct {
 
 #define cco_await_sem(...) c_MACRO_OVERLOAD(cco_await_sem, __VA_ARGS__)
 #define cco_await_sem_1(sem) cco_await_sem_2(sem, )
-#define cco_await_sem_2(sem, retval) \
+#define cco_await_sem_2(sem, ret) \
     do { \
-        cco_await_2((sem)->count > 0, retval); \
+        cco_await_2((sem)->count > 0, ret); \
         --(sem)->count; \
     } while (0)
 
