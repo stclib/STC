@@ -108,17 +108,14 @@ enum {
         if (*_state == cco_state_done) *_state = 0; \
     } while (0)
 
+/*
+ * Semaphore
+ */
 
 typedef struct {
     intptr_t count;
-} cco_semaphore;
+} csem;
 
-/**
- * Wait for a semaphore
- *
- * This macro carries out the "wait" operation on the semaphore,
- * and causes the "thread" to block while the counter is zero.
- */
 #define cco_await_sem(...) c_MACRO_OVERLOAD(cco_await_sem, __VA_ARGS__)
 #define cco_await_sem_1(sem) cco_await_sem_2(sem, )
 #define cco_await_sem_2(sem, retval) \
@@ -127,14 +124,55 @@ typedef struct {
         --(sem)->count; \
     } while (0)
 
-/**
- * Signal a semaphore
- *
- * This macro carries out the "signal" operation on the semaphore,
- * and increments the counter inside the semaphore, which
- * eventually will cause waiting "threads" to continue executing.
+#define csem_signal(sem) ++(sem)->count
+#define csem_set(sem, value) ((sem)->count = (value))
+
+/*
+ * Timer
  */
-#define cco_signal_sem(sem) ++(sem)->count
-#define cco_reset_sem(sem, value) ((sem)->count = (value))
+
+#include <time.h>
+
+#ifdef _WIN32
+    static inline void csleep_ms(long msecs) {
+        extern void Sleep(unsigned long);
+        Sleep((unsigned long)msecs);
+    }
+#elif _POSIX_C_SOURCE >= 199309L
+    static inline void csleep_ms(long msecs) {
+        struct timespec ts = {msecs/1000, 1000000*(msecs % 1000)};
+        nanosleep(&ts, NULL);
+    }
+#endif
+
+typedef struct {
+    clock_t start;
+    clock_t interval;
+} ctimer;
+
+#define cco_await_timer(...) c_MACRO_OVERLOAD(cco_await_timer, __VA_ARGS__)
+#define cco_await_timer_2(t, msecs) cco_await_timer_3(t, msecs, )
+#define cco_await_timer_3(t, msecs, ret) \
+    do { \
+        ctimer_start(t, msecs); \
+        cco_await_2(ctimer_expired(t), ret); \
+    } while (0)
+
+static inline void ctimer_start(ctimer* t, long msecs) {
+    t->interval = msecs*(CLOCKS_PER_SEC/1000);
+    t->start = clock();
+}
+
+static inline void ctimer_restart(ctimer* t) {
+    t->start = clock();
+}
+
+static inline bool ctimer_expired(ctimer* t) {
+    return clock() - t->start >= t->interval;
+}
+
+static inline long ctimer_remaining(ctimer* t) {
+    return (long)((double)(t->start + t->interval - clock())*(1000.0/CLOCKS_PER_SEC));
+}
 
 #endif

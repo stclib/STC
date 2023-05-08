@@ -362,12 +362,21 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |           | `cco_yield()`                        | Suspend execution                       |
 |           | `cco_yield(retval)`                  | Suspend execution and return retval     |
 |           | `cco_await(promise)`                 | Suspend until promise is true           |
-|           | `cco_await_with(promise, retval)`    | Suspend with retval until promise is true |
+|           | `cco_await(promise, retval)`         | Suspend with retval until promise is true |
 |           | Semaphores:                          |                                         | 
-|           | `cco_semaphore`                      | Semaphore type                          |
+|           | `csem`                               | Semaphore type                          |
 |           | `cco_await_sem(sem)`                 | Await for the semaphore count > 0       |
-|           | `cco_await_sem_with(sem, retval)`    | Await with retval for the semaphore     |
-|           | `cco_signal_sem(sem)`                | Signal the semaphore by increasing count|
+|           | `cco_await_sem(sem, retval)`         | Await with retval for the semaphore     |
+|           | `csem_set(sem, long value)`          | Set semaphore                           |
+|           | `csem_signal(sem)`                   | Signal the semaphore                    |
+|           | Timers:                              |                                         | 
+|           | `ctimer`                             | Timer type                              |
+|           | `cco_await_timer(tm)`                | Await for timer to expire               |
+|           | `cco_await_timer(tm, retval)`        | Await with retval for timer to expire   |
+|           | `ctimer_start(tm, long msecs)`       | Start timer for milliseconds            |
+|           | `ctimer_restart(tm)`                 | Restart timer with same duration        |
+| `bool`    | `ctimer_expired(tm)`                 | Return true if timer is expired         |
+| `long`    | `ctimer_remaining(tm)`               | Return milliseconds remaining           |
 |           | From caller side:                    |                                         | 
 | `void`    | `cco_stop(ctx)`                      | Next call of coroutine returns `cco_end()` |
 | `void`    | `cco_reset(ctx)`                     | Reset state to initial (for reuse)      |
