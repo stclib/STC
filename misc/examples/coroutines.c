@@ -81,26 +81,26 @@ struct combined {
 };
 
 
-bool combined(struct combined* g) {
+void combined(struct combined* g) {
     cco_begin(g);
-        cco_await(prime(&g->prm), false);
-        cco_await(fibonacci(&g->fib), false);
+        cco_await(prime(&g->prm));
+        cco_await(fibonacci(&g->fib));
 
         // Reuse the g->prm context and extend the count:
         g->prm.count = 8, g->prm.result += 2;
         cco_reset(&g->prm);
-        cco_await(prime(&g->prm), false);
+        cco_await(prime(&g->prm));
 
     cco_final:
         puts("final combined");
-    cco_end(true);
+    cco_end();
 }
 
 int main(void)
 {
     struct combined c = {.prm={.count=8}, .fib={14}};
 
-    while (!combined(&c)) {
+    cco_run_blocked(&c, combined(&c)) {
         printf("Prime(%d)=%lld, Fib(%d)=%lld\n", 
             c.prm.idx, c.prm.result, 
             c.fib.idx, c.fib.result);

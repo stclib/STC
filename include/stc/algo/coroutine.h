@@ -62,12 +62,12 @@ enum {
     cco_state_done = -2,
 };
 
-#define cco_initial(ctx) ((ctx)->cco_state == 0)
-#define cco_suspended(ctx) ((ctx)->cco_state > 0)
-#define cco_done(ctx) ((ctx)->cco_state == cco_state_done)
+#define cco_initial(co) ((co)->cco_state == 0)
+#define cco_suspended(co) ((co)->cco_state > 0)
+#define cco_done(co) ((co)->cco_state == cco_state_done)
 
-#define cco_begin(ctx) \
-    int *_state = &(ctx)->cco_state; \
+#define cco_begin(co) \
+    int *_state = &(co)->cco_state; \
     goto _begin; _begin: switch (*_state) { \
         case 0:
 
@@ -90,21 +90,30 @@ enum {
         case __LINE__: if (!(promise)) return retval; \
     } while (0)
 
+#define cco_call(...) c_MACRO_OVERLOAD(cco_call, __VA_ARGS__)
+#define cco_call_2(co, call) cco_call_3(co, call, )
+#define cco_call_3(co, call, retval) cco_await_2((call, cco_done(co)), retval)
+
+#define cco_run_blocked(co, call) while (call, !cco_done(co))
+
 #define cco_final \
     case cco_state_final
 
 #define cco_return \
     do { *_state = cco_state_final; goto _begin; } while (0)
 
-#define cco_stop(ctx) \
+#define cco_return_v(value) \
+    return (*_state = cco_state_final, value) 
+
+#define cco_stop(co) \
     do { \
-        int* _state = &(ctx)->cco_state; \
+        int* _state = &(co)->cco_state; \
         if (*_state > 0) *_state = cco_state_final; \
     } while (0)
 
-#define cco_reset(ctx) \
+#define cco_reset(co) \
     do { \
-        int* _state = &(ctx)->cco_state; \
+        int* _state = &(co)->cco_state; \
         if (*_state == cco_state_done) *_state = 0; \
     } while (0)
 
@@ -151,28 +160,28 @@ typedef struct {
 } ctimer;
 
 #define cco_await_timer(...) c_MACRO_OVERLOAD(cco_await_timer, __VA_ARGS__)
-#define cco_await_timer_2(t, msecs) cco_await_timer_3(t, msecs, )
-#define cco_await_timer_3(t, msecs, ret) \
+#define cco_await_timer_2(tm, msecs) cco_await_timer_3(tm, msecs, )
+#define cco_await_timer_3(tm, msecs, ret) \
     do { \
-        ctimer_start(t, msecs); \
-        cco_await_2(ctimer_expired(t), ret); \
+        ctimer_start(tm, msecs); \
+        cco_await_2(ctimer_expired(tm), ret); \
     } while (0)
 
-static inline void ctimer_start(ctimer* t, long msecs) {
-    t->interval = msecs*(CLOCKS_PER_SEC/1000);
-    t->start = clock();
+static inline void ctimer_start(ctimer* tm, long msecs) {
+    tm->interval = msecs*(CLOCKS_PER_SEC/1000);
+    tm->start = clock();
 }
 
-static inline void ctimer_restart(ctimer* t) {
-    t->start = clock();
+static inline void ctimer_restart(ctimer* tm) {
+    tm->start = clock();
 }
 
-static inline bool ctimer_expired(ctimer* t) {
-    return clock() - t->start >= t->interval;
+static inline bool ctimer_expired(ctimer* tm) {
+    return clock() - tm->start >= tm->interval;
 }
 
-static inline long ctimer_remaining(ctimer* t) {
-    return (long)((double)(t->start + t->interval - clock())*(1000.0/CLOCKS_PER_SEC));
+static inline long ctimer_remaining(ctimer* tm) {
+    return (long)((double)(tm->start + tm->interval - clock())*(1000.0/CLOCKS_PER_SEC));
 }
 
 #endif

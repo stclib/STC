@@ -314,7 +314,7 @@ bool triples(struct triples* i) { // coroutine
                 }
             }
         }
-    cco_final: // required for cleanup
+    cco_final: // tear down
         puts("done");
     cco_end(true);
 }
@@ -363,6 +363,8 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |           | `cco_yield(retval)`                  | Suspend execution and return retval     |
 |           | `cco_await(promise)`                 | Suspend until promise is true           |
 |           | `cco_await(promise, retval)`         | Suspend with retval until promise is true |
+|           | `cco_call(ctx, corocall)`            | Call coro async, suspend while not done |
+|           | `cco_call(ctx, corocall, retval)`    | Call coro async, return retval on suspend |
 |           | Semaphores:                          |                                         | 
 |           | `csem`                               | Semaphore type                          |
 |           | `cco_await_sem(sem)`                 | Await for the semaphore count > 0       |
@@ -373,13 +375,14 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |           | `ctimer`                             | Timer type                              |
 |           | `cco_await_timer(tm)`                | Await for timer to expire               |
 |           | `cco_await_timer(tm, retval)`        | Await with retval for timer to expire   |
-|           | `ctimer_start(tm, long msecs)`       | Start timer for milliseconds            |
+|           | `ctimer_start(tm, long msecs)`       | Start timer msecs milliseconds          |
 |           | `ctimer_restart(tm)`                 | Restart timer with same duration        |
 | `bool`    | `ctimer_expired(tm)`                 | Return true if timer is expired         |
 | `long`    | `ctimer_remaining(tm)`               | Return milliseconds remaining           |
 |           | From caller side:                    |                                         | 
 | `void`    | `cco_stop(ctx)`                      | Next call of coroutine returns `cco_end()` |
 | `void`    | `cco_reset(ctx)`                     | Reset state to initial (for reuse)      |
+| `void`    | `cco_run_blocked(ctx, corocall) { }` | Call coro blocked until done            |
 
 ---
 ## RAII scope macros
