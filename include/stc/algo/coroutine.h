@@ -87,7 +87,7 @@ enum {
 #define cco_yield_coro_3(co, call, ret) \
     do { call; if (!cco_done(co)) cco_yield(ret); } while (0)
 
-#define cco_await(...) c_MACRO_OVERLOAD(cco_awaitcoro, __VA_ARGS__)
+#define cco_await(...) c_MACRO_OVERLOAD(cco_await, __VA_ARGS__)
 #define cco_await_1(promise) cco_await_2(promise, )
 #define cco_await_2(promise, ret) \
     do { \
