@@ -36,7 +36,7 @@ typedef i_keyraw _cx_raw;
 
 STC_API void _cx_memb(_make_heap)(_cx_self* self);
 STC_API void _cx_memb(_erase_at)(_cx_self* self, intptr_t idx);
-STC_API void _cx_memb(_push)(_cx_self* self, _cx_value value);
+STC_API _cx_value* _cx_memb(_push)(_cx_self* self, _cx_value value);
 
 STC_INLINE _cx_self _cx_memb(_init)(void)
     { return c_LITERAL(_cx_self){NULL}; }
@@ -144,7 +144,7 @@ _cx_memb(_erase_at)(_cx_self* self, const intptr_t idx) {
     _cx_memb(_sift_down_)(self, idx + 1, n);
 }
 
-STC_DEF void
+STC_DEF _cx_value*
 _cx_memb(_push)(_cx_self* self, _cx_value value) {
     if (self->_len == self->_cap)
         _cx_memb(_reserve)(self, self->_len*3/2 + 4);
@@ -153,6 +153,7 @@ _cx_memb(_push)(_cx_self* self, _cx_value value) {
     for (; c > 1 && (i_less((&arr[c/2]), (&value))); c /= 2)
         arr[c] = arr[c/2];
     arr[c] = value;
+    return arr + c;
 }
 
 #endif

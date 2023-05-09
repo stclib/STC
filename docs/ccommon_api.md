@@ -361,12 +361,12 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |           | `cco_end(ret)`                       | End coroutine block and return ret      |
 |           | `cco_yield()`                        | Yield/suspend execution                 |
 |           | `cco_yield(ret)`                     | Yield/suspend execution and return ret  |
-|           | `cco_yield_at(co, call)`             | Yield next in co call, if not done      |
-|           | `cco_yield_at(co, call, ret)`        | Yield next in co call with ret          |
+|           | `cco_yield_at(co, call)`             | Yield at co call if it is suspended     |
+|           | `cco_yield_at(co, call, ret)`        | Yield at co call with ret if suspended  |
 |           | `cco_await(promise)`                 | Await/suspend until promise is true     |
 |           | `cco_await(promise, ret)`            | Await/suspend with ret value            |
-|           | `cco_await_done(co, call)`           | Await for co call to finish             |
-|           | `cco_await_done(co, call, ret)`      | Await for co call to finish with ret    |
+|           | `cco_await_at(co, call)`             | Await for co call to finish             |
+|           | `cco_await_at(co, call, ret)`        | Await for co call to finish with ret    |
 |           | Semaphores:                          |                                         | 
 |           | `csem`                               | Semaphore type                          |
 |           | `cco_await_sem(sem)`                 | Await for the semaphore count > 0       |
@@ -384,7 +384,7 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |           | From caller side:                    |                                         | 
 | `void`    | `cco_stop(co)`                       | Next call of coroutine returns `cco_end()` |
 | `void`    | `cco_reset(co)`                      | Reset state to initial (for reuse)      |
-| `void`    | `cco_run_blocked(co, corocall) { }`  | Call coro blocked until done            |
+| `void`    | `cco_run(co, corocall) { }`          | Run blocking until coro is done         |
 
 ---
 ## RAII scope macros

@@ -100,7 +100,7 @@ int main(void)
 {
     struct combined c = {.prm={.count=8}, .fib={14}};
 
-    cco_run_blocked(&c, combined(&c)) {
+    cco_run(&c, combined(&c)) {
         printf("Prime(%d)=%lld, Fib(%d)=%lld\n", 
             c.prm.idx, c.prm.result, 
             c.fib.idx, c.fib.result);

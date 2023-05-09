@@ -11,29 +11,28 @@ struct file_read {
     cstr line;
 };
 
-bool file_read(struct file_read* g)
+void file_read(struct file_read* g)
 {
     cco_begin(g)
         g->fp = fopen(g->filename, "r");
         g->line = cstr_init();
 
-        while (cstr_getline(&g->line, g->fp))
-            cco_yield(false);
+        cco_await(!cstr_getline(&g->line, g->fp));
 
     cco_final:
         printf("finish\n");
         cstr_drop(&g->line);
         fclose(g->fp);
-    cco_end(true);
+    cco_end();
 }
 
 int main(void)
 {
     struct file_read g = {__FILE__};
     int n = 0;
-    while (!file_read(&g))
+    cco_run(&g, file_read(&g))
     {
         printf("%3d %s\n", ++n, cstr_str(&g.line));
-        //if (n == 10) cco_stop(&it);
+        //if (n == 10) cco_stop(&g);
     }
 }

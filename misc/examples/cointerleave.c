@@ -43,7 +43,7 @@ void Use(void)
 
     struct Generator g = {{&a}, {&b}};
 
-    cco_run_blocked(&g, interleaved(&g)) {
+    cco_run(&g, interleaved(&g)) {
         printf("%d ", g.value);
     }
     puts("");
