@@ -30,9 +30,9 @@ void interleaved(struct Generator* g)
     cco_begin(g);
         while (!(cco_done(&g->x) & cco_done(&g->y)))
         {
-            cco_yield_at(&g->x, g->value = get_value(&g->x));
-            cco_yield_at(&g->y, g->value = get_value(&g->y));
-        } 
+            cco_yield_coro(&g->x, g->value = get_value(&g->x));
+            cco_yield_coro(&g->y, g->value = get_value(&g->y));
+        }
     cco_end();
 }
 
