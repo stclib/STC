@@ -1,6 +1,7 @@
 #define i_extern
 #include <stc/cregex.h>
 #include <stc/csview.h>
+#include <stc/algo/raii.h>
 #include "ctest.h"
 
 #define M_START(m) ((m).str - inp)

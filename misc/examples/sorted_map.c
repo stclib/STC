@@ -1,9 +1,10 @@
 // https://iq.opengenus.org/containers-cpp-stl/
 
+#include <stdio.h>
+#include <stc/algo/raii.h>
 #define i_key int
 #define i_val int
 #include <stc/csmap.h>
-#include <stdio.h>
 
 int main() 
 { 

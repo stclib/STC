@@ -1,5 +1,6 @@
 /* cbox: heap allocated boxed type */
 #include <stc/cstr.h>
+#include <stc/algo/raii.h>
 
 typedef struct { cstr name, last; } Person;
 

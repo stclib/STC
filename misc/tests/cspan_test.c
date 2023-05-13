@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stc/cspan.h>
+#include <stc/algo/raii.h>
 #include "ctest.h"
 
 using_cspan3(intspan, int);

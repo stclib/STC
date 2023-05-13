@@ -1,4 +1,5 @@
 #include <stc/cstr.h>
+#include <stc/algo/raii.h>
 #define i_val_str
 #include <stc/cvec.h>
 #include <errno.h>

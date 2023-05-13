@@ -1,5 +1,6 @@
 // example: https://doc.rust-lang.org/rust-by-example/std/box.html
 #include <stdio.h>
+#include <stc/algo/raii.h>
 
 typedef struct {
     double x;

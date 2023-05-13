@@ -5,6 +5,7 @@
 //     https://github.com/glouw/ctl/blob/master/examples/astar.c
 //     https://www.redblobgames.com/pathfinding/a-star/introduction.html
 #include <stc/cstr.h>
+#include <stc/algo/raii.h>
 #include <stdio.h>
 
 typedef struct

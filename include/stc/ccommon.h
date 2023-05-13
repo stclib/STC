@@ -29,7 +29,6 @@
 #include <stdbool.h>
 #include <string.h>
 #include <assert.h>
-#include "priv/raii.h"
 
 #define c_NPOS INTPTR_MAX
 #define c_ZI PRIiPTR
@@ -62,7 +61,7 @@
 #define _c_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, \
                  _14, _15, _16, N, ...) N
 
-#ifdef __cplusplus
+#ifdef __cplusplus 
   #include <new>
   #define _i_alloc(T)           static_cast<T*>(i_malloc(c_sizeof(T)))
   #define _i_new(T, ...)        new (_i_alloc(T)) T(__VA_ARGS__)
