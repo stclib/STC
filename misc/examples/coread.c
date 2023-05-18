@@ -13,7 +13,7 @@ struct file_read {
 
 void file_read(struct file_read* g)
 {
-    cco_begin(g)
+    cco(g) {
         g->fp = fopen(g->filename, "r");
         g->line = cstr_init();
 
@@ -23,7 +23,8 @@ void file_read(struct file_read* g)
         printf("finish\n");
         cstr_drop(&g->line);
         fclose(g->fp);
-    cco_end();
+    }
+    return;
 }
 
 int main(void)

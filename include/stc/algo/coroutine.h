@@ -76,9 +76,13 @@ enum {
     *_state = cco_state_done; \
     return ret
 
+#define cco(co) \
+    for (int *_state = &(co)->cco_state, _once=1; _once; *_state = cco_state_done, _once=0) \
+    _begin: switch (*_state) case 0:
+
 #define cco_yield(ret) \
     do { \
-        *_state = __LINE__; return ret; \
+        *_state = __LINE__; return ret; goto _begin; \
         case __LINE__:; \
     } while (0)
 
