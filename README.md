@@ -564,8 +564,8 @@ It adds a MemoryContext to each container by defining the `i_extend` template pa
 the by inclusion of `<stc/extend.h>`.
 ```c
 // stcpgs.h
-#define pgs_malloc(sz) MemoryContextAlloc(c_getcon(self)->memctx, sz)
-#define pgs_calloc(n, sz) MemoryContextAllocZero(c_getcon(self)->memctx, (n)*(sz))
+#define pgs_malloc(sz) MemoryContextAlloc(c_extend(self)->memctx, sz)
+#define pgs_calloc(n, sz) MemoryContextAllocZero(c_extend(self)->memctx, (n)*(sz))
 #define pgs_realloc(p, sz) (p ? repalloc(p, sz) : pgs_malloc(sz))
 #define pgs_free(p) (p ? pfree(p) : (void)0) // pfree/repalloc does not accept NULL.
 
@@ -574,12 +574,12 @@ the by inclusion of `<stc/extend.h>`.
 #define i_extend MemoryContext memctx;
 #include <stc/extend.h>
 ```
-To use it, define both `i_type` and `i_con` (the container type) before including the custom header:
+To use it, define both `i_type` and `i_base` (the container type) before including the custom header:
 ```c
 #define i_type IMap
+#define i_base csmap
 #define i_key int
 #define i_val int
-#define i_con csmap
 #include "stcpgs.h"
 
 // Note the wrapper struct type is IMap_ext. IMap is accessed by .get

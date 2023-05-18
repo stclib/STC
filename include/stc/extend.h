@@ -44,9 +44,9 @@
 #endif
 
 #ifdef _i_key
-  c_PASTE(forward_, i_con)(i_type, _i_key, _i_val);
+  c_PASTE(forward_, i_base)(i_type, _i_key, _i_val);
 #else
-  c_PASTE(forward_, i_con)(i_type, _i_val);
+  c_PASTE(forward_, i_base)(i_type, _i_val);
 #endif
 
 typedef struct {
@@ -54,13 +54,13 @@ typedef struct {
     i_type get;
 } c_PASTE(i_type, _ext);
 
-#define c_getcon(cptr) c_container_of(cptr, _cx_memb(_ext), get)
+#define c_extend(self) c_container_of(self, _cx_memb(_ext), get)
 
 #define i_is_forward
-#define _i_inc <stc/i_con.h>
+#define _i_inc <stc/i_base.h>
 #include _i_inc
 #undef _i_inc
 #undef _i_key
 #undef _i_val
-#undef i_con
+#undef i_base
 #undef i_extend

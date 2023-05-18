@@ -8,10 +8,10 @@
 #include <stdio.h>
 
 #define i_type IPQue
+#define i_base cpque
 #define i_val int
 #define i_extend bool (*less)(const int*, const int*);
-#define i_less(x, y) c_getcon(self)->less(x, y)
-#define i_con cpque
+#define i_less(x, y) c_extend(self)->less(x, y)
 #include <stc/extend.h>
 
 void print_queue(const char* name, IPQue_ext q) {
