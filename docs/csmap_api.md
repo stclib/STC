@@ -83,7 +83,8 @@ void                  csmap_X_next(csmap_X_iter* iter);
 csmap_X_iter          csmap_X_advance(csmap_X_iter it, intptr_t n);
 
 csmap_X_value         csmap_X_value_clone(csmap_X_value val);
-csmap_X_raw           csmap_X_value_toraw(csmap_X_value* pval);
+csmap_X_raw           csmap_X_value_toraw(const csmap_X_value* pval);
+void                  csmap_X_value_drop(csmap_X_value* pval);
 ```
 ## Types
 

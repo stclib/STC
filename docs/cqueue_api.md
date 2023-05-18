@@ -26,27 +26,34 @@ See the c++ class [std::queue](https://en.cppreference.com/w/cpp/container/queue
 
 ```c
 cqueue_X            cqueue_X_init(void);
+cqueue_X            cqueue_X_with_capacity(intptr_t size);
 cqueue_X            cqueue_X_clone(cqueue_X q);
 
 void                cqueue_X_clear(cqueue_X* self);
 void                cqueue_X_copy(cqueue_X* self, const cqueue_X* other);
+bool                cqueue_X_reserve(cqueue_X* self, intptr_t cap);
+void                cqueue_X_shrink_to_fit(cqueue_X* self);
 void                cqueue_X_drop(cqueue_X* self);       // destructor
 
 intptr_t            cqueue_X_size(const cqueue_X* self);
+intptr_t            cqueue_X_capacity(const cqueue_X* self);
 bool                cqueue_X_empty(const cqueue_X* self);
+
 cqueue_X_value*     cqueue_X_front(const cqueue_X* self);
 cqueue_X_value*     cqueue_X_back(const cqueue_X* self);
 
 cqueue_X_value*     cqueue_X_push(cqueue_X* self, i_val value);
 cqueue_X_value*     cqueue_X_emplace(cqueue_X* self, i_valraw raw);
-
 void                cqueue_X_pop(cqueue_X* self);
 
 cqueue_X_iter       cqueue_X_begin(const cqueue_X* self);
 cqueue_X_iter       cqueue_X_end(const cqueue_X* self);
 void                cqueue_X_next(cqueue_X_iter* it);
+cqueue_X_iter       cqueue_X_advance(cqueue_X_iter it, intptr_t n);
 
 i_val               cqueue_X_value_clone(i_val value);
+cqueue_X_raw        cqueue_X_value_toraw(const cqueue_X_value* pval);
+void                cqueue_X_value_drop(cqueue_X_value* pval);
 ```
 
 ## Types

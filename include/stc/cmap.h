@@ -276,13 +276,6 @@ STC_INLINE intptr_t fastrange_1(uint64_t x, uint64_t n)
 STC_INLINE intptr_t fastrange_2(uint64_t x, uint64_t n) 
     { return (intptr_t)(x & (n - 1)); } // n power of 2.
 
-STC_INLINE uint64_t next_power_of_2(uint64_t n) {
-    n--;
-    n |= n >>  1, n |= n >>  2;
-    n |= n >>  4, n |= n >>  8;
-    n |= n >> 16, n |= n >> 32;
-    return n + 1;
-}
 #endif // CMAP_H_INCLUDED
 
 STC_DEF _cx_iter _cx_memb(_begin)(const _cx_self* self) {
@@ -422,7 +415,7 @@ _cx_memb(_reserve)(_cx_self* self, const intptr_t _newcap) {
         return true;
     intptr_t _newbucks = (intptr_t)((float)_newcap / (i_max_load_factor)) | 1;
     #if i_expandby == 2
-    _newbucks = (intptr_t)next_power_of_2((uint64_t)_newbucks);
+    _newbucks = cnextpow2(_newbucks);
     #endif
     _cx_self m = {
         (_cx_value *)i_malloc(_newbucks*c_sizeof(_cx_value)),

@@ -84,19 +84,21 @@ void                clist_X_sort(clist_X* self);
 void                clist_X_sort_with(clist_X* self, int(*cmp)(const clist_X_value*, const clist_X_value*));
 
 // Node API
-clist_X_node*       clist_X_get_node(clist_X_value* val);                               // get the enclosing node
+clist_X_node*       clist_X_get_node(clist_X_value* val);                               // get enclosing node
 clist_X_value*      clist_X_push_back_node(clist_X* self, clist_X_node* node);
 clist_X_value*      clist_X_insert_after_node(clist_X* self, clist_X_node* ref, clist_X_node* node);
-clist_X_node*       clist_X_unlink_after_node(clist_X* self, clist_X_node* ref);        // return the unlinked node
+clist_X_node*       clist_X_unlink_after_node(clist_X* self, clist_X_node* ref);        // return unlinked node
+clist_X_node*       clist_X_unlink_front_node(clist_X* self);                           // return unlinked node
 void                clist_X_erase_after_node(clist_X* self, clist_X_node* node);
 
 clist_X_iter        clist_X_begin(const clist_X* self);
 clist_X_iter        clist_X_end(const clist_X* self);
 void                clist_X_next(clist_X_iter* it);
-clist_X_iter        clist_X_advance(clist_X_iter it, size_t n);                           // return n elements ahead.
+clist_X_iter        clist_X_advance(clist_X_iter it, size_t n);                         // return n elements ahead.
 
-clist_X_raw         clist_X_value_toraw(clist_X_value* pval);
 clist_X_value       clist_X_value_clone(clist_X_value val);
+clist_X_raw         clist_X_value_toraw(const clist_X_value* pval);
+void                clist_X_value_drop(clist_X_value* pval);
 ```
 
 ## Types

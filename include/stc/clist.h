@@ -109,8 +109,9 @@ STC_API _cx_value*      _cx_memb(_push_back_node)(_cx_self* self, _cx_node* node
 STC_API _cx_value*      _cx_memb(_insert_after_node)(_cx_self* self, _cx_node* ref, _cx_node* node);
 STC_API _cx_node*       _cx_memb(_unlink_after_node)(_cx_self* self, _cx_node* ref);
 STC_API void            _cx_memb(_erase_after_node)(_cx_self* self, _cx_node* ref);
-STC_INLINE _cx_node*    _cx_memb(_get_node)(_cx_value* vp) { return _clist_tonode(vp); }
-
+STC_INLINE _cx_node*    _cx_memb(_get_node)(_cx_value* pval) { return _clist_tonode(pval); }
+STC_INLINE _cx_node*    _cx_memb(_unlink_front_node)(_cx_self* self)
+                            { return _cx_memb(_unlink_after_node)(self, self->last); }
 #if !defined i_no_clone
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_INLINE i_key        _cx_memb(_value_clone)(i_key val) { return i_keyclone(val); }
@@ -144,10 +145,10 @@ STC_INLINE _cx_value*   _cx_memb(_push)(_cx_self* self, i_key value)
                             { return _cx_memb(_push_back)(self, value); }
 STC_INLINE void         _cx_memb(_pop_front)(_cx_self* self)
                             { assert(!_cx_memb(_empty)(self)); _cx_memb(_erase_after_node)(self, self->last); }
-STC_INLINE _cx_node*    _cx_memb(_unlink_node_front)(_cx_self* self)
-                            { return _cx_memb(_unlink_after_node)(self, self->last); }
 STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return &self->last->next->value; }
 STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self) { return &self->last->value; }
+STC_INLINE _cx_raw      _cx_memb(_value_toraw)(const _cx_value* pval) { return i_keyto(pval); }
+STC_INLINE void         _cx_memb(_value_drop)(_cx_value* pval) { i_keydrop(pval); }
 
 STC_INLINE intptr_t
 _cx_memb(_count)(const _cx_self* self) {

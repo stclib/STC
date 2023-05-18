@@ -81,12 +81,17 @@ typedef union {
 
 #define _c_cdeq_types(SELF, VAL) \
     typedef VAL SELF##_value; \
-    typedef struct { SELF##_value *ref, *end; } SELF##_iter; \
 \
     typedef struct SELF { \
-        SELF##_value *_base, *data; \
-        intptr_t _len, _cap; \
-    } SELF
+        SELF##_value *data; \
+        intptr_t start, end, capmask; \
+    } SELF; \
+\
+    typedef struct { \
+        SELF##_value *ref; \
+        intptr_t pos; \
+        const SELF* _s; \
+    } SELF##_iter
 
 #define _c_clist_types(SELF, VAL) \
     typedef VAL SELF##_value; \

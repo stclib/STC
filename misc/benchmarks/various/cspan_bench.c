@@ -1,4 +1,4 @@
-#define STC_NDEBUG
+#define NDEBUG
 #include <stc/cspan.h>
 #include <stdio.h>
 #include <time.h>

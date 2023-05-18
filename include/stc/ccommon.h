@@ -171,6 +171,16 @@ STC_INLINE char* cstrnstrn(const char *str, const char *needle,
     return NULL;
 }
 
+STC_INLINE intptr_t cnextpow2(intptr_t n) {
+    n--;
+    n |= n >> 1, n |= n >> 2;
+    n |= n >> 4, n |= n >> 8;
+    n |= n >> 16;
+    #if INTPTR_SIZE == INT64_SIZE
+    n |= n >> 32;
+    #endif
+    return n + 1;
+}
 /* Control block macros */
 
 #define c_foreach(...) c_MACRO_OVERLOAD(c_foreach, __VA_ARGS__)

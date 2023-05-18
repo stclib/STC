@@ -6,8 +6,6 @@
 #include <stc/cvec.h>
 #define i_val int
 #include <stc/cstack.h>
-#define i_val int
-#include <stc/cdeq.h>
 #define i_val_str
 #include <stc/csset.h>
 #include <stc/cspan.h>
@@ -40,9 +38,6 @@ int main()
     cstack_int stk = c_make(cstack_int, {1, 2, 3, 4, 5, 6, 7});
     printMe( (intspan)cspan_from(&stk) );
 
-    cdeq_int deq = c_make(cdeq_int, {1, 2, 3, 4, 5, 6, 7, 8});
-    printMe( (intspan)cspan_from(&deq) );
-
     csset_str set = c_make(csset_str, {"5", "7", "4", "3", "8", "2", "1", "9", "6"});
     printf("%d:", (int)csset_str_size(&set));
     c_foreach (e, csset_str, set)
@@ -52,6 +47,5 @@ int main()
     // cleanup
     cvec_int_drop(&vec);
     cstack_int_drop(&stk);
-    cdeq_int_drop(&deq);
     csset_str_drop(&set);
 }

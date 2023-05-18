@@ -20,9 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifdef _i_template
-  #error template.h already included
-#endif
+#ifndef _i_template
 #define _i_template
 
 #ifndef STC_TEMPLATE_H_INCLUDED
@@ -106,6 +104,9 @@
 #endif
 #ifdef i_eq
   #define _i_has_eq
+#endif
+#if defined i_cmp || defined i_less
+  #define _i_has_cmp
 #endif
 
 #if defined i_key_str
@@ -287,4 +288,5 @@
 #endif
 #ifndef _i_has_from
   #define i_no_emplace
+#endif
 #endif

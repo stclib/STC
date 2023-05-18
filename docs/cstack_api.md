@@ -54,8 +54,9 @@ cstack_X_iter       cstack_X_begin(const cstack_X* self);
 cstack_X_iter       cstack_X_end(const cstack_X* self);
 void                cstack_X_next(cstack_X_iter* it);
 
-i_valraw            cstack_X_value_toraw(cvec_X_value* pval);
 i_val               cstack_X_value_clone(i_val value);
+i_valraw            cstack_X_value_toraw(const cvec_X_value* pval);
+void                cstack_X_value_drop(cvec_X_value* pval);
 ```
 
 ## Types

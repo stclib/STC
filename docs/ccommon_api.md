@@ -212,7 +212,7 @@ You may customize `i_tag` and the comparison function `i_cmp` or `i_less`.
 There is a [benchmark/test file here](../misc/benchmarks/various/csort_bench.c).
 ```c
 #define i_val int
-#include <stc/algo/csort.h>
+#include <stc/algo/sort.h>
 
 int main() {
     int array[] = {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4};

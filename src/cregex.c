@@ -1220,7 +1220,7 @@ _build_subst(const char* replace, int nmatch, const csview match[],
                 if (g < (int)nmatch) {
                     csview m = mfun && mfun(g, match[g], &mstr) ? cstr_sv(&mstr) : match[g];
                     if (len + m.size > cap)
-                        dst = cstr_reserve(subst, cap = cap*3/2 + m.size);
+                        dst = cstr_reserve(subst, cap += cap*3/2 + m.size);
                     for (int i = 0; i < (int)m.size; ++i)
                         dst[len++] = m.str[i];
                 }
