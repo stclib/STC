@@ -207,6 +207,9 @@ STC_INLINE _cx_iter _cx_memb(_advance)(_cx_iter it, size_t n)
 STC_INLINE intptr_t _cx_memb(_index)(const _cx_self* self, _cx_iter it) 
     { return (it.ref - self->data); }
 
+STC_INLINE void _cx_memb(_adjust_end_)(_cx_self* self, intptr_t n)
+    { self->_len += n; }
+
 #if !defined i_no_cmp || defined _i_has_eq
 
 STC_INLINE _cx_iter

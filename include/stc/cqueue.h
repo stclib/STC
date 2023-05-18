@@ -76,17 +76,14 @@ STC_INLINE bool         _cx_memb(_empty)(const _cx_self* self)
 STC_INLINE _cx_raw      _cx_memb(_value_toraw)(const _cx_value* pval)
                             { return i_keyto(pval); }
 
-STC_INLINE _cx_value*
-_cx_memb(_front)(const _cx_self* self) 
-    { return self->data + self->start; }
+STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) 
+                            { return self->data + self->start; }
 
-STC_INLINE _cx_value*
-_cx_memb(_back)(const _cx_self* self)
-    { return self->data + ((self->end - 1) & self->capmask); }
+STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self)
+                            { return self->data + ((self->end - 1) & self->capmask); }
 
-STC_INLINE void
-_cx_memb(_pop)(_cx_self* self) { // pop_front
-    c_ASSERT(!_cx_memb(_empty)(self));
+STC_INLINE void _cx_memb(_pop)(_cx_self* self) { // pop_front
+    assert(!_cx_memb(_empty)(self));
     i_keydrop((self->data + self->start));
     self->start = (self->start + 1) & self->capmask;
 }
@@ -97,24 +94,27 @@ STC_INLINE void _cx_memb(_copy)(_cx_self* self, const _cx_self* other) {
     *self = _cx_memb(_clone)(*other);
 }
 
-STC_INLINE _cx_iter
-_cx_memb(_begin)(const _cx_self* self) {
+STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) {
     return c_LITERAL(_cx_iter){
         _cx_memb(_empty)(self) ? NULL : self->data + self->start,
         self->start, self
     };
 }
 
-STC_INLINE _cx_iter
-_cx_memb(_end)(const _cx_self* self)
-    { return c_LITERAL(_cx_iter){NULL, self->end, self}; }
+STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self)
+    { return c_LITERAL(_cx_iter){.pos=self->end, ._s=self}; }
 
-STC_INLINE void
-_cx_memb(_next)(_cx_iter* it) {
+STC_INLINE void _cx_memb(_next)(_cx_iter* it) {
     if (it->pos != it->_s->capmask) { ++it->ref; ++it->pos; }
     else { it->ref -= it->pos; it->pos = 0; }
     if (it->pos == it->_s->end) it->ref = NULL;
 }
+
+STC_INLINE intptr_t _cx_memb(_index)(const _cx_self* self, _cx_iter it)
+    { return _cdeq_toidx(self, it.pos); }
+
+STC_INLINE void _cx_memb(_adjust_end_)(_cx_self* self, intptr_t n)
+    { self->end = (self->end + n) & self->capmask; }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement)

@@ -106,7 +106,7 @@ int main()
     for (_i = it; it.ref; C##_next(&it)) \
         if (pred) C##_value_drop(it.ref), ++_n; \
         else *_i.ref = *it.ref, C##_next(&_i); \
-    _cnt->_len -= _n; \
+    C##_adjust_end_(_cnt, -_n); \
 } while (0)
 
 // ------------------------ private -------------------------

@@ -80,6 +80,7 @@ STC_INLINE void _cx_memb(_drop)(_cx_self* self) {
     i_free(self->data);
 #endif
 }
+
 STC_INLINE intptr_t _cx_memb(_size)(const _cx_self* self)
     { return self->_len; }
 
@@ -186,5 +187,11 @@ STC_INLINE void _cx_memb(_next)(_cx_iter* it)
 
 STC_INLINE _cx_iter _cx_memb(_advance)(_cx_iter it, size_t n)
     { if ((it.ref += n) >= it.end) it.ref = NULL ; return it; }
+
+STC_INLINE intptr_t _cx_memb(_index)(const _cx_self* self, _cx_iter it) 
+    { return (it.ref - self->data); }
+
+STC_INLINE void _cx_memb(_adjust_end_)(_cx_self* self, intptr_t n)
+    { self->_len += n; }
 
 #include "priv/template2.h"

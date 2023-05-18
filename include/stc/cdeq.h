@@ -46,9 +46,8 @@ _cx_memb(_at_mut)(_cx_self* self, intptr_t idx)
     { return self->data + _cdeq_topos(self, idx); }
 
 STC_INLINE _cx_value*
-_cx_memb(_push_back)(_cx_self* self, _cx_value val) { 
-    return  _cx_memb(_push)(self, val);
-}
+_cx_memb(_push_back)(_cx_self* self, _cx_value val)
+    { return  _cx_memb(_push)(self, val); }
 
 STC_INLINE void
 _cx_memb(_pop_back)(_cx_self* self) {
@@ -141,14 +140,13 @@ _cx_memb(_erase_n)(_cx_self* self, const intptr_t idx, const intptr_t n) {
 STC_DEF _cx_iter
 _cx_memb(_insert_uninit)(_cx_self* self, const intptr_t idx, const intptr_t n) {
     const intptr_t len = _cx_memb(_size)(self);
-    _cx_iter it = {._s=self};
+    _cx_iter it = {.pos=_cdeq_topos(self, idx), ._s=self};
     if (len + n > self->capmask)
         if (!_cx_memb(_reserve)(self, len + n))
             return it;
     for (intptr_t j = len - 1, i = j + n; j >= idx; --j, --i)
         *_cx_memb(_at_mut)(self, i) = *_cx_memb(_at)(self, j);
     self->end = (self->end + n) & self->capmask;
-    it.pos = _cdeq_topos(self, idx);
     it.ref = self->data + it.pos;
     return it;
 }
@@ -172,7 +170,7 @@ _cx_memb(_emplace_n)(_cx_self* self, const intptr_t idx, const _cx_raw* raw, con
 #if defined _i_has_eq || defined _i_has_cmp
 STC_DEF _cx_iter
 _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
-    for (; i1.ref; _cx_memb(_next)(&i1)) {
+    for (; i1.pos != i2.pos; _cx_memb(_next)(&i1)) {
         const _cx_raw r = i_keyto(i1.ref);
         if (i_eq((&raw), (&r)))
             break;
