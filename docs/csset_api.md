@@ -86,7 +86,7 @@ int main ()
 {
     SSet second={0}, third={0}, fourth={0}, fifth={0};
 
-    second = c_make(SSet, {"red", "green", "blue"});
+    second = c_init(SSet, {"red", "green", "blue"});
 
     c_forlist (i, const char*, {"orange", "pink", "yellow"})
         SSet_emplace(&third, *i.ref);

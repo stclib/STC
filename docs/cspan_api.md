@@ -143,8 +143,8 @@ using_cspan3(Span, int); // Shorthand to define Span, Span2, and Span3
 
 int main()
 {
-    // c_make() can create any STC container/span from an initializer list:
-    Span span = c_make(Span, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
+    // c_init() can create any STC container/span from an initializer list:
+    Span span = c_init(Span, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
                               14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24});
     // create a 3d cspan:
     Span3 span3 = cspan_md(span.data, 2, 4, 3);

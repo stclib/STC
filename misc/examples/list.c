@@ -34,7 +34,7 @@ int main() {
     puts("");
 
     DList_drop(&list);
-    list = c_make(DList, {10, 20, 30, 40, 30, 50});
+    list = c_init(DList, {10, 20, 30, 40, 30, 50});
 
     const double* v = DList_get(&list, 30);
     printf("found: %f\n", *v);

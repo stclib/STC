@@ -28,7 +28,7 @@
 
 int main()
 {
-    cstack_int stk = c_make(cstack_int, {1, 2, 3, 4, 5, 6, 7, 8, 9});
+    cstack_int stk = c_init(cstack_int, {1, 2, 3, 4, 5, 6, 7, 8, 9});
 
     c_foreach (i, cstack_int, stk)
         printf(" %d", *i.ref);

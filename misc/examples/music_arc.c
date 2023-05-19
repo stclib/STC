@@ -32,7 +32,7 @@ void Song_drop(Song* s) {
 
 void example3()
 {
-    SongVec vec1 = c_make(SongVec, {
+    SongVec vec1 = c_init(SongVec, {
         Song_make("Bob Dylan", "The Times They Are A Changing"),
         Song_make("Aretha Franklin", "Bridge Over Troubled Water"),
         Song_make("Thalia", "Entre El Mar y Una Estrella")

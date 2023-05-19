@@ -115,7 +115,7 @@ typedef struct { int32_t d[6]; } cspan_idx6;
 #define cspan_md(array, ...) \
     {.data=array, .shape={__VA_ARGS__}, .stride={.d={__VA_ARGS__}}}
 
-/* For static initialization, use cspan_make(). c_make() for non-static only. */
+/* For static initialization, use cspan_make(). c_init() for non-static only. */
 #define cspan_make(SpanType, ...) \
     {.data=(SpanType##_value[])__VA_ARGS__, .shape={sizeof((SpanType##_value[])__VA_ARGS__)/sizeof(SpanType##_value)}}
 

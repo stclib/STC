@@ -16,8 +16,8 @@ void print_ilist(const char* s, clist_i list)
 
 int main ()
 {
-    clist_i list1 = c_make(clist_i, {1, 2, 3, 4, 5});
-    clist_i list2 = c_make(clist_i, {10, 20, 30, 40, 50});
+    clist_i list1 = c_init(clist_i, {1, 2, 3, 4, 5});
+    clist_i list2 = c_init(clist_i, {10, 20, 30, 40, 50});
 
     print_ilist("list1:", list1);
     print_ilist("list2:", list2);

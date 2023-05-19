@@ -18,7 +18,7 @@
 #define i_tag ii
 #include <stc/csmap.h>
 ...
-csmap_ii map = c_make(csmap_ii, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} });
+csmap_ii map = c_init(csmap_ii, { {23,1}, {3,2}, {7,3}, {5,4}, {12,5} });
 
 c_foreach (i, csmap_ii, map)
     printf(" %d", i.ref->first);
@@ -158,7 +158,7 @@ Note that `c_flt_take()` and `c_flt_takewhile()` breaks the loop on false.
 ---
 ## Generic algorithms
 
-### c_make, c_drop
+### c_init, c_drop
 
 Make any container from an initializer list:
 ```c
@@ -170,11 +170,11 @@ Make any container from an initializer list:
 #include <stc/cmap.h>
 ...
 // Initializes with const char*, internally converted to cstr!
-cset_str myset = c_make(cset_str, {"This", "is", "the", "story"});
+cset_str myset = c_init(cset_str, {"This", "is", "the", "story"});
 cset_str myset2 = c_clone(myset); 
 
 int x = 7, y = 8;
-cmap_int mymap = c_make(cmap_int, { {1, 2}, {3, 4}, {5, 6}, {x, y} });
+cmap_int mymap = c_init(cmap_int, { {1, 2}, {3, 4}, {5, 6}, {x, y} });
 ```
 Drop multiple containers of the same type:
 ```c
@@ -232,7 +232,7 @@ possible and very fast. Note that `i_more` must be defined to pick up template p
 #include <stdio.h>
 
 int main() {
-    MyDeq deq = c_make(MyDeq, {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4});
+    MyDeq deq = c_init(MyDeq, {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4});
     MyDeq_sort_n(&deq, MyDeq_size(&deq));
     c_foreach (i, MyDeq, deq) printf(" %d", *i.ref);
     MyDeq_drop(&deq);

@@ -11,7 +11,7 @@ int main()
     // TEST SORTED VECTOR
     {
         int key, *res;
-        cvec_int vec = c_make(cvec_int, {40, 600, 1, 7000, 2, 500, 30});
+        cvec_int vec = c_init(cvec_int, {40, 600, 1, 7000, 2, 500, 30});
 
         cvec_int_sort(&vec);
 
@@ -40,7 +40,7 @@ int main()
     // TEST SORTED SET
     {
         int key, *res;
-        csset_int set = c_make(csset_int, {40, 600, 1, 7000, 2, 500, 30});
+        csset_int set = c_init(csset_int, {40, 600, 1, 7000, 2, 500, 30});
 
         key = 100;
         res = csset_int_lower_bound(&set, key).ref;

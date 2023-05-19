@@ -37,12 +37,12 @@ int point_cmp(const Point* a, const Point* b) {
 
 int main()
 {
-    PMap pmap = c_make(PMap, {
+    PMap pmap = c_init(PMap, {
         {{42, 14}, 1},
         {{32, 94}, 2},
         {{62, 81}, 3},
     });
-    SMap smap = c_make(SMap, {
+    SMap smap = c_init(SMap, {
         {"Hello, friend", "this is the mapped value"},
         {"The brown fox", "jumped"},
         {"This is the time", "for all good things"},
