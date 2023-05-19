@@ -128,7 +128,6 @@ STC_INLINE bool _cbits_disjoint(const uint64_t* set, const uint64_t* other, cons
 typedef struct { uint64_t *data64; int64_t _size; } i_type;
 
 STC_INLINE cbits   cbits_init(void) { return c_LITERAL(cbits){NULL}; }
-STC_INLINE void    cbits_create(cbits* self) { self->data64 = NULL; self->_size = 0; }
 STC_INLINE void    cbits_drop(cbits* self) { c_free(self->data64); }
 STC_INLINE int64_t cbits_size(const cbits* self) { return self->_size; }
 
@@ -200,7 +199,6 @@ STC_INLINE cbits cbits_with_pattern(const int64_t size, const uint64_t pattern) 
 typedef struct { uint64_t data64[(i_capacity - 1)/64 + 1]; } i_type;
 
 STC_INLINE i_type   _i_memb(_init)(void) { return c_LITERAL(i_type){0}; }
-STC_INLINE void     _i_memb(_create)(i_type* self) {}
 STC_INLINE void     _i_memb(_drop)(i_type* self) {}
 STC_INLINE int64_t  _i_memb(_size)(const i_type* self) { return i_capacity; }
 STC_INLINE i_type   _i_memb(_move)(i_type* self) { return *self; }

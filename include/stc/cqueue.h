@@ -62,7 +62,7 @@ STC_INLINE _cx_value*   _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
                             { return _cx_memb(_push)(self, i_keyfrom(raw)); }
 #endif
 
-#if defined _i_has_eq || defined _i_has_cmp
+#if defined _i_has_cmp || defined _i_has_eq
 STC_API bool _cx_memb(_eq)(const _cx_self* self, const _cx_self* other);
 #endif
 
@@ -216,7 +216,7 @@ _cx_memb(_clone)(_cx_self cx) {
 }
 #endif // i_no_clone
 
-#if defined _i_has_eq || defined _i_has_cmp
+#if defined _i_has_cmp || defined _i_has_eq
 STC_DEF bool
 _cx_memb(_eq)(const _cx_self* self, const _cx_self* other) {
     if (_cx_memb(_size)(self) != _cx_memb(_size)(other)) return false;
