@@ -54,6 +54,7 @@ cstack_X_iter       cstack_X_begin(const cstack_X* self);
 cstack_X_iter       cstack_X_end(const cstack_X* self);
 void                cstack_X_next(cstack_X_iter* it);
 
+bool                cstack_X_eq(const cstack_X* c1, const cstack_X* c2); // require i_eq/i_cmp/i_less.
 i_val               cstack_X_value_clone(i_val value);
 i_valraw            cstack_X_value_toraw(const cvec_X_value* pval);
 void                cstack_X_value_drop(cvec_X_value* pval);

@@ -96,6 +96,7 @@ clist_X_iter        clist_X_end(const clist_X* self);
 void                clist_X_next(clist_X_iter* it);
 clist_X_iter        clist_X_advance(clist_X_iter it, size_t n);                         // return n elements ahead.
 
+bool                clist_X_eq(const clist_X* c1, const clist_X* c2);                   // equality test
 clist_X_value       clist_X_value_clone(clist_X_value val);
 clist_X_raw         clist_X_value_toraw(const clist_X_value* pval);
 void                clist_X_value_drop(clist_X_value* pval);

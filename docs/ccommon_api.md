@@ -204,22 +204,40 @@ if (it.ref) cmap_str_erase_at(&map, it);
 c_erase_if(i, csmap_str, map, cstr_contains(i.ref, "hello"));
 ```
 
-### csort - two times faster qsort
+### sort_n_ - two times faster qsort
 
-When very fast array sorting is required, **csort** is about twice as fast as *qsort()*, and often simpler to use.
+The **sort_n**, **sort_ij** algorithm is about twice as fast as *qsort()*, and often simpler to use.
 You may customize `i_tag` and the comparison function `i_cmp` or `i_less`.  
 
 There is a [benchmark/test file here](../misc/benchmarks/various/csort_bench.c).
 ```c
 #define i_val int
 #include <stc/algo/sort.h>
+#include <stdio.h>
 
 int main() {
-    int array[] = {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4};
-    csort_int(array, c_arraylen(array));
+    int nums[] = {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4};
+    intarray_sort_n(nums, c_arraylen(nums));
+    c_forrange (i, c_arraylen(arr)) printf(" %d", arr[i]);
 }
 ```
+Containers with random access may also be sorted. Even sorting cdeq/cqueue (with ring buffer) is
+possible and very fast. Note that `i_more` must be defined to pick up template parameters from the container:
+```c
+#define i_type MyDeq
+#define i_val int
+#define i_more
+#include <stc/cdeq.h> // deque
+#include <stc/algo/sort.h>
+#include <stdio.h>
 
+int main() {
+    MyDeq deq = c_make(MyDeq, {5, 3, 5, 9, 7, 4, 7, 2, 4, 9, 3, 1, 2, 6, 4});
+    MyDeq_sort_n(&deq, MyDeq_size(&deq));
+    c_foreach (i, MyDeq, deq) printf(" %d", *i.ref);
+    MyDeq_drop(&deq);
+}
+```
 
 ### c_new, c_delete
 
@@ -403,6 +421,8 @@ The **checkauto** utility described below, ensures that the `c_auto*` macros are
 | `continue`                             | Exit a defer-block without resource leak                  |
 
 ```c
+#include <stc/algo/raii.h> // or <stc/calgo.h>
+...
 // `c_defer` executes the expression(s) when leaving scope.
 cstr s1 = cstr_lit("Hello"), s2 = cstr_lit("world");
 c_defer (cstr_drop(&s1), cstr_drop(&s2))

@@ -91,6 +91,7 @@ cvec_X_iter         cvec_X_end(const cvec_X* self);
 void                cvec_X_next(cvec_X_iter* iter);
 cvec_X_iter         cvec_X_advance(cvec_X_iter it, size_t n);
 
+bool                cvec_X_eq(const cvec_X* c1, const cvec_X* c2); // equality comp.
 cvec_X_value        cvec_X_value_clone(cvec_X_value val);
 cvec_X_raw          cvec_X_value_toraw(const cvec_X_value* pval);
 cvec_X_raw          cvec_X_value_drop(cvec_X_value* pval);

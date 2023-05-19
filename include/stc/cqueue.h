@@ -62,6 +62,10 @@ STC_INLINE _cx_value*   _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
                             { return _cx_memb(_push)(self, i_keyfrom(raw)); }
 #endif
 
+#if defined _i_has_eq || defined _i_has_cmp
+STC_API bool _cx_memb(_eq)(const _cx_self* self, const _cx_self* other);
+#endif
+
 #if !defined i_no_clone
 STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
 STC_INLINE i_key        _cx_memb(_value_clone)(i_key val)
@@ -211,6 +215,20 @@ _cx_memb(_clone)(_cx_self cx) {
     return out;
 }
 #endif // i_no_clone
+
+#if defined _i_has_eq || defined _i_has_cmp
+STC_DEF bool
+_cx_memb(_eq)(const _cx_self* self, const _cx_self* other) {
+    if (_cx_memb(_size)(self) != _cx_memb(_size)(other)) return false;
+    for (_cx_iter i = _cx_memb(_begin)(self), j = _cx_memb(_begin)(other);
+         i.ref; _cx_memb(_next)(&i), _cx_memb(_next)(&j))
+    {
+        const _cx_raw _rx = i_keyto(i.ref), _ry = i_keyto(j.ref);
+        if (!(i_eq((&_rx), (&_ry)))) return false;
+    }
+    return true;
+}
+#endif
 #endif // IMPLEMENTATION
 #include "priv/template2.h"
 #define CQUEUE_H_INCLUDED

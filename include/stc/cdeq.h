@@ -96,7 +96,6 @@ _cx_memb(_emplace_at)(_cx_self* self, _cx_iter it, const _cx_raw raw)
 
 #if defined _i_has_eq || defined _i_has_cmp
 STC_API _cx_iter _cx_memb(_find_in)(_cx_iter p1, _cx_iter p2, _cx_raw raw);
-STC_API bool _cx_memb(_eq)(const _cx_self* self, const _cx_self* other);
 
 STC_INLINE _cx_iter
 _cx_memb(_find)(const _cx_self* self, _cx_raw raw) {
@@ -182,18 +181,6 @@ _cx_memb(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
             break;
     }
     return i1;
-}
-
-STC_DEF bool
-_cx_memb(_eq)(const _cx_self* self, const _cx_self* other) {
-    if (_cx_memb(_size)(self) != _cx_memb(_size)(other)) return false;
-    for (_cx_iter i = _cx_memb(_begin)(self), j = _cx_memb(_begin)(other);
-         i.ref; _cx_memb(_next)(&i), _cx_memb(_next)(&j))
-    {
-        const _cx_raw _rx = i_keyto(i.ref), _ry = i_keyto(j.ref);
-        if (!(i_eq((&_rx), (&_ry)))) return false;
-    }
-    return true;
 }
 #endif
 #endif // IMPLEMENTATION

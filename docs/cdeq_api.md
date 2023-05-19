@@ -79,6 +79,7 @@ cdeq_X_iter         cdeq_X_end(const cdeq_X* self);
 void                cdeq_X_next(cdeq_X_iter* it);
 cdeq_X_iter         cdeq_X_advance(cdeq_X_iter it, intptr_t n);
 
+bool                cdeq_X_eq(const cdeq_X* c1, const cdeq_X* c2); // require i_eq/i_cmp/i_less.
 cdeq_X_value        cdeq_X_value_clone(cdeq_X_value val);
 cdeq_X_raw          cdeq_X_value_toraw(const cdeq_X_value* pval);
 void                cdeq_X_value_drop(cdeq_X_value* pval);

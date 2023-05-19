@@ -32,7 +32,7 @@ void testsort(Ints *a, int size, const char *desc) {
 #elif defined QSORT
     printf("qsort: "); qsort(a->data, size, sizeof *a->data, cmp_int);
 #else
-    printf("stc_qsort: "); Ints_sort_n(a, size);
+    printf("STC sort_n: "); Ints_sort_n(a, size);
 #endif
     t = clock() - t;
 

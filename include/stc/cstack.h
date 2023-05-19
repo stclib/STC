@@ -194,4 +194,15 @@ STC_INLINE intptr_t _cx_memb(_index)(const _cx_self* self, _cx_iter it)
 STC_INLINE void _cx_memb(_adjust_end_)(_cx_self* self, intptr_t n)
     { self->_len += n; }
 
+#if defined _i_has_eq || defined _i_has_cmp
+STC_INLINE bool
+_cx_memb(_eq)(const _cx_self* self, const _cx_self* other) {
+    if (self->_len != other->_len) return false;
+    for (intptr_t i = 0; i < self->_len; ++i) {
+        const _cx_raw _rx = i_keyto(self->data+i), _ry = i_keyto(other->data+i);
+        if (!(i_eq((&_rx), (&_ry)))) return false;
+    }
+    return true;
+}
+#endif
 #include "priv/template2.h"

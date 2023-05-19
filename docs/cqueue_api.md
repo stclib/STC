@@ -51,6 +51,7 @@ cqueue_X_iter       cqueue_X_end(const cqueue_X* self);
 void                cqueue_X_next(cqueue_X_iter* it);
 cqueue_X_iter       cqueue_X_advance(cqueue_X_iter it, intptr_t n);
 
+bool                cqueue_X_eq(const cqueue_X* c1, const cqueue_X* c2); //  require i_eq/i_cmp/i_less.
 i_val               cqueue_X_value_clone(i_val value);
 cqueue_X_raw        cqueue_X_value_toraw(const cqueue_X_value* pval);
 void                cqueue_X_value_drop(cqueue_X_value* pval);
