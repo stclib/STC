@@ -33,7 +33,6 @@
 
 STC_API _cx_value* _cx_memb(_push_front)(_cx_self* self, i_key value);
 STC_API _cx_iter   _cx_memb(_insert_n)(_cx_self* self, intptr_t idx, const _cx_value* arr, intptr_t n);
-STC_API _cx_iter   _cx_memb(_emplace_n)(_cx_self* self, intptr_t idx, const _cx_raw* raw, intptr_t n);
 STC_API _cx_iter   _cx_memb(_insert_uninit)(_cx_self* self, intptr_t idx, intptr_t n);
 STC_API void       _cx_memb(_erase_n)(_cx_self* self, intptr_t idx, intptr_t n);
 
@@ -79,6 +78,9 @@ _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
 }
 
 #if !defined i_no_emplace
+STC_API _cx_iter
+_cx_memb(_emplace_n)(_cx_self* self, intptr_t idx, const _cx_raw* raw, intptr_t n);
+
 STC_INLINE _cx_value*
 _cx_memb(_emplace_front)(_cx_self* self, const _cx_raw raw)
     { return _cx_memb(_push_front)(self, i_keyfrom(raw)); }
@@ -140,13 +142,15 @@ _cx_memb(_erase_n)(_cx_self* self, const intptr_t idx, const intptr_t n) {
 STC_DEF _cx_iter
 _cx_memb(_insert_uninit)(_cx_self* self, const intptr_t idx, const intptr_t n) {
     const intptr_t len = _cx_memb(_size)(self);
-    _cx_iter it = {.pos=_cdeq_topos(self, idx), ._s=self};
+    _cx_iter it = {._s=self};
     if (len + n > self->capmask)
         if (!_cx_memb(_reserve)(self, len + n))
             return it;
-    for (intptr_t j = len - 1, i = j + n; j >= idx; --j, --i)
-        *_cx_memb(_at_mut)(self, i) = *_cx_memb(_at)(self, j);
+    for (intptr_t i = len - 1, j = i + n; i >= idx; --i, --j)
+        *_cx_memb(_at_mut)(self, j) = *_cx_memb(_at)(self, i);
+
     self->end = (self->end + n) & self->capmask;
+    it.pos = _cdeq_topos(self, idx);
     it.ref = self->data + it.pos;
     return it;
 }
@@ -159,6 +163,7 @@ _cx_memb(_insert_n)(_cx_self* self, const intptr_t idx, const _cx_value* arr, co
     return it;
 }
 
+#if !defined i_no_emplace
 STC_DEF _cx_iter
 _cx_memb(_emplace_n)(_cx_self* self, const intptr_t idx, const _cx_raw* raw, const intptr_t n) {
     _cx_iter it = _cx_memb(_insert_uninit)(self, idx, n);
@@ -166,6 +171,7 @@ _cx_memb(_emplace_n)(_cx_self* self, const intptr_t idx, const _cx_raw* raw, con
         *_cx_memb(_at_mut)(self, i) = i_keyfrom(raw[j]);
     return it;
 }
+#endif
 
 #if defined _i_has_eq || defined _i_has_cmp
 STC_DEF _cx_iter

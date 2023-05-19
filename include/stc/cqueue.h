@@ -210,7 +210,6 @@ _cx_memb(_clone)(_cx_self cx) {
     out.end = sz;
     return out;
 }
-
 #endif // i_no_clone
 #endif // IMPLEMENTATION
 #include "priv/template2.h"
