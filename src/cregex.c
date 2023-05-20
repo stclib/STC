@@ -1251,12 +1251,12 @@ cregex_compile_3(cregex *self, const char* pattern, int cflags) {
 
 int
 cregex_captures(const cregex* self) {
-    return self->prog ? 1 + self->prog->nsubids : 0;
+    return self->prog ? self->prog->nsubids : 0;
 }
 
 int
 cregex_find_4(const cregex* re, const char* input, csview match[], int mflags) {
-    int res = _regexec(re->prog, input, cregex_captures(re), match, mflags);
+    int res = _regexec(re->prog, input, cregex_captures(re) + 1, match, mflags);
     switch (res) {
     case 1: return CREG_OK;
     case 0: return CREG_NOMATCH;
@@ -1281,7 +1281,7 @@ cregex_replace_sv_6(const cregex* re, csview input, const char* replace, int cou
     cstr out = cstr_NULL;
     cstr subst = cstr_NULL;
     csview match[CREG_MAX_CAPTURES];
-    int nmatch = cregex_captures(re);
+    int nmatch = cregex_captures(re) + 1;
     if (!count) count = INT32_MAX;
     bool copy = !(rflags & CREG_R_STRIP);
 

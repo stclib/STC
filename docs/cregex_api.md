@@ -29,7 +29,7 @@ cregex      cregex_from(const char* pattern, int cflags = CREG_DEFAULT);
             // return CREG_OK, or negative error code on failure
 int         cregex_compile(cregex *self, const char* pattern, int cflags = CREG_DEFAULT);
 
-            // num. of capture groups in regex. 0 if RE is invalid. First group is the full match
+            // num. of capture groups in regex, excluding the 0th group which is the full match
 int         cregex_captures(const cregex* self); 
 
             // return CREG_OK, CREG_NOMATCH, or CREG_MATCHERROR
@@ -139,14 +139,14 @@ To iterate multiple matches in an input string, you may use
 ```c
 csview match[5] = {0};
 while (cregex_find(&re, input, match, CREG_M_NEXT) == CREG_OK)
-    c_forrange (k, cregex_captures(&re))
-        printf("submatch %lld: %.*s\n", k, c_SV(match[k]));
+    for (int k = 1; i <= cregex_captures(&re); ++k)
+        printf("submatch %d: %.*s\n", k, c_SV(match[k]));
 ```
 There is also a for-loop macro to simplify it:
 ```c
 c_formatch (it, &re, input)
-    c_forrange (k, cregex_captures(&re))
-        printf("submatch %lld: %.*s\n", k, c_SV(it.match[k]));
+    for (int k = 1; i <= cregex_captures(&re); ++k)
+        printf("submatch %d: %.*s\n", k, c_SV(it.match[k]));
 ```
 
 ## Using cregex in a project

@@ -104,7 +104,7 @@ STC_INLINE cregex cregex_from_2(const char* pattern, int cflags) {
     return re;
 }
 
-/* number of capture groups in a regex pattern including full the match capture, 0 if regex is invalid */
+/* number of capture groups in a regex pattern, excluding the full match capture (0) */
 int cregex_captures(const cregex* re);
 
 /* return CREG_OK, CREG_NOMATCH or CREG_MATCHERROR. */
