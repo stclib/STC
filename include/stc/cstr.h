@@ -364,13 +364,11 @@ STC_INLINE void cstr_pop(cstr* self) {
 STC_INLINE char* cstr_append(cstr* self, const char* str)
     { return cstr_append_n(self, str, c_strlen(str)); }
 
-STC_INLINE void cstr_append_sv(cstr* self, csview sv)
-    { cstr_append_n(self, sv.str, sv.size); }
+STC_INLINE char* cstr_append_sv(cstr* self, csview sv)
+    { return cstr_append_n(self, sv.str, sv.size); }
 
-STC_INLINE char* cstr_append_s(cstr* self, cstr s) {
-    csview sv = cstr_sv(&s);
-    return cstr_append_n(self, sv.str, sv.size);
-}
+STC_INLINE char* cstr_append_s(cstr* self, cstr s)
+    { return cstr_append_sv(self, cstr_sv(&s)); }
 
 #define cstr_replace(...) c_MACRO_OVERLOAD(cstr_replace, __VA_ARGS__)
 #define cstr_replace_3(self, search, repl) cstr_replace_4(self, search, repl, INT32_MAX)

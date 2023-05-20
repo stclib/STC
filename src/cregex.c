@@ -1217,11 +1217,11 @@ _build_subst(const char* replace, int nmatch, const csview match[],
                 g = arg - '0';
                 if (replace[1] >= '0' && replace[1] <= '9' && replace[2] == ';')
                     { g = g*10 + (replace[1] - '0'); replace += 2; }
-                if (g < (int)nmatch) {
+                if (g < nmatch) {
                     csview m = mfun && mfun(g, match[g], &mstr) ? cstr_sv(&mstr) : match[g];
                     if (len + m.size > cap)
-                        dst = cstr_reserve(subst, cap += cap*3/2 + m.size);
-                    for (int i = 0; i < (int)m.size; ++i)
+                        dst = cstr_reserve(subst, cap += cap/2 + m.size);
+                    for (int i = 0; i < m.size; ++i)
                         dst[len++] = m.str[i];
                 }
                 ++replace;
@@ -1230,7 +1230,7 @@ _build_subst(const char* replace, int nmatch, const csview match[],
             }
         }
         if (len == cap)
-            dst = cstr_reserve(subst, cap = cap*3/2 + 4);
+            dst = cstr_reserve(subst, cap += cap/2 + 4);
         dst[len++] = *replace++;
     }
     cstr_drop(&mstr);
