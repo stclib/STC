@@ -42,7 +42,7 @@ void findit(csmap_istr c, csmap_istr_key val)
 
 int main()
 {
-    csmap_istr m1 = c_make(csmap_istr, {{40, "Zr"}, {45, "Rh"}});
+    csmap_istr m1 = c_init(csmap_istr, {{40, "Zr"}, {45, "Rh"}});
     cvec_istr v = {0};
 
     puts("The starting map m1 is (key, value):");

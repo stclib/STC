@@ -92,7 +92,7 @@ void int_drop(int* x) {
 
 int main()
 {
-    IVec vec = c_make(Vec, {2021, 2012, 2022, 2015});
+    IVec vec = c_init(Vec, {2021, 2012, 2022, 2015});
     ISet set = {0};
     c_defer(
       IVec_drop(&vec),

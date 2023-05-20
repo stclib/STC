@@ -25,7 +25,7 @@ int main()
         cvec_str_drop(&values),
         clist_str_drop(&list)
     ){
-        map = c_make(cmap_str, {
+        map = c_init(cmap_str, {
             {"green", "#00ff00"},
             {"blue", "#0000ff"},
             {"yellow", "#ffff00"},

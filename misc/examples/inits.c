@@ -66,7 +66,7 @@ int main(void)
 
     // CMAP CNT
 
-    cmap_cnt countries = c_make(cmap_cnt, {
+    cmap_cnt countries = c_init(cmap_cnt, {
         {"Norway", 100},
         {"Denmark", 50},
         {"Iceland", 10},
@@ -88,7 +88,7 @@ int main(void)
 
     // CVEC PAIR
 
-    cvec_ip pairs1 = c_make(cvec_ip, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
+    cvec_ip pairs1 = c_init(cvec_ip, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
     cvec_ip_sort(&pairs1);
 
     c_foreach (i, cvec_ip, pairs1)
@@ -98,7 +98,7 @@ int main(void)
 
     // CLIST PAIR
 
-    clist_ip pairs2 = c_make(clist_ip, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
+    clist_ip pairs2 = c_init(clist_ip, {{5, 6}, {3, 4}, {1, 2}, {7, 8}});
     clist_ip_sort(&pairs2);
 
     c_foreach (i, clist_ip, pairs2)

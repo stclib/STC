@@ -48,7 +48,7 @@ int main()
     clist_pnt_push_back(&my.pntlst, (Point){123, 456});
     MyStruct_drop(&my);
 
-    clist_pnt plst = c_make(clist_pnt, {{42, 14}, {32, 94}, {62, 81}});
+    clist_pnt plst = c_init(clist_pnt, {{42, 14}, {32, 94}, {62, 81}});
     clist_pnt_sort(&plst);
 
     c_foreach (i, clist_pnt, plst) 
@@ -57,7 +57,7 @@ int main()
     clist_pnt_drop(&plst);
 
 
-    clist_float flst = c_make(clist_float, {123.3f, 321.2f, -32.2f, 78.2f});
+    clist_float flst = c_init(clist_float, {123.3f, 321.2f, -32.2f, 78.2f});
     clist_float_sort(&flst);
 
     c_foreach (i, clist_float, flst)

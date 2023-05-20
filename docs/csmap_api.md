@@ -111,7 +111,7 @@ void                  csmap_X_value_drop(csmap_X_value* pval);
 int main()
 {
     // Create a sorted map of three strings (maps to string)
-    csmap_str colors = c_make(csmap_str, {
+    csmap_str colors = c_init(csmap_str, {
         {"RED", "#FF0000"},
         {"GREEN", "#00FF00"},
         {"BLUE", "#0000FF"}
@@ -192,7 +192,7 @@ This example uses a csmap with cstr as mapped value.
 int main()
 {
     uint32_t col = 0xcc7744ff;
-    IDSMap idnames = c_make(IDSMap, { {100, "Red"}, {110, "Blue"} });
+    IDSMap idnames = c_init(IDSMap, { {100, "Red"}, {110, "Blue"} });
 
     // Assign/overwrite an existing mapped value with a const char*
     IDSMap_emplace_or_assign(&idnames, 110, "White");

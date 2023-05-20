@@ -86,7 +86,7 @@ int main ()
 {
     Strset first, second={0}, third={0}, fourth={0}, fifth;
 
-    first = c_make(Strset, {"red", "green", "blue"});
+    first = c_init(Strset, {"red", "green", "blue"});
     fifth = Strset_clone(second);
 
     c_forlist (i, const char*, {"orange", "pink", "yellow"})

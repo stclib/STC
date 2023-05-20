@@ -38,8 +38,8 @@ void interleaved(struct Generator* g)
 
 void Use(void)
 {
-    IVec a = c_make(IVec, {2, 4, 6, 8, 10, 11});
-    IVec b = c_make(IVec, {3, 5, 7, 9});
+    IVec a = c_init(IVec, {2, 4, 6, 8, 10, 11});
+    IVec b = c_init(IVec, {3, 5, 7, 9});
 
     struct Generator g = {{&a}, {&b}};
 

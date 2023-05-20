@@ -123,7 +123,7 @@ bool                  c_memcmp_eq(const i_keyraw* a, const i_keyraw* b);    // !
 int main()
 {
     // Create an unordered_map of three strings (that map to strings)
-    cmap_str umap = c_make(cmap_str, {
+    cmap_str umap = c_init(cmap_str, {
         {"RED", "#FF0000"},
         {"GREEN", "#00FF00"},
         {"BLUE", "#0000FF"}

@@ -35,7 +35,7 @@ Algorithms
 ----------  
 - [***Ranged for-loops*** - c_foreach, c_forpair, c_forlist](docs/ccommon_api.md#ranged-for-loops)
 - [***Range algorithms*** - c_forrange, crange, c_forfilter](docs/ccommon_api.md#range-algorithms)
-- [***Generic algorithms*** - c_make, c_find_if, c_erase_if, csort, etc.](docs/ccommon_api.md#generic-algorithms)
+- [***Generic algorithms*** - c_init, c_find_if, c_erase_if, csort, etc.](docs/ccommon_api.md#generic-algorithms)
 - [***Coroutines*** - Simon Tatham's coroutines done right.](docs/ccommon_api.md#coroutines)
 - [***Regular expressions*** - Rob Pike's Plan 9 regexp modernized!](docs/cregex_api.md)
 - [***Random numbers*** - a very fast *PRNG* based on *SFC64*](docs/crandom_api.md)
@@ -117,7 +117,7 @@ Benchmark notes:
 ## Naming conventions
 
 - Container names are prefixed by `c`, e.g. `cvec`, `cstr`.
-- Public STC macros are prefixed by `c_`, e.g. `c_foreach`, `c_make`.
+- Public STC macros are prefixed by `c_`, e.g. `c_foreach`, `c_init`.
 - Template parameter macros are prefixed by `i_`, e.g. `i_val`, `i_type`.
 - All containers can be initialized with `{0}`, i.e. no heap allocation used by default init.
 - Common types for a container type Con:

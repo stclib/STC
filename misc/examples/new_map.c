@@ -42,18 +42,18 @@ int point_cmp(const Point* a, const Point* b) {
 
 int main()
 {
-    cmap_pnt pmap = c_make(cmap_pnt, {{{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}});
+    cmap_pnt pmap = c_init(cmap_pnt, {{{42, 14}, 1}, {{32, 94}, 2}, {{62, 81}, 3}});
 
     c_foreach (i, cmap_pnt, pmap)
         printf(" (%d, %d: %d)", i.ref->first.x, i.ref->first.y, i.ref->second);
     puts("");
 
-    cmap_str smap = c_make(cmap_str, {
+    cmap_str smap = c_init(cmap_str, {
         {"Hello, friend", "long time no see"},
         {"So long", "see you around"},
     });
 
-    cset_str sset = c_make(cset_str, {
+    cset_str sset = c_init(cset_str, {
         "Hello, friend",
         "Nice to see you again",
         "So long",
