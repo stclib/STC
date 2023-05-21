@@ -24,7 +24,6 @@
 #define CSVIEW_H_INCLUDED
 
 #include "ccommon.h"
-#include "forward.h"
 #include "utf8.h"
 
 #define             csview_NULL c_sv_1("")

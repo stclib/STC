@@ -175,12 +175,12 @@ STC_INLINE i_keyraw _cx_memb(_value_toraw)(const _cx_value* val)
 #endif // !i_no_clone
 
 STC_INLINE _cx_iter _cx_memb(_begin)(const _cx_self* self) {
-    return c_LITERAL(_cx_iter){self->_len ? self->data : NULL,
-                               self->data + self->_len};
+    return c_LITERAL(_cx_iter){self->_len ? (_cx_value*)self->data : NULL,
+                               (_cx_value*)self->data + self->_len};
 }
 
 STC_INLINE _cx_iter _cx_memb(_end)(const _cx_self* self)
-    { return c_LITERAL(_cx_iter){NULL, self->data + self->_len}; }
+    { return c_LITERAL(_cx_iter){NULL, (_cx_value*)self->data + self->_len}; }
 
 STC_INLINE void _cx_memb(_next)(_cx_iter* it)
     { if (++it->ref == it->end) it->ref = NULL; }

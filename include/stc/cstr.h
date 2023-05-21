@@ -27,6 +27,7 @@
 #ifndef CSTR_H_INCLUDED
 #define CSTR_H_INCLUDED
 
+#define i_header
 #if defined i_extern || defined STC_EXTERN
 #  define _i_extern
 #endif

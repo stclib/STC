@@ -209,7 +209,7 @@ CTEST(cregex, captures_len)
 {
     c_auto (cregex, re) {
        re = cregex_from("(ab(cd))(ef)");
-       ASSERT_EQ(cregex_captures(&re), 4);
+       ASSERT_EQ(cregex_captures(&re), 3);
     }
 }
 
@@ -218,7 +218,7 @@ CTEST(cregex, captures_cap)
     const char* inp;
     c_auto (cregex, re) {
         re = cregex_from("(ab)((cd)+)");
-        ASSERT_EQ(cregex_captures(&re), 4);
+        ASSERT_EQ(cregex_captures(&re), 3);
 
         csview cap[5];
         ASSERT_EQ(cregex_find(&re, inp="xxabcdcde", cap), CREG_OK);
@@ -273,7 +273,7 @@ CTEST(cregex, replace)
 
         // Compile RE separately
         re = cregex_from(pattern);
-        ASSERT_EQ(cregex_captures(&re), 4);
+        ASSERT_EQ(cregex_captures(&re), 3);
 
         // European date format.
         cstr_take(&str, cregex_replace(&re, input, "$3.$2.$1"));
