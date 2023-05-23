@@ -470,6 +470,7 @@ return ok;
 **Example 2**: Load each line of a text file into a vector of strings:
 ```c
 #include <errno.h>
+#define i_implement
 #include <stc/cstr.h>
 
 #define i_val_str

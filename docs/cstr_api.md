@@ -157,6 +157,7 @@ char*        cstrnstrn(const char* str, const char* search, intptr_t slen, intpt
 
 ## Example
 ```c
+#define i_implement
 #include <stc/cstr.h>
 
 int main() {

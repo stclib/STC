@@ -76,6 +76,7 @@ csset_X_value        csset_X_value_clone(csset_X_value val);
 
 ## Example
 ```c
+#define i_implement
 #include <stc/cstr.h>
 
 #define i_type SSet

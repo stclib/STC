@@ -3,6 +3,7 @@
 #include <chrono>
 
 #include <stc/crand.h>
+#define i_static
 #include <stc/cstr.h>
 
 #define i_type StcVec

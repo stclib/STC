@@ -22,6 +22,7 @@
  */
 
 /*
+#define i_implement
 #include <stc/cstr.h>
 #include <stc/forward.h>
 

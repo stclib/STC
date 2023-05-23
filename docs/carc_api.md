@@ -78,6 +78,7 @@ bool        carc_X_value_eq(const i_val* x, const i_val* y);
 // Create two stacks with carcs to maps.
 // Demonstrate sharing and cloning of maps.
 // Show elements dropped.
+#define i_implement
 #include <stc/cstr.h>
 
 #define i_type Map

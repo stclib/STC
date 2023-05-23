@@ -148,6 +148,7 @@ sorted: 5 7 8 13 16 25
 ```
 ### Example 2
 ```c
+#define i_implement
 #include <stc/cstr.h>
 
 #define i_val_str
@@ -184,6 +185,7 @@ item: 2 elements so far
 
 Container with elements of structs:
 ```c
+#define i_implement
 #include <stc/cstr.h>
 
 typedef struct {

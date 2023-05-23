@@ -67,6 +67,7 @@ double              crand_norm(crand_t* rng, crand_norm_t* dist);
 ```c
 #include <time.h>
 #include <stc/crand.h>
+#define i_implement
 #include <stc/cstr.h>
 
 // Declare int -> int sorted map. Uses typetag 'i' for ints.

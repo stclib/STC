@@ -352,10 +352,10 @@ It is possible to generate single headers by executing the python script `src/si
 
 Conveniently, `src\libstc.c` implements non-templated functions as shared symbols for **cstr**, **csview**,
 **cbits** and **crand**. When building in shared mode (-DSTC_HEADER), you may include this file in your project,
-or define your own as descibed above.
+or define your own, e.g.:
 ```c
 // stc_libs.c
-#define STC_IMPLEMENT
+#define STC_IMPLEMENT // implement all the following as shared objects
 
 #include <stc/cstr.h>
 #include "Point.h"

@@ -24,6 +24,7 @@
 // Sorted/Ordered set and map - implemented as an AA-tree.
 /*
 #include <stdio.h>
+#define i_implement
 #include <stc/cstr.h>
 
 #define i_tag sx  // Sorted map<cstr, double>

@@ -102,8 +102,8 @@ void                  csmap_X_value_drop(csmap_X_value* pval);
 
 ## Examples
 ```c
+#define i_implement
 #include <stc/cstr.h>
-
 #define i_key_str // special macro for i_key = cstr, i_tag = str
 #define i_val_str // ditto
 #include <stc/csmap.h>
@@ -150,6 +150,7 @@ Translate a
 
 [ [Run this code](https://godbolt.org/z/9d1PP77Pa) ]
 ```c
+#define i_implement
 #include <stc/cstr.h>
 #define i_type strmap
 #define i_key_str
@@ -182,6 +183,7 @@ int main()
 ### Example 3
 This example uses a csmap with cstr as mapped value.
 ```c
+#define i_implement
 #include <stc/cstr.h>
 
 #define i_type IDSMap

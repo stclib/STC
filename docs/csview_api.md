@@ -20,8 +20,9 @@ description.
 All csview definitions and prototypes are available by including a single header file.
 
 ```c
-#include <stc/cstr.h> // optional, include cstr+csview functionality
-#include <stc/csview.h>
+#define i_implement
+#include <stc/cstr.h>
+#include <stc/csview.h> // after cstr.h: include extra cstr-csview functions
 ```
 ## Methods
 
@@ -116,23 +117,24 @@ uint64_t        csview_hash(const csview* x);
 
 ## Example
 ```c
+#define i_implement
 #include <stc/cstr.h>
 #include <stc/csview.h>
 
 int main ()
 {
     cstr str1 = cstr_lit("We think in generalities, but we live in details.");
-                                                        // (quoting Alfred N. Whitehead)
+                                                            // (quoting Alfred N. Whitehead)
 
-    csview sv1 = cstr_substr(&str1, 3, 5);              // "think"
-    intptr_t pos = cstr_find(&str1, "live");              // position of "live" in str1
-    csview sv2 = cstr_substr(&str1, pos, 4);            // get "live"
-    csview sv3 = cstr_slice(&str1, -8, -1);             // get "details"
+    csview sv1 = cstr_substr_ex(&str1, 3, 5);               // "think"
+    intptr_t pos = cstr_find(&str1, "live");                // position of "live" in str1
+    csview sv2 = cstr_substr_ex(&str1, pos, 4);             // get "live"
+    csview sv3 = cstr_slice_ex(&str1, -8, -1);              // get "details"
     printf("%.*s %.*s %.*s\n",
         c_SV(sv1), c_SV(sv2), c_SV(sv3));
     cstr s1 = cstr_lit("Apples are red");
-    cstr s2 = cstr_from_sv(cstr_substr(&s1, -3, 3));    // "red"
-    cstr s3 = cstr_from_sv(cstr_substr(&s1, 0, 6));     // "Apples"
+    cstr s2 = cstr_from_sv(cstr_substr_ex(&s1, -3, 3));     // "red"
+    cstr s3 = cstr_from_sv(cstr_substr_ex(&s1, 0, 6));      // "Apples"
     printf("%s %s\n", cstr_str(&s2), cstr_str(&s3));
 
     c_drop(cstr, &str1, &s1, &s2, &s3);
@@ -146,8 +148,8 @@ red Apples
 
 ### Example 2: UTF8 handling
 ```c
-#include <stc/cstr.h>
-#include <stc/csview.h>
+#define i_extern
+#include <stc/cstr.h> // i_extern: implement cstr + dependencies (utf8)
 
 int main()
 {
@@ -181,7 +183,7 @@ void print_split(csview input, const char* sep)
         printf("[%.*s]\n", c_SV(i.token));
     puts("");
 }
-
+#define i_implement
 #include <stc/cstr.h>
 #define i_val_str
 #include <stc/cstack.h>
