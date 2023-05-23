@@ -40,7 +40,7 @@ c_forpair (id, count, csmap_ii, map)
 ```
 
 ### c_forlist
-Iterate compound literal array elements. Additional to `i.ref`, you can access `i.data`, `i.size`, and `i.index` of the input list/element.
+Iterate compound literal array elements. Additional to `i.ref`, you can access `i.size` and `i.index` for the input list/element.
 ```c
 // apply multiple push_backs
 c_forlist (i, int, {1, 2, 3})

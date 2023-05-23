@@ -217,8 +217,8 @@ STC_INLINE intptr_t cnextpow2(intptr_t n) {
 #else
   #include <initializer_list>
   #define c_forlist(it, T, ...) \
-    for (struct {std::initializer_list<T> _il; std::initializer_list<T>::iterator data, ref; size_t size, index;} \
-         it = {._il=__VA_ARGS__, .data=it._il.begin(), .ref=it.data, .size=it._il.size()} \
+    for (struct {std::initializer_list<T> _il; std::initializer_list<T>::iterator ref; size_t size, index;} \
+         it = {._il=__VA_ARGS__, .ref=it._il.begin(), .size=it._il.size()} \
          ; it.index < it.size; ++it.ref, ++it.index)
 #endif
 

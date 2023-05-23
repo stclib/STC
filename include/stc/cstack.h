@@ -41,20 +41,14 @@
 #endif
 typedef i_keyraw _cx_raw;
 
-STC_INLINE _cx_self _cx_memb(_init)(void) { 
-    _cx_self cx; cx._len = 0;
-#ifndef i_capacity
-    cx._cap = 0; cx.data = NULL;
-#endif
-    return cx;
-}
-
 #ifdef i_capacity
-STC_INLINE void _cx_memb(_create)(_cx_self* self)
+STC_INLINE void _cx_memb(_init)(_cx_self* self)
     { self->_len = 0; }
 #else
-STC_INLINE void _cx_memb(_create)(_cx_self* self)
-    { self->_len = 0; self->_cap = 0; self->data = NULL; }
+STC_INLINE _cx_self _cx_memb(_init)(void) { 
+    _cx_self out = {0};
+    return out;
+}
 
 STC_INLINE _cx_self _cx_memb(_with_capacity)(intptr_t cap) {
     _cx_self out = {(_cx_value *) i_malloc(cap*c_sizeof(i_key)), 0, cap};

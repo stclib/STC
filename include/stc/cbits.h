@@ -198,7 +198,7 @@ STC_INLINE cbits cbits_with_pattern(const int64_t size, const uint64_t pattern) 
 
 typedef struct { uint64_t data64[(i_capacity - 1)/64 + 1]; } i_type;
 
-STC_INLINE i_type   _i_memb(_init)(void) { return c_LITERAL(i_type){0}; }
+STC_INLINE void     _i_memb(_init)(i_type* self) { memset(self->data64, 0, i_capacity*8); }
 STC_INLINE void     _i_memb(_drop)(i_type* self) {}
 STC_INLINE int64_t  _i_memb(_size)(const i_type* self) { return i_capacity; }
 STC_INLINE i_type   _i_memb(_move)(i_type* self) { return *self; }
@@ -211,7 +211,7 @@ STC_INLINE i_type _i_memb(_clone)(i_type other)
 
 STC_INLINE i_type* _i_memb(_copy)(i_type* self, const i_type* other) 
     { *self = *other; return self; }
-    
+
 STC_INLINE void _i_memb(_set_all)(i_type *self, const bool value);
 STC_INLINE void _i_memb(_set_pattern)(i_type *self, const uint64_t pattern);
 

@@ -53,7 +53,6 @@ enum {
 
 typedef enum {
     CREG_OK = 0,
-    CREG_SUCCESS = 0, /* [deprecated] */
     CREG_NOMATCH = -1,
     CREG_MATCHERROR = -2,
     CREG_OUTOFMEMORY = -3,
