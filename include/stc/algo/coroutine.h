@@ -56,6 +56,7 @@ int main(void) {
     return 0;
 }
 */
+#include <time.h>
 #include <stc/ccommon.h>
 
 enum {
@@ -140,34 +141,34 @@ typedef struct {
  * Timer
  */
 
-#include <time.h>
-#if defined _WIN32 && !defined __GNUC__
-    static inline void csleep_ms(long msec) {
-        extern void Sleep(unsigned long);
-        Sleep((unsigned long)msec);
-    }
-#else
-    static inline void csleep_ms(long msec) {
-        struct timespec ts = {msec/1000, 1000000*(msec % 1000)};
-        nanosleep(&ts, NULL);
-    }
-#endif
-
 typedef struct {
     clock_t start;
     clock_t interval;
 } ctimer;
 
 #define cco_await_timer(...) c_MACRO_OVERLOAD(cco_await_timer, __VA_ARGS__)
-#define cco_await_timer_2(tm, msecs) cco_await_timer_3(tm, msecs, )
-#define cco_await_timer_3(tm, msecs, ret) \
+#define cco_await_timer_2(tm, msec) cco_await_timer_3(tm, msec, )
+#define cco_await_timer_3(tm, msec, ret) \
     do { \
-        ctimer_start(tm, msecs); \
+        ctimer_start(tm, msec); \
         cco_await_2(ctimer_expired(tm), ret); \
     } while (0)
 
-static inline void ctimer_start(ctimer* tm, long msecs) {
-    tm->interval = msecs*(CLOCKS_PER_SEC/1000);
+#if defined _WIN32
+    static inline void csleep_ms(long msec) {
+        extern void Sleep(unsigned long);
+        Sleep((unsigned long)msec);
+    }
+#else
+    #include <sys/time.h>
+    static inline void csleep_ms(long msec) {
+        struct timeval tv = {.tv_sec=msec/1000, .tv_usec=1000*(msec % 1000)};
+        select(0, NULL, NULL, NULL, &tv);
+    }
+#endif
+
+static inline void ctimer_start(ctimer* tm, long msec) {
+    tm->interval = msec*(CLOCKS_PER_SEC/1000);
     tm->start = clock();
 }
 
