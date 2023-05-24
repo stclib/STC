@@ -32,9 +32,8 @@ int main(void)
     clock_t t = clock();
     cbits primes = sieveOfEratosthenes(n + 1);
     int np = (int)cbits_count(&primes);
-    t = t - clock();
+    t = clock() - t;
 
-    printf("Number of primes: %d, time: %f\n\n", np, (double)t/CLOCKS_PER_SEC);
     puts("Show all the primes in the range [2, 1000):");
     printf("2");
     c_forrange (i, 3, 1000, 2)
@@ -49,6 +48,7 @@ int main(void)
         printf("%lld ", *i.ref);
         if (c_flt_getcount(i) % 10 == 0) puts("");
     }
+    printf("Number of primes: %d, time: %.2f\n\n", np, (double)t/CLOCKS_PER_SEC);
 
     cbits_drop(&primes);
 }

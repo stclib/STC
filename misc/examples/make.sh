@@ -6,15 +6,14 @@ if [ "$(uname)" = 'Linux' ]; then
     oflag='-o '
 fi
 
-cc=gcc; cflags="-DSTC_STATIC -s -O3 -std=c99 -Wall -Wextra -Wpedantic -Wconversion -Wwrite-strings -Wdouble-promotion -Wno-unused-parameter -Wno-implicit-fallthrough -Wno-maybe-uninitialized -Wno-missing-field-initializers"
-#cc=gcc; cflags="-DSTC_STATIC -g -std=c99 -Werror -Wfatal-errors -Wpedantic -Wall $sanitize"
-#cc=tcc; cflags="-DSTC_STATIC -Wall -std=c99"
-#cc=clang; cflags="-DSTC_STATIC -s -O3 -std=c99 -Wall -Wextra -Wpedantic -Wconversion -Wwrite-strings -Wdouble-promotion -Wno-unused-parameter -Wno-unused-function -Wno-implicit-fallthrough -Wno-missing-field-initializers"
-#cc=gcc; cflags="-DSTC_STATIC -x c++ -s -O2 -Wall -std=c++20"
-#cc=g++; cflags="-DSTC_STATIC -x c++ -s -O2 -Wall"
-#cc=cl; cflags="-DSTC_STATIC -O2 -nologo -W3 -MD"
-#cc=cl; cflags="-DSTC_STATIC -nologo -TP"
-#cc=cl; cflags="-DSTC_STATIC -nologo -std:c11"
+cc=gcc; cflags="-DSTC_STATIC -std=c99 -s -O3 -Wall -Wextra -Wpedantic -Wconversion -Wwrite-strings -Wdouble-promotion -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-implicit-fallthrough -Wno-missing-field-initializers"
+#cc=gcc; cflags="-DSTC_STATIC -std=c99 -g -Werror -Wfatal-errors -Wpedantic -Wall $sanitize"
+#cc=tcc; cflags="-DSTC_STATIC -std=c99 -Wall"
+#cc=clang; cflags="-DSTC_STATIC -std=c99 -s -O3 -Wall -Wextra -Wpedantic -Wconversion -Wwrite-strings -Wdouble-promotion -Wno-unused-parameter -Wno-unused-function -Wno-implicit-fallthrough -Wno-missing-field-initializers"
+#cc=gcc; cflags="-DSTC_STATIC -x c++ -std=c++20 -O2 -s -Wall"
+#cc=cl; cflags="-DSTC_STATIC -nologo -O2 -MD -W3 -wd4003"
+#cc=cl; cflags="-DSTC_STATIC -nologo -TP -wd4003"
+#cc=cl; cflags="-DSTC_STATIC -nologo -std:c11 -wd4003"
 
 if [ "$cc" = "cl" ]; then
     oflag='/Fe:'

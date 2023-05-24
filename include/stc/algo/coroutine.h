@@ -141,12 +141,17 @@ typedef struct {
  */
 
 #include <time.h>
-#include <sys/time.h>
-
-static inline void csleep_us(int64_t usec) {
-    struct timeval tv = {.tv_sec=(int)(usec/1000000), .tv_usec=usec % 1000000};
-    select(0, NULL, NULL, NULL, &tv);
-}
+#if defined _WIN32 && !defined __GNUC__
+    static inline void csleep_ms(long msec) {
+        extern void Sleep(unsigned long);
+        Sleep((unsigned long)msec);
+    }
+#else
+    static inline void csleep_ms(long msec) {
+        struct timespec ts = {msec/1000, 1000000*(msec % 1000)};
+        nanosleep(&ts, NULL);
+    }
+#endif
 
 typedef struct {
     clock_t start;

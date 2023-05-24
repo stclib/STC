@@ -33,7 +33,12 @@
 #define             csview_lit(literal) c_sv_1(literal)
 #define             csview_from_n(str, n) c_sv_2(str, n)
 
-STC_API intptr_t csview_find_sv(csview sv, csview search);
+STC_API csview_iter csview_advance(csview_iter it, intptr_t pos);
+STC_API intptr_t    csview_find_sv(csview sv, csview search);
+STC_API uint64_t    csview_hash(const csview *self);
+STC_API csview      csview_slice_ex(csview sv, intptr_t p1, intptr_t p2);
+STC_API csview      csview_substr_ex(csview sv, intptr_t pos, intptr_t n);
+STC_API csview      csview_token(csview sv, const char* sep, intptr_t* start);
 
 STC_INLINE csview   csview_from(const char* str)
                         { return c_LITERAL(csview){str, c_strlen(str)}; }
@@ -87,15 +92,6 @@ STC_INLINE void csview_next(csview_iter* it) {
     it->u8.chr.size = utf8_chr_size(it->ref);
     if (it->ref == it->u8.end) it->ref = NULL;
 }
-STC_INLINE csview_iter csview_advance(csview_iter it, intptr_t pos) {
-    int inc = -1;
-    if (pos > 0) pos = -pos, inc = 1;
-    while (pos && it.ref != it.u8.end) pos += (*(it.ref += inc) & 0xC0) != 0x80;
-    it.u8.chr.size = utf8_chr_size(it.ref);
-    if (it.ref == it.u8.end) it.ref = NULL;
-    return it;
-}
-
 
 /* utf8 */
 STC_INLINE intptr_t csview_u8_size(csview sv)
@@ -109,10 +105,6 @@ STC_INLINE csview csview_u8_substr(csview sv, intptr_t bytepos, intptr_t u8len) 
 
 STC_INLINE bool csview_valid_utf8(csview sv) // depends on src/utf8code.c
     { return utf8_valid_n(sv.str, sv.size); }
-
-STC_API csview csview_substr_ex(csview sv, intptr_t pos, intptr_t n);
-STC_API csview csview_slice_ex(csview sv, intptr_t p1, intptr_t p2);
-STC_API csview csview_token(csview sv, const char* sep, intptr_t* start);
 
 #define c_fortoken_sv(it, inputsv, sep) \
     for (struct { csview _inp, token, *ref; const char *_sep; intptr_t pos; } \
@@ -155,10 +147,17 @@ STC_INLINE int csview_icmp(const csview* x, const csview* y)
 STC_INLINE bool csview_eq(const csview* x, const csview* y)
     { return x->size == y->size && !c_memcmp(x->str, y->str, x->size); }
 
-STC_API uint64_t csview_hash(const csview *self);
-
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement)
+
+STC_DEF csview_iter csview_advance(csview_iter it, intptr_t pos) {
+    int inc = -1;
+    if (pos > 0) pos = -pos, inc = 1;
+    while (pos && it.ref != it.u8.end) pos += (*(it.ref += inc) & 0xC0) != 0x80;
+    it.u8.chr.size = utf8_chr_size(it.ref);
+    if (it.ref == it.u8.end) it.ref = NULL;
+    return it;
+}
 
 STC_DEF intptr_t csview_find_sv(csview sv, csview search) {
     char* res = cstrnstrn(sv.str, search.str, sv.size, search.size);
