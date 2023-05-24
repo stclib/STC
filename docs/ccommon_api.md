@@ -321,7 +321,7 @@ struct triples {
 };
 
 bool triples(struct triples* i) { // coroutine
-    cco_begin(i);
+    cco_routine(i) {
         for (i->c = 5; i->n; ++i->c) {
             for (i->a = 1; i->a < i->c; ++i->a) {
                 for (i->b = i->a + 1; i->b < i->c; ++i->b) {
@@ -332,9 +332,10 @@ bool triples(struct triples* i) { // coroutine
                 }
             }
         }
-    cco_final: // tear down
+        cco_final:
         puts("done");
-    cco_end(true);
+    }
+    return true;
 }
 
 int gcd(int a, int b) { // greatest common denominator
@@ -374,9 +375,7 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |           | `cco_return`                         | Early return from the coroutine (no arg) |
 | `bool`    | `cco_suspended(co)`                  | Is coroutine in suspended state?        |
 | `bool`    | `cco_done(co)`                       | Is coroutine done?                      |
-|           | `cco_begin(co)`                      | Begin coroutine block                   |
-|           | `cco_end()`                          | End coroutine block                     |
-|           | `cco_end(ret)`                       | End coroutine block and return ret      |
+|           | `cco_routine(co) { ... }`            | The coroutine closure                   |
 |           | `cco_yield()`                        | Yield/suspend execution                 |
 |           | `cco_yield(ret)`                     | Yield/suspend execution and return ret  |
 |           | `cco_yield_coro(co, call)`           | Yield at co call if it is suspended     |

@@ -26,31 +26,32 @@
 #include <stdio.h>
 #include <stc/algo/coroutine.h>
 
-struct coroutine {
+struct iterpair {
     int max_x, max_y;
     int x, y;
     int cco_state; // required member
 };
 
-bool coroutine(struct coroutine* I) {
-    cco_begin(I);
+bool iterpair(struct iterpair* I) {
+    cco_routine(I) {
         for (I->x = 0; I->x < I->max_x; I->x++)
             for (I->y = 0; I->y < I->max_y; I->y++)
                 cco_yield(false);
 
-    cco_final: // required if there is cleanup code
+        cco_final: // required if there is cleanup code
         puts("final");
-    cco_end(true);
+    }
+    return true; // finished
 }
 
 int main(void) {
-    struct coroutine it = {.max_x=3, .max_y=3};
+    struct iterpair it = {.max_x=3, .max_y=3};
     int n = 0;
-    while (!coroutine(&it))
+    while (!iterpair(&it))
     {
         printf("%d %d\n", it.x, it.y);
         // example of early stop:
-        if (++n == 7) cco_stop(&it); // signal to stop at next
+        if (++n == 7) cco_stop(&it); // signal to stop/finalize in next
     }
     return 0;
 }
@@ -66,19 +67,9 @@ enum {
 #define cco_suspended(co) ((co)->cco_state > 0)
 #define cco_done(co) ((co)->cco_state == cco_state_done)
 
-#define cco_begin(co) \
-    int *_state = &(co)->cco_state; \
-    goto _begin; _begin: switch (*_state) { \
-        case 0:
-
-#define cco_end(ret) \
-    } \
-    *_state = cco_state_done; \
-    return ret
-
-#define cco(co) \
+#define cco_routine(co) \
     for (int *_state = &(co)->cco_state, _once=1; _once; *_state = cco_state_done, _once=0) \
-    _begin: switch (*_state) case 0:
+        _begin: switch (*_state) case 0: // thanks, @liigo!
 
 #define cco_yield(ret) \
     do { \
@@ -96,7 +87,7 @@ enum {
 #define cco_await_2(promise, ret) \
     do { \
         *_state = __LINE__; \
-        case __LINE__: if (!(promise)) return ret; \
+        case __LINE__: if (!(promise)) {return ret; goto _begin;} \
     } while (0)
 
 #define cco_await_coro(...) c_MACRO_OVERLOAD(cco_await_coro, __VA_ARGS__)
@@ -150,18 +141,12 @@ typedef struct {
  */
 
 #include <time.h>
+#include <sys/time.h>
 
-#ifdef _WIN32
-    static inline void csleep_ms(long msecs) {
-        extern void Sleep(unsigned long);
-        Sleep((unsigned long)msecs);
-    }
-#elif _POSIX_C_SOURCE >= 199309L
-    static inline void csleep_ms(long msecs) {
-        struct timespec ts = {msecs/1000, 1000000*(msecs % 1000)};
-        nanosleep(&ts, NULL);
-    }
-#endif
+static inline void csleep_us(int64_t usec) {
+    struct timeval tv = {.tv_sec=(int)(usec/1000000), .tv_usec=usec % 1000000};
+    select(0, NULL, NULL, NULL, &tv);
+}
 
 typedef struct {
     clock_t start;

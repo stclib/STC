@@ -15,13 +15,14 @@ typedef struct {
 } Triple_iter;
 
 void Triple_next(Triple_iter* it) {
-    Triple_value* t = it->ref;
-    cco_begin(it);
-        for (t->c = 5; t->size; ++t->c) {
-            for (t->a = 1; t->a < t->c; ++t->a) {
-                for (t->b = t->a; t->b < t->c; ++t->b) {
-                    if (t->a*t->a + t->b*t->b == t->c*t->c) {
-                        if (it->count++ == t->size)
+    Triple_value* g = it->ref;
+    cco_routine(it)
+    {
+        for (g->c = 5; g->size; ++g->c) {
+            for (g->a = 1; g->a < g->c; ++g->a) {
+                for (g->b = g->a; g->b < g->c; ++g->b) {
+                    if (g->a*g->a + g->b*g->b == g->c*g->c) {
+                        if (it->count++ == g->size)
                             cco_return;
                         cco_yield();
                     }
@@ -30,11 +31,11 @@ void Triple_next(Triple_iter* it) {
         }
     cco_final:
         it->ref = NULL;
-    cco_end();
+    }
 }
 
-Triple_iter Triple_begin(Triple* t) {
-    Triple_iter it = {.ref=t}; 
+Triple_iter Triple_begin(Triple* g) {
+    Triple_iter it = {.ref=g}; 
     Triple_next(&it);
     return it;
 }

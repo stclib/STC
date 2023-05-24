@@ -1,6 +1,6 @@
 // https://www.youtube.com/watch?v=8sEe-4tig_A
-#include <stc/calgo.h>
 #include <stdio.h>
+#include <stc/calgo.h>
 #define i_type IVec
 #define i_val int
 #include <stc/cvec.h>
@@ -13,10 +13,11 @@ struct GenValue {
 
 static int get_value(struct GenValue* g)
 {
-    cco_begin(g);
+    cco_routine(g) {
         for (g->it = IVec_begin(g->v); g->it.ref; IVec_next(&g->it))
             cco_yield(*g->it.ref);
-    cco_end(0);
+    }
+    return -1;
 }
 
 struct Generator {
@@ -27,13 +28,13 @@ struct Generator {
 
 void interleaved(struct Generator* g) 
 {
-    cco_begin(g);
+    cco_routine(g) {
         while (!(cco_done(&g->x) & cco_done(&g->y)))
         {
             cco_yield_coro(&g->x, g->value = get_value(&g->x));
             cco_yield_coro(&g->y, g->value = get_value(&g->y));
         }
-    cco_end();
+    }
 }
 
 void Use(void)

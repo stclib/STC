@@ -33,7 +33,7 @@ struct triples {
 };
 
 bool triples_coro(struct triples* t) {
-    cco_begin(t);
+    cco_routine(t) {
         t->count = 0;
         for (t->c = 5; t->size; ++t->c) {
             for (t->a = 1; t->a < t->c; ++t->a) {
@@ -48,7 +48,8 @@ bool triples_coro(struct triples* t) {
         }
     cco_final:
         puts("done");
-    cco_end(true);
+    }
+    return true;
 }
 
 int main()

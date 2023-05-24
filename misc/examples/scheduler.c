@@ -34,7 +34,7 @@ static bool push_task(const struct Task* task)
 
 static bool taskA(struct Task* task)
 {
-    cco_begin(task);
+    cco_routine(task) {
         puts("Hello, from task A");
         cco_yield(push_task(task));
         puts("A is back doing work");
@@ -42,18 +42,20 @@ static bool taskA(struct Task* task)
         puts("A is back doing more work");
         cco_yield(push_task(task));
         puts("A is back doing even more work");
-    cco_end(true);
+    }
+    return true;
 }
 
 static bool taskB(struct Task* task) 
 {
-    cco_begin(task);
+    cco_routine(task) {
         puts("Hello, from task B");
         cco_yield(push_task(task));
         puts("B is back doing work");
         cco_yield(push_task(task));
         puts("B is back doing more work");
-    cco_end(true);
+    }
+    return true;
 }
 
 void Use(void)

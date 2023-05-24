@@ -1,3 +1,4 @@
+#define i_static
 #include <stc/cstr.h>
 #include <stc/algo/coroutine.h>
 #include <errno.h>
@@ -13,7 +14,7 @@ struct file_read {
 
 void file_read(struct file_read* g)
 {
-    cco(g) {
+    cco_routine(g) {
         g->fp = fopen(g->filename, "r");
         g->line = cstr_init();
 
