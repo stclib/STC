@@ -16,6 +16,7 @@ void file_read(struct file_read* g)
 {
     cco_routine(g) {
         g->fp = fopen(g->filename, "r");
+        if (!g->fp) cco_return;
         g->line = cstr_init();
 
         cco_await(!cstr_getline(&g->line, g->fp));
@@ -23,9 +24,8 @@ void file_read(struct file_read* g)
     cco_final:
         printf("finish\n");
         cstr_drop(&g->line);
-        fclose(g->fp);
+        if (g->fp) fclose(g->fp);
     }
-    return;
 }
 
 int main(void)

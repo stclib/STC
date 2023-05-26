@@ -65,6 +65,7 @@ enum {
 };
 
 #define cco_initial(co) ((co)->cco_state == 0)
+#define cco_active(co) ((co)->cco_state >= 0)
 #define cco_suspended(co) ((co)->cco_state > 0)
 #define cco_done(co) ((co)->cco_state == cco_state_done)
 
@@ -170,6 +171,11 @@ typedef struct {
 static inline void ctimer_start(ctimer* tm, long msec) {
     tm->interval = msec*(CLOCKS_PER_SEC/1000);
     tm->start = clock();
+}
+
+static inline ctimer ctimer_with(long msec) {
+    ctimer tm = {msec*(CLOCKS_PER_SEC/1000), clock()};
+    return tm;
 }
 
 static inline void ctimer_restart(ctimer* tm) {
