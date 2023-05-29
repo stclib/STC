@@ -12,12 +12,12 @@ struct Task {
 #define i_type Scheduler
 #define i_val struct Task
 #define i_no_cmp
-#include <stc/clist.h>
+#include <stc/cqueue.h>
 
 static bool schedule(Scheduler* sched)
 {
     struct Task task = *Scheduler_front(sched);
-    Scheduler_pop_front(sched);
+    Scheduler_pop(sched);
     
     if (!cco_done(&task))
         task.resume(&task);
@@ -27,7 +27,7 @@ static bool schedule(Scheduler* sched)
 
 static bool push_task(const struct Task* task)
 {
-    Scheduler_push_back(task->sched, *task);
+    Scheduler_push(task->sched, *task);
     return false;
 }
 

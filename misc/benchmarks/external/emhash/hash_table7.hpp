@@ -1777,7 +1777,7 @@ private:
             next_bucket = find_last_bucket(next_bucket);
 
         //find a new empty and link it to tail
-        return EMH_BUCKET(_pairs, next_bucket) = find_unique_empty(next_bucket);
+        return EMH_BUCKET(_pairs, next_bucket) = find_empty_bucket(next_bucket, bucket);
     }
 
 #if EMH_INT_HASH
