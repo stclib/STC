@@ -157,7 +157,7 @@ typedef struct {
 
 #if defined _WIN32
     static inline void csleep_ms(long msec) {
-        extern void Sleep(unsigned long);
+        __declspec(dllimport) void Sleep(unsigned long);
         Sleep((unsigned long)msec);
     }
 #else
