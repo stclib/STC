@@ -29,11 +29,15 @@ struct Generator {
 void interleaved(struct Generator* g) 
 {
     cco_routine(g) {
-        while (!(cco_done(&g->x) & cco_done(&g->y)))
-        {
-            cco_yield_coro(&g->x, g->value = get_value(&g->x));
-            cco_yield_coro(&g->y, g->value = get_value(&g->y));
-        }
+        do {
+            g->value = get_value(&g->x);
+            if (!cco_done(&g->x))
+                cco_yield();
+
+            g->value = get_value(&g->y);
+            if (!cco_done(&g->y))
+                cco_yield();
+        } while (!(cco_done(&g->x) & cco_done(&g->y)));
     }
 }
 

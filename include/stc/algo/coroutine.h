@@ -65,8 +65,6 @@ enum {
 };
 
 #define cco_initial(co) ((co)->cco_state == 0)
-#define cco_active(co) ((co)->cco_state >= 0)
-#define cco_suspended(co) ((co)->cco_state > 0)
 #define cco_done(co) ((co)->cco_state == cco_state_done)
 
 #define cco_routine(co) \
@@ -79,11 +77,6 @@ enum {
         case __LINE__:; \
     } while (0)
 
-#define cco_yield_coro(...) c_MACRO_OVERLOAD(cco_yield_coro, __VA_ARGS__)
-#define cco_yield_coro_2(co, call) cco_yield_coro_3(co, call, )
-#define cco_yield_coro_3(co, call, ret) \
-    do { call; if (!cco_done(co)) cco_yield(ret); } while (0)
-
 #define cco_await(...) c_MACRO_OVERLOAD(cco_await, __VA_ARGS__)
 #define cco_await_1(promise) cco_await_2(promise, )
 #define cco_await_2(promise, ret) \
@@ -91,10 +84,6 @@ enum {
         *_state = __LINE__; \
         case __LINE__: if (!(promise)) {return ret; goto _begin;} \
     } while (0)
-
-#define cco_await_coro(...) c_MACRO_OVERLOAD(cco_await_coro, __VA_ARGS__)
-#define cco_await_coro_2(co, call) cco_await_2((call, cco_done(co)), )
-#define cco_await_coro_3(co, call, ret) cco_await_2((call, cco_done(co)), ret)
 
 #define cco_run(co, call) while (call, !cco_done(co))
 
