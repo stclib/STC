@@ -114,18 +114,18 @@ enum {
 
 typedef struct {
     intptr_t count;
-} csem;
+} cco_sem;
 
-#define cco_await_sem(...) c_MACRO_OVERLOAD(cco_await_sem, __VA_ARGS__)
-#define cco_await_sem_1(sem) cco_await_sem_2(sem, )
-#define cco_await_sem_2(sem, ret) \
+#define cco_sem_await(...) c_MACRO_OVERLOAD(cco_sem_await, __VA_ARGS__)
+#define cco_sem_await_1(sem) cco_sem_await_2(sem, )
+#define cco_sem_await_2(sem, ret) \
     do { \
         cco_await_2((sem)->count > 0, ret); \
         --(sem)->count; \
     } while (0)
 
-#define csem_signal(sem) ++(sem)->count
-#define csem_set(sem, value) ((sem)->count = (value))
+#define cco_sem_release(sem) ++(sem)->count
+#define cco_sem_with(value) ((cco_sem){value})
 
 /*
  * Timer
@@ -134,48 +134,51 @@ typedef struct {
 typedef struct {
     clock_t start;
     clock_t interval;
-} ctimer;
+} cco_timer;
 
-#define cco_await_timer(...) c_MACRO_OVERLOAD(cco_await_timer, __VA_ARGS__)
-#define cco_await_timer_2(tm, msec) cco_await_timer_3(tm, msec, )
-#define cco_await_timer_3(tm, msec, ret) \
+#define cco_timer_await(...) c_MACRO_OVERLOAD(cco_timer_await, __VA_ARGS__)
+#define cco_timer_await_2(tm, msec) cco_timer_await_3(tm, msec, )
+#define cco_timer_await_3(tm, msec, ret) \
     do { \
-        ctimer_start(tm, msec); \
-        cco_await_2(ctimer_expired(tm), ret); \
+        cco_timer_start(tm, msec); \
+        cco_await_2(cco_timer_expired(tm), ret); \
     } while (0)
 
-#if defined _WIN32
-    static inline void csleep_ms(long msec) {
-        __declspec(dllimport) void Sleep(unsigned long);
+#ifdef _WIN32
+    #ifdef __cplusplus
+    extern "C"
+    #endif
+    __declspec(dllimport) void __stdcall Sleep(unsigned long);
+    static inline void cco_sleep(long msec) {
         Sleep((unsigned long)msec);
     }
 #else
     #include <sys/time.h>
-    static inline void csleep_ms(long msec) {
+    static inline void cco_sleep(long msec) {
         struct timeval tv = {.tv_sec=msec/1000, .tv_usec=1000*(msec % 1000)};
         select(0, NULL, NULL, NULL, &tv);
     }
 #endif
 
-static inline void ctimer_start(ctimer* tm, long msec) {
+static inline void cco_timer_start(cco_timer* tm, long msec) {
     tm->interval = msec*(CLOCKS_PER_SEC/1000);
     tm->start = clock();
 }
 
-static inline ctimer ctimer_with(long msec) {
-    ctimer tm = {msec*(CLOCKS_PER_SEC/1000), clock()};
+static inline cco_timer cco_timer_with(long msec) {
+    cco_timer tm = {msec*(CLOCKS_PER_SEC/1000), clock()};
     return tm;
 }
 
-static inline void ctimer_restart(ctimer* tm) {
+static inline void cco_timer_restart(cco_timer* tm) {
     tm->start = clock();
 }
 
-static inline bool ctimer_expired(ctimer* tm) {
+static inline bool cco_timer_expired(cco_timer* tm) {
     return clock() - tm->start >= tm->interval;
 }
 
-static inline long ctimer_remaining(ctimer* tm) {
+static inline long cco_timer_remaining(cco_timer* tm) {
     return (long)((double)(tm->start + tm->interval - clock())*(1000.0/CLOCKS_PER_SEC));
 }
 
