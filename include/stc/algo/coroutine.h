@@ -98,15 +98,13 @@ enum {
 
 #define cco_stop(co) \
     do { \
-        int* _state = &(co)->cco_state; \
-        if (*_state > 0) *_state = cco_state_final; \
+        int* _s = &(co)->cco_state; \
+        if (*_s > 0) *_s = cco_state_final; \
+        else if (*_s == 0) *_s = cco_state_done; \
     } while (0)
 
 #define cco_reset(co) \
-    do { \
-        int* _state = &(co)->cco_state; \
-        if (*_state == cco_state_done) *_state = 0; \
-    } while (0)
+    (void)((co)->cco_state = 0)
 
 /*
  * Semaphore
@@ -125,7 +123,8 @@ typedef struct {
     } while (0)
 
 #define cco_sem_release(sem) ++(sem)->count
-#define cco_sem_with(value) ((cco_sem){value})
+#define cco_sem_from(value) ((cco_sem){value})
+#define cco_sem_set(sem, value) ((sem)->count = value)
 
 /*
  * Timer
@@ -165,7 +164,7 @@ static inline void cco_timer_start(cco_timer* tm, long msec) {
     tm->start = clock();
 }
 
-static inline cco_timer cco_timer_with(long msec) {
+static inline cco_timer cco_timer_from(long msec) {
     cco_timer tm = {msec*(CLOCKS_PER_SEC/1000), clock()};
     return tm;
 }
