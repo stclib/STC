@@ -32,17 +32,17 @@ void philosopher(struct Philosopher* p)
 {
     cco_routine(p) {
         while (1) {
-            int duration = (int)(1000 + crand() % 2000); // 1-3 seconds
-            printf("Philosopher %d is thinking for %d minutes...\n", p->id, duration/100);
-            cco_timer_await(&p->tm, duration*1000);
+            double duration = 1.0 + crandf()*2.0;
+            printf("Philosopher %d is thinking for %.0f minutes...\n", p->id, duration*10);
+            cco_timer_await(&p->tm, duration);
 
             printf("Philosopher %d is hungry...\n", p->id);
             cco_sem_await(p->left_fork);
             cco_sem_await(p->right_fork);
             
-            duration = (int)(500 + crand() % 1000);
-            printf("Philosopher %d is eating for %d minutes...\n", p->id, duration/100);
-            cco_timer_await(&p->tm, duration*1000);
+            duration = 0.5 + crandf();
+            printf("Philosopher %d is eating for %.0f minutes...\n", p->id, duration*10);
+            cco_timer_await(&p->tm, duration);
             
             cco_sem_release(p->left_fork);
             cco_sem_release(p->right_fork);
@@ -84,18 +84,20 @@ void dining(struct Dining* d)
     }
 }
 
-
 int main()
 {
     struct Dining dine;
     cco_reset(&dine);
-    cco_timer tm = cco_timer_from(10*1000000); // microseconds
+    int n=0;
+    cco_timer tm = cco_timer_from(10.0); // seconds
     csrand((uint64_t)time(NULL));
 
     while (!cco_done(&dine)) {
         if (cco_timer_expired(&tm))
             cco_stop(&dine);
         dining(&dine);
-        cco_usleep(100);
+        cco_sleep(0.001);
+        ++n;
     }
+    printf("n=%d\n", n);
 }

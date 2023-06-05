@@ -135,71 +135,66 @@ typedef struct {
     #else
     #define _c_LINKC __declspec(dllimport) 
     #endif
-    struct _FILETIME; struct _SECURITY_ATTRIBUTES; union _LARGE_INTEGER;
+    struct _FILETIME;
     _c_LINKC void GetSystemTimePreciseAsFileTime(struct _FILETIME*);
-    _c_LINKC void* CreateWaitableTimerW(struct _SECURITY_ATTRIBUTES*, int, const wchar_t*);
-    _c_LINKC int SetWaitableTimer(void*, const union _LARGE_INTEGER*, long, void(*)(void*, unsigned long, unsigned long), void*, int);
-    _c_LINKC unsigned long WaitForSingleObject(void*, unsigned long);
-    _c_LINKC int CloseHandle(void*);
+    _c_LINKC void Sleep(unsigned long);
 
-    static inline long long cco_utime(void) {
-        static const long long epoch_offset = 11644473600000000LL; /* microseconds betweeen Jan 1,1601 - Jan 1,1970 */
-        unsigned long long quad;          /* 64-bit value, 100-nanosecond intervals since January 1, 1601 00:00 UTC */
+    static inline double cco_time(void) {
+        static const unsigned long long epoch_offset = 116444736000000000ULL; /* 1/10th usecs betweeen Jan 1,1601 - Jan 1,1970 */
+        unsigned long long quad;                     /* 64-bit value, 100-nanosecond intervals since January 1, 1601 00:00 UTC */
         GetSystemTimePreciseAsFileTime((struct _FILETIME*)&quad);
-        return (long long)quad/10 - epoch_offset; /* microseconds since epoch */
+        return (double)(quad - epoch_offset)*1e-7;   /* usecs since epoch */
     }
 
-    static inline void cco_usleep(long long usec) {
-        unsigned long long ft = -10*usec;
-        void* timer = CreateWaitableTimerW(NULL, true, NULL);
-        SetWaitableTimer(timer, (const union _LARGE_INTEGER*)&ft, 0, NULL, NULL, 0);
-        WaitForSingleObject(timer, ~0UL);
-        CloseHandle(timer);
-    }    
+    static inline void cco_sleep(double sec) {
+        Sleep((unsigned long)(sec*1000.0));
+    }
 #else
     #include <sys/time.h>
-    static inline long long cco_utime(void) {
+    static inline double cco_time(void) {
         struct timeval tv;
         gettimeofday(&tv, NULL);
-        return tv.tv_sec*1000000LL + tv.tv_usec;
+        return tv.tv_sec + tv.tv_usec*1e-6;
     }
 
-    static inline void cco_usleep(long long usec) {
-        struct timeval tv = {.tv_sec=(time_t)(usec/1000000), .tv_usec=(suseconds_t)(usec % 1000000)};
+    static inline void cco_sleep(double sec) {
+        struct timeval tv;
+        tv.tv_sec = (time_t)sec;
+        tv.tv_usec = (suseconds_t)(1e6*(sec - tv.tv_sec));
         select(0, NULL, NULL, NULL, &tv);
     }
 #endif
 
-typedef struct { long long interval, start; } cco_timer;
+typedef struct { double interval, start; } cco_timer;
 
 #define cco_timer_await(...) c_MACRO_OVERLOAD(cco_timer_await, __VA_ARGS__)
-#define cco_timer_await_2(tm, usec) cco_timer_await_3(tm, usec, )
-#define cco_timer_await_3(tm, usec, ret) \
+#define cco_timer_await_2(tm, sec) cco_timer_await_3(tm, sec, )
+#define cco_timer_await_3(tm, sec, ret) \
     do { \
-        cco_timer_start(tm, usec); \
+        cco_timer_start(tm, sec); \
         cco_await_2(cco_timer_expired(tm), ret); \
     } while (0)
 
-static inline void cco_timer_start(cco_timer* tm, long long usec) {
-    tm->interval = usec;
-    tm->start = cco_utime();
+static inline void cco_timer_start(cco_timer* tm, double sec) {
+    tm->interval = sec;
+    tm->start = cco_time();
 }
 
-static inline cco_timer cco_timer_from(long long usec) {
-    cco_timer tm = {.interval=usec, .start=cco_utime()};
+static inline cco_timer cco_timer_from(double sec) {
+    cco_timer tm = {.interval=sec, .start=cco_time()};
     return tm;
 }
 
 static inline void cco_timer_restart(cco_timer* tm) {
-    tm->start = cco_utime();
+    tm->start = cco_time();
 }
 
 static inline bool cco_timer_expired(cco_timer* tm) {
-    return cco_utime() - tm->start >= tm->interval;
+    return cco_time() - tm->start >= tm->interval;
 }
 
-static inline long long cco_timer_remaining(cco_timer* tm) {
-    return tm->start + tm->interval - cco_utime();
+static inline double cco_timer_remaining(cco_timer* tm) {
+    return tm->start + tm->interval - cco_time();
 }
 
 #endif
