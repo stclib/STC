@@ -1,5 +1,6 @@
 // https://en.wikipedia.org/wiki/Dining_philosophers_problem
 #include <stdio.h>
+#include <time.h>
 #include <stc/crand.h>
 #include <stc/algo/coroutine.h>
  
@@ -33,7 +34,7 @@ void philosopher(struct Philosopher* p)
         while (1) {
             int duration = (int)(1000 + crand() % 2000); // 1-3 seconds
             printf("Philosopher %d is thinking for %d minutes...\n", p->id, duration/100);
-            cco_timer_await(&p->tm, duration);
+            cco_timer_await(&p->tm, duration*1000);
 
             printf("Philosopher %d is hungry...\n", p->id);
             cco_sem_await(p->left_fork);
@@ -41,7 +42,7 @@ void philosopher(struct Philosopher* p)
             
             duration = (int)(500 + crand() % 1000);
             printf("Philosopher %d is eating for %d minutes...\n", p->id, duration/100);
-            cco_timer_await(&p->tm, duration);
+            cco_timer_await(&p->tm, duration*1000);
             
             cco_sem_release(p->left_fork);
             cco_sem_release(p->right_fork);
@@ -67,10 +68,11 @@ void dining(struct Dining* d)
         }
 
         while (1) {
+            // per-"frame" logic update of all philosophers states
             for (d->ph_idx = 0; d->ph_idx < num_philosophers; ++d->ph_idx) {
                 philosopher(&d->ph[d->ph_idx]);
-                cco_yield();
             }
+            cco_yield(); // suspend, return control back to main
         }
 
         cco_final:
@@ -87,13 +89,13 @@ int main()
 {
     struct Dining dine;
     cco_reset(&dine);
-    cco_timer tm = cco_timer_from(10000);
+    cco_timer tm = cco_timer_from(10*1000000); // microseconds
     csrand((uint64_t)time(NULL));
 
     while (!cco_done(&dine)) {
         if (cco_timer_expired(&tm))
             cco_stop(&dine);
         dining(&dine);
-        cco_sleep(1);
+        cco_usleep(100);
     }
 }

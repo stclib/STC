@@ -379,25 +379,27 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |           | `cco_yield(ret)`                     | Yield/suspend execution and return ret  |
 |           | `cco_await(promise)`                 | Await/suspend until promise is true     |
 |           | `cco_await(promise, ret)`            | Await/suspend with ret value            |
-|           | `cco_sleep(long msec)`               | Sleep for milliseconds                  |
 |           | Semaphores:                          |                                         | 
 |           | `cco_sem`                            | Semaphore type                          |
 |           | `cco_sem_await(sem)`                 | Await for the semaphore count > 0       |
 |           | `cco_sem_await(sem, ret)`            | Await with ret on the semaphore         |
-| cco_sem   | `cco_sem_init(long value)`           | Set semaphore value                     |
+| `cco_sem` | `cco_sem_init(long value)`           | Set semaphore value                     |
 |           | `cco_sem_release(sem)`               | Signal the semaphore                    |
 |           | Timers:                              |                                         | 
 |           | `cco_timer`                          | Timer type                              |
 |           | `cco_timer_await(tm)`                | Await for timer to expire               |
 |           | `cco_timer_await(tm, ret)`           | Await with ret for timer to expire      |
-|           | `cco_timer_start(tm, long msecs)`    | Start timer msecs milliseconds          |
+|           | `cco_timer_start(tm, long usec)`     | Start timer for usec microseconds       |
 |           | `cco_timer_restart(tm)`              | Restart timer with same duration        |
 | `bool`    | `cco_timer_expired(tm)`              | Return true if timer is expired         |
-| `long`    | `cco_timer_remaining(tm)`            | Return milliseconds remaining           |
+|`long long`| `cco_timer_remaining(tm)`            | Return microseconds remaining           |
 |           | From caller side:                    |                                         | 
-| `void`    | `cco_stop(co)`                       | Next call of coroutine returns `cco_end()` |
+| `void`    | `cco_stop(co)`                       | Next call of coroutine finalizes        |
 | `void`    | `cco_reset(co)`                      | Reset state to initial (for reuse)      |
 | `void`    | `cco_run(co, corocall) { }`          | Run blocking until coro is done         |
+|           | Time functions:                      |                                         |
+|`long long`| `cco_utime(void)`                    | Return microseconds since Epoch         |
+|           | `cco_usleep(long long usec)`         | Sleep for microseconds                  |
 
 ---
 ## RAII scope macros
