@@ -139,11 +139,11 @@ typedef struct {
     _c_LINKC void GetSystemTimePreciseAsFileTime(struct _FILETIME*);
     _c_LINKC void Sleep(unsigned long);
 
-    static inline double cco_time(void) {
+    static inline double cco_time(void) { /* seconds since epoch */
         static const unsigned long long epoch_offset = 116444736000000000ULL; /* 1/10th usecs betweeen Jan 1,1601 - Jan 1,1970 */
         unsigned long long quad;                     /* 64-bit value, 100-nanosecond intervals since January 1, 1601 00:00 UTC */
         GetSystemTimePreciseAsFileTime((struct _FILETIME*)&quad);
-        return (double)(quad - epoch_offset)*1e-7;   /* usecs since epoch */
+        return (double)(quad - epoch_offset)*1e-7;
     }
 
     static inline void cco_sleep(double sec) {
@@ -151,16 +151,16 @@ typedef struct {
     }
 #else
     #include <sys/time.h>
-    static inline double cco_time(void) {
+    static inline double cco_time(void) { /* seconds since epoch */
         struct timeval tv;
         gettimeofday(&tv, NULL);
-        return tv.tv_sec + tv.tv_usec*1e-6;
+        return (double)tv.tv_sec + (double)tv.tv_usec*1e-6;
     }
 
     static inline void cco_sleep(double sec) {
         struct timeval tv;
         tv.tv_sec = (time_t)sec;
-        tv.tv_usec = (suseconds_t)(1e6*(sec - tv.tv_sec));
+        tv.tv_usec = (suseconds_t)((sec - (double)(long)sec)*1e6);
         select(0, NULL, NULL, NULL, &tv);
     }
 #endif

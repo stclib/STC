@@ -24,7 +24,7 @@
 template params:
 #define i_val           - value type [required]
 #define i_less          - less function. default: *x < *y
-#define i_tag name      - define namearray_qsort(). i_tag defaults {i_val}
+#define i_type name     - define {{name}}_sort_n(), else {{i_val}}array_sort_n().
 
 // test:
 #include <stdio.h>
@@ -32,12 +32,12 @@ template params:
 #include <stc/algo/sort.h>
 
 int main() {
-    int arr[] = {23, 321, 5434, 25, 245, 1, 654, 33, 543, 21};
+    int nums[] = {23, 321, 5434, 25, 245, 1, 654, 33, 543, 21};
     
-    intarray_qsort(arr, c_arraylen(arr));
+    intarray_sort_n(nums, c_arraylen(arr));
 
-    for (int i = 0; i < c_arraylen(arr); i++)
-        printf(" %d", arr[i]);
+    for (int i = 0; i < c_arraylen(nums); i++)
+        printf(" %d", nums[i]);
     puts("");
 }
 */

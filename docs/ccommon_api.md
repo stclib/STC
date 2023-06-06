@@ -389,7 +389,7 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |           | `cco_timer`                          | Timer type                              |
 |           | `cco_timer_await(tm)`                | Await for timer to expire               |
 |           | `cco_timer_await(tm, ret)`           | Await with ret for timer to expire      |
-|           | `cco_timer_start(tm, double sec)`    | Start timer for sec seconds             |
+|           | `cco_timer_start(tm, double sec)`    | Start timer for sec seconds (usec prec.)|
 |           | `cco_timer_restart(tm)`              | Restart timer with same duration        |
 | `bool`    | `cco_timer_expired(tm)`              | Return true if timer is expired         |
 | `double`  | `cco_timer_remaining(tm)`            | Return seconds remaining                |
@@ -399,7 +399,7 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 | `void`    | `cco_run(co, corocall) { }`          | Run blocking until coro is done         |
 |           | Time functions:                      |                                         |
 | `double`  | `cco_time(void)`                     | Return secs with usec prec. since Epoch |
-|           | `cco_sleep(double sec)`              | Sleep for seconds                       |
+|           | `cco_sleep(double sec)`              | Sleep for seconds (msec or usec prec.)  |
 
 ---
 ## RAII scope macros
