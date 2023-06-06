@@ -372,13 +372,14 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |           |  Function / operator                 | Description                             |
 |:----------|:-------------------------------------|:----------------------------------------|
 |           | `cco_final:`                         | Label for cleanup in coroutine          |
-|           | `cco_return`                         | Early return from the coroutine (no arg) |
 | `bool`    | `cco_done(co)`                       | Is coroutine done?                      |
 |           | `cco_routine(co) { ... }`            | The coroutine closure                   |
 |           | `cco_yield()`                        | Yield/suspend execution                 |
 |           | `cco_yield(ret)`                     | Yield/suspend execution and return ret  |
 |           | `cco_await(promise)`                 | Await/suspend until promise is true     |
 |           | `cco_await(promise, ret)`            | Await/suspend with ret value            |
+|           | `cco_return`                         | Execute final cleanup, enter done-state |
+|           | `cco_return_v(val)`                  | Yield final value, enter final-state    |
 |           | Semaphores:                          |                                         | 
 |           | `cco_sem`                            | Semaphore type                          |
 |           | `cco_sem_await(sem)`                 | Await for the semaphore count > 0       |

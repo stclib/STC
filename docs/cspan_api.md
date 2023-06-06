@@ -136,6 +136,7 @@ int main() {
 ## Example 2
 Slicing cspan without and with reducing the rank:
 ```c
+#define i_implement
 #include <c11/print.h>
 #include <stc/cspan.h>
 
@@ -154,7 +155,7 @@ int main()
 
     puts("\niterate span2 flat:");
     c_foreach (i, Span2, span2)
-        print(" {}", *i.ref);
+        fmt_print(" {}", *i.ref);
     puts("");
 
     // slice without reducing rank:
@@ -164,8 +165,8 @@ int main()
     c_forrange (i, ss3.shape[0]) {
         c_forrange (j, ss3.shape[1]) {
             c_forrange (k, ss3.shape[2])
-                print(" {:2}", *cspan_at(&ss3, i, j, k));
-            print(" |");
+                fmt_print(" {:2}", *cspan_at(&ss3, i, j, k));
+            fmt_print(" |");
         }
     }
     // slice and reduce rank:
@@ -174,13 +175,13 @@ int main()
     puts("\niterate ss2 by dimensions:");
     c_forrange (i, ss2.shape[0]) {
         c_forrange (j, ss2.shape[1])
-            print(" {:2}", *cspan_at(&ss2, i, j));
-        print(" |");
+            fmt_print(" {:2}", *cspan_at(&ss2, i, j));
+        fmt_print(" |");
     }
 
     puts("\niterate ss2 flat:");
     c_foreach (i, Span2, ss2)
-        print(" {:2}", *i.ref);
+        fmt_print(" {:2}", *i.ref);
     puts("");
 }
 ```

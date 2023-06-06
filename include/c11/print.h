@@ -1,7 +1,7 @@
 #ifndef FMT_H_INCLUDED
 #define FMT_H_INCLUDED
 /* 
-VER 2.1: NEW API:
+VER 2.2: NEW API:
 void        print(fmt, ...);
 void        println(fmt, ...);
 void        printd(dest, fmt, ...);
@@ -9,28 +9,31 @@ void        printd(dest, fmt, ...);
 void        fmt_print(fmt, ...);
 void        fmt_println(fmt, ...);
 void        fmt_printd(dest, fmt, ...);
-void        fmt_destroy(fmt_buffer* buf);
+void        fmt_close(fmt_stream* ss);
 
   dest - destination, one of:
     FILE* fp        Write to a file
     char* strbuf    Write to a pre-allocated string buffer
-    fmt_buffer* buf Auto realloc the needed memory (safe).
-                    Set buf->stream=1 for stream-mode.
-                    Call fmt_destroy(buf) after usage.
+    fmt_stream* ss  Write to a string-stream (auto allocated).
+                    Set ss->overwrite=1 for overwrite-mode.
+                    Call fmt_close(ss) after usage.
 
   fmt - format string
     {}              Auto-detected format. If :MOD is not specified,
                     float will use ".8g" format, and double ".16g".
-    {:MOD}          Format modifiers: < left align (replaces -), default for char*, char.
-                                      > right align, default for numbers.
-                    Other than that MOD can be normal printf format modifiers.
-    {{, }}          Print chars {, and }. (note: a single % prints %).
+    {:MODS}         Format modifiers: '<' left align (replaces '-'). Default for char* and char.
+                                      '>' right align. Default for numbers.
+                    Other than that MODS can be regular printf() format modifiers.
+    {{  }}  %       Print the '{', '}', and '%' characters.
 
 * C11 or higher required.
 * MAX 255 chars fmt string by default. MAX 12 arguments after fmt string.
-* Static linking by default, shared symbols by defining FMT_HEADER / FMT_IMPLEMENT.
+* Define FMT_IMPLEMENT or i_implement prior to #include in one translation unit.
+* Define FMT_SHORTS to define print(), println() and printd() macros, without fmt_ prefix.
 * (c) operamint, 2022, MIT License.
 -----------------------------------------------------------------------------------
+#define FMT_IMPLEMENT
+#define FMT_SHORTS
 #include "c11/print.h"
 
 int main() {
@@ -50,15 +53,15 @@ int main() {
     printd(stdout, "{:10} {:10} {:10}\n", "Hello", "Mad", "World");
     printd(stderr, "100%: {:<20} {:.*} {}\n", string, 4, pi, x);
     printd(buffer, "Precision: {} {:.10} {}", string, pi, x);
-    println("{}", buffer);
-    println("Vector: ({}, {}, {})", 3.2, 3.3, pi);
+    fmt_println("{}", buffer);
+    fmt_println("Vector: ({}, {}, {})", 3.2, 3.3, pi);
 
-    fmt_buffer out[1] = {{.stream=1}};
-    printd(out, "{} {}", "Pi is:", pi);
-    print("{}, len={}, cap={}\n", out->data, out->len, out->cap);
-    printd(out, "{} {}", ", Pi squared is:", pi*pi);
-    print("{}, len={}, cap={}\n", out->data, out->len, out->cap);
-    fmt_destroy(out);
+    fmt_stream ss[1] = {0};
+    printd(ss, "{} {}", "Pi is:", pi);
+    print("{}, len={}, cap={}\n", ss->data, ss->len, ss->cap);
+    printd(ss, "{} {}", ", Pi squared is:", pi*pi);
+    print("{}, len={}, cap={}\n", ss->data, ss->len, ss->cap);
+    fmt_close(ss);
 }
 */
 #include <stdio.h>
@@ -77,11 +80,6 @@ int main() {
 #define _fmt_ARG_N(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, \
                    _14, _15, _16, N, ...) N
 
-#if defined FMT_HEADER || defined FMT_IMPLEMENT
-#  define FMT_API
-#else
-#  define FMT_API static inline
-#endif
 #if defined FMT_NDEBUG || defined NDEBUG
 #  define fmt_OK(exp) (void)(exp)
 #else
@@ -91,25 +89,25 @@ int main() {
 typedef struct {
     char* data;
     intptr_t cap, len;
-    _Bool stream;
-} fmt_buffer;
+    _Bool overwrite;
+} fmt_stream;
 
-FMT_API void fmt_destroy(fmt_buffer* buf);
-FMT_API int  _fmt_parse(char* p, int nargs, const char *fmt, ...);
-FMT_API void _fmt_bprint(fmt_buffer*, const char* fmt, ...);
+void fmt_close(fmt_stream* ss);
+int  _fmt_parse(char* p, int nargs, const char *fmt, ...);
+void _fmt_bprint(fmt_stream*, const char* fmt, ...);
 
 #ifndef FMT_MAX
 #define FMT_MAX 256
 #endif
 
-#ifndef FMT_NOSHORTS
+#ifdef FMT_SHORTS
 #define print(...) fmt_printd(stdout, __VA_ARGS__)
-#define println(...) fmt_printd((fmt_buffer*)0, __VA_ARGS__)
+#define println(...) fmt_printd((fmt_stream*)0, __VA_ARGS__)
 #define printd fmt_printd
 #endif
 
 #define fmt_print(...) fmt_printd(stdout, __VA_ARGS__)
-#define fmt_println(...) fmt_printd((fmt_buffer*)0, __VA_ARGS__)
+#define fmt_println(...) fmt_printd((fmt_stream*)0, __VA_ARGS__)
 #define fmt_printd(...) fmt_OVERLOAD(fmt_printd, __VA_ARGS__)
 
 /* Primary function. */
@@ -161,7 +159,7 @@ FMT_API void _fmt_bprint(fmt_buffer*, const char* fmt, ...);
 #define _fmt_fn(x) _Generic ((x), \
     FILE*: fprintf, \
     char*: sprintf, \
-    fmt_buffer*: _fmt_bprint)
+    fmt_stream*: _fmt_bprint)
 
 #if defined(_MSC_VER) && !defined(__clang__)
 #  define _signed_char_hhd
@@ -192,38 +190,38 @@ FMT_API void _fmt_bprint(fmt_buffer*, const char* fmt, ...);
     const wchar_t*: "ls", \
     const void*: "p")
 
-#if defined FMT_IMPLEMENT || !(defined FMT_HEADER || defined FMT_IMPLEMENT)
+#if defined FMT_IMPLEMENT || defined i_implement
 
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
 
-FMT_API void fmt_destroy(fmt_buffer* buf) {
-    free(buf->data);
+void fmt_close(fmt_stream* ss) {
+    free(ss->data);
 }
 
-FMT_API void _fmt_bprint(fmt_buffer* buf, const char* fmt, ...) {
+void _fmt_bprint(fmt_stream* ss, const char* fmt, ...) {
     va_list args, args2;
     va_start(args, fmt);
-    if (buf == NULL) {
+    if (ss == NULL) {
         vprintf(fmt, args); putchar('\n');
         goto done1;
     }
     va_copy(args2, args);
     const int n = vsnprintf(NULL, 0U, fmt, args);
     if (n < 0) goto done2;
-    const intptr_t pos = buf->stream ? buf->len : 0;
-    buf->len = pos + n;
-    if (buf->len > buf->cap) {
-        buf->cap = buf->len + buf->cap/2;
-        buf->data = (char*)realloc(buf->data, (size_t)buf->cap + 1U);
+    const intptr_t pos = ss->overwrite ? 0 : ss->len;
+    ss->len = pos + n;
+    if (ss->len > ss->cap) {
+        ss->cap = ss->len + ss->cap/2;
+        ss->data = (char*)realloc(ss->data, (size_t)ss->cap + 1U);
     }
-    vsprintf(buf->data + pos, fmt, args2);
+    vsprintf(ss->data + pos, fmt, args2);
     done2: va_end(args2);
     done1: va_end(args);
 }
 
-FMT_API int _fmt_parse(char* p, int nargs, const char *fmt, ...) {
+int _fmt_parse(char* p, int nargs, const char *fmt, ...) {
     char *arg, *p0, ch;
     int n = 0, empty;
     va_list args;
@@ -273,3 +271,4 @@ FMT_API int _fmt_parse(char* p, int nargs, const char *fmt, ...) {
 }
 #endif
 #endif
+#undef i_implement
