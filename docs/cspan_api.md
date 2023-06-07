@@ -137,7 +137,7 @@ int main() {
 Slicing cspan without and with reducing the rank:
 ```c
 #define i_implement
-#include <c11/print.h>
+#include <c11/fmt.h>
 #include <stc/cspan.h>
 
 using_cspan3(Span, int); // Shorthand to define Span, Span2, and Span3

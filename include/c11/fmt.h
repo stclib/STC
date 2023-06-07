@@ -2,13 +2,10 @@
 #define FMT_H_INCLUDED
 /* 
 VER 2.2: NEW API:
-void        print(fmt, ...);
-void        println(fmt, ...);
-void        printd(dest, fmt, ...);
-
 void        fmt_print(fmt, ...);
 void        fmt_println(fmt, ...);
 void        fmt_printd(dest, fmt, ...);
+const char* fmt_tm(fmt, struct tm* tp);
 void        fmt_close(fmt_stream* ss);
 
   dest - destination, one of:
@@ -18,7 +15,7 @@ void        fmt_close(fmt_stream* ss);
                     Set ss->overwrite=1 for overwrite-mode.
                     Call fmt_close(ss) after usage.
 
-  fmt - format string
+  fmt - format string (const char*)
     {}              Auto-detected format. If :MOD is not specified,
                     float will use ".8g" format, and double ".16g".
     {:MODS}         Format modifiers: '<' left align (replaces '-'). Default for char* and char.
@@ -29,12 +26,12 @@ void        fmt_close(fmt_stream* ss);
 * C11 or higher required.
 * MAX 255 chars fmt string by default. MAX 12 arguments after fmt string.
 * Define FMT_IMPLEMENT or i_implement prior to #include in one translation unit.
-* Define FMT_SHORTS to define print(), println() and printd() macros, without fmt_ prefix.
+* Define FMT_SHORTS to add print(), println() and printd() macros, without fmt_ prefix.
 * (c) operamint, 2022, MIT License.
 -----------------------------------------------------------------------------------
 #define FMT_IMPLEMENT
 #define FMT_SHORTS
-#include "c11/print.h"
+#include "c11/fmt.h"
 
 int main() {
     const double pi = 3.141592653589793;
@@ -62,6 +59,12 @@ int main() {
     printd(ss, "{} {}", ", Pi squared is:", pi*pi);
     print("{}, len={}, cap={}\n", ss->data, ss->len, ss->cap);
     fmt_close(ss);
+    
+    time_t now = time(NULL);
+    struct tm t1 = *localtime(&now), t2 = t1;
+    t2.tm_year += 2;
+    fmt_print(1, "Dates:\n  {}\n  {}\n", fmt_tm("%Y-%m-%d %X %Z", &t1), 
+                                         fmt_tm("%Y-%m-%d %X %Z", &t2));
 }
 */
 #include <stdio.h>
@@ -92,12 +95,14 @@ typedef struct {
     _Bool overwrite;
 } fmt_stream;
 
+#define fmt_tm(fmt, tmptr) _fmt_strftime(fmt, tmptr) /* Max 2 usages. Buffer = 64 chars. */
 void fmt_close(fmt_stream* ss);
 int  _fmt_parse(char* p, int nargs, const char *fmt, ...);
 void _fmt_bprint(fmt_stream*, const char* fmt, ...);
+struct tm; const char* _fmt_strftime(const char *fmt, const struct tm *tp);
 
 #ifndef FMT_MAX
-#define FMT_MAX 256
+#define FMT_MAX 128
 #endif
 
 #ifdef FMT_SHORTS
@@ -195,9 +200,17 @@ void _fmt_bprint(fmt_stream*, const char* fmt, ...);
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+#include <time.h>
 
 void fmt_close(fmt_stream* ss) {
     free(ss->data);
+}
+
+const char* _fmt_strftime(const char *fmt, const struct tm *tp) {
+    static char buf[2][64], i = 0;
+    i = !i;
+    strftime(buf[i], 64, fmt, tp);
+    return buf[i];
 }
 
 void _fmt_bprint(fmt_stream* ss, const char* fmt, ...) {

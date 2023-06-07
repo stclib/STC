@@ -1,6 +1,6 @@
 d=$(git rev-parse --show-toplevel)
 mkdir -p $d/../stcsingle/c11 $d/../stcsingle/stc
-python singleheader.py $d/include/c11/print.h   > $d/../stcsingle/c11/print.h
+python singleheader.py $d/include/c11/fmt.h   > $d/../stcsingle/c11/fmt.h
 python singleheader.py $d/include/stc/calgo.h   > $d/../stcsingle/stc/calgo.h
 python singleheader.py $d/include/stc/carc.h    > $d/../stcsingle/stc/carc.h
 python singleheader.py $d/include/stc/cbits.h   > $d/../stcsingle/stc/cbits.h
