@@ -95,11 +95,11 @@ typedef struct {
     _Bool overwrite;
 } fmt_stream;
 
-#define fmt_tm(fmt, tmptr) _fmt_strftime(fmt, tmptr) /* Max 2 usages. Buffer = 64 chars. */
-void fmt_close(fmt_stream* ss);
+struct tm;  /* Max 2 usages. Buffer = 64 chars. */
+const char* fmt_tm(const char *fmt, const struct tm *tp);
+void        fmt_close(fmt_stream* ss);
 int  _fmt_parse(char* p, int nargs, const char *fmt, ...);
 void _fmt_bprint(fmt_stream*, const char* fmt, ...);
-struct tm; const char* _fmt_strftime(const char *fmt, const struct tm *tp);
 
 #ifndef FMT_MAX
 #define FMT_MAX 128
@@ -206,7 +206,7 @@ void fmt_close(fmt_stream* ss) {
     free(ss->data);
 }
 
-const char* _fmt_strftime(const char *fmt, const struct tm *tp) {
+const char* fmt_tm(const char *fmt, const struct tm *tp) {
     static char buf[2][64], i = 0;
     i = !i;
     strftime(buf[i], 64, fmt, tp);
