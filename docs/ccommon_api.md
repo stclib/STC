@@ -385,14 +385,15 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |           | `cco_sem_await(sem)`                 | Await for the semaphore count > 0       |
 |           | `cco_sem_await(sem, ret)`            | Await with ret on the semaphore         |
 | `cco_sem` | `cco_sem_init(long value)`           | Set semaphore value                     |
-|           | `cco_sem_release(sem)`               | Signal the semaphore                    |
+|           | `cco_sem_release(sem)`               | Signal the semaphore (count += 1)       |
 |           | Timers:                              |                                         | 
 |           | `cco_timer`                          | Timer type                              |
-|           | `cco_timer_await(tm)`                | Await for timer to expire               |
-|           | `cco_timer_await(tm, ret)`           | Await with ret for timer to expire      |
-|           | `cco_timer_start(tm, double sec)`    | Start timer for sec seconds (usec prec.)|
+|           | `cco_timer_await(tm, double sec)`    | Await secs for timer to expire (usec prec.)|
+|           | `cco_timer_await(tm, double sec, ret)`| Await secs for timer with ret value    |
+|           | `cco_timer_start(tm, double sec)`    | Start timer for secs duration           |
 |           | `cco_timer_restart(tm)`              | Restart timer with same duration        |
 | `bool`    | `cco_timer_expired(tm)`              | Return true if timer is expired         |
+| `double`  | `cco_timer_elapsed(tm)`              | Return seconds elapsed                  |
 | `double`  | `cco_timer_remaining(tm)`            | Return seconds remaining                |
 |           | From caller side:                    |                                         | 
 | `void`    | `cco_stop(co)`                       | Next call of coroutine finalizes        |

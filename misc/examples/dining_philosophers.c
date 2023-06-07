@@ -22,7 +22,6 @@ struct Dining {
     // Define semaphores for the forks
     cco_sem forks[num_forks];
     struct Philosopher ph[num_philosophers];
-    int ph_idx;
     int cco_state; // required
 };
 
@@ -43,7 +42,7 @@ void philosopher(struct Philosopher* p)
             duration = 0.5 + crandf();
             printf("Philosopher %d is eating for %.0f minutes...\n", p->id, duration*10);
             cco_timer_await(&p->tm, duration);
-            
+
             cco_sem_release(p->left_fork);
             cco_sem_release(p->right_fork);
         }
@@ -69,8 +68,8 @@ void dining(struct Dining* d)
 
         while (1) {
             // per-"frame" logic update of all philosophers states
-            for (d->ph_idx = 0; d->ph_idx < num_philosophers; ++d->ph_idx) {
-                philosopher(&d->ph[d->ph_idx]);
+            for (int i = 0; i < num_philosophers; ++i) {
+                philosopher(&d->ph[i]);
             }
             cco_yield(); // suspend, return control back to main
         }

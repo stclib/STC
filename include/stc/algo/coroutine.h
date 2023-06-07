@@ -67,12 +67,12 @@ enum {
 #define cco_done(co) ((co)->cco_state == cco_state_done)
 
 #define cco_routine(co) \
-    for (int *_state = &(co)->cco_state, _once=1; _once; *_state = cco_state_done, _once=0) \
-        _begin: switch (*_state) case 0: // thanks, @liigo!
+    for (int *_state = &(co)->cco_state; *_state != cco_state_done; *_state = cco_state_done) \
+        _resume: switch (*_state) case 0: // thanks, @liigo!
 
 #define cco_yield(ret) \
     do { \
-        *_state = __LINE__; return ret; goto _begin; \
+        *_state = __LINE__; return ret; goto _resume; \
         case __LINE__:; \
     } while (0)
 
@@ -81,7 +81,7 @@ enum {
 #define cco_await_2(promise, ret) \
     do { \
         *_state = __LINE__; \
-        case __LINE__: if (!(promise)) {return ret; goto _begin;} \
+        case __LINE__: if (!(promise)) {return ret; goto _resume;} \
     } while (0)
 
 #define cco_run(co, call) while (call, !cco_done(co))
@@ -91,13 +91,13 @@ enum {
 
 #define cco_return \
     do { \
-        *_state = *_state < 0 ? cco_state_done : cco_state_final; \
-        goto _begin; \
+        *_state = *_state >= 0 ? cco_state_final : cco_state_done; \
+        goto _resume; \
     } while (0)
 
 #define cco_return_v(value) \
     do { \
-        *_state = *_state < 0 ? cco_state_done : cco_state_final; \
+        *_state = *_state >= 0 ? cco_state_final : cco_state_done; \
         return value; \
     } while (0)
 
@@ -115,9 +115,7 @@ enum {
  * Semaphore
  */
 
-typedef struct {
-    intptr_t count;
-} cco_sem;
+typedef struct { intptr_t count; } cco_sem;
 
 #define cco_sem_await(...) c_MACRO_OVERLOAD(cco_sem_await, __VA_ARGS__)
 #define cco_sem_await_1(sem) cco_sem_await_2(sem, )
@@ -146,10 +144,9 @@ typedef struct {
     _c_LINKC void Sleep(unsigned long);
 
     static inline double cco_time(void) { /* seconds since epoch */
-        static const unsigned long long epoch_offset = 116444736000000000ULL; /* 1/10th usecs betweeen Jan 1,1601 - Jan 1,1970 */
-        unsigned long long quad;                     /* 64-bit value, 100-nanosecond intervals since January 1, 1601 00:00 UTC */
+        unsigned long long quad;          /* 64-bit value representing 1/10th usecs since Jan 1 1601, 00:00 UTC */
         GetSystemTimePreciseAsFileTime((struct _FILETIME*)&quad);
-        return (double)(quad - epoch_offset)*1e-7;
+        return (double)(quad - 116444736000000000ULL)*1e-7;  /* time diff Jan 1 1601-Jan 1 1970 in 1/10th usecs */
     }
 
     static inline void cco_sleep(double sec) {
@@ -197,6 +194,10 @@ static inline void cco_timer_restart(cco_timer* tm) {
 
 static inline bool cco_timer_expired(cco_timer* tm) {
     return cco_time() - tm->start >= tm->interval;
+}
+
+static inline double cco_timer_elapsed(cco_timer* tm) {
+    return cco_time() - tm->start;
 }
 
 static inline double cco_timer_remaining(cco_timer* tm) {
