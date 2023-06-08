@@ -378,7 +378,7 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |           | `cco_yield(ret)`                     | Yield/suspend execution and return ret  |
 |           | `cco_await(promise)`                 | Await/suspend until promise is true     |
 |           | `cco_await(promise, ret)`            | Await/suspend with ret value            |
-|           | `cco_return`                         | Execute final cleanup, enter done-state |
+|           | `cco_return`                         | Replaces return. Jump to cco_final: if exist|
 |           | `cco_return_v(val)`                  | Yield final value, enter final-state    |
 |           | Semaphores:                          |                                         | 
 |           | `cco_sem`                            | Semaphore type                          |

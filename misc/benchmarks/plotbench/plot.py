@@ -12,8 +12,8 @@ df = df[df.Method != 'total']
 if n > 0:
     df = df[df.Compiler == comp[n]]
 
-g = sns.catplot(data=df, x='Method', y='Seconds', hue='Library', col='C', kind='bar',
-                 ci=68, legend=False, col_wrap=2, sharex=False, aspect=1.4, height=3.1)
+g = sns.catplot(data=df, x='Method', y='Seconds', hue='Library', col='C', kind='bar', orient='v',
+                 errorbar=('ci', 68), legend=False, col_wrap=2, sharex=False, aspect=1.4, height=3.1)
 g.set_xlabels('')
 
 g.add_legend(bbox_to_anchor=(0.75, 0.2), borderaxespad=0.)

@@ -87,7 +87,7 @@ enum {
 #define cco_run(co, call) while (call, !cco_done(co))
 
 #define cco_final \
-    *_state = cco_state_done; case cco_state_final
+    *_state = cco_state_final; case cco_state_final
 
 #define cco_return \
     do { \

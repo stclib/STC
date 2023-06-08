@@ -32,7 +32,7 @@ struct triples {
     int cco_state;
 };
 
-bool triples_coro(struct triples* t) {
+void triples_coro(struct triples* t) {
     cco_routine(t) {
         t->count = 0;
         for (t->c = 5; t->size; ++t->c) {
@@ -41,15 +41,14 @@ bool triples_coro(struct triples* t) {
                     if ((int64_t)t->a*t->a + (int64_t)t->b*t->b == (int64_t)t->c*t->c) {
                         if (t->count++ == t->size)
                             cco_return;
-                        cco_yield(false);
+                        cco_yield();
                     }
                 }
             }
         }
-    cco_final:
+        cco_final:
         puts("done");
     }
-    return true;
 }
 
 int main()
@@ -61,7 +60,8 @@ int main()
     struct triples t = {INT32_MAX};
     int n = 0;
 
-    while (!triples_coro(&t)) {
+    while (!cco_done(&t)) {
+        triples_coro(&t);
         if (gcd(t.a, t.b) > 1)
             continue;
         if (t.c < 100)
