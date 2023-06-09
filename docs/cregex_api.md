@@ -44,15 +44,15 @@ bool        cregex_is_match(const cregex* re, const char* input);
 
             // Replace all matches in input
 cstr        cregex_replace(const cregex* re, const char* input, const char* replace, int count = INT_MAX);
-            // Replace count matches in input string-view. Optionally transform replacement with mfun.
+            // Replace count matches in input string-view. Optionally transform replacement.
 cstr        cregex_replace_sv(const cregex* re, csview input, const char* replace, int count = INT_MAX);
 cstr        cregex_replace_sv(const cregex* re, csview input, const char* replace, int count,
-                              bool(*mfun)(int capgrp, csview match, cstr* mstr), int rflags);
+                              bool(*transform)(int group, csview match, cstr* result), int rflags);
 
             // All-in-one replacement (compile + find/replace + drop)
 cstr        cregex_replace_pattern(const char* pattern, const char* input, const char* replace, int count = INT_MAX);
 cstr        cregex_replace_pattern(const char* pattern, const char* input, const char* replace, int count,
-                                   bool(*mfun)(int capgrp, csview match, cstr* mstr), int rflags);
+                                   bool(*transform)(int group, csview match, cstr* result), int rflags);
             // destroy
 void        cregex_drop(cregex* self);
 ```

@@ -1,6 +1,6 @@
 #include <stc/ccommon.h>
 #include <stdio.h>
-
+#define i_implement
 #include <stc/cstr.h>
 
 // Create cmap of cstr => long*

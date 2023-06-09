@@ -161,9 +161,9 @@ STC_INLINE void cbits_resize(cbits* self, const int64_t size, const bool value) 
     if (new_n >= old_n) {
         c_memset(self->data64 + old_n, -(int)value, (new_n - old_n)*8);
         if (old_n > 0) {
-            uint64_t m = _cbits_bit(osize) - 1; /* mask */
-            value ? (self->data64[old_n - 1] |= ~m) 
-                  : (self->data64[old_n - 1] &= m);
+            uint64_t mask = _cbits_bit(osize) - 1;
+            if (value) self->data64[old_n - 1] |= ~mask; 
+            else       self->data64[old_n - 1] &= mask;
         }
     }
 }

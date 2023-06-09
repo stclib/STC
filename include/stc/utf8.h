@@ -1,3 +1,4 @@
+
 #ifndef UTF8_H_INCLUDED
 #define UTF8_H_INCLUDED
 
@@ -5,7 +6,6 @@
 #include "forward.h"
 #include "ccommon.h"
 
-// utf8 methods defined in src/utf8code.c:
 enum {
     U8G_Cc, U8G_Lt, U8G_Nd, U8G_Nl,
     U8G_Pc, U8G_Pd, U8G_Pf, U8G_Pi,
@@ -16,6 +16,7 @@ enum {
     U8G_SIZE
 };
 
+// utf8 methods defined in src/utf8code.c:
 extern bool     utf8_isgroup(int group, uint32_t c); 
 extern bool     utf8_isalpha(uint32_t c);
 extern uint32_t utf8_casefold(uint32_t c);
@@ -112,9 +113,16 @@ STC_INLINE const char* utf8_at(const char *s, intptr_t index) {
 
 STC_INLINE intptr_t utf8_pos(const char* s, intptr_t index)
     { return (intptr_t)(utf8_at(s, index) - s); }
-
 #endif // UTF8_H_INCLUDED
-#if defined(i_extern)
+
+#if defined i_extern || (defined i_implement && !defined _i_no_undef)
 #  include "../../src/utf8code.c"
-#  undef i_extern
 #endif
+#ifndef _i_no_undef
+#undef i_static
+#undef i_header
+#undef i_implement
+#undef i_extern
+#undef i_opt
+#endif
+#undef _i_no_undef

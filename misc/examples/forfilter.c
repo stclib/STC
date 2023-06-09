@@ -1,6 +1,7 @@
 #include <stdio.h>
 #define i_extern
 #include <stc/cstr.h>
+#define i_implement
 #include <stc/csview.h>
 #include <stc/algo/filter.h>
 #include <stc/algo/crange.h>

@@ -113,7 +113,7 @@ _cx_memb(_get_mut)(_cx_self* self, _cx_raw raw)
 #endif
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement)
+#if defined(i_implement) || defined(i_static)
 
 STC_DEF _cx_value*
 _cx_memb(_push_front)(_cx_self* self, i_key value) {

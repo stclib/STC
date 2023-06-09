@@ -261,7 +261,7 @@ _cx_memb(_eq)(const _cx_self* self, const _cx_self* other) {
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement)
+#if defined(i_implement) || defined(i_static)
 #ifndef i_max_load_factor
   #define i_max_load_factor 0.80f
 #endif

@@ -135,7 +135,7 @@ STC_INLINE bool cregex_is_match(const cregex* re, const char* input)
 #define cregex_replace_sv_4(pattern, input, replace, count) \
     cregex_replace_sv_6(pattern, input, replace, count, NULL, CREG_DEFAULT)
 cstr cregex_replace_sv_6(const cregex* re, csview input, const char* replace, int count,
-                       bool (*mfun)(int i, csview match, cstr* mstr), int rflags);
+                         bool (*transform)(int group, csview match, cstr* result), int rflags);
 
 /* replace input with replace using regular expression */
 #define cregex_replace(...) c_MACRO_OVERLOAD(cregex_replace, __VA_ARGS__)
@@ -153,20 +153,20 @@ STC_INLINE cstr cregex_replace_4(const cregex* re, const char* input, const char
 #define cregex_replace_pattern_4(pattern, input, replace, count) \
     cregex_replace_pattern_6(pattern, input, replace, count, NULL, CREG_DEFAULT)
 cstr cregex_replace_pattern_6(const char* pattern, const char* input, const char* replace, int count,
-                              bool (*mfun)(int i, csview match, cstr* mstr), int crflags);
+                              bool (*transform)(int group, csview match, cstr* result), int crflags);
 
 /* destroy regex */
 void cregex_drop(cregex* re);
 
-#endif // CREGEX_H_INCLUDED
-#if defined i_extern || defined i_implement
+#if defined i_implement
 #  include "../../src/cregex.c"
 #endif
 #if defined i_extern
 #  include "../../src/utf8code.c"
 #endif
+#endif // CREGEX_H_INCLUDED
 #undef i_opt
 #undef i_header
 #undef i_static
-#undef i_implement
 #undef i_extern
+#undef i_implement

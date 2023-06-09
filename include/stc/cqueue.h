@@ -121,7 +121,7 @@ STC_INLINE void _cx_memb(_adjust_end_)(_cx_self* self, intptr_t n)
     { self->end = (self->end + n) & self->capmask; }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement)
+#if defined(i_implement) || defined(i_static)
 
 STC_DEF _cx_iter _cx_memb(_advance)(_cx_iter it, intptr_t n) {
     intptr_t len = _cx_memb(_size)(it._s);

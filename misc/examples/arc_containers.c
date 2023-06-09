@@ -1,6 +1,6 @@
 // Create a stack and a list of shared pointers to maps,
 // and demonstrate sharing and cloning of maps.
-#define i_static
+#define i_implement
 #include <stc/cstr.h>
 #include <stc/algo/raii.h>
 #define i_type Map

@@ -108,7 +108,7 @@ STC_INLINE void _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
 #endif // !i_no_emplace
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement)
+#if defined(i_implement) || defined(i_static)
 
 STC_DEF void
 _cx_memb(_sift_down_)(_cx_self* self, const intptr_t idx, const intptr_t n) {

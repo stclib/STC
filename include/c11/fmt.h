@@ -69,6 +69,7 @@ int main() {
 */
 #include <stdio.h>
 #include <stdint.h>
+#include <stddef.h>
 #include <assert.h>
 
 #define fmt_OVERLOAD(name, ...) \

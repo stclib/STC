@@ -24,6 +24,7 @@
 #define STC_FORWARD_H_INCLUDED
 
 #include <stdint.h>
+#include <stddef.h>
 
 #define forward_carc(CX, VAL) _c_carc_types(CX, VAL)
 #define forward_cbox(CX, VAL) _c_cbox_types(CX, VAL)

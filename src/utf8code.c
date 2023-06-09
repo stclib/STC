@@ -1,6 +1,9 @@
 #ifndef UTF8_C_INCLUDED
 #define UTF8_C_INCLUDED
-#include <stc/utf8.h> // header only
+
+#ifndef UTF8_H_INCLUDED
+#include "../include/stc/utf8.h" /* header only */
+#endif
 #include "utf8tabs.inc"
 
 const uint8_t utf8_dtab[] = {

@@ -1,4 +1,4 @@
-#define i_static
+#define i_implement
 #include <stc/cstr.h>
 #include <stc/algo/coroutine.h>
 #include <errno.h>

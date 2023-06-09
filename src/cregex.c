@@ -25,9 +25,24 @@ THE SOFTWARE.
 */
 #ifndef CREGEX_C_INCLUDED
 #define CREGEX_C_INCLUDED
-#include <stc/cstr.h>
-#include <stc/cregex.h> // header only
+
 #include <setjmp.h>
+#ifdef i_extern
+#  define _i_extern
+#endif
+#ifndef CREGEX_H_INCLUDED
+#  include "../include/stc/cregex.h"
+#endif
+#ifdef _i_extern
+#  include "utf8code.c"
+#endif
+#ifdef _i_extern
+#  define i_implement
+#else
+#  undef i_implement
+#endif
+#undef _i_extern
+#include "../include/stc/cstr.h"
 
 typedef uint32_t _Rune; /* Utf8 code point */
 typedef int32_t _Token;

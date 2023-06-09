@@ -253,6 +253,6 @@ STC_INLINE intptr_t cnextpow2(intptr_t n) {
 #if defined(STC_EXTERN)
   #define i_extern
 #endif
-#if defined(i_static) || defined(STC_IMPLEMENT) || defined(i_extern)
+#if defined(STC_IMPLEMENT) || defined(i_extern)
   #define i_implement
 #endif

@@ -1,5 +1,6 @@
 #define i_extern
 #include <stc/cregex.h>
+#define i_implement
 #include <stc/csview.h>
 
 #define i_val float

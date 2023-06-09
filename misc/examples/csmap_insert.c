@@ -5,6 +5,7 @@
 #define i_tag ii  // Map of int => int
 #include <stc/csmap.h>
 
+#define i_implement
 #include <stc/cstr.h>
 #define i_key int
 #define i_val_str

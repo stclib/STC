@@ -1,8 +1,9 @@
 #include <stdio.h>
 #include <time.h>
 
-#include <stc/crand.h>
+#define i_implement
 #include <stc/cstr.h>
+#include <stc/crand.h>
 
 // Declare int -> int sorted map.
 #define i_key int

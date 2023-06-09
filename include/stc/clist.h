@@ -214,7 +214,7 @@ STC_INLINE bool _cx_memb(_eq)(const _cx_self* self, const _cx_self* other) {
 #endif
 
 // -------------------------- IMPLEMENTATION -------------------------
-#if defined(i_implement)
+#if defined(i_implement) || defined(i_static)
 
 #if !defined i_no_clone
 STC_DEF _cx_self

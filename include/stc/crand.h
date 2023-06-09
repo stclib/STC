@@ -92,7 +92,7 @@ STC_INLINE double crand_f64(crand_t* rng) {
 }
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement)
+#if defined(i_implement) || defined(i_static)
 
 /* Global random() */
 static crand_t crand_global = {{

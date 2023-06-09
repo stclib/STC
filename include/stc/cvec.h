@@ -264,7 +264,7 @@ _cx_memb(_sort)(_cx_self* self) {
 }
 #endif // !c_no_cmp
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined(i_implement)
+#if defined(i_implement) || defined(i_static)
 
 STC_DEF _cx_self
 _cx_memb(_init)(void) {
