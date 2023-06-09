@@ -1,5 +1,5 @@
 #include <stdio.h>
-#define i_extern
+#define i_import
 #include <stc/cstr.h>
 #define i_implement
 #include <stc/csview.h>

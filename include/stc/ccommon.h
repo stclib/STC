@@ -241,6 +241,9 @@ STC_INLINE intptr_t cnextpow2(intptr_t n) {
 #undef STC_API
 #undef STC_DEF
 
+#ifdef i_extern
+#  define i_import
+#endif
 #if !defined(i_static) && !defined(STC_STATIC) && (defined(i_header) || defined(STC_HEADER) || \
                                                    defined(i_implement) || defined(STC_IMPLEMENT))
   #define STC_API extern
@@ -250,9 +253,6 @@ STC_INLINE intptr_t cnextpow2(intptr_t n) {
   #define STC_API static inline
   #define STC_DEF static inline
 #endif
-#if defined(STC_EXTERN)
-  #define i_extern
-#endif
-#if defined(STC_IMPLEMENT) || defined(i_extern)
+#if defined(STC_IMPLEMENT) || defined(i_import)
   #define i_implement
 #endif

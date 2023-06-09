@@ -265,4 +265,4 @@ STC_DEF intptr_t _cspan_slice(int32_t odim[], int32_t ostri[], int* orank,
 #undef i_header
 #undef i_implement
 #undef i_static
-#undef i_extern
+#undef i_import

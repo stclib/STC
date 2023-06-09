@@ -151,7 +151,7 @@ STC_INLINE bool csview_eq(const csview* x, const csview* y)
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #ifndef CSVIEW_C_INCLUDED
-#if defined i_extern || (defined i_implement && !defined _i_no_undef)
+#if defined i_import || (defined i_implement && !defined _i_no_undef)
 #define CSVIEW_C_INCLUDED
 
 csview_iter csview_advance(csview_iter it, intptr_t pos) {
@@ -201,11 +201,10 @@ csview csview_token(csview sv, const char* sep, intptr_t* start) {
     *start += tok.size + sep_size;
     return tok;
 }
-
 #endif
 #endif
 #undef i_opt
 #undef i_header
 #undef i_implement
 #undef i_static
-#undef i_extern
+#undef i_import

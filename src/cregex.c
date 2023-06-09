@@ -27,7 +27,7 @@ THE SOFTWARE.
 #define CREGEX_C_INCLUDED
 
 #include <setjmp.h>
-#ifdef i_extern
+#ifdef i_import
 #  define _i_extern
 #endif
 #ifndef CREGEX_H_INCLUDED

@@ -118,7 +118,6 @@ Interleave *push_front()* / *push_back()* then *sort()*:
 ```c
 #define i_type DList
 #define i_val double
-#define i_extern // link with sort() fn.
 #include <stc/clist.h>
 
 #include <stdio.h>

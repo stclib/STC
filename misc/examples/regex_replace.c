@@ -1,4 +1,4 @@
-#define i_extern
+#define i_import
 #include <stc/cregex.h>
 #include <stc/csview.h>
 #include <stc/algo/raii.h>

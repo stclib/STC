@@ -99,7 +99,7 @@ If an error occurs ```cregex_compile``` returns a negative error code stored in 
 
 [ [Run this code](https://godbolt.org/z/z434TMKfo) ]
 ```c
-#define i_extern // include external cstr, utf8, cregex functions implementation.
+#define i_import // include dependent cstr, utf8 and cregex function definitions.
 #include <stc/cregex.h>
 
 int main() {
@@ -151,7 +151,7 @@ c_formatch (it, &re, input)
 
 ## Using cregex in a project
 
-The easiest is to `#define i_extern` before `#include <stc/cregex.h>`. Make sure to do that in one translation unit only.
+The easiest is to `#define i_import` before `#include <stc/cregex.h>`. Make sure to do that in one translation unit only.
 
 For reference, **cregex** uses the following files: 
 - `stc/cregex.h`, `stc/utf8.h`, `stc/csview.h`, `stc/cstr.h`, `stc/ccommon.h`, `stc/forward.h`

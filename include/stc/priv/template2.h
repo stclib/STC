@@ -59,7 +59,7 @@
 #undef i_header
 #undef i_implement
 #undef i_static
-#undef i_extern
+#undef i_import
 
 #undef i_allocator
 #undef i_malloc

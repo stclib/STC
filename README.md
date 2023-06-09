@@ -333,6 +333,7 @@ After erasing the elements found:
 ---
 ## Installation
 
+*NEEDS REWRITE!*
 Because it is headers-only, headers can simply be included in your program. By default, functions are static
 (some inlined). You may add the *include* folder to the **CPATH** environment variable to
 let GCC, Clang, and TinyC locate the headers.
@@ -345,8 +346,7 @@ You may also cherry-pick shared linking mode on individual containers by `#defin
 `#define i_implement`, or force static symbols by `#define i_static` before container includes.
 
 As a special case, there may be non-templated functions in templated containers that should be implemented only
-once and if needed. Currently, define `i_extern` before including **clist** for its sorting function, and before 
-**cregex** or **utf8** to implement them (global `STC_EXTERN` can alternatively be defined).
+once and if needed. Currently, define `i_import` before including **cregex** or **utf8** to implement them.
 
 It is possible to generate single headers by executing the python script `src/singleheader.py header-file > single`.
 
@@ -356,7 +356,7 @@ or define your own, e.g.:
 ```c
 // stc_libs.c
 #define STC_IMPLEMENT // implement all the following as shared objects
-
+#define i_implement
 #include <stc/cstr.h>
 #include "Point.h"
 

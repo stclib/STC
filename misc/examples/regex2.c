@@ -1,4 +1,4 @@
-#define i_extern
+#define i_import
 #include <stc/cregex.h>
 
 int main()

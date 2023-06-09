@@ -405,8 +405,8 @@ STC_INLINE bool cstr_getline(cstr *self, FILE *fp)
 
 #endif // CSTR_H_INCLUDED
 
-/* -------------------------- EXTERN ------------------------- */
-#if defined(i_extern) && !defined(CSTR_X_INCLUDED)
+/* -------------------------- UTF8 CASE CONVERSION ------------------------- */
+#if defined(i_import) && !defined(CSTR_X_INCLUDED)
 #define CSTR_X_INCLUDED
 
 static struct {
@@ -437,11 +437,11 @@ cstr cstr_tocase(csview sv, int k) {
     cstr_shrink_to_fit(&out);
     return out;
 }
-#endif // i_extern
+#endif // i_import
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #ifndef CSTR_C_INCLUDED
-#if defined i_extern || (defined i_implement && !defined _i_no_undef)
+#if defined i_import || (defined i_implement && !defined _i_no_undef)
 #define CSTR_C_INCLUDED
 
 uint64_t cstr_hash(const cstr *self) {
@@ -659,4 +659,4 @@ intptr_t cstr_printf(cstr* self, const char* fmt, ...) {
 #undef i_header
 #undef i_static
 #undef i_implement
-#undef i_extern
+#undef i_import

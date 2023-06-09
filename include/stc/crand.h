@@ -158,4 +158,4 @@ STC_DEF double crand_norm(crand_t* rng, crand_norm_t* dist) {
 #undef i_static
 #undef i_header
 #undef i_implement
-#undef i_extern
+#undef i_import
