@@ -114,6 +114,22 @@ STC_INLINE bool csview_valid_utf8(csview sv) // depends on src/utf8code.c
 #define c_fortoken(it, input, sep) \
     c_fortoken_sv(it, csview_from(input), sep)
 
+/* ---- Container helper functions ---- */
+
+STC_INLINE int csview_cmp(const csview* x, const csview* y) {
+    intptr_t n = x->size < y->size ? x->size : y->size;
+    int c = c_memcmp(x->str, y->str, n);
+    return c ? c : (int)(x->size - y->size);
+}
+
+STC_INLINE int csview_icmp(const csview* x, const csview* y)
+    { return utf8_icmp_sv(*x, *y); }
+
+STC_INLINE bool csview_eq(const csview* x, const csview* y)
+    { return x->size == y->size && !c_memcmp(x->str, y->str, x->size); }
+
+#endif // CSVIEW_H_INCLUDED
+
 /* csview interaction with cstr: */
 #ifdef CSTR_H_INCLUDED
 
@@ -131,23 +147,7 @@ STC_INLINE csview cstr_slice_ex(const cstr* self, intptr_t p1, intptr_t p2)
 
 STC_INLINE csview cstr_u8_substr(const cstr* self , intptr_t bytepos, intptr_t u8len)
     { return csview_u8_substr(cstr_sv(self), bytepos, u8len); }
-
 #endif
-/* ---- Container helper functions ---- */
-
-STC_INLINE int csview_cmp(const csview* x, const csview* y) {
-    intptr_t n = x->size < y->size ? x->size : y->size;
-    int c = c_memcmp(x->str, y->str, n);
-    return c ? c : (int)(x->size - y->size);
-}
-
-STC_INLINE int csview_icmp(const csview* x, const csview* y)
-    { return utf8_icmp_sv(*x, *y); }
-
-STC_INLINE bool csview_eq(const csview* x, const csview* y)
-    { return x->size == y->size && !c_memcmp(x->str, y->str, x->size); }
-
-#endif // CSVIEW_H_INCLUDED
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #ifndef CSVIEW_C_INCLUDED
@@ -203,8 +203,11 @@ csview csview_token(csview sv, const char* sep, intptr_t* start) {
 }
 #endif
 #endif
-#undef i_opt
+#ifndef _i_no_undef
+#undef i_static
 #undef i_header
 #undef i_implement
-#undef i_static
 #undef i_import
+#undef i_opt
+#endif
+#undef _i_no_undef

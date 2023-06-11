@@ -655,8 +655,11 @@ intptr_t cstr_printf(cstr* self, const char* fmt, ...) {
 #if defined __GNUC__ && !defined __clang__
 #  pragma GCC diagnostic pop
 #endif
+#ifndef _i_no_undef
 #undef i_opt
 #undef i_header
 #undef i_static
 #undef i_implement
 #undef i_import
+#endif
+#undef _i_no_undef

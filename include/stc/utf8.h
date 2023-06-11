@@ -1,10 +1,11 @@
 
+#include "ccommon.h"
+
 #ifndef UTF8_H_INCLUDED
 #define UTF8_H_INCLUDED
 
 #include <ctype.h>
 #include "forward.h"
-#include "ccommon.h"
 
 enum {
     U8G_Cc, U8G_Lt, U8G_Nd, U8G_Nl,
