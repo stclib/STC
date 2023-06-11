@@ -21,7 +21,7 @@ point;
 point
 point_init(int x, int y, int width)
 {
-    return (point) { x, y, 0, width };
+    return c_LITERAL(point){ x, y, 0, width };
 }
 
 int

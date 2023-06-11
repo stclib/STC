@@ -29,9 +29,10 @@ struct Dining {
 // Philosopher coroutine
 void philosopher(struct Philosopher* p)
 {
+    double duration;
     cco_routine(p) {
         while (1) {
-            double duration = 1.0 + crandf()*2.0;
+            duration = 1.0 + crandf()*2.0;
             printf("Philosopher %d is thinking for %.0f minutes...\n", p->id, duration*10);
             cco_timer_await(&p->tm, duration);
 
@@ -46,7 +47,7 @@ void philosopher(struct Philosopher* p)
             cco_sem_release(p->left_fork);
             cco_sem_release(p->right_fork);
         }
-        
+
         cco_final:
         printf("Philosopher %d finished\n", p->id);
     }

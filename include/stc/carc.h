@@ -49,10 +49,11 @@ int main() {
     c_drop(ArcPers, &p, &q);
 }
 */
-#include "ccommon.h"
+#include "priv/linkage.h"
 
 #ifndef CARC_H_INCLUDED
 #define CARC_H_INCLUDED
+#include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
 
@@ -72,7 +73,7 @@ int main() {
     #define c_atomic_dec_and_test(v) (atomic_fetch_sub(v, 1) == 1)
 #endif
 
-#define carc_NULL {NULL, NULL}
+#define carc_null {0}
 #endif // CARC_H_INCLUDED
 
 #define _i_prefix carc_

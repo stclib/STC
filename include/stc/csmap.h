@@ -49,9 +49,10 @@ int main(void) {
     csmap_sx_drop(&m);
 }
 */
-#include "ccommon.h"
+#include "priv/linkage.h"
 
 #ifndef CSMAP_H_INCLUDED
+#include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>

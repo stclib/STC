@@ -30,7 +30,8 @@ uint64_t Person_hash(const Person* p);
 
 
 Person Person_make(const char* name, const char* last) {
-    return (Person){.name = cstr_from(name), .last = cstr_from(last)};
+    Person p = {.name = cstr_from(name), .last = cstr_from(last)};
+    return p;
 }
 
 int Person_cmp(const Person* a, const Person* b) {

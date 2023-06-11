@@ -7,13 +7,13 @@ if [ "$(uname)" = 'Linux' ]; then
 fi
 
 cc=gcc; cflags="-std=c99 -s -O3 -Wall -Wextra -Wpedantic -Wconversion -Wwrite-strings -Wdouble-promotion -Wno-unused-parameter -Wno-maybe-uninitialized -Wno-implicit-fallthrough -Wno-missing-field-initializers"
-#cc=gcc; cflags="-DSTC_STATIC -std=c99 -g -Werror -Wfatal-errors -Wpedantic -Wall $sanitize"
-#cc=tcc; cflags="-DSTC_STATIC -std=c99 -Wall"
-#cc=clang; cflags="-DSTC_STATIC -std=c99 -s -O3 -Wall -Wextra -Wpedantic -Wconversion -Wwrite-strings -Wdouble-promotion -Wno-unused-parameter -Wno-unused-function -Wno-implicit-fallthrough -Wno-missing-field-initializers"
-#cc=gcc; cflags="-DSTC_STATIC -x c++ -std=c++20 -O2 -s -Wall"
-#cc=cl; cflags="-DSTC_STATIC -nologo -O2 -MD -W3 -wd4003"
-#cc=cl; cflags="-DSTC_STATIC -nologo -TP -wd4003"
-#cc=cl; cflags="-DSTC_STATIC -nologo -std:c11 -wd4003"
+#cc=gcc; cflags="-std=c99 -g -Werror -Wfatal-errors -Wpedantic -Wall $sanitize"
+#cc=tcc; cflags="-std=c99 -Wall"
+#cc=clang; cflags="-std=c99 -s -O3 -Wall -Wextra -Wpedantic -Wconversion -Wwrite-strings -Wdouble-promotion -Wno-unused-parameter -Wno-unused-function -Wno-implicit-fallthrough -Wno-missing-field-initializers"
+#cc=gcc; cflags="-x c++ -std=c++20 -O2 -s -Wall"
+#cc=cl; cflags="-nologo -O2 -MD -W3 -wd4003"
+#cc=cl; cflags="-nologo -TP -std:c++20 -wd4003"
+#cc=cl; cflags="-nologo -std:c11 -wd4003"
 
 if [ "$cc" = "cl" ]; then
     oflag='/Fe:'

@@ -45,7 +45,7 @@ int main()
 {
     MyStruct my = {0};
     clist_i32_push_back(&my.intlst, 123);
-    clist_pnt_push_back(&my.pntlst, (Point){123, 456});
+    clist_pnt_push_back(&my.pntlst, c_LITERAL(Point){123, 456});
     MyStruct_drop(&my);
 
     clist_pnt plst = c_init(clist_pnt, {{42, 14}, {32, 94}, {62, 81}});

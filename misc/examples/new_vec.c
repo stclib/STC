@@ -26,10 +26,10 @@ int main()
 {
     MyStruct my = {0};
 
-    cvec_pnt_push(&my.pntvec, (Point){42, 14});
-    cvec_pnt_push(&my.pntvec, (Point){32, 94});
-    cvec_pnt_push(&my.pntvec, (Point){62, 81});
-    cvec_pnt_push(&my.pntvec, (Point){32, 91});
+    cvec_pnt_push(&my.pntvec, c_LITERAL(Point){42, 14});
+    cvec_pnt_push(&my.pntvec, c_LITERAL(Point){32, 94});
+    cvec_pnt_push(&my.pntvec, c_LITERAL(Point){62, 81});
+    cvec_pnt_push(&my.pntvec, c_LITERAL(Point){32, 91});
 
     cvec_pnt_sort(&my.pntvec);
 

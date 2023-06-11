@@ -42,6 +42,7 @@ int main() {
 }
 */
 #include "../ccommon.h"
+
 #ifndef i_type
   #define i_at(arr, idx) (&arr[idx])
   #ifndef i_tag

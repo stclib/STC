@@ -58,9 +58,10 @@ int main() {
     cvec_str_drop(&svec);
 }
 */
-#include "ccommon.h"
+#include "priv/linkage.h"
 
 #ifndef CVEC_H_INCLUDED
+#include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>

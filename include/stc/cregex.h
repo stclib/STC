@@ -22,6 +22,8 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
+#include "priv/linkage.h"
+
 #ifndef CREGEX_H_INCLUDED
 #define CREGEX_H_INCLUDED
 /*
@@ -157,6 +159,7 @@ cstr cregex_replace_pattern_6(const char* pattern, const char* input, const char
 
 /* destroy regex */
 void cregex_drop(cregex* re);
+#endif // CREGEX_H_INCLUDED
 
 #if defined i_implement
 #  include "../../src/cregex.c"
@@ -164,7 +167,6 @@ void cregex_drop(cregex* re);
 #if defined i_import
 #  include "../../src/utf8code.c"
 #endif
-#endif // CREGEX_H_INCLUDED
 #undef i_opt
 #undef i_header
 #undef i_static

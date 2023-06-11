@@ -20,9 +20,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "ccommon.h"
+#include "priv/linkage.h"
 
 #ifndef CPQUE_H_INCLUDED
+#include "ccommon.h"
 #include <stdlib.h>
 #include "forward.h"
 #endif

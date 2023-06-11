@@ -50,12 +50,12 @@ int main()
     print_collection_csmap_istr(&m1);
 
     typedef cvec_istr_value pair;
-    cvec_istr_push(&v, (pair){43, "Tc"});
-    cvec_istr_push(&v, (pair){41, "Nb"});
-    cvec_istr_push(&v, (pair){46, "Pd"});
-    cvec_istr_push(&v, (pair){42, "Mo"});
-    cvec_istr_push(&v, (pair){44, "Ru"});
-    cvec_istr_push(&v, (pair){44, "Ru"}); // attempt a duplicate
+    cvec_istr_push(&v, c_LITERAL(pair){43, "Tc"});
+    cvec_istr_push(&v, c_LITERAL(pair){41, "Nb"});
+    cvec_istr_push(&v, c_LITERAL(pair){46, "Pd"});
+    cvec_istr_push(&v, c_LITERAL(pair){42, "Mo"});
+    cvec_istr_push(&v, c_LITERAL(pair){44, "Ru"});
+    cvec_istr_push(&v, c_LITERAL(pair){44, "Ru"}); // attempt a duplicate
 
     puts("Inserting the following vector data into m1:");
     print_collection_cvec_istr(&v);

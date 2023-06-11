@@ -57,15 +57,16 @@ int main() {
     }
 }
 */
-#include "ccommon.h"
+#include "priv/linkage.h"
 
 #ifndef CBOX_H_INCLUDED
 #define CBOX_H_INCLUDED
+#include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>
 
-#define cbox_NULL {NULL}
+#define cbox_null {0}
 #endif // CBOX_H_INCLUDED
 
 #define _i_prefix cbox_

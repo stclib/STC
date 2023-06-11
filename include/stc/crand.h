@@ -20,10 +20,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#include "ccommon.h"
+#include "priv/linkage.h"
 
 #ifndef CRAND_H_INCLUDED
 #define CRAND_H_INCLUDED
+#include "ccommon.h"
 /*
 // crand: Pseudo-random number generator
 #include "stc/crand.h"

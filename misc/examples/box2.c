@@ -29,12 +29,12 @@ typedef struct {
 #include <stc/cbox.h> // BoxBoxPoint
 
 Point origin(void) {
-    return (Point){ .x=1.0, .y=2.0 };
+    return c_LITERAL(Point){ .x=1.0, .y=2.0 };
 }
 
 cbox_Point boxed_origin(void) {
     // Allocate this point on the heap, and return a pointer to it
-    return cbox_Point_make((Point){ .x=1.0, .y=2.0 });
+    return cbox_Point_make(c_LITERAL(Point){ .x=1.0, .y=2.0 });
 }
 
 
@@ -47,7 +47,7 @@ int main(void) {
     };
 
     // Heap allocated rectangle
-    cbox_Rectangle boxed_rectangle = cbox_Rectangle_make((Rectangle){
+    cbox_Rectangle boxed_rectangle = cbox_Rectangle_make(c_LITERAL(Rectangle){
         .top_left = origin(),
         .bottom_right = { .x=3.0, .y=-4.0 }
     });

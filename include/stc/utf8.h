@@ -1,9 +1,31 @@
-
-#include "ccommon.h"
+/* MIT License
+ *
+ * Copyright (c) 2023 Tyge Løvset
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+#include "priv/linkage.h"
 
 #ifndef UTF8_H_INCLUDED
 #define UTF8_H_INCLUDED
 
+#include "ccommon.h"
 #include <ctype.h>
 #include "forward.h"
 
@@ -53,9 +75,9 @@ STC_INLINE bool utf8_isspace(uint32_t c) {
 
 /* decode next utf8 codepoint. https://bjoern.hoehrmann.de/utf-8/decoder/dfa */
 typedef struct { uint32_t state, codep; } utf8_decode_t;
+extern const uint8_t utf8_dtab[]; /* utf8code.c */
 
 STC_INLINE uint32_t utf8_decode(utf8_decode_t* d, const uint32_t byte) {
-    extern const uint8_t utf8_dtab[]; /* utf8code.c */
     const uint32_t type = utf8_dtab[byte];
     d->codep = d->state ? (byte & 0x3fu) | (d->codep << 6)
                         : (0xffU >> type) & byte;
@@ -116,14 +138,14 @@ STC_INLINE intptr_t utf8_pos(const char* s, intptr_t index)
     { return (intptr_t)(utf8_at(s, index) - s); }
 #endif // UTF8_H_INCLUDED
 
-#if defined i_import || (defined i_implement && !defined _i_no_undef)
+#if defined i_import || (defined i_implement && !defined _i_nested)
 #  include "../../src/utf8code.c"
 #endif
-#ifndef _i_no_undef
+#ifndef _i_nested
 #undef i_static
 #undef i_header
 #undef i_implement
 #undef i_import
 #undef i_opt
 #endif
-#undef _i_no_undef
+#undef _i_nested

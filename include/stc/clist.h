@@ -51,9 +51,10 @@
         }
     }
 */
-#include "ccommon.h"
+#include "priv/linkage.h"
 
 #ifndef CLIST_H_INCLUDED
+#include "ccommon.h"
 #include "forward.h"
 #include <stdlib.h>
 #include <string.h>

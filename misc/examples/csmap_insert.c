@@ -34,7 +34,7 @@ int main()
     // insert single values
     csmap_ii m1 = {0};
     csmap_ii_insert(&m1, 1, 10);
-    csmap_ii_push(&m1, (csmap_ii_value){2, 20});
+    csmap_ii_push(&m1, c_LITERAL(csmap_ii_value){2, 20});
 
     puts("The original key and mapped values of m1 are:");
     print_ii(m1);
@@ -61,11 +61,11 @@ int main()
     csmap_ii m2 = {0};
     cvec_ii v = {0};
     typedef cvec_ii_value ipair;
-    cvec_ii_push(&v, (ipair){43, 294});
-    cvec_ii_push(&v, (ipair){41, 262});
-    cvec_ii_push(&v, (ipair){45, 330});
-    cvec_ii_push(&v, (ipair){42, 277});
-    cvec_ii_push(&v, (ipair){44, 311});
+    cvec_ii_push(&v, c_LITERAL(ipair){43, 294});
+    cvec_ii_push(&v, c_LITERAL(ipair){41, 262});
+    cvec_ii_push(&v, c_LITERAL(ipair){45, 330});
+    cvec_ii_push(&v, c_LITERAL(ipair){42, 277});
+    cvec_ii_push(&v, c_LITERAL(ipair){44, 311});
 
     puts("Inserting the following vector data into m2:");
     c_foreach (e, cvec_ii, v)

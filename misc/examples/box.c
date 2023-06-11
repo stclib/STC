@@ -5,7 +5,7 @@
 typedef struct { cstr name, last; } Person;
 
 Person Person_make(const char* name, const char* last) {
-    return (Person){.name = cstr_from(name), .last = cstr_from(last)};
+    return c_LITERAL(Person){.name = cstr_from(name), .last = cstr_from(last)};
 }
 
 uint64_t Person_hash(const Person* a) {

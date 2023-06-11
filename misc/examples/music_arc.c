@@ -13,7 +13,7 @@ int Song_cmp(const Song* x, const Song* y)
     { return cstr_cmp(&x->title, &y->title); }
 
 Song Song_make(const char* artist, const char* title)
-    { return (Song){cstr_from(artist), cstr_from(title)}; }
+    { return c_LITERAL(Song){cstr_from(artist), cstr_from(title)}; }
 
 void Song_drop(Song* s) {
     printf("drop: %s\n", cstr_str(&s->title));

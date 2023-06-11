@@ -112,7 +112,7 @@ uint64_t        csview_hash(const csview* x);
 
 | Name           | Value                | Usage                                        |
 |:---------------|:---------------------|:---------------------------------------------|
-| `csview_NULL`  | same as `c_sv("")`   | `sview = csview_NULL;`                       |
+| `csview_null`  | same as `c_sv("")`   | `sview = csview_null;`                       |
 | `c_SV(sv)`     | printf argument      | `printf("sv: %.*s\n", c_SV(sv));`            |
 
 ## Example

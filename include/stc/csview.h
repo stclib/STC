@@ -20,14 +20,14 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#define _i_no_undef
+#define _i_nested
 #include "utf8.h"
 
 #ifndef CSVIEW_H_INCLUDED
 #define CSVIEW_H_INCLUDED
 
-#define             csview_NULL c_sv_1("")
-#define             csview_init() csview_NULL
+#define             csview_null c_sv_1("")
+#define             csview_init() csview_null
 #define             csview_drop(p) c_default_drop(p)
 #define             csview_clone(sv) c_default_clone(sv)
 #define             csview_lit(literal) c_sv_1(literal)
@@ -42,7 +42,7 @@ extern csview       csview_token(csview sv, const char* sep, intptr_t* start);
 
 STC_INLINE csview   csview_from(const char* str)
                         { return c_LITERAL(csview){str, c_strlen(str)}; }
-STC_INLINE void     csview_clear(csview* self) { *self = csview_NULL; }
+STC_INLINE void     csview_clear(csview* self) { *self = csview_null; }
 
 STC_INLINE intptr_t   csview_size(csview sv) { return sv.size; }
 STC_INLINE bool     csview_empty(csview sv) { return sv.size == 0; }
@@ -150,8 +150,8 @@ STC_INLINE csview cstr_u8_substr(const cstr* self , intptr_t bytepos, intptr_t u
 #endif
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
+#if defined i_import || (defined i_implement && !defined _i_nested)
 #ifndef CSVIEW_C_INCLUDED
-#if defined i_import || (defined i_implement && !defined _i_no_undef)
 #define CSVIEW_C_INCLUDED
 
 csview_iter csview_advance(csview_iter it, intptr_t pos) {
@@ -201,13 +201,13 @@ csview csview_token(csview sv, const char* sep, intptr_t* start) {
     *start += tok.size + sep_size;
     return tok;
 }
-#endif
-#endif
-#ifndef _i_no_undef
+#endif // CSVIEW_C_INCLUDED
+#endif // i_implement
+#ifndef _i_nested
 #undef i_static
 #undef i_header
 #undef i_implement
 #undef i_import
 #undef i_opt
 #endif
-#undef _i_no_undef
+#undef _i_nested

@@ -117,10 +117,6 @@
 
 /* Function macros and others */
 
-#define c_init(C, ...) \
-    C##_from_n((C##_raw[])__VA_ARGS__, c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
-#define c_make(C, ...) c_init(C, __VA_ARGS__) // [deprecated]
-
 #define c_litstrlen(literal) (c_sizeof("" literal) - 1)
 #define c_arraylen(a) (intptr_t)(sizeof(a)/sizeof 0[a])
 
@@ -210,16 +206,23 @@ STC_INLINE intptr_t cnextpow2(intptr_t n) {
          ; (_inc > 0) ^ (i > _end); i += _inc)
 
 #ifndef __cplusplus
+  #define c_init(C, ...) \
+      C##_from_n((C##_raw[])__VA_ARGS__, c_sizeof((C##_raw[])__VA_ARGS__)/c_sizeof(C##_raw))
   #define c_forlist(it, T, ...) \
-    for (struct {T* ref; int size, index;} \
-         it = {.ref=(T[])__VA_ARGS__, .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
-         ; it.index < it.size; ++it.ref, ++it.index)
+      for (struct {T* ref; int size, index;} \
+           it = {.ref=(T[])__VA_ARGS__, .size=(int)(sizeof((T[])__VA_ARGS__)/sizeof(T))} \
+           ; it.index < it.size; ++it.ref, ++it.index)
 #else
-  #include <initializer_list>
-  #define c_forlist(it, T, ...) \
-    for (struct {std::initializer_list<T> _il; std::initializer_list<T>::iterator ref; size_t size, index;} \
-         it = {._il=__VA_ARGS__, .ref=it._il.begin(), .size=it._il.size()} \
-         ; it.index < it.size; ++it.ref, ++it.index)
+    #include <initializer_list>
+    template <class C, class T>
+    inline C _from_n(C (*func)(const T[], intptr_t), std::initializer_list<T> il)
+        { return func(&*il.begin(), il.size()); }
+
+    #define c_init(C, ...) _from_n<C,C##_raw>(C##_from_n, __VA_ARGS__)
+    #define c_forlist(it, T, ...) \
+        for (struct {std::initializer_list<T> _il; std::initializer_list<T>::iterator ref; size_t size, index;} \
+             it = {._il=__VA_ARGS__, .ref=it._il.begin(), .size=it._il.size()} \
+             ; it.index < it.size; ++it.ref, ++it.index)
 #endif
 
 #define c_drop(C, ...) \
@@ -236,23 +239,9 @@ STC_INLINE intptr_t cnextpow2(intptr_t n) {
     #define c_umul128(a, b, lo, hi) \
         asm("mulq %3" : "=a"(*(lo)), "=d"(*(hi)) : "a"(a), "rm"(b))
 #endif
+
+// [deprecated]:
+#define c_make(...) c_init(__VA_ARGS__)
+#define cspan_make(...) cspan_init(__VA_ARGS__)
+#define crange_make(...) crange_init(__VA_ARGS__)
 #endif // CCOMMON_H_INCLUDED
-
-#undef STC_API
-#undef STC_DEF
-
-#ifdef i_extern
-#  define i_import
-#endif
-#if !defined(i_static) && !defined(STC_STATIC) && (defined(i_header) || defined(STC_HEADER) || \
-                                                   defined(i_implement) || defined(STC_IMPLEMENT))
-  #define STC_API extern
-  #define STC_DEF
-#else
-  #define i_static
-  #define STC_API static inline
-  #define STC_DEF static inline
-#endif
-#if defined(STC_IMPLEMENT) || defined(i_import)
-  #define i_implement
-#endif

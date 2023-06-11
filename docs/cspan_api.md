@@ -26,7 +26,7 @@ i.e., it may be expanded multiple times. However, all integer arguments are safe
 `cspan_at(&ms3, i++, j++, k++)` is allowed. If the number of arguments does not match the span rank,
 a compile error is issued. Runtime bounds checks are enabled by default (define `STC_NDEBUG` or `NDEBUG` to disable).
 ```c
-SpanType        cspan_make(T SpanType, {v1, v2, ...});              // make a 1-d cspan from values
+SpanType        cspan_init(T SpanType, {v1, v2, ...});              // make a 1-d cspan from values
 SpanType        cspan_from(STCContainer* cnt);                      // make a 1-d cspan from compatible STC container
 SpanType        cspan_from_array(ValueType array[]);                // make a 1-d cspan from C array
 SpanTypeN       cspan_md(ValueType* data,  intptr_t xdim, ...);     // make a multi-dimensional cspan

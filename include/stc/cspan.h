@@ -60,6 +60,7 @@ int demo2() {
 #ifndef STC_CSPAN_H_INCLUDED
 #define STC_CSPAN_H_INCLUDED
 
+#include "priv/linkage.h"
 #include "ccommon.h"
 
 #define using_cspan(...) c_MACRO_OVERLOAD(using_cspan, __VA_ARGS__)
@@ -80,7 +81,7 @@ int demo2() {
         return (Self){.data=raw, .shape={(int32_t)n}}; \
     } \
     STC_INLINE Self Self##_slice_(Self##_value* v, const int32_t shape[], const int32_t stri[], \
-                                     const int rank, const int32_t a[][2]) { \
+                                  const int rank, const int32_t a[][2]) { \
         Self s = {.data=v}; int outrank; \
         s.data += _cspan_slice(s.shape, s.stride.d, &outrank, shape, stri, rank, a); \
         c_ASSERT(outrank == RANK); \
@@ -115,8 +116,8 @@ typedef struct { int32_t d[6]; } cspan_idx6;
 #define cspan_md(array, ...) \
     {.data=array, .shape={__VA_ARGS__}, .stride={.d={__VA_ARGS__}}}
 
-/* For static initialization, use cspan_make(). c_init() for non-static only. */
-#define cspan_make(SpanType, ...) \
+/* For static initialization, use cspan_init(). c_init() for non-static only. */
+#define cspan_init(SpanType, ...) \
     {.data=(SpanType##_value[])__VA_ARGS__, .shape={sizeof((SpanType##_value[])__VA_ARGS__)/sizeof(SpanType##_value)}}
 
 #define cspan_slice(OutSpan, parent, ...) \
@@ -210,6 +211,7 @@ STC_API intptr_t _cspan_next2(int rank, int32_t pos[], const int32_t shape[], co
 STC_API intptr_t _cspan_slice(int32_t odim[], int32_t ostri[], int* orank, 
                               const int32_t shape[], const int32_t stri[], 
                               int rank, const int32_t a[][2]);
+#endif // STC_CSPAN_H_INCLUDED
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement) || defined(i_static)
@@ -259,7 +261,6 @@ STC_DEF intptr_t _cspan_slice(int32_t odim[], int32_t ostri[], int* orank,
     *orank = j;
     return off;
 }
-#endif
 #endif
 #undef i_opt
 #undef i_header

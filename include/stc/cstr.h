@@ -24,7 +24,7 @@
 /* A string type with short string optimization in C99 with good small-string
  * optimization (22 characters with 24 bytes string).
  */
-#define _i_no_undef
+#define _i_nested
 #include "utf8.h"
 
 #ifndef CSTR_H_INCLUDED
@@ -67,7 +67,7 @@ extern char* _cstr_internal_move(cstr* self, intptr_t pos1, intptr_t pos2);
 /**************************** PUBLIC API **********************************/
 
 #define cstr_lit(literal) cstr_from_n(literal, c_litstrlen(literal))
-#define cstr_NULL (c_LITERAL(cstr){{{0}, 0}})
+#define cstr_null (c_LITERAL(cstr){0})
 #define cstr_toraw(self) cstr_str(self)
 
 extern char*        cstr_reserve(cstr* self, intptr_t cap);
@@ -97,7 +97,7 @@ STC_INLINE csview cstr_sv(const cstr* s) {
 }
 
 STC_INLINE cstr cstr_init(void)
-    { return cstr_NULL; }
+    { return cstr_null; }
 
 STC_INLINE cstr cstr_from_n(const char* str, const intptr_t len) {
     cstr s;
@@ -132,7 +132,7 @@ STC_INLINE cstr* cstr_take(cstr* self, const cstr s) {
 
 STC_INLINE cstr cstr_move(cstr* self) {
     cstr tmp = *self;
-    *self = cstr_NULL;
+    *self = cstr_null;
     return tmp;
 }
 
@@ -440,8 +440,8 @@ cstr cstr_tocase(csview sv, int k) {
 #endif // i_import
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
+#if defined i_import || (defined i_implement && !defined _i_nested)
 #ifndef CSTR_C_INCLUDED
-#if defined i_import || (defined i_implement && !defined _i_no_undef)
 #define CSTR_C_INCLUDED
 
 uint64_t cstr_hash(const cstr *self) {
@@ -573,7 +573,7 @@ bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
 
 cstr
 cstr_replace_sv(csview in, csview search, csview repl, int32_t count) {
-    cstr out = cstr_NULL;
+    cstr out = cstr_null;
     intptr_t from = 0; char* res;
     if (!count) count = INT32_MAX;
     if (search.size)
@@ -625,7 +625,7 @@ intptr_t cstr_vfmt(cstr* self, intptr_t start, const char* fmt, va_list args) {
 #endif
 
 cstr cstr_from_fmt(const char* fmt, ...) {
-    cstr s = cstr_NULL;
+    cstr s = cstr_null;
     va_list args;
     va_start(args, fmt);
     cstr_vfmt(&s, 0, fmt, args);
@@ -649,17 +649,17 @@ intptr_t cstr_printf(cstr* self, const char* fmt, ...) {
     va_end(args);
     return n;
 }
-#endif // i_implement
 #endif // CSTR_C_INCLUDED
+#endif // i_implement
 
 #if defined __GNUC__ && !defined __clang__
 #  pragma GCC diagnostic pop
 #endif
-#ifndef _i_no_undef
+#ifndef _i_nested
 #undef i_opt
 #undef i_header
 #undef i_static
 #undef i_implement
 #undef i_import
 #endif
-#undef _i_no_undef
+#undef _i_nested

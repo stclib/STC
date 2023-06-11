@@ -28,20 +28,20 @@ THE SOFTWARE.
 
 #include <setjmp.h>
 #ifdef i_import
-#  define _i_extern
+#  define _i_import
 #endif
 #ifndef CREGEX_H_INCLUDED
 #  include "../include/stc/cregex.h"
 #endif
-#ifdef _i_extern
+#ifdef _i_import
 #  include "utf8code.c"
 #endif
-#ifdef _i_extern
+#ifdef _i_import
 #  define i_implement
 #else
 #  undef i_implement
 #endif
-#undef _i_extern
+#undef _i_import
 #include "../include/stc/cstr.h"
 
 typedef uint32_t _Rune; /* Utf8 code point */
@@ -944,14 +944,14 @@ _runematch(_Rune s, _Rune r)
     case ASC_LO: inv = 1; case ASC_lo: return inv ^ (islower((int)r) != 0);
     case ASC_UP: inv = 1; case ASC_up: return inv ^ (isupper((int)r) != 0);
     case ASC_XD: inv = 1; case ASC_xd: return inv ^ (isxdigit((int)r) != 0);
-    case UTF_AN: inv = 1; case UTF_an: return inv ^ utf8_isalnum(r);
-    case UTF_BL: inv = 1; case UTF_bl: return inv ^ utf8_isblank(r);
-    case UTF_SP: inv = 1; case UTF_sp: return inv ^ utf8_isspace(r);
-    case UTF_LL: inv = 1; case UTF_ll: return inv ^ utf8_islower(r);
-    case UTF_LU: inv = 1; case UTF_lu: return inv ^ utf8_isupper(r);
-    case UTF_LC: inv = 1; case UTF_lc: return inv ^ utf8_iscased(r); 
-    case UTF_AL: inv = 1; case UTF_al: return inv ^ utf8_isalpha(r);
-    case UTF_WR: inv = 1; case UTF_wr: return inv ^ utf8_isword(r);
+    case UTF_AN: inv = 1; case UTF_an: return inv ^ (int)utf8_isalnum(r);
+    case UTF_BL: inv = 1; case UTF_bl: return inv ^ (int)utf8_isblank(r);
+    case UTF_SP: inv = 1; case UTF_sp: return inv ^ (int)utf8_isspace(r);
+    case UTF_LL: inv = 1; case UTF_ll: return inv ^ (int)utf8_islower(r);
+    case UTF_LU: inv = 1; case UTF_lu: return inv ^ (int)utf8_isupper(r);
+    case UTF_LC: inv = 1; case UTF_lc: return inv ^ (int)utf8_iscased(r); 
+    case UTF_AL: inv = 1; case UTF_al: return inv ^ (int)utf8_isalpha(r);
+    case UTF_WR: inv = 1; case UTF_wr: return inv ^ (int)utf8_isword(r);
     case UTF_cc: case UTF_CC:
     case UTF_lt: case UTF_LT:
     case UTF_nd: case UTF_ND:
@@ -972,7 +972,7 @@ _runematch(_Rune s, _Rune r)
     case UTF_latin: case UTF_LATIN:
         n = (int)s - UTF_GRP;
         inv = n & 1;
-        return inv ^ utf8_isgroup(n / 2, r);
+        return inv ^ (int)utf8_isgroup(n / 2, r);
     }
     return s == r;
 }
@@ -1220,7 +1220,7 @@ _build_subst(const char* replace, int nmatch, const csview match[],
     cstr_buf buf = cstr_buffer(subst);
     intptr_t len = 0, cap = buf.cap;
     char* dst = buf.data;
-    cstr mstr = cstr_NULL;
+    cstr mstr = cstr_null;
 
     while (*replace != '\0') {
         if (*replace == '$') {
@@ -1293,8 +1293,8 @@ cregex_find_pattern_4(const char* pattern, const char* input,
 cstr
 cregex_replace_sv_6(const cregex* re, csview input, const char* replace, int count,
                     bool (*mfun)(int, csview, cstr*), int rflags) {
-    cstr out = cstr_NULL;
-    cstr subst = cstr_NULL;
+    cstr out = cstr_null;
+    cstr subst = cstr_null;
     csview match[CREG_MAX_CAPTURES];
     int nmatch = cregex_captures(re) + 1;
     if (!count) count = INT32_MAX;

@@ -47,7 +47,7 @@ int main()
 #ifndef STC_FILTER_H_INCLUDED
 #define STC_FILTER_H_INCLUDED
 
-#include <stc/ccommon.h>
+#include "../ccommon.h"
 
 // c_forfilter:
 
