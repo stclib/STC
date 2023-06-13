@@ -138,14 +138,14 @@ STC_INLINE intptr_t utf8_pos(const char* s, intptr_t index)
     { return (intptr_t)(utf8_at(s, index) - s); }
 #endif // UTF8_H_INCLUDED
 
-#if defined i_import || (defined i_implement && !defined _i_nested)
+#if defined i_import || (defined i_implement && !defined _i_inc_utf8)
 #  include "../../src/utf8code.c"
 #endif
-#ifndef _i_nested
+#ifndef _i_inc_utf8
 #undef i_static
 #undef i_header
 #undef i_implement
 #undef i_import
 #undef i_opt
 #endif
-#undef _i_nested
+#undef _i_inc_utf8

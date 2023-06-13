@@ -20,7 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#define _i_nested
+#define _i_inc_utf8
 #include "utf8.h"
 
 #ifndef CSVIEW_H_INCLUDED
@@ -150,7 +150,7 @@ STC_INLINE csview cstr_u8_substr(const cstr* self , intptr_t bytepos, intptr_t u
 #endif
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined i_import || (defined i_implement && !defined _i_nested)
+#if defined i_import || defined i_implement
 #ifndef CSVIEW_C_INCLUDED
 #define CSVIEW_C_INCLUDED
 
@@ -203,11 +203,8 @@ csview csview_token(csview sv, const char* sep, intptr_t* start) {
 }
 #endif // CSVIEW_C_INCLUDED
 #endif // i_implement
-#ifndef _i_nested
 #undef i_static
 #undef i_header
 #undef i_implement
 #undef i_import
 #undef i_opt
-#endif
-#undef _i_nested

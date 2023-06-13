@@ -24,7 +24,7 @@
 /* A string type with short string optimization in C99 with good small-string
  * optimization (22 characters with 24 bytes string).
  */
-#define _i_nested
+#define _i_inc_utf8
 #include "utf8.h"
 
 #ifndef CSTR_H_INCLUDED
@@ -440,7 +440,7 @@ cstr cstr_tocase(csview sv, int k) {
 #endif // i_import
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined i_import || (defined i_implement && !defined _i_nested)
+#if defined i_import || defined i_implement
 #ifndef CSTR_C_INCLUDED
 #define CSTR_C_INCLUDED
 
@@ -655,11 +655,8 @@ intptr_t cstr_printf(cstr* self, const char* fmt, ...) {
 #if defined __GNUC__ && !defined __clang__
 #  pragma GCC diagnostic pop
 #endif
-#ifndef _i_nested
 #undef i_opt
 #undef i_header
 #undef i_static
 #undef i_implement
 #undef i_import
-#endif
-#undef _i_nested

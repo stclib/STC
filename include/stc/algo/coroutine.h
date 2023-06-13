@@ -84,7 +84,21 @@ enum {
         case __LINE__: if (!(promise)) {return ret; goto _resume;} \
     } while (0)
 
-#define cco_run(co, call) while (call, !cco_done(co))
+#define cco_closure(Ret, Closure, ...) \
+    struct Closure { \
+        Ret (*coroutine)(struct Closure*); \
+        __VA_ARGS__ \
+        int cco_state; \
+    }
+
+#define cco_resume(closure) (closure)->coroutine(closure)
+#define cco_await_on(...) c_MACRO_OVERLOAD(cco_await_on, __VA_ARGS__)
+#define cco_await_on_1(closure) cco_await_on_2(closure, cco_resume(closure))
+#define cco_await_on_2(co, func) cco_await_1((func(co), !cco_done(co)))
+
+#define cco_block_on(...) c_MACRO_OVERLOAD(cco_block_on, __VA_ARGS__)
+#define cco_block_on_1(closure) while (cco_resume(closure), !cco_done(closure))
+#define cco_block_on_2(co, func) while (func(co), !cco_done(co))
 
 #define cco_final \
     *_state = cco_state_final; case cco_state_final

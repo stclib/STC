@@ -380,6 +380,9 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |           | `cco_await(promise, ret)`            | Await/suspend with ret value            |
 |           | `cco_return`                         | Replaces return. Jump to cco_final: if exist|
 |           | `cco_return_v(val)`                  | Yield final value, enter final-state    |
+|           | `cco_closure(Ret, Closure, ...)`     | Define coroutine closure struct.        |
+| `void`    | `cco_await_on(closure) { }`          | Await on closure to finish              |
+| `void`    | `cco_await_on(co, func) { }`         | Await on func(co) to finish             |
 |           | Semaphores:                          |                                         | 
 |           | `cco_sem`                            | Semaphore type                          |
 |           | `cco_sem_await(sem)`                 | Await for the semaphore count > 0       |
@@ -398,7 +401,8 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |           | From caller side:                    |                                         | 
 | `void`    | `cco_stop(co)`                       | Next call of coroutine finalizes        |
 | `void`    | `cco_reset(co)`                      | Reset state to initial (for reuse)      |
-| `void`    | `cco_run(co, corocall) { }`          | Run blocking until coro is done         |
+| `void`    | `cco_block_on(closure) { }`          | Run blocking until closure is finished  |
+| `void`    | `cco_block_on(co, func) { }`         | Run blocking until func is finished     |
 |           | Time functions:                      |                                         |
 | `double`  | `cco_time(void)`                     | Return secs with usec prec. since Epoch |
 |           | `cco_sleep(double sec)`              | Sleep for seconds (msec or usec prec.)  |

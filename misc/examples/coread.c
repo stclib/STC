@@ -32,7 +32,7 @@ int main(void)
 {
     struct file_read g = {__FILE__};
     int n = 0;
-    cco_run(&g, file_read(&g))
+    cco_block_on(&g, file_read)
     {
         printf("%3d %s\n", ++n, cstr_str(&g.line));
         //if (n == 10) cco_stop(&g);
