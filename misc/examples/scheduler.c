@@ -2,12 +2,9 @@
 #include <stdio.h>
 #include <stc/calgo.h>
 
-struct Scheduler;
-struct Task {
-    bool (*resume)(struct Task*);
+cco_closure(bool, Task,
     struct Scheduler* sched;
-    int cco_state;
-};
+);
 
 #define i_type Scheduler
 #define i_val struct Task
@@ -20,7 +17,7 @@ static bool schedule(Scheduler* sched)
     Scheduler_pop(sched);
     
     if (!cco_done(&task))
-        task.resume(&task);
+        cco_resume(&task);
     
     return !Scheduler_empty(sched);
 }

@@ -93,8 +93,8 @@ enum {
 
 #define cco_resume(closure) (closure)->coroutine(closure)
 #define cco_await_on(...) c_MACRO_OVERLOAD(cco_await_on, __VA_ARGS__)
-#define cco_await_on_1(closure) cco_await_on_2(closure, cco_resume(closure))
-#define cco_await_on_2(co, func) cco_await_1((func(co), !cco_done(co)))
+#define cco_await_on_1(closure) cco_await_2((cco_resume(closure), cco_done(closure)), )
+#define cco_await_on_2(co, func) cco_await_2((func(co), cco_done(co)), )
 
 #define cco_block_on(...) c_MACRO_OVERLOAD(cco_block_on, __VA_ARGS__)
 #define cco_block_on_1(closure) while (cco_resume(closure), !cco_done(closure))

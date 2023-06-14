@@ -22,6 +22,7 @@
  */
 #define _i_prefix cdeq_
 #define _pop _pop_front
+#define _pull _pull_front
 #ifdef i_more
   #include "cqueue.h"
   #define i_more
@@ -53,6 +54,12 @@ _cx_memb(_pop_back)(_cx_self* self) {
     assert(!_cx_memb(_empty)(self));
     self->end = (self->end - 1) & self->capmask;
     i_keydrop((self->data + self->end));
+}
+
+STC_INLINE _cx_value _cx_memb(_pull_back)(_cx_self* self) { // move back out of deq
+    assert(!_cx_memb(_empty)(self));
+    self->end = (self->end - 1) & self->capmask;
+    return self->data[self->end];
 }
 
 STC_INLINE _cx_iter

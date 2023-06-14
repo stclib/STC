@@ -133,7 +133,9 @@ STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return self->da
 STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self)
                             { return self->data + self->_len - 1; }
 STC_INLINE void         _cx_memb(_pop)(_cx_self* self)
-                            { assert(!_cx_memb(_empty)(self)); _cx_value* p = &self->data[--self->_len]; i_keydrop(p); }
+                            { assert(self->_len); _cx_value* p = &self->data[--self->_len]; i_keydrop(p); }
+STC_INLINE _cx_value    _cx_memb(_pull)(_cx_self* self)
+                            { assert(self->_len); return self->data[--self->_len]; }
 STC_INLINE _cx_value*   _cx_memb(_push_back)(_cx_self* self, i_key value)
                             { return _cx_memb(_push)(self, value); }
 STC_INLINE void         _cx_memb(_pop_back)(_cx_self* self) { _cx_memb(_pop)(self); }

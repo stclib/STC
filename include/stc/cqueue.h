@@ -93,6 +93,13 @@ STC_INLINE void _cx_memb(_pop)(_cx_self* self) { // pop_front
     self->start = (self->start + 1) & self->capmask;
 }
 
+STC_INLINE _cx_value _cx_memb(_pull)(_cx_self* self) { // move front out of queue
+    assert(!_cx_memb(_empty)(self));
+    intptr_t s = self->start;
+    self->start = (s + 1) & self->capmask;
+    return self->data[s];
+}
+
 STC_INLINE void _cx_memb(_copy)(_cx_self* self, const _cx_self* other) {
     if (self->data == other->data) return;
     _cx_memb(_drop)(self);
@@ -162,7 +169,7 @@ _cx_memb(_reserve)(_cx_self* self, const intptr_t n) {
     if (!data)
         return false;
     intptr_t head = oldcap - self->start;
-    if (self->start < self->end || self->start == 0)
+    if (self->start <= self->end)
         ;
     else if (head < self->end) {
         self->start = newcap - head;
