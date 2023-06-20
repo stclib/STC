@@ -86,12 +86,20 @@ enum {
 
 #define cco_closure(Ret, Closure, ...) \
     struct Closure { \
-        Ret (*coroutine)(struct Closure*); \
-        __VA_ARGS__ \
+        Ret (*cco_fn)(struct Closure*); \
         int cco_state; \
+        __VA_ARGS__ \
     }
 
-#define cco_resume(closure) (closure)->coroutine(closure)
+typedef struct cco_base { 
+    void (*cco_fn)(struct cco_base*);
+    int cco_state;
+} cco_base;
+
+#define cco_cast(closure) \
+    ((cco_base *)(closure) + 0*sizeof((cco_resume(closure), (int*)0 == &(closure)->cco_state)))
+
+#define cco_resume(closure) (closure)->cco_fn(closure)
 #define cco_await_on(...) c_MACRO_OVERLOAD(cco_await_on, __VA_ARGS__)
 #define cco_await_on_1(closure) cco_await_2((cco_resume(closure), cco_done(closure)), )
 #define cco_await_on_2(co, func) cco_await_2((func(co), cco_done(co)), )

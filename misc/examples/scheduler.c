@@ -58,8 +58,8 @@ static bool taskB(struct Task* task)
 void Use(void)
 {
     Scheduler scheduler = c_init(Scheduler, {
-        {taskA, &scheduler}, 
-        {taskB, &scheduler},
+        {.cco_fn=taskA, .sched=&scheduler}, 
+        {.cco_fn=taskB, .sched=&scheduler},
     });
 
     while (schedule(&scheduler)) {}

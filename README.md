@@ -3,7 +3,7 @@
 STC - Smart Template Containers
 ===============================
 
-### [Version 4.3 RC](#version-history)
+### [Version 4.3 RC2](#version-history)
 
 ---
 Description
@@ -613,6 +613,8 @@ STC is generally very memory efficient. Memory usage for the different container
 # Version History
 
 ## Version 4.3
+- algo/coroutine.h much improved with new API and more features.
+- New cdeq and cqueue implementation(s), using circular buffer.
 - Removed deprecated uppercase flow-control macro names.
 - Removed deprecated crandom.h. Use crand.h with new API.
 - Improved default string hash function.
