@@ -69,7 +69,7 @@ enum {
 /* Always use { } after cco_switch(x), cco_case(val), and cco_default. */
 #define cco_switch(x) for (intmax_t _sw = (intmax_t)(x), _once=1; _once; _once=0)
 #define cco_case(val) if (_sw == (intmax_t)(val))
-#define cco_default else
+#define cco_default
 
 #define cco_routine(co) \
     for (int *_state = &(co)->cco_state; *_state != cco_state_done; *_state = cco_state_done) \
