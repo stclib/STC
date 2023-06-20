@@ -26,7 +26,7 @@ template params:
 #define i_less          - less function. default: *x < *y
 #define i_type name     - define {{name}}_sort_n(), else {{i_val}}array_sort_n().
 
-// test:
+// ex1:
 #include <stdio.h>
 #define i_val int
 #include <stc/algo/sort.h>
@@ -34,11 +34,30 @@ template params:
 int main() {
     int nums[] = {23, 321, 5434, 25, 245, 1, 654, 33, 543, 21};
     
-    intarray_sort_n(nums, c_arraylen(arr));
+    intarray_sort_n(nums, c_arraylen(nums));
 
     for (int i = 0; i < c_arraylen(nums); i++)
         printf(" %d", nums[i]);
     puts("");
+}
+
+// ex2:
+#define i_val int
+#define i_type IDeq
+#define i_retain // retain input template params to be reused by sort.h
+#include <stc/cdeq.h>
+#include <stc/algo/sort.h>
+
+int main() {
+    IDeq nums = c_init(IDeq, {5434, 25, 245, 1, 654, 33, 543, 21});
+    IDeq_push_front(&nums, 23);
+    IDeq_push_front(&nums, 321);
+    
+    IDeq_sort_n(&nums, IDeq_size(&nums));
+
+    c_foreach (i, IDeq, nums)
+        printf(" %d", *i.ref);
+    IDeq_drop(&nums);
 }
 */
 #include "../ccommon.h"

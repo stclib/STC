@@ -222,11 +222,11 @@ int main() {
 }
 ```
 Containers with random access may also be sorted. Even sorting cdeq/cqueue (with ring buffer) is
-possible and very fast. Note that `i_more` must be defined to pick up template parameters from the container:
+possible and very fast. Note that `i_retain` must be defined to retain specified template parameters for use by sort:
 ```c
 #define i_type MyDeq
 #define i_val int
-#define i_more
+#define i_retain
 #include <stc/cdeq.h> // deque
 #include <stc/algo/sort.h>
 #include <stdio.h>

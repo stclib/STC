@@ -23,11 +23,11 @@
 #define _i_prefix cdeq_
 #define _pop _pop_front
 #define _pull _pull_front
-#ifdef i_more
+#ifdef i_retain
   #include "cqueue.h"
-  #define i_more
+  #define i_retain
 #else
-  #define i_more
+  #define i_retain
   #include "cqueue.h"
 #endif
 #undef _pop
