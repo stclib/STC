@@ -72,10 +72,10 @@
 #undef i_no_clone
 #undef i_no_emplace
 #undef i_is_forward
+#undef i_has_emplace
 
 #undef _i_prefix
 #undef _i_expandby
-#undef _i_has_from
 #undef _i_has_eq
 #undef _i_has_cmp
 #undef _i_template

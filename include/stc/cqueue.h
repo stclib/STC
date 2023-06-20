@@ -165,21 +165,21 @@ _cx_memb(_reserve)(_cx_self* self, const intptr_t n) {
     if (n <= self->capmask)
         return true;
     intptr_t oldcap = self->capmask + 1, newcap = cnextpow2(n + 1);
-    _cx_value* data = (_cx_value *)i_realloc(self->data, newcap*c_sizeof *self->data);
-    if (!data)
+    _cx_value* d = (_cx_value *)i_realloc(self->data, newcap*c_sizeof *self->data);
+    if (!d)
         return false;
     intptr_t head = oldcap - self->start;
     if (self->start <= self->end)
         ;
     else if (head < self->end) {
         self->start = newcap - head;
-        c_memmove(data + self->start, data + oldcap - head, head*c_sizeof *data);
+        c_memmove(d + self->start, d + oldcap - head, head*c_sizeof *d);
     } else {
-        c_memmove(data + oldcap, data, self->end*c_sizeof *data);
+        c_memmove(d + oldcap, d, self->end*c_sizeof *d);
         self->end += oldcap;
     }
     self->capmask = newcap - 1;
-    self->data = data;
+    self->data = d;
     return true;
 }
 

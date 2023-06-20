@@ -112,7 +112,6 @@
 #if defined i_key_str
   #define i_keyclass cstr
   #define i_rawclass crawstr
-  #define i_keyfrom cstr_from
   #ifndef i_tag
     #define i_tag str
   #endif
@@ -188,7 +187,7 @@
 #ifndef i_keyfrom
   #define i_keyfrom c_default_clone
 #else
-  #define _i_has_from
+  #define i_has_emplace
 #endif
 #ifndef i_keyto
   #define i_keyto c_default_toraw
@@ -225,8 +224,7 @@
 
 #ifdef i_val_str
   #define i_valclass cstr
-  #define i_valraw crawstr
-  #define i_valfrom cstr_from
+  #define i_valraw const char*
 #elif defined i_val_ssv
   #define i_valclass cstr
   #define i_valraw csview
@@ -266,7 +264,7 @@
 #ifndef i_valfrom
   #define i_valfrom c_default_clone
 #else
-  #define _i_has_from
+  #define i_has_emplace
 #endif
 #ifndef i_valto
   #define i_valto c_default_toraw
@@ -286,7 +284,7 @@
 #ifndef i_valraw
   #define i_valraw i_keyraw
 #endif
-#ifndef _i_has_from
+#ifndef i_has_emplace
   #define i_no_emplace
 #endif
 #endif
