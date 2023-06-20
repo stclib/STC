@@ -52,12 +52,12 @@ int main() {
   typedef i_val i_type;
 #endif
 #ifndef i_at
-  #define i_at(arr, idx) _cx_memb(_at_mut)(arr, idx)
+  #define i_at(arr, idx) _cx_MEMB(_at_mut)(arr, idx)
 #endif
 #include "../priv/template.h"
 
 
-static inline void _cx_memb(_insertsort_ij)(_cx_self* arr, intptr_t lo, intptr_t hi) {
+static inline void _cx_MEMB(_insertsort_ij)(_cx_Self* arr, intptr_t lo, intptr_t hi) {
     for (intptr_t j = lo, i = lo + 1; i <= hi; j = i, ++i) {
         i_val key = *i_at(arr, i);
         while (j >= 0 && (i_less((&key), i_at(arr, j)))) {
@@ -68,7 +68,7 @@ static inline void _cx_memb(_insertsort_ij)(_cx_self* arr, intptr_t lo, intptr_t
     }
 }
 
-static inline void _cx_memb(_sort_ij)(_cx_self* arr, intptr_t lo, intptr_t hi) {
+static inline void _cx_MEMB(_sort_ij)(_cx_Self* arr, intptr_t lo, intptr_t hi) {
     intptr_t i = lo, j;
     while (lo < hi) {
         i_val pivot = *i_at(arr, lo + (hi - lo)*7/16);
@@ -87,14 +87,14 @@ static inline void _cx_memb(_sort_ij)(_cx_self* arr, intptr_t lo, intptr_t hi) {
             c_swap(intptr_t, &hi, &j);
         }
 
-        if (j - lo > 64) _cx_memb(_sort_ij)(arr, lo, j);
-        else if (j > lo) _cx_memb(_insertsort_ij)(arr, lo, j);
+        if (j - lo > 64) _cx_MEMB(_sort_ij)(arr, lo, j);
+        else if (j > lo) _cx_MEMB(_insertsort_ij)(arr, lo, j);
         lo = i;
     }
 }
 
-static inline void _cx_memb(_sort_n)(_cx_self* arr, intptr_t len) {
-    _cx_memb(_sort_ij)(arr, 0, len - 1);
+static inline void _cx_MEMB(_sort_n)(_cx_Self* arr, intptr_t len) {
+    _cx_MEMB(_sort_ij)(arr, 0, len - 1);
 }
 
 #include "../priv/template2.h"

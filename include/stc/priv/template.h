@@ -25,17 +25,17 @@
 
 #ifndef STC_TEMPLATE_H_INCLUDED
 #define STC_TEMPLATE_H_INCLUDED
-  #define _cx_self i_type
-  #define _cx_memb(name) c_PASTE(_cx_self, name)
-  #define _cx_deftypes(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
-  #define _cx_value _cx_memb(_value)
-  #define _cx_key _cx_memb(_key)
-  #define _cx_mapped _cx_memb(_mapped)
-  #define _cx_raw _cx_memb(_raw)
-  #define _cx_keyraw _cx_memb(_keyraw)
-  #define _cx_iter _cx_memb(_iter)
-  #define _cx_result _cx_memb(_result)
-  #define _cx_node _cx_memb(_node)
+  #define _cx_Self i_type
+  #define _cx_MEMB(name) c_PASTE(_cx_Self, name)
+  #define _cx_DEFTYPES(macro, SELF, ...) c_EXPAND(macro(SELF, __VA_ARGS__))
+  #define _cx_value _cx_MEMB(_value)
+  #define _cx_key _cx_MEMB(_key)
+  #define _cx_mapped _cx_MEMB(_mapped)
+  #define _cx_raw _cx_MEMB(_raw)
+  #define _cx_keyraw _cx_MEMB(_keyraw)
+  #define _cx_iter _cx_MEMB(_iter)
+  #define _cx_result _cx_MEMB(_result)
+  #define _cx_node _cx_MEMB(_node)
 #endif
 
 #ifndef i_type

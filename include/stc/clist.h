@@ -82,77 +82,77 @@
 #include "priv/template.h"
 
 #ifndef i_is_forward
-  _cx_deftypes(_c_clist_types, _cx_self, i_key);
+  _cx_DEFTYPES(_c_clist_types, _cx_Self, i_key);
 #endif
-_cx_deftypes(_c_clist_complete_types, _cx_self, dummy);
+_cx_DEFTYPES(_c_clist_complete_types, _cx_Self, dummy);
 typedef i_keyraw _cx_raw;
 
-STC_API void            _cx_memb(_drop)(_cx_self* self);
-STC_API _cx_value*      _cx_memb(_push_back)(_cx_self* self, i_key value);
-STC_API _cx_value*      _cx_memb(_push_front)(_cx_self* self, i_key value);
-STC_API _cx_iter        _cx_memb(_insert_at)(_cx_self* self, _cx_iter it, i_key value);
-STC_API _cx_iter        _cx_memb(_erase_at)(_cx_self* self, _cx_iter it);
-STC_API _cx_iter        _cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2);
+STC_API void            _cx_MEMB(_drop)(_cx_Self* self);
+STC_API _cx_value*      _cx_MEMB(_push_back)(_cx_Self* self, i_key value);
+STC_API _cx_value*      _cx_MEMB(_push_front)(_cx_Self* self, i_key value);
+STC_API _cx_iter        _cx_MEMB(_insert_at)(_cx_Self* self, _cx_iter it, i_key value);
+STC_API _cx_iter        _cx_MEMB(_erase_at)(_cx_Self* self, _cx_iter it);
+STC_API _cx_iter        _cx_MEMB(_erase_range)(_cx_Self* self, _cx_iter it1, _cx_iter it2);
 #if !defined i_no_cmp || defined _i_has_eq
-STC_API _cx_iter        _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw val);
-STC_API intptr_t        _cx_memb(_remove)(_cx_self* self, _cx_raw val);
+STC_API _cx_iter        _cx_MEMB(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw val);
+STC_API intptr_t        _cx_MEMB(_remove)(_cx_Self* self, _cx_raw val);
 #endif
 #ifndef i_no_cmp
-STC_API bool            _cx_memb(_sort_with)(_cx_self* self, int(*cmp)(const _cx_value*, const _cx_value*));
-STC_API int             _cx_memb(_sort_cmp_)(const _cx_value*, const _cx_value*);
-STC_INLINE bool         _cx_memb(_sort)(_cx_self* self)
-                            { return _cx_memb(_sort_with)(self, _cx_memb(_sort_cmp_)); }
+STC_API bool            _cx_MEMB(_sort_with)(_cx_Self* self, int(*cmp)(const _cx_value*, const _cx_value*));
+STC_API int             _cx_MEMB(_sort_cmp_)(const _cx_value*, const _cx_value*);
+STC_INLINE bool         _cx_MEMB(_sort)(_cx_Self* self)
+                            { return _cx_MEMB(_sort_with)(self, _cx_MEMB(_sort_cmp_)); }
 #endif
-STC_API void            _cx_memb(_reverse)(_cx_self* self);
-STC_API _cx_iter        _cx_memb(_splice)(_cx_self* self, _cx_iter it, _cx_self* other);
-STC_API _cx_self        _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2);
-STC_API _cx_value*      _cx_memb(_push_back_node)(_cx_self* self, _cx_node* node);
-STC_API _cx_value*      _cx_memb(_insert_after_node)(_cx_self* self, _cx_node* ref, _cx_node* node);
-STC_API _cx_node*       _cx_memb(_unlink_after_node)(_cx_self* self, _cx_node* ref);
-STC_API void            _cx_memb(_erase_after_node)(_cx_self* self, _cx_node* ref);
-STC_INLINE _cx_node*    _cx_memb(_get_node)(_cx_value* pval) { return _clist_tonode(pval); }
-STC_INLINE _cx_node*    _cx_memb(_unlink_front_node)(_cx_self* self)
-                            { return _cx_memb(_unlink_after_node)(self, self->last); }
+STC_API void            _cx_MEMB(_reverse)(_cx_Self* self);
+STC_API _cx_iter        _cx_MEMB(_splice)(_cx_Self* self, _cx_iter it, _cx_Self* other);
+STC_API _cx_Self        _cx_MEMB(_split_off)(_cx_Self* self, _cx_iter it1, _cx_iter it2);
+STC_API _cx_value*      _cx_MEMB(_push_back_node)(_cx_Self* self, _cx_node* node);
+STC_API _cx_value*      _cx_MEMB(_insert_after_node)(_cx_Self* self, _cx_node* ref, _cx_node* node);
+STC_API _cx_node*       _cx_MEMB(_unlink_after_node)(_cx_Self* self, _cx_node* ref);
+STC_API void            _cx_MEMB(_erase_after_node)(_cx_Self* self, _cx_node* ref);
+STC_INLINE _cx_node*    _cx_MEMB(_get_node)(_cx_value* pval) { return _clist_tonode(pval); }
+STC_INLINE _cx_node*    _cx_MEMB(_unlink_front_node)(_cx_Self* self)
+                            { return _cx_MEMB(_unlink_after_node)(self, self->last); }
 #if !defined i_no_clone
-STC_API _cx_self        _cx_memb(_clone)(_cx_self cx);
-STC_INLINE i_key        _cx_memb(_value_clone)(i_key val) { return i_keyclone(val); }
+STC_API _cx_Self        _cx_MEMB(_clone)(_cx_Self cx);
+STC_INLINE i_key        _cx_MEMB(_value_clone)(i_key val) { return i_keyclone(val); }
 STC_INLINE void
-_cx_memb(_copy)(_cx_self *self, const _cx_self* other) {
+_cx_MEMB(_copy)(_cx_Self *self, const _cx_Self* other) {
     if (self->last == other->last) return;
-    _cx_memb(_drop)(self); *self = _cx_memb(_clone)(*other);
+    _cx_MEMB(_drop)(self); *self = _cx_MEMB(_clone)(*other);
 }
 #endif // !i_no_clone
 
 #if !defined i_no_emplace
-STC_INLINE _cx_value*   _cx_memb(_emplace_back)(_cx_self* self, _cx_raw raw)
-                            { return _cx_memb(_push_back)(self, i_keyfrom(raw)); }
-STC_INLINE _cx_value*   _cx_memb(_emplace_front)(_cx_self* self, _cx_raw raw)
-                            { return _cx_memb(_push_front)(self, i_keyfrom(raw)); }
-STC_INLINE _cx_iter     _cx_memb(_emplace_at)(_cx_self* self, _cx_iter it, _cx_raw raw)
-                            { return _cx_memb(_insert_at)(self, it, i_keyfrom(raw)); }
-STC_INLINE _cx_value*   _cx_memb(_emplace)(_cx_self* self, _cx_raw raw)
-                            { return _cx_memb(_push_back)(self, i_keyfrom(raw)); }
+STC_INLINE _cx_value*   _cx_MEMB(_emplace_back)(_cx_Self* self, _cx_raw raw)
+                            { return _cx_MEMB(_push_back)(self, i_keyfrom(raw)); }
+STC_INLINE _cx_value*   _cx_MEMB(_emplace_front)(_cx_Self* self, _cx_raw raw)
+                            { return _cx_MEMB(_push_front)(self, i_keyfrom(raw)); }
+STC_INLINE _cx_iter     _cx_MEMB(_emplace_at)(_cx_Self* self, _cx_iter it, _cx_raw raw)
+                            { return _cx_MEMB(_insert_at)(self, it, i_keyfrom(raw)); }
+STC_INLINE _cx_value*   _cx_MEMB(_emplace)(_cx_Self* self, _cx_raw raw)
+                            { return _cx_MEMB(_push_back)(self, i_keyfrom(raw)); }
 #endif // !i_no_emplace
 
-STC_INLINE _cx_self     _cx_memb(_init)(void) { return c_LITERAL(_cx_self){NULL}; }
-STC_INLINE void         _cx_memb(_put_n)(_cx_self* self, const _cx_raw* raw, intptr_t n)
-                            { while (n--) _cx_memb(_push_back)(self, i_keyfrom(*raw++)); }
-STC_INLINE _cx_self     _cx_memb(_from_n)(const _cx_raw* raw, intptr_t n)
-                            { _cx_self cx = {0}; _cx_memb(_put_n)(&cx, raw, n); return cx; }
-STC_INLINE bool         _cx_memb(_reserve)(_cx_self* self, intptr_t n) { (void)(self + n); return true; }
-STC_INLINE bool         _cx_memb(_empty)(const _cx_self* self) { return self->last == NULL; }
-STC_INLINE void         _cx_memb(_clear)(_cx_self* self) { _cx_memb(_drop)(self); }
-STC_INLINE _cx_value*   _cx_memb(_push)(_cx_self* self, i_key value)
-                            { return _cx_memb(_push_back)(self, value); }
-STC_INLINE void         _cx_memb(_pop_front)(_cx_self* self)
-                            { assert(!_cx_memb(_empty)(self)); _cx_memb(_erase_after_node)(self, self->last); }
-STC_INLINE _cx_value*   _cx_memb(_front)(const _cx_self* self) { return &self->last->next->value; }
-STC_INLINE _cx_value*   _cx_memb(_back)(const _cx_self* self) { return &self->last->value; }
-STC_INLINE _cx_raw      _cx_memb(_value_toraw)(const _cx_value* pval) { return i_keyto(pval); }
-STC_INLINE void         _cx_memb(_value_drop)(_cx_value* pval) { i_keydrop(pval); }
+STC_INLINE _cx_Self     _cx_MEMB(_init)(void) { return c_LITERAL(_cx_Self){NULL}; }
+STC_INLINE void         _cx_MEMB(_put_n)(_cx_Self* self, const _cx_raw* raw, intptr_t n)
+                            { while (n--) _cx_MEMB(_push_back)(self, i_keyfrom(*raw++)); }
+STC_INLINE _cx_Self     _cx_MEMB(_from_n)(const _cx_raw* raw, intptr_t n)
+                            { _cx_Self cx = {0}; _cx_MEMB(_put_n)(&cx, raw, n); return cx; }
+STC_INLINE bool         _cx_MEMB(_reserve)(_cx_Self* self, intptr_t n) { (void)(self + n); return true; }
+STC_INLINE bool         _cx_MEMB(_empty)(const _cx_Self* self) { return self->last == NULL; }
+STC_INLINE void         _cx_MEMB(_clear)(_cx_Self* self) { _cx_MEMB(_drop)(self); }
+STC_INLINE _cx_value*   _cx_MEMB(_push)(_cx_Self* self, i_key value)
+                            { return _cx_MEMB(_push_back)(self, value); }
+STC_INLINE void         _cx_MEMB(_pop_front)(_cx_Self* self)
+                            { assert(!_cx_MEMB(_empty)(self)); _cx_MEMB(_erase_after_node)(self, self->last); }
+STC_INLINE _cx_value*   _cx_MEMB(_front)(const _cx_Self* self) { return &self->last->next->value; }
+STC_INLINE _cx_value*   _cx_MEMB(_back)(const _cx_Self* self) { return &self->last->value; }
+STC_INLINE _cx_raw      _cx_MEMB(_value_toraw)(const _cx_value* pval) { return i_keyto(pval); }
+STC_INLINE void         _cx_MEMB(_value_drop)(_cx_value* pval) { i_keydrop(pval); }
 
 STC_INLINE intptr_t
-_cx_memb(_count)(const _cx_self* self) {
+_cx_MEMB(_count)(const _cx_Self* self) {
     intptr_t n = 1; const _cx_node *node = self->last;
     if (!node) return 0;
     while ((node = node->next) != self->last) ++n;
@@ -160,53 +160,53 @@ _cx_memb(_count)(const _cx_self* self) {
 }
 
 STC_INLINE _cx_iter
-_cx_memb(_begin)(const _cx_self* self) {
+_cx_MEMB(_begin)(const _cx_Self* self) {
     _cx_value* head = self->last ? &self->last->next->value : NULL;
     return c_LITERAL(_cx_iter){head, &self->last, self->last};
 }
 
 STC_INLINE _cx_iter
-_cx_memb(_end)(const _cx_self* self)
+_cx_MEMB(_end)(const _cx_Self* self)
     { return c_LITERAL(_cx_iter){NULL}; }
 
 STC_INLINE void
-_cx_memb(_next)(_cx_iter* it) {
+_cx_MEMB(_next)(_cx_iter* it) {
     _cx_node* node = it->prev = _clist_tonode(it->ref);
     it->ref = (node == *it->_last ? NULL : &node->next->value);
 }
 
 STC_INLINE _cx_iter
-_cx_memb(_advance)(_cx_iter it, size_t n) {
-    while (n-- && it.ref) _cx_memb(_next)(&it);
+_cx_MEMB(_advance)(_cx_iter it, size_t n) {
+    while (n-- && it.ref) _cx_MEMB(_next)(&it);
     return it;
 }
 
 STC_INLINE _cx_iter
-_cx_memb(_splice_range)(_cx_self* self, _cx_iter it,
-                        _cx_self* other, _cx_iter it1, _cx_iter it2) {
-    _cx_self tmp = _cx_memb(_split_off)(other, it1, it2);
-    return _cx_memb(_splice)(self, it, &tmp);
+_cx_MEMB(_splice_range)(_cx_Self* self, _cx_iter it,
+                        _cx_Self* other, _cx_iter it1, _cx_iter it2) {
+    _cx_Self tmp = _cx_MEMB(_split_off)(other, it1, it2);
+    return _cx_MEMB(_splice)(self, it, &tmp);
 }
 
 #if !defined i_no_cmp || defined _i_has_eq
 STC_INLINE _cx_iter
-_cx_memb(_find)(const _cx_self* self, _cx_raw val) {
-    return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), val);
+_cx_MEMB(_find)(const _cx_Self* self, _cx_raw val) {
+    return _cx_MEMB(_find_in)(_cx_MEMB(_begin)(self), _cx_MEMB(_end)(self), val);
 }
 
 STC_INLINE const _cx_value*
-_cx_memb(_get)(const _cx_self* self, _cx_raw val) {
-    return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), val).ref;
+_cx_MEMB(_get)(const _cx_Self* self, _cx_raw val) {
+    return _cx_MEMB(_find_in)(_cx_MEMB(_begin)(self), _cx_MEMB(_end)(self), val).ref;
 }
 
 STC_INLINE _cx_value*
-_cx_memb(_get_mut)(_cx_self* self, _cx_raw val) {
-    return _cx_memb(_find_in)(_cx_memb(_begin)(self), _cx_memb(_end)(self), val).ref;
+_cx_MEMB(_get_mut)(_cx_Self* self, _cx_raw val) {
+    return _cx_MEMB(_find_in)(_cx_MEMB(_begin)(self), _cx_MEMB(_end)(self), val).ref;
 }
 
-STC_INLINE bool _cx_memb(_eq)(const _cx_self* self, const _cx_self* other) {
-    _cx_iter i = _cx_memb(_begin)(self), j = _cx_memb(_begin)(other);
-    for (; i.ref && j.ref; _cx_memb(_next)(&i), _cx_memb(_next)(&j)) {
+STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
+    _cx_iter i = _cx_MEMB(_begin)(self), j = _cx_MEMB(_begin)(other);
+    for (; i.ref && j.ref; _cx_MEMB(_next)(&i), _cx_MEMB(_next)(&j)) {
         const _cx_raw _rx = i_keyto(i.ref), _ry = i_keyto(j.ref);
         if (!(i_eq((&_rx), (&_ry)))) return false;
     }
@@ -218,29 +218,29 @@ STC_INLINE bool _cx_memb(_eq)(const _cx_self* self, const _cx_self* other) {
 #if defined(i_implement) || defined(i_static)
 
 #if !defined i_no_clone
-STC_DEF _cx_self
-_cx_memb(_clone)(_cx_self cx) {
-    _cx_self out = _cx_memb(_init)();
-    c_foreach (it, _cx_self, cx)
-        _cx_memb(_push_back)(&out, i_keyclone((*it.ref)));
+STC_DEF _cx_Self
+_cx_MEMB(_clone)(_cx_Self cx) {
+    _cx_Self out = _cx_MEMB(_init)();
+    c_foreach (it, _cx_Self, cx)
+        _cx_MEMB(_push_back)(&out, i_keyclone((*it.ref)));
     return out;
 }
 #endif
 
 STC_DEF void
-_cx_memb(_drop)(_cx_self* self) {
-    while (self->last) _cx_memb(_erase_after_node)(self, self->last);
+_cx_MEMB(_drop)(_cx_Self* self) {
+    while (self->last) _cx_MEMB(_erase_after_node)(self, self->last);
 }
 
 STC_DEF _cx_value*
-_cx_memb(_push_back)(_cx_self* self, i_key value) {
+_cx_MEMB(_push_back)(_cx_Self* self, i_key value) {
     _c_clist_insert_entry_after(self->last, value);
     self->last = entry;
     return &entry->value;
 }
 
 STC_DEF _cx_value*
-_cx_memb(_push_front)(_cx_self* self, i_key value) {
+_cx_MEMB(_push_front)(_cx_Self* self, i_key value) {
     _c_clist_insert_entry_after(self->last, value);
     if (!self->last)
         self->last = entry;
@@ -248,14 +248,14 @@ _cx_memb(_push_front)(_cx_self* self, i_key value) {
 }
 
 STC_DEF _cx_value*
-_cx_memb(_push_back_node)(_cx_self* self, _cx_node* node) {
+_cx_MEMB(_push_back_node)(_cx_Self* self, _cx_node* node) {
     _c_clist_insert_after_node(self->last, node);
     self->last = node;
     return &node->value;
 }
 
 STC_DEF _cx_value*
-_cx_memb(_insert_after_node)(_cx_self* self, _cx_node* ref, _cx_node* node) {
+_cx_MEMB(_insert_after_node)(_cx_Self* self, _cx_node* ref, _cx_node* node) {
     _c_clist_insert_after_node(ref, node);
     if (!self->last)
         self->last = node;
@@ -263,7 +263,7 @@ _cx_memb(_insert_after_node)(_cx_self* self, _cx_node* ref, _cx_node* node) {
 }
 
 STC_DEF _cx_iter
-_cx_memb(_insert_at)(_cx_self* self, _cx_iter it, i_key value) {
+_cx_MEMB(_insert_at)(_cx_Self* self, _cx_iter it, i_key value) {
     _cx_node* node = it.ref ? it.prev : self->last;
     _c_clist_insert_entry_after(node, value);
     if (!self->last || !it.ref) {
@@ -275,32 +275,32 @@ _cx_memb(_insert_at)(_cx_self* self, _cx_iter it, i_key value) {
 }
 
 STC_DEF _cx_iter
-_cx_memb(_erase_at)(_cx_self* self, _cx_iter it) {
+_cx_MEMB(_erase_at)(_cx_Self* self, _cx_iter it) {
     _cx_node *node = _clist_tonode(it.ref);
     it.ref = (node == self->last) ? NULL : &node->next->value;
-    _cx_memb(_erase_after_node)(self, it.prev);
+    _cx_MEMB(_erase_after_node)(self, it.prev);
     return it;
 }
 
 STC_DEF _cx_iter
-_cx_memb(_erase_range)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
+_cx_MEMB(_erase_range)(_cx_Self* self, _cx_iter it1, _cx_iter it2) {
     _cx_node *end = it2.ref ? _clist_tonode(it2.ref) : self->last->next;
     if (it1.ref != it2.ref) do {
-        _cx_memb(_erase_after_node)(self, it1.prev);
+        _cx_MEMB(_erase_after_node)(self, it1.prev);
         if (!self->last) break;
     } while (it1.prev->next != end);
     return it2;
 }
 
 STC_DEF void
-_cx_memb(_erase_after_node)(_cx_self* self, _cx_node* ref) {
-    _cx_node* node = _cx_memb(_unlink_after_node)(self, ref);
+_cx_MEMB(_erase_after_node)(_cx_Self* self, _cx_node* ref) {
+    _cx_node* node = _cx_MEMB(_unlink_after_node)(self, ref);
     i_keydrop((&node->value));
     i_free(node);
 }
 
 STC_DEF _cx_node*
-_cx_memb(_unlink_after_node)(_cx_self* self, _cx_node* ref) {
+_cx_MEMB(_unlink_after_node)(_cx_Self* self, _cx_node* ref) {
     _cx_node* node = ref->next, *next = node->next;
     ref->next = next;
     if (node == next)
@@ -311,17 +311,17 @@ _cx_memb(_unlink_after_node)(_cx_self* self, _cx_node* ref) {
 }
 
 STC_DEF void
-_cx_memb(_reverse)(_cx_self* self) {
-    _cx_self rev = {NULL};
+_cx_MEMB(_reverse)(_cx_Self* self) {
+    _cx_Self rev = {NULL};
     while (self->last) {
-        _cx_node* node = _cx_memb(_unlink_after_node)(self, self->last);
-        _cx_memb(_insert_after_node)(&rev, rev.last, node);
+        _cx_node* node = _cx_MEMB(_unlink_after_node)(self, self->last);
+        _cx_MEMB(_insert_after_node)(&rev, rev.last, node);
     }
     *self = rev;
 }
 
 STC_DEF _cx_iter
-_cx_memb(_splice)(_cx_self* self, _cx_iter it, _cx_self* other) {
+_cx_MEMB(_splice)(_cx_Self* self, _cx_iter it, _cx_Self* other) {
     if (!self->last)
         self->last = other->last;
     else if (other->last) {
@@ -335,9 +335,9 @@ _cx_memb(_splice)(_cx_self* self, _cx_iter it, _cx_self* other) {
     return it;
 }
 
-STC_DEF _cx_self
-_cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
-    _cx_self lst = {NULL};
+STC_DEF _cx_Self
+_cx_MEMB(_split_off)(_cx_Self* self, _cx_iter it1, _cx_iter it2) {
+    _cx_Self lst = {NULL};
     if (it1.ref == it2.ref)
         return lst;
     _cx_node *p1 = it1.prev,
@@ -353,8 +353,8 @@ _cx_memb(_split_off)(_cx_self* self, _cx_iter it1, _cx_iter it2) {
 #if !defined i_no_cmp || defined _i_has_eq
 
 STC_DEF _cx_iter
-_cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw val) {
-    c_foreach (it, _cx_self, it1, it2) {
+_cx_MEMB(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw val) {
+    c_foreach (it, _cx_Self, it1, it2) {
         _cx_raw r = i_keyto(it.ref);
         if (i_eq((&r), (&val)))
             return it;
@@ -363,14 +363,14 @@ _cx_memb(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw val) {
 }
 
 STC_DEF intptr_t
-_cx_memb(_remove)(_cx_self* self, _cx_raw val) {
+_cx_MEMB(_remove)(_cx_Self* self, _cx_raw val) {
     intptr_t n = 0;
     _cx_node *prev = self->last, *node;
     if (prev) do {
         node = prev->next;
         _cx_raw r = i_keyto((&node->value));
         if (i_eq((&r), (&val))) {
-            _cx_memb(_erase_after_node)(self, prev), ++n;
+            _cx_MEMB(_erase_after_node)(self, prev), ++n;
             if (!self->last) break;
         } else
             prev = node;
@@ -380,16 +380,16 @@ _cx_memb(_remove)(_cx_self* self, _cx_raw val) {
 #endif
 
 #ifndef i_no_cmp
-STC_DEF int _cx_memb(_sort_cmp_)(const _cx_value* x, const _cx_value* y) {
+STC_DEF int _cx_MEMB(_sort_cmp_)(const _cx_value* x, const _cx_value* y) {
     const _cx_raw a = i_keyto(x), b = i_keyto(y);
     return i_cmp((&a), (&b));
 }
 
-STC_DEF bool _cx_memb(_sort_with)(_cx_self* self, int(*cmp)(const _cx_value*, const _cx_value*)) {
+STC_DEF bool _cx_MEMB(_sort_with)(_cx_Self* self, int(*cmp)(const _cx_value*, const _cx_value*)) {
     size_t len = 0, cap = 0;
     _cx_value *a = NULL, *p = NULL;
     _cx_iter i;
-    for (i = _cx_memb(_begin)(self); i.ref; _cx_memb(_next)(&i)) {
+    for (i = _cx_MEMB(_begin)(self); i.ref; _cx_MEMB(_next)(&i)) {
         if (len == cap) {
             if ((p = (_cx_value *)i_realloc(a, (cap += cap/2 + 4)*sizeof *a))) a = p; 
             else { i_free(a); return false; }
@@ -397,7 +397,7 @@ STC_DEF bool _cx_memb(_sort_with)(_cx_self* self, int(*cmp)(const _cx_value*, co
         a[len++] = *i.ref;
     }
     qsort(a, len, sizeof *a, (int(*)(const void*, const void*))cmp);
-    for (i = _cx_memb(_begin)(self); i.ref; _cx_memb(_next)(&i), ++p) 
+    for (i = _cx_MEMB(_begin)(self); i.ref; _cx_MEMB(_next)(&i), ++p) 
         *i.ref = *p;
     i_free(a); return true;
 }

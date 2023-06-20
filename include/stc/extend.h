@@ -54,7 +54,7 @@ typedef struct {
     i_type get;
 } c_PASTE(i_type, _ext);
 
-#define c_extend(self) c_container_of(self, _cx_memb(_ext), get)
+#define c_extend(self) c_container_of(self, _cx_MEMB(_ext), get)
 
 #define i_is_forward
 #define _i_inc <stc/i_base.h>
