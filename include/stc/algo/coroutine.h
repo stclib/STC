@@ -101,7 +101,7 @@ typedef struct cco_base {
     int cco_state;
 } cco_base;
 
-#define cco_cast(closure) \
+#define cco_base_cast(closure) \
     ((cco_base *)(closure) + 0*sizeof((cco_resume(closure), (int*)0 == &(closure)->cco_state)))
 
 #define cco_resume(closure) (closure)->cco_fn(closure)

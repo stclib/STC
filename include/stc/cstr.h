@@ -77,6 +77,7 @@ extern intptr_t     cstr_find_at(const cstr* self, intptr_t pos, const char* sea
 extern intptr_t     cstr_find_sv(const cstr* self, csview search);
 extern char*        cstr_assign_n(cstr* self, const char* str, intptr_t len);
 extern char*        cstr_append_n(cstr* self, const char* str, intptr_t len);
+extern char*        cstr_append_uninit(cstr *self, intptr_t len);
 extern bool         cstr_getdelim(cstr *self, int delim, FILE *fp);
 extern void         cstr_erase(cstr* self, intptr_t pos, intptr_t len);
 extern void         cstr_u8_erase(cstr* self, intptr_t bytepos, intptr_t u8len);
@@ -243,14 +244,6 @@ STC_INLINE cstr_iter cstr_advance(cstr_iter it, intptr_t pos) {
 
 STC_INLINE void cstr_clear(cstr* self)
     { _cstr_set_size(self, 0); }
-
-STC_INLINE char* cstr_append_uninit(cstr *self, intptr_t len) {
-    intptr_t sz = cstr_size(self);
-    char* d = cstr_reserve(self, sz + len);
-    if (!d) return NULL;
-    _cstr_set_size(self, sz + len);
-    return d + sz;
-}
 
 STC_INLINE int cstr_cmp(const cstr* s1, const cstr* s2) 
     { return strcmp(cstr_str(s1), cstr_str(s2)); }
@@ -549,6 +542,14 @@ char* cstr_append_n(cstr* self, const char* str, const intptr_t len) {
     c_memcpy(r.data + r.size, str, len);
     _cstr_set_size(self, r.size + len);
     return r.data;
+}
+
+char* cstr_append_uninit(cstr *self, intptr_t len) {
+    cstr_buf r = cstr_buffer(self);
+    if (r.size + len > r.cap && !(r.data = cstr_reserve(self, r.size*3/2 + len)))
+        return NULL;
+    _cstr_set_size(self, r.size + len);
+    return r.data + r.size;
 }
 
 bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
