@@ -70,8 +70,13 @@ int main() {
 #endif // CBOX_H_INCLUDED
 
 #define _i_prefix cbox_
-#ifdef i_eq
-#define _i_eq
+#if !defined i_cmp && !defined i_less && \
+    !defined i_valclass && !defined i_valboxed && \
+    !defined i_val_str && !defined i_val_ssv
+  #if !defined i_eq
+    #define i_eq(x, y) x == y
+  #endif
+  #define i_less(x, y) x < y
 #endif
 #include "priv/template.h"
 typedef i_keyraw _cx_raw;
@@ -167,9 +172,7 @@ STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other) {
     _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
     return i_cmp((&rx), (&ry));
 }
-#endif
 
-#ifdef _i_eq
 STC_INLINE bool _cx_MEMB(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
     { return i_eq(rx, ry); }
 
@@ -177,12 +180,6 @@ STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
     _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
     return i_eq((&rx), (&ry));
 }
-#elif !defined i_no_cmp
-STC_INLINE bool _cx_MEMB(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
-    { return i_cmp(rx, ry) == 0; }
-
-STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other)
-    { return _cx_MEMB(_cmp)(self, other) == 0; }
 #endif
 
 #ifndef i_no_hash
@@ -193,5 +190,4 @@ STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
     { _cx_raw rx = i_keyto(self->get); return i_hash((&rx)); }
 #endif
 
-#undef _i_eq
 #include "priv/template2.h"
