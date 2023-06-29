@@ -25,6 +25,7 @@
 /* cbox: heap allocated boxed type
 #define i_implement
 #include <stc/cstr.h>
+#include <stc/algo/raii.h> // c_auto
 
 typedef struct { cstr name, email; } Person;
 
@@ -41,8 +42,9 @@ void Person_drop(Person* p) {
     c_drop(cstr, &p->name, &p->email);
 }
 
-#define i_keyclass Person // bind Person clone+drop fn's
 #define i_type PBox
+#define i_valclass Person // bind Person clone+drop fn's
+#define i_no_cmp          // no cmp/hash is defined
 #include <stc/cbox.h>
 
 int main() {
@@ -70,14 +72,7 @@ int main() {
 #endif // CBOX_H_INCLUDED
 
 #define _i_prefix cbox_
-#if !defined i_cmp && !defined i_less && \
-    !defined i_valclass && !defined i_valboxed && \
-    !defined i_val_str && !defined i_val_ssv
-  #if !defined i_eq
-    #define i_eq(x, y) x == y
-  #endif
-  #define i_less(x, y) x < y
-#endif
+#define _i_cbox
 #include "priv/template.h"
 typedef i_keyraw _cx_raw;
 
@@ -164,30 +159,50 @@ STC_INLINE void _cx_MEMB(_assign)(_cx_Self* self, _cx_Self* moved) {
     moved->get = NULL;
 }
 
-#ifndef i_no_cmp
-STC_INLINE int _cx_MEMB(_raw_cmp)(const _cx_raw* rx, const _cx_raw* ry)
-    { return i_cmp(rx, ry); }
+#if defined _i_has_cmp
+    STC_INLINE int _cx_MEMB(_raw_cmp)(const _cx_raw* rx, const _cx_raw* ry)
+        { return i_cmp(rx, ry); }
 
-STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other) {
-    _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
-    return i_cmp((&rx), (&ry));
-}
+    STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other) {
+        _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
+        return i_cmp((&rx), (&ry));
+    }
+#else
+    STC_INLINE int _cx_MEMB(_raw_cmp)(const _cx_raw* rx, const _cx_raw* ry)
+        { return c_default_cmp(&rx, &ry); }
 
-STC_INLINE bool _cx_MEMB(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
-    { return i_eq(rx, ry); }
-
-STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
-    _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
-    return i_eq((&rx), (&ry));
-}
+    STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other) {
+        return c_default_cmp(&self->get, &other->get);
+    }
 #endif
+#if defined _i_has_eq || defined _i_has_cmp
+    STC_INLINE bool _cx_MEMB(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
+        { return i_eq(rx, ry); }
 
-#ifndef i_no_hash
-STC_INLINE uint64_t _cx_MEMB(_raw_hash)(const _cx_raw* rx)
-    { return i_hash(rx); }
+    STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
+        _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
+        return i_eq((&rx), (&ry));
+    }
+#else
+    STC_INLINE bool _cx_MEMB(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
+        { return rx == ry; }
 
-STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
-    { _cx_raw rx = i_keyto(self->get); return i_hash((&rx)); }
+    STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
+        return self->get == other->get;
+    }
 #endif
+#if defined i_hash
+    STC_INLINE uint64_t _cx_MEMB(_raw_hash)(const _cx_raw* rx)
+        { return i_hash(rx); }
 
+    STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
+        { return i_hash(self->get); }
+#else
+    STC_INLINE uint64_t _cx_MEMB(_raw_hash)(const _cx_raw* rx)
+        { return c_default_hash(&rx); }
+
+    STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
+        { return c_default_hash(&self->get); }
+#endif
 #include "priv/template2.h"
+#undef _i_cbox

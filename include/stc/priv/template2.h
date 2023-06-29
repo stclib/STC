@@ -67,6 +67,7 @@
 #undef i_realloc
 #undef i_free
 
+#undef i_native_cmp
 #undef i_no_cmp
 #undef i_no_hash
 #undef i_no_clone
@@ -74,9 +75,9 @@
 #undef i_is_forward
 #undef i_has_emplace
 
+#undef _i_has_cmp
+#undef _i_has_eq
 #undef _i_prefix
 #undef _i_expandby
-#undef _i_has_eq
-#undef _i_has_cmp
 #undef _i_template
 #endif

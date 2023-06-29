@@ -13,8 +13,8 @@
 #include <stc/cstack.h>
 
 #define i_type StackList
-#define i_valclass FloatStack  // "class" picks up _clone, _drop
-#define i_opt c_no_cmp         // no FloatStack_cmp()
+#define i_valclass FloatStack  // "class" picks up _clone, _drop, _cmp
+#define i_opt c_no_cmp         // exclude FloatStack_cmp(): not defined
 #include <stc/clist.h>
 
 #define i_type ListMap

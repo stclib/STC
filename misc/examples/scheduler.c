@@ -8,7 +8,6 @@ cco_closure(bool, Task,
 
 #define i_type Scheduler
 #define i_val struct Task
-#define i_no_cmp
 #include <stc/cqueue.h>
 
 static bool schedule(Scheduler* sched)

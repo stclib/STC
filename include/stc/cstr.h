@@ -433,7 +433,7 @@ cstr cstr_tocase(csview sv, int k) {
 #endif // i_import
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined i_import || defined i_implement
+#if defined i_implement
 #ifndef CSTR_C_INCLUDED
 #define CSTR_C_INCLUDED
 

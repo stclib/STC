@@ -101,7 +101,7 @@ _cx_MEMB(_emplace_at)(_cx_Self* self, _cx_iter it, const _cx_raw raw)
     { return _cx_MEMB(_insert_at)(self, it, i_keyfrom(raw)); }
 #endif
 
-#if defined _i_has_cmp || defined _i_has_eq
+#if defined _i_has_eq || defined _i_has_cmp
 STC_API _cx_iter _cx_MEMB(_find_in)(_cx_iter p1, _cx_iter p2, _cx_raw raw);
 
 STC_INLINE _cx_iter
@@ -179,7 +179,7 @@ _cx_MEMB(_emplace_n)(_cx_Self* self, const intptr_t idx, const _cx_raw* raw, con
 }
 #endif
 
-#if defined _i_has_cmp || defined _i_has_eq
+#if defined _i_has_eq || defined _i_has_cmp
 STC_DEF _cx_iter
 _cx_MEMB(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
     for (; i1.pos != i2.pos; _cx_MEMB(_next)(&i1)) {

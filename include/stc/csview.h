@@ -150,7 +150,7 @@ STC_INLINE csview cstr_u8_substr(const cstr* self , intptr_t bytepos, intptr_t u
 #endif
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined i_import || defined i_implement
+#if defined i_implement
 #ifndef CSVIEW_C_INCLUDED
 #define CSVIEW_C_INCLUDED
 

@@ -11,13 +11,13 @@ void int_drop(int* x) {
 #define i_type Arc          // set type name to be defined (instead of 'carc_int')
 #define i_val int
 #define i_valdrop int_drop  // optional, just to display the elements destroyed
-#define i_no_clone          // required because of valdrop
+#define i_native_cmp        // use int comparison (x < y, x == y).
 #include <stc/carc.h>       // Arc
 
-#define i_keyboxed Arc    // note: use i_keyboxed instead of i_key for carc/cbox elements
+#define i_keyboxed Arc      // note: use i_keyboxed instead of i_key for carc/cbox elements
 #include <stc/csset.h>      // csset_Arc (like: std::set<std::shared_ptr<int>>)
 
-#define i_valboxed Arc    // note: as above.
+#define i_valboxed Arc      // note: as above.
 #include <stc/cvec.h>       // cvec_Arc (like: std::vector<std::shared_ptr<int>>)
 
 int main()
@@ -25,8 +25,12 @@ int main()
     const int years[] = {2021, 2012, 2022, 2015};
 
     cvec_Arc vec = {0};
-    c_forrange (i, c_arraylen(years))
-        cvec_Arc_push(&vec, Arc_from(years[i]));
+    c_forrange (i, c_arraylen(years)) {
+        cvec_Arc_emplace(&vec, years[i]);
+        // cvec_Arc_push(&vec, Arc_from(years[i])); // alt.
+    }
+
+    cvec_Arc_sort(&vec);
 
     printf("vec:");
     c_foreach (i, cvec_Arc, vec)

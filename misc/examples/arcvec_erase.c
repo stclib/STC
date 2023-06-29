@@ -5,7 +5,7 @@ void show_drop(int* x) { printf("drop: %d\n", *x); }
 #define i_type Arc
 #define i_val int
 #define i_valdrop show_drop
-#define i_no_clone          // required because of valdrop
+#define i_native_cmp        // enable sort/search for int type
 #include <stc/carc.h>       // Shared pointer to int
 
 #define i_type Vec

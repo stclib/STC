@@ -27,12 +27,13 @@ int point_cmp(const Point* a, const Point* b) {
 #include <stc/clist.h>
 
 #define i_val float
+#define i_native_cmp               // use < and == operators for comparison 
 #include <stc/clist.h>
 
 void MyStruct_drop(MyStruct* s);
 #define i_type MyList
-#define i_valclass MyStruct        // i_valclass uses MyStruct_drop
-#define i_opt c_no_clone|c_no_cmp
+#define i_valclass MyStruct        // MyStruct contains "class"-types, so define as "class"
+#define i_opt c_no_clone|c_no_cmp  // exclude cloning and comparison support
 #include <stc/clist.h>
 
 void MyStruct_drop(MyStruct* s) {

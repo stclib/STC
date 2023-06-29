@@ -30,6 +30,11 @@ typedef struct { cstr name, last; } Person;
 Person Person_make(const char* name, const char* last) {
     return (Person){.name = cstr_from(name), .last = cstr_from(last)};
 }
+Person Person_clone(Person p) {
+    p.name = cstr_clone(p.name);
+    p.last = cstr_clone(p.last);
+    return p;
+}
 void Person_drop(Person* p) {
     printf("drop: %s %s\n", cstr_str(&p->name), cstr_str(&p->last));
     cstr_drop(&p->name);
@@ -37,8 +42,8 @@ void Person_drop(Person* p) {
 }
 
 #define i_type ArcPers
-#define i_key Person
-#define i_keydrop Person_drop
+#define i_valclass Person    // clone, drop, cmp, hash
+#define i_opt c_no_cmp|c_no_hash  // exclude cmp, hash
 #include <stc/carc.h>
 
 int main() {
@@ -77,14 +82,7 @@ int main() {
 #endif // CARC_H_INCLUDED
 
 #define _i_prefix carc_
-#if !defined i_cmp && !defined i_less && \
-    !defined i_valclass && !defined i_valboxed && \
-    !defined i_val_str && !defined i_val_ssv
-  #if !defined i_eq
-    #define i_eq(x, y) x == y
-  #endif
-  #define i_less(x, y) x < y
-#endif
+#define _i_carc
 #include "priv/template.h"
 typedef i_keyraw _cx_raw;
 
@@ -178,32 +176,53 @@ STC_INLINE void _cx_MEMB(_assign)(_cx_Self* self, _cx_Self ptr) {
     *self = ptr;
 }
 
-#ifndef i_no_cmp
-STC_INLINE int _cx_MEMB(_raw_cmp)(const _cx_raw* rx, const _cx_raw* ry)
-    { return i_cmp(rx, ry); }
+#if defined _i_has_cmp
+    STC_INLINE int _cx_MEMB(_raw_cmp)(const _cx_raw* rx, const _cx_raw* ry)
+        { return i_cmp(rx, ry); }
 
-STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other) {
-    _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
-    return i_cmp((&rx), (&ry));
-}
+    STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other) {
+        _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
+        return i_cmp((&rx), (&ry));
+    }
+#else
+    STC_INLINE int _cx_MEMB(_raw_cmp)(const _cx_raw* rx, const _cx_raw* ry)
+        { return c_default_cmp(&rx, &ry); }
 
-STC_INLINE bool _cx_MEMB(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
-    { return i_eq(rx, ry); }
-
-STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
-    _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
-    return i_eq((&rx), (&ry));
-}
+    STC_INLINE int _cx_MEMB(_cmp)(const _cx_Self* self, const _cx_Self* other) {
+        return c_default_cmp(&self->get, &other->get);
+    }
 #endif
+#if defined _i_has_eq || defined _i_has_cmp
+    STC_INLINE bool _cx_MEMB(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
+        { return i_eq(rx, ry); }
 
-#ifndef i_no_hash
-STC_INLINE uint64_t _cx_MEMB(_raw_hash)(const _cx_raw* rx)
-    { return i_hash(rx); }
+    STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
+        _cx_raw rx = i_keyto(self->get), ry = i_keyto(other->get);
+        return i_eq((&rx), (&ry));
+    }
+#else
+    STC_INLINE bool _cx_MEMB(_raw_eq)(const _cx_raw* rx, const _cx_raw* ry)
+        { return rx == ry; }
 
-STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
-    { _cx_raw rx = i_keyto(self->get); return i_hash((&rx)); }
+    STC_INLINE bool _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
+        return self->get == other->get;
+    }
+#endif
+#if defined i_hash
+    STC_INLINE uint64_t _cx_MEMB(_raw_hash)(const _cx_raw* rx)
+        { return i_hash(rx); }
+
+    STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
+        { return i_hash(self->get); }
+#else
+    STC_INLINE uint64_t _cx_MEMB(_raw_hash)(const _cx_raw* rx)
+        { return c_default_hash(&rx); }
+
+    STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
+        { return c_default_hash(&self->get); }
 #endif
 
 #undef _i_atomic_inc
 #undef _i_atomic_dec_and_test
 #include "priv/template2.h"
+#undef _i_carc

@@ -4,7 +4,8 @@
 
 #define i_type List
 #define i_val int
-#include <stc/clist.h> 
+#define i_native_cmp
+#include <stc/clist.h>
 
 void printList(List list) {
     printf("list:");
@@ -16,7 +17,7 @@ void printList(List list) {
 int main() {
     List list = {0};
     c_forlist (i, int, {6, 9, 3, 1, 7, 4, 5, 2, 8})
-        List_push_back_node(&list, c_new(List_node, {0, *i.ref}));
+        List_push_back_node(&list, c_new(List_node, {.value=*i.ref}));
 
     printList(list);
 

@@ -74,6 +74,7 @@ void vectordemo2()
 
 #define i_val int
 #define i_tag ix
+#define i_native_cmp
 #include <stc/clist.h>
 
 void listdemo1()

@@ -9,7 +9,6 @@
 #include <stc/csmap.h>
 
 #define i_val csmap_istr_raw
-#define i_opt c_no_cmp
 #define i_tag istr
 #include <stc/cvec.h>
 

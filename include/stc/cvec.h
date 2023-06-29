@@ -40,7 +40,7 @@ struct MyStruct {
 #include <stc/cvec.h>
 
 #define i_key int
-#define i_is_forward // forward declared
+#define i_is_forward
 #define i_tag i32
 #include <stc/cvec.h>
 
@@ -85,10 +85,10 @@ STC_API bool            _cx_MEMB(_resize)(_cx_Self* self, intptr_t size, i_key n
 STC_API _cx_value*      _cx_MEMB(_push)(_cx_Self* self, i_key value);
 STC_API _cx_iter        _cx_MEMB(_erase_n)(_cx_Self* self, intptr_t idx, intptr_t n);
 STC_API _cx_iter        _cx_MEMB(_insert_uninit)(_cx_Self* self, intptr_t idx, intptr_t n);
-#if !defined i_no_cmp || defined _i_has_eq
+#if defined _i_has_eq || defined _i_has_cmp
 STC_API _cx_iter        _cx_MEMB(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw raw);
 #endif
-#ifndef i_no_cmp
+#if defined _i_has_cmp
 STC_API int             _cx_MEMB(_value_cmp)(const _cx_value* x, const _cx_value* y);
 STC_API _cx_iter        _cx_MEMB(_binary_search_in)(_cx_iter it1, _cx_iter it2, _cx_raw raw, _cx_iter* lower_bound);
 #endif
@@ -214,7 +214,7 @@ STC_INLINE intptr_t _cx_MEMB(_index)(const _cx_Self* self, _cx_iter it)
 STC_INLINE void _cx_MEMB(_adjust_end_)(_cx_Self* self, intptr_t n)
     { self->_len += n; }
 
-#if !defined i_no_cmp || defined _i_has_eq
+#if defined _i_has_eq || defined _i_has_cmp
 
 STC_INLINE _cx_iter
 _cx_MEMB(_find)(const _cx_Self* self, _cx_raw raw) {
@@ -240,7 +240,7 @@ _cx_MEMB(_eq)(const _cx_Self* self, const _cx_Self* other) {
     return true;
 }
 #endif
-#ifndef i_no_cmp
+#if defined _i_has_cmp
 
 STC_INLINE _cx_iter
 _cx_MEMB(_binary_search)(const _cx_Self* self, _cx_raw raw) {
@@ -265,7 +265,7 @@ STC_INLINE void
 _cx_MEMB(_sort)(_cx_Self* self) {
     _cx_MEMB(_sort_range)(_cx_MEMB(_begin)(self), _cx_MEMB(_end)(self), _cx_MEMB(_value_cmp));
 }
-#endif // !c_no_cmp
+#endif // _i_has_cmp
 /* -------------------------- IMPLEMENTATION ------------------------- */
 #if defined(i_implement) || defined(i_static)
 
@@ -378,7 +378,7 @@ _cx_MEMB(_emplace_n)(_cx_Self* self, const intptr_t idx, const _cx_raw raw[], in
     return it;
 }
 #endif // !i_no_emplace
-#if !defined i_no_cmp || defined _i_has_eq
+#if defined _i_has_eq || defined _i_has_cmp
 
 STC_DEF _cx_iter
 _cx_MEMB(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
@@ -392,7 +392,7 @@ _cx_MEMB(_find_in)(_cx_iter i1, _cx_iter i2, _cx_raw raw) {
     return i2;
 }
 #endif
-#ifndef i_no_cmp
+#if defined _i_has_cmp
 
 STC_DEF _cx_iter
 _cx_MEMB(_binary_search_in)(_cx_iter i1, _cx_iter i2, const _cx_raw raw,
@@ -417,7 +417,7 @@ STC_DEF int _cx_MEMB(_value_cmp)(const _cx_value* x, const _cx_value* y) {
     const _cx_raw ry = i_keyto(y);
     return i_cmp((&rx), (&ry));
 }
-#endif // !c_no_cmp
+#endif // _i_has_cmp
 #endif // i_implement
 #define CVEC_H_INCLUDED
 #include "priv/template2.h"

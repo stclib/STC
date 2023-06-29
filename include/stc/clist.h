@@ -93,11 +93,11 @@ STC_API _cx_value*      _cx_MEMB(_push_front)(_cx_Self* self, i_key value);
 STC_API _cx_iter        _cx_MEMB(_insert_at)(_cx_Self* self, _cx_iter it, i_key value);
 STC_API _cx_iter        _cx_MEMB(_erase_at)(_cx_Self* self, _cx_iter it);
 STC_API _cx_iter        _cx_MEMB(_erase_range)(_cx_Self* self, _cx_iter it1, _cx_iter it2);
-#if !defined i_no_cmp || defined _i_has_eq
+#if defined _i_has_eq || defined _i_has_cmp
 STC_API _cx_iter        _cx_MEMB(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw val);
 STC_API intptr_t        _cx_MEMB(_remove)(_cx_Self* self, _cx_raw val);
 #endif
-#ifndef i_no_cmp
+#if defined _i_has_cmp
 STC_API bool            _cx_MEMB(_sort_with)(_cx_Self* self, int(*cmp)(const _cx_value*, const _cx_value*));
 STC_API int             _cx_MEMB(_sort_cmp_)(const _cx_value*, const _cx_value*);
 STC_INLINE bool         _cx_MEMB(_sort)(_cx_Self* self)
@@ -188,7 +188,7 @@ _cx_MEMB(_splice_range)(_cx_Self* self, _cx_iter it,
     return _cx_MEMB(_splice)(self, it, &tmp);
 }
 
-#if !defined i_no_cmp || defined _i_has_eq
+#if defined _i_has_eq || defined _i_has_cmp
 STC_INLINE _cx_iter
 _cx_MEMB(_find)(const _cx_Self* self, _cx_raw val) {
     return _cx_MEMB(_find_in)(_cx_MEMB(_begin)(self), _cx_MEMB(_end)(self), val);
@@ -350,8 +350,7 @@ _cx_MEMB(_split_off)(_cx_Self* self, _cx_iter it1, _cx_iter it2) {
     return lst;
 }
 
-#if !defined i_no_cmp || defined _i_has_eq
-
+#if defined _i_has_eq || defined _i_has_cmp
 STC_DEF _cx_iter
 _cx_MEMB(_find_in)(_cx_iter it1, _cx_iter it2, _cx_raw val) {
     c_foreach (it, _cx_Self, it1, it2) {
@@ -379,7 +378,7 @@ _cx_MEMB(_remove)(_cx_Self* self, _cx_raw val) {
 }
 #endif
 
-#ifndef i_no_cmp
+#if defined _i_has_cmp
 STC_DEF int _cx_MEMB(_sort_cmp_)(const _cx_value* x, const _cx_value* y) {
     const _cx_raw a = i_keyto(x), b = i_keyto(y);
     return i_cmp((&a), (&b));
@@ -401,7 +400,7 @@ STC_DEF bool _cx_MEMB(_sort_with)(_cx_Self* self, int(*cmp)(const _cx_value*, co
         *i.ref = *p;
     i_free(a); return true;
 }
-#endif // !c_no_cmp
+#endif // _i_has_cmp
 #endif // i_implement
 #define CLIST_H_INCLUDED
 #include "priv/template2.h"

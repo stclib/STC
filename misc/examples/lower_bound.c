@@ -1,6 +1,7 @@
 #include <stdio.h>
 
 #define i_val int
+#define i_native_cmp
 #include <stc/cvec.h>
 
 #define i_val int
