@@ -5,8 +5,8 @@ forward_clist(clist_i32, int);
 forward_clist(clist_pnt, struct Point);
 
 typedef struct {
-    clist_i32 intlst;
-    clist_pnt pntlst;
+    clist_i32 intlist;
+    clist_pnt pntlist;
 } MyStruct;
 
 #define i_val int
@@ -37,33 +37,33 @@ void MyStruct_drop(MyStruct* s);
 #include <stc/clist.h>
 
 void MyStruct_drop(MyStruct* s) {
-    clist_i32_drop(&s->intlst);
-    clist_pnt_drop(&s->pntlst);
+    clist_i32_drop(&s->intlist);
+    clist_pnt_drop(&s->pntlist);
 }
 
 
 int main()
 {
     MyStruct my = {0};
-    clist_i32_push_back(&my.intlst, 123);
-    clist_pnt_push_back(&my.pntlst, c_LITERAL(Point){123, 456});
+    clist_i32_push_back(&my.intlist, 123);
+    clist_pnt_push_back(&my.pntlist, c_LITERAL(Point){123, 456});
     MyStruct_drop(&my);
 
-    clist_pnt plst = c_init(clist_pnt, {{42, 14}, {32, 94}, {62, 81}});
-    clist_pnt_sort(&plst);
+    clist_pnt plist = c_init(clist_pnt, {{42, 14}, {32, 94}, {62, 81}});
+    clist_pnt_sort(&plist);
 
-    c_foreach (i, clist_pnt, plst) 
+    c_foreach (i, clist_pnt, plist) 
         printf(" (%d %d)", i.ref->x, i.ref->y);
     puts("");
-    clist_pnt_drop(&plst);
+    clist_pnt_drop(&plist);
 
 
-    clist_float flst = c_init(clist_float, {123.3f, 321.2f, -32.2f, 78.2f});
-    clist_float_sort(&flst);
+    clist_float flist = c_init(clist_float, {123.3f, 321.2f, -32.2f, 78.2f});
+    clist_float_sort(&flist);
 
-    c_foreach (i, clist_float, flst)
+    c_foreach (i, clist_float, flist)
         printf(" %g", (double)*i.ref);
 
     puts("");
-    clist_float_drop(&flst);
+    clist_float_drop(&flist);
 }
