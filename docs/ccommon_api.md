@@ -222,11 +222,11 @@ int main() {
 }
 ```
 Containers with random access may also be sorted. Even sorting cdeq/cqueue (with ring buffer) is
-possible and very fast. Note that `i_retain` must be defined to retain specified template parameters for use by sort:
+possible and very fast. Note that `i_more` must be defined to retain specified template parameters for use by sort:
 ```c
 #define i_type MyDeq
 #define i_val int
-#define i_retain
+#define i_more
 #include <stc/cdeq.h> // deque
 #include <stc/algo/sort.h>
 #include <stdio.h>
@@ -313,6 +313,7 @@ the gcd() function. It also ensures that it stops when the diagonal size >= 100:
 [ [Run this code](https://godbolt.org/z/coqqrfbd5) ]
 ```c
 #include <stc/calgo.h>
+#include <stdio.h>
 
 struct triples {
     int n; // input: max number of triples to be generated.
@@ -320,22 +321,23 @@ struct triples {
     int cco_state; // required member
 };
 
-bool triples(struct triples* i) { // coroutine
+int triples(struct triples* i) { // coroutine
     cco_routine(i) {
         for (i->c = 5; i->n; ++i->c) {
             for (i->a = 1; i->a < i->c; ++i->a) {
                 for (i->b = i->a + 1; i->b < i->c; ++i->b) {
                     if ((int64_t)i->a*i->a + (int64_t)i->b*i->b == (int64_t)i->c*i->c) {
-                        cco_yield(false);
-                        if (--i->n == 0) cco_return;
+                        cco_yield();
+                        if (--i->n == 0)
+                            cco_return;
                     }
                 }
             }
         }
-        cco_final:
+        cco_cleanup:
         puts("done");
     }
-    return true;
+    return 0;
 }
 
 int gcd(int a, int b) { // greatest common denominator
@@ -352,7 +354,7 @@ int main()
     struct triples t = {.n=INT32_MAX};
     int n = 0;
 
-    while (!triples(&t)) {
+    while (triples(&t)) {
         // Skip triples with GCD(a,b) > 1
         if (gcd(t.a, t.b) > 1)
             continue;
@@ -366,28 +368,36 @@ int main()
 }
 ```
 ### Coroutine API
-**Note**: *cco_yield()* may not be called inside a `switch` statement. Use `if-else-if` constructs instead.
-To resume the coroutine from where it was suspended with *cco_yield()*, simply call the coroutine again.
+To resume the coroutine from where it was suspended with *cco_yield()*: call the coroutine again.
+
+**Note**: *cco_yield()* / *cco_await()* may not be called inside a `switch` statement; either use 
+`if-else-if` constructs, or `cco_switch / cco_case / cco_default` for switch-emulation instead.
 
 |           |  Function / operator                 | Description                             |
 |:----------|:-------------------------------------|:----------------------------------------|
-|           | `cco_final:`                         | Label for cleanup in coroutine          |
+|           | Function / 'keywords':               |                                         |
+|`cco_result` | Enum `CCO_DONE=0`, `CCO_YIELD`, `CCO_AWAIT` | Recommended return values in coroutines |
+|           | Function / 'keywords':               |                                         |
+|           | `cco_cleanup:`                       | Label for cleanup position in coroutine |
 | `bool`    | `cco_done(co)`                       | Is coroutine done?                      |
-|           | `cco_routine(co) { ... }`            | The coroutine closure                   |
-|           | `cco_yield()`                        | Yield/suspend execution                 |
-|           | `cco_yield(ret)`                     | Yield/suspend execution and return ret  |
-|           | `cco_await(promise)`                 | Await/suspend until promise is true     |
-|           | `cco_await(promise, ret)`            | Await/suspend with ret value            |
-|           | `cco_return`                         | Replaces return. Jump to cco_final: if exist|
-|           | `cco_return_v(val)`                  | Yield final value, enter final-state    |
-|           | `cco_closure(Ret, Closure, ...)`     | Define coroutine closure struct.        |
-| `void`    | `cco_await_on(closure) { }`          | Await on closure to finish              |
-| `void`    | `cco_await_on(co, func) { }`         | Await on func(co) to finish             |
+|           | `cco_routine(co) { }`                | The coroutine scope                     |
+|           | `cco_yield();`                       | Yield/suspend execution (return CCO_YIELD)|
+|           | `cco_yield_v();`                     | Yield/suspend execution (return void)   |
+|           | `cco_yield_v(ret);`                  | Yield/suspend execution (return ret)    |
+|           | `cco_yield_final();`                 | Yield final time, enables cleanup-state |
+|           | `cco_yield_final(val);`              | Yield a final value (e.g. CCO_ERROR) |
+|           | `cco_await(condition);`              | Suspend until condition is true (return CCO_AWAIT)|
+|           | `cco_await_v(condition);`            | Suspend until condition is true (return void) |
+|           | `cco_await_v(condition, ret);`       | Suspend until condition is true (return ret)|
+|           | `cco_await_on(cocall);`              | Await on sub-coroutine to finish        |
+|           | `cco_return;`                        | Return from coroutine (inside cco_routine) |
+|           | `cco_closure(Closure, ...);`         | Define a coroutine closure struct (optional) |
 |           | Semaphores:                          |                                         | 
 |           | `cco_sem`                            | Semaphore type                          |
+| `cco_sem` | `cco_sem_from(long value)`           | Create semaphore                        |
+|           | `cco_sem_set(sem, long value)`       | Set semaphore value                     |
 |           | `cco_sem_await(sem)`                 | Await for the semaphore count > 0       |
 |           | `cco_sem_await(sem, ret)`            | Await with ret on the semaphore         |
-| `cco_sem` | `cco_sem_init(long value)`           | Set semaphore value                     |
 |           | `cco_sem_release(sem)`               | Signal the semaphore (count += 1)       |
 |           | Timers:                              |                                         | 
 |           | `cco_timer`                          | Timer type                              |
@@ -401,11 +411,15 @@ To resume the coroutine from where it was suspended with *cco_yield()*, simply c
 |           | From caller side:                    |                                         | 
 | `void`    | `cco_stop(co)`                       | Next call of coroutine finalizes        |
 | `void`    | `cco_reset(co)`                      | Reset state to initial (for reuse)      |
-| `void`    | `cco_block_on(closure) { }`          | Run blocking until closure is finished  |
-| `void`    | `cco_block_on(co, func) { }`         | Run blocking until func is finished     |
+| `void`    | `cco_block_on(cocall) { }`           | Run blocking until cocall is finished   |
+| `void`    | `cco_block_on(cocall, int *result) { }`| Run blocking until cocall is finished |
 |           | Time functions:                      |                                         |
 | `double`  | `cco_time(void)`                     | Return secs with usec prec. since Epoch |
 |           | `cco_sleep(double sec)`              | Sleep for seconds (msec or usec prec.)  |
+|           | Emulate switch:                      |                                         | 
+|           | `cco_switch(x) { }`                  | Like switch syntax                      |
+|           | `cco_case(val) { }`                  | Braces are required. Fall-through if no break; |
+|           | `cco_default { }`                    | Default action                          |
 
 ---
 ## RAII scope macros

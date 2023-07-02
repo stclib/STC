@@ -14,7 +14,7 @@ typedef struct {
     int cco_state;
 } Triple_iter;
 
-void Triple_next(Triple_iter* it) {
+int Triple_next(Triple_iter* it) {
     Triple_value* g = it->ref;
     cco_routine(it)
     {
@@ -29,9 +29,10 @@ void Triple_next(Triple_iter* it) {
                 }
             }
         }
-    cco_final:
+        cco_cleanup:
         it->ref = NULL;
     }
+    return 0;
 }
 
 Triple_iter Triple_begin(Triple* g) {

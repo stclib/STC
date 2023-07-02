@@ -12,7 +12,7 @@ struct file_read {
     cstr line;
 };
 
-void file_read(struct file_read* g)
+int file_read(struct file_read* g)
 {
     cco_routine(g) {
         g->fp = fopen(g->filename, "r");
@@ -21,18 +21,19 @@ void file_read(struct file_read* g)
 
         cco_await(!cstr_getline(&g->line, g->fp));
 
-    cco_final:
+        cco_cleanup:
         printf("finish\n");
         cstr_drop(&g->line);
         if (g->fp) fclose(g->fp);
     }
+    return 0;
 }
 
 int main(void)
 {
     struct file_read g = {__FILE__};
     int n = 0;
-    cco_block_on(&g, file_read)
+    cco_block_on(file_read(&g))
     {
         printf("%3d %s\n", ++n, cstr_str(&g.line));
         //if (n == 10) cco_stop(&g);

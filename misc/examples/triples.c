@@ -32,7 +32,7 @@ struct triples {
     int cco_state;
 };
 
-void triples_coro(struct triples* t) {
+int triples_coro(struct triples* t) {
     cco_routine(t) {
         t->count = 0;
         for (t->c = 5; t->size; ++t->c) {
@@ -46,9 +46,10 @@ void triples_coro(struct triples* t) {
                 }
             }
         }
-        cco_final:
+        cco_cleanup:
         puts("done");
     }
+    return 0;
 }
 
 int main()
@@ -57,11 +58,10 @@ int main()
     triples_vanilla(5);
 
     puts("\nCoroutine triples:");
-    struct triples t = {INT32_MAX};
+    struct triples t = {.size=INT32_MAX};
     int n = 0;
 
-    while (!cco_done(&t)) {
-        triples_coro(&t);
+    while (triples_coro(&t)) {
         if (gcd(t.a, t.b) > 1)
             continue;
         if (t.c < 100)

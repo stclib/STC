@@ -32,22 +32,22 @@ struct iterpair {
     int cco_state; // required member
 };
 
-bool iterpair(struct iterpair* I) {
+int iterpair(struct iterpair* I) {
     cco_routine(I) {
         for (I->x = 0; I->x < I->max_x; I->x++)
             for (I->y = 0; I->y < I->max_y; I->y++)
-                cco_yield(false);
+                cco_yield();
 
-        cco_final: // required if there is cleanup code
+        cco_cleanup: // required if there is cleanup code
         puts("final");
     }
-    return true; // finished
+    return 0; // CCO_DONE
 }
 
 int main(void) {
     struct iterpair it = {.max_x=3, .max_y=3};
     int n = 0;
-    while (!iterpair(&it))
+    while (iterpair(&it))
     {
         printf("%d %d\n", it.x, it.y);
         // example of early stop:
@@ -59,12 +59,19 @@ int main(void) {
 #include "../ccommon.h"
 
 enum {
-    cco_state_final = -1,
-    cco_state_done = -2,
+    CCO_STATE_CLEANUP = -1,
+    CCO_STATE_DONE = -2,
 };
+typedef enum {
+    CCO_DONE = 0,
+    CCO_YIELD = 1,
+    CCO_AWAIT = 2,
+    CCO_ERROR = -1,
+} cco_result;
 
 #define cco_initial(co) ((co)->cco_state == 0)
-#define cco_done(co) ((co)->cco_state == cco_state_done)
+#define cco_suspended(co) ((co)->cco_state > 0)
+#define cco_done(co) ((co)->cco_state == CCO_STATE_DONE)
 
 /* Emulate switch in coro: always use { } after cco_case(val) and cco_default. */
 #define cco_switch(x) for (long long _sw = (long long)(x), _b=0; !_b; _b=1)
@@ -72,71 +79,84 @@ enum {
 #define cco_default
 
 #define cco_routine(co) \
-    for (int *_state = &(co)->cco_state; *_state != cco_state_done; *_state = cco_state_done) \
+    for (int *_state = &(co)->cco_state; *_state != CCO_STATE_DONE; *_state = CCO_STATE_DONE) \
         _resume: switch (*_state) case 0: // thanks, @liigo!
 
-#define cco_yield(ret) \
+#define cco_yield() cco_yield_v(CCO_YIELD)
+#define cco_yield_v(ret) \
     do { \
         *_state = __LINE__; return ret; goto _resume; \
         case __LINE__:; \
     } while (0)
 
-#define cco_await(...) c_MACRO_OVERLOAD(cco_await, __VA_ARGS__)
-#define cco_await_1(promise) cco_await_2(promise, )
-#define cco_await_2(promise, ret) \
+#define cco_await(promise) cco_await_v_2(promise, CCO_AWAIT)
+#define cco_await_v(...) c_MACRO_OVERLOAD(cco_await_v, __VA_ARGS__)
+#define cco_await_v_1(promise) cco_await_v_2(promise, )
+#define cco_await_v_2(promise, ret) \
     do { \
         *_state = __LINE__; \
         case __LINE__: if (!(promise)) {return ret; goto _resume;} \
     } while (0)
 
-#define cco_closure(Ret, Closure, ...) \
-    struct Closure { \
-        Ret (*cco_fn)(struct Closure*); \
-        int cco_state; \
-        __VA_ARGS__ \
-    }
+/* cco_await_on(): assumes coroutine returns a cco_result value (int) */
+#define cco_await_on(corocall) \
+    do { \
+        *_state = __LINE__; \
+        case __LINE__: { int _r = corocall; if (_r != CCO_DONE) {return _r; goto _resume;} } \
+    } while (0)
 
-typedef struct cco_base { 
-    void (*cco_fn)(struct cco_base*);
-    int cco_state;
-} cco_base;
-
-#define cco_base_cast(closure) \
-    ((cco_base *)(closure) + 0*sizeof((cco_resume(closure), (int*)0 == &(closure)->cco_state)))
-
-#define cco_resume(closure) (closure)->cco_fn(closure)
-#define cco_await_on(...) c_MACRO_OVERLOAD(cco_await_on, __VA_ARGS__)
-#define cco_await_on_1(closure) cco_await_2((cco_resume(closure), cco_done(closure)), )
-#define cco_await_on_2(co, func) cco_await_2((func(co), cco_done(co)), )
-
+/* cco_block_on(): assumes coroutine returns a cco_result value (int) */
 #define cco_block_on(...) c_MACRO_OVERLOAD(cco_block_on, __VA_ARGS__)
-#define cco_block_on_1(closure) while (cco_resume(closure), !cco_done(closure))
-#define cco_block_on_2(co, func) while (func(co), !cco_done(co))
+#define cco_block_on_1(corocall) while (corocall != CCO_DONE)
+#define cco_block_on_2(corocall, res) while ((*(res) = (corocall)) != CCO_DONE)
 
-#define cco_final \
-    *_state = cco_state_final; case cco_state_final
+#define cco_cleanup \
+    *_state = CCO_STATE_CLEANUP; case CCO_STATE_CLEANUP
 
 #define cco_return \
     do { \
-        *_state = *_state >= 0 ? cco_state_final : cco_state_done; \
+        *_state = *_state >= 0 ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
         goto _resume; \
     } while (0)
 
-#define cco_return_v(value) \
+#define cco_yield_final() cco_yield_final_v(CCO_YIELD)
+#define cco_yield_final_v(value) \
     do { \
-        *_state = *_state >= 0 ? cco_state_final : cco_state_done; \
+        *_state = *_state >= 0 ? CCO_STATE_CLEANUP : CCO_STATE_DONE; \
         return value; \
     } while (0)
 
 #define cco_stop(co) \
     do { \
         int* _s = &(co)->cco_state; \
-        if (*_s > 0) *_s = cco_state_final; \
-        else if (*_s == 0) *_s = cco_state_done; \
+        if (*_s > 0) *_s = CCO_STATE_CLEANUP; \
+        else if (*_s == 0) *_s = CCO_STATE_DONE; \
     } while (0)
 
 #define cco_reset(co) \
     (void)((co)->cco_state = 0)
+
+/*
+ * Closure (optional)
+ */
+
+#define cco_closure(Name, ...) \
+    struct Name { \
+        int (*cco_fn)(struct Name*); \
+        int cco_state; \
+        __VA_ARGS__ \
+    }
+
+typedef struct cco_base { 
+    int (*cco_fn)(struct cco_base*);
+    int cco_state;
+} cco_base;
+
+#define cco_resume(closure) \
+    (closure)->cco_fn(closure)
+
+#define cco_cast(closure) \
+    ((cco_base *)(closure) + 0*sizeof((cco_resume(closure), (int*)0 == &(closure)->cco_state)))
 
 /*
  * Semaphore
@@ -144,11 +164,12 @@ typedef struct cco_base {
 
 typedef struct { intptr_t count; } cco_sem;
 
-#define cco_sem_await(...) c_MACRO_OVERLOAD(cco_sem_await, __VA_ARGS__)
-#define cco_sem_await_1(sem) cco_sem_await_2(sem, )
-#define cco_sem_await_2(sem, ret) \
+#define cco_sem_await(sem) cco_sem_await_v_2(sem, CCO_AWAIT)
+#define cco_sem_await_v(...) c_MACRO_OVERLOAD(cco_sem_await_v, __VA_ARGS__)
+#define cco_sem_await_v_1(sem) cco_sem_await_v_2(sem, )
+#define cco_sem_await_v_2(sem, ret) \
     do { \
-        cco_await_2((sem)->count > 0, ret); \
+        cco_await_v_2((sem)->count > 0, ret); \
         --(sem)->count; \
     } while (0)
 
@@ -197,12 +218,13 @@ typedef struct { intptr_t count; } cco_sem;
 
 typedef struct { double interval, start; } cco_timer;
 
-#define cco_timer_await(...) c_MACRO_OVERLOAD(cco_timer_await, __VA_ARGS__)
-#define cco_timer_await_2(tm, sec) cco_timer_await_3(tm, sec, )
-#define cco_timer_await_3(tm, sec, ret) \
+#define cco_timer_await(tm, sec) cco_timer_await_v_3(tm, sec, CCO_AWAIT)
+#define cco_timer_await_v(...) c_MACRO_OVERLOAD(cco_timer_await_v, __VA_ARGS__)
+#define cco_timer_await_v_2(tm, sec) cco_timer_await_v_3(tm, sec, )
+#define cco_timer_await_v_3(tm, sec, ret) \
     do { \
         cco_timer_start(tm, sec); \
-        cco_await_2(cco_timer_expired(tm), ret); \
+        cco_await_v_2(cco_timer_expired(tm), ret); \
     } while (0)
 
 static inline void cco_timer_start(cco_timer* tm, double sec) {

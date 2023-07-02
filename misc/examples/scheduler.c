@@ -2,9 +2,11 @@
 #include <stdio.h>
 #include <stc/calgo.h>
 
-cco_closure(bool, Task,
+struct Task {
+    int (*fn)(struct Task*);
+    int cco_state;
     struct Scheduler* sched;
-);
+};
 
 #define i_type Scheduler
 #define i_val struct Task
@@ -16,49 +18,49 @@ static bool schedule(Scheduler* sched)
     Scheduler_pop(sched);
     
     if (!cco_done(&task))
-        cco_resume(&task);
+        task.fn(&task);
     
     return !Scheduler_empty(sched);
 }
 
-static bool push_task(const struct Task* task)
+static int push_task(const struct Task* task)
 {
     Scheduler_push(task->sched, *task);
-    return false;
+    return CCO_YIELD;
 }
 
 
-static bool taskA(struct Task* task)
+static int taskA(struct Task* task)
 {
     cco_routine(task) {
         puts("Hello, from task A");
-        cco_yield(push_task(task));
+        cco_yield_v(push_task(task));
         puts("A is back doing work");
-        cco_yield(push_task(task));
+        cco_yield_v(push_task(task));
         puts("A is back doing more work");
-        cco_yield(push_task(task));
+        cco_yield_v(push_task(task));
         puts("A is back doing even more work");
     }
-    return true;
+    return 0;
 }
 
-static bool taskB(struct Task* task) 
+static int taskB(struct Task* task) 
 {
     cco_routine(task) {
         puts("Hello, from task B");
-        cco_yield(push_task(task));
+        cco_yield_v(push_task(task));
         puts("B is back doing work");
-        cco_yield(push_task(task));
+        cco_yield_v(push_task(task));
         puts("B is back doing more work");
     }
-    return true;
+    return 0;
 }
 
 void Use(void)
 {
     Scheduler scheduler = c_init(Scheduler, {
-        {.cco_fn=taskA, .sched=&scheduler}, 
-        {.cco_fn=taskB, .sched=&scheduler},
+        {.fn=taskA, .sched=&scheduler}, 
+        {.fn=taskB, .sched=&scheduler},
     });
 
     while (schedule(&scheduler)) {}

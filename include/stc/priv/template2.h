@@ -20,8 +20,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-#ifdef i_retain
-#undef i_retain
+#ifdef i_more
+#undef i_more
 #else
 #undef i_type
 #undef i_tag
