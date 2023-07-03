@@ -54,7 +54,10 @@ typedef struct {
     i_type get;
 } c_PASTE(i_type, _ext);
 
-#define c_extend(self) c_container_of(self, _cx_MEMB(_ext), get)
+#define c_extend() c_container_of(self, _cx_MEMB(_ext), get)
+// Note: i_less: c_extend() accessible for cpque types
+//       i_cmp: c_extend() accessible for csmap and csset types
+//       i_hash/i_eq: c_extend() accessible for cmap and cset types
 
 #define i_is_forward
 #define _i_inc <stc/i_base.h>
