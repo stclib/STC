@@ -73,11 +73,6 @@ typedef enum {
 #define cco_suspended(co) ((co)->cco_state > 0)
 #define cco_done(co) ((co)->cco_state == CCO_STATE_DONE)
 
-/* Emulate switch in coro: always use { } after cco_case(val) and cco_default. */
-#define cco_switch(x) for (long long _sw = (long long)(x), _b=0; !_b; _b=1)
-#define cco_case(val) if (_b |= _sw == (val))
-#define cco_default
-
 #define cco_routine(co) \
     for (int *_state = &(co)->cco_state; *_state != CCO_STATE_DONE; *_state = CCO_STATE_DONE) \
         _resume: switch (*_state) case 0: // thanks, @liigo!
@@ -107,8 +102,8 @@ typedef enum {
 
 /* cco_block_on(): assumes coroutine returns a cco_result value (int) */
 #define cco_block_on(...) c_MACRO_OVERLOAD(cco_block_on, __VA_ARGS__)
-#define cco_block_on_1(corocall) while (corocall != CCO_DONE)
-#define cco_block_on_2(corocall, res) while ((*(res) = (corocall)) != CCO_DONE)
+#define cco_block_on_1(corocall) while ((corocall) != CCO_DONE)
+#define cco_block_on_2(corocall, result) while ((*(result) = (corocall)) != CCO_DONE)
 
 #define cco_cleanup \
     *_state = CCO_STATE_CLEANUP; case CCO_STATE_CLEANUP

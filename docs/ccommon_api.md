@@ -370,8 +370,8 @@ int main()
 ### Coroutine API
 To resume the coroutine from where it was suspended with *cco_yield()*: call the coroutine again.
 
-**Note**: *cco_yield()* / *cco_await()* may not be called inside a `switch` statement; either use 
-`if-else-if` constructs, or `cco_switch / cco_case / cco_default` for switch-emulation instead.
+**Note**: *cco_yield()* / *cco_await()* may not be called inside a `switch` statement; use 
+`if-else-if` constructs instead.
 
 |           |  Function / operator                 | Description                             |
 |:----------|:-------------------------------------|:----------------------------------------|
@@ -416,10 +416,6 @@ To resume the coroutine from where it was suspended with *cco_yield()*: call the
 |           | Time functions:                      |                                         |
 | `double`  | `cco_time(void)`                     | Return secs with usec prec. since Epoch |
 |           | `cco_sleep(double sec)`              | Sleep for seconds (msec or usec prec.)  |
-|           | Emulate switch:                      |                                         | 
-|           | `cco_switch(x) { }`                  | Like switch syntax                      |
-|           | `cco_case(val) { }`                  | Braces are required. Fall-through if no break; |
-|           | `cco_default { }`                    | Default action                          |
 
 ---
 ## RAII scope macros
