@@ -31,7 +31,7 @@ int main() {
     cbits_reset(&bset, 9);
     cbits_resize(&bset, 43, false);
 
-    printf("%4zu: ", cbits_size(&bset));
+    printf("%4lld: ", cbits_size(&bset));
     c_forrange (i, cbits_size(&bset))
         printf("%d", cbits_at(&bset, i));
     puts("");
@@ -41,7 +41,7 @@ int main() {
     cbits_resize(&bset, 102, true);
     cbits_set_value(&bset, 99, false);
 
-    printf("%4zu: ", cbits_size(&bset));
+    printf("%4lld: ", cbits_size(&bset));
     c_forrange (i, cbits_size(&bset))
         printf("%d", cbits_at(&bset, i));
     puts("");
@@ -54,11 +54,8 @@ int main() {
 #include <stdlib.h>
 #include <string.h>
 
-#ifndef i_ssize
-#define i_ssize intptr_t
-#endif
 #define _cbits_bit(i) ((uint64_t)1 << ((i) & 63))
-#define _cbits_words(n) (i_ssize)(((n) + 63)>>6)
+#define _cbits_words(n) (_llong)(((n) + 63)>>6)
 #define _cbits_bytes(n) (_cbits_words(n) * c_sizeof(uint64_t))
 
 #if defined(__GNUC__)
@@ -80,23 +77,23 @@ int main() {
     }
 #endif
 
-STC_INLINE i_ssize _cbits_count(const uint64_t* set, const i_ssize sz) {
-    const i_ssize n = sz>>6;
-    i_ssize count = 0;
-    for (i_ssize i = 0; i < n; ++i)
+STC_INLINE _llong _cbits_count(const uint64_t* set, const _llong sz) {
+    const _llong n = sz>>6;
+    _llong count = 0;
+    for (_llong i = 0; i < n; ++i)
         count += cpopcount64(set[i]);
     if (sz & 63)
         count += cpopcount64(set[n] & (_cbits_bit(sz) - 1));
     return count;
 }
 
-STC_INLINE char* _cbits_to_str(const uint64_t* set, const i_ssize sz, 
-                               char* out, i_ssize start, i_ssize stop) {
+STC_INLINE char* _cbits_to_str(const uint64_t* set, const _llong sz, 
+                               char* out, _llong start, _llong stop) {
     if (stop > sz) stop = sz;
     assert(start <= stop);
 
     c_memset(out, '0', stop - start);
-    for (i_ssize i = start; i < stop; ++i) 
+    for (_llong i = start; i < stop; ++i) 
         if ((set[i>>6] & _cbits_bit(i)) != 0)
             out[i - start] = '1';
     out[stop - start] = '\0';
@@ -104,8 +101,8 @@ STC_INLINE char* _cbits_to_str(const uint64_t* set, const i_ssize sz,
 }
 
 #define _cbits_OPR(OPR, VAL) \
-    const i_ssize n = sz>>6; \
-    for (i_ssize i = 0; i < n; ++i) \
+    const _llong n = sz>>6; \
+    for (_llong i = 0; i < n; ++i) \
         if ((set[i] OPR other[i]) != VAL) \
             return false; \
     if (!(sz & 63)) \
@@ -113,10 +110,10 @@ STC_INLINE char* _cbits_to_str(const uint64_t* set, const i_ssize sz,
     const uint64_t i = (uint64_t)n, m = _cbits_bit(sz) - 1; \
     return ((set[i] OPR other[i]) & m) == (VAL & m)
 
-STC_INLINE bool _cbits_subset_of(const uint64_t* set, const uint64_t* other, const i_ssize sz)
+STC_INLINE bool _cbits_subset_of(const uint64_t* set, const uint64_t* other, const _llong sz)
     { _cbits_OPR(|, set[i]); }
 
-STC_INLINE bool _cbits_disjoint(const uint64_t* set, const uint64_t* other, const i_ssize sz)
+STC_INLINE bool _cbits_disjoint(const uint64_t* set, const uint64_t* other, const _llong sz)
     { _cbits_OPR(&, 0); }
 
 #endif // CBITS_H_INCLUDED
@@ -128,12 +125,11 @@ STC_INLINE bool _cbits_disjoint(const uint64_t* set, const uint64_t* other, cons
 #define _i_assert(x) assert(x)
 #define i_type cbits
 
-struct { uint64_t *data64; i_ssize _size; } typedef i_type;
+typedef struct { uint64_t *data64; _llong _size; } i_type;
 
 STC_INLINE cbits   cbits_init(void) { return c_LITERAL(cbits){NULL}; }
-STC_INLINE void    cbits_create(cbits* self) { self->data64 = NULL; self->_size = 0; }
 STC_INLINE void    cbits_drop(cbits* self) { c_free(self->data64); }
-STC_INLINE i_ssize cbits_size(const cbits* self) { return self->_size; }
+STC_INLINE _llong  cbits_size(const cbits* self) { return self->_size; }
 
 STC_INLINE cbits* cbits_take(cbits* self, cbits other) {
     if (self->data64 != other.data64) {
@@ -144,7 +140,7 @@ STC_INLINE cbits* cbits_take(cbits* self, cbits other) {
 }
 
 STC_INLINE cbits cbits_clone(cbits other) {
-    const i_ssize bytes = _cbits_bytes(other._size);
+    const _llong bytes = _cbits_bytes(other._size);
     cbits set = {(uint64_t *)c_memcpy(c_malloc(bytes), other.data64, bytes), other._size};
     return set;
 }
@@ -158,16 +154,16 @@ STC_INLINE cbits* cbits_copy(cbits* self, const cbits* other) {
     return self;
 }
 
-STC_INLINE void cbits_resize(cbits* self, const i_ssize size, const bool value) {
-    const i_ssize new_n = _cbits_words(size), osize = self->_size, old_n = _cbits_words(osize);
+STC_INLINE void cbits_resize(cbits* self, const _llong size, const bool value) {
+    const _llong new_n = _cbits_words(size), osize = self->_size, old_n = _cbits_words(osize);
     self->data64 = (uint64_t *)c_realloc(self->data64, new_n*8);
     self->_size = size;
     if (new_n >= old_n) {
         c_memset(self->data64 + old_n, -(int)value, (new_n - old_n)*8);
         if (old_n > 0) {
-            uint64_t m = _cbits_bit(osize) - 1; /* mask */
-            value ? (self->data64[old_n - 1] |= ~m) 
-                  : (self->data64[old_n - 1] &= m);
+            uint64_t mask = _cbits_bit(osize) - 1;
+            if (value) self->data64[old_n - 1] |= ~mask; 
+            else       self->data64[old_n - 1] &= mask;
         }
     }
 }
@@ -181,13 +177,13 @@ STC_INLINE cbits cbits_move(cbits* self) {
     return tmp;
 }
 
-STC_INLINE cbits cbits_with_size(const i_ssize size, const bool value) {
+STC_INLINE cbits cbits_with_size(const _llong size, const bool value) {
     cbits set = {(uint64_t *)c_malloc(_cbits_bytes(size)), size};
     cbits_set_all(&set, value);
     return set;
 }
 
-STC_INLINE cbits cbits_with_pattern(const i_ssize size, const uint64_t pattern) {
+STC_INLINE cbits cbits_with_pattern(const _llong size, const uint64_t pattern) {
     cbits set = {(uint64_t *)c_malloc(_cbits_bytes(size)), size};
     cbits_set_pattern(&set, pattern);
     return set;
@@ -200,12 +196,11 @@ STC_INLINE cbits cbits_with_pattern(const i_ssize size, const uint64_t pattern) 
 #define i_type c_PASTE(cbits, i_capacity)
 #endif
 
-struct { uint64_t data64[(i_capacity - 1)/64 + 1]; } typedef i_type;
+typedef struct { uint64_t data64[(i_capacity - 1)/64 + 1]; } i_type;
 
-STC_INLINE i_type   _i_memb(_init)(void) { return c_LITERAL(i_type){0}; }
-STC_INLINE void     _i_memb(_create)(i_type* self) {}
+STC_INLINE void     _i_memb(_init)(i_type* self) { memset(self->data64, 0, i_capacity*8); }
 STC_INLINE void     _i_memb(_drop)(i_type* self) {}
-STC_INLINE i_ssize  _i_memb(_size)(const i_type* self) { return i_capacity; }
+STC_INLINE _llong   _i_memb(_size)(const i_type* self) { return i_capacity; }
 STC_INLINE i_type   _i_memb(_move)(i_type* self) { return *self; }
 
 STC_INLINE i_type*  _i_memb(_take)(i_type* self, i_type other)
@@ -216,17 +211,17 @@ STC_INLINE i_type _i_memb(_clone)(i_type other)
 
 STC_INLINE i_type* _i_memb(_copy)(i_type* self, const i_type* other) 
     { *self = *other; return self; }
-    
+
 STC_INLINE void _i_memb(_set_all)(i_type *self, const bool value);
 STC_INLINE void _i_memb(_set_pattern)(i_type *self, const uint64_t pattern);
 
-STC_INLINE i_type _i_memb(_with_size)(const i_ssize size, const bool value) {
+STC_INLINE i_type _i_memb(_with_size)(const _llong size, const bool value) {
     assert(size <= i_capacity);
     i_type set; _i_memb(_set_all)(&set, value);
     return set;
 }
 
-STC_INLINE i_type _i_memb(_with_pattern)(const i_ssize size, const uint64_t pattern) {
+STC_INLINE i_type _i_memb(_with_pattern)(const _llong size, const uint64_t pattern) {
     assert(size <= i_capacity);
     i_type set; _i_memb(_set_pattern)(&set, pattern);
     return set;
@@ -239,36 +234,36 @@ STC_INLINE void _i_memb(_set_all)(i_type *self, const bool value)
     { c_memset(self->data64, value? ~0 : 0, _cbits_bytes(_i_memb(_size)(self))); }
 
 STC_INLINE void _i_memb(_set_pattern)(i_type *self, const uint64_t pattern) {
-    i_ssize n = _cbits_words(_i_memb(_size)(self));
+    _llong n = _cbits_words(_i_memb(_size)(self));
     while (n--) self->data64[n] = pattern;
 }
 
-STC_INLINE bool _i_memb(_test)(const i_type* self, const i_ssize i) 
+STC_INLINE bool _i_memb(_test)(const i_type* self, const _llong i) 
     { return (self->data64[i>>6] & _cbits_bit(i)) != 0; }
 
-STC_INLINE bool _i_memb(_at)(const i_type* self, const i_ssize i)
+STC_INLINE bool _i_memb(_at)(const i_type* self, const _llong i)
     { return (self->data64[i>>6] & _cbits_bit(i)) != 0; }
 
-STC_INLINE void _i_memb(_set)(i_type *self, const i_ssize i)
+STC_INLINE void _i_memb(_set)(i_type *self, const _llong i)
     { self->data64[i>>6] |= _cbits_bit(i); }
 
-STC_INLINE void _i_memb(_reset)(i_type *self, const i_ssize i)
+STC_INLINE void _i_memb(_reset)(i_type *self, const _llong i)
     { self->data64[i>>6] &= ~_cbits_bit(i); }
 
-STC_INLINE void _i_memb(_set_value)(i_type *self, const i_ssize i, const bool b) {
+STC_INLINE void _i_memb(_set_value)(i_type *self, const _llong i, const bool b) {
     self->data64[i>>6] ^= ((uint64_t)-(int)b ^ self->data64[i>>6]) & _cbits_bit(i);
 }
 
-STC_INLINE void _i_memb(_flip)(i_type *self, const i_ssize i)
+STC_INLINE void _i_memb(_flip)(i_type *self, const _llong i)
     { self->data64[i>>6] ^= _cbits_bit(i); }
 
 STC_INLINE void _i_memb(_flip_all)(i_type *self) {
-    i_ssize n = _cbits_words(_i_memb(_size)(self));
+    _llong n = _cbits_words(_i_memb(_size)(self));
     while (n--) self->data64[n] ^= ~(uint64_t)0;
 }
 
 STC_INLINE i_type _i_memb(_from)(const char* str) {
-    int64_t n = c_strlen(str);
+    _llong n = c_strlen(str);
     i_type set = _i_memb(_with_size)(n, false);
     while (n--) if (str[n] == '1') _i_memb(_set)(&set, n);
     return set;
@@ -277,26 +272,26 @@ STC_INLINE i_type _i_memb(_from)(const char* str) {
 /* Intersection */
 STC_INLINE void _i_memb(_intersect)(i_type *self, const i_type* other) {
     _i_assert(self->_size == other->_size);
-    i_ssize n = _cbits_words(_i_memb(_size)(self));
+    _llong n = _cbits_words(_i_memb(_size)(self));
     while (n--) self->data64[n] &= other->data64[n];
 }
 /* Union */
 STC_INLINE void _i_memb(_union)(i_type *self, const i_type* other) {
     _i_assert(self->_size == other->_size);
-    i_ssize n = _cbits_words(_i_memb(_size)(self));
+    _llong n = _cbits_words(_i_memb(_size)(self));
     while (n--) self->data64[n] |= other->data64[n];
 }
 /* Exclusive disjunction */
 STC_INLINE void _i_memb(_xor)(i_type *self, const i_type* other) {
     _i_assert(self->_size == other->_size);
-    i_ssize n = _cbits_words(_i_memb(_size)(self));
+    _llong n = _cbits_words(_i_memb(_size)(self));
     while (n--) self->data64[n] ^= other->data64[n];
 }
 
-STC_INLINE int64_t _i_memb(_count)(const i_type* self)
+STC_INLINE _llong _i_memb(_count)(const i_type* self)
     { return _cbits_count(self->data64, _i_memb(_size)(self)); }
 
-STC_INLINE char* _i_memb(_to_str)(const i_type* self, char* out, int64_t start, int64_t stop)
+STC_INLINE char* _i_memb(_to_str)(const i_type* self, char* out, _llong start, _llong stop)
     { return _cbits_to_str(self->data64, _i_memb(_size)(self), out, start, stop); }
 
 STC_INLINE bool _i_memb(_subset_of)(const i_type* self, const i_type* other) { 
@@ -312,7 +307,6 @@ STC_INLINE bool _i_memb(_disjoint)(const i_type* self, const i_type* other) {
 #pragma GCC diagnostic pop
 #endif
 #define CBITS_H_INCLUDED
-#undef _i_size
 #undef _i_memb
 #undef _i_assert
 #undef i_capacity
