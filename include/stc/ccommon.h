@@ -30,6 +30,7 @@
 #include <string.h>
 #include <assert.h>
 
+typedef long long _llong;
 #define c_NPOS INTPTR_MAX
 #define c_ZI PRIiPTR
 #define c_ZU PRIuPTR
@@ -200,9 +201,9 @@ STC_INLINE intptr_t cnextpow2(intptr_t n) {
 #define c_forrange_1(stop) c_forrange_3(_c_i, 0, stop)
 #define c_forrange_2(i, stop) c_forrange_3(i, 0, stop)
 #define c_forrange_3(i, start, stop) \
-    for (long long i=start, _end=(long long)(stop); i < _end; ++i)
+    for (_llong i=start, _end=(_llong)(stop); i < _end; ++i)
 #define c_forrange_4(i, start, stop, step) \
-    for (long long i=start, _inc=step, _end=(long long)(stop) - (_inc > 0) \
+    for (_llong i=start, _inc=step, _end=(_llong)(stop) - (_inc > 0) \
          ; (_inc > 0) ^ (i > _end); i += _inc)
 
 #ifndef __cplusplus
