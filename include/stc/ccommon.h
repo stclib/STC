@@ -174,7 +174,7 @@ STC_INLINE intptr_t cnextpow2(intptr_t n) {
     n |= n >> 1, n |= n >> 2;
     n |= n >> 4, n |= n >> 8;
     n |= n >> 16;
-    #if INTPTR_SIZE == INT64_SIZE
+    #if INTPTR_MAX == INT64_MAX
     n |= n >> 32;
     #endif
     return n + 1;

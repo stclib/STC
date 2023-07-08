@@ -408,7 +408,8 @@ void assert_dbl_compare(const char* cmp, double exp, double real, double tol, co
 
 void assert_pointers(const char* cmp, const void* exp, const void* real, const char* caller, int line) {
     if ((exp == real) != (cmp[0] == '=')) {
-        CTEST_ERR("%s:%d  assertion failed (0x%02llx) %s (0x%02llx)", caller, line, (unsigned long long)exp , cmp, (unsigned long long)real);
+        CTEST_ERR("%s:%d  assertion failed (0x%02llx) %s (0x%02llx)", caller, line,
+                  (unsigned long long)(uintptr_t)exp , cmp, (unsigned long long)(uintptr_t)real);
     }
 }
 
