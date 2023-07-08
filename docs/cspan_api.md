@@ -22,14 +22,14 @@ using_cspan4(S, ValueType);              // define span types S, S2, S3, S4 with
 ## Methods
 
 All functions are type-safe. Note that the span argument itself is generally not side-effect safe,
-i.e., it may be expanded multiple times. However, all integer arguments are safe, e.g.
+i.e., it may be expanded multiple times. However, all index arguments are safe, e.g.
 `cspan_at(&ms3, i++, j++, k++)` is allowed. If the number of arguments does not match the span rank,
 a compile error is issued. Runtime bounds checks are enabled by default (define `STC_NDEBUG` or `NDEBUG` to disable).
 ```c
 SpanType        cspan_init(T SpanType, {v1, v2, ...});              // make a 1-d cspan from values
 SpanType        cspan_from(STCContainer* cnt);                      // make a 1-d cspan from compatible STC container
 SpanType        cspan_from_array(ValueType array[]);                // make a 1-d cspan from C array
-SpanTypeN       cspan_md(ValueType* data,  intptr_t xdim, ...);     // make a multi-dimensional cspan
+SpanTypeN       cspan_md(char order, ValueType* data, d1, d2, ...); // make a multi-dim cspan. order: 'C' or 'F' (Fortran)
 
 intptr_t        cspan_size(const SpanTypeN* self);                  // return number of elements
 intptr_t        cspan_rank(const SpanTypeN* self);                  // dimensions; compile time constant
@@ -42,6 +42,9 @@ ValueType*      cspan_back(const SpanTypeN* self);
                 // general index slicing to create a subspan.
                 // {i} reduces rank. {i,c_END} slice to end. {c_ALL} use the full extent.
 SpanTypeR       cspan_slice(T SpanTypeR, const SpanTypeN* self, {x0,x1}, {y0,y1}.., {N0,N1});
+
+                // transpose the md span (inverse axes). no changes to the underlying array.
+void            cspan_transpose(const SpanTypeN* self);
                 
                 // create a subspan of lower rank. Like e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
 SpanType        cspan_submd2(const SpanType2* self, intptr_t x);        // return a 1d subspan from a 2d span.
@@ -50,8 +53,8 @@ SpanTypeN       cspan_submd4(const SpanType4* self, intptr_t x, ...);   // numbe
 
                 // create a subspan of same rank. Like e.g. cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
 SpanType        cspan_subspan(const SpanType* self, intptr_t offset, intptr_t count);
-SpanType2       cspan_subspan2(const SpanType2 self, intptr_t offset, intptr_t count);
-SpanType3       cspan_subspan3(const SpanType3 self, intptr_t offset, intptr_t count);
+SpanType2       cspan_subspan2(const SpanType2* self, intptr_t offset, intptr_t count);
+SpanType3       cspan_subspan3(const SpanType3* self, intptr_t offset, intptr_t count);
 
 SpanTypeN_iter  SpanType_begin(const SpanTypeN* self);
 SpanTypeN_iter  SpanType_end(const SpanTypeN* self);
@@ -99,7 +102,7 @@ using_cspan3(myspan, int); // define myspan, myspan2, myspan3.
 int main() {
     int arr[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24};
 
-    myspan3 ms3 = cspan_md(arr, 2, 3, 4);
+    myspan3 ms3 = cspan_md('C', arr, 2, 3, 4); // C-order, i.e. row-major.
     myspan3 ss3 = cspan_slice(myspan3, &ms3, {c_ALL}, {1,3}, {2,c_END});
     myspan2 ss2 = cspan_submd3(&ss3, 1);
 
@@ -148,7 +151,7 @@ int main()
     Span span = c_init(Span, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
                               14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24});
     // create a 3d cspan:
-    Span3 span3 = cspan_md(span.data, 2, 4, 3);
+    Span3 span3 = cspan_md('C', span.data, 2, 4, 3);
 
     // reduce rank: (i.e. span3[1])
     Span2 span2 = cspan_submd3(&span3, 1);

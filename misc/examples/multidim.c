@@ -14,7 +14,7 @@ int main()
     ispan ms1 = cspan_from(&v);
 
     // View the same data as a 3D array 2 x 3 x 4
-    ispan3 ms3 = cspan_md(v.data, 2, 3, 4);
+    ispan3 ms3 = cspan_md('C', v.data, 2, 3, 4);
 
     puts("ms3:");
     for (int i=0; i != ms3.shape[0]; i++) {
