@@ -6,7 +6,7 @@
 #include <stc/cqueue.h>
 
 int main() {
-    int n = 100000000;
+    int n = 1000000;
     crand_unif_t dist;
     crand_t rng = crand_init(1234);
     dist = crand_unif_init(0, n);

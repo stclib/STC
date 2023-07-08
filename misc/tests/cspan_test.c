@@ -112,10 +112,9 @@ CTEST_TEARDOWN(cspan_cube) {
 
 
 CTEST_F(cspan_cube, slice3) {
-    intptr_t n = cstack_int_size(&_self->stack);
-    //printf("\ntiles: %zi, cells: %zi\n", Tiles_size(&_self->tiles), n);
+    long long n = cstack_int_size(&_self->stack);
+    long long sum = 0;
 
-    int64_t sum = 0;
     // iterate each 3d tile in sequence
     c_foreach (i, Tiles, _self->tiles)
         c_foreach (t, intspan3, *i.ref)
