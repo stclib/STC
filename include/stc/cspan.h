@@ -72,7 +72,7 @@ int demo2() {
     typedef struct { \
         Self##_value *data; \
         int32_t shape[RANK]; \
-        cspan_tup##RANK stride; \
+        cspan_tuple##RANK stride; \
     } Self; \
     \
     typedef struct { Self##_value *ref; int32_t pos[RANK]; const Self *_s; } Self##_iter; \
@@ -107,18 +107,18 @@ int demo2() {
 #define using_cspan2(Self, T) using_cspan_3(Self, T, 1); using_cspan_3(Self##2, T, 2)
 #define using_cspan3(Self, T) using_cspan2(Self, T); using_cspan_3(Self##3, T, 3)
 #define using_cspan4(Self, T) using_cspan3(Self, T); using_cspan_3(Self##4, T, 4)
-typedef struct { int32_t d[1]; } cspan_tup1;
-typedef struct { int32_t d[2]; } cspan_tup2;
-typedef struct { int32_t d[3]; } cspan_tup3;
-typedef struct { int32_t d[4]; } cspan_tup4;
-typedef struct { int32_t d[5]; } cspan_tup5;
-typedef struct { int32_t d[6]; } cspan_tup6;
+typedef struct { int32_t d[1]; } cspan_tuple1;
+typedef struct { int32_t d[2]; } cspan_tuple2;
+typedef struct { int32_t d[3]; } cspan_tuple3;
+typedef struct { int32_t d[4]; } cspan_tuple4;
+typedef struct { int32_t d[5]; } cspan_tuple5;
+typedef struct { int32_t d[6]; } cspan_tuple6;
 #define c_END -1
 #define c_ALL 0,-1
 
 #define cspan_md(order, array, ...) \
     {.data=array, .shape={__VA_ARGS__}, \
-     .stride=*(c_PASTE(cspan_tup, c_NUMARGS(__VA_ARGS__))*)_cspan_shape2stride(order, ((int32_t[]){__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))}
+     .stride=*(c_PASTE(cspan_tuple, c_NUMARGS(__VA_ARGS__))*)_cspan_shape2stride(order, ((int32_t[]){__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))}
 
 #define cspan_transpose(self) \
     _cspan_transpose((self)->shape, (self)->stride.d, cspan_rank(self))
@@ -143,16 +143,16 @@ typedef struct { int32_t d[6]; } cspan_tup6;
 #define cspan_rank(self) c_arraylen((self)->shape)
 #define cspan_order(self) ((self)->stride.d[0] < (self)->stride.d[cspan_rank(self) - 1])
 
-#define cspan_index(self, ...) c_PASTE(cspan_tup_, c_NUMARGS(__VA_ARGS__))(self, __VA_ARGS__)
-#define cspan_tup_1 cspan_tup_3
-#define cspan_tup_2 cspan_tup_3
-#define cspan_tup_3(self, ...) \
+#define cspan_index(self, ...) c_PASTE(cspan_idx_, c_NUMARGS(__VA_ARGS__))(self, __VA_ARGS__)
+#define cspan_idx_1 cspan_idx_3
+#define cspan_idx_2 cspan_idx_3
+#define cspan_idx_3(self, ...) \
     c_PASTE(_cspan_idx, c_NUMARGS(__VA_ARGS__))((self)->shape, (self)->stride, __VA_ARGS__) // small/fast
-#define cspan_tup_4(self, ...) \
+#define cspan_idx_4(self, ...) \
     (_cspan_idxN(c_NUMARGS(__VA_ARGS__), (self)->shape, (self)->stride.d, (int32_t[]){__VA_ARGS__}) + \
      c_static_assert(cspan_rank(self) == c_NUMARGS(__VA_ARGS__))) // general
-#define cspan_tup_5 cspan_tup_4
-#define cspan_tup_6 cspan_tup_4
+#define cspan_idx_5 cspan_idx_4
+#define cspan_idx_6 cspan_idx_4
 
 #define cspan_at(self, ...) ((self)->data + cspan_index(self, __VA_ARGS__))
 #define cspan_front(self) ((self)->data)
@@ -200,17 +200,16 @@ STC_INLINE void _cspan_transpose(int32_t shape[], int32_t stride[], int rank) {
     }
 }
 
-STC_INLINE intptr_t _cspan_idx1(const int32_t shape[1], const cspan_tup1 stri, int32_t x)
+STC_INLINE intptr_t _cspan_idx1(const int32_t shape[1], const cspan_tuple1 stri, int32_t x)
     { c_ASSERT(c_LTu(x, shape[0])); return x; }
 
-STC_INLINE intptr_t _cspan_idx2(const int32_t shape[2], const cspan_tup2 stri, int32_t x, int32_t y)
+STC_INLINE intptr_t _cspan_idx2(const int32_t shape[2], const cspan_tuple2 stri, int32_t x, int32_t y)
     { c_ASSERT(c_LTu(x, shape[0]) && c_LTu(y, shape[1])); return (intptr_t)stri.d[0]*x + stri.d[1]*y; }
 
-STC_INLINE intptr_t _cspan_idx3(const int32_t shape[3], const cspan_tup3 stri, int32_t x, int32_t y, int32_t z) {
+STC_INLINE intptr_t _cspan_idx3(const int32_t shape[3], const cspan_tuple3 stri, int32_t x, int32_t y, int32_t z) {
     c_ASSERT(c_LTu(x, shape[0]) && c_LTu(y, shape[1]) && c_LTu(z, shape[2]));
     return (intptr_t)stri.d[0]*x + stri.d[1]*y + stri.d[2]*z;
 }
-
 STC_INLINE intptr_t _cspan_idxN(int rank, const int32_t shape[], const int32_t stride[], const int32_t a[]) {
     intptr_t off = 0;
     while (rank--) {
