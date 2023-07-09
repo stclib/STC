@@ -125,7 +125,7 @@ typedef struct { int32_t d[6]; } cspan_tuple6;
 
 /* Use cspan_init() for static initialization only. c_init() for non-static init. */
 #define cspan_init(SpanType, ...) \
-    {.data=(SpanType##_value[])__VA_ARGS__, .shape={sizeof((SpanType##_value[])__VA_ARGS__)/sizeof(SpanType##_value)}}
+    {.data=(SpanType##_value[])__VA_ARGS__, .shape={sizeof((SpanType##_value[])__VA_ARGS__)/sizeof(SpanType##_value)}, .stride={.d={1}}}
 
 #define cspan_slice(OutSpan, parent, ...) \
     OutSpan##_slice_((parent)->data, (parent)->shape, (parent)->stride.d, cspan_rank(parent) + \
@@ -134,14 +134,14 @@ typedef struct { int32_t d[6]; } cspan_tuple6;
      
 /* create a cspan from a cvec, cstack, cdeq, cqueue, or cpque (heap) */
 #define cspan_from(container) \
-    {.data=(container)->data, .shape={(int32_t)(container)->_len}}
+    {.data=(container)->data, .shape={(int32_t)(container)->_len}, .stride={.d={1}}}
 
 #define cspan_from_array(array) \
-    {.data=(array) + c_static_assert(sizeof(array) != sizeof(void*)), .shape={c_arraylen(array)}}
+    {.data=(array) + c_static_assert(sizeof(array) != sizeof(void*)), .shape={c_arraylen(array)}, .stride={.d={1}}}
 
 #define cspan_size(self) _cspan_size((self)->shape, cspan_rank(self))
 #define cspan_rank(self) c_arraylen((self)->shape)
-#define cspan_order(self) ((self)->stride.d[0] < (self)->stride.d[cspan_rank(self) - 1])
+#define cspan_is_order_F(self) ((self)->stride.d[0] < (self)->stride.d[cspan_rank(self) - 1])
 
 #define cspan_index(self, ...) c_PASTE(cspan_idx_, c_NUMARGS(__VA_ARGS__))(self, __VA_ARGS__)
 #define cspan_idx_1 cspan_idx_3
@@ -158,15 +158,15 @@ typedef struct { int32_t d[6]; } cspan_tuple6;
 #define cspan_front(self) ((self)->data)
 #define cspan_back(self) ((self)->data + cspan_size(self) - 1)
 
-// cspan_subspanN. (N<4) Optimized, same as e.g. cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
+// cspan_subspanN. (N<=3) Optimized, same as e.g. cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
 #define cspan_subspan(self, offset, count) \
-    {.data=cspan_at(self, offset), .shape={count}}
+    {.data=cspan_at(self, offset), .shape={count}, .stride=(self)->stride}
 #define cspan_subspan2(self, offset, count) \
-    {.data=cspan_at(self, offset, 0), .shape={count, (self)->shape[1]}, .stride={(self)->stride}}
+    {.data=cspan_at(self, offset, 0), .shape={count, (self)->shape[1]}, .stride=(self)->stride}
 #define cspan_subspan3(self, offset, count) \
-    {.data=cspan_at(self, offset, 0, 0), .shape={count, (self)->shape[1], (self)->shape[2]}, .stride={(self)->stride}}
+    {.data=cspan_at(self, offset, 0, 0), .shape={count, (self)->shape[1], (self)->shape[2]}, .stride=(self)->stride}
 
-// cspan_submdN: reduce rank (N<5) Optimized, same as e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
+// cspan_submdN: reduce rank (N<=4) Optimized, same as e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
 #define cspan_submd4(...) c_MACRO_OVERLOAD(cspan_submd4, __VA_ARGS__)
 #define cspan_submd3(...) c_MACRO_OVERLOAD(cspan_submd3, __VA_ARGS__)
 #define cspan_submd2(self, x) \
@@ -219,7 +219,7 @@ STC_INLINE intptr_t _cspan_idxN(int rank, const int32_t shape[], const int32_t s
     return off;
 }
 
-#define _cspan_next1(pos, d, s, r, i, inc) (++pos[0], 1)
+#define _cspan_next1(pos, shape, stride, rank, i, inc) (++pos[0], stride[0])
 STC_API intptr_t _cspan_next2(int32_t pos[], const int32_t shape[], const int32_t stride[], int rank, int i, int inc);
 #define _cspan_next3 _cspan_next2
 #define _cspan_next4 _cspan_next2
