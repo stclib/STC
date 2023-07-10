@@ -625,6 +625,7 @@ STC is generally very memory efficient. Memory usage for the different container
     - Define i_import before #include <stc/cstr.h> will also define utf8 case conversions.
     - Define i_import before #include <stc/cregex.h> will also define cstr + utf8 tables.
 - Renamed c_make() => c_init() macro for initialization lists.
+- Renamed input enum flags for cregex functions.
 - Removed deprecated crandom.h. Use crand.h with new API.
 - Removed deprecated uppercase flow-control macro names.
 - Improved default string hash function.

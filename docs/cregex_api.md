@@ -12,16 +12,16 @@ The API is simple and includes powerful string pattern matches and replace funct
 ```c
 enum {
     // compile-flags
-    CREG_C_DOTALL = 1<<0,    // dot matches newline too: can be set/overridden by (?s) and (?-s) in RE
-    CREG_C_ICASE = 1<<1,     // ignore case mode: can be set/overridden by (?i) and (?-i) in RE
+    CREG_DOTALL = 1<<0,    // dot matches newline too: can be set/overridden by (?s) and (?-s) in RE
+    CREG_ICASE = 1<<1,     // ignore case mode: can be set/overridden by (?i) and (?-i) in RE
 
     // match-flags
-    CREG_M_FULLMATCH = 1<<2, // like start-, end-of-line anchors were in pattern: "^ ... $"
-    CREG_M_NEXT = 1<<3,      // use end of previous match[0] as start of input
-    CREG_M_STARTEND = 1<<4,  // use match[0] as start+end of input
+    CREG_FULLMATCH = 1<<2, // like start-, end-of-line anchors were in pattern: "^ ... $"
+    CREG_NEXT = 1<<3,      // use end of previous match[0] as start of input
+    CREG_STARTEND = 1<<4,  // use match[0] as start+end of input
 
     // replace-flags
-    CREG_R_STRIP = 1<<5,     // only keep the replaced matches, strip the rest
+    CREG_STRIP = 1<<5,     // only keep the replaced matches, strip the rest
 };
 
 cregex      cregex_init(void);
@@ -138,7 +138,7 @@ In order to use a callback function in the replace call, see `examples/regex_rep
 To iterate multiple matches in an input string, you may use
 ```c
 csview match[5] = {0};
-while (cregex_find(&re, input, match, CREG_M_NEXT) == CREG_OK)
+while (cregex_find(&re, input, match, CREG_NEXT) == CREG_OK)
     for (int k = 1; i <= cregex_captures(&re); ++k)
         printf("submatch %d: %.*s\n", k, c_SV(match[k]));
 ```
@@ -181,8 +181,8 @@ For reference, **cregex** uses the following files:
 | \B | Not UTF8 word boundary | * |
 | \Q | Start literal input mode | * |
 | \E | End literal input mode | * |
-| (?i) (?-i)  | Ignore case on/off (override CREG_C_ICASE) | * |
-| (?s) (?-s)  | Dot matches newline on/off (override CREG_C_DOTALL) | * |
+| (?i) (?-i)  | Ignore case on/off (override CREG_ICASE) | * |
+| (?s) (?-s)  | Dot matches newline on/off (override CREG_DOTALL) | * |
 | \n \t \r | Match UTF8 newline, tab, carriage return | |
 | \d \s \w | Match UTF8 digit, whitespace, alphanumeric character | |
 | \D \S \W | Do not match the groups described above | |

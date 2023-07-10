@@ -48,7 +48,7 @@ int main()
         printf("euros: %s\n", cstr_str(&str));
 
         /* Strip out everything but the matches */
-        cstr_take(&str, cregex_replace_sv(&re, csview_from(input), "$3.$2.$1;", 0, NULL, CREG_R_STRIP));
+        cstr_take(&str, cregex_replace_sv(&re, csview_from(input), "$3.$2.$1;", 0, NULL, CREG_STRIP));
         printf("strip: %s\n", cstr_str(&str));
 
         /* Wrap all words in ${} */

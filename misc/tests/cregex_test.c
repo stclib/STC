@@ -15,7 +15,7 @@ CTEST(cregex, compile_match_char)
     ASSERT_EQ(re.error, 0);
 
     csview match;
-    ASSERT_EQ(cregex_find(&re, inp="äsdf", &match, CREG_M_FULLMATCH), CREG_OK);
+    ASSERT_EQ(cregex_find(&re, inp="äsdf", &match, CREG_FULLMATCH), CREG_OK);
     ASSERT_EQ(M_START(match), 0);
     ASSERT_EQ(M_END(match), 5); // ä is two bytes wide
 
@@ -193,14 +193,14 @@ CTEST(cregex, search_all)
         int res;
         ASSERT_EQ(re.error, CREG_OK);
         inp="ab,ab,ab";
-        res = cregex_find(&re, inp, &m, CREG_M_NEXT);
+        res = cregex_find(&re, inp, &m, CREG_NEXT);
         ASSERT_EQ(M_START(m), 0);
-        res = cregex_find(&re, inp, &m, CREG_M_NEXT);
+        res = cregex_find(&re, inp, &m, CREG_NEXT);
         ASSERT_EQ(res, CREG_OK);
         ASSERT_EQ(M_START(m), 3);
-        res = cregex_find(&re, inp, &m, CREG_M_NEXT);
+        res = cregex_find(&re, inp, &m, CREG_NEXT);
         ASSERT_EQ(M_START(m), 6);
-        res = cregex_find(&re, inp, &m, CREG_M_NEXT);
+        res = cregex_find(&re, inp, &m, CREG_NEXT);
         ASSERT_NE(res, CREG_OK);
     }
 }
@@ -280,7 +280,7 @@ CTEST(cregex, replace)
         ASSERT_STREQ(cstr_str(&str), "start date: 31.12.2015, end date: 28.02.2022");
 
         // Strip out everything but the matches
-        cstr_take(&str, cregex_replace_sv(&re, csview_from(input), "$3.$2.$1;", 0, NULL, CREG_R_STRIP));
+        cstr_take(&str, cregex_replace_sv(&re, csview_from(input), "$3.$2.$1;", 0, NULL, CREG_STRIP));
         ASSERT_STREQ(cstr_str(&str), "31.12.2015;28.02.2022;");
     }
 }

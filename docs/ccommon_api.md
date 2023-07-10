@@ -369,8 +369,8 @@ int main()
 ### Coroutine API
 To resume the coroutine from where it was suspended with *cco_yield()*: call the coroutine again.
 
-**Note**: *cco_yield()* / *cco_await()* may not be called inside a `switch` statement; use 
-`if-else-if` constructs instead.
+**Note**: *cco_yield()* / *cco_await()* may not be called inside a `switch` statement from a
+cco_routine scope; Use `if-else-if` constructs instead.
 
 |           |  Function / operator                 | Description                             |
 |:----------|:-------------------------------------|:----------------------------------------|
@@ -384,11 +384,11 @@ To resume the coroutine from where it was suspended with *cco_yield()*: call the
 |           | `cco_yield_v();`                     | Yield/suspend execution (return void)   |
 |           | `cco_yield_v(ret);`                  | Yield/suspend execution (return ret)    |
 |           | `cco_yield_final();`                 | Yield final time, enables cleanup-state |
-|           | `cco_yield_final(val);`              | Yield a final value (e.g. CCO_ERROR) |
+|           | `cco_yield_final(ret);`              | Yield a final value (e.g. CCO_ERROR) |
 |           | `cco_await(condition);`              | Suspend until condition is true (return CCO_AWAIT)|
 |           | `cco_await_v(condition);`            | Suspend until condition is true (return void) |
 |           | `cco_await_v(condition, ret);`       | Suspend until condition is true (return ret)|
-|           | `cco_await_on(cocall);`              | Await on sub-coroutine to finish        |
+|           | `cco_await_on(cocall);`              | Await on sub-coroutine to finish (return its ret) |
 |           | `cco_return;`                        | Return from coroutine (inside cco_routine) |
 |           | `cco_closure(Closure, ...);`         | Define a coroutine closure struct (optional) |
 |           | Semaphores:                          |                                         | 

@@ -870,8 +870,8 @@ _regcomp1(_Reprog *pp, _Parser *par, const char *s, int cflags)
         par->error = CREG_OUTOFMEMORY;
         return NULL;
     }
-    pp->flags.icase = (cflags & CREG_C_ICASE) != 0;
-    pp->flags.dotall = (cflags & CREG_C_DOTALL) != 0;
+    pp->flags.icase = (cflags & CREG_ICASE) != 0;
+    pp->flags.dotall = (cflags & CREG_DOTALL) != 0;
     par->freep = pp->firstinst;
     par->classp = pp->cclass;
     par->error = 0;
@@ -1116,7 +1116,7 @@ _regexec1(const _Reprog *progp,  /* program to run */
                     /* efficiency: advance and re-evaluate */
                     continue;
                 case TOK_END:    /* Match! */
-                    match = !(mflags & CREG_M_FULLMATCH) ||
+                    match = !(mflags & CREG_FULLMATCH) ||
                             ((s == j->eol || r == 0 || r == '\n') &&
                             (tlp->se.m[0].str == bol || tlp->se.m[0].str[-1] == '\n'));
                     tlp->se.m[0].size = (s - tlp->se.m[0].str);
@@ -1184,9 +1184,9 @@ _regexec(const _Reprog *progp,    /* program to run */
     j.eol = NULL;
 
     if (mp && mp[0].size) {
-        if (mflags & CREG_M_STARTEND)
+        if (mflags & CREG_STARTEND)
             j.starts = mp[0].str, j.eol = mp[0].str + mp[0].size;
-        else if (mflags & CREG_M_NEXT)
+        else if (mflags & CREG_NEXT)
             j.starts = mp[0].str + mp[0].size;
     }
 
@@ -1298,7 +1298,7 @@ cregex_replace_sv_6(const cregex* re, csview input, const char* replace, int cou
     csview match[CREG_MAX_CAPTURES];
     int nmatch = cregex_captures(re) + 1;
     if (!count) count = INT32_MAX;
-    bool copy = !(rflags & CREG_R_STRIP);
+    bool copy = !(rflags & CREG_STRIP);
 
     while (count-- && cregex_find_sv(re, input, match) == CREG_OK) {
         _build_subst(replace, nmatch, match, mfun, &subst);

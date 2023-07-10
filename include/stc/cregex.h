@@ -39,15 +39,19 @@ THE SOFTWARE.
 
 enum {
     CREG_DEFAULT = 0,
+
     /* compile-flags */
-    CREG_C_DOTALL = 1<<0,    /* dot matches newline too */
-    CREG_C_ICASE = 1<<1,     /* ignore case */
+    CREG_DOTALL = 1<<0,    /* dot matches newline too */
+    CREG_ICASE = 1<<1,     /* ignore case */
+
     /* match-flags */
-    CREG_M_FULLMATCH = 1<<2, /* like start-, end-of-line anchors were in pattern: "^ ... $" */
-    CREG_M_NEXT = 1<<3,      /* use end of previous match[0] as start of input */
-    CREG_M_STARTEND = 1<<4,  /* use match[0] as start+end of input */
+    CREG_FULLMATCH = 1<<2, /* like start-, end-of-line anchors were in pattern: "^ ... $" */
+    CREG_NEXT = 1<<3,      /* use end of previous match[0] as start of input */
+    CREG_STARTEND = 1<<4,  /* use match[0] as start+end of input */
+
     /* replace-flags */
-    CREG_R_STRIP = 1<<5,     /* only keep the matched strings, strip rest */
+    CREG_STRIP = 1<<5,     /* only keep the matched strings, strip rest */
+
     /* limits */
     CREG_MAX_CLASSES = 16,
     CREG_MAX_CAPTURES = 32,
@@ -83,7 +87,7 @@ typedef struct {
 
 #define c_formatch(it, Re, Input) \
     for (cregex_iter it = {Re, Input}; \
-         cregex_find_4(it.re, it.input, it.match, CREG_M_NEXT) == CREG_OK; )
+         cregex_find_4(it.re, it.input, it.match, CREG_NEXT) == CREG_OK; )
 
 STC_INLINE cregex cregex_init(void) {
     cregex re = {0};
@@ -117,7 +121,7 @@ int cregex_find_4(const cregex* re, const char* input, csview match[], int mflag
 STC_INLINE int cregex_find_sv(const cregex* re, csview input, csview match[]) {
     csview *mp = NULL;
     if (match) { match[0] = input; mp = match; }
-    return cregex_find(re, input.str, mp, CREG_M_STARTEND);
+    return cregex_find(re, input.str, mp, CREG_STARTEND);
 }
 
 /* match + compile RE pattern */
