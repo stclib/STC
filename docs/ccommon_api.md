@@ -82,16 +82,16 @@ c_forrange (i, 30, 0, -5) printf(" %lld", i);
 ### crange
 A number sequence generator type, similar to [boost::irange](https://www.boost.org/doc/libs/release/libs/range/doc/html/range/reference/ranges/irange.html). The **crange_value** type is `long long`. Below *start*, *stop*, and *step* are of type *crange_value*:
 ```c
-crange      crange_init(stop);              // will generate 0, 1, ..., stop-1
-crange      crange_init(start, stop);       // will generate start, start+1, ... stop-1
-crange      crange_init(start, stop, step); // will generate start, start+step, ... upto-not-including stop
+crange      crange_make(stop);              // will generate 0, 1, ..., stop-1
+crange      crange_make(start, stop);       // will generate start, start+1, ... stop-1
+crange      crange_make(start, stop, step); // will generate start, start+step, ... upto-not-including stop
                                             // note that step may be negative.
 crange_iter crange_begin(crange* self);
 crange_iter crange_end(crange* self);
 void        crange_next(crange_iter* it);
 
 // 1. All primes less than 32:
-crange r1 = crange_init(3, 32, 2);
+crange r1 = crange_make(3, 32, 2);
 printf("2"); // first prime
 c_forfilter (i, crange, r1, isPrime(*i.ref))
     printf(" %lld", *i.ref);
@@ -99,7 +99,7 @@ c_forfilter (i, crange, r1, isPrime(*i.ref))
 
 // 2. The first 11 primes:
 printf("2");
-crange range = crange_init(3, INT64_MAX, 2);
+crange range = crange_make(3, INT64_MAX, 2);
 c_forfilter (i, crange, range,
     isPrime(*i.ref) &&
     c_flt_take(10)
@@ -140,7 +140,7 @@ bool isPrime(long long i) {
 int main() {
     // Get 10 prime numbers starting from 1000. Skip the first 15 primes,
     // then select every 25th prime (including the initial).
-    crange R = crange_init(1001, INT64_MAX, 2); // 1001, 1003, ...
+    crange R = crange_make(1001, INT64_MAX, 2); // 1001, 1003, ...
 
     c_forfilter (i, crange, R,
                     isPrime(*i.ref)            &&
@@ -171,7 +171,6 @@ Make any container from an initializer list:
 ...
 // Initializes with const char*, internally converted to cstr!
 cset_str myset = c_init(cset_str, {"This", "is", "the", "story"});
-cset_str myset2 = c_clone(myset); 
 
 int x = 7, y = 8;
 cmap_int mymap = c_init(cmap_int, { {1, 2}, {3, 4}, {5, 6}, {x, y} });

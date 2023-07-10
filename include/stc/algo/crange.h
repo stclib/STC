@@ -27,14 +27,14 @@
 
 int main()
 {
-    crange r1 = crange_init(80, 90);
+    crange r1 = crange_make(80, 90);
     c_foreach (i, crange, r1)
         printf(" %lld", *i.ref);
     puts("");
 
     // use a temporary crange object.
     int a = 100, b = INT32_MAX;
-    crange r2 = crange_init(a, b, 8);
+    crange r2 = crange_make(a, b, 8);
     c_forfilter (i, crange, r2,
                     c_flt_skip(i, 10) &&
                     c_flt_take(i, 3))
@@ -51,11 +51,11 @@ typedef long long crange_value;
 typedef struct { crange_value start, end, step, value; } crange;
 typedef struct { crange_value *ref, end, step; } crange_iter;
 
-#define crange_init(...) c_MACRO_OVERLOAD(crange_init, __VA_ARGS__)
-#define crange_init_1(stop) crange_init_3(0, stop, 1)
-#define crange_init_2(start, stop) crange_init_3(start, stop, 1)
+#define crange_make(...) c_MACRO_OVERLOAD(crange_make, __VA_ARGS__)
+#define crange_make_1(stop) crange_make_3(0, stop, 1)
+#define crange_make_2(start, stop) crange_make_3(start, stop, 1)
 
-STC_INLINE crange crange_init_3(crange_value start, crange_value stop, crange_value step)
+STC_INLINE crange crange_make_3(crange_value start, crange_value stop, crange_value step)
     { crange r = {start, stop - (step > 0), step}; return r; }
 
 STC_INLINE crange_iter crange_begin(crange* self)

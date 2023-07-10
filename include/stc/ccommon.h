@@ -241,8 +241,4 @@ STC_INLINE intptr_t cnextpow2(intptr_t n) {
         asm("mulq %3" : "=a"(*(lo)), "=d"(*(hi)) : "a"(a), "rm"(b))
 #endif
 
-// [deprecated]:
-#define c_make(...) c_init(__VA_ARGS__)
-#define cspan_make(...) cspan_init(__VA_ARGS__)
-#define crange_make(...) crange_init(__VA_ARGS__)
 #endif // CCOMMON_H_INCLUDED

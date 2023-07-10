@@ -3,7 +3,7 @@
 STC - Smart Template Containers
 ===============================
 
-### [Version 4.3 RC2](#version-history)
+### [Version 4.3 RC3](#version-history)
 
 ---
 Description
@@ -613,10 +613,20 @@ STC is generally very memory efficient. Memory usage for the different container
 # Version History
 
 ## Version 4.3
-- algo/coroutine.h much improved with new API and more features.
+- Some breaking changes.
+- coroutines: much improved with some new API and added features.
+- cspan: Support for column-major (fortran order) multidim spans and transposed views.
+- Removed default comparison for clist, cvec and cdeq (as with cstack and cqueue). 
+    - Using i_val_str, i_valclass, i_valboxed still expects comparisons defined. 
+    - Define i_native_cmp to enable built-in i_val types comparisons (<, ==).
+- cstr and csview are now shared linked by default. Static linking by defining i_static.
 - New cdeq and cqueue implementation(s), using circular buffer.
-- Removed deprecated uppercase flow-control macro names.
+- Renamed i_extern => i_import.
+    - Define i_import before #include <stc/cstr.h> will also define utf8 case conversions.
+    - Define i_import before #include <stc/cregex.h> will also define cstr + utf8 tables.
+- Renamed c_make() => c_init() macro for initialization lists.
 - Removed deprecated crandom.h. Use crand.h with new API.
+- Removed deprecated uppercase flow-control macro names.
 - Improved default string hash function.
 
 ## Version 4.2
