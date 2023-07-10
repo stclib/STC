@@ -102,6 +102,9 @@
 #if c_option(c_no_emplace)
   #define i_no_emplace
 #endif
+#if c_option(c_native_cmp)
+  #define i_native_cmp
+#endif
 
 #if defined i_key_str
   #define i_keyclass cstr
@@ -194,10 +197,10 @@
 #endif
 
 #ifndef i_no_cmp
-  #if c_option(c_native_cmp) || defined i_native_cmp || defined i_cmp || defined i_less
+  #if defined i_cmp || defined i_less || defined i_native_cmp
     #define _i_has_cmp
   #endif
-  #if defined i_eq
+  #if defined i_eq || defined i_native_cmp
     #define _i_has_eq
   #endif
   
@@ -219,7 +222,7 @@
   #endif
 #endif
 
-#if !(defined i_hash || defined _i_cbox || defined _i_carc)
+#if !defined i_hash && (!(defined _i_cbox || defined _i_carc) || defined i_native_cmp)
   #define i_hash c_default_hash
 #endif
 

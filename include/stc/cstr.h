@@ -24,6 +24,7 @@
 /* A string type with short string optimization in C99 with good small-string
  * optimization (22 characters with 24 bytes string).
  */
+#define i_header // external linkage by default. override with i_static.
 #define _i_inc_utf8
 #include "utf8.h"
 
@@ -61,8 +62,8 @@ enum  { cstr_s_cap =            sizeof(cstr_buf) - 2 };
 #define cstr_l_drop(s)          c_free((s)->lon.data)
 
 #define cstr_is_long(s)         ((s)->sml.size > 127)
-extern char* _cstr_init(cstr* self, intptr_t len, intptr_t cap);
-extern char* _cstr_internal_move(cstr* self, intptr_t pos1, intptr_t pos2);
+STC_API char* _cstr_init(cstr* self, intptr_t len, intptr_t cap);
+STC_API char* _cstr_internal_move(cstr* self, intptr_t pos1, intptr_t pos2);
 
 /**************************** PUBLIC API **********************************/
 
@@ -70,22 +71,22 @@ extern char* _cstr_internal_move(cstr* self, intptr_t pos1, intptr_t pos2);
 #define cstr_null (c_LITERAL(cstr){0})
 #define cstr_toraw(self) cstr_str(self)
 
-extern char*        cstr_reserve(cstr* self, intptr_t cap);
-extern void         cstr_shrink_to_fit(cstr* self);
-extern char*        cstr_resize(cstr* self, intptr_t size, char value);
-extern intptr_t     cstr_find_at(const cstr* self, intptr_t pos, const char* search);
-extern intptr_t     cstr_find_sv(const cstr* self, csview search);
-extern char*        cstr_assign_n(cstr* self, const char* str, intptr_t len);
-extern char*        cstr_append_n(cstr* self, const char* str, intptr_t len);
-extern char*        cstr_append_uninit(cstr *self, intptr_t len);
-extern bool         cstr_getdelim(cstr *self, int delim, FILE *fp);
-extern void         cstr_erase(cstr* self, intptr_t pos, intptr_t len);
-extern void         cstr_u8_erase(cstr* self, intptr_t bytepos, intptr_t u8len);
-extern cstr         cstr_from_fmt(const char* fmt, ...);
-extern intptr_t     cstr_append_fmt(cstr* self, const char* fmt, ...);
-extern intptr_t     cstr_printf(cstr* self, const char* fmt, ...);
-extern cstr         cstr_replace_sv(csview sv, csview search, csview repl, int32_t count);
-extern uint64_t     cstr_hash(const cstr *self);
+STC_API char*       cstr_reserve(cstr* self, intptr_t cap);
+STC_API void        cstr_shrink_to_fit(cstr* self);
+STC_API char*       cstr_resize(cstr* self, intptr_t size, char value);
+STC_API intptr_t    cstr_find_at(const cstr* self, intptr_t pos, const char* search);
+STC_API intptr_t    cstr_find_sv(const cstr* self, csview search);
+STC_API char*       cstr_assign_n(cstr* self, const char* str, intptr_t len);
+STC_API char*       cstr_append_n(cstr* self, const char* str, intptr_t len);
+STC_API char*       cstr_append_uninit(cstr *self, intptr_t len);
+STC_API bool        cstr_getdelim(cstr *self, int delim, FILE *fp);
+STC_API void        cstr_erase(cstr* self, intptr_t pos, intptr_t len);
+STC_API void        cstr_u8_erase(cstr* self, intptr_t bytepos, intptr_t u8len);
+STC_API cstr        cstr_from_fmt(const char* fmt, ...);
+STC_API intptr_t    cstr_append_fmt(cstr* self, const char* fmt, ...);
+STC_API intptr_t    cstr_printf(cstr* self, const char* fmt, ...);
+STC_API cstr        cstr_replace_sv(csview sv, csview search, csview repl, int32_t count);
+STC_API uint64_t    cstr_hash(const cstr *self);
 
 STC_INLINE cstr_buf cstr_buffer(cstr* s) {
     return cstr_is_long(s)
@@ -169,31 +170,14 @@ STC_INLINE intptr_t cstr_capacity(const cstr* self)
 
 // utf8 methods defined in/depending on src/utf8code.c:
 
-extern cstr cstr_tocase(csview sv, int k);
-
-STC_INLINE cstr cstr_casefold_sv(csview sv)
-    { return cstr_tocase(sv, 0); }
-
-STC_INLINE cstr cstr_tolower_sv(csview sv)
-    { return cstr_tocase(sv, 1); }
-
-STC_INLINE cstr cstr_toupper_sv(csview sv)
-    { return cstr_tocase(sv, 2); }
-
-STC_INLINE cstr cstr_tolower(const char* str) 
-    { return cstr_tolower_sv(c_sv(str, c_strlen(str))); }
-
-STC_INLINE cstr cstr_toupper(const char* str) 
-    { return cstr_toupper_sv(c_sv(str, c_strlen(str))); }
-
-STC_INLINE void cstr_lowercase(cstr* self) 
-    { cstr_take(self, cstr_tolower_sv(cstr_sv(self))); }
-
-STC_INLINE void cstr_uppercase(cstr* self) 
-    { cstr_take(self, cstr_toupper_sv(cstr_sv(self))); }
-
-STC_INLINE bool cstr_valid_utf8(const cstr* self)
-    { return utf8_valid(cstr_str(self)); }
+STC_API cstr cstr_casefold_sv(csview sv);
+STC_API cstr cstr_tolower_sv(csview sv);
+STC_API cstr cstr_toupper_sv(csview sv);
+STC_API cstr cstr_tolower(const char* str);
+STC_API cstr cstr_toupper(const char* str);
+STC_API void cstr_lowercase(cstr* self);
+STC_API void cstr_uppercase(cstr* self);
+STC_API bool cstr_valid_utf8(const cstr* self);
 
 // other utf8 
 
@@ -410,7 +394,7 @@ fn_tocase[] = {{tolower, utf8_casefold},
                {tolower, utf8_tolower},
                {toupper, utf8_toupper}};
 
-cstr cstr_tocase(csview sv, int k) {
+STC_DEF cstr cstr_tocase(csview sv, int k) {
     cstr out = cstr_init();
     char *buf = cstr_reserve(&out, sv.size*3/2);
     const char *end = sv.str + sv.size;
@@ -430,25 +414,49 @@ cstr cstr_tocase(csview sv, int k) {
     cstr_shrink_to_fit(&out);
     return out;
 }
+
+STC_DEF cstr cstr_casefold_sv(csview sv)
+    { return cstr_tocase(sv, 0); }
+
+STC_DEF cstr cstr_tolower_sv(csview sv)
+    { return cstr_tocase(sv, 1); }
+
+STC_DEF cstr cstr_toupper_sv(csview sv)
+    { return cstr_tocase(sv, 2); }
+
+STC_DEF cstr cstr_tolower(const char* str) 
+    { return cstr_tolower_sv(c_sv(str, c_strlen(str))); }
+
+STC_DEF cstr cstr_toupper(const char* str) 
+    { return cstr_toupper_sv(c_sv(str, c_strlen(str))); }
+
+STC_DEF void cstr_lowercase(cstr* self) 
+    { cstr_take(self, cstr_tolower_sv(cstr_sv(self))); }
+
+STC_DEF void cstr_uppercase(cstr* self) 
+    { cstr_take(self, cstr_toupper_sv(cstr_sv(self))); }
+
+STC_DEF bool cstr_valid_utf8(const cstr* self)
+    { return utf8_valid(cstr_str(self)); }
 #endif // i_import
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined i_implement
+#if defined i_implement || defined i_static
 #ifndef CSTR_C_INCLUDED
 #define CSTR_C_INCLUDED
 
-uint64_t cstr_hash(const cstr *self) {
+STC_DEF uint64_t cstr_hash(const cstr *self) {
     csview sv = cstr_sv(self);
     return cfasthash(sv.str, sv.size);
 }
 
-intptr_t cstr_find_sv(const cstr* self, csview search) {
+STC_DEF intptr_t cstr_find_sv(const cstr* self, csview search) {
     csview sv = cstr_sv(self);
     char* res = cstrnstrn(sv.str, search.str, sv.size, search.size);
     return res ? (res - sv.str) : c_NPOS;
 }
 
-char* _cstr_internal_move(cstr* self, const intptr_t pos1, const intptr_t pos2) {
+STC_DEF char* _cstr_internal_move(cstr* self, const intptr_t pos1, const intptr_t pos2) {
     cstr_buf r = cstr_buffer(self);
     if (pos1 != pos2) {
         const intptr_t newlen = (r.size + pos2 - pos1);
@@ -460,7 +468,7 @@ char* _cstr_internal_move(cstr* self, const intptr_t pos1, const intptr_t pos2) 
     return r.data;
 }
 
-char* _cstr_init(cstr* self, const intptr_t len, const intptr_t cap) {
+STC_DEF char* _cstr_init(cstr* self, const intptr_t len, const intptr_t cap) {
     if (cap > cstr_s_cap) { 
         self->lon.data = (char *)c_malloc(cap + 1);
         cstr_l_set_size(self, len);
@@ -471,7 +479,7 @@ char* _cstr_init(cstr* self, const intptr_t len, const intptr_t cap) {
     return self->sml.data;
 }
 
-void cstr_shrink_to_fit(cstr* self) {
+STC_DEF void cstr_shrink_to_fit(cstr* self) {
     cstr_buf r = cstr_buffer(self);
     if (r.size == r.cap)
         return;
@@ -485,7 +493,7 @@ void cstr_shrink_to_fit(cstr* self) {
     }
 }
 
-char* cstr_reserve(cstr* self, const intptr_t cap) {
+STC_DEF char* cstr_reserve(cstr* self, const intptr_t cap) {
     if (cstr_is_long(self)) {
         if (cap > cstr_l_cap(self)) {
             self->lon.data = (char *)c_realloc(self->lon.data, cap + 1);
@@ -507,7 +515,7 @@ char* cstr_reserve(cstr* self, const intptr_t cap) {
     return self->sml.data;
 }
 
-char* cstr_resize(cstr* self, const intptr_t size, const char value) {
+STC_DEF char* cstr_resize(cstr* self, const intptr_t size, const char value) {
     cstr_buf r = cstr_buffer(self);
     if (size > r.size) {
         if (size > r.cap && !(r.data = cstr_reserve(self, size)))
@@ -518,20 +526,20 @@ char* cstr_resize(cstr* self, const intptr_t size, const char value) {
     return r.data;
 }
 
-intptr_t cstr_find_at(const cstr* self, const intptr_t pos, const char* search) {
+STC_DEF intptr_t cstr_find_at(const cstr* self, const intptr_t pos, const char* search) {
     csview sv = cstr_sv(self);
     if (pos > sv.size) return c_NPOS;
     const char* res = strstr((char*)sv.str + pos, search);
     return res ? (res - sv.str) : c_NPOS;
 }
 
-char* cstr_assign_n(cstr* self, const char* str, const intptr_t len) {
+STC_DEF char* cstr_assign_n(cstr* self, const char* str, const intptr_t len) {
     char* d = cstr_reserve(self, len);
     if (d) { c_memmove(d, str, len); _cstr_set_size(self, len); }
     return d;
 }
 
-char* cstr_append_n(cstr* self, const char* str, const intptr_t len) {
+STC_DEF char* cstr_append_n(cstr* self, const char* str, const intptr_t len) {
     cstr_buf r = cstr_buffer(self);
     if (r.size + len > r.cap) {
         const size_t off = (size_t)(str - r.data);
@@ -544,7 +552,7 @@ char* cstr_append_n(cstr* self, const char* str, const intptr_t len) {
     return r.data;
 }
 
-char* cstr_append_uninit(cstr *self, intptr_t len) {
+STC_DEF char* cstr_append_uninit(cstr *self, intptr_t len) {
     cstr_buf r = cstr_buffer(self);
     if (r.size + len > r.cap && !(r.data = cstr_reserve(self, r.size*3/2 + len)))
         return NULL;
@@ -552,7 +560,7 @@ char* cstr_append_uninit(cstr *self, intptr_t len) {
     return r.data + r.size;
 }
 
-bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
+STC_DEF bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
     int c = fgetc(fp);
     if (c == EOF)
         return false;
@@ -572,8 +580,7 @@ bool cstr_getdelim(cstr *self, const int delim, FILE *fp) {
     }
 }
 
-cstr
-cstr_replace_sv(csview in, csview search, csview repl, int32_t count) {
+STC_DEF cstr cstr_replace_sv(csview in, csview search, csview repl, int32_t count) {
     cstr out = cstr_null;
     intptr_t from = 0; char* res;
     if (!count) count = INT32_MAX;
@@ -588,14 +595,14 @@ cstr_replace_sv(csview in, csview search, csview repl, int32_t count) {
     return out;
 }
 
-void cstr_erase(cstr* self, const intptr_t pos, intptr_t len) {
+STC_DEF void cstr_erase(cstr* self, const intptr_t pos, intptr_t len) {
     cstr_buf r = cstr_buffer(self);
     if (len > r.size - pos) len = r.size - pos;
     c_memmove(&r.data[pos], &r.data[pos + len], r.size - (pos + len));
     _cstr_set_size(self, r.size - len);
 }
 
-void cstr_u8_erase(cstr* self, const intptr_t bytepos, const intptr_t u8len) {
+STC_DEF void cstr_u8_erase(cstr* self, const intptr_t bytepos, const intptr_t u8len) {
     cstr_buf r = cstr_buffer(self);
     intptr_t len = utf8_pos(r.data + bytepos, u8len);
     c_memmove(&r.data[bytepos], &r.data[bytepos + len], r.size - (bytepos + len));
@@ -610,7 +617,7 @@ void cstr_u8_erase(cstr* self, const intptr_t bytepos, const intptr_t u8len) {
 #  pragma warning(disable: 4996)
 #endif
 
-intptr_t cstr_vfmt(cstr* self, intptr_t start, const char* fmt, va_list args) {
+STC_DEF intptr_t cstr_vfmt(cstr* self, intptr_t start, const char* fmt, va_list args) {
     va_list args2;
     va_copy(args2, args);
     const int n = vsnprintf(NULL, 0ULL, fmt, args);
@@ -625,7 +632,7 @@ intptr_t cstr_vfmt(cstr* self, intptr_t start, const char* fmt, va_list args) {
 #  pragma warning(pop)
 #endif
 
-cstr cstr_from_fmt(const char* fmt, ...) {
+STC_DEF cstr cstr_from_fmt(const char* fmt, ...) {
     cstr s = cstr_null;
     va_list args;
     va_start(args, fmt);
@@ -634,7 +641,7 @@ cstr cstr_from_fmt(const char* fmt, ...) {
     return s;
 }
 
-intptr_t cstr_append_fmt(cstr* self, const char* fmt, ...) {
+STC_DEF intptr_t cstr_append_fmt(cstr* self, const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
     const intptr_t n = cstr_vfmt(self, cstr_size(self), fmt, args);
@@ -643,7 +650,7 @@ intptr_t cstr_append_fmt(cstr* self, const char* fmt, ...) {
 }
 
 /* NB! self-data in args is UB */
-intptr_t cstr_printf(cstr* self, const char* fmt, ...) {
+STC_DEF intptr_t cstr_printf(cstr* self, const char* fmt, ...) {
     va_list args;
     va_start(args, fmt);
     const intptr_t n = cstr_vfmt(self, 0, fmt, args);

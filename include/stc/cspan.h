@@ -189,7 +189,7 @@ typedef struct { int32_t d[6]; } cspan_tuple6;
 
 STC_INLINE intptr_t _cspan_size(const int32_t shape[], int rank) {
     intptr_t sz = shape[0];
-    while (rank-- > 1) sz *= shape[rank];
+    while (--rank > 0) sz *= shape[rank];
     return sz;
 }
 

@@ -20,6 +20,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
+#define i_header // external linkage by default. override with i_static.
 #define _i_inc_utf8
 #include "utf8.h"
 
@@ -33,12 +34,12 @@
 #define             csview_lit(literal) c_sv_1(literal)
 #define             csview_from_n(str, n) c_sv_2(str, n)
 
-extern csview_iter  csview_advance(csview_iter it, intptr_t pos);
-extern intptr_t     csview_find_sv(csview sv, csview search);
-extern uint64_t     csview_hash(const csview *self);
-extern csview       csview_slice_ex(csview sv, intptr_t p1, intptr_t p2);
-extern csview       csview_substr_ex(csview sv, intptr_t pos, intptr_t n);
-extern csview       csview_token(csview sv, const char* sep, intptr_t* start);
+STC_API csview_iter csview_advance(csview_iter it, intptr_t pos);
+STC_API intptr_t    csview_find_sv(csview sv, csview search);
+STC_API uint64_t    csview_hash(const csview *self);
+STC_API csview      csview_slice_ex(csview sv, intptr_t p1, intptr_t p2);
+STC_API csview      csview_substr_ex(csview sv, intptr_t pos, intptr_t n);
+STC_API csview      csview_token(csview sv, const char* sep, intptr_t* start);
 
 STC_INLINE csview   csview_from(const char* str)
                         { return c_LITERAL(csview){str, c_strlen(str)}; }
@@ -150,11 +151,11 @@ STC_INLINE csview cstr_u8_substr(const cstr* self , intptr_t bytepos, intptr_t u
 #endif
 
 /* -------------------------- IMPLEMENTATION ------------------------- */
-#if defined i_implement
+#if defined i_implement || defined i_static
 #ifndef CSVIEW_C_INCLUDED
 #define CSVIEW_C_INCLUDED
 
-csview_iter csview_advance(csview_iter it, intptr_t pos) {
+STC_DEF csview_iter csview_advance(csview_iter it, intptr_t pos) {
     int inc = -1;
     if (pos > 0) pos = -pos, inc = 1;
     while (pos && it.ref != it.u8.end) pos += (*(it.ref += inc) & 0xC0) != 0x80;
@@ -163,15 +164,15 @@ csview_iter csview_advance(csview_iter it, intptr_t pos) {
     return it;
 }
 
-intptr_t csview_find_sv(csview sv, csview search) {
+STC_DEF intptr_t csview_find_sv(csview sv, csview search) {
     char* res = cstrnstrn(sv.str, search.str, sv.size, search.size);
     return res ? (res - sv.str) : c_NPOS;
 }
 
-uint64_t csview_hash(const csview *self)
+STC_DEF uint64_t csview_hash(const csview *self)
     { return cfasthash(self->str, self->size); }
 
-csview csview_substr_ex(csview sv, intptr_t pos, intptr_t n) {
+STC_DEF csview csview_substr_ex(csview sv, intptr_t pos, intptr_t n) {
     if (pos < 0) { 
         pos += sv.size;
         if (pos < 0) pos = 0;
@@ -182,7 +183,7 @@ csview csview_substr_ex(csview sv, intptr_t pos, intptr_t n) {
     return sv;
 }
 
-csview csview_slice_ex(csview sv, intptr_t p1, intptr_t p2) {
+STC_DEF csview csview_slice_ex(csview sv, intptr_t p1, intptr_t p2) {
     if (p1 < 0) { 
         p1 += sv.size;
         if (p1 < 0) p1 = 0;
@@ -193,7 +194,7 @@ csview csview_slice_ex(csview sv, intptr_t p1, intptr_t p2) {
     return sv;
 }
 
-csview csview_token(csview sv, const char* sep, intptr_t* start) {
+STC_DEF csview csview_token(csview sv, const char* sep, intptr_t* start) {
     intptr_t sep_size = c_strlen(sep);
     csview slice = {sv.str + *start, sv.size - *start};
     const char* res = cstrnstrn(slice.str, sep, slice.size, sep_size);

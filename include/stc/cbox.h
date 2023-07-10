@@ -196,7 +196,7 @@ STC_INLINE void _cx_MEMB(_assign)(_cx_Self* self, _cx_Self* moved) {
         { return i_hash(rx); }
 
     STC_INLINE uint64_t _cx_MEMB(_hash)(const _cx_Self* self)
-        { return i_hash(self->get); }
+        { _cx_raw rx = i_keyto(self->get); return i_hash(&rx); }
 #else
     STC_INLINE uint64_t _cx_MEMB(_raw_hash)(const _cx_raw* rx)
         { return c_default_hash(&rx); }
