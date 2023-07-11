@@ -12,8 +12,8 @@ enum {
     nz = 64
 };
 int lx = 15, ly = 10, lz = 5;
-int hx = 20, hy = 15, hz = 15;
-intptr_t n = 1000000;
+int hx = 30, hy = 15, hz = 15;
+intptr_t n = 100000;
 
 // define the contents of two nx x ny x nz arrays in and out
 double Vout[nx * ny * nz];
@@ -49,10 +49,10 @@ static void TraditionalForLoop(intptr_t state)
     for (int s = 0; s < state; ++s) {
         for (int x = lx; x < hx; ++x) {
             for (int y = ly; y < hy; ++y) {
-                for (int z = lz; z < hz; ++z)
-                {
-                    double d = Vin[nz*(ny*x + y) + z];
-                    Vout[nz*(ny*x + y) + z] += d;
+                for (int z = lz; z < hz; ++z) {
+                    int i = nz*(ny*x + y) + z;
+                    double d = Vin[i];
+                    Vout[i] += d;
                     sum += d;
                 }
             }
@@ -64,13 +64,13 @@ static void TraditionalForLoop(intptr_t state)
 
 static void MDRanges_nested_loop(intptr_t state)
 {
+    clock_t t = clock();
     MD3 r_in = cspan_md('C', Vin, nx, ny, nz);
     MD3 r_out = cspan_md('C', Vout, nx, ny, nz);
     r_in = cspan_slice(MD3, &r_in, {lx, hx}, {ly, hy}, {lz, hz});
     r_out = cspan_slice(MD3, &r_out, {lx, hx}, {ly, hy}, {lz, hz});
 
     // C++23: for (auto [o, i] : std::views::zip(flat(r_out), flat(r_in))) { o = i; }
-    clock_t t = clock();
     double sum = 0;
 
     for (intptr_t s = 0; s < state; ++s) {

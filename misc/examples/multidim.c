@@ -28,7 +28,6 @@ int main()
     }
     puts("ss3 = ms3[:, 1:3, 1:3]");
     ispan3 ss3 = ms3;
-    //cspan_slice(&ss3, {c_ALL}, {1,3}, {1,3});
     ss3 = cspan_slice(ispan3, &ms3, {c_ALL}, {1,3}, {1,3});
 
     for (int i=0; i != ss3.shape[0]; i++) {

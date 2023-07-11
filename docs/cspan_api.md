@@ -29,7 +29,11 @@ a compile error is issued. Runtime bounds checks are enabled by default (define 
 SpanType        cspan_init(T SpanType, {v1, v2, ...});              // make a 1-d cspan from values
 SpanType        cspan_from(STCContainer* cnt);                      // make a 1-d cspan from compatible STC container
 SpanType        cspan_from_array(ValueType array[]);                // make a 1-d cspan from C array
-SpanTypeN       cspan_md(char order, ValueType* data, d1, d2, ...); // make a multi-dim cspan. order: 'C' or 'F' (Fortran)
+                
+                // make a subspan of input span rank. Like e.g. cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
+SpanType        cspan_subspan(const SpanType* span, intptr_t offset, intptr_t count);
+SpanType2       cspan_subspan2(const SpanType2* span, intptr_t offset, intptr_t count);
+SpanType3       cspan_subspan3(const SpanType3* span, intptr_t offset, intptr_t count);
 
 intptr_t        cspan_size(const SpanTypeN* self);                  // return number of elements
 intptr_t        cspan_rank(const SpanTypeN* self);                  // dimensions; compile time constant
@@ -39,35 +43,30 @@ ValueType*      cspan_at(const SpanTypeN* self, intptr_t x, ...);   // #args mus
 ValueType*      cspan_front(const SpanTypeN* self);
 ValueType*      cspan_back(const SpanTypeN* self);
 
-                // general index slicing to create a subspan.
-                // {i} reduces rank. {i,c_END} slice to end. {c_ALL} use the full extent.
-SpanTypeR       cspan_slice(T SpanTypeR, const SpanTypeN* self, {x0,x1}, {y0,y1}.., {N0,N1});
-
-                // transpose the md span (inverse axes). no changes to the underlying array.
-void            cspan_transpose(const SpanTypeN* self);
-                
-                // create a subspan of lower rank. Like e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
-SpanType        cspan_submd2(const SpanType2* self, intptr_t x);        // return a 1d subspan from a 2d span.
-SpanTypeN       cspan_submd3(const SpanType3* self, intptr_t x, ...);   // return a 1d or 2d subspan from a 3d span.
-SpanTypeN       cspan_submd4(const SpanType4* self, intptr_t x, ...);   // number of args determines rank of output span.
-
-                // create a subspan of same rank. Like e.g. cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
-SpanType        cspan_subspan(const SpanType* self, intptr_t offset, intptr_t count);
-SpanType2       cspan_subspan2(const SpanType2* self, intptr_t offset, intptr_t count);
-SpanType3       cspan_subspan3(const SpanType3* self, intptr_t offset, intptr_t count);
-
 SpanTypeN_iter  SpanType_begin(const SpanTypeN* self);
 SpanTypeN_iter  SpanType_end(const SpanTypeN* self);
 void            SpanType_next(SpanTypeN_iter* it);
-```
-## Types
 
-| Type name         | Type definition                                     | Used to represent... |
+SpanTypeN       cspan_md(char order, ValueType* data, d1, d2, ...); // make a multi-dim cspan. order: 'C' or 'F' (Fortran)
+                // transpose the md span (inverse axes). no changes to the underlying array.
+void            cspan_transpose(const SpanTypeN* self);
+
+                // create a sub md span of lower rank. Like e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
+OutSpan1        cspan_submd2(const SpanType2* parent, intptr_t x);        // return a 1d subspan from a 2d span.
+OutSpanN        cspan_submd3(const SpanType3* parent, intptr_t x, ...);   // return a 1d or 2d subspan from a 3d span.
+OutSpanN        cspan_submd4(const SpanType4* parent, intptr_t x, ...);   // number of args decides rank of output span.
+
+                // general slicing of an md span.
+                // {i}: reduce rank. {i,c_END}: slice to end. {c_ALL}: use full extent.
+OutSpanN        cspan_slice(TYPE OutSpanN, const SpanTypeN* parent, {x0,x1}, {y0,y1}.., {N0,N1});
+```
+## TypesPd
+| Type name         | Type definition / usage                             | Used to represent... |
 |:------------------|:----------------------------------------------------|:---------------------|
 | SpanTypeN         | `struct { ValueType *data; uint32_t shape[N]; .. }` | SpanType with rank N |
 | SpanTypeN`_value` | `ValueType`                                         | The ValueType        |
-| `c_ALL`           |                                                     | Full extent          |
-| `c_END`           |                                                     | End of extent        |
+| `c_ALL`           | Use with `cspan_slice()`.                           | Full extent          |
+| `c_END`           |            "                                        | End of extent        |
      
 ## Example 1
 

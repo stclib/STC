@@ -107,58 +107,37 @@ int demo2() {
 #define using_cspan2(Self, T) using_cspan_3(Self, T, 1); using_cspan_3(Self##2, T, 2)
 #define using_cspan3(Self, T) using_cspan2(Self, T); using_cspan_3(Self##3, T, 3)
 #define using_cspan4(Self, T) using_cspan3(Self, T); using_cspan_3(Self##4, T, 4)
-typedef struct { int32_t d[1]; } cspan_tuple1;
-typedef struct { int32_t d[2]; } cspan_tuple2;
-typedef struct { int32_t d[3]; } cspan_tuple3;
-typedef struct { int32_t d[4]; } cspan_tuple4;
-typedef struct { int32_t d[5]; } cspan_tuple5;
-typedef struct { int32_t d[6]; } cspan_tuple6;
+#define using_cspan_tuple(N) typedef struct { int32_t d[N]; } cspan_tuple##N
+using_cspan_tuple(1); using_cspan_tuple(2);
+using_cspan_tuple(3); using_cspan_tuple(4);
+using_cspan_tuple(5); using_cspan_tuple(6);
+using_cspan_tuple(7); using_cspan_tuple(8);
+
 #define c_END -1
 #define c_ALL 0,-1
-
-#define cspan_md(order, array, ...) \
-    {.data=array, .shape={__VA_ARGS__}, \
-     .stride=*(c_PASTE(cspan_tuple, c_NUMARGS(__VA_ARGS__))*)_cspan_shape2stride(order, ((int32_t[]){__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))}
-
-#define cspan_transpose(self) \
-    _cspan_transpose((self)->shape, (self)->stride.d, cspan_rank(self))
 
 /* Use cspan_init() for static initialization only. c_init() for non-static init. */
 #define cspan_init(SpanType, ...) \
     {.data=(SpanType##_value[])__VA_ARGS__, .shape={sizeof((SpanType##_value[])__VA_ARGS__)/sizeof(SpanType##_value)}, .stride={.d={1}}}
 
-#define cspan_slice(OutSpan, parent, ...) \
-    OutSpan##_slice_((parent)->data, (parent)->shape, (parent)->stride.d, cspan_rank(parent) + \
-                     c_static_assert(cspan_rank(parent) == sizeof((int32_t[][2]){__VA_ARGS__})/sizeof(int32_t[2])), \
-                     (const int32_t[][2]){__VA_ARGS__})
-     
 /* create a cspan from a cvec, cstack, cdeq, cqueue, or cpque (heap) */
 #define cspan_from(container) \
     {.data=(container)->data, .shape={(int32_t)(container)->_len}, .stride={.d={1}}}
 
 #define cspan_from_array(array) \
-    {.data=(array) + c_static_assert(sizeof(array) != sizeof(void*)), .shape={c_arraylen(array)}, .stride={.d={1}}}
+    {.data=(array), .shape={c_arraylen(array)}, .stride={.d={1}}}
 
 #define cspan_size(self) _cspan_size((self)->shape, cspan_rank(self))
 #define cspan_rank(self) c_arraylen((self)->shape)
 #define cspan_is_order_F(self) ((self)->stride.d[0] < (self)->stride.d[cspan_rank(self) - 1])
 
 #define cspan_index(self, ...) c_PASTE(cspan_idx_, c_NUMARGS(__VA_ARGS__))(self, __VA_ARGS__)
-#define cspan_idx_1 cspan_idx_3
-#define cspan_idx_2 cspan_idx_3
-#define cspan_idx_3(self, ...) \
-    c_PASTE(_cspan_idx, c_NUMARGS(__VA_ARGS__))((self)->shape, (self)->stride, __VA_ARGS__) // small/fast
-#define cspan_idx_4(self, ...) \
-    (_cspan_idxN(c_NUMARGS(__VA_ARGS__), (self)->shape, (self)->stride.d, (int32_t[]){__VA_ARGS__}) + \
-     c_static_assert(cspan_rank(self) == c_NUMARGS(__VA_ARGS__))) // general
-#define cspan_idx_5 cspan_idx_4
-#define cspan_idx_6 cspan_idx_4
 
 #define cspan_at(self, ...) ((self)->data + cspan_index(self, __VA_ARGS__))
 #define cspan_front(self) ((self)->data)
 #define cspan_back(self) ((self)->data + cspan_size(self) - 1)
 
-// cspan_subspanN. (N<=3) Optimized, same as e.g. cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
+// cspan_subspanX: (X <= 3) optimized. Similar to cspan_slice(Span3, &ms3, {off,off+count}, {c_ALL}, {c_ALL});
 #define cspan_subspan(self, offset, count) \
     {.data=cspan_at(self, offset), .shape={count}, .stride=(self)->stride}
 #define cspan_subspan2(self, offset, count) \
@@ -166,16 +145,17 @@ typedef struct { int32_t d[6]; } cspan_tuple6;
 #define cspan_subspan3(self, offset, count) \
     {.data=cspan_at(self, offset, 0, 0), .shape={count, (self)->shape[1], (self)->shape[2]}, .stride=(self)->stride}
 
-// cspan_submdN: reduce rank (N<=4) Optimized, same as e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
-#define cspan_submd4(...) c_MACRO_OVERLOAD(cspan_submd4, __VA_ARGS__)
-#define cspan_submd3(...) c_MACRO_OVERLOAD(cspan_submd3, __VA_ARGS__)
+
+// cspan_submd(): Reduce rank (N <= 4) Optimized, same as e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
 #define cspan_submd2(self, x) \
     {.data=cspan_at(self, x, 0), .shape={(self)->shape[1]}, .stride={.d={(self)->stride.d[1]}}}
+#define cspan_submd3(...) c_MACRO_OVERLOAD(cspan_submd3, __VA_ARGS__)
 #define cspan_submd3_2(self, x) \
     {.data=cspan_at(self, x, 0, 0), .shape={(self)->shape[1], (self)->shape[2]}, \
                                     .stride={.d={(self)->stride.d[1], (self)->stride.d[2]}}}
 #define cspan_submd3_3(self, x, y) \
     {.data=cspan_at(self, x, y, 0), .shape={(self)->shape[2]}, .stride={.d={(self)->stride.d[2]}}}
+#define cspan_submd4(...) c_MACRO_OVERLOAD(cspan_submd4, __VA_ARGS__)
 #define cspan_submd4_2(self, x) \
     {.data=cspan_at(self, x, 0, 0, 0), .shape={(self)->shape[1], (self)->shape[2], (self)->shape[3]}, \
                                        .stride={.d={(self)->stride.d[1], (self)->stride.d[2], (self)->stride.d[3]}}}
@@ -185,7 +165,33 @@ typedef struct { int32_t d[6]; } cspan_tuple6;
 #define cspan_submd4_4(self, x, y, z) \
     {.data=cspan_at(self, x, y, z, 0), .shape={(self)->shape[3]}, .stride={.d={(self)->stride.d[3]}}}
 
-// private definitions:
+
+#define cspan_md(order, array, ...) \
+    {.data=array, .shape={__VA_ARGS__}, \
+     .stride=*(c_PASTE(cspan_tuple, c_NUMARGS(__VA_ARGS__))*)_cspan_shape2stride(order, ((int32_t[]){__VA_ARGS__}), c_NUMARGS(__VA_ARGS__))}
+
+#define cspan_transpose(self) \
+    _cspan_transpose((self)->shape, (self)->stride.d, cspan_rank(self))
+
+
+// General slicing function;
+#define cspan_slice(OutSpan, parent, ...) \
+    OutSpan##_slice_((parent)->data, (parent)->shape, (parent)->stride.d, cspan_rank(parent) + \
+                     c_static_assert(cspan_rank(parent) == sizeof((int32_t[][2]){__VA_ARGS__})/sizeof(int32_t[2])), \
+                     (const int32_t[][2]){__VA_ARGS__})
+
+// ----------- private definitions ------------
+
+// cspan_index() helpers:
+#define cspan_idx_1 cspan_idx_3
+#define cspan_idx_2 cspan_idx_3
+#define cspan_idx_3(self, ...) \
+    c_PASTE(_cspan_idx, c_NUMARGS(__VA_ARGS__))((self)->shape, (self)->stride, __VA_ARGS__) // small/fast
+#define cspan_idx_4(self, ...) \
+    (_cspan_idxN(c_NUMARGS(__VA_ARGS__), (self)->shape, (self)->stride.d, (int32_t[]){__VA_ARGS__}) + \
+     c_static_assert(cspan_rank(self) == c_NUMARGS(__VA_ARGS__))) // general
+#define cspan_idx_5 cspan_idx_4
+#define cspan_idx_6 cspan_idx_4
 
 STC_INLINE intptr_t _cspan_size(const int32_t shape[], int rank) {
     intptr_t sz = shape[0];
