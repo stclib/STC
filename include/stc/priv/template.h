@@ -164,6 +164,8 @@
   #error "No i_key or i_val defined"
 #elif defined i_keyraw ^ defined i_keyto
   #error "Both i_keyraw/valraw and i_keyto/valto must be defined, if any"
+#elif defined i_keyfrom && !defined i_keyraw && !defined i_keyclone
+  #define i_keyclone i_keyfrom
 #elif defined i_keyfrom && !defined i_keyraw
   #error "i_keyfrom/valfrom defined without i_keyraw/valraw"
 #elif defined i_from || defined i_drop
@@ -261,7 +263,9 @@
   #error "i_val* must be defined for maps"
 #endif
 
-#if !(defined i_valclone || defined i_no_clone) && (defined i_valdrop || defined i_valraw)
+#if !defined i_valclone && defined i_valfrom && !defined i_valraw
+  #define i_valclone i_valfrom
+#elif !(defined i_valclone || defined i_no_clone) && (defined i_valdrop || defined i_valraw)
   #error i_valclone should be defined when i_valdrop or i_valraw is defined
 #endif
 #ifndef i_valraw

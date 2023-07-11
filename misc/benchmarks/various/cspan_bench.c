@@ -28,8 +28,8 @@ static void MDRanges_setup(intptr_t state)
 
     for (intptr_t s = 0; s < state; ++s)
     {
-        MD3 r_in = cspan_md('C', Vin, nx, ny, nz);
-        MD3 r_out = cspan_md('C', Vout, nx, ny, nz);
+        MD3 r_in = cspan_md(Vin, nx, ny, nz);
+        MD3 r_out = cspan_md(Vout, nx, ny, nz);
 
         r_in = cspan_slice(MD3, &r_in, {lx, hx}, {ly, hy}, {lz, hz});
         r_out = cspan_slice(MD3, &r_out, {lx, hx}, {ly, hy}, {lz, hz});
@@ -65,8 +65,8 @@ static void TraditionalForLoop(intptr_t state)
 static void MDRanges_nested_loop(intptr_t state)
 {
     clock_t t = clock();
-    MD3 r_in = cspan_md('C', Vin, nx, ny, nz);
-    MD3 r_out = cspan_md('C', Vout, nx, ny, nz);
+    MD3 r_in = cspan_md(Vin, nx, ny, nz);
+    MD3 r_out = cspan_md(Vout, nx, ny, nz);
     r_in = cspan_slice(MD3, &r_in, {lx, hx}, {ly, hy}, {lz, hz});
     r_out = cspan_slice(MD3, &r_out, {lx, hx}, {ly, hy}, {lz, hz});
 
@@ -91,8 +91,8 @@ static void MDRanges_nested_loop(intptr_t state)
 
 static void MDRanges_loop_over_joined(intptr_t state)
 {
-    MD3 r_in = cspan_md('C', Vin, nx, ny, nz);
-    MD3 r_out = cspan_md('C', Vout, nx, ny, nz);
+    MD3 r_in = cspan_md(Vin, nx, ny, nz);
+    MD3 r_out = cspan_md(Vout, nx, ny, nz);
     r_in = cspan_slice(MD3, &r_in, {lx, hx}, {ly, hy}, {lz, hz});
     r_out = cspan_slice(MD3, &r_out, {lx, hx}, {ly, hy}, {lz, hz});
 

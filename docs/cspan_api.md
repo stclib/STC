@@ -52,9 +52,9 @@ SpanTypeN       cspan_md(char order, ValueType* data, d1, d2, ...); // make a mu
 void            cspan_transpose(const SpanTypeN* self);
 
                 // create a sub md span of lower rank. Like e.g. cspan_slice(Span2, &ms4, {x}, {y}, {c_ALL}, {c_ALL});
-OutSpan1        cspan_submd2(const SpanType2* parent, intptr_t x);        // return a 1d subspan from a 2d span.
-OutSpanN        cspan_submd3(const SpanType3* parent, intptr_t x, ...);   // return a 1d or 2d subspan from a 3d span.
-OutSpanN        cspan_submd4(const SpanType4* parent, intptr_t x, ...);   // number of args decides rank of output span.
+OutSpan1        cspan_submd2(TYPE OutSpan1, const SpanType2* parent, intptr_t x);        // return a 1d subspan from a 2d span.
+OutSpanN        cspan_submd3(TYPE OutSpanN, const SpanType3* parent, intptr_t x, ...);   // return a 1d or 2d subspan from a 3d span.
+OutSpanN        cspan_submd4(TYPE OutSpanN, const SpanType4* parent, intptr_t x, ...);   // number of args decides rank of output span.
 
                 // general slicing of an md span.
                 // {i}: reduce rank. {i,c_END}: slice to end. {c_ALL}: use full extent.
@@ -101,9 +101,9 @@ using_cspan3(myspan, int); // define myspan, myspan2, myspan3.
 int main() {
     int arr[] = {1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24};
 
-    myspan3 ms3 = cspan_md('C', arr, 2, 3, 4); // C-order, i.e. row-major.
+    myspan3 ms3 = cspan_md(arr, 2, 3, 4); // C-order, i.e. row-major.
     myspan3 ss3 = cspan_slice(myspan3, &ms3, {c_ALL}, {1,3}, {2,c_END});
-    myspan2 ss2 = cspan_submd3(&ss3, 1);
+    myspan2 ss2 = cspan_submd3(myspan2, &ss3, 1);
 
     c_forrange (i, ss2.shape[0])
         c_forrange (j, ss2.shape[1])
@@ -150,10 +150,10 @@ int main()
     Span span = c_init(Span, {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13,
                               14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24});
     // create a 3d cspan:
-    Span3 span3 = cspan_md('C', span.data, 2, 4, 3);
+    Span3 span3 = cspan_md(span.data, 2, 4, 3);
 
     // reduce rank: (i.e. span3[1])
-    Span2 span2 = cspan_submd3(&span3, 1);
+    Span2 span2 = cspan_submd3(Span2, &span3, 1);
 
     puts("\niterate span2 flat:");
     c_foreach (i, Span2, span2)

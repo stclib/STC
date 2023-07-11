@@ -8,12 +8,12 @@ using_cspan3(intspan, int);
 
 CTEST(cspan, subdim) {
     int array[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-    intspan3 m = cspan_md('C', array, 2, 2, 3);
+    intspan3 m = cspan_md(array, 2, 2, 3);
     
     for (size_t i = 0; i < m.shape[0]; ++i) {
-        intspan2 sub_i = cspan_submd3(&m, i);
+        intspan2 sub_i = cspan_submd3(intspan2, &m, i);
         for (size_t j = 0; j < m.shape[1]; ++j) {
-            intspan sub_i_j = cspan_submd2(&sub_i, j);
+            intspan sub_i_j = cspan_submd2(intspan, &sub_i, j);
             for (size_t k = 0; k < m.shape[2]; ++k) {
                ASSERT_EQ(*cspan_at(&sub_i_j, k), *cspan_at(&m, i, j, k));
             }
@@ -23,7 +23,7 @@ CTEST(cspan, subdim) {
 
 CTEST(cspan, slice) {
     int array[] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-    intspan2 m1 = cspan_md('C', array, 3, 4);
+    intspan2 m1 = cspan_md(array, 3, 4);
 
     size_t sum1 = 0;
     for (size_t i = 0; i < m1.shape[0]; ++i) {
@@ -53,7 +53,7 @@ CTEST(cspan, slice2) {
         c_forrange (i, 10*20*30)
             cstack_int_push(&stack, i);
 
-        intspan3 ms3 = cspan_md('C', stack.data, 10, 20, 30);
+        intspan3 ms3 = cspan_md(stack.data, 10, 20, 30);
         ms3 = cspan_slice(intspan3, &ms3, {1,4}, {3,7}, {20,24});
 
         size_t sum = 0;
@@ -93,7 +93,7 @@ CTEST_SETUP(cspan_cube) {
     c_forrange (i, N)
         cstack_int_push(&_self->stack, i+1);
 
-    intspan3 ms3 = cspan_md('C', _self->stack.data, CUBE, CUBE, CUBE);
+    intspan3 ms3 = cspan_md(_self->stack.data, CUBE, CUBE, CUBE);
 
     c_forrange (i, 0, ms3.shape[0], TSIZE) {
         c_forrange (j, 0, ms3.shape[1], TSIZE) {
